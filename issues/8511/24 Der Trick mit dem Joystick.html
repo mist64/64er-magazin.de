@@ -16,60 +16,61 @@
 <body>
     <article>
         <h1>Der Trick mit dem Joystick</h1>
-<blockquote><p>Wissen Sie eigentlich, wie man den Joystick abfragt? Wenn nicht, dann sollten Sie unbedingt weiterlesen.</p></blockquote>
+        <p class="intro">Wissen Sie eigentlich, wie man den Joystick abfragt? Wenn nicht, dann sollten Sie unbedingt weiterlesen.</p>
 
-<p>Bei der Verwendung professioneller Software (wie zum Beispiel Spielen oder Zeichenprogrammen), fällt es einem schon gar nicht mehr auf. Der Gebrauch des Joysticks wird hier fast als Selbstverständlichkeit empfunden. Will man es dann selbst einmal versuchen, kommt man mit dem Commodore-Handbuch nicht weit. Deshalb soll hier ein Minimalprogramm zur Abfrage des Joysticks weiterhelfen. Diese zehn hier zu erarbeitenden Basic-Zeilen können vielleicht einmal die Basis eines komfortablen Menüs bilden.</p>
+        <p>Bei der Verwendung professioneller Software (wie zum Beispiel Spielen oder Zeichenprogrammen), fällt es einem schon gar nicht mehr auf. Der Gebrauch des Joysticks wird hier fast als Selbstverständlichkeit empfunden. Will man es dann selbst einmal versuchen, kommt man mit dem Commodore-Handbuch nicht weit. Deshalb soll hier ein Minimalprogramm zur Abfrage des Joysticks weiterhelfen. Diese zehn hier zu erarbeitenden Basic-Zeilen können vielleicht einmal die Basis eines komfortablen Menüs bilden.</p>
 
-<p>Zunächst einmal müssen wir wissen, was wir mit der Abfrage bezwecken wollen. Um uns auf das Wesentliche konzentrieren zu können, bewegen wir einfach ein invertiertes Leerzeichen über den Bildschirm, gesteuert durch den Joystick an Port 2. Die Abfrage selbst geschieht durch den Basic-Befehl PEEK, also das Auslesen einer Speicherzelle. Im Falle des Port 2 ist das die Adresse 56320. Für Port 1 wäre es 56321. Um uns auf dem Bildschirm orientieren zu können, benötigen wir dessen Anfangsadresse (1024, das ist links oben) und Endadresse (2023, rechts unten), sowie den dazugehörigen Farbspeicher (pro Bildpunkt 54272 addieren). Unser Programm fängt also so an:<br/>
-10 P0 = 56320:BILD = 1024:FARBE = 54272</p>
+        <p>Zunächst einmal müssen wir wissen, was wir mit der Abfrage bezwecken wollen. Um uns auf das Wesentliche konzentrieren zu können, bewegen wir einfach ein invertiertes Leerzeichen über den Bildschirm, gesteuert durch den Joystick an Port 2. Die Abfrage selbst geschieht durch den Basic-Befehl PEEK, also das Auslesen einer Speicherzelle. Im Falle des Port 2 ist das die Adresse 56320. Für Port 1 wäre es 56321. Um uns auf dem Bildschirm orientieren zu können, benötigen wir dessen Anfangsadresse (1024, das ist links oben) und Endadresse (2023, rechts unten), sowie den dazugehörigen Farbspeicher (pro Bildpunkt 54272 addieren). Unser Programm fängt also so an:<br />
+            10 P0 = 56320:BILD = 1024:FARBE = 54272</p>
 
-<p>Als nächstes müssen wir unser Zeichen auf den Bildschirm bringen — und zwar ohne ein eventuell bereits vorhandenes Zeichen zu verlieren. Und für den Fall, daß kein altes Zeichen vorhanden war, ist noch die aktuelle Farbe zu setzen. Das zu merkende Zeichen lesen wir mit PEEK aus, und heben es in der Variable ME auf. Dann schreiben wir unser Zeichen (es hat den Code 160) mit POKE auf den Bildschirm. Die aktuelle Farbe stellt das Betriebssystem in der Adresse 646 zu unserer Verfügung, die ebenfalls mit PEEK gelesen werden kann.<br/>
-20 ME = PEEK(BILD):POKE BILD, 160: POKE BILD + FARBE, PEEK(646)</p>
+        <p>Als nächstes müssen wir unser Zeichen auf den Bildschirm bringen — und zwar ohne ein eventuell bereits vorhandenes Zeichen zu verlieren. Und für den Fall, daß kein altes Zeichen vorhanden war, ist noch die aktuelle Farbe zu setzen. Das zu merkende Zeichen lesen wir mit PEEK aus, und heben es in der Variable ME auf. Dann schreiben wir unser Zeichen (es hat den Code 160) mit POKE auf den Bildschirm. Die aktuelle Farbe stellt das Betriebssystem in der Adresse 646 zu unserer Verfügung, die ebenfalls mit PEEK gelesen werden kann.<br />
+            20 ME = PEEK(BILD):POKE BILD, 160: POKE BILD + FARBE, PEEK(646)</p>
 
-<p>Jetzt kommt aber endlich der Joystick dran. Die Übergabe erfolgt in der Variablen JS:<br/>
-30 JS = PEEK(P0):BEWEG = 0</p>
+        <p>Jetzt kommt aber endlich der Joystick dran. Die Übergabe erfolgt in der Variablen JS:<br />
+            30 JS = PEEK(P0):BEWEG = 0</p>
 
-<p>BEWEG wird nachher die Summe der Bewegungen, die natürlich vor der Auswertung von JS auf Null gesetzt werden muß.</p>
+        <p>BEWEG wird nachher die Summe der Bewegungen, die natürlich vor der Auswertung von JS auf Null gesetzt werden muß.</p>
 
-<p>Vom Byte des Joystick-Ports interessieren uns genau die ersten fünf Bits, die über die logische Verknüpfung AND ausgefiltert werden. Ein vom Joystick aktiviertes Bit hat den Wert Null, dem Ruhezustand entspricht die logische Eins (Vorsicht, Pferdefuß). Um auf dem Bildschirm eine Bewegung nach oben darzustellen, subtrahiert man von der Position des Zeichens den Wert 40. Eine Zeile nach oben entspricht dem ersten Bit der Variablen JS. In Basic heißt das:<br/>
-40 IF QS AND 1) = 0 THEN BEWEG = BEWEG-40</p>
+        <p>Vom Byte des Joystick-Ports interessieren uns genau die ersten fünf Bits, die über die logische Verknüpfung AND ausgefiltert werden. Ein vom Joystick aktiviertes Bit hat den Wert Null, dem Ruhezustand entspricht die logische Eins (Vorsicht, Pferdefuß). Um auf dem Bildschirm eine Bewegung nach oben darzustellen, subtrahiert man von der Position des Zeichens den Wert 40. Eine Zeile nach oben entspricht dem ersten Bit der Variablen JS. In Basic heißt das:<br />
+            40 IF QS AND 1) = 0 THEN BEWEG = BEWEG-40</p>
 
-<p>Mit den anderen Richtungen wird es genauso gehandhabt. Abwärts entspricht dem zweiten Bit:<br/>
-50 IF JS AND 2) = 0 THEN BEWEG = BEWEG + 40</p>
+        <p>Mit den anderen Richtungen wird es genauso gehandhabt. Abwärts entspricht dem zweiten Bit:<br />
+            50 IF JS AND 2) = 0 THEN BEWEG = BEWEG + 40</p>
 
-<p>Das dritte Bit ist für Bewegung nach links zuständig, und entspricht auf dem Bildschirm der Subtraktion von Eins:<br/>
-60 IF JS AND 4) = 0 THEN BEWEG = BEWEG-1</p>
+        <p>Das dritte Bit ist für Bewegung nach links zuständig, und entspricht auf dem Bildschirm der Subtraktion von Eins:<br />
+            60 IF JS AND 4) = 0 THEN BEWEG = BEWEG-1</p>
 
-<p>und nach rechts:<br/>
-70 IF JS AND 8) = 0 THEN BEWEG = BEWEG + 1</p>
+        <p>und nach rechts:<br />
+            70 IF JS AND 8) = 0 THEN BEWEG = BEWEG + 1</p>
 
-<p>Auf diese Weise sind auch die möglichen Diagonalbewegungen erfaßt, zum Beispiel entspricht die Bewegung nach links unten dem Wert +39.</p>
+        <p>Auf diese Weise sind auch die möglichen Diagonalbewegungen erfaßt, zum Beispiel entspricht die Bewegung nach links unten dem Wert +39.</p>
 
-<p>Die letzte Abfrage gilt dem Feuerknopf. Bei dessen Betätigung wollen wir das Programm beenden. Dabei stellen wir natürlich das Zeichen unter unserem »Cursor« wieder her.<br/>
-80 IF QS AND 16) = 0 THEN POKE BILD,ME:END</p>
+        <p>Die letzte Abfrage gilt dem Feuerknopf. Bei dessen Betätigung wollen wir das Programm beenden. Dabei stellen wir natürlich das Zeichen unter unserem »Cursor« wieder her.<br />
+            80 IF QS AND 16) = 0 THEN POKE BILD,ME:END</p>
 
-<p>Um nicht aus dem Bildschirm »herauszufahren« (dahinter liegt schließlich unser Basic-Programm), müssen wir testen, ob die alte Position zuzüglich der Summe der Bewegungen noch im Bereich von 1024 bis 2023 liegt.<br/>
-90 IF BILD + BEWEG &lt; 1024 OR BILD + BEWEG > 2023THEN BEWEG = 0</p>
+        <p>Um nicht aus dem Bildschirm »herauszufahren« (dahinter liegt schließlich unser Basic-Programm), müssen wir testen, ob die alte Position zuzüglich der Summe der Bewegungen noch im Bereich von 1024 bis 2023 liegt.<br />
+            90 IF BILD + BEWEG &lt; 1024 OR BILD + BEWEG > 2023THEN BEWEG = 0</p>
 
-<p>Jetzt brauchen wir nur noch unseren »Cursor« bewegen. Dazu POKE wir zunächst das vorhin gemerkte Zeichen auf die aktuelle Position. Dann zählen wir die errechneten Bewegungen zur Bildschirmadresse dazu. Alles was bleibt, ist ein Rücksprung zu Zeile 20, um unseren Cursor wieder korrekt auf den Bildschirm zu bringen.<br/>
-100 POKE BILD,ME:BILD = BILD + BEWEG: GOT020</p>
+        <p>Jetzt brauchen wir nur noch unseren »Cursor« bewegen. Dazu POKE wir zunächst das vorhin gemerkte Zeichen auf die aktuelle Position. Dann zählen wir die errechneten Bewegungen zur Bildschirmadresse dazu. Alles was bleibt, ist ein Rücksprung zu Zeile 20, um unseren Cursor wieder korrekt auf den Bildschirm zu bringen.<br />
+            100 POKE BILD,ME:BILD = BILD + BEWEG: GOT020</p>
 
-<p>Will man den Joystick an Port 1 anbringen, ist lediglich Zeile 10 zu ändern. Die Adresse ist dann 56321. Also:<br/>
-10 P0 = 56321&hellip;</p>
+        <p>Will man den Joystick an Port 1 anbringen, ist lediglich Zeile 10 zu ändern. Die Adresse ist dann 56321. Also:<br />
+            10 P0 = 56321&hellip;</p>
 
-<p>Um zwei Joysticks gleichzeitig abzufragen, sind folgende Zeilen umzuschreiben:<br/>
-10 P1 = 56321:P2 = 56320:BI = 1024&hellip;<br/>
-30 Jl=PEEK(P1):J2 = PEEK(P2):<br/>
-JS = NOT(NOT Jl OR NOT J2):<br/>
-BEWEG = 0</p>
+        <p>Um zwei Joysticks gleichzeitig abzufragen, sind folgende Zeilen umzuschreiben:<br />
+            10 P1 = 56321:P2 = 56320:BI = 1024&hellip;<br />
+            30 Jl=PEEK(P1):J2 = PEEK(P2):<br />
+            JS = NOT(NOT Jl OR NOT J2):<br />
+            BEWEG = 0</p>
 
-<p>Die Verknüpfung entsteht durch die negative Logik der Ports.</p>
+        <p>Die Verknüpfung entsteht durch die negative Logik der Ports.</p>
 
-<p>Da ein Joystick an Port 1 Zeichen in den Tastaturpuffer schreibt, ist es sinnvoll, beim Verlassen des Programms diesen zu löschen; am besten, indem man in Zeile 80 vor den END-Befehl ein »POKE 198,0« setzt.</p>
+        <p>Da ein Joystick an Port 1 Zeichen in den Tastaturpuffer schreibt, ist es sinnvoll, beim Verlassen des Programms diesen zu löschen; am besten, indem man in Zeile 80 vor den END-Befehl ein »POKE 198,0« setzt.</p>
 
-<p>Damit wäre unser Minimal-Programm beendet, obwohl es jetzt eigentlich erst richtig losgeht. Wir hoffen, daß Sie die Joystick-Abfrage in Ihren eigenen Programmen ausnutzen können. Dann haben Sie das Lernziel erreicht.</p>
+        <p>Damit wäre unser Minimal-Programm beendet, obwohl es jetzt eigentlich erst richtig losgeht. Wir hoffen, daß Sie die Joystick-Abfrage in Ihren eigenen Programmen ausnutzen können. Dann haben Sie das Lernziel erreicht.</p>
 
-<address class="author">(og)</address>
+        <address class="author">(og)</address>
     </article>
 </body>
+
 </html>
