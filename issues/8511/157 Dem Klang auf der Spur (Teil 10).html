@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Dem Klang auf der Spur (Teil 10)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Krätzig, tr">
+    <meta name="64er.issue" content="11/85">
+    <meta name="64er.pages" content="157-161">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Dem Klang auf der Spur (Teil 10)</h1>
+<blockquote><p>Als krönender Abschluß dieses Kurses wird das Programm Sound-Editor zu einem kompletten Synthesizer-Programm ergänzt.</p></blockquote>
+
+<p>In der heutigen und letzten Folge des Synthesizer-Projekts soll der in Teil 9 beschriebene Sequenzer in den Sound-Editor integriert werden. Zum Sequenzer gibt es im Gesamtprogramm ein eigenes Untermenü, von dem aus er gestartet und gestoppt werden kann. In diesem Untermenü kann man auch das Spieltempo und einige weitere Parameter interaktiv einstellen. Damit liegt jetzt ein komplettes Synthesizer-Programm vor, das von den vielen klanglichen Möglichkeiten her die kommerziell angebotenen Synthesizer-Programme für den C 64 übertreffen dürfte. Für die grafische Gestaltung gibt es natürlich schönere und aufwendigere Konzepte, diese waren aber auch nicht das Thema dieses Kurses.</p>
+
+<p>Um zu dem erwähnten Komplettprogramm zu gelangen, benötigt man diesmal mehrere Teile aus verschiedenen Abschnitten des Kurses:</p>
+
+<p>TODO</p>
+
+<p>MODULATOR (Teil 4)<br/>
+SOUND EDITOR (Teil 6)<br/>
+SEQUENCER.OBJ (Teil 8)<br/>
+REM TEXT KILLER (Teil 10/Listing 1)<br/>
+SOUND.ED.ZUSATZ (Teil 10/Listing 2)<br/>
+SEQ.ERG.OBJ (Teil 10/Listing 3)</p>
+
+<p>Zunächst muß das Programm »Sound-Editor« erweitert werden. Da es den zur Verfügung stehenden Speicher ($0801 — $8FFF) fast vollständig belegt, muß es erst einmal verkürzt werden. Dies ist durch Entfernen der vielen Kommentartexte auch leicht möglich. Wer schon beim Eintippen des Programms die Kommentartexte weggelassen hat, spart sich natürlich jetzt diese Arbeit.</p>
+
+<p>Zum Entfernen von REM-Zeilen gibt es zwar gute und schnelle Tools, diese sind aber für den Sound-Editor leider nicht geeignet, da die REM-Zeilen auch als Sprungziele auftreten. Dabei werden die Zeilennummern der Sprungziele meistens aus einer Tabelle entnommen.</p>
+
+<p>Der »REM-Text-Killer« aus Listing 1 entfernt lediglich Kommentartexte und läßt dabei die Zeilennummern mit leeren REM-Anweisungen stehen. Das kurze Programm muß zum Sound-Editor eingetippt werden. Zeile 0 des Sound-Editors muß gelöscht werden. Anschließend gibt man POKE 253,1: POKE 254,8 (RETURN) im Direktmodus ein und startet den REM-Text-Killer mit RUN. Dann wird der REM-Text-Killer wieder gelöscht und Zeile 0 wieder eingegeben.</p>
+
+<p>Nun kann Listing 2 (Sound, ed. Erg.) eingegeben werden. Listing 2 enthält sowohl Zeilen, die im alten Sound Editor geändert werden müssen, als auch neu hinzukommende Programmteile, »Sound. Ed. Erg.« ist für sich allein aber kein lauffähiges Programm. Beim Eintippen kann man natürlich die Kommentartexte gleich weglassen. Das entstehende Komplettprogramm sollte man dann sofort auf Disk speichern. Es kann getestet werden, wenn alle Maschinenprogramme und ein Musikdatensatz zur Verfügung stehen.</p>
+
+<p>An Maschinenprogrammen werden nachgeladen:<br/>
+MODULATOR<br/>
+SEQUENCER.OBJ<br/>
+SEQ.ERG.OBJ</p>
+
+<p>Bei dem letzten Programm handelt es sich um eine Ergänzung zum Sequenzer aus Teil 9. Diese Ergänzung, die mit dem MSE eingegeben werden muß (Listing 3), ist für den Betrieb zusammen mit dem Sound-Editor und mit »Modulator« erforderlich. Die technischen Einzelheiten wurden bereits in Teil 9 behandelt und sollen hier nicht mehr besprochen werden.</p>
+
+<p>Um das bis jetzt aufgebaute System von Programmen zu testen, kann man den kleinen Musikdatensatz »Test.Song« (Tonleiter und Kadenz) aus MSE-Listing 4 verwenden.</p>
+
+<h3>Bedienung des Sequenzers</h3>
+
+<p>Der erweiterte Sound-Editor wird geladen und gestartet. Nach einer Initialisierungszeit von zirka 30 Sekunden meldet er sich mit dem Hauptmenü, von dem aus man mit »A« den Sequenzer erreichen kann. Parameter werden mit den Cursortasten angewählt und können mit den F-Tasten verändert werden. Solange allerdings kein Song (= Musikdatensatz) geladen worden ist, was in der Titelzeile angezeigt wird, kann der Sequenzer nicht gestartet werden.</p>
+
+<p>Im Untermenü Disk (mit »D« zu erreichen) kann man mit »F2« den Musikdatensatz »Test.Song« laden und gelangt dann automatisch wieder in das Sequenzer-Untermenü. Der Sequenzer kann jetzt mit »F5« gestartet und mit »F3« wieder angehalten werden. »F1« setzt ihn an den Anfang des geladenen Songs zurück.</p>
+
+<h3>TEMPO</h3>
+
+<p>Über das Tempo-Feld kann man die Abspielgeschwindigkeit im Bereich von 40 bis 480 bpm (beats per minute) einstellen. Geschwindigkeiten über 300 bpm sind allerdings musikalisch kaum noch sinnvoll, sondern eher für Klangexperimente gedacht.</p>
+
+<h3>MODUS</h3>
+
+<p>Im Song-Modus wird das ganze Stück gemäß Sequenzfolgeliste gespielt. Der Sequenzmodus ermöglicht es dagegen, einzelne Sequenzen beliebig oft zu hören.</p>
+
+<h3>SEQNR</h3>
+
+<p>Im Sequenz-Modus erscheint hier die Nummer der gespielten Sequenz. Damit ist die aktuelle Position in der Sequenzfolgeliste gemeint und nicht die Nummer der Sequenz bei ihrer Definition. Es kann also unter verschiedenen Nummern die gleiche Sequenz mehrmals zu hören sein. So besteht zum Beispiel »Test.Song« aus zwei verschiedenen Sequenzen, einer Tonleiter und einer Kadenz. Die Tonleiter wird wiederholt und ist unter den Sequenznummern 1 und 2 zu hören. Die Kadenz ist unter Nummer 3 zu finden. Im Song-Modus hat das SEQNR-Feld keine Bedeutung.</p>
+
+<h3>SOFT-EG</h3>
+
+<p>Die Funktion entspricht der schon bekannten, mit Shift-Space erreichbaren Kopplung des Soft-EG an das Tastenfeld-Spiel.</p>
+
+<h3>SUSTAIN</h3>
+
+<p>Die Sustain-Funktion ist auch beim Sequenzer wirksam. Sie verhindert das Rücksetzen der GATE-Bits der drei Stimmen. Dadurch klingen die Töne ohne Lautstärke-Dynamik durchgehend auf dem Sustain-Pegel. Während der Sequenzer läuft, bleiben alle anderen Funktionen des Sound-Editors voll erhalten. Man kann also an einem laufenden Musikstück Änderungen an der Klangeinstellung testen. Lediglich bei Diskettenoperationen wird der Sequenzer unterbrochen.</p>
+
+<p>Mit dem Sequenzgenerator (Listing 5) kann man relativ einfach Song-Dateien erzeugen, die die für den Sequenzer erforderliche Struktur haben. Das Programm erzeugt aus einer in DATA-Zeilen abgelegten Folge von Noten einen Datensatz mit der in Folge 9 beschriebenen &lsquo;Zeigerstruktur. Die Daten werden direkt hinter die Soundparameter ($9000 bis $9A07) also ab $9A08 gespeichert. Das geschieht in der Reihenfolge:</p>
+
+<ul>
+<li>Zeiger auf Sequenzfolgeliste</li>
+<li>Eine oder mehrere Sequenzen, bestehend aus jeweils 1 bis 3 Tracks</li>
+<li>Sequenzfolgeliste (sie enthält die Startadressen der Sequenzen in der Reihenfolge, in der sie abgespielt werden sollen).</li>
+</ul>
+
+
+<p>Es steht der Speicherbereich bis $BFFF, also auch der RAM-Bereich $A0000 bis $BFFF unter dem Basic-ROM zur Verfügung. Da sich POKE-Befehle immer auf das RAM beziehen, sind dazu keine weiteren Maßnahmen notwendig. Programmteile, die auf diesen Bereich lesend zugreifen, sorgen selbständig für das erforderliche Umschalten zwischen RAM und ROM. Auf Editierfunktionen wurde bei diesem Programm verzichtet. Da die Noten in DATA-Zeilen geschrieben werden, kann man diese wie Basic-Programme mit dem Bildschirm-Editor behandeln.</p>
+
+<h3>Syntax der Notendaten</h3>
+
+<p>Ein Song ist in einzelne Sequenzen gegliedert, welche wiederum in bis zu drei Tracks (= Tonspuren) zerfallen. Den Aufbau macht man sich am besten anhand von Listing 5, Zeilen 8000-8820, klar. Dort steht das schon in Teil 9 als Hex-Dump abgedruckte Musikstück. Jenes ist allerdings für den Sequenzer in der jetzigen Form <strong>nicht</strong> weiter verwendbar, da es nicht im Speicherbereich ab $9A08 liegt. Die Zeilen 8100 bis 8130 beschreiben eine Sequenz, in der nur Stimme 3 programmiert wird. Der Track besteht dabei aus sieben Viertelnoten.</p>
+
+<p>Sequenzen müssen mit SEQUENZ, (laufende Nummer) eingeleitet werden. Die laufende Nummer muß im Bereich 1 bis 200 liegen.</p>
+
+<p>Innerhalb einer Sequenz wird mit TRACK, (1, 2 oder 3) angegeben, welcher Stimme die nachfolgenden ; Noten zuzuordnen sind. Man kann in einer Sequenz auch weniger als drei Tracks programmieren. Allen nicht programmierten Tracks ordnet das Generatorprogramm einen 4 Byte langen Dummy-Track zu, der nur aus einer Pause besteht und der nur einmal im Speicher stehen muß.</p>
+
+<p>Innerhalb eines Tracks sind dann folgende Daten zulässig: a — b stellt das Verhältnis zwischen GATE-ON- und GATE-0FF-Zeit ein. Voreinstellung ist 1-1, das heißt, beide Zeiten sind gleich lang. Bei 1-0 hat die GATE-ON-Zeit die maximale Länge, bei 0-1 werden die Noten nur sehr kurz angeschlagen. Die Einstellung hat keinen Einfluß auf die Gesamtlänge der Noten. Diese wird mit a / b eingestellt. Beispiele sind:1/1 ganze Note<br/>
+1/2 halbe Note<br/>
+1/4 Viertelnote<br/>
+1/6 Vierteltriole<br/>
+3/8 punktierte Viertelnote<br/>
+1/8 Achtelnote<br/>
+1/12 Achteltriole</p>
+
+<p>Die Längenangabe bezieht sich auf alle Noten bis zur nächsten Längenangabe.</p>
+
+<p>Als Notennamen werden die üblichen Bezeichnungen C,D,E, F,G,A,H verwendet. Die Notennamen können mit»#«(zum Beispiel F # = Fis) zur Erhöhung um einen Halbton oder mit »B« (zum Beispiel EB = Es) zur Erniedrigung um einen Halbton ergänzt werden. Die Notennamen müssen mit einer Oktavnummer zwischen 0 und 6 versehen sein. Der Kammerton a mit 440 Hz hat in dieser Schreibweise den Namen A3.</p>
+
+<p>P kennzeichnet eine Pause, für die ebenfalls die Längeneinstellung a/b gilt.</p>
+
+<p>SEQUENZFOLGE, n1, n2, n3..0. Diese Anweisung darf an beliebiger Stelle stehen und muß einmal vorhanden sein. Sie stellt die schon erwähnte Sequenzfolgeliste dar, von der die Abspielreihenfolge der Sequenzen gesteuert wird. Die Sequenzen n1, n2 und so weiter müssen natürlich definiert werden. Die Liste wird mit einer 0 abgeschlossen.</p>
+
+<p>ENDE schließt den Datensatz ab.</p>
+
+<p>Das Generatorprogramm weist fehlerhafte Daten mit Fehlermeldungen zurück. Am Ende eines Generatorlaufs kann man den erzeugten Datensatz speichern. Dieser kann dann direkt vom erweiterten Sound-Editor geladen werden.</p>
+
+<p>Mit der Integration des Sequenzers in den Sound-Editor findet dieser Kurs seinen Abschluß. Dem an Computermusik interessierten Anwender stehen nun leistungsfähige Programme zum Experimentieren und zur Realisierung seiner Ideen zur Verfügung. Der erfahrene Programmierer wird vielleicht das eine oder andere hier veröffentlichte Programm seinen Bedürfnissen anpassen können. Über eine Resonanz von seiten der Leser zum Beispiel in Form von Sound- oder Song-Dateien oder Ideen zur Erweiterung oder Verbesserung der Programme würde sich der Autor freuen.</p>
+
+<address class="author">(Thomas Krätzig/tr)</address>
+    </article>
+</body>
+</html>
