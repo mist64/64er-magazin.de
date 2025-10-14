@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hypra-PLATOS</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Eckhard Krabel, ah">
+    <meta name="64er.issue" content="11/85">
+    <meta name="64er.pages" content="50,61-70">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Hypra-PLATOS</h1>
+<blockquote><p>Dieses Platinen-Layout-Operation-System für den C 64 ist ein Leckerbissen und ein Muß für jeden Elektronikbastler. Endlich ist Schluß mit der mühseligen Kleberei von Platinen-Layouts. Das spart neben Geld, auch Zeit und Nerven.</p></blockquote>
+
+<p>Mancher Hobbyelektroniker wird mit Grausen an die mühselige Layout-Arbeit seiner selbstentworfenen Schaltungen denken. Layout-Bearbeitung mit dem Computer wäre das Stichwort. Aber bloß der Gedanke an die sündhaft teuren Platinen-Layout-Systeme, sogenannte CAL-Anlagen, bei denen es sich um extrem schnelle Computer mit sehr hoher Grafikauflösung (2048*2048 Punkte) handelt, läßt alle Hoffnungen schwinden. Für die billigsten Systeme dieser Art ist immerhin die stolze Summe von etwa 20000 Mark zu zahlen; und welcher Hobbyelektroniker ist willens in seine selbstentworfenen Schaltungen eine derartige Summe zu investieren? Wohl keiner. Es mußte ein Platinen-Layout-System für den C 64 her, das sich der engagierte Hobbyelektroniker finanziell leisten kann. Damit auch die weniger Bemittelten in den Genuß kommen, ihre Layout-Bearbeitung vom Computer, sprich C 64, erledigen zu lassen, ist das hier vorgestellte Programm entwickelt worden. Keine Frage, der C 64 ist nur bedingt zur Entwicklung von Layouts zu verwenden, und entsprechend sind die Möglichkeiten der Auflösung und der Rechengeschwindigkeit. Durch horizontales und vertikales Scrollen kann aber ein ausreichend großes Feld von immerhin 100*128 Punkten (etwas größer als eine Europakarte) mit einer Auflösung von 1/20 Zoll (etwa 1,27 mm) bearbeitet werden.</p>
+
+<p>Die überragenden Leistungsmerkmale von Hypra-Platos:</p>
+
+<ol>
+<li>Das Programm ist voll menügesteuert.</li>
+<li>Automatisches Verlegen von Leiterbahnen (Auto-Router).</li>
+<li>Manueller Router. Dadurch kann eine Platine, die mit dem Auto-Router bearbeitet wurde, nachträglich geändert werden. Der Manuell-Router ist voll bildschirmorientiert, dabei kann der Bildschirm vertikal und horizontal gescrollt werden. Bauteile oder auch einzelne Punkte können gedreht, verschoben, gelöscht und gesetzt werden. Natürlich lassen sich in dieser Routine Leiterbahnen löschen und verlegen. Auch kann von hier die jeweils aktuelle Platinenseite aufgerufen werden, die sich durch die Gehäusefarben der Bauteile unterscheiden.</li>
+<li>Bearbeitung, von doppelseitigen Platinen sowohl mit dem Auto-Router, wie aber auch mit dem Manuell-Router.</li>
+<li>Integrierte Bauteil-Bibliothek</li>
+<li>In die Bauteil-Bibliothek lassen sich beliebig viele Bauteile eintragen. Diese einmal definierten Bauteile können nach Bedarf im Hauptprogramm beliebig oft abgerufen werden.</li>
+<li>Auf folgenden Geräten läßt sich das fertige Layout drucken und zwar normal und spiegelverkehrt:</li>
+</ol>
+
+
+<p>MPS 802 (1:1 und 2:1)</p>
+
+<p>Commodore 1526 (1:1 und 2:1)</p>
+
+<p>FX-80 und Kompatible (2:1)</p>
+
+<p>Überzeugen Sie sich selbst von der Leistungsfähigkeit dieses Platinen-Layout-Systems. Bild 1 wurde mit einem FX-80 und Bild 2 von einem MPS 802 erstellt. Beide Bilder wurden im Verhältnis 2:1 ausgedruckt und anschließend auf 50 Prozent verkleinert. Eine Verkleinerung auf 50 Prozent erreichen Sie beim FX-80 durch zweimaliges Verkleinern auf DIN A5.</p>
+
+<p>Beim MPS 802 ist zuerst auf DIN A5 und anschließend noch einmal um den Faktor 0.8 zu verkleinern.</p>
+
+<address class="author">(Eckhard Krabel/ah)</address>
+
+<blockquote><p>Endlich Schluß mit der elenden Kleberei von Platinen-Layouts. Mit diesem Programm spart man Geld, Zeit und Nerven.</p></blockquote>
+
+<p>Das Platinen-Layout-System besteht aus drei Programmteilen. Dem Hauptprogramm »0. PRG« (Listing 1), »1. PRG« (Listing 2) und dem Druckertreiber »2. PRG« (Listing 3). Sind alle drei Programme abgetippt und befinden sie sich auf Ihrer Diskette, kann das Hauptprogramm mit LOAD”0. PRG",8 geladen und mit RUN gestartet werden.</p>
+
+<p>Nach einigen Sekunden erscheint ein Titelbild und anschließend das Hauptmenü auf dem Bildschirm. Von hier können acht Untermenüs beziehungsweise Unterprogramme aufgerufen werden. Die einzelnen Punkte dieses und allen folgenden Menüs können mit der RESTORE-Taste verlassen werden.</p>
+
+<h3>1. Bauteileliste:</h3>
+
+<p>Die einzelnen Bauteileformen werden hier definiert und verwaltet. Diese Bauteildefinitionen werden für die Elementeliste benötigt.</p>
+
+<h3>2.  Elementeliste:</h3>
+
+<p>Die Elementeliste enthält alle Elemente, die in der Schaltung vorkommen. Hier müssen die Elemente definiert werden, bevor die Verbindungsliste erstellt wird.</p>
+
+<h3>3.  Verbindungsliste:</h3>
+
+<p>Hier werden die Verbindungen angegeben, die der Router später routen soll.</p>
+
+<h3>4.  Bauteile plazieren:</h3>
+
+<p>Neben dem Plazieren der Elemente, wird von hier auch der Manuell-Router aufgerufen.</p>
+
+<h3>5.  Routen:</h3>
+
+<p>Der Router verlegt automatisch die Verbindungen, die in der Verbindungsliste angegeben wurden. Bevor diese Routine aufgerufen wird, müssen alle Bauteile plaziert sein.</p>
+
+<h3>6.  Sortieren:</h3>
+
+<p>Hier werden die Verbindungen vor dem Routen der Länge nach sortiert. Das erspart dem Router viel Arbeit. Dadurch wird die Rechenzeit geringer.</p>
+
+<h3>7.  Optimieren:</h3>
+
+<p>Verbindungsketten, wie Masse- oder Plusschienen werden optimiert.</p>
+
+<h3>8.  Features:</h3>
+
+<p>Disketten- und Druckerverwaltung.</p>
+
+<h3>0. Ende:</h3>
+
+<p>Rücksprung zum Basic mit Sicherheitsabfrage.</p>
+
+<h3>Zur Bauteileliste</h3>
+
+<p>In der Bauteileliste wird die Bauteilbibliothek verwaltet. Hier werden die Informationen über die Lage der Pins und die Größe des Gehäuses gespeichert. Wichtig ist im Untermenü »Eintragen«, daß sich alle Pinangaben auf den Pin 1 beziehen. Dabei muß der Pin 1 in der linken oberen Ecke positioniert werden. Jedem definierten Bauteil wird eine sogenannte Organisationsnummer zugeordnet, die bauteilunabhängig ist und nur durch die Reihenfolge der Eingabe bestimmt wird. Um zum Beispiel ein 14poliges IC in die Bauteileliste einzutragen, ist wie folgt vorzugehen:</p>
+
+<ol>
+<li>Vom Hauptmenü aus das Menü Bauteileliste anwählen.</li>
+<li>Vom Untermenü Bauteileliste den Punkt 3 Eintragen anwählen.<br>Auf dem Bildschirm erscheint die Abfrage nach dem Bauteiltyp. Die 7 Buchstaben stellen jeweils den Anfangsbuchstaben des Bauteiltyps dar.<br>I = IC, T = Transistor, S = Steckerleiste oder Schalter, K = Kondensator, W = Widerstand, X = Joker für beliebige andere Bauteiltypen, E = Ende</li>
+<li>I für IC eingeben.</li>
+<li>Für die Anzahl der Pins 14 eingeben.</li>
+<li>Da Hypra-Platos mit einer Auflösung von ’^ Zoll arbeitet, muß die Länge und die Breite des Gehäuses mit 2 multipliziert werden. Von dieser Zahl ist 2 abzuziehen. In unserem Fall entspricht das 2*7-2 = 12 für die x-Ausdehnung.</li>
+<li>Entsprechend gilt für die y-Ausdehnung 2*4-2=6.</li>
+<li>x-Position von Pin 1 eingeben. Hier 0</li>
+<li>y-Position von Pin 1 eingeben. Hier ebenfalls 0</li>
+<li>Geben Sie folgende Zahlengruppen ein, jeweils für die x- und y-Position der Pins 2 bis 14: 2, 0; 4, 0; 6, 0; 8, 0; 10, 0; 12, 0; 12, 6; 10, 6; 8, 6; 6, 6; 4, 6; 2, 6; 0, 6.</li>
+<li>Jetzt können Sie entweder ein weiteres Bauteil definieren oder zurück ins Menü Bauteileliste springen.</li>
+</ol>
+
+
+<p>Die anderen Menüpunkte dienen dazu, die Bauteileliste zu verwalten:</p>
+
+<h3>1.  Listen:</h3>
+
+<p>Alle Bauteile werden nach dem Schema »Bauteiltyp Pinanzahl = Organisationsnummer« geLISTet. Zum Beispiel T 3 = 2</p>
+
+<h3>2. Löschen:</h3>
+
+<p>Um ein Bauteil zu löschen, ist die Organisationsnummer anzugeben. Zum Beispiel 2 für T (Transistor)</p>
+
+<h3>3.  Eintragen:</h3>
+
+<p>Bauteile definieren.</p>
+
+<h3>4.  Speichern:</h3>
+
+<p>Zum Abspeichern der Bauteileliste muß eine Listennummer »n« angegeben werden. Es wird ein File mit dem Namen »n. Baut« erzeugt, »n« ist dabei die Listennummer und muß zwischen 0 und 9 liegen.</p>
+
+<h3>5.  Laden:</h3>
+
+<p>Zum Laden der Bauteileliste ist die Listennummer einzugeben.</p>
+
+<h3>6.  Drucken:</h3>
+
+<p>Entspricht dem Punkt 1 (Listen), aber auf dem Drucker.</p>
+
+<h3>7.  Zeigen:</h3>
+
+<p>Die Pins des Bauteils mit der Organisationsnummer »n« werden auf dem Bildschirm dargestellt. Pin 1 = A bis Pin 26 = Z</p>
+
+<h3>Zur Elementeliste</h3>
+
+<p>Die Elementeliste enthält alle Elemente, die sich in der Schaltung beziehungsweise auf der Platine befinden. Alle Elemente müssen zuvor in der Bauteileliste definiert sein. Der wichtigste Punkt in diesem Untermenü ist der Punkt 4 »Eingeben«. Wir wollen nun unser zuvor definiertes 14poliges IC in die Elementeliste eintragen. Dazu ist folgendermaßen vorzugehen:</p>
+
+<ol>
+<li>Punkt 4 »Eingeben« im Untermenü Elementeliste anwählen.</li>
+<li>Bauteiltyp eingeben (T,I,S,K,W,X). Hier I</li>
+<li>Bauteilnummer eingeben. (1 bis 255) Hier 1</li>
+<li>Die Taste RETURN drücken.</li>
+<li>Die Organisationsnummer angeben. Hier ebenfalls 1</li>
+</ol>
+
+
+<p>Damit ist das Element 11 in der Elementeliste eingetragen. Um ein zweites Element, ebenfalls ein 14poliges IC, unter dem Namen 12 einzutragen, müssen Sie:</p>
+
+<ol>
+<li>Bauteiltyp eingeben. Hier 1</li>
+<li>Bauteilnummer eingeben. Hier 2</li>
+<li>Die Taste RETURN drücken.</li>
+<li>Die Organisationsnummer angeben. Hier wieder 1</li>
+</ol>
+
+
+<p>Geben Sie jetzt »E« für Ende ein, befinden Sie sich wieder im Untermenü Elementeliste.</p>
+
+<p>Die restlichen Menüpunkte dienen dazu, die Elementeliste zu verwalten:</p>
+
+<h3>1.  Speichern:</h3>
+
+<p>Die Elementeliste wird gespeichert. Es ist wieder eine Listennummer anzugeben.</p>
+
+<h3>2.  Laden:</h3>
+
+<p>Die Elementeliste mit der Listennummer »n« wird geladen.</p>
+
+<h3>3.  Drucken:</h3>
+
+<p>Entspricht Punkt 1 (Listen), aber auf dem Drucker.</p>
+
+<h3>4.  Eingeben:</h3>
+
+<p>Hier werden die Elemente eingegeben, die später auf der Platine plaziert werden.</p>
+
+<p>Das Format ist: Bauteiltyp (T,I,S,K,W,X), Bauteilnummer (1 bis 255), Organisationsnummer aus der Bauteileliste. Wenn eine Organisationsnummer nicht existiert, erfolgt eine Fehlermeldung. Existiert das Element schon, so wird das alte Element überschrieben. Wird für die Organisationsnummer eine »0« eingegeben, wird das Element ersatzlos gelöscht. In das Untermenü Elementeliste kommt man mit der Taste »E« für Ende.</p>
+
+<h3>5.  Listen:</h3>
+
+<p>Die Elemente werden in dem Format der Eingabe geLISTet (Bauteiltyp, Bauteilnummer, Organisationsnummer).</p>
+
+<p>Alle Elemente, die später in der Verbindungsliste benötigt werden, müssen jetzt definiert sein.</p>
+
+<h3>Zur Verbindungsliste</h3>
+
+<p>Die in der Elementeliste eingegebenen Elemente müssen verbunden werden, um den Auto-Router aufrufen zu können. Wir wollen jetzt als Beispiel alle Punkte der zuvor definierten zwei Elemente (11,12) miteinander verbinden. Dazu gehen Sie wie folgt vor:</p>
+
+<ol>
+<li>Menüpunkt 4 »Eingeben« im Untermenü Verbindungsliste anwählen.</li>
+<li>Bauteiltyp eingeben. Hier I</li>
+<li>Bauteilnummer eingeben. Hier 1</li>
+<li>Taste RETURN drücken.</li>
+<li>Pinnummer eingeben, von dem aus verbunden werden soll. Hier 1</li>
+<li>Taste RETURN drücken.</li>
+<li>Bauteiltyp eingeben, zu dem verbunden werden soll. Hier I</li>
+<li>Entsprechende Bauteilenummer eingeben. Hier 2</li>
+<li>Taste RETURN drücken.</li>
+<li>Entsprechende Pinnummer eingeben. Hier 1</li>
+<li>Taste RETURN drücken.</li>
+<li>Taste »E« für Eintragen drücken, beziehungsweise »L« für Löschen.</li>
+</ol>
+
+
+<p>Auf dem Bildschirm sollte jetzt folgende Zeile zu sehen sein: >1 1 ,PIN 1 = I 2 ,PIN 1 (L/E)?</p>
+
+<p>Wiederholen Sie die Punkte 1 bis 12 so lange, bis Sie alle IC-Beinchen miteinander verbunden haben.</p>
+
+<p>Haben Sie bei einem Eintrag etwas Falsches eingegeben, brauchen Sie nicht zu verzweifeln. Drücken Sie, wenn das »Größer-Zeichen« erscheint die Taste »E« für Ende. Sie befinden sich wieder im Untermenü Verbindungsliste und können im Punkt 5 »Editieren« die soeben erstellte Verbindungsliste ändern. Mit der Taste »F1« und »F2« kann vor- und zurückgeblättert werden, mit »D« kommt man in den Eingabemodus und »M« steht für manipulieren. Wichtig ist, daß die zu ändernde Zeile komplett neu eingegeben wird.</p>
+
+<p>Alle weiteren Unterpunkte des Untermenüs Verbindungsliste dienen dazu, die Verbindungsliste zu verwalten:</p>
+
+<h3>1.  Speichern:</h3>
+
+<p>Dazu muß analog zur Elementeliste eine Listennummer angegeben werden.</p>
+
+<h3>2.  Laden:</h3>
+
+<p>Eine Verbindungsliste mit der Nummer »n« wird geladen.</p>
+
+<h3>3.  Drucken:</h3>
+
+<p>Die Verbindungsliste wird gedruckt.</p>
+
+<h3>4.  Eingeben:</h3>
+
+<p>Die Verbindungsliste kann erstellt werden.</p>
+
+<h3>5.  Editieren:</h3>
+
+<p>Verbindungsliste kann geändert werden.</p>
+
+<h3>6.  Listen:</h3>
+
+<p>Alle Verbindungen erscheinen in Form der Eingabe auf dem Bildschirm.</p>
+
+<h3>Zum Bauteile plazieren</h3>
+
+<p>In diesem Untermenü können nicht nur Bauteile plaziert werden, sondern von hier läßt sich auch der »manuelle Router« aufrufen.</p>
+
+<p>Die Untermenüpunkte im einzelnen:</p>
+
+<h3>1.  Bauteile plazieren:</h3>
+
+<p>Wird dieser Punkt angewählt, befindet man sich in einem bildschirmorientierten Editor, wie ihn viele Textverarbeitungsprogramme auch haben. Die unteren drei Bildschirm-Zeilen dienen als Informations-Zeilen. Hier sind die momentane Cursor-Position, die Drehung des aktuellen Bauteils und die möglichen Befehls-Tasten aufgeführt. Um ein Bauteil zu plazieren, muß zuerst das Element in der Form Bauteiltyp, Bauteilnummer eingegeben werden. Zum Beispiel »11« oder »I2«. Ein blinkender Cursor macht jetzt darauf aufmerksam, daß Sie das angewählte Bauteil plazieren können. Mit den Cursor-Steuertasten kann der Bildschirm, von dem immer nur ein Ausschnitt zu sehen ist, in alle vier Richtungen gescrollt werden. Beim (T)esten erscheinen die Pins auf dem Bildschirm. Wird die Taste »D« gedrückt, wird das Bauteil immer um 90 Grad im Uhrzeigersinn gedreht. Nach (S)etzen wird das Bauteil auf der Platine plaziert. Mit (V)erschieben läßt sich ein schon plaziertes Bauteil auf der Platine verschieben. Der Cursor muß jedoch auf dem Pin 1 stehen. Mit (E)nde kommt man wieder zurück ins Untermenü »Bauteil plazieren«.</p>
+
+<h3>2.  Listen:</h3>
+
+<p>Plazierte beziehungsweise nicht plazierte Bauteile werden geLISTet.</p>
+
+<h3>3.  Löschen:</h3>
+
+<p>Plazierte Bauteile können gelöscht werden. Dazu ist der Bauteiltyp und die Bauteilnummer einzugeben. Zum Beispiel 11 oder 12.</p>
+
+<h3>4.  Verbinden:</h3>
+
+<p>Um mit dem Auto-Router arbeiten zu können, muß die Verbindungsliste in eine für den Router verständliche Form umgewandelt werden. Diese Routine ist vor jedem neuen Routvorgang aufzurufen.</p>
+
+<h3>5.  Manual Router:</h3>
+
+<p>Hier kann die Platine manipuliert werden, nachdem der Router die Verbindungen gezogen hat. Wird dieser Punkt angewählt, befindet man sich wieder in einem bildschirmorientierten Editor, der genauso aufgebaut ist, wie der Editor zum Plazieren der Bauteile. Mit der Taste »F1« kann die aktuelle Platinenseite umgeschaltet werden.</p>
+
+<h3>6.  Pin 1 listen:</h3>
+
+<p>Die Koordinaten eines plazierten Elements werden angegeben. Dazu ist der Bauteiltyp und die Bauteilnummer einzugeben. Zum Beispiel 11 oder 12.</p>
+
+<h3>7.  Alles löschen:</h3>
+
+<p>Alle drei Listen und die Platine werden gelöscht.</p>
+
+<h3>8.  Bahnen löschen:</h3>
+
+<p>Die Leiterbahnen der aktuellen Platinenseite werden gelöscht. Soll der Auto-Router noch einmal aufgerufen werden, ist vorher der Punkt 4 (Verbinden) anzuwählen.</p>
+
+<h3>9.  Seiten tauschen:</h3>
+
+<p>Die beiden Platinenseiten werden vertauscht.</p>
+
+<h3>Zum Routen</h3>
+
+<p>Die Leiterbahnen auf der aktuellen Platinenseite werden automatisch verlegt. Sollten Fehlverbindungen auftreten, kann, nachdem die aktuelle Platinenseite umgeschaltet wurde, nochmals geroutet werden.</p>
+
+<h3>Zum Sortieren</h3>
+
+<p>Die Verbindungen werden der Länge nach sortiert.</p>
+
+<h3>Zum Optimieren</h3>
+
+<p>Verbindungsketten werden optimiert.</p>
+
+<h3>Zum Menü »Features«</h3>
+
+<p>Dieses Untermenü dient in erster Linie zur Drucker- und Diskettenverwaltung:</p>
+
+<h3>1.  Layout:</h3>
+
+<p>Der Druckertreiber wird geladen. Dazu muß sich die Diskette mit dem Programm »2. PRG« im Laufwerk befinden.</p>
+
+<h3>2.  DOS:</h3>
+
+<p>Disketten-Befehle werden gesendet. Mit »$« kann das Directory geladen und betrachtet werden.</p>
+
+<h3>3.  Matrix OP:</h3>
+
+<p>Die aktuelle Platinenseite wird gespeichert oder geladen. Zu beachten ist, daß jeweils nur ein Matrix-File pro Diskettenseite gespeichert werden kann.</p>
+
+<h3>4.  Fehlverbindungen:</h3>
+
+<p>Die Verbindungen, die der Router nicht gefunden hat, werden in Koordinatendarstellung ausgegeben.</p>
+
+<h3>Zum Druckertreiber</h3>
+
+<p>Dieser Programmteil, der im Untermenü »Features« mit Punkt 1 nachgeladen wird, kann beide Platinenseiten, entweder auf einem FX-80 (und kompatible) oder einem VC 1526, MPS 802, ausdrucken. Dazu erscheint auf dem Bildschirm eine Druckermaske. Alle Parameter können wie folgt eingestellt werden:<br/>
+Drucker: F/V — Auswahl des Druckers FX-80 oder VC 1526 Größe: 1/2 — Ist nur beim VC 1526 ansprechbar. Es wird das Verhältnis, mit dem gedruckt wird, festgelegt (1:1 oder 2:1). Beim FX-80 wird immer im Verhältnis 2:1 gedruckt.<br/>
+Seite: 1/2 — Legtfest, welche Platinenseiteausgedrucktwird. Modus : R/S — definiert, ob die Platinenseite richtig &reg; oder spiegelverkehrt (S) gedruckt wird.<br/>
+D-Kanal: (0 bis 9) Nur bei Betrieb eines FX-80. Entspricht Sekundäradresse zum Senden von Daten (interfacespezifisch). B-Kanal: (0 bis 9) Identisch mit D-Kanal; nur wird hier ein Befehlskanal zur Verfügung gestellt.Der Druckvorgang kann mit der RUN/STOP-Taste unterbrochen werden. Nachdem eine Platinenseite gedruckt wurde, erfolgt die Abfrage, ob weiter gedruckt oder in das Hauptprogramm zurückgesprungen werden soll.</p>
+
+<address class="author">(Eckhard Krabel/ah)</address>
+    </article>
+</body>
+</html>

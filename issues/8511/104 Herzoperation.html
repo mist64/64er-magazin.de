@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Herzoperation</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Helmut Eyssele, aw">
+    <meta name="64er.issue" content="11/85">
+    <meta name="64er.pages" content="104-106,108-111">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Herzoperation</h1>
+<blockquote><p>Haben Sie sich eine Kombination von Hypra-Load und Hypra-Save gewünscht? Bitte, hier ist sie, und als Draufgabe gibt es sogar noch das DOS 5.1., eine Super-Centronics-Schnittstelle, Funktionstastenbelegung und einiges mehr.</p></blockquote>
+
+<p>Das Betriebssystem des C 64 umfaßt, einschließlich des Basic-Interpreters 16 KByte, die in zwei ROM-Bausteinen auf der Computer-Platine untergebracht sind. Die in diesen ROMs abgespeicherten Maschinenprogramme könnte man auch als das »Herz« des C 64 bezeichnen, denn ohne Betriebssystem ist der Computer nichts als eine mehr oder weniger sinnvolle Ansammlung von elektronischen Bauteilen. Durch Austausch des Betriebssystems (Kernal-ROM) könnte man beispielsweise den gesamten C 64 so verändern, daß er nur noch äußerlich dem Original gleicht. So weit wollen wir aber nicht gehen, denn der C 64 soll auch nach der Veränderung des Kernal-ROMs noch mit den meisten Programmen für den unveränderten Computer funktionieren. Das Betriebssystem wird deshalb nicht komplett ersetzt, sondern nur einzelne Teile davon verbessert. Dazu gehört das schnellere Laden (Hypra-Load), das schnellere Speichern (Hypra-Save), eine Centronics-Schnittstelle am User-Port und das DOS 5.1 einschließlich einer Funktionstastenbelegung. Da man aus 8 KByte (denn nur der Bereich $E000-$FFFF wird verändert) natürlich nicht mehr machen kann als 8 KByte, müssen Teile des alten Betriebssystems entfallen. In diesem Fall ist das die Ansteuerung der Datasette und, falls man eine Super-Centronics Schnittstelle haben möchte, auch die RS232.</p>
+
+<h2>Vier Programme in einem</h2>
+
+<p>Das hier abgedruckte Basic-Programm (Listing) erzeugt selbständig eines der vier zur Auswahl stehenden neuen Betriebssysteme. Das geänderte Betriebssystem steht nach fehlerlosem Durchlauf des Programms im Speicherbereich $8000 bis $9FFF ihres C 64 und wird gleichzeitig als Maschinenprogramm mit dem Namen »Superkernal« auf Diskette gespeichert. Um das neue Betriebssystem zu aktivieren, muß das Maschinenprogramm »Superkernal« auf einem EPROM vom Typ 2764 gespeichert werden. Dieses EPROM ist dann das neue Kernal-ROM, das an die Stelle des Original-ROMs auf den Steckplatz U4 des C 64 gesetzt wird (Achtung: Garantieverlust). Da 2764-EPROM und Original-ROM eine unterschiedliche Pin-Belegung haben, braucht man dazu einen Adaptersockel (Tabelle 1).</p>
+
+<p>Aus dem Wissen heraus, daß jeder seinen C 64 für eine andere Anwendung benutzt, haben wir die Wahl zwischen vier verschiedenen Kernal-Versionen vorgesehen. Außerdem können Sie sich die gewünschte Farbkombination der Bildschirmdarstellung einstellen und zwischen Text- oder Grafikmodus nach dem Einschalten wählen. Um Ihnen die Wahl zu erleichtern, ist hier eine kurze Beschreibung der einzelnen Kernal-Versionen.</p>
+
+<p><strong>Kernal 0</strong>: Hypra-Load/DOS 5.1/Funktionstastenbelegung/ Renew/RS232</p>
+
+<p><strong>Kernal 1</strong>: Hypra-Load/DOS5.1/Funktionstasten/Super-Centronics/Renew</p>
+
+<p><strong>Kernal 3</strong>: Hypra-Load/DOS5.1/Funktionstasten/Hypra-Save</p>
+
+<p><strong>Kernal 4</strong>: Hypra-Load/DOS5.1./Funktionstasten/Hypra-Save/Centronics klein</p>
+
+<p>Die vier Betriebssysteme sind nicht grundsätzlich verschieden. Allen gemeinsam ist die Hypra-Load-Routine und das DOS 5.1, das Sie von der VC 1541 Demodiskette her kennen. Außerdem wurde eine 01d- beziehungsweise Renew-Funktion implementiert. Mit den Tasten CTRL und STOP (bitte beide Tasten gleichzeitig drücken) ist ein durch NEW oder Reset gelöschtes Basic-Programm wieder da. Außerdem sind die Funktionstasten, deren Belegung Sie in gewissen Grenzen mit einem Monitor selbst wählen können (Sie finden die Belegung nach dem Durchlauf des Basic-Programms in dem Bereich $9B97-$9BCF) überall vorhanden. Bitte achten Sie darauf, daß der Funktionsstring immer von zwei Funktionstasten-Codes ($85-$8C) eingegrenzt ist. Bei den Funktionstasten wurde ein Punkt gegenüber Hypra-Perfekt (Ausgabe 4/85) verändert: Sie sind nach dem Einschalten des Rechners zunächst nicht belegt, wodurch gekaufte Programme jetzt einwandfrei laufen. Eingeschaltet werden die Funktionstasten ganz einfach durch »CTRL +«. Wenn man sie nicht mehr braucht, ist es möglich, sie durch »CTRL—«wieder abzuschalten.</p>
+
+<p>Wenn Sie Hypra-Save gewählt haben, ist folgendes zu beachten: Nach dem Speichern eines Programms muß bei weiteren Speichervorgängen die Laufwerknummer angegeben werden. Ansonsten funktioniert Hypra-Save wie es in der Ausgabe 8/85 beschrieben wurde. Außerdem können jetzt die Besitzer von Druckern mit Centronics-Schnittstelle aufatmen: Der User-Port wurde zur vollwertigen Centronics-Schnittstelle umprogrammiert. Der Drucker kann einfach so angesprochen werden, als wäre er am seriellen 1EC-Bus angeschlossen. Zwei Versionen stehen hier zur Verfügung: Diejenigen, die auf Hypra-Save nicht verzichten können, müssen sich aus Platzgründen leider mit einer abgemagerten Version zufrieden geben, die das Drucken der Commodore-Grafikzeichen nicht erlaubt. Ohne Hypra-Save ist eine Centronics-Schnittstelle möglich, die auch die Grafik- und Cursorsteuerzeichen druckt! Unter Geräteadresse 5 werden die Cursorsteuerzeichen so wiedergegeben, wie man es vom Bildschirm gewohnt ist — als reverse Zeichen. Ein korrekter Listingausdruck ist somit auch ohne teures Interface möglich. Sollten Sie keinen Epson oder einen vergleichbaren Drucker besitzen, so tragen Sie bitte in den Zeilen 1817 bis 1823 die für Ihren Drucker gültige Umschaltsequenz für den Bitmustermodus ein, wobei die Adresse 28595 die Zeichenzahl der Umschaltsequenz enthalten muß (Achtung: nicht mehr als fünf Zeichen). Bei Öffnen des Druckerkanals mit der Sekundäradrese 0 (oder ohne Sekundäradresse) wird im Großschrift-/Grafikmodus gedruckt. Drucken im Textmodus wird wie bei den Commodore-Druckern durch Sekundäradresse 7 erreicht.</p>
+
+<p>Durch die mögliche Veränderung der Voreinstellung des Textmodus (große und kleine Buchstaben) anstelle des üblichen Grafikmodus, wird auch die Centronics-Schnittstelle beeinflußt: Beim Öffnen eines Druckerkanals mit der Sekundäradresse 0 (oder ohne) arbeitet auch der Drucker im Textmodus mit großen und kleinen Buchstaben. Durch die Sekundäradresse 7 wird er in den Grafikmodus umgeschaltet. Zum Anschluß eines Druckers mit Centronics-Schnittstelle benötigen Sie übrigens nur ein einfaches Kabel, dessen Bauteile zusammen weniger als 40 Mark kosten. Wie Sie den User-Port mit dem Drucker verbinden müssen, ist in Tabelle 2 beschrieben. Ein Tip noch zum Schluß: Das DOS 5.1 läßt sich mit dem Befehl @Q abschalten. Um das DOS5.1 danach wieder zu aktivieren, brauchen Sie nur die Taste F6, beziehungsweise den Befehl SYS 61844 im Direktmodus einzugeben.</p>
+
+<p>Obwohl Super-Kernal den Speicherbereich des Betriebssystems schon fast komplett ausnutzt, ist sicherlich noch die eine oder andere Erweiterung denkbar — man darf gespannt sein. Falls es Ihnen nicht möglich sein sollte, das Kernal selbst zu brennen, besteht die Möglichkeit, fertige Betriebssystem-EPROMs mit Adapterplatine zu erhalten. Lesen Sie dazu unseren Hardware-Leserservice.</p>
+
+<address class="author">(Helmut Eyssele/aw)</address>
+    </article>
+</body>
+</html>
