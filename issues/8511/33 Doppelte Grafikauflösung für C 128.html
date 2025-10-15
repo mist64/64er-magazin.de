@@ -5,7 +5,7 @@
     <title>Doppelte Grafikauflösung für C 128</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="M. Thomas, ev">
+    <meta name="author" content="Michael Thomas, ev">
     <meta name="64er.issue" content="11/85">
     <meta name="64er.pages" content="33-35">
     <meta name="64er.head1" content="Grafik">
@@ -26,23 +26,26 @@
 
         <p>Schalten Sie auf 80 Zeichen um, so übernimmt ein anderer Video-Chip die Arbeit des uns vom C 64 her bekannten VIC II und zaubert ein 80-Zeichen-Feature auf den Bildschirm. Sehen können Sie dabei allerdings nur etwas, wenn Sie auch einen Monitor an der RGB-Buchse des C 128 angeschlossen haben, denn nur dort sind 80 Zeichen pro Zeile möglich. Der 8563-Videocontroller sorgt in diesem Modus für ein anständiges Bild.</p>
 
-        <p>Doch er kann noch mehr. Neben Buchstaben und Zahlen ausgeben ist er fähig, Punktgrafik zu erzeugen, und das in doppelter Auflösung, also statt mit den bekannten 320 mal 200 Punkten nun 640 mal 200 Punkte. Sie haben richtig gelesen. Das sind insgesamt 128000 Bildpunkte, die einzeln ansprechbar sind. Prima, werden Sie sagen, der C 128 hat ja die vielen tollen Grafikbefehle &hellip; Doch halt ! Die Freude ist ein wenig verfrüht. Die doppelte Auflösung des 8563 wird nämlich unverständlicherweise von diesen Basic-Befehlen nicht ausgenutzt. Die ganzen fantastischen Grafikbefehle des C 128 sprechen nur die vom C 64 bekannte 320 x 200 Punkte-Grafik an. Warum das so ist, das weiß nur Commodore allein.</p>
+        <p>Doch er kann noch mehr. Neben Buchstaben und Zahlen ausgeben ist er fähig, Punktgrafik zu erzeugen, und das in doppelter Auflösung, also statt mit den bekannten 320 mal 200 Punkten nun 640 mal 200 Punkte. Sie haben richtig gelesen. Das sind insgesamt 128000 Bildpunkte, die einzeln ansprechbar sind. Prima, werden Sie sagen, der C 128 hat ja die vielen tollen Grafikbefehle &hellip; Doch halt ! Die Freude ist ein wenig verfrüht. Die doppelte Auflösung des 8563 wird nämlich unverständlicherweise von diesen Basic-Befehlen <strong>nicht</strong> ausgenutzt. Die ganzen fantastischen Grafikbefehle des C 128 sprechen nur die vom C 64 bekannte 320 x 200 Punkte-Grafik an. Warum das so ist, das weiß nur Commodore allein.</p>
 
         <p>Auch der Versuch, die Punkte einfach in den Grafikspeicher des 8563 zu POKE wird fehlschlagen, denn dieser Grafikspeicher ist vom Prozessor aus nicht ansprechbar. Der Videocontroller 8563 steht nämlich im Genuß eines eigenen Zeichenspeichers von 16 KByte, der nicht im normalen Adreßbereich liegt und nur ihm selbst zugänglich ist.</p>
 
         <p>Doch ganz so eigenständig ist der VDC 8563 nun auch nicht. Es muß selbstverständlich ein Informationsaustausch zwischen Videoprozessor und dem übrigen Computer stattfinden können. Den gibt es natürlich auch.</p>
 
-        <p>Die Verbindung besteht allerdings nur aus 2 Byte im In-put/Output-Bereich mit den Adressen $D600 und $D601. Durch sie hindurch drängt sich der gesamte Informationsverkehr von VDC 8563 und Computer.</p>
+        <p>Die Verbindung besteht allerdings nur aus 2 Byte im Input/Output-Bereich mit den Adressen $D600 und $D601. Durch sie hindurch drängt sich der gesamte Informationsverkehr von VDC 8563 und Computer.</p>
 
         <p>Denn der VDC 8563 muß viel wissen, wenn er ein ordentliches Bild erzeugen will. Da er nur seinen »Privatspeicher« von 16 KByte kennt, kann er auf den Zeichengenerator nicht direkt zugreifen. Damit er trotzdem die Zeichen erzeugen kann, wird er beim Anschalten des Computers mit den nötigen Bytes aus dem Zeichengenerator über den Engpaß $D600/$D601 gefüttert. Dies geschieht übrigens auch, wenn Sie mit der ASCII/DIN-Taste auf den anderen Zeichensatz umschalten. Die erhaltenen Zeichen legt er in seinem RAM ab, damit er nun darauf zugreifen kann.</p>
 
-        <p>Die Aufteilung seines Speichers sieht dann folgendermaßen aus:<br>
-            2 KByte Zeichen<br>
-            2 KByte Zeichenattribute<br>
-            4 KByte Zeichendefinitionen<br>
-            8 KByte liegen brach</p>
+        <p>Die Aufteilung seines Speichers sieht dann folgendermaßen aus:</p>
 
-        <p>Diese Konfiguration gilt für den Textmodus des 8563. Doch wehe, man setzt im Register 25 das Bit für den Grafikmodus, dann läßt der VDC 8563 Zeichen Zeichen sein und bearbeitet seine 16 KByte im »Bitmapping&lt;&lt;-Modus. Das heißt für jedes gesetzte Bit läßt er einen Punkt auf dem Monitor leuchten, für jedes ungesetzte Bit eben nicht. Sein gesamter Speicher ist nun Grafikspeicher.</p>
+        <ul class="plain">
+            <li>2 KByte Zeichen</li>
+            <li>2 KByte Zeichenattribute</li>
+            <li>4 KByte Zeichendefinitionen</li>
+            <li>8 KByte liegen brach</li>
+        </ul>
+
+        <p>Diese Konfiguration gilt für den Textmodus des 8563. Doch wehe, man setzt im Register 25 das Bit für den Grafikmodus, dann läßt der VDC 8563 Zeichen Zeichen sein und bearbeitet seine 16 KByte im »Bitmapping«-Modus. Das heißt für jedes gesetzte Bit läßt er einen Punkt auf dem Monitor leuchten, für jedes ungesetzte Bit eben nicht. Sein gesamter Speicher ist nun Grafikspeicher.</p>
 
         <p>16 KByte RAM mal 8 Bit ergibt nach sorgfältigem Rechnen genau 128000 Bit, was in unserem Falle 128000 ansteuerbare Bildpunkte bedeutet. Doch wie, werden Sie fragen, kann man durch nur 2 Byte ($D600/$D601) die Register des VDC 8563 oder gar seinen Speicher manipulieren? Die Antwort ist ganz einfach: Sie lautet indirekte Adressierung.</p>
 
@@ -54,7 +57,7 @@
 
         <p>So gibt es Register, die beispielsweise die Startadresse des 80-Zeichen-Speichers enthalten. In den Registern 18 und 19 ist nun eine aktuelle Adresse des Videospeichers abgelegt, dessen Wert gerade bearbeitet werden soll. Und Register 31 hält den Inhalt dieser Adresse bereit.</p>
 
-        <p>Man muß also nach obengenanntem Schema die Register 18 und 19 (HI/L0) mit der Adresse des Videospeichers belegen, die man ansprechen will, und kann dann den Inhalt dieser Adresse über das Register 31 auslesen oder sie mit dem gewünschten Wert beschreiben.</p>
+        <p>Man muß also nach obengenanntem Schema die Register 18 und 19 (HI/LO) mit der Adresse des Videospeichers belegen, die man ansprechen will, und kann dann den Inhalt dieser Adresse über das Register 31 auslesen oder sie mit dem gewünschten Wert beschreiben.</p>
 
         <p>Um Ihnen den Aufwand zu ersparen, ein eigenes Programm schreiben zu müssen, das die Grafik des 8563 ausnutzt, haben wir ein Assemblerlisting (Listing 1) dazu abgedruckt. Es stammt aus dem Commodore 128-Handbuch von Peter Rosenbeck (Markt &amp; Technik-Verlag). Sie können dieses Programm direkt mit dem in den C 128 integrierten Maschinensprache-Monitor eingeben.</p>
 
