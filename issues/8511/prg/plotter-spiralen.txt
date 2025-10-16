@@ -1,0 +1,51 @@
+
+
+;plotter-spiralen.prg ==0801==
+    1 rem**********************************
+    2 rem*                                *
+    3 rem*     verschlungene spiralen     *
+    4 rem*   version fuer plotter 1520    *
+    5 rem*                                *
+    6 rem*  heimo ponnath  hamburg  1985  *
+    7 rem*                                *
+    8 rem**********************************
+    9 rem ***** eingaben ******************
+   10 poke53280,0:poke53281,0:poke646,5:printchr$(147)
+   15 input"anzahl spiralen";n:input"textstart xt,yt";xt,yt
+   20 input"radius,startwinkel";r,a1
+   22 rem**** init ****
+   23 open1,6,1:open2,6,2:print#2,0:close2
+   25 rem**** start ****
+   26 print#1,"m",0,-200:print#1,"i"
+   30 rem**** mitte ****
+   32 print#1,"r",240,0:print#1,"i":gosub100
+   33 rem **** kreis ******
+   35 m=50:d=360*~/(m*180):dimk(m):k(0)=2*~
+   36 fori=1tom:k(i)=k(i-1)+d:print#1,"r",r*cos(k(i-1)),r*sin(k(i-1))
+   37 print#1,"j",r*cos(k(i)),r*sin(k(i)):nexti:print#1,"h"
+   40 a$="verschlungene spiralen"
+   42 rem**** text ****
+   43 open4,6:print#1,"r",xt,yt:print#4,a$:close4
+   45 print#1,"m",240,-yt:print#1,"i"
+   50 rem**** show ****
+   52 print#1,"r",0,-200:print#1,"i"
+   55 poke198,0:wait198,1
+   60 rem**** normal ****
+   62 print#1,"h":close1
+   65 rem**** werte ausdrucken *****
+   70 open3,6,3:print#3,0:open4,6:print#4:print#4," n","  xt","  yt","  r","  w"
+   75 print#4,n,xt,yt,r,a1:print#3,1:print#4:close4:close3
+   80 rem**** greset ****
+   85 open7,6,7:print#7:close7
+   90 end
+  100 rem****** unterprogramm zeichnen ***
+  102 nn=n*100:ra=r/nn:dimt(nn):a=a1
+  105 forj=1ton:a=a+2*~/n
+  110 t=a:th=2*~/100:t(0)=t
+  115 fori=1tonn:t(i)=t(i-1)+th:rr=ra*i
+  120 print#1,"r",(rr-ra)*cos(t(i-1)),(rr-ra)*sin(t(i-1))
+  122 print#1,"j",rr*cos(t(i)),rr*sin(t(i))
+  125 nexti
+  130 nextj
+  135 return
+

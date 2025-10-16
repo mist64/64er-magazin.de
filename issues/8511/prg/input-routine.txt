@@ -1,0 +1,174 @@
+
+
+;input-routine.prg ==0801==
+    0 rem       input (demo)
+    1 rem input-routine fur vc 64
+    2 rem
+    3 rem copyright by
+    4 rem karlheinz boss
+    5 rem sylvester-jordan-str. 11
+    6 rem 3550 marburg
+    7 rem 06421/13509
+    8 poke53281,09:poke53280,09:poke646,07
+    9 print chr$(14)
+   10 rem input-routine
+   20 rem
+   30 rem pa$ ist aufgebaut wie folgt:
+   40 rem pa$ = zespmimac     wobei
+   50 rem       ze = zeile
+   60 rem       sp = spalte
+   70 rem       mi = mindestlaenge
+   80 rem       ma = maximale laenge
+   90 rem        c = code  wobei
+  100 rem         1 = nur zahlen
+  110 rem         2 = nur buchstaben
+  120 rem         3 = alles
+  125 rem         4 = nur kleinbuchst.
+  130 rem       5-6 = frei programmierbar
+  132 rem               ( zeile 60490 )
+  140 rem pa$ muss die zeile und spalte
+  150 rem beinhalten,der rest ist hin-
+  160 rem reichend.es werden dann die
+  170 rem standardparameter in zeile
+  180 rem 60200 angenommen
+  190 rem z.b. pa$="0510"
+  200 :
+ 1000 print"{clr}";
+ 1010 print"{rvon}  Input-Routine   copyright by K.Boss   {rvof}"
+ 1020 print "Ueber get wird eine Input-Routine simu-"
+ 1030 print "liert, wobei saemtliche Sonderfunktions-";
+ 1040 print "tasten (inst,del,home,clr,cr,cl) noch "
+ 1050 print "funktionieren, man aber das Eingabefeld"
+ 1060 print "nicht verlassen kann. Ausserdem kann man";
+ 1070 print "beim Aufruf der Routine gleich Ort, min.";
+ 1080 print "und max. Laenge und die zulaessigen Zei-";
+ 1090 print "chen der Eingabe angeben."
+ 1100 print "{rvon}{gry2} Beisp.:                                ";
+ 1105 print "                                        ";
+ 1110 print "Datum (TTMMJJ) :  {rght}{rght}{rght}{rght}{rght}{rght}                ";
+ 1120 print "                                        ";
+ 1130 print "Name :  {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}            ";
+ 1140 print "                                        ";
+ 1150 print "Kuerzel (mind 2 kl. Buchst.) :  {rght}{rght}{rght}     ";
+ 1160 print "                                        ";
+ 1170 print "Computer :  {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}             ";
+ 1180 print "                                        {rvof}{yel}";
+ 1900 rem hier nun die 4 aufrufe aus
+ 1910 rem vorangegangen beispiel
+ 1920 rem
+ 2000 pa$="121806061":gosub60000:a$=in$
+ 2010 pa$="140800202":gosub60000:b$=in$
+ 2020 pa$="163202034":gosub60000:c$=in$
+ 2030 pa$="1812":gosub60000:d$=in$
+ 2040 rem
+ 2100 rem     das war's
+ 2110 rem
+ 2120 rem ps: die reine input-routine
+ 2130 rem in kompr. form heisst
+ 2140 rem        input (kurz)
+ 3000 print:print "Die Eingaben waren : ";a$
+ 3010 print b$
+ 3020 print c$
+ 3030 print d$
+ 3040 print "            {rvon} Taste druecken {rvof}";
+ 3050 get nj$ : if nj$="" then 3050
+ 3995 print"{clr}"
+ 4000 poke 211,0:poke 214,24:sys58640
+ 4010 print"list1900-2140          "
+ 4015 print"{home}"
+ 4020 list30-190
+29999 end
+30000 :
+31000 :
+32000 :
+33000 :
+34000 :
+60000 bl$="                                        "
+60010 in$=""
+60099 :
+60100 ze=val(mid$(pa$,1,2))
+60110 sp=val(mid$(pa$,3,2))
+60120 if len(pa$)=4 then 60200
+60130 mi=val(mid$(pa$,5,2))
+60140 ma=val(mid$(pa$,7,2))
+60150 co=val(mid$(pa$,9,1))
+60160 goto 60300
+60190 rem******************************
+60200 mi=0:ma=15:co=3
+60210 rem******************************
+60220 :
+60300 gosub 60950
+60310 poke 204,0
+60320 get n$ : if n$="" then 60320
+60330 ss=peek(211)
+60340 if asc(n$)=13 and len(in$)>=mi then poke 204,1 : gosub 63890:return
+60350 if asc(n$)=147 then gosub 61000 : goto 60320
+60360 if asc(n$)=19 then gosub 63890 : gosub 60950:goto 60320
+60370 if asc(n$)=20 and peek(211)>sp then gosub 61410 : goto 60320
+60380 if asc(n$)=157 then gosub 61310:goto 60320
+60390 if asc(n$)=148 and len(in$)<ma then gosub 61505:goto 60320
+60400 if asc(n$)=29 then gosub 61210:goto 60320
+60410 if asc(n$)=17 or asc(n$)=145 then   60320
+60420 if asc(n$)=148 or asc(n$)=20 or asc(n$)=13 then goto 60320
+60430 :
+60485 fl=0
+60490 on co gosub  63900,63910,63920,63930,63940,63950
+60495 if fl=1 goto 60320
+60500 :
+60505 if len(in$)=ss-sp then in$=in$+n$:goto 60515
+60510 in$=left$(in$,ss-sp)+n$+mid$(in$,ss-sp+2,len(in$)-ss+sp-1)
+60515 print n$;
+60520 if ss=sp+ma-1 then print chr$(157);
+60530 goto 60320
+60901 :
+60902 :
+60903 :
+60950 poke211,sp:poke214,ze:sys58640:return
+60999 :
+61000 gosub 60950
+61010 print left$(bl$,ma);
+61020 gosub 60950
+61030 in$=""
+61040 return
+61099 :
+61210 if ss<sp+len(in$)and ss<sp+ma-1then ss=ss+1
+61220 gosub 63890
+61230 poke 211,ss:sys58640
+61240 return
+61250 :
+61310 if ss>sp then ss=ss-1
+61320 gosub 63890
+61330 poke 211,ss : sys 58640
+61340 return
+61350 :
+61410 in$=left$(in$,ss-sp-1)+mid$(in$,ss-sp+1,len(in$)-ss+sp)
+61420 gosub 63890
+61425 if len(in$)<ma-1 then print" ";
+61430 poke 211,ss-1 : sys 58640
+61440 return
+61490 :
+61505 if ss=sp+len(in$) then goto 61540
+61510 in$=left$(in$,ss-sp)+" "+mid$(in$,ss-sp+1,len(in$)-ss+sp)
+61520 gosub 63890
+61530 poke 211,ss : sys 58640
+61540 return
+61590 :
+63890 gosub 60950
+63892 print in$;:if len(in$)<ma then print " ";
+63898 return
+63899 :
+63900 if asc(n$)<48orasc(n$)>57 then fl=1
+63909 return
+63910 if asc(n$)=32 then return
+63911 if(asc(n$)<65orasc(n$)>90)and(asc(n$)<193orasc(n$)>218) then fl=1
+63919 return
+63920 rem
+63929 return
+63930 if asc(n$)=32 then return
+63931 if(asc(n$)<65orasc(n$)>90) then fl=1
+63939 return
+63940 rem
+63949 return
+63950 rem
+63959 return
+

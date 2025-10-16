@@ -30,6 +30,84 @@
         <p>Bevor Sie jetzt anfangen, das Quelltextlisting abzutippen, muß zuerst Hypra-Ass geladen und gestartet werden. Vergessen Sie beim Abtippen nicht das Minuszeichen nach jeder Zeilennummer und das Leerzeichen für Maschinenbefehle hinter dem Minuszeichen. Haben Sie den Quelltext abgetippt, ist Hypra-Ass wie gewohnt mit RUN zu starten. Beim Assemblieren korrigiert sich Hypra-Ass automatisch. Mit SYS 49152 wird die neue Hypra-Ass Version unter dem Namen »Hypra-Ass+« auf Diskette gespeichert.</p>
 
         <address class="author">(Gert Möllmann/ah)</address>
+
+        <figure>
+            <pre>100  -; Old-Befehl berichtigen:
+110  -;
+120  -.ba $1f3c
+130  -          sec
+140  -;
+150  -; Branch auf der Stelle erlauben
+160  -; ( label  beq label):
+170  -;
+180  -.ba $d33
+190  -;
+200  -          lda $3c
+210  -          sec
+220  -          sbc $fb
+230  -          tax
+240  -          lda $3d
+250  -          sbc $fc
+260  -          tay
+270  -          txa
+280  -          sbc #2
+290  -          sta $3c
+300  -          .by $b0,1
+310  -          dey
+320  -;
+330  -br1       cpy #0
+340  -          .by $f0,16
+350  -          iny
+360  -          .by $d0,18
+370  -          cmp #$80
+380  -          .by $90,14
+390  -          inc $3c
+400  -          cmp #$fe
+410  -          .by $90,2
+420  -          dec $3c
+430  -br3       rts
+440  -;
+450  -br2       cmp #$80
+460  -          .by $b0,1
+470  -          rts
+480  -;
+490  -error     lda #5
+500  -          jmp $a7f
+510  -;
+520  -;
+530  -;
+540  -; Um die geaenderte Version neu
+550  -; abzuspeichern ist folgender
+560  -; Quelltext geeignet:
+570  -;
+580  -.ba $c000
+590  -;
+600  -.eq sourcestart = $1fd8
+610  -.eq namlen      = 10
+620  -;
+630  -          lda #1
+640  -          ldx #8
+650  -          sta $fe
+660  -          stx $ff
+670  -          lda #8
+680  -          jsr $ffba
+690  -          lda #namlen
+700  -          ldx #<(name)
+710  -          ldy #>(name)
+720  -          jsr $ffbd
+730  -          lda #$fe
+740  -          ldx #<(sourcestart)
+750  -          ldy #>(sourcestart)
+760  -          jmp $ffd8
+770  -;
+780  -name      .tx "hypra-ass+"
+790  -;
+800  -; Durch sys $c000 wird der ge-
+810  -; aenderte Assembler auf Disk
+820  -; abgespeichert</pre>
+            <!-- Auf Programmservice-Disk ist 610 namlen = 9, und 780 name = "hypra-as+" -->
+            <figcaption>Quelltextlisting zur Hypra-Ass-Ergänzung</figcaption>
+        </figure>
     </article>
 </body>
 

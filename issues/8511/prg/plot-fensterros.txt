@@ -1,0 +1,52 @@
+
+
+;plot-fensterros.prg ==0801==
+    1 rem ********************************
+    2 rem *                              *
+    3 rem *         fensterrose          *
+    4 rem *  version fuer  plotter 1520  *
+    5 rem *                              *
+    6 rem *  heimo ponnath hamburg 1985  *
+    7 rem *                              *
+    8 rem ********************************
+    9 rem **** eingaben *****
+   10 poke53280,0:poke53281,0:poke646,5:printchr$(147)
+   15 input"anzahl stuetzpunkte";n
+   20 input"radius";r:input"textort xt,yt";xt,yt
+   25 rem **** init *****
+   30 open1,6,1:open2,6,2:print#2,1:close2
+   35 rem **** start *****
+   40 print#1,"m",0,-200:print#1,"i"
+   45 rem **** mitte *****
+   50 print#1,"r",240,0:print#1,"i"
+   55 rem*******
+   60 d=2*~/n:dimx(n),y(n)
+   65 rem **** kreis *****
+   70 m=50:dd=360*~/(m*180):dimt(m):t(0)=2*~
+   72 fori=1tom:t(i)=t(i-1)+dd:print#1,"r",r*cos(t(i-1)),r*sin(t(i-1))
+   74 print#1,"j",r*cos(t(i)),r*sin(t(i)):nexti
+   75 rem*******
+   80 gosub200
+   90 a$="fensterrose"
+   95 rem **** text *****
+  100 open4,6:print#1,"r",xt,yt:print#4,a$:close4:print#1,"m",240,-yt:print#1,"i"
+  105 rem **** show *****
+  110 print#1,"r",0,-200
+  115 rem******
+  120 poke198,0:wait198,1
+  125 rem **** normal *****
+  130 open3,6,3:print#3,0:open4,6:print#4:print#4," n","   r","    xt","    yt"
+  132 print#4,n,r,xt,yt:print#3,1:print#4:close3:close4:close1
+  135 rem **** greset *****
+  150 open7,6,7:print#7:close7
+  160 end
+  200 rem ****** up zeichnen **********
+  210 fori=1ton:t=t+d:x(i)=r*cos(t):y(i)=r*sin(t):nexti
+  220 s=n-1
+  230 fori=1tos:z=i+1
+  240 forj=zton
+  242 rem **** linie *****
+  245 print#1,"r",x(i),y(i):print#1,"j",x(j),y(j)
+  247 rem********
+  250 nextj:nexti:return
+

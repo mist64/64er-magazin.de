@@ -1,0 +1,287 @@
+
+
+;sequenzgenerator.prg ==0801==
+ 1000 rem ******************************
+ 1010 rem *                            *
+ 1020 rem *       leseprogramm         *
+ 1030 rem *   fuer sequencer-daten     *
+ 1040 rem *                            *
+ 1050 rem * erzeugt aus data-zeilen    *
+ 1060 rem * einen absolut ladbaren     *
+ 1070 rem * datensatz fuer sequencer   *
+ 1080 rem *                            *
+ 1090 rem * thomas kraetzig   sep 85   *
+ 1100 rem *                            *
+ 1110 rem ******************************
+ 1120 rem
+ 1130 rem konstanten und
+ 1140 rem variablen mit vorbesetzungen
+ 1150 rem
+ 1160 dim sf(200) :rem sequenzfolgeliste
+ 1170 dim sa(200) :rem sequenzadressenl.
+ 1180 dim ta(3)   :rem trackadressen
+ 1190 rem notennamen
+ 1200 nn$="ccddeffggaah"
+ 1210 dn$=""      :rem dateiname
+ 1220 s=1         :rem aktuelle sequenz
+ 1230 t=1         :rem aktueller track
+ 1240 ad=0        :rem allg. adresse
+ 1250 sa=39432    :rem $9a08
+ 1260 q=96        :rem quantisierung
+ 1270 r=0.5       :rem gate on/laenge
+ 1280 nl=1/4      :rem notenlaenge
+ 1290 l=0         :rem stringlaenge
+ 1300 sv=12*4096  :rem save-routine
+ 1500 rem-------------------------------
+ 1510 rem programmstart
+ 1520 rem-------------------------------
+ 1530 rem save-maschinenprogramm
+ 1540 for i=0 to 17
+ 1550 read x:poke sv+i,x:next i
+ 2020 rem
+ 2030 rem dummy-track erzeugen
+ 2040 ad=sa+2
+ 2050 poke ad  ,1  :poke ad+1,97
+ 2060 poke ad+2,239:poke ad+3,0
+ 2070 h0=int(ad/256):l0=ad-256*h0
+ 2080 ad=ad+4:a$=""
+ 2100 rem naechstes datum lesen
+ 2110 print" ";a$;:read a$
+ 2120 l=len(a$):l$=left$(a$,1)
+ 2150 if a$="p"            then 3100
+ 2160 if a$="pause"        then 3100
+ 2165 if a$="track"        then 3800
+ 2170 if a$="sequenz"      then 4000
+ 2175 if a$="sequenzfolge" then 3600
+ 2190 if a$="ende"         then 4300
+ 2200 rem
+ 2210 rem nach notennamen suchen
+ 2220 rem
+ 2230 if l=1 then 5000
+ 2240 if l>3 then 2500
+ 2250 n=1
+ 2260 if l$=mid$(nn$,n,1) then 2300
+ 2270 n=n+1:if n<13 then 2260
+ 2280 goto 2500 :rem keine note
+ 2300 r$=right$(a$,1):o=val(r$)
+ 2310 if o=0 and r$<>"0" then 2420
+ 2320 if o>6 then 2420
+ 2330 if l=2 then 3000
+ 2340 m$=mid$(a$,2,1)
+ 2350 if m$="#" then n=n+1:goto 3000
+ 2360 if m$="b" then n=n-1:goto 3000
+ 2380 f$="nur "+l$+"#"+r$+" oder "+l$+"b"+r$
+ 2390 f$=f$+" oder "+l$+r$+" moeglich"
+ 2400 goto 5000
+ 2420 f$="oktavbereich 0-6"
+ 2430 goto 5000
+ 2500 rem
+ 2510 rem nach / oder - suchen
+ 2520 rem
+ 2530 m$=mid$(a$,2,1)
+ 2540 if m$<>"/" and m$<>"-" then 2560
+ 2550 r$=right$(a$,l-2):goto 2600
+ 2560 m$=mid$(a$,3,1)
+ 2570 if m$<>"/" and m$<>"-" then 5000
+ 2580 l$=left$(a$,2):r$=right$(a$,l-3)
+ 2600 rem
+ 2610 rem zaehler und nenner untersuchen
+ 2620 rem
+ 2630 z=val(l$)
+ 2640 if z>0 and z<99 then 2670
+ 2650 f$="zaehler-bereich 1 bis 99"
+ 2660 goto 5000
+ 2670 n=val(r$)
+ 2680 if n>0 or m$="-" then 2710
+ 2690 f$="nenner muss groesser 0 sein"
+ 2700 goto 5000
+ 2710 if m$="/" then 3200 :rem zeit
+ 2720 if m$="-" then 3400 :rem on/off
+ 2730 goto 5000
+ 3000 rem-------------------------------
+ 3010 rem note (tonnummer n  oktave o)
+ 3020 rem-------------------------------
+ 3030 if n=0  then n=12:o=o-1
+ 3040 if n=13 then n=1 :o=o+1
+ 3050 poke ad,128+16*o+n-1:ad=ad+1
+ 3060 goto 2110
+ 3100 rem-------------------------------
+ 3110 rem pause
+ 3120 rem-------------------------------
+ 3130 poke ad,239:ad=ad+1:goto 2110
+ 3200 rem-------------------------------
+ 3210 rem zeit (notendauer)
+ 3220 rem-------------------------------
+ 3230 t=int(q*z/n)   :rem gesamtzeit
+ 3240 an=int(r*q*z/n):rem gate-on-zeit
+ 3250 of=t-an        :rem gate-off-zeit
+ 3260 if an<=96 then 3290
+ 3270 f$="gate-on-zeit zu gross"
+ 3280 goto 5000
+ 3290 if of<=30 then 3320
+ 3300 f$="gate-off-zeit zu gross"
+ 3310 goto 5000
+ 3320 poke ad,an:ad=ad+1
+ 3330 poke ad,of+97:ad=ad+1
+ 3340 goto 2110
+ 3400 rem-------------------------------
+ 3410 rem verhaeltnis gate-on/gesamtzeit
+ 3420 rem (z/n = gate on/gate-off)
+ 3430 rem-------------------------------
+ 3440 r=z/(z+n):goto 2110
+ 3600 rem-------------------------------
+ 3610 rem sequenzfolge
+ 3620 rem-------------------------------
+ 3630 print:print:as=0
+ 3640 print" ";a$;:reada$:a=int(val(a$))
+ 3650 if a=0 then 3670
+ 3660 sf(as)=a:as=as+1:goto 3640
+ 3670 if a$<>"0" then 3690
+ 3680 print" 0":read a$:goto 2120
+ 3690 f$="liste muss mit 0 abgeschlossen sein"
+ 3700 goto 5000
+ 3800 rem-------------------------------
+ 3810 rem track
+ 3820 rem-------------------------------
+ 3830 print:print:print a$;
+ 3840 read a$:a=int(val(a$))
+ 3850 if a>=1 and a<=3 then 3880
+ 3860 f$="nur 1,2,3 zulaessig"
+ 3870 goto 5000
+ 3880 print a:t=a
+ 3890 if ns then ns=0:goto 3910
+ 3900 poke ad,0:ad=ad+1
+ 3910 hi=int(ad/256):lo=ad-256*hi
+ 3920 poke sa(s)+(t-1)*2,lo
+ 3930 poke sa(s)+(t-1)*2+1,hi
+ 3940 read a$:goto 2120
+ 4000 rem-------------------------------
+ 4010 rem sequenz
+ 4020 rem-------------------------------
+ 4030 print:print:print:print a$;
+ 4040 read a$:a=int(val(a$))
+ 4050 if a>=1 and a<=200 then 4080
+ 4060 f$="nur 1-200 zulaessig"
+ 4070 goto 5000
+ 4080 print a:s=a
+ 4090 poke ad,0:ad=ad+1:ns=-1:sa(s)=ad
+ 4100 rem track-zeiger auf dummy-track
+ 4110 rem initialisieren
+ 4120 poke ad  ,l0:poke ad+1,h0
+ 4130 poke ad+2,l0:poke ad+3,h0
+ 4140 poke ad+4,l0:poke ad+5,h0
+ 4150 ad=ad+6
+ 4160 read a$:goto 2120
+ 4300 rem-------------------------------
+ 4310 rem ende
+ 4320 rem sequenzfolgeliste aufbauen
+ 4330 rem-------------------------------
+ 4340 print:print a$
+ 4350 poke ad,0:ad=ad+1
+ 4360 hi=int(ad/256):lo=ad-256*hi
+ 4370 poke sa,lo:poke sa+1,hi
+ 4380 for i=0 to as-1
+ 4390 : x=sa(sf(i)):if x>0 then 4410
+ 4400 : print"sequenz";i;"nicht definiert":goto 4420
+ 4410 : hi=int(x/256):lo=x-256*hi
+ 4420 : poke ad+3*i,lo
+ 4430 : poke ad+3*i+1,hi
+ 4440 : poke ad+3*i+2,0
+ 4450 next i
+ 4460 for i=0 to 2:poke ad+3*as+i,0:next
+ 4470 ad=ad+3*as+3
+ 4500 rem
+ 4510 rem bereich sa-ad auf disk
+ 4520 rem
+ 4530 input"abspeichern (j/n) ";a$
+ 4540 if a$<>"j" then end
+ 4550 input"dateiname         ";dn$
+ 4560 ah=int(sa/256):al=sa-256*ah
+ 4570 eh=int(ad/256):el=ad-256*eh
+ 4580 open 1,8,1,dn$
+ 4590 poke 252,al:poke 253,ah
+ 4600 poke 780,252
+ 4610 poke 781,el:poke 782,eh
+ 4620 sys sv:close 1
+ 4630 end
+ 5000 rem-------------------------------
+ 5010 rem fehler
+ 5020 rem-------------------------------
+ 5030 print:print
+ 5040 print"fehlerhaftes datum: ";a$
+ 5050 if f$<>"" then print f$
+ 5060 print:a$="":f$="":goto 2110
+ 7000 rem-------------------------------
+ 7010 rem save-routine
+ 7020 rem-------------------------------
+ 7030 data 072,165,001,041,254,133,001
+ 7040 data 104,032,216,255,165,001,009
+ 7050 data 001,133,001,096
+ 8000 rem-------------------------------
+ 8010 rem musikstueck
+ 8020 rem (edvard grieg   kobold)
+ 8030 rem-------------------------------
+ 8100 data sequenz,1
+ 8110 data track,3
+ 8120 data 1-1,1/4,eb1,hb1,eb1,hb0
+ 8130 data eb1,hb1,eb1
+ 8140 rem
+ 8200 data sequenz,2
+ 8210 data track,1
+ 8220 data 1-0,1/4,p,1/8,hb3,3/8,p
+ 8230 data 1/8,hb3,3/8,p,1-1,1/4
+ 8240 data hb3,gb3,gb3,hb3,a3,f3,f3,a3
+ 8250 data 1/2,a3,p,1-0
+ 8260 data 1/8,eb4,3/8,p,1/8,eb4,3/8,p
+ 8270 data 1-1,1/4,eb4,cb4,cb4,eb4
+ 8280 data d4,hb3,hb3,d4,1-0,1/4,d4
+ 8290 data 1/2,p
+ 8300 data track,2
+ 8310 data 1-0,1/8,eb3,f3
+ 8320 data gb3,f3,eb3,f3,gb3,f3,eb3,f3
+ 8330 data 1-1,1/4,gb3,eb3,eb3,gb3
+ 8340 data f3,c3,c3,f3,1/2,f3,1/4,p
+ 8350 data 1-0,1/8,ab3,hb3
+ 8360 data cb4,hb3,ab3,hb3
+ 8370 data cb4,hb3,ab3,hb3,1-1,1/4
+ 8380 data cb4,ab3,ab3,cb4,hb3,f3,f3,hb3
+ 8390 data 1/2,hb3,1/4,p
+ 8400 data track,3
+ 8410 data 1-1,1/4,hb0,eb1,hb1,eb1
+ 8420 rem
+ 8430 data sequenz,3
+ 8440 data track,1
+ 8450 data 1-1,1/4,p
+ 8460 data db5,p,db5,p,ab4,p,ab4,p
+ 8470 data gb4,p,gb4,p,db4,p,db4
+ 8480 data track,2
+ 8490 data 1-0,1/8
+ 8500 data gb4,ab4,hb4,ab4,gb4,ab4,hb4,p
+ 8510 data db4,eb4,f4,eb4,db4,eb4,f4,p
+ 8520 data cb4,db4,eb4,db4,cb4,db4,eb4,p
+ 8530 data gb3,ab3,hb3,ab3,gb3,ab3,hb3,p
+ 8540 data track,3
+ 8550 data 1-0,1/4,p,1/2
+ 8560 data gb3,p,db3,p,cb3,p,gb2,1/4,p
+ 8570 rem
+ 8600 data sequenz,4
+ 8610 data track,1
+ 8620 data 1-0,1/4,p,1/1,p,p,p,p,1/8
+ 8630 data hb1,f2,hb2,hb2,f3,hb3,hb3,f4
+ 8640 data 1/4,hb4,3/4,p
+ 8650 data track,2
+ 8660 data 1-0,1/8,f2,gb2,ab2,gb2,f2,p
+ 8670 data gb2,f2,eb2,p,f2,eb2,db2,p
+ 8680 data eb2,db2,c2,p,1/1,p,1/8
+ 8690 data eb2,db2,cb2,p,1/2,p
+ 8700 data 1/1,f1,1/4,f4,3/4,p
+ 8710 data track,3
+ 8720 data 1-0,1/8,f1,gb1,ab1,gb1,f1,p
+ 8730 data gb1,f1,eb1,p,f1,eb1,db1,p
+ 8740 data eb1,db1,c1,p,1/1,p,1/8
+ 8750 data eb1,db1,cb1,p,1/2,p
+ 8760 data 1/1,f0,1/4,f2,3/4,p
+ 8800 rem
+ 8810 data sequenzfolge,1,2,2,3,3,4,0
+ 8820 data ende
+

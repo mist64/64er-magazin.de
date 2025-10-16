@@ -1,0 +1,571 @@
+
+
+;profiprint.prg ==0801==
+    1 poke650,128:ifpeek(1022)=0then5000
+    2 poke2,32:poke53280,0:poke53281,0:print"{wht}"
+   10 ifpeek(1022)=100thenpoke1022,1:load"zeichen b",8,1
+   11 ifpeek(1022)=250thenpoke1022,240:load"zeichen din",8,1
+   12 ifpeek(1022)=1orpeek(1022)=240thenpoke53272,8:poke56576,peek(56576)and252:poke648,192
+   13 print"{clr}"
+   14 ifpeek(1022)=1thenpoke1022,2:load"zeichen d",8,1
+   15 ifpeek(1022)=240thenpoke1022,210:load"zeichen ddin",8,1
+   16 ifpeek(1022)=2thenpoke1022,3:load"profip v1.0",8,1
+   17 ifpeek(1022)=210thenpoke1022,200:load"profip v1.0",8,1
+   18 ifpeek(1022)=200thenpoke922,2:poke923,1
+   20 c$="n":k$="n":sy$="n":s1$="n":nu$="n":ge=80:zz=60:yy=60
+   39 a6$="                                                                      "
+   40 a8$=a8$+"{$a0}":iflen(a8$)<200then40
+   41 bv$=chr$(27)+"b"+chr$(3)+chr$(27)+"s"+chr$(1)
+   42 bv$=bv$+chr$(27)+"a"+chr$(5):dimv$(50)
+   45 pt$=chr$(14)+"{rvon}  Profiprint (c)'1985 by Oliver Fendt   "
+   46 ifpeek(930)<>0thengosub40000:goto60
+   47 print"{clr}";pt:fa=8
+   48 print"{clr}";pt$:print"Nun die PORFIADRESS Datendiskette       einlegen,";
+   49 print" und den Drucker anschalten."
+   50 n$="":poke917,39:poke918,30:poke920,7:poke924,0
+   51 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Name           ":sys50176,n$,n$:print
+   52 ifval(n$)>0theny=val(n$):goto700
+   53 gosub40100:ify=0thenprint"Benutzer nicht registriert":goto50
+   54 gosub50145:gosub50155:close2:close15
+   55 ifv$(8)="-"orv$(8)=""thenprint"Keine Zugriffsberechtigung":goto50
+   56 p$="":poke917,39:poke918,30:poke920,7:poke924,0
+   57 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}{wht}Kennwort{blk}":sys50176,p$,p$:print"{wht}"
+   58 ifpeek(913)=1then50
+   59 ba$=v$(8):ifpa$<>p$thenprint"Kennwort falsch":goto56
+   60 input"{down}{down}{down}{wht}Druckeradresse  4{left}{left}{left}";da
+   70 d$="":poke917,39:poke918,30:poke920,7:poke924,0:print"{clr}";pt$
+   71 print"{down}Hallo ";v$(1);","
+   72 print"bitte gib das Datum ein."
+   73 poke908,0:poke921,0:print"{down}Datum"
+   74 sys50176,d$,d$
+   90 dimf$(270),a$(250):ge=80:gosub40010
+   99 lf=0:fa$=""
+  100 cv=0:n8=0:yx=0:ed=0:ba=1:gosub37000
+  142 rem
+  143 print"{clr}{down}{down}Bitte nun die Datendiskette mit dem"
+  144 print"Format einlegen und eine Taste druecken."
+  145 poke198,0:wait198,1:getb$:ifb$="{f1}"thengosub37131:goto143
+  150 close15:open15,fa,15,"i"
+  160 open2,fa,2,fo$+",s,r":input#15,er,a$:ifer<>0thenprinta$:poke198,0:wait198,1:goto99
+  170 input#2,an:input#2,c$,k$,sy$,s1$,nu$,ge,zz
+  180 input#2,a$:yy=val(a$)
+  190 fz=1:fort=1toyy+20:gosub3500:gosub12000
+  198 next:close2:gosub20000:ifb$="{f8}"thengosub15000
+  199 ift$<>"alle"thent$=">"+ba$+"??????"+t$
+  200 ift$="alle"thengosub30000
+  201 ifba<qqthent$=n$(ba):ba=ba+1:goto210
+  202 print"{down}{down}{down}{down}Bitte nun die Datendiskette mit dem"
+  203 print"Text einlegen und eine Taste druecken.{down}"
+  204 poke198,0:wait198,1:geta$:ifa$="{f1}"then100
+  205 goto210
+  206 gosub210:end
+  210 ifvv=1then11000
+  211 close2:close15:open15,fa,15
+  212 open2,fa,2,t$+",s,r":input#15,er,a$:ifer<>0thenprinta$:poke198,0:wait198,1:goto100
+  220 input#2,an:p=0:gosub36000
+  225 ta=(ge-zz)/3
+  230 poke198,0:ifed=2thengosub10000:goto240
+  231 print"{clr}{down}{down}Bitte legen Sie ein Blatt ein und       druecken Sie ein Taste"
+  232 gosub10000
+  233 geta$:ifa$=""then233
+  234 print"{clr}";pt$
+  235 print"{down}Ich arbeite ..."
+  240 print"{down}Ich drucke Seite";sh+1:print"Text :";t$
+  245 sh=sh+1:ifsh=2thengosub600
+  250 ra=(ge-zz)/3
+  300 v=0 : if n7<n6 then v= (n6-n7)/3
+  310 u=1:forww=1toyy:co$=left$(f$(ww),1)
+  314 ifco$="*"thengoto500
+  315 ifco$="."thena$=da$:gosub2001:goto 340
+  316 ifco$<>"="andco$<>"+"andco$<>"_"thena$=f$(ww):gosub2000:goto340
+  320 ifv>1thena$="":gosub2000:v=v-1:goto340
+  321 ifu>n7thena$="":gosub2000:u=u+1:goto340
+  330 ifco$="="thena$=a$(u):u=u+1:gosub2000:goto340
+  331 ifco$="+"thengosub400:u=u+1:gosub2000:goto340
+  332 ifco$="_"thengosub410:u=u+1:gosub2000:goto340
+  339 ifm$="{f8}"thenn8=999:ww=999
+  340 nextww
+  341 print"{down}{down}{down}1{down}{down}{down}":ifn8<>999thengs=1:goto230
+  342 ifn8=999thenformn=1to999:geta$:ifa$="{f6}"thenn8=0
+  343 next
+  349 print"{down}{down}{down}2{down}{down}{down}":ifn8=999andba<qqthenclose2:close15:close1:n8=0:goto201
+  350 ifvv=1then210
+  360 print"{clr}fertig":poke198,0:goto6000
+  400 a$=left$(a$(u)+a8$,zz)+right$(f$(ww),len(f$(ww))-1):return
+  410 a$=right$(f$(ww),len(f$(ww))-1)+a$(u):return
+  450 print"{down}{down}{down} *** pause ***"
+  455 getm$:ifm$<>"{f3}"then455
+  456 ifm$<>"{f1}"thenend
+  460 goto2010
+  500 rem ** seitennr. **
+  501 a$=left$(a6$,int(ge/2.5)-ta)+"-"+str$(sh)+" -"
+  502 iftd$="j"thena$=a$+t$
+  510 gosub2001:goto340
+  600 fort=1to20:f$(t)=f$(t+yy):next:gosub20000:return
+  700 ify=999thenba$="ga":goto72
+  710 ify=900thenv$(8)="of":pa$="sabrina":goto56
+  720 ify=901thenv$(8)="ol":pa$="edv":goto56
+  725 ify=902thenv$(8)="rh":pa$="nie":goto56
+  730 ify=903thenv$(8)="sz":pa$="frau":goto56
+  799 goto54
+ 1999 end
+ 2000 gosub30400:gosub2500
+ 2001 ifa$<>""anda$<>"{CBM-F}"thena$=left$(a6$,ta)+a$
+ 2005 rem
+ 2006 xy=1
+ 2007 getm$:ifm$="{f1}"then450
+ 2010 a$=a$+chr$(13):forz=1tolen(a$)
+ 2020 b$=mid$(a$,z,1):gosub4450
+ 2030 as=asc(b$)
+ 2040 ifas>191andas<234thenas=as-96
+ 2050 ifas>223andas<255thenas=as-64
+ 2060 ifas=255thenas=126
+ 2070 ifxy=2thenz=z+1
+ 2080 ifxy=3thenxy=2
+ 2090 ifas<128thenb$=chr$(peek(1026+as)):goto2200
+ 2100 as=as-160:b$=""
+ 2110 z1=0:ifpeek(1202+8*as)<>0andpeek(1201+8*as)<>27thenb$=chr$(peek(1024)):z1=1
+ 2120 ifz1=0thengosub2300
+ 2130 ifz1=1thengosub2400
+ 2140 ifz1=1andbr=0thenb$=b$+chr$(peek(1025))
+ 2150 ifz1=1andbr=1thenb$=b$+chr$(peek(1026))
+ 2200 print#1,b$;
+ 2210 next:poke53265,27:return
+ 2300 fordd=1to8:mn=peek(as*8+dd+1200)
+ 2310 ifmn=0thennextdd:return
+ 2320 gosub4400:b$=b$+c$:nextdd:return
+ 2400 fordd=1to8:mn=peek(as*8+dd+1200)
+ 2410 ifmn=0thennextdd:return
+ 2420 gosub4400:b$=b$+c$:ifbr=1thenb$=b$+c$
+ 2430 nextdd:return
+ 2500 ifleft$(a$,1)<>"#"thenreturn
+ 2501 ifa$<"#00"thenreturn
+ 2510 a$=right$(a$,len(a$)-1):ta=ra+val(left$(a$,2))
+ 2511 a$=right$(a$,len(a$)-2):return
+ 3000 ife7=1thene7=0:et=0:a$=bb$:bb$="":goto3046
+ 3005 a$=bb$:et=0:ifzz=0thenp=p+1:goto3500
+ 3010 ifnf=1then3900
+ 3011 poke915,2:poke917,200:poke908,255:sys50182,bb$:if(st and 64)=64thenbb$="{CBM-F}"
+ 3012 ifpeek(913)=13thenp=p+1
+ 3013 ifbb$=">"thenbb$="{CBM-F}":et=1
+ 3014 ifbb$="> "thenbb$="{CBM-F}":et=1
+ 3015 ifright$(bb$,1)=" "thenbb$=left$(bb$,len(bb$)-1):goto3014
+ 3016 ifleft$(bb$,1)=" "thenbb$=right$(bb$,len(bb$)-1):goto3015
+ 3017 ifleft$(bb$,1)="@"thengosub30300
+ 3018 ifleft$(bb$,8)="noformat"thennf=1:goto3010
+ 3019 ifleft$(bb$,8)="mittezen"thenmi=1:goto3010
+ 3020 ifleft$(bb$,8)="formnorm"thenmi=0:goto3010
+ 3021 ifleft$(bb$,8)="rechtsfo"thenmi=2:goto3010
+ 3022 ifleft$(bb$,8)="keinform"thenmi=3:goto3010
+ 3023 ifleft$(bb$,7)="dezlen="thengoto3650
+ 3024 ifleft$(bb$,1)="_"thengosub3680
+ 3028 ifleft$(bb$,2)="!!"then3600
+ 3029 ifright$(bb$,1)="{CBM-F}"orleft$(bb$,1)="{CBM-D}"thenet=1:e7=1
+ 3030 c$=a$:ifright$(c$,1)="-"thenc$=left$(c$,len(c$)-1):c$=c$+bb$:goto3040
+ 3035 c$=c$+" "+bb$
+ 3040 iflen(c$)<zzthena$=c$:e7=0:ifet=0then3010
+ 3045 ifet=1ande7=0thenbb$=""
+ 3046 ifright$(a$,1)=" "thena$=left$(a$,len(a$)-1):goto3046
+ 3047 ifleft$(a$,1)=" "thena$=right$(a$,len(a$)-1):goto3047
+ 3049 ifmi<>0then3100
+ 3050 ifright$(a$,1)="{CBM-F}"thenreturn
+ 3051 poke918,zz-zz/4:poke917,zz:sys50185,a$,a$
+ 3060 return
+ 3100 ifmi=1then3200
+ 3110 ifmi=2then3300
+ 3120 ifmi=3then3400
+ 3130 rem ifmi=4then3450
+ 3200 ifa$=""ora$="{CBM-F}"thena$="":printa$:return
+ 3201 sys50179,a$:x8=(zz-(len(a$)-peek(919)))/2.1
+ 3210 ifx8>0thena$=left$(a6$,x8)+a$:return
+ 3211 return
+ 3300 ifa$=""ora$="{CBM-F}"thena$="":return
+ 3301 sys50179,a$:x8=(zz-(len(a$)-peek(919)))
+ 3310 ifx8>0thena$=left$(a6$,x8)+a$:return
+ 3311 return
+ 3400 ifa$=""ora$="{CBM-F}"thena$="":return
+ 3401 return
+ 3500 poke908,0
+ 3510 poke915,2:poke917,136
+ 3520 sys50182,a$:ifa$=">"thena$=""
+ 3521 ifright$(a$,1)=" "thena$=left$(a$,len(a$)-1):goto3521
+ 3522 ifleft$(a$,1)=" "thena$=right$(a$,len(a$)-1):goto3522
+ 3530 return
+ 3600 rem ** !! abulator **
+ 3602 bb$=right$(bb$,len(bb$)-2):gh=val(left$(bb$,2))
+ 3605 ifgh>zzthenbb$="{$a0}":goto3040
+ 3610 gh=gh-len(c$):ifgh<0thengh=0
+ 3620 c$=c$+left$(a8$,gh)+"-":goto3040
+ 3650 rem ** dezlen eingabe **
+ 3655 bb$=right$(bb$,len(bb$)-7):dv=val(left$(bb$,1))
+ 3660 bb$=right$(bb$,len(bb$)-1):dn=val(left$(bb$,1))
+ 3670 bb$="":goto3040
+ 3680 rem ** dezimal bildung **
+ 3681 qw=0:rf$=right$(bb$,1):ifval(rf$)=0andrf$<>"0"thenqw=1
+ 3682 ifqw=1thenbb$=left$(bb$,len(bb$)-1)
+ 3683 bb$=right$(bb$,len(bb$)-1):gh=int(val(bb$)):ifgh<0thengh=gh+1
+ 3684 de$=str$(gh):de$=right$(de$,len(de$)-1):gz=gh
+ 3685 de$=right$("{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}"+de$,dv-1)
+ 3686 ifgz<0thende$="-"+de$
+ 3687 ifgz>=0thende$="{$a0}"+de$
+ 3688 gh=abs(val(bb$)-gh)
+ 3690 ifdn=0then3698
+ 3691 de$=de$+"."
+ 3692 gh=gh*10^dn:dn$=str$(gh):dn$=right$(dn$,len(dn$)-1)
+ 3693 de$=de$+left$(dn$+"000000000",dn)
+ 3698 bb$=de$:ifqw=1thenbb$=bb$+rf$
+ 3699 return
+ 3900 poke915,2:poke917,zz:poke908,1:sys50182,bb$:if(st and 64)=64thenbb$="{CBM-F}"
+ 3910 ifbb$="formaton"thennf=0:a$="":bb$="":goto3010
+ 3912 ifbb$=">"thenbb$=""
+ 3920 a$=bb$:return
+ 3999 return
+ 4400 ifrv=0then4420
+ 4401 ifmn=0thenc$="":return
+ 4402 ifmn<128thenc$=chr$(mn):return
+ 4410 mn=mn-128:mn=255-mn
+ 4420 c$=chr$(mn):return
+ 4450 ifb$="{CBM-N}"thenbr=1:xy=3
+ 4451 ifb$="{CBM-M}"thenbr=0:xy=1
+ 4452 ifs1$="s"and(b$="{CBM-N}"orb$="{CBM-G}"orb$="{CBM-J}")thenprint#1,chr$(27)+"b"+chr$(5);
+ 4453 ifs1$="s"and(b$="{CBM-M}"orb$="{CBM-H}"orb$="{CBM-K}")thenprint#1,chr$(27)+"b"+chr$(4);
+ 4460 return
+ 5000 print"{clr}{rvon}  profiprint (c) '1984 by oliver fendt  "
+ 5010 input"{down}{down}tastatur {rght}{rght}din{left}{left}{left}{left}{left}";a$
+ 5020 poke1022,250:ifa$<>"din"thenpoke1022,100
+ 5030 run
+ 6000 print"{clr}";pt$
+ 6010 print"{down}{down}  -0-  Ende"
+ 6011 print"{down}  -1-  Einen Text drucken"
+ 6012 print"{down}  -2-  Profitext laden"
+ 6050 print"{down}{down}Bitte waehlen sie:"
+ 6052 poke198,0:wait198,1:geta$
+ 6054 ifa$="{f1}"ora$="0"thenpoke2,0:poke930,0:end
+ 6055 ifval(a$)>2then6052
+ 6060 ifa$="1"then100
+ 6070 poke2,0:print"{clr}{down}{down}{down}load"+chr$(34)+"c/profitext*"+chr$(34)+",8"
+ 6080 print"{down}{down}{down}{down}run{home}":poke198,2:poke631,13:poke632,13:end
+10000 n7=0:l=0
+10010 ifn7>=n6thenreturn
+10020 gosub3000:n7=n7+1:ifp>anthena$(n7)=a$:n8=999:return
+10030 ifleft$(a$,1)="{CBM-D}"thengosub10100:ifrr=1thenreturn
+10035 iflen(a$)>lthenl=len(a$)
+10040 a$(n7)=a$:ifleft$(a$,1)="{CBM-F}"then10060
+10050 goto10010
+10060 if5>n6-n7thenreturn
+10065 goto10010
+10100 rem ** seitenvorschub ?? **
+10101 if a$="{CBM-D}"thenrr=1:goto10120
+10102 rr=0:a$=right$(a$,len(a$)-1)
+10110 gq=val(left$(a$,2)):ifgq>n6-n7thenrr=1
+10120 a$="":a$(n7)="":return
+11000 ifyx>=cvthen6000
+11005 gosub50145:sh=0:print"{clr}Vardef{down}"
+11010 yx=yx+1:y=a(yx):gosub50155:close2:close15:goto11030
+11020 goto6000
+11030 fort=1to20:printv$(t):next
+11035 goto211
+12000 ifleft$(a$,1)="^"thena$=right$(a$,len(a$)-1):goto13000
+12001 ifleft$(a$,1)="_"thena$=right$(a$,len(a$)-1):goto13010
+12010 f$(fz)=a$:fz=fz+1:return
+13000 f$(fz-1)=f$(fz-1)+right$(a8$,zz-len(f$(fz-1))-len(a$))+a$:return
+13010 f$(fz)=right$(a8$,zz-len(a$))+a$:fz=fz+1:return
+15000 rem ** erstellen formblatt **
+15010 gosub35000
+15020 print"{clr}":fort=1toyy+20
+15021 print"{home}{down}{down}{down}{down}{down}{down}{down}                                        ";
+15022 print"                                        ";
+15023 print"                                        ";
+15024 print"                                        ";
+15025 print"{home}{down}{down}{down}{down}{down}{down}{down}";f$(t);"{CBM-@} "
+15030 print"{home}";pt$:print"Formblatt erstellen"
+15035 ift<1thent=yy
+15036 ift>yythenprint"{rvon}Seite 2{rvof} Zeile";t-yy
+15037 ift>yy+20thenprint"                       ":t=1
+15050 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}= = Text drucken / ^ Ausfuellen"
+15051 print". = Datum hier drucken"
+15052 print"* = Seitenzahl hier drucken"
+15054 print"(f1) Alles OK   (f3) DEMO Druck"
+15055 print"(f5) Zeile hoch (f7) Speichern"
+15056 print"(f2) Formblatt laden"
+15057 print"(f4) Mittezentrierung des Textes"
+15058 print"(f6) Rechstformatierung"
+15059 print"(f8) Blocksatzformatierung"
+15060 print"(CRTL)+(L) Formblatt loeschen"
+15061 print"(CRTL)+(E) Neu Parameter Einstellen"
+15062 print"{rvon}Alles was anders ist, wird so gedruckt, wie es dasteht.";
+15070 print"{home}{rvof}{down}{down}{down}{down}Pos.x.     {left}{left}{left}{left}";len(f$(t))
+15071 print"Pos.y.     {left}{left}{left}{left}";t;" "
+15080 ifpeek(198)<1then15080
+15090 geta$
+15095 ifa$=chr$(20)andlen(f$(t))=0then15080
+15100 ifa$=chr$(20)thenf$(t)=left$(f$(t),len(f$(t))-1):goto15155
+15110 ifa$="{f1}"thenlf=1:fa$="ok":fo$=">"+ba$+"??????ok":gosub20000:return
+15120 ifa$="{f3}"then15600
+15121 ifa$="^"then15900
+15122 ifa$="{wht}"thengosub35000:goto15021
+15123 ifa$="{stop}"thenforu=1to20:f$(yy+u)=f$(u):next:goto15021
+15130 ifa$="{f5}"thent=t-2:next
+15131 ifa$="{CTRL-L}"thenforu=1toyy:f$(u)="":next:t=1:goto15021
+15134 ifa$="{f2}"thent=999:next:goto15800
+15135 ifa$="{f7}"then15700
+15136 ifa$="{f4}"thenf$(t)=left$(a8$,(zz-len(f$(t)))/2)+f$(t):goto15021
+15137 ifa$="{f6}"thenf$(t)=left$(a8$,zz-len(f$(t)))+f$(t):goto15021
+15138 ifa$="{f8}"thenpoke918,3:poke917,zz:sys50185,f$(t),f$(t):goto15021
+15139 ifa$="{clr}"thenf$(t)="":goto15021
+15140 ifa$=chr$(13)thennext:goto15020
+15141 ifa$="{down}"ora$="{up}"ora$="{rght}"ora$="{left}"then15030
+15142 ifa$="{blk}"ora$="{wht}"ora$="{red}"ora$="{cyn}"then15030
+15143 ifa$="{pur}"ora$="{grn}"ora$="{blu}"ora$="{yel}"then15030
+15144 ifa$="{orng}"ora$="{brn}"ora$="{lred}"ora$="{gry1}"then15030
+15145 ifa$="{gry2}"ora$="{lgrn}"ora$="{lblu}"ora$="{gry3}"then15030
+15146 ifa$="{rvon}"ora$="{rvof}"ora$="{clr}"ora$="{home}"orasc(a$)=148then15030
+15147 ifa$="{$a0}"then15150
+15148 iflen(f$(t))=zzthen15160
+15150 f$(t)=f$(t)+a$
+15155 print"{home}{down}{down}{down}{down}{down}{down}{down}";f$(t);"{CBM-@} "
+15160 goto15030
+15600 rem ** drucken **
+15601 print"{clr}";pt$:print"{down}{down}{down}Bitte Warten, ich drucke."
+15610 gosub36000:foru=1toyy
+15611 iff$(u)="."thena$=da$:goto15650
+15612 iff$(u)="*"thena$="        -1-          ":goto15650
+15613 iff$(u)="="thena$="-Test-":goto15650
+15630 a$=f$(u)
+15650 gosub2001
+15660 nextu:a$="":close1:goto15021
+15700 rem ** form speichern **
+15705 print"{clr}";pt$:print"{down}{down}Speichern"
+15706 input"{down}{down}{down}Name";n$
+15710 close2:open2,8,2,"@:>"+ba$+"000000"+n$+",s,w"
+15720 print#2,str$(yy+33);chr$(13);
+15721 print#2,c$:print#2,k$:print#2,sy$:print#2,s1$:print#2,nu$
+15722 print#2,str$(ge);chr$(13);
+15723 print#2,str$(zz);chr$(13);
+15730 print#2,str$(yy);chr$(13);
+15740 foru=1toyy+20:print#2,f$(u):next
+15750 foru=1to7:print#2," ":next:close2:goto15021
+15800 print"{clr}{down}{down}Bitte nun die Datendiskette mit dem"
+15801 print"Format einlegen und den Namen angeben."
+15805 input"{down}{down}Name";a$:a$=">"+ba$+"??????"+a$
+15810 close15:open15,fa,15,"i"
+15815 close2:open2,fa,2,a$+",s,r":input#15,er,a$:ifer<>0thenprinta$
+15816 ifer<>0thenpoke198,0:wait198,1:geta$:print"{clr}":goto15020
+15820 input#2,an
+15821 input#2,c$,k$,sy$,s1$,nu$,ge,zz
+15830 input#2,a$:yy=val(a$)
+15840 fz=1:fort=1toyy+20:gosub3500:gosub12000
+15850 next:close2:gosub20000:print"{clr}":goto15020
+15900 print"{clr}";pt$
+15910 print"{down}Formblatt ausfuellen"
+15920 input"{down}Von Zeile";v
+15925 input"{down}Bis Zeile";b
+15930 foru=vtob:f$(u)="=":next:print"{clr}";pt$:t=b:goto15021
+20000 n6=0:fort=1toyy
+20010 ifleft$(f$(t),1)="="thenn6=n6+1
+20011 ifleft$(f$(t),1)="+"thenn6=n6+1
+20012 ifleft$(f$(t),1)="_"thenn6=n6+1
+20020 next:return
+30000 ifdn<>1thendimn$(144):ff=1:dn=1
+30001 print"{down}{down}Die Diskette, die gedruckt werden soll,"
+30002 print"einlegen und eine Taste druecken{down}{down}{down}"
+30003 poke198,0:wait198,1:geta$
+30005 close2:open2,fa,2,">????????druck"
+30010 input#2,ff:qq=1
+30020 fort=1toff:input#2,n$(qq):ifn$(qq)=">"orn$(qq)=""then30030
+30021 print"Soll ";n$(qq);" gedruckt werden"
+30022 poke198,0:wait198,1:geta$:ifa$="n"thenprint"NEIN":goto30030
+30023 ifa$="f"thenprint"ERROR":goto30000
+30027 n$(qq)=">"+ba$+"??????"+n$(qq):qq=qq+1
+30030 next:close2:return
+30300 ifvv=0thenreturn
+30301 forb=1tolen(bb$)-2
+30310 ifmid$(bb$,b,1)<>"@"thennext:return
+30320 x=val(mid$(bb$,b+1,2)):ifx>50thenx=0
+30330 ifx=0thennext:return
+30340 bb$=left$(bb$,b-1)+v$(x)+right$(bb$,len(bb$)-b-2):goto30300
+30350 next:return
+30400 rem ** vartest **
+30401 forb=1tolen(a$)-2
+30410 ifmid$(a$,b,1)<>"@"thennext:return
+30420 x=val(mid$(a$,b+1,2)):ifx>50thenx=0
+30430 ifx=0thennext:return
+30440 a$=left$(a$,b-1)+v$(x)+right$(a$,len(a$)-b-2):goto30400
+30450 next:return
+34000 input#15,en:ifen<>0theninput#15,a$:printa$:return
+34010 return
+35000 rem ** einstellform  **
+35100 print"{clr}";pt$:close15
+35101 print"{home}":print"{down}Parameter Einstellen"
+35130 print"{down}{down}[N] Normal [K] Klein      ";c$
+35131 input"{up}[N] Normal [K] Klein    ";c$
+35132 print"[N] Normal [K] Komprim.   ";k$
+35133 input"{up}[N] Normal [K] Komprim. ";k$
+35134 print"[N] Normal [E] Elite      ";sy$
+35135 input"{up}[N] Normal [E] Elite    ";sy$
+35138 print"[N] [S] NLQ [E] Emphas.   ";s1$
+35139 input"{up}[N] [S] NLQ [E] Emphas. ";s1$
+35150 print"Null mit Strich           ";nu$
+35160 input"{up}Null mit Strich         ";nu$
+35170 print"Zeichen pro Druckerz.     ";ge:ba=1
+35171 input"{up}Zeichen pro Druckerz.   ";ge
+35175 print"davon benutzte Zeichen    ";zz:n8=0
+35176 input"{up}davon benutzte Zeichen  ";zz:n8=0
+35180 ifzz>200thenprint"Zu gross":goto35180
+35185 print"Zeilen pro Druckerz.      ";yy
+35186 input"{up}Zeilen pro Druckerz.    ";yy
+35190 da$=left$(a8$,zz-len(d$))+d$
+35900 input"Eingaben OK               n{left}{left}{left}";a$:ifa$="n"then35101
+35999 print"{clr}":return
+36000 rem ** drucker init **
+36001 fo$="":fa$="":lf=0
+36010 ifds<>0thenclose1:open1,da,ds
+36011 ifds=0thenclose1:open1,da
+36012 iftd$="j"thenreturn
+36015 print#1,chr$(27);"@";:ifc$="k"thenprint#1,bv$;
+36020 ifed<2thenprint#1,chr$(27)+"8";
+36030 print#1,chr$(27)+"7"+chr$(2);:ifsy$="e"thenprint#1,chr$(27);"b";chr$(2);
+36040 ifs1$="s"thenprint#1,chr$(27);"b";chr$(4);
+36041 ifs1$="e"thenprint#1,chr$(27);"e";
+36050 ifk$="k"thenprint#1,chr$(15);
+36060 ifnu$="j"thenprint#1,chr$(27);chr$(92);chr$(1);
+36070 da$=left$(a8$,zz-len(d$))+d$
+36999 return
+37000 rem ** einstellfunktion **
+37010 ifleft$(t$,1)=">"thent$=right$(t$,len(t$)-9)
+37100 print"{clr}";pt$:cv=0:yx=0:close2:close15
+37101 print"{home}"
+37110 poke198,0:gs=0
+37111 input"{down}USERPORT Interface        j{left}{left}{left}";a$:ifa$="j"thensys50194
+37112 ifa$="n"theninput"Sekundaeradresse          7{left}{left}{left}";ds
+37115 ed=0:input"Einzelblatt Einzug        j{left}{left}{left}";a$:ifa$="n"thened=2
+37116 ifa$="e"then6000
+37117 ifa$="f"thengosub15000:goto37000
+37119 fa$="form"
+37120 print"Name des Formblattes      ";fa$
+37121 input"{up}Name des Formatblattes  ";fo$
+37122 fa$=fo$
+37124 fo$=">"+ba$+"000000"+fo$
+37125 print"Name des Textes auf Disk  ";t$
+37126 input"{up}Name des Textes auf Disk";t$:sh=0:return
+37131 input"Start Seiten nr.          1{left}{left}{left}";s$:sh=val(s$)-1
+37165 input"TEST Druck                n{left}{left}{left}";td$
+37170 input"Adresse benoetigt         n{left}{left}{left}";a$:ifa$="j"then38000
+37171 ifa$="s"thenvv=1:gosub50090
+37172 ifa$="e"then39000
+37999 return
+38000 rem ** eine adresse holen **
+38001 print"{clr}";pt$:print"{down}Eine Adresse laden"
+38002 print"{rvon} Bitte ADRESSDATENDISKETTE einlegen !!! "
+38010 n$="":poke917,39:poke918,30:poke920,7:poke924,0
+38051 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Name           ":sys50176,n$,n$:print
+38052 ifval(n$)>0theny=val(n$):goto38054
+38053 gosub40100:ify=0thenprint"Adresse nicht vorhanden":goto38000
+38054 gosub50145:gosub50155:close2:close15:return
+39000 print"{clr}";pt$:print:print
+39005 n$="":poke917,39:poke918,30:poke920,7:poke924,0
+39010 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Vorname        ":sys50176,"",v$(1):print
+39012 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Nachname       ":sys50176,"",v$(2):print
+39014 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Strasse        ":sys50176,"",v$(3):print
+39016 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}PLZ Ort        ":sys50176,"",v$(4):print
+39018 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Telephon       ":sys50176,"",v$(5):print
+39020 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Geburtsd.      ":sys50176,"",v$(6):print
+39022 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Spitzname      ":sys50176,"",v$(11):print
+39024 poke908,0:poke921,0:print"{home}{down}{down}{down}{down}{down}{down}Susi Kennung   ":sys50176,"",v$(12):print
+39099 return
+40000 ba$=chr$(peek(930))+chr$(peek(931)):fa=peek(932):return
+40010 poke930,asc(left$(ba$,1)):poke931,asc(right$(ba$,1)):poke932,fa:return
+40100 close2:close15:open15,8,15:t=1:open2,8,2,"ad,s,r"
+40110 input#15,er,a$:ifer<>0thenprinter,a$:poke198,0:wait198,1:getb$:goto40100
+40120 input#2,a$,y:ifleft$(a$,len(n$))=n$thenreturn
+40130 ifst<>64then40120
+40140 close2:y=0:return
+50000 rem *****************************
+50005 rem *                           *
+50010 rem * iseq unterprogramme       *
+50015 rem *                           *
+50020 rem * load ad     =  50090      *
+50025 rem * find name   =  50115      *
+50030 rem * open        =  50140      *
+50035 rem * save nr     =  50235      *
+50040 rem * sort        =  50350      *
+50045 rem * save ad     =  50385      *
+50050 rem * load nr     =  50155      *
+50055 rem *             =             *
+50060 rem *                           *
+50065 rem *                           *
+50070 rem *****************************
+50075 rem
+50080 rem
+50085 rem
+50090 rem *** load ad ***
+50095 dima(500):input"name";a$
+50096 close2:close15:open15,8,15:t=1:open2,8,2,a$+",s,r"
+50097 input#15,er,a$:ifer<>0thenprinter,a$:poke198,0:wait198,1:getb$:goto50096
+50100 input#2,a$,a(t)
+50105 ifst<>64thent=t+1:goto50100
+50110 close2:cv=t:return
+50115 rem *** find name ***
+50120 input"name  ";x$
+50125 fory=1toan:ifleft$(a$(y),len(x$))=x$then50135
+50130 next:print"nicht gefunden":y=0:return
+50135 return
+50140 close2:return
+50145 close15:open15,8,15
+50150 close2:open2,8,2,"asalem,l,"+chr$(254):return
+50155 rem *** load nr ***
+50156 hb=int(y/256):lb=y-256*hb
+50160 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1):poke915,2
+50165 poke917,19:sys50182,v$(1)
+50170 sys50182,v$(2)
+50175 sys50182,v$(3)
+50180 poke917,3:sys50182,v$(4)
+50185 poke917,19:sys50182,o$:v$(4)=v$(4)+" "+o$
+50190 poke917,15:sys50182,v$(5)
+50195 poke917,1:sys50182,g$:v$(6)=g$+"."
+50196 sys50182,g$:v$(6)=v$(6)+g$+"."
+50197 poke917,3:sys50182,g$:v$(6)=v$(6)+g$
+50200 poke917,9:sys50182,pa$:v$(7)="geschuetzt"
+50201 ifba$="--"orba$="of"thenv$(7)=pa$
+50205 poke917,1:sys50182,v$(8)
+50210 poke917,9:sys50182,v$(9)
+50215 poke917,9:sys50182,v$(10)
+50220 poke917,19:sys50182,v$(11)
+50225 sys50182,v$(12)
+50226 sys50182,v$(13)
+50227 sys50182,v$(14)
+50230 as=asc(left$(v$(11),1))
+50240 ifas>64andas<91thenas=as+32:v$(11)=chr$(as)+right$(v$(11),len(v$(11))-1)
+50250 a$=mid$(v$(12),5,1)
+50260 ifa$="-"thenv$(20)="Frau"
+50270 ifa$="0"thenv$(20)="Firma"
+50280 ifa$="+"thenv$(20)="Herr"
+50290 a$=left$(v$(12),1)
+50300 ifv$(20)="Firma"thenv$(21)="Sehr geehrte Damen und Herren,":goto50500
+50310 ifa$="+"then50400
+50320 ifa$="-"then50460
+50321 ifa$="0"then50450
+50330 ifv$(20)="Frau"thenv$(21)="Sehr geehrte Frau "+v$(2)+","
+50340 ifv$(20)="Herr"thenv$(21)="Sehr geehrter Herr "+v$(2)+","
+50350 goto50500
+50400 ifv$(20)="Frau"thenv$(21)="Liebe "+v$(1)+","
+50410 ifv$(20)="Herr"thenv$(21)="Lieber "+v$(1)+","
+50420 goto50500
+50450 v$(21)="Hallo "+v$(1)+",":goto50500
+50460 v$(21)=v$(1)+",":goto50500
+50500 v$(22)=ba$
+50510 ifv$(20)="Firma"thenv$(23)="Mit freundlichen Gr{CBM-U}{CBM-+}en,":goto50600
+50520 ifmid$(v$(12),9,1)="+"thenv$(23)="Bussi,":goto50600
+50530 ifa$="+"thenv$(23)="Bis bald, Dein"
+50540 ifa$="f"thenv$(23)="Hochachtungsvoll,"
+50550 ifa$="-"thenv$(23)=""
+50560 ifa$="0"thenv$(23)="Dein"
+50600 ifv$(20)="Firma"thenv$(24)="Mit freundlichen Gr{CBM-U}{CBM-+}en,":goto50600
+50620 ifmid$(v$(12),9,1)="+"thenv$(24)="Bussi,":goto50700
+50630 ifa$="+"thenv$(24)="Bis bald, Deine"
+50640 ifa$="f"thenv$(24)="Hochachtungsvoll,"
+50650 ifa$="-"thenv$(24)=""
+50660 ifa$="0"thenv$(24)="Deine"
+50700 rem
+50999 return
+
