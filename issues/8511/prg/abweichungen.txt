@@ -1,0 +1,80 @@
+
+
+;abweichungen.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *   abweichungsbalkendiagramm   *
+    4 rem *        mittels hires-3        *
+    5 rem *                               *
+    6 rem *  heimo ponnath  hamburg 1985  *
+    7 rem *                               *
+    8 rem * hires-3 muss im speicher sein *
+    9 rem *********************************
+   10 rem
+   15 rem ++++++++ initialisieren ++++++++
+   20 rem
+   25 poke52,112:poke56,112:sys37498:goto65
+   30 rem
+   35 rem ++++++ up cursor setzen ++++++++
+   40 rem
+   45 poke211,sp:poke214,zl:sys58640:return
+   50 rem
+   55 rem +++++    eingabeteil     +++++++
+   60 rem
+   65 printchr$(147):sys34647:poke646,14:zl=10:sp=5:gosub45
+   70 print"balkendiagramm welches den":zl=12:gosub45
+   75 print"mittelwert und die abweichungen":zl=14:gosub45
+   80 print"grafisch darstellt.":pau,5:printchr$(147):zl=10:sp=7:gosub45
+   85 print"wieviele werte (max=50) ";:inputn
+   90 dimw(n),a(n):printchr$(147)
+   95 ma=0:mi=0
+  100 fori=1ton:print"wert nummer "i"=";:inputw(i):s=s+w(i):nexti
+  105 rem
+  110 rem + berechnung der abweichungen +
+  120 rem
+  125 m=s/n:fori=1ton:a(i)=w(i)-m:ifa(i)>mathenma=a(i)
+  130 ifa(i)<mithenmi=a(i)
+  135 nexti
+  140 rem
+  145 rem ++++ bildschirmaufteilung +++++
+  150 rem
+  155 q=ma+abs(mi):q1=.06*q:q2=.2*q:m1=ma+q1:m2=mi-q2
+  160 dx=int(320/n):trs,-5,319,m2,m1
+  165 rem
+  170 rem ++++++     zeichnen      ++++++
+  175 rem
+  180 hfl,14,6:tln,-1,0,319,0:sys35256:x=0
+  185 fori=1ton:ifa(i)>0then:tre,x,a(i),x+dx,0:goto195
+  190 tbk,x,0,x+dx,a(i)
+  195 x=x+dx:nexti
+  200 zl=0:sp=5:gosub45:print"abweichungs-balkendiagramm"
+  205 zl=21:sp=1:gosub45:print"mittelwert = "m:zl=22:gosub45
+  210 print"+ max "ma,"- max "mi
+  215 zl=23:gosub45:print"e = ende","n = neu","d = drucken"
+  220 rem
+  225 rem +++++ menue-auswertung ++++++++
+  230 rem
+  235 geta$:ifa$<>"e"anda$<>"n"anda$<>"d"then235
+  240 rem
+  245 rem ----- option neue werte -------
+  250 rem
+  255 ifa$="n"thensys35377:hof:run
+  260 rem
+  265 rem ----- option drucken ----------
+  270 rem
+  275 ifa$="d"thengosub310:hof:printchr$(147):goto215
+  280 rem
+  285 rem ----- option programmende -----
+  290 rem
+  295 sys35377:hof:end
+  300 rem
+  305 rem ----- option  drucken up ------
+  310 rem
+  315 sys35377:open1,4,10:print#1:close1:open1,4
+  320 print#1,"abweichungs-balkendiagramm":sys34865
+  325 print#1,"groesste ueberschreitung = "ma
+  330 print#1,"groesste unterschreitung = "mi
+  335 print#1,"mittelwert = "m:print#1:close1:return
+  340 rem
+  345 rem *******  das  wars !  *********
+

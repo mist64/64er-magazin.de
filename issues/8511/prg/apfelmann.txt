@@ -1,0 +1,218 @@
+
+
+;apfelmann.prg ==0801==
+   10 rem ********************************
+   15 rem *                              *
+   20 rem *        apfelmaennchen        *
+   30 rem *              by              *
+   40 rem *       gerhard  pehland       *
+   41 rem *                              *
+   43 rem *       markgrafenstr.64       *
+   44 rem *       8000 muenchen 82       *
+   46 rem *                              *
+   50 rem ********************************
+   60 poke53280,11:poke53281,12:printchr$(14)"{clr}{blk}{down}{down}{down}              Moment..."
+   70 ifa=0thena=1:load"apfelroutinen",8,1
+   90 poke 45,10:poke46,65:clr
+  100 c8=200:xi=64:xa=69:yi=74:ya=79:tm=84+3*4096+15*256:bn=49152+15*256+160
+  120 m1=51214:m0=m1+3:sc=m0+3:bg=sc+3:sa=bg+3:lo=sa+3:cl=lo+3
+  130 c0=cl+3:c1=c0+1:c2=c1+1:c3=c2+1
+  140 poke785,7:poke786,c8:rem usrvektor
+  150 vc=53248
+  151 poke 51208,xi:li=usr(0)
+  152 poke 51208,xa:re=usr(0)
+  153 poke 51208,yi:un=usr(0)
+  154 poke 51208,ya:ob=usr(0)
+  155 poke785,0
+  160 fori=832to894:readx:pokei,x:next
+  170 fori=896to958:readx:pokei,x:next
+  200 print"{clr}{down}{down}"tab(10)"**** MENUE ****"
+  220 print"{down}{down}"tab(10)"(1)  Neue Werte"
+  240 print"{down}"tab(10)"(2)  Ausschnitt"
+  260 print"{down}"tab(10)"(3)  Bild ansehen"
+  280 print"{down}"tab(10)"(4)  Speichern
+  300 print"{down}"tab(10)"(5)  Laden"
+  310 print"{down}"tab(10)"(6)  Directory
+  315 print"{down}"tab(10)"(7)  Effekt
+  320 print"{down}{down}{down}"tab(10)"Was darfs sein  ?"
+  340 get a$:if a$<"1" or a$>"7" then 340
+  360 on val(a$) gosub 1000,2000,3000,4000,5000,5500,7000
+  380 goto200
+  990 rem neue werte
+ 1000 print"{clr}{down}*** NEUE{$a0}WERTE ***{down}"
+ 1020 input"{down}Linker Rand  ";li
+ 1040 input"{down}Rechter Rand ";re
+ 1060 input"{down}Unterer Rand ";un
+ 1080 input"{down}Oberer Rand  ";ob
+ 1100 input"{down}{down}Maximale Tiefe ";tm%
+ 1110 if tm%<5ortm%>254then1100
+ 1120 print"{down}Fertiges Bild speichern ? ";
+ 1130 get a$:if a$<>"j"and a$<>"n"and a$<>"_"then1130
+ 1135 ifa$="_"thenreturn
+ 1140 printa$:if a$="j"theninput"{down}Name des Bildes ";nb$
+ 1141 syscl:poke51201,xi:us=usr(li)
+ 1142 poke51201,xa:us=usr(re)
+ 1143 poke51201,yi:us=usr(un)
+ 1144 poke51201,ya:us=usr(ob)
+ 1145 poketm,tm%
+ 1150 sys bg
+ 1160 if a$="j"then4020
+ 1200 return
+ 1990 rem ausschnitt
+ 2000 print"{clr}{down}*** AUSSCHNITT ***"
+ 2005 print"{down}Bewegung mit Cursortasten"
+ 2010 print"{down}Markieren mit <SPACE>"
+ 2015 print"{down}Zurueck mit '_'"
+ 2017 print"{down}Weiter mit Taste"
+ 2020 poke198,0:wait198,1:geta$
+ 2030 dx=(re-li)/319:dy=(ob-un)/199
+ 2040 sys m1:poke 2040,13:poke2041,14
+ 2050 px=24:py=50
+ 2060 poke vc,px:pokevc+1,py
+ 2070 poke vc+39,1:pokevc+40,1
+ 2080 pokevc+21,1:q$=""
+ 2090 get a$:if a$=""then2090
+ 2095 if a$=q$thensp=3
+ 2100 if a$="_"thenpokevc+21,0:sysm0:return
+ 2110 if a$="{down}"and py<249thenpy=py+sp:goto2160
+ 2130 if a$="{up}"and py>50thenpy=py-sp:goto2160
+ 2140 if a$="{rght}"and px<342thenpx=px+sp:goto2160
+ 2150 if a$="{left}"and px>24thenpx=px-sp:goto2160
+ 2155 ifa$=" "then2230
+ 2160 ifpx<256thenpokevc,px:pokevc+16,0:goto2210
+ 2200 pokevc,px-256:pokevc+16,1
+ 2210 pokevc+1,py
+ 2220 q$=a$:sp=1:ifpeek(198)=0thenq$=""
+ 2225 goto2090
+ 2230 ix=px:iy=py
+ 2240 px=320:py=229:sp=1
+ 2250 poke vc+2,px-256:pokevc+16,peek(vc+16)or2:pokevc+3,py:poke vc+21,3:q$=""
+ 2280 get a$:if a$=""then2280
+ 2285 if a$=q$thensp=3
+ 2290 if a$="_"then pokevc+21,0:sysm0:return
+ 2300 if a$="{down}"andpy<229thenpy=py+sp:goto2350
+ 2310 if a$="{up}"and py>iy-18thenpy=py-sp:goto2350
+ 2320 if a$="{rght}"and px<320thenpx=px+sp:goto2350
+ 2330 if a$="{left}"and px>ix-20thenpx=px-sp:goto2350
+ 2340 ifa$=" "then2440
+ 2350 ifpx<256thenpokevc+2,px:pokevc+16,peek(vc+16)and1:goto2410
+ 2400 pokevc+2,px-256:pokevc+16,peek(vc+16)or2
+ 2410 pokevc+3,py
+ 2415 q$=a$:sp=1:ifpeek(198)=0thenq$=""
+ 2420 goto2280
+ 2440 re=li+(px-1)*dx
+ 2450 li=li+(ix-24)*dx
+ 2460 un=ob-(py-30)*dy
+ 2470 ob=ob-(iy-50)*dy
+ 2520 pokevc+21,0:sysm0
+ 2530 print"{clr}{down}*** AUSSCHNITT ***"
+ 2540 print"{down}Linker Rand  :";li
+ 2550 print"{down}Rechter Rand :";re
+ 2560 print"{down}Unterer Rand :";un
+ 2570 print"{down}Oberer Rand  :";ob
+ 2580 goto1100
+ 2990 rem ansehen
+ 3000 print"{clr}{down}*** ANSEHEN ***"
+ 3010 print"{down}Farben = Funktionstasten"
+ 3020 print"{down}Zurueck mit '_'"
+ 3023 print"{down}Weiter mit Taste"
+ 3030 poke198,0:wait198,1:geta$
+ 3040 sysm1
+ 3050 get a$:if a$=""then3050
+ 3055 if a$="_" then sys m0:return
+ 3060 if a$="{f1}"thenpokec0,(peek(c0)+1)and15:sys sc
+ 3070 if a$="{f3}"thenpokec1,(peek(c1)+1)and15:sys sc
+ 3080 if a$="{f5}"thenpokec2,(peek(c2)+1)and15:sys sc
+ 3090 if a$="{f7}"thenpokec3,(peek(c3)+1)and15:sys sc
+ 3100 goto3050
+ 3990 rem speichern
+ 4000 print"{clr}{down}*** SPEICHERN ***"
+ 4010 input"{down}Name des Bildes";nb$
+ 4020 if len(nb$)>12thennb$=left$(nb$,12)
+ 4030 nb$=nb$+".pic"
+ 4040 fori=0tolen(nb$)-1
+ 4050 pokebn+i,asc(mid$(nb$,i+1,1))
+ 4060 next
+ 4070 poke bn+16,len(nb$)
+ 4080 sys sa
+ 4090 open1,8,15:input#1,a,b$,c,d:close1
+ 4100 print"{down}";a;b$
+ 4110 wait198,1:poke198,0:return
+ 4990 rem laden
+ 5000 print"{clr}{down}*** LADEN ***"
+ 5010 input"{down}Name des Bildes";nb$
+ 5020 if len(nb$)>12thennb$=left$(nb$,12)
+ 5030 nb$=nb$+".pic"
+ 5040 fori=0tolen(nb$)-1
+ 5050 pokebn+i,asc(mid$(nb$,i+1,1))
+ 5060 next
+ 5070 poke bn+16,len(nb$)
+ 5080 sys lo
+ 5090 open1,8,15:input#1,a,b$,c,d:close1
+ 5100 print"{down}";a;b$
+ 5110 poke 785,7
+ 5120 poke 51208,xi:li=usr(0)
+ 5130 print"{down}Linker Rand  :";li
+ 5140 poke 51208,xa:re=usr(0)
+ 5150 print"{down}Rechter Rand :";re
+ 5160 poke 51208,yi:un=usr(0)
+ 5170 print"{down}Unterer Rand :";un
+ 5180 poke 51208,ya:ob=usr(0)
+ 5190 print"{down}Oberer Rand  :";ob
+ 5200 tm%=peek(tm)
+ 5210 print"{down}Maximale Tiefe:";tm%
+ 5220 poke198,0:wait198,1:poke198,0
+ 5230 poke785,0:return
+ 5490 rem directory
+ 5500 print"{clr}{down}*** DIRECTORY ***{down}"
+ 5510 poke198,0:open15,8,15,"i0":open10,8,2,"#"
+ 5520 tt=18:ss=1
+ 5530 print#15,"b-r";2;0;tt;ss
+ 5540 print#15,"b-p";2;0
+ 5550 get#10,x$:ifx$=""thenx$=chr$(0)
+ 5560 tt=asc(x$)
+ 5570 get#10,x$:ifx$=""thenx$=chr$(0)
+ 5580 ss=asc(x$)
+ 5590 forq1=0to7
+ 5600 print#15,"b-p";2;q1*32+5
+ 5610 f$=""
+ 5620 forq2=0to15
+ 5630 get#10,x$:ifx$=""thenx$=chr$(0)
+ 5640 if asc(x$)=160thenq2=16:goto5660
+ 5650 f$=f$+x$
+ 5660 next
+ 5670 ifright$(f$,4)=".pic"thenprintf$
+ 5690 next
+ 5700 iftt<>0then5530
+ 5710 close15:close10
+ 5720 wait198,1:poke198,0:return
+ 6000 rem sprites
+ 6010 data 255,255,255,192,0,0,192,0,0,192,0,0
+ 6020 data192,0,0,192,0,0,192,0,0,192,0,0
+ 6030 data192,0,0,192,0,0,192,0,0,192,0,0
+ 6040 data192,0,0,192,0,0,192,0,0,192,0,0
+ 6050 data192,0,0,192,0,0,192,0,0,192,0,0,192,0,0
+ 6060 data0,0,3,0,0,3,0,0,3,0,0,3
+ 6070 data0,0,3,0,0,3,0,0,3,0,0,3
+ 6080 data0,0,3,0,0,3,0,0,3,0,0,3
+ 6090 data0,0,3,0,0,3,0,0,3,0,0,3
+ 6100 data0,0,3,0,0,3,0,0,3,0,0,3
+ 6110 data 255,255,255
+ 6990 rem effekt
+ 7000 print"{clr}{down}*** EFFEKT ***"
+ 7010 print"{down}Farben = Funktionstasten"
+ 7020 print"{down}Zurueck mit '_'"
+ 7023 print"{down}Weiter mit Taste"
+ 7030 poke198,0:wait198,1:geta$
+ 7040 sysm1
+ 7050 ifa$="{f5}"then pokec2,(peek(c2)+1)and15
+ 7060 cp=peek(c3):pokec3,peek(c2):pokec2,peek(c1):pokec1,cp
+ 7070 geta$:ifa$="_"then7140
+ 7080 ifa$="{f1}"then pokec0,(peek(c0)+1)and15
+ 7090 ifa$="{f3}"then pokec1,(peek(c1)+1)and15
+ 7100 ifa$="{f5}"then pokec2,(peek(c2)+1)and15
+ 7110 ifa$="{f7}"then pokec3,(peek(c3)+1)and15
+ 7120 sys sc
+ 7130 goto7060
+ 7140 sysm0:return
+

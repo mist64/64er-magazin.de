@@ -1,0 +1,101 @@
+
+
+;funktionenplot.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem * plotten beliebiger funktionen *
+    4 rem * mit dem printer/plotter  1520 *
+    5 rem *                               *
+    6 rem *  heimo ponnath  hamburg 1985  *
+    7 rem *                               *
+    8 rem *********************************
+    9 goto 25
+   10 rem ++++++++ up cursor setzen ++++++
+   15 poke211,sp:poke214,z:sys58640:return
+   20 rem ++++++++ hauptprogramm teil 1 ++
+   25 printchr$(147):z=10:sp=1:gosub15
+   30 print"im programm befindet sich die funktion:"
+   35 k=1:gosub90:k=0:print:print"y= "f$:z=18:gosub15
+   40 printchr$(18)"a"chr$(146)"lte oder "chr$(18)"n"chr$(146)"eue funktion ?"
+   45 geta$:ifa$<>"a"anda$<>"n"then45
+   50 ifa$="a"then85
+   55 rem ++ neue funktion ins programm ++
+   60 z=20:sp=3:gosub15:print"neue funktion:":input"y= ";f$:poke646,6
+   65 printchr$(147)chr$(17)chr$(17)"90f$="chr$(34)f$chr$(34)
+   70 print"95deffna(x)="f$:print"run85":printchr$(19);
+   75 poke631,13:poke632,13:poke633,13:poke198,3:end
+   80 rem ++++++++ hauptprogramm teil 2 ++
+   85 printchr$(147):poke646,14
+   90 f$="x^2/2"
+   95 deffna(x)=x^2/2
+  100 ifk=1thenreturn
+  105 rem ++++ variable und funktionen ++
+  110 deffnt(x)=int(479/(xo-xu)*x)
+  115 x=0:z=0:sp=0:xu=-1:xo=5:yu=-1:yo=5:ym=6:xa=xu:xe=xo
+  120 x1=0:x2=0:y1=0:y2=0:d=150:dy=.1:i=10:m=10:dx=.2
+  125 a$=""
+  130 rem +++ plotterkanaele oeffnen ++++
+  135 open1,6,1:open4,6:open2,6,2:open3,6,3:print#2,3
+  140 rem +++++ parametereingaben +++++++
+  145 z=0:sp=0:gosub15:print"funktion y="f$
+  150 z=2:gosub15:print"(falls sie mit unstetigkeiten rechnen,"
+  155 print"dann vermeiden sie es, die polstellen"
+  160 print"als parameter (xu,xo,evtl.xa oder xe) "
+  165 print"zu verwenden. d sollte dann klein sein."
+  170 z=7:sp=10:gosub15:print"xu und xo ="
+  175 z=14:sp=10:gosub15:print"yu und yo ="
+  180 z=16:sp=0:gosub15:print"spez. zeichenbereich gewuenscht(j/n)?"
+  182 z=22:sp=10:gosub15:print"schrittweite (d=ca.150)"
+  185 z=7:sp=25:gosub15:inputxu,xo
+  190 ym=int(998*(xo-xu)/479):z=9:sp=3:gosub15:print"yu minimum = ",-ym/2
+  195 z=10:sp=3:gosub15:print"yo maximum = ",ym/2:z=11:sp=0:gosub15
+  200 print"(die summe aus ByuB und yo darf "ym:print" nicht ueberschreiten!)
+  205 z=14:sp=25:gosub15:inputyu,yo:if(yo-yu)>ymthen205
+  210 z=16:sp=36:gosub15:inputa$:ifa$<>"j"anda$<>"n"then210
+  215 ifa$="n"thenxa=xu:xe=xo:goto232
+  220 z=18:sp=3:gosub15:print"(xa > xu und xe < xo !"
+  225 z=20:sp=10:gosub15:print"xa und xe =":sp=25:gosub15:inputxa,xe
+  230 ifxa<xu orxe>xothen225
+  232 z=22:sp=32:gosub15:inputd
+  235 rem +++ plotten anfangswerte ++++++
+  240 print#1,"h":print#1,"m",fnt(-xu),-fnt(yo):print#1,"i"
+  245 x1=fnt(xu)+1:x2=fnt(xo)-1:y1=fnt(yo)-1:y2=fnt(yu)+1
+  250 rem +++ plotten koordinatensystem +
+  255 print#1,"r",0,y1:print#1,"j",0,y2:print#1,"r",x2,0:print#1,"j",x1,0
+  260 rem +++ plotten skalierung ++++++++
+  265 dy=(xo-xu)/47
+  270 fori=xu+1toxo-1:m=int(i):print#1,"r",fnt(m),fnt(0)
+  275 print#1,"j",fnt(m),fnt(-dy)
+  280 nexti
+  285 fori=yu+1toyo-1:m=int(i):print#1,"r",fnt(0),fnt(m)
+  290 print#1,"j",fnt(dy),fnt(m)
+  295 nexti:print#2,0
+  300 rem *** plotten funktion ++++++++++
+  305 iffnt(fna(xa))>y1thenprint#1,"r",fnt(xa),y1:goto320
+  310 iffnt(fna(xa))<y2thenprint#1,"r",fnt(xa),y2:goto320
+  315 print#1,"r",fnt(xa),fnt(fna(xa))
+  320 forx=xatoxestep(xo-xu)/d
+  325 iffnt(fna(x))>y1thenprint#1,"r",fnt(x),y1:goto340
+  330 iffnt(fna(x))<y2thenprint#1,"r",fnt(x),y2:goto340
+  335 print#1,"j",fnt(x),fnt(fna(x))
+  340 nextx
+  345 if(xo-xu)>25then405
+  350 rem +++ plotten einheitenzahlen +++
+  355 print#2,3:print#3,0:dx=(xo-xu)/28
+  360 fori=xu+1toxo-1:m=int(i):print#1,"m",fnt(-xu),-fnt(yo):print#1,"i"
+  365 print#1,"r",fnt(m),fnt(-dx):ifm=0then375
+  370 print#4,m;
+  375 nexti
+  380 fori=yu+1toyo-1:m=int(i):print#1,"m",fnt(-xu),-fnt(yo):print#1,"i"
+  385 print#1,"r",fnt(dx),fnt(m):ifm=0then395
+  390 print#4,m;
+  395 nexti
+  400 rem +++ plotten funktionsname +++++
+  405 print#2,2
+  410 print#1,"m",fnt(-xu),-fnt(yo):print#1,"i":print#1,"r",x1,y2
+  415 print#1,"j",x2,y2:print#1,"j",x2,y1:print#1,"j",x1,y1:print#1,"j",x1,y2
+  420 print#4:print#4:print#2,1:print#3,1:print#4,"y = "f$:print#4:print#2,0
+  425 rem +++ plotterkanaele schliessen +
+  430 close1:close2:close3:close4
+  435 end
+

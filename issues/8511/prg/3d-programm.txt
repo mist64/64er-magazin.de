@@ -1,0 +1,124 @@
+
+
+;3d-programm.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *   3d-grafik mittels hires-3   *
+    4 rem *                               *
+    5 rem *  heimo ponnath  hamburg 1985  *
+    6 rem *                               *
+    7 rem * hires-3 muss im speicher sein *
+    8 rem *********************************
+    9 rem
+   10 rem ++ initialisieren der grafik ++
+   15 rem
+   20 poke52,112:poke56,112:sys37498:goto60
+   25 rem
+   30 rem ++ up  cursor setzen ++++++++++
+   35 rem
+   40 poke211,sp:poke214,zl:sys58640:return
+   45 rem
+   50 rem +++ eingabe der 3d-funktion ++++
+   55 rem
+   60 printchr$(147):sys34647:poke646,14:zl=5:sp=5:gosub40
+   65 print"funktion im programm:"
+   70 k=1:gosub180:k=0
+   75 print:printtab(3)"y="f$:print
+   80 printtab(5)chr$(18)"a"chr$(146)"lte oder "chr$(18)"n"chr$(146)"eue funktion?
+   85 geta$:ifa$<>"a"anda$<>"n"then85
+   90 ifa$="a"then140
+   95 printchr$(147):sp=3:zl=12:gosub40:input"y=";f$:poke646,6
+  100 printchr$(147)chr$(17)chr$(17)"180f$="chr$(34)f$chr$(34)
+  105 print"190deffna(x)="f$
+  110 print"run140":printchr$(19);
+  115 poke631,13:poke632,13:poke633,13:poke198,3:end
+  120 rem
+  125 rem +++ neubeginn des programmes ++
+  130 rem +++    falls neue funktion   ++
+  135 rem
+  140 printchr$(147):poke646,14
+  145 rem
+  150 rem +++ funktionen und variable +++
+  155 rem
+  160 x=0:z=0:sp=0:zl=0:xu=0:xo=0:yu=0:yo=0:z3=0:z4=0:z5=0:z6=0:zu=0:zo=0
+  165 z1=0:z2=0:f1=1:f2=6:a=1:xa=0:xe=0:za=0:ze=0:dz=1:xt=0:xh=0:yt=0:yh=0:zz=1
+  170 rem
+  175 a$=""
+  180 f$="sin(x)*sin(z)"
+  185 rem
+  190 deffna(x)=sin(x)*sin(z)
+  195 deffnz(z)=z/(2*sqr(2))
+  200 ifk=1thenreturn
+  205 rem
+  210 rem ++ eingabe koordinatensystem ++
+  215 rem
+  220 sp=1:zl=3:gosub40
+  225 printchr$(18)"unser system    :"chr$(146):sp=7:zl=5:gosub40
+  230 input"xu,xo=";xu,xo:zl=6:gosub40:input"yu,yo=";yu,yo:sp=9:zl=8:gosub40
+  235 z3=2*xo*sqr(2):z4=2*yo*sqr(2):ifz3<z4thenprint"zo maximal="z3:goto245
+  240 print"zo maximal="z4
+  245 sp=9:zl=10:gosub40
+  250 z5=2*xu*sqr(2):z6=2*yu*sqr(2):ifz5>z6thenprint"zu minimal="z5:goto260
+  255 print"zu minimal="z6
+  260 sp=7:zl=12:gosub40:input"zu,zo=";zu,zo:z1=fnz(zo):z2=fnz(zu)
+  265 ifz1>xoorz1>yothen235
+  270 ifz2<xuorz2<yuthen235
+  275 rem
+  280 rem +++ eingabe zeichenparameter ++
+  285 rem
+  290 zl=14:sp=1:gosub40:printchr$(18)"unsere zeichnung:"chr$(146)
+  295 zl=16:sp=3:gosub40:input"zeichen- und hintergrundfarbe=";f1,f2
+  300 zl=18:sp=7:gosub40:input"schrittweite von z=";a
+  305 zl=20:gosub40:input"x-bereich xa,xe=";xa,xe
+  310 zl=21:gosub40:input"z-bereich za,ze=";za,ze
+  315 rem
+  320 rem +++       zeichnen        +++
+  325 rem
+  330 dz=a/2:xt=xu:xh=xo:yt=yu:yh=yo
+  335 hfl,f1,f2:trs,xu,xo,yu,yo
+  340 rem
+  345 rem ----- koordinatenkreuz ------
+  350 rem
+  355 tln,xu,0,xo,0:tln,0,yu,0,yo:tln,z2,z2,z1,z1
+  360 rem
+  365 rem -----    z-schleife    ------
+  370 rem
+  375 forz=zatozestepdz:zz=fnz(dz):xt=xt-zz:xh=xh-zz:yt=yt-zz:yh=yh-zz
+  380 trs,xt,xh,yt,yh
+  385 funkt,a,xa,xe
+  390 nextz
+  395 tex,"y="+f$,0,3
+  400 rem
+  405 rem ----- zeichnung fertig ------
+  410 rem
+  415 geta$:ifa$=""then415
+  420 hof
+  425 rem
+  430 rem +++++     menue        ++++++
+  435 rem
+  440 zl=23:sp=1:gosub40
+  445 printchr$(18)"e"chr$(146)"nde    "chr$(18)"g"chr$(146)"rafik"
+  450 zl=23:sp=18:gosub40
+  455 printchr$(18)"n"chr$(146)"eu     "chr$(18)"d"chr$(146)"rucken"
+  460 geta$:ifa$<>"e"anda$<>"g"anda$<>"n"anda$<>"d"then460
+  465 rem
+  470 rem -------- option grafik -------
+  475 rem
+  480 ifa$="g"then:han:poke198,0:wait198,1:hof:goto460
+  485 rem
+  490 rem -------- option drucken ------
+  495 rem
+  500 ifa$="d"then:han:open1,4,10:print#1:close1:sys34865:hof
+  505 ifa$="d"thenopen1,4:print#1:print#1,"xu="xu,"xo="xo,"yu="yu,"yo="yo
+  510 ifa$="d"thenprint#1,"zu="zu,"zo="zo,"a="a
+  515 ifa$="d"thenprint#1,"xa="xa,"xe="xe,"za="za,"ze="ze:print#1:close1:goto460
+  520 rem
+  525 rem --- option neue zeichnung ----
+  530 rem
+  535 ifa$="n"thenrun
+  540 rem
+  545 rem ---  option programmende  ----
+  550 rem
+  555 end
+  560 rem ********* das wars ! **********
+
