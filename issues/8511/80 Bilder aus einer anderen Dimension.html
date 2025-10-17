@@ -132,7 +132,404 @@
         </figure>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>        .OPT P1
+ ;*** SYSTEMADRESSEN ***
+VIC      =    53248   ;VIDEOCHIP
+FAC      =    97      ;FLIESSKOMMA-AKKU
+ARG      =    105     ;FLIESSKOMMA-AKKU #2
+CHROUT   =    $FFD2   ;EIN ZEICHEN AUSGEBEN
+DIV      =    $BB12   ;FAC=ARG/FAC
+SUB      =    $B853   ;FAC=ARG-FAC
+BYTENFAC =    $B3A2   ;BYTE IN Y NACH FAC
+FACNARG  =    $BC0C   ;ARG=FAC
+ZEIGSUB  =    $B850   ;FAC=(A/Y)-FAC
+ZEIGADD  =    $B867   ;FAC=(A/Y)+FAC
+ZEIGMULT =    $BA28   ;FAC=(A/Y)*FAC
+KONNARG  =    $BA8C   ;ARG=(A/Y)
+KONNFAC  =    $BBA2   ;FAC=(A/Y)
+FACNKON  =    $BBD4   ;(X/Y)=FAC
+CHSIGN   =    $BFB4   ;FAC=-FAC
+FILEPAR  =    $FFBA   ;FILEPARAMETER SETZEN
+FILENAM  =    $FFBD   ;FILENAME UEBERGEBEN
+SAVE     =    $FFD8   ;SPEICHERN
+LOAD     =    $FFD5   ;LADEN
+ ;*** VARIABLE ***
+ZEIG1    =    $A4     ;UNIVERSALZEIGER
+ZEIG2    =    $A6
+ZEILE    =    $CF00   ;AKTUELLE ZEILE
+SPALTE   =    $CF01   ;AKTUELLE SPALTE
+BYTE     =    $CF02   ;ENTHAELT IMMER 4 PUNKTE
+POS      =    $CF03   ;ZAEHLER FUER 4 PUNKTE (0 BIS 3)
+TIEFE    =    $CF04   ;AKTUELLE TIEFE
+TIEFEMAX =    $3F54   ;MAXIMALE TIEFE
+DX       =    $CF90   ;SCHRITTWEISE REALTEIL
+DY       =    $CF30   ;SCHRITTWEISE IMAGINAERTEIL
+CX       =    $CF40   ;REALTEIL AKTUELLER BILDSCHIRMPUNKT
+CY       =    $CF60   ;DTO. IMAGINAER
+XQUAD    =    87      ;XWERT*XWERT
+YQUAD    =    247     ;YWERT*YWERT
+XWERT    =    $CF70   ;MOMENTANER WERT DER FOLGE REALTEIL
+YWERT    =    $CF80   ;DTO. IMAGINAER
+XMAX     =    $3F45   ;RECHTER RAND
+XMIN     =    $3F40   ;LINKER RAND
+YMAX     =    $3F4F   ;OBERER RAND
+YMIN     =    $3F4A   ;UNTERER RAND
+FILENAME =    $CFA0   ;VON BASIC GEPOKED
+FARBTAB  =    $CE00   ;TABELLE TIEFE MOD 3 +1
+ ;
+ ;*** PROGRAMM ***
+         *=   $C800
+USRIN    LDX  #<XMIN  ;UEBERGABE DER REALZAHLEN VON BASIC
+         LDY  #>XMIN
+         JMP  FACNKON
+USROUT   LDA  #<XMIN  ;REALZAHLEN AN BASIC ZURUECK
+         LDY  #>XMIN
+         JMP  KONNFAC
+ ;SPRUNGTABELLE
+         JMP  MULTION
+         JMP  MULTIOFF
+         JMP  SETCOL
+         JMP  BEGIN
+         JMP  SAVEPIC
+         JMP  LOADPIC
+         JMP  CLRSCR
+COL0     .BYT 0       ;FARBEN
+COL1     .BYT 7
+COL2     .BYT 10
+COL3     .BYT 2
+CLRSCR   LDA  #0      ;GRAFIK LOESCHEN
+         STA  ZEIG1
+         LDA  #$20
+         STA  ZEIG1+1
+         LDY  #0
+L1       LDA  #0
+         STA  (ZEIG1),Y
+         INY
+         BNE  L1
+         INC  ZEIG+1
+         LDA  #$40
+         CMP  ZEIG1+1
+         BNE  L1
+         RTS
+
+
+SETCOL   LDA  #0      ;FARBEN SETZEN
+         STA  53280
+         LDA  COL0
+         STA  53281
+         LDA  COL1
+         ASL  A
+         ASL  A
+         ASL  A
+         ASL  A
+         ORA  COL2
+         LDX  #0
+         STX  ZEIG1
+         STX  ZEIG2
+         LDX  #4
+         STX  ZEIG1+1
+         LDX  #$D8
+         STX  ZEIG2+1
+WAIT     LDX  VIC+18  ;WARTEN AUF STRAHLDURCHLAUF
+         CPX  #58
+         BNE  WAIT
+         LDX  VIC+17
+         BMI  WAIT
+         LDY  #0
+         LDX  #8
+L2       STA  (ZEIG1),Y
+         PHA
+         LDA  COL3
+         STA  (ZEIG2),Y
+         PLA
+         INY
+         BNE  L2
+         INC  ZEIG1+1
+         INC  ZEIG2+1
+         CPX  ZEIG1+1
+         BNE  L2
+         RTS
+
+
+MULTION  LDA  VIC+17  ;MULTICOLOUR EIN
+         ORA  #%00100000
+         STA  VIC+17
+         LDA  VIC+24
+         ORA  #$00001000
+         STA  VIC+24
+         LDA  VIC+22
+         ORA  #$00010000
+         STA  VIC+22
+         JSR  SETCOL
+         RTS
+SETBYTE  LDA  ZEILE   ;4 PUNKTE (=1 BYTE) SETZEN
+         AND  #%11111000
+         LSR  A
+         LSR  A
+         TAX
+         LDA  ZEILTAB,X
+         STA  ZEIG1
+         INX
+         LDA  ZEILTAB,X
+         STA  ZEIG1+1
+         LDA  ZEILE
+         AND  #%00000111
+         CLC
+         ADC  ZEIG1
+         STA  ZEIG1
+         BCC  SETBYT1
+         INC  ZEIG1+1
+SETBYT1  LDA  SPALTE
+         ASL  A
+         ASL  A
+         ASL  A
+         BCC  SETBYT3
+         INC  ZEIG1+1
+SETBYT3  CLC
+         ADC  ZEIG1
+         STA  ZEIG1
+         BCC  SETBYT2
+         INC  ZEIG1+1
+SETBYT2  LDY  #0
+         LDA  BYTE
+         STA  (ZEIG1),Y
+         RTS
+
+FACSARG  LDA  ARG+5;VORZEICHENVERGLEICH VON FAC UND ARG
+         EOR  FAC+5
+         STA  ARG+6
+         LDA  FAC
+         RTS
+
+
+MAKETAB  LDX  #0      ;FARBTABELLE ANLEGEN
+         LDY  #1
+L40      TYA
+         STA  FARBTAB,X
+         INY
+         CPY  #4
+         BNE  MT1
+         LDY  #1
+MT1      INX
+         BNE  L40
+         RTS
+
+
+MULTIOFF LDA  VIC+22  ;MULTICOLOUR AUS
+         AND  #%11101111
+         STA  VIC+22
+         LDA  VIC+17
+         AND  #%11011111
+         STA  VIC+17
+         LDA  VIC+24
+         AND  #%11110111
+         STA  VIC+24
+         LDA  #12
+         STA  53281
+         LDA  #11
+         STA  53280
+         LDA  #147
+         JSR  CHROUT
+         RTS
+
+APFEL    SEI          ;BERECHNUNG DER GRAFIK
+         JSR  MAKETAB
+         LDA  #<XMIN  ;DX=(XMAX-XMIN)/159
+         LDY  #>XMIN
+         JSR  KONNFAC
+         LDA  #<XMAX
+         LDY  #>XMAX
+         JSR  ZEIGSUB
+         JSR  FACNARG
+         LDY  #159
+         JSR  BYTENFAC
+         JSR  FACSARG
+         JSR  DIV
+         LDX  #<DX
+         LDY  #>DX
+         JSR  FACNKON
+         LDA  #<YMIN  ;DY=(YMAX-YMIN)/199
+         LDY  #>YMIN
+         JSR  KONNFAC
+         LDA  #<YMAX
+         LDY  #>YMAX
+         JSR  ZEIGSUB
+         JSR  FACNARG
+         LDY  #199
+         JSR  BYTENFAC
+         JSR  FACSARG
+         JSR  DIV
+         LDX  #<DY
+         LDY  #>DY
+         JSR  FACNKON
+         LDY  #4      ;CX=XMIN CY=YMAX
+L13      LDA  XMIN,Y
+         STA  CX,Y
+         LDA  YMAX,Y
+         STA  CY,Y
+         DEY
+         BPL  L13
+         LDA  #0
+         STA  ZEILE
+         STA  SPALTE
+         STA  POS
+ITERAT   LDA  #0
+         STA  BYTE
+ITERAT1  LDA  #0
+         STA  TIEFE
+         LDY  #4
+L15      STA  XWERT,Y
+         STA  YWERT,Y
+         DEY
+         BPL  L15
+ITER1    INC  TIEFE
+         LDA  TIEFEMAX
+         CMP  TIEFE   ;"MAXIMALE TIEFE ?
+         BCS  ITER4
+         LDA  #0      ;PUNKTFARBE
+         JMP  PLOT
+ITER4    LDA  #<XWERT ;XQUAD= XWERT * XWERT
+         LDY  #>XWERT
+         JSR  KONNFAC
+         LDA  #<XWERT
+         LDY  #>WERT
+         JSR  ZEIGMULT
+         LDX  #XQUAD
+         LDY  #0
+         JSR  FACNKON
+         LDA  #<YWERT ;YQUAD = YWERT * YWERT
+         LDY  #>YWERT
+         JSR  KONNFAC
+         LDA  #<YWERT
+         LDY  #>YWERT
+         JSR  ZEIGMULT
+         LDX  #YQUAD
+         LDY  #0
+         JSR  FACNKON
+         LDA  #XQUAD
+         LDY  #0      ;SUMME XQUAD+YQUAD
+         JSR  ZEIGADD
+         LDA  FAC
+         CMP  #$84    ;"SUMME GROESSER 8 ?
+         BCC  ITER3
+         LDX  TIEFE
+         LDA  FARBTAB,X ;PUNKTFARBE
+         JMP  PLOT
+ITER3    LDA  #<YWERT ;YWERT=XWERT*YWERT*2-CY
+         LDY  #>YWERT
+         JSR  KONNFAC
+         LDA  #<XWERT
+         LDY  #>XWERT
+         JSR  ZEIGMULT
+         LDA  FAC
+         BEQ  ITER2
+         INC  FAC
+ITER2    LDA  #<CY
+         LDY  #>CY
+         JSR  ZEIGSUB
+         JSR  CHSIGN
+         LDX  #<YWERT
+         LDY  #>YWERT
+         JSR  FACNKON
+         LDY  #0      ;XWERT=XQUAD-YQUAD-CX
+         LDA  #YQUAD
+         JSR  KONNFAC
+         LDY  #0
+         LDA  #XQUAD
+         JSR  ZEIGSUB
+         LDA  #<CX
+         LDY  #>CX
+         JSR  ZEIGSUB
+         JSR  CHSIGN
+         LDX  #<XWERT
+         LDY  #>XWERT
+         JSR  FACNKON
+         JMP  ITER1
+PLOT     ASL  BYTE
+         ASL  BYTE
+         ORA  BYTE
+         STA  BYTE
+         LDA  #<CX      ;CX=CX+DX
+         LDY  #>CX
+         JSR  KONNFAC
+         LDA  #<DX
+         LDY  #>DX
+         JSR  ZEIGADD
+         LDX  #<CX
+         LDY  #>CX
+         JSR  FACNKON
+         INC  POS
+         LDA  POS
+         AND  #3
+         BEQ  APFEL1
+         JMP  ITERAT1
+APFEL1   STA  POS
+         JSR  SETBYTE
+         INC  SPALTE
+         LDA  SPALTE
+         CMP  #40
+         BEQ  APFEL2
+         JMP  ITERAT
+APFEL2   LDA  #0
+         STA  SPALTE
+         LDY  #5      ;CX=XMIN
+L30      LDA  XMIN,Y
+         STA  CX,Y
+         DEY
+         BPL  L30
+         INC  ZEILE
+         LDA  ZEILE
+         CMP  #200
+         BEQ  ENDAPFEL
+         LDA  #<DY      ;CY=CY-DY
+         LDY  #>DY
+         JSR  KONNFAC
+         LDA  #<CY
+         LDY  #>CY
+         JSR  ZEIGSUB
+         LDX  #<CY
+         LDY  #>CY
+         JSR  FACNKON
+         JMP  ITERAT
+ENDAPFEL CLI
+         RTS
+
+BEGIN    JSR  MULTION
+         JSR  APFEL
+         JMP  MULTIOFF
+
+SAVEPIC  LDX  #8      ;SPEICHERN
+         JSR  FILEPAR
+         LDA  FILENAME+16
+         LDX  #<FILENAME
+         LDY  #>FILENAME
+         JSR  FILENAM
+         LDA  #0
+         STA  ZEIG1
+         LDA  #$20
+         STA  ZEIG1+1
+         LDA  #ZEIG1
+         LDX  #$56
+         LDY  #$3F
+         JMP  SAVE
+
+LOADPIC  LDX  #8      ;LADEN
+         LDY  #1
+         JSR  FILEPAR
+         LDA  FILENAME+16
+         LDX  #<FILENAME
+         LDY  #>FILENAME
+         JSR  FILENAM
+         LDA  #0
+         JMP  LOAD
+         RTS
+
+ ;TABELLE DER ZEILENANFAENGE
+ZEILTAB  .WOR 8192,8512,8832,9152,9472,9792
+         .WOR 10112,10432,10752,11072,11392,11712
+         .WOR 12032,12352,$3180,12992,13312,13632
+         .WOR 13952,14272,14592,14912,15232,15552
+         .WOR 15872</pre>
             <figcaption>Listing 3. Das Source-Code-Listing des Apfelmännchens</figcaption>
         </figure>
 
