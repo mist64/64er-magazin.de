@@ -34,10 +34,16 @@
 
         <p>Aber vielleicht besteht der Reiz dieser Gedichte gerade darin, daß durch die oftmals absurden Kombinationen von Wörtern neue ungewöhnliche Metaphern gebildet werden:</p>
 
-        <p>Lassen Sie sich doch einfach mal ein Gedicht von Lyrik 3.0 ausdrucken, und lesen Sie es sich bei Kerzenschein oder flackernden Kaminfeuer in aller Ruhe durch:<br>
-            »Goldene Ränke zerschmettern eine Hoffnung.<br>
-            Das Auge schreit.<br>
-            Da immer wieder pulsierende Welten verwehen, stirbt das Universum.«</p>
+        <p>Lassen Sie sich doch einfach mal ein Gedicht von Lyrik 3.0 ausdrucken, und lesen Sie es sich bei Kerzenschein oder flackernden Kaminfeuer in aller Ruhe durch:</p>
+
+        <table class="plain">
+            <tr><td colspan="2">»Goldene Ränke zerschmettern eine</td></tr>
+            <tr><td width="5em"></td><td>Hoffnung.</td></tr>
+            <tr><td colspan="2">Das Auge schreit.</td><td></td></tr>
+            <tr><td colspan="2">Da immer wieder pulsierende</td><td></td></tr>
+            <tr><td width="5em"></td><td>Welten verwehen, stirbt das</td></tr>
+            <tr><td width="5em"></td><td>Universum.«</td></tr>
+        </table>
 
         <address class="author">(Dirk Meier/hm)</address>
 
@@ -79,37 +85,41 @@
 
         <p>Als erstes müssen ihm verschiedene Parameter übergeben werden:</p>
 
-        <p>Anzahl der Strophen (AZ), Anzahl der Verse innerhalb jeder Strophe (VA%(X)), und der Satzbau jedes einzelnen Verses (MN$(X)).</p>
+        <p class="noindent">Anzahl der Strophen (AZ), Anzahl der Verse innerhalb jeder Strophe (VA%(X)), und der Satzbau jedes einzelnen Verses (MN$(X)).</p>
 
-        <p>Sofern diese Daten nicht von Ihnen eingegeben werden, werden AZ und das Variablenfeld VA%(X) mit geeigneten Zufallszahlen aufgefüllt, während der Computer die Satzstrukturen MN$(X) aus dem »Satzbauten-Katalog« C0$(X) auswählt. Dieser wird bei der Initialisierung aus den Daten der DATA-Zeilen 1000-2000 gebildet. Diese ganzen Vorarbeiten werden im Auto-Modus in den Zeilen 814-818, im manuellen Modus in den Zeilen 108-242 ausgeführt.</p>
+        <p>Sofern diese Daten nicht von Ihnen eingegeben werden, werden AZ und das Variablenfeld VA%(X) mit geeigneten Zufallszahlen aufgefüllt, während der Computer die Satzstrukturen MN$(X) aus dem »Satzbauten-Katalog« CO$(X) auswählt. Dieser wird bei der Initialisierung aus den Daten der DATA-Zeilen 1000-2000 gebildet. Diese ganzen Vorarbeiten werden im Auto-Modus in den Zeilen 814-818, im manuellen Modus in den Zeilen 108-242 ausgeführt.</p>
 
         <p>Nun kommt der weitaus schwierigere Teil: Es müssen ganze deutsche Sätze gebildet werden, die den gewünschten Satzbau besitzen und gleichzeitig den Regeln der deutschen Sprache genügen.</p>
 
-        <p>Wie geht das nun vor sich?</p>
+        <p class="noindent">Wie geht das nun vor sich?</p>
 
-        <p>Der C 64 holt sich den Satzbau des aktuellen Verses aus MN$(X) und legt ihn in W$ ab. Dann durchsucht er W$ nach einem ihm bekannten Mnemonik und gibt gegebenenfalls eine Fehlermeldung aus. Wird der Mnemonik erkannt, so springt das Programm in die entsprechenden Routinen zur Ausführung des Befehls. Die Routinen sind teilweise von sehr unterschiedlicher Komplexität. So wird bei der Routine UND einfach nur ein »und« an den bisherigen Vers angehängt. Bei der Routine SUBJEKT hingegen wird eine ganze Nominalphrase, bestehend aus Artikel, Adjektiv und Substantiv, generiert. Dies funktioniert so: Zuerst werden die Parameter des Mnemonik-Artikel, Adjektiv, Kasus und Numerus Mnemonik-Artikel, Adjektiv, Kasus und Numerus — in der Variablen EA,ED, EF,EP eingelesen (Zeile 322 ff).</p>
+        <p>Der C 64 holt sich den Satzbau des aktuellen Verses aus MN$(X) und legt ihn in W$ ab. Dann durchsucht er W$ nach einem ihm bekannten Mnemonik und gibt gegebenenfalls eine Fehlermeldung aus. Wird der Mnemonik erkannt, so springt das Programm in die entsprechenden Routinen zur Ausführung des Befehls. Die Routinen sind teilweise von sehr unterschiedlicher Komplexität. So wird bei der Routine UND einfach nur ein »und« an den bisherigen Vers angehängt. Bei der Routine SUBJEKT hingegen wird eine ganze Nominalphrase, bestehend aus Artikel, Adjektiv und Substantiv, generiert. Dies funktioniert so: Zuerst werden die Parameter des Mnemonik-Artikel, Adjektiv, Kasus und Numerus Mnemonik-Artikel, Adjektiv, Kasus und Numerus — in der Variablen EA,ED,EF,EP eingelesen (Zeile 322 ff).</p>
 
-        <p>Da der Kasus des Adjektivs und des Artikels vom Substantiv abhängt, muß dieses zuerst bestimmt werden. Dies geschieht, wie auch alle folgenden Wortauswahlen, per Zufallsgenerator (Zeile 328). Dann wird der passende Artikel entweder aus der Tabelle AR$(X) (bestimmte Artikel) geholt oder selbst gebildet (unbestimmter Artikel) und mit der korrekten Endung aus der Tabelle EN$(X) versorgt (Zeilen 330-340). Danach wird ein Adjektiv ausgewählt und mit der entsprechenden Endung versehen, die nicht nur vom Kasus, Genus und Numerus des Substantives, sondern auch vom Artikel abhängt. Die Endung wird aus den Tabellen D2(X)-D4(X) herausgesucht (Zeilen 350-366). Jetzt fehlt nur noch das Substantiv. Dieses wurde ja schon ganz am Anfang ausgewählt und muß nun die passende Endung bekommen. Da ich bis dato kein Linguistiker bin, hat mich dieser Teil fast in eine Paranoia getrieben. Ich habe es aber schließlich geschafft, aus der Endsilbe und den darin enthaltenen Vokalen, dem Kasus, Genus und dem Numerus die richtige Endung zu bestimmen, zumindest für 98 Prozent</p>
-
-        <p>aller Worte (Bei Fremdwörtern kann sich das Programm eventuell auch mal irren). Die Parameterübergabe erfolgt in den Zeilen 370-378, die Endung wird in den Zeilen 930-966 bestimmt.</p>
+        <p>Da der Kasus des Adjektivs und des Artikels vom Substantiv abhängt, muß dieses zuerst bestimmt werden. Dies geschieht, wie auch alle folgenden Wortauswahlen, per Zufallsgenerator (Zeile 328). Dann wird der passende Artikel entweder aus der Tabelle AR$(X) (bestimmte Artikel) geholt oder selbst gebildet (unbestimmter Artikel) und mit der korrekten Endung aus der Tabelle EN$(X) versorgt (Zeilen 330-340). Danach wird ein Adjektiv ausgewählt und mit der entsprechenden Endung versehen, die nicht nur vom Kasus, Genus und Numerus des Substantives, sondern auch vom Artikel abhängt. Die Endung wird aus den Tabellen D2(X)-D4(X) herausgesucht (Zeilen 350-366). Jetzt fehlt nur noch das Substantiv. Dieses wurde ja schon ganz am Anfang ausgewählt und muß nun die passende Endung bekommen. Da ich bis dato kein Linguistiker bin, hat mich dieser Teil fast in eine Paranoia getrieben. Ich habe es aber schließlich geschafft, aus der Endsilbe und den darin enthaltenen Vokalen, dem Kasus, Genus und dem Numerus die richtige Endung zu bestimmen, zumindest für 98 Prozent aller Worte (Bei Fremdwörtern kann sich das Programm eventuell auch mal irren). Die Parameterübergabe erfolgt in den Zeilen 370-378, die Endung wird in den Zeilen 930-966 bestimmt.</p>
 
         <p>Sind schließlich gemäß dem Satzbau in W$ alle Glieder des Verses bestimmt, so wird der erzeugte Vers ausgegeben und das Programm fährt mit dem nächsten Vers fort.</p>
 
         <p>Bei Ergänzen des Wortschatzes muß beachtet werden, daß sich im Programmkopf zu den einzelnen Wortarten je ein Zähler befindet (zum Beispiel Q3), der um 1 erhöht werden muß, sobald eine DATA-Zeile der zugehörigen Wortart hinzugefügt wird.</p>
 
-        <p>Wie sehen nun die einzelnen DATA-Zeilen aus?</p>
+        <p class="noindent">Wie sehen nun die einzelnen DATA-Zeilen aus?</p>
 
-        <p>Wichtig sind hier nur die Zeilen mit den Nomen, Adjektiven, den Verben und den Satzstrukturen, die im folgenden näher erklärt werden sollen.<br>
-            Nomen (ab Zeile 2200):<br>
-            DATA MANN,MAENNER,MAENNLICHE,1</p>
+        <p>Wichtig sind hier nur die Zeilen mit den Nomen, Adjektiven, den Verben und den Satzstrukturen, die im folgenden näher erklärt werden sollen.</p>
 
-        <p>Das erste Wort ist die Singular-, das zweite die Pluralform. Danach folgt ein Adjektiv. Dieses muß im Plural stehen. Das heißt, es muß mit einem »e« enden. Die Zahl zum Schluß gibt das Geschlecht des ersten Wortes an. »1« bedeutet männlich, »2« weiblich, »3« sächlich, »4« ein Name.<br>
-            Verben (ab Zeile 6000):<br>
-            DATA LAEUFT,LAUFEN,1</p>
+        <p class="noindent">Nomen (ab Zeile 2200):
+            <code>DATA MANN,MAENNER,MAENNLICHE,1</code>
+        </p>
 
-        <p>Das erste Wort muß eine 3. Person, Singular-Form sein. Das zweite einfach ein Infinitiv. Die Zahl zum Schluß gibt an, ob das Verb transitiv (wie beispielsweise »schlagen« oder »messen«) oder intransitiv (»schlafen« oder »zerbersten«) ist. Im ersten Fall muß die Zahl 0 sein, im zweiten 1. Eine 2 würde bedeuten, daß das Verb eigentlich beides ist.<br>
-            Satzstrukturen (ab Zeile 1000):<br>
-            DATA "SUB1001 VRBll” , ”EIN HUND SCHLAEFT”</p>
+        <p>Das erste Wort ist die Singular-, das zweite die Pluralform. Danach folgt ein Adjektiv. Dieses muß im Plural stehen. Das heißt, es muß mit einem »e« enden. Die Zahl zum Schluß gibt das Geschlecht des ersten Wortes an. »1« bedeutet männlich, »2« weiblich, »3« sächlich, »4« ein Name.</p>
+
+        <p class="noindent">Verben (ab Zeile 6000):
+            <code>DATA LAEUFT,LAUFEN,1</code>
+        </p>
+
+        <p>Das erste Wort muß eine 3. Person, Singular-Form sein. Das zweite einfach ein Infinitiv. Die Zahl zum Schluß gibt an, ob das Verb transitiv (wie beispielsweise »schlagen« oder »messen«) oder intransitiv (»schlafen« oder »zerbersten«) ist. Im ersten Fall muß die Zahl 0 sein, im zweiten 1. Eine 2 würde bedeuten, daß das Verb eigentlich beides ist.</p>
+
+        <p class="noindent">Satzstrukturen (ab Zeile 1000):
+            <code>DATA "SUB1001 VRB11", "EIN HUND SCHLAEFT"</code>
+        </p>
 
         <p>Das erste Datum ist eine korrekte Satzstruktur, das zweite ein Satz, wie er möglicherweise von dieser Satzstruktur erzeugt worden sein könnte.</p>
 
@@ -117,88 +127,97 @@
 
         <p>So ist es zum Beispiel möglich, die Stimmung, die ein von Lyric 3.0 erzeugtes Gedicht hervorrufen kann, gezielt zu beeinflussen. Verwenden Sie zum Beispiel nur Worte wie »Glas«, »kalt«, »Beton«, »metallisch«, »einsam«, so kann das entstandene Gedicht wahrscheinlich einwandfrei als Kritik an der Isolation von Bewohnern eines Hochhauses in einer Großstadt interpretiert werden. 0der Sie verwenden nur Worte wie »Nebel«, »See«, »Drache«, »Hobbit«, »Gandalf«, »Baumbart«. In diesem Fall werden die erzeugten Gedichte sicherlich einen vollkommen anderen Charakter bekommen.</p>
 
-        <p>Zwei Fragen müssen nun noch geklärt werden: Was hat es mit den Satzstrukturen auf sich und wie läßt sich das Programm erweitern? Die Satzstrukturen sind Strings, die dem C 64 genau mitteilen, wie die Form eines Verses aussehen soll. Ein Beispiel:<br>
-            SUB1101 UND SUB2102 VRBl2 TMP SUB2032</p>
+        <p>Zwei Fragen müssen nun noch geklärt werden: Was hat es mit den Satzstrukturen auf sich und wie läßt sich das Programm erweitern? Die Satzstrukturen sind Strings, die dem C 64 genau mitteilen, wie die Form eines Verses aussehen soll.</p>
+
+        <p class="noindent">Ein Beispiel:
+            <code>SUB1101 UND SUB2102 VRBl2 TMP SUB2032</code>
+        </p>
 
         <p>Die dreibuchstabigen Wörter sind Mnemoniks, die ein bestimmtes Wort oder eine Gruppe von Wörtern symbolisieren.</p>
 
         <p>»SUB« erzeugt ein Substantiv. Die darauffolgenden Zahlen geben dem C 64 nähere Informationen zu dem Wort.</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr><td>1. Zahl:</td><td>0 — Wort ohne Artikel</td></tr>
+            <tr><td></td><td>1 — mit unbestimmten Artikel</td></tr>
+            <tr><td></td><td>2 — mit bestimmten Artikel</td></tr>
+            <tr><td>2. Zahl:</td><td>0 — Wort ohne Adjektiv</td></tr>
+            <tr><td></td><td>1 — mit Adjektiv</td></tr>
+            <tr><td>3. Zahl:</td><td>0 — Wort im Nominativ</td></tr>
+            <tr><td></td><td>1 — Genitiv</td></tr>
+            <tr><td></td><td>2 — Dativ</td></tr>
+            <tr><td></td><td>3 — Akkusativ</td></tr>
+            <tr><td>4. Zahl:</td><td>1 — Wort im Singular</td></tr>
+            <tr><td></td><td>2 — Wort im Plural</td></tr>
+        </table>
 
-        <ol>
-            <li>Zahl: 0 — Wort ohne Artikel<br>
-                1 — mit unbestimmten Artikel<br>
-                2 — mit bestimmten Artikel</li>
-            <li>Zahl: 0 — Wort ohne Adjektiv<br>
-                1 — mit Adjektiv</li>
-            <li>Zahl: 0 — Wort im Nominativ<br>
-                1 — Genitiv<br>
-                2 — Dativ<br>
-                3 — Akkusativ</li>
-            <li>Zahl: 1 — Wort im Singular<br>
-                2 — Wort im Plural<br>
-                <strong>UND</strong> gibt das Wort »und« aus.<br>
-                <strong>ODR</strong> gibt »oder« aus.<br>
-                <strong>TMP</strong> erzeugt eine temporale Bestimmung, wie »heute« oder »nun«.<br>
-                <strong>IST</strong> gibt »ist« aus.<br>
-                <strong>SND</strong> gibt »sind« aus.<br>
-                <strong>KON</strong> erzeugt eine Konjunktion, wie »weil« oder »eher als«.<br>
-                <strong>KOM</strong> gibt ein Komma aus.<br>
-                <strong>PRA</strong> erzeugt eine Präposition, wie »neben« oder »in«.<br>
-                <strong>DIE</strong> gibt »die« aus, um Sätze wie »Wirbel, die zerfließen« erzeugen zu können.<br>
-                <strong>VRB</strong> erzeugt ein Verb. Es wird durch zwei direkt folgende Zahlen spezifiziert.
+        <ul class="plain">
+            <li><strong>UND</strong> gibt das Wort »und« aus.</li>
+            <li><strong>ODR</strong> gibt »oder« aus.</li>
+            <li><strong>TMP</strong> erzeugt eine temporale Bestimmung, wie »heute« oder »nun«.</li>
+            <li><strong>IST</strong> gibt »ist« aus.</li>
+            <li><strong>SND</strong> gibt »sind« aus.</li>
+            <li><strong>KON</strong> erzeugt eine Konjunktion, wie »weil« oder »eher als«.</li>
+            <li><strong>KOM</strong> gibt ein Komma aus.</li>
+            <li><strong>PRA</strong> erzeugt eine Präposition, wie »neben« oder »in«.</li>
+            <li><strong>DIE</strong> gibt »die« aus, um Sätze wie »Wirbel, die zerfließen« erzeugen zu können.</li>
+            <li><strong>VRB</strong> erzeugt ein Verb. Es wird durch zwei direkt folgende Zahlen spezifiziert.
+                <table class="plain">
+                    <tr><td>1. Zahl:</td><td></td></tr>
+                    <tr><td></td><td>0 — transitives Verb</td></tr>
+                    <tr><td></td><td>1 — intransitives Verb</td></tr>
+                    <tr><td>2. Zahl:</td><td></td></tr>
+                    <tr><td></td><td>1 — Singularform</td></tr>
+                    <tr><td></td><td>2 — Pluralform</td></tr>
+                </table>
             </li>
-            <li>Zahl:<br>
-                0 — transitives Verb<br>
-                1 — intransitives Verb</li>
-            <li>Zahl:<br>
-                1 — Singularform<br>
-                2 — Pluralform<br>
-                <strong>IWO</strong> gibt so undefinierbare Worte wie »immer wieder« oder »niemals« aus.<br>
-                <strong>KSS</strong> erzeugt ein Subjekt wie »niemand« oder »alles«.
-            </li>
-        </ol>
-
+            <li><strong>IWO</strong> gibt so undefinierbare Worte wie »immer wieder« oder »niemals« aus.</li>
+            <li><strong>KSS</strong> erzeugt ein Subjekt wie »niemand« oder »alles«.</li>
+        </ul>
 
         <p>Die oben genannte Satzstruktur könnte zum Beispiel folgendes erzeugt haben: »Ein bunter Hund und die silbernen Ringe schlagen nun die Wände.« Lyric 3.0 ist vom Aufbau her teilweise recht kompliziert, daher hier ein paar Erläuterungen zu den verschiedenen Abschnitten des Programmes:</p>
 
-        <p>TODO TABLE</p>
-
-        <p>11 -28 Variablendefinition und Anlegen der Felder<br>
-            29-47 Anfangsbild<br>
-            49-64 Einlesen der Wörter und Endungen in Felder<br>
-            100 Beginn der Session zwischen C 64 und Benutzer.<br>
-            Folgende Daten müssen bestimmt werden: Anzahl der Strophen<br>
-            Anzahl der Verse der einzelnen Strophen Satzstrukturen der einzelnen Verse<br>
-            Auf Wunsch kann aber auch alles vom Com-<br>
-            puter erledigt werden.<br>
-            242 Ende der Session<br>
-            300- 700 Auswertung der Satzstrukturen<br>
-            700- 770 Ausgabe eines Verses auf Bildschirm und eventuell Drucker<br>
-            800- 818 Automodus ? Wenn ja, dann Erzeugung aller notwendigen Daten<br>
-            900- 906 Auswertung eines Tastendruckes (ja/nein)<br>
-            920- 928 Routine zur Eingabe maximal zweistelliger Zahlen<br>
-            930- 966 Routine zur Berechnung der Endung eines Substantives aus Kasus, Genus und Endsilbe<br>
-            970- 978 Soundroutine<br>
-            980- 989 Gong<br>
-            990-1000 Musikroutine<br>
-            1000-1500 Satzstrukturen<br>
-            2000-2200 Endungen, Präpositionen, Konjunktionen etc.<br>
-            2200-6000 Nomen und Adjektive<br>
-            ab 6000 Verben</p>
+        <table class="plain right0 center1 right2">
+            <tr><td>11</td><td>-</td><td>28</td><td>Variablendefinition und Anlegen der Felder</td></tr>
+            <tr><td>29</td><td>-</td><td>47</td><td>Anfangsbild</td></tr>
+            <tr><td>49</td><td>-</td><td>64</td><td>Einlesen der Wörter und Endungen in Felder</td></tr>
+            <tr><td>100</td><td></td><td></td><td>Beginn der Session zwischen C 64 und Benutzer.
+                <p class="noindent">Folgende Daten müssen bestimmt werden:</p>
+                <ul class="plain">
+                    <li>Anzahl der Strophen</li>
+                    <li>Anzahl der Verse der einzelnen Strophen Satzstrukturen der einzelnen Verse</li>
+                    <li>Auf Wunsch kann aber auch alles vom Computer erledigt werden.</li>
+                </ul>
+            </td></tr>
+            <tr><td>242</td><td></td><td></td><td>Ende der Session</td></tr>
+            <tr><td>300</td><td>-</td><td>700</td><td>Auswertung der Satzstrukturen</td></tr>
+            <tr><td>700</td><td>-</td><td>770</td><td>Ausgabe eines Verses auf Bildschirm und eventuell Drucker</td></tr>
+            <tr><td>800</td><td>-</td><td>818</td><td>Automodus ? Wenn ja, dann Erzeugung aller notwendigen Daten</td></tr>
+            <tr><td>900</td><td>-</td><td>906</td><td>Auswertung eines Tastendruckes (ja/nein)</td></tr>
+            <tr><td>920</td><td>-</td><td>928</td><td>Routine zur Eingabe maximal zweistelliger Zahlen</td></tr>
+            <tr><td>930</td><td>-</td><td>966</td><td>Routine zur Berechnung der Endung eines Substantives aus Kasus, Genus und Endsilbe</td></tr>
+            <tr><td>970</td><td>-</td><td>978</td><td>Soundroutine</td></tr>
+            <tr><td>980</td><td>-</td><td>989</td><td>Gong</td></tr>
+            <tr><td>990</td><td>-</td><td>1000</td><td>Musikroutine</td></tr>
+            <tr><td>1000</td><td>-</td><td>1500</td><td>Satzstrukturen</td></tr>
+            <tr><td>2000</td><td>-</td><td>2200</td><td>Endungen, Präpositionen, Konjunktionen etc.</td></tr>
+            <tr><td>2200</td><td>-</td><td>6000</td><td>Nomen und Adjektive</td></tr>
+            <tr><td colspan="4" style="text-align:left">ab 6000 Verben</td></tr>
+        </table>
 
         <h3>Das Programm benutzt viele Variablen. Die wichtigsten:</h3>
 
-        <p>E$(X) Feld, das die einzelnen Worte eines Verses enthält<br>
-            Z2 Zeiger auf das nächste freie Element von E$(X)<br>
-            Z1 Zeiger auf den nächsten noch nicht interpretierten Buchstaben der aktuellen Satzstruktur<br>
-            AZ Anzahl der Strophen<br>
-            VA%(X) Anzahl der Verse der einzelnen Strophen<br>
-            AR$ j,n: Soll gedruckt werden?<br>
-            Q0-Q8 Anzahl der Satzstrukturen, Nomen etc.<br>
-            MN$(X) Dieses Feld enthält die Satzstrukturen für das ganze Gedicht<br>
-            AD$ Endung, die zu dem Subjekt addiert werden muß.</p>
+        <table class="plain">
+            <tr><td>E$(X)</td><td>Feld, das die einzelnen Worte eines Verses enthält</td></tr>
+            <tr><td>Z2</td><td>Zeiger auf das nächste freie Element von E$(X)</td></tr>
+            <tr><td>Z1</td><td>Zeiger auf den nächsten noch nicht interpretierten Buchstaben der aktuellen Satzstruktur</td></tr>
+            <tr><td>AZ</td><td>Anzahl der Strophen</td></tr>
+            <tr><td>VA%(X)</td><td>Anzahl der Verse der einzelnen Strophen</td></tr>
+            <tr><td>AR$</td><td>j,n: Soll gedruckt werden?</td></tr>
+            <tr><td>Q0-Q8</td><td>Anzahl der Satzstrukturen, Nomen etc.</td></tr>
+            <tr><td>MN$(X)</td><td>Dieses Feld enthält die Satzstrukturen für das ganze Gedicht</td></tr>
+            <tr><td>AD$</td><td>Endung, die zu dem Subjekt addiert werden muß.</td></tr>
+        </table>
 
         <p>Ich schlage Ihnen einfach mal vor, daß Sie ein wenig mit Lyric 3.0 herumexperimentieren.</p>
 
