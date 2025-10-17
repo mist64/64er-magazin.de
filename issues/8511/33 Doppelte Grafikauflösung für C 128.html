@@ -75,8 +75,279 @@
         <address class="author">(M.Thomas/ev)</address>
 
         <figure>
-            TODO
+            <pre>1400 4c 1e 14 jmp $141e ;Grafikmodus anschalten
+1403 4c 26 14 jmp $1426 ;Grafikmodus einschalten
+1406 4c 87 14 jmp $1487 ;Grafikbildschirm löschen
+1409 4c 62 ff jmp $ff62 ;Zeichensatz neu laden
+140c 4c 81 ff jmp $ff81 ;Editor initialisieren
+140f 4c a3 14 jmp $14a3 ;Punkt setzen
+1412 4c 9d 14 jmp $149d ;Punkt löschen
+1415 4c ?? ?? jmp $???? ;frei für Erweiterungen
+1418 4c ?? ?? jmp $???? ;frei für Erweiterungen
+141b 4c ?? ?? jmp $???? ;frei für Erweiterungen
+
+
+;Grafikmodus anschalten
+
+
+141e a9 80    lda #$80  ;Bit 7 setzen
+1420 a2 19    ldx #$19  ;Register 25
+1422 20 cc cd jsr $cdcc ;Register 25 mit
+                        $80 besetzen
+1425 60       rts
+
+
+;Grafikmodus ausschalten
+
+
+1426 a9 40    lda #$40  ;Bit 6 setzen
+1428 a2 19    ldx #$19  ;Register 25
+142a 20 cc cd jsr $cdcc ;Register 25 mit
+                        $40 besetzen
+142d 60       rts
+
+
+;aktuelle Adresse setzen (in X und Y)
+
+
+142e a9 12    lda #$12  ;Register 18
+1430 8d 00 d6 sta $d600 ;ansteuern
+1433 8e 01 d6 stx $d601 ;HI von Adresse nach Reg. 18
+1436 20 45 14 jsr $1445 ;Warten auf Statusbit
+1439 a9 13    lda #$13  ;Register 19
+143b 8d 00 d6 sta $d600 ;ansteuern
+143e 8c 01 d6 sty $d601 ;LO von Adresse
+                        nach Reg. 19
+1441 20 45 14 jsr $1445 ;Warten auf Statusbit
+1444 60       rts
+
+
+;Warten bis Statusbit gesetzt
+
+1445 2c 00 d6 bit $d600 ;Bit 7 (Status) gesetzt
+1448 10 fb    bpl $1445 ;nein, dann warte
+144a 60       rts
+
+
+;Warten bis Statusbit gelöscht
+
+
+144b 2c 00 d6 bit $d600 ;Bit 7 (Status) gelöscht
+144e 30       bmi $144b ;nein, dann warten
+1450 60       rts
+
+
+;Wortzähler Null setzen
+
+
+1451 a9 1e    lda #$1e  ;Register 30
+1453 8d 00 d6 sta $d600 ;ansteuern
+1456 20 45 14 jsr $1445 ;Warten auf Statusbit
+1459 a9 00    lda #$00  ;Rewgister 30
+145b 8d 01 d6 sta $d601 ;Null setzen
+145e 60       rts
+
+
+;Datenbyte Null setzen
+
+
+145f a9 1f    lda #$1f  ;Register 31
+1461 8d 00 d6 sta $d600 ;ansteuern
+1464 20 45 14 jsr $1445 ;Warten auf Statusbit
+1467 a9 00    lda #0    ;Register 31
+1469 8d 01 d6 sta $d601 ;Null setzen
+146c 60       rts
+
+
+;Datenbyte nach A holen
+
+
+146d a9 1f    lda #$1f  ;Register 31
+146f 8d 00 d6 sta $d600 ;ansteuern
+1472 20 45 14 jsr $1445 ;Warten auf Statusbit
+1475 ad 01 d6 lda $d601 ;Byte nach A holen
+1478 60       rts
+
+
+;Datenbyte (in A) in aktuelle Adresse
+;ablegen
+
+
+1479 48       pha       ;A retten
+147a a9 1f    lda #$1f  ;Register 31
+147c 8d 00 d6 sta $d600 ;ansteuern
+147f 20 45 14 jsr $1445 ;testen auf Statusbit
+1482 68       pla       ;A wieder holen
+1483 8d 01 d6 sta $d601 ;in aktuelle Adr. speichern
+1486 60       rts
+
+
+;Bildschirm löschen
+
+
+1487 a2 00    ldx #$00  ;HI Adresse von Bildschirm in X
+1489 a0 00    ldy #$00  ;LO Adresse in Y
+148b 20 2e 14 jsr $142e ;aktuelle Adresse setzen
+148e 20 51 14 jsr $1451 ;Wortzähler Null setzen
+1491 20 5f 14 jsr $145f ;Datenbyte Null setzen
+1494 c8       iny       ;nächste Adresse
+1495 d0 f4    bne $148b
+1497 e8       inx
+1498 e0 40    cpx #$40  ;letzte Adresse von Bildschirm?
+149a d0 ef    bne $148b ;nein, dann nächste Adresse
+149c 60       rts
+
+
+;Punkt löschen
+
+
+149d 48       pha       ;A retten
+149e a9 00    lda #$00  ;Flag für Löschen
+14a0 4c a6 14 jmp $14a6 ;Punkt löschen
+
+
+;Punkt setzen
+
+
+14a3 48       pha       ;A retten
+14a4 a9 ff    lda #$ff  ;Flag für Setzen
+14a6 85 c3    sta $c3   ;zwischenspeichern
+14a8 68       pla       ;A wieder holen
+14a9 20 db 14 jsr $14db ;Adressberechnung
+                        (X-Koord. in A,X
+                        ; Y-Koord. in Y)
+14ac b0 ee    bcs $149c ;Angaben außerhalb
+                        des Bereichs
+14ae 85 c4    sta $c4   ;Bitmaske (in A)
+                        zwischenspeichern
+14b0 a4 c1    ldy $c1   ;LO Adresse nach Y
+14b2 a6 c2    ldx $c2   ;HI Adresse nach X
+14b4 20 2e 14 jsr $142e ;aktuelle Adresse
+                        (in X/Y) setzen
+14b7 20 6d 14 jsr $146d ;Datenbyte aus aktueller
+                        Adr. nach A holen
+14ba 48       pha       ;retten
+14bb a5 c3    lda $c3   ;Flag für setzen/löschen
+                        nach Adr. f0 06
+14bd f0 06    beq $14c5 ;Punkt löschen, dann
+                        zu Löschen
+14bf 68       pla       ;Datenbyte wieder holen
+14c0 05 c4    ora $c4   ;mit Bitmaske verknüpfen
+                        (Bit setzen)
+14c2 4c ce 14 jmp $14ce ;zum Abspeichern
+14c5 68       pla       ;Datenbyte wieder holen
+14c6 85 c3    sta $c3   ;zwischenspeichern
+14c8 a5 c4    lda $c4   ;Bitmaske nach A
+14ca 49 ff    eor #$ff  ;alle Bits umdrehen
+14cc 25 c3    and $c3   ;mit Datenbyte verknüpfen
+                        (löschen)
+14ce 48       pha       ;neues Datenbyte retten
+14cf a4 c1    ldy $c1   ;LO Adresse nach Y
+14d1 a6 c2    ldx $c2   ;HI Adressenach X
+14d3 20 2e 14 jsr $142e ;aktuelle Adresse setzen
+14d6 68       pla       ;neues Datenbyte wieder holen
+14d7 20 79 14 jsr $1479 ;Datenbyte in aktueller
+                        Adr. ablegen
+
+14da 60       rts
+
+
+;Adresse berechnen (X-Koord. in A/X; Y-Koord. in Y)
+;Adresse nach $C1/$C2; Bitmaske nach A
+
+
+14db c9 03    cmp #$03  ;A größer gleich 3?
+14dd b0 55    bcs $1534 ;wenn ja, dann ord. zu groß
+14df c9 02    cmp #$02  ;A kleiner 2?
+14e1 d0 04    bne $14e7 ;wenn ja, dann X-Koord. ok
+14e3 e0 80    cpx #$80  ;LO von X-Koord. zu groß?
+14e5 10 4d    bpl $1534 ;wenn ja, keine
+                        Adreßberechnung
+14e7 c0 c8    cpy #$c8  ;Y-Koord. zu groß?
+14e9 b0 49    bcs $1534 ;wenn ja, dann keine
+                        Adreßberechnung
+14eb 48       pha       ;HI X-Koord. retten
+14ec 8a       txa       ;LO X-Koord.
+14ed 48       pha       ;retten
+14ee 98       tya
+14ef 29 0f    and #$0f
+14f1 aa       tax
+14f2 bd 40 15 lda $1540,x;LO-Wert aus Tabelle 1
+14f5 85 c1    sta $c1   ;ablegen
+14f7 bd 50 15 lda $1550,x;HI-Wert aus Tabelle 2
+14fa 85 c2    sta $c2   ;ablegen
+14fc 98       tya
+14fd 29 f0    and #$f0
+14ff 4a       lsr
+1500 4a       lsr
+1501 4a       lsr
+1502 4a       lsr
+1503 aa       tax
+1504 bd 60 15 lda $1560,x;HI-Wert aus Tabelle 3
+1507 18       clc
+1508 65 c2    adc $c2   ;dazuzählen
+150a 85 c2    sta $c2
+150c 68       pla
+150d aa       tax
+150e 68       pla
+150f a8       tay
+1510 b9 70 15 lda $1570,y;LO-Wert aus Tabelle 4
+1513 18       clc
+1514 65 c1    adc $c1   ;dazuzählen
+1516 85 c1    sta $c1
+1518 90 02    bcc $151c
+151a e6 c2    inc $c2
+151c 8a       txa
+151d 29 f8    and #$f8
+151f 4a       lsr
+1520 4a       lsr
+1521 4a       lsr
+1522 18       clc
+1523 65 c1    adc $c1
+1525 85 c1    sta $c1
+1527 90 02    bcc $152b
+1529 e6 c2    inc $c2
+152b 8a       txa
+152c 29 07    and #$07
+152e aa       tax
+152f bd 73 15 lda $1573,x;Bitmaske aus Tabelle 5
+1532 18       clc       ;holen
+1533 60       rts
+1534 38       sec
+1535 60       rts
+
+
+;Tabellen für Adreßberechnung
+
+
+Tabelle 1
+
+.: 1540 00 50 a0 f0 40 90 e0 30
+.: 1548 80 d0 20 70 c0 10 60 b0
+
+Tabelle 2
+
+.: 1550 00 00 00 00 01 01 01 02
+.: 1558 02 02 03 03 03 04 04 04
+
+Tabelle 3
+
+.: 1560 00 05 0a 0f 14 19 1e 23
+.: 1568 28 2d 32 37 3c 41 46 00
+
+Tabelle 4
+
+.: 1570 00 20 40
+
+Tabelle 5 (Bitmasken)
+
+.: 1573 80 40 20 10 08 04 02 01</pre>
             <figcaption>Listing 1. Assemblerprogramm zur Nutzung der verborgenen Grafikfähigkeiten des C 128</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="80 zeichen demo" data-name="80-Zeichen Demo"></pre>
+            <figcaption>Listing 2. Eine Demonstration der hochauflösenden 80-Zeichen-Grafik</figcaption>
         </figure>
 
     </article>
