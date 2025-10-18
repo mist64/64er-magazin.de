@@ -38,7 +38,8 @@
 
         <p>Eine Bildschirmmaske kann auf viele verschiedene Arten auf den Bildschirm gebracht werden. Die einfachste ist wohl:
             <code>FOR I = 0 T0 999 : POKE 1024 + I, PEEK (STADR + I) : NEXTI</code>
-            wobei STADR die Startadresse der Maske ist. Doch das ist zu langsam und eintönig. Das gleiche Programm in Assembler ist zirka 200 mal schneller, aber immer noch eintönig.</p>
+            wobei STADR die Startadresse der Maske ist. Doch das ist zu langsam und eintönig. Das gleiche Programm in Assembler ist zirka 200 mal schneller, aber immer noch eintönig.
+        </p>
 
         <p>Das Programm »Screen-Dump« (siehe Listing 1) hilft dem ab. Auf über 100 verschiedene Arten kann hiermit das oben genannte Programm ablaufen (das heißt 100 verschiedene Reihenfolgen), von denen einige verblüffen, fast alle aber besser »aussehen« als dieses Programm. Auch die verstellbare Geschwindigkeit ermöglicht interessante Veränderungen.</p>
 
@@ -57,18 +58,78 @@
         <p>Andere »schöne Versionen« sind:</p>
 
         <table class="plain right">
-            <tr class="separator"><td>Art</td><td>Geschw.</td><td>Art</td><td>Geschw.</td></tr>
-            <tr><td>2</td><td>1</td><td>6</td><td>4</td></tr>
-            <tr><td>9</td><td>4</td><td>13</td><td>8</td></tr>
-            <tr><td>19</td><td>2</td><td>20</td><td>8</td></tr>
-            <tr><td>28</td><td>8</td><td>33</td><td>4</td></tr>
-            <tr><td>36</td><td>10</td><td>44</td><td>4</td></tr>
-            <tr><td>46</td><td>20</td><td>61</td><td>20</td></tr>
-            <tr><td>64</td><td>4</td><td>65</td><td>10</td></tr>
-            <tr><td>66</td><td>4</td><td>84</td><td>4</td></tr>
-            <tr><td>88</td><td>2</td><td>98</td><td>8</td></tr>
-            <tr><td>104</td><td>4</td><td>106</td><td>2</td></tr>
-            <tr><td>120</td><td>20</td><td>125</td><td>20</td></tr>
+            <tr class="separator">
+                <td>Art</td>
+                <td>Geschw.</td>
+                <td>Art</td>
+                <td>Geschw.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>1</td>
+                <td>6</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>4</td>
+                <td>13</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>19</td>
+                <td>2</td>
+                <td>20</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>28</td>
+                <td>8</td>
+                <td>33</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>36</td>
+                <td>10</td>
+                <td>44</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>46</td>
+                <td>20</td>
+                <td>61</td>
+                <td>20</td>
+            </tr>
+            <tr>
+                <td>64</td>
+                <td>4</td>
+                <td>65</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td>66</td>
+                <td>4</td>
+                <td>84</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>88</td>
+                <td>2</td>
+                <td>98</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>104</td>
+                <td>4</td>
+                <td>106</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>120</td>
+                <td>20</td>
+                <td>125</td>
+                <td>20</td>
+            </tr>
         </table>
 
         <h3>Funktionsweise</h3>
@@ -155,11 +216,26 @@
         <p class="noindent">Er setzt sich zusammen aus:</p>
 
         <table class="plain">
-            <tr><td>Stelle 1,2</td><td>Zeile der Eingabe</td></tr>
-            <tr><td>Stelle 3,4</td><td>Spalte der Eingabe</td></tr>
-            <tr><td>Stelle 5,6</td><td>minimale Länge der Eingabe</td></tr>
-            <tr><td>Stelle 7,8</td><td>maximale Länge der Eingabe</td></tr>
-            <tr><td>Stelle 9</td><td>Code (siehe weiter unten)</td></tr>
+            <tr>
+                <td>Stelle 1,2</td>
+                <td>Zeile der Eingabe</td>
+            </tr>
+            <tr>
+                <td>Stelle 3,4</td>
+                <td>Spalte der Eingabe</td>
+            </tr>
+            <tr>
+                <td>Stelle 5,6</td>
+                <td>minimale Länge der Eingabe</td>
+            </tr>
+            <tr>
+                <td>Stelle 7,8</td>
+                <td>maximale Länge der Eingabe</td>
+            </tr>
+            <tr>
+                <td>Stelle 9</td>
+                <td>Code (siehe weiter unten)</td>
+            </tr>
         </table>
 
         <p>Es ist darauf zu achten, daß einstellige Angaben (zum Beispiel: 3. Zeile) mit 03 angegeben werden, da sonst keine klare Trennung der einzelnen Parameter vorgenommen werden kann.</p>
@@ -186,14 +262,82 @@
         <p>Funktionen der Sondertasten:</p>
 
         <table class="plain">
-            <tr><td>CRSR UP,CRSR DOWN</td><td>sind abgeschaltet</td></tr>
-            <tr><td>INST,DEL</td><td>funktionieren innerhalb des Eingabefensters wie gewohnt (Rest der Maske wird nicht berührt)</td></tr>
-            <tr><td>HOME</td><td>springt an Anfang des Eingabefensters</td></tr>
-            <tr><td>CLR</td><td>löscht Eingabefenster und springt an den Anfang desselben</td></tr>
-            <tr><td>CRSR LEFT,RIGHT</td><td>funktionieren wie gewohnt, nur Eingabefeld kann nicht verlassen werden.</td></tr>
+            <tr>
+                <td>CRSR UP,CRSR DOWN</td>
+                <td>sind abgeschaltet</td>
+            </tr>
+            <tr>
+                <td>INST,DEL</td>
+                <td>funktionieren innerhalb des Eingabefensters wie gewohnt (Rest der Maske wird nicht berührt)</td>
+            </tr>
+            <tr>
+                <td>HOME</td>
+                <td>springt an Anfang des Eingabefensters</td>
+            </tr>
+            <tr>
+                <td>CLR</td>
+                <td>löscht Eingabefenster und springt an den Anfang desselben</td>
+            </tr>
+            <tr>
+                <td>CRSR LEFT,RIGHT</td>
+                <td>funktionieren wie gewohnt, nur Eingabefeld kann nicht verlassen werden.</td>
+            </tr>
         </table>
 
         <address class="author">(Karlheinz Boss/tr)</address>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="2">Variablenliste
+                </tr>
+                <tr>
+                    <td>pa$</td>
+                    <td>Parameterstring; dient der Übergabe der Parameter</td>
+                </tr>
+                <tr>
+                    <td>bl$</td>
+                    <td>String, der nur aus Spaces besteht</td>
+                </tr>
+                <tr>
+                    <td>in$</td>
+                    <td>Eingabe</td>
+                </tr>
+                <tr>
+                    <td>n$</td>
+                    <td>gedrückte Taste</td>
+                </tr>
+                <tr>
+                    <td>ze</td>
+                    <td>Zeile für die Eingabe</td>
+                </tr>
+                <tr>
+                    <td>sp</td>
+                    <td>Spalte, ab der die Eingabe erfolgen soll</td>
+                </tr>
+                <tr>
+                    <td>mi</td>
+                    <td>minimale Länge der Eingabe</td>
+                </tr>
+                <tr>
+                    <td>ma</td>
+                    <td>maximale Länge der Eingabe</td>
+                </tr>
+                <tr>
+                    <td>c</td>
+                    <td>Code, welchem die Eingabe entsprechen muß</td>
+                </tr>
+                <tr>
+                    <td>ss</td>
+                    <td>aktuelle Cursorspalte</td>
+                </tr>
+                <tr>
+                    <td>fl</td>
+                    <td>Flag, ob zuletzt gedrückte Taste Code entsprach</td>
+                </tr>
+            </table>
+            <figcaption>Programmbeschreibung</figcaption>
+        </figure>
 
         <figure>
             <pre data-filename="input-routine" data-name="Input-Routine"></pre>
