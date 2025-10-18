@@ -1,0 +1,182 @@
+;sound.ed.zusatz.prg ==0801==
+;Eingetippt von Endurion
+ 1068 if m=7.5 then 7960
+ 1080 if a=0 then a=.1:load"modulator",8,1
+ 1082 if a=.1 then a=.2:load"sequencer.obj",8,1
+ 1084 if a=.2 then a= 1:load"seq.erg.obj",8,1
+ 1160 dim v%(8,255),tn%(255),th(24)
+ 3358 poke 50334+sn,c(sn)
+ 3400 rem-------------------------------
+ 3405 rem tempo
+ 3410 if pw<40  then pw=40
+ 3415 if pw>480 then pw=480
+ 3420 te=pw:sys do,pa,int(6e7/(24*te))
+ 3425 sys pr,6,11,f2$;right$(str$(pw),3)
+ 3430 return
+ 3840 poke 50344,-su:if su then print chr$(18);
+ 4132 sys pr,13,1,f2$;"   a";f1$;" sequencer"
+ 7429 : poke 50334+i,c(i)
+ 7532 sys pr,6,4,f2$;"f2"
+ 7534 sys pr,6,7,f1$;"song   laden"
+ 7632 sys 50198:gosub 2140:rem mod/seq aus
+ 7670 ns=-1:a=211
+ 7675 sys do,56326,int(6e7/(24*te))
+ 7680 if sr then sys 51093:goto 1550
+ 7685 sys mo+1033:goto 1550
+ 7735 sys 50198:gosub 2140:remk mod/seq aus
+ 7805 sys do,56326,int(6e7/(24*te))
+ 7810 if sr then sys 51093:return
+ 7815 sys 50185:return:rem nur mod. an
+ 7900 rem-------------------------------
+ 7905 rem song laden
+ 7910 sys pr,6,7,f2$;"song   laden"
+ 7915 sys pr,10,4,f1$;"dateiname ";
+ 7920 sys pr,10,14,;:input dn$
+ 7925 sys 50966:gosub 2140
+ 7930 open 8,8,8,dn$+",p,r":close 8
+ 7935 open 1,8,15:input#1,a,a$,x,y:close 1
+ 7940 sys pr,12,4,"                             "
+ 7945 if a=0 then 7955
+ 7950 sys pr,12,3,a;a$;x;y:goto 7920
+ 7955 a=0:m=7.5:load dn$,8,1
+ 7960 sys pr,6,7,f1$;"song   laden"
+ 7965 m=7:sq=-1
+ 7970 sys do,56326,int(6e7/(24*te))
+ 7975 sys do,50310,usr(39432)
+ 7980 sys 51001 :rem seq/mod start/init
+ 7985 if not sr then sys 50966
+ 7990 a=65:goto 1550
+ 8130 on l goto 8150,8220,8280,8310,8310
+ 8180 for i=0 to 8:v%(i,a)=zn:next
+ 8400 : for j=0 to 8:v%(j,a)=2000:next
+ 8482 so=36864:ci=56320
+ 8578 : poke 50334+sn,c(sn)
+ 8627 poke 50303,0 :rem eg abkoppeln(seq)
+ 8632 te=120       :rem tempo
+ 8920 sq=0:sm=0:sr=0:a=2:return
+ 9530 data ma,3700,160,3800,s,9990,a
+ 9750 data m7,7600,133,7700,134,7900,137
+ 9800 data m8,10420,029,10450,157
+10000 rem==============================
+10010 rem untermenue sequencer
+10020 rem==============================
+10030 m=8:pv=0:sys cl:print"{home}{down}";f1$;
+10040 print" sequencer";
+10045 if not sq then print"  (kein song vorhanden)"
+10050 sys pr,4,10,"tempo modus seqnr  soft-eg"
+10060 sys pr,5,4,"{CBM-A}CCCC{CBM-R}CCCCC{CBM-R}CCCCC{CBM-R}CCCCC{CBM-R}CCCCCCCCC{CBM-S}"
+10070 sys pr,6,4,"B    B     B     B     B 1  2  3 B"
+10080 sys pr,7,4,"{CBM-Z}CCCC{CBM-E}CCCCC{CBM-E}CCCCC{CBM-E}CCCCC{CBM-E}CCCCCCCCC{CBM-X}"
+10090 sys pr,9,1,f2$;"f1";f1$;"  reset  ++                  1"
+10100 sys pr,10,1,f2$;"f3";f1$;"  stop    +  song    +       2"
+10110 sys pr,11,1,f2$;"f5";f1$;"  run     -  seq     -       3"
+10120 sys pr,12,1,f2$;"f7";f1$;"         --"
+10130 if sr then 10150
+10140 sys pr,6,5,"stop":goto 10160
+10150 sys pr,6,5,"run "
+10160 sys pr,6,11,right$(str$(te),3)
+10170 if sm then 10190
+10180 sys pr,6,16,"song":goto 10210
+10190 sys pr,6,16,"seq "
+10200 sys pr,6,22,right$(" "+str$(se),3)
+10210 rem
+10220 x=peek(50303)
+10230 if x and 1 then sys pr,6,28,"{rvon} 1 "
+10240 if x and 2 then sys pr,6,31,"{rvon} 2 "
+10250 if x and 4 then sys pr,6,34,"{rvon} 3 "
+10300 av=10500:sys gs,av:return
+10400 rem------------------------------
+10410 rem parameterwahl durch cursor
+10420 rem rechts
+10430 av=av+100:if av>10900 then av=10500
+10440 goto 10470
+10450 rem links
+10460 av=av-100:if av<10500 then av=10900
+10470 for i=pb to pb+8:poke i,f1:next
+10480 sys gt,av
+10500 rem------------------------------
+10510 rem run/stop waehlen
+10520 pb=fa+245
+10530 for i=pb to pb+3:poke i,f2:next
+10540 pa=ci+12:pv=11000:return
+10600 rem------------------------------
+10610 rem tempo waehlen
+10620 pb=fa+250
+10630 for i=pb to pb+3:poke i,f2:next
+10640 pa=ci+6:pw=te
+10650 pm=500:p1=1:p2=10:pv=3400:return
+10700 rem------------------------------
+10710 rem modus waehlen
+10720 pb=fa+256
+10730 for i=pb to pb+3:poke i,f2:next
+10740 pa=50345:pw=peek(pa)
+10750 pv=11100:return
+10800 rem------------------------------
+10810 rem seqnr waehlen
+10820 pb=fa+262
+10830 for i=pb to pb+2:poke i,f2:next
+10840 pw=se:p1=1:p2=1:pm=1000
+10850 pv=11200:return
+10900 rem------------------------------
+10910 rem soft-eg waehlen
+10920 pb=fa+268
+10930 for i=pb to pb+8:poke i,f2:next
+10940 pa=50303:pv=11300:return
+11000 rem------------------------------
+11010 rem sequencer reset/stop/run
+11015 if not sq then return
+11020 if a<133 or a>135 then return
+11030 on a-132 goto 11040,11060,11080
+11040 rem reset
+11042 if sm then sys 51116:return
+11045 sys 51001
+11050 if not sr then sys 50966
+11055 return
+11060 rem stop
+11065 sys 50966:sys pr,6,5,f2$;"stop"
+11070 sr=0:if not su then 2140
+11075 return
+11080 rem run
+11085 sys 51093:sys pr,6,5,f2$;"run "
+11090 sr=-1:return
+11100 rem------------------------------
+11110 rem sequencer-modus (song/seq)
+11112 if not sq then return
+11115 if a=134 then 11130
+11120 if a=135 then 11150
+11125 return
+11130 rem song-modus
+11135 sm=0 :poke pa,0
+11140 sys pr,6,16,f2$;"song"
+11145 sys pr,6,22,"     ":return
+11150 rem sequenz-modus
+11155 sm=-1:poke pa,1:sys pr,6,16,"seq "
+11160 sys pr,6,16,f2$;"seq "
+11165 se=(usr(50312)-usr(50310))/3+1
+11170 sys pr,6,22,f1$;right$(" "+str$(se),3)
+11175 return
+11200 rem------------------------------
+11210 rem sequenz-nummer
+11220 if not sm then return
+11230 if pw=0 then pw=1:return
+11240 ad=usr(50310)+(pw-1)*3
+11250 if usr(ad)=0 then pw=pw-1:return
+11260 sys do,50312,ad:se=pw
+11270 sys do,50314,usr(ad)
+11280 sys 51116 :rem nextseq
+11285 sys pr,6,22,f2$;right$(" "+str$(se),3)
+11290 return
+11300 rem------------------------------
+11310 rem sequencer soft-eg-steuerung
+11320 x=peek(pa)
+11330 for i=0 to 2
+11340 : if a<>133+i then 11420
+11350 : y=2^i
+11360 : if (x and y) then 11400
+11370 : x=x or y:poke pa,x
+11380 : sys pr,6,28+3*i,f2$;"{rvon}";i+1;"{left} "
+11390 : goto 11420
+11400 : x=x and (255-y):poke pa,x
+11410 : sys pr,6,28+3*i,f2$;i+1;"{left} "
+11420 next i:return
+
