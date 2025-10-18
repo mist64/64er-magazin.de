@@ -26,7 +26,7 @@
         <p>Dazu werde ich allgemein verständliche Befehlsworte verwenden (wie zum Beispiel LINIE oder PUNKT etc.) und deren Entsprechung in zwei Grafik-Systemen angeben: In HiRes-3-Syntax und in der Syntax, die mit dem Plotter 1520 verwendet wird. Falls Sie ein anderes System benutzen oder einen C 128 Ihr eigen nennen, dürfte es Ihnen nicht schwerfallen, die Syntax-Anpassungen vorzunehmen. Folgende zehn Befehle sollen zunächst vorgestellt werden (wobei sich später noch der eine oder andere zusätzliche Befehl als nötig herausstellen kann):</p>
 
         <h3>INIT</h3>
-        
+
         <p>Werde ich immer dann verwenden, wenn die Grafik initialisiert werden soll. Damit wird die Grafik eingeschaltet, eine eventuell Bit-Map eingerichtet und gelöscht und die Farbgebung bestimmt.</p>
 
         <h3>START</h3>
@@ -66,6 +66,128 @@
         <p>Führt einen Grafik-System-Reset aus. Danach muß für erneute Benutzung der Grafik wieder neu initialisiert werden.</p>
 
         <p>In der Tabelle 1 sind diese allgemeinen Befehle aufgeführt zusammen mit den Übersetzungen in die Syntax von HiRes-3 und die des Plotters 1520:</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Wort</th>
+                    <th>HIRES-3-Syntax</th>
+                    <th>Plotter-Syntax</th>
+                </tr>
+
+                <tr>
+                    <td>INIT</td>
+                    <td>
+                        POKE53280,0 (Rahmen schwarz)<br>
+                        SYS37498 (HIRES anschalten)<br>
+                        HFL,6,12 (blau auf grau)
+                    </td>
+                    <td>
+                        OPEN1,6,1 (Plot X,Y)<br>
+                        OPEN2,6,2 (Stiftfarbe)<br>
+                        PRINT #2,0 (schwarz)<br>
+                        CLOSE2<br>
+                        PRINT #1,"M";0,-200
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>START</td>
+                    <td>
+                        TRS,0,320,0,200<br>
+                        legt Ursprung nach links unten<br>
+                        x von 0 bis 320<br>
+                        y von 0 bis 200
+                    </td>
+                    <td>
+                        PRINT #1,"I"<br>
+                        Papiervorschub um 200 Einheiten. Dort auch Koordinatenursprung.<br>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>MITTE</td>
+                    <td>
+                        TRS,-160,160,-100,100<br>
+                        Ursprung in Bildschirmmitte
+                    </td>
+                    <td>
+                        PRINT #1,"R";240,0<br>
+                        PRINT #1,"I"<br>
+                        Ursprung in Papiermitte.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>PUNKT(X,Y)</td>
+                    <td>TPK,X,Y</td>
+                    <td>
+                        PRINT #1,"R";X,Y<br>
+                        PRINT #1,"J";X+2,Y+2<br>
+                        PRINT #1,"R";X,Y<br>
+                        etwas ungenau, weil einzelner Punkt nicht sichtbar. Deshalb sehr kleiner Strich.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>LINIE(XA,YA,XB,YB)</td>
+                    <td>TLN,XA,YA,XB,YB</td>
+                    <td>
+                        PRINT #1,"R";XA,YA<br>
+                        PRINT #1,"J";XB,YB
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>KREIS(XM,YM,RX,RY)</td>
+                    <td>TKR,XM,YM,RX,RY,2*Pi</td>
+                    <td>
+                        Hier braucht man ein kleines Programm:<br>
+                        M=50:D=360*π/(M*180)<br>
+                        DIMT(M):T(0)=2*π<br>
+                        FORI=1TOM:T(I)=T(I-1)+D<br>
+                        PRINT #1,"R";RX*COS(T(I-1))+XM,RY*SIN(T(I-1))+YM<br>
+                        PRINT #1,"J";RX*COS(T(I))+XM,RY*SIN(T(I))+YM<br>
+                        NEXTI
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>TEXT(A$,XT,YT)</td>
+                    <td>TEX,A$,XT,YT</td>
+                    <td>
+                        OPEN4,6:PRINT #1,"R";XT,YT<br>
+                        PRINT #4,A$:CLOSE4<br>
+                        PRINT #1,"M";240,YT<br>
+                        PRINT #1,"I"
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>SHOW</td>
+                    <td>HAN</td>
+                    <td>
+                        PRINT #1,"R";0,-200<br>
+                        Papiervorschub um 200 Einheiten
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>NORMAL</td>
+                    <td>HOF</td>
+                    <td>CLOSE1</td>
+                </tr>
+
+                <tr>
+                    <td>GRESES</td>
+                    <td>LOE:AUS</td>
+                    <td>
+                        OPEN7,6,7:PRINT #7:CLOSE7
+                    </td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die grundlegenden allgemeinen Grafik-Befehle und ihre Übersetzung in HiRes-3- oder Plotter-Syntax</figcaption>
+        </figure>
 
         <p>Sehen wir uns das nun an zwei netten Beispielen an. Als erstes das Programm »verschlungene Spiralen«, welches (siehe Bilder 1a, 1b) mehrere Spiralen (nämlich N), die mit einem Startwinkel W aus dem Zentrum heraustreten, zu einer Scheibe mit dem Radius R anordnet.</p>
 
