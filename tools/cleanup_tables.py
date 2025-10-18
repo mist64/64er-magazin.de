@@ -1,8 +1,14 @@
 # This script cleans up an HTML file written by macOS TextEdit
 
+import argparse
 import re
 
-with open("/Users/mist/Desktop/SH8504_tables.html", "r") as f:
+parser = argparse.ArgumentParser(description='Clean up HTML tables from macOS TextEdit')
+parser.add_argument('input_file', help='Input HTML file to clean')
+parser.add_argument('output_file', help='Output file for cleaned HTML')
+args = parser.parse_args()
+
+with open(args.input_file, "r") as f:
     content = f.read()
 
 # Apply all the sed transformations:
@@ -30,5 +36,5 @@ content = re.sub(r'<li>(.*?)</li>', r'\1<br>', content)
 # 4. Remove closing </ol> tag
 content = re.sub(r'\s*</ol>\s*', '', content)
 
-with open("SH8504_clean.tables", "w") as f:
+with open(args.output_file, "w") as f:
     f.write(content)
