@@ -32,11 +32,50 @@
         </ul>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>10   -.li 1,4,7
+20   -;*******************************
+30   -;*   Ausgabe eines Textes auf  *
+40   -;*        dem Bildschirm       *
+50   -;*******************************
+60   -.ba $8000 ;Startadresse = $8000
+70   -;
+80   -.eq ausgabe = $ffd2 ;Dies ist ein externes Label
+90   -;
+100  -anfang    ldy #0         ;Schleifenzaehler auf 0 setzen
+110  -loop      lda text,y     ;Zeichen holen
+120  -          cmp #"#"       ;mit Endekennzeichen vergleichen
+130  -          beq ende
+140  -          jsr ausgabe    ;Zeichen ausgeben
+150  -          iny            ;Schleifenzaehler + 1
+160  -          bne loop
+170  -ende      rts            ;Ende und zurueck ins BASIC
+180  -;
+190  -text      .tx "Dies ist ein Beispieltext#"</pre>
             <figcaption>Bild 1. Beispielprogramm zum Reassembler (Original Quelltext erstellt mit Hypra-Ass)</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>100-      .eq elffd2=$ffd2
+110-;
+120-      .ba $8000
+130-;
+140-l8000 ldy #$00       ; "."
+150-l8002 lda tl8010,y
+160-      cmp #$23       ; "#"
+170-      beq l800f
+180-      jsr elffd2
+190-      iny
+200-      bne l8002
+210-l800f rts
+220-;
+230-tl8010.by $c4,$49,$45,$53,$20,$49,$53,$54;"Dies ist"
+240-;
+250-      .by $20,$45,$49,$4e,$20,$c2,$45,$49;" ein Bei"
+260-;
+270-      .by $53,$50,$49,$45,$4c,$54,$45,$58;"spieltex"
+280-;
+290-      .by $54        ; "t"
+300-;
+310-tl8029.by $23        ; "#"</pre>
             <figcaption>Bild 2. Reassembler-Quelltext zum Beispielprogramm aus Bild 1</figcaption>
         </figure>
 
@@ -97,7 +136,7 @@
             <li>Der Reassembler arbeitet ausgezeichnet mit Hypra-Ass zusammen. Dabei ist es jedoch übersichtlicher, das Informationsprogramm ohne Leerzeichen einzugeben, weil Hypra-Ass nach dem ersten Leerzeichen einen Tabulator einfügt. Das Aussehen des Quelltextes würde dadurch verunstaltet. Gestartet wird das Informationsprogramm wie gewohnt mit RUN. (Vergessen Sie nicht den Minusstrich vor jeder Zeile, wenn Hypra-Ass geladen ist.)</li>
             <li>Aus programmtechnischen Gründen kann es vorkommen, daß der Reassembler im ersten Pass ein Maschinenprogramm anders reassembliert als im zweiten. Dadurch können in Pass 2 Sprungadressen im Maschinenprogramm auftauchen, die in Pass 1 nicht gefunden wurden und deshalb auch im Quelltext nicht durch ein Label markiert werden. Der Reassembler ersetzt in diesem Fall die Sprungadresse <strong>nicht</strong> durch ein Label, sondern stellt sie als Hex-Zahl im Quelltext dar. An die entsprechende Zeile werden 3 Fragezeichen angehängt.</li>
             <li>3-Byte-Befehle, die bei der Assemblierung als 2-Byte-Befehle interpretiert werden (BIT $A9 $00 = .BY $2C LDA #$00), werden nicht reassembliert. Statt dessen werden die 3 Byte mit vorangestelltem .BY-Pseudoopcode in den Quelltext eingefügt Der reassemblierte Befehl wird aber als Kommentar an die entsprechende Zeile angefügt.</li>
-            <li>Es ist möglich, ein Programm so zu reassemblieren, als ob es in einem anderen Bereich läge. Dazu ist an den SYS-Befehl eine weitere Adresse anzuhängen: 
+            <li>Es ist möglich, ein Programm so zu reassemblieren, als ob es in einem anderen Bereich läge. Dazu ist an den SYS-Befehl eine weitere Adresse anzuhängen:
                 <code>SYS 49152, anfadr, endadr, get</code>
                 <p>anfadr und endadr geben die Anfangs- und Endadresse des Bereichs an, in dem das Maschinenprogramm liegen soll, get gibt die Anfangsadresse des Bereichs an, in dem das Programm tatsächlich liegt.</p>
                     <p>So kann man zum Beispiel die Kopie der CHRGET-Routine ab $E3A2 reassemblieren, als ob sie im Bereich von $0073 bis $008A liegen würde. Dazu ist im Direktmodus folgende Zeile einzugeben:
