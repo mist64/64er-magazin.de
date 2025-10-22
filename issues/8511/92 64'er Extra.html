@@ -990,7 +990,7 @@
                     </tr>
                 </tbody>
             </table>
-            <figcaption>Tabelle 3. POKE-Werte für Musik-Noten</figcaption>
+            <figcaption>Tabelle 3. <a href="#futureteufelchen" class="futureteufelchen_link">POKE-Werte für Musik-Noten</a></figcaption>
         </figure>
         <figure>
             <img src="92-1.png" alt="">
@@ -1000,6 +1000,28 @@
             <img src="92-2.png" alt="">
             <figcaption>Bild 2. Beispiele für Hüllkurven</figcaption>
         </figure>
+
+        <aside class="futureteufelchen" id="futureteufelchen">
+            <h2>Futureteufelchen</h2>
+
+            <p>Die Tabelle wurde 1:1 vom C64-Handbuch übernommen, und kann durch das folgende Programm generiert werden:</p>
+
+            <pre>10 SF = 985183
+20 FOR N = 0 TO 94
+30 F = 440 * (2 ^ ((N - 57) / 12)) :REM FREQUENCY IN HZ
+40 P = INT(F * (2^24 / SF) + 0.5)  :REM CONVERT TO SID PARAMETER
+50 HI = INT(P / 256)
+60 LO = P - HI * 256
+70 I = N - INT(N / 12) * 12
+80 NT$ = MID$("C  C# D  D# E  F  F# G  G# A  A# H  ", I * 3 + 1, 3)
+90 PRINT N; " "; NT$; "-"; INT(N / 12); " ";
+100 F1 = INT(F * 10 + 0.5) / 10     :REM ROUND TO 1 DECIMAL PLACE
+110 PRINT "F="; F1; " P="; P; " HI="; HI; " LO="; LO
+120 NEXT N</pre>
+    <p>Die Berechnung basiert aber nicht auf einer leicht abweichender Systemfrequenz des C64. Der korrekte Wert wäre<pre>10 SF = 17734472 / 18</pre><p class="noindent">also ca. 985248 Hz (0.985248 MHz).</p>
+
+        </aside>
+
     </article>
 </body>
 
