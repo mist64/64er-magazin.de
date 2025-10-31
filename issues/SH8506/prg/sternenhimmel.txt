@@ -1,6 +1,5 @@
-
-
 ;sternenhimmel.prg ==0801==
+;version=simons
     0 rem ********************************
     1 rem *                              *
     2 rem *        sternenhimmel         *
@@ -28,96 +27,96 @@
   210 r=99-h*198/pi:w=-a-pi/2
   220 x=int(cos(w)*r*1.1+159.5)
   230 y=int(sin(w)*r+99.5)
-  240 ($64){CTRL-B}x,y,1
+  240 plotx,y,1
   296 rem ***********************
-  297 rem * ($64){$6f} ueberschreiben *
+  297 rem * text ueberschreiben *
   298 rem ***********************
   300 n$=left$(n$,13)
   310 ifn3$<>n$thengosub340
   320 ifn4$<>n1$thengosub360
   330 return
-  340 n3$=n$:($64){CTRL-D}0,184,103,191,0
-  350 ($64){$6f}0,184,n$,1,0,8:return
-  360 n4$=n1$:($64){CTRL-D}0,192,119,199,0
-  370 ($64){CTRL-D}216,192,319,199,0
-  380 ($64){$6f}0,192,n1$,1,0,8
-  390 ($64){$6f}319-8*len(n2$),192,n2$,1,0,8
+  340 n3$=n$:block0,184,103,191,0
+  350 text0,184,n$,1,0,8:return
+  360 n4$=n1$:block0,192,119,199,0
+  370 block216,192,319,199,0
+  380 text0,192,n1$,1,0,8
+  390 text319-8*len(n2$),192,n2$,1,0,8
   395 return
   396 rem ***********************
   397 rem *   fehlermeldungen   *
   398 rem ***********************
   400 n1$=left$(n1$,9)
-  410 ($64){$6f}0,192,n1$+" nicht",1,0,8
-  420 ($64){$6f}232,192,"sichtbar",1,0,8
+  410 text0,192,n1$+" nicht",1,0,8
+  420 text232,192,"sichtbar",1,0,8
   430 goto41000
   450 n$=left$(n$,9)
-  460 ($64){$6f}0,192,n$+" nicht",1,0,8
-  470 ($64){$6f}232,192,"gespeichert",1,0,8
+  460 text0,192,n$+" nicht",1,0,8
+  470 text232,192,"gespeichert",1,0,8
   480 goto41000
   496 rem ***********************
   497 rem *    kreuz bewegen    *
   498 rem ***********************
   500 hn=x+19:vn=y+46
-  510 ($64){esc}1,hv,vv,hn,vn,0,100
+  510 mmob1,hv,vv,hn,vn,0,100
   520 goto300
   596 rem ***********************
   597 rem * buchstaben loeschen *
   598 rem ***********************
   600 le=len(n$)-1
-  610 ($64){CTRL-D}le*8,184,le*8+7,199,0
+  610 blockle*8,184,le*8+7,199,0
   620 n$=left$(n$,le)
   630 return
   996 rem ************************
   997 rem * bildschirm erstellen *
   998 rem ************************
- 1000 ($64){CTRL-A}7,6
- 1010 ($64)b160,100,110,100,1
+ 1000 hires7,6
+ 1010 circle160,100,110,100,1
  1020 hu=0:ifb<0thenhu=200
- 1030 ifb<0then($64)b160,hu+b/9*10,2,2,1
- 1040 ($64){$6f}1,0,mid$(str$(t),2)+"."+mid$(str$(m),2)+"."+mid$(str$(j),2),1,0,8
- 1050 ($64){$6f}1,8,"oz"+oz$,1,0,8
- 1060 ($64){$6f}1,16,"wz"+wz$,1,0,8
+ 1030 ifb<0thencircle160,hu+b/9*10,2,2,1
+ 1040 text1,0,mid$(str$(t),2)+"."+mid$(str$(m),2)+"."+mid$(str$(j),2),1,0,8
+ 1050 text1,8,"oz"+oz$,1,0,8
+ 1060 text1,16,"wz"+wz$,1,0,8
  1070 t$=mid$(str$(int(b+.5)),2,4)
  1080 sp$=right$("   ",3-len(t$))
- 1090 ($64){$6f}216,0,"breite "+sp$+t$,1,0,8
+ 1090 text216,0,"breite "+sp$+t$,1,0,8
  1100 t$=mid$(str$(int(l+.5)),2,4)
  1110 sp$=right$("   ",3-len(t$))
  1120 b$="n":ifb<0thenb$="s"
- 1130 ($64){$6f}304,0,b$,1,0,8
- 1140 ($64){$6f}216,8,"laenge "+sp$+t$,1,0,8
+ 1130 text304,0,b$,1,0,8
+ 1140 text216,8,"laenge "+sp$+t$,1,0,8
  1150 l$="w":ifl<0thenl$="o"
- 1160 ($64){$6f}304,8,l$,1,0,8
- 1170 ($64){$6f}32,96,"o",1,0,8
- 1180 ($64){$6f}280,96,"w",1,0,8
+ 1160 text304,8,l$,1,0,8
+ 1170 text32,96,"o",1,0,8
+ 1180 text280,96,"w",1,0,8
  1190 gosub2010
  1200 gosub2110
- 1210 ($64){$6f}288,128,"f5 =",1,0,8
- 1220 ($64){$6f}288,136,"copy",1,0,8
- 1230 ($64){$6f}288,152,"f7 =",1,0,8
- 1240 ($64){$6f}256,160,"neustart",1,0,8
+ 1210 text288,128,"f5 =",1,0,8
+ 1220 text288,136,"copy",1,0,8
+ 1230 text288,152,"f7 =",1,0,8
+ 1240 text256,160,"neustart",1,0,8
  1250 return
- 2000 ($64){CTRL-D}0,128,39,143,0
- 2010 ($64){$6f}0,128,"f1 =",1,0,8
- 2020 ($64){$6f}0,136,"stern",1,0,8
+ 2000 block0,128,39,143,0
+ 2010 text0,128,"f1 =",1,0,8
+ 2020 text0,136,"stern",1,0,8
  2030 return
- 2050 ($64){CTRL-D}0,128,39,143,0
- 2060 ($64){$6f}0,128,"{rvon}sucht",1,0,8
- 2070 ($64){$6f}0,136,"{rvon}stern",1,0,8
+ 2050 block0,128,39,143,0
+ 2060 text0,128,"{rvon}sucht",1,0,8
+ 2070 text0,136,"{rvon}stern",1,0,8
  2080 return
- 2100 ($64){CTRL-D}0,152,39,159,0
- 2110 ($64){CTRL-D}0,160,71,167,0
- 2120 ($64){$6f}0,152,"f3 =",1,0,8
- 2130 ($64){$6f}0,160,"sternbild",1,0,8
+ 2100 block0,152,39,159,0
+ 2110 block0,160,71,167,0
+ 2120 text0,152,"f3 =",1,0,8
+ 2130 text0,160,"sternbild",1,0,8
  2140 return
- 2150 ($64){CTRL-D}0,152,39,159,0
- 2160 ($64){CTRL-D}0,160,71,167,0
- 2170 ($64){$6f}0,152,"{rvon}sucht",1,0,8
- 2180 ($64){$6f}0,160,"{rvon}sternbild",1,0,8
+ 2150 block0,152,39,159,0
+ 2160 block0,160,71,167,0
+ 2170 text0,152,"{rvon}sucht",1,0,8
+ 2180 text0,160,"{rvon}sternbild",1,0,8
  2190 return
  4996 rem **********************
- 4997 rem *    ($64){CTRL-A} kreuz     *
+ 4997 rem *    hires kreuz     *
  4998 rem **********************
- 5000 ($64){$62} 0,32*64+49152
+ 5000 design 0,32*64+49152
  5020 @.....b..................
  5030 @.....b..................
  5040 @.....b..................
@@ -139,9 +138,9 @@
  5200 @........................
  5210 @........................
  5220 @........................
- 5230 ($64){rght} 1,32,0,1,0
+ 5230 mob set 1,32,0,1,0
  5240 hn=179:vn=145
- 5250 ($64){esc}1,hv,vv,hn,vn,0,0
+ 5250 mmob1,hv,vv,hn,vn,0,0
  5260 return
  9996 rem *********************
  9997 rem *  erde/sonne/mond  *
@@ -173,17 +172,17 @@
 12180 bm=bm+sin(m3*p1)*.15
 15000 n$="sonne":al=ls:ab=0:gosub30000
 15010 ifx=0goto15040
-15020 ($64)bx,y,4,3,1
-15030 ($64){$75}x+1,y,1
+15020 circlex,y,4,3,1
+15030 paintx+1,y,1
 15040 n$="mond":al=lm:ab=bm:gosub30000
 15050 ifx=0goto15080
-15060 ($64){CTRL-B}x,y,0
-15070 ($64)bx,y,4,3,1
+15060 plotx,y,0
+15070 circlex,y,4,3,1
 15080 return
 19996 rem *********************
 19997 rem *      planeten     *
 19998 rem *********************
-20000 ($64)062500
+20000 reset62500
 20010 forz=0to5
 20020 readn$,tb,ep,ph,mp,e,kn,i,ae
 20030 p$(z)=n$
@@ -203,7 +202,7 @@
 24996 rem *********************
 24997 rem *     fixsterne     *
 24998 rem *********************
-25000 ($64)060000
+25000 reset60000
 25010 fors=1toi1
 25020 readre,de,n$,a
 25030 de=de*p1
@@ -213,7 +212,7 @@
 25070 next
 25080 return
 29996 rem *********************
-29997 rem *  rektas./dek($64)y.  *
+29997 rem *  rektas./deklin.  *
 29998 rem *********************
 30000 sn=sin(ab*p1):cs=cos(ab*p1)
 30010 sl=sin(al*p1):cl=cos(al*p1)
@@ -237,7 +236,7 @@
 40100 ifp>64andp<91goto47000
 40110 goto40000
 41000 v=v+.5
-41010 ($64){esc}1,hn,vn,hn,vn,0,0
+41010 mmob1,hn,vn,hn,vn,0,0
 41020 goto40000
 42000 x=int(hn-19):y=int(vn-46)
 42010 xm=200000
@@ -260,7 +259,7 @@
 44060 x=p(zp):y=p(zp+1)
 44070 ifxp=xmgoto45000
 44080 x=z%(z):y=z%(z+i2)
-44090 ($64)060000+z*10
+44090 reset60000+z*10
 44100 readre,de,n$,d
 44110 n1$=z$(d,1):n2$=z$(d,0)
 44120 ifp=134thenz1=z:z=d:gosub2100:goto48060
@@ -274,7 +273,7 @@
 47050 n$=n$+g$:gosub350:goto47020
 47060 p=0:z=-1
 47070 fors=0to5
-47080 if($64){CTRL-P}(n$,p$(s))thenz=s:s=5
+47080 ifplace(n$,p$(s))thenz=s:s=5
 47090 next
 47100 ifz<0goto48000
 47110 hv=hn:vv=vn
@@ -283,8 +282,8 @@
 47140 ifx=0goto400
 47150 gosub500:goto40000
 48000 fors=0toi3
-48010 if($64){CTRL-P}(n$,z$(s,0))thenz=s:s=i3
-48020 if($64){CTRL-P}(n$,z$(s,1))thenz=s:s=i3
+48010 ifplace(n$,z$(s,0))thenz=s:s=i3
+48020 ifplace(n$,z$(s,1))thenz=s:s=i3
 48030 next
 48040 ifz<0goto49000
 48050 z1=-1
@@ -299,7 +298,7 @@
 48140 x=z%(z1):y=z%(z1+i2):gosub500
 48150 fora=a1toa2
 48160 x=z%(a)
-48170 ifxthen($64){CTRL-B}x,z%(a+i2),f
+48170 ifxthenplotx,z%(a+i2),f
 48180 next
 48190 f=1-f
 48200 iff=1goto48150
@@ -307,10 +306,10 @@
 48220 ifpgoto40020
 48240 fora=1to1000*f+10:next
 48250 goto48150
-49000 ($64)060000
+49000 reset60000
 49010 fors=1toi1
 49020 readre,de,s$,a
-49030 if($64){CTRL-P}(n$,s$)thenz=s:s=i2
+49030 ifplace(n$,s$)thenz=s:s=i2
 49040 next
 49050 ifz<0thenhn=x+19:vn=y+46:goto450
 49060 ifz%(z)=0thenn1$=s$:goto400
@@ -321,7 +320,7 @@
 49996 rem ********************
 49997 rem *  programmbeginn  *
 49998 rem ********************
-50000 ($64){$70}1
+50000 cset1
 50010 ifpeek(900)>0andpeek(900)<11then50110
 50020 print"{clr}{down}Heutiges Datum"
 50030 input"{down}Jahr ";j$
@@ -373,7 +372,7 @@
 50505 printtab(12)right$(str$(wz),4)
 50510 print"{up}"tab(10);:inputwz$:wz=val(wz$)/100
 50520 ifwz<0orwz>24goto50510
-50530 zt=int(wz)+($64){swlc}(wz)/.6
+50530 zt=int(wz)+frac(wz)/.6
 50600 i=m<3
 50610 k=t+int((153*m-11*i-162)/5)+int((1461*j+i)/4)+(j>=0)*366
 50620 ifk>577736thenk=k-int((int((j+i)/100)*3-5)/4)
@@ -381,25 +380,25 @@
 50640 e=23.452294-i*.013125-i*i*1.639e-6+i*i*i*5.028e-7
 50650 es=sin(e*p1):ec=cos(e*p1)
 52000 rem ** funktionen definieren **
-52010 rem **  ($64){$6b}sin  **
+52010 rem **  arcsin  **
 52020 deffnas(x)=atn(x/sqr(1-x*x))
-52030 rem **  ($64){$6b}cos  **
+52030 rem **  arccos  **
 52040 deffnac(x)=pi/2-atn(x/sqr(1-x*x))
-52050 rem **  ($64)rulo  **
+52050 rem **  modulo  **
 52060 deffnmo(x)=x-int(x/c)*c
 54000 rem ** zeit **
-54010 wz$=mid$(str$(int(($64){swlc}(wz)*100+.5)),2)
+54010 wz$=mid$(str$(int(frac(wz)*100+.5)),2)
 54020 wz$=right$("0"+wz$,2)
 54030 wz$=right$(" "+str$(int(wz)),3)+":"+wz$
 54040 lo=int(l/15)*15
 54050 oz=fnmo(zt*15-lo)/15
 54060 oz$=right$(" "+str$(int(oz)),3)+right$(wz$,3)
 54200 rem aries
-54210 ar=zt*360.985647/24+($64){swlc}(ta/1461)*1440.02509
+54210 ar=zt*360.985647/24+frac(ta/1461)*1440.02509
 54220 ar=ar+int(ta/1461)*.0307572+99.2018973
 54230 ar=fnmo(ar)
 54300 rem daten sternbilder
-54310 ($64)062000
+54310 reset62000
 54320 fora=0toi3
 54330 readz$(a,0),z$(a,1),z(a,0),z(a,1)
 54340 next
@@ -429,11 +428,11 @@
 56030 gosub25000:rem fixsterne
 56040 gosub 5000:rem kreuz
 56050 goto40000
-57000 rem ** hard($64){$77} **
-57100 ($64){$77}
+57000 rem ** hardcopy **
+57100 copy
 57110 goto40000
 58000 rem ** neustart **
-58010 ($64){$67}:($64){$70}1:($64){$68} 1:wh=1
+58010 nrm:cset1:mob off 1:wh=1
 58020 goto50300
 60000 rem ** daten fixsterne **
 60010 data037.8,89.3,polaris,0
