@@ -1,0 +1,178 @@
+
+
+;alle neune.prg ==0801==
+  100 rem *********************************
+  110 rem
+  120 rem  j a h r e s a u s w e r t u n g
+  130 rem
+  140 rem   (c)juergen schaefer , 1984
+  150 rem
+  160 rem   8000  m u e n c h e n  70
+  170 rem
+  180 rem        tel.089-7601642
+  190 rem
+  200 rem ********************************
+  210 print"{clr}"
+  220 poke 53281,0:poke 53280,0:poke 646,1
+  225 rem---------------eingabe routine----------------
+  230 n=7:m=3
+  240 print"anzahl der anwesenheitstage in 1984":print
+  250 input a
+  260 if a>m then print"{clr}":goto240
+  270 print:print"geben sie den namen des keglers ein !":print :input k$
+  280 print"{clr}"
+  290 print"geben sie die einzelwerte der spalten":print
+  300 print"in folgender reihenfolge ein :"
+  310 for t=1to2000
+  320 next t
+  330 gosub1160
+  340 dim u(m+1,n+1)
+  350 for i=1 tom
+  360 gosub1160
+  370 read d$
+  380 print
+  390 printd$
+  400 print"========":print
+  410 for j=1 to n
+  430 print j;".spalte ";
+  440 input u(i,j):u$=str$(u(i,j))
+  442 if len(u$)>4 then 445
+  444 goto450
+  445 print: print"bitte nur zahlen bis max. 999 eingeben !"
+  446 print"eingabewiederholung":print :goto440
+  450 next j
+  460 next i
+  470 restore
+  475 rem---------------hardcopy ausdruck--------------
+  480 print:input"ist der drucker eingeschaltet (j)";p$
+  490 if p$<>"j" then 480
+  500 print:print"es wird ausgedruckt"
+  520 gosub 1350
+  530 gosub 1040
+  540 open4,4
+  550 rem---------------tabelle erzeugen---------------
+  560 for i=1 to m
+  570 read d$
+  580 print#4,d$;"  ";
+  590 for j=1 to n
+  600 x=u(i,j)
+  610 if x>99 then print#4,x;:goto 640
+  620 if x <100 and x>=9  then print#4,x;:goto650
+  630 if x <10 then print#4,x;:goto660
+  640 print#4,   "     ";:goto 670
+  650 print#4,   "      ";:goto 670
+  660 print#4,   "       ";:goto 670
+  670 nextj
+  680 print#4
+  690 next i
+  700 print#4,"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}";
+  710 print#4,"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+  720 rem---------------summe pro spalte bilden--------
+  730 print#4,"summe:   ";
+  740 for j=1 to n
+  750 s=0
+  760 for i=1 to m
+  770 s=s+u(i,j)
+  780 next i
+  790 if j=1 then v=int(s/a+.5)
+  800 if j=2 then b=int(s/a+.5)
+  810 print#4,s;
+  830 if s>99 and s<999 then goto 890
+  840 if s<100 and s>9 then goto 920
+  850 goto 950
+  890 print#4,"     ";
+  900 next j
+  910 goto 970
+  920 print#4,"      ";
+  930 next j
+  940 goto 970
+  950 print#4,"       ";
+  960 next j
+  970 u(m+1,j)=s
+  980 print#4
+  990 print#4:print#4,"jahres-durchschnitt bei 10x in die vollen :";chr$(14);v;
+ 1000 print#4:print#4,"jahres-durschnitt beim bilder-kegeln      :";chr$(14);b
+ 1010 close 4
+ 1020 gosub 1620
+ 1030 end
+ 1040 rem--------------tabellenkopf-------------------
+ 1050 open4,4
+ 1060 print#4,"kegel- ";" ";
+ 1070 print#4,"10 schub ";" ";" summe "; "   ";" pudel";
+ 1080 print#4,"    ";"stiere";"     ";"alle ";"    ";"kranz";"    ";"schnaps"
+ 1090 print#4,"abend  ";" ";
+ 1100 print#4,"i.d.voll.";" ";" bilder ";"  ";"(ratten)";
+ 1110 print#4,"  ";"    ";"       ";"neun ";"    ";"     ";"    ";"runden:"
+ 1120 print#4,"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}";
+ 1130 print#4,"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 1140 close 4
+ 1150 return
+ 1160 rem--------------ton----------------------------
+ 1170 print
+ 1180 poke 54273,23:poke 54272,181
+ 1190 poke 54296,15
+ 1200 poke 54277,9
+ 1210 poke 54278,0
+ 1220 poke 54276,33
+ 1230 for t=1 to  500:next t
+ 1240 poke 54276,32
+ 1250 poke 54273,0
+ 1260 print"{clr}"
+ 1265 print"spaltenbelegung:"
+ 1266 print"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 1270 print"1. 10 schub in die vollen"
+ 1280 print"2. summe bilderkegeln "
+ 1290 print"3. pudel (ratten)"
+ 1300 print"4. stiere(strasse)"
+ 1310 print"5. alle neun"
+ 1320 print"6. kranz"
+ 1330 print"7. schnapsrunden":print:print
+ 1340 return
+ 1350 rem--------------formularkopf-------------------
+ 1360 open4,4
+ 1370 print#4,"****************************************";
+ 1380 print#4,"****************************************" :print#4:print#4
+ 1390 print#4,chr$(16)" 2";chr$(14) chr$(14)"jahresauswertung fuer 1984  ";
+ 1400 print#4:print#4
+ 1410 print#4,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}";
+ 1420 print#4,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 1430 print#4,"kegelclub alle neun ";
+ 1440 print#4,chr$(16)"62";"17.dezember 1984"
+ 1450 print#4
+ 1460 print#4,"die folgende tabelle zeigt die persoenlichen leistungen unseres ";
+ 1470 print#4,"kegelbruders :"
+ 1480 print#4
+ 1490 print#4:print#4,chr$(16)"25" chr$(14);k$
+ 1500 print#4
+ 1510 print#4:print#4,"waehrend des abgelaufenen jahres 1984."
+ 1520 print#4,"in diesem jahr hatten wir insgesamt 24 kegelabende.";
+ 1530 print#4,"sie haben";a;"mal teilgenommen"
+ 1540 print#4,"und erreichten damit ";int(a/24 *100);" %  der max. moeglichen ";
+ 1550 print#4,"anwesenheitszeit !"
+ 1560 print#4
+ 1570 print#4,"i h r e  p e r s o e n l i c h e n  e r g e b n i s s e  :"
+ 1580 print#4,"=========================================================="
+ 1590 print#4 :print#4
+ 1600 close4
+ 1610 return
+ 1620 rem--------------schlussformel------------------
+ 1630 open4,4
+ 1640 print#4:print#4,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}";
+ 1650 print#4,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 1660 print#4:print#4,"im namen der ganzen kegelgruppe wuenschen der computer ";
+ 1670 print#4,"und der vorstand ihnen, "
+ 1680 print#4
+ 1690 print#4,"lieber herr ";k$;",";
+ 1700 print#4,chr$(14)"   gut holz fuer 1985 !"
+ 1710 print#4
+ 1730 print#4
+ 1740 print#4,"****************************************";
+ 1750 print#4,"****************************************" :print#4:print#4
+ 1760 close 4
+ 1765 rem--------------daten der kegelabende----------
+ 1770 data " 2.jan.","16.jan.","30.jan.","13.feb.","27.feb."
+ 1780 data "12.mar.","26.mar."," 9.apr."," 7.mai ","21.mai "
+ 1790 data " 4.jun.","18.jun."," 2.jul.","16.jul.","30.jul."
+ 1800 data "13.aug.","27.aug.","10.sep.","24.sep."," 8.okt."
+ 1810 data "22.okt."," 5.nov.","19.nov."," 3.dez."
+

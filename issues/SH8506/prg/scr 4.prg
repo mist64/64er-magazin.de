@@ -1,0 +1,1 @@
+ ( *** ÚUSATZ-ÂEFEHLE 4 *** ) ( ÁUSGABE AUF ÄRUCKER ) : PRINTER    0 0 4 4 7 OPEN    4 OUT    CR ; ( ÁUSGABE AUF ÄISPLAY ) : DISPLAY    CR    4 CLOSE ; ( * ENDE * )P :

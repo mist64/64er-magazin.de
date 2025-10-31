@@ -1,0 +1,359 @@
+
+
+;fakturierung.prg ==0801==
+   10 rem ================================
+   15 rem =                              =
+   20 rem =  fakturierung    20.03.1984  =
+   25 rem =                              =
+   30 rem ================================
+   35 rem =                              =
+   40 rem =  (c) hans-ullrich schreiber  =
+   45 rem =      humboldtstrasse    2 a  =
+   50 rem =        4950   m i n d e n    =
+   55 rem =                              =
+   60 rem =  telefon:      0571/4 93 60  =
+   65 rem =                              =
+   70 rem ================================
+   75 rem =                              =
+   80 rem =  commodore 64 + floppy 1541  =
+   85 rem =  matrixdrucker epson  rx 80  =
+   90 rem =  centronics interface  9200  =
+   92 rem =                              =
+   94 rem ================================
+  100 rem
+  110 rem -------------------------------
+  120 rem - allg. steuerung             -
+  130 rem -------------------------------
+  140 rem
+  150 poke 53280,0:poke 53281,0
+  160 print chr$(147):print chr$(14)
+  170 clr
+  180 dim rt$(35)
+  300 rem
+  310 rem -------------------------------
+  320 rem - formular                    -
+  330 rem -------------------------------
+  340 rem
+  350 f$(1)="*****   HANS-ULLRICH{$a0}SCHREIBER   *****"
+  360 f$(2)="       h.-u. schreiber * humboldtstr. 2 a * 4950 minden"
+  370 f$(3)="       ------------------------------------------------"
+  380 f$(4)="     RECHNUNG NR   "
+  390 f$(5)="=============================================="
+  500 rem
+  510 rem -------------------------------
+  520 rem - festwerte                   -
+  530 rem -------------------------------
+  540 rem
+  550 me(1)=0.14
+  560 c$=chr$(13):d$=chr$(32)
+  570 e$=chr$(133)
+  580 l$="     "
+  590 lz$="                                                                 "
+  600 f$(5)=l$+left$(f$(5)+f$(5),82)
+  700 rem
+  705 rem -------------------------------
+  710 rem - data begriffe               -
+  715 rem -------------------------------
+  720 rem
+  725 for i=1 to 5:read an$(i):next
+  730 data "1) : ":data "2) : "
+  735 data "3) :{$a0}":data "4) : "
+  740 data "5) : "
+  745 rem
+  750 for i=1 to 2:read rn$(i):next
+  755 data "rg-nr : "
+  760 data "datum : "
+  765 rem
+  770 for i=1 to 2:read lf$(i):next
+  775 data "{rvon}lfsch :{rvof} ":data "{rvon}datum :{rvof} "
+  780 rem
+  785 for i=1 to 6:read ar$(i):next
+  790 data "{rvon}menge    :{rvof} "
+  795 data "{rvon}me    :{rvof} "
+  800 data "{rvon}artikel  :{rvof} "
+  805 data "{rvon}einzelpr :{rvof} "
+  810 data "{rvon}gesamtpr :{rvof} "
+  815 data "{rvon}pe    :{rvof} "
+  820 rem
+  825 for i=1 to 3:read rb$(i):next
+  830 data "warenwert : "
+  835 data "mwst 14 % : "
+  840 data "endbetrag : "
+ 1000 rem
+ 1010 rem ------------------------------
+ 1020 rem - prg maske                  -
+ 1030 rem ------------------------------
+ 1035 rem
+ 1040 print chr$(147)
+ 1045 rem
+ 1050 print"***************************************"
+ 1060 print"*                                     *"
+ 1070 print"*    f a k t u r i e r u n g   1.1    *"
+ 1080 print"*                                     *"
+ 1090 print"***************************************"
+ 1100 rem
+ 1110 rem ------------------------------
+ 1120 rem - anschrift                  -
+ 1130 rem ------------------------------
+ 1140 rem
+ 1145 for l=1 to 3:print:next l
+ 1150 print"rechnungsanschrift"
+ 1160 print"------------------"
+ 1170 print
+ 1180 for i=1 to 4:as$(i)=""
+ 1190 print an$(i);:input as$(i)
+ 1200 if as$(i)="***" then end
+ 1210 next
+ 1220 i=5:print chr$(17);
+ 1230 print an$(i);:input as$(i)
+ 1300 rem
+ 1310 rem ------------------------------
+ 1320 rem - rg daten                   -
+ 1330 rem ------------------------------
+ 1340 rem
+ 1350 print:print
+ 1360 for i=1 to 2:re$(i)=""
+ 1370 print chr$(17);
+ 1380 print tab(18) rn$(i);:input re$(i)
+ 1385 if re$(i)="***" then 1040
+ 1390 next
+ 1400 rem
+ 1410 rem ------------------------------
+ 1420 rem - lfsch                      -
+ 1430 rem ------------------------------
+ 1440 rem
+ 1450 print chr$(147)
+ 1460 print"lieferschein"
+ 1470 print"------------"
+ 1480 print
+ 1490 i=1:ls$(1)=""
+ 1500 print lf$(1);:input ls$(i)
+ 1510 i=2:ls$(2)=""
+ 1520 print chr$(145);
+ 1530 print tab(24) lf$(i);:input ls$(i)
+ 1600 rem
+ 1610 rem ------------------------------
+ 1620 rem - artikel                    -
+ 1630 rem ------------------------------
+ 1640 rem
+ 1650 for l=1 to 3:print:next l
+ 1660 print"artikeleingabe"
+ 1670 print"--------------"
+ 1680 print
+ 1690 i=1:at$(i)=""
+ 1700 print ar$(i);:input at$(i)
+ 1710 i=2:print chr$(145);
+ 1720 print tab(24) ar$(i);:input at$(i)
+ 1730 for i=3 to 4:print chr$(17);
+ 1740 print ar$(i);:input at$(i):next
+ 1750 i=6:at$(6)="":print chr$(145);
+ 1760 print tab(24) ar$(i);:input at$(i)
+ 1800 rem
+ 1810 rem ------------------------------
+ 1820 rem - verzweigung 1              -
+ 1830 rem ------------------------------
+ 1840 rem
+ 1850 for l=1 to 3:print:next l
+ 1860 print"{rvon}neuer artikel -> 1   rechnung ende -> 2{rvof}"
+ 2000 rem
+ 2010 rem ------------------------------
+ 2020 rem - gesamtpreis                -
+ 2030 rem ------------------------------
+ 2040 rem
+ 2050 if at$(6)>"3" or at$(6)="" then at$(6)="0":goto 2090
+ 2060 if at$(6)="1" then gp=val(at$(1))*val(at$(4))/10:goto 2100
+ 2070 if at$(6)="2" then gp=val(at$(1))*val(at$(4))/100:goto 2100
+ 2080 if at$(6)="3" then gp=val(at$(1))*val(at$(4))/1000:goto 2100
+ 2090 if at$(6)="0" then gp=val(at$(1))*val(at$(4))
+ 2100 rem
+ 2110 gp=int(gp*100+0.5)/100
+ 2120 nz$="":g=gp:gosub 30500:gp$=nz$
+ 2130 zs=zs+val(gp$)
+ 2300 rem
+ 2310 rem ------------------------------
+ 2320 rem - get                        -
+ 2330 rem ------------------------------
+ 2340 rem
+ 2350 a$="":get a$:if a$="" then 2350
+ 2360 if a$<"1" or a$>"2" then 2350
+ 2500 rem
+ 2510 rem ------------------------------
+ 2520 rem - gosub                      -
+ 2530 rem ------------------------------
+ 2540 rem
+ 2550 if a$="2" then 2600
+ 2560 rem
+ 2570 gosub 31500:gosub 32000
+ 2580 at$(5)="":goto 1400
+ 2590 rem
+ 2600 gosub 31000:gosub 31500
+ 2610 gosub 32000:gosub 32500
+ 2620 gosub 33000:z=0
+ 2630 gosub 35000:goto 100
+30000 rem
+30010 rem =============================
+30020 rem = routinen                  =
+30030 rem =============================
+30500 rem
+30510 rem -----------------------------
+30520 rem - nachkomma / 0.00          -
+30530 rem -----------------------------
+30540 rem
+30550 nz$=str$(g)
+30560 if left$(right$(nz$,3),1)= "." then 30590
+30570 if left$(right$(nz$,2),1)= "." then nz$=nz$+"0":goto 30590
+30580 if left$(right$(nz$,1),1)<>"." then nz$=nz$+".00"
+30590 if mid$(nz$,2,1)="." then nz$=left$(nz$,1)+"0"+mid$(nz$,2,2)
+30600 g$=str$(g):g$="":g=val(g$)
+30610 return
+31000 rem
+31010 rem -----------------------------
+31020 rem - aufbau anschrift          -
+31030 rem -----------------------------
+31040 rem
+31050 as$(1)=l$+as$(1):as$(2)=l$+as$(2)
+31060 as$(3)=l$+as$(3):as$(4)=l$+as$(4)
+31070 as$(5)=l$+as$(5)
+31080 rem
+31090 if as$(4)="" then 31120
+31100 rem
+31110 as$=c$+as$(1)+c$+as$(2)+c$+as$(3)+c$+as$(4)+c$+c$+as$(5):goto 31140
+31120 as$=as$(1)+c$+as$(2)+c$+as$(3)+c$+c$+as$(5)
+31130 rem
+31140 re$=left$((re$(1)+lz$),33)+right$(lz$+re$(2),35)
+31150 return
+31500 rem
+31510 rem -----------------------------
+31520 rem - aufbau zeile              -
+31530 rem -----------------------------
+31540 rem
+31550 if ls$(1)="" and ls$(2)="" then ls$=left$(lz$,16):goto 31600
+31560 if ls$(1)="" or ls$(2)="" then ls$=left$(lz$,16):goto 31600
+31570 rem
+31580 ls$=l$+left$(ls$(1),4)+d$+d$+left$(ls$(2),5)
+31590 rem
+31600 at$(1)=right$(lz$+at$(1),8)
+31610 at$(2)=left$(at$(2)+lz$,4)
+31620 at$(3)=left$(at$(3)+lz$,34)
+31630 at$(4)=right$(lz$+at$(4),8)
+31640 at$(5)=right$(lz$+gp$,9)
+31650 rem
+31660 at$=ls$+d$+d$+at$(1)+d$+d$+at$(2)+d$+d$+at$(3)+d$+at$(4)+d$+at$(5)
+31670 return
+32000 rem
+32010 rem -----------------------------
+32020 rem - aufbau text               -
+32030 rem -----------------------------
+32040 rem
+32050 z=z+1:rt$(z)=rt$(z)+at$
+32060 ls$="":at$=""
+32070 return
+32500 rem
+32510 rem -----------------------------
+32520 rem - summenbildung             -
+32530 rem -----------------------------
+32540 rem
+32550 gp=val(gp$)
+32560 g$=str$(g):g$="":g=val(g$)
+32570 nz$="":g=zs:gosub 30500:zs$=nz$
+32580 me=int(zs*me(1)*100+0.5)/100
+32590 nz$="":g=me:gosub 30500:me$=nz$
+32600 su=zs+me
+32610 nz$="":g=su:gosub 30500:su$=nz$
+32620 rem
+32630 zs$=right$(l$+zs$,9)
+32640 me$=right$(l$+me$,9)
+32650 su$=right$(l$+su$,9)
+32700 rem
+32710 rem -----------------------------
+32720 rem - summentext                -
+32730 rem -----------------------------
+32740 rem
+32750 st$(1)=rb$(1)+left$(lz$,10)+zs$
+32760 st$(2)=rb$(2)+left$(lz$,10)+me$
+32770 st$(3)=rb$(3)+left$(lz$,10)+su$
+32780 rem
+32790 st$(1)=left$(lz$,56)+st$(1)
+32800 st$(2)=left$(lz$,56)+st$(2)
+32810 st$(3)=left$(lz$,56)+st$(3)
+32820 rem
+32830 return
+33000 rem
+33010 rem -----------------------------
+33020 rem - zahlungsbed.              -
+33030 rem -----------------------------
+33040 rem
+33050 for l=1 to 3:print:next l
+33060 print"{rvon}2% skonto     -> 1   3% skonto     -> 2{rvof}"
+33100 rem
+33110 rem -----------------------------
+33120 rem - get                       -
+33130 rem -----------------------------
+33140 rem
+33150 a$="":get a$:if a$="" then 33150
+33160 if a$=chr$(13) then 33200
+33170 if a$<"1" or a$>"2" then 33150
+33200 rem
+33210 rem -----------------------------
+33220 rem - zb texte                  -
+33230 rem -----------------------------
+33240 rem
+33250 zb$(1)="zahlung :   "
+33260 zb$(2)="nach erhalt - ohne abzug"
+33270 zb$(3)="innerhalb  8 tagen "
+33280 zb$(4)="innerhalb 30 tagen netto kasse"
+33290 zb$(5)="mit 2% skonto"
+33300 zb$(6)="mit 3% skonto"
+33310 rem
+33320 if a$=chr$(13) then zb$=zb$(1)+zb$(2):goto 33360
+33330 if a$="1" then zb$=zb$(1)+zb$(3)+zb$(5)+c$+left$(lz$,34)+zb$(4)
+33340 if a$="2" then zb$=zb$(1)+zb$(3)+zb$(6)+c$+left$(lz$,34)+zb$(4)
+33350 rem
+33360 zb$=left$(lz$,22)+zb$
+33370 return
+35000 rem
+35010 rem -----------------------------
+35020 rem - print drucker             -
+35030 rem -----------------------------
+35040 rem
+35050 close 4:open 4,4
+35060 print#4,chr$(27);"c";chr$(0);chr$(12);
+35070 print#4,chr$(27);"j";chr$(110);
+35080 print#4,chr$(27);"p";
+35090 print#4,chr$(27);"g";
+35100 print#4,chr$(27);"w";chr$(1);
+35110 print#4,f$(1)
+35120 print#4,chr$(27);"w";chr$(0);
+35130 print#4,chr$(27);"h";
+35140 print#4,chr$(27);"j";chr$(120);
+35150 print#4,chr$(27);"p";
+35160 print#4,chr$(27);chr$(15);
+35170 print#4,f$(2)
+35180 print#4,f$(3)
+35190 print#4,chr$(27);"m";
+35200 print#4,as$
+35210 print#4,chr$(27);"j";chr$(110);
+35215 print#4,f$(5)
+35220 print#4,chr$(27);"g";
+35230 print#4,f$(4);
+35240 print#4,chr$(27);"h";
+35250 print#4,chr$(27);"m";
+35260 print#4,re$
+35265 print#4,f$(5)
+35270 print#4,chr$(27);"j";chr$(20);
+35280 z=z+1:if rt$(z)="" then 35300
+35290 print#4,rt$(z):goto 35280
+35300 print#4,chr$(27);"j";chr$(60);
+35310 print#4,st$(1)
+35320 print#4,st$(2)
+35330 print#4,chr$(27);"j";chr$(15);
+35340 print#4,chr$(27);"g";
+35350 print#4,st$(3)
+35360 print#4,chr$(27);"h";
+35370 print#4,chr$(27);"j";chr$(110);
+35380 print#4,zb$
+35390 print#4,chr$(07);
+35400 print#4,chr$(12);
+35410 print#4,chr$(27);chr$(64)
+35420 close 4:return
+

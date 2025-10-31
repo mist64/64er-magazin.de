@@ -1,0 +1,1 @@
+( *** ZUSATZ-BEFEHLE 1 ***)EDIT (  2. ÓCHLEIFENINDEX ) : J    R> R> R>    DUP 704 !    >R >R >R    704 @ ; (  ÖERLASSE ÓCHLEIFE ) : LEAVE    R> R>    DROP DUP    >R >R ; --> (
