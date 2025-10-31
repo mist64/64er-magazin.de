@@ -1,1 +1,0 @@
- ( *** ÚUSATZ-ÂEFEHELE 3 *** ) ( ÁUSGABE AUF ÆILE (LOG --) ) : OUT    X-REG C!    65481 CALL ; ( ÅINGABE VON ÆILE (LOG --) ) : IN    X-REG C!    65478 CALL ; --> (

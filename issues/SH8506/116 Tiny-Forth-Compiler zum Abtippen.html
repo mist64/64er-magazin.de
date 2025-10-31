@@ -17,6 +17,200 @@
     <article>
         <h1>Tiny-Forth-Compiler zum Abtippen</h1>
         <p>TODO 85/8, p.51</p>
+
+        <figure>
+            <pre data-filename="compiler" data-name="Tiny-Forth-Compiler"></pre>
+            <figcaption>Listing 1. Tiny-Forth-Compiler. Beachten Sie bitte die
+                Eingabehinweise auf Seite 16.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="vocabulary.prg" data-name="Maschinenspracheteil" data-mse=mse1></pre>
+            <figcaption>Listing 2. Maschinenspracheteil von Forth (Bitte beachten Sie die Eingabehinweise auf Seite 18) </figcaption>
+        </figure>
+        <div class="binary_download" data-filename="vocabulary.prg" data-name="Maschinenspracheteil"></div>
+
+
+        <figure>
+            <pre> ( *** Zusatz-Befehle 0 *** )
+
+
+ ( Processor-Register )
+
+ 780 constant a-reg
+ 781 constant x-reg
+ 782 constant y-reg
+ ( ---------------------- )
+
+ ( Die folgenden Befehle  )
+
+ ( sollen zeigen,dass es  )
+
+ ( mit dem recht beschei- )
+
+ ( denen Grundvokabular   )
+
+ ( moeglich ist,doch ein  )
+
+ ( sinnvolles,zweckmaess- )
+
+ ( iges zu erstellen.     )
+--&lt;
+</pre>
+            <figcaption>Listing 3. Zusatz-Befehle, Screen 0</figcaption>
+        </figure>
+        <figure>
+            <pre>( *** zusatz-befehle 1 ***)
+
+
+ (  2. Schleifenindex )
+
+ : j
+    r&lt; r&lt; r&lt;
+    dup 704 !
+    &lt;r &lt;r &lt;r
+    704 @
+ ;
+
+
+
+ (  Verlasse Schleife )
+
+ : leave
+    r&lt; r&lt;
+    drop dup
+    &lt;r &lt;r
+ ;
+
+
+ --&lt;
+</pre>
+            <figcaption>Listing 4. Zusatz-Befehle, Screen 1</figcaption>
+        </figure>
+        <figure>
+            <pre> ( *** Zusatz-Befehle 2 *** )
+
+
+ ( open (addr l log nr sec --) )
+
+ : open
+    185 c!   186 c! 184 c!
+    183 c!   187 !
+    65472 call
+ ;
+
+
+
+ ( close (log --) )
+
+ : close
+    cr 65484 call
+    a-reg c!
+    65475 call
+ ;
+
+
+
+ --&lt;
+</pre>
+            <figcaption>Listing 5. Zusatz-Befehle, Screen 2</figcaption>
+        </figure>
+        <figure>
+            <pre> ( *** Zusatz-Befehele 3 *** )
+
+
+ ( Ausgabe auf File (log --) )
+
+ : out
+    x-reg c!
+    65481 call
+ ;
+
+
+
+ ( Eingabe von File (log --) )
+
+ : in
+    x-reg c!
+    65478 call
+ ;
+
+
+
+
+
+ --&lt;
+</pre>
+            <figcaption>Listing 6. Zusatz-Befehle, Screen 3</figcaption>
+        </figure>
+        <figure>
+            <pre> ( *** Zusatz-Befehle 4 *** )
+
+
+ ( Ausgabe auf Drucker )
+
+ : printer
+    0 0 4 4 7 open
+    4 out
+    cr
+ ;
+
+
+ ( Ausgabe auf Display )
+
+ : display
+    cr
+    4 close
+ ;
+
+
+
+ ( * ende * )
+
+
+</pre>
+            <figcaption>Listing 7. Zusatz-Befehle, Screen 4</figcaption>
+        </figure>
+
+        <div style="display: none;">
+            <!-- Screen 5 ist auf Diskette, aber nicht abgedruckt -->
+            <figure>
+                <pre>
+
+;scr 5.prg  : mlen$
+    2 - @
+ ;
+ : len$
+    dup 1 -
+    begin
+      1 + dup
+      c@
+     0 =
+    until
+    swap -
+ ;
+ : input$
+    dup dup mlen$
+    ." :" expect
+    1 -
+    begin
+      1 + dup c@
+     13 =
+    until
+    0 swap c! drop
+ ;
+ : print$ dup len$ type ;
+
+
+</pre>
+            </figure>
+        </div>
+
+
+        <div style="display: none;">
+            <figure>
+                <pre data-filename="vocabulary.sorce" data-name="XXXXXXXXXXXX"></pre>
+            </figure>
+        </div>
     </article>
 </body>
 

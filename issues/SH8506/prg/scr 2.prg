@@ -1,1 +1,0 @@
- ( *** ÚUSATZ-ÂEFEHLE 2 *** ) ( OPEN (ADDR L LOG NR SEC --) ) : OPEN    185 C!   186 C! 184 C!    183 C!   187 !    65472 CALL ; ( CLOSE (LOG --) ) : CLOSE    CR 65484 CALL    A-REG C!    65475 CALL ; -->ÿ (
