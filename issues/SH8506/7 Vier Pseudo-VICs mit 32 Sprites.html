@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Vier Pseudo-VICs mit 32 Sprites</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jürgen und Stefan Haas, bs">
+    <meta name="64er.issue" content="Sonderheft 6/85">
+    <meta name="64er.pages" content="7,67-70">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Vier Pseudo-VICs mit 32 Sprites</h1>
+        <p class="intro">Erweitern Sie Ihren Videochip. Nur duch Software lassen sich ungeahnte Bilder aus dem VIC zaubern. So sind 32 Sprites sowie HiRes-Grafik und Text gleichzeitig nur die leichtesten Übungen für Provic 64.</p>
+
+        <p>Sie wollen mit 32 Sprites und vier Bildschirmbereichen gleichzeitig arbeiten? Nichts leichter als das. Mit Provic 64 können simultan hochauflösende Grafik, Text oder veränderte Zeichensätze dargestellt werden.</p>
+
+        <p>Wir (Jürgen, 21, Physikstudent, und Stefan, 18, Schüler) haben uns Mitte 1983 einen Commodore 64 angeschafft Schon nach kurzer Zeit stellte sich der übliche Frust über die schlechte Dokumentation und die schwierige Informationsbeschaffung ein, besonders wenn es um die speziellen Grafikfähigkeiten dieses Computers geht. So saßen wir oft stundenlang vor dem Bildschirm, der nur undefinierbare Zeichen zeigte, weil wir bei dem Versuch, die Geheimnisse des C 64 zu enträtseln, in irgendeinen unbekannten Darstellungsmodus geraten waren.</p>
+
+        <p>Dabei entdeckten wir, daß der C 64 nicht nur acht, sondern auch 16, 24, 32 oder noch mehr Sprites gleichzeitig zeigen kann. Zusätzlich ergibt sich die Möglichkeit, mehrere Bildschirmmodi zu mischen.</p>
+
+        <p>Nun haben wir uns entschlossen, den Kunstgriff, der dies ermöglicht, anderen C 64-Fans nicht vorzuenthalten. Also entwickelten wir ein Programm in Maschinensprache und dazu ein kleines Demonstrationsprogramm in Basic.</p>
+
+        <h3>Zum Programm</h3>
+
+        <p>Durch Aufruf der Initialisierungsroutine wird der Interruptmechanismus des C 64 verändert. Nicht mehr der Timer der CIA 1, sondern der VIC 6567 löst jetzt den Interrupt aus, und zwar synchron zum Takt des Bildschirmsignals. Außerdem werden vier sogenannte Pseudo-VICs eingerichtet. Alle POKEs, von Spritebewegung über Bildschirmfarbe bis zur Grafikkonfiguration, müssen ab jetzt in diese Pseudo-VICs erfolgen. Jeder dieser Pseudo-VICs ist für einen der vier Bildschirmbereiche zuständig:</p>
+
+        <p>Der Bildschirm wird in vier waagerechte Bereiche aufgeteilt, deren Grenzlinien fast beliebig nach oben oder unten verschoben werden können. Jeder einzelne Bereich kann acht Sprites darstellen und eine eigene Farb- und Grafikkonfiguration aufweisen. So können zum Beispiel Normalschrift, HiRes-Grafik, Multicolor-Grafik und eventuell ein selbstdefinierter Zeichensatz gleichzeitig auf dem Bildschirm gezeigt werden.</p>
+
+        <p>Provic 64 kann selbstverständlich wieder abgeschaltet werden (bei Kassetten- oder Diskettenoperationen nötig).</p>
+
+        <p>Für Maschinensprachefreaks nun eine kurze Funktionsbeschreibung der Interruptroutine:</p>
+
+        <p>Bei Aufruf der Einschaltroutine (SYS 52544) wird der IRQ-Vektor auf die Hauptroutine des Provic 64 gestellt und der bisherige Interrupt durch den Timer A der CIA 1 verboten, während der Raster-IRQ des VIC 6567 erlaubt wird.</p>
+
+        <p>Sobald der Bildschirmstrahl die eingestellte Rasterzeile erreicht, wird ein Interrupt ausgelöst und der Prozessor bearbeitet die Hauptroutine des Provic 64. In dieser wird zunächst anhand eines Zählers ($ CFFF) festgestellt, welcher Bildschirmbereich an der Reihe ist. Dann wird die Rasterzeile, die das Ende dieses Bildschirms kennzeichnet, eingestellt.</p>
+
+        <p>Anschließend werden, falls ein entsprechendes Flag gesetzt ist, die Sprite- und andere Bildschirmparameter in den VIC 6567 übertragen. Nach dem Weiterzählen des IR-Zählers ($CFFF) wird entweder der Interrupt beendet, oder zur IRQ-Routine des Betriebssystems gesprungen (nach jedem vierten Interrupt). So werden in der Sekunde 200 Interrupts (vier pro Fersehbild) ausgelöst und 50 mal in der Sekunde (einmal pro Bild) die normale IRQ-Routine abgearbeitet. Dadurch zählt die interne Uhr TI in 50stel Sekunden und TI$ wird unbrauchbar.</p>
+
+        <p>Beim Aufruf der Ausschaltroutine wird der Raster-IRQ des VIC 6567 unterbunden, der Interrupt des Timers A in CIA 1 erlaubt und der IRQ-Vektor auf die IRQ-Routine des Betriebssystems eingestellt.</p>
+
+        <h2>Handhabung der Pseudo-VICs</h2>
+
+        <p>Im Grunde ist jeder der vier Pseudo-VICs wie der echte VIC zu behandeln. Ausnahmen sind hier nur die Register 30 (Sprite-Sprite-Kollision) und 31 (Sprite-Hintergrund-Kollision), die sich auf den jeweils vorausgegangenen Bildschirmbereich beziehen. Die Register 19 und 20 (Lightpenkoordinaten), sowie 25 und 26 (IRQ-Flags und -maske) werden nicht behandelt, da diese Funktionen nur direkt über den VIC 6567 sinnvoll gehandhabt werden können. Außerdem hat jeder Pseudo-VIC noch zusätzliche Register für zwei Flags (REG 47 und REG 57), acht Sprite-Pointer (REG 48 bis REG 55), Videomatrix-Anfangsadresse Highbyte (REG 56) und die CIA 2, REG 0, Bits 0 und 1 (REG 58) (Adreßbits 14 und 15 des VIC 6567).</p>
+
+        <h3>Übergang eines Sprites zwischen zwei Bildschirmbereichen:</h3>
+
+        <p>Soll ein Sprite zwischen zwei Bildschirmbereichen wechseln, muß in beiden Bereichen derselbe Sprite (also zum Beispiel beides mal Sprite 4) die gleiche Position besitzen, und zwar so lange, wie der Sprite die Trennlinie zwischen den Bereichen überdeckt. Wird dies nicht beachtet, werden die entsprechenden Sprites zerschnitten und verschoben.</p>
+
+        <p>Aktivieren von Provic 64: Von Basic aus mit SYS 52544 und von Maschinensprache aus mit JSR $CD40.</p>
+
+        <p>Ausschalten von Provic 64: Von Basic aus mit SYS 52970 und von Maschinensprache aus mit JSR $CEEA.</p>
+
+        <h3>Eingabe von Provic 64:</h3>
+
+        <p>Die Eingabe des Listing 1 erfolgt mit dem MSE, das Speichern ebenfalls.</p>
+
+        <h3>Laden von Provic 64:</h3>
+
+        <p>Im Programm am besten mit der Zeile IF PEEK (52544) > &lt; 120 THEN LOAD ”PROVIC64”, Gerätenummer, 1 die am Anfag des Basic-Programms stehen sollte.</p>
+
+        <p>Das Demonstrationsprogramm (Listing 2) zeigt einige der Vorzüge von Provic 64. Bis der Bildschirmaufbau fertig ist, müssen Sie eine Weile warten. Es ist nur als Anregung gedacht, deshalb verzichten wir hier auf eine nähere Beschreibung.</p>
+
+        <p>Bei Kassetten- und Disketten- sowie Drucker-Zugriffen muß Provic vorher abgeschaltet werden. Sonst beginnt der Bildschirm wild zu flackern und Provic stürzt vielleicht ab.</p>
+
+        <p>Provic 64 ist nicht nur für Basic-Programmierer, sondern vor allem auch für Maschinensprache-Freaks gedacht, da erst durch schnelle Maschinenprogramme die Möglichkeiten von Provic 64 voll ausgeschöpft werden können.</p>
+
+        <address class="author">(Jürgen und Stefan Haas/bs)</address>
+    </article>
+</body>
+
+</html>
