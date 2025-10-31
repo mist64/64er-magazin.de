@@ -1,0 +1,776 @@
+
+
+;happysynth.prg ==0801==
+  100 gosub7080:rem titelbild
+  110 gosub9030:rem mpg laden
+  120 poke56,152:clr
+  130 gosub9130:rem initialisieren
+  140 gosub7430:rem start
+  150 :
+  160 pokev+21,0:pokev+1,70
+  170 on pa goto 190,300,410
+  180 pa=nr:goto160
+  190 gosub8020:rem seite 1
+  200 pokev+16,6:pokev+2,36:pokev+4,36:pokev+3,109:pokev+5,151
+  210 pokev,60:pokev+21,7:pokev+40,2:pokev+41,2
+  220 sys49152
+  230 nr=peek(40959)
+  240 on nr goto 180,180,180,220,220,220,1010,1020,1040,1090,1100,1120,1170,1180
+  250 on nr -14 goto 1200,220,220,1030,1260,1110,1330,1190,1400,220,220
+  260 on nr-25 goto 1050,1130,1210,1060,1140,1220,220,220,220,1250,1320,1390
+  270 on nr-37 goto 1250,1320,1390,1310,1380,1450,2480,2950,2950,220,220,220
+  280 on nr-49 goto 2510,2510,2510,2570,2570,220,220,220,2520,2710,2710
+  290 goto220
+  300 gosub8400:rem seite 2
+  310 pokev+21,7:pokev+40,2:pokev+41,2
+  320 sys49152
+  330 nr=peek(40959)
+  340 on nr goto 180,180,180,320,320,320,1270,1270,1270,1340,1340,1340
+  350 on nr-12 goto 1410,1410,1410,320,320,1280,1280,1350,1350,1420,1420
+  360 on nr-23 goto 320,320,1290,1360,1430,320,320,320,1300,1370,1440
+  370 on nr-34 goto 320,320,320,1070,1150,1230,1080,1160,1240,320,3170,3170
+  380 on nr-46 goto 320,320,320,1460,1470,1480,2840,2840,320,320,320
+  390 on nr-57 goto 1490,3060,3060
+  400 goto320
+  410 gosub8740:rem seite 3
+  420 pokev+21,7:pokev+40,2:pokev+41,2
+  430 sys49152
+  440 nr=peek(40959)
+  450 on nr goto 180,180,180,4880,3700,4200
+  460 ifnr=>7 and nr <=28 then3570
+  470 goto430
+ 1000 rem +++ sprungtabelle +++
+ 1010 s=0:p=241:goto1510
+ 1020 s=0:p=244:goto1540
+ 1030 s=0:p=321:goto1550
+ 1040 s=0:p=247:goto1560
+ 1050 s=0:p=401:goto1570
+ 1060 s=0:p=441:goto1580
+ 1070 s=0:ta=9:goto3470
+ 1080 s=0:ta=9:goto3280
+ 1090 s=1:p=252:goto1510
+ 1100 s=1:p=255:goto1540
+ 1110 s=1:p=332:goto1550
+ 1120 s=1:p=258:goto1560
+ 1130 s=1:p=412:goto1570
+ 1140 s=1:p=452:goto1580
+ 1150 s=1:ta=20:goto3470
+ 1160 s=1:ta=20:goto3280
+ 1170 s=2:p=263:goto1510
+ 1180 s=2:p=266:goto1540
+ 1190 s=2:p=343:goto1550
+ 1200 s=2:p=269:goto1560
+ 1210 s=2:p=423:goto1570
+ 1220 s=2:p=463:goto1580
+ 1230 s=2:ta=31:goto3470
+ 1240 s=2:ta=31:goto3280
+ 1250 s=0:ta=9:goto1640
+ 1260 s=0:ta=8:goto1820
+ 1270 s=0:ta=3:goto1960
+ 1280 s=0:ta=3:goto2070
+ 1290 s=0:ta=9:goto2180
+ 1300 s=0:ta=3:goto2300
+ 1310 s=0:ta=8:goto2410
+ 1320 s=1:ta=20:goto1640
+ 1330 s=1:ta=19:goto1820
+ 1340 s=1:ta=14:goto1960
+ 1350 s=1:ta=14:goto2070
+ 1360 s=1:ta=20:goto2180
+ 1370 s=1:ta=14:goto2300
+ 1380 s=1:ta=19:goto2410
+ 1390 s=2:ta=31:goto1640
+ 1400 s=2:ta=30:goto1820
+ 1410 s=2:ta=25:goto1960
+ 1420 s=2:ta=25:goto2070
+ 1430 s=2:ta=31:goto2180
+ 1440 s=2:ta=25:goto2300
+ 1450 s=2:ta=30:goto2410
+ 1460 p=842:l=1:mw=1:goto3400
+ 1470 p=845:l=1:mw=0:goto3400
+ 1480 p=848:l=1:mw=2:goto3400
+ 1490 p=922:l=7:mw=3:goto3400
+ 1500 :
+ 1510 rem +++ wellenformen/sync/ring +++
+ 1520 :
+ 1530 de(s)=1-de(s):l=1:goto1590
+ 1540 sz(s)=1-sz(s):l=1:goto1590
+ 1550 re(s)=1-re(s):l=1:goto1590
+ 1560 ra(s)=1-ra(s):l=2:goto1590
+ 1570 ri(s)=1-ri(s):l=9:goto1590
+ 1580 sy(s)=1-sy(s):l=9
+ 1590 gosub9820
+ 1600 wf(s)=sy(s)*2+ri(s)*4+de(s)*16+sz(s)*32+re(s)*64+ra(s)*128
+ 1610 pokewf+s,wf(s)+8:pokewf+s,wf(s)
+ 1620 goto220
+ 1630 :
+ 1640 rem +++ oktave +++
+ 1650 :
+ 1660 gosub9430
+ 1670 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{lgrn}"tab(34)"+okt.{down}{down}{down}{left}{left}{left}{left}{left}+#{down}{down} -#{down}{down}{down}{left}{left}{left}{left}{left}-okt."
+ 1680 wert=ok(s):jo=10:gosub9530
+ 1690 ifjo=0thenok(s)=ok(s)-12
+ 1700 ifjo=20thenok(s)=ok(s)+12
+ 1710 ifjo=9thenok(s)=ok(s)-1
+ 1720 ifjo=11thenok(s)=ok(s)+1
+ 1730 ifok(s)<0orok(s)>=48thenok(s)=wert
+ 1740 pokewf+3+s,okt(s)
+ 1750 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(ta)int(okt(s)/12)
+ 1760 printtab(ta)n$(int(ok(s)-(int(okt(s)/12))*12))
+ 1770 ifbuthen1680
+ 1780 print"{up}{up}{pur}"tab(ta)int(okt(s)/12)
+ 1790 printtab(ta)n$(int(ok(s)-(int(okt(s)/12))*12))
+ 1800 gosub9440:gosub9460:goto220
+ 1810 :
+ 1820 rem +++ pulse +++
+ 1830 :
+ 1840 gosub9430
+ 1850 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{lgrn}"tab(35)"+4{down}{down}{down}{left}{left}{left}+1{down}{down} -1{down}{down}{down}{left}{left}{left}-4"
+ 1860 wert=pu(s)/16:jo=wert
+ 1870 gosub9530:pu(s)=jo*16
+ 1880 p1=int(pu(s)/256)
+ 1890 pokewf+49+s,pu(s)-p1*256:pokewf+52+s,p1
+ 1900 pokesi+3+s*7,p1:pokesi+2+s*7,pu(s)-p1*256
+ 1910 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(ta)right$(str$(int(pu(s)/40.95)),2);"%"
+ 1920 ifbuthen1870
+ 1930 print"{up}{pur}"tab(ta)right$(str$(int(pu(s)/40.95)),2);"%"
+ 1940 gosub9440:gosub9460:goto220
+ 1950 :
+ 1960 rem +++ attack +++
+ 1970 :
+ 1980 gosub 9430:gosub9470
+ 1990 wert=a(s):jo=wert*16
+ 2000 gosub9530:a(s)=int(jo/16)
+ 2010 pokesi+5+s*7,a(s)*16+d(s)
+ 2020 print"{home}{down}{down}{down}{down}{down}{down}{rvon}{grn}"tab(ta)ad$(a(s))
+ 2030 ifbuthen2000
+ 2040 print"{up}{rvof}{lblu}"tab(ta)ad$(a(s))
+ 2050 gosub9440:gosub9460:goto320
+ 2060 :
+ 2070 rem +++ decay +++
+ 2080 :
+ 2090 gosub9430:gosub9470
+ 2100 wert=d(s):jo=wert*16
+ 2110 gosub9530:d(s)=int(jo/16)
+ 2120 pokesi+5+s*7,a(s)*16+d(s)
+ 2130 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}{grn}"tab(ta)r$(d(s))
+ 2140 ifbuthen2110
+ 2150 print"{up}{rvof}{lblu}"tab(ta)r$(d(s))
+ 2160 gosub9440:gosub9460:goto320
+ 2170 :
+ 2180 rem +++ sustain +++
+ 2190 :
+ 2200 gosub9430
+ 2210 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{lgrn}"tab(36)"+1{left}{left}{down}{down}{down}{down}{down}{down}{down}{down}-1"
+ 2220 wert=s(s):jo=wert*16
+ 2230 gosub9530:s(s)=int(jo/16)
+ 2240 pokesi+6+s*7,s(s)*16+r(s)
+ 2250 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}{grn}"tab(ta-6);"vol.: ";right$(str$(s(s)),2)
+ 2260 ifbuthen2230
+ 2270 print"{up}{rvof}{lblu}"tab(ta-6);"vol.: ";right$(str$(s(s)),2)
+ 2280 gosub9440:gosub9460:goto320
+ 2290 :
+ 2300 rem +++ release +++
+ 2310 :
+ 2320 gosub9430:gosub9470
+ 2330 wert=r(s):jo=wert*16
+ 2340 gosub9530:r(s)=int(jo/16)
+ 2350 pokesi+6+s*7,s(s)*16+r(s)
+ 2360 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}{grn}"tab(ta)r$(r(s))
+ 2370 ifbuthen2340
+ 2380 print"{up}{rvof}{lblu}"tab(ta)r$(r(s))
+ 2390 gosub9440:gosub9460:goto320
+ 2400 :
+ 2410 rem +++ filter +++
+ 2420 :
+ 2430 fe(s)=1-fe(s):l=2
+ 2440 pokesi+23,rs*16+fe(0)+fe(1)*2+fe(2)*4
+ 2450 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(ta);fi$(fe(s))
+ 2460 goto220
+ 2470 :
+ 2480 rem +++ hoch- band- tiefpass +++
+ 2490 :
+ 2500 hp=1-hp:p=763:goto2530
+ 2510 bp=1-bp:p=843:goto2530
+ 2520 tp=1-tp:p=923
+ 2530 l=7:gosub9820
+ 2540 pokesi+24,15+hp*64+bp*32+tp*16
+ 2550 goto220
+ 2560 :
+ 2570 rem +++ filterfrequenz +++
+ 2580 :
+ 2590 gosub9430
+ 2600 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{lgrn}"tab(35)"+++{down}{down}{down}{left}{left}{left}{left}+{down}{down}   -{down}{down}{down}{left}{left}{left}{left}---"
+ 2610 wert=30+co*5.8:jo=wert/46.4
+ 2620 gosub9530:if jo<.65then jo=.65
+ 2630 ifjo<>wert/46.4thenco=int((jo*46.4-30)/5.8)
+ 2640 c1=int(co/8)
+ 2650 pokesi+22,c1:pokesi+21,co-c1*8:pokewf+16,c1
+ 2660 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(22);right$("   "+str$(int(co*5.8+30)),5)
+ 2670 ifbuthen2620
+ 2680 print"{up}{pur}"tab(22);right$("   "+str$(int(co*5.8+30)),5)
+ 2690 gosub9440:gosub9460:goto220
+ 2700 :
+ 2710 rem +++ filterresonanz +++
+ 2720 :
+ 2730 gosub9430
+ 2740 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{lgrn}"tab(36)"+1"
+ 2750 print"{down}{down}{down}{down}{down}{down}{down}"tab(36)"-1"
+ 2760 wert=rs:jo=wert*16
+ 2770 gosub9530:rs=int(jo/16)
+ 2780 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(22);right$(str$(rs),2)
+ 2790 pokesi+23,rs*16+fe(0)+fe(1)*2+fe(2)*4
+ 2800 ifbuthen2770
+ 2810 print"{up}{pur}"tab(22);right$(str$(rs),2)
+ 2820 gosub9440:gosub9460:goto220
+ 2830 :
+ 2840 rem +++ envelope-follow +++
+ 2850 :
+ 2860 gosub9430:gosub9450
+ 2870 wert=peek(wf+17):jo=wert
+ 2880 gosub9530:ef=jo
+ 2890 pokewf+17,ef
+ 2900 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(30);right$(" "+str$(ef),3)
+ 2910 ifbuthen2880
+ 2920 print"{up}{pur}"tab(30);right$(" "+str$(ef),3)
+ 2930 gosub9440:gosub9460:goto320
+ 2940 :
+ 2950 rem +++ verstimmung +++
+ 2960 :
+ 2970 gosub9430:gosub9450
+ 2980 wert=vs:jo=wert
+ 2990 gosub9530:vs=jo:ifvs>99thenvs=99:jo=99
+ 3000 pokewf+6,vs
+ 3010 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(30)right$(str$(vs),2)
+ 3020 ifbuthen2990
+ 3030 print"{up}{pur}"tab(30)right$(str$(vs),2)
+ 3040 gosub9440:gosub9460:goto1940
+ 3050 :
+ 3060 rem +++ filter-modulation +++
+ 3070 :
+ 3080 gosub9430:gosub9450
+ 3090 wert=peek(wf+19):jo=wert
+ 3100 gosub9530:mf=jo
+ 3110 pokewf+19,mf
+ 3120 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(30);right$(" "+str$(mf),3)
+ 3130 ifbuthen3100
+ 3140 print"{up}{pur}"tab(30);right$(" "+str$(mf),3)
+ 3150 gosub9440:gosub9460:goto320
+ 3160 :
+ 3170 rem +++ modulation: speed +++
+ 3180 :
+ 3190 gosub9430:gosub9450
+ 3200 wert=peek(wf+34):jo=wert
+ 3210 gosub9530:sp=jo
+ 3220 pokewf+34,sp
+ 3230 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(30);right$(" "+str$(sp),3)
+ 3240 ifbuthen3210
+ 3250 print"{up}{pur}"tab(30);right$(" "+str$(sp),3)
+ 3260 gosub9440:gosub9460:goto320
+ 3270 :
+ 3280 rem +++ pwm-modulation +++
+ 3290 :
+ 3300 gosub9430:gosub9450
+ 3310 wert=peek(wf+40+s):jo=int(wert/2.5757)
+ 3320 gosub9530:if jo>99thenjo=99
+ 3330 pw(s)=int(jo*2.5757)+1
+ 3340 pokewf+40+s,pw(s)
+ 3350 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(ta);right$(str$(int(pw(s)/2.5757)),2)
+ 3360 ifbuthen3320
+ 3370 print"{up}{pur}"tab(ta);right$(str$(int(pw(s)/2.5757)),2)
+ 3380 gosub9440:gosub9460:goto320
+ 3390 :
+ 3400 rem +++ modulation-wellenform +++
+ 3410 :
+ 3420 fori=842to849:pokefr+i,2:pokefr+i+80,2:next
+ 3430 fori=0tol:pokefr+p+i,5:next
+ 3440 pokewf+33,mw
+ 3450 goto320
+ 3460 :
+ 3470 rem +++ vibrato +++
+ 3480 :
+ 3490 gosub9430:gosub9450
+ 3500 wert=peek(wf+64+s):jo=wert
+ 3510 gosub9530:vi(s)=jo:ifvi(s)>99thenvi(s)=99:jo=99
+ 3520 pokewf+64+s,vi(s)
+ 3530 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}"tab(ta);right$(str$(vi(s)),2)
+ 3540 ifbuthen3510
+ 3550 print"{up}{pur}"tab(ta);right$(str$(vi(s)),2)
+ 3560 gosub9440:gosub9460:goto320
+ 3570 :
+ 3580 rem +++ ende +++
+ 3590 :
+ 3600 pokev+21,0:poke198,0
+ 3610 print"{home}{down}{down}{down}{down}{down}{down}{down}{rght}                         "
+ 3620 print"{rght}{lgrn}       sind sie sicher ???"
+ 3630 print"{rght}                         "
+ 3640 geta$:ifa$<>"j"anda$<>"n"then3640
+ 3650 ifa$="n"then 410
+ 3660 poke53280,14:poke53281,6:poke198,0:poke808,237:poke2,0
+ 3670 print"{clr}{lblu}";
+ 3680 fori=1to100:next
+ 3690 sys 64767
+ 3700 :
+ 3710 rem +++ save - routine +++
+ 3720 :
+ 3730 poke198,0:pokev+21,0:d$=""
+ 3740 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}";
+ 3750 print"{gry3}{rvon}  s o u n d  s p e i c h e r n  {rvof}{lblu}"
+ 3760 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"    "
+ 3770 fori=0to9
+ 3780 print"{rght}                                "
+ 3790 next:print"{up}{up}{up}{up}{up}{up}{up}{up}{up}";
+ 3800 print"{grn}{rght}name des sounds ? {red}............{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 3810 getc$:poke204,0
+ 3830 ifc$=chr$(20)thend$="":poke204,1:print"{up}":goto3800
+ 3840 ifc$=chr$(13)then3940
+ 3850 ifc$<"#"orc$>"z"then3810
+ 3855 ifc$="*"orc$=","orc$=":"orc$="?"orc$="@"then3810
+ 3860 printc$;:poke204,1
+ 3870 d$=d$+c$
+ 3880 iflen(d$)<11then3810
+ 3890 iflen(d$)>11then 3910
+ 3900 goto3810
+ 3910 getc$:ifc$=chr$(20)thend$="":poke204,1:print"{up}":goto3800
+ 3920 ifc$=chr$(13) then 3950
+ 3930 goto3910
+ 3940 ifd$=""thenpoke204,1:goto 410
+ 3950 print".":poke204,1:d$=left$(d$+"..............",12)
+ 3960 ue$="":u$="abgespeichert......"
+ 3970 close1:open1,8,2,ue$+"hsy."+d$+",s,w":gosub10820
+ 3980 ifer=63then4030
+ 3990 iferthenprint"{down}{down}"
+ 4000 iferandb$="j"then3970
+ 4010 iferthener=0:close1:goto410
+ 4020 goto4080
+ 4030 print"{down}{rght}{gry3}ueberschreiben  ?";
+ 4040 poke198,0
+ 4050 geta$:ifa$<>"n"anda$<>"j"anda$<>chr$(13)then4050
+ 4060 ifa$="n"thenprint" nein":er=0:close1:goto410
+ 4070 print" ja":ue$="@:":u$="ueberschrieben.....":goto3970
+ 4080 print"{down}{rght}{grn}sound wird "u$
+ 4090 fori=0to2:p1=int(pu(i)/256):ad(i)=a(i)*16+d(i):sr(i)=s(i)*16+r(i)
+ 4100 print#1,chr$(wf(i));chr$(ok(i));chr$(pu(i)-p1*256);chr$(p1);
+ 4110 print#1,chr$(ad(i));chr$(sr(i));chr$(fe(i));chr$(pw(i));chr$(vi(i));
+ 4120 next i
+ 4130 c1=int(co/256)
+ 4140 print#1,chr$(hp*4+bp*2+tp);chr$(co-c1*256);chr$(c1);chr$(rs);chr$(vs);
+ 4150 print#1,chr$(ef);chr$(mf);chr$(mw);chr$(sp);chr$(rg)
+ 4160 close1
+ 4170 c$="":ifue$=""thenf=f+1:ff$(f)=d$:iff=33thenf=32
+ 4180 goto410
+ 4190 :
+ 4200 rem +++ load - routine +++
+ 4210 :
+ 4220 pokev+3,65:pokev+5,107:pokev+21,6
+ 4230 a$="{SHIFT--}{gry3}{rvon} s o u n d  v o n  d i s k  l a d e n {rvof}{lblu}"
+ 4235 a1$="{SHIFT--}{gry3}{rvon}     s o u n d     l a d e n    {rvof}{lblu}{SHIFT--}     "
+ 4240 gosub10030
+ 4250 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{grn}sound {lred}"d$" {grn}wird geladen.{up}{up}{up}{lblu}"
+ 4260 close1:open1,8,2,"hsy."+d$+",s,r":gosub10820
+ 4270 iferandb$="j"then4260
+ 4280 iferthener=0:close1:goto410
+ 4290 fori=0to2
+ 4300 get#1,a$:gosub9730:wf(i)=a%
+ 4310 get#1,a$:gosub9730:ok(i)=a%
+ 4320 get#1,a$:gosub9730:pu(i)=a%
+ 4330 get#1,a$:gosub9730:pu(i)=pu(i)+a%*256
+ 4340 get#1,a$:gosub9730:ad(i)=a%
+ 4350 get#1,a$:gosub9730:sr(i)=a%
+ 4360 get#1,a$:gosub9730:fe(i)=a%
+ 4370 get#1,a$:gosub9730:pw(i)=a%
+ 4380 get#1,a$:gosub9730:vi(i)=a%
+ 4390 next i
+ 4400 get#1,a$:gosub9730:q=a%:hp=(q and 4)/4:bp=(qand2)/2:tp=qand1
+ 4410 get#1,a$:gosub9730:co=a%
+ 4420 get#1,a$:gosub9730:co=co+a%*256
+ 4430 get#1,a$:gosub9730:rs=a%
+ 4440 get#1,a$:gosub9730:vs=a%
+ 4450 get#1,a$:gosub9730:ef=a%
+ 4460 get#1,a$:gosub9730:mf=a%
+ 4470 get#1,a$:gosub9730:mw=a%
+ 4480 get#1,a$:gosub9730:sp=a%
+ 4490 get#1,a$:gosub9730:rg=a%
+ 4500 close1:close15
+ 4510 fori=0to2
+ 4520 ra(i)=(wf(i)and128)/128
+ 4530 re(i)=(wf(i)and64)/64
+ 4540 sz(i)=(wf(i)and32)/32
+ 4550 de(i)=(wf(i)and16)/16
+ 4560 ri(i)=(wf(i)and4)/4
+ 4570 sy(i)=(wf(i)and2)/2
+ 4580 a(i)=(ad(i)and240)/16
+ 4590 d(i)=ad(i)and15
+ 4600 s(i)=(sr(i)and240)/16
+ 4610 r(i)=sr(i)and15
+ 4620 next i
+ 4630 :
+ 4640 rem +++ sound initialisieren +++
+ 4650 :
+ 4660 fors=0to2
+ 4670 pokewf+3+s,okt(s)
+ 4680 pokesi+5+s*7,ad(s)
+ 4690 pokesi+6+s*7,sr(s)
+ 4700 pokewf+40+s,pw(s)
+ 4710 pokewf+64+s,vi(s)
+ 4720 wf(s)=sy(s)*2+ri(s)*4+de(s)*16+sz(s)*32+re(s)*64+ra(s)*128
+ 4730 pokewf+s,wf(s)+8:pokewf+s,wf(s)
+ 4740 p1=int(pu(s)/256)
+ 4750 pokewf+49+s,pu(s)-p1*256:pokewf+52+s,p1
+ 4760 pokesi+3+s*7,p1:pokesi+2+s*7,pu(s)-p1*256
+ 4770 next s
+ 4780 pokesi+23,rs*16+fe(0)+fe(1)*2+fe(2)*4
+ 4790 pokesi+24,15+hp*64+bp*32+tp*16
+ 4800 c1=int(co/8):pokesi+22,c1:pokesi+21,co-c1*8:pokewf+16,c1
+ 4810 pokewf+17,ef
+ 4820 pokewf+6,vs
+ 4830 pokewf+17,ef
+ 4840 pokewf+34,sp
+ 4845 pokewf+19,mf
+ 4850 pokewf+33,mw
+ 4860 goto 410
+ 4870 :
+ 4880 rem +++ sound loeschen +++
+ 4890 :
+ 4900 pokev+3,65:pokev+5,107:pokev+21,6
+ 4910 a$="{SHIFT--}{gry3}{rvon}     s o u n d    l o e s c h e n     {rvof}{lblu}"
+ 4915 a1$="{SHIFT--}{gry3}{rvon}  s o u n d    l o e s c h e n  {rvof}{lblu}{SHIFT--}     "
+ 4920 gosub10030
+ 4930 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{grn}sound {lred}"d$" {grn}loeschen ?";
+ 4940 poke198,0
+ 4950 geta$:ifa$="n"then410
+ 4960 ifa$<>"j"anda$<>chr$(13)then4950
+ 4970 print"{wht} ja"
+ 4980 close1:open1,8,15,"s:hsy."+d$:gosub10820
+ 4990 ifer=1andlo=1thenff$(z1)=ff$(f):ff$(f)="":f=f-1:goto5020
+ 5000 ifer=1thenprint"{down}{rght}sound geschuetzt !":print"{down}{rght}nochmal ?";:goto4950
+ 5010 ifb$="j"then4980
+ 5020 er=0:close1:goto410
+ 7000 ==================================
+ 7010 ==================================
+ 7020 === u n t e r p r o g r a m m e ==
+ 7030 ==================================
+ 7040 ==================================
+ 7050 :
+ 7060 rem +++ titelbild +++
+ 7070 :
+ 7080 ifpeek(2)=1orpeek(2)=2thenreturn
+ 7090 poke53280,0:poke53281,0
+ 7100 print"{clr}{dish}{grn}";chr$(142);
+ 7110 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 7120 print"{orng}{rvon} {SHIFT--} {rght}{SHIFT-POUND} {CBM-*}{rght}  {CBM-*}{rght}  {CBM-*}{rght} {SHIFT--} {rght}{SHIFT-POUND}{CBM-@}{CBM-*}{rght} {SHIFT--} {rght}M  {rght}   {rght} {SHIFT--} "
+ 7130 print"{rvon}   {rght} {CBM-T} {rght} {CBM-T}{rvof}{SHIFT-POUND}{rvon}{rght} {CBM-T}{rvof}{SHIFT-POUND}{rght}{CBM-*}{rvon} {rvof}{SHIFT-POUND}{rght}{CBM-*}{rvon} {CBM-*}{rght}{rvof}{CBM-*}{rvon} {rvof}{SHIFT-POUND}{rvon}{rght} M {rght}{rght} {rght}{rght}   "
+ 7140 print"{rvon} {SHIFT--} {rght} {SHIFT--} {rght}{rvon} {rght}{rght}{rght} {rght}{rght}{rght}{rght} {rght}{rght}{rvof}{CBM-*}{rvon}{CBM-T}{rvof}{SHIFT-POUND}{rght}{rght}{rvon} {rght}{rght}  M{rght}{rght} {rght}{rght} {SHIFT--} {grn}"
+ 7150 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 7160 print"{rvon}{gry2}          {rvof}    {gry2}version 1.0"
+ 7170 print"{rvon}{gry2}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{rvof}    {gry2}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 7180 print"{gry2}ower{red}Q{rvon}{gry2}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+ 7190 print"{rvon}{gry2}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"spc(21)"{rvof}{wht}{CBM-P}"
+ 7200 print"{gry2}{rvon}          "spc(20)"{rvon}{red}{SHIFT-POUND} {CBM-*}"
+ 7210 print"{gry2}{rvon}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"spc(20)"{red}{rvon}   "
+ 7220 print"{rvon}{gry2}          {gry2}{rvof}DE{CBM-Y}M{CBM-@}"spc(15)"{red}{CBM-*}{rvon} {rvof}{SHIFT-POUND}"
+ 7230 print"{gry2}{rvon}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{gry2}{rvof}    {CBM-M}{gry1}{rvon}     {CBM-*}"spc(10)"{gry3} "
+ 7240 print"{gry2}{rvon} {CBM-D}{rvof}{CBM-U}{CBM-U}{CBM-U}{rvon}{CBM-F}   {SHIFT--}{gry2}{rvof}FR{CBM-P}N{CBM-T}     {gry1}{CBM-*}{rvon}{CBM-*}"spc(9)"{gry3} "
+ 7250 print"{gry2}{rvon} {rvof}{CBM-J}f 1{CBM-L}{rvon}   {SHIFT--}{rvof}{lblu}     port 2{gry1}{CBM-*}{rvon}{CBM-*}{rght}{rght}{rght}{rght}{red}{rvof}{CBM-P}{CBM-P}{rght}{gry2}{rvon}{SHIFT-POUND} {CBM-*}"
+ 7260 print"{gry2}{rvon} {CBM-C}{gry1}{rvof}{CBM-O}{CBM-O}{CBM-O}{gry2}{rvon}{CBM-V}   {SHIFT--}{rvof}{gry1}            {CBM-*}{rvon}{CBM-*}"spc(2)"{brn}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 7270 print"{gry2}{rvon} {CBM-D}{gry1}{rvof}{CBM-U}{CBM-U}{CBM-U}{gry2}{rvon}{CBM-F}   {SHIFT--}{rvof}             {gry1}{CBM-*}{rvon}  {brn}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 7280 print"{gry2}{rvon} {rvof}{CBM-J}f 3{CBM-L}{rvon}   {SHIFT--}"spc(16)"{brn}{rvof}{CBM-*}{rvon}         {rvof}{SHIFT-POUND}"
+ 7290 print"{gry2}{rvon} {CBM-C}{gry1}{rvof}{CBM-O}{CBM-O}{CBM-O}{gry2}{rvon}{CBM-V}   {SHIFT--}
+ 7300 print"{gry2}{rvon} {CBM-D}{rvof}{gry1}{CBM-U}{CBM-U}{CBM-U}{gry2}{rvon}{CBM-F}   {SHIFT--}
+ 7310 print"{gry2}{rvon} {rvof}{CBM-J}f 5{CBM-L}{rvon}   {SHIFT--}{rvof}{lblu}  {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 7320 print"{gry2}{rvon} {CBM-C}{gry1}{rvof}{CBM-O}{CBM-O}{CBM-O}{gry2}{rvon}{CBM-V}   {SHIFT--}{rvof}{lblu}  {SHIFT--}   {lgrn}happysynth{gry3} (c) 1985   {lblu}{SHIFT--}"
+ 7330 print"{gry2}{rvon} {CBM-D}{rvof}{gry1}{CBM-U}{CBM-U}{CBM-U}{gry2}{rvon}{CBM-F}   {SHIFT--}{rvof}{lblu}  {SHIFT--}{gry3}christian quirin spitzner{lblu}{SHIFT--}"
+ 7340 print"{gry2}{rvon} {rvof}{CBM-J}f 7{CBM-L}{rvon}   {SHIFT--}{rvof}{lblu}  {SHIFT--}{gry3}    & bernhard carli     {lblu}{SHIFT--}"
+ 7350 print"{gry2}{rvon} {CBM-C}{gry1}{rvof}{CBM-O}{CBM-O}{CBM-O}{gry2}{rvon}{CBM-V}   {SHIFT--}{rvof}{lblu}  {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{up}"
+ 7360 return
+ 7400 :
+ 7410 rem +++ start +++
+ 7420 :
+ 7430 ifpeek(56320)=111then7470
+ 7440 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(27)t$(t1)
+ 7450 ift+40<tithent=ti:t1=1-t1
+ 7460 goto7430
+ 7470 print"{clr}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}";
+ 7480 fori=1064to1944step40:pokei,93:pokei+39,93:print:next
+ 7490 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{home}";
+ 7500 poke2023,125
+ 7510 return
+ 8000 rem +++ seite 1 +++
+ 8010 :
+ 8020 print"{home}{lblu}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}";
+ 8030 print"{lblu}{SHIFT--}{grn}{rvon}oszillator{rvof}{lblu}{SHIFT--}huellkurve{SHIFT--}tastatur  {SHIFT--}{yel}joy- {lblu}{SHIFT--}";
+ 8040 print"{SHIFT--}{grn}{rvon}& filter  {rvof}{lblu}{SHIFT--}modulation{SHIFT--}disk-menue{SHIFT--}{yel}stick{lblu}{SHIFT--}";
+ 8050 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}";
+ 8060 print"{SHIFT--}{wht}  dco 1 {lblu}  {SHIFT--} {wht} dco 2 {lblu}  {SHIFT--} {wht} dco 3 {lblu}  {SHIFT--}"
+ 8070 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8080 print"{SHIFT--}";:fori=0to2
+ 8090 printf$(de(i))"NM"f$(sz(i))" {CBM-M}M"f$(ra(i))" {CBM-+}{CBM-+}{CBM-+}{lblu} {SHIFT--}";:next:print
+ 8100 print"{SHIFT--}          {SHIFT--}          {SHIFT--}          {SHIFT--}"
+ 8110 print"{SHIFT--}";:fori=0to2
+ 8120 printf$(re(i))"OL {pur}pw: "right$(str$(int(pu(i)/40.95)),2)"%{lblu}{SHIFT--}";:next:print
+ 8130 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8140 print"{SHIFT--}"f$(ri(0))"ringmod. 3{lblu}{SHIFT--}";
+ 8150 printf$(ri(1))"ringmod. 1{lblu}{SHIFT--}";
+ 8160 printf$(ri(2))"ringmod. 2{lblu}{SHIFT--}"
+ 8170 print"{SHIFT--}"f$(sy(0))"synchro. 3{lblu}{SHIFT--}";
+ 8180 printf$(sy(1))"synchro. 1{lblu}{SHIFT--}";
+ 8190 printf$(sy(2))"synchro. 2{lblu}{SHIFT--}"
+ 8200 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8210 print"{SHIFT--}";:fori=0to2
+ 8220 print"{pur}oktave: "int(okt(i)/12)"{left}{lblu}{SHIFT--}";:next:print
+ 8230 print"{SHIFT--}";:fori=0to2
+ 8240 print"{pur}tonart: "n$(int(ok(i)-(int(ok(i)/12))*12))"{lblu}{SHIFT--}";:next:print
+ 8250 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8260 print"{SHIFT--}{lred}filter "fi$(fe(0))"{lblu}{SHIFT--}{lred}filter "fi$(fe(1))"{lblu}{SHIFT--}{lred}filter "fi$(fe(2))"{lblu}{SHIFT--}"
+ 8270 print"{orng}{CBM-Q}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{lblu}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8280 print"{orng}{SHIFT--}{wht}f{orng}{SHIFT--}        {orng}{SHIFT--}{pur}dco verstimmung:  "right$(str$(vs),2)" {lblu}{SHIFT--}"
+ 8290 print"{orng}{SHIFT--}{wht}i{orng}{SHIFT--}"f$(hp)"hochpass{orng}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8300 print"{orng}{SHIFT--}{wht}l{orng}{SHIFT--}        {SHIFT--}                     {SHIFT--}"
+ 8310 print"{orng}{SHIFT--}{wht}t{orng}{SHIFT--}"f$(bp)"bandpass{orng}{SHIFT--}";
+ 8320 print"{pur}frequenz: ";right$("   "+str$(int(co*5.8+30)),5);" hertz{orng}{SHIFT--}"
+ 8330 print"{orng}{SHIFT--}{wht}e{orng}{SHIFT--}        {SHIFT--}                     {SHIFT--}"
+ 8340 print"{orng}{SHIFT--}{wht}r{orng}{SHIFT--}"f$(tp)"tiefpass{orng}{SHIFT--}{pur}resonanz: "right$(str$(rs),2)"         {orng}{SHIFT--}"
+ 8350 print"{CBM-Z}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{lblu}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{home}"
+ 8360 return
+ 8370 :
+ 8380 rem +++ seite 2 +++
+ 8390 :
+ 8400 print"{home}{lblu}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}";
+ 8410 print"{lblu}{SHIFT--}oszillator{SHIFT--}{grn}{rvon}huellkurve{rvof}{lblu}{SHIFT--}tastatur  {SHIFT--}{yel}joy- {lblu}{SHIFT--}";
+ 8420 print"{SHIFT--}& filter  {SHIFT--}{grn}{rvon}modulation{rvof}{lblu}{SHIFT--}disk-menue{SHIFT--}{yel}stick{lblu}{SHIFT--}";
+ 8430 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}";
+ 8440 print"{SHIFT--}  {wht}adsr 1{lblu}  {SHIFT--}  {wht}adsr 2{lblu}  {SHIFT--}  {wht}adsr 3{lblu}  {SHIFT--}"
+ 8450 print"{CBM-Q}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8460 print"{SHIFT--}{wht}a{lblu}{SHIFT--}";ad$(a(0));"{SHIFT--}{wht}a{lblu}{SHIFT--}";ad$(a(1));"{SHIFT--}{wht}a{lblu}{SHIFT--}";ad$(a(2));"{SHIFT--}"
+ 8470 print"{CBM-Q}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8480 print"{SHIFT--}{wht}d{lblu}{SHIFT--}";r$(d(0));"{SHIFT--}{wht}d{lblu}{SHIFT--}";r$(d(1));"{SHIFT--}{wht}d{lblu}{SHIFT--}";r$(d(2));"{SHIFT--}"
+ 8490 print"{CBM-Q}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8500 print"{SHIFT--}{wht}s{lblu}{SHIFT--}vol.: "right$(str$(s(0)),2)"{SHIFT--}{wht}s{lblu}{SHIFT--}vol.: "right$(str$(s(1)),2);
+ 8510 print"{SHIFT--}{wht}s{lblu}{SHIFT--}vol.: "right$(str$(s(2)),2)"{SHIFT--}"
+ 8520 print"{CBM-Q}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8530 print"{SHIFT--}{wht}r{lblu}{SHIFT--}";r$(r(0));"{SHIFT--}{wht}r{lblu}{SHIFT--}";r$(r(1));"{SHIFT--}{wht}r{lblu}{SHIFT--}";r$(r(2));"{SHIFT--}"
+ 8540 print"{orng}{CBM-Q}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8550 print"{SHIFT--}";:fori=0to2
+ 8560 print"{pur}vibrato:";right$(str$(vi(i)),2)"{orng}{SHIFT--}";:next:print
+ 8570 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8580 print"{SHIFT--}";:fori=0to2
+ 8590 print"{pur}pw.mod.:"right$(str$(int(pw(i)/2.5757)),2)"{orng}{SHIFT--}";:next:print
+ 8600 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8610 print"{SHIFT--}{wht}modulation{orng}{SHIFT--}{pur}geschwindigkeit:  "right$(" "+str$(sp),3)"{orng}{SHIFT--}"
+ 8620 print"{SHIFT--}          {CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8630 print"{SHIFT--}          {CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8640 print"{SHIFT--}{red}"f$(4+mw)" NM{red}"f$(5+mw)" {CBM-M}M{red}"f$(3+mw)" OL ";
+ 8650 print"{orng}{SHIFT--}{pur}envelope follow:  "right$(" "+str$(ef),3)"{orng}{SHIFT--}"
+ 8660 print"{SHIFT--}          {SHIFT--}                     {SHIFT--}"
+ 8670 print"{SHIFT--}{red}"f$(mw+2)" stimme 3 {orng}{SHIFT--}{pur}filter modulation:";
+ 8680 printright$(" "+str$(mf),3)"{orng}{SHIFT--}"
+ 8690 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{lblu}{CBM-E}{home}"
+ 8700 return
+ 8710 :
+ 8720 rem +++ seite 3 +++
+ 8730 :
+ 8740 print"{home}{lblu}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}";
+ 8750 print"{lblu}{SHIFT--}oszillator{SHIFT--}huellkurve{SHIFT--}{grn}{rvon}tastatur  {rvof}{lblu}{SHIFT--}{yel}joy- {lblu}{SHIFT--}";
+ 8760 print"{SHIFT--}& filter  {SHIFT--}modulation{SHIFT--}{grn}{rvon}disk-menue{rvof}{lblu}{SHIFT--}{yel}stick{lblu}{SHIFT--}";
+ 8770 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}";
+ 8780 print"{SHIFT--}{wht}sound     {lblu}{SHIFT--}{wht}sound     {lblu}{SHIFT--}{wht}sound     {lblu}{SHIFT--}"
+ 8790 print"{SHIFT--}{wht}loeschen  {lblu}{SHIFT--}{wht}speichern {lblu}{SHIFT--}{wht}laden     {lblu}{SHIFT--}"
+ 8800 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+ 8810 print"{SHIFT--}         {orng}{rvon} {CBM-@}{rvof}  {rvon}M  {rvof} {rvon}  {CBM-*}{rvof} {rvon} {CBM-@}{rvof}         {lblu}{SHIFT--}"
+ 8820 print"{SHIFT--}         {orng}{rvon}  {rvof}{CBM-K} {rvon} M {rvof} {rvon} {CBM-G} {rvof} {rvon}  {rvof}{CBM-K}        {lblu}{SHIFT--}"
+ 8830 print"{SHIFT--}         {orng}{rvon} {CBM-T}{CBM-T}{rvof} {rvon}  M{rvof} {rvon}  {rvof}{SHIFT-POUND} {rvon} {CBM-T}{CBM-T}{rvof}        {lblu}{SHIFT--}"
+ 8840 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}     "
+ 8850 print"{SHIFT--}                                {SHIFT--}     "
+ 8860 print"{SHIFT--}  {gry3}{rvon} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof}c{rvon} {rvof}{lblu}   {SHIFT--}     "
+ 8870 print"{lblu}{SHIFT--}  {gry3}{rvon} {rvof}2{rvon} {rvof}3{rvon} {SHIFT--} {rvof}5{rvon} {rvof}6{rvon} {rvof}7{rvon} {SHIFT--} {rvof}9{rvon} {rvof}0{rvon} {SHIFT--} {rvof}-{rvon} {rvof}\{rvon} {rvof}l{rvon} {rvof}{lblu}   {SHIFT--}"
+ 8880 print"{lblu}{SHIFT--}  {gry3}{rvon} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof}r{rvon} {rvof}{lblu}   {SHIFT--}"
+ 8890 print"{lblu}{SHIFT--}  {gry3}{rvon} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {rvof}{lblu}   {SHIFT--}"
+ 8900 print"{lblu}{SHIFT--}  {gry3}{rvon}q{SHIFT--}w{SHIFT--}e{SHIFT--}r{SHIFT--}t{SHIFT--}y{SHIFT--}u{SHIFT--}i{SHIFT--}o{SHIFT--}p{SHIFT--}@{SHIFT--}*{SHIFT--}^{SHIFT--}z{rvof}{lblu}   {SHIFT--}"
+ 8910 print"{SHIFT--}                                {SHIFT--}"
+ 8920 print"{SHIFT--}  {gry3}{rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof}{lblu}         {SHIFT--}"
+ 8930 print"{lblu}{SHIFT--}  {gry3}{rvon} {SHIFT--} {rvof}d{rvon} {rvof}f{rvon} {SHIFT--} {rvof}h{rvon} {rvof}j{rvon} {rvof}k{rvon} {SHIFT--} {rvof}:{rvon} {rvof};{rvon} {rvof}{lblu}         {SHIFT--}"
+ 8940 print"{lblu}{SHIFT--}  {gry3}{rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof} {rvon} {SHIFT--} {rvof} {rvon} {rvof} {rvon} {rvof}{lblu}         {SHIFT--}"
+ 8950 print"{lblu}{SHIFT--}  {gry3}{rvon} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {rvof}{lblu}         {SHIFT--}"
+ 8960 print"{lblu}{SHIFT--}  {gry3}{rvon}z{SHIFT--}x{SHIFT--}c{SHIFT--}v{SHIFT--}b{SHIFT--}n{SHIFT--}m{SHIFT--},{SHIFT--}.{SHIFT--}/{SHIFT--} {rvof}{lblu}         {SHIFT--}"
+ 8970 print"{SHIFT--}                                {SHIFT--}"
+ 8980 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{home}";
+ 8990 return
+ 9000 :
+ 9010 rem +++ mpg's laden +++
+ 9020 :
+ 9030 ifpeek(2)=0thenpoke2,1:load"happys.mpg.1",8,1
+ 9040 ifpeek(2)=1thenpoke2,2:load"happys.mpg.2",8,1
+ 9050 ifpeek(2)=2thenpoke2,3:load"happys.mpg.3",8,1
+ 9060 return
+ 9100 :
+ 9110 rem +++ initialisieren +++
+ 9120 :
+ 9130 open3,8,15
+ 9140 dimad$(15),r$(15),n$(11),b(39),ff$(35)
+ 9150 :
+ 9160 fori=0to15:readad$(i):next
+ 9170 fori=0to15:read r$(i):next
+ 9180 fori=0to11:read n$(i):next
+ 9190 f$(0)=chr$(28):f$(1)=chr$(30):fi$(0)="{red}aus":fi$(1)="{grn}ein":f$(5)=f$(1)
+ 9200 t$(0)="{red}{CBM-P}{CBM-P}{lblu}":t$(1)="{grn}{CBM-P}{CBM-P}{lblu}"
+ 9210 :
+ 9220 v=53248:si=54272:fr=55296:wf=40704:pa=1:mw=1
+ 9230 pokev+32,0:pokev+33,0:pokev+21,0:sys49280
+ 9240 fori=0to23:pokesi+i,0:next:pokesi+24,15
+ 9250 poke2041,14:poke2042,15:poke808,225
+ 9260 poke2040,13:pokev+39,8:pokev+37,7:pokev+38,0:pokev+28,1:pokev+24,21
+ 9270 pokev+23,6:pokev+29,6:pokev+40,2:pokev+41,2:poke49213,5
+ 9280 poke49301,203:poke49360,203
+ 9290 fori=0to66:pokewf+i,0:nexti:pokewf+33,1:pokewf+39,26
+ 9300 return
+ 9400 :
+ 9410 rem +++ sprites +++
+ 9420 :
+ 9430 pokev+21,6:pokev+40,5:pokev+41,5:return
+ 9440 pokev+21,7:pokev+40,2:pokev+41,2:return
+ 9450 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{lgrn}"tab(35)"+10{down}{down}{down}{left}{left}{left}{left}+1{down}{down} -1{down}{down}{down}{left}{left}{left}{left}-10":return
+ 9460 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}"tab(34)"     {down}{down}{down}{left}{left}{left}{left}{left}  {down}{down}   {down}{down}{down}{left}{left}{left}{left}{left}     ":return
+ 9470 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}"tab(34)"+msek{down}{down}{down}{down}{down}{down}{down}{down}{left}{left}{left}{left}{left}-msek":return
+ 9500 :
+ 9510 rem +++ joystick-abfrage +++
+ 9520 :
+ 9530 j=peek(56320):ifjand15>=16then return
+ 9540 ifj=123thenjo=jo+1
+ 9550 ifj=119thenjo=jo-1
+ 9560 ifj=126thenjo=jo+10
+ 9570 ifj=125thenjo=jo-10
+ 9580 ifjo<0thenjo=0
+ 9590 ifjo>255thenjo=255
+ 9600 bu=jand16
+ 9610 return
+ 9700 :
+ 9710 rem +++ a$ --> a% +++
+ 9720 :
+ 9730 a%=asc(a$+chr$(0)):return
+ 9800 :
+ 9810 rem +++ rot <-> gruen +++
+ 9820 :
+ 9830 a=peek(fr+p):ifa/2=int(a/2)thena=5:goto9850
+ 9840 a=2
+ 9850 fori=0tol:pokefr+p+i,a:next:return
+10000 :
+10010 rem +++ laden/loeschen +++
+10020 :
+10030 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+10040 printa$
+10050 poke1463,115:poke1543,115:pokev+40,5:pokev+41,5
+10060 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+10070 fori=0to10
+10080 print"{SHIFT--}            {SHIFT--}            {SHIFT--}            ":next
+10090 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{home}"
+10100 gosub10210:poke1463,93:poke1543,93
+10110 d$=ff$(z1):pokev+3,109:pokev+5,151:pokev+21,0
+10120 iferthener=0:goto410
+10130 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{lblu}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}     "
+10135 printa1$
+10138 print"{lblu}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}     "
+10140 fori=2to12
+10150 print"{SHIFT--}                                {SHIFT--}     ":next
+10160 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{home}";
+10170 return
+10180 :
+10190 rem +++ sound-auswahl +++
+10200 :
+10210 ifllthen10590
+10215 gosub10914:id$(1)=id$
+10220 close1:open1,8,2,"hsy*,s,r":gosub10820
+10225 gosub10914:id$(1)=id$
+10230 iferandb$="j"then10220
+10240 iferthenreturn
+10250 a0=0
+10260 close15:open15,8,15,"i":gosub10820
+10270 iferandb$="j"then10260
+10280 iferthenreturn
+10290 f=-1
+10300 close2:open2,8,2,"#":gosub10820
+10310 iferthenreturn
+10320 iferandb$="j"then10300
+10330 iferthenreturn
+10340 tr=18:se=1
+10350 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}";
+10360 print#15,"u1";2;0;tr;se
+10370 get#2,x$
+10380 tr=asc(x$+chr$(0))
+10390 get#2,x$
+10400 se=asc(x$+chr$(0))
+10410 forx=0to7
+10420 print#15,"b-p";2;x*32+2
+10430 get#2,t$:if(asc(t$+chr$(0))and1)=0then10560
+10440 print#15,"b-p";2;x*32+5
+10450 get#2,x$:ifx$<>"h"then10560
+10460 get#2,x$:ifx$<>"s"then10560
+10470 get#2,x$:ifx$<>"y"then10560
+10480 get#2,x$
+10490 f$=""
+10500 fory=0to11
+10510 get#2,x$:ifx$=""thenx$=chr$(0)
+10520 f$=f$+x$
+10530 nexty:f=f+1:iff=33thenf=32:goto10580
+10535 ff$(f)=f$
+10540 printtab(a0*13+1);"{gry2}";f$;
+10550 a0=a0+1:ifa0>2thena0=0:print
+10560 nextx
+10570 iftr<>0then10360
+10580 close15:close2:ll=1:goto10620
+10590 gosub10914:ifid$<>id$(1)thenll=0:fori=0to32:ff$(i)="":goto10210
+10599 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+10600 a1=-1:fori=0to32:a1=a1+1:ifa1>2thena1=0:print
+10610 printtab(1+a1*13)"{gry2}"ff$(i);:nexti
+10620 z1=0:a1=0:z2=z1:a2=a1
+10630 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+10640 fori=0toint(z2/3):print:nexti
+10650 printtab(a2*13+1)"{gry2}"ff$(z2)
+10660 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+10670 fori=0toint(z1/3):print:nexti
+10680 printtab(a1*13+1)"{wht}"ff$(z1)
+10690 a2=a1:z2=z1:j=peek(56320)
+10700 ifj=119thenz1=z1+1:ifz1>fthenz1=z2:goto10720
+10710 ifj=119thena1=a1+1:ifa1>2thena1=0:goto10770
+10720 ifj=123thenz1=z1-1:ifz1<0thenz1=z2:goto10740
+10730 ifj=123thena1=a1-1:ifa1<0thena1=2:goto10770
+10740 ifj=125thenz1=z1+3:ifz1>fthenz1=z2:goto10750
+10750 ifj=126thenz1=z1-3:ifz1<0thenz1=z2:goto10770
+10760 ifj=111thenreturn
+10770 if(jand15)<15andz1<>z2then10630
+10780 goto10690
+10790 :
+10800 rem +++ fehlermeldung +++
+10810 :
+10820 input#3,er,er$,lo:er$=er$+"                "
+10830 ifer=0orer=63orer=1thenreturn
+10840 print#3,"ui"
+10850 fori=1to39:b(i)=peek(1463+i):next
+10860 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{gry3}";left$(er$,21);": nochmal ?      "
+10870 ifb(34)=93thenprinttab(33)"{up}{lblu}{SHIFT--}"
+10880 getb$:ifb$<>"j"andb$<>"n"then10880
+10890 ifb$="n"thenreturn
+10900 fori=1to39:poke1463+i,b(i):next
+10910 return
+10911 :
+10912 rem +++ id abfragen +++
+10913 :
+10914 close15:open15,8,15,"i"
+10915 iferandb$="j"then10914
+10916 iferthenclose2:clr15:return
+10917 close2:open2,8,2,"#"
+10918 print#15,"u1:";2;0;18;0
+10919 print#15,"b-p:";2;162
+10920 get #2,id$,i1$:id$=id$+i1$
+10930 close2:close15:return
+11000 :
+11010 rem +++ datas +++
+11020 :
+11030 rem +++ daten fuer adsr +++
+11040 data"    2 ms","    8 ms","   16 ms","   24 ms","   38 ms","   56 ms"
+11050 data"   68 ms","   80 ms","  100 ms","  250 ms","  500 ms","  800 ms"
+11060 data" 1000 ms"," 3000 ms"," 5000 ms"," 8000 ms"
+11070 data"    6 ms","   24 ms","   48 ms","   72 ms","  114 ms","  168 ms"
+11080 data"  204 ms","  240 ms","  300 ms","  750 ms"," 1500 ms"," 2400 ms"
+11090 data" 3000 ms"," 9000 ms","15000 ms","24000 ms"
+11100 rem +++ daten fuer noten +++
+11110 data" c","#c"," d","#d"," e"," f","#f"," g","#g"," a","#a"," h"
+

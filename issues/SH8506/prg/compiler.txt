@@ -1,0 +1,483 @@
+
+
+;compiler.prg ==0801==
+  100 rem ****************************
+  110 rem *                          *
+  120 rem *       forth-compiler     *
+  130 rem *                          *
+  140 rem *           fuer           *
+  150 rem *                          *
+  160 rem *        commodore-64      *
+  170 rem *                          *
+  180 rem ****************************
+  190 rem *                          *
+  200 rem *  alexander schindowski   *
+  210 rem *                          *
+  220 rem *  6000 frankfurt/main 50  *
+  230 rem *                          *
+  240 rem * rudolf-hilferding-str.49 *
+  250 rem *                          *
+  260 rem ****************************
+  270 rem *                          *
+  280 rem *  telephon:(069)/570520   *
+  290 rem *                          *
+  300 rem ****************************
+  310 :
+  320 :
+  330 :
+  340 if a=0 thena=1:load"vocabulary",8,1
+  350 def fnh(x)=(int(x/256))
+  360 def fnl(x)=(x-256*fnh(x))
+  370 poke 53272,23:print"{clr}{lblu}";chr$(8);
+  380 voc=6*4096:be=voc:sp=0:z1=0
+  390 poke 55,fn l(be):poke 56,fn h(be)
+  395 dim st(20),sc$(24),wo$(100),ad(100)
+  400 print tab(14);"Forth-Compiler"
+  410 print tab(17);"fuer den"
+  420 print tab(15);"Commodore-64"
+  430 print"----------------------------------------";
+  440 print"     Von Alexander Schindowski 1985{down}{down}{down}{down}{down}{down}{down}{down}"
+  450 data 38
+  460 data "+",49563
+  470 data "cls",49158,"depth",49968
+  480 data "@",50012,"drop",49236
+  490 data "emit",49855,"expect",49936
+  500 data "=",49410,"i",49766
+  510 data "key",49880
+  520 data "+loop",49821,"mod",49733
+  530 data "not",49458,"over",49284
+  540 data ".",49163,"-",49578
+  550 data "swap",49248,">r",49751
+  560 data "and",49497,"cr",49384
+  570 data "/",49721,"do",49757,"!",49977
+  580 data "dup",49239,"xor",49541
+  590 data "get",49862,">",49434
+  600 data "<",49452,"loop",49811
+  610 data "*",49596,"or",49519
+  620 data "c@",50030,"c!",49996
+  630 data "r>",49745,"type",49915
+  640 data "pick",50062,"call",50047,"rot",50085
+  650 read an
+  660 for i=1 to an
+  670 read wo$(i),ad(i)
+  680 next i:poke 2,0:poke 252,0
+  690 gosub 3830
+  693 :
+  695 rem **************************
+  700 rem *** befehls-auswertung ***
+  705 rem **************************
+  708 :
+  710 gosub 2630
+  715 :
+  720 if be$=":" then 1540
+  725 :
+  730 for i=an to 1 step -1
+  740 if be$=wo$(i) then 760
+  750 next i:goto 770
+  760 sys ad(i):goto 700
+  765 :
+  770 gosub 3030
+  780 if ok=0 then 830
+  790 poke 781,fn l(xx)
+  800 poke 780,fn h(xx)
+  810 sys 49194
+  820 goto 700
+  825 :
+  830 if be$="reset" then run
+  835 :
+  840 if be$="basic" then end
+  845 :
+  850 if be$<>"vlist" then 900
+  860 print:for i=an to 1 step-1
+  870 print wo$(i)"  ";
+  880 next:print
+  890 goto 700
+  895 :
+  900 if be$<>"forget" then 950
+  910 gosub 2630:for i=an to 1 step-1
+  920 if be$<>wo$(i) then next i
+  930 if i>an then print be$" I can't find":goto 700
+  935 :
+  940 voc=ad(i):an=i-1:goto 700
+  950 if be$<>"(" then 980
+  960 if be$<>")" then gosub2630:goto960
+  970 goto 700
+  975 :
+  980 if be$<>"edit" then 1020
+  990 gosub 2630 :sc=val(be$)
+ 1000 print"Screen:";sc:gosub 3280
+ 1010 if be$="-->"then ze$="":sc=sc+1:goto1000
+ 1012 goto 700
+ 1015 :
+ 1020 if be$<>"load" then 1050
+ 1030 gosub 2630:sc=val(be$)
+ 1040 block=1:z1=0:gosub 3110:goto 700
+ 1050 if be$<>"-->" then 1070
+ 1060 sc=sc+1:gosub3110:comp=1:block=1:z1=0:goto 700
+ 1070 :
+ 1080 if be$<>"variable" then 1145
+ 1085 gosub 2630:an=an+1:wo$(an)=be$
+ 1090 ad(an)=voc:xx=voc+8
+ 1095 gosub 3470:poke voc,169
+ 1100 poke voc+1,fn h(xx)
+ 1105 poke voc+2,162
+ 1110 poke voc+3,fn l(xx)
+ 1115 poke voc+4,32:poke voc+5,42
+ 1120 poke voc+6,192:poke voc+7,96
+ 1125 poke voc+8,fn l(x)
+ 1130 poke voc+9,fn h(x)
+ 1135 voc=voc+10
+ 1140 goto 700
+ 1145 :
+ 1150 if be$<>"memory" then 1220
+ 1155 gosub 2630:an=an+1:wo$(an)=be$
+ 1160 ad(an)=voc
+ 1165 gosub 3470:poke voc,169
+ 1170 poke voc+1,fn h(voc+12)
+ 1175 poke voc+2,162
+ 1180 poke voc+3,fn l(voc+12)
+ 1185 poke voc+4,32:poke voc+5,42
+ 1190 poke voc+6,192:ad=voc+12+xx
+ 1195 poke voc+7,96
+ 1200 poke voc+8,fn l(ad):poke voc+9,fn h(ad)
+ 1205 poke voc+10,fn l(xx):poke voc+11,fn h(xx)
+ 1210 voc=ad:goto 700
+ 1220 :
+ 1230 if be$<>"constant" then 1280
+ 1240 gosub 2630:a$=": "+be$+" "
+ 1250 gosub 3470
+ 1260 ze$=a$+str$(x)+" ;"+ze$
+ 1270 goto 700
+ 1280 :
+ 1290 if be$<>"clear" then 1350
+ 1300 gosub 2630:sc=val(be$)
+ 1310 for ze=0 to 24
+ 1320 sc$(ze)=""
+ 1330 next ze:gosub3220
+ 1340 goto700
+ 1350 :
+ 1360 ifbe$="save-system"then3510
+ 1365 :
+ 1370 ifbe$="load-system"then3720
+ 1380 :
+ 1390 if be$<>"floppy" then 1420
+ 1400 gosub2630
+ 1410 open1,8,15,be$:close1:goto 700
+ 1420 :
+ 1430 ifbe$<>"list" then 1520
+ 1440 gosub2630:sc=val(be$):gosub3110
+ 1450 input"Auf Drucker (y/n)";a$:a=3:ifa$="y"thena=4
+ 1460 open4,a,-7*(a=4)
+ 1470 for z=0 to 23
+ 1480 print#4,right$(str$(z),2)":"sc$(z)
+ 1490 next z:close4
+ 1500 ifa=3thenpoke198,0:wait198,1
+ 1510 comp=0:goto700
+ 1520 :
+ 1530 printbe$" I can't find":goto 700
+ 1533 :
+ 1535 rem *************************
+ 1540 rem ***     compiler      ***
+ 1545 rem *************************
+ 1548 :
+ 1550 gosub2630:an=an+1:wo$(an)=be$
+ 1560 ad(an)=voc:comp=1
+ 1570 :
+ 1580 gosub 2630
+ 1590 for i=1 to anz
+ 1600 if be$<>wo$(i) then next i
+ 1610 ad=ad(i)
+ 1615 :
+ 1620 if be$<>"begin" then 1640
+ 1630 st(sp)=voc:sp=sp+1:goto 1570
+ 1635 :
+ 1640 if be$<>"until" then 1730
+ 1650 poke voc,32
+ 1660 poke voc+1,180:poke voc+2,194
+ 1670 poke voc+3,176:poke voc+4,3
+ 1680 poke voc+5,76
+ 1690 sp=sp-1:ad=st(sp):if sp<0 then65535
+ 1700 poke voc+6,fn l(ad)
+ 1710 poke voc+7,fn h(ad)
+ 1720 voc=voc+8:goto 1570
+ 1725 :
+ 1730 if be$=";" then poke voc,96:voc=voc+1:comp=0:goto 700
+ 1735 :
+ 1740 gosub 3030
+ 1750 if ok=0 then 1800
+ 1760 poke voc,169:poke voc+1,fn h(xx)
+ 1770 pokevoc+2,162:pokevoc+3,fn l(xx)
+ 1780 poke voc+4,32:poke voc+5,42
+ 1790 poke voc+6,192:voc=voc+7:goto 1570
+ 1800 :
+ 1810 if be$<>"if" then 1870
+ 1820 poke voc,32:poke voc+1,180
+ 1830 poke voc+2,194:poke voc+3,176
+ 1840 poke voc+4,3:poke voc+5,76
+ 1850 st(sp)=voc+6:sp=sp+1
+ 1860 voc=voc+8:goto 1570
+ 1870 :
+ 1880 if be$<>"endif" then 1930
+ 1890 sp=sp-1:ad=st(sp)
+ 1900 poke ad,fn l(voc)
+ 1910 poke ad+1,fn h(voc)
+ 1920 goto 1570
+ 1930 :
+ 1940 if be$<>"else" then 2010
+ 1950 ad=st(sp-1)
+ 1960 st(sp-1)=voc+1
+ 1970 poke voc,76:voc=voc+3
+ 1980 poke ad,fn l(voc)
+ 1990 poke ad+1,fn h(voc)
+ 2000 goto 1570
+ 2010 :
+ 2020 if be$="while" then 1820
+ 2030 :
+ 2040 if be$<>"repeat" then 2110
+ 2050 ad=st(sp-1):a2=st(sp-2)
+ 2060 sp=sp-1
+ 2070 poke voc,76
+ 2080 poke voc+1,fn l(a2)
+ 2090 poke voc+2,fn h(a2)
+ 2100 voc=voc+3:goto 1980
+ 2110 :
+ 2120 if be$<>"."+chr$(34) then 2225
+ 2125 a$="":ze$=mid$(ze$,2)
+ 2130 if left$(ze$,1)<>chr$(34) then a$=a$+left$(ze$,1):ze$=mid$(ze$,2):goto2130
+ 2135 ze$=mid$(ze$,2):a$=a$+chr$(0)
+ 2140 ad=voc+10
+ 2145 poke voc,169
+ 2150 poke voc+1,fn h(ad)
+ 2155 poke voc+2,162
+ 2160 poke voc+3,fn l(ad)
+ 2165 poke voc+4,32:poke voc+5,234
+ 2170 poke voc+6,194:poke voc+7,76
+ 2175 ad=voc+10+len(a$)
+ 2180 poke voc+8,fn l(ad)
+ 2185 poke voc+9,fn h(ad)
+ 2190 voc=voc+10
+ 2200 for i=0 to len(a$)-1
+ 2205 poke voc+i,asc(mid$(a$,i+1,1))
+ 2210 if left$(ze$,1)=" " then ze$=mid$(ze$,2):goto 2210
+ 2215 next i
+ 2220 voc=ad:goto 1570
+ 2225 :
+ 2230 if be$<>"text"+chr$(34) then2320
+ 2235 a$="":ze$=mid$(ze$,2)
+ 2240 if left$(ze$,1)<>chr$(34) then a$=a$+left$(ze$,1):ze$=mid$(ze$,2):goto2240
+ 2245 ze$=mid$(ze$,2):a$=a$+chr$(0)
+ 2250 ad=voc+10
+ 2255 poke voc,169
+ 2260 poke voc+1,fn h(ad)
+ 2265 poke voc+2,162
+ 2270 poke voc+3,fn l(ad)
+ 2273 poke voc+4,32:poke voc+5,42:poke voc+6,192
+ 2275 poke voc+7,76
+ 2280 ad=voc+10+len(a$)
+ 2285 poke voc+8,fn l(ad)
+ 2290 poke voc+9,fn h(ad)
+ 2295 voc=voc+10
+ 2300 for i=0 to len(a$)-1
+ 2305 poke voc+i,asc(mid$(a$,i+1,1)):next
+ 2310 if left$(ze$,1)=" " then ze$=mid$(ze$,2):goto 2310
+ 2315 voc=ad:goto 1570
+ 2320 :
+ 2330 if be$<>"do" then 2390
+ 2340 poke voc,32
+ 2350 poke voc+1,fn l(ad)
+ 2360 poke voc+2,fn h(ad)
+ 2370 voc=voc+3:st(sp)=voc
+ 2380 sp=sp+1:goto 1570
+ 2390 :
+ 2400 if be$<>"loop" and be$<>"+loop" then 2500
+ 2410 poke voc,32
+ 2420 poke voc+1,fn l(ad)
+ 2430 poke voc+2,fn h(ad)
+ 2440 poke voc+3,176:poke voc+4,3
+ 2450 sp=sp-1:ad=st(sp)
+ 2460 poke voc+5,76
+ 2470 poke voc+6,ad-256*int(ad/256)
+ 2480 poke voc+7,int(ad/256)
+ 2490 voc=voc+8:goto 1570
+ 2500 :
+ 2510 if be$<>"(" then 2540
+ 2520 gosub 2630:if be$<>")" then 2520
+ 2530 goto 1570
+ 2540 :
+ 2550 if be$=";s" then poke voc,96:voc=voc+1:goto 1570
+ 2560 :
+ 2570 if i>an then print be$" I can't find":comp=0:goto 700
+ 2575 :
+ 2580 poke voc,32
+ 2590 poke voc+1,ad-256*int(ad/256)
+ 2600 poke voc+2,int(ad/256)
+ 2610 voc=voc+3:goto 1570
+ 2615 :
+ 2620 rem ************************
+ 2630 rem ** hole befehl in be$ **
+ 2635 rem ************************
+ 2637 :
+ 2640 if ze$="" then gosub 2750
+ 2650 if left$(ze$,1)=" "then ze$=mid$(ze$,2):goto 2650
+ 2660 be$="":for i=1 to len(ze$)
+ 2670 if left$(ze$,1)=" " then 2710
+ 2680 be$=be$+left$(ze$,1)
+ 2690 ze$=mid$(ze$,2)
+ 2700 next i
+ 2710 return
+ 2720 :
+ 2730 rem *************************
+ 2740 rem *** hole zeile in ze$ ***
+ 2750 rem *************************
+ 2755 :
+ 2760 if block=1 then 2880
+ 2770 if comp=0 then print"  ok."
+ 2780 sys 42336
+ 2790 ze$=""
+ 2800 for z=512 to 600
+ 2810 a=peek(z)
+ 2820 if a=0 then 2850
+ 2830 ze$=ze$+chr$(a)
+ 2840 next z
+ 2850 if left$(ze$,1)=" "then ze$=mid$(ze$,2):goto 2850
+ 2860 if ze$="" then 2770
+ 2870 return
+ 2880 ze$=sc$(z1):print right$(str$(z1),2);":";ze$
+ 2890 if len(ze$)<2 then ze$="(  )"
+ 2900 z1=z1+1
+ 2910 if z1=24 then block=0
+ 2920 return
+ 2980 :
+ 2990 rem **************************
+ 3000 rem **   wandele zahl um    **
+ 3010 rem **        in xx         **
+ 3020 rem **************************
+ 3030 :
+ 3040 ok=1:x=1
+ 3050 if left$(be$,1)="-" and val(be$)<0 then be$=mid$(be$,2):x=-1:goto 3080
+ 3060 if left$(be$,1)>="0" and left$(be$,1)<="9" then 3080
+ 3070 ok=0:return
+ 3080 xx=val(be$)*x
+ 3090 if xx<0 then xx=(256*256)+xx
+ 3100 return
+ 3103 :
+ 3105 rem *************************
+ 3110 rem *****  lade screen  *****
+ 3115 rem *************************
+ 3118 :
+ 3120 open1,8,15
+ 3130 open 2,8,2,"scr"+str$(sc)+",s,r"
+ 3140 input#1,a
+ 3150 if a<>0 then close2:close1:for i=0to24:sc$(i)="":next i:return
+ 3160 for ze=0 to 24:b$=""
+ 3170 poke251,2:sys830
+ 3180 for i=512 to 600:x=peek(i):if x then b$=b$+chr$(x):next i
+ 3190 sc$(ze)=b$
+ 3200 next ze
+ 3210 close2:close1:return
+ 3213 :
+ 3215 rem **************************
+ 3220 rem *****  save  screen  *****
+ 3225 rem **************************
+ 3228 :
+ 3230 open 1,8,2,"@:scr"+str$(sc)+",s,w"
+ 3240 for ze=0 to 24
+ 3250 print#1,sc$(ze)
+ 3260 next ze
+ 3270 close1:ze$="":print"{clr}";:return
+ 3273 :
+ 3275 rem ***********************
+ 3280 rem **** edit a screen ****
+ 3285 rem ***********************
+ 3288 :
+ 3290 gosub 3400
+ 3300 print"{home}";:comp=1
+ 3310 gosub 2750
+ 3315 if left$(ze$,1)="n" then gosub2630:gosub2630:sc=val(be$):gosub3420:goto3300
+ 3320 if left$(ze$,1)="e" then ze$="":comp=0:goto 3220
+ 3321 if left$(ze$,1)<>"i" then 3330
+ 3322 gosub 2630:gosub 2630:z=val(be$):if z<0 or z>23 then gosub 3420:goto 3300
+ 3323 gosub 2630:a=val(be$):if a<0 or a>23 then gosub 3420:goto 3300
+ 3324 for i=22-a to z step-1:sc$(i+a)=sc$(i):sc$(i)="":next
+ 3325 gosub 3420:goto 3300
+ 3330 if left$(ze$,1)="s" then ze$="":print"{clr}";:comp=0:return
+ 3331 if left$(ze$,1)<>"d" then 3337
+ 3332 gosub 2630:gosub 2630:z=val(be$):if z<0 or z>23 then gosub3420:goto 3300
+ 3333 gosub 2630:a=val(be$):if a<0 or a>23 then gosub 3420:goto 3300
+ 3334 for i=z to 22-a:sc$(i)=sc$(i+a):sc$(i+a)="":next
+ 3335 gosub 3420:goto 3300
+ 3337 if left$(ze$,1)="l" then gosub 3420:goto 3300
+ 3340 ze=val(ze$)
+ 3350 ze$=mid$(ze$,3)
+ 3360 if ze>9 then ze$=mid$(ze$,2)
+ 3370 sc$(ze)=ze$
+ 3380 gosub 2630:if be$="-->" then goto 3220
+ 3390 goto 3310
+ 3393 :
+ 3395 rem *************************
+ 3400 rem *****  list screen  *****
+ 3405 rem *************************
+ 3408 :
+ 3410 gosub 3110
+ 3420 print"{clr}";
+ 3430 for ze=0 to 23
+ 3440 print right$(str$(ze),2);":";
+ 3450 print left$(sc$(ze),38)
+ 3460 next ze:return
+ 3463 :
+ 3465 rem ***********************
+ 3470 rem ** hole wert vom tos **
+ 3475 rem ***********************
+ 3480 ad=52992+peek(2)
+ 3490 x=peek(ad-1)+256*peek(ad-2)
+ 3500 poke 2,peek(2)-2:return
+ 3503 :
+ 3505 rem ***********************
+ 3510 rem ***   save-system   ***
+ 3515 rem ***********************
+ 3518 :
+ 3520 gosub 2630
+ 3530 open1,8,15,"s:"+be$+".*":close1
+ 3540 open2,8,2,be$+".voc,p,w"
+ 3550 print#2,an:print#2,voc
+ 3560 for ze=39 to an
+ 3570 print#2,wo$(ze)
+ 3580 print#2,ad(ze)
+ 3590 next ze
+ 3600 close 2:be$=be$+".code"
+ 3610 poke 187,fn l(720):poke 188,fn h(720)
+ 3620 for i=1 to len(be$)
+ 3630 poke 719+i,asc(mid$(be$,i,1))
+ 3640 next i:poke 183,len(be$)
+ 3650 poke 186,8:poke 185,1
+ 3660 poke 251,fn l(be):poke 252,fn h(be)
+ 3670 poke 780,251
+ 3680 poke 781,fn l(voc)
+ 3690 poke 782,fn h(voc)
+ 3700 sys 216+256*255
+ 3710 goto 700
+ 3713 :
+ 3715 rem ***************************
+ 3720 rem ****    load system    ****
+ 3725 rem ***************************
+ 3728 :
+ 3730 gosub 2630
+ 3740 open 2,8,2,be$+".voc,p,r"
+ 3750 input#2,an,voc
+ 3760 for ze=39 to an
+ 3770 input#2,wo$(ze)
+ 3780 input#2,ad(ze)
+ 3790 next ze:close 2
+ 3800 sys 50139,be$+".code",8
+ 3810 goto 700
+ 3813 :
+ 3815 rem ***************************
+ 3820 rem ***        data         ***
+ 3825 rem ***************************
+ 3828 :
+ 3830 data166,251, 32,198,255,160,  0, 32,207,255,201, 13,240,  7,153,  0
+ 3840 data  2,200, 76, 69,  3,169,  0,153,  0,  2, 76,204,255
+ 3850 for i= 830to 858:read a:poke i,a:z=z+a:next i
+ 3860 if z<>3379 then print"{rvon}Fehler in Data{rvof}":end
+ 3870 return
+
