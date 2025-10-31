@@ -20,6 +20,31 @@ def remove_id_attributes(html_content):
     """Remove all id= attributes from HTML tags."""
     return re.sub(r'\s+id=["\'][^"\']*["\']', '', html_content)
 
+def apply_text_replacements(html_content):
+    """Apply various text and HTML transformations."""
+    # Replace <blockquote><p> with <p class="intro">
+    html_content = html_content.replace('<blockquote><p>', '<p class="intro">')
+
+    # Remove </blockquote>
+    html_content = html_content.replace('</blockquote>', '')
+
+    # Replace <br/> with <br>
+    html_content = html_content.replace('<br/>', '<br>')
+
+    # Replace quote entities (adjust these if the actual entities are different)
+    html_content = html_content.replace('&rsquo;', "'")
+    html_content = html_content.replace('&lsquo;', "'")
+    html_content = html_content.replace('&rdquo;', '"')
+    html_content = html_content.replace('&ldquo;', '"')
+
+    # Replace two single quotes with double quote
+    html_content = html_content.replace("''", '"')
+
+    # Add class="source" to paragraphs like <p>[A-Za-z]*:
+    html_content = re.sub(r'<p>([A-Za-z]+:)', r'<p class="source">\1', html_content)
+
+    return html_content
+
 def split_html(input_file, issue):
     with open(input_file, 'r', encoding='utf-8') as file:
         content = file.read()
@@ -70,6 +95,9 @@ def split_html(input_file, issue):
         # Determine the file name
         first_page = pages.split(',')[0].split('-')[0].strip()
         sanitized_name = sanitize_filename(f"{first_page} {h1_cleaned}.html")
+
+        # Apply text replacements
+        body = apply_text_replacements(body)
 
         # Collect all unique authors from matching <p> tags
         author_matches = re.findall(r'<p>\(([^)]*?)\)</p>', body, re.DOTALL)
