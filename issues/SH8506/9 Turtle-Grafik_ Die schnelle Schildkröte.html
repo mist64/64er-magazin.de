@@ -5,7 +5,7 @@
     <title>Turtle-Grafik: Die schnelle Schildkröte</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="XXX">
+    <meta name="author" content="Peter Menke, ah">
     <meta name="64er.issue" content="Sonderheft 6/85">
     <meta name="64er.pages" content="9,71-76">
     <meta name="64er.toc_category" content="Grafik">
@@ -22,11 +22,282 @@
             <img src="9-1.png" alt="">
         </figure>
 
-        <p>Turtle-Grafik ist eine Spracherweiterung, die es in sich hat. Vollständig in Maschinensprache geschrieben, stellt sie einige Befehle zur Verfügung, mit denen Sie komfortabel sehr schnell Bilder erzeugen können.</p>
+        <p class="intro">Turtle-Grafik ist eine Spracherweiterung, die es in sich hat. Vollständig in Maschinensprache geschrieben stellt sie einige Befehle zur Verfügung, mit denen Sie komfortabel sehr schnell Bilder erzeugen können.</p>
 
-        <img src="71-x.png" alt="">
+        <p>Wenn Sie dieses Programm abtippen, werden Sie keinen Ärger mit den vielen DATAs bekommen. Haben Sie einen falschen Wert eingegeben, weist Sie die eingebaute Prüfsummenroutine auf die fehlerhafte Zeile hin und listet sie am Bildschirm. Bitte halten Sie sich daher an die Zeilennumerierung. Nach der Eingabe sollten Sie das Programm speichern und erst dann starten. Wenn alles ok ist, empfehle ich Ihnen, das Demoprogramm (Listing 2) einzugeben. Es vermittelt Ihnen einen sehr guten Eindruck von den Fähigkeiten der Grafikerweiterung. Doch nun zur Turtle-Grafik selbst.</p>
 
-        <p>TODO -> 11/84 p.48</p>
+        <p>Das Programm ermöglicht die Programmierung von hochauflösender Grafik in Basic mit neuen leistungsfähigen Befehlen.</p>
+
+        <p>Wird das Programm gestartet, meldet es sich mit:
+            <code>TURTLE GRAPHICS
+                BY PETER MENKE
+                38911 BASIC BYTES FREE
+            </code>
+        </p>
+
+        <p>Nun sind alle Funktionen und Befehle des Programms fest in Basic eingebettet und bleiben bis zum Ausschalten erhalten.</p>
+
+        <p>Das Programm unterstützt die Programmierung zweier voneinander völlig unabhängiger Bildschirme:</p>
+
+        <ol>
+            <li>Den normalen Textbildschirm</li>
+            <li>Den Grafikbildschirm auf dem die hochauflösende Grafik erscheint.</li>
+        </ol>
+
+
+        <p>Zwischen den beiden Bildschirmen können Sie mit der Funktionstaste F1 hin- und herschalten. Der neue Befehl HIRES1 schaltet den Grafik-Bildschirm ein (HIRES 0 = ausschalten).</p>
+
+        <p>Im folgenden die Befehle im Einzelnen</p>
+
+        <h3>HIRES1 hi, ra</h3>
+
+        <ul class="plain">
+            <li>hi = Hintergrundfarbe (0-15)</li>
+            <li>ra = Randfarbe (0-15)</li>
+        </ul>
+
+        <p class="noindent">Die Angaben für Hintergrund und/oder Randfarbe sind nicht unbedingt notwendig, die alten Farben werden dann beibehalten.</p>
+
+        <h3>CLEAR</h3>
+
+        <p class="noindent">Dieser Befehl löscht den gesamten Grafikbildschirm.</p>
+
+        <h3>REVERS</h3>
+
+        <p class="noindent">Dieser Befehl invertiert den gesamten Grafikbildschirm.</p>
+
+        <h3>COLOR pu, hi, ra</h3>
+
+        <p class="noindent">Die Farben der hochauflösenden Grafik werden neu definiert (pu = Punktfarbe). Wie beim HIRES-Befehl können auch hier die Angaben für hi und/oder ra entfallen.</p>
+
+        <h3>GSAVE »Name«, Gerätenummer</h3>
+
+        <p class="noindent">Speichert eine erzeugte Grafik ab.</p>
+
+        <h3>GLOAD »Name«, Gerätenummer</h3>
+
+        <p class="noindent">Lädt eine vorher gespeicherte Grafik in den Computer.</p>
+
+        <p>Wenn Sie den Grafikbildschirm einschalten, sehen Sie in der Mitte des Bildschirms einen blinkenden Punkt: Den Grafikcursor (oder »Turtle«, zu deutsch »Schildkröte«),</p>
+
+        <p>Durch Bewegen dieses Grafikcursors können Sie Linien auf dem Bildschirm zeichnen.</p>
+
+        <h3>DEG wi</h3>
+
+        <p class="noindent">Bestimmt die Bewegungsrichtung der Turtle. Acht Richtungen sind möglich (»wi« kann Werte zwischen 0 und 7 annehmen).</p>
+
+        <pre>
+    2
+  3   1
+4   *   0
+  5   7
+    6
+</pre>
+
+        <h3>MOVEx</h3>
+
+        <p class="noindent">Move bewegt die Schildkröte um x Punkte.</p>
+
+        <p>Der HIRES-Befehl positioniert den Grafikcursor automatisch auf die Bildschirmmitte. Der eingestellte Winkel ist 0. Außerdem wird Modus 0 eingeschaltet (siehe MODE).</p>
+
+        <h3>LTURN x (x max.=255)</h3>
+
+        <p class="noindent">Dreht den Grafikcursor um x Einheiten nach links.</p>
+
+        <h3>RTURN x (x max.=255)</h3>
+
+        <p class="noindent">Dreht den Grafikcursor um x Einheiten nach rechts.</p>
+
+        <h3>PLOT x-cor, y-cor</h3>
+
+        <p class="noindent">Setzt den Grafikcursor auf eine bestimmte Bildschirmposition. Die obere linke Ecke des Bildschirms hat die Koordinaten 0,0; die rechte untere 319,199.</p>
+
+        <h3>MODE m (m max 4)</h3>
+
+        <p class="noindent">Bei den Befehlen MOVE und PLOT kennt das Programm 4 Modi.</p>
+
+        <ol start="0">
+            <li>Punkt setzen</li>
+            <li>Punkt löschen</li>
+            <li>Punkt invertieren</li>
+            <li>nichts verändern</li>
+        </ol>
+
+        <p class="noindent">Normalerweise ist Modus 0 eingeschaltet. Mit dem MODE-Befehl läßt sich dies ändern.</p>
+
+        <h2>Gleichzeitige Darstellung von Text und Grafik</h2>
+
+        <p>Das Programm teilt den Bildschirm in einen Text- und in einen Grafikteil.</p>
+
+        <p>Betätigt man bei eingeschaltetem Grafikbildschirm die F3-Taste, so wird im unteren Teil des Bildschirms der untere Teil des normalen Textbildschirms eingeblendet.</p>
+
+        <p>Bei nochmaligem Betätigen dieser Taste wird das »Textfenster« wieder ausgeblendet.</p>
+
+        <h3>WINDOW 1</h3>
+
+        <p class="noindent">Schaltet Textfenster ein.</p>
+
+        <h3>WINDOW 0</h3>
+
+        <p class="noindent">Schaltet Textfenster aus.</p>
+
+        <p>Mit der Taste F5 wird der Cursor (der normale) in die obere linke Ecke des Textfensters gebracht. Dies entspricht der HOME-Taste für den gesamten Bildschirm. Die F5-Taste läßt sich ebenso programmieren wie die HOME-Taste, das heißt mit PRINT ”(F5)” (auf dem Bildschirm erscheint ein reverses Grafikzeichen) läßt sich der Cursor in die obere linke Ecke des Textfensters bringen.</p>
+
+        <h3>JOYSTICK ve</h3>
+
+        <p class="noindent">(ve=Verzögerung. Mit ve = 0 malt man am schnellsten, mit ve = 255 am langsamsten.)</p>
+
+        <p>Dieser Befehl erlaubt das Zeichnen von Bildern mit dem Joystick (Port 2). Mit dem Joystick kann der Grafikcursor bewegt werden. Druckt man gleichzeitig den Feuerknopf, wird entsprechend dem eingestellten Modus ein Punkt gesetzt, gelöscht etc. Nun können beliebige Bilder gezeichnet werden, solange, bis mit der F7-Taste mit der Programmabarbeitung fortgefahren wird.</p>
+
+        <h3>LPEN</h3>
+
+        <p class="noindent">Dieser Befehl erlaubt das Zeichnen von Bildern mit dem Lightpen (Port 1). Ini Prinzip gilt das gleiche wie beim JOYSTICK-Befehl, nur daß hier statt des Feuerknopfes die CTRL-Taste beziehungsweise der Knopf am Lightpen benutzt wird. Man verläßt den Lightpenmodus mit F7.</p>
+
+        <p>Alle Befehle können unabhängig vom Einschaltzustand des Grafikbildschirms angewendet werden. Sie lassen sich auch wie normale Basic-Befehle abkürzen.</p>
+
+        <p>Die Funktionen und Anwendungen des Programms und seiner Befehle sind sehr gut in dem Programm »TURTLE DEMO« demonstriert (Listing 2).</p>
+
+        <p>Das Programm beginnt mit Titel und Autorenanschrift. Das GOSUB in Zeile 260 dient nur zur Suche von Syntax-Fehlern in den DATA-Zeilen. Im Programmteil »Variable« ab Zeilennummer 290 wird der Variablen AN die Startadresse des Maschinenprogramms zugewiesen, der Variable ZI die Endadresse. In NA$ steht der Programmname. Die eigentliche Einleseroutine (ab Zeile 350) funktioniert folgendermaßen: Es werden in einer Schleife die ersten 16 Zahlen aus einer jeden DATA-Zeile gelesen und in den Speicher gePOKEt. Gleichzeitig wird aus den gelesenen Daten eine Prüfsumme gebildet. Diese Summe wird mit der letzten Zahl in der DATA-Zeile verglichen, dies ist die richtige Prüfsumme. Unterscheiden sich die beiden Zahlen, so wurde ein Tippfehler gemacht und die fehlerhafte Zeile wird vom Programm automatisch geLISTet. Außerdem wird geprüft, ob eine Zeile vergessen wurde (Zeile 517-520) und ob die Anzahl der Daten richtig ist (Zeile 530-537). Zusätzlich wird noch getestet, ob die gelesene Zahl auch zwischen 0-255 liegt (Zeile 391). Ist dies nicht der Fall, wird eine Fehlermeldung ausgegeben (Zeile 503-505). Ursache ist wahrscheinlich ein Kommafehler. Wurde kein Fehler gefunden, so fragt das Programm, ob es sich selbst abspeichern soll (davon sollte bei der ersten Benutzung des Programms unbedingt Gebrauch gemacht werden, Zeile 546-580). Danach wird das Maschinenprogramm gestartet (Zeile 590-610). Trotz der Prüfsummen ist ein Fehler in den DATAs nicht völlig ausgeschlossen. Vertauschungen werden zum Beispiel nicht bemerkt. Solche Fehler sind jedoch sehr unwahrscheinlich.</p>
+
+        <h2>Komfortabler DATA-Lader</h2>
+
+        <p>Diese Art der Überprüfung von DATA-Werten sollten Sie sich genau ansehen. Sie erleichtert der Redaktion und vor allem den Lesern die Eingabe und Überprüfung großer Zahlenkolonnen. Falls Sie uns Programme einschicken wollen, dann nehmen Sie sich doch auch bitte etwas Zeit und fügen eine komfortable Prüfroutine in Ihre Programme ein.</p>
+
+        <h3>Programmierung</h3>
+
+        <ol type="a">
+            <li>Speicheraufteilung:
+                <p class="noindent"><a href="#futureteufelchen" class="futureteufelchen_link">Das Video-RAM steht ab $0400. Der Hires-Speicher wurde hinter $CC00 gelegt, das Hires-Farb-RAM nach C800. Das Programm selbst beginnt bei $C000 und endet bei $C88B. Programmvariable liegen im Bereich vor $CC00.</a></p>
+            </li>
+            <li>Die Belegung der Funktionstasten wird durch ein »Anzapfen« des Interrupt ermöglicht. Die Funktion PRINT ”(<a href="#futureteufelchen" class="futureteufelchen_link">fs</a>)” wird durch Verändern der BSOUT-Routine erreicht.</li>
+            <li>Das Textfenster:
+                <p class="noindent">Wie Sie wissen, wird das Bild auf dem Fernseher (Monitor) durch einen Elektronenstrahl erzeugt, der den Bildschirm zeilenweise von oben nach unten abfährt. Der VIC bietet nun die Möglichkeit bei einer bestimmten Zeilenposition einen Interrupt auszulösen. Diese Fähigkeit des VIC wird ausgenutzt. In der dann ausgeführten Interruptroutine wird zwischen Hires- und Textmodus hin und her geschaltet, so daß der Bildschirm in ein Text und ein Grafikfenster eingeteilt wird.</p>
+            </li>
+            <li>Die neuen Befehle:
+                <p class="noindent">Es gibt zahlreiche Möglichkeiten, neue Basic-Befehle zu implementieren. Anzapfen der
+                <ol>
+                    <li>CHRGET-Routme (DOS 5.1)</li>
+                    <li>Eingabe-Warteschleife (Toolkits)</li>
+                    <li>Interpreterschleife (beschrieben im 64 Intern)</li>
+                </ol>
+                </p>
+            </li>
+        </ol>
+
+        <p>Die drei <!-- auf Seite 49 genannten --> Möglichkeiten haben jedoch alle große Nachteile: Sie sind alle entweder zu langsam (1. und 3.), die Befehle lassen sich nur im Direktmodus anwenden (2.) oder sie können nicht abgekürzt werden. Deshalb wurden die Befehle mit sehr komplexen Routinen voll als Tokens integriert. Aus diesem Grund wurde die Interpreterschleife, die Routine zur Umwandlung in Interpretercode und die Routine zur Rückumwandlung in Klartext verändert. Die Vorteile dieser Arbeitsweise sind, daß sich die neuen Befehle wie normale Basic-Befehle anwenden lassen und daß nur minimale Geschwindigkeitsverluste bei der Ausführung von Basic-Programmen in Kauf genommen werden müssen. Ähnliche Methoden verwenden übrigens auch professionelle Basic-Erweiterungen, wie zum Beispiel Simons Basic.</p>
+
+        <h2>Einige Befehle definiert</h2>
+
+        <p>Ein solches »Anzapfen« von Betriebssystem- und Basic-Routinen wird beim C 64 durch zahlreiche Sprungvektoren ermöglicht, die verändert werden können. Dies ist leider nicht bei allen Computern so gut möglich. Die hier benutzten Vektoren sind:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><b>Name:</b></td>
+                    <td><b>Adresse in dezimal:</b></td>
+                </tr>
+                <tr>
+                    <td>Interrupt-Vektor</td>
+                    <td>: 788/789</td>
+                </tr>
+                <tr>
+                    <td>NMI-Vektor</td>
+                    <td>: 792/793</td>
+                </tr>
+                <tr>
+                    <td>BRK-Vektor</td>
+                    <td>: 790/791</td>
+                </tr>
+                <tr>
+                    <td>Bsout-Vektor</td>
+                    <td>: 806/807</td>
+                </tr>
+                <tr>
+                    <td>Vektor für Umwandlung in Interpretercode</td>
+                    <td>: 772/773</td>
+                </tr>
+                <tr>
+                    <td>Vektor für Umwandlung in Klartext</td>
+                    <td>: 774/775</td>
+                </tr>
+                <tr>
+                    <td>Vektor für Basic-Befehl ausführen (Interpreterschleife)</td>
+                    <td>: 776/777</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Das Wissen über die Programmierung des Programms ist für dessen Anwendung nicht nötig. Doch nun viel Spaß mit Turtle Grafik.</p>
+
+        <address class="author">(Peter Menke/ah)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>AN</td>
+                        <td>= Anfangsadresse des Maschinenprogramms</td>
+                    </tr>
+                    <tr>
+                        <td>ZI</td>
+                        <td>= Endadresse des Maschinenprogramms</td>
+                    </tr>
+                    <tr>
+                        <td>NA$</td>
+                        <td>= Programmname beim Abspeichern</td>
+                    </tr>
+                    <tr>
+                        <td>GE</td>
+                        <td>= Geräteadresse beim Abspeichern</td>
+                    </tr>
+                    <tr>
+                        <td>X</td>
+                        <td>= eingelesener DATA-Wert</td>
+                    </tr>
+                    <tr>
+                        <td>S</td>
+                        <td>= Speicherstelle, in die X gePOKEt wird</td>
+                    </tr>
+                    <tr>
+                        <td>Z</td>
+                        <td>= aktuelle DATA-Zeilennummer</td>
+                    </tr>
+                    <tr>
+                        <td>PR</td>
+                        <td>= errechnete Prüfsumme</td>
+                    </tr>
+                    <tr>
+                        <td>I</td>
+                        <td>= Variable der FOR/NEXT-Einleseschleife</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Benutzte Variable</figcaption>
+        </figure>
+
+        <aside class="futureteufelchen" id="futureteufelchen">
+            <h2>Futureteufelchen</h2>
+
+            <p>Das folgenden Fehlerteufelchen aus der 64'er 2/85 haben es leider nicht als Korrektur in diese Wiederholung geschafft:</p>
+
+            <aside>
+            <p>Direkt nach dem IF...THEN-Befehl kann keiner der neuen Basic-Befehle verwendet werden (SYNTAX ERROR), ein Fehler mit dem übrigens auch professionelle Basic-Erweiterungen wie zum Beispiel Supergrafik 64, Screen Graphics, Ultrabasic und andere behaftet sind. Dies kann man jedoch leicht umgehen, indem man nach dem THEN einen Doppelpunkt eingibt, und dann erst den neuen Befehl. Der Fehler kommt dadurch zustande, daß nach dem IF...THEN der Vektor zur Ausführung eines Basic-Befehls übersprungen wird und so die neuen Befehle nicht ausgeführt werden können.</p>
+            <p>Die korrekte Speicheraufteilung von Turtle-Graphics lautet übrigens:</p>
+
+            <ol>
+                <li>Video-RAM wie normal bei $0400</li>
+                <li>Hires-Farb-RAM: $CC00</li>
+                <li>Hires-Bitmap: $E000</li>
+                <li>Das Programm selbst: $C000-$C88B</li>
+            </ol>
+            <p>Im Absatz »Programmierung«, muß es unter b) »f5« statt
+                »fs« heißen.</p>
+            <p>Ich wurde von einigen Lesern gefragt, wie es möglich ist, die lästige Einleseroutine zu verkürzen oder zu umgehen. Dies ist sehr einfach zu bewerkstelligen, indem man den Speicherbereich in dem das Programm liegt direkt abspeichert. Dies ist unter anderem mit einem der Einzeiler in der gleichen Ausgabe möglich. Die einzelnen Werte sind: ls = 0, hs = 192, le = 140 und he = 200.</p>
+            <address class="author">(Peter Menke)</address>
+            </aside>
+            </p>
+            <!-- 64'er 2/1985 -->
+        </aside>
 
         <figure>
             <pre data-filename="turtle grafik.prg" data-name="Turtle-Grafik" data-mse=mse1></pre>

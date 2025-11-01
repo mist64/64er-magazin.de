@@ -18,34 +18,171 @@
         <h1>Der Bitmap-Compander</h1>
         <p class="intro">Mit diesem kurzen Programm können Grafikbildschirme, die auf Diskette abgespeichert werden, auf die Hälfte komprimiert werden.</p>
 
-        <p>Jeder, der schon einmal eine hochauflösende Grafik auf Diskette abgespeichert hat, weiß, daß sie 33 Blocks benötigt. Das entspricht den 8 KByte des hochauflösenden Grafikbildschirms. Es besteht aber die Möglichkeit, diese Grafikbildschirme je nach Inhalt auf 10 bis 20 Blocks zu komprimieren. Das Verfahren beruht darauf, häufig wiederkehrende Sequenzen durch kürzere zu ersetzen. Dazu kann man sich die Bitmap als eine lange Kette von Nullen und Einsen vorstellen. Diese Kette wird jetzt in 4-Bit-Blöcke aufgeteilt. Solche Blöcke bezeichnet man als Halb-Byte oder Nibbles. Es gibt 16 verschiedene solcher Nibbles, wovon einige häufiger und andere seltener vorkommen. Jedem Nibble wird nun ein neuer Code zugeordnet, wobei das häufigste Nibble »0000«, den kürzesten Code »0« bekommt. Alle anderen 15Codes müssen mit einer »1« beginnen. Einen Code »00« darf es nicht mehr geben, denn er könnte bei der Decodierung nicht mehr von dem Code »0« unterschieden werden. Es läßt sich nicht umgehen, viele Codes länger als 4 Bit zu machen. Die komplette Code-Tabelle ist in Tabelle 1 zu sehen. Doch die langen Codes kommen viel seltener vor als die kurzen, so daß bei einem »normalen« Bild viele Bits gespart werden können. Theoretisch wäre es möglich, daß eine komprimierte Bitmap länger wird als das Original. Aber selbst die Fotos aus der »Diashow« lassen sich komprimieren. Sir Winston Churchill magert zum Beispiel auf 24 Blocks ab. Bilder, wie sie üblicherweise in Gafik-Adventures vorkommen, lassen sich meist auf unter 15 Blocks zusammendrücken.</p>
+        <p>Jeder, der schon einmal eine hochauflösende Grafikauf Diskette abgespeichert hat, weiß, daß sie 33 Blocks benötigt. Das entspricht den 8 KByte des hochauflösenden Grafikbildschirms. Es besteht aber die Möglichkeit, diese Grafikbildschirme je nach Inhalt auf 10 bis 20 Blocks zu komprimieren. Das Verfahren beruht darauf, häufig wiederkehrende Sequenzen durch kürzere zu ersetzen. Dazu kann man sich die Bitmap als eine lange Kette von Nullen und Einsen vorstellen. Diese Kette wird jetzt in 4-Bit-Blöcke aufgeteilt. Solche Blöcke bezeichnet man als Halb-Byte oder Nibbles. Es gibt 16 verschiedene solcher Nibbles, wovon einige häufiger und andere seltener vorkommen. Jedem Nibble wird nun ein neuer Code zugeordnet, wobei das häufigste Nibble »0000«, den kürzesten Code »0« bekommt. Alle anderen 15 Codes müssen mit einer »1« beginnen. Einen Code »00« darf es nicht mehr geben, denn er könnte bei der Decodierung nicht mehr von dem Code »0« unterschieden werden. Es läßt sich nicht umgehen, viele Codes länger als 4 Bitzu machen. Die komplette Code-Tabelle ist in Tabelle 1 zu sehen. Doch die langen Codes kommen viel seltener vor als die kurzen, so daß bei einem »normalen« Bild viele Bits gespart werden können. Theoretisch wäre es möglich, daß eine komprimierte Bitmap länger wird als das Original. Aber selbst die Fotos aus der »Diashow« lassen sich komprimieren. Sir Winston Churchill magert zum Beispiel auf 24 Blocks ab. Bilder, wie sie üblicherweise in Gafik-Adventures vorkommen, lassen sich meist auf unter 15 Blocks zusammendrücken.</p>
 
-        <p>Tippen Sie das Programm (Listing 1) mit dem MSE ab und speichern Sie es, damit es jederzeit mit LOAD ”BMC.EXE”,8,1 geladen werden kann (auf der Leserservice-Diskette unter "BIT-MAPCOMPANDER" gespeichert). Der Aufruf des Companders funktioniert vom Basic aus mit einem SYS-Befehl. Die Parameter werden wie beim OPEN-Befehl angehängt.</p>
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr class="separator strong">
+                        <td>Nibbles</td>
+                        <td>Codes</td>
+                        <td>Hex</td>
+                        <td>Länge</td>
+                    </tr>
+                    <tr>
+                        <td>0000</td>
+                        <td>0</td>
+                        <td>$00</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>0001</td>
+                        <td>10100</td>
+                        <td>$A0</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>0010</td>
+                        <td>10101</td>
+                        <td>$A8</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>0011</td>
+                        <td>10110</td>
+                        <td>$B0</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>0100</td>
+                        <td>10111</td>
+                        <td>$B8</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>0101</td>
+                        <td>11000</td>
+                        <td>$C0</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>0110</td>
+                        <td>11001</td>
+                        <td>$C8</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>0111</td>
+                        <td>111100</td>
+                        <td>$F0</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>1000</td>
+                        <td>11010</td>
+                        <td>$D0</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>1001</td>
+                        <td>11011</td>
+                        <td>$D8</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>1010</td>
+                        <td>11100</td>
+                        <td>$E0</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>1011</td>
+                        <td>111101</td>
+                        <td>$F4</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>1100</td>
+                        <td>11101</td>
+                        <td>$E8</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>1101</td>
+                        <td>111110</td>
+                        <td>$F8</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>1110</td>
+                        <td>111111</td>
+                        <td>$FC</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>1111</td>
+                        <td>100</td>
+                        <td>$80</td>
+                        <td>3</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Tabelle aller möglichen Codes</figcaption>
+        </figure>
 
-        <p>Laden einer komprimierten Bitmap:<br>
-            SYS 52798,Filenummer,Geräteadresse,Kanalnummer,”Name”</p>
+        <p>Tippen Sie das Programm (Listing 1) mit dem MSE ab und speichern Sie es, damit es jederzeit mit LOAD "BMC.EXE",8,1 geladen werden kann (auf der Leserservice-Diskette unter "BITMAPCOMPANDER" gespeichert). Der Aufruf des Companders funktioniert vom Basic aus mit einem SYS-Befehl. Die Parameter werden wie beim OPEN-Befehl angehängt.</p>
 
-        <p>Speichern einer komprimierten Bitmap:<br>
-            SYS 52736,Filenummer,Geräteadresse,Kanalnummer,”Name,P,W” Mit der Filenummer wird die Anfangsadresse der Bitmap ausgewählt.</p>
+        <p>Laden einer komprimierten Bitmap:
+            <code>SYS 52798,Filenummer,Geräteadresse,Kanalnummer,"Name"</code>
+        </p>
 
-        <p>TODO TABLE</p>
+        <p>Speichern einer komprimierten Bitmap:
+            <code>SYS 52736.Filenummer,Geräteadresse,Kanalnummer,"Name,P,W"</code>
+        </p>
 
-        <p>Filenummer Bitmap-Adresse<br>
-            1 $2000 = 8192 (sichtbares Bild bei Hi-Eddi)<br>
-            2 $4000 = 16384<br>
-            3 $6000 = 24576<br>
-            5 $A000 = 40960 (Bitmap bei Hires-3)<br>
-            7 $E000 = 57344 (Bitmap bei Simons Basic)</p>
+        <p>Mit der Filenummer wird die Anfangsadresse der Bitmap ausgewählt.</p>
+
+        <table class="plain">
+            <tr>
+                <td>Filenummer</td>
+                <td>Bitmap-Adresse</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>$2000 = 8192</td>
+                <td>(sichtbares Bild bei Hi-Eddi)</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>$4000 = 16384</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>$6000 = 24576</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>$A000 = 40960</td>
+                <td>(Bitmap bei Hires-3)</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>$E000 = 57344</td>
+                <td>(Bitmap bei Simons Basic)</td>
+            </tr>
+        </table>
 
         <p>Die Bitmaps 0, 4 und 6 sind theoretisch möglich, aber nicht sinnvoll, da der Videocontroller sie nicht adressieren kann. Die Gerätenummer ist 8 für das Floppy-Laufwerk und die Kanalnummer eine beliebige Zahl von 2 bis 14.</p>
 
         <p>Beispiele für Aufrufe:</p>
 
-        <p>Speichern einer Simons Basic-Bitmap:<br>
-            SYS 52736,7,8,2,”Name,P,W”</p>
+        <p>Speichern einer Simons Basic-Bitmap:
+            <code>SYS 52736,7,8,2,"Name,P,W"</code>
+        </p>
 
-        <p>Laden dieser Bitmap in Hires-3:<br>
-            SYS 52798,5,8,2,”Name”</p>
+        <p>Laden dieser Bitmap in Hires-3:
+            <code>SYS 52798,5,8,2,"Name"</code>
+        </p>
 
         <p>Das Programm belegt den Bereich von $CE00 bis $CF19 (52736 bis 53017). Es belegt somit keinen Basic-Speicherplatz und verträgt sich auch mit Hires-3 und Simons Basic, solange der Befehl MEM nicht verwendet wird.</p>
 
