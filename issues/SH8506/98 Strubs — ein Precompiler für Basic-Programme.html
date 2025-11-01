@@ -18,72 +18,653 @@
         <h1>Strubs — ein Precompiler für Basic-Programme</h1>
         <p class="intro">Bei Strubs, das steht für »strukturiertes Basic«, handelt es sich um einen sogenannten Precompiler, ein Programm, welches Programmtexte mit gewissen zusätzlichen Befehlen in normale, auf jedem Commodore 64 oder VC 20 ablauffähige Programme übersetzt.</p>
 
-<figure>
-    <img src="98-1.png" alt="">
-    <figcaption>Bild 1. Struktur eines Basic-Programms und dessen Lage im Arbeitsspeicher</figcaption>
-</figure>
-<figure>
-    TODO
-    <figcaption>Bild 2. Interpreter-Erweiterung</figcaption>
-</figure>
-<figure>
-    <img src="98-3.png" alt="">
-    <figcaption>Bild 3. Aufbau von Strubs</figcaption>
-</figure>
-<figure>
-    <img src="98-4.png" alt="">
-    <figcaption>Bild 4. Geschachtelte Loop-Schleife</figcaption>
-</figure>
-<figure>
-    <img src="98-5.png" alt="">
-    <figcaption>Bild 5. Struktogramm der Loop-Schleife</figcaption>
-</figure>
-<figure>
-    <img src="98-6.png" alt="">
-    <figcaption>Bild 6. Syntaxdiagramme der Befehle</figcaption>
-</figure>
-<figure>
-    <img src="98-7.png" alt="">
-    <figcaption>Bild 7. Das Quellprogramm des RENUMBER-Befehls</figcaption>
-</figure>
-<figure>
-    <img src="98-8.png" alt="">
-    <figcaption>Bild 8. Das von Strubs erzeugte Objektprogramm. Wie es in Strubs einzufügen ist, steht auf Seite 107.</figcaption>
-</figure>
-<figure>
-    <img src="98-9.png" alt="">
-    <img src="98-9b.png" alt="">
-    <figcaption>Bild 9. Diese Änderungen sind für die Anpassung von Strubs an den VC 20 (mit mindestens 16 KByte Erweiterung) erforderlich</figcaption>
-</figure>
-<figure>
-    <img src="98-10.png" alt="">
-    <figcaption>Bild 10. Tabellen</figcaption>
-</figure>
-<figure>
-    <img src="98-11.png" alt="">
-    <figcaption>Bild 11. Relevante Zeichencodes</figcaption>
-</figure>
-<figure>
-    <img src="98-12.png" alt="">
-    <figcaption>Bild 12. Beispiellister</figcaption>
-</figure>
-<figure>
-    <img src="98-13.png" alt="">
-    <figcaption>Bild 13. Beispiele Makros</figcaption>
-</figure>
-<figure>
-    <img src="98-14.png" alt="">
-    <figcaption>Bild 14. Die besprochenen Erweiterungen auf einen Blick</figcaption>
-</figure>
-<figure>
-    <img src="98-15.png" alt="">
-    <figcaption>Bild 15. Variablenliste</figcaption>
-</figure>
+        <p>Das Programm Strubs wurde ursprünglich zu einer Zeit entwickelt, als Begriffe wie Forth oder Pascal noch Fremdworte für den C 64 waren. Der Zweck war die Entwicklung von Programmen übersichtlicher, effizienter und bequemer zu gestalten.</p>
 
-        <p>TODO 84/4, p.110<br>
-            TODO 84/5, p.116<br>
-            TODO 84/6, p.128<br>
-            TODO 84/7, p.154</p>
+        <h2>Strubs bietet neue Basicbefehle</h2>
+
+        <p>Auf der einen Seite ermöglicht es Strubs, auf sanftem Weg, das heißt im Rahmen des gewohnten Basic (aber ohne auf unübersichtliche Klimmzüge innerhalb des Commodore Basic angewiesen zu sein), also ohne gleich eine neue Programmiersprache lernen zu müssen, mit der Technik strukturierter Programmierung vertraut zu werden. Auf der anderen Seite ermöglicht es Strubs, sich mit der Arbeit mit Compilern vertraut zu werden.</p>
+
+        <p>Schließlich bietet die Form des Precompilers noch erhebliche Geschwindigkeitsvorteile gegenüber vergleichbaren Interpretererweiterungen. Um diese letzten beiden Punkte zu verstehen, ist es angebracht, auf die unterschiedlichen Arbeitsweisen von Interpretern und Compilern einzugehen.</p>
+
+        <p>Bekanntlich versteht der eigentliche Computer, das heißt hier der Mikroprozessor, nur die sogenannte Maschinensprache. Da diese aber extrem problemfern und unübersichtlich ist, hat man verschiedene höhere Programmiersprachen erfunden, um dem Programmierer seine Arbeit zu erleichtern. Damit aber ein in einer solchen Sprache geschriebenes Programm vom Computer verarbeitet werden kann, muß zunächst eine Übertragung in die Maschinensprache des Computers stattfinden. Dabei wird diese Übertragung wiederum von Programmen vorgenommen und zwar von Compilern oder von Interpretern. Diese beiden Programmarten unterscheiden sich grundlegend in ihrer Arbeitsweise.</p>
+
+        <p>Ein Interpreter besteht im wesentlichen aus einer Reihe von in Maschinensprache geschriebenen Unterprogrammen, einer Tabelle welche die erlaubten Befehle und die Adresse des zu jedem Befehl gehörenden Unterprogramms enthält, schließlich der Variablenverwaltung sowie der sogenannten Interpreterschleife.</p>
+
+        <p>Diese Schleife geht den Programmtext Schritt für Schritt durch. Zu jedem Befehl sucht sie in der Tabelle die zugehörige Unterprogrammadresse, ruft dieses Unterprogramm auf, holt den nächsten Befehl und so weiter, bis das Programmende erreicht ist. Man sieht also, daß ein großer Teil der Arbeit eines Interpreters im Suchen besteht: Suchen in der Befehlstabelle, Suchen in der Variablentabelle und nicht zuletzt Suchen nach Sprungzielen im, zu interpretierenden, Programm.</p>
+
+        <p>Diese ewige Sucherei führt nun dazu, daß Programme nur relativ langsam abgearbeitet werden. Eine Interpretererweiterung (wie etwa Siemens Basic) stellt nun einfach zusätzliche Befehlsroutinen zur Verfügung und erweitert die Befehlstabelle um die neuen Befehle und Adressen. Durch diese Erweiterung der Befehlstabellen wird jetzt aber leider auch der Zeitaufwand für das Suchen größer, so daß die Programme noch langsamer als bisher schon ablaufen. Simons Basic demonstriert dies sehr anschaulich. Ein Beispiel für eine Interpretererweiterung werden wir weiter unten besprechen.</p>
+
+        <p>Nehmen wir zur Illustration der Arbeitsweise eines Interpreters eine Programmzeile wie die folgende:</p>
+
+        <pre>FOR I = 0 to 999: PRINT I: NEXT</pre>
+
+        <p>Der Interpreter muß hier 1000mal die Befehlstabellen nach dem Befehl PRINT und 1000mal die Variablentabelle nach der Variablen I durchsuchen.</p>
+
+        <h2>Compiler kontra Interpreter</h2>
+
+        <p>Völlig anders arbeitet der Compiler: Er übersetzt ein Programm, das in einer Sprache geschrieben ist, welche nur der Programmierer versteht – dieses Programm nennt man Quellprogramm – in ein äquivalentes Programm – das Objektprogramm –, das (meist nur noch) die Maschine versteht. Diese beiden Begriffe – Quellprogramm und Objektprogramm – sollten wir uns gut merken; sie werden noch öfter auftauchen.</p>
+
+        <p>Der größte Teil der Sucharbeit kann nun ein für allemal bei der Übersetzung vom Compiler geleistet werden. Die benötigten Adressen der Befehlsroutinen, der Variablen und der Sprungziele sind für immer fest in das Objektprogramm eingebaut. Dadurch können compilierte Programme oft bis zu zehn- oder mehrmal schneller sein als entsprechende Interpreterprogramme.</p>
+
+        <p>Diesem beträchtlichen Gewinn an Geschwindigkeit steht allerdings ein nicht minder bedeutender Verlust an Bequemlichkeit gegenüber. Zum einen erfordert selbst die geringste Programmänderung eine vollständige Neuübersetzung des Programms. Dies allein kann bei umfangreichen Programmen erhebliche Zeit beanspruchen, zumal häufig auch noch diverse Zwischenschritte erforderlich sind, auf die wir hier nicht näher eingehen wollen. Zum anderen stellt das von einem einfachen Compiler erzeugte Objektprogramm für den Programmierer meist einen großen schwarzen Kasten dar, in den hineinzusehen ihm verwehrt bleibt. Er kann das Programm in der Regel nicht einfach unterbrechen, um sich bestimmte Variablenwerte anzusehen oder Variablen bestimmte Testwerte zuweisen, um damit dann einen kritischen Programmteil ausführen zu lassen, mal eben eine Zeile ändern und was der Annehmlichkeiten beim Programmtest mit einem Interpreter mehr sind. Bessere Compiler bieten zwar eine Reihe von Optionen und Hilfsprogrammen für die Fehlersuche und das Programmtesten an, jedoch bleibt auch hier, verglichen mit einem Interpreter, diese Arbeit reichlich unbequem. Ideal ist es sicherlich, äquivalente Interpreter und Compiler zur Verfügung zu haben. Auch gewisse Mischformen wie zum Beispiel bei der Sprache Forth sind hier interessant.</p>
+
+        <h2>Strubs — eine Mischung von Interpreter und Compiler</h2>
+
+        <p>Um nun aber auf das Programm Strubs zurückzukommen: Auch hier haben wir es in gewisser Hinsicht mit einer Mischform zu tun. Das selbst nicht lauffähige Quellprogramm, welches der Programmierer unter Benutzung der neuen Befehle erstellt, wird von Strubs nicht in Maschinensprache übersetzt, sondern in ein normales Basic-Programm, das dann wie bisher interpretiert wird. Dabei werden Programmteile, die keine Erweiterungen enthalten, mehr oder weniger unverändert übernommen. Dieses von Strubs erzeugte Objektprogramm kann nun wie jedes andere Basic-Programm — auch mit Hilfe von Toolkits — gelistet, ausgetestet und sogar geändert werden. Schließlich ist es dann noch möglich, dieses Objektprogramm mit Hilfe eines Basic-Compilers, wie zum Beispiel dem Austro Compiler, weiter zu übersetzen. Besonders hilfreich ist es, daß einander entsprechende Programmzeilen im Quellprogramm und im Objektprogramm gleiche Zeilennummern besitzen, so daß der Programmierer sich ohne Schwierigkeiten im Objektraum zurechtfinden kann. Gegenüber der Methode, den Basic-Interpreter zu erweitern, bietet dieses Verfahren Geschwindigkeitsvorteile: Diese ergeben sich einerseits aus der Tatsache, daß alle Kommentare und Leerzeichen gelöscht werden können, andererseits wird wie beim Compiler ein Teil der Sucharbeit während der Übersetzung erledigt. Dadurch werden zum Teil erst neue Anweisungen ermöglicht, deren Realisierung im Rahmen einer Interpretererweiterung zu aufwendig wäre.</p>
+
+        <h2>Wer sucht, der findet: aber wann?</h2>
+
+        <p>Daß sich die Suchzeit überhaupt in erträglichen Grenzen hält, liegt nun daran, daß der Programmtext selbst nicht durchsucht werden muß. Vielmehr braucht der Interpreter nur entlang der Kette aus Zeilennummern und Zeigern zur nächsten Zeile zu suchen, bis die gewünschte Zeilennummer gefunden ist (Bild 1). Sollte nun der Interpreter aber bei nicht erfüllter Bedingung in einer IF-Anweisung das zugehörige ELSE suchen, bei nicht erfüllter Eingangsbedingung einer FOR-Schleife das zugehörige NEXT oder zu einem WHILE das END-WHILE, dann müßte der gesamte Programmtext selbst durchsucht werden.</p>
+
+        <figure>
+            <img src="98-1.png" alt="">
+            <figcaption>Bild 1. Struktur eines Basic-Programms und dessen Lage im Arbeitsspeicher</figcaption>
+        </figure>
+
+        <h2>Interpreter durchlaufen jede Schleife mindestens einmal</h2>
+
+        <p>Deshalb arbeiten die Basic-Interpreter im allgemeinen so, daß solche Blöcke — wie die FOR-Schleife — mindestens einmal durchlaufen werden. Deshalb muß bei solchen Interpretern — sofern sie überhaupt ein ELSE kennen — dieses in der gleichen Programmzeile wie das zugehörige IF stehen. Deshalb kennt zum Beispiel Simons Basic die REPEAT-UNTIL-Anweisung, die immer mindestens einmal durchlaufen wird, nicht aber die WHILE-Anweisung. Ein Precompiler aber kann bei der Übersetzung den Abschlußbefehlen eines Blockes — wie ELSE oder END-WHILE — ihre Zeilennummern zuordnen, so daß beim Programmlauf nicht mehr der Programmtext selbst, sondern nur die Kette der Zeilennummern durchsucht werden muß.</p>
+
+        <h2>Vorübersetzung nicht nur beim Precompiler</h2>
+
+        <p>Die Methode der Vorübersetzung zur Erhöhung der Laufgeschwindigkeit benutzt im übrigen auch der Basic-Interpreter des Commodore 64. Und zwar findet sich die Übersetzungsfunktion im Editor: Sofort bei der Eingabe einer Zeile werden die Basic-Befehle, die aus mehreren Zeichen bestehen, in nur 1 Byte lange Zeichen, die sogenannten TOKENS, übersetzt. Eine Liste dieser Tokens findet sich zum Beispiel im Programmierhandbuch zum VC 20. Diese Vorübersetzung bringt zwar einen schönen Gewinn an Geschwindigkeit, hat allerdings den Nachteil, daß Programmtexte nicht mehr mit komfortableren Editor- beziehungsweise Textprogrammen erstellt werden können. Für uns ist jedoch vor allen Dingen wichtig, daß diese TOKENS berücksichtigt werden müssen, falls der Befehlsvorrat von Strubs erweitert werden soll, oder falls Programme für Interpretererweiterungen wie Simons Basic bearbeitet werden sollen. Aber auf diesen Punkt werden wir ein anderes Mal ausführlicher eingehen.</p>
+
+        <p>Wenn wir mit Strubs arbeiten, haben wir es — wie bei jedem Compiler — mit (mindestens) drei Programmen zu tun: Dem Übersetzungsprogramm, dem Quellcode (Quellprogramm) und dem lauffähigen Objektprogramm. Diese Programme müssen sich nun irgendwie den zur Verfügung stehenden Speicherplatz teilen. Daß das Übersetzungsprogramm, um arbeiten zu können, im Hauptspeicher stehen muß, versteht sich von selbst.</p>
+
+        <p>Eine Möglichkeit wäre nun, daß das Übersetzungsprogramm das Quellprogramm von der Diskette einliest, und gleichzeitig das erzeugte Objektprogramm auf Diskette schreibt. Der Compiler zu Simons Basic arbeitet zum Beispiel nach dieser Methode. Da ein Compiler jedoch einen Programmtext in der Regel mindestens zweimal durchliest — man spricht in diesem Fall von 2-Pass-Compilern —, ist es günstiger, wenn das Quellprogramm sich ebenfalls im Hauptspeicher befindet. Diesen Weg gehen zum Beispiel Pascal 64 und Strubs. Um nun den zur Verfügung stehenden Platz aufzuteilen, benutzt zum Beispiel Pascal 64 eine sehr einfache und wirksame Methode: Der Compiler ist selbst in Basic geschrieben und enthält eine unsichtbare Zeile mit der Zeilennummer 0, die ihrerseits einen Sprung zum Übersetzungsprogramm enthält. Ein Pascalprogramm wird nun einfach mit den Zeilennummern zwischen 1 und 9999 in das Compilerprogramm eingefügt.</p>
+
+        <p>Dieses Verfahren hat allerdings den Nachteil, daß Programme immer nur zusammen mit dem Compiler abgespeichert und editiert werden können. Insbesondere ist es damit nicht möglich, Quellprogramme aus fertigen Bausteinen (Modulen) zusammenzusetzen.</p>
+
+        <h2>Strubs geht andere Wege</h2>
+
+        <p>Aus diesem Grund wurde für Strubs ein anderer Weg gewählt: Entsprechend Bild 1 wurde der Speicher des Commodore 64 in drei Bereiche aufgeteilt. Am Anfang des Arbeitsspeichers steht das Programm Strubs (Pointer in Zelle 43/44). Der Edit-Bereich für Quellprogramme beginnt bei (Wert der Variablen EA). Daran anschließend befindet sich der (gemeinsame) Variablenbereich (Pointer in Zelle 45/46). Um nun vom Edit-Bereich aus bequem in den anderen Speicherbereich umschalten und die Übersetzung starten zu können, benutzt Strubs selbst eine kleine Interpretererweiterung, die, wie versprochen, kurz vorgestellt werden soll.</p>
+
+        <p>Die Eingabe von »!« bewirkt nun dasselbe wie die Befehlsfolge »POKE 44,8: RUN«. Das entsprechende Assemblerlisting findet sich in Bild 2. Das kleine Programm »Erweiterung« holt zunächst den nächsten Befehl. Dann muß für die Routine »Befehl ausführen« der Status gerettet werden, da die CHARGET-Routine damit wichtige Informationen übermittelt. (Dies ist wichtig und wurde in dem unten erwähnten Buch übersehen.) Nachdem verglichen wurde, ob ein neuer Befehl vorliegt, wird dann entsprechend zum normalen Programmverlauf oder zur Erweiterungsroutine verzweigt. Für eigene Versuche mit Interpretererweiterungen können an dieser Stelle beliebige Maschinenprogramme (gegebenenfalls mit weiteren Decodierungen) gesetzt werden. Nur sollte zum Abschluß – anders als hier, wo ein Basic-Befehl aufgerufen wird – ein Sprung zur Interpreterroutine $A7E4 erfolgen, wo dann der nächste Befehl bearbeitet wird. Um nun die Erweiterung in den Basic-Interpreter einzubinden, benötigen wir dann nur noch eine kurze Initialisierungsroutine, die den Zeiger in $0308 auf den Anfang der Erweiterung setzt.</p>
+
+        <figure>
+            <pre>
+Erweiterung:
+02C0  207300  JSR 0073  ; Charget, nächstes Zeichen holen
+02C3  08      PHP       ; Status retten
+02C4  C921    CMP #21   ; »!«, neuer Befehl?
+02C6  F004    BEQ 02CC
+02C8  28      PLP       ; nein, dann Status wiederherstellen
+02C9  4CE7A7  JMP A7E7  ; und normalen Befehl ausführen
+02CC  28      PLP
+02CD  A908    LDA #08   ; Erweiterungsroutine:
+02CF  852C    STA 2C    ; entspricht Poke 44,8: RUN
+02D1  A98A    LDA #8A   ; RUN-TOKEN
+02D3  4CE7A7  JMP A7E7  ; Befehl ausführen
+
+INIT:
+02EE  A9C0    LDA #C0   ; Erweiterung, Low Byte
+02F0  8D0803  STA 0308
+02F3  A902    LDA #02   ; Erweiterung, High Byte
+02F5  8D0903  STA 0309
+02F8  60      RTS
+</pre>
+            <figcaption>Bild 2. Interpreter-Erweiterung</figcaption>
+        </figure>
+
+        <p>Wer selbst solche Erweiterungen entwickeln möchte, findet weitere Informationen und viele Anregungen in dem Buch »64 Intern« von Data Becker. Für weitergehend Interessierte empfiehlt sich die gut verständliche Einführung »Compilerbau« von N. Wirth, Teubner, Stuttgart 1981.</p>
+
+        <h2>Strubs stellt sich vor</h2>
+
+        <p>Abschließend wollen wir nun das Programm Strubs kurz vorstellen. Am Anfang der Programmentwicklung standen folgende Vorstellungen, die durch das Programm erfüllt werden sollten:</p>
+
+        <ol>
+            <li>Unabhängigkeit von Zeilennummern</li>
+            <li>Unterstützung strukturierter Programmierung</li>
+            <li>Unterstützung modularer Programmentwicklung</li>
+            <li>Erweiterung der Dokumentationsfähigkeit des Programmtextes. Dabei sollte das Programm</li>
+            <li>einfache Handhabung gewährleisten und</li>
+            <li>effiziente Fehlersuche ermöglichen.</li>
+        </ol>
+
+        <p>Die Unabhängigkeit von Zeilennummern wird erreicht durch die Verwendung beliebig langer Labels oder relativer Sprünge anstelle von Zeilennummern.</p>
+
+        <p>Die wichtigsten Kontrollstrukturen höherer Programmiersprachen werden von Strubs zur Verfügung gestellt:<br>
+            IF – THEN – FI<br>
+            IF – THEN – ELSE – FI<br>
+            WHILE – EWHILE<br>
+            REPEAT – UNTIL<br>
+            LOOP – EXIT (beliebig oft) – ELOOP<br>
+            CASEOF – OF (beliebig oft) – ELSE (optional) – ECASE</p>
+
+        <p>Durch die Unabhängigkeit von Zeilennummern und eine EXTERN-DECLARATION wird das Anlegen einer Modulbibliothek – sowohl auf Quellprogramm- als auch auf Objektprogrammebene – unterstützt.</p>
+
+        <h2>Mit Strubs werden Sie ein vielseitiges Werkzeug in Händen halten</h2>
+
+        <p>Der Dokumentationsfähigkeit des Programmtextes dienen neben den bereits erwähnten Marken und Kontrollstrukturen ein Tabulator und Kommentare an beliebiger Stelle auch innerhalb einer Zeile, ja selbst innerhalb eines Variablennamens (zum Beispiel A'US'G'ABE'% = AG%).</p>
+
+        <p>Programmtexte können wie gewohnt mit dem normalen Basic-Editor geschrieben werden.</p>
+
+        <p>Schließlich werden wir zur Illustration der Erweiterung des Befehlssatzes von Strubs noch eine MAKRO-Funktion implementieren. Von besonderer Bedeutung ist, daß das Programm von Anfang an unter dem Aspekt möglichst einfacher Erweiterbarkeit konzipiert wurde. Damit konnte das Programm im Bootstrapping-Verfahren entwickelt werden, so daß es jetzt selbst sowohl als Quellprogramm wie auch als Objektprogramm vorliegt. Wem es Spaß macht, der mag Strubs einfach auch als ein generelles Übersetzungsprogramm zur Aufbereitung von Programmtexten auffassen und seine gegenwärtigen Funktionen als Beispiel möglicher Implementationen.</p>
+
+        <h2>Die Befehlsstruktur</h2>
+
+        <p>Gehören Sie auch zu denjenigen, die sich manchmal ein Programm aus einer Zeitschrift vornehmen, um zu analysieren, wie es arbeitet oder um eventuell Teile des Programms für eigene Programmprojekte zu verwenden? Dann erinnern Sie sich bestimmt an Programme, bei denen Sie sich verzweifelt von Sprung zu Sprung bewegen und nach nicht allzu langer Zeit vollkommen den Überblick verlieren. Oder vielleicht kennen Sie folgende Situation: Sie schreiben ein Programm und erinnern sich angesichts eines bestimmten Problems, daß Sie ein ganz ähnliches Problem schon einmal in einem anderen Programm gelöst haben. Aber sobald Sie sich den alten Programmtext vornehmen, um den entsprechenden Programmteil in ihr neues Programm zu übernehmen, müssen Sie enttäuscht feststellen, daß diese spezielle Problemlösung so sehr in das Programmgeflecht verwoben ist, daß es Ihnen weitaus einfacher scheint, den entsprechenden Programmteil vollkommen neu zu entwickeln.</p>
+
+        <p>Die Ursache für solche Erscheinungen liegt zum Teil darin, daß viele Basic-Programme mehr oder weniger aus der Sicht des Computer der »Basic-Maschine« — direkt am Computer nach dem Verfahren von Versuch und Irrtum entwickelt werden. Das kann in Einzelfällen sogar soweit führen, daß man zum Schluß zwar sieht, daß das Programm läuft, aber selbst nicht so recht weiß, warum eigentlich und wie es funktioniert. Der Hauptgrund für solche Unübersichtlichkeit aber liegt in der Verwendung zahlreicher wilder Sprünge und ausgefallener Programmier-Tricks. (Daß die Verwendung von GOTO-Anweisungen den mathematischen Beweis für die Korrektheit von Programmen praktisch unmöglich macht, ist für den Informatiker interessant, braucht uns hier aber nicht zu interessieren).</p>
+
+        <p>Den entgegengesetzten Weg geht die strukturierte Programmierung. Sie bedeutet vor allem sorgfältige Planung und den Verzicht auf GOTOs und unübersichtliche Programmiertricks. Hier steht die systematische Analyse des Problems im Vordergrund. Die eigentliche Codierung, das heißt die Formulierung des Programmtextes in einer bestimmten Programmiersprache, spielt nur eine untergeordnete Rolle.</p>
+
+        <p>In der Problemanalyse geht es darum, ein gegebenes Problem in relativ selbständige Teilprobleme zu zerlegen und deren Beziehungen zueinander festzulegen. Den Aufbau des Programms Strubs mit den jeweiligen Zeilennummern können Sie Bild 3 entnehmen. Das komplette Objektprogramm ist ebenfalls abgedruckt (siehe Listing 1).</p>
+
+        <figure>
+            <img src="98-3.png" alt="">
+            <figcaption>Bild 3. Aufbau von Strubs</figcaption>
+        </figure>
+
+        <p>Entsprechend setzt sich das strukturierte Programm aus einer Reihe möglichst selbständiger Programmeinheiten zusammen. Dieses Vorgehen spiegelt sich im Konzept der Blöcke und Module.</p>
+
+        <p>Ein Block ist eine Anweisung oder eine Folge von Anweisungen mit genau einem Eingang und genau einem Ausgang. Das heißt man darf weder in einen solchen Block hineinspringen, noch aus diesem Block herausspringen. Solche Blöcke können entweder aneinander gereiht oder beliebig tief ineinander geschachtelt werden; sie dürfen sich aber nicht überschneiden. In letzterer Hinsicht verhält es sich mit diesen Blöcken also genauso, wie bei den bekannten FOR-Schleifen in Basic.</p>
+
+        <p>Ein strukturiertes Programm besteht nun ausschließlich aus einer geordneten Hierarchie solcher Blöcke. Der kleinste mögliche Block besteht aus einer einzelnen Anweisung, wie zum Beispiel PRINT "Text". Der größte, umfassendste Block besteht aus dem Programm selbst.</p>
+
+        <p>Da ist zunächst einmal die einfache IF-Anweisung, die schon von Basic her bekannt ist. Dieses normale Basic-IF kann natürlich wie alle Basic-Befehle weiterhin benutzt werden. Zusätzlich bietet Strubs aber eine erweiterte Form, bei welcher der THEN-Teil nicht auf den Rest einer Programmzeile begrenzt ist, sondern beliebig viele Zeilen umfassen kann, die durch den Befehl '!FI' — einfach ein umgedrehtes IF — abgeschlossen werden. Ein Beispiel:</p>
+
+        <pre>
+10 ! IF X=Y THEN
+20 :    PRINT "X und Y"
+30 :    PRINT SIND GLEICH"
+...
+99 !FI
+</pre>
+
+        <p>Ist die Bedingung hinter IF erfüllt, so werden die Zeilen zwischen der IF- und der FI-Anweisung ausgeführt, ansonsten wird das Programm sofort hinter der FI-Zeile fortgesetzt.</p>
+
+        <p>Daneben existiert selbstverständlich auch die vollständige Form</p>
+
+        <pre>
+10 !IF X=Y THEN
+20:     PRINT "GLEICH’
+50 !ELSE
+60 :    PRINT "UNGLEICH"
+99 !FI
+</pre>
+
+        <p>Ist die Bedingung erfüllt, dann wird der Block zwischen IF und ELSE ausgeführt, sonst der Block zwischen ELSE und FI.</p>
+
+        <p>Für den Fall, daß mehr als nur zwei Fälle zu unterscheiden sind, bietet Strubs die CASE-Anweisung:</p>
+
+        <pre>
+10 !CASEOF X&lt;0 THEN
+15 :    PRINT "KLEINER ALS 0”
+...
+40 ! OF X=0 THEN
+45 :    PRINT "GLEICH 0"
+...
+60 ! OF X&gt;0 AND Y&lt;XTHEN
+65 : PRINT "X&gt;0 UND Y&lt;X"
+...
+80 ! ELSE
+85 :    PRINT "KEINER DER FÄLLE TRIFFT ZU"
+99 ! ECASE
+</pre>
+
+        <p>Mit dieser Struktur können beliebig viele Fälle unterschieden werden, wobei jedes OF mit einer beliebigen Bedingung verbunden werden kann. Es sollte aber darauf geachtet werden, daß sich die Bedingungen gegenseitig ausschließen (sonst wird das erste Auftreten einer erfüllten Bedingung gewählt). Nach der Bearbeitung des entsprechenden Falles wird das Programm immer hinter ECASE fortgesetzt. Die Möglichkeit, daß keiner der Fälle zutrifft, kann mit Hilfe der ELSE-Anweisung behandelt werden. Ist dies nicht erforderlich, kann der ELSE-Teil auch entfallen.</p>
+
+        <p>Damit kommen wir nun zu den Schleifen. Die FOR-Schleife kann wie bisher benutzt werden. Die WHILE-Schleife wird durchlaufen, solange die Bedingung erfüllt ist. Anschließend wird das Programm hinter EWHILE fortgesetzt. Da die Bedingung am Anfang der Schleife abgefragt wird, kann es vorkommen, daß die Schleife auch überhaupt nicht durchlaufen wird. Ein Beispiel:</p>
+
+        <pre>
+10 ! WHILE X&lt;5 !DO
+20 :  PRINT "IMMER NOCH KLEINER ALS 5"
+30 : X = X + 1
+...
+99 !EWHILE
+</pre>
+
+        <p>Von der WHILE-Schleife unterscheidet sich die REPEAT-Schleife in zwei Punkten: Erstens wird die Schleife durchlaufen, bis die Bedingung erfüllt ist, also solange sie nicht erfüllt ist. Zweitens wird die Bedingung erst am Ende der Schleife abgefragt, so daß die Schleife immer mindestens einmal durchlaufen wird. In diesem wie im nächsten Beispiel bezieht sich die Zeile 30 auf den Fall, daß X beim Eintritt in die Schleife größer als 5 ist:</p>
+
+        <pre>
+10 ! REPEAT
+20 :  PRINT "X KLEINER ALS 5"
+30 : PRINT "VIELLEICHT ABER AUCH NICHT"
+40 : X = X+1
+...
+99 ! UNTIL X >= 5
+</pre>
+
+        <p>Eine weniger weit verbreitete, aber sehr mächtige Schleifenstruktur stellt die LOOP-Schleife dar (sie befindet sich zum Beispiel in der Programmiersprache ADA):</p>
+
+        <pre>
+10 ! LOOP
+30 :  PRINT "EVENTUELL GROESSER ALS 5"
+40 :  IF X>=5 THEN !EXIT
+50 :  PRINT"KLEINER ALS 5"
+60 :  X = X+1
+99 !ELOOP
+</pre>
+
+        <p>Es handelt sich dabei um eine Endlosschleife, welche mit Hilfe des Befehls EXIT verlassen werden kann. Diese Schleife bietet im wesentlichen zwei Vorteile: Zum einen muß die Bedingung nicht entweder am Anfang oder am Ende der Schleife stehen, sondern kann an jeder beliebigen Stelle innerhalb des Blockes abgefragt werden. Darüber hinaus ist das Beenden der Schleife nicht nur von einer Bedingung abhängig, sondern die LOOP-Schleife kann beliebig viele EXIT-Anweisungen enthalten (dadurch wird nicht die oben erwähnte Forderung nach nur einem Ausgang verletzt, da das Programm in allen Fällen hinter dem ELOOP fortgesetzt wird). Damit eignet sich diese Konstruktion insbesondere gut für die Behandlung von Ausnahmen wie zum Beispiel von Eingabebefehlen etc. (eine Angelegenheit, die zum Beispiel in Pascal recht umständlich sein kann, falls man auf GOTOs verzichten will oder muß).</p>
+
+        <p>In Bild 4 (das Zeichen ' kennzeichnet Kommentare) sehen Sie ein Beispiel für geschachtelte LOOP-Schleifen. Die Ausführung einer EXIT-Anweisung bewirkt die Fortsetzung des Programms bei der ersten Zeile hinter derjenigen Schleife, welch© diese EXIT-Anweisung am nächsten umschließt. Im Beispiel enthält die äußere Schleife zwei EXIT-Anweisungen — eine davon vor, die andere hinter der inneren Schleife. Die innere Schleife enthält eine EXIT-Anweisung. Grafisch lassen sich blockstrukturierte Programme am besten durch Struktogramme — anstelle der verbreiteten Flußdiagramme — darstellen. Das Struktogramm für die LOOP Schleifen finden Sie in Bild 5. Über die Diagramme der anderen Strukturen und den Umgang mit Struktogrammen können Sie sich an anderer Stelle in dieser Zeitschrift oder in den unten aufgeführten Büchern informieren. Kommen wir nun zu den Modulen. Dabei handelt es sich um besondere Blöcke, die ein bestimmtes Teilproblem — beispielsweise das Zeichnen einer Linie in einem Grafikprogramm — unter möglichst weitgehender Unabhängigkeit vom restlichen Programmtext bearbeiten. Stellen Sie sich vor, Sie finden in einer Zeitschrift ein Pascal-Programm zur Einstellung von Grafiken. Dieses Programm benutzt zum Beispiel die Anweisung PLOT (X,Y) zum Zeichnen eines Punktes mit den Koordinaten X und Y. Ihr Freund möge eine Sprache Super-Pascal besitzen, die diese Anweisung standardmäßig enthält. Er tippt das Programm ein, es läuft — fertig. Sie selbst besitzen aber nur ein mageres Mini-Pascal, das diesen Befehl nicht kennt. Nun, mit Pascal ist das kein Problem: Sie schreiben sich eine Procedur PLOT (X,Y) fügen diese in das Programm ein — fertig. An dem Programmtext selbst brauchen Sie nicht die geringste Änderung vorzunehmen. Ja, brauchen ihn nicht einmal näher anzusehen. Woran liegt das?</p>
+
+        <figure>
+            <pre>
+510 '*********************************
+520 '* GESCHACHTELTE LOOP-BLOECKE    *
+530 '*********************************
+540 '
+620 !LOOP 'L1
+630 :   PRINT"AEUSSERE LOOP1"
+640 :   IF X=1 THEN !EXIT 'LOOP1
+650 :   !LOOP 'L2
+660 :     PRINT "INNERE LOOP2"
+670 :     IF X=0 THEN !EXIT 'LOOP2
+680 :   !ELOOP ' L2
+690 '   HIER WIRD PROGR. NACH EXIT LOOP2 FORTGESETZT
+700 :   X=X+1
+710 :   !IF X=2 THEN
+720 :       PRINT "LOOP1 VERLASSEN:":!EXIT 'LOOP1
+730 :   !FI
+740 :   X=X+1
+750 !ELOOP 'L1
+760 PRINT"HIER WIRD PROGRAMM NACH EXIT LOOP 1 FORTGESETZT"
+770 '
+</pre>
+            <figcaption>Bild 4. Geschachtelte Loop-Schleife</figcaption>
+        </figure>
+
+        <figure>
+            <img src="98-5.png" alt="">
+            <figcaption>Bild 5. Struktogramm der Loop-Schleife</figcaption>
+        </figure>
+
+        <p>Vom Problem her — dem Erstellen einer Grafik — ist das Zeichnen eines Punktes das Zeichnen eines Punktes. Das einzige, was interessiert, ist, daß dazu zwei Koordinaten erforderlich sind. Dieser Tatsache trägt die Sprache Pascal dadurch Rechnung, daß sie keinen Unterschied macht zwischen dem Aufruf von vorgegebenen Standardanweisungen und selbst definierten Prozeduren.</p>
+
+        <p>Wenn Sie in einem Basic-Programm irgendwo eine Zeile PRINT "TEXT” stehen haben, erwarten Sie selbstverständlich, daß dadurch nicht 50 Zeilen weiter der Wert der Variablen A verändert wird. Entsprechend sorgt nun Pascal dafür, daß eine selbst definierte Prozedur genausowenig Auswirkungen auf andere Programmteile hat wie der Aufruf einer Standard-Anweisung. Die interne Arbeitsweise einer solchen Prozedur wird vor der Programmumgebung genauso versteckt, wie dies bei der internen Arbeitsweise von im Sprachumfang enthaltenen Anweisungen der Fall ist. Entsprechend nennt man dieses Konzept auch »Information Hiding«. Programmiersprachen wie ADA, MODULA oder SIMULA bieten in dieser Hinsicht noch sehr viel weitergehende Möglichkeiten als Pascal.</p>
+
+        <p class="noindent">Schnittstellen:</p>
+
+        <p>Der Datenaustausch mit der Umgebung eines Moduls erfolgt über genau definierte Schnittstellen. Bei einer solchen Schnittstelle handelt es sich um eine Menge derjenigen Annahmen, die die Programmumgebung über ein Modul macht — das heißt welche Daten es als Eingabe erwartet, welche Daten es daraufhin wieder ausgibt und welche anderen Module es seinerseits benötigt.</p>
+
+        <p class="noindent">Modulbibliothek:</p>
+
+        <p>Die relative Eigenständigkeit solcher Module sorgt nun nicht nur für einfache Änderbarkeit und Erweiterbarkeit, sondern ermöglicht auch das Anlegen einer sogenannten Modulbibliothek. Eine solche Bibliothek enthält eine Reihe von Programmbausteinen, die je nach Bedarf in zu entwickelnde Programme eingefügt werden können. Dabei kann es sich um Sortierroutinen, Grafik-Routinen, mathematische und statistische Routinen und so weiter handeln. Aber auch die Entwicklung von Spielen läßt sich auf diese Weise vereinfachen: Man kann Bibliotheken fertiger Sprites, von eigenen Zeichensätzen oder von diversen Soundroutinen anlegen.</p>
+
+        <p>Das wichtigste Hilfsmittel zur Unterstützung modularer Programmentwicklung stellen sicherlich die lokalen Variablen dar. Leider gibt es solche nicht in Basic und auch Strubs kann keine lokalen Variablen bieten. So ist es auch weiterhin erforderlich, beim Einsetzen oder Ändern eines Moduls darauf zu achten, ob und an welchen Stellen Variablen des Moduls in anderen Programmteilen benutzt werden, und gegebenenfalls Umbenennungen vorzunehmen. Der zweite große Nachteil von Basic — die leidigen Zeilennummern — braucht uns dagegen nur noch wenig zu beschäftigen. Strubs bietet alle Möglichkeiten, die erforderlich sind, um ein Programm vollkommen unabhängig von Zeilennummern zu schreiben Als erstes sind da natürlich die oben besprochenen Kontrollstrukturen zu nennen. Darüber hinaus können bei allen Sprüngen Zeilennummern durch Labels (Marken) ersetzt werden. Solche Labels werden durch das Zeichen »£« gekennzeichnet und abgeschlossen durch ein Leerzeichen, Doppelpunkt, Komma oder Zeilenende. Die dürfen zwar reservierte Basic-Worte enthalten, dann können sich aber wegen der in der letzten Folge erwähnten Tokens bei der Ausgabe der Markentabelle seltsame Effekte ergeben. Die Labels werden definiert, indem sie an den Anfang einer Zeile gesetzt werden und können beliebig lang sein:</p>
+
+        <pre>
+10   £X-AUSGEBEN:
+20 : PRINT "X:";X
+30   RETURN
+...
+200 X=1:GOSUB £X-AUSGEBEN
+210 X=2:GOSUB £X-AUSGEBEN
+</pre>
+
+        <p>Schließlich bietet Strubs noch die Möglichkeit relativer Sprünge. Diese dienen vor allem dazu, kurze Schleifen innerhalb einer einzigen Zeile zu konstruieren, ohne dafür extra ein Label zu definieren:</p>
+
+        <p>90 NC=NC+1:C=PEEK(NC):IF C>0 THEN Z$+CHR$(C): GOTO £THIS</p>
+
+        <p>Der Befehl GOTO £THIS bewirkt einen Sprung an den Anfang derjenigen Zeile, in der dieser Befehl steht.</p>
+
+        <p>Da bei der Arbeit mit Strubs Quellprogramme in der Regel weit umfangreicher als die Objektprogramme sind, bietet Strubs die EXTERN-DEKLARATION, die es ermöglicht, Module und Programmteile getrennt zu übersetzen und erst auf der Objektprogrammebene zusammenzufügen. Hierbei müssen die einzelnen Programmteile allerdings verschiedene Zeilennummern belegen. In der Extern-Deklaration wird ein Name vereinbart, unter dem ein Programm ein externes Modul ansprechen kann. Diesen Namen wird die Einsprungadresse (bei Maschinenprogrammen) beziehungsweise die Zeilennummer bei Basic-Routinen zugewiesen:</p>
+
+        <pre>
+20 REM VEREINBARUNG:
+30 ! EXT: £MAPRO:740,£PLOT: 50000
+...
+90 REM AUFRUF:
+99 SYS £MAPRO: X=13:Y=90:GOSUB £PLOT
+</pre>
+
+        <p>Kommen wir abschließend zur Dokumentation: Vom Hobby-Programmierer kann kein Mensch erwarten, daß er Berge von Dokumentationsmaterial anlegt, die den Umfang des Programmtextes um ein Vielfaches übersteigen. Deshalb ist es gerade hier wichtig, Programme weitgehend selbstdokumentierend zu schreiben. Im Gegensatz zu höheren Programmiersprachen mit ihren zahlreichen Deklarationspflichten ist der Basic-Programmierer nahezu ausschließlich auf Kommentare angewiesen. Da Strubs Kommentare bei der Übersetzung eleminiert, stehlen diese weder Speicherplatz noch Laufzeit. Der Programmierer kann also ohne Bedenken einen exzessiven Gebrauch von Kommentaren machen.</p>
+
+        <p>Kommentare werden gekennzeichnet durch das Zeichen »'«. Steht dieses Zeichen direkt am Zeilenanfang, so wird die ganze Zeile gelöscht. Sonst wird der Programmtext bis zum zweiten »'« oder bis zum Zeilenende überlesen. Außer innerhalb von Befehls- und Markennamen können Kommentare an jeder beliebigen Programmstelle eingefügt werden. Kommentare, die in das Objektprogramm übernommen werden sollen, können wie bisher mit REM in den Programmtext eingefügt werden. Beispiel:</p>
+
+        <pre>
+10 'DIESE ZEILE WIRD VOLLSTÄNDIG GELÖSCHT
+20 A'US'G'ABE'$="ENTSPRICHT AG$" 'KOMMENTAR
+</pre>
+
+        <p>Die Lesbarkeit von strukturierten Programmen wird verbessert durch das Einrücken von Zeilen entsprechend der Blockstruktur. Hierzu dient der Tabulator (Bild 4): Ein Doppelpunkt am Zeilenanfang gefolgt von Leerzeichen.</p>
+
+        <p>Wenn Sie Quellprogramme schreiben, achten Sie vor allem auf folgendes: Jeder der neuen Befehle muß durch ein Ausrufezeichen gekennzeichnet werden, zum Beispiel !REPEAT, und benötigt — außer !DO — eine eigene Programmzeile. Folgende Konstruktion ist also zum Beispiel nicht erlaubt:</p>
+
+        <pre>
+40 !REPEAT X = X +1 !UNTIL X > 5
+</pre>
+
+
+        <p>Marken beginnen grundsätzlich mit einem Pfund-Zeichen £.</p>
+
+        <p>Um die Korrektheit von Konstruktionen zu überprüfen, können Sie die Syntax-Diagramme in Bild 6 benutzen. Wenn sich ein Weg entlang der Linien finden läßt, der der Konstruktion entspricht, dann ist diese in Ordnung. Sie können sich aber auch an den verschiedenen Beispielen im Rahmen dieser Artikelfolge orientieren.</p>
+
+        <p>Das beste Beispiel für ein Quellprogramm erhalten Sie, wenn Sie die Programmdiskette mit dem Programm Strubs bestellen (wird allerdings erst ab der nächsten Ausgabe angeboten). Diese Diskette enthält neben dem lauffähigen Objektprogramm, das in der letzten Ausgabe abgedruckt wurde, auch das ausführlich dokumentierte Quellprogramm von Strubs, dessen Abdruck aus Platzgründen nicht möglich ist.</p>
+
+        <figure>
+            <img src="98-6.png" alt="">
+            <figcaption>Bild 6. Syntaxdiagramme der Befehle</figcaption>
+        </figure>
+
+        <h2>Programmentwicklung mit Strubs</h2>
+
+        <p>Bei der Blockschachtelung ist darauf zu achten, daß sich verschiedene Blöcke nicht überschneiden dürfen und daß jeder Block korrekt abgeschlossen wird. Hierbei kann man sich immer das Beispiel der FOR-NEXT-Schleifen in Basic vor Augen halten. Vollkommen unmöglich ist beispielsweise folgende Konstruktion:</p>
+
+        <pre>
+10 !REPEAT
+20 : !WHILE ... !DO
+30 !UNTIL ...
+40 : !EWHILE
+</pre>
+
+
+        <p>Nun wird es aber allmählich Zeit, mit der Praxis zu beginnen. Laden Sie das Programm Strubs in Ihren Computer und starten es mit »RUN«. Nun erscheint ein Menü. Geben Sie hier »E« ein, um in den Editbereich zu gelangen (siehe dazu die erste Folge). Der Computer meldet sich mit »READY«, das heißt also, Sie befinden sich jetzt im Direktmodus. Hier können Sie nun (fast) so arbeiten, als sei Strubs gar nicht vorhanden. Geben Sie zunächst »NEW« ein. Jetzt können Sie das kleine Programm aus Bild 7 eintippen und wie sonst gewohnt mit »SAVE "RENUMBER.QP”,8« abspeichern.</p>
+
+        <p>Mit diesem »QP« hat es folgende Bewandnis: Bei Compilern ist es allgemein üblich, die verschiedenen Files, die zu den einzelnen Phasen der Übersetzung gehören, einheitlich zu kennzeichnen, der Austro-Compiler, arbeitet zum Beispiel mit den Files »name«, »p/name«, »z/name« und »c/name«. Um Quellprogramme und Objektprogramme auseinanderhalten zu können, sollten Sie sich entsprechend von Anfang an daran gewöhnen, dem Programme immer ein »QP« für Quellprogramm beziehungsweise ein »OP« für Objektprogramm hinzuzufügen. Nun kann das Programm übersetzt werden. Geben Sie ein »IRETURN« und es erscheint das Menü von Strubs. Die Übersetzung wird mit »U« gewählt. Strubs fragt nun nach dem Namen für das Objektprogramm. Geben Sie ein: RENUMBER.OP. Da das übersetzte Programm direkt auf Diskette geschrieben wird, achten Sie darauf, daß die Floppy eingeschaltet ist. Nun erscheint auf dem Schirm die Meldung »1. Lauf«, gefolgt von der Ausgabe der Blockstruktur. Nach Beendigung des 2. Laufs sollte die Meldung »0 FEHLER« erscheinen. Ist dies der Fall, dann können sie mit »E« wieder in den Edit-Bereich gelangen. Hier steht immer noch das Quellprogramm. Um sich das übersetzte Programm anzusehen, laden Sie es mit »LOAD "RENUMBER.OP",8«. Es sollte mit dem Listing in Bild 8 übereinstimmen. Aber starten sie das Programm nicht.</p>
+
+        <figure>
+            <pre data-filename="renumber.qp" data-name="Renumber (Quellprogramm)"></pre>
+            <figcaption>Bild 7. Das Quellprogramm des RENUMBER-Befehls</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="renumber.op" data-name="Renumber (Objektprogramm)"></pre>
+            <figcaption>Bild 8. Das von Strubs erzeugte Objektprogramm. Wie es in Strubs einzufügen ist, steht auf Seite 107.</figcaption>
+        </figure>
+
+        <p>Jetzt übersetzen Sie einmal genauso verschiedene kleine Testprogramme — zum Beispiel die Beispiele aus der letzten Folge — und sehen sich die Ergebnisse an. Dabei werden Sie feststellen, daß einige Bedingungen im Objektprogramm in negierter Form erscheinen. Daß Basic keine boolschen Variablen kennt, hat eine wichtige Konsequenz: Beim Test, ob eine Variable ungleich 0 ist, darf man nicht — wie dies normalerweise häufig in Basic formuliert wird — beispielsweise schreiben</p>
+
+        <pre>
+IF A THEN ...,
+</pre>
+
+
+        <p>sondern muß bei jeder Bedingung die vollständige Form</p>
+
+        <pre>
+IF A&lt;&gt;0 THEN ...
+</pre>
+
+
+        <p>verwenden. Dies liegt daran, daß die Bedingung NOT(A) außer für —1 immer erfüllt ist.</p>
+
+        <p>Zweitens kann man sehen, daß in den Objektprogrammen manchmal neue Zeilen auftauchen, die das Quellprogramm nicht enthielt. Strubs generiert solche Zeilen als Sprungziele. Damit immer Platz für solche Zeilen ist, sollte der Abstand der Zeilennummern im Quellprogramm immer mindestens 2 betragen.</p>
+
+        <p>Ist bisher alles wie oben beschrieben verlaufen, dann können Sie sich freuen. Sind irgendwelche Fehler aufgetreten, dann vergleichen Sie noch einmal genau das Testprogramm mit dem Listing in Bild 7 und hoffen Sie, daß der Fehler hier liegt. Wenn Sie keine Abweichungen feststellen, dann haben Sie Pech — Sie haben das Programm Strubs falsch eingetippt.</p>
+
+        <p>Wie steht es aber mit Fehlern im Quellprogramm? Syntax-Fehler können sich auf drei verschiedene Arten bemerkbar machen: Vor allem Fehler, die nicht mit den neuen Befehlen zusammenhängen, führen wie gewohnt beim Lauf des Objektprogramms zu den bekannten Fehlermeldungen. Fehler in bezug auf die neuen Befehle quittiert Strubs mit Abbruch der Übersetzung, falls eine Fortsetzung nicht sinnvoll erscheint, oder mit Eintragung in eine Fehlerliste und gleichzeitiger Kennzeichnung der fehlerhaften Zeile im Objektprogramm. Die Fehlerliste kann man sich mit »F« ansehen.</p>
+
+        <p>Ein Abbruch der Übersetzung mit entsprechender Fehlermeldung am Bildschirm erfolgt vor allem bei Verstößen gegen die Blockstruktur (und bei Speicherplatzproblemen wie Stack-Overflow oder Listen voll). Bei Fehlern mit den Blöcken — zum Beispiel vor einem ELSE fehlt das IF oder zu einem WHILE fehlt das EWHILE etc. — gibt es ein Problem, das nicht nur bei Strubs, sondern generell bei allen Compilern auftaucht. Der Fehler wird nicht an der Stelle seines Auftretens bemerkt, sondern erst viel später. Die Zeilennummer bei einer Fehlermeldung wie »BLOCKSCHACHTELUNG: ANFANG FEHLT«, sagt also nichts weiter aus, als daß der Fehler erst hier bemerkt wurde. Um bei der Suche nach dem Fehler zu helfen, gibt Strubs aber während der Übersetzung ein Schema der Blockstruktur aus, mit dessen Hilfe sich solche Fehler leicht lokalisieren lassen. Bei Meldungen wie »zu viele Marken«, »zu viele WHILE/REPEAT« etc. empfiehlt es sich, das Programm in kleinere Teile zu zerlegen, diese getrennt zu übersetzen und anschließend wieder zusammenzufügen.</p>
+
+        <p>Wie man dazu vorgeht, behandeln wir weiter unten. Die entsprechenden Listen sind allerdings so großzügig dimensioniert, daß dieser Fall sehr selten eintreten wird.</p>
+
+        <p>Sollte während der Übersetzung aus irgendeinem Grund ein unkontrollierter Programmabbruch erfolgen (zum Beispiel OUT OF MEMORY ERROR), dann empfiehlt es sich mit »GOTO 5000« dafür zu sorgen, daß offene Disk-Files ordnungsgemäß geschlossen werden.</p>
+
+        <p>Die Beseitigung von Fehlern, die Strubs bei der Übersetzung entdeckt, gestaltet sich relativ einfach: Notieren Sie sich die Zeilennummern zu jedem Fehler und schalten in den Editbereich (mit »E«), Dort kann das Quellprogramm geändert werden, dann wird mit »!« und Wahl von »U« neu übersetzt. Da das Quellprogramm solange im Edit-Bereich bleibt, bis es durch »NEW« oder Laden eines anderen Programms gelöscht wird, kann dieser Vorgang solange wiederholt werden, bis der letzte Fehler beseitigt ist. Sobald die Übersetzung mit der Meldung »0 Fehler« beendet wird, geht es ans Testen des Objektprogramms.</p>
+
+        <p>Hierzu wird Strubs durch Eingabe von »S« verlassen. Dadurch wird ein Kaltstart ausgeführt, der die Interpretererweiterung abschaltet und den Speicher säubert. Nun laden Sie das Objektprogramm unter dem Namen, den Sie bei der Übersetzung angegeben haben und starten es mit RUN. Dieses Programm wird nun wie jedes normale Basic-Programm ausgetestet. Dazu können selbstverständlich auch Toolkits mit TRACE- und DUMP-Funktionen verwendet werden. Da die Zeilennummern denen des Quellprogramms entsprechen, empfiehlt es sich, ein Listing des Quellprogramms zur Hand zu haben. Fehler in der Programmlogik lassen sich damit leichter finden und beheben.</p>
+
+        <p>Die Bequemlichkeit, die Strubs dadurch bietet, daß Programmänderungen und Verbesserungen im Objektprogramm selbst vorgenommen und sofort ausgetestet werden können, erfordert auf der anderen Seite allerdings eine gewisse Disziplin, damit die Verbindung zum Quellprogramm nicht verloren geht. Jede vorgenommene Änderung sollte sorgfältig notiert und nicht zu viele Änderungen auf einmal vorgenommen werden. Dann wird wieder das Programm Strubs und das Quellprogramm (in den Editierbereich) geladen. Verbessern Sie das Quellprogramm entsprechend Ihren Notizen und übersetzen es erneut. Dieser Vorgang wird solange wiederholt, bis das Ergebnis zufriedenstellend ist.</p>
+
+        <p>Dieser soeben beschriebene Ablauf kann allerdings in den meisten Fällen vereinfacht werden: Bis auf zwei Ausnahmen können Objektprogramme auch direkt im Editbereich getestet werden. Damit entfällt die Notwendigkeit, Strubs für jede Übersetzung neu zu laden. Nach der Übersetzung wird mit »E« der Editbereich gewählt, dort das Objektprogramm geladen und getestet. Anschließend wird wieder das Quellprogramm in den Editbereich geladen, verbessert und mit »!« und »U« neu übersetzt und so weiter.</p>
+
+        <p>Bei Programmen, die nicht im Editbereich getestet werden können, handelt es sich 1. um Programme, die an einer festgelegten Stelle im Speicher stehen müssen. Strubs selbst ist solch ein Programm. Es muß unbedingt am normalen Basic-Anfang stehen. Solche Programme sind allerdings ziemlich selten. Häufiger dagegen findet sich der 2. Fall: Programme, die den Speicherbereich von 700 bis 800 verändern. Hier steht die in Folge 1 erwähnte Interpreter-Erweiterung von Strubs. Dadurch sind vor allem Programme betroffen, die in diesem Bereich Sprites oder Maschinenprogramme benutzen.</p>
+
+        <p>Kommen wir noch einmal auf das Schreiben und Editieren von Quellprogrammen zurück. Bisher haben wir nur davon gesprochen, daß die Programmtexte im Editbereich editiert wurden. Diese Methode hat insbesondere bei der Entwicklung umfangreicher Programme einen Nachteil: Da Strubs selbst mit einer Interpreter-Erweiterung arbeitet, kann man nicht gleichzeitig andere Interpreter-Erweiterungen — zum Beispiel Toolkits oder das DOS — benutzen. Möchte man auf Befehle wie MERGE, AUTO, FIND etc. nicht verzichten, dann kann man die Quellprogramme vollkommen unabhängig von Strubs entwickeln und erst anschließend das fertige Quellprogramm in den Editbereich laden.</p>
+
+        <p>Es zeigt sich, daß die meisten Beschränkungen bei der Arbeit mit Strubs ihren einzigen Grund in der kleinen Interpreter-Erweiterung haben. Wie bereits in der ersten Folge erwähnt, besteht der einzige Sinn dieser Erweiterung darin, das Starten von Strubs vom Editbereich aus dadurch bequemer zu gestalten, daß die Befehlsfolge</p>
+
+        <pre>
+POKE 44,8: RUN
+</pre>
+
+
+        <p>durch Eingabe von »!« abgekürzt werden kann. Wenn Sie bereit sind, diese Befehlsfolge jedesmal von Hand einzugeben, können Sie auf die Erweiterung verzichten, indem Sie im Programm die Zeilen 45600 bis 45680 einfach weglassen. Damit fallen dann die oben erwähnten Beschränkungen weg, das heißt die unter Fall 2 erwähnten Programme können im Editbereich getestet werden und Strubs kann zusammen mit einer Programmierhilfe benutzt werden. Aber editieren Sie keine Quellprogramme unter Simons Basic. Dazu sind weitere Anpassungen erforderlich, auf die wir in der nächsten Folge näher eingehen. Insbesondere wenn ein Programm aus fertigen Modulen zusammengesetzt werden soll, sind solche Programmierhilfen erforderlich.</p>
+
+        <p>Dieser Vorgang verläuft auf der Quellprogramm-Ebene aufgrund der Unabhängigkeit von Zeilennummern relativ einfach. Die einzelnen Programmteile werden in beliebiger Reihenfolge zusammengesetzt. Dazu kann ein Toolkit oder auch das kleine MERGE-Programm aus dem 64'er, Ausgabe 4/84, benutzt werden. Dabei können ruhig gleiche Zeilennummern auftreten und auch die Reihenfolge der Zeilennummern ist beliebig. Anschließend wird der fertige Programmtext mit Hilfe einer RENUMBER-Routine vernünftig durchnumeriert. Da Basic keine lokalen Variablen kennt, ist allerdings vor dem Zusammensetzen auf die Variablennamen zu achten. Um unerwünschte Seiteneffekte zu vermeiden, sind eventuell einige Umbenennungen vorzunehmen. Etwas aufwendiger gestaltet sich der Prozeß, wenn verschiedene Programmteile erst auf der Objekt-Ebene zusammengesetzt werden sollen. Hierbei ist darauf zu achten, daß sich die Bereiche der Zeilennummern nicht überschneiden. Weisen Sie jedem Programmteil einen bestimmten Zeilennummernbereich zu und verlegen diesen Teil gegebenenfalls mit RENUMBER in diesen Bereich. Anschließend werden nun in jedem Programmteil alle externen Routinen, die dieser Teil aufruft, mit Hilfe der EXTERN-Deklaration vereinbart (das sind die Routinen, die erst nach der Übersetzung angefügt werden). Das oben für die Variablennamen gesagte gilt hier entsprechend. Jetzt können die einzelnen Teile getrennt übersetzt und anschließend in der richtigen Reihenfolge verknüpft werden.</p>
+
+        <p>Falls Sie keine Erweiterung besitzen, dann können Sie Strubs um eine RENUMBER-Routine erweitern: Fügen Sie die Zeilen aus Bild 8 in das Objektprogramm von Strubs ein — und, falls Sie das Quellprogramm besitzen, dort entsprechend die Zeilen aus Bild 7. Um nun diese Routine anzubinden, müssen nur noch zwei Zeilen in das Menü eingefügt werden:</p>
+
+        <pre>
+40110 PRINT "{CDOWN} {REV ON} R {REV OFF}ENUMBER"
+</pre>
+
+
+        <p>und</p>
+
+        <pre>
+40210 IF L$=”R” THEN GOSUB 55000: GOTO 40050
+</pre>
+
+
+        <p>beziehungsweise für das Quellprogramm:</p>
+
+        <pre>
+40210 IF Z$=”R” THEN GOSUB £RENUMBER: GOTO £MENUE
+</pre>
+
+
+        <p>Diese Routine kann dann mit »R« aufgerufen werden, um ein Programm, das sich im Editbereich befindet, umzunumerieren. Das Programm Strubs arbeitet nicht mit der Datasette, sondern es benötigt eine Floppy. Damit der für Strubs unterhalb des Edit-Bereichs reservierte Platz nicht überschritten wird, ist darauf zu achten, daß beim Eintippen des Programms keine Blanks eingefügt werden.</p>
+
+        <p>Der Editbereich beginnt bei 40*256 + 1. Vor dem 1. Start von Strubs läßt sich mit &lsquo;PEEK(46) feststellen, ob Strubs diese Grenze nicht überschreitet (der Wert muß kleiner als 40 sein, im Originalprogramm liegt er bei 34).</p>
+
+        <p>Da Strubs den Zeiger für »Variablen-Anfang« heraufsetzt, sollte es immer von dem 1. Start abgespeichert werden (auch bei Veränderungen). Sollte man dies einmal vergessen, kann man durch »POKE 46,39:CLR« vor den Abspeichern Strubs in die richtigen Grenzen verweisen. Die notwendigen Änderungen für VC 20 (mit 16 KByte) sind dem Bild 9 zu entnehmen. Hier beginnt der Editbereich bei 46*256+1.</p>
+
+        <figure>
+            <pre>40050 PRINT"{CLR}";"  *****************"
+40052 PRINT "  * -- STRUBS  -- *"
+40053 PRINT "  *  PRECOMPILER  *"
+40055 PRINT "  * BITTE WAEHLEN *"
+40058 PRINT "  *****************"
+40060 PRINT"{DOWN}{DOWN}{DOWN}{RVON}E{RVOFF}DIT"
+
+
+45600 I=0:READW
+45610 POKE704+I,W:I=I+1:READW:IFW&lt;256THEN45610
+45620 DATA32,115,0,8,201,33,240,4,40,76,231,199
+45630 DATA169,18,133,44,169,138,76,231,199,999</pre>
+            <figcaption>Bild 9. Diese Änderungen sind für die Anpassung von Strubs an den VC 20 (mit mindestens 16 KByte Erweiterung) erforderlich</figcaption>
+        </figure>
+
+        <h2>Zusätzliche Funktionen</h2>
+
+        <p>Die strukturierte Programmierung bietet vor allem Vorteile in bezug auf Wartung, Änderungen und Erweiterbarkeit von Programmen. Dies gilt auch für das Programm Strubs. Um in den Genuß dieser Vorteile zu gelangen, ist allerdings der Zugang zum Quellprogramm erforderlich. Wenn Sie sich das in Heft 5 abgedruckte Objektprogramm ansehen, werden Sie feststellen, daß es auch nicht viel aussagekräftiger als ein unkommentiertes Assemblerlisting ist. Wenn Sie an der Entwicklung eigener Programmerweiterungen interessiert sind, sollten Sie sich deshalb beim Verlag das Quellprogramm besorgen. Da ich hier davon ausgehen muß, daß die meisten Leser das Quellprogramm nicht besitzen, lohnt es sich gar nicht erst, systematisch die einzelnen Programmteile vorzustellen.</p>
+
+        <p>Statt dessen wollen wir nur die für Programmerweiterungen wichtigsten Programmelemente vorstellen und anhand einiger exemplarischer Erweiterungen, die auch, ohne sich weitere Gedanken zu machen, einfach eingetippt werden können, aufzeigen, wie man Erweiterungen implementieren kann und was dabei zu beachten ist. Aus dem gleichen Grund geben wir nur die Änderungen an, die im Objektprogramm vorzunehmen sind. Eine Anpassung an das Quellprogramm dürfte keine Probleme bereiten.</p>
+
+        <p>Achten Sie bei allen Programmänderungen darauf, daß das geänderte Programm abgespeichert wird, bevor es zum ersten Mal gestartet wird, da das Programm den Zeiger auf das Programmende verstellt. Sollte das Programm durch Erweiterungen so lang werden, daß es in den Editbereich hineinreicht, kann der Anfang des Editbereichs in Schritten zu 256 Byte nach oben verschoben werden, um Platz zu schaffen. Dazu ist in den Zeilen 70 bis 80 die Zahl 40 überall, wo sie auftaucht, durch eine größere Zahl (jeweils 4 für jedes Kilobyte) zu ersetzen (vgl. auch den Schluß der 3. Folge).</p>
+
+        <h2>Die wichtigsten Programmelemente</h2>
+
+        <p>Eine grobe Übersicht über den Aufbau des Programms haben wir bereits in der 2. Folge gegeben. Bevor wir uns nun mit einzelnen Erweiterungen beschäftigen, wollen wir zunächst einmal die wichtigsten Programmelemente vorstellen, die man für Änderungen und Erweiterungen des Programms benötigt. Wie bereits erwähnt, liest Strubs das Quellprogramm zweimal vom Anfang bis zum Ende durch. Um Zeit zu sparen, wird im 1. Lauf nur jeweils der Anfang einer Zeile untersucht. Deshalb müssen alle Befehle, die bereits im 1. Lauf zu behandeln sind, auch am Anfang einer Zeile stehen, während Befehle, die nur im 2. Lauf behandelt werden, überall stehen können. Ein Beispiel:</p>
+
+        <p>Die Definition von Marken muß am Zeilenanfang erfolgen, während der Aufruf von Marken an jeder Stelle erfolgen kann. Die Aufgabe des 1. Laufs besteht darin, verschiedene Tabellen anzulegen, mit deren Hilfe dann im 2. Lauf das endgültige Objektprogramm erzeugt wird.</p>
+
+        <p>Jede dieser Tabellen besteht aus einem oder mehreren Array(s), einer Variablen, deren zweiter Buchstabe ein »M« für »Maximal« ist und die Dimension, das heißt die maximale Zahl von Einträgen festlegt, und aus einer Variablen, deren zweiter Buchstabe ein »P« für »Pointer« ist und die auf den jeweils nächsten freien Listenplatz zeigt. Bei Speicherplatzproblemen brauchen nur die Werte der Dimensionsvariablen im Init-Teil geändert zu werden. Möchte man zum Beispiel mehr als 99 Marken (die jetzige Maximalzahl) benutzen, dann schreibt man in Zeile 45060 zum Beispiel »MM = 150:&hellip;«.</p>
+
+        <p>Die Tabellen werden in den Zeilen 45050 bis 45200 definiert (Bild 10). Die Dimension des Stacks bestimmt die mögliche Schachtelungstiefe. Dazu kommen die Tabellen der neuen Befehle (Zeile 45260 bis 45274) und der Fehlermeldungen (Zeile 45480 bis 45514).</p>
+
+        <figure>
+            <img src="98-10.png" alt="">
+            <figcaption>Bild 10. Tabellen</figcaption>
+        </figure>
+
+        <p>Dem schrittweisen Lesen des Quellprogramms dienen die Variablen C und NC. Die Variable C enthält den Code des jeweils zuletzt gelesenen Zeichens, wobei der Wert 0 ein Zeilenende markiert. Die Variable NC enthält die Adresse des nächsten zu lesenden Zeichens.</p>
+
+        <p>Im 2. Lauf wird zeilenweise das Objektprogramm erzeugt, wobei die jeweils aktuelle Zeile in der Variablen Z$ aufgebaut wird. Dabei enthalten die beiden ersten Zeichen von Z$ Low- und Highbyte der Zeilennummer (so wie sie später im Speicher steht), und das letzte Zeichen der fertigen Zeile besteht aus dem Zeichen CHR$(0).</p>
+
+        <p>Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45240 bis 45254 definiert (Bild 11). Die Variable ZA enthält die Adresse des Anfangs der Zeile, die gerade bearbeitet wird. In EA steht die Startadresse des Editbereichs.</p>
+
+        <figure>
+            <img src="98-11.png" alt="">
+            <figcaption>Bild 11. Relevante Zeichencodes</figcaption>
+        </figure>
+
+        <p>Damit kommen wir zu den für Erweiterungen wichtigen Modulen von Strubs. Die Prozedur »NEXT-CHAR« sucht ab Adresse NC das nächste relevante Zeichen des Quellprogrammtextes und liefert dessen Code in der Variablen C. Dabei werden Leerzeichen (Zeile 250) und Kommentare (Zeile 280-295) überlesen. Strings werden direkt in die Ausgabezeile Z$ übertragen (Zeile 350). Der Zeiger NC wird auf das nächste zu lesende Zeichen gesetzt. Die Prozedur »HOLNAME« (Zeile 750-830) liest ab aktueller Adresse NC einen Namen (zum Beispiel Befehl, Label) und zwar bis eines der Trennzeichen »:«, »,«, Blank oder Zeilenende erscheint. Der Name wird in der Variablen T$ ausgegeben, C enthält das erste relevante Zeichen hinter dem Namen (das ist außer beim Blank das Trennzeichen), und NC zeigt auf das nächste Zeichen.</p>
+
+        <p>Die Prozedur »SCHREIBZEILE« (Zeile 550-580) generiert auf der Diskette aus den nacheinander eingegebenen Zeilen Z$ das zusammenhängende Objektprogramm und gibt die Nummer der aktuellen Zeile auf dem Bildschirm aus. Die Variable AA (Linkadresse) darf außerhalb dieser Routine nicht verändert werden!</p>
+
+        <p>Die Prozedur »ERROR« (Zeile 8050 bis 8099) erwartet als Eingabe einen Fehlercode ER. Dabei handelt es sich um den Index der Fehlermeldung in der Tabelle der Fehlermeldungen. Die Zeilennummer und die Fehlermeldung werden auf dem Bildschirm ausgegeben und zugleich in eine Fehlertabelle eingetragen, die man sich nach der Übersetzung auf Bildschirm oder Drucker ausgeben lassen kann. Zusätzlich wird die Fehlermeldung in die Ausgabezeile Z$ geschrieben, so daß sie auch im Objektprogramm erscheint. Die Übersetzung wird mit der folgenden Zeile fortgesetzt.</p>
+
+        <p>Die Prozedur »ABBRUCH« (Zeile 50000 bis 50030) sorgt für einen kontrollierten Abbruch der Übersetzung. Sie erwartet ebenfalls als Eingabe den Fehlercode ER und gibt die entsprechende Fehlermeldung aus. Danach wird die Tabelle der bisher bemerkten Fehler ausgegeben, offene Files ordnungsgemäß geschlossen und Strubs neu gestartet.</p>
+
+        <p>Die Prozedur »WARTEN« (Zeile 49550 bis 49570) fordert den Benutzer auf, eine Taste zu drücken und wartet auf den Tastendruck.</p>
+
+        <p>Die Prozedur »INIT« (Zeile 45050 bis 45999) enthält die Definition der Variablen und Tabellen sowie die Interpretererweiterung.</p>
+
+        <p>Im »MENÜ« (Zeile 40050 bis 40495) können die verschiedenen Funktionen angewählt werden.</p>
+
+        <p>Die Prozeduren »BEFEHLE IM 1. LAUF« (Zeile 1550-2497) und »BEFEHLE IM 2. LAUF« (Zeile 2550-3640) werden von Strubs aufgerufen, sobald im Quellprogramm das Erkennungszeichen »!« für Befehle (Code in der Variablen BE) entdeckt wird. Sie holen den Namen des Befehls, suchen diesen in der Befehlstabelle und rufen entsprechend dem Index (+1) des Befehls in dieser Tabelle em Unterprogramm auf. Falls der Befehl nicht in der Tabelle gefunden wird, wird eine entsprechende Fehlermeldung ausgegeben. Im 1. Lauf kommt noch die Ausgabe der Blockstruktur hinzu. Hierzu dient die Variable In (für Indentmodus). IN = 0 bedeutet, auf der gleichen Schachtelungsebene zu bleiben.</p>
+
+        <p>Damit haben wir nun das notwendige Wissen zusammen, um an dem Programm Strubs einige Änderungen und Erweiterungen vorzunehmen.</p>
+
+        <h2>Andere Anwendungen</h2>
+
+        <p>Bei den Programmtexten, die Strubs übersetzt, handelt es sich zwar um erweiterte Basicprogramme, aber nichtsdestoweniger um Basicprogramme. Deshalb ist es relativ einfach, Strubs auch zur Bearbeitung ganz normaler Basic-Programme einzusetzen. Zwei sinnvolle Möglichkeiten wollen wir im folgenden vorstellen.</p>
+
+        <ol>
+            <li>Ein SPEED-UP-Programm, um normale Basicprogramme schneller zu machen.</li>
+            <li>Ein Programm, das besser lesbare Listings erstellt.</li>
+        </ol>
+
+
+        <p>Dabei ist zu beachten, daß die Änderungen, die wir dazu vornehmen, nicht wie die Makro-Funktion eine Erweiterung des eigentlichen Programmes Strubs und seiner Funktion darstellen, sondern daß wir zwei völlig neue Programme mit völlig neuen Aufgaben erhalten. Deshalb sollten auch die erhaltenen Programme unter neuen Namen, beispielsweise »SPEED-UP« und »LISTER«, abgespeichert werden. Das Arbeiten mit diesen Programmen unterscheidet sich nicht von der Arbeit mit dem »normalen« Strubs-Programm.</p>
+
+        <h2>Schnellere Basic-Programme</h2>
+
+        <p>Zunächst wollen wir Strubs so ändern, daß es normale Basicprogramme in Programme übersetzt, die keine Leerzeichen und Kommentare mehr enthalten und dadurch schneller ablaufen. Wie Sie sich erinnern werden, benutzt Strubs für Kommentare, die gelöscht werden sollen, ein eigenes Zeichen »'«. Kommentare, die mit REM gekennzeichnet werden, bleiben im Objektprogramm erhalten. Da Strubs bereits alle Blanks entfernt (außer in Strings), brauchen wir nur noch dafür zu sorgen, daß Strubs auf das REM-Token reagiert wie bisher auf das Kommentarzeichen »’«. Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45250 bis 45254 definiert (Bild 11). Wir brauchen nur in Zeile 45250 das KO = ASC(»’«) durch KO = 143 (143 ist das REM-Token) ersetzen und schon ist das Speed-Up-Programm fertig. Genauso können Sie die Erkennungszeichen für Label und die neuen Befehle ändern. Dies ist, um Konflikte zu vermeiden, für den Fall sinnvoll, daß Sie mit Strubs Programme für Interpretererweiterungen übersetzen, die ihrerseits »!« oder das Pfundzeichen als Erkennungszeichen für ihre neuen Befehle benutzen.</p>
+
+        <h2>Listings</h2>
+
+        <p>Haben Sie in Ihren Listings häufig Grafik- und Steuerzeichen? Dann können Sie sich viel Ärger ersparen, wenn Sie das Listing vorher mit dem Programm »LISTER« aufbereiten. »LISTER« übersetzt Basic-Programme in Programmtexte, in denen die schwer entzifferbaren Steuer- und Grafikzeichen innerhalb von Strings durch lesbare Worte »&lt;CDOWN&gt;« oder »&lt;HOME&gt;« ersetzt sind (Bild 12).</p>
+
+        <figure>
+            <img src="98-12.png" alt="">
+            <figcaption>Bild 12. Beispiellister</figcaption>
+        </figure>
+
+        <p>Dazu ändern wir eine Zeile innerhalb der Prozedur »NEXTCHAR«. In Zeile 350 werden gelesene Zeichen mit dem ASCII-Code C innerhalb von Strings direkt in die Ausgabezeile Z$ übertragen. Wenn wir nun in Zeile 350 Z$=Z$+CHR$(C); durch Z$=Z$+C$(C); ersetzen, dann können wir ein Array C$(255) definieren, das in jedem ASCII-Wert den String enthält, der dafür im Objektprogramm erscheinen soll. Die Definition dieses Arrays gehört in das Modul »INITIALISIERUNG«:<br>
+            45300 DIM C$(255):FOR I = 0 TO 255:C$(I) = CHR$(I):NEXT</p>
+
+        <p>Damit haben wir zugleich unser Array mit den normalen Werten vorbesetzt. Jetzt bleiben nur noch die Ersetzungen:<br>
+            45310 C$(17)= "&lt;CDOWN&gt;":C$(19)="&lt;HOME&gt;"<br>
+            45312 C$(28) = "&lt;ROT&gt;":C$(31)="&lt;BLAU&gt;"<br>
+            &hellip; usw.</p>
+
+        <p>Hier können Sie nun jedem Zeichen ein beliebiges Wort zuordnen: Den ASCII-Code der einzelnen Zeichen finden Sie im C-64 Handbuch auf S. 135 oder Sie können ihn einfach durch Eingabe von<br>
+            PRINT ASC("X")<br>
+            feststellen, wobei »X« für das interessierende Zeichen steht. Bei sehr vielen Zeichen innerhalb eines Strings kann es allerdings vorkommen, daß die Zeilen zu lang werden. Deshalb sollten die Worte möglichst kurz gewählt werden.</p>
+
+        <h2>Makros</h2>
+
+        <p>An einem etwas umfangreicheren Beispiel wollen wir nun zeigen, wie man neue Strubs-Befehle implementiert und wie man die Prozeduren von Strubs benutzen kann. Dies soll am Beispiel einer Makro-Funktion demonstriert werden.</p>
+
+        <p>Makros, vor allem von Assemblern her bekannt, stellen so etwas wie Abkürzungen für kurze Programmausschnitte dar. Dadurch verringert sich die Tipparbeit und vor allem werden die Quellprogramme übersichtlicher.</p>
+
+        <p>In der Makro-Definition wird ein Makro-Name definiert und diesem ein Programmstück zugeordnet. Überall, wo nun im Quellprogramm ein Makro aufgerufen wird, erscheint im Objektprogramm an dieser Stelle das entsprechende Programmstück. Ein einmal definiertes Makro kann wie ein Label beliebig oft aufgerufen werden.</p>
+
+        <p>Für die Definition eines Makros wollen wir den Befehl »IDMAKRO« und für den Aufruf eines Makros den Befehl »!M« wählen. Ein Beispiel mag die Wirkungsweise der neuen Befehle demonstrieren:<br>
+            10 !DMAKRO:NAME SYS 833:X= PEEK (878)<br>
+            &hellip;<br>
+            200 PRINT X:!M,NAME:PRINT X</p>
+
+        <p>Die Definitionszeile 10 wird gelöscht, da sie nur für die Übersetzung notwendige Informationen enthält. Die Zeile 200 mit dem Makro-Aufruf sieht im Objektprogramm folgendermaßen aus:<br>
+            200 PRINTX:SYS833:X=PEEK(878): PRINTX</p>
+
+        <p>Einige Beispiele für Makros und deren korrekte Benutzung sowie das sich ergebende Objektprogramm zeigt Bild 13. Vor allem ist darauf zu achten, daß Makronamen wie alle Befehls- und Labelnamen mit einem der Trennzeichen abgeschlossen werden müssen. Insbesondere darf bei der Makrodefinition und beim Aufruf mit nachfolgenden Parametern (Spritemakros in Zeile 120 und 130) nicht das Blank hinter dem Makronamen vergessen werden! Jede Makrodefinition benötigt eine eigene Zeile. Eine Übergabe von Parametern an ein Makro ist nicht möglich. Achten Sie bei der Arbeit mit Makros darauf, daß die entstehenden Zeilen des Objektprogramms nicht zu lang werden. Zeilen, die länger als 80 Zeichen sind, lassen sich nicht mehr editieren. Zeilen, die länger als 256 Zeichen werden, führen zum unkontrollierten Abbruch der Übersetzung mit »String too long error«. In diesem Fall kann man mit »GOTO 50000« die Nummer der verantwortlichen Zeile erfahren und offene Files schließen.</p>
+
+        <figure>
+            <img src="98-13.png" alt="">
+            <figcaption>Bild 13. Beispiele Makros</figcaption>
+        </figure>
+
+        <p>Um die Übersetzung zu ermöglichen, muß im 1. Lauf eine Tabelle der Makronamen und der zugehörigen Programmausschnitte angelegt werden. Im 2. Lauf werden dann alle Aufrufe durch den zugehörigen Text ersetzt. Die Verteilung auf zwei Läufe bietet den Vorteil, daß ein Makro (ebenso wie Labels) auch schon vor der Definition aufgerufen werden kann.</p>
+
+        <p>Zur Implementation sind folgende Schritte erforderlich: Zunächst muß dem Übersetzungsprogramm mitgeteilt werden, daß es zwei neue Befehle gibt. Dann müssen wir die notwendige Tabelle definieren und auch entsprechende Fehlermeldungen vorsehen. Diese Erweiterungen gehören in den INIT-Teil.</p>
+
+        <p>Schließlich muß noch dafür gesorgt werden, daß Strubs weiß, wie es im 1. und 2. Lauf auf die neuen Befehle zu reagieren hat. Die Befehlstabelle wird in Zeile 45265 definiert. Hier erhöhen wir die Zahl der Befehle um 2 und fügen dann noch eine DATA-Zeile mit den beiden neuen Befehlsnamen ein:<br>
+            45265 BM = 15:&hellip;<br>
+            45275 DATA DMAKRO,M</p>
+
+        <p>Wählt man Befehlsnamen, die reservierte Basic-Worte enthalten, dann müssen die Tokens berücksichtigt werden (wie dies für IF in der Zeile 45271 geschieht). Für einen Befehl »DEFMAKRO« wäre zum Beispiel<br>
+            BE$(14) = CHR$(150) + "MAKRO” zu setzen (150=DEF-Token).</p>
+
+        <p>Für die Tabelle wählen wir ein Array NA$(NM,1), da der Name M bereits für die Markentabelle vergeben ist. Die Dimension (..,0) soll die Namen und die Dimension (..,1) den zugehörigen Text aufnehmen.<br>
+            45155 NM = 40:DIM NA$(NM,1): NP = 0</p>
+
+        <p>Damit können 41 Makros definiert werden. Indem wir die Zahl der Fehlermeldungen von 9 auf 11 erhöhen, erhalten wir die beiden neuen Fehlercodes 10 und 11 für »zu viele Makros« und »undefiniertes Makro«.<br>
+            45480 EM = ll:DIM&hellip;<br>
+            45500 FOR I = 0 TO EM:READ &hellip;<br>
+            45515 DATA "ZU VIELE MAKROS”, "UNDEFINIERTES MAKRO”</p>
+
+        <p>Nun müssen wir in die beiden Module »BEFEHLE IM 1. LAUF« beziehungsweise »BEFEHLE IM 2. LAUF« jeweils zwei Routinen für die neuen Befehle einfügen. Da die beiden Verteilerzeilen bereits voll sind, legen wir zwei neue Verteilerzeilen, an, die dann aber auch gleich für 10 weitere neue Befehle Platz bieten:<br>
+            1571 IF I>14 THEN ON I-14 GOSUB 2350,2380<br>
+            für den 1. Lauf und<br>
+            2571 IF I>14 THEN ON I-14 GOSUB 3700,3750<br>
+            für den 2. Lauf.</p>
+
+        <p>Die Routine für »IDMAKRO« im 1. Lauf soll zunächst prüfen, ob noch Platz in unserer Makro-Tabelle ist und, falls nicht, mit entsprechendem Fehlercode die Abbruch-Routine anspringen:<br>
+            2350 IF NP>NM THEN ER = 10: GOTO 50000</p>
+
+        <p>Jetzt können wir mit Hilfe der Prozedur »HOLNAME« den Makro-Namen lesen und in unserer Tabelle speichern:<br>
+            2355 Z$ = " ":GOSUB750:NA$(NP,0) =T$</p>
+
+        <p>Nun übertragen wir den Rest der Definitionszeile mit Hilfe von »NEXT-CHAR« nach Z$ (dadurch werden auch Strings mit übertragen. Als Ausgabezeile dient Z$ ja erst im 2. Lauf).<br>
+            2360 Z$ = Z$ + CHR$(C);:GOSUB250:IFC&lt;&gt;0THEN 2360</p>
+
+        <p>Nun brauchen wir nur noch den Text in die Tabelle aufzunehmen, den Zeiger zu erhöhen und den Indentmodus angeben.<br>
+            2370 NA$(NP,l) = Z$:NP = NP + l:IN = 0<br>
+            2375 RETURN</p>
+
+        <p>Der Aufruf eines Makros interessiert im 1. Lauf nicht, also:<br>
+            2380 IN=0:RETURN</p>
+
+        <p>Im 2. Lauf soll die Definitionszeile gelöscht werden. Dazu löschen wir den Ausgabestring und weisen C den Code für Zeilenende zu:<br>
+            3700 Z$ = ””:C = 0:RETURN</p>
+
+        <p>Beim Aufruf eines Makros mit »!M« holen wir zunächst den Namen des Makros mit »HOLNAME« und suchen ihn in der Tabelle:<br>
+            3750 GOSUB 750<br>
+            3755 FOR I = 0 TO NP: IF NA$(I,0) &lt;&gt;T$ THEN NEXT</p>
+
+        <p>Falls der Name nicht gefunden wird, erfolgt ein Sprung zur Error-Routine mit dem Code für »undefiniertes Makro«:<br>
+            3760 IF I>NP THEN ER=11: GOTO 8050</p>
+
+        <p>Nun ist nur noch das definierte Programmstück in die Ausgabezeile zu übertragen:<br>
+            3760 Z$ = Z$ + NA$(I,l):RETURN</p>
+
+        <p>Dadurch, daß diese Makro-Erweiterung Zeile für Zeile besprochen wurde, um zu zeigen, wie man die von Strubs vorgegebenen Prozeduren benutzen kann, ist vielleicht der Eindruck entstanden, eine solche Erweiterung sei relativ kompliziert. Wenn Sie sich aber das Ganze noch einmal genauer ansehen, können Sie feststellen, daß für die Implementation neuer Befehle im Prinzip nur drei Schritte erforderlich sind:</p>
+
+        <ol>
+            <li>Eintrag der neuen Befehlsnamen in die Befehlstabelle</li>
+            <li>Einfügen der entsprechenden Routinen</li>
+            <li>Eintrag der Adressen dieser Routinen in die beiden Verteilerzeilen</li>
+        </ol>
+
+
+        <p>Die ganze Arbeit des Suchens und Decodierens übernimmt Strubs automatisch.</p>
+
+        <p>Wie neue Funktionen (beispielsweise die Ausgabe der Makro-Tabelle) in das Menü aufgenommen werden können, haben sie bereits in der letzten Folge am Beispiel der RENUMBER-Funktion gesehen.</p>
+
+        <p>Eine Zusammenstellung der oben besprochenen Erweiterungen finden Sie in Bild 14.</p>
+
+        <figure>
+            <img src="98-14.png" alt="">
+            <figcaption>Bild 14. Die besprochenen Erweiterungen auf einen Blick</figcaption>
+        </figure>
+
+        <h2>Strubs und Interpretererweiterungen</h2>
+
+        <p>Wollen Sie mit Strubs Programme für Interpretererweiterungen bearbeiten, dann sind einige weitere Dinge zu beachten. Entfernen Sie zunächst wie in Folge 3 beschrieben die Interpretererweiterung von Strubs.</p>
+
+        <p>Falls die Erweiterung, die Sie benutzen wollen, nicht in den Editor ingreift, sondern ihre neuen Befehle durch besondere Zeichen (meistens »!«) gekennzeichnet werden, dann ändern Sie wie bereits oben beschrieben die entsprechenden Erkennungszeichen, die Strubs benutzt.</p>
+
+        <p>Bei Erweiterungen wie Simon’s Basic, die in den Editor eingreifen und die neuen Befehle wie der Basic-Interpreter durch eigene Tokens darstellen, ist es am einfachsten, den Strubs-Befehlen, deren Namen solche Befehle enthalten, neue Namen zu geben. Im Fall von Simon&rsquo;s Basic sind davon beispielsweise Strubs-Befehle wie »!REPEAT«, »!UNTIL« oder »!ELSE« etc. betroffen.</p>
+
+        <p>Dazu sind nur die Namen in den DATA-Zeilen 45272 bis 45274 zu ändern. Sie können die betroffenen Strubs-Befehle aber auch wie oben am Beispiel von »DEFMAKRO« beschrieben aus den Tokens zusammensetzen. Dabei ist aber zu berücksichtigen, daß die Tokens von Simon’s Basic aus zwei Zeichen und nicht wie die normalen Tokens aus nur einem Zeichen bestehen.</p>
+
+        <p>Eine Liste der von Strubs benutzten Variablen bietet Bild 15. Dabei kennzeichnet das Zeichen »*« Zeilennummern, in denen eine Wertzuweisung an die Variable erfolgt.</p>
+
+        <figure>
+            <img src="98-15.png" alt="">
+            <figcaption>Bild 15. Variablenliste</figcaption>
+        </figure>
+
+        <p>Um sich an die Arbeitsweise von Strubs zu gewöhnen, können Sie das Quellprogramm »Menü« (Listing 2) eingeben. »Menü« faßt immer zehn Programme auf einer Bildschirmseite zusammen, die man mit den Cursor-Tasten durchblättern kann. Bei Programmen, die größer sind als »Menü«, muß in der ersten Zeile der Pointer auf das Basic-Ende korrigiert werden (sieheZeile 1 von »Menü«, Listing 3). Hängtman bei Programmen, die von »Menü« geladen werden sollen, an das Programmende LOAD”Menü.obj” ,8 dann wird bei Programmende »Menü« automatisch geladen und gestartet.</p>
+
+        <address class="author">(Matthias Törk/og)</address>
 
         <figure>
             <pre data-filename="strubs.4.qp" data-name="Strubs Objektprogramm"></pre>
@@ -94,12 +675,13 @@
                 <pre data-filename="strubs.4.op" data-name="Strubs Quellcodeprogramm"></pre>
             </figure>
         </div>
+
         <figure>
-            <pre>TODO</pre>
+            <img src="98-l2.png" alt="">
             <figcaption>Listing 2. »Menue«, das erste Strubs-Listing</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <img src="98-l3.png" alt="">
             <figcaption>Listing 3. Das Objektprogramm »Menue«</figcaption>
         </figure>
     </article>
