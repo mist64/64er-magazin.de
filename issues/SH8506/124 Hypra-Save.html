@@ -5,7 +5,7 @@
     <title>Hypra-Save</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="XXX">
+    <meta name="author" content="Martin Pfost, hm">
     <meta name="64er.issue" content="Sonderheft 6/85">
     <meta name="64er.pages" content="124-125">
     <meta name="64er.toc_category" content="Hilfsprogramm">
@@ -16,7 +16,36 @@
 <body>
     <article>
         <h1>Hypra-Save</h1>
-        <p>TODO 85/8, p.79</p>
+
+        <p class="intro">Hypra-Save ist eine Ergänzung zu Hypra-Load. Es speichert Programme 3- bis 5mal schneiler und kann mit Hypra-Load verwendet werden.</p>
+
+        <p>Ein großer Nachteil der Diskettenstation VC 1541 ist die durch den seriellen Bus und durch das DOS V2.6 bedingte geringe Geschwindigkeit. Inzwischen gibt es mehrere Programme, die das Laden von Diskette beschleunigen. Mit der hier vorgestellten Routine geht jetzt auch das Speichern von Programmen mit dem C 64 wesentlich rascher.</p>
+
+        <p>Hypra-Save ist 3- bis 5mal so schnell wie die Originalroutine. Es verträgt sich mit Hypra-Load und vielen anderen, auch professionellen, Programmen und Basic-Erweiterungen. Zur Bedienung von Hypra-Save sollten Sie folgendes beachten: Die Eingabe muß mit dem MSE erfolgen. Nach dem Laden startet man es wie gewohnt mit RUN. Danach sollte man NEW eingeben, wenn man ein eigenes Programm schreiben will.</p>
+
+        <p>Hypra-Save kann Files mit oder ohne Verify speichern.</p>
+
+        <p>Gibt man vor dem Filenamen als erstes Zeichen einen Stern ein, so wird nicht verifiziert. Feststellbar an bis zu 5mal schnelleren Speicherzeiten. Mit Verify ist Hypra-Save etwa 3mal schneller als die Original-SAVE-Routine. Wer einen »25, WRITE ERROR« bisher nur aus der Literatur kennt, der kann getrost ohne Verify arbeiten. Selbstverständlich kann man weiterhin Programme überschreiben. Dann ist der Klammeraffe mit anzugeben. So überschreibt der Befehl SAVE "*@:name", 8 ein File, ohne die auf Diskette geschriebenen Blöcke zu prüfen, also ohne Verify. Hat der Computer alle Daten gesendet, wird im Gegensatz zur Original-SAVE-Routine nicht gewartet, bis das Laufwerk die Datei geschlossen hat. Dies macht sich besonders beim Überschreiben von Programmen bemerkbar. Die Floppystation arbeitet noch, während der Computer sich längst zurückgemeldet hat. Man darf die Diskette selbstverständlich nicht vor dem Erlöschen der roten LED aus dem Laufwerk nehmen.</p>
+
+        <p>Beim Speichern von Programmen mit dem Klammeraffen kommt die 1541 häufig ins »Schleudern«, wie Sie vielleicht aus eigener Erfahrung wissen. So kann es passieren, daß einige Programme nicht mehr geladen werden können. Löschen Sie daher ein Programm erst mit dem SCRATCH-Befehl und speichern Sie erst dann die neue Version (ohne »@«) ab.</p>
+
+        <p>Anstelle von STOP dient bei Hypra-Save 64 die RESTORE-Taste zum Abbrechen. Allerdings wird die Programmdatei dann nicht geschlossen und erscheint im Directory mit einem Stern. Möchte man die nicht geschlossene Datei löschen, so geht das nicht mit dem SCRATCH-, sondern nur mit dem VALIDATE-Befehl. Übrigens blinkt die rote LED nach dem Drücken von RESTORE. Liest man dann den Fehlerkanal aus, so erhält man die Meldung »51, OVERFLOW IN RECORD«, gefolgt von Track und Sektor des letzten Blocks. Diese Fehlermeldung weist sonst auf einen Übertragungsfehler hin, der von zu vielen Geräten am seriellen Bus herrühren kann.</p>
+
+        <p>Sollte man eine merkwürdige Fehlernummer wie zum Beispiel 61 oder 71 erhalten, hilft meist nur ein Aus- und Einschalten der Floppy. Nach STOP/RESTORE oder nach einem Reset ist der SAVE-Vektor zurückgesetzt. Hypra-Save läßt sich dann mit SYS 365 wieder aktivieren.</p>
+
+        <p>Das Programm verschiebt sich nach dem Starten. Der eine Teil von Hypra-Save liegt ab $0150 bis $0177, der andere von $D000 bis $D5FF im Speicher. Wird die SAVE-Routine aufgerufen, so wird über den geänderten SAVE-Vektor in die Initialisierungs-Routine nach $0150 gesprungen. Dort wird geprüft, ob die anzusprechende Gerätenummer größer als 3 ist. Wenn ja, blendet die Routine das RAM unter den I/O-Bausteinen ein. Dann kopiert es den Speicherbereich von $C000 bis $C5FF, der nach dem Speichern wieder zurückgeschrieben wird, nach $D600 bis $DBFF (RAM) und verschiebt die eigentlichen SAVE-Routinen von $D000 bis $D5FF (ROM) nach $C000 bis $C5FF. Denn die I/O-Bausteine können nicht vom darunterliegenden RAM angesprochen werden.</p>
+
+        <p>Durch diese Speicherbelegungstechnik wird kein normalerweise sichtbares RAM verändert und nur ein minimaler Bereich im Stack von der Hypra-Save-Routine belegt. Vom Programmteil bei $C000 wird das File zuerst wie gewohnt durch die normalen IEC-Busroutinen geöffnet. Dann testet Hypra-Save ob kein Fehler aufgetreten ist und die Daten gesendet werden können. Ist kein Fehler aufgetreten, so wird die SAVE-Routine für das Diskettenlaufwerk in das Floppy-RAM geschrieben und gestartet. Dieser Programmteil liegtvon $0146 bis $01D9 im Floppy-RAM. Er enthält hauptsächlich die Transferroutine, mit der sofort nach dem Aufrufen das Diskettenstationsprogramm übertragen, in den Bereich von $0300 bis $04A0 geschrieben und dann gestartet wird.</p>
+
+        <p>Der wesentlich zur Geschwindigkeitserhöhung beitragende Datentransfer beruht auf der gleichzeitigen Übertragung von je zwei Bit und auf dem erheblich eingeschränkten Handshakebetrieb, mit dem beide Geräte ihre Bereitschaft zum Transfer signalisieren.</p>
+
+        <p>Die hohe SAVE-Geschwindigkeit wird aber auch vom Schreibalgorithmus erzielt, der die für das eventuell durchzuführende Verify benötigte Zeit erheblich verkürzt. Hierzu ein Beispiel, um die Arbeitsweise dieses Algorithmus zu verdeutlichen:</p>
+
+        <p>Wenn sich der Schreib-/Lesekopf in einer halben Diskettenumdrehung über dem Header des gewünschten Blocks befindet, die zu schreibenden Daten im Puffer stehen und codiert sind, so hat die Originalroutine den Pufferinhalt nach einer halben Umdrehung geschrieben und nach einer weiteren ganzen Umdrehung verifiziert. Diese Methode benötigt 1,5 Umdrehungen pro Block, also drei für zwei Blöcke.</p>
+
+        <p>Hypra-Save geht anders vor. Es verwendet zwei Puffer. Nach einer halben Umdrehung wird der erste, nach einer weiteren halben der zweite Block geschrieben. Es wird dann noch eine Umdrehung gebraucht, um beide Sektoren zu verifizieren. Man benötigt also nur zwei Rotationen für zwei Blöcke, der Zeitgewinn beträgt etwa 0,1 Sekunden pro Block. Sind sämtliche Bytes übertragen, so stellt der Computer wie erwähnt das RAM von $C000 bis $C5FF wieder her, springt in die Digitalisierungsroutine, schaltet die ursprüngliche Speicherbelegung ein und kehrt ins aufrufende Programm zurück. Das Laufwerk schließt währenddessen das File, wofür es mehr Zeit brauchen kann, wenn beim Überschreiben das alte Programm gelöscht werden muß.</p>
+
+        <address class="author">(Martin Pfost/hm)</address>
 
         <figure>
             <pre data-filename="hypra-save.prg" data-name="Hypra-Save" data-mse=mse1></pre>
