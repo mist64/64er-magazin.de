@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Monitore</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bildinhalt-Austast-Synchron-Si-gnal, engl. Composite = zusammengesetzt, Helmut Jungkunz, hm, Phase-Alternation-Line, Transistor-Transistor-Logik">
+    <meta name="64er.issue" content="12/85">
+    <meta name="64er.pages" content="16-22,24">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Monitore</h1>
+<p class="intro">Was wäre ein Computer ohne Datensichtgerät? Der Bildschirm ist eigentlich das wichtigste Ausgabegerät eines Computers. Hier zeigen wir Ihnen, wie ein Monitor funktioniert und was Sie beim Kauf beachten sollten.</p>
+
+<p>Dank des rasenden Fortschritts auf dem Elektroniksektor wurden die Datensichtgeräte immer besser und billiger. Diese Entwicklung führte aber dazu, daß sich der Käufer unter einer unüberschaubaren Flut von Typen zu entscheiden hat. Um Ihnen eine Einkaufsberatung zu bieten, haben wir uns entschlossen, Ihnen die nötigen Grundlagen zu bieten. Wir möchten, daß Sie durch das Verständnis der technischen Zusammenhänge Fehlentscheidungen vermeiden können.</p>
+
+<p>Mit einem Fernseher lassen sich bis zu 40 Zeichen pro Zeile darstellen. Eine »Mindestleistung« die heute fast alle Heimcomputer fordern. Spätestens seit Einführung der ersten Farb-Heimcomputer mit 80-Zeichen-Darstellung ist ein Monitor fast unabdingbar.</p>
+
+<p>In diesem Zusammenhang wollen wir Ihnen zeigen, wie ein Computer eigentlich ein Bildsignal erzeugt.</p>
+
+<p>Ein Speicher im Computer enthält Zeicheninformationen in binärer Codierung, die als digitale Information dem Video-Chip zur Verfügung stehen. Nach unserer Fernsehnorm (CCIR-Norm PAL B/G) ist die Dauer eines Elektronenstrahl-Durchlaufs gleich der Netzfrequenz: Der Elektronenstrahl bewegt sich 50mal pro Sekunde diagonal über den Bildschirm; von links nach rechts. Die Frequenz von 50 Hz ist zweckmäßig, da man diese Steuerfrequenz leicht aus der Netzfrequenz gewinnen kann. Die Zahl von 50 Bildern pro Sekunde entstand aus der Forderung, die Trägheit des menschlichen Auges mit mindestens 24 Bildern pro Sekunde zu überlisten.</p>
+
+<h2>So kommt ein Zeichen auf den Bildschirm</h2>
+
+<p>Früher glaubte man, daß 18 Bilder je Sekunde ausreichen würden. Aber die Bewegungen waren ziemlich ruckartig und das Bild flimmerte recht stark, während bei 24 Bildern pro Sekunde das Flimmern stark zurückgeht. Wenn auch nicht ganz. Dieses Restflimmern hat man dadurch beseitigt, daß man die »Flimmerfrequenz« verdoppelte, also 50 »halbe« Bilder statt 50 »ganze« schreibt. Das geschieht in der Weise, daß zuerst die ungeradzahligen, dann die geradzahligen Zeilen geschrieben werden. Man nennt diesen Trick das »Zeilensprung-Verfahren«. Das Zeilensprung-Verfahren, auch »Interlace« genannt, ist viel billiger zu realisieren als ein Non-Interlace-Bild mit 50 Vollbildern pro Sekunde, da die Anforderungen an Interlace-Monitore viel geringer sind.</p>
+
+<p>Ein Teilbild besteht wegen der diagonalen Entstehung aus 312,5 Zeilen. Ein ganzes Bild ist aus 625 Zeilen zusammengesetzt (Bild 1). Da ein ganzes Bild 25mal pro Sekunde erzeugt wird, enthält man eine »Zeilenfrequenz« von 25 x 625 = 15 625 Hertz. Bei einigen Fernsehgeräten kann man diese Frequenz auch hören, denn die Schwingungen müssen vom Zeilentransformator und den Ablenkspulen der Bildröhre übertragen werden. Durch die Zwischenräume der Drahtwicklungen können diese Spulen vibrieren und man hört deshalb häufig einen hohen Pfeifton.</p>
+
+<p>Unsere Fernsehnorm erwartet vom Sender eine negative Modulation, das heißt der Bildinhalt wird als negative Spannungsform übertragen, die Steuerimpulse als positive (Bild 2).</p>
+
+<p>Die Zeileninformation ist jeweils 64 Mikrosekunden lang und enthält in den ersten 12 Mikrosekunden einen Synchronisationsimpuls von etwa 5 Mikrosekunden Dauer mit 100-Prozent-Pegel und einen etwa gleich langen Impuls mit einem Pegel von 75 Prozent der maximalen Spannungen, der dem sogenannten »Schwarzpegel« entspricht. Der Fernseher interpretiert diesen Wert als »schwarz«. Dieser Impuls ist der sogenannte »Austastimpuls«. Jetzt spricht man vom Bildinhalt+Austastimpuls + Synchronimpuls-Signal. Kurz: BAS-Signal. Dieses Signal ist ein Schwarzweiß- beziehungsweise Hell/Dunkel-Signal, das vom Video-Teil von Schwarzweiß- und Farbfernsehern gleich »verstanden« wird. Ein Farbsignal ist noch um einiges komplizierter.</p>
+
+<p>Damit zu der Frage: Wann ist das Signal vollständig? Im folgenden wird untersucht, wie ein RGB-Signal und ein FBAS-Signal erzeugt wird. An dieser Stelle muß das Gate-Array zur Sprache kommen. Von den vielen Aufgaben, die dieser Baustein zu bewältigen hat, hier die für die Bilderzeugung notwendigen:</p>
+
+<ul>
+<li>Erzeugung aller benötigten Taktfrequenzen</li>
+<li>Erzeugung der Videosignale</li>
+<li>Steuerung des Bildschirm-Modus</li>
+<li>Speicherung der Schreibfarben</li>
+<li>Erzeugung von RGB-Signalen</li>
+<li>Datentransfer zwischen CPU und Video-Chip</li>
+</ul>
+
+
+<p>Die im Gate-Array erzeugten RGB-Signale ermöglichen theoretisch eine Beschreibung von 512 Farben (inklusive schwarz und weiß).</p>
+
+<p>In der Heimcomputer-Praxis wird jedoch (abhängig von der Bit-Breite des Videoprozessors) die gleichzeitige Darstellung von acht Farben die vorläufige Obergrenze sein. Durch eine zusätzliche Helligkeitsinformation (Intensitäts-Bit, Darstellung hell oder dunkel) erhält man 16 Farbtöne. Man muß sich die Farberzeugung etwa so vorstellen:</p>
+
+<p>TODO TABLE</p>
+
+<p>Eingangssignal erzeugte Farbe<br>
+R G B<br>
+LLL LLL LLL Schwarz<br>
+HHH LLL LLL Rot<br>
+LLL HHH LLL Grün<br>
+LLL LLL HHH Blau<br>
+HHH HHH HHH Weiß<br>
+und die daraus resultierenden Mischfarben</p>
+
+<p>Aus den Buchstaben »H« für High- und »L« für Low-Pegel kann man ersehen, wie diese Signale in digitaler Form vorliegen. Dazu mehr bei »TTL-Pegel« im Stichwortverzeichnis. Ein Rechteck-Signal ist die Kurve, die durch ständiges Ein- und Ausschalten einer Spannung entsteht.</p>
+
+<p>Durch primitive Digital-Analog-Wandler wird die digitale Impuls-Information in manchen Monitoren oder Fernsehern in analoge Spannungen umgewandelt:<br>
+langer Impuls = hohe Spannung<br>
+kurzer Impuls = kleine Spannung</p>
+
+<p>Vollständig wird das Signal durch die Helligkeitsinformation des Inten-sitäts-Bits, dem bereits erwähnten Synchronimpuls, einem Vergleichspotential und Masse. Das wäre die reinste Form eines Farbsignals, ein RGB-Signal.</p>
+
+<p>In der Praxis findet man sowohl digitale als auch analoge RGB-Ausgänge, im Bereich der Mikrocomputer überwiegen aber noch digitale RGB-Anschlüsse. Der Unterschied des analogen zum digitalen RGB-Signals liegt darin, daß die Intensität der drei Farben Rot, Grün und Blau stufenlos variiert werden kann (analoge Signalstärke). Dadurch werden fast alle vorstellbaren Farbtöne möglich. Beim Amiga können deshalb 4096 Farben dargestellt werden. Das RGB-Signal ist prinzipiell an alle Farbgeräte mit RGB- oder SCART-Eingängen anschließbar. SCART ist aus dem Französischen und heißt: Syndicat des Constructeurs d'Apareils Radio recepteurs et Televiseurs, also in etwa »Verband der Konstrukteure von Radio- und Fernseh-Empfängern«. Es ist ein Versuch, einen europäischen Standard zu setzen. Man hat das Gefühl, es klappt.</p>
+
+<p>Die Belegung der SCART-Buchse finden Sie im folgenden Beitrag, den Anschlußhinweisen.</p>
+
+<p>Geräte nach SCART-Norm erwarten dazu eine zusätzliche Schaltspannung (Pin 8), die jedoch nicht erforderlich ist, wenn man die AV-Taste am Fernseher betätigt.</p>
+
+<p>Damit wären wir bei der nächsten Stufe angelangt, der Aufbereitung der RGB-Signale zum kompletten Video-Signal. Die einzelnen RGB-Signale werden dazu durch eine Matrix-Schaltung miteinander verknüpft. Man erhält so die Helligkeitsinformation »Y«, auch Luminanz-Singal genannt. Nimmt man dieses Luminanz-Signal zusammen mit dem Synchronisations- und Austastimpuls, so kann man bereits einen Schwarzweiß-Monitor (Monochrom-Monitor) ansteuern. Es handelt sich dann um das schon erwähnte BAS-Signal, aus dem angelsächsischen Sprachraum auch als Composite-Signal bekannt.</p>
+
+<p>Viele werden sich jetzt fragen, warum trotz der Farbanteile nur ein Schwarzweiß-Bild entsteht.</p>
+
+<p>Der Grund liegt im Fehlen eines Übermittlers für die Farbinformation. Dabei wird ein sogenannter Farbträger, eine hochfrequente Trägerwelle von 4,4336 MHz, nach einem sorgsam ausgetüftelten System amplitudenmoduliert.</p>
+
+<p>Auf der Suche nach einer geeigneten Frequenz mußte man darauf achten, daß das erzeugte Farbsignalgemisch auch zum herkömmlichen S/W-Signal kompatibel war. Um Störungen mit der Zeilenfrequenz zu vermeiden, einigte man sich schließlich auf die 4,4336 MHz. Blieb noch das Problem, mit einer einzigen Hilfsfrequenz mehrere Farbinformationen gleichzeitig zu übertragen. Man untersuchte das Helligkeitsempfinden des menschlichen Auges und fand heraus, daß die Farbe Grün als hellste Farbe empfunden wird.</p>
+
+<p>Da ja mit der Helligkeitsinformation (Y) die Summe aller Farbinformationen übertragen wird, braucht man nur noch zwei der drei Farbanteile als Differenzsignale zu übertragen und kann die dritte Komponente im Empfänger »rechnerisch« über eine Subtraktionsschaltung zurückgewinnen.</p>
+
+<p>Es reicht also, die Anteile (R-Y) und (B-Y) sowie die Summe aller Helligkeitsinformationen zu übertragen und den Grünanteil daraus zu errechnen. Man könnte genausogut einen der anderen beiden Anteile übertragen, aber wegen der geringeren Werte von (R-Y) und (B-Y) gegenüber G-Y spart man Videobandbreite. Die Kosten eines Monitors steigen wesentlich schneller an als seine Videobandbreite. Ganz abgesehen davon ist der Rechenfehler auf diese Weise geringer. Zum Verständnis ein paar Zahlen:</p>
+
+<p>Das 100%-Helligkeits-Signal heißt »Y« und setzt sich zusammen aus Y = 30% Rot + 59% Grün + 11% Blau. Anders ausgedrückt:<br>
+Y = 0,3 R + 0,59 G + 0,11 B</p>
+
+<p>Zieht man von beiden Seiten dieser Gleichung Y ab, so erhält man die Farbdifferenzsignale R-Y,G-Y,B-Y. Die Pegel der Differenzsignale werden danach reduziert, um Übersteuerungen bei der Modulation zu vermeiden. Um Verwechslungen zu vermeiden, benennt man sie um:<br>
+V entspricht 0,88 x (R-Y)<br>
+U entspricht 0,49 x (B-Y)</p>
+
+<p>Der Trick, beide Anteile mit einer einzigen Frequenz übertragen zu können, besteht darin, daß man das zweite Signal zeitlich verzögert aufmoduliert. Man spricht von einer um 90 Grad verschobenen Phasenlage zueinander (Bild 3). Ein elektrisches Signal hat eine begrenzte Dauer, eine Periode, die sich mit einer 360-Grad-Aufteilung in Zeitabschnitte zerlegen läßt. Ein sinusförmiges Wechselsignal hat nach der positiven Halbwelle, der 1. zeitlichen Hälfte, die Amplitude 0 (keine Spannung) und die Phasenlage 180 Grad. Danach beginnt die sogenannte negative Halbwelle.</p>
+
+<p>Auf der Spitze der positiven Halbwelle hat das Signal die Amplitude 100 Prozent und eine Phasenlage von 90 Grad. Hier läßt man jetzt die positive Halbwelle des zweiten Signals beginnen. Es werden somit alle vier Quadranten eines Koordinatensystems durchlaufen. Man nennt diesen Vorgang daher Quadratur-Modulation. Das Ergebnis ist ein Farbart-Vektor, der als Produkt der Phasenlagen und Amplituden beider Differenzsignale die nötigen Farbinformationen liefert.</p>
+
+<p>Der eigentliche Farbträger wird anschließend unterdrückt bis auf 12 — 14 Perioden, die als Farbsynchronisations-Impuls dienen. Der englische Ausdruck »Burst« (Stoß) wurde hierfür aus Bequemlichkeit übernommen. Dieser Burst sitzt auf der sogenannten hinteren Schwarzschulter, dem Teil, der dem Synchron-Impuls folgt. Das ist ein etwa 5 Mikrosekunden langer Teilimpuls mit 75 Prozent Pegel, also Schwarzpegel (angenommen, daß Schwarzpegel gleich Austastpegel ist). Durch diese Schwarzschulter wird verhindert, daß der Zeilenrücklauf als helle Linie zu sehen ist (Bild 2).</p>
+
+<p>Das Farbart-Signal (englisch: Chrominance) wird in Verbindung mit dem Luminanz-Signal zum FBAS-Signal und damit zum vollständigen Farb-Video-Signal (FBAS = Farbart-Bild-Austast-Synchron-Signal).</p>
+
+<p>Hat man jedoch weder Monitor noch Fernseher mit Videoeingang, dann muß das FBAS-Signal noch durch einen VHF- oder UHF-Modulator in ein antennengerechtes Fernsehsignal umgesetzt werden. An dieser Stelle sollen einmal die Bandbreiten der Signale gegenübergestellt werden. Das Fernsehbild mit seinen 625 Zeilen hat ein Seitenverhältnis von 4:3. Das bedeutet also, daß waagrecht (625x4)/3 = 833 Bildpunkte übertragen werden müssen. Bei 625 Zeilen wären die 625 x 833 = 520 625 Bildpunkte. Bei 25 Bildern pro Sekunde sind das 13 Millionen Bildpunkte/Sekunde! Nimmt man den Extremfall an, daß von jedem Punkt zum nächsten immer der maximale Helligkeitssprung schwarz-weiß-schwarz stattfindet, so entstünde eine Übertragungsfrequenz von 13/2 Millionen Hertz, also 6,5 MHz. Da man davon ausgeht, daß dieser Fall jedoch so gut wie nie auftritt, hat man gewisse Unschärfen akzeptiert und die Höchstgrenze bei der Fernsehnorm auf 5 MHz Videobandbreite fixiert. Das entspricht der Bandbreite von Y. Die Farbdifferenzsignale haben eine Bandbreite von 1,3 MHz.</p>
+
+<p>Wie man jetzt schon erkennen kann, bringt ein Farbmonitor mit 7-10 MHz Videobandbreite nicht viel Vorteil gegenüber einem guten Farbfernseher mit Videoeingang. Der Grund für extrem hohe Bandbreiten bei teureren Modellen liegt in der Tatsache begründet, daß 80-Zeichen-Schrift bei der 25-Bild-Darstellung und ungenügendem Bildpunktraster nicht gut möglich ist. Feinste Raster und 50 Bilder pro Sekunde erfordern aber aufwendige Produktionstechnik und doppelte bis dreifache Videobandbreite.</p>
+
+<p>Soweit eine erste Einführung in die Signalerzeugung. Wenn man bedenkt, was dem armen Farbsignal unterwegs alles passiert, wundert man sich nicht mehr über das oft traurige Ergebnis. Einen Vergleich der Bildqualitäten von einem monochromen Monitor, Farbfernseher und Farbmonitor zeigt Bild 4.</p>
+
+<h2>Aufbau und Funktion der Bildröhre</h2>
+
+<p>Eine Bildröhre (Bild 5 und 6) besteht im wesentlichen aus einem Glaskolben, der an einem Ende abgeplattet, am anderen Ende flaschenartig verjüngt ist. Aus dem hinteren Ende ragen Anschlußstifte, die die Verbindung von außen nach innen herstellen. Dazu gehören Heizdrähte zum Erwärmen der Kathodenbleche, die Anschlüsse für die Kathoden und für die Gitter. Wenn die Kathodenbleche genügend erwärmt sind, bilden sich kleine Elektronenwölkchen in der Vakuumröhre. Liegt nun eine negative Spannung an den Kathoden, erfolgt eine Elektronen-Emission (Aussendung).</p>
+
+<p>Am anderen Ende der Bildröhre befindet sich eine Graphitschicht, an die von außen eine positive Hochspannung von bis zu 25000 V angelegt wird. Da entgegengesetzte Ladungen einander bekanntlich anziehen, saust ein regelrechter Elektronenschwall, der Strahlstrom, in Richtung dieser »Anode«. Anode nennt man bei Röhren den Pluspol. Damit die Elektronen sich nicht wild ausbreiten, hat man Fokussiereinheiten eingebaut, die den Strahl fein bündeln.<br>
+Jedes negativ geladene Hindernis auf der Bahn der Elektronen vermindert die Kraft und Intensität des Strahlstroms. Man bedient sich dieser Wirkung, um die Elektronen zu steuern. Die Intensitätssteuerung geschieht mit Hilfe von sogenannten Gittern. Da ja nicht nur ein Punkt, sondern ein ganzes Bild abgebildet werden soll, muß der Strahl von links nach rechts und von oben nach unten bewegt werden. Diese »Zeilensteuerung« erfolgt über die Ablenkspulen. Diese sind um 90 Grad versetzt um den Hals der Bildröhre angeordnet. Wird an die vertikal angeordneten Spulen eine Kippspannung angelegt, wird der Strahl »langsam« über die Bildschirmbreite geführt und »schnell« wieder zurück. Die horizontal angeordneten Spulen bewirken, daß der Strahl nach jedem Zeilendurchlauf eine Zeile tiefer geschaltet wird. Die von den Spulen erzeugten Magnetfelder bewirken also die eigentliche Steuerung.</p>
+
+<p>Damit man ein geschlossenes Bild sieht, wird auf dem Schirm innen eine Schicht aus phosphoreszierenden Leuchtkörpern aufgetragen. Diese leuchten etwas nach, wodurch ein weicher Übergang entsteht.</p>
+
+<p>Erhöht man diese Nachleuchtdauer über %o Sekunde, so leuchtet der Punkt noch auf, wenn die nächste Bildinformation übertragen wird. Man sollte beachten, daß derartige Nachleuchtröhren für schnelle Bildwechsel nicht geeignet sind. Besonders gilt das für die Lightpen-An-wendung.</p>
+
+<p>Bei der Farbröhre heißen die Leuchtpunkte Tripel, da sie aus drei Farbpunkten zusammengesetzt sind, nämlich aus den Farben Rot, Grün und Blau. Addiert man diese Farben, erhält man »Weiß«. Drei einzeln angesteuerte Elektronenstrahlen werden hier gebündelt und durch Lochmasken oder Schlitzmasken daran gehindert, unbeabsichtigt falsche Tripel anzuregen. Die Qualität der Maske und der Tripelabstand zueinander sind wesentliche Faktoren für die Bildschärfe.</p>
+
+<h2>Datensichtgerät für den Heimgebrauch: Monitor oder Fernseher?</h2>
+
+<p>Was wäre der schönste Computer ohne Ausgabe-Terminals? Der Bildschirm, als meist verwendetes Terminal, soll hier einmal näher betrachtet werden. Da wäre zunächst das Fernsehgerät als bescheidene Variante. Über die Antennenbuchse wird das mehrfach modulierte Bildsignal eingespeist und von der Hochfrequenz befreit. Einen solchen Vorgang, bei dem ein Signalgemisch getrennt wird, bezeichnet man als »Demodulation«. Erst nach einer weiteren Stufe (kurz ZF-Stufe) gelangt das Bild an den eigentlichen Videoteil.</p>
+
+<p>Beim Farbgerät wird danach das Farbartsignal (auch Chromasignal oder Chrominanz genannt) vom Luminanzsignal Y und dem Farb-Synchronsignal, dem Burst, befreit. Dabei entstehen wieder die Farbdifferenzsignale R-Y, B-Y und G-Y.</p>
+
+<p>Für die eigentliche Bildröhrenansteuerung gibt es zwei Möglichkeiten:<br>
+1)  Bildröhre wird farbdifferenzgesteuert. Das Luminanzsignal steuert die Intensität der Kathoden-Emis-sion. Die Farbdifferenzsignale liegen an den Steuergittern der Röhre und erzeugen so eine »subtraktive« Farbmischung. Die Bildröhre dient quasi als RGB-Matrix. Dabei hat die Luminanz Y eine Bandbreite von über 4 MHz, die Farbdifferenzsignale nur etwa je 1,3 MHz.<br>
+2)  Bildröhre wird RGB-gesteuert. Aus den Farbdifferenzsignalen und dem Luminanzsignal werden über eine Matrix-Schaltung die Rot-, Grün- und Blau-Anteile als reine RGB-Signale zurückgewonnen. Jetzt entsteht durch die drei Elektronenstrahlen in der Bildröhre eine additive Farbmischung. Zur Erinnerung: 0,3R + 0,59G + O,llB = Y</p>
+
+<p>Die RGB-Matrix ist hier also ein eigener Teil. R-, G- und B-Anteile haben eine gleiche Bandbreite von 4 MHz. Wie man aus der kleinen Formel entnehmen kann, gelangt das Luminanzsignal Y bei der RGB-Steuerung nicht selbst an die Bildröhre, sondern wird zur Wiedergewinnung der Farbanteile »verbraten«.</p>
+
+<p>Welchem System der Vorzug zu geben ist, darüber fachsimpeln die Technik-Freaks noch heute ergebnislos. Im Bereich Monitore hat sich jedoch ein großer Teil der Hersteller, besonders bei uns, auf RGB-Steuerung »eingeschossen«.</p>
+
+<p>Bei einfarbigen (monochromen) Bildschirmen entfallen diese Vorgänge. Das Helligkeitssignal steuert direkt den Strahlstrom, der aus dem Spannungsgefälle zwischen der Kathode und dem Steuergitter der S/W(Monochrom)-Rohre entsteht. Je höher der Strahlstrom, desto größer die Helligkeit.</p>
+
+<p>Zurück zur Farbe. Ein HF-moduliertes FBAS-Signal ist die schlechteste Version eines Farbsignals. Durch die computerseitigen Modulationsvorgänge verliert das Farbsignal seine ursprüngliche Bandbreite. Das hat zur Folge, daß eine Auflösung bei dünnen, senkrechten Linien nur bis zu einem gewissen Grad erfolgen kann. Ab dieser Auflösung verwischt das Bild. Im ungünstigsten Fall bedeutet das für uns Computerfans eine Obergrenze von 20 Zeichen pro Zeile. Meist lassen sich jedoch 40 Zeichen noch ganz ordentlich farbig darstellen. Mehr ist aber ganz bestimmt nicht »drin«. Für 40-Zeichen-Darstellung braucht man bereits eine Videobandbreite von 4 bis 5 MHz. Für 80 Zeichen braucht man höchstwertige Farbröhren, deren dreifache Farbleuchtpunkte, Tripel genannt, einen Abstand von höchstens 0,4 mm zueinander haben dürfen. Das bedeutet bei gleichen Bildschirmabmessungen mehr Bildpunkte, die aufgelöst werden können. Ganz klar, daß die Videobandbreite sofort sprunghaft ansteigt. Da alle erforderlichen Signale an Komplexität zunehmen, erhöht sich die Übertragungsfrequenz erheblich — die Videobandbreite steigt auf 18 MHz. Bei Anwendung der Non-Interlace-Technik reicht aber selbst das nicht aus. Außerdem ist eine Schlitzmaske (Bild 7) anstelle der gewöhnlichen Lochmaske von Vorteil, da die Strahlen exakter fokussiert und senkrechte Linien unterstützt werden.</p>
+
+<p>Mithin ist klar: Qualität ist teuer. 80 Zeichen in Farbe bedeutet in der Regel die Anschaffung eines teuren Industrie-Monitors, der auch mit Non-Interlace-Technik arbeitet, falls der Computer ein entsprechendes Signal bereitstellt. Dabei werden — anders als beim Zeilensprungverfahren — statt 25 Vollbilder aus 50 Halbbildern tatsächlich 50 (!) Vollbilder/Sekunde erzeugt.</p>
+
+<p>Die erforderlichen Videoverstärker haben meist eine Bandbreite von mehr als 25 MHz, ja sogar neuerdings mehr als 100 MHz. Die Kosten sind dabei enorm. Vor dem Ankauf eines Datensichtgerätes muß sich jeder für sich überlegen, wofür er den Bildschirm braucht: Textverarbeitung, Grafik, Programm-Erstellung oder ganz einfach für Spiele. Der normale Anwender ist gut bedient mit einem hochauflösenden Monochrom-Monitor für 80-Zeichen-Darstellung bei Textverarbeitung und einem separaten Farbfernseher für Spiele, und zur Farbkontrolle von eigenen und fremden Programmen. Interessant ist, daß der Tripelabstand beziehungsweise der Pixelabstand fertigungsbedingt konstant, also von der Größe des Bildschirms unabhängig, ist. Größerer Durchmesser bedeutet somit höhere Auflösung, da mehr Bildpunkte pro Zeile zur Verfügung stehen. Erfahrungsgemäß sitzt der Computerfan jedoch in sehr kurzem Abstand vor dem Bildschirm und sieht also statt des erwarteten scharfen Bildes verschmierte Farbübergänge durch die sichtbaren Farbtripel. Auch machen sich aus diesem Abstand Flimmereffekte besonders störend bemerkbar.</p>
+
+<p>Der Kompromiß liegt daher etwa bei Bildschirmdiagonalen von 12 bis 14 Zoll oder etwa 36 Zentimetern. Zieht man die Anschaffung eines bernsteinfarbenen Monitors in Betracht, so sei darauf hingewiesen, daß diese wegen der Nachleuchtröhren für Lightpens nicht geeignet sind. Wählt man einen Monitor mit Mehr-Norm-Anschluß (AV/RGB, SCART), so kann man bei einem späteren Systemwechsel denselben Apparat weiterverwenden und spart so Geld. Die Anschlußnormen (Spannungspegel!) sind leider immer noch ein heißes Eisen. Man sollte darauf achten, daß der Computer und der Monitor problemlos aneinander anschließbar sind. Damit ist gemeint, daß man seinen Computer an den erwählten Monitor vom Händler anschließen läßt und selbst ausprobiert. Außerdem sollte das Format eingehalten werden. Ein Computer mit einem Pixel-Raster von 320 x 200 erfordert einen Bildschirm, der mindestens die gleiche Auflösung bieten kann. Zum Beispiel also 320 x 200 Pixel. Überschreitungen sind zulässig, ja sogar der Bildschärfe förderlich. Hat der Monitor aber eine wesentlich höhere Auflösung als der Computer, kann eine »zerrissene« Zeichendarstellung die Folge sein, weil jeder Pixel für sich deutlich sichtbar ist.</p>
+
+<p>Eine naheliegende Variante bietet eine preisgünstige Alternative: Ein Fernsehgerät mit AV (Video)-Eingang. Ein HF-Modulator entfällt, und natürlich muß im Gerät auch nicht demoduliert werden. Das gilt auch für Geräte mit kombinierten Luminanz/Chrominanz-Eingängen. Dadurch ergibt sich ein besseres Bild. Die beste Farbqualität erhält man mit RGB-Monitoren, da bei ihnen die Farbsignale in ihrer reinsten Form, ohne große Manipulationen, an die Bildröhre gelangen. In der Vergangenheit war allerdings wenig Bedarf, da Computer mit RGB-Ausgängen eine Seltenheit waren. Nicht erst seit dem »Schneider« hat RGB eine rasante Verbreitung erfahren. Auch Atari und Commodore »machen in Qualität«. Sehr viele Fernseher mit SCART-Anschluß können bereits mit RGB-Signalen angesteuert werden. 80 Zeichen pro Zeile sind lesbar. Wer ein superscharfes Bild haben möchte, der wird wohl oder übel in den sauren Apfel beißen und einen RGB-Industrie-Monitor anschaffen müssen.</p>
+
+<address class="author">(Helmut Jungkunz/hm)</address>
+
+<p>TODO ASIDE</p>
+
+<h2>Die wichtigsten Auswahlkriterien:</h2>
+
+<h3>Videobandbreite:</h3>
+
+<p>Qualitätsstufe der Video-Elektronik sind 5 bis 7 MHz bei einem normalen Farbfernsehgerät. Über 10 MHz Bandbreite haben die Geräte eine mittlere Auflösung, über 18 MHz eine hohe Auflösung.<br>
+Pixel (Tripel-)-Abstand:<br>
+über 0,5 mm = mäßige Schärfe<br>
+unter 0,4 mm = gute Schärfe<br>
+unter 0,35 mm = exzellente Schärfe</p>
+
+<p>Prinzipiell ist der Pixel-Abstand das wichtigste Qualitätskriterium.</p>
+
+<h3>Schlitzmaske:</h3>
+
+<p>Besser als Lochmaske. Besonders bei Textdarstellung sind senkrechte Kanten schärfer. Die hohen Präzisionsanforderungen bei der Herstellung machen die Schlitzmaske zum Teil erheblich teurer als die Lochmaske.</p>
+
+<h3>Bildröhren-Arten:</h3>
+
+<p>Monochrom-Röhren werten nur die Helligkeitsinformation des Video-Signals aus. Farbröhren enthalten eine Lochmaske oder eine Schlitzmaske, die verhindert, daß Farbstreuungen entstehen.</p>
+
+<p>Im Gegensatz zu Monochrom-Röhren enthalten Farbröhren drei Kathoden zur Erzeugung von Elektronenstrahlen. Wesentliches Qualitätsmerkmal bei Bildröhren sind der Pixelabstand und die Anzahl der Pixel, sowohl in horizontaler als auch in vertikaler Ebene. Je mehr, desto besser. Mindestens jedoch so viele, wie der anzuschließende Computer braucht.</p>
+
+<p>Eingangsspannungen, Eingangspegel: Ein Punkt, der gern übersehen wird. Passen Art und Größe der Signale des Computers mit dem Eingang des Monitors zusammen? Anpassen kostet Geld und Nerven — also voher überlegen. Leider geben die meisten Handbücher nur unzureichend Aufschluß über einen Ausgangspegel. Besser als selbst anschließen ist es, sich eine Komplettlösung (Monitor und passendes Kabel) zu kaufen.</p>
+
+<p>TODO ASIDE</p>
+
+<h2>Stichwortsammlung</h2>
+
+<h3>TTL-Pegel:</h3>
+
+<address class="author">(Transistor-Transistor-Logik)</address>
+
+<p>Digitale Impulse der Form »Low« oder »High«. Für TTL-Ausgänge gilt: Low ist der Zustand zwischen 0 und 0,4 V. High liegt zwischen 2,4 und 5 V; Spannungen von 0,4 bis 2,4 V sind nicht erlaubt. Deshalb wird diese Zone der »verbotene Bereich« genannt.</p>
+
+<p>TTL-Signale sind Rechtecksignale unterschiedlicher Pulsbreite, aber eines gemeinsamen Spannungsniveaus.</p>
+
+<h3>RGB-Digital:</h3>
+
+<p>Farbkomponenten des von Computern erzeugten Bildes in Form von Impulsen mit TTL-Pegel. Maximal können damit 512 Farben dargestellt werden.</p>
+
+<h3>RGB-Analog:</h3>
+
+<p>Farbkomponenten eines Videobildes mit unterschiedlichem, wechselnden Pegel. Bestimmt die Intensität des Elektronenstrahls. Theoretisch können durch diese Technik beliebig viele Farben erzeugt werden.</p>
+
+<h3>Sync, Synchronisationsimpuls:</h3>
+
+<p>Komplexes Steuersignalgemisch, das einen exakten Verlauf des Elektronenstrahls (nach der Fernsehnorm) bewirkt. Enthält die Vertikal- und Horizontal-Steuerimpulse (50 Hz, 15625 Hz).</p>
+
+<h3>SCART:</h3>
+
+<p>Französische Norm einer Video-Anschlußbuchse, die unter anderem auch für den Anschluß von Btx ausgerüstet ist.</p>
+
+<h3>Luminanz, »Y«:</h3>
+
+<p>Helligkeitsinformation eines Videobildes. Bezeichnet selten die reine Helligkeitsinformation. Meist meint man das kombinierte Luminanz-Signal. Dieses enthält Austast- und Sync-Impulse und entspricht damit dem BAS-Signal.</p>
+
+<h3>BAS-Signal:</h3>
+
+<address class="author">(Bildinhalt-Austast-Synchron-Si-gnal, engl. Composite = zusammengesetzt)</address>
+
+<p>Vollständiges Monochrom-Monitor-Signal.</p>
+
+<h3>FBAS-Signal:</h3>
+
+<p>((Farbart-Bildinhalt-Austast-Synchron)) Enthält zusätzlich zum BAS-Signal die Farbinformation, das Resultat einer komplizierten Mischung von Farb-Differenzsignalen mit einem Farbträger. Enthält auch den »Burst« zur Farb-Syn-chronisation. Die englische Bezeichnung dafür heißt Composite-Colour-Signal oder Compo-site-Video.</p>
+
+<h3>Burst</h3>
+
+<p>Farb-Synchronsignal, das aus 12 bis 14 Perioden (= vollständigen Schwingungen) des unterdrückten Farbträgers (4,4336 MHz) besteht.</p>
+
+<h3>PAL:</h3>
+
+<address class="author">(Phase-Alternation-Line)</address>
+
+<p>Damit Farbverfälschungen sich nicht störend bemerkbar machen, wird nach jeder Zeile die Phasenlage des Chrominanz-Signals um 180 Grad gedreht, also gegensinnig verpolt. Auch der Burst wird geschaltet. Enthalten zwei aufeinanderfolgende Zeilen gleiche Farbfehler, so hebt sich dieser scheinbar auf, da. die Farbart (durch die verpolte Übertragungsart) einmal ins rötliche und einmal ins bläuliche verschoben würde. Durch das Zusammenwirken entsteht der Effekt des »echten« Farbtons. Daher gehört PAL zu den zwar aufwendigsten aber auch besten Farb-Übertragungssystemen der Welt.</p>
+
+<h3>Pixel:</h3>
+
+<p>Bei Monochrom-Bildschirmen der kleinste, adressierbare Leuchtpunkt. Der Abstand der Pixel zueinander bestimmt wesentlich die Auflösungsfähgikeit des Bildes.</p>
+
+<h3>Tripel:</h3>
+
+<p>Äquivalent zum Pixel, allerdings zusammengesetzt aus drei verschiedenen Teilen: Rot, Grün und Blau. Auch hier ist der Abstand das wichtigste Merkmal der Auflösungsfähigkeit eines Farbgeräts. Die Teile (Rot, Grün und Blau) sind nicht einzeln adressierbar und bestehen, ebenso wie die Pixel, aus phosphoreszierendem Material, das beim Beschuß durch den Elektronenstrahl aufleuchtet. Auf einer Farbbildröhre befinden sich bis zu 1,2 Millionen Farbtripel.</p>
+
+<h3>Lochmaske:</h3>
+
+<p>Jede Farb-Bildröhre enthält eine Art Sieb, das verhindert, daß benachbarte Tripel unbeabsichtigt von dem Strahlenbündel getroffen werden. Da die getroffenen Randzonen einer falschen Farbe das Farbbild extrem verfälschen würden, ist die Lochmaske leider unumgänglich.</p>
+
+<h3>Schlitzmaske:</h3>
+
+<p>Im Gegensatz zu den runden Löchern der Lochmaske hat die Schlitzmaske längliche Öffnungen, die bei der Wiedergabe von</p>
+
+<p>Schriftzeichen erheblich weniger Verzerrungen durch Brechung erzeugt als die Lochmaske, da die senkrechten Schriftkanten parallel austreten können.</p>
+
+<h3>Bandbreite:</h3>
+
+<p>Der Übertragungsumfang von der niedrigsten bis zur höchsten Frequenz des zu übertragenden Signals.</p>
+
+<h3>Video-Bandbreite:</h3>
+
+<p>Sie sollte so hoch wie möglich sein. Ab etwa 18 MHz kann eine 80-Zeichen-Darstellung möglich sein, abhängig allerdings vom Abstand der Leuchtpunkte. Bei Fernsehgeräten beträgt die Video-Bandbreite 5 MHz, bei Monochrom-Monitoren 20 MHz und mehr.</p>
+
+<h3>Interlace (Zeilensprungverfahren):</h3>
+
+<p>Um trotz niedriger Video-Bandbreite flimmerfreie Bilder zu erhalten, werden pro Sekunde 50 Teilbilder zu 25 Vollbildern zusammengesetzt. Da die Filmmerfrequenz dadurch doppelt so hoch ist, erscheint das bewegte Bild schärfer zu sein.</p>
+
+<h3>Non-Interlace:</h3>
+
+<p>Aufwendige, teuere Art der Bilderzeugung. Es werden 50 Vollbilder pro Sekunde erzeugt. Dadurch wird nicht nur die Zeilenfrequenz verdoppelt, sondern auch andere Steuerfrequenzen erhöht. Das macht erheblich größere Video-Bandbreiten erforderlich. Dieses Verfahren findet man daher nur in teuren Industrie-Farbmonitoren der Preisklasse über 2000 Mark.</p>
+
+<h3>Nachleuchtröhre:</h3>
+
+<p>Der angestrahlte Leuchtpunkt bleibt länger hell, als das Signal dauert. Dadurch ist auch während der Dunkelphase des Elektronenstrahls ein »Nachleuchten« zu bemerken. Bemsteinfarbene' Monitore sind aus diesem Grund für Lichtgriffel (Lightpen) nicht geeignet.</p>
+
+<h3>Phasenlage:</h3>
+
+<p>Der zeitliche Zusammenhang zwischen Amplituden und Phasenwinkel (zwischen 0 und 360 Grad). Die Phasenlage wird immer zu einem bestimmten Zeitpunkt betrachtet.</p>
+
+<h3>Amplitude:</h3>
+
+<p>Die Differenz zwischen dem maximalen positiven und dem maximalen negativen Spannungswert eines sich ändernden Signals (Spitze-Spitze-Wert).</p>
+
+<p>Eine konstante Amplitude bezeichnet man als Pegel.</p>
+    </article>
+</body>
+</html>

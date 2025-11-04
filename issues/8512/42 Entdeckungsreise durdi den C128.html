@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Entdeckungsreise durdi den C128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, ev">
+    <meta name="64er.issue" content="12/85">
+    <meta name="64er.pages" content="42-43">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Entdeckungsreise durdi den C128</h1>
+<p class="intro">Ein frischgebackener C 128-Besitzer befindet sich in einer ähnlichen Situation wie Livingstone auf seiner Forschungsreise in Afrika. Dies ist ein erster Bericht von der Erforschung des unbekannten Kontinents C 128.</p>
+
+<p>Da steht er nun vor mir: Der neue von Commodore, der C 128. Als alter C 64-Hase bin ich höchst erfreut über den gewaltigen Basic-Wortschatz, der mir nun zur Verfügung steht. Langsam bekommen meine Basic-Programme die vielgelobte »Struktur« mit ELSE und BEGIN und DO etc. Allerdings bin ich vom C 64 allerhand Luxus schon gewohnt. Der Not gehorchend haben sich im Laufe der Zeit nämlich einige nette Erweiterungen angesammelt, die so zur Gewohnheit geworden sind, daß sie mir jetzt fehlen. Auch das feine Basic 7.0 hat seine Lücken!</p>
+
+<p>Als Assembler-Freak, dem nun sogar noch ein eingebauter Monitor zur Verfügung steht, machte ich mich also auf eine Forschungsreise durch die Firmware (integrierte Software im C 128) des Neuen. Das ist ein Weg durch »terra incognita«, denn noch hat niemand ein komplettes ROM-Listing veröffentlicht. Auch das umfangreiche Handbuch weist in der Liste der erweiterten Zeropage allerhand weiße Flecken auf.</p>
+
+<p>In unregelmäßiger Reihenfolge erhalten Sie Zwischenberichte von Entdeckungen, die diese Forschungsreise erbracht hat. Dies ist der erste davon.</p>
+
+<h3>Simulieren eines PRINT AT</h3>
+
+<p>Der neue SYS-Befehl im 128er-Modus erlaubt die Übergabe der Registerinhalte an aufgerufene Routinen:<br>
+SYS adresse,A,X,Y,S<br>
+Dabei ist<br>
+A = Akkumulator, X = X-Register, Y = Y-Register, S = Prozessorstatusregister</p>
+
+<p>An der Adresse 65520 in Bank 15 befindet sich eine Routine, die den Cursor an die Stelle setzt, die durch das X-Register (Zeile) und das Y-Register (Spalte) vorgegeben wird. Deshalb kann ein PRINT AT durch die Befehlssequenz simuliert werden: BANK15:SYS 65520,,Zeile, Spalte:PRINT A$</p>
+
+<p>A$ wird beispielsweise in die 10. Zeile ab der fünften Spalte gedruckt, wenn man schreibt: BANK15:SYS 65520,,10,5:PRINT A$</p>
+
+<h3>Welche Bank haben wir?</h3>
+
+<p>Sollten Sie auch zu denen gehören, die die Umschaltung zwischen den Banks des C 128 interessant finden, dann wird es Ihnen vermutlich auch so ergangen sein wie mir, daß Sie nämlich irgendwann nicht mehr so genau wissen, in welcher Bank Sie nun gerade operieren und erstaunt sind, daß beispielsweise ein POKE nicht das erwünschte Ergebnis bringt, weil die falsche Bank eingeschaltet war. Da stolperte ich über eine Adresse in der erweiterten Zeropage, in der offenbar immer die gerade aktuelle Bank gespeichert ist. Durch »PRINT PEEK(981)« behalten Sie immer den so wichtigen Überblick.</p>
+
+<h3>Ausgabe von Fehlermeldungen</h3>
+
+<p>Vermutlich ist diese Methode von Basic aus weit weniger interessant als in Assembler-Programmen: Durch »BANK15:SYS 19775,,X« (die zwei Kommas gehören da wirklich hin!) erzwingt man die Ausgabe der Fehlermeldung mit der Nummer X.</p>
+
+<p>In Assembler lädt man die Fehlernummer in das X-Register und springt dann die Ausgaberoutine bei $4D3F an:<br>
+LDX #$17<br>
+JMP $4D3F<br>
+erzwingt einen »STRING TOO LONG ERROR« und führt den Computer in den READY-Status. Allerdings sollte man auch hier noch auf die richtige Speicherkonfiguration achten: Die Basic-ROMs müssen eingeschaltet sein.</p>
+
+<h3>Eingabelängen</h3>
+
+<p>Ist es Ihnen schon aufgefallen — im Handbuch bin ich noch nicht darüber gestolpert —, daß man im 128er-Modus jetzt Programmzeilen bis zu vier Bildschirmzeilen (auf dem 40-Zeichen-Schirm) lang machen darf?</p>
+
+<p>Auch INPUT-Eingaben bis zu vier Bildschirmzeilen sind möglich, wer hätte das gedacht?</p>
+
+<h3>Eine OLD-Routine</h3>
+
+<p>Versehentlich gelöschte Basic-Programme wieder LIST- und lauffähig zu machen durch einen OLD-Befehl, das sieht unser Basic 7.0 nicht vor. Dabei passiert es gerade bei den ersten Versuchen am C 128 so leicht, daß man in die falsche Bank rutscht und dann den Computer durch ein kleines POKE‑Kommando scheintot macht. Da gibt es dann den Retter aus der Not: Den RESET-Knopf, dessen Betätigung aber das Basic-Programm unauffindbar macht. Da hilft nur eine OLD-Routine.</p>
+
+<p>Auch beim C 128 wird nur der erste Zeilenlinker durch zwei Nullen überschrieben. Es gilt also, diesen zu restaurieren. Außerdem muß der Interpreter erfahren, wo das Ende des Programms zu finden ist. Hier geht das nicht mehr durch den Zeiger, der den Beginn der Variablen andeutet — die liegen jetzt in der Bank 1 —, sondern dazu existiert ein neuer Zeiger. Hier eine Zusammenstellung der für OLD wichtigen Vektoren:<br>
+$2D/$2E 45/46 Basic-Programmstart<br>
+$1210/1 4624/5 Basic-Programmende</p>
+
+<p>Das im folgenden abgedruckte Programm OLD sucht zuerst den Anfang der zweiten Programmzeile. Sollte das Programm durch allerlei Manipulationen schon so zerstört sein, daß diese Suche erfolglos bleibt, wird ein »STRING TOO LONG ERROR« ausgegeben. Andernfalls restauriert OLD den ersten Zeilenlinker und durchsucht dann den Textspeicher, bis die drei Nullen gefunden werden, die ein Programmende markieren. Die Endadresse wird nun noch in den Endevektor 1210/1 geschrieben und unser Mißgeschick ist repariert.</p>
+
+<h3>Programm OLD</h3>
+
+<p>OLD ist hier genauso abgedruckt, wie Sie es mittels des Monitors eingeben können. Drücken Sie zuerst die F8-Taste (dann schaltet sich der Monitor ein) und geben Sie dann ein:<br>
+A 0E000 LDA $2D ((RETURN))</p>
+
+<p>Die nächste Adresse erscheint nun automatisch und Sie brauchen nun nur noch die weiteren Befehlssequenzen abzuschreiben. OLD ist willkürlich nach $E000 gelegt worden. Falls Sie das Programm lieber an anderer Stelle hätten, können Sie es mit dem T-Befehl des Monitors auch schnell verschieben. Sollten Sie es beispielsweise lieber bei $D000 liegen haben, dann verwenden Sie:<br>
+T E000 E051 D000</p>
+
+<p>Durch SYS 57344 (im Fall, daß Sie es bei $E000 belassen) starten sie unser OLD und das Basic-Programm ist wieder auferstanden.</p>
+
+<h3>Speicher begrenzen</h3>
+
+<p>Ein Nebenprodukt der Arbeit an der OLD-Routine war das Auffinden eines weiteren Vektors, der die Obergrenze des Basic-Textes in der Bank 0 festlegt. Dadurch ist es auch beim C 128 möglich, Assemblerprogramme vor dem Überschreiben durch Basic-Text zu schützen. Eine Rolle kann das dann spielen, wenn ein sehr langes Grafikprogramm Gefahr läuft, in die Maschinenprogramm-Speicherbereiche zu gelangen. Der Vektor ist $1212/3 (4626/7 in dezimal).</p>
+
+<p>Durch BANK0 : POKE4626,0 : POKE4627,224<br>
+können wir beispielsweise unser OLD-Programm schützen.</p>
+
+<p>Dies sind meine ersten Funde auf der Forschungsreise durch den unbekannten Kontinent C 128. Es spricht vieles dafür, daß — nach dem Auffinden der OLD-Routine — auch ein MERGE in greifbarer Nähe liegt. Schließen Sie sich an, vielleicht finden Sie es?</p>
+
+<address class="author">(Heimo Ponnath/ev)</address>
+    </article>
+</body>
+</html>

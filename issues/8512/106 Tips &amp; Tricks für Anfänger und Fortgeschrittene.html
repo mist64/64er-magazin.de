@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Anfänger und Fortgeschrittene</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Alex Haderer, tr, Dirk Trossen, og, Dominik Irion, tr, Ernst Hofler, tr, Felix Vogler, tr, Florian Gallwitz, tr, Florian Müller, tr, Gerhard Pehland, og, Herbert Kunz, tr, Jörg Peschel, tr, Jürgen Atrott, tr, Knut Smoczyk, tr, Stefan Moll, tr, Thomas Dreier, tr, Thorsten Wanschura, tr">
+    <meta name="64er.issue" content="12/85">
+    <meta name="64er.pages" content="106-108">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Anfänger und Fortgeschrittene</h1>
+<p class="intro">Hier wieder einige interessante Hinweise zum Programmieren des C 64.</p>
+
+<h2>Kopieren von Bildschirmzeilen</h2>
+
+<p>Der Kern des Einzeilers (Listing 1) bestehtaus dem Aufruf einer Betriebssystemroutine, die das Kopieren von Bildschirmzeilen ermöglicht. Mit dieser Routine wird ein Scrollen des Bildschirms erreicht, indem die erste Zeile in die letzte Bildschirmzeile kopiert und anschließend durch den Print-Befehl ein Zeilenvorschub ausgelöst wird. Somit erscheint die am oberen Bildschirmrand verdrängte Zeile wieder unten. Um den Einzeiler komfortabler zu gestalten, wird das zum Starten nötige »RUN« zuerst gelöscht, um ein Mitscrollen zu verhindern; mit Druck auf eine beliebige Taste wird der Scroll-Vorgang angehalten und nach loslassen wieder fortgesetzt. Nach dem Eingeben des Einzeilers sollte der Bildschirm gelöscht werden und anschließend der zu scrollende Text oder die Grafik erstellt werden. Es ist lediglich darauf zu achten, daß die 39. Bildschirmzeile nicht benutzt wird. Das Starten erfolgt am Anfang der letzten Bildschirmzeile mit »RUN«, gefolgt von einem Doppelpunkt (um eventuell folgende Zeichen auszuschalten). Die Routine eignet sich besonders gut für Spiele, die mit bewegtem Hintergrund arbeiten, da sie relativ schnell ist.</p>
+
+<p>Dank dieser Routine ist es zum Beispiel möglich gewesen, ein grafisches Froggerspiel (Listing 2) in nur 23 Basic-Zeilen zu erstellen.</p>
+
+<address class="author">(Stefan Moll/tr)</address>
+
+<h2>Scrolling nach unten in Basic</h2>
+
+<p>Die Idee ist folgende: Wen man auf dem Bildschirm eine Zeile schreibt, die länger als 40 Zeichen ist, so wird alles, was unterhalb dieser Zeile steht, nach unten weggescrollt. Der folgende Einzeiler bewirkt, daß nachfolgende PRINT-Anweisungen auf dieselbe Weise den Bildschirm nach unten wegschieben:<br>
+1 PRINT CHR$(19)CHR$(17)CHR$(157)CHR$(148):POKE 218,152</p>
+
+<address class="author">(Thomas Dreier/tr)</address>
+
+<h2>Disketten von verstellten Laufwerken lesen</h2>
+
+<p>10 OPEN1,8,15,”M-W”+CHR$(105)+CHR$(0)+ CHR$(X):CLOSE1</p>
+
+<p>Dieses »Programm« schreibt in die Speicherzelle $69 des Laufwerks-Speichers den Wert X. Diese Speicherzelle enthält die Konstante, die bestimmt, wieviele Leseversuche gemacht werden, bevor eine Fehlermeldung ausgegeben wird. Wird diese Konstante (der Standardwert ist 5) größer gewählt, so kann man auch Disketten lesen, bei denen das Laufwerk vorher Probleme hatte. Die Zugriffszeit erhöht sich natürlich entsprechend der Konstanten und der Anzahl der auftretenden Leseschwierigkeiten. Man hat aber somit die Möglichkeit, Disketten von schlecht justierten Laufwerken zu lesen.</p>
+
+<address class="author">(Alex Haderer/tr)</address>
+
+<h2>Reset ohne Datenverlust</h2>
+
+<p class="source">Wirkung: Folgender Einzeiler wirkt (fast) wie ein Reset; das Programm wird jedoch ohne Datenverlust fortgeführt:<br>
+1 POKE 648,4:SYS 64789:SYS 58451:SYS 58784<br>
+Anwendungsbeispiele:</p>
+
+<p>Sie wollen in einem Basic-Programm sämtliche Erweiterungen (Toolkits etc.) abschalten sowie den regulären Zeichensatz darstellen.</p>
+
+<p>Ein Programm mit hochauflösender Grafik, verändertem Zeichensatz und/oder Schutz-POKEs (gegen Listen, Run/Stop, Save etc.) ist beendet (Fehlermeldung, Abbruch). Wenn Sie Eingaben machen, erscheinen diese nichtaufdem Bildschirm, nur die Farbe ändert sich. In einem solchen Fall geben Sie den Einzeiler ohne Zeilennummer blind ein.</p>
+
+<address class="author">(Florian Müller/tr)</address>
+
+<h2>Bildschirmcode in ASCII-Code umwandeln</h2>
+
+<p>1 X=X+(X>127)*128:W=X-(X>-1ANDX<32ORX>95) * 64-(X > 63ANDX &lt; 96) * 32</p>
+
+<p>In der Variablen X wird der Bildschirmcode (PEEK(&hellip;)) abgelegt. In der Variablen W befindet sich dann der zugehörige ASCII-Code. Es muß allerdings berücksichtigt werden, daß nach Einsetzen eines Codes für inverse Zeichen der Inhalt der Variablen W nachher dem Code für das »normale Zeichen« entspricht. Will man diese Routine aber auch dazu benutzen, inverse Zeichen zu drucken, so muß man vorher überprüfen, ob der Bildschirminhalt größer als 127 ist, denn dann handelt es sich ja um ein inverses Zeichen. Wäre das der Fall, könnte man zum Beispiel durch Setzen des Reversflags (Adresse 199) auf 1 einen inversen Ausdruck bewirken.</p>
+
+<address class="author">(Knut Smoczyk/tr)</address>
+
+<h2>Langsame Bildschirmausgaben</h2>
+
+<p>Dieses kleine Maschinenprogramm (Listing 3) verlangsamt sämtliche Bildschirmausgaben des C 64 um ein Vielfaches. Es läßt sich ohne Probleme in eigene Programme einbinden.</p>
+
+<p>Abschalten läßt sich die kleine Erweiterung mit RUN/STOP-RESTORE oder mit »POKE 806,202:POKE 807,241«. Mit POKE 53232,Zahl kann man die Ausgabegeschwindigkeit regulieren (1=normal).</p>
+
+<p>Nach dem Starten verschiebt sich das Maschinenprogramm, das zuerst in den Bildschirmspeicher geschrieben wird, selbst nach 53228. Dann werden sämtliche Ausgabevektoren auf diese Adresse gerichtet, die nichts weiter als zwei ineinandergeschachtelte Verzögerungsschleifen beinhaltet.</p>
+
+<address class="author">(Dominik Irion/tr)</address>
+
+<h2>Direkter Programmodus</h2>
+
+<p>Jedem Floppy-Besitzer ist das schon oft passiert: die rote Leuchtdiode blinkt und zeigt einen Fehler an. Was tun?<br>
+a)  Ein Programm zum Auslesen des Fehlerkanals eingeben oder einladen ist nicht möglich, da das im Computer befindliche Programm nicht gelöscht oder verändert werden soll.<br>
+b)  Ein Programm im Direktmodus eingeben? Der Computer<br>
+reagiert auf diesen Versuch mit einem »ILLEGAL DIRECT ER-ROR«.<br>
+Die Lösung:</p>
+
+<p>Wir simulieren mit POKE 58,1 einen Programmablauf-Modus und verhindern so die oben genannte Fehlermeldung: OPEN1,8,15:POKE58,1:FORI = 1TO50:GET#1,A$: PRINTA$;:CLOSE-(ST=64):IFST&lt; >64THENNEXT</p>
+
+<address class="author">(Jürgen Atrott/tr)</address>
+
+<h2>Auto-Befehl in Basic</h2>
+
+<p>Mit diesem Mini-Programm lassen sich Zeilennummern au- , tomatisch vorgeben. Gestartet wird das Programm mit A=Anfangszeilennummer: GOTO 1. Nun wird der Bildschirm gelöscht und die in A definierte Zeilennummer ausgegeben. Mit POKE 19,1 wird die Tastatur zum aktuellen Eingabegerät. Dadurch wird bei der nachfolgenden INPUT-Anweisung das Fragezeichen nicht mit ausgegeben. Nach der Eingabe der Zeile wird darunter ausgegeben: »A = nächste Zeilennummer: GOTO 1«. In den Tastaturpuffer wird »Cursor Home« und »RETURN« geschrieben, so daß die Zeile nach dem END-Befehl automatisch ins Programm übernommen wird.<br>
+1 PRINT”{CLR}”A;:POKE 19,1:INPUT A$:POKE 19,0:PRINT<br>
+2 PRINT”A=”A+10”:GOTO1”:POKE 198,3:POKE 631,19:POKE 632,13:POKE 633,13:END</p>
+
+<p>Das Programm wird mit RUN/STOP-RESTORE wieder verlassen.</p>
+
+<address class="author">(Herbert Kunz/tr)</address>
+
+<h2>Einzeiler zur Eingabe von Einzeilern</h2>
+
+<p>Es lassen sich Basic-Zeilen bis zu 88 Zeichen Länge eingeben. Man startet also den Einzeiler: Es wird dabei der Bildschirm gelöscht, der Cursor auf die dritte Bildschirmzeile gebracht, und in der vierten Zeile, Spalte 8, ein »t« ausgedruckt. Nun gibt man eine Zeile, beginnend bei der Cursorposition, ein, bis der Pfeil auf das letzte Zeichen der Eingabezeile zeigt. Auf dem Bildschirm ist nun also eine zweizeilige Basic-Zeile zu sehen und in der dritten Basic-Zeile noch acht weitere Zeichen. Das macht zusammen 2 x 40 + 8 = 88 Zeichen, welche auch nach einem RETURN angenommen werden. Warum steht der Cursor aber erst in der dritten Bildschirmzeile? Ganz einfach: Denn nun kann man in der ersten Bildschirmzeile ein LIST (Zeilennummer) eingeben. Die gelistete Basic-Zeile geht dann genau in dem 88-Zeichenbereich. Aber am besten, man probiert den Einzeiler einfach selber mal aus.<br>
+Nun zum Programm selbst:<br>
+SYS 59749 erzeugt die wichtige Fortsetzungszeile, welche der C 64 selbständig nach 40 Eingabezeilen ausdruckt (Scrollen nach unten, nächste Zeile löschen). SYS 42112 ein Basic-Ende ohne »READY«. Der Vektor hierfür steht in den Speicherstellen 770 und 771.<br>
+1 PRINT”{CLR,2DOWN}”;: SYS 59749:SYS 59749: PRINT”{HOME,2DOWN}”: PRINTTAB(7)”↑”: PRINT” {HOME,DOWN}":SYS 42112</p>
+
+<address class="author">(Jörg Peschel/tr)</address>
+
+<h2>Einzeiliger Taschenrechner</h2>
+
+<p>1 PRINT”{LIG.BLUE,CLR}”A$”=”A:INPUTA$.:PRINT ”{HOME,BLUE}A=”A$”:GOTO1”:POKE631,19:POKE632,13: POKE198,2</p>
+
+<p>Mit diesem Einzeiler kann jede beliebige Rechenoperation innerhalb eines Programms durchgeführt werden.</p>
+
+<p>Zum Programm: Beim ersten Start erscheint in der oberen Ecke ein »=0«, das ignoriert werden kann. In den INPUT-Befehl wird nun eine beliebige Rechenoperation eingegeben. Jetzt folgt der eigentliche Trick: Zuerst wird die Variable A, dahinter die Rechenoperation, die im String vorhanden ist und schließlich der Befehl »GOTO 1« (zum späteren Wiederstarten des Programms) in die erste Bildschirmzeile geschrieben. Um zu verhindern, daß es ein kurzes Auftauchen der Variablenzuweisung gibt, ist der PRINT-Befehl der Bildschirmfarbe angepaßt. Nun wird zuerst ein »HOME«, gefolgt von einem »RETURN« in den Tastaturpuffer geschrieben und dieser auf die Länge von zwei Eingaben gebracht. Ist das Programm beendet, nimmt der Computer die Variablenzuweisung auf, startet das Programm erneut und gibt das Ergebnis aus.</p>
+
+<address class="author">(Thorsten Wanschura/tr)</address>
+
+<h2>Auto-DATA-Routine</h2>
+
+<p>Das Maschinenprogramm (Listing 4) muß mit dem MSE eingegeben werden. Es belegt keinen Basic-Speicher, sondern liegt im Speicherbereich von $C000-$C0CF. Nach dem Laden mit LOAD »Name«, Gerätenummer,1 muß »NEW« eingegeben werden. Die Erweiterung wird mit SYS 49152 initialisiert und stellt dann folgende neue Befehle zur Verfügung:<br>
+@A Startzeilennummer, Schrittweite und<br>
+@D Startzeilennummer, Schrittweite.</p>
+
+<p>Dabei darf die Startzeilennummer Werte von 0 bis 63999 annehmen und die Schrittweite darf 255 nicht überschreiten. Wird die Zeilennummer 63999 überschritten, so hat dies einen »ILLEGAL QUANTITY ERROR« zur Folge.</p>
+
+<p>Der @A-Befehl gibt bei der Eingabe eines Basic-Programms die jeweils folgende Zeilennummer aus. Allerdings ist dieser Befehl wesentlich komfortabler als zum Beispiel der Befehl, der in der 64’er-Ausgabe 12/84 veröffentlicht wurde.</p>
+
+<p>Es ist möglich, die zuletzt eingegebene Zeile zu korrigieren und danach das Abtippen fortzusetzen, ohne den Auto-Befehl zu verlassen. Die Zeilennummer wird dabei nicht stur weiter nach oben gezählt und die Zeile wird korrekt angenommen. Wer einmal mit der Routine von Frank Siedel oder auch mit der Auto-Routine von Hypra-Ass gearbeitet hat, wird diesen Vorteil sehr zu schätzen wissen.</p>
+
+<p>Der @A-Befehl kann zum Beispiel durch Drücken der Return-Taste verlassen werden.</p>
+
+<p>Der @D-Befehl gibt zusätzlich zu der Zeilennummer am Anfang jeder Zeile noch ein »DATA« aus. Er kann verlassen werden, indem man vor dem Drücken der Return-Taste das »DATA« mit der INST/DEL-Taste löscht oder die Cursor-down-Taste betätigt. In Verbindung mit dem Checksummer stellt diese Erweiterung eine große Hilfe beim Abtippen von Programmen dar.</p>
+
+<address class="author">(Florian Gallwitz/tr)</address>
+
+<h2>Zahlenratespiel</h2>
+
+<p>Die Zahlenobergrenze ist veränderbar, indem man die Zahl 108 (=100.000.000) variiert. Durch Verändern der ersten FOR&hellip;NEXT-Schleife kann man die Anzahl der Rateversuche erhöhen beziehungsweise erniedrigen. Das eigentliche Herz des Programms ist die SGN-Funktion. Durch sie wird die Variable D definiert. Nach jedem Rateversuch wird der derzeitige Wert dieser Variable am linken Bildschirmrand ausgegeben: »-1« bedeutet, daß die zu erratende Zahl kleiner ist als die eben eingetippte. »1« bedeutet, daß die Zahl größer ist. Bei »0« hat man die gesuchte Zahl erraten, und der Computer denkt sich automatisch eine neue aus. Die bisherige Anzahl der Versuche wird immer rechts des D-Wertes ausgegeben.<br>
+7PRINT”NEUEZAHL":A=INT(RND(1)*10↑8):FORB=1TO99: INPUTC:D=SGN(A-C):PRINTD,B:OND+1GOTO7:NEXT<br>
+Alle Befehle müssen abgekürzt werden!</p>
+
+<address class="author">(Felix Vogler/tr)</address>
+
+<h2>Der Hypra-POKE</h2>
+
+<p>POKE 57818,8. Nachdem man Hypra-Load geladen und gestartet hat, braucht man nach Eingabe dieses POKEs bei den Befehlen LOAD und SAVE nie wieder das »,8« am Schluß anghängen. Die Defaultnummer (das ist die Nummer, die genommen wird, wenn keine angegeben wird) für die Geräteadresse wird von vormals 1 (Datastette) auf 8 (Diskette) gestellt.</p>
+
+<address class="author">(Ernst Hofler/tr)</address>
+
+<h2>Tips zum Apfelmännchen</h2>
+
+<p>Aufgrund der großen Resonanz und vieler Anfragen, bringen wir hier die Daten der in Ausgabe 11/85 auf Seite 169 veröffentlichten Bilder.<br>
+Bild 1: -0.7; 2.1; -1; 1; 30<br>
+Bild 2. 1.67; 1.86; -.75; 0.75; 40<br>
+Bild 3. 0.1429; 0.1802; 1.02; 1.0477: 100<br>
+Bild 4. 0.5665; 0.5737; 0.5602; 0.5665: 85<br>
+Bild 5. 0.7425; 0.74825; 0.09621; 0.10067; 150<br>
+Bild 6: -0.103; 0.379; 0,618; 0.929; 50</p>
+
+<p>Doch damit nicht genug, wir haben noch ein paar mehr:<br>
+0.7654; 0,76722; 0.10021; 0.10151; 200<br>
+-0.0171; -9.44e-3; 0.6534; 0.658; 150<br>
+0.22223; 0.2545; 0.7089; 0.7421; 150<br>
+0.76461; 0.76498; 0.10056; 0.10082; 254</p>
+
+<address class="author">(Gerhard Pehland/og)</address>
+
+<h2>Anpassung des Apfelmännchen an Datasette</h2>
+
+<p>Folgende Änderungen sind zur Anpassung mit Turbo-Tape notwendig:<br>
+300 ?”{down}”tab(10)"(5){2space} Effekt”<br>
+310 entfällt<br>
+315 entfällt<br>
+340 get a$:if a$&lt;”1” or a$>”5”then 340<br>
+360 on val (a$)gosub 1000,2000,3000,4000,70003<br>
+4020 ←s nb$<br>
+4030 return</p>
+
+<p>Die Zeilen 4040 bis 5720 entfallen. Will man ein Bild sofort nach dem Berechnen speichern, so antwortet man im Programm mit »j«, und drückt, nachdem der Computer zu zeichnen begonnen hat, Record und Play.</p>
+
+<address class="author">(Dirk Trossen/og)</address>
+
+<p>Literaturhinweise zu Apfelmännchen:<br>
+In den Zeitschriften »Spektrum der Wissenschaft«, Ausgabe 10/85 und »geo« sind ausführliche Berichte zur Mandelbrotmenge (Apfelmännchen) enhalten.<br>
+(Dietmar Horst/og)</p>
+    </article>
+</body>
+</html>
