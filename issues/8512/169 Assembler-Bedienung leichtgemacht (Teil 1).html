@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Assembler-Bedienung leichtgemacht (Teil 1)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="ah">
+    <meta name="64er.issue" content="12/85">
+    <meta name="64er.pages" content="169-170,172">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Assembler-Bedienung leichtgemacht (Teil 1)</h1>
+<p class="intro">Lückenhafte Assembler-Anleitungen führen bei Anfängern häufig zu Verwirrungen. Deshalb zeigen wir am Beispiel »Hypra-Ass«, wie man einen solchen Assembler bedient.</p>
+
+<p>Der Umgang mit Maschinensprache dürfte für interessierte Leser kein Problem mehr sein. Wie ein Assembler allerdings bedient wird, ist für viele immer noch ein »Böhmisches Dorf«. Deshalb zeigen wir besonders dem Anfänger, wie es gemacht wird.</p>
+
+<p>In vielen Fachzeitschriften, so auch in der 64'er, stößt man häufiger auf Artikel, die in irgendeiner Form mit Maschinenprogrammierung zu tun haben. Immer mehr Leser sind auch an der Programmierung in Maschinensprache interessiert. Der C 64 läßt sich mit dem eingeschränkten V2-Basic bei weitem nicht ausnutzen. Außerdem hat ein Maschinenprogramm den Vorteil, daß es wesentlich schneller und flexibler ist, als irgendeine Hochsprache wie Basic, Pascal oder C.</p>
+
+<p>Das wichtigste Instrument zum Programmieren in Maschinensprache ist ein Assembler. Es gibt sogenannte Zeilenassembler, wie sie viele Maschinensprachemonitore haben (so auch der SMON) und Mehrpass-Assembler, mit denen wir uns hier beschäftigen wollen. Zeilenassembler eignen sich nicht zum Schreiben größerer Programme. Sie sind von der Bedienung her zu umständlich.</p>
+
+<p>Zuerst ein paar Worte zum Assembler selbst. Grob gesehen ist er mit einem Compiler zu vergleichen. Beide bringen einen verbalen Text, auch Quelltext oder Quellcode genannt, in eine Form, die der Computer versteht. Beide erzeugen ein lauffähiges Programm. Jeder Quelltext (ein Beispiel zeigt Listing 1) besteht aus Maschinenbefehlen, La-beln, Variablen, Formatanweisungen und sogenannten Pseudo-Op-codes.</p>
+
+<h2>Maschinenbefehle</h2>
+
+<p>Der übersetzte beziehungsweise assemblierte Quelltext besteht bis auf Tabellen (Aneinanderreihung beliebiger Zahlen) ausnahmslos aus Maschinenbefehlen. Sie steuern unmittelbar die internen Prozessorabläufe. Jeder Maschinenbefehl setzt sich aus 1, 2 oder 3 Zahlen zwischen 0 und 255 zusammen.</p>
+
+<p>Die Zahl 255 ist die größte, darstellbare Zahl. Sie kommt dadurch zustande, daß der 6502-Prozessor eine 8-Bit-Struktur hat und somit acht Informationen parallel erkennt und verarbeitet. Jede dieser acht Informationen kann entweder Low=0 oder High=1 sein. Daraus folgt, daß insgesamt 28 = 256 unterschiedliche Kombinationen möglich sind. Da die Zahl 0 auch eine Kombination ist, folgt weiter, daß sich mit acht Informationen beziehungsweise 8 Bit 255 Zahlen und die 0 darstellen lassen.</p>
+
+<p>Nun aber wieder zurück zum Maschinenbefehl. Er besteht, wie gesagt, aus 1,2 oder 3 Zahlen, auch Byte genannt. Das erste Byte ist der Operator oder das Befehls-Byte. Dieses Byte teilt dem Prozessor mit, was gemacht werden soll. Bei den beiden anderen Byte handelt es sich um Operanden, mit denen etwas gemacht wird. In einem Quelltext erscheint das Befehls-Byte, jedoch nicht in Form einer Zahl, sondern in Form von drei Buchstaben, die Opcode oder auch Mnemonic genannt weden. Beispiele für Opcodes sind LDA, STA, LDX, JSR und so weiter. Bei einem Operanden handelt es sich entweder um eine Adresse (ein oder zwei Byte), oder um ein Byte, das einen Wert darstellt und unmittelbar geladen werden kann.</p>
+
+<p>»LDA 01« lädt zum Beispiel den Akkumulator, eine prozessorinterne Speicherstelle, mit dem Inhalt der RAM-Speicherzelle 1. Diese Befehlsart nennt sich »absolute Adressierung«.</p>
+
+<p>Der Akkumulator läßt sich aber auch unmittelbar oder direkt mit einem Wert zwischen 0 und 255 laden. Dazu ist dem Wert, der geladen werden soll, ein Nummernzeichen (#) voranzustellen. Nach dem Maschinenbefehl »LDA #01« steht im Akkumulator 01 und nicht wie im ersten Beispiel, der Inhalt der RAM-Speicherzelle 01. Das Nummernzeichen wird immer dann einer Zahl vorangestellt, wenn nicht der Inhalt einer Adresse, sondern die Zahl selbst geladen werden soll. Diese Adressierungsart heißt »unmittelbare Adressierung«.</p>
+
+<p>Es soll noch einmal darauf hingewiesen werden, daß die Zahl > 255 sein muß.</p>
+
+<h2>Label und Variable</h2>
+
+<p>Eigentlich dürfte es die Unterscheidung Label und Variable gar nicht geben. Denn bei beiden handelt es sich um Konstante, die jeweils nur ein einziges Mal im Quelltext definiert werden dürfen. Das Arbeiten mit diesen Konstanten erleichtert das Programmieren in Maschinensprache ganz erheblich. Erst durch sie wird es möglich, Quelltextzeilen einzufügen oder zu löschen. Soll zum Beispiel ein Unterprogramm mit dem »JSR«-Befehl (entspricht dem Basic-Befehl GOSUB) aufgerufen werden, braucht man nicht in mühevoller Kleinarbeit die Startadresse des Unterprogramms ermitteln, sondern schreibt einfach vor den ersten Maschinenbefehl des Unterprogramms einen beliebigen Namen, zum Beispiel »AUSGABE«. »JSR AUSGABE« verzweigt dann in das Unterprogramm mit dem Namen »AUSGABE«. Wird der Assembler gestartet, weist jedem Label, so auch dem Label »AUSGABE« automatisch eine absolute Adresse (Wert) zu. Dazu sind mindestens zwei Assemblerläufe notwendig. Der Grund dafür ist folgender. Stößt der Assembler zum Beispiel auf den Maschinenbefehl »JSR AUSGABE«, bevor das Unterprogramm »AUSGABE« definiert wurde, ist ihm zu diesem Zeitpunkt die absolute Adresse unbekannt. Deshalb werden im ersten Assemblerlauf, auch Pass 1 genannt, allen Labeln absolute Adressen zugeordnet, die in einer Tabelle (Symboltabelle) eingetragen werden. Erst im zweiten Assemblerlauf (Pass 2) wird der Quelltext übersetzt und die Label durch die absoluten Adressen ersetzt. Ähnlich verhält es sich mit den Variablen. Allerdings müssen sie definiert sein, bevor sie das erste Mal benutzt werden. Definiert werden sie, wie in einem Basic-Programm, mit dem Gleichheitszeichen. Zum Beispiel:<br>
+WERT = 50 oder AUSGABE = 5000</p>
+
+<p>Bei einigen Assemblern ist das Gleichheitszeichen zu ersetzen durch »EQU«. Das Beispiel würde in diesem Fall lauten:<br>
+WERT EQU 50 oder AUSGABE EQU 5000</p>
+
+<p>Bei Hypra-Ass wird der Definition ein ».EQ« vorgestellt, zum Beispiel: ».EQ WERT = 50«</p>
+
+<h2>Formatanweisungen</h2>
+
+<p>Wie Sie sicherlich schon bemerkt haben, sind bisher alle Zahlen im dezimalen Zahlensystem angegeben worden. Jeder Assembler akzeptiert neben dem dezimalen Zahlensystem auch Zahlen in anderen Formaten. Nämlich im »binären« und im »hexadezimalen« Zahlensystem. Das dezimale Zahlensystem eignet sich nicht besonders zum Programmieren in Maschinensprache. Der Grund dafür ist der, daß der Inhalt einer Speicherstelle oder Register kleiner gleich 255 sein muß. Wird versucht, eine Zahl größer 255 in eine Speicherstelle zu schreiben, ahndet der Computer das mit einer Fehlermeldung. Man kann eine dezimale Zahl, die größer ist als 255, nicht ohne weiteres in zwei oder drei Zahlen aufteilen, so daß sie gerade in eine Speicherstelle paßt.</p>
+
+<p>Im hexadezimalen Zahlensystem ist das anders. Möchte man zum Beispiel die dezimale Zahl 258 = 0102 hexadezimal speichern, so läßt sich die hexadezimale Zahl direkt in zwei einzelne Zahlen beziehungsweise Byte aufteilen, man nennt sie oft »Low«- und »High«-Byte. In diesem Fall ist 01 das High-Byte und 02 das Low-Byte. Sie können unmittelbar hintereinander in die Speicherzellen geschrieben werden. In einem Assembler-Quelltext wird eine hexadezimale Zahl dadurch gekennzeichnet, daß ihr ein Dollarzeichen vorangestellt ist. Zum Beispiel:<br>
+LDA $CFFF = LDA 53247<br>
+LDA #$30 = LDA #48</p>
+
+<p>Zusammenfassend läßt sich zum hexadezimalen Zahlensystem sagen, daß es sich besonders gut bei allen Opcodes eignet, die in irgend einer Form etwas mit Adressen zu tun haben.</p>
+
+<p>Das binäre Zahlensystem, in dem nur die Ziffern 0 und 1 vorkommen, hängt unmittelbar mit der 8-Bit-Struktur des Computers zusammen. Die Zahl 255 läßt sich im binären Zahlensystem durch eine 8stellige Zahl darstellen (11111111). Dieses Zahlensystem eignet sich besonders gut bei allen logischen Operationen wie »OR«, »AND« und so weiter. Mit Hilfe der AND-Operation können bestimmte Bits gelöscht beziehungsweise isoliert werden. Mit der logischen OR-Verknüpfung lassen sich dagegen bestimmte Bits setzen. In einem Assembler-Quelltext wird eine binäre Zahl dadurch gekennzeichnet, daß ihr ein Prozentzeichen vorangestellt wird. Zum Beispiel: AND # %00010000 isoliert das Bit 4 im Akkumulator. Das Ergebnis kann nur den Wert 0 oder $10 beziehungsweise 16 annehmen.</p>
+
+<p>OR #%10000000 setzt das Bit 7 im Akkumulator. War das Bit 7 vor diesem Maschinenbefehl gesetzt, bleibt es erhalten. War das Bit nicht gesetzt, so wird zum Inhalt des Akkumulators $80 beziehungsweise dezimal 128 addiert.</p>
+
+<p>Ich möchte noch darauf hinweisen, daß jede binäre Zahl bei einem unmittelbaren Befehl 8stellig ist. Ferner können nicht alle Assembler binäre Zahlen verarbeiten, so zum Beispiel der im 64’er, Ausgabe 7/85 veröffentlichte Hypra-Ass.</p>
+
+<h2>Pseudo-Opcodes</h2>
+
+<p>Neben den normalen Opcodes wie LDA, LDX, STX und so weiter, existieren noch Pseudo-Opcodes. Bei ihnen handelt es sich um Befehle, die den Assembler steuern. Auf das erzeugte Maschinenprogramm haben sie zwar eine Wirkung, erscheinen dort aber nicht. Es gibt zwei große Gruppen von Pseudo-Opcodes, punktierte, wie ».BA«, »TX« oder ».BY«, und nicht punktierte, wie»#«, »$«,»=«und»;«. Der letzte nicht punktierte Pseudo-Opcode wurde bisher noch nicht besprochen. Er leitet einen Kommentar ein. Alles was hinter ihm steht, wird vom Assembler ignoriert und folglich nicht mit übersetzt; im Basic entspricht dem»;«die REM-Anweisung. Zum Beispiel:<br>
+LDA #$41 ; DENBUCHSTABEN»A« IN DEN AKKUMULATOR</p>
+
+<p>Der Assembler übersetzt den Maschinenbefehl LDA #$41. Der Rest der Zeile wird überlesen.</p>
+
+<p>Die punktierten Pseudo-Opcodes lassen sich wieder in verschiedene Gruppen zusammenfassen:</p>
+
+<ul>
+<li>Assembler-Steueranweisungen</li>
+<li>Ausgabebefehle</li>
+<li>Befehle zur bedingten Assemblierung</li>
+</ul>
+
+
+<h3>1. Assembler-Steueranweisungen</h3>
+
+<p>Die Assembler-Steueranweisungen stellen die wichtigste Gruppe der Pseudo-Opcodes dar. Durch sie und durch die Verwendung von Variablen und Labeln wird erst das komfortable Arbeiten mit einem Assembler ermöglicht. Die nun folgenden Erklärungen zu den einzelnen Pseudo-Opcodes beziehen sich auf Hypra-Ass.<br>
+<strong>.BA $C000</strong>: legt die Startadresse des Maschinenprogramms fest. Hier $C000. Man kann aber auch den entsprechenden dezimalen Wert (49152) einsetzen. Zu beachten ist, daß die Startadresse vor dem ersten Maschinenbefehl stehen muß. Es ist egal, ob die Startadresse vor oder hinter der Variablendeklaration definiert wird.<br>
+<strong>.EQ LABEL = $41</strong>: Weist der Variablen oder richtiger der Konstanten »la-bel« den Wert $41 zu.</p>
+
+<p>Mit diesen beiden Pseudo-Opcodes und den Opcodes LDA, STA und RTS läßt sich schon ein kleines Maschinenprogramm erstellen. Laden und starten Sie zuerst Hypra-Ass. Anschließend sind die Zeilen entsprechend Bild 1 einzugeben:</p>
+
+<p>TODO</p>
+
+<p>Gestartet wird der Assembler nun im Direktmodus durch den Basic-Befehl RUN. Beide Assemblerläufe (Pass 1 und Pass 2) werden automatisch hintereinander ausgeführt. Ist der Quelltext übersetzt, meldet sich Hypra-Ass mit folgender Meldung:<br>
+END OF ASSEMBLY 0:00.6<br>
+BASE = $9000 LAST BYTE AT $908C</p>
+
+<p>Dieses kleine Maschinenprogramm kann nun im Direktmodus mit SYS 12*4096 gestartet werden. Der Befehl PRINT PEEK(9*4096) liefert als Ergebnis den Wert 255. Mit dem Editor-Befehl »/E« läßt sich der Quelltext LISTen. Wird in Zeile 30 der Wert $FF durch $00 ersetzt und danach der Assembler mit RUN und das Maschinenprogramm mit dem angegebenen SYS-Befehl von neuem gestartet, liefert der PRINT-Befehl als Ergebnis den Wert 0. Um wieder zu den Pseudo-Opcodes zurückzukommen, löschen Sie im Qelltext die Zeile 10 und fügen dafür die Zeile:<br>
+45 -.BA $C000<br>
+ein. Wird der Quelltext nun assembliert und das Maschinenprogramm gestartet, werden Sie keinerlei Veränderungen feststellen. Wird dagegen die Startadresse erst in Zeile 65 definiert, kann das fatale Auswirkungen haben. Es ist durchaus möglich, daß der Computer abstürzt. Aber versuchen Sie es einmal. Aus Fehlern kann man nur lernen.</p>
+
+<p>Die nun folgenden drei Pseudo-Opcodes teilen dem Assembler mit, daß die in der gleichen Zeile stehenden Zeichen nicht übersetzt, sondern direkt übernommen werden sollen. Alle drei Pseudo-Opcodes sind wichtig für die Definition von Tabellen. Wichtig ist auch, daß vor jeder Tabelle ein RTS oder JMP stehen muß. Ist das nicht der Fall, interpretiert der Prozessor das erste Byte der Tabelle als Befehls-Byte. Als Ergebnis werden dann unkontrollierte Befehle ausgeführt.<br>
+<strong>.BY 255,$FF,"A"</strong>: Einfügen von Bytewerten in den Quelltext. Soll eine Bytetabelle definiert werden, ist vor den Pseudo-Opcode ein Label zu setzen. Zum Beispiel: LABEL .BY 255,$FF,”A”<br>
+<strong>.WO 1234,$FFD2,LABEL</strong>: Einfügen von 16-Bit-Adressen in den Quelltext. Die 16-Bit-Adresse wird automatisch in zwei einzelne Byte geteilt (High-Byte, Low-Byte) und anschließend im Format Low/High-Byte im Speicher abgelegt. Eine Worttabelle läßt sich genauso anlegen wie eine Bytetabelle.<br>
+<strong>.TX</strong> "dieses ist ein Beispiel": Mit diesem Pseudo-Opcode lassen sich ganze Textblöcke in den Quelltext einfügen. Prinzipiell handelt es sich bei einer Texttabelle um eine Bytetabelle, mit dem Unterschied, daß die einzelnen Byte nicht in einem Zahlenformat oder als einzelnes ASCII-Zeichen eingefügt werden, sondern eben als Textblock. Tabellen dieser Art werden häufig dazu verwendet, Texte auf dem Bildschirm auszugeben. Eine Texttabelle läßt sich genauso anlegen wie eine Bytetabelle.</p>
+
+<p>Mit einem kleinen Programm (siehe Listing) soll der Umgang mit Pseudo-Opcodes gezeigt werden. Das Programm gibt aufTastendruck einen vorgegebenen Text auf dem Bildschirm aus. In dem Beispielprogramm kommen noch einige nichtpunktierte Pseudo-Opcodes hinzu, die noch nicht erklärt wurden. Es handelt sich um das »größer«- beziehungsweise »kleiner«-Zeichen. Dieser Pseudo-Opcode dient dazu, bei einem 16-Bit Label das High-Byte (»größer«-Zeichen) beziehungsweise das Low-Byte (»kleiner«-Zeichen) zu isolieren, so daß sich vom Quelltext aus die einzelnen Byte des 16-Bit-Labels direkt, also unmittelbar, in den Akkumulator oder in das X-, Y-Register laden lassen.</p>
+
+<p>In den Zeilen 240 bis 280 wird ein kleiner Programmiertrick angewendet. Zuerst wird das High-Byte der anzuspringenden Funktion auf den Stack geschrieben und anschließend das Low-Byte. Trifft das Programm nun auf einen »RTS«-Befehl, werden die beiden Byte (Low und High) in den Programmzeiger geschrieben und zur Adresse Programmzeigerinhalt + 1 verzweigt.</p>
+
+<p>Aus diesem Grund wird bei der Definition der Bytetabellen in Zeile 540 und 550 von der anzuspringenden Funktion eine 1 abgezogen. Auf den ersten Blick ist es vielleicht recht unverständlich, daß die 1 nicht nur vom Low-Byte (Zeile 550) abgezogen wird, sondern auch vom High-Byte. Der Grund ist folgender. Angenommen das Label »TASTE1« entspricht der Adresse $9000. Wird nur vom Low-Byte eine 1 abgezogen, würde die »$90« für das High-Byte stehenbleiben. Das Ergebnis wäre, daß nicht das Unterprogramm bei $8FFF + 1, sondern bei $90FF + 1 in der Zeile 280 angesprungen würde.</p>
+
+<p>Mit diesem Beispielprogramm möchte ich auch den ersten Teil dieses Artikels beenden. Die restlichen Pseudo-Opcodes und das Arbeiten mit Makros werde ich das nächste Mal behandeln.</p>
+
+<address class="author">(ah)</address>
+    </article>
+</body>
+</html>
