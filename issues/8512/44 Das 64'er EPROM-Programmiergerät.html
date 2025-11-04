@@ -44,6 +44,11 @@
 
         <p>Eine weitere Methode, die Kaskade (Bild 1), findet auch in der Hochspannungstechnik Verwendung. Das Verfahren beruht darauf, daß man Kondensatoren parallel auflädt und sie dann in Serie entlädt. So kann man Spannungsimpulse gewinnen, die eine Ausgangsspannung nach der Anzahl der Kondensatoren vervielfältigen. Verwendet man zum Betreiben der Kaskade Wechselstrom, so kann man am Ausgang eine kontinuierlich vervielfältigte Spannung entnehmen. Die letzte Möglichkeit besteht darin, einen fertigen DC-/DC-Wandler zu verwenden. Diese Methode ist zwar die beste, aber normalerweise auch eine der teuersten.</p>
 
+        <figure>
+            <img src="44-1.png" alt="">
+            <figcaption>Bild 1. Die Schaltung einer Kaskade</figcaption>
+        </figure>
+
         <p><strong>Der Adreßbus</strong>: Jedes Byte, das in einem EPROM gespeichert oder aus diesem gelesen werden soll, muß an den Adreßeingängen des EPROMs angesprochen werden. Dazu hat jedes EPROM die Eingänge A0 bis AX, je nach der Kapazität des EPROMs. An diesen Eingängen legt man zum Programmieren binär codiert (mit TTL-Pegeln) die Nummer des Bytes an, welches man im EPROM ansprechen will. Zum Auslesen reicht es, wenn man das EPROM direkt an den Systembus anschließt (was man bei Steckmodulen am Expansion-Port auch macht). Zum Programmieren muß man die selektierte Adresse aber für mindestens 50 ms (Dauer des Programmierimpulses) stabil halten. Dazu ist es unumgänglich, die Adresse zwischenzuspeichern. Auch hier gibt es wieder mehrere Möglichkeiten.</p>
 
         <p>Die erste Möglichkeit besteht in der Verwendung eines Binärzählers. Binärzähler haben einen Impulseingang und mehrere Zählausgänge. Jedesmal, wenn am Eingang eine Impulsflanke auftritt, wird die an den Ausgängen durch TTL-Pegel dargestellte Zahl um eins erhöht. Man kann durch Koppeln von Binärzählern jede beliebige Zahl (als Spannungspegel) realisieren. Will man, wie wir nicht nur zählen, sondern auch bestimmte Zahlen darstellen, so benötigt man unbedingt einen Binärzähler mit sogenanntem »Clear«-Eingang. Gibt man einen Impuls auf diesen Eingang, wird der Zähler auf Null gestellt und man kann durch eine entsprechende Zahl von Impulsen am Zähleingang jede beliebige Zahl (Adresse) an den Ausgängen herstellen. Der Vorteil dieser Anwendung ist, daß man nur drei Steuerleitungen zur Darstellung beliebiger Adressen braucht. Der Nachteil besteht darin, daß die gewünschten Adressen Impuls für Impuls hochgezählt werden müssen. Da am User-Port des C 64 nur eine begrenzte Anzahl von Leitungen zur Verfügung steht, eignet sich diese Methode hauptsächlich für Programmiergeräte, die am User-Port betrieben werden.</p>
@@ -86,42 +91,68 @@
 
         <p>Es gibt EPROM-Programmierer, die nahezu jeden EPROM-Typ programmieren können. Da unser EPROM-Brenner jedoch für den Einsatz am C 64 gedacht ist, genügt es, wenn er die EPROM-Typen programmieren und lesen kann, die an diesem Computer am häufigsten Anwendung finden. Das hat den Vorteil, daß man den EPROM-Programmierer kostengünstig herstellen kann. Meistens benötigt man EPROMs, die das Betriebssystem ersetzen, statt des Basic-ROMs eingesetzt werden, oder als Steckmodul im Bereich $8000 bis $A000 eingeblendet werden. Da alle diese Bereiche 8 KByte Speicher umfassen (wie auch die Betriebssystem ROMs der 1541 Floppy), ist dafür vor allem der Typ 2764 geeignet, der in letzter Zeit auch noch sehr billig geworden ist. Für größere Anwendungen (lange Programme, 16 KByte Steckmodule, Einsatz von Umschaltmodulen gibt es bis 128 KByte) kommt noch der Typ 27128 (16 KByte) oder 27256 (32 KByte) in Frage. Zum Austausch des Zeichensatzes kann man dann noch 4 KByte EPROMs vom 2532 oder 2732 verwenden. Der Einsatz weiterer Typen ist im Regelfall nicht nötig und auch wirtschaftlich unsinnig, da vor allem die 27XX-Reihe zur Zeit fast überall sehr preiswert gehandelt wird. Bislang sind wir noch nie auf ein Problem gestoßen, das sich nicht mit den oben genannten EPROM-Typen (Bild 3) lösen ließe.</p>
 
-        <h2er-eprommers">Das Konzept des 64'er EPROMmers</h2>
+        <h2>Das Konzept des 64'er EPROMmers</h2>
 
-            <p>TODO NOT</p>
+        <p>TODO NOT</p>
 
-            <p>Um eine größtmögliche Flexibilität und Bedienerfreundlichkeit zu gewährleisten, wurde der 64'er EPROMmer zum Anschluß an den Expansion-Port entwickelt (Bild 4). Der Daten und Adreßverkehr, sowie die Steuerung des Kontrollbusses erfolgt über zwei I/O-Bausteine vom Typ 6821. Diese werden im C 64 im Adreßbereich $DF00-$DF03 (Baustein Nummer 1) und $DF04-$DF07 (Baustein Nummer 2) decodiert. Beide Bausteine sind parallel am Datenbus (D0 bis D7) und an den Adreßleitungen A0 und A1 des C 64 angeschlossen. Die Decodiereingänge CS0/CS1/CS2 der Bausteine sind folgendermaßen verschaltet: CS0 sind bei Baustein Nummer 1 direkt, bei Baustein Nummer 2 über einen Inverter 7404 mit der Adreßleitung A2 verbunden. CS1 ist bei beiden Bausteinen mit der Adreßleitung A3 und CS2 mit der Decodierleitung IO2 des Computers verbunden. Die IRQ-Ausgänge der beiden 6821 bleiben bei dieser Anwendung, da sie nicht gebraucht werden, unverschaltet. Weiterhin sind die Leitungen ⌀2 (Systemtakt), R/W (lesen/schreiben), Reset, +5 Volt und GND des C 64 mit beiden 6821 zur Steuerung des Datentausches verbunden. Der I/O Port A des 6821 Nummer 1 übernimmt den Datenverkehr zwischen EPROM und Computer. Da die Datenleitung aller verwendeten EPROMs gleich sind, können diese Verbindungen fest verdrahtet werden. Port B des gleichen IC steuert die Kontroll-Logik zum Lesen oder Programmieren der verschiedenen EPROM-Typen. Der 6821 Baustein Nummer 2 steuert den Adreßbus mit beiden Ports. Dadruch wird die Bearbeitung von EPROMs bis zu 64 KByte ermöglicht. Der größte Teil dieser Leitungen kann auch fest mit dem Textoolsockel (Nullkraftsockel), der der Aufnahme der EPROMs dient, verbunden sein. Dies sind die Leitungen A0 bis A10, die anderen Adreßleitungen sind bei jedem EPROM-Typ spezifisch und müssen über den Kontrollbus gesteuert werden. Bevor nun der Kontrollbus beschrieben wird, der die aufwendigste Verschaltung des EPROM-Programmierers darstellt, muß das Problem der Spannungsversorgung geklärt sein. Die stabilisierte Versorgungsspannung von 5 Volt für die gesamte Logik ist am Expansion-Port verfügbar. Die Programmierspannung wird aus einem DC-/DC-Wandler der Firma TDK (CE 0072) gewonnen. Dieser preiswerte Wandler liefert am Ausgang eine Gleichspannung von 31 Volt. Sie wird durch einen Kondensator von 100 µF geglättet und über ein Transistor Zehner-Dioden-Glied auf 27 Volt vorgeregelt. Die endgültige Regelung auf die erforderlichen Programmierspannungen erfolgt nach nochmaliger Glättung durch einen Kondensator von 10 µF direkt am EPROM durch Zehner-Dioden. Die Spannungen für die verschiedenen EPROM-Typen werden über den Kontrollbus geschaltet. Der Kontrollbus hat somit folgende Aufgaben:</p>
+        <p>Um eine größtmögliche Flexibilität und Bedienerfreundlichkeit zu gewährleisten, wurde der 64'er EPROMmer zum Anschluß an den Expansion-Port entwickelt (Bild 4). Der Daten und Adreßverkehr, sowie die Steuerung des Kontrollbusses erfolgt über zwei I/O-Bausteine vom Typ 6821. Diese werden im C 64 im Adreßbereich $DF00-$DF03 (Baustein Nummer 1) und $DF04-$DF07 (Baustein Nummer 2) decodiert. Beide Bausteine sind parallel am Datenbus (D0 bis D7) und an den Adreßleitungen A0 und A1 des C 64 angeschlossen. Die Decodiereingänge CS0/CS1/CS2 der Bausteine sind folgendermaßen verschaltet: CS0 sind bei Baustein Nummer 1 direkt, bei Baustein Nummer 2 über einen Inverter 7404 mit der Adreßleitung A2 verbunden. CS1 ist bei beiden Bausteinen mit der Adreßleitung A3 und CS2 mit der Decodierleitung IO2 des Computers verbunden. Die IRQ-Ausgänge der beiden 6821 bleiben bei dieser Anwendung, da sie nicht gebraucht werden, unverschaltet. Weiterhin sind die Leitungen ⌀2 (Systemtakt), R/W (lesen/schreiben), Reset, +5 Volt und GND des C 64 mit beiden 6821 zur Steuerung des Datentausches verbunden. Der I/O Port A des 6821 Nummer 1 übernimmt den Datenverkehr zwischen EPROM und Computer. Da die Datenleitung aller verwendeten EPROMs gleich sind, können diese Verbindungen fest verdrahtet werden. Port B des gleichen IC steuert die Kontroll-Logik zum Lesen oder Programmieren der verschiedenen EPROM-Typen. Der 6821 Baustein Nummer 2 steuert den Adreßbus mit beiden Ports. Dadruch wird die Bearbeitung von EPROMs bis zu 64 KByte ermöglicht. Der größte Teil dieser Leitungen kann auch fest mit dem Textoolsockel (Nullkraftsockel), der der Aufnahme der EPROMs dient, verbunden sein. Dies sind die Leitungen A0 bis A10, die anderen Adreßleitungen sind bei jedem EPROM-Typ spezifisch und müssen über den Kontrollbus gesteuert werden. Bevor nun der Kontrollbus beschrieben wird, der die aufwendigste Verschaltung des EPROM-Programmierers darstellt, muß das Problem der Spannungsversorgung geklärt sein. Die stabilisierte Versorgungsspannung von 5 Volt für die gesamte Logik ist am Expansion-Port verfügbar. Die Programmierspannung wird aus einem DC-/DC-Wandler der Firma TDK (CE 0072) gewonnen. Dieser preiswerte Wandler liefert am Ausgang eine Gleichspannung von 31 Volt. Sie wird durch einen Kondensator von 100 µF geglättet und über ein Transistor Zehner-Dioden-Glied auf 27 Volt vorgeregelt. Die endgültige Regelung auf die erforderlichen Programmierspannungen erfolgt nach nochmaliger Glättung durch einen Kondensator von 10 µF direkt am EPROM durch Zehner-Dioden. Die Spannungen für die verschiedenen EPROM-Typen werden über den Kontrollbus geschaltet. Der Kontrollbus hat somit folgende Aufgaben:</p>
 
-            <ol>
-                <li>Die Verschaltung des Adreßbusses (All bis A15) für die verschiedenen EPROM-Typen.</li>
-                <li>Die Steuerungderverschiedenen Programmierspannungen.</li>
-                <li>Die Bedienung der EPROM‑Eingänge der verschiedenen EPROM-Typen zum Lesen oder Programmieren.</li>
-                <li>Die Erzeugung des Programmier-Impulses von 50 ms.</li>
-                <li>Die Bereitstellung der Versorgungsspannung für 24 Pin-EPROMs an Pin 26 des Textoolsockels.</li>
-            </ol>
+        <figure>
+            <img src="44-4.png" alt="">
+            <figcaption>Bild 4. Der Blockschaltplan des 64'er EPROM-Programmiergeräts</figcaption>
+        </figure>
+
+        <ol>
+            <li>Die Verschaltung des Adreßbusses (All bis A15) für die verschiedenen EPROM-Typen.</li>
+            <li>Die Steuerungderverschiedenen Programmierspannungen.</li>
+            <li>Die Bedienung der EPROM‑Eingänge der verschiedenen EPROM-Typen zum Lesen oder Programmieren.</li>
+            <li>Die Erzeugung des Programmier-Impulses von 50 ms.</li>
+            <li>Die Bereitstellung der Versorgungsspannung für 24 Pin-EPROMs an Pin 26 des Textoolsockels.</li>
+        </ol>
 
 
-            <p>TODO NOT</p>
+        <p>TODO NOT</p>
 
-            <p>Diese Aufgaben werden mit Hilfe von Multiplexern und Transistoren (siehe Schaltpläne Bild 4 und Bild 5) erfüllt. Die Logik wurde dabei so geschaltet, daß für jeden EPROM-Typ eine Zahlenkombination in Port B geschrieben wird und das Umschalten zwischen Lesen und Schreiben über ein Bit gesteuert werden kann. Der verwendete 74LS139 Multiplexer ist mit seinen Eingängen mit Leitung B0 und B1<br>
-                des 6821 Nummer 1 verbunden. So kann man mit einer Zahl zwischen Null und Vier eine bestimmte Programmierspanung auswählen. Der Enable-Eingang des Multiplexers, der die Auswahl auf die Ausgänge schaltet, wird von einem Monoflop 74LS123 gesteuert. Dieses Monoflop ist mit Hilfe eines Kondensators von 6,8 µF und eines Widerstandes von 20,5 kΩ auf 50 ms eingestellt. So ist gewährleistet, daß ein programmierter Spannungsimpuls, selbst bei Ausfall des Computers oder Auftreten eines Interrupts, genau 50 ms dauert (ein längerer Impuls könnte zur Zerstörung des EPROMs führen). Zum Einschalten der verschiedenen Programmierspannungen dienen Transistoren vom Typ BC327-40, die die Programmierspannung durchschalten, wenn ihre Basis vom Multiplexer über den angeschlossenen Treiber 7406 auf Masse gezogen wird. Nach dem Passieren des Schalttransistors werden die verschiedenen Spannungen über einen Vorwiderstand mit Zehnerdiode geregelt. Die logischen Zustände bei abgeschalterer Programmierspannung werden durch Dioden mit Vorwiderstand (logisch »1«) oder Widerstände, die mit Masse verbunden sind, (logisch »0«) geregelt. Weiterhin wird das Signal PGM für die Typen 2764 und 27128 aus dem Multiplexer, Leitung 5, gewonnen. Der Monoflop steuert über einen zweiten Ausgang eine LED, die für die Dauer des Programmierimpulses erlischt und so den Programmiervorgang durch Blinken anzeigt. Außer der Ansteuerung der verschiedenen Programmierspannungen müssen noch Pin 1, Pin 26 und 27 des Texttool-Sockels mit verschiedenen EPROM-Typen beschaltet werden.</p>
+        <p>Diese Aufgaben werden mit Hilfe von Multiplexern und Transistoren (siehe Schaltpläne Bild 4 und Bild 5) erfüllt. Die Logik wurde dabei so geschaltet, daß für jeden EPROM-Typ eine Zahlenkombination in Port B geschrieben wird und das Umschalten zwischen Lesen und Schreiben über ein Bit gesteuert werden kann. Der verwendete 74LS139 Multiplexer ist mit seinen Eingängen mit Leitung B0 und B1 des 6821 Nummer 1 verbunden. So kann man mit einer Zahl zwischen Null und Vier eine bestimmte Programmierspanung auswählen. Der Enable-Eingang des Multiplexers, der die Auswahl auf die Ausgänge schaltet, wird von einem Monoflop 74LS123 gesteuert. Dieses Monoflop ist mit Hilfe eines Kondensators von 6,8 µF und eines Widerstandes von 20,5 kΩ auf 50 ms eingestellt. So ist gewährleistet, daß ein programmierter Spannungsimpuls, selbst bei Ausfall des Computers oder Auftreten eines Interrupts, genau 50 ms dauert (ein längerer Impuls könnte zur Zerstörung des EPROMs führen). Zum Einschalten der verschiedenen Programmierspannungen dienen Transistoren vom Typ BC327-40, die die Programmierspannung durchschalten, wenn ihre Basis vom Multiplexer über den angeschlossenen Treiber 7406 auf Masse gezogen wird. Nach dem Passieren des Schalttransistors werden die verschiedenen Spannungen über einen Vorwiderstand mit Zehnerdiode geregelt. Die logischen Zustände bei abgeschalterer Programmierspannung werden durch Dioden mit Vorwiderstand (logisch »1«) oder Widerstände, die mit Masse verbunden sind, (logisch »0«) geregelt. Weiterhin wird das Signal PGM für die Typen 2764 und 27128 aus dem Multiplexer, Leitung 5, gewonnen. Der Monoflop steuert über einen zweiten Ausgang eine LED, die für die Dauer des Programmierimpulses erlischt und so den Programmiervorgang durch Blinken anzeigt. Außer der Ansteuerung der verschiedenen Programmierspannungen müssen noch Pin 1, Pin 26 und 27 des Texttool-Sockels mit verschiedenen EPROM-Typen beschaltet werden.</p>
 
-            <p>Diese sind:<br>
-                Pin 1: Umschaltung zwischen A15 (27512) und U<sub>P</sub> (12,5 oder 25 Volt für 2764/27128/27256)</p>
+        <figure>
+            <img src="44-5.png" alt="">
+            <figcaption>Bild 5. Die Verschaltung des Kontroll-Busses</figcaption>
+        </figure>
 
-            <p>TODO NOT</p>
+        <p>Diese sind:<br>
+            Pin 1: Umschaltung zwischen A15 (27512) und U<sub>P</sub> (12,5 oder 25 Volt für 2764/27128/27256)</p>
 
-            <p>Pin 27: Umschaltungzwischen A14 (27256/27512) und PGM (2764/27128)</p>
+        <p>TODO NOT</p>
 
-            <p>Pin 26: Umschaltungzwischen A13 und U<sub>B</sub> (2732/2532)</p>
+        <p>Pin 27: Umschaltungzwischen A14 (27256/27512) und PGM (2764/27128)</p>
 
-            <p>Die Umschaltung dieser Pins ist in den Bildern 6, 7 und 8 dargestellt. Die Funktion der Steuerleitungen (CT1 bis CT3), die aus dem 6821 Nummer 1 Port B kommen, kann man den Logikdiagrammen entnehmen. Die Leitungskreuzungen für den seltener verwendeten Typen 2532 wurden mit einem Umschalter, dessen Stellung am 6821 Nummer 1 B6 ausgelesen werden kann, realisiert (Bild 9).</p>
+        <p>Pin 26: Umschaltungzwischen A13 und U<sub>B</sub> (2732/2532)</p>
 
-            <p>TODO NOT</p>
+        <p>Die Umschaltung dieser Pins ist in den Bildern 6, 7 und 8 dargestellt. Die Funktion der Steuerleitungen (CT1 bis CT3), die aus dem 6821 Nummer 1 Port B kommen, kann man den Logikdiagrammen entnehmen. Die Leitungskreuzungen für den seltener verwendeten Typen 2532 wurden mit einem Umschalter, dessen Stellung am 6821 Nummer 1 B6 ausgelesen werden kann, realisiert (Bild 9).</p>
 
-            <p>Nachdem hiermit nun die Grundlagen des 64'er EPROM-Programmiergerätes beschrieben wurden, werden wir uns in der nächsten Ausgabe der Bauanleitung, den Bestückungsplänen und dem Platinenlayout widmen.</p>
+        <figure>
+            <img src="44-6.png" alt="">
+            <figcaption>Bild 6. Umschalten zwischen Programmierspannung und A15 an Pin 1 des Textool-Sockels</figcaption>
+        </figure>
+        <figure>
+            <img src="44-7.png" alt="">
+            <figcaption>Bild 7. Umschalten zwischen <span style="text-decoration: overline;">PGM</span> und A14 an Pin 27 des Textool-Sockels</figcaption>
+        </figure>
+        <figure>
+            <img src="44-8.png" alt="">
+            <figcaption>Bild 8. Umschalten zwischen +5 Volt und A13 an Pin 26 des Textool-Sockels</figcaption>
+        </figure>
+        <figure>
+            <img src="44-9.png" alt="">
+            <figcaption>Bild 9. So funktioniert der Umschalter auf 2532-EPROM-Typen</figcaption>
+        </figure>
 
-            <address class="author">(Michael Frank/aw)</address>
+        <p>TODO NOT</p>
+
+        <p>Nachdem hiermit nun die Grundlagen des 64'er EPROM-Programmiergerätes beschrieben wurden, werden wir uns in der nächsten Ausgabe der Bauanleitung, den Bestückungsplänen und dem Platinenlayout widmen.</p>
+
+        <address class="author">(Michael Frank/aw)</address>
     </article>
 </body>
 
