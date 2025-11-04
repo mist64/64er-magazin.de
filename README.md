@@ -252,6 +252,9 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [hiTCH-HiKER](https://www.forum64.de/wcf/index.php?user/30694-hitch-hiker/)
         * [64erGrufti](https://www.forum64.de/wcf/index.php?user/30650-64ergrufti/)
         * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
+* Sonderheft 6/1985:
+    * Abtippen der Listings
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
 
 ![](screenshot1.png)
 
