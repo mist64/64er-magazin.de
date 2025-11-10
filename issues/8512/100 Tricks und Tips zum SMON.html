@@ -22,7 +22,7 @@
         <h1>Tricks und Tips zum SMON</h1>
         <p class="intro">Neben einer kompletten Befehlsübersicht und allen erforderlichen Einsprungadressen stellen wir Ihnen einen komfortablen Disketten-Monitor und einen Disassembler vor, der auch illegale Opcodes disassembliert.</p>
 
-        <p>SMON, der Maschinensprachemonitor, liegt nun seit Ausgabe 4/85 vollständig vor. Damals hatten wir um Kritik und Anregungen gebeten, und das Echo war größer als wir gehofft beziehungsweise befürchtet hatten. Daher wollen wir heute die Fragen beantworten, die am häufigsten gestellt wurden. Außerdem erhalten Sie eine Befehlsübersicht, die nunmehrauch den Diskmonitor mit einschließt, und wichtige Tabellen für die Arbeit mit SMON.</p>
+        <p>SMON, der Maschinensprachemonitor, liegt nun seit Ausgabe 4/85 vollständig vor. Damals hatten wir um Kritik und Anregungen gebeten, und das Echo war größer als wir gehofft beziehungsweise befürchtet hatten. Daher wollen wir heute die Fragen beantworten, die am häufigsten gestellt wurden. Außerdem erhalten Sie eine Befehlsübersicht, die nunmehr auch den Diskmonitor mit einschließt, und wichtige Tabellen für die Arbeit mit SMON.</p>
 
         <p>Daß wir inzwischen nicht ganz untätig waren, das zeigen die beiden kleinen Erweiterungen, die Sie ebenfalls in diesem Artikel finden, sozusagen als Treuebonus.</p>
 
@@ -32,97 +32,118 @@
 
         <p>Gefreut hat uns natürlich, wieviel positive Resonanz SMON bei den Lesern der 64’er gefunden hat, und das Lob und die Zustimmung haben uns für viel Mühe und Ärger entschädigt. (Die originellste Danksagung erhielten wir in Form eines gewaltigen Freßpakets — der Leser ist im Hauptberuf Metzger, ein Beispiel, das Schule machen sollte&hellip;) Genug der Vorrede, hinein ins Vergnügen. Beginnen wir mit den Korrekturen:</p>
 
-        <p>Bereits im zweiten Teil (Ausgabe 12/84) haben wir einen Fehler in der Druckerroutine korrigiert; diese Korrektur scheint aber nicht durchgedrungen zu sein. Der Fehler führt dazu, daß derjeweils letzte Befehl in einem Absatz nicht mit ausgedruckt wird. Sollten Sie Probleme mit dem Drucker haben, listen Sie folgende Zeilen mit<br>
-            M C56C C57B</p>
+        <p>Bereits im zweiten Teil (Ausgabe 12/84) haben wir einen Fehler in der Druckerroutine korrigiert; diese Korrektur scheint aber nicht durchgedrungen zu sein. Der Fehler führt dazu, daß der jeweils letzte Befehl in einem Absatz nicht mit ausgedruckt wird. Sollten Sie Probleme mit dem Drucker haben, listen Sie folgende Zeilen mit
+            <code>M C56C C57B</code>
+        </p>
 
-        <p>Sie sollten folgende Ausgabe erhalten:<br>
-            :C56C 09 C9 30 F0 05 C9 21 D0<br>
-            :C574 1 1 EA 20 94 C4 20 51 03</p>
+        <p>Sie sollten folgende Ausgabe erhalten:
+            <code>:C56C 09 C9 30 F0 05 C9 21 D0
+                :C574 1 1 EA 20 94 C4 20 51 03
+            </code>
+        </p>
 
-        <p>Wenn das bei Ihnen anders aussieht, müssen Sie Ihre Version durch Überschreiben ändern und danach neu speichern. Die Druckerroutine läuft mitallen uns bekannten Druckern, die an Geräteadresse 4 über den seriellen Bus oder Interface betrieben werden. Leider haben wir keine Erfahrung mit Druckern, die über RS232 und Geräteadresse 2 angesteuert werden.</p>
+        <p>Wenn das bei Ihnen anders aussieht, müssen Sie Ihre Version durch Überschreiben ändern und danach neu speichern. Die Druckerroutine läuft mit allen uns bekannten Druckern, die an Geräteadresse 4 über den seriellen Bus oder Interface betrieben werden. Leider haben wir keine Erfahrung mit Druckern, die über RS232 und Geräteadresse 2 angesteuert werden.</p>
 
-        <p>Ebenfalls schon korrigiert ist ein Fehler im Diskmonitor, der dazu führt, daß beim Einlesen eines Sektors das letzte Byte unterschlagen wird, beim Zurückschreiben aber ein (zufälliges) 256. Byte mitgeschickt wird. Wenn Sie es noch nicht korrigiert haben, geben Sie<br>
-            0 CED8 CEDC EA<br>
-            ein, damit werden zwei überflüssige Befehle mit NOPs überschrieben.</p>
+        <p>Ebenfalls schon korrigiert ist ein Fehler im Diskmonitor, der dazu führt, daß beim Einlesen eines Sektors das letzte Byte unterschlagen wird, beim Zurückschreiben aber ein (zufälliges) 256. Byte mitgeschickt wird. Wenn Sie es noch nicht korrigiert haben, geben Sie
+            <code>0 CED8 CEDC EA</code>
+            ein, damit werden zwei überflüssige Befehle mit NOPs überschrieben.
+        </p>
 
         <p>Einen weiteren und hoffentlich den letzten Programmfehler hat ein aufmerksamer Leser aus Hamburg gefunden. Der Trance-Befehl (TW) hat die unangenehme Eigenschaft, bei jedem Aufruf die Prozessorflags, also das Statusregister, nach eigenem Gutdünken zu verändern. Auch hier haben wir des Guten zuviel getan und ein paar überflüssige Befehle programmiert. Abhilfe schafft<br>
-            0 CD59 CD5E EA</p>
+            <code>0 CD59 CD5E EA</code>
+        </p>
 
-        <p>Die weitaus größere Zahl der Anfragen bezog sich aber nicht auf Fehler, sondern auf die Bedienung von SMON. Viele Leser wollten sich mit unserer geschmackvollen Farbgebung nicht zufrieden geben, anderen paßte es nicht, daß sie bei jedem Abspeichern erst auf Kassettenbetrieb umstellen mußten. SMON setzt nämlich bei jedem BRK alle diese Einstellungen mit konstanter Boshaftigkeit auf die von uns voreingestellten Werte. Dauerhafte Abhilfe schafft deshalb nur eine Änderung der Break-Routine, die wir hier disassembliert und kommentiert darstellen wollen. Geben Sie<br>
-            D C214 C22E<br>
-            ein. Sie erhalten</p>
+        <p>Die weitaus größere Zahl der Anfragen bezog sich aber nicht auf Fehler, sondern auf die Bedienung von SMON. Viele Leser wollten sich mit unserer geschmackvollen Farbgebung nicht zufrieden geben, anderen paßte es nicht, daß sie bei jedem Abspeichern erst auf Kassettenbetrieb umstellen mußten. SMON setzt nämlich bei jedem BRK alle diese Einstellungen mit konstanter Boshaftigkeit auf die von uns voreingestellten Werte. Dauerhafte Abhilfe schafft deshalb nur eine Änderung der Break-Routine, die wir hier disassembliert und kommentiert darstellen wollen. Geben Sie
+            <code>D C214 C22E</code>
+            ein. Sie erhalten
+        </p>
 
-        <p>TODO</p>
+        <table class="plain right2">
+            <tr><td>C214</td><td>CLD</td><td></td><td>; löscht eventuellen Dezimalmodus</td></tr>
+            <tr><td>C215</td><td>LDA</td><td>#08</td><td>; das ist die Gerätenummer der Floppy</td></tr>
+            <tr><td>C217</td><td>STA</td><td>02B0</td><td></td></tr>
+            <tr><td>C21A</td><td>LDA</td><td>#04</td><td>; das ist die Gerätenummer des Druckers</td></tr>
+            <tr><td>C21C</td><td>STA</td><td>02AF</td><td></td></tr>
+            <tr><td>C21F</td><td>LDA</td><td>#06</td><td>; Farbe für</td></tr>
+            <tr><td>C221</td><td>STA</td><td>D020</td><td>; Rahmen und</td></tr>
+            <tr><td>C224</td><td>STA</td><td>D021</td><td>; Hintergrund</td></tr>
+            <tr><td>C227</td><td>LDA</td><td>#03</td><td>; Farbe für</td></tr>
+            <tr><td>0229</td><td>STA</td><td>0286</td><td>; Zeichendarstellung</td></tr>
+            <tr><td>C22C</td><td>LDX</td><td>#05</td><td>; jetzt werden 6 Werte</td></tr>
+            <tr><td>C22E</td><td>PLA</td><td></td><td>; vom Stack geholt, nämlich die Register</td></tr>
+        </table>
 
-        <p>C214 CLD ; löscht eventuellen Dezimalmodus<br>
-            C215 LDA #08 ; das ist die Gerätenummer der Floppy<br>
-            C217 STA 02B0<br>
-            C21A LDA #04 ; das ist die Gerätenummer des Druckers<br>
-            C21C STA 02AF<br>
-            C21F LDA #06 Farbe für<br>
-            C221 STA D020 Rahmen und<br>
-            C224 STA D021 Hintergrund<br>
-            C227 LDA #03 Farbe für<br>
-            0229 STA 0286 Zeichendarstellung<br>
-            C22C LDX #05 jetzt werden 6 Werte<br>
-            C22E PLA vom Stack geholt, nämlich die Register</p>
 
         <p>Sie können die Werte mit Ihren Lieblingsfarben, Ihrem Lieblingsdrucker etc. überschreiben und dann ein für allemal auf Ihrem Lieblingsgerätabspeichern.</p>
 
         <p>Weitergehende Änderungen einzelner Routinen lassen sich nachträglich kaum in das bereits abgetippte Programm einbauen. Die von Markt &amp; Technik vertriebene fertige Version von SMON enthält allerdings eine Reihe wichtiger Verbesserungen. So bricht der Vergleichsbefehl nicht mehr bei der ersten Nichtübereinstimmung ab, Änderungen mit dem »K-Befehl« sind inzwischen unkritisch, der Drucker läuft bei allen Befehlen (auch FIND), der Diskmonitor kann alle Diskettenkommandos ausgeben und so weiter. Besonderer Dank gebührt hier Herrn Hans Örtel für seine nicht endenwollende geduldige Kritik, die letztlich zu weiteren Verbesserungen geführt hat. Sollten Sie übrigens zu den glücklichen Besitzern der M&amp;T-Version gehören und nicht die oben dargestellten Fehler im Diskmonitor und Trace-Modus haben, können Sie diese folgendermaßen beheben:</p>
 
-        <p>Suchen Sie nach dem Fehler im Diskmonitor mit<br>
-            F A6 90 D0 06, C000 D000<br>
-            Wenn Sie fündig werden, ist der Fehler vorhanden und Sie müssen ab der angezeigten Adresse 4 Byte mit NOPs ($EA) überschreiben. Genauso können Sie den Fehler im Trace mit F 08 68 8D AA 02 finden. Nur müssen Sie diesmal 5 Byte ab der gefundenen Adresse mit NOPs überschreiben.</p>
+        <p>Suchen Sie nach dem Fehler im Diskmonitor mit
+            <code>F A6 90 D0 06, C000 D000</code>
+            Wenn Sie fündig werden, ist der Fehler vorhanden und Sie müssen ab der angezeigten Adresse 4 Byte mit NOPs ($EA) überschreiben. Genauso können Sie den Fehler im Trace mit
+            <code>F 08 68 8D AA 02</code>
+            finden. Nur müssen Sie diesmal 5 Byte ab der gefundenen Adresse mit NOPs überschreiben.
+        </p>
 
-        <p>Insgesamt gab es einige Schwierigkeiten mit den FIND-Funktionen. Dies ist die einzige Stelle, an der SMON die Einhaltung einer genauen Schreibweise fordert. Während er sonst Komma und Leerzeichen geflissentlich überliest, reagiert er hier recht penibel. Wie Sie wissen, bestehtjeder FIND-Befehl aus zwei Buchstaben, der erste ist immer ein »F«. Der zweite ist »A« für absolute Adressen, »Z« für Zeropage-Adressen, »R« für relative Sprünge und »I« für immediate-Adressierung. Das zweite Zeichen kann aber auch ein Leerzeichen sein, nämlich bei der Suche nach einzelnen Hexbytes. Und dieses Leerzeichen darf auf gar keinen Fall fehlen.</p>
+        <p>Insgesamt gab es einige Schwierigkeiten mit den FIND-Funktionen. Dies ist die einzige Stelle, an der SMON die Einhaltung einer genauen Schreibweise fordert. Während er sonst Komma und Leerzeichen geflissentlich überliest, reagiert er hier recht penibel. Wie Sie wissen, besteht jeder FIND-Befehl aus zwei Buchstaben, der erste ist immer ein »F«. Der zweite ist »A« für absolute Adressen, »Z« für Zeropage-Adressen, »R« für relative Sprünge und »I« für Immediate-Adressierung. Das zweite Zeichen kann aber auch ein Leerzeichen sein, nämlich bei der Suche nach einzelnen Hexbytes. Und dieses Leerzeichen darf auf gar keinen Fall fehlen.</p>
 
-        <p>Nach dem Befehl selbst steht, wonach gesucht werden soll, also eine Adresse oder Bytefolge. Diese muß unmittelbar ohne Leerzeichen hinter dem Befehl stehen und mit einem Komma abgeschlossen werden; dann kann die Angabe des zu untersuchenden Bereichs folgen. Wenn sie unterb|eibt, wird der gesamte Speicher durchsucht. Bei der Bereichsangabe ist SMON wieder tolerant, Komma und Leerzeichen darf, muß aber nicht sein.</p>
+        <p>Nach dem Befehl selbst steht, wonach gesucht werden soll, also eine Adresse oder Bytefolge. Diese muß unmittelbar ohne Leerzeichen hinter dem Befehl stehen und mit einem Komma abgeschlossen werden; dann kann die Angabe des zu untersuchenden Bereichs folgen. Wenn sie unterbleibt, wird der gesamte Speicher durchsucht. Bei der Bereichsangabe ist SMON wieder tolerant, Komma und Leerzeichen darf, muß aber nicht sein.</p>
 
         <p>TODO TABLE</p>
 
-        <p>Ein paar Beispiele:<br>
-            FA D020, C000 D000 Falsch: Space zwischen FA und D020<br>
-            FAD020 C000 D000 Falsch: Kein Komma nach D020<br>
-            FAD020, C000 D000 Richtig<br>
-            F08 68, C000 D000 Falsch: Space nach F fehlt<br>
-            F 0868, C000 D000 Falsch: Space zwischen den Bytes fehlt<br>
-            F 08 68 C000 D000 Falsch: Kein Komma nach der Bytefolge<br>
-            F 08 68, C000, D000 Richtig</p>
+        <p>Ein paar Beispiele:</p>
+
+        <table class="plain">
+            <tr><td>FA D020, C000 D000</td><td>Falsch: Space zwischen FA und D020</td></tr>
+            <tr><td>FAD020 C000 D000</td><td>Falsch: Kein Komma nach D020</td></tr>
+            <tr><td>FAD020, C000 D000</td><td>Richtig</td></tr>
+            <tr><td>F08 68, C000 D000</td><td>Falsch: Space nach F fehlt</td></tr>
+            <tr><td>F 0868, C000 D000</td><td>Falsch: Space zwischen den Bytes fehlt</td></tr>
+            <tr><td>F 08 68 C000 D000</td><td>Falsch: Kein Komma nach der Bytefolge</td></tr>
+            <tr><td>F 08 68, C000, D000</td><td>Richtig</td></tr>
+        </table>
 
         <h2>Noch einmal: SMON verschieben</h2>
 
-        <p>Viele Schwierigkeiten gab es beim Verschieben von SMON in einen anderen Speicherbereich. Immerhin waren die nötigen Routinen einschließlich Fehlerteufelchen auch auf drei Ausgaben verteilt. Da konnte man schon mal das eine oder andere übersehen. Deshalb hier noch einmal alles auf einen Blick. Wie gehabt, gehen wirals Beispiel davon aus, daß SMON in den Bereich von $9000 bis $A000 verschoben werden soll. Natürlich geht das für jeden anderen Bereich genauso.<br>
-            1. Wir verschieben zuerst das ganze Programm ohne Umrechnen in den neuen Bereich:<br>
-            W C000 CFFA 9000<br>
-            2. Nun lassen wiralle absoluten (3-Byte-)Befehle umrechnen. Die Tabellen am Anfang von SMON bleiben verschont:<br>
-            V C000 CFFA 9000 920B 9FD2<br>
-            3. Als nächstes ändern wir die High-Bytes der Befehlsadresse. Geben Sie<br>
-            »M 902B 906B«<br>
-            ein und ändern Sie in jedem zweiten Byte das »C« durch Überschreiben in »9«. Vergessen Sie nicht, am Ende jeder Zeile »RETURN« zu drücken, damit Ihre Änderung auch übernommen wird.<br>
-            4. Nun sind die Befehle mit immediate-Adressierung an der Reihe. Sie müssen so geändert werden, daß sie sich auf den neuen Bereich $9&hellip; beziehen. Suchen Sie sie mit FIC*,9000 9FFA heraus. Sie erhalten</p>
+        <p>Viele Schwierigkeiten gab es beim Verschieben von SMON in einen anderen Speicherbereich. Immerhin waren die nötigen Routinen einschließlich Fehlerteufelchen auch auf drei Ausgaben verteilt. Da konnte man schon mal das eine oder andere übersehen. Deshalb hier noch einmal alles auf einen Blick. Wie gehabt, gehen wirals Beispiel davon aus, daß SMON in den Bereich von $9000 bis $A000 verschoben werden soll. Natürlich geht das für jeden anderen Bereich genauso.</p>
 
-        <p>TODO</p>
-
-        <p>9005 LDA #C2 ändern<br>
-            9124 CPX #00 nicht ändern<br>
-            9386 LDY #C0 ändern<br>
-            9441 CMP #C0 nicht ändern<br>
-            987F LDX #C3 nicht ändern<br>
-            988D LDX #C1 nicht ändern<br>
-            9992 LDA #C1 nicht ändern<br>
-            9C2C LDA #CC ändern<br>
-            9C5B LDA #C2 ändern<br>
-            9CF4 LDA #CC ändern<br>
-            9DA1 LDX #CC ändern<br>
-            9E03 LDA #CC ändern<br>
-            9E6C CMP #00 nicht ändern<br>
-            9F71 LDY #CF ändern</p>
-
-        <p>Sie sehen, es gibt keine Regel, welche Befehle zu ändern sind und welche nicht. Aus diesem Grunde müssen Sie diese Änderungen »von Hand« vornehmen.<br>
-            5. Die Adressen im Diskmonitor müssen ebenfalls umgestellt werden. Dazu geben Sie bitte ein:<br>
-            M 9FD8 9FE4<br>
-            und ändern Sie jedes zweite Byte wie unter Punkt 3 beschrieben.</p>
+        <ol>
+            <li>Wir verschieben zuerst das ganze Programm ohne Umrechnen in den neuen Bereich:
+                <code>W C000 CFFA 9000</code>
+            </li>
+            <li>Nun lassen wir alle absoluten (3-Byte-)Befehle umrechnen. Die Tabellen am Anfang von SMON bleiben verschont:
+                <code>V C000 CFFA 9000 920B 9FD2</code>
+            </li>
+            <li>Als nächstes ändern wir die High-Bytes der Befehlsadresse. Geben Sie
+                <code>»M 902B 906B«</code>
+                ein und ändern Sie in jedem zweiten Byte das »C« durch Überschreiben in »9«. Vergessen Sie nicht, am Ende jeder Zeile »RETURN« zu drücken, damit Ihre Änderung auch übernommen wird.
+            </li>
+            <li>Nun sind die Befehle mit Immediate-Adressierung an der Reihe. Sie müssen so geändert werden, daß sie sich auf den neuen Bereich $9&hellip; beziehen. Suchen Sie sie mit
+                <code>FIC*,9000 9FFA</code>
+                heraus. Sie erhalten
+                <table class="plain">
+                    <tr><td>9005</td><td>LDA</td><td>#C2</td><td>ändern</td></tr>
+                    <tr><td>9124</td><td>CPX</td><td>#00</td><td>nicht ändern</td></tr>
+                    <tr><td>9386</td><td>LDY</td><td>#C0</td><td>ändern</td></tr>
+                    <tr><td>9441</td><td>CMP</td><td>#C0</td><td>nicht ändern</td></tr>
+                    <tr><td>987F</td><td>LDX</td><td>#C3</td><td>nicht ändern</td></tr>
+                    <tr><td>988D</td><td>LDX</td><td>#C1</td><td>nicht ändern</td></tr>
+                    <tr><td>9992</td><td>LDA</td><td>#C1</td><td>nicht ändern</td></tr>
+                    <tr><td>9C2C</td><td>LDA</td><td>#CC</td><td>ändern</td></tr>
+                    <tr><td>9C5B</td><td>LDA</td><td>#C2</td><td>ändern</td></tr>
+                    <tr><td>9CF4</td><td>LDA</td><td>#CC</td><td>ändern</td></tr>
+                    <tr><td>9DA1</td><td>LDX</td><td>#CC</td><td>ändern</td></tr>
+                    <tr><td>9E03</td><td>LDA</td><td>#CC</td><td>ändern</td></tr>
+                    <tr><td>9E6C</td><td>CMP</td><td>#00</td><td>nicht ändern</td></tr>
+                    <tr><td>9F71</td><td>LDY</td><td>#CF</td><td>ändern</td></tr>
+                </table>
+                <p>Sie sehen, es gibt keine Regel, welche Befehle zu ändern sind und welche nicht. Aus diesem Grunde müssen Sie diese Änderungen »von Hand« vornehmen.</p>
+            </li>
+            <li>Die Adressen im Diskmonitor müssen ebenfalls umgestellt werden. Dazu geben Sie bitte ein:
+                <code>M 9FD8 9FE4</code>
+                und ändern Sie jedes zweite Byte wie unter Punkt 3 beschrieben.
+            </li>
+        </ol>
 
         <p>Vergessen Sie bitte auf keinen Fall, Ihre neue(n) Version(en) unter neuem Namen zu speichern. Sie lassen sich dann mit LOAD "Name",8,1 von Diskette laden und mit dem entsprechenden SYS (zum Beispiel 36864 bei SMON $9000) starten. Denken Sie auch daran, nach dem Laden und vor dem SYS ein NEW einzugeben, sonst beschwert sich der B-Befehl mit einem OUT OF MEMORY ERROR.</p>
 
@@ -134,72 +155,66 @@
 
         <p>Wir haben Mnemonics für eine Reihe dieser Befehle eingesetzt und lassen diese von SMON mit einem vorangestellten »*« ausgeben. Übrig bleiben noch zehn Befehle, deren Wirkung aber so komplex ist, daß sie sich beim besten Willen nicht mit einem Mnemonic abkürzen lassen. Sie fallen auch aus der Logik der Prozessorstruktur heraus. Im einzelnen handelt es sich um die Opcodes 0B, 2B, 4B, 6B, 8B, 9C, 9E, AB, CB und EB. Bei diesen Befehlen haben wir keine gemeinsame Struktur entdecken können. Nähere Informationen enthält der oben genannte Artikel. Die neuen Mnemonics haben folgende Bedeutung:</p>
 
-        <p>TODO TABLE</p>
-
-        <p>LAX Load Akku and X<br>
-            entspricht LDA und LDX.<br>
-            DCP Decrement and ComPare<br>
-            entspricht DEC und CMP.<br>
-            ISC Increment and SubtraCt<br>
-            entspricht INC und SBC.<br>
-            RLA Rotate Left and Akku<br>
-            entspricht ROL und AND<br>
-            RRA Rotate Right an Add with carry entspricht ROR und ADC.<br>
-            SLO Shift Left OR Akku<br>
-            entspricht ASL und ORA.<br>
-            SRE Shift Right and EOR Akku<br>
-            entspricht LSR und EOR.<br>
-            SAX Store Akku AND X<br>
-            führt eine UND-Verknüpfung zwischen Akku und X-Register durch und speichert das Ergebnis in der angegebenen Adresse ab.<br>
-            CRA CRAsh<br>
-            führt zum »Absturz« des Prozessors.<br>
-            NOP NO Operation<br>
-            entspricht dem bekannten NOP, jedoch kann dieser Befehl auch 2 oder 3 Byte lang sein. Dies wird durch die angegebene Adresse deutlich, die in diesem Fall natürlich keinerlei Bedeutung hat.</p>
+        <table class="plain">
+            <tr><td>LAX</td><td>Load Akku and X<br>entspricht LDA und LDX.</td></tr>
+            <tr><td>DCP</td><td>Decrement and ComPare<br>entspricht DEC und CMP.</td></tr>
+            <tr><td>ISC</td><td>Increment and SubtraCt<br>entspricht INC und SBC.</td></tr>
+            <tr><td>RLA</td><td>Rotate Left and Akku<br>entspricht ROL und AND</td></tr>
+            <tr><td>RRA</td><td>Rotate Right an Add with carry<br>entspricht ROR und ADC.</td></tr>
+            <tr><td>SLO</td><td>Shift Left OR Akku<br>entspricht ASL und ORA.</td></tr>
+            <tr><td>SRE</td><td>Shift Right and EOR Akku<br>entspricht LSR und EOR.</td></tr>
+            <tr><td>SAX</td><td>Store Akku AND X<br>führt eine UND-Verknüpfung zwischen Akku und X-Register durch und speichert das Ergebnis in der angegebenen Adresse ab.</td></tr>
+            <tr><td>CRA</td><td>CRAsh<br>führt zum »Absturz« des Prozessors.</td></tr>
+            <tr><td>NOP</td><td>NO Operation<br>entspricht dem bekannten NOP, jedoch kann dieser Befehl auch 2 oder 3 Byte lang sein. Dies wird durch die angegebene Adresse deutlich, die in diesem Fall natürlich keinerlei Bedeutung hat.</td></tr>
+        </table>
 
         <p>Über den Sinn dieser Befehle läßt sich sicher streiten; allerdings kommen sie bisweilen in Programmen vor, meist um das Lesen dieser Programme unmöglich zu machen, also als Programmschutz. Von derVerwendung dieser Befehle in eigenen Programmen raten wir auf jeden Fall ab. Erstens wird kein Hersteller garantieren, daß die »illegalen« tatsächlich mit jedem 6510-Prozessor funktionieren, zweitens gibt es keine Funktion, die nicht auch mit den »normalen« Befehlen ebenso gut erreicht werden könnte. Und als Programmschutz taugen die »illegalen« spätestens mit derVeröffentlichung dieses Artikels ja auch nichts mehr. Aus diesem Grund haben wir bewußt auf eine Erweiterung des Assemblers in dieser Richtung verzichtet. Sie können also keine normalen Opcodes durch Überschreiben in »illegale« ändern, wohl aber umgekehrt. Es bleibt lediglich die Eingabe als Einzelbyte, was aber hoffentlich zu umständlich ist.</p>
 
         <h2>Komfortabler Disketten-Monitor für SMON</h2>
 
-        <p>Jetzt folgt unser zweiter Leckerbissen in Form eines kleinen aber ungemein wertvollen Zusatzprogrammes für den SMON. Es handelt sich dabei um eine Erweiterung des Disketten-Monitors, mit dem jeder auf einen Schlag die Arbeit von Stunden zunichte machen kann. Geben Sie das Programm wie beschrieben ein, starten Sie SMON wie gewohnt und springen mit»Z« in den Disketten-Monitor. Von hieraus erreichen Sie mit »F« (wie Floppy) die neuen Befehle. Wir haben absichtlich diesen umständlichen Weg gewählt, denn Fehler in diesem Modus wirken noch dramatischer als sonst. Mit diesem Werkzeug haben Sie unmittelbaren Zugriff auf die Eingeweide der Floppy. Jetzt können Sie die folgenden Befehle mit einer Übungsdiskette (!!!) in aller Ruhe durcharbeiten.</p>
+        <p>Jetzt folgt unser zweiter Leckerbissen in Form eines kleinen aber ungemein wertvollen Zusatzprogrammes für den SMON. Es handelt sich dabei um eine Erweiterung des Disketten-Monitors, mit dem jeder auf einen Schlag die Arbeit von Stunden zunichte machen kann. Geben Sie das Programm wie beschrieben ein, starten Sie SMON wie gewohnt und springen mit »Z« in den Disketten-Monitor. Von hieraus erreichen Sie mit »F« (wie Floppy) die neuen Befehle. Wir haben absichtlich diesen umständlichen Weg gewählt, denn Fehler in diesem Modus wirken noch dramatischer als sonst. Mit diesem Werkzeug haben Sie unmittelbaren Zugriff auf die Eingeweide der Floppy. Jetzt können Sie die folgenden Befehle mit einer Übungsdiskette (!!!) in aller Ruhe durcharbeiten.</p>
 
-        <p><strong>M</strong> Memory-Dump des Disketten-Monitors<br>
-            Beispiel: M (ohne weitere Eingabe) listet den Bereich des Floppy-RAM von $OOOO-$OOFF. (Es erscheint zunächst die erste Zeile, weitere Ausgabe mit der SPACE-Taste.)</p>
-
-        <p>In diesem Bereich befinden sich unter anderem die Jobspeicher ($00-$04) für die fünf Puffer 0-4, sowie die wichtigsten Variablen des DOS.<br>
-            <strong>M 07</strong> Memory-Dump ab $0700
-        </p>
-
-        <p>Die BAM der Diskette wird nach dem Initialisieren in Puffer 4 ($0700 im Floppy-RAM) eingelesen. Schauen Sie sich also mit»M07« die aktuelle BAM an. Sie könnten jetzt durch einfaches Überschreiben den Inhalt der BAM ändern. (Der Doppelpunkt vor der Zeile wirkt als »hidden command«). Dann schauen Sie sich Ihre Änderung mit »M 07« wieder an. Sie sehen, daß inzwischen der Inhalt des Floppy-RAM geändert wurde. Wenn Sie nun den Jobcode »90« (=Schreibbefehl an den Floppy-Controller) in Speicherstelle $04 bringen, würde die geänderte (falsche!) BAM auf Diskette zurückgeschrieben werden!! Es gibt also genug Möglichkeiten, wie oben angedeutet, die Disketten zu »versauen«.</p>
+        <table class="plain">
+            <tr><td class="center"><strong>M</strong></td><td>Memory-Dump des Disketten-Monitors</td></tr>
+            <tr><td colspan="2">Beispiel: M (ohne weitere Eingabe) listet den Bereich des Floppy-RAM von $OOOO-$OOFF. (Es erscheint zunächst die erste Zeile, weitere Ausgabe mit der SPACE-Taste.)<p>In diesem Bereich befinden sich unter anderem die Jobspeicher ($00-$04) für die fünf Puffer 0-4, sowie die wichtigsten Variablen des DOS.</p></td></tr>
+            <tr><td><strong>M 07</strong></td><td>Memory-Dump ab $0700</td></tr>
+            <tr><td colspan="2"><p>Die BAM der Diskette wird nach dem Initialisieren in Puffer 4 ($0700 im Floppy-RAM) eingelesen. Schauen Sie sich also mit»M07« die aktuelle BAM an. Sie könnten jetzt durch einfaches Überschreiben den Inhalt der BAM ändern. (Der Doppelpunkt vor der Zeile wirkt als »hidden command«). Dann schauen Sie sich Ihre Änderung mit »M 07« wieder an. Sie sehen, daß inzwischen der Inhalt des Floppy-RAM geändert wurde. Wenn Sie nun den Jobcode »90« (=Schreibbefehl an den Floppy-Controller) in Speicherstelle $04 bringen, würde die geänderte (falsche!) BAM auf Diskette zurückgeschrieben werden!! Es gibt also genug Möglichkeiten, wie oben angedeutet, die Disketten zu »versauen«.</p></td></tr>
+        </table>
 
         <p>Für das Ausprobieren noch einige wichtige Speicherstellen und Jobcodes:</p>
 
-        <p>TODO TABLE</p>
-
-        <p>$80 Lesen<br>
-            $90 Schreiben<br>
-            $C0 »Anschlagen« des Kopfes<br>
-            $D0 Maschinenprogramme im Puffer ausführen<br>
-            $E0 Programm im Puffer ausführen mit Hochfahren des Laufwerks</p>
+        <table class="plain">
+            <tr><td>$80</td><td>Lesen</td></tr>
+            <tr><td>$90</td><td>Schreiben</td></tr>
+            <tr><td>$C0</td><td>»Anschlagen« des Kopfes</td></tr>
+            <tr><td>$D0</td><td>Maschinenprogramme im Puffer ausführen</td></tr>
+            <tr><td>$E0</td><td>Programm im Puffer ausführen mit Hochfahren des Laufwerks</td></tr>
+            <tr><td></td><td></td></tr>
+        </table>
 
         <p>Speicherstellen im Floppy-RAM:</p>
 
-        <p>TODO TABLE</p>
+        <table class="plain">
+            <tr><td>$06/$07</td><td>ist Spur- und Sektornummer für den Befehl in Puffer 0</td></tr>
+            <tr><td>$08/$09</td><td>für Puffer 1</td></tr>
+            <tr><td>$0A/$0B</td><td>für Puffer 2</td></tr>
+            <tr><td>$0C/$0D</td><td>für Puffer 3</td></tr>
+            <tr><td>$0E/$0F</td><td>für Puffer 4</td></tr>
+        </table>
 
-        <p>$06/$07 ist Spur- und Sektornummer für den Befehl in Puffer 0<br>
-            $08/$09 für Puffer 1<br>
-            $0A/$0B für Puffer 2<br>
-            $0C/$0D für Puffer 3<br>
-            $0E/$0F für Puffer 4</p>
+        <p>Jedem Puffer sind zwei Speicherstellen zugeordnet, eine für den Jobcode ($0000 bis $0004) und eine für Spur und Sektor. Wenn Sie also in Puffer 0 (in $0300 gelegen) einen bestimmten Block einlesen wollen, geben Sie folgende Befehle ein:</p>
 
-        <p>Jedem Puffer sind zwei Speicherstellen zugeordnet, eine für den Jobcode ($0000 bis $0004) und eine für Spur und Sektor. Wenn Sie also in Puffer 0 (in $0300 gelegen) einen bestimmten Block einlesen wollen, geben Siefolgende Befehle ein:</p>
+        <p>»M« liest die Zeropage der Floppy ein - so sehen dann zum Beispiel die ersten Zeilen aus:
+            <code>:0000 01 01 01 FF 03 04 01 34
+                :0008 23 02 04 50 01 03 0A 11
+            </code>
+        </p>
 
-        <p>»M« liest die Zeropage der Floppy ein - so sehen dann zum Beispiel die ersten Zeilen aus:<br>
-            :0000 01 01 01 FF 03 04 01 34<br>
-            :0008 23 02 04 50 01 03 0A 11</p>
-
-        <p>Gehen Sie mit dem Cursor in die erste Zeile und schreiben Sie »80« in die erste Speicherstelle (anstelle der ersten 01). In Speicherstelle $06/$07 (die letzten beiden in der ersten Reihe) die Spur- und die Sektornummer, die gelesen werden soll, zum Beispiel 12 01. Sie sehen dann<br>
-            :0000 80 01 01 FF 03 04 12 01<br>
-            :0008 unverändert</p>
+        <p>Gehen Sie mit dem Cursor in die erste Zeile und schreiben Sie »80« in die erste Speicherstelle (anstelle der ersten 01). In Speicherstelle $06/$07 (die letzten beiden in der ersten Reihe) die Spur- und die Sektornummer, die gelesen werden soll, zum Beispiel 12 01. Sie sehen dann
+            <code>:0000 80 01 01 FF 03 04 12 01
+                :0008 unverändert
+            </code>
+        </p>
 
         <p>Drücken Sie die RETURN-Taste, mit »M 03« kann jetzt der eingelesene Block (hier der erste Directory-Block) angesehen werden. Änderungen können durch einfaches Überschreiben vorgenommen werden. Dauerhaft wird Ihre Änderung erst durch Zurückschreiben (nach Spur $12 und Sektor $01) mit dem Jobcode »90« in der ersten Speicherstelle. Nach Änderung der beiden für Puffer 0 zuständigen Adressen ($06/$07) auch an jede beliebige andere Stelle. Das ist wörtlich zu nehmen. Denn wir befinden uns hier »unterhalb« der Controllerebene, die unter anderem für die Prüfung auf Einhaltung der zulässigen Spur und Sektorgrenzen verantwortlich ist. Es erfolgt also keine Fehlermeldung, wenn Sie versuchen sollten, mit Ihrer Floppy bis in die des Nachbarn zu schreiben (zum Beispiel mit der Spur 152).</p>
 
@@ -209,12 +224,12 @@
 
         <p>Der Befehl @ ohne weitere Angaben fragt den Fehlerkanal ab, ansonsten dient er zur Befehlsübermittlung an die Floppy.</p>
 
-        <p>TODO</p>
-
-        <p>Beispiel:<br>
-            @ Fehlerkanal<br>
-            @I Initialisierungsbefehl oder<br>
-            @S:name Befehl zum Scratchen und so weiter.</p>
+        <table class="plain">
+            <tr><td>Beispiel:</td><td>@</td><td>Fehlerkanal</td></tr>
+            <tr><td></td><td>@I</td><td>Initialisierungsbefehl oder</td></tr>
+            <tr><td></td><td>@S:name</td><td>Befehl zum Scratchen</td></tr>
+            <tr><td></td><td></td><td>und so weiter.</td></tr>
+        </table>
 
         <p>Bedingt durch die verschiedenen Versionen, springt dieser Befehl manchmal in den »normalen« Disketten-Monitor zurück, erkennbar an dem »*« am Zeilenanfang. Sie müssen dann wieder ein »F« eingeben.</p>
 
@@ -222,8 +237,8 @@
 
         <p>Zum Abschluß ein sehr hilfreicher Befehl namens »V«, der es erlaubt, Speicherbereiche aus dem Computer in den Laufwerkspuffer zu verschieben. Folgende einfache Syntax gilt dabei: <strong>V von nach</strong></p>
 
-        <p>Um zum Beispiel ein Maschinenprogramm von $6000 in den Puffer 1 zu bekommen, geben Sie folgendes ein:<br>
-            <strong>V 6000 0400</strong>
+        <p>Um zum Beispiel ein Maschinenprogramm von $6000 in den Puffer 1 zu bekommen, geben Sie folgendes ein:
+            <strong><code>V 6000 0400</code></strong>
         </p>
 
         <p>Dabei wird immer eine ganze Seite, also 256 Byte, übertragen. Was das Programm dort soll, fragen Sie? Führen Sie es doch einfach aus (Jobcode $D0 in Speicherstelle $01 schreiben); oder schreiben Sie es mit dem Jobcode »90« in einen beliebigen Sektor der Diskette.</p>
@@ -242,91 +257,65 @@
 
         <p>Wenn Sie nun das Programm »ILLEGAL-CODE« (Listing 5) laden und mit D 4000 disassemblieren, sehen Sie die »illegalen« Opcodes schön geordnet nacheinander.</p>
 
-        <p>Um die neuen Befehle des Disketten-Monitors in SMON einzubinden, gehen Sie ganz ähnlich vor. Nach dem Abtippen und Speichern des Programms »FLOPPYMON« muß natürlich SMON C000 geladen und gestartet werden. Anschließend geben Sie ein: L"FLOPPYMON"<br>
-            und aktivieren es mit G CDD8 (64’er-Version)<br>
-            beziehungsweise G CDB6 (M&amp;T-Version)</p>
+        <p>Um die neuen Befehle des Disketten-Monitors in SMON einzubinden, gehen Sie ganz ähnlich vor. Nach dem Abtippen und Speichern des Programms »FLOPPYMON« muß natürlich SMON C000 geladen und gestartet werden. Anschließend</p>
+
+        <ul class="plain">
+            <li>geben Sie ein: L"FLOPPYMON"</li>
+            <li>und aktivieren es mit G CDD8 (64’er-Version)</li>
+            <li>beziehungsweise G CDB6 (M&amp;T-Version)</li>
+        </ul>
 
         <p>Zum Abspeichern geben Sie S"SMON-FLOPPY" C000 CFFF ein. Das gilt für beide Versionen.</p>
 
         <address class="author">(Dietrich Weineck/ah)</address>
 
-        <p>TODO ASIDE</p>
+        <figure>
+            <p>Bei allen Ausgabe-Befehlen ist gleichzeitig die Ausgabe auf einem Drucker möglich. Dazu werden die Befehle geSHIFTet eingegeben.</p>
 
-        <p>TODO TABLE</p>
-
-        <p>Bei allen Ausgabe-Befehlen ist gleichzeitig die Ausgabe auf einem Drucker möglich. Dazu werden die Befehle geSHIFTet eingegeben.<br>
-            A 4000 (Assembler)<br>
-            symbolischer Assembler (Verarbeitung von Label möglich) Startadresse $4000<br>
-            B 4000 4200 (Basic-Data)<br>
-            erzeugt Basic-DATA-Zeilen aus Maschinenprogramm im Bereich von $4000 bis $41FF<br>
-            C 4010 4200 4013 4000 4200 (Convert)<br>
-            in ein Programm, das von $4000 bis $4200 im Speicher steht, soll bei 4010 ein 3-Byte-Befehl eingefügt werden. Dazu wird das Programm ab $4010 bis 4200 auf die neue Adresse $4013 verschoben. Alle absoluten Adressen, die innerhalb des Programmbereichs ($4000 bis $4200) stehen, werden umgerechnet, so daß die Sprungziele stimmen.<br>
-            D 4000 (4100) (Disassembler)<br>
-            disassembliert den Bereich von $4000 (bis $4100) mit Ausgabe der Hex-Werte. Änderungen sind durch Überschreiben der Befehle möglich.<br>
-            F (Find)<br>
-            findet Zeichenketten (F), absolute Adressen (FA), relative Sprünge (FR), Tabellen (FT), Zeropageadressen (FZ) und immediate-Befehle (F1)<br>
-            G (4000) (Go)<br>
-            startet ein Maschinenprogramm, das bei $4000 im Speicher beginnt<br>
-            I 01 (l/O-Gerät)<br>
-            stellt die Gerätenummer für Floppy (08 oder 09) oder Datasette (01) ein<br>
-            K A000 (A500) (Kontrolle)<br>
-            zum schnellen Durchsuchen des Bereichs von $A000 (bis $A500) nach ASCII-Zeichen (32 Byte pro Zeile). Änderungen sind durch Überschreiben der ASCII-Zeichen möglich.<br>
-            L (4000) (Load)<br>
-            lädt ein Maschinenprogramm an die richtige oder eine angegebene Adresse ($4000)<br>
-            M 4000 (4400) (Memory-Dump)<br>
-            gibt den Inhalt des Speichers von $4000 (bis $43FF) in Hex-Byte und ASCII-Code aus. Änderungen sind durch Überschreiben der Hex-Zahlen möglich.<br>
-            0 4000 4500 AA (Occupy)<br>
-            füllt den Speicherbereich von $4000 bis $4500 mit vorgegebenem Byte ($AA) aus<br>
-            P 05 (Printer)<br>
-            setzt Geräteadresse 5 für Drucker<br>
-            R (Register)<br>
-            zeigt die Registerinhalte und Flags an. Änderungen sind durch Überschreiben möglich.<br>
-            S »Test« 4000 5000 (Save)<br>
-            speichert ein Programm von $4000 bis $4FFF unter dem Namen »Test« ab.<br>
-            TW (4000) (Trace Walk)<br>
-            führt auf Tastendruck den jeweils nächsten Maschinenbefehl aus und zeigt die Registerinhalte an. Subroutinen können in Echtzeit durchlaufen werden (»J«). Wird keine Startadresse eingegeben, beginnt >TW« bei der letzten mit »R« angezeigten Adresse.<br>
-            TB 4010 05 (Trace Break)<br>
-            setzt einen Haltepunkt für den Schnellschrittmodus bei $4010. Der Schnellschrittmodus wird un-<br>
-            terbrochen, nachdem $4010 zum fünften Mal erreicht worden ist.<br>
-            TQ 4000 (Trace quick)<br>
-            Schnellschrittmodus, springt beim Erreichen eines Haltepunktes in den Einzelschrittmodus.<br>
-            TS 4000 4020 (Trace stop)<br>
-            arbeitet ein Programm ab $4000 in Echtzeit ab und springt beim Erreichen von $4020 in die Registeranzeige. Von dort aus kann (nach eventueller Änderung der Register) mit »G« oder »TW« fortgefahren werden. »TS« arbeitet nur im RAM-Speicher.<br>
-            V 6000 6200 4000 4100 4200 (Verschieben)<br>
-            ändert in einem Programm von $4100 bis $41FF alle absoluten Adressen, die sich auf den Bereich von $6000 bis $6200 beziehen, auf einen neuen Bereich, der bei $4000 beginnt.<br>
-            W 4000 4300 5000 (Write)<br>
-            verschiebt den Speicherinhalt von $4000 bis $42FF nach $5000 ohne Umrechnung der Adressen (zum Beispiel Tabellen)<br>
-            X (Exit)<br>
-            springt aus dem Monitor-Programm ins Basic zurück<br>
-            # 49152<br>
-            Dezimalzahl umrechnen<br>
-            $ 002B<br>
-            4stellige Hex-Zahl umrechnen<br>
-            % 01101010<br>
-            8stellige Binärzahl umrechnen<br>
-            ? 0344 + 5234<br>
-            Addition oder Subtraktion zweier 4stelliger Hex-Zahlen<br>
-            = 4000 5000 (Vergleich)<br>
-            vergleicht den Speicherinhalt ab $4000 mit dem ab $5000<br>
-            Z (Diskmonitor)<br>
-            ruft den Diskmonitor auf. Dieser verfügt über folgende Befehle:<br>
-            R (12 01) (Read)<br>
-            liest Track $12, Sektor $01 von der Diskette in einen Puffer im Speicher. Fehlt die Angabe von Track und Sektor, wird der logisch (!) nächste Sektor gelesen.<br>
-            W (12 01) (Write)<br>
-            schreibt den Puffer im Speicher nach Track $12, Sektor $01 auf die Diskette. Ohne Angabe von Track und Sektor werden die letzten Eingaben von »R« benutzt.<br>
-            M (Memory-Dump)<br>
-            zeigt den Pufferinhalt als Hexdump (wie normales »M«), Weitere Ausgabe mit CBM-Taste, Abbruch mit STOP. Werte können durch Überschreiben geändert werden.<br>
-            X (Exit)<br>
-            springt in SMON zurück<br>
-            F (weitere Disketten-Befehle initialisieren)<br>
-            sind die Befehle initialisiert, gilt:<br>
-            M (07) Memory-Dump (Floppy-RAM/ROM)<br>
-            V 6000 0400<br>
-            Verschieben eines 256-Byte-Blocks von $6000 in den Laufwerkspuffer 1 beziehungsweise in das Floppy-RAM<br>
-            @ normale Disketten-Befehle senden<br>
-            X zurück zum normalen Disketten-Monitor</p>
-
-        <p>Befehlsübersicht zum SMON</p>
+            <table class="plain">
+                <tr><td><strong>A</strong></td><td><strong>4000</strong> (Assembler)<br>symbolischer Assembler (Verarbeitung von Label möglich) Startadresse $4000</td></tr>
+                <tr><td><strong>B</strong></td><td><strong>4000 4200</strong> (Basic-Data)<br>erzeugt Basic-DATA-Zeilen aus Maschinenprogramm im Bereich von $4000 bis $41FF</td></tr>
+                <tr><td><strong>C</strong></td><td><strong>4010 4200 4013 4000 4200</strong> (Convert)<br>in ein Programm, das von $4000 bis $4200 im Speicher steht, soll bei 4010 ein 3-Byte-Befehl eingefügt werden. Dazu wird das Programm ab $4010 bis 4200 auf die neue Adresse $4013 verschoben. Alle absoluten Adressen, die innerhalb des Programmbereichs ($4000 bis $4200) stehen, werden umgerechnet, so daß die Sprungziele stimmen.</td></tr>
+                <tr><td><strong>D</strong></td><td>4<strong>000 (4100)</strong> (Disassembler)<br>disassembliert den Bereich von $4000 (bis $4100) mit Ausgabe der Hex-Werte. Änderungen sind durch Überschreiben der Befehle möglich.</td></tr>
+                <tr><td><strong>F</strong></td><td>(Find)<br>findet Zeichenketten (F), absolute Adressen (FA), relative Sprünge (FR), Tabellen (FT), Zeropageadressen (FZ) und Immediate-Befehle (FI)</td></tr>
+                <tr><td><strong>G</strong></td><td><strong>(4000)</strong> (Go)<br>startet ein Maschinenprogramm, das bei $4000 im Speicher beginnt</td></tr>
+                <tr><td><strong>I</strong></td><td><strong>01</strong> (I/O-Gerät)<br>stellt die Gerätenummer für Floppy (08 oder 09) oder Datasette (01) ein</td></tr>
+                <tr><td><strong>K</strong></td><td><strong>A000 (A500)</strong> (Kontrolle)<br>zum schnellen Durchsuchen des Bereichs von $A000 (bis $A500) nach ASCII-Zeichen (32 Byte pro Zeile). Änderungen sind durch Überschreiben der ASCII-Zeichen möglich.</td></tr>
+                <tr><td><strong>L</strong></td><td><strong>(4000)</strong> (Load)<br>lädt ein Maschinenprogramm an die richtige oder eine angegebene Adresse ($4000)</td></tr>
+                <tr><td><strong>M</strong></td><td><strong>4000 (4400)</strong> (Memory-Dump)<br>gibt den Inhalt des Speichers von $4000 (bis $43FF) in Hex-Byte und ASCII-Code aus. Änderungen sind durch Überschreiben der Hex-Zahlen möglich.</td></tr>
+                <tr><td><strong>0</strong></td><td><strong>4000 4500 AA</strong> (Occupy)<br>füllt den Speicherbereich von $4000 bis $4500 mit vorgegebenem Byte ($AA) aus</td></tr>
+                <tr><td><strong>P</strong></td><td><strong>05</strong> (Printer)<br>setzt Geräteadresse 5 für Drucker</td></tr>
+                <tr><td><strong>R</strong></td><td>(Register)<br>zeigt die Registerinhalte und Flags an. Änderungen sind durch Überschreiben möglich.</td></tr>
+                <tr><td><strong>S</strong></td><td><strong>»Test« 4000 5000</strong> (Save)<br>speichert ein Programm von $4000 bis $4FFF unter dem Namen »Test« ab.</td></tr>
+                <tr><td><strong>TW</strong></td><td><strong>(4000)</strong> (Trace Walk)<br>führt auf Tastendruck den jeweils nächsten Maschinenbefehl aus und zeigt die Registerinhalte an. Subroutinen können in Echtzeit durchlaufen werden (»J«). Wird keine Startadresse eingegeben, beginnt >TW« bei der letzten mit »R« angezeigten Adresse.</td></tr>
+                <tr><td><strong>TB</strong></td><td><strong>4010 05</strong> (Trace Break)<br>setzt einen Haltepunkt für den Schnellschrittmodus bei $4010. Der Schnellschrittmodus wird unterbrochen, nachdem $4010 zum fünften Mal erreicht worden ist.</td></tr>
+                <tr><td><strong>TQ</strong></td><td><strong>4000</strong> (Trace quick)<br>Schnellschrittmodus, springt beim Erreichen eines Haltepunktes in den Einzelschrittmodus.</td></tr>
+                <tr><td><strong>TS</strong></td><td><strong>4000 4020</strong> (Trace stop)<br>arbeitet ein Programm ab $4000 in Echtzeit ab und springt beim Erreichen von $4020 in die Registeranzeige. Von dort aus kann (nach eventueller Änderung der Register) mit »G« oder »TW« fortgefahren werden. »TS« arbeitet nur im RAM-Speicher.</td></tr>
+                <tr><td><strong>V</strong></td><td><strong>6000 6200 4000 4100 4200</strong> (Verschieben)<br>ändert in einem Programm von $4100 bis $41FF alle absoluten Adressen, die sich auf den Bereich von $6000 bis $6200 beziehen, auf einen neuen Bereich, der bei $4000 beginnt.</td></tr>
+                <tr><td><strong>W</strong></td><td><strong>4000 4300 5000</strong> (Write)<br>verschiebt den Speicherinhalt von $4000 bis $42FF nach $5000 ohne Umrechnung der Adressen (zum Beispiel Tabellen)</td></tr>
+                <tr><td><strong>X</strong></td><td>(Exit)<br>springt aus dem Monitor-Programm ins Basic zurück</td></tr>
+                <tr><td><strong>#</strong></td><td><strong>49152</strong><br>Dezimalzahl umrechnen</td></tr>
+                <tr><td><strong>$</strong></td><td><strong>002B</strong><br>4stellige Hex-Zahl umrechnen</td></tr>
+                <tr><td><strong>%</strong></td><td><strong>01101010</strong><br>8stellige Binärzahl umrechnen</td></tr>
+                <tr><td><strong>?</strong></td><td><strong>0344 + 5234</strong><br>Addition oder Subtraktion zweier 4stelliger Hex-Zahlen</td></tr>
+                <tr><td><strong>=</strong></td><td><strong>4000 5000</strong> (Vergleich)<br>vergleicht den Speicherinhalt ab $4000 mit dem ab $5000</td></tr>
+                <tr><td><strong>Z</strong></td><td>(Diskmonitor)<br>ruft den Diskmonitor auf. Dieser verfügt über folgende Befehle:</td></tr>
+                <tr><td><strong>R</strong></td><td><strong>(12 01)</strong> (Read)<br>liest Track $12, Sektor $01 von der Diskette in einen Puffer im Speicher. Fehlt die Angabe von Track und Sektor, wird der logisch (!) nächste Sektor gelesen.</td></tr>
+                <tr><td><strong>W</strong></td><td><strong>(12 01)</strong> (Write)<br>schreibt den Puffer im Speicher nach Track $12, Sektor $01 auf die Diskette. Ohne Angabe von Track und Sektor werden die letzten Eingaben von »R« benutzt.</td></tr>
+                <tr><td><strong>M</strong></td><td>(Memory-Dump)<br>zeigt den Pufferinhalt als Hexdump (wie normales »M«), Weitere Ausgabe mit CBM-Taste, Abbruch mit STOP. Werte können durch Überschreiben geändert werden.</td></tr>
+                <tr><td><strong>X</strong></td><td>(Exit)<br>springt in SMON zurück</td></tr>
+                <tr><td><strong>F</strong></td><td>(weitere Disketten-Befehle initialisieren)<br>
+                    sind die Befehle initialisiert, gilt:
+                    <table class="plain">
+                        <tr><td><strong>M</strong></td><td>(07)<br>Memory-Dump (Floppy-RAM/ROM)</td></tr>
+                        <tr><td><strong>V</strong></td><td>6000 0400<br>Verschieben eines 256-Byte-Blocks von $6000 in den Laufwerkspuffer 1 beziehungsweise in das Floppy-RAM</td></tr>
+                        <tr><td>@</td><td>normale Disketten-Befehle senden</td></tr>
+                        <tr><td><strong>X</strong></td><td>zurück zum normalen Disketten-Monitor</td></tr>
+                    </table>
+                </td></tr>
+            </table>
+            <figcaption>Befehlsübersicht zum SMON</figcaption>
+        </figure>
     </article>
 </body>
 
