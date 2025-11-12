@@ -40,21 +40,30 @@
 
         <h3>Zeiger auf den Anfang der Bildschirmzeile, auf welcher der Cursor gerade steht</h3>
 
-        <p>Dieser Zeiger in Low-/High-Byte-Darstellung zeigt auf die Adresse im Bildschirmspeicher, in welcher diejenige Zeile beginnt, auf der der Cursor gerade steht. Das läßt sich leicht nachprüfen durch folgende Programmzeile:<br>
-            10 PRINT CHR$(147) PEEK(209) PEEK(210)</p>
+        <p>Dieser Zeiger in Low-/High-Byte-Darstellung zeigt auf die Adresse im Bildschirmspeicher, in welcher diejenige Zeile beginnt, auf der der Cursor gerade steht. Das läßt sich leicht nachprüfen durch folgende Programmzeile:
+            <code>10 PRINT CHR$(147) PEEK(209) PEEK(210)</code>
+        </p>
 
-        <p>Nach RUN wird erst der Bildschirm gelöscht, der Cursor in die HOME-Position gebracht und dann der Inhalt der beiden Zellen ausgedruckt. Da dies alles in der ersten Zeile passiert, sehen wir als Resultat eine 0 und eine 4. Die beiden Zahlen ergeben zusammen die Adresse, in der die erste Zeile des Bildschirmspeichers beginnt. Erweitern Sie die Zeile 10 um ein Komma und die Low-/High-Byte-Berechnung:<br>
-            10 PRINT CHR$(147) PEEK(209) PEEK(210), PEEK(209) + 256* PEEK(210)</p>
+        <p>Nach RUN wird erst der Bildschirm gelöscht, der Cursor in die HOME-Position gebracht und dann der Inhalt der beiden Zellen ausgedruckt. Da dies alles in der ersten Zeile passiert, sehen wir als Resultat eine 0 und eine 4. Die beiden Zahlen ergeben zusammen die Adresse, in der die erste Zeile des Bildschirmspeichers beginnt. Erweitern Sie die Zeile 10 um ein Komma und die Low-/High-Byte-Berechnung:
+            <code>10 PRINT CHR$(147) PEEK(209) PEEK(210), PEEK(209) + 256* PEEK(210)</code>
+        </p>
 
-        <p>Jetzt sehen wir als Resultat:<br>
-            0 4 1024</p>
+        <p>Jetzt sehen wir als Resultat:</p>
 
-        <p>Beim VC 20 erscheinen die der verwendeten Speichererweiterung entsprechenden Zahlen. Wir können durch einen TAB-Befehl den zweiten Teil der PRINT-Anweisung in die nächste Zeile schieben und sehen, was dann herauskommt:<br>
-            20 PRINT PEEK(209) PEEK(210), TAB(50) PEEK(209) + 256*PEEK (210)</p>
+        <table class="plain">
+            <tr><td>0</td><td>4</td><td>1024</td></tr>
+        </table>
 
-        <p>Das Resultat ist jetzt:<br>
-            0 4 1024<br>
-            40 4 1104</p>
+        <p>Beim VC 20 erscheinen die der verwendeten Speichererweiterung entsprechenden Zahlen. Wir können durch einen TAB-Befehl den zweiten Teil der PRINT-Anweisung in die nächste Zeile schieben und sehen, was dann herauskommt:
+            <code>20 PRINT PEEK(209) PEEK(210), TAB(50) PEEK(209) + 256*PEEK (210)</code>
+        </p>
+
+        <p>Das Resultat ist jetzt:</p>
+
+        <table class="plain">
+            <tr><td>0</td><td>4</td><td>1024</td></tr>
+            <tr><td>40</td><td>4</td><td>1104</td></tr>
+        </table>
 
         <p>Einen entsprechenden Zeiger für die Adresse der dazugehörigen Zeile im Farbspeicher werden wir in den Speicherzellen 243/244 antreffen. Durch POKEn können wir die Cursorposition leider nicht beeinflussen, aber Abfragen geht, wenn es uns interessiert.</p>
 
@@ -64,15 +73,17 @@
 
         <p>Den Inhalt der Speicherzelle 211 könnte man auch die Spaltenposition des Cursors nennen, wenn es sich nicht um die Position in der logischen Zeile handelte (siehe Texteinschub 1). Beim C 64 sind daher die Werte von 0 bis 79, beim VC 20 von 0 bis 87 möglich.</p>
 
-        <p>Diese Speicherzelle zusammen mit Zelle 214 wird von den Befehlen POS, TAB, SPC und vom Komma innerhalb einer PRINT-Anweisung verwendet, um den Cursor zu positionieren. Das können wir auch. Um den Cursor auf Platz 5 in der Bildschirmzeile 18 zu bringen, geben wir folgende Programmzeile ein:<br>
-            10 POKE 214,17:PRINT:POKE 211,5:PRINT"C 64"</p>
+        <p>Diese Speicherzelle zusammen mit Zelle 214 wird von den Befehlen POS, TAB, SPC und vom Komma innerhalb einer PRINT-Anweisung verwendet, um den Cursor zu positionieren. Das können wir auch. Um den Cursor auf Platz 5 in der Bildschirmzeile 18 zu bringen, geben wir folgende Programmzeile ein:
+            <code>10 POKE 214,17:PRINT:POKE 211,5:PRINT"C 64"</code>
+        </p>
 
         <p>Aus innerbetrieblichen Gründen muß der Wert, den wir als Zeile erzielen wollen, um 1 verringert in die Zelle 214 gePOKEt werden. Mit der Zahl 17 wird also der Cursor zuerst auf die Zeile 18 gebracht, dann in Spalte 5, ab der dann das Wort »C 64« gedruckt wird. Auf diese Weise erhalten wir einen Befehl, der in anderen Basic-Formen unter dem Namen PRINT AT sehr verbreitet ist, der bei den kleinen Commodore-Computern aber fehlt.</p>
 
         <p>Der Vorgang dabei besteht darin, daß die Inhalte von 211 und 214 in das X-Register beziehungsweise in das Y-Register des Mikroprozessors gebracht werden, von dort können die Werte dann von einer Routine des Betriebssystems abgerufen werden. Das klingt alles sehr nach Maschinensprache. Aber wir haben Glück, denn sowohl die beiden Register als auch die besagte Routine sind von Basic aus ansprechbar. Das X-Register steht in Speicherzelle 781, das Y-Register in Speicherzelle 782, die Routine beginnt sowohl beim C 64 als auch beim VC 20 ab der Adresse 58634, wo wir sie mit dem SYS-Befehl starten können.</p>
 
-        <p>Für unser Beispiel sieht das dann so aus:<br>
-            10 POKE 781,18:POKE 782,5: SYS 58634:PRINT"C 64"</p>
+        <p>Für unser Beispiel sieht das dann so aus:
+            <code>10 POKE 781,18:POKE 782,5: SYS 58634:PRINT"C 64"</code>
+        </p>
 
         <p>Wir erhalten dasselbe Ergebnis, nur mit dem Unterschied, daß die Zeile jetzt wirklich die Zeile 18 ist. Mit dieser Methode ist jetzt auch die Zeile 0 erreichbar.</p>
 
@@ -86,7 +97,7 @@
 
         <p>Selbst Anfängern ist der Gänsefuß-Modus sehr rasch geläufig, bietet er doch die Möglichkeit, Zeichen mit der PRINT-Anweisung auszudrucken. Genauso bekannt sind aber auch die Tücken der Gänsefüße. Die Cursor-Tasten reagieren nicht wie gewohnt. Auch die Farbumschaltung und andere Steuertasten zeigen nicht die übliche Wirkung, sondern drucken — allzu oft unerwartet — ein reverses Zeichen auf den Bildschirm.</p>
 
-        <p>Eingeschaltet wird der Gänsefuß-Modus durch Drücken der geSHIFTeten 2-Taste oder der geSHIFTeten INST/DEL-Taste. Abgeschaltet wird er nach je-dem2., 4., 6., also nachjeder geradzahligen Wiederholung der Gänsefuß-Taste innerhalb einer Zeile. Abgeschaltet wird er auch durch die RETURN-Taste. Das spezielle Verhalten der Steuertasten zwischen Gänsefüßen hat Herr Wagner bereits in Ausgabe 6/84, Seite 114, für faszinierende Effekte näher beschrieben, und auch ich habe in 7/84, Seite 152, im Kurs über Tastatur-Abfrage und Tastencodes mehrere Kochrezepte dafür angegeben.</p>
+        <p>Eingeschaltet wird der Gänsefuß-Modus durch Drücken der geSHIFTeten 2-Taste oder der geSHIFTeten INST/DEL-Taste. Abgeschaltet wird er nach jedem 2., 4., 6., also nach jeder geradzahligen Wiederholung der Gänsefuß-Taste innerhalb einer Zeile. Abgeschaltet wird er auch durch die RETURN-Taste. Das spezielle Verhalten der Steuertasten zwischen Gänsefüßen hat Herr Wagner bereits in Ausgabe 6/84, Seite 114, für faszinierende Effekte näher beschrieben, und auch ich habe in 7/84, Seite 152, im Kurs über Tastatur-Abfrage und Tastencodes mehrere Kochrezepte dafür angegeben.</p>
 
         <p>Leider läßt sich der Inhalt der Speicherzelle 212 und damit der Status des Gänsefuß-Modus von Basic aus nicht beeinflussen. Doch in Maschinensprache unter Verwendung der Interrupt-Routine geht es, und einige Vorschläge zum Abschalten des Gänsefuß-Modus per Tastendruck sind schon veröffentlicht worden.</p>
 
@@ -104,7 +115,9 @@
 
         <p>Diese Speicherzelle ist zusammen mit der Speicherzelle 211 beschrieben.</p>
 
-        <p>Adresse 215 ($D7) Zwischenspeicher für den ASCII-Codewert der zuletzt gedrückten Taste</p>
+        <h2>Adresse 215 ($D7)</h2>
+
+        <h3>Zwischenspeicher für den ASCII-Codewert der zuletzt gedrückten Taste</h3>
 
         <p>Bei der Tastaturabfrage werden die Tastencodes (siehe Speicherzelle 203) in ASCII-Codewerte umgewandelt und in den Tastaturpuffer gebracht. Die Speicherzelle 215 dient dabei als Zwischenspeicher. Kassettenoperationen speichern hier auch Prüfsummen ab.</p>
 
@@ -126,7 +139,7 @@
 
         <p>Die ersten 4 Bit, also Bit 0 bis 3, geben an, in welchem Speicherblock, man sagt auch »page« dazu, das erste Byte der betreffenden Bildschirmzeile sich befindet. Diese Angabe wird zur Berechnung des Zeigers in der Speicherzelle 209 (siehe dort) verwendet. Sie ist in dieser Form notwendig, da der Bildschirmspeicher beim C 64 überall in den Arbeitsspeicher gelegt werden kann. Um die Position eines Zeichens oder besser gesagt eines Bytes davon im Bildschirmspeicher genau positionieren zu können, braucht das Betriebssystem noch die genaue Lage innerhalb des Speicherblocks. Das Low-Byte dieser Zahl steht in einer Tabelle ab Speicherzelle 60656 (60952 beim VC 20). Das High-Byte wird berechnet und zwar durch Addition des Wertes der Speicherzelle 648 mit dem Wert der ersten 4 Bits in Tabelle 217 bis 242. Der Wert in Zelle 648 gibt die Anfangsadresse des Bildschirmspeichers an.</p>
 
-        <p>Der zweite Teil jedes Bytes in der Tabelle 217 bis 242 hat eine andere Funktion. Wie im nebenstehenden Texteinschub beschrieben ist, kann eine logische Zeile aus ein oder zwei (beim VC 20 sogar bis zu 4) echten Zeilen bestehen. Das Betriebssystem braucht daher eine Angabe, welche echten Zeilen zu einer logischen Zeile verbunden sind. Dieses Verbinden heißt auf englisch »link«, daher heißt der Speicherbereich 217 bis 242 »Link-Tabelle«. Diese oberen 4 Bit zeigen mit irgendeinem Wert über 0 an, daß die betreffende echte Zeile die erste oder einzige einer logischen Zeile ist. Sind die 4 Bit alle 0, dannist sieeine 2., 3. und4. Zeile der logischen Zeile.</p>
+        <p>Der zweite Teil jedes Bytes in der Tabelle 217 bis 242 hat eine andere Funktion. Wie im nebenstehenden Texteinschub beschrieben ist, kann eine logische Zeile aus ein oder zwei (beim VC 20 sogar bis zu 4) echten Zeilen bestehen. Das Betriebssystem braucht daher eine Angabe, welche echten Zeilen zu einer logischen Zeile verbunden sind. Dieses Verbinden heißt auf englisch »link«, daher heißt der Speicherbereich 217 bis 242 »Link-Tabelle«. Diese oberen 4 Bit zeigen mit irgendeinem Wert über 0 an, daß die betreffende echte Zeile die erste oder einzige einer logischen Zeile ist. Sind die 4 Bit alle 0, dann ist sie eine 2., 3. und 4. Zeile der logischen Zeile.</p>
 
         <h2>Adresse 243 bis 244 ($F3 bis $F4)</h2>
 
@@ -142,7 +155,7 @@
 
         <p>Bei der Diskussion der Speicherzelle 145 (Heft 6/85, Seite 120 und 123) habe ich Ihnen gezeigt, wie das Drücken einer der 64 Tasten entschlüsselt wird.</p>
 
-        <p>Ein entschlüsselter Wert wird in Speicherzelle 145 zwischengespeichert und gelangt dann als Tastencode in die Speicherzelle 203. Im letzten Heft wurden bei der Besprechung der Zelle 203 die Codewerte aufgelistet. Ich habe auch darauf hingewiesen, daß die Codes der drei Steuertasten SHIFT, CTRL und COMMODORE (C = ) separat in der Zelle 653 stehen.</p>
+        <p>Ein entschlüsselter Wert wird in Speicherzelle 145 zwischengespeichert und gelangt dann als Tastencode in die Speicherzelle 203. Im letzten Heft wurden bei der Besprechung der Zelle 203 die Codewerte aufgelistet. Ich habe auch darauf hingewiesen, daß die Codes der drei Steuertasten SHIFT, CTRL und COMMODORE (C=) separat in der Zelle 653 stehen.</p>
 
         <p>Diese Tastencodes sind sehr nützlich und vom Basic aus gut verwendbar. Im Verkehr mit anderen Geräten sind sie aber nicht einsetzbar, da sie keiner internationalen Norm entsprechen.</p>
 
@@ -152,14 +165,18 @@
 
         <p>Die Umrechnung der Tastencodes in ASCII-Code ist sehr einfach. Der Tastencode wird lediglich zu der Anfangsadresse der entsprechenden Tabelle hinzugezählt. Die Summe ergibt die Adresse in der Tabelle, in der der ASCII-Code für das gedrückte Zeichen steht.</p>
 
-        <p>Als Beispiel nehmen wir das normale »G«, sein Tastencode ist 26(VC 20:19). Zur Anfangsadresse der normalen Tabelle 60289 (60510) dazugezählt, ergibt das 60315 (60529). Schauen wir in dieser Speicherzelle nach:<br>
-            PRINT PEEK (60315) beim C 64<br>
-            PRINT PEEK (60529) beim VC 20</p>
+        <p>Als Beispiel nehmen wir das normale »G«, sein Tastencode ist 26(VC 20:19). Zur Anfangsadresse der normalen Tabelle 60289 (60510) dazugezählt, ergibt das 60315 (60529). Schauen wir in dieser Speicherzelle nach:</p>
+
+        <ul class="plain">
+            <li>PRINT PEEK (60315) beim C 64</li>
+            <li>PRINT PEEK (60529) beim VC 20</li>
+        </ul>
 
         <p>In beiden Fällen erhalten wir die Zahl 71. Ein Blick in die ASCII-Tabelle des Handbuchs bestätigt die Richtigkeit.</p>
 
-        <p>Der Vektor in den vorliegenden Speicherzellen 245/246 zeigt auf den Anfang der vier Tabellen und zwar in Abhängigkeit davon, ab und welche der drei Steuertasten zusammen mit einer anderen Taste gedrückt worden ist. Auch das kann ich Ihnen zeigen mit einer Programmzeile, welche ein Zahlenband erzeugt, dessen Zahl durch die Steuertasten verändert wird. Sie werden sehen, es sind die Anfangsadressen der vier Tabellen.<br>
-            10 PRINT PEEK(245) + 256* PEEK(246):GOTO 10</p>
+        <p>Der Vektor in den vorliegenden Speicherzellen 245/246 zeigt auf den Anfang der vier Tabellen und zwar in Abhängigkeit davon, ab und welche der drei Steuertasten zusammen mit einer anderen Taste gedrückt worden ist. Auch das kann ich Ihnen zeigen mit einer Programmzeile, welche ein Zahlenband erzeugt, dessen Zahl durch die Steuertasten verändert wird. Sie werden sehen, es sind die Anfangsadressen der vier Tabellen.
+            <code>10 PRINT PEEK(245) + 256* PEEK(246):GOTO 10</code>
+        </p>
 
         <h2>Adresse 247 bis 248 ($F7 bis $F8)</h2>
 
@@ -193,89 +210,113 @@
 
         <address class="author">(Dr. H. Hauck/ah)</address>
 
-        <p>TODO ASIDE</p>
+        <figure>
+            <table class="plain">
+                <tr><td>ab 60289 (60510)</td><td>normale Zeichen</td></tr>
+                <tr><td>ab 60354 (60575)</td><td>Zeichen mit SHIFT</td></tr>
+                <tr><td>ab 60419 (60640)</td><td>Zeichen mit C=</td></tr>
+                <tr><td>ab 64632 (60835)</td><td>Zeichen mit CTRL</td></tr>
+            </table>
+            <figcaption>Bild 1. Anfangsadressen der 4 Tabellen</figcaption>
+        </figure>
 
-        <h2>Texteinschub Nr. 1 bgische und echte Zeilen</h2>
+        <aside>
+            <h2>Texteinschub Nr. 1<br>Logische und echte Zeilen</h2>
+    
+            <p>Der Bildschirm des C 64 besteht aus 25 Zeilen. Jede davon enthält 40 Stellen. Der VC 20 hat 23 Zeilen mit je 22 Stellen. Diese Zeilen des Bildschirms werden »echte Zeilen« genannt.</p>
+    
+            <p>Der Begriff »Zeile« kommt auch beim Programmieren vor. Dort bedeutet er die Reihe der Anweisungen und Befehle, die hinter einer Zeilennummer zusammengefaßt sind. Diese Programmzeilen werden »logische Zeilen« genannt.</p>
+    
+            <p>Wozu dient dieser Unterschied?</p>
+    
+            <p>Der Grund ist ganz einfach der, daß sehr oft eine Programmzeile mehr Zeichen enthält, als in eine (echte) Zeile des Bildschirms hineinpassen. Besonders Texte innerhalb einer PRINT-Anweisung sind häufig viel länger als 40 Zeichen, erst recht als die 22 Zeichen beim VC 20.</p>
+    
+            <p>Deshalb läßt es das Betriebssystem des Computers zu, daß in einer (logischen) Programmzeile mehr als 40 (22) Zeichen stehen.</p>
+    
+            <p>Beim C 64 kann eine logische Zeile aus zwei echten Zeilen bestehen mit einer maximalen Zeichenzahl von 80.</p>
+    
+            <p>Der VC 20 erlaubt in einer logischen Zeile maximal 88 Zeichen und braucht dazu 4 echte Zeilen.</p>
+    
+            <p>Dieses Zusammenfügen von mehreren echten Zeilen zu einer logischen Zeile hat natürlich Konsequenzen. Am meisten davon betroffen ist der Editor, das ist der Teil des Betriebssystems, der uns erlaubt, auf dem Bildschirm zu arbeiten, zu ändern, zu löschen und fertige Zeilen mit RETURN einzugeben.</p>
+    
+            <p>Ich will Ihnen nur ein paar Beispiele nennen, die Sie sicher kennen, um Ihnen den Zusammenhang zu zeigen.</p>
+    
+            <p>Wenn Sie ein Programm LISTen und anschließend in einer Programmzeile weitere Befehle anhängen, die über die Länge der echten Zeile hinausgehen, brauchen Sie selbst keinen Platz dafür schaffen. Das macht der Editor automatisch, indem er alle folgenden Zeilen auf dem Bildschirm nach unten schiebt. Für die Einsteiger unter Ihnen führe ich das vor. Geben Sie bitte die folgenden drei Zeilen ein (mit RETURN abschließen):
+                <code>10 PRINT"A"
+                    20 PRINT"B"
+                    30 PRINT"C"
+                </code>
+            </p>
+    
+            <p>Jetzt fahren Sie mit dem Cursor auf die Zeile 20 und schreiben statt einem B so viele davon, bis Sie damit in die nächste Zeile kommen.</p>
+    
+            <p>Sie werden sehen, daß dabei die Zeile 30 von selbst eins weiter nach unten rutscht. Erst wenn Sie in die 3. Zeile (5. Zeile beim VC 20) kommen, wird die Zeile 30 überschrieben. Sie sind dann über das Ende der logischen Zeile geraten. Eine überfüllte logische Zeile kann nicht eingegeben werden, die RETURN-Taste wird mit SYNTAX ERROR quittiert beziehungsweise abgewiesen.</p>
+    
+            <p>Es gibt allerdings eine Methode, wie Sie in einem Listing eines Programms Programmzeilen, also logische Zeilen mit mehr als 80 (88) Zeichen erhalten können.</p>
+    
+            <p>Fast alle Basic-Befehle können in abgekürzter Form eingetippt werden, am häufigsten wird sicher das Fragezeichen ? anstelle von PRINT eingesetzt. Sie können nun eine logische Zeile mit Abkürzungen und durch Weglassen von allen Zwischenräumen bis zum erlaubten Maximum füllen. Natürlich wird diese volle Zeile nach RETURN akzeptiert. Beim ausLISTen aber schreibt der Editor alle Befehle, auch die abgekürzten, in voller Länge aus und fügt nach der Zeilennummer einen Zwischenraum ein. Eine solche Zeile hat dann mehr echte Zeilen als erlaubt, intern aber hat sie die richtige Länge.</p>
+    
+            <p>Einen Nachteil hat diese Komprimierung doch. In einer solchen »überlangen« logischen Zeile kann nicht mehr korrigiert werden, es sei denn, sie wird vorher auf eine erlaubte Länge reduziert.</p>
+    
+            <p>Abschließend möchte ich noch kurz erwähnen, daß zur Steuerung dieser Zusammenhänge zwischen echten und logischen Zeilen die Speicherzellen 200, 201, 202, 209, 211,213, 214, 217 bis 242 und 658 eine entsprechende Rolle spielen, die im einzelnen in der Memory Map beschrieben ist.</p>
+        </aside>
 
-        <p>Der Bildschirm des C 64 besteht aus 25 Zeilen. Jede davon enthält 40 Stellen. Der VC 20 hat 23 Zeilen mitje 22 Stellen. Diese Zeilen des Bildschirms werden »echte Zeilen« genannt.</p>
+        <aside>
+            <h2>Texteinschub Nr. 2<br>Zeiger, Vektoren und Flaggen</h2>
+    
+            <p>Zeiger und Vektoren sind Zahlenwerte, die jeweils in zwei benachbarten Speicherzellen stehen und in der Low-/High-Byte Darstellung eine Adresse bilden.</p>
+    
+            <p>Wir sprechen von einem »Zeiger«, wenn diese Adresse den Beginn von gespeicherten Daten angibt.</p>
+    
+            <p>Ein »Vektor« zeigt ebenfalls auf eine Anfangsadresse, allerdings auf die eines Maschinenprogramms. Diese Unterscheidung wird leider nicht immer ganz eindeutig angewendet.</p>
+    
+            <p>Eine »Flagge« besteht aus einem Zahlenwert in einer Speicherzelle, die von einem Programm dort abgelegt wird, um sich das Resultat einer Operation zu merken, beziehungsweise um es für eine spätere Verwendung bereitzuhalten.</p>
+        </aside>    
 
-        <p>Der Begriff »Zeile« kommt auch beim Programmieren vor. Dort bedeutet er die Reihe der Anweisungen und Befehle, die hinter einer Zeilennummer zusammengefaßt sind. Diese Programmzeilen werden »logische Zeilen« genannt.</p>
+        <aside>
+            <h2>Texteinschub Nr. 3<br>Die Low-/High-Byte-Darstellung</h2>
+    
+            <p>Eine Speicherzelle der kleinen Commodore-Computer VC 20 und C 64 hat eine Länge von 8 Bit = 1 Byte. Mit diesen 8 Bit können Zahlen von 0 bis 255 ($00FF) dargestellt werden. Zur Darstellung von Zahlen über 255 verwenden wir die Low-/High-Byte-Methode.</p>
+    
+            <p>Wir hängen einfach zwei Speicherzellen zusammen, mit deren 16 Bit wir Zahlen bis maximal 65535 ($FFFF) darstellen können. Die maximale Zahl 65535 ist übrigens auch die höchste Adresse des gesamten Speichers — was natürlich kein Zufall ist.</p>
+    
+            <p>Ich will Ihnen jetzt zeigen, wie eine Dezimalzahl auf zwei 8-Bit-Speicherzellen verteilt wird, und umgekehrt, wie aus 2 Byte eine Dezimalzahl gebildet wird.</p>
+    
+            <p>Schauen Sie sich das folgende Beispiel an:</p>
 
-        <p>Wozu dient dieser Unterschied?</p>
+            <table class="plain center1 center2 center3 center4">
+                <tr class="strong"><td>DEZIMAL</td><td colspan="4">47&thinsp;491</td></tr>
+                <tr><td>DUAZAHL</td><td>1011</td><td>1001</td><td>1000</td><td>0011</td></tr>
+                <tr><td>HEX $</td><td>B</td><td>9</td><td>8</td><td>3</td></tr>
+                <tr><td>HIGH-BYTE</td><td colspan="2">185</td><td></td><td></td></tr>
+                <tr><td>LOW-BYTE</td><td></td><td></td><td colspan="2">131</td></tr>
+            </table>
+    
+            <p>Wir gehen von der Dezimalzahl 47491 aus. Ihre duale Darstellung mit 16 Bit — 1011100110000011 — teilen wir einfach in der Mitte und erhalten damit zwei neue Dual-Zahlen mit je 8 Bit = 1 Byte. Das linke Byte nennen wir »High-Byte«, da es den höheren Teil der Gesamtzahl darstellt. Das rechte Byte heißt entsprechend »Low-Byte«.</p>
+    
+            <p>Jedes der beiden Bytes kann für sich allein in einer Speicherzelle untergebracht werden, in der natürlich dann der dezimale Wert des Bytes steht.</p>
+    
+            <p>In der Tabelle habe ich zur Vollständigkeit noch die hexadezimalen Werte eingefügt, die sehr schön zeigen, daß der Vorteil dieser Zahlendarstellung darin liegt, daß jede Einzelziffer der 4-Bit-Dualzahl entspricht, genau so wie jede Zweiergruppe dem Byte (sowohl in Dual-, als auch in Dezimaldarstellung) und die vierstellige Zahl der großen Dezimal- und Dualzahl entspricht.</p>
+    
+            <p>Zur Umrechnung der Low-/High-Bytes empfehle ich folgende Kochrezepte:</p>
 
-        <p>Der Grund ist ganz einfach der, daß sehr oft eine Programmzeile mehr Zeichen enthält, als in eine (echte) Zeile des Bildschirms hineinpassen. Besonders Texte innerhalb einer PRINT-Anweisung sind häufig viel länger als 40 Zeichen, erst recht als die 22 Zeichen beim VC 20.</p>
+            <p class="noindent">Dezimal in Low-/High-Byte<br>
+                47491:256 = 185 (High-Byte), Rest 131 (Low-Byte)
+            </p>
+    
+            <p>Der Rest fällt bei der Division per Hand automatisch an. Mit dem (Taschen-)Rechner erhält man den Rest durch:<br>
+                185*256-47491 = -131
+            </p>
 
-        <p>Deshalb läßt es das Betriebssystem des Computers zu, daß in einer (logischen) Programmzeile mehr als 40 (22) Zeichen stehen.</p>
-
-        <p>Beim C 64 kann eine logische Zeile aus zwei echten Zeilen bestehen mit einer maximalen Zeichenzahl von 80.</p>
-
-        <p>Der VC 20 erlaubt in einer logischen Zeile maximal 88 Zeichen und braucht dazu 4 echte Zeilen.</p>
-
-        <p>Dieses Zusammenfügen von mehreren echten Zeilen zu einer logischen Zeile hat natürlich Konsequenzen. Am meisten davon betroffen ist der Editor, das ist der Teil des Betriebssystems, der uns erlaubt, auf dem Bildschirm zu arbeiten, zu ändern, zu löschen und fertige Zeilen mit RETURN einzugeben.</p>
-
-        <p>Ich will Ihnen nur ein paar Beispiele nennen, die Sie sicher kennen, um Ihnen den Zusammenhang zu zeigen.</p>
-
-        <p>Wenn Sie ein Programm LISTen und anschließend in einer Programmzeile weitere Befehle anhängen, die über die Länge der echten Zeile hinausgehen, brauchen Sie selbst keinen Platz dafür schaffen. Das macht der Editor automatisch, indem er alle folgenden Zeilen auf dem Bildschirm nach unten schiebt. Für die Einsteiger unter Ihnen führe ich das vor. Geben Sie bitte die folgenden drei Zeilen ein (mit RETURN abschließen):<br>
-            10 PRINT"A"<br>
-            20 PRINT"B"<br>
-            30 PRINT"C"</p>
-
-        <p>Jetzt fahren Sie mit dem Cursor auf die Zeile 20 und schreiben statt einem B so viele davon, bis Sie damit in die nächste Zeile kommen.</p>
-
-        <p>Sie werden sehen, daß dabei die Zeile 30 von selbst eins weiter nach unten rutscht. Erst wenn Sie in die 3. Zeile (5. Zeile beim VC 20) kommen, wird die Zeile 30 überschrieben. Sie sind dann über das Ende der logischen Zeile geraten. Eine überfüllte logische Zeile kann nicht eingegeben werden, die RETURN-Taste wird mit SYNTAX ERROR quittiert beziehungsweise abgewiesen.</p>
-
-        <p>Es gibt allerdings eine Methode, wie Sie in einem Listing eines Programms Programmzeilen, also logische Zeilen mit mehr als 80 (88) Zeichen erhalten können.</p>
-
-        <p>Fast alle Basic-Befehle können in abgekürzter Form eingetippt werden, am häufigsten wird sicher das Fragezeichen ? anstelle von PRINT eingesetzt. Sie können nun eine logische Zeile mit Abkürzungen und durch Weglassen von allen Zwischenräumen bis zum erlaubten Maximum füllen. Natürlich wird diese volle Zeile nach RETURN akzeptiert. Beim ausLISTen aber schreibt der Editor alle Befehle, auch die abgekürzten, in voller Länge aus und fügt nach der Zeilennummer einen Zwischenraum ein. Eine solche Zeile hat dann mehr echte Zeilen als erlaubt, intern aber hat sie die richtige Länge.</p>
-
-        <p>Einen Nachteil hat diese Komprimierung doch. In einer solchen »überlangen« logischen Zeile kann nicht mehr korrigiert werden, es sei denn, sie wird vorher auf eine erlaubte Länge reduziert.</p>
-
-        <p>Abschließend möchte ich noch kurz erwähnen, daß zur Steuerung dieser Zusammenhänge zwischen echten und logischen Zeilen die Speicherzellen 200, 201,202, 209, 211,213, 214, 217bis242 und 658 eine entsprechende Rolle spielen, die im einzelnen in der Memory Map beschrieben ist.</p>
-
-        <p>TODO ASIDE</p>
-
-        <h2>Texteinschub Nr. 2 Zeiger, Vektoren und Flaggen</h2>
-
-        <p>Zeiger und Vektoren sind Zahlenwerte, die jeweils in zwei benachbarten Speicherzellen stehen und in der Low-/High-Byte Darstellung eine Adresse bilden.</p>
-
-        <p>Wir sprechen von einem »Zeiger«, wenn diese Adresse den Beginn von gespeicherten Daten angibt.</p>
-
-        <p>Ein »Vektor« zeigt ebenfalls auf eine Anfangsadresse, allerdings auf die eines Maschinenprogramms. Diese Unterscheidung wird leider nicht immer ganz eindeutig angewendet.</p>
-
-        <p>Eine »Flagge« besteht aus einem Zahlenwert in einer Speicherzelle, die von einem Programm dort abgelegt wird, um sich das Resultat einer Operation zu merken, beziehungsweise um es für eine spätere Verwendung bereitzuhalten.</p>
-
-        <p>TODO ASIDE</p>
-
-        <h2>Texteinschub Nr. 3 Die hw-/High-Byte-Darstellung</h2>
-
-        <p>Eine Speicherzelle der kleinen Commodore-Computer VC 20 und C 64 hat eine Länge von 8 Bit = 1 Byte. Mit diesen 8 Bit können Zahlen von 0 bis 255 ($00FF) dargestellt werden. Zur Darstellung von Zahlen über 255 verwenden wir die Low-/High-Byte-Methode.</p>
-
-        <p>Wir hängen einfach zwei Speicherzellen zusammen, mit deren 16 Bit wir Zahlen bis maximal 65535 ($FFFF) darstellen können. Die maximale Zahl 65535 ist übrigens auch die höchste Adresse des gesamten Speichers — was natürlich kein Zufall ist.</p>
-
-        <p>Ich will Ihnen jetzt zeigen, wie eine Dezimalzahl auf zwei 8-Bit-Speicherzellen verteilt wird, und umgekehrt, wie aus 2 Byte eine Dezimalzahl gebildet wird.</p>
-
-        <p>Schauen Sie sich das folgende Beispiel an:</p>
-
-        <p>TODO TABLE</p>
-
-        <p>Wir gehen von der Dezimalzahl 47491 aus. Ihre duale Darstellung mit 16 Bit ~ 1011100110000011 — teilen wir einfach in der Mitte und erhalten damit zwei neue Dual-Zahlen mit je 8 Bit = 1 Byte. Das linke Byte nennen wir »High-Byte«, da es den höheren Teil der Gesamtzahl darstellt. Das rechte Byte heißt entsprechend »Low-Byte«.</p>
-
-        <p>Jedes der beiden Bytes kann für sich allein in einer Speicherzelle untergebracht werden, in der natürlich dann der dezimale Wert des Bytes steht.</p>
-
-        <p>In der Tabelle habe ich zur Vollständigkeit noch die hexadezimalen Werte eingefügt, die sehr schön zeigen, daß der Vorteil dieser Zahlendarstellung darin liegt, daß jede Einzelziffer der 4-Bit-Dualzahl entspricht, genau so wie jede Zweiergruppe dem Byte (sowohl in Dual-, als auch in Dezimaldarstellung) und die vierstellige Zahl der großen Dezimal- und Dualzahl entspricht.</p>
-
-        <p>Zur Umrechnung der Low-/High-Bytes empfehle ich folgende Kochrezepte:<br>
-            Dezimal in Low-/High-Byte<br>
-            47491:256 = 185 (High-Byte), Rest 131 (Low-Byte)</p>
-
-        <p>Der Rest fällt bei der Division per Hand automatisch an. Mit dem (Taschen-)Rechner erhält man den Rest durch:<br>
-            185*256-47491 = -131<br>
-            Low-/High-Byte in Dezimal<br>
-            High-Byte * 256 + Low-Byte = Dezimal<br>
-            185 * 256 + 131 = 47491<br>
-            Wichtige Regel:</p>
-
-        <p>Die Mikroprozessoren von VC 20 und C 64 verlangen, daß immer das Low-Byte vor dem High-Byte kommen muß. Die Zahl wird sozusagen von rechts nach links gelesen (131/185).</p>
+            <p class="noindent">Low-/High-Byte in Dezimal<br>
+                High-Byte * 256 + Low-Byte = Dezimal<br>
+                185 * 256 + 131 = 47491
+            </p>
+                
+            <p class="noindent">Wichtige Regel:</p>
+    
+            <p>Die Mikroprozessoren von VC 20 und C 64 verlangen, daß immer das Low-Byte vor dem High-Byte kommen muß. Die Zahl wird sozusagen von rechts nach links gelesen (131/185).</p>
+        </aside>
     </article>
 </body>
 
