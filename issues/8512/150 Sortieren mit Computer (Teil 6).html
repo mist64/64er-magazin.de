@@ -136,7 +136,7 @@
 
         <aside class="fehlerteufelchen" id="fehlerteufelchen">
             <h2>Fehlerteufelchen</h2>
-        
+
             <p>Wenn Zeichenketten länger als 20 Zeichen sind, rutscht der Softwarestack in den Bereich $D000 bis $DFFF. Eine Abhilfe schaffen folgende Zeilen, die mit dem MSE einzugeben sind.
                 <code>cce8: a9 00 8d e7 cd a9 c0 8d 3a
                     cd40: d0 f6 a5 b5 f0 1c ea ea 1d
@@ -146,6 +146,443 @@
 
             <!-- 64'er 2/1986 -->
         </aside>
+
+        <figure>
+            TODO
+            <figcaption>Listing 1. Die korrigierte Version von Quicksort</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="swap" data-name="SWAP-Routine"></pre>
+            <figcaption>Listing 2. Die SWAP-Routine</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="straight select" data-name="Straight Select"></pre>
+            <figcaption>Listing 3. Sortieren ohne »Stringmüll«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="quicksort.obj.prg" data-name="Quicksort in Maschinensprache" data-mse=mse1></pre>
+            <figcaption>Listing 4. Der Quicksort in Maschinensprache. Bitte beachten Sie die Eingabehinweise auf Seite 54</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="quicksort.obj.prg" data-name="Quicksort in Maschinensprache"></div>
+
+        <figure>
+            <pre>   10 SYS36864:.OPT P,OO:*= 52000
+   20 LAENGE1 = $B2
+   30 LAENGE2 = $B5
+   40 STR1    = $B3
+   50 STR2    = $B6
+   55 UMULT1  = $28
+   56 UMULT2  = $71
+   57 UMULT   = $B357
+   58 AARRAY  = $2F
+   59 VEKTOR1 = $FB
+   60 VEKTOR2 = $FD
+  100            JSR REGSET
+  101            LDX #0
+  102 MARKE1     LDA LAENGE1,X
+  103            STA 700,X
+  104            INX
+  105            CPX #6
+  106            BNE MARKE1
+  110            JSR HAUPTSCHL
+  111            LDX #0
+  112 MARKE2     LDA 700,X
+  113            STA LAENGE1,X
+  114            INX
+  115            CPX #6
+  116            BNE MARKE2
+  117            RTS
+  130 ;
+  140 HAUPTSCHL  JSR HOCHZ
+  145            JSR HOLLR
+  150            JSR LRVERGL
+  160            CMP #0
+  170            BEQ Z350
+  180            CMP #2
+  190            BEQ Z350
+  195            JSR HOLXY
+  210            JSR EVINDI
+  220 Z270       JSR XYVERGL
+  230            CMP #2
+  240            BEQ Z330
+  250 Z280       JSR EXINDI
+  260            JSR EINSPR
+  270            CMP #2
+  280            BEQ Z290
+  285            CMP #0
+  286            BEQ Z290
+  290            JSR HOCHX
+  300            JMP Z280
+  310 Z290       JSR EYINDI
+  320            JSR EINSPR
+  330            CMP #1
+  340            BEQ Z300
+  345            CMP #0
+  346            BEQ Z300
+  350            JSR RUNTERY
+  360            JMP Z290
+  370 Z300       JSR XYVERGL
+  380            CMP #2
+  390            BEQ Z330
+  400            JSR SWAP
+  410            JSR HOCHX
+  420            JSR RUNTERY
+  430            JMP Z270
+  435 ;
+  440 Z330       JSR PUSHLY
+  460            JSR HAUPTSCHL
+  470 ;
+  480            JSR PUSHXR
+  500            JSR HAUPTSCHL
+  510 ;
+  940 Z350       JMP RUNTERZ
+ 1005 ;
+ 1010 ;    VERGLEICH STR1 MIT VERGL$
+ 1011 ;1) STR1&gt;VERGL  2) STR1&lt;VERGL
+ 1015 ;
+ 1020 EINSPR    LDY #$FF
+ 1030 SCHL1     INY
+ 1040           CPY LAENGE1
+ 1050           BNE WEITER1
+ 1060           LDA #1
+ 1070           JMP RAUS
+ 1080 WEITER1   CPY LAENGE2
+ 1090           BNE WEITER2
+ 1100           LDA #2
+ 1110           JMP RAUS
+ 1120 WEITER2   LDA (STR1),Y
+ 1130           CMP (STR2),Y
+ 1140 BEQ SCHL1
+ 1150           BCC WEITER3+1
+ 1160           LDA #2
+ 1170 WEITER3   BIT $1A9 ;MASKIERUNG FUER LDA #1
+ 1200           RTS
+ 1210 RAUS      LDX LAENGE1
+ 1220           CPX LAENGE2
+ 1230           BNE FERTIG
+ 1240           LDA #0
+ 1250 FERTIG    RTS
+ 1260 ;
+ 1270 ;    VERGLEICHEN VON X UND Y
+ 1275 ;X&lt;Y LDA #2  X&gt;Y LDA #1  X=Y LDA #0
+ 1280 ;
+ 1290 XYVERGL   LDA XREG+1
+ 1300           CMP YREG+1
+ 1310           BNE WEITER4
+ 1320           LDA XREG
+ 1330           CMP YREG
+ 1340           BEQ GLEICH+1
+ 1350 WEITER4   BCS GROESSER+1
+ 1360           LDA #1
+ 1370 GLEICH   .BYT $2C,$A9,0 ;BIT $00A9
+ 1380 GROESSER  BIT $2A9
+ 1390           RTS
+ 1400 ;
+ 1410 ;    VERGLEICHEN VON L UND R
+ 1415 ;L&lt;R LDA #2  L&gt;R LDA #1  L=R LDA #0
+ 1420 ;
+ 1430 LRVERGL   LDA LREG+1
+ 1440           CMP RREG+1
+ 1450           BNE WEITER5
+ 1460           LDA LREG
+ 1470           CMP RREG
+ 1480           BEQ GLEICH+1
+ 1490 WEITER5   BCS GROESSER+1
+ 1500           LDA #1
+ 1510           RTS
+ 1985 ;
+ 1990 ; REGISTER HOCH- UNG RUNTERZAEHLEN
+ 1995 ;
+ 2000 HOCHZ     CLC
+ 2020           LDA ZREG
+ 2030 ADC #4
+ 2040           STA ZREG
+ 2050           LDA ZREG+1
+ 2060           ADC #0
+ 2070           STA ZREG+1
+ 2090           RTS
+ 2100 RUNTERZ   SEC
+ 2120           LDA ZREG
+ 2130           SBC #4
+ 2140           STA ZREG
+ 2150           LDA ZREG+1
+ 2160           SBC #0
+ 2170           STA ZREG+1
+ 2190           RTS
+ 2200 HOCHX     CLC
+ 2220           LDA XREG
+ 2230           ADC #1
+ 2240           STA XREG
+ 2250           LDA XREG+1
+ 2260           ADC #0
+ 2270           STA XREG+1
+ 2290           RTS
+ 2300 RUNTERY   SEC
+ 2320           LDA YREG
+ 2330           SBC #1
+ 2340           STA YREG
+ 2350           LDA YREG+1
+ 2360           SBC #0
+ 2370           STA YREG+1
+ 2390           RTS
+ 2985 ;
+ 2990 ; DIE MIT X/Y INDIZIERTE VARIABLE
+ 2991 ; WIRD GESUCHT Z.B. ( A$(X) )
+ 2995 ;
+ 3000 XSUCH     LDA XREG
+ 3010           ASL
+ 3015           TAX
+ 3020           LDA XREG+1
+ 3030           JSR PRG1
+ 3040           ADC XREG
+ 3050           TAX
+ 3060           TYA
+ 3070           ADC XREG+1
+ 3080           JMP PRG2
+ 3100 YSUCH     LDA YREG
+ 3110           ASL
+ 3115           TAX
+ 3120           LDA YREG+1
+ 3130           JSR PRG1
+ 3131           ADC YREG
+ 3132           TAX
+ 3133           TYA
+ 3134           ADC YREG+1
+ 3135           JMP PRG2
+ 3140 VSUCH     LDA VERGL
+ 3150           ASL
+ 3155           TAX
+ 3160           LDA VERGL+1
+ 3170           JSR PRG1
+ 3171           ADC VERGL
+ 3172           TAX
+ 3173           TYA
+ 3174           ADC VERGL+1
+ 3175           JMP PRG2
+ 3200 PRG1      ROL
+ 3210           TAY
+ 3220           TXA
+ 3230           CLC
+ 3240           RTS
+ 3250 PRG2      TAY
+ 3260           CLC
+ 3270           TXA
+ 3280           ADC #7
+ 3281           TAX
+ 3282           TYA
+ 3283           ADC #0
+ 3284           TAY
+ 3285           CLC
+ 3286           TXA
+ 3290           ADC AARRAY
+ 3300           STA VEKTOR1
+ 3310           TYA
+ 3320           ADC AARRAY+1
+ 3330           STA VEKTOR1+1
+ 3340           RTS
+ 3985 ;
+ 3990 ;SWAP - VERTAUSCHEN ZWEIER STRINGS
+ 3995 ;
+ 4000 SWAP      JSR XSUCH
+ 4010           LDA VEKTOR1
+ 4020           STA VEKTOR2
+ 4030           LDA VEKTOR1+1
+ 4040           STA VEKTOR2+1
+ 4050           JSR YSUCH
+ 4060           LDY #0
+ 4070 SCHL2     LDA (VEKTOR1),Y
+ 4080           TAX
+ 4090           LDA (VEKTOR2),Y
+ 4100           STA (VEKTOR1),Y
+ 4110           TXA
+ 4120           STA (VEKTOR2),Y
+ 4130           INY
+ 4140           CPY #3
+ 4150           BNE SCHL2
+ 4160           RTS
+ 4985 ;
+ 4990 ;     VERGL = (XREG+YREG)/2
+ 4995 ;
+ 5000 RECHNUNG  CLC
+ 5010           LDA XREG
+ 5020           ADC YREG
+ 5030           STA VERGL
+ 5040           LDA XREG+1
+ 5050           ADC YREG+1
+ 5060           LSR
+ 5070           STA VERGL+1
+ 5080           ROR VERGL
+ 5090           RTS
+ 5100 ;
+ 5110 ;REGISTER AUF AUSGANGSWERTE SETZEN
+ 5120 ;
+ 5200 REGSET    LDA #0
+ 5210           STA XREG
+ 5215           STA XREG+1
+ 5220           LDA #&gt;STACK
+ 5225           STA ZREG
+ 5230           LDA #&lt;STACK
+ 5235           STA ZREG+1
+ 5240           JSR XSUCH
+ 5245           INC XREG
+ 5250           SEC
+ 5260           LDA VEKTOR1
+ 5270           SBC #2
+ 5280           STA VEKTOR1
+ 5290           LDA VEKTOR1+1
+ 5300           SBC #0
+ 5310           STA VEKTOR1+1
+ 5320           LDY #1
+ 5325           SEC
+ 5330           LDA (VEKTOR1),Y
+ 5335           SBC #1
+ 5340           STA YREG
+ 5350           DEY
+ 5360           LDA (VEKTOR1),Y
+ 5365           SBC #0
+ 5370           STA YREG+1
+ 5380           JMP PUSHXY
+ 5985 ;
+ 5990 ;DISCRIPTOREN IN DER ZP EINRICHTEN
+ 5995 ;
+ 6000 EXINDI    JSR XSUCH
+ 6010           JMP DISCRIP1
+ 6020 ;
+ 6030 EYINDI    JSR YSUCH
+ 6040 ;
+ 6050 DISCRIP1  LDY #0
+ 6060 SCHL3     LDA (VEKTOR1),Y
+ 6070           STA LAENGE1,Y
+ 6080           INY
+ 6090           CPY #3
+ 6100           BNE SCHL3
+ 6110           RTS
+ 6120 ;
+ 6130 EVINDI    JSR RECHNUNG
+ 6135           JSR VSUCH
+ 6140           LDY #0
+ 6150 SCHL4     LDA (VEKTOR1),Y
+ 6160           STA LAENGE2,Y
+ 6170           INY
+ 6180           CPY #3
+ 6190           BNE SCHL4
+ 6200           LDA LAENGE2
+ 6205           BEQ KZEICHEN
+ 6210           CMP #21
+ 6220           BCC KLEINER
+ 6230           LDA #20
+ 6240           STA LAENGE2
+ 6250 KLEINER   LDY #0
+ 6260 NZEICHEN  LDA (STR2),Y
+ 6270           STA VSTR,Y
+ 6280           INY
+ 6290           CPY LAENGE2
+ 6300           BNE NZEICHEN
+ 6310           LDA #&gt;VSTR
+ 6320           STA STR2
+ 6330           LDA #&lt;VSTR
+ 6340           STA STR2+1
+ 6350 KZEICHEN  RTS
+ 7000 STCKVEK   LDA ZREG
+ 7010           STA VEKTOR2
+ 7020           LDA ZREG+1
+ 7030           STA VEKTOR2+1
+ 7040           RTS
+ 7045 ;
+ 7100 PUSHXR    JSR HOLLR
+ 7105           JSR VEKTOR4
+ 7110           LDY #0
+ 7120 SCHL5     LDA XREG,Y
+ 7130           STA (VEKTOR2),Y
+ 7150           INY
+ 7160           CPY #2
+ 7170           BNE SCHL5
+ 7172 SCHL6     LDA RREG-2,Y
+ 7173           STA (VEKTOR2),Y
+ 7174           INY
+ 7175           CPY #4
+ 7176           BNE SCHL6
+ 7177           RTS
+ 7178 ;
+ 7180 PUSHLY    JSR HOLLR
+ 7185           JSR VEKTOR4
+ 7190           LDY #0
+ 7200 SCHL7     LDA LREG,Y
+ 7210           STA (VEKTOR2),Y
+ 7230           INY
+ 7240           CPY #2
+ 7250           BNE SCHL7
+ 7261 SCHL8     LDA YREG-2,Y
+ 7262           STA (VEKTOR2),Y
+ 7263           INY
+ 7264           CPY #4
+ 7265           BNE SCHL8
+ 7266           RTS
+ 7270 ;
+ 7280 HOLXY     LDY #0
+ 7310 SCHL9     LDA LREG,Y
+ 7320           STA XREG,Y
+ 7330           INY
+ 7340           CPY #4
+ 7350           BNE SCHL9
+ 7360           RTS
+ 7370 ;
+ 7380 HOLLR     JSR STCKVEK
+ 7400           LDY #0
+ 7410 SCHL10    LDA (VEKTOR2),Y
+ 7420           STA LREG,Y
+ 7430           INY
+ 7440           CPY #4
+ 7450           BNE SCHL10
+ 7460           RTS
+ 7465 ;
+ 7645 ;
+ 7650 VEKTOR4   JSR STCKVEK
+ 7660           CLC
+ 7670           LDA VEKTOR2
+ 7680           ADC #4
+ 7690           STA VEKTOR2
+ 7700           LDA VEKTOR2+1
+ 7710           ADC #0
+ 7720           STA VEKTOR2+1
+ 7730           RTS
+ 7735 ;
+ 7740 PUSHXY    JSR VEKTOR4
+ 7750           LDY #0
+ 7760 SCHL11    LDA XREG,Y
+ 7770           STA (VEKTOR2),Y
+ 7780           INY
+ 7790           CPY #4
+ 7800           BNE SCHL11
+ 7810           RTS
+ 9985 ;
+ 9990 ; REGISTER &amp; EIN SIMULIERTER STACK
+ 9995 ;
+10000 ZREG    .BYT 0,0
+10010 XREG    .BYT 0,0
+10020 YREG    .BYT 0,0
+10050 VERGL   .BYT 0,0
+10060 LREG    .BYT 0,0
+10070 RREG    .BYT 0,0
+10080 VSTR    .BYT 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0  ; 20 * 0
+10100 STACK   .BYT 0
+20000 .END
+READY.</pre>
+            <figcaption>Listing 5. Listing 4 als Quelltext</figcaption>
+        </figure>
+        <div style="display: none;">
+            <figure>
+                <pre data-filename="quicksort.src" data-name="XXXXXXXXXXXX"></pre>
+            </figure>
+        </div>
+
+        <figure>
+            <pre data-filename="quicktester" data-name="Quicksort Test"></pre>
+            <figcaption>Listing 6. »Quicksort« demonstriert die Sortiergeschwindigkeit</figcaption>
+        </figure>
     </article>
 </body>
 

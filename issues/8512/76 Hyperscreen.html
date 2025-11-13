@@ -35,6 +35,92 @@
         <p>Hyperscreen ist ein sehr kurzes und komprimiertes Maschinenprogramm, das den Speicherbereich von $C000 bis $C090 belegt. Es wird mit LOAD »HYPERSCREEN«, 8,1 geladen und durch den Befehl SYS 49152 aktiviert. Zu beachten ist, daß während des LOAD- oder SAVE-Vorgangs der obere untere Bildschirmrand wieder vorhanden ist. Gleiches passiert, wenn das Interruptflag im Prozessorstatusregister gesetzt wird (SEI). Die Demo-Listings 2, 3 und 4 zeigen die Leistungsfähigkeit dieses Programms. Bei Listing 5 handelt es sich um den mit Hypra-Ass erstellten Quelltext.</p>
 
         <address class="author">(Holger Gehrmann/ah)</address>
+
+
+        <figure>
+            <pre data-filename="hyperscreen.prg" data-name="Hyperscreen" data-mse=mse1></pre>
+            <figcaption>Listing 1. Hauptprogramm »Hyperscreen«. Bitte beachten Sie die Eingabehinweise auf Seite 54</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="hyperscreen.prg" data-name="Hyperscreen"></div>
+
+        <figure>
+            <pre data-filename="hauptdemo" data-name="Hyperscreen-Demo"></pre>
+            <figcaption>Listing 2. Demoprogramm zu »Hyperscreen«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="bitmuster-demo" data-name="Bitmuster-Demo"></pre>
+            <figcaption>Listing 3. Demo zum Ändern des Bitmusters</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="sprite-demo" data-name="Spite-Demo"></pre>
+            <figcaption>Listing 4. Sprite-Demo</figcaption>
+        </figure>
+        <figure>
+            <pre>10   -.LI 4,4,7
+100  -          .EQ IRQLO=$0314
+110  -          .EQ IRQHI=$0315
+140  -          .EQ STEUERREGISTER=$D011
+150  -          .EQ RASTERZEILE=$D012
+160  -          .EQ IRR=$D019
+170  -          .EQ IMR=$D01A
+180  -          .EQ RANDFARBE=$D020
+190  -          .EQ HINTERGRUNDFARBE=$D021
+200  -          .EQ CRA=$DC0E
+210  -          .EQ IRQORG=$EA31
+220  -          .EQ AUSGABE=$FFD2
+     -;
+240  -          .BA $C000
+     -;
+     -;IRQ-VEKTOR SETZEN
+310  -          SEI
+320  -          LDY #&lt;(IRQ)
+330  -          LDX #&gt;(IRQ)
+340  -          STY IRQLO
+350  -          STX IRQHI
+     -;
+     -;VIC INITIALISIEREN INTERRUPT DES CIA AUSSCHALTEN
+360  -          LDA #$00
+370  -          STA CRA        ;CONTROL REGISTER A
+380  -          LDA #$F1
+390  -          STA IMR        ;INTERRUPT MASKENREGISTER
+400  -          LDA #$F8
+410  -          STA RASTERZEILE
+420  -          LDA STEUERREGISTER
+430  -          AND #$7F
+440  -          STA STEUERREGISTER
+450  -          LDX #$21
+     -;
+     -;BILDSCHIRM LOESCHEN UND EINSCHALTMELDUNG AUSGEBEN
+460  -LOOP      LDA NAME,X
+470  -          JSR AUSGABE
+480  -          DEX
+490  -          BNE LOOP
+500  -          LDY #$07
+510  -          STY RANDFARBE
+520  -          LDY #$08
+530  -          STY HINTERGRUNDFARBE
+540  -          RTS
+     -;
+     -;HIER BEGINNT DIE EIGENTLICHE ROUTINE
+600  -IRQ       LDX #$13       ;AUF 24 ZEILEN UMSCHALTEN
+610  -          STX STEUERREGISTER
+620  -WARTE     LDA RASTERZEILE
+630  -          BNE WARTE
+640  -          LDX #$1B       ;AUF 25 ZEILEN UMSCHALTEN
+650  -          STX STEUERREGISTER
+660  -          LDA #$01
+670  -          STA IRR        ;INTERRUPT REQUEST
+680  -          LDA #$F1
+690  -          STA IMR        ;INTERRUPT MASKENREGISTER
+700  -          JMP IRQORG
+     -;
+790  -NAME      .TX "NNAMRHEG REGLOH YB NEERCSREPYH"
+800  -          .BY 147</pre>
+            <figcaption>Listing 5. Quelltext zu »Hyperscreen«, erstellt mit Hypra-Ass</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="quelltext.prg" data-name="Hyperscreen Quelltext"></div>
     </article>
 </body>
 

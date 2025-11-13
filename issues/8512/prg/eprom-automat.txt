@@ -1,0 +1,248 @@
+
+
+;eprom-automat.prg ==0801==
+    1 rem (c) 1985 by dirk gazic
+    2 rem             amsterdamer str. 41
+    3 rem             5000 koeln 90
+    4 rem             tel.:02203/32921
+    5 :
+    6 :
+    7 :
+    8 :
+    9 :
+ 1000 rem initializierung ---------------
+ 1010 :
+ 1020 poke55,0:poke56,128:clr:dimze%(4),te$(4)
+ 1030 hf=0:vf=0:sf=5:rem farbvorgabe
+ 1040 printchr$(14)chr$(8)chr$(147)
+ 1050 re$(0)="{rvof}":re$(1)="{rvon}"
+ 1060 fori=1to4:readze%(i):readte$(i):next
+ 1070 ei$="Ihre Eingabe Bitte >>>":rem haeufigste statuszeile
+ 1080 data 8,"Programm bearbeiten"
+ 1090 data10,"Speicherinhalt sichern"
+ 1100 data 12,"Directory zeigen"
+ 1110 data 14,"Programm beenden"
+ 1120 goto2560:rem hauptprogramm
+ 1130 :
+ 1140 :
+ 1150 :
+ 1160 rem input-routine -----------------
+ 1170 :
+ 1180 poke204,0:poke205,2:wait207,1,1:poke204,1
+ 1190 l=len(ww$):printww$;" {left}";:ifl>0thenforzz=1tol:print"{left}";:next:l=0
+ 1200 poke204,0
+ 1210 poke198,0:wait198,1:getw$
+ 1220 poke205,2:wait207,1,1:poke204,1
+ 1230 ifw$=chr$(29)andl<mxthen1300
+ 1240 ifw$=chr$(157)andl>0thenl=l-1:printw$;:goto1200
+ 1250 ifw$=chr$(13)then1320
+ 1260 ifw$=chr$(20)andl>0then1350
+ 1270 ifasc(w$)<32orasc(w$)=34then1200
+ 1280 ifw$="*"orw$=";"orw$=","then1200
+ 1290 ifasc(w$)>127andasc(w$)<160then1200
+ 1300 l=l+1:printw$;:ifl<mxthen1200
+ 1310 l=mx-1:print"{left}";:goto1200
+ 1320 ifl>0thenforzz=1tol:print"{left}";:next
+ 1330 ww$="":open3,3:forzz=1tomx:get#3,w$:ww$=ww$+w$:next:close3
+ 1340 return
+ 1350 ifl=0then1200
+ 1360 gosub1320
+ 1370 forzz=1tomx:print"{left}";:next
+ 1380 ifl=1thenww$=mid$(ww$,2):goto1190
+ 1390 ww$=left$(ww$,l-1)+mid$(ww$,l+1):printww$;" ";
+ 1400 forzz=1tomx-l+1:print"{left}";:next
+ 1410 l=l-1:goto1200
+ 1420 :
+ 1430 :
+ 1440 :
+ 1450 rem leerstellen entfernen ---------
+ 1460 :
+ 1470 l1=len(ww$):ifl1=0thenreturn
+ 1480 l2=asc(right$(ww$,1)):ifl2<>32andl2<>160thenreturn
+ 1490 ww$=left$(ww$,l1-1):goto1470
+ 1500 :
+ 1510 :
+ 1520 :
+ 1530 rem untere statuszeile ------------
+ 1540 :
+ 1550 i=int((39-len(an$))/2)
+ 1560 an$=left$("                                    ",i)+an$
+ 1570 poke214,23:sys58640:print:print"{rvon}                                       {rvof}";
+ 1580 poke214,23:sys58640:print:print"{rvon}";an$"{rvof}";
+ 1590 poke2023,160:poke56295,peek(646)
+ 1600 return
+ 1610 :
+ 1620 :
+ 1630 :
+ 1640 rem obere statuszeile -------------
+ 1650 :
+ 1660 print"{home}{rvon}                                        {rvof}"
+ 1670 i=int((39-len(an$))/2)
+ 1680 an$=left$("                                    ",i)+an$
+ 1690 print"{home}{rvon}";an$;"{rvof}"
+ 1700 return
+ 1710 :
+ 1720 :
+ 1730 :
+ 1740 rem fehlerton ---------------------
+ 1750 :
+ 1760 si=54272
+ 1770 for i=0 to 23:poke i+si,0:next
+ 1780 pokesi+1,7:pokesi+5,60:pokesi+24,15:pokesi+2,50:pokesi+3,15:pokesi+4,65
+ 1790 return
+ 1800 :
+ 1810 :
+ 1820 :
+ 1830 rem disk-fehler -------------------
+ 1840 :
+ 1850 input#1,ff$,fe$,tt$,ss$
+ 1860 iffe$="ok"thenreturn
+ 1870 an$=ff$+","+fe$+","+tt$+","+ss$
+ 1880 gosub1530
+ 1890 ifff$="74"thenprint#1,"uj":fori=1to3000:next
+ 1900 gosub1740:poke198,0:wait198,1
+ 1910 return
+ 1920 :
+ 1930 :
+ 1940 :
+ 1950 rem directory ---------------------
+ 1960 :
+ 1970 open1,8,15,"i":gosub1830:close1:iffe$<>"ok"thenreturn
+ 1980 print"{clr}";:re=0
+ 1990 open1,8,0,"$0"
+ 2000 get#1,a$,b$
+ 2010 get#1,a$,b$
+ 2020 get#1,a$,b$
+ 2030 getq$:ifq$="{f1}"thenclose1:return
+ 2040 ifq$="{f3}"thenwait198,1:poke198,0
+ 2050 print"{rvof}";
+ 2060 c=0
+ 2070 if a$<>"" then c=asc(a$)
+ 2080 if b$<>"" then c=c+asc(b$)*256
+ 2090 printmid$(str$(c),2);:poke211,4
+ 2100 ifre=0thenprint"{rvon}";
+ 2110 get#1,b$:if st<>0 then 2220
+ 2120 if b$<>chr$(34) then 2110
+ 2130 printchr$(34);
+ 2140 get#1,b$:printb$;:ifb$<>chr$(34)then2140
+ 2150 print"  ";
+ 2160 get#1,b$:if b$=chr$(32) then 2160
+ 2170 poke211,24:c$=""
+ 2180 c$=c$+b$:get#1,b$:ifb$<>""then 2180
+ 2190 ifleft$(c$,1)="*"thenpoke211,23
+ 2200 printc$
+ 2210 if st=0 then re=1:goto 2010
+ 2220 print"blocks free"
+ 2230 close1
+ 2240 an$="'TASTE' fuer Rueckkehr ins Menue":gosub1530
+ 2250 poke198,0:wait198,1
+ 2260 return
+ 2270 :
+ 2280 :
+ 2290 :
+ 2300 rem menuesteuerung ----------------
+ 2310 :
+ 2320 print"{clr}":poke646,sf
+ 2330 an$=nm$:gosub1640
+ 2340 an$="Waehlen mit CURSOR und RETURN":gosub1530
+ 2350 gosub2510:re=1:gosub2500
+ 2360 poke53280,hf:poke53281,vf
+ 2370 poke198,0:wait198,1:getq$
+ 2380 ifq$=chr$(13)thenreturn
+ 2390 ifq$="{up}"andze>1thenre=0:gosub2500:ze=ze-1:re=1:gosub2500:goto2360
+ 2400 ifq$="{up}"thenre=0:gosub2500:ze=4:re=1:gosub2500:goto2360
+ 2410 ifq$="{down}"andze<4thenre=0:gosub2500:ze=ze+1:re=1:gosub2500:goto2360
+ 2420 ifq$="{down}"thenre=0:gosub2500:ze=1:re=1:gosub2500:goto2360
+ 2430 ifq$="{f1}"andhf<255thenhf=hf+1:goto2360
+ 2440 ifq$="{f1}"thenhf=0
+ 2450 ifq$="{f3}"andvf<255thenvf=vf+1:goto2360
+ 2460 ifq$="{f3}"thenvf=0
+ 2470 ifq$="{f5}"andsf<15thensf=sf+1:goto2300
+ 2480 ifq$="{f5}"thensf=0:goto2300
+ 2490 goto2360
+ 2500 poke211,8:poke214,ze%(ze):sys58640:printre$(re)te$(ze):return
+ 2510 fori=1to4:poke211,8:poke214,ze%(i):sys58640:printte$(i):next
+ 2520 return
+ 2530 :
+ 2540 :
+ 2550 :
+ 2560 rem hauptprogramm -----------------
+ 2570 :
+ 2580 nm$=" Auto.Eprom V1.2      (c) by Dirk Gazic"
+ 2590 ze=1:gosub2300
+ 2600 onzegosub2650,3050,1950,3270
+ 2610 goto2560
+ 2620 :
+ 2630 :
+ 2640 :
+ 2650 rem programm bearbeiten -----------
+ 2660 :
+ 2670 an$="Modus: Programm bearbeiten":gosub1640
+ 2680 an$=ei$:gosub1530:ww$=""
+ 2690 print"{home}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 2700 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{SHIFT--}Filename:                 {SHIFT--}"
+ 2710 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+ 2720 print"{up}{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:mx=16:gosub1160:gosub1450:na$=ww$
+ 2730 open1,8,15:open2,8,0,na$
+ 2740 gosub1830:iffe$<>"ok"thenclose1:close2:return
+ 2750 get#2,lb$:get#2,hb$
+ 2760 ifasc(lb$+chr$(0))=1andasc(hb$+chr$(0))=8then2790
+ 2770 an$="Programmstart ist nicht $0801":close1:close2:gosub1740:gosub1530
+ 2780 poke198,0:wait198,1:return
+ 2790 restore
+ 2800 an$="Bitte warten":gosub1530
+ 2810 fori=1to4:reada:reada$:next
+ 2820 fori=32768to32859:reada:pokei,a:next
+ 2830 get#2,a$:a$=a$+chr$(0)
+ 2840 pokei,asc(a$)
+ 2850 i=i+1:ifi<40960orst=64then2880
+ 2860 an$="Programm ist zu lang":close1:close2:gosub1740:gosub1530
+ 2870 poke198,0:wait198,1:return
+ 2880 ifst<>64then2830
+ 2890 close1:close2
+ 2900 hb=int(i/256):lb=i-hb*256
+ 2910 poke32838,lb:poke32842,hb
+ 2920 i1=i-30811:i2=i
+ 2930 hb=int(i1/256):lb=i1-hb*256
+ 2940 poke32846,lb:poke32852,hb
+ 2950 return
+ 2960 :
+ 2970 data9,128,9,128,195,194,205,56,48,120,142,22,208,32,163,253,32,80,253,32
+ 2980 data21,253,32,91,255,88,32,83,228,32,191,227,32,61,128,162,251,154,169
+ 2990 data82,141,119,2,169,213,141,120,2,169,13,141,121,2,169,3,141,198,0,76
+ 3000 data134,227,169,92,133,95,169,128,133,96,169,110,133,90,169,128,133,91
+ 3010 data169,20,133,88,133,45,169,8,133,89,133,46,76,191,163
+ 3020 :
+ 3030 :
+ 3040 :
+ 3050 rem speicherinhalt sichern --------
+ 3060 :
+ 3070 ifi2=0thengosub1740:return
+ 3080 an$="Modus: Speicherinhalt sichern":gosub1640
+ 3090 an$=ei$:gosub1530
+ 3100 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 3110 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{SHIFT--}Filename:                 {SHIFT--}"
+ 3120 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}":ww$="modul."+na$
+ 3130 ww$=left$(ww$,16):print"{up}{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:mx=16:gosub1160:gosub1450
+ 3140 open1,8,15:open2,8,1,ww$
+ 3150 gosub1830:iffe$<>"ok"thenclose1:close2:return
+ 3160 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{SHIFT--}Startadresse:   * 4096    "
+ 3170 ww$=mid$(str$(8),2):print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:mx=1:gosub1160
+ 3180 ad=val(ww$):ifad<1orad>8thengosub1740:goto3160
+ 3190 ad=ad*4096:hb=int(ad/256):lb=ad-hb*256
+ 3200 print#2,chr$(lb)chr$(hb);
+ 3210 an$="Bitte warten":gosub1530
+ 3220 fori=32768toi2:print#2,chr$(peek(i));:next
+ 3230 gosub1830:close1:close2:i2=0:return
+ 3240 :
+ 3250 :
+ 3260 :
+ 3270 rem programm beenden --------------
+ 3280 an$="Modus: Programm beenden":gosub1640
+ 3290 an$="Wollen Sie wirklich beenden [j/n]":gosub1530:poke198,0:wait198,1:getq$
+ 3300 ifq$="n"thenreturn
+ 3310 ifq$<>"j"then3290
+ 3320 print"{clr}":ifi1=0then3340
+ 3330 print"Bearbeitetes Programm steht ab $8000    Epromfertig im Speicher"
+ 3340 new
+
