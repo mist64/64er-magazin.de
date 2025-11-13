@@ -1,0 +1,291 @@
+
+
+;lit.verw..prg ==0801==
+   10 rem *******************************
+   15 rem *                             *
+   20 rem *    literatur verwaltung     *
+   25 rem *                             *
+   30 rem *        demoprogramm         *
+   35 rem *          zu  smu            *
+   40 rem *                             *
+   45 rem * autor: georg krcal          *
+   50 rem *                             *
+   60 rem * ziegelhofstrasse 36/11/9    *
+   65 rem * a-1220 wien                 *
+   70 rem * telefon: 22-17-724          *
+   75 rem *                             *
+   80 rem *******************************
+  100 ifa=0thenpoke56,144:clr:a=1:load"smubu",8,1
+  110 clr:sys9*4096
+  120 printchr$(147)chr$(8)chr$(14)chr$(30);
+  130 poke53280,0:poke53281,0
+  140 dim m$(14),h$(20)
+  150 rem
+  160 !mask "zeitschrift",8,m$(0)
+  170 fori=1to40:cd$=cd$+chr$(17)
+  180 cr$=cr$+chr$(29):bl$=bl$+" ":next
+  190 cd$=chr$(19)+cd$:x=fre(0)
+  200 ri$=chr$(18):ro$=chr$(146)
+  210 b1$=ri$+"1"+ro$+" eingeben "+ri$+"3"+ro$+" suchen   "+ri$+"5"+ro$
+  220 b1$=b1$+" weiter  "
+  230 b2$=ri$+"2"+ro$+" drucken  "
+  240 b2$=b2$+ri$+"4"+ro$+" index    "+ri$+"6"+ro$+" prg-ende"
+  300 print"Diskette formatieren [j/n]";:wait 203,63
+  310 getg$:ifg$<>"j"then380
+  320 printg$"a":print"Diskettenname:"
+  330 print"Disketten - ID":!inline 1,15,16,dn$
+  340 !inline2,16,2,di$:ifdi$="  "then340
+  350 h$="n:"+dn$+","+di$:print:print"  Diskette einlegen - Taste druecken"
+  360 getg$:ifg$=""then360
+  370 rem "open 1,8,15,h$:close1"
+  380 printchr$(147)"Bestehende Datei [j/n] ?"
+  390 wait203,63:getg$:ifg$="j"then500
+  400 ifg$<>"n"then390
+  410 open1,8,2,"literatur,l,"+chr$(202)
+  420 gosub10000
+  440 open2,8,15
+  450 print#2,"p"+chr$(2)+chr$(44)+chr$(1)+chr$(1)
+  460 print#1,chr$(255)
+  470 print#2,"p"+chr$(2)+chr$(1)+chr$(1)+chr$(1)
+  480 print#1,1,chr$(13);1;chr$(13);1
+  490 close2:close1
+  500 gosub10000:open1,8,2,"literatur,l,"+chr$(202)
+  510 open2,8,15
+  520 print#2,"p"+chr$(2)+chr$(1)+chr$(1)+chr$(1)
+  530 input#2,en,en$,t,s:ifenthenclose1:close2:gosub10070:goto500
+  540 input#1,lr,se,ae:close2:close1
+  550 ts=se+100:ta=ae+100
+  580 dims$(se+100),au$(ae+100),sl$(se+100),sh$(se+100),al$(ae+100),ah$(ae+100)
+  590 ifse=1then680
+  600 open1,8,2,"stichwort,s,r":open2,8,15:input#2,en,en$,t,s
+  610 ifenthenclose1:gosub10070:goto600
+  620 fori=1tose-1:input#1,s$(i)
+  625 gosub7300:sl$(i)=h$:sh$(i)=h1$
+  630 nexti:close2:close1
+  640 open1,8,2,"autor,s,r"
+  650 rem  ifenthenclose1:gosub10070:goto640
+  660 fori=1toae-1:input#1,au$(i)
+  665 gosub7300:al$(i)=h$:ah$(i)=h1$
+  670 nexti:close1
+  680 print"{clr}":gosub10030
+  700 !screen m$(0)
+  710 gosub10040
+  720 !imask "{f1}{f3}{f5}{f2}{f4}{f6}",s$,t1$,t2$,t3$,t4$,au$,v1$,v2$,o$,ja,se$,b$,an,z1$,z2$
+  725 gosub10000
+  730 onpeek(2)goto740,1100,1000,1200,720,2000,720
+  740 ifse+1>tsthenprint"stichwortdatei zu gross":stop
+  750 gosub7000:iflen(sl$(ei+1))>255thenprint"stichworttabelle zu gross":stop
+  760 ifge=1thenh1=i:goto780
+  770 h1=ei+1:se=se+1:h3$="":h4$=""
+  772 fori=ei+1tose:h$=s$(i):s$(i)=s$:s$=h$
+  773 h1$=sl$(i):sl$(i)=h3$:h3$=h1$:h2$=sh$(i):sh$(i)=h4$:h4$=h2$
+  775 nexti
+  780 ifae+1>tathenprint"autorendatei zu gross":stop
+  790 gosub7100:iflen(al$(ei+1))>255thenprint"autorentabellenueberlauf":stop
+  800 ifge=1thenei=i-1:goto820
+  810 ae=ae+1:h3$="":h4$=""
+  812 fori=ei+1toae:h$=au$(i):au$(i)=au$:au$=h$
+  813 h1$=al$(i):al$(i)=h3$:h3$=h1$:h2$=ah$(i):ah$(i)=h4$:h4$=h2$:next
+  820 lr=lr+1:h=lr:gosub7200
+  830 sh$(h1)=sh$(h1)+chr$(hb):sl$(h1)=sl$(h1)+chr$(lb)
+  840 ah$(ei+1)=ah$(ei+1)+chr$(hb):al$(ei+1)=al$(ei+1)+chr$(lb)
+  845 rem   gosub 11000:lr=lr+1:goto700
+  850 open1,8,2,"literatur,l,"+chr$(202)
+  860 open2,8,15
+  870 print#2,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+  880 h$=t1$+t2$+t3$+t4$+v1$+left$(v2$,10):print#1,h$
+  890 lr=lr+1:lb=lb+1:iflb=256thenlb=0:hb=hb+1
+  900 print#2,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+  910 h3$=right$(v2$,28)+o$
+  920 h$=str$(ja):gosub7210:h1$=h$+left$(bl$,(4-len(h$)))
+  930 h$=str$(an):gosub7210:h2$=h$+left$(bl$,(2-len(h$)))
+  940 h$=h3$+h1$+se$+b$+h2$+z1$+z2$+au$(ei+1)+s$(h1):print#1,h$
+  999 close2:close1:goto700
+ 1000 we=1:gosub8000:ifwe=0then730
+ 1010 goto710
+ 1100 open4,4,7:gosub10000:gosub7900:close4:goto710
+ 1200 s1=1:open4,4,7:print#4,chr$(13)chr$(13)chr$(13)
+ 1220 print#4,chr$(14);"STICHWOERTER";chr$(15);chr$(13);chr$(13)chr$(13)
+ 1230 fori=1tose-1:forj=1to20:h$(j)=" ":next
+ 1240 h$=s$(i):gosub7210:h$(1)=h$+": "
+ 1250 z=1:forj=1tolen(sl$(i))
+ 1260 h=asc(mid$(sl$(i),j,1)):h1=asc(mid$(sh$(i),j,1))
+ 1270 h$=str$((h+h1*256)/2):gosub7210:h$=h$+","
+ 1280 iflen(h$(z))+len(h$)>79thenz=z+1
+ 1290 h$(z)=h$(z)+h$:next
+ 1300 h$(z)=left$(h$(z),(len(h$(z))-1))
+ 1310 forj=1toz:print#4,h$(j)
+ 1315 nextj
+ 1320 nexti
+ 1330 print#4,chr$(13)chr$(13)chr$(13)
+ 1340 print#4,chr$(14)"AUTOREN"chr$(15)chr$(13)chr$(13)chr$(13)
+ 1350 fori=1toae-1:forj=1to20:h$(j)=" ":next
+ 1360 h$=au$(i):gosub7210:h$(1)=h$+": "
+ 1370 z=1:forj=1tolen(al$(i))
+ 1380 h=asc(mid$(al$(i),j,1)):h1=asc(mid$(ah$(i),j,1))
+ 1390 h$=str$((h+h1*256)/2):gosub7210:h$=h$+","
+ 1400 iflen(h$(z))+len(h$)>79thenz=z+1
+ 1410 h$(z)=h$(z)+h$:next
+ 1420 h$(z)=left$(h$(z),(len(h$(z))-1))
+ 1430 forj=1toz:print#4,h$(j)
+ 1440 nextj
+ 1450 nexti
+ 1460 print#4,chr$(13)chr$(13)chr$(13)
+ 1470 print#4,chr$(14)"LITERATURSTELLEN"chr$(15)chr$(13)chr$(13)chr$(13)
+ 1480 fori=2tolr-1step2
+ 1490 h=i:gosub7200:gosub9000:gosub7400
+ 1510 h$=str$(i/2):gosub7210:h$="("+h$+")"
+ 1520 h$=h$+left$(bl$,(9-len(h$)))+h$(1):print#4,h$
+ 1530 forj=2toz:print#4,spc(9);h$(j):next
+ 1550 nexti
+ 1560 close4:goto710
+ 2000 open1,8,15,"s:stichwort":close1
+ 2010 open1,8,2,"stichwort,s,w"
+ 2020 fori=1tose-1:h$=chr$(34)+s$(i)+chr$(34):print#1,h$
+ 2030 forj=1tolen(sl$(i)):g=asc(mid$(sl$(i),j,1))
+ 2040 print#1,g
+ 2052 g=asc(mid$(sh$(i),j,1)):print#1,g:next
+ 2054 print#1,"++":nexti
+ 2060 close1
+ 2070 open1,8,15,"s:autor":close1
+ 2080 open1,8,2,"autor,s,w"
+ 2090 fori=1toae-1:h$=chr$(34)+au$(i)+chr$(34):print#1,h$
+ 2100 forj=1tolen(al$(i)):g=asc(mid$(al$(i),j,1))
+ 2110 print#1,g
+ 2122 g=asc(mid$(ah$(i),j,1)):print#1,g:next
+ 2130 print#1,"++":nexti:close1
+ 2140 open1,8,2,"literatur,l,"+chr$(202)
+ 2150 open2,8,15
+ 2160 print#2,"p"+chr$(2)+chr$(1)+chr$(1)+chr$(1)
+ 2170 h$=str$(lr)+chr$(13)+str$(se)+chr$(13)+str$(ae)
+ 2180 print#1,h$
+ 2200 close2:close1
+ 2210 print"{clr}";:end
+ 7000 li=se:ei=0:i=0:ge=0
+ 7010 if((li-ei)/2)<1thenreturn:rem stichwort nicht vorhanden
+ 7020 i=int((li-ei)/2)+ei
+ 7030 ifs$(i)=s$thenge=1:return
+ 7040 ifs$<s$(i)thenli=i:goto7010
+ 7050 ei=i:goto7010
+ 7100 li=ae:ei=0:i=0:ge=0
+ 7110 if((li-ei)/2)<1thenreturn:rem autor nicht vorhanden
+ 7120 i=int((li-ei)/2)+ei
+ 7130 ifau$(i)=au$thenge=1:return
+ 7140 ifau$<au$(i)thenli=i:goto7110
+ 7150 ei=i:goto7110
+ 7200 hb=int(h/256):lb=h-hb*256:return
+ 7210 forii=len(h$)to1step-1:ifmid$(h$,ii,1)=" "thennext
+ 7220 h$=left$(h$,ii):forii=1tolen(h$):ifmid$(h$,ii,1)=" "thennext
+ 7230 h$=right$(h$,(len(h$)-ii+1)):return
+ 7300 h1$="":h$="":forj=1to256:input#1,g$:ifg$="++"thenj=256:return
+ 7305 ifg$="0 "thenh$=h$+chr$(0):goto7315
+ 7310 h$=h$+chr$(val(g$))
+ 7315 input#1,g$
+ 7320 ifg$="0 "thenh1$=h1$+chr$(0):goto7340
+ 7330 h1$=h1$+chr$(val(g$))
+ 7340 nextj:return
+ 7400 forl=1to10:h$(l)="":next
+ 7405 ifau$=left$(bl$,25)thenau$="?"
+ 7410 h$=au$:gosub7210:h$(1)=h$+":"
+ 7420 ift1$=left$(bl$,38)thent1$="?"
+ 7430 h$=t1$:gosub7210:h$(2)=h$+" ":z=1
+ 7440 ift2$=left$(bl$,38)then7500
+ 7450 h$=t2$:gosub7210:h$(2)=h$(2)+h$+" "
+ 7460 ift3$=left$(bl$,38)then7500
+ 7470 z=2:h$=t3$:gosub7210:h$(3)=h$+" "
+ 7480 ift4$=left$(bl$,38)then7500
+ 7490 h$=t4$:gosub7210:h$(3)=h$(3)+h$
+ 7500 z=z+1:h$(z)=h$(z)+"."
+ 7510 ifb$="n"orb$="N"then7660
+ 7520 z=z+1:ifo$=left$(bl$,34)theno$="?"
+ 7530 h$=o$:gosub7210:h$(z)=h$(z)+h$
+ 7540 ifv2$=left$(bl$,38)thenh$="":goto7560
+ 7550 h$=v2$:gosub7210
+ 7560 iflen(h$(z))+len(h$)+2>70thenz=z+1
+ 7570 h$(z)=h$(z)+h$+", "
+ 7580 ifja=0thenh$="?":goto7600
+ 7590 h$=str$(ja):gosub7210
+ 7600 iflen(h$(z))+len(h$)+2>70thenz=z+1
+ 7610 h$(z)=h$(z)+h$+", "
+ 7620 ifse$=left$(bl$,10)thenh$="":goto7650
+ 7630 h$=se$:gosub7210
+ 7640 iflen(h$(z))+len(h$)+1>70thenz=z+1
+ 7650 h$(z)=h$(z)+h$+".":return
+ 7660 z=z+1:ifz1$=left$(bl$,38)thenh$="?"
+ 7670 h$=z1$:gosub7210:h$(z)=h$(z)+h$+" "
+ 7680 ifz2$=left$(bl$,38)orh$="?"thenh$="":goto7700
+ 7690 h$=z2$:gosub7210
+ 7700 iflen(h$(z))+len(h$)+1>70thenz=z+1
+ 7710 h$(z)=h$(z)+h$+" "
+ 7720 ifan=0thenh$="?":goto7740
+ 7730 h$=str$(an):gosub7210
+ 7740 iflen(h$(z))+len(h$)+1>70thenz=z+1
+ 7750 h$(z)=h$(z)+h$+" "
+ 7760 ifja=0thenh$="(?)":goto7780
+ 7770 h$=str$(ja):gosub7210:h$="("+h$+")"
+ 7780 iflen(h$(z))+len(h$)+1>70thenz=z+1
+ 7790 h$(z)=h$(z)+h$+" "
+ 7800 ifse$=left$(bl$,10)thenh$="":goto7830
+ 7810 h$=se$:gosub7210
+ 7820 iflen(h$(z))+len(h$)+1>70thenz=z+1
+ 7830 h$(z)=h$(z)+h$+".":return
+ 7900 gosub7400:form=1toz:print#4,h$(m):next:return
+ 8000 h=0:h2=0
+ 8005 ifs$<>left$(bl$,21)thengosub7000:ifge=1then h=1:h1=i
+ 8010 ifau$<>left$(bl$,25)thengosub7100:ifge=1thenh2=1:h3=i
+ 8015 ifh=0andh2=0thenreturn
+ 8020 ifh2=1or(h2=1andh=1)then8080
+ 8030 fori=1tolen(sl$(h1)):lb=asc(mid$(sl$(h1),i,1))
+ 8050 hb=asc(mid$(sh$(h1),i,1)):gosub9000
+ 8060 gosub9300:ifwe=0thenreturn
+ 8070 nexti:return
+ 8080 ifh2=1andh=1then8140
+ 8090 fori=1tolen(al$(h3)):lb=asc(mid$(al$(h3),i,1))
+ 8100 hb=asc(mid$(ah$(h3),i,1)):gosub9000
+ 8110 gosub9300:ifwe=0thenreturn
+ 8120 nexti:return
+ 8140 h1$=sh$(h1):h2$=ah$(h3):h4$=sl$(h1):h5$=al$(h3)
+ 8150 ifh1$>h2$thenh3$=h2$:h2$=h1$:h1$=h3$:h3$=h5$:h5$=h4$:h4$=h3$
+ 8160 fori=1tolen(h1$):forl=1tolen(h2$)
+ 8170 ifmid$(h1$,i,1)<>mid$(h2$,l,1)thennextl,i:return
+ 8175 ifmid$(h4$,i,1)<>mid$(h5$,l,1)thennextl,i:return
+ 8180 lb=asc(mid$(h4$,i,1)):hb=asc(mid$(h1$,i,1))
+ 8190 gosub9000:gosub9300
+ 8200 ifwe=0thenreturn
+ 8210 nextl,i:return
+ 9000 open1,8,2,"literatur,l,"+chr$(202)
+ 9010 open2,8,15
+ 9020 print#2,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 9030 forj=0to3:h$(j)=""
+ 9040 fork=1to38:get#1,g$:h$(j)=h$(j)+g$:next:next
+ 9050 t1$=h$(0):t2$=h$(1):t3$=h$(2):t4$=h$(3)
+ 9060 v1$="":forj=0to37:get#1,g$:v1$=v1$+g$:next
+ 9061 v2$="":forj=0to9:get#1,g$:v2$=v2$+g$:next
+ 9062 lb=lb+1:iflb>255thenlb=0:hb=hb+1
+ 9063 print#2,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 9070 forj=1to28:get#1,g$:v2$=v2$+g$:next
+ 9080 o$="":forj=1to34:get#1,g$:o$=o$+g$:next
+ 9090 h$="":forj=1to4:get#1,g$:h$=h$+g$:next:ja=val(h$)
+ 9095 se$="":forj=1to10:get#1,g$:se$=se$+g$:next
+ 9100 get#1,b$
+ 9110 h$="":forj=1to2:get#1,g$:h$=h$+g$:next:an=val(h$)
+ 9130 z1$="":forj=1to38:get#1,g$:z1$=z1$+g$:next
+ 9140 z2$="":forj=1to38:get#1,g$:z2$=z2$+g$:next
+ 9150 au$="":forj=1to25:get#1,g$:au$=au$+g$:next
+ 9160 s$="":forj=1to21:get#1,g$:s$=s$+g$:next
+ 9290 close2:close1:return
+ 9300 gosub 10040
+ 9305 !iomask "{f1}{f3}{f5}{f2}{f4}{f6}",s$,t1$,t2$,t3$,t4$,au$,v1$,v2$,o$,ja,se$,b$,an,z1$,z2$
+ 9310 ifpeek(2)=2thenopen4,4,7:gosub7900:close4:goto9330
+ 9320 ifpeek(2)<>5thenwe=0
+ 9330 gosub10000:return
+ 9999 stop
+10000 printleft$(cd$,24)bl$left$(bl$,38)chr$(145)chr$(145);
+10010 printleft$(cd$,24)spc(12)"SYSTEM{$a0}ARBEITET";
+10020 return
+10030 printleft$(cd$,24)bl$chr$(20)right$(bl$,39)chr$(145)chr$(145);:return
+10040 gosub 10030:printleft$(cd$,24)b1$;:printleft$(cd$,25)b2$chr$(145)chr$(145);
+10050 return
+10060 !dier en,en$,t,s
+10070 printen;en$;t;s:stop
+

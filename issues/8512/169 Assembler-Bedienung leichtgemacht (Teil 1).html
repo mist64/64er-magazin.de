@@ -70,7 +70,7 @@
         <p>Zusammenfassend läßt sich zum hexadezimalen Zahlensystem sagen, daß es sich besonders gut bei allen Opcodes eignet, die in irgend einer Form etwas mit Adressen zu tun haben.</p>
 
         <p>Das binäre Zahlensystem, in dem nur die Ziffern 0 und 1 vorkommen, hängt unmittelbar mit der 8-Bit-Struktur des Computers zusammen. Die Zahl 255 läßt sich im binären Zahlensystem durch eine 8stellige Zahl darstellen (11111111). Dieses Zahlensystem eignet sich besonders gut bei allen logischen Operationen wie »OR«, »AND« und so weiter. Mit Hilfe der AND-Operation können bestimmte Bits gelöscht beziehungsweise isoliert werden. Mit der logischen OR-Verknüpfung lassen sich dagegen bestimmte Bits setzen. In einem Assembler-Quelltext wird eine binäre Zahl dadurch gekennzeichnet, daß ihr ein Prozentzeichen vorangestellt wird. Zum Beispiel:</p>
-        
+
         <ul class="plain">
             <li>AND #%00010000 isoliert das Bit 4 im Akkumulator. Das Ergebnis kann nur den Wert 0 oder $10 beziehungsweise 16 annehmen.</li>
             <li>OR #%10000000 setzt das Bit 7 im Akkumulator. War das Bit 7 vor diesem Maschinenbefehl gesetzt, bleibt es erhalten. War das Bit nicht gesetzt, so wird zum Inhalt des Akkumulators $80 beziehungsweise dezimal 128 addiert.</li>
@@ -105,18 +105,58 @@
         </ul>
 
         <p>Mit diesen beiden Pseudo-Opcodes und den Opcodes LDA, STA und RTS läßt sich schon ein kleines Maschinenprogramm erstellen. Laden und starten Sie zuerst Hypra-Ass. Anschließend sind die Zeilen entsprechend Bild 1 einzugeben:</p>
-        
+
         <figure>
             <table class="plain">
-                <tr><td>10</td><td colspan="2">-.BA $C000</td><td>;STARTADRESSE NACH $C000</td></tr>
-                <tr><td>20</td><td colspan="2">-</td><td>;DIES IST EINE REINE KOMMENTARZEILE</td></tr>
-                <tr><td>30</td><td colspan="2">-.EQ Wert = $FF</td><td>;IN DEN ZEILEN 30 UND 40 WERDEN</td></tr>
-                <tr><td>40</td><td colspan="2">-.EQ ADRESSE = $9000</td><td>;VARIABLE DEFINIERT.</td></tr>
-                <tr><td>50</td><td colspan="2">-;</td><td></td></tr>
-                <tr><td>60</td><td>-</td><td>LDA #WERT</td><td>;DER AKKU WIRD MIT DEM WERT $FF GELADEN</td></tr>
-                <tr><td>70</td><td>-</td><td>STA ADRESSE</td><td>;UND ANSCHLIESSEND IN DER ADRESSE</td></tr>
-                <tr><td>80</td><td>-</td><td></td><td>;$9000 GESPEICHERT</td></tr>
-                <tr><td>90</td><td>-</td><td>RTS</td><td>;DIESER BEFEHL BEENDET DAS PROGRAMM.</td></tr>
+                <tr>
+                    <td>10</td>
+                    <td colspan="2">-.BA $C000</td>
+                    <td>;STARTADRESSE NACH $C000</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td colspan="2">-</td>
+                    <td>;DIES IST EINE REINE KOMMENTARZEILE</td>
+                </tr>
+                <tr>
+                    <td>30</td>
+                    <td colspan="2">-.EQ Wert = $FF</td>
+                    <td>;IN DEN ZEILEN 30 UND 40 WERDEN</td>
+                </tr>
+                <tr>
+                    <td>40</td>
+                    <td colspan="2">-.EQ ADRESSE = $9000</td>
+                    <td>;VARIABLE DEFINIERT.</td>
+                </tr>
+                <tr>
+                    <td>50</td>
+                    <td colspan="2">-;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>60</td>
+                    <td>-</td>
+                    <td>LDA #WERT</td>
+                    <td>;DER AKKU WIRD MIT DEM WERT $FF GELADEN</td>
+                </tr>
+                <tr>
+                    <td>70</td>
+                    <td>-</td>
+                    <td>STA ADRESSE</td>
+                    <td>;UND ANSCHLIESSEND IN DER ADRESSE</td>
+                </tr>
+                <tr>
+                    <td>80</td>
+                    <td>-</td>
+                    <td></td>
+                    <td>;$9000 GESPEICHERT</td>
+                </tr>
+                <tr>
+                    <td>90</td>
+                    <td>-</td>
+                    <td>RTS</td>
+                    <td>;DIESER BEFEHL BEENDET DAS PROGRAMM.</td>
+                </tr>
             </table>
             <figcaption>Ein kleines Beispiel zum Umgang mit Pseudo-Opcodes</figcaption>
         </figure>
@@ -129,7 +169,8 @@
 
         <p>Dieses kleine Maschinenprogramm kann nun im Direktmodus mit SYS 12*4096 gestartet werden. Der Befehl PRINT PEEK(9*4096) liefert als Ergebnis den Wert 255. Mit dem Editor-Befehl »/E« läßt sich der Quelltext LISTen. Wird in Zeile 30 der Wert $FF durch $00 ersetzt und danach der Assembler mit RUN und das Maschinenprogramm mit dem angegebenen SYS-Befehl von neuem gestartet, liefert der PRINT-Befehl als Ergebnis den Wert 0. Um wieder zu den Pseudo-Opcodes zurückzukommen, löschen Sie im Qelltext die Zeile 10 und fügen dafür die Zeile:
             <code>45 -.BA $C000</code>
-            ein. Wird der Quelltext nun assembliert und das Maschinenprogramm gestartet, werden Sie keinerlei Veränderungen feststellen. Wird dagegen die Startadresse erst in Zeile 65 definiert, kann das fatale Auswirkungen haben. Es ist durchaus möglich, daß der Computer abstürzt. Aber versuchen Sie es einmal. Aus Fehlern kann man nur lernen.</p>
+            ein. Wird der Quelltext nun assembliert und das Maschinenprogramm gestartet, werden Sie keinerlei Veränderungen feststellen. Wird dagegen die Startadresse erst in Zeile 65 definiert, kann das fatale Auswirkungen haben. Es ist durchaus möglich, daß der Computer abstürzt. Aber versuchen Sie es einmal. Aus Fehlern kann man nur lernen.
+        </p>
 
         <p>Die nun folgenden drei Pseudo-Opcodes teilen dem Assembler mit, daß die in der gleichen Zeile stehenden Zeichen nicht übersetzt, sondern direkt übernommen werden sollen. Alle drei Pseudo-Opcodes sind wichtig für die Definition von Tabellen. Wichtig ist auch, daß vor jeder Tabelle ein RTS oder JMP stehen muß. Ist das nicht der Fall, interpretiert der Prozessor das erste Byte der Tabelle als Befehls-Byte. Als Ergebnis werden dann unkontrollierte Befehle ausgeführt.</p>
 
@@ -148,6 +189,72 @@
         <p>Mit diesem Beispielprogramm möchte ich auch den ersten Teil dieses Artikels beenden. Die restlichen Pseudo-Opcodes und das Arbeiten mit Makros werde ich das nächste Mal behandeln.</p>
 
         <address class="author">(ah)</address>
+
+        <figure>
+            <pre>30   -.EQ ZEICHEN = $FC ;VARIABLEN VEREINBAREN
+40   -.EQ TEXTLO = $FA
+50   -.EQ TEXTHI = $FB
+60   -.EQ CHROUT = $FFD2
+70   -.EQ GET = $FFE4
+
+90   -.BA $9000 ;STARTADRESSE=$9000
+
+110  -LOOP      JSR GET        ;AUF EINGABE WARTEN
+120  -          BEQ LOOP       ;WENN UNGLEICH 0 DANN WEITER
+
+140  -          STA ZEICHEN    ;UND MERKEN
+150  -          LDX #00        ;INDEXREGISTER X MIT 0 VORBELEGEN
+160  -LOOP1     LDA TASTENTAB,X;ERSTES ZEICHEN AUS TABELLE HOLEN
+170  -          CMP ZEICHEN    ;UND MIT ZEICHEN VERGLEICHEN
+180  -          BEQ LOOP1END   ;WENN GLEICH DANN FERTIG
+190  -          CMP #"#"       ;SONST MIT ENDEZEICHEN VERGLEICHEN
+200  -          BEQ LOOP       ;BEI UEBEREINSTIMMUNG WIEDER AN DEN ANFANG
+210  -          INX            ;SONST X-REGISTER UM 1 ERHOEEN
+220  -          BNE LOOP1      ;UND MIT NAECHSTEM ZEICHEN VERGLEICHEN
+
+240  -LOOP1END  LDA FUNKTABHI,X;ABHAENGIG VOM X-REGISTER HI-BYTE -1 DER ANZU-
+250  -          PHA            ;SPRINGENDEN FUNKTION HOLEN UND AUF DEN STACK
+260  -          LDA FUNKTABLO,X;DAS GLEICHE FUR DAS LO-BYTE
+270  -          PHA
+280  -          RTS            ;AN DIESER STELLE WIRD ZUR FUNKTION VERZWEIGT
+
+300  -TASTE1    LDX #&lt;(TEXT1)  ;LO-BYTE STARTADRESSE DES 1.TEXTES INS X-REGISTER
+310  -          LDY #&gt;(TEXT1)  ;HI-BYTE STARTADRESSE DES 1.TEXTES INS Y-REGISTER
+320  -          JMP AUSGABE    ;TEXT AUSGEBEN
+330  -TASTE2    LDX #&lt;(TEXT2)  ;DAS GLEICHE FUER DEN 2.TEXT
+340  -          LDY #&gt;(TEXT2)
+350  -          JMP AUSGABE
+
+370  -TASTE3    RTS            ;BEI DIESER TASTE IN DEN BASICINTERPRETER VERZW.
+
+390  -AUSGABE   STX TEXTLO     ;LO-BYTE DES AUSGEWAEHLTEN TEXTES MERKEN
+400  -          STY TEXTHI     ;DAS GLEICHE FUER DAS HI-BYTE
+410  -LOOPAUS   LDY #00        ;Y-REGISTER MIT NULL VORBELEGEN
+420  -          LDA (TEXTLO),Y ;UND DEN AKKU MIT DEM ERSTEN ZEICHEN LADEN
+430  -          CMP #"#"       ;IST DAS ENDE SCHON ERREICHT?
+440  -          BEQ LOOPAUSE   ;WENN JA DANN FERTIG
+450  -          JSR CHROUT     ;SONST ZEICHEN AUSGEBEN
+460  -          INC TEXTLO     ;UND DEN ZEIGER TEXTLO UND HI UM 1 ERHOEEN
+470  -          BNE LOOPAUS
+480  -          INC TEXTHI
+490  -          JMP LOOPAUS
+500  -LOOPAUSE  JMP LOOP       ;HIER WIRD WIEDER AN DEN ANFANG (EINGABE) VERZW.
+
+520  -TASTENTAB .TX "123#"
+
+540  -FUNKTABHI .BY &gt;(TASTE1-1),&gt;(TASTE2-1),&gt;(TASTE3-1)
+550  -FUNKTABLO .BY &lt;(TASTE1-1),&lt;(TASTE2-1),&lt;(TASTE3-1)
+
+570  -TEXT1     .TX "DIES IST DER ERSTE TEXT"
+580  -          .BY 13,"#"
+
+600  -TEXT2     .TX "DIES IST DER ZWEITE TEXT"
+610  -          .BY 13,"#"</pre>
+            <figcaption>Listing 1. Beispiel-Quelltext, erstellt mit Hypra-Ass</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="bsp.-quelltext" data-name="Beispiel-Quelltext"></pre>
+        </figure>
     </article>
 </body>
 

@@ -1,0 +1,387 @@
+
+
+;seeschlacht.prg ==0801==
+   10 rem ********************************
+   20 rem
+   30 rem       schiffeversenken mit
+   40 rem         akkustikkoppler
+   60 rem      von lars v. olleschik
+   70 rem          muehlenkamp 31
+   80 rem          4715 ascheberg
+   90 rem          tel. 02593/877
+   95 rem
+   96 rem ********************************
+   97 poke53281,0:poke53280,0
+  100 open2,2,0,chr$(38)+chr$(33)
+  110 print"{clr}schiffeversenken"
+  140 print"geschrieben von lars v. olleschik
+  160 dimt%(127),p%(255),b$(15),z$(15),z(15),b(15)
+  170 rem code umwandlung
+  180 forx=0to64:p%(x)=x:next:forx=65to90:p%(x)=x+32:next:p%(88)=88
+  190 forx=91to96:p%(x)=x:next:forx=97to122:p%(x)=x-32:next
+  200 forx=193to218:p%(x)=x-128:next:forx=0to126:t%(x)=p%(x):next
+  210 p%(148)=127:p%(127)=148
+  230 gosub6290
+  240 goto2280
+  250 rem verbindungsaufbau
+  270 print"{clr}";
+  280 print"UDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDI";
+  290 print"G schiffeversenken  *  kontaktaufnahme H";
+  300 print"JFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFK";
+  310 print"        UDDDDDDDDDDDDDDDDDDDDDI"
+  320 ifsp=3thenprint" ---->  G test-sender         H  <----":goto330
+  325 print" ---->  G test-empfaenger     H  <----"
+  330 print"        JCCCCCCCCCCCCCCCCCCCCCK"
+  400 ifsp=1then450
+  405 fori=1to3000:next
+  410 te$="the quick brown fox jumps over the lazy dog":a$="":print"{home}{down}{down}{down}{down}{down}
+  420 fori=1tolen(te$)
+  430 print#2,chr$(p%(asc(mid$(te$,i,1))));
+  440 printmid$(te$,i,1);:next
+  450 a$="":rem"direkter kontakt
+  460 get#2,a$:ifa$=""then500
+  470 ift%(asc(a$))=34thenpoke212,0
+  480 printchr$(t%(asc(a$)));
+  490 ift%(asc(a$))=95then550
+  500 getb$:ifb$=""then460
+  510 printb$;:
+  520 print#2,chr$(p%(asc(b$)));
+  530 ifb$="_"then550
+  540 goto460
+  550 rem abbruch des direkten kontaktes          ****** spielbeginn ******
+  560 poke53281,6:poke53280,6
+  570 print"{clr}{wht}UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI";
+  580 print"G  schiffeversenken * spielfeldaufbau  H";
+  590 print"JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK";
+  600 print"UCCCCCCCCCCI         UCCCCCCCCCCCI
+  610 print"G *gegner* H         G *spieler* H
+  620 print"JCCCCCCCCCCK         JCCCCCCCCCCCK
+  630 print"UCCCCCCCCCCI         UCCCCCCCCCCI
+  640 print"G 123456789H flotte  G 123456789H"
+  650 print"GaWWWWWWWWWHUCCCCCI  GaWWWWWWWWWH"
+  660 print"GbWWWWWWWWWHGQQQQfH  GbWWWWWWWWWH"
+  670 print"GcWWWWWWWWWHGQQQ zH  GcWWWWWWWWWH"
+  680 print"GdWWWWWWWWWHGQQ  sH  GdWWWWWWWWWH"
+  690 print"GeWWWWWWWWWHGQQ  sH  GeWWWWWWWWWH"
+  700 print"GfWWWWWWWWWHGQQ  sH  GfWWWWWWWWWH"
+  710 print"GgWWWWWWWWWHGQ   uH  GgWWWWWWWWWH"
+  720 print"GhWWWWWWWWWHGQ   uH  GhWWWWWWWWWH"
+  730 print"GiWWWWWWWWWHJCCCCCK  GiWWWWWWWWWH"
+  740 print"JCCCCCCCCCCK         JCCCCCCCCCCK"
+  750 print"{cyn}  {rvon}{SHIFT-POUND}bitte geben sie nun die positionen{CBM-*}{rvof}"
+  760 print"  {rvon} der schiffe ihrer flotte nachein-  {rvof}"
+  770 print"  {rvon} ander ein. buchstabe - zahl        {rvof}"
+  780 print"  {CBM-*}{rvon}nach 15 eingaben wird verifiziert.{rvof}{SHIFT-POUND}{yel}"
+  790 print" UCCCCCCCCCCCCCCCCCCCCCCCCI  UCCCCCCI
+  800 print" Gihre einbabe bitte : *-*H  Gnr.   H
+  810 print" JCCCCCCCCCCCCCCCCCCCCCCCCK  JCCCCCCK";
+  820 rem"flotteneingabe
+  830 fori=1to15:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";tab(33)i;:
+  840 poke1967,42:poke56239,1
+  850 poke1969,42:poke56241,1
+  860 getb$(i):ifb$(i)=""then860
+  870 ifasc(b$(i))<65orasc(b$(i))>73then860
+  880 poke1967,asc(b$(i))-64:poke56239,1
+  890 getz$(i):ifz$(i)=""then890
+  900 ifasc(z$(i))<49orasc(z$(i))>57then890
+  910 poke1969,asc(z$(i)):poke56241,1
+  920 poke(1024+40*(asc(b$(i))-64+7)+asc(z$(i))-26),209
+  930 poke(55296+40*(asc(b$(i))-64+7)+asc(z$(i))-26),13
+  940 next
+  950 rem"kontrolle der positionen
+  960 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+  970 fori=1to6:print"                                        ";:next
+  980 print"                                       ";
+  990 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 1000 print"{wht} UCCCCCCCCCCCCCCCCCCCCCCI               ";
+ 1010 print" Gkontrolle der eingabenH               ";
+ 1020 print" JCCCCCCCCCCCCCCCCCCCCCCK               ";
+ 1030 print" UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI ";
+ 1040 print" Gidentifizierung:                    H ";
+ 1050 print" JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK {home}{yel}";
+ 1060 f=8:rem"abfrage ob 15 felder belegt
+ 1070 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}felder             {home}"
+ 1080 p=0:fori=1to15:b(i)=asc(b$(i))-64:z(i)=asc(z$(i))-26:next
+ 1090 fori=1to9:forj=1to9:ifpeek(1024+40*(i+7)+j+22)=209thenp=p+1:f=0
+ 1100 poke(55296+40*(i+7)+j+22),f:f=8
+ 1110 next:next
+ 1120 ifp=15then1140
+ 1130 goto2150
+ 1140 rem"weitere pruefung
+ 1150 u=0:rem"u-boote (2 stueck)
+ 1160 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}u-boote            {home}"
+ 1170 fori=1to9:forj=1to9:b=i:z=j:gosub2110:ifsv=209then1200
+ 1180 goto1260
+ 1190 rem
+ 1200 b=i-1:z=j:gosub2110:ifsv=209then1260
+ 1210 b=i+1:z=j:gosub2110:ifsv=209then1260
+ 1220 z=j+1:b=i:gosub2110:ifsv=209then1260
+ 1230 z=j-1:b=i:gosub2110:ifsv=209then1260
+ 1240 u=u+1:ifu>2then2150:rem"fehler
+ 1250 poke(55296+40*(i+7)+j+22),1
+ 1260 next:next:ifu<2then2150
+ 1270 sb=0:rem"schnellboote
+ 1280 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}schnellboote       {home}"
+ 1290 fori=1to9:forj=1to9:b=i:z=j:gosub2110:gosub2120:ifsf=1then1560
+ 1300 ifsv=209then1320
+ 1310 goto1560
+ 1320 b=i:z=j-1:gosub2110:ifsv=209then1560
+ 1330 b=i-1:z=j:gosub2110:ifsv=209then1560
+ 1340 b=i+1:gosub2110:ifsv=209then1560
+ 1350 b=i+1:z=j+1:gosub2110:ifsv=209then2150
+ 1360 b=i-1:z=j+1:gosub2110:ifsv=209then2150
+ 1370 b=i:z=j+1:gosub2110:ifsv<>209then1560
+ 1380 b=i:z=j+2:gosub2110:ifsv=209then1560
+ 1390 fort=0to1:poke(55296+40*(i+7)+j+t+22),1:next
+ 1400 sb=sb+1:ifsb>3then2150
+ 1410 goto1560
+ 1420 forj=1to9:fori=1to9:b=i:z=j:gosub2110:gosub2120:ifsf=1then1570
+ 1430 ifsv<>209then1570
+ 1440 b=i-1:z=j:gosub2110:ifsv=209then1570
+ 1450 z=j-1:b=i:gosub2110:ifsv=209then1570
+ 1460 z=j+1:gosub2110:ifsv=209then1570
+ 1470 z=j-1:gosub2110:ifsv=209then1570
+ 1480 z=j+1:b=i+1:gosub2110:ifsv=209then2150
+ 1490 z=j-1:gosub2110:ifsv=209then2150
+ 1500 z=j:b=i+1:gosub2110:ifsv<>209then1570
+ 1510 z=j:b=i+2:gosub2110:ifsv=209then1570
+ 1520 fort=0to1:poke(55296+40*(i+7+t)+j+22),1:next
+ 1530 sb=sb+1:ifsb>3then2150
+ 1540 goto1570
+ 1550 rem
+ 1560 next:next:goto1420
+ 1570 next:next:ifsb<3then2150
+ 1580 zr=0:rem"zerstoerer
+ 1590 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}zerstoerer         {home}"
+ 1600 fori=1to9:forj=1to9:b=i:z=j:gosub2110:gosub2120:ifsf=1then1820
+ 1610 ifsv<>209then1820
+ 1620 b=i:z=j-1:gosub2110:ifsv=209then1820
+ 1630 b=i+1:z=j:gosub2110:ifsv=209then1820
+ 1640 b=i-1:z=j:gosub2110:ifsv=209then1820
+ 1650 b=i:z=j+1:gosub2110:ifsv<>209then1820
+ 1660 b=i:z=j+2:gosub2110:ifsv<>209then1820
+ 1670 b=i:z=j+3:gosub2110:ifsv=209then1820
+ 1680 fort=0to2:poke(55296+40*(i+7)+j+22+t),1:next
+ 1690 zr=zr+1:ifzr>1then2150
+ 1700 goto1820
+ 1710 forj=1to9:fori=1to9:b=i:z=j:gosub2110:gosub2120:ifsf=1then1830
+ 1720 ifsv<>209then1830
+ 1730 z=j:b=i-1:gosub2110:ifsv=209then1830
+ 1740 z=j+1:b=i:gosub2110:ifsv=209then1830
+ 1750 z=j-1:b=i:gosub2110:ifsv=209then1830
+ 1760 z=j:b=i+1:gosub2110:ifsv<>209then1830
+ 1770 z=j:b=i+2:gosub2110:ifsv<>209then1830
+ 1780 z=j:b=i+3:gosub2110:ifsv=209then1830
+ 1790 fort=0to2:poke(55296+40*(t+i+7)+j+22),1:next
+ 1800 zr=zr+1:ifzr>1then2150
+ 1810 goto1830
+ 1820 next:next:goto1710
+ 1830 next:next:ifzr<1then2150
+ 1840 flu=0:rem"flugzeugtraeger
+ 1850 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}flugzeugtraeger    {home}"
+ 1860 fori=1to9:forj=1to9:b=i:z=j:gosub2110:gosub2120:ifsf=1then2080
+ 1870 ifsv<>209then2080
+ 1880 b=i:z=j-1:gosub2110:ifsv=209then2080
+ 1890 b=i+1:z=j:gosub2110:ifsv=209then2080
+ 1900 b=i-1:z=j:gosub2110:ifsv=209then2080
+ 1910 b=i:z=j+2:gosub2110:ifsv<>209then2080
+ 1920 b=i:z=j+3:gosub2110:ifsv<>209then2080
+ 1930 b=i:z=j+4:gosub2110:ifsv=209then2080
+ 1940 fort=0to3:poke(55296+40*(i+7)+j+22+t),1:next
+ 1950 flu=flu+1:ifflu>1then2150
+ 1960 goto2080
+ 1970 forj=1to9:fori=1to9:b=i:z=j:gosub2110:gosub2120:ifsf=1then2090
+ 1980 ifsv<>209then2090
+ 1990 z=j:b=i-1:gosub2110:ifsv=209then2090
+ 2000 z=j+1:b=i:gosub2110:ifsv=209then2090
+ 2010 z=j-1:b=i:gosub2110:ifsv=209then2090
+ 2020 z=j:b=i+2:gosub2110:ifsv<>209then2090
+ 2030 z=j:b=i+3:gosub2110:ifsv<>209then2090
+ 2040 z=j:b=i+4:gosub2110:ifsv=209then2090
+ 2050 fort=0to3:poke(55296+40*(t+i+7)+j+22),1:next
+ 2060 flu=flu+1:ifflu>1then2150
+ 2070 goto2090
+ 2080 next:next:goto1970
+ 2090 next:next:ifflu<1then2150
+ 2100 goto2130:rem"schiffsvariable
+ 2110 sv=peek(1024+40*(b+7)+z+22):return
+ 2120 sf=peek(55296+40*(b+7)+z+22):return
+ 2130 rem
+ 2140 goto2170
+ 2150 print"{pur}{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}fehler in der eingabe...............{home}{yel}"
+ 2160 fori=1to1000:next:goto550
+ 2170 rem"korrekte eingabe
+ 2180 print"{grn}{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}alle eingaben regelgerecht..........{home}{yel}"
+ 2190 rem"ab hier wieder direkter kontakt
+ 2200 fori=1to1000:next
+ 2210 print"{home}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}spielbeginn    "
+ 2220 fori=1744to2024:pokei,32:next
+ 2230 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":
+ 2240 print"{wht}UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI         ";
+ 2250 print"Gpartner ist noch nicht fertigH         ";
+ 2260 print"JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK{yel}"
+ 2270 goto2530
+ 2280 rem"menue
+ 2290 print"{clr} UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI
+ 2300 print" G   schiffeversenken * hauptmenue    H
+ 2310 print" JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK
+ 2320 print"{down}{down} UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI
+ 2330 print" G UCI                                H
+ 2340 print" G GaH  koppler im originate-modus    H
+ 2350 print" G JCK                                H
+ 2360 print" G                                    H
+ 2370 print" G UCI                                H
+ 2380 print" G GbH  koppler im answer-modus       H
+ 2390 print" G JCK                                H
+ 2400 print" G                                    H
+ 2410 print" G                                    H
+ 2420 print" G                                    H
+ 2430 print" G                                    H
+ 2440 print" G  UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI H
+ 2450 print" G  G ---> bitte waehlen sie <---   H H
+ 2460 print" G  JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK H
+ 2470 print" JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK
+ 2480 getb$:ifb$<>"a"andb$<>"b"then2480
+ 2490 ifb$="b"thensp=3:goto250
+ 2500 ifb$="a"thensp=1:goto250
+ 2520 rem
+ 2530 rem"spielbeginn
+ 2540 ifsp=3thenb$="\"
+ 2550 ifsp=1thenb$="*":goto2620
+ 2570 print#2,chr$(p%(asc(b$)))
+ 2580 get#2,a$:ifa$=""then2580
+ 2590 ifchr$(t%(asc(a$)))<>"*"then2580
+ 2600 goto2650
+ 2610 rem
+ 2620 get#2,a$:ifa$=""then2620
+ 2630 ifchr$(t%(asc(a$)))<>"\"then2620
+ 2640 print#2,chr$(p%(asc(b$)))
+ 2650 rem"beginn der schlacht
+ 2660 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}partner ist fertig..........."
+ 2680 ifsp=1then3110
+ 2690 fori=1744to2023:pokei,32:next
+ 2700 rem"eigener schuss
+ 2720 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}UCCCCCCCCCCCCCCCI"
+ 2730 print"Gihr schuss  *-*H"
+ 2740 print"JCCCCCCCCCCCCCCCK{home}";
+ 2750 rem"buchstabe
+ 2760 getb$:ifb$=""then2760
+ 2770 ifasc(b$)>74orasc(b$)<65then2760
+ 2780 print#2,chr$(p%(asc(b$)))
+ 2790 poke1824+13,asc(b$)-64
+ 2800 poke56096+13,8
+ 2810 rem"ziffer
+ 2820 getz$:ifz$=""then2820
+ 2830 ifasc(z$)>57orasc(z$)<49then2820
+ 2840 print#2,chr$(p%(asc(z$)))
+ 2850 rem"eintragen
+ 2860 poke1824+15,asc(z$)
+ 2870 poke56096+15,8
+ 2880 rem"eintragen auf spielplan
+ 2890 poke(1024+40*(asc(b$)-64+7)+asc(z$)-48+1),32
+ 2910 rem"abfrage treffer
+ 2920 rem
+ 2930 get#2,a$:ifa$=""then2930
+ 2940 t=t%(asc(a$))-64
+ 2950 ift<>14andt<>10andt<>5andt<>22then2930
+ 2980 ifpeek(1024+40*(asc(b$)-64+7)+asc(z$)-48+1)=86thentr=tr-1
+ 2990 ift=10ort=22thenpoke(55296+40*(asc(b$)-64+7)+asc(z$)-48+1),10:tr=tr+1
+ 3000 ift=14then3020
+ 3010 gosub6290
+ 3020 ift=10thenpoke(1024+40*(asc(b$)-64+7)+asc(z$)-48+1),86
+ 3025 ift=22ort=5thenpoke(1024+40*(asc(b$)-64+7)+asc(z$)-48+1),22
+ 3030 fori=1to1000:next
+ 3040 ift=5then3630:rem"sieg
+ 3050 iftr=15then3630
+ 3060 ift=10ort=22then2720
+ 3070 rem
+ 3080 rem
+ 3090 rem"auswertung und trefferaufnahme
+ 3110 fori=1744to2023:pokei,32:next
+ 3120 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}UCCCCCCCCCCCCCCCI UCCCCCCCCCCIUCCCCCCCCI";
+ 3130 print"Ggegner-zug  *-*H Gtreffer * HGrunde   H";
+ 3140 print"JCCCCCCCCCCCCCCCK{$a0}JCCCCCCCCCCKJCCCCCCCCK{home}";
+ 3150 rem"buchstabe
+ 3160 get#2,b$:ifb$=""then3160
+ 3170 b$=chr$(t%(asc(b$)))
+ 3180 ifasc(b$)<65orasc(b$)>73then3160
+ 3190 poke1824+13,asc(b$)-64
+ 3200 poke56096+13,8
+ 3210 rem"ziffer
+ 3220 get#2,z$:ifz$=""then3220
+ 3230 z$=chr$(t%(asc(z$)))
+ 3240 ifasc(z$)>57orasc(z$)<49then3220
+ 3250 rem"eintragen
+ 3260 poke1824+15,asc(z$)
+ 3270 poke56096+15,8
+ 3280 g$="n":ze=81:rem"eintragen auf spielplan
+ 3290 ifpeek(1024+40*(asc(b$)-64+7)+asc(z$)-48+22)=209thengt=gt+1:ze=86:g$="j"
+ 3300 ifpeek(1024+40*(asc(b$)-64+7)+asc(z$)-48+22)=86then:ze=86:g$="n":goto3510
+ 3310 ifpeek(1024+40*(asc(b$)-64+7)+asc(z$)-48+22)=87then:ze=32:g$="n":goto3510
+ 3320 ifpeek(1024+40*(asc(b$)-64+7)+asc(z$)-48+22)=32then:ze=32:g$="n":goto3510
+ 3330 bb=1:rem"abfrage versenkt
+ 3340 ifpeek(1024+40*(asc(b$)-64+7)+asc(z$)-48+22+bb)=209then3510
+ 3350 ifpeek(1024+40*(asc(b$)-64+7)+asc(z$)-48+22-bb)=209then3510
+ 3360 ifpeek(1024+40*(asc(b$)-64+7+bb)+asc(z$)-48+22)=209then3510
+ 3370 ifpeek(1024+40*(asc(b$)-64+7-bb)+asc(z$)-48+22)=209then3510
+ 3380 rem
+ 3390 zb=(1024+40*(asc(b$)-64+7)+asc(z$)-48+22)
+ 3400 rem"zerstoerer versenkt ?
+ 3410 ifpeek(zb+1)=86andpeek(zb+2)=209then3510
+ 3420 ifpeek(zb-1)=86andpeek(zb-2)=209then3510
+ 3430 ifpeek(zb-40)=86andpeek(zb-80)=209then3510
+ 3440 ifpeek(zb+40)=86andpeek(zb+80)=209then3510
+ 3450 rem"flugzeugtraeger versenkt ?
+ 3460 ifpeek(zb+1)=86andpeek(zb+2)=86andpeek(zb+3)=209then3510
+ 3470 ifpeek(zb-1)=86andpeek(zb-2)=86andpeek(zb-3)=209then3510
+ 3480 ifpeek(zb+40)=86andpeek(zb+80)=86andpeek(zb+120)=209then3510
+ 3490 ifpeek(zb-40)=86andpeek(zb-80)=86andpeek(zb-120)=209then3510
+ 3500 ze=22:g$="v":ifgt=15theng$="e"
+ 3510 poke(1024+40*(asc(b$)-64+7)+asc(z$)-48+22),ze
+ 3530 rem"ansage der treffer
+ 3540 print#2,chr$(p%((asc(g$))))
+ 3550 g=(asc(g$))-64
+ 3580 ifg$<>"n"thengosub6290
+ 3590 fori=1to1000:next
+ 3600 ifgt=15then3690
+ 3610 ifg$="j"org$="v"then3110
+ 3620 goto2690
+ 3630 rem"sieg
+ 3640 fori=1744to2023:pokei,32:next
+ 3650 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI";
+ 3660 print" G sie haben die schlacht gewonnen ... H";
+ 3670 print" JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK"
+ 3680 goto3740
+ 3690 rem"niederlage
+ 3700 fori=1744to2023:pokei,32:next
+ 3710 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI";
+ 3720 print" G sie haben die schlacht verloren ... H";
+ 3730 print" JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK"
+ 3740 goto4490
+ 4490 rem"spielende erneut terminal modus
+ 4500 print"{clr} UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI";
+ 4510 print" G s p i e l e n d e * t e r m i n a l H";
+ 4520 print" JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK"
+ 4530 print"          {rvon} abbruch mit '^' "
+ 4540 print">";
+ 4550 get#2,a$
+ 4560 ifa$=""then4620
+ 4570 ift%(asc(a$))=34thenpoke212,0
+ 4580 printchr$(t%(asc(a$)));
+ 4590 ifchr$(t%(asc(a$)))="^"then4680:rem"abbbruch
+ 4600 ift%(asc(a$))=13thenprint">";
+ 4610 goto4550
+ 4620 getb$
+ 4630 ifb$=""then4550
+ 4640 print#2,chr$(p%(asc(b$)));
+ 4650 ifb$="^"then4680:rem"abbruch selbst
+ 4660 printb$;
+ 4670 goto4550
+ 4680 print:print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon} kommunikation abgebrochen {rvof}"
+ 4690 print"{down} programm ist beendet."
+ 4700 close2:end
+ 6290 rem"vertikales scrolling
+ 6300 x=0:fori=1to140:x=x+1:ifx=7thenx=-x
+ 6310 poke53270,peek(53270)and248orabs(x)
+ 6320 next:return
+

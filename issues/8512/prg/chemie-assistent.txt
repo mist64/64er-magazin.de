@@ -1,0 +1,407 @@
+
+
+;chemie-assistent.prg ==1401==
+   10 b$=" "
+   20 rem ******************************
+   21 rem *                            *
+   22 rem *   anorganische chemie      *
+   23 rem *                            *
+   24 rem *   wanninger klaus          *
+   25 rem *                            *
+   26 rem *   feldweg 13c              *
+   27 rem *                            *
+   28 rem *   8261 ampfing             *
+   29 rem *                            *
+   30 rem ******************************
+  100 fori=0to71:readq:poke4300+i,q:next
+  110 sys4300
+  120 fori=0to15:readq:poke2048+98*8+i,q:next
+  130 fori=0to7:readq:poke2048+107*8+i,q:next
+  140 fori=0to23:readq:poke2048+113*8+i,q:next
+  150 fori=0to23:readq:poke2048+119*8+i,q:next
+  155 fori=0to7:readq:poke2048+111*8+i,q:next
+  160 fori=0to145:readq:poke4100+i,q:next
+  170 def fn sg(zahl)=10^(1-4+int(log(abs(zahl))/log(10)))
+  180 def fn signi(zahl)=int(zahl/fn sg(zahl)+.5)*fn sg(zahl)
+  300 dimel$(93),me(93)
+  310 fora=1to92:readel$(a):readme(a):next
+  315 rem **************
+  320 rem * hauptmenue *
+  325 rem **************
+  330 print"{clr}{rght}{rght}{rght}{down}{down}{down}{rvon}Berechnungen in der"
+  340 print"{down}{rght}{rght}{rght}{rvon}anorganischen Chemie"
+  350 print"{down}{down}{down}{rght}{rght}{rvon}1{rvof} Loesungen"
+  360 print"{down}{rght}{rght}{rvon}2{rvof} Titration"
+  370 print"{down}{rght}{rght}{rvon}3{rvof} Loeslichkeits-Berechnungen"
+  380 print"{down}{rght}{rght}{rvon}4{rvof} Ende"
+  390 print"{down}{down}{down}{rght}{rght}Bitte entsprechende Nummer eingeben!"
+  400 getv$:ifv$="" then 400
+  410 sp=val(v$)
+  420 ifsp<1orsp>4 then400
+  430 on sp gosub 460,1170,1340,1960
+  440 getv$:ifv$="" then 440
+  450 goto320
+  455 rem ****************
+  460 rem * 1.loesungen  *
+  470 rem * 1.untermenue *
+  475 rem ****************
+  480 print"{clr}{rght}{rght}{rght}{down}{down}{down}{rvon}Loesungen"
+  490 print"{rght}{rght}{down}{rvon}1{rvof} Herstellung"
+  500 print"{rght}{rght}{down}{rvon}2{rvof} Umrechnung"
+  510 print"{down}{down}{down}{rght}{rght}Bitte entsprechende Nummer eingeben!"
+  520 getv$:ifv$="" then 520
+  530 sp=val(v$)
+  540 if sp<1orsp>2 then 520
+  550 if sp=2 then 960
+  555 rem ***************
+  560 rem * herstellung *
+  565 rem ***************
+  570 print"{clr}{down}{down}{down}in welcher Einheit wollen sie die Kon-"
+  580 print"zentration eingeben ?"
+  590 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rvon}1{rvof} ppm"
+  600 print"{down}{rght}{rght}{rght}{rght}{rvon}2{rvof} mol/l"
+  610 print"{down}{rght}{rght}{rght}{rght}{rvon}3{rvof} g/l"
+  620 print"{down}{down}{down}{rght}{rght}Bitte entsprechende Nummer eingeben!"
+  630 getv$:ifv$="" then 630
+  640 ps=val(v$)
+  650 if ps<1orps>3 then 630
+  655 je$(1)="ppm":je$(2)="mol/l":je$(3)="g/l"
+  660 print"{clr}{down}{down}{down}Gesamtformel des zu loesenden Stoffes"
+  670 gi$="":inputgi$
+  680 print"{down}Eingabe eines Teilchens(Ions)ohne"
+  690 print"Koeffizient"
+  700 t1$="":inputt1$
+  710 print"{down}Konzentrationswert in ";je$(ps);" ";:inputkw
+  720 input"{down}vorgegebenes Volumen(Milliliter)";v
+  730 onpsgosub760,850,940
+  740 print"{down}{down}{down}Es sind ";fnsigni(em);tab(19)"Gramm in ";v
+  745 print"Milliliter zu loesen"
+  750 return
+  760 a$=gi$:gosub 1970:gm=m:a1$=a$:a2$=ai$
+  770 ift1$=""thent1$=gi$
+  800 a$=t1$:h=0:b=0
+  810 gosub1970:tm=m
+  815 gosub5000
+  820 ml=(0.001*kw*gm)/(tm*b9)
+  830 em=(v/1000)*ml
+  840 return
+  850 a$=gi$:gosub 1970:gm=m:a1$=a$:a2$=ai$
+  860 ift1$=""thent1$=gi$
+  870 a$=t1$:gosub1970:gosub5000
+  910 ml=(gm/b9)*kw
+  920 em=(v/1000)*ml
+  930 return
+  940 em=(v/1000)*kw
+  950 return
+  955 rem **************
+  960 rem * umrechnung *
+  965 rem **************
+  970 print"{clr}{rght}{rght}{down}{down}{down}{rvon}Konzentrationsumrechnung"
+  980 print"{down}{down}{rght}{rght}{rght}{rvon}1{rvof} mol/l in ppm"
+  990 print"{down}{rght}{rght}{rght}{rvon}2{rvof} ppm in mol/l"
+ 1000 print"{down}{down}{down}Bitte entsprechende Nummer eingeben!"
+ 1010 getv$:ifv$="" then 1010
+ 1020 p1=val(v$)
+ 1030 if p1<1orp1>2 then 1010
+ 1040 input"{down}gegebener Konzentrationswert";cw
+ 1050 input"{down}Formel";i1$
+ 1060 if p1=2 then 1120
+ 1065 rem ****************
+ 1070 rem * mol/l in ppm *
+ 1075 rem ****************
+ 1080 a$=i1$:gosub1970:mm=m
+ 1090 kp=cw*1000*mm
+ 1100 print"{down}{down}{down}{down}";cw;"mol/l entsprechen ";kp;" ppm"
+ 1110 return
+ 1115 rem ****************
+ 1120 rem * ppm in mol/l *
+ 1125 rem ****************
+ 1130 a$=i1$:gosub 1970:mm=m
+ 1140 cm=cw/(1000*mm)
+ 1150 print"{down}{down}{down}{down}";cw;" ppm entsprechen ";fn signi(cm);" mol/l"
+ 1160 return
+ 1165 rem *************
+ 1170 rem * titration *
+ 1175 rem *************
+ 1180 print"{clr}{down}{down}{down}{rght}{rght}Berechnung einer Titration"
+ 1190 print"{down}{down}Konzentration des Titers in mol/l"
+ 1200 inputc1
+ 1210 input"{down}Aequivalent des Titers 1/";zt
+ 1220 input"{down}Aequivalent der Vorlage 1/";zs
+ 1240 print"{down}Verbrauch des Titers in Milliliter"
+ 1250 inputv1
+ 1260 print"{down}Volumen der Vorlage in Milliliter"
+ 1270 inputv2
+ 1280 n1=c1*(v1/1000)
+ 1290 n2=n1*zt/zs
+ 1300 c2=n2/(v2/1000)
+ 1310 print"{down}{down}{down}Die Konzentration der Vorlage betraegt"
+ 1320 printc2;" mol/l"
+ 1330 return
+ 1335 rem ******************************
+ 1340 rem * loeslichkeits-berechnungen *
+ 1345 rem ******************************
+ 1350 print"{clr}{down}{down}{down}{rght}{rght}{rvon}Loeslichkeits-Berechnungen"
+ 1360 print"{down}{down}{down}{rght}{rght}{rght}{rvon}1{rvof} Umrechnungen"
+ 1370 print"{down}{rght}{rght}{rght}{rvon}2{rvof} Ausfallskonzentration"
+ 1380 print"{down}{down}{down}{down}{rght}Bitte entsprechende Nummer eingeben!"
+ 1390 getv$:ifv$=""then 1390
+ 1400 s2=val(v$)
+ 1410 if s2<1ors2>2then 1390
+ 1420 if s2=2 then 1800
+ 1430 print"{clr}{rght}{rght}{down}{down}{down}Umrechnung von"
+ 1440 print"{down}{down}{rvon}1{rvof} Loeslichkeit in Loeslichkeitsproduckt"
+ 1450 print"{down}{down}{rvon}2{rvof} Loeslichkeitsproduckt in Loeslichkeit"
+ 1460 print"{down}{down}{down}{down}{rght}Bitte entsprechende Nummer eingeben!"
+ 1470 getv$:ifv$="" then 1470
+ 1480 s3=val(v$)
+ 1490 ifs3<1ors3>2 then 1470
+ 1500 if s3=2 then 1620
+ 1505 rem *****************************
+ 1510 rem * loeslichkeit zu           *
+ 1513 rem * loeslichkeitsprodukt      *
+ 1515 rem *****************************
+ 1520 input"{down}Formel des Salzes";i2$
+ 1530 input"{down}Loeslichkeitswert in g/l";lo
+ 1540 a$=i2$:gosub1970:gm=m:gosub4000
+ 1550 c=lo/gm
+ 1560 lp=1
+ 1570 forb=1toh-1
+ 1580 lp=lp*(kj(b)*c)^kj(b)
+ 1590 next b
+ 1600 print"{down}Loeslichkeitsprodukt =";fn signi(lp)
+ 1610 return
+ 1615 rem *****************************
+ 1620 rem * loeslichkeitsprodukt zu   *
+ 1622 rem * loeslichkeit              *
+ 1625 rem *****************************
+ 1630 input"{down}Formel des Salzes";i3$
+ 1640 input"{down}Loeslichkeitsprodukt";lp
+ 1650 a$=i3$:gosub1970:gosub4000
+ 1660 fk=kj(1)
+ 1670 forb=2toh-1
+ 1680 ifkj(b)<fkthenfk=kj(b)
+ 1690 nextb
+ 1700 kl=1:s1=0:c1=0:forb=1toh-1
+ 1710 kl=kl*(kj(b)/fk)^kj(b)
+ 1720 s1=s1+kj(b)
+ 1730 nextb
+ 1740 c1=(lp/kl)^(1/s1)
+ 1750 c=c1*(1/fk)
+ 1760 lo=c*m
+ 1770 print"{down}Konzentration des Salzes";fn signi(c);"mol/l"
+ 1780 print"{down}Loeslichkeit=";fn signi(lo);"g/l"
+ 1790 return
+ 1795 rem *************************
+ 1800 rem * ausfallskonzentration *
+ 1805 rem *************************
+ 1810 print"{clr}{down}{down}{down}{down}Formel des ausfallenden Salzes"
+ 1820 inputsa$
+ 1830 print"{down}Art der Ionen die bereits in der Vorlage"
+ 1840 input"vorhanden sind";jv$
+ 1850 print"{down}Konzentration der bereits vorhandenen"
+ 1860 input"Ionen";cv
+ 1870 print"{down}Loeslichkeitsprodukt des ausfallenden"
+ 1880 input"Salzes";lp
+ 1890 a$=sa$:gosub1970:gosub4000
+ 1900 ifjv$=left$(sa$,len(jv$))thennf=kj(1):np=kj(2):goto1920
+ 1910 np=kj(1):nf=kj(2)
+ 1920 c7=cv^nf:c8=lp/c7:c9=c8^(1/np)
+ 1930 print"{down}die Konzentration der zugegebenen Ionen-"
+ 1940 print"betraegt ";fn signi(c9);" mol/l"
+ 1950 return
+ 1960 end
+ 1970 rem ****************
+ 1980 rem * molare masse *
+ 1990 rem ****************
+ 2000 forh=0 to10:ea(h)=0:ez(h)=0:j1$(h)="":i1$(h)="":next:m=0:m1=0:i1$="":j1$=""
+ 2010 ai$="":forh=1 to10:y1(h)=0:next:yy$=""
+ 2020 for h=1 tolen(a$)
+ 2030 b$=mid$(a$,h,1)
+ 2040 sys4100
+ 2050 yy$=yy$+b$
+ 2060 nexth
+ 2070 cy=1:forh=1 to len(a$)-1
+ 2080 ay$=mid$(yy$,h,1)
+ 2090 by$=mid$(yy$,h+1,1)
+ 2100 if asc(ay$)>47andasc(ay$)<58then2120
+ 2110 nexth:goto2140
+ 2120 ifasc(by$)>47andasc(by$)<58theny1(cy)=h:cy=cy+1:goto2110
+ 2130 goto2110
+ 2140 cy=1:h=0
+ 2145 h=h+1
+ 2150 dy$=mid$(yy$,h,1)
+ 2160 ifasc(dy$)>47andasc(dy$)<58 then2190
+ 2170 ai$=ai$+dy$
+ 2180 ifh<len(a$)then2145
+ 2185 goto2240
+ 2190 ifh=y1(cy)then2220
+ 2200 dy$=chr$(160+val(dy$))
+ 2210 goto2170
+ 2220 dy$=chr$(160+val(mid$(yy$,h,2))):cy=cy+1:h=h+1
+ 2230 goto2170
+ 2240 ifcy=1then2450
+ 2250 forey=1tocy-1
+ 2260 a$=left$(a$,y1(ey))+right$(a$,len(a$)-y1(ey)-1)
+ 2265 forwy=eytocy-1:y1(wy)=y1(wy)-1:next
+ 2270 nextey
+ 2450 l=1
+ 2460 forh=1tolen(ai$)
+ 2470 ci$=mid$(ai$,h,1)
+ 2480 if ci$="c"then ea(l)=h
+ 2490 ifci$="d"thenez(l)=h:l=l+1
+ 2500 nexth
+ 2510 if l=1 then2600
+ 2520 for k=1 to l-1
+ 2530 j1$(k)=mid$(a$,ea(k)+1,ez(k)-ea(k)-1)
+ 2540 i1$(k)=mid$(ai$,ea(k)+1,ez(k)-ea(k)-1)
+ 2550 d$=mid$(ai$,ez(k)+1,1)
+ 2560 ifd$="" thend$=" "
+ 2570 ifasc(d$)<=161orasc(d$)>=191thenjk(k)=1:goto2590
+ 2580 jk(k)=asc(d$)-160:ez(k)=ez(k)+1
+ 2590 next k
+ 2600 ez(0)=0:ea(l)=len(a$)+1
+ 2610 for k=0 tol-1
+ 2620 j1$(0)=j1$(0)+mid$(a$,ez(k)+1,ea(k+1)-ez(k)-1)
+ 2630 i1$(0)=i1$(0)+mid$(ai$,ez(k)+1,ea(k+1)-ez(k)-1)
+ 2640 nextk:jk(0)=1
+ 2650 fork=0tol-1
+ 2660 ifj1$(k)=""then2690
+ 2670 j1$=j1$(k):i1$=i1$(k):gosub2710
+ 2680 m=m+m1*jk(k)
+ 2690 nextk
+ 2700 return
+ 2710 forh=0to10:ra(h)=0:rz(h)=0:j2$(h)="":i2$(h)="":next:m1=0:m2=0
+ 2720 n=1:e$="":f$=""
+ 2730 for h=1 tolen(j1$)
+ 2740 e$=mid$(i1$,h,1)
+ 2750 ife$="a"thenra(n)=h
+ 2760 if e$="b"then rz(n)=h:n=n+1
+ 2770 nexth
+ 2780 if n=1 then 2870
+ 2790 forl=1ton-1
+ 2800 j2$(l)=mid$(j1$,ra(l)+1,rz(l)-ra(l)-1)
+ 2810 i2$(l)=mid$(i1$,ra(l)+1,rz(l)-ra(l)-1)
+ 2820 f$=mid$(i1$,rz(l)+1,1)
+ 2830 if f$="" then f$=" "
+ 2840 ifasc(f$)<=161orasc(f$)>=191thenk1(l)=1:goto2860
+ 2850 k1(l)=asc(f$)-160:rz(l)=rz(l)+1
+ 2860 nextl
+ 2870 ra(n)=len(j1$)+1
+ 2880 forl=0ton-1
+ 2890 j2$(0)=j2$(0)+mid$(j1$,rz(l)+1,ra(l+1)-rz(l)-1)
+ 2900 i2$(0)=i2$(0)+mid$(i1$,rz(l)+1,ra(l+1)-rz(l)-1)
+ 2910 nextl:k1(0)=1
+ 2920 forl=0ton-1
+ 2930 ifj2$(l)=""then2960
+ 2940 j2$=j2$(l):i2$=i2$(l):gosub2980
+ 2950 m1=m1+m2*k1(l)
+ 2960 nextl
+ 2970 return
+ 2980 for h=0 to10:g(h)=0:next:o=1:m2=0:m3=0
+ 2990 forh=1tolen(j2$)
+ 3000 g$=mid$(i2$,h,1)
+ 3010 if g$="g"theng(o)=h:o=o+1
+ 3020 nexth:g(o)=len(j2$)+1
+ 3030 forq=1too-1
+ 3040 j3$=mid$(j2$,g(q),g(q+1)-g(q))
+ 3050 i3$=mid$(i2$,g(q),g(q+1)-g(q))
+ 3060 gosub3100
+ 3070 m2=m2+m3
+ 3080 nextq
+ 3090 return
+ 3100 h$=right$(i3$,1):k3=0:m3=0:m4=0
+ 3110 ifasc(h$)<=161orasc(h$)>=191thenk3=1:j4$=j3$:goto3130
+ 3120 k3=asc(h$)-160:j4$=left$(j3$,len(j3$)-1)
+ 3130 gosub3160
+ 3140 m3=m4*k3
+ 3150 return
+ 3160 m4=0:fori=1 to92
+ 3170 ifj4$=el$(i)then3210
+ 3180 nexti
+ 3190 print"Falsches Elementsymbol"
+ 3200 run
+ 3210 m4=me(i)
+ 3220 return
+ 3230 end
+ 3990 rem *******************
+ 4000 rem * ionenaufteilung *
+ 4005 rem *******************
+ 4010 forh=1to10:kj(h)=0:next:p=0:po=0:h=0
+ 4020 goto4090
+ 4030 ifpo=0then4070
+ 4040 d$=mid$(ai$,po,1)
+ 4050 ifasc(d$)<=161orasc(d$)>=191thenkj(h)=1:goto4070
+ 4060 kj(h)=asc(d$)-160
+ 4070 h=h+1:po=p
+ 4080 ifpo>len(a$)thenreturn
+ 4090 e$=mid$(ai$,po+1,1)
+ 4100 ife$=""thenp=p+1:goto4030
+ 4110 ife$<>"c"then4140
+ 4120 p=p+1:ifmid$(ai$,p,1)<>"d"then4120
+ 4130 goto4030
+ 4140 ife$<>"a"then4170
+ 4150 p=p+1:ifmid$(ai$,p,1)<>"b"then4150
+ 4160 goto4030
+ 4170 p=p+1
+ 4180 ife$="g"then4030
+ 4190 po=po+1:goto4090
+ 4200 end
+ 4970 rem *****************************
+ 4975 rem * koeffizient eines ions    *
+ 4980 rem * innerhalb des salzes      *
+ 4990 rem *****************************
+ 5000 b9$="":b9=0:fora=1tolen(a1$)-len(a$)+1
+ 5010 ifa$=mid$(a1$,a,len(a$))then5040
+ 5020 nexta
+ 5030 print"Dieses Ion ist nicht enthalten":goto440
+ 5040 b9$=mid$(a2$,a+len(a$),1)
+ 5050 if b9$="" then b9$=" "
+ 5060 ifasc(b9$)<=161orasc(b9$)>=191thenb9=1:return
+ 5070 b9=asc(b9$)-160
+ 5080 return
+ 9000 rem *** maschinenprogramm ***
+10000 data173,14,220,41,254,141,14,220,165,1,41,251,133,1,169,0,133,34,133
+10010 data36,169,216,133,35,169,8,133,37,162,8,160,0,177,34,145,36,136,208
+10020 data249,230,35,230,37,202,208,240,165,1,9,4,133,1,173,24,208,41,240,9
+10030 data2,141,24,208,173,14,220,9,1,141,14,220,96,255
+10040 rem *** data kleine zahlen ***
+10050 data 0,0,126,102,102,126,102,126
+10060 data 0,0,126,96,96,126,6,126
+10070 data 0,0,6,14,102,6,6,6
+10080 data 0,0,126,6,6,126,6,126
+10090 data 0,0,102,102,102,126,6,6
+10100 data 0,0,24,102,6,24,96,126
+10110 data 0,0,126,96,96,126,102,126
+10120 data 0,0,126,6,6,12,12,12
+10130 data 0,0,126,102,102,126,6,126
+10140 data 0,0,126,102,102,102,102,126
+10990 rem *** maschinenprogramm ***
+11000 data165,45,133,34,165,46,133,35,160,3,177,34,133,36,200,177,34,133,37
+11010 data160,0,177,36,201,65,144,9,201,90,176,5,169,75,145,36,96,162,0,201
+11020 data171,208,4,234,234,162,49,201,179,208,2,162,50,201,177,208,2,162,51
+11030 data201,178,208,2,162,52,201,163,208,2,162,53,201,183,208,2,162,54,201
+11040 data184,208,2,162,55,201,162,208,2,162,56,201,185,208,2,162,57
+11045 data 201,175,208,2,162,48,224,0
+11050 data240,4,138,145,36,96,201,40,208,2,162,65,201,41,208,2,162,66,201,91
+11060 data208,2,162,67,201,93,208,2,162,68,224,0,240,4,138,145,36,96,169,71
+11070 data145,36,96,0
+31000 rem *** periodensysthem ***
+32000 data"H",1,"He",4,"Li",6.94,"Be",9.01,"B",10.81,"C",12,"N",14,"O",16
+32010 data"F",19,"Ne",20.18,"Na",22.99,"Mg",24.31,"Al",26.98,"Si",28.09
+32020 data"P",30.97,"S",32.06,"Cl",35.45,"Ar",39.95,"K",39.1,"Ca",40.08
+32030 data"Sc",44.96,"Ti",47.9,"V",50.94,"Cr",52,"Mn",54.94,"Fe",55.85
+32040 data"Co",58.93,"Ni",58.71,"Cu",63.54,"Zn",65.37,"Ga",69.72,"Ge",72.59
+32050 data"As",74.92,"Se",78.96,"Br",79.01,"Kr",83.8,"Rb",85.47,"Sr",87.62
+32060 data"Y",88.91,"Zr",91.22,"Nb",92.91,"Mo",95.94,"Tc",97,"Ru",101.07
+32070 data"Rh",102.9,"Pd",106.4,"Ag",107.87,"Cd",112.41,"In",114.82
+32080 data"Sn",118.69,"Sb",121.75,"Te",127.6,"I",126.9,"Xe",131.3
+32090 data"Cs",132.9,"Ba",137.33,"La",138.91,"Ce",140.12,"Pr",140.91
+32100 data"Nd",144.24,"Pm",145,"Sm",150.35,"Eu",151.96,"Gd",157.25
+32110 data"Tb",158.92,"Dy",162.5,"Ho",164.93,"Er",167.26,"Tm",168.93
+32120 data"Yb",173.04,"Lu",174.97,"Hf",178.94,"Ta",180.95,"W",183.85
+32130 data"Re",182.2,"Os",190.2,"Ir",192.2,"Pt",195.09,"Au",196.97,"Hg",200.59
+32140 data"Tl",204.37,"Pb",207.19,"Bi",208.98,"Po",209,"At",210
+32150 data"Rn",222,"Fr",223,"Ra",226,"Ac",227,"Th",232.04,"Pa",231
+32160 data"U",238.03
+

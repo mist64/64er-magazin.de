@@ -1,0 +1,63 @@
+
+
+;bsp.-quelltext.prg ==0801==
+   30 .eq zeichen = $fc ;variablen vereinbaren
+   40 .eq textlo = $fa
+   50 .eq texthi = $fb
+   60 .eq chrout = $ffd2
+   70 .eq get = $ffe4
+   80 ;
+   90 .ba $9000 ;startadresse=$9000
+  100 ;
+  110 loop jsrget;auf eingabe warten
+  120  beqloop;wenn ungleich 0 dann weiter
+  130 ;
+  140  stazeichen;und merken
+  150  ldx#00;indexregister x mit 0 vorbelegen
+  160 loop1 ldatastentab,x;erstes zeichen aus tabelle holen
+  170  cmpzeichen;und mit zeichen vergleichen
+  180  beqloop1end;wenn gleich dann fertig
+  190  cmp#"#";sonst mit endezeichen vergleichen
+  200  beqloop;bei uebereinstimmung wieder an den anfang
+  210  inx;sonst x-register um 1 erhoeen
+  220  bneloop1;und mit naechstem zeichen vergleichen
+  230 ;
+  240 loop1end ldafunktabhi,x;abhaengig vom x-register hi-byte -1 der anzu-
+  250  pha;springenden funktion holen und auf den stack
+  260  ldafunktablo,x;das gleiche fur das lo-byte
+  270  pha
+  280  rts;an dieser stelle wird zur funktion verzweigt
+  290 ;
+  300 taste1 ldx#<(text1);lo-byte startadresse des 1.textes ins x-register
+  310  ldy#>(text1);hi-byte startadresse des 1.textes ins y-register
+  320  jmpausgabe;text ausgeben
+  330 taste2 ldx#<(text2);das gleiche fuer den 2.text
+  340  ldy#>(text2)
+  350  jmpausgabe
+  360 ;
+  370 taste3 rts;bei dieser taste in den basicinterpreter verzw.
+  380 ;
+  390 ausgabe stxtextlo;lo-byte des ausgewaehlten textes merken
+  400  stytexthi;das gleiche fuer das hi-byte
+  410 loopaus ldy#00;y-register mit null vorbelegen
+  420  lda(textlo),y;und den akku mit dem ersten zeichen laden
+  430  cmp#"#";ist das ende schon erreicht?
+  440  beqloopause;wenn ja dann fertig
+  450  jsrchrout;sonst zeichen ausgeben
+  460  inctextlo;und den zeiger textlo und hi um 1 erhoeen
+  470  bneloopaus
+  480  inctexthi
+  490  jmploopaus
+  500 loopause jmploop;hier wird wieder an den anfang (eingabe) verzw.
+  510 ;
+  520 tastentab .tx"123#"
+  530 ;
+  540 funktabhi .by>(taste1-1),>(taste2-1),>(taste3-1)
+  550 funktablo .by<(taste1-1),<(taste2-1),<(taste3-1)
+  560 ;
+  570 text1 .tx"dies ist der erste text"
+  580  .by13,"#"
+  590 ;
+  600 text2 .tx"dies ist der zweite text"
+  610  .by13,"#"
+

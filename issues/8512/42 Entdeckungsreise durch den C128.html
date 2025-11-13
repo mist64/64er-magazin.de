@@ -34,7 +34,7 @@
             <code>SYS adresse,A,X,Y,S</code>
             Dabei ist
         </p>
-            
+
         <p class="noindent">A = Akkumulator, X = X-Register, Y = Y-Register, S = Prozessorstatusregister</p>
 
         <p>An der Adresse 65520 in Bank 15 befindet sich eine Routine, die den Cursor an die Stelle setzt, die durch das X-Register (Zeile) und das Y-Register (Spalte) vorgegeben wird. Deshalb kann ein PRINT AT durch die Befehlssequenz simuliert werden: BANK15:SYS 65520,,Zeile,Spalte:PRINT A$</p>
@@ -71,8 +71,16 @@
         <p>Auch beim C 128 wird nur der erste Zeilenlinker durch zwei Nullen überschrieben. Es gilt also, diesen zu restaurieren. Außerdem muß der Interpreter erfahren, wo das Ende des Programms zu finden ist. Hier geht das nicht mehr durch den Zeiger, der den Beginn der Variablen andeutet — die liegen jetzt in der Bank 1 —, sondern dazu existiert ein neuer Zeiger. Hier eine Zusammenstellung der für OLD wichtigen Vektoren:</p>
 
         <table class="plain">
-            <tr><td>$2D/$2E</td><td>45/46</td><td>Basic-Programmstart</td></tr>
-            <tr><td>$1210/1</td><td>4624/5</td><td>Basic-Programmende</td></tr>
+            <tr>
+                <td>$2D/$2E</td>
+                <td>45/46</td>
+                <td>Basic-Programmstart</td>
+            </tr>
+            <tr>
+                <td>$1210/1</td>
+                <td>4624/5</td>
+                <td>Basic-Programmende</td>
+            </tr>
         </table>
 
         <p>Das im folgenden abgedruckte <a href="#fehlerteufelchen" class="fehlerteufelchen_link">Programm OLD</a> sucht zuerst den Anfang der zweiten Programmzeile. Sollte das Programm durch allerlei Manipulationen schon so zerstört sein, daß diese Suche erfolglos bleibt, wird ein »STRING TOO LONG ERROR« ausgegeben. Andernfalls restauriert OLD den ersten Zeilenlinker und durchsucht dann den Textspeicher, bis die drei Nullen gefunden werden, die ein Programmende markieren. Die Endadresse wird nun noch in den Endevektor 1210/1 geschrieben und unser Mißgeschick ist repariert.</p>
@@ -99,11 +107,65 @@
 
         <address class="author">(Heimo Ponnath/ev)</address>
 
+        <figure>
+            <pre>MONITOR
+    PC  SR AC XR YR SP
+; FB000 00 00 00 00 F8
+
+. 0E000  A5 2D    LDA $2D
+. 0E002  18       CLC
+. 0E003  69 04    ADC #$04
+. 0E005  85 24    STA $24
+. 0E007  A5 2E    LDA $2E
+. 0E009  69 00    ADC #$00
+. 0E00B  85 25    STA $25
+. 0E00D  A0 00    LDY #$00
+. 0E00F  B1 24    LDA ($24),Y
+. 0E011  F0 08    BEQ $E01B
+. 0E013  C8       INY
+. 0E014  C0 A0    CPY #$A0
+. 0E016  D0 F7    BNE $E00F
+. 0E018  4C 3F 4D JMP $4D3F
+. 0E01B  C8       INY
+. 0E01C  98       TYA
+. 0E01D  A0 00    LDY #$00
+. 0E01F  18       CLC
+. 0E020  65 24    ADC $24
+. 0E022  91 2D    STA ($2D),Y
+. 0E024  85 24    STA $24
+. 0E026  90 02    BCC $E02A
+. 0E028  E6 25    INC $25
+. 0E02A  A5 25    LDA $25
+. 0E02C  C8       INY
+. 0E02D  91 2D    STA ($2D),Y
+. 0E02F  88       DEY
+. 0E030  B1 24    LDA ($24),Y
+. 0E032  AA       TAX
+. 0E033  C8       INY
+. 0E034  B1 24    LDA ($24),Y
+. 0E036  F0 07    BEQ $E03F
+. 0E038  85 25    STA $25
+. 0E03A  86 24    STX $24
+. 0E03C  38       SEC
+. 0E03D  B0 F0    BCS $E02F
+. 0E03F  A5 24    LDA $24
+. 0E041  18       CLC
+. 0E042  69 02    ADC #$02
+. 0E044  8D 10 12 STA $1210
+. 0E047  90 07    BCC $E050
+. 0E049  E6 25    INC $25
+. 0E04B  A5 25    LDA $25
+. 0E04D  8D 11 12 STA $1211
+. 0E050  60       RTS</pre>
+            <figcaption>Programm OLD. Ein NEW oder RESET versehentlich gelöschtes Basic-Programm wird mit diesem Maschinenprogramm wieder einsatzfähig.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="old fuer c 128.prg" data-name="OLD für C 128"></div>
+
         <aside class="fehlerteufelchen" id="fehlerteufelchen">
             <h2>Fehlerteufelchen</h2>
-        
+
             <p>In der dort beschriebenen »OLD«-Routine wurde vergessen, einen Vektor zu restaurieren. Damit die Routine fehlerfrei arbeitet, ist der »BCC«-Befehl in der Speicherstelle $0E047 abzuändern. Statt nach $0E050 muß nach $0E04B verzweigt werden.</p>
-        
+
             <!-- 64'er 3/1986 -->
         </aside>
     </article>

@@ -361,7 +361,7 @@
                 <td>Memory-Dump des Disketten-Monitors</td>
             </tr>
             <tr>
-                <td colspan="2">Beispiel: M (ohne weitere Eingabe) listet den Bereich des Floppy-RAM von $OOOO-$OOFF. (Es erscheint zunächst die erste Zeile, weitere Ausgabe mit der SPACE-Taste.)<p>In diesem Bereich befinden sich unter anderem die Jobspeicher ($00-$04) für die fünf Puffer 0-4, sowie die wichtigsten Variablen des DOS.</p>
+                <td colspan="2">Beispiel: M (ohne weitere Eingabe) listet den Bereich des Floppy-RAM von $0000-$00FF. (Es erscheint zunächst die erste Zeile, weitere Ausgabe mit der SPACE-Taste.)<p>In diesem Bereich befinden sich unter anderem die Jobspeicher ($00-$04) für die fünf Puffer 0-4, sowie die wichtigsten Variablen des DOS.</p>
                 </td>
             </tr>
             <tr>
@@ -848,148 +848,180 @@
         <figure>
             Folgende Zeropage-Adressen werden benutzt:
             <table class="plain">
-  <tbody>
-    <tr>
-      <td>FLAG</td>
-      <td>$AA</td>
-      <td>Universalflag</td>
-    </tr>
-    <tr>
-      <td>ADRCODE</td>
-      <td>$AB</td>
-      <td>Adressierungscode für Assembler/Disassembler</td>
-    </tr>
-    <tr>
-      <td>COMMAND</td>
-      <td>$AC</td>
-      <td>SMON-Befehlscode</td>
-    </tr>
-    <tr>
-      <td>BEFCODE</td>
-      <td>$AD</td>
-      <td>Befehlscode Ass./Disass.</td>
-    </tr>
-    <tr>
-      <td>LOPER</td>
-      <td>$AE</td>
-      <td>Low-Operand für Ass./Disass.</td>
-    </tr>
-    <tr>
-      <td>HOPER</td>
-      <td>$AF</td>
-      <td>High-Operand für Ass./Disass.</td>
-    </tr>
-    <tr>
-      <td>BEFLEN</td>
-      <td>$B6</td>
-      <td>Befehlslänge Ass./Disass.</td>
-    </tr>
-    <tr>
-      <td>PCL</td>
-      <td>$FB</td>
-      <td>SMON-Programmcounter Low-Byte</td>
-    </tr>
-    <tr>
-      <td>PCH</td>
-      <td>$FC</td>
-      <td>SMON-Programmcounter High-Byte</td>
-    </tr>
-  </tbody>
-</table>
-Außerhalb der Zeropage benutzt SMON die Bereiche:
-<table class="plain">
-  <tbody>
-    <tr>
-      <td>PCHSAVE</td>
-      <td>$02A8</td>
-      <td rowspan="7" class="vertical">dienen der Zwischenspeicherung der angegebenen Register</td>
-    </tr>
-    <tr>
-      <td>PCLSAVE</td>
-      <td>$02A9</td>
-    </tr>
-    <tr>
-      <td>SRSAVE</td>
-      <td>$02AA</td>
-    </tr>
-    <tr>
-      <td>AKSAVE</td>
-      <td>$02AB</td>
-    </tr>
-    <tr>
-      <td>XRSAVE</td>
-      <td>$02AC</td>
-    </tr>
-    <tr>
-      <td>YRSAVE</td>
-      <td>$02AD</td>
-    </tr>
-    <tr>
-      <td>SPSAVE</td>
-      <td>$02AE</td>
-    </tr>
-    <tr>
-      <td>PRINTER</td>
-      <td>$02AF</td>
-      <td>Printernummer</td>
-    </tr>
-    <tr>
-      <td>IO.NR</td>
-      <td>$02B0</td>
-      <td>Devicenummer</td>
-    </tr>
-    <tr>
-      <td>MEM</td>
-      <td>$02B1</td>
-      <td>Buffer bis $02B8</td>
-    </tr>
-    <tr>
-      <td>TRACEBUF</td>
-      <td>$02B8 bis $02BF</td>
-      <td>Buffer für Trace-Modus</td>
-    </tr>
-    <tr>
-      <td colspan="3">Dann folgen die von Diskmonitor benötigten Adressen.</td>
-    </tr>
-    <tr>
-      <td>SAVEX</td>
-      <td>$02C1</td>
-      <td>Zwischenspeicherung der X- und Y-Register</td>
-    </tr>
-    <tr>
-      <td>TMPTRCK</td>
-      <td>$02C2</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>TMPSECTO</td>
-      <td>$02C3</td>
-      <td>Zwischenspeicher für Track und Sektor</td>
-    </tr>
-    <tr>
-      <td>DCMDST</td>
-      <td>$02D0</td>
-      <td>Diskkommandostring</td>
-    </tr>
-    <tr>
-      <td>TRACK</td>
-      <td>$02D8</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>SECTO</td>
-      <td>$02DB</td>
-      <td>Track und Sektornummer</td>
-    </tr>
-    <tr>
-      <td>BUFFER</td>
-      <td>$033C bis $03FC</td>
-      <td>Buffer für Label, nur für Assembler</td>
-    </tr>
-  </tbody>
-</table>
+                <tbody>
+                    <tr>
+                        <td>FLAG</td>
+                        <td>$AA</td>
+                        <td>Universalflag</td>
+                    </tr>
+                    <tr>
+                        <td>ADRCODE</td>
+                        <td>$AB</td>
+                        <td>Adressierungscode für Assembler/Disassembler</td>
+                    </tr>
+                    <tr>
+                        <td>COMMAND</td>
+                        <td>$AC</td>
+                        <td>SMON-Befehlscode</td>
+                    </tr>
+                    <tr>
+                        <td>BEFCODE</td>
+                        <td>$AD</td>
+                        <td>Befehlscode Ass./Disass.</td>
+                    </tr>
+                    <tr>
+                        <td>LOPER</td>
+                        <td>$AE</td>
+                        <td>Low-Operand für Ass./Disass.</td>
+                    </tr>
+                    <tr>
+                        <td>HOPER</td>
+                        <td>$AF</td>
+                        <td>High-Operand für Ass./Disass.</td>
+                    </tr>
+                    <tr>
+                        <td>BEFLEN</td>
+                        <td>$B6</td>
+                        <td>Befehlslänge Ass./Disass.</td>
+                    </tr>
+                    <tr>
+                        <td>PCL</td>
+                        <td>$FB</td>
+                        <td>SMON-Programmcounter Low-Byte</td>
+                    </tr>
+                    <tr>
+                        <td>PCH</td>
+                        <td>$FC</td>
+                        <td>SMON-Programmcounter High-Byte</td>
+                    </tr>
+                </tbody>
+            </table>
+            Außerhalb der Zeropage benutzt SMON die Bereiche:
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td>PCHSAVE</td>
+                        <td>$02A8</td>
+                        <td rowspan="7" class="vertical">dienen der Zwischenspeicherung der angegebenen Register</td>
+                    </tr>
+                    <tr>
+                        <td>PCLSAVE</td>
+                        <td>$02A9</td>
+                    </tr>
+                    <tr>
+                        <td>SRSAVE</td>
+                        <td>$02AA</td>
+                    </tr>
+                    <tr>
+                        <td>AKSAVE</td>
+                        <td>$02AB</td>
+                    </tr>
+                    <tr>
+                        <td>XRSAVE</td>
+                        <td>$02AC</td>
+                    </tr>
+                    <tr>
+                        <td>YRSAVE</td>
+                        <td>$02AD</td>
+                    </tr>
+                    <tr>
+                        <td>SPSAVE</td>
+                        <td>$02AE</td>
+                    </tr>
+                    <tr>
+                        <td>PRINTER</td>
+                        <td>$02AF</td>
+                        <td>Printernummer</td>
+                    </tr>
+                    <tr>
+                        <td>IO.NR</td>
+                        <td>$02B0</td>
+                        <td>Devicenummer</td>
+                    </tr>
+                    <tr>
+                        <td>MEM</td>
+                        <td>$02B1</td>
+                        <td>Buffer bis $02B8</td>
+                    </tr>
+                    <tr>
+                        <td>TRACEBUF</td>
+                        <td>$02B8 bis $02BF</td>
+                        <td>Buffer für Trace-Modus</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Dann folgen die von Diskmonitor benötigten Adressen.</td>
+                    </tr>
+                    <tr>
+                        <td>SAVEX</td>
+                        <td>$02C1</td>
+                        <td>Zwischenspeicherung der X- und Y-Register</td>
+                    </tr>
+                    <tr>
+                        <td>TMPTRCK</td>
+                        <td>$02C2</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>TMPSECTO</td>
+                        <td>$02C3</td>
+                        <td>Zwischenspeicher für Track und Sektor</td>
+                    </tr>
+                    <tr>
+                        <td>DCMDST</td>
+                        <td>$02D0</td>
+                        <td>Diskkommandostring</td>
+                    </tr>
+                    <tr>
+                        <td>TRACK</td>
+                        <td>$02D8</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>SECTO</td>
+                        <td>$02DB</td>
+                        <td>Track und Sektornummer</td>
+                    </tr>
+                    <tr>
+                        <td>BUFFER</td>
+                        <td>$033C bis $03FC</td>
+                        <td>Buffer für Label, nur für Assembler</td>
+                    </tr>
+                </tbody>
+            </table>
             <figcaption>SMON-Speicherstellen</figcaption>
         </figure>
+
+        <figure>
+            <pre data-filename="ndisass.prg" data-name="Erweiterung Illegale Opcodes" data-mse=mse1></pre>
+            <figcaption>Listing 1. Mit dieser Erweiterung lassen sich illegale Opcodes disassemblieren</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="ndisass.prg" data-name="Erweiterung Illegale Opcodes"></div>
+
+        <figure>
+            <pre data-filename="floppymon.prg" data-name="Disketten-Monitor" data-mse=mse1></pre>
+            <figcaption>Listing 2. Komfortabler Disketten-Monitor. Bitte beachten Sie die Eingabehinweise auf Seite 54.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="floppymon.prg" data-name="Disketten-Monitor"></div>
+
+        <figure>
+            <pre data-filename="ndisass m&t.prg" data-name="Erweiterung Illegale Opcodes (M&T)" data-mse=mse1></pre>
+            <figcaption>Listing 3. Illegale Opcodes disassemblieren mit der M&amp;T-Version des SMON</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="ndisass m&t.prg" data-name="Erweiterung Illegale Opcodes (M&T)"></div>
+
+        <figure>
+            <pre data-filename="floppymon m&t.prg" data-name="Disketten-Monitor (M&T)" data-mse=mse1></pre>
+            <figcaption>Listing 4. Komfortabler Disketten-Monitor für die M&T-Version</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="floppymon m&t.prg" data-name="Disketten-Monitor (M&T)"></div>
+
+
+        <figure>
+            <pre data-filename="illegal-code.prg" data-name="Alle illegalen Opcodes" data-mse=mse1></pre>
+            <figcaption>Listing 5. Mit dem Befehl D 4000 erscheinen alle illegalen Opcodes disassembliert auf dem Bildschirm</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="illegal-code.prg" data-name="Alle illegalen Opcodes"></div>
+
     </article>
 </body>
 

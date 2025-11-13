@@ -1,0 +1,115 @@
+
+
+;smu.prg ==0801==
+   11 rem *********************************
+   12 rem *                               *
+   13 rem *             s m u             *
+   14 rem *                               *
+   15 rem *  (screen management utility)  *
+   16 rem *                               *
+   17 rem *                               *
+   19 rem *         georg krcal           *
+   20 rem *   ziegelhofstrasse 36/11/9    *
+   21 rem *   a - 1220 wien               *
+   22 rem *   telephon 22-17-724          *
+   23 rem *                               *
+   24 rem *********************************
+   25 rem
+   26 rem
+   27 rem
+   28 rem
+   29 ifs=0thens=1:load"smubu",8,1
+   30 ifs=1thens=2:load"smu.m",8,1
+   60 poke 56,144:clr
+   65 print"{clr}{grn}"chr$(14)chr$(8);:poke53280,0:poke53281,0
+   70 k$=" MA-ALT  MA-NEU UTILITY DRUCKEN   ENDE  "
+   75 fori=1to25:cd$=cd$+"{down}":fi$=fi$+"##########":ru$=ru$+"!!!!!!!!!!"
+   80 cr$=cr$+"{rght}":next
+   85 cd$="{home}"+cd$:ru$=ru$+"!!!!!":fi$=fi$+"#####"
+   90 dim b$(14),a$(24),bc%(1024)
+  100 rem **** erstellen des bildschirms
+  110 print"{down}{down}{down}{down}   ********   ***      *** ***      *** ";
+  120 print"  ***    ***  ****    **** ***      *** ";
+  130 print" ***      *** *****  ***** ***      *** ";
+  140 print"  ***         *** **** *** ***      *** ";
+  150 print"   ********   ***  **  *** ***      *** ";
+  160 print"         ***  ***      *** ***      *** ";
+  180 print" ***      *** ***      *** ***      *** ";
+  190 print"  ***    ***  ***      ***  ***    ***  ";
+  200 print"   ********   ***      ***   ********   ";
+  210 print"{down}"tab(6)"   SCREEN{$a0}MANAGEMENT{$a0}UTILITY"
+  220 print
+  230 printtab(12)"{down}von  Georg Krcal"
+  240 printtab(13)"Wien, Mai 1985":ifxthen250
+  242 printleft$(cd$,24)"          BITTE TASTE DRUECKEN         {up}{up}"
+  243 poke198,0:wait198,1:poke198,0
+  244 sys9*4096
+  250 printleft$(cd$,24)k$;:x=1
+  390 rem kommandoentgegennahme
+  400 s$=left$(k$,x-1)+"{rvon}"+mid$(k$,x,8)+"{rvof}"+right$(k$,33-x)
+  405 printleft$(cd$,24)s$"{up}{up}";
+  410 wait203,63
+  420 getg$:ifg$="j"then460
+  430 ifg$<>chr$(13)then410
+  440 x=x+8:ifx>=40thenx=1
+  450 goto400
+  460 printleft$(cd$,24)"                                       {up}{up}"
+  470 x=(x-1)/8+1:on x goto 480,500,900,670,471
+  471 print"{clr}";:end
+  480 printleft$(cd$,24)"Alter Dateiname {CBM-J}                {CBM-L}{up}{up}"
+  490 !inline 23,17,16,an$:h$=an$:gosub 2000:an$=h$:ifan$=""then490
+  500 printleft$(cd$,24)"Neuer Dateiname {CBM-J}                {CBM-L}{up}{up}"
+  510 !inline 23,17,16,nn$:h$=nn$:gosub 2000:nn$=h$:ifnn$=""then510
+  520 printleft$(cd$,24)"                                       {up}{up}"
+  530 printleft$(cd$,24)"Geraetenummer {CBM-J}   {CBM-L}{up}{up}"
+  540 !inline 23,15,3,gn$:h$=gn$:gosub 2000:gn$=h$:ifgn$=""then540
+  550 gn=val(gn$):if(gn<>1andgn<4)orgn>255then530
+  555 printleft$(cd$,24)"                                       {up}{up}"
+  560 if x=2 then sys12*4096:goto640:rem neue maske
+  580 !mask an$,gn,b$(0):!screen b$(0)
+  590 fori=1to255:cd=peek(39445+i):cr=peek(39700+i):fe=peek(39955+i)
+  600 ch=peek(40210+i):ifcd=128then630
+  610 h$=fi$:iffe=1thenh$=ru$
+  620 printleft$(cd$,cd+1)spc(cr)left$(h$,ch):next:ifx=4thenreturn
+  630 ifx=4thenreturn
+  640 sys49162:nn$="@:"+nn$+",s,w"
+  650 sys49589,nn$,gn:rem maske analysieren und auf peripherie
+  652 ifpeek(832)=0thenprint"{clr}";:goto100
+  654 h$="!":ifpeek(832)=1thenh$="#"
+  656 printleft$(cd$,24)"FEHLER: "h$" - Feld >255 Zeichen - SPACE{$a0}tasten";
+  658 h=len(nn$)-6:nn$=mid$(nn$,3,h)
+  660 getg$:ifg$=""then660
+  662 printleft$(cd$,24)"                                                     {up}{up}"
+  664 goto640
+  670 printleft$(cd$,24)"Dateiname {CBM-J}                {CBM-L}{up}{up}"
+  680 !inline 23,11,16,an$:h$=an$:gosub 2000:an$=h$:ifan$=""then670
+  690 gosub 520
+  700 fori=0to24:a$(i)="":forj=0to39:bc=peek(1024+i*40+j)
+  710 ifbc>127theng$="":goto725
+  715 ifbc<65andbc>31theng$=chr$(bc):goto725
+  717 ifbc<31orbc>96theng$=chr$(bc+64):goto725
+  720 g$=chr$(bc+32)
+  725 a$(i)=a$(i)+g$:nextj,i
+  730 open4,4,7:rem drucker
+  740 print#4,"   0         1         2         3"
+  750 print#4,"   0....5....0....5....0....5....0....5...."
+  755 print#4
+  760 fori=0to22:h$=str$(i):h$=right$(h$,(len(h$)-1))
+  770 iflen(h$)=1thenh$="0"+h$
+  780 a$(i)=h$+" "+a$(i)
+  790 print#4,a$(i):next
+  800 close 4:rem drucker schliessen
+  810 print"{clr}";:goto100
+  900 printleft$(cd$,24)"Geraetenummer {CBM-J}   {CBM-L}{up}{up}"
+  910 !inline 23,15,3,gn$:h$=gn$:gosub 2000:gn$=h$:ifgn$=""then910
+  920 gn=val(gn$):if(gn<>1andgn<4)orgn>255then900
+  930 printleft$(cd$,24)"                                       {up}{up}"
+  940 open8,gn,1
+  950 poke 183,7:poke187,169:poke188,2
+  960 poke 681,64:poke682,58:poke683,83:poke684,77:poke685,85:poke686,66
+  970 poke687,85:poke251,0:poke252,144
+  980 poke 781,23:poke782,154:poke780,251:sys65496
+ 1000 close8:print"{clr}";:goto100
+ 2000 forj=len(h$)to1step-1:ifmid$(h$,j,1)=" "thennext
+ 2010 h$=left$(h$,j):return
+
