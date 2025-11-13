@@ -67,6 +67,72 @@
 
         <p><strong>Die Kontroll-Leitungen</strong>: Dieser Bus dient zur Steuerung des EPROM-Zustandes. Man kann damit das EPROM auf Programmieren, Lesen oder Stand-By schalten. Zudem dient dieser Bus dazu, die Programmierspannung ein- und auszuschalten. Für den Aufbau des EPROM-Programmiergerätes sind die Signale des Kontroll-Bus besonders wichtig, im Bild 2 sind deshalb die Zustände der Steuerleitungen in Abhängigkeit von der Betriebsart beispielsweise bei einem 2764 EPROM abgebildet.</p>
 
+        <figure><table>
+  <tr>
+    <th>Mode/Pins</th>
+    <th><span style="text-decoration: overline">CE</span><br>(20)</th>
+    <th><span style="text-decoration: overline">OE</span><br>(22)</th>
+    <th><span style="text-decoration: overline">PGM</span><br>(27)</th>
+    <th>V<sub>PP</sub><br>(1)</th>
+    <th>V<sub>CC</sub><br>(28)</th>
+    <th>Outputs<br>(11–13, 15–19)</th>
+  </tr>
+
+  <tr>
+    <td>Read</td>
+    <td>L</td>
+    <td>L</td>
+    <td>H</td>
+    <td>V<sub>CC</sub></td>
+    <td>V<sub>CC</sub></td>
+    <td>D<sub>OUT</sub></td>
+  </tr>
+
+  <tr>
+    <td>Standby</td>
+    <td>H</td>
+    <td>X</td>
+    <td>X</td>
+    <td>V<sub>CC</sub></td>
+    <td>V<sub>CC</sub></td>
+    <td>High Z</td>
+  </tr>
+
+  <tr>
+    <td>Program</td>
+    <td>L</td>
+    <td>X</td>
+    <td>L</td>
+    <td>V<sub>PP</sub></td>
+    <td>V<sub>CC</sub></td>
+    <td>D<sub>IN</sub></td>
+  </tr>
+
+  <tr>
+    <td>Program Verify</td>
+    <td>L</td>
+    <td>L</td>
+    <td>H</td>
+    <td>V<sub>PP</sub></td>
+    <td>V<sub>CC</sub></td>
+    <td>D<sub>OUT</sub></td>
+  </tr>
+
+  <tr>
+    <td>Program Inhibit</td>
+    <td>H</td>
+    <td>X</td>
+    <td>X</td>
+    <td>V<sub>PP</sub></td>
+    <td>V<sub>CC</sub></td>
+    <td>High Z</td>
+  </tr>
+</table>
+
+<p>X kann sowohl L als auch H sein</p>
+            <figcaption>Bild 2. Zusammenhang zwischen Betriebsart und Zustand der Steuerleitungen</figcaption>
+        </figure>
+
         <p><strong><span style="text-decoration: overline">OE</span> (Output Enable)</strong>: Eine logische »0« an diesem Eingang des EPROM ermöglicht in Verbindung mit den Signalen <span style="text-decoration: overline">CE</span> und <span style="text-decoration: overline">PGM</span> ein Lesen des EPROM-Inhaltes. Während des Programmierzyklus ist der Zustand dieser Leitung ohne Bedeutung (kann 0 oder 1 sein).</p>
 
         <p><strong><span style="text-decoration: overline">CE</span> (Chip Enable)</strong>: Ist diese Leitung logisch »1«, so befindet sich das EPROM im Stand-By-Modus, das heißt, alle Ein- und Ausgänge werden in einen hochohmigen Zustand geschaltet. Dies ermöglicht den direkten Anschluß des EPROM an den Systembus. Eine logische »0« ermöglicht den Zugriff sowohl im Programmier- als auch im Lesemodus.</p>
@@ -86,6 +152,293 @@
         <h2>Die Frage der EPROM-Typen</h2>
 
         <p>Es gibt EPROM-Programmierer, die nahezu jeden EPROM-Typ programmieren können. Da unser EPROM-Brenner jedoch für den Einsatz am C 64 gedacht ist, genügt es, wenn er die EPROM-Typen programmieren und lesen kann, die an diesem Computer am häufigsten Anwendung finden. Das hat den Vorteil, daß man den EPROM-Programmierer kostengünstig herstellen kann. Meistens benötigt man EPROMs, die das Betriebssystem ersetzen, statt des Basic-ROMs eingesetzt werden, oder als Steckmodul im Bereich $8000 bis $A000 eingeblendet werden. Da alle diese Bereiche 8 KByte Speicher umfassen (wie auch die Betriebssystem ROMs der 1541 Floppy), ist dafür vor allem der Typ 2764 geeignet, der in letzter Zeit auch noch sehr billig geworden ist. Für größere Anwendungen (lange Programme, 16 KByte Steckmodule, Einsatz von Umschaltmodulen gibt es bis 128 KByte) kommt noch der Typ 27128 (16 KByte) oder 27256 (32 KByte) in Frage. Zum Austausch des Zeichensatzes kann man dann noch 4 KByte EPROMs vom 2532 oder 2732 verwenden. Der Einsatz weiterer Typen ist im Regelfall nicht nötig und auch wirtschaftlich unsinnig, da vor allem die 27XX-Reihe zur Zeit fast überall sehr preiswert gehandelt wird. Bislang sind wir noch nie auf ein Problem gestoßen, das sich nicht mit den oben genannten EPROM-Typen (Bild 3) lösen ließe.</p>
+
+<figure>
+<table>
+  <thead>
+    <tr>
+      <th>2532</th>
+      <th>2732A</th>
+      <th>2764A</th>
+      <th>27128A</th>
+      <th>27256</th>
+      <th>27512</th>
+      <th>PIN</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td>V<sub>PP</sub></td>
+      <td>V<sub>PP</sub></td>
+      <td>V<sub>PP</sub></td>
+      <td>V<sub>PP</sub></td>
+      <td>A<sub>15</sub></td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>A<sub>12</sub></td>
+      <td>A<sub>12</sub></td>
+      <td>A<sub>12</sub></td>
+      <td>A<sub>12</sub></td>
+      <td>A<sub>12</sub></td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>A<sub>7</sub></td>
+      <td>A<sub>7</sub></td>
+      <td>A<sub>7</sub></td>
+      <td>A<sub>7</sub></td>
+      <td>A<sub>7</sub></td>
+      <td>A<sub>7</sub></td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>A<sub>6</sub></td>
+      <td>A<sub>6</sub></td>
+      <td>A<sub>6</sub></td>
+      <td>A<sub>6</sub></td>
+      <td>A<sub>6</sub></td>
+      <td>A<sub>6</sub></td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>A<sub>5</sub></td>
+      <td>A<sub>5</sub></td>
+      <td>A<sub>5</sub></td>
+      <td>A<sub>5</sub></td>
+      <td>A<sub>5</sub></td>
+      <td>A<sub>5</sub></td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>A<sub>4</sub></td>
+      <td>A<sub>4</sub></td>
+      <td>A<sub>4</sub></td>
+      <td>A<sub>4</sub></td>
+      <td>A<sub>4</sub></td>
+      <td>A<sub>4</sub></td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>A<sub>3</sub></td>
+      <td>A<sub>3</sub></td>
+      <td>A<sub>3</sub></td>
+      <td>A<sub>3</sub></td>
+      <td>A<sub>3</sub></td>
+      <td>A<sub>3</sub></td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>A<sub>2</sub></td>
+      <td>A<sub>2</sub></td>
+      <td>A<sub>2</sub></td>
+      <td>A<sub>2</sub></td>
+      <td>A<sub>2</sub></td>
+      <td>A<sub>2</sub></td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>A<sub>1</sub></td>
+      <td>A<sub>1</sub></td>
+      <td>A<sub>1</sub></td>
+      <td>A<sub>1</sub></td>
+      <td>A<sub>1</sub></td>
+      <td>A<sub>1</sub></td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <td>A<sub>0</sub></td>
+      <td>A<sub>0</sub></td>
+      <td>A<sub>0</sub></td>
+      <td>A<sub>0</sub></td>
+      <td>A<sub>0</sub></td>
+      <td>A<sub>0</sub></td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>O<sub>0</sub></td>
+      <td>O<sub>0</sub></td>
+      <td>O<sub>0</sub></td>
+      <td>O<sub>0</sub></td>
+      <td>O<sub>0</sub></td>
+      <td>O<sub>0</sub></td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <td>O<sub>1</sub></td>
+      <td>O<sub>1</sub></td>
+      <td>O<sub>1</sub></td>
+      <td>O<sub>1</sub></td>
+      <td>O<sub>1</sub></td>
+      <td>O<sub>1</sub></td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>O<sub>2</sub></td>
+      <td>O<sub>2</sub></td>
+      <td>O<sub>2</sub></td>
+      <td>O<sub>2</sub></td>
+      <td>O<sub>2</sub></td>
+      <td>O<sub>2</sub></td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <td>GND</td>
+      <td>GND</td>
+      <td>GND</td>
+      <td>GND</td>
+      <td>GND</td>
+      <td>GND</td>
+      <td>14</td>
+    </tr>
+  </tbody>
+</table>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>PIN</th>
+      <th>27512</th>
+      <th>27256</th>
+      <th>27128A</th>
+      <th>2764A</th>
+      <th>2732A</th>
+      <th>2532</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>28</td>
+      <td>V<sub>CC</sub></td>
+      <td>V<sub>CC</sub></td>
+      <td>V<sub>CC</sub><br><span style="text-decoration: overline">PGM</span></td>
+      <td>V<sub>CC</sub><br><span style="text-decoration: overline">PGM</span></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>A<sub>14</sub></td>
+      <td>A<sub>14</sub></td>
+      <td>A<sub>13</sub></td>
+      <td>N.C.</td>
+      <td>V<sub>CC</sub></td>
+      <td>V<sub>CC</sub></td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>A<sub>13</sub></td>
+      <td>A<sub>13</sub></td>
+      <td>A<sub>13</sub></td>
+      <td>N.C.</td>
+      <td>V<sub>CC</sub></td>
+      <td>V<sub>CC</sub></td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>A<sub>8</sub></td>
+      <td>A<sub>8</sub></td>
+      <td>A<sub>8</sub></td>
+      <td>A<sub>8</sub></td>
+      <td>A<sub>8</sub></td>
+      <td>A<sub>8</sub></td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>A<sub>9</sub></td>
+      <td>A<sub>9</sub></td>
+      <td>A<sub>9</sub></td>
+      <td>A<sub>9</sub></td>
+      <td>A<sub>9</sub></td>
+      <td>A<sub>9</sub></td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>A<sub>11</sub></td>
+      <td>A<sub>11</sub></td>
+      <td>A<sub>11</sub></td>
+      <td>A<sub>11</sub></td>
+      <td>A<sub>11</sub></td>
+      <td>V<sub>PP</sub></td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>OE/V<sub>PP</sub></td>
+      <td><span style="text-decoration: overline">OE</span></td>
+      <td><span style="text-decoration: overline">OE</span></td>
+      <td><span style="text-decoration: overline">OE</span></td>
+      <td>OE/V<sub>PP</sub></td>
+      <td><span style="text-decoration: overline">CE</span></td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>A<sub>10</sub></td>
+      <td>A<sub>10</sub></td>
+      <td>A<sub>10</sub></td>
+      <td>A<sub>10</sub></td>
+      <td>A<sub>10</sub></td>
+      <td>A<sub>10</sub></td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td><span style="text-decoration: overline">CE</span></td>
+      <td><span style="text-decoration: overline">CE</span></td>
+      <td><span style="text-decoration: overline">CE</span></td>
+      <td><span style="text-decoration: overline">CE</span></td>
+      <td><span style="text-decoration: overline">CE</span></td>
+      <td>A<sub>11</sub></td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>O<sub>7</sub></td>
+      <td>O<sub>7</sub></td>
+      <td>O<sub>7</sub></td>
+      <td>O<sub>7</sub></td>
+      <td>O<sub>7</sub></td>
+      <td>O<sub>7</sub></td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>O<sub>6</sub></td>
+      <td>O<sub>6</sub></td>
+      <td>O<sub>6</sub></td>
+      <td>O<sub>6</sub></td>
+      <td>O<sub>6</sub></td>
+      <td>O<sub>6</sub></td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>O<sub>5</sub></td>
+      <td>O<sub>5</sub></td>
+      <td>O<sub>5</sub></td>
+      <td>O<sub>5</sub></td>
+      <td>O<sub>5</sub></td>
+      <td>O<sub>5</sub></td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>O<sub>4</sub></td>
+      <td>O<sub>4</sub></td>
+      <td>O<sub>4</sub></td>
+      <td>O<sub>4</sub></td>
+      <td>O<sub>4</sub></td>
+      <td>O<sub>4</sub></td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>O<sub>3</sub></td>
+      <td>O<sub>3</sub></td>
+      <td>O<sub>3</sub></td>
+      <td>O<sub>3</sub></td>
+      <td>O<sub>3</sub></td>
+      <td>O<sub>3</sub></td>
+    </tr>
+  </tbody>
+</table>
+    <figcaption>Bild 3. Die Anschlußbelegungen der verwendeten EPROM-Typen</figcaption>
+</figure>
 
         <h2>Das Konzept des 64'er EPROMmers</h2>
 
