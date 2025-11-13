@@ -57,7 +57,7 @@ while IFS='|' read -r original correction rest; do
         correction_escaped=$(printf '%s\n' "$correction" | sed 's/[[\.*^$()+?{|]/\\&/g')
 
         echo "Replacing on line $line_num: '$word' -> '$correction'"
-        sed -i.tmp "${line_num}s/$word_escaped/$correction_escaped/g" "$TARGET_FILE"
+        sed -i.tmp "${line_num}s/[[:<:]]$word_escaped[[:>:]]/$correction_escaped/g" "$TARGET_FILE"
         rm -f "$TARGET_FILE.tmp"
     else
         # No line number, apply to all occurrences
@@ -66,7 +66,7 @@ while IFS='|' read -r original correction rest; do
         correction_escaped=$(printf '%s\n' "$correction" | sed 's/[[\.*^$()+?{|]/\\&/g')
 
         echo "Replacing globally: '$original' -> '$correction'"
-        sed -i.tmp "s/$original_escaped/$correction_escaped/g" "$TARGET_FILE"
+        sed -i.tmp "s/[[:<:]]$original_escaped[[:>:]]/$correction_escaped/g" "$TARGET_FILE"
         rm -f "$TARGET_FILE.tmp"
     fi
 
