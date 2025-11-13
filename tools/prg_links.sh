@@ -62,7 +62,7 @@ for D64_FILE in "${D64_FILES[@]}"; do
         txtfile="${prgfile%.prg}.txt"
 
         # Run petcat
-        petcat -2 "$prgfile" > "$txtfile" 2>&1
+        petcat "$prgfile" > "$txtfile" 2>&1
 
         # Read the output
         header=""
