@@ -8,8 +8,19 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-# All arguments are D64 files
-D64_FILES=("$@")
+# All arguments are D64 files - convert to absolute paths
+D64_FILES=()
+for file in "$@"; do
+    # Convert to absolute path
+    if [[ "$file" = /* ]]; then
+        # Already absolute
+        D64_FILES+=("$file")
+    else
+        # Make it absolute
+        D64_FILES+=("$(cd "$(dirname "$file")" && pwd)/$(basename "$file")")
+    fi
+done
+
 # Hardcoded output directory
 OUTPUT_DIR="prg"
 
@@ -30,7 +41,7 @@ for D64_FILE in "${D64_FILES[@]}"; do
     # Extract all files from D64 into tmp
     echo "  Extracting files..." >&2
     cd "$TMP_DIR"
-    c1541 "../../$D64_FILE" -extract >/dev/null 2>&1
+    c1541 "$D64_FILE" -extract >/dev/null 2>&1
 
     # Add .prg suffix to all extracted files in tmp
     echo "  Adding .prg suffix to extracted files..." >&2
