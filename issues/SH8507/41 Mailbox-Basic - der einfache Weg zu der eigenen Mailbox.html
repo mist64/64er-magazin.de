@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mailbox-Basic - der einfache Weg zu der eigenen Mailbox</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="R. Horstmann, aw">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="41-44">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Mailbox-Basic - der einfache Weg zu der eigenen Mailbox</h1>
+        <p class="intro">Selbst gemacht ist immer noch am besten. Mit dieser speziellen Mailbox-Sprache brauchen Sie sich um die Bedienung der RS232<sup>chnittstelle</sup> keine Gedanken mehr zu machen.</p>
+
+        <p>Die Mailboxen schießen wie Pilze aus dem Bo'den. Darunter gibt es gute, aber auch schlechte, vor allem aber teure. Viele Mailboxen sind deshalb teuer, weil sie die zur Verfügung stehenden Möglichkeiten nicht richtig ausnutzen. So kommt es vor, daß immer wieder Wartezeiten entstehen, weil das Programm des Mailbox-Computers die geforderten 300 Baud nicht schafft. Mit Mailbox-Basic sind Sie in der Lage, eine schnelle eigene Mailbox zu schreiben. Eine einfache Mailbox ist meistens rasch geschrieben, so daß sie wenigstens im »trockenen«, also ohne Telefonanschluß, funktioniert. Um aber tatsächlich einen solchen »Briefkasten« am Telefonnetz zu betreiben, wird das Ganze schon schwieriger, denn die Hauptsache, die sehr zeitkritische RS232-Ein/Ausgabe fehlt noch. Dort treten dann die ersten Probleme auf. Wie wandelt man die Commodore- in ASCII-Zeichen um? Wie simuliert man einen Textspeicher? Wie umgeht man die Garbage Collection? Abhilfe bringt »Mailbox-Basic«, das diese und noch mehr Funktionen erfüllt.</p>
+
+        <p>Mailbox-Basic (siehe Listing 1) ist eine kleine Basic-Erweiterung, die 12 neue Befehle zur Verfügung stellt, welche dann die gesamte RS232-Steuerung übernehmen. Die Befehle kann man einfach und ohne Probleme in ein bereits bestehendes Programm implementieren.</p>
+
+        <h2>Viele Möglichkeiten</h2>
+
+        <p>Und hier die neuen Befehle:</p>
+
+        <h3>!PRINTA${,X,C,S]</h3>
+
+        <p>Dies ist ein umgewandelter PRINT-Befehl, der den Inhalt des Strings (hier A$) auf dem Bildschirm und auf die RS232-Schnittstelle (natürlich in ASCII-Fbrm) ausgibt. Außerdem gibt es verschiedene Parametereinstellungen, die bestimmte Abbruch- und Stoppfunktionen nicht zulassen. Hierbei gilt:<br>
+            1 = Abbruch zugelassen<br>
+            0 = Abbruch nicht zugelassen</p>
+
+        <p>Die Parameterreihenfolge<br>
+            !PRINT A$,CTRL/X,CTRL/C,CTRL/S<br>
+            wird beispielsweise so geschrieben:<br>
+            !PRINT A$,0,1,1.<br>
+            Bei diesem Beispiel wird der CTRL/X-Abbruch verhindert, der CTRL/C-Abbruch und der CTRL/S-Stopp ermöglicht. Bei einem CTRL/S-Signal stoppt die Ausgabe für 120 Sekunden (bei Normalparametern). Dieser Stopp wird auch auf dem Bildschirm angezeigt (siehe Bildschirmanzeige).<br>
+            !PRINT A$ (ohne Parameter)<br>
+            Hier werden folgende Standardparameter gesetzt: CTRL/X-Abbruch und CTRL/S-Stopp möglich, das entspricht !PRINT A$,1,0,1. Die gesamten Abbruchroutinen bleiben nur so lange erhalten, wie sich der Computer in dieser Maschinen-Routine befindet (siehe !WAIT). Erfolgt ein Abbruch, so wird das entsprechende Bit in der Statusvariable gesetzt.</p>
+
+        <h3>!WAIT A$ [X,C,S]</h3>
+
+        <p>Im Prinzip entspricht dieser Befehl dem !PRINT-Befehl. Im Gegensatz zu !PRINT springt !WAIT wieder ins Basic, wenn der RS232-Ausgabepuffer geleert ist, das heißt, wenn alle Daten über das Telefon geschickt worden sind. Daher bleiben die Abbruchmöglichkeiten bis zuletzt erhalten. Das Warten in der !WAIT-Routine wird auf dem Bildschirm angezeigt (siehe Bildschirmanzeigen). Die Parametermöglichkeiten entsprechen denen des !PRINT-Befehls.</p>
+
+        <h3>!INPUT A$ [,A [,Z1 [,Z2 ]]]</h3>
+
+        <p>Hiermit wird eine Zeichenkette bis zu einem Return mit maximal »A« Zeichen Länge eingelesen, wobei (im Normalzustand) das Eingabegerät sowohl die Tastatur als auch die RS232-Schnittstelle sein kann. Ein Abbruch aus dieser Routine ist auch durch Drücken der CTRL/X-Taste möglich. Es gibt hier ein Eingabe-Timeout, das heißt wenn 60 Sekunden lang kein Zeichen eingegeben wird, springt die Routine zurück ins Basic und es wird ein Bit in der Statusvariable gesetzt. Der bis dahin eingegebene Text wird in einem String abgelegt. Übernommen werden nur die Standard-ASCII-Zeichen, alle anderen werden ignoriert. Hier gibt es ebenfalls Möglichkeiten zur Parametereingabe:<br>
+            Zum Beispiel: !INPUT A$<br>
+            Hier wird eine Eingabe von maximal 253 Zeichen gefordert. Sind diese erreicht, bricht die Routine beim nächsten eingegebenen Zeichen mit einem Return ab.<br>
+            !INPUT A$,100<br>
+            Hier wird die höchste zu übernehmende Zeichenzahl von 253 auf 100 Zeichen gesenkt.<br>
+            !INPUT A$,20,ASC(.)<br>
+            Hier werden höchstens 20 Zeichen übernommen, allerdings wird statt den eingegebenen Zeichen ein ».« (Punkt) auf die RS232-Schnittstelle gesendet. Die eingegebenen Zeichen bleiben im String erhalten (Anwendung: Paßwortabfrage).<br>
+            !INPUT A$,20,ASC(.),ASC(?)<br>
+            Hier wird zusätzlich statt dem eingegebenen Zeichen ein »?« auf dem Bildschirm ausgegeben.</p>
+
+        <h3>Programmbeispiel (Namenseingabe):</h3>
+
+        <p>10 A$=CHR$(38)+CHR$(224)<br>
+            20 OPEN,2,2,A$<br>
+            30 !WAIT "Dein Name = >"<br>
+            40 !INPUT A$,20<br>
+            50 !PRINT "Dein Name ist"<br>
+            60 !WAIT A$<br>
+            70 CLOSE2</p>
+
+        <p>Durch Verwendung von !WAIT vor !INPUT bleiben die Abbruchfunktionen bis zuletzt erhalten. Auch tritt dann die Eingabe-Timeout-Abfrage erst in Kraft, wenn der RS232-Teilnehmer den gesamten Text erhalten hat.</p>
+
+        <h2>8188 Byte Pufferspeicher</h2>
+
+        <h3>!PUFFER L</h3>
+
+        <p>Mit diesem Befehl werden bis zu 8188 Zeichen (ohne daß eines davon verloren geht) in einen internen Puffer eingelesen. Eingabegerät ist hier die Tastatur und/oder die RS232-Schnittstelle. Diese Routine übernimmt so lange Zeichen bis sie »&hellip;« + Return als Enderkennung erhält und übergibt dann die Länge des eingegebenen Textes in die Variable »TL«. Durch Drücken der CTRL/X-Taste oder durch ein Eingabe-Timeout wird diese Routine verlassen; die Enderkennung »&hellip;« + Return wird dabei selbständig vom Programm in den Puffer abgelegt, damit der bis dahin eingegebene Text noch weiter verwendet werden kann. Die Länge des einzulesenden Textes kann durch eine nachfolgende Variable festgelegt werden (hier »L«), Der interne Puffer beginnt bei $A000 (40960) und geht bis $BFFF (49151) und kann mit dem nächsten Befehl leicht ausgelesen werden.</p>
+
+        <h3>!GET AD,A$</h3>
+
+        <p>Durch diese Sequenz wird der interne Puffer ab der angegebenen Adresse (hier: AD) nach einem Return durchsucht, und dann in einen String übergeben.</p>
+
+        <h3>Programmbeispiel:</h3>
+
+        <p>110 A$=CHR$(38)+CHR$(224)<br>
+            120 OPEN2,2,2,A$<br>
+            130 !PUFFER 8188<br>
+            140 A$="DerText:"<br>
+            150 !WAIT A$+CHR$(13)<br>
+            160 AD=40960<br>
+            170 !GET AD,A$<br>
+            180 IF A$="&hellip;'THEN 220<br>
+            190 AD=AD+LEN(A$)<br>
+            200 !PRINT A$+CHR$(13)<br>
+            210GOTO 170<br>
+            220 !WAIT"Das war’s."<br>
+            230 CLOSE2</p>
+
+        <h3>!GET# F,A$ [L [, A ]]</h3>
+
+        <p>Hier wird eine Zeichenkette der bestimmten Länge »L«, oder bis zu einem bestimmten Abbruchzeichen »A« von dem durch die Dateinummer »F« angesprochenen Gerät eingelesen und in einen String übergeben. Zur Erkennung, wie der String zustande kam, das heißt, ob es ein Abbruch wegen erreichter Länge oder wegen erreichtem Abbruchzeichen war, werden entsprechende Bits in die Statusvariablen gesetzt.</p>
+
+        <p>Zum Beispiel: !GET# Dateinummer,A$. Es werden 255 Zeichen von dem Eingabegerät eingelesen. Das Abbruchzeichen wird automatisch auf 255 festgelegt.<br>
+            !GET # Dateinummer,A$,10<br>
+            Genau 10 Zeichen werden eingelesen.<br>
+            !GET # Dateinummer,A$,255,13<br>
+            Hier werden 255 Zeichen eingelesen, sofern sich kein Endkennzeichen mit dem CHR$-Wert 13 findet.</p>
+
+        <h3>Programmbeispiel:</h3>
+
+        <p>10 A$=CHR$(38)+CHR$(224)<br>
+            20 OPEN2,2,2,A$<br>
+            30 A$='Text,S,R"<br>
+            40 OPEN 1,8,2,A$<br>
+            50 !GET#1,A$,255,13<br>
+            60 !WAIT A$<br>
+            70 IF ST AND 64 THEN 50<br>
+            80 CLOSE2</p>
+
+        <h3>!CLR</h3>
+
+        <p>Die Statusvariable »RS« wird bei gesetztem »kein Carrier«-Bit zurückgesetzt (siehe Carrier).</p>
+
+        <h3>!RON/!ROFF</h3>
+
+        <p>Schaltet die Ausgabe auf die RS232-Schnittstelle ein/aus. Bei !ROFF fallen sämtliche Timeouts sowie die Carrierabfrage weg (siehe Carrier).</p>
+
+        <h3>!CON/!COFF</h3>
+
+        <p>Schaltet die Carrierabfrage ein/aus (siehe Carrier).</p>
+
+        <h2>Timeouts</h2>
+
+        <h3>!SET S,E,C1,C2</h3>
+
+        <p>Hiermit können alle Timeouts verändert werden.<br>
+            S = CTRL/S-Timeout: Timeout bei Betätigen der CTRL/S-Taste (1 bis 255 Sekunden). Bei 0 gibt es kein Timeout. E = Eingabetimeout: Timeout bei jeglicher Eingabeforderung (1 bis 255 Sekunden). Bei 0 gibt es kein Timeout.<br>
+            C1 = Maximale Durchlaufzeit der Carrierabfrageroutine (2 bis 255 Sekunden)<br>
+            C2 = Wie lange muß ein bestehendes Carrier gefunden werden, damit das Programm fortfährt (1 bis 30 Sekunden). C1 muß größer als C2 sein.</p>
+
+        <p class="source">Kaltstart: Bei der Eingabe von SYS 49152 werden folgende Einschaltzustände gesetzt:<br>
+            !SET 120,60,30,2<br>
+            !RON /!CON /!CLR</p>
+
+        <p class="source">Carrier: Fehlt das Carriersignal bei einer RS232-Ein/Ausgabe (User-Port:PB4 Pin H = 1 oder Bit4 in 56577 = 1), so springt das Programm in eine Carrier-Suchroutine, in der es (bei Normalparametern) 30 Sekunden lang ein zwei Sekunden langes Carrier-Signal sucht. Wird dies nach 30 Sekunden nicht gefunden, wird das »kein Carrier«-Bit in der Statusvariablen »RS« gesetzt. Spätere RS232-Ein/Ausgabeversuche sind zwecklos, da das entsprechende Programm sofort wieder ins Basic zurückspringt. Man kann allerdings mit !CLR das »kein Carrier«-Bit wieder löschen.</p>
+
+        <p>Statusvariable »RS«: Sie ist dafür zuständig, alle Rückmeldungen der angesprungenen Routinen in das Basic zu übergeben.</p>
+
+        <h3>Bit:</h3>
+
+        <p>TODO</p>
+
+        <p>76543210 (wennBitX=1)<br>
+            10000000 = kein Carrier<br>
+            1000000 = RS232 an<br>
+            100000 = Eingabetimeout erreicht (bei !INPUT/!PUFFER)<br>
+            10000 = interner Puffer voll (bei !PUFFER)<br>
+            1000 = bei !GET#Dateinr.,A$ max. Zeichenzahl erreicht<br>
+            100 = bei !GET#Dateinr.,A$ Abbruchzeichen gefunden<br>
+            10 = CTRL/C-Abbruch<br>
+            1 = CTRL/X-Abbruch</p>
+
+        <p>Beispiel einer Abfrage:<br>
+            IF RS AND 2t1 THEN GOTO<br>
+            (wenn CTRL/C-Abbruch erfolgt, verzweige)</p>
+
+        <p class="source">Bildschirmanzeige: Zur Kontrolle, in welcher Routine sich der Computer zur Zeit befindet, werden folgende Zustände rechts oben auf dem Bildschirm ausgegeben: »&lt;-WCSIT->«</p>
+
+        <p>TODO TABLE</p>
+
+        <p>W = Programm befindet sich in der !WAIT-Routine<br>
+            C = Carrier fehlte momentan und der Computer befindet sich in der Carrier-Suchroutine<br>
+            S = Die CTRL/S-Taste wurde betätigt<br>
+            I = Der Computer befindet sich in einer Eingabeanforderung<br>
+            T = Ein Timeout ist bei dem laufenden Befehl festgesetzt</p>
+
+        <p>Wenn keine der Funktionen angesprochen ist, zeigt der Computer »&lt;&mdash;&ndash;>« auf dem Bildschirm an. Nach dem Verlassen der Routine wird der frühere Bildschirminhalt wieder hergestellt.</p>
+
+        <p class="source">Funktionstastenbelegung: Zur besseren Übersicht wurden folgende Funktionstasten mit CHR$-Codes für eine einfachere Mailbox-Steuerung belegt.</p>
+
+        <p>F1 = CTRL/X<br>
+            F3 = CTRL/C<br>
+            F5 = CTRL/S<br>
+            F7 = CTRL/Q<br>
+            F8 = simuliert ein fehlendes Carrier (Anwendung: gewollter Rauswurf aus der Mailbox)</p>
+
+        <p class="source">Cursor: Das Programm besitzt einen eigenen stehenden Cursor (kleiner Strich), der dem Benutzer immer die aktuelle Position bei einer Ein/Ausgabe anzeigt (bei !PRINT /!WAIT /!INPUT/!PUFFER).</p>
+
+        <p>Zum Schluß noch ein paar technische Daten. Das Programm belegt nach dem Starten zirka 2,5 KByte im $C000 (49152)-Bereich, also keinen Basic-Speicherplatz. Der interne Puffer (für !PUFFER) hat eine Länge von genau 8 KByte und liegt ab $A000 (40690) bis $BFFF (49151). Die gesamten Routinen sind für eine 7 Daten-Bit Host-Ein/Ausgabe mit beliebiger Baudrate (50 bis 2400 Baud) ausgelegt; das achte Bit bei einer 8 Daten-Bit-Ausgabe wird einfach ignoriert. Die Ausgabe wird wie gewöhnlich durch den Open-Befehl eingestellt (wieviel Daten-Bits, welche Baudrate). Die zur RS232-Übertragung möglichen Zeichen sind auf die normalen ASCII-Zeichen und alle Zeichen unter dem CHR$-Code 32 festgelegt. Allerdings werden ein Teil dieser Codes, wegen ihrer Steuerzeichenfunktion (CRSR-HOME, CRSR-UP/DOWN) nicht auf dem Bildschirm ausgegeben.</p>
+
+        <h2>Garant</h2>
+
+        <p>Diese Routinen halten, wenn richtig eingesetzt, das, was sie versprechen. Der beste Beweis hierfür ist wohl der praktische Einsatz einer Mailbox. In diesem Falle ist das die ACM-Club e.V.-Mailbox in München (089/8120338), die nun schon seit etwa sechs Monaten mit diesen Routinen einwandfrei arbeitet. Rufen Sie doch einmal an und verschaffen sich einen Eindruck von der Leistungsfähigkeit des Mailbox-Basic.</p>
+
+        <address class="author">(R. Horstmann/aw)</address>
+    </article>
+</body>
+
+</html>

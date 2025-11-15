@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Disketten-Verwaltung</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Omerzu, tr">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="73-77">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Disketten-Verwaltung</h1>
+        <p class="intro">Viele kennen dieses Problem: Man hat 50 Disketten mit 400 Programmen. Jetzt noch ein bestimmtes Programm zu finden, kann ohne Computerunterstützung zurabendfüllenden Beschäftigung werden. Der Disk-Manager übernimmt diese Aufgabe für Sia</p>
+
+        <p>Der Disk-Manager (siehe Listing) wurde als Programm-Katalog konzipiert, der es erlauben soll, ein gesuchtes Programm durch Eingabe des Namens binnen kürzester Zeit zu finden.</p>
+
+        <p>Der Disk-Manager ist in der Lage, bis zu 300 Directories mit insgesamt bis zu 6500 File-Einträgen auf einer einzigen Diskettenseite zu speichern und zu verwalten. Trotz dieser hohen Speicherkapazitätwirdjedes Programm in wenigerals 30 Sekunden gefunden und durch Ausgabe des Diskettennamens spezifiziert.</p>
+
+        <p>Um diese hohe Geschwindigkeit zu erreichen, wurden relative Files in Kombination mit »Hash-Codes« verwendet.</p>
+
+        <p>Wie funktioniert das Programm? Zunächst einmal besitzt der Disk-Manager einen Menüpunkt »Directory einlesen &amp; speichern«. Dieser Programmteil dientdazu, alle Disketteninhaltsverzeichnisse, die verwaltet werden sollen, einzulesen und in relativen Dateien auf der Disk-Manager-Datendiskette zu speichern. Sind erst einmal alle Disketten gespeichert, ist das Programm voll einsatzbereit: Mit dem Menüpunkt 1 wählen Sie die Programmsuche an und geben auf die Frage nach dem Programmnamen den Titel des gesuchten Files ein. Spätestens nach 30 Sekunden (meistens schon nach fünf bis zehn Sekunden) nennt Ihnen der Disk-Manager den Namen der Diskette(n) auf der beziehungsweise auf denen das gesuchte Programm gespeichert ist.</p>
+
+        <p>Aber wie schafft es der Disk-Manager nun, aus dieser Menge von Programmen (immerhin sind bis zu 6500 möglich) in so kurzer Zeit das Gesuchte herauszufinden? Nun, durch Verwendung einer Programmiertechnik, die speziell für solche Fälle konzipiert wurde. Kern dieser Technik ist eine sogenannte Hash-Funktion, die aus dem Suchbegriff (hier: der gesuchte Programmname) den Schlüsselcode berechnet.</p>
+
+        <h2>Tempo durch Hash-Codes</h2>
+
+        <p>Der Disk-Manager verwendet zwei solcher Hash-Funktionen (siehe Programmlisting Zeilen 100 bis 250, Hash-Funktion 1 und 2).</p>
+
+        <p>Findet das Programm beim Einlesen eines Directories zum Beispiel den Programmnamen »HUGO«, so springt es mit GOSUB 100 die Hash-Funktion 1 an. Hier wird nun in einer FOR-NEXT-Schleifejedem Buchstaben des Strings »HUGO« der entsprechende ASCII-Wert zugeordnet, mit 26 multipliziert und zu den Zahlenwerten der übrigen Buchstaben addiert; Das Ergebnis ist dann eine Zahl zwischen 0 und 6500 (=maximale Fileanzahl).</p>
+
+        <p>Der errechnete Hash-Code wird dann in der Variablen id an das Hauptprogramm übergeben. Für »HUGO« ergibt sich id=3930. Der Disk-Manager speichert daher den Namen »HUGO« im Datensatz Nummer 3930. Wird später das Programm »HUGO« gesucht, so führt der Disk-Manager einfach die Hash-Code-Berechnung für »HUGO« durch, erhält wiederum id=3930, sieht im Datensatz Nummer 3930 auf der Datendiskette nach und findet dort die Informationen über das gesuchte File. Ist jedoch der entsprechende Datensatz leer, so ist das der Hinweis darauf, daß noch kein entsprechendes Programm gespeichert wurde.</p>
+
+        <p>Die Directory-Namen sind nach demselben Prinzip wie die Programmnamen in einem zweiten relativen File eingeordnet. Hier wird jedoch eine andere Hash-Funktion verwendet, um als Hash-Code eine Zahl zwischen 0 und 300 zu erhalten.</p>
+
+        <p>Die Datensätze sind untereinander durch Zeiger verknüpft. Jeder Directory-Datensatz enthält neben dem Diskettennamen, der Disk-ID und der Anzahl der freien Blöcke die Nummer des ersten Programmdatensatzes im Directory.</p>
+
+        <p>Entsprechend enthält jeder Programm-Datensatz außer dem Programmnamen noch die Datensatznummer des im Directory nachfolgenden Programms sowie die Nummer des dazugehörigen Directories.</p>
+
+        <h2>6500 Programme gleichzeitig</h2>
+
+        <p>Nun aber zur Bedienung des Programms: Beim ersten Programmstart wird man zweckmäßigerweise den Menüpunkt 7 zum Anlegen einer neuen Datendiskette anwählen. Legen Sie eine <strong>leere</strong> Diskette ins Floppy-Laufwerk und beantworten Sie die Sicherheitsabfrage, ob eine neue Datendiskette angelegt werden soll, mit »j«. Die Diskette wird dann für die Benutzung durch den Disk-Manager vorbereitet: sie wird formatiert(!), das Programm wird gespeichert und die Datenfiles werden angelegt. Dieser Vorgang dauert zirka acht Minuten, danach meldet sich das Programm mit dem Hauptmenü zurück. Mit Hilfe des Menüpunktes 6 (Speicherinfo) können Sie sich von nun ab stets über die aktuelle Speichersituation auf Ihrer Datendiskette informieren. Nach der Neuanlage erhalten Sie eine Meldung über 6501 freie Programm- und 301 freie Diskettendatensätze. Zur Speicherung dieser Information benutzt das Programm übrigens die Speicherstellen 200 bis 209 in Track 18 Sektor 0. Diese Speicherstellen sind normalerweise unbenutzt und mit chr$(0) gefüllt.</p>
+
+        <p>Mit Hilfe von Menüpunkt 2 lassen sich nun die Disketteninhaltsverzeichnisse einlesen und speichern. Voraussetzung für die korrekte Speicherung ist, daß alle Disketten verschiedene Namen tragen, andernfalls erhalten Sie die Meldung »Diskette XYZ wurde bereits gespeichert«, und die Speicherung wird abgebrochen. Zur Identifikation der Diskette wird nur der Teil des Diskettenkopfes verwendet, der in Hochkommata steht.</p>
+
+        <p>Das Einlesen und Speichern eines Directories dauert, je nach Anzahl der Directory-Einträge und Auslastungsgrad der Datenfiles, zirka eine halbe bis fünf Minuten. Wenn Sie also beabsichtigen, Ihre gesamte Diskettensammlung zu speichern, so ergibt das durchaus schon eine abendfüllende Beschäftigung. Besitzern von Compilern sei gesagt, daß eine Compilierung nicht möglich ist. Es ergeben sich Probleme bei der Arbeit mit den relativen Dateien. Sollten Siejemals bei der Speicherung die Meldung »Speicherung nicht möglich. Speicherplatz erschöpft.« erhalten, so haben Sie entweder versehentlich eine falsche Diskette ins Laufwerk gelegt, oder Sie haben 300 Disketten oder 6500 Files gespeichert. Hier noch ein Rat: Die Speicherkapazität der Datenfiles sollte nach Möglichkeit nur zu maximal 80% ausgelastet werden, da es sonst, bedingt durch die Hash-Code-Technik, zu wesentlich längeren Wartezeiten, insbesondere bei der Speicherung kommt.</p>
+
+        <p>Durch Anwahl von Menüpunkt 1 lassen sich, wie oben beschrieben, Programme durch Angabe des Namens suchen. Die Verwendung von »Jokern« wie » * « oder »?« ist jedoch unzulässig. Falls sich das gesuchte Programm auf mehreren Disketten befindet, werden alle Diskettentitel ausgegeben, die Ausgabe kann jedoch durch Drücken einer beliebigen Taste unterbrochen werden.</p>
+
+        <p>Mit Menüpunkt 3 kann man sich ein gespeichertes Directory ansehen. Geben Sie dazu den Namen der Diskette ein. Die Bildschirmausgabe kann auch hier durch Druck auf eine beliebige Taste abgebrochen werden.</p>
+
+        <p>Menüpunkt 4 löscht ein gespeichertes Directory. Auch hier muß nur der Diskettenname eingegeben werden.</p>
+
+        <p>Menüpunkt 5 dagegen löscht ein einzelnes Programm aus der Datei.</p>
+
+        <address class="author">(Thomas Omerzu/tr)</address>
+    </article>
+</body>
+
+</html>

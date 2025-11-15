@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Aktien-Manager, die grafische Datenverwaltung</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Björn Fiethe, aw">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="144-153">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Aktien-Manager, die grafische Datenverwaltung</h1>
+        <p class="intro">Verfolgen Sie auf verschiedenen Grafik-Bildschirmen, wie sich Ihre finanzielle Lage entwickelt. Am Beispiel einer Aktienkursverwaltung wird gezeigt, wie aus trockenen Zahlen interessante Übersichten entstehen.</p>
+
+        <p>Dieses Programm ist als kommerzielles Programm zur Beobachtung, Darstellung und Auswertung von Aktienkursen mehrerer Unternehmen an vier verschiedenen Börsen konzipiert worden. Es läßt sich aber auch für andere Zwecke im Privatbereich einsetzen (zum Beispiel tägliche Ausgaben oder Einnahmen in vier verschiedenen Bereichen).</p>
+
+        <p>Die eingegebenen Daten können mit diesem Programm (Listing) sowohl zur Einzelbetrachtung als Zahlenwerte, aber auch zur anschaulichen Darstellung mit verschieden langen Zeiträumen als Grafik, auf Bildschirm und Drucker, ausgegeben werden. Bei vollständiger Menüsteuerung durch die Funktionstasten bestehen insgesamt 231 verschiedene Kombinationsmöglichkeiten zur Datenausgabe!</p>
+
+        <p>Das Programm zeichnet sich durch einige Besonderheiten aus. So erfolgt die Ausgabe der Zahlenwerte formatiert (bei der Eingabe braucht also kein Format beachtet zu werden), derComputerwähltimmerden größtmöglichen Darstellungsraum bei einer Grafikaus und das Programm bietet vier besondere Grafik-Ergänzungen zur Vereinfachung der Auswertung (Berechnen der Monatsdurchschnitte und Hoch-Tief-Werte sowie Einzeichnen der Wendepunkte und des 1OO-Tage-Durchschnitts).</p>
+
+        <p>Für die grafische Ausgabe der Werte wird am Programmanfang eine Grafik-Erweiterung in den Bereich $C000 bis $C568 geladen. Auch die mögliche Druckerroutine für den Grafikausdruck muß in den Bereich $C700 bis $C800 geladen werden (beide Erweiterungen finden Sie in dieser Ausgabe direkt hinter dem Programm »Wahlanalyse«). Einen anderen Bereich in Page 12 läßt die Grafik-Erweiterung nicht zu und im normalen RAM ($0800 bis $9FFF) sollte die Routine möglichst nicht gespeichert werden, weil es dann zu Speicherplatzproblemen mit dem Hauptprogramm kommen kann. Aus diesem Grund sollten auch die REM-Zeilen im Programm nicht mit abgetippt werden.</p>
+
+        <p>Als Beispiel wird in dem aufgelisteten Programm die Routine »DCOPY« für den MPS-802 geladen und aufgerufen!</p>
+
+        <p>Mit diesem Programm lassen sich die Aktienkurse und -Umsätze verschiedener Unternehmen an den Börsen Frankfurt, Hamburg, Hannover und Düsseldorf (als Beispiel) genau beobachten und vergleichen.</p>
+
+        <p>Natürlich kann das Programm nach kleinen Änderungen an den Ein- und Ausgabe-Routinen (Bild 1) auch zum Darstellen von Werten aus ganz anderen Bereichen benutzt werden (zum Beispiel Benzinkosten, Temperatur, &hellip;).</p>
+
+        <p>Zum Ausdruck des Grafik-Bildschirms muß die zum jeweiligen Druckerpassende Routineim Bereich $C700-$C800 gespeichert sein (Grafik liegt im Bereich $E000 bis $FFFF).</p>
+
+        <p>Die eingegebenen Werte werden nach Unternehmen und Monat getrennt als sequentielle Dateien auf Disketten abgespeichert.</p>
+
+        <p>Das Programm ist vollständig menügesteuert, aber trotzdem noch einige Hinweise zur richtigen Bedienung:</p>
+
+        <p>Bei Fragen, die mit Ja oder Nein beantwortet werden, darf nur J oder N eingegeben werden.</p>
+
+        <p>Die Fragen »Weiter?« und »Drucker an?« sind Wartefragen, bei denen das Drücken der RETURN-Taste bedeutet, daß der Computer mit dem Programm fortfährt.</p>
+
+        <p>Auch nach dem Erstellen einer Grafik wird durch Drücken der RETURN-Taste mit dem Programm fortgefahren.</p>
+
+        <p>Wird ein Ausdruck des angezeigten Grafikbildschirms gewünscht, muß vorher bei der Frage »Tabulator:?« ein Wert zwischen 0 und 40 eingegeben werden (0=linke / 40=rechte Hälfte einer Seite. Wenn mit der verwendeten Drucker-Routine keine Tab-Funktion möglich ist, Abfrage überspringen!)</p>
+
+        <p>Bei Eingabe der Kurse ist zu beachten, daß die Datumsangaben immer zweistellig erfolgen müssen, der Dezimalpunkt (kein Komma eingeben!), vorangestellte und nachfolgende Nullen nicht mit eingegeben zu werden brauchen.</p>
+
+        <p>Wenn der Computer rechnet oder Kurse von Diskette eingelesen werden, wird in der rechten oberen Ecke »Warten« angezeigt.</p>
+
+        <p>Jetzt folgt noch die Erklärung der einzelnen Auswahlmöglichkeiten in der Programm-Reihenfolge.</p>
+
+        <p>Nach der Eingabe des Firmenkürzels der Firma, deren Aktienkurse bearbeitet werden sollen, folgt das Hauptmenü.</p>
+
+        <p>Im Hauptmenü bestehen folgende Auswahlmöglichkeiten, die danach mit ihren Untermenüs erklärt werden:</p>
+
+        <h3>1. Kurse eingeben/ändern</h3>
+
+        <p>Hier bestehen verschiedene Möglichkeiten zur Kurseingabe:</p>
+
+        <ul>
+            <li>Kurse neu eingeben: Wird normalerweise zur Kurseingabe benutzt. Dazu muß das Kursdatum später als das letzte vorhandene Datum sein. Deshalb Kurse möglichst immer in aufsteigender Reihenfolge des Datums mit diesem Menüpunkt eingeben (letztes Datum läßt sich durch Aufrufen der aktuellen Kurse (siehe Punkt 2) feststellen).</li>
+            <li>Kurse nachträglich ändern: Bei nachträglich notwendigen Änderungen, können nach Eingabe des Datums alle Werte geändert werden.</li>
+            <li>Kurse einfügen: Liegt das Kursdatum zwischen schon vorhandenen Kursen, muß zur Kurseingabe diese Funktion aufgerufen werden.</li>
+            <li>Datei überspielen: Die Kurse von jeweils einem Monat können auf eine andere Diskette überspielt werden (Diskette muß vorher formatiert werden).</li>
+        </ul>
+
+
+        <h3>2. Tägliche Übersicht</h3>
+
+        <p>Bei dieser Funktion werden immer nur Kurse und Umsätze von Tagen gezeigt.</p>
+
+        <ul>
+            <li>Aktuelle Kurse: Die letzten fünf Tage werden ausgewählt.</li>
+            <li>Kurse eines Tages: Tageskurse und Kurse der zwei vorhergehenden und nachfolgenden Tage werden gezeigt.</li>
+            <li>Kurse einer Woche: Anfangstag deranzuzeigenden Woche muß eingegeben werden.</li>
+        </ul>
+
+
+        <p>Nach diesen Eingaben muß man wählen, ob alle Kurse und Umsätze als Zahlenwerte oder Kurse und Umsätze einer Börse als Grafik (Bild 3) ausgegeben werden sollen (bei Grafik-Auswahl zwischen den vier Börsen und Commerzbank-Index/Gesamtumsatz). Bei Ausgabe als Zahlenwerte muß noch eingegeben werden, ob der Höchst- und Tiefstkurs und die Gesamtumsätze des ganzen zuletzt aufgeführten Jahres oder nur die des aufgelisteten Zeitraums ausgegeben werden sollen. Nach der jeweiligen Ausgabeform kommt man nicht wieder zum Hauptmenü, sondern kann unter Beibehaltung des vorher eingegebenen Zeitraums eine andere Darstellungsform wählen (oder zum Hauptmenü zurück).</p>
+
+        <h3>3. Übersicht</h3>
+
+        <p>Hier können verschiedene Zeiträume und Darstellungsvarianten ausgewählt werden:</p>
+
+        <ul>
+            <li>Freier Zeitraum: Variable Auswahl des Zeitraums, siehe 3.1</li>
+            <li>Monat: Kurse eines Monats können ausgewählt werden (auch unvollständiger letzter Monat möglich).</li>
+            <li>Jahr: Kurse eines Jahres (auch unvollständig), siehe 3.2</li>
+            <li>Jahre: Gesamter Zeitraum der Diskette wird benutzt, siehe 3.2</li>
+        </ul>
+
+
+        <h3>3.1 Zeitraum festlegen</h3>
+
+        <p>Bei freiem Zeitraum gibt es weitere Auswahlmöglichkeiten:</p>
+
+        <ul>
+            <li>Alle gespeicherten Tage: Alle Kurse werden ausgewählt (wie bei Jahre)</li>
+            <li>Zeitraumanfang eingeben: Anfangstag und Zeitraumlänge in Tagen (Anfangstag mitgerechnet) müssen eingegeben werden.</li>
+            <li>Zeitraumende eingeben: Zeitraumlänge in Tagen (Endtag mitgerechnet) und Endtag eingeben.</li>
+        </ul>
+
+
+        <h3>3.2 Jährlichen Zeitraum festlegen</h3>
+
+        <p>Bei Jahr/Jahre gibt es folgende weitere Auswahlmöglichkeiten:</p>
+
+        <ul>
+            <li>Monats-Durchschnitt: Hier wird fürjeden Monat des eingegebenen Zeitraums ein Durchschnittswert für jede Börse errechnet und statt der normalen Werte angezeigt (Bild 3).</li>
+            <li>Kontinuierlich: Alle Werte des eingegebenen Zeitraums werden normal ausgegeben.</li>
+            <li>Monats-Hoch-Tief: Wie bei Durchschnitt wird für jeden Monat der höchste und tiefste Wert ausgerechnet und als Balkengrafik oder Zahlenwerte (Reihenfolge: Tief, Hoch) ausgegeben (Bild 4).</li>
+        </ul>
+
+
+        <p>Nach all diesen verschiedenen Auswahlmöglichkeiten kommt man immer zur Auswahl der Darstellungsmöglichkeiten:</p>
+
+        <ul>
+            <li>Zahlenwerte: Alle Kurse und Umsätze werden aufgelistet (siehe auch Punkt 2)</li>
+            <li>Kursgrafik: Darstellung der Kurse oder des Commerzbank-Index (auch zum Darstellen der Durchschnitts- und Hoch-Tief-Werte).</li>
+            <li>Umsatzgrafik: Darstellung der Umsätze der einzelnen Börsen oder der Gesamtumsätze.</li>
+            <li>Hauptmenü: Zurückzum Hauptmenü, wenn neuer Zeitraum ausgewählt werden soll.</li>
+        </ul>
+
+
+        <p>Zu diesem Menü kommt man nach erfolgter jeweiliger Darstellung immer zurück, um die Werte des vorher eingegebenen Zeitraums anders darzustellen.</p>
+
+        <p>Wenn Kursgrafik als Ausgabeform gewählt wurde, können nach der normalen Darstellung noch weitere Erweiterungen eingegeben werden (Bild 5).</p>
+
+        <ul>
+            <li>Durchschnitt: Einzeichnen des 100-Tage-Durchschnitts in die Grafik (gestrichelte Linie in Bild 5). Dieser Durchschnitt berechnet sich aus den 20 letzten Kursen des Wochentages, bei dem dann der errechnete Wert eingezeichnet wird (20*5=100; Börsen haben nur Montag bis Freitag geöffnet).</li>
+            <li>Wendepunkte: Wendepunkte der angezeigten Grafik werden verbunden.</li>
+        </ul>
+
+
+        <p>Sollen beide Erweiterungen eingezeichnet werden, muß zuerst Wendepunkte und dann Durchschnitt aufgerufen werden.</p>
+
+        <h3>4. Programmende</h3>
+
+        <p>Die Grafik-Erweiterung wird ausgeschaltet.</p>
+
+        <p>Noch ein Tip: Wenn die alte Diskette voll ist (weniger als 10 freie Blöcke), sollten die letzten 3 bis 4 Monate auf die neue (vorher formatierte) Diskette überspielt werden, bevor man weitere Kurse eingibt. Dadurch bekommt man einen fließenden Übergang beim Diskettenwechsel (Daten können immer nur von einer Diskette eingelesen werden).</p>
+
+        <p>Das Programm fängt die meisten Bedienungsfehler auf. Nach dem Beseitigen des Fehlers (zum Beispiel falsche Diskette eingelegt) und Drücken von RETURN wird mit dem Programm fortgefahren. Auch Programmfehler werden angezeigt.</p>
+
+        <p>Da der C 64 keine eigenen Grafikbefehle hat, muß in dem Programm auf eine Maschinensprache-Erweiterung (siehe eigener Artikel in dieser Ausgabe) zurückgegriffen werden. Diese wird mit einem Monitor oder dem MSE ab $0000 eingegeben und danach als »GRAFIK-E/MS« abgespeichert.</p>
+
+        <p>Nun kann das eigentliche Programm abgetippt, gespeichert und gestartet werden. Es lädt dann zuerst die Erweiterung und die mögliche Drucker-Routine.</p>
+
+        <p>Noch ein Hinweis: Nach dem Programmabbruch mit der STOP-Taste darf das Programm nicht wieder ganz von vorne gestartet werden, ohne vorher die Grafik-Erweiterung mit - E auszuschalten!</p>
+
+        <address class="author">(Björn Fiethe/aw)</address>
+    </article>
+</body>
+
+</html>

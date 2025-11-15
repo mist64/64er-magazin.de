@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Wahlhochrechnung</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Björn Fiethe, aw">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="154-158">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Wahlhochrechnung</h1>
+        <p class="intro">Da wird selbst die trockenste Bundestagswahl zum interessanten Erlebnis. Aber auch bei Schulwahlen und Clubsitzungen leistet dieses Programm wertvolle Dienste.</p>
+
+        <p>Wenn die Fernsehanstalten ARD und ZDF am Wahlsonntagabend ab 18 Uhr ihre Hochrechnungsschlacht austragen, kann man mit diesem Programmlisting endlich mitmischen. Durch die Mittelwertbildung aus den letzten beiden Hochrechnungen werden wahrscheinlich genauere Ergebnisse erzielt, als wenn die Hochrechnungen der beiden Sender nur getrennt betrachtet werden. Außerdem können mit diesem Programm das alte Ergebnis, die eingegebenen Hochrechnungen und das Endergebnis abgespeichert und als Grafik auf Bildschirm oder Drucker ausgegeben werden.</p>
+
+        <p>Die aus dem Fernsehen bekannten drei zur Verfügung stehenden Balkengrafiken sind zwar nicht dreidimensional, zeichnen sich aber dafür (oder gerade deshalb) durch gute Ables- und Vergleichbarkeit aus.</p>
+
+        <p>Die Eingabe der Hochrechnungen von ARD und ZDF erfolgt in Echtzeit, also genau zu dem Zeitpunkt, zu dem sie auch im Fernsehen gezeigt werden. Dazu läuft die Uhr des Computers sichtbar mit.</p>
+
+        <p>Die Grafik-Erweiterung (Beachten sie den Artikel Grafik-DCopy in dieser Ausgabe) zu diesem Programm erlaubt es, daß trotz der hohen Auflösung von 320x200 Punkten die einzelnen Parteien in verschiedenen Farben dargestellt werden können. Auch die Hintergrundfarbe der Grafiken kann im Programm durch Ändern des Wertes hinter dem Befehl —G (siehe Anleitung zur Grafik-DCopy in dieser Ausgabe) geändert werden.</p>
+
+        <p>Diese Grafik-Erweiterung wird am Programmanfang in den Bereich $C000 bis $C568 geladen. Auch die Druckerroutine für den Grafikausdruck sollte in den Bereich $C700 bis $C800 geladen werden (beide Erweiterungen finden Sie in einem eigenen Artikel in dieser Ausgabe). Einen anderen Bereich in Page 12 läßt die Grafik-Erweiterung nicht zu. Allerdings kann die Routine auch im oberen Bereich des Basic-RAMs gespeichert werden, nur muß sie dann vor Überschreiben geschützt sein (als Beispiel wird in dem aufgelisteten Programm die Routine »DCOPY« für einen MPS-802 Drucker geladen und gestartet!).</p>
+
+        <p>Das Wahlhochrechnungsprogramm berechnet nach jeder Eingabe der Hochrechnungs-Prozentzahlen den Mittelwert zwischen den letzten zwei Hochrechnungen und auf Wunsch auch die zu den Prozentzahlen proportionale Sitzverteilung. Damit wird die Wahrscheinlichkeit erhöht, daß schon eine frühe Hochrechnung mit dem Endergebnis übereinstimmt.</p>
+
+        <p>Zur Darstellung der Werte stehen drei Balken-Grafiken zur Verfügung: Prozente alt und neu (Bild 1), Gewinn und Verlust (Bild 2), neue Sitzverteilung mit Vergleich zur alten (Bild 3). Durch einen Trick können trotz der hohen Auflösung mehrere Farben in der Grafik dargestellt werden. Zum Ausdrucken des Grafik-Bildschirms wird eine druckerspezifische Routine im Bereich $C700 bis $0800 oder im oberen Bereich des Basic-RAMs benötigt (der Grafikspeicher liegt im Bereich $E000 bis $FFFF). Die im Programm geladene und gestartete Routine ist als Beispiel zu verstehen.</p>
+
+        <p>Nun noch einige Bedienungshinweise zum Programm.<br>
+            Nachdem noch einmal eine kurze Bedienungsanleitung gezeigt wird, wird gefragt, ob alte schon abgespeicherte Wahldateien betrachtet und ausgewertet werden sollen, oder eine neue Wahlhochrechnung angefangen wird.</p>
+
+        <p>Soll eine alte Datei geladen werden, muß zuerst der Wahlname eingegeben werden (kann auch mit »*« abgekürzt werden). Dann erscheint eine Auflistung der verschiedenen Hochrechnungen mit Nummern. Paßt die ganze Liste nicht auf den Bildschirm, wird die Auflistung erst einmal angehalten und kann durch Drücken der Space-Taste wieder gestartet werden. Soll eine Hochrechnung zur grafischen Darstellung ausgewählt werden, muß die davorstehende Zahl mit beiden Stellen eingegeben werden (ohne RETURN). Zu dieser Auflistung kommt man auch, wenn man bei der Real-Time-Hochrechnungseingabe »G« für Grafik drückt.</p>
+
+        <p>Allgemein muß bei der Eingabe von Prozentzahlen beachtet werden, daß die vorgegebene Stelle des Punktes und des Prozent-Zeichens nicht verändert wird. Auch die Nullen darf man nicht löschen, wenn sie nicht gebraucht werden.</p>
+
+        <p>Bei der Eingabe der alten Sitzverteilung dürfen Überhangmandate nicht mit eingegeben werden. Natürlich müssen die Verhältnisse der Sitze mit denen der Prozentzahlen übereinstimmen, da der Computer sonst nicht richtig rechnet. Er berechnet die Sitze nämlich nur nach dem Verhältniswahlrecht aus den Zweitstimmen (wie die anderen Hochrechnungscomputer auch). Deshalb können sich kleinere Abweichungen zum Endergebnis ergeben, auch wenn die Prozentzahlen übereinstimmen.</p>
+
+        <p>Da der C 64 keine Grafikbefehle hat, muß auf eine Maschinensprache-Erweiterung zurückgegriffen werden. Diese wird mit einem Monitor oder mit dem MSE ab $C000 eingegeben und danach als »GRAFIK-E/MS« abgespeichert.</p>
+
+        <p>Nun kann das Basic-Programm abgetippt, gespeichert und gestartet werden. Es lädt dann zuerst die Erweiterung und die mögliche Drucker-Routine.</p>
+
+        <p>Nach dem Programmabbruch mit der STOP-Taste darf das Programm nicht wieder ganz von vorne gestartet werden, ohne vorher die Erweiterung mit ←E auszuschalten!</p>
+
+        <address class="author">(Björn Fiethe/aw)</address>
+    </article>
+</body>
+
+</html>
