@@ -1,0 +1,405 @@
+
+
+;quicksort.src.prg ==0801==
+   10 sys36864:.opt p,oo:*= 52000
+   20 laenge1 = $b2
+   30 laenge2 = $b5
+   40 str1    = $b3
+   50 str2    = $b6
+   55 umult1  = $28
+   56 umult2  = $71
+   57 umult   = $b357
+   58 aarray  = $2f
+   59 vektor1 = $fb
+   60 vektor2 = $fd
+  100            jsr regset
+  101            ldx #0
+  102 marke1     lda laenge1,x
+  103            sta 700,x
+  104            inx
+  105            cpx #6
+  106            bne marke1
+  110            jsr hauptschl
+  111            ldx #0
+  112 marke2     lda 700,x
+  113            sta laenge1,x
+  114            inx
+  115            cpx #6
+  116            bne marke2
+  117            rts
+  130 ;
+  140 hauptschl  jsr hochz
+  145            jsr hollr
+  150            jsr lrvergl
+  160            cmp #0
+  170            beq z350
+  180            cmp #2
+  190            beq z350
+  195            jsr holxy
+  210            jsr evindi
+  220 z270       jsr xyvergl
+  230            cmp #2
+  240            beq z330
+  250 z280       jsr exindi
+  260            jsr einspr
+  270            cmp #2
+  280            beq z290
+  285            cmp #0
+  286            beq z290
+  290            jsr hochx
+  300            jmp z280
+  310 z290       jsr eyindi
+  320            jsr einspr
+  330            cmp #1
+  340            beq z300
+  345            cmp #0
+  346            beq z300
+  350            jsr runtery
+  360            jmp z290
+  370 z300       jsr xyvergl
+  380            cmp #2
+  390            beq z330
+  400            jsr swap
+  410            jsr hochx
+  420            jsr runtery
+  430            jmp z270
+  435 ;
+  440 z330       jsr pushly
+  460            jsr hauptschl
+  470 ;
+  480            jsr pushxr
+  500            jsr hauptschl
+  510 ;
+  940 z350       jmp runterz
+ 1005 ;
+ 1010 ;    vergleich str1 mit vergl$
+ 1011 ;1) str1<vergl  2) str1>vergl
+ 1015 ;
+ 1020 einspr    ldy #$ff
+ 1030 schl1     iny
+ 1040           cpy laenge1
+ 1050           bne weiter1
+ 1060           lda #1
+ 1070           jmp raus
+ 1080 weiter1   cpy laenge2
+ 1090           bne weiter2
+ 1100           lda #2
+ 1110           jmp raus
+ 1120 weiter2   lda (str1),y
+ 1130           cmp (str2),y
+ 1140 beq schl1
+ 1150           bcc weiter3+1
+ 1160           lda #2
+ 1170 weiter3   bit $1a9 ;maskierung fuer lda #1
+ 1200           rts
+ 1210 raus      ldx laenge1
+ 1220           cpx laenge2
+ 1230           bne fertig
+ 1240           lda #0
+ 1250 fertig    rts
+ 1260 ;
+ 1270 ;    vergleichen von x und y
+ 1275 ;x>y lda #2  x<y lda #1  x=y lda #0
+ 1280 ;
+ 1290 xyvergl   lda xreg+1
+ 1300           cmp yreg+1
+ 1310           bne weiter4
+ 1320           lda xreg
+ 1330           cmp yreg
+ 1340           beq gleich+1
+ 1350 weiter4   bcs groesser+1
+ 1360           lda #1
+ 1370 gleich   .byt $2c,$a9,0 ;bit $00a9
+ 1380 groesser  bit $2a9
+ 1390           rts
+ 1400 ;
+ 1410 ;    vergleichen von l und r
+ 1415 ;l>r lda #2  l<r lda #1  l=r lda #0
+ 1420 ;
+ 1430 lrvergl   lda lreg+1
+ 1440           cmp rreg+1
+ 1450           bne weiter5
+ 1460           lda lreg
+ 1470           cmp rreg
+ 1480           beq gleich+1
+ 1490 weiter5   bcs groesser+1
+ 1500           lda #1
+ 1510           rts
+ 1985 ;
+ 1990 ; register hoch- ung runterzaehlen
+ 1995 ;
+ 2000 hochz     clc
+ 2020           lda zreg
+ 2030 adc #4
+ 2040           sta zreg
+ 2050           lda zreg+1
+ 2060           adc #0
+ 2070           sta zreg+1
+ 2090           rts
+ 2100 runterz   sec
+ 2120           lda zreg
+ 2130           sbc #4
+ 2140           sta zreg
+ 2150           lda zreg+1
+ 2160           sbc #0
+ 2170           sta zreg+1
+ 2190           rts
+ 2200 hochx     clc
+ 2220           lda xreg
+ 2230           adc #1
+ 2240           sta xreg
+ 2250           lda xreg+1
+ 2260           adc #0
+ 2270           sta xreg+1
+ 2290           rts
+ 2300 runtery   sec
+ 2320           lda yreg
+ 2330           sbc #1
+ 2340           sta yreg
+ 2350           lda yreg+1
+ 2360           sbc #0
+ 2370           sta yreg+1
+ 2390           rts
+ 2985 ;
+ 2990 ; die mit x/y indizierte variable
+ 2991 ; wird gesucht z.b. ( a$(x) )
+ 2995 ;
+ 3000 xsuch     lda xreg
+ 3010           asl
+ 3015           tax
+ 3020           lda xreg+1
+ 3030           jsr prg1
+ 3040           adc xreg
+ 3050           tax
+ 3060           tya
+ 3070           adc xreg+1
+ 3080           jmp prg2
+ 3100 ysuch     lda yreg
+ 3110           asl
+ 3115           tax
+ 3120           lda yreg+1
+ 3130           jsr prg1
+ 3131           adc yreg
+ 3132           tax
+ 3133           tya
+ 3134           adc yreg+1
+ 3135           jmp prg2
+ 3140 vsuch     lda vergl
+ 3150           asl
+ 3155           tax
+ 3160           lda vergl+1
+ 3170           jsr prg1
+ 3171           adc vergl
+ 3172           tax
+ 3173           tya
+ 3174           adc vergl+1
+ 3175           jmp prg2
+ 3200 prg1      rol
+ 3210           tay
+ 3220           txa
+ 3230           clc
+ 3240           rts
+ 3250 prg2      tay
+ 3260           clc
+ 3270           txa
+ 3280           adc #7
+ 3281           tax
+ 3282           tya
+ 3283           adc #0
+ 3284           tay
+ 3285           clc
+ 3286           txa
+ 3290           adc aarray
+ 3300           sta vektor1
+ 3310           tya
+ 3320           adc aarray+1
+ 3330           sta vektor1+1
+ 3340           rts
+ 3985 ;
+ 3990 ;swap - vertauschen zweier strings
+ 3995 ;
+ 4000 swap      jsr xsuch
+ 4010           lda vektor1
+ 4020           sta vektor2
+ 4030           lda vektor1+1
+ 4040           sta vektor2+1
+ 4050           jsr ysuch
+ 4060           ldy #0
+ 4070 schl2     lda (vektor1),y
+ 4080           tax
+ 4090           lda (vektor2),y
+ 4100           sta (vektor1),y
+ 4110           txa
+ 4120           sta (vektor2),y
+ 4130           iny
+ 4140           cpy #3
+ 4150           bne schl2
+ 4160           rts
+ 4985 ;
+ 4990 ;     vergl = (xreg+yreg)/2
+ 4995 ;
+ 5000 rechnung  clc
+ 5010           lda xreg
+ 5020           adc yreg
+ 5030           sta vergl
+ 5040           lda xreg+1
+ 5050           adc yreg+1
+ 5060           lsr
+ 5070           sta vergl+1
+ 5080           ror vergl
+ 5090           rts
+ 5100 ;
+ 5110 ;register auf ausgangswerte setzen
+ 5120 ;
+ 5200 regset    lda #0
+ 5210           sta xreg
+ 5215           sta xreg+1
+ 5220           lda #<stack
+ 5225           sta zreg
+ 5230           lda #>stack
+ 5235           sta zreg+1
+ 5240           jsr xsuch
+ 5245           inc xreg
+ 5250           sec
+ 5260           lda vektor1
+ 5270           sbc #2
+ 5280           sta vektor1
+ 5290           lda vektor1+1
+ 5300           sbc #0
+ 5310           sta vektor1+1
+ 5320           ldy #1
+ 5325           sec
+ 5330           lda (vektor1),y
+ 5335           sbc #1
+ 5340           sta yreg
+ 5350           dey
+ 5360           lda (vektor1),y
+ 5365           sbc #0
+ 5370           sta yreg+1
+ 5380           jmp pushxy
+ 5985 ;
+ 5990 ;discriptoren in der zp einrichten
+ 5995 ;
+ 6000 exindi    jsr xsuch
+ 6010           jmp discrip1
+ 6020 ;
+ 6030 eyindi    jsr ysuch
+ 6040 ;
+ 6050 discrip1  ldy #0
+ 6060 schl3     lda (vektor1),y
+ 6070           sta laenge1,y
+ 6080           iny
+ 6090           cpy #3
+ 6100           bne schl3
+ 6110           rts
+ 6120 ;
+ 6130 evindi    jsr rechnung
+ 6135           jsr vsuch
+ 6140           ldy #0
+ 6150 schl4     lda (vektor1),y
+ 6160           sta laenge2,y
+ 6170           iny
+ 6180           cpy #3
+ 6190           bne schl4
+ 6200           lda laenge2
+ 6205           beq kzeichen
+ 6210           cmp #21
+ 6220           bcc kleiner
+ 6230           lda #20
+ 6240           sta laenge2
+ 6250 kleiner   ldy #0
+ 6260 nzeichen  lda (str2),y
+ 6270           sta vstr,y
+ 6280           iny
+ 6290           cpy laenge2
+ 6300           bne nzeichen
+ 6310           lda #<vstr
+ 6320           sta str2
+ 6330           lda #>vstr
+ 6340           sta str2+1
+ 6350 kzeichen  rts
+ 7000 stckvek   lda zreg
+ 7010           sta vektor2
+ 7020           lda zreg+1
+ 7030           sta vektor2+1
+ 7040           rts
+ 7045 ;
+ 7100 pushxr    jsr hollr
+ 7105           jsr vektor4
+ 7110           ldy #0
+ 7120 schl5     lda xreg,y
+ 7130           sta (vektor2),y
+ 7150           iny
+ 7160           cpy #2
+ 7170           bne schl5
+ 7172 schl6     lda rreg-2,y
+ 7173           sta (vektor2),y
+ 7174           iny
+ 7175           cpy #4
+ 7176           bne schl6
+ 7177           rts
+ 7178 ;
+ 7180 pushly    jsr hollr
+ 7185           jsr vektor4
+ 7190           ldy #0
+ 7200 schl7     lda lreg,y
+ 7210           sta (vektor2),y
+ 7230           iny
+ 7240           cpy #2
+ 7250           bne schl7
+ 7261 schl8     lda yreg-2,y
+ 7262           sta (vektor2),y
+ 7263           iny
+ 7264           cpy #4
+ 7265           bne schl8
+ 7266           rts
+ 7270 ;
+ 7280 holxy     ldy #0
+ 7310 schl9     lda lreg,y
+ 7320           sta xreg,y
+ 7330           iny
+ 7340           cpy #4
+ 7350           bne schl9
+ 7360           rts
+ 7370 ;
+ 7380 hollr     jsr stckvek
+ 7400           ldy #0
+ 7410 schl10    lda (vektor2),y
+ 7420           sta lreg,y
+ 7430           iny
+ 7440           cpy #4
+ 7450           bne schl10
+ 7460           rts
+ 7465 ;
+ 7645 ;
+ 7650 vektor4   jsr stckvek
+ 7660           clc
+ 7670           lda vektor2
+ 7680           adc #4
+ 7690           sta vektor2
+ 7700           lda vektor2+1
+ 7710           adc #0
+ 7720           sta vektor2+1
+ 7730           rts
+ 7735 ;
+ 7740 pushxy    jsr vektor4
+ 7750           ldy #0
+ 7760 schl11    lda xreg,y
+ 7770           sta (vektor2),y
+ 7780           iny
+ 7790           cpy #4
+ 7800           bne schl11
+ 7810           rts
+ 9985 ;
+ 9990 ; register & ein simulierter stack
+ 9995 ;
+10000 zreg    .byt 0,0
+10010 xreg    .byt 0,0
+10020 yreg    .byt 0,0
+10050 vergl   .byt 0,0
+10060 lreg    .byt 0,0
+10070 rreg    .byt 0,0
+10080 vstr    .byt 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0  ; 20 * 0
+10100 stack   .byt 0
+20000 .end
+
