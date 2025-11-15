@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Kassenwart im Wohnzimmer</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Wolfgang Klimecki, tr">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="114-121">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Kassenwart im Wohnzimmer</h1>
+        <p class="intro">Mit unserem Programm »Haushaltskasse« haben Sie jederzeit den Überblick über Ihre Konten, Ihre Verschwendungssucht oder Ihre Sparsamkeit.</p>
+
+        <p>Das Programm »Haushaltskasse« (siehe Listing) verwaltet das verfügbare Einkommen und zeigt die Trendentwicklung auf.</p>
+
+        <p>Es handelt sich um eine Jahresbuchführung mit monatlichen Zwischenergebnissen. Insgesamt stehen 16 Konten zurVerfügung (Konto-Nummern 0 bis 15). Diese Konten können mit beliebigem Text (Kontoname) versehen werden. Die Kontonamen sind auf 15 alphanumerische Zeichen begrenzt; auf den Übersichten können aus Platzgründen jedoch nur 9 Zeichen ausgegeben werden. Sie brauchen nicht alle Konten sofort anzulegen. Die Kontonummern werden vom Programm vergeben, und zwar in aufsteigender Folge von 0 bis 15. Die zunächst nicht benötigten Konten können im Laufe des Jahres jederzeit nachträglich angelegt werden. Andererseits bleiben die Konten, die im Laufe des Jahres auslaufen, bis zum Jahresende erhalten. Eine Löschung ist nicht möglich, weil die Konten auf der Jahresübersicht gebraucht werden.</p>
+
+        <p>Integriert ist eine Budgetrechnung. Das Programm fragt bei Buchungsbeginn und dann bei jedem Monatswechsel für jedes Konto nach der Sollvorgabe (Budget). Die Summe für alle Konten darf das verfügbare Einkommen nicht überschreiten. Auf der Übersicht stellt das Programm die Sollvorgabe und die tatsächlichen Ausgaben gegenüber und wirft die Differenz aus. Minusbeträge, das heißt die Sollvorgabe wurde überschritten, werden rot dargestellt.</p>
+
+        <p>Das Programm ist vollständig menügesteuert. Sie erhalten jederzeit auf dem Bildschirm Hinweise, welche Eingaben erwartet werden. Ungültige Eingaben werden ignoriert.</p>
+
+        <p>Das Programm ist auf eine Floppy mit der Geräteadresse 8 eingestellt. Für den Drucker ist die Geräteadresse 4 vorgesehen. Erzeugt wird eine Hardcopy des jeweiligen Bildschirminhalts. Vor dem Ausdruck wird noch nach dem aktuellen Datum gefragt und dann ausgedruckt. Die Hardcopy-Routine wurde für einen Commodore-Drucker (GP-100 A) geschrieben. Es hat sich gezeigt, daß das Interface »Printstar - C 64« auf dem Epson RX-80 FT+ mit der unveränderten Routine ebenfalls eine Hardcopy erzeugt. Die Zeilen 38700 bis 38900 sind erst später hinzugekommen und nur für den Epson RX-80 F/T+ bestimmt. Diese Routine setzt den linken Rand und schaltet den Papierende-Detektor aus. Für einen anderen Drucker müßten hier entsprechende Werte eingesetzt werden oder gegebenenfalls die gesamte Hardcopy-Routine von 37500 bis 40100 neu geschrieben werden.</p>
+
+        <p>Das Programm ist absturzsicher. Sowohl ein nicht vorhandener Drucker wie auch Fehler in der Floppy (zum Beispiel Ausschalten oder Herausnehmen der Diskette) beeindrucken das Programm nicht. Auf der untersten Bildschirmzeile wird dann ein entsprechender Hinweis ausgegeben.</p>
+
+        <p>Es werden pro Monat und Konto 200 Buchungen verwaltet. Fallen mehr Buchungen an, muß die Variable x in Zeile 1650 entsprechend erhöht werden. In der vorliegenden Version sind noch etwa 4000 Byte frei. Jede Vergrößerung um eine Buchung benötigt 32 Byte.</p>
+
+        <h3>Buchungsanfang</h3>
+
+        <p>Beim Buchungsanfang verwenden Sie am besten eine neue Diskette, da im Laufe des Jahres eine ganze Reihe von Dateien anfallen werden. Das Programm steigt allerdings auch nicht aus, wenn die Buchungen über mehrere Disketten verteilt sind. Erforderlich ist lediglich, daß ein Monat vollständig auf einer Diskette vorhanden ist.</p>
+
+        <p>Das Programm fragt zunächst nach dem Startmonat. Die Eingabe muß numerisch sein und im Bereich von 1 bis 12 liegen. Zur Korrektur — wenn Sie diese Routine irrtümlich aufgerufen haben — drücken Sie einfach nur die »RETURN«-Taste. Es wird dann zum Hauptmenü zurückgesprungen. Anschließend fragt das Programm nach der Jahresangabe. Sie kann zwei- oder vierstellig sein.</p>
+
+        <p>Danach werden die Konten angelegt. Die Kontonummer wird vom Programm vergeben, und zwar in aufsteigender Reihenfolge von 0 bis 15. Wenn Sie nur die »RETURN«-Taste drücken, verzweigt das Programm zu einer Übersicht (siehe hierzu den übernächsten Absatz).</p>
+
+        <p>Der Kontoname ist auf 15 Zeichen begrenzt. Danach müssen Sie die DM-Vorgabe eingeben. Die DM-Vorgabe kann nur volle Markbeträge enthalten und ist auf den theoretischen Wert von 32785 DM begrenzt.</p>
+
+        <p>Wenn Sie keine weiteren Konten anlegen wollen, wird eine Übersicht ausgegeben. Die Übersicht enthält fünf Spalten:<br>
+            1. Spalte : Kontonummer<br>
+            2. Spalte : Kontoname<br>
+            3. Spalte : Vorgabe<br>
+            4. Spalte : Ausgaben<br>
+            5. Spalte : Differenz aus Vorgabe und Ausgabe</p>
+
+        <p>Darüber hinaus wird ein Kurzmenü in der untersten Bildschirmzeile eingeblendet. Esstehenlhnen die Tasten »F1«für »richtige Eingabe« und »F3« für »Korrektur« zur Verfügung. Bei »F3« werden alle Eingaben gelöscht und der Startmonat noch einmal abgefragt.</p>
+
+        <p>Nach Drücken der F1-Taste müssen Sie eingeben, wieviele Buchungen im Monat erwartet werden. Diese Frage bezieht sich nur auf den laufenden Monat. Wenn Sie eine zu große Zahl angeben, wird auf der Diskette unnötig Platz verschwendet. Eine zu kleine Zahl führt später beim Buchen zu Unterbrechungen, die allerdings nur Sekunden in Anspruch nehmen.</p>
+
+        <p>Das Programm richtet jetzt auf der Diskette die erforderlichen Dateien ein. Da das einige Zeit in Anspruch nimmt, können Sie inzwischen eine Tasse Kaffee trinken gehen. Anschließend meldet es sich mit dem Hauptmenü zurück.</p>
+
+        <h3>Buchen</h3>
+
+        <p>Das Buchen stellt Ihre wichtigste Eingabe dar. Wenn Sie mehrere Disketten verwenden, vergewissern Sie sich, daß Sie die zuletzt gültige Diskette im Laufwerk haben. Das Programm überprüft zunächst, ob alle notwendigen Dateien im Computer vorhanden sind. Fällt diese Prüfung negativ aus, werden zuerst die fehlenden Dateien eingelesen. Eben dafür ist es wichtig, daß die letzte gültige Diskette im Laufwerk ist.</p>
+
+        <p>Danach müssen Sie das Buchungsdatum eingeben. Dieses muß im Bereich von 1 bis 31 liegen. Prüfungen auf den 31. April und ähnliches werden allerdings nicht vorgenommen. Es braucht nur der Tag und nicht auch noch der Monat eingegeben zu werden. Der laufende Monat ist dem Programm bereits bekannt. Danach geben Sie den Buchungstext ein. Diese Eingabe ist auf 15 Zeichen begrenzt.</p>
+
+        <p>Anschließend wird eine Übersicht aller vorhandenen Konten ausgegeben. Die Übersicht enthält je Konto die Kontonummer, den Kontennamen, die Vorgabe, die bisherigen Ausgaben und die Differenz zwischen Vorgabe und Ausgabe. Sie haben somit jederzeit Ihre Verschwendungssucht oder Sparsamkeit bei der neuen Buchung vor Augen. Dann können Sie die Nummer des Kontos eingeben, auf das Sie buchen möchten. Die Kontonummer muß im Bereich der bereits angelegten Konten liegen. Mit »RETURN« verlassen Sie die Eingabe.</p>
+
+        <p>Der danach einzugebende DM-Betrag wird nicht weiter überprüft und auf dem jeweiligen Konto verbucht. Der Betrag kann auch negativ sein. Der Minusbetrag ist einerseits als Storno, andererseits auch als Einnahme zu gebrauchen.</p>
+
+        <p>Dann erfolgt die Abfrage nach der nächsten Buchung. Den Buchungsmodus verlassen Sie, indem Sie für Datum nichts oder Null eingeben. Es dauert etwas, bis das Menü erscheint, weil das Programm den aktuellen Stand der Dateien auf Diskette zurückschreibt. Sie brauchen sich daher um die Datensicherung keine Gedanken zu machen. Wenn Sie bei der ersten Buchung gleich die »RETURN«-Taste drücken, also nichts gebucht haben, wird auch nichts auf die Diskette übertragen.</p>
+
+        <h3>Monats-ZJahresübersicht</h3>
+
+        <p>Wenn Sie die Taste F3 für »Monatsübersicht« gedrückt haben, fragt das Programm, welchen Monat Sie sehen wollen. Sie können die Hochpfeiltaste für den laufenden Monat, die Sterntaste für alle Monate oder eine Zahl für einen bestimmten Monat eingeben. Der Monat darf nicht vor Buchungsbeginn und nicht nach dem laufenden Monat liegen. Wenn Sie alle Monate sehen wollen, werden die Monate vom Buchungsbeginn bis zum laufenden Monat der Reihe nach angezeigt. Im Anschluß daran erfolgt die Jahresübersicht. In der untersten Bildschirmzeile wird ein Kurzmenü angezeigt. Sie können wählen, ob Sie weiterblättern (F1), zum Hauptmenü (F3) oder eine Druckerausgabe (F5) wünschen. Bei der Druckerausgabe wird zunächst geprüft, ob der Drucker eingeschaltet ist. Wenn nicht, gibt das Programm einen entsprechenden Hinweis.</p>
+
+        <p>Die Monats- und die Jahresübersicht unterscheiden sich im Aufbau nicht. Sie haben folgendes Format:</p>
+
+        <p>TODO</p>
+
+        <p>Monat XX/ ZZZZ<br>
+            A BBBBBBBBB CCCCC DDDDDD.DD EEEEEE.EE A BBBBBBBBB CCCCC DDDDDD.DD EEEEEE.EE</p>
+
+        <p>X = Monat<br>
+            Z = Jahr<br>
+            A = Kontonummer<br>
+            B = Kontoname<br>
+            C = Vorgabe<br>
+            D = Ausgabe<br>
+            E = Differenz zwischen Vorgabe und Ausgabe</p>
+
+        <h3>Einzelnes Konto</h3>
+
+        <p>Zuerst müssen Sie den Monat eingeben, den Sie sehen wollen. Drücken Sie die Hochpfeiltaste für den laufenden Monat. Wollen Sie einen der Vormonate sehen, geben Sie den Monat als Zahl ein.</p>
+
+        <p>Danach fragt das Programm nach der Kontonummer. Wollen Sie alle Konten sehen, geben Sie den Stern ein, sonst die Kontonummer. Hier gilt auch, daß nicht angelegte Konten ignoriert werden. Die Ausgabe hat folgendes Format:</p>
+
+        <p>TODO</p>
+
+        <p>A BBBBBBBBBBBBBB CCCCC DD/EEEE<br>
+            FF. GGGGGGGGGGGGGGG HHHHHHH.HH<br>
+            FF. GGGGGGGGGGGGGGG HHHHHHH.HH<br>
+            Summe IIIII JJJJJJ.JJ KKKKKKK.KK<br>
+            A =Kontonummer<br>
+            B =Kontoname<br>
+            C = Monatsvorgabe<br>
+            D =Monat<br>
+            E =Jahr<br>
+            F =Buchungsdatum<br>
+            G = Buchungstext<br>
+            H = Betrag<br>
+            I = Vorgabe<br>
+            J =SummederMonatsausgaben<br>
+            K = Differenz zwischen Vorgabe und Ausgabe</p>
+
+        <p>Es werden maximal 15 Zeilen ausgegeben. Die Summenzeile (»J«) wird erst nach der letzten Buchung ausgegeben. In der untersten Bildschirmzeile wird ein Kurzmenü eingeblendet. Sie haben die Wahl zwischen Weiterblättern (F1) zum Hauptmenü (F3) oder einer Druckerausgabe (F5).</p>
+
+        <h3>Journal</h3>
+
+        <p>Das Journal listet alle Buchungstexte in der Reihenfolge auf, wie sie erfaßt wurden. Das Programm fragt zunächst nach dem Monat, den Sie sehen wollen. Danach wird das Journal ausgegeben. Das Journal hat folgendes Format:</p>
+
+        <p>TODO</p>
+
+        <p>Journal AA/BBBB<br>
+            CC DD. EEEEEEEEEEEEEEE FFFFFF.FF<br>
+            CC DD. EEEEEEEEEEEEEEE FFFFFF.FF<br>
+            A = Monat<br>
+            B = Jahr<br>
+            C = Kontonummer<br>
+            D = Datum<br>
+            E = Buchungstext<br>
+            F = Betrag</p>
+
+        <p>Es werden maximal 15 Buchungen auf einer Bildschirmseite ausgegeben. In der untersten Bildschirmzeile sehen Sie ein Kurzmenü. Sie können wählen, ob Sie weiterblättern (F1), zum Hauptmenü (F3) oder eine Druckerausgabe (F5) haben wollen.</p>
+
+        <h3>Zusatzkonto</h3>
+
+        <p>Das Programm prüft zunächst, ob das letzte Konto (Kontonummer 15) bereits angelegt ist. Wenn das der Fall ist, wird ein entsprechender Hinweis ausgegeben. Nach Drücken einer beliebigen Taste kommen Sie ins Hauptmenü zurück. Im anderen Fall gibt das Programm einen Text aus, wie unter Buchungsanfang beschrieben. Achten Sie jedoch darauf, daß das Monatsbudget möglicherweise überschritten werden könnte. Sie können hier einfach als Monatsvorgabe Null DM eingeben. Im Folgemonat steht das Konto dann uneingeschränkt zur Verfügung.</p>
+
+        <h3>Monatswechsel</h3>
+
+        <p>Aus Sicherheitsgründen fragt das Programm zunächst, ob Sie den Monatswechsel wirklich wollen. Falls Sie diese Funktion irrtümlich aufgerufen haben, geben Sie »n« ein. Das Programm springt dann zum Hauptmenü zurück. Das ist deshalb wichtig, weil eine Rückkehr in den Vormonat nicht mehr möglich ist.</p>
+
+        <p>Soll der Monatswechsel durchgeführt werden, prüft das Programm, ob der Dezember bereits erreicht ist. Dann startet es mit »RUN« neu. Sie müssen dann zwar alle Konten wie bei Neubeginn neu eingeben, können dafür aber auch die nicht mehr benötigten Konten weglassen.</p>
+
+        <p>Ist der Dezember nicht erreicht, werden die Konten der Reihe nach aufgerufen, um die Sollvorgaben für den neuen Monat einzugeben.</p>
+
+        <p>TODO</p>
+
+        <p>Monat AA BBBBB CCCCCCC DDDDDDD<br>
+            Vorgabe?</p>
+
+        <p>Die Anzeige zeigt die Monate vom Buchungsbeginn bis zum Vormonat an.<br>
+            A = Monat<br>
+            B = Vorgabe für den jeweiligen Monat<br>
+            C = Ausgabe für den jeweiligen Monat<br>
+            D = Differenz zwischen Vorgabe und Ausgabe</p>
+
+        <p>Sind die tatsächlichen Ausgaben insgesamt höher als die Vorgaben, kann die Vorgabe entsprechend erhöht werden, um die Jahresausgaben angleichen zu können.</p>
+
+        <p>Nach dem letzten Konto erscheint eine Übersicht, auf der Sie Ihre Vorgaben überprüfen können. Insbesondere ist es wichtig, daß die Summe der Vorgaben nicht die Einnahmen überschreitet. In der untersten Bildschirmzeile wird noch ein Kurzmenü eingeblendet. Sie haben die Wahl zwischen F1 für ok und F3 für Korrektur. F1 springt zum Hauptmenü. Der Monatswechsel ist damit vollzogen. F3 löscht die Vorgaben und setzt auch den Monatszähler wieder zurück. Das Programm springt wieder zur Abfrage, ob der Monatswechsel wirklich ausgeführt werden soll.</p>
+
+        <h3>Dateien auf Diskette</h3>
+
+        <p>Im Laufe des Jahres fallen eine Vielzahl von Dateien an. Sie gliedern sich in drei Gruppen.<br>
+            1. KONTEN<br>
+            2. JOURNAL<br>
+            3. JOURNALINDEX</p>
+
+        <p>Die Datei »KONTEN« ist eine sequentielle Datei und enthält die Konten selbst sowie die erforderlichen Verwaltungsdateien. Die Konten werden nur in dem notwendigen Umfang gespeichert, das heißt von Buchungsanfang bis zum laufenden Monat und jeweils nur die angelegten Konten. Aus diesem Grunde wird diese Datei im Laufe des Jahres immer länger.</p>
+
+        <p>Die Datei »JOURNAL« ist eine relative Datei. Sie wird jeden Monat neu angelegt und enthält im Dateinamen noch den jeweiligen Monat. Der Datensatz ist 28 Byte lang und hat folgendes Format:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Byte 1 und 2= Kontonummer<br>
+            Byte 3 und 4= Datum<br>
+            Byte 5bis 19=Buchungstext<br>
+            Byte 20 bis 27= DM-Betrag in Pfennigen<br>
+            Byte 28 = Carriage Return</p>
+
+        <p>Die Länge der Datei »JOURNAL« wird bei Buchungsanfang einmal abgefragt. Für die Folgemonate wird der Durchschnitt der Buchungen der Vormonate herangezogen und aufgerundet. Bei Bedarf wird um jeweils zehn Datensätze verlängert.</p>
+
+        <p>Die Datei »JOURNALINDEX« ist sequentiell und wird ebenfalls monatlich neu angelegt. Sie enthältZeiger, die angeben, welcher Datensatz zu welchem Konto gehört. Ihre Aufgabe besteht darin, bei der Ausgabe der einzelnen Konten einen unmittelbaren Zugriff auf die entsprechende Buchung zu gewährleisten, damit die Datei »JOURNAL«, die ja diegesamten Buchungstexte enthält, nicht von Anfang an durchsucht werden muß.</p>
+
+        <p>Um das Programm weitgehend absturzsicher zu machen, wurde auf »INPUT« verzichtet und die Eingabe über »GET« abgewickelt. Zugelassen sind grundsätzlich nur die Buchstabentasten (Groß- und Kleinschrift), die Ziffern, die Space-Taste, die allgemein üblichen Sonderzeichen (nicht jedoch der Doppelpunkt und das Komma) und die DEL-Taste zum Löschen des letzten Zeichens.</p>
+
+        <address class="author">(Wolfgang Klimecki/tr)</address>
+    </article>
+</body>
+
+</html>

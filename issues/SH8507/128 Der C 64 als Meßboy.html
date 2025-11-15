@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der C 64 als Meßboy</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Uwe Gerlach, ah">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="128-130">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Der C 64 als Meßboy</h1>
+        <p class="intro">Ein kleiner Hardware-Zusatz, der für unter 10 Mark zu haben ist, macht aus Ihrem C64 ein Kapazitäts- und Widerstandsmeßgerät, das einen Vergleich mit professionellen Geräten nicht zu scheuen braucht. Der Meßbereich reicht von einigen pF bis hin zu einigen mF.</p>
+
+        <p>Jeder Elektronikbastler kennt das Problem: in der Bauteilekiste liegen etliche undefinierbare Kondensatoren mit exotischen Aufschriften, wie zum Beispiel 22000 F oder 20j. Woher soll man mit Sicherheit sagen können, ob das herausgefischte Exemplar auch die richtige Zehnerpotenz besitzt? Zwar gibt schon die Bauteilgröße einen Anhaltspunkt, ob Pikofarad, Nanofarad oder gar Mikrofarad gemeint sind, doch man verschätzt sich leicht, weil oft auch die zulässige Spannung nicht klar angegeben ist. So entsteht der Wunsch, die Bauteile nachmessen zu können, doch Kapazitätsmeßgeräte sind nicht billig, und so lohnt sich eine Anschaffung in den meisten Fällen nicht.</p>
+
+        <p>Der hier vorgestellte Meßzusatz ermöglicht aber, den C 64 zu einem Kapazitäts- und Widerstandsmeßgerät aufzuwerten. Mit wenig Aufwand erhält man ein System mit automatischer Meßbereichsumschaltung über mehr als neun Zehnerpotenzen und zehn ständig anzeigenden Meßwertspeichern, einer Ausstattung also, die auch bei den teuren Profigeräten ihresgleichen sucht.</p>
+
+        <h2>Funktion durch Händeschütteln</h2>
+
+        <p>Das Funktionsprinzip ist genial einfach. Ein ganz normales TTL-Monoflop aus der 74XX-Reihe dient als Zeitgeber. Es antwortet auf einen Low-High-Sprung am Eingang mit einem Ausgangsimpuls, dessen Länge weitgehend unabhängig von Betriebsspannung und Temperatur ist, also nur noch von den Werten des Widerstands und des Kondensators bestimmt wird. Mit einem Umschalter kann man wahlweise den Widerstand oder den Kondensator fest einstellen und das jeweils andere Bauelement über die Abgreifklemmen messen.</p>
+
+        <p>Die gesamte übrige Hardware ist bereits im C64 eingebaut. Dank der Schnittstellenbausteine VIA 6526 hat man nämlich die Möglichkeit, über den User-Port die Impulsdauer zu messen, um sie dann auf den gesuchten Wert umzurechnen. Die Aktionen werden dabei über die sogenannten Handshake-Leitungen am User-Port koordiniert, wie im Zeitablaufdiagramm (Bild 1) deutlich zu sehen ist.</p>
+
+        <p>Durch einen Schreib- oder Lesebefehl auf die Port-Adresse 56577 wird der Meßimpuls ausgelöst. Das geschieht in dem abgedruckten Programm (Listing 1) in Zeile 3300. DerC64 signalisiert das am User-Port selbständig dadurch, daßPC2 für die Dauer eines Taktes Low wird. Wenn diese Leitung wieder auf High geht, löst das den Impuls am Monoflop-Ausgang Qaus, dergleichzeitig mitden Anschlüssen CNT2 und Flag2 verbunden ist. Wie die Tabelle »Kontrollregister« (Bild 2) zeigt, wurde der VIA-Baustein so programmiert, daß er mit dem Systemtakt abwärts zählt, solange der Eingang CNT2 High-Pegel führt. Dabei zählt Timer B Unterläufe von Timer A. Das bedeutet, Timer A wird mit einem bestimmten Wert geladen (Zeilen 3200 und 3210) und zählt von dort aus abwärts. Erreicht er die Stellung 0, dann wird der Inhalt des Timers B um eins erniedrigt, Timer A wird wieder mit dem vorgegebenen Startwert geladen, und der Vorgang wiederholt sich.</p>
+
+        <h2>Errechnung des Meßwertes und Bereichsumschaltung</h2>
+
+        <p>Die fallende Flanke am User-Port-Eingang setzt das Bit 4 im Register 56589 (Flag-Interrupt-Bit), das vom Programm abgefragt werden kann (Zeile4040). Essignalisiertsomitdas Ende des Monoflop-Taktes und die Gültigkeit des Timerinhalts. Beim Auslesen wird dieses Bit selbständig wieder gelöscht.</p>
+
+        <p>Das Programm liest nun den Timer aus (2 Byte!), multipliziert ihn mit der Taktzeit und berechnet mit der Formel aus Bild 3 den gesuchten Wert. Für den Meßbereich Pikofarad und Nanofarad (B=0) erfolgt diese Rechnung in Zeile 5020. Sollte die zu messende Zeit die Timerkapazität überschreiten, so steht nach der Messung eine 0 in der Variablen und es wird in Zeile 5030 automatisch auf den Meßbereich Mikrofarad (B=1) umgeschaltet.</p>
+
+        <p>Hierbei wird das Highbyte des Timers A in Zeile 3210 nun mit 5 geladen, so daß längere Zeiten gemessen werden können. Die Umrechnung erfolgt jetzt in Zeile 6000. Falls die gemessene Zeit einen bestimmten Grenzwert unterschreitet, schaltet das Programm in Zeile 5035 wieder zurück in den Bereich 0.</p>
+
+        <p>Um genaue Ergebnisse zu gewährleisten, muß sichergestellt werden, daß nach einer Messung immer eine Erholzeit verstreicht, die mindestens 75% der Impulsdauer betragen soll. Diese Forderung ist normalerweise bereits durch die Programmlaufzeit erfüllt. Lediglich im Bereich Mikrofarad können längere Meßzeiten auftreten, die bei großen Kapazitäten nicht zu unterschätzen sind. Bei 1000 Mikrofarad beträgt die Impulsdauer bereits 27,3 Sekunden. Daher wird in Zeile 6020 eine angepaßte Warteschleife durchlaufen, die auch die Menüfunktionen zugänglich macht.</p>
+
+        <h2>Aufbau und Inbetriebnahme</h2>
+
+        <p>Die kleine Zusatzschaltung (Bild 4) kann auch von weniger Geübten leicht auf einer Lochrasterplatte aufgebaut werden. Alle Teile (Bild 5) sind handelsüblich und der gesamte Kostenaufwand liegtweit unter 10 Mark.</p>
+
+        <p>Um den Anzeigefehler möglichst klein zu halten, sollte für den 39 Kiloohm-Meßwiderstand eine Ausführung mit kleiner Toleranz gewählt werden (±1% oder kleiner).</p>
+
+        <p>Den Festkondensator für die Widerstandsmessung kann man messen, indem man in Stellung »C« und »Kondensatormeßgerät« die mit»-« bezeichnete Klemme mit dem Anschluß des Kondensators verbindet, der am Umschalter liegt. Der angezeigte Wert wird in Zeile 7050 eingetragen. War die Anzeige beispielsweise 211 Nanofarad, dann muß die Zeile lauten:</p>
+
+        <p>TODO PRE</p>
+
+        <p>7050 W=(65535-(PEEK(56582)+PEEK(56583)*256))*1.02e-6/(.7*211e-9)</p>
+
+        <p>Das Meßgerät ist nun geeicht und betriebsfertig.</p>
+
+        <p>Es sollte selbstverständlich sein, daß der Zusatz bei eingeschaltetem Computer weder aufgesteckt noch abgezogen wird.</p>
+
+        <p>Beim Starten des Programms wird zuerst das Kapazitätsmeßgerät aktiviert. Dazu muß man den Schalter auf der Zusatzplatine in Stellung »C« bringen. Auf der linken Bildschirmhälfte erscheinen die numerierten Speicherplätze, rechts leuchtet der Meßwert. Um die Benutzung zu erleichtern, erscheinen am unteren Bildrand alle verfügbaren Funktionen. Man kann sie durch Drücken des Anfangsbuchstabens anwählen.</p>
+
+        <p>Mit »S« gefolgt von einer Ziffer, wird der angezeigte Wert in den entsprechenden Speicher übernommen.</p>
+
+        <p>»L« löscht alle gespeicherten Einträge,<br>
+            »W« oder »R« schalten um auf Widerstandsmessung, »K« oder »C« wieder zurück zur Kapazitätsmessung. Gelegentlich kann es beim Wechsel von Meßobjekten vorkommen, daß das Gerät nicht mehr reagiert. Hier hilft es, mit »I« einen Impuls von Hand auszulösen. Mit »Q« kann man das Programm verlassen.</p>
+
+        <p>Der Meßbereich des Systems reicht bei der angegebenen Dimensionierung von derGrößenordnung der Kabelkapazität bis zu einigen tausend Mikrofarad.</p>
+
+        <p>Im Ohm-Meßbereich überdeckt esjedoch nur die Werte von etwa 100 Ohm bis ungefähr 150 kQ .</p>
+
+        <p>Die Belegung des User-Ports und eine Variablenliste finden Sie in Bild 6 und 7.</p>
+
+        <address class="author">(Uwe Gerlach/ah)</address>
+    </article>
+</body>
+
+</html>

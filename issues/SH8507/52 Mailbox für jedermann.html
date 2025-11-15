@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mailbox für jedermann</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Wieske, hm">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="52-67">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Mailbox für jedermann</h1>
+        <p class="intro">Mit diesem Programm machen Sie Ihren C 64 zu einem elektronischen Briefkasten. Sie brauchen nur noch ein Gerät, das automatisch den Hörer abhebt.</p>
+
+        <p>Der Betreiber der M.C.S.-Mailbox, Kürzel [THW], hat uns sein Programm zur Verfügung gestellt. Es hat sich in der Praxis bereits bestens bewährt. Mitdiesem Programm kannjeder seine eigene Mailbox aufmachen.</p>
+
+        <p>Ein Mailboxprogramm ist eigentlich nichts anderes als ein kombiniertes Verwaltungs- und Textverarbeitungsprogramm. Der Unterschied zu den genannten Programmen liegt nur in der Art der Datenverwaltung. Es verwaltet alle ankommenden Daten in seinem System und bietet viele Möglichkeiten es weiter auszubauen.</p>
+
+        <p>Das Programm kann bis zu 400 Benutzer mit einer 1541 verwalten. Zuzüglich der Text- und Info-Files.</p>
+
+        <p>Neue Texte, die für alle bestimmt sind, werden vom Programm automatisch in das vorhandene Nachrichten-File (Datei für hinterlassene Nachrichten) eingebunden, so daß der nächste Anrufer diese Nachrichten sofort lesen kann. Damit ist gewährleistet, daß der Informationsfluß nicht unterbrochen wird und neue Daten sofort verfügbar sind.</p>
+
+        <p>Die Verwaltung der Anrufer wurde mit einer relativen Datei verwirklicht, da diese sich am besten dazu bewährt hat. Pluspunkte einer solchen Datei sind zum einen der schnelle Zugriff auf die einzelnen Records und das unproblematische Ändern von Daten.</p>
+
+        <p>Die Schnelligkeit wird auch dadurch erreicht, daß parallel zur Recordnummer auch ein Indexfeld mit den Anfangsbuchstaben der eingetragenen Anrufer im Computer mitläuft.</p>
+
+        <p>Damit wird die Suche nach einem Namen zum Kinderspiel und macht sich bei der Identifizierung (UID) sehr schnell positiv bemerkbar.</p>
+
+        <p>Als Indexfeld wurde ein Integerfeld (U%(X)) verwendet, das einige Besonderheiten aufweist. Integervariablen verbrauchen bekanntlich wenig Platz im Speicher. Man muß dann allerdings alle ASCII-Zeichen in eine Zahl konvertieren und diese im Feld ablegen. Beim Suchen wird dann die Zahl wieder in ein Zeichen umgewandelt. Die Zeit, die dafür verloren geht, ist aber so gering, daß sie nicht ins Gewicht fällt.</p>
+
+        <p>Eine entsprechende Lösung über ein Stringfeld ist nicht anzuraten. Dieses verbraucht nur unnötig Speicherplatz und zum anderen kann die Garbage Collection erbarmungslos zuschlagen.</p>
+
+        <p>Noch ein Wort zur Koppler- oder Modemsteuerung.</p>
+
+        <p>Das Programm verwendet die folgenden Signale und Anschlüsse am User-Port:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>PB1 Koppler/Modem<br>
+            Pegel high aus<br>
+            low aktiv<br>
+            PB3 Klingelerkennung<br>
+            Pegel high kein Anruf<br>
+            low Anruf erkannt<br>
+            PB4 Detect-Anzeige<br>
+            Pegel high keine Gegenstelle<br>
+            low Gegenstelle vorhanden</p>
+
+        <p>Es ist wichtig, daß ein Relais zur Aktivierung des Kopplers und zum »Abheben« des Telefonhörers über einen Transistor als Treiber gesteuert wird, da nur so die User-Port-Ausgänge nicht zu stark belastet werden. Außerdem erzielt man damit auch die nötige Invertierung der Signale. Man kann dazu die Auto-Modem-Schaltung aus der 64’er, Ausgabe 9/84, Seite 114verwenden. Allerdings muß die Leitung PB5 (Anschluß H im Schaltplan) mit PB1 verbunden werden.</p>
+
+        <p>Die Befehle für die Koppler/Modemsteuerung sind in diesem Programm durch REM-Zeilen ausgewiesen.</p>
+
+        <p>Das Programmpaket besteht aus drei einzelnen Programmteilen, die zur Inbetriebnahme der Mailbox notwendig sind.</p>
+
+        <h3>1. DATEI/SORT/COPY</h3>
+
+        <p>Mit diesem Programm wird eine Datendiskette, mit allen Files, die das Hauptprogramm erwartet, kreiert.</p>
+
+        <p>Nach der Frage »Datei anlegen« kann unterschieden werden, ob nur eine relative Datei, oder ob eine »komplette Datei« angelegt werden soll. Der Unterschied ist, daß bei der ersten Wahl nur die Diskette formatiert wird, eine relative Datei und ein sequentielles Indexfeld angelegt wird.</p>
+
+        <p>Bei der zweiten Wahl wird eine komplette Datei angelegt mit den folgenden Files, die alle das Programm »MAILBOX« erwarten:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Filename Filetyp Blöcke Verwendungszweck<br>
+            USER rel 128 Anrufer verwalten<br>
+            M-INDEX seq X Persönliches Indexfeld<br>
+            A-INDEX seq X Zwischenspeicher aktueller Daten<br>
+            BILD seq X Titelbild<br>
+            MESSAGE seq X Öffentliche Nachrichten (Texte)<br>
+            AL seq X Allgemeines File (frei verfügbar)<br>
+            RI seq X Rechner Info (frei verfügbar)<br>
+            TEL seq X Telefonverzeichnis (frei verf.)<br>
+            CL seq X Clubfile (frei verfügbar)<br>
+            AK seq X Aktuelles (frei verfügbar)<br>
+            P1-P50 seq X 50 einzelne persönliche Nachrichten</p>
+
+        <p>Die Files BILD,AL,RI,TEL,CL und AK müssen vom Mailbox-Betreiber selbst editiert werden. Denn diese werden vom Benutzer nur angesehen aber nicht beschrieben.</p>
+
+        <p>Man nimmt dazu einen Editor (Terminal 64 ist dazu sehr gut), gibt dort seine Texte ein und speichert diese auf der Datendiskette ab, indem man das vorhandene File überschreibt. Die anderen Files werden vom System selbst verwaltet.</p>
+
+        <p>Im File »USER« werden die Benutzer, soweit sie sich eingetragen haben, gespeichert.</p>
+
+        <p>Es können bei dieser Version maximal 400 Benutzer verwaltet werden.</p>
+
+        <p>Pro eingetragenen Anrufer beziehungsweise pro Record der Datei werden folgende Daten abgelegt:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Anrufername<br>
+            19 Zeichen<br>
+            Wohnort/Stadt<br>
+            19 Zeichen<br>
+            Rechnersystem 10 Zeichen<br>
+            Passwort 10 Zeichen<br>
+            Datum des letzten Login 8 Zeichen<br>
+            Uhrzeit des letzten Login 8 Zeichen<br>
+            Bell on/off 1 Zeichen<br>
+            Linefeed on/off 1 Zeichen<br>
+            Profi/Anfänger 1 Zeichen<br>
+            Reserve 2 Zeichen<br>
+            Gesamte Recordlänge 79 Zeichen<br>
+            Plus ein Return (CR) 80 Zeichen</p>
+
+        <p>Der File M-INDEX speichert die Namen und Paßwörter der eingetragenen Benutzer, für die eine persönliche Nachricht vorhanden ist.</p>
+
+        <p>Wenn sich ein Anrufer zu erkennen gibt (UID), sucht das System, ob der Name und das Paßwort im Indexfeld vorhanden ist. Wenn ja, ergibt die Laufvariable I (FORI=1TO50) das persönliche Textfile (P 1 bis P 50) und wird dem Benutzer gezeigt.</p>
+
+        <p>Im File A-INDEX werden alle aktuellen Daten gesichert, damit diese nicht verloren gehen, wenn das System sich einmal aufhängen sollte. Gesichert wird das Datum, Anzahl der Anrufe, und wann die letzte Nachricht abgespeichert wurde.</p>
+
+        <p>Nach jedem Durchgang (Login-Logoff) werden die Daten dort gesichert.</p>
+
+        <p>Persönliche Nachrichten werden in den Files P 1 bis P 50 abgelegt. Die Belegung dieser Files läuft parallel mit dem M-Indexfeld. Mit dem M-Indexfeld wird auch überprüft, ob noch Platz für eine weitere persönliche Nachricht vorhanden ist.</p>
+
+        <p>Wird eine Nachricht für jemanden abgelegt, für den schon eine vorhanden ist, so wird der neue Text an das vorhandene File mit dem Append-Befehl (,s,a) angehängt.</p>
+
+        <p>Die öffentlichen Texte, die von jedem Benutzer eingegeben werden können, werden automatisch an den Anfang des MESSAGE-Files gestellt.</p>
+
+        <p>Besondere Bedeutung erhält das File »BILD«. Mit diesem File hat der Betreiber (Sysop) die Möglichkeit, die Anfangsmeldung seiner Box zu kreieren.</p>
+
+        <h3>2. [ML] INR</h3>
+
+        <p>Das Listing muß mit dem MSE eingegeben und auf Diskette gespeichert werden. Startadresse dieses Maschinenprogramms ist $C000. Die Maschinenroutine wird automatisch, wenn man das Mailboxprogramm gestartet hat, nachgeladen und aktiviert.</p>
+
+        <p>Das Maschinenprogramm beinhaltet folgende Funktionen :<br>
+            a) Mit SYS49152 wird die RS232-Schnittstelle eröffnet und die Pufferzeiger in den $C000-Bereich verbogen.</p>
+
+        <p>Würde man den Kanal in Basic eröffnen, würde der C 64 die beiden Ein-/Ausgabe-Puffer am Ende des Basic-Speichers anlegen und dadurch den Hauptspeicher um 512 Byte kürzen. Aber warum soll man den Basic-Speicher verschwenden, wenn man den $C000-Bereich dafür nutzen kann.<br>
+            b) DieZeiger$F157 (Input), $F1CA(Output) und $F13E (Get) werden »verbogen« und zeigen auf die eigene Routine. Dort erfolgen die Umrechnungen des ASCII-CBM-Codes. Damit spart man sich das lästige Konvertieren in Basic, was sich sicherlich auch in einer langsameren Geschwindigkeit auswirkt.</p>
+
+        <p>So genügt es einfach zu sagen: PRINT#2,"HALLO" um am User-Port reinen ASCII-Code zu senden.</p>
+
+        <p>Zum anderen ist dieser PRINT-Befehl auch für die Bildschirmausgabe zuständig. Mit einem einzigen PRINT erfolgt die Ausgabe auf dem Bildschirm und am User-Port. Dadurch erspart man sich die doppelten Ausgaben mit PRINT und PRINT #, was sich sicherlich auch vom Speicherplatz her bemerkbar macht.</p>
+
+        <p>Der GET #-Befehl ist im Gegensatz zum PRINT # nur für ein Eingabegerät zuständig.<br>
+            c) Die letzte Routine hat schließlich die Aufgabe, Texte von der Floppy auf dem Bildschirm und gleichzeitig auf dem User-Port auszugeben.</p>
+
+        <p>Unter anderem wird die Tastatur und der User-Port auf Eingaben abgefragt, und die Eingaben auf Steuerzeichen hin geprüft.<br>
+            Mit den Codes<br>
+            Ctrl/S Halt<br>
+            Ctrl/Q Weiter<br>
+            Ctrl/X Abbruch<br>
+            Ctrl/N Nächster<br>
+            kann die Textausgabe vom Benutzer gesteuert werden.</p>
+
+        <p>Nebenbei wird auch die Detect-Anzeige (CD-Leitung aktiv, Carrier erhalten) vom Koppler abgefragt und nach Ausbleiben die Textausgabe unterbrochen.</p>
+
+        <h3>3. MAILBOX</h3>
+
+        <p>Um eine gewisse Übersicht und Struktur im Programm zu erreichen, wurden die einzelnen Funktionen in Programm-Blöcke aufgeteilt.</p>
+
+        <p>Diese sind nach ihrem Zweck entsprechend mit REM-Zeilen gekennzeichnet.</p>
+
+        <p>Die einzelnen Blöcke sind in Tabelle 1 dargestellt.</p>
+
+        <p>Die einzelnen Befehle für die Box kann man den Help-Listen entnehmen, so daß hier nur ein paar Befehle beschrieben werden sollen.</p>
+
+        <p>Da die Box sehr offen gehalten ist, kann sich jeder Anrufer selbst im System eintragen. Man gibt einfach »NU« ein, und danach seinen Namen, Stadt, Computer und das persönliche Paßwort. Nach einem »LOGOFF« wird man in die Benutzerliste aufgenommen und man kann sich dann mit dem Befehl UID &lt;name> zu erkennen geben. Um einem anderen eingetragenen Benutzer eine persönliche Nachricht zu schicken, wird der Befehl PME angewendet. Das System fragt dann nach dem Namen und wenn vorhanden, kann man danach seine Nachricht im Texteditor eingeben und abspeichern.</p>
+
+        <p>Es besteht auch die Möglichkeit, sich die Anruferliste anzuschauen. Es gibt mehrere Arten der Ausgabe und Suche: UL Hiermit wird die gesamte Liste angezeigt.</p>
+
+        <p>TODO TABLE</p>
+
+        <p>ULA Es wird die Anzahl der eingetragenen Benutzer angezeigt.<br>
+            ULN Es werden nur die Namen der Benutzer gezeigt<br>
+            ULN&hellip;. Hiermit kann man direkt einen Benutzer suchen. Es wird der gesamte Name überprüft.<br>
+            ULN &hellip;.* dito., allerdings wird nur die Anzahl der eingegebenen Zeichen überprüft.<br>
+            ULS&hellip;. Es wird nach der Stadt gesucht (Funktion wie oben).<br>
+            DULR&hellip;..Nach Computer suchen (Funktion wie oben).<br>
+            ULD&hellip;. Nach Datum suchen (Funktion wie oben).<br>
+            UIDA Mit diesem Befehl kann der Benutzer seine persönlichen Daten in der Datei ändern (beispielsweise neuer Computer, neue Stadt, etc.).<br>
+            SOR Damit kann der Benutzer den Betreiber (Sysop) rufen, und wenn dieser anwesend ist, kann ein Gespräch (Chat) geführt werden.<br>
+            PRO Es werden die Systemmeldungen unterdrückt.<br>
+            Wenn man die Befehle kennt, ist es sehr nützlich die Help-Listen und Systemmeldungen blockieren zu können, da diese Ausgaben Zeit kosten, was sich in der Telefonrechnung niederschlägt.<br>
+            Tl Man erhält das aktuelle Datum und Uhrzeit. Unter anderem wird die im System verbrachte Zeit angegeben.<br>
+            PML Hat ein eingetragener Benutzer eine persönliche Nachricht erhalten, so kann er sie sich mit diesem Befehl noch einmal anschauen, da diese nach einem »LOGOFF« automatisch vom System gelöscht wird.<br>
+            BE Einige Terminals verwenden ein akustisches Signal, um den Benutzer auf bestimmte Meldungen aufmerksam zu machen. Dieses kann mit diesem Befehl unterbunden oder freigegeben werden.<br>
+            LF Bestimmte DFÜ-Programme brauchen ein Linefeed, um den Cursor eine Zeile nach unten zu bewegen, da bei ihnen ein RETURN den Cursor nur am Zeilenanfang plaziert (on/off- Modus)</p>
+
+        <p>Obwohl dieses Programm für den Mailbox-Betrieb geschrieben wurde, so besteht doch für den einen oder anderen die Möglichkeit, diese oder jene Funktion für andere Programme zu verwenden. Ein Beispiel wäre die Benutzerverwaltung. Damit kann man sich ein sehr komfortables Adressenprogramm mit Direktzugriff aufbauen.</p>
+
+        <p>Oder das Datum, das um 00.00 Uhr vom System automatisch erhöht wird. Schaltjahre werden selbstverständlich berücksichtigt.</p>
+
+        <h3>Compiler</h3>
+
+        <p>Es ist sicherlich ratsam, das Programm zu compilieren. Es erhöht auf alle Fälle die Geschwindigkeit. Aber die Frage ist, welcher Compiler sich dafür eignet.</p>
+
+        <p>Der Petspeed eignet sich leider nicht dafür, da er Register in der Zeropage benutzt, die normalerweise der RS232 zugeordnet sind.</p>
+
+        <p>Der Bass-Compiler ist sehr mühsam, langsam und umständlich.</p>
+
+        <p>Bewährt haben sich der Austro- und der Austrospeed Compiler von Commodore.</p>
+
+        <p>Empfehlenswert ist der Basic 64 von Data Becker. Dieser bietet so viele Möglichkeiten wie kein anderer. Allerdings sind einige Bedingungen oder Einstellungen nötig:</p>
+
+        <p>Da Basic 64 den gesamten RAM-Bereich benutzt, somit auch den $C000-Bereich, wo die Maschinenroutine liegt, muß man dem Compiler klar machen, daß dieser Bereich für ihn tabu ist.</p>
+
+        <p>Das macht man, indem man in der Parameterliste des Compilers Basic 64 den Punkt »E« aufruft und dort die Adresse 49150 eingibt. Dadurch erkennt der Compiler, wo seine Grenze ist, und die Routine im $C000 Bereich bleibt erhalten.<br>
+            Noch einmal die Abtippvorschriften:<br>
+            Zuerst sollten Sie die beiden Basic-Programme (Listing 1 und 2) eintippen und auf Diskette speichern. Dann das Maschinenprogramm (Listing 3). Mit dem Programm »DATEI/SORT/-COPY« generieren Sie dann eine extra Datendiskette.</p>
+
+        <p>Die M.C.S.-Box, das heißt, das hier abgedruckte Programm im praktischen Einsatz, erreichen Sie über die Telefonnummer 040-2512371.</p>
+
+        <address class="author">(Thomas Wieske/hm)</address>
+    </article>
+</body>
+
+</html>

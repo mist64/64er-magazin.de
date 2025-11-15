@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Taktvoller Musiker</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Langens, tr">
+    <meta name="64er.issue" content="Sonderheft 7/85">
+    <meta name="64er.pages" content="27-31">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Taktvoller Musiker</h1>
+        <p class="intro">Dieses Schlagzeugprogramm für den C64 imitiert bis zu acht verschiedene Schlaginstrumente. Durch die Möglichkeit, Taktsequenzen zu programmieren, wird der Computer zum taktgenauen Rhythmusgerät.</p>
+
+        <p>Das Programm (siehe Listing) bietet vier Hauptmenüpunkte:</p>
+
+        <ol>
+            <li>Laden und Speichern von Schlagzeugsequenzen</li>
+            <li>Sequenzen erstellen</li>
+            <li>Sequenzen abspielen</li>
+            <li>Sequenzen auf der »Schautafel« betrachten.</li>
+        </ol>
+
+
+        <p>Von jedem Menüpunkt kommt man durch die Eingabe eines Sterns (*) wieder in das Hauptmenü zurück.</p>
+
+        <p><strong>Zu 1</strong>: Es können insgesamt 100 Sequenzen zu je 32 Takteinheiten eingegeben werden. (8 Presets sind von vornherein vorhanden, sie haben die Sequenznummer 1 bis 8). Die Speicherung dieser Sequenzen übernimmt der erste Programmpunkt. Es muß nur der Programmname angegeben werden und das Programm lädt (oder speichert) alle existierenden Sequenzen auf Kassette. Danach springt es wieder zum Hauptmenü zurück.</p>
+
+        <p><strong>Zu 2</strong>: Zuerst müssen Sie eingeben, welche Sequenz editiert werden soll. (Der Computer zeigtjeweils die letzte eingegebene Sequenznummer an, damit man weiß, wie viele Files schon belegt sind.) Danach wird gefragt, welcher Teil des Schlagzeugs eingestellt werden soll. Es stehen zur Verfügung:</p>
+
+        <p>Snare Drum, Akzente, Baß-Drum, Hi-Hat(zu), Hi-Hat(offen), Becken, kleine Trommel und große Trommel.</p>
+
+        <p>Da der C 64 nicht acht verschiedene Klänge auf einmal spielen kann, mußten folgende Vereinbarungen getroffen werden: Es darf aus den drei Hauptgruppen (siehe unten) jeweils nur ein Instrument pro Takt genommen werden.</p>
+
+        <ol>
+            <li>Gruppe: Snare Drum; Akzente</li>
+            <li>Gruppe: Baß-Drum; kleine Trommel; große Trommel</li>
+            <li>Gruppe: Hi-Hat (zu und offen); Becken</li>
+        </ol>
+
+
+        <p>Wenn alle Schlagzeugteile in einem Takt gesetzt sind, gilt das als Taktende. Das ist nützlich, um zum Beispiel Dreivierteltakte zu programmieren.</p>
+
+        <p>Wenn man aus den acht Instrumenten gewählt hat, wird ein neues Bild aufgebaut und man kann mit dem Joystick oder den Cursor-Tasten auf den 32 Takteinheiten Punkte setzen oder löschen. Falls schon einige Takte gesetzt waren, wird das natürlich auch angezeigt. Das macht man nun mit jedem Schlagzeugteil bis die ganze Sequenz eingestellt ist.</p>
+
+        <p><strong>Zu 3</strong>: Wählt man diese Funktion, wird man gefragt, ob man eine einzelne oder mehrere Sequenzen hintereinander gespielt haben will. Das ist nützlich um zum Beispiel verschiedene Rhythmen mit kleinen Soli (»Breaks«) zu kombinieren. Probieren Sie zum Beispiel einmal die Sequenzenkombination 1,2,4,3,0 aus (die Null zeigt das Ende der Eingabe an). Bei der einzelnen Sequenz kann man zwischen der gerade editierten und einer anderen wählen. Im Spielmodus, der rechts oben im Bild angezeigt wird, kann man mit den Cursor-Tasten die Geschwindigkeit einstellen (insgesamt 256 Geschwindigkeiten). Weitere Funktionen: F1 - Ende; F3 - zurück zum Menü; F5 - Sequenz von Anfang an spielen; F7 - Sequenz von der abgebrochenen Stelle an weiterspielen.</p>
+
+        <p><strong>Zu 4</strong>: Um zu sehen, wie alle Takte einer Sequenz (Snare Drum, Hi-Hat, etc.) aussehen, wählt man den vierten Programmpunkt. Zuerst wird man wieder gefragt, welche Sequenz man sich ansehen will. Danach zeigt der Computer alle Taktsequenzen auf dem Bildschirm. (Wichtig: Einen schönen Effekt erzielt man, wenn Snare Drum und Baß-Drum zusammen gespielt werden; das ergibt ein Metall-Geräusch.) Man kann von hier aus wieder zum Menü oder zum zweiten Programmteil verzweigen. Wie schon erwähnt, sind im Programm bereits acht Presets (fest programmierte Sequenzen) enthalten, die auf Wunsch verändert werden können. Nach »RUN« sind Sie wieder im Ausgangszustand.</p>
+
+        <h3>Programmtechnik:</h3>
+
+        <p>Ich habe mir überlegt, wie man eine 32 Takte lange Sequenz mit je acht verschiedenen Rhythmusgeräten auf minimalen Speicherplatzbedarf ablegen könnte. Am besten erschien mir dann, je einem Takt ein Byte zuzuordnen und jedes Schlaginstrument als 1 Bit (8 Schlaginstrumente = 28 = 2 56 = 1 Byte) zu kennzeichnen. Das erklärt auch, warum eine Belegung aller acht Instrumente auf einem Takt das Taktende kennzeichnen: Bei dem Modus »mehrere Sequenzen hintereinander« ist das Ende-Flag auch die Zahl 255.</p>
+
+        <p>Jede Taktsequenz ist in dem Variablenfeld T(Z,NR) abgespeichert (Z=1 -32 =Taktfeld, NR=Nummer der Sequenz).</p>
+
+        <h3>Wichtige Variablen</h3>
+
+        <p class="source">ZA: Nummer der höchsten Sequenz<br>
+            Z: Nummer der gerade editierten Sequenz<br>
+            N$: Name der Datei A$: Tastaturvariable H;J: Laufvariablen</p>
+
+        <h3>Maschinenprogramme:</h3>
+
+        <p>TODO TABLE</p>
+
+        <p>$ 9003 - $ 900E: Löschen aller SID-Register<br>
+            $ 9010 - $ 9085: Schlagzeugsounds<br>
+            $ 90A0 - $ 9180: Hauptabspielroutine:<br>
+            1. Entsprechend den Bits auf die Sounds verzweigen<br>
+            2. Geschwindigkeitskontrolle<br>
+            3. Geschwindigkeitsdarstellung<br>
+            4. »LED«-Kontrolle<br>
+            $ 9200 - $ 9250: »LEDs« für die Schautafel $9251 -$9273: »LEDs«fürSequenzeinstellen</p>
+
+        <h2>Hinweis</h2>
+
+        <p>Das Programm ist auf Datasettenbetrieb ausgelegt. Für den Betrieb mit einer Floppy sind die Zeilen 2120 und 2270 zu ändern:<br>
+            2120 OPEN 1,8,1,N$+",S,W"<br>
+            2270 OPEN 1,8,0,N$+",S,R"</p>
+
+        <address class="author">(Thomas Langens/tr)</address>
+    </article>
+</body>
+
+</html>
