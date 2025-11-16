@@ -1,0 +1,651 @@
+
+
+;layout.prg ==0801==
+    1 rem ** cassetten-layout   von    **
+    2 rem ** karl-heinz woellecke      **
+    3 rem ** peterstr.15               **
+    4 rem ** 3380 goslar               **
+    5 rem ** tel:(05321)21246          **
+    6 rem ** nur mit input-routine von **
+    7 rem ** thomas graf benutzen !!   **
+    8 rem ** siehe auch  64'er  6/85   **
+    9 rem ** seite 148                 **
+   10 printchr$(147):printchr$(14):goto10000
+   11 rem **leerfelder besetzen**
+   12 fori=6to19
+   13 ifa$(i)="                                       "thena$(i)="."
+   14 next:return
+   15 forj=1to13
+   16 ifb$(j)="                                       "thenb$(j)="."
+   17 next:return
+   18 fork=1to3
+   19 ife$(k)="                                   "thene$(k)="."
+   20 next:return
+   21 fork=5to7
+   22 ife$(k)="                                   "thene$(k)="."
+   23 next:return
+   24 forl=1to14
+   25 iff$(l)="        "thenf$(l)="."
+   26 next:return
+   27 form=1to13
+   28 ifh$(m)="        "thenh$(m)="."
+   29 next:return
+   39 rem **** floppy eingeschaltet ***
+   40 pokeq,9:poker,0:syss:print"{blu}Diskettenstation eingeschaltet   j/n  "
+   42 getx$:ifx$=""then42
+   44 ifx$="j"then48
+   46 ifx$="n"then10010
+   47 goto42
+   48 pokeq,9:poker,0:syss:print"Diskette eingelegt               j/n  "
+   50 getx$:ifx$=""then50
+   52 ifx$="j"then56
+   54 ifx$="n"then10010
+   55 goto50
+   56 pokeq,9:poker,0:syss:print"{wht}  {swlc}                                   "
+   58 return
+   59 rem *** dateneingabe ******
+   60 print"{clr}";:pokee,2:pokef,2:print"{yel}Geben Sie nun den Cassettentitel ein"
+   61 print"{down}39 Zeichen sind verfuegbar{wht}"
+   62 input>39,0,9,a$(5):goto72
+   63 pokeq,13:poker,0:syss:print"                          "
+   64 pokeq,6:poker,0:syss:print"{rvon}{lgrn} Aendern des Cassettentitels {rvof}{wht}"
+   66 pokeq,9:poker,0:syss:printa$(5)
+   68 input>39,0,9,a$(5)
+   72 print"{down}{down}{down}"c$
+   75 getx$:ifx$=""then75
+   76 ifx$="j"then79
+   77 ifx$="n"then63
+   78 goto75
+   79 print"{clr}";:pokee,3:pokef,3:pokeg,1:print"Ausgewaehlte Kriterien :";
+   80 print"    {rvon} w/z/m {rvof}"
+   81 print"{down}{blu}Bandsorte:      {grn}";a$(1)
+   82 print"{down}{blu}Bandmechanik:   {grn}";a$(2)
+   84 print"{down}{blu}Aufnahmeart:    {grn}";a$(3)
+   85 print"{down}{blu}Rauschunterdr.: {grn}";a$(4)
+   86 print"{down}{down}{wht}Cassettentitel: ":print"{down}{down}{gry1}"a$(5)
+   87 print"{wht}{down}{down}{down}"c$
+   88 getx$:ifx$=""then88
+   89 ifx$="j"then100
+   90 ifx$="n"orx$="m"thenreturn
+   91 ifx$="w"then150
+   92 ifx$="z"thenprint"{rvon}{down} m {rvof} oder {rvon} w {rvof} druecken !{rvof}":fort=1to1000:next:goto79
+   98 goto88
+  100 print"{clr}";:pokee,6:pokef,6
+  101 print"{lblu}14 Zeilen mit je 39 Zeichen verfuegbar"
+  102 fori=6to19
+  104 i$="{cyn}Seite 1            {rvon} Eingabe {rvof}"
+  106 g$="{yel}Eingabe fuer Zeile : {wht}"
+  108 pokeq,2:poker,9:syss:printi$
+  110 pokeq,4:poker,9:syss:printg$;:printi-5
+  112 print:print
+  116 input>39,0,i,a$(i):next
+  122 print:printc$
+  124 getx$:ifx$=""then124
+  126 ifx$="j"thengosub12:goto200
+  128 ifx$="n"then150
+  130 goto124
+  150 print"{clr}";:pokee,6:pokef,6:pokeg,1
+  151 gosub12:print"Seite 1           {rvon} Kontrolle  w/z/m  {rvof}"
+  152 print:print"{rvon}{lblu}  Aendern   1  -   5                   {rvof}{wht}"
+  153 fori=6to10:printa$(i):next
+  154 print;:print"{rvon}{lblu}  Aendern   6  -  10                   {rvof}{wht}"
+  155 fori=11to15:printa$(i):next
+  156 print"{rvon}{lblu}  Aendern  11  -  14                   {rvof}{wht}"
+  157 fori=16to19:printa$(i):next
+  158 print"{rvon}{down}{cyn} A e n d e r n  j/n ? {rvof}{down}{wht}"
+  159 getx$:ifx$=""then159
+  160 ifx$="j"then168
+  161 ifx$="n"then200
+  162 ifx$="w"then250
+  163 ifx$="z"then79
+  164 ifx$="m"thenreturn
+  167 goto159
+  168 pokeq,20:poker,0:syss:print"Nummer die geaendert wird  :"
+  170 input>2,30,20,x$:ifval(x$)<1orval(x$)>14then190
+  172 y=val(x$)+5
+  174 pokeq,22:poker,0:syss:printa$(y)
+  178 input>39,0,22,a$(y):goto150
+  190 print:print:print"{rvon} Falsche Eingabe       Falsche Eingabe {rvof}"
+  192 fort=1to1000:next:goto150
+  200 pokee,6:pokef,6:print"{clr}";
+  201 print"{lblu}13 Zeilen mit je 39 Zeichen verfuegbar"
+  202 fori=1to13
+  204 l$="{cyn}Seite 2            {rvon} Eingabe {rvof}"
+  206 m$="{yel}Eingabe fuer Zeile : {wht}"
+  208 pokeq,2:poker,9:syss:printl$
+  210 pokeq,4:poker,9:syss:printm$;:printi
+  212 print:print
+  216 input>39,0,i+5,b$(i):next
+  222 print:printc$
+  224 getx$:ifx$=""then224
+  226 ifx$="j"thengosub15:goto300
+  228 ifx$="n"then250
+  230 goto224
+  250 print"{clr}";:pokee,6:pokef,6:pokeg,1
+  251 gosub15:print"Seite 2           {rvon} Kontrolle  w/z/m  {rvof}"
+  252 print:print"{rvon}{lblu}  Aendern   1  -   5                   {rvof}{wht}"
+  253 fori=1to5:printb$(i):next
+  254 print;:print"{rvon}{lblu}  Aendern   6  -  10                   {rvof}{wht}"
+  255 fori=6to10:printb$(i):next
+  256 print"{rvon}{lblu}  Aendern  11  -  13                   {rvof}{wht}"
+  257 fori=11to13:printb$(i):next
+  258 print"{rvon}{down}{cyn} A e n d e r n  j/n ? {rvof}{down}{wht}"
+  259 getx$:ifx$=""then259
+  260 ifx$="j"then268
+  261 ifx$="n"then300
+  262 ifx$="w"then350
+  263 ifx$="z"then150
+  264 ifx$="m"thenreturn
+  267 goto259
+  268 pokeq,19:poker,0:syss:print"Nummer die geaendert wird  :"
+  270 input>2,30,19,x$:ifval(x$)<1orval(x$)>13then290
+  272 y=val(x$)
+  274 pokeq,22:poker,0:syss:printb$(y)
+  278 input>39,0,22,b$(y):goto250
+  290 print:print:print"{rvon} Falsche Eingabe       Falsche Eingabe {rvof}"
+  292 fort=1to1000:next:goto250
+  300 pokee,4:pokef,4:print"{clr}";
+  301 print"{lred}3 Zeilen mit je  35 Zeichen verfuegbar"
+  302 print"1 Titelzeile mit 29 Zeichen verfuegbar"
+  303 fori=1to3
+  304 l$="{yel}Cassettenseite 1   {rvon} Eingabe {rvof}"
+  306 m$="Eingabe fuer Zeile : {wht}"
+  308 pokeq,3:poker,9:syss:printl$
+  310 pokeq,4:poker,9:syss:printm$;:printi
+  312 print:print
+  316 input>35,0,i+5,e$(i):next
+  318 print:print:print"         {rvon}{yel} Titelzeile eingeben ! {rvof}{wht}"
+  320 input>29,0,12,e$(4)
+  322 print:printc$
+  324 getx$:ifx$=""then324
+  326 ifx$="j"thengosub18:goto400
+  328 ifx$="n"then350
+  330 goto324
+  350 print"{clr}";:pokee,14:pokef,14:pokeg,1
+  351 gosub18:print"Cassettenseite 1  {rvon} Kontrolle  w/z/m  {rvof}"
+  352 print:print"{rvon}{blu}  Aendern   1  -  3                {rvof}{wht}"
+  353 print:fori=1to3:printe$(i):next
+  354 print:print"{rvon}{yel}  Titelzeile    ( 4 )        {rvof}{wht}":print
+  356 printe$(4)
+  358 print"{rvon}{down}{lgrn}  A e n d e r n  j/n ? {rvof}{down}{wht}"
+  359 getx$:ifx$=""then359
+  360 ifx$="j"then368
+  361 ifx$="n"then400
+  362 ifx$="w"then414
+  363 ifx$="z"then250
+  364 ifx$="m"thenreturn
+  367 goto359
+  368 pokeq,12:poker,0:syss:print"Nummer die geaendert wird  :"
+  370 input>1,30,12,x$:ifval(x$)<1orval(x$)>4then390
+  372 y=val(x$):ifval(x$)=4then380
+  374 pokeq,15:poker,0:syss:printe$(y)
+  378 input>35,0,15,e$(y):goto350
+  380 pokeq,15:poker,0:syss:printe$(4)
+  382 input>29,0,15,e$(4):goto350
+  390 print:print:print:print"{rvon} Falsche Eingabe       Falsche Eingabe {rvof}"
+  392 fort=1to1000:next:goto350
+  400 pokee,9:pokef,9:print"{clr}";
+  401 print"{yel}3 Zeilen mit je  35 Zeichen verfuegbar"
+  402 fori=5to7
+  403 l$="{grn}Cassettenseite 2   {rvon} Eingabe {rvof}"
+  404 m$="Eingabe fuer Zeile : {wht}"
+  405 pokeq,2:poker,9:syss:printl$
+  406 pokeq,3:poker,9:syss:printm$;:printi-4
+  407 print:print
+  408 input>35,0,i,e$(i):next
+  409 print:printc$
+  410 getx$:ifx$=""then410
+  411 ifx$="j"thengosub21:goto8000
+  412 ifx$="n"then414
+  413 goto410
+  414 print"{clr}";:pokee,14:pokef,14:pokeg,1
+  415 gosub21:print"Cassettenseite 2  {rvon} Kontrolle  w/z/m  {rvof}"
+  416 print:print"{rvon}{blu}  Aendern   1  -  3                {rvof}{down}{wht}"
+  417 fori=5to7:printe$(i):next
+  418 print:print"{rvon}{yel}  Titelzeile                 {rvof}{wht}":print
+  420 printe$(4)
+  422 print"{rvon}{down}{lgrn}  A e n d e r n  j/n ? {rvof}{down}{wht}"
+  424 getx$:ifx$=""then424
+  426 ifx$="j"then438
+  428 ifx$="n"then8000
+  430 ifx$="w"then8113
+  432 ifx$="z"then350
+  434 ifx$="m"thenreturn
+  436 goto424
+  438 pokeq,12:poker,0:syss:print"Nummer die geaendert wird  :"
+  440 input>1,30,12,x$:ifval(x$)<1orval(x$)>3then448
+  442 y=val(x$)+4
+  444 pokeq,15:poker,0:syss:printe$(y)
+  446 input>35,0,15,e$(y):goto414
+  448 print:print:print:print"{rvon} Falsche Eingabe       Falsche Eingabe {rvof}"
+  450 fort=1to1000:next:goto414
+  459 rem **** datenkontrolle ****
+  460 pokee,1:pokef,1:pokeg,5:print"{clr}"
+  462 print"{rvon}-7- Daten kontrollieren                 {rvof}"
+  464 print"{down}Eingeladene Daten koennen"
+  466 print"gesichtet werden."
+  471 print"{down}{rght}{rght}{rght}1 = Seite 1"
+  472 print"{rght}{rght}{rght}2 = Seite 2"
+  473 print"{rght}{rght}{rght}3 = Cassettenseite 1"
+  474 print"{rght}{rght}{rght}4 = Cassettenseite 2"
+  475 print"{down}{rght}{rght}{rght}5 = Archivdaten Titel"
+  476 print"{rght}{rght}{rght}6 = Archivdaten Seite 1"
+  477 print"{rght}{rght}{rght}7 = Archivdaten Seite 2"
+  478 print"{down}{rght}{rght}{rght}8 = Weiterblaettern
+  479 print"{rght}{rght}{rght}9 = Menue
+  481 print"{down}{down}{down}{rght}{rght}{rght}{rvon} Bitte auswaehlen --> {rvof}"
+  482 getx$:ifval(x$)<1orval(x$)>9then482
+  486 onval(x$)goto150,250,350,414,8113,8214,8314,79,10010
+  499 rem ** druckausgabe vorbereiten**
+  500 fori=1to19
+  502 ifa$(i)=".                                      "ora$(i)="."thena$(i)=""
+  504 nexti
+  510 forj=1to13
+  512 ifb$(j)=".                                      "orb$(j)="."thenb$(j)=""
+  514 nextj
+  520 fork=1to9
+  522 ife$(k)="."thene$(k)=""
+  524 nextk
+  530 forl=1to14
+  532 iff$(l)=".       "orf$(l)="."thenf$(l)=""
+  534 nextl
+  540 form=1to13
+  542 ifh$(m)=".       "orh$(m)="."thenh$(m)=""
+  544 nextm
+  590 return
+  599 rem ** leervariablen besetzen **
+  600 fori=1to19
+  605 ifa$(i)=""thena$(i)="."
+  610 next
+  615 forj=1to13
+  620 ifb$(j)=""thenb$(j)="."
+  625 next
+  630 fork=1to9
+  635 ife$(k)=""thene$(k)="."
+  640 next
+  645 forl=1to14
+  650 iff$(l)=""thenf$(l)="."
+  655 next
+  660 form=1to13
+  665 ifh$(m)=""thenh$(m)="."
+  670 next
+  690 return
+  839 rem *** up druckausgabe archivdaten ***
+  840 print"{clr}";:pokee,4:pokef,4:pokeg,1
+  845 print"{rvon}-9- Archivdaten eingeben/ausdrucken     {rvof}":gosub500
+  850 pokeq,10:poker,5:syss:print"Drucker eingeschaltet  j/n   "
+  860 getx$:ifx$=""then860
+  865 ifx$="j"then880
+  870 ifx$="n"then8000
+  875 goto860
+  880 pokeq,10:poker,5:syss:print" Papier  eingelegt     j/n   "
+  885 getx$:ifx$=""then885
+  888 ifx$="j"then892
+  890 ifx$="n"then8000
+  891 goto885
+  892 pokeq,10:poker,5:syss:print" Dann drucke ich jetzt  !    ":goto8900
+  939 rem **** up druckausgabe layout ***
+  940 print"{clr}";:pokee,3:pokef,3:pokeg,1
+  945 print"{rvon}-8- Layout ausdrucken                   {rvof}":gosub500
+  950 pokeq,10:poker,5:syss:print"Drucker eingeschaltet  j/n   "
+  960 getx$:ifx$=""then960
+  965 ifx$="j"then980
+  970 ifx$="n"thenreturn
+  975 goto960
+  980 pokeq,10:poker,5:syss:print" Papier  eingelegt     j/n   "
+  985 getx$:ifx$=""then985
+  988 ifx$="j"then992
+  990 ifx$="n"thenreturn
+  991 goto985
+  992 pokeq,10:poker,5:syss:print" Dann drucke ich jetzt  !    "
+ 1000 open1,4,7
+ 1005 print#1,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 1010 print#1,"{CBM-G} "chr$(16)"42{CBM-M}"
+ 1015 print#1,"{CBM-G} "a$(1)chr$(16)"12"a$(2)chr$(16)"42{CBM-N}"
+ 1020 print#1,"{CBM-G} "a$(3)chr$(16)"12"a$(4)chr$(16)"42{CBM-M}"
+ 1025 print#1,"{CBM-G} "a$(5)chr$(16)"42{CBM-M}"
+ 1030 print#1,"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 1035 print#1,"{CBM-G} "a$(3)chr$(16)"32"a$(4)chr$(16)"42{CBM-M}"
+ 1040 print#1,"{CBM-G} "a$(5)chr$(16)"42{CBM-M}"
+ 1045 print#1,"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 1050 print#1,"{CBM-G} "o$chr$(16)"42{CBM-M}"
+ 1055 fori=6to19:print#1,"{CBM-G} "a$(i)chr$(16)"42{CBM-M}":next
+ 1060 print#1,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 1065 print#1,"{CBM-G} "p$chr$(16)"42{CBM-M}"
+ 1070 fori=1to13:print#1,"{CBM-G} "b$(i)chr$(16)"42{CBM-M}":next
+ 1075 print#1,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 1080 fori=1to3:print#1,"{CBM-G}"e$(i)chr$(16)"36{CBM-M}":next
+ 1085 print#1,"    {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}   {CBM-M}"
+ 1090 print#1,"  1"chr$(16)"34"a$(1)"{CBM-M}"
+ 1095 print#1,"                                  "a$(2)
+ 1100 print#1,"    {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}   {CBM-M}"
+ 1105 print#1,"{CBM-G}   "e$(4)chr$(16)"36{CBM-M}"
+ 1115 print#1,"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 1120 fori=5to7:print#1,"{CBM-G}"e$(i)chr$(16)"36{CBM-M}":next
+ 1125 print#1,"    {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}   {CBM-M}"
+ 1130 print#1,"   "chr$(16)"34"a$(1)"{CBM-M}"
+ 1135 print#1,"  2                               "a$(2)
+ 1140 print#1,"    {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}   {CBM-M}"
+ 1143 print#1
+ 1145 print#1,"{CBM-G}   "e$(4)chr$(16)"36{CBM-M}"
+ 1150 print#1,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 1420 close1
+ 1422 pokeq,10:poker,5:syss:print" Alle Daten gedruckt   !     "
+ 1424 gosub600:fort=1to3000:next:return
+ 2499 rem **** arbeitshinweise ****
+ 2500 pokee,1:pokef,1:pokeg,14
+ 2505 print"{clr}";:print"{rvon}-1- Arbeitshinweise                     {rvof}"
+ 2510 print"     C a s s e t t e n l a y o u t    {down}"
+ 2520 print"{rvon}                                        {rvof}";:print
+ 2530 return
+ 3000 gosub2500
+ 3002 print"{grn}Im Programmpunkt -2- koennen Sie Ihr"
+ 3004 print" Einspielverfahren festlegen."
+ 3006 print"{down}{down}z.B.:{down}"
+ 3008 print" Bandsorte":print" Bandmechanik"
+ 3010 print" Aufnahmeart"
+ 3012 print" Rauschunterdrueckungssystem"
+ 3014 print"{down}{down}{down}{down}{down}{down}"d$:poke198,0:wait198,1
+ 3016 gosub2500
+ 3020 print"{cyn} Im Programmpunkt -3- koennen Sie auf"
+ 3022 print" ein festgelegtes Einspielverfahren"
+ 3024 print" zurueckgreifen."
+ 3026 print"{down} z.B.:"
+ 3028 print" Bandsorte:    {rvon} Fe {rvof}"
+ 3030 print" Bandmechanik: {rvon} SM {rvof}"
+ 3032 print" Aufnahmeart:  {rvon} stereo {rvof}"
+ 3034 print" Rauschunterdrueckungssystem:{rvon} HIGH()COM {rvof}"
+ 3038 print"{down} Die {rvon}Standardvariablen{rvof} koennen Sie in"
+ 3040 print" der Zeile 5010 Ihren eigenen"
+ 3042 print" Beduerfnissen anpassen.{blu}"
+ 3044 print"{down}{down}"d$:poke198,0:wait198,1
+ 3046 gosub2500
+ 3048 print"{lred}Programmpunkt -4- dient der Daten="
+ 3050 print"eingabe."
+ 3052 print"{rght}Ihre Eingaben koennen Sie mit den"
+ 3054 print"{rght}Kontrollseiten jederzeit ueberpruefen"
+ 3056 print"{rght}und gegebenenfalls aendern."
+ 3064 print:print:print"{gry3}{down}Programmpunkt -5- sichert Ihre Daten."
+ 3082 print:print:print"{down}{grn}Sicherheitsabfragen verhindern das"
+ 3084 print"{rvon}Ueberschreiben{rvof} von bereits "
+ 3086 print"auf Diskette vorhandenen Dateien."
+ 3088 print:printd$
+ 3090 poke198,0:wait198,1
+ 3092 gosub2500
+ 3094 print"{yel}Programmpunkt -6- ladet Ihre Daten."
+ 3096 print:print
+ 3106 print"{down}{grn}Das Programm springt beim Versuch"
+ 3108 print"nicht vorhandene Dateien von Diskette"
+ 3110 print"zu lesen nach der Fehlermeldung in das"
+ 3112 print"Menue zurueck.":print:print
+ 3120 print"{down}{lred}Mit Programmpunkt -7- koennen Sie Ihre"
+ 3122 print"eingelesenen Daten ueberpruefen und"
+ 3124 print"eventuell vor Druckausgabe aendern.":print
+ 3126 print"{down}"d$
+ 3128 poke198,0:wait198,1
+ 3130 gosub2500
+ 3132 print"{red}Mit Programmpunkt -8- rufen Sie die"
+ 3134 print"{rvon}Druckausgabe{rvof} des Layouts auf."
+ 3152 print"{down}{down}{blu}Mit Programmpunkt -9- koennen Sie die"
+ 3154 print"Archivdaten der verwendeten Musik="
+ 3156 print"stuecke eingeben und ausdrucken lassen."
+ 3172 print"{down}{down}{grn}Mit Programmpunkt -0- endet das Programm";
+ 3174 print"und setzt die Hintergrund- und Rahmen="
+ 3176 print"farbe sowie die Schreibfarbe in den"
+ 3178 print"Einschaltzustand zurueck."
+ 3180 print"{down}{down}{down}{down}{blu}**** Noch einmal  j/n ****"
+ 3182 getx$:ifx$=""then3182
+ 3184 ifx$="j"then3000
+ 3186 ifx$="n"thenreturn
+ 3188 goto3182
+ 3999 rem **** einspielvarianten auswaehlen ****
+ 4000 print"{clr}";:pokee,9:pokef,9:pokeg,1
+ 4002 print"{rvon}-2- Betriebsvariablen setzen            {rvof}";
+ 4005 print"{rvon}{down} B a n d s o r t e                      {rvof}"
+ 4010 print"-1- Ferro       (Fe)"
+ 4020 print"-2- Chromdioxid (Cr)"
+ 4030 print"-3- Ferrochrom  (FC)"
+ 4040 print"-4- Metal       (Me)"
+ 4045 getx$:ifx$=""then4045
+ 4050 ifx$="1"thena$(1)="Fe":goto4100
+ 4060 ifx$="2"thena$(1)="Cr":goto4100
+ 4070 ifx$="3"thena$(1)="FC":goto4100
+ 4075 ifx$="4"thena$(1)="Me":goto4100
+ 4080 ifx$<"1"orx$>"4"then4045
+ 4100 print"{rvon} B a n d m e c h a n i k                {rvof}"
+ 4110 print"-1- Sicherheitsmechanik"
+ 4120 print"-2- Keine Sicherheitsmechanik"
+ 4130 gety$:ify$=""then4130
+ 4140 ify$="1"thena$(2)="SM":goto4200
+ 4150 ify$="2"thena$(2)=".":goto4200
+ 4160 ify$<"1"ory$>"2"then4130
+ 4200 print"{rvon} A u f n a h m e a r t                  {rvof}"
+ 4210 print"-1- stereo"
+ 4220 print"-2- mono"
+ 4225 print"-3- mono/stereo"
+ 4230 getz$:ifz$=""then4230
+ 4240 ifz$="1"thena$(3)="stereo":goto4300
+ 4250 ifz$="2"thena$(3)="mono":goto4300
+ 4255 ifz$="3"thena$(3)="mono/stereo":goto4300
+ 4260 ifz$<"1"orz$>"3"then4230
+ 4300 print"{rvon} R a u s c h m i n d e r u n g          {rvof}"
+ 4310 print"-1- HIGH()COM"
+ 4320 print"-2- DOLBY"
+ 4325 print"-3- Keine Rauschminderung"
+ 4330 getv$:ifv$=""then4330
+ 4340 ifv$="1"thena$(4)="HIGH()COM":goto4400
+ 4350 ifv$="2"thena$(4)="DOLBY":goto4400
+ 4355 ifv$="3"thena$(4)=".":goto4400
+ 4360 ifv$<"1"orv$>"3"then4330
+ 4400 print"{clr}{rvon}-2- Betriebsvariablen setzen            {rvof}";
+ 4402 print"{down}{down} Gesetzte Betriebsvariablen :"
+ 4410 print"{rvon}{down} B a n d s o r t e                      {rvof}"
+ 4415 printa$(1)"{down}"
+ 4420 print"{rvon} B a n d m e c h a n i k                {rvof}"
+ 4425 printa$(2)"{down}"
+ 4430 print"{rvon} A u f n a h m e a r t                  {rvof}"
+ 4435 printa$(3)"{down}"
+ 4440 print"{rvon} R a u s c h m i n d e r u n g          {rvof}"
+ 4445 printa$(4)"{down}"
+ 4450 printc$
+ 4460 getu$:ifu$=""then4460
+ 4470 ifu$="j"thenreturn
+ 4480 ifu$="n"then4000
+ 4490 goto4460
+ 4999 rem **** gesetzte einspielvarianten aufrufen ****
+ 5000 print"{clr}";:pokee,12:pokef,12
+ 5002 print"{rvon}-3- Standardvariablen                   {rvof}{down}{down}{down}{blu}";
+ 5005 print"{rvon} S t a n d a r d v a r i a b l e        {rvof}"
+ 5010 a$(1)="Fe":a$(2)="SM":a$(3)="stereo":a$(4)="HIGH()COM"
+ 5030 print"{down}{down}Bandsorte{wht}        :";a$(1)
+ 5040 print"{down}{down}{blu}Bandmechanik{wht}     :";a$(2)
+ 5050 print"{down}{down}{blu}Aufnahmeart{wht}      :";a$(3)
+ 5060 print"{down}{down}{blu}Rauschminderung{wht}  :";a$(4)
+ 5080 print"{down}{down}{down}{down}"d$
+ 5090 gett$:ift$<>""then5090
+ 5095 poke198,0:wait198,1
+ 5100 return
+ 5999 rem **** daten sichern mit diskette ****
+ 6000 print"{clr}";:pokee,7:pokef,7:pokeg,5
+ 6010 print"{rvon}-5- Daten sichern                       {rvof}"
+ 6020 print"{down}{down}{rght}{rght}{rvon} j {rvof}  = Weiter"
+ 6025 print"{down}{rght}{rght}{rvon} n {rvof}  = Menue"
+ 6040 gosub40
+ 6045 print"{down}{wht}Unter welchem Namem sollen die"
+ 6050 print"Daten abgespeichert werden ?{blu}":print
+ 6055 inputdn$
+ 6060 close1:open1,8,2,dn$+",s,w"
+ 6070 close15:open15,8,15:input#15,a,b$,c,d
+ 6075 ifa<>63thenclose15:goto6160
+ 6080 ifa=63thenprint"{rvon}{grn}{down}{down}   "b$"   {rvof}":close15
+ 6085 pokeq,17:poker,22:syss:print"{grn}Ersetzen j/n  "
+ 6090 getx$:ifx$=""then6090
+ 6095 ifx$="j"thenpokeq,17:poker,22:syss:print"{grn}Wird ersetzt !{yel}":goto6160
+ 6100 ifx$="n"thenprint"{down}{blu}Neuer Name ?{wht}  dann  y  sonst  {rvon} * {rvof}{down}"
+ 6105 ifx$="*"thenreturn
+ 6106 ifx$="y"then6108
+ 6107 goto6090
+ 6108 print"{blu}Neuer Name:{wht}{down}":inputdn$:goto6160
+ 6160 close1:open1,8,2,"@:"+dn$+",s,w"
+ 6161 fori=1to19:print#1,a$(i):next
+ 6162 forj=1to13:print#1,b$(j):next
+ 6163 fork=1to9:print#1,e$(k):next
+ 6164 forl=1to14:print#1,f$(l):next
+ 6165 form=1to13:print#1,h$(m):next
+ 6166 close1:close15
+ 6167 pokeq,23:poker,0:syss:print"{blu}Die Daten sind gesichert{wht}"
+ 6168 fort=1to2500:next
+ 6169 return
+ 6999 rem *** daten laden von diskette **
+ 7000 print"{clr}";:pokee,13:pokef,13:pokeg,1
+ 7010 print"{rvon}{gry2}-6- Daten laden                         {rvof}"
+ 7015 print"{down}{down}{rght}{rght}{rvon} j {rvof}   =  Weiter"
+ 7020 print"{down}{rght}{rght}{rvon} n {rvof}   =  Menue"
+ 7035 gosub40
+ 7040 print"{down}{down}{down}{gry2}Geben Sie den Dateinamen ein{wht}":print
+ 7050 inputdn$
+ 7055 close15:open15,8,15
+ 7060 close1:open1,8,2,dn$+",s,r"
+ 7062 input#15,a:ifa=0then7070
+ 7063 pokeq,15:poker,0:syss:print"{blk}{rvon}  "dn$"  {rvof} nicht vorhanden !"
+ 7064 close1:close15:fort=1to2500:next:return
+ 7070 fori=1to19:input#1,a$(i):next
+ 7071 forj=1to13:input#1,b$(j):next
+ 7072 fork=1to9:input#1,e$(k):next
+ 7073 forl=1to14:input#1,f$(l):next
+ 7074 form=1to13:input#1,h$(m):next
+ 7076 close15
+ 7078 close1:close15
+ 7080 pokeq,20:poker,0:syss:print"{blu}Die Daten sind geladen{wht}"
+ 7082 fort=1to1500:next:return
+ 7999 rem *** archivdateneingabe ***
+ 8000 print"{clr}";:pokee,1:pokef,1:pokeg,0
+ 8010 print"{rvon}{blu} Archivdaten eingeben/ausdrucken      {rvof}"
+ 8020 print"{down}{down}{down}{rght}{rght}{rght}{rght}-1- Einspieldaten eingeben"
+ 8025 print"{down}{down}{down}{rght}{rght}{rght}{rght}-2- Einspieldaten ausdrucken"
+ 8027 print"{down}{down}{down}{rght}{rght}{rght}{rght}-3- Menue"
+ 8030 print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}Bitte auswaehlen"
+ 8035 getx$:ifval(x$)<1orval(x$)>3then8035
+ 8040 onval(x$)goto8100,840,10010
+ 8050 goto8035
+ 8100 print"{clr}";:pokee,2:pokef,2:pokeg,1
+ 8102 print"{rvon} Einspieldaten eingeben                 {rvof}"
+ 8110 print"{down}{rvon} Einspieldatum      {rvof}{down}":input>10,0,5,e$(8)
+ 8111 print:print:print:print"{rvon} Fuer wen           {rvof}{down}":input>30,0,10,e$(9)
+ 8113 pokee,5:pokef,5:pokeg,1
+ 8114 print"{clr}Einspieldaten     {rvon} Kontrolle  w/z/m  {rvof}{down}{down}"
+ 8116 print"{down}{rvon}{lgrn} Einspieldatum                         {rvof}{down}{wht}":printe$(8)
+ 8117 print"{down}{rvon}{lgrn} Fuer wen                              {rvof}{down}{wht}":printe$(9)
+ 8118 print"{down}{rvon}{lgrn} Cassettentitel:                       {rvof}{down}{wht}":printa$(5)
+ 8120 print"{down}{down}{down}{down}"c$
+ 8125 getx$:ifx$=""then8125
+ 8127 ifx$="m"thenreturn
+ 8130 ifx$="j"then8200
+ 8132 ifx$="z"then414
+ 8135 ifx$="n"then8100
+ 8137 ifx$="w"then8214
+ 8140 goto8125
+ 8200 pokee,6:pokef,6:pokeg,1
+ 8202 print"{clr}{rvon} Einspieldaten eingeben   Seite 1       {rvof}{down}"
+ 8204 print"Jetzt die Archivdaten eingeben !{down}":print"{down}{down}{rvon} T i t e l {rvof}"
+ 8206 print"{down}{down}{down}{down}{rvon} Archivnummer {rvof}"
+ 8208 fori=6to19:pokeq,10:poker,0:syss:printa$(i)
+ 8210 input>8,0,14,f$(i-5):pokeq,14:poker,0:syss:print"        "
+ 8212 pokeq,10:poker,0:syss:print"                                      ":next
+ 8214 print"{clr}";:gosub24:pokee,2:pokef,2:pokeg,1
+ 8216 print"Archivdaten Seite 1 {rvon} Kontrolle w/z/m  {rvof}":print:print
+ 8218 fori=6to19::printleft$(a$(i),25);:printtab(27)i-5;:printtab(31)f$(i-5):next
+ 8220 print"{down}{down}"c$
+ 8222 getx$:ifx$=""then8222
+ 8224 ifx$="j"then8300
+ 8228 ifx$="n"then8240
+ 8230 ifx$="z"then8113
+ 8232 ifx$="w"then8314
+ 8234 ifx$="m"thenreturn
+ 8236 goto8222
+ 8240 pokeq,20:poker,0:syss:print"Nummer die geaendert wird  :"
+ 8242 input>2,30,20,x$:ifval(x$)<1orval(x$)>14then8250
+ 8244 y=val(x$)
+ 8246 pokeq,22:poker,0:syss:printf$(y)
+ 8248 input>8,0,22,f$(y):goto8214
+ 8250 print:print:print"{rvon} Falsche Eingabe       Falsche Eingabe {rvof}"
+ 8252 fort=1to1000:next:goto8214
+ 8300 pokee,6:pokef,6:pokeg,1
+ 8302 print"{clr}{rvon} Einspieldaten eingeben   Seite 2       {rvof}{down}"
+ 8304 print"Jetzt die Archivdaten eingeben !{down}":print"{down}{down}{rvon} T i t e l {rvof}"
+ 8306 print"{down}{down}{down}{down}{rvon} Archivnummer {rvof}"
+ 8308 fori=1to13:pokeq,10:poker,0:syss:printb$(i)
+ 8310 input>8,0,14,h$(i):pokeq,14:poker,0:syss:print"        "
+ 8312 pokeq,10:poker,0:syss:print"                                      ":next
+ 8314 print"{clr}";:gosub27:pokee,2:pokef,2:pokeg,1
+ 8316 print"Archivdaten Seite 2 {rvon} Kontrolle w/z/m  {rvof}":print:print
+ 8318 fori=1to13::printleft$(b$(i),25);:printtab(27)i;:printtab(31)h$(i):next
+ 8320 print"{down}{down}"c$
+ 8322 getx$:ifx$=""then8322
+ 8324 ifx$="j"thenreturn
+ 8328 ifx$="n"then8340
+ 8330 ifx$="z"then8214
+ 8332 ifx$="w"then8487
+ 8334 ifx$="m"thenreturn
+ 8336 goto8322
+ 8340 pokeq,19:poker,0:syss:print"Nummer die geaendert wird  :"
+ 8342 input>2,30,19,x$:ifval(x$)<1orval(x$)>13then8350
+ 8344 y=val(x$)
+ 8346 pokeq,22:poker,0:syss:printh$(y)
+ 8348 input>8,0,22,h$(y):goto8314
+ 8350 print:print:print"{rvon} Falsche Eingabe       Falsche Eingabe {rvof}"
+ 8352 fort=1to1000:next:goto8314
+ 8487 ifx$="w"thenprint"{rvon}{down} j {rvof} oder {rvon} m {rvof} druecken !":fort=1to1000:next:goto8314
+ 8898 rem *** druckausgabe archivdaten ***
+ 8900 open1,4,7
+ 8903 fori=0to79:print#1,"-";:next
+ 8905 print#1,"C a s s e t t e n l a y o u t                 C a s s e t t e n";
+ 8910 print#1," l a y o u t"
+ 8913 fori=0to79:print#1,"-";:next:print#1:print#1
+ 8915 print#1:print#1,"E i n s p i e l d a t u m   :   ";e$(8)
+ 8920 print#1,"F u e r    w e n            :   ";e$(9)
+ 8922 print#1:fori=0to79:print#1,"-";:next
+ 8925 print#1,"C a s s e t t e n t i t e l :   ";a$(5)
+ 8927 fori=0to79:print#1,"-";:next
+ 8930 print#1:print#1
+ 8935 print#1,"Bandsorte"chr$(16)"15Bandmechanik"chr$(16)"35Aufnahmeart";
+ 8940 print#1,chr$(16)"52Rauschunterdrueckungssystem"
+ 8945 print#1,a$(1)chr$(16)"15"a$(2)chr$(16)"35"a$(3)chr$(16)"52"a$(4)
+ 8950 print#1:print#1:print#1:print#1
+ 8951 print#1,o$spc(16)o$:print#1:print#1
+ 8952 fori=6to19:print#1,a$(i)chr$(16)"47 "f$(i-5):next
+ 8966 print#1:print#1:print#1
+ 8970 print#1,p$spc(16)p$:print#1:print#1
+ 8971 fori=1to13:print#1,b$(i)chr$(16)"47 "h$(i):next
+ 8994 print#1:close1
+ 8995 pokeq,10:poker,5:syss:print" Alle Daten gedruckt   !     "
+ 8996 gosub600:fort=1to3000:next:goto10010
+ 8999 rem *** programmende ***
+ 9000 pokee,14:pokef,6:pokeg,14:print"{clr}";:printchr$(142):end
+ 9999 rem **** menue ****
+10000 dima$(19),b$(13),f$(14),h$(13)
+10001 fori=1to4:a$(i)=".":next
+10003 fork=8to9:e$(k)=".":next
+10006 q=214:r=211:s=58640:e=53280:f=53281:g=646
+10007 d$="{blu}{down}**** Taste druecken ****"
+10008 c$="{rvon}{down} Alles richtig  j/n ? {rvof}{down}"
+10009 o$="***** Seite 1 *****":p$="***** Seite 2 *****"
+10010 print"{clr}";:pokee,0:pokef,0
+10015 print"{wht}  C a s s e t t e n  -  L a y o u t     {grn}"
+10020 print"{down}{rght}{rght}-1- Arbeitshinweise"
+10022 print"{down}{rght}{rght}-2- Betriebsvariablen setzen "
+10025 print"{down}{rght}{rght}-3- Standardvariablen"
+10030 print"{down}{rght}{rght}-4- Dateneingabe"
+10035 print"{down}{rght}{rght}-5- Daten sichern"
+10040 print"{down}{rght}{rght}-6- Daten laden"
+10045 print"{down}{rght}{rght}-7- Daten kontrollieren"
+10047 print"{down}{rght}{rght}-8- Layout ausdrucken"
+10050 print"{down}{rght}{rght}-9- Archivdaten eingeben/ausdrucken"
+10052 print"{down}{rght}{rght}-0- Programmende"
+10055 print"{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}Auswahl -->"
+10060 getx$:ifx$<"0"orx$>"9"then10060
+10062 ifx$<>"0"then10065
+10063 goto9000
+10065 onval(x$)gosub3000,4000,5000,60,6000,7000,460,940,8000
+10110 goto10010
+

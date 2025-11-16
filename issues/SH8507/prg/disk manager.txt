@@ -1,0 +1,431 @@
+
+
+;disk manager.prg ==0801==
+   10 rem " Disk Manager V4.0
+   11 rem "
+   12 rem " Von Thomas Omerzu
+   13 rem "     Birkenweg 3
+   14 rem "     4413 Beelen
+   15 rem "
+   16 rem "      06/09/85
+   17 rem "
+   20 :
+   21 o1=6501: m1=o1+1
+   22 o2=301 : m2=o2+1
+   25 dim di$(150),k(150)
+   26 dim si(4)   : rem speicherinfo
+   30 an=0
+   35 deffnh(x)=int(x/256)
+   36 deffnl(x)=x-256*fnh(x)
+   40 deffnm1(x)=x-(int(x/o1)*o1)+1
+   41 deffnm2(x)=x-(int(x/o2)*o2)+1
+   42 c1$="{rvon} {rvof}{left}":c1=20
+   43 c2$=" {left}":  c2=2*c1
+   44 re$="{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"
+   45 hk$=chr$(34)
+   46 nu$=chr$(0)
+   47 df$="                "
+   48 dl$=chr$(254)+chr$(255)
+   50 :
+   90 goto 1000
+   95 :
+   97 rem
+   98 rem   ----  "Hash-Funktion 1"  ----
+   99 rem
+  100 id=0
+  101 le=len(id$):ifle=0thenid=1:return
+  102 fori=1tole
+  110 a$=mid$(id$,i,1)
+  130 id=fnm1(id*26+asc(a$))
+  140 next
+  150 return
+  197 rem
+  198 rem   ----  "Hash-Funktion 2"  ----
+  199 rem
+  200 di=0
+  201 le=len(di$):ifle=0thendi=1:return
+  202 fori=1tole
+  210 a$=mid$(di$,i,1)
+  230 di=fnm2(di*26+asc(a$))
+  240 next
+  250 return
+  297 rem
+  298 rem ----  "Programmfile lesen"  ----
+  299 rem
+  300 print#15,"p"chr$(2)chr$(fnl(id))chr$(fnh(id))chr$(1)
+  310 input#2,pr$
+  320 print#15,"p"chr$(2)chr$(fnl(id))chr$(fnh(id))chr$(18)
+  330 get#2,a1$,a2$,a3$,a4$,co$
+  340 di=asc(a1$+nu$)+256*asc(a2$+nu$)
+  345 ne=asc(a3$+nu$)+256*asc(a4$+nu$)
+  350 return
+  357 rem
+  358 rem  ----  "Diskfile lesen"  ----
+  359 rem
+  360 print#15,"p"chr$(2)chr$(fnl(di))chr$(fnh(di))chr$(1)
+  370 input#2,na$,in$
+  375 print#15,"p"chr$(2)chr$(fnl(di))chr$(fnh(di))chr$(25)
+  380 get#2,a1$,a2$,a3$,a4$
+  385 ne=asc(a1$+nu$)+256*asc(a2$+nu$)
+  387 fr=asc(a3$+nu$)+256*asc(a4$+nu$)
+  390 return
+  397 rem
+  398 rem ---- "Progfile schreiben" ----
+  399 rem
+  400 print#15,"p"chr$(2)chr$(fnl(id))chr$(fnh(id))chr$(1)
+  410 print#2,id$
+  420 print#15,"p"chr$(2)chr$(fnl(id))chr$(fnh(id))chr$(18)
+  430 print#2,chr$(fnl(dn))chr$(fnh(dn))chr$(fnl(ko))chr$(fnh(ko))co$;
+  450 return
+  457 rem
+  458 rem ---- "Diskfile schreiben" ----
+  459 rem
+  460 print#15,"p"chr$(2)chr$(fnl(di))chr$(fnh(di))chr$(1)
+  470 print#2,di$","i$
+  475 print#15,"p"chr$(2)chr$(fnl(di))chr$(fnh(di))chr$(25)
+  480 print#2,chr$(fnl(ko))chr$(fnh(ko))chr$(fnl(fr))chr$(fnh(fr))
+  490 return
+  497 rem
+  498 rem  ---- "Speicherinfo lesen" ----
+  499 rem
+  500 open5,8,5,"#":gosub700
+  510 print#15,"b-r:" 5;0;18;0
+  520 print#15,"b-p:" 5;200
+  525 for si=0 to 4
+  530 get#5,a1$,a2$:si(si)=asc(a1$+nu$)+256*asc(a2$+nu$):next
+  535 close5:return
+  547 rem
+  548 rem--- "Speicherinfo schreiben" ---
+  549 rem
+  550 open5,8,5,"#":gosub700
+  555 print#15,"b-r:" 5;0;18;0
+  560 print#15,"b-p:" 5;200
+  565 for si=0 to 4
+  570 print#5,chr$(fnl(si(si)))chr$(fnh(si(si)));:next
+  575 print#15,"b-w:" 5;0;18;0
+  580 close5:return
+  597 rem
+  598 rem  ----  "Irgendeine Taste"  ----
+  599 rem
+  600 print:print"{down}{down}Weiter mit einer Taste: ";:gosub800:print:print:return
+  697 rem
+  698 rem    ----  "Disk Error"  ----
+  699 rem
+  700 input#15,ds,ds$,tr,se
+  710 if(ds=0)or(ds=50)or(ds=51)thenreturn
+  720 print:print"Disk Error:"ds;ds$;tr;se
+  730 close2:close15
+  740 gosub600:goto1000
+  797 rem
+  798 rem  ----  "Tastatureingabe"  ----
+  799 rem
+  800 c=0
+  810 gete$:c=c+1:ifc=c1thenprintc1$;
+  820 ifc=c2thenprintc2$;:c=0
+  830 ife$=""thengoto810
+  840 printc2$;:return
+  897 rem
+  898 rem       ----  "Titel"  ----
+  899 rem
+  900 print"{clr}{swlc}{grn}";:fori=1to40:print"{SHIFT-*}";:next
+  910 print:print"           Disk Manager V4.0
+  930 print:fori=1to40:print"{SHIFT-*}";:next
+  940 print:print:return
+  997 rem
+  998 rem      ----  "Hauptmenue"  ----
+  999 rem
+ 1000 poke53280,0:poke53281,0:gosub900
+ 1010 print"< 1 >  Programm suchen
+ 1020 print"< 2 >  Directory einlesen & speichern
+ 1025 print"< 3 >  Directory listen
+ 1026 print"< 4 >  Directory loeschen
+ 1027 print"< 5 >  Programm loeschen
+ 1028 print"< 6 >  Speicherinfo
+ 1029 print"< 7 >  Neue Datendisk anlegen
+ 1031 print"{down}< 0 >  Ende{down}{down}"
+ 1040 print"Ihre Wahl? ";
+ 1045 gosub800:w$=e$
+ 1050 ifw$="0"thenprint:print"{down}{down}(c) 1985 by Thomas Omerzu.":end
+ 1060 on val(w$)goto1200,6000,2000,3000,9000,8000,4000
+ 1070 goto1000
+ 1197 rem
+ 1198 rem  ----  "Programm suchen"  ----
+ 1199 rem
+ 1200 gosub900:fl=0
+ 1210 open15,8,15:open2,8,2,"progfile,l":gosub700
+ 1220 input"{down}{down}Programmname";id$:gosub100:
+ 1225 gosub300
+ 1230 ifpr$=id$then1300
+ 1240 ifpr$=chr$(255)thenprint"{down}Programm nicht vorhanden.":goto1400
+ 1250 id=id+1:ifid>o1thenid=1
+ 1260 goto1225
+ 1300 close2
+ 1310 open2,8,2,"diskfile,l"
+ 1320 gosub360:ifflthen1350
+ 1330 print:print"Das Progamm "hk$id$hk$
+ 1335 fl=-1
+ 1340 print"ist gespeichert auf de";
+ 1345 ifco$="+"thenprint"n Disketten{down}":goto1350
+ 1347 print"r Diskette{down}"
+ 1350 print"{rvon}"hk$;na$;hk$" "in$
+ 1360 ifco$<>"+"then1400
+ 1370 geta$:ifa$=""thenclose2:open2,8,2,"progfile,l":goto1250
+ 1380 print"{down}break.
+ 1400 close2:close15
+ 1410 gosub600:goto1000
+ 1997 rem
+ 1998 rem ----  "Directory listen"  ----
+ 1999 rem
+ 2000 gosub900
+ 2010 input"Diskname";di$
+ 2020 di$=left$(di$+df$,16):gosub200
+ 2030 open15,8,15:open2,8,2,"diskfile,l":gosub700
+ 2040 gosub360:gosub700
+ 2050 ifna$=di$then2100
+ 2060 ifna$=chr$(255)then2090
+ 2070 di=di+1:ifdi>o2thendi=1
+ 2080 goto2040
+ 2090 print"{down}{down}Directory nicht gespeichert.":close2:close15:gosub600:goto1000
+ 2100 print"{down}{down}{rvon}"hk$;di$;hk$" "in$
+ 2110 close2
+ 2120 open2,8,2,"progfile,l":gosub700
+ 2130 ifne=0then2200
+ 2135 geta$:ifa$<>""thenprint"{down}break.":goto2210
+ 2140 id=ne:gosub300
+ 2150 print"  "hk$;pr$;hk$
+ 2160 ifpr$=chr$(255)thenne=0
+ 2170 goto2130
+ 2200 printfr"Blocks free.
+ 2210 close2:close15:gosub600:goto1000
+ 2997 rem
+ 2998 rem ---- "Directory loeschen" ----
+ 2999 rem
+ 3000 gosub900
+ 3010 input"Diskname";di$
+ 3020 di$=left$(di$+df$,16):gosub200
+ 3030 open15,8,15
+ 3033 gosub500
+ 3035 open2,8,2,"diskfile,l":gosub700
+ 3040 gosub360:gosub700
+ 3050 ifna$=di$then3100
+ 3060 ifna$=chr$(255)then3090
+ 3070 di=di+1:ifdi>o2thendi=1
+ 3080 goto3040
+ 3090 print"{down}{down}Directory nicht gespeichert.":close2:close15:gosub600:goto1000
+ 3100 print"{down}{down}{rvon}"hk$;di$;hk$" "in$
+ 3120 print"{down}{down}< 1 >   Directory loeschen
+ 3130 print"< 0 >   Zurueck zum Hauptmenue{down}
+ 3140 print"Ihre Wahl? ";
+ 3150 gosub800
+ 3160 ife$="0"thenclose2:close15:goto1000
+ 3170 ife$<>"1"then3150
+ 3180 gosub900:print"Directory wird geloescht...{down}{down}"
+ 3185 si(0)=si(0)+1:si(1)=si(1)-1
+ 3190 di$=dl$:gosub460:close2
+ 3200 open2,8,2,"progfile,l":gosub700
+ 3210 ifne=0thenclose2:gosub550:close15:goto1000
+ 3215 si(3)=si(3)+1:si(4)=si(4)-1
+ 3220 id=ne:gosub300
+ 3230 id$=dl$:gosub400:gosub700:ifco$="+"then3210
+ 3240 fl=id:id$=pr$:gosub100:ifid=flthen3210
+ 3245 n2=ne
+ 3250 i2=id:id=fl
+ 3260 id=id-1:ifi2>idthen3210
+ 3270 gosub300:ifpr$<>id$then3260
+ 3280 dn=di:ko=ne:co$="-":gosub400:gosub700
+ 3290 ne=n2:goto3210
+ 3997 rem
+ 3998 rem  ----  "Neue Datendisk"  ----
+ 3999 rem
+ 4000 gosub900
+ 4010 print"Legen Sie eine leere Diskette ins Lauf- werk.{down}"
+ 4020 print"< 1 >   Neue Datendisk anlegen
+ 4030 print"< 0 >   Zurueck zum Hauptmenue{down}
+ 4040 print"Ihre Wahl? ";
+ 4050 gosub800
+ 4060 ife$="0"then1000
+ 4070 ife$<>"1"then4050
+ 4080 gosub900
+ 4090 print"Diskette wird formatiert...
+ 4100 open15,8,15,"n0:disk manager,to"
+ 4110 gosub700
+ 4120 print:print"Programm wird abgespeichert..."
+ 4130 save"disk manager 4.0",8
+ 4140 gosub700
+ 4150 print:print"Datenfile 1 wird angelegt..."
+ 4160 open2,8,2,"progfile,l,"+chr$(22)
+ 4170 gosub700
+ 4172 print#15,"p"chr$(2)chr$(fnl(m1))chr$(fnh(m1))chr$(1)
+ 4174 gosub700
+ 4176 print#2,"end"
+ 4178 gosub700
+ 4180 close2
+ 4190 print:print"Datenfile 2 wird angelegt..."
+ 4200 open2,8,2,"diskfile,l,"+chr$(32)
+ 4210 gosub700
+ 4212 print#15,"p"chr$(2)chr$(fnl(m2))chr$(fnh(m2))chr$(1)
+ 4214 gosub700
+ 4216 print#2,"end"
+ 4220 close2
+ 4225 print:print"Speicherinfo wird angelegt..."
+ 4230 si(0)=o2:si(1)=0
+ 4240 si(2)=o1:si(3)=0:si(4)=0
+ 4250 gosub550
+ 4260 close15:goto1000
+ 5996 rem
+ 5997 rem ----  "Directory lesen"  ----
+ 5998 rem ----  "  & speichern  "  ----
+ 5999 rem
+ 6000 gosub900:co=0
+ 6005 print"Directory einlesen:{down}{down}
+ 6006 print"Bitte legen Sie die Diskette ins Lauf-  werk.
+ 6007 gosub600
+ 6008 print:print:print
+ 6010 open15,8,15,"i
+ 6020 open2,8,0,"$0":gosub700
+ 6021 print"Alle Files speichern? ";:
+ 6022 gosub800:ife$="j"thenal=-1:goto6029
+ 6023 ife$<>"n"then6022
+ 6024 al=0
+ 6029 printe$:print:print
+ 6030 fori=1to8:get#2,b$:next:di$=""
+ 6031 fori=1to16:get#2,b$:di$=di$+b$:next:print"{rvon}"hk$di$hk$;:get#2,b$:i1$=""
+ 6033 fori=1to6:get#2,b$:i1$=i1$+b$:next:printi1$:get#2,b$
+ 6035 get#2,b$,c$:ifst<>0then6200
+ 6040 get#2,b$,c$
+ 6050 d=0
+ 6060 if b$<>"" then d=asc(b$)
+ 6070 if c$<>"" then d=d+asc(c$)*256
+ 6080 n$="":hk=0
+ 6090 get#2,c$:if st<>0 then 6200
+ 6093 ifc$=hk$thenhk=not(hk)
+ 6095 ifhkthenn$=n$+c$
+ 6100 ifc$<>""then6090
+ 6101 di$(co)=mid$(n$,2)
+ 6110 if len(di$(co))=0 then6120
+ 6111 print"  "hk$di$(co)hk$:ifalthen6120
+ 6112 print"{up}"re$"- Speichern? ";
+ 6113 gosub800:ife$<>"j"ande$<>"n"then6113
+ 6114 print:print"{up}"re$;
+ 6115 ife$="n"thenprint"- Nein.     ":goto6130
+ 6116 print"- Ja.       "
+ 6120 co=co+1
+ 6130 ifst=0then goto6035
+ 6200 close2:close15
+ 6205 printd"Blocks free.
+ 6210 :
+ 6220 print"{down}{down}{down}Bitte legen Sie die DISK MANAGER -      Diskette ins Laufwerk.{down}{down}
+ 6230 gosub600
+ 6240 gosub900
+ 6250 open15,8,15,"i":gosub500
+ 6255 if si(0)>1 and si(2)>co then 6260
+ 6257 print"Speicherung nicht moeglich."
+ 6258 print"Speicherplatz erschoepft."
+ 6259 close15:gosub600:goto1000
+ 6260 open2,8,2,"diskfile,l":gosub700
+ 6270 gosub200
+ 7024 print"Daten werden gespeichert...{down}{down}"
+ 7025 gosub360
+ 7030 ifna$=di$then7100
+ 7040 ifna$=chr$(255)then7200
+ 7050 di=di+1:ifdi>o2thendi=1
+ 7060 goto7025
+ 7100 print"{down}{down}Die Diskette "di$
+ 7110 print"wurde schon gespeichert.
+ 7120 close2:close15:gosub600:goto1000
+ 7200 i$=i1$:ko=0:gosub460:gosub700
+ 7210 close2
+ 7211 si(0)=si(0)-1:si(1)=si(1)+1
+ 7215 dn=di:ifco<=1then7620
+ 7220 open2,8,2,"progfile,l":gosub700
+ 7230 fori1=co-2to0step-1
+ 7320 id$=di$(i1):printhk$id$hk$:gosub100
+ 7325 gosub300
+ 7330 ifpr$=chr$(255)thensi(2)=si(2)-1:si(4)=si(4)+1:goto7500
+ 7340 ifpr$=id$then7400
+ 7345 ifpr$=dl$thensi(3)=si(3)-1:si(4)=si(4)+1:goto7450
+ 7350 id=id+1:ifid>o1thenid=1
+ 7360 goto7325
+ 7400 ifco$="+"then7350
+ 7405 n2=ko:d2=dn
+ 7410 dn=di:ko=ne:co$="+":gosub400:gosub700
+ 7420 ko=n2:dn=d2:mi=-1:goto7350
+ 7450 ifmithen7500
+ 7460 ix=id
+ 7465 id=id+1:ifid>o1thenid=1
+ 7466 gosub300
+ 7470 ifpr$=chr$(255)thenid=ix:goto7500
+ 7480 ifpr$<>id$then7465
+ 7490 co$="+":id=ix:goto7510
+ 7500 co$="-"
+ 7510 gosub400:gosub700
+ 7520 ko=id:mi=0
+ 7600 next
+ 7610 close2
+ 7620 open2,8,2,"diskfile,l
+ 7630 i$=i1$:di=dn:fr=d:gosub460:gosub700
+ 7700 close2:gosub550:close15:gosub600:goto1000
+ 7997 rem
+ 7998 rem  ----  "Speicherinfo"  ----
+ 7999 rem
+ 8000 gosub900
+ 8010 open15,8,15,"i":gosub700
+ 8020 print"Speicherinformationen:{down}{down}"
+ 8030 gosub500
+ 8040 print,"   frei   geloescht   belegt":print
+ 8050 print"Disketten:   ";
+ 8051 printright$("    "+str$(si(0)),4)"        -       ";
+ 8052 printright$("    "+str$(si(1)),4)
+ 8060 print"Programme:   ";
+ 8061 printright$("    "+str$(si(2)),4)"     ";
+ 8062 printright$("    "+str$(si(3)),4)"       ";
+ 8063 printright$("    "+str$(si(4)),4)
+ 8100 close15:gosub600:goto1000
+ 8997 rem
+ 8998 rem   --- "File loeschen" ---
+ 8999 rem
+ 9000 gosub900
+ 9010 open15,8,15:gosub500:open2,8,2,"progfile,l":gosub700
+ 9020 input"{down}{down}Programmname";id$:gosub100:
+ 9025 gosub300
+ 9030 ifpr$=id$then9100
+ 9040 ifpr$<>chr$(255)then9050
+ 9045 print"{down}Programm nicht vorhanden.":close2:close15:goto1000
+ 9050 id=id+1:ifid>o1thenid=1
+ 9060 goto9025
+ 9100 close2
+ 9110 open2,8,2,"diskfile,l"
+ 9120 gosub360:dd=ne:d3=di:gosub900
+ 9130 print"{down}{down}Progamm   "hk$id$hk$
+ 9135 close2
+ 9140 print"Diskette  {rvon}"hk$na$hk$" "in$
+ 9150 print:print"{down}{down}< 1 >  Loeschen
+ 9160 ifco$="+"thenprint"< 2 >  Anderes Programm loeschen
+ 9170 print"< 0 >  Zurueck zum Hauptmenue{down}{down}
+ 9180 print"Ihre Wahl? ";
+ 9190 gosub800
+ 9200 ife$="0"thenclose15:goto1000
+ 9210 ife$="1"then9300
+ 9220 ife$<>"2"then9190
+ 9230 ifco$<>"+"then9190
+ 9240 open2,8,2,"progfile,l":goto9050
+ 9300 si(3)=si(3)+1:si(4)=si(4)-1
+ 9310 open2,8,2,"progfile,l"
+ 9320 gosub300:n2=ne:i2=id
+ 9330 id$=dl$:gosub400:gosub700:ifco$="+"then9400
+ 9340 id$=pr$:gosub100:ifid=i2then9400
+ 9350 fl=id:id=i2
+ 9360 id=id-1:iffl>idthen9400
+ 9370 gosub300:ifpr$<>id$then9360
+ 9380 dn=di:ko=ne:co$="-":gosub400:gosub700
+ 9400 if dd<>i2 then9500
+ 9410 close2:open2,8,2,"diskfile,l":gosub700
+ 9420 di=d3:gosub360
+ 9430 di$=na$:i$=in$:ko=n2:gosub460:gosub700
+ 9440 goto9600
+ 9500 id=dd:gosub300
+ 9520 ifne<>i2thenid=ne:gosub300:goto9520
+ 9530 dn=d3:ko=n2:id$=pr$:gosub400:gosub700
+ 9600 close2:gosub550:close15:print:print"{down}{down}Programm geloescht"
+ 9610 gosub600:goto1000
+

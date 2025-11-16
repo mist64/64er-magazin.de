@@ -1,0 +1,215 @@
+
+
+;manager-kurve.prg ==0801==
+   10 rem *********************
+   20 rem *** manager - kurve *
+   30 rem ***       von       *
+   40 rem ***  franz  strobl  *
+   50 rem ***  starenweg  12  *
+   60 rem *** d-8050 freising *
+   70 rem *********************
+   80 rem ***
+   90 rem *** initialisierung
+  100 rem ***
+  110 open1,6,1:open2,6,2:open4,6:open3,6,3:open44,6,4:open5,6,5:open7,6,7
+  120 print#44,1:print#4:print#4:print#4:print#3,1
+  130 dimt$(100)
+  140 f$(0)="schwarz":f$(1)="blau":f$(2)="gruen":f$(3)="rot"
+  150 i$(0)="nein":i$(1)="ja":f=0:l=0:g=0:e=0:w=0:m=0:d=.5
+  160 rem ***
+  170 rem *** menue
+  180 rem ***
+  190 rem menue-anzeige
+  200 print"{clr}liniendiagramm{down}"
+  210 print"neues diagramm (d)       ",i$(d*2)
+  220 print"neue linie (l)           ",i$(l*2)
+  230 print"linie weiterzeichnen (w) ",i$(w*2)
+  240 print"ende (e)                 ",i$(e*2)
+  250 print"farbe (f)                ",f$(f*4)
+  260 print"markierung (m)           ",i$(m*2)
+  270 print"gestrichelte linie (g)   ",i$(g*2)
+  280 print"{down}return fuehrt die anweisung aus"
+  290 rem menue-eingabe
+  300 geta$:ifa$=""then300
+  310 ifa$="f"thenf=f+.25:f=f-int(f):goto200
+  320 ifa$="w"thenw=w+.5:w=w-int(w):e=0:l=0:d=0:goto200
+  330 ifa$="l"thenl=l+.5:l=l-int(l):e=0:d=0:w=0:goto200
+  340 ifa$="m"thenm=m+.5:m=m-int(m):e=0:goto200
+  350 ifa$="e"thene=e+.5:e=e-int(e):l=0:d=0:w=0:m=0:g=0:goto200
+  360 ifa$="d"thend=d+.5:d=d-int(d):l=0:e=0:w=0:goto200
+  370 ifa$="g"theng=g+.5:e=0:d=0:g=g-int(g):goto200
+  380 ifasc(a$)=13then410
+  390 goto300
+  400 rem menue-ausfuehrung
+  410 ife=.5thengosub1960:close1:close2:close4:close44:close5:goto2110
+  420 print#2,f*4
+  430 print#5,g*8
+  440 ifw=.5thenw=0:ifc$="j"andd1=1then1490
+  450 ifl=.5andd1=1then1460
+  460 ifd=.5thengosub1960:goto520
+  470 goto300
+  480 rem ***
+  490 rem *** neues diagramm
+  500 rem ***
+  510 rem initialisierung
+  520 print#1,"m",0,-200:print#4:f1=f:d1=1:n1=0:n3=0:print#2,f*4
+  530 forb=0to100:t$(b)="                                       ":nextb
+  540 rem eingabe y-skala und auswertung
+  550 print"{clr}skala:":print"hoehe (y):"
+  560 input"anfang";ya
+  570 input"ende";ye
+  580 ifya>=yethen560
+  590 dy=ye-ya
+  600 z=0
+  610 forb=yatoyestepdy/4
+  620 ifb=0thenn1=1
+  630 y$(z)=str$(b):z=z+1
+  640 nextb
+  650 rem eintragung skalenwerte y in beschriftungsvariable t$(x)
+  660 z=0
+  670 forts=1to33step8
+  680 l1=len(y$(z))
+  690 fortz=22to21-l1step-1
+  700 t$(tz)=left$(t$(tz),ts)+mid$(y$(z),tz-20+l1,1)+right$(t$(tz),38-ts)
+  710 nexttz
+  720 z=z+1
+  730 nextts
+  740 rem eingabe x-skala und auswertung
+  750 print"laenge (x):"
+  760 print"-skala ist in x-richtung doppelt so lang wie in y-richtung"
+  770 input"anfang";xa
+  780 input"ende";xe
+  790 ifxa>=xethen770
+  800 dx=xe-xa
+  810 print.5*dx/dy"-fach ueberhoeht"
+  820 print"{down}return = fuehrt die anweisung aus"
+  830 print"m      = zurueck ins menue"
+  840 print"n      = korrektur der daten"
+  850 geta$:ifa$=""then850
+  860 ifa$="n"then520
+  870 ifa$="m"thend1=0:goto200
+  880 ifasc(a$)<>13then850
+  890 z=0
+  900 forb=xatoxestepdx/4
+  910 ifb=0thenn3=1
+  920 x$(z)=str$(b):z=z+1
+  930 nextb
+  940 rem eintragung skalenwerte x in beschriftungsvariable t$(x)
+  950 z=0
+  960 fortz=21to61step10
+  970 forb=0tolen(x$(z))
+  980 t$(tz+b)=mid$(x$(z),1+b,1)+right$(t$(tz+b),38)
+  990 nextb
+ 1000 z=z+1
+ 1010 nexttz
+ 1020 rem eingabe ueberschrift und auswertung
+ 1030 t1$="":input"ueberschrift";t1$
+ 1040 l1=len(t1$):ifl1=0then1110
+ 1050 ifl1>40thenprint"text zu lang":goto1030
+ 1060 rem eintragung ueberschrift in beschriftungsvariable t$(x)
+ 1070 forb=38to37+l1
+ 1080 t$(b)=left$(t$(b),38)+mid$(t1$,b-37,1)
+ 1090 nextb
+ 1100 rem plotterinitialisierung zum zeichnen des diagramms
+ 1110 print#1,"m",0,-200
+ 1120 print#4,chr$(13)
+ 1130 print#1,"m",18,0:print#1,"i"
+ 1140 rem y-achse
+ 1150 print#1,"j",400,0
+ 1160 forb=400to0step-100
+ 1170 print#1,"r",b,5
+ 1180 print#1,"j",b,-5
+ 1190 nextb
+ 1200 rem x-achse
+ 1210 forb=0to-800step-200
+ 1220 print#1,"r",-5,b
+ 1230 print#1,"j",5,b
+ 1240 nextb
+ 1250 print#1,"r",0,-800
+ 1260 print#1,"j",0,0
+ 1270 rem achse x=0 (mit beschriftung), falls notwendig
+ 1280 ifxa>=0orxe<=0then1350
+ 1290 fx=800*xa/dx:print#1,"r",-5,fx
+ 1300 print#1,"j",400,fx
+ 1310 ifn3=1then1350
+ 1320 n2=int(22-fx/20):ifleft$(t$(n2),1)<>" "then1350
+ 1330 t$(n2)="0"+right$(t$(n2),38)
+ 1340 rem achse y=0 (mit beschriftung), falls notwendig
+ 1350 ifya>=0orye<=0then1410
+ 1360 fy=-400*ya/dy:print#1,"r",fy,5
+ 1370 print#1,"j",fy,-800
+ 1380 ifn1=1then1410
+ 1390 n2=int(1+fy/12):ifmid$(t$(20),n2,1)<>" "then1410
+ 1400 t$(20)=left$(t$(20),n2)+"0"+right$(t$(20),38-n2)
+ 1410 l=.5:d=0:goto200
+ 1420 rem ***
+ 1430 rem *** linie zeichnen
+ 1440 rem ***
+ 1450 rem zeichentyp "r" oder "j"
+ 1460 ifl=.5thenc$="r":goto1490
+ 1470 c$="j"
+ 1480 rem koordinaten- und texteingabe mit auswertung
+ 1490 input"{clr}laengenwert (x)";x
+ 1500 input"hoehenwert (y)";y
+ 1510 ifx<=xeandx>=xaandy<=yeandy>=yathen1560
+ 1520 print"punkt liegt nicht innerhalb des dia-"
+ 1530 print"gramms. soll trotzdem die linie ge-"
+ 1540 print"zeichnet werden, druecken sie return"
+ 1550 t1$="":goto1580
+ 1560 t1$="":input"text";t1$
+ 1570 iflen(t1$)>20thenprint"text zu lang":t1$="":goto1560
+ 1580 print"{down}return = fuehrt die anweisung aus"
+ 1590 print"sh/ret = ausfuehrung, danach ins menue"
+ 1600 print"m      = zurueck ins menue"
+ 1610 print"n      = korrektur der daten"
+ 1620 geta$:ifa$=""then1620
+ 1630 ifa$="n"then1490
+ 1640 ifa$="m"thenw=0.5:l=0:goto200
+ 1650 ifasc(a$)<>13andasc(a$)<>141then1620
+ 1660 rem plotterkoordinaten und ausfuehrung
+ 1670 fx=-800*(x-xa)/dx
+ 1680 fy=400*(y-ya)/dy
+ 1690 print#1,c$,fy,fx
+ 1700 rem markierungskreuz
+ 1710 ifm=0then1760
+ 1720 print#5,0:print#1,"r",fy+3,fx
+ 1730 print#1,"j",fy-3,fx:print#1,"r",fy,fx+3
+ 1740 print#1,"j",fy,fx-3:print#1,"r",fy,fx
+ 1750 print#5,g*8
+ 1760 ift1$=""then1910
+ 1770 rem eintragung text in freien platz der beschriftungsvariable t$(x)
+ 1780 ts=int(2+fy/12)
+ 1790 tz=int(21-fx/20)
+ 1800 v=0
+ 1810 forb=tztotz-1+len(t1$)
+ 1820 ifmid$(t$(tz),ts,1)<>" "thenb=tz-1+len(t1$):v=v+1:nextb:goto1840
+ 1830 nextb:v=0
+ 1840 ifv=1thents=ts+1:goto1810
+ 1850 ifv=2thents=ts-2:goto1810
+ 1860 ifv=3thents=ts+3:goto1810
+ 1870 ifv=4thenprint"text nicht moeglich":forb=0to300:nextb:goto1910
+ 1880 forb=tztotz-1+len(t1$)
+ 1890 t$(b)=left$(t$(b),ts-1)+mid$(t1$,b+1-tz,1)+right$(t$(b),39-ts)
+ 1900 nextb
+ 1910 ifasc(a$)=141thenw=.5:l=0:goto200
+ 1920 goto1470
+ 1930 rem ***
+ 1940 rem *** diagramm am ende durch beschriftung vervollstaendigen
+ 1950 rem ***
+ 1960 ifd1=0thenreturn
+ 1970 print#2,f1*4:print#5,0
+ 1980 print#1,"m",0,410
+ 1990 fort=1to80
+ 2000 ift$(t)="                                       "thenprint#4:nextt:return
+ 2010 ifright$(t$(t),38)="                                      "then2060
+ 2020 ifright$(t$(t),29)="                             "then2070
+ 2030 ifright$(t$(t),19)="                   "then2080
+ 2040 ifright$(t$(t),10)="          "then2090
+ 2050 print#4,t$(t):nextt:return
+ 2060 print#4,left$(t$(t),1):nextt:return
+ 2070 print#4,left$(t$(t),10):nextt:return
+ 2080 print#4,left$(t$(t),20):nextt:return
+ 2090 print#4,left$(t$(t),29):nextt
+ 2100 return
+ 2110 print#7:close7:end
+

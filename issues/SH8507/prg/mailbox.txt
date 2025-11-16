@@ -1,0 +1,1332 @@
+
+
+;mailbox.prg ==0801==
+    1 rem *************************************************************************
+    2 rem ********************* master mailbox programm  v3.0 *********************
+    3 rem ********************* (c) 1985  copyright by m.c.s. *********************
+    4 rem ***************************  2000 hamburg 76  ***************************
+    5 rem *************************** lessingstrasse 2  ***************************
+    6 rem *************************************************************************
+    7 :
+    8 poke650,128:goto19
+    9 :
+   10 rem -- floppy initialisieren -----------------------------------------------
+   11 :
+   12 close15
+   13 open15,8,15,"i"
+   14 close15
+   15 return
+   16 :
+   17 rem -- [ml] routine laden --------------------------------------------------
+   18 :
+   19 x=17:printchr$(14)chr$(8)chr$(147)chr$(x)chr$(x)chr$(158)
+   20 print"    Master-Mailbox-System   vers.3.0"
+   21 gosub12
+   22 printchr$(x)"  (C) 1985  Written by [THW] of M.C.S."
+   23 fa=0
+   24 gosub115
+   25 ifa=2then127
+   26 ifpeek(49152)<>169anda=0thena=1:load"[ml]*",8,1
+   27 printchr$(17)"Bitte Datendiskette einlegen"chr$(17)
+   28 print"OK   J"chr$(157)chr$(157)chr$(157);:inputx$
+   29 ifx$="n"thenend
+   30 ifx$<>"J"then19
+   31 :
+   32 rem -- programm initialisieren ---------------------------------------------
+   33 :
+   34 printchr$(x)"****  SYSTEM BOOTEN ****"chr$(x)
+   35 ifpeek(828)<8then41
+   36 open15,8,15,"v"
+   37 print"Validate"
+   38 fa=2
+   39 gosub115
+   40 poke828,0
+   41 gosub12
+   42 close3:clr
+   43 open3,3
+   44 poke49800,240
+   45 sys49152
+   46 te=56577
+   47 si=54272
+   48 c=56584
+   49 mx=50
+   50 u%=400
+   51 dimte$(40)
+   52 dimm$(50)
+   53 dimu%(400)
+   54 be$=chr$(7)
+   55 li$=chr$(10)
+   56 cr$=chr$(13)
+   57 xn$=chr$(17)
+   58 xf$=chr$(19)
+   59 xe$=chr$(24)
+   60 ru$=be$+"*"
+   61 ga=1
+   62 t2=1
+   63 be=2
+   64 li=1
+   65 dx=1
+   66 lm=1500
+   67 ll=100
+   68 d=2
+   69 ub$="Gast"
+   70 c$="COMMAND ->"
+   71 po=-1
+   72 fi$="a-index"
+   73 gosub299
+   74 input#8,da$,an$,nr$,ak$
+   75 close8
+   76 an=val(an$)
+   77 gosub421
+   78 fi$="m-index"
+   79 gosub299
+   80 fori=1tomx
+   81 input#8,m$(i)
+   82 next
+   83 close8
+   84 nr=val(nr$)
+   85 close1:open1,0
+   86 s$="          "
+   87 s$=s$+s$
+   88 j$(1)="Sonntag"
+   89 j$(2)="Montag"
+   90 j$(3)="Dienstag"
+   91 j$(4)="Mittwoch"
+   92 j$(5)="Donnerstag"
+   93 j$(6)="Freitag"
+   94 j$(7)="Samstag"
+   95 j$(0)=j$(7)
+   96 o$(1)="ON"
+   97 o$(2)="OFF"
+   98 rl$=cr$+li$
+   99 q$=xn$+xn$+xn$+xn$+xn$+xn$+xn$+xn$
+  100 a=2
+  101 fori=0to3
+  102 poke830+i,0
+  103 next
+  104 rem -- indexfeld user relativ datei ---------------------------------------
+  105 gosub417
+  106 re=60
+  107 forbl=u%-nr+1tou%
+  108 gosub427
+  109 get#8,u$
+  110 u%(bl)=asc(u$)
+  111 next
+  112 gosub421
+  113 goto19
+  114 rem -- farbe setzen -------------------------------------------------------
+  115 poke53280,fa
+  116 poke53281,fa
+  117 return
+  118 rem -- nur grosschrifft fuer rs232 ----------------------------------------
+  119 poke49398,196
+  120 return
+  121 rem -- gross und kleinschrifft rs232 --------------------------------------
+  122 poke49398,195
+  123 return
+  124 :
+  125 rem -- warteschleife fuer anrufer -----------------------------------------
+  126 :
+  127 printxf$xn$q$
+  128 gosub173
+  129 print"Anrufe         "right$(s$+an$,10)
+  130 pe=0
+  131 me=0
+  132 ux$=""
+  133 print"Anzahl User    "right$(s$+nr$,10)
+  134 print"MSG    "ak$
+  135 an=an+1
+  136 an$=str$(an)
+  137 nr$=str$(nr)
+  138 printxf$q$q$"'T'ime 'D'atum 'S'tart 'E'nde"
+  139 gosub205
+  140 ti$=ur$
+  141 gosub171
+  142 pokete,255:rem relais an pb1 ausschalten
+  143 dy=0
+  144 gosub313
+  145 gosub163
+  146 print
+  147 gete$:ife$=""then143
+  148 ife$="t"thengosub163:goto158
+  149 ife$="d"thengosub171:goto165
+  150 ife$="e"thengosub267:end
+  151 ife$="s"then435
+  152 gosub205
+  153 ti$=ur$
+  154 goto143
+  155 :
+  156 rem -- ein/ausgabe und berechnung der uhrzeit und des datums --------------
+  157 :
+  158 x$=chr$(157)+chr$(157)+chr$(157)+chr$(157):x$=x$+x$
+  159 printx$;:inputur$
+  160 gosub195
+  161 ti$=ur$
+  162 goto143
+  163 printxf$q$"Uhrzeit            "ti$;
+  164 return
+  165 printchr$(145)"Datum heute  ";
+  166 inputda$
+  167 dx=1
+  168 gosub173
+  169 gosub171
+  170 goto143
+  171 printxf$xn$q$left$(j$(z)+s$,10)"den  "da$
+  172 return
+  173 ta=val(left$(da$,2))
+  174 mo=val(mid$(da$,4,2))
+  175 ja=val(right$(da$,4))
+  176 ifdx=1thendx=0:goto181
+  177 ta=ta+1
+  178 ifta>31thenta=1:mo=mo+1:ifmo>12thenmo=1:ja=ja+1
+  179 ifmo=2thenifta>28thenifja/4<>int(ja/4)thenmo=3:ta=1
+  180 ifta>30and(mo=4ormo=6ormo=9ormo=11)then177
+  181 k=int(.6+(1/mo))
+  182 r=ja-k
+  183 o=mo+12*k
+  184 p=r/100
+  185 z=(int(13*(o+1)/5))+(int((5*r)/4))-(int(p))+(int(p/4))+ta
+  186 z=(z-(7*int(z/7)))
+  187 ta$=str$(ta)
+  188 iflen(ta$)=2thenta$=" 0"+right$(ta$,1)
+  189 mo$=str$(mo)
+  190 iflen(mo$)=2thenmo$=" 0"+right$(mo$,1)
+  191 ja$=str$(ja)
+  192 iflen(ja$)=2thenja$=" 0"+right$(ja$,1)
+  193 da$=right$(ta$,2)+"."+right$(mo$,2)+"."+right$(ja$,4)
+  194 return
+  195 pokec+7,peek(c+7)and127
+  196 pokec+6,peek(c+6)or128
+  197 h=val(left$(ur$,2))
+  198 m=val(mid$(ur$,3,2))
+  199 s=val(right$(ur$,2))
+  200 ifh>11thenh=h+68
+  201 pokec+3,16*int(h/10)+h-int(h/10)*10
+  202 pokec+2,16*int(m/10)+m-int(m/10)*10
+  203 pokec+1,16*int(s/10)+s-int(s/10)*10
+  204 pokec,0:return
+  205 h=peek(c+3)
+  206 m=peek(c+2)
+  207 s=peek(c+1)
+  208 sx=peek(c)
+  209 fl=1
+  210 if(hand128)=128thenh=h-128:fl=0
+  211 iffl=1then214
+  212 ifh=18then215
+  213 h=h+18
+  214 ifh=18andfl=1thenh=0
+  215 ur$=""
+  216 v=h
+  217 gosub226
+  218 gosub228
+  219 v=m
+  220 gosub226
+  221 gosub228
+  222 v=s
+  223 gosub226
+  224 gosub228
+  225 return
+  226 v=int(v/16)*10+v-int(v/16)*16
+  227 return
+  228 v$=str$(v)
+  229 iflen(v$)=2thenv$=" 0"+right$(v$,1)
+  230 ifh=>18andm=>0andfl=0andpeek(706)=1thenpoke706,0
+  231 ifh=>0andm=>0andfl=1andpeek(706)=0then233
+  232 goto237
+  233 poke706,1
+  234 gosub173
+  235 dx=1
+  236 ifdy=0thengosub171
+  237 ur$=ur$+right$(v$,2)
+  238 return
+  239 k$=str$(xx)
+  240 yy=len(k$)
+  241 k$=right$(k$,yy-1)
+  242 ifyy=1thenreturn
+  243 ifyy=2thenk$="00"+k$
+  244 ifyy=3thenk$="0"+k$
+  245 return
+  246 :
+  247 rem -- dialog beenden (logoff) --------------------------------------------
+  248 :
+  249 poke53280,7
+  250 gosub308
+  251 gosub616
+  252 gosub308
+  253 gosub613
+  254 gosub1097
+  255 gosub679
+  256 gosub309
+  257 gosub513
+  258 gosub604
+  259 gosub268
+  260 a$=""
+  261 gosub1123
+  262 lo=0
+  263 goto34
+  264 :
+  265 rem -- mailbox beenden (direct) -------------------------------------------
+  266 :
+  267 printq$"Mailbox beenden"
+  268 x=peek(828)
+  269 x=x+1
+  270 poke828,x
+  271 :
+  272 rem -- daten sichern ------------------------------------------------------
+  273 :
+  274 gosub421
+  275 open8,8,2,"@:a-index,s,w"
+  276 printrl$"Interner Check...."
+  277 print#8,da$;cr$;str$(an);cr$;str$(nr);cr$;ak$;cr$
+  278 gosub421
+  279 open8,8,2,"@:m-index,s,w"
+  280 fori=1tomx
+  281 print#8,m$(i)
+  282 next
+  283 gosub421
+  284 return
+  285 :
+  286 rem -- control abfrage ----------------------------------------------------
+  287 :
+  288 get#1,x$
+  289 get#2,y$
+  290 ifx$=""andy$=""and(ex=0orex=2)thenreturn
+  291 ifx$=xf$ory$=xf$thenex=1:print"xoff":gosub327
+  292 ifx$=xn$ory$=xn$thenex=0:print"xon":gosub327
+  293 ifx$=xe$ory$=xe$thenex=2:print"xend":gosub327
+  294 gosub353
+  295 goto288
+  296 :
+  297 rem -- textausgabe floppy > rs232 -----------------------------------------
+  298 :
+  299 gosub421
+  300 open8,8,0,fi$+",s,r"
+  301 return
+  302 print#d,rl$
+  303 gosub299
+  304 sys49665
+  305 gosub308
+  306 gosub421
+  307 return
+  308 print#3," ";:print#d,rl$;:return
+  309 print#3," ";:print#d,rl$:return
+  310 :
+  311 rem -- klingelabfrage & start wenn pb3 = 1 (dez.8) ist --------------------
+  312 :
+  313 if(peek(te)and8)=8thenreturn
+  314 pokete,255-2:rem relais an pb1 einschalten
+  315 print#d,rl$;
+  316 tn=225
+  317 gosub1059
+  318 goto435
+  319 :
+  320 rem -- on/off bell --------------------------------------------------------
+  321 :
+  322 be=be+1
+  323 ifbe=3thenbe=1
+  324 print#d,"BELL "o$(be);rl$
+  325 return
+  326 ifbe=2thenreturn
+  327 print#d,be$;
+  328 return
+  329 :
+  330 rem -- on/off linefeed ----------------------------------------------------
+  331 :
+  332 li=li+1
+  333 ifli=>3thenli=1
+  334 ifli=1thenrl$=cr$+li$
+  335 ifli=2thenrl$=cr$
+  336 print#d,"LINEFEED "o$(li);rl$
+  337 return
+  338 :
+  339 rem -- detect abfrage an pb4 (dez.16) ist pb4 = 1 dann detect vorhanden ---
+  340 :
+  341 ifco=1thenreturn
+  342 if(peek(te)and16)=0thenreturn
+  343 ife2>=4then256
+  344 e1=e1+1
+  345 ife1>130thene1=0:e2=e2+1:gosub347:e$="":x$=cr$:return
+  346 return
+  347 print#d,rl$rl$"BITTE DEN HOERER FESTER IN DEN KOPPLER  PRESSEN!";
+  348 print#d,rl$"Hinw."str$(e2)rl$rl$
+  349 return
+  350 :
+  351 rem -- timeout/timelimit --------------------------------------------------
+  352 :
+  353 ifco=1thenreturn
+  354 gosub342
+  355 ifga=1andval(ti$)>lmthent=12:gosub1179:goto256
+  356 t1=t1+1
+  357 ift1>2000thent1=1000:goto359
+  358 return
+  359 ift2=0then256
+  360 t=11
+  361 gosub1179
+  362 fori=1to40
+  363 print#d,be$;"!";
+  364 next
+  365 t2=0
+  366 e$=""
+  367 x$=cr$
+  368 return
+  369 ifx1>1thenx1=x1+1:ifx1>350thene$="":x$=cr$:goto399
+  370 goto377
+  371 :
+  372 rem -- get schleife 1 -----------------------------------------------------
+  373 :
+  374 e$=""
+  375 gosub326
+  376 get#2,x$
+  377 get#2,x$
+  378 gosub353
+  379 ifx$=""then382
+  380 get#1,y$
+  381 ify$=""then399
+  382 get#1,x$
+  383 ifx$=""thenprintchr$(159)"{CBM-P}"chr$(157)chr$(158);:goto369
+  384 :
+  385 rem -- interne befehle ----------------------------------------------------
+  386 :
+  387 rem -- direct verbindung vom sysop ----------------------------------------
+  388 ifx$=chr$(133)thentt$=ti$:ce=1:co=1:gosub597:e$="":return
+  389 rem -- adresse ausgeben vom sysop -----------------------------------------
+  390 ifx$="{CBM-A}"thengosub1101:goto382
+  391 rem -- detect abfrage unterdruecken ---------------------------------------
+  392 ifx$=chr$(136)thenprint"detect ein":co=0:poke49800,240:goto382
+  393 ifx$=chr$(140)thenprint"detect aus":co=1:poke49800,208:goto382
+  394 rem -- dialog beenden vom sysop -------------------------------------------
+  395 ifx$=chr$(178)then250
+  396 :
+  397 rem -- string zusammensetzten ---------------------------------------------
+  398 :
+  399 x=asc(x$)
+  400 ifx<>13then406
+  401 t1=0
+  402 ll=100
+  403 gosub308
+  404 pe=0
+  405 return
+  406 ifce=1andx$=xe$thengosub308:return
+  407 ifx=17orx=19then377
+  408 ifce=0thenif(x=8orx=20)andlen(e$)>0thene$=left$(e$,len(e$)-1):goto413
+  409 iflen(e$)=>llthengosub327:goto377
+  410 ifce=0thenife$=""and(x=8orx=20)thengosub327:goto377
+  411 ifce=0thene$=e$+x$
+  412 ifpe=1thenx$=ru$
+  413 print#d,x$;:goto377
+  414 :
+  415 rem -- relative datei oeffnen ---------------------------------------------
+  416 :
+  417 gosub421
+  418 open15,8,15
+  419 open8,8,2,"user"
+  420 return
+  421 close8
+  422 gosub12
+  423 return
+  424 :
+  425 rem -- recordnummer fuer relative datei -----------------------------------
+  426 :
+  427 hb=int(bl/256)
+  428 lb=bl-hb*256
+  429 x$=chr$(2)+chr$(lb)+chr$(hb)+chr$(1+re)
+  430 print#15,"p"+x$
+  431 return
+  432 :
+  433 rem -- anrufer erkannt und start des mailbox dialoges ---------------------
+  434 :
+  435 printchr$(147)q$" Start "xn$xn$
+  436 co=1
+  437 x1=10
+  438 fori=1to2000
+  439 next
+  440 print#d,rl$rl$rl$"M.C.S.->";
+  441 get#2,x$,x$
+  442 gosub374
+  443 gosub1088
+  444 co=0
+  445 x1=0
+  446 ti$="000000"
+  447 :
+  448 rem -- mailbox-menues -----------------------------------------------------
+  449 :
+  450 print#d,rl$
+  451 gosub119
+  452 gosub1170
+  453 onmegoto456,458
+  454 print#d,"- HAUPTMENUE -";
+  455 gosub460
+  456 print#d,"- INFO-MENUE -";
+  457 gosub460
+  458 print#d,"- MAILBOX-MENUE -";
+  459 gosub460
+  460 ifpo=1andct=0thenprint#d," PROFI -";rl$;:ifga=1thenpo=-1:goto450
+  461 ifpo=1then472
+  462 :
+  463 rem -- mailbox-befehle ----------------------------------------------------
+  464 :
+  465 print#d,rl$
+  466 onmegoto469,471
+  467 print#d,"HELP-MA-IN-UID-SOR-PRO-BE-LF-TI-LOGOFF"rl$;
+  468 goto472
+  469 print#d,"HELP-RI-AK-AL-CL-TEL-MA-HM"rl$;
+  470 goto472
+  471 print#d,"HELP-NU-UL-UIDA-PME-PML-ME-ML-IN-HM"rl$;
+  472 print#d,rl$
+  473 ifga=1thengosub523
+  474 print#d,c$;
+  475 gosub374
+  476 ife$=""then474
+  477 :
+  478 rem -- befehle auswerten --------------------------------------------------
+  479 :
+  480 x$=left$(e$,2)
+  481 x=len(e$)
+  482 ifx>1thensu$=right$(e$,x-2)
+  483 y$=left$(e$,4)
+  484 x=len(e$)
+  485 ifx>3thenz$=right$(e$,x-4)
+  486 ife$="HELP"ore$="?"thengosub1286:goto450
+  487 ife$="HM"thenme=0:goto450
+  488 ife$="IN"thenme=1:goto450
+  489 ife$="MA"thenme=2:goto450
+  490 ify$="UID "thengosub804:se=1:goto450
+  491 ifx$="UL"thengosub744:goto450
+  492 ife$="NU"thengosub626:goto450
+  493 ife$="LOGOFF"ore$="ENDE"thenlo=1:goto249
+  494 ife$="UIDA"thenb$=x1$:gosub529:goto450
+  495 ife$="PME"thenmf=2:gosub869:goto450
+  496 ife$="PML"thengosub857:goto450
+  497 ife$="LF"thengosub309:gosub332:gosub308:goto474
+  498 ife$="RI"thenfi$="ri":goto511
+  499 ife$="TI"thengosub308:gosub613:gosub616:gosub308:goto474
+  500 ife$="ML"thenfi$="message":goto511
+  501 ife$="ME"thenfb$="n message":mf=1:au$="Oeff. Message":gosub894:goto59
+  502 ife$="CL"thenfi$="cl":goto511
+  503 ife$="SOR"thengosub562:goto450
+  504 ife$="AK"thenfi$="ak":goto511
+  505 ife$="AL"thenfi$="al":goto511
+  506 ife$="TEL"thenfi$="tel":goto511
+  507 ife$="BE"thengosub309:gosub322:gosub308:goto474
+  508 ife$="PRO"thengosub531:goto450
+  509 gosub515
+  510 goto472
+  511 gosub302
+  512 goto450
+  513 print#d,rl$"DFUE END...."rl$;
+  514 return
+  515 er=er+1
+  516 print#d,rl$"?>"e$"<?"rl$;
+  517 return
+  518 print#d,rl$"DEIN USER ID IST AKTIV"rl$
+  519 return
+  520 :
+  521 rem -- ausgabe timelimit fuer gaeste --------------------------------------
+  522 :
+  523 a1=int(ti/60)
+  524 a2=int(a1/60)
+  525 a1=a1-a2*60
+  526 j$=str$(14-a2)+" m."+str$(59-a1)
+  527 print#d,rl$"Timelimit :"j$" s."rl$
+  528 return
+  529 ifga=0thenae=1:gosub653:ae=0:return
+  530 goto532
+  531 ifga=0thenpo=-po:return
+  532 print#d,rl$"FUNKTION GESPERRT"rl$
+  533 return
+  534 :
+  535 rem -- user suchen im indexfeld und in der relativen datei ----------------
+  536 :
+  537 fu=0
+  538 gosub417
+  539 ud$=left$(ua$,1)
+  540 forbl=u%-nr+1tou%
+  541 re=60
+  542 ifud$<>chr$(u%(bl))then554
+  543 gosub427
+  544 input#8,u$
+  545 ifu$<>ua$then554
+  546 if(fx=2orfx=4)andxl=blthen554
+  547 iffx=2andu$=ua$thenre=0:gosub427:gosub730:fu=1:goto556
+  548 iffx=4andu$=ua$thenfu=1:goto556
+  549 re=0
+  550 gosub427
+  551 gosub730
+  552 iffx=1andco$=cx$thenfu=1:goto556
+  553 iffx=3thenfu=1:goto556
+  554 next
+  555 fu=0
+  556 gosub421
+  557 re=0
+  558 return
+  559 :
+  560 rem -- benutzer ruft den sysop --------------------------------------------
+  561 :
+  562 t=5
+  563 gosub1179
+  564 tt$=ti$
+  565 fori=1to10
+  566 print#d,ru$;
+  567 tn=180
+  568 gosub1059
+  569 forj=1to100
+  570 ru=ru+1
+  571 ifru=30thenru=1:fa=0:gosub115
+  572 ifru=15thenfa=2:gosub115
+  573 get#1,x$
+  574 get#2,y$
+  575 ifx$=""andy$=""then578
+  576 ify$=xe$orx$=xe$thenfa=0:gosub115:return
+  577 ifx$="j"then588
+  578 next
+  579 next
+  580 t=6
+  581 gosub1179
+  582 fa=0
+  583 gosub115
+  584 return
+  585 :
+  586 rem -- user - sysop dialog ------------------------------------------------
+  587 :
+  588 t=7
+  589 gosub1179
+  590 gosub1170
+  591 print#d,"-->";
+  592 fa=0
+  593 ce=1
+  594 co=1
+  595 tt$=ti$
+  596 gosub115
+  597 ll=100
+  598 gosub374
+  599 ifx$=xe$thenco=0:ce=0:ti$=tt$:return
+  600 goto597
+  601 :
+  602 rem -- check index feld fuer pers. msg ------------------------------------
+  603 :
+  604 fori=1tomx
+  605 ifpp$=m$(i)thenm$(i)="loes"
+  606 next:return
+  607 :
+  608 rem -- ausgabe time/datum/online ------------------------------------------
+  609 :
+  610 gosub205
+  611 te$=left$(ur$,2)+"."+mid$(ur$,3,2)+"."+right$(ur$,2)
+  612 return
+  613 gosub610
+  614 print#d,j$(z)" den "da$" / "te$" Uhr"
+  615 return
+  616 m$=mid$(ti$,3,2)
+  617 se$=right$(ti$,2)
+  618 gosub308
+  619 print#d,"Online : "m$" min. und "se$" sec.";rl$;
+  620 return
+  621 print#d,rl$"Einen Moment bitte.."rl$
+  622 return
+  623 :
+  624 rem -- neuer user eintrag -------------------------------------------------
+  625 :
+  626 ifse=1orfh=>3thengosub532:return
+  627 ifsp=1thengosub518:return
+  628 ife2>1orer>3thent=10:gosub1179:return
+  629 t=8
+  630 gosub1179
+  631 print#d,"Wie ist Dein Name  >";
+  632 l=18
+  633 gosub374
+  634 iflen(e$)>0thenx1$=e$
+  635 a$=left$(e$,1)
+  636 fori=1to64
+  637 ife$=""ora$=chr$(i)thenx1$=b$:return
+  638 next
+  639 ub$=e$
+  640 print#d,"Von wo rufst Du an >";
+  641 l=18
+  642 gosub374
+  643 iflen(e$)>0thenx2$=e$
+  644 print#d,"Dein Rechnersystem >";
+  645 l=10
+  646 gosub374
+  647 iflen(e$)>0thenx3$=e$
+  648 gb=1
+  649 print#d,"Dein Pers.Passwort >";
+  650 l=10
+  651 gosub374
+  652 iflen(e$)>0thenx4$=e$
+  653 gosub309
+  654 ifgb=0andsp=0thengosub532:gb=0:return
+  655 :
+  656 rem -- user daten aendern -------------------------------------------------
+  657 :
+  658 print#d,"Name       >"ub$;rl$;
+  659 print#d,"Stadt      >"x2$;rl$;
+  660 print#d,"System     >"x3$;rl$;
+  661 print#d,"Passw.     >"x4$;rl$;
+  662 print#d,rl$"Fertig/Ok J/Y/N >";
+  663 gosub374
+  664 ife$=""ore$="Y"ore$="J"then712
+  665 ife$<>"N"thengosub677:goto662
+  666 print#d,rl$"Korrektur J/Y/N >";
+  667 gosub374
+  668 ife$="Y"ore$="J"thengosub308:goto631
+  669 ife$="N"then712
+  670 gosub677
+  671 goto666
+  672 un$=x1$
+  673 st$=x2$
+  674 rs$=x3$
+  675 co$=x4$
+  676 return
+  677 print#d,rl$"'J'a / 'Y'es oder/or 'N'o !!"rl$;
+  678 return
+  679 ifx1$=""orx2$=""orx3$=""orx4$=""ore2>3thenreturn
+  680 iflo=1andxl>0thenbl=xl:gosub672:gosub417:gosub708:return
+  681 goto700
+  682 gosub610
+  683 u$=left$(left$(da$,6)+right$(da$,2),8)+te$
+  684 xy=1
+  685 xx=sr
+  686 gosub239
+  687 u$=u$+" "+k$
+  688 xx=li
+  689 gosub239
+  690 u$=u$+k$
+  691 xx=po+1
+  692 gosub239
+  693 u$=u$+k$
+  694 xx=be
+  695 gosub239
+  696 u$=u$+k$+left$(st$+s$,19)
+  697 xy=0
+  698 u$=u$+left$(rs$+s$,10)+left$(co$+s$,10)+left$(un$+s$,19)
+  699 return
+  700 gosub417
+  701 nr=nr+1
+  702 ifnr>u%thennr=u%
+  703 bl=u%-nr+1
+  704 un$=x1$
+  705 st$=x2$
+  706 rs$=x3$
+  707 co$=x4$
+  708 gosub682
+  709 gosub427
+  710 print#8,u$
+  711 return
+  712 ifsp=0andae=0then716
+  713 ifsp=1andae=0thenreturn
+  714 ifsp=1andae=1then716
+  715 return
+  716 gosub621
+  717 print#d,rl$;
+  718 ua$=left$(x1$+s$,19)
+  719 cx$=left$(x4$+s$,10)
+  720 ifx1$=""orx2$=""orx3$=""orx4$=""then682
+  721 fx=4
+  722 gosub537
+  723 ifae=1andfu=0thenprint#d,rl$"OK Daten geaendert"rl$:gosub1054:ae=0:return
+  724 ifae=0andfu=0thent=9:gosub1179:sp=1:return
+  725 print#d,rl$"Dieser Name ist leider schon belegt !"rl$
+  726 x1$=b$
+  727 ub$=uc$
+  728 gosub1054
+  729 goto658
+  730 input#8,u$
+  731 d$=left$(u$,8)
+  732 i$=mid$(u$,9,8)
+  733 s1=val(mid$(u$,19,1))
+  734 s2=val(mid$(u$,20,1))-1
+  735 s3=val(mid$(u$,21,1))
+  736 rs$=mid$(u$,41,10)
+  737 s4=val(mid$(u$,18,1))
+  738 st$=mid$(u$,22,19)
+  739 co$=mid$(u$,51,10)
+  740 un$=mid$(u$,61,19)
+  741 return
+  742 rem -- userliste anzeigen -------------------------------------------------
+  743 :
+  744 z$=left$(su$,1)
+  745 print#d,rl$"Eingetragene user bei M.C.S."rl$
+  746 gosub417
+  747 su=0
+  748 re=0
+  749 w$=""
+  750 v=len(su$)
+  751 o$=mid$(su$,3,v)
+  752 ua$=left$(o$+s$,19)
+  753 ifsp=0thenprint#d,rl$"Die Ausgabe ist fuer Gaeste begrenzt"rl$:goto755
+  754 ifz$="A"thenprint#d,rl$"Anzahl User zur Zeit : "nr$;rl$;:goto766
+  755 w=0
+  756 w$=right$(su$,1)
+  757 ifsp=0thenz$="N":ss=1:su$="":goto760
+  758 ss=len(su$)
+  759 ifz$=""thena$="Alle "+nr$+" User anzeigen ":goto768
+  760 ifz$="N"andss=1thena$="Nach namen suchen":su=1:l=18:re=60:goto768
+  761 ifz$="N"andw$<>"*"andss>1thenprint#d,"Nach Namen suchen"rl$:w$="/":goto773
+  762 ifz$="N"andw$="*"andss>1thena$="Nach Namen suchen":su=1:l=18:goto768
+  763 ifz$="D"andss>1thena$="Nach Datum suchen":su=2:l=8:goto768
+  764 ifz$="R"andss>1thena$="Nach Rechner suchen":su=3:l=10:goto768
+  765 ifz$="S"andss>1thena$="Nach Stadt suchen":su=4:l=18:goto768
+  766 gosub421
+  767 return
+  768 ifz$="N"andw$="*"theno$=left$(o$,len(o$)-1)
+  769 v=len(o$)
+  770 ifv>lthengosub421:w$=""
+  771 ifss<>1thenprint#d,rl$a$rl$:goto773
+  772 goto777
+  773 print#d,"User -------------- System ------------ Stadt ------------- Datum"
+  774 print#d,rl$
+  775 ifw$="/"thenfx=3:gosub537:iffu=0thent=13:gosub1179:return
+  776 ifw$="/"andfu=1thenus$=u$:re=0:ss=0:goto787
+  777 forbl=u%-nr+1tou%
+  778 gosub427
+  779 input#8,us$
+  780 gosub288
+  781 ifex=2then795
+  782 ifsu=1andmid$(us$,61,v)<>o$then796
+  783 ifsu=2andleft$(us$,v)<>o$then796
+  784 ifsu=3andmid$(us$,41,v)<>o$then796
+  785 ifsu=4andmid$(us$,22,v)<>o$then796
+  786 ifre>0thenprint#d,us$;:ifsp=0thensu=0
+  787 ifre=0thenprint#d,mid$(us$,61,19);
+  788 ifw<3andre>0thenprint#d," ";
+  789 ifss=1then791
+  790 print#d," "mid$(us$,41,10)"          "mid$(us$,22,19)" "left$(us$,8);
+  791 ifss<>1thenprint#d,rl$;
+  792 ifw$="/"thenprint#d,rl$;:return
+  793 gosub288
+  794 ifss=1thenw=w+1:ifw=4thenw=0:a$="":print#d,rl$;
+  795 ifex=2thenex=0:gosub421:re=0:print#d,rl$:return
+  796 t1=0
+  797 next
+  798 re=0
+  799 gosub421
+  800 return
+  801 :
+  802 rem -- user id (uid) pruefen ----------------------------------------------
+  803 :
+  804 iffh=3thengosub532:return
+  805 ifsp=1thengosub518:return
+  806 y=0
+  807 x=len(z$)
+  808 ifz$=""then450
+  809 fori=1tox
+  810 ify=0andmid$(z$,i,1)=","theny=i:e$=right$(z$,x-i):goto813
+  811 next
+  812 ify=0theny=20
+  813 ua$=left$(z$,y-1)
+  814 ub$=ua$
+  815 ua$=left$(ua$+s$,19)
+  816 uc$=ub$
+  817 ify<>20then823
+  818 print#d,rl$"PASSWORT >";
+  819 pe=1
+  820 gosub374
+  821 pe=0
+  822 ife$=""thenreturn
+  823 cx$=left$(e$+s$,10)
+  824 gosub621
+  825 sp=0
+  826 ga=1
+  827 fx=1
+  828 gosub537
+  829 iffu=1then833
+  830 print#d,rl$"Unbekannter Name/Passwort"rl$
+  831 fh=fh+1
+  832 return
+  833 gosub309
+  834 sp=1
+  835 gosub1076
+  836 print#d,rl$"Dein letzter Anruf erfolgte"rl$;
+  837 xl=bl
+  838 print#d,"am "d$" um "i$;rl$;
+  839 li=s1
+  840 po=s2
+  841 be=s3
+  842 ga=0
+  843 sw=0
+  844 gosub324
+  845 gosub334
+  846 pp$=un$+co$
+  847 x1$=un$
+  848 x2$=st$
+  849 x3$=rs$
+  850 x4$=co$
+  851 gosub857
+  852 gosub1054
+  853 return
+  854 :
+  855 rem -- check pers. message ------------------------------------------------
+  856 :
+  857 fori=1tomx
+  858 ifpp$=m$(i)thensw=1:gosub863
+  859 next
+  860 ifsw=0thenprint#d,rl$"Keine Pers. Message fuer Dich vorhanden"rl$
+  861 ifsw=1thenprint#d,rl$"Das waren alle pers. Message fuer dich"rl$
+  862 return
+  863 print#d,rl$"Pers. Message fuer Dich.."
+  864 fi$="p"+str$(i)
+  865 gosub302
+  866 return
+  867 rem -- eingabe pers. message ----------------------------------------------
+  868 :
+  869 fori=1tomx
+  870 ifm$(i)="loes"then875
+  871 next
+  872 t=1
+  873 gosub1179
+  874 return
+  875 gosub308
+  876 ifpo=-1thent=2:gosub1179
+  877 print#d,"Pers. MSG fuer >";
+  878 gosub374
+  879 ife$=""thenreturn
+  880 au$=e$
+  881 ua$=left$(e$+s$,19)
+  882 ok=0
+  883 gosub621
+  884 fx=2
+  885 gosub537
+  886 iffu=0thengosub309:t=13:gosub1179:goto877
+  887 ok=1
+  888 p$=un$+co$
+  889 gosub421
+  890 goto895
+  891 :
+  892 rem -- text editor --------------------------------------------------------
+  893 :
+  894 ifpeek(830+mf)>3thent=4:gosub1179:return
+  895 yz=0
+  896 gosub308
+  897 tz=1
+  898 fori=1to40
+  899 te$(i)=""
+  900 next
+  901 ty=1
+  902 ifpo=-1thent=3:gosub1179
+  903 print#d,rl$"- TEXT-EDITOR -"rl$
+  904 print#d,"Deine Eingabe fuer "au$rl$
+  905 eo=0
+  906 ongagosub523
+  907 print#d,rl$"HELP-E-A-L-SP-ECHO ("o$(eo+1)")-MA"rl$
+  908 gosub119
+  909 iftz<yzthentz=sz
+  910 print#d,rl$c$;
+  911 gosub374
+  912 ife$=""then910
+  913 ee$=left$(e$,1)
+  914 lx=val(right$(e$,len(e$)-1))
+  915 ife$="?"or"HELP"=e$thent=14:gosub1179:goto908
+  916 ifee$="A"thengosub960:goto907
+  917 ife$="ECHO"then924
+  918 ifee$="L"thengosub974:gosub308:goto907
+  919 ifee$="E"thenontygoto927,996
+  920 ife$="MA"thenog=2:goto1004
+  921 ife$="SP"thenog=1:goto1004
+  922 gosub515
+  923 goto910
+  924 eo=eo+1
+  925 ifeo=2theneo=0
+  926 goto907
+  927 gosub122
+  928 print#d,rl$;
+  929 xz=tz
+  930 ty=2
+  931 ifeo=0thengosub955
+  932 e$=""
+  933 iftz=>41thentz=40:goto907
+  934 gosub341
+  935 get#2,x$
+  936 ifx$=""then938
+  937 goto940
+  938 get#1,x$
+  939 ifx$=""thenprintchr$(159)"_"chr$(157)chr$(158);:goto934
+  940 x=asc(x$)
+  941 ifx=24orx=27thengosub309:gosub308:goto905
+  942 ifx=17orx=19then934
+  943 if(x=8orx=20)andlen(e$)>0thene$=left$(e$,len(e$)-1):goto949
+  944 iflen(e$)=>70thengosub327:iflen(e$)=>79thengosub308:goto951
+  945 iflen(e$)<1and(x=8orx=20)thengosub327:goto934
+  946 ifx=13then951
+  947 e$=e$+x$
+  948 ifeo=1thenprintx$;
+  949 ifeo=0thenprint#d,x$;
+  950 goto934
+  951 ife$="..."ore$="END"thenprint#d,rl$:eo=0:goto905
+  952 te$(tz)=e$
+  953 tz=tz+1
+  954 goto927
+  955 a$=str$(xz)
+  956 a=len(a$)
+  957 ifa=2thena$=mid$(a$,2,1):print#d,"0"+a$+">";
+  958 ifa=3thenprint#d,mid$(a$,2,2)+">";
+  959 return
+  960 print#d,rl$
+  961 iflx=0then967
+  962 iflx<0orlx>40thenreturn
+  963 xz=lx
+  964 gosub971
+  965 print#d,rl$
+  966 return
+  967 forxz=1totz
+  968 gosub971
+  969 next
+  970 return
+  971 gosub955
+  972 print#d,te$(xz);rl$;
+  973 return
+  974 print#d,rl$"Loeschen ? >";
+  975 gosub374
+  976 ife$=""then974
+  977 ife$<>"J"ande$<>"Y"thenreturn
+  978 iflx=0then983
+  979 iflx<0orlx>40thenreturn
+  980 i=lx
+  981 goto991
+  982 return
+  983 fori=1totz
+  984 gosub994
+  985 next
+  986 print#d,rl$"Alle Zeilen geloescht"rl$
+  987 tz=1
+  988 yz=1
+  989 sz=1
+  990 goto993
+  991 gosub994
+  992 print#d,rl$"Zeile"+str$(i)" geloescht"rl$
+  993 return
+  994 te$(i)=""
+  995 return
+  996 sw=sw+1
+  997 ifsw=1thenx=0
+  998 yz=tz
+  999 iflx=0thenyz=0:tz=1:goto927
+ 1000 iflx<0orlx>40then910
+ 1001 sz=tz
+ 1002 tz=lx
+ 1003 goto927
+ 1004 lx=0
+ 1005 fori=1totz
+ 1006 lx=lx+len(te$(i))
+ 1007 next
+ 1008 iflx>10thenonoggoto1016,1011
+ 1009 a$="Kein Text zum Abspeichern vorhanden !"
+ 1010 goto1013
+ 1011 a$="Dein Text ist noch im Editor !"
+ 1012 og=0
+ 1013 ifog=2then450
+ 1014 print#d,rl$a$rl$
+ 1015 goto908
+ 1016 gosub621
+ 1017 gosub610
+ 1018 ak$=da$+" / "+left$(te$,5)
+ 1019 bk$=cr$+ub$+" / "+ak$+cr$+cr$
+ 1020 gosub421
+ 1021 ifok=1then1042
+ 1022 x=peek(830+mf)
+ 1023 x=x+1
+ 1024 poke830+mf,x
+ 1025 fi$="@:"+fb$+",s,w"
+ 1026 ifx>1thenfi$=fb$+",s,a"
+ 1027 gosub12
+ 1028 gosub1118
+ 1029 open8,8,2,fi$
+ 1030 bc$=cr$+cr$+"-NEXT-"+cr$+chr$(14)+cr$
+ 1031 print#8,bk$;
+ 1032 forj=1totz
+ 1033 print#8,te$(j)
+ 1034 next
+ 1035 print#8,bc$;
+ 1036 close8
+ 1037 gosub1106
+ 1038 print#d,rl$"Dein MSG wurde abgespeichert"rl$;
+ 1039 ifok=1thenok=0:gosub308:return
+ 1040 print#d,"und ist beim naechsten Anruf abrufbar"rl$
+ 1041 goto450
+ 1042 fori=1tomx
+ 1043 ifm$(i)=p$thenfa$="p":fb$=",s,a":goto1049
+ 1044 next
+ 1045 fori=1tomx
+ 1046 ifm$(i)="loes"thenm$(i)=p$:fa$="@:p":fb$=",s,w":goto1049
+ 1047 next
+ 1048 goto869
+ 1049 gosub12
+ 1050 gosub1118
+ 1051 open8,8,2,fa$+str$(i)+fb$
+ 1052 goto1031
+ 1053 rem -- user erkannt und anzeigen -----------------------------------------
+ 1054 ux$=ub$
+ 1055 gosub309
+ 1056 c$=ux$+"->"
+ 1057 return
+ 1058 rem -- ton ausgabe -------------------------------------------------------
+ 1059 pokesi,tn
+ 1060 pokesi+1,tn
+ 1061 pokesi+5,11
+ 1062 pokesi+6,10
+ 1063 pokesi+24,15
+ 1064 pokesi+7,tn+3
+ 1065 pokesi+8,tn+3
+ 1066 pokesi+12,10
+ 1067 pokesi+13,11
+ 1068 pokesi+4,32
+ 1069 pokesi+4,33
+ 1070 pokesi+11,32
+ 1071 pokesi+11,33
+ 1072 return
+ 1073 :
+ 1074 rem -- begruessung des erkannten users -----------------------------------
+ 1075 :
+ 1076 gosub205
+ 1077 a$="Hallo"
+ 1078 tt=val(ur$)
+ 1079 iftt>1andtt<90000thena$="Guten Morgen"
+ 1080 iftt>90000andtt<180000thena$="Guten Tag"
+ 1081 iftt>190000andtt<235959thena$="Guten Abend"
+ 1082 iftt>120000andtt<140000thena$="Mahlzeit"
+ 1083 print#d,rl$rl$a$" "ub$;rl$;
+ 1084 return
+ 1085 :
+ 1086 rem -- mailbox begruessung (start) ---------------------------------------
+ 1087 :
+ 1088 gosub308
+ 1089 gosub205
+ 1090 te$=left$(ur$,2)+":"+mid$(ur$,3,2)
+ 1091 ife$="*"thend=3:goto1094
+ 1092 ife$="."then1094
+ 1093 fi$="bild":gosub302
+ 1094 print#d,rl$"Du bist der "+an$". Anrufer"
+ 1095 print#d,"am "da$" um "te$" Uhr"rl$;
+ 1096 return
+ 1097 print#d,rl$"Tschuess and Bye bye "ux$rl$;
+ 1098 print#d,rl$rl$"Bis zum naechsten mal"rl$
+ 1099 return
+ 1100 rem -- adresse vom sysop (m.c.s........) ---------------------------------
+ 1101 print#d,rl$"[THW]"rl$;
+ 1102 print#d,"2000 Hamburg 70"rl$;
+ 1103 print#d,"Auf dem Koenigslande 43"rl$
+ 1104 return
+ 1105 rem -- fehler abfrage floppy ---------------------------------------------
+ 1106 input#15,e,ee$,ex1,ex2
+ 1107 ife<1thenreturn
+ 1108 printxn$"FLOPPY ERROR";e;ee$;ex1;ex2
+ 1109 fori=1to50
+ 1110 ifi>25thentn=100:fa=2:gosub115:gosub1059
+ 1111 ifi<25thentn=70:fa=10:gosub115:gosub1059
+ 1112 next
+ 1113 getx$
+ 1114 ifx$=""then1109
+ 1115 ifx$="w"thenreturn
+ 1116 ifx$="s"thenend
+ 1117 goto1109
+ 1118 close15
+ 1119 open15,8,15:return
+ 1120 :
+ 1121 rem -- text in message einbinden (autoupdate) ----------------------------
+ 1122 :
+ 1123 printchr$(147)xn$"Checking Update"xn$
+ 1124 gosub12
+ 1125 fa$="message"
+ 1126 fori=0to3
+ 1127 ifpeek(830+i)=0thennext:return
+ 1128 gosub12
+ 1129 open15,8,15,"v"
+ 1130 print"Validate"xn$xn$
+ 1131 gosub1106
+ 1132 close15
+ 1133 poke828,0
+ 1134 open15,8,15,"r:"+fa$+"r"+"="+fa$
+ 1135 gosub1106
+ 1136 close15
+ 1137 q=0
+ 1138 e$=""
+ 1139 cx=0
+ 1140 open15,8,15,"r:"+fa$+"=n "+fa$
+ 1141 gosub1106
+ 1142 close15
+ 1143 open5,8,6,fa$+",s,a"
+ 1144 open8,8,0,fa$+"r,s,r"
+ 1145 sr=st
+ 1146 ifsr>0then1159
+ 1147 get#8,x$
+ 1148 ifx$=""then1145
+ 1149 ifx$=cr$then1152
+ 1150 e$=e$+x$
+ 1151 goto1145
+ 1152 q=q+len(e$)
+ 1153 printchr$(145)"Message file "right$("      "+str$(q),6)
+ 1154 ifq>17000then1159
+ 1155 ifq>15000ande$="-NEXT-"then1159
+ 1156 print#5,e$;chr$(13);
+ 1157 e$=""
+ 1158 goto1145
+ 1159 print#5,"-END-";cr$;
+ 1160 close5
+ 1161 close8
+ 1162 open15,8,15
+ 1163 gosub1106
+ 1164 close15
+ 1165 open15,8,15,"s:n "+fa$+","+fa$+"r"
+ 1166 close15
+ 1167 next
+ 1168 return
+ 1169 rem -- ton ausschalten ---------------------------------------------------
+ 1170 pokesi,0
+ 1171 pokesi+1,0
+ 1172 pokesi+7,0
+ 1173 pokesi+8,0
+ 1174 pokesi+24,0
+ 1175 return
+ 1176 :
+ 1177 rem -- mailbox texte -----------------------------------------------------
+ 1178 :
+ 1179 print#d,rl$
+ 1180 cmdd
+ 1181 ontgoto1186,1191,1194,1199,1204,1208,1214
+ 1182 ift>7thent=t-7
+ 1183 ontgoto1218,1227,1236,1245,1256,1266,1278
+ 1184 print#2,rl$
+ 1185 return
+ 1186 print"Es koennen zur Zeit keine pers. MSG"rl$;
+ 1187 print"abgespeichert werden !"rl$;
+ 1188 print"Bitte nimm den Oeffendlichen Teil."rl$;
+ 1189 print"Das System"rl$
+ 1190 return
+ 1191 print"**** Persoenliche Message eingabe ****"rl$;
+ 1192 print"Bitte den Namen des Users angeben"rl$
+ 1193 return
+ 1194 print"Maximal 40 Zeilen  a'80 Zeichen"rl$;
+ 1195 print"Eingabe mit 'E' oder mit 'W' beginnen"rl$;
+ 1196 print"Mit Ctrl/X / ESC / END oder mit ..."rl$;
+ 1197 print"kann die eingabe abgebrochen werden."rl$
+ 1198 return
+ 1199 print"Der Updatespeicher ist voll!"rl$;
+ 1200 print"Neue Texte koennen erst beim"rl$;
+ 1201 print"naechsten Anruf angenommen werden."rl$;
+ 1202 print"Das System"rl$
+ 1203 return
+ 1204 print"SYSTEM OPERATER RUFEN"rl$;
+ 1205 print"BITTE WARTEN ODER MIT Ctrl/X ABBRECHEN"rl$;
+ 1206 print".......... <END"rl$;
+ 1207 return
+ 1208 print"SORRY ER IST ZUR ZEIT NICHT ANWESEND."rl$;
+ 1209 print"VERSUCH ES BITTE SPAETER NOCH MAL ODER"rl$;
+ 1210 print"HINTERLASSE EINE PERS. MESSAGE UNTER"rl$;
+ 1211 print">>>>>  *SYSOP oder [THW]  <<<<<"rl$;
+ 1212 print"Das System."rl$
+ 1213 return
+ 1214 print"Hurra ...... Er ist anwesend  !!"rl$;
+ 1215 print"Zum Menue kommst wieder mit Ctrl/X"rl$;
+ 1216 print"wenn Du mit dem Gespraech fertig bist."rl$
+ 1217 return
+ 1218 print"Du hast die moeglichkeit dich hier"rl$;
+ 1219 print"einzutragen um Mitbenutzter der"rl$;
+ 1220 print"M.C.S. - BOX zu werden."rl$;
+ 1221 print"Alle Angaben erfolgen freiwillig"rl$;
+ 1222 print"und werden nicht weiter verwendet."rl$;
+ 1223 print"Bitte achte auf Uebertragungsfehler und"rl$;
+ 1224 print"BITTE nur ernstgemeinte Eintragungen"rl$;
+ 1225 print"vornehmen !!"rl$
+ 1226 return
+ 1227 print"Ok. Wenn Du die Box spaeter mit LOGOFF"rl$;
+ 1228 print"verlaesst wird der Rechner Dich in die"rl$;
+ 1229 print"Userliste eintragen."rl$;
+ 1230 print"Beim naechsten Anruf von Dir musst"rl$;
+ 1231 print"Du dich bitte mit UID Name und Deinem"rl$;
+ 1232 print"Passwort einloggen damit Du Deine Pers."rl$;
+ 1233 print"Message lesen kannst."rl$;
+ 1234 print"Das System."rl$
+ 1235 return
+ 1236 print"Du hast zu viele Uebertragungsfehler"rl$;
+ 1237 print"Aus Sicherheitsgruenden die Dir"rl$;
+ 1238 print"sicherlich einleuchten  muss ich"rl$;
+ 1239 print"Dir leider die Funktion sperren."rl$;
+ 1240 print"Versuch es bitte noch mal mit einer"rl$;
+ 1241 print"besseren Telefonleitung oder"rl$;
+ 1242 print"ueberpruefe Deinen Koppler einmal."rl$;
+ 1243 print"Das System."rl$
+ 1244 return
+ 1245 print"IST DAS HIER SO LANGWEILIG DAS DU HIER"rl$;
+ 1246 print"EINPENNST ????"rl$;
+ 1247 print"Wenn ich von Dir weiter nichts hoeren"rl$;
+ 1248 print"sollte sehe ich mich gezwungen die"rl$;
+ 1249 print"Verbindung von meiner Seite zu Unter-"rl$;
+ 1250 print"brechen."rl$;
+ 1251 print"Schliesslich wollen auch andere in die  Box."rl$;
+ 1252 print"ALSO KOMM IN DIE HUFEN !!!!"rl$;
+ 1253 print"DAS WAR DIE ALLERLETZTE WARNUNG !!"rl$;
+ 1254 print"Das System."rl$
+ 1255 return
+ 1256 print"TIMEOUT PERIOD EXPIRED"rl$;
+ 1257 print"----------------------"rl$;
+ 1258 print"Du hast leider Dein Zeitlimit ueber-"rl$;
+ 1259 print"schritten !!!!!!"rl$;
+ 1260 print"Habe bitte verstaendnis dafuer das ich"rl$;
+ 1261 print"die Verbindung von meiner Seite ab-"rl$;
+ 1262 print"breche um auch anderen Usern die Gele-"rl$;
+ 1263 print"genheit zu geben hier anzurufen."rl$;
+ 1264 print"So long...... Das System."rl$
+ 1265 return
+ 1266 print"Sorry dieser User ist so bei mir nicht"rl$;
+ 1267 print"eingetragen."rl$;
+ 1268 print"Suche doch mal mit dem Befehl ULN NAME*"rl$;
+ 1269 print"im MAILBOXMENUE nach dem User aber gib"rl$;
+ 1270 print"nur die Anfangs Buchstaben und '*'"rl$;
+ 1271 print"(Joker) an."rl$;
+ 1272 print"Sollte er immer noch nicht gefunden"rl$;
+ 1273 print"werden so ist dieser User noch nicht"rl$;
+ 1274 print"bei mir eingetragen."rl$;
+ 1275 print"Das System."rl$
+ 1276 return
+ 1277 rem -- helplisten --------------------------------------------------------
+ 1278 print"Exx     Eingabe"rl$;
+ 1279 print"Axx     Anzeigen"rl$;
+ 1280 print"Lxx     Loeschen"rl$;
+ 1281 print"xx      Zeile"rl$;
+ 1282 print"SP      Speichern"rl$;
+ 1283 print"ECHO    "+o$(eo+1)rl$;
+ 1284 print"MA      Mailboxmenue"rl$
+ 1285 return
+ 1286 print#d,rl$
+ 1287 cmdd
+ 1288 onmegoto1321,1302
+ 1289 rem -- help hauptmenue ---------------------------------------------------
+ 1290 print"Help     gibt diese Liste aus"rl$;
+ 1291 print"MA       Mailbox-menue"rl$;
+ 1292 print"IN       Info-menue"rl$;
+ 1293 print"UID      User ID"rl$;
+ 1294 print"SOR      System Operater rufen"rl$;
+ 1295 print"PRO      Profiumschaltung"rl$;
+ 1296 print"BE       Bell on/off"rl$;
+ 1297 print"LF       Linefeed on/off"rl$;
+ 1298 print"TI       Time/Datum/Online"rl$;
+ 1299 print"LOGOFF   Verbindung beenden"rl$;
+ 1300 print#d:return
+ 1301 rem -- help mailboxmenue -------------------------------------------------
+ 1302 print"Help     gibt diese Liste aus"rl$;
+ 1303 print"NU       Neuer User eintrag"rl$;
+ 1304 print"UL       Userliste gesammt"rl$;
+ 1305 print"ULA      Anzahl User"rl$;
+ 1306 print"ULN      Nur Namen anzeigen"rl$;
+ 1307 print"ULN .... Nach Namen suchen"rl$;
+ 1308 print"ULN ...* mit Joker"rl$;
+ 1309 print"ULS .... Nach Stadt suchen"rl$;
+ 1310 print"ULR .... Nach Rechner suchen"rl$;
+ 1311 print"ULD .... Nach Datum suchen"rl$;
+ 1312 print"UIDA     User Daten aendern"rl$;
+ 1313 print"PME      Pers. Message eingabe"rl$;
+ 1314 print"PML      Pers. Message lesen"rl$;
+ 1315 print"ME       Message eingabe"rl$;
+ 1316 print"ML       Message lesen"rl$;
+ 1317 print"IN       Infomenue"rl$;
+ 1318 print"HM       Hauptmenue"rl$;
+ 1319 print#d:return
+ 1320 rem -- help infomenue ----------------------------------------------------
+ 1321 print"Help     gibt diese Liste aus"rl$;
+ 1322 print"RI       Rechner Info"rl$;
+ 1323 print"AK       Aktuelles"rl$;
+ 1324 print"AL       Allgemeines"rl$;
+ 1325 print"CL       Clubinfos"rl$;
+ 1326 print"MA       Mailboxmenue"rl$;
+ 1327 print"HM       Hauptmenue"rl$;
+ 1328 print#d:return
+

@@ -1,0 +1,212 @@
+
+
+;kreisdiagramm.prg ==0801==
+   10 rem ***********************
+   20 rem ***   kreisdiagramm   *
+   30 rem *** fuer plotter 1520 *
+   40 rem ***        von        *
+   50 rem ***   franz  strobl   *
+   60 rem ***   starenweg  12   *
+   70 rem ***  d-8050 freising  *
+   80 rem ***********************
+   90 rem ***
+  100 rem *** dateninitialisierung
+  110 rem ***
+  120 print"{clr}kreisdiagramm":input"groesse (max. 2)";a
+  130 ifa>2ora<=0then120
+  140 open1,6,1:open2,6,2:open3,6,3:open4,6
+  150 deffnk(y)=sqr((a*a*10000-y*y))
+  160 input"diagrammfarbe (0 - 3)";f1
+  170 iff1<0orf1>3then160
+  180 print#2,f1
+  190 input"ueberschrift (bis 20 zeichen)";u$:iflen(u$)>20then190
+  200 print#3,2:print#4,u$
+  210 print#3,0
+  220 input"anzahl der sektoren ( < 100)";as
+  230 ifas>100oras<1oras<>int(as)then220
+  240 dimw(as+1),t$(as+1),s(as+1),f$(as+1)
+  250 print"prozent- oder absolut-werte (p/a) ?";
+  260 getg$:ifg$=""or(g$<>"p"andg$<>"a")then260
+  270 printg$
+  280 print"mit texteingabe? (j/n)";
+  290 gett$:ift$<>"j"andt$<>"n"then290
+  300 printt$
+  310 print"sollen die daten korrigiert werden (j/n)?"
+  320 getd$:ifd$<>"j"andd$<>"n"then320
+  330 ifd$="j"thenrun
+  340 rem ***
+  350 rem *** dateneingabe
+  360 rem ***
+  370 s=0
+  380 forr1=1toas
+  390 printr1;:input". wert";w(r1)
+  400 gosub1940
+  410 s=s+w(r1)
+  420 nextr1
+  430 ifg$="a"ors<=100then500
+  440 rem rem summe der prozentwerte > 100
+  450 print"summe der prozentwerte > 100"
+  460 print"neueingabe (n) oder korrektur (k)?"
+  470 gete$:ife$<>"n"ande$<>"k"then470
+  480 ife$="n"thenrun
+  490 goto540
+  500 print"werte korrigieren? (j/n)"
+  510 getk$:ifk$<>"j"andk$<>"n"then510
+  520 ifk$="n"then600
+  530 rem korrektur eines wertes
+  540 input"welchen wert";k:ifk>asork<1then430
+  550 s=s-w(k)
+  560 printk;:input". wert";w(k)
+  570 r1=k:gosub1940
+  580 s=s+w(r1)
+  590 goto430
+  600 ifs<100andg$="p"thenprint"rest:":as=as+1:r1=as:w(r1)=100-s:print"wert:"w(r1):gosub1940
+  610 rem ***
+  620 rem *** umrechnung der werte in bogenmass-winkel
+  630 rem ***
+  640 ifg$="p"thenf=.02*~:goto660
+  650 f=~*2/s
+  660 forr2=1toas
+  670 w(r2)=w(r2)*f
+  680 nextr2
+  690 rem ***
+  700 rem *** kreis zeichen
+  710 rem ***
+  720 print#1,"m",240,-120*a:print#1,"i"
+  730 print#1,"r",0,a*100
+  740 forr3=0to2step.05
+  750 print#1,"j",a*100*sin(r3*~),a*100*cos(r3*~)
+  760 nextr3
+  770 rem ***
+  780 rem *** zeichnen der sektoren
+  790 rem ***
+  800 s1=0:x1=0:y1=a*100
+  810 forr4=1toas
+  820 s0=s1:x0=x1:y0=y1
+  830 s1=s1+w(r4)
+  840 x1=a*100*sin(s1):y1=a*100*cos(s1)
+  850 print#1,"r",0,0:print#1,"j",x1,y1
+  860 rem quadrantenbeschriftung
+  870 ift$="n"then940
+  880 ifs1<=~/2thenprint#1,"r",x1-4,y1+10:goto920
+  890 ifs1<=~thenprint#1,"r",x1+6,y1-6:goto920
+  900 ifs1<=3*~/2thenprint#1,"r",x1-8,y1-12:goto920
+  910 print#1,"r",x1-18,y1
+  920 print#4,r4;:print#1,"m",240,-120*a:print#1,"i"
+  930 rem farbe des sektors
+  940 iff$(r4)=""then1260
+  950 print#2,f$(r4)
+  960 q0=int(2*s0/~):ifq0=4thenq0=3
+  970 q1=int(2*s1/~):ifq1=4thenq1=3
+  980 q=q1-q0
+  990 ifq=0then1210
+ 1000 ifq=1then1150
+ 1010 ifq=2then1090
+ 1020 rem 4 quadranten
+ 1030 xl=x0:yl=y0:xr=a*100:yr=0:gosub1380
+ 1040 xl=a*100:yl=0:xr=0:yr=-100*a:gosub1520
+ 1050 xl=0:yl=-100*a:xr=-100*a:yr=0:gosub1660
+ 1060 xl=-100*a:yl=0:xr=x1:yr=y1:gosub1800
+ 1070 goto1260
+ 1080 rem 3 quadranten
+ 1090 ifq1=3thenxl=x0:yl=y0:xr=0:yr=-100*a:gosub1520:goto1050
+ 1100 xl=x0:yl=y0:xr=a*100:yr=0:gosub1380
+ 1110 xl=a*100:yl=0:xr=0:yr=-100*a:gosub1520
+ 1120 xl=0:yl=-100*a:xr=x1:yr=y1:gosub1660
+ 1130 goto1260
+ 1140 rem 2 quadranten
+ 1150 ifq1=3thenxl=x0:yl=y0:xr=-100*a:yr=0:gosub1660:goto1060
+ 1160 ifq1=2thenxl=x0:yl=y0:xr=0:yr=-100*a:gosub1520:goto1120
+ 1170 xl=x0:yl=y0:xr=a*100:yr=0:gosub1380
+ 1180 xl=a*100:yl=0:xr=x1:yr=y1:gosub1520
+ 1190 goto1260
+ 1200 rem 1 quadrant
+ 1210 xl=x0:yl=y0:xr=x1:yr=y1
+ 1220 q1=q1+1:onq1gosub1380,1520,1660,1800
+ 1230 rem ***
+ 1240 rem *** texte und programmende
+ 1250 rem ***
+ 1260 print#2,f1:nextr4
+ 1270 print#1,"m",0,-240*a
+ 1280 print#4:ift$="n"then1340
+ 1290 print#3,1:print#2,f1:print#4
+ 1300 forr5=1toas
+ 1310 ifr5<10thenprint#4," ";
+ 1320 print#4,r5;:print#4,t$(r5)
+ 1330 nextr5:print#4:print#4
+ 1340 print#4:close1:close2:close3:close4:end
+ 1350 rem ***
+ 1360 rem *** farbe i. quadrant
+ 1370 rem ***
+ 1380 ifyl=0thendeffnl(y)=250:goto1400
+ 1390 deffnl(y)=y*xl/yl
+ 1400 ifyr=0thendeffnr(y)=250:goto1420
+ 1410 deffnr(y)=y*xr/yr
+ 1420 forh1=ylto0step-s(r4)
+ 1430 hx=fnl(h1):ha=fnr(h1):hb=fnk(h1)
+ 1440 ifha>hbthenha=hb
+ 1450 print#1,"r",hx,h1
+ 1460 print#1,"j",ha,h1
+ 1470 nexth1
+ 1480 return
+ 1490 rem ***
+ 1500 rem *** farbe ii. quadrant
+ 1510 rem ***
+ 1520 ifyl=0thendeffnl(y)=250:goto1540
+ 1530 deffnl(y)=y*xl/yl
+ 1540 ifyr=0thendeffnr(y)=250:goto1560
+ 1550 deffnr(y)=y*xr/yr
+ 1560 forh2=0toyrstep-s(r4)
+ 1570 hx=fnr(h2):ha=fnl(h2):hb=fnk(h2)
+ 1580 ifha>hbthenha=hb
+ 1590 print#1,"r",hx,h2
+ 1600 print#1,"j",ha,h2
+ 1610 nexth2
+ 1620 return
+ 1630 rem ***
+ 1640 rem *** farbe iii. quadrant
+ 1650 rem ***
+ 1660 ifyl=0thendeffnl(y)=-250:goto1680
+ 1670 deffnl(y)=y*xl/yl
+ 1680 ifyr=0thendeffnr(y)=-250:goto1700
+ 1690 deffnr(y)=y*xr/yr
+ 1700 forh3=0toylstep-s(r4)
+ 1710 hx=fnl(h3):ha=fnr(h3):hb=-fnk(h3)
+ 1720 ifha<hbthenha=hb
+ 1730 print#1,"r",ha,h3
+ 1740 print#1,"j",hx,h3
+ 1750 nexth3
+ 1760 return
+ 1770 rem ***
+ 1780 rem *** farbe iv. quadrant
+ 1790 rem ***
+ 1800 ifyl=0thendeffnl(y)=-250:goto1820
+ 1810 deffnl(y)=y*xl/yl
+ 1820 ifyr=0thendeffnr(y)=-100*a:goto1840
+ 1830 deffnr(y)=y*xr/yr
+ 1840 forh4=yrto0step-s(r4)
+ 1850 hx=fnr(h4):ha=fnl(h4):hb=-fnk(h4)
+ 1860 ifha<hbthenha=hb
+ 1870 print#1,"r",ha,h4
+ 1880 print#1,"j",hx,h4
+ 1890 nexth4
+ 1900 return
+ 1910 rem ***
+ 1920 rem *** eingabe weiterer sektorendaten
+ 1930 rem ***
+ 1940 ift$="n"then1970
+ 1950 input"    text (bis 36 zeichen";t$(r1)
+ 1960 iflen(t$(r1))>36then1950
+ 1970 print"    farbe (s/b/g/r/return)?";
+ 1980 getf$:iff$=""then1980
+ 1990 iff$="s"thenf$(r1)="0":goto2050
+ 2000 iff$="b"thenf$(r1)="1":goto2050
+ 2010 iff$="g"thenf$(r1)="2":goto2050
+ 2020 iff$="r"thenf$(r1)="3":goto2050
+ 2030 ifasc(f$)=13thenf$(r1)="":print:return
+ 2040 goto1980
+ 2050 printf$
+ 2060 input"    linienabstand schraffierung";s(r1)
+ 2070 ifs(r1)<1then2050
+ 2080 return
+

@@ -1,0 +1,214 @@
+
+
+;tpfm.prg ==0801==
+    1 rem**********************************
+    2 rem*     trainingsprogramm fuer     *
+    3 rem*       maschinenschreiben       *
+    4 rem*  dirk marzluf  brombeermatt 2  *
+    5 rem*        7614 gengenbach         *
+    6 rem**********************************
+    7 :
+   10 printchr$(147);chr$(5);chr$(14);chr$(8):poke53280,0:poke53281,0
+   20 fori=53000to53021:readx:pokei,x:nexti
+   30 gosub7000
+   37 :
+   38 rem***        hauptmenue         ***
+   39 :
+   40 dima$(200):dimb(30,20):print"{clr}{down}{down}{down}{down}1 = Schreiben"
+   50 print"{down}{down}2 = Kontrollieren"
+   53 print"{down}{down}3 = Benoten"
+   55 print"{down}{down}4 = Ende"
+   60 getaa$:ifaa$<>"1"andaa$<>"2"andaa$<>"3"andaa$<>"4"then60
+   70 ifaa$="2"then2000
+   72 ifaa$="3"thenf1=1:goto6007
+   75 ifaa$="4"thenprint"{clr}":poke1,55:end
+  997 :
+  998 rem***      text schreiben      ***
+  999 :
+ 1000 i=0:printchr$(147);"'Shift Return' beendet Text vorzeitig{down}{down}"
+ 1010 geta$
+ 1012 ifti$="001000"thenet$=ti$:a$(i)=b$:print"{clr}":gosub5000:gosub3000:run40
+ 1013 ifza=0thenti$="000000"
+ 1014 ifa$=""then1010
+ 1015 a=asc(a$)
+ 1020 ifa=141andza<>0thenet$=ti$:a$(i)=b$:print"{clr}":gosub5010:gosub3000:run40
+ 1025 ifa<32anda<>13ora>127anda<161then1010
+ 1030 ifa$=chr$(64)thena$="ue"
+ 1032 ifa$=chr$(186)thena$="Ue"
+ 1034 ifa$=chr$(62)thena$="oe"
+ 1036 ifa$=chr$(91)thena$="Oe"
+ 1040 ifa$=chr$(60)thena$="ae"
+ 1042 ifa$=chr$(93)thena$="Ae"
+ 1044 ifa$=chr$(192)thena$="ss"
+ 1050 printa$;:za=za+1
+ 1052 ifa=13thena$=chr$(190)
+ 1053 ifa=58thena$=chr$(191)
+ 1054 ifa=44thena$=chr$(192)
+ 1055 b$=b$+a$:iflen(b$)>70thena$(i)=b$:i=i+1:b$=""
+ 1060 goto1010
+ 1997 :
+ 1998 rem***    text kontrollieren   ***
+ 1999 :
+ 2000 gosub4000
+ 2002 fe$="00":print"{down}Mit 'Space' wird Fehlerzahl erhoeht."
+ 2004 print"{down}Mit 'Shift' kann das Listing des Textes"
+ 2005 print"{down}gestoppt werden.{down}{down}"
+ 2006 forp=0toi:forpp=1to72
+ 2010 a2$=mid$(a$(p),pp,1):ifa2$<>""thenifasc(a2$)=190thena2$=chr$(13)
+ 2012 ifa2$<>""thenifasc(a2$)=191thena2$=chr$(58)
+ 2013 ifa2$<>""thenifasc(a2$)=192thena2$=chr$(44)
+ 2015 ifs1=40thenprint"{up}";
+ 2020 printa2$;:getaa$
+ 2025 ifaa$=" "thenfe=fe+1:fe$=str$(fe):fe$=mid$(fe$,2,2):iffe<10thenfe$="0"+fe$
+ 2027 iffe=99thenfe=98
+ 2030 z1=peek(214):ifpeek(653)=1then2030
+ 2040 s1=peek(211):print"{home}Anzahl der Fehler: ";fe$;"                   "
+ 2060 iff2=1then2205
+ 2100 poke214,z1:poke211,s1:sys58640:nextpp:nextp
+ 2200 print:print"{down}{down}{rvon}'Return'=weiter{rvof} (Auswertung)":f2=1
+ 2205 getaa$:ifaa$<>""thenifasc(aa$)=13then6000
+ 2220 goto2025
+ 2997 :
+ 2998 rem***     abspeichermenue     ***
+ 2999 :
+ 3000 print"{clr}{down}{down}{down}{down}1 = Auf Kassette abspeichern"
+ 3001 print"{down}{down}2 = Auf Diskette abspeichern"
+ 3002 print"{down}{down}3 = Korrigieren (ohne Abspeichern)"
+ 3004 getaa$:ifaa$<>"1"andaa$<>"2"andaa$<>"3"then3004
+ 3005 print"{clr}":pe=8:na$="@:text":ifaa$="1"thenpe=1:gosub8000:na$="text"
+ 3006 ifaa$="3"then2002
+ 3007 :
+ 3008 rem***    text abspeichern     ***
+ 3009 :
+ 3010 open1,pe,1,na$:print#1,e1:print#1,et$
+ 3020 forp=0toi:print#1,a$(p):next:close1:return
+ 3997 :
+ 3998 rem***        lademenue        ***
+ 3999 :
+ 4000 i=0:print"{clr}{down}{down}{down}{down}1 = Von Kassette laden"
+ 4001 print"{down}{down}2 = Von Diskette laden"
+ 4002 getaa$:ifaa$<>"1"andaa$<>"2"then4002
+ 4003 print"{clr}":pe=8:ifaa$="1"thenpe=1:gosub8000
+ 4004 :
+ 4005 rem***       text laden        ***
+ 4006 :
+ 4009 open1,pe,0,"text":input#1,e1:input#1,et$
+ 4010 input#1,a$(i):ifst=64thenclose1:print"{clr}":return
+ 4020 i=i+1:goto4010
+ 4997 :
+ 4998 rem***ergebnisse, informationen***
+ 4999 :
+ 5000 print"{down}Die Zehnminutenabschrift ist zu Ende."
+ 5005 print"{down}Weitere Informationen folgen."
+ 5010 ifet$="000000"thenet$="000001"
+ 5012 a2$=mid$(et$,3,2)
+ 5020 a3$=mid$(et$,5,2)
+ 5030 se=val(a2$)*60+val(a3$):iff3=1thenreturn
+ 5040 print"{down}{down}{down}{down}Der Text hat eine Laenge von";za
+ 5050 print"{down}Zeichen und Sie haben";se;"Sekunden"
+ 5055 print"{down}dafuer benoetigt."
+ 5057 e1=int(za/(se/600)+.5)/10
+ 5060 print"{down}Sie haben einen Anschlag von";e1
+ 5070 print"{down}Zeichen pro Minute."
+ 5080 print"{down}{down}{down}{down}{rvon}'Return'=weiter{rvof} (Abspeicher-Menue)"
+ 5090 getaa$:ifaa$<>""thenifasc(aa$)=13thenreturn
+ 5100 goto5090
+ 5997 :
+ 5998 rem***einlesen der notentabelle***
+ 5999 :
+ 6000 e2=e1*10:f3=1:gosub5010:fe=int((fe/(se/600))+.5)
+ 6001 print"{clr}{down}{down}{down}{down}1 = Anfaenger":print"{down}{down}2 = Examenskandidat"
+ 6002 wait198,1:geta$:ifa$="1"thenan=1:fe=int(fe/2):e2=e2*2:print"{clr}":goto6007
+ 6003 print"{clr}Jetzt wird die Note errechnet, die Sie"
+ 6004 print"{down}in der Abschlusspruefung eines Schreib-"
+ 6005 print"{down}maschinenkurses erhalten haetten."
+ 6006 print"{down}****************************************"
+ 6007 restore:fori=1to43:readx$:nexti:readma:iff1=1thenprint"{clr}"
+ 6008 readx:n1=x
+ 6010 readx:ifx=-1thenf=f+1:goto6008
+ 6020 ifx=-2then6100
+ 6021 ifx<0thenx=abs(x):goto6030
+ 6022 ifx<10thenx=x*1000
+ 6024 ifx<100thenx=x*100
+ 6026 ifx<1000thenx=x*10
+ 6030 b(f,n1)=x:n1=n1+1
+ 6040 goto6010
+ 6097 :
+ 6098 rem***   berechnen der note    ***
+ 6099 :
+ 6100 z2=0:iff1=0then6104
+ 6101 print"{clr}Fuer erneuten Start bei Fehlerzahl 'x'  {down}eingeben."
+ 6102 input"{down}{down}{down}Fehlerzahl";fe$:iffe$="x"thenrun40
+ 6103 input"{down}{down}Anschlagszahl";e2$:e2=val(e2$):fe=val(fe$)
+ 6104 ife2<maorfe>fthenno=6:goto6250
+ 6105 forno=6to1.5step-.5:ifb(fe,z2)>e2then6250
+ 6150 ifb(fe,z2)>b(fe,z2+1)thenno=no-.5:goto6250
+ 6200 z2=z2+1:next
+ 6250 ih=0:ife2<>0ande2>=matheniffe/e2*100<=0.5thenih=1
+ 6297 :
+ 6298 rem***    ausgabe der note     ***
+ 6299 :
+ 6300 iff1=0then6304
+ 6301 print"{down}{down}{rvon}Pruefungsnote:";no:gosub9000
+ 6302 print"{down}{down}{down}Zur Vortsetzung beliebige Taste         {down}druecken."
+ 6303 wait198,1:poke198,0:goto6100
+ 6304 print"Sie haetten die Note";no;"bekommen."
+ 6305 ifet$="001000"thengosub9000:q$="{down}{down}{down}{down}{down}{down}{down}":goto6311
+ 6306 mi=int(se/60):s2=se-mi*60
+ 6307 print"{down}Sie haben";mi;"Min. und";s2;"Sek."
+ 6308 print"{down}geschrieben. Anzahl der Fehler und"
+ 6309 print"{down}Anschlaege wurden auf Zehnminuten-"
+ 6310 print"{down}leistung hochgerechnet.":q$="{down}":gosub9000
+ 6311 printq$;"{rvon}'Return'=weiter{rvof} (erneuter Start)"
+ 6320 getaa$:ifaa$<>""thenifasc(aa$)=13thenrun40
+ 6330 goto6320
+ 6997 :
+ 6998 rem*** umstellen der tastatur  ***
+ 6999 :
+ 7000 print"Die Tastatur wird jetzt umgestellt.{down}{down}{down}"
+ 7002 sys53000:poke1,53
+ 7005 readx:ifx=-1thenpoke60389,61:poke60407,39:return
+ 7010 ready:printchr$(x)" wird zu "chr$(y)
+ 7015 fori=60289to60419:d=peek(i):ifd<>xandd<>ythennext
+ 7016 ifd=xtheni1=i
+ 7017 ifd=ytheni2=i
+ 7018 ifi1=0ori2=0thennext
+ 7020 pokei1,y:pokei2,x:i1=0:i2=0:goto7005
+ 7997 :
+ 7998 rem***       textausgabe       ***
+ 7999 :
+ 8000 print"{down}{down}{down}Bitte Kassette zum Textbeginn zurueck-  {down}spulen."
+ 8010 print"{down}Anschliessend druecken Sie bitte eine"
+ 8015 print"{down}beliebige Taste.{down}{down}{down}"
+ 8020 wait198,1:poke198,0:return
+ 9000 ifan=1thenq$="{down}{down}{down}{down}{down}":return
+ 9002 ifih=0then9010
+ 9005 print"{down}{down}Sie haetten die I.H.K. Pruefung         {down}bestanden."
+ 9007 return
+ 9010 print"{down}{down}Sie haetten die I.H.K. Pruefung nicht   {down}bestanden."
+ 9020 return
+49996 :
+49997 rem*** daten fuer rom-kopier  ***
+49998 rem***        -routine        ***
+49999 :
+50000 data160,  0,169,192,133, 91,133, 89,132, 90,132, 88,169,224
+50010 data132, 95,133, 96, 32,191,163, 96
+50996 :
+50997 rem***  daten fuer tastatur-  ***
+50998 rem***       umstellung       ***
+50999 :
+51000 data89,90,217,218,45,47,47,39,58,62,59,60,63,219,43,42,42,192,35,61,-1
+51997 :
+51998 rem***      notentabelle      ***
+51999 :
+52000 data1200,5,12,14,16,17,18,-1,5,12,14,16,17,18,-1,4,12,14,15,16,17,18,-1
+52010 data3,12,14,15,16,17,18,24,-1,3,12,15,16,17,18,2133,32,-1
+52020 data2,12,14,16,17,18,2,2667,4,-1,2,12,15,16,17,1875,24,32,-1
+52030 data1,12,14,16,17,18,2188,28,3733,-1,1,12,15,16,17,2,25,32,-1
+52040 data0,12,14,16,17,18,225,2813,36,-1,0,12,15,16,17,2,25,3125,4,-1
+52050 data0,14,15,17,18,22,275,3438,-1,0,15,16,17,2,24,3,375,-1
+52060 data0,15,16,18,2167,26,325,-1,0,16,17,1867,2333,2028,35,-1
+52070 data0,16,17,2,25,3,375,-1,0,17,18,2133,2667,32,-1
+52080 data0,17,1889,2267,2833,34,-1,0,18,2,24,3,36,-1,0,18,2111,2533,3167,-1
+52090 data0,1905,2222,2667,3333,-2
+

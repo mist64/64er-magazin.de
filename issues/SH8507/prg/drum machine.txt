@@ -1,0 +1,399 @@
+
+
+;drum machine.prg ==0801==
+   10 rem     drum machine 64
+   20 rem    by thomas langens
+   30 rem   schevenhofer weg 44d
+   40 rem     5600 wuppertal 1
+   50 rem    tel: (02053) 40152
+   60 rem
+  100 print"{clr}{blu}{down}{down} einen moment bitte !"
+  110 poke53281,15:poke53280,2
+  120 forh=0to7:readdr$(h):next
+  130 za=1:z=1:dimt(32,100)
+  140 fa=54272:p1=1548:p2=1508
+  150 gosub3500
+  160 gosub1510:poke198,0
+  170 geta$:ifa$=""then170
+  180 ifa$="{f1}"then1910
+  190 ifa$="{f3}"then2330
+  200 ifa$="{f5}"then2860
+  210 ifa$="{f7}"then3330
+  220 goto170
+  230 geta$:ifa$<>""then230
+  240 geta$:ifa$=""then240
+  250 return
+  260 print"{blu}{clr}{down}{down} welche sequenz soll eingestellt werden"
+  270 print"{down} die sequenz nr.  ";za;:input"{left}{left}{left}{left}";a$
+  280 ifa$="*"then160
+  290 z=val(a$):ifz>zathenza=z
+  300 ifz>100thenprint"{red}{down}unerlaubter wert (1-100){blu}":print"{up}{up}{up}{up}";:goto270
+  310 return
+  320 print"{clr}{gry3}{rvof}                        {blu}U";
+  330 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{gry3}            ";
+  340 print"              {blu}{SHIFT--}{red}f1{blu}={red}sequenz";
+  350 print"  {blu}{SHIFT--}  {gry3}   {blu}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  360 print"{SHIFT-*}I{gry3}  {blu}{SHIFT--}{red}f3{blu}={red}menue{blu}    {SHIFT--}  {gry3}   {blu}{SHIFT--}{gry3} ";
+  370 print"{orng}einstellen der{gry3}  {blu}{SHIFT--}{gry3}  {blu}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  380 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K  {gry3}   {blu}{SHIFT--}{gry3}           ";
+  390 print"      {blu}{SHIFT--}{gry3}           {blu}      {red} ";
+  400 print"{gry3}   {blu}{SHIFT--}{gry3} {orng}"dr$(i)           "  {blu}{SHIFT--}{gry3}   ";
+  410 print"         {blu}      {gry3}   {blu}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  420 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{gry3}            {blu} ";
+  430 print"     {gry3}                    ";
+  440 print"                       {red}U{SHIFT-*}";
+  450 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  460 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{gry3}     {red}{SHIFT--}{gry3}          {wht}1";
+  470 print"{gry3}         {wht}2{gry3}         {wht}3{gry3}  {red}{SHIFT--}{gry3} {wht} ";
+  480 print"{gry3}   {red}{SHIFT--}{wht} 12345678901234567890";
+  490 print"123456789012{red}{SHIFT--}{gry3} {wht} {gry3}   {red}{SHIFT--}{gry3}    {red}{SHIFT--}{gry3} ";
+  500 print"  {red}{SHIFT--}{gry3}   {red}{SHIFT--}{gry3}   {red}{SHIFT--}{gry3}   {red}{SHIFT--}{gry3}   {red}{SHIFT--}{gry3}   {red}{SHIFT--}{gry3}  ";
+  510 print" {red}{SHIFT--}{SHIFT--}{wht}  {gry3}   {red}{SHIFT--}{gry3} {grn}WWWWWWWWWWWWWWW";
+  520 print"WWWWWWWWWWWWWWWWW{red}{SHIFT--}{gry3}     {red}{SHIFT--}{gry3} ";
+  530 print"{blk}^{gry3}                        ";
+  540 print"       {red}{SHIFT--}{gry3}     {red}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  550 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{gry3}  ";
+  560 print"                         ";
+  570 print"                 {blu}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  580 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{gry3}  ";
+  590 print"       {blu}{SHIFT--}cursor tasten{SHIFT--}rec";
+  600 print"hts/links{gry3}   {blu}{SHIFT--}{gry3}    {blu}   {gry3}  {blu}{SHIFT--}& ";
+  610 print"joystick   {SHIFT--}{gry3}             ";
+  620 print"  {blu}{SHIFT--}{gry3}         {blu}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  630 print"{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}{gry3}       ";
+  640 print"  {blu}{SHIFT--}space taste{gry3}  {blu}{SHIFT--}setzen/l";
+  650 print"oeschen{SHIFT--}{gry3}      {blu} {gry3}  {blu}{SHIFT--}& feuer";
+  660 print" {gry3}     {blu}{SHIFT--}{gry3}               {blu}{SHIFT--}{gry3}  ";
+  670 print" {blu}    {gry3}  {blu}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  680 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K    {blu}        {home}";
+  690 return
+  700 print"{clr}{gry3}{rvof}                         ";
+  710 print"                 {red}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  720 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{gry3} {wht}  {gry3} {wht}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{gry3} ";
+  730 print"       {red}{SHIFT--}{gry2}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I";
+  740 print"{red}{SHIFT--}{wht}  {gry3}  {wht}{SHIFT--}{blu} spiel{gry3} {wht}{SHIFT--}{gry3}     {wht} {gry3}  {red}{SHIFT--}{gry2}{SHIFT--}{blu}d";
+  750 print"rum machine 64{gry2}{SHIFT--}{red}{SHIFT--}{wht}  {gry3}  {wht}{SHIFT--}{gry3}    ";
+  760 print"   {wht}{SHIFT--}{gry3}        {red}{SHIFT--}{gry2}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  770 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{red}{SHIFT--}{gry3} {wht}  {gry3} {wht}{SHIFT--}{gry3} {blu}modus{gry3} {wht}{SHIFT--}{gry3}      ";
+  780 print"  {red}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{wht}  {gry3}  ";
+  790 print"{wht}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{gry3}                ";
+  800 print"                        {blu} ";
+  810 print"       {gry3}                  ";
+  820 print"                      {orng}U{SHIFT-*}{SHIFT-*}";
+  830 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+  840 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{blu}  {gry3}  {orng}{SHIFT--}{gry3}          {blu}1{gry3} ";
+  850 print"        {blu}2{gry3}         {blu}3{gry3}   {orng}{SHIFT--}{gry3}  ";
+  860 print"  {orng}{SHIFT--}{gry3} {blu}123456789012345678901";
+  870 print"23456789012 {orng}{SHIFT--}{blu}  {gry3}  {orng}{SHIFT--}{gry3}       ";
+  880 print"                         ";
+  890 print"  {orng}{SHIFT--}{gry3}    {orng}{SHIFT--}{grn} WWWWWWWWWWWWWWWW";
+  900 print"WWWWWWWWWWWWWWWW{gry3} {orng}{SHIFT--}{gry3} {grn} {gry3}  {orng}{SHIFT--}{gry3}  ";
+  910 print"  {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}{gry3}  ";
+  920 print" {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}{gry3} {orng}{SHIFT--}{gry3}    {orng}{SHIFT--}{blk}            ";
+  930 print"                      {orng}{SHIFT--}{gry3}  ";
+  940 print"  {orng}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}";
+  950 print"{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}K{gry3} {orng} {gry3}          ";
+  960 print"                         ";
+  970 print"         {blk}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{gry3} ";
+  980 print" {red}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{blu}       {gry3}    {blk}{SHIFT--}";
+  990 print"{blu}* * * * * * *{blk}{SHIFT--}{gry3}  {red}{SHIFT--}{blu}f1 = end";
+ 1000 print"e {red}{SHIFT--}{gry3}     {blu} {blk} {gry3}    {blk}{SHIFT--}{blu}cursor tas";
+ 1010 print"ten{blk}{SHIFT--}{gry3}  {red}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}{gry3}       ";
+ 1020 print"    {blk}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}{gry3}  {red}{SHIFT--}{blu}f3 ";
+ 1030 print"={gry3} {blu}menue{red}{SHIFT--}{blu}       {gry3}    {blk}{SHIFT--}{blu}schne";
+ 1040 print"ller /{gry3}  {blk}{SHIFT--}{gry3}  {red}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{gry3}  ";
+ 1050 print"   {blu}  {gry3}    {blk}{SHIFT--}{blu}langsamer{gry3}    {blk}{SHIFT--}{gry3} ";
+ 1060 print"              {blu}      {gry3}    {blk}J";
+ 1070 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{gry3}           ";
+ 1080 print"                         ";
+ 1090 return
+ 1100 print"{blu}{clr}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1110 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}I{red}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{blu} {SHIFT--}{red}1= snare ";
+ 1120 print"drum{blu}{SHIFT--}{red}5=  low-tom{gry3}  {blu}{SHIFT--}{rvon}f1{rvof} men";
+ 1130 print"ue {red}{SHIFT--}{blu} {SHIFT--}{red}2=   akzent{gry3}  {blu}{SHIFT--}{red}6= hi";
+ 1140 print"hat (zu){blu}{SHIFT--}         {red}{SHIFT--}{blu} {SHIFT--}{red}3= b";
+ 1150 print"ass  drum{blu}{SHIFT--}{red}7= hihat (of){blu}{SHIFT--}{rvon}f";
+ 1160 print"3{gry3}{rvof} {blu}seq.  {red}{SHIFT--}{blu} {SHIFT--}{red}4=  hi-tom{gry3}   {blu}{SHIFT--}";
+ 1170 print"{red}8=  becken{gry3}   {blu}{SHIFT--}{gry3}      {red}   {SHIFT--}{blu} ";
+ 1180 print"J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1190 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}K{red}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{blu} {orng}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1200 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{blk}1{orng}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{blk}2{orng}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1210 print"{blk}3{orng}{SHIFT-*}I{gry3}  {orng}{SHIFT--}{gry3}     {blk}12345678901234";
+ 1220 print"567890123456789012{gry3} {blk} {orng}{SHIFT--}{gry3}    ";
+ 1230 print"    {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}";
+ 1240 print"   {SHIFT--}   {SHIFT--}{gry3}  {orng}{SHIFT--}{blu}(1){gry3}  {grn}WWWWWWWWW";
+ 1250 print"WWWWWWWWWWWWWWWWWWWWWWW{gry3}  ";
+ 1260 print"{orng}{SHIFT--}{gry3}        {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}   {SHIFT--}   {SHIFT--}   ";
+ 1270 print"{SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}  {SHIFT--}{blu}(2){gry3}  {grn}WWWW";
+ 1280 print"WWWWWWWWWWWWWWWWWWWWWWWWW";
+ 1290 print"WWW{gry3}  {orng}{SHIFT--}{gry3}        {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}   {SHIFT--}  ";
+ 1300 print" {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}{gry3}  {orng}{SHIFT--}{blu}(3){gry3} ";
+ 1310 print" {grn}WWWWWWWWWWWWWWWWWWWWWWWW";
+ 1320 print"WWWWWWWW{gry3}  {orng}{SHIFT--}{gry3}        {orng}{SHIFT--}{gry3}   {orng}{SHIFT--} ";
+ 1330 print"  {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}{gry3}  ";
+ 1340 print"{orng}{SHIFT--}{blu}(4){gry3}  {grn}WWWWWWWWWWWWWWWWWWW";
+ 1350 print"WWWWWWWWWWWWW{gry3}  {orng}{SHIFT--}{gry3}        {orng}{SHIFT--}";
+ 1360 print"{gry3}   {orng}{SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--} ";
+ 1370 print"  {SHIFT--}{gry3}  {orng}{SHIFT--}{blu}(5){gry3}  {grn}WWWWWWWWWWWWWW";
+ 1380 print"WWWWWWWWWWWWWWWWWW{gry3}  {orng}{SHIFT--}{gry3}    ";
+ 1390 print"    {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}";
+ 1400 print"   {SHIFT--}   {SHIFT--}  {SHIFT--}{blu}(6){gry3}  {grn}WWWWWWWWW";
+ 1410 print"WWWWWWWWWWWWWWWWWWWWWWW{gry3}  ";
+ 1420 print"{orng}{SHIFT--}{gry3}        {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}   {SHIFT--}   {SHIFT--}   ";
+ 1430 print"{SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}{gry3}  {orng}{SHIFT--}{blu}(7){gry3}  {grn}WWWW";
+ 1440 print"WWWWWWWWWWWWWWWWWWWWWWWWW";
+ 1450 print"WWW{gry3}  {orng}{SHIFT--}{gry3}        {orng}{SHIFT--}{gry3}   {orng}{SHIFT--}   {SHIFT--}  ";
+ 1460 print" {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}   {SHIFT--}  {SHIFT--}{blu}(8){gry3} ";
+ 1470 print" {grn}WWWWWWWWWWWWWWWWWWWWWWWW";
+ 1480 print"WWWWWWWW{gry3}  {orng}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}";
+ 1490 print"{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{blu}{home}";
+ 1500 return
+ 1510 print"{clr}{blk}{rvof}                         ";
+ 1520 print"                   {brn} {blk}     ";
+ 1530 print" {brn}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{blk}        ";
+ 1540 print"          {brn} {blk}     {brn}{SHIFT--} {blk}{CBM-I}{CBM-I}{gry3} {blk}{CBM-D}{CBM-I} {CBM-D}";
+ 1550 print"{gry3} {blk}{CBM-F}{CBM-D}{gry3}  {blk}{CBM-F}{brn}{SHIFT--}{gry3}                 {blk} ";
+ 1560 print"{gry3} {brn} {blk}  {gry3} {blk} {brn}{SHIFT--}{gry3} {blk}{CBM-K}{gry3} {blk}{CBM-B}{rvon}{CBM-K}{rvof}{CBM-I}{CBM-V}{rvon}{CBM-K}{gry3}{rvof} {blk}{CBM-K}{rvon}{CBM-K}{rvof}{CBM-B}{rvon}{CBM-B}{rvof}{CBM-K}{brn}{SHIFT--}{gry3}   ";
+ 1570 print"      {wht}    {gry3}    {blk}  {gry3} {brn} {gry3} {blk}  {brn}{SHIFT--}{gry3} {blk}{CBM-K}{gry3} ";
+ 1580 print"{blk}{rvon}{CBM-B}{CBM-K}{rvof} {CBM-K}{rvon}{CBM-K}{gry3}{rvof} {blk}{CBM-K}{rvon}{CBM-K}{gry3}{rvof}  {blk}{CBM-K}{brn}{SHIFT--}{gry3}             ";
+ 1590 print"   {blk}  {gry3}   {brn} {blk} {gry3} {brn}{SHIFT--}{gry3} {blk}{CBM-U}{CBM-U}{gry3} {blk}{CBM-C} {CBM-V}{CBM-C}{rvon}{CBM-I}{rvof}{CBM-V}{CBM-C}{gry3}  ";
+ 1600 print"{blk}{CBM-V}{brn}{SHIFT--}{gry3}                {brn} {gry3}      ";
+ 1610 print" {brn}{SHIFT--}{gry3} {red}machine - 64{gry3} {brn}{SHIFT--}{gry3}        ";
+ 1620 print"    {red} {gry3}    {brn} {gry3}      {brn}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1630 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{gry3}              {grn}   {gry3} ";
+ 1640 print"{grn}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1650 print"{SHIFT-*}{SHIFT-*}I{gry3}        {grn}  {gry3}  {grn}{SHIFT--}{wht}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1660 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{grn}{SHIFT--}{gry3}       ";
+ 1670 print" {grn}  {gry3}  {grn}{SHIFT--}{wht}{SHIFT--}{blu}f1{gry3} {blu}- laden/speiche";
+ 1680 print"rn    {wht}{SHIFT--}{grn}{SHIFT--}{gry3}        {grn}  {gry3}  {grn}{SHIFT--}{wht}{SHIFT--}{gry3}   ";
+ 1690 print"                     {wht}{SHIFT--}{grn}{SHIFT--}{gry3} {grn} ";
+ 1700 print"{gry3}      {grn}  {gry3}  {grn}{SHIFT--}{wht}{SHIFT--}{blu}f3{gry3} {blu}- sequenz ";
+ 1710 print"einstellen{gry3} {wht}{SHIFT--}{grn}{SHIFT--}{gry3}         {grn}  {gry3} ";
+ 1720 print"{grn}{SHIFT--}{wht}{SHIFT--}{gry3} {blu} {gry3}                     ";
+ 1730 print" {wht}{SHIFT--}{grn}{SHIFT--}{gry3}        {grn}  {gry3}  {grn}{SHIFT--}{wht}{SHIFT--}{blu}f5{gry3} {blu}- aps";
+ 1740 print"pielen          {wht}{SHIFT--}{grn}{SHIFT--}{gry3}       ";
+ 1750 print" {grn}  {gry3}  {grn}{SHIFT--}{wht}{SHIFT--}{gry3}                  ";
+ 1760 print"      {wht}{SHIFT--}{grn}{SHIFT--}{gry3}        {grn}  {gry3}  {grn}{SHIFT--}{wht}{SHIFT--}{blu}f7{gry3} ";
+ 1770 print"{blu}-{gry3} {blu}schautafel     {gry3}    {wht}{SHIFT--}{grn}{SHIFT--}{gry3}  ";
+ 1780 print"    {blu} {gry3} {grn}    {SHIFT--}{wht}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1790 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{grn}{SHIFT--}{gry3}        {grn}  {gry3}  ";
+ 1800 print"{grn}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 1810 print"{SHIFT-*}{SHIFT-*}K{gry3}                      ";
+ 1820 print"                         ";
+ 1830 print"                         ";
+ 1840 print"                         ";
+ 1850 print"                         ";
+ 1860 print"                {yel}     {gry3}   {blk}*";
+ 1870 print"{gry3} {blk}by drum-freak{gry3}  {blk}*{gry3}    {blk} {gry3}   ";
+ 1880 print"              {red}*{gry3} {red}thomas la";
+ 1890 print"ngens{blk} {red}*{blk} {red}  {blk} {gry3}              ";
+ 1900 return
+ 1910 print"{clr}{blu}{down}{down}        cassettenoperationen"
+ 1920 print"        {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1930 print"{down}{down}{red} wollen sie eine datei laden oder"
+ 1940 print"{down} abspeichern ?"
+ 1950 print"{down}{down}{blu}    {rvon}f1{rvof} = laden"
+ 1960 print"{down}{down}    {rvon}f3{rvof} = speichern"
+ 1970 gosub230
+ 1980 ifa$="*"then160
+ 1990 ifa$="{f1}"then2180
+ 2000 ifa$="{f3}"then2020
+ 2010 goto1970
+ 2020 print"{clr}{down}{blu}           dateien speichern"
+ 2030 print"           {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 2040 print"{down} bitte geben sie einen dateinamen ein{down}"
+ 2050 inputn$:iflen(n$)>10thenprint"{down}zu lang!":print"{up}{up}{up}";:goto2050
+ 2060 ifn$="*"then160
+ 2070 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{red} spulen sie das band an die richtige"
+ 2080 print"{down} stelle und druecken sie dann {blu}f1{rvof}{down}"
+ 2090 gosub230
+ 2100 ifa$="*"then160
+ 2110 ifa$<>"{f1}"then2090
+ 2120 open1,1,1,n$
+ 2130 print#1,za
+ 2140 forh=1toza
+ 2150 fori=1to32:print#1,t(i,h):next:next
+ 2160 close1
+ 2170 goto160
+ 2180 print"{clr}{blu}{down}          dateien laden"
+ 2190 print"          {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 2200 print"{down}{red} bitte geben sie den dateinamen ein !{down}"
+ 2210 inputn$:iflen(n$)>10thenprint"{down}{blu}zu lang{red}":print"{up}{up}{up}";:goto2210
+ 2215 ifn$="*"then160
+ 2220 print"{home}{blu}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} bitte spulen sie das band an die "
+ 2230 print"{down} richtige stelle und druecken sie {rvon}f1{rvof}"
+ 2240 gosub230
+ 2250 ifa$="*"then160
+ 2260 ifa$<>"{f1}"then2240
+ 2270 open1,1,0,n$
+ 2280 input#1,za
+ 2290 forh=1toza
+ 2300 fori=1to32:input#1,t(i,h):next:next
+ 2310 close1:goto160
+ 2320 end
+ 2330 gosub 260
+ 2340 print"{clr}{down}{blu}  welcher teil des schlagzeugs soll"
+ 2350 print"  eingestellt werden ?"
+ 2360 print"{down}{down}{red}   f1 - snare drum"
+ 2370 print"   f2 - akzent(e)"
+ 2380 print"   f3 - bass-drum"
+ 2390 print"   f4 - hi-hat (zu)"
+ 2400 print"   f5 - hi-hat (offen)"
+ 2410 print"   f6 - becken"
+ 2420 print"   f7 - kleine trommel"
+ 2430 print"   f8 - grosse trommel"
+ 2440 gosub230
+ 2450 ifa$="{f1}"theni=0
+ 2460 ifa$="{f2}"theni=1
+ 2470 ifa$="{f3}"theni=2
+ 2480 ifa$="{f4}"theni=5
+ 2490 ifa$="{f5}"theni=6
+ 2500 ifa$="{f6}"theni=7
+ 2510 ifa$="{f7}"theni=3
+ 2520 ifa$="{f8}"theni=4
+ 2530 ifa$="*"then160
+ 2540 print"{down}{down}{blu} einstellen der(des) - "dr$(i)"
+ 2550 print"{down} in ordnung (j/n) ?"
+ 2560 gosub230
+ 2570 ifa$="j"then2590
+ 2580 goto2340
+ 2590 gosub320:forh=1to32:poke32767+h,t(h,z):next
+ 2600 sys37457,2^i
+ 2610 remext
+ 2620 po=1
+ 2630 geta$:ifa$="{rght}"then2730
+ 2640 ifa$="{down}"then2760
+ 2650 ifa$=" "then2790
+ 2660 a=peek(56320):ifa=119then2730
+ 2670 ifa=127thenxx=0
+ 2680 ifa=123then2760
+ 2690 ifa=111andnotxx=1then2790
+ 2700 ifa$="{f1}"then2340
+ 2710 ifa$="{f3}"then160
+ 2720 goto2630
+ 2730 s=po:po=po+1:ifpo>32thenpo=32:goto2630
+ 2740 pokep1+s,32:pokep1+po,30:pokep1+po+fa,0
+ 2750 goto2630
+ 2760 s=po:po=po-1:ifpo<1thenpo=1:goto2630
+ 2770 pokep1+s,32:pokep1+po,30:pokep1+po+fa,0
+ 2780 goto2630
+ 2790 xx=1:s=peek(p2+po):ifs=81then2830
+ 2800 pokep2+po,81:pokep2+po+fa,2
+ 2810 t(po,z)=t(po,z)+2^i
+ 2820 goto2630
+ 2830 pokep2+po,87:pokep2+po+fa,5
+ 2840 t(po,z)=t(po,z)-2^i
+ 2850 goto2630
+ 2860 print"{clr}{down}{down}{red}"
+ 2870 print" soll eine einzelne sequenz oder"
+ 2880 print"{down}{down} mehrere hintereinanderabgespielt"
+ 2890 print"{down}{down} werden ?  {blu}(e/m)"
+ 2900 gosub230
+ 2910 ifa$="e"then2950
+ 2920 ifa$="m"then3180
+ 2930 ifa$="*"then160
+ 2940 goto2900
+ 2950 print"{clr}{down}{down}{red}"
+ 2960 print" welche sequenz soll gespielt werden"
+ 2970 print"{down}{down}{blu}(1)  die gerade editiert wurde"
+ 2980 print"{down}{down}(2)  eine andere"
+ 2990 gosub230
+ 3000 ifa$="1"then3070
+ 3010 ifa$="2"then3030
+ 3020 goto2990
+ 3030 input"{down}{down} {blu}welche ";x$
+ 3040 ifx$="*"then160
+ 3050 x=val(x$):ifx<1orx>zathenprint"{up}{up}{up}";:goto3030
+ 3060 z=x
+ 3070 print"{clr}{down}{down}{down} einen moment bitte !"
+ 3080 forh=1to32:poke32767+h,t(h,z):next
+ 3090 poke32768+32,255
+ 3100 gosub700:poke36998,65:poke36999,65
+ 3110 poke37000,0:poke37001,0
+ 3120 sys37065
+ 3130 gosub230
+ 3140 ifa$="{f7}"then3120
+ 3150 ifa$="{f3}"then160
+ 3160 ifa$="{f5}"then3110
+ 3170 goto3130
+ 3180 print"{clr}{blu}{down} welche sequenzen sollen hintereinander"
+ 3190 print"{down} gespielt werden (nicht mehr als 8 !)"
+ 3200 aa=1:qq=32767
+ 3210 print"{down}";aa;".te sequenz nr. ";
+ 3220 inputse$
+ 3230 ifse$="*"then160
+ 3240 ifse$=""then3280
+ 3250 se(aa)=val(se$):ifse(aa)=0then3280
+ 3260 ifse(aa)<1orse(aa)>100thenprint"{up}{up}";:goto3210
+ 3270 aa=aa+1:ifaa<9then3210
+ 3280 print"{clr}{red}{down}{down}       einen moment bitte !!!"
+ 3290 forh=1toaa-1
+ 3300 fori=1to32:qq=qq+1:pokeqq,t(i,se(h)):next:next
+ 3310 qq=qq+1:pokeqq,255:goto3100
+ 3320 goto3320
+ 3330 print"{clr}{blu}{down}{down}  darstellung fuer welche stimme ?"
+ 3340 print"{down}{down} {rvon}f1{rvof} - {red}die gerade editierte"
+ 3350 print"{blu}{down}{down} {rvon}f3{rvof} = {red}eine andere"
+ 3360 gosub230
+ 3370 ifa$="{f1}"thenx=z:goto3420
+ 3375 ifa$="*"then160
+ 3380 ifa$<>"{f3}"then3360
+ 3390 input"{down}{down}{blu}welche ";x$:x=val(x$)
+ 3400 ifx$="*"then160
+ 3410 ifx<1orx>100thenprint"{up}{up}{up}";:goto3390
+ 3420 forh=1to32:poke32767+h,t(h,x):next
+ 3430 gosub1100
+ 3440 sys37376
+ 3450 gosub230
+ 3460 ifa$="{f1}"then160
+ 3470 ifa$="{f3}"then2330
+ 3475 goto3450
+ 3480 data* snare drum *,*   akzente  *,* bass  drum *,* kl. trommel*
+ 3490 data* gr. trommel*,* hihat (zu) *,* hihat (of.)*,*   becken   *
+ 3500 forh=36864to37223:reada:pokeh,a:next
+ 3510 data76,160,144,160,0,152,153,0,212,200,192,25,208,248,96,234,169,33,141
+ 3520 data1,212,169,8,141,5,212,169,133,141,4,212,96,169,9,141,8,212,169,40
+ 3530 data141,12,212,169,21,141,11,212,96,169,240,141,15,212,169,17,141,19
+ 3540 data212,169,37,141,18,212,96,169,32,141,8,212,169,40,141,12,212,169,21
+ 3550 data141,11,212,96,169,13,141,8,212,169,40,141,12,212,169,21,141,11,212
+ 3560 data96,169,255,141,15,212,169,57,141,19,212,169,133,141,18,212,96,169
+ 3570 data250,141,15,212,169,57,141,19,212,169,133,141,18,212,96,169,15,141
+ 3580 data24,212,96,22,17,10,138,12,243,12,243,0,208,169,0,160,24,153,0,212
+ 3590 data136,16,250,169,10,141,24,212,96,173,134,144,141,135,144,162,32,32
+ 3600 data228,255,201,17,208,3,238,134,144,201,29,208,3,206,134,144,201,133
+ 3610 data208,1,96,202,208,231,206,135,144,173,135,144,208,221,172,136,144
+ 3620 data238,136,144,185,0,128,170,201,255,208,8,169,0,141,136,144,76,201
+ 3630 data144,201,0,208,8,162,16,202,208,253,76,62,145,32,160,145,41,2,201
+ 3640 data2,208,3,32,128,144,138,41,1,201,1,208,3,32,16,144,138,41,4,201,4
+ 3650 data208,3,32,32,144,138,41,8,201,8,208,3,32,64,144,138,41,16,201,16,208
+ 3660 data3,32,80,144,138,41,32,201,32,208,3,32,48,144,138,41,64,201,64,208
+ 3670 data3,32,96,144,138,41,128,201,128,208,3,32,112,144,234,173,137,144,41
+ 3680 data31,168,169,87,153,228,5,169,5,153,228,217,238,137,144,173,137,144
+ 3690 data41,31,168,169,81,153,228,5,169,2,153,228,217,76,160,144,238,136,144
+ 3700 data96
+ 3710 forh=37376to37491:reada:pokeh,a:next
+ 3720 data169,110,133,251,133,253,169,5,133,252,169,217,133,254,169,1,141,102
+ 3730 data3,160,0,185,0,128,45,102,3,205,102,3,208,8,169,81,145,251,169,2,145
+ 3740 data253,200,192,32,208,232,24,14,102,3,176,29,165,251,24,105,80,133,251
+ 3750 data165,252,105,0,133,252,165,253,24,105,80,133,253,165,254,105,0,133
+ 3760 data254,76,19,146,96,32,241,183,142,112,3,160,0,185,0,128,45,112,3,205
+ 3770 data112,3,208,10,169,81,153,229,5,169,2,153,229,217,200,192,32,208,230
+ 3780 data96
+ 3790 forh=37217to37258:reada:pokeh,a:next
+ 3800 data172,143,144,169,32,153,52,6,173,134,144,170,74,74,74,141,143,144
+ 3810 data138,41,7,168,185,131,145,172,143,144,153,52,6,76,160,144,101,84,71
+ 3820 data66,93,72,89,103
+ 3830 forh=37280to37296:reada:pokeh,a:next
+ 3840 data169,0,160,24,153,0,212,136,16,250,169,10,141,24,212,138,96
+ 3850 forh=1to08:fori=1to32
+ 3860 readt(i,h):next:next:za=08:return
+ 3870 data6,0,32,4,1,0,32,4,4,0,36,4,1,8,40,4,2,4,32,4,1,0,36,0,4,0,32,0,33
+ 3880 data16,48,0,4,4,4,4,1,4,4,4,0,4,4,4,1,0,0,4,4,0,4,0,1,4,0,0,4,0,4,0,1
+ 3890 data1,1,0,5,5,5,5,5,0,5,5,5,5,5,0,0,0,0,0,5,5,5,5,0,5,5,0,5,0,5,0,5,0
+ 3900 data5,5,4,0,32,4,1,0,32,4,4,0,32,4,1,4,32,4,4,0,32,4,1,0,32,4,4,0,32
+ 3910 data4,1,4,32,4,68,0,0,0,33,0,0,32,68,0,0,0,33,0,0,32,68,0,0,0,33,0,0
+ 3920 data32,68,0,0,0,33,0,0,32,35,0,0,0,1,0,1,0,99,0,0,0,12,0,32,0,14,0,0
+ 3930 data0,1,0,0,0,80,0,0,0,20,0,0,0,44,0,32,0,72,0,36,0,40,0,36,0,72,0,36
+ 3940 data0,44,0,32,0,72,0,36,0,40,0,36,0,72,0,36,0,1,0,1,1,65,0,8,0,1,0,1
+ 3950 data0,65,0,16,0,1,0,1,1,65,0,8,0,1,0,1,0,80,0,16,0
+

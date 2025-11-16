@@ -1,0 +1,277 @@
+
+
+;fruchtwein.prg ==0801==
+   10 rem  *******************************
+   20 rem  **                           **
+   30 rem  **   fruchtweinbereitung     **
+   40 rem  **         von               **
+   50 rem  **   siegfried dahlmann      **
+   60 rem  **     schloss str.9         **
+   70 rem  **     4044 kaarst 2         **
+   80 rem  **                           **
+   90 rem  *******************************
+  100 printchr$(147)chr$(14)chr$(8)
+  110 c=828:v=53248
+  120 rem
+  130 rem *** daten einlesen ***
+  140 rem
+  150 pokev+32,10:pokev+33,13
+  160 fori=0to62:readq:poke896+i,q:nexti
+  170 fori=0to62:readq:poke704+i,q:nexti
+  180 fori=1to6:readb$(i),h$(i):nexti
+  190 fori=828to850
+  200 readq:pokei,q:nexti
+  210 open15,8,15,"io"
+  220 sysc,0,0
+  230 fori=1to8:printchr$(17)chr$(151)"Frucht",
+  240 forj=1to50:nextj,i
+  250 fori=1to8:printchr$(17)chr$(30)"w e i n",
+  260 forj=1to50:nextj,i
+  270 forj=1to200:nextj
+  280 sysc,20,0:printchr$(5)"Siegfried Dahlmann"
+  290 print"Schloss str.9"
+  300 print"4044 KAARST{$a0}2"
+  310 sysc,0,0:forj=1to500:nextj
+  320 fori=1to8:printchr$(17)"         ",
+  330 forj=1to50:nextj,i
+  340 fori=1to8:printchr$(17)"         ",
+  350 forj=1to50:nextj,i
+  360 pokev+32,5:pokev+33,2
+  370 sysc,7,15:printchr$(153)"F{$a0}r u c h t w e i n"
+  380 sysc,10,19:print"bereitung"
+  390 poke2041,14:poke2042,11:pokev+40,10:pokev+41,13
+  400 pokev+21,6:pokev+23,6:pokev+29,6
+  410 pokev+2,75:pokev+4,75:pokev+3,100:pokev+5,100
+  420 sysc,24,11:print"Bitte Taste druecken!"chr$(146);:fori=1to50:nexti
+  430 poke198,0:wait198,1
+  440 fori=75to190:pokev+2,i:pokev+4,i:nexti
+  450 printchr$(147):pokev+32,6:pokev+33,6
+  460 fori=39to0step-1
+  470 poke1024+i,127:poke55296+i,5
+  480 poke1784+i,127:poke56056+i,5
+  490 poke1984+i,127:poke56256+i,5
+  500 nexti
+  510 fori= 0 to 880 step 40
+  520 poke1064+i,127:poke55336+i,5
+  530 poke1103+i,127:poke55375+i,5
+  540 nexti
+  550 sysc,12,11:printchr$(154)"Zuerst f1 waehlen,"
+  560 print:printtab(7)" dann <{$a0}RETURN{$a0}> druecken ";
+  570 goto890
+  580 rem
+  590 rem *** weinsortenwahl ***
+  600 rem
+  610 pokev+32,9:pokev+33,9:o=0
+  620 sysc,1,15:printchr$(158)"Weinsorten":print
+  630 fori=1to3:print:printtab(2)b$(i)tab(12)"......................";i:nexti
+  640 fori=4to6:print:printtab(2)b$(i)tab(16)"..................";i:nexti
+  650 sysc,17,18:printchr$(18)chr$(153)"Zahl eingeben"chr$(146):fori=1to50:nexti
+  660 sysc,17,18:print"Zahl eingeben":fori=1to50:nexti
+  670 geta$:ifa$=""then650
+  680 ifasc(a$)<49orasc(a$)>54then670
+  690 pokev+21,0:pokev+32,2:pokev+33,2:y=val(a$)
+  700 printchr$(147)
+  710 sysc,0,1:printb$(y):return
+  720 rem
+  730 rem *** befehlsausfuehrung ***
+  740 rem
+  750 ify=2ory=3theno=125
+  760 ifo=0thensysc,1,0:print"Waehle Tisch- oder Dessertwein":me=1:return
+  770 ifo=85thensysc,0,18:print"Tischwein   "
+  780 ifo=125thensysc,0,18:print"Dessertwein"
+  790 on y gosub1280,1520,1590,1280,1280,1280
+  800 return
+  810 ifx=8thenpokev+21,0:printchr$(147)chr$(9):close15:end
+  820 ify=0andx<>1thensysc,4,7:printchr$(150)"Erst Weinsorte <f1> waehlen!":goto890
+  830 ifx=2 or x=9 or me=1then850
+  840 ify<>0thenprintchr$(147):ifx<>1thensysc,0,0:printb$(y)
+  850 on x gosub 610,1750,750,1750,1170,1750,1200,810,2670
+  860 rem
+  870 rem *** menue ***
+  880 rem
+  890 x=0:a$="":ifxx=0then920
+  900 ifxx=1thena$=aa$:goto920
+  910 poke198,0:wait198,1:geta$:xx=1
+  920 sysc,20,2:ifa$=chr$(133)thenprintchr$(18)"f1=Weinsorte"chr$(146):x=1:goto940
+  930 printchr$(158)"f1=Weinsorte"
+  940 sysc,21,2:ifa$=chr$(134)thenprintchr$(18)"f3=Berechnung"chr$(146):x=3:goto960
+  950 print"f3=Berechnung"
+  960 sysc,22,2:ifa$=chr$(135)thenprintchr$(18)"f5=Tischwein"chr$(146):x=5:goto980
+  970 print"f5=Tischwein"
+  980 sysc,23,2:ifa$=chr$(136)thenprintchr$(18)"f7=Dessertwein"chr$(146):x=7:goto1000
+  990 print"f7=Dessertwein"
+ 1000 sysc,20,20:ifa$=chr$(137)thenprintchr$(18)"f2=Speichern"chr$(146):x=2:goto1020
+ 1010 print"f2=Speichern"
+ 1020 sysc,21,20:ifa$=chr$(138)thenprintchr$(18)"f4=Einlesen"chr$(146):x=4:goto1040
+ 1030 print"f4=Einlesen"
+ 1040 sysc,22,20:ifa$=chr$(139)thenprintchr$(18)"f6=Loeschen"chr$(146):x=6:goto1060
+ 1050 print"f6=Loeschen"
+ 1060 sysc,23,20:ifa$=chr$(140)thenprintchr$(18)"f8=Programmende"chr$(146):x=8:goto1080
+ 1070 print"f8=Programmende"
+ 1080 sysc,24,12:ifa$="p"thenprintchr$(18)chr$(29)"P=Ausdruck"chr$(146);:x=9:goto1100
+ 1090 print" P=Ausdruck ";
+ 1100 ifx<1orx>9then910
+ 1110 poke198,0:wait198,1:getaa$
+ 1120 ifaa$<>chr$(13)then890
+ 1130 goto810
+ 1140 rem
+ 1150 rem *** bestimmung der suesse ***
+ 1160 rem
+ 1170 o=85:ifme=1thenme=0:goto770
+ 1180 sysc,0,18:print"Tischwein  "
+ 1190 return
+ 1200 o=125:ifme=1thenme=0:goto780
+ 1210 sysc,0,18:print"Dessertwein"
+ 1220 return
+ 1230 rem
+ 1240 rem *** rechenprogramme fuer ***
+ 1250 rem *** brombeere,johannisbeere ***
+ 1260 rem *** sauerkirsch,stachelbeere **
+ 1270 rem
+ 1280 gosub2000
+ 1290 sysc,1,0:printchr$(144):input"Saft (l):";sl
+ 1300 input"Saeure  :";sg
+ 1310 input"Oechsle :";oe
+ 1320 ifoe=0orsl=0orsg=0thenreturn
+ 1330 zw=(sl*sg)/8-sl:w=int(zw*10+.5)/10
+ 1340 ifw<.1thenprintchr$(5)"Ungueltige Eingaben":return
+ 1350 og=(sl*oe)/(zw+sl)
+ 1360 bo=o-og
+ 1370 a=bo*(zw+sl):zz=int(a*2.5)/1000
+ 1380 ns=int(sl*10.7)/10
+ 1390 printchr$(17)chr$(5)"Wasser      :";w;"l"
+ 1400 print"Zucker      :";zz;"kg"
+ 1410 print"Gesamtliter :";w+sl;"l"
+ 1420 print"Naehrsalz   :";ns;"g"
+ 1430 print"Hefen       : ";h$(y)
+ 1440 ifx=4 then gosub 2000:return
+ 1450 printchr$(155)chr$(18)"Zucker und Wasser duerfen zusammen"
+ 1460 printchr$(18)"nicht mehr als";w;chr$(157)" l betragen !!! "chr$(146)
+ 1470 return
+ 1480 rem
+ 1490 rem *** rechenprogramm fuer ***
+ 1500 rem *** erdbeere, hagebutte ***
+ 1510 rem
+ 1520 gosub2000
+ 1530 sysc,1,0:printchr$(144):input"Fruchtbrei  (l) :";f
+ 1540 w=int(f*.5*10+.5)/10
+ 1550 zz=int(f*.5*1000+.5)/1000
+ 1560 ms=w*10
+ 1570 ns=int(f*.53*10+.5)/10
+ 1580 goto1650
+ 1590 gosub2000
+ 1600 sysc,1,0:printchr$(144):input"Frucht (kg) :";f
+ 1610 w=int(f*3.2*10+.5)/10
+ 1620 zz=int(f*1.2*1000+.5)/1000
+ 1630 ms=int(f*16+.5)
+ 1640 ns=int(ms+.5)/10
+ 1650 printchr$(17)chr$(5)"Wasser     :";w;"l"
+ 1660 print"Zucker     :";zz;"kg zum Wasser dazu!!"
+ 1670 print"Milchsaeure:";ms;"g"
+ 1680 print"Naehrsalz  :";ns;"g"
+ 1690 print"Hefen      : ";h$(y)
+ 1700 ifx=4thengosub2000
+ 1710 return
+ 1720 rem
+ 1730 rem *** disk ***
+ 1740 rem
+ 1750 sysc,1,0:printchr$(144)
+ 1760 ifx=2thensysc,13,0:iff=0andsl=0thenprint"Welche Daten denn?":return
+ 1770 z$="":j$=""
+ 1780 input"Jahrgang";j$
+ 1790 input"Zusatz  ";z$
+ 1800 jj$=left$(b$(y),7)+right$(j$,2)+right$(z$,2)
+ 1810 onx/2gosub1930,2120,2250
+ 1820 ifx<>4thenreturn
+ 1830 sysc,3,0:printchr$(144)
+ 1840 iffe=1thenfe=0:return
+ 1850 ify=2thenprint"Fruchtbrei  (l) :";f:goto1540
+ 1860 ify=3thenprint"Frucht (kg) :";f:goto1610
+ 1870 print"Saft (l):";sl
+ 1880 print"Saeure  :";sg
+ 1890 print"Oechsle :";oe:goto1320
+ 1900 rem
+ 1910 rem *** files schreiben ***
+ 1920 rem
+ 1930 open2,8,2,jj$+",s,w":gosub2330
+ 1940 ifen=63 thenprint"Filename besteht schon":goto2020
+ 1950 ifen>63thenreturn
+ 1960 ifen=0thenprint"okay"
+ 1970 ify=2ory=3thenprint#2,f:goto1990
+ 1980 print#2,sl:print#2,sg:print#2,oe:print#2,o
+ 1990 close2
+ 2000 oe=0:sl=0:sg=0:f=0
+ 2010 return
+ 2020 printtab(15)chr$(150)"Ja   -->    @ "
+ 2030 print"Ueberschreiben?                druecken"
+ 2040 printtab(15)"Nein --> RETURN"
+ 2050 poke198,0:wait198,1:geta$:ifa$=chr$(13)then close 2:return
+ 2060 ifa$<>chr$(64)then2050
+ 2070 close2
+ 2080 open2,8,2,"@:"+jj$+",s,w":goto1970
+ 2090 rem
+ 2100 rem *** files lesen ***
+ 2110 rem
+ 2120 gosub2000
+ 2130 open2,8,2,jj$+",s,r":gosub2330
+ 2140 ifen=62 thenprint"File gibt es nicht":close2:fe=1:return
+ 2150 ifen>63thenreturn
+ 2160 ify=2ory=3theninput#2,f:o=125:goto2190
+ 2170 input#2,sl,sg,oe,o
+ 2180 ifo=85thengosub1180
+ 2190 ifo=125thengosub1210
+ 2200 close 2
+ 2210 return
+ 2220 rem
+ 2230 rem *** files loeschen ***
+ 2240 rem
+ 2250 open 2,8,2,jj$+",s,r":gosub2330
+ 2260 ifen<>0thenprint"File gibt es nicht":close2:return
+ 2270 close2
+ 2280 print#15,"s:"+jj$:gosub2330:ifen=1thenprint"File geloescht"
+ 2290 return
+ 2300 rem
+ 2310 rem *** fehlerkanal lesen ***
+ 2320 rem
+ 2330 input#15,en,em$
+ 2340 ifen=21oren>64thensysc,17,0
+ 2350 ifen=21thenprintem$;"Disk nicht formatiert? Andere einlegen"
+ 2360 ifen=72thenprint"Disk ist voll! Bitte neue einlegen"
+ 2370 ifen=74thenprint"Keine Disk in der Floppy! Disk einlegen"
+ 2380 ifen=21oren>71thenprint"und letzten Programmpunkt wiederholen!":close 2
+ 2390 return
+ 2400 rem
+ 2410 rem *** sprite ***
+ 2420 rem
+ 2430 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+ 2440 data0,170,0,1,255,0,3,255,128,3,255,128,1,255,0,1,255,0,0,254,0,0,124,0
+ 2450 data0,0,0
+ 2460 rem
+ 2470 rem *** sprite ***
+ 2480 rem
+ 2490 data0,0,0,0,56,0,0,56,0,0,56,0,0,16,0,0,124,0,0,56,0,0,56,0,0,56,0,0,124,0
+ 2500 data1,255,0,3,255,128,3,255,128,7,255,192,7,255,192,7,255,192,7,255,192
+ 2510 data3,255,128,3,255,128,1,255,0,0,254,0
+ 2520 rem
+ 2530 rem *** wein- und hefesorten ***
+ 2540 rem
+ 2550 data"Brombeere","Burgunder/Bordeaux","Erdbeere","Tokaier/Suedwein"
+ 2560 data"Hagebutte","Portwein/Malaga/Tokaier","Johannisbeere","Steinberg,Portwein"
+ 2570 data"Sauerkirsch   ","Burgund,Portwein","Stachelbeere  "
+ 2580 data"Steinberg,Sherry/Portwein"
+ 2590 rem
+ 2600 rem *** cursorpositionierung ***
+ 2610 rem
+ 2620 data32,253,174,32,158,183,138,72,32,253,174,32
+ 2630 data158,183,138,168,104,170,24,32,240,255,96
+ 2640 rem
+ 2650 rem *** hardcopyroutine ***
+ 2660 rem
+ 2670 sysc,24,1:print"Drucker fertigmachen, dann ---> RETURN";
+ 2680 poke198,0:wait198,1:geta$:ifa$<>chr$(13)thengosub2700:return
+ 2690 printchr$(19);:open1,4,7:open2,3:gosub2710:close2:close1
+ 2700 sysc,24,1:print"                                      ";:return
+ 2710 fori=1to20:forj=1to20:get#2,c1$:printchr$(20);:get#2,c2$
+ 2720 printchr$(157)chr$(148)c1$c2$;
+ 2730 print#1,c1$c2$;:next:print#1:next:printchr$(19);:return
+

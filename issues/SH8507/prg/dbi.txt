@@ -1,0 +1,870 @@
+
+
+;dbi.prg ==0801==
+    0 rem-dbi / (c)1985 martin hecht,stgt-
+    1 dimmf%(3),lb(3),hb(3),me$(2,18),ap%(5,4),ks$(147),f1%(5),f2%(5),f3%(5),p1(4)
+    2 dimfc%(19),ba(2),fs%(5),zf%(3),ta%(3),p2(7),ph(2),hp%(2,4),br%(3),af%(10)
+    3 dim dd$(15),sn%(15),ds%(15)
+    4 dim fo%(20),fo$(20),ro$(15),ro%(15),fd(50,2),fa%(50):am=50
+   55 gosub4510:lb(1)=213:hb(1)=156:qx$="mp-p-2":gosub11860
+   56 lb(1)=232:hb(1)=199:qx$="mp-p-4":gosub11860
+   63 poke55,212:poke56,156:poke51,212:poke52,156
+   70 gosub4810
+  165 gosub11022:printchr$(142)chr$(8):ff=mf%(3):gosub11235:poke781,1:sys pt
+  180 me=1:gosub405:gosub11027:eg$=""
+  190 gosub11455
+  207 ifeg=13thengosub310:goto190
+  210 ifeg=8thenhp=1:gosub9500:goto165
+  220 ifeg=140andme=1then7750
+  221 ifeg=140andme=2then9002
+  224 ifeg=144thenff=mf%(1):gosub11170:mf%(1)=ff:goto190
+  226 ifeg=5thenff=mf%(2):gosub11200:mf%(2)=ff:goto190
+  227 ifeg=28thenff=mf%(3):gosub11230:mf%(3)=ff:goto190
+  229 ifeg<133oreg>140then190
+  232 ifme=2then250
+  240 oneg-132gosub1005,3012,3512,4000:ifugthenug=0:goto165
+  242 goto190
+  250 oneg-132gosub7010,7500,6000,6500:ifugthenug=0:goto165
+  260 goto190
+  310 ifme=1thenme=2:goto330
+  320 me=1
+  330 fors1=21to5step-1:ze=s1:sp=5:gosub11050:printks$(110):nexts1
+  345 gosub405:poke2004,51-me:return
+  405 ze=1:sp=23:gosub11050:printme$(me,1):fors1=2to18
+  406 ze=s1+3:sp=5:gosub11050:printme$(me,s1):nexts1:return
+ 1005 gosub2610
+ 1135 poke247,c4:poke248,c3:ze=c2:sp=c1:gosub11050:print;
+ 1140 poke199,rs:sys52582:eg=peek(2):gosub11035
+ 1170 ifeg=8thengosub2505:hp=2:gosub9500:gosub2610:goto1135
+ 1172 ifeg=141thengosub2710:ug=1:return
+ 1178 fors1=1tofm:ifeg<>fc%(s1)thennexts1:goto1140
+ 1182 ifs1>10thens1=s1-10:goto1186
+ 1183 ons1gosub9985,9990,9996,10341,10363,1385,1400,1414,10570,10584:goto1135
+ 1186 ons1gosub10610,10623,10657,10746,1430,1454,1692,10544,1492:goto1135
+ 1385 ff=f1%(pg):gosub11170:f1%(pg)=ff:return
+ 1400 ff=f2%(pg):gosub11200:f2%(pg)=ff:return
+ 1414 ff=f3%(pg):gosub11230:f3%(pg)=ff:return
+ 1430 ifpg=5thenreturn
+ 1438 gosub2505:pg=pg+1:goto1465
+ 1454 ifpg=1thenreturn
+ 1462 gosub2505:pg=pg-1
+ 1465 gosub2526:c4=1:c3=0:c1=0:c2=1:return
+ 1492 ze=0:sp=0:gosub11050:printks$(6):gosub11050:printks$(5)
+ 1495 p=2:rv=1:gz=2:sp=36:ze=0:gosub11303:h=val(eg$):ifh<1orh>5then1530
+ 1525 gosub2505:pg=h:gosub2526:c4=1:c3=0:c1=0:c2=1
+ 1530 ze=0:sp=0:gosub11050:printks$(1):return
+ 1692 e=ba(2)+cp:ife>51052thenreturn
+ 1693 ze=0:sp=0:gosub11050:printks$(8):z=1:eg$=""
+ 1694 poke650,128:pokee,60:pokee+1,20:pokee+2,62:goto1715
+ 1698 gosub11455
+ 1702 if(eg=29ande+z<>51053)thenpokee+1+z,102:z=z+1:pokee+1+z,62:goto1715
+ 1704 ifeg=157andz<>1thenpokee+1+z,32:z=z-1:pokee+1+z,62:goto1715
+ 1706 ifeg=13then1720
+ 1708 ifeg=68and(e<51041andz<14)thengosub1740:goto1720
+ 1711 if(eg=69oreg=83)or(eg=84oreg=78)thenpokee+1,eg-64:goto1698
+ 1712 goto1698
+ 1715 ze=0:sp=34:gosub11050:printks$(114)z:goto1698
+ 1720 h=e+z+2-ba(2):c2=int(h/40):c1=h-40*c2:h=h-39:c3=int(h/256):c4=h-256*c3
+ 1728 ze=0:sp=0:gosub11050:printks$(1):return
+ 1740 pokee,60:pokee+1,4:fors1=2to13:pokee+s1,102:nexts1:pokee+14,62:z=13:return
+ 2505 gosub11243:gr=142:ifpeek(53272)=27thengr=14
+ 2514 return
+ 2526 gosub10610:ifpg=1thenpokeba(2)+887,173:pokeba(2)+888,173:goto2534
+ 2531 pokeba(2)+887,176:pokeba(2)+888,175+pg
+ 2533 ifpg=5thenpokeba(2)+917,173:pokeba(2)+918,173:goto2539
+ 2534 pokeba(2)+917,176:pokeba(2)+918,177+pg
+ 2539 ff=f3%(pg):gosub11235:gosub11239:poke53280,f1%(pg):poke53281,f2%(pg)
+ 2541 fs%(pg)=1:return
+ 2610 gosub11022:c4=1:c3=0:c1=0:c2=1
+ 2615 br%(1)=24:br%(2)=0:br%(3)=196:gosub11260:printchr$(9)chr$(gr)
+ 2620 poke781,4:sys pt:gosub2526:gosub11028:return
+ 2710 gosub2505:gosub11022:br%(1)=21:br%(2)=3:br%(3)=4:gosub11260:return
+ 3012 gosub3315
+ 3049 sm=2:rv=0
+ 3050 ze=4:sp=38:gosub11050:print;:sys51682:eg=peek(2)
+ 3056 ifeg=8then hp=1:gosub9500:gosub3315:goto3049
+ 3057 ifeg=141thenug=1:za=0:return
+ 3066 ifeg=144thenff=zf%(1):gosub11170:zf%(1)=ff:goto3050
+ 3067 ifeg=5thenff=zf%(2):gosub11200:zf%(2)=ff:goto3050
+ 3068 ifeg=28thenff=zf%(3):gosub11230:zf%(3)=ff:goto3050
+ 3072 gosub3840:ifud=1thenud=0:goto3050
+ 3073 e=5:gosub 3805:ifud=1thenud=0:goto3050
+ 3080 gosub3850:ze=19:sp=0:gosub11050:printl$l$l$l$c$c$:eg$=str$(eg)
+ 3082 iflen(eg$)<4then eg$=" "+eg$:goto3082
+ 3086 ze=6:sp=29:gosub11050:printeg$
+ 3105 gosub3864
+ 3120 sp=29:fors2=0to7:z=peek(50176+s2):z$="":k=0
+ 3125 z=z/2:h$=".":ifz<>int(z)thenh$=chr$(18)+" "+chr$(146):k=k+2
+ 3127 z=int(z):z$=h$+z$:ifz>0then3125
+ 3130 iflen(z$)-k<8thenz$="."+z$:goto3130
+ 3135 ze=10+s2:gosub11050:printz$:nexts2
+ 3150 k=0:ze=10:sp=29:gosub11050:print;:poke650,64
+ 3155 sys51682:eg=peek(2):h=k
+ 3169 ifeg=141thenug=1:za=0:poke650,128:return
+ 3170 ifeg=19then3150
+ 3171 ifeg=29thenk=k+1:goto3183
+ 3172 ifeg=157thenk=k-1:goto3183
+ 3174 ifeg=17thenk=k+40:goto3183
+ 3175 ifeg=145thenk=k-40:goto3183
+ 3177 ifeg=133thenpoke1453+k,160:k=k+1:eg=29:goto3183
+ 3178 ifeg=134thenpoke1453+k,46:k=k+1:eg=29:goto3183
+ 3179 ifeg=135thengosub3394:goto3150
+ 3181 ifeg=136thenpoke 650,128:goto 3200
+ 3182 goto3155
+ 3183 ifk<0ork>287thenk=h:goto3155
+ 3184 fors1=0to7:ifk=s1*40-1then k=k-32:printks$(81);:goto3155
+ 3186 ifk=s1*40+8thenk=k+32:printks$(80);:goto3155
+ 3187 nexts1:printchr$(eg);:goto3155
+ 3200 ze=20:sp=9:gosub11050:printks$(47)
+ 3202 fors1=0to7:z=0:fors2=0to7:k=1453+s1*40+s2:h=peek(k)
+ 3205 ifh=160thenz=z+2^(7-s2)
+ 3215 nexts2:pokep1+s1,z:nexts1
+ 3250 e=20:k=30:gosub3872:ifug=1thenreturn
+ 3255 gosub3322:goto3049
+ 3315 a1=9:a2=10:gosub11465:gosub11485:ze=4:sp=0:gosub11050:print;
+ 3320 printks$(12):ff=zf%(3):gosub11235:poke53280,zf%(1):poke53281,zf%(2):eg$=""
+ 3322 gosub3835:ze=6:sp=2:gosub11050:printks$(14):printks$(16)
+ 3324 fors1=17to26:printks$(s1):nexts1:ud=0:gosub11028:return
+ 3394 fors1=0to7:ze=10+s1:sp=29:gosub11050:printks$(35):nexts1:return
+ 3512 gosub3895
+ 3560 ze=5:sp=1:gosub11050:printks$(50):ze=7:sp=1:gosub11050:printks$(51)
+ 3562 sm=2:rv=0:ud=0:gosub11028:gosub11455
+ 3569 ifeg=8thenhp=1:gosub9500:gosub3895:goto3560
+ 3570 ifeg=141thenug=1:return
+ 3575 ifeg=144thenff=ta%(1):gosub11170:ta%(1)=ff:goto3560
+ 3580 ifeg=5thenff=ta%(2):gosub11200:ta%(2)=ff:goto3560
+ 3585 ifeg=28thenff=ta%(3):gosub11230:ta%(3)=ff:goto3560
+ 3590 ifeg=133thengosub3655:goto3610
+ 3595 ifeg=134thengosub3735:goto3610
+ 3600 goto3560
+ 3610 ifud=1thenud=0:ug=1:return
+ 3611 ze=5:sp=0:gosub11050:printl$:ze=7:gosub11050:printl$:ze=9:gosub11050:printl$
+ 3613 e=10:k=57:gosub3872:ifug=1thenreturn
+ 3615 goto3560
+ 3655 gosub11023:gosub3907:ze=5:sp=9:gosub11050:printks$(52)
+ 3656 ze=7:sp=9:gosub11050:printks$(53):gosub3835:gosub11028
+ 3658 ze=7:sp=30:gosub11050:print;:sys51682:eg=peek(2)
+ 3666 ifeg=8thenhp=1:gosub9500:gosub3895:goto3655
+ 3667 ifeg=141thenud=1:return
+ 3669 gosub3840:ifud=1thenud=0:goto3658
+ 3670 e=9:gosub3805:ifud=1thenud=0:goto3658
+ 3675 gosub3850:p2=57344+8*eg
+ 3680 ze=5:sp=0:gosub11050:printl$:ze=7:gosub11050:printl$
+ 3682 ze=5:sp=2:gosub11050:printks$(54):ze=7:gosub11050:printks$(55):ze=9:gosub11050:printks$(56)
+ 3687 ze=9:sp=29:gosub11050:print;:sys51682:eg=peek(2)
+ 3705 ifeg=141thenud=1:return
+ 3710 gosub3840:ifud=1thenud=0:goto3687
+ 3715 e=11:gosub3805:ifud=1thenud=0:goto3687
+ 3720 gosub3850:gosub3864:fors1=0to7:pokep2+s1,peek(50176+s1):nexts1:return
+ 3735 gosub11023:gosub3907
+ 3740 ze=5:sp=4:gosub11050:printks$(58):ze=7:gosub11050:printks$(59):gosub3835:gosub11028
+ 3745 ze=7:sp=34:gosub11050:print;:sys51682:eg=peek(2)
+ 3759 ifeg=8thenhp=1:gosub9500:gosub3895:goto3735
+ 3760 ifeg=141thenud=1:return
+ 3762 gosub3840:ifud=1thenud=0:goto3745
+ 3764 e=9:gosub3805:ifud=1thenud=0:goto3745
+ 3766 gosub3850:gosub3864:p2=p1:fors1=0to7:p2(s1)=peek(50176+s1):nexts1
+ 3774 gosub11455:ifeg=141thenud=1:return
+ 3776 gosub3840:ifud=1thenud=0:goto3745
+ 3778 e=9:gosub3805:ifud=1thenud=0:goto3745
+ 3780 gosub3850:gosub3864
+ 3782 fors1=0to7:pokep2+s1,peek(50176+s1):pokep1+s1,p2(s1):nexts1:return
+ 3805 if(eg=45oreg=60)or(eg=62oreg=166)oreg=221then3820
+ 3810 ifeg<32or(eg>127andeg<160)then3820
+ 3811 return
+ 3820 ze=e:sp=5:gosub11050:printks$(32):poke2,1:sys51833:gosub11050:printks$(33):ud=1:return
+ 3835 ze=19:sp=0:gosub11050:printks$(38)ks$(36)ks$(37)ks$(13):return
+ 3840 ifeg=137thensp=3:e=39:sm=2:goto3846
+ 3842 ifeg=138thensp=3:e=41:sm=1:goto3846
+ 3843 ifeg=139thensp=25:e=43:rv=0:goto3846
+ 3844 ifeg=140thensp=25:e=45:rv=1:goto3846
+ 3845 return
+ 3846 ze=20:gosub11050:printks$(e):ze=21:gosub11050:printks$(e+1):ud=1:return
+ 3850 eg=eg-161-33*(eg<255)-64*(eg<192)-32*(eg<160)+32*(eg<96)-64*(eg<64)
+ 3854 ifsm=2theneg=eg+256
+ 3856 ifrv=1theneg=eg+128
+ 3858 return
+ 3864 p1=57344+8*eg:hb(1)=int(p1/256):lb(1)=p1-256*hb(1):lb(2)=lb(1)+7
+ 3865 hb(2)=hb(1)
+ 3866 iflb(2)>255thenlb(2)=255:hb(2)=hb(2)+1
+ 3867 lb(3)=0:hb(3)=196:aw=1:gosub11760:return
+ 3872 ze=19:sp=0:gosub11050:printl$l$l$l$c$c$:ze=e:sp=4:gosub11050:printks$(k)ks$(31)
+ 3880 ze=e+1:sp=26:gosub11050:print;:gosub11445:if eg=78 then za=0:ug=1:return
+ 3882 gosub11023:fors1=0to1:ze=e+s1:sp=0:gosub11050:printl$:nexts1:return
+ 3895 a1=48:a2=49:gosub11465:gosub11485:ff=ta%(3):gosub11235
+ 3896 poke53280,ta%(1):poke53281,ta%(2):eg$="":return
+ 3907 ze=5:sp=0:gosub11050:printl$:ze=7:gosub11050:printl$:return
+ 4000 a1=122:a2=123:gosub11465:iffs%(1)=1then4007
+ 4002 ze=9:sp=5:gosub11050:printks$(101):ze=11:sp=13:gosub11050:printks$(102)
+ 4003 gosub11027:poke2,2:sys51833:pg=1:ug=1:return
+ 4007 ze=10:sp=1:gosub11050:printks$(124)chr$(17)ks$(125):gosub11485:gosub11027
+ 4015 af=0:dl=0:fv=0:s=0:n=0:e=0:es=0:ef=0:s3=0:s5=0
+ 4017 forse=5to1step-1:iffs%(se)=0thennextse
+ 4020 forpg=1tose:poke251,40:poke252,196:s2=0:gosub11239
+ 4025 sys40149:ifpeek(252)=0then4050
+ 4026 ifes=0thenes=pg
+ 4027 af=af+1:s2=s2+1:ifaf>amthena1=128:a2=4:gosub4435:gosub4476:return
+ 4030 fv=1:fors1=1to2:fd(af,s1)=peek(249+2*s1)+256*peek(250+2*s1):nexts1
+ 4034 e=fd(af,2)-fd(af,1)-1:dl=dl+e:ife<5 then4039
+ 4035 h$=right$(str$(af),len(str$(af))-1)
+ 4037 iflen(h$)<3thenh$=chr$(102)+h$:goto4037
+ 4038 fors1=1to3:pokefd(af,2)-4+s1,asc(mid$(h$,s1,1)):nexts1
+ 4039 z=peek(fd(af,1)+1):ifz=19thenfa%(af)=19:s=s+1:sf=pg:ns=af:goto4045
+ 4040 ifz=14thenfa%(af)=14:n=n+1:fo%(n)=af:goto4045
+ 4042 ifz=4thenfa%(af)=4:goto4045
+ 4043 ifz=5then fa%(af)=5:ef=ef+1:ro%(ef)=af:n=n+1:fo%(n)=af:goto4045
+ 4044 fa%(af)=20
+ 4045 iffd(af,2)<>51055thenpoke251,peek(253):poke252,peek(254):goto4025
+ 4050 af%(pg)=s2:gosub11243:nextpg
+ 4052 iffv=0thena1=127:a2=4:gosub4435:return
+ 4055 ifs=0thena1=137:a2=2:gosub4435:gosub4476:return
+ 4056 ifs>1thena1=143:a2=3:gosub4435:gosub4476:return
+ 4057 ifef>15thena1=147:a2=4:gosub4435:gosub4476:return
+ 4058 ifn=0andef=0then4157
+ 4062 poke53280,0:gosub11023:br%(1)=24:br%(2)=0:br%(3)=196:gosub11260
+ 4070 printchr$(147)chr$(9)chr$(gr)chr$(8):ze=0:sp=0:gosub11050:printks$(130):gosub4470
+ 4071 s2=0
+ 4072 forpg=1tose:ifaf%(pg)=0thennextpg:goto4100
+ 4073 gosub4488:gosub11028
+ 4075 fors1=1toaf%(pg):s2=s2+1:iffa%(s2)<>14 and fa%(s2)<>5 then nexts1:goto4095
+ 4076 s3=s3+1:s6$=ks$(100)+ks$(29):eg$=fo$(s3)
+ 4077 iflen(eg$)=3theneg$=" "+eg$
+ 4078 ifval(right$(eg$,2))=0thenag$=left$(s6$,val(left$(eg$,2))):goto4080
+ 4079 ag$=left$(s6$,val(left$(eg$,2)))+"."+right$(s6$,val(right$(eg$,2)))
+ 4080 gosub4443:gosub4470:ifug=1thengosub4475:gosub4420:return
+ 4083 s7=len(eg$):ifs7>80thens7=80
+ 4085 fors6=1tos7
+ 4087 ifmid$(eg$,s6,1)<>"."thennexts6:fo$(s3)=right$(str$(s7),2)+" 0":goto4093
+ 4088 fo$(s3)=right$(str$(s6-1),2)+right$(str$(s7-s6),2)
+ 4093 nexts1:ifun=1thenun=0:gosub11243
+ 4095 nextpg
+ 4100 ifef=0then4135
+ 4105 poke53280,0:gosub11023:ze=0:sp=0:gosub11050:printks$(131):gosub4470:s2=0:gz=72
+ 4110 sy=0:forpg=1tose:ifaf%(pg)=0thennextpg:goto4135
+ 4112 gosub4488:gosub11028
+ 4114 ifsy<>0then4120
+ 4115 ze=22:sp=0:gosub11050:printks$(146);:gosub11445:ze=22:sp=0:gosub11050:printks$(6)c$c$
+ 4116 sy=1:ifeg=74thensy=2
+ 4120 fors1=1toaf%(pg):s2=s2+1:iffa%(s2)<>5thennexts1:goto4133
+ 4121 s5=s5+1
+ 4122 ag$=ro$(s5):gosub4444:ifug=1thengosub4475:gosub4420:return
+ 4123 gosub4405:ro$(s5)=eg$:ifsy=1then4132
+ 4124 s7=0:s8=0:fors6=1tolen(eg$):s6$=mid$(eg$,s6,1)
+ 4125 ze=0:sp=0:gosub11050:printks$(27):if s6$="(" then s7=s7+1
+ 4126 ifs6$=")"thens7=s7-1:ifs7<0thengosub4382:goto4122
+ 4127 s8=0:if(s6$="+"ors6$="-")or(s6$="*"ors6$="/")ors6$="^"then s8=1
+ 4128 ifs6>1thenifmid$(eg$,s6-1,1)="("ands8=1thengosub4382:goto4122
+ 4130 nexts6
+ 4131 ifs7>0thengosub4382:goto4122
+ 4132 gosub4470:ze=0:sp=0:gosub11050:printks$(131):nexts1:if un=1thenun=0:gosub11243
+ 4133 nextpg
+ 4135 gosub11022:gosub4420:gosub4425
+ 4140 ff=mf%(3):gosub11235
+ 4156 a1=122:a2=123:gosub11465:gosub11485:printchr$(14)chr$(8)c$:zg=0
+ 4157 gosub4425:ze=19:sp=0:gosub11050:printks$(79)chr$(17)ks$(79):gosub11027
+ 4160 dp=0:open1,8,2,"dat-dir,s,r":gosub11322:iffe=0then4167
+ 4165 dp=1:ad=1:goto4168
+ 4167 input#1,ad:fors1=1toad:input#1,dd$(s1),sn%(s1),ds%(s1):nexts1
+ 4168 close1
+ 4211 du=0:ze=5:sp=0:gosub11050:printks$(126);:sp=22:gz=14:rv=0:p=1
+ 4212 gosub11303:ifeg=141thenug=1:gosub4476:return
+ 4216 fors1=1toad:ifdd$(s1)<>eg$thennexts1:goto4219
+ 4217 ze=20:sp=2:gosub11050:printks$(136);:gosub 11445:gosub6601:ifeg=78then4211
+ 4218 du=s1
+ 4219 i$=eg$:da$=i$
+ 4220 ze=7:sp=3:gosub11050:printks$(103)ks$(104)ks$(105);
+ 4221 gosub11445:ifeg=74thenzg=1:zg$=da$:printchr$(74):goto4230
+ 4222 forze=7to9:sp=0:gosub11050:printl$c$:nextze:ze=7:sp=2:gosub11050:printks$(132)ks$(133);
+ 4224 gosub11445:printchr$(eg):ifeg=78thenzg$="k":goto4230
+ 4226 ze=10:sp=8:gosub11050:printks$(121):sp=16:gosub11303
+ 4227 ifeg=141thenug=1:gosub4476:gosub6625:return
+ 4228 i$=eg$:ifi$=""thenzg$="k":goto4230
+ 4229 zg$=i$
+ 4230 ze=13:sp=0:gosub11050:printks$(134)ks$(135);:sp=31:ze=14:gz=2:gosub11303
+ 4232 ifeg=141thenug=1:gosub4476:return
+ 4235 as=val(eg$):ifas<1oras>30then4230
+ 4247 ug=0:gosub4476:ag$=ks$(99)+da$:ze=20:gosub11585:i$=da$+".d"
+ 4248 ifdu<>0thenopen1,8,15,"s:"+i$:close1
+ 4249 open1,8,2,i$+",s,w"
+ 4250 print#1,cb,r$,dl,r$,sf,r$,ns,r$,es,r$,af:fors1=1toaf
+ 4252 fd(s1,1)=fd(s1,1)+1:fd(s1,2)=fd(s1,2)-fd(s1,1)
+ 4253 iffd(s1,2)>lfthenlf=fd(s1,2)
+ 4254 print#1,fd(s1,1)r$fd(s1,2):nexts1:lf=int(lf/255)+1:print#1,lf
+ 4255 fors1=1toaf:print#1,fa%(s1):nexts1
+ 4260 print#1,se:fors1=1tose:print#1,af%(s1):nexts1
+ 4265 print#1,s3:ifs3=0then4270
+ 4267 fors1=1tos3:print#1,fo%(s1)r$fo$(s1):nexts1
+ 4270 print#1,s5:ifs5=0then4275
+ 4272 fors1=1tos5:print#1,ro%(s1)r$ro$(s1):nexts1
+ 4275 print#1,zg$r$,as,r$,gr:fors1=1tose:print#1,f1%(s1)r$f2%(s1)r$f3%(s1)
+ 4280 nexts1:close1
+ 4285 i$=da$+".e":ifdu<>0thenopen1,8,15,"s:"+i$:close1
+ 4289 lb(1)=0:hb(1)=160:lb(2)=ap%(se,3)+1:hb(2)=ap%(se,4):qx$=i$:gosub11810
+ 4297 ifdu<>0thensn%(du)=se:goto4345
+ 4300 i$=da$+".i":open1,8,2,i$+",s,w"
+ 4302 at=0:mt=int(2219/(as+3)):print#1,at,r$,mt:close 1
+ 4342 ifdp=0thenad=ad+1
+ 4343 dd$(ad)=da$:sn%(ad)=se:ds%(ad)=0
+ 4345 i$="dat-dir":ifdp=1then4348
+ 4346 open1,8,15,"s:"+i$:close1
+ 4348 open1,8,2,i$+",s,w":print#1,ad
+ 4349 fors1=1toad:print#1,dd$(s1)r$sn%(s1)r$ds%(s1):nexts1:close1
+ 4351 i$=da$+".z":ifdu<>0thenopen1,8,15,"s:"+i$:close1
+ 4352 ifzg=0then4358
+ 4353 lb(1)=0:hb(1)=224:lb(2)=0:hb(2)=240:lb(3)=0:hb(3)=160:aw=1:gosub11760
+ 4356 lb(1)=0:hb(1)=160:lb(2)=0:hb(2)=176:qx$=i$:gosub11810:gosub6635
+ 4357 p=se:se=1:gosub6605:se=p
+ 4358 ag$=ks$(138):ze=20:gosub11585:i$=da$+".e":gosub6650:ug=1:return
+ 4382 ze=0:sp=0:gosub11050:printks$(28):poke2,1:sys51833:gosub11050:printks$(131):return
+ 4405 fors6=len(eg$)to1step-1:ifmid$(eg$,s6,1)=chr$(32)thennexts6
+ 4410 eg$=left$(eg$,s6):return
+ 4420 gosub11023:br%(1)=21:br%(2)=3:br%(3)=4:gosub11260:return
+ 4425 ze=10:sp=0:gosub11050:printl$:ze=12:sp=0:gosub11050:printl$:return
+ 4435 gosub4425:ze=10:sp=a2:gosub11050:printks$(a1):poke2,2:sys51833:ug=1:pg=1:return
+ 4443 gz=fd(s2,2)-fd(s2,1)-1:ifgz>80thengz=80
+ 4444 s4=pg:pokefd(s2,1),188:pokefd(s2,2),190:ze=22:sp=0:gosub11050:printchr$(18)ag$c$c$
+ 4446 ze=22:sp=0:gosub11050:print;:gosub6920:eg=peek(2)
+ 4448 ifeg=13then4460
+ 4449 ifeg=141thenug=1:goto4463
+ 4451 ifeg=135andpg<sethengosub11243:pg=pg+1:gosub4488:un=1:goto4446
+ 4452 ifeg=136andpg>1thengosub11243:pg=pg-1:gosub4488:un=1:goto4446
+ 4453 goto4446
+ 4460 poke253,112:poke254,199:poke2,gz:poke69,69:poke70,199:sys52493
+ 4463 ifun=1thenpg=s4:gosub11239
+ 4464 pokefd(s2,1),60:pokefd(s2,2),62:gosub11243
+ 4466 poke199,0:return
+ 4470 ze=22:sp=0:gosub11050:printks$(6)ks$(6)c$c$:return
+ 4475 gosub11022
+ 4476 s1=0:s4=1:forpg=1tose:ifaf%(pg)=0then nextpg:goto4482
+ 4477 gosub11239:fors1=s4tos4+af%(pg)-1:iffd(s1,2)-fd(s1,1)<6then4479
+ 4478 fors2=1to3:pokefd(s1,2)-4+s2,102:nexts2
+ 4479 ifug=0thenpokefd(s1,1)+1,102
+ 4480 nexts1:gosub11243:s4=s4+af%(pg):nextpg
+ 4482 pg=1:return
+ 4488 gosub10610:ff=f3%(pg):gosub11235:gosub11239
+ 4489 poke53280,f1%(pg):poke53281,f2%(pg):return
+ 4510 printchr$(147)chr$(142)chr$(8):poke53280,0:poke53281,0
+ 4515 poke211,0:poke214,10:sys58640
+ 4520 print"{grn}O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P"
+ 4525 print"{up}{CBM-G}{rvon}                                      {rvof}{CBM-M}"
+ 4530 print"{up}{CBM-G}{rvon}>>>>>>> einen moment bitte !!! <<<<<<<{rvof}{CBM-M}"
+ 4535 print"{up}{CBM-G}{rvon}                                      {rvof}{CBM-M}"
+ 4540 print"{up}L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@}"
+ 4550 return
+ 4730 dimmf%(3),lb(3),hb(3),me$(2,18),ap%(5,4),ks$(147),f1%(5),f2%(5),f3%(5)
+ 4735 dimfc%(19),ba(2),fs%(5),zf%(3),ta%(3),p2(7),ph(2),hp%(2,4),br%(3),ro%(15)
+ 4740 am=75:dim fd(am,2),fa%(am),fo%(am/2),fo$(am/2),ro$(15),dd$(15),sn%(15)
+ 4742 dim af%(10),p1(4),ds%(15)
+ 4810 ba(1)=1024:ba(2)=50176:gr=142:pg=1:rs=0:hp=0:pt=40248
+ 4835 fors1=1to5:f1%(s1)=0:f2%(s1)=0:f3%(s1)=5:nexts1:mf%(1)=0:mf%(2)=0:mf%(3)=5
+ 4841 zf%(1)=0:zf%(2)=0:zf%(3)=5:ta%(1)=0:ta%(2)=0:ta%(3)=5
+ 4860 cb=51:poke 56325,cb:poke 650,128:open15,8,15:ti$="000000"
+ 4861 l$="                                        ":c$=chr$(145):r$=chr$(13)
+ 4960 lb(1)=0:hb(1)=160:lb(2)=103:hb(2)=176:aw=32:gosub11710:se=1:gosub6605
+ 5005 lb(1)=0:hb(1)=240:lb(2)=153:hb(2)=246:aw=32:gosub11710
+ 5027 lb(1)=0:hb(1)=208:lb(2)=255:hb(2)=223:lb(3)=0:hb(3)=224:aw=3:gosub11760
+ 5040 p1(1)=58160:p1(3)=59184:p1(2)=60208:p1(4)=61232
+ 5042 fors2=1to2:p1=p1(s2):fors1=p1top1+6:pokes1,0:nexts1:pokep1+7,24:nexts2
+ 5043 fors2=3to4:p1=p1(s2):fors1=p1top1+6:pokes1,255:nexts1:pokep1+7,231:nexts2
+ 5110 read sz
+ 5115 fors1=1tosz:readsc:fors2=1tosc:readme$(s1,s2):nexts2:nexts1
+ 5131 fors1=1to5:fors2=1to4:readap%(s1,s2):nexts2:nexts1
+ 5135 fors1=1to2:fors2=1to4:readhp%(s1,s2):nexts2:nexts1:ph(1)=52566:ph(2)=52570
+ 5141 readfm:fors1=1tofm:readfc%(s1):nexts1
+ 5144 readsz:fors1=1tosz:readks$(s1):nexts1
+ 5146 return
+ 5149 data2
+ 5152 data18,"datei entwickeln"
+ 5154 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f1{CBM-M} : bildschirmmaske entwerfen","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5156 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f3{CBM-M} : zeichensatz aendern","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5158 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f5{CBM-M} : tastaturbelegung aendern","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5159 data"----------------------------------"
+ 5160 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f7{CBM-M} : --- datei einrichten ------","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5162 data"----------------------------------"
+ 5164 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f8{CBM-M} : programm beenden","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5166 :
+ 5168 data17,"sonderfunktionen"
+ 5170 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f1{CBM-M} : directory ausgeben","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5172 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f3{CBM-M} : disk-kommando senden","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5174 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f5{CBM-M} : dateimaske abspeichern","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5176 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f7{CBM-M} : dateimaske einladen","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5178 data"----------------------------------"
+ 5180 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}","{CBM-G}f8{CBM-M} : lademenue aufrufen","{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5250 data0,160,71,163,72,163,143,166,144,166,215,169,216,169,31,173
+ 5252 data32,173,103,176
+ 5278 data0,240,71,243,76,243,147,246
+ 5282 data19
+ 5284 data19,18,146,20,148,144,5,28,134,133,147,137,138,13,135,136,139,3,140
+ 5350 data147
+ 5352 data"{rvon}-database 64-----------maskendefinition-{rvof}"
+ 5354 data"{rvon}100<-langsamer{SHIFT--}schneller->25+'return'{rvof}"
+ 5356 data"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5358 data"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 5360 data"{rvon}--seitennummer (1-5) ? + 'return' :>  <-{rvof}"
+ 5362 data"{rvon}                                        {rvof}"
+ 5364 data"Unter welchem Namen wurde der Zeicheng. "
+ 5368 data "{rvon}feldende ? ==>'return'{SHIFT--}feldlaenge:      {rvof}"
+ 5370 data" Database 64                Zeichensatz "
+ 5372 data"{rvon}         Zeichensatzaenderung:          {rvof}"
+ 5374 data" >>>> Hauptmenue: 'Shift'+'Return' <<<<"
+ 5376 data"Welches Zeichen wollen Sie abaendern ? "
+ 5378 data" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5380 data"---- BSC-Code des Zeichens: ... ----"
+ 5382 data"Dateimaske einladen:  - F1 -"
+ 5384 data"----------------------------------------"
+ 5386 data"In der nebenstehenden        12345678"
+ 5388 data"Darstellung koennen Sie     1........1"
+ 5390 data"die Matrix des Zeichens     2........2"
+ 5392 data"in gewuenschter Weise       3........3"
+ 5394 data"abaendern:                  4........4"
+ 5396 data"                            5........5"
+ 5398 data" - F1 : Matrixp. setzen   - 6........6"
+ 5400 data" - F3 : Matrixp. loeschen - 7........7"
+ 5402 data" - F5 : Matrix loeschen   - 8........8"
+ 5404 data" - Fertig? : ---> 'F7'    -  12345678"
+ 5406 data"{rvon} syntax-kontrolle / einen moment bitte! {rvof}"
+ 5408 data"{rvon}           syntax-fehler !!!            {rvof}"
+ 5410 data"####################"
+ 5412 data"{rvon}Wollen Sie weitere Zeichen ab-{rvof}      "
+ 5414 data"    {rvon}      aendern ? (j/n)         {rvof}"
+ 5416 data"{rvon}Keine Umdefinition moeglich! {rvof}"
+ 5418 data"                               "
+ 5420 data"Datei einladen:       - F3 -"
+ 5422 data"........"
+ 5424 data" {rvon}  Gr.-/Kl.schrift:-F2- {SHIFT--} RVS off:-F6- {rvof} "
+ 5426 data" {rvon}  {rvof}Graphikmodus:   -F4- {SHIFT--} RVS on: -F8-{rvon} {rvof} "
+ 5428 data" {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+ 5430 data"{rvon}Gr.-/Kl.schrift:-F2- {rvof}"
+ 5432 data"Graphikmodus:   -F4- "
+ 5434 data"Gr.-/Kl.schrift:-F2- "
+ 5436 data"{rvon}Graphikmodus:   -F4- {rvof}"
+ 5438 data"{rvon} RVS off:-F6-{rvof}"
+ 5440 data" RVS on: -F8-"
+ 5442 data" RVS off:-F6-"
+ 5444 data"{rvon} RVS on: -F8-{rvof}"
+ 5446 data"{rvon} Einen Moment Bitte ! {rvof}"
+ 5448 data" Database 64                   Tastatur "
+ 5450 data"{rvon}      Tastaturbelegungsaenderung:       {rvof}"
+ 5452 data"Belegung einer Taste aendern: - F1 -"
+ 5454 data"Zwei Tasten vertauschen:      - F3 -"
+ 5456 data"Bitte druecken Sie die"
+ 5458 data"zu aendernde Taste ! "
+ 5460 data"Mit welcher Belegung wollen Sie die"
+ 5462 data"Taste versehen ? (Bitte druecken Sie"
+ 5464 data"die entsprechende Taste !) "
+ 5466 data"{rvon}Wollen Sie weitere Tasten ab- {rvof}      "
+ 5468 data"Bitte druecken Sie nacheinander"
+ 5470 data"die zu vertauschenden Tasten !"
+ 5472 data" Database 64                  Directory "
+ 5474 data"{rvon}        {rvof}"
+ 5476 data"     "
+ 5478 data"{rvon}     Weiter mit 'Space'    {rvof}"
+ 5480 data"                            "
+ 5482 data" Database 64             Disk-Kommandos "
+ 5484 data"  Saemtliche Disk-Kommandos koennen in  "
+ 5486 data"  folgender,abgekuerzter Form eingege-  "
+ 5488 data"  ben werden:"
+ 5490 data"    k:...................._(Dateiname,  "
+ 5492 data"    ^                       usw.)         "
+ 5494 data"  (Kommando)"
+ 5496 data"  z.B.: Datei umbenennen:               "
+ 5498 data"                   >r:neuname=altname<  "
+ 5500 data"        Datei loeschen:                 "
+ 5502 data"                   >s:dateiname<          "
+ 5504 data"------------------------------------  "
+ 5506 data"  {rvon}Ihr Kommando? : {rvof} > :"
+ 5508 data"<  + 'Return'        "
+ 5510 data"  {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}  "
+ 5512 data"{down}{left}{left}{left}{left}{left}{left}{left}"
+ 5514 data"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"
+ 5516 data"Sind Sie sicher ? (j/n) "
+ 5518 data"Kommandoeingabe loeschen ? (j/n) "
+ 5520 data"Sie haben mit dem Programm"
+ 5522 data" Database 64           Programm beenden "
+ 5524 data"Sind Sie sicher,dass Sie"
+ 5526 data"das Programm beenden"
+ 5528 data"wollen ? (j/n) "
+ 5530 data"gearbeitet !"
+ 5532 data" Stunde "
+ 5534 data" Minute "
+ 5536 data" Sekunde "
+ 5538 data"und "
+ 5540 data"{left}n "
+ 5542 data" Database 64                 Dateimaske "
+ 5544 data"{rvon}        Dateimaske abspeichern:         {rvof}"
+ 5546 data"Unter welchem Namen soll die Dateimaske "
+ 5548 data"abgespeichert werden?: >              <"
+ 5550 data"saving : "
+ 5552 data"+###########################################################"
+ 5554 data"Es wurde noch keine Dateimaske"
+ 5556 data"definiert !!!"
+ 5558 data"Soll der (eventuell) abgeaenderte       "
+ 5560 data"  Zeichensatz mit abgespeichert         "
+ 5562 data"        werden ? (j/n) "
+ 5564 data"  Wollen Sie mit der abgeespeicherten   "
+ 5566 data"  Dateimaske weiterarbeiten ? (j/n) "
+ 5568 data"loading : "
+ 5570 data"Einladung der Dateimaske nicht moeglich!"
+ 5572 data"                                  "
+ 5574 data"{rvon}          Dateimaske einladen:          {rvof}"
+ 5576 data"Unter welchem Namen wurde die Dateimaske"
+ 5578 data"   abgespeichert ? : >              <"
+ 5580 data"{rvon}    {left}{left}{left}{left}"
+ 5582 data "{rvon}-database 64---------------helpscreen"
+ 5584 data"{rvon}-hs speichern/name ?: >              < -{rvof}"
+ 5586 data"{rvon}-hs laden  /  name ?: >              < -{rvof}"
+ 5588 data"helpscreens vertauschen (j/n) ? "
+ 5590 data"Soll ein anderer Zeichensatz"
+ 5592 data"eingeladen werden ? (j/n)"
+ 5594 data"Name?: >              <"
+ 5596 data" Database 64                 Uebernahme "
+ 5598 data"{rvon}           Datei einrichten:            {rvof}"
+ 5600 data"--- Dateimaske wird uebernommen ! ---  "
+ 5602 data"   ---   Einen Moment bitte !    ---"
+ 5604 data"  Name der Datei ? : >              <"
+ 5606 data"{rvon}   Keine Felder vorhanden !!!   {rvof}"
+ 5608 data"{rvon}      Zu viele Felder !!!       {rvof}"
+ 5610 data"Zeichensatz einladen: - F5 -"
+ 5612 data"{rvon}   bitte format-vorschrift eingeben !   {rvof}"
+ 5614 data"{rvon}   bitte rechen-vorschrift eingeben !   {rvof}"
+ 5616 data"Wollen Sie einen anderen Zeichensatz "
+ 5618 data"           verwenden ? (j/n) "
+ 5620 data"   Anzahl der relevanten Stellen des    "
+ 5622 data"     Schluesselfeldes? (1-30) >  <"
+ 5624 data"Datei exist.!/ueberschreiben? (j/n)"
+ 5626 data"{rvon}  Kein Schluesselfeld definiert!!!  {rvof}"
+ 5628 data"Datei ist eingerichtet !!!"
+ 5630 data"Dateimaske abspeichern:    - F1 -"
+ 5632 data"Zeichensatz abspeichern:   - F3 -"
+ 5634 data"Unter welchem Namen soll der Zeichensatz"
+ 5636 data"   Unter welchem Namen wurde die Datei  "
+ 5638 data"{rvon}  Zu Viele Schluesselfelder !!!  {rvof}"
+ 5640 data" Database 64         Lademenue aufrufen "
+ 5642 data"Sind Sie sicher ? (j/n) "
+ 5644 data"{rvon}syntax-kontrolle durchfuehren ? (j/n) {rvof}"
+ 5646 data"{rvon}   Zu viele Rechen-Felder !!!   {rvof}"
+ 6000 a1=95:a2=96:gosub11465
+ 6022 ze=5:sp=3:gosub11050:printks$(139):ze=7:sp=3:gosub11050:printks$(140)
+ 6023 ze=19:sp=0:gosub11050:printks$(79)chr$(17)ks$(79):gosub11485:gosub11027
+ 6024 gosub11455:ifeg=141thenug=1:return
+ 6025 ifeg<>133andeg<>134then6024
+ 6026 ze=5:sp=0:gosub11050:printl$:ze=7:sp=0:gosub11050:printl$:ifeg=134then 6170
+ 6030 if fs%(1)=1then6033
+ 6031 ze=9:sp=5:gosub11050:printks$(101):ze=11:sp=13:gosub11050:printks$(102):gosub11027
+ 6032 ug=1:return
+ 6033 ze=5:sp=0:gosub11050:printks$(97)chr$(17)ks$(98)
+ 6035 sp=24:gosub6235:ifeg=141thenug=1:return
+ 6038 i$=eg$:da$=i$:a1=99:gosub6315:i$=da$+".u":gosub6330
+ 6060 gosub11322:iffe=0then6073
+ 6065 gosub6601:ag$=fe$:ze=20:gosub11585:poke2,2:sys51833:gosub6601:sp=24:goto6033
+ 6073 i$=da$+".m"
+ 6074 open1,8,2,i$+",s,w":gosub11322:iffe<>0then6077
+ 6075 print#1,se:fors1=1tose:print#1,f1%(s1)","f2%(s1)","f3%(s1):nexts1
+ 6076 print#1,gr
+ 6077 close1:gosub6601:ag$=fe$:ze=20:gosub11585:poke2,2:sys51833:gosub6601
+ 6081 gosub6601
+ 6082 zg=1:ze=10:sp=3:gosub11050:printks$(103)chr$(17)ks$(104)chr$(17)ks$(105);
+ 6085 gosub11445:printchr$(eg):ifeg=78thenzg=0:goto6115
+ 6090 i$=da$+".z":a1=99:gosub6315:gosub6350
+ 6115 ze=16:sp=0:gosub11050:printks$(106)ks$(107);:gosub11445:printchr$(eg)
+ 6126 if(eg=74andzg=0)or(eg=78andzg=1)then6155
+ 6127 ifeg=78andzg=0thengosub6635:se=1:gosub6605:goto6155
+ 6130 lb(1)=0:hb(1)=160:qx$=da$+".u":gosub11860:gosub6601
+ 6145 gosub11322:ag$=fe$:ze=20:gosub11585:poke2,2:sys51833
+ 6147 iffe<>0thensp=0:gosub11050:printchr$(18)ks$(109):poke2,2:sys51833
+ 6155 pg=1:gosub6695:ug=1:return
+ 6170 ze=5:sp=0:gosub11050:printks$(141)chr$(17)ks$(98)
+ 6175 sp=24:gosub6235:ifeg=141thenug=1:return
+ 6177 open1,8,15,"s:zwi-sp":close1
+ 6180 i$="zwi-sp":gosub6330:i$=eg$+".z":a1=99:gosub6315:gosub6350
+ 6182 iffe<>0then6170
+ 6185 lb(1)=0:hb(1)=160:qx$="zwi-sp":gosub11860:open1,8,15,"s:zwi-sp":close1:ug=1:return
+ 6235 ze=7:gz=14:rv=0:p=1:gosub11303:return
+ 6315 ag$=ks$(a1)+i$:ze=20:gosub11585:return
+ 6330 forse=5to1step-1:iffs%(se)=0thennextse
+ 6335 lb(1)=0:hb(1)=160:lb(2)=ap%(se,3)+1:hb(2)=ap%(se,4):qx$=i$:gosub11810:return
+ 6350 lb(1)=0:hb(1)=224:lb(2)=0:hb(2)=240:lb(3)=0:hb(3)=160:aw=1:gosub11760
+ 6355 lb(1)=0:hb(1)=160:lb(2)=0:hb(2)=176:qx$=i$:gosub11810:gosub6635:se=1:gosub6605
+ 6360 gosub6601:gosub11322:ag$=fe$:ze=20:gosub11585:poke2,2:sys51833:gosub6601
+ 6361 return
+ 6500 a1=95:a2=111:gosub11465:gosub11485
+ 6516 ze=5:sp=6:gosub11050:printks$(15):ze=7:sp=6:gosub11050:printks$(34)
+ 6517 ze=9:sp=6:gosub11050:printks$(129)
+ 6518 ze=19:sp=0:gosub11050:printks$(79)chr$(17)ks$(79):gosub11485:gosub11027
+ 6519 gosub11455:ifeg=141thenug=1:return
+ 6520 ifeg<>133and(eg<>134andeg<>135)then6518
+ 6522 ze=5:sp=0:gosub11050:printl$:ze=7:gosub11050:printl$:ze=9:gosub11050:printl$
+ 6524 ifeg=134then6547
+ 6526 ifeg=135then6574
+ 6532 a1=112:gosub6590:ifug=1thenreturn
+ 6536 lb(1)=0:hb(1)=160:qx$=i$+".u":gosub11860:gosub6600:if fe<>0 then 6532
+ 6537 open1,8,2,i$+".m,s,r":gosub11322:iffe<>0then6540
+ 6539 input#1,se:fors1=1tose:input#1,f1%(s1),f2%(s1),f3%(s1):nexts1:input#1,gr
+ 6540 close1:gosub6582:iffe<>0thengosub6685
+ 6541 pg=1:gosub6695:ug=1:return
+ 6547 a1=142:gosub6590:ifug=1thenreturn
+ 6548 open1,8,2,i$+".d,s,r"
+ 6550 ze=20:gosub6631:iffe<>0thenclose1:goto6547
+ 6551 input#1,cb,dl,sf,ns,es,af:poke56325,cb
+ 6552 fors1=1toaf:fors2=1to2:input#1,fd(s1,s2):nexts2:nexts1
+ 6554 input#1,lf:fors1=1toaf:input#1,fa%(s1):nexts1
+ 6556 input#1,se:fors1=1tose:input#1,af%(s1):nexts1
+ 6558 input#1,s3:ifs3=0then6562
+ 6560 fors1=1tos3:input#1,fo%(s1),fo$(s1):nexts1
+ 6562 input#1,s5:ifs5=0then6564
+ 6563 fors1=1tos5:input#1,ro%(s1),ro$(s1):nexts1
+ 6564 input#1,zg$,as,gr:fors1=1tose:input#1,f1%(s1),f2%(s1),f3%(s1):nexts1
+ 6565 close1
+ 6567 lb(1)=0:hb(1)=160:qx$=i$+".e":gosub11860:ze=20:gosub6631:iffe<>0thenug=1:return
+ 6569 if zg$="k" thengosub6601:ag$=fe$:gosub11585:goto 6571
+ 6570 i$=zg$:gosub6582:iffe<>0thengosub6685
+ 6571 gosub6625:pg=1:gosub6695:ug=1:return
+ 6574 ze=5:sp=0:gosub11050:printks$(7)chr$(17)ks$(113):ze=19:gosub11050
+ 6575 printks$(79)chr$(17)ks$(79):gosub11027:sp=22:gosub6235:if eg=141then 6577
+ 6576 i$=eg$:gosub6582:iffe<>0then6574
+ 6577 ug=1:return
+ 6582 i$=i$+".z":a1=108:gosub6315
+ 6583 lb(1)=0:hb(1)=224:qx$=i$:gosub11860:gosub11322:ze=20:sp=0:gosub11050:printl$:ag$=fe$
+ 6584 ze=20:gosub11585:poke2,2:sys51833:ze=20:sp=0:gosub11050:printl$:return
+ 6590 ze=5:sp=0:gosub11050:printks$(a1)chr$(17)ks$(113)
+ 6592 ze=19:sp=0:gosub11050:printks$(79)chr$(17)ks$(79):gosub11027
+ 6594 sp=22:gosub6235:ifeg=141thenug=1:return
+ 6596 i$=eg$:a1=108:gosub6315:return
+ 6600 ze=20:sp=0:gosub11050:printl$:gosub11322:ag$=fe$:ze=20:gosub11585:poke2,2:sys51833
+ 6601 ze=20:sp=0:gosub11050:printl$:return
+ 6605 ifse=5thenreturn
+ 6610 fors1=se-1to4:z=40960+s1*840+32:pokez,19:pokez+1,5:pokez+2,9
+ 6615 pokez+3,20:pokez+4,5:pokez+5,58:pokez+6,48:pokez+7,49+s1:nexts1:return
+ 6625 ifaf>0thengosub6705
+ 6626 s1=0:s4=1:forpg=1tose:ifaf%(pg)=0thennextpg:goto6629
+ 6627 gosub11239:fors1=s4tos4+af%(pg)-1:pokefd(s1,1)+1,fa%(s1)
+ 6628 nexts1:gosub11243:s4=s4+af%(pg):nextpg
+ 6629 pg=1:return
+ 6631 gosub11322:iffe<>0thengosub6601:ag$=fe$:gosub11585:poke2,2:sys51833:gosub6601
+ 6632 return
+ 6635 lb(1)=0:hb(1)=160:lb(2)=103:hb(2)=176:aw=32:gosub11710:return
+ 6650 ze=16:sp=0:gosub11050:printks$(106)ks$(107);:gosub11445:printchr$(eg):pg=1:gosub6695
+ 6652 if(eg=74andzg=0)thengosub6625:return
+ 6655 if(eg=78andzg=1)thengosub6682:return
+ 6660 ifeg=78andzg=0thengosub6635:se=1:gosub6605:gosub6682:return
+ 6665 ze=20:sp=0:gosub11050:printl$
+ 6670 lb(1)=0:hb(1)=160:qx$=i$:gosub11860:gosub11322:gosub6601:ag$=fe$:ze=20:gosub11585
+ 6672 gosub6625:gosub6601
+ 6675 iffe<>0thensp=0:gosub11050:printchr$(18)ks$(109):poke2,2:sys51833
+ 6680 return
+ 6682 fors1=1tos3:fo$(s1)="":nexts1:fors1=1tos5:ro$(s1)="":nexts1
+ 6683 s3=0:s5=0:return
+ 6685 ze=12:sp=6:gosub11050:printks$(119):ze=14:sp=7:gosub11050:printks$(120);
+ 6686 gosub11445:ifeg=78then6690
+ 6687 ze=16:sp=8:gosub11050:printks$(121):sp=16:gz=14:p=1:rv=0:gosub11303:ifeg=141then6690
+ 6689 i$=eg$:gosub6582:iffe<>0then6687
+ 6690 return
+ 6695 fors1=1to5:fs%(s1)=0:nexts1:return
+ 6705 fors1=1toaf:fd(s1,2)=fd(s1,2)+fd(s1,1):fd(s1,1)=fd(s1,1)-1:nexts1
+ 6707 return
+ 6920 poke52445,112:poke52446,199:poke52436,gz:poke52437,0:poke199,1:poke52440,13
+ 6925 poke52441,141:poke52442,135:poke52443,136:poke52444,1:sys51946:return
+ 7010 a1=60:gosub7610:gosub11485:gosub11027
+ 7055 open1,8,0,"$":get#1,h$,h$:i$=""
+ 7057 gosub11322:iffe=0then7060
+ 7058 close1:ze=12:sp=8:gosub11050:printfe$:poke2,2:sys51833:ug=1:return
+ 7060 get#1,h$,h$,h$,h$
+ 7065 get#1,h$:ifh$=""then7075
+ 7070 i$=i$+h$:goto7065
+ 7075 i$=ks$(61)+i$+ks$(61):ze=2:sp=0:gosub11050:printi$ks$(3)
+ 7120 ze=4:sp=0:gosub11050:print;:z=0
+ 7130 get#1,h$,h$:get#1,h$,z$:ifst<>0then7240
+ 7135 h$=h$+chr$(0):z$=z$+chr$(0):e=asc(h$)+asc(z$)*256:printks$(62)e;
+ 7190 get#1,h$:ifh$=""then7210
+ 7200 printh$;:geteg$:ifeg$=chr$(141)thenprint:close1:ug=1:return
+ 7205 goto7190
+ 7210 print:z=z+1:ifz=17thengosub7300:goto7120
+ 7220 goto7130
+ 7240 close1:gosub7330:ug=1:return
+ 7300 gosub7330:fors1=1to19:ze=3+s1:sp=6:gosub11050:printks$(64):nexts1:return
+ 7330 ze=22:sp=6:gosub11050:printks$(63)
+ 7335 get eg$:ifeg$<>" "then7335
+ 7340 return
+ 7500 a1=65:gosub7610:printc$ks$(66)ks$(67)ks$(68):print
+ 7518 printks$(69)ks$(70)ks$(71):printchr$(17)ks$(72)ks$(73)
+ 7520 printks$(74)ks$(75)ks$(76):printks$(77):ze=18:sp=20:gosub11050:printks$(78)
+ 7522 printks$(79)chr$(17)ks$(79)ks$(4)ks$(11)c$c$:gosub11027
+ 7550 ze=17:sp=20:gz=40:rv=0:p=1:gosub11303:ifeg=141thenug=1:return
+ 7552 ifleft$(eg$,1)<>"n"andleft$(eg$,1)<>"s"then7560
+ 7554 ze=21:sp=2:gosub11050:printks$(82);:gosub11445:sp=0:gosub11050:printl$:ifeg<>74then7565
+ 7560 print#15,eg$:gosub11322:ag$=fe$:ze=21:gosub11585:poke2,2:sys51833
+ 7565 ze=21:sp=2:gosub11050:printks$(83);:gosub11445:if eg<>74 then 7574
+ 7573 ze=17:sp=20:gosub11050:printl$:poke1725,58
+ 7574 ze=21:sp=0:gosub11050:printl$:goto7550
+ 7610 gosub11022:printchr$(14)chr$(8)c$ks$(a1)ks$(3):return
+ 7750 a1=85:gosub7610:ze=3:sp=6:gosub11050:printks$(84):ze=5:sp=1:gosub11050:print;
+ 7755 a1=90:ag$=left$(ti$,2):gosub7795:ag$=mid$(ti$,3,2):gosub7795:printks$(93);
+ 7765 ag$=right$(ti$,2):gosub7795:ze=7:sp=13:gosub11050:printks$(89)
+ 7766 ze=10:sp=2:gosub11050:printks$(76)
+ 7770 ze=13:sp=7:gosub11050:printks$(86):ze=15:sp=9:gosub11050:printks$(87)
+ 7775 ze=17:sp=12:gosub11050:printks$(88);:gosub11027:gosub11445:ifeg=78then165
+ 7785 close15:sys64738
+ 7795 printag$ks$(a1);:ifval(ag$)<>1thenprintks$(94);
+ 7800 a1=a1+1:return
+ 9002 printchr$(147)chr$(14)chr$(8)
+ 9005 ze=0:sp=0:gosub11050:printks$(144)ks$(3):ze=5:sp=7:gosub11050:printks$(145);
+ 9010 gosub11445:ifeg=78then165
+ 9020 printchr$(147)chr$(144)"load"chr$(34)"dbl"chr$(34)",8,1"
+ 9030 poke631,19:poke632,13:poke198,2:end
+ 9500 gosub11022:gosub9869:gosub11028:hz=hp
+ 9530 poke247,c4:poke248,c3:ze=c2:sp=c1:gosub11050:print;
+ 9535 poke199,hr:sys 52582:eg=peek(2):gosub11035
+ 9545 ifeg=141thengosub9847:return
+ 9550 fors1=1to18:ifeg<>fc%(s1)thennexts1:goto9535
+ 9560 ifs1>10thens1=s1-10:goto9575
+ 9570 ons1gosub9985,9990,9996,10341,10363,9932,9938,9944,10570,10584:goto9530
+ 9575 ons1gosub 10610,10623,10657,10746,9605,9805,9705,10544:goto9530
+ 9605 a1=116:gosub9905:ifeg=141thengosub9766:return
+ 9610 ag$=ks$(99)+i$:ze=23:gosub11585
+ 9625 ifhp=1thenhb(1)=4:hb(2)=7:hb(3)=196:l2=199:goto9628
+ 9627 hb(1)=196:hb(2)=199:hb(3)=4:l2=7
+ 9628 lb(2)=111:lb(3)=40:lb(1)=40:aw=1:gosub11760:l1=116
+ 9632 gosub9896:e=l2*256+lb(2)+1:fors1=0to3:pokee+s1,peek(ph(hp)+s1):nexts1
+ 9635 lb(1)=lb(3):hb(1)=hb(3):lb(2)=l1:hb(2)=l2:qx$=i$:gosub11810
+ 9640 gosub9782:gosub11322:gosub9770:gosub9766:return
+ 9705 a1=117:gosub9905:ifeg=141thengosub9766:return
+ 9710 ag$=ks$(108)+i$:ze=23:gosub11585:lb(1)=hp%(hp,1):hb(1)=hp%(hp,2):qx$=i$
+ 9711 gosub11860
+ 9730 gosub9782:gosub11322:iffe<>0thengosub9770:gosub9766:return
+ 9740 gosub9782:gosub9766
+ 9755 lb(1)=hp%(hp,3)+1:hb(1)=hp%(hp,4):lb(2)=lb(1)+3:hb(2)=hb(1)
+ 9756 hb(3)=int(ph(hp)/256):lb(3)=ph(hp)-256*hb(3)
+ 9757 aw=1:gosub11760
+ 9758 printchr$(peek(ph(hp)))c$:poke53280,peek(ph(hp)+1)
+ 9759 poke53281,peek(ph(hp)+2):ff=peek(ph(hp)+3):gosub11235
+ 9761 hb(3)=196:ifhp=1thenhb(3)=4
+ 9762 lb(1)=hp%(hp,1):hb(1)=hp%(hp,2):lb(2)=hp%(hp,3):hb(2)=hp%(hp,4)
+ 9763 lb(3)=40:aw=1:gosub11760:return
+ 9766 ze=0:sp=0:gosub11050:printks$(115):return
+ 9770 ag$=fe$:ze=23:gosub11585:poke2,2:sys51833:gosub 9782:return
+ 9782 ze=23:sp=0:gosub11050:printchr$(146)l$c$c$:return
+ 9805 ze=23:sp=3:gosub11050:printks$(118);
+ 9810 sys51682:eg=peek(2):ifeg<>74and(eg<>78 andeg<>141)then 9810
+ 9812 ifeg=141thengosub9782:return
+ 9813 ifeg=74then9832
+ 9820 gosub9855:gosub11022:ifhp=1thenhp=2:br%(1)=24:br%(2)=0:br%(3)=196:goto9822
+ 9821 hp=1:br%(1)=21:br%(2)=3:br%(3)=4
+ 9822 gosub11260:gosub9869:gosub11028:return
+ 9832 e=hp:ife=1thenhp=2:goto9834
+ 9833 hp=1
+ 9834 lb(1)=hp%(hp,1):hb(1)=hp%(hp,2):lb(2)=hp%(hp,3):hb(2)=hp%(hp,4)
+ 9835 lb(3)=hp%(e,1):hb(3)=hp%(e,2):aw=1:gosub11760
+ 9836 fors1=0to3:poke2,peek(ph(hp)+s1):pokeph(hp)+s1,peek(ph(e)+s1)
+ 9837 pokeph(e)+s1,peek(2):nexts1
+ 9838 gosub9842:ifhp=1thenbr%(1)=21:br%(2)=3:br%(3)=4:goto9840
+ 9839 br%(1)=24:br%(2)=0:br%(3)=196
+ 9840 gosub11022:printchr$(147):gosub11260:gosub9869:gosub9782
+ 9841 gosub11028:return
+ 9842 hb(1)=4:hb(2)=7:ife=2thenhb(1)=196:hb(2)=199
+ 9843 lb(1)=40:lb(2)=111:lb(3)=hp%(hp,1):hb(3)=hp%(hp,2):aw=1:gosub11760
+ 9844 gosub9896:return
+ 9847 gosub9855:gosub11022:hp=0:ifhz=1then br%(1)=21:br%(2)=3:br%(3)=4:goto9849
+ 9848 br%(1)=24:br%(2)=0:br%(3)=196
+ 9849 gosub11260:gosub11028:return
+ 9855 hb(1)=4:hb(2)=7:ifhp=2thenhb(1)=196:hb(2)=199
+ 9865 lb(1)=40:lb(2)=111:lb(3)=hp%(hp,1):hb(3)=hp%(hp,2):aw=1:gosub11760:gosub9896:return
+ 9869 ifhp=1thenhb(3)=4:goto9871
+ 9870 hb(3)=196
+ 9871 printchr$(9)chr$(peek(ph(hp)))c$:poke781,hp+1:sys pt
+ 9872 lb(1)=hp%(hp,1):hb(1)=hp%(hp,2):lb(2)=hp%(hp,3):hb(2)=hp%(hp,4)
+ 9873 lb(3)=40:aw=1:gosub11760:ff=peek(ph(hp)+3)
+ 9876 gosub11235:c4=1:c3=0:c1=0:c2=1
+ 9877 ks$(115)=left$(ks$(115),38):ks$(115)=ks$(115)+str$(hp)+"-"
+ 9878 poke53280,peek(ph(hp)+1):poke53281,peek(ph(hp)+2):return
+ 9896 pokeph(hp),142:z=peek(53272):ifz=23orz=27thenpokeph(hp),14
+ 9897 return
+ 9905 ze=0:sp=0:gosub11050:printks$(a1):sp=23:gz=14:rv=1:p=hp
+ 9907 gosub11303:ifeg<>141theni$=eg$+".h"
+ 9910 return
+ 9932 ff=peek(ph(hp)+1):gosub11170:pokeph(hp)+1,ff:return
+ 9938 ff=peek(ph(hp)+2):gosub11200:pokeph(hp)+2,ff:return
+ 9944 ff=peek(ph(hp)+3):gosub11230:pokeph(hp)+3,ff:return
+ 9950 return
+ 9985 c1=0:c2=1:c4=1:c3=0:return
+ 9990 ifhp=0thenrs=1:return
+ 9991 hr=1:return
+ 9996 ifhp=0thenrs=0:return
+ 9997 hr=0:return
+10341 z=1:ifhp<>1thenz=2
+10343 ifc1=0thenreturn
+10345 h=ba(z)+40*c2+c1:hb(1)=int(h/256):lb(1)=h-256*hb(1)
+10346 h=h-c1+39:hb(2)=int(h/256):lb(2)=h-256*hb(2)
+10347 poke251,lb(1):poke252,hb(1):poke253,lb(2):poke254,hb(2):sys51248
+10350 c1=c1-1:h=40*c2+c1-39:c3=int(h/256):c4=h-256*c3:return
+10363 z=1:ifhp<>1thenz=2
+10365 ifc1=39thenreturn
+10366 h=ba(z)+40*c2+c1:hb(1)=int(h/256):lb(1)=h-256*hb(1)
+10367 h=h-c1+39:hb(2)=int(h/256):lb(2)=h-256*hb(2)
+10368 poke251,lb(1):poke252,hb(1):poke253,lb(2):poke254,hb(2):sys51353:return
+10544 ze=0:sp=0:gosub11050:printks$(6):gosub11050:printks$(2):ifhp=1thenp=1:goto10546
+10545 p=2
+10546 rv=1:gz=3:sp=37:gosub11303
+10548 z=1:ifhp>0thenz=115:ks$(z)=left$(ks$(z),38):ks$(z)=ks$(z)+str$(hp)+"-"
+10550 ze=0:sp=0:gosub11050:printks$(z):h=val(eg$):ifh<25orh>100thenreturn
+10555 poke56325,h:cb=h:return
+10570 ze=c2:sp=0:gosub11050:printchr$(146)l$:return
+10584 z=1:ifhp<>1thenz=2
+10590 h=40*c2+ba(z):fors1=0to39:k=peek(h+s1):ifk>127thenk=k-128:goto10594
+10592 k=k+128
+10594 pokeh+s1,k:nexts1:return
+10610 ifhp<>1thenhb(1)=196:hb(2)=199:goto10615
+10612 hb(1)=4:hb(2)=7
+10615 lb(1)=40:lb(2)=111:aw=32:gosub11710:return
+10623 if c2=1 then ze=c2:sp=0:gosub11050:printl$:return
+10624 ifhp<>1thenhb(1)=196:goto10630
+10625 hb(1)=4
+10630 poke53027,c2-1:poke53021,80:poke53022,hb(1):sys 52862:return
+10657 if c2=21 then ze=c2:sp=0:gosub11050:printl$:return
+10658 ifhp<>1thenhb(1)=199:goto10662
+10659 hb(1)=7
+10662 poke53223,c2-1:poke53217,32:poke53218,hb(1):sys 53056:return
+10746 ifc2=21thenc2=20
+10750 c2=c2+1:c1=0:h=c2*40-39:c3=int(h/256):c4=h-256*c3:return
+11022 printchr$(147):poke53280,0:poke53281,0
+11023 poke53265,peek(53265)and239:return
+11027 poke53280,mf%(1):poke53281,mf%(2)
+11028 poke53265,peek(53265)or16:return
+11035 c3=peek(248):c4=peek(247):cp=c3*256+c4+39:c2=int(cp/40):c1=cp-c2*40:return
+11050 poke211,sp:poke214,ze:sys58640:return
+11170 ff=ff+1:ifff>=15thenff=0
+11175 poke53280,ff:return
+11200 ff=ff+1:ifff>=15thenff=0
+11205 poke53281,ff:return
+11230 ff=ff+1:ifff>=15thenff=0
+11235 lb(1)=0:hb(1)=216:lb(2)=231:hb(2)=219:aw=ff:gosub11710:poke646,ff:return
+11239 lb(1)=ap%(pg,1):hb(1)=ap%(pg,2):lb(2)=ap%(pg,3):hb(2)=ap%(pg,4)
+11240 lb(3)=40:hb(3)=196:aw=1:gosub11760:return
+11243 lb(1)=40:hb(1)=196:lb(2)=111:hb(2)=199
+11244 lb(3)=ap%(pg,1):hb(3)=ap%(pg,2):aw=1:gosub11760:return
+11260 poke53272,br%(1):poke56576,peek(56576)and252orbr%(2):poke648,br%(3):return
+11303 gosub11050:print;:p3=ze*40+sp+ba(p):p1=int(p3/256):p2=p3-256*p1
+11305 poke52445,p2:poke52446,p1:poke52436,gz:poke52437,0:poke199,rv:poke52440,13
+11306 poke52441,141:poke52442,0:poke52443,0:poke52444,1:sys51946
+11308 if peek(2)=141 then eg=141:goto 11311
+11310 poke253,p2:poke254,p1:poke2,gz:poke69,69:poke70,199:sys52493
+11311 poke199,0:return
+11322 input#15,fe,fe$,h$,z$:fe$=str$(fe)+","+fe$+","+h$+","+z$+" !!!":return
+11445 sys51682:eg=peek(2):if eg<>74 and eg<>78 then 11445
+11450 return
+11455 geteg$:ifeg$=""then11455
+11457 eg=asc(eg$):return
+11465 gosub11022:printchr$(14)chr$(8)
+11470 ze=0:sp=0:gosub11050:printks$(a1)ks$(3)ks$(a2)ks$(3):return
+11485 ze=23:sp=0:gosub11050:printks$(4)ks$(11)c$c$:return
+11510 return
+11585 sp=int((40-len(ag$))/2):gosub11050:printag$c$c$:return
+11710 poke251,lb(1):poke252,hb(1):poke253,lb(2):poke254,hb(2):poke2,aw:sys51479:return
+11760 iflb(1)=lb(2)andhb(1)=hb(2)thenreturn
+11764 poke249,lb(1):poke250,hb(1):poke251,lb(2):poke252,hb(2):poke253,lb(3):poke254,hb(3)
+11765 poke2,aw:sys51586:return
+11810 poke186,8:poke251,lb(1):poke252,hb(1):poke51713,lb(2)
+11815 poke51714,hb(2):poke69,81:poke70,216:poke183,len(qx$):sys51716:return
+11860 poke186,8:poke781,lb(1):poke782,hb(1):poke185,0:poke183,len(qx$)
+11865 poke187,238:poke188,2:fors1=1tolen(qx$):poke749+s1,asc(mid$(qx$,s1,1))
+11870 nexts1:poke780,0:sys65493:return
+

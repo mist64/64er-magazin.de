@@ -1,0 +1,301 @@
+
+
+;minitutor.prg ==0801==
+    0 rem **********************************      *                                *
+    2 rem *     m i n i t u t o r  c 64    *      *                                *
+    4 rem *         1985  by               *      *       michael anton            *
+    6 rem *      herm.essig str 106        *      *      7141 schwieberdingen      *
+    8 rem *       (07150)/31576            *      *                                *
+    9 rem **********************************
+   12 :
+   14 :
+   16 rem init
+   18 :
+   20 va=65 : rem anzahl verben
+   22 :
+   24 dimzb$(15),ft$(15,6),ez(15)
+   26 ep$="ed":ec$="ing":pp$="had":cp$="been":cf$="be":hf$="will":hc$="would"
+   28 fp$="have":ps$(1)="i":ps$(2)="you":ps$(3)="it":ps$(4)="we":ps$(5)="you"
+   30 ps$(6)="they":c1$(1)="am":c1$(2)="are":c1$(3)="is":c1$(4)="are":c1$(5)="are"
+   32 c1$(6)="are":c2$(1)="was":c2$(2)="were":c2$(3)="was":c2$(4)="were"
+   34 c2$(5)="were":c2$(6)="were":hp$(1)="have":hp$(2)="have":hp$(3)="has"
+   36 hp$(4)="have":hp$(5)="have":hp$(6)="have"
+   38 pb$(1)="1.person sing.":pb$(2)="2.person sing.":pb$(3)="3.person sing."
+   40 pb$(4)="1.person plur.":pb$(5)="2.person plur.":pb$(6)="3.person plur."
+   42 zb$(1)="present":zb$(2)="past":zb$(3)="present perfect":zb$(4)="past perfect"
+   44 zb$(5)="future":zb$(6)="future perfect":zb$(7)="conditional i"
+   46 zb$(8)="conditional ii":zb$(9)="present/ef":zb$(10)="past/ef"
+   48 zb$(11)="present perfect/ef":zb$(12)="past perfect/ef":zb$(13)="future/ef"
+   50 zb$(14)="conditional i/ef":zb$(15)="conditional ii/ef"
+   52 ze=214:sp=211:pr=58640:cl$="                                     "
+   54 :
+   56 :
+   58 rem menu
+   60 :
+   62 poke53280,0:poke53281,0
+   64 print"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}m i n i t u t o r"
+   66 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{orng}1985 by michael anton"
+   68 print"{yel}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}a{rvof}nleitung":print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}l{rvof}ernen"
+   70 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}e{rvof}nde"
+   72 gett$:ift$=""then72
+   74 ift$="a"thengosub496:goto62
+   76 ift$="l"then90
+   78 ift$="e"thenend
+   80 goto72
+   82 :
+   84 :
+   86 rem lektion erstellen
+   88 :
+   90 ifuz=0then94
+   92 input"{clr}{down}{down}{down}{down}{down}gleiche lektion nochmal ({rvon}j{rvof}/{rvon}n{rvof}) ";t$:ift$="j"then132
+   94 print"{clr}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}lektion zusammenstellen:"
+   96 print"{grn}{down}{down}soll das":print"{down}{down}{down}geprueft werden?    ({rvon}j{rvof}/{rvon}n{rvof})"
+   98 fori=1to15:ez(i)=0:nexti:print"{yel}"
+  100 fori=1to15:pokeze,6:pokesp,1:syspr:printcl$
+  102 pokeze,6:pokesp,1:syspr:printzb$(i)
+  104 gett$:ift$=""then104
+  106 ift$="n"then112
+  108 ift$="j"thenez(i)=1:goto112
+  110 goto104
+  112 nexti
+  114 pokeze,4:pokesp,5:syspr:print"{grn}die{yel}"
+  116 fori=1to6:ep(i)=0:nexti
+  118 fori=1to6:pokeze,6:pokesp,1:syspr:printcl$
+  120 pokeze,6:pokesp,1:syspr:printpb$(i)
+  122 gett$:ift$=""then122
+  124 ift$="n"then130
+  126 ift$="j"thenep(i)=1:goto130
+  128 goto122
+  130 nexti:print"{grn}{down}{down}{down}{down}{down}{down}{down}{down}"
+  132 ma=0:t=0:fori=1to15:ma=ma+ez(i):nexti:fori=1to6:t=t+ep(i):nexti
+  134 ifma=0ort=0thenprint"{wht}was soll der quatsch?{grn}":uz=0:gosub338:goto90
+  136 t=0:ma=0
+  138 input"anzahl der fragen: (0=beliebig)";ma:ifma<0thenprint"{up}";:goto138
+  140 print"{down}zeitbegrenzung fuer eingabe (in sek.)"
+  142 input" (0=keine) ";t:ift<0thenprint"{up}{up}{up}";:goto140
+  144 t=t*60
+  146 print"{down}{rght}{rght}{rght}{rght}{rght}alles klar!!!":gosub338
+  148 :
+  150 :
+  152 rem abfragen
+  154 :
+  156 fz=0:uz=0:fori=1to15:forj=1to6:ft$(i,j)="W":nextj:nexti
+  158 uz=uz+1:poke53280,11:poke53281,0
+  160 z=int(rnd(ti)*15)+1:ifez(z)=0then160
+  162 p=int(rnd(ti)*6)+1:ifep(p)=0then162
+  164 vn=int(rnd(ti)*va)+1:restore:fori=1tovn:readv1$:nexti
+  166 gosub414:gosub388:vs=0
+  168 print"{clr}{down}{rght}{rght}{rght}{lblu}wie lautet das {yel}";zb$(z)
+  170 print"{lblu} von {yel}";gf$;"{lblu} in der {yel}";pb$(p);"{lblu} ?":print"{grn}"
+  172 gosub 352
+  174 ifl$="hilfe"thengosub496:goto168
+  176 ifl$="ende"thenuz=uz-1:goto214
+  178 ifl$=a$thengosub322:print"{lblu}{down}{down}richtig!!!":gosub338:goto204
+  180 ifl$="timeout"thenprint"{lblu}   viel zulange ueberlegt!!"
+  182 print"{lblu}   das war falsch...":gosub326:vs=vs+1
+  184 ifvs>1then192
+  186 ifl$="timeout"then190
+  188 gosub398:printl$:printtab(fp-1);"^":print"hier beginnt der fehler!"
+  190 print"versuchen sie es nochmal:{grn}{down}":goto172
+  192 ifvs=3then196
+  194 print"{down}versuchen sie es mal damit:":printh$"{up}{grn}":goto172
+  196 print"{yel}{down}{down}aller falschen dinge waren drei,"
+  198 print"jetzt ist es mit dem spiel vorbei!!"
+  200 print"{lblu}{down}richtig waere gewesen:{grn}":printa$"{lblu}"
+  202 fz=fz+1:ft$(z,p)="V":gosub338
+  204 ifuz<maorma=0then158
+  206 :
+  208 :
+  210 rem fehlerauswertung
+  212 :
+  214 ifuz=0then62
+  215 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}wuenschen sie die bewertung auf"
+  216 input"{down}{rvon}d{rvof}rucker oder {rvon}b{rvof}ildschirm ";t$
+  218 dp=0:ift$="d"thendp=1
+  220 poke53280,5:poke53281,0:print"{clr}":k$=" "
+  222 pz=int(fz/uz*10000+.5)/100:ifpz>40thenpoke53280,2:k$=" nicht "
+  224 print" in "uz" aufgaben wurden"
+  226 printfz" fehler gemacht.":print
+  228 print" das ist eine fehlerquote von"
+  230 printpz" prozent.":print
+  232 print"in der schule haetten sie mit diesem"
+  234 print"ergebnis"k$"bestanden!!!":print:print
+  236 print"{down}{down}{yel}    {SHIFT--}                   1 1 1 1 1 1 "
+  238 print"    {SHIFT--} 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 "
+  240 print"CCCC{SHIFT-+}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+  242 forj=1to6:printj;tab(4)"{SHIFT--}";:fori=1to15:print" "ft$(i,j);:nexti:print:nextj
+  244 ifdp=1thengosub306:goto248
+  246 gosub338
+  248 printchr$(147)
+  250 print"{lblu} es bedeuten in der fehlertabelle:"
+  252 print
+  254 print"     horizontal    {SHIFT--}      vertikal"
+  256 print"1=present tense    {SHIFT--}1=1.person singular"
+  258 print"2=past tense       {SHIFT--}2=2.  #        #"
+  260 print"3=present perfect  {SHIFT--}3=3.  #        #"
+  262 print"4=past perfect     {SHIFT--}4=1.  #    plural"
+  264 print"5=future           {SHIFT--}5=2.  #       #"
+  266 print"6=future/perfect   {SHIFT--}6=6.  #       #"
+  268 print"7=conditional i    {CBM-Q}CCCCCCCCCCCCCCCCCCCC";
+  270 print"8=conditional ii   {SHIFT--}"
+  272 print"9=present/ef       {SHIFT--}W=richtig  bzw."
+  274 print"10=past/ef         {SHIFT--}  nicht geprueft"
+  276 print"11=present perf./ef{SHIFT--}"
+  278 print"12=past perf./ef   {SHIFT--}V=hier traten"
+  280 print"13=future/ef       {SHIFT--}  fehler auf"
+  282 print"14=conditional i/ef{SHIFT--}"
+  284 print"15=conditionalii/ef{CBM-Z}CCCCCCCCCCCCC{CBM-R}CCCCCC";
+  286 print"                                 {SHIFT--} m.a."
+  288 print"ef bedeutet expanded form, also  {SHIFT--}"
+  290 print"progressive oder '-ing' form!!!  {SHIFT--} 1985"
+  292 print"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-E}CCCCCC";
+  294 ifdp=1thengosub306:goto62
+  296 gosub338:goto62
+  298 :
+  300 :
+  302 rem hardcopy
+  304 :
+  306 open1,4:open2,3:print"{home}";
+  308 fori=1to25:forj=1to20:get#2,t$:printchr$(20);:get#2,l$
+  310 printchr$(157)chr$(148)t$l$;:print#1,t$l$;:nextj:print#1:nexti
+  312 close2:close1:return
+  314 :
+  316 :
+  318 rem farbspiele
+  320 :
+  322 fori=1to2:forj=1to15:poke53280,j:forv=1to 50:nextv:nextj:nexti
+  324 poke53280,5:return
+  326 poke53281,0:fori=1to20:forj=1to15:poke53280,j:nextj:nexti
+  328 poke53280,2:poke53281,11:return
+  330 :
+  332 :
+  334 rem warten
+  336 :
+  338 print"{down}{rght}{rght}{rght}{rght}{rght}bitte eine taste druecken"
+  340 wait198,1:poke198,0
+  342 return
+  344 :
+  346 :
+  348 rem input
+  350 :
+  352 ti$="000000":l$="":poke204,0
+  354 gett$
+  356 ift$=chr$(13)then376
+  358 ift$<>chr$(20)then362
+  360 iflen(l$)>=1thenprintchr$(20);:l$=left$(l$,len(l$)-1):goto354
+  362 ift$=""then370
+  364 ift$=chr$(32)then368
+  366 ifasc(t$)<65orasc(t$)>90then370
+  368 l$=l$+t$:printt$;
+  370 ift=0then354
+  372 ifti<tthen354
+  374 l$="timeout"
+  376 ifpeek(207)then376
+  378 poke204,1:return
+  380 :
+  382 :
+  384 rem hilfestellungen
+  386 :
+  388 h$=""
+  390 fori=1tolen(a$):t$=mid$((a$),i,1)
+  392 ift$<>chr$(32)thenh$=h$+".":goto396
+  394 h$=h$+chr$(32)
+  396 nexti:return
+  398 fp=0:fori=1tolen(l$)
+  400 ifmid$(l$,i,1)=mid$(a$,i,1)then404
+  402 fp=i:i=len(l$)+2
+  404 nexti:return
+  406 :
+  408 :
+  410 rem satz erzeugen
+  412 :
+  414 x$=right$(v1$,2):x1$=left$(x$,1):x2$=right$(x$,1)
+  416 iflen(v1$)>3thenx0$=mid$(v1$,len(v1$)-2,1)
+  418 ifx2$="e"then426
+  420 ifx2$="t"orx2$="p"orx2$="g"orx2$="b"orx2$="r"orx2$="n"orx2$="m"orx2$="l"then428
+  422 ifx2$="y"then436
+  424 goto440
+  426 gf$=v1$:v1$=left$(v1$,len(v1$)-1):pf$=v1$+ep$:pt$=pf$:cc$=v1$+ec$:goto442
+  428 ifx1$="a"orx1$="e"orx1$="i"orx1$="o"orx1$="u"then432
+  430 goto440
+  432 ifx0$="a"orx0$="e"orx0$="i"orx0$="o"orx0$="u"then440
+  434 gf$=v1$:v1$=v1$+x2$:pf$=v1$+ep$:pt$=pf$:cc$=v1$+ec$:goto442
+  436 ifx1$="a"orx1$="e"orx1$="i"orx1$="o"orx1$="u"then440
+  438 gf$=v1$:cc$=v1$+ec$:pf$=left$(v1$,len(v1$)-1)+"i"+ep$:pt$=pf$:goto442
+  440 gf$=v1$:pf$=gf$+ep$:pt$=pf$:cc$=gf$+ec$
+  442 ifz>8then446
+  444 onzgoto448,460,462,464,466,468,470,472
+  446 onz-8goto474,476,478,480,482,484,486
+  448 a$=ps$(p)+" "+gf$:ifp<>3thenreturn
+  450 ifx2$="o"orx2$="s"orx2$="x"or(x1$="c"orx1$="s"andx2$="h")thena$=a$+"es":return
+  452 ifx2$<>"y"thena$=a$+"s":return
+  454 ifx1$="a"orx1$="e"orx1$="o"orx1$="i"orx1$="u"thena$=a$+"s":return
+  456 a$=left$(a$,len(a$)-1)+"ies":return
+  458 :
+  460 a$=ps$(p)+" "+pf$:return
+  462 a$=ps$(p)+" "+hp$(p)+" "+pt$:return
+  464 a$=ps$(p)+" "+pp$+" "+pt$:return
+  466 a$=ps$(p)+" "+hf$+" "+gf$:return
+  468 a$=ps$(p)+" "+hf$+" "+fp$+" "+pt$:return
+  470 a$=ps$(p)+" "+hc$+" "+gf$:return
+  472 a$=ps$(p)+" "+hc$+" "+fp$+" "+pt$:return
+  474 a$=ps$(p)+" "+c1$(p)+" "+cc$:return
+  476 a$=ps$(p)+" "+c2$(p)+" "+cc$:return
+  478 a$=ps$(p)+" "+hp$(p)+" "+cp$+" "+cc$:return
+  480 a$=ps$(p)+" "+pp$+" "+cp$+" "+cc$:return
+  482 a$=ps$(p)+" "+hf$+" "+cf$+" "+cc$:return
+  484 a$=ps$(p)+" "+hc$+" "+cf$+" "+cc$:return
+  486 a$=ps$(p)+" "+hc$+" "+fp$+" "+cp$+" "+cc$:return
+  488 :
+  490 :
+  492 rem anleitung
+  494 :
+  496 cb=peek(53280):cp=peek(53281):cc=peek(646)
+  498 poke53280,1:poke53281,1:printchr$(147);
+  500 print"{blk}erlaubte tasten:"
+  502 print"- - - - - - - - -"
+  504 print"auswahl im menu:   a,l,e"
+  506 print"lektion erstellen: j,n;0-9,return"
+  508 print"fehlerauswertung:  d bewirkt hardcopy"
+  510 print"satzeingabe:       buchstaben+return"
+  512 print"                   ---------------------";
+  514 print"'hilfe'- zeigt diese anleitung"
+  516 print"'ende' - beendet frageschleife"
+  518 print"----------------------------------------";
+  520 print"hilfestellungen:"
+  522 print"- - - - - - - - -"
+  524 print"'^'- markiert beginn des fehlers"
+  526 print"'. .... .....'- punkt=buchtabe"
+  528 print"----------------------------------------";
+  530 print"drei versuche fuer jede frage!!!"
+  532 print"tippfehler gelten als fehler!!!!"
+  534 print" /ef bedeutet '-ing'-form (progressive.)";
+  536 print"angegeben werden zeit,person und verb."
+  538 print"gefragt ist nach korrektem minimalsatz,"
+  540 print"z.b. 'i have lived'."
+  542 print"erlaubte personalpronomen:"
+  544 print" i , you , it , we , you , they ."
+  546 print"----------------------------------------";
+  548 print"         {rvon}bitte taste druecken{rvof}";
+  550 wait198,1:poke198,0
+  552 poke53280,cb:poke53281,cp:poke646,cc:return
+  554 :
+  556 :
+  558 rem wortliste
+  560 :
+  562 datastay,remain,pass,learn,study,switch,lock,jump,turn,watch,live,print
+  564 datakiss,try,state,permit,sail,talk,sum,travel,walk,prefer,play,occur
+  566 datasatisfy,launch,display,greet,call,work,look,arrive,warn,telephone
+  568 dataappear,expect,wait,hope,suppose,want,help,end,start,change,drop
+  570 datacompare,follow,obey,resist,serve,thank,oppose,believe,enjoy,stop,dream
+  572 dataflow,calculate,cry,scream,check,program,stress,laugh,qualify
+  574 :
+  576 rem momentan 66 verben
+  578 :
+  580 rem hardcopyroutine nach einer idee
+  582 rem von k.h.hess, 64'er 4/85.
+  584 rem          vielen dank!
+  586 :
+  588 rem alle rem-zeilen koennen weg-
+  590 rem gelassen werden!
+
