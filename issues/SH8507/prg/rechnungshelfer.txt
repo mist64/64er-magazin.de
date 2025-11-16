@@ -1,0 +1,316 @@
+
+
+;rechnungshelfer.prg ==0801==
+   10 ff$="                                        "
+   20 poke53272,23
+   30 poke53281,15:poke53280,15
+   40 h$="{clr}{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} ":h1$="......................................._"
+   50 z$=" DM":z1$="  ":m1$="qm/lfm":z2$="   "
+   60 dimc$(301,3):l$=" Preis stck/qm/lfm "
+   70 open3,8,2,"textdaten,l,"+chr$(88)
+   80 open2,8,15
+   90 print#2,"p"chr$(2)chr$(1)chr$(0)chr$(1)
+  100 input#3,sm
+  110 print"{clr}"
+  120 print"{home}{down}{down}      {rvon}{blk}                       "
+  125 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {brn}{rvof} Menue-Angebot {rvon}{blk}    "
+  126 print"      {rvon}{blk}                       "
+  130 print"{down}{down}{down}{down}   {red}{rvon} 1 {blk}{rvof}  Textdaten eintragen"
+  140 print"{down}   {red}{rvon} 2 {blk}{rvof}  Textdatei auf Bildschirm"
+  150 print"{down}   {red}{rvon} 3 {blk}{rvof}  Textdatei drucken"
+  160 print"{down}   {red}{rvon} 4 {blk}{rvof}  Textdatei korrigieren"
+  170 print"{down}   {red}{rvon} 5 {blk}{rvof}  Angebot / Rechnung drucken"
+  180 print"{down}   {red}{rvon} 6 {blk}{rvof}  Textdatei anlegen/vergroessern"
+  190 print"{down}{down}   {red}{rvon} e {blk}{rvof}  Ende"
+  200 geta$:ifa$="e"thenclose2:close3:end
+  210 ifa$<"1"ora$>"6"then200
+  230 onval(a$)goto250,400,540,710,1060,2930
+  240 rem"***************************
+  250 rem"* neue texte einspeichern *
+  260 rem"***************************
+  270 printh$:print"Schluessel (2-";sm;") oder 'e' fuer Ende"
+  280 open1,0:input#1,s$
+  290 ifs$="e"thenclose1:goto110
+  300 sl=val(s$)
+  310 ifsl<2orsl>smthenclose1:goto270
+  320 printh$
+  330 print"{up}{up}Jetzt bitte den Text fuer Schluessel{rvon}";sl:printh1$:input#1,t$
+  340 print"{clr}{left}";h$:printh1$,"{up}  zweite Zeile fuer Sl{rvon}";sl
+  350 input#1,t1$
+  360 printh$;"{up}{up}Preis pro Einheit(gosublfm/qm)":input#1,p$:close1
+  370 gosub2630
+  380 goto250
+  390 rem"****************************
+  400 rem"* textdatei auf bildschirm *
+  410 rem"****************************
+  420 gosub2850
+  430 printchr$(147)
+  440 forsl=atoe
+  450 gosub2730
+  460 ifaa$="leer"then500
+  470 p$=mid$(ac$,1,4)+","+mid$(ac$,6,2)
+  480 printsl;tab(5)aa$;tab(46)l$;z1$;p$;z$
+  490 printtab(4)ab$
+  500 nextsl
+  510 wait198,1
+  520 goto110
+  530 rem"***********************
+  540 rem"*  textdatei drucken  *
+  550 rem"***********************
+  560 printh$;" Bitte warten !!!"
+  570 open1,4,7
+  590 x=0:print#1,chr$(16)"12";"SCHLUESSEL - LISTE"
+  600 print#1,chr$(16)"12";"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  604 print#1,chr$(16)"43";l$:print#1
+  610 gosub2850
+  620 forsl=atoe
+  630 gosub2730
+  640 ifaa$="leer"then680
+  650 p$=mid$(ac$,1,4)+","+mid$(ac$,6,2)
+  660 print#1,slchr$(16)"05"aa$chr$(16)"47"p$z$
+  670 print#1,chr$(16)"05";ab$
+  680 nextsl
+  690 close1:goto110
+  700 rem"**********************
+  710 rem"* textdaten aendern  *
+  720 rem"**********************
+  730 printh$
+  740 input"Korrektur : gib Satzschluessel oder 'e' ";sl$:sl=val(sl$)
+  750 ifsl$="e"then110
+  760 ifsl<2orsl>smthen730
+  770 gosub2730
+  780 printchr$(147)
+  790 ifaa$="leer"then2920
+  800 p$=ac$:t$="":t1$=""
+  810 print"Schluessel    =";sl
+  820 printaa$
+  830 printab$
+  840 print"{down}Preis        =";ac$
+  850 print"{down}{down}{down}{down}{down}welche Aenderung wollen sie vornehmen   Text o. Preis  t/p/e "
+  860 inputq$
+  870 ifq$<>"t"andq$<>"p"andq$<>"e"then850
+  880 ifq$="e"then730
+  890 ifq$="t"then910
+  900 ifq$="p"then990
+  910 printh$;z1$;aa$
+  920 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}";t$:t$=left$(t$,40)
+  930 printh$;z1$;ab$
+  940 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}";t1$:t1$=left$(t1$,40)
+  950 print"{up}{up}";t$;z1$;t1$
+  960 wait198,1
+  970 gosub2610
+  980 goto730
+  990 printh$;z1$;ac$:t$=aa$:t1$=ab$
+ 1000 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";p$:p$=right$(p$,7)
+ 1010 print"{up}";aa$;z1$;ab$;p$;z$
+ 1020 wait198,1
+ 1030 gosub2610
+ 1040 goto730
+ 1050 rem"****************************
+ 1060 rem"* angebot zusammen stellen *
+ 1070 rem"****************************
+ 1080 printh$:z=0:gs=0
+ 1090 input"{up}{up}Sind die firmeneigenen Angaben          gespeichert j/n   j{left}{left}{left}";q$
+ 1100 ifq$<>"j"andq$<>"n"then1090
+ 1110 ifq$="j"then2400
+ 1120 input"Name ihrer Firma";f1$
+ 1130 input"Strasse         ";f2$
+ 1140 input"Wohnort         ";f3$
+ 1150 input"Berufszweig     ";f4$
+ 1160 input"Kontonummer     ";f5$
+ 1170 input"Bank            ";f6$
+ 1180 input"Bankleitzahl    ";f7$
+ 1190 input"Telefon nr.     ";f8$
+ 1200 printh$
+ 1210 input"Wollen sie die Firmendaten speichern j/n";q$
+ 1220 ifq$<>"j"andq$<>"n"then1200
+ 1230 ifq$="j"then2300
+ 1240 input"Datum";fa$
+ 1250 print"{down}'mein Angebot/meine Rechnung'":inputf9$
+ 1260 printh$;"{rvon}Angaben zum Kunden:{rvof}":print
+ 1270 input"Anrede ('Herrn Frau Firma')";a1$:print
+ 1280 input"Vorname Nachname";a2$
+ 1290 input"Strasse         ";a3$
+ 1300 input"Wohnort         ";a4$
+ 1310 input"Betrifft:       ";a5$
+ 1320 printh$:print"Zusammenstellen des Angebots gib :":print
+ 1330 print"Schluessel 2-";sm"
+ 1340 print"{down}Kommentar  'k'"
+ 1350 print"{down}Drucken    'd'"
+ 1360 inputsl$
+ 1370 ifsl$=""then1360
+ 1380 ifsl$="d"then1590
+ 1390 ifsl$="k"thenz=z+2:input"kommentar";c$(z+1,3):c$(z,3)="":goto1320
+ 1400 sl=val(sl$):ifsl<2orsl>smthen1320
+ 1410 gosub2730
+ 1420 ifaa$="leer"then1360
+ 1425 printaa$ab$"1 Einheit="ac$"DM{down}"
+ 1430 ifz>300thenprint"Keine weiteren Eingaben moeglich":goto1360
+ 1440 input"Anzahl an Einheiten";m$
+ 1450 ifm$<"1"orm$>"9"then1440
+ 1460 z=z+1:m=val(m$)
+ 1470 p=val(ac$):ps=p*m
+ 1480 gs=gs+ps
+ 1490 c$(z,1)=aa$+"       "
+ 1500 p$=mid$(ac$,1,4)+","+mid$(ac$,6,2)
+ 1510 c$(z,1)=c$(z,1)+"   "+p$
+ 1520 a=m:gosub2220
+ 1530 c$(z,1)=c$(z,1)+v1$
+ 1540 a=ps:gosub2220
+ 1550 c$(z,1)=c$(z,1)+v1$+z$
+ 1560 c$(z,2)=ab$
+ 1570 goto1320
+ 1580 rem"************************
+ 1590 rem"* angebote ausdrucken  *
+ 1600 rem"************************
+ 1610 z1=28:i=1
+ 1620 open1,4,7
+ 1630 open5,4,0
+ 1640 printchr$(10)
+ 1650 print#1,chr$(16)"04";f1$;chr$(16)"54";f2$
+ 1660 print#1,chr$(16)"54";f3$
+ 1670 print#1,chr$(14);f4$;chr$(15);
+ 1680 print#1,chr$(16)"54";"den, ";fa$
+ 1690 print#1,chr$(10)
+ 1700 print#1,chr$(16)"54";"Kto.Nr.: ";f5$
+ 1710 print#1,chr$(16)"54";"Geldinstitut : "
+ 1720 print#1,chr$(16)"54";f6$
+ 1730 print#1,chr$(16)"54";"Bankleitzahl : ";f7$
+ 1740 print#1,chr$(16)"54";"Telefon: ";f8$
+ 1750 print#1,"     "a1$
+ 1760 print#1,"     "a2$
+ 1770 print#1,"     "a3$
+ 1780 print#1,a4$
+ 1830 print#1,chr$(13)chr$(10)
+ 1840 print#1,"Betrifft: ";a5$
+ 1850 print#1,chr$(10)chr$(10)
+ 1860 print#1,"Als Anlage uebersende ich Ihnen ";f9$;" zum o.g. Bezug."
+ 1870 print#1,chr$(10)chr$(10)
+ 1880 print#1," Arbeitsaufwand";
+ 1890 print#1,chr$(16)"40""Preis stck/qm/lfm     Menge       Gesamt"
+ 1900 forxx=1to80:print#5,chr$(163);:next
+ 1910 print#1,chr$(10)
+ 1920 forx=1toz
+ 1930 ifc$(x,3)<>""thenz1=z1+2:goto3080
+ 1940 ifz1=67then:z1=0:gosub2540
+ 1950 ifz1>67then:z1=1:gosub2540
+ 1960 print#1,c$(x,1):gosub2500
+ 1970 print#1,c$(x,2):gosub2500
+ 1990 nextx
+ 2000 ifz1>=60thengosub2540
+ 2010 print#5,tab(68)"EEEEEEEEEEEE"
+ 2020 a=gs:gosub2220
+ 2030 gs$=v1$
+ 2040 gz=gs*0.14+0.005:gy=gz+gs
+ 2050 a=gz:gosub2220
+ 2060 gz$=v1$
+ 2070 a=gy:gosub2220
+ 2080 gy$=v1$
+ 2090 print#1,tab(67)gs$;z$
+ 2100 print#5,tab(68)"EEEEEEEEEEEE"
+ 2110 print#1,tab(56)"+ 14% MWSt ";gz$;z$
+ 2120 print#5,tab(68)"EEEEEEEEEEEE"
+ 2130 print#1,tab(67)gy$;z$
+ 2140 print#1,tab(68)"============"
+ 2150 print#1,"Mit freundlichen Gruessen"
+ 2160 print#1,chr$(10)chr$(10)
+ 2170 close1:close5
+ 2180 printh$:input"Wollen Sie noch einen Druck j/n";q$
+ 2190 ifq$<>"j"andq$<>"n"then2180
+ 2200 ifq$="j"thengoto1610
+ 2210 goto110
+ 2220 rem"********************************
+ 2230 rem"*aufrunden und komma einfuegen *
+ 2240 rem"********************************
+ 2250 b=int((a+0.005)*100)
+ 2260 v2$="       "+str$(b)
+ 2270 v2$=right$(v2$,9)
+ 2280 v1$=mid$(v2$,1,7)+","+mid$(v2$,8,2)
+ 2290 return
+ 2300 close3
+ 2305 open4,8,2,"@:firmendaten,s,w"
+ 2310 print#4,f1$
+ 2320 print#4,f2$
+ 2330 print#4,f3$
+ 2340 print#4,f4$
+ 2350 print#4,f5$
+ 2360 print#4,f6$
+ 2370 print#4,f7$
+ 2380 print#4,f8$
+ 2390 close4
+ 2396 open3,8,2,"textdaten,l,"+chr$(88):goto1240
+ 2400 open4,8,3,"firmendaten,s,r"
+ 2410 input#4,f1$
+ 2420 input#4,f2$
+ 2430 input#4,f3$
+ 2440 input#4,f4$
+ 2450 input#4,f5$
+ 2460 input#4,f6$
+ 2470 input#4,f7$
+ 2480 input#4,f8$
+ 2490 close4:goto1240
+ 2500 z1=z1+1
+ 2510 ifz1<=66thenreturn
+ 2520 z1=3
+ 2540 forq=1to6
+ 2550 print#1,chr$(10)
+ 2560 nextq
+ 2570 i=i+1
+ 2580 print#1,chr$(16)"35";"- ";i;" -"
+ 2590 print#1,chr$(10)
+ 2600 return
+ 2610 rem"*************************
+ 2620 rem"* textdaten speichern   *
+ 2630 rem"*************************
+ 2640 hb=int(sl/256)
+ 2650 lb=sl-hb*256
+ 2660 t$=t$+ff$:t$=left$(t$,40)
+ 2670 t1$=t1$+ff$:t1$=left$(t1$,40)
+ 2680 p$=ff$+p$:p$=right$(p$,7)
+ 2690 rc$=t$+t1$+p$
+ 2700 print#2,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 2710 print#3,rc$
+ 2720 return
+ 2730 rem"**********************
+ 2740 rem"*  textdaten lesen   *
+ 2750 rem"**********************
+ 2760 hb=int(sl/256)
+ 2770 lb=sl-hb*256
+ 2780 print#2,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 2790 input#3,rc$
+ 2800 ifasc(rc$)=255thenaa$="leer":return
+ 2810 aa$=mid$(rc$,1,40)
+ 2820 ab$=mid$(rc$,41,40)
+ 2830 ac$=mid$(rc$,81,7)
+ 2840 return
+ 2850 rem"**** eingabelimit ******
+ 2860 printh$
+ 2870 input"{up}Ab Schluessel:";a
+ 2880 ifa<2ora>smthen2870
+ 2890 input"{up}Bis zu Schluessel";e
+ 2900 ife<2ora>smthen2890
+ 2910 return
+ 2920 printh$;"Datensatz nicht vorhanden":forx=1to1000:next:goto730
+ 2930 rem"******************************
+ 2940 rem"*textdatei einrichten/erweit.*
+ 2950 rem"******************************
+ 2960 printh$:print"wieviel Saetze soll die Datei enthalten "
+ 2970 input"oder ende 'e' ";sm$
+ 2980 ifsm$="e"then110
+ 2990 sm=val(sm$)
+ 3000 ifsm<2orsm>1800then2960
+ 3010 hb=int(sm/256)
+ 3020 lb=sm-hb*256
+ 3030 print#2,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 3040 print#3,chr$(255)
+ 3050 print#2,"p"+chr$(2)+chr$(01)+chr$(0)+chr$(1)
+ 3060 print#3,sm
+ 3070 goto110
+ 3080 print#1,c$(x,3)
+ 3090 zz=len(c$(x,3))
+ 3100 fory=1tozz
+ 3110 print#5,chr$(163);
+ 3120 nexty
+ 3130 print#1,chr$(141)
+ 3140 goto1990
+

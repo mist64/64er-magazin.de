@@ -1,0 +1,346 @@
+
+
+;datei_sort_copy.prg ==0801==
+    1 rem *************************************************************************
+    2 rem ************************** datei / sort / copy **************************
+    3 rem ***************************** mailbox  v3.0 *****************************
+    4 rem ************************* (c)  1985 by m.c.s. ***************************
+    5 rem *************************************************************************
+    6 poke53280,0
+    7 poke53281,0
+    8 dimu$(400):x=17
+    9 c$=chr$(x)+chr$(x)+chr$(x)+chr$(x)+chr$(x)
+   10 c$=chr$(19)+c$+c$
+   11 print"Einen Augenblick bitte"chr$(14)
+   12 gosub226
+   13 printchr$(147)chr$(158)"Datei/Sort/Copy             V3.0 M.C.S."
+   14 printchr$(x)chr$(x)"Rel > Seq      [1]
+   15 printchr$(x)"Seq > Rel      [2]
+   16 printchr$(x)"Datei anlegen  [3]
+   17 printchr$(x)"End            [4]
+   18 printc$
+   19 ifa<10thenprint"Bitte ---->    [ ]";
+   20 ifa>10thenprint"Bitte ---->    [?]";
+   21 a=a+1
+   22 ifa>20thena=0
+   23 geta$
+   24 ifa$=""then18
+   25 printchr$(157)chr$(157)a$
+   26 onval(a$)goto36,80,116,115,212
+   27 run
+   28 printchr$(x)chr$(x)"Anzahl User >  ";nr;
+   29 printchr$(157)chr$(157)chr$(157)chr$(157);
+   30 inputan
+   31 return
+   32 hb=int(bl/256)
+   33 lb=bl-hb*256
+   34 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+   35 return
+   36 gosub198
+   37 gosub28
+   38 open15,8,15
+   39 open8,8,2,"user"
+   40 printchr$(147)
+   41 forbl=400-an+1to400
+   42 gosub32
+   43 l=an+bl-400
+   44 input#8,u$(l)
+   45 u$=mid$(u$(l),61,4)
+   46 printchr$(19)u$
+   47 printchr$(x)u$(l)
+   48 u$(l)=u$+u$(l)
+   49 next
+   50 close8
+   51 close15
+   52 printchr$(147)"Sortieren"
+   53 !,an,u$(1)
+   54 fori=1toan
+   55 u$(i)=right$(u$(i),79)
+   56 next
+   57 printchr$(147)chr$(x)"Fertig"
+   58 gosub212
+   59 an=nr
+   60 printchr$(x)"Bitte Diskette wechseln"
+   61 printchr$(x)"Wenn auf einer Neuen Datendiskette als"
+   62 print"Relativ dann nur Return"
+   63 printchr$(x)"Als Sequenzeles File OK eingeben"
+   64 printchr$(x)"Bitte Waehl  RE ";
+   65 printchr$(157)chr$(157)chr$(157)chr$(157)chr$(157);
+   66 inputa$
+   67 ifa$="RE"then99
+   68 ifa$<>"ok"then60
+   69 open1,8,2,"@:user sortiert,s,w"
+   70 printchr$(147)"Speichern"
+   71 fori=1toan
+   72 print#1,u$(i)
+   73 printchr$(19)chr$(x)chr$(x)u$(i)
+   74 next
+   75 print#1,"end"
+   76 close1
+   77 printchr$(x)"Das editierte File mit dem Namen"
+   78 print"'user fertig' abspeichern."
+   79 run
+   80 printchr$(147)"File laden"
+   81 an=0
+   82 printchr$(x)chr$(x)"Filename ";
+   83 inputa$
+   84 iflen(a$)>16orlen(a$)<1then80
+   85 open1,8,0,a$+",s,r"
+   86 sr=st
+   87 ifsr>0then94
+   88 input#1,e$
+   89 ife$="end"then94
+   90 an=an+1
+   91 u$(an)=e$
+   92 printchr$(147)an
+   93 goto86
+   94 printchr$(x)"Fertig"
+   95 close1
+   96 printchr$(x)"Bitte Diskette wechseln und Return";
+   97 geta$
+   98 ifa$<>chr$(13)then97
+   99 open15,8,15
+  100 open8,8,2,"user"
+  101 printchr$(147)
+  102 forbl=400-an+1to400
+  103 gosub32
+  104 l=an+bl-400
+  105 printchr$(19)l
+  106 print#8,u$(l)
+  107 printchr$(x)u$(l)
+  108 next
+  109 close15
+  110 close8
+  111 printchr$(147)chr$(x)"Anzahl User jetzt >"an
+  112 nr=an
+  113 gosub203
+  114 run
+  115 sys64738
+  116 printchr$(147)chr$(x)"Mailboxdatei anlegen"
+  117 printchr$(x)"Bitte neue Diskette einlegen"
+  118 printchr$(x)chr$(x)"Compl.  Datei  [1]
+  119 printchr$(x)"Nur Rel. Datei [2]
+  120 printchr$(x)"Return         [3]
+  121 printc$chr$(x)
+  122 ifa<10thenprint"Bitte ---->    [ ]";
+  123 ifa>10thenprint"Bitte ---->    [?]";
+  124 a=a+1
+  125 ifa>20thena=0
+  126 geta$
+  127 ifa$=""then121
+  128 printchr$(157)chr$(157)a$
+  129 ifa$="1"thenx=0:goto133
+  130 ifa$="2"thenx=1:goto133
+  131 ifa$="3"thenrun
+  132 goto116
+  133 printchr$(147)chr$(x)"Diskette Formatieren"
+  134 open15,8,15,"n:datendisk m.m.d.,v3"
+  135 close15
+  136 printchr$(x)"Relatives File fuer User"
+  137 rn=400
+  138 hb=int(rn/256)
+  139 lb=rn-hb*256
+  140 open1,8,2,"user,l,"+chr$(80)
+  141 open15,8,15
+  142 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+  143 print#1,chr$(255)
+  144 print#15,"p"+chr$(2)+chr$(144)+chr$(1)+chr$(1)
+  145 a$="01.06.8500.00.00 0000HAMBURG            SX-64     MASTER    [THW]     "
+  146 print#1,left$(a$+"          ",79)
+  147 close1
+  148 close15
+  149 ifx=1thenrun
+  150 print"{down}Index Feld fuer pers. Message"
+  151 open1,8,2,"m-index,s,w"
+  152 fori=1to50
+  153 print#1,"loes"
+  154 next
+  155 close1
+  156 print"Index Feld fuer Allgemeines"
+  157 open1,8,2,"a-index,s,w"
+  158 print#1,"01.06.85"
+  159 print#1,"1"
+  160 print#1,"1"
+  161 print#1,"01.06.85 / 00.00"
+  162 close1
+  163 print"File fuer Titelbild"
+  164 open1,8,2,"bild,s,w"
+  165 print#1,"Master-Control-System"
+  166 close1
+  167 print"File fuer Message"
+  168 open1,8,2,"message,s,w"
+  169 print#1,"-NEXT-"
+  170 close1
+  171 print"File fuer Allgemeines"
+  172 open1,8,2,"al,s,w"
+  173 print#1,"leer"
+  174 close1
+  175 print"File fuer Rechnerinfo"
+  176 open1,8,2,"ri,s,w"
+  177 print#1,"leer"
+  178 close1
+  179 print"File fuer Telefon"
+  180 open1,8,2,"tel,s,w"
+  181 print#1,"leer"
+  182 close1
+  183 print"File fuer Clubs"
+  184 open1,8,2,"cl,s,w"
+  185 print#1,"leer"
+  186 close1
+  187 print"File fuer Aktuelles"
+  188 open1,8,2,"ak,s,w"
+  189 print#1,"leer"
+  190 close1
+  191 print"Files fuer pers. Message"
+  192 fori=1to50
+  193 open1,8,2,"p"+str$(i)+",s,w"
+  194 close1
+  195 next
+  196 printchr$(x)"Fertig"
+  197 run
+  198 open1,8,0,"a-index,s,r"
+  199 input#1,da$,an$,nr$,ak$
+  200 close1
+  201 nr=val(nr$)
+  202 return
+  203 open1,8,2,"@:a-index,s,w"
+  204 nr$=str$(nr)
+  205 c$=chr$(13)
+  206 print#1,da$
+  207 print#1,an$
+  208 print#1,nr$
+  209 print#1,ak$
+  210 close1
+  211 return
+  212 ax=0
+  213 ax=ax+1
+  214 printu$(ax)
+  215 ifax>nrthenreturn
+  216 print"uebernehmen  J   "chr$(157)chr$(157)chr$(157)chr$(157)chr$(157)chr$(157);
+  217 inputa$
+  218 ifa$="J"then213
+  219 ifa$="s"thenreturn
+  220 ifa$<>"n"then216
+  221 fori=axtonr
+  222 u$(i)=u$(i+1)
+  223 next
+  224 nr=nr-1
+  225 goto213
+  226 ifpeek(52286)=169thenreturn
+  227 xx=0
+  228 fori=52286to53131
+  229 reada
+  230 pokei,a
+  231 xx=xx+a
+  232 next
+  233 ifxx=128958then236
+  234 print"data-fehler!"
+  235 stop
+  236 sys52286
+  237 return
+  238 data169,73,141,8,3,169,204,141,9
+  239 data3,96,32,115,0,201,33,240,6,32
+  240 data121,0,76,231,167,32,115,0,234,234
+  241 data234,234,234,32,100,204,76,174
+  242 data167,32,253,174,32,158,173,32
+  243 data247,183,165,20,141,152,207,165
+  244 data21,141,153,207,32,253,174,32
+  245 data158,173,56,165,71,233,3,133,75
+  246 data165,72,233,0,133,76,162,1,173
+  247 data152,207,157,160,207,173,153,207
+  248 data157,180,207,169,1,157,200,207
+  249 data169,0,157,220,207,189,200,207
+  250 data141,156,207,189,220,207,141,157
+  251 data207,189,160,207,141,158,207,189
+  252 data180,207,141,159,207,32,47,207
+  253 data173,151,207,48,4,202,208,221
+  254 data96,189,200,207,141,156,207,189
+  255 data220,207,141,157,207,169,1,141
+  256 data158,207,169,0,141,159,207,32,101
+  257 data207,189,160,207,141,158,207,141
+  258 data154,207,189,180,207,141,159,207
+  259 data141,155,207,32,47,207,173,151
+  260 data207,48,3,76,167,205,32,131,207
+  261 data173,156,207,141,143,207,173,157
+  262 data207,141,144,207,173,154,207,141
+  263 data145,207,173,155,207,141,146,207
+  264 data32,132,206,32,180,206,173,151
+  265 data207,48,218,173,156,207,141,143
+  266 data207,173,157,207,141,144,207,173
+  267 data158,207,141,156,207,173,159,207
+  268 data141,157,207,169,1,141,158,207
+  269 data169,0,141,159,207,32,101,207,173
+  270 data156,207,141,158,207,173,157,207
+  271 data141,159,207,173,143,207,141,156
+  272 data207,173,144,207,141,157,207,32
+  273 data47,207,173,151,207,16,35,173
+  274 data154,207,141,143,207,173,155,207
+  275 data141,144,207,173,158,207,141,145
+  276 data207,173,159,207,141,146,207,32
+  277 data132,206,32,180,206,173,151,207
+  278 data48,152,32,47,207,173,151,207
+  279 data16,18,173,156,207,141,143,207
+  280 data173,157,207,141,144,207,32,132
+  281 data206,32,31,207,76,241,204,234
+  282 data189,160,207,141,143,207,189,180
+  283 data207,141,144,207,173,156,207,141
+  284 data145,207,173,157,207,141,146,207
+  285 data32,132,206,32,31,207,173,156
+  286 data207,141,158,207,141,143,207,173
+  287 data157,207,141,159,207,141,144,207
+  288 data32,81,207,189,160,207,141,158
+  289 data207,189,180,207,141,159,207,32
+  290 data101,207,173,151,207,48,15,189
+  291 data200,207,141,158,207,189,220,207
+  292 data141,159,207,32,101,207,169,1
+  293 data141,158,207,169,0,141,159,207
+  294 data173,143,207,141,156,207,173,144
+  295 data207,141,157,207,173,151,207,16
+  296 data52,189,200,207,232,157,200,207
+  297 data202,189,220,207,232,157,220,207
+  298 data32,101,207,173,156,207,157,160
+  299 data207,173,157,207,157,180,207,32
+  300 data131,207,32,131,207,202,173,156
+  301 data207,157,200,207,173,157,207,157
+  302 data220,207,76,128,206,32,131,207
+  303 data232,173,156,207,157,200,207,173
+  304 data157,207,157,220,207,202,189,160
+  305 data207,232,157,160,207,202,189,180
+  306 data207,232,157,180,207,202,32,101
+  307 data207,32,101,207,173,156,207,157
+  308 data160,207,173,157,207,157,180,207
+  309 data232,76,162,204,160,3,165,75,133
+  310 data79,133,81,165,76,133,80,133,82
+  311 data24,165,79,109,143,207,133,79
+  312 data165,80,109,144,207,133,80,24
+  313 data165,81,109,145,207,133,81,165
+  314 data82,109,146,207,133,82,136,208
+  315 data223,96,160,0,140,151,207,177,79
+  316 data141,147,207,177,81,141,148,207
+  317 data200,152,205,147,207,240,2,176
+  318 data13,205,148,207,240,21,144,19
+  319 data238,151,207,76,30,207,205,148
+  320 data207,240,2,176,62,206,151,207
+  321 data76,30,207,140,149,207,160,1,177
+  322 data79,133,77,200,177,79,133,78,172
+  323 data149,207,136,177,77,141,150,207
+  324 data140,149,207,160,1,177,81,133
+  325 data77,200,177,81,133,78,172,149
+  326 data207,177,77,200,205,150,207,208
+  327 data3,76,195,206,144,184,76,224,206
+  328 data96,160,2,177,79,72,177,81,145
+  329 data79,104,145,81,136,16,243,96,169
+  330 data0,141,151,207,173,157,207,205
+  331 data159,207,144,6,240,8,238,151,207
+  332 data96,206,151,207,96,173,156,207
+  333 data205,158,207,144,244,208,238,96
+  334 data173,156,207,24,109,158,207,141
+  335 data156,207,173,157,207,109,159,207
+  336 data141,157,207,96,169,0,141,151,207
+  337 data56,173,156,207,237,158,207,141
+  338 data156,207,173,157,207,237,159,207
+  339 data141,157,207,176,3,206,151,207
+  340 data96,238,156,207,208,3,238,157
+  341 data207,96
+  342 return
+

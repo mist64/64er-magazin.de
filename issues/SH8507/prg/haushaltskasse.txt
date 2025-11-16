@@ -1,0 +1,737 @@
+
+
+;haushaltskasse.prg ==0801==
+ 1050 open15,8,15,"m-w"+chr$(7)+chr$(28)+chr$(1)+chr$(15)
+ 1100 close15
+ 1200 poke53280,15:poke53281,15
+ 1300 ro$=chr$(28)
+ 1350 bl$=chr$(31)
+ 1400 pu$=chr$(156)
+ 1450 in$=chr$(18)
+ 1500 no$=chr$(146)
+ 1550 ho$=chr$(147)
+ 1600 cz$=chr$(145)
+ 1650 y=15:x=200
+ 1700 dima1%(12,1),a2%(12),a3%(y,12),a3$(y),a3(y,12),a4%(y,x)
+ 1800 printchr$(14);
+ 1850 goto2800
+ 2100 getc$:ifc$=""then2100
+ 2150 return
+ 2400 printho$pu$;
+ 2450 gosub2550
+ 2500 printin$"       H A U S H A L T S K A S S E      ";
+ 2550 printin$"                                        "no$;:return
+ 2800 gosub2400
+ 2850 printbl$
+ 2900 print:print"  "in$" f1 "no$" = Buchen    "in$" J "no$" = Journal
+ 2950 print:print"  "in$" f3 "no$" = M o n a t s u e b e r s ."
+ 3000 print:print"  "in$" f5 "no$" = J a h r e s u e b e r s ."
+ 3050 print:print"  "in$" f7 "no$" = E i n z e l n e s   K o n t o "
+ 3100 print:print"  "in$" f2 "no$" = N e u b e g i n n "
+ 3150 print:print"  "in$" f4 "no$" = Z u s a t z k o n t o"
+ 3200 print:print"  "in$" f6 "no$" = M o n a t s w e c h s e l"
+ 3250 print:print"  "in$" f8 "no$" = E n d e"
+ 3300 gosub2100
+ 3350 ifasc(c$)=74then11300
+ 3400 c=asc(c$)-132:ifc<1orc>8then3300
+ 3450 oncgoto7150,13650,13650,15600,3700,20700,17550,10950
+ 3700 gosub40300
+ 3750 iff1<>0then3300
+ 3800 gosub2400
+ 3850 printbl$:print
+ 3900 a$="Startmonat als Zahl = "
+ 3950 l=2
+ 4000 gosub29500
+ 4050 printcz$;
+ 4100 ifval(b$)<1orval(b$)>12then2800
+ 4150 a1%(0,0)=val(b$)
+ 4200 print:print
+ 4250 a$="Jahr = "
+ 4300 l=4
+ 4350 gosub29550
+ 4400 a2%(0)=val(b$)
+ 4450 z=0
+ 4500 a1%(0,1)=a1%(0,0)
+ 4550 gosub21550
+ 4600 gosub23950
+ 4650 gosub23250
+ 4700 gosub27250
+ 4750 ifasc(c$)=133then5350
+ 4800 ifasc(c$)=13then4100
+ 4850 fora=0toa2%(a1%(0,1))
+ 4900 a3%(a,a1%(0,1))=0
+ 4950 a3%(a,0)=0
+ 5000 a3$(a)=""
+ 5050 nexta
+ 5100 goto3800
+ 5350 gosub2400
+ 5400 printbl$
+ 5450 print:print"Wieviele Buchungen erwarten Sie im"
+ 5500 print
+ 5550 a$="Monat = "
+ 5600 l=3
+ 5650 gosub29550
+ 5700 re=val(b$)
+ 5750 ifre>1then6050
+ 5800 print:print"ungueltiger Wert"
+ 5850 fora=1to4
+ 5900 printcz$;
+ 5950 nexta
+ 6000 goto5550
+ 6050 print:print"Gehen Sie eine Tasse Kaffee trinken"
+ 6100 n=a1%(0,1)
+ 6150 gosub43850
+ 6200 gosub40300
+ 6250 iff1<>0thengosub28150:gosub2400:goto6050
+ 6300 gosub42250
+ 6350 a$=a$+",l,"+chr$(28)
+ 6400 gosub43200
+ 6450 iff1<>0thengosub28150:gosub2400:goto6300
+ 6500 gosub42800
+ 6550 print#2,chr$(255)
+ 6600 gosub42400
+ 6650 n=a1%(0,1)
+ 6700 gosub34750
+ 6750 a1%(a1%(0,1),0)=c
+ 6800 gosub31050
+ 6850 mm=1
+ 6900 goto2800
+ 7150 ifmm<>0then7300
+ 7200 gosub32200
+ 7250 iff1<>0then3300
+ 7300 n=a1%(0,1)
+ 7350 gosub43850
+ 7400 gosub42250
+ 7450 ifmn=a1%(0,1)then7600
+ 7500 gosub33700
+ 7550 iff1<>0thengosub42400:goto3300
+ 7600 gosub43200
+ 7650 iff1<>0then3300
+ 7700 gosub2400
+ 7750 printbl$
+ 7800 print"  Fuer Buchungsende druecken Sie fuer ":print
+ 7850 print"  Datum nur die Taste >RETURN< ":print
+ 7900 a$=" Datum = "
+ 7950 l=2
+ 8000 gosub29550
+ 8050 a%=val(b$)
+ 8100 ifa%<>0then8350
+ 8150 gosub42400
+ 8200 gosub34750
+ 8250 gosub31050
+ 8300 goto2800
+ 8350 ifa%>0anda%<32then8500
+ 8400 printcz$cz$;
+ 8450 goto7900
+ 8500 print
+ 8550 a$=" Text  = "
+ 8600 gosub28450
+ 8650 d$=b$
+ 8700 g=a1%(0,1)
+ 8750 gosub24400
+ 8800 a$=" Konto Nr. = "
+ 8850 l=2
+ 8900 gosub29550
+ 8950 a=val(b$)
+ 9000 ifa<=a2%(a1%(0,1))then9150
+ 9050 printcz$cz$;
+ 9100 goto8800
+ 9150 a1$=b$+right$("00"+str$(a%),2)+d$
+ 9200 print
+ 9250 b$="        "
+ 9300 print" DM-Betrag = "b$
+ 9350 gosub2100
+ 9400 ifasc(c$)=13then9900
+ 9450 ifasc(c$)<>20then9700
+ 9500 iflen(b$)=0then9600
+ 9550 b$=" "+right$(b$,len(b$)-1)
+ 9600 printcz$;
+ 9650 goto9300
+ 9700 ifasc(c$)=46orasc(c$)=45then9800
+ 9750 ifasc(c$)<48orasc(c$)>57then9350
+ 9800 b$=right$(b$,7)+c$
+ 9850 goto9600
+ 9900 b=int((val(b$)*100)+.5)/100
+ 9950 a1$=a1$+right$("        "+str$(int(b*100)),8)
+10000 a3(a,a1%(0,1))=a3(a,a1%(0,1))+b
+10050 a3(a,0)=a3(a,0)+b
+10100 ifa1%(a1%(0,1),1)<a1%(a1%(0,1),0)then10350
+10150 a1%(a1%(0,1),0)=a1%(a1%(0,1),0)+10
+10200 re=a1%(a1%(0,1),0)
+10250 gosub42800
+10300 print#2,chr$(255)
+10350 a1%(a1%(0,1),1)=a1%(a1%(0,1),1)+1
+10400 re=a1%(a1%(0,1),1)
+10450 gosub42800
+10500 print#2,a1$
+10550 a4%(a,0)=a4%(a,0)+1
+10600 a4%(a,a4%(a,0))=a1%(a1%(0,1),1)
+10650 mm=2
+10700 goto7700
+10950 gosub2400
+11000 gosub42400
+11050 end
+11300 gosub25600
+11350 f1=0:nn=n:ifn<>gthenn=g:gosub33700
+11400 iff1<>0thenn=nn:gosub42400:gosub28150:goto2800
+11450 gosub43850
+11500 gosub42250
+11550 gosub40300
+11600 iff1<>0thengosub42400:gosub28150:goto2800
+11650 gosub43200
+11700 iff1<>0then2800
+11750 gosub12950
+11800 ze=0
+11850 forre=1toa1%(n,1)
+11900 gosub42800
+11950 input#2,a1$
+12000 iflen(a1$)<27thena1$=" "+a1$:goto12000
+12050 b=val(left$(a1$,2))
+12100 c$=right$("   "+str$(b),3)
+12150 ifb=0thenc$="  0"
+12200 printc$"     "mid$(a1$,3,2)".   ";
+12250 printmid$(a1$,5,15);
+12300 ifval(mid$(a1$,20,8))<0thenprintro$;
+12350 printmid$(a1$,20,6)"."right$(a1$,2)bl$
+12400 ze=ze+1
+12450 ifze<15then12700
+12500 gosub27500
+12550 ifasc(c$)=134thenre=a1%(n,1):goto12700
+12600 gosub12950
+12650 ze=0
+12700 nextre
+12750 gosub42400
+12800 ifasc(c$)=134then2800
+12850 gosub27500
+12900 goto2800
+12950 gosub2400
+13000 printbl$
+13050 print"   Journal  "right$("  "+str$(n),2)"/";
+13100 c$=str$(a2%(0))
+13150 printright$(c$,len(c$)-1)
+13200 print
+13250 print" Kto  Datum   Text            DM-Betrag"
+13300 print
+13350 return
+13650 ifmm=0thengosub32200:iff1<>0then3300
+13700 ifc=3then15050
+13750 gosub2400
+13800 printbl$
+13850 print"  ^ = lfd. Monat":print
+13900 print"  * = alle Monate":print
+13950 print"  sonst Monat als Zahl":print:print
+14000 b$="  "
+14050 print"       > "b$
+14100 gosub2100
+14150 a=asc(c$)
+14200 ifa=13then14500
+14250 ifa=32ora=42ora=94then14350
+14300 ifa<48ora>57then14100
+14350 b$=right$(b$,1)+c$
+14400 printcz$;
+14450 goto14050
+14500 a=asc(right$(b$,1))
+14550 ifa=94theng=a1%(0,1):goto15100
+14600 ifa=42then14800
+14650 a=val(b$)
+14700 ifa<a1%(0,0)ora>a1%(0,1)thenprintchr$(145);:goto14000
+14750 g=a:goto15100
+14800 forg=a1%(0,0)toa1%(0,1)
+14850 gosub15200
+14900 ifasc(c$)=134theng=a1%(0,1)
+14950 nextg
+15000 ifasc(c$)=134then2800
+15050 g=0
+15100 gosub15200
+15150 goto2800
+15200 gosub23950
+15250 gosub23250
+15300 gosub27500
+15350 return
+15600 gosub25600
+15650 print"   ---------------------------------"
+15700 print
+15750 print"   Kontonummer":print
+15800 print"   * = alle Konten":print
+15850 b$="  "
+15900 print"        > "b$
+15950 gosub2100
+16000 a=asc(c$)
+16050 ifa=13then16350
+16100 ifa=32ora=42then16200
+16150 ifa<48ora>57then15950
+16200 b$=right$(b$,1)+c$
+16250 printcz$;
+16300 goto15900
+16350 a=asc(right$(b$,1))
+16400 ifa=42then16550
+16450 d=val(b$)
+16500 ifd<0ord>a2%(g)thenprintcz$;:goto15850
+16550 f1=0:nn=n:ifn<>gthenn=g:gosub33700
+16600 iff1<>0thenn=nn:gosub42400:gosub28150:goto2800
+16650 gosub43850
+16700 gosub42250
+16750 gosub40300
+16800 iff1<>0thengosub42400:gosub28150:goto2800
+16850 open2,8,2,"Journal "+a$
+16900 gosub40850
+16950 iff1<>0thengosub42400:gosub28150:goto2800
+17000 ifright$(b$,1)<>"*"thengosub35600:goto17250
+17050 ford=0toa2%(g)
+17100 gosub35600
+17150 ifasc(c$)=134thend=a2%(g)
+17200 nextd
+17250 gosub42400
+17300 goto2800
+17550 gosub2400:print
+17600 printbl$
+17650 print"     Monatswechel? (J/N)"
+17700 gosub2100
+17750 ifc$="n"then2800
+17800 ifc$<>"j"then17700
+17850 ifmm=0thengosub32200
+17900 ifa1%(0,1)=12thenrun
+17950 a1%(0,1)=a1%(0,1)+1
+18000 forb=0toa2%(a1%(0,1)-1)
+18050 gosub2400
+18100 printbl$
+18150 print"        M o n a t s w e c h s e l":print
+18200 printb,left$(a3$(b),20)
+18250 print
+18300 ford=a1%(0,0)toa1%(0,1)-1
+18350 print"Monat"right$("   "+str$(d),3);
+18400 printright$("           "+str$(a3%(b,d)),10);
+18450 l=a3(b,d)
+18500 gosub30500
+18550 printa$;
+18600 l=a3%(b,d)-a3(b,d)
+18650 gosub30500
+18700 ifl<0thenprintro$;
+18750 printa$bl$
+18800 nextd
+18850 print
+18900 a3%(b,a1%(0,1))=0
+18950 a$=" Vorgabe = "
+19000 l=5
+19050 gosub29550
+19100 a3%(b,a1%(0,1))=val(b$)
+19150 nextb
+19200 g=a1%(0,1)
+19250 a2%(a1%(0,1))=a2%(a1%(0,1)-1)
+19300 gosub23950
+19350 gosub23250
+19400 gosub27250
+19450 ifasc(c$)=134then20250
+19500 fora=0toa2%(a1%(0,1))
+19550 a3%(a,0)=a3%(a,0)+a3%(a,a1%(0,1))
+19600 nexta
+19650 ifa1%(0,0)=a1%(0,1)thenc=(int(a1%(a1%(0,0),1)/10)+1)*10:goto6050
+19700 c=0
+19750 fora=a1%(0,0)toa1%(0,1)
+19800 c=c+a1%(a,1)
+19850 nexta
+19900 c=(int(c/(a1%(0,1)-a1%(0,0))/10)+1)*10
+19950 fora=0toy
+20000 a4%(a,0)=0
+20050 nexta
+20100 n=a1%(0,1)
+20150 gosub34750
+20200 goto6050
+20250 fora=0toa2%(a1%(0,1))
+20300 a3%(a,a1%(0,1))=0
+20350 nexta
+20400 a1%(0,1)=a1%(0,1)-1
+20450 goto17550
+20700 ifmm=0thengosub32200
+20750 gosub2400
+20800 print:printbl$
+20850 print"         N e u e   K o n t e n"
+20900 print:print
+20950 ifa2%(a1%(0,1))=ythen21200
+21000 z=a2%(a1%(0,1))+1
+21050 gosub21600
+21100 gosub31050
+21150 goto2800
+21200 print"Es sind keine Konten mehr frei"
+21250 gosub27050
+21300 goto2800
+21550 print
+21600 forb=ztoy
+21650 a3$(b)=""
+21700 a3%(b,a1%(0,1))=0
+21750 gosub2400
+21800 print:printbl$
+21850 print"Geben Sie jezt den Kontennamen und":print
+21900 print"die Sollvorgabe (=Monatsbudget in":print
+21950 print"vollen DM) ein":print
+22000 print"Wenn Sie keine weiteren Konten anlegen":print
+22050 print"wollen, druecken Sie nur die Taste ":print
+22100 print" >RETURN<":print:print
+22150 printright$("    "+str$(b),4);
+22200 print"  Kontoname"
+22250 print
+22300 a$=" > "
+22350 gosub28450
+22400 ifasc(b$)=32thenb=y:goto22850
+22450 a3$(b)=b$
+22500 print
+22550 a2%(a1%(0,1))=b
+22600 a$=" Vorgabe =  "
+22650 l=5
+22700 gosub29550
+22750 a3%(b,a1%(0,1))=val(b$)
+22800 a3%(b,0)=a3%(b,0)+a3%(b,a1%(0,1))
+22850 nextb
+22900 g=a1%(0,1)
+22950 mm=2
+23000 return
+23250 print"   Summe";
+23300 printright$("         "+str$(c),10);
+23350 l=f
+23400 gosub30500
+23450 printright$(a$,10);
+23500 l=c-f
+23550 gosub30500
+23600 ifc-f<0thenprintro$;
+23650 printright$(a$,10)bl$
+23700 return
+23950 gosub2400
+24000 printbl$
+24050 ifg<>0then24300
+24100 print"   M o n a t e   ";
+24150 printa1%(0,0)"-"a1%(0,1);
+24200 print"/"a2%(0)
+24250 goto24400
+24300 print"   M o n a t  "g;
+24350 print" / "a2%(0)
+24400 print
+24450 c=0
+24500 f=0
+24550 fora=0toa2%(a1%(0,1))
+24600 printright$("  "+str$(a),2);
+24650 print" ";
+24700 printleft$(a3$(a)+"         ",9)" ";
+24750 a$=right$("    "+str$(a3%(a,g)),5)
+24800 printtab(13)a$;
+24850 l=a3(a,g)
+24900 gosub30500
+24950 printright$(a$,10);
+25000 l=a3%(a,g)-a3(a,g)
+25050 gosub30500
+25100 ifl<0thenprintro$;
+25150 printright$(a$,10)bl$
+25200 c=c+a3%(a,g)
+25250 f=f+a3(a,g)
+25300 nexta
+25350 return
+25600 ifmm=0thengosub32200:iff1<>0then3300
+25650 gosub2400
+25700 printbl$
+25750 print"   ^ = lfd. Monat":print
+25800 print"   sonst Monat als Zahl"
+25850 print
+25900 b$="  "
+25950 print"        > "b$
+26000 gosub2100
+26050 a=asc(c$)
+26100 ifa=13then26400
+26150 ifa=32ora=94then26250
+26200 ifa<48ora>57then26000
+26250 b$=right$(b$,1)+c$
+26300 printcz$;
+26350 goto25950
+26400 a=asc(right$(b$,1))
+26450 ifa=94theng=a1%(0,1):goto26650
+26500 a=val(b$)
+26550 ifa<a1%(0,0)ora>a1%(0,1)thenprintcz$;:goto25900
+26600 g=a
+26650 return
+26900 gosub28100
+26950 print" "in$"   Drucker ist nicht eingeschaltet    ";
+27000 return
+27050 gosub28100
+27100 print"      "in$"      TASTE{$a0}DRUECKEN        ";
+27150 gosub2100
+27200 return
+27250 gosub28100
+27300 print"    "in$"   f1 = ok   f3 = Korekktur    ";
+27350 gosub2100
+27400 ifasc(c$)<133orasc(c$)>134then27350
+27450 return
+27500 gosub28100
+27550 print"   "in$"  f1=weiter   f3=Menue  f5=Drucker  ";
+27600 gosub2100
+27650 ifasc(c$)<133orasc(c$)>135then27600
+27700 ifasc(c$)=133thenreturn
+27750 ifasc(c$)=134thenreturn
+27800 ifasc(c$)=135thengosub37500
+27850 ifdr=0then27600
+27900 goto27500
+27950 gosub28100
+28000 print"      "in$"      taste druecken        ";
+28050 goto27150
+28100 poke214,24:poke211,0:sys58732:return
+28150 poke214,20:poke211,0:sys58732:goto27100
+28450 b$=""
+28500 printa$;b$" "
+28550 gosub2100
+28600 ifasc(c$)=13then29250
+28650 ifasc(c$)<>20then28900
+28700 iflen(b$)=0then28800
+28750 b$=left$(b$,len(b$)-1)
+28800 printcz$;
+28850 goto28500
+28900 a=asc(c$)
+28950 ifasc(c$)=58orasc(c$)=44then28550
+29000 ifasc(c$)=32then29100
+29050 if((a>34anda<96)or(a>192anda<219))=0then28550
+29100 b$=b$+c$
+29150 b$=left$(b$,15)
+29200 goto28800
+29250 b$=left$(b$+"               ",15)
+29300 return
+29500 :
+29550 print
+29600 b$="               "
+29650 b$=left$(b$,l)
+29700 printa$b$" "
+29750 gosub2100
+29800 ifasc(c$)=13then30250
+29850 ifasc(c$)<>20then30050
+29900 b$=" "+left$(b$,l-1)
+29950 printcz$;
+30000 goto29700
+30050 ifasc(c$)<48orasc(c$)>57then29750
+30100 b$=right$(b$,l-1)+c$
+30150 goto29950
+30200 ifval(b$)<1orval(b$)>32768then29750
+30250 return
+30500 l=int(l*100+.5)
+30550 a$=str$(l)
+30600 m=len(a$)
+30650 ifl=0thena$="0.00":goto30750
+30700 a$=left$(a$,m-2)+"."+right$(a$,2)
+30750 a$=right$("          "+a$,10)
+30800 return
+31050 ifmm=1thenreturn
+31100 open2,8,2,"@:Kont   Haushalt,s,w"
+31150 print#2,a2%(0)
+31200 print#2,a1%(0,0)
+31250 print#2,a1%(0,1)
+31300 fora=a1%(0,0)toa1%(0,1)
+31350 print#2,a1%(a,0)
+31400 print#2,a1%(a,1)
+31450 print#2,a2%(a)
+31500 forb=0toa2%(a)
+31550 print#2,a3%(b,a)
+31600 print#2,a3(b,a)
+31650 nextb
+31700 nexta
+31750 forb=0toa2%(a1%(0,1))
+31800 print#2,a3$(b)
+31850 nextb
+31900 close2
+31950 return
+32200 gosub40300
+32250 iff1<>0thengosub42400:return
+32300 gosub42250
+32350 open2,8,2,"Kont   Haushalt"
+32400 gosub40850
+32450 iff1<>0thengosub42400:return
+32500 input#2,a2%(0),a1%(0,0),a1%(0,1)
+32550 fora=a1%(0,0)toa1%(0,1)
+32600 input#2,a1%(a,0),a1%(a,1),a2%(a)
+32650 forb=0toa2%(a)
+32700 input#2,a3%(b,a),a3(b,a)
+32750 nextb
+32800 nexta
+32850 forb=0toa2%(a1%(0,1))
+32900 input#2,a3$(b)
+32950 nextb
+33000 fora=0toa2%(a1%(0,1))
+33050 a3%(a,0)=0:a3(a,0)=0
+33100 forb=a1%(0,0)toa1%(0,1)
+33150 a3%(a,0)=a3%(a,0)+a3%(a,b)
+33200 a3(a,0)=a3(a,0)+a3(a,b)
+33250 nextb
+33300 nexta
+33350 close2
+33400 mm=1
+33450 return
+33700 gosub43850
+33750 gosub42400
+33800 gosub40300
+33850 iff1<>0thengosub28150:goto2800
+33900 open3,8,3,"Journ.Index "+a$
+33950 gosub40850
+34000 iff1<>0thenreturn
+34050 fora=0toy
+34100 input#3,a4%(a,0)
+34150 ifa4%(a,0)=0then34350
+34200 forb=1toa4%(a,0)
+34250 input#3,a4%(a,b)
+34300 nextb
+34350 nexta
+34400 close3
+34450 mn=n
+34500 return
+34750 ifmm=1thenreturn
+34800 gosub43850
+34850 open3,8,3,"@:Journ.Index "+a$+",s,w"
+34900 fora=0toy
+34950 print#3,a4%(a,0)
+35000 ifa4%(a,0)=0then35200
+35050 forb=1toa4%(a,0)
+35100 print#3,a4%(a,b)
+35150 nextb
+35200 nexta
+35250 close3
+35300 mn=n
+35350 return
+35600 gosub36850
+35650 ze=0
+35700 ifa4%(d,0)=0then36550
+35750 forb=1toa4%(d,0)
+35800 re=a4%(d,b)
+35850 gosub42800
+35900 input#2,a1$
+35950 iflen(a1$)<27thena1$=" "+a1$:goto35950
+36000 printmid$(a1$,3,2)".  "mid$(a1$,5,15);
+36050 ifval(mid$(a1$,20,8))<0thenprintro$;
+36100 printtab(28)mid$(a1$,20,6)"."right$(a1$,2)bl$
+36150 ze=ze+1
+36200 ifze<15then36450
+36250 gosub27500
+36300 ifasc(c$)=134thenb=a4%(d,0):goto36450
+36350 gosub36850
+36400 ze=0
+36450 nextb
+36500 ifasc(c$)=134thenreturn
+36550 f=a3(d,g)
+36600 c=a3%(d,g)
+36650 print
+36700 gosub23250
+36750 gosub27500
+36800 return
+36850 gosub2400
+36900 printbl$
+36950 printdleft$(a3$(d),18)tab(23)a3%(d,g);
+37000 b$=str$(a2%(0))
+37050 printtab(30)right$(str$(n),2)"/"right$(b$,len(b$)-1)
+37100 print
+37150 print"Tag  Text                    DM-Betrag"
+37200 print
+37250 return
+37500 open1,4
+37550 dr=0
+37600 poke768,61
+37650 print#1
+37700 close1
+37750 poke768,139
+37800 ifst<>-128andst<>-125then37950
+37850 goto26900
+37950 gosub28100
+38000 printno$"                                       ";
+38050 b$="                 "
+38100 gosub28100
+38150 print"  Datum:  "b$;
+38200 gosub2100
+38250 a=asc(c$)
+38300 ifa=13then38700
+38350 ifa<>20then38450
+38400 b$=" "+left$(b$,16):goto38100
+38450 ifa=32then38550
+38500 if((a>34anda<96)or(a>192anda<219))=0then38200
+38550 b$=right$(b$,16)+c$
+38600 goto38100
+38700 open4,4,0
+38750 print#4,chr$(27)chr$(64)chr$(27)chr$(108)chr$(15);
+38800 print#4,chr$(27)chr$(56)
+38850 close4
+39000 open4,4,7
+39050 forh=1024to2023step40
+39100 i=0
+39150 dr$=""
+39200 forj=0to39
+39250 c=peek(h+j)
+39300 ifc=96orc=224thenc=c-64
+39350 ifc>127andi=0thendr$=dr$+chr$(18):i=1
+39400 ifc>127andi=1thenc=c-128:goto39500
+39450 ifi=1theni=0:dr$=dr$+chr$(146)
+39500 ifc<32thenc=c+64:goto39600
+39550 ifc>64thenc=c+32
+39600 dr$=dr$+chr$(c)
+39650 nextj
+39700 print#4,dr$
+39750 nexth
+39800 forh=1to5
+39850 print#4
+39900 nexth
+39950 close4
+40000 dr=1
+40050 return
+40300 poke768,61
+40350 open1,8,0,"test"
+40400 close1
+40450 poke768,139
+40500 ifst<>-128andst<>-125thengosub42250:gosub40850:return
+40550 f1=0
+40600 gosub28100
+40650 print" "in$"   Bitte Floppy Ger.Nr. 8 einschalten   ";
+40700 f1=1
+40750 close15
+40800 return
+40850 input#15,f1,f$,f2,f3
+40900 iff1=0thenreturn
+40950 gosub28100
+41000 iff1<>74then41100
+41050 print"     "in$"    Bitte Diskette einlegen   "no$"    ";:return
+41100 if(f1=62orf1=26)=0then41750
+41150 printcz$"   "in$"   Falsche Diskette im Laufwerk  "no$"  "
+41200 close3
+41250 open3,8,3,"#"
+41300 print#15,"u1 3 0 18 0"
+41350 print#15,"b-p 3 144"
+41400 b$=""
+41450 fora=1to16
+41500 get#3,d$
+41550 ifd$=""thend$=chr$(0)
+41600 b$=b$+d$
+41650 nexta
+41700 print"   "in$"  Diskette =  "b$"   "no$"   ";:return
+41750 printcz$"  "in$"   D i s k e t t e n f e h l e r     "
+41800 print"  "in$;
+41850 printright$("   "+str$(f1),3);
+41900 print"  ";
+41950 printleft$(f$+"                  ",18);
+42000 print"  "in$;
+42050 printright$("     "+str$(f2),5);
+42100 printright$("     "+str$(f3),5);
+42150 print"  "no$;
+42200 return
+42250 close15
+42300 open15,8,15,"i"
+42350 return
+42400 close2
+42450 close3
+42500 close15
+42550 return
+42800 hb=int(re/256)
+42850 lb=re-(hb*256)
+42900 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+42950 return
+43200 a$="Journal "+a$
+43250 open2,8,2,a$
+43300 gosub40850
+43350 iff1<>0thengosub42400
+43400 return
+43650 data"Jan","Feb","Mrz"
+43700 data"Apr","Mai","Jun"
+43750 data"Jul","Aug","Spt"
+43800 data"Okt","Nov","Dez"
+43850 restore
+43900 forw=1ton
+43950 reada$
+44000 nextw
+44050 return
+

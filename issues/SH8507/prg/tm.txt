@@ -1,0 +1,234 @@
+
+
+;tm.prg ==3001==
+   10 xx=xx+1:ifxx=1thenprint"{up}"tab(17)"{gry2}Maschinenroutinen":load"tm.code",8,1
+  100 f1=15:f2=0:f0$="{gry3}":f1$="{yel}":f2$="{cyn}"
+  110 poke2,216:poke905,32:poke906,40:sys49553:poke2,208:poke905,40:poke906,48
+  120 sys49553
+  200 poke53272,25:poke788,52:gosub4900:gosub4000
+  300 gosub4400:gosub4300
+  800 data0,102,0,60,6,62,102,62,0
+  801 data28,56,108,108,124,102,102,124,96
+  802 data35,0,0,0,0,0,102,102,102
+  803 data42,102,0,60,102,102,102,60,0
+  804 data30,102,0,102,102,102,102,62,0
+  805 data122,102,24,60,102,126,102,102,0
+  806 data64,102,0,60,102,102,102,60,0
+  807 data94,102,0,102,102,102,102,60,0
+  808 data-1
+  900 data"Unterstreichen","Invertieren","Alternativzeichen","Normal"
+  901 data"Komprimiert"
+ 2000 poke830,x:poke831,y:sys49272
+ 2005 geta$:ifa$=""then2005
+ 2010 ifa$="{rght}"thenx=x+1:y=y-(y<>49andx>59):x=-x*(x<60):goto2000
+ 2020 ifa$="{left}"thenx=x-1:y=y+(y<>0andx<0):x=-x*(x>=0)-59*(x<0):goto2000
+ 2030 ifa$="{down}"theny=y-(y<>49):goto2000
+ 2040 ifa$="{up}"theny=y+(y<>0):goto2000
+ 2050 poke780,asc(a$):sys49489:ifpeek(2)thenx=x+1:ifx=60theny=y-(y<>49):x=0
+ 2060 ifpeek(2)then2000
+ 2070 ifa$<>"{clr}"then2120
+ 2080 a$="Text loeschen (j/n) ?":gosub4800
+ 2090 geta$:ifa$=""then2090
+ 2100 ifa$="j"thenx=0:y=0:sys49204
+ 2110 gosub4810:goto2000
+ 2120 ifa$="{home}"thenx=0:y=0
+ 2125 ifa$=chr$(13)andx=0thenx=39:goto2000
+ 2130 ifa$=chr$(13)andxthenx=0:y=y-(y<>49):a$="{rvof}"
+ 2135 ifa$=chr$(20)andxthensys50335:a$="{left}":goto2020
+ 2137 ifa$="{inst}"thensys50363
+ 2140 ifa$="{rvon}"thenpoke182,128:printf1$"{home}{down}",,"{rvon}Extend
+ 2150 ifa$="{rvof}"thenpoke182,0:printf1$"{home}{down}",,"Norm  "
+ 2160 ifa$<>"{f1}"then2400
+ 2170 a$="Drucken (j/n) ?":gosub4800
+ 2180 poke198,0:wait198,1:geta$:gosub4810:ifa$<>"j"then2000
+ 2190 gosub4700:poke214,11:print:print,"  ab welcher Zeile
+ 2200 ko$="ab Zeile Nr. ":ma=2:a1$="0":a2$="9":gosub4599:fs=val(fs$):
+ 2210 iffs<0orfs>49then2200
+ 2220 poke901,fs:gosub4700:poke214,11:print:print,"bis zu welcher Zeile
+ 2230 ko$="bis Zeile Nr. ":gosub4599:fs=val(fs$):iffs<0orfs>49orfs<peek(901)then2200
+ 2235 iffs$=""thenfs=49
+ 2240 poke902,fs+1:gosub4700:poke214,6:print:print,"   Extended Modus
+ 2250 print,"{down}{down}{down}1) "k$(1)
+ 2260 print,"{down}{down}2) "k$(2)
+ 2270 print,"{down}{down}3) "k$(3)
+ 2280 geta$:d=val(a$):ifd<1ord>3then2280
+ 2281 ifd=1thenpoke900,1
+ 2282 ifd=2thenpoke900,0
+ 2283 ifd=3thenpoke900,128
+ 2290 gosub4700:poke214,6:print:print,"    Zeichendichte
+ 2300 print,"{down}{down}{down}{down}1) "k$(4)
+ 2310 print,"{down}{down}{down}2) "k$(5)
+ 2320 geta$:a=val(a$):ifa<1ora>2then2320
+ 2330 poke904,a-1
+ 2331 gosub4700:poke214,10:print:print,"       rechter
+ 2332 print,"{down}Randausgleich (j/n)?
+ 2333 poke198,0:wait198,1:geta$:poke1000,0:ifa$="j"thenpoke1000,1
+ 2334 gosub4700:poke214,10:print:print," Wieviel Dots fuer
+ 2335 ko$="Hochschrift:":ma=1:a1$="0":a2$="6":gosub4599:poke1012,val(fs$)
+ 2336 ko$="Normalschrift:":gosub4599:poke1013,val(fs$)
+ 2337 ko$="Tiefschrift:":gosub4599:poke1014,val(fs$)
+ 2340 gosub4700:poke214,7:print:print,"Es wird gedruckt
+ 2341 print,"{down}von Zeile"peek(901)"bis"peek(902)-1
+ 2342 print,"{down}"k$(d):print,"{down}"k$(4+peek(904))"e Zei-":print,"{down}chendichte ";
+ 2343 ifpeek(1000)thenprint"mit
+ 2344 ifpeek(1000)=0thenprint"ohne
+ 2345 print,"{down}Randausgleich
+ 2349 a$="Werte in Ordnung (j/n) ?":gosub4800
+ 2350 geta$:ifa$=""then2350
+ 2360 gosub4810:ifa$<>"j"then2170
+ 2370 a$="Drucker betriebsbereit ? <Taste>":gosub4800
+ 2380 poke198,0:wait198,1:geta$:gosub4810:gosub4700:sys49821
+ 2400 ifa$="{f4}"thensys50291
+ 2500 ifa$=chr$(141)thenpoke2048+x+y*60,31:a$=chr$(13):x=1:goto2130
+ 2510 ifa$<>"{f6}"then2700
+ 2520 a$="Zeichensatz laden (j/n) ?":gosub4800:poke198,0:wait198,1:geta$
+ 2530 gosub4810:ifa$<>"j"then2000
+ 2540 gosub4700:poke214,6:print:print,"{gry3} Wofuer benoetigt ?
+ 2550 print,"{down}{down}{down}1) Arbeits-
+ 2560 print,"{down}{down}{down}2) Alternativ-
+ 2570 print,"{down}{down}Zeichensatz ?
+ 2580 poke198,0:wait198,1:geta$:a=val(a$):ifa<1ora>2then2580
+ 2590 ifa=1thenpoke900,32:poke905,32:poke906,40
+ 2595 ifa=2thenpoke900,40:poke905,40:poke906,48
+ 2600 gosub4700:poke214,6:print:print,"    Welcher ?
+ 2610 print,"{down}{down}1) Klein/Gross
+ 2620 print,"{down}2) Gross/Grafik
+ 2630 print,"{down}3) Von Disk laden
+ 2635 print,"{down}4) Deutsch
+ 2640 geta$:a=val(a$):ifa<1ora>4then2640
+ 2650 ifa<3thenpoke2,224-a*8:sys49553:goto2000
+ 2655 ifa=4thenpoke2,216:sys49553:gosub4100:goto2000
+ 2660 ma=16:ko$="Zeichensatzname:":a1$=" ":a2$="_":gosub4599:gosub4200
+ 2670 poke2,len(fs$):fori=1tolen(fs$):poke1983+i,asc(mid$(fs$,i)):next
+ 2680 sys50390:gosub4500:gosub4810:goto2000
+ 2700 ifa$<>"{f2}"then2760
+ 2710 a$="Seite sichern (j/n) ?":gosub4800:poke198,0:wait198,1:geta$
+ 2720 gosub4810:ifa$<>"j"then2000
+ 2725 gosub4200:fs$=str$(as)+do$:open1,8,15,"s:"+fs$:close1
+ 2730 fori=1tolen(fs$):poke1983+i,asc(mid$(fs$,i)):next
+ 2740 poke2,len(fs$):sys50417:gosub4500:gosub4810
+ 2750 ifas>msthenopen1,8,1,"@:'"+do$+",s,w":print#1,as:print#1,co$:print#1,do$
+ 2755 ifas>msthenclose1:gosub4500:ms=as
+ 2756 goto2000
+ 2760 ifa$<>"{f7}"anda$<>"{f8}"then2830
+ 2765 aa=as
+ 2770 ifa$="{f7}"thenas=as+1
+ 2780 ifa$="{f8}"thenas=as+(as<>1)
+ 2790 a$="Blaettere zu Seite"+str$(as):gosub4800
+ 2800 geta$:ifa$=""then2800
+ 2805 gosub4810:ifa$="{stop}"thenas=aa:goto2000
+ 2810 ifa$<>chr$(13)then2770
+ 2820 gosub4200:gosub4450:gosub4300:goto2000
+ 2830 ifa$="{f5}"thensys50455
+ 2840 ifa$="{stop}"thensys50677:sys50455:x=0:goto2000
+ 2850 ifa$="{CTRL-D}"then300
+ 2860 ifa$<>"{CTRL-Z}"then2880
+ 2865 ko$="von Zeile Nr.:":ma=2:a1$="0":a2$="9":gosub4599
+ 2866 f=val(fs$):iff<0orf>59then2865
+ 2867 iffs$=""thenf=y
+ 2868 ko$="bis Zeile Nr.:":gosub4599:f5=val(fs$):iffs$=""thenf5=f
+ 2869 iff5<f orf5>59then2865
+ 2870 fori=ftof5:poke1002,i:sys51015:next
+ 2880 ifa$="{f3}"thensys51124
+ 2900 ifa$<>"{CTRL-F}"then3100
+ 2910 gosub4700:poke214,7:print:print,"    Floppy-Menue":print,"{down}1) Zurueck
+ 2920 print,"{down}2) Befehl senden
+ 2930 print,"{down}3) Dokument loeschen
+ 2940 print,"{down}4) Directory
+ 2950 geta$:a=val(a$):ifa<1ora>4then2950
+ 2955 ifa=1then2000
+ 2960 ifa=2thengosub4200:ko$="Befehl:":ma=30:a1$=" ":a2$="z":gosub4599
+ 2970 ifa=2thenopen1,8,15,fs$:close1:gosub4500
+ 2980 ifa<>3then3040
+ 2990 ko$="Name des Dokuments:":ma=13:a1$=" ":a2$="_":gosub4599
+ 3000 open1,8,0,"'"+fs$+",s,r":input#1,n,a$,fs$:close1:gosub4500
+ 3010 iffthen2000
+ 3020 open1,8,15,"s:'"+fs$:fori=1ton:print#1,"s:"+str$(n)+fs$:next
+ 3030 close1:gosub4500:goto2000
+ 3040 ifa=4thenprint"{clr}{lred}":sys51181:poke198,0:wait198,1:geta$:gosub4900:sys49272:goto2910
+ 3100 rem
+ 3300 ifa$="{blk}"thenpoke2048+x+y*60,252:a$="{rght}":goto2010
+ 3310 ifa$="{wht}"thenpoke2048+x+y*60,253:a$="{rght}":goto2010
+ 3320 ifa$="{red}"thenpoke2048+x+y*60,254:a$="{rght}":goto2010
+ 3400 ifa$<>"{dish}"then3500
+ 3405 gosub4700:poke214,7:print:print,"f1-Druckermenue
+ 3410 print,"f2-Seite sichern
+ 3415 print,"f3-Zeile loeschen
+ 3420 print,"f4-Zeile einfuegen
+ 3425 print,"f5-Text neu ordnen
+ 3430 print,"f6-Zeichensatz laden
+ 3435 print,"f7-vorblaettern
+ 3440 print,"f8-zurueckblaettern
+ 3441 print,"CLR-Text loeschen
+ 3442 print,"STOP-Wort trennen
+ 3445 poke198,0:wait198,1:geta$:ifa$<>"{dish}"then2000
+ 3450 gosub4700:poke214,7:print:print,"Control +
+ 3455 print,"{down}H -Hilfsmenue
+ 3456 print,"W -Farben wechseln
+ 3460 print,"F -Floppymenue
+ 3465 print,"D -Dokument laden
+ 3470 print,"Z -Zeile(n) zentr.
+ 3475 print,"1 -Hochschrift
+ 3480 print,"2 -Normalschrift
+ 3485 print,"3 -Tiefschrift
+ 3490 poke198,0:wait198,1:geta$:goto2000
+ 3500 ifa$<>"{CTRL-W}"then3600
+ 3510 iff1=15thenf1=0:f2=15:f0$="{blk}":f1$="{brn}":f2$="{blu}":goto3530
+ 3520 iff1=0thenf1=15:f2=0:f0$="{gry3}":f1$="{yel}":f2$="{cyn}"
+ 3530 gosub4900:goto2000
+ 3600 goto2000
+ 4000 gosub4100:gosub4700:poke214,8:print:print,"   {CBM-A}{rght}{rvon}  T e x t  {rvof} {CBM-S}
+ 4001 print,"{rght}{rght}{rght}{CBM-Z} {rvon}m a s t e r{rvof} {CBM-X}
+ 4003 print,"{down}{rght}C-64 C-1541 MPS801
+ 4005 print,"{down}   (C)  Juni 1985
+ 4010 print,"{down}     Mario Weck
+ 4020 poke198,0:wait198,1:geta$:return
+ 4100 restore
+ 4110 reada:ifa<0then4150
+ 4120 fori=8192+a*8toi+7:reada:pokei,a:pokei+1024,255-a:next:goto4110
+ 4150 fori=1to5:readk$(i):next:return
+ 4200 poke768,185:open1,8,15,"m-r":close1:poke768,139
+ 4210 ifst<>-128thenreturn
+ 4220 a$="Floppy Disk anschalten & <Taste>":gosub4800
+ 4230 poke198,0:wait198,1:geta$:gosub4810:goto4200
+ 4300 poke214,22:print:fori=0to39:print"{red}{rvon} ";:next:poke214,22:print
+ 4310 print"{rvon} Dokument: "do$tab(29)"Seite:"as"{home}"
+ 4320 gosub4200:open3,8,15:input#3,a:close3:return
+ 4400 gosub4700:poke214,6:print:print,"      {rvon}Dokument
+ 4410 print,"{down}{down}      erstellen":print,"{down}         bzw":print,"{down}     veraendern
+ 4415 print,"{down} ('$' = Directory)
+ 4420 ko$="Dokumentname:":ma=13:a1$=" ":a2$="_":gosub4599:do$=fs$:gosub4200
+ 4425 ifdo$="$"thenprint"{clr}{lred}":sys51181:poke198,0:wait198,1:geta$:gosub4900:goto4400
+ 4430 open2,8,0,"'"+do$+",s,r":close2:open1,8,15:input#1,a:close1:ifathen4460
+ 4440 open2,8,0,"'"+do$+",s,r":input#2,as,co$,do$:close2:gosub4500:ms=as
+ 4441 ifco$<>"{CBM-POUND}"thenko$="Schutz-Code:":ma=13:gosub4599:if"{CBM-POUND}"+fs$<>co$then4420
+ 4450 fs$=str$(as)+do$:fori=1tolen(fs$):poke1983+i,asc(mid$(fs$,i)):next
+ 4455 sys49204:poke2,len(fs$):poke900,8:sys50390:return
+ 4460 a$="Dokument {rvon}"+do$+"{rvof} erstellen (j/n)?":gosub4800:poke198,0:wait198,1:geta$
+ 4465 gosub4810:ifa$<>"j"then4420
+ 4466 ko$="Schutz-Code:":gosub4599:co$="{CBM-POUND}"+fs$:gosub4810
+ 4470 open2,8,1,"'"+do$+",s,w":print#2,1:print#2,co$:print#2,do$:close2:gosub4500
+ 4480 as=1:ms=0:sys49204:return
+ 4499 return
+ 4500 open1,8,15:input#1,a$,b$:close1:f=val(a$):iff=0thenreturn
+ 4510 gosub4810:a$=a$+" {rvon}"+b$:gosub4800:poke198,0:wait198,1:geta$:gosub4810:return
+ 4599 fs$=""
+ 4600 poke214,22:print:printf1$"{down}"ko$fs$"{CBM-P} {home}"
+ 4610 geta$:ifa$=""then4610
+ 4620 ifa$=chr$(13)thengosub4810:return
+ 4630 ifa$=chr$(20)andlen(fs$)>0thenfs$=left$(fs$,len(fs$)-1):goto4600
+ 4640 ifa$>=a1$anda$<=a2$andlen(fs$)<mathenfs$=fs$+a$
+ 4650 goto4600
+ 4700 poke214,5:print:print,f0$"{left}{rvon}                      "
+ 4710 fori=1to12:print,"{left}{rvon} {rvof}                    {rvon} {rvof}
+ 4720 next:print,"{left}{rvon}                      ":return
+ 4800 poke214,22:print:printf1$"{down}"tab(59-len(a$)/2)a$"{home}":return
+ 4810 poke214,22:print:poke646,f2:print"{down}                                       {home}":return
+ 4900 poke53281,f1:print"{clr}":poke53281,f2
+ 4905 poke53280,f2:print"{home}{dish}{pur}  [[[[ Textmaster 64/801 (C) 1985 ]]]]
+ 4910 print"Zeile "f2$"00{pur} Spalte "f2$"00"f1$"  Norm{red}
+ 4920 fori=0to39:print"{rvon} ";:next
+ 4930 gosub4300
+ 4940 poke650,128:poke182,0:return
+ 4999 end
+

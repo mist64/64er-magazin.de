@@ -1,0 +1,115 @@
+
+
+;messboy.prg ==0801==
+  100 rem   **************************
+  110 rem   *                        *
+  120 rem   *     c/r-messgeraet     *
+  130 rem   *                        *
+  140 rem   *                        *
+  150 rem   *  von  uwe gerlach      *
+  160 rem   *       bruehlstr. 23    *
+  170 rem   *                        *
+  180 rem   *       6440 bebra 1     *
+  190 rem   *                        *
+  200 rem   *                        *
+  210 rem   *       april 1985       *
+  220 rem   *                        *
+  230 rem   **************************
+  250 :
+ 1000 poke53280,0: poke53281,0: rem farbe
+ 1010 print "{clr}{wht}Widerstands-  und  Kapazitaetsmessgeraet{gry2}";chr$(14):print:print
+ 1400 print"{home}":print:print:print:print,," Kapazitaetsmessung"
+ 1420 b=0
+ 1430 print:print:print,," Bitte den Schalter"
+ 1440 print,,"  am Messzusatz in"
+ 1450 print,,"    Stellung 'C'"
+ 1460 print,,"      bringen !"
+ 1490 goto 8110
+ 1500 print"{home}":print:print:print:print,," Widerstandsmessung"
+ 1520 b=2
+ 1530 print:print:print,," Bitte den Schalter"
+ 1540 print,,"  am Messzusatz in"
+ 1550 print,,"    Stellung 'R'"
+ 1590 goto 1460
+ 1592 :
+ 1999 rem*********************
+ 2000 rem  anzeige und menue
+ 2001 rem*********************
+ 2010 poke211,21: poke214,17: sys 58732: rem  kursorpositionierung
+ 2020 print"{wht}";w$;"{gry2}": rem aktueller wert
+ 2030 gosub 9030
+ 2998 :
+ 2999 rem*******************************
+ 3000 rem  i/o-baustein initialisieren
+ 3001 rem*******************************
+ 3010 h=0
+ 3060 if b=1 then h=5: rem fuer > 500nf
+ 3100 poke 56590,193: rem kontrollreg. a
+ 3110 poke 56591,121: rem kontrollreg. b
+ 3200 poke 56580,0:   rem timer a low
+ 3210 poke 56581,h:   rem timer a high
+ 3220 poke 56582,255: rem timer b low
+ 3230 poke 56583,255: rem timer b high
+ 3240 :
+ 3300 poke 56577,0: rem impuls ausloesen
+ 3998 :
+ 3999 rem*******************************
+ 4000 rem  warten auf flag-interrupt-bit
+ 4001 rem*******************************
+ 4040 if (peek(56589) and 16)>0 then 4090
+ 4050 gosub 9030: goto 4040: rem  menue
+ 4090 if b=2 then 7000: rem widerstdmsg.
+ 4998 :
+ 4999 rem**********************
+ 5000 rem  kapazitaetsmessung
+ 5001 rem**********************
+ 5020 w=(65535-(peek(56582)+peek(56583)*256))*1.02e-6/(.7*39000)
+ 5030 if w=0 and b=0 then b=1: goto 3000
+ 5035 if w<3e-10 and b=1 then b=0: goto 3000
+ 5050 if b=1 then 6000: rem messbereich
+ 5070 if w<1e-9 then w$=left$(str$(w*1e12)+"      ",6)+" Pikofarad ": goto 2000
+ 5080 if w<1e-6 then w$=left$(str$(w*1e9)+"       ",6)+" Nanofarad ": goto 2000
+ 6000 w=(65535-(peek(56582)+peek(56583)*256))*5*256*1.02e-6/(.7*39000)
+ 6010 w$=left$(str$(w*1e6)+"      ",6)+" Mikrofarad"
+ 6020 for i=0 to w*1e6:gosub 9030: next i
+ 6050 goto 2000
+ 6998 :
+ 6999 rem**********************
+ 7000 rem  widerstandsmessung
+ 7001 rem**********************
+ 7050 w=(65535-(peek(56582)+peek(56583)*256))*1.02e-6/(.7*220e-9)
+ 7070 w$="  "+left$(str$(int(w))+"      ",7)+" Ohm    "
+ 7100 goto2000
+ 7998 :
+ 7999 rem********************
+ 8000 rem  messwertspeicher
+ 8001 rem********************
+ 8050 get a$: if a$="" then 8050
+ 8060 if val(a$)<0 or val(a$)>9 then 8110
+ 8070 w$(val(a$))=w$
+ 8110 poke 211,0: poke 214,2: sys 58732: rem  kursorpositionierung
+ 8120 for i=0 to 9
+ 8130 : print i; w$(i): print
+ 8140 next i
+ 8210 print "Speichern  Loeschen  Widerstandsmessung"
+ 8220 print "Kapazitaetsmessung Impulsausloesen Quit"
+ 8490 goto 2000
+ 8498 :
+ 8499 rem**************************
+ 8500 rem  loeschen der speicher:
+ 8501 rem**************************
+ 8510 for i=0 to 9: w$(i)="                 ": next i
+ 8520 goto 8110
+ 8998 :
+ 9000 rem****************
+ 9010 rem   hauptmenue
+ 9020 rem****************
+ 9030 get a$
+ 9040 if a$="s" then 8000
+ 9050 if a$="l" then 8500
+ 9060 if a$="q" then print"{clr}": end
+ 9070 if a$="k" or a$="c" then 1400
+ 9080 if a$="w" or a$="r" then 1500
+ 9090 if a$="i" then 2000
+ 9095 return
+

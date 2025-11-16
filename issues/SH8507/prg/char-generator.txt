@@ -1,0 +1,43 @@
+
+
+;char-generator.prg ==0801==
+   10 data169,0,141,14,220,169,51,133,1,169,32,133,252,169,216,133,254,160,0,132
+   20 data251,132,253,162,7,177,253,145,251,200,208,249,230,254,230,252,202,16
+   30 data242,169,55,133,1,169,1,141,14,220,96
+   40 fori=828to876:reada:pokei,a:next
+   50 print"{clr}   {down}{down}char-generator v1.0 (c) mario weck
+   60 print"{down}1) gross/klein":print"{down}2) gross/grafik":print"{down}3) nichts
+   70 input"{down}uebernehmen";a
+   80 ifa=2thenpoke842,208
+   85 ifa<3thensys828
+   90 poke53272,25:print"{clr}":fori=0to127:poke55296+i,14:poke1024+i,i:next
+   91 poke214,11:print:print,,"q - setzen":print,,"w - loeschen
+   92 print,,"n - neues zeichen":print,,"r - invertieren
+   93 print,,"c = zchn loeschen":print,,"s - saven
+  100 poke55296+nr,14:input"{home}{down}{blk}{down}{down}{down}{down}{down}{down}{down}{down}nr.:";nr:poke55296+nr,0:ifnr<0ornr>127then100
+  110 poke214,10:print:print"{rvon}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}":fori=1to8:print"{rvon}{SHIFT--}{rvof}        {rvon}{SHIFT--}":next
+  120 print"{rvon}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+  130 forj=8192+nr*8toj+7:zw=128:fori=0to7
+  140 ifpeek(j)andzwthenpoke1505+40*(jand7)+i,160
+  150 zw=zw/2:nexti,j
+  160 ko=1505+40*y+x:p=peek(ko):pokeko,42:by=8192+nr*8+y:pokeko,p
+  170 geta$:ifa$=""then160
+  180 ifa$="{rght}"thenx=(x+1)and7
+  190 ifa$="{left}"thenx=(x-1)and7
+  200 ifa$="{up}"theny=(y-1)and7
+  210 ifa$="{down}"theny=(y+1)and7
+  220 ifa$="n"then100
+  230 ifa$="q"thenpokeko,160:pokeby,peek(by)or2^(7-x)
+  240 ifa$="w"thenpokeko,32:pokeby,peek(by)andnot2^(7-x)
+  250 ifa$="c"thenfori=byand16376toi+7:pokei,0:next:goto110
+  260 ifa$="r"thenfori=byand16376toi+7:pokei,255-peek(i):next:goto110
+  270 ifa$="s"theninput"{down}sicher";b$:ifb$<>"j"then100
+  280 ifa$="s"then400
+  299 goto160
+  400 input"{lblu}{clr}{down}{rght}name";a$
+  405 fori=0to1023:poke9216+i,255-peek(8192+i):next
+  410 print"{clr}save"+chr$(34)+a$+chr$(34)+",8
+  420 print"{down}{down}{down}{down}{down}{rvon} nach saven bitte 'reset' ! "
+  430 poke198,2:poke631,19:poke632,13
+  440 poke43,0:poke44,32:poke45,0:poke46,40
+

@@ -1,0 +1,487 @@
+
+
+;wahlhochrechnung.prg ==0801==
+   10 rem ********************************
+   15 rem *                              *
+   20 rem *       wahlhochrechnung       *
+   25 rem *                              *
+   30 rem *  fuer c-64/floppy/(drucker)  *
+   35 rem *                              *
+   40 rem *  b. fiethe tel.0533173648    *
+   45 rem *                              *
+   50 rem ********************************
+   60 rem --- steuerzeichen ---
+   61 rem "{down}" = crsr down
+   62 rem "{up}" = crsr up
+   63 rem "{left}" = crsr left
+   64 rem "{clr}" = clr
+   65 rem "{home}" = home
+   66 rem "{rvon}" = rvs on
+   67 rem "{rvof}" = rvs off
+   68 rem "{wht}" = ctrl 2
+   69 rem "{red}" = ctrl 3
+   70 rem "{grn}" = ctrl 6
+   71 rem "{blu}" = ctrl 7
+   72 rem "{orng}" = c= 1
+   73 rem "{gry1}" = c= 4
+   74 rem ---------------------
+  100 rem --- grafikerweiterung laden ---
+  110 ifa=0thena=1:load"grafik-e/ms",8,1
+  120 rem --- druckerspezifisches programm        im bereich $c700-$cb00
+  130 rem zum ausdruck des hrg-bildschirms        wird geladen ---
+  140 ifa=1thena=2:load"dcopy",8,1
+  150 sys49152:rem --- erweiterung starten
+  160 dimas$(50),as(50),cd(50),cd$(50),sp(50),sp$(50),gr(50),gr$(50),an(50)
+  170 diman$(50),ze$(50),su(50),sd(50),sf(50),sa(50),se(50),fd$(50),fd(50)
+  180 i=0:open15,8,15
+  190 poke53280,0:poke53281,0:print"{clr}{orng}   w a h l h o c h r e c h n u n g"
+  200 print"   ==============================="
+  210 print:print"{red}{rvon}bedienungsanleitung:{rvof}"
+  220 print:print"{red}-auswertung: {gry1}abgespeicherte hochrechnun-";
+  230 print"   gen koennen wieder eingelesen werden.";
+  240 print"{red}-eingabe der alten wahlergebnisse."
+  250 print"-auswahl und uhrzeit: {orng}"
+  260 print"   <h>={gry1}eingabe einer hochrechnung"
+  270 print"       (auch stelle nach . ausfuellen!)
+  280 print"       (wenn sitzverteilung nich eigege-";
+  290 print"       ben wird, errechnet computer sie)";
+  300 print"{orng}   <e>={gry1}eingabe des endergebnisses"
+  310 print"        (danach werden alle eingegebenen"
+  320 print"{up}         werte abgespeichert!)
+  330 print"        (wenn noch nicht vorliegt, bei"
+  340 print"         cdu 0.0 % eingeben)
+  350 print"{orng}   <g>={gry1}auswaehlen aus eingegebenen"
+  360 print"       hochrechnungen."
+  370 print"       (immer zweistellige zahl eingeben";
+  380 print"        z.b. 01)"
+  390 print"{red}-computerhochrechnungen: {gry1}nach jeder"
+  400 print"   eingabe errechnet computer mittelwert";
+  410 print"{blu}                  {rvon}taste{up}{up}{rvof}"
+  420 poke198,0:wait198,1
+  430 print"{clr}{red}":poke198,0
+  440 close1:input"{down}{down}{down}{down}{down}{down}  auswertung (j/n) ";gg$
+  450 ifgg$="n"then740
+  460 print"{clr}":ifdg=0thengosub4330
+  470 print:print"welche hochrechnung ?"
+  480 print:print:print" 00)             altes ergebnis"
+  490 forg=1toi:g$=str$(g):ifg<10theng$=" 0"+right$(g$,1)
+  500 print"{down}{gry1}"g$") "ze$(g)"    "as(g)"{left}.   "as$(g)
+  510 ifg/10=int(g/10)thenpoke198,0:wait198,1:getg$(1):ifg$(1)<>" "thenwait198,1:getg$(2):goto540
+  520 nextg
+  530 poke198,0:wait198,2:getg$(1),g$(2)
+  540 tt=i:i=val(g$(1)+g$(2))
+  550 ze$=ze$(i):as=as(i):as$=as$(i):ho$=str$(as)+". hochrechnung"
+  560 ifi=0thenho$="altes ergebnis"
+  570 ifcd$(i)="*"theni=i-1:goto3280
+  580 print"{clr}"
+  590 print"{down}{down}{down}{down}      grafiken:"
+  600 print:print:print"     {rvon}f1{rvof} = sitze"
+  610 print:print"     {rvon}f3{rvof} = gewinn/verlust"
+  620 print:print"     {rvon}f5{rvof} = prozent"
+  630 print:print"     {rvon}f7{rvof} = weiter"
+  640 print:print"     {rvon}f8{rvof} = ende"
+  650 getin$:ifin$=""then650
+  660 ifin$=chr$(140)thenifgg$="j"then:_e:close15:end
+  670 ifin$=chr$(133)thengosub1540
+  680 ifin$=chr$(134)thengosub2030
+  690 ifin$=chr$(135)thengosub2630
+  700 ifin$=chr$(136)then720
+  710 goto580
+  720 i=tt:ifgg$="j"then460
+  730 goto1090
+  740 input"{clr}{down}{down}{down}{down}{down}{down}     wahlname (<16):";wa$:iflen(wa$)>15then740
+  750 print"{clr}{down}{down}{down}{down}{down}{gry1}"
+  760 print"momentane uhrzeit eingeben (hhmmss):":print
+  770 inputa$:iflen(a$)<>6then750
+  780 c=56328
+  790 pokec+7,peek(c+7)and127
+  800 pokec+6,peek(c+6)or128
+  810 h=val(left$(a$,2))
+  820 m=val(mid$(a$,3,2))
+  830 s=val(right$(a$,2))
+  840 ifh>23then750
+  850 ifh=12then870
+  860 ifh>11thenh=h+68
+  870 pokec+3,16*int(h/10)+h-int(h/10)*10
+  880 ifm>59then750
+  890 pokec+2,16*int(m/10)+m-int(m/10)*10
+  900 ifs>59then750
+  910 pokec+1,16*int(s/10)+s-int(s/10)*10
+  920 pokec,0
+  930 input"{down}{down}   jahr eingeben:  19  {left}{left}{left}{left}{left}{left}";ja$:ja$=right$(ja$,2)
+  940 print"{clr}"
+  950 rem --- altes ergebnis ---
+  960 ei=1:gosub 3070
+  970 print"{red}{down}{down}{down}{down}{down}   letztes wahlergebnis"
+  980 print:print:print"   "wa$
+  990 input"{orng}{down}{down}   von (jahr):  19  {left}{left}{left}{left}{left}{left}";da$:da$=right$(da$,2)
+ 1000 ze$(0)=da$:as(0)=0:as$(0)="alt"
+ 1010 print:input"{blu}  cdu=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";cd$(0):cd(0)=val(cd$(0))
+ 1020 print:input"{red}  spd=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";sp$(0):sp(0)=val(sp$(0))
+ 1030 print:input"{orng}  fdp=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";fd$(0):fd(0)=val(fd$(0))
+ 1040 input"{down}{grn}  gruene=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";gr$(0):gr(0)=val(gr$(0))
+ 1050 input"{down}{wht}  andere=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";an$(0):an(0)=val(an$(0))
+ 1060 bf=cd(0)+sp(0)+fd(0)+gr(0)+an(0):ifbf<99orbf>101then950
+ 1070 print:print:input"{red}  alte sitzverteilung (j/n)";sv$:ifsv$="j"thengosub3680
+ 1080 rem --- eingabe hochrechnung ---
+ 1090 gosub3070
+ 1100 ifg$="e"then3280
+ 1110 i=i+1:print"{clr}{red}":dg=1
+ 1120 print"{down}{down}{down}{down}{down}{down}     {rvon}f1{rvof} = ard"
+ 1130 print:print"     {rvon}f3{rvof} = zdf"
+ 1140 getin$:ifin$=""then1140
+ 1150 ifin$=chr$(134)thenas$="zdf":as=zd+1:zd=as:goto1180
+ 1160 ifin$=chr$(133)thenas$="ard":as=ar+1:ar=as:goto1180
+ 1170 goto1140
+ 1180 ho$=str$(as)+". hochrechnung"
+ 1190 print"{clr}{down}{down}   "ho$"   "as$
+ 1200 print:print"   "wa$
+ 1210 print:print"    {gry1}"ze$
+ 1220 input"{down}{down}{blu}  cdu=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";cd$(i):cd(i)=val(cd$(i))
+ 1230 print:input"{red}  spd=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";sp$(i):sp(i)=val(sp$(i))
+ 1240 print:input"{orng}  fdp=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";fd$(i):fd(i)=val(fd$(i))
+ 1250 input"{down}{grn}  gruene=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";gr$(i):gr(i)=val(gr$(i))
+ 1260 input"{down}{wht}  andere=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";an$(i):an(i)=val(an$(i))
+ 1270 print:print:input"{red}   sitzverteilung eingeben (j/n)";g$
+ 1280 ifg$="j"thengosub1430:goto1300
+ 1290 gosub3800
+ 1300 as(i)=as:as$(i)=as$:ze$(i)=ze$:gosub4070
+ 1310 print"{clr}{down}{down}{down}{down}   {red}grafiken"
+ 1320 print:print:print"   {rvon}f1{rvof} = sitze"
+ 1330 print:print"   {rvon}f3{rvof} = gewinn/verlust"
+ 1340 print:print"   {rvon}f5{rvof} = prozent"
+ 1350 print:print"   {rvon}f7{rvof} = weiter"
+ 1360 getin$:ifin$=""then1360
+ 1370 in=asc(in$)-132:ifin<1orin>4then1360
+ 1380 oningosub1530,2020,2620,1400
+ 1390 goto1310
+ 1400 ifcd(i+1)>0theni=i+1
+ 1410 goto1090
+ 1420 rem --- eingabe sitze ---
+ 1430 print"{clr}"
+ 1440 print:print:print"   "ho$"   "as$
+ 1450 print:print"   "wa$
+ 1460 print:print:print"   {red}s i t z e"
+ 1470 print:print:input"{blu}  cdu:";su(i)
+ 1480 print:input"{red}  spd:";sd(i)
+ 1490 print:input"{orng}  fdp:";sf(i)
+ 1500 print:input"{grn}  gruene:";se(i)
+ 1510 print:input"{wht}  andere:";sa(i)
+ 1520 return
+ 1530 rem --- grafik sitze ---
+ 1540 ifsg=0then2000
+ 1550 _g0:_c
+ 1560 _p270,2,2,2;15left$(as$,3)
+ 1570 _p100,3ho$:_p110,12wa$
+ 1580 _p1,48ja$
+ 1590 _p1,59"s"
+ 1600 _p1,67"i"
+ 1610 _p1,75"t"
+ 1620 _p1,83"z"
+ 1630 _p1,91"e"
+ 1640 fort=184to186:_l20,tto320,t:nextt:_p1,181" 0"
+ 1650 _l23,105to320,105:_p1,101right$(str$(int(sg/2)),3)
+ 1660 _p22,30,2,2;6"cdu"
+ 1670 _p21,48cd$(i)
+ 1680 sq=160/sg
+ 1690 fort=185to185-int(sq*su(i))step-1:_l25,tto55,t:nextt
+ 1700 _p22,60str$(su(i))
+ 1710 su$=left$(str$(su(i)-su(0)),3):ifval(su$)>0thensu$="+"+mid$(su$,2,2)
+ 1720 _p22,70su$
+ 1730 _p5,2,1,2;2ze$(i)
+ 1740 _p80,30,2,2"spd"
+ 1750 _p80,48sp$(i)
+ 1760 fort=185to185-int(sq*sd(i))step-1:_l80,tto110,t:nextt
+ 1770 _p80,60str$(sd(i))
+ 1780 sd$=left$(str$(sd(i)-sd(0)),3):ifval(sd$)>0thensd$="+"+mid$(sd$,2,2)
+ 1790 _p80,70sd$
+ 1800 _p140,30,2,2;8"fdp"
+ 1810 _p144,48fd$(i)
+ 1820 fort=185to185-int(sq*sf(i))step-1:_l140,tto170,t:nextt
+ 1830 _p144,60str$(sf(i))
+ 1840 sf$=left$(str$(sf(i)-sf(0)),3):ifval(sf$)>0thensf$="+"+mid$(sf$,2,2)
+ 1850 _p144,70sf$
+ 1860 _p200,30,1,2;5"gruene"
+ 1870 _p206,48gr$(i)
+ 1880 fort=185to185-int(sq*se(i))step-1:_l200,tto230,t:nextt
+ 1890 _p206,60str$(se(i))
+ 1900 se$=left$(str$(se(i)-se(0)),3):ifval(se$)>0thense$="+"+mid$(se$,2,2)
+ 1910 _p206,70se$
+ 1920 _p266,30,1,2;1"andere"
+ 1930 _p272,48an$(i)
+ 1940 fort=185to185-int(sq*sa(i))step-1:_l266,tto296,t:nextt
+ 1950 _p272,60str$(sa(i))
+ 1960 sa$=left$(str$(sa(i)-sa(0)),3):ifval(sa$)>0thensa$="+"+mid$(sa$,2,2)
+ 1970 _p272,70sa$
+ 1980 _p10,192;15"weiter mit taste (a=ausdruck)"
+ 1990 geta$:ifa$=""then1990
+ 2000 ifa$="a"thengosub4650:goto1990
+ 2010 _t:return
+ 2020 rem --- grafik gewinn/verlust ---
+ 2030 _g0:_c
+ 2040 _p270,2,2,2;15left$(as$,3)
+ 2050 _p100,3ho$:_p110,12wa$
+ 2060 _p1,48da$
+ 2070 _p1,60ja$
+ 2080 fort=149to151:_l10,tto320,t:nextt
+ 2090 _p10,75"gewinn + verlust (%punkte)"
+ 2100 _p21,48;14cd$(0)
+ 2110 _p22,30,2,2;6"cdu"
+ 2120 _p21,60cd$(i)
+ 2130 vv=0:vc=cd(i)-cd(0):vs=sp(i)-sp(0):vf=fd(i)-fd(0)
+ 2140 vg=gr(i)-gr(0):va=an(i)-an(0):vv=abs(vc)
+ 2150 ifabs(vs)>vvthenvv=abs(vs)
+ 2160 ifabs(vf)>vvthenvv=abs(vf)
+ 2170 ifabs(vg)>vvthenvv=abs(vg)
+ 2180 ifabs(va)>vvthenvv=abs(va)
+ 2190 ifvv<>0thenvv=35/vv
+ 2200 cc=-1:ifvc<0thencc=1
+ 2210 fort=150to150-int(vv*vc)stepcc:_l24,tto55,t:nextt
+ 2220 vc$=left$(str$(vc),4):ifvc<1andvc>-1thenvc$=left$(vc$,1)+"0"+mid$(vc$,2,2)
+ 2230 ifvc>0thenvc$="+"+right$(vc$,3)
+ 2240 _p25,90vc$
+ 2250 _p80,48;10sp$(0)
+ 2260 _p5,2,1,2;2ze$(i)
+ 2270 _p80,30,2,2"spd"
+ 2280 _p80,60sp$(i)
+ 2290 cc=-1:ifvs<0thencc=1
+ 2300 fort=150to150-int(vv*vs)stepcc:_l88,tto119,t:nextt
+ 2310 vs$=left$(str$(vs),4):ifvs<1andvs>-1thenvs$=left$(vs$,1)+"0"+mid$(vs$,2,2)
+ 2320 ifvs>0thenvs$="+"+right$(vs$,3)
+ 2330 _p85,90vs$
+ 2340 _p144,48;7fd$(0)
+ 2350 _p140,30,2,2;8"fdp"
+ 2360 _p144,60fd$(i)
+ 2370 cc=-1:ifvf<0thencc=1
+ 2380 fort=150to150-int(vv*vf)stepcc:_l145,tto175,t:nextt
+ 2390 vf$=left$(str$(vf),4):ifvf<1andvf>-1thenvf$=left$(vf$,1)+"0"+mid$(vf$,2,2)
+ 2400 ifvf>0thenvf$="+"+right$(vf$,3)
+ 2410 _p145,90vf$
+ 2420 _p206,48;13gr$(0)
+ 2430 _p200,30,1,2;5"gruene"
+ 2440 _p206,60gr$(i)
+ 2450 cc=-1:ifvg<0thencc=1
+ 2460 fort=150to150-int(vv*vg)stepcc:_l208,tto238,t:nextt
+ 2470 vg$=left$(str$(vg),4):ifvg<1andvg>-1thenvg$=left$(vg$,1)+"0"+mid$(vg$,2,2)
+ 2480 ifvg>0thenvg$="+"+right$(vg$,3)
+ 2490 _p205,90vg$
+ 2500 _p272,48;12an$(0)
+ 2510 _p266,30,1,2;1"andere"
+ 2520 _p272,60an$(i)
+ 2530 cc=-1:ifva<0thencc=1
+ 2540 fort=150to150-int(vv*va)stepcc:_l272,tto302,t:nextt
+ 2550 va$=left$(str$(va),4):ifva<1andva>-1thenva$=left$(va$,1)+"0"+mid$(va$,2,2)
+ 2560 ifva>0thenva$="+"+right$(va$,3)
+ 2570 _p275,90va$
+ 2580 _p10,192;15"weiter mit taste (a=ausdruck)"
+ 2590 geta$:ifa$=""then2590
+ 2600 ifa$="a"thengosub4650:goto2590
+ 2610 _t:return
+ 2620 rem --- grafik prozent ---
+ 2630 _g0:_c
+ 2640 fort=183to185:_l10,tto320,t;15:nextt
+ 2650 _p270,2,2,2left$(as$,3)
+ 2660 _p100,3ho$:_p110,12wa$
+ 2670 _p1,171" 5"
+ 2680 _p1,81"50"
+ 2690 _p1,91"45"
+ 2700 _p1,101"40"
+ 2710 _p1,48da$
+ 2720 _p1,60ja$
+ 2730 _l20,105to320,105
+ 2740 _l20,95to320,95
+ 2750 _l20,85to320,85
+ 2760 _l20,175to320,175
+ 2770 _p21,48;14cd$(0)
+ 2780 fort=185to(185-2*cd(0))step-1:_l17,tto37,t:nextt
+ 2790 _p22,30,2,2;6"cdu"
+ 2800 _p21,60cd$(i)
+ 2810 fort=185to(185-2*cd(i))step-1:_l40,tto60,t:nextt
+ 2820 _p80,48;10sp$(0)
+ 2830 fort=185to(185-2*sp(0))step-1:_l76,tto95,t:nextt
+ 2840 _p5,2,1,2;2ze$(i)
+ 2850 _p80,30,2,2"spd"
+ 2860 _p80,60sp$(i)
+ 2870 fort=185to(185-2*sp(i))step-1:_l99,tto119,t:nextt
+ 2880 _p144,48;7fd$(0)
+ 2890 fort=185to(185-2*fd(0))step-1:_l137,tto157,t:nextt
+ 2900 _p140,30,2,2;8"fdp"
+ 2910 _p144,60fd$(i)
+ 2920 fort=185to(185-2*fd(i))step-1:_l162,tto182,t:nextt
+ 2930 _p206,48;13gr$(0)
+ 2940 fort=185to(185-2*gr(0))step-1:_l200,tto220,t:nextt
+ 2950 _p200,30,1,2;5"gruene"
+ 2960 _p206,60gr$(i)
+ 2970 fort=185to(185-2*gr(i))step-1:_l225,tto245,t:nextt
+ 2980 _p272,48;12an$(0)
+ 2990 fort=185to(185-2*an(0))step-1:_l266,tto286,t:nextt
+ 3000 _p266,30,1,2;1"andere"
+ 3010 _p272,60an$(i)
+ 3020 fort=185to(185-2*an(i))step-1:_l290,tto310,t:nextt
+ 3030 _p10,192;15"weiter mit taste (a=ausdruck)"
+ 3040 geta$:ifa$=""then3040
+ 3050 ifa$="a"thengosub4650:goto3040
+ 3060 _t:return
+ 3070 rem --- zeit ---
+ 3080 print"{clr}"
+ 3090 h=peek(c+3):m=peek(c+2):s=peek(c+1):t=peek(c)
+ 3100 hh=1:ifh>32thenh=h-128:hh=0
+ 3110 h=int(h/16)*10+h-int(h/16)*16:onhhgoto3140
+ 3120 ifh=12then3150
+ 3130 h=h+12
+ 3140 ifh=12thenh=0
+ 3150 m=int(m/16)*10+m-int(m/16)*16
+ 3160 s=int(s/16)*10+s-int(s/16)*16
+ 3170 h$=str$(h):iflen(h$)=2thenh$=" 0"+right$(h$,1)
+ 3180 m$=str$(m):iflen(m$)=2thenm$=" 0"+right$(m$,1)
+ 3190 s$=str$(s):iflen(s$)=2thens$=" 0"+right$(s$,1)
+ 3200 ze$=right$(h$,2)+"."+right$(m$,2)+"."+right$(s$,2)
+ 3210 print"{gry1}{home}{down}{down}{down}   "ze$
+ 3220 ifei=1thenei=0:return
+ 3230 print:print:print"   {orng}hochrechnung (h) / endergebnis (e) ?"
+ 3240 print:print"              grafiken (g)"
+ 3250 getg$:ifg$="h"org$="e"thenei=1
+ 3260 ifg$="g"thendg=1:goto460
+ 3270 goto3090
+ 3280 rem --- endergebnis ---
+ 3290 print"{clr}":i=i+1
+ 3300 print:print:print"   {red}endergebnis"
+ 3310 input"{down}{down}{blu}  cdu:   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";cd$(i):cd(i)=val(cd$(i))
+ 3320 ifcd(i)=0thencd$(i)="*":goto3440
+ 3330 print:input"{red}  spd=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";sp$(i):sp(i)=val(sp$(i))
+ 3340 print:input"{orng}  fdp=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";fd$(i):fd(i)=val(fd$(i))
+ 3350 input"{down}{grn}  gruene=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";gr$(i):gr(i)=val(gr$(i))
+ 3360 input"{down}{wht}  andere=   0.0 %{left}{left}{left}{left}{left}{left}{left}{left}";an$(i):an(i)=val(an$(i))
+ 3370 print"{clr}"
+ 3380 print:print:print"   {red}s i t z e"
+ 3390 print:print:input"{blu}  cdu:";su(i)
+ 3400 print:input"{red}  spd:";sd(i)
+ 3410 print:input"{orng}  fdp:";sf(i)
+ 3420 print:input"{grn}  gruene:";se(i)
+ 3430 print:input"{wht}  andere:";sa(i)
+ 3440 as$(i)="endergebnis":ze$(i)=ze$:as(i)=0
+ 3450 _f3450:print:print:print"{red}   diskette einlegen!":close1
+ 3460 print:input"   ";a$
+ 3470 open1,8,2,"@:wahl "+wa$+",s,w"
+ 3480 input#15,fe,fe$:iffe=0then3530
+ 3490 iffe=26thenprint:print"diskette geschuetzt!":goto3450
+ 3500 iffe=72thenprint:print"diskette voll!":goto3450
+ 3510 iffe=74thenprint:print"keine diskette eingelegt!":goto3450
+ 3520 print:print"  fehler"fe": "fe$:goto3450
+ 3530 print#1,wa$:print#1,i
+ 3540 print#1,da$:print#1,ja$:print#1,sg
+ 3550 forg=0toi
+ 3560 print#1,cd$(g):ifcd$(g)="*"then3620
+ 3570 print#1,cd(g):print#1,sp$(g):print#1,sp(g)
+ 3580 print#1,fd$(g):print#1,fd(g)
+ 3590 print#1,gr$(g):print#1,gr(g)
+ 3600 print#1,an$(g):print#1,an(g)
+ 3610 print#1,su(g):print#1,sd(g):print#1,sf(g):print#1,se(g):print#1,sa(g)
+ 3620 print#1,as(g):print#1,as$(g)
+ 3630 print#1,ze$(g):ifcd$(g)="*"then3650
+ 3640 nextg
+ 3650 close1
+ 3660 print"{clr}{down}{down}{down}{down}  {red}f e r t i g!"
+ 3670 forg=1to1000:next:goto460
+ 3680 print"{clr}":rem --- sitze alt ---
+ 3690 ei=1:gosub3070
+ 3700 print:print:print"   {red}letztes wahlergebnis"
+ 3710 print:print:print"   "wa$
+ 3720 print:print:print"   {red}s i t z e"
+ 3730 print:print:input"{blu}  cdu:";su(0)
+ 3740 print:input"{red}  spd:";sd(0)
+ 3750 print:input"{orng}  fdp:";sf(0)
+ 3760 print:input"{grn}  gruene:";se(0)
+ 3770 print:input"{wht}  andere:";sa(0)
+ 3780 print:input"{gry1}  gesamtsitze:";sg
+ 3790 return
+ 3800 rem --- sitze ausrechnen ---
+ 3810 hu=cd(i):hd=sp(i):hf=fd(i):he=gr(i):ha=an(i)
+ 3820 ifhu<5thenhu=0
+ 3830 ifhd<5thenhd=0
+ 3840 ifhf<5thenhf=0
+ 3850 ifhe<5thenhe=0
+ 3860 ifha<5thenha=0
+ 3870 hg=hu+hd+hf+he+ha
+ 3880 sm=100/hg
+ 3890 hu=hu*sm:hd=hd*sm:hf=hf*sm:he=he*sm:ha=ha*sm
+ 3900 sm=sg/100
+ 3910 su(i)=hu*sm:sd(i)=hd*sm:sf(i)=hf*sm:se(i)=he*sm:sa(i)=ha*sm
+ 3920 sz=int(sg-int(su(i))-int(sd(i))-int(sf(i))-int(se(i))-int(sa(i))):sw=0
+ 3930 ifsz=0thensu(i)=int(su(i)):sd(i)=int(sd(i)):sf(i)=int(sf(i))
+ 3940 ifsz=0thense(i)=int(se(i)):sa(i)=int(sa(i)):return
+ 3950 hu=int(su(i))-su(i):ifhu<swthent=1:sw=hu
+ 3960 hd=int(sd(i))-sd(i):ifhd<swthent=2:sw=hd
+ 3970 hf=int(sf(i))-sf(i):ifhf<swthent=3:sw=hf
+ 3980 he=int(se(i))-se(i):ifhe<swthent=4:sw=he
+ 3990 ha=int(sa(i))-sa(i):ifha<swthent=5:sw=ha
+ 4000 ontgosub4020,4030,4040,4050,4060
+ 4010 sz=sz-1:sw=0:goto3930
+ 4020 su(i)=int(su(i)+1):return
+ 4030 sd(i)=int(sd(i)+1):return
+ 4040 sf(i)=int(sf(i)+1):return
+ 4050 se(i)=int(se(i)+1):return
+ 4060 sa(i)=int(sa(i)+1):return
+ 4070 rem --- computer hochrechnung ---
+ 4080 ifi=1thenreturn
+ 4090 ei=1:gosub3070
+ 4100 co=co+1:i=i+1:as(i)=co:as$(i)="computer":ze$(i)=ze$
+ 4110 cd(i)=(cd(i-1)+cd(i-2))/2
+ 4120 ifcd(i)=int(cd(i))thencd$(i)=str$(cd(i))+".0 %":goto4140
+ 4130 cd$(i)=str$(int(cd(i)))+mid$(str$(cd(i)-int(cd(i))),2,2)+" %"
+ 4140 cd(i)=val(cd$(i)):cd$(i)=right$(cd$(i),len(cd$(i))-1)
+ 4150 sp(i)=(sp(i-1)+sp(i-2))/2
+ 4160 ifsp(i)=int(sp(i))thensp$(i)=str$(sp(i))+".0 %":goto4180
+ 4170 sp$(i)=str$(int(sp(i)))+mid$(str$(sp(i)-int(sp(i))),2,2)+" %"
+ 4180 sp(i)=val(sp$(i)):sp$(i)=right$(sp$(i),len(sp$(i))-1)
+ 4190 fd(i)=(fd(i-1)+fd(i-2))/2
+ 4200 iffd(i)=int(fd(i))thenfd$(i)=str$(fd(i))+".0 %":goto4220
+ 4210 fd$(i)=str$(int(fd(i)))+mid$(str$(fd(i)-int(fd(i))),2,2)+" %"
+ 4220 fd(i)=val(fd$(i)):fd$(i)=right$(fd$(i),len(fd$(i))-1)
+ 4230 gr(i)=(gr(i-1)+gr(i-2))/2
+ 4240 ifgr(i)=int(gr(i))thengr$(i)=str$(gr(i))+".0 %":goto4260
+ 4250 gr$(i)=str$(int(gr(i)))+mid$(str$(gr(i)-int(gr(i))),2,2)+" %"
+ 4260 gr(i)=val(gr$(i)):gr$(i)=right$(gr$(i),len(gr$(i))-1)
+ 4270 an(i)=(an(i-1)+an(i-2))/2
+ 4280 ifan(i)=int(an(i))thenan$(i)=str$(an(i))+".0 %":goto4300
+ 4290 an$(i)=str$(int(an(i)))+mid$(str$(an(i)-int(an(i))),2,2)+" %"
+ 4300 an(i)=val(an$(i)):an$(i)=right$(an$(i),len(an$(i))-1)
+ 4310 gosub3800:i=i-1:return
+ 4320 rem --- datei einlesen ---
+ 4330 _f4305
+ 4340 close1:input"{home}{down}{down}wahlname (0=katalog):";wa$:print:print:ifwa$="0"thengosub4530:goto4340
+ 4350 print"{clr}"
+ 4360 open1,8,2,"wahl "+wa$+",s,r"
+ 4370 input#15,fe,fe$
+ 4380 iffe=0then4420
+ 4390 iffe=62thenprint:print"  nicht vorhanden!":goto4340
+ 4400 iffe=74thenprint:print"keine diskette eingelegt!":goto4340
+ 4410 print:print" fehler"fe": "fe$:goto4340
+ 4420 input#1,wa$,i,da$,ja$,sg
+ 4430 forg=0toi
+ 4440 input#1,cd$(g):ifcd$(g)="*"then4470
+ 4450 input#1,cd(g),sp$(g),sp(g),fd$(g),fd(g),gr$(g),gr(g),an$(g),an(g)
+ 4460 input#1,su(g),sd(g),sf(g),se(g),sa(g)
+ 4470 input#1,as(g),as$(g)
+ 4480 input#1,ze$(g):ifcd$(g)="*"then4500
+ 4490 nextg
+ 4500 close1
+ 4510 dg=1:return
+ 4520 rem --- directory ---
+ 4530 open1,8,4,"#":nt=18:ns=1
+ 4540 print#15,"b-r:";4;0;nt;ns:print#15,"b-p:";4;0
+ 4550 get#1,nt$,ns$:ifnt$=""then4570
+ 4560 nt=asc(nt$):ns=asc(ns$)
+ 4570 fort=0to7:print#15,"b-p:"4;t*32+2:get#1,ft$:ifft$=""andnt$=""thenclose1:return
+ 4580 ifft$=""thennextt:goto4540
+ 4590 ifasc(ft$)<>129thennextt:goto4540
+ 4600 get#1,a$,a$
+ 4610 a$="":fortt=3to18:get#1,b$:a$=a$+b$:nexttt
+ 4620 ifleft$(a$,5)<>"wahl "thennextt:goto4540
+ 4630 print"  "right$(a$,11)
+ 4640 nextt:goto4540
+ 4650 rem --- bildschirmausdruck ---
+ 4660 _f4610:_t:input"{clr}{down}{down}   tabulator:";ta
+ 4670 sys50944,ta,14:rem --- druckroutine     wird gestartet ---
+ 4680 _g0:return
+

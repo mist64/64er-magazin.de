@@ -1,0 +1,687 @@
+
+
+;aktienmanager.prg ==0801==
+   10 rem ********************************
+   20 rem *                              *
+   30 rem *     aktienkurs-programm      *
+   40 rem *                              *
+   50 rem *  fuer c-64/floppy/(drucker)  *
+   60 rem *                              *
+   70 rem *   (c) 1984/85 by b. fiethe   *
+   80 rem *                              *
+   85 rem ********************************
+   88 rem --- steuerzeichen ---
+   89 rem "{down}" = crsr down
+   90 rem "{up}" = crsr up
+   91 rem "{rght}" = crsr right
+   92 rem "{left}" = crsr left
+   93 rem "{clr}" = clr
+   94 rem "{home}" = home
+   95 rem "{rvon}" = rvs on
+   96 rem "{rvof}" = rvs off
+   97 rem "{red}" = ctrl 3
+   98 rem "{gry1}" = c= 4
+   99 rem ---------------------
+  100 rem --- druckerspezifische routine              im bereich $c700-$cb00
+  110 rem zum ausdruck des hgr-bildschirms        wird geladen ---
+  120 ifwq=0thenwq=1:load"dcopy",8,1
+  130 rem --- grafik-erweiterung laden ---
+  140 ifwq=1thenwq=2:load"grafik-e/ms",8,1
+  150 sys49152:rem --- erweiterung starten
+  155 _f4860:rem --- fehlerbehandlung ein
+  160 open15,8,15:fori=1to32:cr$=cr$+"{rght}":nexti:fi$=".00"
+  170 dimu(500),k(500),ta$(30),mo$(30),ja$(30)
+  180 close2:poke53280,15:poke53281,15:e8=0:et$="":print"{clr}"
+  190 print"{home}{gry1}":print:print:print"firmenkuerzel (max.3/0=katalog):  "ka$
+  200 print"{up}"cr$;:inputka$:iflen(ka$)>3then190
+  210 ifka$="0"thenprint:print:gosub6590:goto190
+  220 print"{clr}{down}{red}      k u r s - p r o g r a m m"
+  230 print:print:print"{gry1}              hauptmenue"
+  240 print"========================================"
+  250 print:print:print"    {rvon}f 1{rvof} = kurse eingeben/aendern"
+  260 print:print"    {rvon}f 3{rvof} = taegl. uebersicht"
+  270 print:print"    {rvon}f 5{rvof} = uebersicht"
+  280 print:print"    {rvon}f 7{rvof} = progr.-ende"
+  290 gosub4470
+  300 iff>1andf<4and(ae=1orje=0)thengosub5190
+  310 onfgoto330,900,2180,4450
+  320 goto180
+  330 print"{clr}{down}{down}  eingabe/aenderung":print"======================================="
+  340 print:print:print"    {rvon}f 1{rvof} = neue kurse eingeben"
+  350 print:print"    {rvon}f 3{rvof} = kurse nachtraeglich aendern"
+  360 print:print"    {rvon}f 5{rvof} = kurse einfuegen"
+  370 print:print"    {rvon}f 7{rvof} = datei ueberspielen"
+  380 print:print"    {rvon}f 6{rvof} = hauptmenue"
+  390 gosub 4470:if f<>1and(ae=1orje=0)thengosub5190
+  400 on f goto 420,5630,5820,6030,180,330
+  410 goto 330
+  420 e=0:print"{clr}{down}{down}{red}             kurse eingeben"
+  430 print"========================================"
+  440 print:print:input"{gry1}  tag:";ta$:print:input"  monat:";mo$:print:input"  jahr:";ja$
+  450 iflen(ta$)<>2orlen(mo$)<>2orlen(ja$)<>2then440
+  460 mo=val(mo$):ja=val(ja$):mo$(1)=str$(mo):ja$(1)=str$(ja)
+  470 ife=1then580
+  480 print:print:input"  kurs frankfurt: dm";kf
+  490 print:input"umsatz ''       : stueck";uf
+  500 ife=2then580
+  510 input"{up}{up}{up}  {rght}{rght}{rght}{rght} hannover {rght}{rght}{rght}{rght}";kh
+  520 print:printleft$(cr$,24);:inputuh:ife=3then580
+  530 input"{up}{up}{up}  {rght}{rght}{rght}{rght} hamburg  {rght}{rght}{rght}{rght}";kb
+  540 print:printleft$(cr$,24);:inputub:ife=4then580
+  550 input"{up}{up}{up}  {rght}{rght}{rght}{rght} duesseld.{rght}{rght}{rght}{rght}";kd
+  560 print:printleft$(cr$,24);:inputud:ife=5then580
+  570 print:print:input"  commerzbank index:";ci
+  580 ifae=5thengosub710:return
+  590 ae=3:gosub710:ae=1:goto6380
+  600 open2,8,2,ka$+"-aktie"+mo$(1)+ja$(1)+",s,a":gosub4960
+  610 print#2,ta$:print#2,mo$:print#2,ja$:print#2,kf:print#2,uf:print#2,kh
+  620 print#2,uh:print#2,kb:print#2,ub:print#2,kd:print#2,ud:print#2,ci
+  630 close2:open2,8,2,"@:"+ka$+"-aktie,s,w":print#2,me:print#2,je:print#2,mo$(1)
+  640 print#2,ja$(1):print#2,na$:close2:goto670
+  650 print:print"diskette voll!  bitte neue disk einlegen":inputf$
+  660 goto600
+  670 open2,8,2,ka$+"-aktie"+mo$(1)+ja$(1)+",s,r"
+  680 input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci
+  690 ifst<>64then680
+  700 close2
+  710 print"{clr}{down}{down}  datum: "ta$"."mo$"."ja$
+  720 print:print"  kurse:"spc(19)"umsatz:":print"  ================================"
+  730 print:print"  frankfurt:"kf"dm"tab(25)uf"stueck"
+  740 print:print"  hannover :"kh"dm"tab(25)uh"stueck"
+  750 print:print"  hamburg  :"kb"dm"tab(25)ub"stueck"
+  760 print:print"  duesseld :"kd"dm"tab(25)ud"stueck"
+  770 print:print"  commerzbank index:"ci
+  780 ifae<3thenprint:input"  auf zweite disk abspeichern (j/n)";f$:iff$="j"then 6380
+  790 if ae<3then1000
+  800 print:print:input"  richtig (j/n) ";e$:ife$="j"thenreturn
+  810 ife$<>"n"thenprint"{up}{up}":goto800
+  820 print"{home}{down}{down}{rvon}1{rvof}{left}{down}{down}{down}{down}{down}{rvon}2{rvof}{left}{down}{down}{rvon}3{rvof}{left}{down}{down}{rvon}4";
+  830 print"{rvof}{left}{down}{down}{rvon}5{rvof}{left}{down}{down}{rvon}6{rvof}"
+  840 z=z-1:print"{down}{down}  was ist falsch (1-6)?"
+  850 gete$:e=val(e$):ife$=""then850
+  860 ife>2ande<6thenprint:print:print"  kurs          : dm  000.00"
+  870 ife>2ande<6thenprint:print"umsatz ''       : stueck"
+  880 onegoto440,480,510,530,550,570,850
+  890 goto850
+  900 ab=30:aa=4:print"{clr}{down}{down}{red}          taegliche uebersicht"
+  910 print"========================================"
+  920 print:print:print"{gry1}    {rvon}f 1{rvof} = aktuelle kurse"
+  930 print:print"    {rvon}f 3{rvof} = kurse eines tages"
+  940 print:print"    {rvon}f 5{rvof} = kurse einer woche"
+  950 print:print"    {rvon}f 7{rvof} = hauptmenue"
+  960 gosub4470
+  970 onfgoto990,1040,1010
+  980 goto180
+  990 mt$=str$(ml):jr$=str$(jl):tg$="":af=5:gosub4580:goto1080
+ 1000 close3:close2:print:input"{gry1}  weiter";f$:goto180
+ 1010 print"{clr}{down}{down}{red}        kurse einer woche":print"==============================="
+ 1020 print"{down}{down}{down}{gry1}  anfangstag der woche eingeben"
+ 1030 af=1:goto1070
+ 1040 print"{clr}{down}{down}{red}             tageskurs"
+ 1050 print"========================================"
+ 1060 print"{down}{down}{down}{gry1}  gewuenschten tag eingeben:":af=3
+ 1070 gosub4520
+ 1080 mn$=mt$:jh$=jr$:print"{clr}{down}{down}{red}               ausgabeform"
+ 1090 print"========================================"
+ 1100 print:print:print"{gry1}    {rvon}f 1{rvof} : zahlenwerte"
+ 1110 print:print"    {rvon}f 3{rvof} : grafik"
+ 1120 print:print"    {rvon}f 5{rvof} : hauptmenue"
+ 1130 gosub4470
+ 1140 onfgoto1170,1720,180
+ 1150 goto1080
+ 1160 rem --- zahlenwertausgabe ---
+ 1170 print:print:input"hoechst-tiefstkurs des ganzen jahres ";f$
+ 1180 print:print:print"{clr}{red}        "na$"-aktie":gf=0:gh=0:gb=0:gd=0
+ 1190 print"========================================":mf=500:mh=500:mb=500:md=500
+ 1200 printspc(15)et$:printspc(20)"{gry1}kassakurse";:gi=0:mi=5000:a1=1
+ 1210 print:print:print"{gry1}  datum   frankf   hann    hamb   d'dorf";
+ 1220 print:print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";:ui=0:gr=0:kl=500:a=16
+ 1230 print:ug=0:fori=0toaa:input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci
+ 1240 m=0:ifkf>=gfthengf=kf:ifkf>=grthengr=kf:m=1
+ 1250 ifkh>=ghthengh=kh:ifkh>=grthengr=kh:m=1
+ 1260 ifkb>=gbthengb=kb:ifkb>=grthengr=kb:m=1
+ 1270 ifkd>=gdthengd=kd:ifkd>=grthengr=kd:m=1
+ 1280 ifm=1thenta$(1)=ta$:mo$(1)=mo$:ja$(1)=ja$:m=0
+ 1290 ifkf=<mfandkf>0thenmf=kf:ifkf=<klthenkl=kf:m=1
+ 1300 ifkh=<mhandkh>0thenmh=kh:ifkh=<klthenkl=kh:m=1
+ 1310 ifkb=<mbandkb>0thenmb=kb:ifkb=<klthenkl=kb:m=1
+ 1320 ifkd=<mdandkd>0thenmd=kd:ifkd=<klthenkl=kd:m=1
+ 1330 ifm=1thenta$(2)=ta$:mo$(2)=mo$:ja$(2)=ja$:m=0
+ 1340 uf=int(uf):uh=int(uh):ub=int(ub):ud=int(ud):ug=uf+uh+ub+ud:ifci>=githengi=ci
+ 1350 ui=ui+ug:ifci=<miandci>0thenmi=ci
+ 1360 ifdr=1thenreturn
+ 1370 printta$"."mo$"."ja$;:kf$=str$(int(kf)):fk$=str$(kf):ll=len(fk$)-len(kf$)
+ 1380 ifll>3thenll=3
+ 1390 printspc(5-len(kf$))left$(fk$,len(kf$)+ll)right$(fi$,(3-ll));
+ 1400 kh$=str$(int(kh)):hk$=str$(kh):ll=len(hk$)-len(kh$):ifll>3thenll=3
+ 1410 printspc(5-len(kh$))left$(hk$,len(kh$)+ll)right$(fi$,(3-ll));
+ 1420 kb$=str$(int(kb)):bk$=str$(kb):ll=len(bk$)-len(kb$):ifll>3thenll=3
+ 1430 printspc(5-len(kb$))left$(bk$,len(kb$)+ll)right$(fi$,(3-ll));
+ 1440 kd$=str$(int(kd)):dk$=str$(kd):ll=len(dk$)-len(kd$):ifll>3thenll=3
+ 1450 printspc(5-len(kd$))left$(dk$,len(kd$)+ll)right$(fi$,(3-ll));
+ 1460 printspc(a-len(str$(uf)))ufspc(7-len(str$(uh)))uhspc(7-len(str$(ub)))ub;
+ 1470 printspc(7-len(str$(ud)))ud"{left}";
+ 1480 ifi=int(aa-1)thenff=kf+kh+kb+kd
+ 1490 ifst<>64thennexti:close2:goto1510
+ 1500 gosub4820:nexti:close2
+ 1510 df=kf+kh+kb+kd
+ 1520 dd=(df-ff)/4:ifdd>2.6thenprint:print"  tendenz: stark steigend":goto1560
+ 1530 ifdd>1.3thenprint:print"  tendenz: leicht steigend":goto1560
+ 1540 ifdd<-2.6thenprint:print"  tendenz: stark fallend":goto1560
+ 1550 ifdd<-1.3thenprint:print"  tendenz: leicht fallend"
+ 1560 iff$="j"thengosub6490
+ 1570 gr$=str$(int(gr)):rg$=str$(gr):ll=len(rg$)-len(gr$):ifll>3thenll=3
+ 1580 print:print"  hoechstkurs:";
+ 1590 printspc(5-len(gr$))left$(rg$,len(gr$)+ll)right$(fi$,(3-ll));
+ 1600 print" dm am "ta$(1)"."mo$(1)"."ja$(1)
+ 1610 kl$=str$(int(kl)):lk$=str$(kl):ll=len(lk$)-len(kl$):ifll>3thenll=3
+ 1620 print"  tiefstkurs :";
+ 1630 printspc(5-len(kl$))left$(lk$,len(kl$)+ll)right$(fi$,(3-ll));
+ 1640 print" dm am "ta$(2)"."mo$(2)"."ja$(2)
+ 1650 print"  gesamtumsaetze:"ui"stueck"
+ 1660 a1=0:print:input"  drucker";f$:iff$<>"j"then3350
+ 1670 a1=1:print"{up}"tab(20)"drucker an";:inputf$:open4,4:mt$=mn$:jr$=jh$
+ 1680 ifmm=0thengosub4740:goto1700
+ 1690 gosub4550
+ 1700 dr=1:goto5230
+ 1710 rem --- grafikausgabe ---
+ 1720 ad=20:te$="":gosub 3960
+ 1730 _l20,10to20,170:_l20,170to150,170:_l190,10to190,170
+ 1740 _l190,170to310,170:fori=10to170step(ac*(int(9/ac)+1)):fort=15to150step5
+ 1750 _dt,i:nextt,i
+ 1760 fori=10to170step(az*(int(9/az)+1)):fort=185to320step5:_dt,i:nextt,i
+ 1770 fori=20to150stepab:fort=10to175step4:_di,t:_d(i+170),t:nextt,i
+ 1780 _p200,0ja$:_p155,170"   0"
+ 1790 _p150,10ur$:_p20,0te$:_p0,10gr$
+ 1800 _p0,170kl$:gosub1950:ad=190:gosub2130:goto3270
+ 1810 inputf$
+ 1820 _t:print"{clr}{down}{down}{down}{red}  erweiterung":print"===================================="
+ 1830 print:print:print"{gry1}    {rvon}f 1{rvof} = grafik ausdrucken":ifet$<>""then1860
+ 1840 print:print"    {rvon}f 3{rvof} = durchschnitt"
+ 1850 print:print"    {rvon}f 5{rvof} = wendepunkte"
+ 1860 print:print"    {rvon}f 7{rvof} = weiter"
+ 1870 gosub4470
+ 1880 onfgoto1900,3400,3650,3330
+ 1890 goto1820
+ 1900 input"{clr}{down}{down}{red}  drucker an";f$
+ 1910 print:input"{gry1}  tabulator:";tb:iftb<0ortb>40then1910
+ 1920 rem --- starten des ausdrucks ---
+ 1930 sys50944,tb,14:goto1820
+ 1940 rem --- linien zeichnen ---
+ 1950 ife8=3then2060
+ 1960 fori=0toaa-1:t=1:f=0
+ 1970 ifk(i+t)<=0thent=t+1:f=2:ifaa-i<tthenf=0:return
+ 1980 iff=2thenf=0:goto1970
+ 1990 ifk(i)<=0theni=i+1
+ 2000 ifi=aathenreturn
+ 2010 ifb=5theny=170-(log(k(i))-log(kl))*lg:y1=170-(log(k(i+t))-log(kl))*lg
+ 2020 ifb=5then:_l(ad+i*ab),yto(ad+(i+t)*ab),y1:goto2040
+ 2030 _l(ad+i*ab),(170-(k(i)-kl)*ac)to(ad+(i+t)*ab),(170-(k(i+t)-kl)*ac)
+ 2040 nexti:return
+ 2050 rem --- hoch-tief-balken ---
+ 2060 fori=0toaastep2
+ 2070 ifb=5theny=170-(log(k(i))-log(kl))*lg:y1=170-(log(k(i+1))-log(kl))*lg:goto2090
+ 2080 y=170-(k(i)-kl)*ac:y1=170-(k(i+1)-kl)*ac
+ 2090 aj=int(100/aa):ifaj>7thenaj=7
+ 2100 fort=0toaj:_l(ad+i*ab+t),yto(ad+i*ab+t),y1:nextt
+ 2110 nexti:return
+ 2120 rem --- umsatz zeichnen ---
+ 2130 fori=0toaa:hu=170-u(i)*az
+ 2140 ifhu>=170thennexti:return
+ 2150 ifhu<9thenhu=9
+ 2160 aj=int(100/aa):ifaj>7thenaj=7
+ 2170 fort=0toaj:_l(ad+t+i*ab),huto(ad+t+i*ab),170:nextt,i:return
+ 2180 print"{clr}{down}{down}{red}  uebersicht":print"========================================"
+ 2190 print:print:print"{gry1}    {rvon}f 1{rvof} = freier zeitraum"
+ 2200 print:print"    {rvon}f 3{rvof} = monat"
+ 2210 print:print"    {rvon}f 5{rvof} = jahr"
+ 2220 print:print"    {rvon}f 7{rvof} = jahre"
+ 2230 print:print"    {rvon}f 8{rvof} = hauptmenue"
+ 2240 gosub4470:onfgoto2260,2400,2470,2480,180,180
+ 2250 goto2180
+ 2260 print"{clr}{down}{down}{down}{red}  freier zeitraum":print"======================================="
+ 2270 print:print:print"{gry1}    {rvon}f 1{rvof} = alle gespeicherten tage"
+ 2280 print:print"    {rvon}f 3{rvof} = zeitraumanfang eingeben"
+ 2290 print:print"    {rvon}f 5{rvof} = zeitraumende eingeben"
+ 2300 gosub4470:onfgoto2320,2330,2370
+ 2310 goto2260
+ 2320 gosub4760:ab=270/aa:ad=30:mm=0:goto3030
+ 2330 print"{clr}{down}{down}{red}  zeitraumanfang eingeben":print"==============================="
+ 2340 print:print:print"{gry1}  anfangstag eingeben":af=1:gosub4520
+ 2350 print:print:input"  zeitraumlaenge in tagen:";aa:aa=aa-1:ab=270/aa:ad=30
+ 2360 goto3030
+ 2370 print"{clr}{down}{down}{red}  zeitraumende eingeben":print"================================="
+ 2380 print:print:input"{gry1}  zeitraumlaenge in tagen:";af:aa=af-1
+ 2390 print:print:print"  endtag eingeben:":gosub4520:ab=270/aa:ad=30:goto3030
+ 2400 print"{clr}{down}{down}{red}  monat":print"======================================="
+ 2410 print:print:input"{gry1}  monat:";mt:print:input"  jahr:";jr:mt$=str$(mt):jr$=str$(jr)
+ 2420 gosub4740:i=0
+ 2430 input#2,a,a,a,a,a,a,a,a,a,a,a,a:i=i+1
+ 2440 ifst<>64then2430
+ 2450 close2:aa=i-1:gosub4740
+ 2460 ab=270/aa:ad=30:goto3030
+ 2470 ee$="1 jahr":ee=1:goto2490
+ 2480 ee$="jahre":ee=2
+ 2490 print"{clr}{down}{down}{red}  ausgabeform":print"======================================="
+ 2500 print:print:print"{gry1}  "ee$
+ 2510 print:print"    {rvon}f 1{rvof} = monats-durchschnitt"
+ 2520 print:print"    {rvon}f 3{rvof} = kontinuierlich"
+ 2530 print:print"    {rvon}f 5{rvof} = monats-hoch-tief-werte"
+ 2540 gosub4470:onfgoto2570,2780,2870,2550
+ 2550 goto2490
+ 2560 rem --- durchschnitte berechnen ---
+ 2570 ifee=1thenprint:input"  jahr:";jr:jr$=str$(jr)
+ 2580 ifee=2thenjr$=str$(je)
+ 2590 mt$=" 1":et$="durchschn "
+ 2600 ifval(jr$)=jethenmt$=str$(me)
+ 2610 i=0:t=0:open3,8,3,"@:"+ka$+"-aktie 13 00,s,w":gosub4740
+ 2620 kf(1)=0:uf(1)=0:kh(1)=0:uh(1)=0:kb(1)=0:ub(1)=0:kd(1)=0:ud(1)=0:ci(1)=0
+ 2630 input#2,a,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci
+ 2640 ifkf=0oruf=0orkh=0oruh=0orkb=0orub=0orkd=0orud=0orci=0then2670
+ 2650 kh(1)=kh(1)+kh:uh(1)=uh(1)+uh:kb(1)=kb(1)+kb:ub(1)=ub(1)+ub:kd(1)=kd(1)+kd
+ 2660 kf(1)=kf(1)+kf:uf(1)=uf(1)+uf:ud(1)=ud(1)+ud:ci(1)=ci(1)+ci:i=i+1
+ 2670 ifst<>64then2630
+ 2680 close2:t=t+1:kf=kf(1)/i:uf=uf(1)/i:kh=kh(1)/i:uh=uh(1)/i:kb=kb(1)/i:f=0
+ 2690 ub=ub(1)/i:kd=kd(1)/i:ud=ud(1)/i:ci=ci(1)/i:print#3,mo$:print#3,ja$:print#3,"00"
+ 2700 print#3,kf:print#3,uf:print#3,kh:print#3,uh:print#3,kb:print#3,ub:print#3,kd:print#3,ud:print#3,ci
+ 2710 ifval(jr$)=jlandval(mt$)=mlthenclose3:aa=t-1:mt$=" 13":jr$=" 00":gosub4740:f=3
+ 2720 iff=3thenab=270/aa:ad=30:f=0:mm=0:goto3030
+ 2730 ifmt$=" 12"thenf=2:ifee=1thenjr$=str$(jl):mt$=str$(ml):goto2710
+ 2740 iff=2andee=2thenmt$=" 1":jr$=str$(val(jr$)+1):goto2760
+ 2750 mt$=str$(val(mt$)+1)
+ 2760 i=0:gosub4740:goto2620
+ 2770 rem --- kontinuierlich ---
+ 2780 print:input"  jahr:";jr:jr$=str$(jr):mt$=" 1":ifjr=jethenmt$=str$(me)
+ 2790 mn$=mt$:i=0:gosub4740
+ 2800 input#2,a,a,a,a,a,a,a,a,a,a,a,a:i=i+1
+ 2810 ifst<>64then2800
+ 2820 close2:ifjr=jlandval(mt$)=mlthen2850
+ 2830 ifmt$=" 12"then2850
+ 2840 mt$=str$(val(mt$)+1):gosub4740:goto2800
+ 2850 aa=i-1:mt$=mn$:gosub4740:ad=30:ab=270/aa:mm=0:goto3030
+ 2860 rem --- hoch-tief-werte ---
+ 2870 e8=3:ifee=1thenprint:input"  jahr:";jr:jr$=str$(jr)
+ 2880 ifee=2thenjr$=str$(je)
+ 2890 mt$=" 1":et$="hoch-tief ":ifval(jr$)=jethenmt$=str$(me)
+ 2900 i=0:open3,8,3,"@:"+ka$+"-aktie 13 00,s,w":gosub4740
+ 2910 kl=500:mf=500:mh=500:mb=500:md=500:gr=0:gf=0:gh=0:gb=0:gd=0:ui=0:gi=0
+ 2920 mi=5000
+ 2930 input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci:dr=1:gosub1240:dr=0
+ 2940 ifst<>64then2930
+ 2950 close2:i=i+1:print#3,mo$:print#3,ja$:print#3,"00":print#3,mf:print#3,ui:print#3,mh:print#3,ui
+ 2960 print#3,mb:print#3,ui:print#3,md:print#3,ui:print#3,mi:print#3,"{$a0}{$a0}":print#3,ja$:print#3,"00":print#3,gf:print#3,ui
+ 2970 print#3,gh:print#3,ui:print#3,gb:print#3,ui:print#3,gd:print#3,ui:print#3,gi
+ 2980 ifval(jr$)=jlandval(mt$)=mlthen3020
+ 2990 f=0:ifmt$=" 12"thenf=3:ifee=1then3020
+ 3000 iff=3andee=2thenmt$=" 1":jr$=str$(val(jr$)+1):gosub4740:goto2910
+ 3010 mt$=str$(val(mt$)+1):gosub4740:goto2910
+ 3020 close3:aa=i*2-1:mt$=" 13":jr$=" 00":gosub4740:ab=270/aa:ad=30:mm=0:goto3030
+ 3030 print"{clr}{down}{down}{down}{red}  ausgabeform":print"======================================="
+ 3040 b=0:print:print:print"{gry1}    {rvon}f 1{rvof} = zahlenwerte":mn$=mt$:jh$=jr$:a2=0
+ 3050 print:print"    {rvon}f 3{rvof} = kursgrafik"
+ 3060 print:print"    {rvon}f 5{rvof} = umsatzgrafik"
+ 3070 print:print"    {rvon}f 7{rvof} = hauptmenue"
+ 3080 gosub4470:onfgoto1170,3110,3130,180
+ 3090 goto3030
+ 3100 rem --- grafikausgabe ---
+ 3110 input"{clr}{down}{down}{down}  log. darstellung (j/n)";f$:iff$="j"thenb=5
+ 3120 te$=et$+"kassakurse ":ad=30:goto3140
+ 3130 te$="umsatz in stueck, ":ad=40
+ 3140 e=f:gosub3960:_lad,10toad,170:_lad,170to320,170
+ 3150 ife=3thenac=az:goto3180
+ 3160 ifb=5thenlg=160/(log(gr)-log(kl)):fori=kltogrstep(int(9/ac)+1)
+ 3170 ifb=5theny=170-(log(i)-log(kl))*lg:fort=25to320step5:_dt,y:nextt,i:goto3190
+ 3180 fori=10to170step(ac*(int(9/ac)+1)):fort=ad-5to320step5:_dt,i:nextt,i
+ 3190 fori=adto320step(ab*(int(aa/12)+1)):fort=10to175step4:_di,t:nextt,i
+ 3200 _p280,0;11ja$:_p40,0te$
+ 3210 ife=2andb=5then:_p0,0"log":goto3230
+ 3220 ife=2then:_p0,0"norm"
+ 3230 ife=2then:_p0,10gr$:_p0,170kl$:ad=30:gosub1950:goto1810
+ 3240 ife=3then:_p0,170"    0":_p0,10ur$
+ 3250 ife=3then:ad=40:gosub2130:goto3270
+ 3260 goto3030
+ 3270 getf$:iff$=""then3270
+ 3280 _t:input"{clr}{down}{down}{down}{red}  ausdrucken";f$:iff$<>"j"then3350
+ 3290 print:print:input"  drucker an";f$
+ 3300 print:input"{gry1}  tabulator:";tb:iftb<0ortb>40then3300
+ 3310 rem --- starten des ausdrucks ---
+ 3320 sys50944,tb,14:goto3280
+ 3330 mt$=mn$:jr$=jh$:ifmm=0thengosub4740:goto3030
+ 3340 gosub4550:goto3030
+ 3350 mt$=mn$:jr$=jh$:ifmm=0thengosub4740:goto3370
+ 3360 gosub4550
+ 3370 ifab=30andaa=4then1080
+ 3380 goto3030
+ 3390 rem --- durchschnittskurve ---
+ 3400 ifet$<>""then1820
+ 3410 ifa2=1then1820
+ 3420 nn=mm:za=aa:aa=100:mt$=mn$:jr$=jh$:af=100:iftg$=""thentg$="00"
+ 3430 gosub4580
+ 3440 zz=-1:fori=0toza:k(i)=0:nexti:zb=aa:aa=int(za+zb)-1:zc=0:t=-1
+ 3450 fori=0toaa
+ 3460 kh=kf:zz=zz+1:ifzz>zathenzz=za
+ 3470 ifi/5=int(i/5)thent=t+1:ifi>zbthenzc=zc+5
+ 3480 ifbb=1theninput#2,a,a,a,kf,a,a,a,a,a,a,a,a:goto3530
+ 3490 ifbb=2theninput#2,a,a,a,a,a,kf,a,a,a,a,a,a:goto3530
+ 3500 ifbb=3theninput#2,a,a,a,a,a,a,a,kf,a,a,a,a:goto3530
+ 3510 ifbb=5theninput#2,a,a,a,a,a,a,a,a,a,kf,a,a:goto3530
+ 3520 ifbb=4theninput#2,a,a,a,a,a,a,a,a,a,a,a,kf
+ 3530 ifkf<=0thenkf=kh
+ 3540 forq=zctozzstep5:k(i-t*5+q)=k(i-t*5+q)+kf:nextq
+ 3550 ifst=64thengosub4820
+ 3560 nexti:_g15:close2
+ 3570 fori=0toza:k(i)=k(i)/int((zb-1)/5+1):nexti
+ 3580 aa=za:fori=0toaa-1
+ 3590 ifb=5theny=170-(log(k(i))-log(kl))*lg:y1=170-(log(k(i+1))-log(kl))*lg:goto3610
+ 3600 y=170-(k(i)-kl)*ac:y1=170-(k(i+1)-kl)*ac
+ 3610 xy=(y1-y)/ab:fort=(i*ab)to((i+1)*ab)step2:x=xy*(t-i*ab)+y:ifx<10orx>170then3630
+ 3620 _dad+t,x
+ 3630 nextt,i:a2=1:mm=nn:goto1810
+ 3640 rem --- wendepunkte verbinden ---
+ 3650 ifet$<>""then1820
+ 3660 a3=1:ai=int(aa/3):g0=0:ko=5000:rg=0:lk=5000:ifa2=1then1820
+ 3670 _g15:fori=0toai-1:ifk(i)>g0theng0=k(i):x1=i
+ 3680 ifk(i)<koandk(i)>0thenko=k(i):x3=i
+ 3690 nexti
+ 3700 fori=aitoint(ai*2)-1
+ 3710 ifk(i)>rgthenrg=k(i):x2=i
+ 3720 ifk(i)<lkandk(i)>0thenlk=k(i):x4=i
+ 3730 nexti:wa=0:wb=x2*ab:aw=0:bw=x4*ab
+ 3740 ifb=5theny=170-(log(g0)-log(kl))*lg:y1=170-(log(rg)-log(kl))*lg:goto3760
+ 3750 y=170-(g0-kl)*ac:y1=170-(rg-kl)*ac
+ 3760 xy=(y1-y)/(x2*ab-x1*ab)
+ 3770 t=xy*(wa-x1*ab)+y:t1=xy*(wb-x1*ab)+y:ift<10thent=10:wa=(t-y)/xy+x1*ab
+ 3780 ift1<10thent1=10:wb=(t1-y)/xy+x1*ab
+ 3790 ift>170thent=170:wa=(t-y)/xy+x1*ab
+ 3800 ift1>170thent1=170:wb=(t1-y)/xy+x1*ab
+ 3810 _lwa+ad,ttowb+ad,t1
+ 3820 ifb=5theny=170-(log(ko)-log(kl))*lg:y1=170-(log(lk)-log(kl))*lg:goto3840
+ 3830 y=170-(ko-kl)*ac:y1=170-(lk-kl)*ac
+ 3840 xy=(y1-y)/(x4*ab-x3*ab)
+ 3850 t=xy*(aw-x4*ab)+y1:t1=xy*(bw-x4*ab)+y1:ift<10thent=10:aw=(t-y1)/xy+x4*ab
+ 3860 ift1<10thent1=10:bw=(t1-y1)/xy+x4*ab
+ 3870 ift>170thent=170:aw=(t-y1)/xy+x4*ab
+ 3880 ift1>170thent1=170:bw=(t1-y1)/xy+x4*ab
+ 3890 _law+ad,ttobw+ad,t1
+ 3900 ifa3=0then1810
+ 3910 g0=0:ko=5000:fori=int(ai*2)toaa
+ 3920 ifk(i)>=g0theng0=k(i):x1=i
+ 3930 ifk(i)=<koandk(i)>0thenko=k(i):x3=i
+ 3940 nexti:a3=0:wa=x2*ab:wb=290:aw=x4*ab:bw=290
+ 3950 goto3740
+ 3960 print"{clr}{down}{down}{red}             boerse":ur=0
+ 3970 print"========================================"
+ 3980 print:print:print"{gry1}    {rvon}f 1{rvof} = frankfurt"
+ 3990 print:print"    {rvon}f 3{rvof} = hannover"
+ 4000 print:print"    {rvon}f 5{rvof} = hamburg"
+ 4010 print:print"    {rvon}f 6{rvof} = duesseldorf"
+ 4020 print:print"    {rvon}f 7{rvof} = commerzbank index"
+ 4030 print:print"    {rvon}f 8{rvof} = umsaetze insgesammt"
+ 4040 gosub4470:_g15:_c:_d320,200;11:at=int(aa/12)+1:bb=f
+ 4050 onfgoto4070,4100,4130,4190,4160,4260,4060
+ 4060 goto3960
+ 4070 mo=15:kl=500:gr=0:fori=0toaa:input#2,ta$,mo$,ja$,k(i),u(i),a$,a$,a$,a$,a$,a$,a$
+ 4080 gosub4330:ifts=64thengosub4820
+ 4090 nexti:close2:te$=te$+"frankfurt":goto4430
+ 4100 mo=15:kl=500:gr=0:fori=0toaa:input#2,ta$,mo$,ja$,a$,a$,k(i),u(i),a$,a$,a$,a$,a$
+ 4110 gosub4330:ifts=64thengosub4820
+ 4120 nexti:close2:te$=te$+"hannover":goto4430
+ 4130 mo=15:kl=500:gr=0:fori=0toaa:input#2,ta$,mo$,ja$,a$,a$,a$,a$,k(i),u(i),a$,a$,a$
+ 4140 gosub4330:ifts=64thengosub4820
+ 4150 nexti:close2:te$=te$+"hamburg":goto4430
+ 4160 mo=15:kl=500:gr=0:fori=0toaa:input#2,ta$,mo$,ja$,a$,a$,a$,a$,a$,a$,k(i),u(i),a$
+ 4170 gosub4330:ifts=64thengosub4820
+ 4180 nexti:close2:te$=te$+"duesseldorf":goto4430
+ 4190 ife<>2andaa>7then:_t:goto3960
+ 4200 mo=15:kl=5000:gr=0:fori=0toaa:input#2,ta$,mo$,ja$,a,a,a,a,a,a,a,a,k(i)
+ 4210 gosub4330:ifts=64thengosub4820
+ 4220 nexti:close2:te$=et$+"commerzbank index":gr$=right$(str$(gr),4):kl$=right$(str$(kl),4)
+ 4230 ac=160/(gr-kl):ifaa=4andab=30thenmt$=mn$:jr$=jh$:ifmm=0thengosub4740:goto4280
+ 4240 ifaa=4andab=30thengosub4550:goto4280
+ 4250 return
+ 4260 ife<>3andaa<>4andab<>30then:_t:goto3960
+ 4270 ifab=30andaa=4then4200
+ 4280 mo=15:ur=0:fori=0toaa:input#2,ta$,mo$,ja$,a,u1,a,u2,a,u3,a,u4,a:ifst=64thents=64
+ 4290 u(i)=u1+u2+u3+u4
+ 4300 gosub4330:ifts=64thengosub4820
+ 4310 nexti:close2:te$=te$+"insgesamt":ifaa=4andab=30thente$="com-ind/ges.um"
+ 4320 goto4440
+ 4330 ifst=64thents=64
+ 4340 ifi=0thentg$=ta$
+ 4350 ifi/at=int(i/at)then:_p(ad+i*ab-8),180ta$
+ 4360 ifval(mo$)<>moandi/at=int(i/at)thenmo=val(mo$):_p(ad+i*ab-8),190mo$
+ 4370 ifab=30andaa=4then:_p(190+i*ab-8),180ta$
+ 4380 ifk(i)<=0andu(i)<=0thenreturn
+ 4390 ifk(i)>=grthengr=int(k(i))+1
+ 4400 ifk(i)=<klandk(i)>0thenkl=int(k(i))
+ 4410 ifu(i)>=urthenur=int(u(i))
+ 4420 return
+ 4430 gr$=right$(str$(gr),3):kl$=right$(str$(kl),3):ac=160/(gr-kl)
+ 4440 ur$=right$(str$(ur),5):az=160/ur:return
+ 4450 print"{clr}{down}{down}{down}      p r o g r a m m - e n d e"
+ 4460 close2:close15:_e:print"{down}{down}{down}":end
+ 4470 f=0:getf$:iff$=""then4470
+ 4480 f=asc(f$)-132:iff=7orf=8thenf=f-2
+ 4490 iff<1orf>6then4470
+ 4500 return
+ 4510 rem --- einlesen der dateien ---
+ 4520 print:input"  tag";tg$:print:input"  monat";mt:print:input"  jahr";jr:mt$=str$(mt)
+ 4530 jr$=str$(jr):ifae=7thenreturn
+ 4540 goto4580
+ 4550 gosub4740:ifae=5thenreturn
+ 4560 fori=1tomm:input#2,ta$,mo$,ja$,a,a,a,a,a,a,a,a,a
+ 4570 nexti:return
+ 4580 i=0:gosub4740:iftg$="00"then4620
+ 4590 input#2,ta$,a,a,a,a,a,a,a,a,a,a,a:i=i+1
+ 4600 iftg$=ta$then4620
+ 4610 ifst<>64then4590
+ 4620 close2
+ 4630 ifi>afthenmm=i-af:goto4550
+ 4640 ifi=afthenmm=0:gosub4740:return
+ 4650 ifi<afthenmb=af-i:ifval(mt$)=meandval(jr$)=jethenaa=aa-mb:mm=0:gosub4740:return
+ 4660 mt$=str$(val(mt$)-1):ifval(mt$)=0thenmt$=" 12":jr$=str$(val(jr$)-1)
+ 4670 i=0:gosub4740
+ 4680 input#2,ta$,a,a,a,a,a,a,a,a,a,a,a:i=i+1
+ 4690 ifst<>64then4680
+ 4700 close2:ifmb<ithenmm=i-mb:goto4550
+ 4710 ifmb=ithenmm=0:gosub4740:return
+ 4720 ifmb>ithenmb=mb-i:ifval(mt$)=meandval(jr$)=jethenaa=aa-mb:mm=0:gosub4740:return
+ 4730 goto4660
+ 4740 ifa1=0thenprint"{home}"spc(33)"{red}{rvon}warten{rvof}{gry1}":fora=1to10:print:print:nexta
+ 4750 open2,8,2,ka$+"-aktie"+mt$+jr$+",s,r":gosub5070:return
+ 4760 i=0:mt$=str$(me):jr$=str$(je):gosub4740
+ 4770 input#2,a,a,a,a,a,a,a,a,a,a,a,a:i=i+1
+ 4780 ifst<>64then4770
+ 4790 close2:ifval(mt$)=mlandval(jr$)=jlthenaa=i-1:mt$=str$(me):jr$=str$(je):gosub4740:return
+ 4800 mt$=str$(val(mt$)+1):ifmt$=" 13"thenmt$=" 1":jr$=str$(val(jr$)+1)
+ 4810 gosub4740:goto 4770
+ 4820 ts=0:ifi=aathenreturn
+ 4830 close2
+ 4840 mt$=str$(val(mt$)+1):ifval(mt$)=13thenmt$=" 1":jr$=str$(val(jr$)+1)
+ 4850 gosub4740:return
+ 4860 _t:rem --- fehler ---
+ 4870 ifpeek(52000)=4thenprint"nicht moeglich! (andere disk einlegen!)":goto1000
+ 4880 ifpeek(52000)=20thenprint:print"nicht moeglich!":goto1000
+ 4890 ifpeek(52000)=5thenprint:print"drucker/floppy nicht eingeschlatet!":goto1000
+ 4900 print:print"fehler"peek(52000)"in"peek(52001)+256*peek(52002):goto1000
+ 4910 input#15,fe,fe$
+ 4920 iffe=0thenreturn
+ 4930 iffe=62thenme=val(mo$):je=val(ja$):input"{down}{down}  firma:";na$:close2:goto600
+ 4940 iffe=74thenprint"{down}{down}floppy einschalten / disk einlegen!":close2:inputf$:goto590
+ 4950 print:print"disk-fehler nr.:"fe": "fe$:goto1000
+ 4960 input#15,fe,fe$
+ 4970 iffe=0thenreturn
+ 4980 _t:close2:iffe=62thenopen2,8,2,ka$+"-aktie"+mo$(1)+ja$(1)+",s,w":goto610
+ 4990 iffe=72then650
+ 5000 iffe=74thenprint:print"floppy einschalten / disk einlegen!":inputf$:goto590
+ 5010 print:print"disk-fehler nr.:"fe": "fe$:goto1000
+ 5020 input#15,fe,fe$
+ 5030 iffe=0thenreturn
+ 5040 iffe=62thenprint"{down}datei nicht auf disk! andere einlegen!":inputf$:close2:goto180
+ 5050 iffe=74thenprint"{down}{down}floppy einschalten / disk einlegen!":close2:inputf$:goto180
+ 5060 print:print"disk-fehler nr.:"fe": "fe$:goto1000
+ 5070 input#15,fe,fe$
+ 5080 iffe=0thenreturn
+ 5090 _t:iffe=62thenprint:print"nicht moeglich!":je=0:goto1000
+ 5100 print:print"disk-fehler nr.:"fe": "fe$:goto1000
+ 5110 input#15,fe,fe$
+ 5120 iffe=0thenreturn
+ 5130 iffe=62thenclose2:goto600
+ 5140 print:print"disk-fehler nr.:"fe": "fe$:goto1000
+ 5150 input#15,fe,fe$
+ 5160 iffe=0thenreturn
+ 5170 iffe=62thenclose2:me=val(mt$):je=val(jr$):ml=me:jl=je:goto6340
+ 5180 print:print"disk-fehler nr.:"fe": "fe$:goto1000
+ 5190 print"{home}"spc(33)"{rvon}{red}warten{rvof}{gry1}":fora=1to10:print:print:nexta:open2,8,2,ka$+"-aktie,s,r":gosub5020
+ 5200 input#2,me,je,ml,jl,na$
+ 5210 z=1:close2:ae=0:return
+ 5220 rem --- druckerzahlenausgabe ---
+ 5230 print#4,"                            "na$"-aktie"
+ 5240 print#4,"========================================";
+ 5250 print#4,"====================================="
+ 5260 print#4,spc(35)et$:print#4,spc(20)"kassakurse";
+ 5270 print#4,spc(21)"umsaetze in stueck"
+ 5280 print#4:print#4,"  datum   frankf   hann    hamb   d'dorf";
+ 5290 print#4,"    fran.  hann.  hamb.  d'df.  insg."
+ 5300 print#4,"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";
+ 5310 print#4,"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 5320 fori=0toaa:input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci:ifst=64thents=64
+ 5330 print#4,ta$"."mo$"."ja$;:kf$=str$(int(kf)):fk$=str$(kf):ll=len(fk$)-len(kf$)
+ 5340 ifll>3thenll=3
+ 5350 print#4,spc(5-len(kf$))left$(fk$,len(kf$)+ll)right$(fi$,(3-ll));
+ 5360 kh$=str$(int(kh)):hk$=str$(kh):ll=len(hk$)-len(kh$):ifll>3thenll=3
+ 5370 print#4,spc(5-len(kh$))left$(hk$,len(kh$)+ll)right$(fi$,(3-ll));
+ 5380 kb$=str$(int(kb)):bk$=str$(kb):ll=len(bk$)-len(kb$):ifll>3thenll=3
+ 5390 print#4,spc(5-len(kb$))left$(bk$,len(kb$)+ll)right$(fi$,(3-ll));
+ 5400 kd$=str$(int(kd)):dk$=str$(kd):ll=len(dk$)-len(kd$):ifll>3thenll=3
+ 5410 print#4,spc(5-len(kd$))left$(dk$,len(kd$)+ll)right$(fi$,(3-ll));
+ 5420 uf=int(uf):uh=int(uh):ub=int(ub):ud=int(ud):ug=uf+uh+ub+ud:a=9
+ 5430 print#4,spc(a-len(str$(uf)))ufspc(6-len(str$(uh)))uhspc(6-len(str$(ub)))ub;
+ 5440 print#4,spc(6-len(str$(ud)))udspc(6-len(str$(ug)))ug
+ 5450 ifts=64thents=0:gosub4820
+ 5460 nexti:close2
+ 5470 ifdd>2.6thenprint#4:print#4,spc(20)"  tendenz: stark steigend":goto5510
+ 5480 ifdd>1.3thenprint#4:print#4,spc(20)"  tendenz: leicht steigend":goto5510
+ 5490 ifdd<-2.6thenprint#4:print#4,spc(20)"  tendenz: stark fallend":goto5510
+ 5500 ifdd<-1.3thenprint#4:print#4,spc(20)"  tendenz: leicht fallend"
+ 5510 print#4:print#4,spc(20);
+ 5520 gr$=str$(int(gr)):rg$=str$(gr):ll=len(rg$)-len(gr$):ifll>3thenll=3
+ 5530 print#4,"  hoechstkurs:";
+ 5540 print#4,spc(5-len(gr$))left$(rg$,len(gr$)+ll)right$(fi$,(3-ll));
+ 5550 print#4," dm am "ta$(1)"."mo$(1)"."ja$(1)
+ 5560 print#4,spc(20);
+ 5570 kl$=str$(int(kl)):lk$=str$(kl):ll=len(lk$)-len(kl$):ifll>3thenll=3
+ 5580 print#4,"  tiefstkurs :";
+ 5590 print#4,spc(5-len(kl$))left$(lk$,len(kl$)+ll)right$(fi$,(3-ll));
+ 5600 print#4," dm am "ta$(2)"."mo$(2)"."ja$(2)
+ 5610 print#4,spc(20)"  gesamtumsaetze:"ui"stueck"
+ 5620 close4:dr=0:goto1660
+ 5630 print"{clr}{down}{down}  kurse aendern":print"======================================="
+ 5640 print:print:print"  datum der aenderung eingeben:"
+ 5650 af=1:ae=5:gosub4520
+ 5660 open3,8,3,"@:aend,s,w":ifmm=0then5700
+ 5670 fori=1tomm:input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci
+ 5680 print#3,ta$:print#3,mo$:print#3,ja$:print#3,kf:print#3,uf:print#3,kh
+ 5690 print#3,uh:print#3,kb:print#3,ub:print#3,kd:print#3,ud:print#3,ci:nexti
+ 5700 input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci:ifst=64theni=2
+ 5710 gosub580
+ 5720 print#3,ta$:print#3,mo$:print#3,ja$:print#3,kf:print#3,uf:print#3,kh
+ 5730 print#3,uh:print#3,kb:print#3,ub:print#3,kd:print#3,ud:print#3,ci
+ 5740 ifi=2then5790
+ 5750 input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci:ifst=64theni=3
+ 5760 print#3,ta$:print#3,mo$:print#3,ja$:print#3,kf:print#3,uf:print#3,kh
+ 5770 print#3,uh:print#3,kb:print#3,ub:print#3,kd:print#3,ud:print#3,ci
+ 5780 ifi<>3then5750
+ 5790 close3:close2:i=0:ae=1:print#15,"s:"+ka$+"-aktie"+mt$+jr$
+ 5800 print#15,"r:"+ka$+"-aktie"+mt$+jr$"=aend"
+ 5810 goto180
+ 5820 print"{clr}{down}{down}  kurse einfuegen":print"========================================"
+ 5830 print:print"  datum eingeben:":ae=7:gosub4520:mm=1
+ 5840 gosub4740:i=0
+ 5850 input#2,ta$,mo$,ja$,a,a,a,a,a,a,a,a,a:i=i+1
+ 5860 iftg$=ta$thenclose2:print:print"  datum schon vorhanden!":goto1000
+ 5870 ifval(ta$)>val(tg$)theni=i-1:goto5910
+ 5880 ifst<>64then5850
+ 5890 ifval(jr$)=jlandval(mt$)=mlthenprint:print"  kurse normal eingeben!":goto1000
+ 5900 mm=0
+ 5910 close2:open3,8,3,"@:aend,s,w":gosub4740:ifi=0then5950
+ 5920 fort=1toi:input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci:print#3,ta$
+ 5930 print#3,mo$:print#3,ja$:print#3,kf:print#3,uf:print#3,kh:print#3,uh:print#3,kb:print#3,ub
+ 5940 print#3,kd:print#3,ud:print#3,ci:nextt
+ 5950 ta$=tg$:ae=5:e=0:gosub480:i=0
+ 5960 print#3,ta$:print#3,mo$:print#3,ja$:print#3,kf:print#3,uf:print#3,kh:print#3,uh:print#3,kb:print#3,ub
+ 5970 print#3,kd:print#3,ud:print#3,ci:ifmm=0then6010
+ 5980 input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci:ifst=64theni=2
+ 5990 print#3,ta$:print#3,mo$:print#3,ja$:print#3,kf:print#3,uf:print#3,kh:print#3,uh:print#3,kb
+ 6000 print#3,ub:print#3,kd:print#3,ud:print#3,ci:ifi<>2then5980
+ 6010 close2:close3:ae=1:i=0:print#15,"s:"+ka$+"-aktie"+mt$+jr$:goto5800
+ 6020 goto 180
+ 6030 print"{clr}{down}{down}         ueberspielen":print"================================="
+ 6040 print:input"ein oder zwei laufwerke (1/2)";f
+ 6050 iff<>1andf<>2then6040
+ 6060 print:print"  welchen monat ueberspielen:":print:print:input"  monat:";mt
+ 6070 print:input"  jahr:";jr:mt$=str$(mt):jr$=str$(jr)
+ 6080 iff=1then6190
+ 6090 print:print:print"zweite diskette in anders laufwerk legen!":inputf$
+ 6100 gosub4740:open3,9,3,ka$+"-aktie"+mt$+jr$+",s,w"
+ 6110 input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,ci
+ 6120 print#3,ta$:print#3,mo$:print#3,ja$:print#3,kf:print#3,uf:print#3,kh
+ 6130 print#3,uh:print#3,kb:print#3,ub:print#3,kd:print#3,ud:print#3,ci
+ 6140 ifst<>64then6110
+ 6150 close3:close2:open3,9,3,ka$+"-aktie,s,r":gosub5150
+ 6160 input#3,me,je,ml,jl,na$:close3:goto6310
+ 6170 open3,9,3,"@:"+ka$+"-aktie,s,w":print#3,me:print#3,je:print#3,ml
+ 6180 print#3,jl:print#3,na$:close3:goto180
+ 6190 gosub4740:i=0
+ 6200 input#2,ta$(i),mo$(i),ja$(i),k(i),u(i),k(i+50),u(i+50),k(i+100),u(i+100)
+ 6210 input#2,k(i+150),u(i+150),k(i+200)
+ 6220 i=i+1:ifst<>64then6200
+ 6230 close2:print:print"zweite disk einlegen!":inputf$
+ 6240 open2,8,2,ka$+"-aktie"+mt$+jr$+",s,w"
+ 6250 fort=0toi-1:print#2,ta$(t):print#2,mo$(t):print#2,ja$(t):print#2,k(t)
+ 6260 print#2,u(t):print#2,k(t+50):print#2,u(t+50):print#2,k(t+100):print#2,u(t+100)
+ 6270 print#2,k(t+150):print#2,u(t+150):print#2,k(t+200)
+ 6280 nextt:close2
+ 6290 open2,8,2,ka$+"-aktie,s,r":gosub5150
+ 6300 input#2,me,je,ml,jl,na$:close2
+ 6310 if(val(jr$)=jeandval(mt$)<me)orval(jr$)<jethenme=val(mt$):je=val(jr$):goto6340
+ 6320 if(val(jr$)=jlandval(mt$)>ml)orval(jr$)>jlthenml=val(mt$):jl=val(jr$):goto6340
+ 6330 goto180
+ 6340 iff=2then6170
+ 6350 open2,8,2,"@:"+ka$+"-aktie,s,w":print#2,me:print#2,je:print#2,ml
+ 6360 print#2,jl:print#2,na$:close2:goto180
+ 6370 rem --- datei pruefen ---
+ 6380 open2,8,2,ka$+"-aktie":gosub4910
+ 6390 input#2,me,je,ml,jl,na$:close2
+ 6400 ifval(ja$(1))<jlor(val(ja$(1))=jlandval(mo$(1))<ml)then6470
+ 6410 open2,8,2,ka$+"-aktie"+mo$(1)+ja$(1)+",s,r":gosub5110
+ 6420 input#2,tg$,mt$,jr$,a,a,a,a,a,a,a,a,a
+ 6430 iftg$=ta$thenclose2:print:print"datum vorhanden!":goto780
+ 6440 ifval(tg$)>val(ta$)thenclose2:goto6470
+ 6450 ifst<>64then6420
+ 6460 close2:goto600
+ 6470 print:print"  spaeteres datum schon vorhanden! kurse einfuegen!":goto780
+ 6480 rem --- hoechst-tiefst-kurse ---
+ 6490 kl=500:gr=0:ui=0:gf=0:gh=0:gb=0:gd=0:mf=500:mh=500:mb=500:md=500
+ 6500 ifval(jr$)=jethenmt$=str$(me):gosub4740:goto6520
+ 6510 mt$=" 1":gosub4740
+ 6520 input#2,ta$,mo$,ja$,kf,uf,kh,uh,kb,ub,kd,ud,a$
+ 6530 dr=1:gosub1240:dr=0
+ 6540 ifst<>64then6520
+ 6550 close2:ifval(jr$)=jlthenifval(mt$)=mlthenreturn
+ 6560 ifmt$=" 12"thenreturn
+ 6570 mt$=str$(val(mt$)+1):gosub4740:goto6520
+ 6580 rem --- directory ---
+ 6590 open1,8,4,"#":nt=18:ns=1
+ 6600 print#15,"b-r:";4;0;nt;ns:print#15,"b-p:";4;0
+ 6610 get#1,nt$,ns$:ifnt$=""then6630
+ 6620 nt=asc(nt$):ns=asc(ns$)
+ 6630 fort=0to7:print#15,"b-p:";4;t*32+2:get#1,ft$:ifft$=""andnt$=""thenclose1:return
+ 6640 ifft$=""thennextt:goto6600
+ 6650 ifasc(ft$)<>129thennextt:goto6600
+ 6660 get#1,a$,a$
+ 6670 a$="":fortt=3to19:get#1,b$:ifb$="{$a0}"then6690
+ 6680 a$=a$+b$:nexttt
+ 6690 ifright$(a$,6)<>"-aktie"thennextt:goto6600
+ 6700 print"  "a$:nextt:goto6600
+

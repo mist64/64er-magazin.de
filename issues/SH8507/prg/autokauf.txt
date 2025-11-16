@@ -1,0 +1,514 @@
+
+
+;autokauf.prg ==0801==
+   10 rem *********************************
+   20 rem * k o s t e n v e r g l e i c h *
+   30 rem *      f u e r   a u t o s      *
+   40 rem *              c 64             *
+   50 rem *                               *
+   60 rem *           d. berner           *
+   70 rem *   ringstr. 8    5431 girod    *
+   80 rem *        tel.06485/1351         *
+   90 rem *********************************
+  100 u=20:dimpg(u),pz(u),pr(u),pt(u),pu(u),pl(u),pd(u),pf(u),p1(u),p2(u),p3(u)
+  110 dimul$(u),ud$(u),uf$(u),u1$(u),u2$(u),u3$(u),u4$(u),u5$(u)
+  120 dimp4(u),p5(u),p1$(u),p2$(u),p3$(u),p4$(u),p5$(u),pe(u),iz(u),hr(u),ty$(u)
+  130 dimtk$(u),p$(u),hu(u),vs(u),vh(u),vt(u),vv(u),vi(u),ve(u),tp(u),wk(u),wj(u)
+  140 dimtr$(u),wv(u),pr$(u),pt$(u),pu$(u),pl$(u),pd$(u),pf$(u),le(u),so(u),p(u)
+  150 dimkb(u),zm(u),mo(u),ge(u),az(u),ks(u),kr(u),ur$(u),ut$(u),uu$(u),k(u)
+  160 fori=1to20:ty$(i)="0":tk$(i)="0":p$(i)="0"
+  170 tr$(i)="0":p1$(i)="0":p2$(i)="0":p3$(i)="0":p4$(i)="0":p5$(i)="0"
+  180 pr$(i)="0":pt$(i)="0":pu$(i)="0":pl$(i)="0":pd$(i)="0":pf$(i)="0":next
+  190 p1$="0":p2$="0":p3$="0":p4$="0":p5$="0"
+  200 printchr$(147):fory=1to6:print:next
+  210 print"                  NO{CBM-Y}{CBM-Y}{CBM-Y}O{CBM-Y}{CBM-Y}{rvon} {CBM-*}"
+  220 print"                 N {CBM-H}   {CBM-H}  {rvon}  {CBM-*}"
+  230 print"                N  {CBM-H}{$a0}{$a0}{$a0}{CBM-H}{$a0}{$a0}{rvon}   {CBM-*}"
+  240 print"         {rvon}       {CBM-H}    {CBM-P} {CBM-H}      {CBM-*}"
+  250 print"         {rvon}       {CBM-H}      {CBM-H}       "
+  260 print"         {rvon}{CBM-H} N{CBM-Y}{CBM-Y}M {CBM-G}      {CBM-G}       "
+  270 print"        {rvon}{CBM-K} {CBM-M}    {CBM-G}{CBM-H}      {CBM-H}{CBM-M}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-G} "
+  280 print"           {rvon}    {rvof}          {rvon}    "
+  290 print"           {CBM-*}{rvon}  {rvof}{SHIFT-POUND}          {CBM-*}{rvon}  {rvof}{SHIFT-POUND}"
+  300 fori=1to1000:next
+  310 printchr$(19):fory=1to4:print:next:print"     k o s t e n v e r g l e i c h"
+  320 fori=1to2000:next
+  330 fory=1to12:print:next:print"        preise und haltungskosten"
+  340 fori=1to2000:next
+  350 print:print:printchr$(18)"1"chr$(146)" dateneingabe"
+  360 print:printchr$(18)"2"chr$(146)" laden gespeicherter daten von diskette";
+  370 getm$:ifm$="1"then400
+  380 ifm$="2"then2740
+  390 goto370
+  400 rem * angaben zu den einzelnen fahrzeugen*
+  410 n=n+1
+  420 printchr$(147)chr$(18)"fahrzeug nr."n;chr$(157)"                          ":i=n
+  430 print"typ: "ty$(i):printchr$(145)spc(3):inputty$(i)
+  440 print"kurzbezeichnung (max. 3 buchst.)  "tk$(i)
+  450 printchr$(145)spc(32);:inputtk$(i)
+  460 print:print"leistung(kw) "le(i):printchr$(145)spc(12):inputle(i)
+  470 printchr$(145)spc(19)"hubraum{$a0}(ccm) "hu(i):printchr$(145)spc(32);:inputhu(i)
+  480 print:print"grundpreis "pg(i):printchr$(145)spc(10):inputpg(i)
+  490 print:print"ueberfuehrung + zulassung "pz(i)
+  500 printchr$(145)spc(25):inputpz(i)
+  510 print:printchr$(18)"              e x t r a s :             ";
+  520 printchr$(18)"setzen sie statt des preises '*' ein,   ";
+  530 printchr$(18)"wenn der posten schon im grundpreis ent-";
+  540 printchr$(18)"halten ist, bzw. '0', wenn das extra    ";
+  550 printchr$(18)"nicht gewuenscht wird oder bei diesem   ";
+  560 printchr$(18)"fahrzeug nicht erhaeltlich ist!         "
+  570 print"autoradio         "pr$(i)
+  580 printchr$(145)spc(16):inputex$:gosub1320:pr(i)=ex:pr$(i)=ex$
+  590 print:print"4 tueren          "pt$(i)
+  600 printchr$(145)spc(16):inputex$:gosub1320:pt(i)=ex:pt$(i)=ex$
+  610 print:print"unterboden- u.hohlraumschutz  "pu$(i)
+  620 printchr$(145)spc(28):inputex$:gosub1320:pu(i)=ex:pu$(i)=ex$
+  630 print:print"servolenkung      "pl$(i)
+  640 printchr$(145)spc(16):inputex$:gosub1320:pl(i)=ex:pl$(i)=ex$
+  650 print:print"schiebedach       "pd$(i)
+  660 printchr$(145)spc(16):inputex$:gosub1320:pd(i)=ex:pd$(i)=ex$
+  670 print:print"sonderlackierung  "pf$(i)
+  680 printchr$(145)spc(16):inputex$:gosub1320:pf(i)=ex:pf$(i)=ex$
+  690 print:print:print"weitere extras: (max.5)":print"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+  700 print"(hoechstens 9 buchstaben)"
+  710 ifp1$<>"0"then740
+  720 gosub1370:ife$="n"then910
+  730 inputp1$:iflen(p1$)>9thenp1$=left$(p1$,9)
+  740 print:printp1$,,"  "p1$(i):printchr$(145),,;:inputex$:gosub1320:p1(i)=ex:p1$(i)=ex$
+  750 ifp2$<>"0"then780
+  760 gosub1370:ife$="n"then910
+  770 inputp2$:iflen(p2$)>9thenp2$=left$(p2$,9)
+  780 print:printp2$,,"  "p2$(i):printchr$(145),,;:inputex$:gosub1320:p2(i)=ex:p2$(i)=ex$
+  790 ifp3$<>"0"then820
+  800 gosub1370:ife$="n"then910
+  810 inputp3$:iflen(p3$)>9thenp3$=left$(p3$,9)
+  820 print:printp3$,,"  "p3$(i):printchr$(145),,;:inputex$:gosub1320:p3(i)=ex:p3$(i)=ex$
+  830 ifp4$<>"0"then860
+  840 gosub1370:ife$="n"then910
+  850 inputp4$:iflen(p4$)>9thenp4$=left$(p4$,9)
+  860 print:printp4$,,"  "p4$(i):printchr$(145),,;:inputex$:gosub1320:p4(i)=ex:p4$(i)=ex$
+  870 ifp5$<>"0"then900
+  880 gosub1370:ife$="n"then910
+  890 inputp5$:iflen(p5$)>9thenp5$=left$(p5$,9)
+  900 print:printp5$,,"  "p5$(i):printchr$(145),,;:inputex$:gosub1320:p5(i)=ex:p5$(i)=ex$
+  910 print:print:print"inzahlungnahme des alten wagens fuer"
+  920 print"wieviel dm "iz(i):printchr$(145)spc(10):inputiz(i)
+  930 print:print"haendlerrabatt in % "hr(i):printchr$(145)spc(19):inputhr(i)
+  940 pe(i)=pg(i)+pz(i)+pr(i)+pt(i)+pu(i)+pl(i)+pd(i)+pf(i)
+  950 pe(i)=pe(i)+p1(i)+p2(i)+p3(i)+p4(i)+p5(i)-iz(i)
+  960 pe(i)=int(pe(i)*(1-hr(i)/100)*100+.5)/100
+  970 forj=1to40:print"{CBM-Y}";:next:print"insgesamt",,pe(i)"dm":print:print
+  980 gosub4310
+  990 print:print:print"sollen daten fuer einen weiteren wagen  eingegeben werden? (j/n)"
+ 1000 gete$:ife$="j"then410
+ 1010 ife$="n"then1030
+ 1020 goto1000
+ 1030 poke53280,14:poke53281,6
+ 1040 printchr$(147)chr$(18)chr$(154)"         z u r   a u s w a h l          "
+ 1050 printchr$(18)"1"chr$(146)" dateneingabe fuer ein weiteres          fahrzeug"
+ 1060 print:printchr$(18)"2"chr$(146)" korrektur: preisangaben
+ 1070 print:printchr$(18);
+ 1080 print"3"chr$(146)" steuer und versicherung":print"  (eingabe bzw. korrektur)"
+ 1090 print:printchr$(18)"4"chr$(146)" werkstattkosten":print"  (eingabe bzw. korrektur)"
+ 1100 print:printchr$(18)"5"chr$(146)" betriebskosten":print"  (eingabe bzw. korrektur)"
+ 1110 print:printchr$(18)"6"chr$(146)" tabelle'anschaffungspreis'"
+ 1120 print:printchr$(18)"7"chr$(146)" tabelle 'kosten pro monat'
+ 1130 print:printchr$(18)"8"chr$(146)" tabelle 'kosten pro kilometer'
+ 1140 print:printchr$(18)"9"chr$(146)" grafik"
+ 1150 print:printchr$(18)"*"chr$(146)" speichern der daten auf diskette";
+ 1160 gete$:ife$=""then1160
+ 1170 ife$="*"then2550
+ 1180 e=val(e$):on e goto400,1200,1400,1570,1740,2150,2280,2460,2960
+ 1190 goto1160
+ 1200 printchr$(147)chr$(18)"   k o r r e k t u r  ( p r e i s e{$a0})   "
+ 1210 gosub1720
+ 1220 print:print"korrektur fuer nr.";:inputi
+ 1230 print:print:print"die korrektur erfolgt durch ueber-"
+ 1240 print"schreiben, einfuegen oder anhaengen."
+ 1250 print"nach der korrektur oder wenn nichts ver-";
+ 1260 print"aendert werden soll, bitte "chr$(18)"return"chr$(146)
+ 1270 print"druecken!"
+ 1280 print:print:print"weiter?"
+ 1290 gete$:ife$=""then1290
+ 1300 goto430
+ 1310 end
+ 1320 rem preise fuer sonderzubehoer
+ 1330 ifex$="0"thenex=0:return
+ 1340 ifex$="*"thenex=0:return
+ 1350 ex=val(ex$):ifex<>0thenreturn
+ 1360 print"eingabe nicht korrekt! bitte neueingabe!";:inputex$:goto1330
+ 1370 print:print"wird die eingabe weiterer extras        gewuenscht?"
+ 1380 gete$:ife$="j"ore$="n"thenreturn
+ 1390 goto1380
+ 1400 printchr$(147):rem *steuer u.versicherung*
+ 1410 gosub1720
+ 1420 print:print:print"steuer- und versicherungsangaben fuer":input"fahrzeug nr.";i
+ 1430 printchr$(147)chr$(18)"        steuer und versicherung         "
+ 1440 print"fuer "ty$(i)
+ 1450 print:printchr$(144)"kraftfahrzeugsteuer/jahr"chr$(154):print" "vs(i)
+ 1460 printchr$(145);:inputvs(i)
+ 1470 print:printchr$(144)"haftpflichtversicherung/jahr"chr$(154):print" "vh(i)
+ 1480 printchr$(145);:inputvh(i)
+ 1490 print:printchr$(144)"teilkaskoversicherung/jahr"chr$(154):print" "vt(i)
+ 1500 printchr$(145);:inputvt(i)
+ 1510 printchr$(144)
+ 1520 print"vollkaskoversicherung/jahr"chr$(154):print" "vv(i):printchr$(145);:inputvv(i)
+ 1530 printchr$(144)
+ 1540 printchr$(144)"insassenunfallversicherung"chr$(154):print" "vi(i):printchr$(145);
+ 1550 inputvi(i)
+ 1560 goto1030
+ 1570 gosub1720:print:print"werkstattkosten fuer nr.";:inputi
+ 1580 printchr$(147)chr$(18)"     w e r k s t a t t k o s t e n      "
+ 1590 print"zu den werkstattkosten gehoeren u.a.:"
+ 1600 print"oelwechsel, inspektionen, reifen- und   auspufferneuerung..."
+ 1610 print"weil es kaum moeglich ist, die werkstatt";
+ 1620 print"kosten der naechsten jahre exakt voraus-";
+ 1630 print"zuberechnen, wird hier mit einer":print"pauschale gerechnet.":print
+ 1640 printchr$(144)"fuer "ty$(i)
+ 1650 print:printchr$(18)"1"chr$(146);
+ 1660 print" pauschale von 100 dm/monat (durch-      schnittswert stand 1984)":print
+ 1670 printchr$(18)"2"chr$(146)" andere pauschale"chr$(154)
+ 1680 gete$:ife$="1"thenwk(i)=100:wj(i)=wk(i)*12:goto1030
+ 1690 ife$="2"thenprint:print:print"wieviel dm "wk(i):printchr$(145)spc(10):inputwk(i)
+ 1700 ife$="2"thenwj(i)=wk(i)*12:goto1030
+ 1710 goto1680
+ 1720 printchr$(147):print"bisher wurden daten eingegeben fuer"
+ 1730 fori=1ton:print:printi;ty$(i):next:return
+ 1740 gosub1720
+ 1750 print:print"betriebskosten fuer welches fahrzeug?":inputi
+ 1760 printchr$(147)chr$(18)"      b e tr i e b s k o s t e n        "
+ 1770 printchr$(144)"fuer "ty$(i):printchr$(154)
+ 1780 print"der motor braucht":print
+ 1790 print"    "chr$(18)"n"chr$(146)" normal    "chr$(18)"s";
+ 1800 printchr$(146)" super    "chr$(18)"d"chr$(146)" diesel"
+ 1810 print:print:print"  "chr$(18)"a"chr$(146)" bleifrei normal   ";
+ 1820 printchr$(18)"b"chr$(146)" bleifrei super"
+ 1830 gettr$(i)
+ 1840 iftr$(i)="n"thenprint:print"preis/1 liter normalbenzin "pn
+ 1850 iftr$(i)="n"thenprintchr$(145)spc(26):inputpn:goto1950
+ 1860 iftr$(i)="s"thenprint:print"preis/1 liter superbenzin "ps
+ 1870 iftr$(i)="s"thenprintchr$(145)spc(26):inputps:goto1950
+ 1880 iftr$(i)="d"thenprint:print"preis/1 liter diesel "pd
+ 1890 iftr$(i)="d"thenprintchr$(145)spc(20):inputpd:goto1950
+ 1900 iftr$(i)="a"thenprint:print"preis/1 liter normal(bleifr.) "pa
+ 1910 iftr$(i)="a"thenprintchr$(145)spc(29):inputpa:goto1950
+ 1920 iftr$(i)="b"thenprint:print"preis/1 liter super (bleifr.) "pb
+ 1930 iftr$(i)="b"thenprintchr$(145)spc(29):inputpb:goto1950
+ 1940 goto1830
+ 1950 print:print:printchr$(144)"verbrauch: "chr$(154)"beruecksichtigen sie dabei,"
+ 1960 print"ob der wagen ueberwiegend auf langstrek-";
+ 1970 print"ken oder im stadtverkehr gefahren wird! "
+ 1980 print"wieviel liter auf 100 km "ve(i)
+ 1990 printchr$(145)spc(24):inputve(i)
+ 2000 print:print:printchr$(144)"die kosten fuer nachgefuelltes oel"
+ 2010 print"werden mit 1% der treibstoffkosten bei"
+ 2020 print"ottomotoren und mit 2% bei dieselmotoren";
+ 2030 print"beruecksichtigt."chr$(154):print:print
+ 2040 gosub2120
+ 2050 printchr$(147)chr$(18)"            s o n s t i g e s           "
+ 2060 print"falls gewuenscht, koennen sie hier"
+ 2070 print"kosten fuer wagenpflege, garagenmiete...";
+ 2080 print"beruecksichtigen.":print
+ 2090 print"summe pro jahr "so(i)
+ 2100 printchr$(145)spc(14):inputso(i)
+ 2110 goto1030
+ 2120 print"weiter? (druecken sie eine beliebige    taste!)";
+ 2130 gete$:ife$=""then2130
+ 2140 return
+ 2150 rem * t a b e l l e n *
+ 2160 printchr$(147)chr$(18)"  a n s c h a f f u n g s k o s t e n   "
+ 2170 fori=1ton:printty$(i);
+ 2180 forj=1to25-len(ty$(i)):print".";:next:px=pe(i):ifkr(i)=1thenpx=ks(i)
+ 2190 printint(px)"dm"
+ 2200 ifn<10thenprint
+ 2210 nexti:gosub2120
+ 2220 goto1030
+ 2230 printchr$(147):fory=1to6:print:next:print"durchschnittliche fahrstrecke pro jahr:"
+ 2240 print:inputs
+ 2250 print:print:print
+ 2260 print"nach wieviel jahren wollen sie den wagenwieder verkaufen";:inputzj
+ 2270 return
+ 2280 gosub2230:printchr$(147)chr$(18)"   kosten pro monat bei"s;
+ 2290 printchr$(157)" km/jahr   "
+ 2300 fori=1ton:printty$(i);
+ 2310 forj=1to28-len(ty$(i)):print".";:next
+ 2320 gosub2360:printint(p(i)/12)"dm"
+ 2330 ifn<10thenprint
+ 2340 nexti:gosub2120
+ 2350 goto1030
+ 2360 rem * kosten pro jahr *
+ 2370 px=pe(i):ifkr(i)=1thenpx=ks(i)
+ 2380 p(i)=px/zj+vs(i)+vh(i)+vt(i)+vv(i)+vi(i)+wj(i)+so(i)
+ 2390 iftr$(i)="n"thentp=pn:oe=1.01
+ 2400 iftr$(i)="s"thentp=ps:oe=1.01
+ 2410 iftr$(i)="d"thentp=pd:oe=1.02
+ 2420 iftr$(i)="a"thentp=pa:oe=1.01
+ 2430 iftr$(i)="b"thentp=pb:oe=1.01
+ 2440 p(i)=p(i)+s/100*ve(i)*tp*oe
+ 2450 return
+ 2460 gosub2230:printchr$(147)chr$(18)" kosten pro kilometer bei"s;
+ 2470 printchr$(157)" km/jahr "
+ 2480 fori=1ton:printty$(i);
+ 2490 forj=1to30-len(ty$(i)):print".";:next:gosub2360
+ 2500 kp=int(p(i)/s*100+.5)/100
+ 2510 kp$=str$(kp):ifkp<1andlen(kp$)<4thenkp$=kp$+"0"
+ 2520 ifkp<1thenkp$="0"+right$(kp$,3)
+ 2530 printkp$" dm":ifn<10thenprint
+ 2540 nexti:gosub2120:goto1030
+ 2550 rem * speichern auf diskette *
+ 2560 print:open1,8,15,"s:autovergl.":close1
+ 2570 open1,8,8,"autovergl.,s,w"
+ 2580 print#1,n:print#1,pn:print#1,ps:print#1,pd:print#1,pa:print#1,pb
+ 2590 print#1,p1$:print#1,p2$:print#1,p3$:print#1,p4$:print#1,p5$
+ 2600 fori=1ton
+ 2610 print#1,ty$(i):print#1,tk$(i):print#1,le(i):print#1,hu(i):print#1,so(i)
+ 2620 print#1,pg(i):print#1,pz(i):print#1,pr(i):print#1,pt(i):print#1,pu(i):print#1,pl(i)
+ 2630 print#1,pd(i):print#1,pf(i):print#1,p1(i):print#1,p2(i):print#1,p3(i)
+ 2640 print#1,p4(i):print#1,p5(i)
+ 2650 print#1,p1$(i):print#1,p2$(i):print#1,p3$(i):print#1,p4$(i):print#1,p5$(i)
+ 2660 print#1,pe(i):print#1,iz(i):print#1,hr(i)
+ 2670 print#1,vs(i):print#1,vh(i):print#1,vt(i):print#1,vv(i):print#1,vi(i)
+ 2680 print#1,ve(i):print#1,tp(i):print#1,wk(i):print#1,wj(i):print#1,tr$(i)
+ 2690 print#1,pd$(i):print#1,pt$(i):print#1,pu$(i):print#1,pl$(i):print#1,pr$(i)
+ 2700 print#1,kb(i):print#1,zm(i):print#1,mo(i):print#1,ge(i):print#1,az(i):print#1,ks(i):print#1,kr(i)
+ 2710 print#1,pf$(i):next
+ 2720 close1
+ 2730 goto1030
+ 2740 rem * laden von diskette *
+ 2750 open1,8,8,"autovergl.,s,r"
+ 2760 input#1,n:input#1,pn:input#1,ps:input#1,pd:input#1,pa:input#1,pb
+ 2770 input#1,p1$:input#1,p2$:input#1,p3$:input#1,p4$:input#1,p5$
+ 2780 fori=1ton
+ 2790 input#1,ty$(i):input#1,tk$(i):input#1,le(i):input#1,hu(i):input#1,so(i)
+ 2800 input#1,pg(i):input#1,pz(i):input#1,pr(i):input#1,pt(i):input#1,pu(i):input#1,pl(i)
+ 2810 input#1,pd(i):input#1,pf(i):input#1,p1(i):input#1,p2(i):input#1,p3(i)
+ 2820 input#1,p4(i):input#1,p5(i)
+ 2830 input#1,p1$(i):input#1,p2$(i):input#1,p3$(i):input#1,p4$(i):input#1,p5$(i)
+ 2840 input#1,pe(i):input#1,iz(i):input#1,hr(i)
+ 2850 input#1,vs(i):input#1,vh(i):input#1,vt(i):input#1,vv(i):input#1,vi(i)
+ 2860 input#1,ve(i):input#1,tp(i):input#1,wk(i):input#1,wj(i):input#1,tr$(i)
+ 2870 input#1,pd$(i):input#1,pt$(i):input#1,pu$(i):input#1,pl$(i):input#1,pr$(i)
+ 2880 input#1,kb(i):input#1,zm(i):input#1,mo(i):input#1,ge(i):input#1,az(i):input#1,ks(i):input#1,kr(i)
+ 2890 input#1,pf$(i):next
+ 2900 ifpr$(i)<>"*"thenpr$(i)=str$(pr(i))
+ 2910 close1
+ 2920 goto1030
+ 2930 print"bisher wurden daten eingegeben fuer"
+ 2940 fori=1ton:print:printi;ty$(i):next
+ 2950 return
+ 2960 rem * g r a f i k *
+ 2970 printchr$(147)chr$(18)" d i a g r a m m e  z u r  a u s w a h l"
+ 2980 printchr$(18)"1"chr$(146)" anschaffungspreise"
+ 2990 print:printchr$(18)"2"chr$(146)" monatliche kosten"
+ 3000 print:printchr$(18)"3"chr$(146)" kosten pro kilometer"
+ 3010 print:printchr$(18)"4"chr$(146)" hubraum und leistung"
+ 3020 print:printchr$(18)"5"chr$(146)" extras"
+ 3030 print:printchr$(18)"6"chr$(146)" druckerausgabe fuer ein fahrzeug"
+ 3040 print:print:print:print"zur programmfortsetzung nach diagrammen"
+ 3050 print"eine beliebige taste druecken!"
+ 3060 print:print"wird eine hardcopy gewuenscht,"
+ 3070 printchr$(18)"f1"chr$(146)" druecken!"
+ 3080 gete$:ife$=""then3080
+ 3090 e=val(e$):onegoto3110,3260,3340,3420,3900,4700
+ 3100 goto3080
+ 3110 rem * grafik anschaffungskosten *
+ 3120 gr=1:mo=1:poke53280,0:poke53281,0:rem hintergr.farbe
+ 3130 printchr$(147)chr$(158)" a n s c h a f f u n g s k o s t e n":print:ms=0
+ 3140 fori=1ton:ifks(i)>60000thenms=3:goto3180
+ 3150 ifks(i)>30000thenifms<2thenms=2
+ 3160 ifks(i)>15000thenifms<1thenms=1
+ 3170 next
+ 3180 fori=1to20:printtab(5)chr$(5)"{CBM-L}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}":next
+ 3190 fori=1to38:print"{CBM-U}";:next:print
+ 3200 ifms=0thenprinttab(14)"5000     10000     15000":di=500
+ 3210 ifms=1thenprinttab(13)"10000     20000     30000":di=1000
+ 3220 ifms=2thenprinttab(13)"20000     40000     60000":di=2000
+ 3230 ifms=3thenprinttab(13)"30000     60000     90000":di=3000
+ 3240 fori=1ton:k(i)=ks(i):next
+ 3250 goto3710
+ 3260 rem * grafik kosten pro monat *
+ 3270 gosub2230:gr=1:mo=1:poke53280,7:poke53281,7:rem hintergr.farbe
+ 3280 printchr$(147)chr$(31)"   k o s t e n   p r o   m o n a t":print:ms=0
+ 3290 fori=1to20:printtab(5)chr$(144)"{CBM-L}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}":next
+ 3300 fori=1to38:print"{CBM-U}";:next:print
+ 3310 fori=1ton:gosub2360:k(i)=int(p(i)/12):next
+ 3320 printtab(14)" 300      600       900":di=30
+ 3330 goto3710
+ 3340 rem * grafik kosten pro kilometer *
+ 3350 gosub2230:gr=1:mo=1:poke53280,14:poke53281,14:rem hintergr.farbe
+ 3360 printchr$(147)chr$(31)" k o s t e n   p r o   k i l o m e t e r":ms=0
+ 3370 fori=1to20:printtab(5)chr$(144)"{CBM-L}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}    {CBM-M}":next
+ 3380 fori=1to38:print"{CBM-U}";:next:print
+ 3390 fori=1ton:gosub2360:k(i)=int(p(i)/s*100):next
+ 3400 printtab(14)"0.30      0.60      0.90";:di=3
+ 3410 goto3710
+ 3420 rem * grafik hubraum und leistung *
+ 3430 gr=1:poke53280,0:poke53281,0:rem hintergrundfarbe
+ 3440 printchr$(147)chr$(5):print:print:fori=1ton:printi;tk$(i):next:printchr$(19):le=0
+ 3450 fori=1ton:ifle(i)>100thenle=1:goto3470
+ 3460 next:hu=0
+ 3470 fori=1ton:ifhu(i)>4000thenhu=2:goto3500
+ 3480 ifhu(i)>2000thenhu=1
+ 3490 next
+ 3500 ifhu=2thenh1$="6000":h2$="4500":h3$="3000":h4$="1500":dh=300
+ 3510 ifhu=1thenh1$="4000":h2$="3000":h3$="2000":h4$="1000":dh=200
+ 3520 ifhu=0thenh1$="2000":h2$="1500":h3$="1000":h4$=" 500":dh=100
+ 3530 ifle=1thenl1$="200":l2$="150":l3$="100":l4$=" 50":dl=10
+ 3540 ifle=0thenl1$="100":l2$=" 75":l3$=" 50":l4$=" 25":dl=5
+ 3550 printchr$(19)"     leistung ("chr$(28)"Q"chr$(154)")             hubraum(W)";
+ 3560 print"        in kw                    in ccm"
+ 3570 printtab(9)l1$"{SHIFT-@}....................L"h1$:x=4:gosub3610
+ 3580 printtab(9)l2$"{SHIFT-@}....................L"h2$:gosub3610
+ 3590 printtab(9)l3$"{SHIFT-@}....................L"h3$:gosub3610
+ 3600 printtab(9)l4$"{SHIFT-@}....................L"h4$:x=5:gosub3610:goto3620
+ 3610 fori=1tox:printtab(12)"{CBM-M}    .    .    .     {CBM-G}":next:return
+ 3620 printtab(12)"{CBM-U}1{CBM-U}{CBM-U}{CBM-U}5{CBM-U}{CBM-U}{CBM-U}10{CBM-U}{CBM-U}{CBM-U}15{CBM-U}{CBM-U}{CBM-U}20{CBM-U}"
+ 3630 fori=1ton:lx=int(le(i)/dl+.5):hx=int(hu(i)/dh+.5)
+ 3640 poke1956+i-lx*40,81:poke56228+i-lx*40,2
+ 3650 poke1956+i-hx*40,87:poke56228+i-hx*40,7
+ 3660 ifhx=lxthenpoke1956+i-hx*40,42
+ 3670 next
+ 3680 gete$:ife$=""then3680
+ 3690 ifasc(e$)=133thengosub4570
+ 3700 goto1030
+ 3710 rem * balkengrafik *
+ 3720 printchr$(19):print:ifn<6thenfory=1to5:print:next
+ 3730 fori=1ton:printtk$(i):ifn<11thenprint
+ 3740 nexti
+ 3750 printchr$(19):print:ifn<6thenfory=1to5:print:next
+ 3760 fori=1ton:printspc(6)
+ 3770 k1=int(k(i)/di):k2=int((k(i)-k1*di)/di*6)
+ 3780 ifk1>=1thenforj=1tok1:printchr$(28)chr$(18)" ";:next
+ 3790 ifk2=0thenprint
+ 3800 ifk2=1thenprintchr$(146)chr$(165)
+ 3810 ifk2=2thenprintchr$(146)chr$(181)
+ 3820 ifk2=3thenprintchr$(146)chr$(161)
+ 3830 ifk2=4thenprintchr$(182)
+ 3840 ifk2=5thenprintchr$(167)
+ 3850 ifn<11thenprint
+ 3860 nexti
+ 3870 gete$:ife$=""then3870
+ 3880 ifasc(e$)=133thengosub4570
+ 3890 mo=0:goto1030
+ 3900 rem * e x t r a s *
+ 3910 printchr$(147)chr$(144)"*-serienm. a-aufpreis 0-nicht vorhanden "
+ 3920 ifn<10thenas$="  ":as=3:goto3950
+ 3930 ifn>15thenas$="":as=1:goto3950
+ 3940 as$=" ":as=2
+ 3950 forj=1to3
+ 3960 tb=11:fori=1ton
+ 3970 printtab(tb)mid$(tk$(i),j,1);:tb=tb+as:nexti:print:nextj
+ 3980 fori=1to40:print"{CBM-U}";:next
+ 3990 fori=1ton
+ 4000 ur$(i)=pr$(i):ifur$(i)<>"*"andur$(i)<>"0"thenur$(i)="a"
+ 4010 ut$(i)=pt$(i):ifut$(i)<>"*"andut$(i)<>"0"thenut$(i)="a"
+ 4020 uu$(i)=pu$(i):ifuu$(i)<>"*"anduu$(i)<>"0"thenuu$(i)="a"
+ 4030 ul$(i)=pl$(i):iful$(i)<>"*"andul$(i)<>"0"thenul$(i)="a"
+ 4040 ud$(i)=pd$(i):ifud$(i)<>"*"andud$(i)<>"0"thenud$(i)="a"
+ 4050 uf$(i)=pf$(i):ifuf$(i)<>"*"anduf$(i)<>"0"thenuf$(i)="a"
+ 4060 u1$(i)=p1$(i):ifu1$(i)<>"*"andu1$(i)<>"0"thenu1$(i)="a"
+ 4070 u2$(i)=p2$(i):ifu2$(i)<>"*"andu2$(i)<>"0"thenu2$(i)="a"
+ 4080 u3$(i)=p3$(i):ifu3$(i)<>"*"andu3$(i)<>"0"thenu3$(i)="a"
+ 4090 u4$(i)=p4$(i):ifu4$(i)<>"*"andu4$(i)<>"0"thenu4$(i)="a"
+ 4100 u5$(i)=p5$(i):ifu5$(i)<>"*"andu5$(i)<>"0"thenu5$(i)="a"
+ 4110 next
+ 4120 print"autoradio  ";:fori=1ton:printur$(i);as$;:next:print
+ 4130 print"4 tueren   ";:fori=1ton:printut$(i);as$;:next:print
+ 4140 print"unterb.sch.";:fori=1ton:printuu$(i);as$;:next:print
+ 4150 print"servolenkg ";:fori=1ton:printul$(i);as$;:next:print
+ 4160 print"schiebed.  ";:fori=1ton:printud$(i);as$;:next:print
+ 4170 print"sonderlack.";:fori=1ton:printul$(i);as$;:next:print
+ 4180 ifp1$<>"0"thenprintp1$;:fori=1to11-len(p1$):print" ";:next
+ 4190 ifp1$<>"0"thenfori=1ton:printu1$(i);as$:next:print
+ 4200 ifp2$<>"0"thenprintp2$;:fori=1to11-len(p2$):print" ";:next
+ 4210 ifp2$<>"0"thenfori=1ton:printu2$(i);as$;:next:print
+ 4220 ifp3$<>"0"thenprintp3$;:fori=1to11-len(p3$):print" ";:next
+ 4230 ifp3$<>"0"thenfori=1ton:printu3$(i);as$;:next:print
+ 4240 ifp4$<>"0"thenprintp4$;:fori=1to11-len(p4$):print" ";:next
+ 4250 ifp4$<>"0"thenfori=1ton:printu4$(i);as$;:next:print
+ 4260 ifp5$<>"0"thenprintp5$;:fori=1to11-len(p5$):print" ";:next
+ 4270 ifp5$<>"0"thenfori=1ton:printu5$(i);as$;:next:print
+ 4280 gete$:ife$=""then4280
+ 4290 ifasc(e$)=133thengosub4570
+ 4300 goto1030
+ 4310 rem * finanzierung *
+ 4320 print"soll zumindest ein teil des neuwagens   finanziert werden?"
+ 4330 gete$:ife$="n"thenkr(i)=0:ks(i)=pe(i):return
+ 4340 ife$="j"thenkr(i)=1:goto4360
+ 4350 goto4330
+ 4360 print:print"wird zusaetzlich zu dem in zahlung"
+ 4370 print"genommenen auto noch eine anzahlung"
+ 4380 print"geleistet?"
+ 4390 gete$:ife$="j"then4420
+ 4400 ife$="n"thenkb(i)=pe(i):goto4450
+ 4410 goto4390
+ 4420 print"hoehe der anzahlung  ";az(i)
+ 4430 printchr$(145)spc(20):inputaz(i)
+ 4440 kb(i)=pe(i)-az(i)
+ 4450 print:print"zinsen pro monat (%) ";zm(i)
+ 4460 printchr$(145)spc(20):inputzm(i)
+ 4470 print:print"wieviele monatsraten ";mo(i)
+ 4480 printchr$(145)spc(20):inputmo(i)
+ 4490 print:print"bearbeitungsgeb. (%) ";ge(i)
+ 4500 printchr$(145)spc(20):inputge(i)
+ 4510 ks(i)=((zm(i)*mo(i)+ge(i))/100+1)*kb(i)
+ 4520 print:print:printchr$(154)"bei einer kreditsumme von"chr$(144)kb(i)"dm"
+ 4530 printchr$(154)"betraegt der teilzahlungspreis"chr$(144):printint(ks(i)*100+.5)/100;
+ 4540 print"dm"chr$(154)
+ 4550 print"monatsrate:"chr$(144)int(ks(i)/mo(i)*100+.5)/100"dm":printchr$(154)
+ 4560 return
+ 4570 rem * hardcopy *
+ 4580 ifgr=1theng1=8
+ 4590 ifgr=0theng1=15
+ 4600 h1=1024:open4,4:print#4
+ 4610 forh2=0to24:h1$="":forh3=0to39
+ 4620 h4=0:h4=peek(h1+h2*40+h3):ifh4>128thenh4=h4-128:h6=1:h1$=h1$+chr$(18)
+ 4630 ifh4>95orh4<32thenh5=h4+64
+ 4640 ifh4>31andh4<64thenh5=h4
+ 4650 ifh4>63andh4<96thenh5=h4+32
+ 4660 h2$=chr$(h5)
+ 4670 h1$=h1$+h2$:ifh6=1thenh6=0:h1$=h1$+chr$(146)
+ 4680 next:print#4,chr$(15)chr$(16)"20"h1$chr$(g1)
+ 4690 next:print#4:close4:gr=0:return
+ 4700 rem * druckerausgabe fuer ein fahrzeug *
+ 4710 printchr$(147):fori=1ton:printi;ty$(i):next
+ 4720 print:input"daten fuer fahrzeug nr.";i
+ 4730 open4,4:print#4
+ 4740 print#4,chr$(14)i"  "ty$(i)chr$(15)
+ 4750 print#4,"leistung (kw):          "le(i)
+ 4760 print#4,"hubraum (ccm):          "hu(i)
+ 4770 print#4,"grundpreis:             "pg(i):print#4
+ 4780 print#4,"ueberfuehrung+zulassung:"pz(i)
+ 4790 print#4,"autoradio:               "pr$(i)
+ 4800 print#4,"4 tueren:                "pt$(i)
+ 4810 print#4,"unterboden- u.hohlr.sch.:"pu$(i)
+ 4820 print#4,"servolenkung:            "pl$(i)
+ 4830 print#4,"schiebedach:             "pd$(i)
+ 4840 print#4,"sonderlackierung:        "pf$(i)
+ 4850 ifp1$<>"0"thenprint#4,p1$;chr$(16)"25"p1$(i)
+ 4860 ifp2$<>"0"thenprint#4,p2$,chr$(16)"25"p2$(i)
+ 4870 ifp3$<>"0"thenprint#4,p3$,chr$(16)"25"p3$(i)
+ 4880 ifp4$<>"0"thenprint#4,p4$,chr$(16)"25"p4$(i)
+ 4890 ifp5$<>"0"thenprint#4,p5$,chr$(16)"25"p5$(i)
+ 4900 print#4,"inzahlungnahme:         "iz(i)
+ 4910 print#4,"haendlerrabatt:         "hr(i)
+ 4920 print#4,"{rvon}gesamtpreis:           "pe(i)
+ 4930 ifkb(i)=0then4960
+ 4940 print#4:ifaz(i)<>0thenprint#4,"anzahlung:              "az(i)
+ 4950 print#4,mo(i)"monatsraten ("zm(i)"{left}%) zu je"int(ks(i)/mo(i)*100+.5)/100"{left}dm"
+ 4960 print#4:print#4,"kraftfahrzeugsteuer/jahr:"vs(i)
+ 4970 print#4,"haftpflichtvers./jahr:   "vh(i)
+ 4980 ifvt(i)<>0thenprint#4,"teilkaskoversicherung:   "vt(i)
+ 4990 ifvv(i)<>0thenprint#4,"vollkaskoversicherung:   "vv(i)
+ 5000 ifvi(i)<>0thenprint#4,"insassenunfallversich.:  "vi(i)
+ 5010 print#4:print#4,"mittlerer verbrauch:"ve(i)"l/100 km";
+ 5020 iftr$(i)="n"thenprint#4,"(normalbenzin)"
+ 5030 iftr$(i)="s"thenprint#4,"(superbenzin)"
+ 5040 iftr$(i)="d"thenprint#4,"(diesel)"
+ 5050 iftr$(i)="a"thenprint#4,"(bleifrei normal)"
+ 5060 iftr$(i)="b"thenprint#4,"(bleifrei super)"
+ 5070 print"druckerausgabe fuer einen weiteren wagen(j/n)"
+ 5080 gete$:ife$=""then5080
+ 5090 close4:ife$="j"then4700
+ 5100 goto1030
+

@@ -1,0 +1,895 @@
+
+
+;mathefix.prg ==0801==
+    1 goto100
+    3 : " {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+    4 : " {SHIFT--}        *** mathefix ***       {SHIFT--}
+    5 : " {SHIFT--}                               {SHIFT--}
+    6 : " {SHIFT--}        ein programm von       {SHIFT--}
+    7 : " {SHIFT--}                               {SHIFT--}
+    8 : " {SHIFT--} juergen riehn + thomas langer {SHIFT--}
+    9 : " {SHIFT--} garlesstr.22    neuhauserst.20{SHIFT--}
+   10 :" {SHIFT--} 8677 selbitz    8677 selbitz  {SHIFT--}
+   11 :" {SHIFT--}  08280/1063      09280/5335   {SHIFT--}
+   12 :" {SHIFT--}                               {SHIFT--}
+   13 :" {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+   14 :
+   15 rem ~ ist das zeichen pi
+  100 rem titelbild
+  105 dimx(20)
+  110 gosub18200:fori=1to2000:next
+ 1000 rem hauptmenue
+ 1010 gosub18000
+ 1020 ($64){$6f}85,50,"{CTRL-B}- 1 - Vektoren",1,1,12
+ 1030 ($64){$6f}85,65,"{CTRL-B}- 2 - Geraden",1,1,12
+ 1033 ($64){$6f}85,80,"{CTRL-B}- 3 - Gerade/Ebene",1,1,12
+ 1040 ($64){$6f}85,95,"{CTRL-B}- 4 - Ebene",1,1,12
+ 1050 ($64){$6f}85,110,"{CTRL-B}- 5 - Ebene/Ebene",1,1,12
+ 1060 ($64){$6f}85,135,"{CTRL-B}- 6 - E{$a0}N{$a0}D{$a0}E",1,1,12
+ 1070 ($64){$6f}85,160,"{CTRL-B}- 7 - Anleitung",1,1,12
+ 1075 ($64){stop}23,110,55,89,1
+ 1076 ($64){stop}54,89,48,89,1
+ 1077 ($64){stop}54,89,54,95,1
+ 1078 ($64){$6f}53,81,"{CTRL-B}A",1,1,9
+ 1079 ($64){$6f}18,113,"{CTRL-B}B",1,1,9
+ 1080 gosub18600
+ 1090 x=val(a$):x=int(x):ifx>7 or x<1then1080
+ 1100 on x goto1200,1300,1400,1500,1600,1700,18300
+ 1200 rem vektormenue
+ 1210 gosub18000
+ 1220 ($64){$6f}75,50,"{CTRL-B}- 1 -  2 Punkte",1,1,12
+ 1230 ($64){$6f}75,70,"{CTRL-B}- 2 -  1 Vektor",1,1,12
+ 1240 ($64){$6f}75,90,"{CTRL-B}- 3 -  2 Vektoren",1,1,12
+ 1250 ($64){$6f}75,110,"{CTRL-B}- 4 -  3 Vektoren",1,1,12
+ 1260 ($64){$6f}75,145,"{CTRL-B}- 5 -  M e n u e",1,1,12
+ 1270 gosub18600
+ 1280 x=val(a$):x=int(x):ifx>5 or x<1 then1270
+ 1290 on x gosub2000,2100,2200,2300,1000
+ 1300 rem geradenmenue
+ 1310 gosub18000
+ 1320 ($64){$6f}75,60,"{CTRL-B}- 1 -  1 Gerade",1,1,12
+ 1330 ($64){$6f}75,80,"{CTRL-B}- 2 -  2 Gerade",1,1,12
+ 1340 ($64){$6f}75,100,"{CTRL-B}- 3 -  Gerade/Punkt",1,1,12
+ 1350 ($64){$6f}75,140,"{CTRL-B}- 4 -  Hauptmenue",1,1,12
+ 1360 gosub18600:x=val(a$):x=int(x):ifx<1orx>4then1360
+ 1370 onxgoto2400,2500,2600,1000
+ 1400 rem e/g
+ 1401 gosub18000:($64){$6f}1,40,"{CTRL-B}Geben Sie die Gerade ein:",1,1,12
+ 1402 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 1403 ($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 1404 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 1405 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 1406 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 1417 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 1420 ($64){stop}39,61,51,61,1
+ 1430 ($64){stop}53,61,47,64,1
+ 1431 ($64){stop}53,61,47,58,1
+ 1440 x=85:i=1:fory=55to55+22step11
+ 1441 gosub19000:ifx$="{f7}"then1000
+ 1442 x(i)=val(x$):i=i+1:next
+ 1450 x=205:i=4:fory=55to55+22step11
+ 1451 gosub19000:ifx$="{f7}"then1000
+ 1452 x(i)=val(x$):i=i+1:next
+ 1453 ifx(4)=0andx(5)=0andx(6)=0thengosub18550:gosub18600:gosub18560:goto1400
+ 1454 ($64){$6f}1,100,"{CTRL-B}Ebene in Normalenform:",1,1,12
+ 1455 ($64){$6f}40,140,"{CTRL-B}(",1,5,9:($64){$6f}110,140,"{CTRL-B})",1,5,9:($64){$6f}130,155,"=",1,1,9
+ 1456 ($64){$6f}10,155,"{CTRL-B}n*",1,1,9
+ 1457 x=55:i=7:fory=90+50to90+80step15
+ 1458 gosub19000:ifx$="{f7}"then1000
+ 1459 x(i)=val(x$):i=i+1:next
+ 1466 ifx(7)=0andx(8)=0andx(9)=0thengosub18550:gosub18600:gosub18560:goto1400
+ 1467 x=140:y=155:gosub19000:x(10)=val(x$)
+ 1468 gosub28500:gosub18600:gosub18000
+ 1470 g1=x(1):g2=x(2):g3=x(3):ux=x(4):uy=x(5):uz=x(6):n1=x(7):n2=x(8):n3=x(9)
+ 1471 c=x(10)
+ 1472 gosub30200:g$=x$:gosub18700:f$=x$:ifg$="e"org$="p"then1480
+ 1473 ($64){$6f}8,50,"{CTRL-B} S (      /      /      )",1,2,12
+ 1474 ($64){$6f}10,100,"{CTRL-B}Winkel=",1,1,12
+ 1475 ($64){$6f}170,100,"{CTRL-B}Grad",1,1,12
+ 1476 x=gx:gosub18700:($64){$6f}60,53,x$,1,1,9
+ 1477 x=gy:gosub18700:($64){$6f}60+85,53,x$,1,1,9
+ 1478 x=gz:gosub18700:($64){$6f}60+2*85,53,x$,1,1,9
+ 1479 ($64){$6f}110,100,f$,1,1,9:goto1498
+ 1480 ($64){$6f}30,140,"{CTRL-B}Abstand:",1,1,10
+ 1481 x=sp:gosub18700:($64){$6f}111,140,x$,1,1,9
+ 1482 ($64){$6f}49,160,"{CTRL-B}Gerade parallel zur Ebene",1,1,9
+ 1498 gosub18500:gosub18600:ifa$=" "then1400
+ 1499 goto1000
+ 1500 rem ebenen
+ 1510 gosub18000
+ 1520 ($64){$6f}75,80,"{CTRL-B}- 1 -  Ebene/Punkt",1,1,12
+ 1530 ($64){$6f}75,100,"{CTRL-B}- 2 -  1 Ebene",1,1,12
+ 1540 ($64){$6f}75,140,"{CTRL-B}- 3 -  Hauptmenue",1,1,12
+ 1550 gosub18600:x=int(val(a$))
+ 1570 onxgoto2700,2800,1000
+ 1600 rem ebene/ebene
+ 1601 gosub18000:op=1
+ 1602 form=-20to40step60
+ 1603 ifm=40thenop=5
+ 1610 ($64){$6f}1,40+30+m,"{CTRL-B}Ebene in Normalenform:",1,1,13
+ 1611 ($64){$6f}40,90+m,"{CTRL-B}(",1,5,9:($64){$6f}110,90+m,"{CTRL-B})",1,5,9:($64){$6f}130,105+m,"=",1,1,9
+ 1612 ($64){$6f}10,105+m,"{CTRL-B}n*",1,1,9
+ 1613 x=55:i=op:fory=90+mto90+28+mstep14
+ 1614 gosub19000:ifx$="{f7}"then1000
+ 1615 x(i)=val(x$):i=i+1:next
+ 1616 ifx(op)=0andx(op+1)=0andx(2+op)=0thengosub18550:gosub18600:gosub18560:goto1600
+ 1617 x=140:y=105+m:gosub19000:x(3+op)=val(x$)
+ 1618 nextm
+ 1619 n1=x(1):n2=x(2):n3=x(3):ce=x(4):m1=x(5):m2=x(6):m3=x(7):cf=x(8):gosub30600
+ 1620 ifx$="u"thengosub17500:gosub18600:goto1000
+ 1621 g$=x$:gosub18700:r$=x$:x=ef:gosub18700:ef$=x$
+ 1650 gosub28500:gosub18600:gosub18000:ifg$="p"then1680
+ 1651 ($64){$6f}1,40,"{CTRL-B}Schnittgerade der Ebenen:",1,1,12
+ 1652 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 1654 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 1655 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 1656 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 1657 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 1658 ($64){stop}39,61,51,61,1:($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 1660 ($64){stop}53,61,47,64,1
+ 1661 ($64){stop}53,61,47,58,1
+ 1671 x=s1:gosub18700:($64){$6f}85,55,x$,1,1,9
+ 1672 x=s2:gosub18700:($64){$6f}85,66,x$,1,1,9
+ 1673 x=s3:gosub18700:($64){$6f}85,77,x$,1,1,9
+ 1674 x=s4:gosub18700:($64){$6f}205,55,x$,1,1,9
+ 1675 x=s5:gosub18700:($64){$6f}205,66,x$,1,1,9
+ 1676 x=s6:gosub18700:($64){$6f}205,77,x$,1,1,9
+ 1680 ifg$="p"then ($64){$6f}1,100,"{CTRL-B}Die Ebenen sind parallel !",1,1,12
+ 1681 ifg$="s"then ($64){$6f}1,100,"{CTRL-B}Die Ebenen sind senkrecht !",1,1,12
+ 1682 ifg$<>"s"andg$<>"p"then ($64){$6f}10,120,"{CTRL-B}Schnittwinkel =",1,1,12
+ 1683 ifg$<>"s"andg$<>"p"then($64){$6f}245,120,"{CTRL-B}Grad",1,1,12:($64){$6f}185,120,r$,1,1,9
+ 1684 ifg$="p"andef<>0then($64){$6f}30,140,"{CTRL-B}Abstand:",1,1,10:($64){$6f}123,140,ef$,1,1,9
+ 1697 gosub18500:gosub18600:ifa$=" "then1600
+ 1698 goto1000
+ 1700 print"{clr}";"{down}{down}{down}{down}{down}{down}{down}{down}        auf  wiedersehen !"
+ 1710 print"                  {down}juergen riehn"
+ 1720 print"                     thomas langer"
+ 1730 end
+ 2000 rem 2 punkte
+ 2001 gosub18000
+ 2002 ($64){$6f}1,40,"{CTRL-B}Geben Sie die Punkte ein:",1,1,12
+ 2010 ($64){$6f}8,50,"{CTRL-B} A (      /      /      )",1,2,12
+ 2020 ($64){$6f}8,70,"{CTRL-B} B (      /      /      )",1,2,12
+ 2021 y=53:i=1:forx=60to60+2*85step85
+ 2022 gosub19000:ifx$="{f7}"then1200
+ 2023 x(i)=val(x$)
+ 2024 i=i+1:next
+ 2025 y=74:i=1
+ 2026 forx=60to60+2*85step85
+ 2027 gosub19000:ifx$="{f7}"then1200
+ 2028 y(i)=val(x$)
+ 2029 i=i+1:next
+ 2030 ($64){$6f}75,140,"{CTRL-B}AB =",1,2,10
+ 2031 ($64){$6f}127,130,"{CTRL-B}(",1,5,1
+ 2032 ($64){$6f}207,130,"{CTRL-B})",1,5,1
+ 2040 ($64){stop}74,135,74+22,135,1
+ 2045 ($64){stop}96,136,92,139,1
+ 2046 ($64){stop}96,136,92,133,1
+ 2060 a1=x(1):a2=x(2):a3=x(3):b1=y(1):b2=y(2):b3=y(3)
+ 2070 gosub24600
+ 2071 x=x1:gosub18700:($64){$6f}143,132,x$,1,1,9
+ 2072 x=x2:gosub18700:($64){$6f}143,132+11,x$,1,1,9
+ 2073 x=x3:gosub18700:($64){$6f}143,132+22,x$,1,1,9
+ 2090 gosub18500
+ 2091 gosub18600
+ 2092 if a$=" "then2000
+ 2093 goto1200
+ 2100 rem 1 vektor
+ 2101 gosub18000
+ 2102 ($64){$6f}1,40,"{CTRL-B}Geben Sie den Vektor ein:",1,1,13
+ 2103 ($64){$6f}100,65,"{CTRL-B}X=",1,2,12
+ 2104 ($64){$6f}130,55,"{CTRL-B}(",1,5,9:($64){$6f}60,147,"{CTRL-B}(",1,5,9
+ 2105 ($64){$6f}200,55,"{CTRL-B})",1,5,9:($64){$6f}130,147,"{CTRL-B})",1,5,9
+ 2106 ($64){$6f}10,100,"{CTRL-B}Winkel(xy)=",1,1,12
+ 2107 ($64){$6f}10,125,"{CTRL-B}{SHIFT--}X{SHIFT--}=",1,1,12
+ 2108 ($64){$6f}22,160,"{CTRL-B}X =",1,1,12
+ 2110 ($64){stop}99,61,111,61,1:($64){$6f}125,125,"{CTRL-B}LE",1,1,12
+ 2111 ($64){stop}113,61,107,64,1
+ 2112 ($64){stop}113,61,107,58,1
+ 2113 ($64){stop}21,121,33,121,1
+ 2114 ($64){stop}36,121,29,118,1
+ 2115 ($64){stop}36,121,29,124,1
+ 2116 ($64){stop}21,155,33,155,1
+ 2117 ($64){stop}36,155,29,152,1
+ 2118 ($64){stop}36,155,29,158,1
+ 2119 ($64){$6f}33,155,"{CTRL-B}o",1,1,9
+ 2120 ($64){$6f}200,100,"{CTRL-B}Grad",1,1,12
+ 2121 x=145:i=1:fory=55to55+22step11
+ 2122 gosub19000:ifx$="{f7}"then1200
+ 2123 x(i)=val(x$):i=i+1:next
+ 2124 ifabs(x(1))+abs(x(2))+abs(x(3))=0thengosub18550:gosub18600:gosub18560:goto2100
+ 2125 a1=x(1):a2=x(2):a3=x(3):
+ 2126 b1=0:b2=0:b3=1:gosub25090:gosub24500:x=abs(90-x):gosub18700
+ 2127 ($64){$6f}145,100,x$,1,1,9
+ 2128 gosub25020:rem betrag
+ 2129 x=a:gosub18700:($64){$6f}60,125,x$,1,1,9
+ 2130 gosub25000:rem einheitsvektor
+ 2131 x=x1:gosub18700:($64){$6f}75,147,x$,1,1,9
+ 2132 x=x2:gosub18700:($64){$6f}75,158,x$,1,1,9
+ 2133 x=x3:gosub18700:($64){$6f}75,169,x$,1,1,9
+ 2134 gosub18500:gosub18600
+ 2135 ifa$=" "then2100
+ 2190 goto1200
+ 2200 rem 2 vektoren
+ 2201 gosub18000:($64){$6f}1,40,"{CTRL-B}Geben Sie die Vektoren ein:",1,1,12
+ 2202 ($64){$6f}40,65,"{CTRL-B}A=",1,2,12
+ 2203 ($64){$6f}160,65,"{CTRL-B}B=",1,2,12
+ 2204 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 2205 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 2206 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 2207 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 2213 ($64){$6f}12,150,"{CTRL-B}A o B=",1,1,11
+ 2215 ($64){$6f}172,150,"{CTRL-B}A x B=",1,1,11
+ 2216 ($64){$6f}245,137,"{CTRL-B}(",1,5,9:($64){$6f}305,137,"{CTRL-B})",1,5,9
+ 2220 ($64){stop}39,61,51,61,1
+ 2230 ($64){stop}53,61,47,64,1
+ 2231 ($64){stop}53,61,47,58,1
+ 2232 ($64){stop}120+39,61,51+120,61,1
+ 2233 ($64){stop}120+53,61,47+120,64,1
+ 2234 ($64){stop}120+53,61,47+120,58,1:a=45
+ 2235 ($64){stop}11,146,22,146,1:($64){stop}11+a,146,22+a,146,1
+ 2236 ($64){stop}24,146,21,143,1:($64){stop}24+a,146,21+a,143,1
+ 2237 ($64){stop}24,146,21,149,1:($64){stop}24+a,146,21+a,149,1
+ 2238 if a=45 thena=160:goto2235
+ 2239 if a=160 thena=205:goto2235
+ 2240 x=85:i=1:fory=55to55+22step11
+ 2241 gosub19000:ifx$="{f7}"then1200
+ 2242 x(i)=val(x$):i=i+1:next
+ 2243 ifx(1)=0andx(2)=0andx(3)=0thengosub18550:gosub18600:gosub18560:goto2200
+ 2250 x=205:i=4:fory=55to55+22step11
+ 2251 gosub19000:ifx$="{f7}"then1200
+ 2252 x(i)=val(x$):i=i+1:next
+ 2253 ifx(4)=0andx(5)=0andx(6)=0thengosub18550:gosub18600:gosub18560:goto2200
+ 2260 a1=x(1):a2=x(2):a3=x(3):b1=x(4):b2=x(5):b3=x(6)
+ 2261 gosub25160
+ 2262 ifx$="p"then:($64){$6f}10,100,"{CTRL-B}Die Vektoren sind parallel !",1,1,11:goto2290
+ 2263 ifx$="s"then:($64){$6f}10,100,"{CTRL-B}Die Vektoren sind senkrecht !",1,1,10:goto2290
+ 2264 ($64){$6f}10,100,"{CTRL-B}Schnittwinkel:",1,1,12
+ 2265 ($64){$6f}245,100,"{CTRL-B}Grad",1,1,12
+ 2268 x=val(x$):gosub18700:($64){$6f}180,100,x$,1,1,9
+ 2290 gosub25050:gosub18700:($64){$6f}80,150,x$,1,1,9:($64){$6f}10,115,"{CTRL-B}Flaeche:",1,1,12
+ 2291 gosub25110:x=x1:gosub18700
+ 2292 ($64){$6f}250,137,x$,1,1,9:($64){$6f}170,115,"{CTRL-B}FE",1,1,12
+ 2293 x=x2:gosub18700:($64){$6f}250,148,x$,1,1,9
+ 2294 x=x3:gosub18700:($64){$6f}250,159,x$,1,1,9
+ 2295 gosub25140:x=a:gosub18700
+ 2296 ($64){$6f}110,115,x$,1,1,9
+ 2297 gosub18500:gosub18600:ifa$=" "then2200
+ 2298 goto1200
+ 2300 rem 3 vektoren
+ 2301 gosub18000:($64){$6f}1,40,"{CTRL-B}Geben Sie die Vektoren ein:",1,1,12
+ 2302 ($64){$6f}5,65,"{CTRL-B}A=",1,2,12
+ 2303 ($64){$6f}115,65,"{CTRL-B}B=",1,2,12
+ 2304 ($64){$6f}35,55,"{CTRL-B}(",1,5,9
+ 2305 ($64){$6f}142,55,"{CTRL-B}(",1,5,9
+ 2306 ($64){$6f}105,55,"{CTRL-B})",1,5,9
+ 2307 ($64){$6f}212,55,"{CTRL-B})",1,5,9
+ 2308 ($64){$6f}223,65,"{CTRL-B}C=",1,2,12
+ 2309 ($64){$6f}243,55,"{CTRL-B}(",1,5,9
+ 2310 ($64){$6f}313,55,"{CTRL-B})",1,5,9:a=0
+ 2311 ($64){stop}4+a,61,16+a,61,1
+ 2312 ($64){stop}19+a,61,18+a-4,64,1
+ 2313 ($64){stop}19+a,61,18+a-4,58,1
+ 2314 if a=0thena=110:goto2311
+ 2315 if a=110 thena=220:goto2311
+ 2340 x=50:i=1:fory=55to55+22step11
+ 2341 gosub19000:ifx$="{f7}"then1200
+ 2342 x(i)=val(x$):i=i+1:next
+ 2343 ifx(1)=0andx(2)=0andx(3)=0thengosub18550:gosub18600:gosub18560:goto2300
+ 2350 x=157:i=4:fory=55to55+22step11
+ 2351 gosub19000:ifx$="{f7}"then1200
+ 2352 x(i)=val(x$):i=i+1:next
+ 2353 ifx(4)=0andx(5)=0andx(6)=0thengosub18550:gosub18600:gosub18560:goto2300
+ 2360 x=258:i=7:fory=55to55+22step11
+ 2361 gosub19000:ifx$="{f7}"then1200
+ 2362 x(i)=val(x$):i=i+1:next
+ 2363 ifx(7)=0andx(8)=0andx(9)=0thengosub18550:gosub18600:gosub18560:goto2300
+ 2364 gosub25300
+ 2365 ifd=0then:($64){$6f}3,120,"{CTRL-B}Die Vektoren sind komlanar !",1,1,11
+ 2366 ifd<>0then($64){$6f}7,120,"{CTRL-B}D=         Volumen=       VE",1,1,11
+ 2367 ifd<>0thenx=d:gosub18700:($64){$6f}38,120,x$,1,1,9
+ 2368 ifd<>0thenx=abs(d):gosub18700
+ 2369 ifd<>0then($64){$6f}221,120,x$,1,1,9
+ 2397 gosub18500:gosub18600:ifa$=" "then2300
+ 2398 goto1200
+ 2400 rem 1 gerade
+ 2401 gosub18000:($64){$6f}1,40,"{CTRL-B}Geben Sie die Gerade ein:",1,1,12
+ 2402 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 2403 ($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 2404 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 2405 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 2406 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 2407 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 2408 x1$="":x2$="":x3$=""
+ 2420 ($64){stop}39,61,51,61,1
+ 2430 ($64){stop}53,61,47,64,1
+ 2431 ($64){stop}53,61,47,58,1
+ 2440 x=85:i=1:fory=55to55+22step11
+ 2441 gosub19000:ifx$="{f7}"then1300
+ 2442 x(i)=val(x$):i=i+1:next
+ 2450 x=205:i=4:fory=55to55+22step11
+ 2451 gosub19000:ifx$="{f7}"then1300
+ 2452 x(i)=val(x$):i=i+1:next
+ 2453 ifx(4)=0andx(5)=0andx(6)=0thengosub18550:gosub18600:gosub18560:goto2400
+ 2455 gosub28500:n1=0:n2=0:n3=1:c=0:g1=x(1):g2=x(2):g3=x(3):ux=x(4):uy=x(5):uz=x(6)
+ 2456 gosub30200:gosub18700:($64){$6f}138,120,x$,1,1,9:($64){$6f}10,120,"{CTRL-B}Winkel(xy)=",1,1,12
+ 2457 ($64){$6f}200,120,"{CTRL-B}Grad",1,1,12:gosub18600
+ 2458 ax=x(1):ay=x(2):az=x(3):ux=x(4):uy=x(5):uz=x(6):gosub28600
+ 2459 fori=1to9:x=z(i):gosub18700:z$(i)=x$:next
+ 2460 gosub18000
+ 2461 ($64){$6f}10,40,"{CTRL-B}Spurpunkte:",1,1,12
+ 2462 ifx1$<>"n"then:($64){$6f}8,60,"{CTRL-B} YZ(      /      /      )",1,2,12
+ 2463 ifx2$<>"n"then:($64){$6f}8,90,"{CTRL-B} XZ(      /      /      )",1,2,12
+ 2464 ifx3$<>"n"then:($64){$6f}8,120,"{CTRL-B} XY(      /      /      )",1,2,12
+ 2465 ifx1$<>"n"thenfori=0to2:($64){$6f}53+i*85,63,z$(i+1),1,1,9:next
+ 2466 ifx2$<>"n"thenfori=0to2:($64){$6f}53+i*85,93,z$(i+4),1,1,9:next
+ 2467 ifx3$<>"n"thenfori=0to2:($64){$6f}53+i*85,123,z$(i+7),1,1,9:next
+ 2497 gosub18500:gosub18600:ifa$=" "then2400
+ 2498 goto1300
+ 2500 rem 2 gerade
+ 2501 gosub18000:($64){$6f}1,40,"{CTRL-B}Geben Sie die Geraden ein:",1,1,12:g$=""
+ 2502 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 2503 ($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 2504 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 2505 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 2506 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 2507 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 2512 ($64){$6f}40,125,"{CTRL-B}Y=",1,2,12
+ 2513 ($64){$6f}160,125,"{CTRL-B}+b",1,2,12
+ 2514 ($64){$6f}70,115,"{CTRL-B}(",1,5,9
+ 2515 ($64){$6f}190,115,"{CTRL-B}(",1,5,9
+ 2516 ($64){$6f}140,115,"{CTRL-B})",1,5,9
+ 2517 ($64){$6f}260,115,"{CTRL-B})",1,5,9
+ 2520 ($64){stop}39,61,51,61,1
+ 2530 ($64){stop}53,61,47,64,1
+ 2531 ($64){stop}53,61,47,58,1
+ 2532 ($64){stop}39,121,51,121,1
+ 2533 ($64){stop}53,121,47,124,1
+ 2534 ($64){stop}53,121,47,118,1
+ 2540 x=85:i=1:fory=55to55+22step11
+ 2541 gosub19000:ifx$="{f7}"then1300
+ 2542 x(i)=val(x$):i=i+1:next
+ 2550 x=205:i=4:fory=55to55+22step11
+ 2551 gosub19000:ifx$="{f7}"then1300
+ 2552 x(i)=val(x$):i=i+1:next
+ 2553 ifx(4)=0andx(5)=0andx(6)=0thengosub18550:gosub18600:gosub18560:goto2500
+ 2560 x=85:i=7:fory=115to115+22step11
+ 2561 gosub19000:ifx$="{f7}"then1300
+ 2562 x(i)=val(x$):i=i+1:next
+ 2570 x=205:i=10:fory=115to115+22step11
+ 2571 gosub19000:ifx$="{f7}"then1300
+ 2572 x(i)=val(x$):i=i+1:next
+ 2573 ifx(10)=0andx(11)=0andx(12)=0thengosub18550:gosub18600:gosub18560:goto2500
+ 2575 gosub28500
+ 2580 gosub18600
+ 2581 gosub18000
+ 2583 ($64){$6f}10,100,"{CTRL-B}Winkel(xy)=",1,1,12
+ 2584 ($64){$6f}200,100,"{CTRL-B}Grad",1,1,12
+ 2585 ax=x(1):ay=x(2):az=x(3):ux=x(4):uy=x(5):uz=x(6)
+ 2586 bx=x(7):by=x(8):bz=x(9):vx=x(10):vy=x(11):vz=x(12):gosub29200:a=t:a$=g$
+ 2587 ifa<>0anda$<>"w"then($64){$6f}8,50,"{CTRL-B} S (      /      /      )",1,2,12
+ 2588 x=sx:gosub18700:sx$=x$:x=sy:gosub18700:sy$=x$:x=sz:gosub18700:sz$=x$
+ 2589 ifa<>0anda$<>"w"then($64){$6f}60,53,sx$,1,1,9:($64){$6f}145,53,sy$,1,1,9
+ 2590 ifa<>0anda$<>"w"then($64){$6f}230,53,sz$,1,1,9
+ 2591 x=t:gosub18700:($64){$6f}140,100,x$,1,1,9
+ 2592 ifa$="p"then($64){$6f}10,140,"{CTRL-B}Die Geraden sind parallel",1,1,9
+ 2593 ifa$="w"then($64){$6f}10,140,"{CTRL-B}Die Geraden sind windschief",1,1,9
+ 2594 ifa$="s"then($64){$6f}10,140,"{CTRL-B}Die Geraden sind senkrecht",1,1,9
+ 2595 ifa$="w"then($64){$6f}10,160,"{CTRL-B}Abstand:",1,1,9:x=fp:gosub18700:($64){$6f}100,160,x$,1,1,12
+ 2596 ifa$="p"then($64){$6f}10,160,"{CTRL-B}Abstand:",1,1,9:x=fp:gosub18700:($64){$6f}100,160,x$,1,1,12
+ 2597 gosub18500:gosub18600:ifa$=" "then2500
+ 2598 goto1300
+ 2600 rem gerade + punkt
+ 2601 gosub18000:($64){$6f}1,40,"{CTRL-B}Geben Sie die Gerade ein:",1,1,12
+ 2602 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 2603 ($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 2604 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 2605 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 2606 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 2607 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 2620 ($64){stop}39,61,51,61,1
+ 2630 ($64){stop}53,61,47,64,1
+ 2631 ($64){stop}53,61,47,58,1
+ 2632 ($64){$6f}1,100,"{CTRL-B}Geben Sie den Punkt ein:",1,1,13
+ 2633 ($64){$6f}8,120,"{CTRL-B} A (      /      /      )",1,2,12
+ 2640 x=85:i=1:fory=55to55+22step11
+ 2641 gosub19000:ifx$="{f7}"then1300
+ 2642 x(i)=val(x$):i=i+1:next
+ 2650 x=205:i=4:fory=55to55+22step11
+ 2651 gosub19000:ifx$="{f7}"then1300
+ 2652 x(i)=val(x$):i=i+1:next
+ 2653 ifx(4)=0andx(5)=0andx(6)=0thengosub18550:gosub18600:gosub18560:goto2600
+ 2671 y=123:i=7:forx=60to60+2*85step85
+ 2672 gosub19000:ifx$="{f7}"then1300
+ 2673 x(i)=val(x$)
+ 2674 i=i+1:next
+ 2680 ($64){$6f}30,140,"{CTRL-B}Abstand:",1,1,10
+ 2681 ax=x(1):ay=x(2):az=x(3):ux=x(4):uy=x(5):uz=x(6):p1=x(7):p2=x(8):p3=x(9)
+ 2682 gosub29000:a=x
+ 2683 x=fp:gosub18700:($64){$6f}145,140,x$,1,1,9
+ 2684 gosub28500:gosub18600:gosub18000
+ 2685 ($64){$6f}1,40,"{CTRL-B}Die senkrechte Projektion:",1,1,12
+ 2686 ($64){$6f}8,50,"{CTRL-B} A (      /      /      )",1,2,12
+ 2687 x=f1:gosub18700:($64){$6f}60,53,x$,1,1,9
+ 2688 x=f2:gosub18700:($64){$6f}60+85,53,x$,1,1,9
+ 2689 x=f3:gosub18700:($64){$6f}60+2*85,53,x$,1,1,9:iffp=0thenx1=0:x2=0:x3=0
+ 2690 x=x1:gosub18700:($64){$6f}55,90,x$,1,1,9
+ 2691 x=x2:gosub18700:($64){$6f}55,90+15,x$,1,1,9
+ 2692 x=x3:gosub18700:($64){$6f}55,90+15*2,x$,1,1,9
+ 2693 ($64){$6f}40,90,"{CTRL-B}(",1,5,9:($64){$6f}110,90,"{CTRL-B})",1,5,9:($64){$6f}10,105,"{CTRL-B}n*",1,1,9
+ 2694 ($64){$6f}130,105,"{CTRL-B}=",1,1,9
+ 2695 x=a:gosub18700:($64){$6f}140,105,x$,1,1,9
+ 2697 gosub18500:gosub18600:ifa$=" "then2600
+ 2698 goto1300
+ 2700 rem ebene/punkt
+ 2701 gosub18000
+ 2702 ($64){$6f}1,40,"{CTRL-B}Ebene in Normalenform:",1,1,12
+ 2703 ($64){$6f}8,120,"{CTRL-B} P (      /      /      )",1,2,12
+ 2704 ($64){$6f}40,70,"{CTRL-B}(",1,5,9:($64){$6f}110,70,"{CTRL-B})",1,5,9:($64){$6f}130,85,"{CTRL-B}=",1,1,9
+ 2705 ($64){$6f}10,85,"{CTRL-B}n*",1,1,9
+ 2706 x=55:i=1:fory=70to70+28step14
+ 2707 gosub19000:ifx$="{f7}"then1500
+ 2708 x(i)=val(x$):i=i+1:next
+ 2709 x=140:i=4:y=85
+ 2710 gosub19000:ifx$="{f7}"then1500
+ 2711 x(i)=val(x$)
+ 2712 ifx(1)=0andx(2)=0andx(3)=0thengosub18550:gosub18600:gosub18560:goto2700
+ 2713 y=123:i=5:forx=55to55+2*85step85
+ 2714 gosub19000:ifx$="{f7}"then1500
+ 2715 x(i)=val(x$):i=i+1:next
+ 2720 nx=x(1):ny=x(2):nz=x(3):c=x(4):xe=x(5):ye=x(6):ze=x(7):gosub30000
+ 2750 gosub28500:gosub18600:gosub18000
+ 2751 ($64){$6f}1,40,"{CTRL-B}Projektion von A auf Ebene:",1,1,9
+ 2752 ($64){$6f}8,50,"{CTRL-B} P (      /      /      )",1,2,12
+ 2753 x=gx:gosub18700:($64){$6f}60,53,x$,1,1,9
+ 2754 x=gy:gosub18700:($64){$6f}60+85,53,x$,1,1,9
+ 2756 x=gz:gosub18700:($64){$6f}60+2*85,53,x$,1,1,9
+ 2757 ($64){$6f}30,140,"{CTRL-B}Abstand:",1,1,10
+ 2758 x=d:gosub18700:($64){$6f}108,140,x$,1,1,9
+ 2798 gosub18500:gosub18600:ifa$=" "then2700
+ 2799 goto1500
+ 2800 rem ebenemenue
+ 2810 gosub18000
+ 2820 ($64){$6f}65,70,"{CTRL-B}- 1 -  Normalenform",1,1,12
+ 2830 ($64){$6f}65,90,"{CTRL-B}- 2 -  Parameterform",1,1,12
+ 2840 ($64){$6f}65,130,"{CTRL-B}- 3 -  Hauptmenue",1,1,12
+ 2850 gosub18600:x=int(val(a$))
+ 2860 if x>3 or x<1 then 2850
+ 2870 on x goto3300,3100,1000
+ 2995 x=fp:gosub18700:($64){$6f}100,160,x$,1,1,9
+ 2996 ($64){$6f}100,160,"{CTRL-B}Abstand:",1,1,9
+ 3100 rem parameterformeingabe
+ 3101 gosub18000:($64){$6f}1,40,"{CTRL-B}Ebene in Parameterform:",1,1,12
+ 3102 ($64){$6f}5,65,"{CTRL-B}X=",1,2,12:($64){$6f}115,65,"{CTRL-B}+a",1,2,12:($64){$6f}35,55,"{CTRL-B}(",1,5,9
+ 3103 ($64){$6f}142,55,"{CTRL-B}(",1,5,9:($64){$6f}105,55,"{CTRL-B})",1,5,9:($64){$6f}212,55,"{CTRL-B})",1,5,9
+ 3104 ($64){$6f}223,65,"{CTRL-B}+b",1,2,12:($64){$6f}243,55,"{CTRL-B}(",1,5,9:($64){$6f}313,55,"{CTRL-B})",1,5,9
+ 3105 ($64){stop}4,61,16,61,1
+ 3106 ($64){stop}19,61,18-4,64,1
+ 3107 ($64){stop}19,61,18-4,58,1
+ 3108 x=50:i=1:fory=55to55+22step11
+ 3109 gosub19000:ifx$="{f7}"then2800
+ 3110 x(i)=val(x$):i=i+1:next
+ 3111 x=157:i=4:fory=55to55+22step11
+ 3112 gosub19000:ifx$="{f7}"then2800
+ 3113 x(i)=val(x$):i=i+1:next
+ 3114 ifx(4)=0andx(5)=0andx(6)=0thengosub18550:gosub18600:gosub18560:goto3100
+ 3115 x=258:i=7:fory=55to55+22step11
+ 3116 gosub19000:ifx$="{f7}"then2800
+ 3117 x(i)=val(x$):i=i+1:next
+ 3118 ifx(7)=0andx(8)=0andx(9)=0thengosub18550:gosub18600:gosub18560:goto3100
+ 3150 gosub28500:gosub18600:gosub18000:($64){$6f}1,40,"{CTRL-B}Ebene in Normalenform:",1,1,12
+ 3151 ($64){$6f}40,90,"{CTRL-B}(",1,5,9:($64){$6f}110,90,"{CTRL-B})",1,5,9:($64){$6f}130,105,"=",1,1,9
+ 3152 ($64){$6f}10,105,"{CTRL-B}n*",1,1,9
+ 3153 e1=x(1):e2=x(2):e3=x(3):e4=x(4):e5=x(5):e6=x(6):e7=x(7):e8=x(8):e9=x(9)
+ 3154 gosub30400
+ 3160 x=n1:gosub18700:($64){$6f}55,90,x$,1,1,9
+ 3161 x=n2:gosub18700:($64){$6f}55,90+15,x$,1,1,9
+ 3162 x=n3:gosub18700:($64){$6f}55,90+30,x$,1,1,9
+ 3163 x=c:gosub18700:($64){$6f}140,105,x$,1,1,9
+ 3164 x(1)=n1:x(2)=n2:x(3)=n3:x(4)=c
+ 3198 gosub28500:gosub18600
+ 3199 goto5000
+ 3300 rem normalenformeingabe
+ 3301 gosub18000
+ 3310 ($64){$6f}1,40,"{CTRL-B}Ebene in Normalenform:",1,1,12
+ 3311 ($64){$6f}40,90,"{CTRL-B}(",1,5,9:($64){$6f}110,90,"{CTRL-B})",1,5,9:($64){$6f}130,105,"=",1,1,9
+ 3312 ($64){$6f}10,105,"{CTRL-B}n*",1,1,9
+ 3313 x=55:i=1:fory=90to90+30step15
+ 3314 gosub19000:ifx$="{f7}"then2800
+ 3315 x(i)=val(x$):i=i+1:next
+ 3316 ifx(1)=0andx(2)=0andx(3)=0thengosub18550:gosub18600:gosub18560:goto3300
+ 3317 x=140:y=105:gosub19000:x(4)=val(x$)
+ 3318 gosub28500:gosub18600:gosub18000
+ 3319 n1=1:n2=0:n3=0:ce=0:m1=x(1):m2=x(2):m3=x(3):cf=x(4):gosub30600
+ 3350 ($64){$6f}1,40,"{CTRL-B}Ebene in Parameterform:",1,1,12
+ 3351 ($64){$6f}5,65,"{CTRL-B}X=",1,2,12:($64){$6f}115,65,"{CTRL-B}+a",1,2,12:($64){$6f}35,55,"{CTRL-B}(",1,5,9
+ 3352 ($64){$6f}142,55,"{CTRL-B}(",1,5,9:($64){$6f}105,55,"{CTRL-B})",1,5,9:($64){$6f}212,55,"{CTRL-B})",1,5,9
+ 3353 ($64){$6f}223,65,"{CTRL-B}+b",1,2,12:($64){$6f}243,55,"{CTRL-B}(",1,5,9:($64){$6f}313,55,"{CTRL-B})",1,5,9
+ 3355 ($64){stop}4,61,16,61,1
+ 3356 ($64){stop}19,61,18-4,64,1
+ 3357 ($64){stop}19,61,18-4,58,1
+ 3360 x=f1:gosub18700:($64){$6f}50,55,x$,1,1,9
+ 3361 x=f2:gosub18700:($64){$6f}50,66,x$,1,1,9
+ 3362 x=f3:gosub18700:($64){$6f}50,77,x$,1,1,9
+ 3363 x=f4:gosub18700:($64){$6f}157,55,x$,1,1,9
+ 3364 x=f5:gosub18700:($64){$6f}157,66,x$,1,1,9
+ 3365 x=f6:gosub18700:($64){$6f}157,77,x$,1,1,9
+ 3366 x=f7:gosub18700:($64){$6f}258,55,x$,1,1,9
+ 3367 x=f8:gosub18700:($64){$6f}258,66,x$,1,1,9
+ 3368 x=f9:gosub18700:($64){$6f}258,77,x$,1,1,9
+ 3398 gosub28500:gosub18600:goto5000
+ 5000 rem zu ebene 1
+ 5001 gosub18000:gosub20000
+ 5002 ($64){$6f}10,40,"{CTRL-B}Spurpunkte:",1,1,12
+ 5003 ifx1$<>"n"then:($64){$6f}8,60,"{CTRL-B} X (      /      /      )",1,2,12
+ 5004 ifx2$<>"n"then:($64){$6f}8,90,"{CTRL-B} Y (      /      /      )",1,2,12
+ 5005 ifx3$<>"n"then:($64){$6f}8,120,"{CTRL-B} Z (      /      /      )",1,2,12
+ 5006 ifx1$<>"n"thenfori=0to2:($64){$6f}53+i*85,63,z$(i+1),1,1,9:next
+ 5007 ifx2$<>"n"thenfori=0to2:($64){$6f}53+i*85,93,z$(i+4),1,1,9:next
+ 5008 ifx3$<>"n"thenfori=0to2:($64){$6f}53+i*85,123,z$(i+7),1,1,9:next
+ 5009 gosub28500:gosub18600:gosub18000
+ 5020 ifx1$="n"andx2$="n"then5040
+ 5021 ($64){$6f}1,40,"{CTRL-B}Spurgerade in xy-Ebene:",1,1,12
+ 5022 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 5023 ($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 5024 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 5025 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 5026 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 5027 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 5030 ($64){stop}39,61,51,61,1
+ 5031 ($64){stop}53,61,47,64,1
+ 5032 ($64){stop}53,61,47,58,1:gosub20500
+ 5033 gosub28500:gosub18600:gosub18000
+ 5040 ifx1$="n"andx3$="n"then5053
+ 5041 ($64){$6f}1,40,"{CTRL-B}Spurgerade in xz-Ebene:",1,1,12
+ 5042 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 5043 ($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 5044 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 5045 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 5046 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 5047 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 5050 ($64){stop}39,61,51,61,1
+ 5051 ($64){stop}53,61,47,64,1
+ 5052 ($64){stop}53,61,47,58,1:gosub20600
+ 5053 ifx2$="n"andx3$="n"then5110
+ 5060 gosub28500:gosub18600:gosub18000
+ 5061 ($64){$6f}1,40,"{CTRL-B}Spurgerade in yz-Ebene:",1,1,12
+ 5062 ($64){$6f}40,65,"{CTRL-B}X=",1,2,12
+ 5063 ($64){$6f}160,65,"{CTRL-B}+a",1,2,12
+ 5064 ($64){$6f}70,55,"{CTRL-B}(",1,5,9
+ 5065 ($64){$6f}190,55,"{CTRL-B}(",1,5,9
+ 5066 ($64){$6f}140,55,"{CTRL-B})",1,5,9
+ 5067 ($64){$6f}260,55,"{CTRL-B})",1,5,9
+ 5070 ($64){stop}39,61,51,61,1
+ 5071 ($64){stop}53,61,47,64,1
+ 5072 ($64){stop}53,61,47,58,1:gosub20700
+ 5110 gosub18500:gosub18600
+ 5120 goto2800
+17500 rem zurueck
+17510 ($64){$6f}23,191,"{CTRL-B}  nicht loesbar !",1,1,15
+17515 ($64){stop}0,187,320,187,1
+17520 return
+18000 ($64){CTRL-A}5,1:($64){$6f}28,8,"{CTRL-B} *** MATHEFIX ***",1,2,15
+18010 ($64){stop}0,30,320,30,1
+18100 return
+18200 rem titelbild erstellen
+18210 ($64){CTRL-A}5,1
+18220 ($64){$6f}20,5,"{CTRL-B}***  Mathefix  ***",1,2,16
+18230 ($64){$6f}135,50,"{CTRL-B}von",1,1,12
+18240 ($64){$6f}107,75,"{CTRL-B}J.Riehn",1,3,16
+18250 ($64){$6f}92,130,"{CTRL-B}Th.Langer",1,3,16
+18260 ($64){$6f}135,111,"{CTRL-B}und",1,1,12
+18270 ($64){$6f}119,173,"{CTRL-B}im Juni 1985",1,1,12
+18271 rem koordinatensystem
+18272 ($64){stop}32,158,32,178,1
+18273 ($64){stop}32,178,52,178,1
+18274 ($64){stop}32,178,22,188,1
+18275 ($64){$6f}28,149,"{CTRL-B}z",1,1,9
+18276 ($64){$6f}18,190,"{CTRL-B}x",1,1,9
+18277 ($64){$6f}56,174,"{CTRL-B}y",1,1,9
+18280 rem pfeile
+18281 ($64){stop}32,158,29,161,1
+18282 ($64){stop}32,158,35,161,1
+18283 ($64){stop}52,178,49,175,1
+18284 ($64){stop}52,178,49,181,1
+18285 ($64){stop}22,188,26,188,1
+18286 ($64){stop}22,188,22,184,1
+18290 return
+18299 rem anleitung
+18300 gosub18000:($64){$6f}95,40,"{CTRL-B}ANLEITUNG:",1,1,16
+18313 ($64){$6f}2,55,"{CTRL-B}Mit diesem Programm koennen fast",1,1,10
+18314 ($64){$6f}2,65,"{CTRL-B}alle Aufgaben aus dem Bereich der",1,1,9
+18315 ($64){$6f}2,75,"{CTRL-B}Vektorgeometrie geloest werden.",1,1,10
+18316 ($64){$6f}2,85,"{CTRL-B}Das Programm verlangt Eingaben",1,1,10
+18317 ($64){$6f}2,95,"{CTRL-B}in Form von kartesischen Koor-",1,1,10
+18318 ($64){$6f}2,105,"{CTRL-B}dinaten im dreidimensionalen",1,1,11
+18319 ($64){$6f}2,115,"{CTRL-B}Raum.",1,1,10
+18320 ($64){$6f}2,125,"{CTRL-B}Befinden Sie sich in R2, so",1,1,11
+18321 ($64){$6f}2,135,"{CTRL-B}setzen Sie einfach die X3-",1,1,12
+18322 ($64){$6f}2,145,"{CTRL-B}Koordinate auf 0.",1,1,12
+18325 ($64){$6f}2,155,"{CTRL-B}Alle Ergebnisse werden auf 2",1,1,11
+18326 ($64){$6f}2,165,"{CTRL-B}Stellen nach dem Komma ge-",1,1,12
+18327 ($64){$6f}2,175,"{CTRL-B}rundet ausgegeben !",1,1,13
+18330 gosub28500:gosub18600
+18340 gosub18000:($64){$6f}95,40,"{CTRL-B}ANLEITUNG:",1,1,16
+18345 ($64){$6f}2,55,"{CTRL-B}Mit F1 kann eine Hardcopy",1,1,13
+18350 ($64){$6f}2,65,"{CTRL-B}erstellt werden.",1,1,13
+18360 ($64){$6f}2,75,"{CTRL-B}Mit F7 kann man wieder ins Haupt-",1,1,9
+18370 ($64){$6f}2,85,"{CTRL-B}menue zurueckgehen.",1,1,13
+18371 ($64){$6f}2,95,"{CTRL-B}Mit SPACE wird dieselbe Rechnung",1,1,10
+18372 ($64){$6f}2,105,"{CTRL-B}mit anderen Zahlenwerten wieder-",1,1,10
+18373 ($64){$6f}2,115,"{CTRL-B}holt.",1,1,10
+18390 gosub28500:gosub18600:goto1000
+18500 rem zurueck
+18510 ($64){$6f}23,191,"{CTRL-B}Zurueck mit RETURN !",1,1,14
+18515 ($64){stop}0,187,320,187,1
+18520 return
+18550 ($64){$6f}23,191,"{CTRL-B}Fehler in Eingabe !",1,1,15
+18551 ($64){stop}0,187,320,187,1
+18552 return
+18560 ($64){$6f}23,191,"{CTRL-B}Fehler in Eingabe !",0,1,15
+18561 ($64){stop}0,187,320,187,0
+18562 return
+18600 geta$:ifa$=""then18600
+18610 ifa$="{f1}"then($64){$77}:goto18600
+18620 return
+18700 rem print using
+18710 x=(int(x*100+0.5))/100
+18720 x$=" "+str$(x)
+18730 ifmid$(x$,len(x$)-1,1)="."thenx$=x$+"0":goto18760
+18740 ifmid$(x$,len(x$)-2,1)="."then18760
+18750 ifmid$(x$,len(x$)-1,1)<>"."thenx$=x$+".00"
+18760 ifmid$(x$,len(x$)-3,1)=" "thenx$="0"+right$(x$,3)
+18770 ifmid$(x$,len(x$)-3,1)="-"thenx$="-0"+right$(x$,3)
+18780 x$=right$("        "+x$,6):return
+19000 rem eingabe
+19010 x$="":qw=1
+19020 ($64){$6f}x+qw*9-9,y+5,"{CTRL-B}-",1,1,9
+19030 gosub18600
+19040 ifasc(a$)=13thenifx$<>""then($64){$6f}x+qw*9-9,y+5,"{CTRL-B}-",0,1,9:return
+19041 ifasc(a$)=13thengosub18550:gosub18600:gosub18560:goto19000
+19050 ifasc(a$)=20 or asc(a$)=148then19300
+19051 if a$="{f7}"thenx$=a$:return
+19055 if ($64){CTRL-P}(a$,"1-234567890.")=0then19030
+19060 ($64){$6f}x+qw*9-9,y,"{CTRL-B}"+a$,1,1,9
+19070 qw=qw+1:x$=x$+a$:goto19020
+19300 ifx$=""thengoto19020
+19310 ($64){$6f}x+qw*9-18,y,"{CTRL-B}"+right$(x$,1),0,1,9:($64){$6f}x+qw*9-9,y+5,"{CTRL-B}-",0,1,9
+19320 qw=qw-1
+19330 x$=left$(x$,len(x$)-1)
+19340 goto19020
+20000 rem spurpunkte
+20001 g1=0:g2=0:g3=0:n1=x(1):n2=x(2):n3=x(3):c=x(4):x1$="":x2$="":x3$=""
+20002 ux=1:uy=0:uz=0:gosub30200
+20003 z(1)=gx:z(2)=gy:z(3)=gz:ifx$="p"orx$="e"thenx1$="n"
+20004 ux=0:uy=1:uz=0:gosub30200
+20005 z(4)=gx:z(5)=gy:z(6)=gz:ifx$="p"orx$="e"thenx2$="n"
+20006 ux=0:uy=0:uz=1:gosub30200
+20007 z(7)=gx:z(8)=gy:z(9)=gz:ifx$="p"orx$="e"thenx3$="n"
+20009 fori=1to9
+20010 x=z(i):gosub18700:z$(i)=x$:next:return
+20500 rem spurgerade zu xy
+20501 n1=x(1):n2=x(2):n3=x(3):ce=x(4)
+20502 m1=0:m2=0:m3=1:cf=0:gosub30600
+20503 g$=x$:gosub18700:r$=x$
+20504 ifg$="u"thengosub18700:gosub18600:return
+20510 x=s1:gosub18700:($64){$6f}85,55,x$,1,1,9
+20511 x=s2:gosub18700:($64){$6f}85,66,x$,1,1,9
+20512 x=s3:gosub18700:($64){$6f}85,77,x$,1,1,9
+20513 x=s4:gosub18700:($64){$6f}205,55,x$,1,1,9
+20514 x=s5:gosub18700:($64){$6f}205,66,x$,1,1,9
+20515 x=s6:gosub18700:($64){$6f}205,77,x$,1,1,9
+20516 ifg$="p"then ($64){$6f}1,100,"{CTRL-B}Die Ebene ist parallel !",1,1,12
+20517 ifg$="s"then ($64){$6f}1,100,"{CTRL-B}Die Ebene ist senkrecht !",1,1,12
+20518 ifg$="p"andef<>0then($64){$6f}30,140,"{CTRL-B}Abstand:",1,1,10:($64){$6f}123,140,ef$,1,1,9
+20519 ifg$<>"s"andg$<>"p"then ($64){$6f}10,120,"{CTRL-B}Winkel:",1,1,12
+20520 ifg$<>"s"andg$<>"p"then($64){$6f}185,120,"{CTRL-B}Grad",1,1,12:($64){$6f}115,120,r$,1,1,9
+20530 return
+20600 rem spurgerade zu xz
+20601 n1=x(1):n2=x(2):n3=x(3):ce=x(4)
+20602 m1=0:m2=1:m3=0:cf=0:gosub30600
+20603 g$=x$:gosub18700:r$=x$
+20604 ifg$="u"thengosub18700:gosub18600:return
+20610 x=s1:gosub18700:($64){$6f}85,55,x$,1,1,9
+20611 x=s2:gosub18700:($64){$6f}85,66,x$,1,1,9
+20612 x=s3:gosub18700:($64){$6f}85,77,x$,1,1,9
+20613 x=s4:gosub18700:($64){$6f}205,55,x$,1,1,9
+20614 x=s5:gosub18700:($64){$6f}205,66,x$,1,1,9
+20615 x=s6:gosub18700:($64){$6f}205,77,x$,1,1,9
+20616 ifg$="p"then ($64){$6f}1,100,"{CTRL-B}Die Ebene ist parallel !",1,1,12
+20617 ifg$="s"then ($64){$6f}1,100,"{CTRL-B}Die Ebene ist senkrecht !",1,1,12
+20618 ifg$="p"andef<>0then($64){$6f}30,140,"{CTRL-B}Abstand:",1,1,10:($64){$6f}123,140,ef$,1,1,9
+20619 ifg$<>"s"andg$<>"p"then ($64){$6f}10,120,"{CTRL-B}Winkel:",1,1,12
+20620 ifg$<>"s"andg$<>"p"then($64){$6f}185,120,"{CTRL-B}Grad",1,1,12:($64){$6f}115,120,r$,1,1,9
+20630 return
+20700 rem spurgerade zu yz
+20701 m1=x(1):m2=x(2):m3=x(3):cf=x(4)
+20702 n1=1:n2=0:n3=0:ce=0:gosub30600
+20703 g$=x$:gosub18700:r$=x$
+20704 ifg$="u"thengosub18700:gosub18600:return
+20710 x=s1:gosub18700:($64){$6f}85,55,x$,1,1,9
+20711 x=s2:gosub18700:($64){$6f}85,66,x$,1,1,9
+20712 x=s3:gosub18700:($64){$6f}85,77,x$,1,1,9
+20713 x=s4:gosub18700:($64){$6f}205,55,x$,1,1,9
+20714 x=s5:gosub18700:($64){$6f}205,66,x$,1,1,9
+20715 x=s6:gosub18700:($64){$6f}205,77,x$,1,1,9
+20716 ifg$="p"then ($64){$6f}1,100,"{CTRL-B}Die Ebene ist parallel !",1,1,12
+20717 ifg$="s"then ($64){$6f}1,100,"{CTRL-B}Die Ebene ist senkrecht !",1,1,12
+20718 ifg$="p"andef<>0then($64){$6f}30,140,"{CTRL-B}Abstand:",1,1,10:($64){$6f}123,140,ef$,1,1,9
+20719 ifg$<>"s"andg$<>"p"then ($64){$6f}10,120,"{CTRL-B}Winkel:",1,1,12
+20720 ifg$<>"s"andg$<>"p"then($64){$6f}185,120,"{CTRL-B}Grad",1,1,12:($64){$6f}115,120,r$,1,1,9
+20730 return
+24500 rem bogen in grad
+24510 x=(x*180)/~:return
+24600 rem vektor ab
+24610 x1=b1-a1
+24611 x2=b2-a2
+24612 x3=b3-a3:return
+25000 gosub25040:gosub25010:return
+25010 x1=a1/a:x2=a2/a:x3=a3/a:return
+25020 gosub25040:return
+25040 a=(a1^2+a2^2+a3^2)^0.5:return
+25050 rem skalarprodukt
+25060 x=a1*b1+a2*b2+a3*b3:return
+25090 gosub25060:s=x:gosub25040:a0=a:v1=a1:v2=a2:v3=a3:a1=b1:a2=b2:a3=b3:gosub25040
+25091 a1=v1:a2=v2:a3=v3:b=a:a=a0
+25100 x=abs(s/(a*b))
+25101 ifx=1thenx=0:return
+25103 x=-atn(x/sqr(1-x^2))+~/2
+25104 ifs<0thenx=~-x
+25105 return
+25110 rem vektorprodukt
+25120 :
+25130 x1=a2*b3-a3*b2:x2=a3*b1-a1*b3:x3=a1*b2-a2*b1:return
+25140 rem flaeche 2 vektoren
+25150 gosub25120:a1=x1:a2=x2:a3=x3:gosub25040:return
+25160 rem lage von vektoren
+25170 gosub25090:ifint(x*100+.5)=314thenx=o
+25171 ifint(x*100+.5)=157thenx$="s":x=~/2:return
+25180 ifint(x*100+.5)=0thenx$="p":x=0:return
+25190 gosub24500:gosub18700:x=val(x$):return
+25300 rem determinante
+25301 d=x(1)*x(5)*x(9)+x(4)*x(8)*x(3)+x(7)*x(2)*x(6)-x(3)*x(5)*x(7)
+25302 d=d-x(6)*x(8)*x(1)-x(9)*x(2)*x(4)
+25303 return
+28500 rem weiter
+28510 ($64){$6f}23,191,"{CTRL-B}Weiter mit RETURN !",1,1,15
+28515 ($64){stop}0,187,320,187,1
+28520 return
+28600 rem spurpunkte
+28601 rem in yz-ebene
+28602 :
+28610 ifux=0thenx1$="n":goto28640
+28620 kx=-ax/ux:z(1)=0:z(2)=ay+kx*uy:z(3)=az+kx*uz
+28630 :
+28631 rem in xz-ebene
+28640 ifuy=0thenx2$="n":goto28670
+28650 ky=-ay/uy:z(4)=ax+ky*ux:z(5)=0:z(6)=az+ky*uz
+28660 :
+28661 rem in xy-ebene
+28670 ifuz=0thenx3$="n":goto28690
+28680 kz=-az/uz:z(7)=ax+kz*ux:z(9)=0:z(8)=ay+kz*uy
+28690 return
+29000 rem abstand punkt/gerade ...
+29020 kg=(p1*ux+p2*uy+p3*uz-ax*ux-ay*uy-az*uz)/(ux^2+uy^2+uz^2)
+29030 f1=ax+kg*ux
+29031 f2=ay+kg*uy
+29032 f3=az+kg*uz
+29040 fx=p1-f1:fy=p2-f2:fz=p3-f3:fp=(fx^2+fy^2+fz^2)^.5
+29100 px=p1-2*fx:py=pz-2*fy:pz=p3-2*fz
+29130 a1=p1-ax:a2=p2-ay:a3=p3-az:b1=ux:b2=uy:b3=uz
+29140 gosub25130
+29150 a1=x(1):a2=x(2):a3=x(3):b1=x1:b2=x2:b3=x3:gosub25060
+29170 return
+29200 rem g/g
+29219 a1=ux:a2=uy:a3=uz:b1=vx:b2=vy:b3=vz
+29220 gosub25170:t=x:ifx$="p"thent=0:g$="p":goto29240
+29221 ifx$="s"thent=90:g$="s"
+29230 goto29250
+29240 p1=bx:p2=by:p3=bz:goto29020
+29241 if t>90 thent=180-t
+29242 return
+29250 rem windschief ?
+29251 x(1)=bx-ax:x(2)=by-ay:x(3)=bz-az
+29252 x(4)=ux:x(5)=uy:x(6)=uz:x(7)=vx:x(8)=vy:x(9)=vz:gosub25301
+29253 ifd<>0theng$="w":goto29270
+29254 goto29320
+29270 rem windschief abstand
+29280 a1=ux:a2=uy:a3=uz:b1=vx:b2=vy:b3=vz:gosub25110:a1=x1:a2=x2:a3=x3:b1=ax
+29281 b2=ay:b3=az:gosub25060:nx=x1:ny=x2:nz=x3:c=x:xe=bx:ye=by:ze=bz
+29290 gosub30000:fp=d
+29291 ift>90 thent=180-t
+29320 rem schnittpunktsbe($64){dish}hnung
+29330 ifux=0andvx<>0then29350
+29340 goto29400
+29350 kb=(ax-bx)/vx
+29360 ifuy<>0thenka=(by-ay+kb*vy)/uy
+29370 ifaz+ka*uz=bz+kb*vzthen29900
+29380 ifuy=0thenka=(bz-az+kb*vz)/uz
+29390 ifay+ka*uy=by+kb*vythen29900
+29392 return
+29400 ifuy=0andvy<>0then29420
+29410 goto29470
+29420 kb=(ay-by)/vy
+29430 ifux<>0thenka=(bx-ax+kb*vx)/ux
+29440 ifaz+ka*uz=bz+kb*vzthen29900
+29450 ifux=0thenka=(bz-az+kb*vz)/uz
+29460 ifax+ka*ux=bx+kb*vxthen29900
+29470 ifuz=0andvz<>0then29490
+29480 goto29540
+29490 kb=(az-bz)/vz
+29500 ifux<>0thenka=(bx-ax+kb*vx)/ux
+29510 ifay+ka*uy=by+kb*vythen29900
+29520 ifux=0thenka=(by-ay+kb*vy)/uy
+29530 ifaz+ka*uz=bz+kb*vzthen29900
+29540 ifux=0andvx=0then29600
+29550 ifuy=0andvy=0then29610
+29560 ifuz=0andvz=0then29620
+29570 ifuy*vz<>uz*vythen29600
+29580 ifux*vz<>uz*vxthen29610
+29590 ifux*vy<>uy*vxthen29620
+29595 stop
+29600 ka=(-(ay-by)*vz+(az-bz)*vy)/(uy*vz-uz*vy):goto29900
+29610 ka=(-(ax-bx)*vy+(az-bz)*vx)/(ux*vz-uz*vx):goto29900
+29620 ka=(-(ax-bx)*vy+(ay-by)*vx)/(ux*vy-uy*vx)
+29900 sx=ax+ka*ux:sy=ay+ka*uy:sz=az+ka*uz:ift>90 thent=180-t
+29901 return
+30000 rem punkt/ebene
+30010 gosub30500:x=fre(x)
+30020 n1=nx:n2=ny:n3=nz:g1=xe:g2=ye:g3=ze:ux=nx:uy=ny:uz=nz:gosub30200
+30030 return
+30200 rem g/e
+30220 a1=ux:a2=uy:a3=uz:b1=n1:b2=n2:b3=n3:gosub25170:ifx$="s"thenx=90
+30230 ifx$="p"thenx$="s":goto30270
+30231 ifx$="s"thenx$="p":goto30233
+30232 goto30270
+30233 nx=n1:ny=n2:nz=n3:xe=g1:ye=g2:ze=g3
+30240 gosub30000:sp=d
+30250 ifsp=0thenx$="e":return
+30260 ifsp<>0thenx$="p":return
+30270 u1=ux:u2=uy:u3=uz:gosub30340
+30280 gx=g1+ke*ux:gy=g2+ke*uy:gz=g3+ke*uz
+30290 x=abs(90-x):return
+30300 rem schnittpunkt g/e
+30340 ke=u1*n1+u2*n2+u3*n3
+30350 ifke=0thenstop
+30360 ke=(c-n1*g1-n2*g2-n3*g3)/ke:return
+30400 rem um($64){dish}hnung para->normal
+30430 a1=e4:a2=e5:a3=e6:b1=e7:b2=e8:b3=e9
+30440 gosub25130:n1=x1:n2=x2:n3=x3
+30450 a1=n1:a2=n2:a3=n3:b1=e1:b2=e2:b3=e3
+30460 gosub25060:c=x:return
+30500 rem hnf aufstellen
+30530 a1=nx:a2=ny:a3=nz:gosub25040:n=a
+30540 ifc>=0thend=(nx*xe+ny*ye+nz*ze-c)/n
+30550 ifc<0thend=(nx*xe+ny*ye+nz*ze-c)/(-n)
+30560 d=abs(d):return
+30600 rem lage e/e
+30620 a1=n1:a2=n2:a3=n3:b1=m1:b2=m2:b3=m3:gosub25170:ifx$="s"orx<>0then30740
+30630 nx=n1:ny=n2:nz=n3:c=ce:gosub30530
+30640 de=d
+30690 nx=m1:ny=m2:nz=m3:c=cf:gosub30530
+30700 df=d:if(ce<0andcf>0)or(ce>0andcf<0)thendf=-df
+30710 ef=abs(de-df):x$="p":return
+30740 rem schnittgerade von e/e
+30741 i=1
+30750 f4=-m2:f5=m1:f6=0:f7=0:f8=-m3:f9=m2
+30760 ifm1=0andm2=0thenf4=i:f5=i+1:f6=0:f7=i+2:f8=i+3:f9=0
+30770 ifm1=0andm3=0thenf4=i:f5=0:f6=i+1:f7=i+2:f8=0:f9=i+3
+30780 ifm2=0andm3=0thenf4=0:f5=i:f6=i+1:f7=0:f8=i+2:f9=i+3
+30790 ifm3<>0thenf1=0:f2=0:f3=cf/m3:goto30820
+30800 ifm2<>0thenf1=0:f2=cf/m2:f3=0:goto30820
+30810 ifm1<>0thenf1=cf/m1:f2=0:f3=0:goto30820
+30820 t1=f4:t2=f5:t3=f6:g1=f7:g2=f8:g3=f9
+30821 fx=t1:fy=t2:fz=t3:gx=g1:gy=t2:gz=t3
+30830 l=n1*fx+n2*fy+n3*fz
+30835 if l=0andi=30thenfx=g1:fy=g2:fz=g3:gx=t1:gy=t2:gz=t3:goto30830
+30840 if l=0andi>100thenx$="u":return
+30850 if l=0theni=i+1:goto30750
+30860 r=(ce-n1*f1-n2*f2-n3*f3)/l
+30870 t=(-n1*gx-n2*gy-n3*gz)/l
+30880 s1=f1+r*fx:s2=f2+r*fy:s3=f3+r*fz
+30890 s4=t*fx+gx:s5=t*fy+gy:s6=t*fz+gz
+30895 ifx>90thenx=180-x
+30900 return
+

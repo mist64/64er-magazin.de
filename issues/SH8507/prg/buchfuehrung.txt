@@ -1,0 +1,664 @@
+
+
+;buchfuehrung.prg ==0801==
+   10 rem*********************
+   13 rem*                   *
+   14 rem*    'bufueg'       *
+   15 rem*                   *
+   17 rem*  buchfuehrungs-   *
+   19 rem*    programm       *
+   20 rem*                   *
+   21 rem*   volker gill     *
+   22 rem*fr.-rechberg-str.15*
+   23 rem* 6430 bad hersfeld *
+   24 rem*  tel.06621/76361  *
+   25 rem*                   *
+   30 rem*********************
+   41 print"{clr}":poke53280,0:poke53281,0:gosub40000
+   42 print"{home}{wht}":fori=1to8:print:next:printspc(16)"bufueg"
+   43 print:printspc(16)"by v.g."
+   44 print:printspc(16)"S1985S"
+   45 dima$(18,20,3),b$(18,20,3),c$(20,25,3),d$(17,3)
+   46 dd$="{wht}{rght}CCCCCCCC   CCCCCCC{SHIFT--}CCCCCCCC{CBM-X}{up}{left}{CBM-A}CC{down}CCCCCCC{grn}"
+   47 jj$="{wht}{rght}========   =======B========   ======={grn}"
+   48 ro$="{wht}{rght}CCCCCCCC   CCCCCCC{SHIFT--}CCCCCCCC   CCCCCCC{grn}"
+   49 lm$="{wht}{rght}CCCCCCCC{CBM-X}{up}{left}{CBM-A}CC{down}CCCCCCC{SHIFT--}CCCCCCCC   CCCCCCC{grn}"
+   50 bb=1:c=4:kk=1:ll=1:mm=1:nn=1
+   60 gosub40000:print"{home}":fori=1to3:print:next:printspc(3)"menue :"
+   65 printspc(3)"{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}"
+   70 print:print:printspc(3)"eroeffnungsbilanz erstellen....(1)"
+   80 printspc(3)"buchen.........................(2)"
+   90 printspc(3)"konten einsehen................(3)"
+  100 printspc(3)"konten neueroeffnen............(4)"
+  110 printspc(3)"konten abschliessen............(5)"
+  120 printspc(3)"neuanfang......................(6)"
+  140 print:print:printspc(5)"{rvon} wie ist ihre wahl ? {rvof} "
+  150 getv$:ifv$=""then150
+  160 ifval(v$)<1orval(v$)>6then60
+  170 onval(v$)goto198,800,2000,2500,2700,60010
+  198 ifyu=1then60
+  199 yu=1
+  200 gosub40000
+  201 print"{home}":fori=1to2:print:next:printspc(4)"geben sie bitte die benoetigten"
+  210 printspc(4)"aktivkonten und ihre anfangsbe-"
+  215 printspc(4)"bestaende (in d-mark) ein !"
+  216 print:printspc(4)"bei kontennamen mit mehr als acht "
+  217 printspc(4)"buchstaben laenge waehlen sie"
+  218 printspc(4)"bitte eine abkuerzung !"
+  219 print:printspc(4)"ausserdem muessen sie das waren-"
+  220 printspc(4)"konto (falls vorhanden) zuerst"
+  221 printspc(4)"eingeben (eingabe : 'waren') !"
+  222 print:printspc(4)"druecken sie 'q' nach beendigung"
+  225 printspc(4)"der eingabe !":
+  230 print:print:s=4:gosub9000
+  235 print"{clr}":print:print:print
+  240 fora=0to16
+  250 print:printspc(5):input"konto";a$(a,0,0):ifa$(a,0,0)="q"then274
+  255 iflen(a$(a,0,0))>8then200
+  260 printspc(7):input"{rvon}betrag";a$(a,0,1)
+  261 iflen(a$(a,0,1))>8then260
+  262 ifval(a$(a,0,1))<=0then260
+  263 ifa$(a,0,0)="mwst"thenc$(3,1,0)="ab":c$(3,1,1)=a$(a,0,1):dg=dg+1
+  264 ifa$(a,0,0)="mwst"thend$(pt,0)="mwst":d$(pt,1)=a$(a,0,1):pt=pt+1:goto271
+  265 ifa$(a,0,0)="vst"thenc$(4,1,0)="ab":c$(4,1,1)=a$(a,0,1):dg=dg+1
+  266 ifa$(a,0,0)="vst"thend$(pt,0)="vst":d$(pt,1)=a$(a,0,1):pt=pt+1
+  271 next
+  272 fori=1to3:print:next:printspc(5)"moegliche kontenanzahl erschoepft !"
+  274 print:printspc(5)"alle eingaben richtig ? (j/n)"
+  275 getl$:ifl$="j"then280
+  276 ifl$="n"thenprint"{clr}":print:print:print:goto240
+  277 goto275
+  280 gosub40000
+  281 print"{home}":fori=1to3:print:next:printspc(4)"geben sie bitte jetzt die passiv-"
+  290 printspc(4)"konten und ihre anfangsbestaende "
+  295 printspc(4)"(in d-mark) ein !"
+  296 print:printspc(4)"waehlen sie auch hier eine abkuer-"
+  297 printspc(4)"zung bei kontennamen mit mehr als"
+  298 printspc(4)"acht buchstaben laenge !"
+  300 print:printspc(4)"benutzen sie wieder 'q' zum been-"
+  310 printspc(4)"den der eingaben !"
+  315 print:print:s=4:gosub9000
+  319 print"{clr}":print:print:print
+  320 forb=0to15
+  330 print:printspc(5):input"konto";b$(b,0,0):ifb$(b,0,0)="q"then354
+  335 iflen(b$(b,0,0))>8then280
+  340 printspc(7):input"{rvon}betrag";b$(b,0,1)
+  341 iflen(b$(b,0,1))>8then340
+  342 ifval(b$(b,0,1))<=0then340
+  343 ifb$(b,0,0)="mwst"thenc$(3,1,2)="ab":c$(3,1,3)=b$(b,0,1):dh=dh+1
+  344 ifb$(b,0,0)="mwst"thene$(tp,0)="mwst":e$(tp,1)=b$(b,0,1):tp=tp+1:goto351
+  345 ifb$(b,0,0)="vst"thenc$(4,1,2)="ab":c$(4,1,3)=b$(b,0,1):dh=dh+1
+  346 ifb$(b,0,0)="vst"thene$(tp,0)="vst":e$(tp,1)=b$(b,0,1):tp=tp+1
+  351 next
+  352 fori=1to3:print:next:printspc(5)"moegliche kontenanzahl erschoepft !"
+  353 b$(16,0,0)="q"
+  354 print:printspc(5)"alle eingaben richtig ? (j/n)"
+  355 getl$:ifl$="j"then358
+  356 ifl$="n"thenprint"{clr}":print:print:print:goto320
+  357 goto355
+  358 ifb$(b,0,0)="q"thenprint"{clr}"
+  360 ifa=0andb=0thenyu=0:goto60
+  361 ifb$(0,0,0)="q"thenb$(0,0,0)=""
+  362 ifa$(0,0,0)="q"thena$(0,0,0)=""
+  363 a=a-1:b=b-1:foraz=0toa:uu=uu+val(a$(az,0,1))
+  364 next
+  365 foraz=0tob
+  366 hh=hh+val(b$(az,0,1))
+  367 next
+  368 jj=uu-hh:cc$=right$(str$(jj),len(str$(jj))-1):ifjj<0thengoto60000
+  369 print"{clr}":gosub50000
+  370 print"{home}":printspc(11)"{red}eroeffnungsbilanz{wht}"
+  375 b$(b+1,0,0)="ek":b$(b+1,0,1)=cc$
+  376 ifa>b+1thenmk=2:goto400
+  377 ifa<b+1thenmk=1
+  390 print"{home}{grn}":fori=1to3:print:next
+  391 forss=0toa:printspc(1)a$(ss,0,0)tab(18-len(a$(ss,0,1)))val(a$(ss,0,1))
+  392 next
+  393 ifmk=2thengf$=dd$:rt=a:goto420
+  400 print"{home}{grn}":fori=1to3:print:next
+  401 forss=0tob+1:printtab(20)b$(ss,0,0)tab(37-len(b$(ss,0,1)))val(b$(ss,0,1))
+  405 next
+  406 ifmk=2then390
+  407 ifmk=1thengf$=lm$:rt=b+1:goto420
+  410 gf$=ro$:rt=a
+  420 printgf$:printtab(19-len(str$(uu)))uutab(38-len(str$(uu)))uu:printjj$
+  421 foraz=2003to1043+(8+rt)*40step-40:pokeaz,32:next
+  422 forsp=0toa:d$(sp,0)=a$(sp,0,0):d$(sp,1)=a$(sp,0,1):next
+  423 forsp=0tob:d$(sp,2)=b$(sp,0,0):d$(sp,3)=b$(sp,0,1):next
+  424 d$(b+1,2)="ek":d$( b+1,3)=cc$
+  672 ifb=-1thenb$(b+1,0,0)="q":b$(b+1,0,1)="":goto675
+  674 b$(b+1,0,0)="":b$(b+1,0,1)=""
+  675 a=a-dg:b=b-dh
+  676 ifa$(0,0,0)<>"waren"then693
+  677 c$(1,0,0)="we":c$(1,1,0)="ab":c$(1,1,1)=a$(0,0,1)
+  678 foraz=0toa:a$(az,0,0)=a$(az+1,0,0):a$(az,0,1)=a$(az+1,0,1):next
+  680 foraz=1to3000:next
+  681 gosub9010:a=a-1
+  685 print"{wht}{clr}":fori=1to7:print:next:printspc(5)"geben sie bitte jetzt noch den"
+  686 print:printspc(5)"warenschlussbestand ein !"
+  687 fori=1to3:print:next:printspc(5):input"{rvon}betrag";kk$:iflen(kk$)>8orval(kk$)<=0then685
+  688 fori=1to4:print:next:printspc(5)"eingabe richtig ? (j/n)"
+  689 getl$:ifl$="j"then692
+  690 ifl$="n"then685
+  691 goto689
+  692 c$(2,0,0)="wv":c$(1,1,2)="sb":c$(1,1,3)=kk$:goto696
+  693 gosub9010
+  696 ifa$(0,0,0)="q"or(a$(0,0,0)="mwst"ora$(0,0,0)="vst")anda$(1,0,0)="q"then701
+  697 foraz=0toa
+  698 ifa$(az,0,0)="mwst"ora$(az,0,0)="vst"thengosub750
+  699 a$(az,1,0)="ab":a$(az,1,1)=a$(az,0,1)
+  700 next
+  701 ifb$(0,0,0)="q"or(b$(0,0,0)="mwst"orb$(0,0,0)="vst")andb$(1,0,0)=""then790
+  702 foraz=0tob
+  704 ifb$(az,0,0)="mwst"orb$(az,0,0)="vst"thengosub730
+  705 b$(az,1,2)="ab":b$(az,1,3)=b$(az,0,1)
+  706 next
+  707 goto790
+  730 forsc=aztob
+  733 b$(sc,0,0)=b$(sc+1,0,0):b$(sc,0,1)=b$(sc+1,0,1)
+  734 next
+  735 return
+  750 forsc=aztoa
+  760 a$(sc,0,0)=a$(sc+1,0,0):a$(sc,0,1)=a$(sc+1,0,1)
+  770 next
+  771 return
+  790 c$(3,0,0)="mwst":c$(4,0,0)="vst":c$(0,0,0)="ek":c$(0,1,2)="ab":c$(0,1,3)=cc$
+  799 goto60
+  800 ifyu<>1orfr=8then60
+  801 gosub40000
+  802 print"{home}":fori=1to3:print:next:printspc(4)"geben sie den buchungssatz"
+  810 printspc(4)"in die folgende tabelle ein !"
+  820 print:printspc(4)"sollten auf der soll- bzw. haben-"
+  830 printspc(4)"seite nicht zwei konten betroffen "
+  840 printspc(4)"sein,so geben sie ein 'q' ein !"
+  850 print:print:s=4:gosub9000
+  875 print"{clr}{down}{down}{down}soll-seite"spc(19)"haben-seite"
+  880 print"{down}{down}N{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}M{down}M{down}MN{up}N{up}N{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}M"
+  890 fori=1to12:print:next:print"M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N{up}N{up}NM{down}M{down}M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N"
+  891 print"{home}":fori=1to10:print:next:printspc(18)"{rvon}    "
+  894 print"{home}":fori=1to12:print:next:printspc(18)"{rvon}    "
+  900 print"{home}":fori=1to11:print:next:printspc(18)"{rvon} an "
+  910 print"{home}":fori=1to8:print:next:input"{rght}konto";ii$
+  915 iflen(ii$)>8orii$=""then875
+  920 printspc(1):input"{rvon}betrag";io$
+  925 iflen(io$)>8orio$=""then875
+  930 ifval(io$)<=0then875
+  940 fori=1to3:print:next:printspc(1):input"konto";oi$
+  943 ifoi$="q"then960
+  945 iflen(oi$)>8oroi$=""then875
+  950 printspc(1):input"{rvon}betrag";oo$
+  955 iflen(oo$)>8oroo$=""then875
+  957 ifval(oo$)=<0then875
+  960 print"{home}":fori=1to8:print:next:printspc(23):input"konto";ee$
+  965 iflen(ee$)>8oree$=""then875
+  970 printspc(23):input"{rvon}betrag";er$
+  975 iflen(er$)>8orer$=""then875
+  977 ifval(er$)=<0then875
+  980 fori=1to3:print:next:printspc(23):input"konto";re$
+  983 ifre$="q"then990
+  985 iflen(re$)>8orre$=""then875
+  986 printspc(23):input"{rvon}betrag";rr$
+  987 iflen(rr$)>8orrr$=""then875
+  988 ifval(rr$)<=0then875
+  990 print"{home}":fori=1to20:print:next:printspc(4)"alle eingaben richtig ? (j/n)"
+  991 getl$:ifl$="j"then995
+  992 ifl$="n"then875
+  993 goto991
+  995 xx$=ii$:gosub50200
+  996 ifkl<>4then1000
+  997 ds$="erste soll-konto":goto1014
+ 1000 ifoi$="q"then1006
+ 1001 xx$=oi$:gosub50200
+ 1002 ifkl<>4then1006
+ 1003 ds$="zweite soll-konto":goto1014
+ 1006 xx$=ee$:gosub50200
+ 1007 ifkl<>4then1010
+ 1008 ds$="erste haben-konto":goto1014
+ 1010 ifre$="q"then1020
+ 1011 xx$=re$:gosub50200
+ 1012 ifkl<>4then1020
+ 1013 ds$="zweite haben-konto"
+ 1014 fori=1to3:print:next:printspc(5)"{rvon}{lblu} das ";ds$;" muss "
+ 1015 print:printspc(5)"{rvon} erst eroeffnet werden ! {wht}"
+ 1016 foraz=1to6000:next:goto60
+ 1020 ifoi$="q"andre$="q"then1025
+ 1021 ifoi$<>"q"andre$<>"q"then1130
+ 1023 goto1060
+ 1025 xx$=ii$:gosub50200
+ 1030 lk=0:xy$=ee$:nm$=io$:yx$="":mn$=""
+ 1035 onklgosub50400,50415,50425
+ 1045 xx$=ee$:gosub50200
+ 1047 lk=2:xy$=ii$:nm$=er$
+ 1050 onklgosub50400,50415,50425
+ 1055 goto1160
+ 1060 ifoi$="q"thenxx$=ii$:gosub50200:goto1065
+ 1063 goto1095
+ 1065 lk=0:xy$=ee$:yx$=re$:mn$=io$:nm$=""
+ 1076 onklgosub50400,50415,50425
+ 1080 xx$=ee$:gosub50200
+ 1081 lk=2:xy$=ii$:nm$=er$:yx$="":mn$=""
+ 1082 onklgosub50400,50415,50425
+ 1090 xx$=re$:gosub50200
+ 1091 lk=2:xy$=ii$:nm$=rr$
+ 1092 onklgosub50400,50415,50425
+ 1093 goto1160
+ 1095 xx$=ee$:gosub50200
+ 1097 lk=2:xy$=ii$:yx$=oi$:mn$=er$:nm$=""
+ 1100 onklgosub50400,50415,50425
+ 1105 xx$=ii$:gosub50200
+ 1107 lk=0:xy$=ee$:nm$=io$:yx$="":mn$=""
+ 1110 onklgosub50400,50415,50425
+ 1115 xx$=oi$:gosub50200
+ 1117 lk=0:xy$=ee$:nm$=oo$
+ 1120 onklgosub50400,50415,50425
+ 1125 goto1160
+ 1130 xx$=ee$:gosub50200
+ 1132 lk=2:xy$=ii$:yx$=oi$:mn$=er$:nm$=""
+ 1134 onklgosub50400,50415,50425
+ 1135 xx$=ii$:gosub50200
+ 1137 lk=0:xy$=ee$:mn$=io$:yx$=re$:nm$=""
+ 1138 onklgosub50400,50415,50425
+ 1139 xx$=oi$:gosub50200
+ 1140 lk=0:xy$=ee$:mn$=oo$:yx$=re$:nm$=""
+ 1142 onklgosub50400,50415,50425
+ 1143 xx$=re$:gosub50200
+ 1145 lk=2:xy$=ii$:mn$=rr$:yx$=oi$:nm$=""
+ 1147 onklgosub50400,50415,50425
+ 1160 print"{clr}":fori=1to5:print:next:printspc(6)"{rvon}                           "
+ 1161 printspc(6)"{rvon} weiter mit buchen ? (j/n) "
+ 1162 printspc(6)"{rvon}                           "
+ 1165 getl$:ifl$=""then1165
+ 1166 ifl$="j"then875
+ 1167 ifl$="n"then60
+ 1168 goto1165
+ 2000 ifyu<>1then60
+ 2001 iffr=8thenpz=7:fk=5:ll=1:kk=1:mm=1:nn=1:goto2700
+ 2010 print"{clr}":fori=1to4:print:next:printspc(6)"welches konto wollen sie"
+ 2020 print:printspc(6):input"ansehen ";po$
+ 2030 iflen(po$)>8orpo$=""then2010
+ 2040 print"{clr}":xx$=po$:gosub50200
+ 2050 ifkl<>4then2060
+ 2052 fori=1to3:print:next:printspc(6)"{rvon}{lblu} das konto muss erst eroeffnet "
+ 2053 print:printspc(6)"{rvon} werden ! {wht}":goto1016
+ 2060 gosub50000
+ 2070 print"{red}"tab(20-(len(po$)/2))po$
+ 2080 onklgoto2085,2220,2300
+ 2085 print"{home}{grn}":fori=1to3:print:next:kj=1
+ 2090 forop=1to20
+ 2095 ifa$(ss,op,0)=""then2145
+ 2096 printtab(kj)a$(ss,op,0)
+ 2100 ifa$(ss,op,1)=""thenprint"{rght}{wht}+{up}{grn}":kj=2:goto2110
+ 2104 kj=1
+ 2105 print"{up}"tab(18-len(a$(ss,op,1)))val(a$(ss,op,1))
+ 2110 next
+ 2145 iflq=2thenreturn
+ 2146 print"{home}{grn}":fori=1to3:print:next
+ 2149 kj=20
+ 2150 forop=1to20
+ 2160 ifa$(ss,op,2)=""then2400
+ 2170 printtab(kj)a$(ss,op,2)
+ 2190 ifa$(ss,op,3)=""thenprintspc(20)"{wht}+{up}{grn}":kj=21:goto2195
+ 2191 kj=20
+ 2193 print"{up}"tab(37-len(a$(ss,op,3)))val(a$(ss,op,3))
+ 2195 next
+ 2220 print"{home}{grn}":fori=1to3:print:next:kj=1
+ 2225 forop=1to20
+ 2227 ifb$(ss,op,0)=""then2245
+ 2232 printtab(kj)b$(ss,op,0)
+ 2235 ifb$(ss,op,1)=""thenprint"{rght}{wht}+{up}{grn}":kj=2:goto2242
+ 2237 kj=1
+ 2240 print"{up}"tab(18-len(b$(ss,op,1)))val(b$(ss,op,1))
+ 2242 next
+ 2245 iflq=2thenreturn
+ 2246 print"{home}{grn}":fori=1to3:print:next:kj=20
+ 2247 forop=1to20
+ 2260 ifb$(ss,op,2)=""then2400
+ 2270 printtab(kj)b$(ss,op,2)
+ 2290 ifb$(ss,op,3)=""thenprintspc(20)"{wht}+{up}{grn}":kj=21:goto2295
+ 2291 kj=20
+ 2293 print"{up}"tab(37-len(b$(ss,op,3)))val(b$(ss,op,3))
+ 2295 next
+ 2300 print"{home}{grn}":fori=1to3:print:next:kj=1
+ 2305 forop=1to20
+ 2310 ifc$(ss,op,0)=""then2345
+ 2315 printtab(kj)c$(ss,op,0)
+ 2320 ifc$(ss,op,1)=""thenprint"{rght}{wht}+{up}{grn}":kj=2:goto2342
+ 2337 kj=1
+ 2340 print"{up}"tab(18-len(c$(ss,op,1)))val(c$(ss,op,1))
+ 2342 next
+ 2345 iflq=2thenreturn
+ 2346 print"{home}{grn}":fori=1to3:print:next
+ 2349 kj=20
+ 2350 forop=1to20
+ 2360 ifc$(ss,op,2)=""then2400
+ 2370 printtab(kj)c$(ss,op,2)
+ 2390 ifc$(ss,op,3)=""thenprintspc(20)"{wht}+{up}{grn}":kj=21:goto2395
+ 2391 kj=20
+ 2393 print"{up}"tab(37-len(c$(ss,op,3)))val(c$(ss,op,3))
+ 2395 next
+ 2400 iflq=1thenreturn
+ 2404 gosub9010
+ 2408 print"{clr}":fori=1to5:print:next:printspc(5)"{rvon}                              "
+ 2409 printspc(5)"{rvon} weiter mit einsehen ? (j/n)  "
+ 2410 printspc(5)"{rvon}                              "
+ 2412 getl$:ifl$=""then2412
+ 2415 ifl$="j"then2000
+ 2420 ifl$="n"then60
+ 2422 goto2412
+ 2500 ifyu<>1orfr=8then60
+ 2510 gosub40000:print"{home}":fori=1to4:print:next
+ 2511 printspc(4)"das neuzueroeffnende konto ist "
+ 2515 printspc(4)"{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}"
+ 2520 print:print:print:printspc(4)"aktiv-konto...............(1)"
+ 2530 print:print:printspc(4)"passiv-konto..............(2)"
+ 2540 print:print:printspc(4)"unterkonto von ek.........(3)"
+ 2550 fori=1to3:print:next:printspc(4)"{rvon} ihre wahl ? "
+ 2560 getvy$:ifvy$=""then2560
+ 2570 ifval(vy$)<1orval(vy$)>3then2510
+ 2580 onval(vy$)goto2590,2620,2640
+ 2590 ifa+1>18thenlp$="aktiv":goto60020
+ 2600 gosub9040
+ 2610 a=a+1:a$(a,0,0)=po$:goto2660
+ 2620 ifb+1>18thenlp$="passiv":goto60020
+ 2630 gosub9040
+ 2635 b=b+1:b$(b,0,0)=po$:goto2660
+ 2640 ifc+1>16thenlp$="ek-unter":goto60020
+ 2650 gosub9040
+ 2655 c=c+1:c$(c,0,0)=po$
+ 2660 print"{clr}":fori=1to5:print:next:printspc(6)"{rvon}                              "
+ 2661 printspc(6)"{rvon} weiter mit eroeffnen ? (j/n) "
+ 2662 printspc(6)"{rvon}                              "
+ 2665 getl$:ifl$=""then2665
+ 2666 ifl$="j"then2510
+ 2667 ifl$="n"then60
+ 2668 goto2665
+ 2700 ifpz=7then2710
+ 2701 ifyu<>1orfr=8then60
+ 2704 fr=8
+ 2710 gosub40000
+ 2711 print"{home}":fori=1to8:print:next:printspc(12)"ZZZZZZZZZZZZZZZZ"
+ 2715 printspc(12)"Z              Z"
+ 2720 printspc(12)"Z aktiv-konten Z"
+ 2725 printspc(12)"Z              Z"
+ 2730 printspc(12)"ZZZZZZZZZZZZZZZZ"
+ 2735 foraz=1to500:next
+ 2740 ifa$(0,0,0)="q"then3710
+ 2745 ifa<0then3710
+ 2750 forss=0toa
+ 2754 ifa$(ss,1,0)=""anda$(ss,1,2)=""then2880
+ 2755 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1
+ 2757 gosub50500
+ 2775 print"{clr}":gosub50000
+ 2776 print"{home}{down}{red}"tab(20-len(a$(ss,0,0))/2)a$(ss,0,0):print"{wht}"
+ 2800 ifiy>yithen2830
+ 2810 ifiy<yithen2840
+ 2820 lq=1:gosub2085
+ 2822 printro$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=iy:goto2850
+ 2830 lq=1:gosub2145
+ 2831 lq=2:gosub2085
+ 2832 printdd$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=iy:goto2850
+ 2840 lq=1:gosub2085
+ 2842 printlm$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=yi
+ 2850 foraz=2003to1043+(7+po)*40step-40
+ 2855 pokeaz,32
+ 2860 next
+ 2876 gosub9010
+ 2880 nextss
+ 3710 gosub40000
+ 3713 print"{home}":fori=1to8:print:next:printspc(12)"ZZZZZZZZZZZZZZZZZ"
+ 3715 printspc(12)"Z               Z"
+ 3720 printspc(12)"Z passiv-konten Z"
+ 3725 printspc(12)"Z               Z"
+ 3730 printspc(12)"ZZZZZZZZZZZZZZZZZ"
+ 3740 foraz=1to1000:next
+ 3745 ifb$(0,0,0)="q"then4000
+ 3750 forss=0tob
+ 3754 ifb$(ss,1,0)=""andb$(ss,1,2)=""then3880
+ 3755 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1
+ 3757 gosub50600
+ 3775 print"{clr}":gosub50000
+ 3776 print"{home}{down}{red}"tab(20-len(b$(ss,0,0))/2)b$(ss,0,0):print"{wht}"
+ 3800 ifiy>yithen3830
+ 3810 ifiy<yithen3840
+ 3820 lq=1:gosub2220
+ 3822 printro$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=iy:goto3850
+ 3830 lq=1:gosub2245
+ 3831 lq=2:gosub2220
+ 3832 printdd$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=iy:goto3850
+ 3840 lq=1:gosub2220
+ 3842 printlm$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=yi
+ 3850 foraf=2003to1043+(7+po)*40step-40
+ 3855 pokeaf,32
+ 3860 next
+ 3876 gosub9010
+ 3880 nextss
+ 4000 gosub40000
+ 4002 print"{home}":fori=1to8:print:next:printspc(9)"ZZZZZZZZZZZZZZZZZZZZZZ"
+ 4010 printspc(9)"Z                    Z"
+ 4020 printspc(9)"Z ek und unterkonten Z"
+ 4030 printspc(9)"Z                    Z"
+ 4040 printspc(9)"ZZZZZZZZZZZZZZZZZZZZZZ"
+ 4045 foraz=1to1000:next
+ 4046 ifc=4then5000
+ 4055 forss=5toc
+ 4056 ifc$(ss,1,0)=""andc$(ss,1,2)=""then4881
+ 4060 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1:fg$="g+v":gl=c+2
+ 4061 ifc$(ss,0,0)="privat"thenfg$="ek":gl=0:gosub50700:goto4075
+ 4070 fg$="g+v":gl=c+2:gosub50700
+ 4075 print"{clr}":gosub50000
+ 4776 print"{home}{down}{red}"tab(20-len(c$(ss,0,0))/2)c$(ss,0,0):print"{wht}"
+ 4800 ifiy>yithen4830
+ 4810 ifiy<yithen4840
+ 4820 lq=1:gosub2300
+ 4822 printro$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=iy:goto4850
+ 4830 lq=1:gosub2345
+ 4831 lq=2:gosub2300
+ 4832 printdd$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=iy:goto4850
+ 4840 lq=1:gosub2300
+ 4842 printlm$:printtab(19-len(ai$))aitab(38-len(ai$))ai:printjj$:po=yi
+ 4850 foraf=2003to1043+(7+po)*40step-40
+ 4855 pokeaf,32
+ 4860 next
+ 4876 gosub9010
+ 4880 iffd=9thenreturn
+ 4881 nextss
+ 5000 ifc$(1,0,0)=""then7880
+ 5001 ifgy=1then5060
+ 5002 ifgy=2then5060
+ 5003 gosub40000
+ 5004 print"{home}{wht}":fori=1to4:print:next:printspc(4)"abschluss der warenkonten durch"
+ 5010 printspc(4)"{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}"
+ 5020 print:print:print:printspc(4)"bruttoabschluss.............(1)"
+ 5030 print:print:printspc(4)"nettoabschluss..............(2)"
+ 5040 print:print:print:printspc(4)"{rvon} ihre wahl ? "
+ 5045 gete$:ife$=""then5045
+ 5050 ifval(e$)<1orval(e$)>2then5000
+ 5055 onval(e$)goto5060,6000
+ 5060 print"{clr}":gx=1:forss=1to2
+ 5065 ifc$(ss,1,0)=""andc$(ss,1,2)=""then7880
+ 5070 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1:fg$="g+v":gl=c+2
+ 5077 gosub50700
+ 5078 print"{clr}":gosub50000
+ 5776 print"{home}{down}{red}"tab(20-len(c$(ss,0,0))/2)c$(ss,0,0):print"{wht}"
+ 5800 fd=9:gosub4800
+ 5810 nextss:goto7880
+ 6000 print"{clr}":gx=2:ss=1
+ 6010 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1:fg$="wv":gl=1
+ 6020 gosub50700
+ 6075 print"{clr}":gosub50000
+ 6776 print"{home}{down}{red}"tab(20-len(c$(ss,0,0))/2)c$(ss,0,0):print"{wht}"
+ 6800 fd=9:gosub4800
+ 6881 ifml=5then6895
+ 6885 ifml=6then6910
+ 6890 goto7000
+ 6895 ml=0:bb=1:xy$="we":nm$=m$:mn$="":yx$="":lk=0:ss=2:gosub50425:goto7000
+ 6910 ml=0:bb=1:xy$="we":nm$=m$:mn$="":yx$="":lk=2:ss=2:gosub50425
+ 7000 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1:fg$="g+v":gl=c+2
+ 7020 gosub50700
+ 7075 print"{clr}":gosub50000
+ 7776 print"{home}{down}{red}"tab(20-len(c$(ss,0,0))/2)c$(ss,0,0):print"{wht}"
+ 7800 fd=9:gosub4800
+ 7880 gosub40000
+ 7882 print"{home}":fori=1to8:print:next:printspc(12)"ZZZZZZZZZZZZZZZZ"
+ 7885 printspc(12)"Z              Z"
+ 7887 printspc(12)"Z     g+v      Z"
+ 7890 printspc(12)"Z              Z"
+ 7892 printspc(12)"ZZZZZZZZZZZZZZZZ"
+ 7895 foraz=1to1000:next
+ 7900 ifc=4andc$(1,0,0)=""then8000
+ 7905 ss=c+2
+ 7906 ifc$(ss,1,0)=""andc$(ss,1,2)=""then8000
+ 7910 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1:fg$="ek":gl=c+2
+ 7920 gosub50700
+ 7930 print"{clr}":gosub50000
+ 7940 print"{red}"tab(18)"g+v"
+ 7950 fd=9:gosub4800
+ 8000 gosub40000
+ 8001 print"{home}":fori=1to8:print:next:printspc(12)"ZZZZZZZZZZZZZZZ"
+ 8010 printspc(12)"Z             Z"
+ 8015 printspc(12)"Z     ek      Z"
+ 8020 printspc(12)"Z             Z"
+ 8025 printspc(12)"ZZZZZZZZZZZZZZZ"
+ 8030 foraz=1to1000:next
+ 8040 ss=0
+ 8041 ifc$(c+2,1,0)=""andc$(c+2,1,2)=""then8070
+ 8045 ifgy=1orgy=2then8070
+ 8050 ifml=5thenml=0:lk=0:bb=1:xy$="g+v":nm$=m$:yx$="":mn$="":gosub50425:goto8070
+ 8060 ifml=6thenml=0:lk=2:bb=1:xy$="g+v":nm$=m$:yx$="":mn$="":gosub50425
+ 8070 iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1:fg$="sb":gl=0
+ 8075 gosub50700
+ 8076 iffk=5then8080
+ 8077 ifml=5thenml=0:lk=0:bb=1:xy$="ek":nm$=m$:yx$="":mn$="":ss=c+1:gosub50425
+ 8078 ifml=6thenml=0:lk=2:bb=1:xy$="ek":nm$=m$:yx$="":mn$="":ss=c+1:gosub50425
+ 8080 print"{clr}":gosub50000:print"{red}"tab(19)"ek"
+ 8090 fd=9:ss=0:gosub4800
+ 8100 gosub40000
+ 8107 print"{home}":fori=1to8:print:next:printspc(12)"ZZZZZZZZZZZZZZZZ"
+ 8108 printspc(12)"Z              Z"
+ 8109 printspc(12)"Z steuerkonten Z"
+ 8110 printspc(12)"Z              Z"
+ 8120 printspc(12)"ZZZZZZZZZZZZZZZZ"
+ 8125 foraz=1to1000:next
+ 8126 ifc$(4,1,0)=""andc$(4,1,2)=""then8164
+ 8130 ss=4:iy=0:yi=0:re=0:er=0:ai=0:ai$="":ag=1:ah=1:fg$="mwst":gl=4:gosub50700
+ 8135 iffk=5then8155
+ 8140 ifml=5thenml=0:bb=1:ss=3:xy$="vst":nm$=m$:yx$="":mn$="":lk=0:gosub50425
+ 8150 ifml=6thenml=0:bb=1:ss=3:xy$="vst":nm$=m$:yx$="":mn$="":lk=2:gosub50425
+ 8155 print"{clr}":gosub50000:print"{red}"tab(18)"vst"
+ 8160 fd=9:ss=4:gosub4800
+ 8164 ifc$(3,1,0)=""andc$(3,1,2)=""then8900
+ 8165 ss=3:iy=0:yi=0:er=0:re=0:ai=0:ai$="":ag=1:ah=1:fg$="sb":gl=3:gosub50700
+ 8166 iffk=5then8180
+ 8170 ifml=5thenml=0:bb=1:ss=c+1:xy$="mwst":nm$=m$:yx$="":mn$="":lk=0:gosub50425
+ 8175 ifml=6thenml=0:bb=1:ss=c+1:xy$="mwst":nm$=m$:yx$="":mn$="":lk=2:gosub50425
+ 8180 print"{clr}":gosub50000:print"{red}"tab(18)"mwst"
+ 8185 fd=9:ss=3:gosub4800
+ 8900 gosub40000
+ 8901 print"{home}":fori=1to8:print:next:printspc(12)"ZZZZZZZZZZZZZZZZZ"
+ 8910 printspc(12)"Z               Z"
+ 8915 printspc(12)"Z schlussbilanz Z"
+ 8920 printspc(12)"Z               Z"
+ 8925 printspc(12)"ZZZZZZZZZZZZZZZZZ"
+ 8930 foraz=1to1000:next
+ 8931 ss=c+1:gl=c+1
+ 8932 ifkk$=""then8935
+ 8933 ifgy=1orgy=2then8935
+ 8934 xy$="waren":nm$=kk$:mn$="":lk=0:yx$="":ss=c+1:gosub50425
+ 8935 iy=0:yi=0:ai=0:ai$="":er=0:re=0:ag=1:ah=1:fg$="":gosub50700
+ 8940 print"{clr}":gosub50000:print"{red}"tab(13)"schlussbilanz"
+ 8950 fd=9:gosub4800
+ 8960 ifgx=1thengy=1
+ 8965 ifgx=2thengy=2
+ 8970 fd=0:goto60
+ 9000 printspc(s)"{wht}{rvon}'space' druecken{rvof}":goto9020
+ 9010 print"{home}{wht}           'space' druecken"
+ 9020 getl$:ifl$=" "thenreturn
+ 9030 goto9020
+ 9040 print"{clr}":fori=1to10:print:next:printspc(5)"wie lautet das neuzueroeffnende"
+ 9050 print:printspc(5):input"konto ";po$
+ 9060 iflen(po$)>8orpo$=""then2510
+ 9070 return
+40000 print"{clr}{rght}{wht}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+40006 foraz=1to23:print"{rght}{CBM-+}"spc(36)"{CBM-+}":next
+40020 print"{up}{rght}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+40050 return
+50000 foraz=1105to1141:pokeaz,100:poke55296-1024+az,1:next
+50004 foraz=1083to2003step40:pokeaz,93:poke55296-1024+az,1:next
+50006 poke1065,19:poke1101,8:poke55337,1:poke55373,1:return
+50200 forss=0toa:ifa$(ss,0,0)=xx$thenkl=1:return
+50210 next
+50235 forss=0tob:ifb$(ss,0,0)=xx$thenkl=2:return
+50236 next
+50250 forss=0toc:ifc$(ss,0,0)=xx$thenkl=3:return
+50252 next
+50258 kl=4:return
+50400 ifa$(ss,bb,lk)<>""thenbb=bb+1:goto50400
+50410 a$(ss,bb,lk)=xy$:a$(ss,bb,lk+1)=nm$
+50411 bb=bb+1:a$(ss,bb,lk)=yx$:a$(ss,bb,lk+1)=mn$:bb=1:return
+50415 ifb$(ss,bb,lk)<>""thenbb=bb+1:goto50415
+50420 b$(ss,bb,lk)=xy$:b$(ss,bb,lk+1)=nm$
+50421 bb=bb+1:b$(ss,bb,lk)=yx$:b$(ss,bb,lk+1)=mn$:bb=1:return
+50425 ifc$(ss,bb,lk)<>""thenbb=bb+1:goto50425
+50430 c$(ss,bb,lk)=xy$:c$(ss,bb,lk+1)=nm$
+50431 bb=bb+1:c$(ss,bb,lk)=yx$:c$(ss,bb,lk+1)=mn$:bb=1:return
+50500 ifa$(ss,ag,0)=""then50540
+50530 iy=iy+1:er=er+val(a$(ss,ag,1)):ag=ag+1:goto50500
+50540 ifa$(ss,ah,2)=""then50570
+50550 yi=yi+1:re=re+val(a$(ss,ah,3)):ah=ah+1:goto50540
+50570 ifer>rethen50575
+50573 goto50580
+50575 zx=er-re:zx$=str$(zx):m$=right$(zx$,len(zx$)-1):c$(c+1,ll,0)=a$(ss,0,0)
+50576 c$(c+1,ll,1)=m$:ll=ll+1
+50577 a$(ss,ah,2)="sb":a$(ss,ah,3)=m$:ai=er:ai$=str$(er):yi=yi+1:return
+50580 ifer<rethen50585
+50583 goto50590
+50585 zx=re-er:zx$=str$(zx):m$=right$(zx$,len(zx$)-1):c$(c+1,kk,2)=a$(ss,0,0)
+50586 c$(c+1,kk,3)=m$:kk=kk+1
+50587 a$(ss,ag,0)="sb":a$(ss,ag,1)=m$:ai=re:ai$=str$(re):iy=iy+1:return
+50590 ai=re:ai$=str$(re):return
+50600 ifb$(ss,ag,0)=""then50640
+50630 iy=iy+1:er=er+val(b$(ss,ag,1)):ag=ag+1:goto50600
+50640 ifb$(ss,ah,2)=""then50670
+50650 yi=yi+1:re=re+val(b$(ss,ah,3)):ah=ah+1:goto50640
+50670 ifer>rethen50675
+50673 goto50680
+50675 zx=er-re:zx$=str$(zx):m$=right$(zx$,len(zx$)-1):c$(c+1,ll,0)=b$(ss,0,0)
+50676 c$(c+1,ll,1)=m$:ll=ll+1
+50677 b$(ss,ah,2)="sb":b$(ss,ah,3)=m$:ai=er:ai$=str$(er):yi=yi+1:return
+50680 ifer<rethen50685
+50683 goto50690
+50685 zx=re-er:zx$=str$(zx):m$=right$(zx$,len(zx$)-1):c$(c+1,kk,2)=b$(ss,0,0)
+50686 c$(c+1,kk,3)=m$:kk=kk+1
+50687 b$(ss,ag,0)="sb":b$(ss,ag,1)=m$:ai=re:ai$=str$(re):iy=iy+1:return
+50690 ai=re:ai$=str$(re):return
+50700 ifc$(ss,ag,0)=""then50740
+50730 iy=iy+1:er=er+val(c$(ss,ag,1)):ag=ag+1:goto50700
+50740 ifc$(ss,ah,2)=""then50770
+50750 yi=yi+1:re=re+val(c$(ss,ah,3)):ah=ah+1:goto50740
+50770 ifer>rethen50775
+50773 goto50780
+50775 zx=er-re:zx$=str$(zx):m$=right$(zx$,len(zx$)-1)
+50776 ifss=glthen50779
+50777 c$(gl,mm,0)=c$(ss,0,0)
+50778 c$(gl,mm,1)=m$:mm=mm+1
+50779 c$(ss,ah,2)=fg$:c$(ss,ah,3)=m$:ai=er:ai$=str$(er):yi=yi+1:ml=5:return
+50780 ifer<rethen50785
+50783 goto50790
+50785 zx=re-er:zx$=str$(zx):m$=right$(zx$,len(zx$)-1)
+50786 ifss=glthen50789
+50787 c$(gl,nn,2)=c$(ss,0,0)
+50788 c$(gl,nn,3)=m$:nn=nn+1
+50789 c$(ss,ag,0)=fg$:c$(ss,ag,1)=m$:ai=re:ai$=str$(re):iy=iy+1:ml=6:return
+50790 ai=re:ai$=str$(re):return
+60000 gosub40000
+60002 print"{home}":fori=1to5:print:next:printspc(4)"das eigenkapital ist negativ !"
+60003 print:print:print:printspc(4)"der computer sieht sich veran-"
+60004 printspc(4)"lasst,aufgrund dieser schlechten"
+60005 printspc(4)"geschaeftslage jegliche buch-"
+60006 printspc(4)"fuehrungsaufgaben abzulehnen !"
+60007 foraz=1to6000:next:sys64738
+60010 fori=1to30:print:next:printchr$(147):restore:end
+60020 print"{clr}{wht}":fori=1to7:print:next:printspc(5)"es kann kein "lp$"konto"
+60030 print:printspc(5)"mehr verwaltet werden !"
+60040 foraz=1to3000:next:goto60
+

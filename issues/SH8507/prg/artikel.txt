@@ -1,0 +1,238 @@
+
+
+;artikel.prg ==0801==
+   10 rem"Artikel"
+   20 printchr$(147):ifs%=0thens%=1:load"input",8,1
+   30 sys49152:j%(1)=1:j%(2)=23:j%(3)=33:j%(4)=40:v$=chr$(29):t$="!"
+   40 l1$="-----":l2$="=====":bl$="{$a0}{$a0}{$a0}{$a0}{$a0}":dima$(600),b%(100):open15,8,15
+   50 fori=1to4:l1$=l1$+l1$:l2$=l2$+l2$:bl$=bl$+bl$:nexti:l3$=left$(l2$,40)
+   60 gosub400:z=6:s=8:gosub800:print"Einen Augenblick bitte"
+   70 l5$=left$(l1$,39):i%(1)=22:i%(2)=10:i%(3)=7:i%(4)=4:l$="!"+left$(l2$,78)+"!"
+   80 ei$="Bitte Programmwunsch eingeben   :":wi$="Weitere Eingaben  j/n    :j"
+   90 k$="!"+left$(l1$,78)+"!":fa$="Bitte Firmenabkuerzung eingeben  :"
+  100 open2,8,2,"Anzahl-Saetze,s,r":gosub9500:ifa<>0thena%=0:close2:goto1000
+  120 input#2,a%:gosub9500:close2:open2,8,2,"Artikel-Nr.,s,r":gosub9500
+  130 z=10:s=7:gosub800:print"Ich lade"a%" Datensaetze":ifa%=0thenclose2:goto1000
+  170 fori=1toa%:input#2,a$(i):printchr$(19)i:nexti:gosub9500:close2:goto1000
+  400 printchr$(147):z=0:s=10:gosub800:print"Programm Artikel":printl3$;
+  410 printleft$(bl$,(40-len(m$))/2)m$:z=23:s=0:gosub800:printl3$;
+  420 z=23:s=0:gosub800:printl3$;"{$a0}{$a0}_ letzte Eingabe  * letztes Menue";:return
+  450 b$(1)="Artikel-Bez.   :":b$(2)="Artikel-Nr.    :":b$(3)="Einkaufspreis  :"
+  460 b$(4)="Bestand        :":da%=2:return
+  500 b$(1)="1. Alle Artikel":b$(2)="2. Alle Artikel einer Firma":da%=3:return
+  600 b$(1)="1. Alle Artikel ausdrucken":b$(2)="2. Alle Artikel einer Firma"
+  610 b$(3)="3. Inventur drucken":return
+  700 b$(1)="1. Neueingabe":b$(2)="2. Aenderungen":b$(3)="3. Bildschirmausgabe"
+  710 b$(4)="4. Druckerausgabe":b$(5)="5. Sortieren":b$(6)="6. Streichen"
+  720 b$(7)="7. Stueckzahleingabe":b$(8)="8. Stckz. auf 0 setzen"
+  730 b$(9)="9. Programm beenden":da%=1:return
+  800 poke214,z:poke211,s:sys58640:return
+  850 gosub400:z=2:s=0:gosub800:print"S-N. Artikelbez Artik-Nr.  EK-Pr.  STCK"
+  870 printl5$:return
+  880 print:print"Taste = weiter  - = zurueck * = abbruch":y$=""
+  890 gety$:ify$="*"thenhh%=1:return
+  895 ify$=""then890
+  896 ify$="-"theni=i-34:return
+  900 return
+  950 :
+  960 forn=z%to71:print#7:nextn:z%=0:return
+ 1000 :
+ 1010 m$="Hauptmenue":ifda%<>1thengosub700:gosub400
+ 1060 fori=1to9 :z=1+i*2:s=8:gosub800:printb$(i):nexti:print:print" "ei$
+ 1070 z=0:s=32:gosub800:input>1,34,21,x$:ifx$="9"then10000
+ 1100 onval(x$)gosub1200,1500,2000,2500,3000,3500,4000,4500:goto1000
+ 1200 :
+ 1210 m$="Max. 600 Neueingaben":a%=a%+1:ifda%<>2thengosub450:ifa%=601then1000
+ 1260 gosub400:z=3:s=0:gosub800:print"Die letzte Eingabe war Position Nr."a%-1
+ 1265 fori=1to4:z=3+i:s=0:gosub800:printb$(i)mid$(a$(a%-1),j%(i),i%(i))"*":nexti
+ 1280 printl5$:s=0:fori=1to4:z=8+i*2:gosub800:printb$(i)left$(bl$,i%(i))"*"
+ 1290 nexti:print:print:printwi$
+ 1350 fori=1to4
+ 1360 input>i%(i),16,8+i*2,c$(i):ifleft$(c$(i),1)=chr$(224)then1360
+ 1370 ifi>1andleft$(c$(i),1)="_"theni=i-1:goto1360
+ 1375 ifleft$(c$(1),1)="*"thena%=a%-1:return
+ 1376 ifi<3andasc(left$(c$(i),1))<91then1360
+ 1377 ifi=2then:ifmid$(c$(i),3,1)<>"."ormid$(c$(i),8,1)<>"."then1360
+ 1378 ifi=3andmid$(c$(i),5,1)<>"."then1360
+ 1380 ifi=4then:ifasc(c$(4))>57then1360
+ 1400 nexti:a$(a%)="":fori=1to4:a$(a%)=a$(a%)+c$(i):nexti
+ 1450 input>1,26,19,x$:ifx$="j"thena%=a%+1:goto1260
+ 1460 ifleft$(x$,1)="_"then1350
+ 1470 gosub9000:return
+ 1500 :
+ 1510 m$="Aendern":gosub400:ifda%<>2thengosub450
+ 1520 z=3:s=6:gosub800:print"Bitte zu aendernde Satz-Nr."
+ 1530 z=5:s=10:gosub800:print"eingeben   :":print:printl5$
+ 1540 input>4,22,5,x$:ifleft$(x$,1)="*"thengosub9000:return
+ 1550 h%=val(x$):ifh%=0orh%>a%then1500
+ 1560 s=0:fori=1to4:z=8+i*2:gosub800:printb$(i)mid$(a$(h%),j%(i),i%(i))"*":nexti
+ 1570 print:print:printwi$
+ 1650 h$="":fori=1to4
+ 1660 input>i%(i),16,8+i*2,c$(i):ifleft$(c$(i),1)=chr$(224)then1660
+ 1670 ifi>1andleft$(c$(i),1)="_"theni=i-1:goto1660
+ 1675 ifi=1then:ifleft$(c$(1),1)="*"thengosub9000:return
+ 1676 ifi<3andasc(left$(c$(i),1))<91then1660
+ 1677 ifi=2then:ifmid$(c$(i),3,1)<>"."ormid$(c$(i),8,1)<>"."then1660
+ 1678 ifi=3andmid$(c$(i),5,1)<>"."then1660
+ 1680 ifi=4then:ifasc(c$(4))>57then1660
+ 1690 nexti
+ 1700 fori=1to4:h$=h$+c$(i):nexti:a$(h%)=h$:input>1,26,19,x$:ifx$="j"then1500
+ 1720 gosub9000:return
+ 2000 :
+ 2010 m$="Bildschirm":h$="":gosub400:ifda%<>3thengosub500:h%=0
+ 2020 s=6:fori=1to2:z=4+i*2:gosub800:printb$(i):nexti:print:print:print"{$a0}{$a0}"ei$
+ 2030 input>1,35,11,x$:ifleft$(x$,1)="*"thenreturn
+ 2040 ifx$="1"thenn%=1:goto2200
+ 2050 z=16:s=2:gosub800:printfa$
+ 2060 input>2,36,16,x$:h$=x$:ifleft$(x$,1)="*"thenreturn
+ 2070 ifasc(left$(x$,1))<91orasc(right$(x$,1))<91then2060
+ 2080 fori=1toa%:ifmid$(a$(i),23,2)=x$thenn%=i:i=a%
+ 2090 nexti
+ 2200 gosub850:fori=n%toa%:ifx$<>"1"then:ifmid$(a$(i),23,2)<>h$then2290
+ 2220 printright$("{$a0}{$a0}{$a0}{$a0}"+str$(i),4)"{$a0}"left$(a$(i),10)"{$a0}"mid$(a$(i),23,10)"{$a0}";
+ 2230 printmid$(a$(i),33,7)"{$a0}"right$("{$a0}{$a0}{$a0}{$a0}"+str$(val(mid$(a$(i),40,4))),4):t%=i
+ 2240 h%=h%+1:ifh%=17thengosub880:ifhh%=1thenhh%=0:return
+ 2245 ifi<0theni=0
+ 2250 ifh%=17thengosub850:h%=0
+ 2290 nexti:h%=0:print:print"{$a0}Dateiende!  - = zurueck   * = Menue"
+ 2300 gety$:ify$="*"thenreturn
+ 2305 ify$="-"thenn%=t%-34:ifn%<0thenn%=0
+ 2306 ify$="-"then2200
+ 2310 goto2300
+ 2500 :
+ 2510 m$="Drucken":gosub400:ifda%<>3thengosub600:da%=3
+ 2520 s=2:fori=1to3:z=4+i*2:gosub800:printb$(i):nexti
+ 2540 print:print:print"{$a0}{$a0}"ei$:input>1,35,13,x$
+ 2550 onval(x$)gosub2570,2800,5000:goto1000
+ 2570 z=18:s=2:gosub800:print"Bitte Datum eingeben    :"
+ 2580 input>8,27,18,dt$:ifmid$(dt$,3,1)<>"."ormid$(dt$,6,1)<>"."then2580
+ 2590 z=20:s=4:gosub800:print"Ich drucke die Bestandsliste !"
+ 2600 open7,4,7:open2,4,2:open1,4,1:bl%=1:gosub2900
+ 2610 f$="a9999  aaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaa99999 9999.99 99999.99 "
+ 2615 f$=f$+"9999.99 99999.99a"
+ 2620 f1$="a aaaaaaaaaaaaa        aaaaaaaaaaaaaaaa  999999.99  "
+ 2622 f1$=f1$+"aaaaaaaaaaaaaaaa  999999.99a":s1=0:s2=0:s3=0:s4=0:s5=0:s6=0
+ 2628 z1$="Zwischensumme":z2$="EK-Zwischensumme":z3$="VK-Zwischensumme"
+ 2630 fori=1toa%:ifx$="2"andmid$(a$(i),23,2)<>fi$then2720
+ 2640 bz$=left$(a$(i),22):at$=mid$(a$(i),23,10):s=val(mid$(a$(i),40,7))
+ 2650 vk=val(mid$(a$(i),26,7)):ek=val(mid$(a$(i),33,7))
+ 2660 s1=int(s*vk*100+.05)/100:s2=int(s*ek*100+.05)/100
+ 2680 print#2,f$:print#1,"!"v$i;bz$v$at$v$s;ek;s2;vk;s1;"!":z%=z%+1
+ 2690 s3=s3+s1:s4=s4+s2:s5=s5+s1:s6=s6+s2
+ 2700 ifmid$(a$(i),23,2)<>mid$(a$(i+1),23,2)thengosub2850
+ 2705 ifa%-i<=3then2720
+ 2710 ifz%>=62thenprint#7,k$:z%=z%+1:gosub950:gosub2900
+ 2720 nexti:print#7,l$:print#2,f1$
+ 2745 print#1,"!"v$"ENDBETRAEGE"v$"EK-ENDSUMME"v$s4;"VK-ENDSUMME"v$s3;"!"
+ 2760 print#7,l$:close1:close2:close7:s1=0:s2=0:s3=0:s4=0:z%=0:return
+ 2800 :
+ 2810 z=16:s=2:gosub800:printfa$:input>2,36,16,fi$:goto2570
+ 2850 print#7,k$:print#2,f1$:print#1,"!"v$z1$v$z2$v$s6;z3$v$s5;"!":z%=z%+3
+ 2860 print#7,k$:s5=0:s6=0:return
+ 2900 print#7,"! Ausdruck der Warenbestaende Kosmetikboutique Werner Demuth  ";
+ 2910 print#7,dt$" Bl.: "right$("{$a0}{$a0}"+str$(bl%),2)"{$a0}!":print#7,l$
+ 2930 print#7,"!Satz! Artikel-Bezeichnung{$a0}{$a0}{$a0}! Artik.Nr.!Stck!";
+ 2940 print#7,"EK-Preis! Summe !VK-Preis! Summe !":z%=z%+4:bl%=bl%+1
+ 2950 print#7,l$:return
+ 3000 :
+ 3010 m$="Sortieren":da%=0:gosub400
+ 3015 z=8:s=6:gosub800:print"Ich sortiere "a%" Datensaetze":az%=a%:b=az%
+ 3030 b=int(b/3+.4):printchr$(19)az%-b
+ 3040 od=0:fora=1toaz%-b
+ 3050 ifmid$(a$(a),23,10)>mid$(a$(a+b),23,10)thenc=a+b:gosub3100:od=1
+ 3060 nexta:ifodthen3040
+ 3070 ifb>1then3030
+ 3080 gosub9000:return
+ 3100 x$=a$(a):a$(a)=a$(c):a$(c)=x$:return
+ 3500 :
+ 3510 m$="Max. 100 Saetze streichen !":h=0:gosub400:da%=0:fori=1to100
+ 3530 z=3:s=1:gosub800:print"Zu streichende S.-Nr. eingeben  :   "
+ 3540 input>4,34,3,x$:ifi=1andleft$(x$,1)="*"thenreturn
+ 3541 ifi=2andleft$(x$,1)="_"theni=1:b%(1)=0
+ 3542 ifleft$(x$,1)="*"theni=100:goto3800
+ 3545 ifi>1andleft$(x$,1)="_"theni=i-2:goto3605
+ 3548 ifval(x$)=0orval(x$)>a%then3540
+ 3550 b%(i)=val(x$):ifi=1then3605
+ 3560 forn=1toi-1
+ 3570 ifb%(n)=val(x$)thenh=1
+ 3580 nextn:ifh=1thenh=0:i=i-1:goto3540
+ 3605 a=1:ifi>14thena=i-14
+ 3610 z=5:s=0:gosub800:forj=atoi:print"Eingabe-Nr. :"right$("{$a0}{$a0}{$a0}{$a0}"+str$(j),3);
+ 3620 print"{$a0}{$a0}{$a0}Satz-Nr. :"right$("{$a0}{$a0}{$a0}{$a0}"+str$(b%(j)),3):nextj:printleft$(bl$,38)
+ 3720 z=22:s=3:gosub800:print"Weitere Streichungen j/n   :j"
+ 3730 input>1,31,22,x$:ifx$="n"thenaz%=i:i=100:h=1:goto3800
+ 3740 ifx$<>"j"then3720
+ 3800 x$="":nexti:ifh=0thenaz%=i-1
+ 3810 gosub400:z=4:s=1:gosub800:print"Sollen die Saetze wirklich gestichen"
+ 3820 z=6:s=10:gosub800:print"werden   j/n   :j"
+ 3830 b=az%:input>1,26,6,x$:ifx$="n"thenreturn
+ 3860 b=int(b/3+.4)
+ 3870 od=0:fora=1toaz%-b
+ 3880 ifb%(a)<b%(a+b)thenc=a+b:x=b%(a):b%(a)=b%(c):b%(c)=x:od=1
+ 3890 nexta:ifodthen3870
+ 3900 ifb>1then3860
+ 3940 forn=1toaz%:z=10:s=0:gosub800:print"Artikel "left$(a$(b%(n)),32)
+ 3945 z=12:s=10:gosub800:print"wird gestrichen !"
+ 3950 form=b%(n)toa%-1:a$(m)=a$(m+1):nextm:a%=a%-1:nextn:gosub9000:return
+ 4000 :
+ 4010 m$="STCK-Eing.":gosub400:ifda%<>2thengosub450
+ 4020 z=3:s=6:gosub800:print"Bitte einzugebende Satz-Nr."
+ 4030 z=5:s=10:gosub800:print"eingeben   :":print:printl5$
+ 4040 input>4,22,5,x$:ifleft$(x$,1)="*"thengosub9000:return
+ 4050 h%=val(x$):ifh%=0orh%>a%then4000
+ 4060 s=0:fori=1to4:z=8+i*2:gosub800:printb$(i)mid$(a$(h%),j%(i),i%(i))"*":nexti
+ 4170 input>4,16,16,x$:ifleft$(x$,1)="_"then4040
+ 4180 ifleft$(x$,1)>"9"orleft$(x$,1)<"0"then4170
+ 4200 a$(h%)=left$(a$(h%),39)+x$:goto4000
+ 4500 :
+ 4510 m$="":gosub400:da%=0
+ 4520 z=5:s=1:gosub800:print"Sollen die Stueckzahlen wirklich auf 0"
+ 4530 z=7:s=4:gosub800:print"gesetzt werden ??? j/n   :"
+ 4540 input>1,30,7,x$:ifx$<>"j"thenreturn
+ 4560 z=9:s=2:gosub800:print"Die Stueckzahlen werden auf 0 gesetzt":fori=1toa%
+ 4570 a$(i)=left$(a$(i),39)+"0{$a0}{$a0}{$a0}":printchr$(19)i:nexti:gosub9000:return
+ 5000 :
+ 5010 m$="Inventur":gosub400:z=5:s=5:gosub800:bl%=0:s1=0:s2=0
+ 5020 print"Bitte Datum eingeben   :":input>8,29,5,dt$
+ 5030 ifleft$(x$,1)="*"thenreturn
+ 5040 z=7:s=5:gosub800:print"Bitte Jahr eingeben   :"
+ 5045 input>4,29,7,j$:ifleft$(j$,1)="_"then5020
+ 5050 f$="a 99999   a aaaaaaaaaaaaaaaaaaaaaaaa a 99999  a 99999.99 a"
+ 5060 f$=f$+" 999999.99   a       a"
+ 5070 f1$="a aaaaaaaaaaaaaaaaaaaaa                                   "
+ 5080 f1$=f1$+"9999999.99           a"
+ 5100 open7,4,7:open2,4,2:open1,4,1:gosub5400
+ 5120 fori=1toa%:ifval(mid$(a$(i),40,7))=0then5210
+ 5130 at$=left$(a$(i),24):s=val(mid$(a$(i),40,7))
+ 5140 ek=int(val(mid$(a$(i),33,7))*100+.05)/100:s1=int(s*ek*100+.05)/100
+ 5160 print#2,f$:print#1,t$v$i;t$v$at$v$t$v$s;t$v$ek;t$v$s1;t$v$t$
+ 5165 z%=z%+1:s2=s2+s1:ifi=a%andz%=66then5210
+ 5170 ifz%<=64then5210
+ 5180 print#7,k$:print#2,f1$:print#1,t$v$"Zwischensumme"v$s2;"!":print#7,k$
+ 5200 z%=z%+3:gosub960:gosub5400
+ 5210 nexti:print#7,l$:print#2,f1$
+ 5220 print#1,t$v$"ENDSUMME INVENTUR"v$s2;"!":print#7,l$
+ 5230 close7:close1:close2:s1=0:s2=0:bl%=0:return
+ 5400 print#7,"! Kosmetik - Boutique  Werner Demuth  Inventur  "j$"  Datum: ";
+ 5410 bl%=bl%+1:print#7,dt$"  Bl. "right$("{$a0}{$a0}{$a0}"+str$(bl%),2)"{$a0}{$a0}!":print#7,l$
+ 5430 print#7,"! Satz-Nr.! Artikel-Bezeichnung      ! Stueck ! EK-Preis !";
+ 5440 print#7,"    Summe    !Bemerk.!":print#7,k$:z%=4:return
+ 9000 :
+ 9010 m$="Abspeichern":gosub400:z=6:s=6:gosub800
+ 9020 print"Daten abspeichern j/n  :j":input>1,30,6,x$:ifx$="j"then9100
+ 9030 return
+ 9100 z=8:s=3:gosub800:print"Ich speichere "a%" Datensaetze"
+ 9120 open1,8,15,"s:Anzahl-Saetze":close1
+ 9130 open2,8,2,"Anzahl-Saetze,s,w":print#2,a%chr$(13):close2
+ 9140 open1,8,15,"s:Artikel-Nr.":close1
+ 9150 open2,8,2,"Artikel-Nr.,s,w"
+ 9160 fori=1toa%:print#2,a$(i):printchr$(19)i:nexti:close2:return
+ 9500 input#15,a:ifa<>0thenclose15:stop
+ 9510 return
+ 9990 open3,4,4:print#3,chr$(66):open4,4:print#4,chr$(147)
+ 9992 open7,4,7:cmd7:list:close3:close4:close7:end
+ 9995 open3,4,3:print#3,chr$(66):open4,4:print#4,chr$(147)
+ 9996 open7,4,7:cmd7:list:close3:close4:close7:goto10000
+ 9999 open1,8,15:print#1,"s:Artikel":close1:save"Artikel",8:verify"Artikel",8
+10000 close15:end
+
