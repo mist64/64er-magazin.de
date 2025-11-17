@@ -1,6 +1,7 @@
-
-
 ;haushaltskasse.prg ==0801==
+;Fehlerteufelchen 64'er 5/86 wurde eingearbeitet
+;(Für Zeile 9950 gibt es zwei Fehlerteufelchen, von 64'er 3/86 und 5/86.
+; Die 3/86-Version löst das Problem falsch, die 5/86-Version löst es richtig.)
  1050 open15,8,15,"m-w"+chr$(7)+chr$(28)+chr$(1)+chr$(15)
  1100 close15
  1200 poke53280,15:poke53281,15
@@ -152,7 +153,12 @@
  9800 b$=right$(b$,7)+c$
  9850 goto9600
  9900 b=int((val(b$)*100)+.5)/100
- 9950 a1$=a1$+right$("        "+str$(int(b*100)),8)
+;Original:
+;9950 a1$=a1$+right$("        "+str$(int(b*100)),8)
+;Fehlerteufelchen 3/86
+;9950 a1$=a1$+right$("        "+str$(int(b*100)+1),8)
+;Fehlerteufelchen 5/86
+ 9950 a1$=a1$+right$("        "+str$(int(b*100+.5)),8)
 10000 a3(a,a1%(0,1))=a3(a,a1%(0,1))+b
 10050 a3(a,0)=a3(a,0)+b
 10100 ifa1%(a1%(0,1),1)<a1%(a1%(0,1),0)then10350
