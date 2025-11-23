@@ -35,11 +35,112 @@
 
         <p>Durch einen Schreib- oder Lesebefehl auf die Port-Adresse 56577 wird der Meßimpuls ausgelöst. Das geschieht in dem abgedruckten Programm (Listing 1) in Zeile 3300. DerC64 signalisiert das am User-Port selbständig dadurch, daßPC2 für die Dauer eines Taktes Low wird. Wenn diese Leitung wieder auf High geht, löst das den Impuls am Monoflop-Ausgang Qaus, dergleichzeitig mitden Anschlüssen CNT2 und Flag2 verbunden ist. Wie die Tabelle »Kontrollregister« (Bild 2) zeigt, wurde der VIA-Baustein so programmiert, daß er mit dem Systemtakt abwärts zählt, solange der Eingang CNT2 High-Pegel führt. Dabei zählt Timer B Unterläufe von Timer A. Das bedeutet, Timer A wird mit einem bestimmten Wert geladen (Zeilen 3200 und 3210) und zählt von dort aus abwärts. Erreicht er die Stellung 0, dann wird der Inhalt des Timers B um eins erniedrigt, Timer A wird wieder mit dem vorgegebenen Startwert geladen, und der Vorgang wiederholt sich.</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: left;">Kontrollregister 14 (TimerA) Adresse 56590 Inhalt 193:</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bit 0: 1</td>
+                        <td>Timer A Start</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 1: 0</td>
+                        <td>Keine Signalisierung an PB6</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 2: 0</td>
+                        <td>(Beliebig)</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 3: 0</td>
+                        <td>Timer A zählt fortlaufend vom Ausgangswert auf 0</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 4: 0</td>
+                        <td>Unbedingtes Laden ausgeschaltet</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 5: 0</td>
+                        <td>Timer A zählt Systemtakte</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 6: 1</td>
+                        <td>(Serieller Port auf Eingang)</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 7: 1</td>
+                        <td>(Echtzeituhrtrigger 50Hz)</td>
+                    </tr>
+                </tbody>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: left;">Kontrollregister 15 (TimerB) Adresse 56591 Inhalt 121:</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bit 0: 1</td>
+                        <td>Timer B Start</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 1: 0</td>
+                        <td>Keine Signalisierung des Unterlaufs an PB7</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 2: 0</td>
+                        <td>(Beliebig)</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 3: 1</td>
+                        <td>Timer zählt nur einmal auf 0</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 4: 1</td>
+                        <td>Unbedingtes Laden eingeschaltet</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 5: 1</td>
+                        <td>Timer B zählt Unterläufe von Timer A</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 6: 1</td>
+                        <td>falls CNT2 = 1 ist</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 7: 0</td>
+                        <td>(Uhrzeit)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. Werte der Kontrollregister zur Zeitmessung mit den Timern des C64</figcaption>
+        </figure>
+
         <h2>Errechnung des Meßwertes und Bereichsumschaltung</h2>
 
         <p>Die fallende Flanke am User-Port-Eingang setzt das Bit 4 im Register 56589 (Flag-Interrupt-Bit), das vom Programm abgefragt werden kann (Zeile4040). Essignalisiertsomitdas Ende des Monoflop-Taktes und die Gültigkeit des Timerinhalts. Beim Auslesen wird dieses Bit selbständig wieder gelöscht.</p>
 
         <p>Das Programm liest nun den Timer aus (2 Byte!), multipliziert ihn mit der Taktzeit und berechnet mit der Formel aus Bild 3 den gesuchten Wert. Für den Meßbereich Pikofarad und Nanofarad (B=0) erfolgt diese Rechnung in Zeile 5020. Sollte die zu messende Zeit die Timerkapazität überschreiten, so steht nach der Messung eine 0 in der Variablen und es wird in Zeile 5030 automatisch auf den Meßbereich Mikrofarad (B=1) umgeschaltet.</p>
+
+        <figure>
+            \[
+            \begin{aligned}
+            T &= 0,7 \, R \, C \\[6pt]
+            C &= \frac{T}{0,7 \, R} \\[6pt]
+            R &= \frac{T}{0,7 \, C}
+            \end{aligned}
+            \]
+
+            \[
+            \text{R in Ohm,} \quad
+            \text{C in Farad,} \quad
+            \text{T in Sekunden}
+            \]
+            <figcaption>Bild 3. Berechnung der Impulsdauer</figcaption>
+        </figure>
 
         <p>Hierbei wird das Highbyte des Timers A in Zeile 3210 nun mit 5 geladen, so daß längere Zeiten gemessen werden können. Die Umrechnung erfolgt jetzt in Zeile 6000. Falls die gemessene Zeit einen bestimmten Grenzwert unterschreitet, schaltet das Programm in Zeile 5035 wieder zurück in den Bereich 0.</p>
 
@@ -52,6 +153,42 @@
         <figure>
             <img src="128-4.png" alt="">
             <figcaption>Bild 4. Schaltplan zum »Meßboy«</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Monoflop SN 74121</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Widerstand 3,3 kΩ</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Meßwiderstand 39 kΩ ±1%</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Kondensator 0,22 Mikrofarad</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Stecker zum Anschluß an den User-Port des C 64, zum Beispiel Cardcon-Stecker Nummer 251-12-50-170 von TRW</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Lochrasterplatte</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Schalter 2x um</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 5. Stückliste zum »Meßboy«</figcaption>
         </figure>
 
         <p>Um den Anzeigefehler möglichst klein zu halten, sollte für den 39 Kiloohm-Meßwiderstand eine Ausführung mit kleiner Toleranz gewählt werden (±1% oder kleiner).</p>
@@ -78,6 +215,59 @@
         <p>Die Belegung des User-Ports und eine Variablenliste finden Sie in Bild 6 und 7.</p>
 
         <address class="author">(Uwe Gerlach/ah)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>A$</td>
+                        <td>Eingabestring von der Tastatur (ein Zeichen)</td>
+                    </tr>
+                    <tr>
+                        <td>W$</td>
+                        <td>Anzuzeigender oder zu speichernder Wert (mit Einheit)</td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>
+                            <table class="plain">
+                                <tbody>
+                                    <tr>
+                                        <td>Bereich:</td>
+                                        <td>0 = Kondensatormessung kleiner 500 Nanofarad</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>1 = Kondensatormessung größer 500 Nanofarad</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>2 = Widerstandsmessung</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>H</td>
+                        <td>High-Byte Timer A (0 im Bereich 0, 5 im Bereich 1)</td>
+                    </tr>
+                    <tr>
+                        <td>I</td>
+                        <td>Indexvariable in Schleifen</td>
+                    </tr>
+                    <tr>
+                        <td>W</td>
+                        <td>Errechneter Meßwert</td>
+                    </tr>
+                    <tr>
+                        <td>Feld W$(1..10)</td>
+                        <td>gespeicherte Meßwerte</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 7. Variablenliste zum Programm »Meßboy«</figcaption>
+        </figure>
 
         <figure>
             <img src="128-6.png" alt="">
