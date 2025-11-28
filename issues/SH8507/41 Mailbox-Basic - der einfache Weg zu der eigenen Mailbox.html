@@ -28,7 +28,7 @@
 
         <h3>!PRINTA${,X,C,S]</h3>
 
-        <p>Dies ist ein umgewandelter PRINT-Befehl, der den Inhalt des Strings (hier A$) auf dem Bildschirm und auf die RS232-Schnittstelle (natürlich in ASCII-Fbrm) ausgibt. Außerdem gibt es verschiedene Parametereinstellungen, die bestimmte Abbruch- und Stoppfunktionen nicht zulassen. Hierbei gilt:<br>
+        <p>Dies ist ein umgewandelter PRINT-Befehl, der den Inhalt des Strings (hier A$) auf dem Bildschirm und auf die RS232-Schnittstelle (natürlich in ASCII-Form) ausgibt. Außerdem gibt es verschiedene Parametereinstellungen, die bestimmte Abbruch- und Stoppfunktionen nicht zulassen. Hierbei gilt:<br>
             1 = Abbruch zugelassen<br>
             0 = Abbruch nicht zugelassen</p>
 
@@ -58,7 +58,7 @@
 
         <h3>Programmbeispiel (Namenseingabe):</h3>
 
-        <p>10 A$=CHR$(38)+CHR$(224)<br>
+        <p class="noindent">10 A$=CHR$(38)+CHR$(224)<br>
             20 OPEN,2,2,A$<br>
             30 !WAIT "Dein Name = >"<br>
             40 !INPUT A$,20<br>
@@ -80,7 +80,7 @@
 
         <h3>Programmbeispiel:</h3>
 
-        <p>110 A$=CHR$(38)+CHR$(224)<br>
+        <p class="noindent">110 A$=CHR$(38)+CHR$(224)<br>
             120 OPEN2,2,2,A$<br>
             130 !PUFFER 8188<br>
             140 A$="DerText:"<br>
@@ -106,7 +106,7 @@
 
         <h3>Programmbeispiel:</h3>
 
-        <p>10 A$=CHR$(38)+CHR$(224)<br>
+        <p class="noindent">10 A$=CHR$(38)+CHR$(224)<br>
             20 OPEN2,2,2,A$<br>
             30 A$='Text,S,R"<br>
             40 OPEN 1,8,2,A$<br>
@@ -146,37 +146,83 @@
 
         <h3>Bit:</h3>
 
-        <p>TODO</p>
-
-        <p>76543210 (wennBitX=1)<br>
-            10000000 = kein Carrier<br>
-            1000000 = RS232 an<br>
-            100000 = Eingabetimeout erreicht (bei !INPUT/!PUFFER)<br>
-            10000 = interner Puffer voll (bei !PUFFER)<br>
-            1000 = bei !GET#Dateinr.,A$ max. Zeichenzahl erreicht<br>
-            100 = bei !GET#Dateinr.,A$ Abbruchzeichen gefunden<br>
-            10 = CTRL/C-Abbruch<br>
-            1 = CTRL/X-Abbruch</p>
+        <table class="plain">
+            <tr>
+                <td>76543210</td>
+                <td>(wenn Bit X=1)</td>
+            </tr>
+            <tr>
+                <td>10000000</td>
+                <td>= kein Carrier</td>
+            </tr>
+            <tr>
+                <td>1000000</td>
+                <td>= RS232 an</td>
+            </tr>
+            <tr>
+                <td>100000</td>
+                <td>= Eingabetimeout erreicht (bei !INPUT/!PUFFER)</td>
+            </tr>
+            <tr>
+                <td>10000</td>
+                <td>= interner Puffer voll (bei !PUFFER)</td>
+            </tr>
+            <tr>
+                <td>1000</td>
+                <td>= bei !GET#Dateinr.,A$ max. Zeichenzahl erreicht</td>
+            </tr>
+            <tr>
+                <td>100</td>
+                <td>= bei !GET#Dateinr.,A$ Abbruchzeichen gefunden</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>= CTRL/C-Abbruch</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>= CTRL/X-Abbruch</td>
+            </tr>
+        </table>
 
         <p>Beispiel einer Abfrage:<br>
-            IF RS AND 2t1 THEN GOTO<br>
+            IF RS AND 2↑1 THEN GOTO<br>
             (wenn CTRL/C-Abbruch erfolgt, verzweige)</p>
 
         <p>Bildschirmanzeige: Zur Kontrolle, in welcher Routine sich der Computer zur Zeit befindet, werden folgende Zustände rechts oben auf dem Bildschirm ausgegeben: »&lt;-WCSIT->«</p>
 
-        <p>TODO TABLE</p>
+        <table class='plain'>
+            <tr>
+                <td>W</td>
+                <td>=</td>
+                <td>Programm befindet sich in der !WAIT-Routine</td>
+            </tr>
+            <tr>
+                <td>C</td>
+                <td>=</td>
+                <td>Carrier fehlte momentan und der Computer befindet sich in der Carrier-Suchroutine</td>
+            </tr>
+            <tr>
+                <td>S</td>
+                <td>=</td>
+                <td>Die CTRL/S-Taste wurde betätigt</td>
+            </tr>
+            <tr>
+                <td>I</td>
+                <td>=</td>
+                <td>Der Computer befindet sich in einer Eingabeanforderung</td>
+            </tr>
+            <tr>
+                <td>T</td>
+                <td>=</td>
+                <td>Ein Timeout ist bei dem laufenden Befehl festgesetzt</td>
+            </tr>
+        </table>
 
-        <p>W = Programm befindet sich in der !WAIT-Routine<br>
-            C = Carrier fehlte momentan und der Computer befindet sich in der Carrier-Suchroutine<br>
-            S = Die CTRL/S-Taste wurde betätigt<br>
-            I = Der Computer befindet sich in einer Eingabeanforderung<br>
-            T = Ein Timeout ist bei dem laufenden Befehl festgesetzt</p>
+        <p>Wenn keine der Funktionen angesprochen ist, zeigt der Computer »&lt;----->« auf dem Bildschirm an. Nach dem Verlassen der Routine wird der frühere Bildschirminhalt wieder hergestellt.</p>
 
-        <p>Wenn keine der Funktionen angesprochen ist, zeigt der Computer »&lt;&mdash;&ndash;>« auf dem Bildschirm an. Nach dem Verlassen der Routine wird der frühere Bildschirminhalt wieder hergestellt.</p>
-
-        <p>Funktionstastenbelegung: Zur besseren Übersicht wurden folgende Funktionstasten mit CHR$-Codes für eine einfachere Mailbox-Steuerung belegt.</p>
-
-        <p>F1 = CTRL/X<br>
+        <p>Funktionstastenbelegung: Zur besseren Übersicht wurden folgende Funktionstasten mit CHR$-Codes für eine einfachere Mailbox-Steuerung belegt.<br>
+            F1 = CTRL/X<br>
             F3 = CTRL/C<br>
             F5 = CTRL/S<br>
             F7 = CTRL/Q<br>
