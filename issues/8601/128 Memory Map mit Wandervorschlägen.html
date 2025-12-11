@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Memory Map mit Wandervorschlägen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. H. Hauck, ah">
+    <meta name="64er.issue" content="1/86">
+    <meta name="64er.pages" content="128-130">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Memory Map mit Wandervorschlägen</h1>
+        <p class="intro">Heute geht es um die Speicherzellen 256 bis 645. Sie entnalten den Stapelspeicher und neben vielen nützlichen Adressen den Tastaturpuffer.</p>
+
+        <p>Der Speicherbereich von 256 bis 511 wird von den meisten Home-Computern zur Speicherung von Adressen und Daten bei Programm-Unterbrechungen und -Verzweigungen verwendet. Warum gerade dieser Bereich dafür genommen wird, und wie dieser Speicher funktioniert, können Sie dem Texteinschub »Der Stapelspeicher« entnehmen.</p>
+
+        <p>Das von Commodore verwendete Basic benötigt allerdings dafür nur den Bereich von 319 bis 511, so daß die Adressen von 256 bis 318 für verschiedene andere Zwecke genutzt werden.</p>
+
+        <h2>Adresse 256 bis 266 ($100 bis $10A)</h2>
+
+        <h3>Arbeitsspeicher für Umwandlung von Gleitkomma-Zahlen in ASCII-Werte, auch FAC (Fließkomma-Akku) genannt</h3>
+
+        <p>Diese 11 Byte werden von einer Routine des Betriebssystems verwendet, um Werte zwischenzuspeichern, die bei der Umwandlung von Gleitkomma-Zahlen in ASCII-Werte oder in Werte der Funktion TI$ anfallen. Eine andere Routine verwendet den Bereich, um Zeichenketten (Strings) zu untersuchen.</p>
+
+        <h2>Adresse 256 bis 318 ($100 bis $13E)</h2>
+
+        <h3>Arbeitsspeicher für Fehler bei der Eingabe vom Band</h3>
+
+        <p>Alle Daten, die auf Band gespeichert werden, stehen dort doppelt in zwei identischen Blöcken hintereinander. Beim Laden in den Computer werden beide Blöcke miteinander verglichen, um Fehler zu finden und, wo möglich, sie zu korrigieren.</p>
+
+        <p>In diesem Bereich, der übrigens auch bei der Speicherzelle 256 anfängt, aber 63 Byte in Anspruch nimmt, werden beim Laden Angaben gespeichert, aus denen das Betriebssystem erkennen kann, welche Bytes fehlerhaft sind.</p>
+
+        <h2>Adresse 319 bis 511 ($13F bis $1FF)</h2>
+
+        <h3>Stapelspeicher (Stack) des Mikroprozessors</h3>
+
+        <p>Die Funktionsweise eines Stapelspeichers, auf englisch »stack«, ist im Texteinschub gleichen Namens erklärt.</p>
+
+        <p>Der Stapelspeicher hat prinzipiell die Aufgabe, bei allen Sprüngen oder Unterbrechungen innerhalb eines normalen Programmablaufs alle Adressen und Daten so zu speichern, daß am Ende der Unterbrechung das Programm wieder fortgesetzt werden kann.</p>
+
+        <p>Derartige Unterbrechungen und Sprünge treten in Basic bei den Befehlen GOSUB-RETURN und FOR-NEXT auf, genauso wie bei vielen Routinen des Betriebssystems. In Maschinensprache gibt es dafür sogar eigene Befehle. Heimo Ponnath hat sie alle in seinem Assemblerkurs (Folge 7 und 8 im 64'er, Ausgabe 2/85 und 3/85) sehr ausführlich beschrieben.</p>
+
+        <p>Da uns hier Basic mehr interessiert, gebe ich Ihnen nur kurz an, was im Stapel gespeichert wird, da der Stapelspeicher nur in Maschinensprache manipuliert werden kann.</p>
+
+        <p>Jeder FOR-TO-NEXT-Befehl belegt 18 Byte im Stapelspeicher.</p>
+
+        <p>Im ersten Byte steht als Kennung die Zahl 129. Byte 2 und 3 enthalten in Low/High-Byte-Dar-stellung einen Zeiger auf die Adresse, in der die durch das FOR definierte Schleifen-Variable (zum Beispiel K in FOR K = 0 TO 3) gespeichert ist. Die nächsten 5 Byte sind für den Gleitkommawert von STEP reserviert, das Byte danach für das Vorzeichen von STEP. Danach folgt der Gleitkommawert von TO mit 5 Byte und in zwei weiteren Byte die Nummer derjenigen Zeile, auf die nach dem NEXT zurückgesprungen wird. In den letzten beiden Byte schließlich steht ein Zeiger auf der Adresse, in der das nächste Zeichen steht, welches nach Beendigung der FOR-TO-NEXT-Schleife gelesen werden muß.</p>
+
+        <p>Ein GOSUB-Befehl belegt 5 Byte im Stapelspeicher. Byte 1 enthält die Kennzahl 141. Ihr folgen zwei Byte für die Nummer der Zeile, auf die nach RETURN zurückgesprungen wird. Die letzten beiden Byte enthalten wieder einen Zeiger auf die Adresse, in der das nächste Zeichen steht, mit dem nach RETURN das Programm fortgesetzt wird.</p>
+
+        <p>Der Basic-Befehl DEF zur freien Definition von Funktionen belegt ebenfalls 5 Byte im Stapelspeicher. Ihre Verteilung ist dieselbe wie von GOSUB, mit dem einzigen Unterschied, daß statt der ersten Kennzahl irgendein anderer Wert verwendet wird, der aber keine Bedeutung hat.</p>
+
+        <p>Wenn so viele FOR&hellip;NEXT-Schleifen oder GOSUB-Sprünge gleichzeitig im Programm vorkommen, daß der Stapelspeicher voll wird, steigt das Programm mit OUT OF MEMORY aus.</p>
+
+        <h2>Adresse 512 bis 600 ($200 bis $258)</h2>
+
+        <h3>Eingabespeicher von Basic</h3>
+
+        <p>Wenn Sie Zeichen, zum Beispiel einen Befehl oder eine Programmzeile, eingeben und mit der RETURN-Taste abschließen, werden diese Zeichen in diesen Speicherbereich von 512 bis 600 gebracht. Seine Länge von 89 Byte entspricht der Länge einer logischen Zeile des VC 20 (88 Zeichen) plus einer Abschluß-Null. Die logische Zeilenlänge des C 64 von 80 Zeichen füllt den Speicherbereich nicht ganz aus, aber das Betriebssystem des C 64 ist nicht geändert worden.</p>
+
+        <p>Nach RETURN sucht der Computer diesen Eingabespeicher nach Gänsefüße, Komma und nach der Zahl für Zeilenende ab. Dann wandelt der Computer die gespeicherten Zeichen in für ihn lesbare Zahlen (Token und ASCII-Werte) um und fügt am Anhang die Zeilennummer und die Anschluß-Adresse (Link) der nächsten Zeile, am Ende die Abschluß-Null hinzu. Wenn eine Zeilennummer vorhanden ist, kommt alles in den Programmspeicher. Fehlt sie jedoch, dann wird die ganze Anweisung sofort ausgeführt (Direktmodus).</p>
+
+        <p>Eine detaillierte Beschreibung dieses Eingabe- und Umwandlungsvorganges gab Christoph Sauer im 3. Teil seines Kurses »Der gläserne VC 20« im 64’er, Ausgabe 11/84 ab Seite 126.</p>
+
+        <p>Dieser Speicherbereich wird auch von den Befehlen INPUT und GET benutzt, um die Eingabedaten aufzunehmen. Das erklärt übrigens, warum diese beiden Befehle nur innerhalb einer Programmzeile und nicht im Direktmodus verwendet werden können. Sie verwenden ja denselben Speicherplatz, der vom Direkt-(Eingabe-)Modus verwendet wird.</p>
+
+        <p>Es erklärt außerdem, warum eine von INPUT geforderte Eingabe maximal 88 Zeichen lang sein darf.</p>
+
+        <h2>Adresse 601 bis 630 ($259 bis $276)</h2>
+
+        <h3>Tabellen für File-Nummern, Geräte-Nummern und Sekundär-Adressen von eröffneten Dateien</h3>
+
+        <p>Bei der Besprechung der Speicherzelle 152 im 64’er, Ausgabe 6/85, Seite 122/123, habe ich diesen Speicherbereich bereits erwähnt. Ich habe damals gesagt und gezeigt, daß die Zelle 152 über die Anzahl der eröffneten Dateien (Files) Buch führt, die Tabellen in 601 bis 630 dagegen darüber, welche File-Nummern, Geräte-Nummern und Sekundär-Adressen jeder eröffneten Datei zugeordnet ist. Wer sich nochmals über diese Begriffe orientieren will, den verweise ich auf Teil 11 dieses Kurses (64’er, Ausgabe 10/85, Seite 134/135).</p>
+
+        <p>Der Speicherbereich von 601 bis 630 ist in drei Blöcke unterteilt.</p>
+
+        <p>In jeder Tabelle können also maximal 10 Byte stehen. Sie haben folgende Zusammensetzung:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>601 bis 610 Tabelle der File-Nummern<br>
+            611 bis 620 Tabelle der Geräte-Nummern<br>
+            621 bis 630 Tabelle der Sekundär-Adressen</p>
+
+        <p>Die drei Angaben über eine eröffnete Datei stehen in den Tabellen jeweils am gleichen Platz. Wenn also die Datei Nummer 5 als dritte Datei eröffnet worden ist, steht eine 5 in Zelle 603, ihre Gerätenummer in Zelle 613, die Sekundär-Adresse entsprechend in Zelle 623.</p>
+
+        <p>Immer wenn eine neue Datei eröffnet wird, kommen diese Angaben auf die nächsten Plätze der Tabellen und der Inhalt der Speicherzelle 152 wird um 1 erhöht. Wird dagegen eine Datei geschlossen, dann rücken alle Angaben dahinter um eine Stelle zurück.</p>
+
+        <p>In diesen Tabellen kann nachgesehen werden, mit welchen Parametern Dateien eröffnet worden sind. Eine sehr interessante Anwendung, die den Vorschlag der beiden Autoren hier zitieren,wurde veröffentlicht [2].</p>
+
+        <p>Eine Änderung der Filenummern in Tabelle 601 bis 610 ist nicht empfehlenswert, um Verwechslungen zu vermeiden.</p>
+
+        <p>Mit dem folgenden kleinen Programm, welches bei einer eröffneten Datei die Geräte-Nummer in Tabelle 611 bis 620 ändert, kann zwischen einem Drucker mit Geräte-Nummer 4 und einem Plotter mit Geräte-Nummer 6 umgeschaltet werden.</p>
+
+        <p>10 OPEN 4,4,0<br>
+            20 POKE611,6: PRINT#4,”PLOTTER”<br>
+            30 POKE 611,4: PRINT#4, "DRUCKER”</p>
+
+        <p>Ähnliches ist mit den Sekun-där-Adressen möglich. Dabei muß man allerdings wissen, daß die Sekundär-Adressen nicht so wie sie sind in der Tabelle 621 bis 630 gespeichert werden, sondern mit »OR 96« verknüpft. Dasselbe müssen wir auch machen:</p>
+
+        <p>10 OPEN 3,4,0<br>
+            20 POKE 621,0 OR96:PRINT#3,”GRAFIKMODUS”<br>
+            30 POKE 621,7 OR96:PRINT#3,”TEXTMODUS”</p>
+
+        <p>Mit dieser Methode können Sie sich das Öffnen und Schließen vieler Dateien ersparen.</p>
+
+        <h2>Adresse 631 bis 640 ($277 bis $280)</h2>
+
+        <h3>Tastaturpuffer</h3>
+
+        <p>Bei der Behandlung der Speicherzelle 203 in Ausgabe 11/85 habe ich die Codezahlen beschrieben, die bei Drücken einer der 64 Tasten erzeugt werden. In der letzten Ausgabe (12/85) bei den Speicherzellen 245/246 haben wir gesehen, wie aus diesen Tastencodes der ASCII-Code für die verschiedenen Zeichen einer Taste umgerechnet wird.</p>
+
+        <p>Hier nun im Tastaturpuffer landen diese umgerechneten ASCII-Werte. Wenn Sie den Kurs schon länger verfolgen, ist Ihnen das auch nicht neu, denn in Ausgabe 7/85 habe ich die Wirkungsweise des Tastaturpuffers bei der »Dynamischen Tastenabfrage« sozusagen im Vorgriff, ausführlich erklärt.</p>
+
+        <p>Zur Erinnerung sei gesagt, daß im Tastaturpuffer alle Zeichen zwischengespeichert werden, die während eines Programmlaufes eingegeben und nicht sofort vom Betriebssystem verarbeitet werden können. Sobald der Computer sich im Eingabe-Modus befindet — nach Programmende oder bei INPUT- und GET-Befehlen, werden die Zeichen in der Reihenfolge ihrer Eingabe herausgeholt und verwendet.</p>
+
+        <p>Der Tastaturpuffer ist 10 Byte lang. In Speicherzelle 198 steht, wieviele Zeichen sich im Puffer befinden.</p>
+
+        <p>Als Ergänzung zu den Beispielen der dynamischen Tastenabfrage im 64'er, Ausgabe 7/85 zeige ich Ihnen im Texteinschub »Programme, die sich selbst verändern« noch ein paar andere Anwendungen.</p>
+
+        <h2>Adresse 641 bis 642 ($281 bis $282)</h2>
+
+        <h3>Zeiger auf den Anfang des Programmspeichers</h3>
+
+        <p>Wenn der Computer eingeschaltet wird oder wenn mit einer Reset-Taste beziehungsweise mit SYS58260 (VC 20: SYS 58232) ein Kaltstart ausgelöst wird, setzt das Betriebssystem diesen Zeiger auf die Adresse des ersten freien RAM-Spei-cherplatzes.</p>
+
+        <p>Beim C 64 ist dies die Adresse 2048. Beim VC 20 hängt sie von der Speichererweiterung ab; ohne Erweiterung ist es 4096, mit einer 3-KByte-Erweiterung dagegen 1024, mit 8 KByte oder mehr ist die Adresse 4608.</p>
+
+        <p>Dieser Zeiger wird vom Basic-Übersetzer in die Speicherzelle 43 übernommen und nur von dort weiter verwendet.</p>
+
+        <h2>Adresse 643 bis 644 ($282 bis $283)</h2>
+
+        <h3>Zeiger auf das Ende des Programmspeichers</h3>
+
+        <p>Dieser Zeiger ist der Zwilling zu dem anderen Zeiger in 641/ 642. Er wird vom Betriebssystem auf die Adresse gesetzt, welche beim Kaltstart beziehungsweise der dabei durchgeführten Prüfung des Speichers den letzten verfügbaren RAM-Speicherplatz angibt. Beim C 64 ist diese Adresse normalerweise 40960 ($A000), beim VC 20 ohne Erweiterung 7680.</p>
+
+        <p>Dieser Zeiger wird vom Basic-Übersetzer in die Speicherzelle 55 übernommen.</p>
+
+        <h2>Adresse 645 ($285)</h2>
+
+        <h3>Flagge für Ein- und Ausschalten der IEEE-488-Karte</h3>
+
+        <p>Diese Speicherzelle ist etwas mysteriös. Sie kommt im ganzen Betriebssystem nur ein einziges Mal zum Einsatz und zwar als Flagge beim Betrieb der sogenannten IEEE-488-Interface-Karte. Wenn diese Flagge gesetzt ist, wartet der Computer 64 Millisekunden lang, ob er von einem angeschlossenen Gerät angesprochen wird. Wenn kein Signal kommt, gibt er ein Fehlersignal aus.</p>
+
+        <p>Zahlen in der Zelle 645, die kleiner als 128 sind, bedeuten Flagge gesetzt, größer als 128 löschen sie die Flagge.</p>
+
+        <p>Das nächste Mal machen wir mit mehreren interessanten Speicherzellen für Schriftfarbe und Tastatursteuerung weiter.</p>
+
+        <address class="author">(Dr. H. Hauck/ah)</address>
+
+        <p>Literatur<br>
+            [1] Sheldon Leemon<br>
+            Mapping the C 64<br>
+            COMPUTE! Publications 1984<br>
+            [2] Hannes Rügheimer,<br>
+            Christian Spanik<br>
+            C 64 PEEK + POKE Adreßbuch<br>
+            CHIP-Special<br>
+            [3] Russ Davies<br>
+            Mapping the VIC<br>
+            COMPUTE! Publications 1984</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Texteinschub #1: Der Stapelspeicher</h2>
+
+        <p>Der normale Speicher, mit dem wir es immer zu tun haben, in den wir Zahlen hineinPOKEn oder herausPEEKen,ist aufgebaut wie eine Häuserreihe, in der jedes Haus seine eigene Adresse hat. Wer etwas in ein bestimmtes Haus abliefern oder aus ihm abholen will, muß seine genaue Adresse kennen.</p>
+
+        <p>Dieses Speicherprinzip heißt RAM, das ist die Abkürzung für »Random Access Memory« oder auf deutsch »Speicher mit wahlfreiem Zugriff«.</p>
+
+        <p>Der Stapelspeicher funktioniert anders. Jetzt werden die Häuser der Reihe nach aufgesucht, wie mit einer Postwurfsendung oder durch die Müllabfuhr. Ein besserer Vergleich ist der Aktenstapel. Die erste Akte wird auf den Tisch gelegt, alle nachfolgenden kommen obendrauf.</p>
+
+        <p>Beim Aktenstapel sieht man eine weitere Eigenschaft. Wenn er nämlich abgearbeitet wird, kommt die Akte als erste an die Reihe, die als letzte auf den Stapel gelegt worden ist.</p>
+
+        <p>Dieses Speicherprinzip heißt »LIFO«; das ist eine Abkürzung aus dem englischen und heißt »Last In First Out«.</p>
+
+        <p>Der Benutzer eines Stapelspeichers braucht sich nicht mehr um Adressen zu kümmern. Er kennt nur noch den Platz, wo der Speicher Daten annimmt beziehungsweise abgibt. Was der Benutzer sich allerdings merken muß, ist die Reihenfolge seiner Ein- und Ausgaben.</p>
+
+        <p>Stapelspeicher werden von mehreren Programmiersprachen verwendet; am bekanntesten ist wohl FORTH, auch die HP-(Hew-lett-Packard)-Taschenrechner arbeiten mit diesem Prinzip.</p>
+
+        <p>Unsere Computer verwenden das Prinzip des Stapelspeichers nur bei Programmschleifen, Unterprogramm-Sprüngen, ja überhaupt bei jeder Unterbrechung des normalen Programmablaufes. Das Problem dabei ist nämlich, sich alle Adressen und Angaben des Programms so zu merken, daß nach dem Ende der Unterbrechung das alte Programm lückenlos fortgesetzt werden kann.</p>
+
+        <p>Der Stapel belegt den Speicherbereich von 256 bis 511. Dieser Bereich unterscheidet sich in seinem Aufbau natürlich überhaupt nicht von den anderen Speicherbereichen. Es wäre auch viel zu aufwendig, alle Daten des Stapelspeichers bei jeder Ein- und Ausgabe rumzuschieben. Diese Aufgabe besorgt ein Register des Mikroprozessors, das »Stapelzeiger« genannt wird und das wie ein Zähler arbeitet.</p>
+
+        <p>Am Anfang steht in diesem Stapelzeiger die oberste Adresse 511. Bei jeder Eingabe wird die Zahl um 1 erniedrigt, bei jeder Ausgabe um 1 erhöht. Da der Stapelzeiger, wie jedes andere Register auch, eine Länge von 8 Bit hat, kann er nur die Dualzahlen von 00000000 bis 11111111 darstellen. Um daraus 256 beziehungsweise 511 zu formen, stellt der Mikroprozessor sozusagen fest verdrahtet ein neuntes Bit, immer auf 1, der Zahl voran.</p>
+
+        <h2>Texteinschub #2: Programme, die sich selbst verändern</h2>
+
+        <p>Der Speicherbereich von 631 bis 640 beherbergt den Tastaturpuffer. Schon im 64’er, Ausgabe 7/85, Seite 141/142 habe ich Ihnen Anwendungen gezeigt, die den Tastaturpuffer einsetzen und in der Literatur unter dem Namen »Dynamische Tastenabfrage« bekannt sind.</p>
+
+        <p>Hinter diesem natürlich aus dem Englischen übersetzten Begriff verbirgt sich die Möglichkeit, innerhalb eines Programms bestimmte Werte in den Puffer zu speichern, die dort so lange aufgehoben bleiben, bis das Programm — aus welchen Gründen auch immer — beendet wird. Dann erst werden die Werte hervorgeholt. Wenn es Zeichen sind, dann erscheinen sie auf dem Bildschirm. Wenn es Steuertasten sind (zum Beispiel RETURN), werden sie ausgeführt.</p>
+
+        <p>Ich will hier nicht die in Ausgabe 7 gezeigten Anwendungen wiederholen, sondern sie lediglich um ein paar weitere Tricks ergänzen, die ich im Juli aus Platzgründen nicht bringen konnte.</p>
+
+        <h3>Zeile in ein Programm einfügen</h3>
+
+        <p>Die folgende Methode ermöglicht die Veränderung eines Programms durch sich selbst. Genauer gesagt, man kann damit Programmzeilen einfügen. Nehmen wir an, Sie haben folgendes Teilprogramm:</p>
+
+        <p>150 PRINT”BITTE TASTE DRUECKEN”<br>
+            160 GET A$:IF A$ = ””THEN 160<br>
+            170 IF A$ &lt; > ”E” THEN 150<br>
+            180 END<br>
+            500 PRINT ’’NAECHSTER TEIL”</p>
+
+        <p>Die ersten vier Zeilen warten so lange, bis die E-Taste gedrückt -wird, dann bleibt das Programm mit READY stehen.</p>
+
+        <p>Wir wollen nun eine zusätzliche Zeile 165 durch das Programm einfügen lassen, mit der nicht beendet, sondern durch Drücken der Q-Taste auf die Zeile 500 gesprungen wird. Das erreichen wir durch folgende Zeilen:</p>
+
+        <p>172 PRINT CHR$(147)<br>
+            174 PRINT ”165 IF A$ = CHR$(81) THEN 500”<br>
+            176 PRINT ”GOTO 150”<br>
+            178 POKE 631,19:POKE 632,13:POKE 633,13: POKE 634,13:POKE 198,4</p>
+
+        <p>Wenn jetzt die E-Taste gedrückt wird, löscht Zeile 172 den Bildschirm, Zeile 174 druckt in die zweite Bildschirmzeile die neue Programmzeile 165 und Zeile 176 darunter ohne Zeilennummer den Direktbefehl GOTO 150. In den Tastaturpuffer werden nacheinander die Werte für HOME und dreimal RETURN eingegeben und die Anzahl der Zeichen im Puffer auf 4 begrenzt.</p>
+
+        <p>Sobald nun das Programm den Befehl END in Zeile 180 erreicht, werden die Werte im Puffer ausgeführt, das heißt der Cursor geht nach HOME, das erste RETURN setzt ihn ohne Wirkung eine Zeile tiefer, wo er auf der neu ausgedruckten Zeile 165 steht. Das zweite RETURN gibt diese Zeile ein, das dritte RETURN führt den Direktbefehl GOTO 150 aus, wodurch das Programm weiterläuft, so wie vorher. Der einzige Unterschied ist nur, daß jetzt eine neue Zeile im Programm steht, nämlich die Zeile 165.</p>
+
+        <p>Prüfen Sie es mit STOP und LIST.</p>
+
+        <h3>Zeile verändern oder löschen</h3>
+
+        <p>Diese Methode habe ich von S. Leemon [1] übernommen. Sie funktioniert im Prinzip genauso wie das Einfügen von Zeilen. Die Programmzeilen sind durch REMs erklärt. Probieren Sie es aus.</p>
+
+        <p>10 REM - DIESE ZEILE WIRD GELÖSCHT<br>
+            20 PRINT CHR$(147):PRINT:PRINT<br>
+            30 PRINT ”60 LIST”<br>
+            40 PRINT ”10”<br>
+            50 PRINT ”GOTO 70” CHR$(19)<br>
+            60 FOR 1 = 631 TO 633:POKE I,13:NEXT: POKE 198,3:END<br>
+            70 REM - DIESE ZEILE WIRD ERSETZT</p>
+
+        <p>Diese Verfahren, Zeilen eines Programms während des Laufs eines Programms zu ändern, haben sicher für einfache Programme keine große Bedeutung. Ich bin aber fest davon überzeugt, daß sie bei Programmen, die selbst lernen können, eine wichtige Rolle spielen. Nur habe ich hier jetzt noch kein gutes Demonstrationsbeispiel.</p>
+
+        <h3>Einfügen einer Funktion</h3>
+
+        <p>Sie alle kennen die Möglichkeit, Funktionen mit dem Basic-Befehl DEF FN.. selbst zu definieren. Vielleicht haben Sie auch schon einmal frustriert die Versuche abgebrochen, eine Funktion während des Programmablaufs per INPUT eingeben zu können. Das funktioniert nämlich nicht.</p>
+
+        <p>Mit dem Tastaturpuffer aber geht es, und zwar sehr elegant.</p>
+
+        <p>Der vergebliche Versuch sieht so aus:</p>
+
+        <p>150 PRINT ’’FORMEL EINGEBEN”<br>
+            160 INPUT”FQO=”;A$<br>
+            250 DEFFNAQO=A$<br>
+            260 PRINT FNA(9)<br>
+            270 GOTO 150</p>
+
+        <p>Der STRING A$, in Zeile 160 eingegeben, wird von Zeile 250 nicht übernommen. Zeile 250 können Sie so nicht verwenden, also löschen Sie sie bitte.</p>
+
+        <p>Sie können diese Zeile aber vom Programm einfügen lassen:</p>
+
+        <p>170 PRINT CHR$(147):PRINT:PRINT<br>
+            180 PRINT ”250 DEF FNA(X)=”;A$<br>
+            190 PRINT ”GOTO 240”<br>
+            200 PRINT CHR$(19)<br>
+            210 POKE 631,13: POKE 632,13: POKE 198,2: END<br>
+            240 REM - FORMELBERECHNUNG -</p>
+
+        <p>Wenn Sie nicht genau nachvollziehen können, was da vorgeht, empfehle ich Ihnen, an das Ende der Zeile 200 noch ein END anzuhängen. Dann bleibt das Programm dort stehen, Sie sehen, wo der Cursor steht und können dann die Wirkung der Zeile 210 in Ruhe überlegen.</p>
+
+        <p>Eine weitere interessante Anwendung habe ich bei Russ Davies gefunden [3]. Sie ermöglicht, Routinen des Betriebssystems oder Basic-Übersetzers aus dem Speicher auszulesen und als DATA-Anweisungen in Ihr Basic-Programm einzufügen.</p>
+
+        <h3>Einfügen von DATA-Zeilen</h3>
+
+        <p>Die Aufgabe besteht darin, aus einem auszuwählenden Speicherbereich — dort, wo die in Frage kommende Routine sitzt — den Maschinencode herauszuPEEKen und mit der inzwischen bekannten Methode in eine DATA-Zeile einzufügen. Ich gehe schrittweise vor:</p>
+
+        <p>20 PRINT CHR$(147): PRINT: PRINT<br>
+            30 PRINT ”5555 DATA”;<br>
+            50 FORA=0TO3<br>
+            60 PRINT PEEK(A)”, ”;:NEXT<br>
+            70 PRINT CHR$(19)<br>
+            80 POKE 631, 13: POKE 632,13: POKE 198,2: END</p>
+
+        <p>Mit Zeilen 20 und 30 wird der DATA-Zeile die Zeilennummer 5555 gegeben und in die 3. Bildschirmzeile geschrieben. Zeile 50 liest die Speicherzellen 0 bis 3 aus und druckt sie, mit einem Komma versehen, dahinter. Zeilen 70 und 80 geben diese Zeile in gewohnter Manier in das Programm ein.</p>
+
+        <p>Ganz richtig ist das noch nicht, da nach LIST die Zeile 5555 zuviele Zwischenräume hat:</p>
+
+        <p>5555 DATA 47,55 , 0 , 170 ,</p>
+
+        <p>Zur Korrektur müssen wir Zeile 60 erweitern:</p>
+
+        <p>60 PRINT MID$(STR$(PEEK(A)),2)”,”;:NEXT</p>
+
+        <p>STR$() wandelt den durch PEEK ausgelesenen Zahlenwert in einen String um. MID$(&hellip;,2) schneidet die Leerstellen weg.</p>
+
+        <p>Mr. Davies hat daraus eine komfortable kleine Routine gebaut, die den auszulesenden Speicherbereich und die gewünschte Zeilennummer der ersten DATA-Zeile abfragt, dafür sorgt, daß eine DATA-Zeile nicht länger als 16 Zeichen wird, in diesem Fall die nächste Zeilennummer um 10 erhöht und sogar das letzte Komma in jeder DATA-Zeile eliminiert.</p>
+
+        <p>Dieser ganze Komfort hat natürlich nichts mit dem Tastaturpuffer zu tun. Dieser Teil bleibt unverändert. Aber ich finde dieses Programm so durchdacht, daß ich es Ihnen als ein Beispiel guter Programmierung angeben will.</p>
+
+        <p>10 INPUT ”STARTADRESE”;A: INPUT ”ENDADRESE”;E: INPUT ”ZEILE”;Z<br>
+            20 PRINT CHR$(147)<br>
+            30 PRINT Z ”DATA”;<br>
+            40 IFA>ETHENEND<br>
+            50 FORA=ATOA + 15 + (E&lt;A + 15)*(A + 15-E)<br>
+            60 PRINTMID$(STR$(PEEK(A)),2)”,”;:NEXT<br>
+            70 PRINT”[CRSR-links]”:PRINT ”A = ”A”: E = ”E”: Z=”Z + 10”: GOTO 20”;<br>
+            80 POKE 631, 19: POKE 632,13: POKE 633,13: POKE 634,13: POKE 198,4: END</p>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>64'er Extra</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="1/86">
+    <meta name="64er.pages" content="92-93">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>64'er Extra</h1>
+        <p class="intro">Das 64'er Extra bringt geballte Information über Ihren C 64 zum Heraustrennen und Sammeln. In dieser fünften Ausgabe finden Sie den ersten Teil einer Übersicht über alle ROM-Routinen des C 64. Statt ziellos in ROM-Listings zu blättern, finden Sie hier im Klartext die Funktionsbeschreibung aller irgendwie nutzbaren Routinen.</p>
+
+        <p>BCOLD $A000<br>
+            Basic-Kaltstartvektor ($E394). Unterzieht Basic der Prozedur NEW, gibt die Meldung BYTES FREE und READY aus. Dies beendet die Reset-Sequenz; siehe die Routinen bei $E394 und $FCE2.<br>
+            BWARM $A002<br>
+            Basic-Warmstartvektor ($E37B). Unterzieht Basic der Prozedur CLR, gibt READY aus. Dies steht am Ende der SHIFT-RESTORE-Sequenz; siehe die Routinen bei $E37B und $FE43.<br>
+            $A004<br>
+            Meldung des CBM-Basic.<br>
+            $A00C<br>
+            Tabelle der um 1 verminderten Adressen der Basic-Befehle (END, FOR, NEXT, etc.).<br>
+            $A052<br>
+            Tabelle der Adressen von Zahlen- und Stringfunktionen (SGN, INT, ABS, etc.).<br>
+            $A080<br>
+            Tabelle der um 1 verminderten Adressen der Routinen zur Bearbeitung der Basic-Operatoren (addieren, subtrahieren, dividieren, etc.); jeder Adresse folgt ein Byte, das die Priorität des Operators angibt.<br>
+            $A09E<br>
+            Basic-Schlüsselwörter als Zeichenketten im CBM-ASCII mit gesetztem Bit 7 des letzten Zeichens.<br>
+            $A129<br>
+            Tabelle verschiedener Schlüsselwörter, die keine Aktionsadressen haben, (TAB, TO, FN, etc.); Bit 7 des letzten Zeichens ist gesetzt.<br>
+            $A140<br>
+            Tabelle der Schlüsselzeichen der Opeatoren; außerdem AND, OR als Zeichenketten mit Bit 7 = ’T des letzten Zeichens.<br>
+            $A14D<br>
+            Tabelle der Schlüsselwörter der Funktionen (SGN, INT, ABS, etc.) mit gesetztem Bit 7 des letzten Zeichens.<br>
+            $A19E<br>
+            Tabelle der 28 Fehlermeldungen (TOO MANY FILES, FILE OPEN etc.) mit Bit 7 des letzten Zeichens gesetzt.<br>
+            $A328<br>
+            Tabelle der Zeiger zu den Fehlermeldungen<br>
+            $A364<br>
+            Tabelle der anderen Meldungen OK, ERROR IN, READY, BREAK.<br>
+            FNDFOR $A38A<br>
+            Prüft den Stapelspeicher auf den Eintrag für FOR. Aufgerufen von NEXT: wird FOR nicht gefunden, erscheint die Meldung ?NEXT WITHOUT FOR. Löscht auch, wenn von RETURN aufgerufen, einen FOR-Datenblock vom Stapel.<br>
+            BLTU $A3B8<br>
+            Schafft eine Lücke im Basic-Text zur Einfügung einer neuen Basic-Zeile. Prüft, ob genug Platz vorhanden, dann:<br>
+            BLTUC $A3BF<br>
+            Verschiebtden Blockzwischen ($5F und ($5A)-1 hinauf zu einem neuen Blockende bei ($58)-1.<br>
+            GETSTIK $A3FB<br>
+            Prüft, ob der Stapelspeicher noch 2 * A Bytes faßt: wenn nicht, erscheint die Meldung ?OUT OF MEMORY.<br>
+            REASON $A408<br>
+            Prüft, ob der Zeiger in (A/Y) unterhalb FRETOP (aktuelle untere Grenze des Zeichenkettenbereichs) zeigt. Wenn ja, wird die Routine verlassen; wenn nein, erfolgt Garbage Collection: wenn danach immer noch nein, wird ?OUT OF MEMORY ausgegeben.<br>
+            ERROR $A437<br>
+            Gibt Fehlermeldung aus; X enthält die Fehlernummer (= die Hälfte der Versetzung innerhalb der Adressentabelle der Fehlermeldungen). Wird durch einen Vektor in ($0300) nach $A43A gelenkt. Dann werden die temporären Adressen für Tastatureingabe und Bildschirmausgabe gesetzt, der Steckpointer zurückgesetzt und, falls im Programm-Modus, die Fehlermeldung zusammen mit der Zeilennummer ausgegeben. Dann:<br>
+            READY $A474<br>
+            Startet Basic neu: Gibt READY aus, schaltet auf Direktmodus, dann:<br>
+            MAIN $A480<br>
+            Nimmt eine Zeile in den Eingabepuffer herein und fügt ein abschließendes Nullbyte an. Prüft, ob Programmzeile oder Befehl im Direktmodus: führt letzteren sofort aus. (MAIN wird über einen Vektor in ($0302) zu $A483 weitergeleitet.)<br>
+            MAIN1 SA49C<br>
+            Ist es eine Programmzeile, wird sie verschlüsselt.<br>
+            INSLIN $A4A4<br>
+            Ersetzt die alte Zeile durch die neue, falls die Zeilennummer bereits vorhanden; fügt ansonsten die neue Zeile ein. Die Zeilennummer befindet sich beim Eintritt in $14, $15; die Länge +4 steht in Y. Ist das erste Byte im Puffer gleich 0, handelt es sich um eine leere Zeile: die alte Zeile wird gelöscht.<br>
+            FINI $A52A<br>
+            Führt nach dem Einfügen einer neuen Zeile RUNC (dadurch gehen beim Editieren die Variablen verloren und anschließendes CONT ist nicht mehr möglich) und LNKPRG aus; springt anschließend zu MAIN.<br>
+            LNKPRG $A533<br>
+            Verkettet die Bindezeiger im Basic-Programm; verwendet dabei Nullbytes als Markierungen für das Zeilenende.<br>
+            INLIN $A560<br>
+            Nimmt eine Bildschirmzeile in den Basic-Puffer ab $0200 herein und fügt ein abschließendes Nullbyte an.<br>
+            RDCHR<br>
+            Setzt einzelnes Zeichen in A.<br>
+            CRUNCH $A579<br>
+            Verschlüsseltdie Schlüsselwörterim Eingabepuffer. Wird übereinenVektorin ($0304) gewöhnlich nach $A57C gelenkt.<br>
+            FNDLIN $A613<br>
+            Suchtden Basic-Textvon Anfang an nach derZeilennummer in $14, $15 ab. Bei gefundenerZeilen-nummer wird das Übertragsflag gesetzt; ($5F) zeigt auf die Bindeadresse.<br>
+            FNDLNC $A617<br>
+            Sucht Basic-Text ab A (niederwertiges Byte) und Y (höherwertiges Byte) nach der Zeilennummer in $14, $15 ab.<br>
+            SCRATH $A642<br>
+            * <strong>NEW springt hierher: prüft die Syntax, dann:<br>
+                SCRTCH $A644<br>
+                Setzt die ersten 2 Byte des Textes (= der erste Bindezeiger) auf 0; lädt den Zeiger für den Anfang der Variablen $2D,$2E mit dem Anfang von Basic+2, dann:<br>
+                RUNC $A659<br>
+                Setzt mittels STXPT den Zeiger innerhalb GETCHR auf den Anfang des Basic-Texts, dann:<br>
+                CLEAR $A65E<br>
+            </strong><em> CLR: Löscht die Variablen durch Zurücksetzen der Zeiger zum Ende des Variablenbereichs auf den Wert des Zeigers für das Programmende; eventuelle Zeiger von Zeichenkettenvariablen werden ebenfalls zurückgesetzt. Bricht l/O-Aktivitäten ab und setzt den Stackpointer zurück.<br>
+                STXPT $A68E<br>
+                Setzt den Zeiger innerhalb der Routine GETCHR auf den Anfang des Basic-Texts zurück, (das heißt, lädt $7A,$7B mit $2B,2C-1).<br>
+                LIST $A69C<br>
+            </em><strong> EINSPRUNG für den LIST-Befehl.<br>
+                LIST1 $A6C9<br>
+                Listet eine Zeile Basic: zuerst die Zeilennummer, dann den Text.<br>
+                QPLOP $A717<br>
+                Bearbeitet das zu listende Zeichen: ist es ein gewöhnliches oder ein Steuerzeichen in Anführungszeichen, wird es ausgegeben; entschlüsselt und druckt Schlüsselzeichen über einen Vektor in ($0306) nach $A71A gelenkt.<br>
+                FOR SA742<br>
+            </strong><em> Bearbeitung von FOR. Schiebt 18 Byte auf den Stapelspeicher. 1) Zeiger auf die nächstfolgende Anweisung, 2) momentane Zeilennummer, 3) oberer Schleifenwert, 4) Schrittweite (Standardwert = 1), 5) Name der Schleifenvariablen und 6) das Schlüsselzeichen für FOR.<br>
+                NEWSTT $A7AE<br>
+                Führt Basic aus: Prüft auf die STOP-Taste und auf das Nullbyte für das Zeilenende oder auf einen Doppelpunkt.<br>
+                CKEOL $A7C4<br>
+                Hält an, wenn Textende erreicht und setzt andernfalls den Zeiger innerhalb CHRGET auf den Anfang der nächsten Zeile.<br>
+                GONE $A7E1<br>
+                Bearbeitet die Basic-Anweisung in der momentanen Zeile. Über einen Vektor in ($0308) nach A7E4 gelenkt; kehrt in einer Schleife zurück zu NEWSTT.<br>
+                GONE3 $A7ED<br>
+                Führt ein Basic-Schlüsselwort aus. Bezieht die Adresse zum Starten der Routine aus der Tabelle bei $A00C. Nimmt ”LET” an, wenn das erste Byte der Anweisung kein Schlüsselwort ist. Legt Adresse auf den Stapelspeicher, so daß der RTS-Befehl von CHRGET dorthin springt.<br>
+                RESTOR $A81D<br>
+                * <strong>RESTORE: Setzt den Datenzeiger bei $41, $42 auf den Anfang des Basic-Textes.<br>
+                    STOP SA82C<br>
+                    * </strong>STOP: auch END sowie Programmunterbrechung. Speichert Information für CONT (Zeiger in den Basic-Text, Zeilennummer). STOP gibt BREAK IN xxx aus, während END dies überspringt und stattdessen READY druckt. Die STOP-Taste aktiviert STOP; Ein Nullbyte für das Programmende ruft END auf.<br>
+                CONT SA857<br>
+            </em><strong> CONT: Setzt den Programmlauf fort. Setzt hierzu die aktuelle Zeilennummer ($39, $3A) und den Zeiger innerhalb CHRGET auf die von STOP gespeicherten Werte. ?CANTT CONTINUE ERROR erscheint, wenn das höherwertige Byte des Zeigers bei einem Syntax-Fehler auf »0« gesetzt wurde.<br>
+                RUN $A871<br>
+            </strong><em> RUN: Löscht alle Variablen (CLR), setzt den Stapelspeicher zurück, setzt CHRGET auf den Anfangvon Basic und beginnt mitderAusführung des Programms. Auf RUN xxxfolgtCLRallerVaria-blen, das Zurücksetzen des Stapelspeichers und schließlich GOTO xxx.<br>
+                GOSUB $A883<br>
+            </em><strong> GOSUB: Schiebt 5 Byte auf den Stapelspeicher: 1) den Zeiger innerhalb CHRGET, 2) die aktuelle Zeilennummer, 3) das Schlüsselzeichen für GOSUB; anschließend wird GOTO aufgerufen. GOTO $A8A0<br>
+            </strong><em> GOTO: Holt sich die auf die GOTO-Anweisung folgende Zeilennummer und sucht den Basic-Text nach dieser Zeile ab. Ist das höherwertige Byte der Bestimmungszeile größer als das der aktuellen Zeilennummer, erfolgt die Suche ab der momentanen Zeile aufwärts, um die Suchzeit abzukürzen; sonst beginnt die Suche von Anfang an. Setzt Zeiger auf die gefundene Zeile in CHRGET ein.<br>
+                RETURN $A8D2<br>
+            </em><strong> RETURN: Der Stapelspeicher wird bis zum GOSUB-Schlüsselzeichen restorniert (7RETURN WITHOUT GOSUB, wenn keines gefunden). Anschließend werden die Nummer und der Zeiger der aufrufenden Zeile wiederhergestellt und die Programmausführung fortgesetzt.<br>
+                DATA $A8F8<br>
+            </strong><em> DATA: Die Routine veranlaßt CHRGET, die DATA-Anweisung bis zum abschließenden Nullbyte oder einem Doppelpunkt zu überspringen.<br>
+                DATAN $A906<br>
+                Sucht nach der Endemarkierung der Anweisung; beim Aussprung enthält Y den Unterschied zwischen Zeilenende und dem Zeiger der Routine CHRGET<br>
+                REMN $A909<br>
+                Sucht nach dem Ende einer Basic-Zeile.<br>
+                IF $A928<br>
+            </em><strong> IF: Wertet den Ausdruck aus; ist das Resultat »Falsch« (das heißt gleich 0), wird der THEN-oder GOTO-Teil mittels REM übergangen.<br>
+                REM $A93B<br>
+            </strong><em> REM: Sucht nach dem Ende der Zeile und bringt den Zeiger in CHRGET auf den neuen Stand. Dadurch wird der Inhalt der REM-Zeile übergangen.<br>
+                OOCOND $A940<br>
+                Setzt IF fort: Ist der Ausdruck wahr, wird der nächste Befehl, oder, wenn eine Zahl folgt, GOTO ausgeführt.<br>
+                ONGOTO $A94B<br>
+            </em><strong> ON: Berechnet den Ausdruck, prüft auf Schlüsselzeichen für GOTO oder GOSUB, geht die Liste der Zeilennummern nach der angegebenen Zeilennummer durch, überspringt dabei Kommata, und führt schließlich GOTO oder GOSUB dorthin aus.<br>
+                LINGET $A96B<br>
+                Liest aus dem Basic-Text eine Ganzzahl (gewöhnlich eine Zeilennummer) in $14, $15 ein; die Zahl muß im Bereich 0&hellip;63999 liegen.<br>
+                LET $A9A5<br>
+            </strong><em> LET: Sucht Zielvariable in der Variablenliste (oder erzeugt sie, falls nicht vorhanden), prüft auf das Schlüsselzeichen für ”=”, berechnet den Ausdruck und setzt das Ergebnis oder den Zeichen-kettendescriptor in die Variablenliste.<br>
+                PUTINT $A9C4<br>
+                Rundet den FAC1 und sezt ihn als Ganzzahl in die Variablenliste an die aktuelle Variablenposition, auf die ($49) zeigt.<br>
+                PTFLPT $A9D6<br>
+                Setzt FAC1 in die Variablenliste an die durch ($49) angegebene Stelle.<br>
+                PUTTIM $A9E3<br>
+                Ordnet die Systemvariable Tl$ zu.<br>
+                ASCADD $AA27<br>
+                Addiert ASCII-Ziffer zu FAC1.<br>
+                GETSPT $AA2C<br>
+                LETfürZeichenketten—setztden Zeichenketten-Deskriptor, aufden (FAC1 + 3) zeigt, in die Variablenliste an die Stelle ($49).<br>
+                PRINTN $AA80<br>
+                PRINT: Ruft CMD auf, löscht dann die l/O-Kanäle und setzt die Standard-Geräteadressen wieder ein.<br>
+                CMD $AA86<br>
+            </em><strong> CMD: Setzt mittels der Kernel-Routine CHKOUT das CMD-Ausgabegerät aus der Dateitabelle und ruft PRINT auf.<br>
+                STRDON $AA9A<br>
+                Teil der PRiNT-Routine: Gibt Zeichenkette aus und fährt mit der Abwicklung von PRINT fort.<br>
+                PRINT $AAAO<br>
+            </strong><em> PRINT: Identifiziert PRINT-Parameter (TAB, SPC, Komma, Strichpunkt usw.) und berechnet Ausdrücke.<br>
+                VAROP $AAB8<br>
+                Gibt Variable aus; Zahlen werden zunächst in eine Zeichenkette umgewandelt.<br>
+                CRDO $AAD7<br>
+                Gibt eine Zeilenschaltung aus, der ein Zeilenvorschub folgt, wenn die Kanaladresse 128 ist.<br>
+                STROUT $AB1E<br>
+                Druckt die Zeichenkette, auf die (A/Y) zeigt, bis ein Nullbyte oder Anführungszeichen angetroffen wird.<br>
+                STRPRT $AB21<br>
+                Druckt Zeichenkette: (FAC1+3) zeigt auf den Zeichenketten-Deskriptor.<br>
+                OUTSTR $AB24<br>
+                Zeichenkettenausgabe: ($22) zeigt auf die Zeichenkette; die Länge ist in A festgehalten.<br>
+                OUTSPC $AB3B<br>
+                Ausgabe eines Cursorschritts nach rechts (oder eines Leerzeichens, wenn die Ausgabe nicht zum Bildschirm erfolgt).<br>
+                PRTSPC $AB3F<br>
+                Gibt Leerzeichen aus.<br>
+                OUTSKP $AB42<br>
+                Gibt Cursorschritt rechts aus.<br>
+                OUTQST $AB45<br>
+                Gibt Fragezeichen vor Fehlermeldung aus.<br>
+                OUTOO $AB47<br>
+                Gibt das Zeichen in A aus.<br>
+                TRMNOK $AB4D<br>
+                Gibt die entsprechenden Fehlermeldungen für GET, READ und INPUT aus.<br>
+                GET $AB7B<br>
+            </em><strong> GET: Prüft auf Direktmodus (nicht zulässig) und holt ein Zeichen von der Tastatur oder Datei.<br>
+                INPUTN $ABA5<br>
+            </strong><em> INPUT: Holt die Dateinummer, schaltet das Gerät ein, ruft INPUT auf und schaltet dann das Gerät ab.<br>
+                INPUT $ABBF<br>
+            </em><strong> INPUT: Gibt den Hinweistext des Benutzers aus, falls vorhanden, dann:<br>
+                QINLIN $ABF9<br>
+                Bringt ein »?« auf den Bildschirm und nimmt die durch eine Zeilenschaltung begrenzte Zeile Text in den Eingabepuffer herein.<br>
+                READ $AC06<br>
+            </strong><em> READ:GET undlNPUTteilensichdieseRoutine,werdenaberdurcheinFlagin$11 unterschieden.<br>
+                INPCON $ACOD<br>
+                Einsprung für INPUT: Setzt das Flag und ruft READ auf; (X/Y) zeigt auf den Puffer.<br>
+                INPCO1 $ACOF<br>
+                Einsprung für GET: Setzt das Flag und ruft READ auf; (X/Y) zeigt auf den Puffer.<br>
+                DATLOP $ACB8<br>
+                Geht Text durch und liest DATA-Anweisungen<br>
+                VARENO $ACDF<br>
+                Prüft auf eine »0« am Ende des Eingabepuffers; gibt die Meldung? EXTRA IGNORED aus, wenn nicht gefunden.<br>
+                EXINT $ACFC<br>
+                Die Meldungen? EXTRA IGNORED und ?REDO FROM START beide gefolgt von CRLF (Zeilenschaltung und Zeilenvorschub).<br>
+                NEXT$AD1E<br>
+            </em><strong> NEXT: Prüft auf das Schlüsselzeichen für FOR und die passende Variable auf dem Stapelspeicher; gibt?NEXTWITHOUT FOR aus, wenn nicht gefunden; berechnet nächsten Wert: wenn dieser noch gültig, werden die aktuelle Zeilennummer und der Zeiger in CHRGET zurückgesetzt und die Schleife fortgesetzt.<br>
+                FRMNUM $AD8A<br>
+                Berechnet einen numerischen Ausdruck von Basic aus durch Aufruf von FRMEVL, dann:<br>
+                CHKNUM $AD80<br>
+                Prüft durch Testen der Flag bei $OD, ob FRMEVL eine Zahl geliefert hat: Meldung ?TYPE MISMATCH ERROR, wenn nicht.<br>
+                CHKSTR $AD8F<br>
+                Prüft durch Testen der Flag bei $OD, ob FRMEVL eine Zeichenkette geliefert hat: Meldung ?TYPE MISMATCH ERROR, wenn nicht.<br>
+                FRMEVL $AD9E<br>
+                Wertet jeglichen Basic-Formelausdruck aus und meldet alle Syntaxfehler; setzt $OD (VALTYP) im Falle einer Zahl auf $00, bei einer Zeichenkette auf $FF. Setzt bei einer Fließkommazahl $OE (INTFLG) auf $00 und legt den Wertin FAC1 ab. War der Variablentyp ganzzahlig, wird INTFLG auf $80 gesetzt, das Ergebnisjedoch im Fließkommaformat in FAC1 belassen. Komplizierte Ausdrücke können eine Vereinfachung erfordern, um Platz im Stapelspeicher zu gewinnen und den Fehler ?OUT OF MEMORY zu vermeiden.<br>
+                EVAL $AE83<br>
+                Wertet einzelnes Glied in einem Ausdruck aus; sucht nach Ziffernketten in ASCII, Variablen, r, NOT, arithmetischen Funktionen und so weiter.<br>
+                PIVAL $AEA8<br>
+                Wert für ?r im 5-Byte-Fließkommaformat.<br>
+                PARCHK $AEF1<br>
+                Wertet Klammerausdrücke innerhalb des Textes aus.<br>
+                CHKCLS $AEF7<br>
+                Prüft, ob CHRGET auf ”)” zeigt —?SYNTAX ERROR, wenn nicht.<br>
+                CHKOPN $AEFA<br>
+                Prüft, ob CHRGET auf ”(” zeigt —?SYNTAX ERROR, wenn nicht.<br>
+                CHKCOM $AEFD<br>
+                Prüft, ob CHRGET auf ” , ” zeigt —?SYNTAX ERROR, wenn nicht<br>
+                SYNCHR $AEFF<br>
+                Prüft, ob CHRGET auf ein Byte gleich dem in A zeigt: wenn ja, wird die Routine mit dem nächsten Byte in A verlassen, sonst ?SYNTAX ERROR.<br>
+                SYNERR $AF08<br>
+                Gibt ?SYNTAX ERROR aus und kehrt zum READY-Status zurück.<br>
+                DOMIN $AFOD<br>
+                Berechnet NOT.<br>
+                TSTROM $AF14<br>
+                Setzt das Übertragsflag auf 1, wenn (FAC1+3) auf ROM zeigt, was auf eine der reservierten Variablen Tl$, Tl, ST hinweist.<br>
+                ISVAR $AF28<br>
+                Sucht die Variablenliste nach der in $45, $46 genannten Variablen ab; beim Verlassen der Routine enthält FAC1 einen numerischen Wert im FLPT-Format (sowohl bei Ganzzahl- wie bei Fließkommavariablen); im Falle einer Stringvariablen zeigt (FAC1+3) auf den Zeichenketten-Descriptor.<br>
+                TISASC $AF48<br>
+                Liest den Taktzähler und bildet eine Zeichenkette, die Tl$ enthält.<br>
+                ISFUN $AFA7<br>
+                Stellt Funktionstyp fest und wertet ihn aus.<br>
+                DROP $AFE6<br>
+            </strong><em> OR-Funktion: Setzt Flag und führt mit zwei Ganzzahlen ausje 2 Bytes in FAC1 und FAC2 logisches ODER (OR) aus.<br>
+                ANDOP $AFE9<br>
+            </em><strong> AND-Funktion: Diese Operationen werden durch eine Routine ausgeführt; ein Flag (in Y) enthält $FF für OR, $00 für AND. Wandel FLPT in Ganzzahl um (Fehlermeldung, wenn außerhalb des zulässigen Bereichs); das Ergebnis bleibt im FLPT-Fbrmat in FAC1.<br>
+                DOREL $B016<br>
+            </strong><em> Vergleiche: &lt; = > prüfen die Variablentypen, dann:<br>
+                NUMREL $BO1B<br>
+                Führt mittels FCOMP bei $DC5B numerische Vergleiche aus, oder:<br>
+                STRREL $B02E<br>
+                FührtZeichenkettenvergleich aus: Aussprung mitX=0 bei gleichen Zeichenketten mitX=1, wenn die erste > die zweite und X=255, wenn die zweite > die erste.<br>
+                DIM $B081<br>
+            </em><strong> DIM: Stellt mittels der Routine PRTGET alle Feldelemente auf.<br>
+                PTRGET $B08B<br>
+                Prüft einen Variablennamen in Basic auf Zulässigkeit; das erste Zeichen muß ein Buchstabe sein, das zweite ein Buchstabe oder eine Zahl; was danach kommt, bleibt unbeachtet. Setzt VALTYP ($0D) auf $FF; wenn ein »$« angetroffen wird, sonst auf $00; setzt INTFLG ($0E) auf $80, wenn ein »%« gefunden wird. Der Name wird in VARNAM ($45, $46) zwischengespeichert. Dabei sind die höchsten Bits so gesetzt, daß sie über den Variablentyp Auskunft geben, wie in Kapitel 5 beschrieben.<br>
+                ORDVAR $B0E7<br>
+                Sucht die Variablenliste nach dem in VARNAM ($45, $46) abgelegten Namen ab und läßt VARPNT ($47) darauf zeigen. Definiert neue Variable, wenn Name nicht gefunden.<br>
+                ISLETC $B113<br>
+                Setzt das Übertragungsflag, wenn der Akkumulator einen der Buchstaben A&hellip;Z enthält.<br>
+                NOTFNS $B11D<br>
+                Stellt eine neue einfache Variable (keine Feldvariable) in der Variablenliste unmittelbar vor den Feldern auf. Der Name befindet sich in VARNAM ($45, $46). Eventuelle Felder müssen um 7 Byte nach oben rücken, um Platz für die neue Variable zu schaffen. Beim Verlassen zeigt ($5F) auf die neu eingerichtete Variable.<br>
+                FMAPTR $B194<br>
+                Berechnet Zeigerwert in $5F,$60; wird bei der Zuweisung von Platz für Felder gebraucht.<br>
+                N32768 $B1A5<br>
+                Enthält — 32768 als 5-Byte-Fließkommazahl.<br>
+                FACINX $B1AA<br>
+                Verwandelt FAC1 in eine Ganzzahl (—32768 bis +32767) und speichert sie in A/Y.<br>
+                INTIDX $B1B2<br>
+                Holt einen positiven Ganzzahlausdruck vom nächsten Teil des Basic-Texts und wertet ihn aus; liegt das Resultat im Bereich 0&hellip;32767, wird es in (FAC1+4, FAC1+3) abgelegt.<br>
+                AYINT $B1BF<br>
+                Wandelt FAC1 in Ganzzahl des Bereichs 0&hellip;32767 um; Ergebnis in FAC+3.<br>
+                ISARY $B1D1<br>
+                Holt Feldparameter aus dem Basic-Text: Zahl der Dimensionen, Zahl der Elemente. Legt sie auf den Stapelspeicher.<br>
+                FNDARY $B218<br>
+                Sucht nach dem Feldnamen in VARNAM ($45,$46) und nach den anderen Einzelheiten auf dem Stapel.<br>
+                BSERR $B245<br>
+                BAD SUBSCRIPT ERROR (falscher Index). BS+3 = ILLEGAL QUANTITY ERROR (nicht zulässige Größe).<br>
+                NOTFDD $B261<br>
+                Ist das Feld nicht vorhanden, nimmt diese Routine die Angaben auf dem Stapelspeicher und definiert das Feld mit der Dimension 10.<br>
+                INPLN2 $B30E<br>
+                Macht angegebenes Feldelement ausfindig und läßt VARPTN ($47) darauf zeigen.<br>
+                UMULT $B34C<br>
+                Berechnet den Abstand des angegebenen Feldelements von der Feldadresse, auf die (VARPTN) ($47) zeigt; setzt das Ergebnis in X/Y.<br>
+                FRE $B37D<br>
+            </strong>* FRE: Führt Garbage Collection aus und läßt (Y/A) auf die unterste (Zeichenkette minus Zeiger auf das Ende der Felder) zeigen; plaziert das Ergebnis in FAC1 durch Aufruf von:<br>
+            GIVAYF $B391<br>
+            Wandelt die 2-Byte-Ganzzahl in Y/A (Bereich —32768 bis +32767) in FLPT um und setzt sie in FAC1.</p>
+    </article>
+</body>
+
+</html>
