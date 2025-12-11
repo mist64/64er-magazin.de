@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Leben und sterben lassen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jürgen Engbring, tr">
+    <meta name="64er.issue" content="1/86">
+    <meta name="64er.pages" content="69-71">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Leben und sterben lassen</h1>
+        <p class="intro">»Life« ist wohl eine der faszinierendsten Simulationen von biologischen Vorgängen auf Computern. Mit »Life« lassen sich evolutionäre Abläufe spielerisch verstehen lernen.</p>
+
+        <p>Obwohl den Lesern der Inhalt des »Spiels« geläufig sein mag, hier die »Regeln«:</p>
+
+        <p>Es existiert ein zweidimensionales Feld und an jedem Punkt ist eine lebende oder eine tote Zelle. Jede Zelle hat acht Nachbarn.</p>
+
+        <p>An einem Punkt wird eine Zelle dann und nur dann lebendig, falls sie genau drei lebende Nachbarn hat.</p>
+
+        <h2>Fast wie im richtigen Leben</h2>
+
+        <p>Eine Zelle stirbt, wenn sie weniger als zwei (Vereinsamung) oder mehr als drei (Überbevölkerung) lebende Nachbarn hat.</p>
+
+        <p>So ändert sich das Feld von Generation zu Generation, mit ei-nermeistfaszinierenden Entwicklung. Das Spiel, erfunden von dem Mathematiker John Horton Conway (Cambridge), stellt sich als höchst komplex und reizvoll heraus.</p>
+
+        <p>Um es gleich zu sagen: Life ist kein Spiel, das man selber spielt. Life spielt sich selbst. Man kann die »Anfangswelt« festlegen und dann beobachten, wie sie sich entwickelt. Das Spiel wird sicher dem einen oder anderen Computer-Fan bekannt sein, da es ein ideales Problem für den Computer ist: Sehr einfache Regeln, aber viel Rechnerei.</p>
+
+        <p>In dem Beispiel (Rotor, siehe Bild 1) sind die Verhältnisse noch sehr einfach, weil die kleine Life-Welt nur zwischen zwei Zuständen hin und her pendelt. Dieser Dreier ist eine der Strukturen, die stabil sind. Meistens dauert es viele Generationen, bis eine Population ausstirbt oder in stabile Strukturen übergeht. Am besten, man experimentiert einfach etwas. Bild 2 zeigt noch einige interessante Strukturen.</p>
+
+        <h3>Zum Programm:</h3>
+
+        <p>Wie würde man das Problem normalerweise angehen? Nun, man legt sich ein zweidimensionales Feld an und speichert für jede lebende Zelle eine Eins, für jedes unbesetzte Kästchen eine Null. Dann geht man alle Felder durch, prüft die acht Nachbarfelder und speichert das Ergebnis, tot oder lebendig in der nächsten Generation, in einem zweiten Feld. Der Computer hat dann (bei 80 mal 50) 32 000 Felder zu überprüfen, und das bedeutet: warten&hellip;</p>
+
+        <p>Aber Moment! Ist es denn nötig, auch die Bereiche zu bearbeiten, in denen es ohnehin kein Leben gibt?</p>
+
+        <p>Besser, man bearbeitetjeweils nur die relevanten (belebten) Bereiche: Es kann nur in dem Bereich etwas passieren, der direkt an lebende Zellen angrenzt. Man speichert die Koordinaten aller lebenden Zellen und ihrer Nachbarn, sorgt dafür, daß keine Felder doppelt gezählt werden und braucht dann jeweils nur noch die Liste der Koordinaten durchzugehen. Dafür benötigt man ein weiteres Variablen-Feld, in dem bereits vermerkte Zellen gekennzeichnet werden. Nach dieser Vorbereitung werden zur Berechnung der nächsten Generation die Koordinaten des relevanten Bereichs durchgegangen. Ein zweites Mal durchläuft man die Koordinaten, um den neuen relevanten Bereich festzustellen. Wenn also eine Struktur auf dem Bildschirm wandert, so wandert auch der relevante Bereich mit.</p>
+
+        <h3>Bedienungshinweise:</h3>
+
+        <p>Man hat eine 78 x 48-Auflösung (der äußerste Rand ist eine Todeszone«; hier ist grundsätzlich kein Leben möglich) zur Verfügung. Startet man das Programm, so befindet man sich in einem Editor.</p>
+
+        <p>Eine Zelle wird mit der SPACE-Taste lebendig.</p>
+
+        <p>Eine Zelle wird mit der DEL-Taste getötet.</p>
+
+        <p>Der Cursor schreitet nach SPACE und DEL in die Richtung fort, die die letzte gedrückte Cursortaste angab.</p>
+
+        <p>Mit »L« wird Life dann gestartet. In dem jetzigen Zustand gibt es folgende Befehle:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>S Stop<br>
+            F1-F8 Verzögerung<br>
+            N Neue Eingabe<br>
+            E Ergänzung, Veränderung<br>
+            Q Quit, Programmende<br>
+            P Power, maximale Geschwindigkeit<br>(nur mit RUN-STOP/RESTORE zu lösen)</p>
+
+        <h3>Erweiterungsmöglichkeiten:</h3>
+
+        <p>Man könnte natürlich die Auflösung weiter erhöhen. Da böte sich dann die Bitmap-Auflösung an (HiRes-Grafik). Hier müßte man allerdings mit dem Speicherplatz sehr vorsichtig umgehen, da der Bildschirm 64000 Bildpunkte hat. Die zusätzlichen Berechnungen würden das Programm auf jeden Fall langsamer machen. Außerdem wird, wenn die relevanten Bereiche zu groß werden, ein Speichern derselben unmöglich (Speicherplatz) und der Generationswechsel dauert zu lange. Eine andere interessante Veränderung wäre mit dem Rand durchzuführen. Mit dem »Todesrand« wurde das Problem der Bildschirm-Bereichsüberschreitung zwar recht elegant gelöst, denn es sind durch das Prinzip der relevanten Bereiche keine Abfragen notwendig. Interessanter jedoch wäre eine offene Wand oder gar eine ganz in sich geschlossene Welt. Unten (rechts) heraustretende Formen würden dann oben (links) wieder auftauchen. Wegen der Abfragen würde jedoch auch dies die Geschwindigkeit verringern.</p>
+
+        <h3>Hinweise zum Abtippen:</h3>
+
+        <p>Als erstes geben Sie die Maschinenroutine (Listing 2) mit dem MSE ein (Speichern nicht vergessen). Zur Eingabe des Hauptprogramms (Listing 1) verwenden Sie bitte den Checksummer.</p>
+
+        <p>Interessierte Leser finden in der Tabelle 1 die Beschreibung des Maschinenprogramms.</p>
+
+        <p>Wer will, kann das Programm noch wesentlich erweitern: Zum Beispiel könnten Hungersnöte, Naturkatastrophen oder Seuchen in bestimmten Gebieten die Bevölkerung wesentlich dezimieren. Ich glaube nicht, daß man das Spiel »Life« auf dem C 64 noch wesentlich schneller programmieren kann, jedoch soll diese Behauptung ruhig dazu provozieren, das Gegenteil zu beweisen.</p>
+
+        <address class="author">(Jürgen Engbring/tr)</address>
+    </article>
+</body>
+
+</html>

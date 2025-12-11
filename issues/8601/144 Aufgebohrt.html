@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Aufgebohrt</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Michael Lamm, og, aw">
+    <meta name="64er.issue" content="1/86">
+    <meta name="64er.pages" content="144,146-147">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Aufgebohrt</h1>
+        <p class="intro">Hier wird beschrieben wie man die 1541 zu einem lEEE-Bus-Laufwerk umrüstet und dreifache Geschwindigkeit bei allen Floppy-Befehlen erreicht.</p>
+
+        <p>Die 1541-Floppy ist ein abgemagertes 2031/4031-Laufwerk. Was steht also näher, sie wieder in den Originalzustand zu versetzen. Mit dieser Erweiterung sind zwar keine Übertragungsgeschwindigkeiten wie etwa bei ProLogic-DOS zu erreichen, aber immerhin werden alle Zugriffe auf die Diskette dreimal schneller. Die Geschwindigkeitssteigerung wird durch den parallelen IEC-Bus erreicht. Das 4040-Doppellaufwerk ist bekanntlich bis zu 6mal schneller, hier sind dafür aber zwei Prozessoren beschäftigt, der eine zum Lesen, der andere zum Übertragen der Daten. Mit dem einen Prozessor der 1541 lassen sich trotzdem ganz vernünftige Werte erzielen. Für den Anschluß am C 64 benötigen Sie ein IEC-Bus-Interface, wie wir es in Ausgabe 7/85, Seite 44 beschrieben ist. Ihre 1541 versteht nach Umbau die »Sprache« der großen CBM-Geräte. Sie können sie also auch direkt an einen CBM 3032/8032-Rechner anschließen und erhalten dadurch eine preisgünstige Alternative zum Doppellaufwerk.</p>
+
+        <h2>Die Hardware</h2>
+
+        <p>Um den parallelen Bus zu realisieren wird einer der beiden Portbausteine VIA 6522 benötigt. Dieser VIA-Baustein CVersatile Interface Adapter) ist teilweise nicht beschältet. Üm der IEC-Norm entsprechen zu können, sind acht Datenleitungen, sowie fünf Handshake-Leitun-gen zum Verbindungsaufbau erforderlich. Über die Handshake-Lei-tung teilt der Computer dem Laufwerk mit, daß er Daten senden, beziehungsweise empfangen möchte (ATN), daß die Daten gültig sind (DAV), daß keine Daten empfangen werden können (NRFD), daß die Daten noch nicht verarbeitet wurden (NDAC), oder daß die Übertragung beendet wurde (EOI). Wenn der Computer eine solche Übertragungssequenz beginnt, wird zuerst festgestellt, ob das Peripheriegerät überhaupt vorhanden beziehungsweise eingeschaltet ist (DEVICE NOT PRESENT). Hierfür sind die Leitungen »NRFD« und »NDAC« zuständig. Wird »ATN« gesetzt, so müssen beide Leitungen sofort nach Masse gezogen werden. Diese Funktion übernimmt das TTL-Gatter (EX-OR 74LS136) in der Schaltung. Die IEC-Norm schreibt weiterhin »Open-Collector«-Ausgänge vor, um mehrere Geräte anschließen zu können, das heißt die Leitungen sind im aktiven Zustand auf Masse-Potential (Low). Die 6522-VIA (Portbelegung siehe Bild 1) hat aber TTL-Pegel. Die notwendige Anpassung übernehmen die beiden IEC-Trei-ber 75160/161.</p>
+
+        <p>Wenn die Platine mit allen Bauteilen bestückt ist, wird die Leiterplatte anstelle der VIA in die Floppy gesteckt und die VIA von oben aufgesetzt. Das serielle Kabel hat in diesem Fall keine Funktion mehr, da alle Übertragungen nur noch parallel stattfinden.</p>
+
+        <h2>Die Software</h2>
+
+        <p>Das Floppy-DOS ist in zwei ROMs untergebracht, das $C000-ROM und das $E000-ROM. Um die Hardware bedienen zu können, müssen die seriellen Routinen durch parallele ersetzt werden. Bei den Laufwerken 2031 und 4031 ist davon der gesamte Bereich betroffen; alle Adressen sind um zirka 40 Byte verschoben. Das hat zur Folge, daß bei der 2031/ 4031 einige Programme mit Direkteinsprüngen im DOS nicht das vorfinden, was sie erwarten. Außerdem müßten beide ROMs gewechselt werden.</p>
+
+        <p>Bei unserem IEC-DOS bleibt der $C000-Bereich unangetastet. Die entsprechenden Routinen sind am Originalplatz eingebunden ($E853), sind aber etwas umfangreicher und belegen zusätzlich noch einige Bytes bei $E780 und $FF10. Bei dieser Gelegenheit wurde die Kopfbewegung verbessert und einige kleine Fehler im DOS beseitigt. Die Formatierungsroutine wurde im Originalzustand belassen.</p>
+
+        <h2>Das Listing</h2>
+
+        <p>Das Generatorprogramm im Listing erwartet ein 1541-Laufwerk. Nach dem Starten wird das OriginalDOS ausgelesen und ab $5000 im C 64 abgelegt. Die Veränderungen werden anschließend mittels POKE-Schleife vorgenommen. Zum Schluß wird die aktuelle Prüfsumme berechnet und eingetragen.</p>
+
+        <p>Das Programm fragt, ob das veränderte DOS abgespeichert werden soll. Wird diese Frage mit »J« beantwortet, so erzeugt es ein File mit dem Namen: 1541.IEEE-DOS.</p>
+
+        <p>Sie können jetzt den Bereich von $5000 bis $6FFF in ein 2764-EPROM brennen und es mittels Kernel-Adapter (64'er, Ausgabe 4/85) anstelle des 1541-ROMs in den Steckplatz UB4 einsetzen. In manchen Laufwerken befindet sich in UB4 bereits ein EPROM mit dazugehörigem Adapter.</p>
+
+        <h2>Der Zusammenbau</h2>
+
+        <p>Den Schaltplan, den Bestückungsplan sowie das Platinenlayout im Maßstab 1:1 finden Sie in Bild 2 bis 4. Bitte beachten Sie, daß die Bestückungsseite die Platine von oben, und die Lötseite die Platine von unten zeigt. Aus Bild 5 entnehmen Sie bitte die Bauteileliste. Die Platine wurde einseitig ausgeführt. Es empfiehlt sich, alle Bausteine zu Sockeln, um sie bei eventuellen Beschädigungen leicht auswechseln zu können, in jedem Fall muß aber der 6422 gesockelt sein. Die Position der Bauteile entnehmen Sie dem Bestückungsplan. Zuerst werden die Widerstände R1 + R2 und die Drahtbrücke eingelötet. Bei den Dioden Dl, D2 und D3 muß auf die Einbaurichtung geachtet werden. Der Pfeil zeigt auf die Anode, was zumeist durch einen Ring gekennzeichnet wird. Anschließend werden die Sockel verlötet. Um die Schaltung in den VIA-Sockel UC3 einsetzen zu können, müssen zwei 20polige Pin-leisten von der Lötseite auf die Platine gelötet werden. Dieser Vorgang erfordert besondere Sorgfalt damit keine unerwünschten Lötbrücken entstehen. Zuletzt ist nur noch das lEEE-Anschlußkabel einzulöten und die Bausteine können eingesetzt werden. Um den Kabelanschluß zu vereinfachen kann ein Einpreßstecker mit Flachbandkabel verwendet werden. Die Anschlußbohrungen sind bereits nach IEEE-Norm angeordnet (siehe Bild 6).</p>
+
+        <p>Die beiden Brücken auf der Leiterbahnseite sind für die Geräteadresse zuständig. Ihre Funktion ist analog zu den Brücken des 1541-Laufwerks, um Adresse 8 einzustellen, sind beide geschlossen.</p>
+
+        <p>Bei älteren Laufwerken sind die Bausteine UC3 und UB4 nicht immer an derselben Stelle, auch die Bezeichnung variiert.</p>
+
+        <p>Es empfiehlt sich also vor dem Einbau einen Fachmann zu Rate zu ziehen, vor allem, wenn man sich bei seiner Laufwerksversion nicht ganz sicher ist. Auf keinem Fall sollte man das Prinzip von Versuch und Irrtum anwenden wollen, sonst kann eine Beschädigung der Laufwerkslogik nicht ausgeschlossen werden.</p>
+
+        <p>Der komplette Bausatz wird ab der nächsten Ausgabe über den Hardware-Service erhältlich sein, beachten Sie dazu die Hinweise auf den Service-Seiten.</p>
+
+        <address class="author">(Michael Lamm/og/aw)</address>
+    </article>
+</body>
+
+</html>

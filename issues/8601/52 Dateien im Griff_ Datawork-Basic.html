@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Dateien im Griff: Datawork-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Klaus Strunk, Klaus Strunk, tr">
+    <meta name="64er.issue" content="1/86">
+    <meta name="64er.pages" content="52,54-58">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Dateien im Griff: Datawork-Basic</h1>
+        <p class="intro">Mit dieser Basic-Erweiterung wird die Programmierung von guten Dateiverwaltungen enorm erleichtert. Umfangreiche Befehle zur Datenein- und ausgabe, zur Stringverarbeitung und Floppyunterstützung erleichtern die Arbeit ebenso wie problemloses Hoch- und Runterscrollen eines Listings.</p>
+
+        <p>Es gibt inzwischen ein fast unüberschaubares Angebot von Basic-Erweiterungen. Diese haben meist den Nachteil, daß von den vielen eingebauten Befehlen nur die Hälfte im »Alltagsgebrauch« benötigt wird. Der Rest geht auf Kosten des Speicherplatzes.</p>
+
+        <p>Datawork-Basic wurde auf 22 sehr leistungsfähige Befehle beschränkt. Weiterhin verbraucht es keinerlei Basic-Speicher, da es im Bereich ab $C000 liegt. Besonderer Wert wurde auf einen neuen INPUT-Befehl gelegt: Der normale INPUT-Befehl hat gerade im Zusammenhang mit Dateiverwaltungen einige gravierende Nachteile. Die Cursor-Steuerung wird zum Beispiel nicht abgeschaltet. Dies kann zur Folge haben, daß bei Fehleingaben die gesamte Bildschirmmaske zerstört wird.</p>
+
+        <p>Auch läßt sich im Original-Basic des C 64 nicht festlegen, welche Zeichen in der aktuellen Eingabe erlaubt sind. Möchte man zum Beispiel ein Feld zur Namens- und Adressenspeicherung definieren, so sollten zur Eingabe auch nur Groß- und Kleinbuchstaben verwendet werden dürfen. Meistens wird dieses Problem mit sehr umfangreichen und umständlichen GET-Routinen gelöst. Der neue Befehl »FETCH« beseitigt alle genannten Schwierigkeiten und ist obendrein noch wesentlich schneller als eine GET-Ab-frage.</p>
+
+        <p>Als weiterer, echter Leckerbissen wurde in die Erweiterung eine Centronics-Schnittstelle implementiert. Drucker, die über eine solche Schnittstelle angesprochen werden (zum Beispiel die Epson-Drucker), lassen sich ohne den Kauf von teuren Interfaces ansteuern. Natürlich lassen sich auch weiterhin seriell betriebene Drucker (zum Beispiel die Commodore MPS-Reihe) verwenden. Umgeschaltet wird einfach durch die beiden neuen Befehle »CENTRONICS« und »SERIELL«.</p>
+
+        <p>Besonders beachtenswert ist auch der eingebaute »SWAP«-Befehl, der die gefürchtete, zeitintensive »Müllabfuhr« im Stringspeicher, die sogenannte »Garbage-Collection« verhindert, sowie die sehr schnelle Suchroutine, die ein dimensioniertes Feld nach beliebigen Zeichenketten durchsucht.</p>
+
+        <p>Eine OLD-Anweisung zur Rettung versehentlich gelöschter Programme, Befehle zur Bildschirmverwal-tungund einige Floppy-Kommandos (zum Beispiel Anzeigen des Inhaltsverzeichnisses ohne Programmverlust) runden Datawork-Basic ab.</p>
+
+        <address class="author">(Klaus Strunk/tr)</address>
+
+        <h2>Lebenslauf</h2>
+
+        <p>Ich bin am 1.6.1962 in Gelsenkirchen geboren und wohne seit 1972 in Bad Waldliesborn bei Lippstadt. SeitzweiJahren studiere ich Elektrotechnik in Aachen.</p>
+
+        <p>Meine Interessen betreffen fast alles, was mit Elektronik zu tun hat. Daneben höre ich sehr gerne Musik und lese alles mögliche.</p>
+
+        <p>Nach meinem Abitur 1982 wurde ich zur Bundeswehr eingezogen. Dort bin ich durch einen Freund auf den VC 20 gestoßen und war sofort von den »immensen Möglichkeiten« eines solchen Computers begeistert.</p>
+
+        <p>Kurze Zeit später kaufte ich mir selbst einen VC 20 und fing an, munter drauflos zu programmieren. Besonders hatten es mir die Dateiverwaltungen angetan. Nachdem mir Basic zu langsam wurde, fing ich an, kleinere Programme in Maschinensprache zu schreiben.</p>
+
+        <p>Als Ende 1983 der C 64 für einen günstigen Preis zu bekommen war, bin ich auf einen C 64 mit Diskettenlaufwerk umgestiegen. Nachdem ich im Laufe der Zeit auch in das Betriebssystem des Computers eingestiegen bin, entschloß ich mich, dem Basic etwas auf die Sprünge zu helfen. So entstand das Datawork-Basic.</p>
+
+        <address class="author">(Klaus Strunk)</address>
+
+        <p class="intro">Mit unserer Anwendung des Monats brauchen Sie nicht länger ein Spitzenprogrammierer zu sein, um gute Dateiverwaltungen selbst zu schreiben. 22 Befehle helfen Ihnen dabei.</p>
+
+        <p>Diese Basic-Erweiterung (siehe Listing) wurde in erster Linie entwickelt, um das Programmieren von Dateiprogrammen, besonders derer, die mit Bildschirmmasken arbeiten, zu erleichtern. Um für solche Programme einen möglichst großen Speicherplatz freizulassen, wurde die Erweiterung in den Bereich ab $C000 gelegt, sie belegt somit keinen Basic-Speicher (siehe auch Tabelle 1).</p>
+
+        <p>Das Programm arbeitet mit Hypra-Load zusammen. Es werden in der Zeropage einige Speicherstellen verwendet, die normalerweise für den Kassettenbetrieb vorgesehen sind (siehe auch Tabelle 2). Benutzer einer Datasette sollten deshalb ausprobieren, ob ein einwandfreier Betrieb möglich ist.</p>
+
+        <p>Das Betriebssystem wird ins RAM kopiert. Deshalb steht für Grafik oder andere Anwendungen das RAM unter dem ROM nicht zur Verfügung.</p>
+
+        <h3>Start des Programms:</h3>
+
+        <ol>
+            <li>Mit Hypra-Load (beziehungsweise allgemein für den Fall, daß das Betriebssystem bereits ins RAM kopiert ist):<br>
+                Zuerst Hypra-Load laden und mit »RUN« starten, dann die Basic-Erweiterung mit »LOAD ’’DATAWORK 1.1”,8,1« laden, und mit »SYS12*4096+6:NEW« ($C006) starten.</li>
+            <li>Ohne Hypra-Load: Die Basic-Erweiterung wie oben laden und mit »SYS12*4096+3:NEW« ($C003) starten.</li>
+            <li>Nach einem Reset: Mit »SYS12*4096« ($C000) starten. Ein Basic-Programm kann danach mitdem OLD-Befehl zurückgeholt werden.</li>
+        </ol>
+
+
+        <h2>I. Eingabebefehle</h2>
+
+        <h3>FETCH</h3>
+
+        <p class="source">Format: FETCH ’’Vorgabestring”, ’’zulässige Zeichen’ Länge, Eingabevariable<br>
+            Oder: FETCH ’’Numerische Vorgabe”, ’’zulässige Zeichen”, Länge, Eingabevariable</p>
+
+        <p>»FETCH« ist ein neuer INPUT-Befehl, der diesen vollständig ersetzen kann. Mit »FETCH« wird ein Eingabefeld bestimmter Länge erzeugt, in dem man sich mit den Cursor-Tasten frei bewegen kann. Die Tasten INST und DEL haben ihre normale Bedeutung. Mit der CLR-Taste wird das Eingabefeld gelöscht. Der String oder der numerische Wert »Vorgabe« wird in das Feld geschrieben und kann dann bearbeitet werden. Für »Vorgabe« sind direkte Angaben und Variablejeder Art erlaubt. Der String »zulässige Zeichen« enthält alle Zeichen, die bei der Eingabe erlaubt sein sollen, andere Zeichen werden dann nicht angenommen. Für ganze Zeichengruppen stehen als Abkürzung zur Verfügung:<br>
+            CRTL-K : Alle Kleinbuchstaben<br>
+            CRTL-G : Alle Großbuchstaben<br>
+            CRTL-N : Ziffern von 0 bis 9<br>
+            CRTL-Z : Alle Zeichen, außer Grafikzeichen und »?« beziehungsweise »*« wegen deren besonderer Bedeutung.</p>
+
+        <p>Der Wert »Länge« gibt die Länge des Eingabefeldes an. In der Eingabevariablen wird die Eingabe abgelegt. Es sind sowohl Stringvariable, als auch numerische Variable zulässig. Bei numerischen Variablen wird ein Zahlenwert gemäß dem Basic-Befehl VAL(X$) übergeben. Für den Fall, daß die Eingabe nur Buchstaben enthält, wird also der Wert 0 übergeben. Beispiel: FETCH ’’Mueller”, ",[CTRL-K,CTRL-G,CTRL-Z],20,AB$ löscht ein 20 Zeichen langes Eingabefeld und schreibt den Text Mueller hinein. Dann erscheint der Cursor im Feld und der Text kann geändert oder ergänzt werden. Nach RETURN wird die Eingabe an die Variable AB$ übergeben.<br>
+            — FETCH ” ”, ”12345”,2,A — erzeugt ein leeres, zwei Zeichen langes Eingabefeld, in dem nur die Tasten 1 bis 5 gedrückt werden können.</p>
+
+        <h3>TAKE</h3>
+
+        <p class="source">Format: TAKE kz, ’zulässige Zeichen”, Eingabevariable DerTAKE-Befehl wartetauf eine gedrückte Taste und übergibt sie an die Eingabevariable, ähnlich wie eine GET-Schleife. Bei >TAKE 0,&hellip;« wird kein Cursor sichtbar, bei »TAKE 1,&hellip;« blinkt der Cursor und die gedrückte Taste wird auf den Bildschirm geschrieben.</p>
+
+        <p>Für »zulässige Zeichen« und »Eingabevariable« gilt Gleiches wie bei »FETCH«.</p>
+
+        <h3>INPUT *</h3>
+
+        <p class="source">Format: INPUT<em>Filenummer, Eingabevariable,&hellip;<br>
+                Die Syntax dieses Befehls ist ähnlich wie bei »INPUT #«. »INPUT * «liestjedoch alle Zeichen bis zum nächsten »CHR$(13)« aus einem File. Es können also führende Leerzeichen, Kommata und Doppelpunkte eingelesen werden. »INPUT</em>« kann maximal 256 Zeichen lesen. Für »Eingabevariable« gilt das gleiche wie bei »FETCH«. Es können beliebig viele Variable angehängt werden.</p>
+
+        <h3>SETIN</h3>
+
+        <p class="source">Format: SETIN lfn, Länge, Variable,&hellip;<br>
+            »SETIN« dient dazu, einen Datensatz aus einer Datei zu lesen und ihn gleichzeitig in seine Datenfelderzu zerlegen. »Ifn« gibt die logische Filenummer an. Es werden so viele Zeichen aus der Datei gelesen, wie »Länge« angibt. Diese werden dann in die Variable übertragen. Leerzeichen am Ende der einzelnen Datenfelder werden zwar eingelesen, jedoch nicht an die Variablen übergeben. Es können beliebig viele Parameter, bestehend aus Länge und Variable, folgen.</p>
+
+        <p>Analog zu »SETIN« gibt es den Befehl »SETOUT« zur Ausgabe eines Datensatzes (siehe weiter unten).</p>
+
+        <h2>II. Ausgabebefehle</h2>
+
+        <h3>PRINTAT</h3>
+
+        <p class="source">Format: PRINTAT sp,ze, Ausgabeliste</p>
+
+        <p>»sp« und »ze« geben Zeile und Spalte an, in die der Cursor vor der Ausgabe positioniert wird. Die »Ausgabeliste« wird genau wie beim normalen PRINT-Befehl angehängt.</p>
+
+        <h3>FIELD</h3>
+
+        <p class="source">Format: FIELD sp,ze, Länge, Zeichen, Farbe, Ausgabeliste</p>
+
+        <p>Der FIELD-Befehl positioniert den Cursor an die Stelle »sp« und »ze«, dann wird ein Ausgabefeld der angegebenen Länge mit dem angegebenen Zeichen in angegebener Farbe gefüllt. Danach wird in dieses Feld die Ausgabeliste wie beim PRINT-Befehl ausgegeben. Für »Zeichen« wird der Bildschirmcode (0 bis 255) angegeben. Für »Farbe« sind die Werte 0 bis 15 gültig.</p>
+
+        <p>Zum Beispiel: FIELD 10,15,20,32,5,’Text” — löscht ein Ausgabefeld ab Spalte 10, Zeile 15 der Länge 20 und schreibt in grüner Farbe >Text«in das Feld. — FIELD 0,0,40,160,5,”[RVS ON] Überschrift” — läßt in der obersten Zeile einen inversen Balken mit dem Text »Überschrift« erscheinen. Dieser Befehl läßt sich besonders gut für Bildschirmmasken verwenden.</p>
+
+        <h3>SETOUT</h3>
+
+        <p class="source">Format: SETOUT lfn, Länge, String,&hellip;</p>
+
+        <p>»SETOUT« dient dazu, Datensätze in eine Datei zu übertragen, zum Beispiel bei relativen Dateien. »Ifn« gibt die logische Filenummer der Datei an. »Länge« gibt die Anzahl der Zeichen an, die übertragen werden. »String« ist eine auszugebende Stringvariable. Ist der String kürzer als »Länge«, so wird er mit Leerzeichen aufgefüllt. Im umgekehrten Fall wird ein »STRING TOO LONG ERROR« ausgegeben. Es können beliebig viele Parameter, bestehend aus Länge und String folgen.</p>
+
+        <p>Durch diesen Befehl spart man sich das umständliche Formatieren eines Datensatzes aus seinen einzelnen Feldern.</p>
+
+        <h2>III. Diskettenbefehle</h2>
+
+        <h3>DIR</h3>
+
+        <p class="source">Format: DIR KZ, ”$”, Zeilen</p>
+
+        <p>Mit dem DIR-Befehl wird ein Inhaltsverzeichnis der Diskette auf dem Bildschirm ausgegeben.</p>
+
+        <p>Wird für »KZ« der Wert 0 angegeben, wird ein einspaltiges Inhaltsverzeichnis ausgegeben, mit dem Wert 1 ein zweispaltiges. Für den String sind Angaben wie beim Laden des Inhaltsverzeichnisses mit dem LOAD-Befehl möglich.<br>
+            Zum Beispiel: ”$” , ”$:*=SEQ” und so weiter</p>
+
+        <p>»Zeilen« gibt an, wieviele Zeilen zunächst auf dem Bildschirm ausgegeben werden sollen. Danach stoppt die Ausgabe und kann durch Drücken einer beliebigen Taste zeilenweise fortgesetzt werden. Mit der STOP-Taste kann die Ausgabe vorzeitig abgebrochen werden.</p>
+
+        <h3>CAT</h3>
+
+        <p class="source">Format: CAT<br>
+            »CAT« gibt wie »DIR 0,&hellip;« ein Inhaltsverzeichnis der Diskette aus, es sind jedoch keine Parameter erforderlich.</p>
+
+        <h3>DISK</h3>
+
+        <p class="source">Format: DISK ’String”<br>
+            Mit dem Disk-Befehl wird ein Befehlsstring an den Befehlskanal des Diskettenlaufwerks übergeberi.</p>
+
+        <h3>ERROR</h3>
+
+        <p class="source">Format: ERROR (numerische Variable, Stringvariable)<br>
+            Mit dem ERROR-Befehl wird der Fehlerkanal des Diskettenlaufwerks ausgelesen. Die Fehlernummer wird in die numerische Variable, der komplette Fehlerstring in die Stringvariable übergeben.</p>
+
+        <h3>ERR</h3>
+
+        <p class="source">Format: ERR<br>
+            »ERR« gibt den Fehlerkanal des Diskettenlaufwerks direkt auf den Bildschirm aus.</p>
+
+        <h2>IV. Stringbefehle</h2>
+
+        <h3>SWAP</h3>
+
+        <p class="source">Format: SWAP String1, String2,&hellip;<br>
+            Mit dem SWAP-Befehl werden die Inhalte der beiden Strings ausgetauscht. Es können weitere Parameter, bestehend aus jeweils zwei zu tauschenden Strings, folgen.</p>
+
+        <p>Mit diesem Befehl ist es möglich, die gefürchtete »Garbage Collection« bei umfangreicher Stringverarbeitung, zum Beispiel beim Sortieren, zu vermeiden.</p>
+
+        <h3>PLACE</h3>
+
+        <p class="source">Format: PLACE (String1, String2, numerische Variable)<br>
+            Der PLACE-Befehl stellt fest, ob »Stringl« irgendwie in »String2« enthalten ist. Ist er nicht enthalten, so wird an die »numerische Variable« der Wert 0, sonst die Position, ab der »Stringl« in »String2« enthalten ist, übergeben.</p>
+
+        <h3>STRCOMP</h3>
+
+        <p class="source">Format: STRCOMP »Wert«<br>
+            Mit dem STRCOMP-Befehl wird der normale Stringvergleich in Programmen beeinflußt.</p>
+
+        <p>Für »Wert« können eingesetzt werden:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>1: Großbuchstaben werden Kleinbuchstaben gleichgesetzt. Zum Beispiel: ”a” = ”A” ist dann wahr.<br>
+            64: Das Vergleichen von Strings mit einem Stern als Abkürzung ist dann möglich. Zum Beispiel: ”dis*” = ’’diskette” ist dann wahr.<br>
+            128 : Das Vergleichen mit einem Fragezeichen als Joker ist möglich. Zum Beispiel: ”m??er” = "meier” ist wahr. ”m??er” = "mayer” ist auch wahr.</p>
+
+        <p>Die Werte können auch addiert werden, um mehrere Funktionen zu nutzen. Zum Beispiel: »STRCOMP 128+64+1« schaltet alle genannten Funktionen ein. Mit »STRCOMP 0« wird der normale Stringvergleich wiederhergestellt.</p>
+
+        <h3>SEARCH</h3>
+
+        <p class="source">Format: SEARCH (A$,B$(0,0),P,Q,X%,Y%)<br>
+            Der SEARCH-Befehl aktiviert die lntellisearch-Routine, die in der 64’er-Ausgabe 3/85 genau beschrieben wird. Man sollte dort auf jeden Fall nachlesen, da die Möglichkeiten der Routine sehr umfangreich sind. Kurze Erklärung:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>A$: Der zu suchende String<br>
+            B$(0,0): Das zu durchsuchende Array. Laufvariable ist immer nur die 1. Dimension des Arrays. Startwert nach Wahl, zum Beispiel auch B$(20,2).<br>
+            P: Anzahl der zu durchsuchenden Strings<br>
+            Q: Startposition der Suche im String<br>
+            X%: Rückgabe der Nummer des Strings, wenn gefunden, sonst —1.<br>
+            Y%: Rückgabe der Position im String. Wenn nicht gefunden: unverändert.</p>
+
+        <p>Zusammenarbeit mit »STRCOMP«: Die lntellisearchroutine hat einen eigenen Programmteil zum Stringvergleich, deshalb ist das Suchen mit»?« und »*« unabhängig von der Einstellung durch »STRCOMP« möglich. Das Gleichsetzen oder Unterscheiden von Groß- und Kleinbuchstaben kann jedoch durch den STRCOMP-Befehl eingestellt werden.</p>
+
+        <h2>V. Druckersteuerung</h2>
+
+        <h3>CENTRONICS</h3>
+
+        <p class="source">Format: CENTRONICS (numerische Variable)<br>
+            Der CENTRONICS-Befehl aktiviert eine Software-Schnittstelle, die über den User-Port mit der Geräteadresse 4 direkt einen Centronics-Drucker anspricht. Es erfolgt eine Commo-dore-ASCII-Codewandlung, die für den normalen Textbetrieb notwendig ist. Sollte diese Umwandlung einmal unerwünscht sein, so kann sie durch »POKE12<em>4096+9,255« ($C009) abgeschaltet und durch »POKE12</em>4096+9,0« wieder eingeschaltet werden. Bei der Initialisierung wird getestet, ob der Drucker ansprechbar, das heißt eingeschaltet und »Online« ist. Ist dies der Fall, so wird in die numerische Variable der Wert 0, andernfalls der Wert 255 übergeben.</p>
+
+        <h3>SERIELL</h3>
+
+        <p class="source">Format: SERIELL<br>
+            Der SERIELL-Befehl leitet die Druckausgabe wieder über den seriellen Bus.</p>
+
+        <h2>VI. Verschiedene Befehle</h2>
+
+        <h3>FILL</h3>
+
+        <p class="source">Format: FILL sp1,ze1,sp2,ze2, Code, Farbe<br>
+            Der FILL-Befehl füllt einen Bildschirmbereich mit einem Zeichen bestimmter Farbe. »sp1« und »ze1« geben Spalte und Zeile der linken oberen Ecke des Bereichs an. »sp2« und »ze2« geben Spalte und Zeile der rechten unteren Ecke an. Für »Code« wird der Bildschirmcode (0 bis 255) des gewählten Zeichens angegeben. Für »Farbe« gelten die Werte 0 bis 15.</p>
+
+        <h3>TRAP</h3>
+
+        <p class="source">Format: TRAP KZ<br>
+            Mit »TRAP 0« wird die Stoptaste abgeschaltet, mit >TRAP 1« wird sie eingeschaltet. Die Stoptaste kann, wenn sie abgeschaltet ist, mit »GET« oder »FAKE« abgefragt werden.</p>
+
+        <h3>OLD</h3>
+
+        <p class="source">Format: OLD<br>
+            Der OLD-Befehl rettet ein Basic-Programm nach einem »NEW« oder einem Reset, solange der Basic-Speicher nicht weiter verändert worden ist.</p>
+
+        <h3>SCROLL</h3>
+
+        <p class="source">Format: SCROLL erste Zeile, letzte Zeile<br>
+            Der SCROLL-Befehl dient dazu, den Zeilenbereich für das normale Bildschirmscrollen einzuschränken. Er ist jedoch nur mit äußerster Vorsicht zu verwenden, da er leicht zu einem Absturz des Computers führen kann. Der Befehl dient eigentlich nur dazu, zum Beispiel bei der Ausgabe eines Directorys, auf dem Bildschirm eine Überschrift am oberen Bildrand oder einen Text am unteren Rand zu erhalten. Er sollte sofort nach der Ausgabe mit »SCROLL 0,24« rückgängig gemacht werden.</p>
+
+        <p>Es ist zu beachten, daß sich der Cursor auf jeden Fall innerhalb des Zeilenbereichs befindet, und daß die ausgegebenen Zeilen nicht länger als 39 Zeichen sind. Dann kann eigentlich nichts schiefgehen.</p>
+
+        <h2>VII. Verschiedenes</h2>
+
+        <p>Die Geräte-Adresse für den LOAD-Befehl ist nicht mehr auf 1, sondern auf 8 voreingestellt. Sie braucht deshalb beim Laden und Speichern nicht unbedingt angegeben werden.</p>
+
+        <p>Das Editieren von Programmen wird durch eine komfortable Listroutine erleichtert. Das Listing kann mit den Cursortasten über den Bildschirm hinauf- und hinuntergescrollt werden.</p>
+
+        <p>Die Funktion ASC(” ”) liefert den Wert 0 und nicht wie bisher einen »ILLEGAL QUANTITY ERROR«.</p>
+
+        <p>Der Tastatur-Repeat ist für alle Tasten voreingestellt. Er kann durch POKE650,0 rückgängig gemacht werden.</p>
+
+        <address class="author">(Klaus Strunk/tr)</address>
+
+        <h2>VIII. Verschieben des Programms</h2>
+
+        <p>TODO TABLE</p>
+
+        <p>Das Verschieben des Programms in einen anderen Speicherbereich (hier $9000 bis $9C00) soll am Beispiel des SMON beschrieben werden.</p>
+
+        <ol>
+            <li>Verschieben nach 9000<br>
+                W C000 D000 9000</li>
+            <li>Programmteile anpassen<br>
+                V C000 D000 9000 9000 9009<br>
+                V C000 D000 9000 906C 9E8A<br>
+                V C000 D000 9000 9F00 9F5B</li>
+            <li>Anpassen der Zeiger<br>
+                Zeigertabelle anzeigen: M 9024 9052<br>
+                Alle Zeiger, die sich auf C&hellip; beziehen, in 9&hellip; ändern. Zeigertabelle 9066 bis 906B anzeigen: M 9066 906B Alle Zeiger, die sich auf C&hellip; beziehen, in 9&hellip; ändern.<br>
+                Einzelne Zeiger im Programm:<br>
+                D 91E5 91E6<br>
+                D 92C4 92C5<br>
+                D 93D9 93DA<br>
+                D 9C07 9C09<br>
+                Zeiger in 9&hellip; ändern</li>
+            <li>Startadressen:<br>
+                Von den Startadressen (im Vorwort) ist der Wert 3*4096 abzuziehen.</li>
+        </ol>
+
+
+        <p>Tabelle 1. So verschieben Sie »Datawork-Basic« in einen anderen Speicherbereich</p>
+    </article>
+</body>
+
+</html>

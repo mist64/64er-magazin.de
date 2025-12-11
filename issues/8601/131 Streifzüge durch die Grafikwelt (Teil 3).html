@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Streifzüge durch die Grafikwelt (Teil 3)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, tr">
+    <meta name="64er.issue" content="1/86">
+    <meta name="64er.pages" content="131,133-134,137-138">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Streifzüge durch die Grafikwelt (Teil 3)</h1>
+        <p class="intro">C 128-Besitzer aufgepaßt: Eine Teilnahme an den Streifzügen ist auch für Sie möglich. Durch die »Übersetzung« des Standards starten auch Sie mit uns in der nullten Dimension.</p>
+
+        <p>Viele von Ihnen werden das neue Flaggschiff von Commodore, den C 128, schon vor sich stehen haben. Damit Sie nicht immer bei der Umsetzung der Beispielprogramme in den C 64-Modus schalten müssen, um HIRES-3 zu verwenden, soll hier die Übersetzung der von uns verwendeten, allgemeinen Grafikbefehle in das Basic 7.0 dieses Computers besprochen werden.</p>
+
+        <h2>Der C 128 und unser Standard</h2>
+
+        <p>Der erste Befehl (»INIT«), der die Initialisierung der Grafik (Bitmap einrichten, löschen und Farbgebung) bewirken soll, ist so umzusetzen:<br>
+            COLOR 0,16 : COLOR 1,7 : COLOR 4,1 : GRAPHIC 1,1</p>
+
+        <p>Komplizierter wird es da leider beim »START«-Befehl. Dieser soll das Grafiksystem in einen definierten Ausgangszustand bringen. Der Ursprung des Bildschirmsystems soll nach »START« in der Ecke links unten liegen und in der Horizontalen müssen 320, in der Vertikalen 200 Bildkoordinaten zur Verfügung stehen. Leider ist auch der Grafikbildschirm des C 128 so eingerichtet, daß von links oben an gezählt wird und die Y-Achse nach unten zeigt. Der »SCALE«-Befehl im Basic 7.0 erlaubt zwar die Skalierung der beiden Achsen bis zu Maximalwerten von 32767 (im Gegensatz zu den Angaben im Handbuch, wo maximal 1023 erwähnt sind). Es gibt aber keine Möglichkeit, das Koordinatensystem zu verschieben. Man muß sich also leider wieder mit einer Transformation begnügen, was — solange wir dazu nicht wieder ein Assemblerprogramm haben wie in HIRES-3 — natürlich Rechenzeit beansprucht.</p>
+
+        <p>In Listing 1 finden Sie ein kleines Unterprogramm, das — ausgehend von den schon aus HIRES-3 bekannten Systemgrenzwerten XU,XO,YU und YO (kleinste/größte X-, beziehungsweise Y-Koordinate) — aus den eingegebenen Koordinaten X und Y die Bildschirmkoordinaten XX und YY berechnet. Nun ist es relativ einfach, durch Festlegung dieser Systemgrenzwerte den Befehl »START« zu realisieren:<br>
+            XU = 0 : XO = 319 : YU = 0 : YO = 199</p>
+
+        <p>Ebenfalls mit Hilfe des Trans-formations-Unterprogrammes kann die Grafikanweisung »MITTE« übersetzt werden durch Definieren von:<br>
+            XU = -160 : XO = 160 : YU = -100 : YG = 100</p>
+
+        <p>Durch die Notwendigkeit der Transformation muß nun jede weitere Punktkoordinate vor dem jeweiligen Grafikbefehl durch unser Unterprogramm laufen. Der Grafik-Befehl »PUNKT (X,Y)« lautet dann:<br>
+            GOSUB 1020 : DRAW l,XX,YY</p>
+
+        <p>Für »LINIE (XA,YA,XB,YB)« steht beim C 128:<br>
+            X = XA : Y=YA : GOSUB 1020 : X1 = XX : Y1=YY<br>
+            X = XB : Y=YB : GOSUB 1020 : X2=XX:Y2=YY<br>
+            DRAW 1,X1,Y1 TO X2,Y2</p>
+
+        <p>Für »KREIS (XM,YM,RX,RY> muß der Mittelpunkt anders transformiert werden als die Halbmesser:<br>
+            X = XM : Y=YM : GOSUB 1020 : X5 = XX: Y5=YY<br>
+            RX = RX<em>319/(XO-XU) : RY=RY</em>199/(YO-YU) CIRCLE l,X5,Y5,RX,RY</p>
+
+        <p>Die weiteren Übersetzungen:<br>
+            TEXT (A$,XT,YT) entspricht CHAR 1,XT,YT,A$<br>
+            SHOW entspricht GRAPHIC1<br>
+            NORMAL entspricht GRAPHIC0<br>
+            GRESET entspricht SCNCLR(1)</p>
+
+        <p>Damit ergeben sich die C 128-Versionen der beiden Programme aus der letzten Folge (Fensterrose und Spiralen), die hier als Listing 2 und Listing 3 abgedruckt sind.</p>
+
+        <p>In Tabelle 1 finden Sie eine Übersicht über alle Grafikbefehle und ihre Übersetzungen in die drei Systeme: C 64 + HIRES-3, Plotter 1520, C 128 Basic 7.0.</p>
+
+        <h2>Grafikstandardprobleme</h2>
+
+        <p>Nicht daß Sie denken, der Sinn für Proportionen sei uns abhanden gekommen, weil sich dieses Kapitel mit verschiedenen Grafikstandards (kurz GKS genannt) in bezug auf unsere Computer befaßt: Es scheint mir aber doch notwendig, zumindest einmal kurz das Verhältnis beispielsweise des GKS und ähnlicher Normen des hier verwendeten Minimal-Grafik-Sprachschatzes anzureißen.</p>
+
+        <p>Bemühungen, eine geräteunabhängige Grafikschnittstelle softwaremäßig zu realisieren, gibt es schon geraume Zeit. In den USA existiert das System CORE, in Deutschland wurde vor einiger Zeit ein GKS als DIN-Entwurf vorgelegt. Beide sind von Haus aus für Großrechenanlagen entwickelt worden und wurden von dem rasanten technischen Fortschritt überholt, der Mikro-, Personal- und sogar Homecomputer im Feld der professionellen Grafikprogrammierung auftauchen ließ. IBM versucht, für den IBM/AT eine GKS-Implementierung zu erstellen. Die erforderlichen Rechenkapazitäten für GKS und auch CORE sind aber relativ hoch, weshalb eine Verwendung dieser Standards bislang nur auf leistungsfähigen Großcomputern oder 32-Bit-Geräten mit arithmetischen Coprozessoren sinnvoll ist. Einem 8-Bit-Computer sind Grenzen gesetzt, die es allenfalls erlauben, eine minimale Teilmenge des Standardwortschatzes anzustreben.</p>
+
+        <p>Die Frage ist, ob das wünschenswert erscheint. Dazu einige Erklärungen: Man kann grob zwei grundlegende Arten von Grafik-Befehlen unterscheiden, nämlich einmal mit und einmal ohne einen Grafik-Cursor. Im ersten Fall gleitet der »Zeichenstift« immer von der aktuellen Position des — häufig nur gedachten — Cursors zeichnend oder nicht zeichnend zur angegebenen neuen Position. Im anderen Fall existiert solch eine Cursorposition nicht. Alle Größen, die zur Ausführung eines Befehls wie LINIE nötig sind, werden mit diesem als Argument übergeben.</p>
+
+        <p>Im CORE-System (auch im GKS) gibt es beispielsweise folgende Befehle:<br>
+            LINE-ABS-2(X,Y):</p>
+
+        <p>Zieht eine Linie von der aktuellen Cursorposition bis X,Y. Die 2 kommt von 2D, also einem ebenen Koordinatensystem mit zwei Achsen.<br>
+            LINE-REL-2(DX,DY):</p>
+
+        <p>Zieht von der Cursorposition aus eine Linie zu einem Punkt, dessen Koordinaten um DX und DY von der Cursorposition verschieden sind.<br>
+            MOVE-ABS-2(X,Y):</p>
+
+        <p>Der Cursor wird nicht-zeich-nend von der aktuellen Position zum Punkt X,Y bewegt.<br>
+            MOVE-REL-2(DX,DY):</p>
+
+        <p>Wie beim entsprechenden LINE-Befehl, aber nicht zeichnend.</p>
+
+        <p>Auf dem C 128 können wir auch diese Art der Grafikprogrammierung durchführen. Die Entsprechungen wären (in der gleichen Reihenfolge):<br>
+            DRAW1 TO X,Y<br>
+            DRAW1 TO (RDOT(0) + DX), (RDOT (1) + DY)<br>
+            LOCATE X,Y<br>
+            LOCATE (RDOT(0) + DX), (RDOT (1) + DY)</p>
+
+        <p>Sehen wir uns den Unterschied am Beispiel in Bild 1 an, wo ein Haus auf den normalen Commodore-Bildschirm gezeichnet werden soll.</p>
+
+        <p>Dem CORE-System nachgebildet, würden die Befehle folgendermaßen lauten:<br>
+            LOCATE 50,50<br>
+            DRAW1 TO 50,80<br>
+            DRAW1 TO 110,80<br>
+            DRAW1 TO 110,50<br>
+            DRAW1 ,30<br>
+            DRAW1 TO 50,50</p>
+
+        <p>In unserer Grafiksprache müßten wir schreiben:<br>
+            LINIE (50,50,50,80)<br>
+            LINIE (50,80,110,80)<br>
+            LINIE (110,80,110,50)<br>
+            LINIE (110,50,80,30)<br>
+            LINIE (80,30,50,50)</p>
+
+        <p>Schon in diesem Beispiel, wo die für das CORE-System günstigeren miteinander verbundenen Linien zu zeichnen sind, haben wir einen Befehl mehr zu verarbeiten. Ganz deutlich tritt der Unterschied zutage, wenn nicht verbundene Strecken zu zeichnen sind. Dann muß vor jeden DRAW-Befehl ein LOCATE treten, das den Cursor auf den Startpunkt einer Linie setzt. Das kostet die auf einem 8-Bit-Com-puter arbeitenden Grafiksysteme wertvolle Zeit.</p>
+
+        <p>Nebenbei sei noch bemerkt, daß das Basic 7.0 seinem DRAW-Befehl ein Zwitterdasein verliehen hat, wie Sie aus dem Vergleich der Übersetzung für den LINIE-Befehl und den CORE-Be-fehlen ersehen konnten. Das obige Programmproblem läßt sich beim C 128 sogar in einem Befehl erledigen:<br>
+            DRAW 1,50,50TC50,80TO 110,80 TO 110,50 TO 80,30 TO 50,50</p>
+
+        <p>Aus Gründen der Rechenzeiten, der besseren Überschaubarkeit eines Befehles und weil es einfach zu kompliziert wäre, HIRES-3 cursororientiert zu gestalten, wurde die cursorfreie Methode für unsere allgemeinen Grafikbefehle gewählt.</p>
+
+        <h2>Noch mal etwas fürs Auge</h2>
+
+        <p>Weil die Anwender des C 128 in den bisher vorgestellten gerätespezifischen Programmen zu kurz gekommen sind, sei ihnen als Trost das Listing 3 angeboten. Es erzeugt interessante Effekte durch Zeichnen ineinander verschachtelter, gegeneinander verdrehter Quadrate (siehe Bild 2).</p>
+
+        <p>Frei wählbar ist die Größe, der Drehwinkel, die Anzahl und der Ort auf dem Bildschirm. Bei geschickter Programmierung können die Ergebnisse als sogenannte Shapes miteinander kombiniert werden.</p>
+
+        <h2>Nulldimensional: der Punkt</h2>
+
+        <p>Betrachten Sie bitte alles bisher Behandelte als Rüstzeug, das wir für unsere Streifzüge durch die Grafikwelt nunmehr angelegt haben. Unser Weg wird uns durch alle Dimensionen führen: Vom Punkt zur 4.Dimension, um diesen Titel vom berühmten Colerus zu entleihen. Und damit haben wir sie auch schon angesprochen: die vielgehaßte, aber auch vielgeliebte Mathematik. Denn professionelle Computergrafik ohne dieses Instrument ist nicht denkbar. Sie, die Sie Ihre letzte Begegnung mit dieser Wissenschaft irgendwann einmal in der Schule hatten, verzagen Sie bitte nicht! Was wir an Voraussetzungen brauchen, haben Sie in der 10.Klasse gelernt: Einfache Gleichungen mit einer oder mehreren Unbekannten zu lösen. Alles andere wird erklärt werden und das ohne trockenen, mathematischen Jargon.</p>
+
+        <p>Nach diesen Vorreden soll gleich der erste Begriff erklärt werden: die Dimension. Das Wort stammt aus dem Lateinischen und bedeutet Ausdehnung. So hat eine ebene Fläche davon zwei: Länge und Breite. Deshalb spricht man hier von zweidimensionalen Gebilden. Eine Linie hat nur ihre Länge als Ausdehnung, sie ist also eindimensional. Fassen wir zusammen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Dimension 0: Punkt &mdash;&mdash;&mdash;-<br>
+            Dimension 1: Linie Länge<br>
+            Dimension 2: Fläche Länge<br>
+            Breite<br>
+            Dimension 3: Körper Länge<br>
+            Breite, Höhe<br>
+            Dimension 4: ??? Länge<br>
+            Breite, Höhe, ???</p>
+
+        <p>In noch höhere Sphären werden wir uns nicht versteigen, obwohl manche Esoteriker der Ansicht sind, daß im Leben des Menschen sechs Dimensionen eine Rolle spielen.</p>
+
+        <p>Beginnen wir also mit einem Gebilde der nullten Dimension, dem Punkt. Nun ist der Punkt an sich sicherlich ein wichtiges Thema für Philosophen, uns als Computergrafiker interessiert er aber immer in Verbindung irgendeiner Ortsbestimmung. Und weil wir — vor dem Bildschirm sitzend — eine Fläche vor uns haben, wollen wir auf dieser Fläche auch den Punkt sehen. Wie bestimmen wir, daß der Punkt an einem ganz bestimmten Ort auftauchen soll? Wir unterteilen unseren Bildschirm — der Computerhersteller hat das für uns schon erledigt — in einen Raster von 320 waagerechten und 200 senkrechten Positionen. Diese numerieren wir: Die horizontalen Positionen von links anfangend nach rechts und die vertikalen oben beginnend nach unten. Was sich auf diese Weise ergibt, nennt man ein Koordinatensystem (vom lateinischen »coordinare«, was »zuordnen« bedeutet). Jeder Punkt kann nun durch Angabe zweier Koordinaten in diesen Raster gelegt werden. Allgemein nennt man die der Waagerechten zugeordneten Zahlen X-Koordina-ten und die anderen Y-Koordina-ten. Ein Punkt wird dann häufig in der Form P(X,Y) charakterisiert. Beispielsweise liegt der Punkt P(160,100) genau in der Bildschirmmitte. Die Koordinatenachsen sind Linien, die durch den Punkt P0(0,0) laufen. Die X-Achse als Linie gesehen, enthält auf ihrer gesamten Länge nur Punkte mit der Y-Koordinate 0, umgekehrt ist es mit der Y-Ach-se, die überall den X-Wert 0 aufweist. Was sich auf diese Weise ergibt, ist das Koordinatensystem, wie es in Bild 3 gezeigt ist.</p>
+
+        <h2>Koordinatensysteme</h2>
+
+        <p>Den Ort von Punkten zu charakterisieren, ist im Prinzip noch auf vielerlei Weise möglich. So gibt es schiefwinklige Koordinatensysteme (siehe Bild 4) und manchmal verwendet man auch das sogenannte »polare« Koordinatensystem (siehe Bild 5). Hier werden die Länge des aus dem Ursprung kommenden Strahls und der Winkel, den dieser mit der Horizontalen bildet, zur Festlegung eines Ortes verwendet. Gebräuchlichstes Koordinatensystem allerdings ist das »kartesische«, angeblich benannt nach dem französischen Philosophen und Mathematiker Rene Descartes (von ihm stammt der berühmte Ausspruch »Ich denke, also bin ich«). Bild 6 zeigt ein kartesisches System, das durch die aufeinander senkrecht stehenden Achsen charakterisiert ist. Im allgemeinen verwendet man ein »rechtshändiges« System.</p>
+
+        <h2>Transformationen</h2>
+
+        <p>Rechtshängig deshalb, weil beim Drehen der X-Achse um den Ursprung (also um den Punkt P0(0,0)) diese auf dem kürzesten Wegzur Y-Achse die Rich-ting einschlägt, in die die Finger der rechten Hand zeigen. Der Daumen weist dabei auf den Betrachter (siehe Bild 7).</p>
+
+        <p>Nun erkennen Sie vielleicht schon, daß Commodore uns ein reichlich ungebräuchliches Koordinatensystem beschert hat: Es ist nämlich linkshändig aufge-baut. Außerdem ist die Skala sowohl auf der X-, als auch auf der Y-Achse sehr unpraktisch, denn Punkte wie zum Beispiel Pl(-l,4) oder P2(3,-5) und P3(-12,-3) können nicht gezeichnet werden, und ein Versuch, das trotzdem zu tun, endet mit einer Fehlermeldung.</p>
+
+        <p>Weiterhin sollten wir uns überlegen, daß Computergrafik für die verschiedensten Zwecke gebraucht wird: Ein Architekt will den Grundriß eines Hauses zeichnen, das in Richtung Norden 15 Meter und in Richtung Osten 18 Meter Ausdehnung besitzt. Ein Geschäftsmann möchte im Rahmen einer Kosten-/Nut-zen-Analyse ein Diagramm erstellen, das Arbeitsaufwand in Stunden gegen produzierte Menge eines Artikels aufzeigt. Ein Ökologe zeichnet ein Schaubild, welches die zahlenmäßige Entwicklung der Weltbevölkerung in den letzten 50 Jahren darstellen soll. Kurz: Jeder von Ihnen benötigt ein anderes Koordinatensystem. Diese Art Koordinaten nennt man häufig die »Benutzerkoordinaten« und weil jeder Benutzer etwas aus einer 2D- oder 3D-Welt grafisch zeigen möchte, hat sich auch der Ausdruck »Weltkoordinaten« eingebürgert.</p>
+
+        <p>Wir müssen also irgendwie die Objekte der realen Welt, die wir im Weltkoordinatensystem festgelegt haben, auf unserem Bildschirm zeigen (siehe Bild 8). Weil es aber nicht möglich ist, auf dem Commodore-Bildschirm den Punkt P(1981,4508000) darzustellen (das ist beispielsweise dieAufgabe des oben erwähnten Ökologen), müssen wir irgendeine Form der Umrechnung durchführen. Solche Umrechnungen nennt man Transformationen (vom spätlateinischen »transformatio«, was Umbildung, Verwandlung von etwas bedeutet, ohne dessen Wert zu ändern).</p>
+
+        <p>Nicht nur die Umrechnung der Weltkoordinaten in Bildschirmkoordinaten, sondern jede Veränderung eines Koordinatensystems kann durch Transformationen computergerecht durchgeführt werden. Wir werden dazu sogenannte Matrizenmathematik betreiben, deren Ergebnis dann die sogenannte Transformationsmatrix ist. Jeder Punkt des Weltkoordinatensystems wird gewissermaßen durch solch eine Transformationsmatrix hindurchgeschickt und kommt als Bildschirmpunkt wieder heraus (Bild 9). Transformationen können Vergrößerung oder Verkleinerung, Verschiebungen von Abbildungen oder ihre Drehung bewirken. Man kann damit Gebilde höherer Dimension auf solchen niedrigerer Dimension abbilden (wie sonst sollte man einen Würfel auf dem Bildschirm zeigen?) und umgekehrt. Es ist damit möglich, Objekte zu spiegeln, zu krümmen, stauchen oder zu zerren. Sie sehen schon, daß es sich lohnt, den Umgang mit Transformationsmatrizen kennenzulernen.</p>
+
+        <p>Unser Thema in der nächsten Folge werden also Matrizen sein und wie man Computer dazu bringen kann, uns die Hauptarbeit mit diesen merkwürdigen mathematischen Gebilden abzunehmen.</p>
+
+        <address class="author">(Heimo Ponnath/tr)</address>
+    </article>
+</body>
+
+</html>

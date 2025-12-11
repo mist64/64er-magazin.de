@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Leserforum</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="1/86">
+    <meta name="64er.pages" content="16-17">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Leserforum</h1>
+        <h2>Fließkommaroutinen beim VC 20</h2>
+
+        <p>Besitzt der VC 20 eingebaute Maschinensprache-Routinen für Multiplikation und Division? Ausgabe 11/85<br>
+            Manfred Klemenz</p>
+
+        <p>Der VC 20 besitzt eine Maschinensprache-Routine zum Multiplizieren; die Startadresse ist $D357, desgleichen eine Divisionsroutine. Die Zero-Page-Adressen, die für diese Routinen verwendet werden, sind dieselben wie beim C 64 und wurden in der Ausgabe 5/85 des 64’er-Magazins im Assemblerkurs besprochen. Die in diesem Kursteil ebenfalls beschriebene Blockverschieberoutine startet beim VC 20 auf der Adresse $C3BF, die dazu gehörigen Speicherstellen sind wiederum dieselben wie beim C 64.</p>
+
+        <p>Meindert Hielkema, Niederlande</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Fragen Sie doch</h2>
+
+        <p>Selbst bei sorgfältiger Lektüre von Handbüchern und Programmbeschreibungen bleiben beim Anwender immer wieder Fragen offen. Viel mehr Fragen ergeben sich bei Computer-Interessenten, die noch keine festen Kontakte zu Händlern, Herstellern oder Computerclubs haben. Sie können der Redaktion Ihre Fragen schreiben oder Probleme schildern (am einfachsten auf der Karte »Lesermeinung«). Wir veranlassen, daß sie von einem Fachmann beantwortet werden. Allgemein interessierende Fragen und Antworten werden veröffentlicht, die übrigen brieflich beantwortet.</p>
+
+        <h2>Probleme mit MPS 801 und Floppy 1541?</h2>
+
+        <p>Als Besitzer eines VC 20 mit 32/27 KByte-Modul habe ich nie Probleme gehabt, mit meinem MPS 801 Programme auszudrucken, die zuvor per Datasette gelesen wurden. Das hat sich schlagartig geändert, seit ich im Besitz einer 1541-Floppy bin. Beide Geräte, Drucker und Floppy, sind ordnungsgemäß angeschlossen und arbeiten für sich alleine auch einwandfrei. Soll allerdings ein Programm bei angeschlossener Floppy ausgedruckt werden, dann führt das regelmäßig zum »Absturz« des Computers. Auch Entfernen aller Erweiterungen führte zu keiner Verbesserung. Sobald sowohl Drucker als auch Floppy gleichzeitig angeschlossen sind, kann ich den Drucker vergessen. Das kann doch wohl nicht im Sinne des Erfinders sein?! Ich wende mich an das Leserforum, weil das, was mir die Verkäufer der Geräte auf meine wohl berechtigten Reklamationen geboten haben, hart an die Grenze desAnstands gegangen ist.<br>
+            Rudolf Inckemann</p>
+
+        <h2>Computer für Blinde?</h2>
+
+        <p>Gibt es ein Programm für den C 64 oder für einen anderen Computer, mit dem auch Blinde und stark Sehbehinderte die Möglichkeit bekommen, einigermaßen sinnvoll mit dem Computer arbeiten zu können? Ich denke dabei an ein Programm, das bei allen Bildschirmausgaben entweder jedes Zeichen im Klartext ansagt (Sprachsynthese) oder wenigstens jedem Zeichen einen bestimmten Ton beziehungsweise eine Tonfolge zuordnet.<br>
+            Gerhard Halmerbauer</p>
+
+        <h2>Haushaltsbuch mit MPS 801</h2>
+
+        <p>Wie kann man das Programm »Haushaltsbuch«aus derAusga-be 7/85 für den MPS 801 umschreiben?<br>
+            Ausgabe 11/85<br>
+            Dirk Zwartenbol, Niederlande</p>
+
+        <p>Ich habe dieses Problem gelöst durch Ändern der Zeilen 250, 2830, 5890, 5910, 5930, 5960, 5970. Zeile 5880 habe ich fortgelassen. Hier die für den Betrieb mit MPS 801 geänderten Zeilen:</p>
+
+        <p>250 POKE 768,185 : OPEN 1,4,7 : PRINT#!,”” : CLOSE 1 : POKE 768,F%<br>
+            2830 CLOSE 1 : OPEN 4,4,7 : PRINT#4 : CMD 4 : IF X = 3 THEN 2540<br>
+            5890 PRINT#1, D$(Y,0); SPC (14); D$(Y,1); SPC(8)<br>
+            5910 PRINT#1, MID$(D$(Y,2), 3,2); ”.”; LEFT$(D$(Y,2),2); ”.”; RIGHT$(D$(Y,2),2)<br>
+            5930 PRINT#1, MID$(D$(Y,2), 2,2); ”. ”; LEFT$(D$(Y,2),1); ”.”; RIGHT$(D$(Y,2),2)<br>
+            5960 PRINT#1, SPC(20);"&mdash;&mdash;&mdash;-”:PRINT#1,”SUMME”;: GOSUB 4370<br>
+            5970 PRINT#1, SPC(19-(L-1)); SU$ : CLOSE 1 : A$ = ”” : RETURN</p>
+
+        <p>Mit diesen Änderungen läuft das Haushaltsbuch auch mit dem MPS 801.<br>
+            Sabine Gnutzmann</p>
+
+        <h2>Turbo-Lader eingebaut</h2>
+
+        <p>Wie muß das BetriebssystemROM beim C 64 geändert werden, um ein Turbo-Tape-Pro-gramm fest zu integrieren? Welche Adressen bestimmen die Baudrate?<br>
+            Ausgabe 11/85<br>
+            Bernt-Dieter Bernt</p>
+
+        <p>Die Baudrate des Kernels zu erhöhen reicht alleine nicht aus, um auf die Geschwindigkeit von Turbo-Tape zu kommen. Wir haben das Betriebssystem dahingehend geändert, daß alle Programme mit der Geschwindigkeit von Turbo-Tape geladen und gespeichert werden können.<br>
+            K. Hallmann, Christian Gallas</p>
+
+        <p>Ich habe ein Turbo-Tape-Programm ins Betriebssystem eingebunden, das als Besonderheit auch solche Programme bearbeiten kann, die bis maximal $D000 (also bis unter das Basic-ROM) reichen. Ein entsprechendes EPROM, das anstelle des normalen Betriebssystems eingesteckt wird, kannich ebenso wie einen notwendigen Adaptersockel zur Verfügung stellen.<br>
+            Franz Hirschmann</p>
+
+        <h2>»Kurvenplotter C 16« für Star-Drucker?</h2>
+
+        <p>Wie und mit welcher Anpassung läuft das auf dem Bildschirm ganz brauchbare Programm zur Kurvendarstellung, so daß es eine Hardcopy auch auf meinem Star SG 10 mit Star-Interface ausdruckt? Mein Plus 4 meldet lediglich »?File Open Error«,wenn ich das Programm ohne Änderungen starte.<br>
+            Günter Dewald</p>
+
+        <h2>Kurzwelle und C 64</h2>
+
+        <p>Gibt es die Möglichkeit, Kurzwellenfunksendungen mit dem C 64 zu verarbeiten?<br>
+            Ausgabe 11/85<br>
+            Holger Jöhnck</p>
+
+        <p>Ich bin selbst lizenzierter Radioamateur und verwende den C 64 im Zusammenhang mit KW-Empfang und RTTY (Radio-Teletype). Was brauchen Sie dazu? Hardware:<br>
+            — Eine gute KW-Außenantenne<br>
+            — Einen Kurzwellenempfänger mit Beat-Oszillator<br>
+            — Ein Interface, welches die ankommenden analogen Signale in digitale Daten umwandelt<br>
+            — Software: Ein spezielles Programm für KW-Verarbeitung, was meistens auch RTTY beinhaltet.</p>
+
+        <p>Für weitere Informationen können Sie sich an den DARC (Deutscher Amateurradio Club) wenden, der Sie sicher weiter beraten wird.</p>
+
+        <p>Hinsichtlich Interface und Software müßte Ihnen die Firma P. Walter in Celle weiterhelfen können.</p>
+
+        <p>Ich würde mich freuen, wenn Sie eines Tages mein Signal (SM0KWK) auf Ihrem Monitor sehen würden&hellip;<br>
+            Holger Kossmann, Schweden</p>
+
+        <p>DARC, Postfach 1155, 3507 Braunatal 1, Firma P. Walter, An der Ziegelei 1, 3100 Celle</p>
+
+        <h2>C 64 und Video-Recorder</h2>
+
+        <p>Wer hat Erfahrung mit Einsatz und Programmierung eines C 64 als Steuereinheit für einen Video-Recorder? Ich möchte zwei Video-Recorder über den User-Port ansteuern können. Als Taktsignal steht der CTL-Im-puls mit 25 Hz zur Verfügung. Über die Ausgänge des User-Ports möchte ich die Funktionen START, STOP, PAUSEetc. ansteuern. Das Taktsignal soll Anfang und Ende einer Steuersequenz bestimmen. Wer ha t hierzu Ideen und eigene Erfahrungen ?<br>
+            Günter Kelleter</p>
+
+        <h2>Hi-Eddi und 1526</h2>
+
+        <p>Wie bekomme ich eine Hardcopy von Hi-Eddi-Bildern mit dem 1526-Druckerzustande?<br>
+            Heinz Krieger<br>
+            Ausgabe 11/85</p>
+
+        <p>Mit dem Drucker 1526 und der Betriebssystemversion REV 07 ist ein Grafik-Ausdruck nicht möglich. Ich hatte das gleiche Problem und habe kurzerhand das Betriebssystem-EPROM des Druckers gelöscht und mit dem MPS 802-Betriebssystem neu programmiert. Danach war ein einwandfreier Grafikbetrieb möglich. Auf Wunsch programmiere ich Herrn Kriegers EPROM gern um.<br>
+            Bernhard Korell</p>
+
+        <h2>C 64 als Btx-Tastatur</h2>
+
+        <p>Kann man den Commodore 64 auch als Btx-Tastaturbenutzen?<br>
+            Ausgabe 11/85<br>
+            Jörg Stalberg</p>
+
+        <p>Der C 64 läßt sich als Btx-Tasta-tur einsetzen, wenn ein Btx-Ge-rät vorhanden ist. Ich habe ein entsprechendes Programm selbst geschrieben. Es hat die gleichen Funktionen wie eine echte Btx-Tastatur. Zusätzlich können Btx-Seiten auf Diskette gespeichert und wieder geladen werden. Das Programm läuft allerdings nur mit Loewe-Decodern, wie sie zum Beispiel auch in Philips-Geräten eingebaut sind. Weiterhin gibt es eine ganze Reihe von Firmen, die ein solches Programm anbieten, zum Beispiel Commodore.<br>
+            Bernhard Korell</p>
+
+        <h2>Fragen zum C 16/Plus 4</h2>
+
+        <p>(1) Ist es möglich, mit dem C16 beziehungsweise dem Plus 4 Datenfernübertragung zu betreiben, und was benötigt man dazu?</p>
+
+        <p>(2) Ist es möglich, von derPost ein Modem zu bekommen, das auch für den Plus 4 geeignet ist, und welches Modem ist das beste, um zum Beispiel mit Mailboxen Datenfernübertragung zu betreiben?</p>
+
+        <p>(3) Warum wurde bei den neuen Commodore-Computern C 16, 116 und Plus 4 auf den User-Port verzichtet? Welchen Grund hatte Commodore dafür; es ist ja schon ärgerlich genug, daß die Anschlüsse für Datasette und Joysticksgeändert wurden.<br>
+            Peter Ludwig</p>
+
+        <p>(1) Zur Datenfernübertragung mit dem Plus 4 brauchen Sie eine serielle Schnittstelle (RS232) und entsprechende Treibersoftware für diese Schnittstelle. Mit einer RS232-Schnittstelle können Sie jeden Akustikkoppler anschließen, desgleichen praktisch jedes Modem. Doch damit sind wir bereits bei einem großen Haken an der ganzen Geschichte: Zum Betrieb eines Akustikkopplers braucht man ein Terminalprogramm. Fürweit verbreitete Computerwie den C 64 oder die Schneider Computer ist das kein Problem, da gibt es jede Menge Auswahl. Beim Plus 4 wird’s da leider schon etwas kritischer. Möglicherweise hilft da nur selber schreiben. Vielleicht kann da aber auch einer unserer Leser weiterhelfen? Über serielle Schnittstellen zum Plus 4 informiert Sie auf jeden Fall Ihr Commodore-Händler.</p>
+
+        <p>(2) Ein Modem wird nicht direkt mit dem Computer angeschlossen, sondern an die serielle (RS232) Schnittstelle. Damit ist die Wahl des Modems nicht an einen bestimmten Computertyp gebunden. Über zugelassene Modems informiert Sie die Deutsche Bundespost.</p>
+
+        <p>(3) Wenn es Ihnen ein Trost ist: Das fragen wir uns auch.</p>
+
+        <h2>C 16 statt C 64?</h2>
+
+        <p>Ich besitze seit geraumerZeit einen C 64 nebst Peripherie. Für manche Anwendungen reicht der Speicher des C 64 aber nicht aus. Schon 10 KByte mehr von Basic aus ansprechbar würden es aber tun. Darum möchte ich mir nun einen C 16 mit 64 KByte Speichererweiterung zulegen. Erstens besitzt dieser Computer ein weitaus besseres Basic und zweitens kann ich Floppy, Drucker und Plotter des C 64 weiterverwenden.</p>
+
+        <p>Dazu habe ich folgende Frage: Ist der C 16 bei dieser vollkommenen Speichererweiterung voll zum C16 in der Grundausführung kompatibel?<br>
+            Joachim Eiselt</p>
+
+        <p>Leider gibt es zum C 16 von Commodore selbst keine Speichererweiterung, so daß man nur Fremdfabrikate verwenden kann. Der C 16 ist jedoch vom Betriebssystem her bereits auf einen Speicher von 64 KByte für Basic-Programme ausgelegt. Von der Basic-Ebene her betrachtet ist der C 16 bei Vollausbau kompatibel zur Grundver-sion, desgleichen zum Plus 4, der ja bereits serienmäßig über 64 KByte Speicher verfügt.</p>
+
+        <p>Leider hört die Kompatibilität bei PEEK, POKE und SYS auf. Bei Programmen, die diese Befehle benutzen, kann ein einwandfreies Funktionieren nicht in jedem Fall garantiert werden. Die Änderungen am Programm, die im Falle eines Falles gemacht werden müssen, sind aber in der Regel minimal.</p>
+
+        <p>Allerdings sollten Sie sich Ihren Entschluß vielleicht doch nochmals überdenken: Der C 16 ist, wie leider auch der Plus 4, völlig inkompatibel zum C 64, so daß Sie große Probleme bekommen werden, wenn Sie versuchen, Ihre C 64-Programme für den C 16 »umzustricken«, insbesondere, wenn die Programme mit Maschinensprache-Unterroutinen arbeiten.</p>
+
+        <p>Zudem gibt es für den C 16 so gut wie keine Software zu kaufen, erst recht keine, die irgendwelche Speichererweiterungen ausnutzen kann. Sie müssen sich darüber im klaren sein, daß Sie mit einem C 16 und Speichererweiterung einen Computer besitzen, der höchstens kompatibel zu sich selbst, aber zu nichts anderem ist.</p>
+
+        <p>Schließlich sollten Sie sich überlegen, ob sich Ihr Problem nicht auch durch effizientere Programmierung oder bessere Ausnutzung des Floppy-Lauf-werks lösen läßt. Und dann gibt es ja auch noch das Business-Basic-Steckmodul von Kingsoft (Test in Ausgabe 8/85), das den Basic-Programmspeicher des C 64 auf 61 KByte RAM erweitert und nebenbei noch über 50 neue Befehle zur Verfügung stellt.</p>
+
+        <h2>Fragen ohne Grenzen</h2>
+
+        <p>Wasbrauchtman alles, um ein professionelles Spiel (nicht so gut wie »Impossible Mission« und nicht so schlecht wie ein billiges Arcade-Game wie »De-fender«) zu schreiben, wenn man den C 64 einigermaßen beherrscht, wiezumBeispiel, VIC, SID, CIA, Zeichensatz? Was ist wichtigzu wissen, um die Sprites auf dem Fernseher, hinter oder in einem scrollenden Grafik-Bildschirm zu bewegen? Ich scheue keine Hilfsmittel wie zum Beispiel einen Sprite-Monitor oder Pascal.</p>
+
+        <p>Ich möchte einen Kopierschutz für meine Programme. Ich will durch einen Hardware-Fehler auf der Diskette einen Ausstieg mit bestimm ter Fehlermeldungerzwingen, sonst wird die Diskette formatiert und gelöscht.</p>
+
+        <p>Das sind zwei von vielen Fragen, die monatlich unsere Redaktion erreichen. Leider sind sie auch typisch für eine Gruppe von Fragen, die sich in letzter Zeit häuft. Fragen, die derart allgemein gehalten sind, können wir beim besten Willen weder im Leserforum noch schriftlich beantworten.</p>
+
+        <p>Wir können leider keine Kurse über professionelle Spielerprogramme bringen, denn es gibt aus guten Gründen nur wenige gute Spiele. Programmierer finden nur durch Probieren ihre Tricks heraus und behalten sie dann für sich. Außerdem braucht man einen guten Schuß Phantasie — Schließlich will man ja kein Allerweltsspiel programmieren sondern etwas Eigenständiges. Auch das Thema Kopierschutz wirft enorme Probleme auf: Die Veröffentlichung eines Schutzes macht diesen so-fortwiederwirkungslos, dajaje-der Semi-Knacker ihn ganz genau kennt. Und Ihnen persönlich einen Kopierschutz zu entwickeln, dazu fehlt uns leider die Zeit, denn wir wollen ja jeden Monat eine interessante Zeitschrift machen. In dieser Zeitschrift, der 64’er, und in unseren Sonderheften können Sie ja fast immer Kurse und Artikel über bestimmte Programmier-Techniken finden, vom Abenteuerspiel bis zum Stringsortieren. Allerdings können wir solche Artikel nicht für alle möglichen Bereiche auf Abruf unserer Leser bereithalten, denn sie müssen erst einmal geschrieben werden.</p>
+
+        <p>Also eine Bitte — Wir sind jederzeit für Fragen und Probleme unserer Leser offen, die wir beantworten können, ohne dafür mehrere Arbeitstage an einer Antwort zu sitzen. Lösungen für ganz allgemeine Fragen können wir Ihnen leider nicht bieten.</p>
+
+        <h2>Directory mit MPS 802?</h2>
+
+        <p>Wie kann ich mit einem MPS 802-Drucker das Inhaltsverzeichnis meiner Disketten in der Mitte des Papiers beziehungsweise am rechten Rand ausdrucken? Natürlich ist mir die im Handbuch beschriebene Methode mit »OPEN 1,4: CMD1 : LIST« bekannt, doch erscheint dabei das Directory immer am linken Rand.<br>
+            Uwe Melchiar</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Wollen Sie antworten?</h2>
+
+        <p>Wir veröffentlichen auf dieserSeite auch Fragen, die sich nicht ohne weiteres anhand eines guten Archivs oder aufgrund der Sachkunde eines Herstellers beziehungsweise Programmierers beantworten lassen. Das ist vor allem der Fall, wenn es um bestimmte Erfahrungen geht oder um die Suche nach speziellen Programmen. Wenn Sie eine Antwort auf eine hier veröffentlichte Frage wissen — oder eine andere, bessere Antwort als die hier gelesene, dann schreiben Sie uns. Antworten publizieren wir in einer der nächsten Ausgaben. Bei Bedarf stellen wir auch den Kontakt zwischen Lesern her.</p>
+    </article>
+</body>
+
+</html>
