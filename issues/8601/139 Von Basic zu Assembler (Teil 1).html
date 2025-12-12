@@ -49,6 +49,11 @@
             20 NEXT I<br>
             In Bild 1 finden Sie die »Übersetzung« in Assembler.</p>
 
+        <figure>
+            <img src="139-1.png" alt="">
+            <figcaption>Bild 1. Etwas zögern mit Variante I und 2</figcaption>
+        </figure>
+
         <p>Sie können sowohl das Y-Re-gister (Variante 1) als auch das X-Register (Variante 2) zum Zählen verwenden. In Zeile 5 finden Sie .LI 1,4. Das ist ein Pseudobefehl — also kein 6502-Befehl —, der die Ausgabe des Protokolls über den Drucker bewirkt. Zeile 40 enthält durch .BA $5000 wieder einen Pseudobefehl. Damit legt man fest, von welcher Adresse an der Maschinencode in den Speicher gelegt werden soll. Die Zeilen 50 bis 90 sind unser Assemblerprogramm. Zuerst wird ein Startwert 0 in das Y-Re-gister geschrieben und dieses dann in der Zeile mit dem Label um 1 hochgezählt.</p>
 
         <p>Falls Ihnen der Ausdruck Label noch nichf geläufig ist: Natürlich kann man auch statt dessen die Adresse 5002 hinter den BCC-Befehl in Zeile 80 schreiben — so haben wir dasja bisher immer mit dem SMON-Assem-bler getan. Das hätte aber im Quelltext, den wir hier schreiben, den Nachteil, daß wir diese Adresse jedesmal ändern müßten, wenn wir uns entschlössen, mit dem Pseudobefehl .BA den Programmstart zu verlegen. Indem wir aber diese Zeile durch das Label-Kennzeichen markieren, merkt sich der Hypra-Ass die dazugehörige Zeilennummer und rechnet sie beim As-semblieren automatisch in die richtige Sprungadresse um.</p>
@@ -89,16 +94,31 @@
 
         <p>Hier ist also der Endwert in Zeile 10 auf 32 gesetzt worden und die Schleife zählt bis zu diesem in A fixierten Wert. In Assembler können wir das ebenfalls. Bild 2 zeigt die Variante 4.</p>
 
+        <figure>
+            <img src="139-2.png" alt="">
+            <figcaption>Bild 2. Verschieden zögern mit Variante 4</figcaption>
+        </figure>
+
         <p>Die Speicherstelle $FA nimmt die Funktion der Variablen A des Basicprogrammes ein. Dorthinein wird der Endwert (32 = $20) gelegt und der Vergleichsbefehl lautet nun:<br>
             CPY $FA</p>
 
         <p>Das ist: »Vergleiche den Inhalt des Y-Registers mit dem Inhalt der Speicherstelle $FA«. Wir haben in dieser Version 4 wieder das Y-Register als Zähler benutzt, Version 5 zeigt uns in Bild 3 dasselbe, nur wird hier die Speicherstelle $5100 zum zählen verwendet.</p>
+
+        <figure>
+            <img src="139-3.png" alt="">
+            <figcaption>Bild 3. Das ist die Variante 5</figcaption>
+        </figure>
 
         <p>Es hat sich eingebürgert, Schleifen in Assembler nicht — wie wir es bisher getan haben — aufwärts, sondern sie abwärts zu zählen. Der Grund dafür ist: Es geht schneller, weil man sich meistens den Compare-Befehl ersparen kann. Bei Verzögerungsschleifen ist das ja noch nicht so interessant, später aber, wenn in den Schleifen noch allerhand geschehen soll, summieren sich die Taktzeiten bei mehrfachen Durchlauf schon ganz erheblich. Eine Basic-Pro-grammsequenz sähe nun so aus:<br>
             10 FOR I = 255 TO 0 STEP -1<br>
             20 NEXT I</p>
 
         <p>In Bild 4 finden Sie das Assemblerlisting der Variante 6.</p>
+
+        <figure>
+            <img src="139-4.png" alt="">
+            <figcaption>Bild 4. Rückwärts zögern mit Variante 6</figcaption>
+        </figure>
 
         <p>Das entspricht der Variante 1. Der Unterschied ist aber, daß hier abwärts gezählt wird und man sich den CPY-Befehl sparen kann, denn vor einem Unterlauf des Y-Registers wird automatisch bei 0 die Zero-Flagge gesetzt. Das aber prüft der BNE-Befehl.</p>
 
@@ -115,6 +135,11 @@
 
         <p>In Bild 5 finden Sie diese Version. $FA dient als Zähler.</p>
 
+        <figure>
+            <img src="139-5.png" alt="">
+            <figcaption>Bild 5. Da haben wir die Variante 7</figcaption>
+        </figure>
+
         <p>Etwas schwieriger wird die Programmierung, wenn man nicht nur um 1 herauf- oder herunterzählt, sondern um 2,3,4 oder mehr. Das Basic-Äquiva-lent drückt sich dann beispielsweise in der Ergänzung STEP -2 der FOR&hellip;NEXT-Schleife aus. Dreht es sich nur um kleine Schrittweiten, die konstant bleiben, dann verwendet man vorteilhaft mehrere DEY (oder DEX, DEC, INY, INX und INC) hintereinander. Man muß außerdem mit der Abbruchbedingung einer solchen Schleife vorsichtig sein. BNE ist nicht immer möglich, weil man unter Umständen schon vor der Prüfung (durch BNE) unter 0 hindurch gezählt hat (dann folgt ja wieder $FF etc.). Hat beispielsweise der Zähler (hier das Y-Register) den Wert 1 und es werde durch eine Sequenz:<br>
             DEY<br>
             DEY<br>
@@ -125,12 +150,22 @@
             20 NEXT I<br>
             findet seine Entsprechung in dem Assemblerlisting Version 8 in Bild 6.</p>
 
+        <figure>
+            <img src="139-6.png" alt="">
+            <figcaption>Bild 6. Verzögern in kleinen Schritten mittels Variante 8</figcaption>
+        </figure>
+
         <p>Wieder dient das Y-Register als Schleifenzähler.</p>
 
         <p>Größere Schrittweiten lassen es — von einer gewissen Grenze an, die durch das Verhältnis von Bytezahl auf der einen und Bearbeitungsdauer auf der anderen Seite, bestimmt wird — sinnvoll erscheinen, den Zähler durch Subtraktion (oder Addition beim Aufwärtszählen) zu verändern. Das Analogon zur Basic-Se-quenz:<br>
             10 FOR I = 127 TO 0 STEP -10<br>
             20 NEXT I<br>
             sehen Sie in Bild 7.</p>
+
+        <figure>
+            <img src="139-7.png" alt="">
+            <figcaption>Bild 7. Verzögern in großen S<hritten mit Variante 9</figcaption>
+        </figure>
 
         <p>In dieser Version 9 dient die Zeropagespeicherstelle $FA als Zähler und in den Programmzeilen 80 bis 110 findet die Verminderung dieses Zählers durch Subtraktion statt ($0A = dezimal 10). Das Programm kann noch verändert werden, indem man anstelle von BPL den BCS-Befehl verwendet. Wenn die Subtraktion einen Unterlauf ergeben hat, wird das Carry-Bit gelöscht. Außerdem lassen sich noch 2 Byte einsparen, indem man das STA $FA aus Zeile 110 herausnimmt und dafür das LABEL eine Zeile höher setzt. Allerdings geht das dann auf Kosten der Durchschaubarkeit unseres Programmes.</p>
 
@@ -147,6 +182,12 @@
         <p>Ausgang. Das war bisher bei uns immer der BRK-Befehl.</p>
 
         <p>Aus diesen vier Bestandteilen lassen sich zwei grundsätzliche Schleifenmöglichkeiten konstruieren, die Sie in Bild 8 dargestellt finden.</p>
+
+        <figure>
+            <img src="139-8a.png" alt="">
+            <img src="139-8b.png" alt="">
+            <figcaption>Bild 8 a und b. Zwei grundsätzliche Schleifenformen.</figcaption>
+        </figure>
 
         <p>In Bild 8a haben wir das Prinzip vorliegen, das unseren normalen FOR&hellip;NEXT-Schleifen in Basic zugrundeliegt. Diese Schleife wird mindestens einmal durchlaufen. Erst nach der Ausführung desJobs erfolgt die Prüfung, ob die Abbruchbedingung gegeben war. Soll solch eine Schleife n-mal durchlaufen werden, muß die Initialisierung mit n-1 im Zähler erfolgen (oder die Abbruchbedingung entsprechend umgeformt werden).</p>
 
