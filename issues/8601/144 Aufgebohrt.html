@@ -16,13 +16,18 @@
 <body>
     <article>
         <h1>Aufgebohrt</h1>
-        <p class="intro">Hier wird beschrieben wie man die 1541 zu einem lEEE-Bus-Laufwerk umrüstet und dreifache Geschwindigkeit bei allen Floppy-Befehlen erreicht.</p>
+        <p class="intro">Hier wird beschrieben wie man die 1541 zu einem IEEE-Bus-Laufwerk umrüstet und dreifache Geschwindigkeit bei allen Floppy-Befehlen erreicht.</p>
 
         <p>Die 1541-Floppy ist ein abgemagertes 2031/4031-Laufwerk. Was steht also näher, sie wieder in den Originalzustand zu versetzen. Mit dieser Erweiterung sind zwar keine Übertragungsgeschwindigkeiten wie etwa bei ProLogic-DOS zu erreichen, aber immerhin werden alle Zugriffe auf die Diskette dreimal schneller. Die Geschwindigkeitssteigerung wird durch den parallelen IEC-Bus erreicht. Das 4040-Doppellaufwerk ist bekanntlich bis zu 6mal schneller, hier sind dafür aber zwei Prozessoren beschäftigt, der eine zum Lesen, der andere zum Übertragen der Daten. Mit dem einen Prozessor der 1541 lassen sich trotzdem ganz vernünftige Werte erzielen. Für den Anschluß am C 64 benötigen Sie ein IEC-Bus-Interface, wie wir es in Ausgabe 7/85, Seite 44 beschrieben ist. Ihre 1541 versteht nach Umbau die »Sprache« der großen CBM-Geräte. Sie können sie also auch direkt an einen CBM 3032/8032-Rechner anschließen und erhalten dadurch eine preisgünstige Alternative zum Doppellaufwerk.</p>
 
         <h2>Die Hardware</h2>
 
         <p>Um den parallelen Bus zu realisieren wird einer der beiden Portbausteine VIA 6522 benötigt. Dieser VIA-Baustein CVersatile Interface Adapter) ist teilweise nicht beschältet. Üm der IEC-Norm entsprechen zu können, sind acht Datenleitungen, sowie fünf Handshake-Leitun-gen zum Verbindungsaufbau erforderlich. Über die Handshake-Lei-tung teilt der Computer dem Laufwerk mit, daß er Daten senden, beziehungsweise empfangen möchte (ATN), daß die Daten gültig sind (DAV), daß keine Daten empfangen werden können (NRFD), daß die Daten noch nicht verarbeitet wurden (NDAC), oder daß die Übertragung beendet wurde (EOI). Wenn der Computer eine solche Übertragungssequenz beginnt, wird zuerst festgestellt, ob das Peripheriegerät überhaupt vorhanden beziehungsweise eingeschaltet ist (DEVICE NOT PRESENT). Hierfür sind die Leitungen »NRFD« und »NDAC« zuständig. Wird »ATN« gesetzt, so müssen beide Leitungen sofort nach Masse gezogen werden. Diese Funktion übernimmt das TTL-Gatter (EX-OR 74LS136) in der Schaltung. Die IEC-Norm schreibt weiterhin »Open-Collector«-Ausgänge vor, um mehrere Geräte anschließen zu können, das heißt die Leitungen sind im aktiven Zustand auf Masse-Potential (Low). Die 6522-VIA (Portbelegung siehe Bild 1) hat aber TTL-Pegel. Die notwendige Anpassung übernehmen die beiden IEC-Trei-ber 75160/161.</p>
+
+        <figure>
+            <img src="144-1.png" alt="">
+            <figcaption>Bild 1. Portbelegung des 6522</figcaption>
+        </figure>
 
         <p>Wenn die Platine mit allen Bauteilen bestückt ist, wird die Leiterplatte anstelle der VIA in die Floppy gesteckt und die VIA von oben aufgesetzt. Das serielle Kabel hat in diesem Fall keine Funktion mehr, da alle Übertragungen nur noch parallel stattfinden.</p>
 
@@ -42,7 +47,28 @@
 
         <h2>Der Zusammenbau</h2>
 
-        <p>Den Schaltplan, den Bestückungsplan sowie das Platinenlayout im Maßstab 1:1 finden Sie in Bild 2 bis 4. Bitte beachten Sie, daß die Bestückungsseite die Platine von oben, und die Lötseite die Platine von unten zeigt. Aus Bild 5 entnehmen Sie bitte die Bauteileliste. Die Platine wurde einseitig ausgeführt. Es empfiehlt sich, alle Bausteine zu Sockeln, um sie bei eventuellen Beschädigungen leicht auswechseln zu können, in jedem Fall muß aber der 6422 gesockelt sein. Die Position der Bauteile entnehmen Sie dem Bestückungsplan. Zuerst werden die Widerstände R1 + R2 und die Drahtbrücke eingelötet. Bei den Dioden Dl, D2 und D3 muß auf die Einbaurichtung geachtet werden. Der Pfeil zeigt auf die Anode, was zumeist durch einen Ring gekennzeichnet wird. Anschließend werden die Sockel verlötet. Um die Schaltung in den VIA-Sockel UC3 einsetzen zu können, müssen zwei 20polige Pin-leisten von der Lötseite auf die Platine gelötet werden. Dieser Vorgang erfordert besondere Sorgfalt damit keine unerwünschten Lötbrücken entstehen. Zuletzt ist nur noch das lEEE-Anschlußkabel einzulöten und die Bausteine können eingesetzt werden. Um den Kabelanschluß zu vereinfachen kann ein Einpreßstecker mit Flachbandkabel verwendet werden. Die Anschlußbohrungen sind bereits nach IEEE-Norm angeordnet (siehe Bild 6).</p>
+        <p>Den Schaltplan, den Bestückungsplan sowie das Platinenlayout im Maßstab 1:1 finden Sie in Bild 2 bis 4. Bitte beachten Sie, daß die Bestückungsseite die Platine von oben, und die Lötseite die Platine von unten zeigt. Aus Bild 5 entnehmen Sie bitte die Bauteileliste. Die Platine wurde einseitig ausgeführt. Es empfiehlt sich, alle Bausteine zu Sockeln, um sie bei eventuellen Beschädigungen leicht auswechseln zu können, in jedem Fall muß aber der 6422 gesockelt sein. Die Position der Bauteile entnehmen Sie dem Bestückungsplan. Zuerst werden die Widerstände R1 + R2 und die Drahtbrücke eingelötet. Bei den Dioden Dl, D2 und D3 muß auf die Einbaurichtung geachtet werden. Der Pfeil zeigt auf die Anode, was zumeist durch einen Ring gekennzeichnet wird. Anschließend werden die Sockel verlötet. Um die Schaltung in den VIA-Sockel UC3 einsetzen zu können, müssen zwei 20polige Pinleisten von der Lötseite auf die Platine gelötet werden. Dieser Vorgang erfordert besondere Sorgfalt damit keine unerwünschten Lötbrücken entstehen. Zuletzt ist nur noch das IEEE-Anschlußkabel einzulöten und die Bausteine können eingesetzt werden. Um den Kabelanschluß zu vereinfachen kann ein Einpreßstecker mit Flachbandkabel verwendet werden. Die Anschlußbohrungen sind bereits nach IEEE-Norm angeordnet (siehe Bild 6).</p>
+
+        <figure>
+            <img src="144-2.png" alt="">
+            <figcaption>Bild 2. Der Schaltplan des lEEE-Interfaces</figcaption>
+        </figure>
+        <figure>
+            <img src="144-3.png" alt="">
+            <figcaption>Bild 3. Der Bestückungsplan (Bestückungsseite)</figcaption>
+        </figure>
+        <figure>
+            <img src="144-4.png" alt="">
+            <figcaption>Bild 4. Das Platinenlayout (Lötseite)</figcaption>
+        </figure>
+        <figure>
+            <img src="144-5.png" alt="">
+            <figcaption>Bild 5. Stückliste zum IEEE-Interface</figcaption>
+        </figure>
+        <figure>
+            <img src="144-6.png" alt="">
+            <figcaption>Bild 6. Die Beschaltung des lEEE-Kabels</figcaption>
+        </figure>
 
         <p>Die beiden Brücken auf der Leiterbahnseite sind für die Geräteadresse zuständig. Ihre Funktion ist analog zu den Brücken des 1541-Laufwerks, um Adresse 8 einzustellen, sind beide geschlossen.</p>
 
