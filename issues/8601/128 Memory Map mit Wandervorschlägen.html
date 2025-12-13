@@ -110,14 +110,14 @@
         <p>Mit dem folgenden kleinen Programm, welches bei einer eröffneten Datei die Geräte-Nummer in Tabelle 611 bis 620 ändert, kann zwischen einem Drucker mit Geräte-Nummer 4 und einem Plotter mit Geräte-Nummer 6 umgeschaltet werden.</p>
 
         <p>10 OPEN 4,4,0<br>
-            20 POKE611,6: PRINT#4,”PLOTTER”<br>
-            30 POKE 611,4: PRINT#4, "DRUCKER”</p>
+            20 POKE611,6: PRINT#4,"PLOTTER"<br>
+            30 POKE 611,4: PRINT#4, "DRUCKER"</p>
 
         <p>Ähnliches ist mit den Sekundär-Adressen möglich. Dabei muß man allerdings wissen, daß die Sekundär-Adressen nicht so wie sie sind in der Tabelle 621 bis 630 gespeichert werden, sondern mit »OR 96« verknüpft. Dasselbe müssen wir auch machen:</p>
 
         <p>10 OPEN 3,4,0<br>
-            20 POKE 621,0 OR96:PRINT#3,”GRAFIKMODUS”<br>
-            30 POKE 621,7 OR96:PRINT#3,”TEXTMODUS”</p>
+            20 POKE 621,0 OR96:PRINT#3,"GRAFIKMODUS"<br>
+            30 POKE 621,7 OR96:PRINT#3,"TEXTMODUS"</p>
 
         <p>Mit dieser Methode können Sie sich das Öffnen und Schließen vieler Dateien ersparen.</p>
 
@@ -214,19 +214,19 @@
 
             <p>Die folgende Methode ermöglicht die Veränderung eines Programms durch sich selbst. Genauer gesagt, man kann damit Programmzeilen einfügen. Nehmen wir an, Sie haben folgendes Teilprogramm:</p>
 
-            <p>150 PRINT”BITTE TASTE DRUECKEN”<br>
-                160 GET A$:IF A$ = ””THEN 160<br>
-                170 IF A$ &lt; > ”E” THEN 150<br>
+            <p>150 PRINT"BITTE TASTE DRUECKEN"<br>
+                160 GET A$:IF A$ = ""THEN 160<br>
+                170 IF A$ &lt; > "E" THEN 150<br>
                 180 END<br>
-                500 PRINT ’’NAECHSTER TEIL”</p>
+                500 PRINT ’’NAECHSTER TEIL"</p>
 
             <p>Die ersten vier Zeilen warten so lange, bis die E-Taste gedrückt wird, dann bleibt das Programm mit READY stehen.</p>
 
             <p>Wir wollen nun eine zusätzliche Zeile 165 durch das Programm einfügen lassen, mit der nicht beendet, sondern durch Drücken der Q-Taste auf die Zeile 500 gesprungen wird. Das erreichen wir durch folgende Zeilen:</p>
 
             <p>172 PRINT CHR$(147)<br>
-                174 PRINT ”165 IF A$ = CHR$(81) THEN 500”<br>
-                176 PRINT ”GOTO 150”<br>
+                174 PRINT "165 IF A$ = CHR$(81) THEN 500"<br>
+                176 PRINT "GOTO 150"<br>
                 178 POKE 631,19:POKE 632,13:POKE 633,13: POKE 634,13:POKE 198,4</p>
 
             <p>Wenn jetzt die E-Taste gedrückt wird, löscht Zeile 172 den Bildschirm, Zeile 174 druckt in die zweite Bildschirmzeile die neue Programmzeile 165 und Zeile 176 darunter ohne Zeilennummer den Direktbefehl GOTO 150. In den Tastaturpuffer werden nacheinander die Werte für HOME und dreimal RETURN eingegeben und die Anzahl der Zeichen im Puffer auf 4 begrenzt.</p>
@@ -241,9 +241,9 @@
 
             <p>10 REM - DIESE ZEILE WIRD GELÖSCHT<br>
                 20 PRINT CHR$(147):PRINT:PRINT<br>
-                30 PRINT ”60 LIST”<br>
-                40 PRINT ”10”<br>
-                50 PRINT ”GOTO 70” CHR$(19)<br>
+                30 PRINT "60 LIST"<br>
+                40 PRINT "10"<br>
+                50 PRINT "GOTO 70" CHR$(19)<br>
                 60 FOR 1 = 631 TO 633:POKE I,13:NEXT: POKE 198,3:END<br>
                 70 REM - DIESE ZEILE WIRD ERSETZT</p>
 
@@ -257,8 +257,8 @@
 
             <p>Der vergebliche Versuch sieht so aus:</p>
 
-            <p>150 PRINT ’’FORMEL EINGEBEN”<br>
-                160 INPUT”FQO=”;A$<br>
+            <p>150 PRINT ’’FORMEL EINGEBEN"<br>
+                160 INPUT"FQO=";A$<br>
                 250 DEFFNAQO=A$<br>
                 260 PRINT FNA(9)<br>
                 270 GOTO 150</p>
@@ -268,8 +268,8 @@
             <p>Sie können diese Zeile aber vom Programm einfügen lassen:</p>
 
             <p>170 PRINT CHR$(147):PRINT:PRINT<br>
-                180 PRINT ”250 DEF FNA(X)=”;A$<br>
-                190 PRINT ”GOTO 240”<br>
+                180 PRINT "250 DEF FNA(X)=";A$<br>
+                190 PRINT "GOTO 240"<br>
                 200 PRINT CHR$(19)<br>
                 210 POKE 631,13: POKE 632,13: POKE 198,2: END<br>
                 240 REM - FORMELBERECHNUNG -</p>
@@ -283,9 +283,9 @@
             <p>Die Aufgabe besteht darin, aus einem auszuwählenden Speicherbereich — dort, wo die in Frage kommende Routine sitzt — den Maschinencode herauszuPEEKen und mit der inzwischen bekannten Methode in eine DATA-Zeile einzufügen. Ich gehe schrittweise vor:</p>
 
             <p>20 PRINT CHR$(147): PRINT: PRINT<br>
-                30 PRINT ”5555 DATA”;<br>
+                30 PRINT "5555 DATA";<br>
                 50 FORA=0TO3<br>
-                60 PRINT PEEK(A)”, ”;:NEXT<br>
+                60 PRINT PEEK(A)", ";:NEXT<br>
                 70 PRINT CHR$(19)<br>
                 80 POKE 631, 13: POKE 632,13: POKE 198,2: END</p>
 
@@ -297,7 +297,7 @@
 
             <p>Zur Korrektur müssen wir Zeile 60 erweitern:</p>
 
-            <p>60 PRINT MID$(STR$(PEEK(A)),2)”,”;:NEXT</p>
+            <p>60 PRINT MID$(STR$(PEEK(A)),2)",";:NEXT</p>
 
             <p>STR$() wandelt den durch PEEK ausgelesenen Zahlenwert in einen String um. MID$(&hellip;,2) schneidet die Leerstellen weg.</p>
 
@@ -305,13 +305,13 @@
 
             <p>Dieser ganze Komfort hat natürlich nichts mit dem Tastaturpuffer zu tun. Dieser Teil bleibt unverändert. Aber ich finde dieses Programm so durchdacht, daß ich es Ihnen als ein Beispiel guter Programmierung angeben will.</p>
 
-            <p>10 INPUT ”STARTADRESE”;A: INPUT ”ENDADRESE”;E: INPUT ”ZEILE”;Z<br>
+            <p>10 INPUT "STARTADRESE";A: INPUT "ENDADRESE";E: INPUT "ZEILE";Z<br>
                 20 PRINT CHR$(147)<br>
-                30 PRINT Z ”DATA”;<br>
+                30 PRINT Z "DATA";<br>
                 40 IFA>ETHENEND<br>
                 50 FORA=ATOA + 15 + (E&lt;A + 15)*(A + 15-E)<br>
-                60 PRINTMID$(STR$(PEEK(A)),2)”,”;:NEXT<br>
-                70 PRINT”{CRSR-links}”:PRINT ”A = ”A”: E = ”E”: Z=”Z + 10”: GOTO 20”;<br>
+                60 PRINTMID$(STR$(PEEK(A)),2)",";:NEXT<br>
+                70 PRINT"{CRSR-links}":PRINT "A = "A": E = "E": Z="Z + 10": GOTO 20";<br>
                 80 POKE 631, 19: POKE 632,13: POKE 633,13: POKE 634,13: POKE 198,4: END</p>
         </aside>
     </article>
