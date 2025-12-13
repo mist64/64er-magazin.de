@@ -1,0 +1,66 @@
+
+
+;vergl.von prg..prg ==0801==
+    1 rem      vergl.von prg.
+   10 :
+   20 rem *************************
+   30 rem *                       *
+   40 rem *  gerhard reul         *
+   50 rem *  8591 troestau        *
+   60 rem *  tel. 09232/1678      *
+   70 rem *                       *
+   80 rem *************************
+   90 :
+  100 dim x(256),y(256):z1$="......"
+  110 f1$="<> zeilen-laenge":f2$="zeichen-fehler":f3$="<> zeilen-nr.!!!"
+  120 goto450
+  130 open15,8,15,"i"
+  140 open2,8,2,b1$+",p,r":f=1:gosub590
+  150 open3,8,3,b2$+",p,r":f=2:gosub590
+  160 get#2,x$,x$
+  170 get#3,x$,x$
+  180 rem======= laden prg 1 =============
+  190 get#2,x$:ifx$=""thenx$=chr$(0)
+  200 i=i+1:x(i)=asc(x$)
+  210 rem (zu zeile 220)  zeilen-nr. bestimmen
+  220 ifi=4thenz=x(4)*256+x(3):z$=right$(z1$+str$(z),7):print"     zeile"z$"  ok{up}"
+  230 ifx(i)=0then goto260
+  240 goto190
+  250 rem  zeilen-oder prg.-ende bestimmen
+  260 ifi=2then:ifx(1)=0andx(2)=0thenclose2:close3:close15:goto550:rem  prg.-ende
+  270 ifi<5thengoto190
+  280 ii=i:i=0
+  290 rem======= laden prg 2 =============
+  300 get#3,y$:ify$=""theny$=chr$(0)
+  310 j=j+1:y(j)=asc(y$)
+  320 ify(j)=0then goto340
+  330 goto300
+  340 ifj<5thengoto300
+  350 jj=j:j=0
+  360 rem====== vergleichen ==============
+  370 ifx(3)<>y(3)orx(4)<>y(4)then:f$=f3$:gosub420:goto430
+  380 ifii<>jjthen:f$=f1$:gosub420:goto190
+  390 fori=5toii
+  400 ifx(i)<>y(i)then:f$=f2$:gosub420:i=ii
+  410 next:i=0:goto190
+  420 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"f$:return
+  430 print"{down}      {rvon}   bitte ueberpruefen !    {rvof}":close2:close3:close15:goto560
+  440 rem========= menue =================
+  450 print"{clr}{down}{down}      {rvon} vergleichen von programmen {rvof}{down}{down}"
+  460 print"  es koennen zwei basic-programme,{down}"
+  470 print"  die sich auf einer diskette befinden,{down}"
+  480 print"  miteinander verglichen werden.{down}{down}{down}{down}"
+  490 input"   programm-name 1 ";b1$:print:print
+  500 input"   programm-name 2 ";b2$
+  510 print"{clr}{down}{down}     {rvon} vergleichen von programmen {rvof}{down}{down}"
+  520 print"  programm 1:         programm 2:{down}{down}"
+  530 print"  "b1$"                "b2$"{down}{down}":goto130
+  540 rem========== warten ===============
+  550 print"{down}{down}             {rvon} ende {rvon}"
+  560 geta$:ifa$=""then560
+  570 run
+  580 rem====== fehler-kanal =============
+  590 input#15,a,a$:ifa=0thenreturn
+  600 print"   "f"{left}. ";a$:close2:close3:close15
+  610 goto560
+

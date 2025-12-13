@@ -225,7 +225,7 @@
 
         <h2>?VERIFY ERROR</h2>
 
-        <p>Da hat man ein gutes Basic-Programm geschrieben, und dann tritt beim obligatorischen VERIFY dieser Fehler auf. Aber in welcher Programmzeile steckt der Fehler? Dieses Programm (Listing 1) gibtdiefehlerhafteZeilen-Nummeran. Beide Programme müssen auf einer Diskette sein.</p>
+        <p>Da hat man ein gutes Basic-Programm geschrieben, und dann tritt beim obligatorischen VERIFY dieser Fehler auf. Aber in welcher Programmzeile steckt der Fehler? Dieses Programm (Listing 1) gibt die fehlerhafte Zeilen-Nummer an. Beide Programme müssen auf einer Diskette sein.</p>
 
         <p>Folgende Fehleraussagen sind möglich:</p>
 
@@ -241,9 +241,14 @@
 
         <address class="author">(Gerhard Reul/tr)</address>
 
+        <figure>
+            <pre data-filename="vergl.von prg." data-name="Vergleichen von Programmen"></pre>
+            <figcaption>Listing 1. »Vergleichen von Programmen«. Bitte benutzen Sie zur Eingabe den Checksummer.</figcaption>
+        </figure>
+
         <h2>INT-Funktion fehlerhaft</h2>
 
-        <p>Wie mir neulich auffiel, ist die »INT&lt;-Funktion beim C 64 keineswegs die definitionsgemäße Integer-Funktion, wie man aus der Abkürzung entnehmen könnte, sondern die Gauss-klammerfunktion. Glücklicherweise ist die Funktion im Handbuch richtig erklärt, nur stimmt nicht, daß »negative Zahlen dem Betrag nach größer werden«, wenn man die Nachkommastellen abschneidet. Die im Betriebssystem definierte Funktion rundet alle Zahlen ab, anstatt die Nachkommastellen abzuschneiden. Das heißt: f(x) = [x] (Gaussklammer), und nicht: f(x) = [ixi] • sgn(x)(lnteger).AuslNT(—1.23)wirdnämlich—2 und nicht, wie es richtig heißen müßte, —1! Es ist also Vorsicht geboten bei Programmen oder Rechnungen, die die lnte-ger-Funktion verlangen und bei denen x negativ ist. Bei kaufmännischen oder sonstigen Anwendungen des C 64, von denen nicht nur das Erfolgserlebnis des Programmierers abhängt, wäre es nötig, die Funktion im Programm neu zu definieren:</p>
+        <p>Wie mir neulich auffiel, ist die »INT&lt;-Funktion beim C 64 keineswegs die definitionsgemäße Integer-Funktion, wie man aus der Abkürzung entnehmen könnte, sondern die Gauss-klammerfunktion. Glücklicherweise ist die Funktion im Handbuch richtig erklärt, nur stimmt nicht, daß »negative Zahlen dem Betrag nach größer werden«, wenn man die Nachkommastellen abschneidet. Die im Betriebssystem definierte Funktion rundet alle Zahlen ab, anstatt die Nachkommastellen abzuschneiden. Das heißt: f(x) = [x] (Gaussklammer), und nicht: f(x) = [ixi] • sgn(x)(lnteger).AuslNT(—1.23)wirdnämlich—2 und nicht, wie es richtig heißen müßte, —1! Es ist also Vorsicht geboten bei Programmen oder Rechnungen, die die Integer-Funktion verlangen und bei denen x negativ ist. Bei kaufmännischen oder sonstigen Anwendungen des C 64, von denen nicht nur das Erfolgserlebnis des Programmierers abhängt, wäre es nötig, die Funktion im Programm neu zu definieren:</p>
 
         <p>DEF FN INT(x) = INT (ABS(x)) * SGN(x)</p>
 
@@ -265,6 +270,11 @@
 
         <address class="author">(Sven Heemeyer/Andreas Meyer/tr)</address>
 
+        <figure>
+            <pre data-filename="mse hex-tastatur" data-name="Hex-Tastatur"></pre>
+            <figcaption>Listing 2. »Hex-Tastatur«.</figcaption>
+        </figure>
+
         <h2>Die unmögliche Uhr</h2>
 
         <p>Dieses Programm stellt während des Editierens oder Ablaufs von Basic- oder Maschinenspracheprogrammen im unteren Rand des Bildschirms eine absolut genaue Uhr mit Stunden-, Minuten und Sekundenanzeige dar. Es verbraucht keinen Basic-Speicherplatz, da das Steuerprogramm von $C000 bis $C2D7 und die Spritedaten unter dem KernelROM liegen. Es verfügt über einen minutengenau einstellbaren Wecker. Zur Funktionsweise des Programmes:</p>
@@ -276,11 +286,19 @@
 
         <p>Nachdem Sie das Listing 3, »BORDER-CLOCK«, das Sie mit dem MSE abgetippt und gespeichert, gestartet haben, erzeugt dieses erst das eigentliche Programm »UHR« auf der Diskette. Dies hat folgenden Grund: Das endgültige Programm »UHR« enthält die vollständigen Daten für die Sprite-Ziffern 0 bis 9 und den Doppelpunkt. Diese Daten werden in »BORDERCLOCK« erst aus den sieben Segmenten einer Digital-Uhr zusammengesetzt. Dies bewirkt, daß »BORDER-CLOCK« etwa 200 Byte kürzer ist als »UHR«. Nach dem Laden und Starten des »UHR«-Programms müssen Zeit und Weckzeit in Tl$-Schreibweise (je zwei Stellen für Stunden, Minuten und Sekunden) eingegeben werden.</p>
 
-        <p>Nach Drücken von RUN/STOP-RESTORE muß die Anzeige mit»SYS 49756« neu aktiviert werden, die Uhr läuftjedoch intern weiter. Vor der Arbeit mit Peripheriegeräten (Floppy, Drucker, etc.) muß die Anzeige ausgeschaltet werden. Dies kann durch die Tastenkombination CTRL-RESTORE erfolgen. Danach kann sie durch Commodore-Taste und RESTORE wieder eingeschaltet werden. Am Programm können Sie natürlich selbst einiges verändern.</p>
+        <p>Nach Drücken von RUN/STOP-RESTORE muß die Anzeige mit»SYS 49756« neu aktiviert werden, die Uhr läuft jedoch intern weiter. Vor der Arbeit mit Peripheriegeräten (Floppy, Drucker, etc.) muß die Anzeige ausgeschaltet werden. Dies kann durch die Tastenkombination CTRL-RESTORE erfolgen. Danach kann sie durch Commodore-Taste und RESTORE wieder eingeschaltet werden. Am Programm können Sie natürlich selbst einiges verändern.</p>
 
-        <p>Die Sprite-Daten der Ziffern 0 bis 9 und des Doppelpunktes liegen von 3270 bis 3974. Die Farbe des Uhrenhintergrundes ist in 2974 enthalten, die Farben der einzelnen Sprites von 2980 bis einschließlich 2987. Es können auch einzelne Ziffern ausgeschaltet bleiben, und zwar durch POKE 2962, PEEK(2962)AND(255-2tl), wobei I zwischen 0 und 7 die auszuschaltende Stelle angibt. Schließlich kann noch die Frequenz des Alarmgongs mittels POKE 3072,INT(F/256): POKE 3067,F-256*PEEK(3072) mit F als Frequenz geändert werden.</p>
+        <p>Die Sprite-Daten der Ziffern 0 bis 9 und des Doppelpunktes liegen von 3270 bis 3974. Die Farbe des Uhrenhintergrundes ist in 2974 enthalten, die Farben der einzelnen Sprites von 2980 bis einschließlich 2987. Es können auch einzelne Ziffern ausgeschaltet bleiben, und zwar durch POKE 2962, PEEK(2962)AND(255-2↑1), wobei I zwischen 0 und 7 die auszuschaltende Stelle angibt. Schließlich kann noch die Frequenz des Alarmgongs mittels POKE 3072,INT(F/256): POKE 3067,F-256*PEEK(3072) mit F als Frequenz geändert werden.</p>
 
         <address class="author">(Anton Ernst/tr)</address>
+
+        <figure>
+            <pre data-filename="b-clock-heft.prg" data-name="Unmögliche Uhr" data-mse=mse1></pre>
+            <figcaption>Listing 3. Die »unmögliche Uhr« müssen Sie mit dem MSE eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="b-clock-heft.prg" data-name="Unmögliche Uhr (Heftversion)"></div>
+        <div class="binary_download" data-filename="b-clock-fertig.prg" data-name="Unmögliche Uhr (fertige Version)"></div>
+
 
         <h2>Das 64’er EPROM-Programmiergerät</h2>
 
@@ -333,6 +351,16 @@
         <p>Beim Einbau in eigene Programme sollten Sie darauf achten, daß die letzte vom VIC ll-Chip addressierbare Speicherstelle, also im Normalfall 16383, den WertObesitzt, dasonstschwar-ze Streifen Ihren Bildrand verunstalten.</p>
 
         <address class="author">(Anton Ernst/tr)</address>
+
+        <figure>
+            <pre data-filename="screenenlarger.prg" data-name="Riesen-Bildschirm" data-mse=mse1></pre>
+            <figcaption>Listing 4. Der »Riesen-Bildschirm«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="screenenlarger.prg" data-name="Riesen-Bildschirm"></div>
+        <figure>
+            <pre data-filename="demo enlarger" data-name="Demo Enlarger"></pre>
+            <figcaption>Listing 5. »Demo Enlarger«. Bitte verwenden Sie zur Eingabe den Checksummer.</figcaption>
+        </figure>
 
         <h2>Die Commander-Datasette streikt nie wieder</h2>
 

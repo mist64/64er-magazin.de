@@ -1,0 +1,73 @@
+
+
+;life.prg ==0801==
+   10 rem-------------------------
+   20 rem**   life fuer c-64   **
+   25 rem-------------------------
+   30 rem** juergen engbring   **
+   40 rem** henkelshof 5-7     **
+   50 rem** 5630 remscheid-11  **
+   60 rem** tel. 02191/65533   **
+   70 rem-------------------------
+   80 m=49152:fori=0to9:reada
+   85 ifa<>peek(m)thenload"maschlife",8,1
+   90 m=m+100:next
+   95 data169,88,87,206,2,152,0,192,45,0
+  100 print"{clr}"
+  110 sys49971: rem initialisierung
+  120 pl=50117: rem syspl,x,y,0/1/2
+  130 :n=50167: rem naechste generation
+  140 :s=50173: rem maximale geschw.
+  150 :g=50087: rem sysg,x,y zelle  lebt
+  155 ba=6*4096:rem basis zellspeicher
+  160 qq=50198: rem testbyte syspl,x,y,2
+  170 rem+++++++++++++++++++++++++++++++++
+  990 rem===  80 x 40 zelleditor  ========
+ 1000 dimg%(255):x=39:y=24:q=ti:ch=29
+ 1005 fori=0to6:reada:readb:g%(a)=b:next
+ 1010 data17,1,29,2,145,3,157,4,20,5,32,6,76,7
+ 1020 geta$:ifti-q>15thenq=ti:w=1-w
+ 1030 syspl,x,y,w
+ 1040 ifa$=""then1020
+ 1050 a=asc(a$)
+ 1060 ong%(a)goto1100,1200,1300,1400,1500,1600,1700
+ 1070 goto1020
+ 1100 syspl,x,y,z:y=y+1:ch=17
+ 1110 ify>49theny=0
+ 1120 goto1450
+ 1200 syspl,x,y,z:x=x+1:ch=29
+ 1210 ifx>79thenx=0
+ 1220 goto1450
+ 1300 syspl,x,y,z:y=y-1:ch=145
+ 1310 ify<0theny=49
+ 1320 goto1450
+ 1400 syspl,x,y,z:x=x-1:ch=157
+ 1410 ifx<0thenx=79
+ 1420 goto1450
+ 1450 syspl,x,y,2:z=peek(qq)
+ 1460 goto1020
+ 1500 z=0:a=ch:pokeba+3*x+y*240,0
+ 1510 goto1060
+ 1600 z=1:a=ch
+ 1610 sysg,x,y:goto1060
+ 1700 syspl,x,y,z
+ 2000 t=9999:rem minimale verzoegerung
+ 2005 poke50209,2:rem vor erstem sysn
+ 2010 geta$:ifti-q>tthenq=ti:sysn
+ 2020 ifa$=""then2010
+ 2030 ifa$=" "thensysn:t=9999:goto2010
+ 2040 ifa$="s"thent=99999
+ 2050 ifa$="n"thenrun
+ 2055 ifa$="e"goto2300
+ 2060 ifa$="q"then:end
+ 2065 ifa$="p"thensyss
+ 2067 ifa$=chr$(133)goto2200
+ 2070 a=asc(a$)
+ 2080 ifa<134ora>140goto2010
+ 2090 t=2*2^(a-134)
+ 2100 goto2010
+ 2200 geta$:ifa$=""thensysn:goto2200
+ 2210 goto2020
+ 2300 ifpeek(50202)=1thensysn
+ 2310 poke50209,0:goto1020
+

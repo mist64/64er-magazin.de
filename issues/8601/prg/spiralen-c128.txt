@@ -1,0 +1,62 @@
+
+
+;spiralen-c128.prg ==1c01==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *    verschlungene spiralen     *
+    4 rem *    version fuer den pc128     *
+    5 rem *                               *
+    6 rem *  heimo ponnath  hamburg 1985  *
+    7 rem *                               *
+    8 rem *********************************
+    9 rem ******** eingaben **********
+   10 color0,1:color4,1:color5,6:scnclr
+   15 input"anzahl spiralen";n:input"textstart xt,yt";xt,yt
+   20 input"radius,startwinkel";r,a
+   22 rem ******* init **************
+   23 color0,16:color1,7:color4,1:graphic1,1
+   25 rem ******* start/mitte *******
+   30 xu=-160:xo=160:yu=-100:yo=100
+   32 fast:gosub100
+   33 rem ******* kreis *************
+   35 x=0:y=0:gosub1020:x5=xx:y5=yy:rx=r*319/(xo-xu):ry=r*199/(yo-yu)
+   37 slow:circle1,x5,y5,rx,ry
+   40 a$="verschlungene spiralen"
+   42 rem ******* text **************
+   45 char1,xt,yt,a$
+   50 rem ******* show (hier unnoetig) **
+   55 getkeyb$
+   60 rem ******* normal ************
+   62 graphic0:color0,1
+   65 rem ******* greset ************
+   67 scnclr(1)
+   70 end
+  100 rem ****** up zeichnen *******
+  102 nn=n*100:ra=r/nn:dimt(nn)
+  105 forj=1ton:a=a+2*~/n
+  110 t=a:th=2*~/100:t(0)=t
+  115 fori=1tonn:t(i)=t(i-1)+th:rr=ra*i
+  117 x=(rr-ra)*cos(t(i-1)):y=(rr-ra)*sin(t(i-1)):gosub1020:xa=xx:ya=yy
+  119 x=rr*cos(t(i)):y=rr*sin(t(i)):gosub1020:xb=xx:yb=yy
+  120 draw1,xa,yatoxb,yb
+  125 nexti
+  130 nextj
+  135 return
+ 1000 rem *** up transformation ********
+ 1001 rem einmal zu definieren sind:
+ 1002 rem  xu,xo = niedrigster,hoechster
+ 1003 rem          x-wert
+ 1004 rem  yu,yo = niedrigster,hoechster
+ 1005 rem          y-wert
+ 1006 rem fuer jeden punkt zu uebergeben
+ 1007 rem  x,y = punktkoordinaten aus
+ 1008 rem        beliebigen cartesischen
+ 1009 rem        koordinatensystem
+ 1010 rem ausgegeben werden dann:
+ 1011 rem  xx,yy = bildschirmkoordinaten
+ 1012 rem          des 320/200-systems
+ 1013 rem ******************************
+ 1020 xx=319*(x-xu)/(xo-xu)
+ 1030 yy=199*(yo-y)/(yo-yu)
+ 1040 return
+
