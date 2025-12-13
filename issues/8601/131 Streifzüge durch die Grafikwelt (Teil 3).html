@@ -57,6 +57,78 @@
 
         <p>In Tabelle 1 finden Sie eine Übersicht über alle Grafikbefehle und ihre Übersetzungen in die drei Systeme: C 64 + HIRES-3, Plotter 1520, C 128 Basic 7.0.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <td><b>Befehl</b></td>
+                    <td><b>HIRES-3<br>auf C 64</b></td>
+                    <td><b>Plotter 1520</b></td>
+                    <td><b>C 128 Basic 7.0</b></td>
+                </tr>
+                <tr>
+                    <td><b>INIT</b></td>
+                    <td>POKE 53280,0:<br>SYS37498:<br>HFL,6,12</td>
+                    <td>OPEN1,6,1:OPEN2,6,2:<br>PRINT # 2,0:CLOSE2</td>
+                    <td>COLOR,16:COLOR1,7:<br>COLOR4,1:GRAPHIC1,1</td>
+                </tr>
+                <tr>
+                    <td><b>START</b></td>
+                    <td>TRS,0,320,0,200</td>
+                    <td>PRINT # 1,"M",0,-200:<br>PRINT # 1,"J"</td>
+                    <td>XU=0:XO=319:YU=0:YO=199<br>Bezogen auf das<br>UP Transformation</td>
+                </tr>
+                <tr>
+                    <td><b>MITTE</b></td>
+                    <td>TRS,-160,160,<br>-100,100</td>
+                    <td>PRINT # 1,"R",240,0:<br>PRINT # 1,"J"</td>
+                    <td>XU=-160:XO=160:YU=-100:<br>YO=100 Bezogen auf das<br>UP Transformation</td>
+                </tr>
+                <tr>
+                    <td><b>PUNKT (X,Y)</b></td>
+                    <td>TPK,X,Y</td>
+                    <td>PRINT # 1,"R",X,Y:PRINT # 1,<br>"J",X+2,Y+2:PRINT # 1,"R",X,Y</td>
+                    <td>GOSUB 1020:DRAW1,XX,YY<br>UP Transformation ab 1020</td>
+                </tr>
+                <tr>
+                    <td><b>LINE<br>(XA,YA,XB,YB)</b></td>
+                    <td>TLN,XA,YA,<br>XB,YB</td>
+                    <td>PRINT #,"R",XA,YA:<br>PRINT # 1,"J",XB,YB</td>
+                    <td>X=XA:Y=YA:GOSUB 1020:XF<br>=XX:Y1=YY:X=XB:Y=YB:<br>GOSUB 1020:X2=XX:Y2=YY:<br>DRAW1,X1,Y1 TO X2,Y2<br>UP Transformation ab 1020</td>
+                </tr>
+                <tr>
+                    <td><b>KREIS<br>(XM,YM,RX,RY)</b></td>
+                    <td>TKR,XM,YM,RX,<br>RY,2*&pi;</td>
+                    <td>PROGRAMM:<br>M=50:D=360 &cdot; &pi; /(M &cdot; 180):<br>DIMT(M):T(O)=2 &cdot; &pi;:<br>FORJ=1 TO M:T(J)=T(J-1)+D:<br>PRINT # 1,"R",RX &cdot; COS(T(J-1))<br>+XM,RY &cdot; SIN(T(J-1))+YM:<br>PRINT # 1,"J",RX &cdot; COS(T(J))<br>+XM,RY &cdot; SIN(T(J))+YM:NEXTJ</td>
+                    <td>X=XM:Y=YM:GOSUB 1020:X5<br>=XX:Y5=YY:RX= &cdot; 319/<br>(XO-XU):RY=RY &cdot; 199/(YO-YU):<br>CIRCLE1,X5,Y5,RX,RY<br>UP Transformation ab 1020</td>
+                </tr>
+                <tr>
+                    <td><b>TEXT (A$,XT,YT)</b></td>
+                    <td>TEX,A$,YT,XT</td>
+                    <td>OPEN4,6:PRINT # 1,"R",XT,YT:<br>PRINT # 4,A$:CLOSE4:<br>PRINT # 1,"M",240,-YT:<br>PRINT # 1,"J"</td>
+                    <td>CHAR1,XT,YT,A$</td>
+                </tr>
+                <tr>
+                    <td><b>SHOW</b></td>
+                    <td>HAN</td>
+                    <td>PRINT # 1,"R",O,-200</td>
+                    <td>GRAPHIC1</td>
+                </tr>
+                <tr>
+                    <td><b>NORMAL</b></td>
+                    <td>HOF</td>
+                    <td>CLOSE1</td>
+                    <td>GRAPHIC0</td>
+                </tr>
+                <tr>
+                    <td><b>GRESET</b></td>
+                    <td>LOE:AUS</td>
+                    <td>OPEN7,6,7:PRINT # 7:CLOSE7</td>
+                    <td>SCNCLR(1)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle I. Alle Grafikbefehle und ihre Übersetzungen</figcaption>
+        </figure>
+
         <h2>Grafikstandardprobleme</h2>
 
         <p>Nicht daß Sie denken, der Sinn für Proportionen sei uns abhanden gekommen, weil sich dieses Kapitel mit verschiedenen Grafikstandards (kurz GKS genannt) in bezug auf unsere Computer befaßt: Es scheint mir aber doch notwendig, zumindest einmal kurz das Verhältnis beispielsweise des GKS und ähnlicher Normen des hier verwendeten Minimal-Grafik-Sprachschatzes anzureißen.</p>
