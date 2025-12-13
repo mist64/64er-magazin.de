@@ -525,7 +525,8 @@ class Issue:
       listings_bin = {}
       binaries = []
       prg_path = os.path.join(issue_directory_path, 'prg')
-      for root, _, files in os.walk(prg_path):
+      for root, dirs, files in os.walk(prg_path):
+          dirs.clear()  # Don't recurse into subdirectories
           for file in files:
               if file.endswith('.txt'):
                   file_path = os.path.join(root, file)
