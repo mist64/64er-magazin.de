@@ -1,0 +1,65 @@
+
+
+;fensterrose-c128.prg ==1c01==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *          fensterrose          *
+    4 rem *    version fuer den pc 128    *
+    5 rem *                               *
+    6 rem *  heimo ponnath  hamburg 1985  *
+    7 rem *                               *
+    8 rem *********************************
+    9 rem ********* eingaben **********
+   10 color0,1:color4,1:color5,6:scnclr
+   15 input"anzahl der stuetzpunkte";n
+   20 input"radius";r:input"textort xt,yt";xt,yt
+   25 rem ******** init **************
+   30 color0,16:color1,7:color4,1:graphic1,1
+   35 rem ******** start/mitte *******
+   40 xu=-160:xo=160:yu=-100:yo=100
+   55 rem ****************************
+   60 d=2*~/n:dimx(n),y(n)
+   65 rem ******** kreis *************
+   70 x=0:y=0:gosub1020:x5=xx:y5=yy:rx=r*319/(xo-xu):ry=r*199/(yo-yu)
+   72 circle1,x5,y5,rx,ry
+   75 rem ****************************
+   80 gosub200
+   90 a$="fensterrose"
+   95 rem ******** text **************
+  100 char1,xt,yt,a$
+  105 rem ******* show(hier unnoetig)
+  115 rem ***************************
+  120 getkeyb$
+  125 rem ******* normal ************
+  130 graphic0:color0,1
+  135 rem ******* greset ************
+  140 scnclr(1)
+  160 end
+  200 rem ******* up zeichnen *******
+  210 fori=1ton:t=t+d:x(i)=r*cos(t):y(i)=r*sin(t):nexti
+  220 s=n-1
+  230 fori=1tos:z=i+1
+  240 forj=zton
+  242 rem ******* linie *************
+  243 x=x(i):y=y(i):gosub1020:x1=xx:y1=yy:x=x(j):y=y(j):gosub1020:x2=xx:y2=yy
+  245 draw1,x1,y1tox2,y2
+  247 rem ***************************
+  250 nextj:nexti:return
+ 1000 rem *** up transformation ********
+ 1001 rem einmal zu definieren sind:
+ 1002 rem  xu,xo = niedrigster,hoechster
+ 1003 rem          x-wert
+ 1004 rem  yu,yo = niedrigster,hoechster
+ 1005 rem          y-wert
+ 1006 rem fuer jeden punkt zu uebergeben
+ 1007 rem  x,y = punktkoordinaten aus
+ 1008 rem        beliebigen cartesischen
+ 1009 rem        koordinatensystem
+ 1010 rem ausgegeben werden dann:
+ 1011 rem  xx,yy = bildschirmkoordinaten
+ 1012 rem          des 320/200-systems
+ 1013 rem ******************************
+ 1020 xx=319*(x-xu)/(xo-xu)
+ 1030 yy=199*(yo-y)/(yo-yu)
+ 1040 return
+

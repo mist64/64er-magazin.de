@@ -1,0 +1,34 @@
+
+
+;box-befehl-c128.prg ==1c01==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *   der box-befehl des pc 128   *
+    4 rem *                               *
+    5 rem *  heimo ponnath  hamburg 1985  *
+    6 rem *                               *
+    7 rem *********************************
+    8 rem ********** eingaben ***********
+    9 color0,1:color4,1:color5,6:scnclr
+   10 input"groesste kantenlaenge";a
+   20 input"drehwinkel,anzahl";w,n:w1=w:w=w*~/180
+   30 input"zentrum x,y";x,y
+   40 dimx1(n),y1(n),x2(n),y2(n)
+   45 rem ********* 1. box *************
+   50 d=(a/2)*(1-(1/(cos(w)+sin(w))))
+   60 x1(0)=x-a/2:y1(0)=y-a/2:x2(0)=x+a/2:y2(0)=y+a/2
+   65 color0,2:color1,7:color4,1
+   70 graphic1,1
+   80 box1,x1(0),y1(0),x2(0),y2(0):i=0
+   85 rem ********* restliche boxen ****
+   90 do until i=n
+   95 i=i+1:d=d/(cos(w)+sin(w))
+  100 x1(i)=x1(i-1)+d:y1(i)=y1(i-1)+d:x2(i)=x2(i-1)-d:y2(i)=y2(i-1)-d
+  105 if x2(i)-x1(i) <=0 then exit
+  110 box1,int(x1(i)),int(y1(i)),int(x2(i)),int(y2(i)),i*w1,0
+  120 loop
+  125 rem ******** ende ***************
+  130 getkeya$:graphic0
+  140 color0,1
+  150 end
+

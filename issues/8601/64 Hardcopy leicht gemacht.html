@@ -120,6 +120,327 @@
         <p>Danach läuft Ihr Programm weiter als wenn nichts geschehen wäre.</p>
 
         <address class="author">(hm)</address>
+
+        <figure>
+            <pre>1000 open2,8,2,"hardcopy.obj,p,w"
+1010 sys9*4096
+1020 ;*********************************
+1030 ;*      lowscreenhardcopy        *
+1040 ;*            incl.              *
+1050 ;*   grafik- und reverszeichen   *
+1060 ;*     epson/wiesemann &amp; komp.   *
+1070 ;*         version 1.2           *
+1080 ;*    harald meyer 21.05.1985    *
+1090 ;*********************************
+1100 .opt o2  ; code auf disk
+1110 *= $c000 ; startadresse
+1120 ; routinen des betriebssytems
+1130 ;**********************************
+1140 ;
+1150 open    = $ffc0 ; file oeffnen
+1160 setnam  = $ffbd ; filenamen setzen
+1170 setfls  = $ffba ; fileparameter
+1180 print   = $ffd2 ; zeichen ausgeben
+1190 clrch   = $ffcc ; bildsch.-ausgabe
+1200 chkout  = $ffc9 ; ausgabegeraet
+1210 close   = $ffc3 ; file schliessen
+1220 stop    = $ffe1 ; stopvektor
+1230 irqend  = $ea31 ; kernal-irq-rout.
+1240 lovideo = $d018 ; videoram lo
+1250 chrgen1 = $d000 ; 1.zeichensatz
+1260 chrgen2 = $d800 ; 2.zeichensatz
+1270 ;
+1280 ; benoetigte speicherzellen
+1290 ; *********************************
+1300 ;
+1310 cursor  = 204   ; cursor aus/an
+1320 irqvek  = $0314 ; ieq-vektor
+1330 taste   = $c5   ; letzte taste
+1340 f1      = 4     ; f1-matrixnummer
+1350 cr      = 13    ; carriage return
+1360 esc     = 27    ; escape
+1370 adresse = $f8   ; zeichenadresse
+1380 zeichen = $d6   ; zeichencode
+1390 viram   = $15   ; zeichenadresse
+1400 zrom    = $f9   ; zeichengenerator
+1410 maske   = $9d   ; bit-abfrage
+1420 ;
+1430 ; interrupt initialisieren
+1440 ; *********************************
+1450 ;
+1460 sei             ; irq verhindern
+1470 lda #&lt;start     ; irq vektor auf
+1480 ldy #&gt;start     ; dieses programm
+1490 sta irqvek
+1500 sty irqvek+1
+1510 cli             ; irq freigeben
+1520 rts             ; init. ende
+1530 ;
+1540 ;
+1550 ; f1 gedrueckt, dann start
+1560 ; *********************************
+1570 ;
+1580 start lda taste ; tastenabfrage
+1590 cmp #f1         ; taste = f1 "?"
+1600 bne l1          ; nein, dann ende
+1610 lda #00         ; tastendruck
+1620 sta taste       ; loeschen
+1630 jsr hdcopy      ; programmbeginn
+1640 l1  jmp irqend  ; zum kernal-irq
+1650 ;
+1660 ;
+1670 ; zeropage retten
+1680 ; *********************************
+1690 ;
+1700 hdcopy ldx #$ff ; byte 255-0
+1710 l2  lda 0,x     ; laden
+1720 sta memory,x    ; und speichern
+1730 dex             ; naechstes byte
+1740 bne l2          ; x=0, dann ende
+1750 lda #01
+1760 sta cursor      ;ausschalten
+1770 ;
+1780 ;
+1790 ; druckerfile oeffen und
+1800 ; zeilenabstand initialisieren
+1810 ; *********************************
+1820 lda #126     ; filenummer
+1830 ldx #4       ; geraeteadresse
+1840 ldy #1       ; sekundaeradresse
+1850 jsr setfls   ; parameter setzen
+1860 lda #0       ; kein filenamen
+1870 jsr setnam   ; namen setzen
+1880 jsr open     ; file oeffnen
+1890 ldx #126     ; alle
+1900 jsr chkout   ; ausgaben auf #126
+1910 ;
+1920 ; drucker auf einzeiligen abstand
+1930 lda #esc     ; esc-sequenz-beginn
+1940 jsr print    ; chr$(27) an drucker
+1950 lda #"3"     ; "3"+chr$(24)
+1960 jsr print
+1970 lda #24
+1980 jsr print    ; an drucker
+1990 ;
+2000 ; zeiger auf videoram
+2010 ; ********************************
+2020 ;
+2030 videoram lda #$00
+2040 ldy $288     ; videoramadressen
+2050 sta viram    ; uebergeben
+2060 sty viram+1
+2070 ;
+2080 ;
+2090 ; zeichen vom screen holen,
+2100 ; charaktergenerator lesen und
+2110 ; zeichenmatrix zusammensetzen
+2120 ; *********************************
+2130 ;
+2140 ldx #25      ; zeilenanzahl
+2150 ;
+2160 ; ausgabeschleife
+2170 ; *********************************
+2180 ;
+2190 ausg jsr stop; stoptaste abfragen
+2200 beq hdende   ; gedrueckt,dann ende
+2210 ;
+2220 ; ist zeile leer "?"
+2230 ; *********************************
+2240 ;
+2250 ldy #39
+2260 l9 lda (viram),y
+2270 cmp #32
+2280 bne l10
+2290 dey
+2300 bpl l9
+2310 lda #cr
+2320 jsr print
+2330 jmp l11
+2340 ;
+2350 ; chrgen-adresse holen
+2360 ; gross/klein oder gross/grafic
+2370 ; *********************************
+2380 ;
+2390 l10 jsr chrtest ;schriftmodus-test
+2400 ;
+2410 ; druckzeile vorbereiten
+2420 ; *********************************
+2430 ;
+2440 ldy #7            ; 6 codes
+2450 l3  lda grafik,y  ; esc-sequenz
+2460 jsr print         ; senden
+2470 dey               ; naechster code
+2480 bne l3            ; fertig "?"
+2490 ;
+2500 ; neue zeile beginnen
+2510 ; *********************************
+2520 ;
+2530 ldy #0  ; zeile von neuem
+2540 ;
+2550 ; zeile abarbeiten, 2. schleife
+2560 ; zeichen holen und im up bearbei.
+2570 ; *********************************
+2580 ; zeichen v. bildsch. holen
+2590 l5  lda #0   ; zeichen von
+2600 lda (viram),y; bildschirm holen
+2610 sta zeichen  ; merken
+2620 jsr auswert  ; bearbeiten
+2630 iny          ; spalte erhoehen
+2640 cpy #40      ; zeilenende "?"
+2650 bne l5       ; bildsch.-ende "?"
+2660 ;
+2670 ; neue zeile vorbereiten
+2680 ; *********************************
+2690 ;
+2700 l11 lda #40; 40 spalten
+2710 clc    ; zeiger auf naechste zeile
+2720 adc viram    ; neue zeile setzen
+2730 sta viram
+2740 bcc l12
+2750 inc viram + 1
+2760 l12 dex       ; zeilen erniedrigen
+2770 bne ausg      ; screen zu ende "?"
+2780 hdende lda #13; zum ende cr an
+2790 jsr print     ; drucker senden
+2800 ;
+2810 ; fertig, dann file schliessen
+2820 ; *********************************
+2830 ;
+2840 lda #126 ; filenummer
+2850 jsr close; druckerdatei schliessen
+2860 jsr clrch; cmd auf screen
+2870 ;
+2880 ;
+2890 ; zeropage wiederherstellen
+2900 ; *********************************
+2910 ;
+2920 ldx #$ff        ; zeropage
+2930 l4  lda memory,x; wieder
+2940 sta $00,x       ; herstellen
+2950 dex
+2960 bne l4
+2970 ;
+2980 rts             ; hardcopy ende
+2990 ;
+3000 ;
+3010 ;
+3020 ;
+3030 ; charaktergenerator lesen
+3040 ; *********************************
+3050 ;
+3060 auswert pha;  register retten
+3070 txa
+3080 pha
+3090 tya
+3100 pha
+3110 ;
+3120 ; adresse im charakterram berech.
+3130 ; = zeichencode * 8
+3140 ; *********************************
+3150 ;
+3160 lda zeichen; zeichencode laden
+3170 sta adresse; adresse im zeichen-
+3180 lda #0     ; rom feststellen
+3190 sta adresse+1
+3200 asl adresse; zeichencode
+3210 rol adresse+1
+3220 asl adresse
+3230 rol adresse+1
+3240 asl adresse
+3250 rol adresse+1 ; mal 8
+3260 lda adresse+1
+3270 clc             ; und
+3280 adc zrom+1    ; romadresse
+3290 sta adresse+1 ; addieren
+3300 ;
+3310 ; charaktergen. lesen und zeichen-
+3320 ; matrix fuer drucker aufbereiten
+3330 ; *********************************
+3340 ;
+3350 ldx $01        ; speicherselekt
+3360 lda #%10000000 ; bit-maske
+3370 sta maske      ; speichern
+3380 l14 lda #$00   ; code
+3390 pha            ; loeschen
+3400 ldy #7         ; 8 bytes abfragen
+3410 ;
+3420 ; chr-ram einschalten &amp; byte lesen
+3430 ; *********************************
+3440 ;
+3450 l15 sei     ; irq sperren
+3460 lda #01:and #251        ; zeichen-rom
+3470 sta $01     ; selektieren
+3480 lda (adresse),y ; code holen
+3490 and maske       ; maskenvergleich
+3500 ;
+3510 ; chr-rom wieder einschalten
+3520 ; *********************************
+3530 ;
+3540 stx $01     ; norm speicherkonf.
+3550 cli         ; wieder herstellen
+3560 beq l6
+3570 pla         ; code laden und
+3580 clc         ; code laden und
+3590 adc nwert,y ; bitwert zu code add.
+3600 pha         ; und merken
+3610 l6  dey     ; naechstes byte
+3620 bpl l15     ; 8 bits gelesen "?"
+3630 pla         ; ja, dann
+3640 jsr print   ; an drucker
+3650 lsr maske   ; maske erhoehen
+3660 bcc l14     ; naechste punktzeile
+3670 ;
+3680 ; register wieder holen
+3690 ; *********************************
+3700 ;
+3710 pla ; register wieder holen
+3720 tay
+3730 pla
+3740 tax
+3750 pla
+3760 rts
+3770 ;
+3780 ; anfangsadresse des charakterrams
+3790 ; feststellen und merken
+3800 ; *********************************
+3810 ;
+3820 chrtest lda #$00
+3830 sta zrom     ; zeichensatzadr. lo
+3840 lda lovideo  ; zeichensatz-page
+3850 and #%00000010
+3860 bne l16
+3870 lda #&gt;chrgen1         ;$d000
+3880 sta zrom + 1
+3890 .byt $2c
+3900 l16 lda #&gt;chrgen2     ;$d800
+3910 sta zrom + 1
+3920 rts           ; zum hauptprogramm
+3930 ;
+3940 ;
+3950 ;
+3960 ;tabelle 320 bitmusterdaten
+3970 grafik .byt 0,$01,$40
+3980 ;
+3990 ;epson auf einzelnadelansteuerung
+4000 .byt 4,"*",esc,cr,24
+4010 ;
+4020 ;tabelle fuer bit-wertigkeiten
+4030 nwert .byt 128,64,32,16,8,4,2,1
+4040 ;
+4050 ;zeichensatz startadressen
+4060 memory .byt 0
+4070 .end
+4080 sys49152
+
+ready.</pre>
+            <figcaption>Quelltext der Hardcopy-Routine</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="hardcopy.obj.prg" data-name="Hardcopy-Routine" data-mse=mse1></pre>
+            <figcaption>MSE-Listing der Hardcopy-Routine</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="hardcopy.obj.prg" data-name="Hardcopy-Routine"></div>
     </article>
 </body>
 
