@@ -155,7 +155,7 @@
 
         <ol>
             <li>Mit Hypra-Load (beziehungsweise allgemein für den Fall, daß das Betriebssystem bereits ins RAM kopiert ist):<br>
-                Zuerst Hypra-Load laden und mit »RUN« starten, dann die Basic-Erweiterung mit »LOAD "DATAWORK 1.1”,8,1« laden, und mit »SYS12*4096+6:NEW« ($C006) starten.</li>
+                Zuerst Hypra-Load laden und mit »RUN« starten, dann die Basic-Erweiterung mit »LOAD "DATAWORK 1.1",8,1« laden, und mit »SYS12*4096+6:NEW« ($C006) starten.</li>
             <li>Ohne Hypra-Load: Die Basic-Erweiterung wie oben laden und mit »SYS12*4096+3:NEW« ($C003) starten.</li>
             <li>Nach einem Reset: Mit »SYS12*4096« ($C000) starten. Ein Basic-Programm kann danach mitdem OLD-Befehl zurückgeholt werden.</li>
         </ol>
@@ -165,8 +165,8 @@
 
         <h3>FETCH</h3>
 
-        <p>Format: FETCH ’’Vorgabestring”, ’’zulässige Zeichen’ Länge, Eingabevariable<br>
-            Oder: FETCH ’’Numerische Vorgabe”, ’’zulässige Zeichen”, Länge, Eingabevariable</p>
+        <p>Format: FETCH "Vorgabestring", "zulässige Zeichen" Länge, Eingabevariable<br>
+            Oder: FETCH "Numerische Vorgabe", "zulässige Zeichen", Länge, Eingabevariable</p>
 
         <p>»FETCH« ist ein neuer INPUT-Befehl, der diesen vollständig ersetzen kann. Mit »FETCH« wird ein Eingabefeld bestimmter Länge erzeugt, in dem man sich mit den Cursor-Tasten frei bewegen kann. Die Tasten INST und DEL haben ihre normale Bedeutung. Mit der CLR-Taste wird das Eingabefeld gelöscht. Der String oder der numerische Wert »Vorgabe« wird in das Feld geschrieben und kann dann bearbeitet werden. Für »Vorgabe« sind direkte Angaben und Variablejeder Art erlaubt. Der String »zulässige Zeichen« enthält alle Zeichen, die bei der Eingabe erlaubt sein sollen, andere Zeichen werden dann nicht angenommen. Für ganze Zeichengruppen stehen als Abkürzung zur Verfügung:<br>
             CRTL-K : Alle Kleinbuchstaben<br>
@@ -174,12 +174,12 @@
             CRTL-N : Ziffern von 0 bis 9<br>
             CRTL-Z : Alle Zeichen, außer Grafikzeichen und »?« beziehungsweise »*« wegen deren besonderer Bedeutung.</p>
 
-        <p>Der Wert »Länge« gibt die Länge des Eingabefeldes an. In der Eingabevariablen wird die Eingabe abgelegt. Es sind sowohl Stringvariable, als auch numerische Variable zulässig. Bei numerischen Variablen wird ein Zahlenwert gemäß dem Basic-Befehl VAL(X$) übergeben. Für den Fall, daß die Eingabe nur Buchstaben enthält, wird also der Wert 0 übergeben. Beispiel: FETCH ’’Mueller”, ",[CTRL-K,CTRL-G,CTRL-Z],20,AB$ löscht ein 20 Zeichen langes Eingabefeld und schreibt den Text Mueller hinein. Dann erscheint der Cursor im Feld und der Text kann geändert oder ergänzt werden. Nach RETURN wird die Eingabe an die Variable AB$ übergeben.<br>
-            — FETCH ” ”, ”12345”,2,A — erzeugt ein leeres, zwei Zeichen langes Eingabefeld, in dem nur die Tasten 1 bis 5 gedrückt werden können.</p>
+        <p>Der Wert »Länge« gibt die Länge des Eingabefeldes an. In der Eingabevariablen wird die Eingabe abgelegt. Es sind sowohl Stringvariable, als auch numerische Variable zulässig. Bei numerischen Variablen wird ein Zahlenwert gemäß dem Basic-Befehl VAL(X$) übergeben. Für den Fall, daß die Eingabe nur Buchstaben enthält, wird also der Wert 0 übergeben. Beispiel: FETCH "Mueller", ",[CTRL-K,CTRL-G,CTRL-Z],20,AB$ löscht ein 20 Zeichen langes Eingabefeld und schreibt den Text Mueller hinein. Dann erscheint der Cursor im Feld und der Text kann geändert oder ergänzt werden. Nach RETURN wird die Eingabe an die Variable AB$ übergeben.<br>
+            — FETCH " ", "12345",2,A — erzeugt ein leeres, zwei Zeichen langes Eingabefeld, in dem nur die Tasten 1 bis 5 gedrückt werden können.</p>
 
         <h3>TAKE</h3>
 
-        <p>Format: TAKE kz, ’zulässige Zeichen”, Eingabevariable DerTAKE-Befehl wartetauf eine gedrückte Taste und übergibt sie an die Eingabevariable, ähnlich wie eine GET-Schleife. Bei >TAKE 0,&hellip;« wird kein Cursor sichtbar, bei »TAKE 1,&hellip;« blinkt der Cursor und die gedrückte Taste wird auf den Bildschirm geschrieben.</p>
+        <p>Format: TAKE kz, ’zulässige Zeichen", Eingabevariable DerTAKE-Befehl wartetauf eine gedrückte Taste und übergibt sie an die Eingabevariable, ähnlich wie eine GET-Schleife. Bei >TAKE 0,&hellip;« wird kein Cursor sichtbar, bei »TAKE 1,&hellip;« blinkt der Cursor und die gedrückte Taste wird auf den Bildschirm geschrieben.</p>
 
         <p>Für »zulässige Zeichen« und »Eingabevariable« gilt Gleiches wie bei »FETCH«.</p>
 
@@ -209,7 +209,7 @@
 
         <p>Der FIELD-Befehl positioniert den Cursor an die Stelle »sp« und »ze«, dann wird ein Ausgabefeld der angegebenen Länge mit dem angegebenen Zeichen in angegebener Farbe gefüllt. Danach wird in dieses Feld die Ausgabeliste wie beim PRINT-Befehl ausgegeben. Für »Zeichen« wird der Bildschirmcode (0 bis 255) angegeben. Für »Farbe« sind die Werte 0 bis 15 gültig.</p>
 
-        <p>Zum Beispiel: FIELD 10,15,20,32,5,’Text” — löscht ein Ausgabefeld ab Spalte 10, Zeile 15 der Länge 20 und schreibt in grüner Farbe >Text«in das Feld. — FIELD 0,0,40,160,5,”[RVS ON] Überschrift” — läßt in der obersten Zeile einen inversen Balken mit dem Text »Überschrift« erscheinen. Dieser Befehl läßt sich besonders gut für Bildschirmmasken verwenden.</p>
+        <p>Zum Beispiel: FIELD 10,15,20,32,5,"Text" — löscht ein Ausgabefeld ab Spalte 10, Zeile 15 der Länge 20 und schreibt in grüner Farbe >Text«in das Feld. — FIELD 0,0,40,160,5,"{RVS ON} Überschrift" — läßt in der obersten Zeile einen inversen Balken mit dem Text »Überschrift« erscheinen. Dieser Befehl läßt sich besonders gut für Bildschirmmasken verwenden.</p>
 
         <h3>SETOUT</h3>
 
@@ -223,12 +223,12 @@
 
         <h3>DIR</h3>
 
-        <p>Format: DIR KZ, ”$”, Zeilen</p>
+        <p>Format: DIR KZ, "$", Zeilen</p>
 
         <p>Mit dem DIR-Befehl wird ein Inhaltsverzeichnis der Diskette auf dem Bildschirm ausgegeben.</p>
 
         <p>Wird für »KZ« der Wert 0 angegeben, wird ein einspaltiges Inhaltsverzeichnis ausgegeben, mit dem Wert 1 ein zweispaltiges. Für den String sind Angaben wie beim Laden des Inhaltsverzeichnisses mit dem LOAD-Befehl möglich.<br>
-            Zum Beispiel: ”$” , ”$:*=SEQ” und so weiter</p>
+            Zum Beispiel: "$" , "$:*=SEQ" und so weiter</p>
 
         <p>»Zeilen« gibt an, wieviele Zeilen zunächst auf dem Bildschirm ausgegeben werden sollen. Danach stoppt die Ausgabe und kann durch Drücken einer beliebigen Taste zeilenweise fortgesetzt werden. Mit der STOP-Taste kann die Ausgabe vorzeitig abgebrochen werden.</p>
 
@@ -239,7 +239,7 @@
 
         <h3>DISK</h3>
 
-        <p>Format: DISK ’String”<br>
+        <p>Format: DISK ’String"<br>
             Mit dem Disk-Befehl wird ein Befehlsstring an den Befehlskanal des Diskettenlaufwerks übergeberi.</p>
 
         <h3>ERROR</h3>
@@ -276,15 +276,15 @@
         <table class="plain">
             <tr>
                 <td>1:</td>
-                <td>Großbuchstaben werden Kleinbuchstaben gleichgesetzt. Zum Beispiel: ”a” = ”A” ist dann wahr.</td>
+                <td>Großbuchstaben werden Kleinbuchstaben gleichgesetzt. Zum Beispiel: "a" = "A" ist dann wahr.</td>
             </tr>
             <tr>
                 <td>64:</td>
-                <td>Das Vergleichen von Strings mit einem Stern als Abkürzung ist dann möglich. Zum Beispiel: ”dis*” = ’’diskette” ist dann wahr.</td>
+                <td>Das Vergleichen von Strings mit einem Stern als Abkürzung ist dann möglich. Zum Beispiel: "dis*" = "diskette" ist dann wahr.</td>
             </tr>
             <tr>
                 <td>128:</td>
-                <td>Das Vergleichen mit einem Fragezeichen als Joker ist möglich. Zum Beispiel: ”m??er” = "meier” ist wahr. ”m??er” = "mayer” ist auch wahr.</td>
+                <td>Das Vergleichen mit einem Fragezeichen als Joker ist möglich. Zum Beispiel: "m??er" = "meier" ist wahr. "m??er" = "mayer" ist auch wahr.</td>
             </tr>
         </table>
 
@@ -366,7 +366,7 @@
 
         <p>Das Editieren von Programmen wird durch eine komfortable Listroutine erleichtert. Das Listing kann mit den Cursortasten über den Bildschirm hinauf- und hinuntergescrollt werden.</p>
 
-        <p>Die Funktion ASC(” ”) liefert den Wert 0 und nicht wie bisher einen »ILLEGAL QUANTITY ERROR«.</p>
+        <p>Die Funktion ASC(" ") liefert den Wert 0 und nicht wie bisher einen »ILLEGAL QUANTITY ERROR«.</p>
 
         <p>Der Tastatur-Repeat ist für alle Tasten voreingestellt. Er kann durch POKE650,0 rückgängig gemacht werden.</p>
 
