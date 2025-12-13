@@ -79,15 +79,50 @@
 
         <p>Häufig tritt in Schleifen der Fall ein, daß weder das Y- noch das X-Register zur Verfügung stehen. Sie dienen dann anderweitig schon als Index. Statt dessen kann ebensogut eine Speicherstelle den Zähler bilden, wie in dieser Variante 3:</p>
 
-        <p>TODO</p>
-
-        <p>LDA #$00<br>
-            STA $FB ;$FB ist Zähler<br>
-            LABEL INC $FB<br>
-            LDA $FB<br>
-            CMP #$FF<br>
-            BCC LABEL<br>
-            RTS</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>LDA</td>
+                <td>#$00</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA</td>
+                <td>$FB</td>
+                <td>;$FB ist Zähler</td>
+            </tr>
+            <tr>
+                <td>LABEL</td>
+                <td>INC</td>
+                <td>$FB</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>LDA</td>
+                <td>$FB</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>CMP</td>
+                <td>#$FF</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>BCC</td>
+                <td>LABEL</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>RTS</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
 
         <p>Selbstverständlich kann auch jede andere Speicherstelle anstelle von $FB verwendet werden, sogar eine, die nicht in der Zeropage liegt. Voraussetzung ist lediglich, daß sie nicht innerhalb der Schleife verändert wird — außer zum Zählen der Schleifendurchläufe. In den bisher kennengelernten Varianten haben wir immer $FF als Endwert genommen. Nun steht man oft vor der Aufgabe, bis zu einem bestimmten Endwert zu zählen, der vorher irgendwie eingegeben oder festgelegt wird. In Basic sähe das beispielsweise so aus:<br>
             10 A = 32<br>
@@ -197,17 +232,17 @@
 
         <p>Sehen wir uns beispielsweise unsere Version 9 an, dann entdecken wir die einzelnen Schleifenteile wie folgt:</p>
 
-        <p>TODO</p>
-
-        <p>Initialisierung: LDA #$7F<br>
-            STA $FA<br>
-            Verarbeitung:LABEL<br>
-            Steuerung: SEC<br>
-            LDA $FA<br>
-            SBC #$0A<br>
-            STA $FA<br>
-            BCS LABEL<br>
-            Ausgang: BRK</p>
+        <table class="plain">
+            <tr><td>Initialisierung:</td><td></td><td>LDA #$7F</td></tr>
+            <tr><td></td><td></td><td>STA $FA</td></tr>
+            <tr><td>Verarbeitung:</td><td>LABEL</td><td>––</td></tr>
+            <tr><td>Steuerung:</td><td></td><td>SEC</td></tr>
+            <tr><td></td><td></td><td>LDA $FA</td></tr>
+            <tr><td></td><td></td><td>SBC #$0A</td></tr>
+            <tr><td></td><td></td><td>STA $FA</td></tr>
+            <tr><td></td><td></td><td>BCS LABEL</td></tr>
+            <tr><td>Ausgang:</td><td></td><td>BRK</td></tr>
+        </table>
 
         <p>Auf diese Weise ist es Ihnen möglich, alle bisher kennengelernten Schleifenvarianten mit einem beliebigen Job zu füllen. Noch eines gibt es zu bedenken: Alle Instruktionen zwischen dem Label und der Abbruchbedingung werden oft ausgeführt, sind also zeitfressend. Daher sollte der auszuführende Job alle Befehle vermeiden, die ebensogut vor der eigentlichen Schleife stehen könnten.</p>
 
