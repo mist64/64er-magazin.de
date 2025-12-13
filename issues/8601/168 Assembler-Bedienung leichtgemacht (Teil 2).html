@@ -67,52 +67,44 @@
 
         <p>Daraus folgt, daß beide Variablen nach dem Makroaufruf den gleichen Wert enthalten. Als Beispiel möchte ich die 16-Bit-Addition hernehmen. Das Makro soll aber so gestaltet werden, daß kein Arbeitsregister (A,X,Y) zerstört wird.</p>
 
-        <p>TODO</p>
-
-        <p>10 -.MA ADDW (ADRl,ADR2,SUMME)<br>
-            20 — PHA<br>
-            30 — LDA ADR1<br>
-            40 — CLC<br>
-            50 — ADC ADR2<br>
-            60 — STA SUMME<br>
-            70 — LDA ADRl+1<br>
-            80 — ADC ADR2+1<br>
-            90 — STA SUMME+1<br>
-            100 — PLA<br>
-            110 -.RT</p>
+        <pre><code> 10 -.MA ADDW (ADR1,ADR2,SUMME)
+ 20 —     PHA
+ 30 —     LDA ADR1
+ 40 —     CLC
+ 50 —     ADC ADR2
+ 60 —     STA SUMME
+ 70 —     LDA ADR1+1
+ 80 —     ADC ADR2+1
+ 90 —     STA SUMME+1
+100 —     PLA
+110 -.RT</code></pre>
 
         <p>In diesem Makro wird also zum Inhalt einer Adresse2 und Adresse2 + 1 der Inhalt einer Adressel und Adressel +1 addiert und das Ergebnis in der Adresse SUMME und SUMME + 1 gespeichert. Um das Makro aufzurufen, ist das Programm wie folgt zu ergänzen:</p>
 
         <p>Dieses kleine Programm addiert die beiden Zahlen $25E5 und $43A8 und gibt das Ergebnis im dezimalen Format auf dem Bildschirm aus, das in diesem Fall 27021 ist. Um das zu testen, sind die Zeilen 10 bis 270 abzutippen, nachdem Hypra-Ass geladen und gestartet wurde. Ist der Quelltext assembliert, müßte, wenn kein Fehler aufgetreten ist, mit SYS 9*4096 das Ergebnis »27021« auf dem Bildschirm erscheinen. Um die Wirkung und die Arbeitsweise von Makros zu verstehen, spielen Sie mit dem Quelltext ruhig ein wenig herum. Ändern Sie einfach die Label und Zahlen ab, kaputtmachen können Sie nichts.</p>
 
+        <pre><code>120 -.BA $9000
+130 -.EQ SUMMAND1 = $FB
+140 -.EQ SUMMAND2 = $FD
+150 -.EQ ERGEBNIS = 2
+160 -    LDA #$E5
+170 -    LDX #$25
+180 -    STA SUMMAND1
+190 -    STX SUMMAND1 + 1
+200 -    LDA #$A8
+210 -    LDX #$43
+220 -    STA SUMMAND2
+230 -    STX SUMMAND2+1
+240 -    ADDW (SUMMAND1, SUMMAND2, ERGEBNIS)
+250 -    LDX ERGEBNIS
+260 -    LDA ERGEBNIS+1
+270 -    JMP $BDCD ;AUSGABE AUF BILDSCHIRM</code></pre>
+
         <p>Hypra-Ass enthält noch eine weitere, sehr angenehme Eigenschaft. Er kann nämlich bedingt assemblie-ren. Was das ist und was man damit machen kann, soll hier detalliert beschrieben werden. Denn gerade im Zusammenhang mit Makros spielt die bedingte Assemblierung eine wichtige Rolle. Mit ihrer Hilfe kann bei einem Makroaufruf ein weiterer Parameter übergeben werden, der bestimmt, ob gewisse Quelltextteile innerhalb des Makros ins Hauptprogramm assembliert werden sollen oder nicht. Dadurch läßt sich in Abhängigkeit des Übergabeparameters ein Makro definieren, das verschiedene Aufgaben erfüllt. Fangen wir zunächst mit einem kleinen Beispiel an, damit Sie die Wirkung der bedingten Assemblierung innerhalb eines Makros kennenlernen. Dazu soll wieder die obenstehende 16-Bit-Addition herhalten, in die wir eine bedingte »,IF«-Abfrage einbauen wollen. Mit dieser bedingten »,IF«-Abfrage soll nun bestimmt werden, ob der Akku bei einem Makroaufruf erhalten bleiben oder zerstört werden soll, beziehungsweise ob das erzeugte Maschinenprogramm den »PHA«- und den »PLA«-Befehl enthalten soll oder nicht. Dazu sind zunächst die Zeilen 10 und 240 abzuändern, denn wir benötigen ja noch einen weiteren Übergabeparameter. Nennen wir diesen Übergabeparameter »RETTEN«. Dann sind die beiden Zeilen wie folgt zu ändern:<br>
-            10 -.MA ADW (ADRl,ADR2,SUMME, RETTEN)<br>
+            10 -.MA ADW (ADR1,ADR2,SUMME, RETTEN)<br>
             240 -&hellip; ADW (SUMMAND1, SUMMAND2,ERGEBNIS,x)</p>
 
-        <p>Das »x« ist zu ersetzen durch eine »1« für Akku retten oder für eine beliebige andere Zahl für Akku zerstören. Als nächstes ist noch die bedingte >>.IF&lt;&lt;-Abfrage in den Quelltext einzubauen. Bevor das geschieht noch einiges zur »,IF«-Abfrage selbst, die etwas anders funktioniert, als Sie es vom Basic her ge-</p>
-
-        <p>TODO !?</p>
-
-        <p>120 -.BA $9000<br>
-            130 -.EQ SUMMAND1 = $FB<br>
-            140 -.EQ SUMMAND2 = $FD<br>
-            150 -.EQ ERGEBNIS = 2<br>
-            160 - LDA #$E5<br>
-            170 - LDX #$25<br>
-            180 - STA SUMMAND1<br>
-            190 - STX SUMMANDl + 1<br>
-            200 - LDA #$A8<br>
-            210 - LDX #$43<br>
-            220 - STA SUMMAND2<br>
-            230 - STX SUMMAND2+1<br>
-            240 - ADDW (SUMMAND1,<br>
-            SUMMAND2,<br>
-            ERGEBNIS)<br>
-            250 - LDX ERGEBNIS<br>
-            260 - LDA ERGEBNIS+1<br>
-            270 - JMP $BDCD ;AUSGABE AUF BILDSCHIRM</p>
-
-        <p>wohnt sind. Trifft das Basic-Pro-gramm auf eine Zeile, in der eine »IF«-Abfrage steht, wird zunächst überprüft, ob diese »IF«-Abfrage wahr oder falsch ist. Ist sie falsch, wird direkt zur nächsten Zeile verzweigt. Das ist bei einem Maschinenprogramm beziehungsweise dem dazugehörigen Quelltext nicht möglich, denn es darf ja pro Zeile immer nur ein Maschinenbefehl stehen. Deshalb muß bei der bedingten ».IF«-Abfrage noch ein weiterer Pseudo-Opcode vorhanden sein, der dem Assembler das Ende dieser ».IF«-Abfrage mitteilt. Dieses ist der »,EI«-Pseudo für »ENDIF«, der eine »,IF«-Abfrage abschließt. Bei Hy-pra-Ass existiert noch ein dritter Pseudo im Zusammenhang mit ».IF«-Abfragen der ».EL«-Pseudo für »ELSE«. Die Struktur innerhalb eines Programms sieht dann so aus:<br>
+        <p>Das »x« ist zu ersetzen durch eine »1« für Akku retten oder für eine beliebige andere Zahl für Akku zerstören. Als nächstes ist noch die bedingte >>.IF&lt;&lt;-Abfrage in den Quelltext einzubauen. Bevor das geschieht noch einiges zur »,IF«-Abfrage selbst, die etwas anders funktioniert, als Sie es vom Basic her gewohnt sind. Trifft das Basic-Pro-gramm auf eine Zeile, in der eine »IF«-Abfrage steht, wird zunächst überprüft, ob diese »IF«-Abfrage wahr oder falsch ist. Ist sie falsch, wird direkt zur nächsten Zeile verzweigt. Das ist bei einem Maschinenprogramm beziehungsweise dem dazugehörigen Quelltext nicht möglich, denn es darf ja pro Zeile immer nur ein Maschinenbefehl stehen. Deshalb muß bei der bedingten ».IF«-Abfrage noch ein weiterer Pseudo-Opcode vorhanden sein, der dem Assembler das Ende dieser ».IF«-Abfrage mitteilt. Dieses ist der »,EI«-Pseudo für »ENDIF«, der eine »,IF«-Abfrage abschließt. Bei Hy-pra-Ass existiert noch ein dritter Pseudo im Zusammenhang mit ».IF«-Abfragen der ».EL«-Pseudo für »ELSE«. Die Struktur innerhalb eines Programms sieht dann so aus:<br>
             .IF A !=! 1<br>
             .
             .EL<br>
@@ -143,16 +135,14 @@
 
         <p>Ein kleines Beispiel soll den Sinn und Zweck dieses Pseudos verdeutlichen. Dazu wollen wir aus dem Quelltext heraus einen bestimmten Speicherbereich mit dem Maschinenbefehl »NOP« füllen.</p>
 
-        <p>TODO</p>
-
-        <p>10 -.BA $9000<br>
-            20 -.EQ A = 0<br>
-            30 -.IFA!&lt;!255<br>
-            40 - NOP<br>
-            50 -.EQ A = A + 1<br>
-            60 -.GO 30<br>
-            70 -.EI<br>
-            80 - RTS</p>
+        <pre><code>10 -.BA $9000
+20 -.EQ A = 0
+30 -.IFA!&lt;!255
+40 -         NOP
+50 -.EQ A = A + 1
+60 -.GO 30
+70 -.EI
+80 -         RTS</code></pre>
 
         <p>Beim Gebrauch von »GO« und »,ON« ist anzumerken, daß im Falle eines RENUMBERs mit dem Editorbefehl »/N« die Sprungziele nicht angepaßt werden.</p>
 
