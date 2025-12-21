@@ -26,7 +26,7 @@
 
         <h2>Die Hardware</h2>
 
-        <p>Um den parallelen Bus zu realisieren wird einer der beiden Portbausteine VIA 6522 benötigt. Dieser VIA-Baustein CVersatile Interface Adapter) ist teilweise nicht beschältet. Üm der IEC-Norm entsprechen zu können, sind acht Datenleitungen, sowie fünf Handshake-Leitungen zum Verbindungsaufbau erforderlich. Über die Handshake-Leitung teilt der Computer dem Laufwerk mit, daß er Daten senden, beziehungsweise empfangen möchte (ATN), daß die Daten gültig sind (DAV), daß keine Daten empfangen werden können (NRFD), daß die Daten noch nicht verarbeitet wurden (NDAC), oder daß die Übertragung beendet wurde (EOI). Wenn der Computer eine solche Übertragungssequenz beginnt, wird zuerst festgestellt, ob das Peripheriegerät überhaupt vorhanden beziehungsweise eingeschaltet ist (DEVICE NOT PRESENT). Hierfür sind die Leitungen »NRFD« und »NDAC« zuständig. Wird »ATN« gesetzt, so müssen beide Leitungen sofort nach Masse gezogen werden. Diese Funktion übernimmt das TTL-Gatter (EX-OR 74LS136) in der Schaltung. Die IEC-Norm schreibt weiterhin »Open-Collector«-Ausgänge vor, um mehrere Geräte anschließen zu können, das heißt die Leitungen sind im aktiven Zustand auf Masse-Potential (Low). Die 6522-VIA (Portbelegung siehe Bild 1) hat aber TTL-Pegel. Die notwendige Anpassung übernehmen die beiden IEC-Treiber 75160/161.</p>
+        <p>Um den parallelen Bus zu realisieren wird einer der beiden Portbausteine VIA 6522 benötigt. Dieser VIA-Baustein (Versatile Interface Adapter) ist teilweise nicht beschaltet. Um der IEC-Norm entsprechen zu können, sind acht Datenleitungen, sowie fünf Handshake-Leitungen zum Verbindungsaufbau erforderlich. Über die Handshake-Leitung teilt der Computer dem Laufwerk mit, daß er Daten senden, beziehungsweise empfangen möchte (ATN), daß die Daten gültig sind (DAV), daß keine Daten empfangen werden können (NRFD), daß die Daten noch nicht verarbeitet wurden (NDAC), oder daß die Übertragung beendet wurde (EOI). Wenn der Computer eine solche Übertragungssequenz beginnt, wird zuerst festgestellt, ob das Peripheriegerät überhaupt vorhanden beziehungsweise eingeschaltet ist (DEVICE NOT PRESENT). Hierfür sind die Leitungen »NRFD« und »NDAC« zuständig. Wird »ATN« gesetzt, so müssen beide Leitungen sofort nach Masse gezogen werden. Diese Funktion übernimmt das TTL-Gatter (EX-OR 74LS136) in der Schaltung. Die IEC-Norm schreibt weiterhin »Open-Collector«-Ausgänge vor, um mehrere Geräte anschließen zu können, das heißt die Leitungen sind im aktiven Zustand auf Masse-Potential (Low). Die 6522-VIA (Portbelegung siehe Bild 1) hat aber TTL-Pegel. Die notwendige Anpassung übernehmen die beiden IEC-Treiber 75160/161.</p>
 
         <figure>
             <img src="144-1.png" alt="">
@@ -37,13 +37,13 @@
 
         <h2>Die Software</h2>
 
-        <p>Das Floppy-DOS ist in zwei ROMs untergebracht, das $C000-ROM und das $E000-ROM. Um die Hardware bedienen zu können, müssen die seriellen Routinen durch parallele ersetzt werden. Bei den Laufwerken 2031 und 4031 ist davon der gesamte Bereich betroffen; alle Adressen sind um zirka 40 Byte verschoben. Das hat zur Folge, daß bei der 2031/ 4031 einige Programme mit Direkteinsprüngen im DOS nicht das vorfinden, was sie erwarten. Außerdem müßten beide ROMs gewechselt werden.</p>
+        <p>Das Floppy-DOS ist in zwei ROMs untergebracht, das $C000-ROM und das $E000-ROM. Um die Hardware bedienen zu können, müssen die seriellen Routinen durch parallele ersetzt werden. Bei den Laufwerken 2031 und 4031 ist davon der gesamte Bereich betroffen; alle Adressen sind um zirka 40 Byte verschoben. Das hat zur Folge, daß bei der 2031/4031 einige Programme mit Direkteinsprüngen im DOS nicht das vorfinden, was sie erwarten. Außerdem müßten beide ROMs gewechselt werden.</p>
 
         <p>Bei unserem IEC-DOS bleibt der $C000-Bereich unangetastet. Die entsprechenden Routinen sind am Originalplatz eingebunden ($E853), sind aber etwas umfangreicher und belegen zusätzlich noch einige Bytes bei $E780 und $FF10. Bei dieser Gelegenheit wurde die Kopfbewegung verbessert und einige kleine Fehler im DOS beseitigt. Die Formatierungsroutine wurde im Originalzustand belassen.</p>
 
         <h2>Das Listing</h2>
 
-        <p>Das Generatorprogramm im Listing erwartet ein 1541-Laufwerk. Nach dem Starten wird das OriginalDOS ausgelesen und ab $5000 im C 64 abgelegt. Die Veränderungen werden anschließend mittels POKE-Schleife vorgenommen. Zum Schluß wird die aktuelle Prüfsumme berechnet und eingetragen.</p>
+        <p>Das Generatorprogramm im Listing erwartet ein 1541-Laufwerk. Nach dem Starten wird das Original-DOS ausgelesen und ab $5000 im C 64 abgelegt. Die Veränderungen werden anschließend mittels POKE-Schleife vorgenommen. Zum Schluß wird die aktuelle Prüfsumme berechnet und eingetragen.</p>
 
         <p>Das Programm fragt, ob das veränderte DOS abgespeichert werden soll. Wird diese Frage mit »J« beantwortet, so erzeugt es ein File mit dem Namen: 1541.IEEE-DOS.</p>
 
@@ -55,11 +55,11 @@
 
         <figure>
             <img src="144-2.png" alt="">
-            <figcaption>Bild 2. Der Schaltplan des lEEE-Interfaces</figcaption>
+            <figcaption>Bild 2. Der Schaltplan des IEEE-Interfaces</figcaption>
         </figure>
         <figure>
             <img src="144-3.png" alt="">
-            <figcaption>Bild 3. Der Bestückungsplan (Bestückungsseite)</figcaption>
+            <figcaption>Bild 3. <a href="#fehlerteufelchen" class="fehlerteufelchen_link">Der Bestückungsplan</a> (Bestückungsseite)</figcaption>
         </figure>
         <figure>
             <img src="144-4.png" alt="">
@@ -71,7 +71,7 @@
         </figure>
         <figure>
             <img src="144-6.png" alt="">
-            <figcaption>Bild 6. Die Beschaltung des lEEE-Kabels</figcaption>
+            <figcaption>Bild 6. Die Beschaltung des IEEE-Kabels</figcaption>
         </figure>
 
         <p>Die beiden Brücken auf der Leiterbahnseite sind für die Geräteadresse zuständig. Ihre Funktion ist analog zu den Brücken des 1541-Laufwerks, um Adresse 8 einzustellen, sind beide geschlossen.</p>
@@ -88,6 +88,14 @@
             <pre data-filename="ieee-generator" data-name="IEEE-DOS Generator"></pre>
             <figcaption>Das Generatorprogramm; es erzeugt das IEEE-DOS. Bitte mit dem Checksummer eingeben.</figcaption>
         </figure>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Im Bestückungsplan zum »1541-IEEE« (Bild 3) sind die Zahlen »13« und »24« an der Anschlußleiste vertauscht.</p>
+
+            <!-- 64'er 5/1986 -->
+        </aside>
     </article>
 </body>
 
