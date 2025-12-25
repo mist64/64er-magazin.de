@@ -26,105 +26,114 @@
 
         <h2>Der C 128 und unser Standard</h2>
 
-        <p>Der erste Befehl (»INIT«), der die Initialisierung der Grafik (Bitmap einrichten, löschen und Farbgebung) bewirken soll, ist so umzusetzen:<br>
-            COLOR 0,16 : COLOR 1,7 : COLOR 4,1 : GRAPHIC 1,1</p>
+        <p>Der erste Befehl (»INIT«), der die Initialisierung der Grafik (Bitmap einrichten, löschen und Farbgebung) bewirken soll, ist so umzusetzen:
+            <code>COLOR 0,16 : COLOR 1,7 : COLOR 4,1 : GRAPHIC 1,1</code>
+        </p>
 
         <p>Komplizierter wird es da leider beim »START«-Befehl. Dieser soll das Grafiksystem in einen definierten Ausgangszustand bringen. Der Ursprung des Bildschirmsystems soll nach »START« in der Ecke links unten liegen und in der Horizontalen müssen 320, in der Vertikalen 200 Bildkoordinaten zur Verfügung stehen. Leider ist auch der Grafikbildschirm des C 128 so eingerichtet, daß von links oben an gezählt wird und die Y-Achse nach unten zeigt. Der »SCALE«-Befehl im Basic 7.0 erlaubt zwar die Skalierung der beiden Achsen bis zu Maximalwerten von 32767 (im Gegensatz zu den Angaben im Handbuch, wo maximal 1023 erwähnt sind). Es gibt aber keine Möglichkeit, das Koordinatensystem zu verschieben. Man muß sich also leider wieder mit einer Transformation begnügen, was — solange wir dazu nicht wieder ein Assemblerprogramm haben wie in HIRES-3 — natürlich Rechenzeit beansprucht.</p>
 
-        <p>In Listing 1 finden Sie ein kleines Unterprogramm, das — ausgehend von den schon aus HIRES-3 bekannten Systemgrenzwerten XU,XO,YU und YO (kleinste/größte X-, beziehungsweise Y-Koordinate) — aus den eingegebenen Koordinaten X und Y die Bildschirmkoordinaten XX und YY berechnet. Nun ist es relativ einfach, durch Festlegung dieser Systemgrenzwerte den Befehl »START« zu realisieren:<br>
-            XU = 0 : XO = 319 : YU = 0 : YO = 199</p>
+        <p>In Listing 1 finden Sie ein kleines Unterprogramm, das — ausgehend von den schon aus HIRES-3 bekannten Systemgrenzwerten XU,XO,YU und YO (kleinste/größte X-, beziehungsweise Y-Koordinate) — aus den eingegebenen Koordinaten X und Y die Bildschirmkoordinaten XX und YY berechnet. Nun ist es relativ einfach, durch Festlegung dieser Systemgrenzwerte den Befehl »START« zu realisieren:
+            <code>XU=0 : XO=319 : YU=0 : YO=199</code>
+        </p>
 
-        <p>Ebenfalls mit Hilfe des Transformations-Unterprogrammes kann die Grafikanweisung »MITTE« übersetzt werden durch Definieren von:<br>
-            XU = -160 : XO = 160 : YU = -100 : YG = 100</p>
+        <p>Ebenfalls mit Hilfe des Transformations-Unterprogrammes kann die Grafikanweisung »MITTE« übersetzt werden durch Definieren von:
+            <code>XU=-160 : XO=160 : YU=-100 : YG=100</code>
+        </p>
 
-        <p>Durch die Notwendigkeit der Transformation muß nun jede weitere Punktkoordinate vor dem jeweiligen Grafikbefehl durch unser Unterprogramm laufen. Der Grafik-Befehl »PUNKT (X,Y)« lautet dann:<br>
-            GOSUB 1020 : DRAW l,XX,YY</p>
+        <p>Durch die Notwendigkeit der Transformation muß nun jede weitere Punktkoordinate vor dem jeweiligen Grafikbefehl durch unser Unterprogramm laufen. Der Grafik-Befehl »PUNKT (X,Y)« lautet dann:
+            <code>GOSUB 1020 : DRAW 1,XX,YY</code>
+        </p>
 
-        <p>Für »LINIE (XA,YA,XB,YB)« steht beim C 128:<br>
-            X = XA : Y=YA : GOSUB 1020 : X1 = XX : Y1=YY<br>
-            X = XB : Y=YB : GOSUB 1020 : X2=XX:Y2=YY<br>
-            DRAW 1,X1,Y1 TO X2,Y2</p>
+        <p>Für »LINIE (XA,YA,XB,YB)« steht beim C 128:
+            <code>X=XA : Y=YA : GOSUB 1020 : X1=XX : Y1=YY
+            X = XB : Y=YB : GOSUB 1020 : X2=XX : Y2=YY
+            DRAW 1,X1,Y1 TO X2,Y2</code>
+        </p>
 
-        <p>Für »KREIS (XM,YM,RX,RY> muß der Mittelpunkt anders transformiert werden als die Halbmesser:<br>
-            X = XM : Y=YM : GOSUB 1020 : X5 = XX: Y5=YY<br>
-            RX = RX*319/(XO-XU) : RY=RY*199/(YO-YU) CIRCLE l,X5,Y5,RX,RY</p>
+        <p>Für »KREIS (XM,YM,RX,RY> muß der Mittelpunkt anders transformiert werden als die Halbmesser:
+            X=XM : Y=YM : GOSUB 1020 : X5=XX: Y5=YY
+            RX=RX*319/(XO-XU) : RY=RY*199/(YO-YU)
+            CIRCLE 1,X5,Y5,RX,RY</p>
 
-        <p>Die weiteren Übersetzungen:<br>
-            TEXT (A$,XT,YT) entspricht CHAR 1,XT,YT,A$<br>
-            SHOW entspricht GRAPHIC1<br>
-            NORMAL entspricht GRAPHIC0<br>
-            GRESET entspricht SCNCLR(1)</p>
+        <p>Die weiteren Übersetzungen:</p>
+
+        <ul class="plain">
+            <li>TEXT (A$,XT,YT) entspricht CHAR 1,XT,YT,A$</li>
+            <li>SHOW entspricht GRAPHIC1</li>
+            <li>NORMAL entspricht GRAPHIC0</li>
+            <li>GRESET entspricht SCNCLR(1)</li>
+        </ul>
 
         <p>Damit ergeben sich die C 128-Versionen der beiden Programme aus der letzten Folge (Fensterrose und Spiralen), die hier als Listing 2 und Listing 3 abgedruckt sind.</p>
 
         <p>In Tabelle 1 finden Sie eine Übersicht über alle Grafikbefehle und ihre Übersetzungen in die drei Systeme: C 64 + HIRES-3, Plotter 1520, C 128 Basic 7.0.</p>
 
         <figure>
-            <table>
-                <tr>
-                    <td><b>Befehl</b></td>
-                    <td><b>HIRES-3<br>auf C 64</b></td>
-                    <td><b>Plotter 1520</b></td>
-                    <td><b>C 128 Basic 7.0</b></td>
+            <table class="plain">
+                <tr class="separator strong">
+                    <td>Befehl</td>
+                    <td class="center">HIRES-3 auf C 64</td>
+                    <td class="center">Plotter 1520</td>
+                    <td class="center">C 128 Basic 7.0</td>
                 </tr>
-                <tr>
-                    <td><b>INIT</b></td>
-                    <td>POKE 53280,0:<br>SYS37498:<br>HFL,6,12</td>
-                    <td>OPEN1,6,1:OPEN2,6,2:<br>PRINT # 2,0:CLOSE2</td>
-                    <td>COLOR,16:COLOR1,7:<br>COLOR4,1:GRAPHIC1,1</td>
+                <tr class="separator">
+                    <td>INIT</td>
+                    <td>POKE 53280,0:SYS37498:HFL,6,12</td>
+                    <td>OPEN1,6,1:OPEN2,6,2:PRINT#2,0:CLOSE2</td>
+                    <td>COLOR,16:COLOR1,7:COLOR4,1:GRAPHIC1,1</td>
                 </tr>
-                <tr>
-                    <td><b>START</b></td>
+                <tr class="separator">
+                    <td>START</td>
                     <td>TRS,0,320,0,200</td>
-                    <td>PRINT # 1,"M",0,-200:<br>PRINT # 1,"J"</td>
-                    <td>XU=0:XO=319:YU=0:YO=199<br>Bezogen auf das<br>UP Transformation</td>
+                    <td>PRINT#1,"M",0,-200:PRINT#1,"J"</td>
+                    <td>XU=0:XO=319:YU=0:YO=199<br>Bezogen auf das UP Transformation</td>
                 </tr>
-                <tr>
-                    <td><b>MITTE</b></td>
-                    <td>TRS,-160,160,<br>-100,100</td>
-                    <td>PRINT # 1,"R",240,0:<br>PRINT # 1,"J"</td>
-                    <td>XU=-160:XO=160:YU=-100:<br>YO=100 Bezogen auf das<br>UP Transformation</td>
+                <tr class="separator">
+                    <td>MITTE</td>
+                    <td>TRS,-160,160,-100,100</td>
+                    <td>PRINT#1,"R",240,0:PRINT#1,"J"</td>
+                    <td>XU=-160:XO=160:YU=-100:YO=100<br>Bezogen auf das UP Transformation</td>
                 </tr>
-                <tr>
-                    <td><b>PUNKT (X,Y)</b></td>
+                <tr class="separator">
+                    <td>PUNKT (X,Y)</td>
                     <td>TPK,X,Y</td>
-                    <td>PRINT # 1,"R",X,Y:PRINT # 1,<br>"J",X+2,Y+2:PRINT # 1,"R",X,Y</td>
+                    <td>PRINT#1,"R",X,Y:PRINT#1,"J",X+2,Y+2:PRINT#1,"R",X,Y</td>
                     <td>GOSUB 1020:DRAW1,XX,YY<br>UP Transformation ab 1020</td>
                 </tr>
-                <tr>
-                    <td><b>LINE<br>(XA,YA,XB,YB)</b></td>
-                    <td>TLN,XA,YA,<br>XB,YB</td>
-                    <td>PRINT #,"R",XA,YA:<br>PRINT # 1,"J",XB,YB</td>
-                    <td>X=XA:Y=YA:GOSUB 1020:XF<br>=XX:Y1=YY:X=XB:Y=YB:<br>GOSUB 1020:X2=XX:Y2=YY:<br>DRAW1,X1,Y1 TO X2,Y2<br>UP Transformation ab 1020</td>
+                <tr class="separator">
+                    <td>LINE (XA,YA,XB,YB)</td>
+                    <td>TLN,XA,YA,XB,YB</td>
+                    <td>PRINT#,"R",XA,YA:PRINT#1,"J",XB,YB</td>
+                    <td>X=XA:Y=YA:GOSUB 1020:XF=XX:Y1=YY:X=XB:Y=YB:GOSUB 1020:X2=XX:Y2=YY:DRAW1,X1,Y1 TO X2,Y2<br>UP Transformation ab 1020</td>
                 </tr>
-                <tr>
-                    <td><b>KREIS<br>(XM,YM,RX,RY)</b></td>
-                    <td>TKR,XM,YM,RX,<br>RY,2*&pi;</td>
-                    <td>PROGRAMM:<br>M=50:D=360 &cdot; &pi; /(M &cdot; 180):<br>DIMT(M):T(O)=2 &cdot; &pi;:<br>FORJ=1 TO M:T(J)=T(J-1)+D:<br>PRINT # 1,"R",RX &cdot; COS(T(J-1))<br>+XM,RY &cdot; SIN(T(J-1))+YM:<br>PRINT # 1,"J",RX &cdot; COS(T(J))<br>+XM,RY &cdot; SIN(T(J))+YM:NEXTJ</td>
-                    <td>X=XM:Y=YM:GOSUB 1020:X5<br>=XX:Y5=YY:RX= &cdot; 319/<br>(XO-XU):RY=RY &cdot; 199/(YO-YU):<br>CIRCLE1,X5,Y5,RX,RY<br>UP Transformation ab 1020</td>
+                <tr class="separator">
+                    <td>KREIS (XM,YM,RX,RY)</td>
+                    <td>TKR,XM,YM,RX,RY,2*&pi;</td>
+                    <td>PROGRAMM:<br>M=50:D=360&sdot;&pi;/(M&sdot;180):DIMT(M):T(O)=2&sdot;&pi;:FORJ=1 TO M:T(J)=T(J-1)+D:PRINT#1,"R",RX&sdot;COS(T(J-1))+XM,RY&sdot;SIN(T(J-1))+YM:PRINT#1,"J",RX&sdot;COS(T(J))+XM,RY&sdot;SIN(T(J))+YM:NEXTJ</td>
+                    <td>X=XM:Y=YM:GOSUB 1020:X5=XX:Y5=YY:RX=&sdot;319/(XO-XU):RY=RY&sdot;199/(YO-YU):CIRCLE1,X5,Y5,RX,RY<br>UP Transformation ab 1020</td>
                 </tr>
-                <tr>
-                    <td><b>TEXT (A$,XT,YT)</b></td>
+                <tr class="separator">
+                    <td>TEXT (A$,XT,YT)</td>
                     <td>TEX,A$,YT,XT</td>
-                    <td>OPEN4,6:PRINT # 1,"R",XT,YT:<br>PRINT # 4,A$:CLOSE4:<br>PRINT # 1,"M",240,-YT:<br>PRINT # 1,"J"</td>
+                    <td>OPEN4,6:PRINT#1,"R",XT,YT:PRINT#4,A$:CLOSE4:PRINT#1,"M",240,-YT:PRINT # 1,"J"</td>
                     <td>CHAR1,XT,YT,A$</td>
                 </tr>
-                <tr>
-                    <td><b>SHOW</b></td>
+                <tr class="separator">
+                    <td>SHOW</td>
                     <td>HAN</td>
-                    <td>PRINT # 1,"R",O,-200</td>
+                    <td>PRINT#1,"R",O,-200</td>
                     <td>GRAPHIC1</td>
                 </tr>
-                <tr>
-                    <td><b>NORMAL</b></td>
+                <tr class="separator">
+                    <td>NORMAL</td>
                     <td>HOF</td>
                     <td>CLOSE1</td>
                     <td>GRAPHIC0</td>
                 </tr>
                 <tr>
-                    <td><b>GRESET</b></td>
+                    <td>GRESET</td>
                     <td>LOE:AUS</td>
-                    <td>OPEN7,6,7:PRINT # 7:CLOSE7</td>
+                    <td>OPEN7,6,7:PRINT#7:CLOSE7</td>
                     <td>SCNCLR(1)</td>
                 </tr>
             </table>
@@ -139,25 +148,30 @@
 
         <p>Die Frage ist, ob das wünschenswert erscheint. Dazu einige Erklärungen: Man kann grob zwei grundlegende Arten von Grafik-Befehlen unterscheiden, nämlich einmal mit und einmal ohne einen Grafik-Cursor. Im ersten Fall gleitet der »Zeichenstift« immer von der aktuellen Position des — häufig nur gedachten — Cursors zeichnend oder nicht zeichnend zur angegebenen neuen Position. Im anderen Fall existiert solch eine Cursorposition nicht. Alle Größen, die zur Ausführung eines Befehls wie LINIE nötig sind, werden mit diesem als Argument übergeben.</p>
 
-        <p>Im CORE-System (auch im GKS) gibt es beispielsweise folgende Befehle:<br>
-            LINE-ABS-2(X,Y):</p>
+        <p>Im CORE-System (auch im GKS) gibt es beispielsweise folgende Befehle:</p>
 
-        <p>Zieht eine Linie von der aktuellen Cursorposition bis X,Y. Die 2 kommt von 2D, also einem ebenen Koordinatensystem mit zwei Achsen.<br>
-            LINE-REL-2(DX,DY):</p>
+        <ul class="plain">
+            <li><code>LINE-ABS-2(X,Y):</code>
+                <p>Zieht eine Linie von der aktuellen Cursorposition bis X,Y. Die 2 kommt von 2D, also einem ebenen Koordinatensystem mit zwei Achsen.</p>
+            </li>
+            <li><code>LINE-REL-2(DX,DY):</code>
+                <p>Zieht von der Cursorposition aus eine Linie zu einem Punkt, dessen Koordinaten um DX und DY von der Cursorposition verschieden sind.</p>
+            </li>
+            <li><code>MOVE-ABS-2(X,Y):</code>
+                <p>Der Cursor wird nicht-zeichnend von der aktuellen Position zum Punkt X,Y bewegt.</p>
+            </li>
+            <li><code>MOVE-REL-2(DX,DY):</code>
+                <p>Wie beim entsprechenden LINE-Befehl, aber nicht zeichnend.</p>
+            </li>
+        </ul>
 
-        <p>Zieht von der Cursorposition aus eine Linie zu einem Punkt, dessen Koordinaten um DX und DY von der Cursorposition verschieden sind.<br>
-            MOVE-ABS-2(X,Y):</p>
-
-        <p>Der Cursor wird nicht-zeichnend von der aktuellen Position zum Punkt X,Y bewegt.<br>
-            MOVE-REL-2(DX,DY):</p>
-
-        <p>Wie beim entsprechenden LINE-Befehl, aber nicht zeichnend.</p>
-
-        <p>Auf dem C 128 können wir auch diese Art der Grafikprogrammierung durchführen. Die Entsprechungen wären (in der gleichen Reihenfolge):<br>
-            DRAW1 TO X,Y<br>
-            DRAW1 TO (RDOT(0) + DX), (RDOT (1) + DY)<br>
-            LOCATE X,Y<br>
-            LOCATE (RDOT(0) + DX), (RDOT (1) + DY)</p>
+        <p>Auf dem C 128 können wir auch diese Art der Grafikprogrammierung durchführen. Die Entsprechungen wären (in der gleichen Reihenfolge):
+            <code>DRAW1 TO X,Y
+                DRAW1 TO (RDOT(0)+DX), (RDOT(1)+DY)
+                LOCATE X,Y
+                LOCATE (RDOT(0)+DX), (RDOT(1)+DY)
+            </code>
+        </p>
 
         <p>Sehen wir uns den Unterschied am Beispiel in Bild 1 an, wo ein Haus auf den normalen Commodore-Bildschirm gezeichnet werden soll.</p>
 
@@ -166,25 +180,30 @@
             <figcaption>Bild 1. Ein Haus soll gezeichnet werden</figcaption>
         </figure>
 
-        <p>Dem CORE-System nachgebildet, würden die Befehle folgendermaßen lauten:<br>
-            LOCATE 50,50<br>
-            DRAW1 TO 50,80<br>
-            DRAW1 TO 110,80<br>
-            DRAW1 TO 110,50<br>
-            DRAW1 ,30<br>
-            DRAW1 TO 50,50</p>
+        <p>Dem CORE-System nachgebildet, würden die Befehle folgendermaßen lauten:
+            <code>LOCATE 50,50
+                DRAW1 TO 50,80
+                DRAW1 TO 110,80
+                DRAW1 TO 110,50
+                DRAW1 ,30
+                DRAW1 TO 50,50
+            </code>
+        </p>
 
-        <p>In unserer Grafiksprache müßten wir schreiben:<br>
-            LINIE (50,50,50,80)<br>
-            LINIE (50,80,110,80)<br>
-            LINIE (110,80,110,50)<br>
-            LINIE (110,50,80,30)<br>
-            LINIE (80,30,50,50)</p>
+        <p>In unserer Grafiksprache müßten wir schreiben:
+            <code>LINIE (50,50,50,80)
+                LINIE (50,80,110,80)
+                LINIE (110,80,110,50)
+                LINIE (110,50,80,30)
+                LINIE (80,30,50,50)
+            </code>
+        </p>
 
         <p>Schon in diesem Beispiel, wo die für das CORE-System günstigeren miteinander verbundenen Linien zu zeichnen sind, haben wir einen Befehl mehr zu verarbeiten. Ganz deutlich tritt der Unterschied zutage, wenn nicht verbundene Strecken zu zeichnen sind. Dann muß vor jeden DRAW-Befehl ein LOCATE treten, das den Cursor auf den Startpunkt einer Linie setzt. Das kostet die auf einem 8-Bit-Computer arbeitenden Grafiksysteme wertvolle Zeit.</p>
 
-        <p>Nebenbei sei noch bemerkt, daß das Basic 7.0 seinem DRAW-Befehl ein Zwitterdasein verliehen hat, wie Sie aus dem Vergleich der Übersetzung für den LINIE-Befehl und den CORE-Befehlen ersehen konnten. Das obige Programmproblem läßt sich beim C 128 sogar in einem Befehl erledigen:<br>
-            DRAW 1,50,50TC50,80TO 110,80 TO 110,50 TO 80,30 TO 50,50</p>
+        <p>Nebenbei sei noch bemerkt, daß das Basic 7.0 seinem DRAW-Befehl ein Zwitterdasein verliehen hat, wie Sie aus dem Vergleich der Übersetzung für den LINIE-Befehl und den CORE-Befehlen ersehen konnten. Das obige Programmproblem läßt sich beim C 128 sogar in einem Befehl erledigen:
+            <code>DRAW 1,50,50 TO 50,80 TO 110,80 TO 110,50 TO 80,30 TO 50,50</code>
+        </p>
 
         <p>Aus Gründen der Rechenzeiten, der besseren Überschaubarkeit eines Befehles und weil es einfach zu kompliziert wäre, HIRES-3 cursororientiert zu gestalten, wurde die cursorfreie Methode für unsere allgemeinen Grafikbefehle gewählt.</p>
 
@@ -219,7 +238,7 @@
             <tr>
                 <td>Dimension 2:</td>
                 <td>Fläche</td>
-                <td>Länge<br>Breite</td>
+                <td>Länge, Breite</td>
             </tr>
             <tr>
                 <td>Dimension 3:</td>
@@ -268,7 +287,7 @@
             <figcaption>Bild 7. Rechtshändigkeit eines Systems</figcaption>
         </figure>
 
-        <p>Nun erkennen Sie vielleicht schon, daß Commodore uns ein reichlich ungebräuchliches Koordinatensystem beschert hat: Es ist nämlich linkshändig aufgebaut. Außerdem ist die Skala sowohl auf der X-, als auch auf der Y-Achse sehr unpraktisch, denn Punkte wie zum Beispiel Pl(-1,4) oder P2(3,-5) und P3(-12,-3) können nicht gezeichnet werden, und ein Versuch, das trotzdem zu tun, endet mit einer Fehlermeldung.</p>
+        <p>Nun erkennen Sie vielleicht schon, daß Commodore uns ein reichlich ungebräuchliches Koordinatensystem beschert hat: Es ist nämlich linkshändig aufgebaut. Außerdem ist die Skala sowohl auf der X-, als auch auf der Y-Achse sehr unpraktisch, denn Punkte wie zum Beispiel P1(-1,4) oder P2(3,-5) und P3(-12,-3) können nicht gezeichnet werden, und ein Versuch, das trotzdem zu tun, endet mit einer Fehlermeldung.</p>
 
         <p>Weiterhin sollten wir uns überlegen, daß Computergrafik für die verschiedensten Zwecke gebraucht wird: Ein Architekt will den Grundriß eines Hauses zeichnen, das in Richtung Norden 15 Meter und in Richtung Osten 18 Meter Ausdehnung besitzt. Ein Geschäftsmann möchte im Rahmen einer Kosten-/Nutzen-Analyse ein Diagramm erstellen, das Arbeitsaufwand in Stunden gegen produzierte Menge eines Artikels aufzeigt. Ein Ökologe zeichnet ein Schaubild, welches die zahlenmäßige Entwicklung der Weltbevölkerung in den letzten 50 Jahren darstellen soll. Kurz: Jeder von Ihnen benötigt ein anderes Koordinatensystem. Diese Art Koordinaten nennt man häufig die »Benutzerkoordinaten« und weil jeder Benutzer etwas aus einer 2D- oder 3D-Welt grafisch zeigen möchte, hat sich auch der Ausdruck »Weltkoordinaten« eingebürgert.</p>
 
