@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-    <title>Memory Map mit Wandervorschlägen</title>
+    <title>Memory Map mit Wandervorschlägen (14)</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="Dr. Helmuth Hauck, ah">
@@ -19,7 +19,7 @@
 
 <body>
     <article>
-        <h1>Memory Map mit Wandervorschlägen</h1>
+        <h1>Memory Map mit Wandervorschlägen (14)</h1>
         <p class="intro">Heute geht es um die Speicherzellen 256 bis 645. Sie entnalten den Stapelspeicher und neben vielen nützlichen Adressen den Tastaturpuffer.</p>
 
         <p>Der Speicherbereich von 256 bis 511 wird von den meisten Home-Computern zur Speicherung von Adressen und Daten bei Programm-Unterbrechungen und -Verzweigungen verwendet. Warum gerade dieser Bereich dafür genommen wird, und wie dieser Speicher funktioniert, können Sie dem Texteinschub »Der Stapelspeicher« entnehmen.</p>
@@ -86,40 +86,51 @@
 
         <p>In jeder Tabelle können also maximal 10 Byte stehen. Sie haben folgende Zusammensetzung:</p>
 
-        <table class="plain">
-            <tr>
-                <td>601 bis 610</td>
-                <td>Tabelle der File-Nummern</td>
-            </tr>
-            <tr>
-                <td>611 bis 620</td>
-                <td>Tabelle der Geräte-Nummern</td>
-            </tr>
-            <tr>
-                <td>621 bis 630</td>
-                <td>Tabelle der Sekundär-Adressen</td>
-            </tr>
-        </table>
+        <aside>
+            <table class="plain">
+                <tr>
+                    <td>601 bis 610</td>
+                    <td>Tabelle der File-Nummern</td>
+                </tr>
+                <tr>
+                    <td>611 bis 620</td>
+                    <td>Tabelle der Geräte-Nummern</td>
+                </tr>
+                <tr>
+                    <td>621 bis 630</td>
+                    <td>Tabelle der Sekundär-Adressen</td>
+                </tr>
+            </table>
+        </aside>
+
 
         <p>Die drei Angaben über eine eröffnete Datei stehen in den Tabellen jeweils am gleichen Platz. Wenn also die Datei Nummer 5 als dritte Datei eröffnet worden ist, steht eine 5 in Zelle 603, ihre Gerätenummer in Zelle 613, die Sekundär-Adresse entsprechend in Zelle 623.</p>
 
         <p>Immer wenn eine neue Datei eröffnet wird, kommen diese Angaben auf die nächsten Plätze der Tabellen und der Inhalt der Speicherzelle 152 wird um 1 erhöht. Wird dagegen eine Datei geschlossen, dann rücken alle Angaben dahinter um eine Stelle zurück.</p>
 
-        <p>In diesen Tabellen kann nachgesehen werden, mit welchen Parametern Dateien eröffnet worden sind. Eine sehr interessante Anwendung, die den Vorschlag der beiden Autoren hier zitieren,wurde veröffentlicht [2].</p>
+        <p>In diesen Tabellen kann nachgesehen werden, mit welchen Parametern Dateien eröffnet worden sind. Eine sehr interessante Anwendung, die den Vorschlag der beiden Autoren hier zitieren, wurde veröffentlicht [2].</p>
 
         <p>Eine Änderung der Filenummern in Tabelle 601 bis 610 ist nicht empfehlenswert, um Verwechslungen zu vermeiden.</p>
 
         <p>Mit dem folgenden kleinen Programm, welches bei einer eröffneten Datei die Geräte-Nummer in Tabelle 611 bis 620 ändert, kann zwischen einem Drucker mit Geräte-Nummer 4 und einem Plotter mit Geräte-Nummer 6 umgeschaltet werden.</p>
 
-        <p>10 OPEN 4,4,0<br>
-            20 POKE611,6: PRINT#4,"PLOTTER"<br>
-            30 POKE 611,4: PRINT#4, "DRUCKER"</p>
+        <aside>
+            <table class="plain">
+                <tr><td>10</td><td>OPEN 4,4,0</td></tr>
+                <tr><td>20</td><td>POKE 611,6: PRINT#4,"PLOTTER"</td></tr>
+                <tr><td>30</td><td>POKE 611,4: PRINT#4, "DRUCKER"</td></tr>
+            </table>
+        </aside>
 
         <p>Ähnliches ist mit den Sekundär-Adressen möglich. Dabei muß man allerdings wissen, daß die Sekundär-Adressen nicht so wie sie sind in der Tabelle 621 bis 630 gespeichert werden, sondern mit »OR 96« verknüpft. Dasselbe müssen wir auch machen:</p>
 
-        <p>10 OPEN 3,4,0<br>
-            20 POKE 621,0 OR96:PRINT#3,"GRAFIKMODUS"<br>
-            30 POKE 621,7 OR96:PRINT#3,"TEXTMODUS"</p>
+        <aside>
+            <table class="plain">
+                <tr><td>10</td><td>OPEN 3,4,0</td><td></td></tr>
+                <tr><td>20</td><td>POKE 621,0</td><td>OR 96:PRINT#3, "GRAFIKMODUS"</td></tr>
+                <tr><td>30</td><td>POKE 621,7</td><td>OR 96:PRINT#3, "TEXTMODUS"</td></tr>
+            </table>
+        </aside>
 
         <p>Mit dieser Methode können Sie sich das Öffnen und Schließen vieler Dateien ersparen.</p>
 
@@ -141,7 +152,7 @@
 
         <h3>Zeiger auf den Anfang des Programmspeichers</h3>
 
-        <p>Wenn der Computer eingeschaltet wird oder wenn mit einer Reset-Taste beziehungsweise mit SYS58260 (VC 20: SYS 58232) ein Kaltstart ausgelöst wird, setzt das Betriebssystem diesen Zeiger auf die Adresse des ersten freien RAM-Speicherplatzes.</p>
+        <p>Wenn der Computer eingeschaltet wird oder wenn mit einer Reset-Taste beziehungsweise mit SYS58260 (VC 20: SYS58232) ein Kaltstart ausgelöst wird, setzt das Betriebssystem diesen Zeiger auf die Adresse des ersten freien RAM-Speicherplatzes.</p>
 
         <p>Beim C 64 ist dies die Adresse 2048. Beim VC 20 hängt sie von der Speichererweiterung ab; ohne Erweiterung ist es 4096, mit einer 3-KByte-Erweiterung dagegen 1024, mit 8 KByte oder mehr ist die Adresse 4608.</p>
 
@@ -151,7 +162,7 @@
 
         <h3>Zeiger auf das Ende des Programmspeichers</h3>
 
-        <p>Dieser Zeiger ist der Zwilling zu dem anderen Zeiger in 641/ 642. Er wird vom Betriebssystem auf die Adresse gesetzt, welche beim Kaltstart beziehungsweise der dabei durchgeführten Prüfung des Speichers den letzten verfügbaren RAM-Speicherplatz angibt. Beim C 64 ist diese Adresse normalerweise 40960 ($A000), beim VC 20 ohne Erweiterung 7680.</p>
+        <p>Dieser Zeiger ist der Zwilling zu dem anderen Zeiger in 641/642. Er wird vom Betriebssystem auf die Adresse gesetzt, welche beim Kaltstart beziehungsweise der dabei durchgeführten Prüfung des Speichers den letzten verfügbaren RAM-Speicherplatz angibt. Beim C 64 ist diese Adresse normalerweise 40960 ($A000), beim VC 20 ohne Erweiterung 7680.</p>
 
         <p>Dieser Zeiger wird vom Basic-Übersetzer in die Speicherzelle 55 übernommen.</p>
 
@@ -214,22 +225,26 @@
 
             <h3>Zeile in ein Programm einfügen</h3>
 
-            <p>Die folgende Methode ermöglicht die Veränderung eines Programms durch sich selbst. Genauer gesagt, man kann damit Programmzeilen einfügen. Nehmen wir an, Sie haben folgendes Teilprogramm:</p>
-
-            <p>150 PRINT"BITTE TASTE DRUECKEN"<br>
-                160 GET A$:IF A$ = ""THEN 160<br>
-                170 IF A$ &lt; > "E" THEN 150<br>
-                180 END<br>
-                500 PRINT ’’NAECHSTER TEIL"</p>
+            <p>Die folgende Methode ermöglicht die Veränderung eines Programms durch sich selbst. Genauer gesagt, man kann damit Programmzeilen einfügen. Nehmen wir an, Sie haben folgendes Teilprogramm:
+                <code class="strong">150 PRINT"BITTE TASTE DRUECKEN"
+                    160 GET A$:IF A$ = ""THEN 160
+                    170 IF A$ &lt;&gt; "E" THEN 150
+                    180 END
+                    &hellip;
+                    &hellip;
+                    500 PRINT "NAECHSTER TEIL"
+                </code>
+            </p>
 
             <p>Die ersten vier Zeilen warten so lange, bis die E-Taste gedrückt wird, dann bleibt das Programm mit READY stehen.</p>
 
-            <p>Wir wollen nun eine zusätzliche Zeile 165 durch das Programm einfügen lassen, mit der nicht beendet, sondern durch Drücken der Q-Taste auf die Zeile 500 gesprungen wird. Das erreichen wir durch folgende Zeilen:</p>
-
-            <p>172 PRINT CHR$(147)<br>
-                174 PRINT "165 IF A$ = CHR$(81) THEN 500"<br>
-                176 PRINT "GOTO 150"<br>
-                178 POKE 631,19:POKE 632,13:POKE 633,13: POKE 634,13:POKE 198,4</p>
+            <p>Wir wollen nun eine zusätzliche Zeile 165 durch das Programm einfügen lassen, mit der nicht beendet, sondern durch Drücken der Q-Taste auf die Zeile 500 gesprungen wird. Das erreichen wir durch folgende Zeilen:
+                <code class="strong">172 PRINT CHR$(147)
+                    174 PRINT "165 IF A$ = CHR$(81) THEN 500"
+                    176 PRINT "GOTO 150"
+                    178 POKE 631,19:POKE 632,13:POKE 633,13: POKE 634,13:POKE 198,4
+                </code>
+            </p>
 
             <p>Wenn jetzt die E-Taste gedrückt wird, löscht Zeile 172 den Bildschirm, Zeile 174 druckt in die zweite Bildschirmzeile die neue Programmzeile 165 und Zeile 176 darunter ohne Zeilennummer den Direktbefehl GOTO 150. In den Tastaturpuffer werden nacheinander die Werte für HOME und dreimal RETURN eingegeben und die Anzahl der Zeichen im Puffer auf 4 begrenzt.</p>
 
@@ -239,15 +254,16 @@
 
             <h3>Zeile verändern oder löschen</h3>
 
-            <p>Diese Methode habe ich von S. Leemon [1] übernommen. Sie funktioniert im Prinzip genauso wie das Einfügen von Zeilen. Die Programmzeilen sind durch REMs erklärt. Probieren Sie es aus.</p>
-
-            <p>10 REM - DIESE ZEILE WIRD GELÖSCHT<br>
-                20 PRINT CHR$(147):PRINT:PRINT<br>
-                30 PRINT "60 LIST"<br>
-                40 PRINT "10"<br>
-                50 PRINT "GOTO 70" CHR$(19)<br>
-                60 FOR 1 = 631 TO 633:POKE I,13:NEXT: POKE 198,3:END<br>
-                70 REM - DIESE ZEILE WIRD ERSETZT</p>
+            <p>Diese Methode habe ich von S. Leemon [1] übernommen. Sie funktioniert im Prinzip genauso wie das Einfügen von Zeilen. Die Programmzeilen sind durch REMs erklärt. Probieren Sie es aus.
+                <code class="strong">10 REM - DIESE ZEILE WIRD GELÖSCHT
+                    20 PRINT CHR$(147):PRINT:PRINT
+                    30 PRINT "60 LIST"
+                    40 PRINT "10"
+                    50 PRINT "GOTO 70" CHR$(19)
+                    60 FOR 1 = 631 TO 633:POKE I,13:NEXT: POKE 198,3:END
+                    70 REM - DIESE ZEILE WIRD ERSETZT
+                </code>
+            </p>
 
             <p>Diese Verfahren, Zeilen eines Programms während des Laufs eines Programms zu ändern, haben sicher für einfache Programme keine große Bedeutung. Ich bin aber fest davon überzeugt, daß sie bei Programmen, die selbst lernen können, eine wichtige Rolle spielen. Nur habe ich hier jetzt noch kein gutes Demonstrationsbeispiel.</p>
 
@@ -257,24 +273,29 @@
 
             <p>Mit dem Tastaturpuffer aber geht es, und zwar sehr elegant.</p>
 
-            <p>Der vergebliche Versuch sieht so aus:</p>
-
-            <p>150 PRINT ’’FORMEL EINGEBEN"<br>
-                160 INPUT"FQO=";A$<br>
-                250 DEFFNAQO=A$<br>
-                260 PRINT FNA(9)<br>
-                270 GOTO 150</p>
+            <p>Der vergebliche Versuch sieht so aus:
+                <code class="strong">150 PRINT "FORMEL EINGEBEN"
+                    160 INPUT"F(X)=";A$
+                    &hellip;
+                    250 DEF FNA(X)=A$
+                    260 PRINT FNA(9)
+                    270 GOTO 150
+                </code>
+            </p>
 
             <p>Der STRING A$, in Zeile 160 eingegeben, wird von Zeile 250 nicht übernommen. Zeile 250 können Sie so nicht verwenden, also löschen Sie sie bitte.</p>
 
-            <p>Sie können diese Zeile aber vom Programm einfügen lassen:</p>
-
-            <p>170 PRINT CHR$(147):PRINT:PRINT<br>
-                180 PRINT "250 DEF FNA(X)=";A$<br>
-                190 PRINT "GOTO 240"<br>
-                200 PRINT CHR$(19)<br>
-                210 POKE 631,13: POKE 632,13: POKE 198,2: END<br>
-                240 REM - FORMELBERECHNUNG -</p>
+            <p>Sie können diese Zeile aber vom Programm einfügen lassen:
+                <code class="strong">170 PRINT CHR$(147):PRINT:PRINT
+                    180 PRINT "250 DEF FNA(X)=";A$
+                    190 PRINT "GOTO 240"
+                    200 PRINT CHR$(19)
+                    210 POKE 631,13: POKE 632,13: POKE 198,2: END
+                    &hellip;
+                    &hellip;
+                    240 REM - FORMELBERECHNUNG -
+                </code>
+            </p>
 
             <p>Wenn Sie nicht genau nachvollziehen können, was da vorgeht, empfehle ich Ihnen, an das Ende der Zeile 200 noch ein END anzuhängen. Dann bleibt das Programm dort stehen, Sie sehen, wo der Cursor steht und können dann die Wirkung der Zeile 210 in Ruhe überlegen.</p>
 
@@ -282,39 +303,39 @@
 
             <h3>Einfügen von DATA-Zeilen</h3>
 
-            <p>Die Aufgabe besteht darin, aus einem auszuwählenden Speicherbereich — dort, wo die in Frage kommende Routine sitzt — den Maschinencode herauszuPEEKen und mit der inzwischen bekannten Methode in eine DATA-Zeile einzufügen. Ich gehe schrittweise vor:</p>
-
-            <p>20 PRINT CHR$(147): PRINT: PRINT<br>
-                30 PRINT "5555 DATA";<br>
-                50 FORA=0TO3<br>
-                60 PRINT PEEK(A)", ";:NEXT<br>
-                70 PRINT CHR$(19)<br>
-                80 POKE 631, 13: POKE 632,13: POKE 198,2: END</p>
+            <p>Die Aufgabe besteht darin, aus einem auszuwählenden Speicherbereich — dort, wo die in Frage kommende Routine sitzt — den Maschinencode herauszuPEEKen und mit der inzwischen bekannten Methode in eine DATA-Zeile einzufügen. Ich gehe schrittweise vor:
+                <code class="strong">20 PRINT CHR$(147): PRINT: PRINT
+                    30 PRINT "5555 DATA";
+                    50 FORA=0TO3
+                    60 PRINT PEEK(A)", ";:NEXT
+                    70 PRINT CHR$(19)
+                    80 POKE 631, 13: POKE 632,13: POKE 198,2: END
+                </code>
+            </p>
 
             <p>Mit Zeilen 20 und 30 wird der DATA-Zeile die Zeilennummer 5555 gegeben und in die 3. Bildschirmzeile geschrieben. Zeile 50 liest die Speicherzellen 0 bis 3 aus und druckt sie, mit einem Komma versehen, dahinter. Zeilen 70 und 80 geben diese Zeile in gewohnter Manier in das Programm ein.</p>
 
-            <p>Ganz richtig ist das noch nicht, da nach LIST die Zeile 5555 zuviele Zwischenräume hat:</p>
-
-            <p>5555 DATA 47,55 , 0 , 170 ,</p>
-
-            <p>Zur Korrektur müssen wir Zeile 60 erweitern:</p>
-
-            <p>60 PRINT MID$(STR$(PEEK(A)),2)",";:NEXT</p>
+            <p>Ganz richtig ist das noch nicht, da nach LIST die Zeile 5555 zuviele Zwischenräume hat:
+                <code>5555 DATA 47 , 55 , 0 , 170 ,</code>
+                Zur Korrektur müssen wir Zeile 60 erweitern:
+                <code class="strong">60 PRINT MID$(STR$(PEEK(A)),2)",";:NEXT</code>
+            </p>
 
             <p>STR$() wandelt den durch PEEK ausgelesenen Zahlenwert in einen String um. MID$(&hellip;,2) schneidet die Leerstellen weg.</p>
 
             <p>Mr. Davies hat daraus eine komfortable kleine Routine gebaut, die den auszulesenden Speicherbereich und die gewünschte Zeilennummer der ersten DATA-Zeile abfragt, dafür sorgt, daß eine DATA-Zeile nicht länger als 16 Zeichen wird, in diesem Fall die nächste Zeilennummer um 10 erhöht und sogar das letzte Komma in jeder DATA-Zeile eliminiert.</p>
 
-            <p>Dieser ganze Komfort hat natürlich nichts mit dem Tastaturpuffer zu tun. Dieser Teil bleibt unverändert. Aber ich finde dieses Programm so durchdacht, daß ich es Ihnen als ein Beispiel guter Programmierung angeben will.</p>
-
-            <p>10 INPUT "STARTADRESE";A: INPUT "ENDADRESE";E: INPUT "ZEILE";Z<br>
-                20 PRINT CHR$(147)<br>
-                30 PRINT Z "DATA";<br>
-                40 IFA>ETHENEND<br>
-                50 FORA=ATOA + 15 + (E&lt;A + 15)*(A + 15-E)<br>
-                60 PRINTMID$(STR$(PEEK(A)),2)",";:NEXT<br>
-                70 PRINT"{CRSR-links}":PRINT "A = "A": E = "E": Z="Z + 10": GOTO 20";<br>
-                80 POKE 631, 19: POKE 632,13: POKE 633,13: POKE 634,13: POKE 198,4: END</p>
+            <p>Dieser ganze Komfort hat natürlich nichts mit dem Tastaturpuffer zu tun. Dieser Teil bleibt unverändert. Aber ich finde dieses Programm so durchdacht, daß ich es Ihnen als ein Beispiel guter Programmierung angeben will.
+                <code class="strong">10 INPUT "STARTADRESE";A: INPUT "ENDADRESE";E: INPUT "ZEILE";Z
+                    20 PRINT CHR$(147)
+                    30 PRINT Z "DATA";
+                    40 IFA&gt;ETHENEND
+                    50 FORA=ATOA + 15 + (E&lt;A + 15)*(A + 15-E)
+                    60 PRINTMID$(STR$(PEEK(A)),2)",";:NEXT
+                    70 PRINT"{CRSR-links}":PRINT "A = "A": E = "E": Z="Z + 10": GOTO 20";
+                    80 POKE 631, 19: POKE 632,13: POKE 633,13: POKE 634,13: POKE 198,4: END
+                </code>
+            </p>
         </aside>
     </article>
 </body>
