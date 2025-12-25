@@ -227,6 +227,11 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 * Ausgabe 12/85:
     * Formatierung, Metadaten, OCR-Fixes
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+* Ausgabe 1/86:
+    * Formatierung, Metadaten, OCR-Fixes
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * Abtippen der Listings
+        * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
 
 * Sonderheft 1/1985:
     * Abtippen der Listings

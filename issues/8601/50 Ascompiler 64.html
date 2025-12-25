@@ -26,7 +26,7 @@
 
         <p>Die Bezeichnung für diesen Compiler ist eine Wortbildung aus Assembler und Compiler. Ascompiler 64 ist keiner der bekannten Compiler, mit dem Sie Ihre Basic-Programme praktisch unverändert übersetzen können und dadurch etwa die dreifache Geschwindigkeit erreichen. Nein, der Ascompiler 64 ist gleichzeitig mehr und weniger: Er übersetzt nur einen sehr stark eingeschränkten Basic-Befehlssatz mit recht vielen Restriktionen, aber er übersetzt dafür in einen derart effizienten Code, daß praktisch kaum noch ein Unterschied zu Assembler besteht. Da Ascompiler 64 wirklich reinen Maschinencode erzeugt, ist er hervorragend dazu geeignet, zeitkritische Routinen zu compilieren, um sie dann in andere Basic-Programme einzusetzen. Ein kleines Beispiel soll die Leistungsfähigkeit dieses Compilers zeigen. Geben Sie doch einmal die folgenden Basic-Zeilen in Ihren Computer ein:</p>
 
-<pre><code>10 let a=0
+        <pre><code>10 let a=0
 20 let a=a+1
 30 if a&lt; 60000 then 20
 40 print"fertig"</code></pre>
@@ -102,7 +102,7 @@
 
         <p>Als ersten Test könnten Sie eingeben:</p>
 
-<pre><code>10 LET A=0
+        <pre><code>10 LET A=0
 20 LET A=A+1
 30 IF A&lt; 60000 THEN 20
 40 PRINT A</code></pre>
@@ -182,6 +182,113 @@
             <figcaption>Listing 1. »Ascompiler 64«. Bitte mit dem MSE eingeben.</figcaption>
         </figure>
         <div class="binary_download" data-filename="ascompiler.prg" data-name="Ascompiler 64"></div>
+
+        <figure>
+            <pre>10 REM  HIRES-PLOT-DEMO
+20 REM FUER ASCOMPILER 64
+30 REM
+60000 POKE 53265,59
+60010 POKE 53272,24
+60011 POKE 20000,128
+60012 POKE 20001,64
+60013 POKE 20002,32
+60014 POKE 20003,16
+60015 POKE 20004,8
+60016 POKE 20005,4
+60017 POKE 20006,2
+60018 POKE 20007,1
+60020 LET I=1024
+60030 POKE I,1
+60040 LET I=I+1
+60050 IF I&lt;2023 THEN 60030
+60060 LET I=8192
+60070 POKE I,0
+60075 LET I=I+1
+60080 IF I&lt;16384 THEN 60070
+60090 GOTO 63000
+61000 LET W=Y/8
+61010 LET V=X/8
+61020 LET H=W*40
+61030 LET H=H+V
+61040 LET H=H*8
+61050 LET H=H+8192
+61060 LET G=W*8
+61070 LET G=Y-G
+61080 LET P=H+G
+61100 IF P&gt;16384 THEN 63900
+61110 LET B=X/8
+61120 LET B=B*8
+61130 LET B=X-B
+61140 LET Q=20000+B
+61150 LET Q=PEEK(Q)
+61155 LET L=PEEK(P)
+61156 LET L=LORQ
+61160 POKE P,L
+61170 RETURN
+63000 LET X=0
+63005 LET Y=X*X
+63010 LET Y=Y+X
+63020 LET Y=Y/200
+63030 GOSUB 61000
+63040 LET X=X+1
+63050 IF X&lt;400 THEN 63005
+63900 LET Q=PEEK(203)
+63910 IF Q=64 THEN 63900
+63940 POKE 53265,27
+63950 POKE 53272,23
+63960 PRINT "{CLR}";
+63970 END
+
+READY.</pre>
+            <figcaption>Listing 2. Ein Mini-Plot-Programm für den Ascompiler 64</figcaption>
+        </figure>
+
+        <figure>
+            <pre>1 REM  SPLITSCREEN-DEMO
+2 REM FUER ASCOMPILER 64
+3 REM
+10 LET A=PEEK(53266)
+20 IF A&GT;0 THEN 10
+30 POKE 53281,2
+40 LET A=PEEK(53266)
+50 IF A&LT;128 THEN 40
+60 POKE 53281,3
+70 LET A=PEEK(197)
+80 IF A=64 THEN 10
+
+READY.</pre>
+            <figcaption>Listing 3. Dieses »Screen-Split«-Demo zeigt die mit dem Ascompiler erreichbaren Geschwindigkeiten</figcaption>
+        </figure>
+
+        <figure>
+            <pre>1 REM DREI NUETZLICHE ROUTINEN
+2 REM FUER DEN ASCOMPILER 64
+3 REM
+7 REM
+8 REM GET Z
+9 REM
+10 LET Z=PEEK(198)
+11 IF Z=0 THEN 14
+12 LET Z=PEEK(631)
+13 POKE 198,0
+14 RETURN
+17 REM
+18 REM PRINT CHR$(Z)
+19 REM
+20 POKE 2,Z
+21 SYS 65490
+22 RETURN
+27 REM
+28 REM INPUT(Z)
+29 REM
+30 SYS 42336
+31 LET Z=512
+32 RETURN
+
+READY.</pre>
+            <figcaption>Listing 4. Drei nützliche Unterroutinen</figcaption>
+
+        </figure>
     </article>
 </body>
 

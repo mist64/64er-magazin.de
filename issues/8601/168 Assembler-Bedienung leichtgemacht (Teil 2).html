@@ -172,6 +172,114 @@
         <p>Sollten Sie noch irgendwelche Fragen zur Bedienung eines Assemblers haben, würden wir uns freuen, Ihnen bei der Lösung Ihrer Probleme zu helfen. Wir sind bestrebt, alle schriftlichen Anfragen zu beantworten.</p>
 
         <address class="author">(ah)</address>
+
+        <figure>
+            <pre> 30 -.MA JMP (ADRESSE, XY)
+ 40 -.EQ HI = $FB
+ 50 -.EQ LO = $FA
+ 60 -.GO 131
+ 70 -.MA JSR (ADRESSE, XY)
+ 80 -.EQ HI = $FB
+ 90 -.EQ LO = $FA
+100 -          LDA #> (RUECKSP)
+110 -          PHA
+120 -          LDA #< (RUECKSP)
+130 -          PHA
+131 -.ON  (XY = 1)!O!(XY = 2) , 270
+140 -.IF (XY = 1)
+150 -          LDA ADRESSE+1,X
+160 -          STA HI
+170 -          LDA ADRESSE,X
+180 -          STA LO
+190 -.EI
+200 -.IF (XY = 2)
+210 -          LDA ADRESSE+1,Y
+220 -          STA HI
+230 -          LDA ADRESSE,Y
+240 -          STA LO
+250 -.EI
+251 -.GO 530
+270 -          INC ADRESSE
+280 -          BNE LBL1
+290 -          INC ADRESSE+1
+310 -.IF (XY = 3)
+320 -LBL1      LDA (ADRESSE,X)
+330 -.EI
+340 -.IF (XY = 4)
+350 -LBL1      LDA (ADRESSE),Y
+360 -.EI
+380 -          STA HI
+390 -          LDA ADRESSE
+400 -          BNE LBL2
+410 -          DEC ADRESSE+1
+420 -LBL2      DEC ADRESSE
+440 -.IF (XY = 3)
+450 -          LDA (ADRESSE,X)
+460 -.EI
+470 -.IF (XY = 4)
+480 -          LDA (ADRESSE),Y
+490 -.EI
+500 -.IF (XY=3)!O!(XY=4)
+510 -          STA LO
+520 -.EI
+530 -          BNE LBL3
+540 -          DEC HI
+550 -LBL3      DEC LO
+560 -          LDA HI
+570 -          PHA
+580 -          LDA LO
+590 -          PHA
+600 -RUECKSP   RTS
+610 -.RT</pre>
+            <figcaption>Listing 1. Dieses Makro simuliert einen JSR-Befehl mit sämtlichen Adressierungsarten.</figcaption>
+        </figure>
+
+        <figure>
+            <pre>,9000  A9 90     LDA #90
+,9002  48        PHA
+,9003  A9 1C     LDA #1C
+,9005  48        PHA
+,9006  BD 01 C0  LDA C001,X
+,9009  85 FB     STA   FB
+,900B  BD 00 C0  LDA C000,X
+,900E  85 FA     STA   FA
+,9010  D0 02     BNE 9014
+,9012  C6 FB     DEC   FB
+,9014  C6 FA     DEC   FA
+,9016  A5 FB     LDA   FB
+,9018  48        PHA
+,9019  A5 FA     LDA   FA
+,901B  48        PHA
+,901C  60        RTS</pre>
+            <figcaption>Listing 2.. Eine »I« als Adressierungsart generiert dieses Maschinenprogramm. (Disassemblerausdruck SMON)</figcaption>
+        </figure>
+
+        <figure>
+            <pre>,9000  A9 90     LDA #90
+,9002  48        PHA
+,9003  A9 28     LDA #28
+,9005  48        PHA
+,9006  E6 02     INC   02
+,9008  D0 02     BNE 900C
+,900A  E6 03     INC   03
+,900C  B1 02     LDA  (02),Y
+,900E  85 FB     STA   FB
+,9010  A5 02     LDA   02
+,9012  D0 02     BNE 9016
+,9014  C6 03     DEC   03
+,9016  C6 02     DEC   02
+,9018  B1 02     LDA  (02),Y
+,901A  85 FA     STA   FA
+,901C  D0 02     BNE 9020
+,901E  C6 FB     DEC FB
+,9020  C6 FA     DEC FA
+,9022  A5 FB     LDA FB
+,9024  48        PHA
+,9025  A5 FA     LDA FA
+,9027  48        PHA
+,9028  60        RTS</pre>
+            <figcaption>Listing 3. Eine »4« als Adressierungsart generiert dieses Maschinenprogramm. (Disassemblerausdruck SMON)</figcaption>
+        </figure>
     </article>
 </body>
 
