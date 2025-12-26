@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Andreas Blödow, tr, Frank Hoffmann, tr, Helge Kautz, tr, Julian Ziersch, tr, Martin Thierer, tr, Stefan Zellin, tr, Uli Beyenbach, tr, tr">
+    <meta name="64er.issue" content="2/86">
+    <meta name="64er.pages" content="77,80-82,84">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Nachdem die Anfänger unter den C 64-Fans nun ihre eigene Rubrik haben, sollen natürlich die Profis auch nicht zu kurz kommen. Sicher wird auch für diese Lesergruppe noch der eine oder andere unbekannte Trick dabei sein.</p>
+
+        <p>Wer sich als echter Profi bezeichnet, wird bei der Durchsicht unserer Tips &amp; Tricks-Sammlung sicher ab und zu in ein leichtes Schmunzeln verfallen. Es ist bei manchen Beiträgen nämlich gar nicht so leicht, sie eindeutig den Anfängern beziehungsweise den Profis zuzuordnen. Wir hoffen aber trotzdem, eine gute Auswahl getroffen zu haben.</p>
+
+        <p>Nun unsere Bitte an Sie: Helfen Sie den vielen Anfängern unter unseren Lesern mit kleinen, leicht verständlichen Tricks, die vielleicht für Sie schon ein »alter Hut« sein mögen, den Einsteigern jedoch eine große Hilfe sein werden. Jeder Beitrag, ob Einzeiler, Programmiertrick oder sonstiges, ist willkommen. Achten Sie auch bitte auf eine leicht verständliche, einfach geschriebene Anleitung.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>OLD-Funktion für Variablen</h2>
+
+        <p>Dieses Programm (Listing 1) holt nicht nur ein Basic-Programm nach NEW, CLR oder einem Reset zurück, sondern auch sämtliche Variablen, Strings und Felder.</p>
+
+        <p>Da arbeitet man an einem phänomenalen Basic-Programm und tippt »CLR« statt »CLOSE« oder »NEW« statt NEXT in seinen Computer ein, oder dieser hängt sich selbst auf—und die Variablen sind weg, die womöglich den Grund für den Absturz in sich bergen!</p>
+
+        <p>Oder: Man lädt ein Maschinenprogramm in den $C000-Bereich, und nach »RUN« erfolgt ein »?OUT OF MEMORY ERROR«, weil die Basic-Ende-Zeiger verstellt wurden.</p>
+
+        <p>Das Maschinenprogramm, welches dabei entstand, steht ab $C000 im Speicher (kann verschoben werden), benötigt 115 Byte Speicherplatz und wird einfach mit »SYS 49152« aufgerufen.</p>
+
+        <p>Es können, wie gesagt, alle Werte und sogar definierte Funktionen und Felder zurückgeholt werden. Allerdings bestehen da noch drei kleine Bedingungen:</p>
+
+        <ol>
+            <li>Es muß vorher bereits ein Basic-Programm im Speicher gestanden haben (mindestens: »10 :«).</li>
+            <li>Es darf vor Aufrufen der Routine kein Variablen-Programm eingegeben oder ein Feld abgefragt worden sein.</li>
+            <li>
+                <p>Die erste Dimensionierung eines Feldes muß ein Stringfeld sein. Beispiele:</p>
+            </li>
+            <li>
+                <p>»DIM DE(20),DE$(20)« muß umgestellt werden zu<br>»DIM DE$(20),DE(20)«</p>
+            </li>
+            <li>»DIM E(34)« muß ergänzt werden zu<br>»DIM A$(0),E(34)« (A$(0) genügt schon!!)</li>
+        </ol>
+
+
+        <p>Diese Ergänzung braucht der Computer nämlich, um zu erkennen, daß in die Array-Behandlung gesprungen werden muß, sonst entsteht ein Fehler.</p>
+
+        <h3>Funktionsweise</h3>
+
+        <p>Der Computer untersucht das erste Byte nach dem Basic-Programm-Ende. Wenn dieses ein Buchstabe ist, prüft er es auf Stringvariable. Wenn nicht, wird der Zähler einfach um 7 Byte (zwei Namensbyte und fünf Informationsbyte) erhöht und diese übergangen.</p>
+
+        <p>Wenn aber eine Stringvariable gefunden wurde, untersucht er Byte 6 und 7. Diese sind bei einem String nämlich immer Null, weil sie hier nicht gebraucht werden; bei einem Feldkopf hingegen ist die Anzahl der Elemente der Dimensionierung des folgenden Feldes darin abgelegt: Wenn der Computer also eine numerische als erste Dimensionierung findet, hält er sie für eine normale numerische Variable (denn eine andere Erkennung ist hier leider nicht möglich!) und nicht für den ersten Feldkopf der Arrays, gibt einen falschen und unsinnigen Wert für die meist nicht vorhandene einfache Variable und findet auch die restlichen Felder nicht mehr!</p>
+
+        <p>Wenn keine Buchstaben mehr gefunden werden, wird noch eine Garbage-Collection durchgeführt, um die Stringzeiger wieder nachzustellen.</p>
+
+        <p>Beachten Sie bitte:<br>
+            Falls Sie zum Beispiel eingeben<br>
+            10 DIM A$(30),B$(10)<br>
+            20 CLR<br>
+            30 DIM A$(30)<br>
+            40 SYS 49152<br>
+            wird automatisch A$(30), aber auch B$(10) zurückgeholt!!</p>
+
+        <p>Tip: Das Programm kann auch nach einem »NEW«, »CLR« oder »Reset« eingeladen werden. Sie können das Programm auch auf anderen Speicherbereichen laufen lassen (zum Beispiel im Kassettenpuffer). Dazu müssen Sie die beiden Sprungbefehle<br>
+            C04B JMP C018<br>
+            C06A JMP C04E<br>
+            jeweils anpassen (und die SYS-Adresse). Mit dem SMON ist das Verschieben ja kein Problem.</p>
+
+        <p>Übrigens: Bild 1 zeigt das dokumentierte Assemblerlisting von »RE-CLR«.</p>
+
+        <address class="author">(Andreas Blödow/tr)</address>
+
+        <h2>Wersiboard und Sound-Editor</h2>
+
+        <p>Das Programm »Sound-Editor« aus der 64’er ist eines der besten (oder sogar das beste) Synthesizerprogramm, das es für den C 64 gibt.</p>
+
+        <p>Einzigstes Manko ist, daß man sich jedes Mal die Finger verknotet, wenn man versucht, eine Melodie zu spielen. Überdies muß man eine Ewigkeit (verglichen mit anderen Programmen) warten, ehe eine angeschlagene Note auch tatsächlich erklingt. So erkannte ich also, daß zwei Dinge fehlten:<br>
+            a) ein Programm, welches die gespielten Noten schneller zu Gehör bringt, und<br>
+            b) eine professionelle Klaviatur.</p>
+
+        <p>Das kurze Maschinenprogramm (Listing 2) übernimmt die Abfrage des Wersiboards und ahmt im wesentlichen die Arbeitsweise deroriginalen Basic-Routine in Ausgabe 7/85 (Zeilen 2025 bis 2160) nach. Der größte Unterschied besteht darin, daß die Maschinenroutine eine Tabelle mit Frequenzwerten ab Speicherstelle dezimal 52948 erwartet, aus der sie die aktuelle Frequenz holt. Im Basic-Programm wird dies mit »f*bf(sn)« gelöst. Meine Vorgehensweise hat den Nachteil, daß die Frequenztabelle bei jedem Wechsel der Frequenz (Untermenü »Stimmen-Parameter« Punkt »F«) neu angelegt werden muß.</p>
+
+        <p>Die Basic-Zeilen 20000 bis 20080 im Listing 3 erfüllen diese Aufgabe. Dieses Basic-Listing ist übrigens für sich als Programm nicht lauffähig und nur in Verbindung mit dem Sound-Editor (Ausgabe 7/85) sinnvoll!</p>
+
+        <p>Die Bedienung des wersiboardfähigen Sound-Editors ist denkbar einfach: Die normale Computertastaturabfrage bleibt erhalten. Ändern Sie die Frequenzwerte, ist die Änderung zunächst nur über diese zu bemerken; das Wersiboard ist noch auf die alten Frequenzwerte gestimmt.</p>
+
+        <p>Dies können Siejedoch ändern, indem Sie die Tastenkombination »Shift-W« betätigen. Die oben erwähnte Frequenztabelle wird sodann erneuert.</p>
+
+        <p>Viel mehr ist beim erweiterten Sound-Editor nicht zu beachten, alle übrigen Parameter des erweiterten Sound-Editors sind direkt nach einer Änderung ohne zusätzliche Maßnahmen auch über das Wersiboard spielbar.</p>
+
+        <p>Sie sollten jedoch darauf achten, daß Sie keine Oktave über vier einstellen; denn der C 64 kann nur acht Oktaven darstellen. Das Wersiboard reicht aber über vier Oktaven, und rechnen Sie mal 5+4&hellip; Achten Sie also im Untermenü »Stimmen-Parameter« auf eine entsprechende Einstellung.</p>
+
+        <p>Ein Tip zum Sound-Editor: Schalten Sie im Untermenü Filter/Laut. immer »FiltEx« ein. Das Hintergrundrauschen wird dadurch beträchtlich vermindert.</p>
+
+        <p>Und nun zur Vorgehensweise bei der Eingabe der Erweiterung:</p>
+
+        <ol>
+            <li>Laden Sie den Sound-Editor und geben Sie die zusätzlichen Basic-Zeilen ein. Diese enthalten alle neuen Zeilen sowiejene, die nur geändert werden.</li>
+            <li>Speichern Sie den erweiterten Sound-Editor wieder (zum Beispiel unter dem Namen »Sound-Editor +«).</li>
+            <li>Laden Sie den MSE und geben Sie mit ihm die wenigen Hexazeilen ein; »SAVEn« Sie das Programm unter dem Namen »Wersi« auf der Diskette, auf der sich auch die anderen zum Sound-Editor gehörenden Routinen befinden.</li>
+            <li>Fertig!</li>
+        </ol>
+
+
+        <p>Laden Sie nun ganz normal den erweiterten Sound-Editor und starten Sie ihn mit »RUN«.</p>
+
+        <p>Und nun viel Spaß mit dem Wersiboard plus Sound-Editor!</p>
+
+        <address class="author">(Helge Kautz/tr)</address>
+
+        <h2>Paint Magic und Basic-Programme</h2>
+
+        <p>Um Paint Magic-Bilder in einem Basic-Programm aufrufen zu können, geht man wie folgt vor:</p>
+
+        <ul>
+            <li>Laden des Bildes</li>
+            <li>Starten des Bildes mit »RUN«</li>
+            <li>RUN-STOP/RESTORE drücken</li>
+            <li>Im Direktmodus »POKE 24565,96« eingeben</li>
+            <li>Speichern mit einem Monitor (zum Beispiel SMON) von Hex $4000 bis $6400</li>
+        </ul>
+
+
+        <p>Das Bild kann jetzt, wenn es zuvor absolut geladen wurde, in einem Basic-Programm mit »SYS 24513« aufgerufen werden.</p>
+
+        <p>Verschwinden des Bildes:<br>
+            POKE 53272,21<br>
+            POKE 56576,151<br>
+            POKE 53265,27<br>
+            POKE 53270,200</p>
+
+        <address class="author">(Frank Hoffmann/tr)</address>
+
+        <h2>Zerstörtes Directory retten</h2>
+
+        <p>Jedem eifrigen Benutzer der Floppy, der nicht gleichzeitig ein Übermensch ist, wird es wohl schon mindestens einmal passiert sein, daß er das Directory einer Diskette (vielleicht auch nur teilweise) »vermurkst« hat.</p>
+
+        <p>Sei es nun durch Formatieren (ohne ID) oder eine sonstige Unachtsamkeit. Der arme Mensch wird wohl alles daransetzen, das oder die Programme wiederzubekommen. Eine mögliche Vorgehensweise besteht darin, die einzelnen Blöcke der Diskette nach den Zahlen für die Anfangsadresse des Programms abzusuchen.</p>
+
+        <p>Diese steht im dritten und vierten Byte des ersten Blocks jedes Programms in der Form Low-Byte/High-Byte. Dies ist notwendig, damit der Computer bei absolutem Laden (mit LOAD ”Name”,8,1) weiß, wo er das Programm im Speicher ablegen soll.</p>
+
+        <p>Nun kann man natürlich jeden Block einzeln »per Hand« absuchen. Dies ist aber in Anbetracht der Tatsache, daß es dero 664 gibt, nicht ratsam. Deshalb wird man sich für diesen Zweck wohl ein Programm schreiben. Hierbei wird wohl der erste Versuch eine Basic-Version sein. So auch bei mir. Ich mußte aber leider feststellen, daß es zwar gut funktionierte (kein Wunder, es war ja auch von mir!), aber auch einen sehr großen Zeitbedarf hatte.</p>
+
+        <p>Also mußte ein schnelleres Programm her. Denn man wartet schließlich nicht gerne, und schon gar nicht, wenn man um ein geliebtes Programm bangen muß.</p>
+
+        <p>Und so kam ich auf die Idee, das Problem dadurch zu lösen, daß man ein Maschinenprogramm im Floppyspeicher ablegt. Durch diese Methode läßt sich das umgehen, was beim Basic-Programm den größten Teil des Geschwindigkeitsverlustes ausmacht:</p>
+
+        <p>Denn da muß man jeden Block vollständig einlesen. Und bis die Zahlen mit GET verarbeitet sind und der nächste Block gelesen werden soll, ist der Lesekopf schon weiter. Mit dieser Methode braucht man zirka eine Umdrehung.</p>
+
+        <p>Der Programmsucher (Listing 4) geht hier, wie schon angedeutet, einen etwas anderen Weg: Es wird nicht der ganze Block, sondern nur die zur Bestimmung der benötigten Zahlen notwendigen GCR-Byte eingelesen (siehe dazu auch 64’er 6/85, Seite 116-119).</p>
+
+        <p>Soviel zu den programmtechnischen Dingen. Wer sich mit Maschinensprache und insbesondere der Floppy-Programmierung auskennt, wird das Programm wohl ohnehin verstehen. Wer nicht, sollte sich den Floppy-Kurs im 64’er durchlesen.</p>
+
+        <p>Nun zur Bedienung des Programms:</p>
+
+        <p>Diese ist zum Glück sehr einfach. Das Programm wird mit »RUN« gestartet und fragt dann nach der Startadresse des zu suchenden Programms. Hier nicht die Zahl eingeben, mit der das Programm eventuell über »SYS« gestartet wird, sondern die, an der es im Speicher beginnt. Diese sind aber in den meisten Fällen identisch. Bei Programmen, die am Basic-Start stehen (dies trifft für alle zu, die mit »LOAD ”Name”,8« geladen werden), braucht nur »RETURN« gedrückt zu werden. Danach startet das Programm die Suche auf der Diskette. Nach etwa 14 Sekunden beginnt das Programm, wenn kein Fehler aufgetreten ist, mit der Ausgabe der (möglichen) Startblocks.</p>
+
+        <p>Wenn man die Startadresse(n) hat, trägt man diese am besten mit einem Disk-Monitor, zusammen mit irgendwelchen Pseudonamen (zum Beispiel X1, X2, &hellip;), in das Directory ein und probiert dann aus, welches das richtige Programm ist. Danach kann man dann mit »SCRATCH« und »RENAME« die anderen wieder löschen und dem gesuchten den richtigen Namen geben. Validate nicht vergessen!</p>
+
+        <address class="author">(Martin Thierer/tr)</address>
+
+        <h2>59390 Bytes free</h2>
+
+        <p>Mit Double-Basic (Listing 5) können Sie zwei unabhängige Basic-Programme im Speicher halten, die zusammen 59390 Byte (!) lang sein können. Die Programme können 38911 (PRG 1) und 20480 Byte (PRG 2) belegen.</p>
+
+        <p>Durch CTRL + F1 werden beide Programme gegeneinander ausgetauscht, während alle Variablen des jeweiligen Programmes erhalten bleiben. Wenn Sie also erst Programm 1 bearbeitet haben, können Sie nach CTRL + F1 mit Programm 2 fortfahren und umgekehrt. Zusätzlich besitzt Double-Basic zwei andere, ungewöhnliche Funktionen:</p>
+
+        <ol>
+            <li>CTRL + Pfeil links verlangsamt die Ausführungszeiten des Computers. Der Grad der Verzögerung kann durch »POKE 53024,&hellip;« eingestellt werden (255 = größte Verzögerung).</li>
+            <li>CTRL + RUN/STOP hält den Computer an, bis SPACE gedrückt wird. Sehr praktisch für das Listen eines Programmes: CTRL + STOP gedrückt halten und für jede nächste Zeile zusätzlich kurz SPACE drücken.</li>
+        </ol>
+
+
+        <p>Wenn Sie Double-Basic mit dem MSE abgetippt haben, speichern Sie es. Nach dem Laden mit »,8,1« und NEW können Sie Double-Basic mitSYS 52992 initialisieren (SYS 52992 ist nach jedem RUN/STOP-RESTORE notwendig!). Es stehen nun die beschriebenen Funktionen zur Verfügung.</p>
+
+        <p>Hinweise: CTRL + F1 ist nur möglich, wenn sich der Computer im Direktmodus befindet. Während des Listens führt der Druck dieser Tastenkombination zum Absturz! Also: erst STOP, dann CTRL + F1. Da alle Variablen erhalten bleiben, kann ein Programm nach einem Tausch mit CONT fortgeführt werden, wenn es vorher unterbrochen wurde. Es sei denn, das System hat seit dem letzten Tausch eine FOR-, NEXT- oder GOSUB-RETURN-Struktur bearbeitet. In diesem Fall reagiert der Computer, wenn er auf NEXT oder RETURN stößt, mit Unsinn, Fehlermeldungen oder gar Absturz.</p>
+
+        <p>Einige Daten zu Double-Basic. Double-Basic ist in den System-Interrupt eingebunden und belegt den Speicherbereich von $CF00 bis $D000, ist also verwendbar mit Turbo-Tape und SMON (ohne Diskmonitor).</p>
+
+        <p>In der Interrupt-Routine (ab $CF0B) wird auf die Betätigung einer der drei Tasten-Kombinationen geprüft. Wird der Programmtausch aufgerufen, erfolgt zuerst noch ein Test, ob sich der Computer auch im Direktmodus befindet. Daraufhin wird der Inhalt des Speichers von 2049 bis 22528 mit dem des RAM-Bereichs unter dem ROM vertauscht. Genauso wird mit den Basic-Vektoren in den Zellen 43 bis 66 (die unter anderem die Programmlänge und den freien Speicherplatz angeben) und einer Tabelle ab $CFD9 verfahren. Bevor in die normale Interrupt-Routine gesprungen wird, wird noch die Nummer des aktuellen Programmes angezeigt.</p>
+
+        <address class="author">(Julian Ziersch/tr)</address>
+
+        <h2>Tips für Schreibmaschinen-Profis</h2>
+
+        <p>Jeder, der einmal einen Schreibmaschinenkurs absolviert hat, hat sich auch schon über die Vertauschung der Tasten »Y« und »Z« auf der Tastatur des C 64 geärgert. Vor allem, wenn man in einem Basic-Programm in PRINT-Zeilen einen kleinen Text schreiben möchte, ist dieser Umstand sehr störend. Eine naheliegende, wenn auch sehr umständliche Methode ist, das Betriebssystem zu ändern. Es empfiehltsich, diese Änderung dann in ein EPROM zu »brennen«.</p>
+
+        <p>Um die genannten Tasten in die deutsche Norm zu bringen, ist zuerst das Betriebssystem ins RAM zu kopieren (zum Beispiel mit einem Monitor), dann sind die folgenden POKEs einzugeben:<br>
+            POKE 60301,89<br>
+            POKE 60314,90<br>
+            POKE 60366,217<br>
+            POKE 60379,218<br>
+            POKE 60431,183<br>
+            POKE 60444,173</p>
+
+        <p>Übrigens: Wenn das Betriebssystem ins RAM kopiert wurde, besteht im allgemeinen das Problem, diese Kopie dauerhaft eingeschaltet zu lassen. Wenn man nämlich RUN/STOP-RESTORE drückt, wird das RAM aus- und das ROM wieder eingeblendet. Durch einen POKE 64982,53 wird dies verhindert.</p>
+
+        <address class="author">(Stefan Zellin/tr)</address>
+
+        <h2>Tips zum Gedichtgenerator</h2>
+
+        <p>Das Programm »Lyrik« aus der Ausgabe 11/85 istja wirklich sehr schön, vor allem ist die Programmstruktur so gewählt, daß problemlos eigene Erweiterungen eingebaut werden können. Im Programm sind jedoch keine Bereichskontrollen für die Anzahl der Verse vorgesehen. Hier muß man selbst aufpassen. Auch sollte im Wortschatz wegen Zeile 371 kein »Ei« vorkommen! Nebenbei: Die Satzstrukturen passen großenteils nicht zu den angegebenen Mnemonic-Strukturen. Ein richtiger Fehler ist jedoch in Zeile 196, dort muß es heißen:<br>
+            fora=1toaz-1 &hellip;.</p>
+
+        <p>Geben Sie mal folgende Struktur ein: 2 Strophen, 1. Strophe 10 Verse, 2. Strophe 2 Verse, und geben Sie eigene Mnemonics ein. Es klappt nicht! Die Verse der zweiten Strophe erscheinen auch in der ersten Strophe. Der Grund ist die Codierung der Indizes von mn$. Zur Abhilfe muß ein eigener Verszähler vz eingeführt werden:</p>
+
+        <p>107 vz=-1:&hellip;.<br>
+            181 vz=vz+1:inputmn$(vz):&hellip;.<br>
+            192 vz=vz+1:inputmn$(vz):&hellip;<br>
+            196 fora=1toaz4:forb=0tova%(0)-1:vz=vz+1:mn$(vz)=mn$(b): nextb,a:goto300<br>
+            242 vz=vz+1:mn$(vz)=pm$(&hellip;.<br>
+            301 &hellip;.:vz=-1<br>
+            305 &hellip;.:vz=vz+1:w$=mn$(vz):&hellip;.<br>
+            816 fora=0tor-1:b=int(rnd(1)*q0):vz=vz+1:mn$(vz)=co$(b):next 818 goto196</p>
+
+        <p>Durch eine weitere sehr kleine Änderung kann mit VRB10 beziehungsweise VRB20 ein Imperativ wie »höre« eingebaut werden:</p>
+
+        <p>418 ifepthen&hellip;.<br>
+            419 e$(z2)=left$(vb$(wa,1),len(vb$(wa,1))-1)<br>
+            420 ifright$(e$(z2),1)o”e”thene$(z2) = e$(z2)+”e”<br>
+            421 z1=z1+6:goto710</p>
+
+        <p>Folgende kleine Änderung ergibt ein neues Mnemonic, das einen sehr viel lebendigeren Versaufbau erlaubt. ADV erzeugt ein Adverb, somit sind Verse wie »Der Blitz lächelt schrecklich« (sub2001 vrb11 adv) möglich.</p>
+
+        <p>462 rem — adv —<br>
+            464 ifm$ &lt; > ”adv”then468<br>
+            466 wa=int(rnd(1)*q4):e$(z2)=left$(no$(wa,2),len(no$(wa,2))-1)<br>
+            467 z1=z1+4:goto710<br>
+            468</p>
+
+        <p>Wie das Listing zeigt, werden die Adverben aus den Adjektiven erzeugt, das schränkt die Wahl der Adjektive geringfügig ein: »größte« oder »dunkle« kann nicht mehr verwendet werden. Noch zwei Vorschläge für neue Mnemonics: FIX setzt einen vorher eingegebenen String ein, so lassen sich Gedichte für »unsere Oma« erzeugen! KMP setzt eine Vergleichsstruktur wie »so sehr wie« oder »größer als« ein. Strukturen wie »schöner als« oder »so blutrünstig wie« erzeugt das Programm selbst unter Verwendung der Adjektive. Deshalb dürfen dort zum Beispiel »große« »gute« »viele« und ähnliche nicht auftreten. Auch »scharfe« oder »fromme« sind nicht möglich. Eine Einschränkung zwar, aber der Gewinn ist größer!</p>
+
+        <p>468 rem — fix 469ifm$ = -fix-thene$(z2)=fi$:z1=z1 + 4: goto710<br>
+            470 rem — vergleich —<br>
+            471 ifm$&lt;>”kmP”—then700<br>
+            472 wa=int(rnd(1)*(q9 + 4)):ifwa> =q9then475<br>
+            473 e$(z2)=v9$(wa)<br>
+            474 z1=z1+4:goto710<br>
+            475 w1=int(rnd(1)*q4)<br>
+            476 if wa>q9 + 1thene$(z2) = no$(w1,2)+”r als ”:goto474<br>
+            477 e$(z2)=”so ”+left$(no$(w1,2),len(no$(w1,2))-1)+”<br>
+            wie”:goto474</p>
+
+        <p>Für das Mnemonic »FIX« sind noch folgende Zeilen im Programm nötig:</p>
+
+        <p>99 fi$=”derC64”<br>
+            150 Print:Print:inPut”String für FIX”;fi$</p>
+
+        <p>Das Mnemonic KMP benötigt noch folgende Zeilen:</p>
+
+        <p>11 q9=xx Für xx müssen Sie die Anzahl der von Ihnen ab Zeile 9000 eingegebenen Vergleiche einsetzen.<br>
+            26 &hellip;.,v9$(q9-1)<br>
+            65 fora=0toq9-1:readv9$(a):next:rem vergleich<br>
+            9000 data besser als, so gut wie, und so weiter.</p>
+
+        <p>Wichtig: Um auch beim automatischen Dichten in den Genuß der eigenen Mnemonics zu kommen, sollten die Satzstrukturen ab Zeile 1001 überarbeitet beziehungsweise ergänzt und mit Strukturen, die die neuen Mnemonics enthalten, versehen werden.</p>
+
+        <p>Wenn es Sie stört, daß Komma und Leerzeichen vertauscht gedruckt werden, daß am Versende auch nach einem Komma ein Punkt gesetzt wird und daß bei mehr als 80 Zeichen pro Vers der Ausdruck falsch formatiert wird, dann helfen Ihnen folgende Zeilen:</p>
+
+        <p>712 forx=0toz2-1:p$ = p$+e$(x) 4-””:ife$(x)”, ”then714<br>
+            713 iflen(p$)>3thenp$=left$(p$, len(p$)-4)+e$(x)<br>
+            715 ifright$(p$,2)=”, ”thenp$ = left$(p$, len(p$)-1):goto722<br>
+            716 p$=left$(p$, len(p$)-1)+”.”<br>
+            722 printp$<br>
+            723 ifdr$&lt;>jthen739<br>
+            724 x=len(p$):y=y:ifx&lt;81then738<br>
+            725 x=x-1:ifmid$(p$,x,1)&lt; >””orx>80then725<br>
+            726 print#1, left$(p$,x-1)<br>
+            727 print#1, spc(78+x-y);mid$(p$,x+1,y-x)<br>
+            730 goto739<br>
+            738 print#1,p$<br>
+            739 p$=””:nextb:print:ifdr$=”j”thenprint # 1</p>
+
+        <p>Haben Sie sich auch schon geärgert, wenn Sie lange Mnemonic-Ketten eingegeben haben und das Programm lapidar mit »UNKNOWN MNEMONIC« aussteigt? Dann helfen Ihnen die folgenden Zeilen. Nach Erkennen eines Fehlers wird die fehlerhafte Versstruktur ausgegeben, nach Berichtigung wird das Gedicht neu erzeugt.</p>
+
+        <p>700 print”ERROR&hellip;UNKNOWN MNEMONIC:”m$:goto13000<br>
+            13000 close1:gosub13100<br>
+            13010 forx=0toz2:e$(x)=””:next:goto300<br>
+            13100 print”[home,11 Cursordown,2Spacesj”mn$(vz)<br>
+            13101 input"{home,11 Cursordown]";mn$(vz)<br>
+            13102 return</p>
+
+        <p>Wenn Sie zusätzlich noch Groß- und Kleinschrift einführen wollen, müssen Sie sämtliche DATA-Zeilen ab 2060 anpassen! Die DATA-Elemente müssen dabei in Anführungszeichen stehen, da sonst Großbuchstaben nicht übernommen werden. Dieser Aufwand lohnt sich wohl nur, wenn Sie sowieso den Wortschatz ändern wollen. Folgende Zeilen müssen dann zusätzlich geändert werden:</p>
+
+        <p>304 &hellip;. open1,4,7<br>
+            714 nextx:x=asc(left$(p$,1)):x$=chr$(xor128):p$=x$+mid$(p$,2)</p>
+
+        <p>Man könnte nun daran denken, eine Korrekturmöglichkeit der Mnemoniczeilen vorzusehen. Weiter wäre es sicher reizvoll, von gelungenen Gedichten die Struktur speichern beziehungsweise laden zu können. Auch wäre daran zu denken, bei der Struktureingabe eine Abfrage des Stringzählers einzubauen, um einen »illegal quantity error« zu vermeiden. Wollen Sie obiges nicht alles selbst machen, so können Sie eine leere Diskette mit Rückporto an Uli Beyenbach, Gluckstr. 12, 75 Karlsruhe-21 schicken. Ich schicke Ihnen dann das verbesserte Programm zu.</p>
+
+        <address class="author">(Uli Beyenbach/tr)</address>
+
+        <p>TODO FEHLERTEUFELCHEN</p>
+    </article>
+</body>
+
+</html>

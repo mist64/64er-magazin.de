@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips zu Textverarbeitungsprogrammen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Schacht, og">
+    <meta name="64er.issue" content="2/86">
+    <meta name="64er.pages" content="49-51">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips zu Textverarbeitungsprogrammen</h1>
+        <p class="intro">Bei der Arbeit mit Textprogrammen wie »SM-Text«, »StarTexter« und »Vizawrite« kann man sich durch Tricks das Leben leichter machen. Wir zeigen Ihnen wie es geht.</p>
+
+        <p>Kann man Basic-Programme mit Textverarbeitungsprogrammen bearbeiten? Natürlich geht das, Sie brauchen nur ein Programm, das das Basic- in ein Text-File konvertiert, und diesen Vorgang nach der Bearbeitung wieder rückgängig macht. Ein solches Programm ist der »text-transposer«, dessen Listing wir nachfolgend abgedruckt haben.</p>
+
+        <p>Bevor wir allerdings dazu kommen, haben wir noch ein paar Tips zu »SM-Text« und »StarTexter«.</p>
+
+        <h2>Tips zu SM-Text</h2>
+
+        <p>Lädt man das »(«-Programm (Lader-Programm), so erscheint zunächst ein Menü, in dem man nochmals ein »t« für Textverarbeitung eingeben muß. Wem das zuviel ist, braucht nur im »(«-Programm in Zeile 60 folgende Erweiterung voranzustellen:<br>
+            60 POKE631,84:POKE632,13: POKE 198,2:..</p>
+
+        <p>Es wird ein »t« im Tastaturpuffer abgelegt, und bei der Abfrage eingelesen. So ist es nun möglich, »SM-Text« in einem Stück zu laden.</p>
+
+        <p>Bei der neuesten Version (SM-Text+) braucht man diesen Kniff nicht, da das Programm mit »*« geladen werden kann.</p>
+
+        <p>Hier gibt es aber die Möglichkeit, kleine Routinen zu programmieren und diese zu speichern. Dadurch kann man einen kleinen Mangel kompensieren, der beim Speichern eines Textes auftritt. Normalerweise wird der Text dann gelöscht und man müßte ihn, wenn man weiterarbeiten möchte, wieder laden. Das Abarbeiten der einzelnen Menüpunkte können Sie dem C 64 überlassen. Nachstehend ist untereinander aufgelistet, was einzugeben ist. Daneben steht die Erklärung der Tastenoperationen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Beim Eingeben der Routine sollte man einen Text benutzen, der bereits auf Diskette vorhanden ist, damit man die Routine (die ja beim Speichern gleichzeitig ausgeführt wird), eingeben kann.</p>
+
+        <p>Will man den laufenden Text zwischendurch einmal speichern, so genügt das Drücken von »RESTORE« und der F1-Taste.</p>
+
+        <p>Ein weiterer Trick ist folgender: Es geht darum, einen Info-Text in den vorhandenen Text, den man gerade bearbeitet, einzublenden und wieder zu löschen (Fenstertechnik). In diesem Infotext können zum Beispiel die gängigsten Steuerzeichen erklärt sein. So geht man vor:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Nun kann man durch Drücken von RESTORE und der F3-Taste einen beliebigen Text einblenden und ihn durch Drücken von RESTORE und der F4-Taste wieder löschen.</p>
+
+        <h2>Tips zu StarTexter</h2>
+
+        <p>Dieses Programm ist fast als perfekt zu bezeichnen. Es fehlt jedoch der Tabulator. Hier kann man sich aber leicht behelfen.</p>
+
+        <p>In einer Zeile setzt man an der gewünschten Tabulatorstelle einen Punkt. Dann vervielfältigt man diese Zeile so oft wie nötig: CTRL, a, e, i; etc. Hat man sich so ein mit Punkten ausgefülltes Feld aufgebaut, kann man mit der RUN/Stop-Taste (Worttabulator) schnell von Punkt zu Punkt springen.</p>
+
+        <h2>Basic-Programme bearbeiten</h2>
+
+        <p>Basic-Programme sind im Speicher normalerweise als Gemisch von Klartext und Token vorhanden. Damit kann ein Textprogramm natürlich nichts anfangen. Es ist also erforderlich, das Programm im Klartext zu haben. Der LIST-Befehl benutzt eine Betriebssystem-Routine, die dies bewerkstelligt. Es besteht die Möglichkeit, sein Basic-Programm als Text-File zu speichern. Man gibt im Direktmodus ein:<br>
+            open8,8,8"NAME,P,W":cmd8:list: print#8<br>
+            und schließt das File mit<br>
+            close8</p>
+
+        <p>Ein solches Text-File kann zwar von vielen Textprogrammen geladen werden (auch als sequentielles File denkbar). Leider treten aber verschiedene unangenehme Effekte auf: Anführungsstriche verschwinden; die Formatierung stimmt nicht; Zeichen sind grundsätzlich codemäßig anders definiert.</p>
+
+        <p>Das Programm »text-transposer« (Listing) paßt das Text-File an das entsprechende Textprogramm an. Nun kann man mit diesem modifizierten File im Textprogramm hantieren. Beim Speichern macht nun jedes Textprogramm seinen eigenen Spaghetti-Code daraus. Mit »text-transposer« kann dieses File wieder in ein lauffähiges Basic-Programm umgewandelt werden.</p>
+
+        <h2>Programmbeschreibung und Benutzung</h2>
+
+        <p>Im Hauptmenü besteht die Auswahl zwischen<br>
+            (a) »prg-file« in »textprg-file« wandeln und<br>
+            (b) »textprg-file« in »basic-file« wandeln.</p>
+
+        <p>Hat man sein Basic-Programm in der oben erwähnten Weise abgespeichert, wählt man (a). Dann wählt man sein Textprogramm 1 bis 3 und lädt sein Text-Quellprogramm. Danach speichert man das modifizierte Textfile (unter anderem Namen).</p>
+
+        <p>Liegt nach der Bearbeitung mit einem Textprogramm ein von diesem gespeichertes File vor, wählt man (b) und lädt dieses Programm. Es besteht die Möglichkeit, das zu wandelnde Text-File komplett zu übernehmen oder einzeln nach Zeilennummern zu editieren. Editiert man im Textprogramm, sollte man die READY-Meldung unbedingt stehen lassen, »text-transposer« erkennt dadurch das Ende durch einen SYNTAX ERROR. Ist dies geschehen, kann man mit RUN 61500 den »text-transposer« löschen.</p>
+
+        <h2>Bemerkungen zu SM-Text</h2>
+
+        <p>Bevor man das gewandelte Text-File (sequentiell) lädt, muß man die Zeilenbreite auf die längste auftretende Zeile stellen (zirka 100). SM-Text hat die Eigenschaft, Buchstaben zu verlieren, wenn das Format größer ist als die eingestellte Zeilenzahl. Weiter ist die Umstellung vom deutschen Zeichensatz auf Commodore(ASCII-)Tastatur sinnvoll, aber nicht unbedingt nötig.</p>
+
+        <p>Hat man den Text geladen, bleibt als einzige Forderung nur, daß eine Leerzeile nach dem Textnamen stehenbleiben muß. Weiterhin sollte das Programm nicht mehr als 100 Zeilen haben, da SM-Text sonst indiskutabel langsam wird.</p>
+
+        <h2>Bemerkungen zu StarTexter</h2>
+
+        <p>Das Programm verarbeitet maximal 250 Zeilen ohne merkbar langsamer zu werden. Die Pfeil-nach-links-Taste wird durch das Telefonsymbol (Commodore-Taste »t«), und der Klammeraffe durch Pac-man dargestellt. Man fängt in der ersten Zeile an. Auch hier muß die READY-Meldung als Endekennzeichen am Schluß stehenbleiben.</p>
+
+        <h2>Bemerkungen zu Vizawrite</h2>
+
+        <p>Das Text-File wird als sequentielles File eingelesen. Dazu geht man ins Editierfeld und benutzt die Merge-Funktion: Commodore-Taste drücken, großes M, Namen eingeben, bei page ein »s« eingeben, RETURN. Nun wird das Text-File als sequentielles File geladen. Dabei sollte die Formatzeile unbedingt 75 Zeichen lang sein (sonst klappt die Rückwandlung nicht richtig).</p>
+
+        <p>Ist das Text-File geladen, muß man die ersten zwei Leerzeilen unbedingt stehenlassen. Man sollte sich nicht daran stören, wenn eine Basic-Zeile etwas unkonventionell abgekürzt wird (durch word-wrapping, also automatischem Zeilenumbruch); den Abschluß einer Basic-Zeile bildet immer das Dreieck-Sonderzeichen für RETURN.</p>
+
+        <p>Die Anführungsstriche werden von Vizawrite normalerweise eliminiert und sind daher vom »text-transposer« durch ein Sonderzeichen ersetzt. Beim weiteren Editieren des Programms kann man natürlich Anführungsstriche weiterverwenden. Beim Rücktransformieren werden die Anführungsstriche und das Sonderzeichen in jeden Fall als Anführungsstriche ausgegeben.</p>
+
+        <h2>Funktionsweise von »text-transposer«</h2>
+
+        <p>Der Klartext wird ab Adresse 20 000 geladen (die Lade- und Speicherroutine ist angelehnt an filecopy der Test/Demo-Disk). Die Parameter sind ab Zeile 61070 aufgeführt (lb = 32,hb = 78). Je nach verwendetem Textprogramm wird etwas unelegant von außen in ein Maschinenprogramm hineingePOKEt, um eine Verzweigung zu erreichen. Bei Vizawrite und SM-Text werden die Zeichen nacheinander eingelesen. Bei StarTexter wird beim Einlesen gleich formatiert, das heißt eine Zeile wird auf 80 Zeichen mit Leerzeichen aufgefüllt.</p>
+
+        <p>Vor dem Speichern werden, je nach Textprogramm, die entsprechenden Parameter (a) gesetzt (Zeile 60710, 60830, 60940). Zur Erklärung der einzelnen Parameter:<br>
+            (a) parameter-viza:<br>
+            Text-File als sequentielles File (f$="s") speichern ab Adresse 20 000 (lb = 32, hb = 78); Anführungsstriche Code 34 in Code 191 wandeln.<br>
+            (a) parameter-star:<br>
+            Als Programm-File speichern ab Adresse 20152 (unnötige Leerzeichen); Code-Wandlung 95 in 163 und 13 in 95<br>
+            (a) parameter-sm:<br>
+            Als sequentielles File speichern, ab Adresse 19983; Vorschreiben der Namenskennungszeile(nn$); Codewandlung 34 in 191</p>
+
+        <p>Wünscht man weitere Code-Wandlungen, so braucht man dies nur mit POKE TA + (ALTER CODE),(NEUER CODE) zu machen. TA ist eine Tabelle, die ab 50000 im Speicher steht.</p>
+
+        <p>Hat man das Text-File mit einem Textprogramm bearbeitet und gespeichert, muß eine erneute Code-Wandlung erfolgen (b).<br>
+            (b) parameter-viza:<br>
+            Als Programm-File laden; Code-Wandlung vornehmen (Zeile 60780, 60790); dann 279 Byte überlesen (POKE 250/251 Anfangsadresse; nur spezifische Informationen)<br>
+            (b) parameter-star:<br>
+            Als Programm-File laden; durch POKE 985,234 auf Routine »verzweigen«, die den Text wieder kürzt (alle Leerzeichen nach einer Zeile entfernt); Code-Wandlung 95 in 13, 163 in 95; dann die ersten beiden Byte überlesen (Sonderzeichen)<br>
+            (b) parameter-sm:<br>
+            Als sequentielles File laden; Code-Wandlung 191 in 34; dann die ersten 19 Byte überlesen (Namenskennungszeile; nn$).</p>
+
+        <p>Beim Editieren (Schleife 60310 bis 60390) wird durch SYS 864 eine Basic-Zeile nach der anderen auf den Bildschirm geschrieben, gleichzeitig der Code geändert, und die Zeile durch ein »Carriage Return« im Tastaturpuffer übernommen. Bei Zeilen, die länger als 80 Zeichen sind, erfolgt die Aufforderung zum Kürzen.</p>
+
+        <p>Die Schleife wird beendet, wenn die READY-Meldung auf dem Bildschirm erscheint, und bei dem Versuch, diese mit RETURN zu übernehmen, ein Syntax Error entsteht. Man hat nun die Möglichkeit, mit RUN 61500 den »text-transposer« zu löschen.</p>
+
+        <h2>Hinweise zum Abtippen</h2>
+
+        <p>Alle REM-Zeilen können weggelassen werden. Umnummerierung ist jedoch nicht ratsam, da aus dem Direktmodus heraus Zeilen direkt angesprungen werden, und durch ein Renumber nicht geändert würden (Zeilen 60380 und 61550).</p>
+
+        <address class="author">(M. Schacht/og)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Programmieren Sie strukturiert! (Teil 2)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Burkhard Leuschner, gk">
+    <meta name="64er.issue" content="2/86">
+    <meta name="64er.pages" content="156,158,160">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Programmieren Sie strukturiert! (Teil 2)</h1>
+        <p class="intro">Im ersten Teil haben wir uns mit Sequenzen, Schleifen und Verzweigungen beschäftigt, das heißt mit Steuerbausteinen, die festleaen, wie das Programm jeweils fließt. Heute geht es um einen anderen Bausteintyp, um die Unterprogramm-Bausteine.</p>
+
+        <p>Jede Programmiersprache, und sei sie noch so reichhaltig, kann immer nur eine begrenzte Anzahl von Befehlen zur Verfügung stellen. Und so kommen wir beim Programmieren immer wieder an den Punkt, wo ein Befehl, den man eigentlich brauchte, nicht vorhanden ist.</p>
+
+        <p>Kein Grund zur Resignation. Was man nicht hat, verschafft man sich. Es gibt zwei Möglichkeiten, sich neue Befehle zu verschaffen: Entweder man besorgt sie sich, oder man macht sie sich selber.</p>
+
+        <p>Wie man sich Befehle besorgen kann? Nun ja, man sammelt sie zum Beispiel aus Zeitschriften, man studiert Programme anderer Leute, oder man kauft sich eine Befehlesammlung, wie zum Beispiel Macro Basic, und stellt sich daraus jeweils die Befehlsmenge zusammen, die man gerade braucht.</p>
+
+        <p>Was man sich nicht versorgen kann, muß man sich, wie gesagt, selber machen. Wie, darum geht es im folgenden.</p>
+
+        <p>Neue Befehle erstellt man mit Hilfe von Unterprogramm-Bausteinen. Basic stellt zwar solche Bausteine zur Verfügung (die Subroutinen und die Funktionen), aber diese sind, vom Standpunkt des strukturierten Programmierens aus, doch sehr verbesserungsbedürftig. Wir wollen sehen, wo Verbesserungen möglich sind und wie sie aussehen können.</p>
+
+        <p>Wie im ersten Teil wollen wir auch dabei die Programmiersprache Comal als Wegweiser benutzen. Diese Sprache ist, wie schon dort angemerkt wurde, besonders gut durchdacht, besonders menschenfreundlich ausgestaltet. Und sie stellt uns Unterprogramm-Bausteine zur Verfügung, die es dem Programmierer ausgesprochen leicht machen, neue Befehle zu erfinden und einzusetzen. Diese Unterprogrammstruktur wollen wir in Basic so weit wie möglich imitieren. Im übrigen werden wir uns, wo notwendig, auch von anderen Programmiersprachen, wie zum Beispiel Ada, anregen lassen.</p>
+
+        <h3>Befehlstypen</h3>
+
+        <p>Es gibt in Programmiersprachen viele verschiedene Arten von Befehlen. WennwirzumBeispiel sagen»PREIS = 25.99«, dann habenwir einen Zuweisungsbefehl benutzt. Schleifen und Verzweigungen gehören zu den Steuerbefehlen, wir haben sie in der letzten Folge behandelt. Im heutigen Zusammenhang interessieren uns die beiden folgenden Typen: die Handlungsbefehle und die Funktionen.</p>
+
+        <h3>Handlungsbefehle</h3>
+
+        <p>»PRINT NAME$« ist ein Handlungsbefehl. Er bringt den Computer dazu, eine Druckhandiungauszuführen. »POKE 1024,1« bewirkt, daß der Computer in die erste Bildschirmspeicherzelle des C 64 die Zahl 1 steckt, so daß ein »A« in der linken oberen Ecke des Bildschirms erscheint. »SAVE ”programm”,8« veranlaßt den Computer dazu, das Programm, das im Speicher ist, auf Diskette zu schreiben.</p>
+
+        <p>Handlungsbefehle benutzt man, wenn man will, daß der Computer eine bestimmte Handlung ausführt.</p>
+
+        <h3>Funktionen</h3>
+
+        <p>Funktionen sind Befehle, die man als spezialisierte Handlungsbefehle ansehen kann. Ihre spezielle Aufgabe ist es, solche Handlungen durchzuführen, die Daten zum Ergebnis haben. Praktisch gesprochen: Funktionen sind Befehle, die Daten erzeugen. Die Funktion »INT(25.99)« erzeugt die Zahl »25«, die Funktion »MID$ (”Zeitschrift”,5,3)« den Text »sch«.</p>
+
+        <p>Zu den speziellen Eigenschaften von Funktionen gehört, daß man ihnen das erzeugte Datum abnehmen muß. Während es bei Handlungsbefehlen genügt, einfach den Befehl auszusprechen, zum Beispiel »RESTORE«, reicht dies bei Funktionen nicht aus. »INT(25.99)« mag zwar möglicherweise dazu führen, daß der Computer die notwendigen Handlungen durchführt (Dezimalpunkt finden, Bruchteil abschneiden), aber er streikt spätestens dann, wenn er nicht weiß, was er mit dem erzeugten Zahlenwert anfangen soll. Wenn man eine Funktion verwendet, muß man also dem Computer gleichzeitig auch sagen, was mit dem erzeugten Datum zu geschehen hat. Beispiele: PRINT INT(25.99) oder GANZZAHL = INT(25.99) oder IF INT(25.99)&lt;100 THEN&hellip;</p>
+
+        <p>Das ist natürlich kein Nachteil; es hat vielmehr den Vorteil, daß man Funktionen wie Zahlen (beziehungsweise Texte) einsetzen kann. Funktionsbefehle, kann man auch sagen, werden immer in Ausdrücken aufgerufen. Lassen Sie uns nun sehen, wie man Handlungsbefehle und Funktionen herstellt, die nicht in der Programmiersprache vorhanden sind.</p>
+
+        <h3>Comal: Prozeduren und Funktionen</h3>
+
+        <p>Comal stellt zwei Bausteintypen für selbstgemachte Befehle zur Verfügung, die einander sehr ähnlich sind: Prozeduren und Funktionen . Beide haben prinzipiell dieselbe Struktur. Für Handlungsbefehle benutzen wir die Prozedurstruktur, für selbstgestrickte Befehle vom Typ Funktion die Funktionsstruktur.<br>
+            Beispiel 1: Bildschirm löschen</p>
+
+        <p>In einigen Programmiersprachen gibt es den Handlungsbefehl PAGE, der den Bildschirm löscht (und also eine neue Bildschirmseite anfängt). Für die Definition dieses Befehls benutzen wir folgenden Prozedurbaustein:</p>
+
+        <p>9000 PROC page<br>
+            9010 PRINT CHR$(147),<br>
+            9020 ENDPROC page</p>
+
+        <p>Wenn diese Prozedur in einem Comal-Programm enthalten ist, dann steht damit in diesem Programm der Befehl PAGE zur Verfügung. Das heißt, immer wenn der Bildschirm gelöscht werden soll, geben wir einfach den Namen der Prozedur, also PAGE, ein:</p>
+
+        <p>0010 page<br>
+            0020 &hellip;</p>
+
+        <p>Eine neue Funktion zu definieren, ist ebenso einfach. Sie unterscheidet sich in ihrem Aufbau von einer Prozedur nur durch den zusätzlichen Befehl RETURN (der übrigens nichts mit dem gleichnamigen Befehl in Basic zu tun hat!).<br>
+            Beispiel 2: Wo befindet sich der Cursor?</p>
+
+        <p>Die Funktion CURSORZEILE soll die Nummer der Zeile ausgeben, in der sich der Cursor gerade befindet:</p>
+
+        <p>9000 FUNC cursorzeile<br>
+            9010 zeile: = PEEK(214) + l<br>
+            9020 RETURN zeile<br>
+            9030 ENDFUNC cursorzeile</p>
+
+        <p>Die Speicherzelle 214 enthält beim Commodore 64 die Nummer der Zeile, in der sich der Cursor gerade befindet. Der Wert 1 wird addiert, damit die erste Zeile auch tatsächlich die erste ist und nicht etwa die nullte.</p>
+
+        <p>Der Befehl »RETURN zeile« (9020) weist die Funktion an, den Wert der Variablen ZEILE »zurückzugeben« (to return the value) und die Funktion zu verlassen. Dies ist der Wert, den die gesamte Funktion zur Verfügung stellt; den Sie also erhalten, wenn Sie sagen:</p>
+
+        <p>PRINT cursorzeile</p>
+
+        <p>Wenn also die Funktion CURSORZEILE in einem Comal-Programm steht, dann steht damit in diesem Programm der neue Befehl CURSORZEILE zur freien Verfügung. Beispiel:</p>
+
+        <p>Nehmen wir an, Sie drucken einen längeren Text auf dem Bildschirm aus. Sie wollen, daß immer nur 20 Zeilen gedruckt werden; danach soll der Bildschirm gelöscht werden und der Text wieder in der ersten Zeile beginnen. Sie könnten schreiben:</p>
+
+        <p>0100 IF cursorzeile > 20 THEN page</p>
+
+        <p>In dieser Zeile sind also zwei selbstdefinierte Befehle verwendet, der Handlungsbefehl PAGE und der Funktionsbefehl CURSORZEILE.</p>
+
+        <p>Lassen Sie uns nun anschauen, wie dasselbe in Basic aussieht.</p>
+
+        <h3>Basic: Subroutinen und Funktionen</h3>
+
+        <p>Basic stellt ebenfalls zwei Bausteintypen für selbstdefinierte Befehle zur Verfügung, einmal die Subroutinen, zum andern die Funktionen. Im Gegensatz zu Comal sind die beiden Bausteintypen allerdings völlig verschieden aufgebaut. Die Subroutinenstruktur kann für selbstgemachte Handlungsbefehle, die Funktionsstruktur für Funktionsbefehle eingesetzt werden.</p>
+
+        <p>Eine Subroutine, die den Bildschirm löscht, könnte so aussehen:</p>
+
+        <p>1000 printchr$(147);<br>
+            1020 return</p>
+
+        <p>Eine Funktion, die die Zeile abfragt, in der sich der Cursor gerade befindet, wird so definiert:</p>
+
+        <p>100 deffncz(x)=peek(214) +1</p>
+
+        <p>Die Programmzeile, die bewirkt, daß nur 20 Zeilen gedruckt und danach der Bildschirm freigemacht wird, sähe so aus:</p>
+
+        <p>500 iffncz(0) > = 20thengosubl000</p>
+
+        <p>Zu beachten ist dabei, daß in Basic (anders als in Comal) die Funktion definiert sein muß, bevor sie aufgerufen werden kann. Funktionsdefinitionen findet man deshalb häufig zu Beginn von Basic-Programmen.</p>
+
+        <p>Ein Vergleich zwischen der Comal- und der Basic-Definition unserer selbstdefinierten Befehle macht sehr deutlich, um wieviel menschenfreundlicher Comal ist, einmal beim Codieren, vor allem aber beim Lesen eines Programms. Bei Comal benutzen wir einfach den Namen einer Prozedur oder einer Funktion, wenn diese abgearbeitet werden soll, und wenn wir die Namen geschickt gewählt haben, verstehen wir auf Anhieb, was das Programm jeweils tut. Eine Basic-Zeile hingegen erschließt sich nur nach langem Studium des Programms, falls überhaupt: Um FNCZ(0) zu verstehen, muß die Definition dieser Funktion gesucht werden; wenn man wissen will, was GOSUB1000 bewirkt, muß man zur Zeile 1000 gehen und das dortige Unterprogramm analysieren.</p>
+
+        <p>Basic hat es also bitter nötig, menschenfreundlicher gemacht zu werden. Lassen Sie uns dies in Angriff nehmen. Zwar können wir natürlich die Basic-Version, die auf dem Commodore 64 installiert ist, nicht ändern, aber wir können dasselbe tun, was wir in Teil I getan haben: Wir können Bausteinstrukturen entwickeln, die denen, die wir in Comal finden, nachempfunden sind, und uns auf diese Weise sowohl das Codieren wie das Lesen unserer Basic-Programme erleichtern.</p>
+
+        <h3>Prozeduren in Basic: Grundprinzipien</h3>
+
+        <p>Neben den Grundprinzipien, die für alle Bausteine gelten (insbesondere, daß jeder Bausteinblock nur einen Eingang und einen Ausgang hat — vergleiche Teil 1), wollen wir zusätzlich folgendes beachten:</p>
+
+        <ol>
+            <li>Eine Prozedur muß, wenn sie lesbar und verstehbar sein soll, überschaubar bleiben. Das bedeutet, sie darf eine gewisse Länge nicht überschreiten. Wenn irgend möglich, soll sie auf einer Seite Platz finden.<br>Das ist ein relatives Maß. Wer Listings nur gedruckt studiert, könnte als Maßstab die Druckseite festlegen; wer Programme auf dem Bildschirm verstehen will (und das ist zum Beispiel, wenn man Fehler verbessert, der Normalfall), wird diesen zum Maßstab machen. Wer einen 80-Zeichen-Bildschirm besitzt, kann mehr unterbringen als wer nur 40 Zeichen zur Verfügung hat. Da wir als C 64-Benutzer uns mit 40 Zeichen begnügen müssen, soll dies unser Maß sein: Prozeduren sollen möglichst auf einen C 64-Bildschirm passen.</li>
+            <li>Eine Prozedur ist so zu konzipieren, daß sie eine Welt für sich bildet. Was in der Außenwelt passiert, darf sie nicht berühren. Was in der Welt der Prozedur geschieht, darf nicht nach außen wirken.<br>Das hat einen sehr praktischen Grund. Veränderungen, die im Programm vorgenommen werden, wirken dann immer nur auf einen überschaubaren Bereich und bleiben auf diese Weise kontrollierbar. Wenn hingegen dieses Prinzip nicht beachtet wird, kann die Wirkung einer unbedeutenden Änderung an einer Stelle des Programms ein ganzes Programm unbrauchbar machen. Es gibt wohl keinen Programmierer, der dazu nicht ein garstig Liedchen beisteuern könnte.<br>Im übrigen haben Prozeduren dieser Art noch den Vorteil, daß man sie bei Bedarf auch in anderen Programmen verwenden kann, ohne daß man sie an die Situation des neuen Programms anpassen müßte.</li>
+            <li>Eine Prozedur soll zwar eine abgeschlossene Welt sein, das bedeutet aber nicht, daß nicht Kommunikation zwischen Prozedur und Außenwelt stattfinden könnte.</li>
+        </ol>
+
+
+        <p>Solche Kommunikation kann zwei Richtungen haben: von der Außenwelt in die Prozedur und aus der Prozedur in die Außenwelt. Im einen Fall verarbeitet die Prozedur Daten, die sie von außen erhält, im andern Fall gibt sie Ergebnisse ihres Wirkens der Außenwelt bekannt.</p>
+
+        <p>Je nach dem Typ der Kommunikation zwischen Prozedur und Außenwelt können wir die folgenden Typen unterscheiden:</p>
+
+        <ol>
+            <li>Prozeduren ohne Kommunikation mit der Außenwelt</li>
+            <li>Prozeduren, die Information hereinlassen</li>
+            <li>Prozeduren, die Information hinauslassen</li>
+            <li>Prozeduren, die Information sowohl herein- und hinauslassen</li>
+            <li>Damit keine unbeabsichtigte Kommunikation zwischen Prozedur und Außenwelt stattfinden kann, müssen wir dafür sorgen, daß Variablen, die in der Welt der Prozedur benutzt werden, nur in dieser Welt und sonst nirgendwo bekannt sind. Man nennt solche Variablen »lokal« (im Gegensatz zu »globalen« Variablen, die sowohl in der Außenwelt wie in der Prozedur gelten).</li>
+        </ol>
+
+
+        <h3>Prozeduren ohne Kommunikation mit der Außenwelt</h3>
+
+        <p>Beispiel 3: Linie</p>
+
+        <p>Die Prozedur soll eine Linie über den Bildschirm ziehen.</p>
+
+        <p>TODO</p>
+
+        <p>Prozedur ohne Kommunikation LINIE<br>
+            Anfang Block<br>
+            Linie zeichnen<br>
+            Ende Block</p>
+
+        <p>Die Handlung »Linie zeichnen« kann hier sehr einfach mit Hilfe einer einzeiligen Zählschleife bewerkstelligt werden. In Comal wird das so codiert:</p>
+
+        <p>9000 PROC linie CLOSED<br>
+            9010 FOR i # = 1 TO 40 DO PRINT CHR$(192),<br>
+            9020 ENDPROC linie</p>
+
+        <p>Die Zählvariable I # ist eine Integervariable, was in Comal im Gegensatz zu Basic möglich ist und die Geschwindigkeit des Schleifendurchlaufs um ein Mehrfaches erhöht.</p>
+
+        <p>Diese Variable gilt nur innerhalb der Prozedur, sie ist nur lokal gültig. Dies wird dadurch bewirkt, daß die Prozedur ausdrücklich mit dem Befehl CLOSED gegenüber der Außenwelt abgeschottet wird. Wenn also woanders im Programm die Variable I # noch einmal auftritt, macht das keine Probleme. Das heißt ein Comal-Programm könnte folgenden Schleifenblock enthalten, also 20mal Linie aufrufen, ohne daß Schwierigkeiten entstünden:</p>
+
+        <p>0100 FORi#=1to20<br>
+            0110 linie<br>
+            0120 ENDFORi#</p>
+
+        <p>In Basic ist dies in so einfacher Weise nicht zu lösen. Es gibt keinen Befehl, der eine Subroutine abschließen und deren Variablen von der Außenwelt abschotten könnte. Wir müssen vielmehr selber dafür sorgen, daß Variablen lokal sind. Dies können wir dadurch erreichen, daß wir bestimmte Variablennamen für Prozeduren reservieren und außerhalb von Prozeduren grundsätzlich nicht verwenden. Ich schlage vor, daß wir Variablennamen, die wir in Prozeduren verwenden, mit U beginnen lassen und außerhalb von Prozeduren keine Namen, die mit U beginnen, benutzen (»U« steht für »Unterprogramm«).</p>
+
+        <p>In Basic gibt es weiterhin keinen Prozedurrahmen, der die Prozedur deutlich von ihrer Umgebung abgrenzen könnte. Wir brauchen jedoch einen, denn wir wollen ja, daß unsere Programme gut lesbar sind. Also müssen wir selber einen schaffen.</p>
+
+        <p>Den Prozedurkopf wollen wir mit einer REM-Zeile so markieren:</p>
+
+        <p>REM PROC: Prozedurname</p>
+
+        <p>(Später werden wir noch eine Klammer für Variablen anfügen.)</p>
+
+        <p>Als Endemarkierung benutzen wir RETURN. Wir können uns deshalb damit begnügen, weil wir ja grundsätzlich jeden Baustein, also auch Unterprogramme, so bauen, daß Sie nur einen Ausgang haben, und diesen immer am Ende des Bausteins. (Vergleiche Teil I).</p>
+
+        <p>Wir können nun eine Basic-Prozedur LINIE analog zum Comal-Vorbild codieren.</p>
+
+        <p>42000 rem proc: linie<br>
+            42010 for ui=1 to 40:print chr$(192);: next<br>
+            42020 return</p>
+
+        <p>Aufgerufen wird eine solche Prozedur in Basic leider nicht einfach mit dem Prozedurnamen wie in Comal, sondern viel umständlicher mit »GOSUB Zeilennummer«. Ein Programmblock, der 20 Linien druckt, würde in Basic also so aussehen:</p>
+
+        <p>100 fori=1to20<br>
+            110 gosub 42000: rem linie<br>
+            120 next</p>
+
+        <p>Da die Schleifenvariable des Hauptprogramms I und die Schleifenvariable der Prozedur UI unterschiedlich sind, kann auch hier kein Konflikt entstehen. Aber dafür ist in Basic, wie gesagt, der Programmierer verantwortlich.</p>
+
+        <p>Der Programmierer muß auch für mehr Lesbarkeit sorgen. In Comal informiert der Prozedurname sowohl bei der Definition wie beim Aufruf der Prozedur darüber, was die Prozedur tut. In Basic müssen wir diese Information selber beisteuern — durch REM-Bemerkungen, sowohl im Prozedurkopf (Zeile 42000) als auch da, wo die Prozedur mit GOSUB aufgerufen wird (Zeile 110).</p>
+
+        <p>Und noch eins: Comal sorgt automatisch für bessere Lesbarkeit, indem es selbständig einrückt und Leerzeichen verlangt. Auch hier muß der Basic-Programmierer selber handeln.</p>
+
+        <p>Die Prozedur LINIE führt die gewünschten Handlungen durch, ohne daß sie Information von der Außenwelt benötigte. Das ist jedoch nur selten der Fall — die meisten Befehle kommen ohne Kommunikation mit der Außenwelt nicht aus.</p>
+
+        <h3>Prozeduren mit Einwegkommunikation 1: Information kommt herein</h3>
+
+        <p>Beispiel 4: Pause</p>
+
+        <p>Wenn die Prozedur PAUSE aufgerufen wird, soll das Programm die angegebene Anzahl Sekunden pausieren.</p>
+
+        <p>TODO</p>
+
+        <p>Prozedur mit Einwegkommunikation: Info kommt herein PAUSE<br>
+            Anfang Block<br>
+            Anzahl Schleifen berechnen<br>
+            Schleifenanfang<br>
+            nichts tun<br>
+            Schleifenende<br>
+            Ende Block</p>
+
+        <p>Die Comal-Prozedur:</p>
+
+        <p>9000 PROC pause(sekunden) CLOSED<br>
+            9010 anzahl’schleifen: = sekunden*1050<br>
+            9020 FOR i=l TO anzahl’schleifen DO NULL<br>
+            9030 ENDPROC pause</p>
+
+        <p>Bei Comal (Version 2.01) läuft der Computer ungefähr 1050mal in einer Sekunde durch eine leere Zählschleife. Wenn das Programm 4 Sekunden lang pausieren soll, dann muß man ihn anweisen, 4 x 1050mal eine solche Schleife zu durchlaufen.</p>
+
+        <p>Wieviel Sekunden die Pause dauern soll, muß der Prozedur natürlich mitgeteilt werden. Dies geschieht durch die Variable SEKUNDEN, die dem Prozedurnamen in Klammern folgt. Eine solche Variable in Klammern schlägt gleichsam ein Loch in die Mauer, welche die Prozedur umgibt, und schafft einen Eingang, durch den eine Information in das Innere der Prozedur gelangen kann.</p>
+
+        <p>Der Variablename SEKUNDEN gilt übrigens nur innerhalb der Prozedur, ist also lokal.</p>
+
+        <p>Wenn man im Programm eine Pause von 4 Sekunden Länge benötigt, gibt man folgenden Befehl ein:</p>
+
+        <p>pause (4)</p>
+
+        <p>Man kann natürlich statt der Zahl auch einen Variablennamen benutzen, zum Beispiel</p>
+
+        <p>pause (anzahl’sekunden)</p>
+
+        <p>Ja, man kann sogar denselben Variablennamen benutzen wie in der Prozedurdefinition:</p>
+
+        <p>pause (sekunden)</p>
+
+        <p>Für Comal handelt es sich trotzdem um zwei verschiedene Variablennamen, der eine ist in der Außenwelt zuhause, der andere gilt nur lokal, das heißt in der Welt der Prozedur.</p>
+
+        <p>In Basic müssen wir da wieder vorsichtig und selber um die »Lokalität« der Prozedurvariablen besorgt sein, indem wir, wie verabredet, U vor dem Variablennamen schreiben. Den Prozedurkopf erweitern wir jetzt, wie angekündigt, um eine Klammer für Variablen.</p>
+
+        <p>43000 rem proc: pause (usek: in)<br>
+            43010 uanzahl = usek*950<br>
+            43020 for ui = l to uanzahl: next<br>
+            43030 return</p>
+
+        <p>In Basic läuft der Commodore 64 nur 950mal in der Sekunde durch eine leere Zählschleife — deshalb die Zahl 950 im Basic-Programm.</p>
+
+        <p>Das (englische) Wort »IN« vor dem Namen der Variablen USEK soll andeuten, daß sie einen Wert von außen erhält und diesen in die Prozedur hineinnimmt. Nachher werden wir für die Gegenrichtung das Wort »OUT« benutzen. Die Anregung, IN und OUT in dieser Weise zu benutzen, kommt übrigens aus der Programmiersprache Ada, die sich an dieser Stelle noch menschenfreundlicher als Comal gibt.</p>
+
+        <p>Wie geben wir nun unseren Pausenbefehl in Basic ein? In Comal konnten wir den Befehlsnamen schreiben und in Klammern die Anzahl der Sekunden nennen: PAUSE(4). Der Wert »4« wird von Comal automatisch der Prozedur übermittelt. In Basic müssen wir wieder selber tätig werden und den Wert »4« der Subroutine eigenhändig mitteilen. Wir tun dies so:</p>
+
+        <p>usek = 4: gosub 43000: rem pause</p>
+
+        <p>An dieser Stelle wird nun vielleicht auch klar, warum es sinnvoll ist, im Kopf der Basic-Prozedur »USEK: UN« anzugeben: Dies erinnert uns daran, daß wir beim Aufruf der Prozedur nicht vergessen dürfen, der Variablen USEK: einen Wert zuzuweisen.</p>
+
+        <p>Anmerkung: Zur guten Lesbarkeit von Comal-Programmen trägt auch die Möglichkeit bei, lange Variablennamen zu benutzen (sie können bis zu 78 Zeichen lang sein!). Basic kann Variablennamen nur bis zur Länge von 2 Zeichen verstehen. ZEIT und ZETTEL zum Beispiel kann es nicht unterscheiden, denn beide beginnen mit ZE. Trotzdem sind wir nicht auf zwei Zeichen beschränkt, längere Namen werden akzeptiert, nur müssen wir, wie immer bei Basic, selber denken und deshalb aufpassen, daß keine unserer Variablen in den ersten beiden Zeichen übereinstimmen. Und auf noch etwas müssen wir achten: Ein Variablenname darf kein Basic-Befehlswort enthalten; der Name KORREKT zum Beispiel erzeugt einen Syntaxfehler, weil er QR enthält. Man kann Basic überlisten, indem man den Namen so schreibt: KO RREKT; er trägt dann immer noch zur besseren Verständlichkeit des Programms bei, und der Computer macht keine Zicken. Es gibt noch einen Trick, um Basic zu überlisten. Schreiben Sie »KO«, tippen Sie dann irgendein Grafikzeichen ein, zum Beispiel Shift-O, und anschließend »RREKT«. Wenn Sie die Zeile wieder listen, ist das Grafikzeichen unsichtbar, obwohl es noch immer vorhanden ist und das »O« vom »R« trennt. Aber Vorsicht: Wenn Sie (zum Beispiel nach einer Veränderung der Zeile) noch einmal RETURN drücken, verschwindet das Grafikzeichen wieder, und Basic hat Sie überlistet!</p>
+
+        <h3>Prozeduren mit Einwegkommunikation 2: Information geht hinaus Beispiel 5: Zufallswort</h3>
+
+        <p>Wenn der Befehl ZUFALLSWORT’ERZEUGEN eingegeben wird, soll ein Wort hergestellt werden, das aus zufällig ausgewählten Buchstaben besteht. Die Wortlänge soll (ebenfalls zufällig) zwischen 1 und 10 Zeichen betragen. Das Wort soll in der Variablen TEXT$ gespeichert und an die Außenwelt gegeben werden. Wörter, die entstehen könnten: LM, LVBFPSNL, KEKN, YN,RGUY, etc. (Manbenutzt derartige Befehle manchmal, um Sortierprogramme zu testen.)</p>
+
+        <p>TODO</p>
+
+        <p>Prozedur mit Einwegkommunikation: Info geht hinaus ZUFALLSWORT’ERZEUGEN<br>
+            Anfang Block<br>
+            Variable initialisieren<br>
+            Wortlänge bestimmen<br>
+            Wort erzeugen<br>
+            Ende Block</p>
+
+        <p>Die Comal-Prozedur:</p>
+
+        <p>9000 PROC zufallswort'erzeugen(REF text$) CLOSED<br>
+            9010 text$: = " "<br>
+            9020 wortlaenge: = RND(l,10)<br>
+            9030 FOR i # = 1 TO wortlaenge<br>
+            9040 ascii = RND(65,90)<br>
+            9050 text$=text$ + CHR$(ascii)<br>
+            9060 ENDFORi#<br>
+            9070 ENDPROC zufallswort’erzeugen</p>
+
+        <address class="author">(Übrigens läßt Comal uns hier eigentlich im Stich. Was wir bräuchten, wäre ein Prozedurtyp, der nur Information hinausläßt. Den aber gibt’s nicht. Aber es gibt einen, der Information herein- und wieder hinausläßt. Den haben wir hier ersatzweise benutzt. Wir ignorieren halt die hereinkommende Information. Das Fenster für den Informationsgegenverkehr wird durch den Zusatz REF geöffnet, der also bewirkt, daß über die Variable TEXT$ Information nicht nur hereinkommt, sondern auch wieder hinausgeht.)</address>
+
+        <p>Aufgerufen wird die Prozedur, wie bekannt (die Klammer enthält die Variable WORT$, die außerhalb der Prozedur gilt und nach dem Aufruf das erzeugte Zufallswort aufnimmt):</p>
+
+        <p>zufallswort'erzeugen(wort$)</p>
+
+        <p>Nach dem Aufruf enthält die Variable WORT$ also das erzeugte Zufallswort, zum Beispiel KEKN, so daß Sie nun also sagen könnten: PRINT WORT$.</p>
+
+        <p>Die Basic-Prozedur sieht so aus:</p>
+
+        <p>30000 rem proc: zufallswort erzeugen (utext$: out)<br>
+            30010 utext$ = " "<br>
+            30020 ulaenge = int(rnd(l)*10 +1)<br>
+            30030 for iu = l to ulaenge<br>
+            30040 ua = int(rnd(l)*(90-65) + 65)<br>
+            30050 utext$ = utext$ + chr$(ua)<br>
+            30060 next<br>
+            30070 return</p>
+
+        <p>Den Befehl ZUFALLSWORT’ERZEUGEN ruft man so im Basic-Programm auf:</p>
+
+        <p>gosub 30000:wo rt$ = utext$:</p>
+
+        <p>Das heißt nach der Rückkehr aus der Subroutine müssen Sie der Variablen WO RT$ den in der Prozedur hergestellten Inhalt, das erzeugte Zufallswort, mit eigener Hand zuweisen. Erst dann können Sie sagen: PRINT WO RT$.<br>
+            Bisher wurden Prozeduren ohne Kommunikation sowie mit Einwegkommunikation (nur Eingabe oder nur Ausgabe) beschrieben. Natürlich gibt es auch Prozeduren mit Zweiwegkommunikation, also mit Ein- und Ausgabe. Auch die Zahl der Variablen ist prinzipiell nicht beschränkt. Doch darüber mehr in der übernächsten Ausgabe.</p>
+
+        <address class="author">(Burkhard Leuschner/gk)</address>
+    </article>
+</body>
+
+</html>
