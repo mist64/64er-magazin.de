@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Monitor zum Ascompiler</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Quirin Spitzner, ev">
+    <meta name="64er.issue" content="2/86">
+    <meta name="64er.pages" content="68-70">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Der Monitor zum Ascompiler</h1>
+        <p class="intro">Dieser Maschinensprache-Monitor ist die ideale Ergänzung zum Ascompiler 64 aus der letzten Ausgabe: Speichern, Laden und Ändern von übersetzten Programmen wird damit zum Kinderspiel.</p>
+
+        <p>Dieser Monitor wurde speziell für den Ascompiler 64 (Listing des Monats in der Ausgabe 1/86) entwickelt. Der Ascompiler ist ein einfacher, aber extrem schneller Übersetzer für ein sogenanntes »Tiny Basic« (ein Integer-Basic mit eingeschränktem Befehlssatz).</p>
+
+        <p>Natürlich ist der hier vorgestellte Monitor vollständig im Ascompiler-Format geschrieben. Weil der Compiler nur einen sehr eingeschränkten Basic-Befehlssatz verarbeitet, wurde die Programmierung auch etwas umständlich. Als normales Basic-Programm läuft der Monitor nur bedingt, da einige Maschinenroutinen aufgerufen werden, die von Basic aus zu langsam bearbeitet werden. Es ist daher auf jeden Fall eine Übersetzung mit dem Ascompiler 64 notwendig. Ist dies geschehen, dann läuftdas Programm einwandfrei und kann mitjedem in Assembler geschriebenen Maschinenmonitor mithalten, und das sowohl hinsichtlich der Geschwindigkeit als der Bedienungsfreundlichkeit. Wie bei jedem professionellen Monitor üblich, sind generell alle Adressenangaben hexadezimal. Der »SPITZMON 64«genannte Monitorhatfolgenden Befehlssatz:</p>
+
+        <h3>Memory Dump: »M XXXX YYYY«</h3>
+
+        <p>Hexdump des Speicherbereichs von $XXXX bis $YYYY. Der ausgegebene Memory-Dump kann natürlich beliebig editiert werden. Dazu fährt man mit dem Cursor auf die zu ändernde Speicherstelle und überschreibt diese. Nach RETURN werden alle 8 Byte einer Zeile neu in den Speicher geschrieben.</p>
+
+        <h3>Exit: »X«</h3>
+
+        <p>Dieser Befehl beendet das Programm und führt zurück ins B3sic</p>
+
+        <h3>Save: »S”Name” AA XXXX YYYY«</h3>
+
+        <p>Dieser Befehl speichert den Bereich von $XXXX bis $YYYY als Maschinenprogramm »Name« auf Datasette oder Diskette. Die genaue Bedeutung der einzelnen Parameter:<br>
+            $AA = Geräteadresse<br>
+            (AA = 01: Datasette, AA = 08: Diskettenlaufwerk).<br>
+            $XXXX = Programmanfang<br>
+            $YYYY = Programmende plus eins</p>
+
+        <p>Beispiel: Wenn Sie das Monitor-Programm (Listing) genau abtippen und mit dem Ascompiler nach $4000 compilieren, so liegt das Maschinenprogramm zwischen $4000 und $5520. Sie können nun den Spitzmon von Basic aus mit »SYS 4*4096« (4*4096=$4000) starten und ihn als erstes sich selbst als Maschinenprogramm für zukünftige Verwendung speichern lassen. Dazu geben Sie ein:</p>
+
+        <p>»S”SPITZMON64.$4000” 08 4000 5521«. Falls Sie mit Datasette arbeiten, müssen Sie die »08« natürlich in »01« ändern.</p>
+
+        <h3>Load: »L”Name” AA«</h3>
+
+        <p>Dieser Befehl lädt ein Maschinenprogramm an seine Originaladresse.</p>
+
+        <p>$AA ist wieder die Geräteadresse (AA = 01: Datasette, AA = 08 Diskettenlaufwerk)</p>
+
+        <h3>Go: »G XXXX«</h3>
+
+        <p>Ein Maschinenprogramm mit der Startadresse $XXXX wird gestartet. Mitdiesem Befehl muß sehrvorsichtig umgegangen werden, denn wenn an der angegebenen Adresse kein sinnvolles Maschinenprogramm steht, dann führt das in der Regel zum »Absturz« des Computers.</p>
+
+        <h3>Fill: »F XXXX YYYY AA«</h3>
+
+        <p>Dieser Befehl füllt den Speicherbereich von $XXXX bis $YYYY mit dem Byte $AA.</p>
+
+        <h3>Transfer: »T XXXX YYYY ZZZZ«</h3>
+
+        <p>Transfer verschiebt den Speicherbereich von $XXXX bis $YYYY nach $ZZZZ.</p>
+
+        <h3>Compare: »C XXXX YYYY ZZZZ«</h3>
+
+        <p>Dieser Befehl überprüft, ob sich ab $ZZZZ die gleichen Daten im Speicher befinden, wie zwischen $XXXX und $YYYY. Treten Unterschiede auf, so werden diese Adressen in hexadezimaler Schreibweise ausgegeben.</p>
+
+        <h3>Hunt: »H XXXX YYYY AA BB CC«</h3>
+
+        <p>oder: <strong>»H XXXX YYYY AA BB«</strong><br>
+            oder: <strong>»H XXXX YYYY AA«</strong></p>
+
+        <p>Der Hunt-Befehl durchsucht den Speicherbereich von $XXXX bis $YYYY nach maximal 3 Bytes. Findet das Programm die gesuchten Bytes, so werden die Adressen des jeweils ersten Bytes (»AA«) in Hex-Schreibweise ausgegeben.</p>
+
+        <p>Beispiel: »H E000 FFFF 20 D2 00« durchsucht den Speicherbereich zwischen $E000 und $FFFF nach dem Auftreten der Bytefolge $20, $D2, $00.</p>
+
+        <h2>Vom Umgang mit dem Spitzmon</h2>
+
+        <p>Für den Maschinensprache-Unkundigen ist in erster Linie die Funktion »Save« interessant, denn dadurch wird es möglich, mit dem Ascompiler übersetzte Programme direkt als Maschinenprogramme zu speichern. Vorausgesetzt, Sie haben ein Programm für den Ascompiler 64 geschrieben und natürlich den Ascompiler selbst und eine bereits übersetzte Version des Spitzmon zur Hand, dann funktioniert das Arbeiten mit Ascompiler und Spitzmon folgendermaßen:</p>
+
+        <ul>
+            <li>Ascompiler 64 laden und starten</li>
+            <li>Nach »Ready«-Meldung das eigene Tiny-Basic-Programm eintippen oder laden</li>
+            <li>Mit »SYS 49152« den Ascompiler 64 aktivieren.</li>
+            <li>Startadresse des zu erzeugenden Maschinenprogramms angeben — Der Ascompiler übersetzt nun das Tiny-Basic-Programm im Speicher und gibt anschließend die Anfangsund Endadresse des erzeugten Maschinenprogramms an. Diese beiden Adressen aufschreiben</li>
+            <li>Eine bereits übersetzte Version des Spitzmon mit »LOAD ”Name”,8,1« (»..,1,1« bei Datasette) laden und mit SYS starten, wobei hinter dem SYS-Befehl die dezimale Startadresse des Spitzmon angegeben werden muß (Beispiel: Der Spitzmon wurde ab Adresse $8000 compiliert, dann lautet der SYS-Befehl: »SYS 8*4096«)</li>
+            <li>Sie sind jetzt im Spitzmon 64 und können das vorhin übersetzte Tiny-Basic-Programm mit »S”Name” 08 XXXX YYYY« auf Diskette speichern, wobei Sie für XXXX und YYYY die vorhin notierte Anfangs- und Endadresse des übersetzten Programms angeben. Bei der Arbeit mit dem Spitzmon ist darauf zu achten, daß alle Eingaben in hexadezimaler Schreibweise gemacht werden. Das »$«-Zeichen wird aber natürlich nicht eingegeben.</li>
+        </ul>
+
+
+        <p>Der Spitzmon überprüft jede Eingabe des Benutzers. Mehrere Zahlenangaben müssen durch eine Leerstelle (Blank) voneinander getrennt werden. Natürlich sind für die Zahleneingabe nur die Ziffern 1 bis 9 und die Buchstaben A bis F erlaubt. Werden diese Bedingungen nicht erfüllt, so erscheint als Fehlermeldung ein Fragezeichen hinter der Fehlerstelle. Der Befehl wird dabei natürlich abgebrochen.</p>
+
+        <h2>Hinweise zum Abtippen</h2>
+
+        <p>Wenn Sie den Ascompiler 64 aus der Ausgabe 1/86 nicht besitzen, dann ist es sinnlos, sich die Mühe des Abtippens zu machen.</p>
+
+        <p>Bevor Sie darangehen, den Spitzmon 64 (Listing) abzutippen, sollten Sie als erstes den Ascompiler laden und starten, um den Spitzmon nach der Eingabe unverzüglich compilieren zu können. Beim abgedruckten Listing des Spitzmon wurde auf Prüfsummen verzichtet, da es beim Zusammenwirken von Checksummer und Ascompiler 64 möglicherweise zu Problemen kommen kann. Steuer- und Grafikzeichen wurden allerdings in der bewährten Klartext-Form ausgegeben.</p>
+
+        <p>Auf folgende Punkte sollten Sie besonders achten:</p>
+
+        <ul>
+            <li>Verändern oder vereinfachen Sie keine Zeilen oder Variablen.</li>
+            <li>Mehrere Befehle in einer Zeile sind unzulässig.</li>
+            <li>Lesen Sie nochmals genau die Anleitung für den Ascompiler 64 (Ausgabe 1/86) durch.</li>
+        </ul>
+
+
+        <p>Der Spitzmon 64 kann natürlich noch beliebig erweitert werden (zum Beispiel Dissasembler etc.). Es ist aber darauf zu achten, daß nur die Variablennamen von A-Z zur Verfügung stehen. Um das Maschinenprogramm so kurz wie möglich zu halten, sollte man von Multiplikation und Divisionen wenig Gebrauch machen. Die Anweisung »LET K=J * 2« benötigt in der Übersetzung mehr als 70 Byte (!). In diesem Fall könnte man das gleiche Ergebnis durch Addition erreichen (»LET K=J + J). Im Spitzmon 64 wurden für Multiplikation und Division spezielle Unterprogramme eingerichtet: (12310, 13290, 13310, 15020). Durch diese »Rationalisierung« konnte das gleiche Programm um mehr als 1 KByte verkürzt werden (!).</p>
+
+        <h2>Erweiterungen sind möglich</h2>
+
+        <p>Ein letztes Wort wäre noch zur Compilierung zu sagen: Sie können den Spitzmon beliebig irgendwo im Basic-Speicherbereich ansiedeln. Es ist empfehlenswert, sich verschiedene Versionen des Spitzmon 64 für unterschiedliche Adressenbereiche zu erzeugen, um dann jeweils die geeignete Version auswählen zu können. Haben Sie beispielsweise ein Tiny-Basic-Programm geschrieben, das mit dem Ascompiler 64 übersetzt im Adressenbereich ab $3000 liegt, dann können Sie, um dieses Programm zu speichern, natürlich nicht eine Spitzmon-Version verwenden, die im gleichen Adressenbereich liegt. Es istalso sinnvoll, sich verschiedene Versionen für unterschiedliche Adreßbereiche herzustellen und mit dem Ascompiler 64 auch gar kein Problem.</p>
+
+        <address class="author">(Christian Quirin Spitzner/ev)</address>
+    </article>
+</body>
+
+</html>

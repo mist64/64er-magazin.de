@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Das 64’er EPROM-Programmiergerät</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M.Frank, C. Q. Spitzner, og">
+    <meta name="64er.issue" content="2/86">
+    <meta name="64er.pages" content="64-65">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Das 64’er EPROM-Programmiergerät</h1>
+        <p class="intro">Nach der Fertigstellung der Hardware in der letzten Ausgabe, bringen wir nun die Software des 64’er EPROM-Programmiergerätes. Damit ist der EPROM-Brenner vollständig und einsatzbereit.</p>
+
+        <p>Auf geht’s zum letzten Teil des 64’er EPROM-Brenners. Der Software. Da die Programmbeschreibung schon in der letzten Ausgabe erschienen ist, bleibt dem Programm nicht mehr allzuviel hinzuzufügen.</p>
+
+        <p>Es wurden lediglich noch einige minimale Änderungen im Programm vorgenommen, so daß ein paar Kleinigkeiten ergänzt werden müssen. Der Menüpunkt »(T)ype wählen« bleibt auch bei Schalterstellung (2532) im Menü. Drückt man dann die >T«-Taste, so passiert nichts. Zeigt der Schalter vom Computer weg (Stellung 27xxx), kann mit Hilfe der >T«-Taste, durch»blättern« das gewünschte EPROM aus der 27er-Familie ausgewählt werden. Derjeweils aktuelle EPROM-Typ erscheint am Bildschirm rechts oben.</p>
+
+        <p>Interessant und wichtig ist noch das Register für den CIA 1, Port B. Dieses Register steuert die Kontroll-Logik zum Programmieren beziehungsweise Lesen der verschiedenen EPROM-Typen. Aus der Tabelle kann man den Zusammenhang zwischen EPROM-Typ, Registerinhalt und Schalterstellung entnehmen.</p>
+
+        <p>Bit 0 und Bit 1 bestimmen die Programmierspannung:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>REGISTERINHALT SPANNUNG<br>
+            00 = 24,0 V—Masse<br>
+            01 = 12,5V-Masse<br>
+            10 =24,0V-5V<br>
+            11 =12,5V-5V</p>
+
+        <p>Bit 2 steuert Pin 1 des Textoolsockels. Ist Bit 2 nicht gesetzt, dann liegt an diesem Pin die Programmierspannung an. Für das EPROM 27512 ist dort aber die Leitung A15 angeschlossen. Bit 3 kontrolliert den Umschalter zwischen PGM und A14 an Pin 27 des EPROM-Sockels. Ist das Bit gesetzt, liegt Pin 27 auf A14. Bit 4 programmiert den Umschalter zwischen +5V und A13 am Pin 26. Ist das Bit gesetzt, so liegt Pin 26 an A13. Bit 5 ist in unserem Fall unwichtig. Bit 6 ist gesetzt, wenn der Schalter auf Stellung 2532 steht (zum Computer hin). Bit 7 steuert zu guter Letzt die Programmierspannung.</p>
+
+        <h2>EPROM-bedingte Veränderungen der Software</h2>
+
+        <p>Beim Durchtesten aller handelsüblichen EPROMs stellten wir fest, daß das 16-KByte-EPROM (27128) von Mitsubishi nicht richtig programmiert werden kann! Alle anderen 16-KByte-EPROMs sind aber einwandfrei zu programmieren. Beim Programmieren des 2532 von Texas Instruments mußten wirfeststellen, daß beim unmittelbaren Überprüfen des beschriebenen Bytes immer ein VERIFY-Fehler angezeigt wird. Trotzdem wurde das EPROM aber richtig programmiert. Der Fehler läßt sich dadurch erklären, daß dieses EPROM zu lange braucht um von Schreiben auf Lesen umzuschalten. Abhilfe läßt sich durch Abschalten des unmittelbaren Verify erreichen. Dies geht mit einem einfachen POKE-Befehl (nach dem Laden des Maschinenprogramms): POKE 49419,23</p>
+
+        <p>Das EPROM kann aber trotzdem nach Beendigung des Programmiervorgangs mit (V)erify überprüft werden. Eine weitere Möglichkeit bietet die Verlängerung der Pause zwischen Programmier- und Lesezyklus. POKEt man in die Speicherstelle 49551 einen Wert größer 3 (zum Beispiel 5 oder 6), dürfte je nach EPROM kein VERIFY-Fehler mehr auftreten. In unserem Fall reichte der Wert 4 schon aus.</p>
+
+        <p>Das Programm (siehe Listing) tippen Sie bitte mit dem MSE ab. Beim EPROM-Brenner-Bausatz, beziehungsweise Fertiggerät des 64’er Hardware-Service, ist das Programm bereits enthalten.</p>
+
+        <address class="author">(M.Frank/C. Q. Spitzner/og)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Einsteiger</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Barnim König, tr, Bernd Kleine-Voßbeck, tr, Cadrio, tr, Florian Gudermann, tr, Gerhard Muth, tr, Heinrich Stender, tr, Jürgen Ehnes, tr, Peter Tiesat, tr, Sascha Lengen, tr, Volker Hilt, tr">
+    <meta name="64er.issue" content="2/86">
+    <meta name="64er.pages" content="71-72,74-76">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Einsteiger</h1>
+        <p class="intro">Unter dieser neuen Überschrift wollen wir den »Newcomern« unter den Computer-Fans helfen, durch kleine Tricks und Kniffe zu echten Profis zu werden.</p>
+
+        <p>Bevor Sie sich jedoch in unsere kleinen Tips und Listings stürzen, eine Bitte an Sie: Bestimmt haben auch Sie noch Schwierigkeiten mit dem C 64, die Sie aus Mangel an Erfahrung selber nicht beseitigen können. Schreiben Sie uns! Aber auch, wenn Sie die Probleme bereits gelöst haben und vielleicht jetzt darüber lachen. Schicken Sie die Lösung. Denken Sie daran, daß es anderen ebenso gehen könnte.</p>
+
+        <h2>Simons Basic-Modul abschalten</h2>
+
+        <p>Wer häufig, aber eben nicht immer mit Simons Basic programmiert, kann das Modul mit »SYS 64760« abschalten. Allerdings stehen dann statt 38911 nur 30719 Byte für Basic zur Verfügung. Man erspart sich aber das dauernde Rausziehen und Reinstecken des Moduls. Eingeschaltet wird Simons Basic wieder mit »SYS 64738«, durch einen Reset-Taster oder durch Aus- und Einschalten des C 64.</p>
+
+        <address class="author">(Jürgen Ehnes/tr)</address>
+
+        <h2>Der bunte Cursor</h2>
+
+        <p>Durch »POKE 53265,80« wird der Cursor rot, die Schrift bleibt allerdings hellblau. Farbige und reverse PRINT-Anweisungen werden zerstört. Läßt sich gut vor INPUT einsetzen. »Ge-SHIFTete« Zeichen erscheinen hellblau mit weißem Hintergrund.</p>
+
+        <address class="author">(Volker Hilt/tr)</address>
+
+        <h2>Berechnung von PI</h2>
+
+        <p>Im Mathematikunterricht habe ich die näherungsweise Berechnung der Kreiszahl PI kennengelernt. Das Näherungsverfahren beruht auf der Umfangsberechnung regulärer Tangenten- und Sehnenvielecke eines Kreises. Dieses Verfahren, das ich in einem Einzeiler realisiert habe, entwickelte der englische Mathematiker Gregory im 17. Jahrhundert. Das Programm (Listing 1) berechnet eine Intervallschachtelung.</p>
+
+        <p>Programmerklärung: Die FOR-NEXT-Schleife bricht die Berechnungen nach dem 13. Durchgang (FOR I=0TO12) ab, da PI vom Basic-Interpreter nicht mehr genauer berechnet werden kann. An der Variablen W erkennt der C 64, ob U=0 ist. Im ersten Durchlauf ist U=0, da nach einem »RUN« automatisch alle Variablen gelöscht werden. Das bedeutet, daß der Term »U=0« wahr ist (-1). In den folgenden Durchläufen ist U * 0 (ungleich Null). Dasbedeutet, daßderTerm»U<sup>O</sup>«nichtwahr, beziehungsweise falsch ist (siehe Bild 1 und 2).</p>
+
+        <p>Indem ich vor den Term »U=0« ein Minuszeichen setze, erreiche ich folgende Belegung der Variablen W:<br>
+            W=1: 1. Durchlauf (U=0)<br>
+            W=0: x-ter Durchlauf (U≠0)</p>
+
+        <p>Dadurch wird bewirkt, daß die Variablen nur einmal initialisiert werden. Zu dem Produkt aus W und der Initialisierungszahl addiere ich die Variable selbst, damit die Variablenwerte in den nachfolgenden Durchläufen nicht verlorengehen (siehe Bild 3). Dann folgt die eigentliche Berechnung:</p>
+
+        <p>TODO FORMEL</p>
+
+        <p>Bevor ein neuer Programmdurchlauf gestartet wird, werden N, U und 0 auf dem Bildschirm ausgegeben. Das n-Eck (Vieleck) hat zuerst sechs Ecken, dann 12, 24, 48 und so weiter, wird also an einem Kreis angenähert. Das bedeutet, daß N nach jeder Berechnung mit 2 multipliziert wird (n:=2n). Durch die Formel 6*2↑I berechne ich N für den I+1-ten Durchgang (siehe Bild 4).</p>
+
+        <address class="author">(Gerhard Muth/tr)</address>
+
+        <h2>Fehlersuche für Einsteiger</h2>
+
+        <p>Vor allem Anfänger haben Schwierigkeiten, die manchmal nur schwer verständlichen englischen Fehlermeldungen des C 64 richtig zu deuten. Aber gerade während der ersten Schritte in Basic ist es wichtig zu wissen, was man denn eigentlich falsch gemacht hat. Dieses Programm (Listing 2) •übersetzt für Sie die Meldungen des Basic-Interpreters und bringt die fehlerhafte Programmzeile gleich auf den Bildschirm. Nach der Eingabe mit dem MSE speichern Sie das Listing erst einmal auf Diskette oder Kassette. Laden Sie es dann absolut, also mit LOAD"FEHLER",8,1 für Diskette beziehungsweise mit LOAD"FEHLER",1,1 für Datasette. Danach müssen Sie NEW eingeben (RETURN-Taste nicht vergessen), damit Sie später keinen »OUT OF MEMORY ERROR« (auf Deutsch: Speicher voll) erhalten. Starten Sie dann das Programm mit SYS 49152. Wenn Sie die Erweiterung nicht mehr brauchen, geben Sie einfach SYS 49163 ein.</p>
+
+        <address class="author">(Florian Gudermann/tr)</address>
+
+        <h2>Geniale Bildschirm-Hardcopy</h2>
+
+        <p>Diese extrem kurze Programmroutine (Listing 3), die sich natürlich auch in eigene Programme einbauen läßt, bringt den Bildschirminhalt zu Papier. Angenommen, Sie möchten einen kleinen Text, oder einen Brief ausdrucken, so gibt es zwei Möglichkeiten:</p>
+
+        <ol>
+            <li>Sie laden ein Textverarbeitungsprogramm (falls Sie eines besitzen) und quälen sich durch zig Menüs, bis Sie auf dem Drucker endlich das gewünschte Resultat haben, oder</li>
+            <li>Sie tippen dieses kurze Programm ein, schreiben Ihren Text einfach auf den Bildschirm und starten das Programm mit »RUN«.</li>
+        </ol>
+
+
+        <p>Das Prinzip besteht darin, den Bildschirm als Eingabegerät zu definieren, und dann die einzelnen Zeichen direkt an den Drucker zu senden. Dabei gehen Sie so vor:</p>
+
+        <ul>
+            <li>Löschen Sie den Bildschirm mit der Taste SHIFTCLR und schreiben Sie Ihren Text (maximal 23 Zeilen). Beachten Sie, daß Sie niemals »RETURN« drücken, da sonst der C 64 Ihre Eingaben als Befehle interpretieren würde, was eine Fehlermeldung zur Folge hätte.</li>
+            <li>Wenn Sie fertig sind, schreiben Sie in die vorletzte Zeile ein »RUN« und drücken die »RETURN«-Taste (hoffentlich haben Sie vorher Ihren Drucker eingeschaltet). Das »RUN« wird jetzt automatisch gelöscht und der Text zu Papier gebracht.</li>
+        </ul>
+
+
+        <p>Das war’s auch schon!</p>
+
+        <address class="author">(Peter Tiesat/tr)</address>
+
+        <p>TODO ASIDE/TABLE</p>
+
+        <h2>»RUN« mit zwei Tastendrücken</h2>
+
+        <p>Preisfrage: Wie erreiche ich einen Programmstart auf dem C 64 ohne RUN (Return) eintippen zu müssen?<br>
+            Antwort: Bitte drücken Sie<br>
+            A und dann SHIFT zusammen mit RUN/STOP<br>
+            Auf dem Bildschirm erscheint:<br>
+            ALOAD<br>
+            ?SYNTAX ERROR<br>
+            READY.<br>
+            RUN<br>
+            (Ein eventuell vorhandenes Basic-Programm wird gestartet.)</p>
+
+        <p>Erklärung: Das Betriebssystem hält eine Routine bereit, die die Zeichenfolge<br>
+            LOAD⟨cr⟩ RUN ⟨cr⟩<br>
+            in den Tastaturpuffer einliest (⟨cr⟩ bedeutet »carriage return« und heißt »Return-Taste ausführen«).</p>
+
+        <p>Diese Routine wird durch Drücken von SHIFT und RUN/STOP aktiviert. (Sie ist besonders für Datasettenbenutzer als »Autostart« interessant.) Um nur das »RUN⟨cr⟩« zu aktivieren, muß man das »LOAD⟨cr⟩« gewissermaßen außer Betrieb setzen. Dieses geschieht dadurch, daß man durch die vorherige Eingabe eines Buchstabens (zum Beispiel »A«) das Wort »ALOAD« erzeugt. Da das ⟨cr⟩ danach aus dem Tastaturpuffer geholt wird, versucht der Basic-Interpreter diesen »ALOAD«-Befehl auszuführen. Dieser ist aber nicht im Befehlssatz vorhanden — ein »Syntax Error« wird ausgegeben. Danach geht das Betriebssystem wieder dazu über, den Tastaturpuffer abzufragen. Dort steht immer noch »RUN⟨cr⟩«. Dieses wird nun in den Bildschirmspeicher geschrieben und ausgeführt — ein Basic-Programm wird gestartet.</p>
+
+        <address class="author">(Bernd Kleine-Voßbeck/tr)</address>
+
+        <h2>Der Piepser</h2>
+
+        <p>Dieses Maschinenprogramm für den C 64 (Listing 4) bewirkt, daß immer dann, wenn eine Taste gedrückt wird, ein Ton erklingt (außer bei der »RESTORE«-Taste). Nützlich zum Beispiel bei schnellen Tipparbeiten auf ausgeleierter Tastatur als Bestätigung des »korrekten«Tastendrucks. Das Programm kopiert den Basic-Interpreter und das Kernel ins darunterliegende RAM und schaltet auf RAM um (auch mit POKE 1,53 möglich). Dann wird in die Tastaturabfrage des Betriebssystems ein JMP-Befehl zu der Routine ab $C000 (49152) eingefügt. Diese läßt einen Ton erklingen (sie wird nur bei gedrückter Taste angesprungen) und springt wieder in die Betriebssystem-Routinezurück. DasProgramm stehtab $C000=49152, wird aber mit SYS 49184 gestartet. Ist das Programm einmal aktiviert, so kann der Bereich ab 49184 genutzt werden. Experimente mit Frequenz und ADSR-Hüllkurve sind natürlich möglich.<br>
+            Start: SYS 49194<br>
+            Nach Drücken von RUN/STOP-RESTORE: POKE 1,53 Abschalten: POKE 1,55</p>
+
+        <address class="author">(Cadrio/tr)</address>
+
+        <h2>Zahlen rechtsbündig</h2>
+
+        <p>Wer hat sich noch nicht geärgert, daß die Zahlenausgabe im normalen Commodore-Basic immer linksbündig erfolgt? (Zum besseren Verständnis gebe man einmal »PRINT 3:PRINT 12« ein!) Wer keine komplizierte Print-Using-Routine benutzen will, kann sich in vielen Fällen mit dem hier vorgestellten Trick behelfen:</p>
+
+        <p>Die Kennziffer des dekadischen Logarithmus gibt die Anzahl der Vorkommastellen -1 an. In Verbindung mit der »PRINT TAB«-Funktion bietet sich die Möglichkeit, Zahlen formatiert auszugeben:<br>
+            PRINT TAB (A-(INT(LOG(X)/LOG(10)))); INT (X*10↑B)/10↑B<br>
+            wobei<br>
+            A die Anzahl der Vorkommastellen,<br>
+            B die Anzahl der Nachkommastellen,<br>
+            X die auszugebende Zahl bedeutet.</p>
+
+        <p>Natürlich ist zu beachten, daß für X-Werte kleiner gleich Null keine reellen Lösungen existieren. Auch bei Zahleneingaben die kleiner als 0,001 sind, wird die vorgestellte Print-Using-Hilfe nicht funktionieren.</p>
+
+        <address class="author">(Heinrich Stender/tr)</address>
+
+        <h2>Listschutz geknackt</h2>
+
+        <p>Der Listschutz aus der 64’er, Ausgabe 11/85, läßt sich knacken, indem man nach dem Laden einen »POKE 2067,73« eingibt.</p>
+
+        <address class="author">(Sascha Lengen/tr)</address>
+
+        <h2>Sauberes Schriftbild auf dem MPS 801</h2>
+
+        <p>Ein weit verbreiteter und derzeit sehr preisgünstiger Matrix-Drucker für den C 64 beziehungsweise VC 20 ist der MPS 801 beziehungsweise GP 100 VC, dessen Matrix mit der des älterenVC 1515fürdenVC20identisch ist Diese Druckerhaben ein sehr gut lesbares Schriftbild bei ausschließlicher Verwendung von Großbuchstaben (bei Listings meist ausreichend). Bei Verwendung von Groß- und Kleinschreibung fällt aber sehr störend das Fehlen von Unterlängen auf, wodurch die Zeichen p,q,j und so weiter hochgerutscht erscheinen. Und beim Schreiben deutscher Texte ist zwar durch eigene Zeichendefinition ein deutscher Zeichensatz mit Umlauten möglich und in vielen Textsystemen auch realisiert. Dabei fehlen dann jedoch die Oberlängen bei den großen Umlauten Ä, Ö, Ü. Bedingt ist dies durch die Zeichenmatrix, die zwar in der Breite von 6 Punkten sehr gut lesbar ist, in der Höhe von 7 Punkten aber für Unter- oder Oberlängen (Ä, 0, Ü) nicht ausreicht. Die folgende Maschinensprache-Routine (Listing 5) versetzt die genannten Drucker dennoch in die Lage, mit Hilfe der Grafikcodes echte Ober- und Unterlängen zu drucken, außerdem auch die deutschen Sonderzeichen. Des weiteren werden statt inverser Zeichen unterstrichene gedruckt, wodurch in Basic-Listing (CMD-Modus) die Steuerzeichen besser lesbar werden. Ein besonderer »Leckerbissen« ist das Anführungszeichen, das abwechselnd unten und oben erscheint. Die Druckroutine funktioniert bei Normalschrift (CHR$(14)) und Breitschrift(CHR$(15)), wobei auch das Mischen von Schmal- und Breitschrift innerhalb einer Zeile unverändert möglich ist.</p>
+
+        <p>Das Programm nimmt Rücksicht auf den geringen Zeichenpuffer des Matrix-Druckers und ist so ausgelegt, daß der Drucker möglichst schnell arbeitet. Daher wird kein völlig eigener Zeichensatz verwendet, sondern nur der vorhandene entsprechend modifiziert.</p>
+
+        <p>Das Programm ist für den C 64 konzipiert und kann im Bereich $D000, also über dem l/O-Port arbeiten, so daß es weder Basic-Speicherplatz belegt noch den gleichzeitigen Betrieb von eigenen Betriebssystem-Erweiterungen, Toolkits oder 80-Zeichen-Karte beeinträchtigt! In diesem Falle steht jedoch der Kassettenpuffer für die Datasette nicht mehr zu Verfügung, da dort ein Ein- und Aussprungprogramm nach $D000 steht. Aufgrund des universellen Basic-Laders ist das Programm allerdings auch in anderen Speicherbereichen zu betreiben und somit auch im VC 20 ohne Änderung (mindestens 3 KByte-RAM-Erweiterung erforderlich). Bei allen Speicherbereichen außer $D000 kann auch weiterhin ein Kassettenrecorder betrieben werden.</p>
+
+        <p>Selbstverständlich kann die Drucker-Routine auch in Textverarbeitungsprogramme eingebaut werden, wozu es allerdings Maschjnensprache-Kenntnisse bedarf.</p>
+
+        <p>Das Programm ist in Basic-DATAs geschrieben, um es universell und kompatibel zu halten. So kann jeder, der es einmal abgetippt hat, es an VC 20- und C 64-Besitzer ohne Anpassungsprobleme weitergeben.</p>
+
+        <p>Zur Bedienung des Programms: Nach dem Start mit »RUN« bietet es fünf Möglichkeiten für den Speicherbereich oder den verwendeten Computer an. Je nach gewähltem Bereich setzt es aufgrund der DATA-Zeilen die Maschinenroutine an die richtige Stelle. Die DATA-Prüfsummen werden vor Ansprung der Maschinensprache geprüft. Nach einer Wartezeit von 30 Sekunden wird dann noch angeboten, die Lage der deutschen Umlaute auf der Tastatur zu ändern, im Original ist ä=CHR$(60), A=CHR$(62), 0=CHR$(91), 0=CHR$(93), ü=CHR$(64), U=CHR$(42), ß=CHR$(92). Um dies zu ändern, müssen neue ASCII-Codes eingegeben werden. Achtung: Es ist nicht zulässig, daß für verschiedene Umlaute der gleiche Code eingegeben wird (zum Beispiel alles Null). Die Routine hängt sich sonst auf. Werden keine deutschen Sonderzeichen gewünscht, so können für diese die Codes über 200 eingegeben werden, die in der Praxis kaum vorkommen. Wenn das Programm durchgelaufen ist, werden POKEs angeboten, mit denen die Drucker-Routine ein- und ausgeschaltet werden kann. Achtung: Beide POKEs müssen jeweils wie angezeigt in einer Befehlszeile mit Doppelpunkt getrennt eingegeben werden, keinesfalls einzeln! Nach Ausschalten muß mit »PRINT#4,CHR$(15);« (oder CHR$(14)) der Drucker zunächst wieder in den Normalzustand gebracht werden (steht sonst auf CHR$(8) = Grafik). Das Basic-Programm endet, indem es den Befehl »NEW« und die Abfrage »PRINT FRE(0)« vorschlägt, um zu dokumentierten, wieviel freier Speicherraum noch verfügbar ist. Auch nach »NEW« kann mit den genannten POKEs die Unterroutine beliebig an- und ausgeschaltet werden. Achtung: RUN/STOP-RESTORE schaltet die Druckerroutine ab.</p>
+
+        <p>Noch zwei Hinweise: Wird mit »OPEN4,4« ein Druckerfile erstmals eröffnet, so empfiehlt es sich, mit »PRINT #4« erst einmal eine Leerzeile zu drucken. Beim CMD-Modus entfällt dies. Am Ende eines Druckvorgangs ist die letzte Zeile stets ohne Unterlängen gedruckt, da der Computer noch auf die Oberlängen der nächsten Zeile wartet. Kommt keine nächste Zeile mehr, so sollte mit »PRINT#4« eine Leerzeile gedruckt werden. Nach Beendigung eines »CMD« muß daher manchmal nicht nur ein- sondern zweimal »PRINT # 4« eingegeben werden.</p>
+
+        <address class="author">(Barnim König/tr)</address>
+    </article>
+</body>
+
+</html>

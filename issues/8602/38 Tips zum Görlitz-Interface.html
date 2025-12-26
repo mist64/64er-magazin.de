@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips zum Görlitz-Interface</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="ah">
+    <meta name="64er.issue" content="2/86">
+    <meta name="64er.pages" content="38-39">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips zum Görlitz-Interface</h1>
+        <p class="intro">Hier finden Sie die gesammelten Erfahrungen vieler Anwender des Görlitz-Interface. Gerade die Arbeit mit Epson- und kompatiblen Druckern wird dadurch wesentlich erleichtert.</p>
+
+        <p>Eine Hardcopy des Bildschirmes ist nur mit einem Zusatzprogramm möglich, da der Computer hierfür keinen eigenen Befehl hat. Ein solcher Befehl »COPY« ist zum Beispiel in Simons Basic enthalten, es gibt aber auch entsprechende Veröffentlichungen in Zeitschriften.</p>
+
+        <p>Einige Programme sprechen die Typen der Commodore-Drucker an, die eine Grafik mit sieben Punkten pro Zeile ausdrucken. Diese Befehle müssen vom Drucker-Interface umgesetzt werden, damit ein Epson-Drucker sie versteht. In der Anleitung zum Görlitz-Interface finden Sie den Befehl »ESC Leertaste V«, der den VC-Grafikmodus einschaltet.</p>
+
+        <p>Die Vorbereitung des Interfaces für 7-Nadel-Hardcopy, zum Beispiel aus Simons Basic, geschieht dann durch<br>
+            OPEN1,4:PRINT#1,CHR$(27)" X” CHR$(27)" V"<RETURN>
+        </p>
+
+        <p>Wobei man die Leertasten in den ” ” nicht vergessen darf und auch nicht (!) mit Shift eintippt. Letzteres würden Sie am Bildschirm nicht als Fehler sehen, aber die Shift-Leertaste hat einen anderen Code. Hinweis für Abtipper von Hardcopy-Programmen aus Zeitschriften, die den 8-Nadel-Modus nutzen: auch das geht natürlich. Man sollte das Interface im Linearkanal mit SA = 12 aufrufen, also die Routine nach OPEN1, 4, 12 benutzen. Sofern die Hardcopy-Routine nicht mit einem OPEN-Befehl, sondern nur mit SYS zu starten ist: Hier ist es etwas schwieriger, da man in der Maschinensprache das OPEN1, 4 und die Sekundäradresse suchen muß. Jedenfalls auch hier möglichst SA = 12 einsetzen. Beachten Sie auch, daß der Bildschirminhalt an verschiedenen Stellen im Speicher stehen kann!</p>
+
+        <h2>Arbeiten mit VCEI</h2>
+
+        <p>Das planlose Herumprobieren mit Sekundäradressen bringt hier keinen Erfolg. Die zu treffende Maßnahme ist einfach: Der Drucker ist in den Textmodus (Groß- und Kleinschreibung) zu stellen und festzuklemmen.</p>
+
+        <p>Der Drucker sollte vor dem Starten mittels »ESC Space X« in die Epson-Schrift gebracht werden, damit Sie die Steuerfunktionen nutzen. Das geht beispielsweise mittels<br>
+            OPEN 10,4,10,”12”<br>
+            OPEN 1,4<br>
+            PRINT#1,CHR$(27)" X"<br>
+            oder<br>
+            OPEN 1,4<br>
+            PRINT#1,CHR$(27)" X"<br>
+            PRINT#1,CHR$(27)" T"</p>
+
+        <p>Natürlich gibt es noch weitere Steuermöglichkeiten; mit diesen Vorbefehlen (vor dem Programmstart!) sollte das Arbeiten mit Ihrem Textprogramm einfacher sein. Generell ist zu sagen: Wenn der Drucker nur von links nach rechts druckt und damit also CBM-Schrift erzeugt, stimmt die Ansprache nicht, denn in dieser Schrift können Sie ja nicht die Funktionen wie Fettoder Breitdruck und so weiter anwenden.</p>
+
+        <h2>Multiplan</h2>
+
+        <p>Das Programm »Multiplan« gibt erstaunlicherweise die Groß- und Kleinschreibung genau verkehrt herum aus, dies wird nicht etwa im VCEI umgedreht. Sie können bei Multiplan durch die einfache Anweisung nach einem der obigen Beispiele (Leertaste im ”X” nicht vergessen) den Drucker vor dem Programmstart richtig einstellen.</p>
+
+        <h2>Textomat</h2>
+
+        <p>Für Textomat gilt zum Einstellen die gleiche Sequenz. Die Druckertabellen in diversen Programmen sollten zunächst leer gelassen und bei Erstellung Befehl für Befehl geprüft und nachvollzogen werden. Häufiger Fehler am Beispiel Fettschrift (ESC E): Der ASCII-Befehl lautet »lB 45«:, der C 64 muß im Textmodus für ein großes »E« aber »C5« senden, also muß der Befehl in hex lauten: »1B C5«. Viele Anwender leiden darunter, daß das schwache Handbuch des C 64 auf diese Codierung und die Abweichung CBM-ASCII zu wenig eingeht.</p>
+
+        <p>Beim Test von »Textomat Plus« haben wir festgestellt, daß nach dem Einschalten des Computers und dem Eingeben der genannten OPEN-Befehle ein nachfolgendes NEW notwendig war, sonst wurde das Programm nicht richtig geladen. Der Grund kann eigentlich nur sein, daß der Programmierer hier eine Sequenz einsetzt, die sich über noch offene Files in der Filetabelle stört; ziemlich ungewöhnlich.</p>
+
+        <h3>»Wenn ich versuche, die Schriftarten des Druckers auszuprobieren, dann geht das nur bis Schrift 159. Ab Schrift 160 kommt Unfug.«</h3>
+
+        <p>Eine häufige Frage von Anwendern, die die Umcodierung der Zeichen über den seriellen Bus nicht bis ins letzte nachvollziehen können.</p>
+
+        <p>Die Drucker ermöglichen mit dem Befehl »ESC-!-CHR$(n)« das Einstellen einer bestimmten Schrift mit den Merkmalen fett, mager, breit, eng und so weiter. Kommt die Anweisung CHR$(n) über den Wert 160, dann nimmt das Interface an, es handele sich um ein nicht druckbares Zeichen, und setzt dieses in ein Grafikbildchen um. Diese Reaktion ist natürlich richtig, hier aber nicht erwünscht. Also geben Sie den obigen Befehl über den Linearkanal, nach Sekundäradresse 4. So kann nichts passieren. Hierzu noch ein Beispiel:<br>
+            10 OPEN4,4,4:PRINT#4,CHR$(27) ”!”CHR$(160);<br>
+            20 OPEN10,4,10:PRINT#;10," ”;<br>
+            30 OPEN1,4:PRINT #1,"Schriftart 160”</p>
+
+        <p>Die mittlere Zeile überträgt, ohne eigentlich etwas zu drucken, die Sekundäradresse 10. Damit wird für das folgende Arbeiten festgelegt, daß im Groß-/Kleinmodus zu schreiben ist, denn sonst würde die Sekundäradresse 4 weiterhin Gültigkeit haben!</p>
+
+        <p>Die neueste Versionskennung der VCEIs ist V2.7/V3.7. Die »2« oder »3« kennzeichnet nur eine unterschiedliche Hardware, keine Funktionsunterschiede. Data Becker weist in einigen Anleitungsheften auf Version V2.4 hin; diese Angabe ist als »mindestens V2.4« zu verstehen. Die von Görlitz in der Folgezeit noch eingebauten Verbesserungen und Funktionserweiterungen sind kein Hinderungsgrund für das Arbeiten dieses Teils. Sollten »Data-Becker«-Programme nicht richtig laufen, so ist vermutlich die Vorsteuerung des Interfaces nicht exakt durchgeführt.</p>
+
+        <h2>Versionen des VC-Epson-Interfaces</h2>
+
+        <p>Wenn man Ihnen bei »Data Becker« mitteilen sollte, Sie müßten unbedingt die Version 2.4/3.4 haben, dann hat die Auskunft von Data Becker Sie leider in die Irre geführt. Nach Aussage von Görlitz sind alle Serien des Interfaces Commodorekompatibel.</p>
+
+        <h3>Ausdrucken mit Koala-Printer:</h3>
+
+        <p>Dieses Programm benutzt die originalen ASCII-Sequenzen zum Ansteuern der Grafik in Epson-Druckern. Diese ASCII-Codierungen stimmen direkt, sind also im Interface nicht mehr umzucodieren: Ein klarer Fall für den Linearkanal. Sie geben also vor der Benutzung dieses Programmes ein:<br>
+            OPEN9,4,9,”8” : OPEN1,4 : PRINT #1,CHR$(27)" X"CHR$(27)" L” <RETURN>
+        </p>
+
+        <p>Die erste Anweisung stellt außerdem auf acht Nadeln Vorschub ein, damit der Ausdruck vertikal bündig erfolgt.</p>
+
+        <h3>Punkte am linken Rand einer Grafik</h3>
+
+        <p>Erscheinen am linken Rand eines Grafikausdruckes kleine Punkte, dann hat das folgende Bewandtnis: Das Programm verwendet den Befehl »ESC CHR$(16)&hellip;«, um die Grafik auf einem VC-Drucker in die Bildmitte zu rücken oder allgemein einen TAB in Einzelpunktweise zu bewirken. Diesen Befehl berücksichtigte das VCEI früher nicht, im Gegensatz zu der Version ».7« mit dem die Befehle CHR$(16) als CBM-TAB-Befehl und ESC CHR$(16) als Einzelpunkt-TAB auch zusätzlich verarbeitet werden, wenn der VC-Modus mit »ESC Leertaste V« eingeschaltet würde.</p>
+
+        <h2>Hi-Eddi mit Görlitz-Interface</h2>
+
+        <p>In den Ausgaben 1/85 und Sonderheft 6 wurde eine Printerroutine für das Grafikprogramm Hi-Eddi beschrieben, welche für die Epson RX/FX-Drucker gedacht ist und deren Einzelpunktbefehle verwendet. Die hierbei benutzte Sekundäradresse ist für das Görlitz-Druckerinterface falsch. Es ist möglich, beim Abtippen des Programmes hier eine »4« einzusetzen, also den Linearkanal einzuschalten, und das Interface auf Linearkanal ohne Auto Line Feed zu setzen. Das Öffnen des Druckers würde dann geschehen mittels<br>
+            OPEN1,4:PRINT#1,CHR$(27)" X” CHR$(27)" B"CHR$(27)" L" <RETURN>.</p>
+
+        <p>Es ist aber auch möglich, die Sekundäradresse im Basic-Programm umzuändern. Dies ist ein POKE-Befehl in der Zeile 650, welche dann insgesamt lautet:<br>
+            650 POKE780,C:POKE3691,4:SYS3328: PRINT"{Cursor down}NOCHMAL";: GOSUB800:IFC$="J"THEN600</p>
+
+        <p>Nach dieser kleinen Anpassung arbeitet die Routine und das Ausdrucken mit »Hi-Eddi« einwandfrei mit allen Görlitz-VC-Interfaces zusammen.</p>
+
+        <h2>Print Shop</h2>
+
+        <p>Ein wirklich gelungenes Programm. Es arbeitet bestens mit den Görlitz-Interfaces zusammen — wenn Sie keine Raubkopie haben. Die Originaldiskette hat zwei Seiten, eine ist für Epson-Drucker. Diese ist mit dem Görlitz-Interface ohne jede Vorbereitung lauffähig. Wer mit Print-Shop Schwierigkeiten hat, sollte sich vergewissern, ob er im Besitz eines Originals ist.</p>
+
+        <address class="author">(ah)</address>
+
+        <p class="source">Info: Auszug aus der Bedienungsanleitung zum Görlitz-Interface: Görlitz-Computerbau, Lambertstr. 49, 5400 Koblenz, Tel.: (02 61) 20 44</p>
+    </article>
+</body>
+
+</html>
