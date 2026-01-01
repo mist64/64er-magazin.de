@@ -30,12 +30,10 @@
 
         <p>Zu diesem und zu allen folgenden Programmen benötigen Sie den Hypra-Ass. Er wird wie ein Basic-Programm geladen und mit RUN initialisiert. Jedes weitere RUN startetjetzt einen Assemberlauf, ist aber zunächst noch wirkungslos, da noch nichts im Textspeicher des Assemblers steht. Geben Sie nun folgende vier Zeilen ein:</p>
 
-        <p>TODO</p>
-
-        <p>10 - .BA $C000<br>
-            20 - LDA #1<br>
-            30 - STA $400<br>
-            40 - RTS</p>
+        <pre><code>10 - .BA $C000
+20 - LDA #1
+30 - STA $400
+40 - RTS</code></pre>
 
         <p>Dabei dürfen die Minus-Zeichen nach den Zeilennummern nicht vergessen werden (Eigenartvon Hypra-Ass). Auch das Leerzeichen nach den Minus-Zeichen ist wichtig. Sie werden feststellen, daß der Assember die Zeilen nach Drücken der RETURN-Taste formatiert. Listen Sie die vier Zeilen auch einmal probeweise mit<br>
             LIST (unformatiert) und<br>
@@ -57,9 +55,7 @@
 
         <p>Mit RUN wird der Assembler gestartet. Er erzeugt ein 6 Byte kurzes Maschinenprogramm ab $C000 und gibt in einer Abschlußmeldung den belegten Speicherbereich zusammen mit der Assemblierzeit bekannt. Das Maschinenprogramm kann nun mit</p>
 
-        <p>TODO</p>
-
-        <p>SYS $C000 oder SYS 12 * 4096</p>
+        <pre><code>SYS $C000 oder SYS 12 * 4096</code></pre>
 
         <p>gestartet werden. (Wenn Hypra-Ass aktiv ist, versteht der C 64 auch Hex-Zahlen). Es müßte ein »A« in der linken oberen Bildschirmecke erscheinen. Sollte das nicht der Fall sein, so kann das zwei Ursachen haben:</p>
 
@@ -71,17 +67,13 @@
 
         <p>Im zweiten Fall ergänzen Sie das Programm durch:</p>
 
-        <p>TODO</p>
-
-        <p>35 - STA $D800</p>
+        <pre><code>35 - STA $D800</code></pre>
 
         <p>Dieser Befehl speichert die immer noch im Akkumulator (im folgenden nur Akku genannt) stehende 1 an die Startadresse des Farb-RAMs. Dadurch erscheint das »A« in weißer Farbe.</p>
 
         <p>Ergänzen Sie Ihr kleines Programm einmal durch den Pseudobefehl</p>
 
-        <p>TODO</p>
-
-        <p>5 - .LI 1,3,0</p>
+        <pre><code>5 - .LI 1,3,0</code></pre>
 
         <p>und assemblieren Sie mit RUN. Der Assembler erzeugtjetzt ein Listing, dessen Zeilen von links nach rechts wie folgt aufgebaut sind:</p>
 
@@ -94,17 +86,13 @@
 
         <p>Das Assemblerlisting ist bei der Fehlersuche mit einem Monitor nützlich, da es zu jedem Maschinenbefehl seine Adresse enthält. Mit dem Pseudobefehl:</p>
 
-        <p>TODO</p>
-
-        <p>.11 1,4,0</p>
+        <pre><code>.li 1,4,0</code></pre>
 
         <p>erhält man ein Druckerlisting. Angenehm dabei ist, daß es bei ausgeschaltetem Drucker automatisch auf den Bildschrim umgeleitet wird.</p>
 
         <p>Die abgedruckten Listings enthalten allerdings keine Speicheradressen mit zugehörigem Maschinencode. Diese Information ist zum Studieren der Programme uninteressant und zum Eintippen der Listings nicht erforderlich. Die Listings wurden mit dem Editorbefehl /E (formatiertes Listen) gewonnen, nachdem vorher die Ausgabe durch</p>
 
-        <p>TODO</p>
-
-        <p>OPEN 4,4:CMD 4</p>
+        <pre><code>OPEN 4,4:CMD 4</code></pre>
 
         <p>auf den Drucker umgeleitet wurde.</p>
 
@@ -132,11 +120,10 @@
 
         <p>Das Inkrementieren eines 16-Bit Wertes verläuft nach dem Schema:</p>
 
-        <p>TODO</p>
-
-        <p>INC ZEIGER ;Low-Byte inkrementieren<br>
-            BNE Weiter ;falls ungleich 0, dann fertig INC ZEIGER+l;Ubertrag ins High-Byte<br>
-            WEITER (Programmfortsetzung)</p>
+        <pre><code>       INC ZEIGER  ;Low-Byte inkrementieren
+       BNE Weiter  ;falls ungleich 0, dann fertig
+       INC ZEIGER+1;Übertrag ins High-Byte
+WEITER (Programmfortsetzung)</code></pre>
 
         <p>Spezifisch für den Hypra-Ass ist, daß man mit</p>
 
@@ -144,9 +131,7 @@
 
         <p>das Low- bezeihungsweise High-Byte einer Adresse (beziehungsweise eines Labels) gezielt ansprechen kann. Von dieser Möglichkeit wird im Programm häufig Gebrauch gemacht. So bedeutet zum Beispiel:</p>
 
-        <p>TODO</p>
-
-        <p>LDA #&lt; (VON)</p>
+        <pre><code>LDA #&lt; (VON)</code></pre>
 
         <p>Lade den Akkumulator mit dem Low-Byte des Wertes VON.</p>
 
@@ -158,34 +143,31 @@
 
         <p>Die Parameterübergabe an Maschinensprache-Unterprogramme gestaltet sich leider nicht so systematisch wie bei den meisten höheren Programmiersprachen. Es werden mehrere Möglichkeiten bunt gemischt angewendet.</p>
 
-        <p>TODO NESTED</p>
-
         <ol>
             <li>Man schreibt Parameter in vereinbarte Speicherstellen. Aus diesen holt sich dann das aufgerufene Programm die Parameter.</li>
             <li>Wenn nur Ein- bis Drei-Byte-Parameter benötigt werden, kann man diese auch in den Registern A, X und Y übergeben. Auf diese Weise werden die meisten Kernel-Funktionen mit Parametern versorgt.<br>Dieser Mechanismus steht übrigens auch von Basic aus zur Verfügung: Man schreibt Registerparameter per POKE an speziell dafür vorgesehene Speicherstellen:<br>
-                TODO<br>
-                AkkuA 780 ($30C)<br>
-                IndexX 781($30D)<br>
-                IndexY 782 ($30E)<br>
-                Status-Register 783 ($30f)<br>
-                Das Maschinenprogramm (Listing 4) wird nun mit SYS aufgerufen. Der Basic-Interpreter besetzt erst die Register mit den Inhalten dieser Speicherstellen und bringt dann in das Unterprogramm. Nach der Rückkehr werden die (neuen) Registerinhaltewiederin denselben Speicherstellen abgelegt, wo sie für eine eventuelle Inspektion durch das Basic-Programm zur Verfügung stehen.</li>
+                <pre><code>Akku A 780 ($30C)
+                Index X 781($30D)
+                Index Y 782 ($30E)
+                Status-Register 783 ($30f)</code></pre>
+                Das Maschinenprogramm (Listing 4) wird nun mit SYS aufgerufen. Der Basic-Interpreter besetzt erst die Register mit den Inhalten dieser Speicherstellen und bringt dann in das Unterprogramm. Nach der Rückkehr werden die (neuen) Registerinhaltewiederin denselben Speicherstellen abgelegt, wo sie für eine eventuelle Inspektion durch das Basic-Programm zur Verfügung stehen.
+            </li>
             <li>Man kann Parameter auch über den Stack übergeben. Diese Methode ist wegen des kleinen Stackbereichs der 6510-CPU (256 Byte) nur bedingt brauchbar und wird deshalb auch kaum praktiziert.</li>
-            <li>Durch geschickte Verwendung von Unterprogrammen in Basic-ROM kann man Parameter direkt hinter den SYS-Befehl schreiben. Diese Methode ist</li>
-            <li>komfortabel, weil keine umständlichen POKEs nötig sind</li>
-            <li>schnell, weil der Interpreter weniger zu tun hat</li>
-            <li>flexibel, weil als Parameter auch ganze arithmetische oder Stringausdrücke geschrieben werden können.</li>
+            <li>Durch geschickte Verwendung von Unterprogrammen in Basic-ROM kann man Parameter direkt hinter den SYS-Befehl schreiben. Diese Methode ist
+                <ul>
+                    <li>komfortabel, weil keine umständlichen POKEs nötig sind</li>
+                    <li>schnell, weil der Interpreter weniger zu tun hat</li>
+                    <li>flexibel, weil als Parameter auch ganze arithmetische oder Stringausdrücke geschrieben werden können.</li>
+                </ul>
+            </li>
+            <p>Diese Methode wird in den Programm-Listings 5 bis 8 verwendet.</p>
         </ol>
-
-
-        <p>Diese Methode wird in den Programm-Listings 5 bis 8 verwendet.</p>
 
         <p>Das folgende Programm (Listing 4) nutzt die Funktionen GETIN und CHROUT. GETIN liefert den ASCII-Code einer gedrückten Taste im Akku. Falls keine Taste gedrückt wurde, wird 0 zurückgegeben. GETIN entspricht damit genau dem GET-Befehl in Basic.</p>
 
         <p>CHROUT gibt ein Zeichen, dessen ASCII-Code im Akku stehen muß, auf dem Bildschrim aus. Es entspricht dem Basic-Befehl (man beachte das Semikolon):</p>
 
-        <p>TODO</p>
-
-        <p>PRINT CHR$(A);</p>
+        <pre><code>PRINT CHR$(A);</code></pre>
 
         <p>Das Programm gibt einen Prompt aus und erwartet anschließend Eingaben. Unter einem Prompt versteht man ein (beliebig zu vereinbarendes) Zeichen am linken Bildschirmrand, das dem Benutzer mitteilt, daß Eingaben von ihm erwartet werden. Bei interaktiven Programmen (wie zum Beispiel Monitore, Editore) sind Prompts sehr nützlich, da der Benutzer daran eindeutig erkennen kann, in welchem Programm er gerade ist. Das vorliegende Programm gibt die Eingabezeichen sofort wieder aus, ohne sie weiter zu verarbeiten. Nach maximal zehn Zeichen wird automatisch ein Zeilenvorschub ausgeführt und ein weiterer Prompt ausgegeben. Das Programm ist eine Endlosschleife, die man mit der Eingabe von »X« verlassen kann.</p>
 
@@ -193,13 +175,28 @@
 
         <p>Diese Interpreter-Routinen werden in den folgenden Programmbeispielen eingesetzt:</p>
 
-        <p>TODO TABLE</p>
-
-        <p>CHKKOM ($AEFD) liest aus dem laufenden Basic-Text ein Komma. Steht an der aktuellen Stelle kein Komma, wird das Programm mit SYNTAX ERROR abgebrochen. Kommata sind nötig, um Parameter voneinander abzugrenzen.<br>
-            FRMNUM ($AD8A) wertet einen beliebigen arithmetischen Ausdruck aus. Das Ergebnis wird im Fließkomma-Akkumulator 1 (kurz FAC) abgelegt. Der FAC besteht aus den Speicherstellen $61-$66. Die Bedeutung der einzelnen Byte ist hier nicht relevant.<br>
-            GETADR ($B7F7) wandelt den Inhalt des FAC in ein 2-Byte-Integer-Format um, sofern diese Zahl im Bereich 0 &hellip; 65535 liegt. Ansonsten wird ein ILLEGAL QUANTITY ERROR ausgegeben. Die Integerzahl steht in den Speicherstellen $14/$15 und zusätzlich im Registerpaar Y/A. Mit der Kombination FRMNUM und GETADR kann man also 16-Bit-Größen aus Basic-Programmen übernehmen.<br>
-            XBYTE ($B79E) wertet ebenfalls arithmetische Ausdrücke aus und wandelt das Ergebnis in 8-Bit-Integerformat, sofern es im Bereich 0 &hellip; 255 liegt. Das Byte-Ergebnis wird im X-Register übergeben.<br>
-            USR () ist eine Basic-Funktion, mit der man Werte von Maschinenprogrammen an Basic zurückgeben kann. USR wertet einen in Klammern stehenden Ausdruck aus und übergibt ihn in den FAC. Es wird ein Maschinenprogramm aufgerufen, dessen Startadresse in $311/$312 steht. (USR-Vektor). Das Maschinenprogramm kann dann im FAC einen Wert an Basic zurückgeben.</p>
+        <table class="plain">
+            <tr>
+                <td>CHKKOM ($AEFD)</td>
+                <td>liest aus dem laufenden Basic-Text ein Komma. Steht an der aktuellen Stelle kein Komma, wird das Programm mit SYNTAX ERROR abgebrochen. Kommata sind nötig, um Parameter voneinander abzugrenzen.</td>
+            </tr>
+            <tr>
+                <td>FRMNUM ($AD8A)</td>
+                <td>wertet einen beliebigen arithmetischen Ausdruck aus. Das Ergebnis wird im Fließkomma-Akkumulator 1 (kurz FAC) abgelegt. Der FAC besteht aus den Speicherstellen $61-$66. Die Bedeutung der einzelnen Byte ist hier nicht relevant.</td>
+            </tr>
+            <tr>
+                <td>GETADR ($B7F7)</td>
+                <td>wandelt den Inhalt des FAC in ein 2-Byte-Integer-Format um, sofern diese Zahl im Bereich 0 &hellip; 65535 liegt. Ansonsten wird ein ILLEGAL QUANTITY ERROR ausgegeben. Die Integerzahl steht in den Speicherstellen $14/$15 und zusätzlich im Registerpaar Y/A. Mit der Kombination FRMNUM und GETADR kann man also 16-Bit-Größen aus Basic-Programmen übernehmen.</td>
+            </tr>
+            <tr>
+                <td>XBYTE ($B79E)</td>
+                <td>wertet ebenfalls arithmetische Ausdrücke aus und wandelt das Ergebnis in 8-Bit-Integerformat, sofern es im Bereich 0 &hellip; 255 liegt. Das Byte-Ergebnis wird im X-Register übergeben.</td>
+            </tr>
+            <tr>
+                <td>USR ()</td>
+                <td>ist eine Basic-Funktion, mit der man Werte von Maschinenprogrammen an Basic zurückgeben kann. USR wertet einen in Klammern stehenden Ausdruck aus und übergibt ihn in den FAC. Es wird ein Maschinenprogramm aufgerufen, dessen Startadresse in $311/$312 steht. (USR-Vektor). Das Maschinenprogramm kann dann im FAC einen Wert an Basic zurückgeben.</td>
+            </tr>
+        </table>
 
         <p>Das folgende Listing (Listing 5) ist der Programmkopf zu den vier nachfolgenden Beispielen. Diese können mit dem Kopf zusammen assembliert werden. Der Kopf enthält eine Sprungliste. Dadurch werden Einsprungstellen ($C000, $C003, etc.) für die vier aufgeführten Programme fixiert, unabhängig davon, wo die Programme dann später tatsächlich im Speicher stehen. Diese Technik ist zum Beispiel sinnvoll, wenn mehrere Leute zusammen an einem größeren Programm arbeiten. Ein Programmierer kann seinen Kollegen bereits feste Einsprungstellen für Routinen, an denen er noch arbeitet oder die noch gar nicht existieren, zur Verfügung stellen.</p>
 
@@ -250,7 +247,7 @@
 
         <p>DEEK und DOKE können natürlich auch verschachtelt eingesetz werden. So kann man mit</p>
 
-        <p>SYSD0,A2,USR(A1)</p>
+        <pre><code>SYSDO,A2,USR(A1)</code></pre>
 
         <p>einen 16-Bit-Wert von der Stelle A1 nach A2 kopieren.</p>
 
@@ -258,11 +255,11 @@
 
         <p>Das Programm (Listing 9) realisiert das Gegenstück zum Basic-Befehl:</p>
 
-        <p>LOAD "Name",8,1</p>
+        <pre><code>LOAD "Name",8,1</code></pre>
 
         <p>Aufgerufen wird es durch:</p>
 
-        <p>SYSSAV,Date iname,gn,s a,ea</p>
+        <pre><code>SYSSAV,Date iname,gn,s a,ea</code></pre>
 
         <p>Dabei kann bei »Dateinamen« ein Name oder ein Stringausdruck in Anführungszeichen stehen.<br>
             »gn« ist die Gerätenummer (8 oder 9)<br>
@@ -270,11 +267,20 @@
 
         <p>Die Routine bei $E257 beschafft sich den Filenamen aus dem Basic-Text und stellt ihn der später folgenden SAVE-Routine zur Verfügung. Mit SETLFS kann man dem Betriebssystem eine logische Filenummer (im Akku), eine Gerätenummer (in X) und eine Sekundäradresse (in Y) bekanntgeben. Die Parametrisierung der Kernel-SAVE-Routine ist etwas komplizierter:</p>
 
-        <p>TODO</p>
-
-        <p>X Endadresse Low-Byte<br>
-            Y Endadresse High-Byte<br>
-            A Zeiger auf das untere Byte eines Zero-Page-Bytepaares, welches die Startadresse enthält.</p>
+        <table class="plain">
+            <tr>
+                <td>X</td>
+                <td>Endadresse Low-Byte</td>
+            </tr>
+            <tr>
+                <td>Y</td>
+                <td>Endadresse High-Byte</td>
+            </tr>
+            <tr>
+                <td>A</td>
+                <td>Zeiger auf das untere Byte eines Zero-Page-Bytepaares, welches die Startadresse enthält.</td>
+            </tr>
+        </table>
 
         <p>Die SAVE-Routione kehrt mit gesetztem Carry-Flag zurück, falls beim Speichern ein Fehler aufgetreten ist. Das Programm bei $E0F9 sorgt dann für eine ordentliche Fehlermeldung.</p>
 
@@ -282,23 +288,24 @@
 
         <p>Das Programm (Listing 10) multipliziert zwei Byte-Werte miteinander und liefert ein 16-Bit-Produkt. Es ist aber trotz seiner Kürze nicht ganz einfach zu verstehen. Die beiden zu multiplizierenden Faktoren seien mit</p>
 
-        <p>Multiplikator MR und Mulitplikand MD</p>
+        <pre><code>Multiplikator MR und Mulitplikand MD</code></pre>
 
         <p>bezeichnet. Für das Resultat ist es natürlich gleichgültig, welcher Faktor als MR und welcher als MD an das Programm übergeben wird. MR kann man sich, wie jede binäre Größe, folgendermaßen vorstellen:</p>
 
         <p>MR=MR(7)*128+MR(6)*64+&hellip;+MR(1)*2+MR(0)*1</p>
 
-        <p>Dabei bezeichnet zum Beispiel MR(6) das Bit Nummer 6 von MR in der üblichen Zählweise von 0 bis 7 und von rechts nach links. Das Produkt MR*MD kann man nun so berechnen:<br>
-            Addiere folgende Teilprodukte:<br>
-            MD*128, falls MR(7)=1, sonst 0<br>
-            MD*64, falls MR(6)=1, sonst 0<br>
-            MD*2, falls MR(1)=1, sonst 0<br>
-            MD, falls MR(0)=l, sonst 0</p>
+        <p>Dabei bezeichnet zum Beispiel MR(6) das Bit Nummer 6 von MR in der üblichen Zählweise von 0 bis 7 und von rechts nach links. Das Produkt MR*MD kann man nun so berechnen:</p>
+
+<pre><code>Addiere folgende Teilprodukte:
+MD*128, falls MR(7)=1, sonst 0
+MD*64,  falls MR(6)=1, sonst 0
+MD*2,   falls MR(1)=1, sonst 0
+MD,     falls MR(0)=l, sonst 0</code></pre>
 
         <p>Die Teilprodukte erhält man einfach durch Linksverschieben von MD:</p>
 
-        <p>MD*128 durch 7-maligen Links-Shift<br>
-            MD*64 durch 6-maligen Links-Shift</p>
+        <pre><code>MD*128 durch 7-maligen Links-Shift
+MD*64  durch 6-maligen Links-Shift</code></pre>
 
         <p>Zu addieren ist nur dann etwas, wenn das entsprechende Bit in MR= 1 ist. Wenn man MR mit dem ROL-Befehl achtmal nach links schiebt, so durchwandern alle 8 Bit nacheinander das Carry-Flag und letzteres kann leicht abgefragt werden. Der Trick des Programms besteht nun darin, daß das Berechnen von Teilproduktsummen mit dem Linksschieben von MR kombiniert wird. Zunächst wird die Zwischensumme in A mit 0 vorbesetzt. MR wird nach links geschoben. Das höchstwertige Bit von MR steht jetzt im Carry-Flag. Ist es 1, so wird MD zum Akku addiert. Eigentlich müßte jetzt der Akku um sieben Positionen nach links geschoben werden, da zum ersten Teilprodukt der Faktor 128 gehört. Diese Verschiebung ergibt sich aber automatisch im Verlauf der nächsten sieben Schleifendurchläufe.</p>
 
@@ -317,25 +324,89 @@
 
         <p>Die folgende Tabelle enthält geeignete Anzapfstellen für Schieberegister unterschiedlicher Länge.</p>
 
-        <p>TODO TABLE</p>
-
-        <p>Registerlänge Rückkopplung Periodenlänge<br>
-            2 O + 1 3<br>
-            3 1+2 7<br>
-            4 2 + 3 15<br>
-            5 2 + 4 31<br>
-            6 4+5 63<br>
-            7 5 + 6 127<br>
-            8 1+2+3+7 255<br>
-            9 4 + 8 511<br>
-            10 6 + 9 1023<br>
-            11 8+10 2047<br>
-            12 1+9 + 10+11 4095<br>
-            13 0 + 10+11 + 12 8191<br>
-            14 1+11 + 12 + 13 16383<br>
-            15 13+14 32767<br>
-            16 10 + 12 + 13+15 65535<br>
-            »+« steht hier für »EOR«</p>
+<table>
+    <tr>
+        <td>Registerlänge</td>
+        <td>Rückkopplung</td>
+        <td>Periodenlänge</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>0+1</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>1+2</td>
+        <td>7</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>2+3</td>
+        <td>15</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>2+4</td>
+        <td>31</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>4+5</td>
+        <td>63</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>5+6</td>
+        <td>127</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>1+2+3+7</td>
+        <td>255</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>4+8</td>
+        <td>511</td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>6+9</td>
+        <td>1023</td>
+    </tr>
+    <tr>
+        <td>11</td>
+        <td>8+10</td>
+        <td>2047</td>
+    </tr>
+    <tr>
+        <td>12</td>
+        <td>1+9+10+11</td>
+        <td>4095</td>
+    </tr>
+    <tr>
+        <td>13</td>
+        <td>0+10+11+12</td>
+        <td>8191</td>
+    </tr>
+    <tr>
+        <td>14</td>
+        <td>1+11+12+13</td>
+        <td>16383</td>
+    </tr>
+    <tr>
+        <td>15</td>
+        <td>13+14</td>
+        <td>32767</td>
+    </tr>
+    <tr>
+        <td>16</td>
+        <td>10+12+13+15</td>
+        <td>65535</td>
+    </tr>
+</table>
+<p><small>»+« steht hier für »EOR«</small></p>
 
         <p>Die angegebenen Periodenlängen sind die bei der jeweiligen Registerlänge maximal möglichen. Die Schieberegisterfolgen haben die angenehme Eigenschaft, daß die Registerwerte alle Zahlen von 1 bis zur Periodenlänge in quasizufälliger Reihenfolge durchlaufen. Man darf ein solches Schieberegister allerdings nicht mit lauter Nullen vorbesetzen, da es dann seinen Zustand nicht mehr ändert (O EOR 0 =O).</p>
 
