@@ -1258,8 +1258,12 @@ def html_generate_all_article_previews(db):
 ### Write full HTML files
 
 def write_full_html_file(db, path, title, preview_img, body_html, body_class, comments=False, additional_head_tags=''):
-    latest_issue_path = db.issues[db.latest_regular_issue_key()].issue_dir_name
-    impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
+    latest_issue_key = db.latest_regular_issue_key()
+    if latest_issue_key:
+        latest_issue_path = db.issues[latest_issue_key].issue_dir_name
+        impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
+    else:
+        impressum_path = None
 
     isso_id = path.removeprefix(OUT_DIRECTORY) # XXX hack :(
     url = RSS_BASE_URL + isso_id[1:]           # XXX hack :(
@@ -1387,7 +1391,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
   <span class="left_text">© 1985 Markt & Technik Verlag Aktiengesellschaft</span>
   <nav class="right_nav">
     <a href="https://github.com/mist64/64er-magazin.de">{LABEL_CONTACT}</a>
-    <a href="/{BASE_DIR}{impressum_path}">{LABEL_IMPRINT}</a>
+    {f'<a href="/{BASE_DIR}{impressum_path}">{LABEL_IMPRINT}</a>' if impressum_path else ''}
     <a href="/{BASE_DIR}{FILENAME_PRIVACY}.html">{LABEL_PRIVACY}</a>
   </nav>
 </footer>
@@ -1461,9 +1465,10 @@ def generate_landing_html(db, out_directory):
 
 
     html_parts.append("<div class=\"column2\">\n")
-    html_parts.append("<div class=\"current_sidebox\">\n");
-    html_parts.append(html_generate_latest_issue(db, False))
-    html_parts.append("</div>")
+    if db.latest_regular_issue_key():
+        html_parts.append("<div class=\"current_sidebox\">\n");
+        html_parts.append(html_generate_latest_issue(db, False))
+        html_parts.append("</div>")
     if db.latest_special_issue_key():
         html_parts.append("<div class=\"current_sidebox\">\n");
         html_parts.append(html_generate_latest_issue(db, True))
