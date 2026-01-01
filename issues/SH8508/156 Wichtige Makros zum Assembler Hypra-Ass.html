@@ -8,109 +8,113 @@
     <meta name="author" content="ah">
     <meta name="64er.issue" content="Sonderheft 8/85">
     <meta name="64er.pages" content="156-157">
-    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <meta name="64er.toc_category" content="Tips und Tricks">
     <!-- <meta name="64er.toc_title" content="XXX"> -->
-    <meta name="64er.id" content="XXX">
+    <meta name="64er.id" content="macros_hypra-ass">
 </head>
 
 <body>
     <article>
         <h1>Wichtige Makros zum Assembler Hypra-Ass</h1>
-<p class="intro">Der beschränkte Befehlssatz des 6502-Prozessors macht Maschinenprogramme unübersichtlich und fehleranfällig. Wir zeigen Ihnen hier, wie sich mit Hypra-Ass der Maschinen-Befehlssatz durch Makros erweitern läßt. Aber nicht nur das ist möglich, Sie können sich auch Ihre eigene, ganz persönliche Sprache basteln.</p>
+        <p class="intro">Der beschränkte Befehlssatz des 6502-Prozessors macht Maschinenprogramme unübersichtlich und fehleranfällig. Wir zeigen Ihnen hier, wie sich mit Hypra-Ass der Maschinen-Befehlssatz durch Makros erweitern läßt. Aber nicht nur das ist möglich, Sie können sich auch Ihre eigene, ganz persönliche Sprache basteln.</p>
 
-<p>esonders dem Maschinensprache-Anfänger dürfte das Wort »Makro« gänzlich unbekannt sein. Denn weder das im C 64 implementierte noch irgendein anderes Basic kennt die Definition eines Makros. Das ist wahrscheinlich auch der Grund dafür, warum Makros nur selten angewendet werden. Sie spielen jedoch gerade beim 6502- beziehungsweise 6510-Prozessor eine wichtige Rolle. Durch Makros läßt sich nämlich der bescheiden ausgefallene Befehlssatz des Prozessors um wichtige Befehle erweitern. Es werden durch Makros prinzipiell keine neuen Maschinenbefehle geschaffen, sind aber Makros einmal definiert, lassen sie sich aufrufen wie ganz normale Maschinenbefehle. Was sind nun eigentlich Makros? Dies soll an einem kleinen Beispiel erklärt werden.</p>
+        <p>esonders dem Maschinensprache-Anfänger dürfte das Wort »Makro« gänzlich unbekannt sein. Denn weder das im C 64 implementierte noch irgendein anderes Basic kennt die Definition eines Makros. Das ist wahrscheinlich auch der Grund dafür, warum Makros nur selten angewendet werden. Sie spielen jedoch gerade beim 6502- beziehungsweise 6510-Prozessor eine wichtige Rolle. Durch Makros läßt sich nämlich der bescheiden ausgefallene Befehlssatz des Prozessors um wichtige Befehle erweitern. Es werden durch Makros prinzipiell keine neuen Maschinenbefehle geschaffen, sind aber Makros einmal definiert, lassen sie sich aufrufen wie ganz normale Maschinenbefehle. Was sind nun eigentlich Makros? Dies soll an einem kleinen Beispiel erklärt werden.</p>
 
-<p>Angenommen, Sie möchten in einem Maschinenprogramm 20 verschiedene 16-Bit Adressen inkrementieren, dann müßte Ihr Programm zwangsläufig zwanzigmal folgende Befehlsfolge enthalten:</p>
+        <p>Angenommen, Sie möchten in einem Maschinenprogramm 20 verschiedene 16-Bit Adressen inkrementieren, dann müßte Ihr Programm zwangsläufig zwanzigmal folgende Befehlsfolge enthalten:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>INC ADRESSE<br>
-BNE LBL<br>
-INC ADRESSE+1<br>
-LBL</p>
+        <p>INC ADRESSE<br>
+            BNE LBL<br>
+            INC ADRESSE+1<br>
+            LBL</p>
 
-<p>Diese 20 Befehlsfolgen machen aber das Programm unübersichtlich und vor allen Dingen fehleranfällig. Genau so gut ließe sich auch ein Makro mit dem Namen »INCW (adresse)« für INCWord definieren, das dann anstelle der Befehlsfolgen 20mal im Quelltext erscheint. Das Makro selbst würde wie folgt aussehen:</p>
+        <p>Diese 20 Befehlsfolgen machen aber das Programm unübersichtlich und vor allen Dingen fehleranfällig. Genau so gut ließe sich auch ein Makro mit dem Namen »INCW (adresse)« für INCWord definieren, das dann anstelle der Befehlsfolgen 20mal im Quelltext erscheint. Das Makro selbst würde wie folgt aussehen:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>10 -.MA INCW (ADRESSE)<br>
-20 -    INC ADRESSE<br>
-30 -    BNE LBL<br>
-40 -    INC ADRESSE+l<br>
-50 -LBL<br>
-60 -.RT</p>
+        <p>10 -.MA INCW (ADRESSE)<br>
+            20 - INC ADRESSE<br>
+            30 - BNE LBL<br>
+            40 - INC ADRESSE+l<br>
+            50 -LBL<br>
+            60 -.RT</p>
 
-<p>Aufgerufen wird das Makro im Quelltext nun durch den neuen Befehl»&hellip; INCW (adresse)«.</p>
+        <p>Aufgerufen wird das Makro im Quelltext nun durch den neuen Befehl»&hellip; INCW (adresse)«.</p>
 
-<p>Gefolgt von dem Makronamen und in Klammern den Übergabeparametern, diedurch Kommatagetrenntwerden, leitet der ».MA«-Pseudo-Opcode die Definition eines Makros ein. Dies geschieht in Zeile 10. Der Pseudo-Opcode ».RT« in Zeile 60 schließt die Definition des Makros ab. Alle im Makro stehenden Label sind lokal. Das heißt, daß dem Programm außerhalb des Makros die internen Label unbekannt sind. Würde dies nicht so sein, dann würde der Assembler den zweiten Makroaufruf mit der Fehlermeldung »label twice error« ahnden. Was macht der Assembler, wenn er auf einen Makroaufruf stößt? Er assembliert in den Objektcode, wie man das erzeugte Maschinenprogramm auch nennt, die Befehlsfolgen, die im Makro definiert wurden. Das heißt, daß letztendlich im erzeugten Maschinenprogramm wieder zwanzigmal, um bei dem Beispiel zu bleiben, die oben stehenden Befehlsfolgen auftauchen.</p>
+        <p>Gefolgt von dem Makronamen und in Klammern den Übergabeparametern, diedurch Kommatagetrenntwerden, leitet der ».MA«-Pseudo-Opcode die Definition eines Makros ein. Dies geschieht in Zeile 10. Der Pseudo-Opcode ».RT« in Zeile 60 schließt die Definition des Makros ab. Alle im Makro stehenden Label sind lokal. Das heißt, daß dem Programm außerhalb des Makros die internen Label unbekannt sind. Würde dies nicht so sein, dann würde der Assembler den zweiten Makroaufruf mit der Fehlermeldung »label twice error« ahnden. Was macht der Assembler, wenn er auf einen Makroaufruf stößt? Er assembliert in den Objektcode, wie man das erzeugte Maschinenprogramm auch nennt, die Befehlsfolgen, die im Makro definiert wurden. Das heißt, daß letztendlich im erzeugten Maschinenprogramm wieder zwanzigmal, um bei dem Beispiel zu bleiben, die oben stehenden Befehlsfolgen auftauchen.</p>
 
-<p>Im Listing sind die wichtigsten Makros aufgeführt. Neben den »Befehlserweiterungen« ist noch eine interessante Gruppe von Makros definiert worden, die die strukturierte Programmierung durch »Repeat&hellip;Until«- und »While&hellip;Endwhile«-Schleifen unterstützt. Zu beachten istjedoch, daß die Schleifen nichtverschachteltwerden dürfen. Schleifenkonstruktionen wie</p>
+        <p>Im Listing sind die wichtigsten Makros aufgeführt. Neben den »Befehlserweiterungen« ist noch eine interessante Gruppe von Makros definiert worden, die die strukturierte Programmierung durch »Repeat&hellip;Until«- und »While&hellip;Endwhile«-Schleifen unterstützt. Zu beachten istjedoch, daß die Schleifen nichtverschachteltwerden dürfen. Schleifenkonstruktionen wie</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>REPEAT<br>
-REPEAT<br>
-UNTIL<br>
-UNTIL</p>
+        <p>REPEAT<br>
+            REPEAT<br>
+            UNTIL<br>
+            UNTIL</p>
 
-<p>sind veboten. Die einzelnen Makros haben folgende Wirkung:<br>
-<strong>TXY</strong>: Das Y-Register wird mit dem Inhalt des X-Registers geladen.<br>
-<strong>TYX</strong>: Das X-Register wird mit dem Inhalt des Y-Registers geladen.<br>
-<strong>PHX</strong>: Das X-Register wird auf dem Stack abgelegt<br>
-<strong>PHY</strong>: Das Y-Register wird auf dem Stack abgelegt<br>
-<strong>PLX</strong>: Das X-Register wird vom Stack geholt.<br>
-<strong>PLY</strong>: Das Y-Register wird vom Stack geholt.</p>
+        <p>sind veboten. Die einzelnen Makros haben folgende Wirkung:<br>
+            <strong>TXY</strong>: Das Y-Register wird mit dem Inhalt des X-Registers geladen.<br>
+            <strong>TYX</strong>: Das X-Register wird mit dem Inhalt des Y-Registers geladen.<br>
+            <strong>PHX</strong>: Das X-Register wird auf dem Stack abgelegt<br>
+            <strong>PHY</strong>: Das Y-Register wird auf dem Stack abgelegt<br>
+            <strong>PLX</strong>: Das X-Register wird vom Stack geholt.<br>
+            <strong>PLY</strong>: Das Y-Register wird vom Stack geholt.
+        </p>
 
-<p>Die folgenden vier Makros definieren einen Userstack, der an eine beliebige Stelle gelegt werden kann. Dazu muß im Hauptprogramm eine globale Variable mit dem Namen »USER« in der Zeropage angelegt werden. Anschließend muß in die Adresse, die die Variable repräsentiert, die Startadresse des Stacks geschrieben werden. Das könnte so aussehen:</p>
+        <p>Die folgenden vier Makros definieren einen Userstack, der an eine beliebige Stelle gelegt werden kann. Dazu muß im Hauptprogramm eine globale Variable mit dem Namen »USER« in der Zeropage angelegt werden. Anschließend muß in die Adresse, die die Variable repräsentiert, die Startadresse des Stacks geschrieben werden. Das könnte so aussehen:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>10 -.GL USER = 3<br>
-20  -   LDA #0  ;L0-BYTE<br>
-STARTADRESSE USERSTACK<br>
-30  -   STA USER<br>
-40  -   LDA #$C0    ;HI-BYTE<br>
-STARTADRESSE USERSTACK<br>
-50  -   STA USER+1</p>
+        <p>10 -.GL USER = 3<br>
+            20 - LDA #0 ;L0-BYTE<br>
+            STARTADRESSE USERSTACK<br>
+            30 - STA USER<br>
+            40 - LDA #$C0 ;HI-BYTE<br>
+            STARTADRESSE USERSTACK<br>
+            50 - STA USER+1</p>
 
-<p>Hier wurde ein Userstack angelegt, der bei Adresse $C000 beginnt. Der Stackpointer, als oder Zeiger, der auf die aktuelle Stackadresse zeigt, steht in der Zeropage in den Speicherzellen 3 und 4.<br>
-<strong>PUSHA</strong>: Der Inhalt des Akkumulators wird auf dem Userstack abgelegt.<br>
-<strong>PUSHAY</strong>: Der Inhalt des Akkumulators und der Inhalt des Y-Registers werden auf dem Userstack abgelegt.<br>
-<strong>PULLA</strong>: Der Akkumulator wird vom Userstack geholt.<br>
-<strong>PULLAY</strong>: Der Akkumulator und das Y-Register werden vom Userstack geholt.<br>
-<strong>ADW (adresse)</strong>: 16-Bit Addition. Der Inhalt einer beliebigen Adresse wird zum Inhalt des Akkumulators (Low-Byte) und zum Inhalt des Y-Registers (High-Byte) addiert. Das Ergebnis steht anschließend im Akkumulator (Low-Byte) und im Y-Register (High-Byte).<br>
-<strong>ADMW (adr1,adr2,summe)</strong>: 16-Bit Addition. Der Inhalt von adr1 und adr1 + 1 wird zum Inhalt der Adresse adr2 und adr2 +1 addiert und das Ergebnis in der Adresse summe und summe+1 abgelegt.<br>
-<strong>SBCW (adresse)</strong>: 16-Bit Subtraktion. Der Inhalt von adresse und adresse+1 wird vom Inhalt des Akkumulators (Low-Byte) und vom Inhalt des Y-Registers (High-Byte) abgezogen. Das Ergebnis steht anschließend im Akkumulator (Low-Byte) und im Y-Register (High-Byte).<br>
-<strong>SBCMW(adr1,adr2,diff)</strong>: 16-Bit Subtraktion. Vom Inhalt adr1 und adr1 + 1 wird der Inhalt von adr2 und adr2 + 1 abgezogen. Das Ergebnis wird in der Adresse diff und diff+1 abgelegt.<br>
-<strong>INCW(adresse)</strong>: Der Inhalt von adresse und adresse+1 wird inkrementiert. Das Ergebnis steht in adresse und adresse+1. DECW (adresse): Der Inhalt von adresse und adresse+1 wird dekrementiert. Das Ergebnis steht in adresse und adresse+1.<br>
-<strong>LDAY (adresse)</strong>: Der Akkumulator wird mit dem Inhalt von adresse und das Y-Register mit dem Inhalt von adresse+1 geladen.<br>
-<strong>STAY (adresse)</strong>: Der Inhalt des Akkumulators wird nach adresse und der Inhalt des Y-Registers nach adresse+1 geschrieben.<br>
-<strong>LDAYI (wert)</strong>: Der Akkumulator und das Y-Register wird mit »wert« unmittelbar geladen. Dabei steht das Low-Byte im Akkumulator und das High-Byte im Y-Register.<br>
-Die folgenden Makros unterstützen die strukturierte Programmierung.<br>
-<strong>REPEAT, EXITREPEAT, UNTIL (übergabe.bedingung)</strong>: Die Schleife wird so lange fortgesetzt, bis die Speicherzelle »übergabe« den Wert »bedingung« enthält. Beispiel:</p>
+        <p>Hier wurde ein Userstack angelegt, der bei Adresse $C000 beginnt. Der Stackpointer, als oder Zeiger, der auf die aktuelle Stackadresse zeigt, steht in der Zeropage in den Speicherzellen 3 und 4.<br>
+            <strong>PUSHA</strong>: Der Inhalt des Akkumulators wird auf dem Userstack abgelegt.<br>
+            <strong>PUSHAY</strong>: Der Inhalt des Akkumulators und der Inhalt des Y-Registers werden auf dem Userstack abgelegt.<br>
+            <strong>PULLA</strong>: Der Akkumulator wird vom Userstack geholt.<br>
+            <strong>PULLAY</strong>: Der Akkumulator und das Y-Register werden vom Userstack geholt.<br>
+            <strong>ADW (adresse)</strong>: 16-Bit Addition. Der Inhalt einer beliebigen Adresse wird zum Inhalt des Akkumulators (Low-Byte) und zum Inhalt des Y-Registers (High-Byte) addiert. Das Ergebnis steht anschließend im Akkumulator (Low-Byte) und im Y-Register (High-Byte).<br>
+            <strong>ADMW (adr1,adr2,summe)</strong>: 16-Bit Addition. Der Inhalt von adr1 und adr1 + 1 wird zum Inhalt der Adresse adr2 und adr2 +1 addiert und das Ergebnis in der Adresse summe und summe+1 abgelegt.<br>
+            <strong>SBCW (adresse)</strong>: 16-Bit Subtraktion. Der Inhalt von adresse und adresse+1 wird vom Inhalt des Akkumulators (Low-Byte) und vom Inhalt des Y-Registers (High-Byte) abgezogen. Das Ergebnis steht anschließend im Akkumulator (Low-Byte) und im Y-Register (High-Byte).<br>
+            <strong>SBCMW(adr1,adr2,diff)</strong>: 16-Bit Subtraktion. Vom Inhalt adr1 und adr1 + 1 wird der Inhalt von adr2 und adr2 + 1 abgezogen. Das Ergebnis wird in der Adresse diff und diff+1 abgelegt.<br>
+            <strong>INCW(adresse)</strong>: Der Inhalt von adresse und adresse+1 wird inkrementiert. Das Ergebnis steht in adresse und adresse+1. DECW (adresse): Der Inhalt von adresse und adresse+1 wird dekrementiert. Das Ergebnis steht in adresse und adresse+1.<br>
+            <strong>LDAY (adresse)</strong>: Der Akkumulator wird mit dem Inhalt von adresse und das Y-Register mit dem Inhalt von adresse+1 geladen.<br>
+            <strong>STAY (adresse)</strong>: Der Inhalt des Akkumulators wird nach adresse und der Inhalt des Y-Registers nach adresse+1 geschrieben.<br>
+            <strong>LDAYI (wert)</strong>: Der Akkumulator und das Y-Register wird mit »wert« unmittelbar geladen. Dabei steht das Low-Byte im Akkumulator und das High-Byte im Y-Register.<br>
+            Die folgenden Makros unterstützen die strukturierte Programmierung.<br>
+            <strong>REPEAT, EXITREPEAT, UNTIL (übergabe.bedingung)</strong>: Die Schleife wird so lange fortgesetzt, bis die Speicherzelle »übergabe« den Wert »bedingung« enthält. Beispiel:
+        </p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>io -    LDX #255<br>
-20 -    REPEAT<br>
-30 -    DEX<br>
-40 -    STX $FB<br>
-50 -    &hellip; UNTIL ($FB,0)</p>
+        <p>io - LDX #255<br>
+            20 - REPEAT<br>
+            30 - DEX<br>
+            40 - STX $FB<br>
+            50 - &hellip; UNTIL ($FB,0)</p>
 
-<p>Das X-Register wird solange dekrementiert, bis es den Wert »0« enthält.<br>
-<strong>WHILE (übergabe,bedingung), EXITWHILE, ENDWHILE:</strong> Die Schleife wird solange fortgesetzt, bis der Inhalt der Speicherzelle »übergabe« gleich »bedingung« ist. Beispiel:</p>
+        <p>Das X-Register wird solange dekrementiert, bis es den Wert »0« enthält.<br>
+            <strong>WHILE (übergabe,bedingung), EXITWHILE, ENDWHILE:</strong> Die Schleife wird solange fortgesetzt, bis der Inhalt der Speicherzelle »übergabe« gleich »bedingung« ist. Beispiel:
+        </p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>10 -    LDX #255<br>
-20 -    &hellip; WHILE ($FB,0)<br>
-30 -    DEX<br>
-40 -    STX $FB<br>
-50 -    &hellip; ENDWHILE</p>
+        <p>10 - LDX #255<br>
+            20 - &hellip; WHILE ($FB,0)<br>
+            30 - DEX<br>
+            40 - STX $FB<br>
+            50 - &hellip; ENDWHILE</p>
 
-<p>Solange der Inhalt der Speicherzelle $FB ungleich Null ist, wird das X-Register dekrementiert.</p>
+        <p>Solange der Inhalt der Speicherzelle $FB ungleich Null ist, wird das X-Register dekrementiert.</p>
 
-<address class="author">(ah)</address>
+        <address class="author">(ah)</address>
     </article>
 </body>
+
 </html>
