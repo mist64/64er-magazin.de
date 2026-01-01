@@ -24,43 +24,39 @@
 
         <p>Ein kleiner Fehler tritt beim Sortieren der Symboltabelle auf. Hypra-Ass stürzt ab, wenn die Symboltabelle genau 36, 73, 109 (und so weiter) Variablen oder Label enthält. Der Fehler liegt in den Speicherzellen $1EB8 bis $1EBB. Hier wurden zwei Branch-Befehle vertauscht. Es muß richtig lauten:</p>
 
-        <p>TODO</p>
-
-        <p>1EB8 90 D0 BCC 1EA8<br>
-            1EBA D0 04 BNE 1EC0</p>
+        <pre>        1EB8 90 D0 BCC 1EA8
+        1EBA D0 04 BNE 1EC0</pre>
 
         <p>Diese Änderung kann unmittelbar mit einem Monitor in die entsprechenden Speicherzellen geschrieben und anschließend gespeichert werden. Sollten Sie keinen Monitor haben, dann geben Sie bitte den folgenden Quelltext ein:</p>
 
-        <p>TODO</p>
-
-        <p>10 -.BA $C000<br>
-            ;STARTADRESSE = $C000<br>
-            20 - LDY #0<br>
-            30 - LBL LDA TAB,Y<br>
-            ;KORREKTUREN VORNEHMEN<br>
-            40- STA$1EB8,Y<br>
-            50 - INY<br>
-            60 - CPY #4<br>
-            70 - BNE LBL<br>
-            80 -.EQ SOURCESTART = $1FD8 ;UND DIE KORRIGIERTE<br>
-            90 -.EQ NAMLEN = 12 ;VERSION SPEICHERN<br>
-            100- LDA #1<br>
-            110- LDX#8<br>
-            120- STA$FE<br>
-            130- STX $FF<br>
-            140- LDA #8<br>
-            150- JSR $FFBA<br>
-            160- LDA#NAMLEN<br>
-            170- LDX#&lt;(NAME)<br>
-            180- LDY#>(NAME)<br>
-            190- JSR $FFBD<br>
-            200- LDA #$FE<br>
-            210- LDX #&lt;(SOURCESTART)<br>
-            220- LDY # >(SOURCESTART)<br>
-            230- JMP $FFD8<br>
-            240-;<br>
-            250-NAME .TX "HYPRA-ASS.V1 "<br>
-            260-TAB .BY $90,$D0,$D0,$04</p>
+        <pre>10 -.BA $C000
+;STARTADRESSE = $C000
+20 -        LDY #0
+30         LBL LDA TAB,Y
+;KORREKTUREN VORNEHMEN
+40        STA $1EB8,Y
+50         INY
+60         CPY #4
+70         BNE LBL
+80 -.EQ SOURCESTART = $1FD8 ;UND DIE KORRIGIERTE
+90 -.EQ NAMLEN = 12 ;VERSION SPEICHERN
+100        LDA #1
+110        LDX #8
+120        STA $FE
+130        STX $FF
+140        LDA #8
+150        JSR $FFBA
+160        LDA #NAMLEN
+170        LDX #&lt;(NAME)
+180        LDY #>(NAME)
+190        JSR $FFBD
+200        LDA #$FE
+210        LDX #&lt;(SOURCESTART)
+220        LDY # >(SOURCESTART)
+230        JMP $FFD8
+240-;
+250-NAME .TX "HYPRA-ASS.V1 "
+260-TAB .BY $90,$D0,$D0,$04</pre>
 
         <p>Nach dem Assemblieren wird mit SYS 49152 &lt; RETURN > Hypra-Ass geändert und unter dem neuen Namen »Hypra-Ass.VI« auf Diskette gespeichert.</p>
 
@@ -78,27 +74,34 @@
 
         <p>Bei der Anwendung von Makros gab es auch einige Schwierigkeiten. Wird zum Beispiel von einem Makro (Ordnung 1) zweimal ein weiteres Makro (Ordnung 2) aufgerufen, meldet Hypra-Ass einen »label twice error«, vorausgesetzt, im Makro zweiter Ordnung befindet sich ein Label. Zum Beispiel würde folgendes Programm zu einer solchen Fehlermeldung führen:</p>
 
-        <p>TODO</p>
-
-        <p>i o -.BA $C000<br>
-            20 -.MA MAK1 ;MAKRODEFINITION 1. ORDNUNG<br>
-            30 - &hellip; MAK2 ;MAKROAUFRUF 2. ORDNUNG<br>
-            40 - &hellip; MAK2<br>
-            50 -.RT<br>
-            60-.MA MAK2<br>
-            7O-LBL NOP<br>
-            80 -.RT<br>
-            90 - &hellip; MAK1</p>
+        <pre>10 -.BA $C000
+20 -.MA MAK1 ;MAKRODEFINITION 1. ORDNUNG
+30 - &hellip; MAK2 ;MAKROAUFRUF 2. ORDNUNG
+40 - &hellip; MAK2
+50 -.RT
+60-.MA MAK2
+7O-LBL NOP
+80 -.RT
+90 - &hellip; MAK1</pre>
 
         <p>Dabei ist Mak1 das Makro 1. Ordnung und Mak2 das Makro 2. Ordnung. Alle Label in Makros zweiter oder dritter Ordnung sind untereinander global. Das heißt, daß in Makros zweiter Ordnung nur einmal das Label mit dem Namen »LBL« definiert werden dürfte.</p>
 
         <p>Im Augenblick wird an einer Erweiterung gearbeitet, die diesen Mißstand beseitigt. Denn gerade beim intensiven Arbeiten mit Makros sind Makros zweiter und sogar dritter Ordnung unabdingbar. Ganz deutlich sieht man dies an dem Artikel »Wichtige Makros für Hypra-Ass« in dieser Ausgabe. Dort wurde ein Makro mit dem Namen »INCW (adresse)« definiert. Würde man die dort stehende 16-Bit-Addition ersetzen durch:</p>
 
-        <p>TODO</p>
-
-        <p>INC ADRESSE<br>
-            BNE LBL<br>
-            INC ADRESSE+1 LBL</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>INC ADRESSE</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>BNE LBL</td>
+            </tr>
+            <tr>
+                <td>INC</td>
+                <td>ADRESSE+1 LBL</td>
+            </tr>
+        </table>
 
         <p>könnte dieses Makro von keinem anderen Makro aus zweimal aufgerufen werden, weil durch das Label »LBL« ein »label twice error« erscheinen würde.</p>
 
@@ -108,55 +111,48 @@
 
         <p>Auch mit der bedingten Assemblierung wissen nur die wenigsten etwas anzufangen, obwohl sie gerade im Zusammenhang mit Makros eine große Rolle spielt. Dies soll an einem kleinen Beispiel demonstriert werden:</p>
 
-        <p>TODO</p>
-
-        <p>10 -.MA ADW (ADR1,ADR2,SUMME,RETTEN) <br>
-            20 -.IF RETTEN ! = ! 1 ;NUR WENN RETTEN = 1, WIRD<br>
-            30 - PHA ;PHA IN DAS MASCHINENPROGRAMM<br>
-            40 -.EI 50 - CLC ;ASSEMBLIERT<br>
-            60 - LDA ADR1 <br>
-            70 - ADC ADR2 <br>
-            80 - STA SUMME <br>
-            90 - LDA ADR1 + 1 <br>
-            100- ADC ADR2 + 1 <br>
-            110- STASUMME+1<br>
-            120 -.IF RETTEN ! = ! 1 ;NUR WENN RETTEN = 1, WIRD<br>
-            130- PLA ;PLA IN DAS MASCHINENPROGRAMM<br>
-            140 -.EI ; 150 -.RT ASSEMBLIERT</p>
+        <pre>10 -.MA ADW (ADR1,ADR2,SUMME,RETTEN)
+            20 -.IF RETTEN ! = ! 1 ;NUR WENN RETTEN = 1, WIRD
+            30 -        PHA ;PHA IN DAS MASCHINENPROGRAMM
+            40 -.EI ;ASSEMBLIERT
+            50 -        CLC
+            60 -        LDA ADR1
+            70 -        ADC ADR2
+            80 -        STA SUMME
+            90 -        LDA ADR1 + 1
+            100-        ADC ADR2 + 1
+            110-        STASUMME+1
+            120 -.IF RETTEN ! = ! 1 ;NUR WENN RETTEN = 1, WIRD
+            130-        PLA ;PLA IN DAS MASCHINENPROGRAMM ASSEMBLIERT
+            140 -.EI ; 150 -.RT</pre>
 
         <p>Dieses Makro addiert (ADR1,ADR1+1)+(ADR2,ADR2 +1) und speichert das Ergebnis in den Speicherzellen (SUMME,SUMME+1). ADR1, ADR2 und SUMME können beliebige Speicherzellen oder Variablen sein. Soll der Inhalt des Akkumulators erhalten bleiben, wird für RETTEN eine 1, ansonsten eine beliebige andere Zahl eingegeben. Anhand des Übergabeparameters RETTEN erkennt der Assembler, ob das erzeugte Maschinenprogramm den Maschinenbefehl »PHA« beziehungsweise »PLA« enthalten soll oder nicht. Die Befehle zur bedingten Assemblierung zeigen also einzig und allein eine Wirkung beim Assemblieren. Durch sie wird bestimmt, welche Teile des Quelltextes im erzeugten Maschinenprogramm stehen und welche unter bestimmten Bedingungen übersprungen werden sollen. Schauen Sie sich nun noch einmal die Zeilen 20 und 120 an. Sie finden dort in der bedingten »,IF«-Abfrage den Operator »=«, der wie alle anderen Operatoren auch in Ausrufezeichen einzufassen ist. Durch dieses Ausrufezeichen erkennt Hypra-Ass, daß es sich bei dem Operator »=« um eine Rechenvorschrift aus dem Quelltext heraus handelt. Alle Operatoren können außer bei der bedingten Assemblierung zum Beispiel auch bei der unmittelbaren Adressierungangewendetwerden. Ein kleines Beispiel soll die Wirkung dieser Operatoren bei der unmittelbaren Adressierung verdeutlichen:</p>
 
-        <p>TODO</p>
-
-        <p>20 -.EQ VARIABLE1 = 10<br>
-            30 -.EQ VARIABLE2 = 20<br>
-            40 - LDA#(VARIABLE1!0!VARIABLE2)</p>
+        <pre>20 -.EQ VARIABLE1 = 10
+30 -.EQ VARIABLE2 = 20
+40 -        LDA#(VARIABLE1!0!VARIABLE2)</pre>
 
         <p>Der Akkumulator wird mit einer Zahl geladen, die mit der Variablen »VARIABLE1« und »VARIABLE2« wie im Basic geORt wird. Das Ergebnis ist folglich 30.</p>
 
         <p>Viele Maschinensprache-Anfänger verwechseln die Befehle zur bedingten Assemblierung mit normalen Basic-Befehlen. Deshalb möchte ich an einem kleinen Beispiel zeigen, was nicht mit der bedingten Assemblierung funktioniert:</p>
 
-        <p>TODO</p>
-
-        <p>10 -.BA $cooo<br>
-            20 - INC $D020<br>
-            30 -.GO 20</p>
+        <pre>10 -.BA $C000
+20 -        INC $D020
+30 -.GO 20</pre>
 
         <h2>Was nicht funktioniert</h2>
 
         <p>Das Programm sollte die Bildschirmrahmenfarbe laufend um 1 incrementieren. Wird der Assembler jedoch gestartet, ersetzt er den Befehl ».GO 20« nicht durch den Befehl »JMP adresse«. Vielmehr versucht er den gesamten Speicher von $C000 bis unendlich mit dem Befehl »INC $D020« zu füllen, denn es fehlt jegliche Abbruchbedingung. Nur mit einer Abbruchbedingung ist der ».GO«-Befehl sinnvoll. Sollte das Maschinenprogramm zehnmal hintereinander den Befehl »INC $D020« enthalten, könnte das so aussehen:</p>
 
-        <p>TODO</p>
-
-        <p>10 -.LI1,3<br>
-            20 -.BA $C000<br>
-            30 -.EQ A = 0<br>
-            40 -.EQ A = A + 1<br>
-            50 - INC $D020<br>
-            60 -.IFA!&lt;!11<br>
-            70 -.GO 40<br>
-            80 -.EI<br>
-            90 - JMP $C000</p>
+        <pre>10 -.LI1,3
+20 -.BA $C000
+30 -.EQ A = 0
+40 -.EQ A = A + 1
+50 -        INC $D020
+60 -.IFA!&lt;!11
+70 -.GO 40
+80 -.EI
+90 -        JMP $C000</pre>
 
         <p>Der Assembler überprüft in Zeile 60, ob die Variable »A« kleiner 11 ist. Trifft das zu, wird in Zeile 70 durch den ».GO«-Befehl zur Zeile 40 verzweigt und der Befehl »INC $D020« ein weiteres Mal assembliert. Sobald »A« gleich 10 ist, verzweigt der Assembler in die Zeile 90, übersezt den Befehl »JMP $C000« und beendet den Assembliervorgang.</p>
 

@@ -22,23 +22,19 @@
 
         <p>Angenommen, Sie möchten in einem Maschinenprogramm 20 verschiedene 16-Bit Adressen inkrementieren, dann müßte Ihr Programm zwangsläufig zwanzigmal folgende Befehlsfolge enthalten:</p>
 
-        <p>TODO</p>
-
-        <p>INC ADRESSE<br>
-            BNE LBL<br>
-            INC ADRESSE+1<br>
-            LBL</p>
+        <pre><code>    INC ADRESSE
+    BNE LBL
+    INC ADRESSE+1
+LBL</code></pre>
 
         <p>Diese 20 Befehlsfolgen machen aber das Programm unübersichtlich und vor allen Dingen fehleranfällig. Genau so gut ließe sich auch ein Makro mit dem Namen »INCW (adresse)« für INCWord definieren, das dann anstelle der Befehlsfolgen 20mal im Quelltext erscheint. Das Makro selbst würde wie folgt aussehen:</p>
 
-        <p>TODO</p>
-
-        <p>10 -.MA INCW (ADRESSE)<br>
-            20 - INC ADRESSE<br>
-            30 - BNE LBL<br>
-            40 - INC ADRESSE+l<br>
-            50 -LBL<br>
-            60 -.RT</p>
+        <pre><code>10 -.MA INCW (ADRESSE)
+20 -      INC ADRESSE
+30 -      BNE LBL
+40 -      INC ADRESSE+l
+50 -LBL
+60 -.RT</code></pre>
 
         <p>Aufgerufen wird das Makro im Quelltext nun durch den neuen Befehl»&hellip; INCW (adresse)«.</p>
 
@@ -46,12 +42,14 @@
 
         <p>Im Listing sind die wichtigsten Makros aufgeführt. Neben den »Befehlserweiterungen« ist noch eine interessante Gruppe von Makros definiert worden, die die strukturierte Programmierung durch »Repeat&hellip;Until«- und »While&hellip;Endwhile«-Schleifen unterstützt. Zu beachten istjedoch, daß die Schleifen nichtverschachteltwerden dürfen. Schleifenkonstruktionen wie</p>
 
-        <p>TODO</p>
-
-        <p>REPEAT<br>
-            REPEAT<br>
-            UNTIL<br>
-            UNTIL</p>
+        <pre><code>    REPEAT
+      .
+      .
+      REPEAT
+        .
+        .
+      UNTIL
+    UNTIL</code></pre>
 
         <p>sind veboten. Die einzelnen Makros haben folgende Wirkung:<br>
             <strong>TXY</strong>: Das Y-Register wird mit dem Inhalt des X-Registers geladen.<br>
@@ -66,13 +64,11 @@
 
         <p>TODO</p>
 
-        <p>10 -.GL USER = 3<br>
-            20 - LDA #0 ;L0-BYTE<br>
-            STARTADRESSE USERSTACK<br>
-            30 - STA USER<br>
-            40 - LDA #$C0 ;HI-BYTE<br>
-            STARTADRESSE USERSTACK<br>
-            50 - STA USER+1</p>
+        <pre><code>10 -.GL USER = 3
+20 -      LDA #0     ;LO-BYTE STARTADRESSE USERSTACK
+30 -      STA USER
+40 -      LDA #$C0   ;HI-BYTE STARTADRESSE USERSTACK
+50 -      STA USER+1</code></pre>
 
         <p>Hier wurde ein Userstack angelegt, der bei Adresse $C000 beginnt. Der Stackpointer, als oder Zeiger, der auf die aktuelle Stackadresse zeigt, steht in der Zeropage in den Speicherzellen 3 und 4.<br>
             <strong>PUSHA</strong>: Der Inhalt des Akkumulators wird auf dem Userstack abgelegt.<br>
@@ -91,25 +87,21 @@
             <strong>REPEAT, EXITREPEAT, UNTIL (übergabe.bedingung)</strong>: Die Schleife wird so lange fortgesetzt, bis die Speicherzelle »übergabe« den Wert »bedingung« enthält. Beispiel:
         </p>
 
-        <p>TODO</p>
-
-        <p>io - LDX #255<br>
-            20 - REPEAT<br>
-            30 - DEX<br>
-            40 - STX $FB<br>
-            50 - &hellip; UNTIL ($FB,0)</p>
+        <pre><code>10 -       LDX #255
+20 -       ... REPEAT
+30 -       DEX
+40 -       STX $FB
+50 -       ... UNTIL ($FB,0)</code></pre>
 
         <p>Das X-Register wird solange dekrementiert, bis es den Wert »0« enthält.<br>
             <strong>WHILE (übergabe,bedingung), EXITWHILE, ENDWHILE:</strong> Die Schleife wird solange fortgesetzt, bis der Inhalt der Speicherzelle »übergabe« gleich »bedingung« ist. Beispiel:
         </p>
 
-        <p>TODO</p>
-
-        <p>10 - LDX #255<br>
-            20 - &hellip; WHILE ($FB,0)<br>
-            30 - DEX<br>
-            40 - STX $FB<br>
-            50 - &hellip; ENDWHILE</p>
+        <pre><code>10 -       LDX #255
+20 -       ... WHILE ($FB,0)
+30 -       DEX
+40 -       STX $FB
+50 -       ... ENDWHILE</pre></article>
 
         <p>Solange der Inhalt der Speicherzelle $FB ungleich Null ist, wird das X-Register dekrementiert.</p>
 
