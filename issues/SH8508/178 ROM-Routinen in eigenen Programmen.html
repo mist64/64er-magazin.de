@@ -40,13 +40,34 @@
         <p>Die Tabelle nennt den Label-Namen, die Einsprungadresse und gibt eine Kurzbeschreibung der Funktion. Das Ein- und auch das Ausgabeformat ist ebenso angegeben wie auch die Adressen, an denen diese Parameter übergeben werden. Die verwendeten Bezeichnungen halten sich eng an die im Assembler-Kurs kennengelernten. Sie sind allgemein üblich:</p>
 
         <table class="plain">
-            <tr><td>FAC</td><td>Fließkomma-Akku 1</td></tr>
-            <tr><td>ARG</td><td>Fließkomma-Akku 2</td></tr>
-            <tr><td>A</td><td>Akkumulator</td></tr>
-            <tr><td>X,Y</td><td>X-, Y-Register</td></tr>
-            <tr><td>A/Y</td><td>2-Byte-Angabe im Format LSB/MSB im Akku/Y-Register</td></tr>
-            <tr><td>FLPT</td><td>Fließkommazahl im Normalformat</td></tr>
-            <tr><td>MFLPT</td><td>gepacktes Fließkommaformat</td></tr>
+            <tr>
+                <td>FAC</td>
+                <td>Fließkomma-Akku 1</td>
+            </tr>
+            <tr>
+                <td>ARG</td>
+                <td>Fließkomma-Akku 2</td>
+            </tr>
+            <tr>
+                <td>A</td>
+                <td>Akkumulator</td>
+            </tr>
+            <tr>
+                <td>X,Y</td>
+                <td>X-, Y-Register</td>
+            </tr>
+            <tr>
+                <td>A/Y</td>
+                <td>2-Byte-Angabe im Format LSB/MSB im Akku/Y-Register</td>
+            </tr>
+            <tr>
+                <td>FLPT</td>
+                <td>Fließkommazahl im Normalformat</td>
+            </tr>
+            <tr>
+                <td>MFLPT</td>
+                <td>gepacktes Fließkommaformat</td>
+            </tr>
         </table>
 
         <p>Damit das alles nicht so trocken abläuft, soll noch ein kleines Beispiel vorgestellt werden! Die oben schon erwähnte Kotangens-Funktion wird in einem Maschinenprogramm erzeugt, das durch USR anzuspringen ist. In Bild 1 finden Sie ein Flußdiagramm zu dem Programm, welches hier als Hypra-Ass-Listing abgebildet ist (Listing 1). Ein kurzes Testprogramm liefert Listing 2.</p>
@@ -71,6 +92,61 @@
             TODO
             <figcaption>Tabelle der ROM-Routinen</figcaption>
         </figure>
+
+        <figure>
+            <pre data-filename="cotangens test" data-name="Kotangens"></pre>
+            <figcaption>Listing 2. Test der Kotangens-Funktion</figcaption>
+        </figure>
+
+        <!-- cot quell hypra -->
+        <figure>
+            <pre>
+10  -          .LI 1,4
+20  -          .BA $6000
+30  -;********************************
+40  -;*                              *
+50  -;*    BEISPIELPROGRAMM ZU DEN   *
+60  -;*       R O M - ROUTINEN       *
+70  -;*                              *
+80  -;*      COTANGENS-FUNKTION      *
+90  -;* HEIMO PONNATH  HAMBURG  1985 *
+100  -;*                              *
+110  -;********************************
+120  -;
+130  -;EINSPRUNG MITTELS USR
+140  -;ZUVOR USR-VEKTOR EINSTELLEN!
+150  -;
+160  -          .EQ COS=$E264
+165  -          .EQ MOVFM=$BBA2
+170  -          .EQ MOVMF=$BBD4
+180  -          .EQ SIN=$E26B
+190  -          .EQ FDIV=$BB0F
+200  -          .EQ WERT=$7000
+205  -          .EQ WERT1=$7010
+210  -;
+212  -START     LDX #&lt;(WERT1)
+214  -          LDY #&gt;(WERT1)
+216  -          JSR MOVMF
+220  -          JSR COS
+230  -          LDX #&lt;(WERT)
+240  -          LDY #&gt;(WERT)
+250  -          JSR MOVMF
+252  -          LDA #&lt;(WERT1)
+254  -          LDY #&gt;(WERT1)
+256  -          JSR MOVFM
+260  -          JSR SIN
+270  -          LDA #&lt;(WERT)
+280  -          LDY #&gt;(WERT)
+290  -          JSR FDIV
+300  -          RTS
+310  -;
+320  -          .SY 1,4
+330  -          .ST
+</pre>
+            <figcaption>Listing 1. Hypra-Ass-Listing der Kotangens-Funktion</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="cot quell hypra.prg" data-name="Kotangens (Quelltext)"></div>
+
     </article>
 </body>
 

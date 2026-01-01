@@ -1,0 +1,435 @@
+
+
+;smon+src.prg ==0801==
+  100 sys9*4096
+  110 .opt oo
+  130 ;
+  140 ; !smon-erweiterung
+  150 ; erweitert smon um folgende
+  160 ; befehle   - h adr1 (adr2)
+  170 ;           - z adr1 (adr2)
+  180 ;           - n adr1 (adr2)
+  190 ;           - u adr1 (adr2)
+  200 ;           - e adr1  adr2
+  210 ;           - y byte
+  220 ;           - q adr1
+  230 ;           - j
+  240 ;
+  250 ;------------------------------
+  260 ; 'h'
+  270 ;
+  280 ;     bildet jeweils drei bytes
+  290 ;     in binaerdarstellung ab.
+  300 ;     (fuer sprite-daten)
+  310 ;------------------------------
+  320 ; 'z' (zeichen)
+  330 ;
+  340 ;     bildet jeweils ein byte
+  350 ;     in binaerdarstellung ab.
+  360 ;     (fuer character-daten)
+  370 ;------------------------------
+  380 ; 'n' (normal)
+  390 ;
+  400 ;     bildet 32 bytes als bild-
+  410 ;     schirm-code ab.(+ adr!)
+  420 ;------------------------------
+  430 ; 'u' (uebersicht)
+  440 ;
+  450 ;     bildet 40 bytes als bild-
+  460 ;     schirm-code ab.       
+  470 ;------------------------------
+  480 ; 'e' (erase)
+  490 ;
+  500 ;     fuellt bereich von adr1
+  510 ;     bis adr2 mit $00.
+  520 ;------------------------------
+  530 ; 'y'
+  540 ;
+  550 ;     schreibt smon auf
+  560 ;     $byte00 um.
+  570 ;------------------------------
+  580 ; 'q'
+  590 ;
+  600 ;     kopiert zeichensatz
+  610 ;     nach adr1.
+  620 ;------------------------------
+  630 ; 'j'
+  640 ;
+  650 ;     holt letzten ausgabe-
+  660 ;     befehl (h,z,n,u,k,m,d)
+  670 ;     zurueck.
+  680 ;------------------------------
+  690 ;
+  700 s = $c000      ;basisadresse smon
+  710 ;
+  720 hch      ="("  ;hidden commands
+  730 hcz      =")"
+  740 hcn      ="!"
+  750 ;
+  760 flag     =$aa
+  770 temp     =$ab
+  780 pcl      =$fb
+  790 pch      =$fc
+  800 hinibble =$ff
+  810 ;
+  820 cmds     =s+$02b
+  830 get12adr =s+$264
+  840 get2adr  =s+$27a
+  850 getadr1  =s+$27e
+  860 getbyt   =s+$28d
+  870 skipspac =s+$2b8
+  880 getret   =s+$2c2
+  890 getchrer =s+$2ca
+  900 error    =s+$2d1
+  910 execute  =s+$2d6
+  920 cmdstore =s+$2ff
+  930 charret  =s+$340
+  940 return   =s+$351
+  950 hexout   =s+$323
+  960 pcinc    =s+$367
+  970 ascii4   =s+$44f
+  980 ascii5   =s+$456
+  990 contin   =s+$45d
+ 1000 occupy   =s+$9c7
+ 1010 ;-------------
+ 1011 *= s+38
+ 1012 .byte 00      ;alten z-befehl loeschen
+ 1013 ;
+ 1020 *= s+$61
+ 1030 ;
+ 1040 hcmdtab .asc "':;,"
+ 1050 .byte hch,hcz,hcn
+ 1060 ;
+ 1070 *=s+$2e3
+ 1080 ;
+ 1090 ldx #6        ;zeilenanfang
+ 1100 f1 cmp hcmdtab,x
+ 1110 beq exec1
+ 1120 dex
+ 1130 bpl f1
+ 1140 lda #"."
+ 1150 jsr $ffd2
+ 1160 ;
+ 1170 exec1 jsr getchrerr
+ 1180 cmp #"."
+ 1190 beq exec1
+ 1200 jmp linstore
+ 1210 weiter jmp morecmd
+ 1220 ;
+ 1230 *=s+$30d      ;weitere befehle
+ 1240 ;
+ 1250 beq weiter
+ 1260 ;
+ 1270 *=s+$e09      ;neue routinen
+ 1280 ;
+ 1290 ;-------------
+ 1300 ;
+ 1310 zcmd lda #$80 ;flag setzen
+ 1320 .byte $2c
+ 1330 ;
+ 1340 hcmd lda #0
+ 1350 sta temp
+ 1360 jsr get12adr  ;start/end-adresse
+ 1370 ;
+ 1380 l1 bit temp
+ 1390 bpl w8
+ 1400 ldx #hcz      ;hidden command
+ 1410 .byte $2c     ;ausgeben
+ 1420 w8 ldx #hch
+ 1430 jsr charret
+ 1440 jsr hexout    ;pc ausgeben
+ 1450 ldy #6        ;spalte 6
+ 1460 ;
+ 1470 l2 ldx #0
+ 1480 lda (pcl,x)
+ 1490 ;
+ 1500 l3 asl
+ 1510 pha           ;byte merken
+ 1520 bcs bitset    ;bit=1, dann *
+ 1530 lda #"."      ;bit=0, dann .
+ 1540 .byte $2c     ;ausgeben
+ 1550 bitset lda #"*"
+ 1560 sta ($d1),y
+ 1570 lda $286
+ 1580 sta ($f3),y
+ 1590 ;
+ 1600 pla           ;byte zurueckholen
+ 1610 iny           ;cursor weiter
+ 1620 inx           ;naechstes byte
+ 1630 cpx #8        ;8 bit
+ 1640 bne l3        ;byte weiterschieben
+ 1650 ;
+ 1660 jsr pcinc     ;zaehler erhoehen
+ 1670 bit temp      ;flag fuer 1*8 bit
+ 1680 bmi w9        ;zeile fertig
+ 1690 cpy #30       ;3 bytes
+ 1700 bcc l2
+ 1710 w9 jsr contin ;tasten-abfrage
+ 1720 bcc l1
+ 1730 rts
+ 1740 ;
+ 1750 ;-------------
+ 1760 ;
+ 1770 zcmdh   ldy #8
+ 1780 .byte $2c     ;1 byte
+ 1790 ;
+ 1800 hcmdh ldy #24 ;3 byte
+ 1810 jsr getadr1
+ 1820 jsr skipspace ;spaces ueberlesen
+ 1830 a1 ldx #8
+ 1840 lda #0
+ 1850 sta flag
+ 1860 ;
+ 1870 a2 jsr getchrerr
+ 1880 cmp #"."      ;. => bit=0
+ 1890 beq bit0      ;* => bit=1
+ 1900 cmp #"*"
+ 1910 beq bit1
+ 1920 err1 jmp error ;anderes zeichen
+ 1930 ;
+ 1940 bit0 clc
+ 1950 bit1 rol flag
+ 1960 dey
+ 1970 dex           ;byte
+ 1980 bne a2        ;noch nicht fertig
+ 1990 ;
+ 2000 lda flag      ;in speicher
+ 2010 sta (pcl,x)   ;schreiben
+ 2020 cmp (pcl,x)
+ 2030 bne err1
+ 2040 jsr pcinc
+ 2050 ;
+ 2060 cpy #0
+ 2070 bne a1        ;noch nicht fertig
+ 2080 rts
+ 2090 ;
+ 2100 ;-------------
+ 2110 ;
+ 2120 ncmd lda #$80
+ 2130 .byte $2c
+ 2140 ucmd lda #0
+ 2150 sta temp
+ 2160 jsr get12adr
+ 2170 ;
+ 2180 l5 jsr return
+ 2190 bit temp
+ 2200 bpl u
+ 2210 lda #hcn      ;hidden command
+ 2220 jsr $ffd2
+ 2230 jsr hexout
+ 2240 ldy #8        ;spalte 8
+ 2250 .byte $2c
+ 2260 ;
+ 2270 u ldy #0      ;spalte 0
+ 2280 ldx #0
+ 2290 ;
+ 2300 l4 lda (pcl,x)
+ 2310 jsr ascii4    ;als bildschirm-code
+ 2320 bne l4        ;ausgeben
+ 2330 ;
+ 2340 jsr contin
+ 2350 bcc l5        ;naechste zeile
+ 2360 rts
+ 2370 ;-------------
+ 2380 ncmdh jsr getadr1
+ 2390 ldx #0
+ 2400 ldy #8        ;spalte 8
+ 2410 c1 lda ($d1),y
+ 2420 sta (pcl,x)   ;in speicher
+ 2430 cmp (pcl,x)   ;schreiben
+ 2440 bne err1
+ 2450 jsr ascii5    ;pc erhoehen
+ 2460 bcc c1
+ 2470 rts           ;zeile fertig
+ 2480 ;
+ 2490 ;-------------
+ 2500 ;
+ 2510 ycmd jsr getbyt
+ 2520 and #%11110000
+ 2530 sta hinibble  ;neuer 4k-block
+ 2540 jsr setptr    ;adressen setzen
+ 2550 jsr $79d6     ;w-befehl
+ 2560 ;
+ 2570 jsr setptr
+ 2580 lda #$14      ;bereich ohne
+ 2590 sta $fb       ;tabellen
+ 2600 lda #2
+ 2610 ora hinibble
+ 2620 sta $fc
+ 2630 lda #<newcmds
+ 2640 sta $fd
+ 2650 lda #(newcmds>8 & $f)
+ 2660 ora hinibble
+ 2670 sta $fe
+ 2680 jsr $7a68     ;v-befehl
+ 2690 ;
+ 2700 ldy #0        ;lade-befehle
+ 2710 ldx #13       ;anpassen
+ 2720 d3 lda change,x
+ 2730 ora hinibble
+ 2740 sta pch       ;adresse als zeiger
+ 2750 dex
+ 2760 lda change,x
+ 2770 sta pcl
+ 2780 lda (pcl),y
+ 2790 and #%00001111
+ 2800 ora hinibble
+ 2810 sta (pcl),y
+ 2820 dex
+ 2830 bpl d3
+ 2840 ;
+ 2850 lda #<cmds    ;zeiger auf
+ 2860 sta pcl       ;befehlsadressen
+ 2870 lda #(cmds>8 & $f)
+ 2880 ora hinibble
+ 2890 sta pch
+ 2900 ;
+ 2910 ldy #53
+ 2920 d1 lda (pcl),y
+ 2930 and #%00001111
+ 2940 ora hinibble  ;hibytes
+ 2950 sta (pcl),y   ;angleichen
+ 2960 w1 dey
+ 2970 dey
+ 2980 bpl d1
+ 2990 ;
+ 3000 lda #<newadr  ;zeiger auf neue
+ 3010 sta pcl       ;befehlsadressen
+ 3020 lda #(newadr>8 & $f)
+ 3030 ora hinibble
+ 3040 sta pch
+ 3050 ;
+ 3060 ldy #tabend-newadr-1
+ 3070 d2 lda (pcl),y
+ 3080 and #%00001111
+ 3090 ora hinibble  ;hibytes
+ 3100 sta (pcl),y   ;angleichen
+ 3110 dey
+ 3120 dey
+ 3130 bpl d2
+ 3140 rts
+ 3150 ;
+ 3160 ;
+ 3170 setptr lda hinibble
+ 3180 sta $a9       ;neuer start hi
+ 3190 jsr gethi
+ 3200 gethi pla
+ 3210 pla
+ 3220 and #%11110000
+ 3230 sta $a5       ;alter start hi
+ 3240 clc
+ 3250 adc #$10
+ 3260 sta $a7       ;altes ende hi
+ 3270 ;
+ 3280 lda #0        ;lo-bytes loeschen
+ 3290 sta $a4
+ 3300 sta $a6
+ 3310 sta $a8
+ 3320 rts
+ 3330 ;
+ 3340 ;---------
+ 3350 ;
+ 3360 ecmd jsr get2adr
+ 3370 lda #0
+ 3380 jmp occupy
+ 3390 ;
+ 3400 ;---------
+ 3410 ;
+ 3420 qcmd jsr getadr1
+ 3430 ldy #0
+ 3440 lda #$d0      ;zeiger auf
+ 3450 sty $fd       ;zeichenrom
+ 3460 sta $fe
+ 3470 ;
+ 3480 sei
+ 3490 lda #%011     ;rom einblenden
+ 3500 sta 1
+ 3510 ldx #16       ;4k uebertragen
+ 3520 e1 lda ($fd),y
+ 3530 sta (pcl),y
+ 3540 iny
+ 3550 bne e1
+ 3560 inc pch
+ 3570 inc $fe
+ 3580 dex
+ 3590 bne e1
+ 3600 lda #$27      ;normaleinstellung
+ 3610 sta 1
+ 3620 cli
+ 3630 rts
+ 3640 ;
+ 3650 ;---------
+ 3660 ;
+ 3670 linstore pha  ;befehl merken
+ 3680 cmp #"j"
+ 3690 bne store
+ 3700 ;
+ 3710 ldy #39
+ 3720 g1 lda $0200,y
+ 3730 sta ($d1),y   ;zeile auf
+ 3740 dey           ;bildschirm
+ 3750 bpl g1        ;schreiben
+ 3760 pla
+ 3770 dec $d6       ;cursor 1 hoch
+ 3780 jmp execute
+ 3790 ;
+ 3800 store ldy #6
+ 3810 g3 cmp outcmds,y
+ 3820 bne w3
+ 3830 ;
+ 3840 ok1 ldy #39
+ 3850 g2 lda ($d1),y
+ 3860 sta $0200,y   ;zeile nur bei
+ 3870 dey           ;h,z,n,u,k,m,d
+ 3880 bpl g2        ;speichern
+ 3890 ;
+ 3900 w3 dey
+ 3910 bpl g3
+ 3920 stend pla     ;befehl zurueckholen
+ 3930 jmp cmdstore
+ 3940 ;
+ 3950 ;+++++++++
+ 3960 ;
+ 3970 morecmd ldx #newadr-newcmds-3
+ 3980 b1 cmp newcmds-1,x
+ 3990 beq found
+ 4000 dex
+ 4010 bne b1
+ 4020 jmp error
+ 4030 ;
+ 4040 found jsr cmdexec2
+ 4050 jmp execute
+ 4060 ;
+ 4070 cmdexec2 txa
+ 4080 asl
+ 4090 tax
+ 4100 lda newadr-1,x
+ 4110 pha
+ 4120 lda newadr-2,x
+ 4130 pha
+ 4140 rts
+ 4150 ;
+ 4160 newcmds .byte hch,hcz,hcn
+ 4170 .asc "eyq"
+ 4180 outcmds .asc "hznudkm"
+ 4190 ;
+ 4200 newadr .word hcmdh-1
+ 4210 .word zcmdh-1
+ 4220 .word ncmdh-1
+ 4230 .word ecmd-1             ;e
+ 4240 .word ycmd-1             ;y
+ 4250 .word qcmd-1             ;q
+ 4260 .word hcmd-1             ;!
+ 4270 .word zcmd-1             ;z
+ 4280 .word ncmd-1             ;n
+ 4290 .word ucmd-1             ;u
+ 4300 tabend = *
+ 4310 ;
+ 4320 change .word $0005+1
+ 4330 .word $0386+1
+ 4340 .word $0c2c+1
+ 4350 .word $0c5b+1
+ 4360 .word $0cf4+1
+ 4370 .word $0da1+1
+ 4380 .word $0e03+1
+
