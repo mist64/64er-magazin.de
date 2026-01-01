@@ -8,96 +8,97 @@
     <meta name="author" content="Guy Mootz, og">
     <meta name="64er.issue" content="Sonderheft 8/85">
     <meta name="64er.pages" content="146-151">
-    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <meta name="64er.toc_category" content="Tips und Tricks">
     <!-- <meta name="64er.toc_title" content="XXX"> -->
-    <meta name="64er.id" content="XXX">
+    <meta name="64er.id" content="exinput">
 </head>
 
 <body>
     <article>
         <h1>INPUT mit Pfiff</h1>
-<p class="intro">Einen INPUT-Befehl, der keine Wünsche mehr offenläßt, stellen wir Ihnen mit diesem Programm vor. Anhand des ausführlich dokumentierten Assembler-Listings können Sie zum Beispiel lernen, wie man eigene Befehle in den Interpreter einbaut.</p>
+        <p class="intro">Einen INPUT-Befehl, der keine Wünsche mehr offenläßt, stellen wir Ihnen mit diesem Programm vor. Anhand des ausführlich dokumentierten Assembler-Listings können Sie zum Beispiel lernen, wie man eigene Befehle in den Interpreter einbaut.</p>
 
-<p>Exinput 64« löst all Ihre Probleme, die Sie jemals mit dem INPUT-Befehl des Basic V2 gehabt haben. Mit dieser kleinen Erweiterung haben Sie ein Werkzeug in der Hand, das alle seitenlangen GET-Eingabeschleifen vergessen läßt. »Exinput 64« beschränkt sich nicht auf 80 Zeichen; Sie haben, wenn Sie wollen, die volle Länge eines Strings (255 Zeichen) zur Verfügung. Das Eingabefeld wird dabei durch eine Linie sichtbar gemacht. Sämtliche Zeichen können übernommen werden - auch Kommata und Doppelpunkte. Natürlich kann man die Eingabe auch auf bestimmte Tasten beschränken.</p>
+        <p>Exinput 64« löst all Ihre Probleme, die Sie jemals mit dem INPUT-Befehl des Basic V2 gehabt haben. Mit dieser kleinen Erweiterung haben Sie ein Werkzeug in der Hand, das alle seitenlangen GET-Eingabeschleifen vergessen läßt. »Exinput 64« beschränkt sich nicht auf 80 Zeichen; Sie haben, wenn Sie wollen, die volle Länge eines Strings (255 Zeichen) zur Verfügung. Das Eingabefeld wird dabei durch eine Linie sichtbar gemacht. Sämtliche Zeichen können übernommen werden - auch Kommata und Doppelpunkte. Natürlich kann man die Eingabe auch auf bestimmte Tasten beschränken.</p>
 
-<p class="source">Eingabehinweis: Bitte geben Sie Listing 1 mit dem MSE ein, und speichern Sie es mit einem beliebigen Namen.</p>
+        <p class="source">Eingabehinweis: Bitte geben Sie Listing 1 mit dem MSE ein, und speichern Sie es mit einem beliebigen Namen.</p>
 
-<h3>Programmbeschreibung</h3>
+        <h3>Programmbeschreibung</h3>
 
-<p>Die Erweiterung steht im Speicher von $C000 bis $C51D, wird mit »LOAD "Name",8,1« geladen, mit »SYS 49152« gestartet und muß nur nach einem Reset wieder neu initialisiert werden. Die Routine wurde über einen Zeiger aus der Zero-Page des C 64 in das normale Basic eingebunden.</p>
+        <p>Die Erweiterung steht im Speicher von $C000 bis $C51D, wird mit »LOAD "Name",8,1« geladen, mit »SYS 49152« gestartet und muß nur nach einem Reset wieder neu initialisiert werden. Die Routine wurde über einen Zeiger aus der Zero-Page des C 64 in das normale Basic eingebunden.</p>
 
-<p>Dies ist der Zeiger für »Basic-Befehlsadresse holen« in den Adressen $308/$309 (dezimal 776/777). Der Zeiger in diesen beiden Speicherstellen wird von $A7E4 auf den Anfang der Befehlserweiterung, in diesem Fall auf $C00B geändert. Dies wird beim Start des Programms durch die vier ersten Assemblerbefehle gemacht. Danach springt das Programm wieder ins Basic zurück und die beiden zusätzlichen »Basic-Befehle« stehen zum sofortigen Gebrauch im Basic-Programm zur Verfügung (siehe auch Kasten).</p>
+        <p>Dies ist der Zeiger für »Basic-Befehlsadresse holen« in den Adressen $308/$309 (dezimal 776/777). Der Zeiger in diesen beiden Speicherstellen wird von $A7E4 auf den Anfang der Befehlserweiterung, in diesem Fall auf $C00B geändert. Dies wird beim Start des Programms durch die vier ersten Assemblerbefehle gemacht. Danach springt das Programm wieder ins Basic zurück und die beiden zusätzlichen »Basic-Befehle« stehen zum sofortigen Gebrauch im Basic-Programm zur Verfügung (siehe auch Kasten).</p>
 
-<p>Die Routine übernimmt das selektieren der neuen Befehlsworte. Wird ein INPUT- oder PRINT-Befehl gefunden, wird auf das Erkennungszeichen der neuen Befehle (>) geprüft. Ist dieses Zeichen vorhanden, so wird in die eigene Routine verzweigt, ansonsten wird die Routine des Basic-Interpreters aufgerufen.</p>
+        <p>Die Routine übernimmt das selektieren der neuen Befehlsworte. Wird ein INPUT- oder PRINT-Befehl gefunden, wird auf das Erkennungszeichen der neuen Befehle (>) geprüft. Ist dieses Zeichen vorhanden, so wird in die eigene Routine verzweigt, ansonsten wird die Routine des Basic-Interpreters aufgerufen.</p>
 
-<p>Der INPUT-Befehl sieht auf den ersten Blick vielleicht etwas kompliziert aus, ist es aber nach ein wenig Ausprobieren nicht mehr.</p>
+        <p>Der INPUT-Befehl sieht auf den ersten Blick vielleicht etwas kompliziert aus, ist es aber nach ein wenig Ausprobieren nicht mehr.</p>
 
-<p>INPUT> Zeile, Spalte, Länge, Farbe, Text, Code, Zeichen, Variable</p>
+        <p>INPUT> Zeile, Spalte, Länge, Farbe, Text, Code, Zeichen, Variable</p>
 
-<h3>Erklärung der Parameter</h3>
+        <h3>Erklärung der Parameter</h3>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p class="source">Zeile:  1 bis 25    (oder Variable)<br>
-Spalte: 1 bis 40    (oder Variable)<br>
-Länge: 1bis 255 (oder Variable)<br>
-Farbe:  0-15    (Farbe des Textes und des Eingabefeldes)<br>
-Text:   Beliebiger Text zwischen "", erscheint vor dem Eingabefeld<br>
-Code:   - 'A' = Alle Zeichen bei der Eingabe erlaubt<br>
-- ’B’ = Nur Buchstaben, Leerzeichen, ’.’ und ’-’ für Abkürzung und Trennung<br>
-- ’Z’ = Nur Ziffern, Minuszeichen und Dezimalpunkt<br>
-Zeichen: Einzelne Ziffern, Buchstaben oder jedes andere Zeichen zwischen " ", das bei der Eingabe erlaubt ist. (&lt; 30 Zeichen) zum Beispiel Menüpunktabfrage zwischen 1 und 4: INPUT >20,5,1,1,"Bitte wählen: ",<strong>Z</strong>,"<strong>1234</strong>", X$<br>
-Variable: Muß eine String-Variable sein.<br>
-Einziger Nachteil: Ziffern müssen zum Rechnen mit VAL umgewandelt werden.</p>
+        <p class="source">Zeile: 1 bis 25 (oder Variable)<br>
+            Spalte: 1 bis 40 (oder Variable)<br>
+            Länge: 1bis 255 (oder Variable)<br>
+            Farbe: 0-15 (Farbe des Textes und des Eingabefeldes)<br>
+            Text: Beliebiger Text zwischen "", erscheint vor dem Eingabefeld<br>
+            Code: - 'A' = Alle Zeichen bei der Eingabe erlaubt<br>
+            - ’B’ = Nur Buchstaben, Leerzeichen, ’.’ und ’-’ für Abkürzung und Trennung<br>
+            - ’Z’ = Nur Ziffern, Minuszeichen und Dezimalpunkt<br>
+            Zeichen: Einzelne Ziffern, Buchstaben oder jedes andere Zeichen zwischen " ", das bei der Eingabe erlaubt ist. (&lt; 30 Zeichen) zum Beispiel Menüpunktabfrage zwischen 1 und 4: INPUT >20,5,1,1,"Bitte wählen: ",<strong>Z</strong>,"<strong>1234</strong>", X$<br>
+            Variable: Muß eine String-Variable sein.<br>
+            Einziger Nachteil: Ziffern müssen zum Rechnen mit VAL umgewandelt werden.</p>
 
-<p>Ganz einfach ist der Befehl, weil man verschiedene Parameter einzeln oder zusammen weglassen kann, und zwar »Farbe«, »Text« und »Zeichen«. Dann bleibt zum Beispiel noch übrig:</p>
+        <p>Ganz einfach ist der Befehl, weil man verschiedene Parameter einzeln oder zusammen weglassen kann, und zwar »Farbe«, »Text« und »Zeichen«. Dann bleibt zum Beispiel noch übrig:</p>
 
-<p>INPUT>10,3,15,B,A$</p>
+        <p>INPUT>10,3,15,B,A$</p>
 
-<p>Die Länge des Eingabefeldes wird durch eine Linie markiert, dessen einzelnes Zeichen (CHR$(100)) an der Adresse 49244 steht und durch »POKE 49244, CHR$-Code« beliebig geändert werden kann, zum Beispiel 32 (Leerzeichen), 46 (Punkt) etc.</p>
+        <p>Die Länge des Eingabefeldes wird durch eine Linie markiert, dessen einzelnes Zeichen (CHR$(100)) an der Adresse 49244 steht und durch »POKE 49244, CHR$-Code« beliebig geändert werden kann, zum Beispiel 32 (Leerzeichen), 46 (Punkt) etc.</p>
 
-<p>Wird eine unerlaubte Taste gedrückt, oder soll der Cursor die Feldgrenze überschreiten, ertönt zur Warnung ein Piepston. Dieser kann mit »POKE 50340,0« ausgeschaltet und mit »POKE 50340,65« wieder eingeschaltet werden.</p>
+        <p>Wird eine unerlaubte Taste gedrückt, oder soll der Cursor die Feldgrenze überschreiten, ertönt zur Warnung ein Piepston. Dieser kann mit »POKE 50340,0« ausgeschaltet und mit »POKE 50340,65« wieder eingeschaltet werden.</p>
 
-<p>Am Ende des Eingabefeldes wird das letzte Zeichen bei weiteren Eingaben überschrieben.</p>
+        <p>Am Ende des Eingabefeldes wird das letzte Zeichen bei weiteren Eingaben überschrieben.</p>
 
-<h3>Editier-Tasten</h3>
+        <h3>Editier-Tasten</h3>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>CRSR Left <br>
-CRSR Right<br>
-CRSR Up (Nur bei mehreren Zeilen)<br>
-CRSR Down INST DEL HOME CLR/HOME    (Nur bei mehreren Zeilen)<br>
-RETURN  übernimmtden Feldinhaltohne Leerstellen am Ende<br>
-SHIFT/RETURN    übernimmtauch die Leerstellen, also das ganze Feld<br>
-Ob mit oder ohne Leerstellen kann bei den beiden Tasten auch selbst bestimmt werden.<br>
-Für RETURN: »POKE 49595, 182(ohne)/208(mit)«<br>
-Für SHIFT/RETURN: »POKE 49602, 208(mit)/182(ohne)«<br>
-F8  läßt einen eventuellen Inhalt der Variablen im Eingabefeld erscheinen, jedoch nur bis zur Länge des Feldes selbst<br>
-Der zweite Befehl der Erweiterung betrifft den PRINT-Befehl.</p>
+        <p>CRSR Left <br>
+            CRSR Right<br>
+            CRSR Up (Nur bei mehreren Zeilen)<br>
+            CRSR Down INST DEL HOME CLR/HOME (Nur bei mehreren Zeilen)<br>
+            RETURN übernimmtden Feldinhaltohne Leerstellen am Ende<br>
+            SHIFT/RETURN übernimmtauch die Leerstellen, also das ganze Feld<br>
+            Ob mit oder ohne Leerstellen kann bei den beiden Tasten auch selbst bestimmt werden.<br>
+            Für RETURN: »POKE 49595, 182(ohne)/208(mit)«<br>
+            Für SHIFT/RETURN: »POKE 49602, 208(mit)/182(ohne)«<br>
+            F8 läßt einen eventuellen Inhalt der Variablen im Eingabefeld erscheinen, jedoch nur bis zur Länge des Feldes selbst<br>
+            Der zweite Befehl der Erweiterung betrifft den PRINT-Befehl.</p>
 
-<h3>Die Syntax des PRINT-Befehls</h3>
+        <h3>Die Syntax des PRINT-Befehls</h3>
 
-<p>PRINT > Zeile, Spalte, Farbe, String<br>
-Hier kann die Farbe weggelassen werden, der zu druckende String muß zwischen " " stehen wie beim normalen PRINT-Befehl und jeder Parameter kann durch eine Variable ersetzt werden.</p>
+        <p>PRINT > Zeile, Spalte, Farbe, String<br>
+            Hier kann die Farbe weggelassen werden, der zu druckende String muß zwischen " " stehen wie beim normalen PRINT-Befehl und jeder Parameter kann durch eine Variable ersetzt werden.</p>
 
-<p>Mit den Angaben der im Kasten genannten Routinen kann man leicht eine Variable erstellen. Man kopiert nur die Adresse des reservierten Bereichs und die Länge in den Stringdescriptor und den Text der Variablen schreibt man in den reservierten Bereich. Alles andere erfahren Sie, wenn Sie das Programm selbst durchlesen (Listing 2).</p>
+        <p>Mit den Angaben der im Kasten genannten Routinen kann man leicht eine Variable erstellen. Man kopiert nur die Adresse des reservierten Bereichs und die Länge in den Stringdescriptor und den Text der Variablen schreibt man in den reservierten Bereich. Alles andere erfahren Sie, wenn Sie das Programm selbst durchlesen (Listing 2).</p>
 
-<address class="author">(Guy Mootz/og)</address>
+        <address class="author">(Guy Mootz/og)</address>
 
-<p>TODO ASIDE</p>
+        <p>TODO ASIDE</p>
 
-<h3>Erklärungen zu oft benötigten ROM-Routinen und zur Erstellung der Variablen.</h3>
+        <h3>Erklärungen zu oft benötigten ROM-Routinen und zur Erstellung der Variablen.</h3>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p class="source">CHRGET: Diese Routine steht ab $E3A2 im Betriebssystem und wird beim Einschalten des Computers nach $0073 in die Zero-Page kopiert Der Zeiger in $007A/$007B zeigt immer auf das aktuelle Zeichen im Basic-Text und beim Ansprung der Routine wird jeweils das nächste Zeichen in den Akku geholt.<br>
-CHRGOT: Dies ist nur eine andere Einsprungadresse der CHRGET-Routine. Hier wird das aktuelle Zeichen in den Akku geholt und die Flags wieder gesetzt, ohne den Zeiger in $7A/$7B vorher zu erhöhen.<br>
-CHKCOM: Hier handelt es sich um eine Basic-Routine, die das laufende Zeichen prüft. Beim Einsprung in »CHKCOM« ($AEFD) wird auf ein Komma im Basic-Text geprüft, bei $AEF7 auf »Klammer zu« und bei $AEFA auf »Klammer auf«. Stimmen die Zeichen nicht überein, wird automatisch ein »Syntax Error« ausgegeben.<br>Vor dem Rücksprung liest die Routine gleich das nächste Zeichen aus dem Basic-Text in den Akku, so daß dies beim Weiterführen des Programms entfallen kann.<br>
-GETBYT: Diese Basic-Routine holt eine Zahl (Byte 0-255) in das X-Register. Beim Einsprung in $B79B wird zuerst durch »JSR $0073« das nächste Zeichen geholt (CHRGET). Hat man vorher jedoch mit »JSR $AEFD« auf ein Komma geprüft (CHKCOM), darf man erst bei $B79E einspringen, weil das nächste Zeichen sich bereits im Akku befindet.<br>
-GETVAR: Diese Routine holt sich den Variablennamen aus dem Basic-Text und sucht diese Variable dann im Speicher. Wenn sie nicht vorhanden ist, wird sie angelegt. Danach stehen dann in $0D das Typflag dieser Variablen (String=$FF/Zahl = $OO), im Akku das Low-Byte und im Y-Register das High-Byte der Adresse, an der der Stringdescriptor beginnt.<br>
-FRESTR: Mit dieser Routine wird die weitere Auswertung der mit »GETVAR« eingelesenen Variablen vorgenommen. Nachher stehen im X-Register das Low-Byte der Adresse, im Y-Register das High-Byte der Adresse und im Akku die Länge des Strings.<br>
-STRPOI: Hiermit berechnet man den Stringzeiger und reserviert gleichzeitig Speicher für den String am Ende des Stringspeichers. Die Länge des Strings muß vorher im Akku stehen, wo sie sich nach »FRESTR« ja auch befindet. Man findet dann in $61 die Länge des reservierten Bereichs, in $62 das Low-Byte der Adresse und in $63 das High-Byte der Adresse des reservierten Bereichs.</p>
+        <p class="source">CHRGET: Diese Routine steht ab $E3A2 im Betriebssystem und wird beim Einschalten des Computers nach $0073 in die Zero-Page kopiert Der Zeiger in $007A/$007B zeigt immer auf das aktuelle Zeichen im Basic-Text und beim Ansprung der Routine wird jeweils das nächste Zeichen in den Akku geholt.<br>
+            CHRGOT: Dies ist nur eine andere Einsprungadresse der CHRGET-Routine. Hier wird das aktuelle Zeichen in den Akku geholt und die Flags wieder gesetzt, ohne den Zeiger in $7A/$7B vorher zu erhöhen.<br>
+            CHKCOM: Hier handelt es sich um eine Basic-Routine, die das laufende Zeichen prüft. Beim Einsprung in »CHKCOM« ($AEFD) wird auf ein Komma im Basic-Text geprüft, bei $AEF7 auf »Klammer zu« und bei $AEFA auf »Klammer auf«. Stimmen die Zeichen nicht überein, wird automatisch ein »Syntax Error« ausgegeben.<br>Vor dem Rücksprung liest die Routine gleich das nächste Zeichen aus dem Basic-Text in den Akku, so daß dies beim Weiterführen des Programms entfallen kann.<br>
+            GETBYT: Diese Basic-Routine holt eine Zahl (Byte 0-255) in das X-Register. Beim Einsprung in $B79B wird zuerst durch »JSR $0073« das nächste Zeichen geholt (CHRGET). Hat man vorher jedoch mit »JSR $AEFD« auf ein Komma geprüft (CHKCOM), darf man erst bei $B79E einspringen, weil das nächste Zeichen sich bereits im Akku befindet.<br>
+            GETVAR: Diese Routine holt sich den Variablennamen aus dem Basic-Text und sucht diese Variable dann im Speicher. Wenn sie nicht vorhanden ist, wird sie angelegt. Danach stehen dann in $0D das Typflag dieser Variablen (String=$FF/Zahl = $OO), im Akku das Low-Byte und im Y-Register das High-Byte der Adresse, an der der Stringdescriptor beginnt.<br>
+            FRESTR: Mit dieser Routine wird die weitere Auswertung der mit »GETVAR« eingelesenen Variablen vorgenommen. Nachher stehen im X-Register das Low-Byte der Adresse, im Y-Register das High-Byte der Adresse und im Akku die Länge des Strings.<br>
+            STRPOI: Hiermit berechnet man den Stringzeiger und reserviert gleichzeitig Speicher für den String am Ende des Stringspeichers. Die Länge des Strings muß vorher im Akku stehen, wo sie sich nach »FRESTR« ja auch befindet. Man findet dann in $61 die Länge des reservierten Bereichs, in $62 das Low-Byte der Adresse und in $63 das High-Byte der Adresse des reservierten Bereichs.</p>
     </article>
 </body>
+
 </html>
