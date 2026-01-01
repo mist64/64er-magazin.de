@@ -1,0 +1,1097 @@
+## This is a description file for a 6502-like CPU.
+## See https://github.com/mist64/c64ref for details.
+
+[info]
+manufacturer MOS
+name         6502
+year         1975
+id           6502
+description  This is the (bug-fixed, post June 1976 version of the) original implementation of the 6502 designed by MOS Technology, Inc. in 1975, and manufactured in the NMOS, HMOS or HMOS-2 technologies. All MOS/CSG 65xx/75xx/85xx CPUs, the Rockwell R6502, Synertek SY6502 and Pravetz CM630 CPUs as well as the Ricoh 2A03 and 2A07 chips in the NES are based on this implementation. 151 opcodes are documented, the remaining 105 have undocumented behavior.
+
+[registers]
+#   A,X,Y,S,P,PC
+A   8   Accumulator
+X   8   X Index Register
+Y   8   Y Index Register
+S   8   Stack Pointer
+P   8   Processor Status
+PC  16  Program Counter
+
+[flags]
+7  N  Negative
+6  V  Overflow
+5  -  (Expansion)
+4  B  Break Command
+3  D  Decimal
+2  I  Interrupt Disable
+1  Z  Zero
+0  C  Carry
+
+[mnemos]
+ADC  Add with Carry
+AND  Logical AND
+ASL  Arithmetic Shift Left
+BCC  Branch if Carry Clear
+BCS  Branch if Carry Set
+BEQ  Branch if Equal
+BIT  Bit Test
+BMI  Branch if Minus
+BNE  Branch if Not Equal
+BPL  Branch if Plus
+BRK  Force Interrupt
+BVC  Branch if Overflow Clear
+BVS  Branch if Overflow Set
+CLC  Clear Carry Flag
+CLD  Clear Decimal Mode
+CLI  Clear Interrupt Disable
+CLV  Clear Overflow Flag
+CMP  Compare
+CPX  Compare X Register
+CPY  Compare Y Register
+DEC  Decrement Memory
+DEX  Decrement X Register
+DEY  Decrement Y Register
+EOR  Exclusive OR
+INC  Increment Memory
+INX  Increment X Register
+INY  Increment Y Register
+JMP  Jump
+JSR  Jump to Subroutine
+LDA  Load Accumulator
+LDX  Load X Register
+LDY  Load Y Register
+LSR  Logical Shift Right
+NOP  No Operation
+ORA  Logical OR
+PHA  Push Accumulator
+PHP  Push Processor Status
+PLA  Pull Accumulator
+PLP  Pull Processor Status
+ROL  Rotate Left
+ROR  Rotate Right
+RTI  Return from Interrupt
+RTS  Return from Subroutine
+SBC  Subtract with Carry
+SEC  Set Carry Flag
+SED  Set Decimal Flag
+SEI  Set Interrupt Disable
+STA  Store Accumulator
+STX  Store X Register
+STY  Store Y Register
+TAX  Transfer Accumulator to X
+TAY  Transfer Accumulator to Y
+TSX  Transfer Stack Pointer to X
+TXA  Transfer X to Accumulator
+TXS  Transfer X to Stack Pointer
+TYA  Transfer Y to Accumulator
+
+[operations]
+ADC  arith  NV----ZC  A + M + C → A, C
+AND  logic  N-----Z-  A ∧ M → A
+ASL  shift  N-----ZC  C ← /M7...M0/ ← 0
+BCC  bra    --------  Branch on C = 0
+BCS  bra    --------  Branch on C = 1
+BEQ  bra    --------  Branch on Z = 1
+BIT  logic  NV----Z-  A ∧ M, M7 → N, M6 → V
+BMI  bra    --------  Branch on N = 1
+BNE  bra    --------  Branch on Z = 0
+BPL  bra    --------  Branch on N = 0
+BRK  ctrl   -----1--  PC + 2↓, [FFFE] → PCL, [FFFF] → PCH
+BVC  bra    --------  Branch on V = 0
+BVS  bra    --------  Branch on V = 1
+CLC  flags  -------0  0 → C
+CLD  flags  ----0---  0 → D
+CLI  flags  -----0--  0 → I
+CLV  flags  -0------  0 → V
+CMP  arith  N-----ZC  A - M
+CPX  arith  N-----ZC  X - M
+CPY  arith  N-----ZC  Y - M
+DEC  inc    N-----Z-  M - 1 → M
+DEX  inc    N-----Z-  X - 1 → X
+DEY  inc    N-----Z-  Y - 1 → Y
+EOR  logic  N-----Z-  A ⊻ M → A
+INC  inc    N-----Z-  M + 1 → M
+INX  inc    N-----Z-  X + 1 → X
+INY  inc    N-----Z-  Y + 1 → Y
+JMP  ctrl   --------  [PC + 1] → PCL, [PC + 2] → PCH
+JSR  ctrl   --------  PC + 2↓, [PC + 1] → PCL, [PC + 2] → PCH
+LDA  load   N-----Z-  M → A
+LDX  load   N-----Z-  M → X
+LDY  load   N-----Z-  M → Y
+LSR  shift  0-----ZC  0 → /M7...M0/ → C
+NOP  nop    --------  No operation
+ORA  logic  N-----Z-  A ∨ M → A
+PHA  stack  --------  A↓
+PHP  stack  --------  P↓
+PLA  stack  N-----Z-  A↑
+PLP  stack  NV--DIZC  P↑
+ROL  shift  N-----ZC  C ← /M7...M0/ ← C
+ROR  shift  N-----ZC  C → /M7...M0/ → C
+RTI  ctrl   NV--DIZC  P↑ PC↑
+RTS  ctrl   --------  PC↑, PC + 1 → PC
+SBC  arith  NV----ZC  A - M - ~C → A
+SEC  flags  -------1  1 → C
+SED  flags  ----1---  1 → D
+SEI  flags  -----1--  1 → I
+STA  load   --------  A → M
+STX  load   --------  X → M
+STY  load   --------  Y → M
+TAX  trans  N-----Z-  A → X
+TAY  trans  N-----Z-  A → Y
+TSX  trans  N-----Z-  S → X
+TXA  trans  N-----Z-  X → A
+TXS  trans  --------  X → S
+TYA  trans  N-----Z-  Y → A
+
+# mnemos are based on VICE
+ANC  arith  *-----**  A ∧ M → A, N → C
+ARR  arith  **----**  (A ∧ M) / 2 → A
+ASR  arith  0-----**  (A ∧ M) / 2 → A            ## Ormston, groepaz: ALR
+DCP  arith  *-----**  M - 1 → M, A - M           ## Ormston: DCM
+ISC  arith  **----**  M + 1 → M, A - M → A       ## Ormston: INS; VICE: ISB
+JAM  kil    --------  Stop execution             ## Ormston: HLT; Graham: KIL
+LAS  load   *-----*-  M ∧ S → A, X, S
+LAX  load   *-----*-  M → A, X
+RLA  arith  *-----**  C ← /M7...M0/ ← C, A ∧ M → A
+RRA  arith  **----**  C → /M7...M0/ → C, A + M + C → A
+SAX  load   --------  A ∧ X → M
+SBX  arith  *-----**  (A ∧ X) - M → X            ## Graham: AXS
+SHA  load   --------  A ∧ X ∧ V → M              ## Graham: AHX
+SHS  trans  --------  A ∧ X → S, S ∧ (H + 1) → M ## Graham, groepaz: TAS
+SHX  load   --------  X ∧ (H + 1) → M
+SHY  load   --------  Y ∧ (H + 1) → M
+SLO  arith  *-----**  M * 2 → M, A ∨ M → A       ## Ormston: ASO
+SRE  arith  *-----**  M / 2 → M, A ⊻ M → A       ## Ormston: LSE
+XAA  arith  *-----*-  (A ∨ V) ∧ X ∧ M → A        ## VICE, groepaz: ANE
+
+[addmodes]
+-      1  -        Implied
+A      1  A        Accumulator
+#d8    2  #$nn     Immediate
+a8     2  $nn      Zero Page
+a8,X   2  $nn,X    X-Indexed Zero Page
+a8,Y   2  $nn,Y    Y-Indexed Zero Page
+(a8,X) 2  ($nn,X)  X-Indexed Zero Page Indirect
+(a8),Y 2  ($nn),Y  Zero Page Indirect Y-Indexed
+a16    3  $nnnn    Absolute
+a16,X  3  $nnnn,X  X-Indexed Absolute
+a16,Y  3  $nnnn,Y  Y-Indexed Absolute
+(a16)  3  ($nnnn)  Absolute Indirect
+r8     2  $nnnn    Relative
+
+[opcodes]
+00  BRK
+01  ORA   (a8,X)
+05  ORA   a8
+06  ASL   a8
+08  PHP
+09  ORA   #d8
+0A  ASL   A
+0D  ORA   a16
+0E  ASL   a16
+10  BPL   r8
+11  ORA   (a8),Y
+15  ORA   a8,X
+16  ASL   a8,X
+18  CLC
+19  ORA   a16,Y
+1D  ORA   a16,X
+1E  ASL   a16,X
+20  JSR   a16
+21  AND   (a8,X)
+24  BIT   a8
+25  AND   a8
+26  ROL   a8
+28  PLP
+29  AND   #d8
+2A  ROL   A
+2C  BIT   a16
+2D  AND   a16
+2E  ROL   a16
+30  BMI   r8
+31  AND   (a8),Y
+35  AND   a8,X
+36  ROL   a8,X
+38  SEC
+39  AND   a16,Y
+3D  AND   a16,X
+3E  ROL   a16,X
+40  RTI
+41  EOR   (a8,X)
+45  EOR   a8
+46  LSR   a8
+48  PHA
+49  EOR   #d8
+4A  LSR   A
+4C  JMP   a16
+4D  EOR   a16
+4E  LSR   a16
+50  BVC   r8
+51  EOR   (a8),Y
+55  EOR   a8,X
+56  LSR   a8,X
+58  CLI
+59  EOR   a16,Y
+5D  EOR   a16,X
+5E  LSR   a16,X
+60  RTS
+61  ADC   (a8,X)
+65  ADC   a8
+66  ROR   a8
+68  PLA
+69  ADC   #d8
+6A  ROR   A
+6C  JMP   (a16)
+6D  ADC   a16
+6E  ROR   a16
+70  BVS   r8
+71  ADC   (a8),Y
+75  ADC   a8,X
+76  ROR   a8,X
+78  SEI
+79  ADC   a16,Y
+7D  ADC   a16,X
+7E  ROR   a16,X
+81  STA   (a8,X)
+84  STY   a8
+85  STA   a8
+86  STX   a8
+88  DEY
+8A  TXA
+8C  STY   a16
+8D  STA   a16
+8E  STX   a16
+90  BCC   r8
+91  STA   (a8),Y
+94  STY   a8,X
+95  STA   a8,X
+96  STX   a8,Y
+98  TYA
+99  STA   a16,Y
+9A  TXS
+9D  STA   a16,X
+A0  LDY   #d8
+A1  LDA   (a8,X)
+A2  LDX   #d8
+A4  LDY   a8
+A5  LDA   a8
+A6  LDX   a8
+A8  TAY
+A9  LDA   #d8
+AA  TAX
+AC  LDY   a16
+AD  LDA   a16
+AE  LDX   a16
+B0  BCS   r8
+B1  LDA   (a8),Y
+B4  LDY   a8,X
+B5  LDA   a8,X
+B6  LDX   a8,Y
+B8  CLV
+B9  LDA   a16,Y
+BA  TSX
+BC  LDY   a16,X
+BD  LDA   a16,X
+BE  LDX   a16,Y
+C0  CPY   #d8
+C1  CMP   (a8,X)
+C4  CPY   a8
+C5  CMP   a8
+C6  DEC   a8
+C8  INY
+C9  CMP   #d8
+CA  DEX
+CC  CPY   a16
+CD  CMP   a16
+CE  DEC   a16
+D0  BNE   r8
+D1  CMP   (a8),Y
+D5  CMP   a8,X
+D6  DEC   a8,X
+D8  CLD
+D9  CMP   a16,Y
+DD  CMP   a16,X
+DE  DEC   a16,X
+E0  CPX   #d8
+E1  SBC   (a8,X)
+E4  CPX   a8
+E5  SBC   a8
+E6  INC   a8
+E8  INX
+E9  SBC   #d8
+EA  NOP
+EC  CPX   a16
+ED  SBC   a16
+EE  INC   a16
+F0  BEQ   r8
+F1  SBC   (a8),Y
+F5  SBC   a8,X
+F6  INC   a8,X
+F8  SED
+F9  SBC   a16,Y
+FD  SBC   a16,X
+FE  INC   a16,X
+
+02  *JAM
+03  *SLO  (a8,X)
+04  *NOP  a8
+07  *SLO  a8
+0B  *ANC  #d8
+0C  *NOP  a16
+0F  *SLO  a16
+12  *JAM
+13  *SLO  (a8),Y
+14  *NOP  a8,X
+17  *SLO  a8,X
+1A  *NOP
+1B  *SLO  a16,Y
+1C  *NOP  a16,X
+1F  *SLO  a16,X
+22  *JAM
+23  *RLA  (a8,X)
+27  *RLA  a8
+2B  *ANC  #d8
+2F  *RLA  a16
+32  *JAM
+33  *RLA  (a8),Y
+34  *NOP  a8,X
+37  *RLA  a8,X
+3A  *NOP
+3B  *RLA  a16,Y
+3C  *NOP  a16,X
+3F  *RLA  a16,X
+42  *JAM
+43  *SRE  (a8,X)
+44  *NOP  a8
+47  *SRE  a8
+4B  *ASR  #d8
+4F  *SRE  a16
+52  *JAM
+53  *SRE  (a8),Y
+54  *NOP  a8,X
+57  *SRE  a8,X
+5A  *NOP
+5B  *SRE  a16,Y
+5C  *NOP  a16,X
+5F  *SRE  a16,X
+62  *JAM
+63  *RRA  (a8,X)
+64  *NOP  a8
+67  *RRA  a8
+6B  *ARR  #d8
+6F  *RRA  a16
+72  *JAM
+73  *RRA  (a8),Y
+74  *NOP  a8,X
+77  *RRA  a8,X
+7A  *NOP
+7B  *RRA  a16,Y
+7C  *NOP  a16,X
+7F  *RRA  a16,X
+80  *NOP  #d8
+82  *NOP  #d8
+83  *SAX  (a8,X)
+87  *SAX  a8
+89  *NOP  #d8
+8B  *XAA  #d8
+8F  *SAX  a16
+92  *JAM
+93  *SHA  (a8),Y
+97  *SAX  a8,Y
+9B  *SHS  a16,Y
+9C  *SHY  a16,X
+9E  *SHX  a16,Y
+9F  *SHA  a16,Y
+A3  *LAX  (a8,X)
+A7  *LAX  a8
+AB  *LAX  #d8
+AF  *LAX  a16
+B2  *JAM
+B3  *LAX  (a8),Y
+B7  *LAX  a8,Y
+BB  *LAS  a16,Y
+BF  *LAX  a16,Y
+C2  *NOP  #d8
+C3  *DCP  (a8,X)
+C7  *DCP  a8
+CB  *SBX  #d8
+CF  *DCP  a16
+D2  *JAM
+D3  *DCP  (a8),Y
+D4  *NOP  a8,X
+D7  *DCP  a8,X
+DA  *NOP
+DB  *DCP  a16,Y
+DC  *NOP  a16,X
+DF  *DCP  a16,X
+E2  *NOP  #d8
+E3  *ISC  (a8,X)
+E7  *ISC  a8
+EB  *SBC  #d8
+EF  *ISC  a16
+F2  *JAM
+F3  *ISC  (a8),Y
+F4  *NOP  a8,X
+F7  *ISC  a8,X
+FA  *NOP
+FB  *ISC  a16,Y
+FC  *NOP  a16,X
+FF  *ISC  a16,X
+
+[timing]
+00  7
+01  6
+05  3
+06  5
+08  3
+09  2
+0A  2
+0D  4
+0E  6
+10  2+t+p
+11  5+p
+15  4
+16  6
+18  2
+19  4+p
+1D  4+p
+1E  7
+20  6
+21  6
+24  3
+25  3
+26  5
+28  4
+29  2
+2A  2
+2C  4
+2D  4
+2E  6
+30  2+t+p
+31  5+p
+35  4
+36  6
+38  2
+39  4+p
+3D  4+p
+3E  7
+40  6
+41  6
+45  3
+46  5
+48  3
+49  2
+4A  2
+4C  3
+4D  4
+4E  6
+50  2+t+p
+51  5+p
+55  4
+56  6
+58  2
+59  4+p
+5D  4+p
+5E  7
+60  6
+61  6
+65  3
+66  5
+68  4
+69  2
+6A  2
+6C  5
+6D  4
+6E  6
+70  2+t+p
+71  5+p
+75  4
+76  6
+78  2
+79  4+p
+7D  4+p
+7E  7
+81  6
+84  3
+85  3
+86  3
+88  2
+8A  2
+8C  4
+8D  4
+8E  4
+90  2+t+p
+91  6
+94  4
+95  4
+96  4
+98  2
+99  5
+9A  2
+9D  5
+A0  2
+A1  6
+A2  2
+A4  3
+A5  3
+A6  3
+A8  2
+A9  2
+AA  2
+AC  4
+AD  4
+AE  4
+B0  2+t+p
+B1  5+p
+B4  4
+B5  4
+B6  4
+B8  2
+B9  4+p
+BA  2
+BC  4+p
+BD  4+p
+BE  4+p
+C0  2
+C1  6
+C4  3
+C5  3
+C6  5
+C8  2
+C9  2
+CA  2
+CC  4
+CD  4
+CE  6
+D0  2+t+p
+D1  5+p
+D5  4
+D6  6
+D8  2
+D9  4+p
+DD  4+p
+DE  7
+E0  2
+E1  6
+E4  3
+E5  3
+E6  5
+E8  2
+E9  2
+EA  2
+EC  4
+ED  4
+EE  6
+F0  2+t+p
+F1  5+p
+F5  4
+F6  6
+F8  2
+F9  4+p
+FD  4+p
+FE  7
+
+02  X
+03  8
+04  3
+07  5
+0B  2
+0C  4
+0F  6
+12  X
+13  8
+14  4
+17  6
+1A  2
+1B  7
+1C  4+p
+1F  7
+22  X
+23  8
+27  5
+2B  2
+2F  6
+32  X
+33  8
+34  4
+37  6
+3A  2
+3B  7
+3C  4+p
+3F  7
+42  X
+43  8
+44  3
+47  5
+4B  2
+4F  6
+52  X
+53  8
+54  4
+57  6
+5A  2
+5B  7
+5C  4+p
+5F  7
+62  X
+63  8
+64  3
+67  5
+6B  2
+6F  6
+72  X
+73  8
+74  4
+77  6
+7A  2
+7B  7
+7C  4+p
+7F  7
+80  2
+82  2
+83  6
+87  3
+89  2
+8B  2
+8F  4
+92  X
+93  6
+97  4
+9B  5
+9C  5
+9E  5
+9F  5
+A3  6
+A7  3
+AB  2
+AF  4
+B2  X
+B3  5+p
+B7  4
+BB  4+p
+BF  4+p
+C2  2
+C3  8
+C7  5
+CB  2
+CF  6
+D2  X
+D3  8
+D4  4
+D7  6
+DA  2
+DB  7
+DC  4+p
+DF  7
+E2  2
+E3  8
+E7  5
+EB  2
+EF  6
+F2  X
+F3  8
+F4  4
+F7  6
+FA  2
+FB  7
+FC  4+p
+FF  7
+
+[vectors]
+FFFA NMI
+FFFC RESET
+FFFE IRQ
+
+[documentation-mnemos]
+## This is taken from:
+##  MCS6500 Microcomputer Family Programming Manual, Second Edition, January 1976
+
+LDA  Load Accumulator with Memory
+     When instruction LDA is executed by the microprocessor, data is transferred from memory to the accumulator and stored in the accumulator.
+     LDA affects the contents of the accumulator, does not affect the carry or overflow flags; sets the zero flag if the accumulator is zero as a result of the LDA, otherwise resets the zero flag; sets the negative flag if bit 7 of the accumulator is a 1, other­ wise resets the negative flag.
+
+STA  Store Accumulator in Memory
+     This instruction transfers the contents of the accumulator to memory.
+     This instruction affects none of the flags in the processor status register and does not affect the accumulator.
+
+ADC  Add Memory to Accumulator with Carry
+     This instruction adds the value of memory and carry from the previous operation to the value of the accumulator and stores the result in the accumulator.
+     This instruction affects the accumulator; sets the carry flag when the sum of a binary add exceeds 255 or when the sum of a decimal add exceeds 99, otherwise carry is reset. The overflow flag is set when the sign or bit 7 is changed due to the result exceeding +127 or -128, otherwise overflow is reset. The negative flag is set if the accumulator result contains bit 7 on, otherwise the negative flag is reset. The zero flag is set if the accumulator result is 0, otherwise the zero flag is reset.
+     ## XXX are the flags correctly described for decimal mode?
+
+SBC  Subtract Memory from Accumulator with Borrow
+     This instruction subtracts the value of memory and borrow from the value of the accumulator, using two's complement arithmetic, and stores the result in the accumulator. Borrow is defined as the carry flag complemented; therefore, a resultant carry flag indicates that a borrow has not occurred.
+     This instruction affects the accumulator. The carry flag is set if the result is greater than or equal to 0. The carry flag is reset when the result is less than 0, indicating a borrow. The over­flow flag is set when the result exceeds +127 or -127, otherwise it is reset. The negative flag is set if the result in the accumulator has bit 7 on, otherwise it is reset. The Z flag is set if the result in the accumulator is 0, otherwise it is reset.
+     ## XXX are the flags correctly described for decimal mode?
+
+AND  "AND" Memory with Accumulator
+     The AND instruction transfer the accumulator and memory to the adder which performs a bit-by-bit AND operation and stores the result back in the accumulator.
+     This instruction affects the accumulator; sets the zero flag if the result in the accumulator is 0, otherwise resets the zero flag; sets the negative flag if the result in the accumulator has bit 7 on, otherwise resets the negative flag.
+
+ORA  "OR" Memory with Accumulator
+     The ORA instruction transfers the memory and the accumulator to the adder which performs a binary "OR" on a bit-by-bit basis and stores the result in the accumulator.
+     This instruction affects the accumulator; sets the zero flag if the result in the accumulator is 0, otherwise resets the zero flag; sets the negative flag if the result in the accumulator has bit 7 on, otherwise resets the negative flag.
+
+EOR  "Exclusive OR" Memory with Accumulator
+     The EOR instruction transfers the memory and the accumulator to the adder which performs a binary "EXCLUSIVE OR" on a bit-by-bit basis and stores the result in the accumulator.
+     This instruction affects the accumulator; sets the zero flag if the result in the accumulator is 0, otherwise resets the zero flag sets the negative flag if the result in the accumulator has bit 7 on, otherwise resets the negative flag.
+
+SEC  Set Carry Flag
+     This instruction initializes the carry flag to a 1. This operation should normally precede a SBC loop. It is also useful when used with a ROL instruction to initialize a bit in memory to a 1.
+     This instruction affects no registers in the microprocessor and no flags other than the carry flag which is set.
+
+CLC  Clear Carry Flag
+     This instruction initializes the carry flag to a 0. This operation should normally precede an ADC loop. It is also useful when used with a ROL instruction to clear a bit in memory.
+     This instruction affects no registers in the microprocessor and no flags other than the carry flag which is reset.
+
+SEI  Set Interrupt Disable
+     This instruction initializes the interrupt disable to a 1. It is used to mask interrupt requests during system reset operations and during interrupt commands.
+     It affects no registers in the microprocessor and no flags other than the interrupt disable which is set.
+
+CLI  Clear Interrupt Disable
+     This instruction initializes the interrupt disable to a 0. This allows the microprocessor to receive interrupts.
+     It affects no registers in the microprocessor and no flags other than the interrupt disable which is cleared.
+
+SED  Set Decimal Mode
+     This instruction sets the decimal mode flag D to a 1. This makes all subsequent ADC and SBC instructions operate as a decimal arithmetic operation.
+     SED affects no registers in the microprocessor and no flags other than the decimal mode which is set to a 1.
+
+CLD  Clear Decimal Mode
+     This instruction sets the decimal mode flag to a 0. This all subsequent ADC and SBC instructions to operate as simple operations.
+     CLD affects no registers in the microprocessor and no flags other than the decimal mode flag which is set to a 0.
+
+CLV  Clear Overflow Flag
+     This instruction clears the overflow flag to a 0. This command is used in conjunction with the set overflow pin which can change the state of the overflow flag with an external signal.
+     CLV affects no registers in the microprocessor and no flags other than the overflow flag which is set to a 0.
+
+JMP  Jump to New Location
+     In this instruction, the data from the memory location located in the program sequence after the OP CODE is loaded into the low order byte of the program counter (PCL) and the data from the next memory location after that is loaded into the high order byte of the program counter (PCH).
+
+BMI  Branch on Result Minus
+     This instruction takes the conditional branch if the N bit is set.
+     BMI does not affect any of the flags or any other part of the machine other than the program counter and then only if the N bit is on.
+
+BPL  Branch on Result Plus
+     This instruction is the complementary branch to branch on result minus. It is a conditional branch which takes the branch when the N bit is reset (0). BPL is used to test if the previous result bit 7 was off (0) and branch on result minus is used to determine if the previous result was minus or bit 7 was on (1).
+     The instruction affects no flags or other registers other than the P counter and only affects the P counter when the N bit is reset.
+
+BCC  Branch on Carry Clear
+     This instruction tests the state of the carry bit and takes a conditional branch if the carry bit is reset.
+     It affects no flags or registers other than the program counter and then only if the C flag is not on.
+
+BCS  Branch on Carry Set
+     This instruction takes the conditional branch if the carry flag is on.
+     BCS does not affect any of the flags or registers except for the program counter and only then if the carry flag is on.
+
+BEQ  Branch on Result Zero
+     This instruction could also be called "Branch on Equal."
+     It takes a conditional branch whenever the Z flag is on or the previous result is equal to 0.
+     BEQ does not affect any of the flags or registers other than the program counter and only then when the Z flag is set.
+
+BNE  Branch on Result Not Zero
+     This instruction could also be called "Branch on Not Equal." It tests the Z flag and takes the conditional branch if the Z flag is not on, indicating that the previous result was not zero.
+     BNE does not affect any of the flags or registers other than the program counter and only then if the Z flag is reset.
+
+BVS  Branch on Overflow Set
+     This instruction tests the V flag and takes the conditional branch if V is on.
+     BVS does not affect any flags or registers other than the program, counter and only when the overflow flag is set.
+
+BVC  Branch on Overflow Clear
+     This instruction tests the status of the V flag and takes the conditional branch if the flag is not set.
+     BVC does not affect any of the flags and registers other than the program counter and only when the overflow flag is reset.
+
+CMP  Compare Memory and Accumulator
+     This instruction subtracts the contents of memory from the contents of the accumulator.
+     The use of the CMP affects the following flags: Z flag is set on an equal comparison, reset otherwise; the N flag is set or reset by the result bit 7, the carry flag is set when the value in memory is less than or equal to the accumulator, reset when it is greater than the accumulator. The accumulator is not affected.
+
+BIT  Test Bits in Memory with Accumulator
+     This instruction performs an AND between a memory location and the accumulator but does not store the result of the AND into the accumulator.
+     The bit instruction affects the N flag with N being set to the value of bit 7 of the memory being tested, the V flag with V being set equal to bit 6 of the memory being tested and Z being set by the result of the AND operation between the accumulator and the memory if the result is Zero, Z is reset otherwise. It does not affect the accumulator.
+
+LDX  Load Index Register X From Memory
+     Load the index register X from memory.
+     LDX does not affect the C or V flags; sets Z if the value loaded was zero, otherwise resets it; sets N if the value loaded in bit 7 is a 1; otherwise N is reset, and affects only the X register.
+
+LDY  Load Index Register Y From Memory
+     Load the index register Y from memory.
+     LDY does not affect the C or V flags, sets the N flag if the value loaded in bit 7 is a 1, otherwise resets N, sets Z flag if the loaded value is zero otherwise resets Z and only affects the Y register.
+
+STX  Store Index Register X In Memory
+     Transfers value of X register to addressed memory location.
+     No flags or registers in the microprocessor are affected by the store operation.
+
+STY  Store Index Register Y In Memory
+     Transfer the value of the Y register to the addressed memory location.
+     STY does not affect any flags or registers in the microprocessor.
+
+INX  Increment Index Register X By One
+     Increment X adds 1 to the current value of the X register. This is an 8-bit increment which does not affect the carry operation, therefore, if the value of X before the increment was FF, the resulting value is 00.
+     INX does not affect the carry or overflow flags; it sets the N flag if the result of the increment has a one in bit 7, otherwise resets N; sets the Z flag if the result of the increment is 0, otherwise it resets the Z flag.
+     INX does not affect any other register other than the X register.
+
+INY  Increment Index Register Y By One
+     Increment Y increments or adds one to the current value in the Y register, storing the result in the Y register. As in the case of INX the primary application is to step thru a set of values using the Y register.
+     The INY does not affect the carry or overflow flags, sets the N flag if the result of the increment has a one in bit 7, otherwise resets N, sets Z if as a result of the increment the Y register is zero otherwise resets the Z flag.
+
+DEX  Decrement Index Register X By One
+     This instruction subtracts one from the current value of the index register X and stores the result in the index register X.
+     DEX does not affect the carry or overflow flag, it sets the N flag if it has bit 7 on as a result of the decrement, otherwise it resets the N flag; sets the Z flag if X is a 0 as a result of the decrement, otherwise it resets the Z flag.
+
+DEY  Decrement Index Register Y By One
+     This instruction subtracts one from the current value in the index register Y and stores the result into the index register Y. The result does not affect or consider carry so that the value in the index register Y is decremented to 0 and then through 0 to FF.
+     Decrement Y does not affect the carry or overflow flags; if the Y register contains bit 7 on as a result of the decrement the N flag is set, otherwise the N flag is reset. If the Y register is 0 as a result of the decrement, the Z flag is set otherwise the Z flag is reset. This instruction only affects the index register Y.
+
+CPX  Compare Index Register X To Memory
+     This instruction subtracts the value of the addressed memory location from the content of index register X using the adder but does not store the result; therefore, its only use is to set the N, Z and C flags to allow for comparison between the index register X and the value in memory.
+     The CPX instruction does not affect any register in the machine; it also does not affect the overflow flag. It causes the carry to be set on if the absolute value of the index register X is equal to or greater than the data from memory. If the value of the memory is greater than the content of the index register X, carry is reset. If the results of the subtraction contain a bit 7, then the N flag is set, if not, it is reset. If the value in memory is equal to the value in index register X, the Z flag is set, otherwise it is reset.
+
+CPY  Compare Index Register Y To Memory
+     This instruction performs a two's complement subtraction between the index register Y and the specified memory location. The results of the subtraction are not stored anywhere. The instruction is strictly used to set the flags.
+     CPY affects no registers in the microprocessor and also does not affect the overflow flag. If the value in the index register Y is equal to or greater than the value in the memory, the carry flag will be set, otherwise it will be cleared. If the results of the subtraction contain bit 7 on the N bit will be set, otherwise it will be cleared. If the value in the index register Y and the value in the memory are equal, the zero flag will be set, otherwise it will be cleared.
+
+TAX  Transfer Accumulator To Index X
+     This instruction takes the value from accumulator A and transfers or loads it into the index register X without disturbing the content of the accumulator A.
+     TAX only affects the index register X, does not affect the carry or overflow flags. The N flag is set if the resultant value in the index register X has bit 7 on, otherwise N is reset. The Z bit is set if the content of the register X is 0 as a result of the operation, otherwise it is reset.
+
+TXA  Transfer Index X To Accumulator
+     This instruction moves the value that is in the index register X to the accumulator A without disturbing the content of the index register X.
+     TXA does not affect any register other than the accumulator and does not affect the carry or overflow flag. If the result in A has bit 7 on, then the N flag is set, otherwise it is reset. If the resultant value in the accumulator is 0, then the Z flag is set, other­ wise it is reset.
+
+TAY  Transfer Accumulator To Index Y
+     This instruction moves the value of the accumulator into index register Y without affecting the accumulator.
+     TAY instruction only affects the Y register and does not affect either the carry or overflow flags. If the index register Y has bit 7 on, then N is set, otherwise it is reset. If the content of the index register Y equals 0 as a result of the operation, Z is set on, otherwise it is reset.
+
+TYA  Transfer Index Y To Accumulator
+     This instruction moves the value that is in the index register Y to accumulator A without disturbing the content of the register Y.
+     TYA does not affect any other register other than the accumulator and does not affect the carry or overflow flag. If the result in the accumulator A has bit 7 on, the N flag is set, otherwise it is reset. If the resultant value in the accumulator A is 0, then the Z flag is set, otherwise it is reset.
+
+JSR  Jump To Subroutine
+     This instruction transfers control of the program counter to a subroutine location but leaves a return pointer on the stack to allow the user to return to perform the next instruction in the main program after the subroutine is complete. To accomplish this, JSR instruction stores the program counter address which points to the last byte of the jump instruction onto the stack using the stack pointer. The stack byte contains the program count high first, followed by program count low. The JSR then transfers the addresses following the jump instruction to the program counter low and the program counter high, thereby directing the program to begin at that new address.
+      The JSR instruction affects no flags, causes the stack pointer to be decremented by 2 and substitutes new values into the program counter low and the program counter high.
+
+RTS  Return From Subroutine
+      This instruction loads the program count low and program count high from the stack into the program counter and increments the program counter so that it points to the instruction following the JSR. The stack pointer is adjusted by incrementing it twice.
+      The RTS instruction does not affect any flags and affects only PCL and PCH.
+
+PHA  Push Accumulator On Stack
+      This instruction transfers the current value of the accumulator to the next location on the stack, automatically decrementing the stack to point to the next empty location.
+      The Push A instruction only affects the stack pointer register which is decremented by 1 as a result of the operation. It affects no flags.
+
+PLA  Pull Accumulator From Stack
+      This instruction adds 1 to the current value of the stack pointer and uses it to address the stack and loads the contents of the stack into the A register.
+      The PLA instruction does not affect the carry or overflow flags. It sets N if the bit 7 is on in accumulator A as a result of instructions, otherwise it is reset. If accumulator A is zero as a result of the PLA, then the Z flag is set, otherwise it is reset. The PLA instruction changes content of the accumulator A to the contents of the memory location at stack register plus 1 and also increments the stack register.
+
+TXS  Transfer Index X To Stack Pointer
+     This instruction transfers the value in the index register X to the stack pointer.
+     TXS changes only the stack pointer, making it equal to the content of the index register X. It does not affect any of the flags.
+
+
+TSX  Transfer Stack Pointer To Index X
+     This instruction transfers the value in the stack pointer to the index register X.
+     TSX does not affect the carry or overflow flags. It sets N if bit 7 is on in index X as a result of the instruction, otherwise it is reset. If index X is zero as a result of the TSX, the Z flag is set, other­ wise it is reset. TSX changes the value of index X, making it equal to the content of the stack pointer.
+
+PHP  Push Processor Status On Stack
+     This instruction transfers the contents of the processor status register unchanged to the stack, as governed by the stack pointer.
+     The PHP instruction affects no registers or flags in the microprocessor.
+
+PLP  Pull Processor Status From Stack
+     This instruction transfers the next value on the stack to the Processor Status register, thereby changing all of the flags and setting the mode switches to the values from the stack.
+     The PLP instruction affects no registers in the processor other than the status register. This instruction could affect all flags in the status register.
+
+RTI  Return From Interrupt
+     This instruction transfers from the stack into the microprocessor the processor status and the program counter location for the instruction which was interrupted. By virtue of the interrupt having stored this data before executing the instruction and the fact that the RTI reinitializes the microprocessor to the same state as when it was interrupted, the combination of interrupt plus RTI allows truly reentrant coding.
+     The RTI instruction reinitializes all flags to the position to the point they were at the time the interrupt was taken and sets the program counter back to its pre-interrupt state. It affects no other registers in the microprocessor.
+
+JMP  JMP Indirect
+     This instruction establishes a new value for the program counter.
+     It affects only the program counter in the microprocessor and affects no flags in the status register.
+
+BRK  Break Command
+     The break command causes the microprocessor to go through an interrupt sequence under program control. This means that the program counter of the second byte after the BRK. is automatically stored on the stack along with the processor status at the beginning of the break instruction. The microprocessor then transfers control to the interrupt vector.
+     Other than changing the program counter, the break instruction changes no values in either the registers or the flags.
+
+LSR  Logical Shift Right
+     This instruction shifts either the accumulator or a specified memory location 1 bit to the right, with the higher bit of the result always being set to 0, and the low bit which is shifted out of the field being stored in the carry flag.
+     The shift right instruction either affects the accumulator by shifting it right 1 or is a read/modify/write instruction which changes a specified memory location but does not affect any internal registers. The shift right does not affect the overflow flag. The N flag is always reset. The Z flag is set if the result of the shift is 0 and reset otherwise. The carry is set equal to bit 0 of the input.
+
+ASL  Arithmetic Shift Left
+     The shift left instruction shifts either the accumulator or the address memory location 1 bit to the left, with the bit 0 always being set to 0 and the input bit 7 being stored in the carry flag. ASL either shifts the accumulator left 1 bit or is a read/modify/write instruction that affects only memory.
+     The instruction does not affect the overflow bit, sets N equal to the result bit 7 (bit 6 in the input), sets Z flag if the result is equal to 0, otherwise resets Z and stores the input bit 7 in the carry flag.
+
+ROL Rotate Left
+     The rotate left instruction shifts either the accumulator or addressed memory left 1 bit, with the input carry being stored in bit 0 and with the input bit 7 being stored in the carry flags.
+     The ROL instruction either shifts the accumulator left 1 bit and stores the carry in accumulator bit 0 or does not affect the internal registers at all. The ROL instruction sets carry equal to the input bit 7, sets N equal to the input bit 6 , sets the Z flag if the result of the rotate is 0, otherwise it resets Z and does not affect the overflow flag at all.
+
+ROR  Rotate Right
+     The rotate right instruction shifts either the accumulator or addressed memory right 1 bit with bit 0 shifted into the carry and carry shifted into bit 7.
+     The ROR instruction either shifts the accumulator right 1 bit and stores the carry in accumulator bit 7 or does not affect the internal registers at all. The ROR instruction sets carry equal to input bit 0, sets N equal to the input carry and sets the Z flag if the result of the rotate is 0; otherwise it resets Z and does not affect the overflow flag at all.
+     (Available on Microprocessors after June, 1976)
+
+INC  Increment Memory By One
+     This instruction adds 1 to the contents of the addressed memory location.
+     The increment memory instruction does not affect any internal registers and does not affect the carry or overflow flags. If bit 7 is on as the result of the increment,N is set, otherwise it is reset; if the increment causes the result to become 0, the Z flag is set on, otherwise it is reset.
+
+DEC  Decrement Memory By One
+     This instruction subtracts 1, in two's complement, from the contents of the addressed memory location.
+     The decrement instruction does not affect any internal register in the microprocessor. It does not affect the carry or overflow flags. If bit 7 is on as a result of the decrement, then the N flag is set, otherwise it is reset. If the result of the decrement is 0, the Z flag is set, other­wise it is reset.
+
+
+## Undocumented Opcodes
+##
+## This was written by Michael Steil <mist64@mac.com>, imitating the style of the
+## Programming Manual.
+
+SAX  Store Accumulator "AND" Index Register X In Memory
+     The undocumented SAX instruction performs a bit-by-bit AND operation of the accumulator and the X register and transfers the result to the addressed memory location.
+     No flags or registers in the microprocessor are affected by the store operation.
+
+SHA  Store Accumulator "AND" Index Register X "AND" Value
+     The undocumented SHA instruction performs a bit-by-bit AND operation of the following three operands: The first two are the accumulator and the index register X.
+     The third operand depends on the addressing mode. In the zero page indirect Y-indexed case, the third operand is the data in memory at the given zero page address (ignoring the addressing mode's Y offset) plus 1. In the Y-indexed absolute case, it is the upper 8 bits of the given address (ignoring the addressing mode's Y offset), plus 1.
+     It then transfers the result to the addressed memory location.
+     No flags or registers in the microprocessor are affected by the store operation.
+
+ASR  "AND" then Logical Shift Right
+     The undocumented ASR instruction performs a bit-by-bit AND operation of the accumulator and memory, then shifts the accumulator 1 bit to the right, with the higher bit of the result always being set to 0, and the low bit which is shifted out of the field being stored in the carry flag.
+     This instruction affects the accumulator. It does not affect the overflow flag. The N flag is always reset. The Z flag is set if the result of the shift is 0 and reset otherwise. The carry is set equal to bit 0 of the result of the "AND" operation.
+
+ANC  "AND" Memory with Accumulator then Move Negative Flag to Carry Flag
+     The undocumented ANC instruction performs a bit-by-bit AND operation of the accumulator and memory and stores the result back in the accumulator.
+     This instruction affects the accumulator; sets the zero flag if the result in the accumulator is 0, otherwise resets the zero flag; sets the negative flag and the carry flag if the result in the accumulator has bit 7 on, otherwise resets the negative flag and the carry flag.
+
+ARR "AND" Accumulator then Rotate Right
+     The undocumented ARR instruction performs a bit-by-bit "AND" operation of the accumulator and memory, then shifts the result right 1 bit with bit 0 shifted into the carry and carry shifted into bit 7. It then stores the result back in the accumulator.
+     If bit 7 of the result is on, then the N flag is set, otherwise it is reset. The instruction sets the Z flag if the result is 0; otherwise it resets Z.
+     The V and C flags depends on the Decimal Mode Flag:
+     In decimal mode, the V flag is set if bit 6 is different than the original data's bit 6, otherwise the V flag is reset. The C flag is set if (operand & 0xF0) + (operand & 0x10) is greater than 0x50, otherwise the C flag is reset.
+     In binary mode, the V flag is set if bit 6 of the result is different than bit 5 of the result, otherwise the V flag is reset. The C flag is set if the result in the accumulator has bit 6 on, otherwise it is reset.
+
+SBX  Subtract Memory from Accumulator "AND" Index Register X
+     This undocumented instruction performs a bit-by-bit "AND" of the value of the accumulator and the index register X and subtracts the value of memory from this result, using two's complement arithmetic, and stores the result in the index register X.
+     This instruction affects the index register X. The carry flag is set if the result is greater than or equal to 0. The carry flag is reset when the result is less than 0, indicating a borrow. The negative flag is set if the result in index register X has bit 7 on, otherwise it is reset. The Z flag is set if the result in index register X is 0, otherwise it is reset. The over­flow flag not affected at all.
+
+DCP  Decrement Memory By One then Compare with Accumulator
+     This undocumented instruction subtracts 1, in two's complement, from the contents of the addressed memory location. It then subtracts the contents of memory from the contents of the accumulator.
+     The DCP instruction does not affect any internal register in the microprocessor. It does not affect the overflow flag. Z flag is set on an equal comparison, reset otherwise; the N flag is set or reset by the result bit 7, the carry flag is set when the result in memory is less than or equal to the accumulator, reset when it is greater than the accumulator.
+
+ISC  Increment Memory By One then SBC then Subtract Memory from Accumulator with Borrow
+     This undocumented instruction adds 1 to the contents of the addressed memory location. It then subtracts the value of the result in memory and borrow from the value of the accumulator, using two's complement arithmetic, and stores the result in the accumulator.
+     This instruction affects the accumulator. The carry flag is set if the result is greater than or equal to 0. The carry flag is reset when the result is less than 0, indicating a borrow. The over­flow flag is set when the result exceeds +127 or -127, otherwise it is reset. The negative flag is set if the result in the accumulator has bit 7 on, otherwise it is reset. The Z flag is set if the result in the accumulator is 0, otherwise it is reset.
+     ## XXX are the flags correctly described for decimal mode?
+
+JAM  Halt the CPU
+     This undocumented instruction stops execution. The microprocessor will not fetch further instructions, and will neither handle IRQs nor NMIs. It will handle a RESET though.
+
+LAS  "AND" Memory with Stack Pointer
+     This undocumented instruction performs a bit-by-bit "AND" operation of the stack pointer and memory and stores the result back in the accumulator, the index register X and the stack pointer.
+      The LAS instruction does not affect the carry or overflow flags. It sets N if the bit 7 of the result is on, otherwise it is reset. If the result is zero, then the Z flag is set, otherwise it is reset.
+
+LAX  Load Accumulator and Index Register X From Memory
+     The undocumented LAX instruction loads the accumulator and the index register X from memory.
+     LAX does not affect the C or V flags; sets Z if the value loaded was zero, otherwise resets it; sets N if the value loaded in bit 7 is a 1; otherwise N is reset, and affects only the X register.
+     ## TODO: according t groepaz, it's more complicated than that
+
+RLA  Rotate Left then "AND" with Accumulator
+     The undocumented RLA instruction shifts the addressed memory left 1 bit, with the input carry being stored in bit 0 and with the input bit 7 being stored in the carry flags. It then performs a bit-by-bit AND operation of the result and the value of the accumulator and stores the result back in the accumulator.
+     This instruction affects the accumulator; sets the zero flag if the result in the accumulator is 0, otherwise resets the zero flag; sets the negative flag if the result in the accumulator has bit 7 on, otherwise resets the negative flag.
+
+RRA  Rotate Right and Add Memory to Accumulator
+     The undocumented RRA instruction shifts the addressed memory right 1 bit with bit 0 shifted into the carry and carry shifted into bit 7. It then adds the result and generated carry to the value of the accumulator and stores the result in the accumulator.
+     This instruction affects the accumulator; sets the carry flag when the sum of a binary add exceeds 255 or when the sum of a decimal add exceeds 99, otherwise carry is reset. The overflow flag is set when the sign or bit 7 is changed due to the result exceeding +127 or -128, otherwise overflow is reset. The negative flag is set if the accumulator result contains bit 7 on, otherwise the negative flag is reset. The zero flag is set if the accumulator result is 0, otherwise the zero flag is reset.
+     ## XXX are the flags correctly described for decimal mode?
+     ## when happens on CPUs with the ROR bug?
+
+SAX  Store Accumulator "AND" Index Register X in Memory
+     The undocumented SAX instruction performs a bit-by-bit AND operation of the value of the accumulator and the value of the index register X and stores the result in memory.
+     No flags or registers in the microprocessor are affected by the store operation.
+
+SHX  Store Index Register X "AND" Value
+     The undocumented SHX instruction performs a bit-by-bit AND operation of the index register X and the upper 8 bits of the given address (ignoring the addressing mode's Y offset), plus 1. It then transfers the result to the addressed memory location.
+     No flags or registers in the microprocessor are affected by the store operation.
+
+SHY  Store Index Register Y "AND" Value
+     The undocumented SHY instruction performs a bit-by-bit AND operation of the index register Y and the upper 8 bits of the given address (ignoring the addressing mode's X offset), plus 1. It then transfers the result to the addressed memory location.
+     No flags or registers in the microprocessor are affected by the store operation.
+
+SLO  Arithmetic Shift Left then "OR" Memory with Accumulator
+     The undocumented SLO instruction shifts the address memory location 1 bit to the left, with the bit 0 always being set to 0 and the bit 7 output always being contained in the carry flag. It then performs a bit-by-bit "OR" operation on the result and the accumulator and stores the result in the accumulator.
+     The negative flag is set if the accumulator result contains bit 7 on, otherwise the negative flag is reset. It sets Z flag if the result is equal to 0, otherwise resets Z and stores the input bit 7 in the carry flag.
+
+SRE  Logical Shift Right then "Exclusive OR" Memory with Accumulator
+     The undocumented SRE instruction shifts the specified memory location 1 bit to the right, with the higher bit of the result always being set to 0, and the low bit which is shifted out of the field being stored in the carry flag. It then performs a bit-by-bit "EXCLUSIVE OR" of the result and the value of the accumulator and stores the result in the accumulator.
+     This instruction affects the accumulator. It does not affect the overflow flag. The negative flag is set if the accumulator result contains bit 7 on, otherwise the negative flag is reset. The Z flag is set if the result is 0 and reset otherwise. The carry is set equal to input bit 0.
+
+SHS  Transfer Accumulator "AND" Index Register X to Stack Pointer then Store Stack Pointer "AND" Hi-Byte In Memory
+     The undocumented SHS instruction performs a bit-by-bit AND operation of the value of the accumulator and the value of the index register X and stores the result in the stack pointer. It then performs a bit-by-bit AND operation of the resulting stack pointer and the upper 8 bits of the given address (ignoring the addressing mode's Y offset), plus 1, and transfers the result to the addressed memory location.
+     No flags or registers in the microprocessor are affected by the store operation.
+
+XAA  Non-deterministic Operation of Accumulator, Index Register X, Memory and Bus Contents
+     The operation of the undocumented XAA instruction depends on the individual microprocessor. On most machines, it performs a bit-by-bit AND operation of the following three operands: The first two are the index register X and memory.
+     The third operand is the result of a bit-by-bit AND operation of the accumulator and a magic component. This magic component depends on the individual microprocessor and is usually one of $00, $EE, $EF, $FE and $FF, and may be influenced by the RDY pin, leftover contents of the data bus, the temperature of the microprocessor, the supplied voltage, and other factors.
+     On some machines, additional bits of the result may be set or reset depending on non-deterministic factors.
+     It then transfers the result to the accumulator.
+     XAA does not affect the C or V flags; sets Z if the value loaded was zero, otherwise resets it; sets N if the result in bit 7 is a 1; otherwise N is reset.
+     ## http://visual6502.org/wiki/index.php%3Ftitle%3D6502_Opcode_8B_(XAA,_ANE)
+
+[documentation-mnemos~private]
+
+## TODO details
+ADC  In decimal mode, the N, V and Z flags are not consistent with the decimal result.
+
+SBC  In decimal mode, the N, V and Z flags are not consistent with the decimal result.
+
+BRK  If an IRQ happens at the same time as a BRK instruction, the BRK instruction is ignored.
+
+SED  The value of the decimal mode flag is indeterminate after a RESET.
+
+CLD  The value of the decimal mode flag is indeterminate after a RESET.
+
+[documentation-addmodes]
+## http://archive.6502.org/datasheets/mos_6510_mpu.pdf
+
+-       Implied
+        In the implied addressing mode, the address containing the operand is implicitly stated in the operation code of the instruction.
+
+A       Accumulator
+        This form of addressing is represented with a one byte instruction, implying an operation on the accumulator.
+
+#d8     Immediate
+        In immediate addressing, the operand is contained in the second byte of the instruction, with no further memory addressing required.
+
+a8      Zero Page
+        The zero page instructions allow for shorter code and execution times by only fetching the second byte of the instruction and assuming a zero high address byte. Careful use of the zero page can result in significant increase in code efficiency.
+
+a8,X    X-Indexed Zero Page
+        This form of addressing is used in conjunction with the X index register. The effective address is calculated by adding the second byte to the contents of the index register. Since this is a form of "Zero Page" addressing, the content of the second byte references a location in page zero. Additionally, due to the “Zero Page" addressing nature of this mode, no carry is added to the high order 8 bits of memory and crossing of page boundaries does not occur.
+
+a8,Y    Y-Indexed Zero Page
+        This form of addressing is used in conjunction with the Y index register. The effective address is calculated by adding the second byte to the contents of the index register. Since this is a form of "Zero Page" addressing, the content of the second byte references a location in page zero. Additionally, due to the “Zero Page" addressing nature of this mode, no carry is added to the high order 8 bits of memory and crossing of page boundaries does not occur.
+
+(a8,X)  X-Indexed Zero Page Indirect
+        In indexed indirect addressing, the second byte of the instruction is added to the contents of the X index register, discarding the carry. The result of this addition points to a memory location on page zero whose contents is the low order eight bits of the effective address. The next memory location in page zero contains the high order eight bits of the effective address. Both memory locations specifying the high and low order bytes of the effective address must be in page zero.
+
+(a8),Y  Zero Page Indirect Y-Indexed
+        In indirect indexed addressing, the second byte of the instruction points to a memory location in page zero. The contents of this memory location is added to the contents of the Y index register, the result being the low order eight bits of the effective address. The carry from this addition is added to the contents of the next page zero memory location, the result being the high order eight bits of the effective address.
+
+a16     Absolute
+        In absolute addressing, the second byte of the instruction specifies the eight low order bits of the effective address while the third byte specifies the eight high order bits. Thus, the absolute addressing mode allows access to the entire 65 K bytes of addressable memory.
+
+a16,X   X-Indexed Absolute
+        This form of addressing is used in conjunction with the X index register. The effective address is formed by adding the contents of X to the address contained in the second and third bytes of the instruction. This mode allows the index register to contain the index or count value and the instruction to contain the base address. This type of indexing allows any location referencing and the index to modify multiple fields resulting in reduced coding and execution time.
+
+a16,Y   Y-Indexed Absolute
+        This form of addressing is used in conjunction with the Y index register. The effective address is formed by adding the contents of Y to the address contained in the second and third bytes of the instruction. This mode allows the index register to contain the index or count value and the instruction to contain the base address. This type of indexing allows any location referencing and the index to modify multiple fields resulting in reduced coding and execution time.
+
+(a16)   Absolute Indirect
+        The second byte of the instruction contains the low order eight bits of a memory location. The high order eight bits of that memory location is contained in the third byte of the instruction. The contents of the fully specified memory location is the low order byte of the effective address. The next memory location contains the high order byte of the effective address which is loaded into the sixteen bits of the program counter.
+
+r8      Relative
+        Relative addressing is used only with branch instructions and establishes a destination for the conditional branch.
+        The second byte of-the instruction becomes the operand which is an “Offset" added to the contents of the lower eight bits of the program counter when the counter is set at the next instruction. The range of the offset is —128 to +127 bytes from the next instruction.
+
+[documentation-addmodes~private]
+(a16)   The indirect jump instruction does not increment the page address when the indirect pointer crosses a page boundary. JMP ($xxFF) will fetch the address from $xxFF and $xx00.
+
+a16,X   The value at the specified address, ignoring the addressing mode's X offset, is read (and discarded) before the final address is read. This may cause side effects in I/O registers.
+
+a16,Y   The value at the specified address, ignoring the addressing mode's Y offset, is read (and discarded) before the final address is read. This may cause side effects in I/O registers.
