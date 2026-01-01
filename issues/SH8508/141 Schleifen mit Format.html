@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Schleifen mit Format</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="H. Zwartscholten, gk">
+    <meta name="64er.issue" content="Sonderheft 8/85">
+    <meta name="64er.pages" content="141-143">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Schleifen mit Format</h1>
+<p class="intro">In manchen Pascal-Versionen geht es automatisch, beim C 64 nur mit einem Trick: das Einrücken von Schleifen. Anhand eines Programms in Maschinensprache bringen Sie Form in Ihre Listings. Wir zeigen auch, wie es geht.</p>
+
+<p>Anhänger der strukturierten Programmierung haben es gelernt, selbst der in Schulungen: ein Programm modular aufbauen, in kleine Schritte zerlegen, übersichtlich gestalten. Leider ist es mit dem C 64 nicht so ganz einfach. Außer IF..THEN, GOTO, GOSUB und FOR..NEXT wird strukturiertes Codieren nicht unterstützt.</p>
+
+<p>Eine Möglichkeit ist, FOR..NEXT-Schleifen einzurücken. Normalerweise macht man das, indem nach der Zeilennummer ein Doppelpunkt gesetzt wird und erst danach die gewünschte Anzahl Leerstellen. Ein kurzes Beispiel:<br>
+Schleife ohne einrücken:</p>
+
+<p>10 FOR I=1 TO 10<br>
+20 A = A + 1<br>
+30 GOSUB 100<br>
+40 FOR J = 1 TO10<br>
+50 PRINT I,J,A*J<br>
+60 NEXT J<br>
+70 NEXT I<br>
+Schleife mit einrücken durch Doppelpunkte:<br>
+10 FOR I=1 TO 10<br>
+20 : A=A+1<br>
+30 : GOSUB 100<br>
+40 : FOR J=1 TO 10<br>
+50 : PRINT I,J,A*J<br>
+60 : NEXT J<br>
+70 NEXT I<br>
+Das sieht schon viel besser aus. Bei langen Listings werden Sie diese Form schätzen lernen. Allerdings, das Nonplusultra ist es auch nicht. Besser wäre es, das Listing würde so aussehen:</p>
+
+<p>10 FOR I=1 TO 10<br>
+20 A=A+I 100<br>
+30 GOSUB 100<br>
+40 FOR J = 1 TO 10<br>
+50 PRINT I,J,A*J<br>
+60 NEXT J<br>
+70 NEXT I<br>
+Um das zu erreichen, müssen wir eine kleine Maschinenroutine schreiben. Aber wie?</p>
+
+<p>Ein Gedanke liegt nah: Warum nicht die normale LIST-Routine des C 64 verwenden? Sie erledigt ja schon einen großen Teil der Aufgabe, nämlich das normale LISTen. Was fehlt, ist nur noch das Einrücken. Zuerst muß also ein dokumentiertes ROM-Listing her. Dort finden wir die LIST-Routine des Basic-Interpreters ab $A69C. Sie geht bis $A740. Soweit, so gut. Aber wie greifen wir in diese Routine ein? Sieht man sich die LIST-Routine etwas genauer an, findet man einen indirekten Sprung ab Adresse $A717 (JMP ($0306)). Das bedeutet, an dieser Stelle springt die LIST- Routine zu der Adresse, die sich aus dem Inhalt der Adressen $0306/$0307 (LO/HI-Byte) ergibt. Man spricht in so einem Fall auch von einem Vektor. Dort kurz spioniert, finden wir in $0306/$0307 die Zahlen $1A und $A7, zusammengesetzt also die Adresse A71 A, das heißt genau die Adresse, die dem JMP($0306) folgt. Damit haben wir genau das, was wir suchen, eine Möglichkeit, in die LIST-Routine einzugreifen. Denn $0306 steht im RAM, kann also (von uns) geändert werden.</p>
+
+<p>Im Prinzip brauchen wir also nur folgendes zu machen: Wir schreiben die Anfangsadresse unserer Routine in die Speicherstellen $0306/$0307. Damit springt die Original-LIST- Routine unsere neue Routine an und führt sie aus. In »Fachkreisen« würde man sagen, der LIST-Vektor ist verbogen worden. Am Ende unseres Programms müssen wir noch dafür sorgen, daß die alte LIST-Routine wieder fortgesetzt wird und zwar machen wir das mit JMP $A71A.</p>
+
+<p>Grundsätzlich kennen wir nun also das Wie. In der Zwischenzeit taucht aber noch ein Gedanke auf: Wie soll das Programm gestartet werden? Nach dem Lesen des Assembler-Kurses (Assembler ist keine Alchimie) im 64’er und einigen anderen Artikeln fällt das Stichwort: Interrupt.</p>
+
+<p>Interrupt war für mich immer ein Wort, vor dem ich mich etwas gedrückt habe, aber so schlimm ist es gar nicht. Doch zuerst einmal zur Aufgabe: Die neue LIST-Routine soll mit der Funktionstaste F7 an- und mit F1 ausgeschaltet werden. Um das zu erreichen, muß noch einmal ein Vektor verbogen werden, und zwar der Interrupt-Vektor in Adresse $0314/$0315 auf unser eigenes Programm (siehe Listing 2, Zeilen 290 bis 360). Wir müssen dafür sorgen, daß die Tasten F7 und F1 dauernd abgefragt werden. Das erreicht man, indem die Interrupt-Routine erweitert wird. Auch hier hilft ein kleines Programm (Listing 2, Zeilen 364 bis 372). Im Prinzip soll unsere neue LIST-Routine so ablaufen:</p>
+
+<ol>
+<li>Initialisieren des Programms mit SYS adresse (»adresse« können wir selbst festlegen)</li>
+<li>mit F7 einschalten und mit F1 ausschalten.</li>
+<li>mitdem ganz normalen LIST-Befehl ein beliebiges Basic-Programm auf dem Bildschirm oder Drucker ausgeben. Auf dem Drucker sollen die Basic-Befehle FOR und NEXT fettgedruckt werden.</li>
+</ol>
+
+
+<p>Und damit auch zu sehen ist, ob die neue oder die normale Routine aktiviert ist, soll der Rahmen beim Drücken von F7 die Farbe wechseln (Listing 2, Zeile 452/453) und bei F1 ebenso (Listing 2, Zeile 522/523).</p>
+
+<h2>Die LIST-Routine</h2>
+
+<p>Die eigentliche neue LIST-Routine finden Sie in Listing 2, Zeile 1000 bis 1340. Danach folgen einige Unterprogramme, zum Beispiel Fettdruck ein-/ausschalten und Leerzeichen ausgeben.</p>
+
+<p>Um das Programm zu verstehen, muß man folgendes wissen:</p>
+
+<ol>
+<li>Wenn die neue LIST-Routine angesprungen wird, steht im Akku ein Zeichen aus dem Basic-Listing, das wir ausgeben wollen. Das kann jedes Zeichen sein zwischen der Basic-Zeilennummer und dem Ende einer Basic-Zeile (die Zeilennummer selbst wird vorher, von der alten List-Routine selbst, ausgegeben.).</li>
+<li>Der Akku-Inhalt muß am Ende unserer LIST-Routine wieder an das Original-LIST übergeben werden. Aus diesem Grund wird er sicherheitshalber am Anfang der Routine mit PHA gesichert und am Ende mit PLA zurückgeholt.</li>
+<li>Jeder Basic-Befehl wird im Speicher als Token abgelegt, eine Abkürzung. Der Befehl FOR hat den Wert $81 und NEXT den Wert $82.</li>
+</ol>
+
+
+<p>Der Algorithmus istjetzt nicht mehr schwer zu entwickeln. Da man FOR..NEXT-Schleifen (fast) beliebig schachteln kann, setzen wir einen Zähler ein (im Listing 2 ZAEHLER genannt), der die Anzahl der Verschachtelungen zählt: Bei jedem FOR wird ZAEHLER um 1 erhöht (Zeile 1210 bis 1240, bei jedem NEXT um 1 vermindert (Zeile 1160 bis 1180). Der Inhalt von ZAEHLER bestimmt auch die Anzahl der Leerzeichen, die am Anfang der Zeile, nach der Zeilennummer, ausgegeben werden (Zeile 1190 bis 1207). Der Anfang der Zeile wird durch eine 4 im Y-Register gekennzeichnet. Das hängt mit dem Aufbau einer Basic-Zeile im C 64 zusammen und mit der indirekt-indizierten Adressierung, die die LIST-Routine verwendet (Y=0 und Y=1 sind die Startadresse der Basic-Zeile, Y=2 und Y=3 die Zeilennummer und ab Y=4 folgt der Rest der Basic-Zeile).</p>
+
+<p>Das Unterprogramm BLANKOUT (Zeile 2010 bis 2070 gibt Leerzeichen aus, und zwar so viele, wie in ZAEHLER stehen.</p>
+
+<p>Die Routinen FETTDRUCK und NORMDRUCK schalten bei Ausgabe auf Drucker (mit OPEN 1,4:CMD1:LIST) Fettdruck an und aus. Interessant sind hier vielleicht die Zeilen 1510 bis 1530 oder 1710 bis 1730. Durch die Abfrage der Speicherstelle $9A (dezimal 154) kann die mit CMD gewählte Geräteadresse überprüft werden (4 steht für Drucker). Die Sequenz, diehiergewähltwurde, um Fettschrift einzuschalten, giltfür Epson-kompatible Drucker (Zeile 1630 und Normalschrift Zeile 1830). Sie können diese Routinen natürlich entfernen, es ist Geschmacksache, die FOR..NEXT- Schleife auch noch fettgedruckt zu sehen (Listing 1).</p>
+
+<h3>Hinweise zum Abtippen</h3>
+
+<p>Listing 2 ist der Quelltext oder, wie man auch sagt, der Sourcecode der neuen Listroutine. Wenn Sie wollen, können Sie ihn mit Hypra-Ass eingeben. Das hat den Vorteil, daß Sie das Programm weiterentwickeln oder verändern können. Wollen Sie das Programm lediglich benutzen, tippen Sie am besten Listing 3 mit dem MSE ab. Gestartet wird mit SYS 5*4096 oder SYS 20480. Mit F7 ist die neue LIST-Routine aktiv, mit F1 abgeschaltet. Auch während des LISTens kann umgeschaltet werden. Eine korrekte FOR..NEXT - Schleife wird daran erkannt, daß sich FOR und NEXT auf der gleichen Höhe befinden (Listing 1). Wenn Sie das Programm etwas genauer analysieren, dürfte es nicht schwerfallen, eigene Wünsche zu verwirklichen.</p>
+
+<address class="author">(H. Zwartscholten/gk)</address>
+    </article>
+</body>
+</html>

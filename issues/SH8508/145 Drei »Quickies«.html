@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Drei »Quickies«</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Meister, tr, Peter Sajonez, tr, Ulrich Pasch, tr">
+    <meta name="64er.issue" content="Sonderheft 8/85">
+    <meta name="64er.pages" content="145">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Drei »Quickies«</h1>
+<p class="intro">Einzeiler lassen sich nicht nur in Basic, sondern auch in Assembler schreiben! Tippen Sie unsere drei »Quickies« ein, und lassen Sie sich überraschen, mit welchen Tricks da gearbeitet wurde.</p>
+
+<p>Die beiden Basic-Programme »Zeichensatz ändern« und »invertierte Grafik« müssen Sie mit dem MSE eingeben. Dies hat zwei Gründe: Erstens einmal lassen sich dadurch Tippfehler leichter ausschalten und zweitens wäre die Eingabe über Basic sehr mühsam. Wenn Sie die »Einzeiler« auf Diskette gespeichert haben, können Sie sie ohne weiteres wie normale Basic-Listings laden, listen und mit »RUN« starten.</p>
+
+<h2>Stop!</h2>
+
+<p>1 fori = 828to839:reada:pokei,a:next:data72,173,141,2, 201,1,240, 249,104,76,202,241</p>
+
+<p>TODO TABLE</p>
+
+<p>Einschalten poke806,60:poke807,3<br>
+Ausschalten poke 806,202:poke807,241</p>
+
+<p>In diesem kleinen Maschinenprogramm wird während des Listens eines Programms die Shift-Taste abgefragt und, wenn diese gedrückt ist, gewartet. Sonst wird zur Adresse 61898 (Ausgabe eines Zeichens) gesprungen. Durch die zwei POKEs wird der Ausgabe-Vektor ($F1CA) auf den Kassettenpuffer nach 828 »verbogen«.</p>
+
+<p>TODO TABLE</p>
+
+<p>828 pha : Akku sichern<br>
+829 Ida 653 : Flag fürSHIFT<br>
+832 cmp#1   : gedrückt?<br>
+834 beq 829 : ja, dann warten<br>
+836 pla : Akku wiederherstellen<br>
+837 jmp 61898   : zur Ausgaberoutine</p>
+
+<address class="author">(Ulrich Pasch/tr)</address>
+
+<h2>Zeichensatz ändern</h2>
+
+<p>Dieser Einzeiler verschiebt den Zeichensatz in den Speicherbereich Hexadezimal $2000 - $3000. Damit können jederzeit beliebige Zeichen geändert werden; zum Beispiel, um Sonderzeichen zu definieren.</p>
+
+<h3>Zum Aufbau des Programms (Listing 1a und 1b)</h3>
+
+<p>Ein PRINT-Befehl schreibt das Maschinenprogramm in den Bildschirmspeicher, wo es dann mit SYS 1024 gestartet wird.</p>
+
+<p>Das Maschinenprogramm setzt zunächst das Interruptflag, um einen Interrupt durch den CIA 1 zu unterbinden. Das ist nötig, da der Computer sonst abstürzen würde, wenn das Zeichen-ROM eingeschaltet wird. Danach wird das ZeichenROM eingeschaltet. Jetzt wird nach der nötigen Parameterübergabe (alter Blockanfang, altes Blockende, neues Blockende) die Blockverschieberoutine des Interpreters aufgerufen. Dann wird der Zeichengenerator wieder abgeschaltet und der Zeiger auf den Zeichengenerator entsprechend geändert (Hexadezimal D018, Bit 1-3). Nach dem Löschen des Interruptflags erfolgt der Rücksprung ins Basic.</p>
+
+<address class="author">(Peter Sajonez/tr)</address>
+
+<h2>Invertierte Grafik</h2>
+
+<p>Dieser Einzeiler (Listing 2) invertiert eine im Speicher stehende Grafik. Gegenüber dem Einzeiler, der in der 64’er, 3/85 veröffentlicht wurde, braucht er zur Ausführung nur den Bruchteil einer Sekunde. Er besteht im wesentlichen aus einer kleinen Maschinenroutine, die mittels einem PRINT-Befehl in den Bildschirm geschrieben und mit SYS 1024 gestartet wird.</p>
+
+<address class="author">(Frank Meister/tr)</address>
+    </article>
+</body>
+</html>

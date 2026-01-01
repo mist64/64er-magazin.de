@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Superhirn, einmal andersherum</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="A. Reiser, H. Bauschke, og">
+    <meta name="64er.issue" content="Sonderheft 8/85">
+    <meta name="64er.pages" content="164-166">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Superhirn, einmal andersherum</h1>
+<p class="intro">Lassen Sie den C 64 Ihre Kombination herausfinden. Nach einem perfekten Algorithmus kann der C 64 Ihre Zahlenfolge in maximal sechs Versuchen berechnen.</p>
+
+<p>Beim Spiel Superhirn geht es darum, einen von einem Q Mitspieler ausgedachten Farbcode zu erraten. Man W probiert verschiedene Farbcodes aus; der Mitspieler gibt nach einer versuchten Kombination Information über deren Richtigkeit.</p>
+
+<p>Es gibt schon einige Superhirn-Programme, die eine Kombination wählen, die dann der menschliche Mitspieler erraten muß.</p>
+
+<p>Superhirn II geht den anderen Weg: Der Mensch denkt sich eine Kombination aus, die dann der Computer erraten muß! Superhirn II findet jede Kombination garantiert (siehe Kasten).</p>
+
+<p>Die Farben werden durch Zahlen symbolisiert. Es gibt sechs»Farbzahlen«, nämlich die Ziffern 1,2,3,4,5und6. Für die Farben gibt es vier Positionen</p>
+
+<h3>Bedienungsanleitung:</h3>
+
+<p>Geben Sie Superhirn II bitte mit dem MSE ein (Listing 1) und starten Sie es mit »SYS 13312«.</p>
+
+<p>Sie antworten, indem Sie zuerst die Anzahl der richtigen Farbziffern an der richtigen Position eingeben und dann mit »RETURN« abschließen. Dann geben Sie die Anzahl der richtigen Farbziffern an der falschen Position ein und bestätigen wiederum mit »RETURN«.</p>
+
+<p>Superhirn II gibt dann seinen neuen Lösungsvorschlag aus; Sie antworten wieder wie oben. Das Programm ist beendet, wenn</p>
+
+<ul>
+<li>das Programm die richtige Kombination gefunden hat (es meldet sich mit »OK«)</li>
+<li>oder wenn Sie eine unmögliche Antwort gegeben haben (das Programm meldet sich mit »ERROR«).</li>
+</ul>
+
+
+<h3>Beispiel:</h3>
+
+<p>Nehmen wir die Kombination »3436«. Nach Programm-Start beginnt Superhirn II wie üblich mit seiner Startkombination »1234«.</p>
+
+<p>Der Computer hat die »3« richtig als Zahl und Position; die »4« stimmt nur als Zahl.<br>
+Also wird eingegeben:</p>
+
+<p>TODO</p>
+
+<p>1234    - der Vorschlag des Computers.<br>
+1 &lt; RETURN > - für die richtige »3«.<br>
+1 &lt; RETURN > - für die »4« an falscher Position.<br>
+Jetzt sucht der Computer einen neuen Lösungsvorschlag.<br>
+Verfolgen wir die Eingaben bis zum Ende &hellip;<br>
+2211    - der 2. Versuch des Computers.<br>
+0 &lt; RETURN > - keine richtige Position/richtige Ziffer.<br>
+0 &lt; RETURN > - keine falsche Position/richtige Ziffer.<br>
+4333    - der 3. Versuch des Computers.<br>
+1 &lt; RETURN > - für die richtige »3«.<br>
+2 &lt; RETURN > - für die »3« und »4«.<br>
+3344    - der 4. Versuch des Computers.<br>
+1 &lt; RETURN > - diesmal stimmt die erste »3«.<br>
+2 &lt; RETURN > - dafür sind »3« und »4« vertauscht.<br>
+3435    - der 5. Versuch des Computers.<br>
+3 &lt; RETURN > - bis auf die fehlende »6« richtig.<br>
+0 &lt; RETURN > - die »5« ist falsch.<br>
+3436    - der 6. Versuch des Computers.<br>
+4 &lt; RETURN > - die Kombination ist gefunden.<br>
+OK  - Sie befinden sich wieder im Basic.</p>
+
+<p>Das Programm kann mit »SYS 13312« wieder gestartet werden.</p>
+
+<h3>Hinweise:</h3>
+
+<p>Die Eingabe unlogischer Daten führt zur Ausgabe von »ERROR«. Sie haben dann entweder eine offensichtlich falsche Eingabe gemacht (zum Beispiel bei der Eingabe einer »6« für die Anzahl der richtigen Ziffern - es kann ja nur höchstens »4« als korrekte Eingabe vorkommen!) oder eine logisch falsche Eingabe.</p>
+
+<p>Was ist eine logisch falsche Eingabe? Nehmen wir unser Beispiel von oben:</p>
+
+<p>Geben Sie nach dem 6. Versuch des Computers nicht die (richtige!) »4« ein, sondern »0« und nochmal »0«, antwortet Ihnen der Computer mit »ERROR«. Warum?</p>
+
+<p>Nun gibt es einfach keine Ziffernkombination mehr, die allen Ihren Eingaben gerecht werden kann. Folglich müssen Sie einen Eingabe-Fehler gemacht haben.</p>
+
+<p>Geben Sie in unserem Beispiel nach dem 3. Versuch des Computers nicht »1« und »2« (was nach Wahl unserer Ziffernkombination »3436« die einzig korrekte Eingabe ist), sondern »2« und »2«, kann Fehleingabe natürlich nicht miteinem »ERROR« beantwortet werden, weil nämlich jetzt noch Ziffernkombinationen vorhanden sind, die nicht im Widerspruch zu Ihren bis dahin gemachten Eingaben stehen.</p>
+
+<h3>Zum Programm:</h3>
+
+<p>Den Quelltext des Programms entnehmen Sie Listing 2. Die Eingabe-Routine liest nur das erste Zeichen jeder Zeile - es macht also keinen Unterschied, ob man als Antwort »1« oder »123456« eingibt, da die restlichen Zeichen nicht berücksichtigt werden.</p>
+
+<p>Das Programm ist leicht auf zum Beispiel 10 Positionen erweiterbar - man muß jedoch folgendes beachten: Die Abstände zwischen den Registern POS1,&hellip;., CWEISSE müssen vergrößert werden, da möglicherweise neun Versuche nicht zum Ziel führen.</p>
+
+<p>Auch die Anzahl der möglichen Ziffern kann leicht von sechs auf acht erweitert werden. Möchte man mehr als acht Ziffern, muß man mit 16-Bit-Zahlen arbeiten, was größere Umschreibarbeiten zur Folge hat.</p>
+
+<h3>Kombinations-Codierung:</h3>
+
+<p>Es bleibt noch die Frage, in welcher Art und Weise die Kombinationen gespeichert werden. Nehmen wir dazu doch wieder unsere Kombination aus dem Beispiel, also »3436«.</p>
+
+<p>In POS1, POS2, POS3 und POS4 steht immer die aktuelle Kombination, die der Computer gerade als Lösungsversuch ausgegeben hat.</p>
+
+<p>Ist das Problem gerade bei der Lösung angelangt, dann steht nicht etwa in POS1 die »3«, in POS2 die »4«, in POS3 wieder die »3« und in POS4 die »6« - sondern die Kombination ist folgendermaßen festgehalten:<br>
+POS1 - 2 hoch (3-1)<br>
+POS2 - 2 hoch (4-1)<br>
+POS3 - 2 hoch (3-1)<br>
+POS4 - 2 hoch (6-1)</p>
+
+<p>Durch diese Darstellung ist es später leichter möglich, die Anzahl der Schwarzen (= richtige Ziffer/richtige Position) und die Anzahl der Weißen (= richtige Ziffer/falsche Position) zu bestimmen.</p>
+
+<p>Der Lösungsversuch des Computers in der x-ten Runde stehtgenauso codiertin POS1+X, POS2+X, POS3+Xund POS4+X.</p>
+
+<address class="author">(A. Reiser/H. Bauschke/og)</address>
+
+<p>TODO ASIDE</p>
+
+<p>Das Programm gibt den ersten Lösungsvorschlag aus. Nach der Eingabe des menschlichen Mitspielers wird eine Ziffernkombination gesucht, die logisch richtig ist in bezug auf alle vorher gemachten Eingaben.</p>
+
+<p>Dabei werden alle Ziffernkombinationen von »1111« bis »6666« getestet.</p>
+
+<p>Ist die aktuelle Ziffernkombination logisch richtig, gibt sie der Computer aus.</p>
+
+<p>Das Programm beginnt bei der nächsten Suche nach der Lösung bei der zuletzt ausgegebenen Ziffernkombination; es muß also nicht wieder bei »1111« anfangen.</p>
+
+<p>Hat der menschliche Gegner nicht mit »4« bei richtiger Position/richtige Farbe geantwortet und ist das Programm bei »6666« angelangt, kann es sich nur um eine falsche Eingabe handeln - es wird »ERROR« ausgegeben.</p>
+
+<p>Wie beurteilt das Programm nun, ob es in seiner Schleife von »1111« bis »6666« gerade bei einer logisch richtigen oder logisch falschen Ziffernkombination ist?</p>
+
+<p>Dazu benutzt der Algorithmus folgenden Trick: Es wird angenommen, daß die zu prüfende Ziffernkombination die richtige ist. Dann werden alle bis dahin getätigten Eingaben mit dieser Kombination verglichen. Es wird also nach der Anzahl der richtigen Ziffer/richtige Position und nach der Anzahl richtige Ziffer/falsche Position gesucht. Das Ergebnis wird festgehalten und mit den Eingaben, die Sie gemacht haben, verglichen.</p>
+
+<p>Stimmen diese Werte sämtlich überein, kann es sich bei der zu prüfenden Kombination um die Lösung handeln - sie muß es aber nicht sein!</p>
+
+<p>Trifft nun das Programm auf eine solche Lösungsmöglichkeit, gibt es diese auch aus.</p>
+
+<p>Ist die Prüfung negativ ausgefallen, das heißt, es gab mindestens eine Abweichung von der tatsächlichen Eingabe des menschlichen Mitspielers, wird in der großen Schleife weitergesucht - so lange, bis die Kombination gefunden ist.</p>
+
+<p>So findet das Programm die Kombination</p>
+    </article>
+</body>
+</html>
