@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# Get script directory (before any cd commands)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Check arguments
 if [ $# -lt 1 ]; then
     echo "Usage: $0 <d64_file1> [d64_file2 ...]"
     echo "Example: $0 S8506A.D64 S8506B.D64"
-    echo "Output: prg/ directory and prg.html file"
+    echo "Output: prg/ directory and prg.txt file"
     exit 1
 fi
 
@@ -110,12 +113,30 @@ for D64_FILE in "${D64_FILES[@]}"; do
         fi
 
         # Keep txt or prg, move the other to del
+        basename="${prgfile%.prg}"
         if [ "$keep_txt" = true ]; then
             mv "$prgfile" "../del/"
-            echo "    Kept: $(basename "$txtfile")" >&2
+            printf "    %-18s BASIC\n" "$basename" >&2
         else
             mv "$txtfile" "../del/"
-            echo "    Kept: $(basename "$prgfile")" >&2
+            # Try hypra-ass-decode
+            if python3 "$SCRIPT_DIR/hypra-ass-decode.py" "$prgfile" > "$txtfile" 2>/dev/null; then
+                # Check if output looks valid (has line numbers AND contains Hypra-Ass keywords)
+                if head -1 "$txtfile" | grep -qE '^[0-9]+  -' && grep -qE '\.(LI|BA|GL|TX|BY|MA|RT) ' "$txtfile"; then
+                    mv "$txtfile" "../del/"
+                    printf "    %-18s Hypra-Ass\n" "$basename" >&2
+                else
+                    rm "$txtfile"
+                    rm -f "../del/$txtfile"
+                    load_addr=$(xxd -p -l 2 "$prgfile" | sed 's/\(..\)\(..\)/\2\1/' | tr 'a-f' 'A-F')
+                    printf "    %-18s PRG (\$%s)\n" "$basename" "$load_addr" >&2
+                fi
+            else
+                rm -f "$txtfile"
+                rm -f "../del/$txtfile"
+                load_addr=$(xxd -p -l 2 "$prgfile" | sed 's/\(..\)\(..\)/\2\1/' | tr 'a-f' 'A-F')
+                printf "    %-18s PRG (\$%s)\n" "$basename" "$load_addr" >&2
+            fi
         fi
     done
 
@@ -152,13 +173,24 @@ echo "Generating HTML..." >&2
                 # Check for .txt file (BASIC listing)
                 if [ -f "${OUTPUT_DIR}/${filename_alt}.txt" ]; then
                     echo "<figure><pre data-filename=\"${filename}\" data-name=\"XXXXXXXXXXXX\"></pre><figcaption>YYYYYYYYYYYYY</figcaption></figure>"
+                    echo ""
                     found=true
                 fi
 
+                # Check for Hypra-Ass (prg in main dir AND txt in del)
+                if [ -f "${OUTPUT_DIR}/${filename_alt}.prg" ] && [ -f "${OUTPUT_DIR}/del/${filename_alt}.txt" ]; then
+                    echo "<!-- ${filename} -->"
+                    echo "<figure><pre>"
+                    sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' "${OUTPUT_DIR}/del/${filename_alt}.txt"
+                    echo "</pre><figcaption>YYYYYYYYYYYYY</figcaption></figure>"
+                    echo "<div class=\"binary_download\" data-filename=\"${filename_alt}.prg\" data-name=\"XXXXXXXXXXXXXXX\"></div>"
+                    echo ""
+                    found=true
                 # Check for .prg file (MSE listing & binary download)
-                if [ -f "${OUTPUT_DIR}/${filename_alt}.prg" ]; then
+                elif [ -f "${OUTPUT_DIR}/${filename_alt}.prg" ]; then
                     echo "<figure><pre data-filename=\"${filename_alt}.prg\" data-name=\"XXXXXXXXXXXX\" data-mse=mse1></pre><figcaption>YYYYYYYYYYYYY</figcaption></figure>"
                     echo "<div class=\"binary_download\" data-filename=\"${filename_alt}.prg\" data-name=\"XXXXXXXXXXXXXXX\"></div>"
+                    echo ""
                     found=true
                 fi
 
@@ -171,6 +203,6 @@ echo "Generating HTML..." >&2
             fi
         done
     done
-} > prg.html
+} > prg.txt
 
-echo "Done! Output written to prg.html" >&2
+echo "Done! Output written to prg.txt" >&2
