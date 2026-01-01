@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Effektives Programmieren in Assembler</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Florian Müller, tr">
+    <meta name="64er.issue" content="Sonderheft 8/85">
+    <meta name="64er.pages" content="74-103">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Effektives Programmieren in Assembler</h1>
+<p class="intro">Es gibt viele Möglichkeiten, ein Basic-Programm schneller und komfortabler zu gestalten. Aber auch für die Assemblerprogrammierung gibt es einige Tricks und Kniffe, die wir Ihnen in diesem praxisnahen Kurs verraten wollen.</p>
+
+<p>Wer das Optimum an Geschwindigkeit aus seinem Computer herausholen will, kommt an Maschinensprache nicht vorbei. Die Grundlagen zur Maschinenprogrammierung wurden bereits im Kurs »Assembler ist keine Alchimie«, den Sie in diesem Sonderheft finden, geschaffen. Das Thema dieses Artikels ist es nun, die Möglichkeiten von Maschinensprache optimal zu nutzen. Sie erfahren, wie man<br>
+a)  Programme beschleunigen und<br>
+b)  Speicherplatz sparen kann.</p>
+
+<p>Dazu werden Ihnen eine Vielzahl von Programmiertechniken, Tips und Tricks vermittelt, die Ihnen die Programmierung erleichern.</p>
+
+<h2>1.   Beschleunigungen des Betriebssystems (in Assembler)</h2>
+
+<p>Der C 64 muß viele Aufgaben gleichzeitig erledigen: Bearbeiten des Hauptprogramms, Ablauf der Systeminterrupts und Senden des Video-Signals (an den Monitor/Fernseher). Alle diese Funktionen erfordern</p>
+
+<ul>
+<li>viele Zugriffe auf den Datenbus des Prozessors</li>
+<li>und dadurch Ausführungszeit.</li>
+</ul>
+
+
+<p>Unser Grundproblem ist nun, wie wir den Computer dazu bewegen, diese Aufgaben nicht (oder nur teilweise) auszuführen.</p>
+
+<h3>a)  Eingriffe in den Systeminterrupt</h3>
+
+<p>Eine detaillierte Beschreibung des Systeminterrupts finden Sie im bereits erwähnten Kurs »Assembler ist keine Alchimie«. Hier möchte ich nur zusammenfassen, was im normalen Interrupt des Betriebssystems geschieht: 60 mal in der Sekunde wird das Hauptprogramm verlassen und die Routine ab $EA31 angesprungen. Ist diese abgearbeitet, wird wieder ins Hauptprogramm zurückgesprungen. Während dieser Unterbrechung (»interrupt«) tut sich einiges:</p>
+
+<ul>
+<li>die RUN/STOP-Taste wird überprüft</li>
+<li>die Tastatur und der Datasettenmotor werden abgefragt</li>
+<li>das Cursorblinken wird erledigt</li>
+<li>die interne Uhr (Tl$) wird gestellt.</li>
+</ul>
+
+
+<p>Überlegen wir uns, welche Funktionen verzichtbar sind: Die RUN/STOP-Taste bewirkt nur in Basic-Programmen einen Abbruch, in Assembler müßte sie zum Beispiel über »JSR $FFE1« zusätzlich abgefragt werden. Die interne Uhr findet von Maschinensprache aus praktisch keine Verwendung. Kurz und gut, ein Maschinenprogramm kann auf beide Funktionen verzichten. Dies wird durch ein</p>
+
+<p>LDA #$34<br>
+STA $0314</p>
+
+<p>erreicht. Weil der Computer dadurch entlastet wird, läuft das Hauptprogramm etwas schneller ab.</p>
+
+<p>Die Normaleinstellung erhält man mit</p>
+
+<p>LDA #$31<br>
+STA $0314</p>
+
+<h3>Beschleunigungsmethode 1:</h3>
+
+<p class="source">Trick: Verkürzung der Interrupt-Routine<br>
+Nebenwirkungen: Abfrage der STOP-Taste und interne Uhr entfallen</p>
+
+<p>Können Sie zwischenzeitlich auf die ganze Interrupt-Routine verzichten, genügt ein einziger Befehl:</p>
+
+<p>SEI (»set Interrupt«)</p>
+
+<p>Er verhindert grundsätzlich das Auftreten von Interrupts.<br>
+Die Normaleinstellung bewirkt:</p>
+
+<p>CLI (»clear interrupt«)</p>
+
+<h3>Beschleunigungsmethode 2:</h3>
+
+<p class="source">Trick: Interrupt total abschalten<br>
+Nebenwirkungen: Abfrage von Tastatur, STOP-Taste und Datasette, sowie Cursor und interne Uhr entfallen.</p>
+
+<p>Es gibt aber noch eine Möglichkeit, im Zusammenhang mit dem Systeminterrupt: Von der Adresse $DC05, die als Zähler dient, hängtdie Anzahl der Interrupts (in der Regel 60 Aufrufe pro Sekunde) in einer bestimmten Zeit ab. Diese Adresse kann durch Schreibzugriff geändert werden. Schreibt man in $DC05 einen niedrigen Wert (im Extremfall 0), so werden sehr viele Interrupts ausgelöst. Dies macht sich in der Geschwindigkeit der Interrupt-Routine bemerkbar. Cursor und Tastaturabfrage werden sehr schnell, die interne Uhr geht vor, und so weiter. Verwendet man eine eigene, eventuell zeitkritische Interrupt-Routine, kann sie auf diese Weise beschleunigt werden.</p>
+
+<p>Dieser Geschwindigkeitszuwachs geht allerdings auf Kosten des Hauptprogramms, das stark verlangsamt wird. Bei wenigen Interrupts (große Zahl in $DC05) wird es beschleunigt. Die entsprechenden Assemblerbefehle lauten:</p>
+
+<p>LDA #$FF<br>
+STA $DC05</p>
+
+<p>um eine starke Beschleunigung zu bewirken.<br>
+Die Normaleinstellung wird durch</p>
+
+<p>LDA #$3A<br>
+STA $DC05</p>
+
+<p>erreicht.</p>
+
+<h3>Beschleunigungsmethode 3:</h3>
+
+<p class="source">Trick: Anzahl der Interruptaufrufe pro Sekunde ändern<br>
+Nebenwirkungen: Bei zu wenigen Aufrufen hinken Uhr, Cursor und Tastaturabfrage nach; bei zu vielen werden sie zu schnell.</p>
+
+<h3>b)  VIC-Register Nummer 17</h3>
+
+<p>Ist Ihnen schon bei Hypra-Load, beim Arbeiten mitder Datasette und einigen Kopierprogrammen aufgefallen, daß manchmal der Bildschirm abgeschaltet wird (ähnlich wie im FAST-Mode des C 128)? Dies kann man mit einem Vorhang vergleichen, der zwischenzeitlich den Bildschirm verdeckt. Der Bildschirm kann zwar nach wie vor (hinter dem Vorhang) geändert werden (PRINT-Anweisungen werden also ausgeführt), aber sichtbar wird die Wirkung erst, wenn der Vorhang entfernt wird.</p>
+
+<p>Verantwortlich für das Ein-/Ausschalten des Bildschirms ist das VIC-Register Nummer 17:</p>
+
+<p>Bit 4 gesetzt: Bildschirm wird angezeigt<br>
+Bit 4 gelöscht: Bildschirm wird abgeschaltet und nimmt Rahmenfarbe an.</p>
+
+<p>Da wir die theoretischen Grundlagen haben, brauchen wir nur noch unser Wissen in Befehle umzusetzen:</p>
+
+<p>Bildschirm abschalten:<br>
+LDA $D011 ($D011 ist VIC-Register #17)<br>
+AND #$EF ($EF = %11101111)<br>
+STA $D011   ↑<br>
+              Bit4<br>
+In diesem Zustand arbeiten manche Kopierprogramme um zirka 15% schneller. Programme, dienichtaufexterneGeräte wie die Floppy zugreifen, laufen zirka 5% schneller ab. Bildschirm wieder einschalten:<br>
+LDA $D011<br>
+ORA#$10 ($10 = %00010000)<br>
+STA $D011   ↑<br>
+               Bit4</p>
+
+<p>Dies ist der Normalzustand.</p>
+
+<h3>Beschleunigungsmethode 4:</h3>
+
+<p class="source">Trick: Bildschirm abschalten<br>
+Nebenwirkungen: Der Bildschirminhalt ist nicht zu sehen, geht aber auch nicht verloren.</p>
+
+<h3>c)  Hinweise zum bisher Gesagten</h3>
+
+<p>Alle bis zu dieser Stelle genannten Tricks beziehen sich auf die Beschleunigung von Programmen. Sie lassen sich leicht nachträglich einfügen, weil am Programmalgorithmus keine Änderungen erforderlich sind.</p>
+
+<p>Sie können das Abschalten des Bildschirms mit dem Abschalten oder Einschränken des Interrupts verknüpfen, um die Geschwindigkeit noch weiter zu erhöhen. Wenn Sie den Interruptganzabschalten (SEI), bringtes keinen zusätzlichen Gewinn, ihn einzuschränken oder die Zahl der Aufrufe zu ändern.</p>
+
+<p>Beachten Sie bitte, daß alle beschriebenen Tricks durch RUN/STOP-RESTORE, einem Reset oder den Assemblerbefehl BRK rückgängig gemacht werden.</p>
+
+<h2>2.   Systembeschleunigungen in Basic</h2>
+
+<p>Hier erfahren Sie, wie sich die Systembeschleunigungen von Basic aus verwerten lassen. Die Nebenwirkungen bleiben allerdings diegleichen, wie unter 1. genannt.</p>
+
+<h3>a)  Interrupt einschränken</h3>
+
+<p>POKE788,52 verkürztdie Interrupt-Routine um das Abfragen der RUN/STOP-Taste und das Stellen von Tl$.</p>
+
+<p>POKE 788,49 Normalzustand</p>
+
+<p>In Basic ist das Ausfallen von RUN/STOP und Tl$ wesentlich störender als in Maschinensprache. Überprüfen Sie daher Ihre Programme auf Verwendung von Tl$ und fügen Sie den POKE erst nach (!) der Fertigstellung des Programms ein.</p>
+
+<h3>b)  Interrupt abschalten</h3>
+
+<p>POKE 56334,PEEK (56334) AND 254</p>
+
+<p>schaltet den Interrupt ab,</p>
+
+<p>POKE 56334,PEEK(56334) OR 1</p>
+
+<p>schaltet ihn wieder ein. Dies geschieht dadurch, daß der Timer ab- beziehungsweise wieder eingeschaltet wird.</p>
+
+<h3>c)  Anzahl der Interrupt-Aufrufe ändern</h3>
+
+<p>POKE 56325,0: Extrem viele Interruptaufrufe<br>
+POKE 56325,255: Extrem wenige (daraus folgt: Interrupt langsam, Basic-Programm schnell)</p>
+
+<h3>d)  Bildschirm abschalten</h3>
+
+<p>POKE 53265,PEEK(53265) AND 239<br>
+schaltet den Bildschirm ab.<br>
+POKE 53265,PEEK(53265) OR 16<br>
+schaltet ihn wieder ein.</p>
+
+<p>An dieser Stelle sei noch einmal auf Punkt 1c hingewiesen, damit keine (vermeidbaren) Probleme auftreten.</p>
+
+<p>Anhand von Listing 1 wollen wir uns nun mit der Anwendung der Systembeschleunigungen befassen. Dieses kleine Beispielprogramm, an dem Sie nach Herzenslust experimentieren können, versucht, mit Hilfe von Tl$ die Arbeitsdauer der Schleife (Zeile 150) zu messen.</p>
+
+<p>Während des Ablaufs dieser Schleife, die kontinuierlich die Rahmenfarbe ändert, sollten Sie keine Taste drücken, um die Meßwerte nicht zu verfälschen.<br>
+Wenn Sie dies beachten, erhalten Sie folgende Werte:</p>
+
+<ol>
+<li>Normalzustand: 000003</li>
+<li>Verkürzter Interrupt: 000000<br>An der gemessenen Zeit können Sie erkennen, daß Tl$ abgeschaltet wurde.</li>
+<li>Häufige Interrupts: 000010<br>Aufgrund vieler Interrupt-Anforderungen wurde die Uhr Tl$ sehr oft erhöht.</li>
+<li>Seltene Interrupts: 000001<br>Da die IRQ-Routine nur selten durchlaufen wurde, ist Tl$ kaum weitergezählt worden.</li>
+<li>Bildschirm abgeschaltet: 000002</li>
+</ol>
+
+
+<p>Nur bei diesem Punkt (und natürlich auch bei »1«) hat Tl$ volle Aussagekraft bezüglich der Ablaufzeit. An dieser Zeit können wir erkennen, daß durch das Abschalten des Bildschirms tatsächlich gegenüber »1« ein Zeitgewinn anfällt.</p>
+
+<p>Bei den Punkten »3« und »4« wurde der Cursor eingeschaltet. Bei »3« (häufige Interrupts) ist er sehr schnell, bei »4« dagegen sehr langsam.</p>
+
+<p>An Punkt »5« können Sie erkennen, daß bei abgeschaltetem Bildschirm der Hintergrund immer die Rahmenfarbe ($D020) annimmt, ohne daß wir die entsprechende Farbe ins Register$DO21 »POKEn«.</p>
+
+<h2>3.   Optimierung der Bildschirmausgabe</h2>
+
+<p>Ohne die Bildschirmausgabe kommt kein Programm aus, aber oft kostet sie unnötig viel Rechenzeit. Der Grund ist hier nicht beim Betriebssystem zu suchen, sondern bei umständlicher Programmierung. Diese wiederum ist auf mangelndes Know-how zurückzuführen, welches wir nun ändern wollen.</p>
+
+<p>In der Regel wird zur Ausgabe eines Zeichens dieses in den Akku geladen und die Routine BASOUT ($FFD2) aufgerufen. Veranschaulichen wir uns einmal die Arbeitsweise von BASOUT: Das Betriebssystem prüft bei jedem Zeichen, ob es sich um einen Buchstaben oder ein Steuerzeichen, zum Beispiel »Bildschirm löschen« handelt. Buchstaben werden in den Bildschirmcode umgewandelt und ins Bildschirm-RAM ab $0400 geschrieben.</p>
+
+<p>Für Steuerzeichen existieren jeweils Unterroutinen die zum Beispiel eine Leerzeile einfügen, den Bildschirm löschen oder ähnliches.</p>
+
+<p>Diese aufwendige Überprüfung verlangsamt die Bildschirmausgabe erheblich. BASOUT läßt sich zwar geringfügig beschleunigen, indem man statt bei $FFD2 (Kerneleinsprung) bei $E716 einsteigt, aber es geht noch schneller:</p>
+
+<h3>a)  Bildschirm löschen</h3>
+
+<p class="source">Langsam:</p>
+
+<p>LDA #$93 $93 = 147 = Codefür»Bildschirm löschen«, entspricht PRINT CHR$(147)<br>
+JSR $FFD2 (oder$E176)</p>
+
+<p class="source">Schnell:</p>
+
+<p>JSR $E544 (Routine für »Bildschirm löschen«)</p>
+
+<h3>b) Cursor in Home-Position (linke obere Ecke)</h3>
+
+<p class="source">Langsam:</p>
+
+<p>LDA #$13 ; $13 = Code für »Cursor Home«<br>
+JSR $FFD2 (oder$E176)</p>
+
+<p class="source">Schnell:</p>
+
+<p>JSR $E566 (Routine für »Cursor Home«)</p>
+
+<h3>c)  Cursor-Positionierung</h3>
+
+<p class="source">Langsam:<br>
+Senden von Steuerzeichen (CRSR DOWN, UP und so weiter) über BASOUT.<br>
+Schnell:</p>
+
+<p>LDX #Zeile<br>
+LDY #Spalte<br>
+JSR $E50C (Cursorposition setzen)</p>
+
+<h3>d)  Textausgabe</h3>
+
+<p>Unkomfortable Lösung:<br>
+Senden von Zeichen (Buchstaben, Grafikzeichen) über BASOUT.</p>
+
+<p>Eine solche Schleife finden Sie in Listing 2, Zeilen 148 -220 und 320 - 330. Nach dem Start durch »SYS 49152« gibt Listing 2 zweimal hintereinander den Text »DAS IST DER TEXT« aus. Das erste Mal wird der Text über eine BASOUT-Schleife gedrückt, beim zweiten Mal nimmt das Programm die Komfortable Lösung:</p>
+
+<p>Ab der Adresse »TEXT« muß der Text (in ASCII-Darstellung) stehen, in dem keine Anführungszeichen vorkommen dürfen. Am Ende des Textes muß $00 als Endmarkierung zu finden sein. Die Ausgabe erfolgt dann über</p>
+
+<p>LDA #&lt;(TEXT) Low-Byte der Adresse<br>
+LDY #>(TEXT) High-Byte<br>
+JSR $AB1E</p>
+
+<p>Die Routine $AB1E wird fortan als »STROUT« (STRing-OUTput = String-Ausgabe) bezeichnet. STROUT ist zwar etwas langsamer als BASOUT; dafür erlaubt die komfortable Parameterübergabe eine wesentlich bequemere Programmierung, wie Sie am zweiten Teil von Listing 2 (Zeilen 260 -300, 320 - 330) sehen können. Mit nur drei Befehlen wird der Text ausgegeben!</p>
+
+<h3>Beschleunigungsmethode 5.</h3>
+
+<p>TODO TABLE</p>
+
+<p>Zusammenfassung der bisherigen Alternativen<br>
+zu BASOUT:<br>
+CLEAR HOME: JSR $E544<br>
+CURSOR HOME:    JSR $E566<br>
+Cursorpositionierung:<br>
+LDX #Zeile<br>
+LDY #Spalte<br>
+JSR $E50C<br>
+Textausgabe:<br>
+Text ab TEXT ablegen (wie Listing 2, Zeile 320 - 330)<br>
+LDA #&lt;(TEXT)<br>
+LDY #>(TEXT)<br>
+JSR $AB1E</p>
+
+<p>Alle diese Verfahren sind nicht nur schnell, sondern auch speicherplatzsparend.</p>
+
+<p>Eine Anwendung von (fast) allen Routinen aus der Beschleunigungsmethode 5 zeigt Listing 3.</p>
+
+<p>Der Bildschirm wird gelöscht und in Zeile 12 ab Spalte 10 ein Text ausgegeben. Auch in diesem Programm sollten Sie zur Übung etwas experimentieren!</p>
+
+<h3>e)  Kopieren des Textes in den Bildschirmspeicher</h3>
+
+<p>Dies ist die schnellste Methode: Der Text wird in den Bildschirmspeicher kopiert. Die lange Umwandlung entfällt völlig, da der Text als fertiger Bildschirmcode im Speicher abgelegt wird. Wenn einige Kopfzeilen (zum Beispiel mit Copyright-Vermerken) an verschiedenen Stellen ausgegeben werden sollen, ist es ratsam, ein kleines Unterprogramm zu erstellen. Dieses schreibt dann die Kopfzeilen direkt in den Bildschirmspeicher, ohne die aktuelle Cursor-Position zu beeinflussen.</p>
+
+<p>Eines müssen Sie aber unbedingt beachten: Die Farbgebung ist nur durch Ändern des Farb-RAMs möglich.</p>
+
+<p>Eine Tabelle der Bildschirmcodes finden Sie übrigens im Anhang des C 64-Handbuchs und am Schluß dieser Ausgabe.</p>
+
+<p>Beschäftigen wir uns nun mit Listing 4:</p>
+
+<p>Dieses Programm entspricht in der Wirkung Listing 3, gibt den Text jedoch nicht über die Betriebssystem-Routinen CURSOR und STROUT aus, sondern schreibt ihn direkt in den Bildschirm.</p>
+
+<p>In den Zeilen 310 - 320 steht der Bildschirmcode des Textes.</p>
+
+<p>Zurück zur Routine STROUT: Diese Routine arbeitet, da sie sich auf die BASOUT-Routine stützt, auch mit Peripheriegeräten wie Floppy und Drucker, wenn diese über dem CMD-Befehl als Ausgabegeräte definiert wurden. In »Assembler ist keine Alchimie« wurde gezeigt, wie man mit der BASOUT-Routine die Drucker-Ausgabe betreibt. Dort wurden alle wichtigen Routinen bis ins Detail beschrieben.</p>
+
+<p>Listing 5 gibt einen Text zuerst auf dem Drucker und dann auf dem Bildschirm aus. Daran soll außer dem Druckerbetrieb auch gezeigt werden, wie man die Parameterübergabe an STROUT als Makro (Zeilen 230 - 270) definiert und sich somit einen bequemen Ausgabe-Befehl schafft.</p>
+
+<h2>4.   Unterprogramme</h2>
+
+<p>Ohne die Unterprogramm-Befehle JSR und RTS kommt fast kein Maschinenprogramm aus. Es ist allerdings ziemlich unbekannt, daß beide Befehle das Programm stark verlangsamen. Grund genug für uns, JSR und RTS näher zu betrachten:</p>
+
+<p>Trifft der Prozessor auf JSR, schiebt er den aktuellen Programmzähler plus 2 (= Rücksprungadresse - 1) auf den Stack und springt dann zu der Adresse, die hinter JSR steht. Trifft er auf RTS, holt er die Adresse vom Stapel zurück, erhöht sie um 1 und verwendet sie wieder als Programmzähler.</p>
+
+<p>Bemerkenswert ist, daß die Zugriffe auf den Stapel sich in keiner Weise von den Zugriffen über die Befehle PHA und PLA unterscheiden. Daher muß jedesmal der Stapelzeiger neu errechnet werden. Diese vielen Operationen sind schuld daran, daß JSR und RTS so langsam sind.</p>
+
+<p>Da wir das Problem erkannt haben, können wir damit beginnen, unser Wissen anzuwenden.</p>
+
+<h3>a)  Unterprogrammverschachtelung</h3>
+
+<p>Stellen wir uns folgendes Beispiel vor: ein Hauptprogramm ruft das Unterprogramm 1 auf. Dieses ruft an seinem Ende das Unterprogramm 2 auf, um dann mit RTS ins Hauptprogramm zurückzukehren.<br>
+Alles ziemlich schwierig, oder?</p>
+
+<p>Deshalb gehen wir mit Hilfe einer Grafik vor: In Bild 1 sehen Sie ein Flußdiagramm nach obigem Aufbau. In der Beschriftung soll »Code« nicht »Kennwort« bedeuten, sondern heißt einfach »Befehlsnummer«.</p>
+
+<p>Wie an den Pfeilen zu erkennen ist, werden zwei RTS-Befehle hintereinander abgearbeitet (von Unterprogramm 2 nach Unterprogramm 1 und von dort zum Hauptprogramm). Dies ist immer ein Indiz dafür, daß das Programm noch optimiert werden kann.</p>
+
+<p>Eine »Übersetzung« von Bild 1 in Assembler ist Listing 6: Wenn Sie dieses über »SYS 49152« starten, ist aus den ausgegebenen Texten ersichtlich, welcher Programmteil wann abgearbeitet wird.</p>
+
+<p>Sobald Sie die Strukturvon Bild 1 beziehungsweise Listing 6 verstanden haben, können wir uns mit der optimierten Form befassen, die in Bild 2 beziehungsweise Listing 7 zu finden ist.</p>
+
+<p>Hier wird das ehemalige Unterprogramm 2 ans Ende von Unterprogramm 1 gehängt (wobei es ebenfalls über JMP UP2 angesprungen werden könnte). Auf diese Weise muß es nicht über JSR aufgerufen werden, was auch einen RTS-Befehl überflüssig macht.</p>
+
+<p>Trotz dieser Änderung kann das Unterprogramm 2 auch weiterhin als Unterprogramm aufgerufen werden, da bei JSR UP2 die CPU auf einen RTS-Befehl trifft (Bild 2).</p>
+
+<p>In Listing 7 muß noch der JMP-Befehl in Zeile 480 erläutert werden:</p>
+
+<p>Dort muß nichtJSR STROUT:RTS stehen, weil am Ende der STROUT-Routine im ROM ohnehin ein RTS steht. Deshalb benötigt unser Programm keinen eigenen RTS-Befehl zur Rückkehr ins Hauptprogramm.</p>
+
+<p>Die folgende Regel gilt für Aufrufe von Betriebssystemroutinen:</p>
+
+<p>JSR $XXXX   entspricht  JMP $XXXX<br>
+RTS</p>
+
+<p>Voraussetzung ist, daß im Unterprogramm ab $XXXX keine Stapelmanipulation erfolgt, wie sie gleich beschrieben wird. Das geschilderte Verfahren zur Unterprogrammverschachtelung und die entsprechenden Regeln können Sie dann auf jede (!) Programmiersprache übertragen.</p>
+
+<h3>b)  Stapelmanipulation</h3>
+
+<p>Wenn Sie »Exbasic Level II« kennen, wissen Sie sicher den Befehl »DISPOSE RETURN« zu schätzen. Er dient dazu, ein Unterprogramm ohne RETURN abzuschließen. Dadurch kann dieses zum Beispiel über GOTO verlassen werden.</p>
+
+<p>In Assembler ist dies auch möglich. Die Befehlseingabe</p>
+
+<p>PLA<br>
+PLA</p>
+
+<p>entspricht in der Wirkung »DISPOSE RETURN«.</p>
+
+<p>Da die Rücksprungadresse auf den Stapel abgelegt wird und dort 2 Byte in Anspruch nimmt, kann sie über PLA:PLA wieder vom Stapel geholt werden. Ein Unterprogramm ist nach PLA:PLA eigentlich kein Unterprogramm mehr, sondern Bestandteil des aufrufenden Programms. PLA:PLA findet vor allem in der Fehlerbehandlung Anwendung. An einem späteren Listing werden wir dies noch sehen. Nach PLA:PLA kann ein Unterprogramm über JMP verlassen werden. Dies machen wir uns zunutze, um den Rücksprung an eine beliebige Adresse zu simulieren. Dies ist sonst nicht möglich, da bei RTS immer hinter den Befehl gesprungen wird, der das Unterprogramm aufgerufen hat.</p>
+
+<p>Ein RTS an eine beliebige Adresse müßte »RTS XXXX« heißen, doch diesen Befehl gibt es beim 6510 nicht. So wird er aber simuliert:</p>
+
+<p>PLA ;   holt Rücksprungadresse<br>
+PLA ;   vom Stapel und<br>
+JMP $XXXX   ; springt nach $XXXX</p>
+
+<p>So sieht ein Makro dazu aus:</p>
+
+<p>-.MA RTS (RUECKSPRUNGADRESSE)<br>
+- PLA<br>
+- PLA<br>
+- JMP RUECKSPRUNGADRESSE<br>
+-.RT</p>
+
+<p>Und noch ein Mangel der Unterprogrammbefehle soll beseitigt werden: Obwohl es JMP (indirekt) gibt, kennt der 6510 keinen Befehl wie JSR (indirekt); über Stapelmanipulation ist dies dennoch möglich (siehe dazu auch im 64’er, Ausgabe 1/86: Assembler-Bedienung leicht gemacht).</p>
+
+<p>Nehmen wir an, im Vektor $14/$15 steht die Adresse $C000. Nun soll über den $14/$15-Vektor ein Unterprogramm aufgerufen werden (also das ab $C000). Bild 3 zeigt, was im einzelnen geschehen muß.</p>
+
+<p>Die Rücksprungadresse steht zwar in Bild 3 direkt hinter dem JMP ($0014)-Befehl, kann aber auch anderswo im Programm stehen.</p>
+
+<p>Folgendes Makro ermöglicht die Simulation von JSR (indirekt):</p>
+
+<p>-. MAJSRIND(VEKTOR, RUECKSPRUNGADRESSE)<br>
+- LDA #>(RUECKSPRUNGADRESSE-1)<br>
+- PHA<br>
+- LDA #&lt;(RUECKSPRUNGADRESSE-1)<br>
+- PHA<br>
+- JMP (VEKTOR)<br>
+-. RT</p>
+
+<p>Diese Simulation von JSR ($XXXX) verwendet auch der SYS-Befehl (disassemblieren Sie von $E12A bis $E155 und betrachten Sie dazu Bild 3).</p>
+
+<p>Zuerst holt er die Zahl nach SYS in die Adressen $14/$15, dann legt er die Rücksprungadresse ($E147) -1 auf dem Stack ab. Nun holt er die Register P, A, X, Y aus den Adressen $030F, $030C, $030D, $030E. Es folgt ein indirekter Sprung über $0014/$0015.</p>
+
+<p>Nach dem Rücksprung werden die Register wieder im Speicher dort abgelegt, woher sie genommen wurden und ein Sprung ins Basic wird durchgeführt.</p>
+
+<p>Später werden wir noch eine weitere Möglichkeit für JSR (ind) kennenlernen, die aber nicht auf Stapelmanipulation beruht.</p>
+
+<h3>c)  Vergleich zwischen Unterprogramm und Makro bezüglich Geschwindigkeit</h3>
+
+<p>Wenn Sie den Hypra-Ass (oder einen anderen Makro-Assembler) besitzen, haben Sie die Möglichkeit, Befehlsfolgen als Makros zu definieren. Makros sind deswegen so beliebt, wei! sie den größten Vorteil von Unterprogrammen bieten, nämlich Übersichtlichkeit. Da Makros aber wie »normale« Befehle im Speicher stehen, entfällt der Aufruf über JSR und RTS. Dies ist der Grund, weshalb Makros etwas schneller (wenige Taktzyklen) als Unterprogramme sind. Das Problem, wann Makros und wann Unterprogramme vorteilhaft sind, wird später noch aufgegriffen.</p>
+
+<h2>5.   Tabellen</h2>
+
+<p>lm allgemeinen Sprachgebrauch werden Tabellen als »geordnete Zusammenstellungen von Daten« verstanden. Diese Funktion haben sie auch in Computerprogrammen, wo man sie daran erkennt, daß Tabellen keinen Befehlscharakter haben.</p>
+
+<p>SMON-Benutzer können mit »FT« ein Programm nach Tabellen durchsuchen lassen; dann sucht SMON im Programm nach Bytes, die nicht zu Maschinensprachebefehlen gehören.</p>
+
+<p>Wozu werden nun Tabellen verwendet?</p>
+
+<p>In der Regel dienen Tabellen einem Computerprogramm als »elektronischer Rechenschieber«. So wie das Kopfrechnen durch einen Rechenschieber ersetzt werden kann, weil man nur in einer geordneten Zusammenstellung von Ergebnissen das richtige suchen muß, kann ein Programm aus seinen Tabellen denselben Nutzen ziehen: die Berechnungen entfallen, die Programmierung wird einfacher.</p>
+
+<p>Aus den weniger erforderlichen Berechnungen entsteht ein deutlicher Geschwindigkeitszuwachs, der Hauptvorteil von Tabellen. Wie man Tabellen einsetzt, erfahren Sie im folgenden.</p>
+
+<h3>a)  Tabellen aus Rechenergebnissen</h3>
+
+<p>Noch einmal zum Rechenschieber. Es geht beim Kopfrechnen viel schneller, 4x10 auszurechnen als 4x7. Bei einem Rechenschieber besteht kaum ein Unterschied in der »Rechenzeit«.</p>
+
+<p>Dementsprechend existiert fast kein Algorithmus, dessen Ausführungszeit bei unterschiedlichen Parametern immer gleich bliebe. Wer den Artikel »Dem Klang auf der Spur (5)« (64’er, Ausgabe 5/85, Seite 152 ff.) gelesen hat, weiß, welch grobe Differenzen bei Multiplikationen auftreten können.</p>
+
+<p>Ersetzt (beziehungsweise unterstützt) man einen Algorithmus durch eine Multiplikationstabelle, fällt eine einheitlichere (und kürzere) Ausführungszeit an.</p>
+
+<p>Für das Rechnen mit einzelnen Bits in einem Byte werden oft die Zweierpotenzen benötigt; es empfiehlt sich, diese als Tabelle anzulegen:</p>
+
+<p>1000 -; Zweierpotenzen als Tabellle<br>
+1010 -; im DOS der Floppy 1541 ab $EFE9<br>
+1020 -; zu finden<br>
+1030 -; ZWEIPOT .BY2↑O, 2↑1, 2↑2, 2↑3, 2↑4, 2↑5, 2↑6, 2↑7</p>
+
+<p>Folgende Unterroutine legt im Akkumulator den Wert 2tA ab, wobei mit A der Inhalt des Akkumulators bei Aufruf der Routine gemeint ist:</p>
+
+<p>10000 -;<br>
+10010 -; Subroutine zur Berechnung von<br>
+10020 -; 21A (Ergebnis kommt in den Akku)<br>
+10030 -;<br>
+10040 - TAX ; Akku in Indexregister<br>
+10050 - LDA ZWEIPOT,X; aus Tabelle einlesen<br>
+10060 - RTS ; Das war’s schon! Wer ein schnelleres und zugleich so einfaches Verfahren kennt, möge sich melden&hellip;<br>
+10070 - ZWEIPOT .BY 2↑0,2↑1,2↑2,2↑3,2↑4,2↑5,2↑6,2↑7</p>
+
+<p>Wenn A größerals 7 ist, liefert das Programm falsche Werte. Sie können es noch erweitern, wenn Sie es für nötig halten.</p>
+
+<h3>b)  Tabellen aus Fließkommawerten</h3>
+
+<p>Zu den zeitraubendsten Operationen gehört die Rechnung mit Fließkommazahlen. Daß diese selbst in Maschinenprogrammen lähmend wirkt, sehen Sie am HiRes-3-Befehl »FUNKT« (64’er, Ausgabe 3/85, Grafikkurs-Anwendung). Daher sollte man nur dann auf die Fließkommaroutinen zugreifen, wenn es unvermeidbar ist. Berechnen Sie soviele Werte wie möglich voraus, hierfür eignet sich der Direktmodus des Basic-Interpreters besonders gut! Wie Sie einen auf diese Weise berechneten Wert ins MFLPT-(Floating Point)Format umwandeln können, zeigt Ihnen der folgende Kasten.</p>
+
+<p>Verfahren zur Umwandlung einer Zahl ins MFLPT-Format</p>
+
+<ol>
+<li>SMON (oder anderen Monitor) laden</li>
+<li>RESET auslösen oder NEW eingeben</li>
+<li>»XX = Fließkommazahl« eingeben, zum Beispiel »XX = 1.23456«</li>
+<li>Monitor starten (SYS 49152)</li>
+<li>»M 0805 0809« eingeben</li>
+</ol>
+
+
+<p>Sie sehen nun in den Adressen $0805 - $0809 die MFLPT-Darstellung der Zahl, mit der Sie die Variable XX belegt haben.</p>
+
+<p>Damit wir uns unter Zuhilfenahme präziser Fachausdrücke und Abkürzungen verständigen können, sollten Sie den Abschnitt in »Assembler ist keine Alchimie« aufmerksam lesen, der sich mit Fließkommazahlen befaßt. Nach dem Studium dieses Abschnitts sollten Ihnen Begriffe wie »MFLPT«, »FAC« oder »ARG« geläufig sein.</p>
+
+<p>Im Falle der Zahl 1.23456 erhalten wir als Ergebnis:</p>
+
+<p>:0805 81 1E06 0FE5&hellip;</p>
+
+<p>Diese Werte legen wir folgendermaßen als Tabelle ab:</p>
+
+<p>540 -BSPZAHL .BY $81, $1E, $06, $0F, $E5</p>
+
+<p>Wie wir nun diese Zahl verarbeiten, zeigt Ihnen Listing 8. Das Makro (200 - 240) stützt sich auf die Interpreter-Routine MEMFAC, die eine Zahl (Adresse wird in Akku/Y-Register übergeben) vom Speicherformat MFLPT in den FAC als FLPT-Zahl schreibt und dabei die erforderliche MFLPT-—FLPT-Umwandlung durchführt.</p>
+
+<p>In der Tabelle in Zeile 540 können Sie beliebige Fließkommawerte (sofern Sie diese wie angegeben berechnet haben) einsetzen, das Programm rechnet dann mit der jeweiligen Fließkommazahl, die ab BSPZAHL im MFLPT-Format steht.</p>
+
+<p>Diese Zahl wird zunächst nur in den FAC geladen und der FAC wird dann ausgedruckt (270 - 290), dann wird die Zahl wieder geholt, die Wurzel berechnet und ausgegeben (310-350). Schließlich wird die Zahl wieder in den FAC geholt, der natürliche Logarithmus errechnet und auch ausgegeben (370-410).</p>
+
+<p>Zur Routine FACOUT sind, außer daß sie den Inhalt des FAC ausgibt, noch zwei Bemerkungen zu machen:</p>
+
+<ol>
+<li>Nach der Zahl wird noch ein CARRIAGE RETURN ausgegeben.</li>
+<li>Nach dem Aufruf von FACOUT hat sich der Inhalt des FAC aufgrund mehrerer Divisionen durch Zehnerpotenzen verändert.</li>
+</ol>
+
+
+<p>Auf das Thema »Fließkommaarithmetik« geht Texteinschub 1 noch näher ein. Dort werden auch weitere Interpreter-Routinen vorgestellt.</p>
+
+<h3>c)  Sprungtabelle</h3>
+
+<p>Beim Thema »Unterprogramme« wurde Ihnen eine Methode vorgestellt, um JSR (ind) zu simulieren. Diese erweistsich in Verbindung mit einer Tabelle, in der die Sprungadressen gespeichert sind, als sehr nützlich. So kann beispielsweise eine Parallele zum Basic-Befehl ON&hellip;GOSUB ZIEL1,ZIEL2&hellip;. geschaffen werden.</p>
+
+<p>Ein Beispiel: Wenn der Basic-Interpreter auf einen Basic-Befehl trifft, holt er aus der Tabelle $AOOC - $A09D die Adresse der zugehörigen Routine. Diese springt er dann durch Stapelmanipulation an.</p>
+
+<p>Der SMON arbeitet genauso: Seine Sprungtabelle liegt im Bereich $C02B - $C06B.</p>
+
+<p>Die Anwendung von Sprungtabellen werden wir noch ausführlich im folgenden Abschnitt d) sowie bei der Besprechung von Listing 11 behandeln.</p>
+
+<h3>d)  Vergleichstabellen</h3>
+
+<p>Weder der SMON noch der Basic-Interpreter benutzen zum Suchen der zum jeweiligen Befehl gehörenden Routine eine Reihe von CMP-Abfragen mit BRANCH-Befehlen. Auch für die Vergleichswerte (in diesem Fall die Befehlswörter) gibt es eine Tabelle: Beim SMON liegt sie im Bereich $COOB -$C02A, beim Basic-Interpreter $A09E - $A327.</p>
+
+<p>Sprung- und Vergleichstabellen sind in gleicher Befehlsfolge angeordnet; wird der Befehl an einer bestimmten Stelle in der Vergleichstabelle gefunden, erfolgt ein Sprung an die Adresse, die an gleicher Stelle in der Sprungtabelle steht. So sehen die Befehls- und Vergleichstabellen im SMON aus:</p>
+
+<p>TODO TABLE</p>
+
+<p>Die Sprungadressen sind wegen der Stapelmanipulation in der Tabelle ab $C02B um 1 dekrementiertgespeichert; in der Darstellung sehen Sie aber das tatsächliche Sprungziel.</p>
+
+<p>Wir werden jetzt anhand des SMON die Verwendung einer Vergleichs-Sprungtabelle in Assembler erläutern.</p>
+
+<p>Wenn wir die zum Befehl » # « gehörende Sprungadresse finden wollen, gehen wir folgendermaßen vor:</p>
+
+<ol>
+<li>Wir suchen in Reihe 2 das # -Zeichen.</li>
+<li>Wir gehen (in derselben Spalte) eine Reihe nach unten und finden dort die Sprungadresse ($C92C).</li>
+</ol>
+
+
+<p>Der Computer hat nicht die Möglichkeit, direkt eine Reihe weiter unten die Suche fortzusetzen. Er muß einen Umweg wählen und sich die Spalte merken. Ein Beispiel:</p>
+
+<ol>
+<li>Der SMON sucht unter den Elementen aus Reihe 2 das »#«. In einem Zähler merkt er sich die Spalte, in der der Befehl gefunden wurde.</li>
+<li>Nun sucht er in Reihe 3 in der Spalte, die im Zähler steht, die zugehörige Sprungadresse.</li>
+</ol>
+
+
+<p>Wie ähnlich beide Suchvorgänge sind, erkennen Sie daran, daßjedesmal die Hauptschritte 1. und 2. vorkommen.</p>
+
+<p>Nach so viel Theorie sehen wir uns nun umso ausführlicher die Routine im SMON an, die für die Steuerung der Vergleichs-Befehlstabelle verantwortlich ist. Dazu können Sie »D C303 C323« eingeben.</p>
+
+<p>Bei Adresse $C303 steht im Akku der ASCII-Code des Kommandos, das der SMON ausführen soll (zum Beispiel $40, wenn ein M-Befehl eingegeben wurde).</p>
+
+<p>TODO TABLE/CODE</p>
+
+<p>Damit haben wir SMONs Schleife zum Suchen eines Befehls und dessen Routine durchleuchtet. Sofern Sie ein ROM-Listing zur Verfügung haben, können Sie sich zusätzlich die entsprechenden Stellen im Basic-Interpreter an|sehen. Dieser aber benötigt wegen seiner unterschiedlich langen Befehle einen etwas komplizierteren Suchalgorithmus, was wiederum zu erheblich höherer Ausführungszeit beiträgt.</p>
+
+<h2>6.   Vergleiche von Prüfsummen</h2>
+
+<p>Nun lernen wir ein besonders raffiniertes Vergleichsverfahren kennen:</p>
+
+<p>Wie gesagt, benötigen Vergleiche mit Wörtern, die aus unterschiedlich vielen Zeichen bestehen, mehr Taktzyklen. Dies wäre nicht so, wenn wir alle Zeichen auf eine einheitliche Länge bringen würden. Genau dies tut der Basic-Interpreter: Bei Eingabe einer Zeile wandelt er alle Basic-Befehlswörter in Token um. Jedes Token vertritt einen Befehl und kann, da es nur ein Byte benötigt, schneller erkannt werden, als es bei mehreren Bytes möglich wäre.</p>
+
+<p>Ein Nachteil ist jedoch der Speicherplatzaufwand; für die Umwandlung müssen die Befehle irgendwo im Speicher in Langform vorhanden sein.</p>
+
+<p>Es gibt aber noch ein anderes Verfahren, einer Zeichenkette einen Wert zuzuweisen: Die Prüfsummenberechnung. Dieseführen zum Beispiel die Eingabehilfen »Checksummer« und »MSE« durch: Aus 8 Byte Programmcode und 2 Byte Adresse errechnet der MSE eine 1 Byte Prüfsumme.</p>
+
+<p>In Bild 4 sehen Sie einen sehr zuverlässigen Algorithmus zur Berechnung von Prüfsummen (insofern zuverlässig, als er sehr unterschiedliche Prüfsummen ermittelt). Listing 9 stellt ein Hilfsprogramm dar, das zu einer Eingabe die Prüfsumme nach dem Algorithmus aus Bild 4 errechnet.</p>
+
+<p>In Listing 9 ist Ihnen eventuell die Routine NUMOUT nicht bekannt. Daher eine Kurzbeschreibung: NUMOUT gibt eine positive Integerzahl, die im Akkumulator (High-Byte) und im X-Register (Low-Byte) übergeben wird, aus. NUMOUT wird zum Beispiel von der LIST-Routine bei der Ausgabe einer Zeilennummer aufgerufen.</p>
+
+<p>Die Routine BASIN soll ebenfalls erklärt werden, da sie in allen folgenden Programmen verwendet werden wird. Wenn die Routine BASIN zum ersten Mal aufgerufen wird, erwartet das Betriebssystem eine Eingabe (normalerweise von Tastatur), die der Eingabe einer Basic-Zeile entspricht. Nach der Eingabe wird das erste eingegebene Byte in den Akku geladen, jeder weitere Aufruf von BASIN holt das nächste Zeichen in den Akku. Wurden alle Bytes eingelesen, wird im Akku der Wert 13 ($0D, RETURN) übergeben. Danach führt ein weiterer Aufruf von BASIN zu erneuter Eingabe von Tastatur.</p>
+
+<p>Ein großer Vorteil von Prüfsummen ist, daß die Vergleiche mit nur einem Byte, nämlich der Prüfsumme, durchgeführt werden müssen.</p>
+
+<p>Wie man in den Genuß dieses Vorteils kommt, zeigt Listing 10. Wenn Sie den Namen eines Computers (C 64, VC 20, PC 128 oder AMIGA) eingeben, nennt das Programm den in diesem Computer installierten Mikroprozessor. Bei der Eingabe der Computernamen kann man aufgrund der Zeilen 230 und 248 beliebig viele Leerzeichen eingeben. Bei der Errechnung der Prüfsummen mit Listing 9 dürfen allerdings keine eingegeben werden, da Listing 9 diese nicht überliest und somit ein falsches Ergebnis liefern würde.</p>
+
+<p>Der Programmteil, der die Prüfsumme der Eingabe berechnet, ist mit Ausnahmen der Zeilen 230/240 aus Listing 9 übernommen worden. Nach Zeile 450 wird die ermittelte Prüfsumme mit der Tabelle »PRÜFSUMMEN« (Zeile 2060) verglichen.</p>
+
+<p>Bei »WEITER2« (Zeile 620) steht im X-Register die Spalte, in der die Prüfsumme gefunden wurde. Listing 10 numeriert, im Gegensatz zum SMON die Spalten mit 0 (statt mit 1) beginnend. Außerdem wurde die Adressentabelle in »LOWTAB« (Tabelle der Low-Bytes) und »HIGHTAB« (High-Bytes) zerlegt, was die Programmierung stark erleichtert.</p>
+
+<p>Wir würden zwar Spalten von 1 an numerieren, für den Computer ist es aber besser, mit Spalte 8 zu beginnen. Wenn im X-Register die Spalte (0: VC 20,1: C 64, 2: PC 128, 3: AMIGA) steht, lesen die Zeilen 620/630 aus einer Tabelle die Adresse, ab der die ASCII-Darstellung des Prozessors zu finden ist. Weil jede der Tabellen »LOWTAB« und »HIGHTAB« gleich viele Elemente wie die Tabelle »PRUEFSUMMEN« hat, muß keine komplizierte Umwandlung über Multiplikation mit 2 oder ähnliches erfolgen wie beispielsweise beim SMON.</p>
+
+<p>Auf eine akute Gefahr bei der Verwendung von Prüfsummen soll jetzt hingewiesen werden: die »Überschneidung von Prüfsummen«:</p>
+
+<p>So wie unterschiedliche Basic-Zeilen beim Checksummer eine gleiche Prüfsumme haben können, sind Prüfsummen nie eindeutig.</p>
+
+<p>Wenn Sie bei Listing 10 etwas herumprobieren, werden Sie sicher feststellen, daß auch eigentlich nicht vorgesehene Eingaben Wirkung zeigen. Dies liegt daran, daß diese Eingaben die gleiche Prüfsumme wie die Taste »VC 20«. »C 64«, »PC 128« oder »AMIGA« haben. Daher sollte man immer darauf achten, daß sich die vorgesehenen Eingaben nicht in ihren Prüfsummen überschneiden (das heißt, die gleichen Prüfsummen haben). Wenn man dies aber beachtet, so ist das Arbeiten mit Prüfsummen, vor allem bei kleineren Datenmengen, eine angenehme Sache.</p>
+
+<h3>e)  Beispielprogramm für Tabellen</h3>
+
+<p>Wenden wir uns jetzt einem etwas größeren (aber keineswegs komplizierteren) Programm zu. Es heißt schlicht und einfach »TABELLEN-BEISPIEL«, womit schon einiges über die Funktion ausgesagt ist: ein reines Beispielprogramm, das nicht den Anspruch erhebt, etwa als Anwendersoftware nützlich zu sein. In Listing 11 finden Sie den kommentierten Quelltext.</p>
+
+<p>Zuerst soll die Bedienung des Programms erläutert werden. Gestartet wird »TABELLEN-BEISPIEL« durch SYS 49152, worauf man sich in folgendem Menü befindet:</p>
+
+<p>ZAHLINZAHLWORTWANDELN (0)<br>
+BILDSCHIRMFARBE (1)<br>
+RESETAUSLOESEN (2)<br>
+PROGRAMMENDE UEBER RTS (3)<br>
+BITTE AUSWAEHLEN!</p>
+
+<p>Die Zahlen in Klammern sehen Sie nicht, diese zeigen nur die interne Numerierung der Menüpunkte an.</p>
+
+<p>Der jeweils angewählte Menüpunkt (unmittelbar nach dem Start: 0) wird im Gegensatz zu den anderen revers hervorgehoben.</p>
+
+<p>Der angewählte Menüpunkt kommt durch Drücken von F1,RETURN, »—« - oder »=«-Taste zur Ausführung.</p>
+
+<p>Wollen Sie einen anderen Menüpunkt anwählen, drücken Sie einfach CRSR DOWN, »D«,F5 oder »+«, um den invertierten Bereich nach unten zu bewegen. Weiter nach oben gelangen Sie über CRSR UP, »U«, F3 oder »-«.</p>
+
+<p>Wenn Sie von »3« aus nach unten wollen, geht es wieder bei »0« los; von »0« nach oben führt auf Punkt »3«.</p>
+
+<p>Auf Punkt »0« (Ausgangseinstellung) kommen Sie über HOME,»0« oder Klammeraffe.</p>
+
+<p>Sicher würden Sie Ihre Programme auch gerne mit einem solch komfortablen Menü aufwerten. Wenn Sie die Beschreibung des Quelltextes gut durchlesen, wird dies keine Schwierigkeiten bereiten.</p>
+
+<p>Nun zu den einzelnen Menüpunkten.</p>
+
+<p>»2« (Reset auslösen) springt in die RESET-Routine ab $FCE2. »3« (Programmende über RTS) bewirkt einen Rücksprung ins Basic. Wenn Sie aber »TABELLEN-BEISPIEL« vom Hypra-Ass aus gestartet haben, finden Sie sich im »AUTO-NUMBER«-Modus wieder. Dies ist weder ein Fehler von »TABELLEN-BEISPIEL« noch von Hypra-Ass, sondern liegt daran, daß beide Programme eine bestimmte Adresse verwenden, die Hypra-Ass dann als Aufforderung zur automatischen Zeilennumerierung wertet. Am besten starten Sie »TABELLEN-BEISPIEL« nur vom normalen Basic aus.</p>
+
+<p>Punkt »0« bittet Sie um Eingabe einer Zahl von 0 bis 9 und gibt zur eingegebenen Zahl das Zahlwort aus. Beispiel: Eingabe »0«, Ausgabe »NULL«.</p>
+
+<p>Danach müssen Sie eine Taste drücken, um ins Hauptmenü zu kommen.</p>
+
+<p>Punkt »1« schließlich bietet die Möglichkeit, die Hintergrundfarbe besonders elegant einzustellen: Sie geben einfach die Farbe als Wort ein, zum Beispiel SCHWARZ.</p>
+
+<p>Folgende Eingaben sind vorgesehen:<br>
+SCHWARZ, WEISS, ROT, TUERKIS, VIOLETT, GRUEN, BLAU, GELB, ORANGE, BRAUN, HELLROT, GRAU 1, GRAU 2, HELLGRUEN, HELLBLAU, GRAU 3</p>
+
+<p>Aufgrund der Überschneidung von Prüfsummen zeigen jedoch auch andere Eingaben Wirkung, zum Beispiel:<br>
+SCH, HYPRAASS, PRINT, COMPUTER-GRAPHIK, TAGESSCHAU</p>
+
+<p>Nun wollen wir uns mit dem Quelltext befassen.</p>
+
+<p>Ab Zeile 10000 finden Sie die Tabellen. Und weil unser Programm ein Beispiel für die Verwendung von Tabellen sein soll, sind es derer recht viele. Die wichtigsten davon sind jedoch analog der internen Numerierung der Menüpunkte aufgebaut, da sie Daten für die Menüsteuerung beinhalten. Diese Tabellen sind auch mit 0 - 3 numeriert und grafisch in Bild 6 dargestellt.</p>
+
+<p>Sehen wir uns wieder den Quelltext, beginnend mit der ersten Zeile, an.</p>
+
+<p>Auf die Symboldefinitionen (210 - 260) folgt die Initialisierung der Hauptschleife (280 - 310). Diese Initialisierung löscht Bildschirm (280) und Tastaturpuffer (290 - 300). Außerdem wird der aktuelle (= derzeit invers dargestellte) Menüpunkt (immer in der Adresse »MPT« enthalten) auf 0 gesetzt (310). Zeile 310 ist also dafür verantwortlich, daß nach dem Start über SYS 49152 das Inversfeld ganz oben steht (auf Punkt 0).</p>
+
+<p>Die Texte, die der Beschreibung der Menüpunkte dienen, werden in der Hauptschleife »HSCHLEIFE« (350 - 550) ausgegeben. Mit dieser wollen wir uns nun eingehend auseinandersetzen.</p>
+
+<p>Zunächst wird die Tabelle »RVSTAB« gelöscht (350 - 400). Diese Tabelle enthält die Information, ob der erläuternde Text zu einem Menüpunkt invers ausgegeben wird. Wenn nein, so enthält das entsprechende Byte eine »0«, andernfalls eine »18« (= REVERS-ON-Code für Betriebssystem). Das entsprechende Byte aus »RVSTAB« braucht nur vor dem Menüpunkt-Text ausgegeben werden (470- 480). Die Zeilen 410- 430 sorgen dafür, daß das Byte in »RVSTAB«, welches sich auf den aktuellen Menüpunkt bezieht, den RVS-ON-Code erhält.</p>
+
+<p>In der Hauptschleife muß das X-Register in »XSAVE« gesichert werden, weil die Routine »STROUT« den Inhalt des X-Registers ändert.</p>
+
+<p>Mit »TASTE« (610) beginnt dann die Tastaturabfrage im Menü. Die Routine »GET« holt ein Zeichen von der Tastatur als ASCII-Code in den Akku. Wurde keine Taste gedrückt, erhält der Akku den Code 0. In diesem Fall wartet 620 auf eine neue Eingabe. Beachten Sie bitte, daß der Akku nach der Zeile 620 NIE den Wert 0 haben kann (dies wird sich bald als nützlich erweisen)!</p>
+
+<p>Wurde nun eine Taste gedrückt, sucht »SCHLEIFE« (630 -680) in der Tabelle »TASTEN«, die im Quelltextab Zeile 10210 steht, nach dem eingegebenen Zeichen (wird es nicht gefunden, erfolgt in 690 der Sprung zur neuen Eingabe).</p>
+
+<p>Diese Tabelle »TASTEN« enthält alle vorgesehenen Tastendrücke zur Menüsteuerung, die in 4er-Blockweise angeordnet sind (Bild 5). Nach der Suchschleife steht im X-Register die Position der gedrückten Taste innerhalb der Tabelle »TASTEN« (zum Beispiel 0 = F1 gedrückt, 4 = HOME gedrückt). Diese Position wird - ohne Berücksichtigung des Divisions-Restes - durch 4 dividiert (700 - 730), um festzuhalten, von welchem Tastenblock eine Taste gedrückt wurde.</p>
+
+<p>Dadurch ist eindeutig bestimmt, welche Befehlsgruppe aufgerufen werden muß.</p>
+
+<p>Steht nach 730 im X-Register 0, wurde eine der ersten vier in »TASTEN« enthaltenen Tasten gedrückt, die die Ausführung des aktuellen Menüpunktes veranlassen (Zeile 10210 und Bild 5). Ist X=1, so wurde eine Taste aus Zeile 10220 gedrückt. In 10220 stehtals letztes Byte eine 0. Diese dient, da für die Funktion »Inversfeld in HOME-Position« nur drei Tastendrücke vorgesehen wurden, zum Auffüllen auf vier Tasten. 0 kann hier bedenkenlos als Dummy (Füllbyte ohne wirkliche Bedeutung) stehen, da der Akku aufgrund von 620 nie den Wert 0 annehmen wird.</p>
+
+<p>Beinhaltet X nach der Division durch 4 den Wert2, wird das Inversfeld nach unten bewegt, istX=3, dann nach oben. Dies können Sie sich an Bild 6 veranschaulichen.</p>
+
+<p>An den Zeilen 740 - 870 sehen wir nun die Verwendung einer Sprungtabelle. Unsere Sprungtabelle ist »SP1LO/SP1HI«. »SP1LO« beinhaltet die Low-, »SP1HI« die High-Bytes der anzuspringenden Routinen. In den Vektor »SPRUNG« wird einfach die Zieladresse geschrieben (740 - 770).</p>
+
+<p>Die Zuweisungszeile 790 errechnet die Rücksprungadresse des aufzurufenden Unterprogramms. Bei einem RTS soll nämlich zur »HSCHLEIFE« gesprungen werden.</p>
+
+<p>Diese Rücksprungadresse »RUECKSPRUNG« wird auf den Stapel gelegt (830 - 860), zuletzt erfolgt der indirekte Sprung (870). Die über die soeben beschriebene Simulation von JSR (ind) angesprungenen Routinen finden Sie ab Zeile 900. Es wird einfach der aktuelle Menüpunkt »MPT« entsprechend dem Tastendruck geändert, dann wird zur »HSCHLEIFE« gesprungen, die auch die Tabelle »RVSTAB« entsprechend anpaßt.</p>
+
+<p>»EXEC« (1090) holt die Rücksprungadresse vom Stapel (1090 - 1100), da diese Routine nicht als Unterprogramm behandelt werden soll.</p>
+
+<p>Die Zeile 1110 holt den angeforderten Menüpunkt ins X-Register. Dann wird aus »SP2LO/SP2HI« die Adresse der zum Menüpunkt gehörenden Routine geholt und diese über einen gewöhnlichen indirekten Sprung aufgerufen (1160).</p>
+
+<p>Als Routine zu »2« wird einfach die RESET-Routine des Betriebssystems angesprungen, für »3« eignet sich jeder RTS-Befehl, also auch der bei »ENDE« (920).</p>
+
+<p>»ZAHLWORT«, die Routine zu 0, holt eine Zahl als ASCII-Code (1230) und wandelt sie in einen numerischen Wert um (1240 -1250), indem der ASCII-Code von 0 abgezogen wird. Das Ergebnis landet im X-Register (1260). Ob auch eine Zahl eingegeben wurde, prüfen die Zeilen 1310 - 1330. Bei »ZAHLWORT« (1350) wird das Resultat der Subtraktion in »XSAVE« gesichert, der Text »IN WORTEN« ausgegeben und das X-Register wieder geholt.</p>
+
+<p>Die Tabelle »ZWLO/ZWHI« enthält die Adressen, ab denen die Texte der Zahlwörter als ASCII-Code stehen. Aus »ZWLO/ZWHI« wird dann diese Adresse geholt (1400 -1410) und der dort stehende Text ausgegeben (1420). Danach erwartet das Programm noch einen Tastendruck (1440-1450), bevor ins Hauptmenü verzweigt wird (1460).</p>
+
+<p>Als letzte Routine wird »FARBE« besprochen (1500-1850): Hierzu istjedoch aufgrund derÄhnlichkeitzu Listing 10 nicht viel zu erläutern. Bei 1820 steht im X-Register der Code der eingegebenen Farbe (= Position der Prüfsumme innerhalb der Tabelle »PRUEFSUMMEN«). Dieser muß nur noch in die entsprechenden VIC-Register geschrieben werden (1820-1830). Ab Zeile 10000 stehen dann die Tabellen. Wenn Sie die Tabellen angesehen haben, sollten Sie durchaus noch einmal den Quelltext bis 10000 betrachten und die hier endende Beschreibung des Programms lesen. Denn wenn Sie das Programm »TABELLEN-BEISPIEL« ganz verstanden haben, sind Sie einen großen Schritt in der Assemblerprogrammierung weitergekommen I</p>
+
+<p>Ich könnte mir übrigens vorstellen, daß Sie in Ihren eigenen Programmen jetzt auch eine Menüsteuerung wie die in »TABELLEN-BEISPIEL« einbauen; wie das geht, können Sie dem Programm »TABELLEN-BEISPIEL« entnehmen.</p>
+
+<p>Eine Anmerkung ist wichtig: »TABELLEN-BEISPIEL« kann noch weiter verbessert werden. Sie werden sehen, daß viele Stellen noch optimiert werden können. Insbesondere der Speicherplatzbedarf kann verringert werden.</p>
+
+<h3>f)  Weitere Anregungen zur Anwendung von Tabellen</h3>
+
+<p>Auch die bisherigen Erläuterungen und das Beispielprogramm können die Kreativität des Programmierers nicht ersetzen, sondern nur die Programmierung erleichtern. Aus diesem Grund möchte ich Ihnen noch einige Beispiele nennen, wie sich Tabellen sinnvoll verwerten lassen.</p>
+
+<ul>
+<li>Ein Anwenderprogramm, das aus Menüs und Untermenüs besteht, sollte in einer Tabelle die Adressen der Menüs/Untermenüs speichern.</li>
+<li>Spiele müssen oft viele Spritebewegungen, die immer gleich sind, durchführen. Es empfiehlt sich, die Spritebewegungen als Koordinaten in einer Tabelle abzulegen.<br>
+-Bei Software-Interfaces müssen viele Umrechnungen<br>
+erfolgen. Durch eine Umwandlungstabelle können diese stark beschleunigt werden.</li>
+<li>Naturwissenschaftlich orientierte Programme müssen verschiedene Maße umrechnen. Die Umrechnungswerte können in einer Tabelle untergebracht werden.</li>
+</ul>
+
+
+<p>Dies soll nur eine Anregung sein. Ich wüßte aber kein komplexes Programm, das sich nicht durch den gezielten Einsatz von Tabellen vereinfachen und beschleunigen ließe.</p>
+
+<h3>Texteinschub #1: Fließkommazahlen</h3>
+
+<p>Im Text wurde ein Verfahren vorgestellt, um eine Zahl ins MFLPT-Fbrmat (MELPT=Memory floating point) umzuwandeln. Das 5 Byte lange Ergebnis dieser Umwandlung kann man dann als KONSTANTE handhaben. Konstanten sind feste, vorausberechnete Werte, die man mit Hilfe der Routine »MEMFAC« in den FAC (Flieskomma-AKKU) kopieren kann. Für viele Werte ist es jedoch überflüssig, die Umwandlung durchzuführen und eine entsprechende Tabelle anzulegen, da sie schon im ROM vorhanden sind. Im Kurs »Assembler ist keine Alchimie« wurden solche Konstanten mitsamt ihrer Adressen schon in einer Tabelle vorgestellt.</p>
+
+<p>Um mit Konstanten (für die Rechenroutinen macht es keinen Unterschied, ob diese im RAM oder im ROM stehen) zu rechnen, kann man diese wie gesagt, in den FAC kopieren und alle weiteren Operationen auf diesen beziehen. Dies war in Listing 8 bei den Funktionen SQR und LOGNAT ausreichend.</p>
+
+<p>Oft möchte man aber den Inhalt des FAC nicht mit einer Funktion wie SQR behandeln, sondern mit anderen Konstanten addieren, multiplizieren und so weiter.</p>
+
+<p>Dafür möchte ich Ihnen im folgenden weitere Interpreter-Routinen vorstellen, die das Rechnen mit Konstanten ermöglichen. Da fast immer in den Akku das Low-, ins Y-Register das High-Byte der Adresse, ab der die Konstante abgelegt ist, geladen werden muß, definieren wir noch vorher folgende Makro:</p>
+
+<ul>
+<li>.MA LDAY (ADRESSE)</li>
+<li>LDA#&lt;(ADRESSE)</li>
+<li>LDY#>(ADRESSE)<br>
+-.RT</li>
+</ul>
+
+
+<p>Nun zu den Routinen, bei deren Parameterübergabe wir uns auf das Makro LDAY stützen wollen:</p>
+
+<p>TODO TABLE</p>
+
+<p>ADDMEM  FAC+Konstante - FAC &hellip; LDAY (KONSTANTE) JSR$B867<br>
+ADD0,5  FAC+0.5 - FAC   JSR $B849<br>
+SUBMEM  Konstante-FAC - FAC &hellip;LDAY(KONSTANTE) JSR $B850<br>
+MULMEM  Konstante*FAC - FAC    &hellip;LDAY(KONSTANTE) JSR $BA28<br>
+MULT10  FAC*1O-FAC JSR $BAE2<br>
+DIVMEM  Konstante/FAC - FAC &hellip;LDAY(KONSTANTE) JSR $BBOF<br>
+DIVS10  FAC/10 - FAC    JSR $BAFE<br>
+CMPMEM  vergleicht Konstante mit FAC FAC&lt;Konstante: Akku=$FF FAC=Konstante: Akku=$OO FAC>Konstante: Akku=$O1    &hellip; LDAY (KONSTANTE) JSR $BC5B<br>
+POTMEM  Konstante tFAC - FAC    &hellip;LDAY(KONSTANTE) JSR $BF78<br>
+POTE    e↑FAC-FAC JSR $BFED<br>
+MEMFAC  holt Konstante in FAC   &hellip;LDAY(KONSTANTE) JSR $BBA2<br>
+FACMEM  FAC ab Konstante als MFLPT-Zahl ablegen LDX#&lt;(KONSTANTE) LDY#>(KONSTANTE) JSR$BBD7<br>
+FACOUT  gibt FAC aus    JSR $AABC</p>
+
+<h2>7.   Die Initialisierung</h2>
+
+<p>»Initialisierung« nennt man eine Routine, die vor einem Programmteil (meist einer Schleife) steht und diese vorbereitet. Die Initialisierung wird nur einmal, eine Schleife aber mehrfach durchlaufen. Deshalb bringt es einen Geschwindigkeitszuwachs, wenn die Initialisierung der Schleife Arbeit abnimmt.</p>
+
+<p>Ein Beispiel: Wenn ein Basic-Programm mit »RUN« gestartet wird, werden alle Variablen gelöscht, Files geschlossen und die Adressen, ab denen die Variablen abgelegt werden dürfen, errechnet. Dies ist die Initialisierung der Interpreterschleife. Dann wird Byte für Byte des Basic-Programms eingelesen und bearbeitet.</p>
+
+<p>Muß im gerade übersetzten Befehl ein Sprung (GOTO 500 oder ähnliches) durchgeführt werden, kostet dies bekanntlich viel Zeit, wenn das Sprungziel am Ende eines langen Programms steht. Dies ist darauf zurückzuführen, daß der Interpreter, beginnend mit der ersten Zeile, das ganze Programm nach der Sprungzeile durchsucht, bis er sie gefunden hat.</p>
+
+<p>Diese Berechnung der Adressen wird bei jedem »GOTO« oder »GOSUB« neu durchgeführt.</p>
+
+<p>Viel besser und schneller wäre folgende Vorgehensweise: Bei »RUN« wird zunächst eine Tabelle angelegt, in der die Adressen aller Zeilen enthalten sind. Diese Tabelle könnte zum Beispiel als Array definiert werden. Folgt nun ein Sprung, kann aus der Tabelle die Adresse der Zeile im Speicher geholt werden.</p>
+
+<p>Damit haben wir noch ein wesentliches Merkmal der Initialisierungsroutinen gefunden: Die Initialisierung kann Tabellen anlegen, die dann von der Hauptschleife verarbeitet werden.</p>
+
+<p>Aber nicht nur Tabellen können generiert werden, auch die Berechnung von Flags ist sinnvoll. So merkt sich die »LOAD/VERIFY«-Routine ($FFD5), ob ein Verifizieren oder Laden gewünscht wird. Die Ladeschleife liest dann ein Zeichen von der Floppy oder der Datasette ein und entscheidet erst anschließend, ob das Byte im Speicher abgelegt oder mit dem Speicher verglichen werden soll.</p>
+
+<p>Halten wir also fest, daß Initialisierungsroutinen Schleifen entlasten können. Näher werden wir uns damit beim Thema »Schleifen« beschäftigen.</p>
+
+<h2>8.   Die Nutzung der Zeropage</h2>
+
+<p>In jedem Assembler-Lehrbuch werden die Vorteile der Zeropage-Adressierung gepriesen. Speicherplatzersparnis und hohe Verarbeitungsgeschwindigkeit sind nicht die einzigen Vorzüge; die indirekt-indizierte Adressierung kann nur auf Zeropage-Adressen zugreifen, nicht auf absolute 16-Bit-Adressen. Damit wird der Leser aber schon alleine gelassen. Er erfährt nicht, welche Adressen in der Zeropage für die Praxis geeignet sind. Das wird nun nachgeholt.</p>
+
+<p>Fast die ganze Zeropage wird durch Basic-Interpreter und Betriebssystem belegt. Deshalb führen bestimmte Werte in Zeropage-Adressen oft zum Absturz oder sonstigem Fehlverhalten des Computers.</p>
+
+<p>Wie dies im einzelnen aussieht, erfahren Sie in der Serie »Memory Map mit Wandervorschlägen«, die im 64’er Stammheft erscheint. Nicht nur in Zweifelsfällen stellt diese Serie das optimale Nachschlagewerk dar.</p>
+
+<p>Ich möchte Ihnen nun zeigen, welche Adressen Sie als (Zwischen-)Speicher ohne Schwierigkeiten verwenden können, beziehungsweise was Sie bei Verwendung von Zeropage-Adressen beachten müssen.</p>
+
+<h3>a)  Adressen, die problemlos verwendet werden können</h3>
+
+<p>Auf die Adressen $02 und $FB - $FE wird weder vom Basic-Interpreter noch vom Betriebssystem zugegriffen. Lediglich bei Initialisierung der Arbeitsspeicher (RESET) werden Sie auf 0 gesetzt.</p>
+
+<p>Für die Praxis heißt das, daß Ihnen die genannten Adressen völlig zur Verfügung stehen.</p>
+
+<h3>b)  Adressen, die in keiner Weise verwendet werden sollten</h3>
+
+<p>Von anderen Adressen hingegen müssen wir unsere Finger lassen. Diese haben entweder elementare Funktionen für Betriebssystem oder CPU, oder werden von beiden dauernd geändert, so daß die Datensicherheit in Frage gestellt ist. Genauer soll hier nicht unterschieden werden.</p>
+
+<p>Belassen Sie die Adressen $00 und $01 unverändert, da sie (siehe Memory Map) für die CPU wichtige Informationen beinhalten und außerdem einige Bits nur durch externe Vorgänge geändert werden.</p>
+
+<p>Das Betriebssystem und der Basic-Interpreter beanspruchen alle bislang ungenannten Adressen.</p>
+
+<p>Von Bildschirmeditor und Tastaturabfrage werden die Adressen $C6 - $F6 beeinflußt. Die Adressen $90 - $C2 dienen der Ein-/Ausgabe-Steuerung mit Peripheriegeräten und der Verwaltung offener Files. Einzige Ausnahme: $A0 -$A2 (interne Uhr). Wenn ein Maschinenprogrammm in ein Basic-Programm eingebaut ist, sind die Adressen $03 - $56 sowie $73 - $8B tabu.</p>
+
+<h3>c)  Bedingt einsetzbar</h3>
+
+<p>Der Vektor $C3/$C4 wird durch RUN/STOP-Restore, RESET oder LOAD beeinflußt. Ansonsten kann mit $C3/$C4 frei verfahren werden.</p>
+
+<p>Ganz Vorsichtige können diesen Vektor auf seinen Ausgangswert $FD30 setzen, sobald das Programm die Adressen $C3/$C4 nicht mehr für eigene Zwecke benötigt.</p>
+
+<h3>d)  Adressen, die unter Verzicht auf Kassettenbetrieb verwendet werden können</h3>
+
+<p>Die folgenden Adressen können verwendet werden, wenn nicht auf RS232 oder Datasette zugegriffen wird.</p>
+
+<p>$9E/$9F, $A5-$A7, $A9-$AB, $B0-$B6, $F7-$FA</p>
+
+<p>Bei anderen Adressen, die sich auf den RS232- oder Kassettenbetrieb beziehen, ist Vorsicht angebracht.</p>
+
+<h3>e)  Geeignete Zwischenspeicher</h3>
+
+<p>Die Adressen $22-$2A und $57-$60 sind sogenannte »verschieden genutzte Arbeitsbereiche«. Sie werden vom Basic-Interpreter vor allem bei arithmetischen Operationen als Zwischenspeicher verwendet. Als solche Zwischenspeicher können wir sie auch verwenden. Sobald allerdings bestimmte Interpreterroutinen aufgerufen werden, können die Inhalte dieser Adressen verlorengehen. Eine längerfristige Aufbewahrung von Daten in diesen Adressen ist zwar nicht möglich, andererseits können wir aber durch Schreibzugriffe auf diese Adressen das Betriebssystem oder den Basic-Interpreter nicht stören.</p>
+
+<p>Zu sagen wäre noch, daß die Adressen $57 - $60 den wichtigen Routinen BLTUC und UMULT (siehe »Assembler ist keine Alchimie«) als Zwischenspeicher dienen.</p>
+
+<h3>f)  Zeropage kopieren</h3>
+
+<p>Zum Abschluß dieses Abschnittes über die Nutzung der Zeropage möchte ich Ihnen noch einen kleinen Trick verraten, der von einigen professionellen Programmen angewandt wird.</p>
+
+<p>Wir sichern die Zeropage-Inhalte in einem anderen Bereich, zum Beispiel von $6F00 an.</p>
+
+<p>Dann können wir viele Adressen in der Zeropage nutzen, sofern wir keine Interpreter- oder Betriebssystemroutine aufrufen. Danach schreiben wir die Zeropage wieder von der Kopie, zum Beispiel von $6F00, zurück und können wie gewöhnlich fortfahren.</p>
+
+<p>Die Adressen 0 und 1 kopieren wir nicht, weil diese nach wie vor für solche Zwecke nutzlos sind. Ebenso könnten wir nur einzelne Bereiche kopieren (zum Beispiel die Zeiger für Basic-Programme$16 - $4A). Dann dürfen wiraberauch nur diesen Bereich verändern. Wenn wir nun den Bereich $02 - $FF kopieren, stehen uns folgende Adressen zur Verfügung: $03-$06, $14-$86, $71-$8A, $C3/$C4, $FB-$FF Diese Adressen können Sie nur so lange verwenden, bis eine Routine des Betriebssystems oder Basic-Interpreters aufgerufen wird. Davor muß die alte Zeropage zurückgeschrieben werden. Da Sie auf diese Weise viel Speicherplatz in der Zeropage gewonnen haben, ist es sogar möglich, eine Tabelle aus Geschwindigkeitsgründen in die Zeropage zu verlegen. Damit steigt auch der Wert der indiziert-indirekten Adressierung erheblich. Dennoch ist der Speicherplatz in der Zeropage begrenzt. Überlegen Sie sich also, auf welche Werte besonders schnell zugegriffen werden muß und schreiben Sie vorzugsweise diese in die Zeropage.</p>
+
+<h2>9.   Schleifenprogrammierung</h2>
+
+<p>Zunächst befassen wir uns mit Schleifen, die maximal 256mal durchlaufen werden.</p>
+
+<h3>Typ a: Schleifen mit maximal 256 Durchläufen</h3>
+
+<p>Da 256 verschiedene Zahlen mit einem 8-Bit-Prozessor dargestellt werden können, verwendet man hier das X- (oder Y-) Register als Schleifenzähler. In Listing 12 sehen Sie die einfachste Form einer Schleife, die die Zeropage-Adressen $02 - $FF nach $6F00 kopiert.</p>
+
+<p>Da der Schleifenzähler X in Listing 12 INKREMENTIERT wird, haben wir es mit einer INKREMENTIERSCHLEIFE zu tun. Nach dem Inkrementieren (»6007 INX«) wird durch »6008 CPX # FE« überprüft, ob die Schleife beendet werden kann. Eine eingehendere Beschreibung des Programmablaufs erübrigt sich.</p>
+
+<p>Für Schleifen des Typs a (maximal 256 Durchläufe) ist es aber meist vorteilhaft, eine DEKREMENTIERSCHLEIFE zu verwenden. Wie eine solche Schleife programmiert wird, sehen wir an Listing 13.</p>
+
+<p>Listing 13 unterscheidet sich in der Wirkung nicht von Listing 12, obwohl man dies nicht unbedingt auf den ersten Blick erkennt. Deshalb soll dieses Listing näher besprochen werden. In Zeile 6000 erhält das X-Register den Inhalt $FE. Durch »6002 LDA 01,X« wird damit das letzte Byte der Zeropage, nämlich $FF, zuerst gelesen und nach $7OFE geschrieben. Dann wird X dekrementiert. Ist X noch nicht 0, so wird die Schleife erneut durchlaufen.</p>
+
+<p>Der niedrigste X-Wert innerhalb der Schleife ist folglich 1; aufgrund von »6002 LDA 01,X« ist $02 die niedrigste Zeropage-Adresse, die kopiert wird. In Listing 12 ist 0 der niedrigste X-Wert. Die niedrigste Adresse aufgrund von »6002 LDA 02,X« ist also auch $02 (stimmt auffällig). Warum $FF die höchste kopierte Zeropage-Adresse ist, können Sie nun selbst den Listings 12 und 13 entnehmen.</p>
+
+<p>Listing 14 ist eine Dekrementierschleife, die die Kopie der Zeropage wieder von $6F00 nach $02 zurückholt.</p>
+
+<p>Der Vorteil von Dekrementierschleifen beim Typ a ist, daß zum Erkennen der Abbruchbedingung (X=0) kein Vergleichsbefehl erforderlich ist, weil nach dem DEX-Befehl automatisch das Z-Flag gesetzt wird, wenn X Null wird.</p>
+
+<p>Das Entfallen des Vergleichsbefehls »CPX #« bringt eine Ersparnis von 2 Byte Speicherplatz sowie insgesamt 508 Taktzyklen Rechenzeit. Dajedoch bei 6004 eine Seitenüberschreitung (eine Seite entspricht 256 Byte) vorliegt, schrumpft der Zeitgewinn auf 254 Taktzyklen (dies ließe sich aber vermeiden, indem wir die Zeropage nach $6F01 kopieren, womit durch »6004 STA $6F00,X« keine Seitenüberschreitung auftreten würde).</p>
+
+<p>Nun wollen wir noch einen Sonderfall behandeln:</p>
+
+<p>Dekrementierschleifen vom Typ a, bei denen der Ausgangswert für X &lt; 129 ist.</p>
+
+<p>In Listing 15 sehen Sie eine Schleife, die den Bereich $16 - $4A nach $6F00 kopiert, Listing 16 schreibt die Werte von $6F00 zurück nach $16. Selbstverständlich hätten wir das Problem auch so lösen können wie in Listing 13. Wir wollen aber noch eine andere Konstruktion von Dekrementierschleifen kennenlernen, die in diesem Sonderfall möglich ist. Besprechen wir also Listing 15.</p>
+
+<p>Bei 6000 wird ins X-Register die Zahl geladen, die man zu $16 addieren muß, um $4A zu erhalten. Dadurch wird zunächst bei 6002 die Adresse $4A gelesen und nach $6F34 geschrieben. Bei 6007 wird dekrementiert. Neu ist der Verzweigungsbefehl: es wird das N-Flag überprüft. Ist X = $FF, wird das N-Flag gesetzt und »6008 BPL 6002« beendet die Schleife. Der niedrigste Wert von X, der innerhalb der Schleife vorkommt, ist demnach $00.</p>
+
+<p>Der BPL-Befehl funktioniert nur, wenn der Ausgangswert von X <129 ist. Andernfalls wäre nämlich nach dem Dekrementieren X>127 und damit das N-Flag gesetzt. Dies aber hätte zur Folge, daß die Schleife nur 1mal durchlaufen würde.</p>
+
+<p>Zur soeben behandelten Schleifenkonstruktion sind noch zwei Dinge zu sagen; erstens, daß sie nur in diesem Sonderfall (X&lt;129) möglich ist, und zweitens, daß sie nicht effektiver als eine Lösung wie in Listing 13 ist.</p>
+
+<p>Allgemeine Gültigkeit hat aber folgende Regel für Schleifen vom Typ a:</p>
+
+<p>Bei Schleifen vom Typ a ist Dekrementieren effektiver als Inkrementieren, solange die Durchlaufzahl nicht 255 überschreitet.</p>
+
+<p>Bei 256 Durchläufen erweist sich Inkrementieren oft als besser.</p>
+
+<p>An Listing 17 sehen wir ein Beispiel für den letzten Satz der Regel. Listing 17 kopiert die letzten 256 Speicherplätze des Stapels ($0100 - $01FF) und den Stapelzeiger nach $6F00 - $7000. Listing 18 schreibt den Stapel wieder zurück.</p>
+
+<p>Die Dekrementierschleife (6000 - 600A) kopiert nun den Bereich $0101 - $O1FF, $0100 wird nicht übertragen. Dies geschieht in 600B - 600F. Eine andere Möglichkeit wäre ein zeitraubender CPX #FF-Befehl nach »6008 DEX«.</p>
+
+<p>6011 - 6013 sichert schließlich noch das SP-Register.</p>
+
+<p>Hier ist in der Tat eine Inkrementierschleife besser. Ändern wir Listing 17 also in Listing 17a:</p>
+
+<pre><code>LDX #00 
+</code></pre>
+
+<ul>
+<li>LOOP  LDA 0100,X</li>
+<li>STA 6F00,X<br>
+INX ;(!!)</li>
+<li>BNE LOOP</li>
+<li>TSX</li>
+<li>STX 7000</li>
+</ul>
+
+
+<p>Analog ergibt sich Listing 18a:</p>
+
+<pre><code>LDX #00 
+</code></pre>
+
+<ul>
+<li>LOOP  LDA 6F00,X</li>
+<li>STA 0100,X<br>
+INX ;(!!)<br>
+— BNE LOOP</li>
+<li>LDX 7000</li>
+<li>TXS</li>
+</ul>
+
+
+<p>In den Listings 17a und 18a habe ich diejenigen Befehle, die sich in der symbolischen Darstellung nicht von den Listings 17 und 18 unterscheiden, mit einem »-« markiert.</p>
+
+<h3>Typ b: Schleifen mit mehr als 256 Durchläufen</h3>
+
+<p>Während Schleifen des Typs a meist so schnell abgearbeitet werden, daß man es gar nicht bemerkt, dauern Typ-b-Schleifen oft eine oder mehrere Sekunden.</p>
+
+<p>Deswegen wollen wir hier versuchen, den Zeitbedarf von Typ-b-Schleifen zu verringern.</p>
+
+<p>Unsere erste Typ-b-Schleife (Listing 19) soll den Bereich von $3FD2 bis $475F invertieren (= EOR # FF-verknüpfen, aus jeder 1 wird eine 0 und umgekehrt). Da hierfür ein 8-Bit-Indexregister nicht ausreicht, benötigen wir einen 16-Bit-Zähler, nämlich$14/$15. Dieser soll immer die Adresse beinhalten, die invertiert wird. In diesen Zähler schreibt die Initialisierung der Schleife den Startwert $3FD2 (siehe $6000 -$6007).</p>
+
+<p>Da es beim 6510 keine indirekte Adressierung für LDA/STA gibt, sbndern nur die indirekt-indizierte oder indiziert-indirekte, müssen wir auf eine dieser Adressierungen ausweichen und den Index auf 0 setzen (»6008 LDY #00«).</p>
+
+<p>Bei $600A beginnt die Schleife: der Wert wird eingelesen, mit $FF EOR-verknüpft und zurückgeschrieben. Nun wird der 16-Bit-Zähler $14/$15 erhöht (6010 - 6015). Dann wird überprüft, ob die nächste Adresse schon mit der ersten Adresse nach der Endadresse ($475F), also $4760, übereinstimmt (siehe $6016 - $601D). Dieser 16-Bit-Vergleich wurde bereits im SMON vorgestellt. Bei $601E wird schließlich die Schleife beendet, falls die Abbruchbedingung (C=1) erfüllt ist.</p>
+
+<p>Listing 20 ist eine Dekrementierschleife, die sich in der Wirkung nicht von Listing 19 unterscheidet. Da das Dekrementieren einer 16-Bit-Adresse beim 6510 langsamer und speicherplatzaufwendiger ist als das Inkrementieren, ist Listing 20 weniger effektiv als Listing 19.</p>
+
+<p>Grundsätzlich können Sie an den Listings 19 und 20 sehen, wie man eine Typ-b-Schleife programmiert. Diese arbeitet jedoch nicht besonders schnell. Der Grund ist, daß der Bereich von $3FD2 - $475F nicht restlos in ganze Seiten (256-Byte-Blöcke)aufgeteilt werden kann. Daher sollte man sich immer überlegen, ob die Schleifendurchlaufzahl nicht auf ganze 256-Byte-Blöcke »aufgerundet« werden kann. In unserem Fall würde dies heißen, daß mit einer schnelleren Schleife der exakt 8 x 256 Byte lange Bereich $3FD2 - $47D1 invertiert wird, anstelle des »ungeraden« Bereichs $3FD2 - $475F. An einfacheren Zahlen wollen wir nun eine solche Schleife für ganze Seiten programmieren. Der 32 x 256 Byte umfassende Bereich von $2000 bis $3FFF (einschließlich) soll invertiert werden. Mit einer solcher Routine könnte das gerade sichtbare Bild bei Hi-Eddi invertiert werden.</p>
+
+<p>Die einfachste Form finden Sie in Listing 21. Zuerst wird die Anfangsadresse in $14/$15 abgelegt. Ins Y-Register kommt der Wert 0. Dann wird der Wert invertiert und das Y-Register, der Low-Zähler, erhöht. Ist der Wert noch nicht 0, wird die Schleife neu durchlaufen. Andernfalls wurde gerade eine Seite abgearbeitet. Der High-Zähler ($15) wird erhöht. Ist der Inhalt des High-Zählers = $40, wird die Schleife abgebrochen. Zu bemerken ist, daß während der Schleife die Adresse $14 unverändert 0 bleibt. Die Adresse, die invertiert wird, ergibt sich folgendermaßen:</p>
+
+<p>(Y+Inhalt von $14)+256*(Inhalt von $15)</p>
+
+<p>Da wir auf die Adresse über das Prozessor-Register Y Einfluß nehmen können und die Adresse $14 nicht verändert werden muß, ist die Verarbeitungsgeschwindigkeit gegenüber der »Normalform« (Listing 20) gestiegen. Das High-Byte müssen wir aber weiterhin in $15 belassen. Neu führen wir den High-Zähler X ein. Im X-Register merken wir uns, wieviele Seiten invertiert werden. Diesen Wert verwenden wir als Dekrementierzähler. In unserem Fall werden $20 Seiten invertiert. Weil $20 zufälligerweise auch das High-Byte der Anfangsadresse ($2000) ist, wird dieser Wert in Listing 22 nur einmal (6005) in den Akku geladen und dann bei 6009 ins X-Register übertragen.</p>
+
+<p>Beachten Sie bitte, daß in Listing 22 die Befehle »6004 TAY« und »6009 TAX« nur bei den Werten dieses Beispiels verwendet werden können. In der Regel sind eigene »LDX # «- oder »LDY #«-Befehle erforderlich. Wenn wir zum Beispiel den Bereich $3FD2 - $47D1 invertieren wollen, muß die Initialisierung so aussehen:</p>
+
+<p>LDA # D2 Low-Byte der ersten Adresse<br>
+STA 14<br>
+LDY #00 Index-Register<br>
+LDA #3F High-Byte der ersten Adresse<br>
+STA 15<br>
+LDX #08 High-Zähler<br>
+&hellip; Schleife wie ab 600C in Listing 22</p>
+
+<p>Damit hätten wir eine Schleife, die den Bereich # 3FD2 -$475F (siehe Listings 19 und 20) invertiert und wesentlich schnellerals die Listings 19 und 20 arbeitet. Dawiraber »aufgerundet« haben, wird zusätzlich der Bereich $4760 - $47D1 invertiert, obwohlwirdasgarnichtwollen. Esgibtnun mehrere Möglichkeiten, dies zu verhindern:</p>
+
+<ol>
+<li>Wir verwenden die Schleife aus Listing 19, müssen aber eine deutlich höhere Arbeitsdauer hinnehmen.</li>
+<li>Wir verwenden die Schleife aus Listing 22 mit obiger Initialisierung. Dann invertiert eine Typ-a-Schleife den Restbereich $4760 - $47D1 ein weiteres Mal. Damit wären - eine Besonderheit der EOR # FF-Verknüpfung - im Restbereich die alten Inhalte wiederhergestellt. Diese Lösung eignet sich aber (fast) nur bei dieser logischen Verknüpfung und hilft bei den meisten anderen Typ-b-Schleifen nicht weiter.</li>
+<li>Dies dürfte wohl die beste Lösung sein: Wir schreiben eine »gemischte« Schleife, die aus einer Typ-a-Schleife und einer Typ-b-Schleife besteht. Dieses Verfahren ist immer (!) möglich und wird von der BLTUC-Routine ($A3BF) des Basic-Interpreters angewandt. Diese Verschiebe-Routine zerlegt den Bereich, der verschoben werden soll, in einen Bereich der aus 256-Byte-Blöcken besteht und in einen Restbereich. Beide Bereiche werden dann getrennt verschoben.</li>
+</ol>
+
+
+<p>Folgendermaßen sieht die optimale Invertierroutine für den Bereich $3FD2 - $475F aus:</p>
+
+<p>a)  Der exakt 7 Seiten umfassende Bereich 3FD2 - $46D1 wird mit einer Typ-b-Schleife wie in Listing 22 komplementiert.</p>
+
+<p>b)  Der Restbereich $46D2 - $475F wird mit einer Typ-a-Schleife wie in Listing 13 komplementiert.</p>
+
+<p>Wir haben nun viele verschiedene Schleifenkonstruktionen in Theorie und Praxis behandelt. Was uns noch fehlt, sind Formeln, nach denen Sie die einzelnen Parameter (zum Beispiel den Startwert für X in einer Dekrementier-Schleife vom Typ a) errechnen können. Als Zusammenfassung finden Sie in Form von Listing 23 ein Hypra-Ass-Assemblerlisting zu mehreren Schleifenkonstruktionen. An den Quelltext-Ausdrücken können Sie sehen, wie einzelne Parameter errechnet werden können.</p>
+
+<p class="source">Merke: Sofern es der Programmablauf zuläßt, sollten Sie Inkrementierschleifen verwenden.</p>
+
+<p>Bei Verschiebeschleifen ist aber oft eine Dekrementierschleife erforderlich.</p>
+
+<p>Noch etwas zum Schleifen-Inhalt: Wenn mehrere Schleifen einen gleichen Innenteil haben (zum Beispiel einen Invertierbefehl), definieren Sie diesen unbedingt als Makro und nicht als Unterprogramm! JSRs sollten Sie nur beim Aufruf von ROM-Routinen verwenden.</p>
+
+<p>Damit wäre das Thema »Schleifen« erst einmal abgeschlossen. Im nächsten Abschnitt(überSelbstmodifikation) werden wir uns aber wieder mit Schleifen auseinandersetzen.</p>
+
+<h2>10.  Selbstmodifikation</h2>
+
+<p>Bevor wir uns mit dieser Programmiertechnik beschäftigen, die zwar nicht strukturiert, aber sehr trickreich ist, soll der Begriff geklärt werden.</p>
+
+<p>Unter Modifikation versteht man »eine Änderung, Anpassung«. Wenn Sie bei einem Spiel einen der vielen POKE-Befehle, die im 64’er schon vorgestellt wurden, eingeben, so wird dadurch das Spiel »modifiziert«. Die Änderung ist zum Beispiel eine Erhöhung der Spielfigurenanzahl.</p>
+
+<p>Selbstmodifikation bedeutet, daß ein Programm sich selbst programmgesteuert verändert. Dies wäre der Fall, wenn im Spielprogramm eine Passage stünde, die den POKE ausführt.</p>
+
+<p>Wenn Sie sich für die Selbstmodifikation von Basic-Programmen interessieren, finden Sie in der Zeitschrift »Happy-Computer« (Ausgabe 8/85) unter der Überschrift »Lernen Sie Ihren Commodore 64 kennen« alles, was Sie wissen müssen. Auf simulierten Direktmodus wurde im 64’er schon mehrfach eingegangen, unter anderem in der »Memory Map mit Wandervorschlägen«.</p>
+
+<p>Wir werden uns an dieser Stelle ausschließlich mit der Selbstmodifikation von Maschinenprogrammen befassen. Als erstes Beispiel nehmen wir Listing 24.</p>
+
+<p>Es handelt sich um eine selbstmodifizierende Schleife, die den Bereich $2000 - $3FFF komplementiert.</p>
+
+<p>TRACEn Sie doch einmal Listing 24 mit dem SMON und vergleichen Sie die disassemblierten Befehle mit den ursprünglichen Werten, die Sie in Listing 24 finden. Sie werden erkennen, daß die Befehle »6002 LDA 2000,Y« und »6007 STA 2000,Y« aufgrund der INC-Befehle immer auf andere Adressen zugreifen. Besagte INC-Befehle erhöhen jeweils das High-Byte des Operanden. Ist dieses schon $40, so wird die Schleife beendet. In Listing 25 sehen Sie, wie unsere Schleife aus Listing 24 aussieht, wenn sie fertig durchlaufen wurde. Ein weiterer Start bewirkt, daß das Programm sich früher oder später selbst invertiert und darum abstürzt.</p>
+
+<p>Was nämlich unserem Listing 24 fehlt, damit es mehr als einmal arbeitet, ist eine Initialisierung, diejedesmal den Ausgangswert ($2000) in die LDA/STA-Befehle einsetzt. In Listing 26 sehen Sie eine solche Initialisierung (6000 -600F). Die Adresse $FFFF (bei 6012 und 6017) ist ein Dummy-Wert, das heißt er dient nur zum vorläufigen Ausfüllen von Adressen und hat keine programmtechnische Bedeutung. Der Dummy-Wert wird ohnehin von der Initialisierung überschrieben; wir hätten also statt $FFFF auch $040C oder andere verwenden können. Wichtig ist nur, daß »LDA DummyY« 3 Byte belegt.</p>
+
+<p>Ein besonderer Vorteil der Selbstmodifikation ist es, daß selbstmodifizierende Schleifen keine Zähler in der Zeropage benötigen, weil der Zähler praktisch im Programm selbst liegt. In puncto Geschwindigkeit sind selbstmodifizierende Schleifen den herkömmlichen aber oft unterlegen.</p>
+
+<p>Ein weiterer Vorteil von ihnen ist aber, daß man außer mit weniger Zeropage-Speicherplätzen auch mit weniger Registern auskommen kann (sofern man hier Einsparungen vornehmen will). Listing 27 beispielsweise invertiert den Bereich $3FD2 - $475F. X- und Y-Register sowie die Zeropage bleiben unverändert, lediglich der Akkumulator fungiert als Arbeitsregister.</p>
+
+<p>Listing 28 kopiert den Basic-Interpreter ($A000 - $BFFF) ins RAM an gleicher Adresse, wobei nur das X-Register verwendet wird (!).</p>
+
+<p>Nun wollen wir sehen, wie man bei der Entwicklung selbstmodifizierender Programme unter Zuhilfenahme eines guten Assemblers (Hypra-Ass) vorgehen muß.</p>
+
+<p>Zunächst einmal müssen diejenigen Stellen, an denen Modifikationen vorgenommen werden, mit Label definiert werden. Von diesen Label aus können die Stellen im Speicher die geändert werden sollen, leicht berechnet werden.</p>
+
+<p>Befehlscode = LABEL + 0 = LABEL<br>
+Low-Operand =   LABEL + 1<br>
+High-Operand    =   LABEL + 2</p>
+
+<p>Bei 2-Byte-Befehlen wird der Parameter wie der Low-Operand eines 3-Byte-Befehls errechnet.</p>
+
+<p>Als Beispiel finden Sie in Form von Listing 29 einen Quelltext (Assembler: Hypra-Ass) für Listing 28. Während in Listing 28 der Ausgangswert bei 6010 »LDX 0000« und bei 6013 »STX 0000« ist, wurde im Quelltext $FFFF verwendet (270, 280), um den Assembler zu zwingen, den Dummy-Wert als 16-Bit-Adresse abzulegen (und nicht als Zeropage-Adresse, wodurch der Befehl nur 2 statt 3 Byte belegen würde).</p>
+
+<p>Die Stellen, die modifiziert werden, wurden mit »MOD1« und »MOD2« definiert. MOD1 ist zugleich der Schleifenbeginn.</p>
+
+<p>Nachdem Sie jetzt den Eingang gefunden haben, möchte ich einige Anregungen liefern, wie Sie die Vorteile der Selbstmodifikation nutzen können. Wir werden hier die Anwendung nach den verschiedenen Adressierungsarten unterteilen.</p>
+
+<h3>a)  Anwendung auf absolute Adressierung</h3>
+
+<p>Bei der Stapelmanipulation haben wir schon ein Verfahren kennengelernt, den Befehl JSR (indirekt), der im normalen 6510-Befehlssatz nicht existiert, zu simulieren.</p>
+
+<p>Folgendermaßen kann über Selbstmodifikation ein Unterprogramm ab ADRESSE aufgerufen werden.</p>
+
+<p>LDA # &lt;ADRESSE<br>
+STA SPRUNGBEFEHL+1 ; Low-Operand<br>
+LDA # >ADRESSE<br>
+STA SPRUNGBEFEHL+2; High-Operand<br>
+SPRUNGBEFEHL<br>
+JSR $FFFF ; $FFFF=Dummy</p>
+
+<p>Genauso kann man mit dem JMP-Befehl verfahren. Sogar bei den Schieber-, Dekrementier- und Inkrementierbefehlen, die im Gegensatz zu JMP die indirekte Adressierung nicht haben, ist auf diese Weise eine Simulation der indirekten Adressierung möglich.</p>
+
+<p>Wird eine Sprungtabelle per Selbstmodifikation verarbeitet, müssen die Sprungadressen in der Tabelle nicht (!) dekrementiert werden.</p>
+
+<h3>b)  Anwendung auf lmmediate-Befehle</h3>
+
+<p>Oft müssen Werte, die berechnet werden, auf dem Stapel oder im Speicher abgelegt und dann, wenn sie gebraucht werden, wieder aufgenommen werden.</p>
+
+<p>Ein Beispiel hierfür ist der »Basic-Start-Generator« (64’er, 7/85, Seite 74). Bei Erwähnung dieses Programms taucht natürlich die Frage auf, ob es sich hier noch um ein selbstmodifizierendes Programm handelt oder ob der »Basic-Start-Generator« nicht eher zu den Programmgeneratoren zählt. Diese Frage ist voll berechtigt. Deshalb wollen wir darauf kurz eingehen.</p>
+
+<p>Der »Basic-Start-Generator« ist eindeutig den Programmgeneratoren zuzuordnen, da der generierte Programmteil nie angesprungen wird und somit ein eigenständiges Programm darstellt. Das Programm modifiziert also nicht sich selbst, sondern vielmehr ein zweites Programm, welches dann vom Benutzer gespeichert werden kann.</p>
+
+<p>Die Programmierung ist aber bei Programmgeneratoren nicht anders als bei selbstmodifizierenden Programmen. Auf den Unterschied Programmgeneration/Selbstmodifikation werden wir an späterer Stelle näher eingehen.</p>
+
+<p>Zunächst wollen wir aber ein praktisches Beispiel für die Anwendung der Modifikation von lmmediate-Befehlen behandeln. Oft steht man vor dem Problem, ein Register zu sichern und später wieder zu holen. Im Falle des Akkumulators sieht das so aus:</p>
+
+<p>PHA ; Akku sichern<br>
+&hellip;     ; weiteres Programm<br>
+PLA ; Akku wieder holen</p>
+
+<p>Beim X-Register wird’s schon ungünstiger:</p>
+
+<p>TXA ; X-Register in Akku<br>
+PHA ; Akku sichern<br>
+&hellip;&hellip;&hellip;.. ; weiteres Programm<br>
+PLA ; Akku wieder holen<br>
+TAX ; Akku ins X-Register</p>
+
+<p>Hier wird also zusätzlich der Akku beeinflußt. Wenn dies vermieden werden muß, wird folgender Weg gewählt:</p>
+
+<p>STX $02 ; $02 = Zwischenspeicher<br>
+&hellip; ; weiteres Programm<br>
+LDX $02 ; X wieder holen</p>
+
+<p>Für die Sicherung des X-Registers gibt es aber noch eine weitere Lösung, die den X-Wert im Programm ablegt und dadurch nicht den Stapel oder einen Zwischenspeicher außerhalb des Programms benötigt.</p>
+
+<p>STX GETX+1 ; X direkt in lmmediate-Befehl schreiben<br>
+&hellip; ; weiteres Programm<br>
+GETX LDX #$OO ; $00 = Dummy-Wert</p>
+
+<p>Obiges Beispiel kann sehr leicht auf Akkumulator oder Y-Register umgeschrieben werden.</p>
+
+<p>Folgendermaßen kann das X-Register mit dem Akkumulator verglichen werden:</p>
+
+<p>STX VGL+1 ; in Vergleichsbefehl ablegen<br>
+(&hellip;&hellip;&hellip;&hellip;. ;    evtl, weitere Programme)<br>
+VGL CMP #$00    ; $00 = Dummy</p>
+
+<p>Als letztes Beispiel für die Anwendung auf Immediate-Befehle soll das Y-Register zum Akkumulator addiert werden:</p>
+
+<p>STY ADD+1   ; in Arithmetikbefehl ablegen<br>
+(&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.. ; evtl, weiteres Programm)<br>
+CLC ; Carry vor Addition<br>
+ADD ADC #$FF ; $FF = Dummy</p>
+
+<p>Die Anwendungsmöglichkeiten sind hier unbegrenzt.</p>
+
+<h3>c)  Anwendung auf komplette Befehle</h3>
+
+<p>Bisher haben wir nur die Parameter einzelner Befehle modifiziert. Es ist selbstverständlich auch möglich, die Befehlscodes oder die kompletten Befehle zu modifizieren.</p>
+
+<p>Wenn nur der Befehlscode geändert wird (zum Beispiel ein ORA #- in einen EOR #-Befehl) bleiben die Parameter erhalten. Es könnte ferner ein impliziter Befehl (SEI,CLI,CLD, DEX,INX&hellip;) geändert werden, um beispielsweise zwischen In- und Dekrementieren umzuschalten. Außerdem könnte bei einem BRANCH-Befehl die Sprungbedingung (CS,CC,VS, VC,NE,EQ) geändert werden. Aus BCS könnte also leicht BCC werden.</p>
+
+<p>Weil man hier die Opcodes der Befehle kennen muß, empfehle ich das erste 64’er Extra (Ausgabe 9/85) oder die Tabelle am Ende dieser Ausgabe.</p>
+
+<p>Nun lösen wir noch das häufig auftretende Problem, wie die Ausführung eines Unterprogramms verhindert wird. Dazu werden wir drei Lösungen (I - III) entwickeln.</p>
+
+<p><strong>I</strong>. Die Adresse FLAG wird auf 0 gesetzt, wenn das Unterprogramm ausgeführt werden soll; auf einen anderen Wert, wenn es nicht ausgeführt werden soll.</p>
+
+<p>LDA # 0 ;   Flag für Ausführung<br>
+STA FLAG    ;   Flag setzen<br>
+(&hellip;&hellip;&hellip;. ;   evtl, weiteres Programm)<br>
+LDA FLAG    ;   Flag testen<br>
+BNE NEIN    ;   Flag &lt; > 0, also nicht ausführen<br>
+JSR UNTERPROGRAMM ; Aufruf weiteres Programm<br>
+NEIN &hellip;..</p>
+
+<p>Das Flag könnte auch am Beginn des Unterprogramms abgefragt und dann (wenn FLAG &lt; > 0) das Unterprogramm verlassen werden.</p>
+
+<p><strong>II</strong>. Als ersten Befehl des Unterprogramms verwenden wir NOP:</p>
+
+<p>UP NOP  ; Beginn des Unterprogramms<br>
+&hellip;&hellip;..    ; Fortsetzung des Unterprogramms</p>
+
+<p>So wird die Ausführung des Unterprogramms gestattet:</p>
+
+<p>LDA # $EA ; Opcode für NOP<br>
+STA UP  ; an Anfang des Unterprogramms schreiben</p>
+
+<p>Und so wird sie verhindert:</p>
+
+<p>LDA #$60    ; Opcode für RTS<br>
+STA UP  ; an Anfang des Unterprogramms schreiben</p>
+
+<p>Wer noch einen NOP-Befehl und damit 1 Byte sparen möchte, kann den NOP-Befehl entfallen lassen. Dann muß auch der Opcode $EA beim Erlauben des Unterprogramms in den Opcode des ersten Byte im Unterprogramm geändert werden. Weil dies ziemlich mühselig ist, ziehe ich die ursprüngliche Lösung II trotz des um 1 Byte erhöhten Speicherbedarfs vor.</p>
+
+<p><strong>III</strong>.    Das beste Verfahren. Wir schalten den JSR-Befehl aus, indem wir ihn in einen BIT-Befehl abändern.</p>
+
+<p>AUFRUF JSR Unterprogramm</p>
+
+<p>JSR ausschalten:</p>
+
+<p>LDA # $2C ; Opcode für BIT STA AUFRUF</p>
+
+<p>JSR wieder erlauben:</p>
+
+<p>LDA #$20 ; Opcode für JSR STA AUFRUF</p>
+
+<p>Der JSR-Opcode kann auch mit $0C überschrieben werden. $0C ist ein illegaler Opcode für ein 3-Byte-NOP und arbeitet mit allen mir bekannten Versionen des C 64. Ob er ebenfalls auf dem C 128 läuft, konnte ich noch nicht prüfen.</p>
+
+<p>Im übrigen können mit dem soeben beschriebenen Verfahren auch andere Befehle ausgeschaltet werden, zum Beispiel JMP, LDA, STA und so weiter. Wenn aber der JSR-Opcode mit $2C (BIT) überschrieben wird, ist darauf zu achten, daß bei der Ausführung des BIT-Befehls die Prozessorflags gesetzt werden.</p>
+
+<p>Sicherlich gibt es noch mehr Problemlösungen als I - III, aber III dürfte wohl kaum zu übertreffen sein.</p>
+
+<h3>d)  Anwendung auf mehrere Befehle</h3>
+
+<p>Selbstverständlich können ganze Befehlsfolgen, also größere Programmteile gegeneinander ausgetauscht werden. Zu beachten ist nur, daß die Routinen, die gegeneinander ausgetauscht werden, auch in dem Bereich, in den sie vom Programm aus geschrieben werden, lauffähig sind. Dies ist vor allem dann gegeben, wenn nur die relative Adressierung verwendet wird und dadurch die Routine im Speicher frei verschoben werden kann.</p>
+
+<h3>e)  Anwendung auf Tabellen</h3>
+
+<p>Dieser Anwendungsfall würde auch zum Abschnitt über »Tabellen« passen.</p>
+
+<p>Wir bleiben hier bei der Theorie, denn die Umsetzung in ein Programm ist nicht mehr schwer. Vielmehr soll Ihre Kreativität nicht durch Unmengen von Beispielen gehemmt werden.</p>
+
+<p>Zunächst wollen wir uns ein wenig mit dem SMON befassen. Wenn Sie den Disk-Monitor einschalten, kopiert das Programm einen Floppy-Befehl («U1 ..«) vom Ende des SMON in einen Bereichzwischen $02A0 und $02FF. Dieser Lesebefehl wird nach Bedarf modifiziert, zum Beispiel wird beim Schreiben der »U1«- in einen »U2«-Befehl umgewandelt oder die Angabe des einzulesenden Blocks wird geändert. Dies wäre ein typisches Anwendungsbeispiel für Selbstmodifikation, wenn der Lesebefehl nicht erst in einen Bereich außerhalb des Programms kopiert würde (worin ich keinen Sinn sehe), sondern am Ende des SMON (etwa bei $CFF0) bliebe und dort modifiziert würde.</p>
+
+<p>Im Hi-Eddi liegt eine Tabelle, die die High-Byte der Bit-Map-Anfangsadressen beinhaltet. Diese Tabelle wird von Hi-Eddi bei jedem Bildwechsel umgerechnet.</p>
+
+<p>Nach den vorausgegangenen zwei Beispielen an Spitzenprogrammen aus dem 64’er möchte ich noch andere Anwendungsbeispiele nennen.</p>
+
+<p>Besonders flexible Programme erlauben Eingriffe des Anwenders in die Befehls- oder Text-Tabellen. So können Bildschirmmasken editiert oder Eingabemasken erstellt werden.</p>
+
+<p>Ein solches Programm braucht sich nach den Modifikationen nur selbstabzuspeichern. Weil hier unter Umständen ein erheblicher Teil des Programmschutzes verlorengeht, werden dann lediglich die Tabellen gespeichert.</p>
+
+<p>Ein Adventure-Generator modifiziert in der Regel auch nur die Tabellen eines fertigen Adventureprogramms, das eigentliche Programm bleibt unverändert. In diesen Tabellen sind die einzelnen Spielsituationen enthalten.</p>
+
+<p>Bei diesen (theoretischen) Fällen wollen wir es belassen. Letztendlich muß ja der Programmierer entscheiden, inwieweit er die Selbstmodifikation auf Tabellen anwenden kann.</p>
+
+<h3>f)  Das Beispielprogramm »Loader-Maker 64«</h3>
+
+<p>Wie aus dem Namen des Beispielprogramms schon zu entnehmen ist, handelt es sich um einen Programmgenerator. Da - wie gesagt - die Programmierung wie bei selbstmodifizierenden Programmen ist, habe ich bewußt einen Programmgenerator als Beispiel gewählt.</p>
+
+<p>Als Listing 31 finden Sie ein MSE-Listing, falls Sie »Loader-Maker 64« bequem abtippen wollen und an der Anwendung des Programms interessiert sind. Deshalb zunächst eine Kurzbeschreibung für Anwender.</p>
+
+<p>»Loader-Maker« ermöglicht es Ihnen, zu einem Programm ein (Maschinensprache-) Ladeprogramm zu generieren, welches normal geladen und mit »RUN« gestartet wird, worauf es das nachzuladende Programm nachlädt und startet.</p>
+
+<p>Nach dem Laden von »Loader-Maker« wird dieses Programm durch SYS 2154,START gestartet. START ist eine Variable und wird durch die Startadresse des nachzuladenden Programms ausgedrückt. Soll ein Basic-Programm nachgeladen werden, hat diese Adresse keine Bedeutung (einfach SYS2154,0 eingeben). Bei einem Maschinenprogramm handelt es sich hier um die Adresse, mit der das Programm über »SYS« gestartet wird (49152 beim SMON $C000).</p>
+
+<p>Das Programm meldet sich mit »Loader-Maker 64« und gibt die Startadresse aus. Dazu können Sie den Filenamen eingeben.</p>
+
+<p>Bei allen weiteren Eingaben (Gerätenummer, von der geladen werden soll; Maschinenprogramm j/n; Systemmeldungen wie »SEARCHING FOR« ausgeben j/n; LOAD ERROR bei Ladefehler ausgeben j/n) können Sie das Programm durch Eingabe des Linkspfeils abbrechen. Sind alle Eingaben gemacht worden, kommt die Meldung »LOADER GENERIERT« und der Lader kann mit »SAVE« gespeichert werden.</p>
+
+<p>Wenn das nachzuladende Programm von der Adresse geladen werden soll, von der auch das Ladeprogramm selbst eingelesen wurde, ist als Gerätenummer nur 0 einzugeben.</p>
+
+<p>Befassen wir uns nun mit dem Programm, dessen Quelltext Sie als Listing 30 finden.</p>
+
+<p>Die Zeilen bis 990 stellen das Ladeprogramm in unmodifizierter Form dar und enthalten viele Dummywerte, wie zum Beispiel die (unsinnige) Startadresse 0 in Zeile 820.</p>
+
+<p>Mit 1000 beginnt die Modifikationsroutine. Nach 1120 wurde die Startadresse eingelesen, die ja per SYS übergeben wurde, und wird wieder mit dem Titel ausgegeben. 1100/1110 schreiben die Startadresse hinter den JMP-Befehl in Zeile 820.</p>
+
+<p>1150 - 1350 bringen das (noch unmodifizierte) Gerüst in den Ausgangszustand, der dann nach Bedarf geändert wird.</p>
+
+<p>1400 - 1550 holen den Filenamen, legen ihn bei NAME (850) ab, berechnen gleich die Länge des Filenamens und legen diese bei LAENGE (750) ab.</p>
+
+<p>1600 - 1720 holen die Geräteadresse. Da diese im ASCII-Fbrmat vorliegt, muß der ASCII-Code von 0 abgezogen werden (1640/1650). Wurde 0 eingegeben, wird der LDX # DEVICE-Befehl (730) in »LDX $BA« geändert. Die Adresse $BA enthältjeweils die Adresse, von der das letzte Programm geladen wurde.</p>
+
+<p>1750 - 1850 fragen, ob das nachzuladende Programm mit der per SYS übermittelten Startadresse gestartet wird (Eingabe »j«). Wurde »n« eingegeben, muß das Programm über den Basic-Befehl RUN eingegeben werden. Auf eine entsprechende Routine (870 - 980) wird die Startadresse gestellt (1810 - 1840).</p>
+
+<p>1900 - 1970 ermöglichen die Einstellung, ob »SEARCHING..«, »LOADING« etc. ausgegeben werden sollen.</p>
+
+<p>Soll im Falle eines Ladefehlers das Programm nicht gestartet und stattdessen »LOAD ERROR..« ausgegeben werden, wird dies bei 2000 - 2090 festgelegt. Wird die Fehlerausgabe unterdrückt, muß der BCS-Befehl (810) unschädlich gemacht werden. Dies geschieht einfach dadurch, daß die Sprungweite auf 0 gesetzt wird (2070/2080).</p>
+
+<p>Am Programmende wird noch eine Meldung ausgegeben (2140 - 2160) und der Vektor für das Ende des Basic-Programms neu gesetzt, damit das generierte Ladeprogramm mit »SAVE« gespeichert werden kann.</p>
+
+<p>10000 - 10310 enthalten nur die Text-Tabellen.</p>
+
+<p>Von 15000 bis zur letzten Zeile (15170) steht ein Unterprogramm, daß bei jeder J/N-Entscheidung über »JSR J,N« aufgerufen wird.</p>
+
+<p>Es gibt den Text »(J/N)?« aus (15030 - 15050) und holt eine Eingabe. Ist diese »J«, so ist nach dem Verlassen des Unterprogramms (1517) das Zero-Flag gesetzt (andernfalls &lt; nicht).</p>
+
+<p>Wurde der Linkspfeil eingegeben, wird das Programm abgebrochen und eine entsprechende Meldung ausgegeben (15100- 15150).</p>
+
+<p>Wie wir nun gesehen haben, handelfes sich bei »Loader-Maker« um einen Programmgenerator. Mit zwei kleinen Änderungen wird erjedoch zum selbstmodifizierenden Ladeprogramm. Wir müssen nur die beiden »JMP READY.«-Befehle (2240/15150) in »JMP SYSTEM« umwandeln, wodurch am Programmende der generierte Lader angesprungen würde. Schon hätten wir ein selbstmodifizierendes Ladeprogramm.</p>
+
+<p>Um Ihnen noch die Anwendung des Loader-Maker zu erleichtern, hier zwei Eingabebeispiele:</p>
+
+<p>Startadresse&hellip;&hellip;&hellip;&hellip;&hellip;..49152<br>
+Filename&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;SMON $C000<br>
+Geräteadresse&hellip;&hellip;&hellip;&hellip;&hellip;.0<br>
+Maschinenprogramm&hellip;&hellip;&hellip;&hellip;j<br>
+Systemmeldungen&hellip;&hellip;&hellip;&hellip;..j<br>
+LOAD ERROR ausgeben..j<br>
+Startadresse&hellip;&hellip;&hellip;&hellip;&hellip;..0 (bedeutungslos)<br>
+Filename&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;HI-EDDI<br>
+Geräteadresse&hellip;&hellip;&hellip;&hellip;&hellip;.8<br>
+Maschinenprogramm&hellip;&hellip;&hellip;&hellip;n<br>
+Systemmeldungen&hellip;&hellip;&hellip;&hellip;..n<br>
+LOAD ERROR ausgeben. .j</p>
+
+<h3>g)  Verbesserungen an »Tabellen-Beispiel«</h3>
+
+<p>Zum Abschluß des Themas »Selbstmodifikation« wollen wir noch kleine Verbesserungen am Programm »Tabellen-Beispiel« erwähnen. Ich werde hier eher Anregungen geben als fertige Änderungsvorschläge.</p>
+
+<p>Zunächst soll die Adresse XSÄVE (zum Sichern des X-Registers in Schleifen) überflüssig werden. So könnte es nun gesichert werden:</p>
+
+<p>XSV STX GETX<br>
+&hellip;<br>
+GETX LDX #$00 O=Dummy; hier wird X wieder aufgenommen.</p>
+
+<p>Auch die Sprungtabelle läßt sich - viel einfacher, finde ich - anders handhaben:</p>
+
+<p>LDA J?LO,X  JMLO oder JELO<br>
+STA SPRO+1<br>
+LDA J?HI,X  JMHI oder JEHI<br>
+STA SPRG+2<br>
+SPRG JMP 0000</p>
+
+<p>In den Tabellen JMLO/JMHI und JELO/JEHI (Low- und High-Bytes der Sprungadressen) dürfen die Adressen aber nicht dekrementiert werden.</p>
+
+<p>Wird ein JSR (IND)-Befehl simuliert, muß nach wie vor die Rücksprungadresse auf den Stapel gelegt werden. Dies würde entfallen, wenn die Rücksprungadresse direkt auf »SPRG JMP 0000« folgen und der JMP-Befehl bei SPRG in JSR umgewandelt würde.</p>
+
+<p>Damit soll das Thema »Selbstmodifikation« abgeschlossen sein. Die vorgestellten Programmiertechniken bieten fast unbegrenzte Möglichkeiten, hier konnte ich nur einen kleinen Überblickgeben, welcher aber für fortgeschrittene Programmierer ausreicht.</p>
+
+<h2>11.  Mehr über relative Adressierung</h2>
+
+<p>So wie wir schon die Tücken der Zeropage-Adressierung zumindest teilweise beseitigen konnten, wollen wir uns mit der in vergleichbarer Weise leistungsstarken Relativ-Adressierung auseinandersetzen.</p>
+
+<h3>a)  So vermeidet man JMP</h3>
+
+<p>Oft muß eine Stelle im Programm angesprungen werden, ohne daß erst eine Bedingung geprüft wird. Diese Stelle ist nicht selten weniger als 128 Byte vom Sprungbefehl entfernt, könnte also relativ adressiert werden.</p>
+
+<p>Dennoch ist es in vielen Fällen möglich, einen Branch-Befehl - obwohl diese Befehle eine Bedingung (C=0..) prüfen - zu verwenden.<br>
+Beispiel:</p>
+
+<p>7050    BNE 7040<br>
+7052    JMP 708A</p>
+
+<p>Kann ersetzt werden durch:</p>
+
+<p>7050    BNE 7040<br>
+7052    BEQ 708A</p>
+
+<p>da bei 7052 in jedem Fall das Z-Flag = 0 ist (dafür sorgt der Abfang-Befehl BNE) und somit immer verzweigt wird.</p>
+
+<p>Man könnte den BEQ-Befehl als »Pseudo-Verzweigungsbefehl« bezeichnen, da die Bedingung gar nicht überprüft werden müßte (sie ist sowieso erfüllt).</p>
+
+<p>Der Branch-Befehl übertrifft den JMP-Befehl deutlich an Effektivität, da ein Byte weniger verbraucht wird.</p>
+
+<p>Im übrigen ist auch bei</p>
+
+<p>7050    BVS 7040<br>
+7052    CLV</p>
+
+<p>der CLV-Befehl überflüssig, solange vor7052 der Befehl von 7050 verarbeitet wird.</p>
+
+<h3>b)  Zugriff auf Befehle in »Umgebung«</h3>
+
+<p>Unter »Umgebung« wollen wir den Bereich um einen Programmteil verstehen, der über relative Adressierung angesprochen werden kann. Da in diesem oft ähnliche Befehlsfolgen stehen wie im anderen Programm, läßt sich hier durch gezielten Zugriff auf die »Umgebung« der Speicherplatzbedarf senken.</p>
+
+<p>Beispielsweise stehen an vielen Stellen im Programm RTS-Befehle. Diese werden, wenn ein Unterprogramm verlassen werden soll, manchmal durch einen Branch-Befehl angesprungen.</p>
+
+<p>X1 RTS ; Ende eines im Speicher vorausgehenden Unterprogramms<br>
+UP &hellip;&hellip;.  ; Unterprogramm<br>
+TEST BEQ X2 ; Unterprogramm verlassen, falls Z=0<br>
+&hellip;&hellip;&hellip;.  ; andernfalls weiteres Programm<br>
+X2 RTS ; Ende des Unterprogramms</p>
+
+<p>Wenn X1 von TEST aus relativ adressiert werden kann, können wir folgendermaßen ein Byte sparen:</p>
+
+<p>X1 RTS<br>
+UP &hellip;<br>
+TEST BEQ X1 ; nach X1 springen, wo auch ein RTS steht<br>
+X2 RTS ; wird nicht mehr benötigt</p>
+
+<p>Noch ein Beispiel aus dem Basic-Interpreter. Bei Adresse $AF08 stehen zwei Befehle, die einen SYNTAX ERROR erzeugen.</p>
+
+<p>Nun gibt es im Basic-Interpreter unzählige Stellen, an denen ein SYNTAX ERROR aufgerufen werden muß. Deshalb steht dort nur »JMP $AF08«. Diese Stellen werden bei Bedarf relativ adressiert, so daß nicht an jeder Stelle, an der ein SYNTAX ERROR aufgerufen wird, der Befehl »JMP $AF08« stehen muß.</p>
+
+<p>Zur Übung könnten Sie noch versuchen, im Programm Tabellen-Beispiel (Listing 11) die Menüroutine (insbesondere die Routinen HOME, DOWN, UP, EXEC), in der beispielsweise wiederholt STX MPT steht, durch Zugriff auf »Umgebung« zu optimieren. Besonders hilfreich dürfte es sein, zunächst statt Branch-Befehlen JMPs einzusetzen und dann zu überlegen, inwieweit die JMPs durch Branches ersetzt werden können, weil zum Beispiel nach »LDX # 0« das Z-Flag immer gesetzt ist etc.</p>
+
+<h2>12.  Puffer-Technik</h2>
+
+<p>In der Computerei fällt der Begriff »Puffer« sehr häufig. Beim C 64 gehören der Kassetten- und der Tastaturpuffer gemeinhin zu den bekanntesten Puffern. Statt »Puffer« kann man auch Zwischenspeicher sagen. Puffer dienen nämlich immer als Zwischenspeicher.</p>
+
+<p>Zunächst wollen wir klären, was zu einem Puffer gehört,</p>
+
+<h3>a) Was benötigt ein Puffer?</h3>
+
+<p>– Pufferspeicher</p>
+
+<p>Selbstverständlich muß ein Puffer einen bestimmten Speicherbereich belegen, in dem die Werte zwischengespeichert werden.</p>
+
+<p>Ebenso muß die maximale Puffergröße festgelegt werden, damit geprüft werden kann, ob sich der Puffer schon angefüllt hat. Beim Kassettenzugriff werden vorerst alle Byte, die auf die Kassette sollen, im Puffer (ab $033C) zwischengespeichert. Ist dieser Puffer voll, würde er beim nächsten Byte, das er aufnehmen soll, überlaufen (das heißt, die maximale Puffergröße überschreiten). Deshalb wird dann Byte für Byte der Puffer entleert, indem die Bytes auf Kassette geschrieben werden. Jedes Byte, das auf Kassette geschrieben wurde, belegt keinen Speicher mehr im Puffer, so daß der Puffer wieder aufnahmefähig ist.</p>
+
+<p>Damit das Programm, das den Puffer verwaltet, auch weiß, aus welcher Adresse im Puffer es sich das nächste Byte holen soll beziehungsweise wo im Puffer das nächste Byte abgelegt werden soll, gibt es noch einen<br>
+– Pufferzeiger</p>
+
+<p>Auf englisch heißt er »BUFFER-POINTER«, woher auch die Abkürzung »B-P« beim Floppy-Befehl zur Manipulation des Pufferzeigers stammt.</p>
+
+<p>Dieser Pufferzeiger kann mit dem Stapelzeiger verglichen werden. Auf keinen Fall ist er mit dem<br>
+– Puffervektor</p>
+
+<p>zu verwechseln, der die Startadresse des Pufferspeichers beinhaltet. Ein Puffervektor ist nicht unbedingt erforderlich, erhöht aber die Flexibilität.</p>
+
+<p>Damit wären die Fachausdrücke im Zusammenhang mit Puffern geklärt.</p>
+
+<h3>b) Wann verwendet man Puffer?</h3>
+
+<p>Puffer dienen in der Regel als Zwischenspeicher, wie zum Beispiel der Basic-Eingabepuffer (ab $0200).</p>
+
+<p>Im Fall des Tastatur- oder Diskettenpuffers aber sind die Puffer als Verbindungsstelle zwischen zwei parallel arbeitenden Programmen beziehungsweise Peripheriegeräten vorgesehen (interruptgesteuerte Tastaturabfrage/Hauptprogramm im Computer, DOS/Betriebssystem des Computers).</p>
+
+<p>Die Puffer sind in diesen Fällen ein Bereich, auf den zwei (quasi-) parallel arbeitende Programme zugreifen.</p>
+
+<p>Bei Computern, die ein wirklich starkes Multitasking bieten (wie der Commodore Amiga) finden Puffer weitaus mehr Verwendung als beim C 64, der nur einen quasiparallelen Ablauf ermöglicht.</p>
+
+<p>Daher werden bei ihm Puffer hauptsächlich im I/O-Bereich verwendet, zum Beispiel bei Druckern, Datasette, Floppy, Tastatur etc. (I/O = lnput/Output = Eingabe/Ausgabe).</p>
+
+<h2>13.  Pass-Technik</h2>
+
+<h3>a)  Begriffserläuterung</h3>
+
+<p>Der Begriff »Pass« wurde schon mehrfach im 64’er erläutert (unter anderem Ausgabe 7/85, Seite 51).</p>
+
+<p>Am einfachsten kann der Begriff als »Schritt beim Programmmablauf« verstanden werden. Mit »Schritt« ist hier nicht ein einzelner Befehl, sondern ein größerer Block im Programm gemeint.</p>
+
+<p>Wenn ein Programm in 3 Passes (Durchläufen) arbeitet, heißt dies, daß 3 Schleifen hintereinander abgearbeitet werden, die alle eine Teilaufgabe erfüllen, die in Verbindung mit den anderen Passes erst eine größere Aufgabe (zum Beispiel eine Assemblierung) ausfüllen kann. Jeder einzelne Pass führt eine bestimmte Tätigkeit aus, die für das Funktionieren der darauffolgenden Passes unbedingt erforderlich ist. Pass 1 wirkt also wie eine Initialisierung von Pass 2 etc.</p>
+
+<p>Komplexe Programme in Schritte (Passes) zu gliedern, gehört zu den Grundregeln des strukturierten Programmierens.</p>
+
+<h3>b)  Beispiele von Anwendungen der Pass-Technik</h3>
+
+<p>Besonders umfangreiche Programme wie Assembler (Hypra-Ass), Compiler (Austro-Speed) und Interpreter (Comal) sind immer in mehrere Passes eingeteilt.</p>
+
+<p>So erfolgt bei den meisten Assemblern im ersten Pass ein Syntax-Check und das Anlegen der Symbol-Tabelle. Erst im zweiten Pass wird der Objektcode generiert, wobei die bereits erstellte Symboltabelle benötigt wird.</p>
+
+<h2>14.  Diverse Tips zur optimalen Speichernutzung</h2>
+
+<p>Mit übermäßig viel RAM ist der C 64 bestimmt nicht gesegnet. Bei vielen Anwendungen (zum Beispiel Datenverarbeitung) braucht man auch das letzte Byte.</p>
+
+<p>Sie werden nun mehrere Tips erhalten, wie man den wenigen vorhandenen Speicher möglichst sparsam verwenden kann.</p>
+
+<p>Zu den speicherplatzaufwendigsten Einrichtungen gehören die Puffer. Der Kassettenpuffer beispielsweise belegt den RAM-Bereich $033C - $03FB, auf den man somit oft verzichten muß.</p>
+
+<p>Hier wollen wir einfach den Kassettenpuffer in den Bildschirmspeicher (ab $0400 in Normaleinstellung) verlegen.</p>
+
+<p>LDA #&lt;$400<br>
+LDY #>$400<br>
+STA $B2<br>
+STY $B3</p>
+
+<p>Da der Bildschirm beim Kassettenbetrieb ohnehin abgeschaltet wird, fällt dies nicht auf. Nach dem Kassettenbetrieb sollte man aber den Bildschirm unverzüglich löschen.</p>
+
+<p>Ebenso kann man andere Puffer, für die es einen Vektor gibt, problemlos nach $400verlegen, sofern sie nicht größer als 1000 Byte sind.</p>
+
+<p>Ein Problem für sich stellt das RAM ab $E000 (also unter dem Betriebssystem!) dar. Diesen Speicher kann man nur durch Bank-Switching nutzen, wobei man noch auf das Betriebssystem verzichten muß, solange der $E000-Bereich auf RAM geschaltet ist.</p>
+
+<p>Hier können wir uns zunutze machen, daß der VIC auch ohne Ändern des Prozessor-Ports (Adresse $0001) auf diesen RAM-Bereichzugreifen kann. FürGrafikbilderodereinen geänderten Zeichensatz ist der$E000-Bereich bestens geeignet.</p>
+
+<p>Oft wird der $E000-Bereich zur Ablage verschiedener Daten verwendet, auf die nicht andauernd zugegriffen werden muß.</p>
+
+<p>Man könnte aber auch das Betriebssystem ins RAM ab $E000 kopieren und diejenigen Bereiche, in denen nicht benötigte Routinen stehen (zum Beispiel für Kassettenbetrieb) einfach überschreiben. Dies ist dann sinnvoll, wenn nur ein paar Byte im $E000-Bereich gebraucht werden. Außerdem ist eine gute Kenntnis des C 64-ROMs erforderlich.</p>
+
+<p>Nun wollen wir noch besprechen, wie der Speicherplatzbedarf eines Programms niedriggehalten werden kann. Dazu wurde im Laufe des Kurses schon einiges gesagt (Unterprogramme statt Makros verwenden etc.).</p>
+
+<p>Jedes Programm benötigt eine Menge Flags. Meist belegt ein Flag genau 1 Byte, für dessen Inhalt es oft nur zwei mögliche Werte gibt: einen für »JA« und einen für »NEIN«.</p>
+
+<p>Für diese primitive Unterscheidungsform genügt aber auch 1/8 Byte, also ein Bit.</p>
+
+<p>Wenn Sie sich das 64’er Extra in der Ausgabe 10/85 ansehen, werden Sie feststellen, daß fast jedes VIC-Register mehrere Funktionen hat, weil jedem Bit eine eigene Bedeutung zukommt. Würde der VIC hier statt auf Bits auf Bytes zugreifen müssen, wäre er</p>
+
+<ol>
+<li>langsamer und</li>
+<li>würde der Speicherplatzaufwand für die Register sich vervielfachen.</li>
+</ol>
+
+
+<p>Man sollte also bei Flags jedem Bit eine Bedeutung geben und nur die Bits prüfen:</p>
+
+<p>BIT FLAG</p>
+
+<p>Danach ist das N-Flag gesetzt, falls das 7. Bit im FLAG gesetzt ist, und das V-Flag, falls das 6. Bit gesetzt ist. Die übrigen Flags erhält man über das Z-Flag im Prozessor-Status-Register mit Hilfe des Akkus. Angenommen, man möchte testen, ob Bit 0 im Flag gesetzt ist oder nicht, dann macht das folgendes Programm:</p>
+
+<p>LDA #01<br>
+BIT Flag<br>
+BNE ??? ; (Bit gesetzt)<br>
+.
+.<br>
+.
+; (Bit nicht gesetzt)</p>
+
+<p>Der Bit-Befehl ANDet den Inhalt des Akkus mit dem Inhalt der Speicherzelle »Flag«. Möchte man Bit 1 testen, so ist der Befehl LDA # 01 zu ersetzen durch LDA # 02 und so weiter.</p>
+
+<p>Durch Selbstmodifikation können Flags bekanntlich vermieden werden. Aber auch sonst bietet die Selbstmodifikation die Möglichkeit, Speicherplatz zu sparen: die Steuerung einer Sprungtabelle belegt mit Selbstmodifikation weniger Speicher als ohne.</p>
+
+<p>Auch die »Wegwerfmethode« ist sehr vorteilhaft. Programmteile werden einmal abgearbeitet und dann (zum Beispiel durch Nachladen) überschrieben.</p>
+
+<p>Damit hätten wir unseren Kurs abgeschlossen. Ich hoffe, daß er Ihnen etwas Spaß gemacht hat und Sie einige interessante Informationen herausholen konnten. Sie sollten sich jedoch darüber im klaren sein, daß einige der hier vorgestellten Methoden die Lesbarkeit eines Assembler-Listings einschränken können. Also, verzichten Sie, wenn nicht unbedingt notwendig, auf allzu trickreiche Programmierung. Falls Sie noch Fragen oder Probleme haben (vielleicht erst wegen diesem Artikel), dann schreiben Sie doch einfach.</p>
+
+<address class="author">(Florian Müller/tr)</address>
+    </article>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>ÜberLISTet</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Matthias Meyer, tr">
+    <meta name="64er.issue" content="Sonderheft 8/85">
+    <meta name="64er.pages" content="143-144">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>ÜberLISTet</h1>
+<p class="intro">Mit dieser Betriebssystemerweiterung wird das Schreiben von Basic-Programmen zum Vergnügen. Scrolling aufwärts und abwärts sowie einige Zusatzfunktionen machen es möglich.</p>
+
+<p>Dieses Maschinenprogramm (eventuell in Verbindung mit einem Toolkit) macht das Editieren von Basic-Texten fast so komfortabel wie mit einem guten Textverarbeitungssystem. Man kann damit nämlich nicht nur, wie von vielen teuren Basic-Erweiterungen bekannt, das Listing mit den Cursortasten hinauf und hinunterscrollen, sondern auch:</p>
+
+<ul>
+<li>andere Erweiterungen verwenden</li>
+<li>einzelne Zeilen löschen und einfügen</li>
+<li>eine Zeile bis beziehungsweise ab Cursorposition löschen</li>
+<li>eine ganze Zeile mit Leerzeichen füllen</li>
+<li>einen Zeilenausschnitt beliebig oft an andere Positionen kopieren.</li>
+</ul>
+
+
+<p>Dies alles geschieht auf einfachen Tastendruck und ohne Absturzgefahr.</p>
+
+<p>Um mit möglichst vielen anderen Programmen zusammenarbeiten zu können, liegt das zirka 1300 Byte lange Programm im Bereich $7A00 - 7F20 (Hexadezimal). Dazu muß das Ende des Basic-Bereichs gegebenenfalls herabgesetzt werden (POKE 56,122:POKE 55,0: NEW). Mit »SYS 31232« wird die Erweiterung in den Interrupt eingehängt und ist dann sofort einsatzbereit. Es wird nur der IRQ-Vektor verändert.</p>
+
+<p>Das Listing läßt sich im Direktmodus mit Hilfe der Cursortasten fließend hoch- und runterscrollen. Die Programmzeilen können dabei natürlich wie gewohnt geändert und mittels der RETURN-Taste übernommen werden. Stößt man jedoch mit dem Cursor gegen den oberen beziehungsweise unteren Bildschirmrand, wird der Inhalt des Bildschirms in die entsprechende Richtung gescrollt und die nächste Zeile ausgegeben.</p>
+
+<p>Das Programm geht dabei so vor: Es sucht die am nächsten zum Cursor stehende Zeilennummer. Steht keine Zahl in der ersten Spalte, wird normal gescrollt (auch nach unten). Ist die gefundene Zahl größer gleich 64000, wird der Cursor auf diese Zeile gesetzt und das Scrolling verhindert. Andernfalls wird die nächsthöhere beziehungsweise nächstniedrigere Zeile aus dem Basic-Listing gesucht, der Bildschirm in die richtige Richtung gescrollt und die gefundene Zeile gelistet.</p>
+
+<p>Die Erweiterung arbeitet nur im Direktmodus, das heißt wenn in einem Programm ein »INPUT«-Befehl oder ähnliches vorkommt, verhält sich der Bildschirm normal.</p>
+
+<p>Zusätzlich bietet dieses Programm noch einige andere Möglichkeiten, die das Editieren erleichtern. Diese Funktionen werden durch gleichzeitiges Drücken der Control-Taste und einer Buchstabentaste aufgerufen. Zwischen zwei Anführungszeichen werden diese »Control-Codes« jedoch normal ausgegeben.</p>
+
+<p>TODO TABLE</p>
+
+<p>CTRL-i Einfügen (Insert) einer Leerzeile. Der untere Teil des Bildschirms wird nach unten geschoben. Dies dient zur Übersichtlichkeit, wenn eine neue Basic-Zeile eingegeben werden soll, da keine anderen Zeilen überschrieben werden brauchen.<br>
+CTRL-d Löschen (Delete) einer Zeile mit Nachrücken des unteren Bildschirmteils. Auch dies dient der Übersichtlichkeit. Soll eine Zeile gänzlich aus dem Listing gelöscht werden, muß man (wie üblich) die »leere« Zeilennummer und RETURN eingeben.<br>
+CTRL-I Füllen einer Zeile (Line) mit Leerzeichen. Nach den drei letztgenannten Funktionen springt der Cursor an den Anfang der Zeile.<br>
+CTRL-b löscht die Zeile bis ausschließlich Cursorposition<br>
+CTRL-a löscht die Zeile ab einschließlich Cursorposition<br>
+CTRL-u setzt Cursor in die linke untere Ecke<br>
+CTRL-k Kopieren eines Zeilenausschnitts. Der Bereich wird durch Invertieren angezeigt und kann mit der Cursor-right/left Taste vergrößert oder verkleinert werden. Bei Betätigen der RETURN- oder der STOP-Taste wird der vorher invertierte Bereich gespeichert.<br>
+CTRL-w schreibt (Write) vorher markierten Bereich wieder auf den Bildschirm.</p>
+
+<p>Die Erweiterung läßt sich durch Normalisieren des IRQ-Vektors (zum Beispiel über die Tastenkombination RUN/STOP-RESTORE) oder CTRL-X (exit) abschalten.</p>
+
+<p>Starten von »Listmaster«: Tippen Sie das Listing mit dem MSE ab und speichern Sie es auf Disk oder Kassette. Bei Bedarf laden Sie es absolut (das heißt mit ,8,1 oder ,1,1) und geben ein:</p>
+
+<p>POKE 56,122: POKE 55,0:NEW<br>
+Dies ist wie gesagt notwendig, um das Ende des Basic-Bereichs herabzusetzen und das Maschinenprogramm vor der Zerstörung durch Basic-Variablen zu schützen.</p>
+
+<p>Noch ein paar Informationen zu »Listmaster«: Erarbeitet mit anderen Interrupt-Programmen zusammen, da die Routine, auf die der IRQ-Vektor ($0314) vor der Initialisierung von »Listmaster« zeigte, als Unterprogramm aufrufen wird. Man darf also keinesfalls zweimal nacheinander »SYS 31232« eingeben. Das würde einen Selbstaufruf und somit Systemabsturz bewirken. Außerdem benötigt »Listmaster« einige Direkteinsprünge ins Betriebssystem, so daß es bei stark geänderten Varianten desselbigen zu Fehlfunktionen kommen kann.</p>
+
+<p>An Speicheradressen verändert »Listmaster« nur einige wenige, die auch vom Standardbasic oder vom normalen Bildschirmeditor gebraucht werden. Es sind dies im Wesentlichen:</p>
+
+<p>TODO TABLE</p>
+
+<p>$07 ;Zwischenspeicher<br>
+$14/15  ;Zwischenspeicher<br>
+$22/23  ;Suchzeiger<br>
+$5F/60  ;Suchzeiger<br>
+$62/63  ;Zwischenspeicher<br>
+$AC/AD  ;Zeiger für Scrolling<br>
+$AE/AF  ;Zeiger für Scrolling<br>
+$B0 ;Zwischenspeicher<br>
+$CC ;Flag für Cursor blinken<br>
+$D1/D2  ;Zeiger auf aktuelle Zeile<br>
+$D9-F2  ;Tabelle Bildschirmzeilen<br>
+$F3/F4  ;Zeiger auf Farbram<br>
+$0314/15    ;Interruptvektor</p>
+
+<p>Die Daten für den k-Befehl werden unmittelbar hinter dem »Listmaster«-Programm aufbewahrt (maximal 80 Zeichen).</p>
+
+<address class="author">(Matthias Meyer/tr)</address>
+    </article>
+</body>
+</html>
