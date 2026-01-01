@@ -44,60 +44,66 @@
             <li>die RUN/STOP-Taste wird überprüft</li>
             <li>die Tastatur und der Datasettenmotor werden abgefragt</li>
             <li>das Cursorblinken wird erledigt</li>
-            <li>die interne Uhr (Tl$) wird gestellt.</li>
+            <li>die interne Uhr (TI$) wird gestellt.</li>
         </ul>
 
 
         <p>Überlegen wir uns, welche Funktionen verzichtbar sind: Die RUN/STOP-Taste bewirkt nur in Basic-Programmen einen Abbruch, in Assembler müßte sie zum Beispiel über »JSR $FFE1« zusätzlich abgefragt werden. Die interne Uhr findet von Maschinensprache aus praktisch keine Verwendung. Kurz und gut, ein Maschinenprogramm kann auf beide Funktionen verzichten. Dies wird durch ein</p>
 
-        <p>LDA #$34<br>
-            STA $0314</p>
+        <pre>        LDA #$34
+        STA $0314</pre>
 
         <p>erreicht. Weil der Computer dadurch entlastet wird, läuft das Hauptprogramm etwas schneller ab.</p>
 
         <p>Die Normaleinstellung erhält man mit</p>
 
-        <p>LDA #$31<br>
-            STA $0314</p>
+        <pre>        LDA #$31
+        STA $0314</pre>
 
-        <h3>Beschleunigungsmethode 1:</h3>
+        <aside>
+            <h3>Beschleunigungsmethode 1:</h3>
 
-        <p class="source">Trick: Verkürzung der Interrupt-Routine<br>
-            Nebenwirkungen: Abfrage der STOP-Taste und interne Uhr entfallen</p>
+            <p>Trick: Verkürzung der Interrupt-Routine<br>
+                Nebenwirkungen: Abfrage der STOP-Taste und interne Uhr entfallen</p>
+        </aside>
 
         <p>Können Sie zwischenzeitlich auf die ganze Interrupt-Routine verzichten, genügt ein einziger Befehl:</p>
 
-        <p>SEI (»set Interrupt«)</p>
+        <pre>        SEI (»set Interrupt«)</pre>
 
         <p>Er verhindert grundsätzlich das Auftreten von Interrupts.<br>
             Die Normaleinstellung bewirkt:</p>
 
-        <p>CLI (»clear interrupt«)</p>
+        <pre>        CLI (»clear interrupt«)</pre>
 
-        <h3>Beschleunigungsmethode 2:</h3>
+        <aside>
+            <h3>Beschleunigungsmethode 2:</h3>
 
-        <p class="source">Trick: Interrupt total abschalten<br>
-            Nebenwirkungen: Abfrage von Tastatur, STOP-Taste und Datasette, sowie Cursor und interne Uhr entfallen.</p>
+            <p>Trick: Interrupt total abschalten<br>
+                Nebenwirkungen: Abfrage von Tastatur, STOP-Taste und Datasette, sowie Cursor und interne Uhr entfallen.</p>
+        </aside>
 
-        <p>Es gibt aber noch eine Möglichkeit, im Zusammenhang mit dem Systeminterrupt: Von der Adresse $DC05, die als Zähler dient, hängtdie Anzahl der Interrupts (in der Regel 60 Aufrufe pro Sekunde) in einer bestimmten Zeit ab. Diese Adresse kann durch Schreibzugriff geändert werden. Schreibt man in $DC05 einen niedrigen Wert (im Extremfall 0), so werden sehr viele Interrupts ausgelöst. Dies macht sich in der Geschwindigkeit der Interrupt-Routine bemerkbar. Cursor und Tastaturabfrage werden sehr schnell, die interne Uhr geht vor, und so weiter. Verwendet man eine eigene, eventuell zeitkritische Interrupt-Routine, kann sie auf diese Weise beschleunigt werden.</p>
+        <p>Es gibt aber noch eine Möglichkeit, im Zusammenhang mit dem Systeminterrupt: Von der Adresse $DC05, die als Zähler dient, hängt die Anzahl der Interrupts (in der Regel 60 Aufrufe pro Sekunde) in einer bestimmten Zeit ab. Diese Adresse kann durch Schreibzugriff geändert werden. Schreibt man in $DC05 einen niedrigen Wert (im Extremfall 0), so werden sehr viele Interrupts ausgelöst. Dies macht sich in der Geschwindigkeit der Interrupt-Routine bemerkbar. Cursor und Tastaturabfrage werden sehr schnell, die interne Uhr geht vor, und so weiter. Verwendet man eine eigene, eventuell zeitkritische Interrupt-Routine, kann sie auf diese Weise beschleunigt werden.</p>
 
         <p>Dieser Geschwindigkeitszuwachs geht allerdings auf Kosten des Hauptprogramms, das stark verlangsamt wird. Bei wenigen Interrupts (große Zahl in $DC05) wird es beschleunigt. Die entsprechenden Assemblerbefehle lauten:</p>
 
-        <p>LDA #$FF<br>
-            STA $DC05</p>
+        <pre>        LDA #$FF
+        STA $DC05</pre>
 
         <p>um eine starke Beschleunigung zu bewirken.<br>
             Die Normaleinstellung wird durch</p>
 
-        <p>LDA #$3A<br>
-            STA $DC05</p>
+        <pre>        LDA #$3A
+        STA $DC05</pre>
 
-        <p>erreicht.</p>
+        <p class="noindent">erreicht.</p>
 
-        <h3>Beschleunigungsmethode 3:</h3>
+        <aside>
+            <h3>Beschleunigungsmethode 3:</h3>
 
-        <p class="source">Trick: Anzahl der Interruptaufrufe pro Sekunde ändern<br>
-            Nebenwirkungen: Bei zu wenigen Aufrufen hinken Uhr, Cursor und Tastaturabfrage nach; bei zu vielen werden sie zu schnell.</p>
+            <p>Trick: Anzahl der Interruptaufrufe pro Sekunde ändern<br>
+                Nebenwirkungen: Bei zu wenigen Aufrufen hinken Uhr, Cursor und Tastaturabfrage nach; bei zu vielen werden sie zu schnell.</p>
+        </aside>
 
         <h3>b) VIC-Register Nummer 17</h3>
 
@@ -105,58 +111,68 @@
 
         <p>Verantwortlich für das Ein-/Ausschalten des Bildschirms ist das VIC-Register Nummer 17:</p>
 
-        <p>Bit 4 gesetzt: Bildschirm wird angezeigt<br>
-            Bit 4 gelöscht: Bildschirm wird abgeschaltet und nimmt Rahmenfarbe an.</p>
+        <table class="plain">
+            <tr>
+                <td>Bit 4 gesetzt:</td>
+                <td>Bildschirm wird angezeigt</td>
+            </tr>
+            <tr>
+                <td>Bit 4 gelöscht:</td>
+                <td>Bildschirm wird abgeschaltet und nimmt Rahmenfarbe an.</td>
+            </tr>
+        </table>
 
         <p>Da wir die theoretischen Grundlagen haben, brauchen wir nur noch unser Wissen in Befehle umzusetzen:</p>
 
-        <p>Bildschirm abschalten:<br>
-            LDA $D011 ($D011 ist VIC-Register #17)<br>
-            AND #$EF ($EF = %11101111)<br>
-            STA $D011 ↑<br>
-            Bit4<br>
-            In diesem Zustand arbeiten manche Kopierprogramme um zirka 15% schneller. Programme, dienichtaufexterneGeräte wie die Floppy zugreifen, laufen zirka 5% schneller ab. Bildschirm wieder einschalten:<br>
-            LDA $D011<br>
-            ORA#$10 ($10 = %00010000)<br>
-            STA $D011 ↑<br>
-            Bit4</p>
+        <p>Bildschirm abschalten:</p>
+        <pre>        LDA $D011 ($D011 ist VIC-Register #17)
+        AND #$EF ($EF = %11101111)
+        STA $D011                      ↑
+                                             Bit 4</pre>
+        <p>In diesem Zustand arbeiten manche Kopierprogramme um zirka 15% schneller. Programme, dienichtaufexterneGeräte wie die Floppy zugreifen, laufen zirka 5% schneller ab. Bildschirm wieder einschalten:</p>
+        <pre>        LDA $D011
+        ORA#$10 ($10 = %00010000)
+        STA $D011                   ↑
+                                           Bit 4</pre>
 
-        <p>Dies ist der Normalzustand.</p>
+        <p class="noindent">Dies ist der Normalzustand.</p>
 
-        <h3>Beschleunigungsmethode 4:</h3>
+        <aside>
+            <h3>Beschleunigungsmethode 4:</h3>
 
-        <p class="source">Trick: Bildschirm abschalten<br>
-            Nebenwirkungen: Der Bildschirminhalt ist nicht zu sehen, geht aber auch nicht verloren.</p>
+            <p>Trick: Bildschirm abschalten<br>
+                Nebenwirkungen: Der Bildschirminhalt ist nicht zu sehen, geht aber auch nicht verloren.</p>
+        </aside>
 
         <h3>c) Hinweise zum bisher Gesagten</h3>
 
         <p>Alle bis zu dieser Stelle genannten Tricks beziehen sich auf die Beschleunigung von Programmen. Sie lassen sich leicht nachträglich einfügen, weil am Programmalgorithmus keine Änderungen erforderlich sind.</p>
 
-        <p>Sie können das Abschalten des Bildschirms mit dem Abschalten oder Einschränken des Interrupts verknüpfen, um die Geschwindigkeit noch weiter zu erhöhen. Wenn Sie den Interruptganzabschalten (SEI), bringtes keinen zusätzlichen Gewinn, ihn einzuschränken oder die Zahl der Aufrufe zu ändern.</p>
+        <p>Sie können das Abschalten des Bildschirms mit dem Abschalten oder Einschränken des Interrupts verknüpfen, um die Geschwindigkeit noch weiter zu erhöhen. Wenn Sie den Interrupt ganz abschalten (SEI), bringt es keinen zusätzlichen Gewinn, ihn einzuschränken oder die Zahl der Aufrufe zu ändern.</p>
 
         <p>Beachten Sie bitte, daß alle beschriebenen Tricks durch RUN/STOP-RESTORE, einem Reset oder den Assemblerbefehl BRK rückgängig gemacht werden.</p>
 
         <h2>2. Systembeschleunigungen in Basic</h2>
 
-        <p>Hier erfahren Sie, wie sich die Systembeschleunigungen von Basic aus verwerten lassen. Die Nebenwirkungen bleiben allerdings diegleichen, wie unter 1. genannt.</p>
+        <p>Hier erfahren Sie, wie sich die Systembeschleunigungen von Basic aus verwerten lassen. Die Nebenwirkungen bleiben allerdings die gleichen, wie unter 1. genannt.</p>
 
         <h3>a) Interrupt einschränken</h3>
 
-        <p>POKE788,52 verkürztdie Interrupt-Routine um das Abfragen der RUN/STOP-Taste und das Stellen von Tl$.</p>
+        <p>POKE788,52 verkürzt die Interrupt-Routine um das Abfragen der RUN/STOP-Taste und das Stellen von TI$.</p>
 
         <p>POKE 788,49 Normalzustand</p>
 
-        <p>In Basic ist das Ausfallen von RUN/STOP und Tl$ wesentlich störender als in Maschinensprache. Überprüfen Sie daher Ihre Programme auf Verwendung von Tl$ und fügen Sie den POKE erst nach (!) der Fertigstellung des Programms ein.</p>
+        <p>In Basic ist das Ausfallen von RUN/STOP und TI$ wesentlich störender als in Maschinensprache. Überprüfen Sie daher Ihre Programme auf Verwendung von TI$ und fügen Sie den POKE erst nach (!) der Fertigstellung des Programms ein.</p>
 
         <h3>b) Interrupt abschalten</h3>
 
-        <p>POKE 56334,PEEK (56334) AND 254</p>
+        <pre>        POKE 56334,PEEK (56334) AND 254</pre>
 
-        <p>schaltet den Interrupt ab,</p>
+        <p class="noindent">schaltet den Interrupt ab,</p>
 
-        <p>POKE 56334,PEEK(56334) OR 1</p>
+        <pre>        POKE 56334,PEEK(56334) OR 1</pre>
 
-        <p>schaltet ihn wieder ein. Dies geschieht dadurch, daß der Timer ab- beziehungsweise wieder eingeschaltet wird.</p>
+        <p class="noindent">schaltet ihn wieder ein. Dies geschieht dadurch, daß der Timer ab- beziehungsweise wieder eingeschaltet wird.</p>
 
         <h3>c) Anzahl der Interrupt-Aufrufe ändern</h3>
 
@@ -165,28 +181,27 @@
 
         <h3>d) Bildschirm abschalten</h3>
 
-        <p>POKE 53265,PEEK(53265) AND 239<br>
-            schaltet den Bildschirm ab.<br>
-            POKE 53265,PEEK(53265) OR 16<br>
-            schaltet ihn wieder ein.</p>
+        <pre>        POKE 53265,PEEK(53265) AND 239</pre>
+        <p class="noindent">schaltet den Bildschirm ab.</p>
+        <pre>        POKE 53265,PEEK(53265) OR 16</pre>
+        <p class="noindent">schaltet ihn wieder ein.</p>
 
         <p>An dieser Stelle sei noch einmal auf Punkt 1c hingewiesen, damit keine (vermeidbaren) Probleme auftreten.</p>
 
-        <p>Anhand von Listing 1 wollen wir uns nun mit der Anwendung der Systembeschleunigungen befassen. Dieses kleine Beispielprogramm, an dem Sie nach Herzenslust experimentieren können, versucht, mit Hilfe von Tl$ die Arbeitsdauer der Schleife (Zeile 150) zu messen.</p>
+        <p>Anhand von Listing 1 wollen wir uns nun mit der Anwendung der Systembeschleunigungen befassen. Dieses kleine Beispielprogramm, an dem Sie nach Herzenslust experimentieren können, versucht, mit Hilfe von TI$ die Arbeitsdauer der Schleife (Zeile 150) zu messen.</p>
 
         <p>Während des Ablaufs dieser Schleife, die kontinuierlich die Rahmenfarbe ändert, sollten Sie keine Taste drücken, um die Meßwerte nicht zu verfälschen.<br>
             Wenn Sie dies beachten, erhalten Sie folgende Werte:</p>
 
         <ol>
             <li>Normalzustand: 000003</li>
-            <li>Verkürzter Interrupt: 000000<br>An der gemessenen Zeit können Sie erkennen, daß Tl$ abgeschaltet wurde.</li>
-            <li>Häufige Interrupts: 000010<br>Aufgrund vieler Interrupt-Anforderungen wurde die Uhr Tl$ sehr oft erhöht.</li>
-            <li>Seltene Interrupts: 000001<br>Da die IRQ-Routine nur selten durchlaufen wurde, ist Tl$ kaum weitergezählt worden.</li>
+            <li>Verkürzter Interrupt: 000000<br>An der gemessenen Zeit können Sie erkennen, daß TI$ abgeschaltet wurde.</li>
+            <li>Häufige Interrupts: 000010<br>Aufgrund vieler Interrupt-Anforderungen wurde die Uhr TI$ sehr oft erhöht.</li>
+            <li>Seltene Interrupts: 000001<br>Da die IRQ-Routine nur selten durchlaufen wurde, ist TI$ kaum weitergezählt worden.</li>
             <li>Bildschirm abgeschaltet: 000002</li>
         </ol>
 
-
-        <p>Nur bei diesem Punkt (und natürlich auch bei »1«) hat Tl$ volle Aussagekraft bezüglich der Ablaufzeit. An dieser Zeit können wir erkennen, daß durch das Abschalten des Bildschirms tatsächlich gegenüber »1« ein Zeitgewinn anfällt.</p>
+        <p>Nur bei diesem Punkt (und natürlich auch bei »1«) hat TI$ volle Aussagekraft bezüglich der Ablaufzeit. An dieser Zeit können wir erkennen, daß durch das Abschalten des Bildschirms tatsächlich gegenüber »1« ein Zeitgewinn anfällt.</p>
 
         <p>Bei den Punkten »3« und »4« wurde der Cursor eingeschaltet. Bei »3« (häufige Interrupts) ist er sehr schnell, bei »4« dagegen sehr langsam.</p>
 
@@ -204,35 +219,61 @@
 
         <h3>a) Bildschirm löschen</h3>
 
-        <p class="source">Langsam:</p>
+        <p>Langsam:</p>
 
-        <p>LDA #$93 $93 = 147 = Codefür»Bildschirm löschen«, entspricht PRINT CHR$(147)<br>
-            JSR $FFD2 (oder$E176)</p>
+        <table class="plain">
+            <tr>
+                <td>LDA&nbsp;#$93</td>
+                <td>$93 = 147 = Code für »Bildschirm löschen«, entspricht PRINT CHR$(147)</td>
+            </tr>
+            <tr>
+                <td>JSR&nbsp;$FFD2</td>
+                <td>(oder $E176)</td>
+            </tr>
+        </table>
 
-        <p class="source">Schnell:</p>
+        <p>Schnell:</p>
 
-        <p>JSR $E544 (Routine für »Bildschirm löschen«)</p>
+        <table class="plain">
+            <tr>
+                <td>JSR&nbsp;$E544</td>
+                <td>(Routine für »Bildschirm löschen«)</td>
+            </tr>
+        </table>
 
         <h3>b) Cursor in Home-Position (linke obere Ecke)</h3>
 
-        <p class="source">Langsam:</p>
+        <p>Langsam:</p>
 
-        <p>LDA #$13 ; $13 = Code für »Cursor Home«<br>
-            JSR $FFD2 (oder$E176)</p>
+        <table class="plain">
+            <tr>
+                <td>LDA&nbsp;#$13</td>
+                <td>; $13 = Code für »Cursor Home«</td>
+            </tr>
+            <tr>
+                <td>JSR&nbsp;$FFD2</td>
+                <td>(oder $E176)</td>
+            </tr>
+        </table>
 
-        <p class="source">Schnell:</p>
+        <p>Schnell:</p>
 
-        <p>JSR $E566 (Routine für »Cursor Home«)</p>
+        <table class="plain">
+            <tr>
+                <td>JSR&nbsp;$E566</td>
+                <td>(Routine für »Cursor Home«)</td>
+            </tr>
+        </table>
 
         <h3>c) Cursor-Positionierung</h3>
 
-        <p class="source">Langsam:<br>
+        <p>Langsam:<br>
             Senden von Steuerzeichen (CRSR DOWN, UP und so weiter) über BASOUT.<br>
             Schnell:</p>
 
-        <p>LDX #Zeile<br>
-            LDY #Spalte<br>
-            JSR $E50C (Cursorposition setzen)</p>
+        <pre>        LDX #Zeile
+        LDY #Spalte
+        JSR $E50C (Cursorposition setzen)</pre>
 
         <h3>d) Textausgabe</h3>
 
@@ -243,31 +284,44 @@
 
         <p>Ab der Adresse »TEXT« muß der Text (in ASCII-Darstellung) stehen, in dem keine Anführungszeichen vorkommen dürfen. Am Ende des Textes muß $00 als Endmarkierung zu finden sein. Die Ausgabe erfolgt dann über</p>
 
-        <p>LDA #&lt;(TEXT) Low-Byte der Adresse<br>
-            LDY #>(TEXT) High-Byte<br>
-            JSR $AB1E</p>
+        <pre>        LDA #&lt;(TEXT) Low-Byte der Adresse
+        LDY #>(TEXT) High-Byte
+        JSR $AB1E</pre>
 
         <p>Die Routine $AB1E wird fortan als »STROUT« (STRing-OUTput = String-Ausgabe) bezeichnet. STROUT ist zwar etwas langsamer als BASOUT; dafür erlaubt die komfortable Parameterübergabe eine wesentlich bequemere Programmierung, wie Sie am zweiten Teil von Listing 2 (Zeilen 260 -300, 320 - 330) sehen können. Mit nur drei Befehlen wird der Text ausgegeben!</p>
 
-        <h3>Beschleunigungsmethode 5.</h3>
+        <aside>
+            <h3>Beschleunigungsmethode 5.</h3>
 
-        <p>TODO TABLE</p>
+            <p>Zusammenfassung der bisherigen Alternativen zu BASOUT:</p>
 
-        <p>Zusammenfassung der bisherigen Alternativen<br>
-            zu BASOUT:<br>
-            CLEAR HOME: JSR $E544<br>
-            CURSOR HOME: JSR $E566<br>
-            Cursorpositionierung:<br>
-            LDX #Zeile<br>
-            LDY #Spalte<br>
-            JSR $E50C<br>
-            Textausgabe:<br>
-            Text ab TEXT ablegen (wie Listing 2, Zeile 320 - 330)<br>
-            LDA #&lt;(TEXT)<br>
-            LDY #>(TEXT)<br>
-            JSR $AB1E</p>
+            <table class="plain">
+                <tr>
+                    <td>CLEAR HOME:</td>
+                    <td>JSR $E544</td>
+                </tr>
+                <tr>
+                    <td>CURSOR HOME:</td>
+                    <td>JSR $E566</td>
+                </tr>
+                <tr>
+                    <td>Cursorpositionierung:</td>
+                    <td>
+                        LDX #Zeile<br>
+                        LDY #Spalte<br>
+                        JSR $E50C</td>
+                </tr>
+                <tr>
+                    <td>Textausgabe:</td>
+                    <td>Text ab TEXT ablegen (wie Listing 2, Zeile 320 - 330)<br>
+                        LDA #&lt;(TEXT)<br>
+                        LDY #>(TEXT)<br>
+                        JSR $AB1E</td>
+                </tr>
+            </table>
 
-        <p>Alle diese Verfahren sind nicht nur schnell, sondern auch speicherplatzsparend.</p>
+            <p>Alle diese Verfahren sind nicht nur schnell, sondern auch speicherplatzsparend.</p>
+        </aside>
 
         <p>Eine Anwendung von (fast) allen Routinen aus der Beschleunigungsmethode 5 zeigt Listing 3.</p>
 
@@ -324,8 +378,10 @@
 
         <p>Die folgende Regel gilt für Aufrufe von Betriebssystemroutinen:</p>
 
-        <p>JSR $XXXX entspricht JMP $XXXX<br>
-            RTS</p>
+        <aside>
+            <pre>        JSR $XXXX entspricht JMP $XXXX
+        RTS</pre>
+        </aside>
 
         <p>Voraussetzung ist, daß im Unterprogramm ab $XXXX keine Stapelmanipulation erfolgt, wie sie gleich beschrieben wird. Das geschilderte Verfahren zur Unterprogrammverschachtelung und die entsprechenden Regeln können Sie dann auf jede (!) Programmiersprache übertragen.</p>
 
@@ -335,8 +391,8 @@
 
         <p>In Assembler ist dies auch möglich. Die Befehlseingabe</p>
 
-        <p>PLA<br>
-            PLA</p>
+        <pre>        PLA
+        PLA</pre>
 
         <p>entspricht in der Wirkung »DISPOSE RETURN«.</p>
 
@@ -344,17 +400,17 @@
 
         <p>Ein RTS an eine beliebige Adresse müßte »RTS XXXX« heißen, doch diesen Befehl gibt es beim 6510 nicht. So wird er aber simuliert:</p>
 
-        <p>PLA ; holt Rücksprungadresse<br>
-            PLA ; vom Stapel und<br>
-            JMP $XXXX ; springt nach $XXXX</p>
+        <pre>        PLA ; holt Rücksprungadresse
+        PLA ; vom Stapel und
+        JMP $XXXX ; springt nach $XXXX</pre>
 
         <p>So sieht ein Makro dazu aus:</p>
 
-        <p>-.MA RTS (RUECKSPRUNGADRESSE)<br>
-            - PLA<br>
-            - PLA<br>
-            - JMP RUECKSPRUNGADRESSE<br>
-            -.RT</p>
+        <pre>        -.MA RTS (RUECKSPRUNGADRESSE)
+        -        PLA
+        -        PLA
+        -        JMP RUECKSPRUNGADRESSE
+        -.RT</pre>
 
         <p>Und noch ein Mangel der Unterprogrammbefehle soll beseitigt werden: Obwohl es JMP (indirekt) gibt, kennt der 6510 keinen Befehl wie JSR (indirekt); über Stapelmanipulation ist dies dennoch möglich (siehe dazu auch im 64’er, Ausgabe 1/86: Assembler-Bedienung leicht gemacht).</p>
 
@@ -364,13 +420,13 @@
 
         <p>Folgendes Makro ermöglicht die Simulation von JSR (indirekt):</p>
 
-        <p>-. MAJSRIND(VEKTOR, RUECKSPRUNGADRESSE)<br>
-            - LDA #>(RUECKSPRUNGADRESSE-1)<br>
-            - PHA<br>
-            - LDA #&lt;(RUECKSPRUNGADRESSE-1)<br>
-            - PHA<br>
-            - JMP (VEKTOR)<br>
-            -. RT</p>
+        <pre>        -.MA JSRIND(VEKTOR, RUECKSPRUNGADRESSE)
+        -        LDA #>(RUECKSPRUNGADRESSE-1)
+        -        PHA
+        -        LDA #&lt;(RUECKSPRUNGADRESSE-1)
+        -        PHA
+        -        JMP (VEKTOR)
+        -.RT</pre>
 
         <p>Diese Simulation von JSR ($XXXX) verwendet auch der SYS-Befehl (disassemblieren Sie von $E12A bis $E155 und betrachten Sie dazu Bild 3).</p>
 
@@ -406,21 +462,61 @@
 
         <p>Für das Rechnen mit einzelnen Bits in einem Byte werden oft die Zweierpotenzen benötigt; es empfiehlt sich, diese als Tabelle anzulegen:</p>
 
-        <p>1000 -; Zweierpotenzen als Tabellle<br>
-            1010 -; im DOS der Floppy 1541 ab $EFE9<br>
-            1020 -; zu finden<br>
-            1030 -; ZWEIPOT .BY2↑O, 2↑1, 2↑2, 2↑3, 2↑4, 2↑5, 2↑6, 2↑7</p>
+        <table class="plain">
+            <tr>
+                <td>1000&nbsp;-</td>
+                <td>; Zweierpotenzen als Tabellle</td>
+            </tr>
+            <tr>
+                <td>1010&nbsp;-</td>
+                <td>; im DOS der Floppy 1541 ab $EFE9</td>
+            </tr>
+            <tr>
+                <td>1020&nbsp;-</td>
+                <td>; zu finden</td>
+            </tr>
+            <tr>
+                <td>1030&nbsp;-</td>
+                <td>; ZWEIPOT .BY2↑O, 2↑1, 2↑2, 2↑3, 2↑4, 2↑5, 2↑6, 2↑7</td>
+            </tr>
+        </table>
 
         <p>Folgende Unterroutine legt im Akkumulator den Wert 2tA ab, wobei mit A der Inhalt des Akkumulators bei Aufruf der Routine gemeint ist:</p>
 
-        <p>10000 -;<br>
-            10010 -; Subroutine zur Berechnung von<br>
-            10020 -; 21A (Ergebnis kommt in den Akku)<br>
-            10030 -;<br>
-            10040 - TAX ; Akku in Indexregister<br>
-            10050 - LDA ZWEIPOT,X; aus Tabelle einlesen<br>
-            10060 - RTS ; Das war’s schon! Wer ein schnelleres und zugleich so einfaches Verfahren kennt, möge sich melden&hellip;<br>
-            10070 - ZWEIPOT .BY 2↑0,2↑1,2↑2,2↑3,2↑4,2↑5,2↑6,2↑7</p>
+        <table class="plain">
+            <tr>
+                <td>10000 -</td>
+                <td>;</td>
+            </tr>
+            <tr>
+                <td>10010 -</td>
+                <td>; Subroutine zur Berechnung von</td>
+            </tr>
+            <tr>
+                <td>10020 -</td>
+                <td>; 21A (Ergebnis kommt in den Akku)</td>
+            </tr>
+            <tr>
+                <td>10030 -</td>
+                <td>;</td>
+            </tr>
+            <tr>
+                <td>10040 -</td>
+                <td>TAX ; Akku in Indexregister</td>
+            </tr>
+            <tr>
+                <td>10050 -</td>
+                <td>LDA ZWEIPOT,X; aus Tabelle einlesen</td>
+            </tr>
+            <tr>
+                <td>10060 -</td>
+                <td>RTS ; Das war’s schon! Wer ein schnelleres und zugleich so einfaches Verfahren kennt, möge sich melden&hellip;</td>
+            </tr>
+            <tr>
+                <td>10070 -</td>
+                <td>ZWEIPOT .BY 2↑0,2↑1,2↑2,2↑3,2↑4,2↑5,2↑6,2↑7</td>
+            </tr>
+        </table>
 
         <p>Wenn A größerals 7 ist, liefert das Programm falsche Werte. Sie können es noch erweitern, wenn Sie es für nötig halten.</p>
 
@@ -428,28 +524,29 @@
 
         <p>Zu den zeitraubendsten Operationen gehört die Rechnung mit Fließkommazahlen. Daß diese selbst in Maschinenprogrammen lähmend wirkt, sehen Sie am HiRes-3-Befehl »FUNKT« (64’er, Ausgabe 3/85, Grafikkurs-Anwendung). Daher sollte man nur dann auf die Fließkommaroutinen zugreifen, wenn es unvermeidbar ist. Berechnen Sie soviele Werte wie möglich voraus, hierfür eignet sich der Direktmodus des Basic-Interpreters besonders gut! Wie Sie einen auf diese Weise berechneten Wert ins MFLPT-(Floating Point)Format umwandeln können, zeigt Ihnen der folgende Kasten.</p>
 
-        <p>Verfahren zur Umwandlung einer Zahl ins MFLPT-Format</p>
+        <aside>
+            <h3>Verfahren zur Umwandlung einer Zahl ins MFLPT-Format</h3>
 
-        <ol>
-            <li>SMON (oder anderen Monitor) laden</li>
-            <li>RESET auslösen oder NEW eingeben</li>
-            <li>»XX = Fließkommazahl« eingeben, zum Beispiel »XX = 1.23456«</li>
-            <li>Monitor starten (SYS 49152)</li>
-            <li>»M 0805 0809« eingeben</li>
-        </ol>
+            <ol>
+                <li>SMON (oder anderen Monitor) laden</li>
+                <li>RESET auslösen oder NEW eingeben</li>
+                <li>»XX = Fließkommazahl« eingeben, zum Beispiel »XX = 1.23456«</li>
+                <li>Monitor starten (SYS 49152)</li>
+                <li>»M 0805 0809« eingeben</li>
+            </ol>
 
-
-        <p>Sie sehen nun in den Adressen $0805 - $0809 die MFLPT-Darstellung der Zahl, mit der Sie die Variable XX belegt haben.</p>
+            <p>Sie sehen nun in den Adressen $0805 - $0809 die MFLPT-Darstellung der Zahl, mit der Sie die Variable XX belegt haben.</p>
+        </aside>
 
         <p>Damit wir uns unter Zuhilfenahme präziser Fachausdrücke und Abkürzungen verständigen können, sollten Sie den Abschnitt in »Assembler ist keine Alchimie« aufmerksam lesen, der sich mit Fließkommazahlen befaßt. Nach dem Studium dieses Abschnitts sollten Ihnen Begriffe wie »MFLPT«, »FAC« oder »ARG« geläufig sein.</p>
 
         <p>Im Falle der Zahl 1.23456 erhalten wir als Ergebnis:</p>
 
-        <p>:0805 81 1E06 0FE5&hellip;</p>
+        <pre>        :0805 81 1E06 0FE5&hellip;</pre>
 
         <p>Diese Werte legen wir folgendermaßen als Tabelle ab:</p>
 
-        <p>540 -BSPZAHL .BY $81, $1E, $06, $0F, $E5</p>
+        <pre>        540 -BSPZAHL .BY $81, $1E, $06, $0F, $E5</pre>
 
         <p>Wie wir nun diese Zahl verarbeiten, zeigt Ihnen Listing 8. Das Makro (200 - 240) stützt sich auf die Interpreter-Routine MEMFAC, die eine Zahl (Adresse wird in Akku/Y-Register übergeben) vom Speicherformat MFLPT in den FAC als FLPT-Zahl schreibt und dabei die erforderliche MFLPT-—FLPT-Umwandlung durchführt.</p>
 
@@ -483,7 +580,32 @@
 
         <p>Sprung- und Vergleichstabellen sind in gleicher Befehlsfolge angeordnet; wird der Befehl an einer bestimmten Stelle in der Vergleichstabelle gefunden, erfolgt ein Sprung an die Adresse, die an gleicher Stelle in der Sprungtabelle steht. So sehen die Befehls- und Vergleichstabellen im SMON aus:</p>
 
-        <p>TODO TABLE</p>
+        <table>
+            <tr>
+                <td>Spalte Nr.</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>&hellip;</td>
+            </tr>
+            <tr>
+                <td>Befehl</td>
+                <td>/</td>
+                <td>#</td>
+                <td>$</td>
+                <td>%</td>
+                <td>&hellip;</td>
+            </tr>
+            <tr>
+                <td>Sprungadr. $</td>
+                <td>CADB</td>
+                <td>C920</td>
+                <td>C908</td>
+                <td>C91C</td>
+                <td>&hellip;</td>
+            </tr>
+        </table>
 
         <p>Die Sprungadressen sind wegen der Stapelmanipulation in der Tabelle ab $C02B um 1 dekrementiertgespeichert; in der Darstellung sehen Sie aber das tatsächliche Sprungziel.</p>
 
@@ -511,7 +633,123 @@
 
         <p>Bei Adresse $C303 steht im Akku der ASCII-Code des Kommandos, das der SMON ausführen soll (zum Beispiel $40, wenn ein M-Befehl eingegeben wurde).</p>
 
-        <p>TODO TABLE/CODE</p>
+        <table class="plain">
+            <tr>
+                <td>C303</td>
+                <td>LDX&nbsp;#$20</td>
+                <td>32–1 Befehle müssen durchsucht werden. Weshalb »–1« erforderlich ist, liegt an der Schleifenstruktur und ist unbedeutend.</td>
+            </tr>
+            <tr>
+                <td>C305</td>
+                <td>CMP&nbsp;$C00A,X</td>
+                <td>Akku (enthält Befehl) mit X-tem Element der Befehlstabelle vergleichen; $C00A = Befehlstabelle –1, weil Adresse $C00A nie zum Vergleich herangezogen wird.</td>
+            </tr>
+            <tr>
+                <td>C308</td>
+                <td>BEQ&nbsp;$C30F</td>
+                <td>Vergleich positiv; im X-Register steht jetzt die Spalte.</td>
+            </tr>
+            <tr>
+                <td>C30A</td>
+                <td>DEX</td>
+                <td>Zähler wird dekrementiert; es handelt sich hier um eine »Dekrementierschleife« (dieses Thema wird noch behandelt).</td>
+            </tr>
+            <tr>
+                <td>C30B</td>
+                <td>BNE&nbsp;$C305</td>
+                <td>Wenn der Zähler noch nicht gleich 0 ist, folgt ein Sprung zum Schleifenbeginn.</td>
+            </tr>
+            <tr>
+                <td>C30D</td>
+                <td>BEQ&nbsp;$C2D1</td>
+                <td>Wenn X=0, dann wurde die ganze Tabelle durchsucht, und der Befehl nicht gefunden! Deshalb wird in die SMON-Fehlerbehandlung gesprungen.</td>
+            </tr>
+            <tr>
+                <td>C30F</td>
+                <td>JSR&nbsp;$C315</td>
+                <td>Diese Stelle wird von $C308 aus angesprungen; hier wiederum steht ein Aufruf des Unterprogramms ab $C315, das etwas weiter unten besprochen wird.</td>
+            </tr>
+            <tr>
+                <td>C312</td>
+                <td>JMP&nbsp;$C2D6</td>
+                <td>Nachdem nun der Befehl durch die Subroutine $C315 abgearbeitet wurde, folgt ein Sprung zur Eingabe des nächsten Befehls.</td>
+            </tr>
+            <tr>
+                <td>C30A</td>
+                <td>DEX</td>
+                <td>Zähler wird dekrementiert; es handelt sich hier um eine »Dekrementierschleife« (dieses Thema wird noch behandelt).</td>
+            </tr>
+            <tr>
+                <td>C308</td>
+                <td>BNE&nbsp;$C305</td>
+                <td>Wenn der Zähler noch nicht gleich 0 ist, folgt ein Sprung zum Schleifenbeginn.</td>
+            </tr>
+            <tr>
+                <td>C30D</td>
+                <td>BEQ&nbsp;$C2D1</td>
+                <td>Wenn X=0, dann wurde die ganze Tabelle durchsucht, und der Befehl nicht gefunden! Deshalb wird in die SMON-Fehlerbehandlung gesprungen.</td>
+            </tr>
+            <tr>
+                <td>C30F</td>
+                <td>JSR&nbsp;$C315</td>
+                <td>Diese Stelle wird von $C308 aus angesprungen; hier wiederum steht ein Aufruf des Unterprogramms ab $C315, das etwas weiter unten besprochen wird.</td>
+            </tr>
+            <tr>
+                <td>C312</td>
+                <td>JMP&nbsp;$C2D6</td>
+                <td>Nachdem nun der Befehl durch die Subroutine $C315 abgearbeitet wurde, folgt ein Sprung zur Eingabe des nächsten Befehls.</td>
+            </tr>
+            <tr>
+                <td>C315</td>
+                <td>TXA</td>
+                <td>Das ist sie, die Subroutine! Weil im X-Register die Nummer des Befehls (= Spalte in Tabelle) steht, kommt das X-Register ins Hauptrechenregister.</td>
+            </tr>
+            <tr>
+                <td>C316</td>
+                <td>ASL</td>
+                <td>Die Befehlsnummer wird mit 2 multipliziert...</td>
+            </tr>
+            <tr>
+                <td>C317</td>
+                <td>TAX</td>
+                <td>und kommt wieder ins X-Register. Die Multiplikation mit 2 ist erforderlich, weil in der Sprungtabelle ein Element doppelt so lang ist, wie in der Vergleichstabelle, nämlich 2 Byte. Die Sprungadressen belegen deshalb 2 Byte, weil sie aus Low- und High-Bytes bestehen.</td>
+            </tr>
+            <tr>
+                <td>C318</td>
+                <td>INX</td>
+                <td>Das X-Register wird um 1 erhöht, da das High-Byte eine Position hinter dem Low-Byte steht.</td>
+            </tr>
+            <tr>
+                <td>C319</td>
+                <td>LDA&nbsp;$C029,X</td>
+                <td>High-Byte wird gelesen. Die Sprungtabelle beginnt zwar 2 Byte nach $C029, aber weil es keine Spalte 0 gibt, muß der Speicherbedarf einer Sprungadresse (=2) abgezogen werden.</td>
+            </tr>
+            <tr>
+                <td>C31C</td>
+                <td>PHA</td>
+                <td>Das High-Byte der Adresse wird auf den Stapel gelegt.</td>
+            </tr>
+            <tr>
+                <td>C31D</td>
+                <td>DEX</td>
+                <td>–1, weil Low-Byte eine Adresse vor High-Byte steht.</td>
+            </tr>
+            <tr>
+                <td>C31E</td>
+                <td>LDA&nbsp;$C029,X</td>
+                <td>Nun wird auch das Low-Byte der Adresse</td>
+            </tr>
+            <tr>
+                <td>C321</td>
+                <td>PHA</td>
+                <td>auf den Stapel geschoben.</td>
+            </tr>
+            <tr>
+                <td>C322</td>
+                <td>RTS</td>
+                <td>Der Befehl RTS wird hier zur Simulation von JMP (ind) verwendet. Auf dieses (unpraktische) Verfahren soll nicht weiter eingegangen werden, weil der 6510 den Befehl JMP (ind) kennt. Wichtig ist für uns nur, daß jede SMON-Routine mit einem RTS abgeschlossen wird, dann erfolgt ein Rücksprung zur Adresse $C312.</td>
+            </tr>
+        </table>
 
         <p>Damit haben wir SMONs Schleife zum Suchen eines Befehls und dessen Routine durchleuchtet. Sofern Sie ein ROM-Listing zur Verfügung haben, können Sie sich zusätzlich die entsprechenden Stellen im Basic-Interpreter an|sehen. Dieser aber benötigt wegen seiner unterschiedlich langen Befehle einen etwas komplizierteren Suchalgorithmus, was wiederum zu erheblich höherer Ausführungszeit beiträgt.</p>
 
@@ -523,7 +761,7 @@
 
         <p>Ein Nachteil ist jedoch der Speicherplatzaufwand; für die Umwandlung müssen die Befehle irgendwo im Speicher in Langform vorhanden sein.</p>
 
-        <p>Es gibt aber noch ein anderes Verfahren, einer Zeichenkette einen Wert zuzuweisen: Die Prüfsummenberechnung. Dieseführen zum Beispiel die Eingabehilfen »Checksummer« und »MSE« durch: Aus 8 Byte Programmcode und 2 Byte Adresse errechnet der MSE eine 1 Byte Prüfsumme.</p>
+        <p>Es gibt aber noch ein anderes Verfahren, einer Zeichenkette einen Wert zuzuweisen: Die Prüfsummenberechnung. Diese führen zum Beispiel die Eingabehilfen »Checksummer« und »MSE« durch: Aus 8 Byte Programmcode und 2 Byte Adresse errechnet der MSE eine 1 Byte Prüfsumme.</p>
 
         <p>In Bild 4 sehen Sie einen sehr zuverlässigen Algorithmus zur Berechnung von Prüfsummen (insofern zuverlässig, als er sehr unterschiedliche Prüfsummen ermittelt). Listing 9 stellt ein Hilfsprogramm dar, das zu einer Eingabe die Prüfsumme nach dem Algorithmus aus Bild 4 errechnet.</p>
 
@@ -553,11 +791,27 @@
 
         <p>Zuerst soll die Bedienung des Programms erläutert werden. Gestartet wird »TABELLEN-BEISPIEL« durch SYS 49152, worauf man sich in folgendem Menü befindet:</p>
 
-        <p>ZAHLINZAHLWORTWANDELN (0)<br>
-            BILDSCHIRMFARBE (1)<br>
-            RESETAUSLOESEN (2)<br>
-            PROGRAMMENDE UEBER RTS (3)<br>
-            BITTE AUSWAEHLEN!</p>
+        <table class="plain">
+            <tr>
+                <td>ZAHL IN ZAHLWORT WANDELN</td>
+                <td>(0)</td>
+            </tr>
+            <tr>
+                <td>BILDSCHIRMFARBE</td>
+                <td>(1)</td>
+            </tr>
+            <tr>
+                <td>RESET AUSLOESEN</td>
+                <td>(2)</td>
+            </tr>
+            <tr>
+                <td>PROGRAMMENDE UEBER RTS</td>
+                <td>(3)</td>
+            </tr>
+            <tr>
+                <td>BITTE AUSWAEHLEN!</td>
+            </tr>
+        </table>
 
         <p>Die Zahlen in Klammern sehen Sie nicht, diese zeigen nur die interne Numerierung der Menüpunkte an.</p>
 
@@ -652,41 +906,94 @@
 
         <p>Dies soll nur eine Anregung sein. Ich wüßte aber kein komplexes Programm, das sich nicht durch den gezielten Einsatz von Tabellen vereinfachen und beschleunigen ließe.</p>
 
-        <h3>Texteinschub #1: Fließkommazahlen</h3>
+        <aside>
+            <h3>Texteinschub #1: Fließkommazahlen</h3>
 
-        <p>Im Text wurde ein Verfahren vorgestellt, um eine Zahl ins MFLPT-Fbrmat (MELPT=Memory floating point) umzuwandeln. Das 5 Byte lange Ergebnis dieser Umwandlung kann man dann als KONSTANTE handhaben. Konstanten sind feste, vorausberechnete Werte, die man mit Hilfe der Routine »MEMFAC« in den FAC (Flieskomma-AKKU) kopieren kann. Für viele Werte ist es jedoch überflüssig, die Umwandlung durchzuführen und eine entsprechende Tabelle anzulegen, da sie schon im ROM vorhanden sind. Im Kurs »Assembler ist keine Alchimie« wurden solche Konstanten mitsamt ihrer Adressen schon in einer Tabelle vorgestellt.</p>
+            <p>Im Text wurde ein Verfahren vorgestellt, um eine Zahl ins MFLPT-Fbrmat (MELPT=Memory floating point) umzuwandeln. Das 5 Byte lange Ergebnis dieser Umwandlung kann man dann als KONSTANTE handhaben. Konstanten sind feste, vorausberechnete Werte, die man mit Hilfe der Routine »MEMFAC« in den FAC (Flieskomma-AKKU) kopieren kann. Für viele Werte ist es jedoch überflüssig, die Umwandlung durchzuführen und eine entsprechende Tabelle anzulegen, da sie schon im ROM vorhanden sind. Im Kurs »Assembler ist keine Alchimie« wurden solche Konstanten mitsamt ihrer Adressen schon in einer Tabelle vorgestellt.</p>
 
-        <p>Um mit Konstanten (für die Rechenroutinen macht es keinen Unterschied, ob diese im RAM oder im ROM stehen) zu rechnen, kann man diese wie gesagt, in den FAC kopieren und alle weiteren Operationen auf diesen beziehen. Dies war in Listing 8 bei den Funktionen SQR und LOGNAT ausreichend.</p>
+            <p>Um mit Konstanten (für die Rechenroutinen macht es keinen Unterschied, ob diese im RAM oder im ROM stehen) zu rechnen, kann man diese wie gesagt, in den FAC kopieren und alle weiteren Operationen auf diesen beziehen. Dies war in Listing 8 bei den Funktionen SQR und LOGNAT ausreichend.</p>
 
-        <p>Oft möchte man aber den Inhalt des FAC nicht mit einer Funktion wie SQR behandeln, sondern mit anderen Konstanten addieren, multiplizieren und so weiter.</p>
+            <p>Oft möchte man aber den Inhalt des FAC nicht mit einer Funktion wie SQR behandeln, sondern mit anderen Konstanten addieren, multiplizieren und so weiter.</p>
 
-        <p>Dafür möchte ich Ihnen im folgenden weitere Interpreter-Routinen vorstellen, die das Rechnen mit Konstanten ermöglichen. Da fast immer in den Akku das Low-, ins Y-Register das High-Byte der Adresse, ab der die Konstante abgelegt ist, geladen werden muß, definieren wir noch vorher folgende Makro:</p>
+            <p>Dafür möchte ich Ihnen im folgenden weitere Interpreter-Routinen vorstellen, die das Rechnen mit Konstanten ermöglichen. Da fast immer in den Akku das Low-, ins Y-Register das High-Byte der Adresse, ab der die Konstante abgelegt ist, geladen werden muß, definieren wir noch vorher folgende Makro:</p>
 
-        <ul>
-            <li>.MA LDAY (ADRESSE)</li>
-            <li>LDA#&lt;(ADRESSE)</li>
-            <li>LDY#>(ADRESSE)<br>
-                -.RT</li>
-        </ul>
+            <pre>        -.MA LDAY (ADRESSE)
+        -        LDA #&lt;(ADRESSE)
+        -        LDY #>(ADRESSE)
+        -.RT
+            </pre>
 
+            <p>Nun zu den Routinen, bei deren Parameterübergabe wir uns auf das Makro LDAY stützen wollen:</p>
 
-        <p>Nun zu den Routinen, bei deren Parameterübergabe wir uns auf das Makro LDAY stützen wollen:</p>
+            <table class="plain">
+                <tr>
+                    <td>ADDMEM</td>
+                    <td>FAC+Konstante → FAC</td>
+                    <td>... LDAY (KONSTANTE)<br>JSR $B867</td>
+                </tr>
+                <tr>
+                    <td>ADD0,5</td>
+                    <td>FAC+0.5 → FAC</td>
+                    <td>JSR $B849</td>
+                </tr>
+                <tr>
+                    <td>SUBMEM</td>
+                    <td>Konstante-FAC → FAC</td>
+                    <td>... LDAY (KONSTANTE)<br>JSR $B850</td>
+                </tr>
+                <tr>
+                    <td>MULMEM</td>
+                    <td>Konstante*FAC → FAC</td>
+                    <td>... LDAY (KONSTANTE)<br>JSR $BA28</td>
+                </tr>
+                <tr>
+                    <td>MULT10</td>
+                    <td>FAC*10 → FAC</td>
+                    <td>JSR $BAE2</td>
+                </tr>
+                <tr>
+                    <td>DIVMEM</td>
+                    <td>Konstante/FAC → FAC</td>
+                    <td>... LDAY (KONSTANTE)<br>JSR $BBOF</td>
+                </tr>
+                <tr>
+                    <td>DIVS10</td>
+                    <td>FAC/10 → FAC</td>
+                    <td>JSR $BAFE</td>
+                </tr>
+                <tr>
+                    <td>CMPMEM</td>
+                    <td>vergleicht Konstante mit FAC<br>FAC&lt;Konstante: Akku=$FF<br>FAC=Konstante: Akku=$00<br>FAC&gt;Konstante: Akku=$01</td>
+                    <td>... LDAY (KONSTANTE)<br>JSR $BC5B</td>
+                </tr>
+                <tr>
+                    <td>POTMEM</td>
+                    <td>Konstante ↑ FAC → FAC</td>
+                    <td>... LDAY (KONSTANTE)<br>JSR $BF78</td>
+                </tr>
+                <tr>
+                    <td>POTE</td>
+                    <td>e↑FAC → FAC</td>
+                    <td>JSR $BFED</td>
+                </tr>
+                <tr>
+                    <td>MEMFAC</td>
+                    <td>holt Konstante in FAC</td>
+                    <td>... LDAY (KONSTANTE)<br>JSR $BBA2</td>
+                </tr>
+                <tr>
+                    <td>FACMEM</td>
+                    <td>FAC ab Konstante als MFLPT-Zahl ablegen</td>
+                    <td>LDX #&lt;(KONSTANTE)<br>LDY #&gt;(KONSTANTE)<br>JSR $BBD7</td>
+                </tr>
+                <tr>
+                    <td>FACOUT</td>
+                    <td>gibt FAC aus</td>
+                    <td>JSR $AABC</td>
+                </tr>
+            </table>
 
-        <p>TODO TABLE</p>
-
-        <p>ADDMEM FAC+Konstante - FAC &hellip; LDAY (KONSTANTE) JSR$B867<br>
-            ADD0,5 FAC+0.5 - FAC JSR $B849<br>
-            SUBMEM Konstante-FAC - FAC &hellip;LDAY(KONSTANTE) JSR $B850<br>
-            MULMEM Konstante*FAC - FAC &hellip;LDAY(KONSTANTE) JSR $BA28<br>
-            MULT10 FAC*1O-FAC JSR $BAE2<br>
-            DIVMEM Konstante/FAC - FAC &hellip;LDAY(KONSTANTE) JSR $BBOF<br>
-            DIVS10 FAC/10 - FAC JSR $BAFE<br>
-            CMPMEM vergleicht Konstante mit FAC FAC&lt;Konstante: Akku=$FF FAC=Konstante: Akku=$OO FAC>Konstante: Akku=$O1 &hellip; LDAY (KONSTANTE) JSR $BC5B<br>
-            POTMEM Konstante tFAC - FAC &hellip;LDAY(KONSTANTE) JSR $BF78<br>
-            POTE e↑FAC-FAC JSR $BFED<br>
-            MEMFAC holt Konstante in FAC &hellip;LDAY(KONSTANTE) JSR $BBA2<br>
-            FACMEM FAC ab Konstante als MFLPT-Zahl ablegen LDX#&lt;(KONSTANTE) LDY#>(KONSTANTE) JSR$BBD7<br>
-            FACOUT gibt FAC aus JSR $AABC</p>
+        </aside>
 
         <h2>7. Die Initialisierung</h2>
 
@@ -798,9 +1105,11 @@
 
         <p>Allgemeine Gültigkeit hat aber folgende Regel für Schleifen vom Typ a:</p>
 
-        <p>Bei Schleifen vom Typ a ist Dekrementieren effektiver als Inkrementieren, solange die Durchlaufzahl nicht 255 überschreitet.</p>
+        <aside>
+            <p class="noindent">Bei Schleifen vom Typ a ist Dekrementieren effektiver als Inkrementieren, solange die Durchlaufzahl nicht 255 überschreitet.</p>
 
-        <p>Bei 256 Durchläufen erweist sich Inkrementieren oft als besser.</p>
+            <p class="noindent">Bei 256 Durchläufen erweist sich Inkrementieren oft als besser.</p>
+        </aside>
 
         <p>An Listing 17 sehen wir ein Beispiel für den letzten Satz der Regel. Listing 17 kopiert die letzten 256 Speicherplätze des Stapels ($0100 - $01FF) und den Stapelzeiger nach $6F00 - $7000. Listing 18 schreibt den Stapel wieder zurück.</p>
 
@@ -810,32 +1119,85 @@
 
         <p>Hier ist in der Tat eine Inkrementierschleife besser. Ändern wir Listing 17 also in Listing 17a:</p>
 
-        <pre><code>LDX #00
-</code></pre>
-
-        <ul>
-            <li>LOOP LDA 0100,X</li>
-            <li>STA 6F00,X<br>
-                INX ;(!!)</li>
-            <li>BNE LOOP</li>
-            <li>TSX</li>
-            <li>STX 7000</li>
-        </ul>
-
+        <table class="plain">
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>LDX #00</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td>LOOP</td>
+                <td>LDA 0100,X</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>STA 6F00,X</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>INX</td>
+                <td>;(!!)</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>BNE LOOP</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>TSX</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>STX 7000</td>
+            </tr>
+        </table>
 
         <p>Analog ergibt sich Listing 18a:</p>
 
-        <pre><code>LDX #00
-</code></pre>
+        <table class="plain">
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>LDX #00</td>
+            <tr>
+                <td>-</td>
+                <td>LOOP</td>
+                <td>LDA 6F00,X</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>STA 0100,X</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>INX</td>
+                <td>;(!!)</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>BNE LOOP</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>LDX 7000</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td></td>
+                <td>TXS</td>
+            </tr>
+        </table>
 
-        <ul>
-            <li>LOOP LDA 6F00,X</li>
-            <li>STA 0100,X<br>
-                INX ;(!!)<br>
-                — BNE LOOP</li>
-            <li>LDX 7000</li>
-            <li>TXS</li>
-        </ul>
 
 
         <p>In den Listings 17a und 18a habe ich diejenigen Befehle, die sich in der symbolischen Darstellung nicht von den Listings 17 und 18 unterscheiden, mit einem »-« markiert.</p>
@@ -864,13 +1226,39 @@
 
         <p>Beachten Sie bitte, daß in Listing 22 die Befehle »6004 TAY« und »6009 TAX« nur bei den Werten dieses Beispiels verwendet werden können. In der Regel sind eigene »LDX # «- oder »LDY #«-Befehle erforderlich. Wenn wir zum Beispiel den Bereich $3FD2 - $47D1 invertieren wollen, muß die Initialisierung so aussehen:</p>
 
-        <p>LDA # D2 Low-Byte der ersten Adresse<br>
-            STA 14<br>
-            LDY #00 Index-Register<br>
-            LDA #3F High-Byte der ersten Adresse<br>
-            STA 15<br>
-            LDX #08 High-Zähler<br>
-            &hellip; Schleife wie ab 600C in Listing 22</p>
+        <table class="plain">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>LDA #D2</td>
+                <td>Low-Byte der ersten Adresse</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA 14</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>LDY #00</td>
+                <td>Index-Register</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>LDA #3F</td>
+                <td>High-Byte der ersten Adresse</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA 15</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>LDX #08</td>
+                <td>High-Zähler</td>
+            </tr>
+            <tr>
+                <td colspan="3">&hellip; Schleife wie ab 600C in Listing 22</td>
+            </tr>
+        </table>
 
         <p>Damit hätten wir eine Schleife, die den Bereich # 3FD2 -$475F (siehe Listings 19 und 20) invertiert und wesentlich schnellerals die Listings 19 und 20 arbeitet. Dawiraber »aufgerundet« haben, wird zusätzlich der Bereich $4760 - $47D1 invertiert, obwohlwirdasgarnichtwollen. Esgibtnun mehrere Möglichkeiten, dies zu verhindern:</p>
 
@@ -889,7 +1277,7 @@
 
         <p>Wir haben nun viele verschiedene Schleifenkonstruktionen in Theorie und Praxis behandelt. Was uns noch fehlt, sind Formeln, nach denen Sie die einzelnen Parameter (zum Beispiel den Startwert für X in einer Dekrementier-Schleife vom Typ a) errechnen können. Als Zusammenfassung finden Sie in Form von Listing 23 ein Hypra-Ass-Assemblerlisting zu mehreren Schleifenkonstruktionen. An den Quelltext-Ausdrücken können Sie sehen, wie einzelne Parameter errechnet werden können.</p>
 
-        <p class="source">Merke: Sofern es der Programmablauf zuläßt, sollten Sie Inkrementierschleifen verwenden.</p>
+        <p>Merke: Sofern es der Programmablauf zuläßt, sollten Sie Inkrementierschleifen verwenden.</p>
 
         <p>Bei Verschiebeschleifen ist aber oft eine Dekrementierschleife erforderlich.</p>
 
@@ -925,9 +1313,23 @@
 
         <p>Zunächst einmal müssen diejenigen Stellen, an denen Modifikationen vorgenommen werden, mit Label definiert werden. Von diesen Label aus können die Stellen im Speicher die geändert werden sollen, leicht berechnet werden.</p>
 
-        <p>Befehlscode = LABEL + 0 = LABEL<br>
-            Low-Operand = LABEL + 1<br>
-            High-Operand = LABEL + 2</p>
+        <table class="plain">
+            <tr>
+                <td>Befehlscode</td>
+                <td>= LABEL + 0 = </td>
+                <td>LABEL</td>
+            </tr>
+            <tr>
+                <td>Low-Operand</td>
+                <td>= </td>
+                <td>LABEL + 1</td>
+            </tr>
+            <tr>
+                <td>High-Operand</td>
+                <td>= </td>
+                <td>LABEL + 2</td>
+            </tr>
+        </table>
 
         <p>Bei 2-Byte-Befehlen wird der Parameter wie der Low-Operand eines 3-Byte-Befehls errechnet.</p>
 
@@ -943,18 +1345,40 @@
 
         <p>Folgendermaßen kann über Selbstmodifikation ein Unterprogramm ab ADRESSE aufgerufen werden.</p>
 
-        <p>LDA # &lt;ADRESSE<br>
-            STA SPRUNGBEFEHL+1 ; Low-Operand<br>
-            LDA # >ADRESSE<br>
-            STA SPRUNGBEFEHL+2; High-Operand<br>
-            SPRUNGBEFEHL<br>
-            JSR $FFFF ; $FFFF=Dummy</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>LDA #&lt;ADRESSE</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA SPRUNGBEFEHL+1</td>
+                <td>; Low-Operand</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>LDA #>ADRESSE</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA SPRUNGBEFEHL+2</td>
+                <td>; High-Operand</td>
+            </tr>
+            <tr>
+                <td>SPRUNGBEFEHL</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>JSR $FFFF</td>
+                <td>; $FFFF=Dummy</td>
+            </tr>
+        </table>
 
         <p>Genauso kann man mit dem JMP-Befehl verfahren. Sogar bei den Schieber-, Dekrementier- und Inkrementierbefehlen, die im Gegensatz zu JMP die indirekte Adressierung nicht haben, ist auf diese Weise eine Simulation der indirekten Adressierung möglich.</p>
 
         <p>Wird eine Sprungtabelle per Selbstmodifikation verarbeitet, müssen die Sprungadressen in der Tabelle nicht (!) dekrementiert werden.</p>
 
-        <h3>b) Anwendung auf lmmediate-Befehle</h3>
+        <h3>b) Anwendung auf Immediate-Befehle</h3>
 
         <p>Oft müssen Werte, die berechnet werden, auf dem Stapel oder im Speicher abgelegt und dann, wenn sie gebraucht werden, wieder aufgenommen werden.</p>
 
@@ -964,46 +1388,131 @@
 
         <p>Die Programmierung ist aber bei Programmgeneratoren nicht anders als bei selbstmodifizierenden Programmen. Auf den Unterschied Programmgeneration/Selbstmodifikation werden wir an späterer Stelle näher eingehen.</p>
 
-        <p>Zunächst wollen wir aber ein praktisches Beispiel für die Anwendung der Modifikation von lmmediate-Befehlen behandeln. Oft steht man vor dem Problem, ein Register zu sichern und später wieder zu holen. Im Falle des Akkumulators sieht das so aus:</p>
+        <p>Zunächst wollen wir aber ein praktisches Beispiel für die Anwendung der Modifikation von Immediate-Befehlen behandeln. Oft steht man vor dem Problem, ein Register zu sichern und später wieder zu holen. Im Falle des Akkumulators sieht das so aus:</p>
 
-        <p>PHA ; Akku sichern<br>
-            &hellip; ; weiteres Programm<br>
-            PLA ; Akku wieder holen</p>
+        <table class="plain">
+            <tr>
+                <td>PHA</td>
+                <td>; Akku sichern</td>
+            </tr>
+            <tr>
+                <td>&hellip;</td>
+                <td>; weiteres Programm</td>
+            </tr>
+            <tr>
+                <td>PLA</td>
+                <td>; Akku wieder holen</td>
+            </tr>
+        </table>
 
         <p>Beim X-Register wird’s schon ungünstiger:</p>
 
-        <p>TXA ; X-Register in Akku<br>
-            PHA ; Akku sichern<br>
-            &hellip;&hellip;&hellip;.. ; weiteres Programm<br>
-            PLA ; Akku wieder holen<br>
-            TAX ; Akku ins X-Register</p>
+        <table class="plain">
+            <tr>
+                <td>TXA</td>
+                <td>; X-Register in Akku</td>
+            </tr>
+            <tr>
+                <td>PHA</td>
+                <td>; Akku sichern</td>
+            </tr>
+            <tr>
+                <td>&hellip;&hellip;&hellip;..</td>
+                <td>; weiteres Programm</td>
+            </tr>
+            <tr>
+                <td>PLA</td>
+                <td>; Akku wieder holen</td>
+            </tr>
+            <tr>
+                <td>TAX</td>
+                <td>; Akku ins X-Register</td>
+            </tr>
+        </table>
 
         <p>Hier wird also zusätzlich der Akku beeinflußt. Wenn dies vermieden werden muß, wird folgender Weg gewählt:</p>
 
-        <p>STX $02 ; $02 = Zwischenspeicher<br>
-            &hellip; ; weiteres Programm<br>
-            LDX $02 ; X wieder holen</p>
+        <table class="plain">
+            <tr>
+                <td>STX $02</td>
+                <td>; $02 = Zwischenspeicher</td>
+            </tr>
+            <tr>
+                <td>&hellip;</td>
+                <td>; weiteres Programm</td>
+            </tr>
+            <tr>
+                <td>LDX $02</td>
+                <td>; X wieder holen</td>
+            </tr>
+        </table>
 
         <p>Für die Sicherung des X-Registers gibt es aber noch eine weitere Lösung, die den X-Wert im Programm ablegt und dadurch nicht den Stapel oder einen Zwischenspeicher außerhalb des Programms benötigt.</p>
 
-        <p>STX GETX+1 ; X direkt in lmmediate-Befehl schreiben<br>
-            &hellip; ; weiteres Programm<br>
-            GETX LDX #$OO ; $00 = Dummy-Wert</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>STX&nbsp;GETX+1</td>
+                <td>; X direkt in Immediate-Befehl schreiben</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>&hellip;</td>
+                <td>; weiteres Programm</td>
+            </tr>
+            <tr>
+                <td>GETX</td>
+                <td>LDX #$00</td>
+                <td>; $00 = Dummy-Wert</td>
+            </tr>
+        </table>
 
         <p>Obiges Beispiel kann sehr leicht auf Akkumulator oder Y-Register umgeschrieben werden.</p>
 
         <p>Folgendermaßen kann das X-Register mit dem Akkumulator verglichen werden:</p>
 
-        <p>STX VGL+1 ; in Vergleichsbefehl ablegen<br>
-            (&hellip;&hellip;&hellip;&hellip;. ; evtl, weitere Programme)<br>
-            VGL CMP #$00 ; $00 = Dummy</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>STX VGL+1</td>
+                <td>; in Vergleichsbefehl ablegen</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>(&hellip;&hellip;&hellip;&hellip;</td>
+                <td>; evtl. weitere Programme)</td>
+            </tr>
+            <tr>
+                <td>VGL</td>
+                <td>CMP #$00</td>
+                <td>; $00 = Dummy</td>
+            </tr>
+        </table>
 
         <p>Als letztes Beispiel für die Anwendung auf Immediate-Befehle soll das Y-Register zum Akkumulator addiert werden:</p>
 
-        <p>STY ADD+1 ; in Arithmetikbefehl ablegen<br>
-            (&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;.. ; evtl, weiteres Programm)<br>
-            CLC ; Carry vor Addition<br>
-            ADD ADC #$FF ; $FF = Dummy</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>STY ADD+1</td>
+                <td>; in Arithmetikbefehl ablegen</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>(&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</td>
+                <td>; evtl, weiteres Programm)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>CLC</td>
+                <td>; Carry vor Addition</td>
+            </tr>
+            <tr>
+                <td>ADD</td>
+                <td>ADC #$FF</td>
+                <td>; $FF = Dummy</td>
+            </tr>
+        </table>
 
         <p>Die Anwendungsmöglichkeiten sind hier unbegrenzt.</p>
 
@@ -1019,44 +1528,128 @@
 
         <p><strong>I</strong>. Die Adresse FLAG wird auf 0 gesetzt, wenn das Unterprogramm ausgeführt werden soll; auf einen anderen Wert, wenn es nicht ausgeführt werden soll.</p>
 
-        <p>LDA # 0 ; Flag für Ausführung<br>
-            STA FLAG ; Flag setzen<br>
-            (&hellip;&hellip;&hellip;. ; evtl, weiteres Programm)<br>
-            LDA FLAG ; Flag testen<br>
-            BNE NEIN ; Flag &lt; > 0, also nicht ausführen<br>
-            JSR UNTERPROGRAMM ; Aufruf weiteres Programm<br>
-            NEIN &hellip;..</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>LDA #0</td>
+                <td>; Flag für Ausführung</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA FLAG</td>
+                <td>; Flag setzen</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>(&hellip;&hellip;&hellip;</td>
+                <td>; evtl, weiteres Programm)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>LDA FLAG</td>
+                <td>; Flag testen</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>BNE NEIN</td>
+                <td>; Flag &lt; > 0, also nicht ausführen</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>JSR UNTERPROGRAMM</td>
+                <td>; Aufruf weiteres Programm</td>
+            </tr>
+            <tr>
+                <td>NEIN</td>
+                <td>&hellip;..</td>
+            </tr>
+        </table>
 
         <p>Das Flag könnte auch am Beginn des Unterprogramms abgefragt und dann (wenn FLAG &lt; > 0) das Unterprogramm verlassen werden.</p>
 
         <p><strong>II</strong>. Als ersten Befehl des Unterprogramms verwenden wir NOP:</p>
 
-        <p>UP NOP ; Beginn des Unterprogramms<br>
-            &hellip;&hellip;.. ; Fortsetzung des Unterprogramms</p>
+        <table class="plain">
+            <tr>
+                <td>UP</td>
+                <td>NOP</td>
+                <td>; Beginn des Unterprogramms</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>&hellip;&hellip;..</td>
+                <td>; Fortsetzung des Unterprogramms</td>
+            </tr>
+        </table>
 
         <p>So wird die Ausführung des Unterprogramms gestattet:</p>
 
-        <p>LDA # $EA ; Opcode für NOP<br>
-            STA UP ; an Anfang des Unterprogramms schreiben</p>
+        <table class="plain">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>LDA&nbsp;#$EA</td>
+                <td>; Opcode für NOP</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA UP</td>
+                <td>; an Anfang des Unterprogramms schreiben</td>
+            </tr>
+        </table>
 
         <p>Und so wird sie verhindert:</p>
 
-        <p>LDA #$60 ; Opcode für RTS<br>
-            STA UP ; an Anfang des Unterprogramms schreiben</p>
+        <table class="plain">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>LDA&nbsp;#$60</td>
+                <td>; Opcode für RTS</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA&nbsp;UP</td>
+                <td>; an Anfang des Unterprogramms schreiben</td>
+            </tr>
+        </table>
 
         <p>Wer noch einen NOP-Befehl und damit 1 Byte sparen möchte, kann den NOP-Befehl entfallen lassen. Dann muß auch der Opcode $EA beim Erlauben des Unterprogramms in den Opcode des ersten Byte im Unterprogramm geändert werden. Weil dies ziemlich mühselig ist, ziehe ich die ursprüngliche Lösung II trotz des um 1 Byte erhöhten Speicherbedarfs vor.</p>
 
         <p><strong>III</strong>. Das beste Verfahren. Wir schalten den JSR-Befehl aus, indem wir ihn in einen BIT-Befehl abändern.</p>
 
-        <p>AUFRUF JSR Unterprogramm</p>
+        <table class="plain">
+            <tr>
+                <td>AUFRUF</td>
+                <td>JSR Unterprogramm</td>
+            </tr>
+        </table>
 
-        <p>JSR ausschalten:</p>
+        <p class="noindent">JSR ausschalten:</p>
 
-        <p>LDA # $2C ; Opcode für BIT STA AUFRUF</p>
+        <table class="plain">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>LDA #$2C</td>
+                <td>; Opcode für BIT</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA AUFRUF</td>
+        </table>
 
-        <p>JSR wieder erlauben:</p>
 
-        <p>LDA #$20 ; Opcode für JSR STA AUFRUF</p>
+        <p class="noindent">JSR wieder erlauben:</p>
+
+        <table class="plain">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>LDA #$20</td>
+                <td>; Opcode für JSR</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA AUFRUF</td>
+            </tr>
+        </table>
 
         <p>Der JSR-Opcode kann auch mit $0C überschrieben werden. $0C ist ein illegaler Opcode für ein 3-Byte-NOP und arbeitet mit allen mir bekannten Versionen des C 64. Ob er ebenfalls auf dem C 128 läuft, konnte ich noch nicht prüfen.</p>
 
@@ -1136,18 +1729,56 @@
 
         <p>Um Ihnen noch die Anwendung des Loader-Maker zu erleichtern, hier zwei Eingabebeispiele:</p>
 
-        <p>Startadresse&hellip;&hellip;&hellip;&hellip;&hellip;..49152<br>
-            Filename&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;SMON $C000<br>
-            Geräteadresse&hellip;&hellip;&hellip;&hellip;&hellip;.0<br>
-            Maschinenprogramm&hellip;&hellip;&hellip;&hellip;j<br>
-            Systemmeldungen&hellip;&hellip;&hellip;&hellip;..j<br>
-            LOAD ERROR ausgeben..j<br>
-            Startadresse&hellip;&hellip;&hellip;&hellip;&hellip;..0 (bedeutungslos)<br>
-            Filename&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;HI-EDDI<br>
-            Geräteadresse&hellip;&hellip;&hellip;&hellip;&hellip;.8<br>
-            Maschinenprogramm&hellip;&hellip;&hellip;&hellip;n<br>
-            Systemmeldungen&hellip;&hellip;&hellip;&hellip;..n<br>
-            LOAD ERROR ausgeben. .j</p>
+        <table class="plain">
+            <tr>
+                <td>Startadresse</td>
+                <td>49152</td>
+            </tr>
+            <tr>
+                <td>Filename</td>
+                <td>SMON $C000</td>
+            </tr>
+            <tr>
+                <td>Geräteadresse</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Maschinenprogramm</td>
+                <td>j</td>
+            </tr>
+            <tr>
+                <td>Systemmeldungen</td>
+                <td>j</td>
+            </tr>
+            <tr>
+                <td>LOAD ERROR ausgeben</td>
+                <td>j</td>
+            </tr>
+            <tr>
+                <td>Startadresse</td>
+                <td>0 (bedeutungslos)</td>
+            </tr>
+            <tr>
+                <td>Filename</td>
+                <td>HI-EDDI</td>
+            </tr>
+            <tr>
+                <td>Geräteadresse</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>Maschinenprogramm</td>
+                <td>n</td>
+            </tr>
+            <tr>
+                <td>Systemmeldungen</td>
+                <td>n</td>
+            </tr>
+            <tr>
+                <td>LOAD ERROR ausgeben</td>
+                <td>j</td>
+            </tr>
+        </table>
 
         <h3>g) Verbesserungen an »Tabellen-Beispiel«</h3>
 
@@ -1155,17 +1786,47 @@
 
         <p>Zunächst soll die Adresse XSÄVE (zum Sichern des X-Registers in Schleifen) überflüssig werden. So könnte es nun gesichert werden:</p>
 
-        <p>XSV STX GETX<br>
-            &hellip;<br>
-            GETX LDX #$00 O=Dummy; hier wird X wieder aufgenommen.</p>
+        <table class="plain">
+            <tr>
+                <td>XSV</td>
+                <td>STX&nbsp;GETX</td>
+            </tr>
+            <tr>
+                <td>&hellip;</td>
+            </tr>
+            <tr>
+                <td>GETX</td>
+                <td>LDX&nbsp;#$00</td>
+                <td>0=Dummy; hier wird X wieder aufgenommen.</td>
+            </tr>
+        </table>
 
         <p>Auch die Sprungtabelle läßt sich - viel einfacher, finde ich - anders handhaben:</p>
 
-        <p>LDA J?LO,X JMLO oder JELO<br>
-            STA SPRO+1<br>
-            LDA J?HI,X JMHI oder JEHI<br>
-            STA SPRG+2<br>
-            SPRG JMP 0000</p>
+        <table class="plain">
+            <tr>
+                <td></td>
+                <td>LDA J?LO,X</td>
+                <td>JMLO oder JELO</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA SPRO+1</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>LDA J?HI,X</td>
+                <td>JMHI oder JEHI</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>STA SPRG+2</td>
+            </tr>
+            <tr>
+                <td>SPRG</td>
+                <td>JMP 0000</td>
+            </tr>
+        </table>
 
         <p>In den Tabellen JMLO/JMHI und JELO/JEHI (Low- und High-Bytes der Sprungadressen) dürfen die Adressen aber nicht dekrementiert werden.</p>
 
@@ -1184,15 +1845,15 @@
         <p>Dennoch ist es in vielen Fällen möglich, einen Branch-Befehl - obwohl diese Befehle eine Bedingung (C=0..) prüfen - zu verwenden.<br>
             Beispiel:</p>
 
-        <p>7050 BNE 7040<br>
-            7052 JMP 708A</p>
+        <pre>        7050 BNE 7040
+        7052 JMP 708A</pre>
 
-        <p>Kann ersetzt werden durch:</p>
+        <p class="noindent">Kann ersetzt werden durch:</p>
 
-        <p>7050 BNE 7040<br>
-            7052 BEQ 708A</p>
+        <pre>        7050 BNE 7040
+        7052 BEQ 708A</pre>
 
-        <p>da bei 7052 in jedem Fall das Z-Flag = 0 ist (dafür sorgt der Abfang-Befehl BNE) und somit immer verzweigt wird.</p>
+        <p class="noindent">da bei 7052 in jedem Fall das Z-Flag = 0 ist (dafür sorgt der Abfang-Befehl BNE) und somit immer verzweigt wird.</p>
 
         <p>Man könnte den BEQ-Befehl als »Pseudo-Verzweigungsbefehl« bezeichnen, da die Bedingung gar nicht überprüft werden müßte (sie ist sowieso erfüllt).</p>
 
@@ -1200,10 +1861,10 @@
 
         <p>Im übrigen ist auch bei</p>
 
-        <p>7050 BVS 7040<br>
-            7052 CLV</p>
+        <pre>        7050 BVS 7040
+        7052 CLV</pre>
 
-        <p>der CLV-Befehl überflüssig, solange vor7052 der Befehl von 7050 verarbeitet wird.</p>
+        <p class="noindent">der CLV-Befehl überflüssig, solange vor7052 der Befehl von 7050 verarbeitet wird.</p>
 
         <h3>b) Zugriff auf Befehle in »Umgebung«</h3>
 
@@ -1211,18 +1872,55 @@
 
         <p>Beispielsweise stehen an vielen Stellen im Programm RTS-Befehle. Diese werden, wenn ein Unterprogramm verlassen werden soll, manchmal durch einen Branch-Befehl angesprungen.</p>
 
-        <p>X1 RTS ; Ende eines im Speicher vorausgehenden Unterprogramms<br>
-            UP &hellip;&hellip;. ; Unterprogramm<br>
-            TEST BEQ X2 ; Unterprogramm verlassen, falls Z=0<br>
-            &hellip;&hellip;&hellip;. ; andernfalls weiteres Programm<br>
-            X2 RTS ; Ende des Unterprogramms</p>
+        <table class="plain">
+            <tr>
+                <td>X1</td>
+                <td>RTS</td>
+                <td>; Ende eines im Speicher vorausgehenden Unterprogramms</td>
+            </tr>
+            <tr>
+                <td>UP</td>
+                <td>&hellip;&hellip;</td>
+                <td>; Unterprogramm</td>
+            </tr>
+            <tr>
+                <td>TEST</td>
+                <td>BEQ X2</td>
+                <td>; Unterprogramm verlassen, falls Z=0</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>&hellip;&hellip;&hellip;</td>
+                <td>; andernfalls weiteres Programm</td>
+            </tr>
+            <tr>
+                <td>X2</td>
+                <td>RTS ; Ende des Unterprogramms</td>
+            </tr>
+        </table>
 
         <p>Wenn X1 von TEST aus relativ adressiert werden kann, können wir folgendermaßen ein Byte sparen:</p>
 
-        <p>X1 RTS<br>
-            UP &hellip;<br>
-            TEST BEQ X1 ; nach X1 springen, wo auch ein RTS steht<br>
-            X2 RTS ; wird nicht mehr benötigt</p>
+        <table class="plain">
+            <tr>
+                <td>X1</td>
+                <td>RTS</td>
+            </tr>
+            <tr>
+                <td>UP</td>
+                <td>&hellip;</td>
+            </tr>
+            <tr>
+                <td>TEST</td>
+                <td>BEQ X1</td>
+                <td>; nach X1 springen, wo auch ein RTS steht</td>
+            </tr>
+            <tr>
+                <td>X2</td>
+                <td>RTS</td>
+                <td>; wird nicht mehr benötigt</td>
+            </tr>
+        </table>
 
         <p>Noch ein Beispiel aus dem Basic-Interpreter. Bei Adresse $AF08 stehen zwei Befehle, die einen SYNTAX ERROR erzeugen.</p>
 
@@ -1296,10 +1994,10 @@
 
         <p>Hier wollen wir einfach den Kassettenpuffer in den Bildschirmspeicher (ab $0400 in Normaleinstellung) verlegen.</p>
 
-        <p>LDA #&lt;$400<br>
-            LDY #>$400<br>
-            STA $B2<br>
-            STY $B3</p>
+        <pre>        LDA #&lt;$400
+        LDY #>$400
+        STA $B2
+        STY $B3</pre>
 
         <p>Da der Bildschirm beim Kassettenbetrieb ohnehin abgeschaltet wird, fällt dies nicht auf. Nach dem Kassettenbetrieb sollte man aber den Bildschirm unverzüglich löschen.</p>
 
@@ -1333,15 +2031,15 @@
 
         <p>Danach ist das N-Flag gesetzt, falls das 7. Bit im FLAG gesetzt ist, und das V-Flag, falls das 6. Bit gesetzt ist. Die übrigen Flags erhält man über das Z-Flag im Prozessor-Status-Register mit Hilfe des Akkus. Angenommen, man möchte testen, ob Bit 0 im Flag gesetzt ist oder nicht, dann macht das folgendes Programm:</p>
 
-        <p>LDA #01<br>
-            BIT Flag<br>
-            BNE ??? ; (Bit gesetzt)<br>
-            .
-            .<br>
-            .
-            ; (Bit nicht gesetzt)</p>
+        <pre>        LDA #01
+        BIT Flag
+        BNE ??? ; (Bit gesetzt)
+        .
+        .
+        .
+        ; (Bit nicht gesetzt)</pre>
 
-        <p>Der Bit-Befehl ANDet den Inhalt des Akkus mit dem Inhalt der Speicherzelle »Flag«. Möchte man Bit 1 testen, so ist der Befehl LDA # 01 zu ersetzen durch LDA # 02 und so weiter.</p>
+        <p>Der Bit-Befehl ANDet den Inhalt des Akkus mit dem Inhalt der Speicherzelle »Flag«. Möchte man Bit 1 testen, so ist der Befehl LDA #01 zu ersetzen durch LDA #02 und so weiter.</p>
 
         <p>Durch Selbstmodifikation können Flags bekanntlich vermieden werden. Aber auch sonst bietet die Selbstmodifikation die Möglichkeit, Speicherplatz zu sparen: die Steuerung einer Sprungtabelle belegt mit Selbstmodifikation weniger Speicher als ohne.</p>
 
