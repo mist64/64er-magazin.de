@@ -1,0 +1,251 @@
+
+
+;quell-code.prg ==0801==
+  100 sys32768
+  110 .opt oo,p
+  120 *= $3400
+  121 ;
+  122 ; variablen-deklaration
+  123 ;
+  125 alt = $6a ; zeropage adressen fuer
+  126 neu = $6c ; verschiebe-routine
+  130 chrout = $ffd2
+  140 chrin = $ffcf
+  150 strout = $ab1e
+  160 pos1 =  850 ; speicher fuer
+  170 pos2 =  860 ; kombinationen
+  180 pos3 =  870
+  190 pos4 =  880
+  200 schwarze = 890 ; eingaben mitspieler
+  210 cschwarze = 900 ; errechnete eingaben
+  220 weisse = 910 ; ( siehe algorithmus )
+  230 cweisse = 920 ;
+  240 runde = 830
+  245 ; diverse hilfsregister
+  250 cpos1 = 831
+  260 cpos2 = 832
+  270 cpos3 = 833
+  280 cpos4 = 834
+  290 cv1 = 835
+  300 cv2 = 836
+  310 cv3 = 837
+  320 cv4 = 838
+  330 h1 = 839
+  340 h2 = 840
+  360 min = 841
+  370 ;
+  372 ; programm-start
+  374 ;
+  380 lda #147
+  390 jsr chrout ; bildschirm loeschen
+  470 lda #1
+  475 sta runde ; runde initialisiert
+  480 sta pos1:sta pos2:sta pos3:sta pos4 ; schleife initialisiert auf '1111'
+  485 ;
+  486 ; 1. versuch '1234' abspeichern und ausgeben
+  487 ;
+  490 sta pos1+1
+  500 asl a :sta pos2+1
+  510 asl a :sta pos3+1
+  520 asl a :sta pos4+1
+  540 lda #<text
+  550 ldy #>text
+  560 jsr strout
+  570 jsr antwort
+  572 cpy #$ff ; kombination gefunden ja/nein
+  574 bne l0 ; nein - also suchen
+  576 rts ; ja - zurueck ins basic
+  580 l0 jmp liloop
+  600 ;
+  610 ; grosse schleife - '1111' bis '6666'
+  620 ;
+  640 grloop lda pos1
+  650 and #%00100000
+  660 bne massn1
+  670 asl pos1
+  680 jmp liloop
+  690 massn1 lda #1
+  700 sta pos1
+  710 test2 lda pos2
+  720 and #%00100000
+  730 bne massn2
+  740 asl pos2
+  750 jmp liloop
+  760 massn2 lda #1
+  770 sta pos2
+  780 test3 lda pos3
+  790 and #%00100000
+  800 bne massn3
+  810 asl pos3
+  820 jmp liloop
+  830 massn3 lda #1
+  840 sta pos3
+  850 test4 lda pos4
+  860 and #%00100000
+  870 bne massn4
+  880 asl pos4
+  890 jmp liloop
+  900 massn4 lda #$6b:ldy #$a3 ; kombination nicht gefunden
+  910 jsr strout ; 'error' ausgeben
+  930 rts ; und zurueck ins basic.
+  932 ;
+  933 ; unterprogramm anzahl schwarze ermitteln
+  934 ;
+  940 blacks lda #0
+  950 sta cschwarze,x
+  960 pos1v lda pos1
+  970 and pos1,x
+  980 beq pos2v
+  990 inc cschwarze,x
+ 1000 pos2v lda pos2
+ 1010 and pos2,x
+ 1020 beq pos3v
+ 1030 inc cschwarze,x
+ 1040 pos3v lda pos3
+ 1050 and pos3,x
+ 1060 beq pos4v
+ 1070 inc cschwarze,x
+ 1080 pos4v lda pos4
+ 1090 and pos4,x
+ 1100 beq bfin
+ 1110 inc cschwarze,x
+ 1120 bfin rts
+ 1122 ;
+ 1124 ; unterprogramm anzahl weisse ermitteln
+ 1126 ;
+ 1130 whites lda pos1
+ 1140 sta cpos1
+ 1150 lda pos2
+ 1160 sta cpos2
+ 1170 lda pos3
+ 1180 sta cpos3
+ 1190 lda pos4
+ 1200 sta cpos4
+ 1210 lda pos1,x
+ 1220 sta cv1
+ 1230 lda pos2,x
+ 1240 sta cv2
+ 1250 lda pos3,x
+ 1260 sta cv3
+ 1270 lda pos4,x
+ 1280 sta cv4
+ 1290 lda #0
+ 1300 sta min
+ 1310 ldy #6
+ 1330 los lda #0
+ 1340 sta h1
+ 1350 sta h2
+ 1400 txa:pha:lda #3:tax
+ 1410 l1 lsr cpos1,x
+ 1420 bcc l2
+ 1430 inc h1
+ 1440 l2 lsr cv1,x
+ 1450 bcc l3
+ 1460 inc h2
+ 1470 l3 dex
+ 1480 bpl l1
+ 1490 pla:tax
+ 1600 minfind lda h1
+ 1610 sec
+ 1620 sbc h2
+ 1630 bmi h2gross
+ 1640 h1gross lda min
+ 1650 clc
+ 1660 adc h2
+ 1670 sta min
+ 1680 jmp ykleiner
+ 1690 h2gross lda min
+ 1700 clc
+ 1710 adc h1
+ 1720 sta min
+ 1730 ykleiner dey
+ 1740 bne los
+ 1750 lda min
+ 1760 sec
+ 1770 sbc cschwarze,x
+ 1780 sta cweisse,x
+ 1790 wfin rts
+ 1792 ;
+ 1794 ; kleine schleife - kombination logisch-richtig (j/n)
+ 1796 ;
+ 1800 liloop ldx runde
+ 1810 listart jsr blacks
+ 1820 lda cschwarze,x
+ 1830 cmp schwarze,x
+ 1840 beq l4
+ 1845 jmp grloop
+ 1850 l4 jsr whites
+ 1860 lda cweisse,x
+ 1870 cmp weisse,x
+ 1880 beq l5
+ 1885 jmp grloop
+ 1890 l5 dex
+ 1900 bne listart
+ 1902 ;
+ 1904 ; logisch-richtige kombination ausgeben
+ 1906 ;
+ 1910 ldx runde
+ 1920 inx
+ 1930 lda pos1
+ 1940 sta pos1,x:sta cv1
+ 1950 lda pos2
+ 1960 sta pos2,x:sta cv2
+ 1970 lda pos3
+ 1980 sta pos3,x:sta cv3
+ 1990 lda pos4
+ 2000 sta pos4,x:sta cv4
+ 2080 ldy #0
+ 2090 l6 lda #0:tax
+ 2095 clc:iny
+ 2100 lda cv1-1,y
+ 2110 l7 lsr a
+ 2120 inx
+ 2130 bcc l7
+ 2140 txa:clc:adc #$30
+ 2150 jsr chrout
+ 2160 cpy #4
+ 2170 bne l6
+ 2190 inc runde
+ 2200 jsr antwort
+ 2202 cpy #$ff
+ 2204 bne l8
+ 2206 rts
+ 2210 l8 jmp grloop
+ 2212 ;
+ 2214 ; unterprogramm antwort holen
+ 2216 ;
+ 2220 antwort lda #$0d:jsr chrout
+ 2230 jsr chrin
+ 2240 ldx runde
+ 2250 sec:sbc #$30
+ 2252 cmp #4
+ 2254 bne l9
+ 2256 lda #$64:ldy #$a3:jsr strout
+ 2258 ldy #$ff
+ 2259 rts
+ 2260 l9 sta schwarze,x:lda #$0d:jsr chrout
+ 2270 jsr chrin
+ 2280 sec:sbc #$30:sta weisse,x
+ 2290 lda #$0d
+ 2300 jsr chrout:rts
+ 2310 ;
+ 2311 ; '1234'
+ 2312 ;
+ 2320 text .asc "1234" : .byt 0
+ 3000 ;
+ 3005 ; verschieben nach $3400
+ 3010 ;
+ 3100 lda #0:sta alt:sta neu
+ 3110 lda #$04:sta alt+1
+ 3120 lda #$34:sta neu+1
+ 3130 l10 ldy #0
+ 3140 l11 lda (alt),y:sta (neu),y
+ 3170 iny
+ 3180 bne l11
+ 3190 lda alt+1
+ 3200 cmp #$07
+ 3210 beq aufgehts
+ 3220 inc alt+1:inc neu+1
+ 3230 clc:bcc l10
+ 3240 aufgehts jmp $3400 ; programm-start
+

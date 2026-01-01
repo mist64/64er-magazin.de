@@ -1,0 +1,55 @@
+
+
+;drawline setpunk.prg ==0801==
+  100 rem             drawline
+  110 rem diese routine berechnet die koordinaten
+  120 rem der punkte auf einer strecke, die durch
+  130 rem die endpunkte gegeben ist. mit einer ge-
+  140 rem eigneten 'setpoint'-routine kann der
+  150 rem bildschirm oder ein plotter angesteuert
+  160 rem werden. die grenzen der werte fuer x und
+  170 rem y entsprechen den werten fuer den hi-res
+  180 rem bildschirm des commodore 64.
+  190 rem
+  200 rem das original dieses programmes stammt von
+  210 rem mike higgins erschienen in byte 1981 im
+  220 rem heft 8 auf den seiten 414 - 416
+  230 rem
+  240 rem
+  250 input"koordinaten 1. punkt";x0,y0
+  260 ifx0>319ory0>199then250
+  270 ifx0<0ory0<0then250
+  280 input"koordinaten 2. punkt";x1,y1
+  290 ifx1>319ory1>199then280
+  300 ifx1<0ory1<0then280
+  310 rem setpar
+  320 s1=0:s2=1:a1=1:a2=0
+  330 ifx1=>x0thend1=x1-x0:goto360
+  340 a1=-1
+  350 d1=x0-x1
+  360 ify1=>y0thend2=y1-y0:goto390
+  370 d2=y0-y1
+  380 s2=-1
+  390 ifd1=>d2then470
+  400 n1=d1:rem vertausche d1 und d2
+  410 d1=d2
+  420 d2=n1
+  430 s1=a1
+  440 a1=0
+  450 a2=s2
+  460 s2=0
+  470 d3=d1/2
+  480 n1=1:rem schleifenzaehler
+  490 goto580:rem plotte ursprungspunkt
+  500 x0=x0+a1
+  510 y0=y0+a2
+  520 d3=d3+d2
+  530 n1=n1+1
+  540 ifd3<=d1then580
+  550 d3=d3-d1
+  560 x0=x0+s1
+  570 y0=y0+s2
+  580 printx0,y0
+  590 ifd1=>n1then500
+  600 end
+

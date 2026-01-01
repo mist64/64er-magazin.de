@@ -1,0 +1,32 @@
+
+
+;listing 1.prg ==0801==
+   90 goto 200
+  100 rem >> up - schleife <<
+  110 :
+  120 print" <taste>";:wait 198,1:poke198,0:fori=1to7:printchr$(20);:next
+  130 :
+  140 for i=1 to 100:next
+  150 ti$="000000":for i = 0 to 255:poke 53280,i and 15:next:printti$:return
+  160 :
+  170 rem >> up - cursorblinken aus <<
+  180 :
+  190 poke 207,0:poke 204,1:print" ":return
+  200 rem -------------------
+  210 rem -- hauptprogramm --
+  220 rem -------------------
+  230 :
+  240 printchr$(147)"demo fuer systembeschleunigungen (basic)";
+  250 print"----------------------------------------"
+  260 print"{down}{down}1) normalzustand";:gosub100
+  270 :
+  280 print"{down}2) verkuerzter interrupt";:poke788,52:gosub 100:poke 788,49
+  290 :
+  300 print"{down}3) haeufige interrupts";:poke 56325,20:poke204,0:gosub100:gosub170
+  310 :
+  320 print"4) seltene  interrupts";:poke 56325,150:poke204,0:gosub100:gosub170
+  330 sys64931:rem normalzustand ein
+  340 :
+  350 print"5) bildschirm abgeschaltet ";:poke53265,peek(53265) and 239:gosub140
+  360 poke 53265,peek(53265) or 16:print"{down}** ende **"
+

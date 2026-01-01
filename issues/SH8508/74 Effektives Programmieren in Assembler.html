@@ -18,6 +18,7 @@
         <h1>Effektives Programmieren in Assembler</h1>
         <p class="intro">Es gibt viele Möglichkeiten, ein Basic-Programm schneller und komfortabler zu gestalten. Aber auch für die Assemblerprogrammierung gibt es einige Tricks und Kniffe, die wir Ihnen in diesem praxisnahen Kurs verraten wollen.</p>
 
+
         <p>Wer das Optimum an Geschwindigkeit aus seinem Computer herausholen will, kommt an Maschinensprache nicht vorbei. Die Grundlagen zur Maschinenprogrammierung wurden bereits im Kurs »Assembler ist keine Alchimie«, den Sie in diesem Sonderheft finden, geschaffen. Das Thema dieses Artikels ist es nun, die Möglichkeiten von Maschinensprache optimal zu nutzen. Sie erfahren, wie man<br>
             a) Programme beschleunigen und<br>
             b) Speicherplatz sparen kann.</p>
@@ -190,6 +191,11 @@
 
         <p>Anhand von Listing 1 wollen wir uns nun mit der Anwendung der Systembeschleunigungen befassen. Dieses kleine Beispielprogramm, an dem Sie nach Herzenslust experimentieren können, versucht, mit Hilfe von TI$ die Arbeitsdauer der Schleife (Zeile 150) zu messen.</p>
 
+        <figure>
+            <pre data-filename="listing 1" data-name="XXXXXXXXXXXX"></pre>
+            <figcaption>Listing 1. Systembeschleunigungen in Basic</figcaption>
+        </figure>
+
         <p>Während des Ablaufs dieser Schleife, die kontinuierlich die Rahmenfarbe ändert, sollten Sie keine Taste drücken, um die Meßwerte nicht zu verfälschen.<br>
             Wenn Sie dies beachten, erhalten Sie folgende Werte:</p>
 
@@ -290,6 +296,37 @@
 
         <p>Die Routine $AB1E wird fortan als »STROUT« (STRing-OUTput = String-Ausgabe) bezeichnet. STROUT ist zwar etwas langsamer als BASOUT; dafür erlaubt die komfortable Parameterübergabe eine wesentlich bequemere Programmierung, wie Sie am zweiten Teil von Listing 2 (Zeilen 260 -300, 320 - 330) sehen können. Mit nur drei Befehlen wird der Text ausgegeben!</p>
 
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -;
+120  -; TEXTAUSGABE (UEBER BASOUT)
+130  -;
+140  -.BA $C000 ; START: SYS 49152
+150  -;
+160  -.GL BASOUT = $FFD2
+170  -;
+180  -          LDX #0
+190  -SCHLEIFE  LDA TEXT,X     ; ZEICHEN LESEN
+200  -          INX
+210  -          JSR BASOUT     ; UND AUSGEBEN
+220  -          BNE SCHLEIFE   ; SCHON ENDMARKIERUNG?
+230  -;
+240  -; TEXTAUSGABE (UEBER STROUT)
+250  -;
+260  -.GL STROUT = $AB1E
+270  -;
+280  -          LDA #&lt;(TEXT)   ; LOW-BYTE IN AKKU
+290  -          LDY #&gt;(TEXT)   ; HIGH-BYTE IN Y
+300  -          JMP STROUT     ; TEXTAUSGABE UND ENDE
+310  -;
+320  -TEXT      .TX "DAS IST DER TEXT!"
+330  -.BY 0 ; ENDMARKIERUNG DES TEXTES
+</pre>
+            <figcaption>Listing 2. Die unkomfortable Lösung, einen Text auszugeben</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 2.prg" data-name="Listing 2"></div>
+
         <aside>
             <h3>Beschleunigungsmethode 5.</h3>
 
@@ -325,6 +362,36 @@
 
         <p>Eine Anwendung von (fast) allen Routinen aus der Beschleunigungsmethode 5 zeigt Listing 3.</p>
 
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -;
+120  -; TEXTAUSGABE (UEBER STROUT)
+130  -;
+140  -.BA $C000 ; START: SYS 49152
+150  -;
+160  -.GL STROUT = $AB1E
+170  -.GL CURSOR = $E50C
+180  -.GL CLRSCR = $E544 ; BILDSCHIRM LOESCHEN
+190  -;
+200  -.GL ZEILE  = 12
+210  -.GL SPALTE = 10
+220  -;
+230  -          JSR CLRSCR     ; = PRINT CHR$(147)
+240  -          LDX #ZEILE     ; ZEILE IN X
+250  -          LDY #SPALTE    ; SPALTE IN Y
+260  -          JSR CURSOR     ; CURSOR SETZEN
+270  -          LDA #&lt;(TEXT)   ; LOW-BYTE IN AKKU
+280  -          LDY #&gt;(TEXT)   ; HIGH-BYTE IN Y
+290  -          JMP STROUT     ; TEXTAUSGABE &amp; ENDE
+300  -;
+310  -TEXT      .TX "DAS IST DER TEXT!"
+320  -.BY 0 ; ENDMARKIERUNG FUER STROUT
+</pre>
+            <figcaption>Listing 3. Die komfortable Lösung einen Text auszugeben</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 3.prg" data-name="Listing 3"></div>
+
         <p>Der Bildschirm wird gelöscht und in Zeile 12 ab Spalte 10 ein Text ausgegeben. Auch in diesem Programm sollten Sie zur Übung etwas experimentieren!</p>
 
         <h3>e) Kopieren des Textes in den Bildschirmspeicher</h3>
@@ -337,6 +404,39 @@
 
         <p>Beschäftigen wir uns nun mit Listing 4:</p>
 
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -;
+120  -; TEXT IN VIDEO-RAM SCHREIBEN
+130  -;
+140  -.BA $C000 ; START: SYS 49152
+150  -;
+180  -.GL CLRSCR = $E544 ; BILDSCHIRM LOESCHEN
+190  -;
+200  -.GL ZEILE  = 12
+210  -.GL SPALTE = 10
+220  -;
+230  -.GL VIDEORAM = 1024 ; BILDSCHIRMSPEICHER
+240  -.GL ADRESSE = VIDEORAM + (40*ZEILE) + SPALTE
+250  -;
+255  -          JSR CLRSCR     ; = PRINT CHR$(147)
+260  -          LDX #0
+270  -SCHLEIFE  LDA TEXT,X     ; BILDSCHIRMCODE LESEN
+280  -          BEQ ENDE       ; =0, DANN ENDE
+290  -          STA ADRESSE,X  ; IN BILDSCHIRMSPEICHER
+295  -          INX
+296  -          JMP SCHLEIFE   ; NAECHSTES ZEICHEN
+300  -ENDE      RTS
+305  -;
+310  -TEXT      .BY 4,1,19," ",9,19,20," "
+311  -.BY 4,5,18," ",20,5,24,20,"!"
+320  -.BY 0 ; ENDMARKIERUNG DES TEXTES
+</pre>
+            <figcaption>Listing 4. Die schnellste Lösung, einen Text auszugeben</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 4.prg" data-name="Listing 4"></div>
+
         <p>Dieses Programm entspricht in der Wirkung Listing 3, gibt den Text jedoch nicht über die Betriebssystem-Routinen CURSOR und STROUT aus, sondern schreibt ihn direkt in den Bildschirm.</p>
 
         <p>In den Zeilen 310 - 320 steht der Bildschirmcode des Textes.</p>
@@ -344,6 +444,60 @@
         <p>Zurück zur Routine STROUT: Diese Routine arbeitet, da sie sich auf die BASOUT-Routine stützt, auch mit Peripheriegeräten wie Floppy und Drucker, wenn diese über dem CMD-Befehl als Ausgabegeräte definiert wurden. In »Assembler ist keine Alchimie« wurde gezeigt, wie man mit der BASOUT-Routine die Drucker-Ausgabe betreibt. Dort wurden alle wichtigen Routinen bis ins Detail beschrieben.</p>
 
         <p>Listing 5 gibt einen Text zuerst auf dem Drucker und dann auf dem Bildschirm aus. Daran soll außer dem Druckerbetrieb auch gezeigt werden, wie man die Parameterübergabe an STROUT als Makro (Zeilen 230 - 270) definiert und sich somit einen bequemen Ausgabe-Befehl schafft.</p>
+
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -;
+120  -; DRUCKER-AUSGABE MIT
+130  -; DER STROUT-ROUTINE
+140  -;
+150  -.GL STROUT = $AB1E
+160  -.GL SETNAM = $FFBD ; DIE BEDEUTUNG
+170  -.GL SETLFS = $FFBA ; DIESER ROUTINEN
+180  -.GL OPEN   = $FFC0 ; ENTNEHMEN SIE
+190  -.GL CHKOUT = $FFC9 ; BITTE DEM KURS
+200  -.GL CLRCHN = $FFCC ; "ASSEMBLER IST
+210  -.GL CLOSE  = $FFC3 ; KEINE ALCHIMIE"
+220  -;
+230  -.MA PRINT (ADRESSE)
+240  -          LDA #&lt;(ADRESSE)
+250  -          LDY #&gt;(ADRESSE)
+260  -          JSR STROUT
+270  -.RT
+280  -;
+290  -.BA $C000 ; START: SYS 49152
+300  -;
+310  -          LDA #0         ; KEINEN
+320  -          JSR SETNAM     ; FILENAMEN
+330  -;
+340  -          LDA #4         ; LOG. FILENUMMER =4
+350  -          TAX            ; GERAETEADRESSE 4
+360  -          LDY #0         ; SEKUNDAERADRESSE 0
+370  -          JSR SETLFS     ; PARAMETER SETZEN
+380  -;
+390  -          JSR OPEN       ; FILE OEFFNEN
+400  -;
+410  -          LDX #4         ; FILENUMMER 4
+420  -          JSR CHKOUT     ; AUSGABE AUF DRUCKER LENKEN
+430  -;
+440  -...PRINT (TEXT) ; TEXT AUSGEBEN
+450  -;
+460  -          JSR CLRCHN     ; WIEDER BILDSCHIRMAUSGABE
+470  -;
+480  -...PRINT (TEXT) ; JETZT AUF BILDSCHIRM
+490  -;
+500  -          LDA #4         ; LOG. FILENUMMER 4
+510  -          JMP CLOSE      ; FILE SCHLIESSEN
+520  -; &amp; PROGRAMM BEENDEN
+530  -;
+540  -TEXT      .TX "DIESER TEXT WIRD AUF"
+550  -.TX " DEN DRUCKER AUSGEGEBEN !"
+560  -.BY 13,13,13,0 ; 3 * CAR.RETURN
+</pre>
+            <figcaption>Listing 5. So gibt man Text auf dem Drucker aus</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 5.prg" data-name="Listing 5"></div>
 
         <h2>4. Unterprogramme</h2>
 
@@ -366,7 +520,137 @@
 
         <p>Eine »Übersetzung« von Bild 1 in Assembler ist Listing 6: Wenn Sie dieses über »SYS 49152« starten, ist aus den ausgegebenen Texten ersichtlich, welcher Programmteil wann abgearbeitet wird.</p>
 
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -.BA $C000 ; START: SYS 49152
+120  -;
+130  -; UNTERPROGRAMMVERSCHACHTELUNG IN ASSEMBLER
+140  -;
+150  -.GL STROUT = $AB1E
+160  -;
+170  -.MA PRINT (ADRESSE)
+180  -          LDA #&lt;(ADRESSE)
+190  -          LDY #&gt;(ADRESSE)
+200  -          JSR STROUT
+210  -.RT
+220  -;
+230  -; --------------- HAUPTPROGRAMM
+240  -;
+250  -...PRINT (TEXT1)
+260  -;
+270  -          JSR UP1
+280  -;         ^ AUFRUF VON UNTERPROGRAMM 1
+290  -;
+300  -...PRINT (TEXT2)
+310  -;
+320  -          JMP $A474      ; WARMSTART
+330  -;
+340  -;
+350  -; --------------- UNTERPROGRAMM 1
+360  -;
+365  -UP1       NOP            ; BELIEBIGER CODE
+370  -...PRINT (TEXT3)
+380  -;
+390  -          JSR UP2
+400  -;         ^ AUFRUF VON UNTERPROGRAMM 2
+410  -;
+420  -          RTS            ; UP1 VERLASSEN
+430  -;
+440  -;
+450  -; --------------- UNTERPROGRAMM 2
+460  -;
+465  -UP2       NOP            ; BELIEBIGER CODE
+470  -...PRINT (TEXT4)
+480  -;
+490  -          RTS            ; UP2 VERLASSEN
+500  -;
+10000  -;
+10010  -; --------------- TEXTE
+10020  -;
+10030  -TEXT1     .TX "HIER IST DAS HAUPTPROGRAMM."
+10040  -.BY 13,13 ; 1 LEERZEILE
+10050  -.BY 0 ; ENDMARKIERUNG
+10060  -;
+10070  -TEXT2     .TX "HIER IST WIEDER DAS HAUPTPROGRAMM."
+10080  -.BY 13,13,0
+10090  -;
+10100  -TEXT3     .TX "HIER IST DAS UNTERPROGRAMM 1."
+10110  -.BY 13,13,0
+10120  -;
+10130  -TEXT4     .TX "HIER IST DAS UNTERPROGRAMM 2."
+10140  -.BY 13,13,0
+</pre>
+            <figcaption>Listing 6. Die umständliche Methode, Unterroutinen aufzurufen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 6.prg" data-name="Listing 6"></div>
+
         <p>Sobald Sie die Strukturvon Bild 1 beziehungsweise Listing 6 verstanden haben, können wir uns mit der optimierten Form befassen, die in Bild 2 beziehungsweise Listing 7 zu finden ist.</p>
+
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -.BA $C000 ; START: SYS 49152
+120  -;
+130  -; UNTERPROGRAMMVERSCHACHTELUNG
+140  -; (OPTIMIERTE ASSEMBLERVERSION)
+150  -;
+160  -.GL STROUT = $AB1E
+170  -;
+180  -.MA PRINT (ADRESSE)
+190  -          LDA #&lt;(ADRESSE)
+200  -          LDY #&gt;(ADRESSE)
+210  -          JSR STROUT
+220  -.RT
+230  -;
+240  -; --------------- HAUPTPROGRAMM
+250  -;
+260  -...PRINT (TEXT1)
+270  -;
+280  -          JSR UP1
+290  -;         ^ AUFRUF VON UNTERPROGRAMM 1
+300  -;
+310  -...PRINT (TEXT2)
+320  -;
+330  -          JMP $A474      ; WARMSTART
+340  -;
+350  -;
+360  -; --------------- UNTERPROGRAMM 1
+370  -;
+380  -UP1       NOP            ; BELIEBIGER CODE
+390  -...PRINT (TEXT3)
+400  -;
+410  -;
+420  -;
+430  -; --------------- CODE VON UNTERPROGRAMM 2
+440  -;
+450  -UP2       NOP            ; BELIEBIGER CODE
+460  -          LDA #&lt;(TEXT4)  ; LOW-BYTE
+470  -          LDY #&gt;(TEXT4)  ; HIGH-BYTE
+480  -          JMP STROUT     ; TEXTAUSGABE
+490  -; UND RUECKSPRUNG VOM UNTERPROGRAMM,
+500  -; WEIL AM ENDE DER STROUT-ROUTINE
+510  -; EIN RTS-BEFEHL STEHT.
+10000  -;
+10010  -;
+10020  -; --------------- TEXTE
+10030  -;
+10040  -TEXT1     .TX "HIER IST DAS HAUPTPROGRAMM."
+10050  -.BY 13,13 ; 1 LEERZEILE
+10060  -.BY 0 ; ENDMARKIERUNG
+10070  -;
+10080  -TEXT2     .TX "HIER IST WIEDER DAS HAUPTPROGRAMM."
+10090  -.BY 13,13,0
+10100  -;
+10110  -TEXT3     .TX "HIER IST DAS UNTERPROGRAMM 1."
+10120  -.BY 13,13,0
+10130  -;
+10140  -TEXT4     .TX "HIER IST DAS UNTERPROGRAMM 2."
+10150  -.BY 13,13,0
+</pre>
+            <figcaption>Listing 7. Die optimierte Methode, Unterroutinen aufzurufen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 7.prg" data-name="Listing 7"></div>
 
         <p>Hier wird das ehemalige Unterprogramm 2 ans Ende von Unterprogramm 1 gehängt (wobei es ebenfalls über JMP UP2 angesprungen werden könnte). Auf diese Weise muß es nicht über JSR aufgerufen werden, was auch einen RTS-Befehl überflüssig macht.</p>
 
@@ -550,6 +834,51 @@
 
         <p>Wie wir nun diese Zahl verarbeiten, zeigt Ihnen Listing 8. Das Makro (200 - 240) stützt sich auf die Interpreter-Routine MEMFAC, die eine Zahl (Adresse wird in Akku/Y-Register übergeben) vom Speicherformat MFLPT in den FAC als FLPT-Zahl schreibt und dabei die erforderliche MFLPT-—FLPT-Umwandlung durchführt.</p>
 
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -.BA $C000 ; START: SYS 49152
+120  -;
+130  -; RECHNUNG MIT FLIESSKOMMAWERTEN
+140  -;
+150  -.GL MEMFAC = $BBA2
+160  -.GL FACOUT = $AABC
+170  -.GL SQRFAC = $BF71
+180  -.GL LOGNAT = $B9EA
+190  -;
+200  -.MA HOLE (ADRESSE) ; MAKRO-DEF.
+210  -          LDA #&lt;(ADRESSE); HOLT MFLPT-ZAHL
+220  -          LDY #&gt;(ADRESSE); VON ADRESSE IN
+230  -          JSR MEMFAC     ; DEN FAC
+240  -.RT
+250  -;
+260  -;
+270  -...HOLE (BSPZAHL)
+280  -;
+290  -          JSR FACOUT     ; AUSDRUCKEN
+300  -;
+310  -...HOLE (BSPZAHL)
+320  -;
+330  -          JSR SQRFAC     ; QUADRATWURZEL
+340  -;
+350  -          JSR FACOUT     ; AUSDRUCKEN
+360  -;
+370  -...HOLE (BSPZAHL)
+380  -;
+390  -          JSR LOGNAT     ; LOGARITHMUS NATURALIS
+400  -;
+410  -          JMP FACOUT     ; AUSDRUCKEN
+500  -;
+510  -; BEISPIELZAHL 1.23456
+520  -; IM MFLPT-FORMAT
+530  -;
+540  -BSPZAHL   .BY $81,$1E,$06,$0F,$E5
+550  -;
+</pre>
+            <figcaption>Listing8. Fließkommazahlen in Assembler verarbeiten</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 8.prg" data-name="Listing 8"></div>
+
         <p>In der Tabelle in Zeile 540 können Sie beliebige Fließkommawerte (sofern Sie diese wie angegeben berechnet haben) einsetzen, das Programm rechnet dann mit der jeweiligen Fließkommazahl, die ab BSPZAHL im MFLPT-Format steht.</p>
 
         <p>Diese Zahl wird zunächst nur in den FAC geladen und der FAC wird dann ausgedruckt (270 - 290), dann wird die Zahl wieder geholt, die Wurzel berechnet und ausgegeben (310-350). Schließlich wird die Zahl wieder in den FAC geholt, der natürliche Logarithmus errechnet und auch ausgegeben (370-410).</p>
@@ -573,6 +902,319 @@
         <p>Der SMON arbeitet genauso: Seine Sprungtabelle liegt im Bereich $C02B - $C06B.</p>
 
         <p>Die Anwendung von Sprungtabellen werden wir noch ausführlich im folgenden Abschnitt d) sowie bei der Besprechung von Listing 11 behandeln.</p>
+
+        <figure>
+            <pre>
+100  -.BA $C000 ; START: SYS 49152
+110  -;
+120  -; *************************
+130  -; *                       *
+140  -; *  TABELLEN - BEISPIEL  *
+150  -; *  ===================  *
+160  -; *                       *
+170  -; *  BY  FLORIAN MUELLER  *
+180  -; *                       *
+190  -; *************************
+200  -;
+210  -.GL STROUT = $AB1E
+220  -.GL CURSORHOME = $E566
+230  -.GL GET = $FFE4
+240  -.GL BASIN = $FFCF
+250  -.GL BASOUT = $FFD2
+260  -.GL RESET = $FCE2 ; SOFTWARE-RESET
+270  -;
+280  -START     JSR $E544      ; = PRINT CHR$(147)
+290  -          LDA #0         ; TASTATURPUFFER
+300  -          STA 198        ; LOESCHEN
+310  -          STA MPT
+320  -; ^ SETZT AKTUELLEN MENUEPUNKT AUF 0
+330  -HSCHLEIFE JSR CURSORHOME
+340  -; ^ HSCHLEIFE = HAUPTSCHLEIFE
+350  -          LDA #0
+360  -          TAX
+370  -SCHLEIFE1 STA RVSTAB,X
+380  -          INX
+390  -          CPX #4
+400  -          BNE SCHLEIFE1
+410  -          LDX MPT
+420  -          LDA #18        ; 18 = REVERS EIN
+430  -          STA RVSTAB,X
+440  -          LDX #0
+450  -; ^ SCHLEIFENZAEHLER INITIALISIEREN
+460  -SCHLEIFE2 STX XSAVE      ; X RETTEN
+470  -          LDA RVSTAB,X
+480  -          JSR BASOUT
+490  -          LDA TEXTLO,X   ; ERKLAERUNG
+500  -          LDY TEXTHI,X   ; ZUM MENUEPUNKT
+510  -          JSR STROUT     ; AUSGEBEN
+520  -          LDX XSAVE      ; X WIEDER HOLEN
+530  -          INX
+540  -          CPX #4
+550  -          BNE SCHLEIFE2
+560  -;
+570  -;
+580  -; HIER IST DAS MENUE BEREITS AUF
+590  -; DEN BILDSCHIRM AUSGEGEBEN WORDEN.
+600  -;
+610  -TASTE     JSR GET        ; TASTATURABFRAGE
+620  -          BEQ TASTE      ; WARTEN AUF TASTENDRUCK
+630  -          LDX #0
+640  -SCHLEIFE3 CMP TASTEN,X
+650  -          BEQ WEITER1
+660  -          INX
+670  -          CPX #16
+680  -          BNE SCHLEIFE3
+690  -          JMP TASTE
+700  -WEITER1   TXA
+710  -          LSR            ; DIVIDIERT AKKU-
+720  -          LSR            ; MULATOR DURCH 4
+730  -          TAX
+740  -          LDA SP1LO,X
+750  -          STA SPRUNG
+760  -          LDA SP1HI,X
+770  -          STA SPRUNG+1
+780  -;
+790  -.EQ RUECKSPRUNG = HSCHLEIFE-1
+800  -; ^ LEGT RUECKSPRUNGADRESSE DES
+810  -;   UNTERPROGRAMMS FEST.
+820  -;
+830  -          LDA #&gt;(RUECKSPRUNG)
+840  -          PHA
+850  -          LDA #&lt;(RUECKSPRUNG)
+860  -          PHA
+870  -          JMP (SPRUNG)
+880  -;
+890  -;
+900  -HOME      LDX #0
+910  -          STX MPT
+920  -ENDE      RTS            ; ENDE DES UNTERPRG
+930  -;
+940  -DOWN      LDX MPT        ; MENUEPUNKT
+950  -          INX            ; UM 1 ERHOEHEN
+960  -          CPX #4         ; GROESSER ALS 3?
+970  -          BEQ HOME       ; DANN =0
+980  -          STX MPT        ; SONST UEBERNEHMEN
+990  -          RTS            ; ZUR HAUPTSCHLEIFE
+1000  -;
+1010  -UP        LDX MPT        ; MENUEPUNKT
+1020  -          DEX            ; DEKREMENTIEREN
+1030  -          BPL ENDUP      ; &gt; 0?
+1040  -          LDX #3         ; NEIN, DANN =3
+1050  -ENDUP     STX MPT        ; UND UEBERNEHMEN
+1060  -          RTS            ; ZUR HAUPTSCHLEIFE
+1070  -;
+1080  -;
+1090  -EXEC      PLA            ; STAPELMANIPULATION
+1100  -          PLA
+1110  -          LDX MPT
+1120  -          LDA SP2LO,X
+1130  -          STA SPRUNG
+1140  -          LDA SP2HI,X
+1150  -          STA SPRUNG+1
+1160  -          JMP (SPRUNG)
+1170  -;
+1180  -;
+1190  -;
+1200  -ZAHLWORT  LDA #&lt;(TZAHL)  ; AUFFORDERUNG
+1210  -          LDY #&gt;(TZAHL)  ; ZUR EINGABE
+1220  -          JSR STROUT     ; AUSGEBEN
+1230  -          JSR BASIN      ; HOLT ZEICHEN
+1240  -          SEC            ; IN BINAERZAHL
+1250  -          SBC #"0"       ; UMWANDELN
+1260  -          TAX            ; INS X-REGISTER
+1270  -;
+1280  -; JETZT STEHT IM X-REGISTER
+1290  -; DIE EINGEGEBENE ZAHL
+1300  -;
+1310  -          CMP #10        ; &gt; 10?
+1320  -          BCC ZAHLWORT1  ; NEIN=&gt; WEITER
+1330  -          JMP ZAHLWORT   ; NEUEINGABE
+1340  -;
+1350  -ZAHLWORT1 STX XSAVE      ; X RETTEN
+1360  -          LDA #&lt;(TWORT)  ; AUFFORDERUNG
+1370  -          LDY #&gt;(TWORT)  ; ZUR EINGABE
+1380  -          JSR STROUT     ; AUSGEBEN
+1390  -          LDX XSAVE      ; X WIEDER HOLEN
+1400  -          LDA ZWLO,X     ; ADRESSE DES
+1410  -          LDY ZWHI,X     ; ZAHLWORTES HOLEN
+1420  -          JSR STROUT     ; UND Z.WORT DRUCKEN
+1430  -;
+1440  -WAIT      JSR GET        ; WARTET AUF
+1450  -          BEQ WAIT       ; TASTENDRUCK
+1460  -          JMP START      ; ZUM HAUPTMENUE
+1470  -;
+1480  -;
+1490  -;
+1500  -FARBE     LDA #&lt;(TFARBE)
+1510  -          LDY #&gt;(TFARBE)
+1520  -          JSR STROUT
+1530  -          LDX #0
+1540  -FARBE1    JSR BASIN      ; HOLT EINGABE
+1550  -          CMP #" "       ; SPACE ?
+1560  -          BEQ FARBE1     ; JA=&gt;UEBERLESEN
+1570  -          CMP #13        ; ENDE DER EINGABE?
+1580  -          BEQ FARBE2     ; JA, DANN WEITER
+1590  -          STA FARBWORT,X ; EINGABE SPEICHERN
+1600  -          INX            ; ZAEHLER ERHOEHEN
+1610  -          JMP FARBE1     ; ZUR SCHLEIFE
+1620  -FARBE2    STX 2          ; LAENGE MERKEN
+1630  -          LDX #0
+1640  -          TXA
+1650  -FARBE3    ROL
+1660  -          EOR FARBWORT,X
+1670  -          INX
+1680  -          CPX 2          ; SCHON FERTIG?
+1690  -          BNE FARBE3     ; NEIN,ZUR SCHLEIFE
+1700  -          CLC            ; LAENGE
+1710  -          ADC 2          ; ADDIEREN
+1720  -;
+1730  -; HIER STEHT IM AKKU DIE PRUEFSUMME
+1740  -;
+1750  -          LDX #0
+1760  -FARBE4    CMP PRUEFSUMMEN,X
+1770  -          BEQ FARBE5     ; GEFUNDEN
+1780  -          INX
+1790  -          CPX #16
+1800  -          BNE FARBE4
+1810  -          JMP FARBE      ; NEUE EINGABE
+1820  -FARBE5    STX 53280      ; BILDSCHIRM-
+1830  -          STX 53281      ; FARBE SETZEN
+1840  -          JMP START      ; ZUM MENUE
+1850  -;
+10000  -;
+10010  -; TABELLEN
+10020  -; ========
+10030  -;
+10040  -; TEXTE:
+10050  -;
+10060  -PUNKT0    .TX "ZAHL IN ZAHLWORT UMWANDELN"
+10070  -.BY 13,13,0
+10080  -;
+10090  -PUNKT1    .TX "BILDSCHIRMFARBE"
+10100  -.BY 13,13,0
+10110  -;
+10120  -PUNKT2    .TX "RESET AUSLOESEN"
+10130  -.BY 13,13,0
+10140  -;
+10150  -PUNKT3    .TX "PROGRAMMENDE UEBER RTS"
+10160  -.BY 13,13,13
+10170  -.TX "BITTE AUSWAEHLEN !"
+10180  -.BY 0
+10190  -;
+10200  -;
+10210  -TASTEN    .BY 133,13,"_","="; 133=F1,13=RETURN
+10220  -.BY 19,"0","@",0 ; 19=HOME,0=DUMMY
+10230  -.BY 17,"D",135,"+" ; 17=CRSR DOWN,135=F5
+10240  -.BY 145,"U",134,"-" ; 145=CRSR UP,134=F3
+10250  -;
+10260  -;
+10270  -TZAHL     .BY 147        ; CLEAR HOME
+10280  -.TX "ZAHL (0-9) ? "
+10290  -.BY 0
+10300  -;
+10310  -TWORT     .TX " IN WORTEN : "
+10320  -.BY 0
+10330  -;
+10340  -;
+10350  -; ZAHLWOERTER (0-9)
+10360  -;
+10370  -;
+10380  -NULL      .TX "NULL"
+10390  -.BY 0
+10400  -;
+10410  -EINS      .TX "EINS"
+10420  -.BY 0
+10430  -;
+10440  -ZWEI      .TX "ZWEI"
+10450  -.BY 0
+10460  -;
+10470  -DREI      .TX "DREI"
+10480  -.BY 0
+10490  -;
+10500  -VIER      .TX "VIER"
+10510  -.BY 0
+10520  -;
+10530  -FUENF     .TX "FUENF"
+10540  -.BY 0
+10550  -;
+10560  -SECHS     .TX "SECHS"
+10570  -.BY 0
+10580  -;
+10590  -SIEBEN    .TX "SIEBEN"
+10600  -.BY 0
+10610  -;
+10620  -ACHT      .TX "ACHT"
+10630  -.BY 0
+10640  -;
+10650  -NEUN      .TX "NEUN"
+10660  -.BY 0
+10670  -;
+10680  -;
+10690  -TFARBE    .BY 147        ; CLEAR HOME
+10700  -.TX "WELCHE FARBE ? "
+10710  -.BY 0
+10720  -;
+10730  -;
+10740  -RVSTAB    .BY 0,0,0,0    ; 4 BYTES RESERVIEREN
+10750  -;
+10760  -;
+10770  -; ZAHLEN:
+10780  -;
+10790  -; ADRESSEN DER TEXTE, DIE DIE
+10800  -; MENUEPUNKTE BESCHREIBEN
+10810  -;
+10820  -TEXTLO    .BY &lt;(PUNKT0),&lt;(PUNKT1)
+10830  -.BY &lt;(PUNKT2),&lt;(PUNKT3)
+10840  -;
+10850  -TEXTHI    .BY &gt;(PUNKT0),&gt;(PUNKT1)
+10860  -.BY &gt;(PUNKT2),&gt;(PUNKT3)
+10870  -;
+10880  -;
+10890  -; ADRESSEN DER ZAHLWOERTER
+10900  -;
+10910  -ZWLO      .BY &lt;(NULL),&lt;(EINS),&lt;(ZWEI),&lt;(DREI)
+10920  -.BY &lt;(VIER),&lt;(FUENF),&lt;(SECHS),&lt;(SIEBEN)
+10930  -.BY &lt;(ACHT),&lt;(NEUN)
+10940  -;
+10950  -ZWHI      .BY &gt;(NULL),&gt;(EINS),&gt;(ZWEI),&gt;(DREI)
+10960  -.BY &gt;(VIER),&gt;(FUENF),&gt;(SECHS),&gt;(SIEBEN)
+10970  -.BY &gt;(ACHT),&gt;(NEUN)
+10980  -;
+10990  -;
+11000  -; ADRESSEN DER UNTERROUTINEN
+11010  -; FUER DIE MENUESTEUERUNG
+11020  -;
+11030  -SP1LO     .BY &lt;(EXEC),&lt;(HOME),&lt;(DOWN),&lt;(UP)
+11040  -;
+11050  -SP1HI     .BY &gt;(EXEC),&gt;(HOME),&gt;(DOWN),&gt;(UP)
+11060  -;
+11070  -;
+11080  -; ADRESSEN DER EINZELNEN
+11090  -; MENUEPUNKTE
+11100  -;
+11110  -SP2LO     .BY &lt;(ZAHLWORT),&lt;(FARBE)
+11120  -.BY &lt;(RESET),&lt;(ENDE) ; BEI ENDE STEHT
+11130  -SP2HI     .BY &gt;(ZAHLWORT),&gt;(FARBE)
+11140  -.BY &gt;(RESET),&gt;(ENDE) ; EIN RTS-BEFEHL
+11150  -;
+11160  -; PRUEFSUMMEN DER FARB-WOERTER
+11170  -;
+11180  -PRUEFSUMMEN.BY 41,158,137,212,159,101
+11190  -.BY 3,2,33,69,201,116,113,121,127,114
+11200  -;
+11210  -;
+11220  -; ZWISCHENSPEICHER
+11230  -;
+11240  -MPT       .BY 0          ; 1 BYTE RESERVIEREN
+11250  -XSAVE     .BY 0
+11260  -SPRUNG    .WO 0          ; 2 BYTES FREIHALTEN
+11270  -FARBWORT  .BY 0
+11280  -; ^ AB 'FARBWORT' WIRD DIE EINGABE
+11290  -;   DER FARB-BEZEICHNUNG ABGELEGT.
+</pre>
+            <figcaption>Listing 11. »Tabellen-Beispiel«, ein Beispiel zur Verwendung von Tabellen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 11.prg" data-name="Listing 11"></div>
 
         <h3>d) Vergleichstabellen</h3>
 
@@ -765,6 +1407,67 @@
 
         <p>In Bild 4 sehen Sie einen sehr zuverlässigen Algorithmus zur Berechnung von Prüfsummen (insofern zuverlässig, als er sehr unterschiedliche Prüfsummen ermittelt). Listing 9 stellt ein Hilfsprogramm dar, das zu einer Eingabe die Prüfsumme nach dem Algorithmus aus Bild 4 errechnet.</p>
 
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -.BA $C000 ; START: SYS 49152
+120  -;
+130  -.GL BASIN = $FFCF
+140  -.GL NUMOUT = $BDCD
+150  -.GL STROUT = $AB1E
+160  -;
+170  -ANFANG    LDA #&lt;(TEXT1)
+180  -          LDY #&gt;(TEXT1)
+190  -          JSR STROUT
+200  -;
+210  -          LDX #0
+220  -SCHLEIFE1 JSR BASIN
+230  -          CMP #13        ; 13 = RETURN
+240  -          BEQ WEITER
+250  -          STA STORE,X
+260  -          INX
+270  -          JMP SCHLEIFE1
+280  -;
+290  -WEITER    STX LAENGE
+300  -          LDA #&lt;(TEXT2)
+310  -          LDY #&gt;(TEXT2)
+320  -          JSR STROUT
+330  -          LDA #0
+340  -; 0 = AUSGANGSWERT DER PRUEFSUMME
+350  -          TAX            ; ZAEHLER = 0
+360  -SCHLEIFE2 ROL            ; PRUEFSUMME * 2
+370  -          EOR STORE,X
+380  -          INX            ; ZAEHLER ERHOEHEN
+390  -          CPX LAENGE
+400  -          BNE SCHLEIFE2
+410  -          CLC
+420  -          ADC LAENGE     ; LAENGE ADDIEREN
+430  -          TAX            ; PRUEFSUMME
+440  -          LDA #0         ; AUSGEBEN
+450  -          JSR NUMOUT
+460  -          JMP ANFANG     ; NOCH EINMAL
+1000  -;
+1010  -; TEXTE
+1020  -;
+1030  -TEXT1     .BY 13
+1040  -.TX "----------------------------------------"
+1050  -.TX "EINGABE ?  "
+1060  -.BY 0
+1070  -;
+1080  -TEXT2     .BY 13
+1090  -.TX "PRUEFSUMME "
+1100  -.BY 0
+2000  -;
+2010  -; ZWISCHENSPEICHER
+2020  -;
+2030  -LAENGE    .BY 0          ; ZWISCHENSPEICHER
+2040  -STORE     .BY 0
+2050  -; ^ AB STORE WIRD DIE EINGABE ABGELEGT
+</pre>
+            <figcaption>Listing 9. Die Berechnung von Prüfsummen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 9.prg" data-name="Listing 9"></div>
+
         <p>In Listing 9 ist Ihnen eventuell die Routine NUMOUT nicht bekannt. Daher eine Kurzbeschreibung: NUMOUT gibt eine positive Integerzahl, die im Akkumulator (High-Byte) und im X-Register (Low-Byte) übergeben wird, aus. NUMOUT wird zum Beispiel von der LIST-Routine bei der Ausgabe einer Zeilennummer aufgerufen.</p>
 
         <p>Die Routine BASIN soll ebenfalls erklärt werden, da sie in allen folgenden Programmen verwendet werden wird. Wenn die Routine BASIN zum ersten Mal aufgerufen wird, erwartet das Betriebssystem eine Eingabe (normalerweise von Tastatur), die der Eingabe einer Basic-Zeile entspricht. Nach der Eingabe wird das erste eingegebene Byte in den Akku geladen, jeder weitere Aufruf von BASIN holt das nächste Zeichen in den Akku. Wurden alle Bytes eingelesen, wird im Akku der Wert 13 ($0D, RETURN) übergeben. Danach führt ein weiterer Aufruf von BASIN zu erneuter Eingabe von Tastatur.</p>
@@ -772,6 +1475,112 @@
         <p>Ein großer Vorteil von Prüfsummen ist, daß die Vergleiche mit nur einem Byte, nämlich der Prüfsumme, durchgeführt werden müssen.</p>
 
         <p>Wie man in den Genuß dieses Vorteils kommt, zeigt Listing 10. Wenn Sie den Namen eines Computers (C 64, VC 20, PC 128 oder AMIGA) eingeben, nennt das Programm den in diesem Computer installierten Mikroprozessor. Bei der Eingabe der Computernamen kann man aufgrund der Zeilen 230 und 248 beliebig viele Leerzeichen eingeben. Bei der Errechnung der Prüfsummen mit Listing 9 dürfen allerdings keine eingegeben werden, da Listing 9 diese nicht überliest und somit ein falsches Ergebnis liefern würde.</p>
+
+        <figure>
+            <pre>
+100  -.LI 1,3,0
+110  -.BA $C000 ; START: SYS 49152
+120  -;
+130  -.GL BASIN = $FFCF
+140  -.GL NUMOUT = $BDCD
+150  -.GL STROUT = $AB1E
+160  -;
+170  -ANFANG    LDA #&lt;(TEXT1)
+180  -          LDY #&gt;(TEXT1)
+190  -          JSR STROUT
+200  -;
+210  -          LDX #0
+220  -SCHLEIFE1 JSR BASIN
+230  -          CMP #" "       ; SPACE?
+240  -          BEQ SCHLEIFE1  ; DANN UEBERLESEN
+250  -          CMP #13        ; 13 = RETURN
+260  -          BEQ WEITER1
+270  -          STA STORE,X
+280  -          INX
+290  -          JMP SCHLEIFE1
+300  -;
+310  -WEITER1   STX LAENGE
+320  -          LDA #&lt;(TEXT2)
+330  -          LDY #&gt;(TEXT2)
+340  -          JSR STROUT
+350  -          LDA #0
+360  -; 0 = AUSGANGSWERT DER PRUEFSUMME
+370  -          TAX            ; ZAEHLER = 0
+380  -SCHLEIFE2 ROL            ; PRUEFSUMME * 2
+390  -          EOR STORE,X
+400  -          INX            ; ZAEHLER ERHOEHEN
+410  -          CPX LAENGE
+420  -          BNE SCHLEIFE2
+430  -          CLC
+440  -          ADC LAENGE     ; LAENGE ADDIEREN
+450  -; HIER STEHT DIE PRUEFSUMME IM AKKU
+460  -;
+470  -          LDX #0
+480  -SCHLEIFE3 CMP PRUEFSUMMEN,X
+490  -          BEQ WEITER2
+500  -          INX
+510  -          CPX #4
+520  -          BNE SCHLEIFE3
+530  -; PRUEFSUMME NICHT GEFUNDEN
+540  -;
+550  -          PLA
+560  -          PLA
+570  -          LDA #&lt;(TEXT3)
+580  -          LDY #&gt;(TEXT3)
+590  -          JSR STROUT
+600  -          JSR ANFANG     ; VON VORNE
+610  -;
+620  -WEITER2   LDA LOWTAB,X   ; LOW-BYTE
+630  -          LDY HIGHTAB,X  ; HIGH-BYTE
+640  -          JSR STROUT
+650  -          JMP ANFANG     ; NOCH EINMAL!
+660  -;
+1000  -;
+1010  -; TEXTE
+1020  -;
+1030  -TEXT1     .BY 13
+1040  -.TX "----------------------------------------"
+1050  -.TX "COMPUTER : "
+1060  -.BY 0
+1070  -;
+1080  -TEXT2     .BY 13
+1090  -.TX "PROZESSOR: "
+1100  -.BY 0
+1110  -;
+1120  -TEXT3     .TX "WEISS ICH NICHT!"
+1130  -.BY 0
+1140  -;
+1150  -;
+1160  -T6502     .TX "MOS 6502"
+1170  -.BY 0
+1180  -;
+1190  -T6510     .TX "MOS 6510"
+1200  -.BY 0
+1210  -;
+1220  -T8502     .TX "MOS 8502 &amp; Z80"
+1230  -.BY 0
+1240  -;
+1250  -T68000    .TX "MOTOROLA 68000"
+1260  -.BY 0
+1270  -;
+2000  -;
+2010  -; NUMERISCHE TABELLEN
+2020  -;
+2030  -LOWTAB    .BY &lt;(T6502),&lt;(T6510),&lt;(T8502),&lt;(T68000)
+2040  -HIGHTAB   .BY &gt;(T6502),&gt;(T6510),&gt;(T8502),&gt;(T68000)
+2050  -;
+2060  -PRUEFSUMMEN.BY 228,83,149,136
+2070  -; REIHENFOLGE: VC20,C64,PC128,AMIGA
+3000  -;
+3010  -; ZWISCHENSPEICHER
+3020  -;
+3030  -LAENGE    .BY 0          ; ZWISCHENSPEICHER
+3040  -STORE     .BY 0
+3050  -; ^ AB STORE WIRD DIE EINGABE ABGELEGT
+</pre>
+            <figcaption>Listing 10. Eine Anwendung der Prüfsummenberechnung</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 10.prg" data-name="Listing 10"></div>
 
         <p>Der Programmteil, der die Prüfsumme der Eingabe berechnet, ist mit Ausnahmen der Zeilen 230/240 aus Listing 9 übernommen worden. Nach Zeile 450 wird die ermittelte Prüfsumme mit der Tabelle »PRÜFSUMMEN« (Zeile 2060) verglichen.</p>
 
@@ -1077,15 +1886,46 @@
 
         <p>Da 256 verschiedene Zahlen mit einem 8-Bit-Prozessor dargestellt werden können, verwendet man hier das X- (oder Y-) Register als Schleifenzähler. In Listing 12 sehen Sie die einfachste Form einer Schleife, die die Zeropage-Adressen $02 - $FF nach $6F00 kopiert.</p>
 
+        <figure>
+            <pre>,6000  A2 00     LDX #00
+,6002  B5 02     LDA   02,X
+,6004  9D 00 6F  STA 6F00,X
+,6007  E8        INX
+,6008  E0 FE     CPX #FE
+,600A  D0 F6     BNE 6002</pre>
+            <figcaption>Listing 12</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 12.prg" data-name="Listing 12"></div>
+
         <p>Da der Schleifenzähler X in Listing 12 INKREMENTIERT wird, haben wir es mit einer INKREMENTIERSCHLEIFE zu tun. Nach dem Inkrementieren (»6007 INX«) wird durch »6008 CPX # FE« überprüft, ob die Schleife beendet werden kann. Eine eingehendere Beschreibung des Programmablaufs erübrigt sich.</p>
 
         <p>Für Schleifen des Typs a (maximal 256 Durchläufe) ist es aber meist vorteilhaft, eine DEKREMENTIERSCHLEIFE zu verwenden. Wie eine solche Schleife programmiert wird, sehen wir an Listing 13.</p>
+
+        <figure>
+            <pre>,6000  A2 FE     LDX #FE
+,6002  B5 01     LDA   01,X
+,6004  9D FF 6E  STA 6EFF,X
+,6007  CA        DEX
+,6008  D0 F8     BNE 6002</pre>
+            <figcaption>Listing 13</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 13.prg" data-name="Listing 13"></div>
 
         <p>Listing 13 unterscheidet sich in der Wirkung nicht von Listing 12, obwohl man dies nicht unbedingt auf den ersten Blick erkennt. Deshalb soll dieses Listing näher besprochen werden. In Zeile 6000 erhält das X-Register den Inhalt $FE. Durch »6002 LDA 01,X« wird damit das letzte Byte der Zeropage, nämlich $FF, zuerst gelesen und nach $7OFE geschrieben. Dann wird X dekrementiert. Ist X noch nicht 0, so wird die Schleife erneut durchlaufen.</p>
 
         <p>Der niedrigste X-Wert innerhalb der Schleife ist folglich 1; aufgrund von »6002 LDA 01,X« ist $02 die niedrigste Zeropage-Adresse, die kopiert wird. In Listing 12 ist 0 der niedrigste X-Wert. Die niedrigste Adresse aufgrund von »6002 LDA 02,X« ist also auch $02 (stimmt auffällig). Warum $FF die höchste kopierte Zeropage-Adresse ist, können Sie nun selbst den Listings 12 und 13 entnehmen.</p>
 
         <p>Listing 14 ist eine Dekrementierschleife, die die Kopie der Zeropage wieder von $6F00 nach $02 zurückholt.</p>
+
+        <figure>
+            <pre>,6000  A2 FE     LDX #FE
+,6002  BD FF 6E  LDA 6EFF,X
+,6005  95 01     STA   01,X
+,6007  CA        DEX
+,6008  D0 F8     BNE 6002</pre>
+            <figcaption>Listing 14</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 14.prg" data-name="Listing 14"></div>
 
         <p>Der Vorteil von Dekrementierschleifen beim Typ a ist, daß zum Erkennen der Abbruchbedingung (X=0) kein Vergleichsbefehl erforderlich ist, weil nach dem DEX-Befehl automatisch das Z-Flag gesetzt wird, wenn X Null wird.</p>
 
@@ -1096,6 +1936,26 @@
         <p>Dekrementierschleifen vom Typ a, bei denen der Ausgangswert für X &lt; 129 ist.</p>
 
         <p>In Listing 15 sehen Sie eine Schleife, die den Bereich $16 - $4A nach $6F00 kopiert, Listing 16 schreibt die Werte von $6F00 zurück nach $16. Selbstverständlich hätten wir das Problem auch so lösen können wie in Listing 13. Wir wollen aber noch eine andere Konstruktion von Dekrementierschleifen kennenlernen, die in diesem Sonderfall möglich ist. Besprechen wir also Listing 15.</p>
+
+        <figure>
+            <pre>,6000  A2 34     LDX #34
+,6002  B5 16     LDA   16,X
+,6004  9D 00 6F  STA 6F00,X
+,6007  CA        DEX
+,6008  10 F8     BPL 6002</pre>
+            <figcaption>Listing 15</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 15.prg" data-name="Listing 15"></div>
+
+        <figure>
+            <pre>,6000  A2 34     LDX #34
+,6002  BD 00 6F  LDA 6F00,X
+,6005  95 16     STA   16,X
+,6007  CA        DEX
+,6008  10 F8     BPL 6002</pre>
+            <figcaption>Listing 16</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 16.prg" data-name="Listing 16"></div>
 
         <p>Bei 6000 wird ins X-Register die Zahl geladen, die man zu $16 addieren muß, um $4A zu erhalten. Dadurch wird zunächst bei 6002 die Adresse $4A gelesen und nach $6F34 geschrieben. Bei 6007 wird dekrementiert. Neu ist der Verzweigungsbefehl: es wird das N-Flag überprüft. Ist X = $FF, wird das N-Flag gesetzt und »6008 BPL 6002« beendet die Schleife. Der niedrigste Wert von X, der innerhalb der Schleife vorkommt, ist demnach $00.</p>
 
@@ -1112,6 +1972,34 @@
         </aside>
 
         <p>An Listing 17 sehen wir ein Beispiel für den letzten Satz der Regel. Listing 17 kopiert die letzten 256 Speicherplätze des Stapels ($0100 - $01FF) und den Stapelzeiger nach $6F00 - $7000. Listing 18 schreibt den Stapel wieder zurück.</p>
+
+        <figure>
+            <pre>,6000  A2 FF     LDX #FF
+,6002  BD 00 01  LDA 0100,X
+,6005  9D 00 6F  STA 6F00,X
+,6008  CA        DEX
+,6009  D0 F7     BNE 6002
+,600B  AD 00 01  LDA 0100
+,600E  8D 00 6F  STA 6F00
+,6011  BA        TSX
+,6012  8E 00 70  STX 7000</pre>
+            <figcaption>Listing 17</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 17.prg" data-name="Listing 17"></div>
+
+        <figure>
+            <pre>,6000  A2 FF     LDX #FF
+,6002  BD 00 6F  LDA 6F00,X
+,6005  9D 00 01  STA 0100,X
+,6008  CA        DEX
+,6009  D0 F7     BNE 6002
+,600B  AD 00 6F  LDA 6F00
+,600E  8D 00 01  STA 0100
+,6011  AE 00 70  LDX 7000
+,6014  9A        TXS</pre>
+            <figcaption>Listing 18</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 18.prg" data-name="Listing 18"></div>
 
         <p>Die Dekrementierschleife (6000 - 600A) kopiert nun den Bereich $0101 - $O1FF, $0100 wird nicht übertragen. Dies geschieht in 600B - 600F. Eine andere Möglichkeit wäre ein zeitraubender CPX #FF-Befehl nach »6008 DEX«.</p>
 
@@ -1210,11 +2098,54 @@
 
         <p>Unsere erste Typ-b-Schleife (Listing 19) soll den Bereich von $3FD2 bis $475F invertieren (= EOR # FF-verknüpfen, aus jeder 1 wird eine 0 und umgekehrt). Da hierfür ein 8-Bit-Indexregister nicht ausreicht, benötigen wir einen 16-Bit-Zähler, nämlich$14/$15. Dieser soll immer die Adresse beinhalten, die invertiert wird. In diesen Zähler schreibt die Initialisierung der Schleife den Startwert $3FD2 (siehe $6000 -$6007).</p>
 
+        <figure>
+            <pre>,6000  A9 D2     LDA #D2
+,6002  85 14     STA   14
+,6004  A9 3F     LDA #3F
+,6006  85 15     STA   15
+,6008  A0 00     LDY #00
+,600A  B1 14     LDA (14),Y
+,600C  49 FF     EOR #FF
+,600E  91 14     STA (14),Y
+,6010  E6 14     INC   14
+,6012  D0 02     BNE 6016
+,6014  E6 15     INC   15
+,6016  A5 14     LDA   14
+,6018  C9 60     CMP #60
+,601A  A5 15     LDA   15
+,601C  E9 47     SBC #47
+,601E  90 EA     BCC 600A</pre>
+            <figcaption>Listing 19</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 19.prg" data-name="Listing 19"></div>
+
         <p>Da es beim 6510 keine indirekte Adressierung für LDA/STA gibt, sbndern nur die indirekt-indizierte oder indiziert-indirekte, müssen wir auf eine dieser Adressierungen ausweichen und den Index auf 0 setzen (»6008 LDY #00«).</p>
 
         <p>Bei $600A beginnt die Schleife: der Wert wird eingelesen, mit $FF EOR-verknüpft und zurückgeschrieben. Nun wird der 16-Bit-Zähler $14/$15 erhöht (6010 - 6015). Dann wird überprüft, ob die nächste Adresse schon mit der ersten Adresse nach der Endadresse ($475F), also $4760, übereinstimmt (siehe $6016 - $601D). Dieser 16-Bit-Vergleich wurde bereits im SMON vorgestellt. Bei $601E wird schließlich die Schleife beendet, falls die Abbruchbedingung (C=1) erfüllt ist.</p>
 
         <p>Listing 20 ist eine Dekrementierschleife, die sich in der Wirkung nicht von Listing 19 unterscheidet. Da das Dekrementieren einer 16-Bit-Adresse beim 6510 langsamer und speicherplatzaufwendiger ist als das Inkrementieren, ist Listing 20 weniger effektiv als Listing 19.</p>
+
+        <figure>
+            <pre>,6000  A9 5F     LDA #5F
+,6002  85 14     STA   14
+,6004  A9 47     LDA #47
+,6006  85 15     STA   15
+,6008  A0 00     LDY #00
+,600A  B1 14     LDA (14),Y
+,600C  49 FF     EOR #FF
+,600E  91 14     STA (14),Y
+,6010  A5 14     LDA   14
+,6012  D0 02     BNE 6016
+,6014  C6 15     DEC   15
+,6016  C6 14     DEC   14
+,6018  A5 14     LDA   14
+,601A  C9 D2     CMP #D2
+,601C  A5 15     LDA   15
+,601E  E9 3F     SBC #3F
+,6020  B0 E8     BCS 600A</pre>
+            <figcaption>Listing 20</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 20.prg" data-name="Listing 20"></div>
 
         <p>Grundsätzlich können Sie an den Listings 19 und 20 sehen, wie man eine Typ-b-Schleife programmiert. Diese arbeitet jedoch nicht besonders schnell. Der Grund ist, daß der Bereich von $3FD2 - $475F nicht restlos in ganze Seiten (256-Byte-Blöcke)aufgeteilt werden kann. Daher sollte man sich immer überlegen, ob die Schleifendurchlaufzahl nicht auf ganze 256-Byte-Blöcke »aufgerundet« werden kann. In unserem Fall würde dies heißen, daß mit einer schnelleren Schleife der exakt 8 x 256 Byte lange Bereich $3FD2 - $47D1 invertiert wird, anstelle des »ungeraden« Bereichs $3FD2 - $475F. An einfacheren Zahlen wollen wir nun eine solche Schleife für ganze Seiten programmieren. Der 32 x 256 Byte umfassende Bereich von $2000 bis $3FFF (einschließlich) soll invertiert werden. Mit einer solcher Routine könnte das gerade sichtbare Bild bei Hi-Eddi invertiert werden.</p>
 
@@ -1222,7 +2153,45 @@
 
         <p>(Y+Inhalt von $14)+256*(Inhalt von $15)</p>
 
+        <figure>
+            <pre>,6000  A9 00     LDA #00
+,6002  85 14     STA   14
+,6004  A9 20     LDA #20
+,6006  85 15     STA   15
+,6008  A0 00     LDY #00
+,600A  B1 14     LDA (14),Y
+,600C  49 FF     EOR #FF
+,600E  91 14     STA (14),Y
+,6010  C8        INY
+,6011  D0 F7     BNE 600A
+,6013  E6 15     INC   15
+,6015  A5 15     LDA   15
+,6017  C9 40     CMP #40
+,6019  D0 EF     BNE 600A</pre>
+            <figcaption>Listing 21</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 21.prg" data-name="Listing 21"></div>
+
         <p>Da wir auf die Adresse über das Prozessor-Register Y Einfluß nehmen können und die Adresse $14 nicht verändert werden muß, ist die Verarbeitungsgeschwindigkeit gegenüber der »Normalform« (Listing 20) gestiegen. Das High-Byte müssen wir aber weiterhin in $15 belassen. Neu führen wir den High-Zähler X ein. Im X-Register merken wir uns, wieviele Seiten invertiert werden. Diesen Wert verwenden wir als Dekrementierzähler. In unserem Fall werden $20 Seiten invertiert. Weil $20 zufälligerweise auch das High-Byte der Anfangsadresse ($2000) ist, wird dieser Wert in Listing 22 nur einmal (6005) in den Akku geladen und dann bei 6009 ins X-Register übertragen.</p>
+
+        <figure>
+            <pre>,6000  A9 00     LDA #00
+,6002  85 14     STA   14
+,6004  A8        TAY
+,6005  A9 20     LDA #20
+,6007  85 15     STA   15
+,6009  AA        TAX
+,600A  B1 14     LDA (14),Y
+,600C  49 FF     EOR #FF
+,600E  91 14     STA (14),Y
+,6010  C8        INY
+,6011  D0 F7     BNE 600A
+,6013  E6 15     INC   15
+,6015  CA        DEX
+,6016  D0 F2     BNE 600A</pre>
+            <figcaption>Listing 22</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 22.prg" data-name="Listing 22"></div>
 
         <p>Beachten Sie bitte, daß in Listing 22 die Befehle »6004 TAY« und »6009 TAX« nur bei den Werten dieses Beispiels verwendet werden können. In der Regel sind eigene »LDX # «- oder »LDY #«-Befehle erforderlich. Wenn wir zum Beispiel den Bereich $3FD2 - $47D1 invertieren wollen, muß die Initialisierung so aussehen:</p>
 
@@ -1277,6 +2246,142 @@
 
         <p>Wir haben nun viele verschiedene Schleifenkonstruktionen in Theorie und Praxis behandelt. Was uns noch fehlt, sind Formeln, nach denen Sie die einzelnen Parameter (zum Beispiel den Startwert für X in einer Dekrementier-Schleife vom Typ a) errechnen können. Als Zusammenfassung finden Sie in Form von Listing 23 ein Hypra-Ass-Assemblerlisting zu mehreren Schleifenkonstruktionen. An den Quelltext-Ausdrücken können Sie sehen, wie einzelne Parameter errechnet werden können.</p>
 
+        <figure>
+            <pre>
+70  -.BA $C000
+80  -.LI 1,3,0
+90  -;
+100  -; *******************************
+110  -; *    QUELLTEXTE (HYPRA-ASS)   *
+120  -; *    ======================   *
+130  -; *                             *
+140  -; * FUER VERSCHIEDENE SCHLEIFEN *
+150  -; *                             *
+160  -; * 28.08.85 BY FLORIAN MUELLER *
+170  -; *                             *
+180  -; *******************************
+190  -;
+200  -;
+210  -; QUELLTEXT ZU LISTING 1
+220  -; ======================
+230  -;
+240  -.EQ ANFANGSADRESSE = $02
+250  -.EQ ENDADRESSE = $FF
+260  -.EQ ZIELBEREICH = $6F00
+270  -;
+280  -          LDX #0
+290  -SCHLEIFE1 LDA ANFANGSADRESSE,X
+300  -          STA ZIELBEREICH,X
+310  -          INX
+320  -          CPX #(ENDADRESSE+1-ANFANGSADRESSE)
+330  -          BNE SCHLEIFE1
+340  -;
+350  -;
+360  -; QUELLTEXT ZU LISTING 2
+370  -; ======================
+380  -;
+390  -.EQ ANFANGSADRESSE = $02
+400  -.EQ ENDADRESSE = $FF
+410  -.EQ ZIELBEREICH = $6F00
+420  -;
+430  -          LDX #(ENDADRESSE+1-ANFANGSADRESSE)
+440  -SCHLEIFE2 LDA ANFANGSADRESSE-1,X
+450  -          STA ZIELBEREICH-1,X
+460  -          DEX            ; DEKREMENTIERBEFEHL
+470  -          BNE SCHLEIFE2
+480  -;
+490  -;
+500  -; QUELLTEXT ZU LISTING 4
+510  -; ======================
+520  -;
+530  -.EQ ANFANGSADRESSE = $16
+540  -.EQ ENDADRESSE = $4A
+550  -.EQ ZIELBEREICH = $6F00
+560  -;
+570  -          LDX #(ENDADRESSE-ANFANGSADRESSE)
+580  -SCHLEIFE3 LDA ANFANGSADRESSE,X
+590  -          STA ZIELBEREICH,X
+600  -          DEX
+610  -          BPL SCHLEIFE3  ; PRUEFT N-FLAG
+620  -;
+630  -;
+640  -; QUELLTEXT ZU LISTING 8
+650  -; ======================
+660  -;
+670  -.EQ ANFANGSADRESSE = $3FD2
+680  -.EQ ENDADRESSE = $475F
+690  -.EQ ZAEHLER = $14
+700  -;
+710  -          LDA #&lt;(ANFANGSADRESSE)
+720  -          STA ZAEHLER
+730  -          LDA #&gt;(ANFANGSADRESSE)
+740  -          STA ZAEHLER+1
+750  -          LDY #0
+760  -SCHLEIFE4 LDA (ZAEHLER),Y
+770  -          EOR #$FF
+780  -          STA (ZAEHLER),Y
+790  -          INC ZAEHLER
+800  -          BNE WEITER
+810  -          INC ZAEHLER+1
+820  -WEITER    LDA ZAEHLER
+830  -          CMP #&lt;(ENDADRESSE+1)
+840  -          LDA ZAEHLER+1
+850  -          SBC #&gt;(ENDADRESSE+1)
+860  -          BCC SCHLEIFE4
+870  -;
+880  -;
+890  -; QUELLTEXT ZU LISTING 10
+900  -; =======================
+910  -;
+920  -.EQ ANFANGSADRESSE = $2000
+930  -.EQ ENDADRESSE  = $3FFF
+940  -.EQ ZAEHLER = $14
+950  -;
+960  -          LDA #&lt;(ANFANGSADRESSE)
+970  -          STA ZAEHLER
+980  -          LDA #&gt;(ANFANGSADRESSE)
+990  -          STA ZAEHLER+1
+1000  -          LDY #0
+1010  -SCHLEIFE5 LDA (ZAEHLER),Y
+1020  -          EOR #$FF
+1030  -          STA (ZAEHLER),Y
+1040  -          INY
+1050  -          BNE SCHLEIFE5
+1060  -          INC ZAEHLER+1
+1070  -          LDA ZAEHLER+1
+1080  -          CMP #&gt;(ENDADRESSE+1)
+1090  -          BNE SCHLEIFE5
+1100  -;
+1110  -;
+1120  -; QUELLTEXT ZU EINER SCHLEIFE,
+1130  -; DIE DEN BEREICH $3FD2-$47D1
+1140  -; KOMPLEMENTIERT
+1150  -;
+1160  -.EQ ANFANGSADRESSE = $3FD2
+1170  -.EQ ENDADRESSE = $47D1
+1180  -.EQ ZAEHLER = $14
+1190  -;
+1200  -          LDA #&lt;(ANFANGSADRESSE)
+1210  -          STA ZAEHLER
+1220  -          LDA #&gt;(ANFANGSADRESSE)
+1230  -          STA ZAEHLER+1
+1240  -          LDX #&gt;(ENDADRESSE+1-ANFANGSADRESSE)
+1250  -          LDY #0
+1260  -SCHLEIFE6 LDA (ZAEHLER),Y
+1270  -          EOR #$FF
+1280  -          STA (ZAEHLER),Y
+1290  -          INY
+1300  -          BNE SCHLEIFE6
+1310  -          INC ZAEHLER+1
+1320  -          DEX
+1330  -          BNE SCHLEIFE6
+1340  -;
+1350  -; ENDE VON LISTING 12
+</pre>
+            <figcaption>Listing 23</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 23.prg" data-name="Listing 23"></div>
+
         <p>Merke: Sofern es der Programmablauf zuläßt, sollten Sie Inkrementierschleifen verwenden.</p>
 
         <p>Bei Verschiebeschleifen ist aber oft eine Dekrementierschleife erforderlich.</p>
@@ -1297,17 +2402,116 @@
 
         <p>Wir werden uns an dieser Stelle ausschließlich mit der Selbstmodifikation von Maschinenprogrammen befassen. Als erstes Beispiel nehmen wir Listing 24.</p>
 
+        <figure>
+            <pre>,6000  A0 00     LDY #00
+,6002  B9 00 20  LDA 2000,Y
+,6005  49 FF     EOR #FF
+,6007  99 00 20  STA 2000,Y
+,600A  C8        INY
+,600B  D0 F5     BNE 6002
+,600D  EE 04 60  INC 6004
+,6010  EE 09 60  INC 6009
+,6013  AD 09 60  LDA 6009
+,6016  C9 40     CMP #40
+,6018  D0 E8     BNE 6002</pre>
+            <figcaption>Listing 24</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 24.prg" data-name="Listing 24"></div>
+
         <p>Es handelt sich um eine selbstmodifizierende Schleife, die den Bereich $2000 - $3FFF komplementiert.</p>
 
         <p>TRACEn Sie doch einmal Listing 24 mit dem SMON und vergleichen Sie die disassemblierten Befehle mit den ursprünglichen Werten, die Sie in Listing 24 finden. Sie werden erkennen, daß die Befehle »6002 LDA 2000,Y« und »6007 STA 2000,Y« aufgrund der INC-Befehle immer auf andere Adressen zugreifen. Besagte INC-Befehle erhöhen jeweils das High-Byte des Operanden. Ist dieses schon $40, so wird die Schleife beendet. In Listing 25 sehen Sie, wie unsere Schleife aus Listing 24 aussieht, wenn sie fertig durchlaufen wurde. Ein weiterer Start bewirkt, daß das Programm sich früher oder später selbst invertiert und darum abstürzt.</p>
 
+        <figure>
+            <pre>,6000  A0 00     LDY #00
+,6002  B9 00 40  LDA 4000,Y
+,6005  49 FF     EOR #FF
+,6007  99 00 40  STA 4000,Y
+,600A  C8        INY
+,600B  D0 F5     BNE 6002
+,600D  EE 04 60  INC 6004
+,6010  EE 09 60  INC 6009
+,6013  AD 09 60  LDA 6009
+,6016  C9 40     CMP #40
+,6018  D0 E8     BNE 6002</pre>
+            <figcaption>Listing 25</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 25.prg" data-name="Listing 25"></div>
+
         <p>Was nämlich unserem Listing 24 fehlt, damit es mehr als einmal arbeitet, ist eine Initialisierung, diejedesmal den Ausgangswert ($2000) in die LDA/STA-Befehle einsetzt. In Listing 26 sehen Sie eine solche Initialisierung (6000 -600F). Die Adresse $FFFF (bei 6012 und 6017) ist ein Dummy-Wert, das heißt er dient nur zum vorläufigen Ausfüllen von Adressen und hat keine programmtechnische Bedeutung. Der Dummy-Wert wird ohnehin von der Initialisierung überschrieben; wir hätten also statt $FFFF auch $040C oder andere verwenden können. Wichtig ist nur, daß »LDA DummyY« 3 Byte belegt.</p>
+
+        <figure>
+            <pre>,6000  A9 00     LDA #00
+,6002  8D 13 60  STA 6013
+,6005  8D 18 60  STA 6018
+,6008  A9 20     LDA #20
+,600A  8D 14 60  STA 6014
+,600D  8D 19 60  STA 6019
+,6010  A0 00     LDY #00
+,6012  B9 FF FF  LDA FFFF,Y
+,6015  49 FF     EOR #FF
+,6017  99 FF FF  STA FFFF,Y
+,601A  C8        INY
+,601B  D0 F5     BNE 6012
+,601D  EE 14 60  INC 6014
+,6020  EE 19 60  INC 6019
+,6023  AD 19 60  LDA 6019
+,6026  C9 40     CMP #40
+,6028  D0 E8     BNE 6012</pre>
+            <figcaption>Listing 26</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 26.prg" data-name="Listing 26"></div>
 
         <p>Ein besonderer Vorteil der Selbstmodifikation ist es, daß selbstmodifizierende Schleifen keine Zähler in der Zeropage benötigen, weil der Zähler praktisch im Programm selbst liegt. In puncto Geschwindigkeit sind selbstmodifizierende Schleifen den herkömmlichen aber oft unterlegen.</p>
 
         <p>Ein weiterer Vorteil von ihnen ist aber, daß man außer mit weniger Zeropage-Speicherplätzen auch mit weniger Registern auskommen kann (sofern man hier Einsparungen vornehmen will). Listing 27 beispielsweise invertiert den Bereich $3FD2 - $475F. X- und Y-Register sowie die Zeropage bleiben unverändert, lediglich der Akkumulator fungiert als Arbeitsregister.</p>
 
+        <figure>
+            <pre>,6000  A9 D2     LDA #D2
+,6002  8D 11 60  STA 6011
+,6005  8D 16 60  STA 6016
+,6008  A9 3F     LDA #3F
+,600A  8D 12 60  STA 6012
+,600D  8D 17 60  STA 6017
+,6010  AD 00 00  LDA 0000
+,6013  49 FF     EOR #FF
+,6015  8D 00 00  STA 0000
+,6018  EE 11 60  INC 6011
+,601B  EE 16 60  INC 6016
+,601E  D0 06     BNE 6026
+,6020  EE 12 60  INC 6012
+,6023  EE 17 60  INC 6017
+,6026  AD 11 60  LDA 6011
+,6029  C9 60     CMP #60
+,602B  AD 12 60  LDA 6012
+,602E  E9 47     SBC #47
+,6030  90 DE     BCC 6010</pre>
+            <figcaption>Listing 27</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 27.prg" data-name="Listing 27"></div>
+
         <p>Listing 28 kopiert den Basic-Interpreter ($A000 - $BFFF) ins RAM an gleicher Adresse, wobei nur das X-Register verwendet wird (!).</p>
+
+        <figure>
+            <pre>,6000  A2 00     LDX #00
+,6002  8E 11 60  STX 6011
+,6005  8E 14 60  STX 6014
+,6008  A2 A0     LDX #A0
+,600A  8E 12 60  STX 6012
+,600D  8E 15 60  STX 6015
+,6010  AE 00 00  LDX 0000
+,6013  8E 00 00  STX 0000
+,6016  EE 11 60  INC 6011
+,6019  EE 14 60  INC 6014
+,601C  D0 F2     BNE 6010
+,601E  EE 12 60  INC 6012
+,6021  EE 15 60  INC 6015
+,6024  AE 12 60  LDX 6012
+,6027  E0 C0     CPX #C0
+,6029  D0 E5     BNE 6010</pre>
+            <figcaption>Listing 28</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 28.prg" data-name="Listing 28"></div>
 
         <p>Nun wollen wir sehen, wie man bei der Entwicklung selbstmodifizierender Programme unter Zuhilfenahme eines guten Assemblers (Hypra-Ass) vorgehen muß.</p>
 
@@ -1334,6 +2538,42 @@
         <p>Bei 2-Byte-Befehlen wird der Parameter wie der Low-Operand eines 3-Byte-Befehls errechnet.</p>
 
         <p>Als Beispiel finden Sie in Form von Listing 29 einen Quelltext (Assembler: Hypra-Ass) für Listing 28. Während in Listing 28 der Ausgangswert bei 6010 »LDX 0000« und bei 6013 »STX 0000« ist, wurde im Quelltext $FFFF verwendet (270, 280), um den Assembler zu zwingen, den Dummy-Wert als 16-Bit-Adresse abzulegen (und nicht als Zeropage-Adresse, wodurch der Befehl nur 2 statt 3 Byte belegen würde).</p>
+
+        <figure>
+            <pre>
+80  -.BA $6000
+90  -.LI 1,3,0
+100  -;
+110  -; HYPRA-ASS-QUELLTEXT ZU EINER
+120  -; SELBSTMODIFIZIERENDEN SCHLEIFE
+130  -; (ARBEITET WIE LISTING 5)
+140  -;
+150  -; 1985 BY FLORIAN MUELLER
+160  -;
+170  -;
+180  -.GL START = $A000
+190  -.GL ENDE  = $BFFF
+200  -;
+210  -          LDX #&lt;(START)
+220  -          STX MOD1+1
+230  -          STX MOD2+1
+240  -          LDX #&gt;(START)
+250  -          STX MOD1+2
+260  -          STX MOD2+2
+270  -MOD1      LDX $FFFF
+280  -MOD2      STX $FFFF
+290  -          INC MOD1+1
+300  -          INC MOD2+1
+310  -          BNE MOD1
+320  -          INC MOD1+2
+330  -          INC MOD2+2
+340  -          LDX MOD1+2
+350  -          CPX #&gt;(ENDE+1)
+360  -          BNE MOD1
+</pre>
+            <figcaption>Listing 29</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 29.prg" data-name="Listing 29"></div>
 
         <p>Die Stellen, die modifiziert werden, wurden mit »MOD1« und »MOD2« definiert. MOD1 ist zugleich der Schleifenbeginn.</p>
 
@@ -1687,6 +2927,12 @@
 
         <p>Als Listing 31 finden Sie ein MSE-Listing, falls Sie »Loader-Maker 64« bequem abtippen wollen und an der Anwendung des Programms interessiert sind. Deshalb zunächst eine Kurzbeschreibung für Anwender.</p>
 
+        <figure>
+            <pre data-filename="listing 31.prg" data-name="XXXXXXXXXXXX" data-mse=mse1></pre>
+            <figcaption>Listing 31</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 31.prg" data-name="Listing 31"></div>
+
         <p>»Loader-Maker« ermöglicht es Ihnen, zu einem Programm ein (Maschinensprache-) Ladeprogramm zu generieren, welches normal geladen und mit »RUN« gestartet wird, worauf es das nachzuladende Programm nachlädt und startet.</p>
 
         <p>Nach dem Laden von »Loader-Maker« wird dieses Programm durch SYS 2154,START gestartet. START ist eine Variable und wird durch die Startadresse des nachzuladenden Programms ausgedrückt. Soll ein Basic-Programm nachgeladen werden, hat diese Adresse keine Bedeutung (einfach SYS2154,0 eingeben). Bei einem Maschinenprogramm handelt es sich hier um die Adresse, mit der das Programm über »SYS« gestartet wird (49152 beim SMON $C000).</p>
@@ -1698,6 +2944,319 @@
         <p>Wenn das nachzuladende Programm von der Adresse geladen werden soll, von der auch das Ladeprogramm selbst eingelesen wurde, ist als Gerätenummer nur 0 einzugeben.</p>
 
         <p>Befassen wir uns nun mit dem Programm, dessen Quelltext Sie als Listing 30 finden.</p>
+
+        <figure>
+            <pre>
+100  -.BA $0801
+110  -.OB "LOADER-MAKER 64,P,W"
+120  -;
+130  -;
+140  -; *****************************
+150  -; *                           *
+160  -; *  L O A D E R - M A K E R  *
+170  -; *                           *
+180  -; *****************************
+190  -; *                           *
+200  -; *   EIN PROGRAMMGENERATOR   *
+210  -; *                           *
+220  -; *    VON FLORIAN MUELLER    *
+230  -; *                           *
+240  -; *****************************
+250  -;
+260  -;
+270  -;
+280  -.GL BASIN  = $FFCF
+290  -.GL SETPAR = $FFBA
+300  -.GL SETNAM = $FFBD
+310  -.GL LOAD   = $FFD5
+320  -.GL READY  = $A474
+330  -.GL NUMOUT = $BDCD
+340  -.GL TASTPF = 631 ; TASTATURPUFFER
+350  -.GL ANZAHL = 198 ; ENTHAELT ANZAHL
+360  -;                  DER ZEICHEN IM
+370  -;                  TASTATURPUFFER
+380  -.GL KASSPF = 828 ; KASSETTENPUFFER
+390  -;
+400  -;
+410  -.MA PRINT (TEXT)
+420  -          LDA #&lt;(TEXT)   ; MAKRO
+430  -          LDY #&gt;(TEXT)   ; FUER
+440  -          JSR $AB1E      ; TEXTAUSGABE
+450  -.RT
+460  -;
+470  -;
+480  -;
+490  -;
+500  -.WO LINK+1 ; LINKPOINTER
+510  -.WO 1985   ; ZEILENNUMMER
+520  -.BY $9E    ; TOKEN FUER "SYS"
+530  -          .TX "2061"
+540  -LINK      .BY 0,0,0      ; ENDMARKIERUNG
+550  -;                          DER BASIC-ZEILE
+560  -;
+570  -SYSTEM    LDX #0         ; FLAG FUER SYSTEM-
+580  -          STX $9D        ; MELDUNGEN SETZEN
+590  -;
+600  -          LDX #$49       ; DEKR.-ZAEHLER
+610  -SCHLEIFE1 LDA ABLAGE,X   ; LADEROUTINE
+620  -          STA KASSPF,X   ; VON ABLAGE IN
+630  -          DEX            ; DEN BEREICH
+640  -          BPL SCHLEIFE1  ; KOPIEREN, IN
+650  -;                          DEM SIE LAEUFT
+660  -          JMP KASSPF     ; &amp; STARTEN
+670  -;
+680  -;
+690  -; ES FOLGT DIE LADEROUTINE, DIE HIER
+700  -; AN FALSCHER STELLE ABGELEGT IST UND
+710  -; VON DER "SCHLEIFE1" (600-640) IN
+720  -; DEN ORIGINALBEREICH GESCHRIEBEN WIRD.
+730  -;
+740  -ABLAGE    LDA #1         ; FILENUMMER #1
+750  -          TAY            ; SEKUNDAERADRESSE #1
+760  -GERAETENR LDX #0         ; GERAETEADRESSE #?
+770  -          JSR SETPAR     ; PARAMETER SETZEN
+780  -;
+790  -LAENGE    LDA #0         ; LAENGE DES FILENAMEN
+800  -          LDX #&lt;($35C)   ; ADRESSE DES
+810  -          LDY #&gt;($35C)   ; FILENAMEN: $035C
+820  -          JSR SETNAM     ; NAMEN SETZEN
+830  -;
+840  -          LDA #0         ; FLAG FUER "LADEN"
+850  -          JSR LOAD
+860  -;
+870  -FEHLER    BCS LOADERROR  ; LADEFEHLER?
+880  -START     JMP 0          ; ZUR STARTADRESSE
+890  -LOADERROR LDX #$1D       ; "LOAD ERROR"
+900  -          JMP ($300)     ; AUSGEBEN
+910  -;
+920  -NAME      .BY 0,0,0,0    ; 16 BYTES
+930  -          .BY 0,0,0,0    ; FUER FILENAMEN
+940  -          .BY 0,0,0,0    ; RESERVIEREN
+950  -          .BY 0,0,0,0
+960  -;
+970  -BASIC     STX $2D        ; POINTER FUER
+980  -          STY $2E        ; PROGRAMMENDE SETZEN
+990  -          JSR $E544      ; = PRINT CHR$(147)
+1000  -          LDX #3         ; 3 BYTES IN
+1010  -          STX ANZAHL     ; TASTATURPUFFER
+1020  -;
+1030  -SCHLEIFE2 LDA $0383,X    ; AUS DER TABELLE
+1040  -          STA TASTPF,X   ; IN ZEILE 1100
+1050  -          DEX            ; KOPIEREN
+1060  -          BPL SCHLEIFE2
+1070  -;
+1080  -          JMP READY      ; WARMSTART
+1090  -;
+1100  -.BY "R",$D5,13 ; "R",SHIFT U,RETURN
+1110  -;
+1120  -; HIER ENDET DER PROGRAMMTEIL,
+1130  -; DER MODIFIZIERT WIRD.
+1140  -; ES FOLGT DIE MODIFIKATIONSROUTINE:
+1150  -;
+1160  -MDFIKATOR JSR $E544      ; = PRINT CHR$(147)
+1170  -...PRINT (TEXT1)
+1180  -; STARTADRESSE HOLEN
+1190  -;
+1200  -          JSR $AEFD      ; PRUEFT AUF KOMMA
+1210  -          JSR $AD8A      ; HOLT PARAMETER
+1220  -          JSR $B7F7      ; NACH $14/$15
+1230  -;
+1240  -          LDX $14        ; STARTADRESSE
+1250  -          LDA $15        ; HOLEN,
+1260  -          STX START+1    ; IM PROGRAMM
+1270  -          STA START+2    ; ABLEGEN UND
+1280  -          JSR NUMOUT     ; UND AUSGEBEN
+1290  -;
+1300  -;
+1310  -; NUN WIRD NOCH DER ZU MODIFIZIERENDE
+1320  -; PROGRAMMTEIL IN DEN AUSGANGSZUSTAND
+1330  -; GEBRACHT:
+1340  -;
+1350  -          LDX #15        ; NAMEN MIT NULL-BYTES
+1360  -          LDA #0         ; BELEGEN
+1370  -SCHLEIFE3 STA NAME,X     ; DURCH EINE
+1380  -          DEX            ; DEKREMENTIER-
+1390  -          BPL SCHLEIFE3  ; SCHLEIFE
+1400  -;
+1410  -          STA SYSTEM+1   ; KEINE SYSTEMMELDUNGEN
+1420  -;
+1430  -          LDA #3         ; SPRUNGWEITE = 3
+1440  -          STA FEHLER+1
+1450  -;
+1460  -          LDA #$A2       ; OPCODE FUER "LDX #"
+1470  -          STA GERAETENR
+1480  -;
+1490  -;
+1500  -; AN DIESER STELLE IST DAS "GERUEST"
+1510  -; (DER ZU MODIFIZIERENDE TEIL)
+1520  -; IM AUSGANGSZUSTAND
+1530  -;
+1540  -;
+1550  -; EINGABE DES FILENAMEN
+1560  -; =====================
+1570  -;
+1580  -...PRINT (TEXT2)
+1590  -          LDX #0         ; ZAEHLER AUF 0
+1600  -SCHLEIFE4 JSR BASIN
+1610  -          CMP #13        ; ENDE DER EINGABE?
+1620  -          BEQ WEITER1    ; JA=&gt;WEITER
+1630  -          STA NAME,X     ; BYTE ABLEGEN
+1640  -          INX
+1650  -          CPX #16        ; 16 ZEICHEN MAX.
+1660  -          BNE SCHLEIFE4  ; NAECHSTES ZEICHEN
+1670  -;
+1680  -; WENN DIESE STELLE DURCHLAUFEN WIRD,
+1690  -; HAT DAS X-REGISTER DEN WERT 16.
+1700  -;
+1710  -; BEI "WEITER1" HINGEGEN KANN ES AUFGRUND
+1720  -; DES BRANCH-BEFEHLS "BEQ WEITER1"
+1730  -; UNTERSCHIEDLICHE WERTE HABEN.
+1740  -;
+1750  -WEITER1   STX LAENGE+1
+1760  -;
+1770  -;
+1780  -; EINGABE DER GERAETEADRESSE
+1790  -; ==========================
+1800  -;
+1810  -...PRINT (TEXT3)
+1820  -          JSR BASIN      ; HOLT ZEICHEN
+1830  -          SEC            ; VOR SUBTRAKTION
+1840  -          SBC #"0"       ; IM AKKU STEHT JETZT
+1850  -;                          DIE ZAHL
+1860  -;
+1870  -          STA GERAETENR+1; ABLEGEN
+1880  -          BNE WEITER2    ; GERAET&lt;&gt;0 : WEITER
+1890  -; DA ALS GERAETENUMMER 0 EINGEGEBEN
+1900  -; WURDE, MUSS DER GESAMTE BEFEHL
+1910  -; "LDX #GERAET" IN "LDX $BA"
+1920  -; UMGEWAENDELT WERDEN, DAMIT DAS
+1930  -; NACHLADEN VON DEM GERAET ERFOLGT,
+1940  -; VON DEM DER LADER EINGELESEN WIRD.
+1950  -;
+1960  -          LDA #$A6       ; OPCODE FUER "LDX ZP"
+1970  -          STA GERAETENR
+1980  -          LDA #$BA       ; "LDX $BA"
+1990  -          STA GERAETENR+1; GENERIEREN
+2000  -;
+2010  -;
+2020  -; MASCHINENPROGRAMM (J/N)?
+2030  -; ========================
+2040  -;
+2050  -WEITER2   ... PRINT(TEXT4)
+2060  -          JSR JANEIN     ; (JA/NEIN)?
+2070  -          BEQ WEITER3    ; JA=&gt;WEITER
+2080  -          LDA #$6C       ; SPRUNG AUF $036C
+2090  -          LDY #$03       ; VERBIEGEN
+2100  -          STA START+1    ; BEI $36C STEHT
+2110  -          STY START+2    ; EINE ROUTINE,
+2120  -;                          DIE DEN "RUN"-
+2130  -;                          BEFEHL SIMULIERT
+2140  -;
+2150  -;
+2160  -; SYSTEMMELDUNGEN (J/N)?
+2170  -; ======================
+2180  -;
+2190  -WEITER3   ... PRINT(TEXT5)
+2200  -          JSR JANEIN     ; (JA/NEIN)?
+2210  -          BNE WEITER4    ; NEIN=&gt;WEITER
+2220  -          LDA #$80       ; FLAG FUER
+2230  -          STA SYSTEM+1   ; SYSTEMMELDUNGEN
+2240  -;
+2250  -;
+2260  -; LOAD ERROR  AUSGEBEN (J/N)
+2270  -; ==========================
+2280  -;
+2290  -;
+2300  -WEITER4   ... PRINT(TEXT6)
+2310  -          JSR JANEIN     ; (JA/NEIN)?
+2320  -          BEQ WEITER5    ; NEIN=&gt;WEITER
+2330  -          LDA #0         ; FEHLERMELDUNGEN
+2340  -          STA FEHLER+1   ; UNTERDRUECKEN
+2350  -;
+2360  -;
+2370  -; PROGRAMMENDE
+2380  -; ============
+2390  -;
+2400  -;
+2410  -WEITER5   ... PRINT(TEXT7)
+2420  -;
+2430  -; VEKTOR FUER BASIC-ENDE SETZEN
+2440  -; =============================
+2450  -;
+2460  -;
+2470  -          LDA #&lt;(MDFIKATOR)
+2480  -          STA $2D        ; LOW-BYTE
+2490  -          LDA #&gt;(MDFIKATOR)
+2500  -          STA $2E        ; HIGH-BYTE
+2510  -          JMP READY      ; SPRUNG INS BASIC
+2520  -;
+2530  -;
+10000  -;
+10010  -; ASCII-TABELLEN
+10020  -; ==============
+10030  -;
+10040  -;
+10050  -TEXT1     .TX "LOADER-MAKER 64"
+10060  -          .BY 13,13
+10070  -          .TX "STARTADRESSE : "
+10080  -          .BY 0
+10090  -;
+10100  -TEXT2     .BY 13,13
+10110  -          .TX "FILENAME : "
+10120  -          .BY 0
+10130  -;
+10140  -TEXT3     .BY 13,13
+10150  -          .TX "GERAETENR. (1-9;0=UEBERNEHMEN) : "
+10160  -          .BY 0
+10170  -;
+10180  -TEXT4     .BY 13,13
+10190  -          .TX "MASCHINENPROGRAMM"
+10200  -          .BY 0
+10210  -;
+10220  -TEXT5     .BY 13,13
+10230  -          .TX "SYSTEMMELDUNGEN"
+10240  -          .BY 0
+10250  -;
+10260  -TEXT6     .BY 13,13
+10270  -          .TX "LOAD ERROR  AUSGEBEN"
+10280  -          .BY 0
+10290  -;
+10300  -TEXT7     .BY 13,13,18
+10310  -          .TX "*** LOADER GENERIERT ***"
+10320  -          .BY 13,13
+10330  -          .TX "MIT 'SAVE' SPEICHERN,"
+10340  -          .TX " MIT 'RUN' STARTEN"
+10350  -          .BY 0
+10360  -;
+10370  -TEXT8     .BY 13,13,18
+10380  -          .TX "*** PROGRAMMENDE ! ***"
+10390  -          .BY 13,13,0
+10400  -;
+10410  -TEXT9     .TX " (J/N)? "
+10420  -          .BY 0
+10430  -;
+10440  -;
+20000  -;
+20010  -; UNTERPROGRAMM FUER "J/N?"
+20020  -; =========================
+20030  -;
+20040  -;
+20050  -JANEIN    ... PRINT(TEXT9)
+20060  -          JSR BASIN      ; EINGABE HOLEN
+20070  -          CMP #"_"
+20080  -          BNE JANEIN1
+20090  -          PLA            ; SIEHE STAPEL-
+20100  -          PLA            ; MANIPULATION
+20110  -...PRINT(TEXT8)
+20120  -          JMP READY      ; SPRUNG INS BASIC
+20130  -JANEIN1   CMP #"J"       ; VERGLEICH MIT "J"
+20140  -          RTS            ; RUECKKEHR VOM
+20150  -;                          UNTERPROGRAMM
+20160  -.EN
+</pre>
+            <figcaption>Listing 30</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 30.prg" data-name="Listing 30"></div>
 
         <p>Die Zeilen bis 990 stellen das Ladeprogramm in unmodifizierter Form dar und enthalten viele Dummywerte, wie zum Beispiel die (unsinnige) Startadresse 0 in Zeile 820.</p>
 

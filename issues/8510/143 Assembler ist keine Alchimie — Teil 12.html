@@ -432,7 +432,7 @@ C000           0B18 VERZ        .DE $02             ;AKTUELLE VERZOEG.
 C000           0B3B FARB        .DE $03             ;WERT FUER RAHMEN
 C000           0B57 ;               EOR-OPERATION
 C000           0B78 VORW        .DE $04             ;VERZOEGERUNGSWERT
-C000           0B9B VALTYP      .DE $0D             ;INHALT:F=STR 0=N
+C000           0B9B VALTYP      .DE $0D             ;INHALT:FF=STR 0=N
 C000           0B9E ;
 C000           0BAD INDEX       .DE $22
 C000           0BC6 INDEX3      .DE $24             ;POINTER
@@ -457,7 +457,7 @@ C000           0CFD ;
 C000           0D23 ILLQUERR    .DE $B248           ;ILLEGAL QUANTITY
 C000           0D4B ;          ERROR=NORMALWERT USR-VEKTOR
 C000           0D4E ;
-C000           0D70 STRIN18     .DE $B47D           ;SPEICHERPLATZ
+C000           0D70 STRINI8     .DE $B47D           ;SPEICHERPLATZ
 C000           0D99 ;          PRUEFEN,STRINGPOINTER SETZEN
 C000           0DBF STRLIT67    .DE $B4CA           ;REST DER STRING-
 C000           0DD8 ;          LESE-ROUTINE
@@ -484,13 +484,13 @@ C000           0FD3 CRA2        .DE $DD0E           ;TIMER-A KONTRREG
 C000           0FF5 CRB2        .DE $DD0F           ;TIMER-B KONTRREG
 C000           0FF8 ;
 C000           0FFB ;
-C000           1024 ;********** LABELS OBERES ROM *********
+C000           1024 ;********* LABELS OBERES ROM **********
 C000           1027 ;
 C000           1045 NORM        .DE $EA31           ;NORMALER IRQ
 C000           1048 ;
 C000           106B TASTFLAG    .DE $F6BC           ;TEIL DER NMI-
 C000           108E ;            ROUTINE (KEIN MODUL)
-C000           10AD VECTAB      .DE $F02F           ;TABELLE DER
+C000           10AD VECTAB      .DE $FD2F           ;TABELLE DER
 C000           10C8 ;            ROM-VEKTOREN
 C000           10E9 VECTAB7     .DE $FD35           ;MSB DES NMI-
 C000           110E ;            VEKTORS IN DER TABELLE
@@ -532,10 +532,10 @@ C01F 48        140C             PHA
 C020 98        1412             TYA
 C021 48        1418             PHA
 C022           141B ;
-C022 A9 7F     1439             LDA #7F             ;SPERREN ALLER NMI
-C024 8D 0D DD  1444             STA DD0D
+C022 A9 7F     1439             LDA #$7F            ;SPERREN ALLER NMI
+C024 8D 0D DD  1444             STA ICR2
 C027           1447 ;
-C027 AC 0D DD  1462             LDY DD0D            ;PRUEFEN OB NMI
+C027 AC 0D DD  1462             LDY ICR2            ;PRUEFEN OB NMI
 C02A 10 06     1481             BPL RESTNMI         ;VOM CIA2 KOMMT.
 C02C           14A4 ;                WENN NEIN=SPRUNG
 C02C 4C 6A C1  14C1             JMP ALARM           ;WENN JA, ALARM
@@ -621,7 +621,7 @@ C08E           1AF9 ;**** DURCH USR AUFRUFBARE ROUTINE ****
 C08E           1AFC ;
 C08E 24 0D     1B1D USR         BIT VALTYP          ;WELCHER TYP VON
 C090           1B44 ;               VARIABLEN LIEGT VOR ?
-C090 30 03     1B5F             BMI STRING          ;WENN STRING
+C090 30 03     1B5F             BMI STRING          ;WENN STRING,
 C092           1B83 ;               DANN UEBERSPRINGEN
 C092 4C 20 C1  1B9F             JMP ZAHLVAR         ;SONST SPRUNG
 C095           1BA2 ;
@@ -663,9 +663,9 @@ C0BD           1EFA ;
 C0BD 20 FC C0  1F18             JSR ASCBCD1         ;ZEICHENTEST U.
 COC0           1F3F ;               UMWANDELN IN BCD-ZAHL
 C0C0 8D 0A DD  1F5A             STA TODMIN2         ;ERGEBNIS IN
-C0C3           1F7F ;               TOD-MIINUTENREGISTER
+C0C3           1F7F ;               TOD-MINUTENREGISTER
 C0C3           1F82 ;
-C0C3 20 FC C0  1F9F             JSR ASCBCD1         ;DASSELBE
+C0C3 20 FC C0  1F9F             JSR ASCBCD1         ;DASSELBE FUER
 C0C6 8D 09 DD  1FBB             STA TODSEC2         ;DIE SEKUNDEN
 C0C9           1FBE ;
 C0C9 20 66 C1  1FDA             JSR TEST            ;PRUEFEN,OB 1/10
@@ -686,7 +686,7 @@ C0D6           212D ;
 C0D6 68        2138 ERROR       PLA
 C0D7 68        213E             PLA
 C0D8           2141 ;
-C0D8 A9 FF     2164 ERROR       LDA #$FF            ;FEHLERKENNUNG IN
+C0D8 A9 FF     2164 ERROR1      LDA #$FF            ;FEHLERKENNUNG IN
 C0DA D0 F5     2180             BNE AKKUFAC         ;AKKU UND FAC
 C0DC           2183 ;
 C0DC           21AC ;ENDE DIESES TEILS D. UNBEDINGTEN SPRG.
@@ -694,7 +694,7 @@ C0DC           21D5 ;--------------------------------------
 C0DC           21D8 ;
 C0DC           2201 ;**** ALARMZEIT EINLESEN **************
 C0DC           2204 ;
-C0DC           222A ;  AUFRUF DURCH Z.B. USR("AHHMMSSTT")
+C0DC           222A ;  AUFRUF DURCH Z.B. USR("AHHMMSST")
 C0DC           222D ;
 C0DC C0 08     224B ALSET       CPY #$08            ; 8 ZEICHEN ?
 C0DE D0 F8     2265             BNE ERROR1          ;NEIN=FEHLER
@@ -889,7 +889,10 @@ C18A           3229 ;
 C18A 4C 31 EA  3244             JMP NORM            ;ZUM NORMAL-IRQ
 C18D           3247 ;
 C18D           324D             .EN</pre>
-            <!-- Eingetippt von Endurion -->
+            <!--
+                 Eingetippt von Endurion; korrigiert durch Quelltext auf
+                 Programmservicediskette zum Sonderheft 8/85
+            -->
             <figcaption>Listing 4. Der Quelltext zur Echtzeituhr</figcaption>
         </figure>
     </article>
