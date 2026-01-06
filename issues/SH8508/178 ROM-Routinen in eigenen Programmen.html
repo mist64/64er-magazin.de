@@ -90,7 +90,925 @@
             4. Ponnath, C 64 Wunderland der Grafik, München 1985: Markt &amp; Technik Verlag MT 756.</p>
 
         <figure>
-            TODO
+            <table>
+                <tr>
+                    <td colspan="7">
+                        <h3>1. Routinen, die die Kooperation von Basic und Assembler erleichtern:</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Label</td>
+                    <td rowspan="2">Adresse</td>
+                    <td rowspan="2">Funktion</td>
+                    <td colspan="2">Eingabe</td>
+                    <td colspan="2">Ausgabe</td>
+                </tr>
+                <tr>
+                    <td>Format</td>
+                    <td>Adresse</td>
+                    <td>Format</td>
+                    <td>Adresse</td>
+                </tr>
+
+                <tr>
+                    <td>CHRGET</td>
+                    <td>0073</td>
+                    <td>Holt nächstes Byte</td>
+                    <td>1 Byte</td>
+                    <td>Basic-Text</td>
+                    <td>1 Byte</td>
+                    <td>A</td>
+                </tr>
+                <tr>
+                    <td>CHRGOT</td>
+                    <td>0073</td>
+                    <td>Holt aktuelles Byte</td>
+                    <td>1 Byte</td>
+                    <td>Basic-Text</td>
+                    <td>1 Byte</td>
+                    <td>A</td>
+                </tr>
+                <tr>
+                    <td>READY</td>
+                    <td>A474</td>
+                    <td>Erzeugt READY-Status</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>LINGET</td>
+                    <td>A96B</td>
+                    <td>Holt Integerwert<br>(0-63999)</td>
+                    <td>ASCII-Zahl</td>
+                    <td>Basic-Text</td>
+                    <td>2-Byte Integer</td>
+                    <td>14/15</td>
+                </tr>
+                <tr>
+                    <td>FRMNUM</td>
+                    <td>AD8A</td>
+                    <td>Holt beliebigen nume-<br>rischen Ausdruck</td>
+                    <td>Basic-<br>Ausdruck</td>
+                    <td>Basic-Text</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="8">FRMEVL</td>
+                    <td rowspan="8">AD9E</td>
+                    <td rowspan="7">Holt beliebigen<br>Ausdruck</td>
+                    <td rowspan="7">Basic-<br>Ausdruck</td>
+                    <td rowspan="7">Basic-Text</td>
+                    <td colspan="2">a) bei Fließkomma:</td>
+                </tr>
+                <tr>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td colspan="2">b) bei Integer:</td>
+                </tr>
+                <tr>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td colspan="2">c) bei String:</td>
+                </tr>
+                <tr>
+                    <td>Zeiger auf</td>
+                    <td>FAC+3,</td>
+                </tr>
+                <tr>
+                    <td>Descriptor</td>
+                    <td>FAC+4</td>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        Diese Routine setzt außerdem eine Reihe von Flaggen:<br>
+                        VALTYP($0D) 0=Zahl FF=String<br>
+                        INTFLAG ($0E) 0=Fließkomma 80=integer<br>
+                        War Ausdruck einfache Variable, dann zeigt VARNAM ($45/6)<br>das 1. Byte des Variablen-Namens</td>
+                </tr>
+
+                <tr>
+                    <td>CHKCLS</td>
+                    <td>AEF7</td>
+                    <td>Prüft auf » ) «</td>
+                    <td>ASCII</td>
+                    <td>Basic-Text</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>CHKOPN</td>
+                    <td>AEFA</td>
+                    <td>Prüft auf » ( «</td>
+                    <td>ASCII</td>
+                    <td>Basic-Text</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>CHKCOM</td>
+                    <td>AEFD</td>
+                    <td>Prüft auf »,«</td>
+                    <td>ASCII</td>
+                    <td>Basic-Text</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>SYNCHR</td>
+                    <td>AEFF</td>
+                    <td>Prüft auf Zeichen<br>im Akkumulator</td>
+                    <td>ASCII</td>
+                    <td>Basic-Text<br>A</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="5">
+                        Diese 4 Routinen überlesen das Zeichen, wenn vorhanden.<br>
+                        Wenn nicht vorhanden, folgt SYNTAX ERROR
+                    </td>
+                </tr>
+
+                <tr>
+                    <td rowspan="4">ISVAR</td>
+                    <td rowspan="4">AF28</td>
+                    <td rowspan="4">Sucht Variablenwert</td>
+                    <td rowspan="4">Name +<br>Kennung</td>
+                    <td rowspan="4">$45/46</td>
+                    <td colspan="2">a) Zahl:</td>
+                </tr>
+                <tr>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td colspan="2">b) String:</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Descriptor-FAC+3</td>
+                </tr>
+
+                <tr>
+                    <td>ORDVAR</td>
+                    <td>B0E7</td>
+                    <td>Sucht Variablennamen</td>
+                    <td>Name+<br>Kennung</td>
+                    <td>$45/46</td>
+                    <td>Adresse</td>
+                    <td>$47/48</td>
+                </tr>
+
+                <tr>
+                    <td>GTBYTC</td>
+                    <td>B79B</td>
+                    <td>Holt Zahl (0-255)</td>
+                    <td>ASCII</td>
+                    <td>Basic-Text</td>
+                    <td>1 Byte</td>
+                    <td>X</td>
+                </tr>
+
+                <tr>
+                    <td>GETNUM</td>
+                    <td>B7EB</td>
+                    <td>Liest 2 Integerzahlen<br>(Trennung durch Komma)<br>1. Zahl: 0 bis 65535<br>2. Zahl: 0 bis 255</td>
+                    <td>ASCII</td>
+                    <td>Basic-Text</td>
+                    <td>2Byte-Int.<br>1Byte-Int.</td>
+                    <td>$14/15<br>X</td>
+                </tr>
+
+                <tr>
+                    <td>COMBYT</td>
+                    <td>E200</td>
+                    <td>Prüft auf »,« und holt<br>folgende Zahl</td>
+                    <td>ASCII</td>
+                    <td>Basic-Text</td>
+                    <td>1 Byte</td>
+                    <td>X</td>
+                </tr>
+                <tr>
+                    <td colspan="7">
+                        <h3>2. Routinen, die die Verschiebungen im Speicher durchführen:</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="6">BLTUC</td>
+                    <td rowspan="6">A3BF</td>
+                    <td rowspan="6">Verschiebt Blöcke</td>
+                    <td colspan="2">Adressen:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2">Quelle</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Start</td>
+                    <td>$5F/60</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Ende+1</td>
+                    <td>$5A/5B</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2">Ziel</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Ende+1</td>
+                    <td>$58/59</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2">PUTINT</td>
+                    <td rowspan="2">A9C4</td>
+                    <td>Schiebt FAC als Integer</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>2Byte-</td>
+                    <td>angegebene</td>
+                </tr>
+                <tr>
+                    <td>in Variable</td>
+                    <td>Adresse</td>
+                    <td>$49/50</td>
+                    <td>Integer</td>
+                    <td>Variable</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2">PTFLPT</td>
+                    <td rowspan="2">A9D6</td>
+                    <td>Schiebt FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>MFLPT</td>
+                    <td>angegebene</td>
+                </tr>
+                <tr>
+                    <td>in Variable</td>
+                    <td>Adresse</td>
+                    <td>$49/50</td>
+                    <td></td>
+                    <td>Variable</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2">GETSPT</td>
+                    <td rowspan="2">AA2C</td>
+                    <td>Schiebt String-</td>
+                    <td>Zeiger</td>
+                    <td>FAC+3</td>
+                    <td>Descriptor</td>
+                    <td>angegebene</td>
+                </tr>
+                <tr>
+                    <td>descriptor in Variable</td>
+                    <td>Adresse</td>
+                    <td>$49/50</td>
+                    <td></td>
+                    <td>Variable</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2">STRVAL</td>
+                    <td rowspan="2">B7B5</td>
+                    <td>Zahlenstring in</td>
+                    <td>ASCII</td>
+                    <td>ab $22</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FAC einlesen</td>
+                    <td>Länge</td>
+                    <td>A</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>CONUPK</td>
+                    <td>BA8C</td>
+                    <td>Lädt ARG aus Speicher</td>
+                    <td>MFLPT</td>
+                    <td>A/Y</td>
+                    <td>FLPT</td>
+                    <td>ARG</td>
+                </tr>
+
+                <tr>
+                    <td>MOVFM</td>
+                    <td>BBA2</td>
+                    <td>Lädt FAC aus Speicher</td>
+                    <td>MFLPT</td>
+                    <td>A/Y</td>
+                    <td>FLPT</td>
+                    <td>ARG</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="3">MOVMF</td>
+                    <td rowspan="3">BBD4</td>
+                    <td>Schiebt FAC</td>
+                    <td>FLPT</td>
+                    <td></td>
+                    <td>MFLPT</td>
+                    <td>ange-</td>
+                </tr>
+                <tr>
+                    <td>in Speicher</td>
+                    <td>Adresse</td>
+                    <td>FAC X/Y</td>
+                    <td></td>
+                    <td>gebener</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>Speicher</td>
+                </tr>
+
+                <tr>
+                    <td>MOVFA</td>
+                    <td>BBFC</td>
+                    <td>ARG in FAC kopieren</td>
+                    <td>FLPT</td>
+                    <td>ARG</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+
+                <tr>
+                    <td>MOVAF</td>
+                    <td>BCOC</td>
+                    <td>FAC in ARG kopieren</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>ARG</td>
+                </tr>
+
+                <tr>
+                    <td>ACTOFC</td>
+                    <td>BC3C</td>
+                    <td>Akku in FAC schieben</td>
+                    <td>1Byte</td>
+                    <td>A</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+            </table>
+            <h3>3. Routinen zur Arithmetik:</h3>
+            <table>
+                <tr>
+                    <td>ASCADD</td>
+                    <td>AA27</td>
+                    <td>Addiert ASCII-Ziffer<br>zu FAC</td>
+                    <td>ASCII<br>Ziffer</td>
+                    <td>A</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>OROP</td>
+                    <td>AFE6</td>
+                    <td>FAC=(FAC)OR(ARG)</td>
+                    <td>FLPT</td>
+                    <td>FAC,ARG</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>ANDOP</td>
+                    <td>AFE9</td>
+                    <td>FAC=(FAC)AND(ARG)</td>
+                    <td>FLPT<br>0</td>
+                    <td>FAC,ARG<br>Y</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FACINX</td>
+                    <td>B1AA</td>
+                    <td>FAC wird als Integer<br>in A/Y abgelegt</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>2Byte-<br>Integer</td>
+                    <td>A/Y</td>
+                </tr>
+                <tr>
+                    <td>UMULT</td>
+                    <td>B357</td>
+                    <td>16-Bit-Multiplikation</td>
+                    <td>2-Byte-Integer<br>Zahl1<br>Zahl2</td>
+                    <td><br>$28/29<br>$71/72</td>
+                    <td>2Byte-<br>Integer</td>
+                    <td>X/Y</td>
+                </tr>
+                <tr>
+                    <td>CIVAYF</td>
+                    <td>B391</td>
+                    <td>Integer (-32768 bis<br>32767) in FAC</td>
+                    <td>2Byte-<br>Integer</td>
+                    <td>A/Y</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>SGNFT</td>
+                    <td>B3A2</td>
+                    <td>Integer (0 bis 255)<br>in FAC</td>
+                    <td>1Byte</td>
+                    <td>y</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>GETADR</td>
+                    <td>B7F7</td>
+                    <td>Wandelt FAC zu<br>Integer (0-65535)</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>2Byte-<br>Integer</td>
+                    <td>Y/A<br>+$14/15</td>
+                </tr>
+                <tr>
+                    <td>FADDH</td>
+                    <td>B849</td>
+                    <td>FAC = FAC + 0,5</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FSUB</td>
+                    <td>B850</td>
+                    <td>FAC=Speicherzahl-FAC</td>
+                    <td>MFLPT</td>
+                    <td>Zeiger A/Y</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FSUBT</td>
+                    <td>B853</td>
+                    <td>FAC = ARG - FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FADD</td>
+                    <td>B867</td>
+                    <td>FAC=Speicherzahl +FAC</td>
+                    <td>MFLPT<br>MFLPT</td>
+                    <td>Zeiger A/Y<br>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FADDT</td>
+                    <td>B86A</td>
+                    <td>FAC = ARG + FAC</td>
+                    <td>FLPT</td>
+                    <td>ARG,FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>COMPLT</td>
+                    <td>B947</td>
+                    <td>Erzeugt Zweierkomplement von FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>LOG</td>
+                    <td>B9EA</td>
+                    <td>FAC = In(FAC)</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">FMULT</td>
+                    <td rowspan="2">BA28</td>
+                    <td rowspan="2">FAC=Speicherwert*FAC</td>
+                    <td>MFLPT</td>
+                    <td>Zeiger A/Y</td>
+                    <td rowspan="2">FLPT</td>
+                    <td rowspan="2">FAC</td>
+                </tr>
+                <tr>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FMULTT</td>
+                    <td>BA30</td>
+                    <td>FAC = ARG * FAC</td>
+                    <td>FLPT</td>
+                    <td>ARG,FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>MUL10</td>
+                    <td>BAE2</td>
+                    <td>FAC = 10 * FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>DIV10</td>
+                    <td>BAFE</td>
+                    <td>FAC = FAC/10</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">FDIVF</td>
+                    <td rowspan="2">BB07</td>
+                    <td rowspan="2">FAC=ARG/Speicherzahl</td>
+                    <td>MFLPT</td>
+                    <td>Zeiger A/Y</td>
+                    <td rowspan="2">FLPT</td>
+                    <td rowspan="2">FAC</td>
+                </tr>
+                <tr>
+                    <td>FLPT</td>
+                    <td>ARG</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">FDIV</td>
+                    <td rowspan="2">BB0F</td>
+                    <td rowspan="2">FAC=Speicherzahl/FAC</td>
+                    <td>MFLPT</td>
+                    <td>Zeiger A/Y</td>
+                    <td rowspan="2">FLPT</td>
+                    <td rowspan="2">FAC</td>
+                </tr>
+                <tr>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>FDIVT</td>
+                    <td>BB14</td>
+                    <td>FAC = ARG/FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC,ARG</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>SIGN</td>
+                    <td>BC28</td>
+                    <td>Ermittelt Vorzeichen<br>von FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>1Byte</td>
+                    <td>A<br>1 ← +<br>0 → 0<br>FF ← -</td>
+                </tr>
+                <tr>
+                    <td>ABS</td>
+                    <td>BC58</td>
+                    <td>FAC = ABS(FAC)</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                    <td>FLPT</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">FCOMP</td>
+                    <td rowspan="2">BC5B</td>
+                    <td rowspan="2">Vergleicht FAC mit<br>Speicherzahl</td>
+                    <td>MFLPT</td>
+                    <td>Zeiger A/Y</td>
+                    <td rowspan="2">1Byte:</td>
+                    <td rowspan="2">A<br>1: FAC > Speicher<br>0: FAC = Speicher<br>FF: FAC < Speicher</td>
+    </tr>
+    <tr>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td>INT</td>
+        <td>BCCC</td>
+        <td>FAC = INT(FAC)</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td rowspan="2">AADD</td>
+        <td rowspan="2">BD7E</td>
+        <td rowspan="2">Addiert A zu FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td rowspan="2">FLPT</td>
+        <td rowspan="2">FAC</td>
+    </tr>
+    <tr>
+        <td>1Byte</td>
+        <td>A</td>
+    </tr>
+    <tr>
+        <td>SQR</td>
+        <td>BF71</td>
+        <td>FAC = SQR(FAC)</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td rowspan="2">MPOT</td>
+        <td rowspan="2">BF78</td>
+        <td rowspan="2">FAC=Speicherwert<br>↑ FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td rowspan="2">FLPT</td>
+        <td rowspan="2">FAC</td>
+    </tr>
+    <tr>
+        <td>MFLPT</td>
+        <td>Zeiger A/Y</td>
+    </tr>
+    <tr>
+        <td>FPWRT</td>
+        <td>BF7B</td>
+        <td>FAC = ARG ↑ FAC</td>
+        <td>FLPT</td>
+        <td>ARG,FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td>NEGOP</td>
+        <td>BFB4</td>
+        <td>FAC = -FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td>EXP</td>
+        <td>BFED</td>
+        <td>FAC = e↑FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td>POLYX</td>
+        <td>E059</td>
+        <td>Polynomberechnung<br>FAC=a0+a1x+a2x²+...</td>
+        <td>Adresse</td>
+        <td>Zeiger A/Y</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td colspan="5">
+            Zeiger weist auf Start der Konstantentabelle.<br>
+            1. Byte = Polynomgrad<br>
+            Weitere Bytes sind die Koeffizienten des Polynoms<br>
+            in der Reihenfolge an,.....,a0 im MFLPT-Format.
+        </td>
+    </tr>
+    <tr>
+        <td>COS</td>
+        <td>E264</td>
+        <td>FAC = COS(FAC)</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td>SIN</td>
+        <td>E26B</td>
+        <td>FAC = SIN(FAC)</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td>TAN</td>
+        <td>E2B4</td>
+        <td>FAC = TAN(FAC)</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+    <tr>
+        <td>ATN</td>
+        <td>E30E</td>
+        <td>FAC = ATN(FAC)</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+    </tr>
+</table>
+<h3>4. Auswahl von Ein-/Ausgabe-Routinen:</h3>
+<table>
+    <tr>
+        <td>ERROR</td>
+        <td>A437</td>
+        <td>Fehlermeldung ausgeben und READY</td>
+        <td>Fehlernummer</td>
+        <td>X</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>LIST</td>
+        <td>A69C</td>
+        <td>Listet Basic-Programm</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>NUMDON</td>
+        <td>AABC</td>
+        <td>Druckt FAC auf Bildschirm aus</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>STROUT</td>
+        <td>AB1E</td>
+        <td>Gibt String auf Bildschirm aus. Ende=0</td>
+        <td>Adresse</td>
+        <td>Zeiger A/Y</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>SYNERR</td>
+        <td>AF08</td>
+        <td>Ausgabe SYNTAX ERROR</td>
+        <td>-</td>
+        <td>-</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>OVERR</td>
+        <td>B97E</td>
+        <td>Ausgabe OVERFLOW ERR.</td>
+        <td>-</td>
+        <td>-</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>LINPRT</td>
+        <td>BDCD</td>
+        <td>Druckt Integerzahl (0 bis 65535) aus.</td>
+        <td>2Byte-Integer</td>
+        <td>X/A</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>FACOUT</td>
+        <td>BDD7</td>
+        <td>Druckt FAC auf Bildschirm aus</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>FOUT</td>
+        <td>BDDD</td>
+        <td>FAC wird zu ASCII-String (Ende=0). Kann direkt mit STROUT ausgegeben werden.</td>
+        <td>FLPT</td>
+        <td>FAC</td>
+        <td>ASCII<br>(Ende=0)<br>Startadr.</td>
+        <td>ab $100<br><br>A/Y</td>
+    </tr>
+    <tr>
+        <td>SAVET</td>
+        <td>E156</td>
+        <td>Save</td>
+        <td colspan="4">Parameter aus Basic-Text</td>
+    </tr>
+    <tr>
+        <td>VERFYT</td>
+        <td>E165</td>
+        <td>Verify</td>
+        <td colspan="4">Parameter aus Basic-Text</td>
+    </tr>
+    <tr>
+        <td>LOADT</td>
+        <td>E168</td>
+        <td>Load</td>
+        <td colspan="4">Parameter aus Basic-Text</td>
+    </tr>
+    <tr>
+        <td>SLPARA</td>
+        <td>E1D4</td>
+        <td colspan="5">Holt Parameter für Save, Verify, Load aus dem Basic-Text</td>
+    </tr>
+    <tr>
+        <td>PLOTK</td>
+        <td>E50A</td>
+        <td>Setzt Cursorposition</td>
+        <td>Zeile<br>Spalte</td>
+        <td>X<br>Y</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>HOME</td>
+        <td>E566</td>
+        <td colspan="5">Cursor in Home-Position</td>
+    </tr>
+    <tr>
+        <td>PLOTR</td>
+        <td>E56C</td>
+        <td>Setzt Cursor-Position</td>
+        <td>Zeile<br>Spalte</td>
+        <td>$D6<br>$D3</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>GETKBC</td>
+        <td>E5B4</td>
+        <td>Holt Zeichen aus Tastaturpuffer</td>
+        <td>-</td>
+        <td>-</td>
+        <td>1Byte</td>
+        <td>A</td>
+    </tr>
+    <tr>
+        <td>PRT</td>
+        <td>E716</td>
+        <td>Gibt Zeichen in A auf Bildschirm aus</td>
+        <td>1Byte</td>
+        <td>A</td>
+        <td>ASCII</td>
+        <td>Bildschirm</td>
+    </tr>
+    <tr>
+        <td>CLRLN</td>
+        <td>E9FF</td>
+        <td>Löscht xte Bildschirmzeile</td>
+        <td>Zeilennummer</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+    </tr>
+</table>
             <figcaption>Tabelle der ROM-Routinen</figcaption>
         </figure>
 
@@ -99,7 +1017,6 @@
             <figcaption>Listing 2. Test der Kotangens-Funktion</figcaption>
         </figure>
 
-        <!-- cot quell hypra -->
         <figure>
             <pre>
 10  -          .LI 1,4
