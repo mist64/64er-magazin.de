@@ -517,6 +517,11 @@
 
         <p>Deshalb gehen wir mit Hilfe einer Grafik vor: In Bild 1 sehen Sie ein Flußdiagramm nach obigem Aufbau. In der Beschriftung soll »Code« nicht »Kennwort« bedeuten, sondern heißt einfach »Befehlsnummer«.</p>
 
+        <figure>
+            <img src="74-1.png" alt="">
+            <figcaption>Bild 1. Der Algorithmus zur Verschachtelung von Unterprogrammen</figcaption>
+        </figure>
+
         <p>Wie an den Pfeilen zu erkennen ist, werden zwei RTS-Befehle hintereinander abgearbeitet (von Unterprogramm 2 nach Unterprogramm 1 und von dort zum Hauptprogramm). Dies ist immer ein Indiz dafür, daß das Programm noch optimiert werden kann.</p>
 
         <p>Eine »Übersetzung« von Bild 1 in Assembler ist Listing 6: Wenn Sie dieses über »SYS 49152« starten, ist aus den ausgegebenen Texten ersichtlich, welcher Programmteil wann abgearbeitet wird.</p>
@@ -587,6 +592,11 @@
         <div class="binary_download" data-filename="listing 6.prg" data-name="Listing 6"></div>
 
         <p>Sobald Sie die Strukturvon Bild 1 beziehungsweise Listing 6 verstanden haben, können wir uns mit der optimierten Form befassen, die in Bild 2 beziehungsweise Listing 7 zu finden ist.</p>
+
+        <figure>
+            <img src="74-2.png" alt="">
+            <figcaption>Bild 2. Der optimierte Algorithmus zur Verschachtelung von Unterprogrammen</figcaption>
+        </figure>
 
         <figure>
             <pre>
@@ -700,6 +710,11 @@
         <p>Und noch ein Mangel der Unterprogrammbefehle soll beseitigt werden: Obwohl es JMP (indirekt) gibt, kennt der 6510 keinen Befehl wie JSR (indirekt); über Stapelmanipulation ist dies dennoch möglich (siehe dazu auch im 64’er, Ausgabe 1/86: Assembler-Bedienung leicht gemacht).</p>
 
         <p>Nehmen wir an, im Vektor $14/$15 steht die Adresse $C000. Nun soll über den $14/$15-Vektor ein Unterprogramm aufgerufen werden (also das ab $C000). Bild 3 zeigt, was im einzelnen geschehen muß.</p>
+
+        <figure>
+            <img src="74-3.png" alt="">
+            <figcaption>Bild 3. Der Algorithmus, um einen JSR (indirekt)-Befehl zu simulieren</figcaption>
+        </figure>
 
         <p>Die Rücksprungadresse steht zwar in Bild 3 direkt hinter dem JMP ($0014)-Befehl, kann aber auch anderswo im Programm stehen.</p>
 
@@ -1409,6 +1424,11 @@
         <p>In Bild 4 sehen Sie einen sehr zuverlässigen Algorithmus zur Berechnung von Prüfsummen (insofern zuverlässig, als er sehr unterschiedliche Prüfsummen ermittelt). Listing 9 stellt ein Hilfsprogramm dar, das zu einer Eingabe die Prüfsumme nach dem Algorithmus aus Bild 4 errechnet.</p>
 
         <figure>
+            <img src="74-4.png" alt="">
+            <figcaption>Bild 4. Das Flußdiagramm zur Prüfsummenberechnung</figcaption>
+        </figure>
+
+        <figure>
             <pre>
 100  -.LI 1,3,0
 110  -.BA $C000 ; START: SYS 49152
@@ -1657,6 +1677,11 @@
 
         <p>Ab Zeile 10000 finden Sie die Tabellen. Und weil unser Programm ein Beispiel für die Verwendung von Tabellen sein soll, sind es derer recht viele. Die wichtigsten davon sind jedoch analog der internen Numerierung der Menüpunkte aufgebaut, da sie Daten für die Menüsteuerung beinhalten. Diese Tabellen sind auch mit 0 - 3 numeriert und grafisch in Bild 6 dargestellt.</p>
 
+        <figure>
+            <img src="74-6.png" alt="">
+            <figcaption>Bild 6. Die Tastaturabfrage aus Listing 11</figcaption>
+        </figure>
+
         <p>Sehen wir uns wieder den Quelltext, beginnend mit der ersten Zeile, an.</p>
 
         <p>Auf die Symboldefinitionen (210 - 260) folgt die Initialisierung der Hauptschleife (280 - 310). Diese Initialisierung löscht Bildschirm (280) und Tastaturpuffer (290 - 300). Außerdem wird der aktuelle (= derzeit invers dargestellte) Menüpunkt (immer in der Adresse »MPT« enthalten) auf 0 gesetzt (310). Zeile 310 ist also dafür verantwortlich, daß nach dem Start über SYS 49152 das Inversfeld ganz oben steht (auf Punkt 0).</p>
@@ -1672,6 +1697,11 @@
         <p>Wurde nun eine Taste gedrückt, sucht »SCHLEIFE« (630 -680) in der Tabelle »TASTEN«, die im Quelltextab Zeile 10210 steht, nach dem eingegebenen Zeichen (wird es nicht gefunden, erfolgt in 690 der Sprung zur neuen Eingabe).</p>
 
         <p>Diese Tabelle »TASTEN« enthält alle vorgesehenen Tastendrücke zur Menüsteuerung, die in 4er-Blockweise angeordnet sind (Bild 5). Nach der Suchschleife steht im X-Register die Position der gedrückten Taste innerhalb der Tabelle »TASTEN« (zum Beispiel 0 = F1 gedrückt, 4 = HOME gedrückt). Diese Position wird - ohne Berücksichtigung des Divisions-Restes - durch 4 dividiert (700 - 730), um festzuhalten, von welchem Tastenblock eine Taste gedrückt wurde.</p>
+
+        <figure>
+            <img src="74-5.png" alt="">
+            <figcaption>Bild 5. So verwendet man Tabellen zur Realisierung eines Menüs</figcaption>
+        </figure>
 
         <p>Dadurch ist eindeutig bestimmt, welche Befehlsgruppe aufgerufen werden muß.</p>
 
