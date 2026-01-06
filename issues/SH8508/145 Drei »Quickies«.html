@@ -98,6 +98,29 @@
         </figure>
         <div class="binary_download" data-filename="chr-ram.prg" data-name="Geänderter Zeichensatz"></div>
 
+<figure>
+    <pre>$0400 78        SEI       Interruptflag setzen
+$0401  A9 B3     LDA #$B3
+$0403  85 01     STA $01   ;Zeichen-ROM ein
+$0405  A9 00     LDA #$00
+$0407  A0 D0     LDY #$D0
+$0409  85 5F     STA $5F   ;Alter Blockanfang Low-Byte
+$040B  84 60     STY $60   ;Alter Blockanfang High-Byte
+$040D  A0 E0     LDY #$E0
+$040F  85 5A     STA $5A   ;Altes Blockende Low-Byte
+$0411  84 5B     STY $5B   ;Altes Blockende High-Byte
+$0413  A0 30     LDY #$30
+$0415  85 58     STA $58   ;Neues Blockende Low-Byte
+$0417  84 59     STY $59   ;Neues Blockende High-Byte
+$0419  20 BF A3  JSR $A3BF ;Blockverschieberoutine
+$041C  A9 B7     LDA #$B7
+$041E  85 01     STA $01   ;Zeichen-ROM aus
+$0420  A9 18     LDA #$18
+$0422  8D 18 D0  STA $DO18 ;Zeiger für Zeichengenerator auf $2000
+$0425  58        CLI       ;Interruptflag löschen
+$0426  60        RTS</pre>
+    <figcaption>Listing 1b. Der Quelltext zum geänderten Zeichensatz</figcaption>
+</figure>
 
         <h2>Invertierte Grafik</h2>
 

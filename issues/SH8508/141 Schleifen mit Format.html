@@ -24,31 +24,32 @@
         <p>Eine Möglichkeit ist, FOR..NEXT-Schleifen einzurücken. Normalerweise macht man das, indem nach der Zeilennummer ein Doppelpunkt gesetzt wird und erst danach die gewünschte Anzahl Leerstellen. Ein kurzes Beispiel:<br>
             Schleife ohne einrücken:</p>
 
-        <p>10 FOR I=1 TO 10<br>
-            20 A = A + 1<br>
-            30 GOSUB 100<br>
-            40 FOR J = 1 TO10<br>
-            50 PRINT I,J,A*J<br>
-            60 NEXT J<br>
-            70 NEXT I<br>
-            Schleife mit einrücken durch Doppelpunkte:<br>
-            10 FOR I=1 TO 10<br>
-            20 : A=A+1<br>
-            30 : GOSUB 100<br>
-            40 : FOR J=1 TO 10<br>
-            50 : PRINT I,J,A*J<br>
-            60 : NEXT J<br>
-            70 NEXT I<br>
-            Das sieht schon viel besser aus. Bei langen Listings werden Sie diese Form schätzen lernen. Allerdings, das Nonplusultra ist es auch nicht. Besser wäre es, das Listing würde so aussehen:</p>
+        <pre>10 FOR I=1 TO 10
+20 A = A + 1
+30 GOSUB 100
+40 FOR J = 1 TO10
+50 PRINT I,J,A*J
+60 NEXT J
+70 NEXT I</pre>
+<p class="noindent">Schleife mit einrücken durch Doppelpunkte:</p>
+<pre>10 FOR I=1 TO 10
+20 : A=A+1
+30 : GOSUB 100
+40 : FOR J=1 TO 10
+50 :   PRINT I,J,A*J
+60 : NEXT J
+70 NEXT I</pre>
 
-        <p>10 FOR I=1 TO 10<br>
-            20 A=A+I 100<br>
-            30 GOSUB 100<br>
-            40 FOR J = 1 TO 10<br>
-            50 PRINT I,J,A*J<br>
-            60 NEXT J<br>
-            70 NEXT I<br>
-            Um das zu erreichen, müssen wir eine kleine Maschinenroutine schreiben. Aber wie?</p>
+            <p class="noindent">Das sieht schon viel besser aus. Bei langen Listings werden Sie diese Form schätzen lernen. Allerdings, das Nonplusultra ist es auch nicht. Besser wäre es, das Listing würde so aussehen:</p>
+
+        <pre>10 FOR I=1 TO 10
+20     A=A+I 100
+30     GOSUB 100
+40     FOR J = 1 TO 10
+50         PRINT I,J,A*J
+60     NEXT J
+70 NEXT I</pre>
+            <p class="noindent">Um das zu erreichen, müssen wir eine kleine Maschinenroutine schreiben. Aber wie?</p>
 
         <p>Ein Gedanke liegt nah: Warum nicht die normale LIST-Routine des C 64 verwenden? Sie erledigt ja schon einen großen Teil der Aufgabe, nämlich das normale LISTen. Was fehlt, ist nur noch das Einrücken. Zuerst muß also ein dokumentiertes ROM-Listing her. Dort finden wir die LIST-Routine des Basic-Interpreters ab $A69C. Sie geht bis $A740. Soweit, so gut. Aber wie greifen wir in diese Routine ein? Sieht man sich die LIST-Routine etwas genauer an, findet man einen indirekten Sprung ab Adresse $A717 (JMP ($0306)). Das bedeutet, an dieser Stelle springt die LIST- Routine zu der Adresse, die sich aus dem Inhalt der Adressen $0306/$0307 (LO/HI-Byte) ergibt. Man spricht in so einem Fall auch von einem Vektor. Dort kurz spioniert, finden wir in $0306/$0307 die Zahlen $1A und $A7, zusammengesetzt also die Adresse A71 A, das heißt genau die Adresse, die dem JMP($0306) folgt. Damit haben wir genau das, was wir suchen, eine Möglichkeit, in die LIST-Routine einzugreifen. Denn $0306 steht im RAM, kann also (von uns) geändert werden.</p>
 
