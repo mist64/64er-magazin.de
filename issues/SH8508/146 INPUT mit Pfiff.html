@@ -189,7 +189,794 @@
             <div class="binary_download" data-filename="exinput 64.prg" data-name="Exinput 64"></div>
 
             <figure>
-                TODO
+                <pre>               ASM VERS. 4.23
+               ;---------------------------------------
+               ;-                                     -
+               ;-         EXTENDED INPUT 64           -
+               ;-                                     -
+               ;-            GUY MOOTZ                -
+               ;-                                     -
+               ;-          BOUVARTSTR. 11             -
+               ;-          L 7519  MERSCH             -
+               ;-            LUXEMBURG                -
+               ;-                                     -
+               ;-            15.10.85                 -
+               ;-                                     -
+               ;---------------------------------------
+               ;
+               *      =$C000  ;STARTADRESSE DEZ.49152
+               BINPUT =$ABBF  ;BASIC INPUT
+               BPRINT =$AAA0  ;BASIC PRINT
+               BSOUT  =$FFD2  ;GIBT ZEICHEN AUS
+               CHRGET =$0073  ;HOLT ZEICHEN AUS BASIC-T
+               EXT
+               CHRGOT =$0079  ;FLAGS WIEDER SETZEN
+               CURCOL =$0286  ;MOMENTANE ZEICHENFARBE
+               CURSOR =$E50C  ;SETZT CURSOR
+               CKCOM  =$AEFD  ;PRUEFT AUF KOMMA
+               EXESTA =$A7E7  ;STATEMENT AUSFUEHREN
+               FRESTR =$B6A3  ;STRINGVERWALTUNG
+               GETIN  =$FFE4  ;HOLT ZEICHEN IN A
+               GETBYT =$B79B  ;HOLT BYTE(0-255) NACH X
+               GETBY  =$B79E  ;ID.OHNE ZEICHEN ZU HOLEN
+               GETVAR =$B08B  ;VARIABLE HOLEN
+               INTERP =$A7AE  ;INTERPRETERSCHLEIFE
+               ILQUAN =$B248  ;GIBT ILLEGAL QUANT. AUS
+               OUTSCR =$E716  ;ZEICHEN AUF BILDSCHIRM
+               SYNTAX =$AF08  ;GIBT SYNTAX ERROR AUS
+               STRLON =$A571  ;GIBT STR TOO LONG AUS
+               STRPOI =$B475  ;STRINGZEIGER BERECHNEN
+               TYPMIS =$AD99  ;GIBT TYPE MISMATCH AUS
+               ;
+               ;---------------------------------------
+               ;     ZEIGER AUF EIGENE ERWEITERUNG
+               ;---------------------------------------
+               ;
+C000 A9 0B            LDA #$0B      ;LB START
+C002 A0 C0            LDY #$C0      ;HB START
+C004 8D 08 03         STA $0308     ;LB/HB VEKTOR FUER
+C007 8C 09 03         STY $0309     ;BASIC-BEFEHLSADR.
+C00A 60               RTS           ;HOLEN
+               ;
+               ;---------------------------------------
+               ;   SID-PARAMETER FUER PIEPTON SETZEN
+               ;---------------------------------------
+               ;
+C00B A2 9C            LDX #$9C
+C00D 8E 00 D4         STX $D400
+C010 A2 48            LDX #$48
+C012 8E 01 D4         STX $D401
+C015 A2 00            LDX #$00
+C017 8E 02 D4         STX $D402
+C01A 8E 04 D4         STX $D404
+C01D A2 08            LDX #$08
+C01F 8E 03 D4         STX $D403
+C022 A2 0A            LDX #$0A
+C024 8E 05 D4         STX $D405
+C027 A2 64            LDX #$64
+C029 8E 06 D4         STX $D406
+C02C A2 0F            LDX #$0F
+C02E 8E 18 D4         STX $D418
+               ;
+               ;---------------------------------------
+               ;         BASIC BEFEHLE PRUEFEN
+               ;---------------------------------------
+               ;
+C031 20 73 00         JSR CHRGET    ;ZEICHEN HOLEN
+C034 C9 85            CMP #$85      ;INPUT-BEFEHL ?
+C036 F0 0D            BEQ INPUT     ;JA,NACH 'INPUT'
+C038 C9 99            CMP #$99      ;PRINT-BEFEHL ?
+C03A F0 06            BEQ PRINT1    ;JA,NACH 'PRINT1'
+C03C 20 79 00         JSR CHRGOT    ;NEIN,FLAGS SETZEN+
+C03F 4C E7 A7         JMP EXESTA    ;BEFEHL AUSFUEHREN
+C042 4C 4D C4  PRINT1 JMP PRINT
+               ;
+               ;---------------------------------------
+               ;    AUF NEUEN INPUT-BEFEHL PRUEFEN
+               ;---------------------------------------
+               ;
+C045 20 73 00  INPUT  JSR CHRGET    ;ZEICHEN HOLEN
+C048 C9 B1            CMP #$B1      ;'&gt;' ?
+C04A F0 32            BEQ ACCINP    ;JA, NEUEN BEFEHL
+C04C 20 BF AB         JSR BINPUT    ;NEIN, BASIC INPUT
+C04F 4C AE A7         JMP INTERP    ;
+C052 4C 08 AF  SYNOUT JMP SYNTAX    ;
+               ;
+               ;---------------------------------------
+               ; SPEICHERPLATZ FUER BEFEHLSPARAMETER
+               ;---------------------------------------
+               ;
+C055 00        COUNT  .BYTE 0       ;ZAEHLER IM FELD
+C056 00        CRSLIN .BYTE 0       ;CURSORZEILE
+C057 00        CRSCOL .BYTE 0       ;CURSORSPALTE
+C058 00        LENGTH .BYTE 0       ;LAENGE
+C059 00        CODE   .BYTE 0       ;INPUT-CODE
+C05A 00        COLOR  .BYTE 0       ;FARBE
+C05B 00        ALLNUM .BYTE 0       ;ZAHL ERL. ZEICHEN
+C05C 64        FIELDC .BYTE $64     ;FELD MARKIERER
+C05D 00        OUTNUM .BYTE 0       ;ZAEHLER
+C05E 00        VARADL .BYTE 0       ;ADR FUER VAR. LOW
+C05F 00        VARADH .BYTE 0       ;ADR FUER VAR. HIGH
+               ALLSTR  *=*+30       ;ERLAUBTE ZEICHEN
+               ;
+               ;---------------------------------------
+               ;       BEGINN NEUER INPUT-BEFEHL
+               ;
+               ;            CURSOR SETZEN
+               ;---------------------------------------
+               ;
+C07E A2 00     ACCINP LDX #$00
+C080 8E 5B C0         STX ALLNUM
+C083 8E 59 C0         STX CODE
+C086 20 9B B7         JSR GETBYT    ;ZEILE NACH X
+C089 8A               TXA
+C08A 38               SEC
+C08B E9 01            SBC #$01
+C08D C9 19            CMP #$19      ;&gt; 25 ?
+C08F B0 11            BCS CRSNO1    ;JA, ILLEGAL QUANT.
+C091 8D 56 C0         STA CRSLIN    ;NEIN, SPEICHERN
+C094 20 FD AE         JSR CKCOM     ;PRUEFT AUF KOMMA
+C097 20 9E B7         JSR GETBY     ;SPALTE NACH X
+C09A 8A               TXA
+C09B 38               SEC
+C09C E9 01            SBC #$01
+C09E C9 28            CMP #$28      ;&gt; 40 ?
+C0A0 90 03            BCC CRSOK1    ;JA, WEITER
+C0A2 4C 48 B2  CRSNO1 JMP ILQUAN    ;ILLEGAL QUANTITY
+C0A5 A8        CRSOK1 TAY
+C0A6 8C 57 C0         STY CRSCOL
+C0A9 AE 56 C0         LDX CRSLIN
+C0AC 20 0C E5         JSR CURSOR    ;CURSOR SETZEN
+               ;
+               ;---------------------------------------
+               ;          FELDLAENGE HOLEN
+               ;---------------------------------------
+               ;
+C0AF 20 FD AE         JSR CKCOM     ;KOMMA ?
+C0B2 20 9E B7         JSR GETBY     ;BYTE-WERT HOLEN
+C0B5 E0 00            CPX #$00      ;0 ?
+C0B7 F0 E9            BEQ CRSNO1    ;JA, ILLEGAL QUANT.
+C0B9 8E 58 C0  LENGOK STX LENGTH    ;UND SPEICHERN
+               ;
+               ;---------------------------------------
+               ;   FARBE ODER TEXT HOLEN UND AUSGEBEN
+               ;---------------------------------------
+               ;
+C0BC AC 86 02         LDY CURCOL    ;AKTUELLE FARBE
+C0BF 8C 5A C0         STY COLOR     ;SPEICHERN
+C0C2 20 FD AE         JSR CKCOM     ;KOMMA ?
+C0C5 C9 39            CMP #$39      ;&gt; "9" ?
+C0C7 B0 11            BCS INTEXT    ;JA, DANN TEXT
+C0C9 C9 2F            CMP #$2F      ;&lt; "0" ?
+C0CB 90 0D            BCC INTEXT    ;JA, DANN TEXT
+C0CD 20 9E B7         JSR GETBY     ;FARBE HOLEN
+C0D0 E0 10            CPX #$10      ;&lt; 16 ?
+C0D2 B0 CE            BCS CRSNO1    ;JA, ILLEGAL QUANT.
+C0D4 8E 86 02         STX CURCOL    ;UND SPEICHERN
+C0D7 20 FD AE         JSR CKCOM     ;KOMMA ?
+C0DA C9 22     INTEXT CMP #$22      ;""" ?
+C0DC F0 03            BEQ OUTEXT    ;JA, DANN TEXT
+C0DE 4C 00 C1         JMP CODEIN    ;NEIN, DANN CODE
+C0E1 A0 01     OUTEXT LDY #$01      ;ZAEHLER = 1
+C0E3 B1 7A     CONT3  LDA ($7A),Y   ;ZEICHEN HOLEN
+C0E5 C9 22            CMP #$22      ;ENDE DES TEXTES ?
+C0E7 F0 0A            BEQ GCODE     ;JA, DANN CODE
+C0E9 20 D2 FF         JSR BSOUT     ;SONST AUSGEBEN
+C0EC C8               INY           ;ZAEHLER +1
+C0ED 4C E3 C0         JMP CONT3     ;NAECHSTES ZEICHEN
+C0F0 4C 99 AD  TYPERR JMP TYPMIS    ;TYPE-MISMATCH ERR
+               ;
+               ;---------------------------------------
+               ;      INPUT CODE HOLEN + PRUEFEN
+               ;---------------------------------------
+               ;
+C0F3 38        GCODE  SEC           ;PROGRAMMZEIGER
+C0F4 98               TYA           ;UM ZAHL DER AUSGE-
+C0F5 65 7A            ADC $7A       ;GEBENEN ZEICHEN
+C0F7 90 02            BCC CONT2     ;ERHOEHEN
+C0F9 E6 7B            INC $7B
+C0FB 85 7A     CONT2  STA $7A
+C0FD 20 FD AE         JSR CKCOM     ;KOMMA ?
+C100 C9 5A     CODEIN CMP #'Z'      ;'Z' ?
+C102 F0 0B            BEQ CODEOK    ;JA, OK
+C104 C9 42            CMP #'B'      ;'B' ?
+C106 F0 07            BEQ CODEOK    ;JA, OK
+C108 C9 41            CMP #'A'      ;'A' ?
+C10A F0 03            BEQ CODEOK    ;JA, OK
+C10C 4C 08 AF         JMP SYNTAX    ;SONST SYNTAX ERROR
+C10F 8D 59 C0  CODEOK STA CODE      ;UND SPEICHERN
+               ;
+               ;---------------------------------------
+               ;ERLAUBTE ZEICHEN HOLEN + ANZAHL PRUEFEN
+               ;---------------------------------------
+               ;
+C112 20 73 00         JSR CHRGET    ;ZEICHEN HOLEN
+C115 20 FD AE         JSR CKCOM     ;KOMMA ?
+C118 A2 00            LDX #$00      ;ZAEHLER = 0
+C11A C9 22            CMP #$22      ;" AM ANFANG ?
+C11C D0 1E            BNE CREVAR    ;NEIN, WEITER
+C11E 20 73 00  NEXT JSR CHRGET      ;JA, ZEICHEN HOLEN
+C121 C9 22            CMP #$22      ;" ZUM SCHLUSS
+C123 F0 0E            BEQ ALLEND    ;JA, ENDE
+C125 E0 1E            CPX #$1E      ;ZAEHLER = 30
+C127 D0 03            BNE CONT23    ;NEIN, WEITER
+C129 20 71 A5         JSR STRLON    ;SONST STR TOO LONG
+C12C 9D 60 C0  CONT23 STA ALLSTR,X  ;ZEICHEN SPEICHERN
+C12F E8               INX           ;ZAEHLER + 1
+C130 4C 1E C1         JMP NEXT      ;NAECHSTES ZEICHEN
+C133 8E 5B C0  ALLEND STX ALLNUM    ;ZEICHENZAHL MERKEN
+C136 20 73 00         JSR CHRGET    ;ZEICHEN HOLEN
+C139 20 FD AE         JSR CKCOM     ;KOMMA ?
+               ;
+               ;---------------------------------------
+               ;          VARIABLE HOLEN
+               ;---------------------------------------
+               ;
+C13C 20 8B B0  CREVAR JSR GETVAR    ;VARIABLE HOLEN
+C13F A6 0D            LDX $0D       ;AUF STRING PRUEFEN
+C141 F0 AD            BEQ TYPERR    ;SONST TYPE MISM.
+C143 8D 5E C0         STA VARADL    ;ADR STRDESCRIPT.LO
+C146 8C 5F C0         STY VARADH    ;ADRESSE HI
+               ;
+               ;---------------------------------------
+               ;       FELDMARKIERUNG AUSGEBEN
+               ;---------------------------------------
+               ;
+C149 A0 00            LDY #$00      ;ZAEHLER = 0
+C14B AD 5C C0  FIELD LDA FIELDC     ;MARKIERUNGSZEICHEN
+C14E C9 64            CMP #$64      ;HOLEN
+C150 D0 02            BNE CONT28
+C152 A9 A4            LDA #$A4
+C154 20 D2 FF  CONT28 JSR BSOUT     ;UND AUSGEBEN
+C157 C8               INY           ;ZAEHLER ERHOEHEN
+C158 CC 58 C0         CPY LENGTH    ;MIT LAENGE VERGL.
+C15B D0 EE            BNE FIELD     ;KLEINER ?, WEITER
+               ;
+               ;---------------------------------------
+               ;   CURSOR AUF STARTPOSITION SETZEN
+               ;---------------------------------------
+               ;
+C15D A0 00            LDY #$00
+C15F A9 9D     CONT27 LDA #$9D      ;CRSR LINKS
+C161 20 D2 FF         JSR BSOUT     ;AUSGEBEN
+C164 C8               INY
+C165 CC 58 C0         CPY LENGTH    ;BIS LAENGE
+C168 D0 F5            BNE CONT27
+               ;
+               ;---------------------------------------
+               ;        STARTPOSITION MERKEN
+               ;---------------------------------------
+               ;
+C16A A4 D3            LDY $00D3     ;CURSOR SPALTE UND
+C16C A6 D6            LDX $00D6     ;CURSOR ZEILE
+C16E 8C 57 C0         STY CRSCOL    ;SPEICHERN
+C171 8E 56 C0         STX CRSLIN
+               ;
+               ;---------------------------------------
+               ;     BILDSCHIRMPOSITION MERKEN
+               ;---------------------------------------
+               ;
+C174 20 24 EA         JSR $EA24     ;ZEIGER FARB-RAM
+C177 A5 D2            LDA $D2       ;AKTUELLE ZEILE HB
+C179 85 FE            STA $FE       ;MERKEN
+C17B AC 57 C0         LDY CRSCOL
+C17F 98               TYA
+C17F 18               CLC
+C180 65 D1            ADC $D1       ;AKTUELLE ZEILE LB
+C182 90 02            BCC CONT6     ;ADDIEREN
+C184 E6 FE            INC $FE
+C186 85 FD     CONT6 STA $FD        ;UND MERKEN
+C188 A5 F4            LDA $F4       ;ZEIGER IN FARB-RAM
+C18A 85 FC            STA $FC       ;HB MERKEN
+C18C 98               TYA
+C18D 18               CLC
+C18E 65 F3            ADC $F3       ;ZEIGER LB ADDIEREN
+C190 90 02            BCC CONT7
+C192 E6 FC            INC $FC
+C194 85 FB     CONT7 STA $FB        ;UND MERKEN
+               ;
+               ;---------------------------------------
+               ;       HAUPT EINGABESCHLEIFE
+               ;---------------------------------------
+               ;
+C196 A9 00     RSTART LDA #$00
+C198 8D 55 C0         STA COUNT     ;FELD ZAEHLER = 0
+C19B 46 CC     INLOOP LSR $CC       ;CRSR FLAG EIN/AUS
+C19D 46 CF            LSR $CF       ;CRSR EIN/AUS PHASE
+C19F 20 E4 FF         JSR GETIN     ;ZEICHEN VON TASTAT
+C1A2 F0 F7            BEQ INLOOP    ;NEIN, WARTEN
+C1A4 48               PHA           ;JA, ZEICHEN MERKEN
+C1A5 E6 CC            INC $CC       ;CURSOR AUS
+C1A7 A4 D3            LDY $D3       ;SPALTE HOLEN
+C1A9 B1 D1            LDA ($D1),Y   ;ZEICHEN VON SCHIRM
+C1AB 29 7F            AND #$7F      ;POSITIVIEREN UND
+C1AD 91 D1            STA ($D1),Y   ;ZURUECK SPEICHERN
+               ;
+               ;---------------------------------------
+               ;     EINGEGEBENES ZEICHEN PRUEFEN
+               ;---------------------------------------
+               ;
+C1AF A5 91            LDA $91       ;STOP FLAG
+C1B1 C9 7F            CMP #$7F      ;CODE FUER STOP ?
+C1B3 F0 41            BEQ NOTACC    ;NICHT ERLAUBT
+C1B5 68               PLA           ;ZEICHEN HOLEN
+C1B6 C9 0D            CMP #$0D      ;RETURN
+C1B8 D0 03            BNE CONT5     ;NEIN, WEITER
+C1BA 4C B6 C3         JMP TAKEVA    ;JA, MIT SPACES
+C1BD C9 8D     CONT5  CMP #$8D      ;SHIFT/RETURN
+C1BF D0 03            BNE CONT8     ;NEIN, WEITER
+C1C1 4C D0 C3         JMP MKSPAC    ;JA, OHNE SPACES
+C1C4 C9 14     CONT8  CMP #$14      ;DELETE
+C1C6 F0 37            BEQ MOVLFT    ;JA, WEITER
+C1C8 C9 9D            CMP #$9D      ;CRSR LEFT
+C1CA F0 33            BEQ MOVLFT    ;JA, WEITER
+C1CC C9 1D            CMP #$1D      ;CRSR RIGHT
+C1CE F0 38            BEQ PASS      ;JA,AUSGABE PRUEFEN
+C1D0 C9 94            CMP #$94      ;INSERT
+C1D2 F0 28            BEQ INSER     ;JA,AUSGABE PRUEFEN
+C1D4 C9 91            CMP #$91      ;CRSR UP
+C1D6 F0 2A            BEQ CRSUP     ;JA,AUSGABE PRUEFEN
+C1D8 C9 13            CMP #$13      ;HOME
+C1DA F0 29            BEQ HOM       ;JA, AUSGABE
+C1DC C9 8C            CMP #$8C      ;F8
+C1DE F0 2B            BEQ VARINF    ;JA, VARIABLE HOLEN
+C1E0 C9 85            CMP #$85      ;F1-F7
+C1E2 B0 03            BCS CONT25    ;NICHT
+C1E4 4C EF C1         JMP CONT26    ;ANNEHMEN
+C1E7 C9 8C     CONT25 CMP #$8C
+C1E9 90 0B            BCC NOTACC
+C1EB C9 93            CMP #$93      ;CLR/HOME
+C1ED F0 16            BEQ HOM       ;JA, AUSGABE
+C1EF C9 11     CONT26 CMP #$11      ;CRSR DOWN
+C1F1 D0 1B            BNE CONT10    ;NEIN, WEITER
+C1F3 4C 3A C3         JMP CRSRDN    ;JA, AUSGABE TESTEN
+C1F6 20 A3 C4  NOTACC JSR SOUND     ;PIEPTON
+C1F9 4C 9B C1         JMP INLOOP    ;ZUR EINGABE
+C1FC 4C CA C2  INSER  JMP INSERT
+C1FF 4C 73 C2  MOVLFT JMP MOVLEF
+C202 4C 14 C3  CRSUP  JMP CRSRUP
+C205 4C 75 C3  HOM    JMP HOME
+C208 4C 4E C2  PASS   JMP PASSED
+C20B 4C C1 C4  VARINF JMP VARIN
+               ;
+               ;--------  INPUT-CODE PRUEFEN ----------
+               ;
+C20E AE 59 C0  CONT10 LDX CODE      ;CODE HOLEN
+C211 E0 41            CPX #$41      ;CODE = A
+C213 F0 26            BEQ ACCALL    ;JA, OK
+C215 C9 2E            CMP #$2E      ;ZEICHEN = .
+C217 F0 22            BEQ ACCALL    ;JA, OK
+C219 C9 2D            CMP #$2D      ;ZEICHEN = -
+C21B F0 1E            BEQ ACCALL    ;JA, OK
+C21D E0 5A            CPX #$5A      ;CODE = Z
+C21F F0 0F            BEQ ACCNUM    ;JA, NUR ZIFFERN
+C221 C9 20            CMP #$20      ;NEIN, BUCHSTABEN
+C223 F0 16            BEQ ACCALL    ;LEERZEICHEN ?, OK
+C225 C9 41            CMP #$41      ;ASCII &lt; 65 ?
+C227 90 CD            BCC NOTACC    ;JA, NICHT ERLAUBT
+C229 C9 5B            CMP #$5B      ;ASCII &lt; 91 ?
+C22B 90 0E            BCC ACCALL    ;JA, OK
+C22D 4C F6 C1         JMP NOTACC    ;NEIN,NICHT ERLAUBT
+C230 C9 30     ACCNUM CMP #$30      ;ASCII &lt; 48 ?
+C232 90 C2            BCC NOTACC    ;JA, NICHT ERLAUBT
+C234 C9 3A            CMP #$3A      ;ASCII &lt; 58 ?
+C236 90 03            BCC ACCALL    ;JA, OK
+C238 4C F6 C1         JMP NOTACC    ;NEIN,NICHT ERLAUBT
+               ;
+               ;------ ERLAUBTE ZEICHEN PRUEFEN -------
+               ;
+C23B AE 5B C0  ACCALL LDX ALLNUM    ;ANZAHL HOLEN
+C23E E0 00            CPX #$00      ;WENN 0
+C240 F0 C6            BEQ PASS      ;DANN OK
+C242 CA               DEX           ;ZAEHLER -1
+C243 DD 60 C0  CONT13 CMP ALLSTR,X  ;VERGLEICHEN
+C246 F0 06            BEQ PASSED    ;GLEICH ? AUSGABE
+C248 CA               DEX           ;ZAEHLER -1
+C249 10 F8            BPL CONT13    ;WENN NICHT DABEI
+C24B 4C F6 C1         JMP NOTACC    ;NICHT ERLAUBT
+               ;
+               ;---------------------------------------
+               ;   ALLE TESTS OK, ZEICHEN AUSGEBEN
+               ;---------------------------------------
+               ;
+C24E AE 55 C0  PASSED LDX COUNT     ;ZAEHLER HOLEN
+C251 EC 58 C0         CPX LENGTH    ;MIT LAENGE VERGL.
+C254 F0 0B            BEQ CONT14    ;GLEICH ?, WEITER
+C256 EE 55 C0         INC COUNT     ;SONST ZAEHLER + 1
+C259 AE 55 C0         LDX COUNT     ;NOCHMAL VERGL.
+C25C EC 58 C0         CPX LENGTH    ;WENN NICHT GLEICH
+C25F D0 09            BNE CAROUT    ;ZEICHEN AUSGEBEN
+C261 C9 1D     CONT14 CMP #$1D      ;CRSR RECHTS ?
+C263 F0 0B            BEQ CONT17    ;JA, NICHT MOEGLICH
+C265 20 16 E7         JSR OUTSCR    ;NEIN, AUSGEBEN
+C268 A9 9D            LDA #$9D      ;UND CURSOR EINE
+C26A 20 16 E7  CAROUT JSR OUTSCR    ;STELLE NACH RECHTS
+C26D 4C 9B C1         JMP INLOOP    ;ZUR EINGABE
+C270 4C F6 C1  CONT17 JMP NOTACC
+               ;
+               ;---------------------------------------
+               ;      CURSOR LINKS ODER DELETE
+               ;---------------------------------------
+               ;
+C273 AC 55 C0  MOVLEF LDY COUNT     ;ZAEHLER HOLEN
+C276 C0 00            CPY #$00      ;GLEICH 0 ?
+C278 F0 F6            BEQ CONT17    ;NEIN,NICHT ERLAUBT
+C27A CC 58 C0         CPY LENGTH    ;ZAEHLER = LAENGE
+C27D D0 1F            BNE CONT19    ;NEIN, WEITER
+C27F C9 9D            CMP #$9D      ;CRSR LINKS ?
+C281 D0 0D            BNE DELET     ;NEIN, DANN DELETE
+C283 AC 58 C0         LDY LENGTH    ;WENN LAENGE = 1
+C286 C0 01            CPY #$01
+C288 F0 38            BEQ LEN1      ;KEIN CURSOR LINKS
+C28A CE 55 C0         DEC COUNT     ;SONST ZAEHLER -1
+C28D 4C 9E C2         JMP CONT19    ;UND WEITER
+C290 CE 55 C0  DELET  DEC COUNT     ;ZAEHLER -1
+C293 AC 55 C0         LDY COUNT
+C296 AD 5C C0         LDA FIELDC    ;MARKIERUNGSZEICHEN
+C299 91 FD            STA ($FD),Y   ;ANST. DES LETZTEN
+C29B 4C 9B C1         JMP INLOOP    ;ZEICHENS, ZURUECK
+C29E CE 55 C0  CONT19 DEC COUNT     ;ZAEHLER -1
+C2A1 C9 9D            CMP #$9D      ;CURSOR LINKS ?
+C2A3 F0 C5            BEQ CAROUT    ;JA, DANN AUSGABE
+C2A5 B1 FB     DELETE LDA ($FB),Y   ;FARBE HOLEN
+C2A7 AA               TAX
+C2A8 B1 FD            LDA ($FD),Y   ;POSITION HOLEN
+C2AA 88               DEY           ;EINE STELLE ZURECK
+C2AB 91 FD            STA ($FD),Y   ;ZEICHEN AUSGEBEN
+C2AD 8A               TXA
+C2AE 91 FB            STA ($FB),Y   ;UND FARBE AUSGEBEN
+C2B0 C8               INY           ;ZAEHLER ERHOEHEN
+C2B1 C8               INY
+C2B2 CC 58 C0         CPY LENGTH    ;LAENGE GANZ DURCH?
+C2B5 90 EE            BCC DELETE    ;NEIN, NAECHSTES
+C2B7 88               DEY           ;ZEICH. VERSCHIEBEN
+C2B8 AD 5C C0         LDA FIELDC    ;JA, MARKIERUNG
+C2BB 91 FD            STA ($FD),Y   ;ANS ENDE SETZEN
+C2BD A9 9D     LEFOUT LDA #$9D      ;CURSOR LINKS
+C2BF 4C 6A C2         JMP CAROUT    ;AUSGEBEN, ZURUECK
+C2C2 A0 00     LEN1   LDY #$00      ;ZAEHLER FUER DEL
+C2C4 8C 55 C0         STY COUNT     ;ZURUECKSETZEN
+C2C7 4C F6 C1         JMP NOTACC
+               ;
+               ;---------------------------------------
+               ;               INSERT
+               ;---------------------------------------
+               ;
+C2CA AC 58 C0  INSERT LDY LENGTH    ;ZAEHLER = LAENGE
+C2CD CE 58 C0         DEC LENGTH    ;LAENGE - 1
+C2D0 88        CONT15 DEY           ;ZAEHLER -1
+C2D1 C0 FF            CPY #$FF      ;ZAEHLER UEBER 0 ?
+C2D3 F0 33            BEQ NOINST    ;JA, KEIN INSERT
+C2D5 CC 55 C0         CPY COUNT     ;FELD ZAEHLER= INS-
+C2D8 90 2E            BCC NOINST    ;ZAEHLER ?
+C2DA B1 FD            LDA ($FD),Y   ;WENN GROESSER
+C2DC CD 5C C0         CMP FIELDC    ;DANN INSERT
+C2DF F0 EF            BEQ CONT15
+C2E1 CC 58 C0         CPY LENGTH
+C2E4 F0 22            BEQ NOINST
+C2E6 B1 FB     NEXTIN LDA ($FB),Y   ;FARBE HOLEN
+C2E8 AA               TAX
+C2E9 B1 FD            LDA ($FD),Y   ;ZEICHEN HOLEN
+C2EB C8               INY           ;POSITION + 1
+C2EC 91 FD            STA ($FD),Y   ;ZEICHEN ZURUECK
+C2EE 8A               TXA
+C2EF 91 FB            STA ($FB),Y   ;FARBE ZURUECK
+C2F1 88               DEY
+C2F2 88               DEY
+C2F3 C0 FF            CPY #$FF      ;ALLE ZEICHEN ?
+C2F5 F0 05            BEQ CONT16    ;JA, DANN WEITER
+C2F7 CC 55 C0         CPY COUNT     ;NEIN, DANN
+C2FA B0 EA            BCS NEXTIN    ;NAECHSTES ZEICHEN
+C2FC C8        CONT16 INY
+C2FD AD 5C C0         LDA FIELDC    ;MARKIERUNGSZEICHEN
+C300 91 FD            STA ($FD),Y   ;ZWISCHEN 2 STRING-
+C302 EE 58 C0  NOTINS INC LENGTH    ;TEILE
+C305 4C 9B C1         JMP INLOOP    ;ZUR EINGABE
+C308 48        NOINST PHA           ;KEIN INSERT
+C309 8A               TXA
+C30A 48               PHA
+C30B 20 A3 C4         JSR SOUND     ;PIEPTON
+C30E 68               PLA
+C30F AA               TAX
+C310 68               PLA
+C311 4C 02 C3         JMP NOTINS    ;UND ZURUECK
+               ;
+               ;---------------------------------------
+               ;           CURSOR NACH OBEN
+               ;---------------------------------------
+               ;
+C314 AD 55 C0  CRSRUP LDA COUNT     ;FELDZAEHLER
+C317 38               SEC
+C318 E9 28            SBC #$28      ;- 40
+C31A 90 1B            BCC NOTUP     ;WENN &lt; 0 NICHT
+C31C AE 55 C0         LDX COUNT     ;MOEGLICH
+C31F EC 58 C0         CPX LENGTH    ;ZAEHLER = LAENGE
+C322 D0 0B            BNE CONT38    ;NEIN, WEITER
+C324 8D 55 C0         STA COUNT     ;FELDZAEHLER MERKEN
+C327 A9 1D            LDA #$1D      ;CURSOR RECHTS
+C329 20 16 E7         JSR OUTSCR    ;AUSGEBEN
+C32C 4C 32 C3         JMP CONT39
+C32F 8D 55 C0  CONT38 STA COUNT     ;FELDZAEHLER MERKEN
+C332 A9 91     CONT39 LDA #$91      ;CURSOR NACH OBEN
+C334 4C 6A C2         JMP CAROUT    ;AUSGEBEN
+C337 4C F6 C1  NOTUP  JMP NOTACC
+               ;
+               ;---------------------------------------
+               ;        CURSOR NACH UNTEN
+               ;---------------------------------------
+               ;
+C33A AD 58 C0  CRSRDN LDA LENGTH    ;WENN LAENGE = 40
+C33D C9 28            CMP #$28
+C33F F0 0F            BEQ CONT36    ;NICHT MOEGLICH
+C341 AD 55 C0         LDA COUNT
+C344 18               CLC           ;WENN FELDZAEHLER
+C345 69 28            ADC #$28      ;&gt; 255, DANN NICHT
+C347 B0 07            BCS CONT36    ;MOEGLICH
+C349 CD 58 C0         CMP LENGTH    ;WENN FELDZAEHLER=
+C34C F0 05            BEQ NOTOVE    ;LAENGE,1 POS LINKS
+C34E 90 0E            BCC DOWNOK    ;SONST OK
+C350 4C F6 C1  CONT36 JMP NOTACC
+C353 8D 55 C0  NOTOVE STA COUNT     ;FELDZAEHLER MERKEN
+C356 A9 9D            LDA #$9D      ;CRSR LINKS
+C358 20 16 E7         JSR OUTSCR    ;AUSGEBEN
+C35B 4C 61 C3         JMP CONT21    ;WEITER
+C35E 8D 55 C0  DOWNOK STA COUNT
+C361 A9 11     CONT21 LDA #$11      ;CURSOR NACH UNTEN
+C363 20 16 E7         JSR OUTSCR    ;AUSGEBEN
+C366 AE 58 C0         LDX LENGTH    ;WENN LETZTES FELD,
+C369 CA               DEX           ;FELDZAEHLER
+C36A EC 55 C0         CPX COUNT     ;KORRIGIEREN
+C36D D0 03            BNE CONT37
+C36F EE 55 C0         INC COUNT
+C372 4C 9B C1  CONT37 JMP INLOOP    ;ZUR EINGABESCHL.
+               ;
+               ;---------------------------------------
+               ;               HOME
+               ;---------------------------------------
+               ;
+C375 48        HOME   PHA           ;ZEICHEN MERKEN
+C376 AC 55 C0         LDY COUNT     ;FELDZAEHLER= 0
+C379 F0 0E            BEQ CONT24    ;JA, DANN WEITER
+C37B CC 58 C0         CPY LENGTH    ;WENN FELDZAEHLER
+C37E D0 01            BNE CONT30    ;= LAENGE, DANN
+C380 88               DEY           ;FELDZAEHLER -1
+C381 A9 9D     CONT30 LDA #$9D      ;CURSOR LINKS BIS
+C383 20 D2 FF         JSR BSOUT     ;ZUR ANFANGSPOSIT.
+C386 88               DEY           ;AUSGEBEN
+C387 D0 F8            BNE CONT30    ;WENN &gt;0 WEITER
+C389 68        CONT24 PLA           ;ZEICHEN HOLEN
+C38A C9 93            CMP #$93      ;CLR/HOME ?
+C38C F0 0A            BEQ CLRHOM    ;JA, WEITER
+C38E C9 FF            CMP #$FF      ;HOME NACH ALTE
+C390 F0 03            BEQ VARIIN    ;VARIABLE INS FELD
+C392 4C 96 C1         JMP RSTART    ;ZUR EINGABESCHL.
+C395 4C C6 C4  VARIIN JMP CONT11
+               ;
+               ;---------------------------------------
+               ;             CLR/HOME
+               ;---------------------------------------
+               ;
+C398 AC 58 C0  CLRHOM LDY LENGTH    ;ZAEHLER = LAENGE
+C39B AD 5C C0  CONT32 LDA FIELDC    ;ALLE ZEICHEN DURCH
+C39E C9 64            CMP #$64      ;MARKIERUNGSZEICHEN
+C3A0 D0 02            BNE CONT31
+C3A2 A9 A4            LDA #$A4
+C3A4 20 D2 FF  CONT31 JSR BSOUT     ;ERSETZEN
+C3A7 88               DEY
+C3AB D0 F1            BNE CONT32    ;UND CURSOR
+C3AD A9 13            LDA #$13
+C3AC 48               PHA
+C3AD AC 58 C0         LDY LENGTH    ;NACH HOME
+C3B0 4C B1 C3         JMP CONT30    ;BRINGEN
+C3B3 4C 96 C1  RESTAR JMP RSTART    ;ZUR EINGABESCHL.
+               ;
+               ;---------------------------------------
+               ;    AUSLESE DER MARKIERUNGSZEICHEN
+               ;---------------------------------------
+               ;
+C3B6 AC 58 C0  TAKEVA LDY LENGTH    ;ZAEHLER= LAENGE
+C3B9 4C C0 C3         JMP BCKPRT    ;MARKIERUNGSZEICHEN
+C3BC A9 20     ELIMIN LDA #$20      ;AM ENDE DURCH LEER
+C3BE 91 FD            STA ($FD),Y   ;-ZEICHEN ERSETZEN
+C3C0 88        BCKPRT DEY
+C3C1 C0 FF            CPY #$FF
+C3C3 F0 07            BEQ CONT34    ;LAENGE ERREICHT,
+C3C5 B1 FD            LDA ($FD),Y
+C3C7 CD 5C C0         CMP FIELDC
+C3CA F0 F0            BEQ ELIMIN
+C3CC C8        CONT34 INY
+C3CD 8C 58 C0         STY LENGTH    ;NEUE LAENGE MERKEN
+C3D0 AC 58 C0  MKSPAC LDY LENGTH    ;UND MARKIERUNG
+C3D3 88        MAKSPC DEY           ;ZWISCHEN ANDEREN
+C3D4 C0 FF            CPY #$FF
+C3D6 F0 0E            BEQ TAKVAR    ;FERTIG,ZU VARIABLE
+C3D8 B1 FD            LDA ($FD),Y   ;ZEICHEN HOLEN
+C3DA CD 5C C0         CMP FIELDC    ;MARKIERUNG ?
+C3DD D0 F4            BNE MAKSPC
+C3DF A9 20            LDA #$20
+C3E1 91 FD            STA ($FD),Y   ;JA, ERSETZEN
+C3E3 4C D3 C3         JMP MAKSPC    ;UND WEITER
+
+               ;
+               ;---------------------------------------
+               ;  VARIABLE ERSTELLEN + STRING KOPIEREN
+               ;---------------------------------------
+               ;
+C3E6 AE 5A C0  TAKVAR LDX COLOR     ;FARBE ZURUECK
+C3E9 8E 86 02         STX CURCOL
+C3EC AE 58 C0         LDX LENGTH    ;WENN NEUE LAENGE 0
+C3EF F0 4B            BEQ CONT29    ;KEINE VARIABLE
+C3F1 20 A3 B6         JSR FRESTR    ;AUSWERTUNG DES
+C3F4 AD 5F C0         LDA VARADH    ;STRINGAUSDRUCKS
+C3F7 85 65            STA $65       ;ZEIGER AUF
+C3F9 AD 5E C0         LDA VARADL    ;STRINGDESCRIPTOR
+C3FC 85 64            STA $64
+C3FE AD 58 C0         LDA LENGTH
+C401 20 75 B4         JSR STRPOI    ;BERECHNET STRZEIG.
+C404 84 FB            STY $FB       ;STRZEIGER KOPIEREN
+C406 A0 00            LDY #$00
+C408 91 64            STA ($64),Y   ;LAENGE
+C40A C8               INY
+C40B 8A               TXA
+C40C 91 64            STA ($64),Y   ;ADRESSE LOW
+C40E C8               INY
+C40F A5 FB            LDA $FB
+C411 91 64            STA ($64),Y   ;ADRESSE HIGH
+C413 A0 01            LDY #$01
+C415 B1 64            LDA ($64),Y
+C417 48               PHA
+C418 C8               INY
+C419 B1 64            LDA ($64),Y   ;ADR DES STRING
+C41B 85 65            STA $65       ;NACH $64/$65
+C41D 68               PLA
+C41E 85 64            STA $64
+
+               ;
+               ;---------------------------------------
+               ;     STING IN VARIABLE EINLESEN
+               ;---------------------------------------
+               ;
+C420 AC 58 C0         LDY LENGTH    ;ZAEHLER = LAENGE
+C423 88        READIN DEY
+C424 B1 FD            LDA ($FD),Y   ;ZEICHEN LESEN
+C426 29 7F            AND #$7F      ;BILDSCHIRMCODE
+C428 C9 20            CMP #$20      ;NACH ASCII
+C42A 90 19            BCC CONT40    ;WANDELN
+C42C C9 40            CMP #$40
+C42E 90 06            BCC STOVAR
+C430 C9 60            CMP #$60
+C432 90 15            BCC CONT41
+C434 69 3F            ADC #$3F      ;UND NACH ADR AUS
+C436 91 64     STOVAR STA ($64),Y   ;$64/$65 SCHREIBEN
+C438 C0 00            CPY #$00      ;ALLES GELESEN
+C43A D0 E7            BNE READIN    ;NEIN, WEITER
+C43C AE 56 C0  CONT29 LDX CRSLIN    ;JA, CURSOR SETZEN
+C43F 20 0C E5         JSR CURSOR    ;UND ZURUECK ZUR
+C442 4C AE A7         JMP INTERP    ;INTERPRETERSCHL.
+               ;---------------------------------------
+C445 09 40     CONT40 ORA #$40      ;BILDSCHIRM
+C447 D0 ED            BNE STOVAR    ;NACH
+C449 09 20     CONT41 ORA #$20      ;ASCII
+C44B D0 E9            BNE STOVAR
+               ;
+               ;***************************************
+               ;---------------------------------------
+               ;     AUF NEUEN PRINT-BEFEHL PRUEFEN
+               ;---------------------------------------
+               ;
+C44D 20 73 00  PRINT  JSR CHRGET    ;ZEICHEN HOLEN
+C450 C9 B1            CMP #$B1      ;&gt; ?
+C452 F0 06            BEQ ACCPRI    ;JA, NEUER BEFEHL
+C454 20 A0 AA         JSR BPRINT    ;SONST BASIC-PRINT
+C457 4C AE A7         JMP INTERP    ;INTERPRETERSCHL.
+               ;
+               ;---------------------------------------
+               ;         NEUER PRINT-BEFEHL
+               ;---------------------------------------
+               ;
+C45A 20 9B B7  ACCPRI JSR GETBYT    ;CURSORPOSITION
+C45D 8A               TXA           ;HOLEN, SIEHE
+C45E 38               SEC           ;INPUT-BEFEHL
+C45F E9 01            SBC #$01
+C461 C9 19            CMP #$19      ;&gt; 25
+C463 B0 0F            BCS CRSNO2
+C465 48               PHA
+C466 20 FD AE         JSR CKCOM
+C469 20 9E B7         JSR GETBY
+C46C 8A               TXA
+C46D 38               SEC
+C46E E9 01            SBC #$01
+C470 C9 28            CMP #$28      ;&gt; 40
+C472 90 03            BCC CRSOK2
+C474 4C 48 B2  CRSNO2 JMP ILQUAN
+C477 A8        CRSOK2 TAY
+C478 68               PLA
+C479 AA               TAX
+C47A 20 0C E5         JSR CURSOR    ;CURSOR SETZEN
+               ;
+               ;---------------------------------------
+               ;    FARBE HOLEN ODER TEXT AUSGEBEN
+               ;---------------------------------------
+               ;
+C47D AD 86 02         LDA CURCOL    ;AKTUELLE FARBE
+C480 8D 5A C0         STA COLOR     ;MERKEN
+C483 20 FD AE         JSR CKCOM     ;KOMMA ?
+C486 C9 39            CMP #$39      ;ASCII &lt; 57 ?
+C488 B0 0D            BCS PRICOM    ;NEIN, DANN PRINT
+C48A C9 2F            CMP #$2F      ;ASCII &gt; 47 ?
+C48C 90 09            BCC PRICOM    ;NEIN, DANN PRINT
+C48E 20 9E B7         JSR GETBY     ;JA, BYTE-WERT
+C491 BE 86 02         STX CURCOL    ;HOLEN + SPEICHERN
+C494 20 FD AE         JSR CKCOM     ;KOMMA ?
+C497 20 A0 AA  PRICOM JSR BPRINT    ;BASIC PRINT-BEFEHL
+C49A AD 5A C0         LDA COLOR     ;FARBE WIEDER
+C49D 8D 86 02         STA CURCOL    ;ZURUECKSTELLEN UND
+C4A0 4C AE A7         JMP INTERP    ;INTERPRETERSCHL.
+               ;
+               ;---------------------------------------
+               ;               PIEPTON
+               ;---------------------------------------
+               ;
+C4A3 A2 41     SOUND  LDX #$41      ;WELLENFORM 65
+C4A5 8E 04 D4         STX $D404     ;SETZEN
+C4A8 A2 90            LDX #$90      ;ZAEHLER SETZEN
+C4AA 86 02            STX $02       ;UND HERUNTER
+C4AC CA        LOOP   DEX           ;ZAEHLEN
+C4AD D0 FD            BNE LOOP
+C4AF C6 02            DEC $02
+C4B1 F0 05            BEQ OFF
+C4B3 A2 FF            LDX #$FF
+C4B5 4C AC C4         JMP LOOP
+C4B8 A2 00     OFF    LDX #$00      ;WELLENF. LOESCHEN
+C4BA 8E 04 D4         STX $D404
+C4BD 60               RTS           ;ZURUECK
+C4BE 4C 96 C1  NOVAR  JMP RSTART
+               ;
+               ;---------------------------------------
+               ;     ALTE VARIABLE INS FELD GEBEN
+               ;---------------------------------------
+               ;
+C4C1 A9 FF     VARIN  LDA #$FF      ;CURSOR NACH HOME
+C4C3 4C 75 C3         JMP HOME
+C4C6 A0 00     CONT11 LDY #$00      ;ZAEHLER = 0
+C4C8 B1 47     CONT12 LDA ($47),Y   ;STRING-DESCRIPTOR
+C4CA 99 61 00         STA $61,Y     ;NACH $61-$63 KOP.
+C4CD C8               INY           ;ZAEHLER +1
+C4CE C0 03            CPY #$03
+C4D0 D0 F6            BNE CONT12
+C4D2 A5 61            LDA $61       ;LAENGE DES ALTEN
+C4D4 CD 58 C0         CMP LENGTH    ;STR MIT DER DES
+C4D7 90 03            BCC CONT9     ;FELDES VERGLEICHEN
+C4D9 AD 58 C0         LDA LENGTH    ;ZU LANG,DANN FELD-
+C4DC 8D 5D C0  CONT9  STA OUTNUM    ;LAENGE ALS ZAEHLER
+C4DF A0 00            LDY #$00
+C4E1 C9 00            CMP #$00      ;FELD-LAENGE=0 ?
+C4E3 F0 D9            BEQ NOVAR     ;NICHTS INS FELD
+C4E5 B1 62     STROUT LDA ($62),Y   ;VARIABLE LESEN UND
+C4E7 C9 20            CMP #$20      ;LEERZEICHEN DURCH
+C4E9 D0 07            BNE CONT18
+C4EB AD 5C C0         LDA FIELDC    ;MARKIERUNGSZEICHEN
+C4EE 91 FD            STA ($FD),Y   ;ERSETZEN
+C4F0 A9 1D            LDA #$1D      ;CURSOR RECHTS
+C4F2 20 D2 FF  CONT18 JSR BSOUT     ;AUSGEBEN
+C4F5 C8               INY
+C4F6 18               CLC
+C4F7 CC 5D C0         CPY OUTNUM    ;GANZE VARIABLE ?
+C4FA B0 03            BCS FILSPC    ;JA,REST AUFFUELLEN
+C4FC 4C E5 C4         JMP STROUT    ;NEIN, WEITER
+C4FF AD 5C C0  FILSPC LDA FIELDC    ;RESTLICHE LAENGE
+C502 CC 58 C0  CONT4  CPY LENGTH    ;MIT MARKIERUNGS-
+C505 B0 06            BCS ALLOUT    ;ZEICHEN
+C507 91 FD            STA ($FD),Y   ;AUFFUELLEN
+C509 C8               INY
+C50A 4C 02 C5         JMP CONT4
+C50D AC 5D C0  ALLOUT LDY OUTNUM    ;UND CURSOR
+C510 A9 9D     CONT35 LDA #$9D      ;WIEDER
+C512 20 D2 FF         JSR BSOUT     ;NACH HOME
+C515 88               DEY           ;BRINGEN
+C516 C0 00            CPY #$00
+C518 D0 F6            BNE CONT35
+C51A 4C 96 C1         JMP RSTART    ;ZUR EINGABESCHL.</pre>
                 <figcaption>Listing 2. Das ausführlich kommentierte Quell-Code-Listing des »Exinput 64«</figcaption>
             </figure>
     </article>
