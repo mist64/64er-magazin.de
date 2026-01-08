@@ -23,6 +23,11 @@
 
         <p>Die letzte Folge hatten wir beendet mit der Aussicht, in die einfachen Verzögerungsschleifen nun die Würze von Aufgaben einzubauen. Ein kleines Basic-Programm, das Sie vielleicht verlockt hat, die Entsprechung in Assembler zu schreiben, sollte 128 bunte Zeichen auf den Bildschirm zaubern. Haben Sie es versucht? Wenn ja, dann vergleichen Sie Ihr Ergebnis doch mal mit Listing 1.</p>
 
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 1. Unser Beispiel 1 in Assembler: Bunte Zeichen </figcaption>
+        </figure>
+
         <p>In den Zeilen 30, 40 und 160, 170 sehen Sie die Anwendung eines weiteren Pseudobefehls. Das .EQ bewirkt, daß eine bestimmte Speicherstelle mit einem Namen versehen werden kann. Im folgenden braucht man sich nur noch den Namen zu merken, der auch am Ende in der Symboltabelle mit ausgegeben wird. Dadurch wird man bis zu einem gewissen Grad sogar systemunabhängig. Um beispielsweise dieses Programm auf einem VC 20 in der Grundversion laufen zu lassen, muß in Zeile 30 der SCREEN-Wert auf $lE00 und in Zeile 40 der COLOR-Wert auf $9600 geändert werden.</p>
 
         <p>Bevor Sie durch G 5000 aus dem Monitor heraus das Programm starten, löschen Sie am besten zuerst den Bildschirm und fahren den Cursor in eine mittlere Bildschirmzeile, damit er dem Ergebnis des Programmes nicht ins Gehege kommt. Das Programm läuft natürlich auch auf dem C 128 (im C 128-Modus). Allerdings werden hier die Zeichen nur einfarbig, weil man zum Beschreiben des Bildschirmfarbspeichers (mit STA COLOR,Y) noch die Bank umschalten muß, was hier nicht getan wird.</p>
@@ -46,15 +51,35 @@
 
         <p>Listing 2 zeigt nun das Äquivalent dazu in Assembler.</p>
 
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 2. Ein schneller Flitzer: Beispiel 2</figcaption>
+        </figure>
+
         <p>In den Zeilen 30 bis 80 finden Sie wieder den Pseudobefehl .EQ. Mit diesem werden außer den bisher schon besprochenen Speicherstellen (Zeile, Spalte, CSET und BSOUT) auch noch zwei Zähler kreiert: COUNTZ (Zeilerzähler) und COUNTS (Spaltenzähler). Was soll das, werden Sie fragen, warum verwendet man nicht direkt ZEILE und SPALTE? Die Ursache liegt darin, daß BSOUT ebenfalls diese Speicherstellen benutzt und daher keine richtige Zählung mehr stattfinden kann. So zählt $FA und $FB und jedesmal vor Aufruf von CSET wird deren Inhalt in ZEILE und SPALTE übertragen. Wir brauchen natürlich nur einen Zähler für diese Schleife. COUNTS läuft nur nebenher und könnte eigentlich auch in den Schleifenteil »Verarbeitung« geschrieben werden. Die Abbruchoperation in Zeile 480 prüft nur COUNTZ. Mehr Kommentar finden Sie direkt im Listing.</p>
 
         <p>So, nun starten Sie mal das Programm nach dem Assemblieren aus dem Monitor mit G 5000! Sie meinen, da passiert ja gar nichts? Ich kann Ihnen beweisen, daß doch etwas passiert — nur so immens schnell, daß wir nichts davon sehen. Verändern Sie doch mal in Zeile 400 das #$20 (Leerzeichen) zu #$lC (Farbe Rot). Das können Sie auch schnell aus dem Monitor her erreichen durch M 5033 — dort finden Sie am Anfang die 20 — und überschreiben durch lC ((RETURN)). Wenn Sie nun starten, wird der Ball nicht mehr gelöscht, sondern nur rot gefärbt. Wir erhalten die Diagonale aus roten Bällen. Es geht also doch!</p>
 
         <p>Wir müssen daher das ganze etwas verlangsamen. Dazu ist schon eine Stelle vorgesehen: In Zeile 340 befindet sich ein gänzlich unmotiviertes NOP-Kommando. Dorthin packen wir nun eine Verzögerungsschleife und es ergibt sich Listing 3.</p>
 
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 3. Flitzer mit kleinem Handicap</figcaption>
+        </figure>
+
         <p>In die Zeilen 335 bis 345 haben wir die Version 6, mit dem Y-Register als Zähler eingefügt. Ein erneuter Start nach dem Assemblieren zeigt uns ein kurzes weißes Aufflackern (falls Sie die Farbe Rot wieder gegen #$20 ausgetauscht haben!). Das war also immer noch zu schnell! Also bauen wir noch eine Verzögerungsschleife ein (Zeilen 346 bis 348 in Listing 4).</p>
 
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 4. Der doppelt zögernde Flitzer</figcaption>
+        </figure>
+
         <p>Nun sehen wir schon ein wenig mehr, aber wir können uns vorstellen, daß es reichlich ungelenk wäre, nun noch eine dritte, vierte,&hellip; Verzögerung einzubauen. Es gibt noch einen anderen Weg, nämlich einfach zwei Verzögerungen ineinander zu verschachteln. Das ist schließlich in Listing 5 geschehen und wenn Sie das nach der Assemblierung starten, dann gehts hübsch langsam. Immerhin wird die innere Schleife 255 x 255mal durchlaufen. Jedesmal nämlich, wenn wir X bis 0 heruntergezählt haben, wird Y dekrementiert und X wieder mit #$FF beladen. Das geht so lange, bis auch Y auf Null heruntergezählt wurde. Wenn Sie in Zeile 332 statt # $FF einen kleineren Startwert eingeben (geht wieder ganz gut vom Monitor aus), läuft der Ball schneller. Damit haben Sie die Geschwindigkeit völlig im Griff.</p>
+
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 5. Der Flitzer ist voll unter Kontrolle</figcaption>
+        </figure>
 
         <p>Außerdem haben wir auf diese Weise die einfachen 8-Bit-Schleifen verlassen, denn diese Verzögerung ist schon eine 16-Bit-Schleife. Auf die und auf die im Listing 2 verwendeten Firmwareroutinen kommen wir nun zu sprechen.</p>
 
@@ -124,11 +149,26 @@
 
         <p>Bevor wir uns an diese schwierigeren Sachen wagen, wollen wir uns aber noch ein wenig mit Fragen der Schleifenstruktur befassen. Zunächst kann nur relativ selten auf die beiden Indexregister als Zähler zurückgegriffen werden. Man muß meistens zwei Speicherstellen dazu verwenden. Außerdem kann man natürlich ebensogut in den Schleifen aufwärts zählen. Das soll im folgenden Beispiel beides geschehen, wo wir den Bildschirminhalt invertieren wollen. Das geschieht einfach durch Setzen des Bit 7 des Codes in jeder Bildschirmspeicherstelle (wir machen das durch EOR $80). Das hat den Vorzug, daß ein zweiter Durchlauf des Programmes wieder den Ausgangszustand des Bildschirmes herstellt. Zuerst sollen Sie eine etwas schwerfällige, aber überschaubare Form des Programmes kennenlernen (Listing 6):</p>
 
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 6. Invertieren des Bildschirms</figcaption>
+        </figure>
+
         <p>Hier wurden — auf höchst plumpe Weise — vier ganze Pages bearbeitet. Eine andere Lösung wäre es, anstelle von $FA in der Zeile 4010 das Y-Register zu erhöhen (mittels INY). Es würde dann sowohl als Index als auch als Zähler dienen. (In unserer Version hatte esja nur eine Alibifunktion für die spezielle Art der Adressierung der Bildschirmspeicherzellen). Eleganter kann das Problem gelöst werden mit einer Technik, die Florian Müller in seinem Artikel »Effektives Programmieren in Assembler« (64’er Sonderheft 8, 1985, S.22) vorstellt. Dabei werden $FA und $FB nicht mehr als Zähler verwendet, sondern dem Y-Register kommt wieder die Doppelfunktion zu als Index und als Zähler der inneren Schleife. Das X-Register ist Zähler der äußeren Schleife. In der inneren wird Y hoch-, in der äußeren Schleife X heruntergezählt. Das Ergebnis davon ist: Das Programm wird kürzer und auch schneller (Listing 7).</p>
+
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 7. Verbesserte Form von Listing 6</figcaption>
+        </figure>
 
         <p>Es stört uns immer noch manchmal, daß wir — statt nur bis $07E7 (denn das ist dezimal 2023) — bis $07FF invertieren. Bevor wir in der nächsten Folge die oben erwähnte Variante ergründen, die in der BLTUC-Routine verwendet wird, soll Ihnen noch eine weitere Möglichkeit vorgestellt werden, die im SMON und neuerdings auch von F. Müller (siehe oben) gezeigt worden ist. Da geht’s recht trickreich zu.</p>
 
         <p>Wieder wird pro forma das Indexregister Y initialisiert wegen der speziellen Art der Adressierung (Listing 8).</p>
+
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 8. Die trickreichste Version</figcaption>
+        </figure>
 
         <p>Natürlich wird diese Doppelschleife durch die ständigen Rechnungen im Steuerteil relativ langsam, weshalb es doch lohnt, auch andere Wege zu untersuchen.</p>
 

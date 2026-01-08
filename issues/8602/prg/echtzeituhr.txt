@@ -1,0 +1,67 @@
+
+
+;echtzeituhr.prg ==0801==
+  110 rem *    beispielprogramm zur    *
+  120 rem *   nutzung der echtzeituhr  *
+  140 cia = 56576:rem basisadresse cia #2
+  150 rem 50 hertz netzfrequenz
+  160 poke cia+15,peek(cia+15) or 128
+  170 print "alarmzeit setzen"
+  180 gosub 1000
+  190 gosub 2000
+  200 rem alarmzeitflag
+  210 poke cia + 15,peek (cia+15) or 128
+  220 gosub 3000
+  230 print "uhrzeit setzen"
+  240 gosub 1000
+  250 gosub 2000
+  260 rem uhrzeitflag
+  270 poke cia + 15,peek (cia+15) and 127
+  280 gosub 3000
+  290 gosub 4000
+  300 print chr$ (147)
+  310 print h;":";m;":";s;",";z
+  320 rem alarm ?
+  330 a = peek (cia+13)
+  340 poke cia+13,a
+  350 if (a and 4) = 0 goto 290
+  360 for i=0 to 20:print "alarm":next
+  370 end
+ 1000 rem eingabe
+ 1010 input"0 = am  1 = pm ";fl
+ 1020 if fl <> 0 and fl <> 1 then 1010
+ 1030 input"std.,min.,sek.,1/10 sek";h,m,s,z
+ 1040 return
+ 1050 return
+ 2000 rem umrechnung in bcd-format
+ 2010 h1=int (h/10)
+ 2020 h2 = h - h1*10
+ 2030 h = h1*16 + h2
+ 2040 m1 = int (m/10)
+ 2050 m2 = m - m1*10
+ 2060 m = m1*16 + m2
+ 2070 s1 = int (s/10)
+ 2080 s2 = s - s1*10
+ 2090 s = s1*16 + s2
+ 2100 return
+ 3000 rem register setzen
+ 3010 h = h + fl * 128:rem am/pm
+ 3020 poke cia + 11,h
+ 3030 poke cia + 10,m
+ 3040 poke cia + 9,s
+ 3050 poke cia + 8,z
+ 3060 return
+ 4000 rem register lesen
+ 4010 h = peek (cia+11)
+ 4020 fl = (h and 128)/ 128 * 12
+ 4030 h1 = (h and 16) / 16 * 10
+ 4040 h = h1 + fl + (h and 15)
+ 4050 m = peek (cia+10)
+ 4060 m1 = (m and 112) / 16 * 10
+ 4070 m = m1 + (m and 15)
+ 4080 s = peek (cia+9)
+ 4090 s1 = (s and 112) / 16 * 10
+ 4100 s = s1 + (s and 15)
+ 4110 z = peek (cia+8) and 15
+ 4120 return
+

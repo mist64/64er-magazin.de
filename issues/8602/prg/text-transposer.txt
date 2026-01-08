@@ -1,0 +1,154 @@
+
+
+;text-transposer.prg ==0801==
+60000 rem *****************************
+60010 rem **     text-transposer     **
+60020 rem **(vizawrite/startexter/sm)**
+60030 rem **   m.schacht (c) 1985    **
+60040 rem *****************************
+60050 :
+60060 printchr$(147):poke788,52:rem run/stop blockieren
+60070 an=32:en=78:rem lb/hb basic-ende=anfang textspeicher
+60080 zs=20000:ta=50000:rem adressen zwischenspeicher/tabelle
+60090 poke53280,0:poke53281,0
+60100 fori=1to38:bl$=bl$+chr$(32):bs$=bs$+chr$(163):next
+60110 gosub61220:gosub61300:rem datas einlesen
+60120 poke250,80:poke251,195:sys927:rem tabelle vorbelegen
+60130 :
+60140 rem ---------------menue/abfragen
+60150 po=4:az=18:gosub60690:printchr$(159)chr$(14)chr$(8):poke214,1:print
+60160 printchr$(18)left$(bl$,14);"Text-Editor";left$(bl$,13):printbl$:printbs$
+60170 poke214,22:print:printchr$(18)left$(bl$,13);"mit _ zurueck";left$(bl$,12)
+60180 poke214,8:print:fori=0to1:printme$(i):print:next
+60190 poke198,0:wait198,1:getx$:ifx$="_"thenprintchr$(147):poke788,49:end
+60200 ifasc(x$)<65orasc(x$)>66then60190
+60210 poke214,2:print:printtab(2)right$(me$(asc(x$)-65),34)
+60220 on(asc(x$)-64)gosub60420,60510
+60230 po=4:az=18:gosub60690:goto60150
+60240 :
+60250 rem ---------------file editieren
+60260 poke214,20:print:printchr$(18)"einzeln oder komplett editieren (e/k)?"
+60270 poke198,0:wait198,1:getx$:ifx$<>"e"andx$<>"k"andx$<>"_"then60270
+60280 ifx$="_"then run 60070
+60290 poke788,49:poke49155,0:ifx$="e"thenpoke49155,1:rem flag
+60300 :
+60310 rem......schleife anfang.........
+60320 printchr$(147):poke214,0:sys58640
+60330 sys864:rem codewandlung und print
+60340 an=peek(5)+peek(250)+1:en=peek(251):ifan>255thenan=an-256:en=en+1
+60350 poke250,an:poke251,en:rem neue anfangsadresse
+60360 poke631,19:poke632,13:poke633,13:poke634,13:poke198,4:ifpeek(49155)=1thenpoke198,2
+60370 ifpeek(214)>2andpeek(1104)<>32thenpoke198,2:poke214,3:poke211,0:print:print"kuerzen!?"
+60380 printchr$(18)"run 60320":end
+60390 rem.....schleife ende............
+60400 :
+60410 rem --------------(a)-prg => text
+60420 po=8:az=3:gosub60690:poke214,4:print
+60430 printtab(4)chr$(28)me$(5):printme$(6)chr$(34)me$(7)chr$(34);me$(8)
+60440 printme$(9)chr$(159):printbs$
+60450 poke214,6:print:gosub60580:ift$="_"thenreturn
+60460 gosub61080:rw$="r":ad=828:gosub61140:ifn$="_"thenreturn
+60470 poke214,19:print:onval(t$)gosub60720,60840,60950
+60480 rw$="w":ad=885:gosub61140:run 60070
+60490 :
+60500 rem --------------(b)-text => prg
+60510 po=8:az=3:gosub60690
+60520 gosub60580:ift$="_"thenreturn
+60530 poke214,19:print:onval(t$)gosub60770,60890,61020
+60540 rw$="r":poke936,96:ad=828:gosub61140:poke936,234:ifn$="_"thenreturn
+60550 goto60260:rem editieren
+60560 :
+60570 rem-----------------------auswahl
+60580 poke214,8:print:fori=2to4:print:printtab(12)me$(i):next
+60590 poke198,0:wait198,1:gett$:ift$="_"thenreturn
+60600 ifasc(t$)<49orasc(t$)>51 then60590
+60610 poke214,val(t$)*2+7:print:printtab(12)chr$(18)me$(val(t$)+1):return
+60620 :
+60630 rem -----------------------fehler
+60640 input#15,fe,fe$:iffe=0thenreturn
+60650 poke214,20:print:printtab(19)chr$(28)left$(fe$+bl$,19)chr$(159)
+60660 fori=0to2000:next:po=19:az=3:gosub60690:poke214,po:print:return
+60670 :
+60680 rem ---------teilbereich loeschen
+60690 poke214,po:print:forq=1toaz:printbl$:next:return
+60700 :
+60710 rem -----------(a)-parameter-viza
+60720 f$="s":an=32:en=78
+60730 poketa+34,191
+60740 return
+60750 :
+60760 rem -----------(b)-parameter-viza
+60770 f$="p":poke985,96:rem prg-file/flag
+60780 fori=0to31:poketa+i,i+64:poketa+65+i,i+97:next
+60790 poketa+220,13:poketa+127,34
+60800 poke250,an+23:poke251,en+1:rem bytes ueberlesen
+60810 return
+60820 :
+60830 rem -----------(a)-parameter-star
+60840 f$="p":an=184:en=78
+60850 poketa+95,163:poketa+13,95
+60860 return
+60870 :
+60880 rem -----------(b)-parameter-star
+60890 f$="p":poke985,234
+60900 poketa+95,13:poketa+163,95
+60910 poke250,an+2:poke251,en:rem bytes ueberlesen
+60920 return
+60930 :
+60940 rem -----------(a)-parameter---sm
+60950 f$="s":an=15:en=78
+60960 nn$=">.............000"
+60970 fori=1to17:pokezs-18+i,asc(mid$(nn$,i,1)):next
+60980 poketa+34,191
+60990 return
+61000 :
+61010 rem -----------(b)-parameter---sm
+61020 f$="s":poke985,96:rem seq-file/flag
+61030 poketa+191,34
+61040 poke250,an+19:poke251,en:rem bytes ueberlesen
+61050 return
+61060 :
+61070 rem --------(a)-all.parameter-prg
+61080 f$="p":an=32:en=78
+61090 ift$="1"ort$="3"thenpoke936,96
+61100 ift$="2"thenpoke936,234
+61110 return
+61120 :
+61130 rem ---------file lesen/schreiben
+61140 w$="<load> ":ifrw$="w"thenw$="<save> "
+61150 poke214,19:print:print:printw$;:input"file-name:";n$:ifn$="_"thenreturn
+61160 open15,8,15:open2,8,2,"@:"+n$+","+f$+","+rw$:gosub60640
+61170 iffe<>0thenclose2:close15:goto61140
+61180 poke3,an:poke4,en:sys ad:poke214,21:print:printbs$
+61190 close2:close15:return
+61200 :
+61210 rem ------------------datas menue
+61220 fori=0to9:readme$(i):next:return
+61230 data "(a) prg-file  in  textprg-file wandeln"
+61240 data "(b) textprg-file in basic-file wandeln"
+61250 data "(1) Vizawrite ","(2) StarTexter ","(3) SM - Text "
+61260 data "prg-file zuvor abspeichern mit","open8,8,8,","name,p,w"
+61270 data ":cmd8:list:print#8","close8"
+61280 :
+61290 rem ------datas maschinenroutinen
+61300 ifpeek(828)=162thenreturn:rem bereits eingelesen
+61310 fori=0to170:readdt:poke828+i,dt:next:return
+61320 data162,2,32,198,255,160,0,32,207,255,32,168,3,145,3,230,3,208,2,230,4
+61330 data36,144,80,238,165,3,133,5,165,4,133,6,76,204,255,160,0,177,250,170
+61340 data189,80,195,32,210,255,201,13,240,106,200,132,5,208,238,96,162,2,32
+61350 data201,255,198,1,160,0,56,165,3,229,5,165,4,229,6,176,17,177,3,170,189
+61360 data80,195,32,210,255,230,3,208,232,230,4,208,228,230,1,76,204,255,160
+61370 data0,152,145,250,200,208,250,96,234,232,201,13,240,1,96,145,3,224,82,240
+61380 data13,176,16,169,32,232,230,3,208,241,230,4,208,237,162,2,96,145,3,224
+61390 data162,240,11,169,32,232,230,3,208,243,230,4,208,239,162,2,96,96,200,177
+61400 data250,201,32,240,1,96,132,5,76,218,3
+61410 :
+61490 rem -----------------prg loeschen
+61500 printchr$(147);tab(7)"Text-Editor loeschen (j/n)?":poke198,0:wait198,1:getx$
+61510 ifx$<>"j"andx$<>"n"then61500
+61520 ifx$="n"thenrun60060
+61530 poke49152,0
+61540 printchr$(147);:fori=peek(49152)topeek(49152)+7:print(i+6000)*10:next
+61550 print"goto61540":poke49152,peek(49152)+8
+61560 poke631,19:fori=632to640:pokei,13:next:poke198,10
+

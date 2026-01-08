@@ -1,0 +1,87 @@
+
+
+;demo_mps-support.prg ==0801==
+ 1000 rem graph-64 demo
+ 1010 input "demo 1,2,3 oder 4";de
+ 1020 _clear:_colour 1,5,7
+ 1030 on de gosub 2000,3000,4000,5000
+ 1040 _zoom:_graphic
+ 1050 end
+ 1999 :
+ 2000 rem demo 1
+ 2010 for i=-~/4 to ~/4 step ~/15
+ 2020 for j=0 to 2*~ step ~/15
+ 2030 _line cos(i)*319+320,sin(i)*199+200,cos(j)*319+320,sin(j)*199+200
+ 2040 next j,i
+ 2050 return
+ 2999 :
+ 3000 rem demo 2
+ 3010 for i=0 to 2*~ step ~/50
+ 3020 _line cos(i)*50+320,sin(i)*50+200,sqr(i/(2*~))*639,i/(2*~)*399
+ 3030 next
+ 3040 return
+ 3999 :
+ 4000 rem demo 3
+ 4010 _poly 2,2,637,2,637,397,2,397
+ 4020 _line 10,200,630,200
+ 4030 _line 320,10,320,390
+ 4040 _line 320,10,316,15
+ 4050 _line 320,10,324,15
+ 4060 _line 630,200,626,205
+ 4070 _line 630,200,626,195
+ 4080 for i=10+620/32 to 630-620/32 step 620/32
+ 4090 _line i,196,i,204:next
+ 4100 for i=10+380/40 to 390-380/40 step 380/40
+ 4110 _line 316,i,324,i:next
+ 4120 _char 42,26,asc("~")
+ 4130 _char 38,13,asc("1")
+ 4140 _char 78,26,asc("x")
+ 4150 xc=35:yc=1:a$="f(x)":gosub 6000
+ 4160 xc=6:yc=5:a$="f(x)=sin(x)+sin(x*1.1)":gosub 6000
+ 4170 _poly 44,36,228,36,228,50,44,50
+ 4180 def fns(x)=sin(x)+sin(x*1.1)
+ 4190 y1=fns((0-310)/310*16*~)*(-95)+200
+ 4200 for i=1 to 620
+ 4210 y2=fns((i-310)/310*16*~)*(-95)+200
+ 4220 _line i+9,y1,i+10,y2
+ 4230 y1=y2
+ 4240 next
+ 4250 return
+ 4999 :
+ 5000 rem demo 4
+ 5010 dim x1%(68),x2%(68),z1%(68),z2%(68)
+ 5020 co=cos(~/9):si=sin(~/9)
+ 5030 y=-168
+ 5040 for x=-272 to 272 step 8
+ 5050 gosub 5240
+ 5060 x1%(x/8+34)=xp:z1%(x/8+34)=zp
+ 5070 next
+ 5080 for y=-160 to 168 step 8
+ 5090 for x=-272 to 272 step 8
+ 5100 gosub 5240
+ 5110 x2%(x/8+34)=xp:z2%(x/8+34)=zp
+ 5120 next
+ 5130 for i=0 to 67
+ 5140 _epoly x1%(i),z1%(i),x1%(i+1),z1%(i+1),x2%(i+1),z2%(i+1),x2%(i),z2%(i)
+ 5150 _poly x1%(i),z1%(i),x1%(i+1),z1%(i+1),x2%(i+1),z2%(i+1),x2%(i),z2%(i)
+ 5160 next
+ 5170 for i=0 to 68
+ 5180 x1%(i)=x2%(i):z1%(i)=z2%(i)
+ 5190 next
+ 5200 next
+ 5210 xc=22:yc=3:a$="f(x,y)=cos(x^2+y^2)/exp((x^2+y^2)/4)":gosub 6000
+ 5220 _poly 172,20,468,20,468,34,172,34
+ 5230 return
+ 5240 tp=(x*x/73984*~+y*y/28224*~)
+ 5250 z=cos(tp*2)/exp(tp/2)*200
+ 5260 xq=x*co+y*si:yq=-x*si+y*co:zq=z
+ 5270 xp=xq:yp=zq*si+yq*co:zp=zq*co-yq*si
+ 5280 xp=320+xp:zp=250-zp
+ 5290 return
+ 5999 :
+ 6000 rem
+ 6010 for i=0 to len(a$)-1
+ 6020 _char xc+i,yc,asc(mid$(a$,i+1,1))
+ 6030 next
+ 6040 return
+

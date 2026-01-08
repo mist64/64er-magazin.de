@@ -1,0 +1,462 @@
+
+
+;garbage64quell.prg ==0801==
+   10 sys9*4096
+   20 .opt p,oo
+   30 *= $c700
+  100 ; **** garbage collection ****
+  101 ;
+  102 ;definition der hilfszeiger
+  103 lazei =$45;laufzeiger d.deskriptoren
+  104 romzei =$47;laufzeiger unter rom
+  105 strizei =$49;hilfszeiger f. string
+  106 mezei =$4b;letzter platz oberes rom
+  107 neuzei =$4d;stringbereichslaufzeiger
+  108 feldend =$4f;hilfzeiger arrayende
+  109 strispei =$51;hilfszeiger
+  110 subtrah =$53;stringlaengezwischensp.
+  111 ;
+  112 ;
+  113 ;vorbelegung der speicherplaetze
+  114 vromzei =$0000;start von romzei
+  116 vgrenzei =$df00;grenze+ fuer romzei
+  117 vjumpzei =$c000
+  118 ;
+  119 ; 1. vorbereitung ------------------
+  120 ;
+  121 anfang sei;interrupts verhindern
+  122 pha;prozessorregister retten
+  123 tya
+  124 pha
+  125 txa
+  126 pha
+  127 lda 1;speicherkonfiguration retten
+  128 sta zahl
+  129 lda #46;kontrollanzeige bildschirm
+  130 sta 2023
+  131 lda #9
+  132 sta 56295
+  133 ldy #20;benoetigte speicher retten
+  134 ret lda $44,y
+  135 sta save,y
+  136 dey
+  137 bne ret
+  138 lda #55;auf rom umschalten
+  139 sta 1
+  140 lda 45;variablenstart nach lazei
+  141 sta lazei
+  142 lda 46
+  143 sta lazei+1
+  144 ;
+  145 lda #<vromzei;$ffff+1 nach romzei
+  146 sta romzei
+  147 lda #>vromzei
+  148 sta romzei+1
+  149 ;
+  150 lda #0;mezei vorbelegen
+  151 sta mezei
+  152 sta mezei+1
+  153 sta zwei
+  154 ;
+  155 lda 55;durchl.zeiger f.stringbereich
+  156 sta neuzei
+  157 lda 56
+  158 sta neuzei+1
+  159 ;
+  160 ;
+  161 ;2. variablenbereich ---------------
+  162 ;                                   600
+  163 vovorn lda lazei;schon ende variable
+  164 cmp 47
+  165 bne wei1
+  166 lda lazei+1
+  167 cmp 48
+  168 beq felder
+  169 ;
+  170 wei1 ldy #0;stringvariable j/n
+  171 lda (lazei),y
+  172 asl
+  173 bcs la7;keine stringvariable
+  174 iny
+  175 lda (lazei),y
+  176 asl
+  177 bcc la7;keine stringvariable
+  178 ;
+  179 clc;lazei=lazei+2;stringvariable
+  180 lda #2
+  181 adc lazei
+  182 sta lazei
+  183 bcc wei2
+  184 inc lazei+1
+  185 ;
+  186 ;
+  187 wei2 ldy #0
+  188 lda (lazei),y;leerstring j/n
+  189 beq la5
+  190 ;
+  191 ldy #2;descriptor in str.bereich j/n
+  192 lda (lazei),y
+  193 cmp 52
+  194 bcc la5;hb 52 > als descriptor hb
+  195 bne wei3;hb 52 <> hb deskriptor=ok
+  196 dey
+  197 lda (lazei),y
+  198 cmp 51
+  199 bcc la5;lb 51 > lb des,hb 52 =hb des
+  200 ;
+  201 wei3 jsr abspei
+  202 ;
+  203 la5 clc;lazei um 5 erhoehen
+  204 lda #5
+  205 adc lazei
+  206 sta lazei
+  207 bcc l1
+  208 inc lazei+1
+  209 l1 jmp vovorn
+  210 ;
+  211 la7 clc;lazei um 7 erhoehen
+  212 lda #7
+  213 adc lazei
+  214 sta lazei
+  215 bcc l2
+  216 inc lazei+1
+  217 l2 jmp vovorn
+  218 ;
+  219 ;
+  220 ;
+  221 ;3. arraybereich -------------------
+  222 ;
+  223 felder lda lazei;arraybereichendej/n
+  224 cmp 49
+  225 bne wei11
+  226 lda lazei+1
+  227 cmp 50
+  228 bne wei11
+  229 jmp ramun
+  230 ;
+  231 wei11 ldy #0;stringfeld j/n
+  232 lda (lazei),y
+  233 asl
+  234 bcs lastrl;kein stringfeld
+  235 iny
+  236 lda (lazei),y
+  237 asl
+  238 bcc lastrl;kein stringfeld
+  239 ;
+  240 ;
+  241 ;
+  242 ;stringfeld
+  243 ldy #3;errechnen feldende
+  244 lda (lazei),y
+  245 pha
+  246 dey
+  247 clc
+  248 lda (lazei),y
+  249 adc lazei
+  250 sta feldend
+  251 pla
+  252 adc lazei+1
+  253 sta feldend+1
+  254 ;
+  255 ldy #4;anzahl der dimensionen nach y
+  256 lda (lazei),y
+  257 tay
+  258 ;
+  259 lda #5;lazei auf 1. descriptor
+  260 clc;lazei um 5 erhoehen
+  261 adc lazei
+  262 sta lazei
+  263 bcc wei14
+  264 inc lazei+1
+  265 ;
+  266 ;
+  267 wei14 lda #2;lazei + dimens.anzahl*2
+  268 clc
+  269 adc lazei
+  270 sta lazei
+  271 bcc wei15
+  272 inc lazei+1
+  273 wei15 dey
+  274 bne wei14
+  275 ;
+  276 vuvurn lda lazei;feldende j/n
+  277 cmp feldend
+  278 bne wei16
+  279 lda lazei+1
+  280 cmp feldend+1
+  281 beq felder
+  282 ;
+  283 wei16 lda (lazei),y;string leer j/n
+  284 beq la3
+  285 ;
+  286 ldy #2;descriptor im str.bereich j/n
+  287 lda (lazei),y
+  288 cmp 52
+  289 bcc la3
+  290 bne wei17
+  291 dey
+  292 lda (lazei),y
+  293 cmp 51
+  294 bcc la3
+  295 wei17 jsr abspei
+  296 ;
+  297 la3 clc;lazei um 3 erhoehen
+  298 lda #3
+  299 adc lazei
+  300 sta lazei
+  301 bcc wei18
+  302 inc lazei+1
+  303 wei18 jmp vuvurn
+  304 ;
+  305 lastrl ldy #3;lazei + arraylaenge
+  306 lda (lazei),y
+  307 pha
+  308 dey
+  309 lda (lazei),y
+  310 clc
+  311 adc lazei
+  312 sta lazei
+  313 pla
+  314 adc lazei+1
+  315 sta lazei+1
+  316 jmp felder
+  317 ;
+  318 ;
+  319 ;
+  320 ;
+  321 ;4. ram unter rom nach variable ----
+  322 ;
+  323 ramun lda romzei;waren strings da
+  324 cmp #<vromzei
+  325 bne rumun
+  326 lda romzei+1
+  327 cmp #>vromzei
+  328 bne rumun
+  329 jmp ende
+  330 ;
+  331 rumun lda #53;auf rom schalten
+  332 sta 1
+  333 lda neuzei;stringbeginnszeiger neu
+  334 sta 51
+  335 lda neuzei+1
+  336 sta 52
+  337 ;
+  338 lda zwei;war unteres ram in use j/n
+  339 bne dopp
+  340 ;
+  341 lda romzei;nur 1.bereich romzei-ffff
+  342 sta strispei;subroutinevorbelegung
+  343 lda romzei+1
+  344 sta strispei+1
+  345 lda #<vromzei-1
+  346 sta lazei
+  347 lda #>vromzei-1
+  348 sta lazei+1
+  349 ;
+  350 jsr speistri;umspeicherungsroutine
+  351 ;
+  352 jmp romneu
+  353 ;
+  354 ;
+  355 dopp lda romzei;1.und 2. benutzt
+  356 sta strispei;subroutinevorbelegung
+  357 lda romzei+1
+  358 sta strispei+1
+  359 lda #<vjumpzei-1
+  360 sta lazei
+  361 lda #>vjumpzei-1
+  362 sta lazei+1
+  363 ;
+  364 jsr speistri;umspeicherroutine
+  365 ;
+  366 lda mezei;subroutinevorbelegung
+  367 sta strispei
+  368 lda mezei+1
+  369 sta strispei+1
+  370 lda #<vromzei-1
+  371 sta lazei
+  372 lda #>vromzei-1
+  373 sta lazei+1
+  374 ;
+  375 jsr speistri;umspeicherroutine
+  376 jmp romneu
+  377 ;
+  378 ;
+  379 ;
+  380 ;
+  381 speistri ldy #0;kopier v strispei
+  382 ;- lazei nach neuzei aufwaerts
+  383 wida lda (strispei),y
+  384 sta (neuzei),y
+  385 lda lazei
+  386 cmp strispei
+  387 bne w21
+  388 lda lazei+1
+  389 cmp strispei+1
+  390 bne w21
+  391 beq w24
+  392 w21 inc neuzei
+  393 bne w22
+  394 inc neuzei+1
+  395 w22 inc strispei
+  396 bne wida
+  397 inc strispei+1
+  398 w23 jmp wida
+  399 ;
+  400 w24 inc neuzei
+  401 bne w25
+  402 inc neuzei+1
+  403 w25 rts
+  404 ;
+  405 ;
+  406 ;
+  407 ;5. rom neu ins ram kopieren -------
+  408 ;
+  409 romneu lda zahl;eingebunden j/n
+  410 cmp #55
+  411 beq ende;laeuft im rom
+  412 jsr rumneu
+  413 jmp ende
+  414 ;
+  415 lda #1;hier extraeinsprung von basic
+  416 sta zwei
+  417 jsr rumneu
+  418 lda #53
+  419 sta 1
+  420 rts
+  421 ;
+  422 rumneu lda #55;auf rom umschalten
+  423 sta 1
+  424 ;
+  425 lda #$00
+  426 sta lazei
+  427 lda #$e0
+  428 sta lazei+1
+  429 jsr copi
+  430 ;
+  431 lda zwei;unt. rom auch zu kopieren
+  432 beq end
+  433 lda #$00
+  434 sta lazei
+  435 lda #$a0
+  436 sta lazei+1
+  437 jsr copi
+  438 end jsr einbind
+  439 rts
+  440 ;
+  441 ;
+  442 copi ldx #32;8k rom in ram kopieren
+  443 ldy #0
+  444 agein lda (lazei),y
+  445 sta (lazei),y
+  446 iny
+  447 bne agein
+  448 inc lazei+1
+  449 dex
+  450 bne agein
+  451 rts
+  452 ;
+  453 ;6. ende ---------------------------
+  454 ;
+  455 ende ldy #20;speicher rueckretten
+  456 rot lda save,y
+  457 sta $44,y
+  458 dey
+  459 bne rot
+  460 lda #32;kontrollanzeige loeschen
+  461 sta 2023
+  462 lda zahl;alte speicherkonfiguration
+  463 sta 1
+  464 pla;prozessorinhalte wiederholen
+  465 tax
+  466 pla
+  467 tay
+  468 pla
+  469 cli;interrupts wieder erlaubt
+  470 rts
+  471 ;
+  472 ;
+  473 ;subroutinen -----------------------
+  474 ;
+  475 ;unterprogramm, das den string, auf
+  476 ;dessen deskpriptor lazei steht,un-
+  477 ;terhalb romzei abspeichert und die
+  478 ;positionsangabe des deskr. relativ
+  479 ;zum richt. stringber. aktualisiert
+  480 ;
+  481 abspei ldy #2;stringadr. in strizei
+  482 lda (lazei),y;laenge in y und stack
+  483 sta strizei+1
+  484 dey
+  485 lda (lazei),y
+  486 sta strizei
+  487 dey
+  488 lda (lazei),y
+  489 sta subtrah
+  490 tay
+  491 ;
+  492 ogain lda romzei;romzei-stringlaenge
+  493 sec
+  494 sbc subtrah
+  495 sta romzei
+  496 bcs etz
+  497 dec romzei+1
+  498 lda romzei+1
+  499 cmp #>vgrenzei
+  500 bne etz
+  501 ;
+  502 lda #1;o.ram voll,romzei+ynach mezei
+  503 sta zwei
+  504 tya
+  505 clc
+  506 adc romzei
+  507 sta mezei
+  508 bcc wtr
+  509 inc romzei+1
+  510 wtr lda romzei+1
+  511 sta mezei+1
+  512 lda #<vjumpzei;romzei auf  c000
+  513 sta romzei
+  514 lda #>vjumpzei
+  515 sta romzei+1
+  516 jmp ogain
+  517 ;
+  518 etz dey;string unters rom speichern
+  519 noml lda (strizei),y
+  520 sta (romzei),y
+  521 dey
+  522 cpy #255
+  523 bne noml
+  524 ;
+  525 ;
+  526 ldy #1;neuzei-str.laenge=deskriptor
+  527 lda neuzei
+  528 sec
+  529 sbc subtrah
+  530 sta neuzei
+  531 sta (lazei),y
+  532 bcs waidr
+  533 dec neuzei+1
+  534 waidr iny
+  535 lda neuzei+1
+  536 sta (lazei),y
+  537 rts
+  538 ;
+  539 zahl nop;merker fuer konfiguration
+  540 zwei nop;=1 wenn mehr o.ram used
+  541 save nop
+  542 *= *+25
+  543 ;
+  544 ;veraenderung des garbageeinsprungs
+  545 ;und eventuell des betriebssystems
+  546 gar =$b526
+  547 einbind lda #$20;jsr anfang u. rts
+  548 sta gar
+  549 lda #<anfang
+  550 sta gar+1
+  551 lda #>anfang
+  552 sta gar+2
+  553 lda #$60
+  554 sta gar+3
+  555 rts
+

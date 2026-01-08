@@ -1,0 +1,1192 @@
+
+
+;sound-editor +.prg ==0801==
+    0 ifa>1thenreturn
+ 1000 :
+ 1005 :
+ 1010 :
+ 1015 :
+ 1020 :
+ 1025 :
+ 1030 :
+ 1035 :
+ 1040 :
+ 1045 :
+ 1050 :
+ 1055 :
+ 1060 ifw=0thenw=1:load"wersi",8,1
+ 1065 ifm=7then7665
+ 1068 ifm=7.5then7960
+ 1070 :
+ 1080 ifa=0thena=.1:load"modulator",8,1
+ 1082 ifa=.1thena=.2:load"sequencer.obj",8,1
+ 1084 ifa=.2thena=1:load"seq.erg.obj",8,1
+ 1120 :
+ 1130 ifa=0thena=1:load"modulator",8,1
+ 1140 :
+ 1150 :
+ 1155 poke56,144:clr
+ 1160 dimv%(8,255),tn%(255),th(49)
+ 1165 dimbf(2),t(2),o(2),of(2),s(2)
+ 1170 dimc1(2),c(2),ad(2),sr(2)
+ 1175 dimbl$(6),kv$(3),kf$(6),md$(3)
+ 1180 dimtn$(11)
+ 1185 :
+ 1190 gosub8000
+ 1200 gosub4000
+ 1210 :
+ 1500 :
+ 1510 :
+ 1520 :
+ 1530 sys51300:geta$:ifa$=""then1530
+ 1535 ifa$="W"thengosub20000:goto1530
+ 1540 a=asc(a$)
+ 1550 sysgs,v%(m,a)
+ 1560 goto1530
+ 2000 :
+ 2010 :
+ 2020 :
+ 2025 poke650,0
+ 2030 f=th(tn%(a)):ad=mo+72:x=peek(ad)
+ 2035 ifs(0)thensysdo,mo,f*bf(0):pokesi+4,c1(0)
+ 2040 ifs(1)thensysdo,mo+7,f*bf(1):pokesi+11,c1(1)
+ 2050 ifs(2)thensysdo,mo+14,f*bf(2):pokesi+18,c1(2)
+ 2090 ifegthenpokead,xor1
+ 2110 ifsuthenpoke650,128:return
+ 2120 ifpeek(203)<>64andpeek(198)=0then2120
+ 2130 pokead,xand254
+ 2140 pokesi+4,c(0)
+ 2150 pokesi+11,c(1):pokesi+18,c(2)
+ 2160 poke650,128:return
+ 2500 :
+ 2510 :
+ 2520 :
+ 2530 :
+ 2550 pw=pw+p2:ifpw>=pmthenpw=pw-pm
+ 2555 sysgt,pv
+ 2560 pw=pw+p1:ifpw>=pmthenpw=pw-pm
+ 2565 sysgt,pv
+ 2570 pw=pw-p1:ifpw<0thenpw=pw+pm
+ 2575 sysgt,pv
+ 2580 pw=pw-p2:ifpw<0thenpw=pw+pm
+ 2585 sysgt,pv
+ 2600 :
+ 2605 :
+ 2610 sysdo,pa,pw:l=len(str$(pw))
+ 2620 syspr,3+ln,4,bl$(6-l);f2$;pw
+ 2625 return
+ 2630 :
+ 2635 :
+ 2640 pokepa,pw:l=len(str$(pw))
+ 2650 syspr,3+ln,11,bl$(4-l);f2$;pw
+ 2655 return
+ 2660 :
+ 2665 :
+ 2670 pokepa,pw:l=len(str$(pw))
+ 2680 syspr,3+ln,16,bl$(4-l);f2$;pw
+ 2685 return
+ 2690 :
+ 2695 :
+ 2700 ifa>136ora<133thenreturn
+ 2705 b=a-133
+ 2710 pokepa,(peek(pa)and231)or(b*8)
+ 2715 syspr,3+ln,21,f2$;kv$(b)
+ 2717 syspr,6,34,f2$;kf$(b):return
+ 2720 :
+ 2725 :
+ 2730 ifa>135ora<133thenreturn
+ 2735 b=a-132
+ 2740 pokepa,(peek(pa)and249)or(b*2)
+ 2745 syspr,3+ln,28,f2$;md$(b):return
+ 2750 :
+ 2755 :
+ 2760 pokepa,pw:l=len(str$(pw))
+ 2765 syspr,7,s,bl$(4-l);f2$;pw:return
+ 2770 :
+ 2775 :
+ 2780 b=-(a>134)
+ 2785 pokepa,(peek(pa)and247)or(b*8)
+ 2790 syspr,7,29,f2$;chr$(43+2*b)
+ 2795 return
+ 2810 :
+ 2815 :
+ 2820 ifa>135ora<133thenreturn
+ 2825 b=a-132
+ 2830 pokepa,(peek(pa)and249)or(b*2)
+ 2835 syspr,7,33,f2$;md$(b):return
+ 2840 :
+ 2845 :
+ 2850 pokepa,pwand7:pokepa+1,int(pw/8)
+ 2855 l=len(str$(pw))
+ 2860 syspr,5,2,bl$(5-l);f2$;pw:return
+ 2865 :
+ 2870 :
+ 2875 rf=(rfand15)+16*pw:pokepa,rf
+ 2880 l=len(str$(pw))
+ 2885 syspr,5,9,bl$(3-l);f2$;pw:return
+ 2890 :
+ 2895 :
+ 2900 ifa>136ora<133thenreturn
+ 2905 b=a-133
+ 2910 x=2^b:x1=255-x
+ 2915 y=rfandx
+ 2920 rf=(rfandx1)or(x-y):pokepa,rf
+ 2925 y=-128*(y=0):ad=1024+(5+b)*40+15
+ 2930 fori=adtoad+5
+ 2935 pokei,(peek(i)and127)ory
+ 2940 next:return
+ 2945 :
+ 2950 :
+ 2955 ifa>136ora<133thenreturn
+ 2960 b=a-129
+ 2965 x=2^b:x1=255-x
+ 2970 pw=peek(pa):y=pwandx
+ 2975 pokepa,(pwandx1)or(x-y)
+ 2980 y=-128*(y=0):ad=1024+(1+b)*40+25
+ 2985 fori=adtoad+3
+ 2990 pokei,(peek(i)and127)ory
+ 2995 next:return
+ 3000 :
+ 3005 :
+ 3010 pokepa,(peek(pa)and240)orpw
+ 3015 l=len(str$(pw))
+ 3020 syspr,5,31,bl$(3-l);f2$;pw:return
+ 3050 :
+ 3052 :
+ 3054 ifa<>134then3064
+ 3056 :
+ 3058 of=of+1:ifof<=50then3110
+ 3062 of=-49:goto3076
+ 3064 ifa<>135then3074
+ 3066 :
+ 3068 of=of-1:ifof>=-49then3110
+ 3072 of=50:goto3084
+ 3074 ifa<>133then3082
+ 3076 :
+ 3078 t=t+1:ift<=11then3110
+ 3080 t=0:goto3090
+ 3082 ifa<>136thenreturn
+ 3084 :
+ 3086 t=t-1:ift>=0then3110
+ 3088 t=11:goto3096
+ 3090 :
+ 3092 o=o+1:ifo<=5then3110
+ 3094 o=0:goto3110
+ 3096 :
+ 3098 o=o-1:ifo>=0then3110
+ 3100 o=5:t=10
+ 3110 :
+ 3112 ift=11ando=5thent=0:o=0
+ 3114 bf=440*2^(o-4+(t-9)/12+of/1200)
+ 3116 o(sn)=o:t(sn)=t:of(sn)=of
+ 3118 bf(sn)=bf*17.0327
+ 3120 sysdo,mo+7*sn,f*bf(sn)
+ 3122 :
+ 3124 syspr,3+sn,3,f2$;o
+ 3126 syspr,3+sn,2,tn$(t)
+ 3128 syspr,3+sn,5,right$(" "+str$(of),3)
+ 3130 return
+ 3150 :
+ 3155 :
+ 3160 sysdo,pa,pw
+ 3165 syspr,3+sn,9,f2$;right$("  "+str$(pw),4)
+ 3170 return
+ 3175 :
+ 3180 :
+ 3185 ad(sn)=(ad(sn)and15)orpw*16
+ 3190 pokepa,ad(sn)
+ 3195 syspr,3+sn,14,f2$;right$(str$(pw),2)
+ 3200 return
+ 3205 :
+ 3210 :
+ 3215 ad(sn)=(ad(sn)and240)orpw
+ 3220 pokepa,ad(sn)
+ 3225 syspr,3+sn,17,f2$;right$(str$(pw),2)
+ 3230 return
+ 3235 :
+ 3240 :
+ 3245 sr(sn)=(sr(sn)and15)orpw*16
+ 3250 pokepa,sr(sn)
+ 3255 syspr,3+sn,20,f2$;right$(str$(pw),2)
+ 3260 return
+ 3265 :
+ 3270 :
+ 3275 sr(sn)=(sr(sn)and240)orpw
+ 3280 pokepa,sr(sn)
+ 3285 syspr,3+sn,23,f2$;right$(str$(pw),2)
+ 3290 return
+ 3300 :
+ 3305 :
+ 3310 ifa<>133anda<>134then3335
+ 3315 :
+ 3320 c(sn)=c(sn)or2^(7-s)
+ 3325 c1(sn)=c(sn)or1
+ 3330 syspr,3+sn,26+s,f2$;"1":goto3355
+ 3335 :
+ 3340 c(sn)=c(sn)and255-2^(7-s)
+ 3345 c1(sn)=c(sn)or1
+ 3350 syspr,3+sn,26+s,f2$;"0"
+ 3355 :
+ 3358 poke50334+sn,c(sn)
+ 3360 x=c(sn):ifsuthenx=c1(sn)
+ 3362 poke984+sn,c(sn):poke987+sn,c1(sn)
+ 3365 pokesi+7*sn+4,x:return
+ 3370 :
+ 3375 :
+ 3380 pokepa,pw:l=len(str$(pw))
+ 3385 syspr,3+sn,34,bl$(4-l);f2$;pw
+ 3390 return
+ 3400 :
+ 3405 :
+ 3410 ifpw<40thenpw=40
+ 3415 ifpw>480thenpw=480
+ 3420 te=pw:sysdo,pa,int(6e7/(24*te))
+ 3425 syspr,6,11,f2$;right$(str$(pw),3)
+ 3430 return
+ 3500 :
+ 3510 :
+ 3520 :
+ 3525 syspr,15,10,f2$;"stimme 1,2,3"
+ 3530 geta$:ifa$=""then3530
+ 3540 ifa$="1"ora$="2"ora$="3"then3560
+ 3550 goto3590
+ 3560 i=val(a$)-1:s(i)=nots(i)
+ 3565 poke981+i,abs(s(i))
+ 3570 ifs(i)thenprintchr$(18);
+ 3580 syspr,21,31+2*i,f1$;a$;chr$(146);
+ 3590 syspr,15,10,f1$;"stimme 1,2,3"
+ 3595 return
+ 3600 :
+ 3610 :
+ 3620 :
+ 3630 poke650,64
+ 3640 ad=mo+27:x=peek(ad):pokead,xor1
+ 3650 ifpeek(203)<>64andpeek(198)=0then3650
+ 3660 pokead,xand254:poke650,128:return
+ 3700 :
+ 3710 :
+ 3720 :
+ 3730 eg=noteg
+ 3735 poke990,abs(eg)
+ 3740 ifegthenprintchr$(18);
+ 3750 syspr,23,31,f1$;"soft-eg{rvof}":return
+ 3800 :
+ 3810 :
+ 3820 :
+ 3830 su=notsu
+ 3835 poke991,abs(su)
+ 3840 poke50344,-su:ifsuthenprintchr$(18);
+ 3850 syspr,22,31,f1$;"sustain{rvof}"
+ 3860 ifnotsuthen2140
+ 3870 return
+ 4000 :
+ 4010 :
+ 4020 :
+ 4030 m=0:pv=0:syscl:print"{home}";f1$
+ 4040 print" {CBM-A}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-S}"
+ 4045 print" B{rvon}         m o d u l a t o r          {rvof}B"
+ 4050 print" B{rvon}     thomas kraetzig       1985     {rvof}B"
+ 4055 print" {CBM-Z}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-X}"
+ 4100 syspr,6,1,f2$;"sh v";f1$;" stimmen"
+ 4105 syspr,7,1,f2$;"   f";f1$;" filter/lautstaerke"
+ 4110 syspr,8,1,f2$;"   l";f1$;" lfo"
+ 4115 syspr,9,1,f2$;"   h";f1$;" huellkurve (soft-eg)"
+ 4120 syspr,10,1,f2$;"   k";f1$;" ksv "
+ 4125 syspr,11,1,f2$;"sh s";f1$;" sounds"
+ 4130 syspr,12,1,f2$;"   d";f1$;" disk"
+ 4132 syspr,13,1,f2$;"   a";f1$;" sequencer"
+ 4135 return
+ 4200 :
+ 4210 :
+ 4220 :
+ 4240 syspr,15,1,f2$;"v 1,2,3"
+ 4245 syspr,15,10,f1$;"stimme 1,2,3
+ 4250 syspr,15,26,f2$;"s"
+ 4255 syspr,15,32,f1$;"sustain"
+ 4260 syspr,16,1,f2$;"sh space"
+ 4270 syspr,16,10,f1$;"eg (ab)-koppeln)"
+ 4280 syspr,16,26,f2$;"space"
+ 4290 syspr,16,32,f1$;"eg  gate"
+ 4292 syspr,17,1,f2$;"x"
+ 4294 syspr,17,10,f1$;"hauptmenue"
+ 4295 syspr,18,1,;"{wht}sh w{grn}     wersiboard stimmen"
+ 4300 syspr,19,0,f2$;
+ 4310 fori=1to4
+ 4320 print" {rvon} B B B B B B B B B B B B B B {rvof}":next
+ 4330 print" {rvon}qBwBeBrBtByBuBiBoBpB@B*B^B;B="
+ 4340 syspr,19,0,;
+ 4350 fori=1to2
+ 4360 print" {rght} {rght} {rght}{rght}{rght} {rght} {rght} {rght}{rght}{rght} {rght} {rght}{rght}{rght} {rght} {rght} ":next
+ 4370 print" {rght}2{rght}3{rght}{rght}{rght}5{rght}6{rght}7{rght}{rght}{rght}9{rght}0{rght}{rght}{rght}-{rght}\{rght}c"
+ 4380 syspr,19,31,f1$;"aktiv:"
+ 4390 fori=0to2
+ 4400 a$=right$(str$(i+1),1)
+ 4410 gosub3570:nexti
+ 4420 gosub3840:gosub3740
+ 4430 return
+ 4500 :
+ 4505 :
+ 4510 :
+ 4515 m=1:pv=3050:syscl:print"{home}{rvof}";f1$
+ 4520 print"     f    pw   a  d  s  r control porta"
+ 4525 print" {CBM-A}CCCCCC{CBM-R}CCCC{CBM-R}CC{CBM-R}CC{CBM-R}CC{CBM-R}CC{CBM-R}CCCCCCC{CBM-R}CCCC{CBM-S}"
+ 4530 fori=1to3
+ 4535 print" B      B    B  B  B  B  B       B    B"
+ 4540 nexti
+ 4545 print" {CBM-Z}CCCCCC{CBM-E}CCCC{CBM-E}CC{CBM-E}CC{CBM-E}CC{CBM-E}CC{CBM-E}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-E}CCCC{CBM-X}"
+ 4550 syspr,7,26,"BBBBBB{CBM-Z}CCsync"
+ 4555 syspr,8,26,"BBBBB{CBM-Z}CCring"
+ 4560 syspr,9,1,f2$;"f1  ++";f1$
+ 4565 syspr,9,26,"BBBB{CBM-Z}CCtest"
+ 4570 syspr,10,1,f2$;"f3  +";f1$
+ 4575 syspr,10,26,"BBB{CBM-Z}CCtrian"
+ 4580 syspr,11,1,f2$;"f5  -";f1$
+ 4585 syspr,11,26,"BB{CBM-Z}CCsawtooth"
+ 4590 syspr,12,1,f2$;"f7  --";f1$
+ 4595 syspr,12,26,"B{CBM-Z}CCsquare"
+ 4600 syspr,13,26,"{CBM-Z}CCnoise"
+ 4602 :
+ 4604 a$=f2$:f2$=f1$
+ 4606 forsn=0to2
+ 4608 t=t(sn):o=o(sn):of=of(sn)
+ 4610 gosub3122
+ 4612 pw=(usr(mo+7*sn+2)):gosub3165
+ 4614 pw=int(ad(sn)/16):gosub3195
+ 4616 pw=ad(sn)and15:gosub3225
+ 4618 pw=int(sr(sn)/16):gosub3255
+ 4620 pw=sr(sn)and15:gosub3285
+ 4622 :
+ 4624 b=c(sn):a=128
+ 4626 syspr,3+sn,26,f1$;"0000000"
+ 4628 fors=7to1step-1
+ 4630 if(banda)thensyspr,3+sn,33-s,"1"
+ 4632 a=a/2:nexts
+ 4634 pa=mo+7*sn+4:pw=peek(pa)
+ 4636 gosub3370
+ 4638 nextsn
+ 4640 f2$=a$
+ 4642 sn=0:av=4700:sysgs,av:return
+ 4650 :
+ 4652 :
+ 4654 :
+ 4656 sn=sn-1:ifsn<0thensn=2
+ 4658 gosub5815:sysgt,av
+ 4660 :
+ 4662 sn=sn+1:ifsn>2thensn=0
+ 4664 gosub5815:sysgt,av
+ 4666 :
+ 4668 ifav<>4880then4674
+ 4670 s=s+1:ifs>6thenav=4910
+ 4672 goto4678
+ 4674 av=av+30:ifav>4910thenav=4700
+ 4676 ifav=4880thens=0
+ 4678 gosub5815:sysgt,av
+ 4680 :
+ 4682 ifav<>4880then4688
+ 4684 s=s-1:ifs<0thenav=4850
+ 4686 goto4692
+ 4688 av=av-30:ifav<4700thenav=4910
+ 4690 ifav=4880thens=6
+ 4692 gosub5815:sysgt,av
+ 4700 :
+ 4702 :
+ 4704 pb=fa+40*(sn+3)+2
+ 4706 fori=pbtopb+5:pokei,f2:next
+ 4708 t=t(sn):o=o(sn):of=of(sn)
+ 4710 pa=mo+7*sn:pv=3050:return
+ 4730 :
+ 4732 :
+ 4734 pb=fa+40*(sn+3)+9
+ 4736 fori=pbtopb+3:pokei,f2:next
+ 4738 pa=mo+7*sn+2:pw=usr(pa):pm=4096
+ 4740 p1=1:p2=50:pv=3150:return
+ 4760 :
+ 4762 :
+ 4764 pb=fa+40*(sn+3)+14
+ 4766 pokepb,f2:pokepb+1,f2
+ 4768 pa=si+7*sn+5:pw=int(ad(sn)/16)
+ 4770 pm=16:p1=1:p2=1:pv=3175:return
+ 4790 :
+ 4792 :
+ 4794 pb=fa+40*(sn+3)+17
+ 4796 pokepb,f2:pokepb+1,f2
+ 4798 pa=si+7*sn+5:pw=ad(sn)and15
+ 4800 pm=16:p1=1:p2=1:pv=3205:return
+ 4820 :
+ 4822 :
+ 4824 pb=fa+40*(sn+3)+20
+ 4826 pokepb,f2:pokepb+1,f2
+ 4828 pa=si+7*sn+6:pw=int(sr(sn)/16)
+ 4830 pm=16:p1=1:p2=1:pv=3235:return
+ 4850 :
+ 4852 :
+ 4854 pb=fa+40*(sn+3)+23
+ 4856 pokepb,f2:pokepb+1,f2
+ 4858 pa=si+7*sn+6:pw=sr(sn)and15
+ 4860 pm=16:p1=1:p2=1:pv=3265:return
+ 4880 :
+ 4882 :
+ 4884 pb=fa+40*(sn+3)+26+s
+ 4886 pokepb,f2
+ 4888 pa=si+7*sn+4:pv=3300:return
+ 4910 :
+ 4912 :
+ 4914 pb=fa+40*(sn+3)+35
+ 4916 fori=0to2:pokepb+i,f2:next
+ 4918 pa=mo+7*sn+4:pw=peek(pa):pm=256
+ 4920 p1=1:p2=10:pv=3370:return
+ 5000 :
+ 5005 :
+ 5010 :
+ 5015 m=2:pv=0:syscl:print"{home}{rvof}";f1$
+ 5020 print"filter/lautstaerke"
+ 5025 print" {CBM-A}CCCCC{CBM-R}CCCCC{CBM-R}CCCCCCCC{CBM-R}CCCCCCC{CBM-R}CCCC{CBM-S}"
+ 5030 print" BfiltfB res BschalterB modus BlautB"
+ 5035 print" {CBM-Q}CCCCC{SHIFT-+}CCCCC{SHIFT-+}CCCCCCCC{SHIFT-+}CCCCCCC{SHIFT-+}CCCC{CBM-W}"
+ 5040 print" B     B     B filt1  B   lp  B    B"
+ 5045 print" {CBM-Q}CCCCC{CBM-E}CCCCC{CBM-W} filt2  B   bp  {CBM-Q}CCCC{CBM-X}"
+ 5050 print" B           B filt3  B   hp  B"
+ 5055 print" B           B filtex B  3off B"
+ 5060 print" {CBM-Z}CCCCCCCCCCC{CBM-E}CCCCCCCC{CBM-E}CCCCCCC{CBM-X}"
+ 5065 printf2$;" f1";f1$;"    ++      filt1      lp    ++"
+ 5070 printf2$;" f3";f1$;"    +       filt2      bp    +"
+ 5075 printf2$;" f5";f1$;"    -       filt3      hp    -"
+ 5080 printf2$;" f7";f1$;"    -       filtex    3off   --"
+ 5085 pw=(peek(mo+21)and7)+8*peek(mo+22)
+ 5090 syspr,5,7-len(str$(pw)),pw
+ 5095 pw=int(rf/16)
+ 5100 syspr,5,12-len(str$(pw)),pw
+ 5102 ifrfand1thensyspr,5,15,"{rvon}filt1 {rvof}"
+ 5104 ifrfand2thensyspr,6,15,"{rvon}filt2 {rvof}"
+ 5106 ifrfand4thensyspr,7,15,"{rvon}filt3 {rvof}"
+ 5108 ifrfand8thensyspr,8,15,"{rvon}filtex{rvof}"
+ 5110 pw=peek(mo+23)
+ 5112 ifpwand16thensyspr,5,25,"{rvon} lp {rvof}"
+ 5114 ifpwand32thensyspr,6,25,"{rvon} bp {rvof}"
+ 5116 ifpwand64thensyspr,7,25,"{rvon} hp {rvof}"
+ 5118 ifpwand128thensyspr,8,25,"{rvon}3off{rvof}"
+ 5120 pw=peek(mo+23)and15
+ 5122 syspr,5,34-len(str$(pw)),pw
+ 5125 av=5200:sysgs,av:return
+ 5130 :
+ 5135 :
+ 5140 :
+ 5145 av=av+50:ifav>5400thenav=5200
+ 5150 goto5165
+ 5155 :
+ 5160 av=av-50:ifav<5200thenav=5400
+ 5165 gosub5815:a=pb-fa-200
+ 5170 ifa<>15anda<>25thensysgt,av
+ 5175 forj=1to3:pb=pb+40:gosub5815:next
+ 5180 pb=pb-120:sysgt,av
+ 5200 :
+ 5205 :
+ 5210 pb=fa+203
+ 5215 fori=pbtopb+3:pokei,f2:next
+ 5220 pa=mo+21:pw=peek(pa)+8*peek(pa+1)
+ 5225 pm=2048:p1=1:p2=50:pv=2850:return
+ 5250 :
+ 5255 :
+ 5260 pb=fa+210
+ 5265 pokepb,f2:pokepb+1,f2
+ 5270 pa=si+23:pw=int(rf/16)
+ 5275 pm=16:p1=1:p2=1:pv=2875:return
+ 5300 :
+ 5310 pb=fa+215
+ 5315 fori=0to120step40:forj=0to5
+ 5320 pokepb+i+j,f2:next:next
+ 5325 pa=si+23:pw=rfand15
+ 5330 pv=2900:return
+ 5350 :
+ 5355 :
+ 5360 pb=fa+225
+ 5365 fori=0to120step40:forj=0to3
+ 5370 pokepb+i+j,f2:next:next
+ 5375 pa=mo+23
+ 5380 pv=2955:return
+ 5400 :
+ 5405 :
+ 5410 pb=fa+232
+ 5415 pokepb,f2:pokepb+1,f2
+ 5420 pa=mo+23:pw=peek(pa)and15
+ 5425 pm=16:p1=1:p2=1:pv=3010:return
+ 5500 :
+ 5505 :
+ 5510 :
+ 5515 m=3:syscl:print"{home}{rvof}";f1$;
+ 5520 print"   {CBM-A}CCCCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCCCC{CBM-R}CCCCC{CBM-S}"
+ 5525 print"   B lfof BlfopBlfoaBkurve BmodusB"
+ 5530 print" {CBM-A}C{SHIFT-+}CCCCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCCCC{SHIFT-+}CCCCC{SHIFT-+}CCCC{CBM-S}"
+ 5535 forz=3to9
+ 5540 syspr,z,1,"B B      B    B    B      B     B    B"
+ 5545 nextz
+ 5550 syspr,10,1,"{CBM-Z}C{CBM-E}CCCCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCCCC{CBM-E}CCCCC{CBM-E}CCCC{CBM-X}"
+ 5555 printf2$;" f1";f1$;"  ++     ++   ++  trian  reset"
+ 5560 printf2$;" f3";f1$;"  +      +    +   sawup  hold"
+ 5565 printf2$;" f5";f1$;"  -      -    -   sawdwn run"
+ 5570 printf2$;" f7";f1$;"  --     --   --  square"
+ 5575 forln=0to6
+ 5580 z=3+ln
+ 5585 syspr,z,2,chr$(48+ln)
+ 5590 pw=usr(mo+32+5*ln)
+ 5595 syspr,z,10-len(str$(pw)),pw
+ 5600 pw=peek(mo+34+5*ln)
+ 5605 syspr,z,15-len(str$(pw)),pw
+ 5610 pw=peek(mo+35+5*ln)
+ 5615 syspr,z,20-len(str$(pw)),pw
+ 5620 pw=peek(mo+36+5*ln)
+ 5625 syspr,z,21,kv$((pwand24)/8)
+ 5630 syspr,z,28,md$((pwand6)/2)
+ 5640 nextln
+ 5645 ln=0:av=5830:sysgs,av:return
+ 5650 :
+ 5655 :
+ 5670 :
+ 5675 ln=ln-1:ifln<0thenln=6
+ 5680 gosub5815:sysgt,av
+ 5685 :
+ 5690 ln=ln+1:ifln>6thenln=0
+ 5695 gosub5815:sysgt,av
+ 5700 :
+ 5705 av=av+30:ifav>5950thenav=5830
+ 5710 gosub5810:sysgt,av
+ 5715 :
+ 5720 av=av-30:ifav<5830thenav=5950
+ 5725 gosub5810:sysgt,av
+ 5800 :
+ 5805 :
+ 5810 syspr,6,34,"    "
+ 5815 fori=pbtopb+6:pokei,f1:next:return
+ 5820 :
+ 5825 :
+ 5830 pb=fa+40*(ln+3)+4
+ 5835 fori=pbtopb+5:pokei,f2:next
+ 5840 pa=mo+32+5*ln:pw=usr(pa):pm=65536
+ 5845 p1=1:p2=200:pv=2610:return
+ 5850 :
+ 5855 :
+ 5860 pb=fa+40*(ln+3)+11
+ 5865 fori=pbtopb+3:pokei,f2:next
+ 5870 pa=mo+34+5*ln:pw=peek(pa):pm=256
+ 5875 p1=1:p2=10:pv=2640:return
+ 5880 :
+ 5885 :
+ 5890 pb=fa+40*(ln+3)+16
+ 5895 fori=pbtopb+3:pokei,f2:next
+ 5900 pa=mo+35+5*ln:pw=peek(pa):pm=256
+ 5905 p1=1:p2=10:pv=2670:return
+ 5910 :
+ 5915 :
+ 5920 pb=fa+40*(ln+3)+21
+ 5925 fori=pbtopb+5:pokei,f2:next
+ 5930 pa=mo+36+5*ln:pv=2700
+ 5935 b=(peek(pa)and24)/8:goto2717
+ 5940 :
+ 5945 :
+ 5950 pb=fa+40*(ln+3)+28
+ 5955 forj=pbtopb+4:pokej,f2:next
+ 5960 pa=mo+36+5*ln
+ 5965 pv=2730:return
+ 6000 :
+ 6010 :
+ 6020 :
+ 6030 m=4:syscl:print"{home}{rvof}";f1$
+ 6040 print" software-eg":print:print
+ 6050 print" {CBM-A}CCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCCC{CBM-R}CCCCC{CBM-S}"
+ 6060 print" B  a B  d B  s B  r B egaB formBmodusB"
+ 6070 print" {CBM-Q}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCCC{SHIFT-+}CCCCC{CBM-W}"
+ 6080 print" B    B    B    B    B    B     B     B"
+ 6090 print" {CBM-Z}CCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCCC{CBM-E}CCCCC{CBM-X}"
+ 6100 syspr,10,1,f2$;"f1":print" f3"
+ 6110 print" f5":print" f7";f1$
+ 6120 syspr,10,13,"++                  reset"
+ 6130 syspr,11,13,"+               +   hold"
+ 6140 syspr,12,13,"-               -   run"
+ 6150 syspr,13,13,"--"
+ 6160 fori=0to4
+ 6170 pw=peek(mo+67+i)
+ 6180 syspr,7,6+5*i-len(str$(pw)),pw
+ 6190 nexti
+ 6210 pw=peek(mo+72)
+ 6220 syspr,7,29,chr$(43+(pwand8)/4)
+ 6230 syspr,7,33,md$((pwand6)/2)
+ 6240 av=6310:an=0:sysgt,av
+ 6300 :
+ 6305 :
+ 6310 pb=fa+282+5*an:s=2+5*an
+ 6315 fori=pbtopb+3:pokei,f2:next
+ 6320 pa=mo+67+an:pw=peek(pa)
+ 6325 pm=256:ifan=0thenpm=129
+ 6330 p1=1:p2=10:pv=2760:return
+ 6335 :
+ 6340 :
+ 6345 pb=fa+280+27:pokepb+2,f2
+ 6350 pa=mo+72:pv=2780:return
+ 6370 :
+ 6375 :
+ 6380 pb=fa+280+33
+ 6385 fori=pbtopb+4:pokei,f2:next
+ 6390 pa=mo+72:pv=2820:return
+ 6395 :
+ 6400 :
+ 6405 :
+ 6410 ifav<>6310then6420
+ 6415 an=an-1:ifan>=0then6430
+ 6420 av=av-35:an=4
+ 6425 ifav<6310thenav=6380
+ 6430 gosub5815:sysgt,av
+ 6435 :
+ 6440 ifav<>6310then6450
+ 6445 an=an+1:ifan<=4then6460
+ 6450 av=av+35
+ 6455 ifav>6380thenav=6310:an=0
+ 6460 gosub5815:sysgt,av
+ 6500 :
+ 6510 :
+ 6520 :
+ 6530 m=5:pv=0:print"{rvof}";:syscl
+ 6540 syspr,1,1,f1$;"kreuzschienen-verteiler"
+ 6550 syspr,3,1,"e    lfo"
+ 6560 syspr,4,1,"g6543210"
+ 6570 syspr,5,1,f2$;"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 6580 a$=f2$+"{CBM-M}"+f1$+"        "+f2$+"T "+f1$
+ 6590 printa$;"f1";f2$;"     cursortasten"
+ 6600 printa$;"f2"
+ 6610 printa$;"f3"
+ 6620 printa$;"p1";f2$;"     f1 ";f1$;"verbindung"
+ 6630 printa$;"p2"
+ 6640 printa$;"p3";f2$;"     f7 ";f1$;"keine verbindung"
+ 6650 printa$;"filt"
+ 6660 printa$;"laut"
+ 6670 printf2$;" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 6680 forz=0to7:gosub6730:next
+ 6685 z=0:s=7:poke55296+40*(6+z)+8-s,f2
+ 6690 return
+ 6700 :
+ 6710 :
+ 6720 :
+ 6730 b=peek(mo+24+z):a=128
+ 6740 syspr,6+z,1,f1$;"{rvon}00000000"
+ 6750 ifb=0thenreturn
+ 6760 fors=7to0step-1
+ 6770 if(banda)thensyspr,6+z,8-s,"{rvon}1";
+ 6780 a=a/2:nexts
+ 6790 printf1$;:return
+ 6800 :
+ 6810 :
+ 6820 :
+ 6830 poke55296+40*(6+z)+8-s,f1
+ 6840 z=(z-1)and7:goto6910
+ 6850 poke55296+40*(6+z)+8-s,f1
+ 6860 z=(z+1)and7:goto6910
+ 6870 poke55296+40*(6+z)+8-s,f1
+ 6880 s=(s+1)and7:goto6910
+ 6890 poke55296+40*(6+z)+8-s,f1
+ 6900 s=(s-1)and7:goto6910
+ 6910 poke55296+40*(6+z)+8-s,f2
+ 6915 return
+ 6920 :
+ 6925 :
+ 6930 :
+ 6935 ad=mo+24+z
+ 6940 pokead,peek(ad)or2^s
+ 6950 poke1024+40*(6+z)+8-s,177:return
+ 6960 :
+ 6965 :
+ 6970 :
+ 6975 ad=mo+24+z
+ 6980 pokead,peek(ad)and(255-2^s)
+ 6990 poke1024+40*(6+z)+8-s,176:return
+ 7000 :
+ 7005 :
+ 7010 :
+ 7015 m=6:pv=0:syscl:print"{home}{rvof}";f2$
+ 7020 syspr,1,8,"a           b           c"
+ 7025 printf1$;"   {CBM-A}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-S}"
+ 7030 fori=1to8
+ 7035 syspr,2+i,1,f2$;chr$(48+i);f1$" B"
+ 7040 syspr,2+i,38,"B":next
+ 7045 syspr,11,3,"{CBM-Z}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-X}"
+ 7050 syspr,12,4,f2$;"a-c 1-8"
+ 7055 syspr,12,13,f1$;"sound waehlen"
+ 7060 syspr,13,1,f2$;"_  a-c 1-8"
+ 7065 syspr,13,13,f1$"sound abspeichern"
+ 7070 syspr,14,1,f2$;"n"
+ 7075 syspr,14,13,f1$;"namen eingeben (return)"
+ 7080 fors=0to2:forz=0to7
+ 7085 syspr,3+z,4+s*12,;
+ 7090 sysna,so+107*(8*s+z)+97
+ 7095 next:next:ifns<0thenz=0:s=0:return
+ 7100 z=nsand7:s=int(ns/8):goto7180
+ 7110 :
+ 7115 :
+ 7120 x=a-65
+ 7122 syspr,12,13,f2$;"{rvof}sound waehlen"
+ 7125 geta$:ifa$=""then7125
+ 7130 y=asc(a$)-49
+ 7135 ify<0ory>7then7142
+ 7140 gosub7150:gosub7400
+ 7142 syspr,12,13,f1$;"{rvof}sound waehlen"
+ 7144 return
+ 7146 :
+ 7150 :
+ 7155 ns=8*s+z
+ 7160 syspr,3+z,4+s*12,f1$;"{rvof}";
+ 7165 sysna,so+107*ns+97
+ 7170 :
+ 7175 s=x:z=y:ns=8*s+z
+ 7180 syspr,3+z,4+s*12,f2$;"{rvof}";
+ 7185 sysna,so+107*ns+97
+ 7190 return
+ 7200 :
+ 7205 :
+ 7210 syspr,13,13,f2$;"{rvof}sound abspeichern"
+ 7215 geta$:ifa$=""then7215
+ 7220 x=asc(a$)-65
+ 7225 ifx<0orx>2then7250
+ 7230 geta$:ifa$=""then7230
+ 7235 y=asc(a$)-49
+ 7240 ify<0ory>7then7250
+ 7245 gosub7150:gosub7450:goto7260
+ 7250 syspr,13,13,f1$;"{rvof}sound abspeichern"
+ 7255 return
+ 7260 syspr,13,13,f1$;"{rvof}sound abspeichern"
+ 7300 :
+ 7305 :
+ 7310 syspr,14,13,f2$;"namen eingeben (return)"
+ 7315 x=12*s+4:y=z+3:ad=1024+40*y+x
+ 7320 sa=so+107*ns+97:i=0
+ 7325 pokead+i,peek(ad+i)or128
+ 7330 geta$:ifa$=""then7330
+ 7335 a=asc(a$):ifa<32ora>95then7370
+ 7340 :
+ 7345 syspr,y,x+i,f2$;a$;:pokesa+i,a
+ 7350 i=i+1
+ 7355 ifi>9theni=9:goto7325
+ 7360 ifi<0theni=0
+ 7365 goto7325
+ 7370 ifa=29thenpokead+i,peek(ad+i)and127:goto7350
+ 7375 ifa=157thenpokead+i,peek(ad+i)and127:i=i-1:goto7355
+ 7380 ifa<>13then7330
+ 7385 pokead+i,peek(ad+i)and127
+ 7390 syspr,14,13,f1$;"namen eingeben (return)"
+ 7395 return
+ 7400 :
+ 7402 :
+ 7404 sa=so+ns*107:sysge,sa
+ 7406 fori=0to2
+ 7408 ad=sa+7*i
+ 7410 bf(i)=usr(ad+73)
+ 7412 x=bf(i)/17.0327/440
+ 7414 y=log(x)/log(2)
+ 7416 y=y+4+9/12+49/1200
+ 7418 o(i)=int(y):y=(y-o(i))*12
+ 7420 t(i)=int(y)
+ 7422 of(i)=int((y-t(i))*100-48.5)
+ 7424 s(i)=(peek(ad+75)=1)
+ 7425 poke981+i,abs(s(i))
+ 7426 a$=chr$(49+i):gosub3570
+ 7428 c(i)=peek(ad+77)and254
+ 7429 poke50334+i,c(i):poke984+i,c(i)
+ 7430 c1(i)=c(i)or1
+ 7431 poke987+i,c1(i)
+ 7432 ad(i)=peek(ad+78)
+ 7434 sr(i)=peek(ad+79)
+ 7436 nexti
+ 7438 rf=peek(sa+94)
+ 7440 eg=(peek(sa+95)=1):gosub3740
+ 7441 poke990,abs(eg)
+ 7442 su=(peek(sa+96)=1):gosub3840
+ 7443 poke991,abs(su)
+ 7444 gosub20000:return
+ 7450 :
+ 7452 :
+ 7454 sa=so+ns*107:syspu,sa
+ 7456 forsn=0to2
+ 7458 ad=sa+7*sn
+ 7460 sysdo,ad+73,bf(sn)
+ 7462 pokead+75,-s(sn)
+ 7464 pokead+77,c(sn)
+ 7466 pokead+78,ad(sn)
+ 7468 pokead+79,sr(sn)
+ 7470 nextsn
+ 7472 pokesa+94,rf
+ 7474 pokesa+95,-eg
+ 7476 pokesa+96,-su
+ 7478 return
+ 7500 :
+ 7505 :
+ 7510 :
+ 7515 m=7:pv=0:syscl:print"{home}";f1$
+ 7520 print" disk"
+ 7525 syspr,5,4,f2$;"f1"
+ 7530 syspr,5,7,f1$;"sounds laden"
+ 7532 syspr,6,4,f2$;"f2"
+ 7534 syspr,6,7,f1$;"song   laden"
+ 7535 syspr,7,4,f2$;"f3"
+ 7540 syspr,7,7,f1$;"sounds abspeichern"
+ 7545 return
+ 7600 :
+ 7605 :
+ 7610 syspr,5,7,f2$;"sounds laden"
+ 7615 syspr,10,4,f1$;"dateiname";
+ 7620 dn$="sounds              "
+ 7625 syspr,10,16,dn$
+ 7630 syspr,10,14,;:inputdn$
+ 7632 sys50198:gosub2140
+ 7635 open8,8,8,dn$+",p,r":close8
+ 7640 open1,8,15:input#1,a,a$,x,y:close1
+ 7645 syspr,12,4,"                             "
+ 7650 ifa=0then7660
+ 7655 syspr,12,3,a;a$;x;y:goto7625
+ 7660 a=0:loaddn$,8,1
+ 7665 syspr,5,7,f1$;"sounds laden"
+ 7670 ns=-1:a=211
+ 7675 sysdo,56326,int(6e7/(24*te))
+ 7680 ifsrthensys51093:goto1550
+ 7685 sysmo+1033:goto1550
+ 7700 :
+ 7705 :
+ 7710 syspr,7,7,f2$;"sounds abspeichern"
+ 7715 syspr,10,4,f1$;"dateiname";
+ 7720 dn$="sounds              "
+ 7725 syspr,10,16,dn$
+ 7730 syspr,10,14,;:inputdn$
+ 7735 sys50198:gosub2140
+ 7740 :
+ 7745 open1,8,1,"@:"+dn$
+ 7750 poke252,0:poke253,144
+ 7755 poke780,252
+ 7760 poke781,8
+ 7765 poke782,154
+ 7770 sys65496
+ 7775 close1
+ 7780 open1,8,15:input#1,a,a$,x,y:close1
+ 7785 ifa=0then7795
+ 7790 syspr,12,4,a;a$;x;y:goto7725
+ 7795 syspr,12,4,"                              "
+ 7800 syspr,7,7,f1$;"sounds abspeichern"
+ 7805 sysdo,56326,int(6e7/(24*te))
+ 7810 ifsrthensys51093:return
+ 7815 sys50185:return
+ 7900 :
+ 7905 :
+ 7910 syspr,6,7,f2$;"song   laden"
+ 7915 syspr,10,4,f1$;"dateiname ";
+ 7920 syspr,10,14,;:inputdn$
+ 7925 sys50966:gosub2140
+ 7930 open8,8,8,dn$+",p,r":close8
+ 7935 open1,8,15:input#1,a,a$,x,y:close1
+ 7940 syspr,12,4,"                             "
+ 7945 ifa=0then7955
+ 7950 syspr,12,3,a;a$;x;y:goto7920
+ 7955 a=0:m=7.5:loaddn$,8,1
+ 7960 syspr,6,7,f1$;"song   laden"
+ 7965 m=7:sq=-1
+ 7970 sysdo,56326,int(6e7/(24*te))
+ 7975 sysdo,50310,usr(39432)
+ 7980 sys51001
+ 7985 ifnotsrthensys50966
+ 7990 a=65:goto1550
+ 8000 :
+ 8010 :
+ 8020 :
+ 8030 print"{clr}{swuc}{dish}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}       ";
+ 8035 print"bitte 40 sekunden warten"
+ 8040 :
+ 8045 :
+ 8050 fori=0to22
+ 8055 poke828+i,peek(43139+i):next
+ 8060 fori=0to129:readx:poke851+i,x:next
+ 8065 poke785,169:poke786,3
+ 8070 :
+ 8072 :
+ 8074 fori=50211to50291
+ 8076 readx:pokei,x:next
+ 8078 :
+ 8080 :
+ 8082 fori=0to11:readtn$(i):next
+ 8100 :
+ 8110 :
+ 8120 reada$:l=len(a$)
+ 8130 onlgoto8150,8220,8280,8310,8310
+ 8150 :
+ 8160 a=asc(a$)
+ 8170 ifm>=0thenv%(m,a)=zn:goto8120
+ 8180 fori=0to8:v%(i,a)=zn:next
+ 8190 goto8120
+ 8200 ifleft$(a$,1)<>"m"then8120
+ 8220 :
+ 8230 ifleft$(a$,1)<>"m"then8120
+ 8240 a$=right$(a$,1)
+ 8250 ifa$="a"thenm=-1:goto8120
+ 8260 m=val(a$):goto8120
+ 8280 :
+ 8290 a=val(a$):goto8170
+ 8310 :
+ 8320 ifa$="ende"then8340
+ 8330 zn=val(a$):goto8120
+ 8340 :
+ 8350 :
+ 8360 a$="q2w3er5t6y7ui9o0p@-*\^{home};="
+ 8370 fori=0to24
+ 8380 a=asc(mid$(a$,i+1,1))
+ 8390 tn%(a)=i
+ 8400 forj=0to8:v%(j,a)=2000:next
+ 8410 nexti
+ 8450 :
+ 8455 :
+ 8460 fori=0to48:th(i)=2^(i/12):next
+ 8465 :
+ 8470 :
+ 8472 gs=828:gt=857:pr=869:do=897:cl=959
+ 8474 na=50229:ge=50245:pu=50276
+ 8480 si=54272:mo=49152:fa=55296
+ 8482 so=36864:ci=56320
+ 8484 f1$=chr$(30):f1=5
+ 8490 f2$=chr$(5):f2=1
+ 8495 kv$(0)="trian ":kf$(0)="NMNM"
+ 8500 kv$(1)="sawup ":kf$(1)="NLNL"
+ 8505 kv$(2)="sawdwn":kf$(2)="{SHIFT-@}M{SHIFT-@}M"
+ 8510 kv$(3)="square":kf$(3)="OLOL"
+ 8515 md$(0)="reset":md$(1)="reset"
+ 8520 md$(2)="hold ":md$(3)="run  "
+ 8525 bl$(0)="":bl$(1)=" ":bl$(2)="  "
+ 8530 bl$(3)="   ":bl$(4)="    "
+ 8535 bl$(5)="     ":bl$(6)="      "
+ 8540 :
+ 8545 :
+ 8550 forsn=0to2
+ 8555 pokesi+7*sn+5,10:ad(sn)=10
+ 8560 pokesi+7*sn+6,138:sr(sn)=138
+ 8565 o(sn)=3+sn:of(sn)=0:t(sn)=0
+ 8570 bf=440*2^(o(sn)-4+(t(sn)-9)/12+of(sn)/1200)
+ 8572 bf(sn)=bf*17.0327
+ 8575 c(sn)=64:c1(sn)=65
+ 8576 poke984+sn,c(sn):poke987+sn,c1(sn)
+ 8578 poke50334+sn,c(sn)
+ 8580 s(sn)=(sn=0)
+ 8582 poke981+sn,abs(s(sn))
+ 8585 sysdo,mo+7*sn+2,2048
+ 8590 pokemo+7*sn+4,0
+ 8595 nextsn
+ 8600 pokesi+23,0:rf=0
+ 8605 sysdo,mo+21,0
+ 8610 pokemo+23,15
+ 8615 fori=24to72
+ 8620 pokemo+i,0:next
+ 8625 eg=0
+ 8627 poke50303,0
+ 8630 su=0
+ 8631 poke990,abs(eg):poke991,abs(su)
+ 8632 te=120
+ 8635 :
+ 8640 :
+ 8645 forns=0to23
+ 8650 gosub7450
+ 8655 ad=so+107*ns+97
+ 8660 fori=adtoad+9:pokei,46:next
+ 8665 nextns:ns=0
+ 8666 gosub20000:w=1
+ 8700 :
+ 8870 :
+ 8880 poke53280,0:poke53281,0
+ 8890 printf1$;"{rvof}";:poke650,128
+ 8900 gosub4200
+ 8910 sysmo+1033
+ 8920 sq=0:sm=0:sr=0:a=2:return
+ 9000 :
+ 9010 :
+ 9020 :
+ 9030 :
+ 9060 data032,089,003,076,174,167,032
+ 9070 data253,174,032,138,173,032,247
+ 9080 data183,076,163,168,032,253,174
+ 9090 data032,158,183,138,072,032,253
+ 9100 data174,032,158,183,138,168,104
+ 9110 data170,024,032,240,255,032,253
+ 9120 data174,076,160,170,032,253,174
+ 9130 data032,138,173,032,247,183,165
+ 9140 data020,133,158,165,021,133,159
+ 9150 data032,253,174,032,138,173,032
+ 9160 data247,183,160,000,120,165,020
+ 9170 data145,158,200,165,021,145,158
+ 9180 data088,096,032,247,183,160,000
+ 9190 data120,177,020,133,099,200,177
+ 9200 data020,088,133,098,162,144,056
+ 9210 data076,073,188,169,032,162,000
+ 9220 data157,000,004,157,000,005,202
+ 9230 data208,247,162,087,157,000,006
+ 9240 data202,016,250,096
+ 9250 :
+ 9260 :
+ 9270 data032,253,174,032,138,173,032
+ 9280 data247,183,165,020,133,158,165
+ 9290 data021,133,159,096,032,035,196
+ 9300 data160,000,177,158,032,210,255
+ 9310 data200,192,010,208,246,096,032
+ 9320 data035,196,160,000,177,158,153
+ 9330 data000,192,200,192,073,208,246
+ 9340 data177,158,153,183,211,200,192
+ 9350 data094,208,246,177,158,141,023
+ 9360 data212,096,032,035,196,160,000
+ 9370 data185,000,192,145,158,200,192
+ 9380 data073,208,246,096
+ 9400 :
+ 9410 :
+ 9420 datac,c#,d,d#,e,f,f#,g,g#,a,a#,h
+ 9500 :
+ 9510 :
+ 9520 datama,4000,x,3500,v,3600,032
+ 9530 datama,3700,160,3800,s,9990,a
+ 9540 datama,2550,133,2560,134
+ 9550 datama,2570,135,2580,136,4500,214
+ 9555 datama,5500,l,6000,h,6500,k
+ 9560 datama,5000,f,7000,211,7500,d
+ 9565 datam1,4654,145,4660,017
+ 9570 datam1,4666,029,4680,157
+ 9580 datam2,5160,157,5145,029
+ 9600 datam3,5675,145,5690,017
+ 9610 datam3,5720,157,5705,029
+ 9620 datam4,6410,157,6440,029
+ 9630 datam5,6830,145,6850,017
+ 9640 datam5,6870,157,6890,029
+ 9650 datam5,6935,133,134,6975,135,136
+ 9700 datam6,7110,a,b,c,7200,_,7300,n
+ 9750 datam7,7600,133,7700,134,7900,137
+ 9800 datam8,10420,029,10450,157
+ 9900 dataende
+ 9990 :
+10000 :
+10010 :
+10020 :
+10030 m=8:pv=0:syscl:print"{home}{down}";f1$;
+10040 print" sequencer";
+10045 ifnotsqthenprint"  (kein song vorhanden)"
+10050 syspr,4,10,"tempo modus seqnr  soft-eg"
+10060 syspr,5,4,"{CBM-A}CCCC{CBM-R}CCCCC{CBM-R}CCCCC{CBM-R}CCCCC{CBM-R}CCCCCCCCC{CBM-S}"
+10070 syspr,6,4,"B    B     B     B     B 1  2  3 B"
+10080 syspr,7,4,"{CBM-Z}CCCC{CBM-E}CCCCC{CBM-E}CCCCC{CBM-E}CCCCC{CBM-E}CCCCCCCCC{CBM-X}"
+10090 syspr,9,1,f2$;"f1";f1$;"  reset  ++                  1"
+10100 syspr,10,1,f2$;"f3";f1$;"  stop    +  song    +       2"
+10110 syspr,11,1,f2$;"f5";f1$;"  run     -  seq     -       3"
+10120 syspr,12,1,f2$;"f7";f1$;"         --"
+10130 ifsrthen10150
+10140 syspr,6,5,"stop":goto10160
+10150 syspr,6,5,"run "
+10160 syspr,6,11,right$(str$(te),3)
+10170 ifsmthen10190
+10180 syspr,6,16,"song":goto10210
+10190 syspr,6,16,"seq "
+10200 syspr,6,22,right$(" "+str$(se),3)
+10210 :
+10220 x=peek(50303)
+10230 ifxand1thensyspr,6,28,"{rvon} 1 "
+10240 ifxand2thensyspr,6,31,"{rvon} 2 "
+10250 ifxand4thensyspr,6,34,"{rvon} 3 "
+10300 av=10500:sysgs,av:return
+10400 :
+10410 :
+10420 :
+10430 av=av+100:ifav>10900thenav=10500
+10440 goto10470
+10450 :
+10460 av=av-100:ifav<10500thenav=10900
+10470 fori=pbtopb+8:pokei,f1:next
+10480 sysgt,av
+10500 :
+10510 :
+10520 pb=fa+245
+10530 fori=pbtopb+3:pokei,f2:next
+10540 pa=ci+12:pv=11000:return
+10600 :
+10610 :
+10620 pb=fa+250
+10630 fori=pbtopb+3:pokei,f2:next
+10640 pa=ci+6:pw=te
+10650 pm=500:p1=1:p2=10:pv=3400:return
+10700 :
+10710 :
+10720 pb=fa+256
+10730 fori=pbtopb+3:pokei,f2:next
+10740 pa=50345:pw=peek(pa)
+10750 pv=11100:return
+10800 :
+10810 :
+10820 pb=fa+262
+10830 fori=pbtopb+2:pokei,f2:next
+10840 pw=se:p1=1:p2=1:pm=1000
+10850 pv=11200:return
+10900 :
+10910 :
+10920 pb=fa+268
+10930 fori=pbtopb+8:pokei,f2:next
+10940 pa=50303:pv=11300:return
+11000 :
+11010 :
+11015 ifnotsqthenreturn
+11020 ifa<133ora>135thenreturn
+11030 ona-132goto11040,11060,11080
+11040 :
+11042 ifsmthensys51116:return
+11045 sys51001
+11050 ifnotsrthensys50966
+11055 return
+11060 :
+11065 sys50966:syspr,6,5,f2$;"stop"
+11070 sr=0:ifnotsuthen2140
+11075 return
+11080 :
+11085 sys51093:syspr,6,5,f2$;"run"
+11090 sr=-1:return
+11100 :
+11110 :
+11112 ifnotsqthenreturn
+11115 ifa=134then11130
+11120 ifa=135then11150
+11125 return
+11130 :
+11135 sm=0:pokepa,0
+11140 syspr,6,16,f2$;"song"
+11145 syspr,6,22,"     ":return
+11150 :
+11155 sm=-1:pokepa,1:syspr,6,16,"seq "
+11160 syspr,6,16,f2$;"seq "
+11165 se=(usr(50312)-usr(50310))/3+1
+11170 syspr,6,22,f1$;right$(" "+str$(se),3)
+11175 return
+11200 :
+11210 :
+11220 ifnotsmthenreturn
+11230 ifpw=0thenpw=1:return
+11240 ad=usr(50310)+(pw-1)*3
+11250 ifusr(ad)=0thenpw=pw-1:return
+11260 sysdo,50312,ad:se=pw
+11270 sysdo,50314,usr(ad)
+11280 sys51116
+11285 syspr,6,22,f2$;right$(" "+str$(se),3)
+11290 return
+11300 :
+11310 :
+11320 x=peek(pa)
+11330 fori=0to2
+11340 ifa<>133+ithen11420
+11350 y=2^i
+11360 if(xandy)then11400
+11370 x=xory:pokepa,x
+11380 syspr,6,28+3*i,f2$;"{rvon}";i+1;"{left} "
+11390 goto11420
+11400 x=xand(255-y):pokepa,x
+11410 syspr,6,28+3*i,f2$;i+1;"{left} "
+11420 nexti:return
+20000 ifw=1thensyspr,18,1,;"{wht}sh w     {rvon}wersiboard stimmen{rvof}"
+20010 forxx=0to2:zz=-2
+20020 foryy=0to48
+20025 zz=zz+2
+20030 ww=th(yy)*bf(xx)
+20040 ifww>65535thenww=0
+20050 sys do,52950+(98*xx)+zz,ww
+20060 nextyy,xx
+20070 ifw=1thensyspr,18,1,;"{wht}sh w{grn}     wersiboard stimmen"
+20080 return
+
