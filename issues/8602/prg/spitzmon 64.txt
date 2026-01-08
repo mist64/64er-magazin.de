@@ -1,0 +1,490 @@
+
+
+;spitzmon 64.prg ==0801==
+  100 rem********************************
+  110 rem*                              *
+  120 rem*   spitzmon 64 fuer ascomp 64 *
+  130 rem*   christian q. spitzner      *
+  140 rem*   gruberstr. 53              *
+  150 rem*   8011 poing                 *
+  160 rem*   tel:08121/81100            *
+  170 rem*                              *
+  180 rem********************************
+  190 rem
+ 1000 rem ***       hauptprogramm     ***
+ 1010 print"{clr}{swuc}*****************************************     {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 1020 print"{left}**     {SHIFT--}spitzmon 64{SHIFT--}  fuer  ascomp 64   **     {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+ 1030 print"{left}**{down}{left}{left}**      copyright (c) poing 1985        **{down}{left}{left}*";
+ 1040 print"*      by christian quirin spitzner    *";
+ 1050 print"*{down}{left}{left}*****************************************"
+ 1060 poke 204,0
+ 1070 poke 650,128
+ 1080 print">";
+ 1090 let f=0
+ 1100 sys 42336
+ 1110 let z = 512
+ 1120 let v = peek(512)
+ 1130 if v=0 then 1080
+ 1140 if v=62 then 1160
+ 1150 goto 1220
+ 1160 let x=z+1
+ 1170 let c=peek(x)
+ 1180 poke z,c
+ 1190 if c=0 then 1110
+ 1200 let z=z+1
+ 1210 goto 1160
+ 1220 if v=77 then 3020
+ 1230 if v=71 then 6020
+ 1240 if v=88 then 4020
+ 1250 if v=76 then 5020
+ 1260 if v=83 then 5020
+ 1270 if v=70 then 7020
+ 1280 if v=84 then 8020
+ 1290 if v=72 then 9020
+ 1300 if v=67 then 8020
+ 2000 rem
+ 2010 rem ***       zeileneingabe     ***
+ 2020 let j=0
+ 2030 let k=j+j
+ 2040 let k=k+j
+ 2050 let t=4+k
+ 2060 gosub 10020
+ 2070 if f=1 then 1080
+ 2080 let j=j+1
+ 2090 if j<8 then 2030
+ 2100 gosub 11020
+ 2110 if c=28 then 2130
+ 2120 goto 14020
+ 2130 let s=1
+ 2140 let a=1
+ 2150 let g=0
+ 2160 let t=4
+ 2170 gosub 12020
+ 2180 if f=1 then 1080
+ 2190 let d=g
+ 2200 let j=0
+ 2210 let k=j+j
+ 2220 let k=k+j
+ 2230 let a=6+k
+ 2240 let s=3
+ 2250 let g=0
+ 2260 let t=a+1
+ 2270 gosub 12020
+ 2280 if f=1 then 1080
+ 2290 let e=d+j
+ 2300 poke e,g
+ 2310 let j=j+1
+ 2320 if j<8 then 2210
+ 2330 goto 1080
+ 3000 rem
+ 3010 rem ***       memory-dump       ***
+ 3020 let t=1
+ 3030 gosub 10020
+ 3040 let t=6
+ 3050 gosub 10020
+ 3060 if f=1 then 1080
+ 3070 gosub 11020
+ 3080 if c=11 then 3100
+ 3090 goto 14020
+ 3100 let s=1
+ 3110 let a=3
+ 3120 let g=0
+ 3130 let t=12
+ 3140 gosub 12020
+ 3150 if f=1 then 1080
+ 3160 let h=g
+ 3170 let s=1
+ 3180 let a=8
+ 3190 let g=0
+ 3200 gosub 12020
+ 3210 if f=1 then 1080
+ 3220 let y=h
+ 3230 print">";
+ 3240 gosub 13020
+ 3250 print" ";
+ 3260 let i=0
+ 3270 let d=i+h
+ 3280 let y=peek(d)
+ 3290 gosub 13120
+ 3300 print" ";
+ 3310 let i=i+1
+ 3320 if i<8 then 3270
+ 3330 poke 2,13
+ 3340 sys 65490
+ 3350 let t=peek(197)
+ 3360 if t=63 then 1080
+ 3370 let h=h+8
+ 3380 if h>g then 1080
+ 3390 goto 3220
+ 4000 rem
+ 4010 rem ***       exit              ***
+ 4020 poke 650,0
+ 4030 poke 204,1
+ 4040 end
+ 5000 rem
+ 5010 rem ***       load/save         ***
+ 5020 let t=1
+ 5030 let d=peek(513)
+ 5040 if d=34 then 5080
+ 5050 poke 211,t
+ 5060 print"{up}{rght}?"
+ 5070 goto 1080
+ 5080 let m=0
+ 5090 let n=515+m
+ 5100 let t=m+4
+ 5110 if m>15 then 5050
+ 5120 let d=peek(n)
+ 5130 if d=34 then 5160
+ 5140 let m=m+1
+ 5150 goto 5090
+ 5160 let t=m+4
+ 5170 gosub 10020
+ 5180 let w=17
+ 5190 if v=83 then 5220
+ 5200 let w=7
+ 5210 if v=76 then 5260
+ 5220 let t=t+3
+ 5230 gosub 10020
+ 5240 let t=t+5
+ 5250 gosub 10020
+ 5260 if f=1 then 1080
+ 5270 gosub 11020
+ 5280 let n=m+w
+ 5290 if c=n then 5320
+ 5300 let t=n
+ 5310 goto 5050
+ 5320 let s=3
+ 5330 let a=m+6
+ 5340 let g=0
+ 5350 let t=a+1
+ 5360 gosub 12020
+ 5370 if f=1 then 1080
+ 5380 let o=g
+ 5390 let p=m+1
+ 5400 if v=76 then 5720
+ 5410 let s=1
+ 5420 let a=m+9
+ 5430 let g=0
+ 5440 let t=a+3
+ 5450 gosub 12020
+ 5460 if f=1 then 1080
+ 5470 gosub 15020
+ 5480 let r=h
+ 5490 let q=l
+ 5500 let a=m+14
+ 5510 let g=0
+ 5520 let t=a+3
+ 5530 let s=1
+ 5540 gosub 12020
+ 5550 if f=1 then 1080
+ 5560 gosub 15020
+ 5570 let a=peek(45)
+ 5580 let b=peek(46)
+ 5590 gosub 16020
+ 5600 poke 251,q
+ 5610 poke 252,r
+ 5620 poke 780,251
+ 5630 poke 781,l
+ 5640 poke 782,h
+ 5650 poke 20,216
+ 5660 poke 21,255
+ 5670 sys 57648
+ 5680 poke 45,a
+ 5690 poke 46,b
+ 5700 print
+ 5710 goto 1080
+ 5720 print"{up}{up}"
+ 5730 gosub 16020
+ 5740 poke 780,0
+ 5750 poke 20,213
+ 5760 poke 21,255
+ 5770 sys 57648
+ 5780 print
+ 5790 goto 1080
+ 6000 rem
+ 6010 rem ***       goto              ***
+ 6020 let t=1
+ 6030 gosub 10020
+ 6040 if f=1 then 1080
+ 6050 gosub 11020
+ 6060 if c=6 then 6080
+ 6070 goto 14020
+ 6080 let s=1
+ 6090 let a=3
+ 6100 let g=0
+ 6110 let t=12
+ 6120 gosub 12020
+ 6130 if f=1 then 1080
+ 6140 gosub 15020
+ 6150 poke 20,l
+ 6160 poke 21,h
+ 6170 sys 57648
+ 6180 goto 1080
+ 7000 rem
+ 7010 rem ***       fill              ***
+ 7020 let b=513
+ 7030 let d=peek(b)
+ 7040 if d=32 then 7060
+ 7050 goto 2020
+ 7060 let t=6
+ 7070 gosub 10020
+ 7080 let t=11
+ 7090 gosub 10020
+ 7100 if f=1 then 1080
+ 7110 gosub 11020
+ 7120 if c=14 then 7140
+ 7130 goto 14020
+ 7140 let s=1
+ 7150 let a=3
+ 7160 let g=0
+ 7170 let t=15
+ 7180 gosub 12020
+ 7190 let h=g
+ 7200 let s=1
+ 7210 let a=8
+ 7220 let g=0
+ 7230 gosub 12020
+ 7240 let i=g
+ 7250 let s=3
+ 7260 let a=13
+ 7270 let g=0
+ 7280 gosub 12020
+ 7290 if f=1 then 1080
+ 7300 pokeh,g
+ 7310 let h=h+1
+ 7320 if h>i then 1080
+ 7330 goto 7300
+ 8000 rem
+ 8010 rem ***    transfer/compare     ***
+ 8020 let t=1
+ 8030 gosub 10020
+ 8040 let t=6
+ 8050 gosub 10020
+ 8060 let t=11
+ 8070 gosub 10020
+ 8080 if f=1 then 1080
+ 8090 gosub 11020
+ 8100 if c=16 then 8120
+ 8110 goto 14020
+ 8120 let s=1
+ 8130 let a=3
+ 8140 let g=0
+ 8150 let t=15
+ 8160 gosub 12020
+ 8170 let h=g
+ 8180 let s=1
+ 8190 let a=8
+ 8200 let g=0
+ 8210 gosub 12020
+ 8220 let i=g
+ 8230 let s=1
+ 8240 let a=13
+ 8250 let g=0
+ 8260 gosub 12020
+ 8270 if f=1 then 1080
+ 8280 if v=67 then 8370
+ 8290 let j=peek(h)
+ 8300 poke g,j
+ 8310 let h=h+1
+ 8320 let g=g+1
+ 8330 if h>i then 1080
+ 8340 goto 8290
+ 8350 rem
+ 8360 rem ***       compare           ***
+ 8370 let j=peek(h)
+ 8380 let k=peek(g)
+ 8390 if k=j then 8410
+ 8400 goto 8470
+ 8410 let h=h+1
+ 8420 let q=peek(197)
+ 8430 if q=63 then 9740
+ 8440 let g=g+1
+ 8450 if h>i then 9740
+ 8460 goto 8370
+ 8470 let y=h
+ 8480 gosub 13020
+ 8490 print" ";
+ 8500 goto 8410
+ 9000 rem
+ 9010 rem ***       hind              ***
+ 9020 let t=1
+ 9030 gosub 10020
+ 9040 let t=6
+ 9050 gosub 10020
+ 9060 let t=11
+ 9070 gosub 10020
+ 9080 if f=1 then 1080
+ 9090 gosub 11020
+ 9100 if c=14 then 9220
+ 9110 let t=14
+ 9120 gosub 10020
+ 9130 if f=1 then 1080
+ 9140 gosub 11020
+ 9150 if c=17 then 9220
+ 9160 let t=17
+ 9170 gosub 10020
+ 9180 if f=1 then 1080
+ 9190 gosub 11020
+ 9200 if c=20 then 9220
+ 9210 goto 14020
+ 9220 let s=1
+ 9230 let a=3
+ 9240 let g=0
+ 9250 let t=c-1
+ 9260 gosub 12020
+ 9270 let h=g
+ 9280 let s=1
+ 9290 let a=8
+ 9300 let g=0
+ 9310 gosub 12020
+ 9320 let i=g
+ 9330 let s=3
+ 9340 let a=13
+ 9350 let g=0
+ 9360 gosub 12020
+ 9370 let j=g
+ 9380 if f=1 then 1080
+ 9390 if t=13 then 9520
+ 9400 let s=3
+ 9410 let a=16
+ 9420 let g=0
+ 9430 gosub 12020
+ 9440 let k=g
+ 9450 if f=1 then 1080
+ 9460 if t=16 then 9520
+ 9470 let s=3
+ 9480 let a=19
+ 9490 let g=0
+ 9500 gosub 12020
+ 9510 if f=1 then 1080
+ 9520 let l=peek(h)
+ 9530 let o=h+1
+ 9540 let p=h+2
+ 9550 let m=peek(o)
+ 9560 let n=peek(p)
+ 9570 if t=13 then 9630
+ 9580 if t=16 then 9610
+ 9590 if n=g then 9610
+ 9600 goto 9640
+ 9610 if m=k then 9630
+ 9620 goto 9640
+ 9630 if l=j then 9700
+ 9640 let h=h+1
+ 9650 let q=peek(197)
+ 9660 if q=63 then 9740
+ 9670 if h>i then 9740
+ 9680 if h=0 then 9740
+ 9690 goto 9520
+ 9700 let y=h
+ 9710 gosub 13010
+ 9720 print" ";
+ 9730 goto 9640
+ 9740 print""
+ 9750 goto 1080
+10000 rem
+10010 rem ***      blank vorhanden ? ***
+10020 let b=t+512
+10030 let d=peek(b)
+10040 if d=32 then 10080
+10050 poke 211,t
+10060 print"{up}{rght}?"
+10070 let f=1
+10080 return
+11000 rem
+11010 rem ***      laenge der zeile  ***
+11020 let c=0
+11030 let b=c+512
+11040 let b=peek(b)
+11050 if b = 0 then 11080
+11060 let c=c+1
+11070 goto 11030
+11080 return
+12000 rem
+12010 rem ***      hex/dez           ***
+12020 let b=511+a
+12030 let c=peek(b)
+12040 if c<65 then 12080
+12050 if c>70 then 12080
+12060 let c=c-55
+12070 goto 12110
+12080 if c<48 then 12290
+12090 if c>57 then 12290
+12100 let c=c-48
+12110 if s=1 then 12150
+12120 if s=2 then 12180
+12130 if s=3 then 12210
+12140 if s=4 then 12230
+12150 let u=4096
+12160 gosub 12310
+12170 goto 12230
+12180 let u=256
+12190 gosub 12310
+12200 goto 12230
+12210 let u=16
+12220 gosub 12310
+12230 let g=g+c
+12240 if s=4 then 12280
+12250 let s=s+1
+12260 let a=a+1
+12270 goto 12020
+12280 return
+12290 gosub 10050
+12300 return
+12310 let c=c*u
+12320 return
+13000 rem
+13010 rem ***      dez/hex           ***
+13020 let u=4096
+13030 gosub 13290
+13040 gosub 13220
+13050 gosub 13310
+13060 let y=y-b
+13070 let u=256
+13080 gosub 13290
+13090 gosub 13220
+13100 gosub 13310
+13110 let y=y-b
+13120 let u=16
+13130 gosub 13290
+13140 gosub 13220
+13150 gosub 13310
+13160 let y=y-b
+13170 let a=y
+13180 gosub 13220
+13190 let b=a
+13200 let y=y-b
+13210 return
+13220 if a>9 then 13270
+13230 let c=a+48
+13240 poke 2,c
+13250 sys 65490
+13260 return
+13270 let c=a+55
+13280 goto 13240
+13290 let a=y/u
+13300 return
+13310 let b=a*u
+13320 return
+14000 rem
+14010 rem ***      fehler            ***
+14020 let t=c-1
+14030 gosub 10050
+14040 goto 1080
+15000 rem
+15010 rem ***      low-high-byte     ***
+15020 let h=g/256
+15030 let i=h*256
+15040 let l=g-i
+15050 return
+16000 rem
+16010 rem ***   parametereinstellung ***
+16020 poke 186,o
+16030 poke 185,1
+16040 poke 780,p
+16050 poke 781,2
+16060 poke 782,2
+16070 poke 20,189
+16080 poke 21,255
+16090 sys 57648
+16100 return
+
