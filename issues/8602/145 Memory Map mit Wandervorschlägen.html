@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-    <title>Memory Map mit Wandervorschlägen</title>
+    <title>Memory Map mit Wandervorschlägen — Teil 15</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="Dr.H. Hauck, ah">
@@ -19,7 +19,7 @@
 
 <body>
     <article>
-        <h1>Memory Map mit Wandervorschlägen</h1>
+        <h1>Memory Map mit Wandervorschlägen — Teil 15</h1>
         <p class="intro">Bei unserer Wanderung durch die Speicherlandschaft, treffen wir heute auf die Speicherzellen 646 bis 658. Sie sind verantwortlich für die Zeichenfarbe und für die Tastenwiederholuna beziehungsweise Tastenwiederholgeschwindigkeit.</p>
 
         <p>Die Speicherzellen, die wir heute behandeln, sind für all diejenigen interessant, die gerne Spiele programmieren oder Bewegung auf den Bildschirm bringen wollen. Denn neben der Tastaturverriegelung und Tastenwiederholung beziehungsweise Tastenwiederholgeschwindigkeit werde ich heute auch die Speicherzellen besprechen, die für die Tastaturdecodierung und Zeichenfarben verantwortlich sind.</p>
@@ -41,12 +41,14 @@
 
         <p>Innerhalb eines Programms ist das POKEn in Zelle 646 wohl die eleganteste Methode (Tabelle 1).</p>
 
-        <p>Als Beispiel möge dieses kleine Programm dienen:<br>
-            10 FORX = 0 TO 7<br>
-            20 POKE 646,X<br>
-            30 PRINT "A";<br>
-            40 NEXT X<br>
-            50 GOTO 10</p>
+        <p>Als Beispiel möge dieses kleine Programm dienen:
+            <code>10 FOR X = 0 TO 7
+                20 POKE 646,X
+                30 PRINT "A";
+                40 NEXT X
+                50 GOTO 10
+            </code>
+        </p>
 
         <p>Wer mehr über Vordergrund- und Hintergrundfarben erfahren will, der lese den nebenstehenden Texteinschub »Bunte Zeichen und bunter Hintergrund« auf Seite 147.</p>
 
@@ -56,7 +58,7 @@
 
         <p>Das Blinken des Cursors wird dadurch erzeugt, daß das Zeichen auf der Stelle des Bildschirms, auf der er gerade steht (meistens ist es eine Leerstelle), dauernd von »normal« auf »revers« (oder »invertiert«) und zurück geschaltet wird. Die reverse Darstellung benutzt dabei die Farbe des Zeichens.</p>
 
-        <p>Genauso, wie sich der Computer in der Speicherzelle 206 das Zeichen merkt, mit dem er gerade blinkt, um beim Weiterwandern dieses Zeichen in seiner »normalen« Form auf dem Bildschirmzurückzulassen, merkt er sich die Farbe dieses Zeichens in der Speicherzelle 647.</p>
+        <p>Genauso, wie sich der Computer in der Speicherzelle 206 das Zeichen merkt, mit dem er gerade blinkt, um beim Weiterwandern dieses Zeichen in seiner »normalen« Form auf dem Bildschirm zurückzulassen, merkt er sich die Farbe dieses Zeichens in der Speicherzelle 647.</p>
 
         <h2>Adresse 648 ($288)</h2>
 
@@ -82,17 +84,20 @@
 
         <p>Diese Zahl wird immer mit dem Inhalt der Speicherzelle 198 verglichen, der die aktuelle Anzahl der Zeichen im Tastaturpuffer angibt. Ist die Differenz der beiden Zahlen gleich Null, dann können keine weiteren Zeichen eingegeben werden.</p>
 
-        <p>Es ist naheliegend, daß durch Verändern der Zahl in Zelle 649 die Länge des Tastaturpuffers verändert werden kann. Der eine Extremfall ist 0:<br>
-            POKE 649,0 schaltet die Tastatur aus. Nichts geht mehr.</p>
+        <p>Es ist naheliegend, daß durch Verändern der Zahl in Zelle 649 die Länge des Tastaturpuffers verändert werden kann. Der eine Extremfall ist 0:</p>
+
+        <p class="noindent">POKE 649,0 schaltet die Tastatur aus. Nichts geht mehr.</p>
 
         <p>Das kann bei Programmen oder Spielen, die durch falsches oder zeitlich unpassendes Drücken von Tasten gestört werden, recht nützlich sein. Einschalten kann man dann die Tastatur nur mit RUN/STOP und RESTORE.</p>
 
         <p>Auch eine Erhöhung der Zahl in 649 über 10 hinaus ist möglich. Die Zeichen werden halt nur über die dafür reservierten Speicherzellen 631 bis 640 hinaus in Zellen geschrieben, die eigentlich eine andere Funktion haben. Bis zur Speicherzelle 645 geht das normalerweise ohne Probleme, da die betroffenen »fremden« Adressen nur direkt nach dem Einschalten des Computers gebraucht werden.</p>
 
-        <p>Probieren Sie es aus, indem Sie zuerst eine Zeitschleife laufen lassen und in dieser Zeit etwa 20 Tasten drücken. Am Ende der Zeitschleife wird der Inhalt des Tastaturpuffers ausgedruckt, und Sie sehen in der Tat 15 der eingegebenen Zeichen:<br>
-            POKE 649,15<br>
-            FOR X = 0T0 10000:NEXT X<br>
-            QWERTYUIOPASDFGHJKL</p>
+        <p>Probieren Sie es aus, indem Sie zuerst eine Zeitschleife laufen lassen und in dieser Zeit etwa 20 Tasten drücken. Am Ende der Zeitschleife wird der Inhalt des Tastaturpuffers ausgedruckt, und Sie sehen in der Tat 15 der eingegebenen Zeichen:
+            <code>POKE 649,15
+                FOR X = 0T0 10000:NEXT X
+                QWERTYUIOPASDFGHJKL
+            </code>
+        </p>
 
         <p>Auf dem Bildschirm erscheinen die Zeichen Q bis G.</p>
 
@@ -136,27 +141,36 @@
 
         <h3>Tastencode der SHIFT-,CTRL- und Commodore-Taste</h3>
 
-        <p>In der Speicherzelle 203 stehen die Codes aller Tasten, die gedrückt werden, außer die der drei Steuertasten SHIFT, CTRL und Commodore (oft auch CBM-, Logo- oder C = -Taste genannt). Diese drei Ausnahmen haben ihr eigenes Code-Register, eben 653.</p>
+        <p>In der Speicherzelle 203 stehen die Codes aller Tasten, die gedrückt werden, außer die der drei Steuertasten SHIFT, CTRL und Commodore (oft auch CBM-, Logo- oder C=-Taste genannt). Diese drei Ausnahmen haben ihr eigenes Code-Register, eben 653.</p>
 
-        <p>Der Grund dafür liegt in der Bedeutung der drei Tasten. Sie können ja bekanntlich verschiedene Zeichensätze einschalten: — SHIFT schaltet das Zeichen vorne rechts auf einer Taste ein — C = schaltet das Zeichen vorne links auf einer Taste ein — CTRL schaltet die Farben vorn auf den Zahlentasten ein — SHIFT + C = schaltet von dem normalen Zeichensatz auf die Groß-/ Kleinschreibung um.</p>
+        <p>Der Grund dafür liegt in der Bedeutung der drei Tasten. Sie können ja bekanntlich verschiedene Zeichensätze einschalten:</p>
+
+        <ul>
+            <li>SHIFT schaltet das Zeichen vorne rechts auf einer Taste ein</li>
+            <li>C= schaltet das Zeichen vorne links auf einer Taste ein</li>
+            <li>CTRL schaltet die Farben vorn auf den Zahlentasten ein</li>
+            <li>SHIFT + C= schaltet von dem normalen Zeichensatz auf die Groß-/ Kleinschreibung um.</li>
+        </ul>
 
         <p>Ich habe diese Zusammenhänge auch bei der Behandlung der Speicherzellen 245/246 erwähnt.</p>
 
         <p>Die Codezahlen selbst sind auch in der Tabelle 1 der Memory Map in Ausgabe 11/85 auf Seite 146 enthalten. Der Vollständigkeit halber sind sie hier noch einmal angegeben:</p>
 
-        <p>TODO TABLE</p>
+        <table class="plain">
+            <tr class="separator"><td>SHIFT</td><td>1</td></tr>
+            <tr class="separator"><td>C=</td><td>2</td></tr>
+            <tr class="separator"><td>CTRL</td><td>4</td></tr>
+            <tr class="separator"><td>SHIFT und C=</td><td>3</td></tr>
+            <tr class="separator"><td>SHIFT und CTRL</td><td>5</td></tr>
+            <tr class="separator"><td>C= und CTRL</td><td>6</td></tr>
+            <tr class="separator"><td>SHIFT und C= und CTRL</td><td>7</td></tr>
+        </table>
 
-        <p>SHIFT 1<br>
-            C= 2<br>
-            CTRL 4<br>
-            SHIFT und C= 3<br>
-            SHIFT und CTRL 5<br>
-            C= und CTRL 6<br>
-            SHIFT und C= und CTRL 7</p>
-
-        <p>Mit dem folgenden kleinen Programm und mit ein wenig Fingerfertigkeit können Sie diese Codewerte nachvollziehen:<br>
-            10 PRINT PEEK(653)<br>
-            20 GOTO 10</p>
+        <p>Mit dem folgenden kleinen Programm und mit ein wenig Fingerfertigkeit können Sie diese Codewerte nachvollziehen:
+            <code>10 PRINT PEEK(653)
+                20 GOTO 10
+            </code>
+        </p>
 
         <p>Eine interessante Anwendung habe ich im Texteinschub »Abfrage der Tastencodes oder 476 Funktionstasten« in Ausgabe 11/85 auf Seite 147 gegeben.</p>
 
@@ -170,7 +184,7 @@
 
         <h3>Vektor auf die Routine der Tastencode-Tabellen</h3>
 
-        <p>Das Betriebssystem hat eine Routine ab Adresse 60232 (60380 beim VC 20), auf die der Vektor in 655/656 zeigt. Sie liest den Codewert der SHIFT-, CTRL- und C = -Taste in der Speicherzelle 653 aus und verändert entsprechend den Vektor der Zellen 245/246 (siehe Memory Map Teil 13, Ausgabe 12/85), so daß er auf die richtige Codetabelle zeigt.</p>
+        <p>Das Betriebssystem hat eine Routine ab Adresse 60232 (60380 beim VC 20), auf die der Vektor in 655/656 zeigt. Sie liest den Codewert der SHIFT-, CTRL- und C=-Taste in der Speicherzelle 653 aus und verändert entsprechend den Vektor der Zellen 245/246 (siehe Memory Map Teil 13, Ausgabe 12/85), so daß er auf die richtige Codetabelle zeigt.</p>
 
         <p>Es gibt Anwenderprogramme, die diesen Vektor so verbiegen, daß die Decodierung der Tasten umgangen und durch eine andere, selbstgebaute Routine ersetzt wird. So kann zum Beispiel das Drücken einer bestimmten Taste umgemünzt werden.</p>
 
@@ -184,7 +198,7 @@
 
         <p>Dieser Effekt kann auf zwei, beim C 64 sogar auf drei Arten erzielt werden:</p>
 
-        <ul>
+        <ul class="hsquare">
             <li>Umschaltung des Zeichensatzes zulassen
 
                 <ul>
@@ -228,19 +242,24 @@
 
             <p>Wie Zeichen und Buchstaben in bunten Farben auf den Bildschirm gedruckt werden, lernt jeder Hobby-Programmierer schon bei den ersten Gehversuchen — dasselbe innerhalb eines Programms zu erreichen, dauert sicher schon etwas länger.</p>
 
-            <p>Bei der Diskussion der Speicherzelle 646 habe ich drei Methoden dafür erwähnt. Ich habe auch gesagt, daß ich die Methode, den Farbcodewert in die Speicherzelle 646 zu POKEn, für die eleganteste halte. Deswegen verwendet das folgende Demonstrations-Programm dieses Verfahren, um den Bildschirm mit einer bunten Reihe der Zahl 1 zu füllen.<br>
-                10 PRINT CHR$(147)<br>
-                20 POKE 53281,1<br>
-                30 FORJ = 0 TO 1000<br>
-                40 POKE 646.INT(RND(l)*14 + 2)<br>
-                50 PRINT "1";<br>
-                60 NEXT J</p>
+            <p>Bei der Diskussion der Speicherzelle 646 habe ich drei Methoden dafür erwähnt. Ich habe auch gesagt, daß ich die Methode, den Farbcodewert in die Speicherzelle 646 zu POKEn, für die eleganteste halte. Deswegen verwendet das folgende Demonstrations-Programm dieses Verfahren, um den Bildschirm mit einer bunten Reihe der Zahl 1 zu füllen.
+                <code>10 PRINT CHR$(147)
+                    20 POKE 53281,1
+                    30 FORJ = 0 TO 1000
+                    40 POKE 646.INT(RND(1)*14+2)
+                    50 PRINT "1";
+                    60 NEXT J
+                </code>
+            </p>
 
-            <p>VC 20-Besitzer müssen die Zeilen 20, 30 und 40 umändern in:<br>
-                20 POKE 36879,233<br>
-                30 FORJ=0 TO 505<br>
-                40 POKE 646,INT(RND(l)*6 + 2)<br>
-                Erklärung:</p>
+            <p>VC 20-Besitzer müssen die Zeilen 20, 30 und 40 umändern in:
+                <code>20 POKE 36879,233
+                    30 FORJ=0 TO 505
+                    40 POKE 646,INT(RND(1)*6+2)
+                </code>
+            </p>
+
+            <p class="noindent">Erklärung:</p>
 
             <p>Zeile 10 löscht den Bildschirm, Zeile 20 erzeugt einen weißen Hintergrund und eine hellblaue Umrahmung. Zeile 30 zählt vom ersten bis zum letzten Platz auf dem Bildschirm. Zeile 40 erzeugt für jedes Zeichen auf dem Bildschirm eine neue Farbe. Zeile 50 schließlich druckt, durch das Semikolon gesteuert, die Zahl 1 hintereinander und zwar in den Farben, die in Zeile 40 zufällig ausgewürfelt wurden.</p>
 
@@ -256,27 +275,31 @@
 
             <p>Butterfield geht dabei von einer lustigen Überlegung aus. Wir wissen zum Beispiel, daß der nächtliche Sternenhimmel aus hellen Punkten besteht, die vor einem schwarzen Hintergrund leuchten. Ohne dieses Wissen könnten wir aber ebenso gut annehmen, daß der Himmel — also der Hintergrund — im hellsten Weiß erstrahlt, aber durch einen schwarzen Vorhang (Vordergrund) mit vielen kleinen Löchern abgedunkelt ist.</p>
 
-            <p>Das folgende Demo-Programm benutzt diese Denkweise.<br>
-                100 PRINT CHR$(147)<br>
-                110 POKE 53281,1<br>
-                120 FORJ = OTO 1000<br>
-                130 POKE 1024+J,160<br>
-                140 POKE 55296 + J,INT(RND(l)*14 + 2)<br>
-                150 NEXT J<br>
-                160 FORK = OTO 1000<br>
-                170 POKE 1024 + K,177<br>
-                180 NEXT K</p>
+            <p class="noindent">Das folgende Demo-Programm benutzt diese Denkweise.
+                <code>100 PRINT CHR$(147)
+                    110 POKE 53281,1
+                    120 FOR J=0 TO 1000
+                    130 POKE 1024+J,160
+                    140 POKE 55296+J,INT(RND(1)*14+2)
+                    150 NEXT J
+                    160 FOR K=0 TO 1000
+                    170 POKE 1024+K,177
+                    180 NEXT K
+                </code>
+            </p>
 
-            <p>Für den VC 20 (ohne Erweiterung) sieht das Programm so aus:<br>
-                100 PRINT CHR$(147)<br>
-                110 POKE 36879,233<br>
-                120 FORJ = Oto 505<br>
-                130 POKE 7680+J,160<br>
-                140 POKE 38400+J,INT(RND(l)*6 + 2)<br>
-                150 NEXT J<br>
-                160 FORK = OTO 505<br>
-                170 POKE 7680 + K,177<br>
-                180 NEXT K</p>
+            <p class="noindent">Für den VC 20 (ohne Erweiterung) sieht das Programm so aus:
+                <code>100 PRINT CHR$(147)
+                    110 POKE 36879,233
+                    120 FOR J=0 to 505
+                    130 POKE 7680+J,160
+                    140 POKE 38400+J,INT(RND(1)*6+2)
+                    150 NEXT J
+                    160 FOR K=0 TO 505
+                    170 POKE 7680+K,177
+                    180 NEXT K
+                </code>
+            </p>
 
             <p>Die ersten drei Zeilen sind mit denen des ersten Demonstrations-Programms identisch.</p>
 
@@ -286,15 +309,16 @@
 
             <p>Ab Zeile 160 werden alle Plätze des Bildschirms mit der invertierten 1 (Bildschirmcode 177) gefüllt. Diese invertierten Zeichen sind in der Farbe des Hintergrundes geschrieben, eben weiß. Dadurch entsteht der Eindruck, als wäre der Hintergrund bunt und die Zeichenfarbe weiß.</p>
 
-            <p>Der Eindruck verstärkt sich noch, wenn wir die 1 über den Bildschirm wandern lassen. Das erreichen wir durch Ändern der folgenden Zeilen:<br>
-                170 POKE 1024 + K,160<br>
-                175 POKE 1025 + K,177</p>
+            <p>Der Eindruck verstärkt sich noch, wenn wir die 1 über den Bildschirm wandern lassen. Das erreichen wir durch Ändern der folgenden Zeilen:
+                <code>170 POKE 1024+K,160
+                    175 POKE 1025+K,177
+                </code>
+            </p>
 
             <p>Durch geschicktes Ausbauen der Zeile 140 können Sie einen vielfarbigen Bildschirm-Hintergrund in Zeilen oder Blöcken erzielen, ein weites Gebiet für bunte Grafik.</p>
         </aside>
 
         <aside>
-
             <h2>Texteinschub #2 Turbo-Tasten</h2>
 
             <p>Das Trio der Speicherzellen 650, 651 und 652 ist zuständig für die Steuerung der sogenannten Wiederholfunktion der Tasten. Darunter verstehen wir die Eigenschaft der Tastatur, das Zeichen oder die Funktion einer Taste so lange zu wiederholen, bis die Taste losgelassen wird. Normalerweise haben diese Funktion nur die Leertaste, die Cursor-Tasten und die INST/DEL-Taste.</p>
@@ -315,7 +339,7 @@
 
             <p>Das Kochrezept zur Veränderung der Inhalte von 651 und 652 stammt von Dan Carmichael aus seinem Aufsatz »Speeding Up The VIC« in Ausgabe 10/83 der COMPUTE!'s Gazette.</p>
 
-            <p>Wir schreiben es als Maschinenprogramm in Form von DATA-Zeilen in den Bandpuffer ab Adresse 828, wo es geschützt residieren karin, solange keine Kassettenoperationen durchgeführt werden. Das Ladeprogramm in Basic steht in Listing 1.</p>
+            <p>Wir schreiben es als Maschinenprogramm in Form von DATA-Zeilen in den Bandpuffer ab Adresse 828, wo es geschützt residieren kann, solange keine Kassettenoperationen durchgeführt werden. Das Ladeprogramm in Basic steht in Listing 1.</p>
 
             <p>Für den VC 20 lautet die vorletzte Zahl 191 statt 49.</p>
 
@@ -323,8 +347,9 @@
 
             <p>Für Anhänger der hexadezimalen Darstellung gebe ich das Programm als HEX-Ausdruck in Listing 3 wieder.</p>
 
-            <p>Für den VC 20 lautet die letzte Zeile anders:<br>
-                ,0353 4C BF EA JMP EABF</p>
+            <p>Für den VC 20 lautet die letzte Zeile anders:
+                <code>,0353 4C BF EA JMP EABF</code>
+            </p>
 
             <p>Mit dem Befehl SEI werden jegliche Programmunterbrechungen gesperrt. Anschließend kommt das Zahlenpaar 73 und 3 in die Speicherzellen 788/789, wo es in Low/High-Byte Darstellung die Adresse 841 (73 + 256*3 = 841) darstellt.</p>
 
