@@ -36,9 +36,9 @@
 
         <p>In dieser Zeit, die im Extremfall eine Stunde übersteigen kann, war die besagte Garbage Collection am Werk. Dabei läuft etwa Folgendes ab (ausführlich beschrieben im 64’er, Ausgabe 1/85 und 2/85):</p>
 
-        <p>Da der Computerjedesmal, wenn eine Stringvariable neu definiert wird, den Text des Strings (wenn er nicht im Programm steht oder die Länge Null hat) in freie Speicherplätze schreibt, den Zeiger auf diesen Text ändert und den alten Text einfach stehenläßt, ist irgendwann kein Speicherplatz mehr frei. Dann muß das Betriebssystem die alten, ungültig gewordenen Texte entfernen, beziehungsweise die Aktuellen wieder zusammenschieben, bevor es weitergeht.</p>
+        <p>Da der Computer jedesmal, wenn eine Stringvariable neu definiert wird, den Text des Strings (wenn er nicht im Programm steht oder die Länge Null hat) in freie Speicherplätze schreibt, den Zeiger auf diesen Text ändert und den alten Text einfach stehenläßt, ist irgendwann kein Speicherplatz mehr frei. Dann muß das Betriebssystem die alten, ungültig gewordenen Texte entfernen, beziehungsweise die Aktuellen wieder zusammenschieben, bevor es weitergeht.</p>
 
-        <p>Dieses »Müllaufsammeln« (englisch: garbage collection) macht nun der C 64 nach einer relativ umständlichen Methode. Deren Zeitbedarf wächst ungefähr quadratisch mit der Anzahl der definierten Stringvariablen. Das heißt, bei einem Programm mit 1000 definierten Strings braucht die Garbage Collection etwa 10000mal so lang wie bei zehn definierten Strings.</p>
+        <p>Dieses »Müllaufsammeln« (englisch: garbage collection) macht nun der C 64 nach einer relativ umständlichen Methode. Deren Zeitbedarf wächst ungefähr quadratisch mit der Anzahl der definierten Stringvariablen. Das heißt, bei einem Programm mit 1&thinsp;000 definierten Strings braucht die Garbage Collection etwa 10&thinsp;000mal so lang wie bei zehn definierten Strings.</p>
 
         <h3>Die Lösung: eine neue Routine</h3>
 
@@ -64,30 +64,36 @@
 
         <p class="intro">Superschnelle Garbage Collection auf dem C 64. Keine überflüssigen Wartezeiten mehr bei umfangreichen String- und Arrayoperationen.</p>
 
-        <p>Die hier vorliegende neue Garbage-Collection hat folgende Vorteile:<br>
-            a) Ausführen der Garbage Collection im 10tel Sekundenbereich<br>
-            b) Aufruf von Basic aus möglich<br>
-            c) Einbindung ins Betriebssystem möglich<br>
-            d) Obwohl, wie viele bereits erkannt haben werden, der Bereich unter dem Betriebssystem- und Interpreter-ROM benutzt wird, kann der Anwender das Betriebssystem nach seinen Erfordernissen ändern (zum Beispiel Tastaturtabellen-Änderungen) und unter bestimmten Voraussetzungen sogar hochauflösende Grafik in diesem RAM benutzen.</p>
+        <p>Die hier vorliegende neue Garbage-Collection hat folgende Vorteile:</p>
+
+        <ol type="a">
+            <li>Ausführen der Garbage Collection im 10tel Sekundenbereich</li>
+            <li>Aufruf von Basic aus möglich</li>
+            <li>Einbindung ins Betriebssystem möglich</li>
+            <li>Obwohl, wie viele bereits erkannt haben werden, der Bereich unter dem Betriebssystem- und Interpreter-ROM benutzt wird, kann der Anwender das Betriebssystem nach seinen Erfordernissen ändern (zum Beispiel Tastaturtabellen-Änderungen) und unter bestimmten Voraussetzungen sogar hochauflösende Grafik in diesem RAM benutzen.</p></li>
+        </ol>
 
         <h3>Einschränkungen:</h3>
 
-        <p>a) Da als Hilfsspeicherbereich das RAM unter dem ROM (2 x 8 KByte) verwendet wird, sollte die Zeichenzahl aller definierten, aktuellen Stringtexte (ohne Mülltexte) nicht größer als zirka 16000 Byte sein. Bei einer größeren Zahl kann es zu Textfehlern kommen, da dann der Speicherbereich von $FFFF bis $E000 und $BFFF bis $A000 nicht mehr ausreicht (Bereich von oben nach unten benutzt) und damit der normale Stringtextbereich von $A000 nach unten zu mit überschrieben wird. In der Regel sind aber Texte, die in diesem überschriebenen Bereich stehen, längst im Hilfsbereich als eine der ersten gerettet worden, so daß man auch mehr als zirka 16 000 Zeichen verwenden kann.</p>
+        <ol type="a">
+            <li>Da als Hilfsspeicherbereich das RAM unter dem ROM (2 x 8 KByte) verwendet wird, sollte die Zeichenzahl aller definierten, aktuellen Stringtexte (ohne Mülltexte) nicht größer als zirka 16&thinsp;000 Byte sein. Bei einer größeren Zahl kann es zu Textfehlern kommen, da dann der Speicherbereich von $FFFF bis $E000 und $BFFF bis $A000 nicht mehr ausreicht (Bereich von oben nach unten benutzt) und damit der normale Stringtextbereich von $A000 nach unten zu mit überschrieben wird. In der Regel sind aber Texte, die in diesem überschriebenen Bereich stehen, längst im Hilfsbereich als eine der ersten gerettet worden, so daß man auch mehr als zirka 16&thinsp;000 Zeichen verwenden kann.
+                <p>Auch in großen Programmen werden meist wesentlich weniger Strings benutzt. Wird der Bereich unterhalb von $A000 vor Basic geschützt und mit Maschinenprogrammen belegt, darf die Zahl von zirka 16&thinsp;000 nicht überschritten werden.</p>
+            </li>
+            <li>Das RAM unter dem Interpreter-ROM ($A000 bis $BFFF) kann frei benutzt werden, wenn die Gesamtzeichenzahl aller aktuellen Strings nicht über zirka 8&thinsp;000 liegt und die Garbage Collection nicht ins Betriebssystem eingebunden wird.</li>
+        </ol>
 
-        <p>Auch in großen Programmen werden meist wesentlich weniger Strings benutzt. Wird der Bereich unterhalb von $A000 vor Basic geschützt und mit Maschinenprogrammen belegt, darf die Zahl von zirka 16000 nicht überschritten werden.<br>
-            b) Das RAM unter dem Interpreter-ROM ($A000 bis $BFFF) kann frei benutzt werden, wenn die Gesamtzeichenzahl aller aktuellen Strings nicht über zirka 8 000 liegt und die Garbage Collection nicht ins Betriebssystem eingebunden wird.</p>
+        <p>Tippen Sie zuerst Listing 1 mit dem MSE ein, und speichern Sie es.</p>
 
-        <p>Tippen Sie zuerst Listing 1 mit dem MSE ein, und speichern Sie es.<br>
-            a) Anwendung in »normalen« Basic-Programmen</p>
-
-        <p>Einzige Voraussetzung ist, daß sich das Programm mit der schnellen Routine im Speicher befindet. Es kann jederzeit durch SYS 50944 (zum Beispiel in regelmäßig durchlaufenden Programmteilen oder während des Einlesens von sequentiellen Dateien) aufgerufen werden.<br>
-            b) Einbindung ins Betriebssystem</p>
-
-        <p>Die Garbage Collection kann auch fest ins Betriebssystem eingebunden werden, das heißtwenn kein Speicherplatz mehr vorhanden ist, wird sie automatisch anstelle der alten ausgeführt. Selbstverständlich ist sie auch noch einzeln mit SYS 50944 aufrufbar.</p>
-
-        <p>Die Einbindung veranlaßt der Befehl SYS 51400.</p>
-
-        <p>Damit läuft das Betriebssystem und der Interpreter im RAM (Inhalt der Speicherstelle 1 ist 53 anstatt der üblichen 55).</p>
+        <ol type="a">
+            <li>Anwendung in »normalen« Basic-Programmen
+                <p>Einzige Voraussetzung ist, daß sich das Programm mit der schnellen Routine im Speicher befindet. Es kann jederzeit durch SYS 50944 (zum Beispiel in regelmäßig durchlaufenden Programmteilen oder während des Einlesens von sequentiellen Dateien) aufgerufen werden.</p>
+            </li>
+            <li>Einbindung ins Betriebssystem
+                <p>Die Garbage Collection kann auch fest ins Betriebssystem eingebunden werden, das heißt wenn kein Speicherplatz mehr vorhanden ist, wird sie automatisch anstelle der alten ausgeführt. Selbstverständlich ist sie auch noch einzeln mit SYS 50944 aufrufbar.</p>
+                <p>Die Einbindung veranlaßt der Befehl SYS 51400.</p>
+                <p>Damit läuft das Betriebssystem und der Interpreter im RAM (Inhalt der Speicherstelle 1 ist 53 anstatt der üblichen 55).</p>
+            </li>
+        </ol>
 
         <h2>Die Anwendung</h2>
 
@@ -97,36 +103,30 @@
 
         <p>Dies macht man am besten durch ein Monitorprogramm, mit dem man dann auch die gesamte Neufassung seiner »persönlichen« Garbage Collection/Betriebssystemversion speichern kann.</p>
 
-        <p>TODO TABLE</p>
-
-        <p>Normaler Inhalt Beispiel für Änderungen<br>
-            $C9B2 $60 RTS $C9B2 $A9 LDA #$FF<br>
-            $FF<br>
-            $C9B4 $8D STA $A000<br>
-            $00<br>
-            $A0<br>
-            $C9B7 $60 RTS<br>
-            Speichert den Wert 255 ($FF) an die Speicher Stelle 40960 ($A000). Dieses Beispiel ergibt natürlich keinen Sinn.</p>
+        <table class="plain small">
+            <tr><td colspan="3">Normaler Inhalt</td><td colspan="3">Beispiel für Änderungen</td></tr>
+            <tr><td>$C9B2</td><td>$60</td><td>RTS</td><td>$C9B2</td><td>$A9</td><td>LDA #$FF</td></tr>
+            <tr><td colspan="3"></td><td></td><td>$FF</td><td></td></tr>
+            <tr><td colspan="3"></td><td>$C9B4</td><td>$8D</td><td>STA $A000</td></tr>
+            <tr><td colspan="3"></td><td></td><td>$00</td><td></td></tr>
+            <tr><td colspan="3"></td><td></td><td>$A0</td><td></td></tr>
+            <tr><td colspan="3"></td><td>$C9B7</td><td>$60</td><td>RTS</td></tr>
+            <tr><td colspan="6">Speichert den Wert 255 ($FF) an die Speicher Stelle 40960 ($A000).</td></tr>
+            <tr><td colspan="6">Dieses Beispiel ergibt natürlich keinen Sinn.</td></tr>
+        </table>
 
         <p>Mit Grundkenntnissen im Maschinensprache ist es kein Problem, die Erweiterung herzustellen, zumal ja meist mehr als Grundkenntnisse notwendig sind, um das Betriebssystem zu ändern.</p>
 
         <h3>Übersicht:</h3>
 
-        <p>TODO TABLE</p>
-
-        <p>Keine Einbindung<br>
-            Aufruf<br>
-            SYS 50944<br>
-            Speicherkonfiguration<br>
-            Normal<br>
-            (Inhalt von 1 ist 55)<br>
-            Verwendbarkeit RAM von $AOOO-$BFFF (40960-49151)<br>
-            Verwendbarkeit RAM von $EOOO-$FFFF (57344-65535) Speicherplatz unterhalb $A000 für Maschinenprogramme<br>
-            ja, wenn Gesamtzeichenzahl aller aktuellen Strings geringerals zirka 8000 (8 KByte) nein<br>
-            Einbindung ins Betriebssystem<br>
-            Automatisch und mit SYS 50944 zusätzlich möglich. Inhalt von 1 ist 53 ROM läuft im RAM Einbindung ins Betriebssystem mit SYS 51398 Betriebssystemänderungen mit aufnehmbar nein<br>
-            nein<br>
-            frei verwendbar, wenn Gesamtzeichenzahl aller aktuellen Strings kleiner als 16 KByte ist</p>
+        <table class="plain">
+            <tr class="strong"><td></td><td>Keine Einbindung</td><td>Einbindung ins Betriebssystem</td></tr>
+            <tr><td>Aufruf</td><td>SYS 50944</td><td>Automatisch und mit SYS 50944 zusätzlich möglich.</td></tr>
+            <tr><td>Speicherkonfiguration</td><td>Normal (Inhalt von 1 ist 55)</td><td><ul class="plain"><li>Inhalt von 1 ist 53</li><li>ROM läuft im RAM</li><li>Einbindung ins Betriebssystem mit SYS 51398</li><li>Betriebssystemänderungen mit aufnehmbar</li></ul></td></tr>
+            <tr><td>Verwendbarkeit RAM von $A000-$BFFF (40960-49151)</td><td>ja, wenn Gesamtzeichenzahl aller aktuellen Strings geringer als zirka 8000 (8 KByte)</td><td>nein</td></tr>
+            <tr><td>Verwendbarkeit RAM von $E000-$FFFF (57344-65535)</td><td>nein</td><td>nein</td></tr>
+            <tr><td>Speicherplatz unterhalb $A000 für Maschinenprogramme</td><td>frei verwendbar, wenn Gesamtzeichenzahl aller aktuellen Strings kleiner als 16 KByte ist</td><td></td></tr>
+        </table>
 
         <p>Eine Besonderheit am Schluß: Um eine Kontrolle zu haben, wann und wie lange die Garbage Collection läuft, wird während der Ausführung ganz unten rechts am Bildschirm ein kleiner, brauner Punkt angezeigt.</p>
 
@@ -140,9 +140,9 @@
 
         <h3>Aufruf</h3>
 
-        <p>Prinzipiell kann das Programm, wie oben erwähnt, jederzeit mit SYS 50944 (beziehungsweise mitJSR $C700) aufgerufen werden.</p>
+        <p>Prinzipiell kann das Programm, wie oben erwähnt, jederzeit mit SYS 50944 (beziehungsweise mit JSR $C700) aufgerufen werden.</p>
 
-        <p>DerTrick, es ins Betriebssystem einzubinden (SYS 51400), besteht darin, das ROM (Betriebssystem und Interpreter) ins RAM zu kopieren und anstelle der normalen Garbage Collection einen Sprung in »Garbage 64« unterzubringen. Dies muß natürlich nach jeder Garbage Collection immer wieder automatisch geschehen, da »Garbage 64« das RAM unter dem ROM beschreibt, um die gültigen Stringtexte zwischenzuspeichern (siehe weiter unten).</p>
+        <p>Der Trick, es ins Betriebssystem einzubinden (SYS 51400), besteht darin, das ROM (Betriebssystem und Interpreter) ins RAM zu kopieren und anstelle der normalen Garbage Collection einen Sprung in »Garbage 64« unterzubringen. Dies muß natürlich nach jeder Garbage Collection immer wieder automatisch geschehen, da »Garbage 64« das RAM unter dem ROM beschreibt, um die gültigen Stringtexte zwischenzuspeichern (siehe weiter unten).</p>
 
         <p>An die Routine, die diese Änderung vornimmt (am Ende von »Garbage 64« ab $C9A0), kann man eigene, zusätzliche Befehle anfügen, die zum Beispiel die Tastaturtabellen beeinflussen, so daß der Interpreter beziehungsweise das Betriebssystem bei der Einbindung von »Garbage 64« durch SYS 51400 anwenderspezifisch mit geändert und diese Änderung nach jeder Garbage Collection erhalten wird.</p>
 
@@ -188,13 +188,13 @@
 
         <h3>Programmteil Ende</h3>
 
-        <p>Hier sind die am Anfang geretteten Speicher wieder zu holen und die Kontrollanzeigezu löschen. Dievorhereingestellte Speicherkonfiguration wird aktiviert und mit RTS »Garbage 64« beendet.</p>
+        <p>Hier sind die am Anfang geretteten Speicher wieder zu holen und die Kontrollanzeigezu löschen. Die vorher eingestellte Speicherkonfiguration wird aktiviert und mit RTS »Garbage 64« beendet.</p>
 
         <h2>Testen Sie doch mal die »Müllabfuhr« im C 64</h2>
 
         <p>Um Ihnen den Geschwindigkeitsvorteil einmal vorzuführen, haben wir noch ein Demonstrationsprogramm (Listing 3) für Sie. Tippen Sie es zuerst ohne die Zeilen 1 bis 5 ein und starten Sie das Demo. Die Zahl hinter dem Kommentar »test ok« ist zunächst die normale Zeit der Schleifen. Wenn die Garbage Collection zuschlägt, sehen Sie das an der wesentlich längeren Zeit. Tippen Sie dann die fehlenden fünf Zeilen ein, und starten Sie das Programm erneut. Dazu muß »GARBAGE64« (Listing 1) auf Diskette verfügbar sein. Für Kassette ändern Sie bitte Zeile 2 in »&hellip; ,1,1«. Von der Garbage Collection merken Sie nun nichts mehr. Noch krasser ist der Vorgang beim folgenden Beispiel zu sehen:</p>
 
-        <p>DIM A$(9000):FOR I=0 TO 9000 : A$(I)=”A” : NEXT : PRINT FRE(0)</p>
+        <p>DIM A$(9000):FOR I=0 TO 9000 : A$(I)="A" : NEXT : PRINT FRE(0)</p>
 
         <p>Mit der schnellen Routine ist das kein Problem, aber ohne sie &hellip;</p>
 

@@ -28,7 +28,7 @@
             <figcaption>Listing 1. Unser Beispiel 1 in Assembler: Bunte Zeichen </figcaption>
         </figure>
 
-        <p>In den Zeilen 30, 40 und 160, 170 sehen Sie die Anwendung eines weiteren Pseudobefehls. Das .EQ bewirkt, daß eine bestimmte Speicherstelle mit einem Namen versehen werden kann. Im folgenden braucht man sich nur noch den Namen zu merken, der auch am Ende in der Symboltabelle mit ausgegeben wird. Dadurch wird man bis zu einem gewissen Grad sogar systemunabhängig. Um beispielsweise dieses Programm auf einem VC 20 in der Grundversion laufen zu lassen, muß in Zeile 30 der SCREEN-Wert auf $lE00 und in Zeile 40 der COLOR-Wert auf $9600 geändert werden.</p>
+        <p>In den Zeilen 30, 40 und 160, 170 sehen Sie die Anwendung eines weiteren Pseudobefehls. Das .EQ bewirkt, daß eine bestimmte Speicherstelle mit einem Namen versehen werden kann. Im folgenden braucht man sich nur noch den Namen zu merken, der auch am Ende in der Symboltabelle mit ausgegeben wird. Dadurch wird man bis zu einem gewissen Grad sogar systemunabhängig. Um beispielsweise dieses Programm auf einem VC 20 in der Grundversion laufen zu lassen, muß in Zeile 30 der SCREEN-Wert auf $1E00 und in Zeile 40 der COLOR-Wert auf $9600 geändert werden.</p>
 
         <p>Bevor Sie durch G 5000 aus dem Monitor heraus das Programm starten, löschen Sie am besten zuerst den Bildschirm und fahren den Cursor in eine mittlere Bildschirmzeile, damit er dem Ergebnis des Programmes nicht ins Gehege kommt. Das Programm läuft natürlich auch auf dem C 128 (im C 128-Modus). Allerdings werden hier die Zeichen nur einfarbig, weil man zum Beschreiben des Bildschirmfarbspeichers (mit STA COLOR,Y) noch die Bank umschalten muß, was hier nicht getan wird.</p>
 
@@ -36,16 +36,18 @@
 
         <p>Alle Randbedingungen werden durch dieses Basic-Programm realisiert:</p>
 
-        <p>10 S=211:Z=214:B=58640:S1=40:Z1=20<br>
-            20 PRINT CHR$(147)CHR$(5)<br>
-            30 GOSUB 100:PRINT CHR$(113)<br>
-            40 FOR I=19 T0 0 STEP -1<br>
-            50 GOSUB 100:PRINT CHR$(32)<br>
-            60 S1=S1-2:Z1=Z1-1<br>
-            70 GOSUB 100:PRINT CHR$(113)<br>
-            80 NEXT I<br>
-            90 PRINT CHR$(154):END<br>
-            100 POKE S,S1:POKE Z,Z1:SYS B:RETURN</p>
+        <table class="plain right0">
+            <tr><td>10</td><td>S=211:Z=214:B=58640:S1=40:Z1=20</td></tr>
+            <tr><td>20</td><td>PRINT CHR$(147)CHR$(5)</td></tr>
+            <tr><td>30</td><td class="indent1">GOSUB 100:PRINT CHR$(113)</td></tr>
+            <tr><td>40</td><td class="indent1">FOR I=19 T0 0 STEP -1</td></tr>
+            <tr><td>50</td><td class="indent2">GOSUB 100:PRINT CHR$(32)</td></tr>
+            <tr><td>60</td><td class="indent2">S1=S1-2:Z1=Z1-1</td></tr>
+            <tr><td>70</td><td class="indent2">GOSUB 100:PRINT CHR$(113)</td></tr>
+            <tr><td>80</td><td>NEXT I</td></tr>
+            <tr><td>90</td><td>PRINT CHR$(154):END</td></tr>
+            <tr><td>100</td><td>POKE S,S1:POKE Z,Z1:SYS B:RETURN</td></tr>
+        </table>
 
         <p>In der Schleife wird immer zuerst das zuletzt gedruckte Zeichen gelöscht (sonst hätten wir nicht nur einen Ball, sondern eine Diagonale aus weißen Bällen) und dann nach dem Weitersetzen des Cursors der nächste Ball gezeichnet.</p>
 
@@ -58,7 +60,7 @@
 
         <p>In den Zeilen 30 bis 80 finden Sie wieder den Pseudobefehl .EQ. Mit diesem werden außer den bisher schon besprochenen Speicherstellen (Zeile, Spalte, CSET und BSOUT) auch noch zwei Zähler kreiert: COUNTZ (Zeilerzähler) und COUNTS (Spaltenzähler). Was soll das, werden Sie fragen, warum verwendet man nicht direkt ZEILE und SPALTE? Die Ursache liegt darin, daß BSOUT ebenfalls diese Speicherstellen benutzt und daher keine richtige Zählung mehr stattfinden kann. So zählt $FA und $FB und jedesmal vor Aufruf von CSET wird deren Inhalt in ZEILE und SPALTE übertragen. Wir brauchen natürlich nur einen Zähler für diese Schleife. COUNTS läuft nur nebenher und könnte eigentlich auch in den Schleifenteil »Verarbeitung« geschrieben werden. Die Abbruchoperation in Zeile 480 prüft nur COUNTZ. Mehr Kommentar finden Sie direkt im Listing.</p>
 
-        <p>So, nun starten Sie mal das Programm nach dem Assemblieren aus dem Monitor mit G 5000! Sie meinen, da passiert ja gar nichts? Ich kann Ihnen beweisen, daß doch etwas passiert — nur so immens schnell, daß wir nichts davon sehen. Verändern Sie doch mal in Zeile 400 das #$20 (Leerzeichen) zu #$lC (Farbe Rot). Das können Sie auch schnell aus dem Monitor her erreichen durch M 5033 — dort finden Sie am Anfang die 20 — und überschreiben durch lC ((RETURN)). Wenn Sie nun starten, wird der Ball nicht mehr gelöscht, sondern nur rot gefärbt. Wir erhalten die Diagonale aus roten Bällen. Es geht also doch!</p>
+        <p>So, nun starten Sie mal das Programm nach dem Assemblieren aus dem Monitor mit G 5000! Sie meinen, da passiert ja gar nichts? Ich kann Ihnen beweisen, daß doch etwas passiert — nur so immens schnell, daß wir nichts davon sehen. Verändern Sie doch mal in Zeile 400 das #$20 (Leerzeichen) zu #$1C (Farbe Rot). Das können Sie auch schnell aus dem Monitor her erreichen durch M 5033 — dort finden Sie am Anfang die 20 — und überschreiben durch 1C ((RETURN)). Wenn Sie nun starten, wird der Ball nicht mehr gelöscht, sondern nur rot gefärbt. Wir erhalten die Diagonale aus roten Bällen. Es geht also doch!</p>
 
         <p>Wir müssen daher das ganze etwas verlangsamen. Dazu ist schon eine Stelle vorgesehen: In Zeile 340 befindet sich ein gänzlich unmotiviertes NOP-Kommando. Dorthin packen wir nun eine Verzögerungsschleife und es ergibt sich Listing 3.</p>
 
@@ -74,7 +76,7 @@
             <figcaption>Listing 4. Der doppelt zögernde Flitzer</figcaption>
         </figure>
 
-        <p>Nun sehen wir schon ein wenig mehr, aber wir können uns vorstellen, daß es reichlich ungelenk wäre, nun noch eine dritte, vierte,&hellip; Verzögerung einzubauen. Es gibt noch einen anderen Weg, nämlich einfach zwei Verzögerungen ineinander zu verschachteln. Das ist schließlich in Listing 5 geschehen und wenn Sie das nach der Assemblierung starten, dann gehts hübsch langsam. Immerhin wird die innere Schleife 255 x 255mal durchlaufen. Jedesmal nämlich, wenn wir X bis 0 heruntergezählt haben, wird Y dekrementiert und X wieder mit #$FF beladen. Das geht so lange, bis auch Y auf Null heruntergezählt wurde. Wenn Sie in Zeile 332 statt # $FF einen kleineren Startwert eingeben (geht wieder ganz gut vom Monitor aus), läuft der Ball schneller. Damit haben Sie die Geschwindigkeit völlig im Griff.</p>
+        <p>Nun sehen wir schon ein wenig mehr, aber wir können uns vorstellen, daß es reichlich ungelenk wäre, nun noch eine dritte, vierte,&hellip; Verzögerung einzubauen. Es gibt noch einen anderen Weg, nämlich einfach zwei Verzögerungen ineinander zu verschachteln. Das ist schließlich in Listing 5 geschehen und wenn Sie das nach der Assemblierung starten, dann gehts hübsch langsam. Immerhin wird die innere Schleife 255 x 255mal durchlaufen. Jedesmal nämlich, wenn wir X bis 0 heruntergezählt haben, wird Y dekrementiert und X wieder mit #$FF beladen. Das geht so lange, bis auch Y auf Null heruntergezählt wurde. Wenn Sie in Zeile 332 statt #$FF einen kleineren Startwert eingeben (geht wieder ganz gut vom Monitor aus), läuft der Ball schneller. Damit haben Sie die Geschwindigkeit völlig im Griff.</p>
 
         <figure>
             <pre>TODO</pre>
@@ -87,55 +89,62 @@
 
         <p>Sehen wir uns zunächst einmal in Basic an, was wir da gemacht haben. Es dreht sich um etwas uns sehr bekanntes: Zwei ineinander geschachtelte Schleifen. Am genauesten entspricht wohl diese Programmsequenz unserer 16-Bit-Verzögerung:</p>
 
-        <p>100 Y=255<br>
-            110 X=255<br>
-            120 X=X-1<br>
-            130 IF X .. 0 THEN 120<br>
-            140 Y=Y-1<br>
-            150 IF Y .. 0 THEN 110</p>
+        <table class="plain right0">
+            <tr><td>100</td><td>Y=255</td></tr>
+            <tr><td>110</td><td>X=255</td></tr>
+            <tr><td>120</td><td>X=X-1</td></tr>
+            <tr><td>130</td><td>IF X .. 0 THEN 120</td></tr>
+            <tr><td>140</td><td>Y=Y-1</td></tr>
+            <tr><td>150</td><td>IF Y .. 0 THEN 110</td></tr>
+        </table>
 
         <p>Gebräuchlicher wäre allerdings diese Version:</p>
 
-        <p>100 FOR Y=255 T0 0 STEP-1<br>
-            110 FOR X=255 T0 0 STEP-1<br>
-            120 NEXT X<br>
-            130 NEXT Y</p>
+        <table class="plain right0">
+            <tr><td>100</td><td>FOR Y=255 T0 0 STEP-1</td></tr>
+            <tr><td>110</td><td class="indent1">FOR X=255 T0 0 STEP-1</td></tr>
+            <tr><td>120</td><td class="indent1">NEXT X</td></tr>
+            <tr><td>130</td><td>NEXT Y</td></tr>
+        </table>
 
         <p>Dagegen halten wir unsere Verzögerungsschleife aus dem letzten Assemblerprogramm (Listing 5):</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr><td></td><td>LDY #$FF</td></tr>
+            <tr><td>LABEL</td><td>LDX #$FF</td></tr>
+            <tr><td>MARKE</td><td>DEX</td></tr>
+            <tr><td></td><td>BNE MARKE</td></tr>
+            <tr><td></td><td>DEY</td></tr>
+            <tr><td></td><td>BNE LABEL</td></tr>
+            <tr><td></td><td>&hellip;</td></tr>
+        </table>
 
-        <p>LDY #$FF<br>
-            LABEL LDX #$FF<br>
-            MARKE DEX<br>
-            BNE MARKE<br>
-            DEY<br>
-            BNE LABEL</p>
+        <p>Diese Schleife zählt das X-Register so oft eine ganze Page (minus 1, also jeweils 255mal) durch, wie es das Y-Register angibt, hier also 255mal. Insgesamt finden daher 255*255 = 65025 Durchläufe statt. Um ganze Pages, also 256 Zählungen zu erreichen, lädt man ins X-Register einfach 0 ein. Der DEX-Befehl sorgt dann noch vor der BNE-Prüfung für einen Unterlauf auf $FF.</p>
 
-        <p>Diese Schleife zählt das X-Register so oft eine ganze Page (minus 1, alsojeweils 255mal) durch, wie es das Y-Register angibt, hier also 255mal. Insgesamt finden daher 255*255 = 65025 Durchläufe statt. Um ganze Pages, also 256 Zählungen zu erreichen, lädt man ins X-Register einfach 0 ein. Der DEX-Befehl sorgt dann noch vor der BNE-Prüfung für einen Unterlauf auf $FF.</p>
+        <p>Deutlich wird Ihnen sicher, daß wir — im Gegensatz zur einfachen Schleife — hier einen Multiplikationseffekt zu beachten haben. Die Anzahl der Durchläufe setzt sich zusammen aus:</p>
 
-        <p>Deutlich wird Ihnen sicher, daß wir — im Gegensatz zur einfachen Schleife — hier einen Multiplikationseffekt zu beachten haben. Die Anzahl der Durchläufe setzt sich zusammen aus:<br>
-            Y-Startwert * X-Startwert</p>
+        <p class="noindent">Y-Startwert * X-Startwert</p>
 
         <p>Das ist auch ganz akzeptabel, solange man die gewünschte Durchlaufzahl aus zwei Faktoren zusammensetzen kann. Soll ein Job beispielsweise 1000mal ausgeführt werden, dann gibt es mehrere Möglichkeiten, denn</p>
 
-        <p>TODO</p>
-
-        <p>1000 = 8 * 125<br>
-            = 4*250<br>
-            =10 * 100</p>
+        <table class="plain right2">
+            <tr><td>1000</td><td>=</td><td>8 * 125</td></tr>
+            <tr><td></td><td>=</td><td>4 * 250</td></tr>
+            <tr><td></td><td>=</td><td>10 * 100</td></tr>
+        </table>
 
         <p>Wir könnten dann unsere Job-Schleife schreiben:</p>
 
-        <p>TODO</p>
-
-        <p>LDY #$04<br>
-            LABEL LDX #$FA<br>
-            MARKE Job-Befehle<br>
-            DEX<br>
-            BNE MARKE<br>
-            DEY<br>
-            BNE LABEL</p>
+        <table class="plain">
+            <tr><td></td><td>LDY #$04</td></tr>
+            <tr><td>LABEL</td><td>LDX #$FA</td></tr>
+            <tr><td>MARKE</td><td>Job-Befehle</td></tr>
+            <tr><td></td><td>DEX</td></tr>
+            <tr><td></td><td>BNE MARKE</td></tr>
+            <tr><td></td><td>DEY</td></tr>
+            <tr><td></td><td>BNE LABEL</td></tr>
+            <tr><td></td><td>&hellip;</td></tr>
+        </table>
 
         <p>Abgesehen davon, daß es doch ein wenig aufwendig ist — besonders bei einer nicht festgelegten Anzahl von Durchläufen — jedesmal eine Aufspaltung in zwei Faktoren vorzunehmen: Was tun wir bei Primzahlen? 997 Jobs beispielsweise lassen sich in solch einer Doppelschleife nicht bearbeiten (997 ist eine Primzahl, das bedeutet, diese Zahl ist nicht in Faktoren zerlegbar).</p>
 
@@ -158,7 +167,7 @@
 
         <figure>
             <pre>TODO</pre>
-            <figcaption>Listing 7. Verbesserte Form von Listing 6</figcaption>
+            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing 7</a>. Verbesserte Form von Listing 6</figcaption>
         </figure>
 
         <p>Es stört uns immer noch manchmal, daß wir — statt nur bis $07E7 (denn das ist dezimal 2023) — bis $07FF invertieren. Bevor wir in der nächsten Folge die oben erwähnte Variante ergründen, die in der BLTUC-Routine verwendet wird, soll Ihnen noch eine weitere Möglichkeit vorgestellt werden, die im SMON und neuerdings auch von F. Müller (siehe oben) gezeigt worden ist. Da geht’s recht trickreich zu.</p>
@@ -176,40 +185,48 @@
 
         <p>Kommen wir nun — wie versprochen — noch auf die beiden vorhin verwendeten Routinen zurück, die sich im oberen ROM-Bereich unseres Computers befinden. Die eine davon ($FFD2) ist mittlerweile schon vielen recht geläufig. Sie dient dazu, ein im Akku enthaltenes Zeichen an ein vorher definiertes Gerät auszugeben. Der Unterschied zwischen beiden Routinen ist, daß CHROUT (also $FFD2) sich im sogenannten Kernel-Bereich befindet, die andere (PLOTK $E510) aber nicht. Was ist denn nun das besondere am Kernel-Bereich? Es handelt sich um eine Tabelle von 39 JMP-Befehlen, für die Commodore garantiert, daß sie in allen Computerversionen an der gleichen Stelle liegt und gleiche Funktionen beinhaltet. Sollten Sie also im Besitz eines VC 20 oder eines C 128 sein: Sie können die gleiche Einsprungadresse für CHROUT benutzen wie ein C 64-Programmierer. Zwar enthält beispielsweise die Kernel-Sprungleiste des C 128 wesentlich mehr Möglichkeiten als die des VC 20, aber alle im VC 20 gültigen Einsprünge behalten auch hier ihre Bedeutung. Leider existiert diese Möglichkeit des Kernel nur für relativ wenige Verwendungszwecke. Wer beispielsweise Fließkommaoperationen in Assembler zu programmieren hat, sucht oft ziemlich verzweifelt im ROM eines neuen Computers nach den dazu passenden Firmware-Routinen.</p>
 
-        <p>Alle Kernel-Routinen verlangen eine festgelegte Bearbeitungsweise:<br>
-            a) Vorbereitungen treffen<br>
-            b) Routinenaufruf<br>
-            c) Fehlerabfrage und -behandlung</p>
+        <p>Alle Kernel-Routinen verlangen eine festgelegte Bearbeitungsweise:</p>
+
+        <ol type="a">
+            <li>Vorbereitungen treffen</li>
+            <li>Routinenaufruf</li>
+            <li>Fehlerabfrage und -behandlung</li>
+        </ol>
 
         <p>Damit hätten wir die Vorrede hinter uns und können uns dem CHROUT-Programm zuwenden, das wir an dieser Stelle in seiner eingeschränkten Funktion betrachten, nämlich zur Ausgabe des Akku-Inhaltes auf dem Bildschirm. Falls Sie eine detaillierte Schilderung weiterer Anwendungsmöglichkeiten suchen sollten: Im Assembler-Kurs (64'er Sonderheft, Ausgabe 8/85, Seite 33 und ab Seite 39) finden Sie beispielsweise die Ausgabe auf den Drucker.</p>
 
-        <p>TODO</p>
-
-        <p>Name CHROUT (auch BSOUT)<br>
-            Zweck Ausgabe eines Zeichens<br>
-            Adresse $FFD2, 65490<br>
-            Vorbereitungen Parameter (CHKOUT,OPEN)<br>
-            Eingabeort Akku<br>
-            Eing.Format ASCII<br>
-            Ausgabeort spezifiziertes Gerät<br>
-            Ausg.format -<br>
-            Fehler 0<br>
-            Stapelbedarf 8<br>
-            Register Akku</p>
+        <aside>
+            <table class="plain">
+                <tr><td><strong>Name</strong></td><td><strong>CHROUT</strong>(auch BSOUT)</td></tr>
+                <tr><td>Zweck</td><td>Ausgabe eines Zeichens</td></tr>
+                <tr><td>Adresse</td><td>$FFD2, 65490</td></tr>
+                <tr><td>Vorbereitungen</td><td>(CHKOUT,OPEN)</td></tr>
+                <tr><td>Parameter</td><td></td></tr>
+                <tr><td>Eingabeort</td><td>Akku</td></tr>
+                <tr><td>Eing.Format</td><td>ASCII</td></tr>
+                <tr><td>Ausgabeort</td><td>spezifiziertes Gerät</td></tr>
+                <tr><td>Ausg.format</td><td>-</td></tr>
+                <tr><td>Fehler</td><td>0</td></tr>
+                <tr><td>Stapelbedarf</td><td>8</td></tr>
+                <tr><td>Register</td><td>Akku</td></tr>
+            </table>
+        </aside>
 
         <p>CHROUT ist nun freundlicherweise so geschaffen worden, daß von den Vorbereitungen lediglich das Zeichen in den Akku zu bringen übrigbleibt, falls man nur die Bildschirmausgabe wünscht. CHROUT ist zwar ein enorm vielseitiger, aber leider auch etwas langsamer Geselle. Das liegt daran, daß CHROUT gewissermaßen als die eierlegende Wollmilchsau konstruiert wurde, also fast alles kann. Damit sind aber endlos viele Prüfungen und Abfragen verbunden, die man sich durch Verwenden anderer Routinen — die lernen Sie noch kennen — ersparen kann.</p>
 
-        <p>TODO</p>
-
-        <p>Name PLOTK<br>
-            Zweck Cursor setzen<br>
-            Adresse $E510, 58640<br>
-            Vorbereitungen Zeile in 214, Spalte in 211<br>
-            Parameter übergaben spielen hier keine Rolle.<br>
-            Fehler spielen nur bei Kernel-Routinen eine Rolle. 2<br>
-            Stapelbedarf 2<br>
-            Register Akku, X, Y<br>
-            Weitere Speicherstellen, die durch die Routine beschrieben werden können: 209, 210, 213, 217 (alle als Dezimalzahlen).</p>
+        <aside>
+            <table class="plain">
+                <tr><td><strong>Name</strong></td><td><strong>PLOTK</strong></td></tr>
+                <tr><td>Zweck</td><td>Cursor setzen</td></tr>
+                <tr><td>Adresse</td><td>$E510, 58640</td></tr>
+                <tr><td>Vorbereitungen</td><td>Zeile in 214, Spalte in 211</td></tr>
+                <tr><td>Parameter</td><td>übergaben spielen hier keine Rolle.</td></tr>
+                <tr><td>Fehler</td><td>spielen nur bei Kernel-Routinen eine Rolle.</td></tr>
+                <tr><td>Stapelbedarf</td><td>2</td></tr>
+                <tr><td>Register</td><td>Akku, X, Y</td></tr>
+                <tr><td colspan="2">Weitere Speicherstellen, die durch die Routine beschrieben werden können: 209, 210, 213, 217 (alle als Dezimalzahlen).</td></tr>
+            </table>
+        </aside>
 
         <p>Nun zur zweiten Adresse $E510, der PLOTK-Routine. Dies ist nur eine der möglichen Einsprungadressen dazu. Es handelt sich nicht um eine Kernel-Routine: Prompt findet sich auch in dem dazugehörigen Programm an einer anderen Einsprungstelle ein Unterschied bei verschiedenen C 64-ROMs, der uns aber nicht zu kümmern braucht.</p>
 
@@ -218,6 +235,31 @@
         <p>In der nächsten Folge sollen Sie dann die BLTUC-Routine als Beispiel für eine 16-Bit-Schleife aus unserer Firmware kennen- und benutzenlernen.</p>
 
         <address class="author">(Heimo Ponnath/gk)</address>
+
+        <figure>
+            <table class="plain center0">
+                <tr class="separator"><td>Nr.</td><td>Text</td><td>Bedeutung</td></tr>
+                <tr><td>0</td><td>BREAK</td><td>Während des Programmes wurde die RUN/STOP-Taste gedrückt</td></tr>
+                <tr><td>1</td><td>TOO MANY FILES</td><td>Man kann maxinal 10 offene Files einrichten</td></tr>
+                <tr><td>2</td><td>FILE OPEN</td><td>Ein bereits geöffneter File wird nochmal geöffnet</td></tr>
+                <tr><td>3</td><td>FILE NOT OPEN</td><td>Auf einen noch nicht geöffneten Flle sollte zugegriffen werden</td></tr>
+                <tr><td>4</td><td>FILE NOT FOUND</td><td>Der geforderte File ist nicht verfügbar</td></tr>
+                <tr><td>5</td><td>DEVICE NOT PRESENT</td><td>Das angesprochene Gerät zeigt keine Reaktion</td></tr>
+                <tr><td>6</td><td>NOT INPUT FILE</td><td>Aus einem Schreibfile kann nicht gelesen werden</td></tr>
+                <tr><td>7</td><td>NOT OUTPUT FILE</td><td>In einem Lesefile kann nicht geschrieben werden</td></tr>
+                <tr><td>8</td><td>MISSING FILE NAME</td><td>Bei Operationen, die einen Filenamen erfordern, fehlt dieser</td></tr>
+                <tr><td>9</td><td>ILLEGAL DEVICE NUMBER</td><td>Das versuchte Kommando ist beim angesprochenen Gerät nicht möglich</td></tr>
+            </table>
+            <figcaption>Tabelle. Fehlernummern und ihre Bedeutung. Die Nummern findet man nach Aufruf von Kernel-Routinen bei gesetztem Carry im Akku.</figcaption>
+        </figure>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Im dokumentierten SMON-Listing wurde eine Zeile vergessen: »4013 INC $FB«.</p>
+
+            <!-- 64'er 4/1986 -->
+        </aside>
     </article>
 </body>
 

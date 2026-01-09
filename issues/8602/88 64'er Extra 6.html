@@ -21,284 +21,284 @@
         <h1>64'er Extra 6</h1>
         <p class="intro">Das 64'er Extra bringt geballte Information iiber lhren C 64 zum Heraustrennen und Sammeln. In dieser sechsten Ausgabe finden Sie den zweiten Teil einer Übersicht über alle ROM-Routinen des C 64. Statt ziellos in ROM-Listings zu blättern, finden Sie hier im Klartext die Funktionsbeschreibung aller irgendwie nutzbaren Routinen.</p>
 
-        <p>POS $B39E<br>
-            *** POS: Ruft die Kernal-Routine PLOT auf, um sich die Cursorposition zu verschaffen, und lädt sie dann in FAC1 mittels:<br>
-            SNGET $B3A2<br>
-            Wandelt das Byte in Y in FLPT in FAC1 um (0&hellip;255).<br>
-            ERRDIP $B3A6<br>
-            Prüft, ob der Befehl nicht im Direktmodus eingegeben wurde; ein Wert von $FF in CURLIN+3 ($3A) zeigt Direktmodus an. Ist das der Fall, erfolgt die Meldung 7ILLEGAL DIRECT ERROR. Wird von Routinen aufgerufen, die nicht im Direktmodus zu verwenden sind, wie zum Beispiel GET.<br>
-            DEF $B3B3<br>
-            *** DEF: Erzeugt Funktionsdefinition; sucht die Funktionsvariable oder stellt sie auf. Ein Aufruf von FN setzt den Zeiger innerhalb CHRGET auf den Anfang der FN-Definition im Basic-Text, und der dort vorgefundene Ausdruck wird ausgewertet; anschließend wird der Zeiger wieder zurückgestellt. Die dafür notwendige Information ist mit der in GETFNM aufgestellten Funktionsvariablen gespeichert.<br>
-            GETFNM $B3E1<br>
-            Prüft die Syntax von FN; sucht oder stellt Variable mit dem Funktionsnamen auf und läßt (DEFPNT) ($4E) darauf zeigen (muß numerisch sein, keine Zeichenkettenvariable).<br>
-            FNDOER $B3F4<br>
-            Wertet Funktion aus: Berechnet den Klammerausdruck in der Anweisung mit dem Funktionsaufruf und legt das Ergebnis in FAC1 ab; anschließend erfolgt die Auswertung des Funktionsausdrucks (siehe DEF).<br>
-            STRD $B465<br>
-            *** STR$-Funktion: Berechnet Ausdruck und verwandelt das Ergebnis in eine ASCII-Zeichenkette.<br>
-            STRINI $B475<br>
-            Schafft im Zeichenkettenbereich Platz zum Einfügen einer Zeichenkette: A enthält die Länge und (FAC1+3) zeigt auf die Zeichenkette (zum Beispiel im Eingabepuffer). Beim Verlassen enthält $61 bis $63 den Descriptor der neuen Zeichenkette. CHR$, LEFT$ und so weiter arbeiten sämtlich mit dieser Routine.<br>
-            STRLIT $B487<br>
-            Kopiert eine Zeichenkette in den Zeichenkettenbereich am oberen Speicherende; beim Eintritt in die Routine zeigt (A/Y) auf die Zeichenkette. Sucht nach » ” « oder einem Nullbyte als Endmarkierung, um die Länge zu bestimmen. Beim Verlassen enthalten $61, $62, $63 den Descriptor.<br>
-            GETSPA $B4F4<br>
-            Weist im dynamischen Zeichenkettenbereich am oberen Speicherende Platz für eine Zeichenkette zu; die Länge ist in A festgehalten. Führt eine Garbage Collection durch, wenn der Platz erschöpft ist. Aufgerufen von STRINI.<br>
-            GARBA2 $B526<br>
-            Führt Garbage Collection aus; sammelt die gültigen Zeichenketten und entfernt überflüssige aus dem Zeichenkettenbereich. Bei einer großen Zahl von Zeichenketten wird die Routine für Garbage Collection langsam.<br>
-            DVARS $B606<br>
-            Sucht Variablen und Felder nach der nächsten, durch die Garbage Collection zu sichernde Zeichenkette ab.<br>
-            CAT $B63D<br>
-            Verknüpft zwei Zeichenketten.<br>
-            MOVINS $B67A<br>
-            Verschiebt Zeichenkette in den Zeichenkettenbereich oben im Speicher; beim Eintritt zeigt ($6F) auf den Descriptor der betreffenden Zeichenkette.<br>
-            ERESTR $B6A3<br>
-            Verwirft Zeichenkette: Beim Eintritt zeigt (FAC1 + 3) auf den Zeichenketten-Descriptor; beim Verlassen finden sich neue Zeichenkettenlänge und Zeiger in INDEX1.<br>
-            FRETMS $B6DB<br>
-            Löscht den Descriptor-Stapel.<br>
-            CHRD $B6EC<br>
-            *** CHR$: Stellt eine Zeichenkette der Länge 1 auf.<br>
-            LEFTD $B700<br>
-            *** LEFT$.<br>
-            RIGHTD $B72C<br>
-            *** RIGHT$.<br>
-            MIDD $B737<br>
-            *** MID$.<br>
-            PREAM $B761<br>
-            Holt Zeiger für Zeichenketten-Descriptor nach $50,$51 und die Länge nach A (auch nach X).<br>
-            LEN $B77C<br>
-            * * LEN: Fließkommawert des Parameters Zeichenkettenlänge, plaziert in FAC1.<br>
-            LEN1 $B782<br>
-            Ermittelt Länge der Zeichenkette, setzt das Ergebnis in Y, schaltet von Zeichenketten-Modus auf Zahlen-Modus. Aufgerufen von LEN, VAL.<br>
-            ASC $B78B<br>
-            *** ASC: Holt das erste Zeichen einer Zeichenkette und wandelt es in einen Fließkommawert in FAC1 um. Eine Zeichenkette der Länge 0 erzeugt den Fehler 7SYNTAX ERROR.<br>
-            GTBYTC $B79B<br>
-            Liest einen Ausdruck aus dem Basic-Text und wertet ihn aus; muß einen 1-Byte-Wert liefern, der dann in X und FAC1+4 abgelegt wird.<br>
-            VAL $B7AD<br>
-            *** VAL: Wandelt Wert in Fließkommazahl in FAC1 um.<br>
-            GETNUM $B7EB<br>
-            Liest die Parameter für WAIT und POKE aus dem Basic-Text; setzt den ersten (2-Byte-Ganzzahl) in $14,$15 und den zweiten in X ein.<br>
-            GETADR $B7F7<br>
-            Verwandelt FAC1 in 2-Byte-Ganzzahl (Bereich 0&hellip;65535) in $14,$15 und Y/A.<br>
-            PEEK $B80D<br>
-            * * PEEK: Beim Eintritt enthält FAC1 die Adresse, die gelesen werden soll, im Fließkomma.<br>
-            Beim Verlassen steht der abgelesene Wert in Y.<br>
-            POKE $B824<br>
-            *** POKE: Holt zwei Parameter aus dem Text und führt POKE aus.<br>
-            WAIT $B82D<br>
-            *** WAIT: Holt zwei Parameter aus dem Text, und eventuell noch einen dritten, der als 0 betrachtet wird, wenn nicht vorhanden. Tritt in eine WAIT-Schleife ein.<br>
-            FADDH $B849<br>
-            Addiert 0,5 zum Inhalt des FAC1; dient zum Runden.<br>
-            FSUB $B850<br>
-            Fließkomma-Subtraktion: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (A/Y) zeigt, minus FAC1.<br>
-            FSUBT $B853<br>
-            *** Fließkomma-Subtraktion: FAC1 wird ersetzt durch (FAC2 minus FAC1).<br>
-            FADD $B867<br>
-            Fließkomma-Addition: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (A/Y) zeigt, plus FAC1.<br>
-            FADDT $B86F<br>
-            Fließkomma-Addition: FAC1 wird ersetzt durch (FAC2 plus FAC1). Enthält beim Eintritt den Exponenten von FAC1, zum Beispiel Inhalt von $61: addiert »0« schneller.<br>
-            COMPLT $B947<br>
-            Ersetzt FAC1 durch sein Zweierkomplement.<br>
-            OVERR $B97E<br>
-            Gibt die Meldung 7OVERFLOW ERROR und anschließend READY aus.<br>
-            MULSHF $B983<br>
-            Multipliziert mit einem Byte.<br>
-            FONE $B9BC<br>
-            Tabelle von Konstanten im MFLPT-Format: zuerst eine »1«, dann ein Byte vom Wert 3, dann Konstante zur Berechnung von LOG, dann SQR(0.5),SQR(2),-0.5 und LOG(2).<br>
-            LOG $B9EA<br>
-            *** LOG: Berechnet vom Inhalt des FAC1 den Logarithmus zur Basis e.<br>
-            FMULT $BA28<br>
-            Fließkomma-Multiplikation: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (AY/Y) zeigt, mal FAC1.<br>
-            FMULTT $BA30<br>
-            *** Fließpunkt-Multiplikation: FAC1 wird ersetzt durch FAC1 mal FAC2.<br>
-            MLTPLY $BA59<br>
-            Multipliziert FAC1 mit einem Byte und speichert das Ergebnis in $26&hellip;$2A.<br>
-            CONUPK $BA8C<br>
-            Lädt FAC2 mit dem MFLPT-Wert bei (A/Y), isoliert das Vorzeichenbit, speichert es separat und bildet so das FLPT-Format. Beim Verlassen enthält A das erste Byte von FAC1.<br>
-            MULDIV $BAB7<br>
-            Prüft Akkumulatoren für Multiplikation und Division: Ist FAC2 »0«, wird FAC1 »0« gesetzt; ist die Summe der Exponenten zu groß, erfolgt die Meldung 7OVERFLOW ERROR, wenn zu klein, wird das Ergebnis ohne Unterlaufmeldung auf 0 gesetzt.<br>
-            MUL10 $BAE2<br>
-            Multipliziert FAC1 mit 10 und setzt das Ergebnis in FAC1.<br>
-            TENC $BAF9<br>
-            10 im MFLPT-Format.<br>
-            DIV10 $BAFE<br>
-            Dividiert FAC1 durch 10 und legt das Ergebnis in FAC1 ab.<br>
-            FDIVF $BB07<br>
-            Fließkomma-Division: FAC1 wird ersetzt durch FAC2 dividiert durch denjenigen MFLPT-Wert, auf den (A/Y) zeigt; beim Einsprung enthält X das Vorzeichen des Resultats.<br>
-            FDIV $BBOF<br>
-            Fließkomma-Division: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (A/Y) zeigt, dividiert durch FAC1.<br>
-            FDIVT $BB14<br>
-            *** Fließkomma-Division: FAC1 wird ersetzt durch (FAC2 dividiert durch FAC1).<br>
-            MOVFM $BBA2<br>
-            Lädt FAC2 mit dem MFLPT-Wert bei (A/Y), holt das Vorzeichenbit heraus, speichert es separat und bildet so das FLPT-Fbrmat.<br>
-            M0V2F $BBC7<br>
-            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat in $5C bis $60, TEMPFP2.<br>
-            MOV1F $BBCA<br>
-            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat in $57 bis $5B, TEMPFP1.<br>
-            MOVVF $BBDO<br>
-            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat an der Adresse, auf die ($49) zeigt.<br>
-            MOVMF $BBD4<br>
-            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat an der Adresse, auf die (A/Y) zeigt.<br>
-            MOVFA $BBFC<br>
-            Kopiert FAC2 in FAC1.<br>
-            MOVAF $BCOC<br>
-            Rundet FAC1 durch Aufruf von ROUND und kopiert das Ergebnis in FAC2.<br>
-            ROUND $BC1B<br>
-            Rundet FAC1.<br>
-            SIGN $BC2B<br>
-            Ermittelt das Vorzeichen von FAC1: beim Verlassen ist A=0, wenn der Wert in FAC1 null ist, A=1, wenn er positiv ist und A=$FF, wenn er negativ ist.<br>
-            SGN $BC39<br>
-            *** SGN-Funktion: Ruft SIGN auf und verwandelt dann A in Fließkommaform in FAC1.<br>
-            ABS $BC58<br>
-            *** ABS-Funktion: Verwandelt FAC1 in ABS(FAC1).<br>
-            FCOMP $BC5B<br>
-            Vergleicht FAC1 mit dem MFLPT-Wert bei (A/Y); beim Verlassen ist A=0, wenn die Werte gleich sind, A=1, wenn FAC1 >MFLPT, und A=$FF, wenn FAC1 &lt;MFLPT<br>
-            QINT $BC9B<br>
-            Verwandelt FAC1 in 4-Byte-Ganzzahl und speichert das Ergebnis, höchstes Byte zuerst, in (FAC1 + 1) (FAC + 4).<br>
-            INT $BCCC<br>
-            INT-Funktion: Rundet FAC1 ab, beläßt das Resultatjedoch in FLPT-Fbrm in FAC1.<br>
-            FIN $BCF3<br>
-            Wandelt eine ASCII-Zeichenkette, zum Beispiel »—99.375« in eine Zahl in FAC1 um. Beim Eintritt zeigt TXTPTR auf den Anfang. Die Umwandlung erfolgt dann durch JSR CHRGET/JSR FIN.<br>
-            AADD $BD7E<br>
-            Addiert den Inhalt von A zu FAC1.<br>
-            STCONS $BDB3<br>
-            3 Konstante in MFLPT-Form: 99999999.9, 999999999, 1000000000. Verwendet bei Zeichenkettenumwandlungen.<br>
-            INPRT $BDC2<br>
-            Druckt IN gefolgt von der aktuellen Zeilennummer in CURLIN ($39, $3A).<br>
-            LINPRT $BDCD<br>
-            Gibt die Ganzzahl in A/Y aus; Bereich 0&hellip;65535.<br>
-            FOUT $BDDD<br>
-            Verwandelt den Inhalt von FAC1 in eine ASCII-Zeichenkette, die mit der Adresse $0100 beginnt und mit einem Null-Byte endet. Beim Verlassen enthält (A/Y) die Startadresse, so daß STROUT die Zeichenkette ausgeben kann.<br>
-            FOUTIM $BE68<br>
-            Verwandelt Tl in ASCII-Zeichenkette, die mit der Adresse $0100 beginnt und mit einem Null-Byte endet.<br>
-            TICONS $BF11<br>
-            Konstanten zur Umwandlung von Zeichenketten und Tl sowie der Wert 0,5 in MFLPT-Form, danach 15 weitere Konstanten C4-Byte-Ganzzahlen).<br>
-            SQR $BF71<br>
-            *** SQR: FAC1 wird durch die Quadratwurzel aus FAC1 ersetzt.<br>
-            FPWRT $BF7B<br>
-            * * Führt Potenzberechnungen aus: FAC1 wird ersetzt durch FAC2 hoch FAC1. Beim Eintritt muß A den Inhalt von FAC2 (das heißt von $69) speichern, damit Potenzen von 0 korrekt sind.<br>
-            NEGOP $BFB4<br>
-            Macht FAC1 negativ.<br>
-            EXCONS $BFBF<br>
-            Tabelle von 8 Konstanten zur Auswertung von EXP-Reihen.<br>
-            EXP $BFEO<br>
-            *** EXP-Funktion: FAC1 wird durch e hoch FAC1 ersetzt.<br>
-            POLYX $E059<br>
-            Routine zur Reihenberechnung. Beim Eintritt zeigt A/Y auf den Zähler am Anfang der Konstantentabelle, die zur Berechnung der Potenzreihe herangezogen wird.<br>
-            RMULC $E08D<br>
-            11879546.4 im MFLPT-Format: multiplikative Konstante zur Auswertung von RND.<br>
-            RAODC $E092<br>
-            3.92767778 E-8 im MFLPT-Format: additive Konstante zur Auswertung von RND.<br>
-            RND $E097<br>
-            *** RND: Setzt in FAC1 je nach seinem Vorzeichen auf folgende Weise eine Zahl:<br>
-            RNDO $E09E<br>
-            Wenn 0, wird FAC1 von den Registern derCIA-Timer geladen: eine einfache Art, einen neuen Keim für Zufallszahlen zu setzen.<br>
-            QSETNR $EOBE<br>
-            Wenn > 0, wird die in ($88&hellip;$8C gespeicherte) durch vorhergehende Aufrufe erzeugte Zufallszahl mit RMULC multipliziert und RADDC hinzugezählt; das Ergebnis steht in FAC1.<br>
-            RND1 $E003<br>
-            Wenn &lt; 0, wird FAC1 mit vermischten Bytes von sich selbst geladen, daher ist RND(-We) Konstant und also wiederholbar. In allen diesen drei Fällen wird FAC1 in $88&hellip;$8C gespeichert.<br>
-            RNDRNG $E0E5<br>
-            , Zwingt FAC1 in den Bereich 0&hellip;1,0 und C gespeichert.<br>
-            BIOERR $E0F9<br>
-            Fehlerbehandlung für bestimmte Basic-Aufrufe des Kernel (erforderlich zur Verarbeitung von CMB, LOAD, SAVE), falls bei der Rückkehr von der Kernal-Routine das Fehlerflag C gesetzt ist. x BCHOUT $E1OC<br>
-            Gibt Zeichen mittels CHROUT aus; Fehlermeldung bei Versagen.<br>
-            BCHIN $E112<br>
-            Nimmt Zeichen mittels CHRIN herein; Fehlermeldung bei Versagen.<br>
-            BCKOUT $E118<br>
-            Richtet mittels CHKOUT eine Ausgabedatei ein; Fehlermeldung bei Versagen.<br>
-            BCKIN $E11E<br>
-            Richtet mittels CHKIN eine Eingabedatei ein; Fehlermeldung bei Versagen.<br>
-            BGETIN $E124<br>
-            Holt Zeichen mittels GETIN; Fehlermeldung bei Versagen.<br>
-            SYS $E12A<br>
-            *** SYS: Lädt A, X, Y, SR aus $30C&hellip;, ruft MC-Routine an der Adresse auf, die in der Anweisung als Argument angegeben ist. Lädt bei der Rückkehr von der Routine alle Registerinhalte aus $30C&hellip; zurück.<br>
-            SAVET $E156<br>
-            *** SAVE: Sichert ein Basic-Programm: läßt A auf die Adresse in Seite Null zeigen, die ihrerseits auf die Startadresse zeigt; setzt (X/Y) auf $2D,$2E = Programmende. Anschließend wird über einen Vektor bei $FFD8 die Kernal-Routine SAVE aufgerufen.<br>
-            VERFYT $E165<br>
-            *** VERIFY: Setzt das Flag in A auf 1, um die Verify-Operation anzuzeigen; tritt in LOADT ein und prüft auf Fehler.<br>
-            LOADT $E168<br>
-            *** LOAD: Holt die Parameter aus dem Basic-Text und stellt sie auf; ruft die Kernal-Routine LOAD über einen Vektor bei $FFD5 auf.<br>
-            LOADR $E16F<br>
-            Lädt vom bereits angesprochenen Gerät ins RAM ab der Basic-Adresse in ($2B).<br>
-            LDFIN $E195<br>
-            Beendet das Laden. Nach Aufruf von LOAD im Direktmodus wird der Zeiger auf das obere Ende von Basic ($2D) auf die Adresse des letzten geladenen Bytes gesetzt. Nach einem Aufruf aus einem Programm heraus unterbleibt dies, so daß die Variablenliste bewahrt ist. Dann wird der Zeiger in CHRGET zurückgesetzt und ein Basic-Warmstart durchgeführt, um das neue Programm zu starten.<br>
-            OPENT $E1BE<br>
-            *** OPEN: Liest die Parameter aus dem Text und stellt sie durch entsprechende Kernel-Aufrufe auf. Ruft über den Vektor bei $FFC0 die Kernal-Routine OPEN auf.<br>
-            CLOSET $E1C7<br>
-            *** CLOSE: Liest die Parameter aus dem Text und stellt sie auf. Ruft über den Vektor bei $FFC3 die Kernel-Routine CLOSE auf.<br>
-            SLPARA $E1D4<br>
-            Holt die Parameter für LOAD, SAVE und VERIFY aus dem Basic-Text; setzt die Standardwerte, wenn Angaben fehlen. Richtet durch einen Aufruf von SETLFS über den Vektor bei $FFBA eine Datei ein.<br>
-            COMBYT $E200<br>
-            Prüft auf ein Komma, wertet den folgenden 1-Byte-Parameter aus und setzt ihn in X.<br>
-            CMMERR $E20E<br>
-            Prüft auf Komma, dem irgendwas außer dem Anweisungsende folgt: andernfalls 7SYNTAX ERROR.<br>
-            OCPARA $E219<br>
-            Holt die Parameter für OPEN/CLOSE-Aufrufe aus dem Basic-Text; setzt die Standardwerte, wenn Angaben fehlen.<br>
-            COS $E26<br>
-            *** COS: FAC1 wird durch COS(FAC1) ersetzt.<br>
-            SIN $E26 B<br>
-            *** SIN: FAC 1 wird durch SIN(FAC1) ersetzt.<br>
-            TAN $E2B4<br>
-            *** TAN: FAC1 wird durch TAN(FAC1) ersetzt.<br>
-            $E2E0<br>
-            Tabelle von Konstanten im MFLPT-Fbrmat: Pi/2, Pi*2 und Pi*0,25. Danach folgt ein Zähler (5) und 6 MFLPT-Konstanten zur Berechnung von SIN.<br>
-            ATN $E30E<br>
-            *** ATN: FAC1 wird durch ARCTAN(FAC1) ersetzt.<br>
-            $E33E<br>
-            Zähler (11) und Tabelle mit 12 Konstanten im MFLPT-Format zur Berechnung von ATN.<br>
-            BASSFT $E37B<br>
-            Basic-Warmstartroutine. Eintritt mitJMP ($A002): Teil (nur) der Interrupt-Sequenz, die infolge einer BRK-Instruktion oder auf eine Betätigung der Tasten STOP/RESTORE hin abläuft. Schließt alle l/O-Kanäle, restauriert den Stapelspeicher, gibt die Meldung 7BREAK ERROR aus und springt zu READY.<br>
-            INIT $E394<br>
-            Basic-Kaltstart EintrittmitJMP ($A000): Teil der RESET-Sequenz. Führt INTV, INITCZ, INITMS aus, setzt den Stapelzeiger und springt zu READY.<br>
-            CHRCPY $E3A2<br>
-            Routine CHRGET und Keim für RND im ROM für Verlegung ins RAM.<br>
-            INITCZ $E3BF<br>
-            Initialisiert Sprunginstruktion für USR und den Standardvektor sowie die Vektoren von $03&hellip;$06. Überträgt CHRGET und Keim für RND in das RAM; ruftdie Kernel-Routinen MEMBOT und MEMTOP auf, um die Zeiger für Basic-Anfang und oberes Speicherende ($2B,$37) gemäß den beim Einschalten initialisierten Zeigern bei $282&hellip;$285 zu setzen. Setzt in 2048 das Nullbyte für Programmende.<br>
-            INITMS $E422<br>
-            Gibt die Einschaltmeldung ”*** COMMODORE 64 BASIC V2 *** 64 K RAM SYSTEM” und die Zahl der freien Bytes (auf dem C64 gewöhnlich 38911) aus.<br>
-            INITV $E453<br>
-            Initialisiert die Vektoren für ERROR, MAIN etc. an den Adressen $0300&hellip;$030B.<br>
-            CPATCH $E4DA<br>
-            Korrektur, um die momentane Hintergrundfarbe in das aktuelle Nibble des Farb-RAM zu schreiben; das mindert das Flimmern des Bildschirms. Aufrufen von $EAOB (eine von CLR benutzte Routine).<br>
-            IOBASK SE500<br>
-            Kernel-Routine lOBASE. Gibt die Basisadresse der CIA in X/Y aus. Verwerndet von der Kernel-Routine SCNKEY (Tastaturabfrage).<br>
-            SCRENK $E505<br>
-            Kernel-Routine SCREEN gibt die Bildschirmeinstellung aus: die Zahl der Spalten (40) in X, die Zahl der Zeilen (25) in Y.<br>
-            PLOTK $E50A<br>
-            Kernel-Routine PLOT. Setzt den Cursor auf X (Zeile), Y (Spalte), oder gibt die aktuellen Werte für Zeile, Spalte aus.<br>
-            CINT $E518<br>
-            Allgemeine Initialisierung von Bildschirm und VIC-Chip: Stellt die Tabellen für die Bildschirmeditierung an den Adressen $D9 bis $F2 auf, initialisiert den VIC-Chip, setzt die Zeichenfarbe auf hellblau, führt CLR und HOME aus und stellt in $9A die Standardadresse der l/O-Geräte ein.<br>
-            HOME $E566<br>
-            Bringt den Cursor in die Grundpositionn (links oben).<br>
-            INITVC $E5A0<br>
-            Initialisiert den VIC-Chip mittels der Wertetabelle bei $ECB9&hellip;$ECE6.<br>
-            GETKBC $E5B4<br>
-            Holt ein Zeichen aus dem Tastaturpuffer und schiebt die übrigen Zeichen weiter, der Puffer muß beim Eintritt mindestens 1 Zeichen enthalten (die Länge des Pufferinhalts ist in $C6 festgehalten). Beim Verlassen enthält A das Zeichen.<br>
-            INPPRO $E5CA<br>
-            Liest SHIFT-STOP, RETURN etc. und verarbeitet sie.<br>
-            QTSWC $E684<br>
-            Kehrt das Anführungszeichen-Flag ($D4) um, wenn A beim Eintritt ein Anführungszeichen enthält.<br>
-            PRT $E716<br>
-            Gibt das Zeichen in A zum Bildschirm aus. Behandelt die Zeichen für Cursorsteuerung, Bildschirmeditierung, zur Einstellung der Farben etc. Besorgt außerdem den Übergang zur nächsten Zeile und das Scrollen.<br>
-            CHKCOL $E8CB<br>
-            Prüft A auf ein Farbcode-Zeichen: Ändert die Farbe in $0286, wenn eines gefunden.<br>
-            COLTAB $E8DA<br>
-            Tabelle der 16 Farbcode-Zeichen in der Anordnung Schwarz, Weiß, Rot, Cyan etc.<br>
-            SCROL $E8EA<br>
-            Srollt den Bildschirm. Ist die oberste Zeile länger als 40 Zeichen, wird um 2 Zeilen gescrollt, um sie vollständig zu entfernen. Verzögert, wenn die »CTRL«-Taste gedrückt ist: der Test darauf erfolgt durch direktes Abfragen des CIA-Chips.<br>
-            CLRIN $E9FF<br>
-            Löscht die X-te Bildschirmzeile.<br>
-            DSPP $EA 13<br>
-            Setzt das Zeichen in A an die Cursorposition auf den Bildschirm; keine Prüfung auf Steuerzeichen und so weiter. Die Farbe befindet sich in X.<br>
-            KEY $EA31<br>
-            Interrupt-Dienstroutine: Bei unverändertem Vektor in ($0314) verarbeitet diese Routine alle IRQ-Interrupts. Die Funktionen von KEY sind: Taktzähle und Speicherstelle $91 mittels der Kernel-Routine UDTIM aktualisieren; das Cursorblinken aufrechterhalten, falls der Cursor aktiviert ist (siehe $CC&hellip;$CF); den Motor des Bandgeräts gemäß der Flag bei $CO ein- oder ausschalten; die Tastatur mittels der Kernel-Routine SCNKEY auf ein neues Zeichen hin überprüfen. Schließlich wird noch das Interrupt-Register bei $DC00 im CIA gelöscht, Y,X und A werden wiederhergestellt und mit RTI erfolgt die Rückkehr zum Hauptprogramm.<br>
-            SCNKEY $EA87<br>
-            Kernel-Routine SCNKEY. Prüft auf einen Tastendruck; liest Spalte und Zeile der Tastatur-Matrix, nimmt die entsprechenden Änderungen vor, falls Tasten wie SHIFT, CTRL etc. gedrückt sind, wandelt den Matrixwert mittels Tabellen ab $EB81 in den CBM-ASCII-Wert um und plaziert ihn in Tastaturpuffer, wenn dort noch Platz ist.<br>
-            SHFOG $EB48<br>
-            Logische Behandlung der SHIFT- Taste.<br>
-            KBDTBL $EB81<br>
-            Tabellen zur Umwandlung der Matrixwerte in CBM-ASCII-Werte; 3 Tabellen für Normal-SHIFT- und Graphikmodus; eine vierte für die CTRL-Codes findet sich in$EC78&hellip;$ECB8. Anfangswerte für den VIC-Chip (die Sprite-Farben sind falsch gesetzt).<br>
-            LDRUN $ECE)<br>
+        <p class="hanging"><strong>POS $B39E</strong><br>
+            *** POS: Ruft die Kernal-Routine PLOT auf, um sich die Cursorposition zu verschaffen, und lädt sie dann in FAC1 mittels:</p>
+        <p class="hanging"><strong>SNGET $B3A2</strong><br>
+            Wandelt das Byte in Y in FLPT in FAC1 um (0&hellip;255).</p>
+        <p class="hanging"><strong>ERRDIP $B3A6</strong><br>
+            Prüft, ob der Befehl nicht im Direktmodus eingegeben wurde; ein Wert von $FF in CURLIN+3 ($3A) zeigt Direktmodus an. Ist das der Fall, erfolgt die Meldung ?ILLEGAL DIRECT ERROR. Wird von Routinen aufgerufen, die nicht im Direktmodus zu verwenden sind, wie zum Beispiel GET.</p>
+        <p class="hanging"><strong>DEF $B3B3</strong><br>
+            *** DEF: Erzeugt Funktionsdefinition; sucht die Funktionsvariable oder stellt sie auf. Ein Aufruf von FN setzt den Zeiger innerhalb CHRGET auf den Anfang der FN-Definition im Basic-Text, und der dort vorgefundene Ausdruck wird ausgewertet; anschließend wird der Zeiger wieder zurückgestellt. Die dafür notwendige Information ist mit der in GETFNM aufgestellten Funktionsvariablen gespeichert.</p>
+        <p class="hanging"><strong>GETFNM $B3E1</strong><br>
+            Prüft die Syntax von FN; sucht oder stellt Variable mit dem Funktionsnamen auf und läßt (DEFPNT) ($4E) darauf zeigen (muß numerisch sein, keine Zeichenkettenvariable).</p>
+        <p class="hanging"><strong>FNDOER $B3F4</strong><br>
+            Wertet Funktion aus: Berechnet den Klammerausdruck in der Anweisung mit dem Funktionsaufruf und legt das Ergebnis in FAC1 ab; anschließend erfolgt die Auswertung des Funktionsausdrucks (siehe DEF).</p>
+        <p class="hanging"><strong>STRD $B465</strong><br>
+            *** STR$-Funktion: Berechnet Ausdruck und verwandelt das Ergebnis in eine ASCII-Zeichenkette.</p>
+        <p class="hanging"><strong>STRINI $B475</strong><br>
+            Schafft im Zeichenkettenbereich Platz zum Einfügen einer Zeichenkette: A enthält die Länge und (FAC1+3) zeigt auf die Zeichenkette (zum Beispiel im Eingabepuffer). Beim Verlassen enthält $61 bis $63 den Descriptor der neuen Zeichenkette. CHR$, LEFT$ und so weiter arbeiten sämtlich mit dieser Routine.</p>
+        <p class="hanging"><strong>STRLIT $B487</strong><br>
+            Kopiert eine Zeichenkette in den Zeichenkettenbereich am oberen Speicherende; beim Eintritt in die Routine zeigt (A/Y) auf die Zeichenkette. Sucht nach » " « oder einem Nullbyte als Endmarkierung, um die Länge zu bestimmen. Beim Verlassen enthalten $61, $62, $63 den Descriptor.</p>
+        <p class="hanging"><strong>GETSPA $B4F4</strong><br>
+            Weist im dynamischen Zeichenkettenbereich am oberen Speicherende Platz für eine Zeichenkette zu; die Länge ist in A festgehalten. Führt eine Garbage Collection durch, wenn der Platz erschöpft ist. Aufgerufen von STRINI.</p>
+        <p class="hanging"><strong>GARBA2 $B526</strong><br>
+            Führt Garbage Collection aus; sammelt die gültigen Zeichenketten und entfernt überflüssige aus dem Zeichenkettenbereich. Bei einer großen Zahl von Zeichenketten wird die Routine für Garbage Collection langsam.</p>
+        <p class="hanging"><strong>DVARS $B606</strong><br>
+            Sucht Variablen und Felder nach der nächsten, durch die Garbage Collection zu sichernde Zeichenkette ab.</p>
+        <p class="hanging"><strong>CAT $B63D</strong><br>
+            Verknüpft zwei Zeichenketten.</p>
+        <p class="hanging"><strong>MOVINS $B67A</strong><br>
+            Verschiebt Zeichenkette in den Zeichenkettenbereich oben im Speicher; beim Eintritt zeigt ($6F) auf den Descriptor der betreffenden Zeichenkette.</p>
+        <p class="hanging"><strong>ERESTR $B6A3</strong><br>
+            Verwirft Zeichenkette: Beim Eintritt zeigt (FAC1 + 3) auf den Zeichenketten-Descriptor; beim Verlassen finden sich neue Zeichenkettenlänge und Zeiger in INDEX1.</p>
+        <p class="hanging"><strong>FRETMS $B6DB</strong><br>
+            Löscht den Descriptor-Stapel.</p>
+        <p class="hanging"><strong>CHRD $B6EC</strong><br>
+            *** CHR$: Stellt eine Zeichenkette der Länge 1 auf.</p>
+        <p class="hanging"><strong>LEFTD $B700</strong><br>
+            *** LEFT$.</p>
+        <p class="hanging"><strong>RIGHTD $B72C</strong><br>
+            *** RIGHT$.</p>
+        <p class="hanging"><strong>MIDD $B737</strong><br>
+            *** MID$.</p>
+        <p class="hanging"><strong>PREAM $B761</strong><br>
+            Holt Zeiger für Zeichenketten-Descriptor nach $50,$51 und die Länge nach A (auch nach X).</p>
+        <p class="hanging"><strong>LEN $B77C</strong><br>
+            * * LEN: Fließkommawert des Parameters Zeichenkettenlänge, plaziert in FAC1.</p>
+        <p class="hanging"><strong>LEN1 $B782</strong><br>
+            Ermittelt Länge der Zeichenkette, setzt das Ergebnis in Y, schaltet von Zeichenketten-Modus auf Zahlen-Modus. Aufgerufen von LEN, VAL.</p>
+        <p class="hanging"><strong>ASC $B78B</strong><br>
+            *** ASC: Holt das erste Zeichen einer Zeichenkette und wandelt es in einen Fließkommawert in FAC1 um. Eine Zeichenkette der Länge 0 erzeugt den Fehler ?SYNTAX ERROR.</p>
+        <p class="hanging"><strong>GTBYTC $B79B</strong><br>
+            Liest einen Ausdruck aus dem Basic-Text und wertet ihn aus; muß einen 1-Byte-Wert liefern, der dann in X und FAC1+4 abgelegt wird.</p>
+        <p class="hanging"><strong>VAL $B7AD</strong><br>
+            *** VAL: Wandelt Wert in Fließkommazahl in FAC1 um.</p>
+        <p class="hanging"><strong>GETNUM $B7EB</strong><br>
+            Liest die Parameter für WAIT und POKE aus dem Basic-Text; setzt den ersten (2-Byte-Ganzzahl) in $14,$15 und den zweiten in X ein.</p>
+        <p class="hanging"><strong>GETADR $B7F7</strong><br>
+            Verwandelt FAC1 in 2-Byte-Ganzzahl (Bereich 0&hellip;65535) in $14,$15 und Y/A.</p>
+        <p class="hanging"><strong>PEEK $B80D</strong><br>
+            * * PEEK: Beim Eintritt enthält FAC1 die Adresse, die gelesen werden soll, im Fließkomma. Beim Verlassen steht der abgelesene Wert in Y.</p>
+        <p class="hanging"><strong>POKE $B824</strong><br>
+            *** POKE: Holt zwei Parameter aus dem Text und führt POKE aus.</p>
+        <p class="hanging"><strong>WAIT $B82D</strong><br>
+            *** WAIT: Holt zwei Parameter aus dem Text, und eventuell noch einen dritten, der als 0 betrachtet wird, wenn nicht vorhanden. Tritt in eine WAIT-Schleife ein.</p>
+        <p class="hanging"><strong>FADDH $B849</strong><br>
+            Addiert 0,5 zum Inhalt des FAC1; dient zum Runden.</p>
+        <p class="hanging"><strong>FSUB $B850</strong><br>
+            Fließkomma-Subtraktion: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (A/Y) zeigt, minus FAC1.</p>
+        <p class="hanging"><strong>FSUBT $B853</strong><br>
+            *** Fließkomma-Subtraktion: FAC1 wird ersetzt durch (FAC2 minus FAC1).</p>
+        <p class="hanging"><strong>FADD $B867</strong><br>
+            Fließkomma-Addition: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (A/Y) zeigt, plus FAC1.</p>
+        <p class="hanging"><strong>FADDT $B86F</strong><br>
+            Fließkomma-Addition: FAC1 wird ersetzt durch (FAC2 plus FAC1). Enthält beim Eintritt den Exponenten von FAC1, zum Beispiel Inhalt von $61: addiert »0« schneller.</p>
+        <p class="hanging"><strong>COMPLT $B947</strong><br>
+            Ersetzt FAC1 durch sein Zweierkomplement.</p>
+        <p class="hanging"><strong>OVERR $B97E</strong><br>
+            Gibt die Meldung ?OVERFLOW ERROR und anschließend READY aus.</p>
+        <p class="hanging"><strong>MULSHF $B983</strong><br>
+            Multipliziert mit einem Byte.</p>
+        <p class="hanging"><strong>FONE $B9BC</strong><br>
+            Tabelle von Konstanten im MFLPT-Format: zuerst eine »1«, dann ein Byte vom Wert 3, dann Konstante zur Berechnung von LOG, dann SQR(0.5),SQR(2),-0.5 und LOG(2).</p>
+        <p class="hanging"><strong>LOG $B9EA</strong><br>
+            *** LOG: Berechnet vom Inhalt des FAC1 den Logarithmus zur Basis e.</p>
+        <p class="hanging"><strong>FMULT $BA28</strong><br>
+            Fließkomma-Multiplikation: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (AY/Y) zeigt, mal FAC1.</p>
+        <p class="hanging"><strong>FMULTT $BA30</strong><br>
+            *** Fließpunkt-Multiplikation: FAC1 wird ersetzt durch FAC1 mal FAC2.</p>
+        <p class="hanging"><strong>MLTPLY $BA59</strong><br>
+            Multipliziert FAC1 mit einem Byte und speichert das Ergebnis in $26&hellip;$2A.</p>
+        <p class="hanging"><strong>CONUPK $BA8C</strong><br>
+            Lädt FAC2 mit dem MFLPT-Wert bei (A/Y), isoliert das Vorzeichenbit, speichert es separat und bildet so das FLPT-Format. Beim Verlassen enthält A das erste Byte von FAC1.</p>
+        <p class="hanging"><strong>MULDIV $BAB7</strong><br>
+            Prüft Akkumulatoren für Multiplikation und Division: Ist FAC2 »0«, wird FAC1 »0« gesetzt; ist die Summe der Exponenten zu groß, erfolgt die Meldung ?OVERFLOW ERROR, wenn zu klein, wird das Ergebnis ohne Unterlaufmeldung auf 0 gesetzt.</p>
+        <p class="hanging"><strong>MUL10 $BAE2</strong><br>
+            Multipliziert FAC1 mit 10 und setzt das Ergebnis in FAC1.</p>
+        <p class="hanging"><strong>TENC $BAF9</strong><br>
+            10 im MFLPT-Format.</p>
+        <p class="hanging"><strong>DIV10 $BAFE</strong><br>
+            Dividiert FAC1 durch 10 und legt das Ergebnis in FAC1 ab.</p>
+        <p class="hanging"><strong>FDIVF $BB07</strong><br>
+            Fließkomma-Division: FAC1 wird ersetzt durch FAC2 dividiert durch denjenigen MFLPT-Wert, auf den (A/Y) zeigt; beim Einsprung enthält X das Vorzeichen des Resultats.</p>
+        <p class="hanging"><strong>FDIV $BB0F</strong><br>
+            Fließkomma-Division: FAC1 wird ersetzt durch den MFLPT-Wert, auf den (A/Y) zeigt, dividiert durch FAC1.</p>
+        <p class="hanging"><strong>FDIVT $BB14</strong><br>
+            *** Fließkomma-Division: FAC1 wird ersetzt durch (FAC2 dividiert durch FAC1).</p>
+        <p class="hanging"><strong>MOVFM $BBA2</strong><br>
+            Lädt FAC2 mit dem MFLPT-Wert bei (A/Y), holt das Vorzeichenbit heraus, speichert es separat und bildet so das FLPT-Fbrmat.</p>
+        <p class="hanging"><strong>M0V2F $BBC7</strong><br>
+            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat in $5C bis $60, TEMPFP2.</p>
+        <p class="hanging"><strong>MOV1F $BBCA</strong><br>
+            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat in $57 bis $5B, TEMPFP1.</p>
+        <p class="hanging"><strong>MOVVF $BBD0</strong><br>
+            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat an der Adresse, auf die ($49) zeigt.</p>
+        <p class="hanging"><strong>MOVMF $BBD4</strong><br>
+            Verwandelt FAC1 in MFLPT-Format und speichert das Resultat an der Adresse, auf die (A/Y) zeigt.</p>
+        <p class="hanging"><strong>MOVFA $BBFC</strong><br>
+            Kopiert FAC2 in FAC1.</p>
+        <p class="hanging"><strong>MOVAF $BC0C</strong><br>
+            Rundet FAC1 durch Aufruf von ROUND und kopiert das Ergebnis in FAC2.</p>
+        <p class="hanging"><strong>ROUND $BC1B</strong><br>
+            Rundet FAC1.</p>
+        <p class="hanging"><strong>SIGN $BC2B</strong><br>
+            Ermittelt das Vorzeichen von FAC1: beim Verlassen ist A=0, wenn der Wert in FAC1 null ist, A=1, wenn er positiv ist und A=$FF, wenn er negativ ist.</p>
+        <p class="hanging"><strong>SGN $BC39</strong><br>
+            *** SGN-Funktion: Ruft SIGN auf und verwandelt dann A in Fließkommaform in FAC1.</p>
+        <p class="hanging"><strong>ABS $BC58</strong><br>
+            *** ABS-Funktion: Verwandelt FAC1 in ABS(FAC1).</p>
+        <p class="hanging"><strong>FCOMP $BC5B</strong><br>
+            Vergleicht FAC1 mit dem MFLPT-Wert bei (A/Y); beim Verlassen ist A=0, wenn die Werte gleich sind, A=1, wenn FAC1 &gt;MFLPT, und A=$FF, wenn FAC1 &lt;MFLPT</p>
+        <p class="hanging"><strong>QINT $BC9B</strong><br>
+            Verwandelt FAC1 in 4-Byte-Ganzzahl und speichert das Ergebnis, höchstes Byte zuerst, in (FAC1+1) (FAC+4).</p>
+        <p class="hanging"><strong>INT $BCCC</strong><br>
+            INT-Funktion: Rundet FAC1 ab, beläßt das Resultat jedoch in FLPT-Fbrm in FAC1.</p>
+        <p class="hanging"><strong>FIN $BCF3</strong><br>
+            Wandelt eine ASCII-Zeichenkette, zum Beispiel »—99.375« in eine Zahl in FAC1 um. Beim Eintritt zeigt TXTPTR auf den Anfang. Die Umwandlung erfolgt dann durch JSR CHRGET/JSR FIN.</p>
+        <p class="hanging"><strong>AADD $BD7E</strong><br>
+            Addiert den Inhalt von A zu FAC1.</p>
+        <p class="hanging"><strong>STCONS $BDB3</strong><br>
+            3 Konstante in MFLPT-Form: 99999999.9, 999999999, 1000000000. Verwendet bei Zeichenkettenumwandlungen.</p>
+        <p class="hanging"><strong>INPRT $BDC2</strong><br>
+            Druckt IN gefolgt von der aktuellen Zeilennummer in CURLIN ($39, $3A).</p>
+        <p class="hanging"><strong>LINPRT $BDCD</strong><br>
+            Gibt die Ganzzahl in A/Y aus; Bereich 0&hellip;65535.</p>
+        <p class="hanging"><strong>FOUT $BDDD</strong><br>
+            Verwandelt den Inhalt von FAC1 in eine ASCII-Zeichenkette, die mit der Adresse $0100 beginnt und mit einem Null-Byte endet. Beim Verlassen enthält (A/Y) die Startadresse, so daß STROUT die Zeichenkette ausgeben kann.</p>
+        <p class="hanging"><strong>FOUTIM $BE68</strong><br>
+            Verwandelt TI in ASCII-Zeichenkette, die mit der Adresse $0100 beginnt und mit einem Null-Byte endet.</p>
+        <p class="hanging"><strong>TICONS $BF11</strong><br>
+            Konstanten zur Umwandlung von Zeichenketten und TI sowie der Wert 0,5 in MFLPT-Form, danach 15 weitere Konstanten C4-Byte-Ganzzahlen).</p>
+        <p class="hanging"><strong>SQR $BF71</strong><br>
+            *** SQR: FAC1 wird durch die Quadratwurzel aus FAC1 ersetzt.</p>
+        <p class="hanging"><strong>FPWRT $BF7B</strong><br>
+            * * Führt Potenzberechnungen aus: FAC1 wird ersetzt durch FAC2 hoch FAC1. Beim Eintritt muß A den Inhalt von FAC2 (das heißt von $69) speichern, damit Potenzen von 0 korrekt sind.</p>
+        <p class="hanging"><strong>NEGOP $BFB4</strong><br>
+            Macht FAC1 negativ.</p>
+        <p class="hanging"><strong>EXCONS $BFBF</strong><br>
+            Tabelle von 8 Konstanten zur Auswertung von EXP-Reihen.</p>
+        <p class="hanging"><strong>EXP $BFE0</strong><br>
+            *** EXP-Funktion: FAC1 wird durch e hoch FAC1 ersetzt.</p>
+        <p class="hanging"><strong>POLYX $E059</strong><br>
+            Routine zur Reihenberechnung. Beim Eintritt zeigt A/Y auf den Zähler am Anfang der Konstantentabelle, die zur Berechnung der Potenzreihe herangezogen wird.</p>
+        <p class="hanging"><strong>RMULC $E08D</strong><br>
+            11879546.4 im MFLPT-Format: multiplikative Konstante zur Auswertung von RND.</p>
+        <p class="hanging"><strong>RAODC $E092</strong><br>
+            3.92767778 E-8 im MFLPT-Format: additive Konstante zur Auswertung von RND.</p>
+        <p class="hanging"><strong>RND $E097</strong><br>
+            *** RND: Setzt in FAC1 je nach seinem Vorzeichen auf folgende Weise eine Zahl:</p>
+        <p class="hanging"><strong>RNDO $E09E</strong><br>
+            Wenn 0, wird FAC1 von den Registern der CIA-Timer geladen: eine einfache Art, einen neuen Keim für Zufallszahlen zu setzen.</p>
+        <p class="hanging"><strong>QSETNR $E0BE</strong><br>
+            Wenn &gt; 0, wird die in ($88&hellip;$8C gespeicherte) durch vorhergehende Aufrufe erzeugte Zufallszahl mit RMULC multipliziert und RADDC hinzugezählt; das Ergebnis steht in FAC1.</p>
+        <p class="hanging"><strong>RND1 $E003</strong><br>
+            Wenn &lt; 0, wird FAC1 mit vermischten Bytes von sich selbst geladen, daher ist RND(-We) Konstant und also wiederholbar. In allen diesen drei Fällen wird FAC1 in $88&hellip;$8C gespeichert.</p>
+        <p class="hanging"><strong>RNDRNG $E0E5</strong><br>
+            Zwingt FAC1 in den Bereich 0&hellip;1,0 und C gespeichert.</p>
+        <p class="hanging"><strong>BIOERR $E0F9</strong><br>
+            Fehlerbehandlung für bestimmte Basic-Aufrufe des Kernel (erforderlich zur Verarbeitung von CMB, LOAD, SAVE), falls bei der Rückkehr von der Kernal-Routine das Fehlerflag C gesetzt ist.</p>
+        <p class="hanging"><strong>BCHOUT $E10C</strong><br>
+            Gibt Zeichen mittels CHROUT aus; Fehlermeldung bei Versagen.</p>
+        <p class="hanging"><strong>BCHIN $E112</strong><br>
+            Nimmt Zeichen mittels CHRIN herein; Fehlermeldung bei Versagen.</p>
+        <p class="hanging"><strong>BCKOUT $E118</strong><br>
+            Richtet mittels CHKOUT eine Ausgabedatei ein; Fehlermeldung bei Versagen.</p>
+        <p class="hanging"><strong>BCKIN $E11E</strong><br>
+            Richtet mittels CHKIN eine Eingabedatei ein; Fehlermeldung bei Versagen.</p>
+        <p class="hanging"><strong>BGETIN $E124</strong><br>
+            Holt Zeichen mittels GETIN; Fehlermeldung bei Versagen.</p>
+        <p class="hanging"><strong>SYS $E12A</strong><br>
+            *** SYS: Lädt A, X, Y, SR aus $30C&hellip;, ruft MC-Routine an der Adresse auf, die in der Anweisung als Argument angegeben ist. Lädt bei der Rückkehr von der Routine alle Registerinhalte aus $30C&hellip; zurück.</p>
+        <p class="hanging"><strong>SAVET $E156</strong><br>
+            *** SAVE: Sichert ein Basic-Programm: läßt A auf die Adresse in Seite Null zeigen, die ihrerseits auf die Startadresse zeigt; setzt (X/Y) auf $2D,$2E = Programmende. Anschließend wird über einen Vektor bei $FFD8 die Kernal-Routine SAVE aufgerufen.</p>
+        <p class="hanging"><strong>VERFYT $E165</strong><br>
+            *** VERIFY: Setzt das Flag in A auf 1, um die Verify-Operation anzuzeigen; tritt in LOADT ein und prüft auf Fehler.</p>
+        <p class="hanging"><strong>LOADT $E168</strong><br>
+            *** LOAD: Holt die Parameter aus dem Basic-Text und stellt sie auf; ruft die Kernal-Routine LOAD über einen Vektor bei $FFD5 auf.</p>
+        <p class="hanging"><strong>LOADR $E16F</strong><br>
+            Lädt vom bereits angesprochenen Gerät ins RAM ab der Basic-Adresse in ($2B).</p>
+        <p class="hanging"><strong>LDFIN $E195</strong><br>
+            Beendet das Laden. Nach Aufruf von LOAD im Direktmodus wird der Zeiger auf das obere Ende von Basic ($2D) auf die Adresse des letzten geladenen Bytes gesetzt. Nach einem Aufruf aus einem Programm heraus unterbleibt dies, so daß die Variablenliste bewahrt ist. Dann wird der Zeiger in CHRGET zurückgesetzt und ein Basic-Warmstart durchgeführt, um das neue Programm zu starten.</p>
+        <p class="hanging"><strong>OPENT $E1BE</strong><br>
+            *** OPEN: Liest die Parameter aus dem Text und stellt sie durch entsprechende Kernel-Aufrufe auf. Ruft über den Vektor bei $FFC0 die Kernal-Routine OPEN auf.</p>
+        <p class="hanging"><strong>CLOSET $E1C7</strong><br>
+            *** CLOSE: Liest die Parameter aus dem Text und stellt sie auf. Ruft über den Vektor bei $FFC3 die Kernel-Routine CLOSE auf.</p>
+        <p class="hanging"><strong>SLPARA $E1D4</strong><br>
+            Holt die Parameter für LOAD, SAVE und VERIFY aus dem Basic-Text; setzt die Standardwerte, wenn Angaben fehlen. Richtet durch einen Aufruf von SETLFS über den Vektor bei $FFBA eine Datei ein.</p>
+        <p class="hanging"><strong>COMBYT $E200</strong><br>
+            Prüft auf ein Komma, wertet den folgenden 1-Byte-Parameter aus und setzt ihn in X.</p>
+        <p class="hanging"><strong>CMMERR $E20E</strong><br>
+            Prüft auf Komma, dem irgendwas außer dem Anweisungsende folgt: andernfalls ?SYNTAX ERROR.</p>
+        <p class="hanging"><strong>OCPARA $E219</strong><br>
+            Holt die Parameter für OPEN/CLOSE-Aufrufe aus dem Basic-Text; setzt die Standardwerte, wenn Angaben fehlen.</p>
+        <p class="hanging"><strong>COS $E26</strong><br>
+            *** COS: FAC1 wird durch COS(FAC1) ersetzt.</p>
+        <p class="hanging"><strong>SIN $E26 B</strong><br>
+            *** SIN: FAC 1 wird durch SIN(FAC1) ersetzt.</p>
+        <p class="hanging"><strong>TAN $E2B4</strong><br>
+            *** TAN: FAC1 wird durch TAN(FAC1) ersetzt.</p>
+        <p class="hanging"><strong>$E2E0</strong><br>
+            Tabelle von Konstanten im MFLPT-Fbrmat: Pi/2, Pi*2 und Pi*0,25. Danach folgt ein Zähler (5) und 6 MFLPT-Konstanten zur Berechnung von SIN.</p>
+        <p class="hanging"><strong>ATN $E30E</strong><br>
+            *** ATN: FAC1 wird durch ARCTAN(FAC1) ersetzt.</p>
+        <p class="hanging"><strong>$E33E</strong><br>
+            Zähler (11) und Tabelle mit 12 Konstanten im MFLPT-Format zur Berechnung von ATN.</p>
+        <p class="hanging"><strong>BASSFT $E37B</strong><br>
+            Basic-Warmstartroutine. Eintritt mit JMP ($A002): Teil (nur) der Interrupt-Sequenz, die infolge einer BRK-Instruktion oder auf eine Betätigung der Tasten STOP/RESTORE hin abläuft. Schließt alle I/O-Kanäle, restauriert den Stapelspeicher, gibt die Meldung ?BREAK ERROR aus und springt zu READY.</p>
+        <p class="hanging"><strong>INIT $E394</strong><br>
+            Basic-Kaltstart Eintritt mit JMP ($A000): Teil der RESET-Sequenz. Führt INTV, INITCZ, INITMS aus, setzt den Stapelzeiger und springt zu READY.</p>
+        <p class="hanging"><strong>CHRCPY $E3A2</strong><br>
+            Routine CHRGET und Keim für RND im ROM für Verlegung ins RAM.</p>
+        <p class="hanging"><strong>INITCZ $E3BF</strong><br>
+            Initialisiert Sprunginstruktion für USR und den Standardvektor sowie die Vektoren von $03&hellip;$06. Überträgt CHRGET und Keim für RND in das RAM; ruft die Kernel-Routinen MEMBOT und MEMTOP auf, um die Zeiger für Basic-Anfang und oberes Speicherende ($2B,$37) gemäß den beim Einschalten initialisierten Zeigern bei $282&hellip;$285 zu setzen. Setzt in 2048 das Nullbyte für Programmende.</p>
+        <p class="hanging"><strong>INITMS $E422</strong><br>
+            Gibt die Einschaltmeldung "*** COMMODORE 64 BASIC V2 *** 64 K RAM SYSTEM" und die Zahl der freien Bytes (auf dem C64 gewöhnlich 38911) aus.</p>
+        <p class="hanging"><strong>INITV $E453</strong><br>
+            Initialisiert die Vektoren für ERROR, MAIN etc. an den Adressen $0300&hellip;$030B.</p>
+        <p class="hanging"><strong>CPATCH $E4DA</strong><br>
+            Korrektur, um die momentane Hintergrundfarbe in das aktuelle Nibble des Farb-RAM zu schreiben; das mindert das Flimmern des Bildschirms. Aufrufen von $EA0B (eine von CLR benutzte Routine).</p>
+        <p class="hanging"><strong>IOBASK $E500</strong><br>
+            Kernel-Routine IOBASE. Gibt die Basisadresse der CIA in X/Y aus. Verwerndet von der Kernel-Routine SCNKEY (Tastaturabfrage).</p>
+        <p class="hanging"><strong>SCRENK $E505</strong><br>
+            Kernel-Routine SCREEN gibt die Bildschirmeinstellung aus: die Zahl der Spalten (40) in X, die Zahl der Zeilen (25) in Y.</p>
+        <p class="hanging"><strong>PLOTK $E50A</strong><br>
+            Kernel-Routine PLOT. Setzt den Cursor auf X (Zeile), Y (Spalte), oder gibt die aktuellen Werte für Zeile, Spalte aus.</p>
+        <p class="hanging"><strong>CINT $E518</strong><br>
+            Allgemeine Initialisierung von Bildschirm und VIC-Chip: Stellt die Tabellen für die Bildschirmeditierung an den Adressen $D9 bis $F2 auf, initialisiert den VIC-Chip, setzt die Zeichenfarbe auf hellblau, führt CLR und HOME aus und stellt in $9A die Standardadresse der I/O-Geräte ein.</p>
+        <p class="hanging"><strong>HOME $E566</strong><br>
+            Bringt den Cursor in die Grundpositionn (links oben).</p>
+        <p class="hanging"><strong>INITVC $E5A0</strong><br>
+            Initialisiert den VIC-Chip mittels der Wertetabelle bei $ECB9&hellip;$ECE6.</p>
+        <p class="hanging"><strong>GETKBC $E5B4</strong><br>
+            Holt ein Zeichen aus dem Tastaturpuffer und schiebt die übrigen Zeichen weiter, der Puffer muß beim Eintritt mindestens 1 Zeichen enthalten (die Länge des Pufferinhalts ist in $C6 festgehalten). Beim Verlassen enthält A das Zeichen.</p>
+        <p class="hanging"><strong>INPPRO $E5CA</strong><br>
+            Liest SHIFT-STOP, RETURN etc. und verarbeitet sie.</p>
+        <p class="hanging"><strong>QTSWC $E684</strong><br>
+            Kehrt das Anführungszeichen-Flag ($D4) um, wenn A beim Eintritt ein Anführungszeichen enthält.</p>
+        <p class="hanging"><strong>PRT $E716</strong><br>
+            Gibt das Zeichen in A zum Bildschirm aus. Behandelt die Zeichen für Cursorsteuerung, Bildschirmeditierung, zur Einstellung der Farben etc. Besorgt außerdem den Übergang zur nächsten Zeile und das Scrollen.</p>
+        <p class="hanging"><strong>CHKCOL $E8CB</strong><br>
+            Prüft A auf ein Farbcode-Zeichen: Ändert die Farbe in $0286, wenn eines gefunden.</p>
+        <p class="hanging"><strong>COLTAB $E8DA</strong><br>
+            Tabelle der 16 Farbcode-Zeichen in der Anordnung Schwarz, Weiß, Rot, Cyan etc.</p>
+        <p class="hanging"><strong>SCROL $E8EA</strong><br>
+            Srollt den Bildschirm. Ist die oberste Zeile länger als 40 Zeichen, wird um 2 Zeilen gescrollt, um sie vollständig zu entfernen. Verzögert, wenn die »CTRL«-Taste gedrückt ist: der Test darauf erfolgt durch direktes Abfragen des CIA-Chips.</p>
+        <p class="hanging"><strong>CLRIN $E9FF</strong><br>
+            Löscht die X-te Bildschirmzeile.</p>
+        <p class="hanging"><strong>DSPP $EA 13</strong><br>
+            Setzt das Zeichen in A an die Cursorposition auf den Bildschirm; keine Prüfung auf Steuerzeichen und so weiter. Die Farbe befindet sich in X.</p>
+        <p class="hanging"><strong>KEY $EA31</strong><br>
+            Interrupt-Dienstroutine: Bei unverändertem Vektor in ($0314) verarbeitet diese Routine alle IRQ-Interrupts. Die Funktionen von KEY sind: Taktzähle und Speicherstelle $91 mittels der Kernel-Routine UDTIM aktualisieren; das Cursorblinken aufrechterhalten, falls der Cursor aktiviert ist (siehe $CC&hellip;$CF); den Motor des Bandgeräts gemäß der Flag bei $C0 ein- oder ausschalten; die Tastatur mittels der Kernel-Routine SCNKEY auf ein neues Zeichen hin überprüfen. Schließlich wird noch das Interrupt-Register bei $DC00 im CIA gelöscht, Y,X und A werden wiederhergestellt und mit RTI erfolgt die Rückkehr zum Hauptprogramm.</p>
+        <p class="hanging"><strong>SCNKEY $EA87</strong><br>
+            Kernel-Routine SCNKEY. Prüft auf einen Tastendruck; liest Spalte und Zeile der Tastatur-Matrix, nimmt die entsprechenden Änderungen vor, falls Tasten wie SHIFT, CTRL etc. gedrückt sind, wandelt den Matrixwert mittels Tabellen ab $EB81 in den CBM-ASCII-Wert um und plaziert ihn in Tastaturpuffer, wenn dort noch Platz ist.</p>
+        <p class="hanging"><strong>SHFOG $EB48</strong><br>
+            Logische Behandlung der SHIFT- Taste.</p>
+        <p class="hanging"><strong>KBDTBL $EB81</strong><br>
+            Tabellen zur Umwandlung der Matrixwerte in CBM-ASCII-Werte; 3 Tabellen für Normal-SHIFT- und Graphikmodus; eine vierte für die CTRL-Codes findet sich in $EC78&hellip;$ECB8. Anfangswerte für den VIC-Chip (die Sprite-Farben sind falsch gesetzt).</p>
+        <p class="hanging"><strong>LDRUN $ECE)</strong><br>
             LOAD RETURN RUN RETURN für den Tastaturpuffer.</p>
 
-        <p>Fortsetzung im nächsten Extra</p>
+        <p class="right">Fortsetzung im nächsten Extra</p>
     </article>
 </body>
 
