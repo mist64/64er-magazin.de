@@ -58,6 +58,122 @@
 
         <p>Ein Programm, das die Schrift der Märchenbücher zu ermöglichen versucht, sollte auch deren Umlaute beherrschen. Diese Änderung gegenüber der ersten Version klingt nach wenig Aufwand, erfordert jedoch eine Umstrukturierung des gesamten Programms. Natürlich soll man die Umlaute auch auf dem Bildschirm sehen können; also mußte der Zeichensatz des C 64 geändert werden (das Assemblerlisting entnehmen Sie bitte Bild 2). Die neuen Zeichen auf der Tastatur werden in Bild 3 dargestellt. In die DATA-Zeilen der ersten Version mußten dann die Umlaute eingebunden werden. Die durch REMs gekennzeichneten DATA-Zeilen weichen vom ursprünglichen »Schreiberling« ab, das Programm ist ja flexibel. Weiterhin sind einige Verbesserungen im Programmablauf entstanden. Zum Beispiel der Druckertest (Zeile 800 bis 840), der einen eventuellen »DEVICE NOT PRESENT ERROR« abfängt. Die Variablenfelder sind im »Schreiberling V2« vollständig umgruppiert (Bild 4), wodurch die Einleseschleife vereinfacht werden konnte. Ein neuer Druckmodus wurde eingeführt, der durch » « an erster Stelle angewählt wird. Eine Liste aller Veränderungen könnte man nicht mehr überblicken, langwierige Fehlersuche wäre vorprogrammiert. Deshalb enthält Listing 3 das komplette Programm »Schreiberling V2«. In dieser Form ist das Programm auf einem Epson RX 80 mit Print 64-Interface lauffähig. Man müßte jedoch jedes Interface, das sich softwaremäßig »verriegeln« läßt, damit ansprechen können. Es genügt der Direktmodus ohne jegliche Zeichenumwandlung durch das Interface. »Schreiberling V2« wird es als Basic-Programm und als Compilat auf der Leserservice-Diskette geben.</p>
 
+        <figure>
+            TODO
+            <figcaption>Bild 2. Assemblerlisting für die Umlaute auf dem C 64 bei »Schreiberling V2«</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>BS-Code</th>
+                        <th>alt</th>
+                        <th>neu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>@</td>
+                        <td>ü</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>[</td>
+                        <td>ö</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>]</td>
+                        <td>ä</td>
+                    </tr>
+                    <tr>
+                        <td>43</td>
+                        <td>+</td>
+                        <td>ß</td>
+                    </tr>
+                    <tr>
+                        <td>60</td>
+                        <td>&lt;</td>
+                        <td>Ö</td>
+                    </tr>
+                    <tr>
+                        <td>62</td>
+                        <td>&gt;</td>
+                        <td>Ä</td>
+                    </tr>
+                    <tr>
+                        <td>122</td>
+                        <td>&radic;</td>
+                        <td>Ü</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 3. Die neue Tastaturbelegung bei »Schreiberling V2«</figcaption>
+        </figure>
+
+        <figure>
+            <h3>Neu eingeführte Variable</h3>
+            <table class="plain">
+                <thead>
+                    <tr>
+                        <th>Zeile</th>
+                        <th>Variable</th>
+                        <th>Bemerkung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>80</td>
+                        <td>k</td>
+                        <td>Start Maschinenprogramm<br>kann auch verlegt<br>werden (z.B. k=678)</td>
+                    </tr>
+                    <tr>
+                        <td>80</td>
+                        <td>b</td>
+                        <td>Start Zeichensatz 2</td>
+                    </tr>
+                    <tr>
+                        <td>290</td>
+                        <td>a$(92,2)</td>
+                        <td>Tabelle der Druck-DATAs</td>
+                    </tr>
+                    <tr>
+                        <td>320</td>
+                        <td>sd$</td>
+                        <td>Druckbefehlsstring für<br>Normalgrafik (480 P/Z)</td>
+                    </tr>
+                    <tr>
+                        <td>330</td>
+                        <td>md$</td>
+                        <td>Befehlsstring für<br>CRT-Grafik (640 P/Z)</td>
+                    </tr>
+                    <tr>
+                        <td>340</td>
+                        <td>dd$</td>
+                        <td>Befehlsstring für<br>doppelte Dichte (960 P/Z)</td>
+                    </tr>
+                    <tr>
+                        <td>350</td>
+                        <td>I$</td>
+                        <td>Befehlsstring für<br>Druckerinitialisierung</td>
+                    </tr>
+                    <tr>
+                        <td>360</td>
+                        <td>bz</td>
+                        <td>Bildschirmposition,<br>ab der gelesen wird</td>
+                    </tr>
+                    <tr>
+                        <td>360</td>
+                        <td>lf$</td>
+                        <td>Befehlsstring Linefeed</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 4. Die neuen Variablen für »Schreiberling V2«</figcaption>
+        </figure>
+
         <p>Mit diesen Erweiterungen beziehungsweise Veränderungen dürfte nun ein Großteil aller Drucker mit »Schreiberling« zusammenarbeiten. Selbstverständlich sind damit auch MPS-kompatible gemeint, wie zum Beispiel Seikosha 1000 VC oder der Epson GX 80. Sollte der Zeichensatz nicht Ihrem Geschmack entsprechen, können Sie ihn jederzeit verändern oder neu entwerfen (siehe 64’er 10/85, Seite 54). Versuchen Sie sich doch einmal am Zeichensatz der 64’er.</p>
 
         <address class="author">(D. Surrey/G. Knöpfel/O. Brudel/F. Behrens/og)</address>

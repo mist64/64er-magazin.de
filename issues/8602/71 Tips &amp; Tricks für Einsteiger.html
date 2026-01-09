@@ -61,11 +61,46 @@
 
         <p>Programmerklärung: Die FOR-NEXT-Schleife bricht die Berechnungen nach dem 13. Durchgang (FOR I=0TO12) ab, da PI vom Basic-Interpreter nicht mehr genauer berechnet werden kann. An der Variablen W erkennt der C 64, ob U=0 ist. Im ersten Durchlauf ist U=0, da nach einem »RUN« automatisch alle Variablen gelöscht werden. Das bedeutet, daß der Term »U=0« wahr ist (-1). In den folgenden Durchläufen ist U≠0 (ungleich Null). Das bedeutet, daß der Term »U≠0« nicht wahr, beziehungsweise falsch ist (siehe Bild 1 und 2).</p>
 
+        <figure>
+            <pre>READY.
+? 1=5
+ 0
+
+READY.
+? 7=7
+-1
+
+READY.
+Q = (1=5) : ? Q
+ 0
+
+READY.
+Q = (7=7) : ? Q
+-1
+
+READY.
+</pre>
+            <figcaption>Bild 1. Beispiel für »wahre« und »falsche« Aussagen. Das »?« ist die Abkürzung für »PRINT«</figcaption>
+        </figure>
+
+        <figure>
+            <pre> 0 : falsch
+-1 : wahr
+</pre>
+            <figcaption>Bild 2. Das mathematische »Ergebnis« »wahrer« und »falscher« Aussagen</figcaption>
+        </figure>
+
         <p>Indem ich vor den Term »U=0« ein Minuszeichen setze, erreiche ich folgende Belegung der Variablen W:</p>
 
         <table class="plain">
-            <tr><td>W=1:</td><td>1. Durchlauf (U=0)</td></tr>
-            <tr><td>W=0:</td><td>x-ter Durchlauf (U≠0)</td></tr>
+            <tr>
+                <td>W=1:</td>
+                <td>1. Durchlauf (U=0)</td>
+            </tr>
+            <tr>
+                <td>W=0:</td>
+                <td>x-ter Durchlauf (U≠0)</td>
+            </tr>
         </table>
 
         <p>Dadurch wird bewirkt, daß die Variablen nur einmal initialisiert werden. Zu dem Produkt aus W und der Initialisierungszahl addiere ich die Variable selbst, damit die Variablenwerte in den nachfolgenden Durchläufen nicht verlorengehen (siehe Bild 3). Dann folgt die eigentliche Berechnung:</p>
@@ -75,6 +110,84 @@
         <p>Bevor ein neuer Programmdurchlauf gestartet wird, werden N, U und O auf dem Bildschirm ausgegeben. Das n-Eck (Vieleck) hat zuerst sechs Ecken, dann 12, 24, 48 und so weiter, wird also an einem Kreis angenähert. Das bedeutet, daß N nach jeder Berechnung mit 2 multipliziert wird (n:=2n). Durch die Formel 6*2↑I berechne ich N für den I+1-ten Durchgang (siehe Bild 4).</p>
 
         <address class="author">(Gerhard Muth/tr)</address>
+
+        <figure>
+            <pre>U = W * 3 + U = U;
+       0, da W=0
+
+O = W * 2 * SQR(3) + O = O;
+       0, da W=0
+</pre>
+            <figcaption>Bild 3. So werden die Variablen bei jedem Schleifendurchlauf neu definiert</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>I</td>
+                    <td>6 * 2&uarr;I</td>
+                    <td></td>
+                    <td>N</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>6 * 1</td>
+                    <td>=</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>6 * 2</td>
+                    <td>=</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>6 * 4</td>
+                    <td>=</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>6 * 8</td>
+                    <td>=</td>
+                    <td>48</td>
+                </tr>
+                <tr>
+                    <td>...</td>
+                    <td>... ...</td>
+                    <td></td>
+                    <td>...</td>
+                </tr>
+            </table>
+            <figcaption>Bild 4. Die Wertetabelle unseres kleinen Programms</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>I</td>
+                    <td>Schleifenzähler</td>
+                </tr>
+                <tr>
+                    <td>W</td>
+                    <td>Kennvariable</td>
+                </tr>
+                <tr>
+                    <td>O</td>
+                    <td>obere Grenze</td>
+                </tr>
+                <tr>
+                    <td>U</td>
+                    <td>untere Grenze</td>
+                </tr>
+                <tr>
+                    <td>N</td>
+                    <td>Anzahl der Ecken des Vielecks)</td>
+                </tr>
+            </table>
+            <figcaption>Bild 5. Die verwendeten Variablen und ihre Bedeutung</figcaption>
+        </figure>
 
         <figure>
             <pre data-filename="kreiszahl pi" data-name="Kreiszahl PI"></pre>
@@ -117,20 +230,62 @@
         <aside>
             <p class="noindent">Erklärung des Programms</p>
             <table class="plain">
-                <tr class="strong"><td>Zeile</td><td>Bedeutung</td></tr>
-                <tr><td>10</td><td>definiert den Bildschirm (Sekundäradresse 3) als Eingabegerät mit der Kanalnummer 1</td></tr>
-                <tr><td>20</td><td>definiert den Drucker (Sekundäradresse 4) als Ausgabegerät mit der Kanalnummer 4</td></tr>
-                <tr><td>30</td><td>das störende »RUN« auf dem Bildschirm wird gelöscht, damit es nicht mit aufs Papier kommt, und der Cursor wird in die obere linke Bildschirmposition gesetzt (ab hier werden die Zeichen eingelesen)</td></tr>
-                <tr><td>40</td><td>erste Schleife; wird 25mal durchlaufen (der Bildschirm hat 25 Zeilen)</td></tr>
-                <tr><td>50</td><td>zweite Schleife; wird 40mal durchlaufen (40 Zeichen pro Zeile)</td></tr>
-                <tr><td>60</td><td>holt ein Zeichen aus Kanal 1, der in der Zeile 10 definiert wurde, und legt dieses in der Variablen A$ ab</td></tr>
-                <tr><td>70</td><td>für jede Bildschirmzeile werden alle Zeichen erst in der Variablen B$ gesammelt</td></tr>
-                <tr><td>80</td><td>zweite Schleife weiterführen</td></tr>
-                <tr><td>90</td><td>jetzt wurde eine ganze Bildschirmzeile eingelesen, der Text in dieser Zeile kann also ausgedruckt werden (Kanal 4 »zeigt« ja wegen Zeile 20 zum Drucker)</td></tr>
-                <tr><td>100</td><td>die Sammelvariable wird wieder gelöscht,</td></tr>
-                <tr><td>110</td><td>die nächste Bildschirmzeile eingelesen</td></tr>
-                <tr><td>120</td><td>und</td></tr>
-                <tr><td>130</td><td>die Kanäle aus den Zeilen 10 und 20 werden wieder ge­schlossen.</td></tr>
+                <tr class="strong">
+                    <td>Zeile</td>
+                    <td>Bedeutung</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>definiert den Bildschirm (Sekundäradresse 3) als Eingabegerät mit der Kanalnummer 1</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>definiert den Drucker (Sekundäradresse 4) als Ausgabegerät mit der Kanalnummer 4</td>
+                </tr>
+                <tr>
+                    <td>30</td>
+                    <td>das störende »RUN« auf dem Bildschirm wird gelöscht, damit es nicht mit aufs Papier kommt, und der Cursor wird in die obere linke Bildschirmposition gesetzt (ab hier werden die Zeichen eingelesen)</td>
+                </tr>
+                <tr>
+                    <td>40</td>
+                    <td>erste Schleife; wird 25mal durchlaufen (der Bildschirm hat 25 Zeilen)</td>
+                </tr>
+                <tr>
+                    <td>50</td>
+                    <td>zweite Schleife; wird 40mal durchlaufen (40 Zeichen pro Zeile)</td>
+                </tr>
+                <tr>
+                    <td>60</td>
+                    <td>holt ein Zeichen aus Kanal 1, der in der Zeile 10 definiert wurde, und legt dieses in der Variablen A$ ab</td>
+                </tr>
+                <tr>
+                    <td>70</td>
+                    <td>für jede Bildschirmzeile werden alle Zeichen erst in der Variablen B$ gesammelt</td>
+                </tr>
+                <tr>
+                    <td>80</td>
+                    <td>zweite Schleife weiterführen</td>
+                </tr>
+                <tr>
+                    <td>90</td>
+                    <td>jetzt wurde eine ganze Bildschirmzeile eingelesen, der Text in dieser Zeile kann also ausgedruckt werden (Kanal 4 »zeigt« ja wegen Zeile 20 zum Drucker)</td>
+                </tr>
+                <tr>
+                    <td>100</td>
+                    <td>die Sammelvariable wird wieder gelöscht,</td>
+                </tr>
+                <tr>
+                    <td>110</td>
+                    <td>die nächste Bildschirmzeile eingelesen</td>
+                </tr>
+                <tr>
+                    <td>120</td>
+                    <td>und</td>
+                </tr>
+                <tr>
+                    <td>130</td>
+                    <td>die Kanäle aus den Zeilen 10 und 20 werden wieder ge­schlossen.</td>
+                </tr>
             </table>
         </aside>
 
@@ -160,7 +315,8 @@
                 READY.
                 RUN
             </code>
-            (Ein eventuell vorhandenes Basic-Programm wird gestartet.)</p>
+            (Ein eventuell vorhandenes Basic-Programm wird gestartet.)
+        </p>
         </p>
 
         <p>Erklärung: Das Betriebssystem hält eine Routine bereit, die die Zeichenfolge
