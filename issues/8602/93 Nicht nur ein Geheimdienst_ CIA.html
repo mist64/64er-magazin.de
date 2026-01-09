@@ -57,6 +57,162 @@
 
         <p>Ein Erreichen negativer Werte nennt man Unterlauf. Bei jedem Unterlauf sieht der Timer in seinem Kontrollregister nach (Timer A: Register 14, Timer B: Register 15), ob das Bit 3 gesetzt ist. Wenn das der Fall ist, bleibt der Timer stehen. Diese Betriebsart nennt man »One Shot Mode«. Andernfalls beginnt der Timer erneut von dem Wert, der vorher eingegeben wurde, nach Null zu zählen (»Continuous Mode«). Starten und stoppen kann man den Timerjederzeit mit Bit 0 des jeweiligen Kontrollregisters. Setzt man das Bit, so startet der Timer, löscht man es, bleibt er stehen. Eine Übersicht über alle Betriebsarten gibt Tabelle 1. Die Timer können in konstanten Zeitabständen (bei jedem Unterlauf) einen Interrupt erzeugen, wenn ein bestimmtes Bit im Interrupt-Control Register (Register 13, siehe auch Tabelle 1) gesetzt wird. Dieser Interrupt-Impuls, der von Timer A der CIA 1, im Normalfall jede 1/60-Sekunde ausgelöst wird, bewirkt einen Sprung ins Interrupt-Programm, mit dem unter anderem die Tastatur abgefragt und die Software-Uhr (TI$ und TI) gestellt wird. Ein interessanter Effekt entsteht, wenn man den Wert, von dem dieser Timer nach Null zählt, verändert. Normalerweise ist dieser Wert 16427 (High-Byte = 64, Low-Byte = 37). Verkleinert man diesen Wert, indem man zum Beispiel »5« in das High-Byte-Register schreibt (POKE 56325,5), dann beginnt der Cursor äußerst schnell zu blinken. Dies liegt daran, daß jetzt die Interrupts in kürzerer Folge ausgelöst werden. Auch die Software-Uhr TI$ läuft nun viel schneller. Vergrößert man den Wert (etwa durch POKE 56325,200) geschieht genau das Umgekehrte. Der Cursor blinkt ermüdend langsam und die »TI$-Uhr« geht nach.</p>
 
+        <figure>
+            <table>
+    <thead>
+        <tr>
+            <th>Reg.</th>
+            <th>Adresse</th>
+            <th>Funktion</th>
+            <th>Verwendung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0</td>
+            <td>56320<br>56576</td>
+            <td>($dc00)<br>($dd00)</td>
+            <td>Datenregister Port A<br>Ein gesetztes Bit signalisiert High an der entsprechenden Port-Leitung</td>
+            <td>Tastaturabfrage<br>IEC-Bus + RS232</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>56321<br>56577</td>
+            <td>($dc01)<br>($dd01)</td>
+            <td>Datenregister Port B<br>Wie Register 0, jedoch für Port B</td>
+            <td>Tastaturabfrage<br>User-Port</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>56322<br>56578</td>
+            <td>($dc02)<br>($dd02)</td>
+            <td>Datenrichtungsregister Port A<br>Ein gesetztes Bit programmiert die zugehörige Portleitung als Ausgang</td>
+            <td>zusammen mit Register 0<br>zusammen mit Register 0</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>56323<br>56579</td>
+            <td>($dc03)<br>($dd03)</td>
+            <td>Datenrichtungsregister Port B<br>Wie Register, jedoch für Port B</td>
+            <td>zusammen mit Register 1<br>zusammen mit Register 1</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>56324<br>56580</td>
+            <td>($dc04)<br>($dd04)</td>
+            <td>Timer A, Low-Byte<br>Beim Lesen wird der momentane Zählerstand erhalten, beim Schreiben der Zählerstand (Low-Byte) gesetzt, von dem der 16-Bit-Zähler nach Null zählt</td>
+            <td>IRQ (alle 1/60 s)<br>RS232</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>56325<br>56581</td>
+            <td>($dc05)<br>($dd05)</td>
+            <td>Timer A, High Byte<br>Wie Register 4, jedoch für High-Byte, Timer A<br>Siehe auch Register 14 (Control-Register A)</td>
+            <td>zusammen mit Register 4<br>zusammen mit Register 4</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>56326<br>56582</td>
+            <td>($dc06)<br>($dd06)</td>
+            <td>Timer B, Low-Byte<br>Wie Register 4, jedoch für Timer B<br>Siehe auch Register 15 (Control-Register B)</td>
+            <td>für Kassetten Op.<br>RS232</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>56327<br>56583</td>
+            <td>($dc07)<br>($dd07)</td>
+            <td>Timer B, High-Byte<br>Wie Register 5, jedoch für Timer B<br>Siehe auch Register 15 (Control-Register B)</td>
+            <td>zusammen mit Register 6<br>zusammen mit Register 6</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>56328<br>56584</td>
+            <td>($dc08)<br>($dd08)</td>
+            <td>Time of Day 1/10 Sekunden<br>Bit 0-3 enthalten die 1/10 Sekunden im BCD-Format. Ist Bit 7 in Register 15 gesetzt, so wird beim Schreiben die Alarmzeit gesetzt, ansonsten die Uhrzeit. Bit 4-7 unbenutzt.</td>
+            <td>(für RND)<br>unbenutzt</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>56329<br>56585</td>
+            <td>($dc09)<br>($dd09)</td>
+            <td>Time of Day Sekunden<br>Dieses Register enthält die Sekunden im BCD-Format. Schreibzugriff siehe Register 8</td>
+            <td>(für RND)<br>unbenutzt</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>56330<br>56586</td>
+            <td>($dc0a)<br>($dd0a)</td>
+            <td>Time of Day Minuten<br>Dieses Register enthält die Minuten im BCD-Format<br>Schreibzugriff siehe Register 8</td>
+            <td>(für RND)<br>unbenutzt</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>56331<br>56587</td>
+            <td>($dc0b)<br>($dd0b)</td>
+            <td>Time of Day Stunden<br>Bit 0-3 enthalten die Stunden im BCD-Format, Bit 4 die 10er Stunden. Bit 7 ist bei AM (vormittags) 0 und bei PM (nachmittags) 1. Bit 5+6 unbenutzt<br>Schreibzugriff siehe Register 8</td>
+            <td>(für RND)<br>unbenutzt</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>56332<br>56588</td>
+            <td>($dc0c)<br>($dd0c)</td>
+            <td>Serial Data Register (SDR)<br>Schieberegister, über das Daten am Pin SP herausgeschoben und hereingeholt werden. Das höchstwertige Bit erscheint zuerst.</td>
+            <td>unbenutzt<br>unbenutzt</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>56333<br>56589</td>
+            <td>($dc0d)<br>($dd0d)</td>
+            <td>Interrupt Control Register (ICR)<br>
+            Bit 0: Unterlauf Timer A<br>
+            Bit 1: Unterlauf Timer B<br>
+            Bit 2: Uhrzeit und Alarmzeit sind gleich<br>
+            Bit 3: Schieberegister voll oder leer (je nach Betriebsart)<br>
+            Bit 4: 1, wenn negative Spannungsflanke an FLAG aufgetreten ist<br>
+            Bit 5 und Bit 6 sind immer 0<br>
+            Bit 7: Es stimmt mindestens ein gesetztes Bit im INT MASK und INT DATA-Register überein<br>
+            Achtung: Beim Lesen wird das ICR gelöscht!</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td>56334<br>56590</td>
+            <td>($dc0e)<br>($dd0e)</td>
+            <td>Control Register A (CRA)<br>
+            Bit 0: 1=Timer A starten  0=Timer A stoppen<br>
+            Bit 1: 1=Ein Umlauf von Timer A wird an PB 6 signalisiert, auch wenn dieses Port-Bit als Eingang programmiert ist.<br>
+            Bit 2: 1=Bei einem Unterlauf von Timer A wird PB 6 invertiert<br>
+            Bit 3: 0=Continous-Mode  1=One-Shot-Mode<br>
+            Bit 4: Wird eine 1 eingeschrieben, so wird Timer A sofort mit dem Wert geladen, der vorher in Register 4 + 5 stand, egal ob der Timer gerade läuft oder nicht.<br>
+            Bit 5: 1=Timer A zählt positive Flanken an CNT<br>
+            0=Timer A zählt Systemtakte<br>
+            Bit 6: 0=Das Schieberegister ist Eingang<br>
+            1=Das Schieberegister ist Ausgang<br>
+            Bit 7: 1=TOD verarbeitet 50 Hz Netzfrequenz<br>
+            0=TOD verarbeitet 60 Hz Netzfrequenz</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>56335<br>56591</td>
+            <td>($dc0f)<br>($dd0f)</td>
+            <td>Control Register B (CRB)<br>
+            Bit 0-4: entsprechen Bit 0-4 von CRA, jedoch für Timer B und PB 7<br>
+            Bit 5+6 bestimmen paarweise die Triggerquelle<br>
+            00=Timer B zählt Systemtakte<br>
+            01=Timer B zählt positive Flanken an CNT<br>
+            10=Timer B zählt Unterläufe von Timer A<br>
+            11=Timer B zählt Unterläufe von Timer A nur, wenn CNT high ist<br>
+            Bit 7: 1=TOD Alarmzeit setzen<br>
+            0=TOD Uhrzeit setzen</td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+</table>
+            <figcaption>Tabelle 1. Die Register der CIA</figcaption>
+        </figure>
+
         <p>Über die eben erwähnten »Uhren« (TI,TI$) werden sich diejenigen, denen es auf hohe Genauigkeit ankommt, schon geärgert haben. Sie haben nämlich eine Ungenauigkeit von bis zu einer halben Stunde pro Tag. Außerdem werden sie bei Kassettenoperationen ganz abgeschaltet. In der CIA ist jedoch eine Uhr mit hervorragender Genauigkeit und einer Auflösung von einer Zehntelsekunde.</p>
 
         <h2>Sehr ganggenaue Echtzeituhr</h2>
