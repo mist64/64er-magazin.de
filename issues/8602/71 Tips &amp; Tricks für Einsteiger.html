@@ -341,7 +341,64 @@ O = W * 2 * SQR(3) + O = O;
         <address class="author">(Cadrio/tr)</address>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>C000     LDA   #$10          ;Wellenform, Gate-Bit off
+         STA   $D404
+         LDA   #$80          ;Attack, Decay
+         STA   $D405
+         LDA   #$00          ;Sustain, Release
+         STA   $D406
+         LDA   #$67          ;Frequenz Low-Byte
+         STA   $D400
+         LDA   #$11          ;Frequenz High-Byte
+         STA   $D401
+         LDA   #$11          ;Gate-Bit on
+         STA   $D404
+         LDA   #$FF          ;Lautstärke maximal
+         STA   $D418
+         LDA   #$81          ;2 Befehle aus Tasten-
+         STA   $F5           ;abfrage
+         JMP   $EA9F         ;zurück ins Betriebssystem
+C02A     LDY   #$00          ;Kopieren des BASIC-ROM
+         LDA   #$20
+         STA   $03E8
+         LDA   #$00
+         STA   $BB
+         LDA   #$A0
+         STA   $BC
+C039     LDA   ($BB), Y
+         STA   ($BB), Y
+         INC   $BB
+         BEQ   M01
+         JMP   C039
+     M01 INC   $BC
+         DEC   $03E8
+         BEQ   M02
+         JMP   C039
+     M02 LDA   #$20          ;Kopieren des KERNEL
+         STA   $03E8
+         LDA   #$00
+         STA   $BB
+         LDA   #$E0
+         STA   $BC
+C05B     LDA   ($BB), Y
+         STA   ($BB), Y
+         INC   $BB
+         BEQ   M03
+         JMP   C05B
+     M03 INC   $BC
+         DEC   $03E8
+         BEQ   M04
+         JMP   C05B
+     M04 LDA   #$35          ;Umschalten auf
+         STA   $01           ;RAM
+         LDA   #$4C          ;Code für JMP
+         STA   $EA9B
+         LDA   #$00          ;Low-Byte von C000
+         STA   $EA9C
+         LDA   #$C0          ;High-Byte von C000
+         STA   $EA9D
+         RTS</pre>
+         <!-- Eingetippt von Endurion -->
             <hr>
             <pre data-filename="tastenton.prg" data-name="Der Piepser" data-mse=mse1></pre>
             <figcaption>Listing 4. »Der Piepser«: akustische Rückmeldung Tastendrucks, Oben der Source-Code, darunter das MSE-Listing.</figcaption>
