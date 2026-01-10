@@ -24,7 +24,36 @@
         <p>Die letzte Folge hatten wir beendet mit der Aussicht, in die einfachen Verzögerungsschleifen nun die Würze von Aufgaben einzubauen. Ein kleines Basic-Programm, das Sie vielleicht verlockt hat, die Entsprechung in Assembler zu schreiben, sollte 128 bunte Zeichen auf den Bildschirm zaubern. Haben Sie es versucht? Wenn ja, dann vergleichen Sie Ihr Ergebnis doch mal mit Listing 1.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>10   -          .LI 1,4
+20   -          .BA $5000
+30   -          .EQ SCREEN=$0400;BILDSCHIRMSTART
+40   -          .EQ COLOR=$D800;FARBRAMSTART
+50   -;*** BEISPIEL 1 ***
+60   -;VERSION 8 MIT EINGFACHEM JOB
+70   -;ZEICHEN AUF BILDSCHIRM ZEIGEN
+80   -;
+90   -;----- INITIALISIERUNG -----
+100  -;
+110  -          LDY #$7F       ;DAS IST DEZIMAL 127
+120  -;
+130  -;----- VERARBEITUNG --------
+140  -;
+150  -LABEL     TYA
+160  -          STA SCREEN,Y
+170  -          STA COLOR,Y
+180  -;
+190  -;----- STEUERUNG -----------
+200  -;
+210  -          DEY
+220  -          DEY
+230  -          BPL LABEL
+240  -;
+250  -;----- AUSGANG -------------
+260  -;
+270  -          BRK
+280  -;
+290  -          .SY 1,4
+300  -          .ST</pre>
             <figcaption>Listing 1. Unser Beispiel 1 in Assembler: Bunte Zeichen </figcaption>
         </figure>
 
@@ -84,7 +113,63 @@
         <p>Listing 2 zeigt nun das Äquivalent dazu in Assembler.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>10   -          .LI 1,4
+20   -          .BA $5000
+30   -          .EQ SPALTE=$D3
+40   -          .EQ ZEILE=$D6
+50   -          .EQ COUNTZ=$FA
+60   -          .EQ COUNTS=$FB
+70   -          .EQ CSET=$E510
+80   -          .EQ BSOUT=$FFD2
+90   -;*** BEISPIEL 2 ***
+100  -;BILDSCHIRMAUSGABE MIT FIRMWARE-ROUTINEN
+110  -;
+120  -;----- VORBEREITUNGEN -----
+130  -;
+140  -          LDA #$93       ;DEZIMAL 147
+150  -          JSR BSOUT      ;BILDSCHIRM LOESCHEN
+160  -          LDA #$05
+170  -          JSR BSOUT      ;ZEICHENFARBE WEISS
+180  -          LDA #$14       ;DEZIMAL 20
+190  -          STA ZEILE
+200  -          STA COUNTZ     ;SICHERN
+210  -          LDA #$27       ;DEZIMAL 39
+220  -          STA SPALTE
+230  -          STA COUNTS     ;SICHERN
+240  -;
+250  -;----- VERARBEITUNG -------
+260  -;
+270  -LABEL     LDA COUNTZ
+280  -          STA ZEILE
+290  -          LDA COUNTS
+300  -          STA SPALTE
+310  -          JSR CSET       ;CURSOR SETZEN
+320  -          LDA #$71       ;DEZIMAL 113
+330  -          JSR BSOUT      ;GRAFIKZEICHEN DRUCKEN
+340  -          NOP
+350  -          LDA COUNTZ
+360  -          STA ZEILE
+370  -          LDA COUNTS
+380  -          STA SPALTE
+390  -          JSR CSET
+400  -          LDA #$20       ;DEZIMAL 32
+410  -          JSR BSOUT      ;ZEICHEN LOESCHEN
+420  -;
+430  -;----- STEUERUNG ----------
+440  -;
+450  -          DEC COUNTS
+460  -          DEC COUNTS
+470  -          DEC COUNTZ
+480  -          BNE LABEL      ;HERUNTERZAEHLEN BIS 0
+490  -;
+500  -;----- ABSCHLUSS ----------
+510  -;
+520  -          LDA #$9A       ;DEZIMAL 154
+530  -          JSR BSOUT      ;ZEICHENFARBE HELLBLAU
+540  -          BRK
+550  -;
+560  -          .SY 1,4
+570  -          .ST</pre>
             <figcaption>Listing 2. Ein schneller Flitzer: Beispiel 2</figcaption>
         </figure>
 
@@ -95,21 +180,85 @@
         <p>Wir müssen daher das ganze etwas verlangsamen. Dazu ist schon eine Stelle vorgesehen: In Zeile 340 befindet sich ein gänzlich unmotiviertes NOP-Kommando. Dorthin packen wir nun eine Verzögerungsschleife und es ergibt sich Listing 3.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>250  -;----- VERARBEITUNG -------
+260  -;
+270  -LABEL     LDA COUNTZ
+280  -          STA ZEILE
+290  -          LDA COUNTS
+300  -          STA SPALTE
+310  -          JSR CSET       ;CURSOR SETZEN
+320  -          LDA #$71       ;DEZIMAL 113
+330  -          JSR BSOUT      ;GRAFIKZEICHEN DRUCKEN
+340  -MARKE     DEY
+350  -          BNE MARKE
+360  -          STA ZEILE
+370  -          LDA COUNTS
+380  -          STA SPALTE
+390  -          JSR CSET
+400  -          LDA #$20       ;DEZIMAL 32
+410  -          JSR BSOUT      ;ZEICHEN LOESCHEN
+420  -;
+430  -;----- STEUERUNG ----------</pre>
             <figcaption>Listing 3. Flitzer mit kleinem Handicap</figcaption>
         </figure>
 
         <p>In die Zeilen 335 bis 345 haben wir die Version 6, mit dem Y-Register als Zähler eingefügt. Ein erneuter Start nach dem Assemblieren zeigt uns ein kurzes weißes Aufflackern (falls Sie die Farbe Rot wieder gegen #$20 ausgetauscht haben!). Das war also immer noch zu schnell! Also bauen wir noch eine Verzögerungsschleife ein (Zeilen 346 bis 348 in Listing 4).</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>250  -;----- VERARBEITUNG -------
+260  -;
+270  -LABEL     LDA COUNTZ
+280  -          STA ZEILE
+290  -          LDA COUNTS
+300  -          STA SPALTE
+310  -          JSR CSET       ;CURSOR SETZEN
+320  -          LDA #$71       ;DEZIMAL 113
+330  -          JSR BSOUT      ;GRAFIKZEICHEN DRUCKEN
+335  -          LDY #$FF       ;VERZOEGERUNG
+340  -MARKE     DEY
+345  -          BNE MARKE
+346  -          LDY #$FF
+347  -WEITER    DEY
+348  -          BNE WEITER
+350  -          LDA COUNTZ
+360  -          STA ZEILE
+370  -          LDA COUNTS
+380  -          STA SPALTE
+390  -          JSR CSET
+400  -          LDA #$20       ;DEZIMAL 32
+410  -          JSR BSOUT      ;ZEICHEN LOESCHEN
+420  -;
+430  -;----- STEUERUNG ----------</pre>
             <figcaption>Listing 4. Der doppelt zögernde Flitzer</figcaption>
         </figure>
 
         <p>Nun sehen wir schon ein wenig mehr, aber wir können uns vorstellen, daß es reichlich ungelenk wäre, nun noch eine dritte, vierte,&hellip; Verzögerung einzubauen. Es gibt noch einen anderen Weg, nämlich einfach zwei Verzögerungen ineinander zu verschachteln. Das ist schließlich in Listing 5 geschehen und wenn Sie das nach der Assemblierung starten, dann gehts hübsch langsam. Immerhin wird die innere Schleife 255 x 255mal durchlaufen. Jedesmal nämlich, wenn wir X bis 0 heruntergezählt haben, wird Y dekrementiert und X wieder mit #$FF beladen. Das geht so lange, bis auch Y auf Null heruntergezählt wurde. Wenn Sie in Zeile 332 statt #$FF einen kleineren Startwert eingeben (geht wieder ganz gut vom Monitor aus), läuft der Ball schneller. Damit haben Sie die Geschwindigkeit völlig im Griff.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>250  -;----- VERARBEITUNG -------
+260  -;
+270  -LABEL     LDA COUNTZ
+280  -          STA ZEILE
+290  -          LDA COUNTS
+300  -          STA SPALTE
+310  -          JSR CSET       ;CURSOR SETZEN
+320  -          LDA #$71       ;DEZIMAL 113
+330  -          JSR BSOUT      ;GRAFIKZEICHEN DRUCKEN
+332  -          LDY #$FF       ;VERZOEGERUNG
+334  -MARKE     LDX #$FF
+336  -WEITER    DEX
+338  -          BNE WEITER
+340  -          DEY
+342  -          BNE MARKE
+350  -          LDA COUNTZ
+360  -          STA ZEILE
+370  -          LDA COUNTS
+380  -          STA SPALTE
+390  -          JSR CSET
+400  -          LDA #$20       ;DEZIMAL 32
+410  -          JSR BSOUT      ;ZEICHEN LOESCHEN
+420  -;
+430  -;----- STEUERUNG ----------</pre>
             <figcaption>Listing 5. Der Flitzer ist voll unter Kontrolle</figcaption>
         </figure>
 
@@ -276,14 +425,53 @@
         <p>Bevor wir uns an diese schwierigeren Sachen wagen, wollen wir uns aber noch ein wenig mit Fragen der Schleifenstruktur befassen. Zunächst kann nur relativ selten auf die beiden Indexregister als Zähler zurückgegriffen werden. Man muß meistens zwei Speicherstellen dazu verwenden. Außerdem kann man natürlich ebensogut in den Schleifen aufwärts zählen. Das soll im folgenden Beispiel beides geschehen, wo wir den Bildschirminhalt invertieren wollen. Das geschieht einfach durch Setzen des Bit 7 des Codes in jeder Bildschirmspeicherstelle (wir machen das durch EOR $80). Das hat den Vorzug, daß ein zweiter Durchlauf des Programmes wieder den Ausgangszustand des Bildschirmes herstellt. Zuerst sollen Sie eine etwas schwerfällige, aber überschaubare Form des Programmes kennenlernen (Listing 6):</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>Initialisierung:
+  4000         LDA  #$00              Die Bildschirmadresse wird
+  4002         STA $FA                in den Vektor $FA/FB geschrieben
+  4004         LDA  #$04              Index auf Null.
+  4006         STA $FB
+  4008         LDY  #$00
+Job:
+  400A         LDA ($FA),Y            Code in Akku
+  400C         EOR  #$80              invertieren und
+  400E         STA ($FA),Y            zurückschreiben
+Steuerung:
+  4010         INC $FA                LSB hochzählen
+  4012         BNE $400A              und weiter Job ausführen, bis ein Über-
+                                      lauf von 255 auf 0 stattfindet.
+  4014         INC $FB                dann MSB erhöhen
+  4016         LDA $FB                und prüfen, ob
+  4018         CMP  #$08              Endadresse erreicht ist.
+  401A         BNE $400A              Falls noch nicht, erneut zur
+                                      Jobschleife
+Ausgang:
+  401C         BRK                    Sonst Ende mit Registeranzeige</pre>
             <figcaption>Listing 6. Invertieren des Bildschirms</figcaption>
         </figure>
 
         <p>Hier wurden — auf höchst plumpe Weise — vier ganze Pages bearbeitet. Eine andere Lösung wäre es, anstelle von $FA in der Zeile 4010 das Y-Register zu erhöhen (mittels INY). Es würde dann sowohl als Index als auch als Zähler dienen. (In unserer Version hatte esja nur eine Alibifunktion für die spezielle Art der Adressierung der Bildschirmspeicherzellen). Eleganter kann das Problem gelöst werden mit einer Technik, die Florian Müller in seinem Artikel »Effektives Programmieren in Assembler« (64’er Sonderheft 8, 1985, S.22) vorstellt. Dabei werden $FA und $FB nicht mehr als Zähler verwendet, sondern dem Y-Register kommt wieder die Doppelfunktion zu als Index und als Zähler der inneren Schleife. Das X-Register ist Zähler der äußeren Schleife. In der inneren wird Y hoch-, in der äußeren Schleife X heruntergezählt. Das Ergebnis davon ist: Das Programm wird kürzer und auch schneller (Listing 7).</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>Initialisierung:
+  4000         LDA  #$00              LSB Bildschirm
+  4002         STA $FA                in Vektor
+  4004         TAY                    Index = 0.
+  4005         LDA  #$04              MSB in Vektor
+  4007         STA $FB                schreiben und
+  4009         TAX                    Zähler für die pages auf 4.
+Job:
+  400A         LDA ($FA),Y            Dasselbe wie
+  400C         EOR  #$80              wir es vorhin
+  400E         STA ($FA),Y            hatten.
+Steuerteil:
+  4010         INY                    Index (Zähler)+1
+  4011         BNE $400A              wenn noch kein Überlauf, erneut Job aus-
+                                      führen.
+  4015         DEX                    sonst page-Zähler herunterzählen
+  4016         BNE $400A              Wenn noch nicht 0, dann wieder Jobbear-
+                                      beitung.
+Ausgang:
+  4018         BRK                    sonst wieder Ende mit Registeranzeige</pre>
             <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing 7</a>. Verbesserte Form von Listing 6</figcaption>
         </figure>
 
@@ -292,7 +480,34 @@
         <p>Wieder wird pro forma das Indexregister Y initialisiert wegen der speziellen Art der Adressierung (Listing 8).</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>Initialisierung:
+  4000         LDA  #$00              Bildschirmstart
+  4002         STA $FA                in Vektor $FA/FB
+  4004         LDA  #$04
+  4006         STA $FB
+  4008         LDY  #$00
+Job:
+  400A         LDA ($FA),Y            Das kennen wir
+  400C         EOR  #$80              nun schon.
+  400E         STA ($FA),Y
+Steuerung:
+  4010         INC $FA                Erhöhen des LSB
+  4012         BNE 4016               Wenn kein Überlauf, erfolgt ein Sprung.
+  4014         INC $FB                Sonst auch Erhöhen des MSB.
+  4016         LDA $FA                Das LSB wird nun
+  4018         CMP  #$E8              verglichen mit dem MSB der Endadresse +
+                                      1. Dabei findet die Resultatanzeige in
+                                      den Flaggen (N,Z,C) statt.
+  401A         LDA $FB                Nun wird das MSB der Adresse in den Akku
+                                      geladen und
+  401C         SBC  #$07              das MSB der Endadresse subtrahiert. Die
+                                      Carryflaggge ist gesetzt, wenn die Adres-
+                                      se in $FA/FB gleich der Endadresse+1
+                                      ($07E8) geworden ist.
+  401E         BCC 400A               Solange das noch nicht der Fall ist, wird
+                                      zum Job zurückverzweigt.
+Ausgang:
+  4020         BRK                    Sonst aber Ende mit Registeranzeige.</pre>
             <figcaption>Listing 8. Die trickreichste Version</figcaption>
         </figure>
 

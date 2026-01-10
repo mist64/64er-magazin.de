@@ -104,7 +104,73 @@
         <address class="author">(Andreas Blödow/tr)</address>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>LABEL         LOC         CODE                STATEMENT
+
+STPRG         0000                        *=        $C000
+Old           C000      A0    01          LDY       #01
+              C002      98                TYA
+              C003      91    2B          STA       (2B),Y        eine "NEW-Null" löschen (mit 1 überschreiben)
+              C005      20    33    A5    JSR       A533          Basic-Zeilen neu binden
+              C008      18                CLC
+              C009      A5    22          LDA       22
+              C00B      69    02          ADC       #02
+              C00D      85    2D          STA       2D
+              C00F      A5    23          LDA       23            Programmende (= Zeiger + 2 Nullen) überlesen
+              C011      69    00          ADC       #00
+              C013      85    2E          STA       2E
+              C015      20    60    A6    JSR       A660          zum CLR-Befehl
+-----------------------------------------------------------------------------------------------------------------------------
+Variablen     C018      A0    00          LDY       #00
+              C01A      B1    2F          LDA       (2F),Y        1.Byte nach Programmende
+              C01C      AA                TAX                     retten
+              C01D      29    7F          AND       #7F           Bit 7 löschen
+              C01F      20    13    B1    JSR       B113          Buchstabe?
+              C022      90    49          BCC       C06D          nein, denn fertig
+              C024      8A                TXA
+              C025      0A                ASL                     war Bit 7 gesetzt?
+              C026      B0    10          BCS       C038          ja, kein String (sondern Integervariable oder Funktion),
+              C028      C8                INY                     Arrayerkennungsschleife überspringen
+              C029      B1    2F          LDA       (2F),Y        2. Namensbyte
+              C02B      10    0B          BPL       C038          kleiner als $80, also REAL-Variable, kein String
+              C02D      A0    05          LDY       #05
+              C02F      B1    2F          LDA       (2F),Y        6. Byte des Strings
+              C031      D0    1B          BNE       C04E          ungleich Null => Array-Feldkopf, kein String
+              C033      C8                INY
+              C034      B1    2F          LDA       (2F),Y        7. Byte des Strings
+              C036      D0    16          BNE       C04E          ungleich Null => Array-Feldkopf, kein String
+              C038      A0    07          LDY       #07
+              C03A      E6    2F          INC       2F
+              C03C      D0    02          BNE       C040
+              C03E      E6    30          INC       30            7 Bytes überlesen
+              C040      88                DEY
+              C041      D0    F7          BNE       C03A
+              C043      A5    2F          LDA       2F
+              C045      85    31          STA       31
+              C047      A5    30          LDA       30            Array-Ende = Variablen-Ende
+              C049      85    32          STA       32
+              C04B      4C    18    C0    JMP       C018          und weitermachen, nächstes Element prüfen
+-----------------------------------------------------------------------------------------------------------------------------
+ARRAY         C04E      A0    00          LDY       #00
+              C050      B1    31          LDA       (31),Y        1.Byte nach Variablenende
+              C052      29    7F          AND       #7F           Bit 7 löschen
+              C054      20    13    B1    JSR       B113          Buchstabe?
+              C057      90    14          BCC       C06D          nein, dann fertig, keine Felder mehr
+              C059      C8                INY
+              C05A      C8                INY
+              C05B      18                CLC
+              C05C      B1    31          LDA       (31),Y        Feldlänge Low-Byte
+              C05E      65    31          ADC       31            zu Array-Ende-Zeiger addieren und merken
+              C060      AA                TAX
+              C061      C8                INY
+              C062      B1    31          LDA       (31),Y        Feldlänge High-Byte
+              C064      65    32          ADC       32            zu Array-Zeiger addieren
+              C066      85    32          STA       32            Feld überlesen und
+              C068      86    31          STX       31            Array-Zeiger auf Feld-Ende positionieren
+              C06A      4C    4E    C0    JMP       C04E          und weitermachen
+-----------------------------------------------------------------------------------------------------------------------------
+Ende          C06D      20    26    B5    JSR       B526          Garbage-Collection: Stringzeiger nachstellen
+              C070      4C    AE    A7    JMP       A7AE          zurück zur Interpreterschleife</pre>
+              <!-- Eingetippt von Endurion -->
             <figcaption>Bild 1. Das dokumentierte Assembler-Listing zu »RE-CLR«</figcaption>
         </figure>
         <figure>

@@ -59,7 +59,38 @@
         <p>Ein Programm, das die Schrift der Märchenbücher zu ermöglichen versucht, sollte auch deren Umlaute beherrschen. Diese Änderung gegenüber der ersten Version klingt nach wenig Aufwand, erfordert jedoch eine Umstrukturierung des gesamten Programms. Natürlich soll man die Umlaute auch auf dem Bildschirm sehen können; also mußte der Zeichensatz des C 64 geändert werden (das Assemblerlisting entnehmen Sie bitte Bild 2). Die neuen Zeichen auf der Tastatur werden in Bild 3 dargestellt. In die DATA-Zeilen der ersten Version mußten dann die Umlaute eingebunden werden. Die durch REMs gekennzeichneten DATA-Zeilen weichen vom ursprünglichen »Schreiberling« ab, das Programm ist ja flexibel. Weiterhin sind einige Verbesserungen im Programmablauf entstanden. Zum Beispiel der Druckertest (Zeile 800 bis 840), der einen eventuellen »DEVICE NOT PRESENT ERROR« abfängt. Die Variablenfelder sind im »Schreiberling V2« vollständig umgruppiert (Bild 4), wodurch die Einleseschleife vereinfacht werden konnte. Ein neuer Druckmodus wurde eingeführt, der durch » « an erster Stelle angewählt wird. Eine Liste aller Veränderungen könnte man nicht mehr überblicken, langwierige Fehlersuche wäre vorprogrammiert. Deshalb enthält Listing 3 das komplette Programm »Schreiberling V2«. In dieser Form ist das Programm auf einem Epson RX 80 mit Print 64-Interface lauffähig. Man müßte jedoch jedes Interface, das sich softwaremäßig »verriegeln« läßt, damit ansprechen können. Es genügt der Direktmodus ohne jegliche Zeichenumwandlung durch das Interface. »Schreiberling V2« wird es als Basic-Programm und als Compilat auf der Leserservice-Diskette geben.</p>
 
         <figure>
-            TODO
+            <pre>;$E000 und den Bildschirm nach $CC00
+; Es ist frei verschiebbar gehalten.
+;
+* = $828            ;Start im Kassettenpuffer
+SEI   ;IRQ verbieten
+LDA   1
+AND   #$FB          ;auf Zeichen-ROM
+STA   1             ;umschalten
+LDA   #0
+STA   $5F           ;Blockstart alt Low
+STA   $5A           ;Blockende alt Low
+STA   $58           ;Blockende neu
+LDA   #$D0
+STA   $60           ;Blockstart alt High
+LDA   #$E0
+STA   $5B           ;Blockende alt High
+LDA   #$F0
+STA   $59           ;Blockende neu High
+JSR   $A3BF         ;Blockverschieberoutine
+LDA   1
+ORA   #4            ;auf I/O umschalten
+STA   1
+LDA   $DD00         ;CIA 2
+AND   #$FC          ;obere 16Byte für VIC
+STA   $DD00         ;selektieren
+LDA   #%00111001    ;Bildschirm und
+STA   $D018         ;Zeichensatz verlegen
+LDA   #$CC          ;High-Byte Bildschirm
+STA   $0288         ;für Betriebssystem
+CLI                 ;IRQ zulassen
+RTS</pre>
+            <!-- Eingetippt von Endurion -->
             <figcaption>Bild 2. Assemblerlisting für die Umlaute auf dem C 64 bei »Schreiberling V2«</figcaption>
         </figure>
 
