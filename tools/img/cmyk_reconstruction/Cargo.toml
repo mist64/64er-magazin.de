@@ -1,0 +1,21 @@
+[package]
+name = "cmyk_reconstruction"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Image decoding - only enable formats likely to be used, disable rayon (we use our own)
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "tiff"] }
+
+# TIFF encoder for CMYK output (matches image's tiff version)
+tiff = "0.10"
+
+# Linear algebra - only core functionality for SVD, no serialization/proptest
+nalgebra = { version = "0.33", default-features = false, features = ["std"] }
+
+# Parallelism
+rayon = "1.10"
+
+[profile.release]
+lto = true
+codegen-units = 1
