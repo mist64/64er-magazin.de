@@ -4,7 +4,6 @@ use rayon::prelude::*;
 use std::error::Error;
 use std::fs::File;
 use std::io::BufWriter;
-use std::time::Instant;
 use tiff::encoder::{colortype, TiffEncoder};
 
 // ============================================================================
@@ -24,15 +23,27 @@ use tiff::encoder::{colortype, TiffEncoder};
 // ];
 
 // *** SH8601
+// const REFS: [[f32; 3]; 8] = [
+//     [214.0, 195.0, 186.0], // W - White (paper)
+//     [52.0, 127.0, 153.0],  // C - Cyan
+//     [194.0, 64.0, 87.0],   // M - Magenta
+//     [220.0, 156.0, 71.0],  // Y - Yellow
+//     [205.0, 53.0, 46.0],   // R - Red (M+Y)
+//     [70.0, 105.0, 60.0],   // G - Green (C+Y)
+//     [43.0, 54.0, 80.0],    // B - Blue (C+M)
+//     [52.0, 46.0, 45.0],    // K - Black
+// ];
+
+// *** 8605
 const REFS: [[f32; 3]; 8] = [
-    [214.0, 195.0, 186.0], // W - White (paper)
-    [52.0, 127.0, 153.0],  // C - Cyan
-    [194.0, 64.0, 87.0],   // M - Magenta
-    [220.0, 156.0, 71.0],  // Y - Yellow
-    [205.0, 53.0, 46.0],   // R - Red (M+Y)
-    [70.0, 105.0, 60.0],   // G - Green (C+Y)
-    [43.0, 54.0, 80.0],    // B - Blue (C+M)
-    [52.0, 46.0, 45.0],    // K - Black
+    [205.0, 194.0, 190.0], // W - White (paper)
+    [39.0, 136.0, 165.0],  // C - Cyan
+    [235.0, 82.0, 117.0],  // M - Magenta
+    [180.0, 141.0, 50.0],  // Y - Yellow
+    [195.0, 37.0, 32.0],   // R - Red (M+Y)
+    [63.0, 113.0, 57.0],   // G - Green (C+Y)
+    [33.0, 41.0, 77.0],    // B - Blue (C+M)
+    [26.0, 27.0, 27.0],    // K - Black
 ];
 
 const TARGETS: [[f32; 3]; 7] = [
@@ -53,7 +64,7 @@ const EPS: f32 = 1e-6;
 const LEVEL_C: [f32; 2] = [0.15, 0.85];
 const LEVEL_M: [f32; 2] = [0.15, 0.85];
 const LEVEL_Y: [f32; 2] = [0.15, 0.85];
-const LEVEL_K: [f32; 2] = [0.05, 0.80];
+const LEVEL_K: [f32; 2] = [0.30, 0.50];
 
 // ============================================================================
 // RGB to CMYK conversion
@@ -107,12 +118,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let output = &args[2];
 
     // Load image
-    let t0 = Instant::now();
     let mut reader = ImageReader::open(input)?;
     reader.no_limits();
     let img = reader.decode()?.into_rgb8();
     let (width, height) = (img.width() as usize, img.height() as usize);
-    eprintln!("Decode: {:?} ({}x{})", t0.elapsed(), width, height);
 
     // Derive calibration matrix
     let m = derive_matrix();
@@ -121,7 +130,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let rgb = img.into_raw();
 
     // Process pixels in parallel
-    let t1 = Instant::now();
     let mut cmyk = vec![0u8; width * height * 4];
 
     cmyk.par_chunks_exact_mut(4)
@@ -147,10 +155,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             out[2] = (y_final * 255.0) as u8;
             out[3] = (k * 255.0) as u8;
         });
-    eprintln!("Process RGB->CMYK: {:?}", t1.elapsed());
 
     // Apply per-channel level stretch
-    let t_level = Instant::now();
     let levels = [LEVEL_C, LEVEL_M, LEVEL_Y, LEVEL_K];
 
     cmyk.par_chunks_exact_mut(4).for_each(|pixel| {
@@ -162,16 +168,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             pixel[i] = stretched as u8;
         }
     });
-    eprintln!("Level stretch: {:?}", t_level.elapsed());
 
     // Write CMYK TIFF
-    let t2 = Instant::now();
     let file = File::create(output)?;
     let mut writer = BufWriter::new(file);
     let mut encoder = TiffEncoder::new(&mut writer)?;
     let image = encoder.new_image::<colortype::CMYK8>(width as u32, height as u32)?;
     image.write_data(&cmyk)?;
-    eprintln!("Write CMYK TIFF: {:?}", t2.elapsed());
 
     Ok(())
 }
