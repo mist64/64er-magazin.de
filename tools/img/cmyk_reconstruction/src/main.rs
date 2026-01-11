@@ -3,48 +3,10 @@ use nalgebra::DMatrix;
 use rayon::prelude::*;
 use std::error::Error;
 use std::fs::File;
-use std::io::BufWriter;
+use std::io::{BufRead, BufReader, BufWriter};
 use tiff::encoder::{colortype, TiffEncoder};
 
-// ============================================================================
-// RGB to CMYK conversion constants
-// ============================================================================
-
-// *** Early Stammagazin
-// const REFS: [[f32; 3]; 8] = [
-//     [203.0, 195.0, 191.0], // W - White (paper)
-//     [35.0, 140.0, 167.0],  // C - Cyan
-//     [194.0, 51.0, 83.0],   // M - Magenta
-//     [204.0, 170.0, 72.0],  // Y - Yellow
-//     [192.0, 45.0, 42.0],   // R - Red (M+Y)
-//     [34.0, 106.0, 51.0],   // G - Green (C+Y)
-//     [35.0, 57.0, 94.0],    // B - Blue (C+M)
-//     [28.0, 28.0, 26.0],    // K - Black
-// ];
-
-// *** SH8601
-// const REFS: [[f32; 3]; 8] = [
-//     [214.0, 195.0, 186.0], // W - White (paper)
-//     [52.0, 127.0, 153.0],  // C - Cyan
-//     [194.0, 64.0, 87.0],   // M - Magenta
-//     [220.0, 156.0, 71.0],  // Y - Yellow
-//     [205.0, 53.0, 46.0],   // R - Red (M+Y)
-//     [70.0, 105.0, 60.0],   // G - Green (C+Y)
-//     [43.0, 54.0, 80.0],    // B - Blue (C+M)
-//     [52.0, 46.0, 45.0],    // K - Black
-// ];
-
-// *** 8605
-const REFS: [[f32; 3]; 8] = [
-    [205.0, 194.0, 190.0], // W - White (paper)
-    [39.0, 136.0, 165.0],  // C - Cyan
-    [235.0, 82.0, 117.0],  // M - Magenta
-    [180.0, 141.0, 50.0],  // Y - Yellow
-    [195.0, 37.0, 32.0],   // R - Red (M+Y)
-    [63.0, 113.0, 57.0],   // G - Green (C+Y)
-    [33.0, 41.0, 77.0],    // B - Blue (C+M)
-    [26.0, 27.0, 27.0],    // K - Black
-];
+const EPS: f32 = 1e-6;
 
 const TARGETS: [[f32; 3]; 7] = [
     [1.0, 0.0, 0.0], // C
@@ -56,33 +18,104 @@ const TARGETS: [[f32; 3]; 7] = [
     [1.0, 1.0, 1.0], // K = C+M+Y
 ];
 
-// const WHITE: [f32; 3] = [203.0, 195.0, 191.0];
-const WHITE: [f32; 3] = REFS[0];
-const EPS: f32 = 1e-6;
+const EXAMPLE_CONFIG: &str = r#"# Example CMYK profile
+#
+# Reference colors (RGB values 0-255)
+W 205 194 190
+C 39 136 165
+M 235 82 117
+Y 180 141 50
+R 195 37 32
+G 63 113 57
+B 33 41 77
+K 26 27 27
 
-// Level stretch: [low%, high%] for each CMYK channel
-const LEVEL_C: [f32; 2] = [0.15, 0.85];
-const LEVEL_M: [f32; 2] = [0.15, 0.85];
-const LEVEL_Y: [f32; 2] = [0.15, 0.85];
-const LEVEL_K: [f32; 2] = [0.30, 0.50];
+# Level stretch (low% high%, 0-100)
+LC 15 85
+LM 15 85
+LY 15 85
+LK 30 50
+"#;
 
-// ============================================================================
-// RGB to CMYK conversion
-// ============================================================================
+struct Config {
+    refs: [[f32; 3]; 8],
+    levels: [[f32; 2]; 4],
+}
+
+fn parse_config(path: &str) -> Result<Config, Box<dyn Error>> {
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+
+    let mut refs = [[0.0f32; 3]; 8];
+    let mut levels = [[0.0f32; 2]; 4];
+
+    for line in reader.lines() {
+        let line = line?;
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.is_empty() {
+            continue;
+        }
+
+        match parts[0] {
+            "W" => refs[0] = parse_rgb(&parts[1..])?,
+            "C" => refs[1] = parse_rgb(&parts[1..])?,
+            "M" => refs[2] = parse_rgb(&parts[1..])?,
+            "Y" => refs[3] = parse_rgb(&parts[1..])?,
+            "R" => refs[4] = parse_rgb(&parts[1..])?,
+            "G" => refs[5] = parse_rgb(&parts[1..])?,
+            "B" => refs[6] = parse_rgb(&parts[1..])?,
+            "K" => refs[7] = parse_rgb(&parts[1..])?,
+            "LC" => levels[0] = parse_level(&parts[1..])?,
+            "LM" => levels[1] = parse_level(&parts[1..])?,
+            "LY" => levels[2] = parse_level(&parts[1..])?,
+            "LK" => levels[3] = parse_level(&parts[1..])?,
+            _ => {}
+        }
+    }
+
+    Ok(Config { refs, levels })
+}
+
+fn parse_rgb(parts: &[&str]) -> Result<[f32; 3], Box<dyn Error>> {
+    if parts.len() < 3 {
+        return Err("RGB needs 3 values".into());
+    }
+    Ok([
+        parts[0].parse::<f32>()?,
+        parts[1].parse::<f32>()?,
+        parts[2].parse::<f32>()?,
+    ])
+}
+
+fn parse_level(parts: &[&str]) -> Result<[f32; 2], Box<dyn Error>> {
+    if parts.len() < 2 {
+        return Err("Level needs 2 values".into());
+    }
+    Ok([
+        parts[0].parse::<f32>()? / 100.0,
+        parts[1].parse::<f32>()? / 100.0,
+    ])
+}
 
 #[inline(always)]
-fn poly_features(r: f32, g: f32, b: f32) -> [f32; 6] {
-    let dr = -(r.max(EPS) / WHITE[0]).log10();
-    let dg = -(g.max(EPS) / WHITE[1]).log10();
-    let db = -(b.max(EPS) / WHITE[2]).log10();
+fn poly_features(r: f32, g: f32, b: f32, white: &[f32; 3]) -> [f32; 6] {
+    let dr = -(r.max(EPS) / white[0]).log10();
+    let dg = -(g.max(EPS) / white[1]).log10();
+    let db = -(b.max(EPS) / white[2]).log10();
     [dr, dg, db, dr * dg, dr * db, dg * db]
 }
 
-fn derive_matrix() -> [f32; 18] {
+fn derive_matrix(refs: &[[f32; 3]; 8]) -> [f32; 18] {
+    let white = &refs[0];
     let mut design = Vec::with_capacity(7 * 6);
     for i in 1..=7 {
-        let [r, g, b] = REFS[i];
-        design.extend_from_slice(&poly_features(r, g, b));
+        let [r, g, b] = refs[i];
+        design.extend_from_slice(&poly_features(r, g, b, white));
     }
 
     let mut targets = Vec::with_capacity(7 * 3);
@@ -103,19 +136,51 @@ fn derive_matrix() -> [f32; 18] {
     m
 }
 
-// ============================================================================
-// Main
-// ============================================================================
+fn print_usage(program: &str) {
+    eprintln!("Usage: {} [--colors FILE] <input> <output.tiff>", program);
+    eprintln!();
+    eprintln!("Options:");
+    eprintln!("  --colors FILE   Color profile (default: colors.txt)");
+    eprintln!();
+    eprintln!("Example colors.txt:");
+    eprint!("{}", EXAMPLE_CONFIG);
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() < 3 {
-        eprintln!("Usage: {} <input> <output.tiff>", args[0]);
+
+    let mut config_path = String::from("colors.txt");
+    let mut positional: Vec<&str> = Vec::new();
+
+    let mut i = 1;
+    while i < args.len() {
+        if args[i] == "--colors" {
+            if i + 1 >= args.len() {
+                print_usage(&args[0]);
+                std::process::exit(1);
+            }
+            config_path = args[i + 1].clone();
+            i += 2;
+        } else if args[i].starts_with('-') {
+            eprintln!("Unknown option: {}", args[i]);
+            print_usage(&args[0]);
+            std::process::exit(1);
+        } else {
+            positional.push(&args[i]);
+            i += 1;
+        }
+    }
+
+    if positional.len() < 2 {
+        print_usage(&args[0]);
         std::process::exit(1);
     }
 
-    let input = &args[1];
-    let output = &args[2];
+    let input = positional[0];
+    let output = positional[1];
+
+    let config = parse_config(&config_path)?;
+    let white = config.refs[0];
 
     // Load image
     let mut reader = ImageReader::open(input)?;
@@ -124,7 +189,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let (width, height) = (img.width() as usize, img.height() as usize);
 
     // Derive calibration matrix
-    let m = derive_matrix();
+    let m = derive_matrix(&config.refs);
 
     // Convert to raw RGB bytes
     let rgb = img.into_raw();
@@ -139,7 +204,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let g = inp[1] as f32;
             let b = inp[2] as f32;
 
-            let f = poly_features(r, g, b);
+            let f = poly_features(r, g, b, &white);
 
             let c = (f[0] * m[0] + f[1] * m[1] + f[2] * m[2] + f[3] * m[3] + f[4] * m[4] + f[5] * m[5]).clamp(0.0, 1.0);
             let mt = (f[0] * m[6] + f[1] * m[7] + f[2] * m[8] + f[3] * m[9] + f[4] * m[10] + f[5] * m[11]).clamp(0.0, 1.0);
@@ -157,10 +222,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         });
 
     // Apply per-channel level stretch
-    let levels = [LEVEL_C, LEVEL_M, LEVEL_Y, LEVEL_K];
+    let levels = config.levels;
 
     cmyk.par_chunks_exact_mut(4).for_each(|pixel| {
-        for (i, &[low_pct, high_pct]) in levels.iter().enumerate() {
+        for (i, [low_pct, high_pct]) in levels.iter().enumerate() {
             let low = low_pct * 255.0;
             let high = high_pct * 255.0;
             let range = high - low;
