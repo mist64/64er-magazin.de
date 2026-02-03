@@ -16,94 +16,95 @@
 <body>
     <article>
         <h1>Leserforum</h1>
-<h2>Hilfe gegen Absturz</h2>
+        <h2>Hilfe gegen Absturz</h2>
 
-<p>Bei der Zeichensatzveränderungstürzt mein C 64 in einigen Fällen nach »POKE 648,192« und Löschen des Bildschirms rettungslos ab. Wo liegt der Fehler, und was kann ich dagegen tun?<br>
-Peter Scholz<br>
-Ausgabe 11/85</p>
+        <p>Bei der Zeichensatzveränderungstürzt mein C 64 in einigen Fällen nach »POKE 648,192« und Löschen des Bildschirms rettungslos ab. Wo liegt der Fehler, und was kann ich dagegen tun?<br>
+            Peter Scholz<br>
+            Ausgabe 11/85</p>
 
-<p>Der vermutete Absturz ist keiner. Der C 64 besitzt zwei Register für die Lage des Bildschirmspeichers. Das erste ist das in der Frage erwähnte bei der Speicheradresse 648. Hier ist das High-Byte der Bildschirmadresse für das Betriebssystem festgehalten.</p>
+        <p>Der vermutete Absturz ist keiner. Der C 64 besitzt zwei Register für die Lage des Bildschirmspeichers. Das erste ist das in der Frage erwähnte bei der Speicheradresse 648. Hier ist das High-Byte der Bildschirmadresse für das Betriebssystem festgehalten.</p>
 
-<p>Darüber hinaus gibt es auch das Register 24 des Video-Controlers (VIC), nämlich die Speicherstelle 53272. Hier ist in den höchsten vier Bits noch einmal die Adresse des Bildschirmspeichers, und zwar geteilt durch 1024, festgelegt. Dieses Register wird vom VIC zur Ausgabe des Bildes benutzt.</p>
+        <p>Darüber hinaus gibt es auch das Register 24 des Video-Controlers (VIC), nämlich die Speicherstelle 53272. Hier ist in den höchsten vier Bits noch einmal die Adresse des Bildschirmspeichers, und zwar geteilt durch 1024, festgelegt. Dieses Register wird vom VIC zur Ausgabe des Bildes benutzt.</p>
 
-<p>Wird nun durch »POKE 648, 192« die Bildschirmausgabe nach $C000 oder dezimal 49152 umgelenkt, so liegt zwar aus der Sicht des Betriebssystems der Bildschirmspeicher bei 49152, der VIC aber zeigt auf dem Fernseher oder Monitor immer noch den Bereich ab $0400 oder dezimal 1024. Um also den Bildschirmspeicher wirklich im neuen Bereich zu haben, muß noch das Register im VIC korrigiert werden. Jetzt beginnt die Arbeit: Der VIC kann nämlich von Haus aus nur 16 KByte des Speichers adressieren. Um nun trotzdem den gesamten Speicher von 64 KByte erfassen zu können, teilt er ihn sich in vier Blöcke ein. Zur Auswahl eines dieser Blöcke stehen die beiden Bits PA0 und PA1 in der CIA 2 zur Verfügung. Auf deutsch gesagt: Die beiden untersten Bits der Adresse 56576.</p>
+        <p>Wird nun durch »POKE 648, 192« die Bildschirmausgabe nach $C000 oder dezimal 49152 umgelenkt, so liegt zwar aus der Sicht des Betriebssystems der Bildschirmspeicher bei 49152, der VIC aber zeigt auf dem Fernseher oder Monitor immer noch den Bereich ab $0400 oder dezimal 1024. Um also den Bildschirmspeicher wirklich im neuen Bereich zu haben, muß noch das Register im VIC korrigiert werden. Jetzt beginnt die Arbeit: Der VIC kann nämlich von Haus aus nur 16 KByte des Speichers adressieren. Um nun trotzdem den gesamten Speicher von 64 KByte erfassen zu können, teilt er ihn sich in vier Blöcke ein. Zur Auswahl eines dieser Blöcke stehen die beiden Bits PA0 und PA1 in der CIA 2 zur Verfügung. Auf deutsch gesagt: Die beiden untersten Bits der Adresse 56576.</p>
 
-<p>Bei der Wahl der Blöcke gilt: Block 1 von 0 bis 16383: Blockzahl = 3<br>
-Block 2 von 16384 bis 32767: Blockzahl = 2<br>
-Block 3 von 32768 bis 49151: Blockzahl = 1<br>
-Block 4 von 49152 bis 65535: Blockzahl = 0</p>
+        <p>Bei der Wahl der Blöcke gilt: Block 1 von 0 bis 16383: Blockzahl = 3<br>
+            Block 2 von 16384 bis 32767: Blockzahl = 2<br>
+            Block 3 von 32768 bis 49151: Blockzahl = 1<br>
+            Block 4 von 49152 bis 65535: Blockzahl = 0</p>
 
-<p>Zur Wahl eines bestimmten Blockes gibt man ein:</p>
+        <p>Zur Wahl eines bestimmten Blockes gibt man ein:</p>
 
-<p>POKE 56576, PEEK(56576) AND 252 OR Blockzahl</p>
+        <p>POKE 56576, PEEK(56576) AND 252 OR Blockzahl</p>
 
-<p>Jetzt kommen wir zur Lage des Bildschirmspeichers innerhalb des 16-KByte-Blocks. Dazu zieht man von der Startadresse des Bildschirmspeichers die Anfangsadresse des Blocks ab und dividiert das ganze durch 64. Es ist zu beachten, daß der Bildschirmspeicher nur in Schritten zu 1 KByte verschoben werden kann, das heißt die Startadresse des Bildschirmspeichers muß durch 1024 teilbar sein. Jetzt gibt man ein:</p>
+        <p>Jetzt kommen wir zur Lage des Bildschirmspeichers innerhalb des 16-KByte-Blocks. Dazu zieht man von der Startadresse des Bildschirmspeichers die Anfangsadresse des Blocks ab und dividiert das ganze durch 64. Es ist zu beachten, daß der Bildschirmspeicher nur in Schritten zu 1 KByte verschoben werden kann, das heißt die Startadresse des Bildschirmspeichers muß durch 1024 teilbar sein. Jetzt gibt man ein:</p>
 
-<p>POKE 53272, PEEK(53272) AND 15 0R (errechneter Wert)</p>
+        <p>POKE 53272, PEEK(53272) AND 15 0R (errechneter Wert)</p>
 
-<p>Der Bildschirmspeicher stimmt jetzt. Aber kaum ist das Problem gelöst, taucht das nächste auf: Der Zeichengenerator (oder der Zeichensatz). Die Schwierigkeit ist, daß der fest eingebaute Zeichensatz nur verwendet werden kann, wenn man ihn bei $1000 oder $9000 (4096 oder 36864) adressiert. Wollen wir nun unseren Bildschirm nach $C000 (49152) legen, können wir den Zeichensatz in seiner ursprünglichen Form nicht mehr verwenden; wir müssen ihn verschieben. Das ganze Verfahren hierzu kann hier nicht geschildert werden, da es nahezu das gesamte Leserforum füllen würde. Nur soviel sei zu diesem Problem noch gesagt: bei der Benutzung eines Zeichensatzes im Speicher ist zu beachten, daß</p>
+        <p>Der Bildschirmspeicher stimmt jetzt. Aber kaum ist das Problem gelöst, taucht das nächste auf: Der Zeichengenerator (oder der Zeichensatz). Die Schwierigkeit ist, daß der fest eingebaute Zeichensatz nur verwendet werden kann, wenn man ihn bei $1000 oder $9000 (4096 oder 36864) adressiert. Wollen wir nun unseren Bildschirm nach $C000 (49152) legen, können wir den Zeichensatz in seiner ursprünglichen Form nicht mehr verwenden; wir müssen ihn verschieben. Das ganze Verfahren hierzu kann hier nicht geschildert werden, da es nahezu das gesamte Leserforum füllen würde. Nur soviel sei zu diesem Problem noch gesagt: bei der Benutzung eines Zeichensatzes im Speicher ist zu beachten, daß</p>
 
-<ul>
-<li>die Startadresse durch 2048 teilbar ist, und</li>
-<li>der Zeichensatz im gleichen 16 KByte-Bereich liegt, wie der Bildschirmspeicher.</li>
-</ul>
+        <ul>
+            <li>die Startadresse durch 2048 teilbar ist, und</li>
+            <li>der Zeichensatz im gleichen 16 KByte-Bereich liegt, wie der Bildschirmspeicher.</li>
+        </ul>
 
 
-<p>Ist beides der Fall, dann gilt:<br>
-Wert = (Zeichensatzadresse — Anfangsadresse des 16-KByte-Bereichs) / 1024<br>
-Durch</p>
+        <p>Ist beides der Fall, dann gilt:<br>
+            Wert = (Zeichensatzadresse — Anfangsadresse des 16-KByte-Bereichs) / 1024<br>
+            Durch</p>
 
-<p>POKE 53272, PEEK(53272) AND 240 OR Wert</p>
+        <p>POKE 53272, PEEK(53272) AND 240 OR Wert</p>
 
-<p>wird der Inhalt des Bildschirms mit diesem Zeichensatz ausgegeben.</p>
+        <p>wird der Inhalt des Bildschirms mit diesem Zeichensatz ausgegeben.</p>
 
-<p>Rainer Wiesenfarth</p>
+        <p>Rainer Wiesenfarth</p>
 
-<h2>Was kann die 1571-Floppy?</h2>
+        <h2>Was kann die 1571-Floppy?</h2>
 
-<p>(1) Können eine 1541 und eine 1571 gleichzeitig am C 128 betrieben werden, um C 64-Dateien auf das 1571-Format zu überspielen?</p>
+        <p>(1) Können eine 1541 und eine 1571 gleichzeitig am C 128 betrieben werden, um C 64-Dateien auf das 1571-Format zu überspielen?</p>
 
-<p>(2) Ist das C128 CP/M kompatibel zum C 64 CP/M, das heißt, können CP/M-Programme vom C 64 auch auf dem C128 laufen?</p>
+        <p>(2) Ist das C128 CP/M kompatibel zum C 64 CP/M, das heißt, können CP/M-Programme vom C 64 auch auf dem C128 laufen?</p>
 
-<p>(3) Wie können Dateien des C 64 CP/M auf das Format der 1571 gebracht werden?</p>
+        <p>(3) Wie können Dateien des C 64 CP/M auf das Format der 1571 gebracht werden?</p>
 
-<p>(4) Kann man beim C128 unter CP/M auch die alte 1541 benutzen?</p>
+        <p>(4) Kann man beim C128 unter CP/M auch die alte 1541 benutzen?</p>
 
-<p>Dietmar Hoffmann</p>
+        <p>Dietmar Hoffmann</p>
 
-<p>(1) Natürlich, das ist kein Problem. Sie brauchen dazu nur die Gerätenummer eines der beiden Laufwerke von 8 auf 9 zu ändern.</p>
+        <p>(1) Natürlich, das ist kein Problem. Sie brauchen dazu nur die Gerätenummer eines der beiden Laufwerke von 8 auf 9 zu ändern.</p>
 
-<p>(2) Im Prinzip ja. Das CP/M Plus des C 128 ist kompatibel zum CP/M 2.2, das auf dem C 64 mit CP/M-Modul läuft. Bei einigen Programmen (wie Textverarbeitung etc.) kann eine neue Anpassung mittels eines speziellen (immer mitgelieferten) Install-Programms notwendig werden.</p>
+        <p>(2) Im Prinzip ja. Das CP/M Plus des C 128 ist kompatibel zum CP/M 2.2, das auf dem C 64 mit CP/M-Modul läuft. Bei einigen Programmen (wie Textverarbeitung etc.) kann eine neue Anpassung mittels eines speziellen (immer mitgelieferten) Install-Programms notwendig werden.</p>
 
-<p>(3) Einfach mit der 1571 eine Diskette im 1571-Format neu formatieren, dann die alte Diskette darauf kopieren — fertig.</p>
+        <p>(3) Einfach mit der 1571 eine Diskette im 1571-Format neu formatieren, dann die alte Diskette darauf kopieren — fertig.</p>
 
-<p>(4) Das CP/M des C 128 läuft auch mit der guten alten 1541. Eine CP/M-Diskette im 1541-Format liegt jedem C 128 bei.</p>
+        <p>(4) Das CP/M des C 128 läuft auch mit der guten alten 1541. Eine CP/M-Diskette im 1541-Format liegt jedem C 128 bei.</p>
 
-<h2>Wer kennt das PTS100?</h2>
+        <h2>Wer kennt das PTS100?</h2>
 
-<p>Vor einiger Zeit erwarb ich das Dialogterminalsystem PTS 100 der Firma Raytheon Data Systems. Der Anschluß des Gerätes oder zumindest des Monitors an den C 64 erwies sich jedoch als unmöglich, da ich keine Schaltungsunterlagen für das PTS 100 besitze. Telefonate mit der Firma Raytheon blieben erfolglos. Deshalb meine Frage an das Leserforum: Wer kann mir Hinweise für den Anschluß des PTS 100 an den C 64 geben oder Schaltpläne dazu besorgen?</p>
+        <p>Vor einiger Zeit erwarb ich das Dialogterminalsystem PTS 100 der Firma Raytheon Data Systems. Der Anschluß des Gerätes oder zumindest des Monitors an den C 64 erwies sich jedoch als unmöglich, da ich keine Schaltungsunterlagen für das PTS 100 besitze. Telefonate mit der Firma Raytheon blieben erfolglos. Deshalb meine Frage an das Leserforum: Wer kann mir Hinweise für den Anschluß des PTS 100 an den C 64 geben oder Schaltpläne dazu besorgen?</p>
 
-<p>Andreas Möllemann</p>
+        <p>Andreas Möllemann</p>
 
-<h2>Maschinensprache wider Willen?</h2>
+        <h2>Maschinensprache wider Willen?</h2>
 
-<p>Die Joystickabfrage bei meinem C 128machtmirProbleme. Mit der Anweisung »PRINT JOY(1)« kann ich zwar den Joystick sehr komfortabel per Basic-Befehl abfragen, aber wenn ich im Verlaufe des Programms auch nur ein einziges Mal den Feuerknopf gedrückt hatte, erscheint nach dem Ende des Programms ganz ohne mein Zutun der Befehl MONITOR, und dereingebaute Maschinensprachemonitor ist aufgerufen. Ich muß also jedesmal nach Beendigung meines Programms erst mit »X« aus dem Monitor heraus, um in den Direktmodus zu gelangen. Wie kann ich das verhindern?</p>
+        <p>Die Joystickabfrage bei meinem C 128machtmirProbleme. Mit der Anweisung »PRINT JOY(1)« kann ich zwar den Joystick sehr komfortabel per Basic-Befehl abfragen, aber wenn ich im Verlaufe des Programms auch nur ein einziges Mal den Feuerknopf gedrückt hatte, erscheint nach dem Ende des Programms ganz ohne mein Zutun der Befehl MONITOR, und dereingebaute Maschinensprachemonitor ist aufgerufen. Ich muß also jedesmal nach Beendigung meines Programms erst mit »X« aus dem Monitor heraus, um in den Direktmodus zu gelangen. Wie kann ich das verhindern?</p>
 
-<p>Stefan Schulte</p>
+        <p>Stefan Schulte</p>
 
-<p>Der Joystick-Port 1 besitztbeim C 128 (wie auch beim C 64) einige gemeinsame Abfrage-Leitungen mit der Tastatur. Die Feuerknopf-Leitung ist dabei so unglücklich verschaltet, daß sie dem Betätigen der Funktionstaste F8 (MONITOR) entspricht. Abhilfe: Im Programm selbst sollte nach jeder Joystick-Abfrage ein GET-Befehl folgen. Versuchen Sie es also statt »X=JOY(1)« mit der Befehlsfolge »X=JOY(1): GET A$«. Durch den GET-Befehl wird jede durch den Joystick ausgelöste »Tastenfunktion« unterdrückt. Eine noch einfachere Lösung ist allerdings die Benutzung von Joystick-Port 2. Dort treten solche Probleme nicht auf, weswegen auch die meisten Spiele den Port 2 benutzen.</p>
+        <p>Der Joystick-Port 1 besitztbeim C 128 (wie auch beim C 64) einige gemeinsame Abfrage-Leitungen mit der Tastatur. Die Feuerknopf-Leitung ist dabei so unglücklich verschaltet, daß sie dem Betätigen der Funktionstaste F8 (MONITOR) entspricht. Abhilfe: Im Programm selbst sollte nach jeder Joystick-Abfrage ein GET-Befehl folgen. Versuchen Sie es also statt »X=JOY(1)« mit der Befehlsfolge »X=JOY(1): GET A$«. Durch den GET-Befehl wird jede durch den Joystick ausgelöste »Tastenfunktion« unterdrückt. Eine noch einfachere Lösung ist allerdings die Benutzung von Joystick-Port 2. Dort treten solche Probleme nicht auf, weswegen auch die meisten Spiele den Port 2 benutzen.</p>
 
-<h2>DOS 5.1 mit Hypra-Load</h2>
+        <h2>DOS 5.1 mit Hypra-Load</h2>
 
-<p>Besteht die Möglichkeit, DOS 5.1 zusammen mit »Hypra-Load Perfekt« in ein EPROM zu brennen?<br>
-Dieter Bast<br>
-Ausgabe 10/85</p>
+        <p>Besteht die Möglichkeit, DOS 5.1 zusammen mit »Hypra-Load Perfekt« in ein EPROM zu brennen?<br>
+            Dieter Bast<br>
+            Ausgabe 10/85</p>
 
-<p>Ich selbst habe beide Programme in ein EPROM vom Typ 2732 A gebrannt. Anzumerken wäre dazu, daß ich die beiden Programme nicht im Bereich ab $8000 (wo EPROMs normalerweise eingeblendet werden) laufen lasse, sondern sie in den Original-Speicherbereich verschiebe ($0800 beziehungsweise $CC00). Dies macht sich zeitlich kaum bemerkbar und es laufen so mehr Programme mit diesen Erweiterungen.</p>
+        <p>Ich selbst habe beide Programme in ein EPROM vom Typ 2732 A gebrannt. Anzumerken wäre dazu, daß ich die beiden Programme nicht im Bereich ab $8000 (wo EPROMs normalerweise eingeblendet werden) laufen lasse, sondern sie in den Original-Speicherbereich verschiebe ($0800 beziehungsweise $CC00). Dies macht sich zeitlich kaum bemerkbar und es laufen so mehr Programme mit diesen Erweiterungen.</p>
 
-<p>Wer eine Kopie dieses EPROMs haben möchte, möge mir bitte ein EPROM 2732 (A) mit selbstadressierten Freiumschlag zuschicken.</p>
+        <p>Wer eine Kopie dieses EPROMs haben möchte, möge mir bitte ein EPROM 2732 (A) mit selbstadressierten Freiumschlag zuschicken.</p>
 
-<p class="source">Info: Frank Giese, Overbergstr. 49, 5758 Fröndenberg</p>
+        <p class="source">Info: Frank Giese, Overbergstr. 49, 5758 Fröndenberg</p>
     </article>
 </body>
+
 </html>
