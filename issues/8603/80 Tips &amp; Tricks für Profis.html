@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bergerhoff, Nikolas, tr, Frank Sander, tr, Gert Harlacher, tr, N.J.W. Cuppen, tr, Oliver Rahm, tr, Yves Forkl, tr">
+    <meta name="64er.issue" content="3/86">
+    <meta name="64er.pages" content="80-82">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+<p class="intro">Auch diesmal haben wir für die Profis unter unseren Lesern einige interessante Hinweisa Beachtenswert ist unter anderem »das geheimnisvolle, reverse SHIFT-M«.</p>
+
+<p>Schalten Sie den Reverse-Modus ein und drücken Sie dann die Tastenkombination SHIFT-M. Was dieser entstandene reverse Schrägbalken alles bewirken kann, möchte ich kurz schildern:</p>
+
+<h3>1.  Innerhalb von REM-Zeilen</h3>
+
+<p>Geben Sie eine Zeilenummer und REM ”” ein. Nun löschen Sie das zweite Hochkomma mit der DEL-Taste, schalten den Reverse-Modus ein und drücken die Tastenkombination SHIFT-M. Schalten Sie den Reverse-Modus wieder aus und setzen abermals ein Hochkomma, das Sie anschließend mit der DEL-Taste wieder löschen. Nun können Sie wie innerhalb eines PRINT-Befehls einen Text mit Farbcodes etc. eingeben. Nach der Eingabe drücken Sie die RETURN-Taste und listen das Programm. Sie werden erstaunt sein. Zur Veranschaulichung soll folgende Zeile gelten (die Kommata nicht mit eintippen):</p>
+
+<p>10 REM " "{DEL, RVSON, SHIFTM, RVSOFF} "{DEL, SHIFTCLR/HOME, WHITE, RVSON} This Program is protected {RVSOFF, DARK BLUE}"</p>
+
+<h3>2.  Im Directory</h3>
+
+<p>Geben Sie »SAVE« ein und erzeugen Sie den reversen Schrägbalken wie oben beschrieben. Dann tippen Sie den Programmnamen mit beliebig vielen Steuerzeichen (insgesamt 16 Zeichen) ein und schließen die Eingabe mit ”,8 und RETURN ab. Auch hier zur Veranschaulichung wieder ein Beispiel:</p>
+
+<p>SAVE " " {DEL, RVSON, SHIFT M, RVSOFF} " {DEL, RVSON} TEST {RVSOFF} ",8</p>
+
+<p>Alle Codes werden ebenfalls aktiviert, wenn Sie eingeben: SAVE CHR$ (34) + {RVSON} Test {RVSOFF} ",8</p>
+
+<h3>3.  Als Programmschutz</h3>
+
+<p>Wenn Sie am Anfang einer Programmzeile PRINT” {reverser Schrägbalken}” und danach weitere Basic-Befehle eingeben, können diese nach Drücken der RETURN-Taste nicht mehr geändert werden (nur durch Zeile löschen oder mit einem Monitor). Beim Listen des Programms werden die nachfolgenden Befehle um eine oder mehrere Zeilen nach unten gerückt (je nach dem, wieviele reverse Schrägbalken Sie in dem PRINT-Befehl verwendet haben), 80 Zeichen pro Zeile werden meistens überschritten. Will man diese Zeile durch Return abermals speichern, so wird nur der PRINT-Befehl gespeichert, alle anderen nachfolgenden Befehle gehen verloren. Ein Beispiel: 10 PRINT" " {DEL ,RVSON ,SHIFTM ,RVSOFF} ":PRINT "COPYRIGHT BY 64'ER-REDAKTION"</p>
+
+<p>Nachdem Sie diese Zeile eingetippt haben und RETURN gedrückt haben, versuchen Sie einmal, den in den Hochkommata des zweiten PRINT-Befehls stehenden Text auszubessern. Nach dem Ausbesssern und RETURN-Drücken tritt entweder ein Syntax Error auf und die Zeile bleibt unverändert, oder in der Zeile 10 steht nur mehr PRINT”.</p>
+
+<h3>4.  Als Listschutz</h3>
+
+<p>Geben Sie das erste Beispiel ein, fügen Sie nach dem letzten Hochkomma noch das Zeichen SHIFT L hinzu, drücken Sie RETURN. Nun tippen Sie im Direktmodus POKE 2052,255 ein und speichern das Programm. Nach dem Laden ist der Listschutz noch immer vorhanden.</p>
+
+<p>Durch diesen POKE bekommt die erste Zeile in einem Programm eine unzulässige Zeilennummer (größer als 63999). Sie kann daher nicht mehr gelöscht werden. Das Listen des Programms wird bei der ersten Zeile abgebrochen, Befehle wie LIST 20- (oder ähnliches) werden auch nicht ausgeführt, da der Computer glaubt, die erste Zeile sei wegen der hohen Zeilennummer die letzte. Der Listenschutz kann jedoch mit POKE 2052,0 wieder aufgehoben werden.</p>
+
+<address class="author">(Gert Harlacher/tr)</address>
+
+<h2>Versteckspiel mit dem Directory</h2>
+
+<p>Wenn eine Diskette mit "N:NAME" + CHR$(O) + CHR$ (0) + CHR$ (0) +", ID" formatiert wird, so wird beim Laden und Auflisten des Directories nur noch der Name der Diskette angezeigt. Der Interpreter »denkt« nämlich, daß das Directory nach den drei Nullen zu Ende ist. Die Programme auf dieser Diskette lassen sich aber trotzdem noch laden.</p>
+
+<p>Ein weiterer Trick besteht darin, beim Speichern eines Programms an den Namen ein »,S,W« anzuhängen (also zum Beispiel SAVE "TEST, S, W", 8).</p>
+
+<p>Im Directory steht dieses File nun unter »SEQ« vermerkt. Wer versucht, dieses Programm »normal« mit LOAD zu laden, der wird von der Floppy die Fehlermeldung »64, FILE TYPE MISMATCH« erhalten.</p>
+
+<p>Der Kundige jedoch wird das Programm mit »LOAD "NAME, S,R",8« laden, und sich des gelungenen Tricks erfreuen. Beide Methoden kombiniert ergeben einen recht wirkungsvollen Programmschutz.</p>
+
+<address class="author">(Oliver Rahm/tr)</address>
+
+<h2>Englisch für Fortgeschrittene</h2>
+
+<p>Geben sie einmal folgende kleine Basic-Zeile sorgfältig ein.</p>
+
+<p>Wenn Sie die Zeile listen, sehen Sie nichts Ungewöhnliches. Löschen Sie nun das Anführungszeichen hinter der REM-Anweisung und listen Sie die Zeile. Mehr wird hier nicht verraten. Lassen Sie sich überraschen!</p>
+
+<address class="author">(Yves Forkl/tr)</address>
+
+<h2>Die mysteriöse Zahl 35072120</h2>
+
+<p>Zur Erinnerung: In der Ausgabe 1/86 schrieben wir, daß der List-Schutz-»POKE 808,225« durch die Eingabe der Zahl 35072120 wieder zurückgesetzt werden kann. Wir fragten weiterhin, worauf dieses Phänomen zurückzuführen ist.</p>
+
+<p>Wir danken allen Lesern, die sich bei der Lösung des Problems beteiligt haben. Hier stellvertretend für viele Einsendungen die Erklärung von Frank Sander:</p>
+
+<p>Nun, was geschieht da, besonders wo der C 64 derartig hohen Zeilennummern sonst nur mit einem kalten Lächeln (auch Syntax-Error genannt) begegnet?</p>
+
+<p>Es geschieht folgendes:</p>
+
+<p>Die Eingabewarteschleife ($A480) stellt fest, daß die soeben eingegebene Zeile (»35072120«) mit einer Ziffer beginnt und entscheidet daher, daß es sich um eine in das Programm einzubauende Programmzeile handelt.</p>
+
+<p>Also übergibt sie die Zeile an die Routine zum Einfügen von Programmzeilen ($A49C).</p>
+
+<p>Die Einfügeroutine versucht nun als erstes (und in diesem ’ Falle auch als letztes), die Zeilennummer ins Low-/High-Byte-Fbrmat zu verwandeln. Dazu verzweigt sie nach $A96B, wo die Routine liegt, die für das ganze »Wunder« verantwortlich ist. Denn: Ist die Zeilennummer (wie unsere) zu groß, so versucht die Routine verzweifelt, einen Syntax-Error von sich zu geben (aber die entsprechende Ausgabeschleife ist für einen BRANCH-Befehl zu weit entfernt). Also (da man ja unmöglich drei Byte für einen »JMP $AF08« opfern konnte) wird nach $A953 verzweigt, in der Hoffnung, daß der Akku etwas anderes als $89 enthält. Denn $A953 liegt mitten in der ON-GOTO-Routine und dort wird, falls der Akku etwas anderes als den GOTO-Code (eben $89) enthält, zu einem Syntax-Error-Ansprung verzweigt.</p>
+
+<p>Nur lautet die Zeilennummer 35072120, so ist der im Akku enthaltene »Rest« dummerweise gerade $89, also wird nicht zum Syntax-Error gesprungen, sondern der Prozessor beginnt eine Fahrt ins Ungewisse</p>
+
+<ul>
+<li>vorbei an total unpassenden Befehlen:</li>
+<li>vorbei an einem JSR CHRGET</li>
+<li>weiter bei einem erneuten Versuch, eine Zeilennummer zu holen (leider ist aber die Zeile zu Ende, also $00)</li>
+<li>dieses $00 ist auch nicht gleich einem Komma&hellip;</li>
+</ul>
+
+
+<p>also muß der auf dem Stack liegende Code für ON-GOTO geholt werden (PLA) und das Ganze endet mit einem RTS.</p>
+
+<p>Nur&hellip; es liegt ja gar kein ON-GOTO-Code auf dem Stack, sondern die Rücksprungadresse aus der Eingabewarteschleife!</p>
+
+<p>Also wirft der ahnungslose Prozessor das Rücksprung-Low-Byte in die Ecke und hält nun das Rücksprung-High-Byte für ein Low-Byte und das nachfolgende Byte für ein High-Byte. Daraus folgt: der Prozessor springt ins Ungewisse: zu einer Adresse mit Low-Byte $A5. Als High-Byte liegt bei ordnungsgemäß gereinigtem Stack $79 obenauf (ehemaliger Rücksprung nach $A67A während der Basic-Initialisierung). Dies führtzu einem Sprung nach $79A5, wo der Professor hoffentlich auf ein BRK trifft, den sonst&hellip; Einen schweigenden, cursorlosen C 64 hat wohl jeder schon einmal gesehen.</p>
+
+<p>Aber meist liegt dort ein BRK (oder ein mit TAX gepflasterter Weg dorthin), was den wild gewordenen Computer wieder auf den rechten Weg bringt: Nämlich die NMI-Routine.</p>
+
+<p>Diese NMI-Routine, die bei unblockierter RUN/STOP-Taste auch über RUN/STOP-RESTORE erreichbar ist, setzt unter anderem den Stop-Vektor (Adresse 808/809!) neu und schon ist das Listing wieder auf den Beinen.</p>
+
+<p>Hier noch einmal zusammengefaßt die Irrfahrt des C 64:</p>
+
+<p>TODO TABLE</p>
+
+<p>Oben auf dem Stack hätte $9E, $A4, $79, $A6 gelegen, das $9E wurde jedoch durch das PLA vom Stack geholt. Also erfolgt ein »Rücksprung« nach $79A5.</p>
+
+<p>Man kann dies ganz einfach ausprobieren, indem man in den (frisch eingeschalteten) Computer, ein POKE 31141,2 (=$79A5) eingibt. Dies führt dann bei Eingabe von »35072120« zum Absturz des Prozessors. (Befehl $02 = Prozessorabsturz).</p>
+
+<p>So weit so gut. Nur — hätte es ein POKE 2,0:SYS2 nicht auch getan?</p>
+
+<address class="author">(Frank Sander/tr)</address>
+
+<h2>HiRes-Scrolling per Interrupt</h2>
+
+<p>Wer hat nicht schon solche Titelbilder wie bei dem Spiel »Boulderdash« gesehen? Man hat den Eindruck, als ob der Hintergrund stufenlos scrollen würde, die Schrift aber stehenbliebe. Solch ein Effekt wäre natürlich auch hervorragend für eigene Spielszenen geeignet. Das folgende Maschinenprogramm läuft völlig interruptgesteuert und simuliert diese Funktion in vielfältiger Weise. Das Maschinenprogramm (Listing 1) wird zuerst mit »SYS 49152« gestartet.</p>
+
+<p>Der erste Befehl schaltet das Pseudo-Scrolling ein. Die Syntax lautet: »SYS 49232,a,b,c«. Nun zu den Parametern: Der Parameter a ist für die Geschwindigkeit zuständig. Sinnvoll sind nur die Werte 1 bis 255, wobei 1 die höchste Geschwindigkeit bewirkt. Der Parameter b kann die Werte 0 oder 1 annehmen. Ist b=0, so wird nach dem Aufruf der gesamte Bildschirm mit dem zu scrollenden Zeichen aufgefüllt. Das ist zu Anfang ein kleiner Kreis, kann aber von Ihnen im Quelltext ge-ändertwerden. Istb=1, sowirdderBildschirmnichtaufgefüllt. Dies wird zum Beispiel in dem Demoprogramm ausgenützt.</p>
+
+<p>Der Parameter c kann ebenfalls die Werte 0 oder 1 annehmen. Ist c=0, so wird nach oben gescrollt, ist c=1, so wird nach unten gescrollt. Abgeschaltet wird das Ganze mit SYS 49400. Am besten starten Sie zu Anfang das Demoprogramm (Listing 2), um sich mit den Befehlen vertraut zu machen. Zuvor müssen Sie aber das Maschinenprogramm absolut (mit »,8,1«) geladen haben.</p>
+
+<p>Zur Funktionsweise:</p>
+
+<p>Zuerst wird der Zeichensatz umkopiert und einige Zeiger initialisiert. Der Trick beim Scrolling besteht darin, daß im Interrupt kontinuierlich das Zeichen »SHIFT-X« (Bildschirmcode= 88) umdefiniert wird. Dadurch scheint der Hintergrund gescrollt zu werden. Unterbrechen Sie doch einmal das Demoprogramm mit RUN/STOP, löschen Sie den Bildschirm und listen das Programm. Sie werden sehen, daß sogar »im Listing« die Zeichen gescrollt werden.</p>
+
+<p class="source">Hinweis: Wenn Sie die neue Version vom »SMON« besitzen (64’er, Ausgabe 10/85), dann können Sie, nachdem Sie den SMON mit »Y8000« verschoben haben, das zu scrollende Zeichen beliebig mit dem »Z«-Befehl umdefinieren. Die Zeichendefinitionen liegen ab $C107.</p>
+
+<address class="author">(Bergerhoff/Nikolas/tr)</address>
+
+<h2>1520-Plotter als vollwertiger Drucker</h2>
+
+<p>Dieses kleine Programm (Listing 3) schicktalle Druckausgaben, die zur Geräteadresse 4 gesendet werden, automatisch zum 1520-Plotter mit der Geräteadresse 6. Das heißt, daß fertige Programme nicht mehr mühselig nach OPEN-Befehlen durchkämmt werden müssen, um die Druckerausgaben entsprechend umzulenken. Weiterhin wird der Plotter automatisch auf Kleinschrift gestellt, wenn diese am C 64 eingeschaltet ist.</p>
+
+<p>Auch läßt sich die Zeilenlänge am Plotter einstellen: »POKE 713,Z:POKE 754,Z&lt;&lt;, wobei folgende Werte für Z zulässig sind:<br>
+0: 80 Zeichen/Zeile (eingestellter Wert)<br>
+1: 40 Zeichen/Zeile<br>
+2: 20 Zeichen/Zeile</p>
+
+<address class="author">(N.J.W. Cuppen/tr)</address>
+
+<p>TODO ASIDE<br>
+Kalauer des Monats:<br>
+»God Save the Queen Komma acht Komma eins!«</p>
+    </article>
+</body>
+</html>
