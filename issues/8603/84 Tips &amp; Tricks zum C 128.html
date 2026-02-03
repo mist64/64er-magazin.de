@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Marcus Heinze, tr, P. Guth, ah">
+    <meta name="64er.issue" content="3/86">
+    <meta name="64er.pages" content="84-85">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 128</h1>
+<p class="intro">Beachtenswert ist diesmal ein vollwertiges Software-Interface zum Anschluß eines Centronics-Druckers an den C128. Der Kauf eines teuren Hardware-Interfaces erübrigt sich damit.</p>
+
+<p>Besitzen Sie einen Drucker mit parallelem Dateneingang und einen C 128? Und Sie sind der Meinung, daß sich diese beiden im C 128-Modus nicht kombinieren lassen? (Ohne den Kauf eines teuren Hardware-Interfaces natürlich.)</p>
+
+<p>Irrtum! Das Programm »Interface« lenkt sämtliche Druckerausgaben auf den User-Port, an dem es einen Centronics-Port simuliert. Sie benötigen lediglich noch zwei Stecker und ein paar Kabel.</p>
+
+<p>Am besten, Sie tippen das Programm (Listing 1) im C 64-Modus mit Hilfe des MSE ein. Im C 128-Modus laden Sie es dann absolut, das heißt mit »,8,1«.</p>
+
+<p>Nach der Initialisierung mit »SYS 5120« meldet sich das Interface mit seiner Einschaltmeldung. Man hat jetzt zwei Kanäle zur Verfügung:<br>
+OPEN1,4: wandelt den Commodore-eigenen Code in Epson-kompatiblen Code um. (Zum Beispiel, um Sonderzeichen auszudrucken, oder Escape-Sequenzen zu senden.)<br>
+OPEN1,5: gibt die Daten ungewandelt aus. (Um zum Beispiel den Drucker per Software umzuschalten.)</p>
+
+<p>Um die zusätzlichen Eigenheiten des Interfaces zu nutzen, ist das Steuer-Byte (Adresse 5126) interessant.</p>
+
+<p>Setzt man hier das Bit 2, so wird nach jedem Carriage Return ein Zeilenvorschub (Linefeed) ausgegeben (POKE 5126,4).</p>
+
+<p>Setzt man das Bit 3, so kann man das Interface durch Betätigen der Restore-Taste initialisieren (POKE 5126,8)</p>
+
+<p>Will man beide Funktionen aktivieren, so geschieht dies durch POKE 5126,12.</p>
+
+<p>Ausgeschaltet wird das Interface entweder mit »POKE 5126, PEEK(5126) AND 251« und anschließendem Drücken von RUN/STOP-RESTORE, oder durch »SYS 5123«.</p>
+
+<p>Noch ein Wort zur Codewandlung: Ist die ASCII/DIN-Taste gedrückt, so liefern die Umlaute einen anderen Code. Das Interface berücksichtigt selbständig, ob diese Taste gedrückt ist oder nicht und schaltet gegebenenfalls eine zusätzliche Codewandlung ein.</p>
+
+<address class="author">(Marcus Heinze/tr)</address>
+
+<p>TODO Verkabelungsplan</p>
+
+<h2>Flimmerproblem beim C 128 beseitigt</h2>
+
+<p>Einigen C 128-Besitzern, die das Programm »80-Zeichen-Grafik« aus der Ausgabe 12/85 abgetippt haben, wird das merkwürdige »kräuseln« am rechten Bildschirmrand unangenehm aufgefallen sein. Um diesen Fehlerzu beseitigen, gehen Sie wie folgt vor:</p>
+
+<p>Nach dem Einschalten des Computers ist die Befehlsfolge<br>
+POKE 54874,25 : ? PEEK (54875)<br>
+einzugeben. Als Ergebnis gibt es nun zwei Möglichkeiten: Bei der ersten Version des C 128 erscheint eine »64« und bei der zweiten eine »71«. Erscheint die »71«, muß der Basic-Lader der 80-Zeichen-Grafik folgendermaßen geändert werden.</p>
+
+<p>In Zeile 14040 muß die »64« durch »71« und in Zeile 14080 die Zahl »128«durch »135«ersetztwerden. Besitztjemand nur den Maschinensprache-Teil, so kann er das Programm durch die Befehle: POKE 6752,71: POKE 6789,13 5 anpassen. Die nötigen Änderungen für das Programm »Doppelte Grafikauflösung« aus der Ausgabe 11/85 sehen dann so aus: POKE 5150,135 : POKE 5158,71.</p>
+
+<p>Es existieren anscheinend zwei Versionen des VDC-8563-Chips. Überprüft man deren Statusanzeige, so kann man feststellen, welche der beiden Versionen vorliegt.</p>
+
+<p>Genau dies wird auch in der Initialisierungs-Routine für den VDC (ab $E179) gemacht. Hier wird die Adresse $D600 gelesen und die Bit 0 bis 2 getestet. Sind diese Bit alle gelöscht, so wird in das VDC-Register 25 eine 64 geschrieben, andernfalls kommt in das Register 25 eine 71.</p>
+
+<p>Will man die hochauflösende Grafik einschalten, so muß im Register 25 das Bit 7 gesetzt und das Bit 6 gelöscht werden. Verändert man hierbei die Bit 0 bis 3, so hat das ein Verschieben des Bildschirms nach links oder rechts zur Folge. Der VDC greift nun auf einen anderen Teil seines Video-RAMs zu, und es kommt somit im Grafik-Modus zu dem bekannten »Kräuseln«.</p>
+
+<address class="author">(P. Guth/ah)</address>
+    </article>
+</body>
+</html>

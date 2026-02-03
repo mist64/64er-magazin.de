@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Shapes auf dem C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="R. Löwenstein, ah">
+    <meta name="64er.issue" content="3/86">
+    <meta name="64er.pages" content="71-72">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Shapes auf dem C 64</h1>
+<p class="intro">Mit diesem Programm bringen Sie Bewegung ins Bild. Denn neben den Shapes, die sich beliebig auf dem Bildschirm positionieren lassen, stehen die Sprites im vollen Umfang zur Verfügung. Shape kann aber noch viel mehr! Probieren Sie es aus.</p>
+
+<p>»Shape« wurde dazu entwickelt, Teile aus dem Bildschirm zu speichern und an beliebiger Stelle wieder einzusetzen (Dieses Programm simuliert also keine Sprites!). Jedoch hat man noch mehr Möglichkeiten: Bildbereiche mit Zeichen beliebiger Farbe füllen, Zeichensatzänderung und mehr Platz für Basic-Programme. Die beiden letzten Punkte haben eigentlich nichts mit Shapes zu tun, aber dadurch wurde der Einsatzbereich noch vergrößert. Sie werden sehen, daß sich mit alldem eine ganze Menge anfangen läßt. Man kann »Shape« zum Beispiel für Spiele, Maskengeneratoren, zum Window-Aufbau in diversen Programmen und zu viel mehr benutzen.</p>
+
+<p class="source">Anleitung: Zuerst lädt man das Hauptprogramm und startet es mit RUN (Listing 1). Es erscheint ein leicht veränderter Bildschirm mit der Einschaltmeldung. Jetzt kann man entweder das Demoprogramm (Listing 2) laden, welches zeigt, was mit »Shape« alles möglich ist, oder selbst programmieren.</p>
+
+<p>Ein Shape wird mit SYS 49152,ADR,X,Y,2 definiert. Für ADR ist dabei die Bildschirmadresse zu setzen, die der linken, oberen Ecke entspricht. Für X schreibt man die X-Ausdehnung, für Y die Y-Ausdehnung. Bei ADR wäre zu beachten, daß der Bildschirm jetzt bei 50176 beginnt. ADR läßt sich also durch 50176+40*Zeile+Spalte errechnen.</p>
+
+<p>Mit SYS 49152,ADR,X,Y,1 setzt man ein Shape auf den Bildschirm. Mit SYS 49152,ADR,X,Y,0,CHR,COL schließlich wird der definierte Bereich mit dem Zeichen CHR der Farbe COL gefüllt. Bei CHR muß das Zeichen dabei im POKE-Code angegeben werden.</p>
+
+<p>Ein Beispiel: Schreiben Sie den Bildschirm voll und definieren Sie ein Shape mit SYS 49152,50176,10,12,2. Löschen Sie nun das Bild und geben SYS 49152,50256,10,12,1 ein. Jetzt erscheint ein oberer Teil des Bildes um zwei Zeilen versetzt. Nach der Eingabe von SYS 49152,50256,10,12,0,129,2 erscheinen lauter reverse »A« an genau derselben Stelle. Sie sollten jetzt ein wenig experimentieren, nur so läßt sich der richtige Umgang mit »Shape« erlernen.</p>
+
+<p>Noch ein Tip: Natürlich muß man sich nicht auf den Bildschirm beschränken, man kann zum Beispiel bis zu 5 KByte Speicher verschieben!</p>
+
+<p>Wie gesagt ist auch eine Zeichensatzänderung möglich. Ich möchte nicht näher darauf eingehen. Es ist schon oft genug erklärt worden. Nur soviel: Der Zeichensatz liegt ab 51200. Die Adresse für ein Zeichen läßt sich also durch 51200+8*CHR finden. Da in diesem Bereich jedoch nur Platz für einen Zeichensatz ist, wird er beim Umschalten durch C-SHIFT durch eine IRQ-Routine umkopiert. Hierbei wird jedoch ein eventuell vorhandener geänderter Zeichensatz gelöscht! Daher sollte man die Möglichkeit einer Zeichensatzumschaltung mit POKE 49349,96 ausschließen. Wieder einschalten läßt er sich mit POKE 49349,234. Außerdem muß nun mit SYS 49503 auf Groß- und mit SYS 49512 auf Kleinschreibung umgeschaltet werden (auch hierbei wird ein veränderter Zeichensatz gelöscht!).</p>
+
+<p>Ganz wichtig: Nach RUN/STOP-RESTORE muß blind SYS 49152:SYS42291 eingegeben werden, um die Parameter wieder richtig einzustellen. Das Maschinenprogramm legt die Bilddaten ab 40960 und die Farbdaten ab 45056 ab. Daher lassen sich nurjeweils 5 KByte verschieben. Für Assembler-Freaks ist das bei Bedarf aber leicht zu ändern.</p>
+
+<p>Die Einsprungadresse zur Shape-Definition lautet 49185, zum Shape-Abbilden 49199 und zum Füllen 49227. Dazu muß in Speicherzelle 4 die X-Koordinate und in Speicherzelle 5 die Y-Koordinate abgelegt werden. Außerdem müssen die Speicherzellen 2 und 3 »ADR« im Low-/High-Byte-Format enthalten. In der Zelle 49258 steht »CHR« und in 49262 »COL«.</p>
+
+<address class="author">(R. Löwenstein/ah)</address>
+    </article>
+</body>
+</html>
