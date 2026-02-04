@@ -24,6 +24,15 @@
 
         <p>(mit Shift) für Merge ist auch, wie Vizawrite 64 die verschiedenen Codes, die von CHR$(0) bis CHR$(255) reichen können, auf dem Bildschirm darstellt. In Bild 1 ist ein Programm zum Erstellen einer sequentiellen Datei, die alle Codes von 0 bis 255 enthält, abgebildet. Bild 2 zeigt die Zeichen so, wie sie von Vizawrite 64 übernommen wurden. Die Zeichen sind dabei in einer Tabelle zusammengefaßt, die wegen des geringen Platzes einer Bildschirmseite hexadezimal organisiert ist. Links oben in der Tabelle steht das Zeichen mit dem Wert Null, rechts oben das mit Wert 15, links in der zweiten Zeile das mit Wert 16 und so fort. Rechts unten ist das Zeichen, das in Basic durch CHR$(255) ausgedruckt wurde, abgebildet. Man sieht neben den schon bekannten Buchstaben, Zahlen und Sonderzeichen auch noch einige unter Vizawrite 64 über die Tastatur nicht erreichbare Grafikzeichen, die man natürlich, wenn sie schon einmal vorhanden sind, auch weiterverwenden, sprich vervielfältigen und verschieben kann. Wir haben mit zwei solcher Zeichen den horizontalen und vertikalen Balken zur besseren Übersicht erzeugt. Aber Vorsicht, diese Zeichen dürfen nicht gelöscht werden, denn man kann sie mit der Tastatur nicht mehr neu erzeugen. Am besten legt man eine Kopie dieser Zeichen in die Arbeitsseite und kopiert sie dann nach Bedarf in den Text. Ein adäquater Ausdruck dieser Zeichen ist natürlich nur mit Commodore-Druckern oder entsprechenden Hardware-Interfaces für andere Drucker möglich.</p>
 
+        <figure>
+            <img src="162-1.png" alt="">
+            <figcaption>Bild 1. Das Basic-Programm zum Erzeugen der sequentiellen Datei mit allen Werten</figcaption>
+        </figure>
+        <figure>
+            <img src="162-2.png" alt="">
+            <figcaption>Bild 2. Die Tabelle aller über eine sequentielle Datei erreichbaren Zeichen</figcaption>
+        </figure>
+
         <p>Ein weiteres interessantes Detail ist aus dieser Tabelle ersichtlich, nämlich die Werte der Umlaute und des »ß«. Verwendet man diese Werte bei der Übernahme von sequentiellen Dateien in einer für Vizawrite 64 geeigneten Form, so kann man auch Umlaute direkt in Vizawrite 64 importieren und muß sie nicht mehr nachträglich in den eingeladenen Text aus einer sequentiellen Datei hineineditieren.</p>
 
         <p>Das oben besprochene Einsetzen von Datensätzen beim Ausdruck klappt nicht nur mit sequentiellen Dateien. Man kann auch mit Vizawrite 64 eine Adressendatei entwerfen und extra speichern. Diese Datei kann nun ebenfalls erst beim Ausdruck von Serienbriefen benutzt werden und damit für verschiedene Rundschreiben nützlich sein. Dazu ist im Druckermenü in der »Global/ Fill:«-Option ein »f« einzugeben und wieder der Dateiname unter »File:« einzusetzen. Um diese Funktion noch sinnvoller benutzen zu können, sollte man bei der Datendatei hinter jedem Datensatz (zum Beispiel einer vollständigen Adresse) eine Seitentrennung (mit CTRL und »p«) durchführen, so daß man dann genauso viele Seiten wie Datensätze hat. Denn nun kann man vor dem Ausdruck des entsprechenden Serienbriefes mit der so erstellten Datendatei genau den ersten und letzten, auszudruckenden Datensatz bestimmen. Wenn man beispielsweise die ersten drei Adressen weglassen und erst bei der vierten Adresse mit dem Serienbrief beginnen will, so setzt man vor dem Ausdruck im Druckermenü in die Option »Start-Page:« eine »4« ein. Ähnlich kann man das Ende des Ausdrucks des Serienbriefes bestimmen, in dem man die letzte zu druckende Adresse angibt. Will man zum Beispiel mit der zehnten Adresse aufhören Briefe zu drucken, so gibt man einfach unter »End-Page:« eine »10« ein.</p>
@@ -38,15 +47,42 @@
 
         <p>Fast alle Matrixdrucker haben einen Modus, in dem sie gesendete Zeichen nicht als Zeichen, sondern als Bitmuster interpretieren und ausdrucken. Damit kann man hochauflösende Grafik zu Papier bringen. Manchmal wäre es auch interessant nicht vorhandene Zeichen in einen Text einzufügen, wie zum Beispiel das Copyright-Zeichen oder ein Telefonsymbol. Das kann man auch mit Vizawrite 64 erledigen. Man benutzt dazu einfach die vorhandenen zehn frei definierbaren Sonderzeichen, sowie normale Buchstaben, sofern deren Werte nützlich für die gewünschte Grafik sind. Zwei Beispiele hierzu sind in Bild 3 erkennbar. Was auf dem Bildschirm ziemlich komisch aussieht, wird später beim Ausdruck ein durchaus gelungenes, neues Zeichen, wie das Bild 4 beweist. Zum Verständnis dieses Tricks ist es notwendig etwas näher auf die Entstehung des Commodore-Zeichens eingehen. Bei Epson und vergleichbaren Druckern gibt es den Befehl »ESC K«, der eine begrenzte Anzahl von nachfolgenden Zeichen als Bitmuster interpretiert und sie ensprechend in Einzelnadelgrafik umsetzt. In unserem Beispiel besteht das neue Zeichen aus insgesamt zehn Bitmustercodes. Beim Ausdruck wird zuerst das Sonderzeichen »0« gesendet und der Drucker in den obengenannten Bitmustermodus geschaltet. Danach</p>
 
+        <figure>
+            <img src="162-3.png" alt="">
+            <figcaption>Bild 3. So sehen die Definitionen von Grafikzeichen auf dem Bildschirm aus.</figcaption>
+        </figure>
+        <figure>
+            <img src="162-4.png" alt="">
+            <figcaption>Bild 4. Und das ist dann das Druckresultat</figcaption>
+        </figure>
+
         <p>folgen die Sonderzeichen »1« und »2«, die die Anzahl der Zeichen, die als Bitmuster gedruckt werden sollen, enthalten. Dabei wird das sogenannte High-Low-Verfahren benutzt, bei dem man eine Zahl in zwei Byte-Zahlen aufspaltet. Beispielsweise ergibt die Zahl 10 das High-Byte 0 und das Low-Byte 10, die Zahl 256 dagegen das High-Byte 1 und das Low-Byte 0 (quasi 0*256 + 10=10 oder 1*256+0 = 256). Das Low-Byte wird immer zuerst gesendet (in unserem Beispiel 10), gefolgt vom High-Byte mit dem Wert 0 als Inhalt. Nun folgen die eigentlichen 10 Bitmuster, die zusammengesetzt das neue Zeichen ergeben. Dabei wurden neben extra definierten Sonderzeichen auch normale Druckzeichen benutzt, da diese gemäß ASCII-Definition genau den richtigen Wert besitzen. Man spart sich damit die ohnehin nicht üppig vorhandenen Sonderzeichen und kann so größere Folgen realisieren, ohne eine neue Formatzeile einzusetzen und dort die Sonderzeichen 0 bis 9 neu zu belegen. Jedes beliebige Zeichen, ja sogar richtige Grafikzeilen lassen sich so erzeugen.</p>
 
         <p>Vizawrite 64 verwaltet neben den eigentlichen Textseiten und der Arbeitsseite noch zwei weitere Seiten, die Kopf- und Fußseite. Diese beiden Seiten enthalten Text, der zu Beginn und am Ende jeder Textseite gedruckt wird. Man kann diese Seiten mit dem »Go«-Befehl erreichen. Dazu drückt man einfach die CBM-Taste, gefolgt von der Taste »g«. Wenn man bei der nun folgenden Frage »Go to Page:« ein »h« eingibt, landet man in der Header- oder Kopfseite. Gibt man statt dem »h« ein »f« ein, kommt man in die Footeroder Fußseite. Zurück in die normalen Textseiten kann man auch mit dem GO-Befehl springen, man muß dann nur die Nummer der Seite angeben, in die man gelangen will. Der in der Kopfseite eingegebene Text wird nur dann zu Beginn jeder neuen Druckseite ausgedruckt, wenn man vorher im Druckermenü unmittelbar vor Beginn des Ausdruckes in der Option »Header:« ein »y« für »yes« eingegeben hat, sonst wird sie ignoriert. Der Inhalt der Fußseite wird dagegen immer ausgedruckt. Mit diesen beiden Seiten kann man ein Dokument beispielsweise oben und unten »einrahmen«, in dem man in diesen beiden Sonderseiten entsprechende Texte eingibt. Ein Beispiel hierzu zeigen die Bilder 5 und 6.</p>
+
+        <figure>
+            <img src="162-5.png" alt="">
+            <figcaption>Bild 5. Kopf- und Fußzeilen verschönern ein Dokument (Bildschirmdarstellung)</figcaption>
+        </figure>
+        <figure>
+            <img src="162-6.png" alt="">
+            <figcaption>Bild 6. Kopf- und Fußzeilen im fertigen Dokument (Ausdruck)</figcaption>
+        </figure>
 
         <p>Man kann aber speziell die Kopfseite noch für andere Zwecke nutzen. Wenn man beispielsweise eine mehrseitige Liste mit vielen Einzelspalten zu drucken hat, ist es unbedingt nötig am Anfang jeder neuen Seite vor dem eigentlichen Listenteil die Bedeutung der Spalten darüber anzugeben. Damit man diesen Teil nicht immer wieder neu pro Druckseite im Text halten muß, kann man ihn in die Kopfseite verbannen und die normalen Textseiten mit der eigentlichen Liste füllen. So läßt sich die Unterteilung der Liste in Druckseiten je nach Bedarf leichter umändern, man muß nur den Anfang und das Ende der Textseiten neu festlegen, die Bedeutungserklärung kommt dann automatisch für jede Seite erst beim Ausdruck hinzu.</p>
 
         <p>Hier gleich eine Warnung. Durch einen bekannten DOS-Fehler kommt es beim Abspeichern von Dateien immer wieder zu Fehlern, wenn dabei das Replace-Symbol benutzt wird (Beispiel: SAVE "@:name",8 löscht die alte Datei und schreibt dann die neue unter demselben Namen auf die Diskette zurück). Wenn man einen Vizawrite 64-Text, den man geladen und editiert hat, unter dem gleichen Namen zurückspeichert, so wird von Vizawrite 64 eben diese fehlerhafte DOS-Routine benutzt. Vermeiden kann man dies, indem man dem Text vor dem Abspeichern mittels CBM und »n« einen anderen Namen gibt, oder indem man den Text auf eine andere Diskette speichert. Man kann beispielsweise ständig zwischen Vorder und Rückseite einer Diskette hin- und herpendeln und hat so immer die Gewißheit, daß eine Version sicher gespeichert ist. Man muß nur vor dem Speichern der neuesten Version immer die gerade älteste mit der DISK-Routine von Vizawrite 64 löschen (Aufruf mit CBM und »d«, dann Eingabe eines DOS-Befehls wie »s:name« zum Löschen der Datei »name« auf der Diskette). Dieser Fehler tritt übrigens nicht mehr auf, wenn man das 64’er-DOS, das wir in dieser Ausgabe veröffentlichen, besitzt.</p>
 
         <p>Die gerade genannte Routine kann man aber nicht nur zum Senden von Floppy-Befehlen gebrauchen. Tippt man hier statt eines DOS-Befehls ein »$« ein, so bekommt man das Disketteninhaltsverzeichnis gezeigt. Man kann hier auch Teile des Inhaltsverzeichnisses anzeigen lassen. Wenn man beispielsweise »$artikel*« eingibt, bekommt man alle Dateien gezeigt, die mit »artikel« anfangen. Auch lassen sich solche Directory-Ausschnitte in den Text mit der Merge-Funktion übernehmen. Nach dem Drücken der CBM-Taste, gefolgt von »M« (mit Shift), werden nach oben gezeigter Eingabe »$artikel*« wieder nur all jene Dateinamen übernommen, die mit »artikel« anfangen. Die Bilder 7 und 8 zeigen das genannte Beispiel.</p>
+
+        <figure>
+            <img src="162-7.png" alt="">
+            <figcaption>Bild 7. Die Übernahme eines Directorys in den Textspeicher von Vizawrite 64.</figcaption>
+        </figure>
+        <figure>
+            <img src="162-8.png" alt="">
+            <figcaption>Bild 8. Und hier nur ein ausgesuchter Teil des Directorys</figcaption>
+        </figure>
 
         <p>Wer sich darüber ärgert, daß der Replace-Befehl mit zunehmender Textlänge immer länger braucht, um ein Vorkommnis zu ersetzen, der sollte den Text mit der Taste CTRL und »p« in mehrere, einzelne Textseiten unterteilen. Der Replace-Befehl springt dann nämlich über die schon abgearbeiteten Textseiten schnell hinweg und durchsucht nur die gerade angebrochene Textseite Wort für Wort.</p>
 
@@ -55,6 +91,11 @@
         <p>Manchmal ist es notwendig, gerade zum Korrigieren von Textfahnen, zwischenjede Druckzeile eine oder mehrere Leerzeilen zu setzen, damit man genügend Platz zum Verbessern hat. Um dies zu erreichen, genügt es in der Formatzeile gleich hinter dem Formatzeichen in der zweiten Spalte die Anzahl von Zeilenvorschüben anzugeben. Die Eingabe einer »1« bedeutet dabei einfachen Zeilenvorschub, also keinerlei Änderung gegenüber dem normalen Ausruck. Gibt man jedoch eine »2« oder »3« an, so führt das zu zwei- oder dreifachem Zeilenvorschub am Ende jeder Druckzeile und damit zu einer oder zwei Leerzeilen zwischen jeder Zeile.</p>
 
         <p>Und noch ein kleiner Tip. Im Ausland wird zur Darstellung gebrochener Zahlen ein Punkt zwischen ganz- und gebrochen-rationalem Teil gesetzt (Beispiel: 12.34). In Deutschland wird dazu aber das Komma verwendet. Vizawrite 64 schreibt bei der Verwendung des Dezimaltabulators solche Zahlen genau mit dem Dezimalpunkt untereinander, wobei aber auch das Komma als Trennzeichen akzeptiert wird. Das Bild 9 zeigt einige Beispielzahlen und deren Wirkungen.</p>
+
+        <figure>
+            <img src="162-9.png" alt="">
+            <figcaption>Bild 9. Beispiele für den Zahlentabulator</figcaption>
+        </figure>
 
         <h2>Wer kennt »Vizaspell«?</h2>
 
