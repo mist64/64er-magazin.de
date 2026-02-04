@@ -64,6 +64,10 @@
 
         <p>Geben sie einmal folgende kleine Basic-Zeile sorgfältig ein.</p>
 
+        <figure>
+            <pre data-filename="engl.f.fortg." data-name="Englisch für Fortgeschrittene"></pre>
+        </figure>
+
         <p>Wenn Sie die Zeile listen, sehen Sie nichts Ungewöhnliches. Löschen Sie nun das Anführungszeichen hinter der REM-Anweisung und listen Sie die Zeile. Mehr wird hier nicht verraten. Lassen Sie sich überraschen!</p>
 
         <address class="author">(Yves Forkl/tr)</address>
@@ -132,6 +136,198 @@
 
         <address class="author">(Bergerhoff/Nikolas/tr)</address>
 
+        <figure>
+            <pre data-filename="pseudo-scroll.prg" data-name="HiRes-Scrolling" data-mse=mse1></pre>
+            <figcaption>Listing 1. Das Stenoprogrmm zum HiRes-Scrolling. Bitte mit dem MSE eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="pseudo-scroll.prg" data-name="HiRes-Scrolling"></div>
+
+        <figure>
+            <pre data-filename="scroll-demo" data-name="HiRes-Scrolling Demo"></pre>
+            <figcaption>Listing 2. Ein Demo-Programm zum HiRes-Scrolling.</figcaption>
+        </figure>
+
+        <figure>
+            <pre>
+100  -.BA$C000
+110  -;
+120  -; *********************
+130  -; **  PSEUDO-SCROLL  **
+140  -; **-----------------**
+150  -; **   (C) 1985 BY   **
+160  -; **   N.BERGERHOFF  **
+170  -; **   MEISENWEG 22  **
+180  -; **  5020 FRECHEN 4 **
+190  -; *********************
+200  -;
+210  -.GL V=53248        ;VIC-ADRESSE
+220  -.GL SATZ=53248     ;ZEICHENSATZ
+230  -.GL ZIEL=14336     ;ZIEL-ADRESSE
+240  -.GL IRQVEC=$0314   ;IRQVECTOR
+250  -.GL CHKOM=$AEFD    ;KOMMA?
+260  -.GL GETBYT=$B79E   ;BYTE HOLEN
+270  -.GL ZDEF=ZIEL+704  ;NEUES ZEICHEN
+280  -.GL IRQALT=$EA31   ;ALTE ROUTINE
+290  -;
+300  -INIT      SEI            ;KEIN INTERRUPT
+310  -          LDA $01        ;REG.1
+320  -          PHA            ;RETTEN
+330  -          AND #251
+340  -          STA $01        ;
+350  -          LDA #&gt;(SATZ)   ;HIGH-BYTE
+360  -          STA $03        ;MERKEN
+370  -          LDA #&gt;(ZIEL)   ;NOCHMAL FUER
+380  -          STA $05        ;DAS ZIEL
+390  -          LDY #00
+400  -          STY $02        ;LOW-BYTES
+410  -          STY $04        ;LOESCHEN
+420  -          LDX #$10
+430  -COPY      LDA (02),Y     ;LADEN UND
+440  -          STA (04),Y     ;KOPIEREN
+450  -          INY
+460  -          BNE COPY
+470  -          INC $03        ;HIGH-BYTES
+480  -          INC $05        ;ERHOEHEN
+490  -          DEX
+500  -          BNE COPY
+510  -          PLA            ;VOM STACK
+520  -          STA $01        ;ZURUECKHOLEN
+530  -          LDA V+24
+540  -          ORA #14        ;NEUER
+550  -          STA V+24       ;ZEICHENSATZ
+560  -          CLI
+570  -          LDA #08        ;K/G SCHRIFT
+580  -          JSR $FFD2      ;BLOCKIEREN
+590  -IN        LDX #40
+600  -          LDY #00
+610  -IN1       LDA DEF,X      ;NEUE ZEICHEN-
+620  -          STA ZDEF,Y     ;DEFINITION
+630  -          INX
+640  -          INY
+650  -          CPY #08
+660  -          BNE IN1
+670  -          LDA #05
+680  -          STA $FA        ;MERKER1
+690  -          LDA #00
+700  -          STA $FE        ;MERKER2
+710  -          RTS
+720  -;
+730  -AN        JSR IN
+740  -          JSR CHKOM      ;KOMMA?
+750  -          JSR GETBYT     ;BYTE HOLEN
+760  -          STX SPEED      ;MERKEN
+770  -          JSR CHKOM
+780  -          JSR GETBYT     ;VIDEQRAM MIT
+790  -          CPX #00        ;88 FUELLEN?
+800  -          BNE A0
+810  -          JSR FULL       ;JA
+820  -A0        JSR CHKOM
+830  -          JSR GETBYT
+840  -          CPX #00        ;HOCH?
+850  -          BNE A1
+860  -          SEI            ;JA
+870  -          LDA #&lt;(IRQ1)
+880  -          LDY #&gt;(IRQ1)
+890  -          STA IRQVEC
+900  -          STY IRQVEC+1
+910  -          CLI
+920  -          RTS
+930  -A1        SEI            ;RUNTER
+940  -          LDA #&lt;(IRQ2)
+950  -          LDY #&gt;(IRQ2)
+960  -          STA IRQVEC
+970  -          STY IRQVEC+1
+980  -          CLI
+990  -          RTS
+1000  -;
+1010  -FULL      LDX #00        ;VIDEORAM
+1020  -          LDA #88        ;MIT 88
+1030  -F1        STA 1024,X     ;AUFFUELLEN
+1040  -          INX
+1050  -          BNE F1
+1060  -F2        STA 1280,X
+1070  -          INX
+1080  -          BNE F2
+1090  -F3        STA 1536,X
+1100  -          INX
+1110  -          BNE F3
+1120  -F4        STA 1768,X
+1130  -          INX
+1140  -          BNE F4
+1150  -          RTS
+1160  -;
+1170  -IRQ1      JSR TIME       ;IST ZEIT
+1180  -          BNE BACK       ;ERREICHT?
+1190  -          INC $FA
+1200  -          LDX $FA
+1210  -          CPX #11
+1220  -          BNE IR1
+1230  -          LDA #03
+1240  -          TAX
+1250  -          STA $FA
+1260  -IR1       JMP WEITER
+1270  -;
+1280  -IRQ2      JSR TIME       ;IST ZEIT
+1290  -          BNE BACK       ;ERREICHT?
+1300  -          DEC $FA
+1310  -          LDX $FA
+1320  -          CPX #$FF
+1330  -          BNE WEITER
+1340  -          LDA #07
+1350  -          TAX
+1360  -          STA $FA
+1370  -WEITER    LDY #00
+1380  -          TXA
+1390  -          ASL            ;
+1400  -          ASL            ; MAL 8
+1410  -          ASL            ;
+1420  -          TAX
+1430  -W1        LDA DEF,X      ;LADEN UND NEU
+1440  -          STA ZDEF,Y     ;DEFINIEREN
+1450  -          INX
+1460  -          INY
+1470  -          CPY #08
+1480  -          BNE W1
+1490  -BACK      JMP IRQALT     ;ALTE ROUTINE
+1500  -;
+1510  -TIME      INC $FE
+1520  -          LDA $FE
+1530  -          CMP SPEED
+1540  -          BEQ T1
+1550  -          LDA #10
+1560  -          RTS
+1570  -T1        LDA #00
+1580  -          STA $FE
+1590  -          RTS
+1600  -;
+1610  -AUS       SEI
+1620  -          LDA #$31       ;ALTE VECTOREN
+1630  -          LDY #$EA
+1640  -          STA IRQVEC     ;HERSTELLEN
+1650  -          STY IRQVEC+1
+1660  -          CLI
+1670  -          RTS            ;ZURUECK
+1680  -;
+1690  -SPEED     .BY 0,0
+1700  -;
+1710  -; **** ZEICHENDEFINITIONEN ****
+1720  -;
+1730  -DEF       .BY 60,60,24,0,0,0,0,24
+1740  -.BY 60,24,0,0,0,0,24,60
+1750  -.BY 24,0,0,0,0,24,60,60
+1760  -.BY 0,0,0,0,24,60,60,24
+1770  -.BY 0,0,0,24,60,60,24,0
+1780  -.BY 0,0,24,60,60,24,0,0
+1790  -.BY 0,24,60,60,24,0,0,0
+1800  -.BY 24,60,60,24,0,0,0,0
+1810  -.BY 60,60,24,0,0,0,0,24
+1820  -.BY 60,24,0,0,0,0,24,60
+1830  -.BY 24,0,0,0,0,24,60,60
+</pre>
+            <figcaption>HiRes-Scrolling Quelltext</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="quelltext.prg" data-name="HiRes-Scrolling Quelltext"></div>
+
         <h2>1520-Plotter als vollwertiger Drucker</h2>
 
         <p>Dieses kleine Programm (Listing 3) schicktalle Druckausgaben, die zur Geräteadresse 4 gesendet werden, automatisch zum 1520-Plotter mit der Geräteadresse 6. Das heißt, daß fertige Programme nicht mehr mühselig nach OPEN-Befehlen durchkämmt werden müssen, um die Druckerausgaben entsprechend umzulenken. Weiterhin wird der Plotter automatisch auf Kleinschrift gestellt, wenn diese am C 64 eingeschaltet ist.</p>
@@ -143,9 +339,16 @@
 
         <address class="author">(N.J.W. Cuppen/tr)</address>
 
-        <p>TODO ASIDE<br>
-            Kalauer des Monats:<br>
-            »God Save the Queen Komma acht Komma eins!«</p>
+        <figure>
+            <pre data-filename="1520 als drucker" data-name="1520-Plotter als Drucker"></pre>
+            <figcaption>Listing 3. Der 1520-Plotter als vollwertiger Drucker.</figcaption>
+        </figure>
+
+        <aside>
+            <p>
+                Kalauer des Monats:<br>
+                »God Save the Queen Komma acht Komma eins!«</p>
+        </aside>
     </article>
 </body>
 

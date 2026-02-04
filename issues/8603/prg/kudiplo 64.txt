@@ -1,0 +1,282 @@
+
+
+;kudiplo 64.prg ==0801==
+  100 rem***********kudiplo**************
+  110 rem funktion diskutieren + plotten
+  120 rem  mit c-64 und  plotter vc-1520
+  130 rem
+  140 rem          juergen curdt
+  150 rem         kessemeierweg 5
+  160 rem           493 detmold
+  170 rem
+  180 rem********************************
+  190 poke53280,11:poke53281,11:af=11
+  200 :
+  210 rem parameter und variable lesen
+  220 :
+  230 ein=49152:of=49410:an=49234:cl=49182:fb=49203
+  240 f$="sin(x)+ sin(x*2)"
+  250 deffnf(x)=sin(x)+ sin(x*2)
+  260 deffnf1(x)=(fnf(x+1e-4)-fnf(x-1e-4))/2e-4
+  270 deffnf2(x)=(fnf1(x+1e-4)-fnf1(x-1e-4))/2e-4
+  280 xu=-4:xo= 4:yu=-4:yo= 4:oy= 0
+  290 xn= 280:yn= 0
+  300 xe=(xo-xu)/16:ye=(yo-yu)/16:xw=xu
+  310 print"{clr}{blk}"tab(81)"funktionen plotten und diskutieren mit"
+  320 print"    c 64 und printer-plotter vc-1520            oder bildschirmausgabe
+  330 fori=0to39:print"{CBM-O}";:next:print
+  335 :
+  340 rem    eingabe der funktion
+  345 :
+  350 printspc(120)"als funktion wird dargestellt:"
+  360 x=5:y=15:gosub2370:print"{wht}y=";f$
+  370 printtab(160):ifpeek(49152)+peek(49153)=62then400
+  380 printtab(5)"{wht}ein wenig geduld bitte !"
+  390 gosub5000:syscl
+  395 load"hc epson*",8,1
+  400 print"{up}{blk}soll die funktion veraendert werden ?":printtab(57)"j/n"
+  410 gete$:ife$="n"then590
+  420 ife$<>"j"then410
+  430 print"{clr}{blk}"tab(80)"bitte die funktion eingeben oder aendern"
+  440 fori=0to39:print"{SHIFT-*}";:next:print
+  450 print"wenn die funktion im divisor den{$a0}faktor x enthaelt, sollte der ganze ";
+  460 print"divisor in         klammern gesetzt werden.":print
+  470 fori=0to39:print"{CBM-O}";:next:print
+  480 x=5:y=16:gosub2370:print"{wht}y=  "f$;
+  490 printtab(243)"eingabe in ueblicher basic-syntax
+  500 x=7:gosub2370:inputf$
+  510 print"{clr}"tab(240)tab(250)"{blk}moment bitte !"
+  520 print"{home}{gry1}240f$="chr$(34)f$chr$(34)"
+  530 print"250deffnf(x)="f$"
+  540 print"280 xu="xu"{left}:xo="xo"{left}:yu="yu"{left}:yo="yo"{left}:oy="oy
+  550 print"1390y="f$":goto1410"
+  560 print"2260y="f$":goto2280"
+  570 print"290 xn="xn"{left}:yn="yn:print"sv="sv"{left}:bs="bs"{left}:af="af"{left}:goto220{down}{down}"
+  580 poke631,19:fori=632to640:pokei,13:next:poke198,9:end
+  590 print"{clr}{blk}"tab(120)"die parameter fuer die darstellung:"
+  600 printtab(120)"unterster x-wert: {wht}"xu
+  610 printtab(80)"{blk}oberster  x-wert: {wht}"xo
+  620 printtab(120)"{blk}unterster y-wert: {wht}"yu
+  630 printtab(80)"{blk}oberster  y-wert: {wht}"yo
+  640 printtab(120)"{blk}sollen die parameter veraendert werden ?":printtab(17)"j/n"
+  650 gete$:ife$="n"then820
+  660 ife$<>"j"then650
+  670 print"{wht}";:syscl:bs=0:sv=0
+  680 x=16:y=7:gosub2370:inputxu
+  690 x=16:y=10:gosub2370:inputxo
+  700 xe=(xo-xu)/16:ifxe<=0then680
+  710 ifsgn(xu)=sgn(xo)thenxn=80:goto730
+  720 xn=abs(xu)*25/xe+80
+  730 x=16:y=14:gosub2370:inputyu
+  740 x=16:y=17:gosub2370:inputyo
+  750 ye=(yo-yu)/16:ifye=<0then730
+  760 rem achsenschnittpunkt berechnen
+  770 ifsgn(yu)<>sgn(yo)then800
+  780 ifyo<=0thenyn=200:oy=abs(yo*25/ye)+200:goto810
+  790 ifyu>=0thenyn=-200:oy=-200-yu*25/ye:goto810
+  800 yn=abs(yu)*25/ye-200:oy=yn
+  810 goto590
+  815 :
+  820 rem hauptmenue
+  825 :
+  830 print"{clr}{blk}";:fori=0to39:print"C";:next
+  840 print"{wht}  y="f$:print"  im bereich von x="xu" bis x="xo
+  850 print"  skaleneinheit auf dem bildschirm:
+  860 print"  x-achse "xe*2,"y-achse "ye*2
+  870 print"{blk}";:fori=0to39:print"C";:next
+  880 print"{blk}die ausgabe erfolgt auf dem ";
+  890 ifaf=10thenprint"{rvon}  plotter  {rvof}":goto910
+  900 print"{rvon}bildschirm {rvof}"
+  910 print"{wht}w{blk}echsel des ausgabegeraetes           {wht}w{blk}"
+  920 fori=0to39:print"C";:next
+  930 printtab(51)"{wht}welche aufgabe ?
+  940 printtab(40)"{wht}z{lgrn}eichnen  der  funktion"tab(38)"{wht}z"
+  950 printtab(40)"k{lgrn}urvendiskussion ausgeben"tab(38)"{wht}k"
+  960 printtab(40)"p{lgrn}arameter aendern"tab(38)"{wht}p"
+  970 printtab(40)"f{lgrn}unktion  aendern"tab(38)"{wht}f"
+  980 printtab(40)"u{lgrn}mschalten auf  grafikbildschirm"tab(38)"{wht}u"
+  990 printtab(40)"l{lgrn}oeschen des  grafikbildschirms"tab(38)"{wht}l"
+ 1000 printtab(40)"h{lgrn}ardcopy des grafikbildschirms"tab(38)"{wht}h"
+ 1010 poke198,0:sys62255
+ 1020 geta$:ifa$<>"w"then1050
+ 1030 ifaf<>11thenaf=11:goto820
+ 1040 ifaf<>10thenaf=10:goto820
+ 1050 ifa$<>"z"then1080
+ 1060 ifaf=10then1160
+ 1070 sysein+3:sysfb,27:goto2020
+ 1080 ifa$="f"then310
+ 1090 ifa$="l"thensyscl:bs=0:goto1020
+ 1100 ifa$="k"thenprint"{clr}":gosub1480:goto820
+ 1110 ifa$="u"thensysein+3:sysfb,27:goto2320
+ 1120 ifa$="h"thensysein+3:sysfb,27:gosub2520:sysof:goto820
+ 1130 ifa$<>"p"then1020
+ 1140 print"{clr}";
+ 1150 syscl:goto590
+ 1155 :
+ 1160 rem  kreuz plotten
+ 1165 :
+ 1170 open1,6,1:open2,6,2:open3,6,3:open10,6
+ 1180 ifsvthen1330
+ 1190 print#3,0:print#2,1
+ 1200 print#10:print#1,"m";0;-440:print#1,"m";0;-200:print#10
+ 1210 print#1,"m";80;yn:fori=0to14step2
+ 1220 print#1,"i":print#1,"r";0;4:print#1,"j";0;-4
+ 1230 print#1,"r";-12;-14
+ 1240 print#10,int((xe*i+xu)*100+.5)/100;
+ 1250 print#1,"m";80+i*25;yn:print#1,"d";80+(i+2)*25;yn
+ 1260 next:print#1,"m";75+i*25;yn-4:print#10,">";
+ 1270 print#1,"m";xn;-200
+ 1280 fori=0to14step2:print#1,"i":print#1,"r";4;0
+ 1290 print#1,"j";-4;0:print#1,"r";-30;-4
+ 1300 j=yu+int(ye*100*i+.5)/100:ifj<>0thenprint#10,j;
+ 1310 print#1,"m";xn;i*25-200:print#1,"d";xn;(i+2)*25-200
+ 1320 next:print#1,"m";xn-5;i*25-209:print#3,1:print#10,"^";
+ 1325 :
+ 1330 rem kurve plotten
+ 1335 :
+ 1340 print"{clr}{blk}"tab(250)"etwas geduld bitte":print#2,sv+3
+ 1350 e$="m":xw=xu:ifxu=0thenxw=1e-6
+ 1360 gosub2340
+ 1370 j=(xo-xu)/400:fori=0to400
+ 1380 x=j*i+xw
+ 1390 y=sin(x)+ sin(x*2):goto1410
+ 1400 e$="m":goto1440
+ 1410 y=y/ye*25+oy
+ 1420 ify>210ory<-210thene$="m":goto1440
+ 1430 print#1,e$;i+80;y:e$="d"
+ 1440 next:gosub2350
+ 1450 print#1,"m";0;180-sv*20:print#3,1:print#10,"y="f$;
+ 1460 print#1,"m";0;-250
+ 1470 sv=sv+1:sys62255:goto820
+ 1480 rem       kurvendiskussion ausgeben
+ 1490 open1,6,1:open2,6,2:open3,6,3:open10,6:open11,3
+ 1500 ifaf=10thenprint#1,"m";0;180-sv*25:print#3,0
+ 1510 print"{clr}funktion:":printtab(6)"y="f$
+ 1520 print#af
+ 1530 print#af,"kurvendiskussion  von x="xu"bis x="xo:print#af
+ 1540 print#af,"  nullstellen:"
+ 1550 s1=xe/5:gosub2340
+ 1560 a=fnf(xu-1e-4)
+ 1570 forx=xu+s1toxosteps1
+ 1580 f=fnf(x)
+ 1590 ifsgn(f)=sgn(a)then1720
+ 1600 s=x-s1:z=x:c=x-s1/2
+ 1610 fc=fnf(c)
+ 1620 fz=fnf(z)
+ 1630 ifsgn(fc)<>sgn(fz)thens=c:goto1650
+ 1640 z=c
+ 1650 c=(s+z)/2
+ 1660 ifabs(z-s)>1e-6then1610
+ 1670 fd=fnf1(c)
+ 1680 ifabs(fc)<1e-4then1710
+ 1690 ifabs(fd)>1e3thenprint#af,"  sprung bei x="int(c*1e4+.5)/1e4:goto1720
+ 1700 goto1610
+ 1710 print#af,tab(6)int(c*1e4+.5)/1e4;"/0","f'=";int((fd)*1e4+.5)/1e4
+ 1720 a=f
+ 1730 nextx
+ 1740 print#af,"  extrema:":xw=xu
+ 1750 a=fnf1(xw)
+ 1760 forx=xu+s1toxosteps1
+ 1770 f=fnf1(x)
+ 1780 ifsgn(f)=sgn(a)then1940
+ 1790 s=x-s1:z=x:c=x-s1/2
+ 1800 fc=fnf1(c)
+ 1810 fz=fnf1(z)
+ 1820 ifsgn(fc)<>sgn(fz)thens=c:goto1840
+ 1830 z=c
+ 1840 c=(s+z)/2
+ 1850 ifabs(z-s)>1e-5then1800
+ 1860 ifabs(fc)<1e-2then1880
+ 1870 goto1950
+ 1880 fd=fnf2(c)
+ 1890 ifabs(fd)<1e-5thenprint#af,"      sattel";:goto1920
+ 1900 iffd>0thenprint#af,"      min.";:goto1920
+ 1910 iffd<0thenprint#af,"      max.";
+ 1920 fa=fnf(c):goto1930
+ 1930 print#af,tab(7)int(c*1e4+.5)/1e4"/"int(fa*1e4+.5)/1e4:goto1950
+ 1940 ifabs(f)<1e-6thenc=x:goto1890
+ 1950 a=f:nextx:gosub2350:poke198,0:ifaf<>10then2000
+ 1960 print#1,"m";0;-275
+ 1970 printtab(15)"{rvon} fertig {rvof}{down}"
+ 1980 print" in das gleiche achsenkreuz kann keine"
+ 1990 print"  weitere funktion geplottet werden !":wait198,1:goto820
+ 2000 printtab(10)"{rvon}ende der ausgabe{rvof}":sys62255:wait198,1:return
+ 2010 :
+ 2020 rem ausgabe auf bildschirm
+ 2030 :
+ 2040 rem y-achse-zeichnen bs
+ 2050 yk=(200-yn)*.5:ifyk<0thenyk=0
+ 2060 ifyk>199thenyk=199
+ 2070 ifbsthen2230
+ 2080 bs=1:xk=(xn-80)*.5+60
+ 2090 fory=0to199:sysan,xk,y:next
+ 2100 un=xk-2
+ 2120 fori=0to7
+ 2130 forj=untoun+5:sysan,j,i*25:nextj,i
+ 2140 un=yk-3:ifun<0thenun=0
+ 2150 ifun+5>199thenun=194
+ 2160 forx=60to259:sysan,x,yk:next
+ 2170 fori=0to8:forj=untoun+5
+ 2180 sysan,i*25+60,j
+ 2190 nextj,i
+ 2200 :
+ 2210 rem kurve zeichnen bs
+ 2220 :
+ 2230 gosub2340:xw=xu:ifxw=0thenxw=1e-6
+ 2240 j=(xo-xu)/200:yk=100-oy/2
+ 2250 fori=1to200:x=j*i+xw
+ 2260 y=sin(x)+ sin(x*2):goto2280
+ 2270 goto2310
+ 2280 y=yk-y/ye*12.5
+ 2290 ify<0ory>199then2310
+ 2300 sysan,i+60,y
+ 2310 next:gosub2350
+ 2320 poke198,0:wait198,1:sysof:goto820
+ 2330 rem up fehlerroutine ein- aus
+ 2340 poke768,23:poke769,193:return
+ 2350 poke768,139:poke769,227:return
+ 2360 rem up  cursor positionieren
+ 2370 poke211,x:poke214,y:sys58732:return
+ 2380 :
+ 2500 rem up hardcopy drucken
+ 2510 :
+ 2520 sys62255
+ 2530 rem einsprung in das mp hardcopy:
+ 2540 sys49440,8192,3
+ 2550 sys62255:sysof
+ 2555 rem hardcopy beschriften:
+ 2560 open1,4:print#1:print#1
+ 2565 print#1,"    funktion: y="f$
+ 2570 print#1,"    skaleneinheit auf der x-achse:"xe*2
+ 2580 print#1,"                          y-achse:"ye*2
+ 2590 print"{clr}"tab(240)" soll die kurvendiskussion ausgedruckt
+ 2600 printtab(55)"werden ?":printtab(57)"j/n"
+ 2610 geta$:ifa$="n"then2640
+ 2620 ifa$<>"j"then2610
+ 2630 af=1:gosub1510:af=11
+ 2640 sys62255:return
+ 5000 :
+ 5010 rem erstellen des mp. feingrafik
+ 5020 :
+ 5030 fori=49152to49429
+ 5040 readx:pokei,x:next
+ 5050 data32,30,192,173,17,208,141,17,193,173,24,208,141,18,193,169,59,141,17
+ 5060 data208,169,24,141,24,208,162,16,76,57,192,160,0,162,32,132,253,134,254
+ 5070 data152,234,145,253,200,208,251,230,254,202,208,246,96,32,253,174,32,158
+ 5080 data183,160,0,169,4,132,253,133,254,138,162,4,145,253,200,208,251,230,254
+ 5090 data202,208,246,96,169,128,44,169,0,133,151,32,253,174,32,235,183,224,200
+ 5100 data176,238,165,21,201,1,144,8,208,230,165,20,201,64,176,224,138,74,74
+ 5110 data74,10,168,185,200,192,141,20,193,185,201,192,141,21,193,138,41,7,24
+ 5120 data109,20,193,141,20,193,165,20,41,248,141,19,193,24,169,0,109,20,193
+ 5130 data133,253,169,32,109,21,193,133,254,24,165,253,109,19,193,133,253,165
+ 5140 data254,101,21,133,254,165,20,41,7,73,7,170,189,250,192,160,0,36,151,16
+ 5150 data5,73,255,49,253,44,17,253,145,253,96,0,0,64,1,128,2,192,3,0,5,64,6
+ 5160 data128,7,192,8,0,10,64,11,128,12,192,13,0,15,64,16,128,17,192,18,0,20
+ 5170 data64,21,128,22,192,23,0,25,64,26,128,27,192,28,0,30,1,2,4,8,16,32,64
+ 5180 data128,173,17,193,141,17,208,173,18,193,141,24,208,76,68,229,0,0,0,0,0
+ 5190 rem erstellen fehlerroutine
+ 5200 fori=49431to49439:readx:pokei,x:next
+ 5210 data138,48,3,76,59,169,76,116,164
+ 5220 return
+ 5230 rem             ende
+
