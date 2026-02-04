@@ -1,0 +1,56 @@
+
+
+;laufschrift.prg ==0801==
+    0 poke53272,23:poke53280,0:poke53281,0
+   50 print"{clr}{down}{down}{down}{down}{wht}Lese Daten ein.....Bitte warten Sie....."
+   60 fori=56256to56295:pokei,1:next
+ 8999 rem **** maschinensprache ****
+ 9000 data120,169,31,141,20,3,169,192,141,21,3,173,17,208,41,127,141,17,208,169
+ 9010 data186,141,18,208,169,129,141,26,208,88,96,173,25,208,141,25,208,48,7,173
+ 9020 data13,220,88,76,49,234,173,84,195,201,6,240,16:rem_laenge 1.unterprg.
+ 9040 data169,6,141,84,195,169,1,141,18,208
+ 9041 data32,0,193,76,188,254
+ 9090 data169,0,141,84,195,169,231,141,18,208
+ 9091 data169,200,141,22,208,76,188,254
+ 9210 data120,169,49,141,20,3,169,234,141,21,3,169,240,141,26,208,88,96
+ 9300 fori=49152to49256:readq:pokei,q:next
+ 9400 data174,251,3,202,142,251,3,142,22,208,224,255,240,1,96,162,7,142,251,3
+ 9410 data142,22,208,162,0,189,193,7,157,192,7,232,224,39,208,245,174,250,3,232
+ 9420 data142,250,3,189,0,194,141,231,7,96
+ 9500 fori=49408to49457:readq:pokei,q:next:poke1019,0:poke1018,0
+ 9999 print"{clr}"
+10000 print"{yel}  Laufschriftgenerator {wht}von s.Goebbels":print"{down}{down}{down}{wht}Menue:"
+10001 print"{down}{down}-1- Erstellen der Laufschrift"
+10002 print"{down}-2- Ansehen der Schrift"
+10003 print"{down}-3- Speichern (Disk)"
+10004 print"{down}-4- Aendern des Textes"
+10005 input"{down}{down}Ihre Wahl ";a
+10006 ifa=1thensys49239:poke53270,200:goto20000
+10007 ifa=2thenpoke1018,0:print"{clr}":sys49152:goto10000
+10008 ifa=3thensys49239:poke53270,200:goto30000
+10009 ifa=4thensys49239:poke53270,200:goto40000
+10010 goto9999
+20000 print"{clr}{wht}Der Text darf max. etwas laenger als 6"
+20001 print"{down}Zeilen sein. (max. 256 Zeichen)"
+20002 print"{down}Wenn Sie den Text eingegeben haben,"
+20003 print"{down}Druecken Sie bitte Return."
+20004 input"{down}Text ";a$:a$="":gosub48000:goto9999
+30000 print"{clr}":input"Filenamen ";a$:ifa$=""then30000
+30001 print"{down}Bitte warten..."
+30009 open1,8,1,a$
+30010 print#1,chr$(0);chr$(192);:fori=49152to49664+255:w=peek(i)
+30020 print#1,chr$(w);:nexti:close1
+30030 print"{down}Das eben erzeugte Programm koennen Sie"
+30031 print"{down}spaeter absolut laden und mit SYS49152"
+30032 print"{down}aktivieren."
+30033 printtab(32)"Return"
+30034 geta$:ifa$=""then30034
+30035 goto9999
+40000 print"{clr}Sie koennen den unten stehenden Text"
+40001 print"{down}aendern. Achten Sie jedoch auf das auto-"
+40002 print"matische Zeilenscrolling. Druecken Sie"
+40003 print"{down}{cyn}RETURN{wht} um zu enden."
+40004 fori=0to255:poke1344+6+i,peek(49664+i):next
+40005 print"{home}{down}{down}{down}{down}{down}{down}{down}":input"Text ";a$:gosub48000:goto9999
+48000 fori=0to255:poke49664+i,peek(1024+i+8*40+6):next:return
+

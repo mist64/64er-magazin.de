@@ -1,0 +1,393 @@
+
+
+;umformer print-s.prg ==0801==
+   10 v=53248
+   20 pokev+21,0 : pokev+29,0 : pokev+23,0 : pokev+16,0
+   30 printchr$(142);chr$(8)
+   40 poke53280,11:poke53281,12:poke646,0
+   50 print"{clr}{rvon}           print-shop-umformer          {rvof}";
+   60 print"{rvon}                                        {rvof}";
+   70 print"{rvon}        von andreas nothaft 1985        {rvof}";
+   80 print"{down}{down} {rvon} 0 {rvof} - programm-ende"
+   90 print"{down} {rvon} 1 {rvof} - informationen"
+  100 print"{down} {rvon} 2 {rvof} - directory anzeigen"
+  110 print"----------------------------------------";
+  120 print" {rvon} 3 {rvof} - 1 hires-sprite "
+  130 print"{down} {rvon} 4 {rvof} - 1 multi-c-sprite (normalgroesse)"
+  140 print"{down} {rvon} 5 {rvof} - 2 hires-sprites (nebeneinander)"
+  150 print"{down} {rvon} 6 {rvof} - 2 hires-sprites (uebereinader)"
+  160 print"{down} {rvon} 7 {rvof} - 4 hires-sprites"
+  170 getg$:ifg$=""then170
+  180 if g$="0" then 270
+  190 if g$="1" then 310
+  200 if g$="2" then 3730
+  210 if g$="3" then 520
+  220 if g$="4" then 910
+  230 if g$="5" then 1810
+  240 if g$="6" then 2140
+  250 if g$="7" then 2600
+  260 goto 170
+  270 print"{clr}{down}sind sie sicher ??? (j/n)"
+  280 get g$:ifg$="" then 280
+  290 ifg$="j" then sys 64738
+  300 run
+  310 rem ******************************
+  320 rem *****   informationen    *****
+  330 rem ******************************
+  340 a$="informationen":gosub3090
+  350 print"{down} dieses programm veraendert die daten"
+  360 print" von sprites so, dass sie von dem"
+  370 print" programm ";chr$(34);"print shop";chr$(34);" verwendet"
+  380 print" werden koennen."
+  390 print"{down} aufgrund der aufloesungs-punkte"
+  400 print" funktioniert dieses programm nur mit"
+  410 print" der {rvon}print shop version fuer"
+  420 print"     {rvon}nicht commodore drucker{rvof}."
+  430 print"{down} die einzulesenden daten koennen"
+  440 print" entweder aus einer sequentiellen datei"
+  450 print" oder aus einem programm-file bestehen."
+  460 print" es werden jeweils nur die ersten "
+  470 print" 63 bytes gelesen."
+  480 print"{down}{down}   viel erfolg mit diesem prg wuenscht"
+  490 print"{rvon}     andreas,  thorsten und matthias    {rvof}"
+  500 gosub3150
+  510 run
+  520 rem ******************************
+  530 rem 1 hires-sprite (normalgroesse)
+  540 rem ******************************
+  550 az=1:gosub2940
+  560 a$="1 hires-sprite (normalgroesse)"
+  570 gosub3090 :rem name-amzeigen
+  580 pokev+21,3
+  590 poke2040,192:poke2041,192
+  600 pokev,126:pokev+1,140
+  610 pokev+2,170:pokev+3,130
+  620 pokev+29,2:pokev+23,2
+  630 pokev+39,15:pokev+40,15
+  640 gosub3640
+  650 pokev+21,0
+  660 gosub3050: rem fill mit 00
+  670 an=12288 : a1=22584 : z1=0 :z=0:s1=00:b=0
+  680 print"{home}{down}{down}";
+  690 forth=0to20:printth:next:print"{home}{down}{down}";
+  700 for p=1 to 21
+  710 print"{rght}{rght}{rght}{rght}+"
+  720 for m=1 to 3
+  730 a=peek(an+z)
+  740 for n=21 to 0 step -3
+  750 if a>=2^(n/3) then b=b+2^(n+2):b=b+2^(n+1):b=b+2^n :a=a-2^(n/3)
+  760 next n : z=z+1
+  770 c=int(b/65536):d=int((b-(c*65536))/256):e=b-(c*65536+d*256)
+  780 b=0
+  790 pokea1+z1+s1,c : pokea1+z1+s1+11,c
+  800 pokea1+z1+s1+1,d:pokea1+z1+s1+11+1,d
+  810 pokea1+z1+s1+2,e:pokea1+z1+s1+11+2,e
+  820 z1=z1+3
+  830 next m : s1=s1+22 : z1=0
+  840 next p
+  850 gosub3220:rem save
+  860 gosub3360:rem fehler ???
+  870 if a=0 then run
+  880 print"{down} {rvon} disk-error {rvof}: ";a;a$;b;c
+  890 gosub3150
+  900 goto850
+  910 rem ******************************
+  920 rem *1 multi-c-sprite (normalgr.)*
+  930 rem ******************************
+  940 az=1:gosub2940
+  950 a$="1 multi-c-sprite (normalgr.)"
+  960 gosub3090
+  970 gosub3050
+  980 poke2040,192
+  990 poke2041,192
+ 1000 v=53248
+ 1010 pokev+21,3
+ 1020 pokev,220:pokev+1,185
+ 1030 pokev+2,5:pokev+3,175:pokev+16,2
+ 1040 pokev+28,3:pokev+29,2:pokev+23,2
+ 1050 c1=15 : c2=11 : c3=00 : c4=12
+ 1060 pokev+33,c1 : pokev+37,c2 : pokev+38,c3 : pokev+39,c4 : pokev+40,c4
+ 1070 print"{wht}{home}":fori=1 to 40 :print" ";:next
+ 1080 print"{down}":fori=1 to 40 :print" ";:next
+ 1090 a$="1 multi-c-sprite (normalgr.)":gosub3090
+ 1100 print"{down}{down}{down} {rvon} f1 {rvof} = multi-color-farbe #01"
+ 1110 print"{down} {rvon} f3 {rvof} = multi-color-farbe #02"
+ 1120 print"{down} {rvon} f5 {rvof} = multi-color-farbe #03"
+ 1130 print"{down} {rvon} f7 {rvof} = multi-color-farbe #04"
+ 1140 print"{down} {rvon} f8 {rvof} = zurueck ins menue"
+ 1150 print"{down}{down} return = weiter im programm"
+ 1160 get g$:ifg$=""then1160
+ 1170 if g$=chr$(133) then gosub 1240
+ 1180 if g$=chr$(134) then gosub 1290
+ 1190 if g$=chr$(135) then gosub 1340
+ 1200 if g$=chr$(136) then gosub 1390
+ 1210 ifg$=chr$(140)thenrun
+ 1220 if g$<>chr$(13) then 1160
+ 1230 goto1440
+ 1240 if c1=0  then c1=11 : goto1280
+ 1250 if c1=11 then c1=12 : goto1280
+ 1260 if c1=12 then c1=15 : goto1280
+ 1270 if c1=15 then c1=0
+ 1280 pokev+33,c1:return
+ 1290 if c2=0  then c2=11 : goto1330
+ 1300 if c2=11 then c2=12 : goto1330
+ 1310 if c2=12 then c2=15 : goto1330
+ 1320 if c2=15 then c2=0
+ 1330 pokev+37,c2:return
+ 1340 if c3=0  then c3=11 : goto1380
+ 1350 if c3=11 then c3=12 : goto1380
+ 1360 if c3=12 then c3=15 : goto1380
+ 1370 if c3=15 then c3=0
+ 1380 pokev+38,c3:return
+ 1390 if c4=0  then c4=11 : goto1430
+ 1400 if c4=11 then c4=12 : goto1430
+ 1410 if c4=12 then c4=15 : goto1430
+ 1420 if c4=15 then c4=0
+ 1430 pokev+39,c4:pokev+40,c4:return
+ 1440 pokev+21,0:pokev+28,0
+ 1450 poke53280,11:poke53281,12:poke646,0
+ 1460 gosub3090
+ 1470 a1=22584:z=0:an=12288:s1=0
+ 1480 print"{home}{down}{down}";
+ 1490 forth=0to20:printth:next:print"{home}{down}{down}";
+ 1500 forp=0to20:fork=0to2:f$="":ff$=""
+ 1520 a=peek(an+(p*3)+k)
+ 1530 form=3to0step-1
+ 1540 forn=3to0step-1
+ 1550 ifa>=2^(m*2+n)thena=a-2^(m*2+n):b=b+2^n
+ 1560 nextn
+ 1570 ifb=0thenf=c1
+ 1580 ifb=1thenf=c2
+ 1590 ifb=2thenf=c4
+ 1600 ifb=3thenf=c3
+ 1610 iff=0thenf$=f$+"111111":ff$=ff$+"111111"
+ 1620 iff=11thenf$=f$+"110110"                       :ff$=ff$+"011011"
+ 1630 iff=12thenf$=f$+"111000"                       :ff$=ff$+"000111"
+ 1640 iff=15thenf$=f$+"000000":ff$=ff$+"000000"
+ 1650 b=0:f=0:nextm
+ 1660 forr=1to24
+ 1670 ifmid$(f$,r,1)="1"theng=g+2^(24-r)
+ 1680 ifmid$(ff$,r,1)="1"thenh=h+2^(24-r)
+ 1690 nextr
+ 1700 c=int(g/65536):d=int((g-(c*65536))/256):e=g-(c*65536+d*256):g=0
+ 1710 pokea1+z+s1,c:pokea1+z+1+s1,d:pokea1+z+2+s1,e
+ 1720 c=int(h/65536):d=int((h-c*65536)/256):e=h-(c*65536+d*256):h=0
+ 1730 pokea1+z+11+s1,c:pokea1+z+12+s1,d:pokea1+z+13+s1,e
+ 1740 z=z+3:nextk:s1=s1+22:z=0:print"{rght}{rght}{rght}{rght}+":nextp
+ 1750 gosub3220:rem save
+ 1760 gosub3360:rem disk error
+ 1770 ifa=0thenrun
+ 1780 print"{down} {rvon} disk-error {rvof}: ";a;a$;b;c
+ 1790 gosub3150
+ 1800 goto1750
+ 1810 rem ******************************
+ 1820 rem 2 hires-sprites (nebeneinand.)
+ 1830 rem ******************************
+ 1840 az=2:gosub2940
+ 1850 a$="2 hires-sprites (nebeneinand.)"
+ 1860 gosub3090
+ 1870 pokev+21,3
+ 1880 poke2040,192:poke2041,193
+ 1890 pokev,160:pokev+1,150
+ 1900 pokev+2,184:pokev+3,150
+ 1910 pokev+39,15:pokev+40,15
+ 1920 gosub3640
+ 1930 pokev+21,0
+ 1940 gosub3050
+ 1950 i=0 : a1=12288 : a2=12352 : aa=22695
+ 1960 print"{home}{down}{down}";
+ 1970 forth=0to20:printth:next:print"{home}{down}{down}";
+ 1980 fort=1to3
+ 1990 a=peek(a1)
+ 2000 pokeaa,a
+ 2010 aa=aa+1:a1=a1+1
+ 2020 nextt
+ 2030 fort=1to3
+ 2040 b=peek(a2)
+ 2050 pokeaa,b
+ 2060 aa=aa+1:a2=a2+1
+ 2070 nextt:aa=aa+5:i=i+1:print"{rght}{rght}{rght}{rght}+":ifi<21then1980
+ 2080 gosub3220
+ 2090 gosub3360
+ 2100 ifa=0thenrun
+ 2110 print"{down} {rvon} disk-error {rvof}: ";a;a$;b;c
+ 2120 gosub3150
+ 2130 goto2080
+ 2140 rem ******************************
+ 2150 rem 2 hires-sprites (uebereinand.)
+ 2160 rem ******************************
+ 2170 az=2:gosub2940
+ 2180 a$="2 hires-sprites (uebereinand.)"
+ 2190 gosub3090
+ 2200 pokev+21,3
+ 2210 poke2040,192:poke2041,193
+ 2220 pokev,172:pokev+1,155
+ 2230 pokev+2,172:pokev+3,176
+ 2240 pokev+39,15:pokev+40,15
+ 2250 gosub3640
+ 2260 pokev+21,0
+ 2270 gosub3050 : rem fill mit 00
+ 2280 aa=12288 : b=0 : z=0
+ 2290 a1=22585
+ 2300 print"{home}{down}{down}";
+ 2310 forth=0to20:printth:next:print"{home}{down}{down}";
+ 2320 forth=21to41:printtab(10)th:next:print"{home}{down}{down}";
+ 2330 for n=0 to 20
+ 2340 print"{rght}{rght}{rght}{rght}+"
+ 2350 form=0to2
+ 2360 a=peek(aa+(n*3+m))
+ 2370 for o=14 to 0 step -2
+ 2380 if a>=2^(o/2)then b=b+2^(o+1):b=b+2^o:a=a-2^(o/2)
+ 2390 nexto:pokea1+z,int(b/256):pokea1+z+1,b-peek(a1+z)*256
+ 2400 z=z+2 :b=0 : next m:z=z+5
+ 2410 next n
+ 2420 aa=12352 : b=0 : z=0
+ 2430 a1=22816
+ 2440 print"{home}{down}{down}";
+ 2450 for n=0 to 20
+ 2460 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}+"
+ 2470 for m=0 to 2
+ 2480 a=peek(aa+(n*3+m))
+ 2490 for o=14 to 0 step -2
+ 2500 if a>=2^(o/2)then b=b+2^(o+1):b=b+2^o:a=a-2^(o/2)
+ 2510 nexto:pokea1+z,int(b/256):pokea1+z+1,b-peek(a1+z)*256
+ 2520 z=z+2 :b=0 : next m:z=z+5
+ 2530 next n
+ 2540 gosub3220:rem save
+ 2550 gosub3360:rem disk error
+ 2560 ifa=0thenrun
+ 2570 print"{down} {rvon} disk-error {rvof}: ";a;a$;b;c
+ 2580 gosub3150
+ 2590 goto2540
+ 2600 rem ******************************
+ 2610 rem *****  4 hires-sprites   *****
+ 2620 rem ******************************
+ 2630 az=4:gosub2940
+ 2640 a$="4 hires-sprites":gosub3090
+ 2650 pokev+21,15
+ 2660 poke2040,192:poke2041,193:poke2042,194:poke2043,195
+ 2670 pokev,136:pokev+1,119
+ 2680 pokev+2,160:pokev+3,119
+ 2690 pokev+4,136:pokev+5,140
+ 2700 pokev+6,160:pokev+7,140
+ 2710 pokev+39,15:pokev+40,15:pokev+41,15:pokev+42,15
+ 2720 gosub3640
+ 2730 pokev+21,0
+ 2740 gosub3050:remfill mit 00
+ 2750 aa=12288 : ab=aa+64:ac=ab+64:ad=ac+64
+ 2760 a1=22585 :a2=22588:a3=22816:a4=22819
+ 2770 t=0:q=0
+ 2780 print"{home}{down}{down}";
+ 2790 forth=0to20:printth:next:print"{home}{down}{down}";
+ 2800 forf=0to20
+ 2810 print"{rght}{rght}{rght}{rght}+"
+ 2820 fori=0to2:
+ 2830 a=peek(aa+q):b=peek(ab+q):c=peek(ac+q):d=peek(ad+q)
+ 2840 pokea1+t,a:pokea2+t,b:pokea3+t,c:pokea4+t,d
+ 2850 q=q+1:t=t+1:next:t=t+8
+ 2860 next f
+ 2870 gosub3220:rem save
+ 2880 gosub3360:rem disk error
+ 2890 ifa=0thenrun
+ 2900 print"{down} {rvon} disk-error {rvof}: ";a;a$;b;c
+ 2910 gosub3150
+ 2920 goto2870
+ 2930 rem******************************
+ 2940 rem*****   load - routine   *****
+ 2950 rem******************************
+ 2960 sz=1:gosub3400
+ 2970 if az=1 then return
+ 2980 sz=2:gosub3400
+ 2990 if az=2 then return
+ 3000 sz=3:gosub3400
+ 3010 if az=3 then return
+ 3020 sz=4:gosub3400
+ 3030 return
+ 3040 rem******************************
+ 3050 rem*****    fill mit 00     *****
+ 3060 rem******************************
+ 3070 fori=22528 to 23164 : pokei,0:next:return
+ 3080 rem******************************
+ 3090 rem****  print ueberschrift  ****
+ 3100 rem******************************
+ 3110 print"{clr}{rvon} ";a$;
+ 3120 a=len(a$):a=a+1:fori=a to 39:print"{rvon} {rvof}";:next
+ 3130 return
+ 3140 rem******************************
+ 3150 rem*******   get any key   ******
+ 3160 rem******************************
+ 3170 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}    bitte druecken sie eine taste !!!  {rvof}";
+ 3180 poke2023,160:poke56295,0
+ 3190 getyy$:ifyy$=""then 3190
+ 3200 return
+ 3210 rem******************************
+ 3220 rem*** save print-shop grafik ***
+ 3230 rem******************************
+ 3240 print"{clr}":a$="save print-shop graphik":gosub3090
+ 3250 print"{down} name (save) :  ";:open1,0:input#1,sn$:close1:print
+ 3260 open3,8,2,sn$+",p,w"
+ 3270 print#3,chr$(0);chr$(88);
+ 3280 for i=22528 to 23164 : print#3,chr$(peek(i));:next
+ 3290 close3
+ 3300 gosub3360
+ 3310 ifa=0thenreturn
+ 3320 print"{down} {rvon} disk-error {rvof}: ";a;a$;b;c
+ 3330 getyy$:ifyy$=""then3330
+ 3340 goto3220
+ 3350 rem******************************
+ 3360 rem*****   disk-error ???   *****
+ 3370 rem******************************
+ 3380 open15,8,15:input#15,a,a$,b,c:close15
+ 3390 return
+ 3400 :
+ 3410 a$="load routine ":gosub3090
+ 3420 print"{down}name fuer sprite #";sz;:open1,0:input#1,n$:close1:print
+ 3430 n$=left$(n$,16)
+ 3440 print"{down} {rvon}p{rvof}rogramm- o. {rvon}s{rvof}equentielles file ?"
+ 3450 gett$:ift$=""then3450
+ 3460 if t$="p" then 3480
+ 3470 if t$<>"s" then 3450
+ 3480 open2,8,2,n$+","+t$+",r"
+ 3490 if t$="p" then get#2,m$:get#2,m$
+ 3500 fori = 0 to 62
+ 3510 get#2,sp$:ifsp$=""thensp$=chr$(0)
+ 3520 sp=asc(sp$)
+ 3530 if sz=1 then poke12288+i,sp
+ 3540 if sz=2 then poke12352+i,sp
+ 3550 if sz=3 then poke12416+i,sp
+ 3560 if sz=4 then poke12480+i,sp
+ 3570 next:close2
+ 3580 gosub3360 : if a=0 then return
+ 3590 print"{down} {rvon} disk error {rvof}: ";a;a$;b;c
+ 3600 gosub3150
+ 3610 goto 2940
+ 3640 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}    richtiger sprite/sprites   (j/n)   {rvof}";
+ 3650 poke2023,160:poke56295,0
+ 3660 getg$:ifg$=""then3660
+ 3670 ifg$="j"thenfori=1984to2023:pokei,32:next:return
+ 3680 ifg$<>"n"then3660
+ 3690 pokev+21,0:run
+ 3700 rem******************************
+ 3710 rem*****     directory      *****
+ 3720 rem******************************
+ 3730 print"{clr}"
+ 3740 open1,8,0,"$":kv=0
+ 3750 fori=0to30:get#1,a$:b$=b$+a$:next
+ 3760 print"  ";b$
+ 3770 get#1,a$,b$,e$,f$,g$:fori=0to26:get#1,d$:c$=c$+d$:next
+ 3780 iff$<=chr$(0)thena=0:goto3800
+ 3790 a=asc(f$)
+ 3800 ifg$<=chr$(0)thenb=0:goto3820
+ 3810 b=asc(g$)
+ 3820 d=a+256*b
+ 3830 ifc$="GGGGGGGGGGGGGGGGGGGGGGGGGGG"thenc$="":goto3910
+ 3840 ifc$="~~~~~~~~~~~~~~~~~~~~~~~~~~~"thenc$="":goto3910
+ 3850 printd;c$:c$=""
+ 3860 kv=kv+1:ifkv=22then3880
+ 3870 goto3770
+ 3880 kv=0:gosub3150
+ 3890 print"{up}                                        ";:print"{clr}":poke2023,32
+ 3900 goto3770
+ 3910 kv=0:gosub3150
+ 3920 close1:run
+

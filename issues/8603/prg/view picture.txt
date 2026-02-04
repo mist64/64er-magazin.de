@@ -1,0 +1,42 @@
+
+
+;view picture.prg ==0801==
+    0 rem **************************
+    1 rem *      view picture      *
+    2 rem *      ------------      *
+    3 rem *                        *
+    4 rem *      written 1985      *
+    5 rem *           by           *
+    6 rem *                        *
+    7 rem *     r.eichenberger     *
+    8 rem *                        *
+    9 rem **************************
+   10 :
+   11 poke53280,11:poke53281,12:rem bildschirmfarben aendern
+   15 fort=0to27:reada:poke828+t,a:next:rem einlesen des masch.prg nach $033c
+   20 print"{clr}{blk}{rvon}{SHIFT-POUND}                                      {CBM-*}{rvof}";
+   30 print"{rvon}            view pic  (8192)            {rvof}";
+   40 print"{CBM-*}{rvon}                                      {rvof}{SHIFT-POUND}";:rem bildschirmmaske
+   50 print"{down}{down}{down}{down}{gry1}filename: ";:open1,0:input#1,na$:close1:rem eingabe des namens
+   60 ifna$=""thengoto120:rem wenn kein name, dann bild zeigen
+  100 print"{clr}lO"+chr$(34)+na$+chr$(34)+",8,1":print"{down}{down}{down}{down}gO120"
+  110 poke631,19:poke632,13:poke633,13:poke198,3:end:rem laden des prg's
+  120 print"{clr}":v=53248:rem bildschirm loeschen
+  130 pokev+17,peek(v+17) or (8+3)*16:rem grafik einschalten
+  140 pokev+22,peek(v+22)and255-16:rem multicolor ausschalten
+  150 pokev+24,peek(v+24)or8:rem grafik bei $2000
+  155 sys828:rem maschinen-prg starten (farben von $4000 nach $0400
+  160 geta$:ifa$=""then160:rem warte auf taste
+  161 print"{clr}":rem bildschirm loeschen
+  170 pokev+17,peek(v+17)and255-6*16:rem grafik ausschalten
+  180 pokev+22,peek(v+22)and255-1*16:rem multicolor ausschalten
+  190 pokev+24,peek(v+24)and255-8:rem grafik wieder bei $1000
+  200 input"{clr}{down}noch ein bild:{$a0}[j/n]";a$
+  210 ifa$<>"j"thenend
+  220 goto20:rem noch ein bild, dann zur zeile 20
+  225 :
+  226 rem *** maschinenprg fuer farbe
+  227 :
+  230 data162,0,160,64,134,95,132,96,162,232,160,67,134,90,132,91,162,232,160
+  240 data7,134,88,132,89,32,191,163,96
+

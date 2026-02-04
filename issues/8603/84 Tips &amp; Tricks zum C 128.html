@@ -62,6 +62,172 @@
 
         <address class="author">(P. Guth/ah)</address>
     </article>
+
+    <figure>
+        <pre data-filename="interface 5120.prg" data-name="Interface 5120" data-mse=mse1></pre>
+        <figcaption>Listing 1. Das Maschinenprogramm »Interface 5120« geben Sie am besten im C 64-Modus mit dem MSE ein.</figcaption>
+    </figure>
+    <div class="binary_download" data-filename="interface 5120.prg" data-name="Interface 5120"></div>
+
+    <figure>
+        <pre>.opt p,oo
+*=   $1400
+print    = $ffd2
+         jmp init	;einschalten des nterfaces = sys 5120
+         jmp exit     ;ausschalten des nterfaces = sys 5123
+steuer   .byte%00000000 ;
+init     sei
+         lda #$ff  	; i/o register
+         sta $dd03 	; port b auf
+         lda $dd02 	; ausgang setzen
+         ora #$04  	;
+         sta $dd02 	;
+         lda #&lt;open  	 ;kanal fuer ausgabe
+         sta $0320 	;auf interface
+         lda #&gt;open 	;setzen
+         sta $0321 	;(ckout vector)
+         lda #&lt;output   ;output vector
+         sta $0326 	;auf interface
+         lda #&gt;output   ;setzen
+         sta $0327 	;
+         ldx #$00  	;systemmeldung
+l00      lda text,x	;
+         jsr print	;
+         inx 	;
+         cmp #$00 	;
+         bne l00	;
+         lda #&lt;nmistr   ;nmi vector
+         sta $0318	;auf interface
+         lda #&gt;nmistr   ;setzen
+         sta $0319	;
+         cli
+         rts
+nmistr   lda #%00001000
+         and steuer
+         beq l1
+         cli
+         jsr init
+         jmp ($0a00)
+l1       jmp $fa40 	;nmi routine kernal
+open     jsr $f202	;sucht logische filenummer ( in x )
+         beq opn	;gefunden -&gt; ausgabe setzen
+         jmp $f682	; betriebssystemmeldung ausgeben
+opn      jsr $f212	;flparam
+         lda $ba  	;aktuelles geraet
+         cmp #$04       ; =4 "?
+         bne l02        ; nein
+         jmp l05        ; ja , nummer des ausgabegeraetes setzen
+l02      cmp #$05  ; =5 "?
+         bne l03        ; nein
+         jmp l05        ; ja , nummer des ausgabegeraetes setzen
+l03      jmp $f156 	;nummer des ausgabegeraetes setzen
+ ; verkuerztes ckout; mit ueberpruefung ob auf bildschirm, usw
+l05      jmp $f169 	; nummer des ausgabegeraetes setzen
+ ;
+output   pha 	;akku retten
+         lda $9a 	;aktuelle geraete nummer
+         cmp #$04
+         bne l06
+         jmp prlell
+l06      cmp #$05
+         bne l09
+         jmp druck
+l09      pla
+         jmp $ef79 	;print
+prlell   pla
+         jsr codew
+         cmp #$0d
+         beq l13
+         jmp drucke
+l13      lda #%00000100  ; auf zusaetzliches
+         and steuer          ; line feed pruefen
+         bne l15
+         lda #$0d
+         jmp l14
+l15      lda #$0a
+         jsr drucke
+         lda #$0d
+l14      jmp drucke
+;
+codew    cmp #29	;  cursor right
+         bne cw
+         lda #32        ; =space
+cw       cmp #$80  	; groesser 127 "?
+         bpl l16   	;
+         cmp #65   	; kleiner "a"
+         bmi l17   	;
+         cmp #93   	;
+         bpl l17   	; groesser"ue"
+         clc
+         adc #32   	; in kleinschrift wandeln
+l17      jsr codew2
+         rts
+l16      cmp #193	; groesser gross "a"
+         bmi l17
+         cmp #222  	; s.o.
+         bpl l17
+         sec
+         sbc #128
+         jmp l17
+codew2   pha 	;akku retten
+         lda $d3 	; ascii/din
+         and #%00010000   ;umgeschaltet "?
+         bne wandel
+gewandeltpla
+         rts 	;nein;zurueck
+ ;wandel pla  	;zurueck
+wandel   pla        	;ja;wandeln
+         cmp #187
+         bmi lr 	; kleiner als 188
+         cmp #191
+         bpl lr 	; groesser als 190
+         clc
+         sbc #63
+lr       pha
+         jmp gewandelt
+;
+druck    pla
+drucke   cmp #$22
+         bne lp
+         lda $11
+         eor #$ff
+         sta $11
+         lda #$22
+lp       sta $dd01	;akku auf bus legen
+         lda $dd0d	;output bits loeschen
+         lda $dd00	;strobe setzen
+         and #$fb 	;
+         sta $dd00	;
+         ora #$04 	;und wieder
+         sta $dd00	;loeschen
+;
+         lda #$10       ; auf
+l07      bit $dd0d	; acknowledge
+         beq l07        ; warten
+         clc
+         rts
+exit     sei
+         ldx #$f1
+         lda #$4c
+         stx $0320
+         sta $0321
+         ldx #$79
+         lda #$ef
+         stx $0326
+         sta $0327
+         cli
+         rts
+text     .byte18,14
+         .asc "128 Centronics-Interface     Version 2.0"
+         .byte146
+         .byte$20
+         .asc" ((c) by M.Heinze 17.11.1985 in Erlangen"
+         .byte$0d
+         .byte00</pre>
+        <figcaption>Listing 2. Der dokumentierte Quellcode zum »Interface 5120«.</figcaption>
+    </figure>
+    <div class="binary_download" data-filename="interface source.prg" data-name="Interface 5120 Quellcode"></div>
+
 </body>
 
 </html>
