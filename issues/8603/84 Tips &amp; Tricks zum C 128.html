@@ -28,9 +28,12 @@
 
         <p>Am besten, Sie tippen das Programm (Listing 1) im C 64-Modus mit Hilfe des MSE ein. Im C 128-Modus laden Sie es dann absolut, das heißt mit »,8,1«.</p>
 
-        <p>Nach der Initialisierung mit »SYS 5120« meldet sich das Interface mit seiner Einschaltmeldung. Man hat jetzt zwei Kanäle zur Verfügung:<br>
-            OPEN1,4: wandelt den Commodore-eigenen Code in Epson-kompatiblen Code um. (Zum Beispiel, um Sonderzeichen auszudrucken, oder Escape-Sequenzen zu senden.)<br>
-            OPEN1,5: gibt die Daten ungewandelt aus. (Um zum Beispiel den Drucker per Software umzuschalten.)</p>
+        <p>Nach der Initialisierung mit »SYS 5120« meldet sich das Interface mit seiner Einschaltmeldung. Man hat jetzt zwei Kanäle zur Verfügung:</p>
+
+        <ul class="plain">
+            <li>OPEN1,4: wandelt den Commodore-eigenen Code in Epson-kompatiblen Code um. (Zum Beispiel, um Sonderzeichen auszudrucken, oder Escape-Sequenzen zu senden.)</li>
+            <li>OPEN1,5: gibt die Daten ungewandelt aus. (Um zum Beispiel den Drucker per Software umzuschalten.)</li>
+        </ul>
 
         <p>Um die zusätzlichen Eigenheiten des Interfaces zu nutzen, ist das Steuer-Byte (Adresse 5126) interessant.</p>
 
@@ -46,17 +49,40 @@
 
         <address class="author">(Marcus Heinze/tr)</address>
 
-        <p>TODO Verkabelungsplan</p>
+        <figure>
+            <table class="plain center0 right2 center3">
+                <tr class="strong"><td>User-Port-Pins</td><td colspan="2">Name</td><td>Centronics-Pins</td></tr>
+                <tr><td>A</td><td colspan="2">GND (Masse)</td><td class="center">16</td></tr>
+                <tr><td>B</td><td colspan="2">Busy-Flag Datenleitung</td><td class="center">11</td></tr>
+                <tr><td>C</td><td>d0</td><td>Bit 0</td><td>2</td></tr>
+                <tr><td>D</td><td>d1</td><td>Bit 1</td><td>3</td></tr>
+                <tr><td>E</td><td>d2</td><td>Bit 2</td><td>4</td></tr>
+                <tr><td>F</td><td>d3</td><td>Bit 3</td><td>5</td></tr>
+                <tr><td>H</td><td>d4</td><td>Bit 4</td><td>6</td></tr>
+                <tr><td>J</td><td>d5</td><td>Bit 5</td><td>7</td></tr>
+                <tr><td>K</td><td>d6</td><td>Bit 6</td><td>8</td></tr>
+                <tr><td>L</td><td>d7</td><td>Bit 7</td><td>9</td></tr>
+                <tr><td>M</td><td colspan="2">PA2-Strobe</td><td class="center">1</td></tr>
+            </table>
+            <table class="plain">
+                <tr><td class="strong">Stecker:</td><td>User-Port: TRW 251-12-50-170</td></tr>
+                <tr><td></td><td>Drucker: Amphenol (36polig)</td></tr>
+            </table>
+            <table class="plain">
+                <tr><td class="strong">Kabel:</td><td>Flach- oder Rundkabel, maximal 1,5 Meter Länge</td></tr>
+            </table>
+            <figcaption>Verkabelungsplan</figcaption>
+        </figure>
 
         <h2>Flimmerproblem beim C 128 beseitigt</h2>
 
-        <p>Einigen C 128-Besitzern, die das Programm »80-Zeichen-Grafik« aus der Ausgabe 12/85 abgetippt haben, wird das merkwürdige »kräuseln« am rechten Bildschirmrand unangenehm aufgefallen sein. Um diesen Fehlerzu beseitigen, gehen Sie wie folgt vor:</p>
+        <p>Einigen C 128-Besitzern, die das Programm »80-Zeichen-Grafik« aus der Ausgabe 12/85 abgetippt haben, wird das merkwürdige »kräuseln« am rechten Bildschirmrand unangenehm aufgefallen sein. Um diesen Fehler zu beseitigen, gehen Sie wie folgt vor:</p>
 
-        <p>Nach dem Einschalten des Computers ist die Befehlsfolge<br>
-            POKE 54874,25 : ? PEEK (54875)<br>
+        <p>Nach dem Einschalten des Computers ist die Befehlsfolge
+            <code>POKE 54874,25 : ? PEEK (54875)</code>
             einzugeben. Als Ergebnis gibt es nun zwei Möglichkeiten: Bei der ersten Version des C 128 erscheint eine »64« und bei der zweiten eine »71«. Erscheint die »71«, muß der Basic-Lader der 80-Zeichen-Grafik folgendermaßen geändert werden.</p>
 
-        <p>In Zeile 14040 muß die »64« durch »71« und in Zeile 14080 die Zahl »128«durch »135«ersetztwerden. Besitztjemand nur den Maschinensprache-Teil, so kann er das Programm durch die Befehle: POKE 6752,71: POKE 6789,13 5 anpassen. Die nötigen Änderungen für das Programm »Doppelte Grafikauflösung« aus der Ausgabe 11/85 sehen dann so aus: POKE 5150,135 : POKE 5158,71.</p>
+        <p>In Zeile 14040 muß die »64« durch »71« und in Zeile 14080 die Zahl »128« durch »135« ersetzt werden. Besitzt jemand nur den Maschinensprache-Teil, so kann er das Programm durch die Befehle: POKE 6752,71: POKE 6789,135 anpassen. Die nötigen Änderungen für das Programm »Doppelte Grafikauflösung« aus der Ausgabe 11/85 sehen dann so aus: POKE 5150,135 : POKE 5158,71.</p>
 
         <p>Es existieren anscheinend zwei Versionen des VDC-8563-Chips. Überprüft man deren Statusanzeige, so kann man feststellen, welche der beiden Versionen vorliegt.</p>
 
