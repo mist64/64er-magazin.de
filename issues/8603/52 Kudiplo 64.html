@@ -85,7 +85,7 @@
 
         <p>Nun zum Abtippen: Beginnen Sie bitte mit dem kleinen Ladeprogramm (Listing 1) und speichern Sie es auf Diskette oder Kassette ab. Es ist erforderlich, um im Basic-Speicher Platz für die Bit-Map freizuhalten. Dazu wird der Zeiger für den Basic-Start hochgelegt auf $4204. Außerdem lädt und startet das Ladeprogramm das Hauptprogramm automatisch nach. Damit das auch bei Benutzung der Datasette funktioniert, muß gegebenenfalls in Zeile 60 die »8« durch eine »1« ersetzt werden.</p>
 
-        <p>Anschließend kann das Hauptprogramm (Listing 2) abgetippt werden. Aber bitte nicht starten, sondern zuerst speichern, sonst wird Ihre Fleißarbeit womöglich blitzschnell von der Grafik überschrieben. Sollten Ihnen trotz Checksummer Bedenken kommen, ob Sie die DATA-Zeilen richtig übernommen haben, so erhalten Sie die Prüfsumme, indem Sie provisorisch eingeben: »10 READ A: S=S+A: GOTO 10«. Wenn Sie das Programm nun starten, wird es sich nach kurzer Zeit mit der Fehlermeldung OUT 0F DATA ERROR IN 10 beschweren. Im Direktmodus geben Sie nun ein: »PRINT S ⟨RETURN⟩«. Nun müßte als Prüfsumme der Wert 32709 ausgegeben werden. Danach können Sie die Zeile 10 wieder löschen.</p>
+        <p>Anschließend kann das Hauptprogramm (Listing 2) abgetippt werden. Aber bitte nicht starten, sondern zuerst speichern, sonst wird Ihre Fleißarbeit womöglich blitzschnell von der Grafik überschrieben. Sollten Ihnen trotz Checksummer Bedenken kommen, ob Sie die DATA-Zeilen richtig übernommen haben, so erhalten Sie die Prüfsumme, indem Sie provisorisch eingeben: »10 READ A: S=S+A: GOTO 10«. Wenn Sie das Programm nun starten, wird es sich nach kurzer Zeit mit der Fehlermeldung OUT OF DATA ERROR IN 10 beschweren. Im Direktmodus geben Sie nun ein: »PRINT S ⟨RETURN⟩«. Nun müßte als Prüfsumme der Wert 32709 ausgegeben werden. Danach können Sie die Zeile 10 wieder löschen.</p>
 
         <p>In der abgedruckten Form enthält das Programm noch nicht die Hardcopy-Routine für die Arbeit mit einem Matrix-Drucker. Wenn Sie einen solchen Drucker als Ausgabegerät vorsehen wollen, dann müssen Sie das Programm insoweit an Ihre Hardware anpassen. Am besten und präzisesten arbeitet das Programm allerdings zusammen mit dem Plotter 1520. Wenn Sie nur dieses Gerät für die Ausgabe benutzen oder wenn Sie auf eine Hardcopy-Ausgabe verzichten wollen, dann müssen Sie die Zeile 395 weglassen und Sie können dann auch auf die Zeilen 1000, 1120 und 2500 bis 2640 verzichten.</p>
 
@@ -99,7 +99,7 @@
 
         <p>Sollte das Modul »HC Epson 49440« bei Ihnen nicht funktionieren, so könnte es an dem von Ihnen verwendeten Interface liegen. In diesem Fall haben Sie die Möglichkeit, sich das benötigte Hardcopy-Modul nach Ihren Bedürfnissen selbst herzustellen. Dazu benötigen Sie das in dieser Zeitschrift, Ausgabe 8/1984, Seite 83 abgedruckte Programm von Frank Lonczewski. Zu beachten ist dann nur noch, daß für die Zusammenarbeit mit »Kudiplo« die Hardcopy-Routine in den Speicherbereich ab 49440 (=$C120) geschrieben werden und daß die Startadresse des Grafikbildschirms mit 8192 (=$2000) angegeben werden muß.</p>
 
-        <p>Oder wollen Sie mit einem MPS-Drucker arbeiten? In diesem Fall hilft eins der anderen Module. Als Aufruf des Moduls ist dann für das Modul »MP-802-49440« in Zeile 2540 einzusetzen: »SYS 49440,2,0« und für das Modul »MP 801-49525« der Einsprungsbefehl OPEN4,4: SYS49525,4: Close4.</p>
+        <p>Oder wollen Sie mit einem MPS-Drucker arbeiten? In diesem Fall hilft eins der anderen Module. Als Aufruf des Moduls ist dann für das Modul »MP-802-49440« in Zeile 2540 einzusetzen: »SYS 49440,2,0« und für das Modul »MP 801-49525« der Einsprungsbefehl <a href="#fehlerteufelchen" class="fehlerteufelchen_link">OPEN4,4: SYS49525,4: Close4</a>.</p>
 
         <p>Nähere Einzelheiten für die Arbeit mit dieser Hardcopy-Routine finden Sie in Ausgabe 10/1984, Seite 82. Je nach der Art des von Ihnen verwendeten Druckers und Interfaces muß möglicherweise auch die Geräteadresse in dem OPEN-Befehl in Zeile 2560 geändert werden.</p>
 
@@ -134,6 +134,16 @@
             <figcaption>Listing 5. Hardcopy-Modul für Epson- und Kompatible, die über ein Hardware-Interface verfügen</figcaption>
         </figure>
         <div class="binary_download" data-filename="hc epson 49440.prg" data-name="Hardcopy Epson"></div>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Wenn Sie mit dem MPS 801 arbeiten wollen, ist die Zeile 2540 wie folgt zu ändern:
+                <code>2540 OPEN4,4: SYS 49525,4: PRINT#4,CHR$(15): CLOSE4</code>
+            </p>
+
+            <!-- 64'er 6/1986 -->
+        </aside>
     </article>
 </body>
 
