@@ -29,6 +29,121 @@
 
         <p>Jeder OPEN-Befehl, mit dem bekanntlich eine Datei (File) eröffnet wird, kann neben File-Nummer und Geräte-Nummer auch einen File-Namen haben. Der File-Namen einer RS232-Schnittstelle hat maximal nur vier Zeichen. Das erste Zeichen wird in diese Speicherzelle 659 gebracht und steuert dort Übertragungsgeschwindigkeit, die Wortlänge und die Anzahl der Stopp-Bits. Die nähere Bedeutung dieser Fachwörter können Sie dem Texteinschub »Die Elemente der RS232-Schnittstelle« entnehmen. Tabelle 1 zeigt die Bedeutung jedes einzelnen Bits dieser Speicherzelle.</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">BINÄR</th>
+                        <th style="text-align: center;">BITWERT</th>
+                        <th style="text-align: right;">STEUERFUNKTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3">Bit 0 bis 3 steuern die Übertragungsgeschwindigkeit</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0000</td>
+                        <td style="text-align: center;">0</td>
+                        <td style="text-align: right;">(siehe 1)</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0001</td>
+                        <td style="text-align: center;">1</td>
+                        <td style="text-align: right;">50 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0010</td>
+                        <td style="text-align: center;">2</td>
+                        <td style="text-align: right;">75 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0011</td>
+                        <td style="text-align: center;">3</td>
+                        <td style="text-align: right;">110 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0100</td>
+                        <td style="text-align: center;">4</td>
+                        <td style="text-align: right;">134,5 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0101</td>
+                        <td style="text-align: center;">5</td>
+                        <td style="text-align: right;">150 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0110</td>
+                        <td style="text-align: center;">6</td>
+                        <td style="text-align: right;">300 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx0111</td>
+                        <td style="text-align: center;">7</td>
+                        <td style="text-align: right;">600 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx1000</td>
+                        <td style="text-align: center;">8</td>
+                        <td style="text-align: right;">1200 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx1001</td>
+                        <td style="text-align: center;">9</td>
+                        <td style="text-align: right;">1800 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td>xxxx1010</td>
+                        <td style="text-align: center;">10</td>
+                        <td style="text-align: right;">2400 bit/s</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">die Werte 11 bis 15 sind nicht belegt</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Bit 4 ist nicht belegt</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Bit 5 und 6 steuern die Wortlänge</td>
+                    </tr>
+                    <tr>
+                        <td>x00xxxxx</td>
+                        <td style="text-align: center;">0</td>
+                        <td style="text-align: right;">8 Bit-Wort</td>
+                    </tr>
+                    <tr>
+                        <td>x01xxxxx</td>
+                        <td style="text-align: center;">32</td>
+                        <td style="text-align: right;">7 Bit-Wort</td>
+                    </tr>
+                    <tr>
+                        <td>x10xxxxx</td>
+                        <td style="text-align: center;">64</td>
+                        <td style="text-align: right;">6 Bit-Wort</td>
+                    </tr>
+                    <tr>
+                        <td>x11xxxxx</td>
+                        <td style="text-align: center;">96</td>
+                        <td style="text-align: right;">5 Bit-Wort</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Bit 7 steuert die Stopp-Bits</td>
+                    </tr>
+                    <tr>
+                        <td>0xxxxxxx</td>
+                        <td style="text-align: center;">0</td>
+                        <td style="text-align: right;">1 Stopp-Bit</td>
+                    </tr>
+                    <tr>
+                        <td>1xxxxxxx</td>
+                        <td style="text-align: center;">128</td>
+                        <td style="text-align: right;">2 Stopp-Bit</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Die Bedeutung der einzelnen Bit im RS232-Steuerregister</figcaption>
+        </figure>
+
         <p>Die praktische Anwendung dieser Bit-Werte innerhalb eines OPEN-Befehls ist ausführlich im Texteinschub »Die Programmierung der RS232-Schnittstelle« beschrieben.</p>
 
         <h2>Adresse 660 ($294)</h2>
@@ -36,6 +151,93 @@
         <h3>RS232-Befehlsregister</h3>
 
         <p>In diese Speicherzelle wird, ähnlich wie bei der Zelle 659, das zweite Zeichen des File-Namens gebracht. Die einzelnen Bits steuern das Handshake-Protokoll (3-/X-Leitung), den Duplex-Modus (Halb-/Voll-Duplex) und die Parity-Prüfung (keine, gerade, ungerade). Die nähere Bedeutung dieser Fachwörter können Sie dem Texteinschub »Die Elemente der RS232-Schnittstelle« entnehmen. Tabelle 2 zeigt die Bedeutung jedes einzelnen Bits dieser Speicherzelle.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">BINÄR</th>
+                        <th style="text-align: center;">BITWERT</th>
+                        <th style="text-align: right;">STEUERFUNKTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3">Bit 0 steuert den Handshake-Typ</td>
+                    </tr>
+                    <tr>
+                        <td>xxxxxxx0</td>
+                        <td style="text-align: center;">0</td>
+                        <td style="text-align: right;">3-Leitung</td>
+                    </tr>
+                    <tr>
+                        <td>xxxxxxx1</td>
+                        <td style="text-align: center;">1</td>
+                        <td style="text-align: right;">X-Leitung</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Bit 1 bis 3 sind nicht belegt</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Bit 4 steuert den Duplex-Modus</td>
+                    </tr>
+                    <tr>
+                        <td>xxx0xxxx</td>
+                        <td style="text-align: center;">0</td>
+                        <td style="text-align: right;">Voll-Duplex</td>
+                    </tr>
+                    <tr>
+                        <td>xxx1xxxx</td>
+                        <td style="text-align: center;">16</td>
+                        <td style="text-align: right;">Halb-Duplex</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Bit 5 bis 7 steuern den Paritäts-Test</td>
+                    </tr>
+                    <tr>
+                        <td>000xxxxx</td>
+                        <td style="text-align: center;">0</td>
+                        <td style="text-align: right;">keine Parität</td>
+                    </tr>
+                    <tr>
+                        <td>001xxxxx</td>
+                        <td style="text-align: center;">32</td>
+                        <td style="text-align: right;">ungerade (1)</td>
+                    </tr>
+                    <tr>
+                        <td>010xxxxx</td>
+                        <td style="text-align: center;">64</td>
+                        <td style="text-align: right;">keine Parität</td>
+                    </tr>
+                    <tr>
+                        <td>011xxxxx</td>
+                        <td style="text-align: center;">96</td>
+                        <td style="text-align: right;">gerade (1)</td>
+                    </tr>
+                    <tr>
+                        <td>100xxxxx</td>
+                        <td style="text-align: center;">128</td>
+                        <td style="text-align: right;">keine Parität</td>
+                    </tr>
+                    <tr>
+                        <td>101xxxxx</td>
+                        <td style="text-align: center;">160</td>
+                        <td style="text-align: right;">Parität = 1 (2)</td>
+                    </tr>
+                    <tr>
+                        <td>110xxxxx</td>
+                        <td style="text-align: center;">192</td>
+                        <td style="text-align: right;">keine Parität</td>
+                    </tr>
+                    <tr>
+                        <td>111xxxxx</td>
+                        <td style="text-align: center;">224</td>
+                        <td style="text-align: right;">Parität = 0 (2)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Das R$232-Befehlsregister im einzelnen</figcaption>
+        </figure>
 
         <p>Wenn Sie sich für die praktische Anwendung dieser Bit-Werte innerhalb eines OPEN-Befehls interessieren, dann verweise ich auf den Texteinschub »Die Programmierung der RS232-Schnittstelle«.</p>
 
@@ -50,6 +252,61 @@
         <h3>RS232-Statusregister</h3>
 
         <p>Genauso wie in der Speicherzelle 144 der Status aller Ein- und Ausgabe-Operationen angezeigt wird, werden alle Fehler der RS232-Schnittstelle in der Speicherzelle 663 angezeigt. Die Bedeutung der einzelnen Bits, wenn sie auf 1 gesetzt sind, zeigt Tabelle 3.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">BIT</th>
+                        <th style="text-align: right;">BIT-WERT</th>
+                        <th style="text-align: left;">BEDEUTUNG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td style="text-align: right;">1</td>
+                        <td>Fehler bei Paritäts-Test</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td style="text-align: right;">2</td>
+                        <td>Fehler in der Bit-Folge</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td style="text-align: right;">4</td>
+                        <td>Überlauf des Eingabepufferspeichers</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td style="text-align: right;">8</td>
+                        <td>Eingabepufferspeicher ist leer</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td style="text-align: right;">16</td>
+                        <td>das Clear-To-Send-(CTS-)Signal (Handshake) fehlt</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td style="text-align: right;">32</td>
+                        <td>nicht belegt</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td style="text-align: right;">64</td>
+                        <td>das Data-Set-Ready-(DSR-)Signal (Handshake) fehlt</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td style="text-align: right;">128</td>
+                        <td>Übertragung ist unterbrochen</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3. Das RS232-Status-Register</figcaption>
+        </figure>
 
         <p>Der Status wird nicht automatisch angezeigt, sondern muß vom Programm abgefragt werden. Abfragen können Sie sowohl durch PEEKen der Speicherzelle 663 als auch durch Aufrufen der Statusvariablen ST. Die Variable ST, die normalerweise den Inhalt der Zelle 144 wiedergibt, schaltet nach dem Eröffnen eines RS232-Kanals durch OPEN 1,2 auf die Speicherzelle 663 um. Jedoch ist Vorsicht geboten, da durch Aufruf von ST der Inhalt von 663 gelöscht wird. Es ist ratsam, den Wert von ST erst einer anderen Variablen zuzuordnen, wenn sie mehrfach verwendet werden soll. Falls das Status-Register einen Fehler anzeigt, muß das Programm entsprechende Konsequenzen ziehen. Wenn zum Beispiel Bit 0 oder Bit 1 gesetzt sind, ist es angebracht, das letzte Daten-Byte noch einmal zu übertragen. Wenn Bit 2 gesetzt ist, heißt dies, daß der GET#-Befehl den Eingabepufferspeicher nicht schnell genug entleert. Falls die Übertragungsgeschwindigkeit von 300 bit/s, die maximal mit einem Basic-Programm erreichbar ist, nicht ausreicht, muß entweder der Sender langsamer eingestellt werden, oder Sie schreiben das Programm in Maschinensprache.</p>
 
@@ -105,6 +362,29 @@
         </p>
 
         <address class="author">(Dr.H.Hauck/ah)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Bit 0</td>
+                        <td>(Bitwert 1)</td>
+                        <td>Daten werden gesendet</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 1</td>
+                        <td>(Bitwert 2)</td>
+                        <td>Daten werden empfangen</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 4</td>
+                        <td>(Bitwert 16)</td>
+                        <td>Schnittstelle wartet auf Daten vom Sender</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 4. Flagge für den RS232-Interrupt</figcaption>
+        </figure>
 
         <aside>
             <h2>Texteinschub #1: Schnittstelle und Port</h2>
@@ -163,6 +443,51 @@
             <p>Zur parallelen Datenübertragung entstand in Europa die »IEC-625-Schnittstelle«, in USA die »IEEE-488-Schnittstelle«. Beide sind praktisch identisch. Sie unterscheiden sich nur in der Verwendung des Steckers (was natürlich idiotisch ist). Bei den Commodore-Computern ist diese Schnittstelle sowohl am Erweiterungs-Port (1) als auch über den seriellen Port (4) einrichtbar. Der serielle Port allerdings enthält wiederum eine für Commodore typische Einschränkung. Er erlaubt, wie sein Name andeutet, nur eine serielle Datenübertragung. Das heißt, statt — wie bei der IEC-/IEEE-Schnittstelle festgelegt — alle 8 Bits eines Wortes über acht Leitungen gleichzeitig, werden hier die Bits hintereinander auf nur einer Leitung übertragen. Auch das erfordert eine zusätzliche Anpassung. Das Prinzip der IEC-/IEEE-Schnittstelle wurde bereits im Ausgabe 3/85 ab Seite 24 von Arnd Wängler genau beschrieben.</p>
 
             <p>Die »Centronics-Schnittstelle« ist aus der harten Realität des Geschäftslebens entstanden. Während sich noch die Normstellen in Europa und USA herumstritten, hat der damalige Marktführer unter den Druckerherstellern, die Firma Centronics, eine eigene Schnittstelle geschaffen, die sich schlicht und einfach durch die weite Verbreitung der Centronics-Drucker durchgesetzt hat. Sie ist eine parallele Schnittstelle, die sich beim C 64/VC 20 sowohl am User-Port (6) als auch am seriellen Port (4) einrichten läßt. Zur Beschreibung der Schnittstelle habe ich in meiner Literatursammlung nur zwei Aufsätze gefunden, die eine von Georg Werner in c’t, Ausgabe 4/84, Seite 92, die andere von Peter Bonsch in Computer persönlich, Ausgabe 11/83 ab Seite 152. Tabelle 5 gibt eine Zusammenfassung über die Realisierbarkeit der drei Schnittstellen an den Ports von C 64 und VC 20.</p>
+            <figure>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">SCHNITT-<br>STELLE</th>
+                            <th>Erweit<br>①</th>
+                            <th>Seriell<br>④</th>
+                            <th>Kasset<br>⑤</th>
+                            <th>User<br>⑥</th>
+                            <th>Spiel<br>⑧</th>
+                            <th>PORT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RS232</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align: center;">X</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>IEC/IEEE</td>
+                            <td style="text-align: center;">X</td>
+                            <td style="text-align: center;">X</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Centronics</td>
+                            <td></td>
+                            <td style="text-align: center;">X</td>
+                            <td></td>
+                            <td style="text-align: center;">X</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <figcaption>Tabelle 5. Realisierbarkeit der lEC-, IEEE- und Centronics-Schnittstelle am C 64 und VC 20</figcaption>
+            </figure>
         </aside>
 
         <aside>
