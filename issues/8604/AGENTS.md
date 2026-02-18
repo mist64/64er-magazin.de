@@ -442,6 +442,53 @@ These rules are blocking. If any one fails, status is `partial`.
    - `done`: zero unresolved items + all hard gates pass.
    - `partial`: anything else.
 
+## Anti-Memory Enforcement (Mandatory)
+
+The extraction-first workflow exists to prevent hallucinated or paraphrased prose from entering articles. These enforcement rules make the constraint mechanically verifiable, not just advisory.
+
+### Why this matters
+
+LLMs bias toward generating plausible-sounding text from training data. For a faithful OCR transcription project, this is the primary failure mode: the model "knows" what the article probably says and writes it from memory instead of from the actual OCR source. The result looks correct but may silently differ from what was printed.
+
+### Enforcement rules
+
+1. Mandatory extraction artifact:
+   - Phase 2 must produce a `_work/*_ocr_raw.txt` file via `nl|sed|cut`.
+   - Phase 4 must `Read` this file before any HTML body text is written.
+   - If the raw file does not exist, phases 4+ are blocked.
+
+2. Import via script, not Write:
+   - Phase 4 (mechanical import) should use a script (Python/Bash) that reads from the raw extraction file and produces HTML.
+   - The model does not compose prose during import — the script does mechanical line placement.
+   - The Write tool may only be used for the initial HTML shell (metadata + empty body) in phase 3.
+
+3. Edit-only after import:
+   - After the mechanical import in phase 4, all subsequent text changes must use the Edit tool (old_string/new_string replacements on text already present in the file).
+   - The Write tool must not be used on article HTML files after phase 4.
+   - This is the single most important enforcement rule: if the text is not already in the file, it cannot be edited in — it must come from the extraction.
+
+4. Scratchpad citation for corrections:
+   - During OCR correction (phase 6), each non-trivial correction should cite the source evidence: scan page + region (for example "p.142 col2 para3: scan shows 'Fehlerbeseitigung' not 'Fohler-beseitigung'").
+   - This grounds corrections in visual evidence rather than model knowledge.
+
+5. Verbatim-first, correct-second:
+   - The imported text must contain all OCR errors verbatim.
+   - Corrections are applied as a separate pass (phase 6+), never during import.
+   - This makes it verifiable that the base text came from extraction, not memory.
+
+6. Provenance chain:
+   - For any line in the final HTML, it must be possible to trace back:
+     `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `8604.md line range`
+   - If this chain is broken (for example by a Write that replaces the whole file), the article must be re-extracted.
+
+### Detection of violations
+
+A Write-from-memory violation is indicated by any of:
+- Use of the Write tool on an article HTML file after phase 4
+- Article body text that does not appear in `_ocr_raw.txt` (after accounting for edits)
+- Prose that is suspiciously clean (no OCR artifacts) on first import
+- Missing `_ocr_raw.txt` file for a completed article
+
 ## Checklist Policy (Mandatory)
 
 - Use one checklist file per article run in `8604/_work/`.
