@@ -339,10 +339,21 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
 3. Create initial HTML shell:
    - Add metadata, `h1`, and intro placeholder.
    - Keep `index_title` commented and empty.
+   - Body placeholder must be exactly: `        <!-- BODY WILL BE MECHANICALLY IMPORTED -->`
 
 4. Mechanical import pass:
-   - Import extracted text in reading order.
-   - No rewriting from memory.
+   - Copy the import template: `cp _work/IMPORT_TEMPLATE.py _work/<NNN>_import.py`
+   - Edit the copy: set `RAW` path, fill in article-specific line mappings.
+   - Available helpers (see template for full API):
+     - `p(cls, *line_nums)` — emit `<p>` from raw lines (merges with space)
+     - `h(level, line_num)` — emit heading
+     - `blank()` — readability separator
+     - `raw(text)` — emit raw HTML (figures, tables)
+     - `basic_listing(start, end)` — emit BASIC listing table (`plain right0`)
+     - `tsv_table(header, start, end)` — emit tab-separated table (`plain pre`)
+   - Run: `python3 _work/<NNN>_import.py > _work/<NNN>_body.html`
+   - Inject into shell: `python3 _work/inject.py "<HTML_FILE>" "_work/<NNN>_body.html" "<address_text>"`
+   - No rewriting from memory at any point.
 
 5. Structure pass:
    - Convert headings, intros, `noindent`, `strong`, `pre`, `table`, `figure`, `address`.
@@ -458,14 +469,20 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
    - If the raw file does not exist, phases 4+ are blocked.
 
 2. Import via script, not Write:
-   - Phase 4 (mechanical import) should use a script (Python/Bash) that reads from the raw extraction file and produces HTML.
+   - Phase 4 (mechanical import) must use the reusable toolchain:
+     1. Copy `_work/IMPORT_TEMPLATE.py` → `_work/<NNN>_import.py`
+     2. Fill in article-specific line mappings (the only creative step)
+     3. Run: `python3 _work/<NNN>_import.py > _work/<NNN>_body.html`
+     4. Inject: `python3 _work/inject.py "<HTML>" "_work/<NNN>_body.html" "<address>"`
    - The model does not compose prose during import — the script does mechanical line placement.
    - The Write tool may only be used for the initial HTML shell (metadata + empty body) in phase 3.
 
-3. Edit-only after import:
+3. Edit-only after import (small edits only):
    - After the mechanical import in phase 4, all subsequent text changes must use the Edit tool (old_string/new_string replacements on text already present in the file).
    - The Write tool must not be used on article HTML files after phase 4.
-   - This is the single most important enforcement rule: if the text is not already in the file, it cannot be edited in — it must come from the extraction.
+   - CRITICAL: The Edit tool's `new_string` parameter is also a memory vector. An Edit that replaces a placeholder with 200+ lines of body text is functionally identical to a Write from memory — the LLM is composing the content in the `new_string` field.
+   - Therefore: Edit calls in phases 5+ must be small, targeted corrections (fix a word, merge a hyphenation, add a tag). Any bulk insertion of body text must go through the import script (phase 4).
+   - The phase 4 import must use `_work/inject.py` (generic tool) to read from `_work/*_body.html` (itself generated from `_work/*_import.py` reading `_work/*_ocr_raw.txt`) and inject into the HTML shell. The injection must be done by the script, not by pasting content into an Edit or Write call.
 
 4. Scratchpad citation for corrections:
    - During OCR correction (phase 6), each non-trivial correction should cite the source evidence: scan page + region (for example "p.142 col2 para3: scan shows 'Fehlerbeseitigung' not 'Fohler-beseitigung'").
@@ -485,9 +502,47 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
 
 A Write-from-memory violation is indicated by any of:
 - Use of the Write tool on an article HTML file after phase 4
+- An Edit call where `new_string` contains more than ~5 lines of article prose (bulk insertion disguised as an edit)
 - Article body text that does not appear in `_ocr_raw.txt` (after accounting for edits)
 - Prose that is suspiciously clean (no OCR artifacts) on first import
 - Missing `_ocr_raw.txt` file for a completed article
+
+## Reusable Toolchain (`_work/`)
+
+### `_work/inject.py` — Generic body injector
+
+Injects mechanically generated body HTML into an article shell. This is the anti-memory enforcement chokepoint: the body content flows from a file, never from the LLM's output.
+
+```
+python3 _work/inject.py <html_file> <body_file> [<address_text>]
+```
+
+- `<html_file>`: the article HTML shell (must contain placeholder comment)
+- `<body_file>`: the generated body (output of the import script)
+- `<address_text>`: optional, e.g. `"(Logo/aw)"` — appended as `<address class="author">`
+
+### `_work/IMPORT_TEMPLATE.py` — Import script template
+
+Copy this for each new article. Provides reusable helpers:
+
+| Helper | Purpose |
+|--------|---------|
+| `p(cls, *line_nums)` | Emit `<p>` from raw OCR lines (1-indexed), merged with space |
+| `h(level, line_num)` | Emit `<h2>`/`<h3>` from a raw line |
+| `blank()` | Emit blank line for readability |
+| `raw(text)` | Emit raw HTML (figures, custom markup) |
+| `basic_listing(start, end)` | Emit BASIC listing as `table.plain.right0` |
+| `tsv_table(header, start, end)` | Emit tab-separated table as `table.plain.pre` |
+
+Workflow:
+```
+cp _work/IMPORT_TEMPLATE.py _work/<NNN>_import.py
+# edit: set RAW path, fill article-specific line mappings
+python3 _work/<NNN>_import.py > _work/<NNN>_body.html
+python3 _work/inject.py "<article>.html" "_work/<NNN>_body.html" "(author/xx)"
+```
+
+The only creative work is deciding which raw lines map to which HTML elements. All prose flows mechanically from the OCR extraction file.
 
 ## Checklist Policy (Mandatory)
 
