@@ -8,7 +8,7 @@ Convert scanned 600 DPI master pages via per-page Tesseract OCR into repository-
 
 ## Agreed Ground Rules
 
-- Primary text source is per-page Tesseract OCR output, stored as `_work/<NNN>_ocr_raw.txt`.
+- Primary text source is per-page Tesseract TSV output (`_work/<NNN>_ocr.tsv`), reconstructed into `_work/<NNN>_ocr.txt` by the agent, and concatenated into `_work/<NNN>_ocr_raw.txt`.
 - 600 DPI master PNGs (one per page) are the authoritative source images.
 - Scanned page images are mandatory for verification and correction.
 - TOC wording can differ from the on-page article title.
@@ -44,21 +44,25 @@ Discovered through systematic testing on pages 134 and 159:
 # Step 1: Downscale 600 DPI master to 300 DPI
 magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
 
-# Step 2: Run Tesseract
-tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1
-# produces _work/<NNN>_ocr.txt
+# Step 2: Run Tesseract with TSV output
+tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
+# produces _work/<NNN>_ocr.tsv
 ```
+
+After producing the TSV, the agent reconstructs a plain-text file (`_work/<NNN>_ocr.txt`) with correct column reading order. See "Column Reconstruction from TSV" below.
 
 ### Multi-Page Articles
 
-For articles spanning multiple pages, OCR each page individually and concatenate:
+For articles spanning multiple pages, OCR each page individually, reconstruct each page's text from TSV, then concatenate:
 
 ```bash
-# OCR each page
+# OCR each page (TSV output)
 for p in 134 135 136; do
     magick png/${p}_600_cropped.png -resize 50% _work/${p}_300.png
-    tesseract _work/${p}_300.png _work/${p}_ocr -l deu --psm 1
+    tesseract _work/${p}_300.png _work/${p}_ocr -l deu --psm 1 tsv
 done
+
+# Agent reconstructs _work/<NNN>_ocr.txt for each page from TSV (see below)
 
 # Concatenate into article raw file (with page markers)
 for p in 134 135 136; do
@@ -71,20 +75,41 @@ The `--- PAGE NNN ---` markers help locate content during the import script mapp
 
 ### Known Limitations
 
-- **Column bleeding around figures/diagrams**: Tesseract PSM 1 may merge text from both columns when a figure spans or interrupts the column boundary. The import script's `p(cls, *line_nums)` mapping handles reordering.
 - **Code listings fragment**: Assembly/BASIC listings may split into many small OCR blocks. Manual stitching in the import script is expected.
 - **Directory listings and tables**: Structured columnar content (like Commodore directory listings) loses alignment. Manual correction needed during technical fidelity pass.
 - **Old German spelling**: Tesseract `deu` handles pre-1997 orthography (daß, muß, Fluß) correctly — no special configuration needed.
 
-### Optional: Structured Output
+### Column Reconstruction from TSV
 
-For difficult pages, Tesseract TSV output provides block-level bounding boxes useful for column assignment:
+TSV output is the primary Tesseract format. The agent reconstructs correct reading order from position data. This replaces reliance on Tesseract's built-in column ordering, which frequently fails around figures and diagrams.
 
-```bash
-tesseract _work/<NNN>_300.png _work/<NNN>_tsv -l deu --psm 1 tsv
-```
+#### TSV format
 
-The TSV includes `block_num`, `left`, `top`, `width`, `height`, `conf`, and `text` columns. Blocks with `left < page_midpoint` are left column; blocks with `left > page_midpoint` are right column. This is a debugging aid, not part of the standard pipeline.
+Each row has: `level`, `page_num`, `block_num`, `par_num`, `line_num`, `word_num`, `left`, `top`, `width`, `height`, `conf`, `text`.
+
+- `level=5` rows are individual words (the only rows with text content).
+- `level=1..4` rows are structural (page, block, paragraph, line boundaries) — useful for grouping but contain no text.
+
+#### Reconstruction procedure
+
+For each page TSV:
+
+1. **Filter** to `level=5` rows where `text` is non-empty.
+2. **Group** words by `(block_num, par_num, line_num)` to form text lines.
+3. **Determine column assignment** for each block using its `left` coordinate:
+   - Compute page midpoint from the image width (typically ~1275 px at 300 DPI for these magazine pages, so midpoint ~637).
+   - Blocks with `left < midpoint` → left column.
+   - Blocks with `left >= midpoint` → right column.
+4. **Sort** lines: left-column blocks first (sorted by `top`), then right-column blocks (sorted by `top`).
+5. **Join** words within each line with spaces.
+6. **Emit** as plain text lines, one per reconstructed line.
+7. **Save** as `_work/<NNN>_ocr.txt`.
+
+#### Handling special cases
+
+- **Full-width blocks** (headings, titles, page-spanning figures): These may have `left` near 0 and `width` spanning the full page. Place them in reading order by `top` coordinate relative to surrounding column text.
+- **Figures and captions**: Tesseract often creates separate blocks for figure captions. Their `left`/`top` coordinates indicate which column they belong to.
+- **Three-column layouts** (rare): Use three x-coordinate ranges instead of two. Inspect the TSV `left` values to identify natural clusters.
 
 ## TOC Workflow
 
@@ -382,7 +407,7 @@ Pilot article completed:
   2. paragraph-by-paragraph correction against scan
 - OCR normalization: fix only what is visually confirmed on scan; avoid stylistic rewrites.
 - Split-line repair: aggressively repair OCR line-break artifacts (for example `Mit-` + `gliedern`, split words around punctuation) only when unambiguous on scan.
-- Column reordering: Tesseract PSM 1 generally reconstructs two-column reading order correctly, but around figures and diagrams the columns may bleed. Always verify reading order against the scan and reorder in the import script if needed.
+- Column reordering: TSV output with x-coordinates makes column assignment mechanical. The agent reconstructs reading order from position data during Phase 2, so the `_ocr.txt` files already have correct column order. This eliminates the column-bleeding problem that plain-text Tesseract output had around figures and diagrams.
 - Metadata discipline:
   - on-page title in `<title>` and `<h1>`
   - TOC wording in `64er.toc_title`
@@ -463,12 +488,13 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - **Always check the page AFTER the TOC-listed last page** for continuation content (closing paragraphs, author credits like `(hm)`, `Info:` blocks). Articles frequently spill onto the next page. OCR that page and inspect the top portion.
    - List all pages to OCR (article content pages, excluding pure ad pages).
 
-2. Run Tesseract OCR:
+2. Run Tesseract OCR (TSV pipeline):
    - For each page in the article, run the standard pipeline:
      ```bash
      magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
-     tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1
+     tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
      ```
+   - For each page, reconstruct `_work/<NNN>_ocr.txt` from the TSV using the column reconstruction procedure (see "Column Reconstruction from TSV" in the OCR Pipeline section). Read the TSV, assign columns by x-coordinate, sort by column then vertical position, and write the reconstructed text.
    - Concatenate per-page results into the article raw file:
      ```bash
      for p in <page_list>; do
@@ -619,7 +645,7 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
 ### Enforcement rules
 
 1. Mandatory extraction artifact:
-   - Phase 2 must produce per-page `_work/<NNN>_ocr.txt` files via Tesseract and a concatenated `_work/<NNN>_<slug>_ocr_raw.txt`.
+   - Phase 2 must produce per-page `_work/<NNN>_ocr.tsv` files via Tesseract, per-page `_work/<NNN>_ocr.txt` files reconstructed from TSV by the agent, and a concatenated `_work/<NNN>_<slug>_ocr_raw.txt`.
    - Phase 4 must `Read` this file before any HTML body text is written.
    - If the raw file does not exist, phases 4+ are blocked.
 
@@ -650,7 +676,7 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
 
 6. Provenance chain:
    - For any line in the final HTML, it must be possible to trace back:
-     `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `_work/<NNN>_ocr.txt` ← `tesseract` ← `_work/<NNN>_300.png` ← `600 DPI master PNG`
+     `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `_work/<NNN>_ocr.txt` ← `agent column reconstruction` ← `_work/<NNN>_ocr.tsv` ← `tesseract` ← `_work/<NNN>_300.png` ← `600 DPI master PNG`
    - If this chain is broken (for example by a Write that replaces the whole file), the article must be re-extracted.
 
 ### Detection of violations
@@ -666,13 +692,16 @@ A Write-from-memory violation is indicated by any of:
 
 ### OCR Pipeline Scripts
 
-The OCR pipeline is two commands per page, no scripts needed:
+The OCR pipeline is two commands per page, plus agent-driven column reconstruction:
 
 ```bash
 # Per-page OCR (repeat for each page)
 magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
-tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1
+tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
+# produces _work/<NNN>_ocr.tsv
 ```
+
+After each page's TSV is produced, the agent reads it, reconstructs correct reading order using the column reconstruction procedure, and saves the result as `_work/<NNN>_ocr.txt`.
 
 ### `_work/inject.py` — Generic body injector
 
