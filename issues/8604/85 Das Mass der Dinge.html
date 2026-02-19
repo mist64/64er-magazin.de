@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Das Maß der Dinge</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Mark Richters, Franz Stoiber">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="85-89">
+    <meta name="64er.head1" content="Tips&Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Das Mass der Dinge">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <!-- <meta name="64er.index_title" content=""> -->
+    <meta name="64er.index_category" content="Tips und Tricks">
+    <meta name="64er.id" content="das_mass_der_dinge">
+</head>
+
+<body>
+    <article>
+        <h1>Das Maß der Dinge</h1>
+        <p class="intro">Das exakte Ausmessen eines Unterprogrammes ist eine große Hilfe, um Laufzeiten zu verringern. Meist steht jedoch keine hinreichend genaue Uhr zur Verfügung. Wir bieten Ihnen zwei Lösungen an, eine für Maschinensprache- und eine für Basic-Programme.</p>
+
+        <p>Um die Laufzeiten von Programmen genau messen zu können, reicht die Stoppuhr für den 100-Meter-Lauf nicht mehr aus. Vor allem bei Maschinenprogrammen, bei denen die menschliche Reaktionsfähigkeit weit hinter der geforderten Genauigkeit bleibt. Doch auch die eingebaute interruptgesteuerte Uhr TI$ im C 64 versagt, wenn es um das Auszählen sehr kurzer Maschinenprogramme geht. Ladevorgänge können damit überhaupt nicht erfaßt werden, da TI$ während des Ladens stillsteht. Abhilfe schaffen hier die Timer der CIAs.</p>
+
+        <h2>Taktzyklen zählen</h2>
+
+        <p>Um Maschinensprache-Programme zu messen, ist es am besten, die Taktzyklen zu zählen. Dies liefert einen gut zu vergleichenden Wert. Geben Sie zunächst das Programm »Taktzyklen« (Listing 1) mit dem MSE ein und speichern Sie es. Aufgerufen wird die Routine durch den Befehl</p>
+        <p class="noindent">SYS 49152, Startadresse &lt;RETURN&gt;</p>
+
+        <p>Die anzugebende Startadresse entspricht der des zu untersuchenden Maschinenprogramms. Dieses Unterprogramm wird nun ausgeführt und die dafür benötigte Zeit bestimmt. Während dieses Ablaufes ist der Bildschirm ausgeblendet, er nimmt die Farbe des Rahmens an. Am Ende des zu messenden Programmes muß ein RTS stehen. Nach Programmende gibt das Programm den gemessenen Wert aus und springt in den Direkt-(READY-)Modus. Der angezeigte Zahlenwert drückt die Anzahl der Systemtakte aus, die während der Abarbeitung des Maschinen-Unterprogrammes durch den Mikroprozessor verstrichen sind. Da ein solcher Takt etwa 1,015 Mikrosekunden dauert, läßt sich durch Multiplizieren mit diesem Faktor die benötigte Zeit in Mikrosekunden errechnen. Bei eingeschaltetem Bildschirm vergrößert sich das Ergebnis um etwa 5 bis 6 Prozent.</p>
+
+        <h3>Beschreibung des Programms »Taktzyklen«</h3>
+
+        <p>Die beim Aufruf des Programms übergebene Startadresse des zu messenden Unterprogramms wird als Operand für einen Sprungbefehl gespeichert. Anschließend wird die Möglichkeit der Unterbrechung durch einen IRQ ausgeschaltet, weil sonst ein falsches Resultat geliefert werden kann. Nach dem Ausblenden des Bildschirms lädt das Programm beide Timer des CIA 2 mit dem Maximalwert und koppelt sie miteinander. Sobald die Zähler gestartet sind, erfolgt der Sprung in das Unterprogramm, nach dessen Ende die Zähler sofort wieder gestoppt werden. Schließlich werden neben der Einrichtung des Normalzustandes — den Bildschirm und den IRQ betreffend — die Timer-Bytes ausgewertet. Dazu invertiert das Programm sämtliche Bits der von den Timern gelieferten Werte, da beide Registerpaare heruntergezählt werden. Zusätzlich werden noch elf Takte subtrahiert, die zum Starten beziehungsweise Stoppen der Timer und zum Aufruf des Unterprogramms nötig sind. Damit erhält man einen Meßbereich, der zwischen 1 und 2<sup>32</sup>−1 Taktzyklen (entsprechend einer Zeit von 1 µs bis 1 Stunde 12 Minuten) liegt.</p>
+
+        <h2>Laufzeit-Meß-System »LMS«</h2>
+
+        <p>Das LMS wurde entwickelt, um die Laufzeit von Basic-Programmen zeilenbezogen messen zu können. Weiterhin sollte die Anzahl einzelner Aufrufe von Programmzeilen festgestellt werden können.</p>
+
+        <h3>Einsatzmöglichkeiten</h3>
+
+        <p>Das LMS ist im wesentlichen als Werkzeug für folgende Anwendungsfälle konzipiert:</p>
+        <p class="noindent">1. Performance-Verbesserung von Basic-Programmen</p>
+
+        <p>Durch den Einsatz des LMS ist sofort erkennbar, wo die zeitmäßig kritischen Stellen eines Programms sind. Oft kann durch einige Veränderungen von Basic-Statements wertvolle Laufzeit eingespart werden. Sollte das nicht ausreichen, so ist der Einsatz von Maschinenroutinen angebracht.</p>
+
+        <p>Die Erfahrung zeigt, daß es selten notwendig ist, ein Programm vollständig in Assembler zu schreiben. Meist bringt ein begrenzter Einsatz von Maschinenroutinen an zeitkritischen Stellen ausreichende Geschwindigkeit unter Beibehaltung der Vorteile von Basic. Diese sind vor allem wesentlich bessere Lesbarkeit und Wartung sowie geringerer Erstellungsaufwand.</p>
+
+        <p class="noindent">2. Testhilfe</p>
+
+        <p>Das Laufzeit-Meß-System stellt die Anzahl der Aufrufe von Basic-Zeilen fest. Es ist daher damit leicht überprüfbar, ob Programmzeilen überhaupt durchlaufen werden und wenn ja, ob die Anzahl der Aufrufe stimmt.</p>
+
+        <p>Mit dem LMS können auch Statements gemessen werden, die mit TI$ — abgesehen von der geringen Genauigkeit von TI$ — nicht zu erfassen sind (zum Beispiel INPUT#).</p>
+
+        <h3>Bedienungsanleitung</h3>
+
+        <p>Geben Sie zuerst die Listings 3 bis 5 ein und speichern Sie diese auf einer Diskette. Nach dem Laden und Starten des Programms »LMS« erscheint nach kurzer Zeit ein Menü mit folgenden Wahlmöglichkeiten:</p>
+
+        <h3>Messen (m)</h3>
+
+        <p>Durch die Auswahl der Funktion »Messen« wird das eigentliche Meßprogramm aktiviert. Dies ist immer erkennbar an der roten Rahmenfarbe. Es wird eine Einschaltmeldung geschrieben und danach in den READY-Modus verzweigt. Jetzt muß das zu messende Programm eingegeben oder geladen werden.</p>
+
+        <p>Bei jedem Start des Programms werden für jede Programmzeile Laufzeit und Aufrufanzahl gespeichert. Wichtig ist, daß das Programm mit RUN gestartet wird. Ein Start mit GOTO oder CONT ist möglich, führt aber nicht zur Messung.</p>
+
+        <figure>
+            <img src="85-1.png" alt="">
+            <figcaption>Bild 1. Flußdiagramm zum Laufzeit-Meß-System »LMS«. Nach diesem Schema berechnet man die Laufzeit eines Basic-Programms.</figcaption>
+        </figure>
+
+        <figure>
+        <pre>
+programm : taktzyklen cooB cQbi 210 ; tel. 9842907/1870
+zZ28 ;
+230 ;
+cORR : 28 fd ae 20 Ba ad 20 f7 55 a an
+cBQ8 : b7 Bc 2# cB Bd 52 cQ 78 =8 2682 fac =+62 sfliesskomma-akku
+ceBiR : a9 Ob Bd 11 dO ad 12 dd 29 278 frmnum =tad8Ba ;ausdruck holen
+cBiB : dB fb a2 03 a9 ff 94 24 028 282 chkcom =#aefd ;auf komma pruefen
+ch2a : dd ca 10 fa 39 11 a2 51 16 290 getadr =$b7f7 ;52-byte integer
+c028 : Be Of dd Bd Be dd 28 ff b7 3@2 vicctrl =#d21l ;re fuer bs aus
+ca38 : ff ad BR Sc Be dd Sc Or 31@® raster =$d@12 ;raster-zeile
+ca= : dd a9 ib 8d 11 dd 58 358 cc 328 timer =+ddß4 ;timer a lo-byte
+cB4Q : ad B4 dd 49 ## e9 Ob 85 16 Sn cr ae a same
+cQ48 : 65 a2 93 b? 05 dd 49 ff 5b  _ en mer
+cB50 : e9 BO 95 61 c8 ca dß f3 dP? 368 jsr chkcom ;startadresse der
+cu58 : 58 Ba a2 ad 28 4 bc Ac 9a 372 jsr frmnum ;zu messenden
+-Bb5Q =: d?7 bd aa + DO fr DD Fr 1&amp; 382 jsr getadr zroutine hole:
+398 sty jsubr+i1 sund als sprung-
+        </pre>
+            <figcaption>Listing 1. »Taktzyklen« geben Sie bitte mit dem MSE ein.</figcaption>
+        </figure>
+
+        <figure>
+        <pre>
+120 sys9#4296 470 ;
+11® .opt oo A488 1dx #3 sbeide timer auf
+120 5; 490 Ida ##+ff smaximalwert
+130 ; “ 588 settimer sta timer ‚x
+148 ; taktzyklen eines 512 dex
+15@ ; maschinenprogramms messen 522 bpl settimer
+160 ; 530 ;
+170 ; 542 Ida #72@2Q120@01 ;timer koppeln,
+188 von mark richters 552 1dx #740101090B1 sladen und starten
+190 ; allerstr.4 560 stx crb
+22 2895 oyten 578 sta cra
+
+ssprung auf routine
+
+sbeide timer stop
+
+648 1da #7/0@21 1811
+
+sbildschirm wieder
+
+658 sta vicctri an
+
+668 cli sirg wieder frei-
+670 ;
+
+688 sec ;4 timer-bytes
+690 1da timer
+
+;noetigte zyklen
+sabziehen
+sund die restlichen
+
+75@ 11 Ida timer+1,y;3 timer-werte
+768 eor ##+ff sanpassen
+
+778 sbc #8
+
+788 sta fac-1,x
+
+792 iny
+
+ex
+818 bne 11
+
+;4 byte werten
+sohne vorzeichen
+sin fliesskommazahl
+
+8780 jmp +bdd7 sfac ausgeben/rts
+
+ready.
+        </pre>
+            <figcaption>Listing 2. Information für Profis. Quell-Code-Listing zu »Taktzyklen«</figcaption>
+        </figure>
+
+        <p>Durch die Eingabe von END im READY-Modus wird das Meßprogramm inaktiv, und es verzweigt anschließend wieder zum Hauptmenü, in dem die Meßergebnisse des letzten Programmlaufs ausgewertet werden können.</p>
+
+        <h3>Anzeige ab Nr. (a)</h3>
+
+        <p>Diese Funktion gestattet die Eingabe einer Zeilennummer, ab der die Meßergebnisse am Bildschirm angezeigt werden.</p>
+
+        <p>Der Bildschirm zeigt die jeweilige Zeilennummer, die Anzahl der Aufrufe dieser Zeile und die Gesamtverweilzeit des Basic-Interpreters in dieser Zeile. Bei einer Aufrufanzahl größer als eins wird zusätzlich die durchschnittliche Laufzeit pro Aufruf angezeigt.</p>
+
+        <p>Die jeweils größte Laufzeit ist zur leichteren Orientierung durch »←« markiert.</p>
+
+        <h3>Vorhergehende Seite (↑)</h3>
+
+        <p>Durch Drücken der Taste (↑) wird die Ausgabe am Bildschirm um eine Seite zurückgeblättert.</p>
+
+        <h3>Nächste Seite (RETURN)</h3>
+
+        <p>Die Bildschirmausgabe wird mit »RETURN« um eine Seite weitergeblättert.</p>
+
+        <h3>Summe (s)</h3>
+
+        <p>Diese Funktion erlaubt die Berechnung der Programmlaufzeit bezogen auf einen einzugebenden Zeilenbereich.</p>
+
+        <h3>Drucken (d)</h3>
+
+        <p>Die Auswahl dieser Funktion bewirkt die Ausgabe der Meßergebnisse auf Drucker. Durch die Angabe von Zeilennummern kann der Ausgabebereich eingegrenzt werden.</p>
+
+        <h3>Hilfe (h)</h3>
+        <p>Das Menü wird angezeigt.</p>
+
+        <h3>Ende (e)</h3>
+
+        <p>Der Computer wird nach Bestätigung der Auswahl in den Einschaltzustand versetzt.</p>
+
+        <p>Wird bei der Eingabe einer Zeilennummer nur »RETURN« gedrückt, so wird die Zeilennummer ab inklusive 0 und die Zeilennummer bis inklusive 63999 angenommen.</p>
+
+        <h3>Hinweise</h3>
+
+        <p>Das Meßverfahren kann auf Programme mit bis zu 1022 Zeilen angewandt werden. Der Basic-Speicher ist auf zirka 30 KByte verkürzt. Die maximal erfaßbare Anzahl von Zeilenaufrufen beträgt 65535. Die maximal meßbare Laufzeit pro Zeile beträgt etwa 72 Minuten.</p>
+
+        <p>Wenn das LMS aktiviert ist, braucht es etwa 0,9 Millisekunden (ms) pro Zeilenaufruf. Dies führt zu einer Verlängerung der Programmlaufzeit während der Messung. Die Meßergebnisse sind jedoch Netto-Laufzeiten; das heißt die ange-</p>
+
+        <figure>
+        <pre>
+100 REM ----------- LAUFZEIT-MESS-SYSTEM &lt;146&gt;
+110 REM LADEPROGRAMM &lt;129&gt;
+120 REM &lt;166&gt;
+130 REM ------------- FRANZ STOIBER &lt;150&gt;
+140 REM ------------- BRAEUNLICHGASSE 382 &lt;016&gt;
+150 REM ------------ A-2702 WR.NEUSTADT &lt;194&gt;
+160 REM OESTERREICH &lt;197&gt;
+170 REM &lt;216&gt;
+180 IF L=1 THEN 240 &lt;045&gt;
+190 POKE 53280,15: POKE 53281,15: POKE 646
+,15 &lt;099&gt;
+200 GA=8 &lt;033&gt;
+210 PRINT CHR$(14);&quot;{CLR,11DOWN,8RIGHT}LAU
+FZEIT-MESS-SYSTEM {2SPACE}V2.0&quot; &lt;122&gt;
+220 PRINT &quot;{7RIGHT}(C) FRANZ STOIBER {2SPAC
+E} 11/85&quot; &lt;237&gt;
+230 PRINT &quot;{2DOWN,12RIGHT}BITTE WARTEN&quot; &lt;091&gt;
+240 POKE 646,15 &lt;224&gt;
+250 L=1: LOAD &quot;LMS.PHA&quot;,GA,1 &lt;085&gt;
+260 SYS 40497 &lt;084&gt;
+270 PRINT &quot;{HOME}&quot;; &lt;202&gt;
+280 PRINT &quot;{2DOWN}SYS 49780&quot; &lt;375&gt;
+290 PRINT &quot;{2DOWN}LOAD &quot;;CHR$(34);&quot;LMS.BAS
+&quot;;CHR$(34);&quot;,&quot;;GA &lt;189&gt;
+300 PRINT &quot;{4DOWN}RUN&quot; &lt;234&gt;
+310 FOR I=631 TO 633: POKE I,13: NEXT &lt;226&gt;
+320 POKE 198,3 &lt;103&gt;
+330 PRINT &quot;{HOME}&quot;; &lt;006&gt;
+340 REM &lt;132&gt;
+350 REM FUER DAS ARBEITEN MIT DATASSETTE &lt;118&gt;
+360 REM SIND FOLGENDE ZEILEN ZU AENDERN: &lt;217&gt;
+370 REM &lt;178&gt;
+380 REM *** 200 GA=1 &lt;207&gt;
+390 REM *** 210 ENTFAELLT &lt;174&gt;
+400 REM *** 220 ENTFAELLT &lt;057&gt;
+410 REM *** 250 ENTFAELLT &lt;195&gt;
+420 REM *** 240 POKE 646,8 &lt;247&gt;
+430 REM *** 270 PRINT &quot;{CLR}&quot;; &lt;007&gt;
+440 REM *** 300 PRINT &quot;{5DOWN}RUN&quot; &lt;103&gt;
+450 REM &lt;002&gt;
+460 REM &lt;232&gt;
+470 REM AM BAND MUESSEN DIE PROGRAMME &lt;214&gt;
+480 REM IN DER REIHENFOLGE &lt;215&gt;
+490 REM &lt;042&gt;
+500 REM LMS, LMS.PHA, LMS.BAS &lt;074&gt;
+510 REM &lt;002&gt;
+520 REM GESPEICHERT WERDEN. &lt;123&gt;
+</pre>
+            <figcaption>Listing 3. Das Ladeprogramm »LMS« geben Sie bitte mit dem Checksummer V 3 (Ausgabe 3/86, Seite 55) ein.</figcaption>
+        </figure>
+
+        <figure>
+        <pre>
+programm : Ims.pha IceB Ff4 9deß : BR b9 7b
+Y9de8 : B8 dA f&amp;
+9dfR : 2c 85 fc
+9ceß : 28 ei Ie a9 83 a2 9 85 a4 Y9df8 : bi fb Bd
+9ce8B : #7 B6 fa a2 57 28 c3 Je ba IJeBR : Bd dY 9
+9ctB : ad 88 OS Bd de 94 ad 99 a7 JeQ8 : dd Ad a9
+Ict8 : 85 Bd dd 94 a9 Bc Bd QB Ge gei® : c8 91 fd
+9dRR : BI a9 Id Bd 99 DI 28 67 e9 Jeil8 : 82 bi fb
+9da8 : 9 Ac 74 a4 208 ei 9e a5 56 9e28 : BS bi fb
+9d1R : 9d FB 33 Ac 7b Id ad Be e7 g9e28 : BB cB
+9d18 : dd 29 fe Bd Be dd ad Br ad ge78 : ad dB 9
+9d22 : dd 29 fe Bd Bf dd a5 37 ec 9e38 : 85 fc 4c
+9428 : cd d6 9 da 07 a5 Sa cd 84 9e4B : Ac e7 a7
+9438 : d7 9 fa 32 ad d7 9 c9 85 9e48 : fc 85 91
+9438 : FF FA DI 20 80 Je a5 59 7a ge5Q : 289 03 85
+9448 : Bd da 9 a5 Sa Bd d7 9 84 9e58 : BR 85 fd
+9d48 : a9 ff Bd 34 dd Bd 25 dd ef gebdß : 45 9e dB
+9458 : Bd Bb dd Bd 97 dd ad Be 3c ge68 : bi fd cd
+9458 : dd 29 d7 Bd Be dd ad Bf 16 9e78 : bi fd cd
+9d6R : dd 29 d7 Bd Bf dd 78 ad 96 g9e78 : Ad I9e 60
+9468 : Be dd 97 Bi Bd Be dd ad e3 9eB88 : 22 57 9e
+9478 : Bf dd 27 A1 Bd Or dd 58 52 g9e88 : 18 bi fd
+9478 : Ac e4 a7 28 73 00 c9 BR 84 ge9B : bi fd 697
+9480 : FO Ba c9 Ba da 83 28 b&amp; 4c 9e98 : 20 Ad 9e
+9488 : Y9d Ac Sd 9e 20 67 9 ad 86 geaQ : 28 45 9e
+9498 : de 9# Bd 98 OS ad dd 9 #5 geaß : cQ 27 8
+9d98 : Bd 99 DS a9 52 Bd 77 02 13 9eba : 28 298 Ad
+9daß : a9 55 Bd 78 92 a9 Ae Bd 728 gebB : 65 fd 85
+9da8ß : 79 32 a9 Ad Bd 7a 02 a9 56 9ec : 85 fe 68
+9dbR : 24 85 ch dc 92 83 28 AS #5 9ec8 : 16 e7 cB
+9db8 ge ad 22 8: Bd da 9 ad 97 gedß : 82 9e ad
+dc : 23 BI Bd db 9 a9 c# Bd c5 9edB : ad db 9
+9dc8 : B2 95 a9 Je Bd 83 935 a9 da geeß : 853 a9 82
+FddB : FF Bd dh 9 Bd d7 9 a9 39 gee8B : 45 Je ad
+9ddsS : BR 85 fd a9 dO 85 fe ad ch gef® : 9 c8B ca
+
+9 91 fd c8 ca 3d gef8 : Je 60 20 45 Fe a9 OO Sd 87
+a5 2b 85 fb a5 e5 900 : DR da 20 Ad Ge dO 20 fd 83
+28 b5 9e ad oa #5 988 : ae 28 9e b7 Ba 48 28 fd cc
+de 9 c8 bi fb 24 g9f1B : ae 20 Fe b7 48 aß 18 28 d?
+da 12 ad d8 9 ad 918 fa ff 28 fd ae 4c a4 aa 85
+ff ad @g@ 91 fd 15 920 : a9 QAR Bd BR BB a9 Bl 85 Ba
+2@ Ad Je d0 aß bi 928 : 2b a9 28 85 2c a9 90 85 f6
+ad aa 71 fd aß ch 9530 : 37 a9 80 85 58 640 a9 BB Sa
+aa Bi 91 fd a9 #7 938 : Bd ZA BR a9 Bl 85 2b a9 57
+fd ca 87 da #9 2c 9408 : 88 85 2c a9 e@ 85 37 a9 2d
+B5 fb ad d9 9 b&amp; 948 : 9c 85 38 du 20 20 9 28 83
+f3 9d 28 79 008 Be 950 : 44 ab a2 QQ b5 Zb 9d eds 589
+48 78 a5 81 29 7e 958 : 9 eB eB Be dO fü 20 36 17
+68 40 48 a5 Bi 35 g6D : 9 20 44 a6 Ac 74 a4 a2 35
+v1 58 68 40 a9 fa 968 : BR bd e6 9 48 b5 2b 9d Be
+a9 d@ 85 fe 28 45 970 : eds 9# 68 95 2b eB eß De B8c
+22 b5 9e ad Bı 2 978 : dd ef 42 Ac Ad 55 2d 44 92
+d7 9 da Gc 88 48 988 : Ze 55 Ze Ad 4c 41 55 46 36
+d&amp; 9 da 94 208 3f 988 : Sa 45 49 54 2d Ad 45 53 5b
+ba fa Ac 63 9e 1f 990 : 53 2d 53 59 53 54 45 4d Bi
+2@ 43 9e ad 22 a7 998 : 20 20 564 32 Ze 30 28 28 c9
+67 81 91 fdcB 4b 9aBd : 31 351 2# 38 355 Ad 28 43 28
+ao 91 fd 18 c8 95 9fa8 : 29 20 46 52 41 4e 5a 208 ed
+b9 @@ dd 49 ft 352 9fbB : 55 54 4 49 42 45 52 @d de
+71 fd 908 91 fd 9a 9fb8 : 11 52 55 4e 29 2d 20 Ad 98
+u4 28 4c 97 9e 29 9cQ : 45 53 55 45 4e Od 45 4e 2b
+ge 40 18 a9 28 Bd 9c8 : 44 20 2d 28 41 55 53 57 26
+fd a9 80 45 fe üb 9dR : 45 52 54 45 4e Ad DR om 49
+aß DB bi f9 28 ab 9d8 : BR Da DO nn nm On am aD dd?’
+ca da f7 4a 28 ec 9feB : DO BR DO DO DB mm pm DO ei
+da 9 Bd 82 25 da g9fe8 : BO DO Da DD Da na aD DR €e97
+Bd 983 93 &amp;4c 902 Ba 90 : DB DO Dam DR fr mo fr Do FR
+se) br; = - - -
+        </pre>
+            <figcaption>Listing 4. Das Maschinenprogramm »LMS.PHA« bitte mit dem MSE eingeben.</figcaption>
+        </figure>
+
+        <p>zeigten Zeiten entsprechen den Laufzeiten ohne Meßprogramm. Es ist zu beachten, daß Programmschleifen innerhalb einer Basic-Zeile vom LMS nicht erkannt werden. Dies liegt an der zeilenorientierten Arbeitsweise des LMS.</p>
+
+        <pre>
+10 GET A$: IF A$="" THEN 10
+        </pre>
+
+        <p>ergibt als Anzahl der Aufrufe der Zeile 10 die Zahl 1.</p>
+
+        <p>Um die exakte Aufrufanzahl zu erhalten, muß die Zeile geteilt werden.</p>
+
+        <pre>
+10 GET A$
+20 IF A$="" THEN 10
+        </pre>
+
+        <p>ergibt die genaue Anzahl der Aufrufe.</p>
+
+        <p>Die gleiche Vorgangsweise ist auch für Zeilen angebracht, in denen nach einem GOSUB noch weitere Statements folgen. In diesem Fall wird nämlich nach der Rückkehr vom Unterprogramm die Aufrufanzahl der Zeile um 1 erhöht. Die ausgewiesene durchschnittliche Laufzeit ist in diesem Fall mit Vorsicht zu genießen.</p>
+
+        <p>Im Rahmen von mehreren Messungen an einem Programm treten in der Regel unterschiedliche Laufzeiten für dieselben Statements auf. Diese zunächst etwas verblüffende Feststellung hat ihre Ursache darin, daß für die Abarbeitung eines Basic-Befehls nicht immer die gleiche Anzahl von Instruktionen durchlaufen wird. Dies ergibt sich zum Beispiel durch Bildschirm-Scrolling, Interrupt-Behandlung oder Garbage Collection. Bei der Festlegung der Meßgenauigkeit wurde diese Tatsache berücksichtigt; das heißt nicht aussagekräftige Dezimalstellen wurden weggelassen.</p>
+
+        <p>Das LMS funktioniert nicht mit Programmen,</p>
+        <p>— die den vom LMS belegten Speicher benötigen ($8000 bis $9FFF und $D000 bis $FFFF; siehe auch Programmbeschreibung),</p>
+        <p>— die Basic-Zeilen generieren oder</p>
+        <p>— die den NMI-Timer verwenden (zum Beispiel RS232-Programme).</p>
+
+        <address class="author">(Mark Richters/Franz Stoiber/og)</address>
+
+        <h3>Programmbeschreibung</h3>
+
+        <p>Das Laufzeit-Meß-System besteht aus dem Maschinenprogramm »LMS.PHA« und den Basic-Programmen »LMS« und »LMS.BAS«. »LMS.PHA« ist das eigentliche Meßprogramm. Es liegt im Speicherbereich $9CE0 bis $9FFF und wird bei seiner Aktivierung in die Basic-Interpreterschleife eingebunden. Für die Zeitmessung wird der Timer im CIA2 benutzt. Als Zeitbasis wird der Systemtakt verwendet. Die Meßergebnisse werden im RAM ab $D000 unter dem Betriebssystem abgelegt.</p>
+
+        <p>Der Ablauf einer Messung kann dem Flußdiagramm (siehe Bild 1) beziehungsweise dem Listing »LMS.ASS« entnommen werden. Die Aufbereitung und Auswertung der Meßergebnisse erfolgt im Programm »LMS.BAS«. Um ein abwechselndes Laden des in Basic geschriebenen Auswerteprogramms und des zu messenden Programms zu vermeiden, wird der Basic-Speicher derart geteilt, daß beide Programme gleichzeitig geladen sein können. LMS.BAS muß sich dabei mit weniger als 8 KByte ab Adresse $8000 begnügen.</p>
+
+        <p>Die Umschaltung des Basic-Speichers erfolgt in »LMS.PHA«. Beim Aktivieren des Meßprogramms wird das zu messende Programm zur Verfügung gestellt, beim Deaktivieren wird zum Auswerteprogramm verzweigt.</p>
+
+        <p>Das Ladeprogramm »LMS« lädt zunächst »LMS.PHA«, damit die Maschinenroutinen zur Verfügung stehen. Danach teilt und initialisiert das Programm den Basic-Bereich. Zuletzt lädt und startet es das Auswerteprogramm.</p>
+
+        <p>Die Anpassung von »LMS.BAS« an unterschiedliche Drucker ist problemlos, da außer der Sekundäradresse 7 keine speziellen Steuercodes verwendet wurden.</p>
+
+        <p>Für die Verwendung mit Datassette müssen die im Programmlisting LMS enthaltenen Hinweise beachtet werden.</p>
+
+        <figure>
+        <pre>
+1020 REM -----—- ES BUBWERTEPROSBANE v2.8 “B31&gt; 388 IF A+=&quot;D&quot; THEN 728 217&gt;
+181 REM ------- 1 NZ STOIBER &lt;181&gt; 3978 IF A$=&quot;H&quot; THEN 1918 &lt;211&gt;
+118 PRINT ERsuarcmeter: VE 888,225: 420 IF At=&quot;E&quot; THEN 1058 &lt;1253&gt;
+ZF=&amp; 0725 412 GOTO 320 &lt;1B2&gt;
+128 Fe —— ENDE ZEXKRRHHEH A228 REM MESSUNG &lt;B&gt;
+HHAHH, x@58&gt; 432 FOEKE 888,237=2 PRINT CHR&amp; (9); &quot;X{CLR}Y&quot;5:
+138 FOKE S3200, 122 Fi 53281,15: FOKE 646 SyS 42148 ı857&gt;
+„ZF: GOSUB &lt;240&gt; 442 REM ANZEIGE AB &lt;208&gt;
+14Q8 BLt=&quot; TAOSBABEI&quot; &lt;B42&gt; 458 GOSUR 1938: IF F THEN 2308 “2527
+152 RA=53248: PU=255: L=22: CL=985.248: R= 468 GOSUR 1442: GOSUB 1480 &lt;a02&gt;
+- &lt;BB6&gt; 478 F=P-8: GOSUB 1158: GOTO Z08 &lt;116&gt;
+162 K@=218: Ki=2t1lö: K2=2124: KI=?1372: K4= 488 REM ZURUECK &lt;B85&gt;
+Ei-1: K5=-453999: Kö6=18 iB76&gt; 498 GOSUR 19350: IF F THEN 300 xa356&gt;
+178 RD=48679: AT=49710: AB=40535: NR=40918 &lt;128&gt; SsaR@ F=FP-(ZZ+L-1)*8 &lt;057&gt;
+1820 Pi=48926: F2=Pi+1: P3=Pi+2: P4=Pi+3: P si@ IF P&lt;RA THEN P=RA &lt;B96&gt;
+S=Pil+4: P6=Pi+5: P7=Pil+6: P8=P1+7 &lt;B44&gt; 528 GOSUB 1138: GOTD S@Q 1577&gt;
+zu2 J=0: K=8Q: P=RA {19475 5:2 REM VOR &lt;145&gt;
+218 KZ#+=&quot; 165PACEFNR {SSPACE FRANZ {BSPACE }MSEK 542 GOSUB 19350: IF F THEN 302 {B8B8&gt;
+{4SPACE IMSEK/RANZ&quot; &lt;218&gt; 558 GOSUR 1130: GOTO 308 x187&gt;
+22B SYS AT,6,S,&quot;MESSUNG „nun nunnnunnn „ {SSP 568 REM SUMME &lt;221&gt;
+ACE}M&quot; 1035 578 GOSUR 1930: IF F THEN S08 &lt;118&gt;
+220 SYS AT,6,7,&quot;ANZEIGE AB NR „....... . i35P 582 GOSUR 1442 2225
+ACEFA&quot; x155&gt; sa SYS AT,S,4, &quot;SUMME&quot;: SYS AT,5,S,&quot;TTTITT&quot; &lt;1705
+240 SYS AT,6,97,&quot;NMDRHERGEHENDE SEITE ..{3S5P sad GOSUR 1480: GOSUB 1580 A215
+ACEIT&quot; . x194&gt; sim P=P-8: S=2 &lt;B89°&gt;
+250 SYS AT,&amp;6,11,&quot;NAECHSTE SEITE „...... RE j 622 GOSUR 1080 | 069 &gt;
+TURN&quot; &lt;111&gt; 63Q@0 IF Z&gt;ZRB THEN 670 2167&gt;
+2ER SYS AT,6,13,&quot;SUMME nun nnunnunnnnnn 435 642 GOSUB 1378 x184&gt;
+FACEIS&quot; 21547 650 5=S+T: SYS AT,S@,10,Z “203%
+278 SYS AT,Ö,15, &quot;DRUCKEN „nun nnaannn nn 135 Gh GOTO 628 “1525
+PACEID&quot; A23IF 670 SYS AT,3Q,10,&quot; {4SPACE}&quot; ö 23ER
+280 SYS AT, ‚6: 17 ,&quot;HILFE „..nuunuunnnnnnn {35 6828 T=5: Tf=&quot;&quot;: GOSUB 1400 2157
+PACE}&gt;H £2171&gt; &amp;7B SYS AT,S,17,&quot;3UMME =&quot;;T$;&quot; MSEK&quot; Z2A5:
+270 SYS Fa 19,&quot;ENDE „unnnnnunununnnnn {35 788 F=RA: GOTO 300 21365
+FACEIE&quot; “1275 7ı@ REM DRUCHEN 2675
+=2@ FOKE 198,8: SYS AT,@B,24,&quot; {RVSON,4SPACE 728 GOSUR 1938: IF F THEN 308 “B12&gt;
+&gt;WEITER MIT: M/A/T/RETURN/S/BD/H/E {3SPA 720 GOSUB 1448 &lt;114&gt;
+CE,RVOFF}&quot;; &lt;144&gt; 748 SYS AT,S,4, &quot;DRUCKEN&quot;: SYS AT,5,5,&quot;TTTT
+318 FOEE 2023,160: FOKE 56295,ZF 206: TTT&quot; &lt;BB5}
+322 GET At: IF A$=&quot;&quot; THEN 3280 Z1S15&gt; 758 GOSUB 1480: GOSUR 1580: P=P-8: S=Q 22785
+338 IF A$=&quot;M&quot; THEN 458 223975 7680 SYS AT,S,15,&quot;DBRUCKER 0.K. &gt;?&quot; &lt;216&gt;
+348 IF At=&quot;A&quot; THEN 458 0595 778 SYS AT,„S,16,&quot;HEITER MIT BELIERIGER IAS
+3580 IF A+=&quot;t&quot; THEN 492 x244 &gt; E&quot; {2E2&gt;
+SB IF A#=CHRF (13) THEN 542 “156&gt; 788 POKE 198,8: WAIT 198,1: POKE 198,0 A121&gt;
+378 IF Af=&quot;5&quot; THEN 572 &lt;118&gt; 772 OPEN 4,4,7: FOKE 768,185: PRINT#4,&quot;&quot;3:
+FOKE 768,139
+Sa@ IF ST THEN SYS AT,8,22,&quot; {RVSON,SPACE}D
+RUCKER NICHT BEREIT {SPACE ,RVOFF&gt;&quot;: CLO
+SE 4: GDTO 300
+B1B IF K&lt;BB THEN PL$=&quot;&quot;: GOSUR 18358: GOTO
+832
+820 SYS AT,D, 15, BL$;: SYS AT,@,16,BlL$;
+830 F=: PLs=&quot;
+842 GOSUR 1288
+852 IF Z&gt;ZB THEN 968
+840 GOSUR 1328
+872 GOSUB 1378
+BER S=S+T: T$=&quot;&quot;: B$=&quot;{12SPACE}&quot;
+872 GOSUB 1420
+gB@ IF AZ&lt;2 THEN 920
+918 B$=&quot;&quot;: T=T/AZ: AZ=8: GOTO 898
+920 PL$=PL$+&quot; {2SPACE}&quot;+Z$+AZE+T$+B$
+938 IF F=@ THEN F=1: GOTO 840
+942 GOSUB 1858
+950 GOTO 838
+968 IF F THEN sosun kai:
+972 T=S: T$=&quot;&quot;: 608 au
+980 PLs- « (7SPAGE&gt; SUMME =&quot;+T$+&quot; MSEK&quot;: GDSU
+B 183
+9982 En 4: P=RA: G0TD 302
+1222 REM HILFE
+1212 GOSUR 1442: GOTO 228
+1222 REM ENDE
+1038 GOSUB 1448: SYS AT,5,13,&quot;BITTE ENDE B
+ESTAETIGBEN (J/N) : {SPACE ,RVSON,SPACE,R
+VORFY&quot;z
+1048 GET A$: IF A$=&quot;&quot; THEN 1948
+1050 IF At=&quot;J&quot; THEN SYS AT,35,13,&quot;J&quot;: SYS
+64738
+1062 SYS AT,B,13,BlL$;: GOTO 228
+1072 REM -----—-——— RTE AUS RAM LESEN
+1082 P=P+B: PH=INT (P/K®): PL=P-PH&amp;K@
+1098 POKE PU,PL: POKE PU+1,PH: SYS RD
+1102 Z=PEEK (P1)+PEEK (P2) *K@
+1110 RETURN
+1128 REM ---------—- AUSGABE BILDSCHIRM
+1138 PRINT &quot;{CLR,RVSON,4SPACE}NR {3SPACE}AN
+Z {BSPACE }MSEK {4SPACE &gt;MSEK/ ANZ {4SPACE}
+1142 Mi=Q: M2=B: Ci$=&quot; &quot;: C2g=&quot; &quot;
+1158 FOR ZZ=1 TOL
+1160 :BOSUB 1088
+117@ :IF Z=K4 THEN P=P-8: PRINT E$;: GOTO.
+1288
+1188 :60SUR 1320
+1198 :G0SUR 1378
+1288 :IF T&gt;Mi1 THEN Mi=T: Li=Z2: Ci$=&quot;e&quot;
+1218 :T$=&quot;&quot;
+1220 :GOSUB 1408
+123@ :IF AZ&lt;2 THEN 1268
+1248 :T=T/AZ: IF T&gt;M2 THEN M2=T: L2=ZZ: C2
+genen
+1250 :AZ=Q: GOTD 1228
+1262 :PRINT Z$3AZ$; T&amp;
+127@ NEXT
+1288 IF Ci$=&quot;+&quot; THEN SYS AT,24,1L1+1,C1$;
+1278 IF C2$=&quot;e&quot; THEN SYS AT,S6,L2+1,02$;
+1302 RETURN \
+131B REM --------—- AUFBEREITUNG NR,ANZ
+1322 Z$= RIGHTS (&quot; CHEPADEI&quot;+BTRS(ZI, &amp;)
+133@ AZ=PEEK (PS) +PEEK (P4)
+1348 AZSCRIBHTS (&quot; (SBPACEI&quot;+BTRE(AZ), 6)
+1258 RETURN
+136@ REM ZEIT ERRECHNEN
+1372 T=(PEEK (PS) +PEEK (P6) #KO+PEEK (P7) #K1+P
+EEK (PB) #K2) /CL
+1380 RETURN
+1392 REM ------------ AUFBEREITUNG ZEIT
+1428 TR=T+R: TH=INT(TRIz TL=INTECTR-TH)#K&amp;
+1418 T$=T$+RIGHT$ (&quot; {FSPACEF&quot;+STRS (TH) „1D)+
+&quot;&quot;+RIGHT&amp;(STRE(TL) ,1)
+1420 RETURN
+1438 REM KOPFZEILEN
+1440 PRINT &quot;{CLR,RVSON,2SPACE LAUFZEIT {2SP
+ACE}- (2SPACE I NESS {2SPACE I- {2SPACEYSYS
+TEM{3SPACEIV2.BLSSPACEI&quot;;
+1458 PRINT &quot;{RVSON,ZSPACE}(C) 11/85{SPACE,
+SHIFT-SPACEFERANZ STOIBER {14SPACE}&quot;
+1468 RETURN
+1478 REM -------——— EINGABE ZEILENNR AB
+
+19775
+
+&lt;251&gt;
+
+{2335
+&lt;AB&amp;b&gt;
+21775
+A223&gt;
+2817&gt;
+
+&lt;a39&gt;
+
+1488
+
+1490
+
+1502
+
+1518
+
+1858
+1868
+
+18780
+
+RO=8: SYS AT,5,RO,&quot;AB NR{2SPACE}?{25P
+ACE}&quot;3: GOSUR 1658 &lt;Q8S&gt;
+IF A$=&quot;{SSPACE}&quot; THEN ZA=Q: SYS AT,14
+„RO,ZA: 60TO 1528 &lt;Q62&gt;
+ZA=VAL(A$): IF ZA{=KS THEN SYS AT,@,2
+2,BlL$;: 60T0 1528 &lt;169&gt;
+SYS AT,6,22,&quot; {RVSON , 4SPACE}ZEILENNUMM
+ER ZU GROSS{4SPACE ,RVOFF}&quot;;: GOTO 148
+2 &lt;231&gt;
+ZH=INT (ZA/KB): ZL=ZA-ZH*KB: POKE NR,Z
+L: POKE NR+1,ZH &lt;Q64&gt;
+SYS AB: P=PEEK (PU) +PEEK (PU+1)*K@ &lt;@70&gt;
+P=P-8: GOSUB 1082 {2545
+IF Z&lt;K4 THEN RETURN . &lt;@44&gt;
+SYS AT,6,22,&quot; {RVSON , SPACE }ZEILENNUMME
+R NICHT GEFUNDEN {SPACE,RVOFF}&quot;;: GOTO
+
+ae &lt;2B8&gt;
+REM -------—- EINGABE ZEILENNR BIS &lt;165&gt;
+Anni: SYS AT,S,RO,&quot;BIS NR ?{2SPACE}&quot;
+
+s: GOSUB 1658 &lt;138&gt;
+IF A$=&quot;{SSPACE}&quot; THEN ZB=K5: SYS AT,1
+4,R0,ZB: RETURN &lt;162&gt;
+ZB=VAL(A$): IF ZB&gt;=ZA THEN 1620 &lt;120&gt;
+SYS AT,5,22,&quot; {RVSON,2SPACE}ZEILENNR B
+
+IS &lt; ZEILENNR AB{ZSPACE,RVOFF}&quot;5=2 GOT
+0 158 &lt;118&gt;
+IF ZE&gt;K5S THEN ZB=kK5 &lt;121&gt;
+SYS AT,B,22,BlL$:;: RETURN &lt;243&gt;
+REM ZAHL EINGEBEN &lt;217&gt;
+N=1: RC=1924+14+40*R0: CO=RC+54272: P
+DEE 198,82 £B12&gt;
+FOR I=1 TO 5: POKE CO+I1,ZF: NEXT &lt;171&gt;
+IF N&gt;5 THEN N=5 &lt;@31&gt;
+IF N&lt;1 THEN N=1 &lt;193&gt;
+PO=RC+N: POKE PD,PEEK{PO)+128 &lt;@4Q&gt;
+GET C$: IF C$=&quot;&quot; THEN &lt;@51&gt;
+IF C$&gt;=&quot;B&quot; AND C$&lt;=&quot;9&quot; THEN POKE PO,A
+SC(C$): N=N+1: 60TO 39&gt;
+IF C$=CHR$ (157) THEN POKE PD,PEEK (PO)
+-128: N=N-1: GOTO 71&gt;
+IF C$=CHR$ (29) THEN POKE PO,PEEK(PO)-
+
+128: N=N+1: GOTO 1678 120&gt;
+IF C$=CHR$ (28) THEN SYS AT,15,R0,&quot; 158
+PACE}&quot;;: GOTO 1658 &lt;206&gt;
+IF C$=CHR$ (13) THEN POKE FO„PEEK(PO)-
+
+128: GOTO 1770 &lt;164&gt;
+G0TO 1728 &lt;B32&gt;
+Ag=&quot;&quot; &lt;@19&gt;
+FOR I=1 T0 5 &lt;120&gt;
+: A$=A$+CHR$ (PEEK(RC+T)) &lt;@21&gt;
+NEXT _ &lt;032&gt;
+RETURN &lt;Q98@&gt;
+REM ZEILE DRUCKEN &lt;178&gt;
+IF K{&amp;8 THEN 1900 &lt;138&gt;
+IF K&lt;73 THEN PRINT# 4,&quot;&quot;: K=K+1: GDTO
+
+184 &lt;@38&gt;
+J=J+1: PRINT# 4,&quot;&quot;: PRINT# 4,&quot;&quot; &lt;2@2&gt;
+PRINT# 4,&quot; {3SPACE}LAUFZEIT - HESS - 5
+YSTEM{2SPACEIV2.2&quot;; 208 &gt;
+PRINT# 4,&quot;{5SPACE}(C) ERANZ STOIBER 1
+1/85{6SPACEISEITE: &quot;:RIGHT$ (STRE$ (J+10
+
+3,2) &lt;115&gt;
+FRINT# 4,&quot;&quot;:2 PRINT# 4,&quot;&quot;: PRINT# 4,KZ
+$;KZ$: PRINT# 4,&quot;&quot; &lt;144&gt;
+K=8 &lt;181&gt;
+PRINT# 4,PL$: K=k+1 &lt;050&gt;
+RETURN &lt;190&gt;
+a — TEST AUF MESSUNG &lt;159&gt;
+PP=P: F=B: P=RA-B: As=&quot;&quot; &lt;032&gt;
+G0SUB 1988 &lt;119&gt;
+FOR I=P1 TO PB: At=A$+CHR&amp;(PEEK(I)):
+NEXT &lt;Q50&gt;
+IF A$=&quot;LMS-F.S.&quot; THEN &lt;174&gt;
+SYS AT,&amp;6,22,&quot; {RVSÖN,SPACE}KEINE MESSU
+NG GELAUFEN ! {SPACE ,RVOFF}&quot; &lt;@19&gt;
+F=1: RETURN &lt;117&gt;
+GOSUR. 1288 &lt;169&gt;
+IF Z&lt;K4 THEN P=PP: RETURN &lt;078&gt;
+SYS AT,6,21,&quot; {RVSON,SPACE}HAEHREND DE
+R MESSUNG WAR &quot; &lt;Q57&gt;
+SYS AT,6,22,&quot; {RVSON,2SPACE&gt;KEIN PROGR
+AMM GELADEN! {2SPACE „RVOFF}&quot; &lt;Q85&gt;
+G0TO 1988 &lt;@81&gt;
+        </pre>
+            <figcaption>Listing 5. Das Auswertungsprogramm »LMS.BAS« (Schluß)</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

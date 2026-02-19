@@ -183,6 +183,17 @@ Use standard metadata fields where available:
 - `64er.index_category`
 - `64er.id`
 
+`64er.id` format:
+
+- Lowercase, no spaces.
+- Underscores separate words (e.g. `memory_map`, `tips_tricks`).
+- Hyphens for model numbers or compound technical names (e.g. `hr-5c`, `hypra-text`).
+- German umlauts are allowed (e.g. `bücher`, `dfü`).
+- Short and descriptive — typically the main topic, software name, or hardware model.
+- For recurring column types, reuse the same id across issues (e.g. `leserforum`, `impressum`, `aktuell`).
+- For articles about a specific program/product, use that name (e.g. `superbase64`, `mse`, `sid`).
+- No strict length limit, but keep concise.
+
 Lead text rule:
 
 - The subtitle/lead directly under `<h1>` should be encoded as `<p class="intro">...</p>`, not `<blockquote>`.
@@ -449,6 +460,7 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
 1. Identify boundaries:
    - Resolve start/end pages from `8604_toc_improved.tsv`.
    - Confirm real start page and continuation pages from scans.
+   - **Always check the page AFTER the TOC-listed last page** for continuation content (closing paragraphs, author credits like `(hm)`, `Info:` blocks). Articles frequently spill onto the next page. OCR that page and inspect the top portion.
    - List all pages to OCR (article content pages, excluding pure ad pages).
 
 2. Run Tesseract OCR:
@@ -489,7 +501,18 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
 
 5. Structure pass:
    - Convert headings, intros, `noindent`, `strong`, `pre`, `table`, `figure`, `address`.
+   - Heading level determination (mandatory before writing `h()` calls in import script):
+     1. Scan ALL pages of the article and inventory every heading.
+     2. Classify each heading by its visual typographic treatment:
+        - **h2**: heading text with a horizontal rule/line above AND below it.
+        - **h3**: bold heading text without horizontal rules.
+     3. Record the full heading inventory (text, scan page, visual treatment, assigned level) in the checklist `heading_inventory` field before proceeding.
+   - **Displaced headings**: Typesetters sometimes moved headings away from their logical position to avoid placing them at the very top or bottom of a column. When a heading appears in the middle of a paragraph in the scan, move it to its logical position — typically right before the paragraph it introduces. The surrounding text should be re-joined into one paragraph above the heading.
    - Build special structures (for example `div.q`/`div.a`) only when scan supports it.
+   - **Author credit and Info block** (mandatory check):
+     - Look for an author abbreviation in parentheses at the end of the article text, e.g. `(hm)`, `(sc)`, `(gk)`. Render as `<address class="author">(xx)</address>`.
+     - Look for an `Info:` block (book/product reference, supplier address). Render as `<p class="source">Info: ...</p>`.
+     - These may appear on the page AFTER the main article text (see Phase 1 boundary rule).
 
 6. OCR correction pass (`prose_pass`):
    - Paragraph-by-paragraph visual compare against page images.
