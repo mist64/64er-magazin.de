@@ -1,8 +1,12 @@
 # 8604 Conversion Workflow — Tesseract Edition (Living Document)
 
+**NEVER reproduce article text from memory. ALWAYS extract it from the OCR output first. The output HTML is COMPLETELY unusable if text was ever reproduced from memory.**
+
 This file is intentionally iterative and will be updated and improved during the conversion.
 
 ## Goal
+
+100% reproduce the original magazine text. This includes preserving the original spelling (even spelling errors in the original), but excludes OCR artifacts. Never change any wording or content. Never add anything that is not in the original (no captions, no summaries, no editorial notes, no bridge text).
 
 Convert scanned 600 DPI master pages via per-page Tesseract OCR into repository-style HTML files in `8604/`, aligned with existing issue folders (for example `8603/`).
 
@@ -17,6 +21,32 @@ Convert scanned 600 DPI master pages via per-page Tesseract OCR into repository-
 - Generic anti-memory rule: avoid writing content from memory as much as possible.
 - Prefer extraction, copy, and incremental edits over manual retyping.
 - No false done rule: if unresolved OCR or structure issues remain, status must be `partial`.
+
+## Known Hallucination Patterns (from practice)
+
+These are the most common ways agents introduce fabricated content. Be vigilant about all of them.
+
+1. **Figcaptions are the #1 hallucination risk.** Agents invent captions for photos that have no caption in the magazine. Rule: if a figure has no caption text visible on the scan, use `<figure>` with NO `<figcaption>`. Never invent a descriptive caption.
+
+2. **Table/figure captions get silently reworded.** Agents paraphrase or summarize captions instead of reproducing them exactly. Example: OCR says "Zusammenhang zwischen EXROM/GAME" but agent writes "Zusammenstellung EXROM/GAME". Every caption must be extracted from OCR, not described from the image content.
+
+3. **Bridge text across page/column breaks is fabricated.** When a paragraph spans a page or column break and the OCR for the continuation is hard to find, agents fill the gap with plausible-sounding German text. This is the most dangerous pattern because it reads naturally. Example: agent wrote "weil dort das Basic-Interpreter-ROM liegt" when the actual text was "weil dann der Basic-Interpreter abgeschaltet ist und der SYS-Befehl nicht mehr ausgeführt werden kann."
+
+4. **Figure placement defaults to end-of-article.** Agents dump figures at the end of the article instead of placing them where they appear in the magazine layout. Always check the scan for figure position. Main article photos typically go after the intro paragraph, not before the author line.
+
+5. **Multi-session context loss causes re-hallucination.** When a conversation runs out of context and resumes, the agent may re-invent text that was correctly extracted in the previous session. Always re-verify against OCR after a session boundary.
+
+## Known Recurring OCR Errors
+
+These Tesseract errors appear consistently across articles and should be checked:
+
+- `»I«` → `»l«` (uppercase I misread for lowercase L in switch positions)
+- `$1` → `S1`, `Sl` → `S1` (switch name S1 misread as dollar-one or S-lowercase-L)
+- `S]` → `S1` (bracket misread for digit 1)
+- `ı` → `i` (Turkish dotless i appearing in German text)
+- Spacing errors in compound words: `abgeschaltetistund` → `abgeschaltet ist und`
+- `©` → `C` (copyright symbol misread for letter C, as in "C 64")
+- `®` → garbage (registered symbol appearing as OCR noise)
 
 ## OCR Pipeline
 
@@ -742,6 +772,17 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
      `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `/tmp/<NNN>_ocr.txt` ← `agent column reconstruction` ← `/tmp/<NNN>_ocr.tsv` ← `tesseract` ← `/tmp/<NNN>_300.png` ← `600 DPI master PNG`
    - If this chain is broken (for example by a Write that replaces the whole file), the article must be re-extracted.
 
+7. Adding text missed during initial import (Option C procedure):
+   - When post-import verification reveals text that was missed during Phase 4 (for example: an unprocessed column area, a page boundary paragraph, right-column text buried in TSV noise), the missing text must NEVER be composed from memory.
+   - Required procedure:
+     1. Identify the missing text's location in the `_ocr_raw.txt` or per-page `_ocr.txt`/`_ocr.tsv` files.
+     2. Write a Python script that extracts the relevant blocks/paragraphs from the OCR source, performs mechanical cleanup (line joining, dehyphenation), and outputs `<p>`-tagged HTML to an intermediate file on disk.
+     3. Use a second script to replace the affected text in the HTML file, sourcing from the intermediate file.
+     4. Fix OCR errors with targeted Edit calls on the HTML (small `old_string` → `new_string` pairs, each verifiable against the scan). Each Edit fixes one specific OCR artifact.
+   - The intermediate HTML file (`*_html.txt` or `*_replacement.txt`) is the provenance artifact. The script that produced it is the audit trail.
+   - What is NOT allowed: reading OCR data in the LLM context, mentally assembling sentences, and writing them into an Edit `new_string` or a Write call. This is reconstruction-from-memory even if the individual words came from OCR — the LLM is composing the sentence structure, joining, and punctuation from its own knowledge.
+   - Rule of thumb: if you cannot point to a script + output file on disk that produced your text, you are writing from memory.
+
 ### Detection of violations
 
 A Write-from-memory violation is indicated by any of:
@@ -750,6 +791,26 @@ A Write-from-memory violation is indicated by any of:
 - Article body text that does not appear in `_ocr_raw.txt` (after accounting for edits)
 - Prose that is suspiciously clean (no OCR artifacts) on first import
 - Missing `_ocr_raw.txt` file for a completed article
+- Missing text added without an intermediate extraction file as provenance
+- Figcaptions, bridge text, or any other content not present in the original scan
+
+### Hallucination review pass (mandatory)
+
+After an article is complete, run a review pass to detect hallucinated content. This is NOT optional — it has caught real hallucinations in every article checked so far.
+
+**Procedure:**
+1. Write a script that extracts every figcaption, heading, and paragraph from the HTML.
+2. For each element, search for distinctive words/phrases in the OCR raw text.
+3. Flag elements with low OCR coverage for manual verification against the scan.
+4. Verify ALL figcaptions and headings individually against the scan — these are highest risk.
+5. Check page/column break boundaries specifically — bridge text is often fabricated.
+
+**Priority areas (from most to least likely to contain hallucinations):**
+1. Figcaptions — especially for photos (vs. numbered diagrams/tables)
+2. Bridge text at page/column breaks
+3. Table captions (often reworded instead of reproduced)
+4. Content added after a session boundary
+5. Paragraphs that are "too clean" compared to surrounding OCR quality
 
 ## Reusable Toolchain
 
