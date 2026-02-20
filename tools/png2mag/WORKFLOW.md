@@ -8,7 +8,7 @@ Convert scanned 600 DPI master pages via per-page Tesseract OCR into repository-
 
 ## Agreed Ground Rules
 
-- Primary text source is per-page Tesseract TSV output (`_work/<NNN>_ocr.tsv`), reconstructed into `_work/<NNN>_ocr.txt` by the agent, and concatenated into `_work/<NNN>_ocr_raw.txt`.
+- Primary text source is per-page Tesseract TSV output (`/tmp/<NNN>_ocr.tsv`), reconstructed into `/tmp/<NNN>_ocr.txt` by the agent, and concatenated into `/tmp/<NNN>_ocr_raw.txt`.
 - 600 DPI master PNGs (one per page) are the authoritative source images.
 - Scanned page images are mandatory for verification and correction.
 - TOC wording can differ from the on-page article title.
@@ -42,14 +42,14 @@ Discovered through systematic testing on pages 134 and 159:
 
 ```bash
 # Step 1: Downscale 600 DPI master to 300 DPI
-magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
+magick png/<NNN>_600_cropped.png -resize 50% /tmp/<NNN>_300.png
 
 # Step 2: Run Tesseract with TSV output
-tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
-# produces _work/<NNN>_ocr.tsv
+tesseract /tmp/<NNN>_300.png /tmp/<NNN>_ocr -l deu --psm 1 tsv
+# produces /tmp/<NNN>_ocr.tsv
 ```
 
-After producing the TSV, the agent reconstructs a plain-text file (`_work/<NNN>_ocr.txt`) with correct column reading order. See "Column Reconstruction from TSV" below.
+After producing the TSV, the agent reconstructs a plain-text file (`/tmp/<NNN>_ocr.txt`) with correct column reading order. See "Column Reconstruction from TSV" below.
 
 ### Multi-Page Articles
 
@@ -58,17 +58,17 @@ For articles spanning multiple pages, OCR each page individually, reconstruct ea
 ```bash
 # OCR each page (TSV output)
 for p in 134 135 136; do
-    magick png/${p}_600_cropped.png -resize 50% _work/${p}_300.png
-    tesseract _work/${p}_300.png _work/${p}_ocr -l deu --psm 1 tsv
+    magick png/${p}_600_cropped.png -resize 50% /tmp/${p}_300.png
+    tesseract /tmp/${p}_300.png /tmp/${p}_ocr -l deu --psm 1 tsv
 done
 
-# Agent reconstructs _work/<NNN>_ocr.txt for each page from TSV (see below)
+# Agent reconstructs /tmp/<NNN>_ocr.txt for each page from TSV (see below)
 
 # Concatenate into article raw file (with page markers)
 for p in 134 135 136; do
     echo "--- PAGE ${p} ---"
-    cat _work/${p}_ocr.txt
-done > _work/133_von_basic_zu_assembler_teil3_ocr_raw.txt
+    cat /tmp/${p}_ocr.txt
+done > /tmp/133_von_basic_zu_assembler_teil3_ocr_raw.txt
 ```
 
 The `--- PAGE NNN ---` markers help locate content during the import script mapping phase. They are ignored during import (never emitted as HTML).
@@ -103,7 +103,7 @@ For each page TSV:
 4. **Sort** lines: left-column blocks first (sorted by `top`), then right-column blocks (sorted by `top`).
 5. **Join** words within each line with spaces.
 6. **Emit** as plain text lines, one per reconstructed line.
-7. **Save** as `_work/<NNN>_ocr.txt`.
+7. **Save** as `/tmp/<NNN>_ocr.txt`.
 
 #### Handling special cases
 
@@ -378,7 +378,7 @@ Conservative normalization only:
 - Never draft article prose from memory (for example by writing full text directly in a heredoc such as `cat <<EOF ...`).
 - Extraction method (required):
   - OCR each page belonging to the article with the standard pipeline (see OCR Pipeline above)
-  - Concatenate per-page OCR results into `_work/<NNN>_<slug>_ocr_raw.txt`
+  - Concatenate per-page OCR results into `/tmp/<NNN>_<slug>_ocr_raw.txt`
 - Build/refresh HTML text from that extracted block before applying any cleanup edits.
 - Do not begin from manually retyped prose.
 - Fix obvious missing spaces and broken word joins.
@@ -394,7 +394,7 @@ These steps are mandatory for every article. Do all of them.
 All transformations must be edits on top of the Tesseract OCR output.
 Do not rebuild prose from scratch at any stage.
 
-1. Run Tesseract on each page and concatenate into `8604/_work/*_ocr_raw.txt`.
+1. Run Tesseract on each page and concatenate into `/tmp/*_ocr_raw.txt`.
 2. Build an initial HTML draft by importing that extracted text verbatim (line-preserving).
 3. Structural pass:
    - convert headings to appropriate tags (`h1`, `h2`, etc.)
@@ -464,7 +464,7 @@ Pilot article completed:
 ## Best Practices Learned So Far
 
 - Start/end boundaries: determine article boundaries from scanned page layout first, then confirm from OCR output.
-- Provenance: always keep the per-page OCR files and the concatenated `_work/*_ocr_raw.txt` for traceability.
+- Provenance: always keep the per-page OCR files and the concatenated `/tmp/*_ocr_raw.txt` for traceability.
 - Two-pass text handling:
   1. Tesseract OCR into working text
   2. paragraph-by-paragraph correction against scan
@@ -554,16 +554,16 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
 2. Run Tesseract OCR (TSV pipeline):
    - For each page in the article, run the standard pipeline:
      ```bash
-     magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
-     tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
+     magick png/<NNN>_600_cropped.png -resize 50% /tmp/<NNN>_300.png
+     tesseract /tmp/<NNN>_300.png /tmp/<NNN>_ocr -l deu --psm 1 tsv
      ```
-   - For each page, reconstruct `_work/<NNN>_ocr.txt` from the TSV using the column reconstruction procedure (see "Column Reconstruction from TSV" in the OCR Pipeline section). Read the TSV, assign columns by x-coordinate, sort by column then vertical position, and write the reconstructed text.
+   - For each page, reconstruct `/tmp/<NNN>_ocr.txt` from the TSV using the column reconstruction procedure (see "Column Reconstruction from TSV" in the OCR Pipeline section). Read the TSV, assign columns by x-coordinate, sort by column then vertical position, and write the reconstructed text.
    - Concatenate per-page results into the article raw file:
      ```bash
      for p in <page_list>; do
          echo "--- PAGE ${p} ---"
-         cat _work/${p}_ocr.txt
-     done > _work/<NNN>_<slug>_ocr_raw.txt
+         cat /tmp/${p}_ocr.txt
+     done > /tmp/<NNN>_<slug>_ocr_raw.txt
      ```
    - All article text edits must be applied on top of this extraction.
 
@@ -573,7 +573,7 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - Body placeholder must be exactly: `        <!-- BODY WILL BE MECHANICALLY IMPORTED -->`
 
 4. Mechanical import pass:
-   - Copy the import template: `cp _work/IMPORT_TEMPLATE.py _work/<NNN>_import.py`
+   - Copy the import template: `cp IMPORT_TEMPLATE.py /tmp/<NNN>_import.py`
    - Edit the copy: set `RAW` path, fill in article-specific line mappings.
    - Available helpers (see template for full API):
      - `p(cls, *line_nums)` — emit `<p>` from raw lines (1-indexed), merged with space
@@ -584,8 +584,8 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
      - `tsv_table(header, start, end)` — emit tab-separated table (`plain pre`)
    - When mapping lines, skip `--- PAGE NNN ---` marker lines (they are not content).
    - When Tesseract column order is wrong, reorder by specifying correct line numbers in the import script.
-   - Run: `python3 _work/<NNN>_import.py > _work/<NNN>_body.html`
-   - Inject into shell: `python3 _work/inject.py "<HTML_FILE>" "_work/<NNN>_body.html" "<address_text>"`
+   - Run: `python3 /tmp/<NNN>_import.py > /tmp/<NNN>_body.html`
+   - Inject into shell: `python3 inject.py "<HTML_FILE>" "/tmp/<NNN>_body.html" "<address_text>"`
    - No rewriting from memory at any point.
 
 5. Structure pass:
@@ -708,16 +708,16 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
 ### Enforcement rules
 
 1. Mandatory extraction artifact:
-   - Phase 2 must produce per-page `_work/<NNN>_ocr.tsv` files via Tesseract, per-page `_work/<NNN>_ocr.txt` files reconstructed from TSV by the agent, and a concatenated `_work/<NNN>_<slug>_ocr_raw.txt`.
+   - Phase 2 must produce per-page `/tmp/<NNN>_ocr.tsv` files via Tesseract, per-page `/tmp/<NNN>_ocr.txt` files reconstructed from TSV by the agent, and a concatenated `/tmp/<NNN>_<slug>_ocr_raw.txt`.
    - Phase 4 must `Read` this file before any HTML body text is written.
    - If the raw file does not exist, phases 4+ are blocked.
 
 2. Import via script, not Write:
    - Phase 4 (mechanical import) must use the reusable toolchain:
-     1. Copy `_work/IMPORT_TEMPLATE.py` → `_work/<NNN>_import.py`
+     1. Copy `IMPORT_TEMPLATE.py` → `/tmp/<NNN>_import.py`
      2. Fill in article-specific line mappings (the only creative step)
-     3. Run: `python3 _work/<NNN>_import.py > _work/<NNN>_body.html`
-     4. Inject: `python3 _work/inject.py "<HTML>" "_work/<NNN>_body.html" "<address>"`
+     3. Run: `python3 /tmp/<NNN>_import.py > /tmp/<NNN>_body.html`
+     4. Inject: `python3 inject.py "<HTML>" "/tmp/<NNN>_body.html" "<address>"`
    - The model does not compose prose during import — the script does mechanical line placement.
    - The Write tool may only be used for the initial HTML shell (metadata + empty body) in phase 3.
 
@@ -726,7 +726,7 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
    - The Write tool must not be used on article HTML files after phase 4.
    - CRITICAL: The Edit tool's `new_string` parameter is also a memory vector. An Edit that replaces a placeholder with 200+ lines of body text is functionally identical to a Write from memory — the LLM is composing the content in the `new_string` field.
    - Therefore: Edit calls in phases 5+ must be small, targeted corrections (fix a word, merge a hyphenation, add a tag). Any bulk insertion of body text must go through the import script (phase 4).
-   - The phase 4 import must use `_work/inject.py` (generic tool) to read from `_work/*_body.html` (itself generated from `_work/*_import.py` reading `_work/*_ocr_raw.txt`) and inject into the HTML shell. The injection must be done by the script, not by pasting content into an Edit or Write call.
+   - The phase 4 import must use `inject.py` (generic tool) to read from `/tmp/*_body.html` (itself generated from `/tmp/*_import.py` reading `/tmp/*_ocr_raw.txt`) and inject into the HTML shell. The injection must be done by the script, not by pasting content into an Edit or Write call.
 
 4. Scratchpad citation for corrections:
    - During OCR correction (phase 6), each non-trivial correction should cite the source evidence: scan page + region (for example "p.142 col2 para3: scan shows 'Fehlerbeseitigung' not 'Fohler-beseitigung'").
@@ -739,7 +739,7 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
 
 6. Provenance chain:
    - For any line in the final HTML, it must be possible to trace back:
-     `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `_work/<NNN>_ocr.txt` ← `agent column reconstruction` ← `_work/<NNN>_ocr.tsv` ← `tesseract` ← `_work/<NNN>_300.png` ← `600 DPI master PNG`
+     `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `/tmp/<NNN>_ocr.txt` ← `agent column reconstruction` ← `/tmp/<NNN>_ocr.tsv` ← `tesseract` ← `/tmp/<NNN>_300.png` ← `600 DPI master PNG`
    - If this chain is broken (for example by a Write that replaces the whole file), the article must be re-extracted.
 
 ### Detection of violations
@@ -751,7 +751,7 @@ A Write-from-memory violation is indicated by any of:
 - Prose that is suspiciously clean (no OCR artifacts) on first import
 - Missing `_ocr_raw.txt` file for a completed article
 
-## Reusable Toolchain (`_work/`)
+## Reusable Toolchain
 
 ### OCR Pipeline Scripts
 
@@ -759,26 +759,26 @@ The OCR pipeline is two commands per page, plus agent-driven column reconstructi
 
 ```bash
 # Per-page OCR (repeat for each page)
-magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
-tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
-# produces _work/<NNN>_ocr.tsv
+magick png/<NNN>_600_cropped.png -resize 50% /tmp/<NNN>_300.png
+tesseract /tmp/<NNN>_300.png /tmp/<NNN>_ocr -l deu --psm 1 tsv
+# produces /tmp/<NNN>_ocr.tsv
 ```
 
-After each page's TSV is produced, the agent reads it, reconstructs correct reading order using the column reconstruction procedure, and saves the result as `_work/<NNN>_ocr.txt`.
+After each page's TSV is produced, the agent reads it, reconstructs correct reading order using the column reconstruction procedure, and saves the result as `/tmp/<NNN>_ocr.txt`.
 
-### `_work/inject.py` — Generic body injector
+### `inject.py` — Generic body injector
 
 Injects mechanically generated body HTML into an article shell. This is the anti-memory enforcement chokepoint: the body content flows from a file, never from the LLM's output.
 
 ```
-python3 _work/inject.py <html_file> <body_file> [<address_text>]
+python3 inject.py <html_file> <body_file> [<address_text>]
 ```
 
 - `<html_file>`: the article HTML shell (must contain placeholder comment)
 - `<body_file>`: the generated body (output of the import script)
 - `<address_text>`: optional, e.g. `"(Logo/aw)"` — appended as `<address class="author">`
 
-### `_work/IMPORT_TEMPLATE.py` — Import script template
+### `IMPORT_TEMPLATE.py` — Import script template
 
 Copy this for each new article. Provides reusable helpers:
 
@@ -793,10 +793,10 @@ Copy this for each new article. Provides reusable helpers:
 
 Workflow:
 ```
-cp _work/IMPORT_TEMPLATE.py _work/<NNN>_import.py
+cp IMPORT_TEMPLATE.py /tmp/<NNN>_import.py
 # edit: set RAW path, fill article-specific line mappings
-python3 _work/<NNN>_import.py > _work/<NNN>_body.html
-python3 _work/inject.py "<article>.html" "_work/<NNN>_body.html" "(author/xx)"
+python3 /tmp/<NNN>_import.py > /tmp/<NNN>_body.html
+python3 inject.py "<article>.html" "/tmp/<NNN>_body.html" "(author/xx)"
 ```
 
 The only creative work is deciding which raw lines map to which HTML elements. All prose flows mechanically from the OCR extraction file.
@@ -805,12 +805,12 @@ The only creative work is deciding which raw lines map to which HTML elements. A
 
 ## Checklist Policy (Mandatory)
 
-- Use one checklist file per article run in `8604/_work/`.
-- Start from template: `8604/_work/CHECKLIST_TEMPLATE.md`.
+- Use one checklist file per article run in `/tmp/`.
+- Start from template: `CHECKLIST_TEMPLATE.md`.
 - Suggested naming:
-  - `8604/_work/<startpage>_<slug>_CHECKLIST.md`
+  - `/tmp/<startpage>_<slug>_CHECKLIST.md`
 - Create checklist instances by copying the template with `cp`, for example:
-  - `cp 8604/_work/CHECKLIST_TEMPLATE.md 8604/_work/133_von_basic_zu_assembler_teil3_CHECKLIST.md`
+  - `cp CHECKLIST_TEMPLATE.md /tmp/133_von_basic_zu_assembler_teil3_CHECKLIST.md`
 - Phases must be checked in order; do not check a later phase before earlier phase is complete.
 - The final lock checkbox:
   - `All checkboxes above are checked`
