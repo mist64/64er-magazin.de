@@ -654,6 +654,7 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
 3. Create initial HTML shell:
    - Add metadata, `h1`, and intro placeholder.
    - Keep `index_title` commented and empty.
+   - Keep `author` as placeholder (`content="TODO"`). The author field is filled at the very end (phase 12), not during shell creation. This prevents premature decisions and keeps the shell mechanical.
    - Body placeholder must be exactly: `        <!-- BODY WILL BE MECHANICALLY IMPORTED -->`
 
 4. Mechanical import pass:
@@ -728,6 +729,7 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
 
 12. Final QA gate:
     - No unresolved placeholders or malformed HTML blocks.
+    - Fill the `<meta name="author">` field now (it was left empty during shell creation in phase 3).
     - Author credit normalized to `<address class="author">...</address>`.
     - All Bild/Tabelle/Listing references resolved.
     - Unresolved issue count must be zero.
