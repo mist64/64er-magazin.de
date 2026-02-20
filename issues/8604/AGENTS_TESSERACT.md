@@ -228,13 +228,75 @@ Leserforum format:
 - Use `article` with class `qa`.
 - Add header image block first:
   - `<header><img src="<startpage>-0.png" alt="Leserforum" title="Leserforum"></header>`
-- For cleanly separable items use:
-  - `<section><h2>...</h2> ... </section>`
-  - question blocks in `<div class="q">...</div>`
-  - answer blocks in `<div class="a">...</div>`
-  - sender/signature lines as `<p class="author">...</p>`
-  - contact/info lines as `<p class="source">...</p>`
+- Each Q/A topic is a `<section>`:
+  - `<h2>Topic Title</h2>` — the topic heading (mixed case, even if ALL CAPS in scan)
+  - `<div class="q">` — question block containing:
+    - `<p>` paragraphs with question text
+    - `<p class="author">Author Name</p>` — questioner name (mixed case)
+    - Optional issue reference: `<p class="noindent">Ausgabe N/YY</p>` or `<h3>Ausgabe N/YY</h3>` when visually prominent
+  - `<div class="a">` — answer block (when present) containing:
+    - `<p>` paragraphs with answer text
+    - `<p class="author">Answerer Name</p>` — when the answer is from a named reader (not editorial)
+  - `<p class="source">Info: ...</p>` — after `div.a`, still inside section
+  - `<ul class="source plain">` — for multi-line address/source blocks
+- Questions without answers: `<div class="q">` only, no `<div class="a">`
+- Items that are tips/answers without a preceding question: use `<div class="a">` directly (no `<div class="q">`)
+- Numbered questions/answers: use `<ol>` / `<li>` when the magazine uses numbered format, or prefix with `(N)` when inline
+- `<aside>` blocks for recurring features:
+  - "Fragen Sie doch" — reader question invitation
+  - "Wollen Sie antworten?" — call for reader answers
+  - "Leser fragen - Willi Brechtl antwortet" — special column (use `<h1>` for title, `<p class="intro">` for intro)
+  - "Ein Wort in eigener Sache" — editorial notes
+  - These are NOT `<section>` — they are `<aside>` with `<h2>` (or `<h1>` for Willi Brechtl)
+- Name normalization: ALL CAPS names from the magazine scan are converted to mixed case in HTML (e.g. `MARCO TRUNZER` → `Marco Trunzer`)
+- Heading normalization: ALL CAPS topic headings are converted to mixed case (e.g. `FRAGEN ZUM C 64` → `Fragen zum C 64`)
+  - Preserve proper nouns and acronyms: `CP/M`, `C 64`, `C 128`, `MPS 801`, etc.
+- When question has inline author name at end of text (common in compact items), split it into separate `<p class="author">` tag
+- `<code>` for inline code/commands within answer text
 - If OCR quality prevents reliable structural splitting, prefer a faithful line-preserving conversion from extracted text over guessed restructuring.
+
+Example — typical Q/A section:
+```html
+        <section>
+            <h2>Topic Title</h2>
+
+            <div class="q">
+                <p>Question text...</p>
+                <p class="author">Questioner Name</p>
+            </div>
+
+            <div class="a">
+                <p>Answer text...</p>
+                <p class="author">Answerer Name</p>
+            </div>
+
+            <p class="source">Info: Address or reference...</p>
+        </section>
+```
+
+Example — question only (no answer):
+```html
+        <section>
+            <h2>Topic Title</h2>
+
+            <div class="q">
+                <p>Question text...</p>
+                <p class="author">Questioner Name</p>
+            </div>
+        </section>
+```
+
+Example — answer/tip without preceding question:
+```html
+        <section>
+            <h2>Topic Title</h2>
+
+            <div class="a">
+                <p>Tip/answer text...</p>
+                <p class="author">Contributor Name</p>
+            </div>
+        </section>
+```
 
 Image/Bild integration rule:
 
@@ -252,7 +314,7 @@ Image/Bild integration rule:
 
 Listing placement and content rules:
 
-- **Listing contents are omitted.** The `<figure>` wrapper and `<figcaption>` must be present, but the `<pre>` block inside must be empty (no OCR content). Listings are too error-prone from Tesseract to include; they will be added separately from a verified source.
+- **Listing contents are omitted** for listings in "Checksummer" format (BASIC code with `<123>`-style checksums after every line) or "MSE" format (address, 8 hex bytes, 1 checksum byte per line). These formats are identifiable either by an explicit label ("Checksummer", "MSE") or by their characteristic structure. The `<figure>` wrapper and `<figcaption>` must be present, and the `<pre>` block inside must contain only `TODO` (no OCR content). These listings will be added separately from a verified source.
 - **Default placement: end of article.** All listing `<figure>` blocks go at the end of the article, grouped together just before `</article>`. This keeps the prose flow clean.
 - **Exception 1 — tutorial-style articles with small captioned Listings:** When a numbered `Listing N` is small and directly embedded in the prose flow as part of a step-by-step tutorial explanation, keep it inline at the point of reference. The `<figure>` with `<figcaption>` stays; it is just placed inline instead of at the end.
 - **Exception 2 — "Tips und Tricks" multi-tool collection articles:** In "Tips und Tricks" articles where every `<h2>` describes a separate, independent tool or trick, place each tool's Listings inline (at the end of that tool's section, before the next `<h2>`). This keeps each self-contained tool section complete. If the article is a single continuous narrative that happens to be in the Tips und Tricks section, use the default (Listings at end).
@@ -265,14 +327,12 @@ Example — default (single-narrative article, Listings at end):
         <address class="author">(...)</address>
 
         <figure>
-            <pre>
-            </pre>
+            <pre>TODO</pre>
             <figcaption>Listing 1. ...</figcaption>
         </figure>
 
         <figure>
-            <pre>
-            </pre>
+            <pre>TODO</pre>
             <figcaption>Listing 2. ...</figcaption>
         </figure>
     </article>
@@ -283,16 +343,14 @@ Example — Tips und Tricks multi-tool (Listings inline per tool section):
         <h2>Tool A</h2>
         <p>...description of Tool A...</p>
         <figure>
-            <pre>
-            </pre>
+            <pre>TODO</pre>
             <figcaption>Listing 1. Tool A program.</figcaption>
         </figure>
 
         <h2>Tool B</h2>
         <p>...description of Tool B...</p>
         <figure>
-            <pre>
-            </pre>
+            <pre>TODO</pre>
             <figcaption>Listing 2. Tool B program.</figcaption>
         </figure>
     </article>
