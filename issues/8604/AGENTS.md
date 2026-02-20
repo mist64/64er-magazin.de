@@ -1,21 +1,115 @@
-# 8604 Conversion Workflow (Living Document)
+# 8604 Conversion Workflow — Tesseract Edition (Living Document)
 
 This file is intentionally iterative and will be updated and improved during the conversion.
 
 ## Goal
 
-Convert `8604/8604.md` (OCR dump) + scanned issue pages into repository-style HTML files in `8604/`, aligned with existing issue folders (for example `8603/`).
+Convert scanned 600 DPI master pages via per-page Tesseract OCR into repository-style HTML files in `8604/`, aligned with existing issue folders (for example `8603/`).
 
 ## Agreed Ground Rules
 
-- Primary text source is `8604/8604.md`.
-- Scanned page images / PDF pages are mandatory for verification and correction.
+- Primary text source is per-page Tesseract TSV output (`_work/<NNN>_ocr.tsv`), reconstructed into `_work/<NNN>_ocr.txt` by the agent, and concatenated into `_work/<NNN>_ocr_raw.txt`.
+- 600 DPI master PNGs (one per page) are the authoritative source images.
+- Scanned page images are mandatory for verification and correction.
 - TOC wording can differ from the on-page article title.
 - On-page title and on-page start page always win over TOC when they conflict (TOC errors are ignored).
 - `index_title` is currently not set from this workflow and must remain commented out in generated HTML until provided from another source.
 - Generic anti-memory rule: avoid writing content from memory as much as possible.
 - Prefer extraction, copy, and incremental edits over manual retyping.
 - No false done rule: if unresolved OCR or structure issues remain, status must be `partial`.
+
+## OCR Pipeline
+
+### Source Files
+
+600 DPI cropped master PNGs, one per magazine page. These are the authoritative originals; the 150 DPI images in the PDF are derived from them.
+
+Expected location: `png/<NNN>_600_cropped.png` (or provided externally in `/tmp/` or similar).
+
+### Optimal Tesseract Parameters
+
+Discovered through systematic testing on pages 134 and 159:
+
+| Parameter | Value | Reason |
+|-----------|-------|--------|
+| Input DPI | 300 (downscaled from 600) | Tesseract LSTM trained ~300 DPI; native 600 DPI causes Turkish dotless-ı bug |
+| Downscale | `magick <src> -resize 50%` | Clean 2:1 integer downscale, no interpolation artifacts |
+| Language | `-l deu` | German; handles both old (daß/muß) and new orthography |
+| PSM mode | `--psm 1` | Automatic page segmentation with OSD; correctly detects two-column layouts |
+| Preprocessing | None | Upscaling, thresholding, sharpening all make results worse |
+
+### Per-Page OCR Command
+
+```bash
+# Step 1: Downscale 600 DPI master to 300 DPI
+magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
+
+# Step 2: Run Tesseract with TSV output
+tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
+# produces _work/<NNN>_ocr.tsv
+```
+
+After producing the TSV, the agent reconstructs a plain-text file (`_work/<NNN>_ocr.txt`) with correct column reading order. See "Column Reconstruction from TSV" below.
+
+### Multi-Page Articles
+
+For articles spanning multiple pages, OCR each page individually, reconstruct each page's text from TSV, then concatenate:
+
+```bash
+# OCR each page (TSV output)
+for p in 134 135 136; do
+    magick png/${p}_600_cropped.png -resize 50% _work/${p}_300.png
+    tesseract _work/${p}_300.png _work/${p}_ocr -l deu --psm 1 tsv
+done
+
+# Agent reconstructs _work/<NNN>_ocr.txt for each page from TSV (see below)
+
+# Concatenate into article raw file (with page markers)
+for p in 134 135 136; do
+    echo "--- PAGE ${p} ---"
+    cat _work/${p}_ocr.txt
+done > _work/133_von_basic_zu_assembler_teil3_ocr_raw.txt
+```
+
+The `--- PAGE NNN ---` markers help locate content during the import script mapping phase. They are ignored during import (never emitted as HTML).
+
+### Known Limitations
+
+- **Code listings fragment**: Assembly/BASIC listings may split into many small OCR blocks. Manual stitching in the import script is expected.
+- **Directory listings and tables**: Structured columnar content (like Commodore directory listings) loses alignment. Manual correction needed during technical fidelity pass.
+- **Old German spelling**: Tesseract `deu` handles pre-1997 orthography (daß, muß, Fluß) correctly — no special configuration needed.
+
+### Column Reconstruction from TSV
+
+TSV output is the primary Tesseract format. The agent reconstructs correct reading order from position data. This replaces reliance on Tesseract's built-in column ordering, which frequently fails around figures and diagrams.
+
+#### TSV format
+
+Each row has: `level`, `page_num`, `block_num`, `par_num`, `line_num`, `word_num`, `left`, `top`, `width`, `height`, `conf`, `text`.
+
+- `level=5` rows are individual words (the only rows with text content).
+- `level=1..4` rows are structural (page, block, paragraph, line boundaries) — useful for grouping but contain no text.
+
+#### Reconstruction procedure
+
+For each page TSV:
+
+1. **Filter** to `level=5` rows where `text` is non-empty.
+2. **Group** words by `(block_num, par_num, line_num)` to form text lines.
+3. **Determine column assignment** for each block using its `left` coordinate:
+   - Compute page midpoint from the image width (typically ~1275 px at 300 DPI for these magazine pages, so midpoint ~637).
+   - Blocks with `left < midpoint` → left column.
+   - Blocks with `left >= midpoint` → right column.
+4. **Sort** lines: left-column blocks first (sorted by `top`), then right-column blocks (sorted by `top`).
+5. **Join** words within each line with spaces.
+6. **Emit** as plain text lines, one per reconstructed line.
+7. **Save** as `_work/<NNN>_ocr.txt`.
+
+#### Handling special cases
+
+- **Full-width blocks** (headings, titles, page-spanning figures): These may have `left` near 0 and `width` spanning the full page. Place them in reading order by `top` coordinate relative to surrounding column text.
+- **Figures and captions**: Tesseract often creates separate blocks for figure captions. Their `left`/`top` coordinates indicate which column they belong to.
+- **Three-column layouts** (rare): Use three x-coordinate ranges instead of two. Inspect the TSV `left` values to identify natural clusters.
 
 ## TOC Workflow
 
@@ -114,6 +208,17 @@ Use standard metadata fields where available:
 - `64er.index_category`
 - `64er.id`
 
+`64er.id` format:
+
+- Lowercase, no spaces.
+- Underscores separate words (e.g. `memory_map`, `tips_tricks`).
+- Hyphens for model numbers or compound technical names (e.g. `hr-5c`, `hypra-text`).
+- German umlauts are allowed (e.g. `bücher`, `dfü`).
+- Short and descriptive — typically the main topic, software name, or hardware model.
+- For recurring column types, reuse the same id across issues (e.g. `leserforum`, `impressum`, `aktuell`).
+- For articles about a specific program/product, use that name (e.g. `superbase64`, `mse`, `sid`).
+- No strict length limit, but keep concise.
+
 Lead text rule:
 
 - The subtitle/lead directly under `<h1>` should be encoded as `<p class="intro">...</p>`, not `<blockquote>`.
@@ -123,13 +228,75 @@ Leserforum format:
 - Use `article` with class `qa`.
 - Add header image block first:
   - `<header><img src="<startpage>-0.png" alt="Leserforum" title="Leserforum"></header>`
-- For cleanly separable items use:
-  - `<section><h2>...</h2> ... </section>`
-  - question blocks in `<div class="q">...</div>`
-  - answer blocks in `<div class="a">...</div>`
-  - sender/signature lines as `<p class="author">...</p>`
-  - contact/info lines as `<p class="source">...</p>`
+- Each Q/A topic is a `<section>`:
+  - `<h2>Topic Title</h2>` — the topic heading (mixed case, even if ALL CAPS in scan)
+  - `<div class="q">` — question block containing:
+    - `<p>` paragraphs with question text
+    - `<p class="author">Author Name</p>` — questioner name (mixed case)
+    - Optional issue reference: `<p class="noindent">Ausgabe N/YY</p>` or `<h3>Ausgabe N/YY</h3>` when visually prominent
+  - `<div class="a">` — answer block (when present) containing:
+    - `<p>` paragraphs with answer text
+    - `<p class="author">Answerer Name</p>` — when the answer is from a named reader (not editorial)
+  - `<p class="source">Info: ...</p>` — after `div.a`, still inside section
+  - `<ul class="source plain">` — for multi-line address/source blocks
+- Questions without answers: `<div class="q">` only, no `<div class="a">`
+- Items that are tips/answers without a preceding question: use `<div class="a">` directly (no `<div class="q">`)
+- Numbered questions/answers: use `<ol>` / `<li>` when the magazine uses numbered format, or prefix with `(N)` when inline
+- `<aside>` blocks for recurring features:
+  - "Fragen Sie doch" — reader question invitation
+  - "Wollen Sie antworten?" — call for reader answers
+  - "Leser fragen - Willi Brechtl antwortet" — special column (use `<h1>` for title, `<p class="intro">` for intro)
+  - "Ein Wort in eigener Sache" — editorial notes
+  - These are NOT `<section>` — they are `<aside>` with `<h2>` (or `<h1>` for Willi Brechtl)
+- Name normalization: ALL CAPS names from the magazine scan are converted to mixed case in HTML (e.g. `MARCO TRUNZER` → `Marco Trunzer`)
+- Heading normalization: ALL CAPS topic headings are converted to mixed case (e.g. `FRAGEN ZUM C 64` → `Fragen zum C 64`)
+  - Preserve proper nouns and acronyms: `CP/M`, `C 64`, `C 128`, `MPS 801`, etc.
+- When question has inline author name at end of text (common in compact items), split it into separate `<p class="author">` tag
+- `<code>` for inline code/commands within answer text
 - If OCR quality prevents reliable structural splitting, prefer a faithful line-preserving conversion from extracted text over guessed restructuring.
+
+Example — typical Q/A section:
+```html
+        <section>
+            <h2>Topic Title</h2>
+
+            <div class="q">
+                <p>Question text...</p>
+                <p class="author">Questioner Name</p>
+            </div>
+
+            <div class="a">
+                <p>Answer text...</p>
+                <p class="author">Answerer Name</p>
+            </div>
+
+            <p class="source">Info: Address or reference...</p>
+        </section>
+```
+
+Example — question only (no answer):
+```html
+        <section>
+            <h2>Topic Title</h2>
+
+            <div class="q">
+                <p>Question text...</p>
+                <p class="author">Questioner Name</p>
+            </div>
+        </section>
+```
+
+Example — answer/tip without preceding question:
+```html
+        <section>
+            <h2>Topic Title</h2>
+
+            <div class="a">
+                <p>Tip/answer text...</p>
+                <p class="author">Contributor Name</p>
+            </div>
+        </section>
+```
 
 Image/Bild integration rule:
 
@@ -145,6 +312,50 @@ Image/Bild integration rule:
 - If no article PNG assets exist for the start page, do not invent image figures.
 - Special case: files matching `*-0*.png` are usually unnumbered and uncaptioned teaser/lead images; place them near the article start, typically directly below the lead/intro block.
 
+Listing placement and content rules:
+
+- **Listing contents are omitted** for listings in "Checksummer" format (BASIC code with `<123>`-style checksums after every line) or "MSE" format (address, 8 hex bytes, 1 checksum byte per line). These formats are identifiable either by an explicit label ("Checksummer", "MSE") or by their characteristic structure. The `<figure>` wrapper and `<figcaption>` must be present, and the `<pre>` block inside must contain only `TODO` (no OCR content). These listings will be added separately from a verified source.
+- **Default placement: end of article.** All listing `<figure>` blocks go at the end of the article, grouped together just before `</article>`. This keeps the prose flow clean.
+- **Exception 1 — tutorial-style articles with small captioned Listings:** When a numbered `Listing N` is small and directly embedded in the prose flow as part of a step-by-step tutorial explanation, keep it inline at the point of reference. The `<figure>` with `<figcaption>` stays; it is just placed inline instead of at the end.
+- **Exception 2 — "Tips und Tricks" multi-tool collection articles:** In "Tips und Tricks" articles where every `<h2>` describes a separate, independent tool or trick, place each tool's Listings inline (at the end of that tool's section, before the next `<h2>`). This keeps each self-contained tool section complete. If the article is a single continuous narrative that happens to be in the Tips und Tricks section, use the default (Listings at end).
+- **Bare code snippets are always inline.** Unlabeled code examples (bare `<pre>` without `<figure>`/`<figcaption>`, no "Listing N" caption) are always part of the prose flow and stay inline. These are not "Listings" — they are just code examples. This is not an exception; it is the normal case.
+
+Example — default (single-narrative article, Listings at end):
+```html
+        <p>...prose referencing Listing 1...</p>
+        <!-- Listings are NOT here -->
+        <address class="author">(...)</address>
+
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 1. ...</figcaption>
+        </figure>
+
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 2. ...</figcaption>
+        </figure>
+    </article>
+```
+
+Example — Tips und Tricks multi-tool (Listings inline per tool section):
+```html
+        <h2>Tool A</h2>
+        <p>...description of Tool A...</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 1. Tool A program.</figcaption>
+        </figure>
+
+        <h2>Tool B</h2>
+        <p>...description of Tool B...</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 2. Tool B program.</figcaption>
+        </figure>
+    </article>
+```
+
 Figure placement rule for Tabellen:
 
 - Treat `Tabelle` entries like `Bild` entries at markup level:
@@ -154,16 +365,20 @@ Figure placement rule for Tabellen:
 - Do not leave standalone `Tabelle` headings as plain `<p>` blocks when a figure/table is present.
 - Do not keep duplicated caption-spill paragraphs like `<p>Bild n. ...</p>` when the same text is already in adjacent `<figcaption>`.
 
+Author/Info adjacency rule:
+
+- **Paragraph + author + Info form an atomic block.** The `<address class="author">` and any "Info" box always stick directly to the preceding paragraph — never insert a `<figure>` (Bild, Listing, or Tabelle) between them.
+- **Image placement treats this block as a unit.** The rule "place figure after the paragraph that references it" means: after the atomic block (paragraph + author + info), not between the paragraph and the author. Figures referenced in the last paragraph go after the author/info, not before it.
+
 ## OCR Cleanup Policy
 
 Conservative normalization only:
 
-- Always start article text from a direct line-range extraction out of `8604/8604.md`.
+- Always start article text from Tesseract OCR output of the article's pages.
 - Never draft article prose from memory (for example by writing full text directly in a heredoc such as `cat <<EOF ...`).
 - Extraction method (required):
-  - identify start/end line numbers in `8604/8604.md`
-  - extract with `cut` from numbered lines, for example:
-  - `nl -ba 8604/8604.md | sed -n '<start>,<end>p' | cut -f2-`
+  - OCR each page belonging to the article with the standard pipeline (see OCR Pipeline above)
+  - Concatenate per-page OCR results into `_work/<NNN>_<slug>_ocr_raw.txt`
 - Build/refresh HTML text from that extracted block before applying any cleanup edits.
 - Do not begin from manually retyped prose.
 - Fix obvious missing spaces and broken word joins.
@@ -176,10 +391,10 @@ Conservative normalization only:
 Post-extraction editing workflow (required):
 
 These steps are mandatory for every article. Do all of them.
-All transformations must be edits on top of the `cut` extraction output.
+All transformations must be edits on top of the Tesseract OCR output.
 Do not rebuild prose from scratch at any stage.
 
-1. Extract raw block from `8604.md` with `nl|sed|cut` into `8604/_work/*_ocr_raw.txt`.
+1. Run Tesseract on each page and concatenate into `8604/_work/*_ocr_raw.txt`.
 2. Build an initial HTML draft by importing that extracted text verbatim (line-preserving).
 3. Structural pass:
    - convert headings to appropriate tags (`h1`, `h2`, etc.)
@@ -248,13 +463,14 @@ Pilot article completed:
 
 ## Best Practices Learned So Far
 
-- Start/end boundaries: determine article boundaries from scanned page layout first, then confirm with `8604.md` line range.
-- Provenance: always keep the extracted OCR source block under `8604/_work/*_ocr_raw.txt` for traceability.
+- Start/end boundaries: determine article boundaries from scanned page layout first, then confirm from OCR output.
+- Provenance: always keep the per-page OCR files and the concatenated `_work/*_ocr_raw.txt` for traceability.
 - Two-pass text handling:
-  1. direct `cut` extraction into working text
+  1. Tesseract OCR into working text
   2. paragraph-by-paragraph correction against scan
 - OCR normalization: fix only what is visually confirmed on scan; avoid stylistic rewrites.
 - Split-line repair: aggressively repair OCR line-break artifacts (for example `Mit-` + `gliedern`, split words around punctuation) only when unambiguous on scan.
+- Column reordering: TSV output with x-coordinates makes column assignment mechanical. The agent reconstructs reading order from position data during Phase 2, so the `_ocr.txt` files already have correct column order. This eliminates the column-bleeding problem that plain-text Tesseract output had around figures and diagrams.
 - Metadata discipline:
   - on-page title in `<title>` and `<h1>`
   - TOC wording in `64er.toc_title`
@@ -278,14 +494,15 @@ Use this mode whenever highest fidelity is required.
 
 2. Line coverage accounting:
    - Track each extracted line/paragraph as one of: `kept`, `merged`, `split`, `dropped`.
-   - Any dropped line needs explicit reason (for example running header/footer noise).
+   - Any dropped line needs explicit reason (for example running header/footer noise, page marker line).
 
 3. Multi-column reading order:
    - Confirm and follow printed reading order before edits.
    - Do not reorder paragraphs for style.
+   - When Tesseract column ordering is wrong (detected by comparing against scan), fix in the import script line mapping.
 
 4. Page-noise whitelist:
-   - Only remove running heads/footers, page numbers, and issue/date footer lines.
+   - Only remove running heads/footers, page numbers, issue/date footer lines, and `--- PAGE NNN ---` markers.
    - Keep everything else unless explicitly identified as foreign/ad content.
 
 5. Table fidelity:
@@ -309,31 +526,45 @@ Use this mode whenever highest fidelity is required.
    - If unreferenced, mark placement as best guess in TSV `notes`.
 
 10. Author normalization:
-   - Trailing author credits like `(Name/xx)` must be `<address class="author">(...)</address>`.
+    - Trailing author credits like `(Name/xx)` must be `<address class="author">(...)</address>`.
 
 11. Completion gate:
-   - No unresolved OCR artifacts in kept text.
-   - All references resolved (Bild/Tabelle/Listing).
-   - Paragraph-by-paragraph scan check done.
+    - No unresolved OCR artifacts in kept text.
+    - All references resolved (Bild/Tabelle/Listing).
+    - Paragraph-by-paragraph scan check done.
 
 12. Stop on uncertainty:
-   - If a block is ambiguous, flag exact line(s) instead of guessing.
+    - If a block is ambiguous, flag exact line(s) instead of guessing.
 
 13. Unresolved-issue accounting:
-   - Keep an explicit unresolved ledger during conversion.
-   - Every unresolved item must include file line and reason.
-   - Completion is blocked until unresolved count is zero.
+    - Keep an explicit unresolved ledger during conversion.
+    - Every unresolved item must include file line and reason.
+    - Completion is blocked until unresolved count is zero.
 
 ## Execution Contract (Required For `do page X` / `do article X`)
 
 This is the mandatory sequence. Do not skip steps. Do not report completion before step 12 is done.
 
 1. Identify boundaries:
-   - Resolve start/end from `8604_toc_improved.tsv` and `8604/8604.md`.
+   - Resolve start/end pages from `8604_toc_improved.tsv`.
    - Confirm real start page and continuation pages from scans.
+   - **Always check the page AFTER the TOC-listed last page** for continuation content (closing paragraphs, author credits like `(hm)`, `Info:` blocks). Articles frequently spill onto the next page. OCR that page and inspect the top portion.
+   - List all pages to OCR (article content pages, excluding pure ad pages).
 
-2. Extract source text:
-   - Extract with `nl | sed | cut` into `8604/_work/<article>_ocr_raw.txt`.
+2. Run Tesseract OCR (TSV pipeline):
+   - For each page in the article, run the standard pipeline:
+     ```bash
+     magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
+     tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
+     ```
+   - For each page, reconstruct `_work/<NNN>_ocr.txt` from the TSV using the column reconstruction procedure (see "Column Reconstruction from TSV" in the OCR Pipeline section). Read the TSV, assign columns by x-coordinate, sort by column then vertical position, and write the reconstructed text.
+   - Concatenate per-page results into the article raw file:
+     ```bash
+     for p in <page_list>; do
+         echo "--- PAGE ${p} ---"
+         cat _work/${p}_ocr.txt
+     done > _work/<NNN>_<slug>_ocr_raw.txt
+     ```
    - All article text edits must be applied on top of this extraction.
 
 3. Create initial HTML shell:
@@ -345,19 +576,32 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - Copy the import template: `cp _work/IMPORT_TEMPLATE.py _work/<NNN>_import.py`
    - Edit the copy: set `RAW` path, fill in article-specific line mappings.
    - Available helpers (see template for full API):
-     - `p(cls, *line_nums)` — emit `<p>` from raw lines (merges with space)
+     - `p(cls, *line_nums)` — emit `<p>` from raw lines (1-indexed), merged with space
      - `h(level, line_num)` — emit heading
      - `blank()` — readability separator
      - `raw(text)` — emit raw HTML (figures, tables)
      - `basic_listing(start, end)` — emit BASIC listing table (`plain right0`)
      - `tsv_table(header, start, end)` — emit tab-separated table (`plain pre`)
+   - When mapping lines, skip `--- PAGE NNN ---` marker lines (they are not content).
+   - When Tesseract column order is wrong, reorder by specifying correct line numbers in the import script.
    - Run: `python3 _work/<NNN>_import.py > _work/<NNN>_body.html`
    - Inject into shell: `python3 _work/inject.py "<HTML_FILE>" "_work/<NNN>_body.html" "<address_text>"`
    - No rewriting from memory at any point.
 
 5. Structure pass:
    - Convert headings, intros, `noindent`, `strong`, `pre`, `table`, `figure`, `address`.
+   - Heading level determination (mandatory before writing `h()` calls in import script):
+     1. Scan ALL pages of the article and inventory every heading.
+     2. Classify each heading by its visual typographic treatment:
+        - **h2**: heading text with a horizontal rule/line above AND below it.
+        - **h3**: bold heading text without horizontal rules.
+     3. Record the full heading inventory (text, scan page, visual treatment, assigned level) in the checklist `heading_inventory` field before proceeding.
+   - **Displaced headings**: Typesetters sometimes moved headings away from their logical position to avoid placing them at the very top or bottom of a column. When a heading appears in the middle of a paragraph in the scan, move it to its logical position — typically right before the paragraph it introduces. The surrounding text should be re-joined into one paragraph above the heading.
    - Build special structures (for example `div.q`/`div.a`) only when scan supports it.
+   - **Author credit and Info block** (mandatory check):
+     - Look for an author abbreviation in parentheses at the end of the article text, e.g. `(hm)`, `(sc)`, `(gk)`. Render as `<address class="author">(xx)</address>`.
+     - Look for an `Info:` block (book/product reference, supplier address). Render as `<p class="source">Info: ...</p>`.
+     - These may appear on the page AFTER the main article text (see Phase 1 boundary rule).
 
 6. OCR correction pass (`prose_pass`):
    - Paragraph-by-paragraph visual compare against page images.
@@ -389,28 +633,28 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - Confirm there are no orphaned article images left unhandled.
 
 10. Coverage validation:
-   - Confirm page coverage including continuation/listing pages.
-   - Confirm ad-only pages excluded.
+    - Confirm page coverage including continuation/listing pages.
+    - Confirm ad-only pages excluded.
 
 11. Final QA gate:
-   - No unresolved placeholders or malformed HTML blocks.
-   - Author credit normalized to `<address class="author">...</address>`.
-   - All Bild/Tabelle/Listing references resolved.
-   - Unresolved issue count must be zero.
-   - Synthetic prose additions must be zero unless explicitly justified with evidence.
-   - Run objective grep/lint checks for common OCR artifacts and record results.
-   - Verify no duplicated caption-spill body paragraphs remain (`<p>Bild n...` / `<p>Tabelle n...` adjacent to same `<figcaption>`).
-   - Verify no standalone numeric OCR-junk paragraphs remain unless intentional (`^\d+( \d+)*$`).
-   - Verify `residual_defects` is present and equals `none`.
+    - No unresolved placeholders or malformed HTML blocks.
+    - Author credit normalized to `<address class="author">...</address>`.
+    - All Bild/Tabelle/Listing references resolved.
+    - Unresolved issue count must be zero.
+    - Synthetic prose additions must be zero unless explicitly justified with evidence.
+    - Run objective grep/lint checks for common OCR artifacts and record results.
+    - Verify no duplicated caption-spill body paragraphs remain (`<p>Bild n...` / `<p>Tabelle n...` adjacent to same `<figcaption>`).
+    - Verify no standalone numeric OCR-junk paragraphs remain unless intentional (`^\d+( \d+)*$`).
+    - Verify `residual_defects` is present and equals `none`.
 
 12. Completion report format:
-   - When reporting done, always include:
-   - extracted line range used
-   - output HTML file path
-   - list of Bild/Tabelle placements (`reference paragraph -> figure`)
-   - unresolved/uncertain items (if any)
-   - unresolved issue count
-   - grep/lint check summary
+    - When reporting done, always include:
+    - pages OCR'd and raw file path
+    - output HTML file path
+    - list of Bild/Tabelle placements (`reference paragraph -> figure`)
+    - unresolved/uncertain items (if any)
+    - unresolved issue count
+    - grep/lint check summary
 
 ## Failure Policy
 
@@ -464,7 +708,7 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
 ### Enforcement rules
 
 1. Mandatory extraction artifact:
-   - Phase 2 must produce a `_work/*_ocr_raw.txt` file via `nl|sed|cut`.
+   - Phase 2 must produce per-page `_work/<NNN>_ocr.tsv` files via Tesseract, per-page `_work/<NNN>_ocr.txt` files reconstructed from TSV by the agent, and a concatenated `_work/<NNN>_<slug>_ocr_raw.txt`.
    - Phase 4 must `Read` this file before any HTML body text is written.
    - If the raw file does not exist, phases 4+ are blocked.
 
@@ -495,7 +739,7 @@ LLMs bias toward generating plausible-sounding text from training data. For a fa
 
 6. Provenance chain:
    - For any line in the final HTML, it must be possible to trace back:
-     `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `8604.md line range`
+     `final HTML line` ← `Edit operation` ← `imported OCR line` ← `_ocr_raw.txt line` ← `_work/<NNN>_ocr.txt` ← `agent column reconstruction` ← `_work/<NNN>_ocr.tsv` ← `tesseract` ← `_work/<NNN>_300.png` ← `600 DPI master PNG`
    - If this chain is broken (for example by a Write that replaces the whole file), the article must be re-extracted.
 
 ### Detection of violations
@@ -508,6 +752,19 @@ A Write-from-memory violation is indicated by any of:
 - Missing `_ocr_raw.txt` file for a completed article
 
 ## Reusable Toolchain (`_work/`)
+
+### OCR Pipeline Scripts
+
+The OCR pipeline is two commands per page, plus agent-driven column reconstruction:
+
+```bash
+# Per-page OCR (repeat for each page)
+magick png/<NNN>_600_cropped.png -resize 50% _work/<NNN>_300.png
+tesseract _work/<NNN>_300.png _work/<NNN>_ocr -l deu --psm 1 tsv
+# produces _work/<NNN>_ocr.tsv
+```
+
+After each page's TSV is produced, the agent reads it, reconstructs correct reading order using the column reconstruction procedure, and saves the result as `_work/<NNN>_ocr.txt`.
 
 ### `_work/inject.py` — Generic body injector
 
@@ -531,8 +788,8 @@ Copy this for each new article. Provides reusable helpers:
 | `h(level, line_num)` | Emit `<h2>`/`<h3>` from a raw line |
 | `blank()` | Emit blank line for readability |
 | `raw(text)` | Emit raw HTML (figures, custom markup) |
-| `basic_listing(start, end)` | Emit BASIC listing as `table.plain.right0` |
-| `tsv_table(header, start, end)` | Emit tab-separated table as `table.plain.pre` |
+| `basic_listing(start, end)` | Emit BASIC listing table (`plain right0`) |
+| `tsv_table(header, start, end)` | Emit tab-separated table (`plain pre`) |
 
 Workflow:
 ```
@@ -543,6 +800,8 @@ python3 _work/inject.py "<article>.html" "_work/<NNN>_body.html" "(author/xx)"
 ```
 
 The only creative work is deciding which raw lines map to which HTML elements. All prose flows mechanically from the OCR extraction file.
+
+**Page markers**: When the `_ocr_raw.txt` contains `--- PAGE NNN ---` separator lines, skip them in line mappings. They exist only for human orientation during the mapping step.
 
 ## Checklist Policy (Mandatory)
 
