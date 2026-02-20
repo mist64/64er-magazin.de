@@ -52,34 +52,40 @@ Status rule: if any checkbox is unchecked, the article status is `partial`.
   - `noindent/strong`:
   - `pre/table/figure/address`:
 
-- [ ] 6. OCR correction pass (`prose_pass`, paragraph-by-paragraph vs scan)
+- [ ] 6. Soft hyphen resolution pass
+  - Evidence:
+  - `soft_hyphen_report.py` initial count:
+  - Resolved (remove/hyphen per occurrence):
+  - `soft_hyphen_report.py` final count: `0`
+
+- [ ] 7. OCR correction pass (`prose_pass`, paragraph-by-paragraph vs scan)
   - Evidence:
   - Pages checked:
   - Notes:
 
-- [ ] 7. Technical fidelity pass (`technical_pass`)
+- [ ] 8. Technical fidelity pass (`technical_pass`)
   - Evidence:
   - Listings:
   - Tables:
   - Symbols/notation:
   - Listing quality ledger (`start/end/opcode-sequence/unknown_tokens`):
 
-- [ ] 8. Bild/Tabelle positioning pass
+- [ ] 9. Bild/Tabelle positioning pass
   - Evidence:
   - Placement map (`reference -> figure`):
   - Reference proof (`OCR/scan line -> HTML line -> asset`):
 
-- [ ] 9. Asset validation
+- [ ] 10. Asset validation
   - Evidence:
   - All referenced files exist:
   - Orphan article assets handled:
 
-- [ ] 10. Coverage validation
+- [ ] 11. Coverage validation
   - Evidence:
   - Page coverage confirmed:
   - Continuation pages confirmed:
 
-- [ ] 11. Final QA gate
+- [ ] 12. Final QA gate
   - Evidence:
   - HTML sanity:
   - Author normalization:
@@ -87,15 +93,17 @@ Status rule: if any checkbox is unchecked, the article status is `partial`.
   - `open_issues_count = 0`:
   - `residual_defects = none`:
   - Synthetic prose additions (count):
+  - Soft hyphens remaining: `0`
 
-- [ ] 11b. Objective lint checks
+- [ ] 12b. Objective lint checks
   - Evidence:
   - OCR-noise grep (for example `1 da|Ida|Kl I|I\\^`):
   - Variable confusion grep (for example `\\bZl\\b|\\bSl\\b`):
+  - Soft hyphen grep (`\\u00AD`/`&shy;`):
   - Asset existence/orphan check:
   - Result: `pass/fail`
 
-- [ ] 12. Completion report prepared
+- [ ] 13. Completion report prepared
   - Evidence:
   - Pages OCR'd and raw file:
   - Output path:
@@ -105,6 +113,6 @@ Status rule: if any checkbox is unchecked, the article status is `partial`.
 ## Completion Lock
 
 - [ ] All checkboxes above are checked.
-- [ ] Lock integrity verified (`phase 11 checked`, `phase 11b pass`, `open_issues_count = 0`).
+- [ ] Lock integrity verified (`phase 12 checked`, `phase 12b pass`, `open_issues_count = 0`).
 
 Only when this box is checked may the article be reported as `done`.

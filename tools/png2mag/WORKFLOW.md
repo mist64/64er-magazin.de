@@ -70,13 +70,15 @@ Discovered through systematic testing on pages 134 and 159:
 
 ### Per-Page OCR Command
 
+**Important:** All intermediate files must be stored within the issue's `./tmp/` directory, not in system `/tmp/`. Tesseract and other tools may not have access to `/tmp/` due to sandboxing.
+
 ```bash
 # Step 1: Downscale 600 DPI master to 300 DPI
-magick png/<NNN>_600_cropped.png -resize 50% /tmp/<NNN>_300.png
+magick png/<NNN>_600_cropped.png -resize 50% ./tmp/<NNN>_300.png
 
 # Step 2: Run Tesseract with TSV output
-tesseract /tmp/<NNN>_300.png /tmp/<NNN>_ocr -l deu --psm 1 tsv
-# produces /tmp/<NNN>_ocr.tsv
+tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 tsv
+# produces ./tmp/<NNN>_ocr.tsv
 ```
 
 After producing the TSV, the agent reconstructs a plain-text file (`/tmp/<NNN>_ocr.txt`) with correct column reading order. See "Column Reconstruction from TSV" below.
@@ -400,6 +402,57 @@ Author/Info adjacency rule:
 - **Paragraph + author + Info form an atomic block.** The `<address class="author">` and any "Info" box always stick directly to the preceding paragraph — never insert a `<figure>` (Bild, Listing, or Tabelle) between them.
 - **Image placement treats this block as a unit.** The rule "place figure after the paragraph that references it" means: after the atomic block (paragraph + author + info), not between the paragraph and the author. Figures referenced in the last paragraph go after the author/info, not before it.
 
+## Line-Break Hyphen Handling
+
+### Rule: no script dehyphenation
+
+Scripts must **NEVER** dehyphenate. Dehyphenation requires judgment about whether a hyphen is a line-break artifact or a real compound-word hyphen (e.g., `Basic-Editor`, `Multiple-Choice`, `Generator-Programm`). Scripts cannot make this distinction reliably. All dehyphenation decisions are made by the agent in a dedicated pass.
+
+### Soft hyphen marking (mechanical, in import script)
+
+The import script's `p()` helper joins OCR lines as follows:
+
+- If the previous line **ends with `-`**: replace the trailing `-` with a soft hyphen (`\u00AD`) and join **without space**.
+- If the previous line does **not** end with `-`: join with a normal space.
+
+This marks every line-break hyphen position without making any judgment call. Mid-line hyphens (like `Sprachen- oder`) are untouched because they don't occur at line boundaries.
+
+Examples (showing `­` for `\u00AD`):
+
+| OCR lines | Joined result |
+|-----------|---------------|
+| `"Gene-"` + `"rator-Programm"` | `"Gene­rator-Programm"` |
+| `"Basic-"` + `"Editor, aber"` | `"Basic­Editor, aber"` |
+| `"Sprachen- oder Ma-"` + `"thematikkurs"` | `"Sprachen- oder Ma­thematikkurs"` |
+| `"daß man auch"` + `"mit relativ"` | `"daß man auch mit relativ"` |
+
+### Soft hyphen resolution pass (mandatory agent pass)
+
+After mechanical import, the agent must resolve **every** soft hyphen (`\u00AD`) in the article HTML. No soft hyphens may remain in the final output.
+
+For each `\u00AD`, the agent decides:
+
+1. **Remove** (the common case): the two halves form one word without a hyphen.
+   - `Gene­rator` → `Generator`
+   - `Ma­thematikkurs` → `Mathematikkurs`
+   - `er­möglicht` → `ermöglicht`
+   - `Beant­wortung` → `Beantwortung`
+
+2. **Replace with real hyphen `-`**: the original text has a compound-word hyphen at this position.
+   - `Basic­Editor` → `Basic-Editor`
+   - `Multiple­Choice` → `Multiple-Choice`
+   - `Generator­Programm` → `Generator-Programm`
+   - `Bildschirm­rand` → depends on original: `Bildschirmrand` (one word) or `Bildschirm-Rand` (compound)
+
+Decision process:
+
+- Does removing the soft hyphen produce a valid German word? → **Remove**.
+- Does the position separate two independent word parts that form a compound with a hyphen? → **Replace with `-`**.
+- When uncertain, check the scan at the corresponding line break position.
+- ALL-CAPS words (e.g., `UNTERSTAN­DING` → `UNDERSTANDING`): the uppercase rule doesn't apply; check the scan.
+
+Verification: grep the final HTML for `\u00AD` or `&shy;`. Count must be **zero** before the article can be marked done.
+
 ## OCR Cleanup Policy
 
 Conservative normalization only:
@@ -573,7 +626,7 @@ Use this mode whenever highest fidelity is required.
 
 ## Execution Contract (Required For `do page X` / `do article X`)
 
-This is the mandatory sequence. Do not skip steps. Do not report completion before step 12 is done.
+This is the mandatory sequence. Do not skip steps. Do not report completion before step 13 is done.
 
 1. Identify boundaries:
    - Resolve start/end pages from `8604_toc_improved.tsv`.
@@ -606,7 +659,7 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - Copy the import template: `cp IMPORT_TEMPLATE.py /tmp/<NNN>_import.py`
    - Edit the copy: set `RAW` path, fill in article-specific line mappings.
    - Available helpers (see template for full API):
-     - `p(cls, *line_nums)` — emit `<p>` from raw lines (1-indexed), merged with space
+     - `p(cls, *line_nums)` — emit `<p>` from raw lines (1-indexed), joined with soft-hyphen logic (see "Line-Break Hyphen Handling")
      - `h(level, line_num)` — emit heading
      - `blank()` — readability separator
      - `raw(text)` — emit raw HTML (figures, tables)
@@ -633,11 +686,17 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
      - Look for an `Info:` block (book/product reference, supplier address). Render as `<p class="source">Info: ...</p>`.
      - These may appear on the page AFTER the main article text (see Phase 1 boundary rule).
 
-6. OCR correction pass (`prose_pass`):
+6. Soft hyphen resolution pass:
+   - Grep the HTML for `\u00AD` (soft hyphen) to find all line-break positions.
+   - For each soft hyphen, decide: **remove** (dehyphenate) or **replace with `-`** (real compound hyphen).
+   - See "Soft hyphen resolution pass" in the "Line-Break Hyphen Handling" section for decision rules.
+   - After this pass, grep again to confirm zero soft hyphens remain.
+
+7. OCR correction pass (`prose_pass`):
    - Paragraph-by-paragraph visual compare against page images.
    - Fix only confirmed OCR errors.
 
-7. Technical fidelity pass (`technical_pass`):
+8. Technical fidelity pass (`technical_pass`):
    - Listing/table/formula/symbol verification is mandatory and separate from prose.
    - Ensure all listings/tables are fully transcribed and not collapsed into prose.
    - Keep symbols/control notation exact.
@@ -649,7 +708,7 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - `unknown tokens count`
    - If `unknown tokens count > 0`, article cannot be `done`.
 
-8. Bild/Tabelle positioning pass (mandatory):
+9. Bild/Tabelle positioning pass (mandatory):
    - For each `Bild` and `Tabelle`, find first textual reference.
    - Place matching `<figure>` immediately after that paragraph.
    - If unreferenced, place by strongest visual/content match and note in TSV `notes`.
@@ -658,15 +717,15 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - final HTML line
    - asset filename
 
-9. Asset validation:
-   - Confirm every referenced image file exists.
-   - Confirm there are no orphaned article images left unhandled.
+10. Asset validation:
+    - Confirm every referenced image file exists.
+    - Confirm there are no orphaned article images left unhandled.
 
-10. Coverage validation:
+11. Coverage validation:
     - Confirm page coverage including continuation/listing pages.
     - Confirm ad-only pages excluded.
 
-11. Final QA gate:
+12. Final QA gate:
     - No unresolved placeholders or malformed HTML blocks.
     - Author credit normalized to `<address class="author">...</address>`.
     - All Bild/Tabelle/Listing references resolved.
@@ -676,8 +735,9 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
     - Verify no duplicated caption-spill body paragraphs remain (`<p>Bild n...` / `<p>Tabelle n...` adjacent to same `<figcaption>`).
     - Verify no standalone numeric OCR-junk paragraphs remain unless intentional (`^\d+( \d+)*$`).
     - Verify `residual_defects` is present and equals `none`.
+    - Verify zero soft hyphens remain (`\u00AD` / `&shy;` count = 0).
 
-12. Completion report format:
+13. Completion report format:
     - When reporting done, always include:
     - pages OCR'd and raw file path
     - output HTML file path
@@ -845,7 +905,7 @@ Copy this for each new article. Provides reusable helpers:
 
 | Helper | Purpose |
 |--------|---------|
-| `p(cls, *line_nums)` | Emit `<p>` from raw OCR lines (1-indexed), merged with space |
+| `p(cls, *line_nums)` | Emit `<p>` from raw OCR lines (1-indexed), with soft-hyphen line joining |
 | `h(level, line_num)` | Emit `<h2>`/`<h3>` from a raw line |
 | `blank()` | Emit blank line for readability |
 | `raw(text)` | Emit raw HTML (figures, custom markup) |
@@ -864,6 +924,17 @@ The only creative work is deciding which raw lines map to which HTML elements. A
 
 **Page markers**: When the `_ocr_raw.txt` contains `--- PAGE NNN ---` separator lines, skip them in line mappings. They exist only for human orientation during the mapping step.
 
+### `soft_hyphen_report.py` — Soft hyphen diagnostic
+
+Lists all soft hyphens (`\u00AD`) in an article HTML file with context, showing both resolution options (remove vs. replace with `-`) for each occurrence. Run after mechanical import to inventory work for the soft hyphen resolution pass, and again after resolution to confirm zero remain.
+
+```
+python3 tools/png2mag/soft_hyphen_report.py "<article>.html"
+```
+
+- Exits 0 if no soft hyphens found (PASS)
+- Exits 1 if soft hyphens remain (agent must resolve them)
+
 ## Checklist Policy (Mandatory)
 
 - Use one checklist file per article run in `/tmp/`.
@@ -878,7 +949,7 @@ The only creative work is deciding which raw lines map to which HTML elements. A
   - is required before reporting article status `done`.
 - Lock integrity rule:
   - The final lock may be checked only when:
-  - phase 11 is checked
+  - phase 12 is checked
   - unresolved issue count is `0`
   - objective grep/lint checks are marked `pass`
 - If final lock is unchecked, status must be reported as `partial`.

@@ -28,11 +28,31 @@ def e(text):
 # Build output lines
 out = []
 
+SHY = "\u00AD"  # soft hyphen — marks line-break hyphen positions
+
+def join_ocr_lines(parts):
+    """Join OCR line parts. If a part ends with '-', replace it with a soft
+    hyphen and join without space (marking the line-break position for the
+    agent to resolve later). Otherwise join with a normal space.
+    Mid-line hyphens are never touched."""
+    if not parts:
+        return ""
+    result = parts[0]
+    for part in parts[1:]:
+        if not part:
+            continue
+        if result.endswith("-"):
+            result = result[:-1] + SHY + part
+        else:
+            result = result + " " + part
+    return result
+
 def p(cls, *line_nums):
-    """Emit a <p> by concatenating raw lines (1-indexed). Merges with space.
+    """Emit a <p> by concatenating raw lines (1-indexed).
+    Uses soft-hyphen joining: line-ending '-' becomes \\u00AD (see WORKFLOW.md).
     cls=None for plain <p>, or a string like "intro", "noindent"."""
     parts = [e(L[n - 1]) for n in line_nums]
-    text = " ".join(parts)
+    text = join_ocr_lines(parts)
     if cls:
         out.append(f'        <p class="{cls}">{text}</p>')
     else:
