@@ -279,6 +279,7 @@ Leserforum format:
   - "Wollen Sie antworten?" — call for reader answers
   - "Leser fragen - Willi Brechtl antwortet" — special column (use `<h1>` for title, `<p class="intro">` for intro)
   - "Ein Wort in eigener Sache" — editorial notes
+  - "Lebenslauf" — author biography box in "Anwendung des Monats" articles. Author name at the end (e.g. `(Matthias Gerloff)`) must be a separate `<address class="author">` element, not inline in the paragraph text.
   - These are NOT `<section>` — they are `<aside>` with `<h2>` (or `<h1>` for Willi Brechtl)
 - Name normalization: ALL CAPS names from the magazine scan are converted to mixed case in HTML (e.g. `MARCO TRUNZER` → `Marco Trunzer`)
 - Heading normalization: ALL CAPS topic headings are converted to mixed case (e.g. `FRAGEN ZUM C 64` → `Fragen zum C 64`)
