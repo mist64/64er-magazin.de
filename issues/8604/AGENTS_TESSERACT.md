@@ -365,6 +365,11 @@ Figure placement rule for Tabellen:
 - Do not leave standalone `Tabelle` headings as plain `<p>` blocks when a figure/table is present.
 - Do not keep duplicated caption-spill paragraphs like `<p>Bild n. ...</p>` when the same text is already in adjacent `<figcaption>`.
 
+Author/Info adjacency rule:
+
+- **Paragraph + author + Info form an atomic block.** The `<address class="author">` and any "Info" box always stick directly to the preceding paragraph — never insert a `<figure>` (Bild, Listing, or Tabelle) between them.
+- **Image placement treats this block as a unit.** The rule "place figure after the paragraph that references it" means: after the atomic block (paragraph + author + info), not between the paragraph and the author. Figures referenced in the last paragraph go after the author/info, not before it.
+
 ## OCR Cleanup Policy
 
 Conservative normalization only:
