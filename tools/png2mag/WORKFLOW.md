@@ -228,6 +228,9 @@ For each TOC entry (one HTML per TOC line):
 - `64er.index_title` handling (current rule):
   - Keep commented out and empty:
   - `<!-- <meta name="64er.index_title" content=""> -->`
+- `64er.index_category` handling (current rule):
+  - Keep commented out and empty:
+  - `<!-- <meta name="64er.index_category" content=""> -->`
 
 Use standard metadata fields where available:
 
@@ -238,7 +241,6 @@ Use standard metadata fields where available:
 - `64er.head2`
 - `64er.toc_title`
 - `64er.toc_category`
-- `64er.index_category`
 - `64er.id`
 
 `64er.id` format:
