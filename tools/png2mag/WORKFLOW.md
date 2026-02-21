@@ -149,6 +149,7 @@ For each page TSV:
 
 - Build a clean TOC from TOC pages in the PDF (not from noisy OCR alone).
 - Maintain section order exactly as printed.
+- Use normal case for section names in the TSV (e.g., "Hardware-Test" not "HARDWARE-TEST"). Match the casing used in `toc.txt`.
 - Keep canonical artifacts:
   - `8604/8604_toc_reconstructed.md`
   - `8604/8604_toc_reconstructed.tsv`
@@ -638,16 +639,17 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
 2. Run Tesseract OCR (TSV pipeline):
    - For each page in the article, run the standard pipeline:
      ```bash
-     magick png/<NNN>_600_cropped.png -resize 50% /tmp/<NNN>_300.png
-     tesseract /tmp/<NNN>_300.png /tmp/<NNN>_ocr -l deu --psm 1 tsv
+     magick png/<NNN>_600_cropped.png -resize 50% ./tmp/<NNN>_300.png
+     tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 tsv
+     python3 ../../tools/png2mag/tsv_reconstruct.py ./tmp/<NNN>_ocr.tsv > ./tmp/<NNN>_ocr.txt
      ```
-   - For each page, reconstruct `/tmp/<NNN>_ocr.txt` from the TSV using the column reconstruction procedure (see "Column Reconstruction from TSV" in the OCR Pipeline section). Read the TSV, assign columns by x-coordinate, sort by column then vertical position, and write the reconstructed text.
+   - Use `tsv_reconstruct.py --dump-blocks` to inspect layout when column assignment needs manual review.
    - Concatenate per-page results into the article raw file:
      ```bash
      for p in <page_list>; do
          echo "--- PAGE ${p} ---"
-         cat /tmp/${p}_ocr.txt
-     done > /tmp/<NNN>_<slug>_ocr_raw.txt
+         cat ./tmp/${p}_ocr.txt
+     done > ./tmp/<NNN>_<slug>_ocr_raw.txt
      ```
    - All article text edits must be applied on top of this extraction.
 
@@ -879,16 +881,32 @@ After an article is complete, run a review pass to detect hallucinated content. 
 
 ### OCR Pipeline Scripts
 
-The OCR pipeline is two commands per page, plus agent-driven column reconstruction:
+The OCR pipeline is two commands per page, plus column reconstruction via `tsv_reconstruct.py`:
 
 ```bash
 # Per-page OCR (repeat for each page)
-magick png/<NNN>_600_cropped.png -resize 50% /tmp/<NNN>_300.png
-tesseract /tmp/<NNN>_300.png /tmp/<NNN>_ocr -l deu --psm 1 tsv
-# produces /tmp/<NNN>_ocr.tsv
+magick png/<NNN>_600_cropped.png -resize 50% ./tmp/<NNN>_300.png
+tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 tsv
+# produces ./tmp/<NNN>_ocr.tsv
+
+# Reconstruct reading order from TSV
+python3 ../../tools/png2mag/tsv_reconstruct.py ./tmp/<NNN>_ocr.tsv > ./tmp/<NNN>_ocr.txt
 ```
 
-After each page's TSV is produced, the agent reads it, reconstructs correct reading order using the column reconstruction procedure, and saves the result as `/tmp/<NNN>_ocr.txt`.
+### `tsv_reconstruct.py` — Column reconstruction from TSV
+
+Reconstructs correct reading order from Tesseract TSV output. Assigns words to columns by x-coordinate clustering, then sorts by column and vertical position.
+
+```
+python3 tools/png2mag/tsv_reconstruct.py <tsv_file> [--width W] [--boundaries X,X,...] [--annotate] [--dump-blocks]
+```
+
+- `--width W`: page width in pixels (default: 2480)
+- `--boundaries X,X,X`: explicit column boundary x-coordinates (auto-detected if omitted)
+- `--annotate`: prefix each line with block/band/x/y metadata (useful for debugging layout)
+- `--dump-blocks`: show block summary with x/y ranges (for layout analysis before import)
+
+Use `--dump-blocks` first to inspect the layout, then use the plain output for the `_ocr.txt` file.
 
 ### `inject.py` — Generic body injector
 
