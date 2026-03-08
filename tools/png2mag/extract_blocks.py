@@ -5,7 +5,7 @@ Usage:
     python3 extract_blocks.py <page_png> <output_dir>
 
 Example:
-    python3 extract_blocks.py issues/8604/png/053_600_cropped.png /tmp/8604_p053_blocks
+    python3 extract_blocks.py issues/8604/png/053_600_cropped.png issues/8604/tmp/p053_blocks
 
 Produces for each block with text:
     <output_dir>/block_NN.png  — cropped region from the page image (from 600 DPI source)
@@ -13,46 +13,46 @@ Produces for each block with text:
 
 Tesseract runs at 300 DPI (downscaled 50%) for optimal recognition.
 Block crops are taken from the original 600 DPI source with coordinates scaled back up.
-A padding of 20px (at 300 DPI) is added around each crop to avoid clipping.
+Font sizes from hOCR are annotated as {{fsize:N}} on paragraph first lines.
+Output dir must NOT be in /tmp (Tesseract sandbox issue).
 """
 
 import csv
 import os
+import re
 import subprocess
 import sys
-import tempfile
 
-PADDING_300 = 0  # no padding — avoid overlap between adjacent blocks
+INDENT_THRESHOLD = 15  # px at 300 DPI — above this = indented paragraph
 
 
-def downscale_to_300(page_png):
-    """Downscale 600 DPI source to 300 DPI temp file. Returns path."""
-    tmp = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
-    tmp.close()
+def downscale_to_300(page_png, output_dir):
+    """Downscale 600 DPI source to 300 DPI. Written to output_dir (not /tmp)
+    because Tesseract/Leptonica can't read files from /tmp due to sandboxing."""
+    out = os.path.join(output_dir, '_page_300.png')
     subprocess.run(
-        ['magick', page_png, '+repage', '-resize', '50%', tmp.name],
+        ['magick', page_png, '+repage', '-resize', '50%', out],
         check=True, capture_output=True,
     )
-    return tmp.name
+    return out
 
 
-def run_tesseract(page_png_300):
-    """Run Tesseract on 300 DPI image and return parsed blocks dict."""
-    with tempfile.NamedTemporaryFile(suffix='.tsv', delete=False) as tmp:
-        tsv_base = tmp.name.removesuffix('.tsv')
+def run_tesseract(page_png_300, output_dir):
+    """Run Tesseract on 300 DPI image, produce TSV + hOCR, return parsed blocks dict."""
+    base = os.path.join(output_dir, '_ocr')
 
-    # Pipe via stdin — works around Leptonica PNG path-reading bug
-    with open(page_png_300, 'rb') as img_f:
-        subprocess.run(
-            ['tesseract', 'stdin', tsv_base, '-l', 'deu', 'tsv'],
-            check=True, capture_output=True, stdin=img_f,
-        )
-    tsv_path = tsv_base + '.tsv'
+    # Run TSV + hOCR in one call. Input file must be in a readable dir (not /tmp).
+    subprocess.run(
+        ['tesseract', page_png_300, base, '-l', 'deu',
+         '-c', 'hocr_font_info=1', 'tsv', 'hocr'],
+        check=True, capture_output=True,
+    )
 
+    # Parse TSV for structure + coordinates
     blocks = {}
-    with open(tsv_path) as f:
+    with open(base + '.tsv') as f:
         reader = csv.reader(f, delimiter='\t')
-        next(reader)  # skip header
+        next(reader)
         for row in reader:
             level = int(row[0])
             block = int(row[2])
@@ -63,19 +63,47 @@ def run_tesseract(page_png_300):
 
             if level == 2:
                 blocks.setdefault(block, {'bbox': (left, top, w, h), 'lines': {},
-                                          'word_bboxes': [], 'par_first_x': {}})
+                                          'word_bboxes': [], 'par_first_x': {},
+                                          'word_fsizes': {}})
             if level == 5 and text.strip():
                 blocks.setdefault(block, {'bbox': (0, 0, 0, 0), 'lines': {},
-                                          'word_bboxes': [], 'par_first_x': {}})
+                                          'word_bboxes': [], 'par_first_x': {},
+                                          'word_fsizes': {}})
                 key = (par, line_num)
                 blocks[block]['lines'].setdefault(key, []).append(text)
                 blocks[block]['word_bboxes'].append((left, top, w, h))
-                # Track first word x per paragraph (for indent detection)
                 if par not in blocks[block]['par_first_x']:
                     blocks[block]['par_first_x'][par] = left
 
-    os.unlink(tsv_path)
+    # Match hOCR font sizes to TSV words by sequential position
+    _match_fsize_sequential(base + '.hocr', blocks)
+
+    os.unlink(base + '.tsv')
+    os.unlink(base + '.hocr')
     return blocks
+
+
+def _match_fsize_sequential(hocr_path, blocks):
+    """Match hOCR font sizes to TSV blocks/words by sequential text matching."""
+    with open(hocr_path) as f:
+        hocr_words = re.findall(
+            r"x_fsize (\d+)'>(.*?)</span>", f.read()
+        )
+
+    # Build sequential list of TSV words across all blocks
+    tsv_words = []
+    for bnum in sorted(blocks):
+        b = blocks[bnum]
+        for key in sorted(b['lines']):
+            par, line_num = key
+            for word_num, text in enumerate(b['lines'][key], 1):
+                tsv_words.append((bnum, par, line_num, word_num, text))
+
+    # Match by position — both lists are in reading order
+    for i, (bnum, par, line_num, word_num, text) in enumerate(tsv_words):
+        if i < len(hocr_words):
+            fsize = int(hocr_words[i][0])
+            blocks[bnum]['word_fsizes'][(par, line_num, word_num)] = fsize
 
 
 def get_image_size(png_path):
@@ -92,11 +120,11 @@ def extract_blocks(page_png, output_dir):
     """Extract all text blocks into output_dir."""
     os.makedirs(output_dir, exist_ok=True)
 
-    # Downscale to 300 DPI for Tesseract
-    page_300 = downscale_to_300(page_png)
+    # Downscale to 300 DPI for Tesseract (written to output_dir, not /tmp)
+    page_300 = downscale_to_300(page_png, output_dir)
     img_w_300, img_h_300 = get_image_size(page_300)
 
-    blocks = run_tesseract(page_300)
+    blocks = run_tesseract(page_300, output_dir)
     os.unlink(page_300)
 
     # Crop from the original 600 DPI source (strip canvas offset with +repage)
@@ -111,31 +139,43 @@ def extract_blocks(page_png, output_dir):
         if w < 5 or h < 5:
             continue
 
-        # Add padding at 300 DPI, then clamp
-        x_pad = max(0, x - PADDING_300)
-        y_pad = max(0, y - PADDING_300)
-        w_pad = min(img_w_300, x + w + PADDING_300) - x_pad
-        h_pad = min(img_h_300, y + h + PADDING_300) - y_pad
-
         # Scale to 600 DPI for cropping the original
-        cx, cy, cw, ch = x_pad * 2, y_pad * 2, w_pad * 2, h_pad * 2
+        cx, cy, cw, ch = x * 2, y * 2, w * 2, h * 2
 
         prefix = os.path.join(output_dir, f'block_{bnum:02d}')
 
-        # Write text with indent annotations
+        # Write text with metadata annotations using {{tag}} syntax
         block_left = b['bbox'][0]
         par_first_x = b.get('par_first_x', {})
+        word_fsizes = b.get('word_fsizes', {})
         prev_par = None
+
+        # Determine the dominant (body) font size for this block
+        from collections import Counter
+        all_fsizes = list(word_fsizes.values())
+        body_fsize = Counter(all_fsizes).most_common(1)[0][0] if all_fsizes else None
+
         with open(f'{prefix}.txt', 'w') as f:
             for key in sorted(b['lines']):
                 par_num, line_num = key
-                line_text = ' '.join(b['lines'][key])
+                words = b['lines'][key]
+                line_text = ' '.join(words)
+
                 # Annotate first line of each paragraph
                 if par_num != prev_par:
                     offset = par_first_x.get(par_num, block_left) - block_left
-                    tag = '[INDENT] ' if offset > 15 else '[FLUSH] '
-                    line_text = tag + line_text
+                    indent_tag = '{{indent}}' if offset > INDENT_THRESHOLD else '{{flush}}'
+
+                    # Font size of first word
+                    first_fsize = word_fsizes.get((par_num, 1, 1))
+                    fsize_tag = ''
+                    if first_fsize is not None and body_fsize is not None:
+                        if first_fsize != body_fsize:
+                            fsize_tag = f'{{{{fsize:{first_fsize}}}}}'
+
+                    line_text = f'{indent_tag}{fsize_tag}{line_text}'
                     prev_par = par_num
+
                 f.write(line_text + '\n')
 
         # Crop from 600 DPI source (+repage strips canvas offset)
