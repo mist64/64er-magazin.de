@@ -76,22 +76,24 @@ Discovered through systematic testing on pages 134 and 159:
 # Step 1: Downscale 600 DPI master to 300 DPI
 magick png/<NNN>_600_cropped.png -resize 50% ./tmp/<NNN>_300.png
 
-# Step 2: Run Tesseract with TSV output
-tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 tsv
-# produces ./tmp/<NNN>_ocr.tsv
+# Step 2: Run Tesseract with TSV + hOCR output
+tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 -c hocr_font_info=1 tsv hocr
+# produces ./tmp/<NNN>_ocr.tsv and ./tmp/<NNN>_ocr.hocr
 ```
 
 After producing the TSV, the agent reconstructs a plain-text file (`/tmp/<NNN>_ocr.txt`) with correct column reading order. See "Column Reconstruction from TSV" below.
+
+The hOCR file is used by `tsv_layout.py` (see below) to extract font size information per block.
 
 ### Multi-Page Articles
 
 For articles spanning multiple pages, OCR each page individually, reconstruct each page's text from TSV, then concatenate:
 
 ```bash
-# OCR each page (TSV output)
+# OCR each page (TSV + hOCR output)
 for p in 134 135 136; do
     magick png/${p}_600_cropped.png -resize 50% /tmp/${p}_300.png
-    tesseract /tmp/${p}_300.png /tmp/${p}_ocr -l deu --psm 1 tsv
+    tesseract /tmp/${p}_300.png /tmp/${p}_ocr -l deu --psm 1 -c hocr_font_info=1 tsv hocr
 done
 
 # Agent reconstructs /tmp/<NNN>_ocr.txt for each page from TSV (see below)
@@ -642,10 +644,11 @@ This is the mandatory sequence. Do not skip steps. Do not report completion befo
    - For each page in the article, run the standard pipeline:
      ```bash
      magick png/<NNN>_600_cropped.png -resize 50% ./tmp/<NNN>_300.png
-     tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 tsv
+     tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 -c hocr_font_info=1 tsv hocr
      python3 ../../tools/png2mag/tsv_reconstruct.py ./tmp/<NNN>_ocr.tsv > ./tmp/<NNN>_ocr.txt
      ```
    - Use `tsv_reconstruct.py --dump-blocks` to inspect layout when column assignment needs manual review.
+   - For complex layouts (images, captions, asides interleaved across columns), use `tsv_layout.py` with a sub-agent for block ordering (see "tsv_layout.py" in Reusable Toolchain below).
    - Concatenate per-page results into the article raw file:
      ```bash
      for p in <page_list>; do
@@ -888,8 +891,8 @@ The OCR pipeline is two commands per page, plus column reconstruction via `tsv_r
 ```bash
 # Per-page OCR (repeat for each page)
 magick png/<NNN>_600_cropped.png -resize 50% ./tmp/<NNN>_300.png
-tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 tsv
-# produces ./tmp/<NNN>_ocr.tsv
+tesseract ./tmp/<NNN>_300.png ./tmp/<NNN>_ocr -l deu --psm 1 -c hocr_font_info=1 tsv hocr
+# produces ./tmp/<NNN>_ocr.tsv and ./tmp/<NNN>_ocr.hocr
 
 # Reconstruct reading order from TSV
 python3 ../../tools/png2mag/tsv_reconstruct.py ./tmp/<NNN>_ocr.tsv > ./tmp/<NNN>_ocr.txt
@@ -909,6 +912,172 @@ python3 tools/png2mag/tsv_reconstruct.py <tsv_file> [--width W] [--boundaries X,
 - `--dump-blocks`: show block summary with x/y ranges (for layout analysis before import)
 
 Use `--dump-blocks` first to inspect the layout, then use the plain output for the `_ocr.txt` file.
+
+### `tsv_layout.py` — Layout analysis for LLM-driven block ordering
+
+Produces a compact, LLM-friendly page layout summary from Tesseract TSV (and optional hOCR) files. Designed for a sub-agent to determine reading order on complex multi-column layouts with images, captions, and asides.
+
+```
+# Single page (TSV only)
+python3 ../../tools/png2mag/tsv_layout.py ./tmp/<NNN>_ocr.tsv
+
+# Single page with hOCR for font size
+python3 ../../tools/png2mag/tsv_layout.py ./tmp/<NNN>_ocr.tsv --hocr ./tmp/<NNN>_ocr.hocr
+
+# Multi-page article
+python3 ../../tools/png2mag/tsv_layout.py ./tmp/020_ocr.tsv ./tmp/021_ocr.tsv ./tmp/022_ocr.tsv \
+  --hocr ./tmp/020_ocr.hocr ./tmp/021_ocr.hocr ./tmp/022_ocr.hocr
+```
+
+Output format:
+
+- **Page header**: page number and dimensions
+- **HRULE/VRULE**: thin blocks (≤ 10px in one dimension) as one-liners
+- **IMAGE**: block bounding box only (no words detected)
+- **TEXT**: bounding box, line count, median word height (`h=`), modal font size (`f=`, from hOCR), and a text preview (first + last sentence with `…` in between)
+
+Block classification:
+
+- No automatic SKIP filtering — the LLM sub-agent decides what is a running header, page number, or footer based on context and position data.
+
+#### LLM sub-agent workflow for block ordering
+
+This is a workflow pattern, not code. The sub-agent invocation happens in the main agent's conversation.
+
+1. Run `tsv_layout.py` on all pages of an article → capture output
+2. Spawn a sub-agent (Task tool, `subagent_type=general-purpose`, `model=sonnet`, fresh context) with ONLY the layout summary as input plus the prompt template below
+3. The sub-agent returns a structured block ordering that the main agent uses to drive the import script's line mappings
+
+This replaces the manual block-ordering step for complex layouts. Simple two-column pages can still use `tsv_reconstruct.py` directly.
+
+#### Sub-agent prompt template
+
+Paste the `tsv_layout.py` output into the marked position. Adjust the column count and any magazine-specific notes as needed.
+
+```
+You are a layout analysis expert. You will receive a page layout summary
+from an OCR'd magazine page. Your job is to determine:
+
+1. **BODY blocks** — the continuous article text flow, listed in correct
+   reading order
+2. **Non-body blocks** — blocks that are NOT part of the continuous text
+   flow, each annotated with its type
+
+The page is from a German computer magazine (multi-column layout). Use
+the block positions (x,y coordinates), sizes, font sizes (f=), line
+counts, and text previews to make your decisions.
+
+**Guidelines:**
+
+- Body text blocks (small font, many lines) form the main article flow.
+- **H3 subheadings** (larger font, 1–3 lines, free-standing between body
+  blocks) are part of the body flow. Include them in the BODY list at
+  their correct position.
+- Reading order within columns is top-to-bottom. Column order is
+  generally left-to-right, but VERIFY by checking text continuity at
+  block boundaries.
+- **CRITICAL — text continuity check:** The text preview shows the first
+  and last words/sentences of each block. Use these to verify reading
+  order:
+  - If Block A's preview ends with a hyphenated word fragment like
+    "verschaf-" and Block B starts with "fen.", then B must immediately
+    follow A.
+  - Always check these continuation patterns to confirm the correct
+    sequence, especially across column boundaries.
+- Short blocks near images that start with "Bild N." are CAPTION blocks.
+- Very short blocks at page top/bottom edges (especially with page
+  numbers or magazine names) are HEADER/FOOTER — mark for discard.
+- HRULEs and VRULEs are structural separators, not content — ignore them.
+
+**Page layout:**
+
+<PASTE tsv_layout.py OUTPUT HERE>
+
+**Your output:**
+
+First, show your reasoning: list the text continuity checks at block
+boundaries so the logic is visible. Then output a JSON block.
+
+The JSON must follow this exact structure:
+
+```json
+{
+  "pages": [
+    {
+      "page": "022",
+      "body": [
+        {"block": 5},
+        {"block": 11},
+        {"block": 12, "type": "h2"},
+        {"block": 13}
+      ],
+      "non_body": [
+        {"block": 1, "type": "header"},
+        {"block": 16, "type": "caption"},
+        {"block": 7, "type": "image"},
+        {"block": 6, "type": "aside", "aside_id": "specs", "heading": true},
+        {"block": 7, "type": "aside", "aside_id": "specs"},
+        {"block": 26, "type": "aside", "aside_id": "lastminute", "heading": true},
+        {"block": 27, "type": "aside", "aside_id": "lastminute"}
+      ]
+    }
+  ]
+}
+```
+
+Rules:
+- `body`: ordered list. Each entry has `"block"` (int). Add `"type"` only
+  for non-default types: `"h2"`, `"aside"`. No type = regular body text.
+- `non_body`: unordered list. Each entry has `"block"` and `"type"`.
+  Types: `"header"`, `"footer"`, `"caption"`, `"image"`, `"discard"`,
+  `"aside"` (for boxed/sidebar content like spec tables or info boxes).
+- Aside blocks MUST have an `"aside_id"` string that groups blocks
+  belonging to the same box/sidebar. Use a short descriptive slug
+  (e.g. `"specs"`, `"lastminute"`, `"bio"`). All blocks from the same
+  visual box share the same `aside_id`.
+- One page object per page, in page order.
+```
+
+### `tsv_reading_order.py` — Reconstruct text from JSON block ordering
+
+Takes the JSON output from the sub-agent (saved to a file) plus the same TSV files, and produces concatenated article text in reading order with non-body blocks (captions, asides) collected at the end.
+
+```
+# Single page
+python3 ../../tools/png2mag/tsv_reading_order.py order.json ./tmp/022_ocr.tsv
+
+# Multi-page article
+python3 ../../tools/png2mag/tsv_reading_order.py order.json \
+  ./tmp/020_ocr.tsv ./tmp/021_ocr.tsv ./tmp/022_ocr.tsv ...
+```
+
+The script maps page numbers from the JSON `"page"` field to TSV files by extracting the page number from the filename (e.g. `022_ocr.tsv` → `"022"`).
+
+Output sections:
+- `--- BODY ---` — all body blocks (including H3s) in reading order, with `[page, block, type]` markers
+- `--- CAPTION ---` — all caption blocks
+- `--- ASIDE ---` — all aside blocks (if any)
+- Headers, footers, images, and discard blocks are silently dropped.
+
+#### Full pipeline example
+
+```bash
+# 1. OCR all pages (if not already done)
+for p in 020 021 022 023 024 025 026 027; do
+    magick png/${p}_600_cropped.png -resize 50% ./tmp/${p}_300.png
+    tesseract ./tmp/${p}_300.png ./tmp/${p}_ocr -l deu --psm 1 -c hocr_font_info=1 tsv hocr
+done
+
+# 2. Generate layout summary
+python3 ../../tools/png2mag/tsv_layout.py ./tmp/0{20,21,22,23,24,25,26,27}_ocr.tsv \
+  --hocr ./tmp/0{20,21,22,23,24,25,26,27}_ocr.hocr > ./tmp/layout.txt
+
+# 3. Send layout.txt to sub-agent (using prompt template above) → save JSON to order.json
+
+# 4. Reconstruct text
+python3 ../../tools/png2mag/tsv_reading_order.py ./tmp/order.json \
+  ./tmp/0{20,21,22,23,24,25,26,27}_ocr.tsv > ./tmp/article_body.txt
+```
 
 ### `inject.py` — Generic body injector
 

@@ -12,6 +12,7 @@ Options:
     --width W           Page width in pixels (default: 2480)
     --boundaries X,X,X  Explicit band boundaries (e.g. 400,1000,1600,2480)
     --annotate          Prefix each line with block/band/x/y metadata
+    --paragraphs        Add [P]/[Pn] paragraph markers (indent/noindent)
     --dump-blocks       Show block summary with x/y ranges (for layout analysis)
 
 Output goes to stdout. Redirect to _work/<NNN>_ocr.txt.
@@ -20,7 +21,7 @@ Output goes to stdout. Redirect to _work/<NNN>_ocr.txt.
 import csv
 import sys
 import argparse
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 
 def read_tsv(path):
@@ -55,11 +56,20 @@ def group_lines(words):
                 'block': w['block'],
                 'left': w['left'],
                 'top': w['top'],
+                'right_edge': 0,
+                'total_word_width': 0,
+                'total_char_count': 0,
                 'words': [],
             }
         lines[key]['words'].append(w['text'])
         # Track minimum left for the line
         lines[key]['left'] = min(lines[key]['left'], w['left'])
+        # Track maximum right edge for the line
+        word_right = w['left'] + w['width']
+        lines[key]['right_edge'] = max(lines[key]['right_edge'], word_right)
+        # Accumulate for character width estimation
+        lines[key]['total_word_width'] += w['width']
+        lines[key]['total_char_count'] += len(w['text'])
     return lines
 
 
@@ -137,7 +147,92 @@ def assign_bands(lines, block_stats, boundaries):
         data['band'] = band
 
 
-def reconstruct(lines, annotate=False):
+def compute_band_margins(lines):
+    """Compute per-band left margins and per-block right margins.
+
+    Returns dict: band -> {left_margin, indent_threshold,
+                           block_right: {block_id -> right_margin},
+                           short_threshold}
+    """
+    by_band = defaultdict(list)
+    for key, data in lines.items():
+        by_band[data['band']].append(data)
+
+    margins = {}
+    for band, band_lines in by_band.items():
+        if not band_lines:
+            continue
+
+        # Left margin: mode of left values binned to 10px
+        left_bins = Counter(ln['left'] // 10 * 10 for ln in band_lines)
+        left_margin = left_bins.most_common(1)[0][0]
+
+        # Median character width from word-level aggregates
+        total_w = sum(ln['total_word_width'] for ln in band_lines)
+        total_c = sum(ln['total_char_count'] for ln in band_lines)
+        char_width = total_w / total_c if total_c > 0 else 15
+
+        # Per-block right margins: 90th percentile within each block
+        by_block = defaultdict(list)
+        for ln in band_lines:
+            by_block[ln['block']].append(ln['right_edge'])
+        block_right = {}
+        for block_id, edges in by_block.items():
+            edges.sort()
+            idx = min(int(len(edges) * 0.9), len(edges) - 1)
+            block_right[block_id] = edges[idx]
+
+        margins[band] = {
+            'left_margin': left_margin,
+            'block_right': block_right,
+            'indent_threshold': 2 * char_width,
+            'continuation_threshold': char_width,
+            'short_threshold': 5 * char_width,
+        }
+
+    return margins
+
+
+def classify_paragraphs(by_band, band_margins):
+    """Walk lines in band order and assign paragraph markers.
+
+    Returns list of (marker, top, key, data) in output order.
+    Markers: '[P]' = indented start, '[Pn]' = non-indented start, '' = continuation.
+    """
+    result = []
+    for band in sorted(by_band.keys()):
+        m = band_margins.get(band)
+        prev_right_edge = None
+        prev_left = None
+        prev_block = None
+        for i, (top, key, data) in enumerate(by_band[band]):
+            if not m:
+                marker = '[Pn]' if i == 0 else ''
+            else:
+                is_indented = data['left'] > m['left_margin'] + m['indent_threshold']
+                # Use previous line's block right margin for short-line detection
+                prev_block_right = m['block_right'].get(prev_block, 0) if prev_block else 0
+                is_after_short = (prev_right_edge is not None and prev_block_right > 0 and
+                                  prev_right_edge < prev_block_right - m['short_threshold'])
+                # Continuation: indented but same left as previous line (e.g. drop-cap wrap)
+                is_continuation = (is_indented and prev_left is not None and
+                                   abs(data['left'] - prev_left) < m['continuation_threshold'])
+                if is_continuation:
+                    marker = ''
+                elif is_indented:
+                    marker = '[P]'
+                elif i == 0 or is_after_short:
+                    marker = '[Pn]'
+                else:
+                    marker = ''
+            result.append((marker, top, key, data))
+            prev_right_edge = data['right_edge']
+            prev_left = data['left']
+            prev_block = data['block']
+    return result
+
+
+def reconstruct(lines, annotate=False, paragraphs=False, band_margins=None):
     """Sort lines by band then top, return as text lines."""
     # Group by band
     by_band = defaultdict(list)
@@ -148,15 +243,28 @@ def reconstruct(lines, annotate=False):
     for band in by_band:
         by_band[band].sort()
 
-    # Emit in band order
+    # Classify paragraphs if requested
+    if paragraphs and band_margins:
+        classified = classify_paragraphs(by_band, band_margins)
+    else:
+        classified = []
+        for band in sorted(by_band.keys()):
+            for top, key, data in by_band[band]:
+                classified.append(('', top, key, data))
+
+    # Emit lines
     result = []
-    for band in sorted(by_band.keys()):
-        for top, key, data in by_band[band]:
-            text = ' '.join(data['words'])
-            if annotate:
-                result.append(f"b{data['block']:2d} B{data['band']} x={data['left']:4d} y={data['top']:4d}  {text}")
-            else:
-                result.append(text)
+    for marker, top, key, data in classified:
+        text = ' '.join(data['words'])
+        parts = []
+        if annotate:
+            parts.append(f"b{data['block']:2d} B{data['band']} x={data['left']:4d} y={data['top']:4d}")
+        if paragraphs and marker:
+            parts.append(f"{marker:4s}")
+        if parts:
+            result.append('  '.join(parts) + '  ' + text)
+        else:
+            result.append(text)
 
     return result
 
@@ -185,6 +293,7 @@ def main():
     parser.add_argument('--boundaries', type=str, default=None,
                         help='Explicit band boundaries, comma-separated (e.g. 400,1000,1600,2480)')
     parser.add_argument('--annotate', action='store_true', help='Add block/band/position metadata')
+    parser.add_argument('--paragraphs', action='store_true', help='Add [P]/[Pn] paragraph markers')
     parser.add_argument('--dump-blocks', action='store_true', help='Show block summary')
     args = parser.parse_args()
 
@@ -202,7 +311,14 @@ def main():
         return
 
     assign_bands(lines, block_stats, boundaries)
-    result = reconstruct(lines, annotate=args.annotate)
+
+    band_margins = None
+    if args.paragraphs:
+        band_margins = compute_band_margins(lines)
+
+    result = reconstruct(lines, annotate=args.annotate,
+                         paragraphs=args.paragraphs,
+                         band_margins=band_margins)
 
     for line in result:
         print(line)
