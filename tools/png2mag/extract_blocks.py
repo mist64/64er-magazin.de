@@ -78,9 +78,40 @@ def run_tesseract(page_png_300, output_dir):
     # Match hOCR font sizes to TSV words by sequential position
     _match_fsize_sequential(base + '.hocr', blocks)
 
+    # Generate layout summary + initial classify.txt before deleting intermediate files
+    _write_layout_summary(base + '.tsv', base + '.hocr', output_dir, blocks)
+
     os.unlink(base + '.tsv')
     os.unlink(base + '.hocr')
     return blocks
+
+
+def _write_layout_summary(tsv_path, hocr_path, output_dir, blocks):
+    """Write layout.txt using tsv_layout.py's format_page, and initial classify.txt."""
+    # Import from sibling module
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, script_dir)
+    from tsv_layout import format_page
+    sys.path.pop(0)
+
+    summary = format_page(tsv_path, hocr_path)
+    layout_path = os.path.join(output_dir, 'layout.txt')
+    with open(layout_path, 'w') as f:
+        f.write(summary + '\n')
+    print(f'layout          {layout_path}')
+
+    # Write initial classify.txt with all text blocks defaulting to "body"
+    # Do not overwrite if it already exists (may contain agent classifications)
+    classify_path = os.path.join(output_dir, 'classify.txt')
+    if os.path.exists(classify_path):
+        print(f'classify        {classify_path} (kept existing)')
+        return
+    with open(classify_path, 'w') as f:
+        for bnum in sorted(blocks):
+            b = blocks[bnum]
+            if b['lines'] and b['bbox'][2] >= 5 and b['bbox'][3] >= 5:
+                f.write(f'block_{bnum:02d}: body\n')
+    print(f'classify        {classify_path}')
 
 
 def _match_fsize_sequential(hocr_path, blocks):

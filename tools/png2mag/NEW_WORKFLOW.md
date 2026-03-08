@@ -2,13 +2,16 @@
 
 ## Overview
 
-Per-page, block-level extraction pipeline. Each magazine page is processed as follows:
+Per-page, block-level extraction pipeline:
 
-1. **Block detection + extraction** — Tesseract identifies text blocks; each is cropped to PNG + TXT.
-2. **Sub-agent correction** — Each block's PNG + OCR text goes to a sub-agent for visual verification.
-3. **Assembly** — Corrected blocks are combined into final article HTML.
+1. **Block detection + extraction** — `extract_blocks.py` runs Tesseract, identifies blocks, classifies them (header/footer/body), crops PNGs, writes annotated TXT.
+2. **Header/footer extraction** — Script separates headers and footers into `headers.txt`, removes them from the block set.
+3. **Sub-agent correction** — Each body block's PNG + TXT goes to a sub-agent for OCR correction and HTML conversion.
+4. **Concatenation** — Script concatenates corrected block HTMLs with `{{newblock}}` markers between them.
+5. **Join agent pass** — A second agent pass fixes `{{newblock}}` boundaries: joins split paragraphs across blocks, resolves cross-block hyphens.
+6. **Final assembly** — Wrap in article HTML shell with metadata from headers and TOC.
 
-## Step 1 + 2: Block Detection and Extraction
+## Step 1: Block Detection and Extraction
 
 Script: `tools/png2mag/extract_blocks.py`
 
@@ -16,45 +19,95 @@ Script: `tools/png2mag/extract_blocks.py`
 python3 tools/png2mag/extract_blocks.py <page_png> <output_dir>
 ```
 
-Produces per block: `block_NN.png` (cropped from 600 DPI source) and `block_NN.txt` (OCR text).
+Output dir should be `issues/NNNN/tmp/pNNN_blocks/` (NOT `/tmp/` — Tesseract sandbox issue).
+
+Produces per block:
+- `block_NN.png` — cropped from 600 DPI source
+- `block_NN.txt` — OCR text with `{{flush}}`/`{{indent}}` and `{{fsize:N}}` annotations
+
+Also produces:
+- `layout.txt` — compact layout summary (from `tsv_layout.py`) with block positions, sizes, font sizes, text previews
+- `classify.txt` — initial classification file with all blocks set to `body`
+- `overview.png` — annotated page image with numbered block rectangles
 
 Key details:
-- Input PNGs are 600 DPI masters. The script downscales to 300 DPI for Tesseract (its optimal DPI).
-- Block coordinates from 300 DPI are scaled 2x back to 600 DPI for cropping the original.
-- No padding is added — Tesseract's exact bounding boxes are used to avoid overlap between adjacent blocks.
-- Canvas offset (`+repage`) is stripped before cropping.
+- Downscales 600→300 DPI for Tesseract (its optimal DPI).
+- Runs TSV + hOCR together for font size detection.
+- Coordinates scaled 2x back to 600 DPI for cropping.
 
-### Example: Page 053 Block Map (at 300 DPI / after downscale)
+## Step 2: Header/Footer Classification
 
-| Block | Size (600dpi) | Content summary |
-|-------|---------------|-----------------|
-| 01 | 404x188 | "C 64" (header left) |
-| 03 | 2218x804 | "Quizmaster" title + subtitle |
-| 04 | 2208x320 | Body start (drop cap "Z" merged) |
-| 06 | 2216x1252 | Body continuation |
-| 09 | 2218x2600 | "Quiz erstellen" section (large) |
-| 14 | 2214x402 | "Einbau von Titelbildern" |
-| 17 | 1576x200 | "Anwendung des Monats" (header right) |
-| 18 | 2218x4126 | Right column (large) |
-| 23 | 2212x870 | "Hinweise zum Eintippen" |
-| 27-28 | ~2200x150 | Titelbild continuation sentences |
-| 29 | 2214x910 | "Der Zeichensatz" |
-| 31 | 680x132 | Footer "Ausgabe 4/April 1986" |
-| 33 | 1964x1098 | Memory address table + attribution |
-| 37 | 1466x160 | "Tabelle 1" caption |
-| 38 | 668x196 | Page number "53" |
+Prompt template: `tools/png2mag/classify_agent_prompt.txt`
+
+A classification agent receives `layout.txt` + `overview.png` and edits `classify.txt`. Each TEXT block gets one of:
+- `body` — article content
+- `head1` — running header (article section name, e.g. "Anwendung des Monats")
+- `head2` — running header (computer name, e.g. "C 64")
+- `footer_issue` — issue line ("Ausgabe N/Monat JJJJ")
+- `footer_page` — page number
+
+For head1/head2, the corrected text is appended after a tab:
+```
+block_01: head2	C 64
+block_17: head1	Anwendung des Monats
+```
+
+After classification, run `tools/png2mag/apply_classify.py`:
+
+```
+python3 tools/png2mag/apply_classify.py <blocks_dir> [<page_num>]
+```
+
+This reads `classify.txt` and produces:
+- `headers.txt` — one line: `PAGE NNN: head1=... | head2=...`
+- `body_blocks.txt` — one block number per line (body blocks only, used by steps 3-4)
 
 ## Step 3: Sub-agent Correction
 
 Prompt template: `tools/png2mag/block_agent_prompt.txt`
 
-For each block:
+For each body block:
 1. Copy `block_NN.txt` → `block_NN.html`
 2. Launch sub-agent with the prompt (substituting `{block_png}` and `{block_html}`)
 3. Sub-agent reads the PNG and edits the .html in place — fixing OCR and adding markup
 
-### Observations
+## Step 4: Concatenation
 
-- 300 DPI gives better block grouping than 600 DPI (16 blocks vs 22). Fewer fragmented paragraphs.
-- Drop cap issue mostly resolved — Tesseract merges the initial letter with the body at 300 DPI.
-- No padding added — padding caused overlap between adjacent blocks (e.g. blocks 04 and 06 shared 75px + 40px padding).
+Script concatenates all `block_NN.html` files (body blocks only, in reading order) into `page_NNN.html`, with `{{newblock}}` on a line by itself between each block:
+
+```html
+<h3>Quiz erstellen</h3>
+<p>Um Fragen und Titelbilder...</p>
+{{newblock}}
+<p>Einbau von Titelbildern</p>
+<p>Wovon hängt es denn nun ab...</p>
+{{newblock}}
+...
+```
+
+For multi-page articles, page HTMLs are concatenated with `{{newpage:NNN}}` markers.
+
+## Step 5: Join Agent Pass
+
+A second agent receives the concatenated HTML + the full page image(s). It fixes block boundaries:
+
+- Paragraphs split across blocks: remove `{{newblock}}`, join the `</p>` and `<p>` into one `<p>`.
+- Hyphens at block boundaries: join words across blocks (same rules as line-break hyphens).
+- Verify reading order is correct.
+- Remove all `{{newblock}}` and `{{newpage}}` markers.
+
+## Step 6: Final Assembly
+
+Wrap the joined HTML body in the article shell:
+- `<head>` metadata from TOC TSV + headers.txt
+- `<article>` wrapper
+- Standard stylesheet link
+
+---
+
+## Observations
+
+- 300 DPI gives better block grouping than 600 DPI (16 blocks vs 22).
+- Drop cap issue mostly resolved at 300 DPI — Tesseract merges the initial letter with body.
+- No padding on crops — padding caused overlap between adjacent blocks.
+- `{{fsize:N}}` reliably identifies titles (≥15), headers (6-14), and code (≤3). Italic subheadings have same fsize as body — sub-agent identifies these from the image.

@@ -1,0 +1,49 @@
+You are a page layout classifier for a 1980s German computer magazine ("64'er").
+
+## Your inputs
+
+1. Layout summary: `{layout_txt}` — block positions, sizes, font sizes, text previews
+2. Page overview: `{overview_png}` — annotated page image with numbered block rectangles
+
+## Your task
+
+Read both files. For each TEXT block, classify it as one of:
+
+- `body` — article content (title, subtitle, body text, subheadings, tables, listings, author credit)
+- `head1` — running header with the article section name (e.g. "Anwendung des Monats", "Tips & Tricks")
+- `head2` — running header with the computer name (e.g. "C 64", "C 128")
+- `footer_issue` — issue line (e.g. "Ausgabe 4/April 1986")
+- `footer_page` — page number (e.g. "53", "64'er 53")
+- `skip` — horizontal/vertical rules, image placeholders, or other non-text blocks
+
+## Classification guidelines
+
+- Headers appear at the TOP of the page, in a larger font than body text.
+- On odd pages: head2 is LEFT, head1 is RIGHT. On even pages: head1 is LEFT, head2 is RIGHT.
+- The page number is typically at the BOTTOM, often with "64'er" prefix. It may be OCR'd incorrectly (e.g. "rar 53" for "64'er 53").
+- The issue line ("Ausgabe N/Monat JJJJ") is at the bottom of the page.
+- Everything else is body content.
+
+## Output format
+
+Edit `{classify_txt}`. List body blocks in **reading order** (typically: left column top-to-bottom, then right column top-to-bottom). Use block positions from the layout summary and the overview image to determine the correct order.
+
+Put non-body blocks (headers, footers) at the end, after a blank line.
+
+One line per block:
+
+```
+block_03: body
+block_04: body
+block_06: body
+...
+
+block_01: head2	C 64
+block_17: head1	Anwendung des Monats
+block_31: footer_issue
+block_38: footer_page
+```
+
+For head1 and head2, append the corrected text after a tab.
+
+Only TEXT blocks need classification. Skip IMAGE/HRULE/VRULE blocks.
