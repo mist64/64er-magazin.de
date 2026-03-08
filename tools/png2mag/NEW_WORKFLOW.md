@@ -4,12 +4,13 @@
 
 Per-page, block-level extraction pipeline:
 
-1. **Block detection + extraction** — `extract_blocks.py` runs Tesseract, identifies blocks, classifies them (header/footer/body), crops PNGs, writes annotated TXT.
-2. **Header/footer extraction** — Script separates headers and footers into `headers.txt`, removes them from the block set.
-3. **Sub-agent correction** — Each body block's PNG + TXT goes to a sub-agent for OCR correction and HTML conversion.
-4. **Concatenation** — Script concatenates corrected block HTMLs with `{{newblock}}` markers between them.
-5. **Join agent pass** — A second agent pass fixes `{{newblock}}` boundaries: joins split paragraphs across blocks, resolves cross-block hyphens.
-6. **Final assembly** — Wrap in article HTML shell with metadata from headers and TOC.
+1. **Block detection + extraction** — `extract_blocks.py` runs Tesseract, crops per-block PNGs + annotated TXTs, writes `layout.txt` + `classify.txt` + `overview.png`.
+2. **Classification agent** — Agent reads `layout.txt` + `overview.png`, edits `classify.txt` with block types and reading order.
+3. **Apply classification** — `apply_classify.py` reads `classify.txt`, writes `headers.txt` + `body_blocks.txt`.
+4. **Sub-agent correction** — Each body block's PNG + TXT goes to a sub-agent for OCR correction and HTML conversion.
+5. **Concatenation** — `concat_blocks.py` joins block HTMLs with `{{newblock}}`/`{{newpage}}` markers.
+6. **Join agent pass** — Agent fixes block/page boundaries: joins split paragraphs, resolves cross-block hyphens.
+7. **Final assembly** — `assemble_article.py` wraps in article HTML shell with metadata from headers + TOC.
 
 ## Step 1: Block Detection and Extraction
 
@@ -35,7 +36,7 @@ Key details:
 - Runs TSV + hOCR together for font size detection.
 - Coordinates scaled 2x back to 600 DPI for cropping.
 
-## Step 2: Header/Footer Classification
+## Steps 2-3: Classification Agent + Apply
 
 Prompt template: `tools/png2mag/classify_agent_prompt.txt`
 
@@ -60,48 +61,109 @@ python3 tools/png2mag/apply_classify.py <blocks_dir> [<page_num>]
 
 This reads `classify.txt` and produces:
 - `headers.txt` — one line: `PAGE NNN: head1=... | head2=...`
-- `body_blocks.txt` — one block number per line (body blocks only, used by steps 3-4)
+- `body_blocks.txt` — one block number per line (body blocks only, in reading order)
 
-## Step 3: Sub-agent Correction
+## Step 4: Sub-agent Correction
 
 Prompt template: `tools/png2mag/block_agent_prompt.txt`
 
-For each body block:
+Script: `tools/png2mag/run_block_agents.py` (TODO)
+
+```
+python3 tools/png2mag/run_block_agents.py <blocks_dir>
+```
+
+For each block listed in `body_blocks.txt`:
 1. Copy `block_NN.txt` → `block_NN.html`
 2. Launch sub-agent with the prompt (substituting `{block_png}` and `{block_html}`)
 3. Sub-agent reads the PNG and edits the .html in place — fixing OCR and adding markup
 
-## Step 4: Concatenation
+Sub-agents run independently per block. They can be parallelized.
 
-Script concatenates all `block_NN.html` files (body blocks only, in reading order) into `page_NNN.html`, with `{{newblock}}` on a line by itself between each block:
+## Step 5: Concatenation
 
+Script: `tools/png2mag/concat_blocks.py` (TODO)
+
+```
+python3 tools/png2mag/concat_blocks.py <blocks_dir> [<blocks_dir2> ...]
+```
+
+Reads `body_blocks.txt` from each blocks_dir. Concatenates `block_NN.html` files in reading order into a single `article_draft.html`, with `{{newblock}}` on a line by itself between blocks from the same page, and `{{newpage:NNN}}` between pages.
+
+For single-page articles, one blocks_dir. For multi-page, pass all page dirs in order.
+
+Example output:
 ```html
+<h1>Quizmaster</h1>
+<p class="intro">Prüfungsvorbereitungen oder Party-Gag...</p>
+{{newblock}}
+<p>Zunächst eine Funktionsbeschreibung...</p>
+{{newblock}}
 <h3>Quiz erstellen</h3>
 <p>Um Fragen und Titelbilder...</p>
-{{newblock}}
-<p>Einbau von Titelbildern</p>
-<p>Wovon hängt es denn nun ab...</p>
+{{newpage:054}}
+<p>Continuation from previous page...</p>
 {{newblock}}
 ...
 ```
 
-For multi-page articles, page HTMLs are concatenated with `{{newpage:NNN}}` markers.
+## Step 6: Join Agent Pass
 
-## Step 5: Join Agent Pass
+Prompt template: `tools/png2mag/join_agent_prompt.txt` (TODO)
 
-A second agent receives the concatenated HTML + the full page image(s). It fixes block boundaries:
+The join agent receives `article_draft.html` + the full page PNG(s) for all pages of the article. It fixes block/page boundaries:
 
-- Paragraphs split across blocks: remove `{{newblock}}`, join the `</p>` and `<p>` into one `<p>`.
-- Hyphens at block boundaries: join words across blocks (same rules as line-break hyphens).
-- Verify reading order is correct.
-- Remove all `{{newblock}}` and `{{newpage}}` markers.
+- **Split paragraphs**: When a paragraph is split across blocks (ending `</p>` + `{{newblock}}` + starting `<p>`), join into one `<p>`. Check the page image to confirm they are the same paragraph.
+- **Cross-block hyphens**: If a block ends with a hyphenated word and the next starts with the continuation, join them (same rules as line-break hyphens).
+- **Cross-page continuations**: Same as above but across `{{newpage}}` markers.
+- **Reading order verification**: Confirm the text flows naturally. Flag if something looks wrong.
+- **Remove all markers**: Delete all `{{newblock}}` and `{{newpage:NNN}}` lines.
 
-## Step 6: Final Assembly
+Output: cleaned `article_draft.html` with no markers.
 
-Wrap the joined HTML body in the article shell:
-- `<head>` metadata from TOC TSV + headers.txt
-- `<article>` wrapper
-- Standard stylesheet link
+## Step 7: Final Assembly
+
+Script: `tools/png2mag/assemble_article.py` (TODO)
+
+```
+python3 tools/png2mag/assemble_article.py <article_draft.html> <toc_tsv> <page_num> <output_html>
+```
+
+Wraps the joined HTML body in the article shell. Metadata sources:
+- **TOC TSV** (`issues/NNNN/NNNN_toc_improved.tsv`): section, toc_title, pages, author
+- **headers.txt** (from step 2): head1, head2
+
+Output format (matching existing articles):
+```html
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Quizmaster</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Matthias Gerloff, dm">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="53-57">
+    <meta name="64er.head1" content="Anwendung des Monats">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Anwendung des Monats: Quizmaster">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <!-- <meta name="64er.index_title" content=""> -->
+    <meta name="64er.index_category" content="Listings zum Abtippen">
+    <meta name="64er.id" content="quizmaster_listings">
+</head>
+
+<body>
+    <article>
+        <h1>Quizmaster</h1>
+        ...body content...
+    </article>
+</body>
+</html>
+```
+
+The `<h1>` comes from the article body (already present from step 3). The script wraps everything else around it.
 
 ---
 
