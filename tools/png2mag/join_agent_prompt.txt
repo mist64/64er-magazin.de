@@ -39,8 +39,27 @@ If the same content appears in two different blocks (e.g. author credit, end of 
 ### 5. Reading order verification
 The blocks are already in reading order (left column top-to-bottom, then right column). Verify the text flows naturally. If something seems out of order, check the page image.
 
-### 6. Table captions
-If a table caption appears after the table (common in magazine layout), move it before the table as a `<p class="noindent"><b>...</b></p>`.
+### 6. Figure/table/listing placement
+
+**Tabelle**: Should be wrapped in `<figure>` with `<figcaption>`. If the caption ("Tabelle N. ...") is a separate block from the table content, merge them into one `<figure>`:
+```html
+<figure>
+    <table>...</table>
+    <figcaption>Tabelle 1. Die wichtigsten Programmadressen</figcaption>
+</figure>
+```
+Place each Tabelle immediately after the first paragraph that references it (e.g. "Aus Tabelle 1 können Sie...").
+
+**Bild**: `<figure>` blocks for images. Place after the paragraph that first mentions "Bild N". No `<figcaption>` unless the caption text is visible in the scan.
+
+**Listing**: Labeled listings (`<figure><pre>...</pre><figcaption>Listing N. ...</figcaption></figure>`) go at the END of the article, grouped together before `</article>`. Exception: small inline listings in tutorial-style articles stay at point of reference.
+
+**Bare `<pre>`**: Unlabeled inline code snippets (no "Listing N" caption) are NOT figures — they stay inline in the prose flow.
+
+**Author + Info adjacency**: `<address class="author">` sticks to the preceding paragraph. Never insert a figure between the last paragraph and the author credit.
+
+### 7. Duplicate caption cleanup
+If a caption appears both as a standalone `<p>` and inside a `<figcaption>`, remove the standalone `<p>`.
 
 ## Final cleanup
 
