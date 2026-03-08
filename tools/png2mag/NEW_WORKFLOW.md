@@ -126,14 +126,37 @@ Output: cleaned `article_draft.html` with no markers.
 Script: `tools/png2mag/assemble_article.py` (TODO)
 
 ```
-python3 tools/png2mag/assemble_article.py <article_draft.html> <toc_tsv> <page_num> <output_html>
+python3 tools/png2mag/assemble_article.py <article_draft.html> <issue_dir> <start_page> <output_html>
 ```
 
-Wraps the joined HTML body in the article shell. Metadata sources:
-- **TOC TSV** (`issues/NNNN/NNNN_toc_improved.tsv`): section, toc_title, pages, author
-- **headers.txt** (from step 2): head1, head2
+The script drives everything. It reads the article body from `article_draft.html` and stamps in all metadata to produce the final HTML file.
 
-Output format (matching existing articles):
+### Metadata sources
+
+| Field | Source | How |
+|-------|--------|-----|
+| `<title>` | article body | Script extracts from `<h1>` in the draft |
+| `author` | article body | Script extracts from `<address class="author">` if present |
+| `64er.issue` | issue dir name | Script derives from YYMM (e.g. `8604` → `4/86`) |
+| `64er.pages` | start_page + page count | Script computes from blocks_dirs used |
+| `64er.head1` | `headers.txt` | Script reads from step 3 output |
+| `64er.head2` | `headers.txt` | Script reads from step 3 output |
+| `64er.toc_title` | placeholder | `<!-- TODO -->` — filled in during manual QA |
+| `64er.toc_category` | placeholder | `<!-- TODO -->` — filled in during manual QA |
+| `64er.index_title` | placeholder | `<!-- TODO -->` — filled in during manual QA |
+| `64er.index_category` | placeholder | `<!-- TODO -->` — filled in during manual QA |
+| `64er.id` | agent | Script asks agent to choose a short id based on article content |
+
+### Agent calls from the script
+
+The script makes minimal agent calls for values it cannot determine mechanically:
+
+- **`64er.id`**: Agent receives the article title + first paragraph and returns a short snake_case identifier (e.g. `quizmaster_listings`). Single-shot, no file editing.
+
+### Output
+
+The script produces the complete HTML file — no further agent involvement:
+
 ```html
 <!DOCTYPE html>
 <html lang="de">
@@ -142,28 +165,25 @@ Output format (matching existing articles):
     <title>Quizmaster</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="Matthias Gerloff, dm">
+    <meta name="author" content="">
     <meta name="64er.issue" content="4/86">
     <meta name="64er.pages" content="53-57">
     <meta name="64er.head1" content="Anwendung des Monats">
     <meta name="64er.head2" content="C 64">
-    <meta name="64er.toc_title" content="Anwendung des Monats: Quizmaster">
-    <meta name="64er.toc_category" content="Listings zum Abtippen">
-    <!-- <meta name="64er.index_title" content=""> -->
-    <meta name="64er.index_category" content="Listings zum Abtippen">
+    <!-- <meta name="64er.toc_title" content="TODO"> -->
+    <!-- <meta name="64er.toc_category" content="TODO"> -->
+    <!-- <meta name="64er.index_title" content="TODO"> -->
+    <!-- <meta name="64er.index_category" content="TODO"> -->
     <meta name="64er.id" content="quizmaster_listings">
 </head>
 
 <body>
     <article>
-        <h1>Quizmaster</h1>
-        ...body content...
+        ...body content from article_draft.html...
     </article>
 </body>
 </html>
 ```
-
-The `<h1>` comes from the article body (already present from step 3). The script wraps everything else around it.
 
 ---
 
