@@ -16,8 +16,10 @@ Steps:
     5  Concatenation (concat_blocks.py)
     6  Join agent (needs LLM — prints prompt)
     7  Final assembly (assemble_article.py)
+    8  Metadata agent (needs LLM — head1/head2/toc/id)
+    9  Stamp metadata (stamp_meta.py)
 
-Without --step, runs all steps. Agent steps (2, 4, 6) print prompts and
+Without --step, runs all steps. Agent steps (2, 4, 6, 8) print prompts and
 pause for confirmation. Use --step N to resume from step N.
 """
 
@@ -227,6 +229,67 @@ def step7_assemble(issue_dir, start_page, end_page):
     ])
 
 
+def step8_meta(issue_dir, start_page, end_page):
+    """Step 8: Metadata agent — returns manifest for LLM."""
+    print('\n' + '=' * 60)
+    print('STEP 8: Metadata (needs LLM)')
+    print('=' * 60)
+    tmp_dir = os.path.join(issue_dir, 'tmp')
+    meta_json = os.path.join(tmp_dir, f'meta_{start_page}.json')
+    # Find article HTML
+    article_htmls = glob.glob(os.path.join(issue_dir, f'{int(start_page)} *.html'))
+    article_html = article_htmls[0] if article_htmls else None
+    # Find TOC page PNGs (pages 6 and 7 of the issue)
+    toc_pngs = []
+    for p in ['006', '007']:
+        png = page_png(issue_dir, p)
+        if png:
+            toc_pngs.append(png)
+    # Find article page PNGs (for head1/head2)
+    article_pngs = []
+    for p in range(int(start_page), int(end_page) + 1):
+        png = page_png(issue_dir, f'{p:03d}')
+        if png:
+            article_pngs.append(png)
+    manifest = {
+        'meta_json': meta_json,
+        'article_html': article_html,
+        'toc_pngs': toc_pngs,
+        'article_pngs': article_pngs,
+        'start_page': start_page,
+    }
+    manifest_path = os.path.join(tmp_dir, 'meta_manifest.json')
+    with open(manifest_path, 'w') as f:
+        json.dump(manifest, f, indent=2)
+    print(f'Manifest: {manifest_path}')
+    print(f'Article: {article_html}')
+    print(f'TOC PNGs: {", ".join(toc_pngs)}')
+    print(f'Output JSON: {meta_json}')
+    print('>>> Run metadata agent to write JSON, then continue with --step 9')
+    return manifest
+
+
+def step9_stamp_meta(issue_dir, start_page):
+    """Step 9: Stamp metadata into article HTML."""
+    print('\n' + '=' * 60)
+    print('STEP 9: Stamp metadata')
+    print('=' * 60)
+    meta_json = os.path.join(issue_dir, 'tmp', f'meta_{start_page}.json')
+    if not os.path.exists(meta_json):
+        print(f'WARNING: {meta_json} not found, skipping stamp')
+        return
+    # Find the article HTML
+    article_htmls = glob.glob(os.path.join(issue_dir, f'{int(start_page)} *.html'))
+    if not article_htmls:
+        print(f'WARNING: No article HTML found for page {start_page}')
+        return
+    article_html = article_htmls[0]
+    run_script([
+        os.path.join(SCRIPT_DIR, 'stamp_meta.py'),
+        article_html, meta_json,
+    ])
+
+
 # ── Main ──────────────────────────────────────────────────────────
 
 def main():
@@ -236,7 +299,7 @@ def main():
     parser.add_argument('start_page', help='First page (e.g. 053)')
     parser.add_argument('end_page', help='Last page (e.g. 057)')
     parser.add_argument('--step', type=int, default=None,
-                        help='Start from this step (1-7)')
+                        help='Start from this step (1-9)')
     parser.add_argument('--clean', action='store_true',
                         help='Clean tmp/ block dirs before running')
     args = parser.parse_args()
@@ -276,6 +339,12 @@ def main():
             return  # Pause for agent
     if start <= 7:
         step7_assemble(args.issue_dir, args.start_page, args.end_page)
+    if start <= 8:
+        step8_meta(args.issue_dir, args.start_page, args.end_page)
+        if start < 8 or args.step == 8:
+            return  # Pause for agent
+    if start <= 9:
+        step9_stamp_meta(args.issue_dir, args.start_page)
 
     print('\n' + '=' * 60)
     print('PIPELINE COMPLETE')

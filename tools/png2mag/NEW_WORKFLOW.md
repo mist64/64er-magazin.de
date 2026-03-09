@@ -63,6 +63,9 @@ A classification agent receives `layout.txt` + `overview.png` and edits `classif
 - `head2` — running header (computer name, e.g. "C 64")
 - `footer_issue` — issue line ("Ausgabe N/Monat JJJJ")
 - `footer_page` — page number
+- `listing` — machine code/BASIC listing content (hex dumps, DATA lines). NOT transcribed.
+- `listing_caption` — caption for a listing. Append corrected text after tab.
+- `skip` — rules, image artifacts, noise
 
 For head1/head2, the corrected text is appended after a tab:
 ```
@@ -79,6 +82,7 @@ python3 tools/png2mag/apply_classify.py <blocks_dir> [<page_num>]
 This reads `classify.txt` and produces:
 - `headers.txt` — one line: `PAGE NNN: head1=... | head2=...`
 - `body_blocks.txt` — one block number per line (body blocks only, in reading order)
+- `listings.txt` — one listing caption per line (only if listing_caption blocks found). These are appended as `<figure><pre>TODO</pre><figcaption>...</figcaption></figure>` at the end of the article by step 7.
 
 ## Step 4: Sub-agent Correction
 

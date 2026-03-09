@@ -36,6 +36,7 @@ def apply_classify(blocks_dir, page_num=None):
     head1 = None
     head2 = None
     body_blocks = []
+    listing_captions = []
 
     with open(classify_path) as f:
         for line in f:
@@ -56,7 +57,9 @@ def apply_classify(blocks_dir, page_num=None):
                 head2 = text
             elif classification == 'body':
                 body_blocks.append(block_num)
-            # footer_issue, footer_page, skip → ignored
+            elif classification == 'listing_caption':
+                listing_captions.append(text)
+            # footer_issue, footer_page, listing, skip → ignored
 
     # Write headers.txt
     headers_path = os.path.join(blocks_dir, 'headers.txt')
@@ -75,6 +78,14 @@ def apply_classify(blocks_dir, page_num=None):
         for bnum in body_blocks:
             f.write(f'{bnum:02d}\n')
     print(f'body_blocks     {body_path}  ({len(body_blocks)} blocks)')
+
+    # Write listings.txt (if any listing captions found)
+    if listing_captions:
+        listings_path = os.path.join(blocks_dir, 'listings.txt')
+        with open(listings_path, 'w') as f:
+            for caption in listing_captions:
+                f.write(caption + '\n')
+        print(f'listings        {listings_path}  ({len(listing_captions)} listings)')
 
 
 if __name__ == '__main__':

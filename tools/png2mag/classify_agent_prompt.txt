@@ -9,11 +9,13 @@ You are a page layout classifier for a 1980s German computer magazine ("64'er").
 
 Read both files. For each TEXT block, classify it as one of:
 
-- `body` — article content (title, subtitle, body text, subheadings, tables, listings, author credit)
+- `body` — article content (title, subtitle, body text, subheadings, tables, author credit)
 - `head1` — running header with the article section name (e.g. "Anwendung des Monats", "Tips & Tricks")
 - `head2` — running header with the computer name (e.g. "C 64", "C 128")
 - `footer_issue` — issue line (e.g. "Ausgabe 4/April 1986")
 - `footer_page` — page number (e.g. "53", "64'er 53")
+- `listing` — machine code or BASIC listing content (hex dumps, DATA lines, etc.). These are NOT transcribed.
+- `listing_caption` — caption for a listing (e.g. "Listing «Hardmaker». Bitte mit dem MSE eingeben"). Append corrected caption text after a tab.
 - `skip` — horizontal/vertical rules, image placeholders, or other non-text blocks
 
 ## Classification guidelines
@@ -22,6 +24,7 @@ Read both files. For each TEXT block, classify it as one of:
 - On odd pages: head2 is LEFT, head1 is RIGHT. On even pages: head1 is LEFT, head2 is RIGHT.
 - The page number is typically at the BOTTOM, often with "64'er" prefix. It may be OCR'd incorrectly (e.g. "rar 53" for "64'er 53").
 - The issue line ("Ausgabe N/Monat JJJJ") is at the bottom of the page.
+- Listing pages contain dense columns of hex bytes (MSE format: address + hex + checksum) or BASIC code with checksums. Mark ALL content blocks on listing pages as `listing`, and the caption block as `listing_caption`.
 - Everything else is body content.
 
 ## Output format

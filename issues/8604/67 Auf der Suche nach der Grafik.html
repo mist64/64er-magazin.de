@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Auf der Suche nach der Grafik</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Kurts, og">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="67-69">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Hardmaker — Hardcopy-Programm für MPS801 und MPS803">
+    <meta name="64er.toc_category" content="Grafik">
+    <!-- <meta name="64er.index_title" content=""> -->
+    <!-- <meta name="64er.index_category" content=""> -->
+    <meta name="64er.id" content="hardmaker">
+</head>
+
+<body>
+    <article>
+        <h1>Auf der Suche nach der Grafik</h1>
+        <p class="intro">Egal, wo Ihre HiRes-Grafik liegt, »Hardmaker« findet sie. Multi-Color-Grafiken können auf Wunsch in Graustufen umgerechnet und ausgedruckt werden.</p>
+        <p class="noindent"><span class="drop-cap">D</span>er »Hardmaker« erlaubt es, HiRes-Grafiken aus fast allen Programmen aufs Papier zu bringen. Dazu stehen umfangreiche Routinen zur Verfügung, die dem Benutzer fast alle Arbeiten abnehmen. Nur das Papier müssen Sie noch von Hand einspannen.</p>
+        <p><strong>Eingabehinweise:</strong> Geben Sie den »Hardmaker« (siehe Listing) bitte mit dem MSE ein, und speichern Sie ihn. Der Programmstart erfolgt durch RUN.</p>
+        <p>Danach sehen Sie auf dem Bildschirm (meistens) ein wüstes Durcheinander von Punkten. Das ist der Bereich von $2000 bis $4000 als Multicolor-Grafik dargestellt. Das könnte zum Beispiel Teil eines Computerspiels sein, das vorher im Computer war. Wenn Sie nun ein Programm auf Bilder untersuchen wollen, müßten Sie im »Diskworkmodus« dieses Programm laden, die Grafik finden, eventuell speichern und ausdrucken. Dazu stehen Ihnen folgende Funktionen zur Verfügung.</p>
+        <h3>Speicherbereiche:</h3>
+        <p>Computergrafiken können nur an bestimmten Stellen im Speicher stehen, um vom VIC ausgelesen werden zu können. Ein solcher Bereich ist der von $2000 bis $3FFF. Diesen Bereich sehen Sie grundsätzlich auf dem Bildschirm; er wird vom Programm als Grafik-RAM benutzt. Wollen Sie den Inhalt eines anderen Bereiches sehen, muß er nach $2000 transportiert werden. Dazu dienen die Tasten 1 bis 6 und =:</p>
+        <p>1: $4000 bis $5FFF
+        2: $6000 bis $7FFF
+        3: $8000 bis $9FFF
+        4: $A000 bis $BFFF (RAM unterm Basic)
+        5: $C000 bis $DFFF ($D000 bis $DFFF; RAM unter I/O)
+        6: $E000 bis $FFFF (RAM unterm Kernel)
+        =: $0000 bis $1FFF, Dieser Bereich ist nur der Vollständigkeit halber per Taste erreichbar. Benutzen können Sie ihn nicht, da dort Zeropage, Stack, Video-RAM und der Hardmaker selbst liegen!</p>
+        <p>Wenn Sie auf eine dieser Tasten ohne SHIFT, CTRL oder CBM drücken, wird der entsprechende Speicherbereich nach $2000 transportiert und ist damit auf dem Bildschirm sichtbar. Drücken Sie jedoch SHIFT und dann eine dieser Tasten, wird der entsprechende Bereich mit dem ab $2000 ODER-verknüpft. So können zwei Bilder zusammengemischt werden. Das Ergebnis liegt wieder ab $2000.</p>
+        <p class="noindent">Folgende Kombinationen bewirken also:</p>
+        <p class="noindent">a) (nur Taste = bis 6) &#8796; Bereich nach $2000 transportieren
+        b) SHIFT &#8796; ODER-Verknüpfen
+        c) CBM &#8796; EX-OR-Verknüpfen
+        d) SHIFT und CBM &#8796; UND-Verknüpfen
+        e) CTRL &#8796; Bereich mit dem ab $2000 vertauschen
+        f) CTRL SHIFT &#8796; $2000 bis $3FFF in entsprechenden Bereich kopieren
+        (oder CTRL C=)</p>
+        <p>Wenn Sie eine Kombination mit CTRL drücken, wird der entsprechende Speicherplatz verändert! Auf diese Weise können Sie zum Beispiel den Inhalt von $2000 bis $3FFF zwischenspeichern, wenn Sie ihn danach weiterbearbeiten wollen (Zum Beispiel bei schwierigen Korrekturen).</p>
+        <h3>Bilder »schneiden«</h3>
+        <p>Manchmal kommt es vor, daß nicht der gesamte Inhalt des Bildschirms zu einer Grafik gehört und man den Rest »wegschneiden« möchte. Zum Beispiel möchten Sie am rechten Rand etwas entfernen. Dazu drücken Sie die Taste R. Der Rahmen wechselt seine Farbe und an der rechten Seite erscheint eine flackernde Linie, die Sie mit Cursor links/rechts hin- und herbewegen können.</p>
+        <p>Wenn Sie die Linie richtig positioniert haben, drücken Sie auf SPACE; der Bereich rechts der Linie wird gelöscht (oder gefüllt, wenn sie SHIFT SPACE drücken). Möchten Sie nichts löschen, dann drücken Sie Q, und die flackernde Linie ist verschwunden.</p>
+        <p class="noindent">r: rechts Randfarbe: orange
+        l: links Randfarbe: blau
+        o: oben Randfarbe: hellrot
+        u: unten Randfarbe: grün</p>
+        <p>Im Schneidemodus stehen folgende Funktionen zur Verfügung:</p>
+        <ul>
+        <li>Cursor nach oben/unten (nur o, u)</li>
+        <li>Cursor nach oben links/rechts (nur l, r)</li>
+        <li>SPACE, SHIFT-SPACE</li>
+        <li>Q (wie quit)</li>
+        </ul>
+        <h3>Bilder verschieben:</h3>
+        <p>Wenn die Grafik nicht genau oben links beginnt, muß sie verschoben werden. Eine Möglichkeit dazu ist das Scrollen:</p>
+        <p>Mit Commodore-Taste + Cursor-Taste wird die Grafik um 1 Byte nach links oder rechts verschoben.</p>
+        <p>Die andere Möglichkeit sind die Tasten A und E. Positionieren Sie den Cursor irgendwo mitten auf dem Bildschirm und drücken Sie die Taste A: Die Grafik wird so verschoben, daß die Cursorposition nun den Anfang der Grafik bildet. Analog funktioniert hier die Taste E: Die Cursorposition wird zum Ende der Grafik. Gerade diese Funktionen ermöglichen ein bequemes Positionieren einer Grafik, die irgendwo im Speicher liegt.</p>
+        <h3>Farbe</h3>
+        <p>Mit den Funktionstasten kann die Farbe der Grafik geändert werden, wenn die Ausgangsbelegung (die sich für Schwarzweiß-Fernseher übrigens gut eignet) nicht gefällt:</p>
+        <p class="noindent">f1/f2 &#8796; Farbe 1 HiRes/Multi
+        f3/f4 &#8796; Farbe 2 HiRes/Multi
+        f5/f6 &#8796; Farbe 3 Multi
+        f7/f8 &#8796; Farbe 4 Multi</p>
+        <p>Die Funktionstaste blättert die Farben vorwärts, geshiftet blättert sie die Farben zurück. Für Multi und HiRes sind getrennte Farb-Speicher vorhanden.</p>
+        <p class="noindent"><strong>Folgende Tasten bewegen den Cursor:</strong></p>
+        <p>Cursor links/rechts
+        /oben/unten gewohnte Cursor-Bewegung
+        RETURN Bewegt ihn in die erste Spalte der nächsten Zeile
+        SHIFT HOME
+        (CLEAR) löscht die Grafik
+        HOME Cursor links oben
+        &#163; (Gegenteil von HOME: Cursor in letzte Spalte letzte Zeile)
+        SPACE Cursor rechts + Cursorfeld löschen
+        SHIFT SPACE Cursor rechts + Cursorfeld füllen mit Farbe 3
+        CBM SPACE Cursor rechts + Cursorfeld füllen mit Farbe 1
+        CTRL SPACE Cursor rechts + Cursorfeld füllen mit Farbe 2
+        DEL genauso wie SPACE, bloß mit Cursor nach links (also kein echtes DEL!)</p>
+        <h3>Sonderfunktionen:</h3>
+        <p class="noindent">H schaltet HiRes-Modus ein; genauso wie Sie die Grafik nun sehen, wird sie von einem Matrixdrucker ausgegeben werden.
+        M schaltet Multicolor an.</p>
+        <p class="noindent">T ist eine sehr praktische Sache, wenn man einen der erwähnten Matrixdrucker besitzt. Diese geben die Multicolor-Grafiken nämlich so aus, daß die Farben 1 und 2 als charakteristische Linien erscheinen. T verwandelt diese Farben nun in Graustufen, die der Drucker ausgeben kann (siehe Kasten).</p>
+
+        <p>T funktioniert nur, wenn Multicolor eingeschaltet ist, und schaltet dann auf HiRes um!</p>
+
+        <p class="noindent">I&quot; invertiert die Grafik</p>
+
+        <p class="noindent">S spiegelt die Grafik an der Vertikalen, und vertauscht die Farben 1 und 2, die ja auch gespiegelt werden. Spiegeln an der Horizontalen ist nicht nötig, da man ja die Hardcopy einfach umdrehen kann!</p>
+
+        <p class="noindent">X kehrt ins Basic zurück.</p>
+        <h3>Diskworkmodus:</h3>
+
+        <p>Wird mit D aktiviert. Die Grafik wird dann ausgeblendet und Sie haben den normalen Kernel-Editor vor sich. Folgende Befehle wurden hier implementiert.</p>
+        <p class="noindent">$ Directory</p>
+
+        <p class="noindent">@ Kommandokanal des Laufwerks abfragen</p>
+
+        <p class="noindent">@i initialisieren (analoges gilt für SCRATCH, RENAME, FORMAT, etc.)</p>
+
+        <p class="noindent">n gibt die aktuelle Geräteadresse aus (Voreingestellt 8)</p>
+
+        <p class="noindent">n9 schaltet auf Geräteadresse 9 um</p>
+        <p class="noindent">? ist der normale Basic-PRINT-Befehl, der hier für Berechnung genutzt werden kann</p>
+
+        <p class="noindent">Q schaltet den Grafikmodus wieder an</p>
+
+        <p class="noindent">X Rückkehr zum Basic</p>
+
+        <p>Mit &mdash; kann aus dem Hardmaker heraus eine Grafik gespeichert werden; zum Beispiel &raquo;&mdash; Bild 1 &lsaquo;return&rsaquo;&laquo; speichert den Bereich $2000 bis $3FFF (genauer bis $3F40) auf Diskette unter dem Namen &raquo;Bild 1&laquo; ab. Das erzeugt Programmfile ist 32 Blöcke lang.</p>
+
+        <p class="noindent">&pound; Um ein Programm nach Grafiken zu durchsuchen, muß man es irgendwie in den Computer bekommen. Die eine Möglichkeit ist, das Programm zu laden, zu starten, mit Reset auszusteigen und dann den Hardmaster nachzuladen. Dies empfiehlt sich immer dann, wenn das Programm die Grafik erst erzeugt. Außerdem liegt diese dann schon meist an der richtigen Stelle im Speicher, so daß man nicht mehr zu verschieben braucht.</p>
+
+        <p>Die andere Möglichkeit ist, erst den Hardmaker zu laden und dann mit dem &pound;-Befehl das betreffende Programm. Dies wird dann in den Bereich ab $2000 geladen, so daß ein Autostart entfällt. Diese Methode kann zu Problemen führen, wenn das betreffende File länger als 178 Blöcke ist, weil dann in die Register der I/O-Bausteine hineingeladen wird. Diese Methode ist dann nötig, wenn ein Programm sich nicht durch Reset stoppen läßt.</p>
+        <h3>Hardcopy</h3>
+
+        <p class="noindent">Dieser Programmteil ist zugleich der wichtigste wie auch der problematischste. Denn eine Hardcopy-Routine muß an die meisten Drucker speziell angepaßt werden. Die im &raquo;Hardmaker&laquo; integrierte Hardcopy-Routine spricht Drucker mit sieben Nadeln an, also den MPS 801, den MPS 803, und Epsondrucker, deren Interface eine Umwandlung auf acht Nadeln vornehmen kann. Hier hilft entweder nur ausprobieren, oder eine andere Hardcopy-Routine. Diese kann ab der Adresse $13A0 an den &raquo;Hardmaker&laquo; angehängt werden.</p>
+
+        <p>Aktiviert wird die Hardcopy mit der Taste P. Daraufhin färbt sich der Rahmen schwarz und der C 64 beginnt mit der Hardcopy. Danach wird in den Grafikmodus zurückgesprungen.</p>
+
+        <address class="author">(Christian Kurts/og)</address>
+        <h3>Funktionsweise des T-Befehls beim Hardmaker</h3>
+
+        <p class="noindent">Im Multicolor-Modus stellen immer je 2 Bit eines Bytes die Information für einen Bildpunkt zur Verfügung, so daß die Auflösung gegenüber dem HiRes-Modus halbiert wird. Dafür hat man vier Farben statt zwei zur Auswahl, die durch die Bitkombinationen 00, 01, 10 und 11 repräsentiert werden. Ein normaler Matrixdrucker hat hingegen keinen Multicolor-Modus und stellt die Bitmuster genau so dar, wie sie im Grafik-ROM stehen. Das führt bei Gebieten, die aus den Farben 1 und 2 beziehungsweise den Bitmustern 01 oder 10 bestehen, zu den bekannten Streifenmustern (Bild 1). Um diese in Graustufen (Bild 2) umzuwandeln, geht der Computer folgendermaßen vor: Die vier Zweierbit-Kombinationen eines jeden der 8000 Byte des Grafik-RAMs werden nach den Bitkombinationen 01 und 10 untersucht.</p>
+
+        <p>1. Fall: Zweierbit-Kombination = 00 oder 11: nichts wird verändert.</p>
+
+        <p class="noindent">2. Fall: Zweierbit-Kombination = 01: In diesem Fall werden die zwei Bit invertiert, also durch 10 ersetzt, aber nur dann, wenn die zwei Bit Bestandteil des 1., 3., 5., etc. Bytes des Grafik-RAMs sind. Dadurch wird das Bitmuster in jeder zweiten Grafikzeile um ein Bit nach links versetzt. Wenn die ersten 3 Byte also</p>
+        <pre>01  01  00  01                          10  10  00  10
+01  01  11  01  lauten, so wird daraus  01  01  11  01
+01  01  01  01                          10  10  10  10</pre>
+        <p class="noindent">und der Drucker gibt ein gleichmäßig graues Feld aus.</p>
+
+        <p class="noindent">3. Fall: Bitkombination = 10</p>
+
+        <p class="noindent">Hierbei würde aus den ersten 3 Byte</p>
+        <pre>10  10  00  10                          01  10  00  10
+10  10  11  10  folgendes werden:       10  01  11  01
+10  10  10  10                          01  10  01  10</pre>
+        <p>Also ein etwas gröberes Graufeld. Dieser Effekt wird dadurch erreicht, daß eine Zweierbit-Kombination nur dann invertiert wird, wenn sie entweder im 1., 3., 5., ... Byte die 1. oder 3. Zweierkombination oder im 2., 4., 6., ... Byte die 2. oder 4. Zweierkombination ist.</p>
+        <figure>
+            <img src="67-1.png" alt="">
+            <figcaption>Bild 1. Eine Hardcopy ohne Umrechnung...</figcaption>
+        </figure>
+        <figure>
+            <img src="67-2.png" alt="">
+            <figcaption>Bild 2. ...und eine mit Umrechnung der Multi-Color-Daten.</figcaption>
+        </figure>
+
+                <figure>
+                    <pre>TODO</pre>
+                    <figcaption>Listing «Hardmaker». Bitte mit dem MSE eingeben</figcaption>
+                </figure>
+
+    </article>
+</body>
+</html>

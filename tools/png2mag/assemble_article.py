@@ -22,6 +22,7 @@ Derives:
 Output: issues/NNNN/PPP Title.html (in issue dir, named by start_page + title)
 """
 
+import glob
 import os
 import re
 import sys
@@ -61,22 +62,6 @@ def extract_author(body):
     return ''
 
 
-def read_headers(blocks_dir):
-    """Read head1 and head2 from headers.txt."""
-    path = os.path.join(blocks_dir, 'headers.txt')
-    head1 = ''
-    head2 = ''
-    if os.path.exists(path):
-        with open(path) as f:
-            line = f.read().strip()
-        m = re.search(r'head1=([^|]+)', line)
-        if m:
-            head1 = m.group(1).strip()
-        m = re.search(r'head2=([^|]+)', line)
-        if m:
-            head2 = m.group(1).strip()
-    return head1, head2
-
 
 def issue_code(issue_dir):
     """Derive issue string from dir name: 8604 -> 4/86."""
@@ -112,6 +97,69 @@ def indent_body(body, spaces=8):
     return '\n'.join(result)
 
 
+def collect_listings(issue_dir, start_page, end_page):
+    """Collect listing captions from all page block dirs."""
+    captions = []
+    for p in range(int(start_page), int(end_page) + 1):
+        listings_path = os.path.join(issue_dir, 'tmp', f'p{p:03d}_blocks', 'listings.txt')
+        if os.path.exists(listings_path):
+            with open(listings_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        captions.append(line)
+    return captions
+
+
+def insert_unmatched_images(body, issue_dir, start_page, end_page):
+    """Find images P-N.png not yet referenced in body and insert before first body paragraph."""
+    # Collect all article images: start_page-*.png through end_page-*.png
+    all_images = []
+    for p in range(int(start_page), int(end_page) + 1):
+        pattern = os.path.join(issue_dir, f'{int(p)}-*.png')
+        all_images.extend(sorted(glob.glob(pattern)))
+
+    # Find which are already referenced
+    referenced = set(re.findall(r'src="([^"]+\.png)"', body))
+
+    unmatched = []
+    for img_path in all_images:
+        fname = os.path.basename(img_path)
+        if fname not in referenced:
+            unmatched.append(fname)
+
+    if not unmatched:
+        return body
+
+    # Build figure HTML for unmatched images
+    fig_lines = []
+    for fname in unmatched:
+        fig_lines.append(f'<figure>\n    <img src="{fname}" alt="">\n</figure>')
+    fig_html = '\n\n'.join(fig_lines)
+
+    # Insert before the first <p> that is NOT class="intro"
+    # i.e., after <h1> and <p class="intro">, before the first regular <p>
+    m = re.search(r'(</p>\s*\n\s*)\n(\s*<p[ >])', body)
+    # More robust: find first <p> or <p class="noindent"> after any <p class="intro">
+    # Strategy: split after last intro paragraph, insert before next element
+    intro_end = 0
+    for match in re.finditer(r'<p class="intro">.*?</p>', body, re.DOTALL):
+        intro_end = match.end()
+    if intro_end == 0:
+        # No intro — find end of <h1>
+        m = re.search(r'</h1>', body)
+        if m:
+            intro_end = m.end()
+
+    if intro_end > 0:
+        body = body[:intro_end] + '\n\n' + fig_html + '\n' + body[intro_end:]
+    else:
+        body = fig_html + '\n\n' + body
+
+    print(f'images          {len(unmatched)} unmatched image(s) inserted: {", ".join(unmatched)}')
+    return body
+
+
 def assemble(draft_path, issue_dir, start_page, end_page):
     with open(draft_path) as f:
         body = f.read().strip()
@@ -120,9 +168,21 @@ def assemble(draft_path, issue_dir, start_page, end_page):
     author = extract_author(body)
     issue = issue_code(issue_dir)
 
-    # Find headers.txt in the start page's blocks dir
-    blocks_dir = os.path.join(issue_dir, 'tmp', f'p{start_page}_blocks')
-    head1, head2 = read_headers(blocks_dir)
+    # Insert unmatched images before first body paragraph
+    body = insert_unmatched_images(body, issue_dir, start_page, end_page)
+
+    # Collect listing captions from all pages
+    listings = collect_listings(issue_dir, start_page, end_page)
+    if listings:
+        listing_html = '\n\n'
+        for caption in listings:
+            listing_html += '        <figure>\n'
+            listing_html += '            <pre>TODO</pre>\n'
+            listing_html += f'            <figcaption>{caption}</figcaption>\n'
+            listing_html += '        </figure>\n'
+        # Insert before </address> or at end of body
+        # Listings go after author credit (which is the last element)
+        body = body + listing_html
 
     # Pages string
     if start_page == end_page:
@@ -142,13 +202,13 @@ def assemble(draft_path, issue_dir, start_page, end_page):
     <meta name="author" content="{author}">
     <meta name="64er.issue" content="{issue}">
     <meta name="64er.pages" content="{pages}">
-    <meta name="64er.head1" content="{head1}">
-    <meta name="64er.head2" content="{head2}">
-    <!-- <meta name="64er.toc_title" content="TODO"> -->
-    <!-- <meta name="64er.toc_category" content="TODO"> -->
-    <!-- <meta name="64er.index_title" content="TODO"> -->
-    <!-- <meta name="64er.index_category" content="TODO"> -->
-    <meta name="64er.id" content="TODO">
+    <meta name="64er.head1" content="__HEAD1__">
+    <meta name="64er.head2" content="__HEAD2__">
+    <meta name="64er.toc_title" content="__TOC_TITLE__">
+    <meta name="64er.toc_category" content="__TOC_CATEGORY__">
+    <!-- <meta name="64er.index_title" content=""> -->
+    <!-- <meta name="64er.index_category" content=""> -->
+    <meta name="64er.id" content="__ID__">
 </head>
 
 <body>
