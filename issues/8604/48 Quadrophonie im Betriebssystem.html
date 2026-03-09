@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Quadrophonie im Betriebssystem</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="C. Q. Spitzner, M. Frank, og">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="48">
+    <meta name="64er.head1" content="Selbstbau">
+    <meta name="64er.head2" content="C 64">
+    <!-- <meta name="64er.toc_title" content="TODO"> -->
+    <!-- <meta name="64er.toc_category" content="TODO"> -->
+    <!-- <meta name="64er.index_title" content="TODO"> -->
+    <!-- <meta name="64er.index_category" content="TODO"> -->
+    <meta name="64er.id" content="TODO">
+</head>
+
+<body>
+    <article>
+        <h1>Quadrophonie im Betriebssystem</h1>
+
+        <p class="intro">Bisher war es sehr aufwendig, mehrere Betriebssysteme im Computer unterzubringen. Mit einem Trick läßt sich der Aufwand um ein Vielfaches verringern.</p>
+
+        <p><span class="drop-cap">U</span>m gleichzeitig mehrere Betriebssysteme in den C 64 abrufbereit einzusetzen, wurde bislang eine Adapterplatine mit mehreren EPROM-Sockeln verwendet (zum Beispiel EPROM-Trans, 64'er 10/85, Seite 42). Die Herstellung solcher Platinen ist aufgrund ihres Umfanges recht zeitaufwendig und kompliziert.</p>
+
+        <p>Unser neuer Kernel-Adapter besteht aus einer kleinen und sehr einfachen Platine (Bild 1). Dabei können in einem großen EPROM mehrere Betriebssysteme gleichzeitig untergebracht werden. So lassen sich in einem EPROM des Typs 27256 (32 KByte) vier, und im nächstkleineren Typ 27128 (16 KByte) zwei Betriebssysteme unterbringen. Der Preis für ein solches EPROM liegt meist wesentlich unter 30 Mark. Um die Platine so einfach wie möglich zu halten, haben wir auf Flip-Flops für die Umschaltung des Betriebssystems verzichtet. Deshalb sollte nur bei ausgeschaltetem Computer umgeschaltet werden, andernfalls wäre ein Systemabsturz unumgänglich. Für ein 16-KByte-EPROM brauchen Sie einen, für das 32-KByte-EPROM zwei Umschalter (1 x Um). Bild 2 zeigt den Anschluß des 27128, in Bild 3 finden Sie die Schaltungsvariante für den 27256. Bei Verwendung des 32-KByte-EPROMs muß die Leiterbahn zwischen Anschluß 1 und 2 an der vorgesehenen Stelle unterbrochen werden (Bild 3). Bei der Verschaltung darf auf keinen Fall der 10-KOhm-Widerstand zwischen dem Schalter und der Versorgungsspannung vergessen werden.</p>
+
+        <figure>
+            <img src="48-1.png" alt="">
+            <figcaption>Bild 1. 4fach-Umschaltplatine</figcaption>
+        </figure>
+
+        <figure>
+            <img src="48-2.png" alt="">
+            <figcaption>Bild 2. Die Verdrahtung der Schalter für das 27128</figcaption>
+        </figure>
+
+        <figure>
+            <img src="48-3.png" alt="">
+            <figcaption>Bild 3. Die Verdrahtung der Schalter für das 27256</figcaption>
+        </figure>
+
+        <p>Die Betriebssysteme werden hintereinander auf das EPROM programmiert. In den Bildern 4 und 5 wird das Schema der EPROM-Belegung dargestellt.</p>
+
+        <figure>
+            <img src="48-4.png" alt="">
+<pre>
+        27128
+$ 0000 ┌────────┐
+       │        │
+       │Kernel 1│
+       │        │
+$ 2000 ├────────┤
+       │        │
+       │Kernel 2│
+       │        │
+$ 3000 └────────┘
+</pre><figcaption>Bild 4. Die Speicheraufteilung im EPROM 27128...</figcaption></figure>
+
+        <figure>
+            <img src="48-5.png" alt="">
+<pre>
+        27256
+$ 0000 ┌────────┐
+       │        │
+       │Kernel 1│
+       │        │
+$ 2000 ├────────┤
+       │        │
+       │Kernel 2│
+       │        │
+$ 4000 ├────────┤
+       │        │
+       │Kernel 3│
+       │        │
+$ 6000 ├────────┤
+       │        │
+       │Kernel 4│
+       │        │
+$ 8000 └────────┘
+</pre><figcaption>Bild 5. ... und im 27256</figcaption></figure>
+
+        <p>Wie gesagt ist der Selbstbau der Adapterplatine sehr einfach. Sie benötigen nur die Bauteile aus der Stückliste (Bild 6).</p>
+
+        <figure>
+            <img src="48-6.png" alt="">
+            <table>
+            <thead>
+                <tr><th>Zweifach-Kernel</th><th>Vierfach-Kernel</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1 Platine</td><td>1 Platine (Anschluß 1 und 2 durchtrennen!)</td></tr>
+                <tr><td>1 Schalter (1xUm)</td><td>2 Schalter (je 1xUM)</td></tr>
+                <tr><td>1 IC-Fassung (28polig)</td><td>1 IC-Fassung (28polig)</td></tr>
+                <tr><td>2 Pin-Leisten (je 12 Pins)</td><td>2 Pin-Leisten (je 12 Pins)</td></tr>
+                <tr><td>1 Widerstand 10 KOhm</td><td>1 Widerstand 10 KOhm</td></tr>
+                <tr><td>1 EPROM 27128</td><td>1 EPROM 27256</td></tr>
+                <tr><td>1 3poliges Flachbandkabel</td><td>1 4poliges Flachbandkabel</td></tr>
+            </tbody>
+        </table><figcaption>Bild 6. Stückliste für die 2- beziehungsweise 4fach-Umschaltplatine</figcaption></figure>
+
+        <p>Zuerst werden die Pin-Leisten auf der Leiterbahnseite eingelötet, so daß die Platine später anstelle des Kernel-ROMs in den Computer eingesetzt werden kann. Anschließend sollten Sie die 28polige IC-Fassung einlöten. Nun können Sie das entsprechende Flachbandkabel einlöten und mit dem (den) Schalter(n) verbinden. Vergessen Sie den 10-KOhm-Widerstand nicht! Vergleichen Sie anschließend alle Lötstellen, denn Kurzschlüsse können das Ende für den Computer bedeuten.</p>
+
+        <p>Ist die Platine fertig, sollte man die Betriebssysteme ins EPROM »brennen«. Dazu eignet sich unter anderem der 64'er EPROMmer (Ausgabe 12/85 und 1/86). Die Betriebssysteme müssen wie in Bild 4 oder 5 angeordnet werden.</p>
+
+        <h3>Vor dem Umbau des C 64 ist unbedingt der Netzstecker zu ziehen!</h3>
+
+        <p class="noindent">Lösen Sie die drei Schrauben an der Unterseite und heben Sie das Oberteil vorsichtig ab. Das Gehäuseoberteil wird nach Abstecken der Tastatur und der Leuchtdiode beiseite gelegt. Ist dies alles geschehen, ziehen Sie vorsichtig das Original-Kernel aus der Fassung (Steckplatz U4) und stecken die Platine mit der überstehenden Seite nach hinten zeigend (Richtung zum User-Port) in den C 64. Das EPROM wird ebenfalls mit der Kerbe nach hinten zeigend in die 28polige Fassung eingesetzt; die Kerbe im Sockel muß mit der Kerbe des EPROMs übereinstimmend im überstehenden Teil des Sockels liegen (Richtung zum User-Port). Die Schalter können nach Belieben am Computergehäuse befestigt werden.</p>
+        <p>Sollte Ihr Kernel-PROM eingelötet sein, lassen Sie bitte das IC von einem Fachmann durch eine 24polige Fassung ersetzen. Übernehmen Sie den Umbau selbst, so sollten Sie nach Möglichkeit eine Lötstation mit Trenntrafo verwenden.</p>
+        <p>Vorsicht! Durch Öffnen des C 64 oder durch irgendwelche Änderungen kann der Garantieanspruch verlorengehen.</p>
+        <address class="author">(C. Q. Spitzner/M. Frank/og)</address>
+    </article>
+</body>
+</html>

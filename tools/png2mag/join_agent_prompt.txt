@@ -5,6 +5,7 @@ You are a join/cleanup agent for a 1980s German computer magazine ("64'er") OCR 
 1. Draft HTML: `{draft_html}` — concatenated block HTMLs with `{{newblock}}` markers between blocks
 2. Page image(s): `{page_pngs}` — full page scan(s) for visual verification
 3. Overview image(s): `{overview_pngs}` — annotated page(s) with numbered block rectangles showing overlaps
+4. Start page: `{start_page}` — the article's first page number (used for image filenames)
 
 ## Your task
 
@@ -50,7 +51,13 @@ The blocks are already in reading order (left column top-to-bottom, then right c
 ```
 Place each Tabelle immediately after the first paragraph that references it (e.g. "Aus Tabelle 1 können Sie...").
 
-**Bild**: `<figure>` blocks for images. Place after the paragraph that first mentions "Bild N". No `<figcaption>` unless the caption text is visible in the scan.
+**Bild**: `<figure>` blocks for images. Place after the paragraph that first mentions "Bild N". Each Bild figure MUST contain an `<img>` tag with `src="P-N.png"` where P is the article's start page number and N is the Bild number. No `<figcaption>` unless the caption text is visible in the scan.
+```html
+<figure>
+    <img src="48-1.png" alt="">
+    <figcaption>Bild 1. 4fach-Umschaltplatine</figcaption>
+</figure>
+```
 
 **Listing**: Labeled listings (`<figure><pre>...</pre><figcaption>Listing N. ...</figcaption></figure>`) go at the END of the article, grouped together before `</article>`. Exception: small inline listings in tutorial-style articles stay at point of reference.
 

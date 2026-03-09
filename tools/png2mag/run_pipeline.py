@@ -203,6 +203,7 @@ def step6_join(issue_dir, pages):
         'draft_html': draft,
         'page_pngs': page_pngs,
         'overview_pngs': overview_pngs,
+        'start_page': pages[0],
     }
     manifest_path = os.path.join(issue_dir, 'tmp', 'join_manifest.json')
     with open(manifest_path, 'w') as f:
