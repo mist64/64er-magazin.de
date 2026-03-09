@@ -103,7 +103,7 @@
         <table class="plain">
         <tr><td>H</td><td>schaltet HiRes-Modus ein; genauso wie Sie die Grafik nun sehen, wird sie von einem Matrixdrucker ausgegeben werden.</td></tr>
         <tr><td>M</td><td>schaltet Multicolor an.</td></tr>
-        <tr><td>T</td><td>ist eine sehr praktische Sache, wenn man einen der erwähnten Matixdrucker besitzt. Diese geben die Multicolor-Grafiken nämlich so aus, daß die Farben 1 und 2 als charakteristische Linien erscheinen. T verwandelt diese Farben nun in Graustufen, die der Drucker ausgeben kann (siehe Kasten).<br>T funktioniert nur, wenn Multicolor eingeschaltet ist, und schaltet dann auf HiRes um!</td></tr>
+        <tr><td>T</td><td>ist eine sehr praktische Sache, wenn man einen der erwähnten Matrixdrucker besitzt. Diese geben die Multicolor-Grafiken nämlich so aus, daß die Farben 1 und 2 als charakteristische Linien erscheinen. T verwandelt diese Farben nun in Graustufen, die der Drucker ausgeben kann (siehe Kasten).<br>T funktioniert nur, wenn Multicolor eingeschaltet ist, und schaltet dann auf HiRes um!</td></tr>
         <tr><td>I</td><td>invertiert die Grafik</td></tr>
         <tr><td>S</td><td>spiegelt die Grafik an der Vertikalen, und vertauscht die Farben 1 und 2, die ja auch gespiegelt werden. Spiegeln an der Horizontalen ist nicht nötig, da man ja die Hardcopy einfach umdrehen kann!</td></tr>
         <tr><td>X</td><td>kehrt ins Basic zurück.</td></tr>
@@ -130,38 +130,43 @@
         <p>Aktiviert wird die Hardcopy mit der Taste P. Daraufhin färbt sich der Rahmen schwarz und der C 64 beginnt mit der Hardcopy. Danach wird in den Grafikmodus zurückgesprungen.</p>
         <address class="author">(Christian Kurts/og)</address>
 
-        <h3>Funktionsweise des T-Befehls beim Hardmaker</h3>
-        <p class="noindent">Im Multicolor-Modus stellen immer je 2 Bit eines Bytes die Information für einen Bildpunkt zur Verfügung, so daß die Auflösung gegenüber dem HiRes-Modus halbiert wird. Dafür hat man vier Farben statt zwei zur Auswahl, die durch die Bitkombinationen 00, 01, 10 und 11 repräsentiert werden. Ein normaler Matrixdrucker hat hingegen keinen Multicolor-Modus und stellt die Bitmuster genau so dar, wie sie im Grafik-ROM stehen. Das führt bei Gebieten, die aus den Farben 1 und 2 beziehungsweise den Bitmustern 01 oder 10 bestehen, zu den bekannten Streifenmustern (Bild 1). Um diese in Graustufen (Bild 2) umzuwandeln, geht der Computer folgendermaßen vor: Die vier Zweierbit-Kombinationen eines jeden der 8000 Byte des Grafik-RAMs werden nach den Bitkombinationen 01 und 10 untersucht.</p>
-        <p>1. Fall: Zweierbit-Kombination = 00 oder 11: nichts wird verändert.</p>
-        <p class="noindent">2. Fall: Zweierbit-Kombination = 01: In diesem Fall werden die zwei Bit invertiert, also durch 10 ersetzt, aber nur dann, wenn die zwei Bit Bestandteil des 1., 3., 5., etc. Bytes des Grafik-RAMs sind. Dadurch wird das Bitmuster in jeder zweiten Grafikzeile um ein Bit nach links versetzt. Wenn die ersten 3 Byte also</p>
+        <aside>
+            <h3>Funktionsweise des T-Befehls beim Hardmaker</h3>
 
-        <table class="plain pre">
-        <tr><td>01 01 00 01</td><td></td><td>10 10 00 10</td></tr>
-        <tr><td>01 01 11 01</td><td>lauten, so wird daraus</td><td>01 01 11 01</td></tr>
-        <tr><td>01 01 01 01</td><td></td><td>10 10 10 10</td></tr>
-        </table>
+            <p class="noindent">Im Multicolor-Modus stellen immer je 2 Bit eines Bytes die Information für einen Bildpunkt zur Verfügung, so daß die Auflösung gegenüber dem HiRes-Modus halbiert wird. Dafür hat man vier Farben statt zwei zur Auswahl, die durch die Bitkombinationen 00, 01, 10 und 11 repräsentiert werden. Ein normaler Matrixdrucker hat hingegen keinen Multicolor-Modus und stellt die Bitmuster genau so dar, wie sie im Grafik-ROM stehen. Das führt bei Gebieten, die aus den Farben 1 und 2 beziehungsweise den Bitmustern 01 oder 10 bestehen, zu den bekannten Streifenmustern (Bild 1). Um diese in Graustufen (Bild 2) umzuwandeln, geht der Computer folgendermaßen vor: Die vier Zweierbit-Kombinationen eines jeden der 8000 Byte des Grafik-RAMs werden nach den Bitkombinationen 01 und 10 untersucht.</p>
 
-        <p class="noindent">und der Drucker gibt ein gleichmäßig graues Feld aus.</p>
-        <p class="noindent">3. Fall: Bitkombination = 10</p>
-        <p class="noindent">Hierbei würde aus den ersten 3 Byte</p>
+            <p>1. Fall: Zweierbit-Kombination = 00 oder 11: nichts wird verändert.</p>
 
-        <table class="plain pre">
-        <tr><td>10 10 00 10</td><td></td><td>01 10 00 10</td></tr>
-        <tr><td>10 10 11 10</td><td>folgendes werden:</td><td>10 01 11 01</td></tr>
-        <tr><td>10 10 10 10</td><td></td><td>01 10 01 10</td></tr>
-        </table>
+            <p class="noindent">2. Fall: Zweierbit-Kombination = 01: In diesem Fall werden die zwei Bit invertiert, also durch 10 ersetzt, aber nur dann, wenn die zwei Bit Bestandteil des 1., 3., 5., etc. Bytes des Grafik-RAMs sind. Dadurch wird das Bitmuster in jeder zweiten Grafikzeile um ein Bit nach links versetzt. Wenn die ersten 3 Byte also</p>
 
-        <p>Also ein etwas gröberes Graufeld. Dieser Effekt wird dadurch erreicht, daß eine Zweierbit-Kombination nur dann invertiert wird, wenn sie entweder im 1., 3., 5., ... Byte die 1. oder 3. Zweierkombination oder im 2., 4., 6., ... Byte die 2. oder 4. Zweierkombination ist.</p>
+            <table class="plain pre">
+            <tr><td>01 01 00 01</td><td></td><td>10 10 00 10</td></tr>
+            <tr><td>01 01 11 01</td><td>lauten, so wird daraus</td><td>01 01 11 01</td></tr>
+            <tr><td>01 01 01 01</td><td></td><td>10 10 10 10</td></tr>
+            </table>
 
-        <figure>
-        <img src="67-1.png" alt="Bild 1">
-        <figcaption>Bild 1. Eine Hardcopy ohne Umrechnung...</figcaption>
-        </figure>
+            <p class="noindent">und der Drucker gibt ein gleichmäßig graues Feld aus.</p>
+            <p class="noindent">3. Fall: Bitkombination = 10</p>
+            <p class="noindent">Hierbei würde aus den ersten 3 Byte</p>
 
-        <figure>
-        <img src="67-2.png" alt="Bild 2">
-        <figcaption>Bild 2. ...und eine mit Umrechnung der Multi-Color-Daten.</figcaption>
-        </figure>
+            <table class="plain pre">
+            <tr><td>10 10 00 10</td><td></td><td>01 10 00 10</td></tr>
+            <tr><td>10 10 11 10</td><td>folgendes werden:</td><td>10 01 11 01</td></tr>
+            <tr><td>10 10 10 10</td><td></td><td>01 10 01 10</td></tr>
+            </table>
+
+            <p>Also ein etwas gröberes Graufeld. Dieser Effekt wird dadurch erreicht, daß eine Zweierbit-Kombination nur dann invertiert wird, wenn sie entweder im 1., 3., 5., ... Byte die 1. oder 3. Zweierkombination oder im 2., 4., 6., ... Byte die 2. oder 4. Zweierkombination ist.</p>
+
+            <figure>
+            <img src="67-1.png" alt="Bild 1">
+            <figcaption>Bild 1. Eine Hardcopy ohne Umrechnung...</figcaption>
+            </figure>
+
+            <figure>
+            <img src="67-2.png" alt="Bild 2">
+            <figcaption>Bild 2. ...und eine mit Umrechnung der Multi-Color-Daten.</figcaption>
+            </figure>
+        </aside>
 
                 <figure>
                     <pre>TODO</pre>
