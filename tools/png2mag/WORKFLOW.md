@@ -1079,6 +1079,129 @@ python3 ../../tools/png2mag/tsv_reading_order.py ./tmp/order.json \
   ./tmp/0{20,21,22,23,24,25,26,27}_ocr.tsv > ./tmp/article_body.txt
 ```
 
+### Block-Based Pipeline (Two-Pass Architecture)
+
+The primary pipeline for converting scanned pages to HTML. Uses Tesseract for block detection, then per-block LLM correction.
+
+#### Architecture
+
+**Pass 1** — Block detection: Run Tesseract on the full page (`--psm 1`) to detect block bounding boxes and text. IMAGE blocks >= 80px are also OCR'd — if >= 3 words are found, they're promoted to text blocks (rescues tables in shaded/boxed regions).
+
+**Merge** — Nearby blocks (vertical gap < 20px at 300 DPI, x-overlap > 30%) are clustered into single regions. This prevents Tesseract from fragmenting sidebars and dense content into many tiny blocks.
+
+**Pass 2** — Per-block OCR: Each final block is cropped from the 600 DPI source and run through Tesseract with `--psm 6` (uniform block).
+
+#### Pipeline Steps (10 steps)
+
+```
+Step 1: extract_blocks.py     — block detection + OCR (per page, parallelizable)
+Step 2: classify agent        — LLM classifies blocks (per page, parallelizable)
+Step 3: apply_classify.py     — generates headers.txt, body_blocks.txt, listings.txt
+Step 4: block agents          — LLM corrects OCR + converts to HTML (per block, parallelizable)
+Step 5: concat_blocks.py      — concatenates body block HTMLs into article_draft.html
+Step 6: join agent            — fixes cross-block paragraph joins, hyphens, duplicates
+Step 7: figure agent          — places <figure> blocks at correct text references
+Step 8: assemble_article.py   — wraps draft in HTML shell with metadata placeholders
+Step 9: metadata agent/manual — fills head1, head2, toc_category, toc_title, id
+Step 10: stamp_meta.py        — replaces __PLACEHOLDER__ values from JSON
+```
+
+**Parallelization**: Steps 1-2 run per page (all pages in parallel). Step 4 runs per block (all blocks in parallel). Steps 5-10 are sequential.
+
+**Ad pages**: Full-page ads should be skipped entirely (no extraction, no classification). Partial ad pages (e.g. listing + ads) still need extraction and classification.
+
+#### Multi-page example (pages 133-141, ad pages 136/138/140):
+
+```bash
+# Working directory: project root
+
+# Step 1: Extract blocks — all content pages in parallel
+for p in 133 134 135 137 139 141; do
+    pp=$(printf '%03d' $p)
+    python3 tools/png2mag/extract_blocks.py issues/8604/png/${p}_600_cropped.png issues/8604/tmp/p${pp}_blocks &
+done
+# Partial ad pages (listing + ads) also need extraction:
+python3 tools/png2mag/extract_blocks.py issues/8604/png/138_600_cropped.png issues/8604/tmp/p138_blocks &
+wait
+
+# Step 2: Classify agent — one LLM agent per page (parallel)
+# Uses classify_agent_prompt.txt with: overview.png, layout.txt, block .txt/.png files
+# Agent edits classify.txt in place
+
+# Step 3: Apply classification
+for p in 133 134 135 137 138 139 141; do
+    pp=$(printf '%03d' $p)
+    python3 tools/png2mag/apply_classify.py issues/8604/tmp/p${pp}_blocks $pp
+done
+
+# Step 4: Block agents — copy .txt to .html, then LLM processes each body block
+for p in 133 134 135 137 139 141; do
+    pp=$(printf '%03d' $p)
+    bdir="issues/8604/tmp/p${pp}_blocks"
+    while read bnum; do
+        cp "$bdir/block_${bnum}.txt" "$bdir/block_${bnum}.html"
+    done < "$bdir/body_blocks.txt"
+done
+# Launch one LLM agent per page (or per block) using block_agent_prompt.txt
+
+# Step 5: Concatenate (skip ad-only page dirs)
+python3 tools/png2mag/concat_blocks.py \
+    issues/8604/tmp/p133_blocks issues/8604/tmp/p134_blocks issues/8604/tmp/p135_blocks \
+    issues/8604/tmp/p137_blocks issues/8604/tmp/p139_blocks issues/8604/tmp/p141_blocks
+
+# Step 6: Join agent — single LLM call using join_agent_prompt.txt
+# Edits article_draft.html in place
+
+# Step 7: Figure agent — uses collect_figures.py manifest + figure_agent_prompt.txt
+python3 tools/png2mag/collect_figures.py issues/8604 133 141  # prints manifest
+# LLM agent places <figure> blocks at correct locations in article_draft.html
+
+# Step 8: Assemble
+python3 tools/png2mag/assemble_article.py issues/8604/tmp/article_draft.html issues/8604 133 141
+
+# Step 9: Create metadata JSON (manually or via LLM agent reading page scans)
+# Step 10: Stamp metadata
+python3 tools/png2mag/stamp_meta.py "issues/8604/133 Von Basic zu Assembler (Teil 3).html" issues/8604/tmp/p133_meta.json
+```
+
+#### Key Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `extract_blocks.py` | Two-pass block extraction + IMAGE block promotion |
+| `classify_agent_prompt.txt` | Prompt for automated block classification agent |
+| `apply_classify.py` | Read classify.txt → headers.txt + body_blocks.txt + listings.txt |
+| `block_agent_prompt.txt` | Prompt for per-block OCR correction + HTML conversion |
+| `concat_blocks.py` | Concatenate block .html files into article_draft.html |
+| `join_agent_prompt.txt` | Prompt for cross-block joining/cleanup agent |
+| `collect_figures.py` | Build figures manifest (images + captions) for figure agent |
+| `figure_agent_prompt.txt` | Prompt for figure placement agent |
+| `assemble_article.py` | Wrap draft in HTML shell with metadata placeholders |
+| `stamp_meta.py` | Replace `__HEAD1__` etc. placeholders from JSON |
+
+#### Block Merging Constants
+
+- `MERGE_GAP = 20` — max vertical gap in px at 300 DPI for blocks to be merged
+- `MERGE_MIN_BLOCKS = 3` — minimum blocks in a cluster to trigger merging
+- `IMAGE_MIN_SIZE = 80` — IMAGE blocks >= 80px are OCR'd for text promotion
+- `IMAGE_MIN_WORDS = 3` — minimum words to promote IMAGE → text block
+
+#### classify.txt Format
+
+One line per block: `block_NN: classification[\toptional text]`
+
+Classifications:
+- `head1` — article title (text extracted into headers.txt)
+- `head2` — category/computer line (text extracted into headers.txt)
+- `body` — article body text (included in body_blocks.txt)
+- `listing` — code listing (skipped in body flow). Optional tab text = listing caption.
+- `listing_caption` — standalone listing caption (tab-separated text → listings.txt)
+- `caption` — image/table caption (tab-separated text, used by collect_figures.py)
+- `skip` — ads, decorative elements, other articles' content
+- `footer_issue` / `footer_page` — page footer elements (discarded)
+
+Body blocks must be listed in **reading order** (left column top-to-bottom, then right column). `apply_classify.py` silently skips blocks whose .txt files don't exist (merged blocks).
+
 ### `inject.py` — Generic body injector
 
 Injects mechanically generated body HTML into an article shell. This is the anti-memory enforcement chokepoint: the body content flows from a file, never from the LLM's output.
