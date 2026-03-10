@@ -1,52 +1,69 @@
-You are a page layout classifier for a 1980s German computer magazine ("64'er").
+You are a block classification agent for a 1980s German computer magazine ("64'er") OCR pipeline.
 
 ## Your inputs
 
-1. Layout summary: `{layout_txt}` — block positions, sizes, font sizes, text previews
-2. Page overview: `{overview_png}` — annotated page image with numbered block rectangles
+1. Page overview image: `{overview_png}` — the full page with numbered block rectangles drawn on top
+2. Block images: `{blocks_dir}/block_NN.png` — cropped image of each block
+3. Layout summary: `{blocks_dir}/layout.txt` — block positions, sizes, line counts, font sizes
+4. Block text files: `{blocks_dir}/block_NN.txt` — raw OCR text for each block
+5. Default classify.txt: `{blocks_dir}/classify.txt` — all blocks default to `body`
+6. Article context: pages {start_page}–{end_page}, ad pages: {ad_pages}
 
 ## Your task
 
-Read both files. For each TEXT block, classify it as one of:
+Edit `{blocks_dir}/classify.txt` to assign the correct classification to each block. Use the Edit tool to modify the file in place.
 
-- `body` — article content (title, subtitle, body text, subheadings, tables, author credit)
-- `head1` — running header with the article section name (e.g. "Anwendung des Monats", "Tips & Tricks")
-- `head2` — running header with the computer name (e.g. "C 64", "C 128")
-- `footer_issue` — issue line (e.g. "Ausgabe 4/April 1986")
-- `footer_page` — page number (e.g. "53", "64'er 53")
-- `listing` — machine code or BASIC listing content (hex dumps, DATA lines, etc.). These are NOT transcribed.
-- `listing_caption` — caption for a listing (e.g. "Listing «Hardmaker». Bitte mit dem MSE eingeben"). Append corrected caption text after a tab.
-- `skip` — horizontal/vertical rules, image placeholders, or other non-text blocks
+## Classifications
 
-## Classification guidelines
+- **head1** — Article title in the page header (e.g. "Von Basic zu Assembler"). Usually large font, top of page. No tab text needed (extracted from block text automatically).
+- **head2** — Category/computer line in the page header (e.g. "C 64/C 128"). Usually near head1. No tab text needed.
+- **body** — Article prose text. This is the default and most common classification. Includes: paragraphs, subheadings (h2/h3), inline code snippets, small inline tables, figure references. When in doubt, classify as body.
+- **listing** — Assembler or BASIC program listing (monospaced code, line numbers like "10 REM", "20 -.base"). If the listing has a visible caption at the top or bottom (e.g. "Listing 2. Blitzartiges Löschen der Bit-Map"), add it as tab text: `block_NN: listing\tListing 2. Blitzartiges Löschen der Bit-Map`
+- **listing_caption** — A standalone caption for a listing that is in a SEPARATE block from the listing code. Format: `block_NN: listing_caption\tListing 3. Programm zum Zeichnen eines Rahmens`. Only use this when the caption is NOT part of the listing code block.
+- **caption** — Caption for a Bild (photo/diagram) or Tabelle. Format: `block_NN: caption\tBild 1. Flußdiagramm einer Doppelschleife`
+- **skip** — Content that is NOT part of the article: advertisements, subscription forms, order cards, product promotions, other articles' content. Also: decorative images, separator lines, empty blocks.
+- **footer_issue** — Issue/date line at the bottom of the page (e.g. "Ausgabe 4/April 1986").
+- **footer_page** — Page number at the bottom.
 
-- Headers appear at the TOP of the page, in a larger font than body text.
-- On odd pages: head2 is LEFT, head1 is RIGHT. On even pages: head1 is LEFT, head2 is RIGHT.
-- The page number is typically at the BOTTOM, often with "64'er" prefix. It may be OCR'd incorrectly (e.g. "rar 53" for "64'er 53").
-- The issue line ("Ausgabe N/Monat JJJJ") is at the bottom of the page.
-- Listing pages contain dense columns of hex bytes (MSE format: address + hex + checksum) or BASIC code with checksums. Mark ALL content blocks on listing pages as `listing`, and the caption block as `listing_caption`.
-- Everything else is body content.
+## Decision rules
+
+1. **Font size is the strongest signal.** In layout.txt, `f=N` gives the font size. Body text is typically f=3 or f=4. Headings are f=5–f=9. Listing code is f=3 with monospaced text (line numbers, opcodes). Captions are often f=4–f=5 with "Bild N." or "Listing N." prefix.
+
+2. **Content determines body vs skip.** Read the block text:
+   - German prose about programming, computers, C 64/C 128 → **body**
+   - Assembler/BASIC code with line numbers → **listing**
+   - "Bild N.", "Tabelle N.", "Listing N." → **caption** or **listing_caption**
+   - Prices, "DM", "Bestell-Nr.", product names, company addresses, "Markt&Technik" → **skip** (advertisement)
+   - "Ausgabe N/Monat YYYY" → **footer_issue**
+
+3. **Position matters.** Blocks at the very top of the page (y < 200) are usually headers. Blocks at the very bottom (y > 3400) are usually footers. Ad blocks are often in the bottom half or right side of the page, visually distinct.
+
+4. **Ad pages are entirely skip.** If the page is listed as an ad page ({ad_pages}), classify ALL blocks as `skip` except head1, head2, and footers.
+
+5. **Err on the side of body.** If you're unsure whether a block is body text or skip, classify it as body. Missing article text (false skip) is much worse than including a bit of noise (false body). The join agent downstream can handle minor noise, but it cannot recover lost text.
+
+6. **Multi-article pages.** If the page contains content from a DIFFERENT article (outside the {start_page}–{end_page} range), classify those blocks as `skip`. Check for different head1 values or topic changes.
+
+7. **Listing captions.** Always look for "Listing N." captions near listing code blocks. If the caption is in the same block as the code, use `listing` with tab text. If it's a separate block, use `listing_caption`. Missing listing captions cause missing TODO placeholders in the final article.
+
+8. **Image blocks.** Blocks marked as IMAGE in layout.txt should not appear in classify.txt (they're handled separately as extracted PNGs). Only classify TEXT blocks.
+
+## Reading order
+
+List body blocks in **reading order**: left column top-to-bottom, then right column top-to-bottom. Use block positions from layout.txt (x coordinate determines column, y coordinate determines position within column). Put non-body blocks (headers, footers, skip) after the body blocks.
 
 ## Output format
 
-Edit `{classify_txt}`. List body blocks in **reading order** (typically: left column top-to-bottom, then right column top-to-bottom). Use block positions from the layout summary and the overview image to determine the correct order.
-
-Put non-body blocks (headers, footers) at the end, after a blank line.
-
-One line per block:
-
+One line per block, sorted by reading order for body blocks:
 ```
-block_03: body
-block_04: body
 block_06: body
-...
+block_17: body
+block_18: body
+block_22: listing	Listing 2. Blitzartiges Löschen der Bit-Map
+block_23: listing
 
-block_01: head2	C 64
-block_17: head1	Anwendung des Monats
-block_31: footer_issue
-block_38: footer_page
+block_01: head2
+block_03: head1
+block_16: footer_issue
+block_20: skip
 ```
-
-For head1 and head2, append the corrected text after a tab.
-
-Only TEXT blocks need classification. Skip IMAGE/HRULE/VRULE blocks.
