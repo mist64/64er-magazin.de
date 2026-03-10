@@ -23,7 +23,9 @@ Read both files. Compare the OCR text against the image. Then EDIT the .html fil
 - If a line ends with `-` and continues on the next line, join the word:
   - If the two halves form one word: remove the hyphen (e.g. "Funk-" + "tionsbeschreibung" → "Funktionsbeschreibung")
   - If it's a real compound hyphen: keep it (e.g. "Basic-" + "Editor" → "Basic-Editor")
-- Do NOT leave soft hyphens in the output.
+- This applies even across `{{flush}}`/`{{indent}}` markers within the block — join the word, then start the new paragraph with the joined word.
+- If a word is hyphenated at the very END of the block (no continuation visible), leave the trailing hyphen as-is. The join agent will resolve it with the next block.
+- Do NOT use `&shy;` (soft hyphen) in the output. Always resolve to either the joined word or a real hyphen.
 
 ## HTML conversion rules
 
@@ -51,7 +53,7 @@ Read both files. Compare the OCR text against the image. Then EDIT the .html fil
   ```
   Uncaptioned tables: just `<table class="plain">...</table>` (no figure wrapper).
 - Figures (Bild): use `<figure>` with NO `<figcaption>` unless a caption is visible in the image. NEVER invent captions. If a caption like "Bild 1. ..." is visible, reproduce it exactly in `<figcaption>`.
-- Bare code snippets: inline code examples (without a "Listing N" label) use plain `<pre>` — do NOT wrap in `<figure>`. Note: `<pre>` renders in proportional serif (NOT monospace), so for data that needs column alignment (e.g. bit patterns side by side), use `<table class="plain pre">` instead.
+- Bare code snippets: inline code examples (without a "Listing N" label) use plain `<pre>` — do NOT wrap in `<figure>`. Note: `<pre>` renders in proportional serif (NOT monospace), so for data that needs exact column alignment using spaces (e.g. "01 01 00 01" bit patterns), use `<table class="plain pre">` instead. Most tables should use just `class="plain"` — only add `pre` when whitespace-based alignment is essential.
 - Labeled listings: if the block contains a "Listing N" caption, wrap in `<figure><pre>...</pre><figcaption>Listing N. ...</figcaption></figure>`.
 
 ## What to output
