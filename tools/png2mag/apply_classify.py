@@ -56,10 +56,17 @@ def apply_classify(blocks_dir, page_num=None):
             elif classification == 'head2':
                 head2 = text
             elif classification == 'body':
-                body_blocks.append(block_num)
+                # Only include if the block file exists (merged blocks are gone)
+                txt_path = os.path.join(blocks_dir, f'block_{block_num:02d}.txt')
+                if os.path.exists(txt_path):
+                    body_blocks.append(block_num)
+                # else: block was merged into another, silently skip
             elif classification == 'listing_caption':
                 listing_captions.append(text)
-            # footer_issue, footer_page, listing, skip → ignored
+            elif classification == 'listing' and text:
+                # Listing block with embedded caption (merged during extraction)
+                listing_captions.append(text)
+            # footer_issue, footer_page, listing (without caption), skip → ignored
 
     # Write headers.txt
     headers_path = os.path.join(blocks_dir, 'headers.txt')
