@@ -32,6 +32,9 @@ MERGE_GAP = 20         # px at 300 DPI — vertical gap below which adjacent blo
 MERGE_MIN_BLOCKS = 3   # minimum cluster size to trigger merge
 IMAGE_MIN_SIZE = 80    # px at 300 DPI — IMAGE blocks smaller than this are ignored
 IMAGE_MIN_WORDS = 3    # minimum words from OCR to promote IMAGE → text block
+GAP_MIN_HEIGHT = 40    # px at 300 DPI — minimum vertical gap to probe for missing content
+GAP_X_OVERLAP = 0.3    # fraction of x-overlap to consider two blocks in the same column
+GAP_MIN_WORDS = 1      # minimum words to accept a gap-fill block (1 = catches headings)
 
 
 # ── Pass 1: Block detection ──────────────────────────────────────
@@ -209,6 +212,118 @@ def merge_blocks(block_bboxes):
 
     final.sort(key=lambda x: x[0])
     return final
+
+
+# ── Gap detection ────────────────────────────────────────────────
+
+def detect_gaps(final_specs, page_png_300, output_dir, img_w_300, img_h_300):
+    """Find vertical gaps between consecutive blocks in the same column.
+
+    Groups blocks into columns by x-overlap, then probes gaps >GAP_MIN_HEIGHT px
+    between consecutive blocks (and after the last block before page bottom).
+    Returns list of (block_num, bbox_300) for gap regions that contain text.
+    Block numbers start at 90 to avoid collisions."""
+
+    if not final_specs:
+        return []
+
+    # Group blocks into columns by x-overlap
+    def x_overlap_frac(a, b):
+        ax1, _, aw, _ = a
+        bx1, _, bw, _ = b
+        ax2, bx2 = ax1 + aw, bx1 + bw
+        overlap = max(0, min(ax2, bx2) - max(ax1, bx1))
+        min_w = min(aw, bw)
+        return overlap / min_w if min_w > 0 else 0
+
+    specs_by_num = {bnum: bbox for bnum, bbox in final_specs}
+    assigned = set()
+    columns = []
+
+    # Sort by x position for column grouping
+    sorted_specs = sorted(final_specs, key=lambda s: s[1][0])
+
+    for bnum, bbox in sorted_specs:
+        if bnum in assigned:
+            continue
+        col = [(bnum, bbox)]
+        assigned.add(bnum)
+        for bnum2, bbox2 in sorted_specs:
+            if bnum2 in assigned:
+                continue
+            # Check overlap with any member of the column
+            if any(x_overlap_frac(bbox2, cb) >= GAP_X_OVERLAP for _, cb in col):
+                col.append((bnum2, bbox2))
+                assigned.add(bnum2)
+        columns.append(col)
+
+    # For each column, find gaps between consecutive blocks
+    gap_regions = []
+    page_bottom = int(img_h_300 * 0.90)  # don't probe below 90% of page
+
+    for col in columns:
+        # Sort column blocks by y position
+        col_sorted = sorted(col, key=lambda s: s[1][1])
+
+        # Compute column x-extent (union of all block x-ranges)
+        col_x1 = min(bbox[0] for _, bbox in col_sorted)
+        col_x2 = max(bbox[0] + bbox[2] for _, bbox in col_sorted)
+
+        for i in range(len(col_sorted)):
+            _, bbox_a = col_sorted[i]
+            y_end_a = bbox_a[1] + bbox_a[3]
+
+            if i + 1 < len(col_sorted):
+                _, bbox_b = col_sorted[i + 1]
+                y_start_b = bbox_b[1]
+            else:
+                # Tail gap: after last block in column
+                y_start_b = page_bottom
+
+            gap_h = y_start_b - y_end_a
+            if gap_h >= GAP_MIN_HEIGHT:
+                gap_regions.append((col_x1, y_end_a, col_x2 - col_x1, gap_h))
+
+    # Filter out gap regions that overlap >30% with existing blocks
+    def overlaps_existing(gap_bbox):
+        gx1, gy1, gw, gh = gap_bbox
+        gx2, gy2 = gx1 + gw, gy1 + gh
+        gap_area = gw * gh
+        if gap_area <= 0:
+            return True
+        for _, bbox in final_specs:
+            bx1, by1, bw, bh = bbox
+            bx2, by2 = bx1 + bw, by1 + bh
+            ox = max(0, min(gx2, bx2) - max(gx1, bx1))
+            oy = max(0, min(gy2, by2) - max(gy1, by1))
+            if ox * oy / gap_area > 0.3:
+                return True
+        return False
+
+    gap_blocks = []
+    next_bnum = 90
+
+    for gap_bbox in gap_regions:
+        if overlaps_existing(gap_bbox):
+            continue
+
+        # OCR the gap region
+        block_data = ocr_region(page_png_300, gap_bbox, output_dir)
+        if block_data is None:
+            continue
+
+        word_count = sum(len(words) for words in block_data['lines'].values())
+        if word_count >= GAP_MIN_WORDS:
+            # Find unused block number starting at 90
+            while any(bnum == next_bnum for bnum, _ in final_specs) or \
+                  any(bnum == next_bnum for bnum, _ in gap_blocks):
+                next_bnum += 1
+            gap_blocks.append((next_bnum, gap_bbox))
+            print(f'gap→text        block {next_bnum} ({gap_bbox[2]}x{gap_bbox[3]}, '
+                  f'{word_count} words, y={gap_bbox[1]})')
+            next_bnum += 1
+
+    return gap_blocks
 
 
 # ── Pass 2: OCR each final block ─────────────────────────────────
@@ -449,13 +564,18 @@ def extract_blocks(page_png, output_dir):
             print(f'image→text      block {bnum} ({bbox[2]}x{bbox[3]}, {word_count} words)')
         # else: truly an image, skip
 
-    # Append promoted image blocks to classify.txt (only if freshly generated)
-    if promoted:
+    # Detect gaps between blocks
+    gap_blocks = detect_gaps(final_specs, page_300, output_dir, img_w_300, img_h_300)
+    final_specs.extend(gap_blocks)
+
+    # Append promoted + gap blocks to classify.txt
+    new_blocks = promoted + [bnum for bnum, _ in gap_blocks]
+    if new_blocks:
         classify_path = os.path.join(output_dir, 'classify.txt')
         with open(classify_path) as f:
             existing = f.read()
         with open(classify_path, 'a') as f:
-            for bnum in sorted(promoted):
+            for bnum in sorted(new_blocks):
                 tag = f'block_{bnum:02d}:'
                 if tag not in existing:
                     f.write(f'{tag} body\n')
