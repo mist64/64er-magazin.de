@@ -164,12 +164,16 @@ def assemble(draft_path, issue_dir, start_page, end_page):
     with open(draft_path) as f:
         body = f.read().strip()
 
+    # Strip pipeline markers
+    body = re.sub(r'\s*\{\{newblock\}\}\s*', '\n\n', body)
+    body = re.sub(r'\s*\{\{newpage:\d+\}\}\s*', '\n\n', body)
+
     title = extract_title(body)
     author = extract_author(body)
     issue = issue_code(issue_dir)
 
-    # Insert unmatched images before first body paragraph
-    body = insert_unmatched_images(body, issue_dir, start_page, end_page)
+    # NOTE: Image placement is now handled by the figure agent step.
+    # insert_unmatched_images() is no longer called here.
 
     # Collect listing captions from all pages
     listings = collect_listings(issue_dir, start_page, end_page)
