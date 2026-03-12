@@ -35,7 +35,7 @@
         <p class="noindent">JSR JOB</p>
         <p>Unsere Aufgabe ist es dann, an der Stelle JOB jeweils das gebrauchte Unterprogramm bereitzuhalten. Allerdings sollten solche Schleifenformen nicht oft benutzt werden, denn die Sprünge ins Unterprogramm verbrauchen relativ viel Rechenzeit.</p>
 
-        <h3>Grafik-Farbspeicher belegen</h3>
+        <h2>Grafik-Farbspeicher belegen</h2>
 
         <p>Zwei Fragen treten häufig auf, die das Löschen oder Neubeschreiben der Grafikspeicher betreffen. Beide sind mit ein- und derselben Doppelschleife lösbar. Sehen wir uns zunächst einmal die Sache mit dem Grafik-Farbspeicher an. Im allgemeinen verwendet ein C 64-Grafik-Programmierer eine Bit-Map, die bei 8192 startet und ein Farb-RAM, das anstelle des normalen Bildschirmes (also ab 1024 = $400) zu finden ist. Der Benutzer des C 128 hat die Bit-Map am gleichen Ort, aber dafür ein extra Grafik-Farb-RAM ab $1C00. Zwar hat das Basic 7.0 des C 128 allerlei nette Grafik-Befehle anzubieten: Wenn aber gewünscht wird, eine schon auf dem Bildschirm sichtbare Zeichnung mit anderen Farben zu zeigen, stehen beide (also C 64- und C 128-Benutzer) vor demselben Problem. Eine globale Farbänderung ist beim C 128 nämlich nur bei gleichzeitigem Löschen der Bit-Map möglich! Wie also ist die Aufgabe lösbar?</p>
         <p>In beiden Fällen ist in 1000 Speicherstellen ein bestimmter Wert einzuschreiben: Beim C 64 von $400 bis $7E8, beim C 128 von $01C00 bis $01FE8. Der Farbcode, der einzutragen ist, hat in beiden Fällen denselben Aufbau: Das untere Nibble (also die Bits 0 bis 3) enthält den Code der Hintergrund-, das obere Nibble (Bits 4 bis 7) den der Zeichenfarbe. C 128-Benutzer müssen vom Farbcode jeweils noch eine 1 abziehen. Sei ZF die Zeichen- und HF die Hintergrundfarbe, dann folgt für den einzuschreibenden Code F:</p>
@@ -55,13 +55,13 @@
 
         <p>Auf ähnliche Weise können natürlich auch die Start- und/oder Endadressen variiert werden, so daß beispielsweise nur der halbe Farbspeicher neu belegt wird. C 128-Benutzer müssen zum Ändern des Grafik-Farb-RAM die Werte in den Zeilen 70 und 80 auf die oben genannten Adressen einstellen.</p>
 
-        <h3>Bit-Map löschen</h3>
+        <h2>Bit-Map löschen</h2>
 
         <p>Vom eben gezeigten Beispiel zum Löschen einer Bit-Map ist es nur ein kleiner Schritt. Lediglich der Ort einer Bit-Map ist ein anderer und ihr Umfang. Im allgemeinen startet der Grafik-Speicher bei 8192 ($2000), hat eine Ausdehnung von 8000 Bytes (nämlich 200*320/8) und endet bei $3F3F (dezimal 16191). Der einzutragende Wert ist Null. Listing 1 unterscheidet sich vom Listing 2 somit nur durch die Zeilen 70 bis 90.</p>
         <p>Daran können Sie ersehen, wie vielseitig unsere Doppelschleife ist. C 128-Benutzer werden nun meinen, daß sie das Listing 2 und — falls ihnen niemals das Problem der Farbänderung eines fertigen Bildes unterkommt — auch das Listing 1 entbehren könnten. Sollten sie aber jemals in die Lage kommen, eine andere Bit-Map und einen anderen Grafik-Farbspeicher als die softwaremäßig voreingestellten bedienen zu wollen, dann sind sie in der gleichen Lage wie ein C 64-Benutzer. Alle Grafik-Kommandos zielen nur auf die oben erwähnten Standard-Grafik-Speicherbereiche. Jede andere Bit-Map und jedes andere Farb-RAM muß mit selbst gebastelten Befehlssequenzen behandelt werden.</p>
         <p>Noch eine kleine Bemerkung am Rande: Falls es Ihnen in den Sinn kommen sollte, das zum Listing 2 gehörende Maschinenprogramm einfach mal zu starten, dann bedenken Sie, daß durch Hypra-Ass im fraglichen — zu löschenden — Speicherbereich Quelltexte und Label abgelegt sind. Speichern Sie sie also vor dem Start ab! Noch schlimmer ergeht es C 128-Benutzern, die den Top-Ass verwenden: Das Löschen des Grafik-Bereiches reißt ein tiefes Loch ins Top-Ass-Programm. Top-Ass und normale Grafik können nicht gleichzeitig betrieben werden.</p>
 
-        <h3>Bildschirm umrahmen</h3>
+        <h2>Bildschirm umrahmen</h2>
 
         <p>Viele Leser wollten wissen, wie man in Assembler einen Rahmen um den Textbildschirm legen kann. Gehen wir also dieses Problem möglichst allgemeingültig an. Wir brauchen dazu acht verschiedene Grafikzeichen (siehe dazu das Bild 2).</p>
 
@@ -116,7 +116,7 @@ INY</pre>
 
         <p class="noindent">starten und der Rahmen wird bunt. Soll Ihr Rahmen aus anderen Zeichen bestehen? Kein Problem: Dann ändern Sie die Initialisierung oder POKEn Sie direkt in das Programm die neuen Codes hinein. Eine andere Rahmenfarbe wird gewünscht? Wieder können Sie durch POKE-Kommando oder Ändern der Initialisierung Ihre Farbe erzielen. Der Rahmen soll nur um die obere Bildschirmhälfte reichen? Dann verändern Sie einfach den Wert, der nach VERT geschrieben wird. Schwieriger wird es, wenn Sie auch HORIZ anders haben möchten. Nach dem Setzen des letzten Zeichens in eine Zeile müßte dann noch anstelle des INY eine Addition stehen, damit der Abstand zum ersten Zeichen der nächsten Zeile übersprungen wird. Vielleicht gibt Ihnen dazu die Antwort auf die nächste Frage einige Hilfen.</p>
 
-        <h3>Teilbereiche des Bildschirmes beschreiben</h3>
+        <h2>Teilbereiche des Bildschirmes beschreiben</h2>
 
         <p>Ein weiteres Problem tritt in Leserfragen häufig auf: Wie kann man beliebige rechteckige Teile des Bildschirmes mit Zeichen ausfüllen? Sehen wir uns das also auch mal an: Bild 5 zeigt, was gemeint ist und welche Bezeichnungen wir im folgenden verwenden werden.</p>
 
