@@ -17,6 +17,8 @@ Read both files. Compare the OCR text against the image. Then EDIT the .html fil
 - Fix obvious character confusions: l/I/1, 0/O, ı→i (Turkish dotless-i), ©→C, run-together words (add missing spaces), wrong punctuation.
 - The Commodore left-arrow `←` is often misread as `=`, `—`, `–`, or dropped entirely by Tesseract. The Commodore up-arrow `↑` is often misread as `t`. Check the image when you see these characters in unexpected positions.
 - Preserve code/listings exactly. Escape HTML-sensitive characters in code.
+- **German guillemets: do NOT reverse them.** German uses `»...«` (opening » on the left, closing « on the right). This is the OPPOSITE of French style `«...»`. Tesseract gets them right — do not "fix" them. If the OCR text has `»Teilbereich«`, keep it exactly as-is.
+- **Verify all numbered references** ("Listing N", "Bild N", "Tabelle N") against the image. Tesseract frequently drops single digits next to words. If the OCR text says "Listing schließlich" but the image shows "Listing 5 schließlich", add the missing number.
 
 ## Line-break hyphen handling
 
@@ -43,6 +45,7 @@ Read both files. Compare the OCR text against the image. Then EDIT the .html fil
     - fsize ≤ 3: code or listing text → `<pre>`
     - Note: italic subheadings (e.g. "Quiz erstellen") often have the same fsize as body text. Identify these from the image — they appear as bold/italic standalone lines.
   - Headings and other special elements (ul, pre, address) ignore indent tags — just remove them.
+- Multi-line formulas and equations: when consecutive lines within the same paragraph (no `{{flush}}`/`{{indent}}` between them) form a visual unit like a formula block (e.g. "Breite: SD = S2-S1" / "Höhe : ZD = Z2-Z1"), insert `<br>` between them to preserve the line break. Without `<br>`, HTML collapses whitespace and the lines merge into one.
 - Author credits: convert "(Name/initials)" to `address class="author"`.
 - Tables: use semantic `<table>` markup for any tabular/columnar data — including key/value lists, memory maps, and function overviews, even without a "Tabelle" label. A table without visible separator lines gets `class="plain"`. If a formal caption is visible (e.g. "Tabelle 1. ..."), wrap in `<figure>` with `<figcaption>`. Example:
   ```
