@@ -2,10 +2,17 @@
 """Extract Tesseract text blocks from a page scan into per-block PNG + TXT files.
 
 Usage:
-    python3 extract_blocks.py <page_png> <output_dir>
+    python3 extract_blocks.py [--no-merge] [--crop X,Y,W,H] <page_png> <output_dir>
+
+Options:
+    --no-merge       Disable block merging (useful for mixed article/ad pages)
+    --crop X,Y,W,H   Restrict extraction to a sub-region (coordinates in 300 DPI px).
+                      Useful for continuation pages where article wraps around ads.
+                      Block positions in output are relative to the crop origin.
 
 Example:
     python3 extract_blocks.py issues/8604/png/053_600_cropped.png issues/8604/tmp/p053_blocks
+    python3 extract_blocks.py --no-merge --crop 125,1680,560,1700 page.png out/
 
 Two-pass pipeline:
     Pass 1: Run Tesseract on full page to detect block bounding boxes.
@@ -537,9 +544,28 @@ def get_image_size(png_path):
 
 # ── Main entry point ─────────────────────────────────────────────
 
-def extract_blocks(page_png, output_dir):
-    """Extract all text blocks into output_dir."""
+def extract_blocks(page_png, output_dir, no_merge=False, crop=None):
+    """Extract all text blocks into output_dir.
+
+    Args:
+        crop: optional (x, y, w, h) in 300 DPI px to restrict extraction region.
+              The 600 DPI source is cropped first, then the normal pipeline runs.
+    """
     os.makedirs(output_dir, exist_ok=True)
+
+    # If crop requested, pre-crop the 600 DPI source
+    if crop:
+        cx, cy, cw, ch = crop
+        # Scale to 600 DPI
+        crop_spec = f'{cw*2}x{ch*2}+{cx*2}+{cy*2}'
+        cropped_png = os.path.join(output_dir, '_page_cropped_600.png')
+        subprocess.run(
+            ['magick', page_png, '+repage', '-crop', crop_spec,
+             '+repage', cropped_png],
+            check=True, capture_output=True,
+        )
+        print(f'crop            {crop_spec} (300 DPI: {cx},{cy} {cw}x{ch})')
+        page_png = cropped_png
 
     page_300 = downscale_to_300(page_png, output_dir)
     img_w_300, img_h_300 = get_image_size(page_300)
@@ -548,7 +574,10 @@ def extract_blocks(page_png, output_dir):
     text_bboxes, image_bboxes = detect_blocks(page_300, output_dir)
 
     # Merge nearby text blocks into clusters
-    final_specs = merge_blocks(text_bboxes)
+    if no_merge:
+        final_specs = [(b, bbox) for b, bbox in sorted(text_bboxes.items())]
+    else:
+        final_specs = merge_blocks(text_bboxes)
 
     # Try OCR on large IMAGE blocks — Tesseract sometimes misdetects
     # text in shaded/boxed regions as images
@@ -624,7 +653,25 @@ def extract_blocks(page_png, output_dir):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    args = []
+    no_merge = False
+    crop = None
+    i = 1
+    while i < len(sys.argv):
+        a = sys.argv[i]
+        if a == '--no-merge':
+            no_merge = True
+        elif a == '--crop':
+            i += 1
+            parts = sys.argv[i].split(',')
+            crop = tuple(int(p) for p in parts)
+        elif a.startswith('--crop='):
+            parts = a.split('=', 1)[1].split(',')
+            crop = tuple(int(p) for p in parts)
+        elif not a.startswith('--'):
+            args.append(a)
+        i += 1
+    if len(args) != 2:
         print(__doc__.strip())
         sys.exit(1)
-    extract_blocks(sys.argv[1], sys.argv[2])
+    extract_blocks(args[0], args[1], no_merge=no_merge, crop=crop)

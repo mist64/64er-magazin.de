@@ -86,6 +86,18 @@ def apply_classify(blocks_dir, page_num=None):
             f.write(f'{bnum:02d}\n')
     print(f'body_blocks     {body_path}  ({len(body_blocks)} blocks)')
 
+    # Ensure .html exists for each body block (copy from .txt if missing)
+    created_html = 0
+    for bnum in body_blocks:
+        txt_path = os.path.join(blocks_dir, f'block_{bnum:02d}.txt')
+        html_path = os.path.join(blocks_dir, f'block_{bnum:02d}.html')
+        if not os.path.exists(html_path):
+            import shutil
+            shutil.copy2(txt_path, html_path)
+            created_html += 1
+    if created_html:
+        print(f'html_init       {created_html} .html files created from .txt')
+
     # Write listings.txt (if any listing captions found)
     if listing_captions:
         listings_path = os.path.join(blocks_dir, 'listings.txt')
