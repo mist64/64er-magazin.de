@@ -17,7 +17,7 @@ import pytz
 import argparse
 import gzip
 import lunr
-from tools import mse, checksummer, hypra_ass_decode
+from tools import mse, checksummer, assembler_decode
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
@@ -675,7 +675,7 @@ class Issue:
               else:
                   # Hypra-Ass: .txt in prg/ is the master, use petcat2prg binary
                   asm_bin, basicver = listings_bin[data_filename]
-              lines = hypra_ass_decode.decode_bytes(asm_bin, topass=topass)
+              lines = assembler_decode.decode_bytes(asm_bin, topass=topass)
               listing = "\n".join(lines)
               listing = listing.replace("&", "&amp;")
               listing = listing.replace("<", "&lt;")
