@@ -106,6 +106,31 @@
 
         <p>In Listing 1 wird nochmals an einem vollständigen Beispiel die Wirkung der If-Anweisung gezeigt. Das Programm Intervall überprüft, ob ein bestimmter Eingabewert sich innerhalb eines Intervalls befindet, oder ob er kleiner oder größer ist. Die Grenzen des Intervalls (a und b) werden als Konstante definiert. Die Konstantendeklarationen werden in Pascal nach der Label-Anweisung, aber vor der Typen- beziehungsweise Variablendeklaration angegeben. Konstanten bekommen wie Variablen einen Namen, ihr Wert läßt sich aber nicht mehr verändern. Das Programm zeigt gleichzeitig, wie in Pascal Eingabewerte überprüft werden.</p>
 
+        <!-- Eingetippt von Patrick Georgi -->
+        <figure>
+            <pre>
+program intervall;
+(* es wird ueberprueft, ob ein
+Eingabewert innerhalb eines
+Intervalls liegt *)
+(* a &lt;= x &lt;= b *)
+const a= -10.0;
+      b=  20.0;
+var x:real;
+begin
+writeln('Bitte Eingabe');
+read(x);
+if x&gt;b then writeln('x: ',x:5:2,' groesser als obere Schranke')
+else
+begin
+  if x&gt;=a then writeln('x: ',x:5:2,' innerhalb der Schranke')
+  else
+    writeln('x: ',x:5:2,' kleiner als untere Schranke')
+end
+end.</pre>
+            <figcaption>Listing 1. Beispiel zur If-Then-Else-Klausel</figcaption>
+        </figure>
+
         <p>Das Beispielprogramm enthält einen Kommentar. In Pascal werden Kommentare zwischen die Zeichen »(*« und »*)« eingeschlossen. Beispiel:<br>
             (* dies ist ein Kommentar *)<br>
             (* dies<br>
@@ -137,6 +162,25 @@
 
         <p>Ausgewählt und ausgeführt wird diejenige Anweisung, deren Case-Label mit dem Ergebnis des Ausdruck übereinstimmt. Listing 2 enthält ein Beispiel zur Case-Anweisung. Insgesamt werden drei Fälle unterschieden. Als Ausdruck wird hier ganz einfach eine Integer-Variable verwendet.</p>
 
+        <!-- Eingetippt von Patrick Georgi -->
+        <figure>
+            <pre>
+program fall;
+var note:integer;
+    buchstabe:char;
+begin
+  read(note);
+  if (note&gt;=1) and (note&lt;=6) then
+    case note of
+    1: writeln('sehr gut');
+    2,3,4: writeln('o.k.');
+   5,6: writeln('schwach')
+   end
+ else writeln('liegt ausserhalb des Bereichs')
+end.</pre>
+            <figcaption>Listing 2. Die Case-Anweisung wählt unter mehreren Möglichkeiten</figcaption>
+        </figure>
+
         <p>Die Marken in einer Case-Anweisung, die »Case-Labels«, dürfen auf keinen Fall mit den normalen Labels im Programm verwechselt werden. Sie brauchen nicht gesondert in einer Label-Deklaration definiert werden. Und ein Versuch, mit dem »goto« ein solches Case-Label anzuspringen, ist natürlich erfolglos!</p>
 
         <p>Eine Frage ist noch offen: was passiert, wenn der Ausdruck einen Wert ergibt, für den kein Case-Label vorhanden ist ? Dieser Fall ist in Standard-Pascal nicht definiert und wird daher von jedem Compiler anders behandelt. Bei Oxford-Pascal erhält man den Laufzeitfehler »CASE ERROR«. Bei Profi-Pascal wird das Programm mit der nächsten Anweisung ohne Fehlermeldung fortgesetzt.</p>
@@ -164,6 +208,29 @@
 
         <p>Bei dem Beispiel in Listing 3 wird zunächst überprüft, ob der Eingabewert gleich Null ist. In diesem Fall steht das Ergebnis bereits fest. Bei einem Eingabewert größer Null wird die Fakultät berechnet und mit allen Zwischenergebnissen ausgegeben. N-Fakultät bedeutet: 1*2* &hellip;. *N-1 *N.</p>
 
+        <!-- Eingetippt von Patrick Georgi -->
+        <figure>
+            <pre>
+program fakultaet;
+var i,f,n:integer;
+begin
+ f:=1;
+ writeln('bitte n eingeben');
+ readln(n);
+ if n=0 then writeln('Fakultaet = 1')
+ else begin
+  if n&gt;0 then begin
+   for i:=1 to n do begin
+    f:=f*i;
+    writeln(i:4, ' Fakultaet: ',f:6);
+   end
+ end
+ else writeln('negativ')
+end;
+end.</pre>
+            <figcaption>Listing 3. Die Fakultät-Funktion — mit der For-Schleife berechnet</figcaption>
+        </figure>
+
         <p>So ist beispielsweise die Fakultät für<br>
             N = 4 : 1 *2*3*4 = 24 .</p>
 
@@ -176,6 +243,26 @@
         <p>Der logische Ausdruck entscheidet, ob die Anweisung hinter dem »do« ausgeführt wird oder nicht. Ist das Ergebnis »true«, wird die Anweisung ausgeführt; bei dem Ergebnis »false« wird sie nicht ausgeführt. Die Anzahl der Wiederholungen hängt also von der Bedingung ab. Es ist möglich, daß der Ausdruck sofort den Wert »false« ergibt und die Anweisung damit überhaupt nicht ausgeführt wird. Es gibt auch Fälle, in denen die Schleife nicht beendet wird, weil der Ausdruck niemals den Wert »true« erhält. Einen solchen Fall nennt man eine unendliche Schleife. Diesen Fall sollte ein Programmierer auf jeden Fall vermeiden! Deshalb muß man auf diesen Fall achten, wenn das Ergebnis des logischen Ausdrucks auch innerhalb der Schleife geändert wird.</p>
 
         <p>Das Beispiel in Listing 4 zeigt, wie innerhalb einer While-Schleife so lange Zahlen eingelesen und aufsummiert werden, bis die Zahl 1000 überschritten wird. Anhand dieses Beispiels nochmals die einzelnen Schritte bei While:</p>
+
+        <!-- Eingetippt von Patrick Georgi -->
+        <figure>
+            <pre>
+program sum;
+var i,k,n,summe:integer;
+begin
+ n:=1000;
+ summe:=0;
+ k:=0;
+ while summe &lt;= n do
+ begin
+  writeln('bitte Wert eingeben');
+  read(i);
+ if i&gt;0 then summe:=summe+i
+end;
+writeln(summe)
+end.</pre>
+            <figcaption>Listing 4. Beispielprogramm mit einer While-Schleife</figcaption>
+        </figure>
 
         <ol>
             <li>Der logische Ausdruck wird berechnet.</li>
@@ -200,6 +287,23 @@
         <p>Wenn der logische Ausdruck den Wert »true« hat, dann ist das Schleifenende erreicht. Solange er »false« ist, wird die Schleife wiederholt. Bei der Repeat-Anweisung wird (im Gegensatz zu While!) die Anweisung mindestens einmal durchlaufen. Ein Unterschied besteht auch darin, daß zwischen Repeat und Until mehrere Anweisungen stehen dürfen (in der While-Schleife muß man eine Verbundanweisung verwenden), da diese Schlüsselwörter die gleiche Wirkung wie Begin und End haben.</p>
 
         <p>Listing 5 zeigt die Anwendung der Repeat-Anweisung. Die Zahlen 1 bis 10 werden innerhalb der Schleife addiert. Zur Verdeutlichung nochmals die einzelnen Schritte:</p>
+
+        <!-- Eingetippt von Patrick Georgi -->
+        <figure>
+            <pre>
+program schleife;
+var summe,k:integer;
+begin
+ summe:=0;
+ k:=0;
+ repeat
+ k:=k+1;
+ summe:=summe+k
+until k&gt;=10;
+writeln('Summe: ',summe)
+end.</pre>
+            <figcaption>Listing 5. Beispielprogramm mit einer Repeat-Anweisung</figcaption>
+        </figure>
 
         <ol>
             <li>Der Schleifenkörper, das sind die Anweisungen zwischen Repeat und Until, wird ausgeführt.</li>
@@ -243,115 +347,11 @@
 
         <address class="author">(Anton Gruber/ Silvia Gutschmidt/cg)</address>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Die Sache mit dem Semikolon:</h2>
 
-        <h2>Die Sache mit dem Semikolon:</h2>
-
-        <p>Ein Semikolon trennt zwei Anweisungen voneinander. »Begin« ist keine Anweisung. Aber hinter dem »end« muß ein Semikolon stehen! Vor einem »end« kann die letzte Anweisung mit »;« abgeschlossen werden, muß jedoch nicht. Direkt vor dem »end« muß also kein Semikolon stehen. Vor einem »else« schließlich darf auf keinen Fall ein»;« stehen. Hier würde dieses Trennzeichen einen Syntaxfehler erzeugen.</p>
-        <!-- Eingetippt von Patrick Georgi -->
-        <figure>
-            <pre>
-program intervall;
-(* es wird ueberprueft, ob ein
-Eingabewert innerhalb eines
-Intervalls liegt *)
-(* a &lt;= x &lt;= b *)
-const a= -10.0;
-      b=  20.0;
-var x:real;
-begin
-writeln('Bitte Eingabe');
-read(x);
-if x&gt;b then writeln('x: ',x:5:2,' groesser als obere Schranke')
-else
-begin
-  if x&gt;=a then writeln('x: ',x:5:2,' innerhalb der Schranke')
-  else
-    writeln('x: ',x:5:2,' kleiner als untere Schranke')
-end
-end.</pre>
-            <figcaption>Listing 1. Beispiel zur If-Then-Else-Klausel</figcaption>
-        </figure>
-
-        <!-- Eingetippt von Patrick Georgi -->
-        <figure>
-            <pre>
-program fall;
-var note:integer;
-    buchstabe:char;
-begin
-  read(note);
-  if (note&gt;=1) and (note&lt;=6) then
-    case note of
-    1: writeln('sehr gut');
-    2,3,4: writeln('o.k.');
-   5,6: writeln('schwach')
-   end
- else writeln('liegt ausserhalb des Bereichs')
-end.</pre>
-            <figcaption>Listing 2. Die Case-Anweisung wählt unter mehreren Möglichkeiten</figcaption>
-        </figure>
-
-        <!-- Eingetippt von Patrick Georgi -->
-        <figure>
-            <pre>
-program fakultaet;
-var i,f,n:integer;
-begin
- f:=1;
- writeln('bitte n eingeben');
- readln(n);
- if n=0 then writeln('Fakultaet = 1')
- else begin
-  if n&gt;0 then begin
-   for i:=1 to n do begin
-    f:=f*i;
-    writeln(i:4, ' Fakultaet: ',f:6);
-   end
- end
- else writeln('negativ')
-end;
-end.</pre>
-            <figcaption>Listing 3. Die Fakultät-Funktion — mit der For-Schleife berechnet</figcaption>
-        </figure>
-
-        <!-- Eingetippt von Patrick Georgi -->
-        <figure>
-            <pre>
-program sum;
-var i,k,n,summe:integer;
-begin
- n:=1000;
- summe:=0;
- k:=0;
- while summe &lt;= n do
- begin
-  writeln('bitte Wert eingeben');
-  read(i);
- if i&gt;0 then summe:=summe+i
-end;
-writeln(summe)
-end.</pre>
-            <figcaption>Listing 4. Beispielprogramm mit einer While-Schleife</figcaption>
-        </figure>
-
-        <!-- Eingetippt von Patrick Georgi -->
-        <figure>
-            <pre>
-program schleife;
-var summe,k:integer;
-begin
- summe:=0;
- k:=0;
- repeat
- k:=k+1;
- summe:=summe+k
-until k&gt;=10;
-writeln('Summe: ',summe)
-end.</pre>
-            <figcaption>Listing 5. Beispielprogramm mit einer Repeat-Anweisung</figcaption>
-        </figure>
-
+            <p>Ein Semikolon trennt zwei Anweisungen voneinander. »Begin« ist keine Anweisung. Aber hinter dem »end« muß ein Semikolon stehen! Vor einem »end« kann die letzte Anweisung mit »;« abgeschlossen werden, muß jedoch nicht. Direkt vor dem »end« muß also kein Semikolon stehen. Vor einem »else« schließlich darf auf keinen Fall ein»;« stehen. Hier würde dieses Trennzeichen einen Syntaxfehler erzeugen.</p>
+        </aside>
     </article>
 </body>
 
