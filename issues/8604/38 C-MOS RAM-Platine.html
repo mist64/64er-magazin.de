@@ -18,6 +18,10 @@
         <h1>C-MOS RAM-Platine</h1>
         <p class="intro">Haben Sie schon einmal Ihr Programm auf ein EPROM gebrannt und sich anschließend geärgert, weil doch noch eine kleine Verbesserung nötig war? Das CMOS-RAM schafft Abhitfe. Was es damit auf sich hat, wie es funktioniert und wie Sie es selbst bauen können, wollen wir Ihnen erklären.</p>
 
+        <figure>
+            <img src="38-0.png" alt="">
+        </figure>
+
         <p>Wer das Betriebssystem eines Computers schon einmal verändert hat, wird über die beiden Möglichkeiten der Speicherung (Diskette oder EPROM) nicht gerade glücklich gewesen sein. Das EPROM ist für die Entwicklungsphase eine ungünstige Lösung und das Arbeiten mit Diskette erweist sich für diesen Fall als eine aufwendige Angelegenheit. Auch wenn Sie in den nächsten Wochen beispielsweise vorwiegend mit Ihrem Monitor-Programm arbeiten wollen, kann Ihnen das dauernde Laden von Diskette schnell lästig werden. Dafür ein EPROM zu brennen, ist nicht gerade die billigste und schnellste Lösung.</p>
 
         <p>Das akkugepufferte CMOS-RAM (großes Foto) löst die eben genannten Probleme und viele weitere auf überraschend einfache Weise.</p>
@@ -36,9 +40,19 @@
 
         <p>Für den ersten Überblick ist es ratsam, sich an dem Blockschaltplan in Bild 1 zu orientieren. An dieser Stelle wollen wir auch erwähnen, daß alle Abbildungen inklusive Layout mit dem C 64 entwickelt wurden. Im Blockschaltplan sind die beiden Anschlußmöglichkeiten dargestellt — links der Expansion-Port, rechts ein ROM-Sockel. Wie Sie sehen, sind Adreß- und Datenbus durchgeschleift. Der enscheidende Unterschied liegt bei den Kontrollbussen.</p>
 
+        <figure>
+            <img src="38-1.png" alt="">
+            <figcaption>Bild 1. Der Blockschaltplan</figcaption>
+        </figure>
+
         <h2>Schaltungsubersicht</h2>
 
         <p>In Bild 2 können Sie erkennen, wie der Kontrollbus für einen Speicherbaustein aufgebaut ist. Über das Chipauswahlsignal (<span style="text-decoration: overline">CE</span>, CE) wird der entsprechende Speicherbaustein angesprochen und aktiviert.</p>
+
+        <figure>
+            <img src="38-2.png" alt="">
+            <figcaption>Bild 2. Schaltbild des Speicherblocks</figcaption>
+        </figure>
 
         <p>Das Ausgangsfreigabesignal (<span style="text-decoration: overline">OE</span>) bestimmt, ob der adressierte Speicherinhalt auf dem Datenbus erscheint oder nicht.</p>
 
@@ -70,7 +84,17 @@
 
         <p><strong>Schreibsteuerung</strong>: Die Schreibsteuerung (Bild 3) sieht auf den ersten Blick vielleicht etwas konfus aus, läßt sich aber schnell »aufdröseln«. Schreibzugriffe (<span style="text-decoration: overline">WE</span> = L) dürfen in einem 6502-System nur auftreten, wenn Φ<sub>2</sub> = H ist. Das wird durch Verknüpfung von Φ<sub>2</sub> und R/<span style="text-decoration: overline">W</span> mittels der NAND-Gatter 2 und 4 erreicht. Gatter 4 dient dabei nur als Inverter. Die Pull-up/Pull-down-Widerstände aus den Arrays A2/A1 ziehen <span style="text-decoration: overline">WE</span> bei ungesteuerten Gattern auf High. In vielen Systemen werden die <span style="text-decoration: overline">OE</span>-Leitungen der Speicherbausteine einfach fest auf Low o_der an die entsprechenden <span style="text-decoration: overline">CE</span>-Leitungen gelegt. Da die CMOS-RAMs im Schreibbetrieb einfach parallel zu den C-64-RAMs liegen, würde es hier jedoch zwangsläufig zur Datenkollision auf dem Bus kommen. Deshalb wird der Output über das NAND-Gatter 1 nur im Lesebetrieb freigegeben. Das AND-Gatter 2 von IC 3 läßt wahlweise das so gewonnene <span style="text-decoration: overline">OE</span>-Signal oder das vom ROM-Sockel kommende <span style="text-decoration: overline">OE</span>-Signal zum RAM.</p>
 
+        <figure>
+            <img src="38-3.png" alt="">
+            <figcaption>Bild 3. Schaltbild der Schreibsteuerung</figcaption>
+        </figure>
+
         <p><strong>Adreßdecodierung</strong>: Nun zur Adreßdecodierung in Bild 4. Die drei höchstwertigen Adreßleitungen A13 bis A15 liegen an den Adreßeingängen eines 3-Bit-Binärdecoders. Dieser macht daraus an semen Ausgängen (Y 0 bis Y7) <span style="text-decoration: overline">CE</span>-Signale für jeweils 8-KByte-Gruppen. Die CMOS-RÄMs werden von Y4 und Y5 angesprochen. Dadurch liegen sie im Adreßbereich $8000 bis $BFFF. Es genügt hier nicht, die am Expansion-Port vorhandenen Signale ROML und ROMH zu verwenden, da sie nur im Lesebetrieb wirksam sind. Außerdem ist für die ROM-Simulation ohnehin eine Decodierung notwendig. Die Pull-up/down-Widerstände an den Adreßleitungen sorgen in diesem Fall dafür, daß nur die untere Speicherhälfte angesprochen wird.</p>
+
+        <figure>
+            <img src="38-4.png" alt="">
+            <figcaption>Bild 4. Schaltbild der Adreßdecodierung und Adreßsteuerung</figcaption>
+        </figure>
 
         <p>Mit der Decodiererei allein ist es aber noch nicht getan, denn es müssen noch weitere Bedingungen eingehalten werden. Dazu dient das AND-Gatter von IC 3, dessen Ausgang an den Low-aktiven Enable-Eingänqen G2A und G2B des Decoders liegt. Nur wenn mindestens einer der Gattereingänge Low ist und gleichzeitig die Adresse im Bereich $8000 bis $BFFF liegt, werden die RAMs angesprochen. In folgenden Fällen ist dies gegeben:</p>
 
@@ -82,9 +106,29 @@
 
         <p><strong>Die Schalter</strong>: Jetzt kommen wir zu den mit EXROM und GAME verbundenen Schaltern S1 und S2 (Bild 5). Sie dienen dazu, den C 64 darüber in Kenntnis zu setzen, ob ein ROM-Modul vorhanden ist und in welchem Adreßbereich es liegt. Die beiden Schalter sind so verdrahtet, daß die verbotene Kombination, <span style="text-decoration: overline">EXROM</span> = H und <span style="text-decoration: overline">GAME</span> = L, nicht möglich ist.</p>
 
+        <figure>
+            <img src="38-5.png" alt="">
+            <figcaption>Bild 5. Verdrahtung der Pinout-Codierung</figcaption>
+        </figure>
+
         <p>Die Schaltung des Blocks »Pinout-Codierung« in Bild 7 besteht aus fünf Umschaltern oder Steckbrücken (S4 bis S8) und bestimmt das zu simulierende IC.</p>
 
+        <figure>
+            <img src="38-7.png" alt="">
+            <figcaption>Bild 7. Layout der Platinenoberseite</figcaption>
+        </figure>
+        <figure>
+            <img src="38-8.png" alt="">
+            <figcaption>Bild 8. Layout der Platinenunterseite</figcaption>
+        </figure>
+
         <p><strong>Spannungsversorgung</strong>: Die »Power-Fail-Steuerung« (Bild 6) ist ebenso einfach wie wirksam. Sie muß bei absinkender Betriebsspannung die CMOS-RAMs schnell genug in den inaktiven Zustand versetzen, damit keine unkontrollierten Informationsänderungen vorkommen. Dazu liegt die Basis des PNP-Transistors T1 an einem Spannungsteiler aus R3 und R2. T1 wird bei voller Betriebsspannung (Vcc) aufgesteuert und zieht den High-aktiven CE-Eingang der RAMs nach Plus. Die LED im Spannungsteiler dient neben den Anzeigezwecken dazu, den Arbeitsbereich von T1 zu verbessern. Sinkt Vcc unter einen bestimmten Wert ab, so sperrt T1. CE liegt dann über R1 auf Low und die RAMs sind nicht ansprechbar. Durch den Akku verlieren die CMOS-RAMs aber nicht die Speicherinhalte. Im Betrieb wird der Akku über Dl und R4 geladen, während er bei fehlender Versorgungsspannung die RAMs über D2 mit etwa 2,2 bis 3,4V versorgt. Mit dem Schalter S9 kann der Akku abgeschaltet werden, um eine Tiefentladung bei längerer Lagerung zu verhindern.</p>
+
+        <figure>
+            <img src="38-6.png" alt="">
+            <figcaption>Bild 6. Schaltbild
+                der Power-Fail-Steuerung</figcaption>
+        </figure>
 
         <h2>Bauteile</h2>
 
@@ -93,6 +137,15 @@
         <p>Das Layout für die Herstellung der Platine finden Sie in den Bildern 7 und 8. Es entstand übrigens vollständig auf dem C 64, wie auch alle anderen Bilder.</p>
 
         <p>Die Beschaffung der elektronischen Bauteile (ICs, Widerstände, etc.) dürfte keine größeren Schwierigkeiten machen. Bei der LED muß man sich wegen der erforderlichen Durchlaßspannung an den in der Stückliste angegebenen Typ halten. Für alle ICs empfehlen sich Sockel, nach Möglichkeit Präzisionsausführungen. Bei einigen Bauteilen ist auf ihre Polung gemäß Bestückungsplan (Bild 9) zu achten. ICs haben einen Punkt an Pin 1 oder eine Kerbe an derselben Stirnseite. Die Pinbelegung der anderen gepolten Bauelemente können Sie dem Bild 10 entnehmen. Wie man bei Beschaffungsschwierigkeiten der Widerstandsarrays diese aus acht Einzelwiderständen selbst herstellt, finden Sie ebenfalls dort.</p>
+
+        <figure>
+            <img src="38-9.png" alt="">
+            <figcaption>Bild 9. Bestückungsplan</figcaption>
+        </figure>
+        <figure>
+            <img src="38-10.png" alt="">
+            <figcaption>Bild 10. Pinbelegung der gepolten Bauteile</figcaption>
+        </figure>
 
         <p>Nun zum Akku. Hier sind die Abmessungen wichtig. Die zur Verfügung stehende Grundfläche auf der Platine beträgt etwa 15x33 mm. Der Pluspol liegt in jedem Fall bei D2, wie im Bestückungsplan ersichtlich, für den Minuspol stehen verschiedene Lötpunkte zur Auswahl. Die Kapazität des Akkus ist nicht so wichtig, da der Stand-By-Strom der Schaltung im Mikroampere-Bereich liegt und damit etwa die Größenordnung der Selbstentladung hat. Ohne weiteres können Sie statt eines Akkus auch eine Trockenbatterie verwenden. Gut geeignet sind hier Lithiumzellen zum Einlöten. Der Betrieb mit Lithiumzellen empfiehlt sich besonders, wenn RoSi nicht häufig benutzt wird. Sie sind auch umweltfreundlich und sichern die Daten über Jahre. Bei Batteriebetrieb kann der Ladewiderstand R4 wegfallen. Für Akkus sollte der Ladestrom etwa 1/50 der Akku-Nennkapazität betragen. R4 errechnet sich demnach wie folgt: R4 (in kΩ) = (4,5V - Ua)/I, wobei Ua die Spannung in Volt des verwendeten Akkus ist und I der gewünschte Ladestrom in mA. Beispiel für Akku 2,4V, 150mAh: I = (150/50)mA = 3mA; R4 = (4,5V -2,4V)/3mA = 0,7kΩ.</p>
 
@@ -116,6 +169,11 @@
 
         <p>Noch etwas zur Pinbelegung der DIL-Stecker (Bild 11). Blickt man vom C 64 aus auf die im Expansion-Port steckende Platine, in die wiederum das Flachbandkabel hinten eingesteckt ist, so liegt Pin 1 der beiden DIL-Stecker jeweils auf der linken Seite (also genau wie bei den RAMs). Am besten gleich kennzeichnen. Die Kabellänge sollte zirka 30 cm betragen. Längen über 50 cm sollten Sie wegen der Kabelkapazitäten in Verbindung mit der hohen Taktfrequenz vermeiden.</p>
 
+        <figure>
+            <img src="38-11.png" alt="">
+            <figcaption>Bild 11. Verdrahtungsplan des Flachbandkabels</figcaption>
+        </figure>
+
         <p>Das Anquetschen des Kabels können Sie manchmal im Elektronik-Geschäft erledigen lassen, oder Sie machen es selbst im Schraubstock mit Hilfe einer Vorlage auf der Pinseite. Aber bitte mit Gefühl, damit die Stecker noch heil bleiben.</p>
 
         <p>In die äußeren Ecken der Platine sollten Sie Löcher bohren und Stützschrauben der Größe M3x20 einsetzen, wie es im Bild auf Seite 38 zu sehen ist. Der Expansion-Port-Stecker wird es Ihnen danken.</p>
@@ -125,6 +183,22 @@
         <p>Nun wollen wir erläutern, wie Sie mit RoSi arbeiten können. Fangen wir mit der Modul-Simulation an.</p>
 
         <p><strong>Modul-Simulation</strong>: Für diese Betriebsart wird die Platine in den Expansion-Port des ausgeschalteten C 64 gesteckt, mit der Bauteileseite nach oben. Schalten Sie den Computer jetzt wieder ein. Die Schalter S1 und S2 bestimmen nun die logischen Pegel an den Leitungen <span style="text-decoration: overline">EXROM</span> und <span style="text-decoration: overline">GAME</span> des C 64. Wie schon erwähnt, sind sie so verschaltet, daß die Kombination <span style="text-decoration: overline">EXROM</span> = 1 und <span style="text-decoration: overline">GAME</span> = 0 nicht einstellbar ist, denn dies würde unweigerlich zu einem Absturz beim C 64 führen. Nun zu den Funktionen der Schalter. S2 schaltet RoSi aus (1) oder ein &reg;. S1 bestimmt den Adreßbereich, in den die Karte eingeblendet wird (siehe Tabellen 1 bis 3).</p>
+
+        <figure>
+            <img src="38-t1.png" alt="">
+            <figcaption>Tabelle 1. Die Schalterfunktionen (Bei Verwendung von Stiftleisten und Jumpern kehren sich alle Funktionen bei S4 bis S8 um)</figcaption>
+        </figure>
+        <figure>
+            <img src="38-t2.png" alt="">
+            <figcaption>Tabelle 2. Zusammenhang
+                zwischen <span style="text-decoration: overline">EXROM</span>/<span style="text-decoration: overline">GAME</span>
+                und den Schalterstellungen
+                von S1, S2</figcaption>
+        </figure>
+        <figure>
+            <img src="38-t3.png" alt="">
+            <figcaption>Tabelle 3. Zusammenhang zwischen HRAM, LRAM, S1, S2 und den eingeblendeten Adreßbereichen</figcaption>
+        </figure>
 
         <p>Schalter S3 entscheidet unabhängig von S1 und S2, ob ein Schreibzugriff im Adreßbereich $8000 bis $BFFF auf das CMOS-RAM möglich ist.</p>
 
@@ -144,6 +218,11 @@
 
         <p>Die Pinbelegung der ROMs und EPROMs, die mit RoSi simuliert werden können, finden Sie in Bild 12 neben der des CMOS-RAMs aufgeführt. Es sind nur die Anschlüsse mehrfach abgebildet, die bei den verschiedenen Typen unterschiedlich belegt sind.</p>
 
+        <figure>
+            <img src="38-12.png" alt="">
+            <figcaption>Bild 12. Pinbelegung der simulierbaren ROMs und des CMOS-RAMs (6264). Nur die unterschiedlich belegten Anschlüsse sind mehrfach aufgeführt.</figcaption>
+        </figure>
+
         <p>Die Handhabung der ROM-Simulation ist ebenso einfach wie die der Modul-Simulation. Zuerst wird der Inhalt des zu simulierenden ROMs nach der Anleitung im vorigen Abschnitt in RoSi untergebracht. Die Stellung der Schalter S4 bis S8 ist hier noch unerheblich. Jede der in Tabelle 1 aufgeführten Kombinationen ist möglich. Ein Tip: die Platine wurde so ausgelegt, daß das am meisten verbreitete EPROM 2764 eine leicht zu merkende Einstellung hat, nämlich S4 bis S8 alle in Stellung »1«. Wenn die Software in RoSi untergebracht ist, wird sie wieder mittels S3 geschützt. Anschließend müssen Sie den Computer ausschalten und die Platine aus dem Expansion-Port ziehen.</p>
 
         <p>Nie darf RoSi gleichzeitig mit dem Expansion-Port und über Kabel mit einem ROM-Sockel verbunden sein!</p>
@@ -162,17 +241,21 @@
 
         <p>Hier sehen Sie die CMOS-RAM-Platine mit dem Anschlußkabel für die ROM-Simulation. Der DIL-Stecker am freien Kabelende wird anstelle eines ROMs oder EPROMs in den entsprechenden IC-Sockel gesteckt. Auf dem Bild erkennen Sie, daß der Pin 1 und die entsprechende Steckerseite markiert sind. Dies sollten Sie bei Ihren Steckern ebenfalls tun, um ein verkehrtes Einstecken zu vermeiden.</p>
 
-        <p>TODO ASIDE</p>
+        <figure>
+            <img src="38-x.png" alt="">
+        </figure>
 
-        <h2>2000 Mark für Marcus Plewa</h2>
+        <aside>
+            <h2>2000 Mark für Marcus Plewa</h2>
 
-        <p>Markus Plewa ist 25 Jahre alt und studiert im fünften Semester Maschinenbau an der Technischen Hochschule in Aachen. Vor zirka acht Jahren hat er angefangen, elektronische Bauteile im Modellbau zu verwenden und daran immer mehr Gefallen gefunden. So ist die Elektronik zu einem interessanten Hobby für Ihn geworden.</p>
+            <p>Markus Plewa ist 25 Jahre alt und studiert im fünften Semester Maschinenbau an der Technischen Hochschule in Aachen. Vor zirka acht Jahren hat er angefangen, elektronische Bauteile im Modellbau zu verwenden und daran immer mehr Gefallen gefunden. So ist die Elektronik zu einem interessanten Hobby für Ihn geworden.</p>
 
-        <p>Während des Zivildienstes ist Marcus Plewa mit der Computerwelt in Berührung gekommen. Auch ihn hat diese technische Errungenschaft so begeistert, daß er sich nach dem Zivildienst einen C 64 kaufte.</p>
+            <p>Während des Zivildienstes ist Marcus Plewa mit der Computerwelt in Berührung gekommen. Auch ihn hat diese technische Errungenschaft so begeistert, daß er sich nach dem Zivildienst einen C 64 kaufte.</p>
 
-        <p>Im anschließenden Studium lernte er weiter C 64-Besitzer kennen. Einige beschäftigten sich damit, das Betriebssystem des C 64 zu ändern und modifizierte Zeichensätze für Drucker zu erstellen. Das ständige EPROM-Brennen erwies sich dabei bald als ein Problem.</p>
+            <p>Im anschließenden Studium lernte er weiter C 64-Besitzer kennen. Einige beschäftigten sich damit, das Betriebssystem des C 64 zu ändern und modifizierte Zeichensätze für Drucker zu erstellen. Das ständige EPROM-Brennen erwies sich dabei bald als ein Problem.</p>
 
-        <p>So ist Marcus Plewa auf die Idee gekommen, ein CMOS-RAM zu bauen. Mit Hilfe seiner Elektronik-Erfahrung und den Computer-Kenntnissen ist dann die CMOS-RAM-Platine entstanden. Eine Idee und deren Umsetzung, die uns 2000 Mark wert ist.</p>
+            <p>So ist Marcus Plewa auf die Idee gekommen, ein CMOS-RAM zu bauen. Mit Hilfe seiner Elektronik-Erfahrung und den Computer-Kenntnissen ist dann die CMOS-RAM-Platine entstanden. Eine Idee und deren Umsetzung, die uns 2000 Mark wert ist.</p>
+        </aside>
     </article>
 </body>
 
