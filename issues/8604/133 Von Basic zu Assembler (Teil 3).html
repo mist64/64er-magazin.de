@@ -80,18 +80,62 @@
 
         <p>Die Nummern entsprechen jeweils den verschiedenen Zeichen, die in eine Speicherstelle einzuschreiben sind. Es handelt sich um folgende:</p>
 
-        <p>TODO TABLE</p>
-
-        <p>Nr. Hex. Dez. Beschreibung<br>
-            1 4F 79 Winkel links oben<br>
-            2 77 119 Linie oben<br>
-            3 50 80 Winkel rechts oben<br>
-            4 74 116 Linie linksseitig<br>
-            5 6A 106 Linie rechtsseitig<br>
-            6 4C 76 Winkel links unten<br>
-            7 6F 111 Linie unten<br>
-            8 7A 122 Winkel rechts unten</p>
-
+        <table>
+            <tr>
+                <td><strong>Nr.</strong></td>
+                <td><strong>Hex.</strong></td>
+                <td><strong>Dez.</strong></td>
+                <td><strong>Beschreibung</strong></td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>4F</td>
+                <td>79</td>
+                <td>Winkel links oben</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>77</td>
+                <td>119</td>
+                <td>Linie oben</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>50</td>
+                <td>80</td>
+                <td>Winkel rechts oben</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>74</td>
+                <td>116</td>
+                <td>Linie linksseitig</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>6A</td>
+                <td>106</td>
+                <td>Linie rechtsseitig</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>4C</td>
+                <td>76</td>
+                <td>Winkel links unten</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>6F</td>
+                <td>111</td>
+                <td>Linie unten</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>7A</td>
+                <td>122</td>
+                <td>Winkel rechts unten</td>
+            </tr>
+        </table>
         <p>Im Listing 3 sind diese acht Zeichen in der Initialisierungsphase in acht Zeropage-Speicherstellen geschrieben worden ($lB bis $22), die CODE1 bis CODE8 genannt wurden.</p>
 
         <p>Bevor wir dieses Programm besprechen, gebe ich Ihnen in Bild 4 noch das Flußdiagramm dazu an.</p>
@@ -194,20 +238,7 @@
 
         <p>In unserem Programm beginnen wir diese Berechnung in Zeile 580. Dort wird zunächst sicherheitshalber das Carry-Bit-gelöscht für das erste ROL-Kommando. Durch DEC BILD erzeugen wir den Wert Zl-1 (nach BILD hatten wir ja Z1 geschrieben, BILD + 1 wurde reserviert für das MSB und eine Null eingetragen). Dreimaliges ASL BILD erzeugt 8*(Z1-1). Sie erinnern sich: Erst vom vierten ASL an mußte beim größten erlaubten Zl-Wert auch ROL eingesetzt werden. In den Zeilen 640/650 packen wir diesen Summanden in den Zwischenspeicher. Danach sind noch zwei ASL mit anschließenden ROL-Kommandos nötig, um in BILD/BILD +1 den Wert 32*(Z1-1) zu erzeugen. Von Zeile 690 bis 740 addieren wir beide Summanden und erhalten so 40*(Z1-1). Normalerweise muß vor jeder Addition mit ADC (denn das heißt ja »add with carry«, also addiere mit dem Carry-Bit, sogar addiere auch das Carry-Bit) das Carry-Bit durch CLC freigemacht werden. Hier können wir uns das aber ersparen, weil wir wissen, daß auch der größte Zl-Wert bei der letzten ROL- Operation nur eine Null ins Carry-Bit schieben konnte. Bei der folgenden Addition von S1 (Zeilen 760 bis 820) entsteht schließlich unser gewünschter Startwert — aber noch ohne Berücksichtigung der Anfangsadressen von Bildschirm- und Farb-RAM. Das kommt nun: Von Zeile 840 bis 900 entsteht im Vektor COLOR/COLOR + 1 der Zeiger auf die erste Farb-RAM-Stelle, von Zeile 920 bis 980 im Vektor BILD/BILD +1 schließlich der auf die erste Bildschirmspeicherstelle. Zum Abschluß dieser Programmphase schieben wir noch den Farbcode ins X-Register.</p>
 
-        <p>Nun kommt die Doppelschleife, die den Bildschirmausschnitt beschreibt. Das Y-Register dient als Zähler jeweils einer Zeile. Der Zeichencode gelangt — ebenso wie der Farbcode — nach dem gleichen Rezept in die notwendigen Speicherstellen, das wir auch schon in den vorangegangenen Programmbeispielen gezeigt haben (das war die Sequenz, die wir dort auch als Makro hätten schreiben können:</p>
-
-        <p>TODO TABLE</p>
-
-        <p>Parameter Ortim Programm POKE-Adressen<br>
-            C64 C 128<br>
-            MARKE1 + 1 49157 5125<br>
-            S1 MARKE2+1 49161 5129<br>
-            S2 MARKE3+1 49166 5134<br>
-            Z2 MARKE4+1 49175 5143<br>
-            Farbe MARKE5+1 49255 5223<br>
-            Wert LABEL2+1 49259 5227</p>
-
-        <p>Hier in den Zeilen 1050 bis 1080). Jeweils am Ende der kleinen Schleife (in 1090 und 1100) wird der aktuelle Y-Zählerstand verglichen mit der Spaltendifferenz (SPDIFF) und — falls die Zeile noch nicht fertig ist — der nächste Durchlauf eingeleitet. Andernfalls addieren wir sowohl zum Vektor BILD/BILD + 1 als auch zu COLOR/COLOR +1 den Wert 40, rücken also eine Zeile runter. In 1280 dient ein DEC ZDIFF dazu, die Anzahl bearbeiteter Zeilen abzustreichen, bis dabei eine Null auftritt. Ist das noch nicht der Fall, wird zurückverzweigt nach LABEL1, wo wir den Y-Zähler neu initialisieren.</p>
+        <p>Nun kommt die Doppelschleife, die den Bildschirmausschnitt beschreibt. Das Y-Register dient als Zähler jeweils einer Zeile. Der Zeichencode gelangt — ebenso wie der Farbcode — nach dem gleichen Rezept in die notwendigen Speicherstellen, das wir auch schon in den vorangegangenen Programmbeispielen gezeigt haben (das war die Sequenz, die wir dort auch als Makro hätten schreiben können: Hier in den Zeilen 1050 bis 1080). Jeweils am Ende der kleinen Schleife (in 1090 und 1100) wird der aktuelle Y-Zählerstand verglichen mit der Spaltendifferenz (SPDIFF) und — falls die Zeile noch nicht fertig ist — der nächste Durchlauf eingeleitet. Andernfalls addieren wir sowohl zum Vektor BILD/BILD + 1 als auch zu COLOR/COLOR +1 den Wert 40, rücken also eine Zeile runter. In 1280 dient ein DEC ZDIFF dazu, die Anzahl bearbeiteter Zeilen abzustreichen, bis dabei eine Null auftritt. Ist das noch nicht der Fall, wird zurückverzweigt nach LABEL1, wo wir den Y-Zähler neu initialisieren.</p>
 
         <p>Der letzte Teil unseres Programmes besteht lediglich wieder aus einem lapidaren RTS.</p>
 
