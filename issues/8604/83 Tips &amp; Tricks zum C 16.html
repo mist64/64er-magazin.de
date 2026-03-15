@@ -47,9 +47,18 @@
         <h3>Wiederholfunktion der Tasten</h3>
 
         <table class="plain">
-            <tr><td>POKE 1344,0</td><td>Wiederholfunktion aus, nur »CRSR«, »SPACE«, »INST/DEL« haben Wiederholfunktion</td></tr>
-            <tr><td>POKE 1344,64</td><td>keine Taste hat Wiederholfunktion</td></tr>
-            <tr><td>POKE 1344,128</td><td>alle Tasten haben Wiederholfunktion (Normalzustand)</td></tr>
+            <tr>
+                <td>POKE 1344,0</td>
+                <td>Wiederholfunktion aus, nur »CRSR«, »SPACE«, »INST/DEL« haben Wiederholfunktion</td>
+            </tr>
+            <tr>
+                <td>POKE 1344,64</td>
+                <td>keine Taste hat Wiederholfunktion</td>
+            </tr>
+            <tr>
+                <td>POKE 1344,128</td>
+                <td>alle Tasten haben Wiederholfunktion (Normalzustand)</td>
+            </tr>
         </table>
 
         <h3>Tastaturpuffer</h3>
@@ -74,50 +83,153 @@
 
         <h2>Nützliche Speicherstellen</h2>
 
-        <p>— WAIT 1,192 wartet darauf, daß eine Taste am Recorder gedrückt wird.<br>
-            — Der Funktionstastenspeicher steht in den Adressen $0567 bis $05E6<br>
-            — Die Einsprungadresse für die USR-Funktion steht in #1281/1282 = $0501/0502</p>
+        <ul>
+            <li>WAIT 1,192 wartet darauf, daß eine Taste am Recorder gedrückt wird.</li>
+            <li>Der Funktionstastenspeicher steht in den Adressen $0567 bis $05E6</li>
+            <li>Die Einsprungadresse für die USR-Funktion steht in #1281/1282 = $0501/0502
 
-        <table class="plain">
-            <tr><td>Basic-Start</td><td>43/44 (Low-/Highbyte)</td></tr>
-            <tr><td>Anfang der Variablen</td><td>45/46 (Low-/Highbyte)</td></tr>
-            <tr><td>Anfang der Felder</td><td>47/48 (Low-/Highbyte)</td></tr>
-            <tr><td>Ende der Felder</td><td>49/50 (Low-/Highbyte)</td></tr>
-            <tr><td>Stringspeicher Ende</td><td>51/52 (Low-/Highbyte)</td></tr>
-            <tr><td>Anfang der Strings</td><td>53/54 (Low-/Highbyte)</td></tr>
-            <tr><td>Basicspeicher Ende</td><td>55/56 (Low-/Highbyte)</td></tr>
-        </table>
+                <table class="plain">
+                    <tr>
+                        <td>Basic-Start</td>
+                        <td>43/44 (Low-/Highbyte)</td>
+                    </tr>
+                    <tr>
+                        <td>Anfang der Variablen</td>
+                        <td>45/46 (Low-/Highbyte)</td>
+                    </tr>
+                    <tr>
+                        <td>Anfang der Felder</td>
+                        <td>47/48 (Low-/Highbyte)</td>
+                    </tr>
+                    <tr>
+                        <td>Ende der Felder</td>
+                        <td>49/50 (Low-/Highbyte)</td>
+                    </tr>
+                    <tr>
+                        <td>Stringspeicher Ende</td>
+                        <td>51/52 (Low-/Highbyte)</td>
+                    </tr>
+                    <tr>
+                        <td>Anfang der Strings</td>
+                        <td>53/54 (Low-/Highbyte)</td>
+                    </tr>
+                    <tr>
+                        <td>Basicspeicher Ende</td>
+                        <td>55/56 (Low-/Highbyte)</td>
+                    </tr>
+                </table>
+            </li>
+            <li>Der Ton-Chip des C 16 läßt sich in Assembler wie folgt programmieren: Soundregister ist Adresse 65297. Jedem Bit kommt eine bestimmte Steuerfunktion zu:</p>
 
-        <p>— Der Ton-Chip des C 16 läßt sich in Assembler wie folgt programmieren: Soundregister ist Adresse 65297. Jedem Bit kommt eine bestimmte Steuerfunktion zu:</p>
+                <table class="plain">
+                    <tr>
+                        <td>Bit 0 bis 2</td>
+                        <td>#0 bis #7 Lautstärke = VOL 0 bis VOL 6</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 3</td>
+                        <td>#8 volle Lautstärke (wenn Bit 3 gesetzt ist, sind Bit 0-2 ohne Bedeutung)</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 4</td>
+                        <td>#16 Stimme 1 an (=1) / aus (=0)</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 5</td>
+                        <td>#32 Stimme 2 an (=1) / aus (=0)</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 6</td>
+                        <td>#64 Stimme 2 Rauschen (=1)</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 7</td>
+                        <td>#128 Bit gesetzt = kein Ton</td>
+                    </tr>
+                </table>
+                <p>Der Ton ist in 10 Bits codiert: mögliche Werte: #0 bis #1023</p>
 
-        <p>TODO TABLE</p>
+                <table class="plain">
+                    <tr>
+                        <td><strong>Frequenzen</strong></td>
+                        <td><strong>Low-Byte</strong></td>
+                        <td><strong>High-Byte (0,1)</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Stimme 1</td>
+                        <td>65294</td>
+                        <td>65298</td>
+                    </tr>
+                    <tr>
+                        <td>Stimme 2</td>
+                        <td>65295</td>
+                        <td>65296</td>
+                    </tr>
+                </table>
 
-        <p>Bit 0 bis 2 = # 0 bis # 7 Lautstärke = VOL 0 bis VOL 6<br>
-            Bit 3 = # 8 volle Lautstärke (wenn Bit 3 gesetzt ist, sind Bit<br>
-            0-2 ohne Bedeutung)<br>
-            Bit 4 = # 16 Stimme 1 an (= 1) / aus (= 0)<br>
-            Bit 5 = # 32 Stimme 2 an (= 1) / aus (= 0)<br>
-            Bit 6 = # 64 Stimme 2 Rauschen (= 1)<br>
-            Bit 7 = # 128 Bit gesetzt = kein Ton</p>
-
-        <p>Der Ton ist in 10 Bits codiert: mögliche Werte: #0 bis #1023</p>
-
-        <p>TODO TABLE</p>
-
-        <p>Frequenzen Low-Byte High-Byte (0,1)<br>
-            — Register Stimme 1 65294 65298 Stimme 2 65295 65296 Durch Löschen der Bits 0/1 läßt sich der Bild-<br>
-            65286: schirm um bis zu drei Rasterzeilen nach oben<br>
-            — Register verschieben. Bit 2 gesetzt Bildschirm vier Rasterzeilen nach unten Bit 3 gelöscht Bildschirm vier Rasterzeilen nach unten Bit 4 gelöscht Bildschirm ausgeblendet Bit 5 gesetzt Char-Speicher verschoben Bit 6 gesetzt kein Cursor sichtbar Bit 0/1 setzen Verschieben des Bildschirms<br>
-            65287 um bis zu drei Rasterzeilen<br>
-            -POKE nach rechts. Bit 4 gesetzt Mehrfarbmodus ein Bit 5 gesetzt Videochip stoppt (keine Bild- erzeugung mehr) Bit 6 gesetzt Programmierbare Bildstö- rung Bit 7 gesetzt 38 Zeichen/Zeile sperrt Tastatur<br>
-            65290, 162 -POKE entriegelt Tasta-<br>
-            65290, 163 tur<br>
-            — Register Hintergrund- Bit 0—3 (Low-Nibble) Farbe<br>
-            65301 farbe<br>
-            — Register Rahmenfarbe Bit 4—6 (High-Nibble) Intensi-<br>
-            65305 tät</p>
-
-        <address class="author">(Frank Plachetta/tr)</address>
+                <table class="plainÎ">
+                    <tr>
+                        <td>Register 65286:</td>
+                        <td>Durch Löschen der Bits 0/1 lässt sich der Bildschirm um bis zu drei Rasterzeilen nach oben verschieben.</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 2 gesetzt: Bildschirm vier Rasterzeilen nach unten</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 3 gelöscht: Bildschirm vier Rasterzeilen nach unten</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 4 gelöscht: Bildschirm ausgeblendet</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 5 gesetzt: Char-Speicher verschoben</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 6 gesetzt: kein Cursor sichtbar</td>
+                    </tr>
+                    <tr>
+                        <td>Register 65287:</td>
+                        <td>Bit 0/1 setzen: Verschieben des Bildschirms um bis zu drei Rasterzeilen nach rechts.</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 4 gesetzt: Mehrfarbmodus ein</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 5 gesetzt: Videochip stoppt (keine Bilderzeugung mehr)</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 6 gesetzt: Programmierbare Bildstörung</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Bit 7 gesetzt: 38 Zeichen/Zeile</td>
+                    </tr>
+                    <tr>
+                        <td>POKE 65290, 162</td>
+                        <td>sperrt Tastatur</td>
+                    </tr>
+                    <tr>
+                        <td>POKE 65290, 163</td>
+                        <td>entriegelt Tastatur</td>
+                    </tr>
+                    <tr>
+                        <td>Register 65301</td>
+                        <td>Hintergrundfarbe (Bit 0—3 (Low-Nibble) Farbe)</td>
+                    </tr>
+                    <tr>
+                        <td>Register 65305</td>
+                        <td>Rahmenfarbe (Bit 4—6 (High-Nibble) Intensität)</td>
+                    </tr>
+                </table>
+                <address class="author">(Frank Plachetta/tr)</address>
     </article>
 </body>
 
