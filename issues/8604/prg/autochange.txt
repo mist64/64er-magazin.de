@@ -1,0 +1,40 @@
+
+
+;autochange.prg ==0801==
+   10 lc=0:color0,1:color4,1:color5,2
+  100 name$="{clr}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{down}{down}{down}{down}{down}{down}{down}c64 diskette"
+  110 print"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}automatischer wechsel"
+  120 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}in den 64'er modus"
+  130 open15,8,15,"i0":a$=chr$(0)
+  140 ifds<>0thenbegin
+  150 print"{down}{down}{rght}disketten fehler: ";ds$
+  160 close8:close15
+  170 print"{down}{down}{rght}abbruch":end
+  180 bend
+  190 open8,8,8,"#"
+  200 print#15,"u1:8 0 18 0":print#15,"b-p";8;5
+  210 get#8,ba$
+  220 print#15,"u1:8 0 1 0"
+  230 fori=0to24:get#8,s$:bl$=bl$+chr$(asc(s$)):next
+  240 if(asc(ba$)and1)=0thenbegin
+  250 ifleft$(bl$,3)="cbm"thenprint"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}boot-sector schon vorhanden"
+  270 ifleft$(bl$,3)<>"cbm"thenprint"{down}{down}{rght}{rght}{rght}{rght}{rght}programm liegt auf boot-sector"
+  280 print"{down}{down}{rght}{rght}{rght}{rght}installierung fortsetzen? (j/n)" :lc=1
+  290 getkeyx$
+  300 ifx$<>"j"thenbegin
+  310 close8:close15
+  320 print"{down}{down}{rght}{rght}{rght}{rght}{rght}abbruch":end:bend
+  330 bend
+  340 print"{down}     installieren des boot-sektors
+  345 print"    bitte entfernen sie einen evtl.
+  350 print"     vorhandenen schreibschutz und
+  360 print"        druecken sie eine taste
+  370 getkeyx$
+  380 print#15,"b-p 8 0"
+  390 print#8,chr$(67);chr$(66);chr$(77);a$;a$;a$;a$;name$;a$;
+  400 print#8,a$;chr$(dec("20"));chr$(dec("4d"));chr$(dec("ff"));a$
+  410 print#15,"u2:";8;0;1;0
+  415 iflc=0thenprint#15,"b-a 0 1 0"
+  420 close8:close15
+  430 print"    boot-sector installiert":end
+

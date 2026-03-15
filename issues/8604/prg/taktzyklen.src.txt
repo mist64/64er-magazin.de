@@ -1,0 +1,82 @@
+
+
+;taktzyklen.src.prg ==0801==
+  100 sys9*4096
+  110 .opt oo
+  120 ;
+  130 ;
+  140 ; taktzyklen eines
+  150 ; maschinenprogramms messen
+  160 ;
+  170 ;
+  180 ; von  mark richters
+  190 ;      allerstr.4
+  200 ;      2806 oyten
+  210 ;      tel. 04207/1870
+  220 ;
+  230 ;
+  240 *=$c000
+  250 ;
+  260 fac      =$62   ;fliesskomma-akku
+  270 frmnum   =$ad8a ;ausdruck holen
+  280 chkcom   =$aefd ;auf komma pruefen
+  290 getadr   =$b7f7 ;2-byte integer
+  300 vicctrl  =$d011 ;reg. fuer bs aus
+  310 raster   =$d012 ;raster-zeile
+  320 timer    =$dd04 ;timer a lo-byte
+  330 cra      =$dd0e ;timer a control
+  340 crb      =$dd0f ;timer b control
+  350 ;---------------
+  360 jsr chkcom      ;startadresse der
+  370 jsr frmnum      ;zu messenden
+  380 jsr getadr      ;routine holen
+  390 sty jsubr+1     ;und als sprung-
+  400 sta jsubr+2     ;adresse speichern
+  410 ;
+  420 sei             ;irq sperren
+  430 lda #%00001011  ;bildschirm aus
+  440 sta vicctrl
+  450 wait lda raster ;warten bis bild-
+  460 bne wait        ;schirm ganz aus
+  470 ;
+  480 ldx #3          ;beide timer auf
+  490 lda #$ff        ;maximalwert
+  500 settimer sta timer,x
+  510 dex
+  520 bpl settimer
+  530 ;
+  540 lda #%00010001  ;timer koppeln,
+  550 ldx #%01010001  ;laden und starten
+  560 stx crb
+  570 sta cra
+  580 ;---------------
+  590 jsubr jsr $ffff ;sprung auf routine
+  600 ;---------------
+  610 ldy #0          ;beide timer stop
+  620 sty cra
+  630 sty crb
+  640 lda #%00011011  ;bildschirm wieder
+  650 sta vicctrl     ;an
+  660 cli             ;irq wieder frei-
+  670 ;
+  680 sec             ;4 timer-bytes
+  690 lda timer       ;umrechnen
+  700 eor #$ff        ;fuer aufruf be-
+  710 sbc #11         ;noetigte zyklen
+  720 sta fac+3       ;abziehen
+  730 ldx #3          ;und die restlichen
+  740 ;
+  750 l1 lda timer+1,y;3 timer-werte
+  760 eor #$ff        ;anpassen
+  770 sbc #0
+  780 sta fac-1,x
+  790 iny
+  800 dex
+  810 bne l1
+  820 ;
+  830 sec
+  840 txa             ;4 byte werten
+  850 ldx #$a0        ;ohne vorzeichen
+  860 jsr $bc4f       ;in fliesskommazahl
+  870 jmp $bdd7       ;fac ausgeben/rts
+

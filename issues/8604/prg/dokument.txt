@@ -1,0 +1,26 @@
+
+
+;dokument.prg ==0801==
+   10 rem ****** dokument ******
+   20 poke53280,0:poke53281,0:diman$(16),as$(16),ae$(16),ad$(16)
+   30 input"{clr}{wht}geraetenummer 3=bild,4=drucker ";g
+   40 input"{down}startmodul:";sm
+   50 input"{down}endmodul:";em:print"{clr}";
+   60 fori=smtoem:gosub 500
+   70 open 1,g:i$=str$(i)+")  "
+   80 print#1,left$(i$,4);:a$=" "
+  100 for k=1toab:ifk<>1thena$="     "
+  110 print#1,a$;an$(k)"        "as$(k)" - "ae$(k)"     "ad$(k)
+  120 next
+  130 print#1,"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}":close1
+  135 if g=3thenprint"{down}         weiter mit taste !!":poke198,0:wait198,1:print
+  140 next
+  150 ifg=3then60
+  160 end
+  500 rem **** subr. parameter holen ****
+  505 na$=mid$(str$(i),2,4)+"modul,s,r"
+  510 open 1,8,3,na$
+  520 input#1,ab$:ab=val(ab$)
+  530 for k=1 to ab
+  540 input#1,an$(k),as$(k),ae$(k),ad$(k):next:close1:return
+

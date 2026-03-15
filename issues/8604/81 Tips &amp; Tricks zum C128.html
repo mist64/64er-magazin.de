@@ -32,6 +32,36 @@
 
         <p>Zum Schluß möchte ich noch auf einen Fehler im Betriebssystem hinweisen: Betätigt man, während der 40-Zeichen-Bildschirm gescrollt wird, die ASCII/DIN-Taste, so erscheint sehr oft in etwa der Mitte des Bildschirms ein Zeichensalat. Disassembliert ergeben die ASCII-Werte ein Programm, das auch in der erweiterten Zeropage zu finden ist.</p>
 
+        <!-- Eingetippt von Patrick Georgi -->
+        <figure>
+            <pre>
+  $0FFD0         SEI            ;IRQ aus
+  $0FFD1         LDA #$3E       ;Wert für »I/O ein«
+  $0FFD3         STA $FF00      ;in Konf. Register
+  $0FFD6         LDA #$B0       ;Wert für »Z80 ein«
+  $0FFD8         STA $D505      ;in Mode Konf. Reg. Kurz: Einschalten
+  $0FFDB         NOP
+  $0FFDC         JMP $1100      ;muß auf eigene Routine verbogen werden
+
+Wichtig: Die Z80-CPU beginnt ihre Arbeit bei $0FFED!</pre>
+            <figcaption>Listing 1. So wird die Z80-CPU eingeschaltet</figcaption>
+        </figure>
+
+        <figure>
+            <pre>
+  $0FFE0            DI                ;IRQ aus
+  $0FFE1            LD A,$3E          ;Wert für »I/O ein«
+  $0FFE3            LD $FF00,A        ;in Konf. Reg
+  $0FFE6            LD BC,$D505       ;Mode Konfigurations Register
+  $0FFE9            LD A,$B1          Wert für »8502 ein«
+  $0FFEB            OUT (C),A         ;Einschalten
+  $0FFED            NOP
+  $0FFEE            RST $08           ;Weiter bei $0008
+
+Wichtig: Die 8502-CPU beginnt ihre Arbeit bei $0FFDB!</pre>
+            <figcaption>Listing 2. Ein Z80-Programm, um die 8502-CPU wieder einzuschalten</figcaption>
+        </figure>
+
         <address class="author">(Frank Probst/tr)</address>
 
         <h2>»PRINT AT« oder »CHAR«?</h2>

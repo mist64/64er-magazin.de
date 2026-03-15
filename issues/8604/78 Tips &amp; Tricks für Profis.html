@@ -44,6 +44,12 @@
 
         <p>Um zu zeigen, was man mit diesem Programm alles in einer Zeile unterbringen kann, habe ich folgende drei »Einzeiler« geschrieben:</p>
 
+        <figure>
+            <pre data-filename="ex-line.prg" data-name="Ex-Line" data-mse=mse1></pre>
+            <figcaption>Listing 1. »Ex-Line«. Bitte mit dem MSE eingeben</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="ex-line.prg" data-name="Ex-Line"></div>
+
         <h3>1. SOFT FLASH:</h3>
 
         <p>Dieser Einzeiler (Listing 2) bewirkt, daß die rote LED am Diskettenlaufwerk scheinbar stufenlos ein- und ausgeschaltet wird. Wenn man das Programm mit Hilfe von »EX-LINE« eingegeben hat, kann man mit »PRINT PEEK(2)« die Prüfsumme abfragen. Diese sollte 180 betragen.<br>
@@ -52,6 +58,11 @@
         <p>In der FOR-NEXT-Schleife wird ein Maschinenprogramm mittels »Memory-Write« in das RAM der Floppy ab $0500 geschrieben. Der Floppy-Befehl »UC« bewirkt dann, daß dieses gestartet wird. Das Maschinenprogramm schaltet die LED so schnell an und aus, daß dies für das Auge nicht sichtbar ist. Dabei ändert sich die Länge der Hell- und Dunkelphase, so daß es scheint, als ob die Lampe langsam hell und dunkel würde.</p>
 
         <p>Weil das Programm als Endlosschleife geschrieben ist, läßt sich das Laufwerk nicht mehr ansprechen. Wenn man die Floppy weiter verwenden will, muß man sie vorher aus- und anschalten.</p>
+
+        <figure>
+            <pre data-filename="soft flash" data-name="Soft Flash"></pre>
+            <figcaption>Listing 2. »Soft Flash« läßt die rote LED der Floppy stufenlos ein- und ausschalten. Zur Eingabe bitte Listing 1 verwenden.</figcaption>
+        </figure>
 
         <h3>2. STRICH-CURSOR:</h3>
 
@@ -62,12 +73,29 @@
 
         <p>Bevor man nun den Originalzeichensatz bei $D000 mit »POKE 1,3« lesbar machen kann, muß noch der Interrupt mit »POKE 56333,1« ausgeschaltet werden. Die erste FOR-NEXT-Schleife kopiert den Bildschirm an seine neue Position. Die zweite Schleife kopiert den Zeichensatz ins RAM. Dabei werden die reversen Zeichen so verändert, daß nur die unterste Reihe revers erscheint. Die folgenden POKEs bewirken schließlich, daß der Interrupt eingeschaltet wird und der I/O-Bereich bei $D000 wieder ansprechbar ist.</p>
 
+        <figure>
+            <pre data-filename="strich-cursor" data-name="Strich-Cursor"></pre>
+            <figcaption>Listing 3. »Strich-Cursor«. Verleiht Ihrem Cursor ein äußerst professionelles Aussehen</figcaption>
+        </figure>
+
         <h3>3. UPSIDE-DOWN:</h3>
 
         <p>Dieses Programm habe ich in zwei Versionen geschrieben, da es als Einzeiler (Listing 4) sehr schwer abzutippen ist. Die zweite Version (Listing 5) wird mit dem MSE eingegeben (die Prüfsumme für den Einzeiler lautet 76). Beide Versionen können einfach mit »RUN« gestartet werden. Danach erscheint der ganze Bildschirm »auf den Kopf gestellt«. Dies bezieht sich auf alle Ein- und Ausgaben. Auch Zeichen, die mit »POKE« auf den Bildschirm gebracht werden, erscheinen an der entsprechenden anderen Stelle auf dem Kopf. Die meisten Programme vertragen sich damit gut, da nur der IRQ-Vektor verändert wird. Nach einem Reset oder RUN/STOP-RESTORE kann das Programm mit »SYS 300« wieder aktiviert werden.<br>
             Programmbeschreibung:</p>
 
         <p>Das Maschinenprogramm, das bei dem Einzeiler mittels »PRINT« auf den Bildschirm gebracht wird, kopiert zunächst eine Interruptroutine in den Stack ab Adresse 300. (Dieser Bereich ist besonders geeignet, da er nach einem Reset nicht gelöscht wird und ein Programm dort nicht stört.) Dann wird der gesamte Zeichensatz auf den Kopf gestellt und in das RAM bei $D000 kopiert. Der VIC wird veranlaßt, den Zeichensatz aus $D000 und den Bildschirm aus $E000 zu lesen, und schließlich wird die Interruptroutine aktiviert, die 60mal in der Sekunde den Bildschirm umgekehrt nach $E000 kopiert.</p>
+
+        <figure>
+            <pre data-filename="upside-down.prg" data-name="Upside-Down (Einzeiler)" data-mse=mse1></pre>
+            <figcaption>Listing 4. »Upside-Down«. Dreht den Bildschirm um 180 Grad! Beachten Sie bitte die Eingabehinweise im Text.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="upside-down.prg" data-name="Upside-Down (Einzeiler)"></div>
+
+        <figure>
+            <pre data-filename="upside-down v2.prg" data-name="Upside-Down V2" data-mse=mse1></pre>
+            <figcaption>Listing 5. »Upside-Down V2«. Listing 4 als MSE-Dump</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="upside-down v2.prg" data-name="Upside-Down V2"></div>
 
         <address class="author">(H. C. Edelmann/tr)</address>
 
@@ -90,6 +118,13 @@
         <p>Jetzt sucht das Programm die Blöcke heraus, die addiert die vorher eingegebene Summe ergeben. Damit keine gleichen Zahlenfolgen auf dem Bildschirm erscheinen, sortiert das Programm solche Zahlenfolgen, die bereits schon einmal gefunden wurden, aus. Nach einer Weile sehen wir, daß es mehrere Kombinationen gibt, diese Programme platzsparend auf wenigen Disketten unterzubringen. Wir suchen uns die passenden aus und erhalten durch geschicktes Umkopieren der Programme auf eine oder mehrere Disketten brauchbaren Speicherplatz. Hätten Sie gedacht, daß man mit diesen 13 Programmen so viele verschiedene Möglichkeiten hat, eine Diskette randvoll zu füllen? Die Bedeutung der »Versuche«-Anzeige im Fenster oben links wird in der Programmbeschreibung erklärt. Das Programm sucht so lange nach neuen Folgen, bis Sie durch Drücken der START-/STOP-Taste »S« neu beginnen.</p>
 
         <p>Da das Basic-Programm relativ langsam arbeitet, empfiehlt es sich, es zu compilieren. Erst bei 3- bis 4mal schnellerer Bearbeitungsgeschwindigkeit wird man es gern einsetzen. Die Programmservice-Diskette enthält neben der Basic- auch die compilierte Version.</p>
+
+        <figure>
+            <pre data-filename="disk-optimizer" data-name="Disk-Optimizer"></pre>
+            <figcaption>Listing 6. »Disk-Optimizer«. Nützen Sie die vorhandenen Diskettenkapazitäten voll aus!</figcaption>
+        </figure>
+
+        <div class="binary_download" data-filename="c_disk-optimizer.prg" data-name="Disk-Optimizer (compiliert)"></div>
 
         <address class="author">(Martin Boels/tr)</address>
 
@@ -171,6 +206,17 @@
         <p class="source">Drittens: Man kann sogar ein LoRes-Bild, das mit einem anderen Zeichensatz erstellt wurde, weiterverarbeiten! Der Konvertierungsroutine muß nur die Basisadresse des neuen Zeichensatzes mitgeteilt werden. Das High-Byte wird in die Speicherstelle 828 + 55 geschrieben, das Low-Byte muß $00 sein, braucht also nicht extra geändert zu werden.</p>
 
         <p>Das Basic-Programm (Listing 8) ist äquivalent zu dem Maschinen. Interessant ist der Zeitvergleich: In Basic dauert die Hi-Res-Übertragung 2:13 min, in Maschinensprache 0,4 s! Die Basic-Version ist daher weniger zum Abtippen, sondern vielmehr zum leichten Verstehen des Algorithmus gedacht.</p>
+
+        <figure>
+            <pre data-filename="lores zu hires.prg" data-name="LoRes zu HiRes" data-mse=mse1></pre>
+            <figcaption>Listing 7. »LoRes zu HiRes«. Bitte mit dem MSE eingeben</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="lores zu hires.prg" data-name="LoRes zu HiRes"></div>
+
+        <figure>
+            <pre data-filename="algorithm. lo_hi" data-name="Algorithmus LoRes zu HiRes"></pre>
+            <figcaption>Listing 8. Der grundlegende Algorithmus von Listing 7</figcaption>
+        </figure>
 
         <address class="author">(Martin Boels/tr)</address>
     </article>

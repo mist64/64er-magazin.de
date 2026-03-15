@@ -1,0 +1,198 @@
+
+
+;lms.bas.prg ==0801==
+  100 rem ------ lms-auswerteprogramm v2.0
+  101 rem ------- 11/85  (c) franz stoiber
+  110 print chr$(14);chr$(8): poke 808,225: zf=6
+  120 e$="{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} Ende {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  130 poke 53280,15: poke 53281,15: poke 646,zf: gosub 1440
+  140 bl$="                                        "
+  150 ra=53248: pu=253: l=22: cl=985.248: r=.05
+  160 k0=2^8: k1=2^16: k2=2^24: k3=2^32: k4=k1-1: k5=63999: k6=10
+  170 rd=40679: at=40710: ab=40535: nr=40918
+  180 p1=40926: p2=p1+1: p3=p1+2: p4=p1+3: p5=p1+4: p6=p1+5: p7=p1+6: p8=p1+7
+  200 j=0: k=80: p=ra
+  210 kz$="      Nr   Anz        msek    msek/Anz"
+  220 sys at,6,5,"Messung ..............   m"
+  230 sys at,6,7,"Anzeige ab Nr ........   a"
+  240 sys at,6,9,"Vorhergehende Seite ..   ^"
+  250 sys at,6,11,"Naechste Seite ....... return"
+  260 sys at,6,13,"Summe ................   s"
+  270 sys at,6,15,"Drucken ..............   d"
+  280 sys at,6,17,"Hilfe ................   h"
+  290 sys at,6,19,"Ende .................   e"
+  300 poke 198,0: sys at,0,24,"{rvon}    Weiter mit: m/a/^/return/s/d/h/e   {rvof}";
+  310 poke 2023,160: poke 56295,zf
+  320 get a$: if a$="" then 320
+  330 if a$="m" then 430
+  340 if a$="a" then 450
+  350 if a$="^" then 490
+  360 if a$=chr$(13) then 540
+  370 if a$="s" then 570
+  380 if a$="d" then 720
+  390 if a$="h" then 1010
+  400 if a$="e" then 1030
+  410 goto 300
+  420 rem ------------------------ messung
+  430 poke 808,237: print chr$(9);"{clr}";: sys 40160
+  440 rem --------------------- anzeige ab
+  450 gosub 1930: if f then 300
+  460 gosub 1440: gosub 1480
+  470 p=p-8: gosub 1130: goto 300
+  480 rem ------------------------ zurueck
+  490 gosub 1930: if f then 300
+  500 p=p-(zz+l-1)*8
+  510 if p<ra then p=ra
+  520 gosub 1130: goto 300
+  530 rem ---------------------------- vor
+  540 gosub 1930: if f then 300
+  550 gosub 1130: goto 300
+  560 rem -------------------------- summe
+  570 gosub 1930: if f then 300
+  580 gosub 1440
+  590 sys at,5,4,"Summe": sys at,5,5,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  600 gosub 1480: gosub 1580
+  610 p=p-8: s=0
+  620 gosub 1080
+  630 if z>zb then 670
+  640 gosub 1370
+  650 s=s+t: sys at,30,10,z
+  660 goto 620
+  670 sys at,30,10,"      "
+  680 t=s: t$="": gosub 1400
+  690 sys at,5,17,"Summe =";t$;" msek"
+  700 p=ra: goto 300
+  710 rem ------------------------ drucken
+  720 gosub 1930: if f then 300
+  730 gosub 1440
+  740 sys at,5,4,"Drucken": sys at,5,5,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  750 gosub 1480: gosub 1580: p=p-8: s=0
+  760 sys at,5,15,"Drucker O.K. ?"
+  770 sys at,5,16,"Weiter mit beliebiger Taste"
+  780 poke 198,0: wait 198,1: poke 198,0
+  790 open 4,4,7: poke 768,185: print#4,"";: poke 768,139
+  800 if st then sys at,8,22,"{rvon} Drucker nicht bereit {rvof}": close 4: goto 300
+  810 if k<80 then pl$="": gosub 1830: goto 830
+  820 sys at,0,15,bl$;: sys at,0,16,bl$;
+  830 f=0: pl$=""
+  840 gosub 1080
+  850 if z>zb then 960
+  860 gosub 1320
+  870 gosub 1370
+  880 s=s+t: t$="": b$="            "
+  890 gosub 1400
+  900 if az<2 then 920
+  910 b$="": t=t/az: az=0: goto 890
+  920 pl$=pl$+"  "+z$+az$+t$+b$
+  930 if f=0 then f=1: goto 840
+  940 gosub 1830
+  950 goto 830
+  960 if f then gosub 1830
+  970 t=s: t$="": gosub 1400
+  980 pl$="       Summe ="+t$+" msek": gosub 1830
+  990 close 4: p=ra: goto 300
+ 1000 rem ------------------------- hilfe
+ 1010 gosub 1440: goto 220
+ 1020 rem -------------------------- ende
+ 1030 gosub 1440: sys at,5,13,"Bitte Ende bestaetigen (j/n): {rvon} {rvof}";
+ 1040 get a$: if a$="" then 1040
+ 1050 if a$="j" then sys at,35,13,"j": sys 64738
+ 1060 sys at,0,13,bl$;: goto 220
+ 1070 rem ----------  werte aus ram lesen
+ 1080 p=p+8: ph=int(p/k0): pl=p-ph*k0
+ 1090 poke pu,pl: poke pu+1,ph: sys rd
+ 1100 z=peek(p1)+peek(p2)*k0
+ 1110 return
+ 1120 rem -----------  ausgabe bildschirm
+ 1130 print "{clr}{rvon}    Nr   Anz        msek    msek/Anz    "
+ 1140 m1=0: m2=0: c1$=" ": c2$=" "
+ 1150 for zz=1 to l
+ 1160 :gosub 1080
+ 1170 :if z=k4 then p=p-8: print e$;: goto 1280
+ 1180 :gosub 1320
+ 1190 :gosub 1370
+ 1200 :if t>m1 then m1=t: l1=zz: c1$="_"
+ 1210 :t$=""
+ 1220 :gosub 1400
+ 1230 :if az<2 then 1260
+ 1240 :t=t/az: if t>m2 then m2=t: l2=zz: c2$="_"
+ 1250 :az=0: goto 1220
+ 1260 :print z$;az$;t$
+ 1270 next
+ 1280 if c1$="_" then sys at,24,l1+1,c1$;
+ 1290 if c2$="_" then sys at,36,l2+1,c2$;
+ 1300 return
+ 1310 rem ----------  aufbereitung nr,anz
+ 1320 z$=right$("     "+str$(z),6)
+ 1330 az=peek(p3)+peek(p4)*k0
+ 1340 az$=right$("     "+str$(az),6)
+ 1350 return
+ 1360 rem ---------------  zeit errechnen
+ 1370 t=(peek(p5)+peek(p6)*k0+peek(p7)*k1+peek(p8)*k2)/cl
+ 1380 return
+ 1390 rem ------------  aufbereitung zeit
+ 1400 tr=t+r: th=int(tr): tl=int((tr-th)*k6)
+ 1410 t$=t$+right$("         "+str$(th),10)+"."+right$(str$(tl),1)
+ 1420 return
+ 1430 rem -------------------  kopfzeilen
+ 1440 print "{clr}{rvon}  Laufzeit  -  Mess  -  System   V2.0   ";
+ 1450 print "{rvon}  (c) 11/85 {$a0}Franz Stoiber              "
+ 1460 return
+ 1470 rem ----------  eingabe zeilennr ab
+ 1480 ro=8: sys at,5,ro,"Ab Nr  ?  ";: gosub 1650
+ 1490 if a$="     " then za=0: sys at,14,ro,za: goto 1520
+ 1500 za=val(a$): if za<=k5 then sys at,0,22,bl$;: goto 1520
+ 1510 sys at,6,22,"{rvon}    Zeilennummer zu gross    {rvof}";: goto 1480
+ 1520 zh=int(za/k0): zl=za-zh*k0: poke nr,zl: poke nr+1,zh
+ 1530 sys ab: p=peek(pu)+peek(pu+1)*k0
+ 1540 p=p-8: gosub 1080
+ 1550 if z<k4 then return
+ 1560 sys at,6,22,"{rvon} Zeilennummer nicht gefunden {rvof}";: goto 1480
+ 1570 rem ---------  eingabe zeilennr bis
+ 1580 ro=10: sys at,5,ro,"Bis Nr ?  ";: gosub 1650
+ 1590 if a$="     " then zb=k5: sys at,14,ro,zb: return
+ 1600 zb=val(a$): if zb>=za then 1620
+ 1610 sys at,5,22,"{rvon}  Zeilennr bis < Zeilennr ab  {rvof}";: goto 1580
+ 1620 if zb>k5 then zb=k5
+ 1630 sys at,0,22,bl$;: return
+ 1640 rem ----------------  zahl eingeben
+ 1650 n=1: rc=1024+14+40*ro: co=rc+54272: poke 198,0
+ 1660 for i=1 to 5: poke co+i,zf: next
+ 1670 if n>5 then n=5
+ 1680 if n<1 then n=1
+ 1690 po=rc+n: poke po,peek(po)+128
+ 1700 get c$: if c$="" then 1700
+ 1710 if c$>="0" and c$<="9" then poke po,asc(c$): n=n+1: goto 1670
+ 1720 if c$=chr$(157) then poke po,peek(po)-128: n=n-1: goto 1670
+ 1730 if c$=chr$(29) then poke po,peek(po)-128: n=n+1: goto 1670
+ 1740 if c$=chr$(20) then sys at,15,ro,"     ";: goto 1650
+ 1750 if c$=chr$(13) then poke po,peek(po)-128: goto 1770
+ 1760 goto 1700
+ 1770 a$=""
+ 1780 for i=1 to 5
+ 1790 :a$=a$+chr$(peek(rc+i))
+ 1800 next
+ 1810 return
+ 1820 rem ----------------  zeile drucken
+ 1830 if k<68 then 1900
+ 1840 if k<73 then print# 4,"": k=k+1: goto 1840
+ 1850 j=j+1: print# 4,"": print# 4,""
+ 1860 print# 4,"   Laufzeit - Mess - System  V2.0";
+ 1870 print# 4,"     (c) Franz Stoiber 11/85      Seite: ";right$(str$(j+100),2)
+ 1880 print# 4,"": print# 4,"": print# 4,kz$;kz$: print# 4,""
+ 1890 k=8
+ 1900 print# 4,pl$: k=k+1
+ 1910 return
+ 1920 rem -------------- test auf messung
+ 1930 pp=p: f=0: p=ra-8: a$=""
+ 1940 gosub 1080
+ 1950 for i=p1 to p8: a$=a$+chr$(peek(i)): next
+ 1960 if a$="lms-f.s." then 1990
+ 1970 sys at,6,22,"{rvon} Keine Messung gelaufen ! {rvof}"
+ 1980 f=1: return
+ 1990 gosub 1080
+ 2000 if z<k4 then p=pp: return
+ 2010 sys at,6,21,"{rvon} Waehrend der Messung war "
+ 2020 sys at,6,22,"{rvon}  kein Programm geladen!  {rvof}"
+ 2030 goto 1980
+
