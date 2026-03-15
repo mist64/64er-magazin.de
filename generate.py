@@ -17,7 +17,7 @@ import pytz
 import argparse
 import gzip
 import lunr
-from tools import mse, checksummer
+from tools import mse, checksummer, hypra_ass_decode
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
@@ -666,7 +666,22 @@ class Issue:
           data_availability = tag.get("data-availability")
           data_checksummer = tag.get("data-checksummer")
           data_mse = tag.get("data-mse")
-          if data_mse and data_filename:
+          data_hypraass = tag.get("data-assembler")
+          if data_hypraass and data_filename:
+              topass = data_hypraass == "top-ass"
+              if topass:
+                  # Top-Ass: .prg in prg/ is the master
+                  asm_bin = listings_bin[data_filename + '.prg'][0]
+              else:
+                  # Hypra-Ass: .txt in prg/ is the master, use petcat2prg binary
+                  asm_bin, basicver = listings_bin[data_filename]
+              lines = hypra_ass_decode.decode_bytes(asm_bin, topass=topass)
+              listing = "\n".join(lines)
+              listing = listing.replace("&", "&amp;")
+              listing = listing.replace("<", "&lt;")
+              tag.string = listing
+
+          elif data_mse and data_filename:
               data = listings_bin[data_filename][0]
               start = data[0] | (data[1] << 8)
               end = start + (len(data) - 2)
