@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Das Maß der Dinge</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Mark Richters, Franz Stoiber, og">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="85-89">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Das Maß der Dinge</h1>
+        <p class="intro">Das exakte Ausmessen eines Unterprogrammes ist eine große Hitfe, um Laufzeiten zu verringern. Meist steht jedoch keine hinreichend genaue Uhr zur Verfügung. Wir bieten Ihnen zwei Lösungen an, eine für Maschinensprache- und eine für Basic-Programme.</p>
+
+        <p>Um die Laufzeiten von Programmen genau messen zu können, reicht die Stoppuhr für den 100-Meter-Lauf nicht mehr aus. Vor allem bei Maschinenprogrammen, bei denen die menschliche Reaktionsfähigkeit weit hinter der geforderten Genauigkeit bleibt. Doch auch die eingebaute interruptgesteuerte Uhr TI$ im C 64 versagt, wenn es um das Auszählen sehr kurzer Maschinenprogramme geht. Ladevorgänge können damit überhaupt nicht erfaßt werden, da TI$ während des Ladens stillsteht. Abhilfe schaffen hier die Timer der CIAs.</p>
+
+        <h2>Taktzyklen zählen</h2>
+
+        <p>Um Maschinensprache-Programme zu messen, ist es am besten, die Taktzyklen zu zählen. Dies liefert einen gut zu vergleichenden Wert. Geben Sie zunächst das Programm »Taktzyklen« (Listing 1) mit dem MSE ein und speichern Sie es. Aufgerufen wird die Routine durch den Befehl SYS49152,Startadresse <RETURN>
+        </p>
+
+        <p>Die anzugebende Startadresse entspricht der des zu untersuchenden Maschinenprogrammes. Dieses Unterprogramm wird nun ausgeführt und die dafür benötigte Zeit bestimmt. Während dieses Ablaufes ist der Bildschirm ausgeblendet, er nimmt die Farbe des Rahmens an. Am Ende des zu messenden Programmes muß ein RTS stehen. Nach Programmende gibt das Programm den gemessenen Wert aus und springt in den Direkt-(READY.-)Modus. Der angezeigte Zahlenwert drückt die Anzahl der Systemtakte aus, die während der Abarbeitung des Maschinen-Unterprogrammes durch den Mikroprozessor verstrichen sind. Da ein solcher Takt etwa 1,015 Mikrosekunden dauert, läßt sich durch Multiplizieren mit diesem Faktor die benötigte Zeit in Mikrosekunden errechnen. Bei eingeschaltetem Bildschirm vergrößert sich das Ergebnis um etwa 5 bis 6 Prozent.</p>
+
+        <h2>Beschreibung des Programms »Taktzyklen«</h2>
+
+        <p>Die beim Aufruf des Programms übergebene Startadresse des zu messenden Unterprogramms wird als Operand für einen Sprungbefehl gespeichert. Anschließend wird die Möglichkeit der Unterbrechung durch einen IRQ ausgeschaltet, weil sonst ein falsches Resultat geliefert werden kann. Nach dem Ausblenden des Bildschirms lädt das Programm beide Timer des CIA 2 mit dem Maximalwert und koppelt sie miteinander. Sobald die Zähler gestartet sind, erfolgt der Sprung in das Unterprogramm, nach dessen Ende die Zähler sofort wieder gestoppt werden. Schließlich werden neben der Einrichtung des Normalzustandes — den Bildschirm und den IRQ betreffend — die Timer-Bytes ausgewertet. Dazu invertiert das Programm sämtliche Bits der von den Timern gelieferten Werte, da beide Registerpaare heruntergezählt werden. Zusätzlich werden noch elf Takte subtrahiert, die zum Starten beziehungsweise Stoppen der Timer und zum Aufruf des Unterprogramms nötig sind. Damit erhält man einen Meßbereich, der zwischen 1 und 2<sup>32</sup>-11 Taktzyklen (entsprechend einer Zeit von 1 µs bis 1 Stunde 12 Minuten) liegt.</p>
+
+        <h2>Laufzeit-Meß-System »LMS«</h2>
+
+        <p>Das LMS wurde entwickelt, um die Laufzeit von Basic-Programmen zeilenbezogen messen zu können. Weiterhin sollte die Anzahl einzelner Aufrufe von Programmzeilen festgestellt werden können.</p>
+
+        <h2>Einsatzmöglichkeiten</h2>
+
+        <p>Das LMS ist im wesentlichen als Werkzeug für folgende Anwendungsfälle konzipiert.<br>
+            1. Performance-Verbesserung von Basic-Programmen</p>
+
+        <p>Durch den Einsatz des LMS ist sofort erkennbar, wo die zeitmäßig kritischen Stellen eines Programms sind. Oft kann durch einige Veränderungen von Basic-Statements wertvolle Laufzeit eingespart werden. Sollte das nicht ausreichen, so ist der Einsatz von Maschinenroutinen angebracht.</p>
+
+        <p>Die Erfahrung zeigt, daß es selten notwendig ist, ein Programm vollständig in Assembler zu schreiben. Meist bringt ein begrenzter Einsatz von Maschinenroutinen an zeitkritischen Stellen ausreichende Geschwindigkeit unter Beibehaltung der Vorteile von Basic. Diese sind vor allem wesentlich bessere Lesbarkeit und Wartung sowie geringerer Erstellungsaufwand .<br>
+            2. Testhilfe</p>
+
+        <p>Das Laufzeit-Meß-System stellt die Anzahl der Aufrufe von Basic-Zeilen fest. Es ist daher damit leicht überprüfbar, ob Programmzeilen überhaupt durchlaufen werden und wenn ja, ob die Anzahl der Aufrufe stimmt.</p>
+
+        <p>Mit dem LMS können auch Statements gemessen werden, die mit TI$ — abgesehen von der geringen Genauigkeit von TI$ — zu erfassen sind (zum Beispiel INPUT#).</p>
+
+        <h3>Bedienungsanleitung</h3>
+
+        <p>Geben Sie zuerst die Listings 3 bis 5 ein und speichern Sie diese auf einer Diskette. Nach dem Laden und Starten des Programms »LMS« erscheint nach kurzer Zeit ein Menü mit folgenden Wahlmöglichkeiten:</p>
+
+        <h3>Messen (m)</h3>
+
+        <p>Durch die Auswahl der Funktion »Messen« wird das eigentliche Meßprogramm aktiviert. Dies ist immer erkennbar an der roten Rahmenfarbe. Es wird eine Einschaltmeldung geschrieben und danach in den READY-Modus verzweigt. Jetzt muß das zu messende Programm eingegeben oder geladen werden.</p>
+
+        <p>Bei jedem Start des Programms werden für jede Programmzeile Laufzeit und Aufrufanzahl gespeichert. Wichtig ist, daß das Programm mit RUN gestartet wird. Ein Start mit GOTO oder CONT ist möglich, führt aber nicht zur Messung.</p>
+
+        <p>Durch die Eingabe von END im READY-Modus wird das Meßprogramm interaktiv, und es verzweigt anschließend wieder zum Hauptmenü, in dem die Meßergebnisse des letzten Programmlaufs ausgewertet werden können.</p>
+
+        <h3>Anzeige ab Nr. (a)</h3>
+
+        <p>Diese Funktion gestattet die Eingabe einer Zeilennummer, ab der die Meßergebnisse am Bildschirm angezeigt werden.</p>
+
+        <p>Der Bildschirm zeigt die jeweilige Zeilennummer, die Anzahl der Aufrufe dieser Zeile und die Gesamtverweilzeit des Basic-Interpreters in dieser Zeile. Bei einer Aufrufanzahl größer als eins wird zusätzlich die durchschnittliche Laufzeit pro Aufrufangezeigt.</p>
+
+        <p>Die jeweils größte Laufzeit ist zur leichteren Orientierung durch »*-« markiert.</p>
+
+        <h3>Vorhergehende Seite (↑)</h3>
+
+        <p>Durch Drücken der Taste (t) wird die Ausgabe am Bildschirm um eine Seite zurückgeblättert.</p>
+
+        <h3>Nächste Seite (RETURN)</h3>
+
+        <p>Die Bildschirmausgabe wird mit »RETURN« um eine Seite weitergeblättert.</p>
+
+        <h3>Summe (s)</h3>
+
+        <p>Diese Funktion erlaubt die Berechnung der Programmlaufzeit bezogen auf einen einzugebenden Zeilenbereich.</p>
+
+        <h3>Drucken(d)</h3>
+
+        <p>Die Auswahl dieser Funktion bewirkt die Ausgabe der Meßergebnisse auf Drucker. Durch die Angabe von Zeilennummern kann der Ausgabebereich eingegrenzt werden.</p>
+
+        <h3>Hilfe (h)</h3>
+
+        <p>Das Menü wird angezeigt.</p>
+
+        <h3>Ende (e)</h3>
+
+        <p>Der Computer wird nach Bestätigung der Auswahl in den Einschaltzustand versetzt.</p>
+
+        <p>Wird bei der Eingabe einer Zeilennummer nur »RETURN« gedrückt, so wird die Zeilennummer ab inklusive 0 und die Zeilennummer bis inklusive 63999 angenommen.</p>
+
+        <h3>Hinweise</h3>
+
+        <p>Das Meßverfahren kann auf Programme mit bis zu 1022 Zeilen angewandt werden. Der Basic-Speicher ist auf zirka 30 KByte verkürzt. Die maximal erfaßbare Anzahl von Zeilenaufrufen beträgt 65535. Die maximal meßbare Laufzeit pro Zeile beträgt etwa 72 Minuten.</p>
+
+        <p>Wenn das LMS aktiviert ist, braucht es etwa 0,9 Millisekunden (ms) pro Zeilenaufruf. Dies führt zu einer Verlängerung der Programmlaufzeit während der Messung. Die Meßergebnisse sind jedoch Netto-Laufzeiten; das heißt die angezeigten Zeiten entsprechen den Laufzeiten ohne Meßprogramm. Es ist zu beachten, daß Programmschleifen innerhalb einer Basic-Zeile vom LMS nicht erkannt werden. Dies liegt an der zeilenorientierten Arbeitsweise des LMS.<br>
+            10 GET A$: IF A$="" THEN 10<br>
+            ergibt als Anzahl der Aufrufe der Zeile 10 die Zahl 1.</p>
+
+        <p>Um die exakte Aufrufanzahl zu erhalten, muß die Zeile geteilt werden.<br>
+            10 GET A$<br>
+            20 IFA$="" THEN 10<br>
+            ergibt die genaue Anzahl der Aufrufe.</p>
+
+        <p>Die gleiche Vorgangsweise ist auch für Zeilen angebracht, in denen nach einem GOSUB noch weitere Statements folgen. In diesem Fall wird nämlich nach der Rückkehr vom Unterprogramm die Aufrufanzahl der Zeile um 1 erhöht. Die ausgewiesene durchschnittliche Laufzeit ist in diesem Fall mit Vorsicht zu genießen.</p>
+
+        <p>Im Rahmen von mehreren Messungen an einem Programm treten in der Regel unterschiedliche Laufzeiten für dieselben Statements auf. Diese zunächst etwas verblüffende Feststellung hat ihre Ursache darin, daß für die Abarbeitung eines Basic-Befehls nicht immer die gleiche Anzahl von Instruktionen durchlaufen wird. Dies ergibt sich zum Beispiel durch Bildschirm-Scrolling, Interrupt-Behandlung oder Garbage Collection. Bei der Festlegung der Meßgenauigkeit wurde diese Tatsache berücksichtigt; das heißt nicht aussagekräftige Dezimalstellen wurden weggelassen.</p>
+
+        <p>Das LMS funktioniert nicht mit Programmen</p>
+
+        <p>— die den vom LMS belegten Speicher benötigen ($8000 bis $9FFF und $D000 bis $FFFF; siehe auch Programmbeschreibung),<br>
+            — die Basic-Zeilen generieren oder<br>
+            — die den NMI-Timer verwenden (zum Beispiel RS232-Programme).</p>
+
+        <h3>Programmbeschreibung</h3>
+
+        <p>Das Laufzeit-Meß-System besteht aus dem Maschinenprogramm »LMS.PHA« und den Basic-Programmen »LMS« und »LMS.BAS.«. »LMS.PHA« ist das eigentliche Meßprogramm. Es liegt im Speicherbereich $9CE0 bis $9FFF und wird bei seiner Aktivierung in die Basic-Interpreterschleife eingebunden. Für die Zeitmessung wird der Timer im CIA2 benutzt. Als Zeitbasis wird der Systemtakt verwendet. Die Meßergebnisse werden im RAM ab $D000 unter dem Betriebssystem abgelegt.</p>
+
+        <p>Der Ablauf einer Messung kann dem Flußdiagramm (siehe Bild 1) beziehungsweise dem Listing »LMS.ASS« entnommen werden. Die Aufbereitung und Auswertung der Meßergebnisse erfolgt im Programm »LMS.BAS«. Um ein abwechselndes Laden des in Basic geschriebenen Auswerteprogramms und des zu messenden Programms zu vermeiden, wird der Basic-Speicher derart geteilt, daß beide Programme gleichzeitig geladen sein können. LMS.BAS muß sich dabei mit weniger als 8 KByte ab Adresse $8000 begnügen.</p>
+
+        <p>Die Umschaltung des Basic-Speichers erfolgt in »LMS.PHA«. Beim Aktivieren des Meßprogramms wird das zu messende Programm zur Verfügung gestellt, beim Desaktivieren wird zum Auswerteprogrammm verzweigt.</p>
+
+        <p>Das Ladeprogramm »LMS« lädt zunächst »LMS.PHA«, damit die Maschinenroutinen zur Verfügung stehen. Danach teilt und initialisiert das Programm den Basic-Bereich. Zuletzt lädt und startet es das Auswerteprogramm.</p>
+
+        <p>Die Anpassung von »LMS.BAS« an unterschiedliche Drucker ist problemlos, da außer der Sekundäradresse 7 keine speziellen Steuercodes verwendet wurden.</p>
+
+        <p>Für die Verwendung mit Datassette müssen die im Programmlisting LMS enthaltenen Hinweise beachtet werden.</p>
+
+        <address class="author">(Mark Richters/Franz Stoiber/og)</address>
+    </article>
+</body>
+
+</html>
