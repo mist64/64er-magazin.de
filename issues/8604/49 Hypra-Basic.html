@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hypra-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="R. Aretz, og">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="49,58-63">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Hypra-Basic</h1>
+        <p class="intro">Erstellen Sie sich Ihre eigene Befehlserweiterung mit den Befehlen, die Sie wirklich brauchen. Hypra-Basic ist eine universelle und ausbaufähige Basic-Erweiterung. Es überbietet die Mächtigkeit professioneller Erweiterungen und die Stärke teurer Toolkits bei weitem.</p>
+
+        <p>Hypra-Basic ist mehr als nur eine einfache Erweiterung. Durch seinen modularen Aufbau kann man in Hypra-Basic problemorientierte Erweiterungen erstellen, die die meisten kommerziellen Programme in den Schatten stellen werden. Hypra-Basic ist keine in allen Einzelheiten und Programmsegmenten feststehende Basic-Erweiterung. Vielmehr dient es zum Verknüpfen einzelner Maschinensprache-Routinen.</p>
+
+        <p>Es ist also als Linker (aus dem englischen »to link = verbinden, verketten«) zu bezeichnen. Die Vorteile von Hypra-Basic liegen damit klar auf der Hand:</p>
+
+        <p>Auch mehrere Programme, die sich im Bereich ab $C000 befinden, können so gleichzeitig im Speicher liegen. Hypra-Basic verschiebt diese Programme und paßt Adressen automatisch an.</p>
+
+        <p>Die erstellten Routinen können im Speicher fast frei verschoben werden.</p>
+
+        <p>Der Aufruf der einzelnen Routinen erfolgt, wie im normalen Basic, über von Hypra-Basic frei definierbare Namen (mit Ausnahme der Basic-Befehlsworte) und nicht über SYS-Aufrufe.</p>
+
+        <p>Die einzelnen Befehlserweiterungen können jeweils bestimmten Problemen angepaßt werden. Denkbar sind zum Beispiel Grafik- oder Soundprogramme genauso wie Tools oder genauere Rechenroutinen.</p>
+
+        <p>Im Laufe der Zeit können Sie sich eine umfassende Bibliothek anlegen, die Ihnen für alle Eventualitäten eine Lösung anbietet.</p>
+
+        <p>Natürlich werden wir in den nächsten Ausgaben noch viele Routinen unserer Leser abdrucken. Die vorgestellten Routinen machen den Anfang.</p>
+
+        <p>Ihre Aufgabe soll es sein, für Hypra-Basic Programm-Module zu schreiben. Die besten werden wir veröffentlichen.</p>
+
+        <address class="author">(R. Aretz/og)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Lebenslauf</h2>
+
+        <p>Mein Name ist Richard Aretz, ich erblickte am 12.11.1958 das Licht der Welt. Mein Geburtsort heißt Kempen. Das liegt zirka 30 km von der Stadt Aachen entfernt. Nach dem Besuch der Volksschule (1965 bis 1973) erlernte ich das Handwerk des Heizungsbauers. Im Anschluß an die Gesellenprüfung folgten sieben Jahre in meinem erlernten Beruf. In der Zwischenzeit holte ich auf dem sogenannten 2. Bildungsweg in Form von Abendkursen die mittlere Reife und die Fachhochschulreife nach. Danach, seit 1983, Studium der Elektrotechnik an der Fachhochschule Aachen.</p>
+
+        <p>Im Verlauf des 1. Semesters kam ich zum ersten Mal mit Computern in Berührung und erlernte die Programmiersprache Fortran. Das faszinierte mich derart, daß es bis zum eigenen Computer kein weiter Weg war. Seit zirka zwei Jahren besitze ich einen C 64.</p>
+
+        <p>Es ist schon erstaunlich, was in einer solch »kleinen« Maschine alles steckt. Bei aller Begeisterung über diese schnell fortschreitende Technik sollte man eines nicht vergessen. Es ist eine Maschine, die keine Gefühle, Launen oder sonstige menschliche Regungen zeigen kann, sondern nur das ausführt, was ein Programmierer ihr vermittelt. Einige Filmemacher scheinen das vergessen zu haben. Solche Filme — Sie wissen sicher, über welche Art Filme ich hier spreche — tragen meines Erachtens nur zur Verunsicherung vieler Menschen bei, die nicht mit der Materie vertraut sind.</p>
+
+        <p>Richard Aretz</p>
+
+        <p class="intro">Stricken Sie sich Ihre persönliche Erweiterung mit Hypra-Basic. Ohne überflüssigen Ballast mitzuführen, können Sie sich mit Hypra-Basic die Erweiterungen selbst herstellen, deren Befehle, Mächtigkeit und Umfang Sie selbst bestimmen können.</p>
+
+        <p>Geben Sie zunächst das Programm »BASIC .ASS« (Listing 1) mit dem MSE ein und speichern Sie es auf Diskette. Beachten Sie bitte das Leerzeichen vor dem Punkt.</p>
+
+        <p>Dann geben Sie »HYPRA-BASIC« (Listing 2) sowie »DOKUMENT« (Listing 3) und »MG SPEICHER« (Listing 4) mit dem Checksummer ein und speichern diese ebenfalls.</p>
+
+        <p>Die Programme haben folgende Funktionen.</p>
+
+        <p>»MG SPEICHER« speichert ein Maschinenprogramm nach Angabe von Modulnummer, Start- und Endadresse.</p>
+
+        <p>»DOKUMENT« erstellt eine Auflistung der auf Diskette befindlichen Module mit allen wesentlichen Daten.</p>
+
+        <p>»HYPRA-BASIC« ist das Herz des Programms, das das menügesteuerte Verbinden der Module übernimmt.</p>
+
+        <p>»BASIC .ASS« enthält zum einen die Umrechnungsroutine, um Maschinenprogramme an andere Bereiche anzupassen. Dahinter befindet sich die Erweiterung für den Interpreter.</p>
+
+        <h2>Eigene Programme einbinden</h2>
+
+        <p>Wenn Sie eine eigene Routine in Hypra-Basic einbauen wollen, muß Ihr Unterprogramm folgende Voraussetzungen erfüllen: Start- und Endadresse müssen bekannt sein. Datenbytes, zum Beispiel für eine Fehlermeldung, müssen nach dem Maschinenprogrammteil stehen, also daran angehängt sein. Die Anzahl der Datenbytes muß ebenfalls bekannt sein. Die Befehlsworte der Module dürfen keine Basic-Anweisungen oder Funktionen enthalten. Verbotene Namen sind zum Beispiel »SPRITEON« (enthält das ON aus ON X GOTO/ GOSUB) oder »PRINTAT« (enthält PRINT). Module, die mehrere Befehle beinhalten, müssen in sich geschlossen sein. Es dürfen maximal 16 Befehle in einem Modul enthalten sein. Ein Filename muß folgendes Format haben: "xERW . ASS".</p>
+
+        <p>Dabei entspricht x der Nurnmmer des Moduls. Beispiele für Namen sind »4ERW .ASS«, »38ERW .ASS« etc. Beachten Sie im Namen bitte wieder das Leerzeichen vor dem Punkt.</p>
+
+        <p>Da eine Diskette maximal 144 Einträge im Directory aufnehmen kann, und für jedes Modul zwei Einträge benötigt werden, sind auf einer Diskette 70 Module das Maximum. Bei höheren Modulnummern wird vom Computer eine andere Diskette verlangt. Bei den Modulnummern von 71 bis 140 also Disk 2, von 141 bis 210 Disk 3 etc.</p>
+
+        <p><strong>Die Lage der erstellten Erweiterung im C 64</strong>: Die Befehlstabelle und die Interpreter-Erweiterung können nur im RAM-Bereich liegen, der ständig aktiv ist und nicht zu weit unten im Basic-Bereich liegt (dort liegt ja das Hypra-Basic). Diese Bereiche sind:<br>
+            13200 ($3390) bis 40959 ($9FFF) und<br>
+            49152 ($C000) bis 53247 ($CFFF).</p>
+
+        <p>Die Befehlsmodule selbst können auch im RAM unter dem ROM liegen. Dadurch erschließt sich ein Bereich von:<br>
+            13200 ($3390) bis 53247 ($CFFF) und<br>
+            57344 ($E000) bis 65535 ($FFFF).</p>
+
+        <p>Natürlich dürfen sich die beiden Bereiche nicht überlappen. Deshalb ist es vorteilhaft, wenn die Befehlsmodule hinter der Befehlstabelle liegen.</p>
+
+        <p><strong>Starten des Programms</strong>: Laden Sie »HYPRA-BASIC« und starten Sie es. Das Maschinenprogramm »BASIC .ASS« wird daraufhin selbständig nachgeladen.</p>
+
+        <p><strong>Eigene Befehle</strong>: Mit dem Programm »MG SPEICHER« oder mit einem Monitor auf Diskette gespeicherte Programme müssen mit einem bestimmten Namen versehen sein (siehe oben). Mit dem Menüpunkt »Parameter eingeben« des Hauptprogrammes müssen Sie die zu jedem Modul folgenden Angaben machen: Die Anzahl der im Modul enthaltenen Befehle, den Namen, mit dem der Befehl aufgerufen wird, zu jedem Namen die Startadresse, die Endadresse und die Anzahl der Datenbytes. Die Parameter werden dann in einem File mit dem Namen »xMODUL« gespeichert. X ist dabei wieder die Nummer des Moduls.</p>
+
+        <p><strong>Erweiterungen erstellen</strong>: Geben Sie einfach die Nummern der gewünschten Module nacheinander ein. Die Eingabe von »F« storniert das jeweils letzte Modul. Sind alle Erweiterungen im Speicher, beenden Sie die Eingaben mit »E«. Als nächsten Schritt geben Sie die Startadresse der Tabelle sowie der Befehle ein. Wenn die Befehle direkt nach der Tabelle liegen sollen, dann bestätigen Sie bei »Befehle« die vom Computer vorgeschlagene Adresse mit der RETURN-Taste. Daraufhin wird die Erweiterung generiert, jedoch noch nicht gespeichert. Sie steht jetzt im Speicher des Computers an den von Ihnen angegebenen Adressen.</p>
+
+        <p><strong>Speichern einer Erweiterung</strong>: Mit der Taste F3 gelangen Sie in das Speicher-Menü. Zwei Angaben werden hier von Ihnen erwartet: Der Name, unter dem die Befehlstabelle und die Interpreter-Erweiterung gespeichert wird sowie der Name, unter dem die Befehle gespeichert werden. Wenn Tabelle und Befehle direkt hintereinander liegen, genügt zum Speichern natürlich ein Name. In diesem Fall geben Sie bei »Befehle« nichts ein, sondern tippen einfach nur RETURN. Daraufhin wird die Erweiterung auf Diskette gespeichert.</p>
+
+        <p><strong>Protokoll</strong>: Alle wichtigen Daten der im Speicher des C 64 liegenden Erweiterung werden noch einmal gezeigt. Eventuell sollten Sie hier noch einmal prüfen, ob es zwischen der Tabelle und den Befehlen keine Überschneidung gegeben hat. Das Protokoll können Sie auf Drucker ausgegeben.</p>
+
+        <p>Starten einer Erweiterung: Bringen Sie Ihren C 64 in den Einschaltzustand und laden Sie Ihre Erweiterung mit LOAD "name",8,1. Danach geben Sie NEW ein, um alle Zeiger wieder richtig zu setzen. Ist die Tabelle von den Befehlen getrennt, so laden Sie diese nun nach und geben auch danach wieder ein NEW ein. Der Start der Erweiterung, also das Einbinden in die Interpreterschleife, geschieht durch den Befehl SYS (Startadresse der Tabelle). Nach dem READY des Computers sind die neuen Befehle aktiv.</p>
+
+        <p>Hinweise für Programmierer: Wenn Sie selbst in Maschinensprache programmieren und sich einige Module selbst anfertigen wollen, beachten Sie bitte folgende Punkte: Ein Modul muß, bevor es mit Namen aufgerufen wird, auch über einen SYS-Befehl zu erreichen sein. Ein entsprechender Aufruf wäre zum Beispiel: SYS (Adresse) P1,P2,P3.</p>
+
+        <p>Vor dem ersten Parameter darf also kein Komma stehen, denn dieser müßte ja sonst nach dem Befehlswort mit eingegeben werden. Achten Sie bitte darauf, daß ein Modul mit mehreren Befehlen in sich geschlossen lauffähig sein muß, also nicht in ein anderes Modul verzweigt.</p>
+
+        <h2>Module</h2>
+
+        <p>Die in dieser Ausgabe veröffentlichten Module (Listings 5 bis 13) sind Beispiele, die die Fähigkeiten des Hypra-Basic demonstrieren und den Umgang veranschaulichen sollen. Die Erklärungen und Parameter dazu sind jeweils beim Modul selbst in der Bildunterschrift enthalten.</p>
+
+        <p>Bestimmt werden auch Sie Module für Hypra-Basic entwickeln. Die besten Module, die uns zugeschickt werden, werden wir gegen ein entsprechendes Honorar abdrucken. Somit kann sichjeder in kurzer Zeit eine Bibliothek von Basic-Befehlen, Tools und sonstigen nützlichen Routinen anlegen. Erstrebenswert wäre ein Standard-Basic für den C 64, für das dann auch Listings veröffentlicht würden. In diesem Sinne wünschen wir Ihnen viel Erfolg mit Hypra-Basic.</p>
+
+        <address class="author">(R. Aretz/og)</address>
+    </article>
+</body>
+
+</html>

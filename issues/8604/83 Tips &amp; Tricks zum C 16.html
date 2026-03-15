@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 16</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Plachetta, tr, Ulrich Käfferbitz, tr">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="83">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 16</h1>
+        <p class="intro">Auch zu Commodores Kleinstem haben wir einige interessante Programmierhinweise fiir Sie herausgesucht. Neben einigen nützlichen POKEs finden Sie ein Programm, um den Zeichensatz nach Ihren Wünschen zu ändern.</p>
+
+        <p>Der Zeichensatz besteht beim C 16 aus nur 128 Zeichen. Die anderen 128 Zeichen sind die inverse Darstellung der ersten 128 Zeichen. Ein Zeichensatz kann also alle 1024 Bytes stehen (zum Beispiel ab den Adressen 12288, 13312, 14336, 15360).</p>
+
+        <p>Nun die Befehle, um ihn zu verändern:</p>
+
+        <ol>
+            <li>»POKE 65298, PEEK (65298) AND NOT 4«</li>
+            <li>»POKE 65299, Anfang Zeichensatz/256«</li>
+        </ol>
+
+
+        <p>Nach einer Fehlermeldung sind allerdings keine Zeichen mehr zu erkennen. Sie erscheinen erst dann wieder, wenn wieder ein Befehl eingegeben wird.</p>
+
+        <p>Listing 1 zeigt ein Programm zum Kopieren des Zeichensatzes vom ROM ins RAM. Startadresse des Zeichensatzes ist 15360.</p>
+
+        <h3>Farben auf den Farbtasten verändern</h3>
+
+        <p>Die Farben der Farbtasten (CTRL- oder Commodore-Taste zusammen mit einer Zahlentaste) sind in den Adressen 275 bis 290 gespeichert. Sie können beliebig geändert werden. Die entsprechenden Steuerzeichen bleiben allerdings gleich!</p>
+
+        <p class="source">Beispiel: POKE 275,69.<br>
+            Statt Schwarz liegt auf der ersten Farbtaste jetzt Grün.</p>
+
+        <h3>Wiederholfunktion der Tasten</h3>
+
+        <p>TODO TABLE</p>
+
+        <p>POKE 1344,0:<br>
+            POKE 1344,64<br>
+            POKE 1344,128<br>
+            Wiederholfunktion aus, nur »CRSR«, »SPACE«, »INST/DEL« haben Wiederholfunktion keine Taste hat Wiederholfunktion alle Tasten haben Wiederholfunktion (Normalzustand).</p>
+
+        <h3>Tastaturpuffer</h3>
+
+        <p>Die Adressen 1319 bis 1328 enthalten die Codes der Tasten, die nicht unmittelbar ausgeführt werden können.</p>
+
+        <p>239 enthält den Zähler für den Tastaturpuffer, der angibt, wieviel Codes im Tastaturpuffer abgelegt sind.</p>
+
+        <p>Hier ein Beispiel, bei dem ein Programm nachgeladen wird (in einem Programm)</p>
+
+        <p>POKE 1319,13 : POKE 1320,13 : POKE 239,2<br>
+            PRINT "DLOAD" : CHR$ (34)<br>
+            PHINT "RUN"</p>
+
+        <h3>Tastaturabfrage</h3>
+
+        <p>In der Adresse 198 wird der Code der gerade gedrückten Taste abgelegt. Wenn keine Taste gedrückt wird, ist PEEK (198) gleich 64. Mit PEEK (198) können auch die Funktionstasten abgefragt werden.</p>
+
+        <h3>Abfragen der »SHIFT«-, »Commodore«- und »CTRL«-Tasten Mit PEEK (1347) können diese Tasten abgefragt werden.</h3>
+
+        <address class="author">(Ulrich Käfferbitz/tr)</address>
+
+        <h2>Nützliche Speicherstellen</h2>
+
+        <p>— WAIT 1,192 wartet darauf, daß eine Taste am Recorder gedrückt wird.<br>
+            — Der Funktionstastenspeicher steht in den Adressen $0567 bis $05E6<br>
+            — Die Einsprungadresse für die USR-Funktion steht in #1281/1282 = $0501/0502</p>
+
+        <p>TODO TABLE</p>
+
+        <p>— Basic-Start<br>
+            — Anfang der Variablen<br>
+            — Anfang der Felder<br>
+            — Ende der Felder<br>
+            — Stringspeicher Ende<br>
+            — Anfang der Strings<br>
+            — Basicspeicher Ende<br>
+            43/44 (Low-/Highbyte)<br>
+            45/46 (Low-/Highbyte)<br>
+            47/48 (Low-/Highbyte)<br>
+            49/50 (Low-/Highbyte)<br>
+            51/52 (Low-/Highbyte)<br>
+            53/54 (Low-/Highbyte)<br>
+            55/56 (Low-/Highbyte)</p>
+
+        <p>— Der Ton-Chip des C 16 läßt sich in Assembler wie folgt programmieren: Soundregister ist Adresse 65297. Jedem Bit kommt eine bestimmte Steuerfunktion zu:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Bit 0 bis 2 = # 0 bis # 7 Lautstärke = VOL 0 bis VOL 6<br>
+            Bit 3 = # 8 volle Lautstärke (wenn Bit 3 gesetzt ist, sind Bit<br>
+            0-2 ohne Bedeutung)<br>
+            Bit 4 = # 16 Stimme 1 an (= 1) / aus (= 0)<br>
+            Bit 5 = # 32 Stimme 2 an (= 1) / aus (= 0)<br>
+            Bit 6 = # 64 Stimme 2 Rauschen (= 1)<br>
+            Bit 7 = # 128 Bit gesetzt = kein Ton</p>
+
+        <p>Der Ton ist in 10 Bits codiert: mögliche Werte: #0 bis #1023</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Frequenzen Low-Byte High-Byte (0,1)<br>
+            — Register Stimme 1 65294 65298 Stimme 2 65295 65296 Durch Löschen der Bits 0/1 läßt sich der Bild-<br>
+            65286: schirm um bis zu drei Rasterzeilen nach oben<br>
+            — Register verschieben. Bit 2 gesetzt Bildschirm vier Rasterzeilen nach unten Bit 3 gelöscht Bildschirm vier Rasterzeilen nach unten Bit 4 gelöscht Bildschirm ausgeblendet Bit 5 gesetzt Char-Speicher verschoben Bit 6 gesetzt kein Cursor sichtbar Bit 0/1 setzen Verschieben des Bildschirms<br>
+            65287 um bis zu drei Rasterzeilen<br>
+            -POKE nach rechts. Bit 4 gesetzt Mehrfarbmodus ein Bit 5 gesetzt Videochip stoppt (keine Bild- erzeugung mehr) Bit 6 gesetzt Programmierbare Bildstö- rung Bit 7 gesetzt 38 Zeichen/Zeile sperrt Tastatur<br>
+            65290, 162 -POKE entriegelt Tasta-<br>
+            65290, 163 tur<br>
+            — Register Hintergrund- Bit 0—3 (Low-Nibble) Farbe<br>
+            65301 farbe<br>
+            — Register Rahmenfarbe Bit 4—6 (High-Nibble) Intensi-<br>
+            65305 tät</p>
+
+        <address class="author">(Frank Plachetta/tr)</address>
+    </article>
+</body>
+
+</html>

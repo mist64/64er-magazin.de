@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="H. C. Edelmann, tr, Jürgen Römer, tr, Martin Boels, tr">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="78-81">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Hätten Sie gedacht, daß die rote LED an lhrer Hoppy ihre Helligkeit verändern kann? Oder daß ein kurzes Maschinenprogramm den Bildschirm auf den Kopf steift? Auch diesmal haben wir für Sie einige Beiträge gesammett, die selbst ausgefuchste Profis in Erstaunen versetzen werden.</p>
+
+        <p>Beginnen wollen wir diesmal mit einer wirklich außergewöhnlichen »Basic-Erweiterung«: Sie ermöglicht es, bis zu 252 Zeichen lange Basic-Zeilen einzugeben! Damit taucht unwillkürlich folgende Frage auf: Ist dies noch ein Einzeiler oder nicht?</p>
+
+        <h2>Die Super-Einzeiler</h2>
+
+        <p>Wer nicht will, daß sein Basic-Programm unnötig viel Speicher verbraucht, da er jedes freie Byte für Daten gebrauchen kann, oder wer will, daß sein Programm möglichst schnell ist, weil ihm jede Sekunde kostbar ist, für den ist es oft von Nutzen, mehrere Programmzeilen zu einer zusammenzufassen. Jede Zeile, die neu begonnen wird, verbraucht nämlich vier Byte mehr Speicherplatz, als wenn diese mit einem Doppelpunkt an die vorhergehende Zeile angehängt würde. Bei einem längeren Programm kann da schon einiges zusammenkommen. Außerdem kann der Interpreter Befehle in einer Zeile schneller abarbeiten, als wenn jeder Befehl in einer eigenen Zeile steht. Wenn diese sich dann noch in einer Schleife befinden, die vielleicht einige hundertmal durchlaufen wird, könnte man hier schon durch eine andere Anordnung Zeit sparen. Um das Programm allerdings nicht allzu unübersichtlich zu machen, sollte man nur solche Zeilen zusammenfassen, die auch logisch zusammengehören.</p>
+
+        <p>Wenn man dies nun beherzigen will, wird man allerdings durch den Basic-Editor ziemlich eingeschränkt, da dieser nur maximal 80 Zeichen in einer Zeile zuläßt. Der Interpreter würde aber auch längere Zeilen akzeptieren, nur kann man solche eben nicht eingeben.</p>
+
+        <p>Um dieses Manko zu beseitigen, habe ich EX-LINE geschrieben (siehe Listing 1). Mit diesem Programm ist es nun möglich, mit einer Länge von bis zu 252 Zeichen Basic-Zeilen einzugeben.</p>
+
+        <p>Nachdem man dieses Programm mit dem MSE eingegeben oder mit »LOAD "EX-LiNE",8,1« von Diskette geladen hat, kann man es mit »SYS 49152« starten. Danach steht das Ausrufungszeichen als neuer Befehl zur Verfügung. Wenn man diesen Befehl eingibt, erscheint der Cursor in der linken oberen Ecke des Bildschirms. Nun kann man eine Programmzeile oder Befehle im Direktmodus eingeben. Dabei ist zu beachten, daß nach »RETURN« nur die ersten 6,5 Bildschirmzeilen übernommen werden, egal wo sich der Cursor dann befindet. Wenn man nach dem Ausrufungszeichen noch eine Zeilennummer angibt, wird vorher noch der Bildschirm gelöscht und die entsprechende Zeile gelistet, so daß man auch überlange Zeilen editieren kann.</p>
+
+        <p>Da sich das Programm nicht mit dem Checksummer verträgt, errechnet es noch eine Prüfsumme, die sich mit »PRINT PEEK(2)« auslesen läßt. Sie entsteht einfach durch Addition der ASC-Werte der eingegebenen Zeichen. In der Speicherzelle 2 steht dann das Low-Byte der Summe.</p>
+
+        <p>Wenn man die Befehle in abgekürzter Form eingibt, erhält man eine andere Prüfsumme, als wenn man sie ausschreibt. Die angegebenen Prüfsummen bei den folgenden Programmen beziehen sich immer auf die ausgeschriebene Form.</p>
+
+        <h3>Programmbeschreibung</h3>
+
+        <p>Das Programm ist komplett in Maschinensprache geschrieben und steht im Speicher ab $C000. Nach dem Start mit »SYS 49152« wird zuerst das Basic-ROM in den darunter liegenden RAM-Bereich kopiert und so verändert, daß der Eingabepuffer nicht mehr bei $0200, sondern bei $C200 liegt. Dies ist nötig, da dieser jetzt mehr Platz benötigt, als das Betriebssystem für ihn vorsieht.</p>
+
+        <p>Schließlich wird der Vektor für »Basic-Befehl holen« bei $0308 auf die neue Routine gelenkt. Diese prüft, ob das erste Zeichen ein Ausrufungszeichen ist. Wenn dies der Fall ist und noch eine Zeilennummer folgt, wird zunächst der Bildschirm gelöscht und die entsprechende Zeile gelistet. (Wenn keine Zeile angegeben war, wird dieser Teil übersprungen.)</p>
+
+        <p>Nachdem dann die Eingabe erfolgt ist, wird das RAM bei $A000 aktiviert, der Text im oberen Teil des Bildschirms in den Puffer bei $C200 kopiert, in Interpretercode umgewandelt und ausgeführt. Das ROM wird bei der nächsten Eingabe wieder eingeschaltet, so daß der Eingabepuffer wieder wie üblich bei $0200 liegt.</p>
+
+        <p>Um zu zeigen, was man mit diesem Programm alles in einer Zeile unterbringen kann, habe ich folgende drei »Einzeiler« geschrieben:</p>
+
+        <h3>1. SOFT FLASH:</h3>
+
+        <p>Dieser Einzeiler (Listing 2) bewirkt, daß die rote LED am Diskettenlaufwerk scheinbar stufenlos ein- und ausgeschaltet wird. Wenn man das Programm mit Hilfe von »EX-LINE« eingegeben hat, kann man mit »PRINT PEEK(2)« die Prüfsumme abfragen. Diese sollte 180 betragen.<br>
+            Programmbeschreibung:</p>
+
+        <p>In der FOR-NEXT-Schleife wird ein Maschinenprogramm mittels »Memory-Write« in das RAM der Floppy ab $0500 geschrieben. Der Floppy-Befehl »UC« bewirkt dann, daß dieses gestartet wird. Das Maschinenprogramm schaltet die LED so schnell an und aus, daß dies für das Auge nicht sichtbar ist. Dabei ändert sich die Länge der Hell- und Dunkelphase, so daß es scheint, als ob die Lampe langsam hell und dunkel würde.</p>
+
+        <p>Weil das Programm als Endlosschleife geschrieben ist, läßt sich das Laufwerk nicht mehr ansprechen. Wenn man die Floppy weiter verwenden will, muß man sie vorher aus- und anschalten.</p>
+
+        <h3>2. STRICH-CURSOR:</h3>
+
+        <p>Dieser Einzeiler (Listing 3) verwandelt den Cursor in einen Strich, der unter den Zeichen blinkt, so wie man es oft bei größeren Computern sieht. Man kann diese Routine verwenden, um seinen Programmen ein professionelles Aussehen zu verleihen (Prüfsumme: 186).<br>
+            Programmbeschreibung:</p>
+
+        <p>Die ersten drei POKE-Befehle bewirken, daß der Bildschirm nach $CC00 verlegt wird und der Zeichensatz aus dem RAM ab $D000 gelesen wird. Dies ist notwendig, da kein Basic-Speicher verloren gehen soll und der VIC nur 16 KByte auf einmal adressieren kann.</p>
+
+        <p>Bevor man nun den Originalzeichensatz bei $D000 mit »POKE 1,3« lesbar machen kann, muß noch der Interrupt mit »POKE 56333,1« ausgeschaltet werden. Die erste FOR-NEXT-Schleife kopiert den Bildschirm an seine neue Position. Die zweite Schleife kopiert den Zeichensatz ins RAM. Dabei werden die reversen Zeichen so verändert, daß nur die unterste Reihe revers erscheint. Die folgenden POKEs bewirken schließlich, daß der Interrupt eingeschaltet wird und der I/O-Bereich bei $D000 wieder ansprechbar ist.</p>
+
+        <h3>3. UPSIDE-DOWN:</h3>
+
+        <p>Dieses Programm habe ich in zwei Versionen geschrieben, da es als Einzeiler (Listing 4) sehr schwer abzutippen ist. Die zweite Version (Listing 5) wird mit dem MSE eingegeben (die Prüfsumme für den Einzeiler lautet 76). Beide Versionen können einfach mit »RUN« gestartet werden. Danach erscheint der ganze Bildschirm »auf den Kopf gestellt«. Dies bezieht sich auf alle Ein- und Ausgaben. Auch Zeichen, die mit »POKE« auf den Bildschirm gebracht werden, erscheinen an der entsprechenden anderen Stelle auf dem Kopf. Die meisten Programme vertragen sich damit gut, da nur der IRQ-Vektor verändert wird. Nach einem Reset oder RUN/STOP-RESTORE kann das Programm mit »SYS 300« wieder aktiviert werden.<br>
+            Programmbeschreibung:</p>
+
+        <p>Das Maschinenprogramm, das bei dem Einzeiler mittels »PRINT« auf den Bildschirm gebracht wird, kopiert zunächst eine Interruptroutine in den Stack ab Adresse 300. (Dieser Bereich ist besonders geeignet, da er nach einem Reset nicht gelöscht wird und ein Programm dort nicht stört.) Dann wird der gesamte Zeichensatz auf den Kopf gestellt und in das RAM bei $D000 kopiert. Der VIC wird veranlaßt, den Zeichensatz aus $D000 und den Bildschirm aus $E000 zu lesen, und schließlich wird die Interruptroutine aktiviert, die 60mal in der Sekunde den Bildschirm umgekehrt nach $E000 kopiert.</p>
+
+        <address class="author">(H. C. Edelmann/tr)</address>
+
+        <h2>Print Shop und CP 80X</h2>
+
+        <p>Probleme traten bei Print Shop und angeschlossenem Drucker (Melchers) CP 80X auf. Das lag daran, daß Print Shop nach jeder Druckzeile ein $0A sendet. Dies wird aber vom CP 80X laut Handbuch ignoriert. Abhilfe: Im Programmteil »Syslib« ($8800-$A0C0) die Adresse $9B31 von $0A auf $0D (= 13, entspricht Carriage Return + Linefeed)abändernund beim Setup den Druckertyp »Mannesmann Tally Spirit 80« anwählen. Seit dieser Änderung läuft Print Shop mit CP 80X einwandfrei. Die gesuchte Adresse befindet sich auf der (Original-) Disk im 20. Block, Adresse 5B von »Syslib«.</p>
+
+        <address class="author">(Jürgen Römer/tr)</address>
+
+        <h2>Disk-Optimizer</h2>
+
+        <p>Ein nützliches Utility für Sparsame. Das Programm läuft auf allen Commodore-Computern, wenn man den DIM-Befehl in Zeile 60 demverfügbaren Speicherplatz des jeweiligen Computers anpaßt.</p>
+
+        <p>Das Programm (Listing 6) ermöglicht die optimale Ausnutzung der Disketten. Man kann seine Programmsammlung auf die kleinstmögliche Anzahl von Disketten verteilen und belastet damit den schmalen Geldbeutel vieler Computerfreaks nicht so stark. Ein Anwenderprogramm dieser Art ist bis jetzt nicht nur einzigartig, sondern nützt auch wirklich etwas — wird seinem Namen (Utility) also gerecht!</p>
+
+        <h3>Anwendungsbeispiel:</h3>
+
+        <p>Wir haben 13 Programme zur Verfügung, die auf möglichst wenige Disketten verteilt werden sollen. Sie haben folgende Blocklängen: 116,153,182,6,33,191,38,84,156,5,86,186,113. Nach dem Programmstart mit »RUN« geben wir die freien Blöcke einer Diskette ein (meistens 664) und anschließend die Blocklängen der 13 Programme in beliebiger Reihenfolge. Vertippt man sich, so kann man mit einer »0« oder einfach RETURN die jeweils letzte Eingabe berichtigen. Zum Abschluß der Eingabe muß die Zahl »999« folgen.</p>
+
+        <p>Jetzt sucht das Programm die Blöcke heraus, die addiert die vorher eingegebene Summe ergeben. Damit keine gleichen Zahlenfolgen auf dem Bildschirm erscheinen, sortiert das Programm solche Zahlenfolgen, die bereits schon einmal gefunden wurden, aus. Nach einer Weile sehen wir, daß es mehrere Kombinationen gibt, diese Programme platzsparend auf wenigen Disketten unterzubringen. Wir suchen uns die passenden aus und erhalten durch geschicktes Umkopieren der Programme auf eine oder mehrere Disketten brauchbaren Speicherplatz. Hätten Sie gedacht, daß man mit diesen 13 Programmen so viele verschiedene Möglichkeiten hat, eine Diskette randvoll zu füllen? Die Bedeutung der »Versuche«-Anzeige im Fenster oben links wird in der Programmbeschreibung erklärt. Das Programm sucht so lange nach neuen Folgen, bis Sie durch Drücken der START-/STOP-Taste »S« neu beginnen.</p>
+
+        <p>Da das Basic-Programm relativ langsam arbeitet, empfiehlt es sich, es zu compilieren. Erst bei 3- bis 4mal schnellerer Bearbeitungsgeschwindigkeit wird man es gern einsetzen. Die Programmservice-Diskette enthält neben der Basic- auch die compilierte Version.</p>
+
+        <address class="author">(Martin Boels/tr)</address>
+
+        <h2>LoRes zu HiRes</h2>
+
+        <p>Diese geniale Maschinenroutine (Listing 7) konvertiert den normalen Low-Resolution-Bildschirm, also den Bildschirm, der nach dem Einschalten aktiv ist, zu einem hochauflösenden Grafikbild und speichert dieses auf Diskette. Es kann sowohl die niedrig auflösende Grafik (Pixel-Grafik) als auch der normale Textbildschirm umgewandelt und gespeichert werden.</p>
+
+        <h3>Bedienung</h3>
+
+        <p>Nach dem Laden des Programms mit »LOAD"LORES zu HIRES",8,1« wird die Maschinenroutine mit »SYS 828,"BILDNAME1",8« aufgerufen. Die Parameter nach dem »SYS 828,« entsprechen genau den Angaben hinter dem normalen SAVE-Befehl. Da das Programm frei im Speicher verschiebbar ist, muß man nur die SYS-Startadresse auf den benutzten Speicherbereich anpassen. Ursprünglich liegt die Routine im Kassettenpuffer, wird also von keinem Basic-Programm gestört. Der Aufruf »SYS 828,"NAME",8« kann sowohl im Programm- als auch im Direktmodus erfolgen. Im Direktmodus jedoch wird dann auch der eingegebene SYS-Befehl, der sich noch auf dem Bildschirm befindet, als Bestandteil des Textbildschirms gespeichert.</p>
+
+        <h3>Anwendung:</h3>
+
+        <p>Wird von einem LoRes-Grafikbild eine Hardcopy gemacht, so erscheint bei fast allen Druckern zwischen den Bildschirmzeilen ein weißer Streifen. Das ist beim Text ja auch sehr sinnvoll — wie sollte man ihn sonst auch lesen? Bilder werden durch diese Art des Druckes aber leider zerstört.</p>
+
+        <p>Nun hilft die »LoRes zu HiRes«-Routine: Man speichert sein Bild als hochauflösende Grafik, lädt es mit Hi-Eddi oder einem sonstigen Malprogramm wieder und kann nun mit diesem Programm eine »heile« Hardcopy erstellen. Wenn diese Hardcopy-Routine Bilder doppelt groß drucken kann (Hi-Eddi!), hat man erstmalig die Möglichkeit, einen LoRes-Bildschirm im Riesenformat auf Papier zu bringen.<br>
+            Zweites Beispiel:</p>
+
+        <p>Wer schon einmal ein schönes Grafikbild mit Hi-Eddi erstellt hat, weiß, wieviel Arbeit das macht. Oft kann man die grobe, geometrische Struktur mit einem Maskengenerator (64’er, Ausgabe 8/85) erstellen. Da man sein Werk jetzt in Hi-Res übertragen kann, ist für die Feinarbeit mit Hi-Eddi schon gute Vorarbeit geleistet.</p>
+
+        <p class="source">Drittens: Man kann sogar ein LoRes-Bild, das mit einem anderen Zeichensatz erstellt wurde, weiterverarbeiten! Der Konvertierungsroutine muß nur die Basisadresse des neuen Zeichensatzes mitgeteilt werden. Das High-Byte wird in die Speicherstelle 828 + 55 geschrieben, das Low-Byte muß $00 sein, braucht also nicht extra geändert zu werden.</p>
+
+        <p>Das Basic-Programm (Listing 8) ist äquivalent zu dem Maschinen. Interessant ist der Zeitvergleich: In Basic dauert die Hi-Res-Übertragung 2:13 min, in Maschinensprache 0,4 s! Die Basic-Version ist daher weniger zum Abtippen, sondern vielmehr zum leichten Verstehen des Algorithmus gedacht.</p>
+
+        <address class="author">(Martin Boels/tr)</address>
+    </article>
+</body>
+
+</html>

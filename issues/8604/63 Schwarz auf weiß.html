@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Schwarz auf weiß</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Martin Hecht, tr">
+    <meta name="64er.issue" content="4/86">
+    <meta name="64er.pages" content="63-64">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Schwarz auf weiß</h1>
+        <p class="intro">Mit den folgenden Änderungen zum Programm »Database« (Sonderheft 7/85) ist es nun auch möglich, Datensätze auf dem Drucker auszugeben. Außerdem können Sie leicht eigene Ideen verwirklichen, zum Beispiel Etikettendruck oder ähnliches.</p>
+
+        <p>Um die erforderlichen Änderungen an Database vorzunehmen, gehen Sie bitte wie folgt vor:</p>
+
+        <ol>
+            <li>Bitte laden Sie das Programm »DBII« (Datenpflege).</li>
+            <li>Anschließend geben Sie die in Listing 1 enthaltenen Programmzeilen ein. Bei den Zeilen 330 und 3500 müssen die einzelnen Befehle abgekürzt eingegeben werden (siehe auch Anhang D in der Bedienungsanleitung Ihres C 64).</li>
+            <li>Zum Schluß speichern Sie das geänderte Programm — nachdem Sie die alte Version gelöscht haben — mit »SAVE "DBII", 8« wieder auf Diskette.</li>
+        </ol>
+
+
+        <h2>Die neuen Kommandos</h2>
+
+        <p>Neu hinzugekommen sind drei Kommandos im Menüpunkt »Daten ausgeben« (im Teil »Datenpflege«).</p>
+
+        <p>Das erste Kommando erreichen Sie durch Drücken der Taste »C«. Mit ihm ist es möglich, den gerade im Speicher befindlichen Datensatz noch einmal einzulesen und auf dem Bildschirm auszugeben. Dabei kann auch zwischenzeitlich in einen anderen Programmteil verzweigt werden.</p>
+
+        <p>Ein Beispiel: Sie haben über die Indexsuche einen bestimmten Datensatz selektiert. Nun möchten Sie — aus welchen Gründen auch immer — in den Programmteil »directory ausgeben« verzweigen. Wenn Sie dann anschließend wieder in die Datenausgabe zurückkehren und mit dem zuvor selektierten Datensatz weiterarbeiten wollen, blieb bisher nur die Möglichkeit, diesen nochmals suchen zu lassen. Jetzt drücken Sie einfach die »C«-Taste und der betreffende Datensatz wird wieder in Ihren C 64 geladen und auf dem Bildschirm ausgegeben!</p>
+
+        <p>Besonders interessant wird der »C«-Befehl auch im Zusammenhang mit dem zweiten Kommando, das die Ausgabe von Datensätzen auf den Drucker ermöglicht: Durch Drücken der Taste »P« wird die Druckerausgabe ein-, durch Drücken von »O« wieder ausgeschaltet. Außer im Programmteil »Daten ausgeben« kann die Druckerausgabe auch im Hauptmenü (mit denselben Tasten) ein- oder ausgeschaltet werden. Im Hauptmenü wird die eingeschaltete Druckerausgabe durch den Schriftzug »Ausgabe auf Drucker!« (im unteren Bildschirmbereich); im Teil »Daten ausgeben« durch ein »P« in der Kopfzeile (anstelle des»/«nach dem Dateinamen) angezeigt.</p>
+
+        <p>Wenn Sie jetzt — bei eingeschalteter Druckerausgabe — einen Datensatz in den Computer laden, so erfolgt die Ausgabe gleichzeitig auf Drucker und Bildschirm! Bei der Druckerausgabe wird dabei jedes Datenfeld in einer neuen Zeile zu Papier gebracht. Am Ende eines Datensatzes werden jeweils zwei Leerzeilen (zur Abtrennung mehrerer Datensätze voneinander) gedruckt.</p>
+
+        <p>Um auf den »C«-Befehl zurückzukommen: Wenn Sie sich nicht sicher sind, ob Sie einen bestimmten Datensatz ausdrucken wollen oder nicht, so laden Sie diesen zunächst bei ausgeschalteter Druckerausgabe. Haben Sie sich dann für einen Ausdruck entschieden, schalten Sie jetzt mit »P« die Druckerausgabe ein und drücken anschließend »C« und schon wird der Datensatz ausgedruckt! Danach können Sie mit »O« die Druckerausgabe wieder ausschalten, um nach weiteren Datensätzen zu suchen.</p>
+
+        <h2>Die Ausgaberoutinen von Database</h2>
+
+        <p>Wenn Sie selbst Änderungen an Database, speziell an den Ausgaberoutinen, vornehmen wollen, dann werden Ihnen die folgenden Erläuterungen dabei sehr hilfreich sein.</p>
+
+        <p>Alle Datensatzausgaben von Database werden zentral von zwei kleinen Unterprogrammen abgewickelt (siehe Listing 2). Dadurch ist es sehr einfach, hier weitgreifende Änderungen vorzunehmen.</p>
+
+        <p>Die erste Routine (Zeilen 6355 bis 6397) liest einen Datensatz Datenfeld für Datenfeld in die Variable EG$ ein. Bei einer Datenfeldlänge von mehr als 255 Zeichen wird das Datenfeld in mehreren (bis zu drei) Teilen eingelesen. Ist das Feld zum Beispiel 600 Byte lang, so wird es auf folgende Weise geladen: Zuerst zweimal 255 (= 510) Byte, anschließend die restlichen 90 Byte.</p>
+
+        <p>Jedesmal, wenn ein neues Daten(teil)feld in EG$ eingelesen wurde, wird in das zweite Unterprogramm (Zeilen 6415 bis 6478) verzweigt, wo dann die Ausgabe auf dem Bildschirm (oder Drucker) erfolgt.</p>
+
+        <p>Diese zweite Routine bietet den besten Ansatzpunkt für Erweiterungen. Wie leicht hier Veränderungen möglich sind, sehen Sie anhand der zusätzlich eingebauten Druckerausgabe.</p>
+
+        <p>In Zeile 6415 wird zunächst kontrolliert, ob die Variable XX den Wert 1 enthält. Ist das der Fall, so wird in die Druckerroutine ab Zeile 6475 verzweigt. Ansonsten (und auch nach erfolgter Druckerausgabe) wird mit der alten Routine (zur Bildschirmausgabe) fortgefahren.</p>
+
+        <p>Genausogut wie in die Zeile 6475 verzweigt wird, kann natürlich zu jeder beliebigen anderen Stelle gesprungen werden! So wäre es zum Beispiel ohne weiteres denkbar (auch zusätzlich zur gleichzeitig stattfindenden Bildschirm-Druckerausgabe), Datensätze in eine sequentielle Datei schreiben zu lassen, um sie dann an anderer Stelle in einer Textverarbeitung zur Serienbrieferstellung weiterzuverarbeiten.</p>
+
+        <p>Das Prinzip zum Schreiben in eine sequentielle Datei ist im Grunde genommen dasselbe wie zur Ausgabe auf den Drucker. Schauen wir uns also die Druckerroutine etwas genauer an.</p>
+
+        <p>In Zeile 6475 wird eine Datei auf den Drucker (Geräteadresse 4) eröffnet.</p>
+
+        <p>In Zeile 6476 wird durch den Vergleich von S6 und Gl +1 ermittelt, ob es sich bei dem aktuellen Inhalt von EG$ um ein komplettes Datenfeld oder um ein Datenteilfeld handelt. Ist S6 nämlich ungleich G1 +1, dann befindet sich in EG$ ein Datenteilfeld (eines Datensatzes größer als 255 Zeichen). In diesem Fall wird der Wagenrücklauf am Ende des Ausdrucks durch das Semikolon hinter EG$ verhindert. Dadurch wird erreicht, daß das nächste Daten(teil)feld direkt dahinter ausgedruckt wird. Im gegenteiligen Fall, also wenn S6 = Gl + 1, enthält EG$ ein komplettes Datenfeld beziehungsweise das letzte Teilfeld eines größeren Datenfeldes. In diesem Fall wird am Ende des Ausdrucks ein Wagenrücklauf erzeugt.</p>
+
+        <p>In Zeile 6478 wird dann die Datei wieder geschlossen und zur Aufrufstelle zurückgekehrt.</p>
+
+        <p>Um eine neue Funktion benutzen zu können, muß diese natürlich eingeschaltet (und möglichst auch ausgeschaltet) werden können. Wie das aussehen könnte, sehen Sie in den Zeilen 215 und 216 beziehungsweise 3029 und 3030 (Listing 1). Die Variable EG enthält jeweils den ASC-Code der gedrückten Taste. Entsprechend dieser Taste wird dann die Variable XX, die ja bei der Datensatzausgabe kontrolliert wird, auf 0 oder 1 gesetzt (und eventuell eine Meldung auf dem Bildschirm ausgegeben).</p>
+
+        <p>Noch ein Tip: Nähere Informationen zu allen verwendeten Variablen finden Sie in den Tabellen 5 und 6 im Artikel zu Database (Sonderheft 7/85, Seite 94/95). Bei allen Änderungen sollten Sie jedoch folgendes beachten:</p>
+
+        <p>Kleinere Ergänzungen, wie zum Beispiel einen Etikettendruck, für denja an sich nur druckerspezifische Steueranweisungen eingefügt werden müssen, können ohne weiteres direkt in die Ausgaberoutine integriert werden. Bei umfangreicheren Erweiterungen sollten Sie allerdings auf einen neuen Programmteil ausweichen, da der für die Variablen zur Verfügung stehende Speicherplatz ohnehin sehr knapp ist und jeder hinzukommende Basictext die Maximalanzahl der Datenfelder weiter herabsetzt.</p>
+
+        <p>Zur Erinnerung: Ein zusätzliches Programm kann ohne weiteres in das Gesamtsystem integriert werden, vorausgesetzt es erfüllt zwei Bedingungen: Es ist, zumindest teilweise, ein Basicprogramm, und es ist unter dem Namen »SOFT« auf Diskette gespeichert!</p>
+
+        <p>Im Lademenü kann dieses Programm dann über den Menüpunkt »Sonderfunktionen« (»F5«-Taste) aufgerufen werden.</p>
+
+        <p>Zum Schluß noch ein Wort zur Druckerausgabe:</p>
+
+        <p>Wie Sie sicher schon bemerkt haben, ist bei der Dateneingabe jedes Datenfeld mit einem Sonderzeichen (einem kleinen Punkt) vorbelegt. Wenn Sie bisher ein Datenfeld nicht in seiner ganzen Länge benötigten, konnten Sie den Restbereich getrost mit diesem Zeichen aufgefüllt lassen. Bei der Druckerausgabe wird aber nun natürlich nicht dieses Sonderzeichen, sondern das Originalzeichen (ein Grafikzeichen (CHR$(166)) gedruckt (was nicht gerade zur optischen Aufbesserung des Ausdrucks beiträgt). Um das zu vermeiden, sollten Sie bei der Dateneingabe oder nachträglich über die Änderungsfunktion (dazu drücken Sie bei der Datenausgabe die Taste »R«) alle Restbereiche mit einem Leerzeichen auffüllen.</p>
+
+        <address class="author">(Martin Hecht/tr)</address>
+    </article>
+</body>
+
+</html>
