@@ -1,0 +1,20 @@
+
+
+;micro-tagebuch.prg ==0801==
+    5 print"{swlc}{clr}{down}{down}   Elektronisches Tagebuch"
+   10 poke808,254:print"{down}{down}   Menue:":input"{down}   1=codieren, 2=decodieren";w
+   12 print"{down}   Bitte Diskette einlegen!{down}"
+   15 printtab(26)"tt.mm.jjjj{up}{up}":input"{down}                  Datum ";d$
+   18 print"{down}   Codezahlen x,y,z":input"{down}   durch Komma getrennt ";a,b,c
+   20 dimt(839),t$(839):x=0:ifw=2then70
+   25 print"{clr}{down}   Texteingabe (max. 839 Zeichen)":print"   '*' = Ende":print"{down}>";
+   30 gett$(x):ift$(x)=""then30
+   35 ift$(x)="*"orx=839then50
+   40 printt$(x);:x=x+1:goto30
+   50 open1,8,2,d$+",s,w":print#1,x:fori=0tox-1:b=b+(a*c):print#1,asc(t$(i))+c+b
+   60 nexti:close1:goto99
+   70 print"{clr}{down}>";:open1,8,2,d$+",s,r":input#1,x:fori=0tox-1:b=b+(a*c):input#1,t(i)
+   80 t(i)=(t(i)-b)-c:ift(i)<0ort(i)>255thenclose1:print"{down}Falsche Eingabe":goto99
+   90 printchr$(t(i));:nexti:close1
+   99 clr:poke808,237:end:rem -pts,1985-
+

@@ -1,0 +1,193 @@
+
+
+;hypra-basic.prg ==0801==
+    5 iffg<>0then10
+    7 fg=1:load"basic .ass",8,1
+   10 dima%(100):an=1:md=1:poke53280,0:poke53281,0:f=1:poke646,f:mp=12600
+   15 poke55,56:poke56,49
+   20 hl$="                                       "
+   30 h$="{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+   40 rem****hauptmenue*******
+   50 printchr$(147)tab(9)"{rvon} hauptmenue {rvof} hypra-basic":printh$:an=1:md=1
+   60 print"folgende optionen sind moeglich:":printh$:print
+   70 printtab(5)"{rvon}[f1]{rvof} erweiterung erstellen
+   80 printtab(5)"{down}{rvon}[f3]{rvof} erweiterung abspeichern
+   90 printtab(5)"{down}{rvon}[f5]{rvof} parameter eingeben
+  100 printtab(5)"{down}{rvon}[f7]{rvof} parameter anzeigen"
+  110 printtab(5)"{down}{rvon}[f2]{rvof} protokoll":print:printh$
+  115 printtab(10)"bitte waehlen sie !!"
+  120 poke198,0:wait198,1:gets$:s=asc(s$)
+  130 ifs<133ors>137then120
+  140 s=s-132
+  150 onsgosub210,410,600,800,11000
+  160 goto50
+  200 rem*****erweiterungerstellen***
+  210 gosub1010
+  220 poke211,8:poke214,0:sys58640:print"sind sie sicher ? (j/n)"
+  230 poke198,0:wait198,1:gets$:ifs$<>"j"oran=0thenreturn
+  240 gosub10010
+  250 printchr$(147)"sie muessen jetzt zwei speicherbereiche"
+  260 print"auswaehlenen":print:print"1) bereich fuer befehlstabelle.dieser"
+  270 printtab(3)"darf nur im 'normalen ram' liegen.
+  280 print:print"2) bereich fuer die erweiterung.hier
+  290 printtab(3)"ist der speicherbereich beliebig.":print
+  292 print"falls beide programmteile nacheinander"
+  293 print"stehen sollen,bitte bei 'befehle' nur"
+  294 print"<return> druecken.":printh$
+  295 print"die befehlstabelle braucht";hg" bytes":printh$
+  300 input"1) tabelle:";sd$:sd=val(sd$):ifsd=0then250
+  305 printtab(12)sd+hg
+  310 input"{up}2) befehle:";ma$:ma=val(ma$):ms=ma
+  320 ifma=0thenreturn
+  330 printchr$(147)"erweiterung wird generiert":print
+  340 la=sd+162+ha:gosub10410
+  350 forki=1toan:mo%=a%(ki):printmo%,
+  360 hm=int(mo%/70)+1:ifmd<>hmthengosub10210
+  370 gosub10660:next:return
+  400 rem*****programmabspeichern**
+  410 printchr$(147)tab(10)"erweiterung speichern":printh$
+  420 print"beim abspeichern koennen zwei verschie- dene";
+  430 print" files abgelegt werden.":print
+  440 print"1) befehlstabelle"
+  450 print"2) module":print
+  460 print"dies ist erforderlich,wenn beide pro-"
+  470 print"grammteile unabhaengig voneinander
+  480 print"existieren. falls sie beide programme"
+  490 print"gemeinsam generiert haben, geben sie un-";
+  500 print"ter module einen leerstring ein.":printh$
+  510 input"tabelle:";na$
+  520 input"befehle:";nb$:printh$
+  525 print"sind sie sicher,dass die richtige dis- "
+  527 print"kette im laufwerk ist? (j/n)"
+  528 poke198,0:wait198,1:geta$:ifa$="n"thenreturn
+  530 ifnb$=""thensys(mp+362)"@:"+na$,8,sd,ma+1:return
+  540 sys(mp+362)"@:"+na$,8,sd,bt+1
+  550 sys(mp+229)ms,ma+1,mp+2000
+  560 close1:open1,8,1,"@:"+nb$:print#1,chr$(ms-int(ms/256)*256);chr$(ms/256);
+  570 n=ma+1-ms
+  580 fori=0ton-1:print#1,chr$(peek(mp+2000+i));:next:close1
+  590 return
+  600 rem*******parametereingeben***
+  610 printchr$(147)tab(10)"parameter eingeben":printh$
+  615 input"modulnummer     :";mo$
+  620 input"wieviele befehle:";ab
+  630 printh$
+  640 fori=1toab
+  650 poke211,0:poke214,5:sys58640:printi"{left}) ";:input"name:";na$(i):printh$
+  660 input"    startadresse:";as$(i)
+  670 input"    endadresse  :";ae$(i)
+  680 input"    datenbytes  :";ad$(i)
+  690 printh$:next
+  700 printtab(10)"sind sie sicher (j/n)"
+  710 poke198,0:wait198,1:geta$:ifa$="n"thenreturn
+  720 close1:open1,8,1,"@:"+mo$+"modul,s"
+  730 print#1,str$(ab)
+  740 fori=1toab:print#1,na$(i):print#1,as$(i):print#1,ae$(i):print#1,ad$(i)
+  750 next:close1:return
+  800 rem******parameteranzeigen****
+  810 printchr$(147)tab(10)"parameter anzeigen":printh$
+  820 input"von modulnummer:";m1
+  830 input"bis modulnummer:";m2:printh$
+  840 fork=m1tom2:poke214,5:sys58640
+  845 fori=1to15:printhl$:next
+  850 poke211,0:poke214,5:sys58640
+  860 mo%=k:gosub10530:print"modulnummer:"k:print"anzahl der befehle:"ab:printh$
+  870 fori=1toab
+  880 poke214,9:sys58640:printi"{left}) name:"na$(i);left$(hl$,10):print
+  890 print"startadresse:"as(i);left$(hl$,10)
+  900 print"endadresse  :"ae(i);left$(hl$,10)
+  910 print"datenbytes  :"ad(i);left$(hl$,10)
+  930 printh$:printtab(6)"weiter mit beliebiger taste"
+  940 poke198,0:wait198,1:next:next:return
+  999 end
+ 1000 rem*****moduleauswaehlen*****
+ 1010 printchr$(147)tab(10)"module auswaehlen!"
+ 1020 printh$
+ 1040 print"bitte modulnummern eingeben:"
+ 1050 printh$
+ 1060 fori=1to19:printhl$:next
+ 1070 printh$:printtab(5)"{rvon} e {rvof} = ende         {rvon} f {rvof} = fehler";
+ 1080 poke211,30:poke214,2:sys58640:poke19,1:inputmn$:poke19,0:print
+ 1090 ifleft$(mn$,1)="e"thenan=an-1:return
+ 1100 ifleft$(mn$,1)="f"andan>1thenan=an-1:mn$="   ":goto1130
+ 1110 iflen(mn$)>3orval(mn$)=0then1080
+ 1120 a%(an)=val(mn$)
+ 1130 z=int(an/10)+4:s=(an-(z-4)*10)*4:poke211,s:poke214,z:sys58640:printmn$
+ 1150 ifmn$<>"   "thenan=an+1
+ 1160 goto1080
+10000 rem****laengedecodebestimmen*
+10010 hg=0:ha=0:ab=0:zb=0:forji=1toan
+10015 hm=int(a%(ji)/70)+1:ifhm<>mdthengosub10210
+10020 close1:open1,8,0,mid$(str$(a%(ji)),2,4)+"modul,s"
+10030 input#1,a$:h=val(a$):zb=zb+h
+10040 forj=1toh
+10050 input#1,h1$,h2$(j),h3$(j),h4$(j):ha=ha+len(h1$)+6
+10060 next
+10070 hb=(val(h3$(h))+val(h4$(h)))-val(h2$(1)):ifhb>hgthenhg=hb
+10090 close1:next
+10100 hg=int((hg/256)+1)*256:hg=hg+ha+170:return
+10200 rem****moduldiskausgeben****
+10210 h1=peek(211):h2=peek(214)
+10212 forx=1984to2023:pokex-1156,peek(x):pokex,32:x1=x1+1:next
+10215 poke211,0:poke214,24:sys58640
+10220 printtab(3)"{gry2}bitte moduldisk nr."hm" einlegen! ";
+10230 md=hm:poke646,f:poke198,0:wait198,1
+10240 forx=1984to2023:pokex,peek(x-1156):pokex+54272,f:next:poke211,h1
+10250 poke214,h2:sys58640:return
+10300 rem******programmladen*****
+10310 hi=int(la/256):lo=la-256*hi
+10330 sys(57812)na$,8,0:poke780,0:poke781,lo:poke782,hi:sys65493
+10340 return
+10400 rem******decoderoutineholen**
+10410 h=la:la=sd:sys(mp+229)13025,13184,sd
+10430 la=h:h=sd+11:hi=int(h/256):lo=h-256*hi:pokesd+1,lo:pokesd+6,hi
+10440 h=sd+161:hi=int(h/256):lo=h-256*hi:pokesd+25,lo:pokesd+29,hi
+10460 hi=int(la/256):lo=la-256*hi:pokesd+103,lo:pokesd+107,hi
+10470 pokela-1,0:bt=sd+161:return
+10500 rem*****parameterladen*****
+10530 fl$=mid$(str$(mo%)+"modul,s,r",2,13)
+10540 close2:open2,8,2,fl$
+10550 input#2,a$:ab=val(a$)
+10560 forji=1toab:input#2,na$(ji):input#2,a$:as(ji)=val(a$)
+10570 input#2,a$:ae(ji)=val(a$)
+10580 input#2,a$:ad(ji)=val(a$)
+10590 next
+10600 close2:return
+10610 rem****befehlstabellebearbeiten**
+10615 yy=len(na$(i)):pokebt,yy
+10620 fork=1toyy:pokebt+k,asc(mid$(na$(i),k,1)):next:bt=bt+k
+10630 hi=int(pz/256):lo=pz-256*hi:pokebt,lo:pokebt+1,hi
+10635 hi=int(ma/256):lo=ma-256*hi:pokebt+2,lo:pokebt+3,hi
+10636 le=ae(ab)+ad(ab)-as(1):pokebt+4,int(le/256):bt=bt+5
+10640 return
+10650 rem**********verschieb**********
+10660 gosub10530:a$=str$(mo%)+"erw .ass":na$=mid$(a$,2,13):gosub10310:pz=la
+10670 n1=pz:fori=1toab:gosub10610:n=as(i)
+10680 sysmp,pz:a=peek(247)
+10690 ifa<>3then10740
+10700 a1=peek(249)+256*peek(250)
+10710 ifa1<as(1)ora1>ae(ab)+ad(ab)then10750
+10720 a1=a1-as(1):a1=n1+a1:hi=int(a1/256):lo=a1-256*hi
+10730 pokepz+1,lo:pokepz+2,hi
+10740 ifa=0thena=1
+10750 pz=pz+a:n=n+a:ifn<>ae(i)+1then10680
+10760 pz=pz+ad(i):next
+10770 sys(mp+229)la,pz,ma
+10780 ma=ma+le+1:return
+11000 rem******protokoll********
+11010 printchr$(147)tab(12)"protokoll":printh$
+11020 gn=3
+11025 close1:open1,gn
+11030 print#1,"erweiterung hypra-basic version 1.1":print#1,h$
+11040 print#1,"anzahl der befehle:         ";zb
+11050 print#1,"startadresse befehlstabelle:";sd
+11060 print#1,"startadresse der module:    ";ms:print#1,h$
+11070 print#1,"bytes fuer tabelle:         ";hg
+11080 print#1,"bytes fuer befehle:         ";ma-ms:print#1,h$
+11082 print#1,"die erweiterung enthaelt folgende module":print#1
+11085 fori=1toki-1:print#1,a%(i);:next:print#1
+11090 iffk=1thenfk=0:gn=3:close1:return
+11100 print#1,h$:print#1,"  ausgabe auf drucker (j/n)"
+11110 poke198,0:wait198,1:geta$:ifa$="n"thenclose1:return
+11120 gn=4:fk=1:close1:goto11025
+

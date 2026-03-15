@@ -1,0 +1,302 @@
+
+
+;quizmaster.prg ==0801==
+   10 rem ***     quizmaster    ***
+   11 rem ***        von        ***
+   12 rem ***      matthias     ***
+   13 rem ***      gerloff      ***
+   14 rem *** weidenbaumsweg 94 ***
+   15 rem ***  2050 hamburg 80  ***
+   16 rem *** tel.(040) 7211517 ***
+   17 rem ***                   ***
+   18 rem ***    c 64 + 1541    ***
+   99 gosub32005
+  100 printchr$(8)chr$(14)"{blk}"chr$(147);:poke53280,10:poke53281,10
+  110 sys36631
+  119 ifpeek(2)=0then149
+  123 print"{wht}Ladefehler":print"{down}Neuer Versuch mit <{rvon}SPACE{rvof}>."
+  124 gosub11000:ifk$=" "thenprint"{clr}";:goto110
+  125 goto124
+  149 clr:dim re(99)
+  151 rem b1/2 - bildschirm an
+  152 rem bw   - bewegung
+  153 rem f1/2 - suchstart 1/2
+  154 rem fc   - suche continue
+  155 rem pl   - plot text
+  157 rem zs   - zeichensatz speichern
+  158 rem ch   - zeichensaetze copy
+  159 rem eb   - box einblenden
+  160 rem sa   - bild save
+  161 rem lo   - bild laden
+  162 rem ed   - editor
+  163 rem sp   - sprite copy
+  164 rem in   - init routine
+  165 rem bf   - bewegungsflag
+  166 rem e1/2 - ende der bildschirme
+  170 rem *** sys list ***
+  171 b1=49152:b2=49202:bw=49291:f1=49662:f2=49675:fc=49391:pl=49636:bf=32247
+  172 ch=50266:eb=49528:sa=50066:lo=49987:ed=49696:sp=49561:in=50190:zs=50283
+  173 e1=33792:e2=34816
+  174 tx$="{blk}":bl$="{wht}":tx=0:bl=1:rem*** farb combo fuer menue
+  180 rem *** such wert fn ***
+  181 hm=1:em=1:fm=1:lm=1:sm=1:rem ** init der menues ***
+  185 def fn fi(x)=peek(251)+256*peek(252)
+  186 fb$="{blk}{wht}{red}{cyn}{pur}{grn}{blu}{yel}{orng}{brn}{lred}{gry1}{gry2}{lgrn}{lblu}{gry3}"
+  188 sysin:syssp:print"{clr}":sysb2:poke53280,10:poke53281,10:print"{clr}":poke32247,0
+  189 syspl,10,13,"{blk}booting Quizmaster..."
+  190 gosub920:a$="_quizchar":au=1:gosub31500:syseb
+  200 a$="_quiztitel":gosub31510:au=0:ife=0then300
+  210 print"{clr}{yel}          Q U I Z M{$a0}A{$a0}S{$a0}T{$a0}E{$a0}R"
+  211 print"          {CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  212 syspl,18,5,"von"
+  213 syspl,11,9,"Matthias Gerloff"
+  214 gosub11000:goto400
+  300 gosub40000:rem *** show pic ***
+  399 rem *** hauptmenue ***
+  400 printtx$"{clr}"
+  401 syspl,15,6,bl$"Hauptmenue":syspl,15,7,tx$"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  402 syspl,12,9,bl$"@"tx$" Quiz spielen"
+  403 syspl,12,11,bl$"@"tx$" Editormenue"
+  404 syspl,12,13,bl$"@"tx$" Farbmenue"
+  405 syspl,12,15,bl$"@"tx$" Ende"
+  410 fs=f2:en=e2:f=hm:gosub34000:gosub33000
+  420 hm=f:onfgosub1000,500,700,430
+  425 goto400
+  430 print"{clr}":end
+  499 rem *** editormenue ***
+  500 printtx$"{clr}"
+  501 syspl,13,0,bl$"Editormenue":syspl,13,1,tx$"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  502 syspl,10,4,bl$"@"tx$" Bild zeigen
+  503 syspl,10,5,bl$"@"tx$" Bild editieren"
+  504 syspl,10,6,bl$"@"tx$" Bild laden"
+  505 syspl,10,7,bl$"@"tx$" Bild speichern"
+  506 syspl,10,8,bl$"@"tx$" Zeichensatz laden"
+  507 syspl,10,9,bl$"@"tx$" Zeichensatz speichern"
+  508 syspl,10,10,bl$"@"tx$" Titelbild laden"
+  509 syspl,10,11,bl$"@"tx$" Titelbild speichern"
+  510 syspl,10,12,bl$"@"tx$" Quiz anlegen"
+  511 syspl,10,13,bl$"@"tx$" Bewegung : An ":ifpeek(bf)=0thensyspl,23,13,tx$"Aus"
+  512 syspl,10,14,bl$"@"tx$" Hauptmenue{home}"
+  513 f=em:gosub34000:gosub33000
+  516 em=f:iff=11thenem=1:return
+  517 iff<>3andf<>4thenpokefnfi(0),0
+  518 onfgoto521,520,530,535,519,522,540,541,551,550
+  519 gosub900:goto500
+  520 sysed:print"{rvof}";:goto513
+  521 gosub40000:goto513
+  522 gosub800:goto500
+  530 gosub32500:x=xx:gosub63500:ifa$="00"orf>xxthengosub10000:goto513
+  531 a$="frage "+a$:gosub31510:gosub10000:pokefnfi(0),0:em=1
+  532 ifpeek(bf)=1thensyspl,23,13,tx$"An "
+  533 ifpeek(bf)=0thensyspl,23,13,tx$"Aus"
+  534 goto513
+  535 fs=f1:en=e1:poke2,128:sysfs:iffnfi(0)<>enthen538
+  536 poke2,0:sysfs:iffnfi(0)=enthen595
+  537 sysb1:gosub33000:sysb2:pokefnfi(0),128
+  538 fs=f2:en=e2:gosub32500:x=xx+1:gosub63500:ifa$="00"orf>xthengosub10000:goto513
+  539 a$="frage "+a$:gosub31520:xx=xx-(x=f):gosub32600:gosub10000:goto513
+  540 syspl,15,24,bl$"loading...";:a$="_quiztitel":gosub31510:gosub10000:em=1:goto513
+  541 syspl,15,24,bl$"saving...";:a$="_quiztitel":gosub31520:gosub10000:goto513
+  550 pokebf,1-peek(bf):goto511
+  551 gosub63000:ifin$=""thengosub10000:goto513
+  552 gosub10000:syspl,0,24,bl$"Leere Diskette einlegen. <{rvon}SPACE{rvof}>";
+  553 gosub11000:gosub10000:ifk$<>" "then513
+  554 syspl,10,24,bl$"Formatiere "in$;
+  555 gosub38000:open1,8,15,"n:"+in$+",mg":gosub61000:ife<>0thengosub10000:close1:goto513
+  556 xx=0:gosub32600:gosub10000:print#1,"i":close1:goto513
+  595 gosub10000:syspl,5,24,bl$"Keine Antwort moeglich. <{rvon}SPACE{rvof}>";
+  596 gosub11000:ifk$<>" "then596
+  597 gosub10000:fs=f2:en=e2:goto513
+  599 rem *** farbwahlmenue ***
+  600 printtx$"{clr}"
+  601 syspl,13,0,bl$"Farbwahlmenue":syspl,13,1,tx$"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  602 syspl,14,4,bl$"@"tx$" Schwarz"
+  603 syspl,14,5,bl$"@"tx$" Weiss"
+  604 syspl,14,6,bl$"@"tx$" Rot"
+  605 syspl,14,7,bl$"@"tx$" Tuerkis"
+  606 syspl,14,8,bl$"@"tx$" Violett"
+  607 syspl,14,9,bl$"@"tx$" Gruen"
+  608 syspl,14,10,bl$"@"tx$" Blau"
+  609 syspl,14,11,bl$"@"tx$" Gelb"
+  610 syspl,14,12,bl$"@"tx$" Orange"
+  611 syspl,14,13,bl$"@"tx$" Braun"
+  612 syspl,14,14,bl$"@"tx$" Hellrot"
+  613 syspl,14,15,bl$"@"tx$" Dunkelgrau"
+  614 syspl,14,16,bl$"@"tx$" Grau"
+  615 syspl,14,17,bl$"@"tx$" Hellgruen"
+  616 syspl,14,18,bl$"@"tx$" Hellblau"
+  617 syspl,14,19,bl$"@"tx$" Hellgrau"
+  620 gosub34000:gosub33000:f=f-1:return
+  699 rem *** farbmenue ***
+  700 print"{clr}"
+  701 syspl,15,5,bl$"Farbmenue":syspl,15,6,tx$"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  702 syspl,13,8,bl$"@"tx$" Hintergrund"
+  703 syspl,13,10,bl$"@"tx$" Block u. Titel"
+  704 syspl,13,12,bl$"@"tx$" Schrift"
+  705 syspl,13,14,bl$"@"tx$" Hauptmenue"
+  710 f=fm:gosub34000:gosub33000
+  725 iff=4thenfm=1:return
+  726 fm=f:onfgosub732,730,731
+  727 goto700
+  730 f=bl+1:gosub600:bl=f:bl$=mid$(fb$,f+1,1):return
+  731 f=tx+1:gosub600:tx=f:tx$=mid$(fb$,f+1,1):return
+  732 f=(peek(53280)and15)+1:gosub600:poke53280,f:poke53281,f:return
+  799 rem ** zs - saver **
+  800 print"{clr}":syspl,10,5,bl$"Zeichensatz speichern"
+  801 syspl,10,6,tx$"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  802 syspl,12,9,bl$"@"tx$" 1.Zeichensatz"
+  804 syspl,12,11,bl$"@"tx$" Doppelzeichensatz"
+  805 syspl,12,13,bl$"@"tx$" Editormenue"
+  806 f=sm:gosub34000:gosub33000
+  810 iff=3thensm=1:return
+  811 sm=f:onfgosub820,822:gosub63000:ifin$=""then806
+  812 fori=1tolen(in$):poke829+i,asc(mid$(in$,i,1)):next:poke2,len(in$):syszs
+  813 ifpeek(2)=5thengosub60000:goto812
+  814 gosub61000:gosub10000:goto806
+  820 poke50349,168:return
+  822 poke50349,176:return
+  899 rem ** zs laden **
+  900 print"{clr}":syspl,11,5,bl$"Zeichensatz laden"
+  901 syspl,11,6,tx$"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  902 syspl,12,9,bl$"@"tx$" 1.Zeichensatz"
+  903 syspl,12,11,bl$"@"tx$" 2.Zeichensatz"
+  904 syspl,12,13,bl$"@"tx$" Doppelzeichensatz"
+  905 syspl,12,15,bl$"@"tx$" Editormenue"
+  906 f=lm:gosub34000:gosub33000
+  910 iff=4thenlm=1:return
+  911 lm=f:onfgosub920,921,920:gosub63000:ifin$=""then906
+  912 a$=in$:gosub31500
+  915 syseb:gosub10000:goto906
+  920 poke36686,160:return
+  921 poke36686,168:return
+  999 rem *** quiz spielen ***
+ 1000 gosub10000:syspl,3,24,bl$"Spieldiskette einlegen. <{rvon}SPACE{rvof}>";
+ 1005 gosub11000:ifk$<>" "then1005
+ 1006 gosub10000:syspl,13,24,tx$"booting Quiz...";
+ 1010 gosub920:au=1:a$="_quizchar":gosub31500:a$="_quiztitel":gosub31510:au=0
+ 1020 gosub10000:syseb:ife=0thengosub40000
+ 1030 print"{clr}":gosub32500:gosub32800
+ 1040 printtx$"{clr}":syspl,13,0,bl$"Quiz spielen":syspl,13,1,tx$"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 1050 syspl,10,5,bl$"Name: "tx$qu$
+ 1060 syspl,16,7,tx$"{left}"xx"Fragen":ifxx=0thengosub11000:return
+ 1070 syspl,10,10,bl$"Wie viele wollen Sie ? ";:in$="":e=0
+ 1080 print"{CBM-O}{left}";:gosub11000:ifk$=chr$(13)thenprint" ";:goto1100
+ 1090 ife>0andk$=chr$(20)thene=e-1:in$=left$(in$,e):printk$;:goto1080
+ 1095 ifk$>="0"andk$<="9"ande<2thenin$=in$+k$:printk$;
+ 1096 goto1080
+ 1100 nu=val(in$):syspl,10,10,tx$"Gewaehlte Anzahl:"nu"{left}         ";:ifnu=0thenreturn
+ 1101 syspl,10,15,tx$"Fragen: ":syspl,10,17,tx$"Richtige Antworten:"
+ 1102 syspl,10,19,tx$"Falsche Antworten :"
+ 1105 fori=1toxx:re(i)=i:next
+ 1106 gosub10000:syspl,5,24,bl$"{rvon}G{rvof}emischt oder der {rvon}R{rvof}eihe nach.";
+ 1107 gosub11000:ifk$="r"then1150
+ 1108 ifk$<>"g"then1107
+ 1109 gosub10000
+ 1110 fori=1toxx
+ 1120 a%=rnd(ti)*xx+1:b%=rnd(ti)*xx+1
+ 1130 e=re(a%):re(a%)=re(b%):re(b%)=e
+ 1140 next
+ 1150 ri=0:fa=0
+ 1160 foryy=1tonu
+ 1170 a$="frage "+right$("00"+mid$(str$(re(yy)),2),2)
+ 1180 gosub31510:ife<>0thenreturn
+ 1190 poke2,128:sysf1:at=fnfi(0):pokeat,0
+ 1200 sysb1:mo=1:fs=f1:en=e1:poke198,0:gosub33000:sysb2:mo=0
+ 1210 iffnfi(0)=atthenri=ri+1:goto1220
+ 1211 fa=fa+1:gosub10000:syspl,3,24,bl$"Leider falsch. Richtig war..<{rvon}SPACE{rvof}>";
+ 1212 pokefnfi(0),0:pokeat,128:gosub11000:gosub40000:gosub10000
+ 1213 goto1230
+ 1220 gosub10000:syspl,10,24,bl$"Die Antwort ist richtig.";
+ 1230 syspl,18,15,tx$yy
+ 1231 syspl,29,17,ri:po=ri:gosub32900:syspl,33,17,"     ";:syspl,35,17,po$;
+ 1232 syspl,29,19,fa:po=fa:gosub32900:syspl,33,19,"     ";:syspl,35,19,po$;
+ 1240 nextyy
+ 1250 gosub10000:syspl,6,24,bl$"Ende des Quizspiels. <{rvon}SPACE{rvof}>";
+ 1260 gosub11000:ifk$<>" "then1260
+ 1270 return
+10000 syspl,0,24,"                                       ";:return
+10002 return
+11000 getk$:ifmo=1andpeek(bf)=1thensysbw
+11001 ifk$=""then11000
+11010 return
+31499 rem *** zeichen satz load ***
+31500 fori=1tolen(a$):poke36614+i,asc(mid$(a$,i,1)):next:poke2,len(a$)
+31501 sys36665:ifpeek(2)=5thengosub60000:goto31500
+31502 goto61000
+31509 rem ** bild load **
+31510 fori=1tolen(a$):poke829+i,asc(mid$(a$,i,1)):next:poke2,len(a$)
+31512 syslo
+31513 ifpeek(2)=5thengosub60000:goto31510
+31515 goto61000
+31519 rem ** bild save **
+31520 fori=1tolen(a$):poke829+i,asc(mid$(a$,i,1)):next:poke2,len(a$)
+31522 syssa
+31523 ifpeek(2)=5thengosub60000:goto31520
+31525 goto61000
+31530 return
+31999 rem *** data 8f00 ***
+32000 data95,81,85,73,90,77,76,95,81,85,73,90,67,72,65,82,0,0,0,0,0,0,0,162,8
+32001 data160,0,32,186,255,162,0,160,143,169,7,32,189,255,169,0,162,0,160,192
+32002 data32,213,255,160,0,132,2,144,2,133,2,96,162,8,160,0,32,186,255,162,7
+32003 data160,143,165,2,32,189,255,169,0,162,0,160,160,32,213,255,160,0,132,2
+32004 data144,2,133,2,96,-1
+32005 a=36608
+32006 readx:ifx<>-1thenpokea,x:a=a+1:goto32006
+32007 return
+32499 rem*** read max frage ***
+32500 gosub38000:open15,8,15,"i":open5,8,5,"#"
+32510 print#15,"u1 5 0 18 0":print#15,"b-p 5 165"
+32515 get#5,a$,b$:xx=val(a$+b$):close5:close15:gosub61000:ife<>0thenxx=0
+32520 return
+32599 rem*** write max frage ***
+32600 gosub38000:open15,8,15,"i":open5,8,5,"#":print#15,"u1 5 0 18 0"
+32605 print#15,"b-p 5 165":a$=left$(right$(str$(xx),2),1)+right$(str$(xx),1)
+32610 print#5,a$;:print#15,"u2 5 0 18 0":close5:close15:return
+32799 rem *** read quizname ***
+32800 open15,8,15,"i":open5,8,5,"#":print#15,"u1 5 0 18 0":print#15,"b-p 5 144"
+32810 qu$="":fori=1to16:get#5,k$:qu$=qu$+k$:next:close5:close15:return
+32899 rem *** po --> po$ ***
+32900 po$="":po=int(po/yy*100+.5):po$=mid$(str$(po),2)+" %"
+32910 po$=left$("{left}{left}",len(po$)-3)+po$:return
+32999 rem ** menue auswahl ** ed=ende:fs=f1 bzw. f2
+33000 poke2,128:sysfs:iffnfi(0)<>enthengosub35000:mx=e+1:sysfs:poke2,0:goto33007
+33001 gosub35000:mx=e:f=1:poke2,0:sysfs:iffnfi(0)=enthenreturn
+33006 pokefnfi(0),128
+33007 gosub11000:ifk$=chr$(13)thenpokefnfi(0),0:return
+33008 ifk$="{rght}"thenpokefnfi(0),0:f=f-1-mx*(f=1):gosub34000:goto33006
+33010 ifk$<>"{down}"then33007
+33015 pokefnfi(0),0:f=f+1:sysfc:iffnfi(0)=enthensysfs:f=1
+33020 goto33006
+33035 .
+34000 poke2,0:sysfs:iff=1thenpokefnfi(0),128:return
+34001 fori=1tof-1:sysfc:next:pokefnfi(0),128:return
+34999 rem *** finde ma ***
+35000 po=peek(2):poke2,0:sysfs:e=0
+35010 ifen<>fnfi(0)thene=e+1:sysfc:goto35010
+35020 poke2,po:return
+37999 rem *** test floppy an **
+38000 a$=chr$(0):au=1:gosub31510:au=0:return
+40000 sysb1
+40001 ifpeek(bf)=1thensysbw
+40002 getk$:ifk$=""then40001
+40003 sysb2:return
+59999 rem ** floppy aus hinweis **
+60000 gosub10000:syspl,10,24,bl$"Floppy anschalten";:gosub11000:return
+60999 rem *** error kanal ***
+61000 open8,8,15:input#8,e,e$,tr,se:close8:ife=0orau=1thenreturn
+61010 gosub10000:syspl,0,24,bl$"Fehler : ";e;e$;tr;se;:gosub11000:gosub10000:return
+62999 rem *** file eingabe ***
+63000 gosub10000:syspl,0,24,tx$"Name:";
+63001 in$="":e=0
+63002 print"{CBM-O}{left}";:gosub11000:ifk$=chr$(13)thenprint" ";:return
+63003 ifk$=chr$(20)ande>0thene=e-1:in$=left$(in$,e):printk$;:goto63002
+63004 ife=16ork$=chr$(34)ork$<chr$(32)or(k$>chr$(127)andk$<chr$(160))then63002
+63005 printk$;:e=e+1:in$=in$+k$:goto63002
+63499 rem ** eingabe bild nummer **
+63500 a$="00":gosub10000:syspl,0,24,tx$"Bildnummer 00  "bl$"max ";
+63501 f=0:printright$("00"+mid$(str$(x+(x=100)),2),2)tx$;
+63502 gosub11000:ifk$=chr$(13)thenreturn
+63503 ifk$<"0"ork$>"9"then63502
+63504 f=10*(f-10*int(f/10))+val(k$):a$=right$("00"+mid$(str$(f),2),2)
+63505 syspl,11,24,a$;:goto63502
+
