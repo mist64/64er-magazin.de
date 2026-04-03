@@ -5,13 +5,15 @@
     <title>Tips &amp; Tricks zum C128</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="Andreas Ligendza, tr, Carsten Schmidt, tr, Florian Müller, tr, Frank Mülheims, tr, Frank Probst, tr, Thorsten Wanschura, tr">
+    <meta name="author" content="Frank Mülheims, Frank Probst, tr">
     <meta name="64er.issue" content="4/86">
     <meta name="64er.head1" content="Tips & Tricks">
     <meta name="64er.head2" content="C 64/C 128">
     <meta name="64er.pages" content="81-82">
+    <meta name="64er.toc_title" content="Tips und Tricks zum C128">
     <meta name="64er.toc_category" content="Listings zum Abtippen">
-    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.index_title" content="Tips & Tricks zum C 128">
+    <meta name="64er.index_category" content="Tips & Tricks C 128|Verschiedenes">
     <meta name="64er.id" content="tips_c128">
 </head>
 
@@ -26,11 +28,11 @@
 
         <p>Einige frischgebackene C 128-Besitzer möchten jetzt auch einmal in Z80-Assembler programmieren. Um den Z80-Mikroprozessor einzuschalten, muß das Bit 0 in Speicherstelle $fd505 auf 1 gesetzt werden. Doch wo beginnt der Prozessor seine Arbeit und was ist sonst noch zu beachten?</p>
 
-        <p>Zunächst müssen die System-IRQs gesperrt werden. Weiterhin sollte man sich in Bank 0 befinden (dort wird später das Z80-ROM von $0000 bis $1000 eingeblendet). Nachdem dies geschehen ist, kann man endlich das Bit 0 in $fd505 auf »High« legen. Nach dem Abfallen des Systemtaktes der 8502-CPU beginnt nun endlich der Z80 seine Arbeit ab der Adresse $Offed. Hinter dem dort stehenden »NOP« findet sie einen Sprungbefehl nach $0008 in das nun eingeschaltene ROM. Das dort stehende Programm bootet normalerweise die CP/M-System-Diskette.</p>
+        <p>Zunächst müssen die System-IRQs gesperrt werden. Weiterhin sollte man sich in Bank 0 befinden (dort wird später das Z80-ROM von $0000 bis $1000 eingeblendet). Nachdem dies geschehen ist, kann man endlich das Bit 0 in $fd505 auf »High« legen. Nach dem Abfallen des Systemtaktes der 8502-CPU beginnt nun endlich der Z80 seine Arbeit ab der Adresse $0ffed. Hinter dem dort stehenden »NOP« findet sie einen Sprungbefehl nach $0008 in das nun eingeschaltene ROM. Das dort stehende Programm bootet normalerweise die CP/M-System-Diskette.</p>
 
         <p>Um in eigene Programme zu gelangen, muß man vor dem Einschalten den Sprungbefehl verbiegen. Dazu schreibt man in die Speicherstelle $0ffee ein $c3 (entspricht dem »JP«-Befehl) und in die folgenden beiden Stellen die Startadresse im Low/High-Format.</p>
 
-        <p>Listing 1 zeigt ein Programm, das die oben genannten Punkte, außer dem Verändern des Sprungbefehls, für Sie ausführt. Nach dem Abarbeiten des Z80-Programms sollte man nach $OffeO springen. Dort wird die 8502-CPU reaktiviert (Näheres in Listing 2). Beide Programme stehen sofort nach Einschalten des Computers zur Verfügung.</p>
+        <p>Listing 1 zeigt ein Programm, das die oben genannten Punkte, außer dem Verändern des Sprungbefehls, für Sie ausführt. Nach dem Abarbeiten des Z80-Programms sollte man nach $0ffe0 springen. Dort wird die 8502-CPU reaktiviert (Näheres in Listing 2). Beide Programme stehen sofort nach Einschalten des Computers zur Verfügung.</p>
 
         <p>Zum Schluß möchte ich noch auf einen Fehler im Betriebssystem hinweisen: Betätigt man, während der 40-Zeichen-Bildschirm gescrollt wird, die ASCII/DIN-Taste, so erscheint sehr oft in etwa der Mitte des Bildschirms ein Zeichensalat. Disassembliert ergeben die ASCII-Werte ein Programm, das auch in der erweiterten Zeropage zu finden ist.</p>
 
@@ -68,14 +70,17 @@ Wichtig: Die 8502-CPU beginnt ihre Arbeit bei $0FFDB!</pre>
 
         <h2>»PRINT AT« oder »CHAR«?</h2>
 
-        <p>Zunächst möchte ich zu dem Artikel »Entdeckungsreise durch den C 128« (64’er, Ausgabe 12/85) Stellung nehmen: Ein Simulieren des »PRINT AT«-Befehls, wie in diesem Artikel beschrieben, ist nicht nötig: Er ist im Basic 7.0 im Prinzip enthalten. Er wird mit dem »CHAR«-Befehl angesprochen, der nicht nur im Grafik-Modus wirksam ist. Format: char, Spalte, Zeile, Beispiel:</p>
+        <p>Zunächst möchte ich zu dem Artikel »Entdeckungsreise durch den C 128« (64’er, Ausgabe 12/85) Stellung nehmen: Ein Simulieren des »PRINT AT«-Befehls, wie in diesem Artikel beschrieben, ist nicht nötig: Er ist im Basic 7.0 im Prinzip enthalten. Er wird mit dem »CHAR«-Befehl angesprochen, der nicht nur im Grafik-Modus wirksam ist. Format: char, Spalte, Zeile,</p>
 
-        <p>10 char,5,5,"hallo" : char,15,15,"&hellip;.",1<br>
-            15 char,20,20 : input "eingabe";a</p>
+        <p class="noindent">Beispiel:
+            <code>10 char,5,5,"hallo" : char,15,15,"&hellip;.",1
+                15 char,20,20 : input "eingabe";a
+            </code>
+        </p>
 
         <p>Der eingebaute Sprite-Editor des C 128 besitzt außer den im Handbuch aufgeführten Anweisungen noch den Befehl »COPY«. Drückt man inder SPRDEF-Ebene die Taste »C«, so erscheint unten die Frage »COPY FROM ?«. Es wird dann die Nummer des Sprite angegeben (1-8), dessen Bitmuster in das momentan bearbeitete Raster kopiert werden soll. So lassen sich an verschiedenen Sprites geringfügige Änderungen leicht anbringen. Hat man den Sprite-Editor aufgerufen, haben die Funktionstasten F1 bis F8 folgende Bedeutung: F1 = C, F2 = A, F5 = A, F6 = RETURN, F7 = RETURN, F8 = M</p>
 
-        <p>Der eingebaute Maschinensprache-Monitor kann zusätzlich zu den im Handbuch beschriebenen Funktionen die vier möglichen Zahlensysteme (Hexadezimal, Dezimal, Binär, Oktal) ineinander umrechnen und anzeigen. Dazu gibt man, wenn man den Monitor aufgerufen hat, nur die umzuwan-,delnde Zahl mit ihrem entsprechenden Kennsymbol ein (»$«, »+«, »&amp;«, »%« siehe Handbuch, Anhang C-3).</p>
+        <p>Der eingebaute Maschinensprache-Monitor kann zusätzlich zu den im Handbuch beschriebenen Funktionen die vier möglichen Zahlensysteme (Hexadezimal, Dezimal, Binär, Oktal) ineinander umrechnen und anzeigen. Dazu gibt man, wenn man den Monitor aufgerufen hat, nur die umzuwandelnde Zahl mit ihrem entsprechenden Kennsymbol ein (»$«, »+«, »&amp;«, »%« siehe Handbuch, Anhang C-3).</p>
 
         <p>Im Kapitel »Organisation der Zeropage« des Handbuches ist die Anfangsadresse des Tastaturpuffers nicht erwähnt. Dieser liegt bei 842 (dezimal) in der Bank 0 und hat normalerweise die Länge 10 (Länge in Speicherstelle dez. 2592, Bank 0). Der Tastaturpuffer ist in Verbindung mit der Speicherstelle, die die Anzahl der Zeichen im Tastaturpuffer enthält (dez. 208, Bank 0), wichtig, um vom Programm aus Funktionen auszuführen, die sonst nur im Direktmodus möglich sind (zum Beispiel die Übernahme von neuen Programmzeilen). Dieser Programmiertrick ist schon vom C 64 und VC20 her bekannt.</p>
 
@@ -92,55 +97,61 @@ Wichtig: Die 8502-CPU beginnt ihre Arbeit bei $0FFDB!</pre>
 
         <address class="author">(Frank Mülheims/tr)</address>
 
-        <h2-und-pokes">Neue SYS' und POKEs</h2>
+        <h2>Neue SYS' und POKEs</h2>
 
-            <p>Mit »SYS 65341« läßt sich beim C 128 ein Reset erreichen. Mit »SYS 65357« kommt man vom C 128-Modus in den C 64-Modus, ohne Sicherheitsabfrage. Einen recht guten Programmschutz erreicht man mit folgenden POKEs:<br>
-                POKE 802,0:P0KE803, 224</p>
+        <p>Mit »SYS 65341« läßt sich beim C 128 ein Reset erreichen. Mit »SYS 65357« kommt man vom C 128-Modus in den C 64-Modus, ohne Sicherheitsabfrage. Einen recht guten Programmschutz erreicht man mit folgenden POKEs:
+            <code>POKE 802,0:P0KE803, 224</code>
+        </p>
 
-            <p>In ein Programm eingebaut, lösen diese POKEs nach dem Drücken der RUN/STOP-Taste einen Reset aus. Wer Spaß an Bildschirmeffekten hat, sollte einmal folgendes Programm ausprobieren:<br>
-                10 FOR I = 1 T0 15: SYS 51914: NEXT<br>
-                20 FOR I = 1 T0 15: SYS 51900: NEXT<br>
-                30 GOTO 10</p>
+        <p>In ein Programm eingebaut, lösen diese POKEs nach dem Drücken der RUN/STOP-Taste einen Reset aus. Wer Spaß an Bildschirmeffekten hat, sollte einmal folgendes Programm ausprobieren:
+            <code>10 FOR I = 1 T0 15: SYS 51914: NEXT
+                20 FOR I = 1 T0 15: SYS 51900: NEXT
+                30 GOTO 10
+            </code>
+        </p>
 
-            <address class="author">(Andreas Ligendza/tr)</address>
+        <address class="author">(Andreas Ligendza/tr)</address>
 
-            <h2>Programmschutz-POKEs</h2>
+        <h2>Programmschutz-POKEs</h2>
 
-            <p>Wie man beim C 64 über »POKE 808,225« die RUN/STOP- und die RESTORE-Taste abschalten kann, geht dies beim C 128 über POKE 808,98. Der große Nachteil ist, daß damit die interne Uhr (TIME,TI,TIME$,TI) unbrauchbar wird. Doch durch einen Reset und gleichzeitiges Drücken von RUN/STOP kann man in den Monitor gelangen, diesen verlassen, und ans Programm kommen, da es nicht gelöscht ist. Dies umgeht man über BANK 1:POKE 65528,3. Nach diesem POKE führt ein Reset nur zum Absturz. Dieser POKE funktioniert selbstverständlich auch ohne das Abschalten von RUN/STOP-RESTORE, aber beide POKEs zusammen ergeben einen recht guten Schutz. Wer auf TIME$ (TI$) und TIME (TI) nicht verzichten will, kann mit P0KE792,51:P0KE793,255 die Tastenkombination RUN/STOP-RESTORE abschalten, die RUN/STOP-Taste alleine funktioniert aber weiterhin. Die letzten POKEs eignen sich vor allem dann, wenn man ein Basic-Programm compiliert: nach dem Compilieren sind sie ohnehin gegen RUN/STOP (ohne RESTORE) geschützt, und durch die beiden letzten POKEs wird auch noch die Kombination RUN/STOP-RESTO-RE und/oder durch BANK1:P0KE65528,3 der RESET verhindert.</p>
+        <p>Wie man beim C 64 über »POKE 808,225« die RUN/STOP- und die RESTORE-Taste abschalten kann, geht dies beim C 128 über POKE 808,98. Der große Nachteil ist, daß damit die interne Uhr (TIME,TI,TIME$,TI) unbrauchbar wird. Doch durch einen Reset und gleichzeitiges Drücken von RUN/STOP kann man in den Monitor gelangen, diesen verlassen, und ans Programm kommen, da es nicht gelöscht ist. Dies umgeht man über BANK 1:POKE 65528,3. Nach diesem POKE führt ein Reset nur zum Absturz. Dieser POKE funktioniert selbstverständlich auch ohne das Abschalten von RUN/STOP-RESTORE, aber beide POKEs zusammen ergeben einen recht guten Schutz. Wer auf TIME$ (TI$) und TIME (TI) nicht verzichten will, kann mit P0KE792,51:P0KE793,255 die Tastenkombination RUN/STOP-RESTORE abschalten, die RUN/STOP-Taste alleine funktioniert aber weiterhin. Die letzten POKEs eignen sich vor allem dann, wenn man ein Basic-Programm compiliert: nach dem Compilieren sind sie ohnehin gegen RUN/STOP (ohne RESTORE) geschützt, und durch die beiden letzten POKEs wird auch noch die Kombination RUN/STOP-RESTORE und/oder durch BANK1:P0KE65528,3 der RESET verhindert.</p>
 
-            <address class="author">(Florian Müller/tr)</address>
+        <address class="author">(Florian Müller/tr)</address>
 
-            <h2>Einfache Spritesteuerung</h2>
+        <h2>Einfache Spritesteuerung</h2>
 
-            <p>10 SPRDEF:SPRITE 1,1<br>
-                20 J=(JOY(2)-1)*45:IFJ=-45THENMOVSPR1,0#0: GOT020: ELSE:MOVSPR1,J#7:GOTO20</p>
+        <p><code>10 SPRDEF:SPRITE 1,1
+                20 J=(JOY(2)-1)*45:IFJ=-45THENMOVSPR1,0#0: GOT020: ELSE:MOVSPR1,J#7:GOTO20
+            </code>
+        </p>
 
-            <p>Dieser Einzeiler ermöglicht eine einfache (aber schnelle) Joystickabfrage. Statt »IF&hellip;THEN«-Anweisungen werden die Joystickrichtungen in Grad umgewandelt und später von einem »MOVSPR x,x # x«-Befehl verarbeitet.<br>
-                Zum Programm:</p>
+        <p>Dieser Einzeiler ermöglicht eine einfache (aber schnelle) Joystickabfrage. Statt »IF&hellip;THEN«-Anweisungen werden die Joystickrichtungen in Grad umgewandelt und später von einem »MOVSPR x,x # x«-Befehl verarbeitet.</p>
 
-            <p>In Zeile 10 wird das Sprite definiert (SPRDEF) und eingeschaltet.</p>
+        <p class="noindent">Zum Programm:</p>
 
-            <p>In Zeile 20 wird in der Variablen J die Richtung des Joysticks —1*45 (360 Grad / 8 Richtungen = 45 Grad) abgelegt. Ist J=-45 (bei Nullstellung), wird das Sprite gestoppt und das Programm springt wieder nach Zeile 20.</p>
+        <p>In Zeile 10 wird das Sprite definiert (SPRDEF) und eingeschaltet.</p>
 
-            <p>Ist J nicht —45, bewegt sich das Sprite in Richtung J (mit »MOVSPR l,j # Geschwindigkeit« (die Geschwindigkeit ist beliebig von 2-15 wählbar). Zum Schluß startet das Programm erneut von Zeile 20</p>
+        <p>In Zeile 20 wird in der Variablen J die Richtung des Joysticks —1*45 (360 Grad / 8 Richtungen = 45 Grad) abgelegt. Ist J=-45 (bei Nullstellung), wird das Sprite gestoppt und das Programm springt wieder nach Zeile 20.</p>
 
-            <address class="author">(Thorsten Wanschura/tr)</address>
+        <p>Ist J nicht —45, bewegt sich das Sprite in Richtung J (mit »MOVSPR 1,j#Geschwindigkeit« (die Geschwindigkeit ist beliebig von 2-15 wählbar). Zum Schluß startet das Programm erneut von Zeile 20</p>
 
-            <h2>Deutscher Zeichensatz im C 64-Modus</h2>
+        <address class="author">(Thorsten Wanschura/tr)</address>
 
-            <p>Wenn man im C 64-Modus die »CAPS-LOCK«-Taste drückt, stehen alle internationalen Zeichen zur Verfügung, die sonst nur vom C 128-Modus aus erreichbar sind. Dabei werden einige Grafikzeichen mit den internationalen Zeichen belegt. Die CHR$ Tabelle sieht nun folgendermaßen aus:</p>
+        <h2>Deutscher Zeichensatz im C 64-Modus</h2>
 
-            <table class="plain">
-                <tr><td>CHR$ (172) = é</td><td>CHR$ (187) = ä</td><td>CHR$ (174) = è</td><td>CHR$ (123) = Ä</td></tr>
-                <tr><td>CHR$ (177) = µ</td><td>CHR$ (188) = ö</td><td>CHR$ (178) = à</td><td>CHR$ (124) = Ö</td></tr>
-                <tr><td>CHR$ (179) = ù</td><td>CHR$ (189) = ü</td><td>CHR$ (180) = å</td><td>CHR$ (125) = Ü</td></tr>
-                <tr><td>CHR$ (181) = ê</td><td>CHR$ (190) = ß</td><td>CHR$ (182) = î</td><td>CHR$ (191) = ^</td></tr>
-                <tr><td>CHR$ (183) = ô</td><td>CHR$ (192) = à</td><td>CHR$ (184) = û</td><td>CHR$ (64) = §</td></tr>
-                <tr><td>CHR$ (185) = √</td><td>CHR$ (96) = á</td><td>CHR$ (186) = Σ</td><td></td></tr>
-            </table>
+        <p>Wenn man im C 64-Modus die »CAPS-LOCK«-Taste drückt, stehen alle internationalen Zeichen zur Verfügung, die sonst nur vom C 128-Modus aus erreichbar sind. Dabei werden einige Grafikzeichen mit den internationalen Zeichen belegt. Die CHR$ Tabelle sieht nun folgendermaßen aus:</p>
+
+        <table class="plain">
+            <tr><td>CHR$ (172) = é</td><td>CHR$ (187) = ä</td><td>CHR$ (174) = è</td><td>CHR$ (123) = Ä</td></tr>
+            <tr><td>CHR$ (177) = µ</td><td>CHR$ (188) = ö</td><td>CHR$ (178) = à</td><td>CHR$ (124) = Ö</td></tr>
+            <tr><td>CHR$ (179) = ù</td><td>CHR$ (189) = ü</td><td>CHR$ (180) = å</td><td>CHR$ (125) = Ü</td></tr>
+            <tr><td>CHR$ (181) = ê</td><td>CHR$ (190) = ß</td><td>CHR$ (182) = î</td><td>CHR$ (191) = ^</td></tr>
+            <tr><td>CHR$ (183) = ô</td><td>CHR$ (192) = à</td><td>CHR$ (184) = û</td><td>CHR$ (64) = §</td></tr>
+            <tr><td>CHR$ (185) = √</td><td>CHR$ (96) = á</td><td>CHR$ (186) = Σ</td><td></td></tr>
+        </table>
 
 
-            <address class="author">(Carsten Schmidt/tr)</address>
+        <address class="author">(Carsten Schmidt/tr)</address>
     </article>
 </body>
 
