@@ -3,6 +3,7 @@
 // * https://aaronluna.dev/blog/add-search-to-static-site-lunrjs-hugo-vanillajs/
 
 let pagesIndex, searchIndex;
+let searchReady = initSearchIndex();
 const MAX_SUMMARY_LENGTH = 100;
 // Improved sentence boundary detection for German text
 const SENTENCE_BOUNDARY_REGEX = /(?<![A-Z][a-z]\.)\s*[.!?]+\s+/gm;
@@ -21,22 +22,30 @@ async function fetchJsonData(url) {
 
 async function initSearchIndex() {
   try {
-    fetchJsonData('/' + BASE_DIR + 'search.json').then(p => {
-      pagesIndex = p
-    });
-    fetchJsonData('/' + BASE_DIR + 'search_idx.json').then(s => {
-      searchIndex = lunr.Index.load(s)
-    });
+    const [p, s] = await Promise.all([
+      fetchJsonData('/' + BASE_DIR + 'search.json'),
+      fetchJsonData('/' + BASE_DIR + 'search_idx.json')
+    ]);
+    pagesIndex = p;
+    searchIndex = lunr.Index.load(s);
   } catch (e) {
     console.log(e);
   }
 }
 
-function handleSearchQuery(event) {
+async function handleSearchQuery(event) {
   event.preventDefault();
   const query = document.getElementById("search").value.trim().toLowerCase();
   if (!query) {
-    // do nothing
+    return;
+  }
+  if (!searchIndex || !pagesIndex) {
+    document.querySelector(".main_content").innerHTML = "<p>Suchindex wird geladen…</p>";
+    document.body.className = "search";
+    await searchReady;
+  }
+  if (!searchIndex || !pagesIndex) {
+    document.querySelector(".main_content").innerHTML = "<p>Suchindex konnte nicht geladen werden.</p>";
     return;
   }
   const results = searchSite(query);
@@ -202,7 +211,6 @@ function ellipsize(input, maxLength) {
   return input.slice(0, words[maxLength].end) + "...";
 }
 
-initSearchIndex();
 document.addEventListener("DOMContentLoaded", function() {
   if (document.getElementById("search-form") != null) {
     const searchInput = document.getElementById("search");
