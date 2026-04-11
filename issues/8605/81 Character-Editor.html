@@ -22,28 +22,58 @@
 
         <p>Alles in allem wird dem C 64-Benutzer ein sehr leistungsfähiges Toolkit zur Verfügung gestellt, mit dem ein den individuellen Bedürfnissen und Wünschen angepaßter Zeichensatz erstellt werden kann.</p>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Bedienungsanleitung</h2>
 
-        <h2>Bedienungsanleitung</h2>
+            <h3>Belegung der Tasten und deren Funktionen</h3>
 
-        <h3>Belegung der Tasten und deren Funktionen</h3>
-
-        <p>TODO TABLE</p>
-
-        <ul>
-            <li>Anwahl des zu bearbeitenden Zeichens durch Erhöhen des Zeichen-Codes um 1.<br>
-                — Anwahl des zu bearbeitenden Zeichens durch Erniedrigen des Zeichen-Codes um 1.<br>
-                £ Anwahl des zu bearbeitenden Zeichens durch Erhöhen beziehungsweise durch Erniedrigen des Zeichen-Codes um 128.<br>
-                t Schaltet den editierten Zeichensatz ein beziehungsweise aus. Die Meldung »ZEICHENSATZ NICHT AKTIVIERT« wird entsprechend im Bildschirm ein- oder ausgeblendet.<br>
-                — Kopiert die Zeichen der Character-Codes 0 bis 127 in die Zeichen mit den Character-Codes 128 bis 255 und invertiert sie.<br>
-                F1 Austausch der beiden zu bearbeitenden Zeichensätze.<br>
-                F3 Invertierung des aktuellen Zeichens.<br>
-                F4 Löschen des aktuellen Zeichens.<br>
-                F5 Sprung in Test-Modus. Zurück mit der »RETURN«-Taste.<br>
-                F7 Speichern des aktuellen Zeichens.<br>
-                F8 Übernehmen des gespeicherten Zeichens anstelle des aktuellen Zeichens.</li>
-        </ul>
-
+            <table>
+                <tr>
+                    <td>+</td>
+                    <td>Anwahl des zu bearbeitenden Zeichens durch Erhöhen des Zeichen-Codes um 1.</td>
+                </tr>
+                <tr>
+                    <td>−</td>
+                    <td>Anwahl des zu bearbeitenden Zeichens durch Erniedrigen des Zeichen-Codes um 1.</td>
+                </tr>
+                <tr>
+                    <td>£</td>
+                    <td>Anwahl des zu bearbeitenden Zeichens durch Erhöhen beziehungsweise durch Erniedrigen des Zeichen-Codes um 128.</td>
+                </tr>
+                <tr>
+                    <td>↑</td>
+                    <td>Schaltet den editierten Zeichensatz ein beziehungsweise aus. Die Meldung »ZEICHENSATZ NICHT AKTIVIERT« wird entsprechend im Bildschirm ein- oder ausgeblendet.</td>
+                </tr>
+                <tr>
+                    <td>←</td>
+                    <td>Kopiert die Zeichen der Character-Codes 0 bis 127 in die Zeichen mit den Character-Codes 128 bis 255 und invertiert sie.</td>
+                </tr>
+                <tr>
+                    <td>F1</td>
+                    <td>Austausch der beiden zu bearbeitenden Zeichensätze.</td>
+                </tr>
+                <tr>
+                    <td>F3</td>
+                    <td>Invertierung des aktuellen Zeichens.</td>
+                </tr>
+                <tr>
+                    <td>F4</td>
+                    <td>Löschen des aktuellen Zeichens.</td>
+                </tr>
+                <tr>
+                    <td>F5</td>
+                    <td>Sprung in Test-Modus. Zurück mit der »RETURN«-Taste.</td>
+                </tr>
+                <tr>
+                    <td>F7</td>
+                    <td>Speichern des aktuellen Zeichens.</td>
+                </tr>
+                <tr>
+                    <td>F8</td>
+                    <td>Übernehmen des gespeicherten Zeichens anstelle des aktuellen Zeichens.</td>
+                </tr>
+            </table>
+        </aside>
 
         <p>Diese Funktionen sind in jeder Bearbeitungsroutine frei wählbar.</p>
 
@@ -56,7 +86,93 @@
             <figcaption>Bild 1. Die übersichtliche Eingabemaske zum Programm »Character-Editor«.</figcaption>
         </figure>
 
-        <p>TODO TABLE</p>
+        <h3>Erklärung der einzelnen Bearbeitungsroutinen</h3>
+        <table>
+            <tr>
+                <td><b>EDC</b> (Edit Character)</td>
+                <td>Editieren eines Zeichens. Es erscheint der Cursor (nicht blinkend) innerhalb der Bildschirmmatrix des aktuellen Zeichens. Mit den Cursor-Tasten kann nun jedes Bit des Zeichens angewählt werden und mit der »S«-Taste gesetzt beziehungsweise zurückgesetzt werden.</td>
+            </tr>
+            <tr>
+                <td><b>CHC</b> (Change Characters)</td>
+                <td>Vertauschen zweier Zeichen. Mit den Cursor-Tasten kann nun das erste zu vertauschende Zeichen angewählt werden. Ist dies abgeschlossen, so ist die Aufforderung »SELECT 1. CHARACTER« mit der »RETURN«-Taste zu quittieren. Ebenso ist mit der Anwahl des zweiten Zeichens zu verfahren. Ist die Aufforderung »SELECT 2. CHARACTER« mit der »RETURN«-Taste quittiert worden, so erscheint die Sicherheitsfrage »ARE YOU SHURE (Y/N)?«. Wird diese mit »Y« quittiert, werden die beiden ausgewählten Zeichen vertauscht. Es lassen sich Zeichen aus dem ersten mit Zeichen aus dem zweiten Zeichensatz vertauschen, wenn mit »F1« der Zeichensatz umgeschaltet wird.</td>
+            </tr>
+            <tr>
+                <td><b>MVC</b> (Move Character)</td>
+                <td>Verschieben (kopieren) eines Zeichens. Auswahl des zu verschiebenden Zeichens. Wie ein Zeichen sich verschieben läßt, wurde bereits bei der Routine CHC beschrieben.</td>
+            </tr>
+            <tr>
+                <td><b>LDC</b> (Load Character-Set)</td>
+                <td>Laden eines zuvor mit der SVC-Routine gespeicherten Zeichensatzes. Der Name des zu ladenden Zeichensatzes wird in der untersten Bildschirmzeile eingegeben.</td>
+            </tr>
+            <tr>
+                <td><b>SVC</b> (Save Character-Set)</td>
+                <td>Speichern der beiden in Bearbeitung stehenden Zeichensätze. Eingabe des Namens wie bei der LDC-Routine.</td>
+            </tr>
+            <tr>
+                <td><b>LS1</b> (Load Set 1)</td>
+                <td>Laden des ersten C 64-Zeichensatzes. Wird die Sicherheitsfrage mit »Y« quittiert, wird der erste der beiden orginalen Zeichensätze als aktueller Zeichensatz übernommen. Der in Bearbeitung stehende Zeichensatz geht dabei verloren.</td>
+            </tr>
+            <tr>
+                <td><b>LS2</b> (Load Set 2)</td>
+                <td>Laden des zweiten C 64-Zeichensatzes. Wie LS1-Routine, nur wird der zweite Zeichensatz des C 64 geladen.</td>
+            </tr>
+            <tr>
+                <td><b>TCH</b> (Turn Character)</td>
+                <td>Drehen eines Zeichens. Mit den Cursor-Tasten kann das aktuelle Zeichen rechts und links herum gedreht werden.</td>
+            </tr>
+            <tr>
+                <td><b>TCS</b> (Turn Character-Set)</td>
+                <td>Drehen sämtlicher Zeichen des in Bearbeitung stehenden Zeichensatzes (mit Hilfe der Cursor-Tasten).</td>
+            </tr>
+            <tr>
+                <td><b>RBH</b> (Rotate Byte horizontal)</td>
+                <td>Horizontales Rotieren eines Bytes innerhalb eines Zeichens. Mit den Cursor-Tasten UP und DOWN wird ein Pfeil-Cursor »–« innerhalb der Bildschirmmatrix gesteuert, der das zu rotierende Byte anwählt. Mit den Cursor-Tasten RIGHT und LEFT wird das angewählte Byte entsprechend rotiert.</td>
+            </tr>
+            <tr>
+                <td><b>RBV</b> (Rotate Byte vertikal)</td>
+                <td>Vertikales Rotieren eines Bytes innerhalb eines Zeichens. Mit den Cursor-Tasten RIGHT und LEFT wird ein Pfeil-Cursor »|« innerhalb der Bildschirmmatrix gesteuert, der das zu rotierende Byte anwählt. Mit den Cursor-Tasten UP und DOWN wird das angewählte Byte entsprechend rotiert.</td>
+            </tr>
+            <tr>
+                <td><b>RCH</b> (Rotate Character)</td>
+                <td>Rotieren eines Zeichens. Mit den Cursor-Tasten kann das aktuelle Zeichen in jede Richtung byteweise rotiert werden.</td>
+            </tr>
+            <tr>
+                <td><b>RCS</b> (Rotate Character-Set)</td>
+                <td>Rotieren sämtlicher Zeichen des in Bearbeitung stehenden Zeichensatzes (mit Hilfe der Cursor-Tasten).</td>
+            </tr>
+            <tr>
+                <td><b>MBH</b> (Mirror Byte horizontal)</td>
+                <td>Horizontales Spiegeln eines Bytes innerhalb eines Zeichens. Die Steuerung erfolgt wie bei der RBH-Routine.</td>
+            </tr>
+            <tr>
+                <td><b>MBV</b> (Mirror Byte vertikal)</td>
+                <td>Vertikales Spiegeln eines Bytes innerhalb eines Zeichens. Die Steuerung erfolgt wie bei der RBV-Routine.</td>
+            </tr>
+            <tr>
+                <td><b>MCH</b> (Mirror Character)</td>
+                <td>Spiegeln eines Zeichens. Mit den Cursor-Tasten kann das aktuelle Zeichen horizontal und vertikal gespiegelt werden.</td>
+            </tr>
+            <tr>
+                <td><b>MCS</b> (Mirror Character-Set)</td>
+                <td>Spiegeln sämtlicher Zeichen des in Bearbeitung stehenden Zeichensatzes (mit Hilfe der Cursor-Tasten).</td>
+            </tr>
+            <tr>
+                <td><b>DIR</b> (Directory)</td>
+                <td>Einlesen und Anzeigen der Directory der eingelegten Diskette.</td>
+            </tr>
+            <tr>
+                <td><b>SDC</b> (Send Disk Command)</td>
+                <td>Senden von Diskettenbefehlen. In der Eingabe-Zeile im unteren Teil des Bildschirms kann jeder Befehl an die Floppy gesendet werden (zum Beispiel Scratch, Validate, New etc.). Nach beendeter Diskettenoperation wird der Status der Floppy angezeigt.</td>
+            </tr>
+            <tr>
+                <td><b>CCP</b> (Create Character Programm)</td>
+                <td>Erzeugen eines Zeichensatz-Programmes. Diese Routine generiert ein Programm mit Basic-Start. Der momentan bearbeitete Zeichensatz wird zusammen mit einer Aktivierungsroutine auf Diskette gespeichert. Die Eingabe des Namens erfolgt in der untersten Bildschirmzeile. Vor dem Namen wird automatisch »P/« als Kennung für Characterprogramm gesetzt.</td>
+            </tr>
+            <tr>
+                <td><b>LCE</b> (Leave Editor)</td>
+                <td>Verlassen des Character-Editors. Nach quittieren der Sicherheitsabfrage mit »Y« sind Sie wieder im Direkt-Modus des C 64. Soll der zuletzt bearbeitete Zeichensatz weiter editiert werden, so ist der Character-Editor mit ?USR(0) zu starten. Ansonsten kann mit RUN ganz neu begonnen werden.</td>
+            </tr>
+        </table>
 
         <p>Mit »RETURN« können die Routinen verlassen werden. Der Pfeil-Cursor »*-« erscheint dann wieder. Die reverse Darstellung der angewählten Routine wird wieder aufgehoben.</p>
 
