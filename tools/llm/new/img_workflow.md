@@ -107,6 +107,20 @@ This makes the 2000px limit structurally unreachable and keeps main context focu
 
 **Subagent tool discipline for images:** subagents view image content via the `Read` tool — that is how Claude actually sees a PNG. For any image *manipulation* (cropping, resizing, format conversion) use `magick` (ImageMagick) via `Bash`. **Do not use Python / PIL / Pillow / any scripting language for image work** — `magick` is sufficient and is the only tool the main workflow assumes. Spell this out explicitly in the subagent prompt so it doesn't reach for Python by habit.
 
+## When you can't decide — log, don't delete
+
+If a TODO, heading, figure stub, or stray reference in the HTML looks wrong or orphaned and you can't find a corresponding source on the scan, **do not silently delete it**. Write an entry in the issue's `LOG.md` (create it if it doesn't exist) describing:
+
+- the file and location
+- the exact content
+- what you looked for and where
+- possibilities you considered
+- what action a reviewer should take
+
+Then leave the HTML alone and move on. A human can decide later — a deleted orphan cannot be retrieved without scanning git history.
+
+Similarly, when an alt-text decision is genuinely ambiguous (the image is unclear, the subject is unrecognizable, the caption on the scan is illegible even at 300 dpi), prefer a best-effort description plus a `LOG.md` entry listing the uncertain choices over silently guessing. When in doubt, leave the `alt` as a minimal visible-facts description and log what you couldn't resolve.
+
 ## Anti-memory rule
 
 When reading captions from the scan, type what you see — do not compose from memory or context. If a caption is unclear, OCR the caption region or ask rather than guessing.
