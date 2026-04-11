@@ -35,12 +35,24 @@
 
         <p>Bedeutung der Variablen:</p>
 
-        <p>TODO TABLE</p>
-
-        <p class="source">lf: logische Filenummer; beliebig, sollte nicht anderweitig verwendet werden.<br>
-            ga: Geräteadresse des ^u überprüfenden Geräts, üblicherweise 4 für den Drucker, 8 oder 9 für die Floppy.<br>
-            sa: Sekundäradresse, darf bei der Floppy nicht 15 sein, da sonst der CLOSE-Befehl auch alle anderen Floppy-Kanäle schließt; kann beim Drucker entfallen.<br>
-            ST ist die Computer-interne Statusvariable, in der das Betriebssystem Fehler bei der Ein- und Ausgabe festhält.</p>
+        <table class="plain">
+            <tr>
+                <td>lf</td>
+                <td>logische Filenummer; beliebig, sollte nicht anderweitig verwendet werden.</td>
+            </tr>
+            <tr>
+                <td>ga:</td>
+                <td>Geräteadresse des zu überprüfenden Geräts, üblicherweise 4 für den Drucker, 8 oder 9 für die Floppy.</td>
+            </tr>
+            <tr>
+                <td>sa:</td>
+                <td>Sekundäradresse, darf bei der Floppy nicht 15 sein, da sonst der CLOSE-Befehl auch alle anderen Floppy-Kanäle schließt; kann beim Drucker entfallen.</td>
+            </tr>
+            <tr>
+                <td>ST</td>
+                <td>ist die Computer-interne Statusvariable, in der das Betriebssystem Fehler bei der Ein- und Ausgabe festhält.</td>
+            </tr>
+        </table>
 
         <p class="source">Funktionsweise: Der OPEN-Befehl aktualisiert, da kein Filename angegeben ist, nur die Computer-interne Tabelle der geöffneten Files. Daher kann der OPEN-Befehl auch niemals einen »DEVICE NOT PRESENT ERROR« nach sich ziehen. Entscheidend ist der CLOSE-Befehl: Da die in dieser Tabelle eingetragene Geräteadresse auf den seriellen Bus weist, wird auf jeden Fall auf den Bus zugegriffen und dabei festgestellt, daß das Gerät nicht angeschlossen beziehungsweise eingeschaltet ist. Dieser Zustand setzt Bit 7 der Statusvariablen ST. Der Basic-Interpreter verzichtet beim CLOSE-Befehl aufdie Überprüfung dieser Systemvariablen, also tritt kein »?device not present error« auf. Wird ST dann von Basic aus angesprochen, wird Bit 7 als Vorzeichenbit aufgefaßt, folglich enthält ST bei fehlendem/ausgeschaltetem Gerät einen negativen Wert und der IF-Befehl wird nach dem THEN fortgesetzt.</p>
 
@@ -172,11 +184,139 @@
 
         <address class="author">(Reinet Gebhardt/tr)</address>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Diverse POKEs</h2>
 
-        <p>Diverse POKEs</p>
+            <table>
+                <tr>
+                    <td>POKE</td>
+                    <td>53265,27</td>
+                    <td>Bildschirm aus/einschalten</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>204,0</td>
+                    <td>Cursor-Blinken einschalten</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>207,0 : POKE 204,1</td>
+                    <td>Cursor-Blinken ausschalten</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>56325,5-255</td>
+                    <td>Cursor schnell/langsam</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>56334, PEEK (56334) OR 1</td>
+                    <td>Interrupt ausschalten</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>56334, PEEK (56334) AND 254</td>
+                    <td>Interrupt einschalten</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>788,52/49</td>
+                    <td>RUN/STOP Taste aus/einschalten</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>792,193/71</td>
+                    <td>RESTORE Taste aus/einschalten</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>651,255</td>
+                    <td>Repeat um 4 Sekunden verzögern</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>646,0-15</td>
+                    <td>Schriftfarbe setzen</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>199,0...1</td>
+                    <td>Revers-Modus aus/ein</td>
+                </tr>
+                <tr>
+                    <td>POKE</td>
+                    <td>649,0...10</td>
+                    <td>Tastatur ab/einschalten</td>
+                </tr>
+                <tr>
+                    <td>SYS</td>
+                    <td>65499</td>
+                    <td>TI$="000000"</td>
+                </tr>
+                <tr>
+                    <td>SYS</td>
+                    <td>42115</td>
+                    <td>END ohne READY.</td>
+                </tr>
+                <tr>
+                    <td>SYS</td>
+                    <td>44808</td>
+                    <td>? SYNTAX ERROR</td>
+                </tr>
+                <tr>
+                    <td>SYS</td>
+                    <td>62255</td>
+                    <td>Alle Files schließen</td>
+                </tr>
+                <tr>
+                    <td>WAIT</td>
+                    <td>653,1...2...4</td>
+                    <td>Warten bis SHIFT/Commodore/CTRL gedrückt wird</td>
+                </tr>
+                <tr>
+                    <td>WAIT</td>
+                    <td>203,63</td>
+                    <td>Warten auf Tastendruck</td>
+                </tr>
+                <tr>
+                    <td>WAIT</td>
+                    <td>203,64</td>
+                    <td>Warten solange Taste gedrückt ist</td>
+                </tr>
+                <tr>
+                    <td>PRINT</td>
+                    <td>PEEK (152)</td>
+                    <td>Anzahl der offenen Files</td>
+                </tr>
+                <tr>
+                    <td>PRINT</td>
+                    <td>PEEK (153)</td>
+                    <td>Aktuelles Eingabegerät</td>
+                </tr>
+                <tr>
+                    <td>PRINT</td>
+                    <td>PEEK (154)</td>
+                    <td>Aktuelles Ausgabegerät</td>
+                </tr>
+                <tr>
+                    <td>PRINT</td>
+                    <td>PEEK (184)</td>
+                    <td>Aktuelle Filenummer</td>
+                </tr>
+                <tr>
+                    <td>PRINT</td>
+                    <td>PEEK (185)</td>
+                    <td>Aktuelle Sekundäradresse</td>
+                </tr>
+                <tr>
+                    <td>PRINT</td>
+                    <td>PEEK (647)</td>
+                    <td>Aktuelle Zeichenfarbe</td>
+                </tr>
+            </table>
 
-        <p>TODO TABLE</p>
+            <address class="author">(Alexander Niepel/tr)</address>
+        </aside>
     </article>
 </body>
 
