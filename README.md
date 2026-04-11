@@ -238,6 +238,11 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
 * Ausgabe 4/86:
+    * Formatierung, Metadaten, OCR-Fixes
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * Abtippen der Listings
+        * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
+* Ausgabe 5/86:
     * Abtippen der Listings
         * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
 
