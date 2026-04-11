@@ -1,0 +1,97 @@
+
+
+;greatprint-demo.prg ==0801==
+ 1000 rem 'greatprint' fuer c-64, von martin sprave, mai 1985
+ 1010 a=53000:fori=0to247:readb:pokea+i,b:p=p+b:next
+ 1020 ifp<>27293thenprint"{rvon}pruefsummenfehler!":stop
+ 1030 data 169, 47,133,  0,169, 55,133,  1, 32,241,183,224, 22,176, 33,134
+ 1040 data   3, 32,241,183,224, 37,176, 24,134,  4, 32,253,174, 32,158,173
+ 1050 data  36, 13, 48,  6, 32,221,189, 32,135,180, 32,166,182,170,208,  3
+ 1060 data  76, 72,178,134,  5,160,  0,120,177, 34,170, 10,201, 64,138,176
+ 1070 data   6, 32, 22,231, 76,230,207,132, 96, 10,176, 12,201,192,144,  3
+ 1080 data  41,190, 44, 41,126, 76,104,207,201,254,208,  2,169,188,  9,128
+ 1090 data 133, 92,173, 24,208, 41,  2,  9, 52,166,199,240,  2,  9,  1,  6
+ 1100 data  92, 42,  6, 92, 42,133, 93,166,  3, 24,189,240,236,101,  4,133
+ 1110 data  88,133, 90,181,217, 41,  3,109,136,  2,133, 89, 41,  3,  9,216
+ 1120 data 133, 91,160,  0,162,  0,169, 51,133,  1,161, 92,133, 94,230, 92
+ 1130 data 161, 92,133, 95,230, 92,169, 55,133,  1,169,  0,  6, 94, 42,  6
+ 1140 data  94, 42,  6, 95, 42,  6, 95, 42,170,189,240,207,145, 88,173,134
+ 1150 data   2,145, 90,200,152, 41,  3,208,225, 24,152,105, 36,168,192,160
+ 1160 data 144,194,165,  4,105,  3,133,  4,201, 37,176, 10,164, 96,200,196
+ 1170 data   5,176,  3, 76, 63,207, 88, 96, 32,108,123, 98,124,225,255,254
+ 1180 data 126,127, 97,252,226,251,236,160
+ 2000 k$=chr$(14):g$=chr$(142):c$=chr$(147):r$=chr$(13)
+ 2010 poke53280,12:poke53281,12:sysa,0,0,k$+chr$(8)+c$+"{gry3}{rvon}Greatprint"
+ 2020 print"{rvof}{gry1}{down}{down}{down}{down}{down}Dieses Programm erlaubt die grossforma-"
+ 2030 print"tige Darstellung von Zeichenketten und"
+ 2040 print"Werten auf dem Text-Bildschirm. Die"
+ 2050 print"Buchstaben werden mit Hilfe von sechzehn";
+ 2060 print"Graphikzeichen, der sogenannten Viertel-";
+ 2070 print"punktgraphik, aufgebaut. Sie bestehen"
+ 2080 print"aus einer Matrix von vier mal vier sol-"
+ 2090 print"cher Zeichen. Da nicht in den hochauf-"
+ 2100 print"loesenden Modus gegangen wird, lassen"
+ 2110 print"sich normale und grosse Zeichen mitein-"
+ 2120 print"ander mischen. Die Zeichen werden in der";
+ 2130 print"aktuellen Cursorfarbe und eventuell auch";
+ 2140 print"invertiert gedruckt. Als Zeichensatz"
+ 2150 print"wird derjenige verwendet, der beim Auf-"
+ 2160 print"ruf der Routine aktiviert ist. Insgesamt";
+ 2170 print"koennen auf einem Bildschirm sechs"
+ 2180 print"Reihen mit je zehn Zeichen geschrieben"
+ 2190 print"werden.":gosub5230
+ 3000 sysa,0,0,c$+"Syntax:":print:print:print:print:print:print
+ 3010 print"SYS 53000 , {rvon}Zeile{rvof} , {rvon}Spalte{rvof} , {rvon}Ausdruck"
+ 3020 print: print"Die Zeile und die Spalte definieren die"
+ 3030 print"linke, obere Ecke, ab der der Ausdruck"
+ 3040 print"geschrieben werden soll. Beide duerfen"
+ 3050 print"als beliebige numerische Terme angegeben";
+ 3060 print"werden, sofern ihr Ergebnis sich im Be-"
+ 3070 print"reich von 0-21 fuer die Zeile und 0-36"
+ 3080 print"fuer die Spalte bewegt."
+ 3090 print"Der 'Ausdruck' kann sowohl ein String-"
+ 3100 print"als auch ein numerischer Term sein."
+ 3110 print"Numerische Ausdruecke werden automatisch";
+ 3120 print"in eine Zeichenkette gewandelt. Es wer-"
+ 3130 print"den so viele Zeichen ausgegeben, bis der";
+ 3140 print"rechte Rand erreicht , oder der String"
+ 3150 print"zu Ende ist. Tauchen vor Erreichen des"
+ 3160 print"rechten Randes Steuerzeichen auf,"
+ 3170 gosub5230
+ 4000 printc$;"so werden diese an die normale Ausgabe-"
+ 4010 print"routine weitergeleitet. Auf diese Weise"
+ 4020 print"koennen innerhalb eines Strings z.B."
+ 4030 print"verschiedene Farben angewaehlt, der"
+ 4040 print"REVERS-Modus ein- und ausgeschaltet,"
+ 4050 print"oder der Bildschirm geloescht werden."
+ 4060 print:print"Es folgen einige Demonstrationen, die"
+ 4070 print"jeweils mit RETURN unterbrochen werden"
+ 4080 print"koennen.":gosub5230
+ 5000 printc$;"Text:":sysa,0,6,"{gry3}{rvon}-64'er-{rvof}":sysa,5,14,"{gry1}Das":sysa,9,6,"Magazin"
+ 5010 sysa,13,12,"fuer":sysa,17,2,"Computer-":sysa,21,12,"Fans"
+ 5020 gosub5240:printg$;c$;"und graphik:"
+ 5030 fori=0to59:z%=i/10:sysa,z%*4+1,(i-10*z%)*4,chr$(192+i):next:gosub5240
+ 5040 sysa,1,6,k$+c$+"normale":sysa,7,14,"und"
+ 5050 sysa,13,4,"{rvon}negative":sysa,19,4,"Schrift!{rvof}":gosub5240
+ 5060 sysa,0,2,c$+"verschie-":sysa,4,12,"dene":sysa,8,6,"Farben:"
+ 5070 sysa,13,0,"{blk}{CBM-+}{CBM-+}{wht}{CBM-+}{CBM-+}{red}{CBM-+}{CBM-+}{cyn}{CBM-+}{CBM-+}{pur}{CBM-+}{CBM-+}"
+ 5080 sysa,17,0,"{grn}{CBM-+}{CBM-+}{blu}{CBM-+}{CBM-+}{yel}{CBM-+}{CBM-+}{orng}{CBM-+}{CBM-+}{brn}{CBM-+}{CBM-+}"
+ 5090 sysa,21,0,"{lred}{CBM-+}{CBM-+}{gry1}{CBM-+}{CBM-+}{lgrn}{CBM-+}{CBM-+}{lblu}{CBM-+}{CBM-+}{gry3}{CBM-+}{CBM-+}":gosub5240
+ 5100 sysa,2,4,c$+"{gry1}Strings:":sysa,14,4,"Zahlen:"
+ 5110 poke198,0:sysa,8,4,left$(ti$,2)+":"+mid$(ti$,3,2)+":"+right$(ti$,2)
+ 5120 sysa,20,0,ti:getw$:ifw$<>r$then5110
+ 5130 sysa,0,6,c$+"Riesen-":sysa,4,4,"graphik:"
+ 5140 sysa,9,12,g$+"{SHIFT-@}{CBM-O}{CBM-P}":sysa,13,8,"{rvon}-usa-{rvof}{SHIFT-*}{SHIFT-*}"
+ 5150 sysa,17,0,"{CBM-A}{SHIFT-*}K===J{SHIFT-*}{SHIFT-*}I":sysa,21,0,"{CBM-Z}WWWWWWWWK":gosub5240
+ 5160 t$="   Lange Texte, die nicht mehr auf den Bildschirm passen, koennen "
+ 5170 t$=t$+"z.B. durch eine Laufschrift (wie diese hier) dargestellt werden!"
+ 5180 sysa,1,10,k$+c$+"Lauf-":sysa,6,4,"schrift:{gry3}"
+ 5190 poke198,0:sysa,20,0,t$:t$=mid$(t$,2)+left$(t$,1):fori=1to90:next
+ 5200 getw$:ifw$<>r$then5190
+ 5210 sysa,3,12,c$+"{gry1}Ende":sysa,10,14,"deq":sysa,17,10,"Demos"
+ 5220 end
+ 5230 print"{down}Bitte 'RETURN' druecken!";
+ 5240 poke198,0
+ 5250 getw$:ifw$<>r$then5250
+ 5260 return
+

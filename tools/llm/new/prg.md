@@ -111,6 +111,27 @@ This rule resolves the ambiguity that used to send orphan files to `LOG.md`: if 
 </figure>
 ```
 
+**Anti-memory rule for inline listings:** when embedding an inline listing of any non-trivial length (more than a handful of lines), **never retype it from memory or from context**. The file is on disk — splice it in via shell:
+
+```bash
+{
+  head -N article.html   # lines before the insertion point
+  echo '        <!-- Eingetippt von Name -->'
+  echo '        <figure>'
+  echo '            <pre>'
+  cat /path/to/source.txt
+  echo '</pre>'
+  echo '            <figcaption>Listing N. Caption from scan</figcaption>'
+  echo '        </figure>'
+  echo '    </article>'
+  echo '</body>'
+  echo ''
+  echo '</html>'
+} > article.html.new && mv article.html.new article.html
+```
+
+Then `Read` the result to verify the splice. Do NOT use the Edit tool to insert a multi-line code block by re-typing its contents — that's exactly the pattern the anti-memory rule forbids (reading a file into context then writing it back out = reproduction from memory).
+
 ### data-range for line subsets of a BASIC listing
 ```html
 <pre data-filename="dbii" data-name="DBII" data-range="182,215-216,330,3016-3032"></pre>
@@ -141,6 +162,21 @@ This rule resolves the ambiguity that used to send orphan files to `LOG.md`: if 
 - **Compiled/binary-only versions**: use only `binary_download` div, no `<pre>` display
 - **Placement**: in Tips & Tricks articles, place each listing at the end of its own section, not at the end of the entire article. For other articles, all listings go at the end before `</article>`.
 - **Files from external contributors** (e.g. `prg2/`): copy to `prg/`, fix header line to match filename, add credit line. For inline-only listings (Z80 asm, Pascal), embed directly in HTML.
+
+## Report files that belong nowhere — don't dump them in Impressum
+
+Some files on the D64 belong to no article in the current issue:
+- Boot/splash screens like `leserinfo!` (a "Dear Reader" screen that runs at disk boot)
+- Reprints of earlier-issue utilities (Checksummer, MSE, Speeddos, etc.) that are shipped so readers can type in the current issue's listings, marked on the disk with `"------M/YY-NN"` section separators pointing at the original publication, not the current issue
+- Any file whose D64 section separator doesn't match any article in the issue
+
+**Do NOT dump these into the Impressum, a service page, or any random article.** They have no printed counterpart in this issue and no natural reader-facing home. Instead:
+
+1. Leave them out of all articles.
+2. Report them to the user in the session (list the filenames + their section separator if any + why they don't fit).
+3. If the user doesn't give a placement decision, add a `LOG.md` entry listing the unplaced files so a future reviewer can deal with them.
+
+The user may choose to ignore these files entirely (the disk download itself is sufficient), add them to a dedicated utilities page, or place them in an article I haven't found. That's a human decision — do not pre-commit it by shoving them into the Impressum.
 
 ## When you can't decide — log, don't delete
 

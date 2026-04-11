@@ -1,0 +1,120 @@
+
+
+;super-hardcopy.prg ==0801==
+   10 rem*********************************
+   11 rem*                               *
+   12 rem*         super-hardcopy        *
+   13 rem*                               *
+   14 rem*    1985 by christian stetter  *
+   15 rem*                               *
+   16 rem*          haydnstr.17          *
+   17 rem*                               *
+   18 rem*        8850 donauwoerth       *
+   19 rem*                               *
+   20 rem*********************************
+  100 poke 53281,006
+  110 poke45,140:poke46,020
+  120 poke47,003:poke48,021
+  130 poke49,250:poke50,021
+  140 f$(0)=" schwarz   :"
+  150 f$(1)=" weiss     :"
+  160 f$(2)=" rot       :"
+  170 f$(3)=" tuerkis   :"
+  180 f$(4)=" violett   :"
+  190 f$(5)=" gruen     :"
+  200 f$(6)=" blau      :"
+  210 f$(7)=" gelb      :"
+  220 f$(8)=" orange    :"
+  230 f$(9)=" braun     :"
+  240 f$(10)=" hellrot   :"
+  250 f$(11)=" grau 1    :"
+  260 f$(12)=" grau 2    :"
+  270 f$(13)=" hellgruen :"
+  280 f$(14)=" hellblau  :"
+  290 f$(15)=" grau 3    :"
+  300 ae%=0:print"{clr}{lblu}         *** super hardcopy ***"
+  310 print"{down}     {left}   1985 by christian stetter"
+  320 gosub830:gosub860:gosub890:gosub900:gosub910:gosub920:gosub930:gosub970
+  330 print"{home}{wht}{down}{down}{down}";:gosub830
+  340 geta$:ifa$=""then340
+  350 ifa$=chr$(157)thenae%=1:print"{up}{up}";:gosub830
+  360 ifa$=chr$(29)thenae%=0:print"{up}{up}";:gosub830
+  370 ifa$<>chr$(13)then340
+  380 print"{up}{up}{lblu}";:gosub830:ifae%=0then 730
+  390 print"{wht}";:gosub860
+  400 geta$:ifa$=""then400
+  410 ifa$=chr$(157)thenin%=0:print"{up}{up}";:gosub860
+  420 ifa$=chr$(29)thenin%=1:print"{up}{up}";:gosub860
+  430 ifa$<>chr$(13)then400
+  440 print"{up}{up}{lblu}";:gosub860
+  450 print"{wht}";:gosub890:printtab(15)"{up}";:inputga%
+  460 print"{up}{lblu}";:gosub890
+  470 print"{wht}";:gosub900:printtab(15)"{up}";:inputsa%
+  480 print"{up}{lblu}";:gosub900
+  490 print"{wht}";:gosub910:printtab(15)"{up}";:inputst$:gosub1020
+  500 print"{up}{lblu}";:gosub910
+  510 print"{wht}";:gosub920:printtab(15)"{up}";:inputgr$:gosub1100
+  520 print"{up}{lblu}";:gosub920
+  530 print"{wht}";:gosub930:poke214,11:sys58732
+  540 geta$:ifa$=chr$(141)then print"{up}{lblu}":gosub930:goto730
+  550 ifa$=chr$(13)then 580
+  560 ifa$<"0" or a$>"5" then 540
+  570 ct%=val(a$):goto 530
+  580 print"{lblu}";:gosub930
+  590 poke214,14:sys58732
+  600 for i=0 to 7
+  610 print"{wht}";f$(i)f%(i,ct%);
+  620 poke213,19:input"{left}{left}{left}{left}";f%(i,ct%)
+  630 if f%(i,ct%)<0 or f%(i,ct%)>8 then printtab(15)"{up}";:goto620
+  640 print"{up}{lblu}";f$(i)f%(i,ct%)
+  650 nexti
+  660 poke214,14:sys58732
+  670 for i=8 to 15
+  680 printtab(23)"{wht}";f$(i);f%(i,ct%);
+  690 input"{left}{left}{left}{left}";f%(i,ct%)
+  700 if f%(i,ct%)<0 or f%(i,ct%)>8 then printtab(38)"{up}";:goto620
+  710 printtab(23)"{up}{lblu}";f$(i)f%(i,ct%)
+  720 nexti
+  730 poke214,22:sys58732
+  740 ae%=0:print"{wht}";:gosub970
+  750 geta$:ifa$=""then750
+  760 ifa$=chr$(157)thenae%=1:print"{up}{up}";:gosub970
+  770 ifa$=chr$(29)thenae%=0:print"{up}{up}";:gosub970
+  780 ifa$<>chr$(13)then750
+  790 print"{up}{up}{lblu}";:gosub970:ifae%=0then 820
+  800 poke45,011:poke46,033
+  810 print"{clr}{down}{down}{down}save"chr$(34)"@0:super-hardcopy"chr$(34)",8{home}":end
+  820 sys05714
+  830 print"{down}parameter aendern: ";
+  840 if ae%=0thenprint"ja/{rvon}nein{rvof}":return
+  850 print"{rvon}ja{rvof}/nein":return
+  860 print"{down}interface      : ";
+  870 ifin%=0thenprint"{rvon}centronics{rvof}/seriell":return
+  880 print"centronics/{rvon}seriell{rvof}":return
+  890 print" geraetenummer :"ga%:return
+  900 print" sekundaeradr. :"sa%:return
+  910 print" start-sequenz :";:gosub980:return
+  920 print" grafik-sequenz:";:gosub990:return
+  930 print"{down}farbcodetabelle:"ct%"{lblu}{down}"
+  940 for i=0 to 7
+  950 printf$(i)f%(i,ct%)tab(23)f$(i+8)f%(i+8,ct%)
+  960 nexti:return
+  970 print"{down} speichern: ";:goto840
+  980 fori=0toas%:by=st%(i):gosub1000:print" "by$;:next:print:return
+  990 fori=0toag%:by=gr%(i):gosub1000:print" "by$;:next:print:return
+ 1000 by%=by/16:by$=chr$(48+by%-(by%>9)*7):by%=byand15
+ 1010 by$=by$+chr$(48+by%-(by%>9)*7):return
+ 1020 st$=st$+" ":as%=-1:b$="":fori=1tolen(st$)
+ 1030 a$=mid$(st$,i,1)
+ 1040 ifa$=" "thengosub1070:goto1060
+ 1050 b$=b$+a$:nexti
+ 1060 as%=as%+1:st%(as%)=by:nexti:return
+ 1070 b$=right$("00"+b$,2):by=0
+ 1080 forj=1to2:b%=asc(b$):b%=b%-48+(b%>64)*7
+ 1090 b$=mid$(b$,2):by=16*by+b%:next:return
+ 1100 gr$=gr$+" ":ag%=-1:b$="":fori=1tolen(gr$)
+ 1110 a$=mid$(gr$,i,1)
+ 1120 ifa$=" "thengosub1070:goto1140
+ 1130 b$=b$+a$:nexti
+ 1140 ag%=ag%+1:gr%(ag%)=by:nexti:return
+

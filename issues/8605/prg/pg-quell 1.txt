@@ -1,0 +1,283 @@
+
+
+;pg-quell 1.prg ==0801==
+  990 open1,4
+  995 sys 9*4096
+ 1000 .opt oo,p1
+ 1005 ;
+ 1010 ;grafikroutinen 'profi-grafik 64'
+ 1015 ;
+ 1020 *= $8390           ;startadresse
+ 1025 ;
+ 1030 getcom   = $aefd ;prueft auf komma
+ 1035 getbyte  = $b79e ;holt byte ins x-register
+ 1040 getadr   = $b7eb ;adresswert nach $14/$15 + getbyte
+ 1045 chrget   = $0073 ;holt naechstes zeichen
+ 1050 chrgot   = $0079 ;holt letztes zeichen
+ 1055 illegal  = $b248 ;fehlermeldung 'illegal quantity'
+ 1060 ;
+ 1065 scrnum   = $9ff1 ;aktuelle bildschirmnummer
+ 1070 ;
+ 1075 screen jsr getbyte
+ 1080 cpx #2
+ 1085 bcc scrok
+ 1090 jmp illegal
+ 1095 scrok lda scrtab,x
+ 1100 sta scrnum       ;merken
+ 1105 rts
+ 1110 ;
+ 1115 scrtab .byt $a0,$e0
+ 1120 ;
+ 1125 hires lda $dd00        ;16k-bereich,den der vic adressiert
+ 1130 and #%11111100   ;festlegen $c000-$ffff
+ 1135 bit scrnum
+ 1140 bvs *+4          ;bei $e0 ist das v-flag gesetzt !
+ 1145 ora #%00000001   ;bereich von $8000-$bfff
+ 1150 sta $dd00
+ 1155 lda $d018        ;position des videorams
+ 1160 ora #%00101000   ;festlegen $0c00-$0fff
+ 1165 sta $d018
+ 1170 jsr tex1
+ 1175 lda $d011        ;einzelpunktmodus einschalten
+ 1180 ora #%00100000   ;bit5=1
+ 1185 sta $d011
+ 1190 rts
+ 1195 ;
+ 1200 multi jsr hires        ;hires-modus ein
+ 1205 lda $d016        ;multicolormodus einschalten
+ 1210 ora #%00010000   ;bit4=1
+ 1215 sta $d016
+ 1220 rts
+ 1225 ;
+ 1230 text lda $dd00        ;vic adressiert jetzt wieder
+ 1235 ora #%00000011   ;bereich von $0000-$3fff
+ 1240 sta $dd00
+ 1245 lda $d018        ;videoram ab $0400-$07ff
+ 1250 and #%11010111
+ 1255 sta $d018
+ 1260 lda $d011        ;einzelpunktmodus abschalten
+ 1265 and #%11011111
+ 1270 sta $d011
+ 1275 tex1 lda $d016        ;multicolormodus abschalten
+ 1280 and #%11101111
+ 1285 sta $d016
+ 1290 rts
+ 1295 ;
+ 1300 help = $20          ;hilfszeiger
+ 1305 ;
+ 1310 clear lda scrnum
+ 1315 sta help+1
+ 1320 lda #0
+ 1325 sta help         ;zeiger auf anfang der bitmap
+ 1330 tay
+ 1335 ldx #32          ;32 bloecke = 8 kbyte
+ 1340 cloop sta (help),y     ;byte loeschen
+ 1345 iny
+ 1350 bne cloop
+ 1355 inc help+1       ;naechster block
+ 1360 dex
+ 1365 bne cloop
+ 1370 rts
+ 1375 ;
+ 1380 hicol jsr getbyte      ;zeichenfarbe holen
+ 1385 stx help         ;merken
+ 1390 jsr getcom
+ 1395 jsr getbyte      ;hintergrundfarbe
+ 1400 stx help+1       ;merken
+ 1405 lda help         ;zeichenfarbe
+ 1410 asl a
+ 1415 asl a            ;mal 16
+ 1420 asl a
+ 1425 asl a
+ 1430 clc
+ 1435 adc help+1       ;+ hintergrundfarbe
+ 1440 jsr hic1         ;mit diesem wert videoram fuellen
+ 1445 jsr chrgot
+ 1450 cmp #","         ;wenn noch ein komma folgt,
+ 1455 bne mode-1
+ 1460 jsr chrget
+ 1465 jsr getbyte      ;dann 3.zeichenfarbe holen
+ 1470 txa
+ 1475 ldx #$d8         ;und das farbram ($d800-$dfff)
+ 1480 bne hic2         ;damit fuellen
+ 1485 ;
+ 1490 hic1 bit scrnum
+ 1495 bvs scr1a
+ 1500 ldx #$8c         ;screen0 videoram von $8c00-$8fff
+ 1505 .byt $2c          ;bit-opcode
+ 1510 scr1a ldx #$cc         ;screen1 videoram von $cc00-$cfff
+ 1515 hic2 stx help+1
+ 1520 ldy #0
+ 1525 sty help         ;zeiger auf anfang videoram
+ 1530 ldx #4           ;4 bloecke sind zu fuellen
+ 1535 hloop sta (help),y
+ 1540 iny
+ 1545 bne hloop
+ 1550 inc help+1       ;naechster block
+ 1555 dex
+ 1560 bne hloop
+ 1565 rts
+ 1570 ;
+ 1575 plotmode = $9ff2        ;aktueller plotmodus
+ 1580 ;
+ 1585 mode jsr getbyte
+ 1590 cpx #3
+ 1595 bcc modeok
+ 1600 illmode jmp illegal
+ 1605 modeok lda modetab,x
+ 1610 sta plotmode     ;modus merken
+ 1615 rts
+ 1620 ;
+ 1625 modetab .byt 0,64,128
+ 1630 ;
+ 1635 multicol = $9ff3        ;zeichenfarbe fuer multi
+ 1640 ;
+ 1645 ink jsr getbyte      ;zeichenfarbe setzen
+ 1650 cpx #4
+ 1655 bcs illmode      ;>=4, dann fehler
+ 1660 stx multicol     ;merken
+ 1665 rts
+ 1670 ;
+ 1675 xlo = $14
+ 1680 xhi = $15
+ 1685 ;
+ 1690 ;bytenummer errechnen (hires-modus)
+ 1695 hiplot lsr       ;y-koord. schon im akku !
+ 1700 lsr              ;(y/8)
+ 1705 lsr
+ 1710 tay              ;ins y-register
+ 1715 clc              ;alle lobytes addieren
+ 1720 txa
+ 1725 and #%00000111   ;(y and #7)
+ 1730 adc maltab,y     ;+ (320*y/8)lo (c=0!)
+ 1735 sta $f7
+ 1740 lda xlo
+ 1745 and #%11111000   ;+ (xlo and #248)
+ 1750 adc $f7
+ 1755 sta $f7          ;nach $f7
+ 1760 ;addition der hibytes
+ 1765 lda maltab1,y    ;(320*y/8)hi
+ 1770 adc scrnum       ;+ anfang bitmap
+ 1775 adc xhi          ;+ xhi
+ 1780 sta $f8          ;nach $f8
+ 1785 lda xlo          ;bitposition errechnen
+ 1790 and #%00000111   ;(xlo and #7)
+ 1795 tay
+ 1800 lda hochtab,y    ;2^(7-yregister)
+ 1805 rts
+ 1810 ;
+ 1815 muplot lsr             ;(y/8)
+ 1820 lsr
+ 1825 lsr
+ 1830 tay
+ 1835 lda xlo
+ 1840 and #%11111100   ;(xlo and #252)
+ 1845 asl                    ;mal 2 (bit7 ins carry !)
+ 1850 sta $f7          ;nach $f7
+ 1855 lda maltab1,y    ;(320*y/8)hi
+ 1860 adc scrnum       ;+anfang bitmap
+ 1865 sta $f8          ;nach $f8
+ 1870 txa
+ 1875 and #%00000111   ;(y and #7)
+ 1880 adc maltab,y     ;+(320*y/8)lo
+ 1885 tay              ;ins y-register
+ 1890 lda xlo          ;bitposition errechnen
+ 1895 and #%00000011   ;(xlo and #3)
+ 1900 tax
+ 1905 lda multab,x     ;bitwert laden
+ 1910 sec
+ 1915 rts
+ 1920 ;
+ 1925 plot jsr getadr       ;koordinaten holen
+ 1930 lda $d016
+ 1935 and #%00010000
+ 1940 bne mplot        ;multicolormodus
+ 1945 cpx #200
+ 1950 bcs plot-1       ;ykoord.>199 (c=1)
+ 1955 ldy xhi
+ 1960 beq ok
+ 1965 dey
+ 1970 bne plot-2       ;xhi>1 (c=1)
+ 1975 lda xlo          ;xhi=1, dann xlo testen
+ 1980 cmp #<320
+ 1985 bcs plot-1       ;xlo>$40 (c=1)
+ 1990 ok sei
+ 1995 lda #$34         ;speicher auf ram umschalten
+ 2000 sta 1            ;um bit-map lesen zu koennen
+ 2005 txa
+ 2010 pha              ;y-koord. merken
+ 2015 jsr hiplot       ;bytenummer berechnen
+ 2020 ldy #0
+ 2025 bit plotmode
+ 2030 bvs loesch
+ 2035 bmi invert
+ 2040 ora ($f7),y      ;punkt setzen
+ 2045 bne store        ;unbedingter sprung
+ 2050 ;
+ 2055 mplot cpx #200
+ 2060 bcs plot-1
+ 2065 lda xhi          ;xhi<>0 (c=1)
+ 2070 bne plot-2
+ 2075 lda xlo
+ 2080 cmp #160
+ 2085 bcs plot-2       ;xlo>159 (c=1)
+ 2090 sei
+ 2095 lda #$34         ;speicher auf ram umschalten
+ 2100 sta 1
+ 2105 txa
+ 2110 pha              ;ykoord. merken
+ 2115 jsr muplot       ;bytenummer errechnen
+ 2120 bit plotmode
+ 2125 bvs loesch
+ 2130 bmi invert
+ 2135 pha              ;punkt setzen
+ 2140 eor #255         ;vorher loeschen
+ 2145 and ($f7),y
+ 2150 sta ($f7),y
+ 2155 ldx multicol     ;zeichenfarbe laden
+ 2160 pla
+ 2165 and multab1,x    ;bitmuster der farbe setzen
+ 2170 ora ($f7),y
+ 2175 bne store
+ 2180 loesch eor #255         ;punkt loeschen
+ 2185 and ($f7),y
+ 2190 .byt $2c
+ 2195 invert eor ($f7),y      ;punkt invertieren
+ 2200 store sta ($f7),y      ;bitmuster setzen
+ 2205 pla              ;ykoord. wiederherstellen
+ 2210 tax
+ 2215 plotend lda #$37         ;normale speicherkonfiguration
+ 2220 sta 1
+ 2225 cli
+ 2230 clc                    ;c=0 wenn punkt gesetzt
+ 2235 rts
+ 2240 ;
+ 2245 maltab .byt 0,<320,<640,<960 ;multiplikationstabelle
+ 2250 .byt $00,$40,$80,$c0  ;mal 320
+ 2255 .byt $00,$40,$80,$c0  ;lobytes
+ 2260 .byt $00,$40,$80,$c0
+ 2265 .byt $00,$40,$80,$c0
+ 2270 .byt $00,$40,$80,$c0
+ 2275 .byt $00
+ 2280 ;
+ 2285 maltab1 .byt 0,>320,>640,>960
+ 2290 .byt $05,$06,$07,$08  ;mal 320
+ 2295 .byt $0a,$0b,$0c,$0d  ;hibytes
+ 2300 .byt $0f,$10,$11,$12
+ 2305 .byt $14,$15,$16,$17
+ 2310 .byt $19,$1a,$1b,$1c
+ 2315 .byt $1e
+ 2320 ;
+ 2325 hochtab .byt $80,$40,$20,$10 ;zweierpotenzen
+ 2330 .byt $08,$04,$02,$01
+ 2335 ;
+ 2340 multab .byt %11000000    ;xposition0
+ 2345 .byt %00110000    ;xposition1
+ 2350 .byt %00001100    ;xposition2
+ 2355 .byt %00000011    ;xposition3
+ 2360 ;
+ 2365 multab1 .byt %00000000    ;farbe0=hintergrund
+ 2370 .byt %01010101    ;farbe1
+ 2375 .byt %10101010    ;farbe2
+ 2380 .byt %11111111    ;farbe3
+

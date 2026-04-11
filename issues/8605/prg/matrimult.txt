@@ -1,0 +1,89 @@
+
+
+;matrimult.prg ==0801==
+   10 rem ***** matrizenmultiplikation *****
+   20 poke 53280,0:poke 53281,0
+   30 rem ----- eingabe der parameter -----
+   40 printchr$(147)chr$(17)chr$(17)chr$(18)"parameter der matrizen:"
+   50 printchr$(17)chr$(17)"name der 1.matrix"tab(32);:inputa$
+   60 print"anzahl spalten(s1) u. zeilen(z1)"tab(31);:inputs1,z1
+   70 printchr$(17)"name der 2.matrix"tab(32);:inputb$
+   80 print"anzahl spalten(s2) u. zeilen(z2)"tab(31);:inputs2,z2
+   90 printchr$(17)chr$(17)"fuer die ausgabe der matrix geben sie bitte an:"
+  100 print"verwenden sie einen 80-zeichen-bildschirm (j/n)"
+  110 getd$:if d$<>"j" and d$<>"n" then 110
+  120 if d$="j" then s=2
+  130 s=1
+  140 rem ----- pruefung auf zulaessigkeit -----
+  150 ifs1<>z2then printchr$(17)chr$(17)chr$(18)"s1 muss gleich z2 sein !":goto50
+  160 rem ---- array-definitionen ----
+  170 dima(z1,s1),b(z2,s2),c(z1,s2)
+  180 rem ---- eingabe der elemente: 1.matrix ----
+  190 printchr$(147)
+  200 for i=1 to z1:rem zeilenindex
+  210 :for j=1 to s1:rem spaltenindex
+  220 ::printa$"("i","j") ="tab(20);:inputa(i,j)
+  230 :next j
+  240 next i
+  250 rem -------------------------  2.matrix ----
+  260 printchr$(17)chr$(17)
+  270 for i=1 to z2
+  280 :for j=1 to s2
+  290 ::printb$"("i","j") ="tab(20);:inputb(i,j)
+  300 :next j
+  310 next i
+  320 rem ---- berechnung ergebnismatrix ----
+  330 for i=1 to z1
+  340 :for j=1 to s2:c(i,j)=0
+  350 ::for k=1 to s1
+  360 :::c(i,j)=c(i,j)+a(i,k)*b(k,j)
+  370 ::next k
+  380 :next j
+  390 next i
+  400 rem ---- matrixanzeige menue ----
+  410 printchr$(147)
+  420 printchr$(17)chr$(17)chr$(17)chr$(18)"matrix zeigen:"
+  430 printchr$(17)chr$(17)"matrix"tab(12)a$tab(25)"1"
+  440 printchr$(17)"matrix"tab(12)b$tab(25)"2"
+  450 printchr$(17)"ergebnis-matrix"tab(25)"3"
+  460 printchr$(17)"programmende"tab(25)"4"
+  470 printchr$(17)chr$(17)chr$(17)chr$(18)"bitte auswaehlen !"
+  480 getc$:if c$<"1" or c$>"4" then 480
+  490 on val(c$) gosub 570,670,770,550
+  500 printchr$(17)chr$(18)"zum menue   _ druecken"
+  510 getc$:if c$<>"_" then 510
+  520 goto 420
+  530 rem ***** unterprogramme *****
+  540 rem ---- programmende ----
+  550 end
+  560 rem ---- ausgabe der 1.matrix ----
+  570 printchr$(17)chr$(17)chr$(18)a$
+  580 printchr$(17)chr$(17)
+  590 for i=1 to z1
+  600 :for j=1to s1
+  610 ::printtab(int((s*40-5)/s1)*(j-1))a(i,j);
+  620 :next j
+  630 :print:print
+  640 next i
+  650 return
+  660 rem ---- ausgabe der 2.matrix ----
+  670 printchr$(17)chr$(17)chr$(18)b$
+  680 printchr$(17)chr$(17)
+  690 for i=1 to z2
+  700 :for j=1 to s2
+  710 ::printtab(int((s*40-5)/s2)*(j-1))b(i,j);
+  720 :next j
+  730 :print:print
+  740 next i
+  750 return
+  760 rem ---- ausgabe der ergebnismatrix ----
+  770 printchr$(17)chr$(17);:c$=a$+"*"+b$:printchr$(18)c$
+  780 printchr$(17)chr$(17)
+  790 for i=1 to z1
+  800 :for j=1 to s2
+  810 ::printtab(int((s*40-5)/s2)*(j-1))c(i,j);
+  820 :next j
+  830 :print:print
+  840 next i
+  850 return
+
