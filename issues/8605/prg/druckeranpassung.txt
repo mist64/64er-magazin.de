@@ -1,0 +1,283 @@
+
+
+;druckeranpassung.prg ==0801==
+   10 rem ********************************
+   11 rem *                              *
+   12 rem *   super-print-editor fuer    *
+   13 rem *                              *
+   14 rem *      super-print v 3.0       *
+   15 rem *                              *
+   16 rem *          11.2.1986           *
+   17 rem *                              *
+   18 rem *       eckehard fiedler       *
+   19 rem *     adalbertsteinweg 74      *
+   20 rem *         5100 aachen          *
+   21 rem *         0241/500303          *
+   22 rem *                              *
+   23 rem ********************************
+   24 :
+   25 :
+   90 dim w(50):wm=49
+  100 print chr$(147)
+  110 print tab(5)"**** super-print editor ****"
+  120 print:print:print:print:print
+  130 print tab(5)"bitte diskette einlegen und"
+  140 print:print
+  150 print tab(7)"schreibschutz entfernen"
+  160 print:print
+  180 print tab(9)"taste druecken > <" chr$(157) chr$(157);
+  190 poke 204,0
+  200 geta$:ifa$=""then 200
+  201 :
+  202 :
+  203 :  rem zwischenfile loeschen
+  204 :
+  205 :
+  210 poke 204,1:print" "
+  220 print:print
+  230 open 15,8,15,"i"
+  240 nn$ = chr$(21)+"super-print"        :rem name fuer zwischenfile
+  250 print#15,"s0:"nn$                   :rem ev. altes zwischenfile
+  255 :
+  260 gosub 50000                         :rem loeschen
+  270 if m1<>1then 60000 :rem abbruch
+  290 :
+  291 :
+  292 :  rem alte werte auslesen
+  293 :
+  294 :
+  300 open 3,8,3,"super-print,p,r"
+  310 gosub 50000                         :rem fehlermeldung holen
+  311 print tab(5)m2$
+  312 if m1<>0then 60000
+  318 :
+  319 :
+  320 fori=1to23
+  325 get#3,a$:if st<>0then 60000          :rem abbruch
+  330 next i
+  340 :
+  341 :
+  350 for i=1 to wm                       :rem alte werte einlesen
+  360 get#3,w$: if st<>0 then 60000       :rem abbruch
+  370 w(i)=0:if w$<>"" thenw(i)=asc(w$)
+  380 next i
+  390 close 3 
+  400 :
+  401 :
+  402 :  rem werte editieren
+  403 :
+  404 :
+  407 restore: poke 198,0
+  409 :
+  410 sm=10:for ea=0tosm                  :rem schleife drucker-codes <---
+  411 :
+  412 :
+  420 print chr$(147):print
+  430 print tab(6)"bitte steuersequenzen fuer":print
+  440 print tab(10)"drucker eingeben :":print
+  441 print tab(2)"(fuer 2-byte-befehle 3. wert 255!)"
+  442 print:print:print
+  445 print tab(2)"steuerbefehl :":print
+  449 :
+  450 read o$
+  451 data 480 punkte/zeile (standard)
+  452 data 960 punkte/zeile (double)
+  453 data 960 punkte/zeile double speed
+  454 data 1920 punkte/zeile (quadruple)
+  455 data 640 punkte/zeile
+  456 data 512 punkte/zeile (plotter)
+  457 data 720 punkte/zeile
+  458 data hoechste moegliche dichte
+  459 data drucker initialisieren
+  460 data linken rand einstellen
+  461 data zeilenvorschub n/216
+  462 :
+  463 print tab(2)chr$(18)"*** "o$" ***"
+  464 print:print:print
+  465 :
+  466 :
+  470 a=4*ea+1
+  480 b=4*ea+2
+  490 c=4*ea+3
+  500 :
+  510 :
+  520 print tab(26)w(a);chr$(145)
+  530 input "  1) escape-code       : ";w(a)
+  535 :
+  540 print tab(26)w(b);chr$(145)
+  550 input "  2) erster steuercode : ";w(b)
+  555 :
+  560 print tab(26)w(c);chr$(145)
+  570 input "  3) zweiter steuercode: ";w(c)
+  575 :
+  576 :
+  580 next ea                             :rem schleife drucker-codes --->
+  581 :
+  582 :
+  583 :  rem drucker-tabelle ok ?
+  584 :
+  585 :
+  590 printchr$(147):restore              :rem werte darstellen
+  591 print
+  592 :
+  593 for i=0tosm
+  594 read a$
+  595 print a$" :"
+  596 print tab(24);chr$(18);w(4*i+1);w(4*i+2);w(4*i+3)
+  597 nexti
+  598 :
+  599 printchr$(19);
+  600 print tab(4)"steuercodes ok ? [j/n] > <"chr$(157)chr$(157);
+  610 poke 204,0
+  620 get a$:ifa$=""then 620
+  625 poke 204,1
+  630 ifa$="n"then 400
+  640 ifa$<>"j"and a$<>"y"then 610
+  690 :
+  691 :
+  692 :  rem rest einstellen
+  693 :
+  694 :
+  700 print chr$(147)
+  705 print:print
+  710 print tab(5)"**** sonstige parameter ****"
+  715 print:print:print
+  716 p0=45
+  718 :
+  719 :
+  720 print tab(25);w(p0);chr$(145)
+  730 input "  carriage return      :";w(p0)
+  735 print
+  740 print tab(25);w(p0+1);chr$(145)
+  750 input "  linefeed character   :";w(p0+1)
+  755 print
+  760 print tab(25);w(p0+2);chr$(145)
+  770 input "  printer-geraetenummer:";w(p0+2)
+  775 print
+  780 print tab(25);w(p0+3);chr$(145)
+  790 input "  hintergrund-farbe    :";w(p0+3)
+  795 print
+  800 print tab(25);w(p0+4);chr$(145)
+  810 input "  text-farbe           :";w(p0+4)
+  812 print:print
+  815 :
+  816 :
+  817 :  rem parameter ok?
+  818 :
+  819 :
+  820 print "  parameter ok ? [j/n/^] > <"chr$(157)chr$(157);
+  825 :
+  830 poke 204,0
+  840 get a$:ifa$=""then 840
+  850 poke 204,1
+  855 :
+  860 if a$="n"then 700
+  865 if a$="^"then 400
+  870 if a$<>"j"and a$<>"y"then 830
+  875 :
+  876 :
+  877 :  rem abspeichern ?
+  878 :
+  879 :
+  880 print chr$(147)
+  885 print:print:print:print
+  890 print tab(5)"abspeichern ? [j/n] > <"chr$(157)chr$(157);
+  895 :
+  900 poke 204,0
+  910 get a$:ifa$=""then 910
+  920 poke 204,1
+  925 :
+  930 ifa$="n"then end
+  940 ifa$<>"j"and a$<>"y"then 900
+  951 :
+  952 :
+  953 :  rem super-print-file aendern
+  954 :
+  955 :
+ 1000 printchr$(147)
+ 1005 print:print:print:print
+ 1010 printtab(10)"working..."chr$(191)chr$(157);
+ 1020 poke204,0
+ 1031 :
+ 1032 : rem files oeffnen
+ 1033 :
+ 1100 print#15,"i"
+ 1110 open 3,8,3,"super-print,p,r"       :rem lesefile
+ 1115 nm$ = nn$+",p,w"
+ 1120 open 4,8,4,nm$                     :rem schreibfile
+ 1130 for i=1to23                        :rem ersten 23 bytes uebernehmen
+ 1135 get#3,a$:if a$=""then a$=chr$(0)
+ 1140 if st<>0 then 60000 :rem abbruch
+ 1150 print#4,a$;
+ 1160 next i
+ 1161 :
+ 1162 : rem werte einfuegen
+ 1163 :
+ 1170 for i=1towm                        :rem alte werte ignorieren
+ 1175 get#3,a$:ifst<>0 then 60000        :rem abbruch
+ 1180 next i
+ 1181 :
+ 1182 : rem neue werte einfuegen
+ 1183 :
+ 1190 for i=1towm
+ 1195 print#4,chr$(w(i));
+ 1196 ifst<>0then 60000                  :rem abbruch
+ 1200 next i
+ 1201 :
+ 1202 : rem rest uebernehmen
+ 1203 :
+ 1210 j=0:for i=0to1                     :rem endlosschleife
+ 1215 :
+ 1220 get#3,a$
+ 1221 :
+ 1225 ifa$=""then a$=chr$(0)
+ 1230 if st<>0 then j=1                  :rem file-ende ??
+ 1235 :
+ 1240 print#4,a$;                        :rem wert schreiben
+ 1245 i=j: next i
+ 1246 :
+ 1247 gosub 50000:if m1<>0 then 60000
+ 1250 close 4: close 3
+ 1255 :
+ 1256 :
+ 1257 :  rem altes file ersetzen
+ 1258 :
+ 1259 :
+ 1260 print#15,"i"
+ 1270 print#15,"s0:super-print"          :rem altes loeschen
+ 1275 print#15,"i"
+ 1280 print#15,"c0:super-print="nn$      :rem neues auf alten platz
+ 1290 gosub 50000
+ 1295 print#15,"i"
+ 1297 :
+ 1298 :
+ 1300 poke204,1:print" "
+ 1310 print:print
+ 1315 print tab(5)m2$,m3                 :rem fehlermeldung ?
+ 1317 :
+ 1318 :
+ 1320 print#15,"s0:"nn$                  :rem zwischenfile loeschen
+ 1330 gosub 50000
+ 1335 print#15,"i"                       :rem floppy initialisieren
+ 1337 :
+ 1340 if m1=1then print tab(5)"ok":goto1400
+ 1350 print tab(5) m2$
+ 1400 close 15                           :rem ende
+ 1500 end
+49000 :rem ------------------------------------------------
+49001 :
+49002 :
+49003 :  rem fehlermeldung von floppy lesen
+49004 :
+49005 :
+50000 input#15,m1,m2$,m3,m4 : return
+59000 :rem ------------------------------------------------
+59001 :
+59002 :
+59003 :  rem abbruch bei diskettenfehler
+59004 :
+59005 :
+60000 print:print"diskettenfehler !!":print
+60010 gosub 50000: print m2$
+60020 close 3:close 4: close 15:end
+

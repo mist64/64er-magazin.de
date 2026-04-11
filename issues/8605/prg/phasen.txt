@@ -1,0 +1,58 @@
+
+
+;phasen.prg ==0801==
+   20 rem ** mini-phasengenerator **
+   25 rem ** c 64 + simons basic  **
+   30 :
+  100 rem *** daten lesen ***
+  110 for i= 1 to 4
+  120 read x(i):read y(i)
+  130 next
+  140 for i=1 to 3
+  150 read ap(i):read ep(i)
+  160 next
+  170 :
+  180 input "startkoordinaten x,y ";sx,sy
+  190 input "startwinkel          ";sw
+  200 input "zielkoordinaten x,y  ";zx,zy
+  210 input "zielwinkel           ";zw
+  220 input "anzahl der schritte  ";n
+  230 sw=sw*~/180:zw=zw*~/180
+  235 rem *** schrittweiten ***
+  240 dx=(zx-sx)/n:rem schrittweite x
+  250 dy=(zy-sy)/n:rem schrittweite y
+  260 dw=(zw-sw)/n:rem schrittweite winkel
+  290 rem *** istwerte=startwerte ***
+  300 iw=sw:ix=sx:iy=sy
+  330 ($64){CTRL-A} 7,6
+  350 for nn=0 to n
+  360 si=sin(iw):co=cos(iw)
+  370 for p=1 to 4
+  375 rem *** punkte ($64){ensh}ieren ***
+  380 xr= x(p)*co+y(p)*si
+  390 yr=-x(p)*si+y(p)*co
+  395 rem *** punkte verschieben ***
+  400 xr(p)=xr+ix
+  410 yr(p)=yr+iy
+  420 next p
+  425 rem *** ($64)yien ziehen ***
+  430 for i=1 to 3
+  440 ($64){stop} 160+xr(ap(i)),99-yr(ap(i)),160+xr(ep(i)),99-yr(ep(i)),1
+  450 next
+  455 rem *** istwerte neu be($64){dish}hnen ***
+  460 ix=ix+dx
+  470 iy=iy+dy
+  480 iw=iw+dw
+  490 next nn
+  500 wait 198,1:get a$
+  510 end
+  950 :
+ 1000 rem *** daten der ($64)yien ***
+ 1050 data 0,-20:rem punkt 1
+ 1060 data 0,20:rem:punkt 2
+ 1070 data -20,0:rem punkt 3
+ 1080 data 20,0:rem punkt 4
+ 1090 data 1,2:rem linie 1
+ 1100 data 3,2:rem linie 2
+ 1110 data 4,2:rem linie 3
+

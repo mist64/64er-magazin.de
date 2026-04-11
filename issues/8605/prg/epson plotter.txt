@@ -1,0 +1,146 @@
+
+
+;epson plotter.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *         epson plotter         *
+    4 rem *                               *
+    5 rem *   c-64 + epson rx 80 (f/t+)   *
+    6 rem *       (+ interface)           *
+    7 rem *                               *
+    8 rem *********************************
+    9 rem *                               *
+   10 rem*         volker raum           *
+   11 rem*     noetherstrasse 20a        *
+   12 rem*        8520 erlangen          *
+   13 rem*         09131/65511           *
+   14 rem*                               *
+   15 rem*********************************
+   16 :
+   17 :
+   30 rem "{clr} = shift+clr/home
+   32 rem "{down} = cursor down
+   34 rem "{lblu} = c= + 7
+   36 rem "{blu} = ctrl + 7
+   38 rem "{left} = cursor left
+   40 ifpeek(49152)<>165thenload"plotter masch",8,1:rem laden druckerausgabe
+   42 poke53281,6
+   44 sys49289 :rem loeschen des ausgabepuffers
+   46 clr
+   48 print"{clr}{down}{lblu}               plotter "
+   50 print"{down}         c-64 <-> rx-80 (f/t)"
+   52 print"{down}   eine bel. funktion f(x) wird auf"
+   54 print"{down}       dem drucker ausgedruckt."
+   56 input"{down} f(x) = ";f$:iff$=""then74:rem eingabe der funktion
+   58 print"{clr}{blu}10000 deffnf(x)=";f$
+   60 print"10010 f$="chr$(34);f$;chr$(34)
+   62 print"goto74
+   64 poke631,19:poke632,13:poke633,13:poke634,13:poke198,4:end
+   66 rem
+   68 rem funktion in deffnf einsetzen und f$ zuruecksetzen
+   70 rem *** programmierter direktmodus ***
+   72 rem
+   74 dim sw(200):rem scharparameter
+   76 gosub 10000:print"{lblu}":rem deffnf ausfuehren
+   78 print"{clr}{down} f(x) = ";f$
+   80 print"{down} angabe des definitionsbereiches :"
+   82 input"{down} xa,xe :   -5,5       {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";xa,xe
+   83 ifxa>xe thenprint"{up}{up}";:goto82
+   84 input"{down} ya,ye :   -5,5       {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";ya,ye
+   85 ifya>ye thenprint"{up}{up}";:goto84
+   86 rem definitions und wertebereich von f(x)
+   88 print"{down} aufloesung y-richtung :"
+   90 print" 0) 480 einzelpunkte"
+   92 print" 1) 960 einzelpunkte"
+   94 print" 2) 960 einzelpunkte doppelte gesch."
+   96 print" 3) 1920 einzelpunkte "
+   98 print" 4) 640 einzelpunkte "
+  100 print" 5) 720 einzelpunkte "
+  102 input"{down} aufloesung :  0{left}{left}{left}";a1
+  104 if a1=0thenaf=480
+  106 if a1=1thenaf=960
+  108 if a1=2thenaf=960
+  110 if a1=3thenaf=1920
+  112 if a1=4thenaf=640
+  114 if a1=5thenaf=720:a1=6
+  116 ifa1>5goto102
+  118 poke2,a1
+  120 rem
+  122 rem aufloesung fuer drucker eingeben (y-richtung)
+  124 rem uebergabe dieser aufloesung an das masch.prog.
+  126 rem
+  128 print"{clr}{down} f(x) = "f$
+  130 print"{down} breite der x-achse auf dem drucker"
+  132 print"{down} in punkten"
+  134 input"{down} aufloesung :  480{left}{left}{left}{left}{left}";a2
+  135 a2=a2-1
+  136 rem angabe der laenge des ausdrucks a2/8=zeichen
+  138 input"{clr}{down} ist f(x) eine funktionenschar   n{left}{left}{left}";fs$
+  140 if fs$="n"then150
+  142 sc=1:print
+  144 print" a("sc")= ";:input gf$
+  146 ifgf$="ende"then150
+  148 sw(sc)=val(gf$):sc=sc+1:goto144
+  150 rem falls schar,dann angabe der parameter
+  152 dy=abs(ye-ya)/af:rem 1punkt=?x
+  154 dx=abs(xe-xa)/a2:rem schrittweite
+  156 rem einheiten der x-und y-achse
+  158 lx=(-ya*af/(ye-ya))
+  160 ly=int((-xa*a2/(xe-xa))+.5)+1
+  162 iflx<0orlx>480 thenlx=-1
+  164 ifly<0orly>480 thenly=-1
+  166 iflx=-1then172
+  168 rem festlegung der lage der achsen
+  170 fori=lyto1step-30:of=i:next:rem beginn der skaleneinteilung
+  172 rem start des plottens
+  174 rem ******************
+  176 open1,4:print#1,chr$(27);"3";chr$(20);
+  178 print#1,"f(x)="f$:print#1
+  180 print#1,"dx="30*dx"      dy="30*dy:print#1
+  182 print#1,"xa,xe = ("xa","xe")":print#1
+  184 print#1,"ya,ye = ("ya","ye")":print#1
+  186 iffs$="j"thenprint#1,"a = ("sw(1);
+  188 iffs$="j"thenfori=2tosc-1:print#1,","sw(i);:next:print#1,")"
+  190 rem ausdruck der funktion,definitions,wertebereich,einheiten der x,y achse
+  192 rem gegebenfalls scharparameter
+  194 cmd1:rem ausgabe komplett auf drucker,notwendig fuer masch.prog.
+  196 by=0:ku=-1:co=xa-dx:fori=1toa2step8:bi=256:rem begin der plotsvchleife
+  198 iffs$="j"thenforaq=1tosc-1:rem falls schar dann alle parameter
+  200 foru=itoi+7:co=co+dx:bi=bi/2:rem schritte zu 8 fuer ausdruck auf drucker
+  202 iffs$="j"thena=sw(aq):rem scharparameter
+  204 poke768,112:poke769,168:yi=fnf(co):rem ausschalten der fehlermeldung
+  206 rem und bestimmung des funktionswertes
+  208 ry=int(((yi-ya)*(af-1)/(ye-ya))+.5):rem umrechnen des funktionswertes
+  210 poke768,139:poke769,227:rem fehlermeldung frei geben
+  212 ifry<0orry>afthen216:rem funktionspunkt einzeichnen ?
+  214 pokery+49920,peek(49920+ry)orbi:rem punkt an ausgabepuffer geben
+  216 ifku>=0thenku=ku+1:rem zaehler fuer einteilung der x-achse
+  218 ifu=lythenby=bi
+  220 ifu=ofthenku=0
+  222 if(ku/30)=int(ku/30)thenvr=1:po=bi:rem skaleneinteilung ?
+  224 nextu:iffs$="j"thenku=ku-8:co=co-8*dx:bi=256:nextaq:co=co+8*dx:ku=ku+8
+  226 rem 8punkte fertig machen,dann ev. alle scharparameter durchlaufen lassen
+  228 iflx=-1thensys49152:nexti:goto240:rem ausgabe auf drucker
+  230 poke49920+lx,255:rem x-achse setzen
+  232 ifvr=1thenforq=-1to1:poke49920+lx+q,peek(49920+lx+q)orpo:next:vr=0
+  234 rem skaleneinteilung
+  236 ifby<>0thengosub244:rem y-achse ausgeben
+  238 sys49152:nexti:rem drucken
+  240 print#1:close1:rem kanal schliessen
+  242 goto46:rem neue funktion
+  244 rem
+  246 forv=49920to49920+af:pokev,(peek(v) or by):nextv
+  248 iflx=-1thenreturn
+  250 b1=by/2:ifb1<1thenb1=0
+  252 b2=by/4:ifb2<1thenb2=0
+  254 b3=by*2:ifb3>128thenb3=0
+  256 b4=by*4:ifb4>128thenb4=0
+  258 ag=b1+b2+b3+b4
+  260 forzx=0to(af-lx)step30:poke49920+lx+zx,peek(49920+lx+zx)orag:next
+  262 forzx=0tolxstep30:poke49920+lx-zx,peek(49920+lx-zx)orag:next
+  264 by=0:return
+  266 rem y-achse ausgeben und skaleneinteilung vornehmen
+10000 deffnf(x)=x
+10010 f$="x"
+10020 return
+

@@ -1,0 +1,29 @@
+
+
+;zviza.prg ==0801==
+    1 rem *********************************       *          zviza                *
+    2 rem *     zeichensatz fuer          *       *     vizawrite (engl.)         *
+    3 rem *      bertram hafner           *       *********************************
+   10 i=i+1:reada:ifa=-1goto12
+   11 poke49200+i,a:goto10
+   12 poke49200+i,1
+   15 poke160,0:poke161,0:poke162,0           :rem timer auf 0 stellen
+   20 poke789,192                             :rem start des maschinenprg
+   30 load"vizawrite 64",8,1
+  100 data165,161,201,12,240,3,76,49,234,162,0,189,100,192,201,1,240,25,133,251
+  101 data232,189,100,192,133,252,232,160,0,189,100,192,145,251,232,200,192,8
+  102 data48,245,76,60,192,169,234,141,21,3,76,49,234
+  200 rem  neue zeichen fuer bildschirm            ****************************
+  210 rem  eingabeformat der 10 datas:             zieladr low,hi,8 bytes
+  211 rem  berechnung der zieladresse:             bc=bildschirmcode des zu
+  212 rem  ersetzenden zeichens (satz 2)           zieladr=bc*8+56*256
+  213 rem  hi = int(zieladr/256)                   low= zieladr-hi*256
+  220 data0,56,102,0,60,6,62,102,62,0         :rem klein ae fuer @
+  230 data224,56,102,0,60,102,102,102,60,0    :rem klein oe fuer \
+  240 data216,56,102,24,60,102,126,102,102,0  :rem gross ae fuer [
+  250 data232,56,51,102,102,102,102,102,60,0  :rem gross ue fuer ]
+  260 data240,56,0,60,102,108,102,102,108,96  :rem scharf s fuer ^
+  270 data80,57,102,0,102,102,102,102,59,0    :rem klein ue fuer *
+  280 data240,58,0,0,3,62,118,54,54,0         :rem ~ fuer shift ^
+  500 data-1:rem flag fuer ende
+
