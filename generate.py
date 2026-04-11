@@ -586,6 +586,18 @@ class Issue:
                 print("BAD", issue_key, article.issue_key)
               assert(issue_key == article.issue_key)
 
+      # verify that 64er.id is unique within the issue
+      seen_ids = {}
+      for article in articles:
+          if not article.id:
+              raise AssertionError(f"- [{issue_directory_path}] article '{article.title}' has no 64er.id")
+          if article.id in seen_ids:
+              raise AssertionError(
+                  f"- [{issue_directory_path}] duplicate 64er.id '{article.id}': "
+                  f"'{seen_ids[article.id]}' and '{article.title}'"
+              )
+          seen_ids[article.id] = article.title
+
       if not pubdate:
           # no system exit as this also triggers for empty folders (eg. after branch change)
           raise AssertionError(f"- [{issue_directory_path}] Skipping: no pubdate")
