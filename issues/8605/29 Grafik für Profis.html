@@ -89,7 +89,22 @@
 
         <p>Der PLOT-Befehl dient dazu, ein Bit in der Bitmap, das durch die Koordinaten »x« und »y« festgelegt wird, zu setzen, zu löschen oder zu invertieren. Die x-Koordinate darf sich dabei zwischen 0 und 319 bewegen, die y-Koordinate zwischenO und 199, wobei der Ursprung des Koordinatensystems in der linken oberen Bildschirmecke liegt. Nun ist es, wie Sie wohl wissen, nicht so einfach herauszufinden, welches Bit in welchem Byte zu einer bestimmten Bildschirmkoordinate gehört. Um das festzustellen, müssen wir uns den Aufbau der Bitmap anschauen (Bild 1).</p>
 
+        <figure>
+            <img src="29-1.png" alt="Schematische Darstellung des Bitmap-Aufbaus mit 40 Spalten und 25 Zeilen">
+            <figcaption>Bild 1. Aufbau der Bitmap: die Anfangsadresse liegt bei 8192 und die Punkte zeigen die einzelnen Positionen auf dem Bildschirm</figcaption>
+        </figure>
+
         <p>Sie sehen, daß die ersten acht Byte untereinander liegen, die nächsten acht rechts daneben und so weiter, insgesamt 40 Spalten mal 8 Byte = 320 Byte. Im gleichen Stil sind 25 Zeilen untereinander aufgebaut. Das ergibt zusammen 25 mal 320 Byte = 8000 Byte. Der Bildschirmaufbau hat also große Ähnlichkeit mit dem des Textbildschirms. Nun gilt es, einen Algorithmus zu finden, der uns zu einer Bildschirmkoordinate x, y das entsprechende Byte in der Bitmap sowie die Bitposition innerhalb dieses Bytes liefert. Überlegen wir uns zunächst, wie sich die x-Koordinate auf die Byte-Position auswirkt. Wir müssen hier zwischen HiRes- und Multicolor-Grafik unterscheiden. Während im HiRes-Modus jedes Bit einem Punkt entspricht, benötigt man im Multicolor-Modus zwei Bits, um einen Punkt darzustellen. Deshalb gibt es dort nur 160 Punkte auf der x-Achse. Die Tabellen 1 und 2 zeigen, wie sich x-Koordinate und Byte-Nummer in der Bitmap zueinander verhalten, wenn wir die y-Koordinate gleich 0 setzen.</p>
+
+        <figure>
+            <img src="29-t1.png" alt="Tabelle mit x-Werten und zugehörigen Bytenummern im HiRes-Modus">
+            <figcaption>Tabelle 1. So verhalten sich die x-Werte und die Bytenummer zueinander bei y=0</figcaption>
+        </figure>
+
+        <figure>
+            <img src="29-t2.png" alt="Tabelle mit x-Werten und zugehörigen Bytenummern im Multicolor-Modus">
+            <figcaption>Tabelle 2. Multicolor-Modus: x-Werte und Bytenummer für y=0</figcaption>
+        </figure>
 
         <p>Sie sehen, daß im HiRes-Modus die unteren drei Bit für die Byte-Nummer unwichtig sind und deshalb gelöscht werden müssen. Dies geschieht mit der AND-Funktion:<br>
             xlo and #^11111000</p>
