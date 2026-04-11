@@ -79,24 +79,29 @@ Before calling a first listing "done":
 
 ### Hidden companion files (belong to an article but have no printed listing)
 
-A `.prg` or `.txt` file from the disk can be assignable to an article (because the section separator on the D64 says so) but have no corresponding printed listing in the magazine — it's bonus content the reader can download but not type in. Place it in that article, but hide it:
+A `.prg` or `.txt` file from the disk can be assignable to an article (because the section separator on the D64 says so) but have no corresponding printed listing in the magazine — it's bonus content the reader can download but not type in. Place it in that article, but hide it.
 
-- **Binary `.prg` files** → `<div class="binary_download" …>` (identical to the binary-only pattern above). The CSS hides the div's body and only the download link is shown.
-- **Text `.txt` files** (rare) → `<pre data-filename="…" data-name="…"></pre>` wrapped in `<div style="display: none;">`, so the petcat text is available for the download machinery but nothing renders in the article body.
+**The pattern depends on the file's CLASSIFICATION by `prg_links.sh`, not its on-disk extension:**
 
-Example for a Hi-Res font bonus file that belongs to the Super-Print article but has no printed listing:
+- **Binary file** (moved to `prg/*.prg` only — no `.txt` companion): use `<div class="binary_download">`. The CSS hides the div body and only shows the download link.
 
-```html
-<div class="binary_download" data-filename="duennschrift.prg" data-name="Dünnschrift"></div>
-```
+  ```html
+  <div class="binary_download" data-filename="duennschrift.prg" data-name="Dünnschrift"></div>
+  ```
 
-Example for a text companion file with no printed listing:
+- **BASIC file** (classified as BASIC: `.txt` exists in `prg/`, the `.prg` was moved to `prg/del/`): use a hidden `<pre>` wrapping pattern with the basename-only `data-filename` (no `.prg` suffix). The generator reads the petcat text and makes a binary download link from it via `petcat2prg`.
 
-```html
-<div style="display: none;">
-    <pre data-filename="helper" data-name="Helper"></pre>
-</div>
-```
+  ```html
+  <div style="display: none;">
+      <pre data-filename="greatprint-demo" data-name="Greatprint Demo"></pre>
+  </div>
+  ```
+
+  **Do NOT** use `<div class="binary_download" data-filename="greatprint-demo.prg">` for a BASIC-classified file. Two problems with that:
+  1. `prg/greatprint-demo.prg` doesn't exist (it's in `del/`), so the generator throws `BinaryDownloadError: Binary file not found`.
+  2. Even if you move the `.prg` back, the `.prg` suffix forces MSE/hex rendering mode, which is wrong for BASIC content — you'd get a hex dump where a petcat text listing belongs.
+
+  The hidden `<pre>` pattern solves both: the text renders via the `.txt` + `petcat2prg` pipeline, and nothing displays in the article body because the wrapper div is `display: none`.
 
 This rule resolves the ambiguity that used to send orphan files to `LOG.md`: if the D64 section separator tells you which article a file belongs to, and the article text doesn't mention it, place it as a hidden companion — don't log or skip.
 
