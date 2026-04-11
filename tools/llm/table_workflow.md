@@ -150,6 +150,55 @@ This entire pipeline (Steps 1–6) is a good fit for a subagent because:
 
 Give the subagent the full pipeline spelled out (see `img_workflow.md`'s subagent-delegation rules for the general principle). Ask it to return **only** the final `<table>...</table>` block, plus a short note if any cell was `[ILLEGIBLE]`.
 
+## Placement rules (once you have the HTML `<table>`)
+
+Placement mirrors the figure-placement rules in `img_workflow.md`:
+
+1. **Find the first text reference** to the table in the article body (e.g. "Tabelle 3", "siehe Tabelle", "wie folgende Tabelle zeigt"). The reference may be in a paragraph that doesn't precisely match the caption — phrases like "folgende Kombinationen" or "in der Tabelle unten" count.
+2. **Insert the `<figure>` AFTER the `</p>`** of the paragraph that first mentions it. **Never split a paragraph.** If the reference sits mid-paragraph, the figure still goes after the full enclosing `</p>`.
+3. **If the article never references the table explicitly**, append it at the end of the article body, just before the `</article>` close tag (or before the `<address class="author">` block if present). Logging the "unreferenced" decision in `LOG.md` is optional — do it only if you're unsure which article the table belongs to.
+
+## "Bild" can be a table
+
+The caption label `Bild N.` on a scan does not always point at an image — 64'er routinely labels data tables as `Bild N` when they're numbered alongside the article's figures. Sweep for these too, **but only if they are not already included as an image**:
+
+- Grep the all-blocks index for every `Bild` caption.
+- For each hit, check whether a PNG file `<page>-<n>.png` already exists in the issue folder *and* the article HTML references it via an `<img>`.
+  - **If yes → it's already placed. STOP. Do not touch it**, even if it's actually a data table. Converting placed images to HTML tables is explicitly forbidden by the "Skip tables already present as images" rule below.
+  - If no → open the surrounding block on the scan. If the block is a rectangular grid of text cells (data table), extract it with the tesseract pipeline. If it's a photo, diagram, or schematic, fall back to the image workflow in `img_workflow.md`.
+- Place the result the same way as a Tabelle caption: `<figure>` + `<figcaption>` wrapping the `<table>`, after the first paragraph that references it.
+
+This catches tables that would otherwise be invisible to a pure "Tabelle N." search.
+
+## Skip tables already present as images
+
+Before extracting a table, check whether it is already placed as an `<img>` inside a `<figure>` in the target article. If the image + figcaption are already there, **leave them alone** — do not "upgrade" them to HTML `<table>` elements. Image-tables are a valid representation and converting them mechanically loses fidelity (the image is the ground truth, an OCR'd table is a best-effort transcription).
+
+Example: `29 Grafik für Profis.html` places `Tabelle 1` and `Tabelle 2` from page 32 as `<img src="29-t1.png">` / `<img src="29-t2.png">` inside `<figure>` blocks. These are **done**. Do not replace them with HTML tables.
+
+Only extract-as-HTML when:
+- the placeholder is explicitly `<p>TODO TABLE</p>`, or
+- the referenced table is missing entirely from the HTML (no image, no `<table>`, no TODO marker).
+
+## Sweeping captions across a whole issue
+
+When you need to find *every* "Tabelle …" that needs to be placed:
+
+```bash
+grep -iE "Tabelle[ :.][^.]" _cache/all_blocks.txt \
+    | grep -vE "Farbtabelle|Steuersequenztabelle|[Ww]ertetabelle|Preistabelle|Linktabelle" \
+    > /tmp/table_candidates.txt
+```
+
+The second grep filters out compound words that contain "tabelle" but aren't captions (e.g. *Preistabelle*). Tune the filter as you encounter false positives.
+
+Then for each candidate:
+- Confirm the block's bbox points at an actual caption, not just running prose that *mentions* a table
+- Crop + re-OCR the table region (usually the block immediately above or below the caption block — adjacency in bbox y-coordinates)
+- Place the resulting HTML in the referencing article
+
+Some "Tabelle" matches will be false positives (e.g. the word appearing inside a paragraph). Read the first ~100 characters of the matching block text to decide.
+
 ## When you can't decide — log, don't delete
 
 If a TODO, heading, or stray fragment in the HTML looks wrong or orphaned and you can't find a corresponding source on the scan, **do not silently delete it**. Write an entry in the issue's `LOG.md` (create it if it doesn't exist) describing:

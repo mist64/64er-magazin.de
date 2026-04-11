@@ -45,13 +45,105 @@
 
         <address class="author">(Logo/aw)</address>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Instr.</th>
+                    <th>Adr.</th>
+                    <th>Data</th>
+                    <th>Opcode</th>
+                </tr>
+                <tr>
+                    <td>−0002</td>
+                    <td>C434</td>
+                    <td>20 3D C6</td>
+                    <td>JSR $C63D</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0141</td>
+                    <td>C4</td>
+                    <td>Mem Write</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0140</td>
+                    <td>36</td>
+                    <td>Mem Write</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>C436</td>
+                    <td>C6</td>
+                    <td>Mem Read</td>
+                </tr>
+                <tr>
+                    <td>−0001</td>
+                    <td>C63D</td>
+                    <td>A5 68</td>
+                    <td>LDA $68</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0068</td>
+                    <td>00</td>
+                    <td>Mem Read</td>
+                </tr>
+                <tr>
+                    <td>+0000</td>
+                    <td>C63F</td>
+                    <td>D0 28</td>
+                    <td>BNE $C669</td>
+                </tr>
+                <tr>
+                    <td>+0001</td>
+                    <td>C641</td>
+                    <td>A6 7F</td>
+                    <td>LDX $7F</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>007F</td>
+                    <td>00</td>
+                    <td>Mem Read</td>
+                </tr>
+            </table>
+            <figcaption>Bild 3. Datenanalyser im »Disassembler«-Mode (65xx CPU)</figcaption>
+        </figure>
 
         <p>Sehr gut ist hier bis in das kleinste Detail die Arbeitsweise der CPU zu erkennen. Bei -0002 steht ein Jump to Subroutine-Befehl (analog in Basic der GOSUB-Befehl). Die CPU packt die Rücksprungadresse ($C436) auf den Stack (Stapelspeicher) und macht bei $C636 mit LDA $68 weiter. Der Datenanalyser zeichnet also jedes Ereignis außerhalb der CPU auf.</p>
 
         <p>Vor dem -0001 steht zwar schon die nächste Adresse, doch der Programmzähler der CPU »hat sich geirrt«. Diese Daten werden in der CPU »verworfen«.</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Adresse</th>
+                    <th>Daten</th>
+                    <th>Befehl</th>
+                </tr>
+                <tr>
+                    <td>$1000</td>
+                    <td>A9 00</td>
+                    <td>LDA #$00</td>
+                </tr>
+                <tr>
+                    <td>$1002</td>
+                    <td>85 D2</td>
+                    <td>STA $D2</td>
+                </tr>
+                <tr>
+                    <td>$1004</td>
+                    <td>F0 FA</td>
+                    <td>BEQ $1000</td>
+                </tr>
+                <tr>
+                    <td>$1005</td>
+                    <td>...</td>
+                </tr>
+            </table>
+            <figcaption>Bild 4. Die Endlosschleife</figcaption>
+        </figure>
 
         <p>Hier hilft nur noch der NMI (Stop/Restore-Taste). Der Wert # $00 wird unmittelbar in den Akkumulator der CPU geladen und beim zweiten Befehl in die Adresse $D2 gebracht. Der Verzweigungsbefehl fragt das Statusregister ab, und stellt fest, daß die Zero-Flag gesetzt ist. Also »brancht« (Verzweige, wenn Z = 0) die CPU zur Adresse $1000 und das Spiel beginnt von vorn. Profis, die behaupten, das sei ihnen nie passiert, sind keine.</p>
     </article>

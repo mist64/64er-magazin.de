@@ -42,6 +42,21 @@
 
         <p>Jede Einzelvariable belegt 7 Byte. Den Aufbau ersehen Sie aus Bild 1:</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <td>Name 1 + 126</td>
+                    <td>Name 2 + 128</td>
+                    <td>MSB</td>
+                    <td>LSB</td>
+                    <td>00</td>
+                    <td>00</td>
+                    <td>00</td>
+                </tr>
+            </table>
+            <figcaption>Bild 1. Aufbau einer Integer-Variable</figcaption>
+        </figure>
+
         <h3>Felder</h3>
 
         <p>Ein Feld belegt 5 + 2 x Dimension + (Dimension n x Dimension (n-1) x Dimension (n-2)&hellip;) x 2 Byte.</p>
@@ -63,6 +78,19 @@
 
         <p>Die Feldelemente werden direkt hinter dem Deskriptorblock in je 2 Byte (MSB-LSB) gespeichert (siehe Bild 2).</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <td>MSB 1</td>
+                    <td>LSB 1</td>
+                    <td>MSB 2</td>
+                    <td>LSB 2</td>
+                    <td>etc.</td>
+                </tr>
+            </table>
+            <figcaption>Bild 2. So liegen die Feldelemente hintereinander</figcaption>
+        </figure>
+
         <p>Bei mehrdimensionalen Feldern wird die letzte Dimension als erste angelegt.</p>
 
         <h3>Gleitkomma-Variable</h3>
@@ -74,6 +102,18 @@
         <h3>Einzelvariable</h3>
 
         <p>Jede Einzelvariable belegt 7 Byte, wie Sie aus Bild 3 ersehen können.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>Name 1</td>
+                    <td>Name 2 + 128</td>
+                    <td>Exponent</td>
+                    <td colspan="4">Mantisse 32-Bit</td>
+                </tr>
+            </table>
+            <figcaption>Bild 3. Aufbau einer Gleitkomma-Variable</figcaption>
+        </figure>
 
         <h3>Felder</h3>
 
@@ -96,6 +136,19 @@
 
         <p>Die Feldelemente werden direkt hinter dem Deskriptorblock in je fünf Speicherzellen gespeichert. (Siehe Bild 4)/</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <td>Expon 1</td>
+                    <td>Mantisse 1</td>
+                    <td>Expon 2</td>
+                    <td>Mantisse 2</td>
+                    <td>usw.</td>
+                </tr>
+            </table>
+            <figcaption>Bild 4. Und auf diese Weise liegen die Feldelemente im Speicher</figcaption>
+        </figure>
+
         <p>Bei mehrdimensionalen Feldern wird die letzte Dimension als erste angelegt.</p>
 
         <h3>Stringvariable</h3>
@@ -114,6 +167,26 @@
         <h3>Einzelvariable</h3>
 
         <p>Jede Einzelvariable belegt 7 Byte und im oberen RAM-Bereich zwei Byte + Länge des Strings. Der Aufbau wird aus Bild 5 ersichtlich.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>Name 1</td>
+                    <td>Name 2 + 128</td>
+                    <td>String-länge</td>
+                    <td colspan="2">Zeiger in RAM</td>
+                    <td>00</td>
+                    <td>00</td>
+                </tr>
+                <tr>
+                    <td colspan="3"></td>
+                    <td>low</td>
+                    <td>high</td>
+                    <td colspan="2"></td>
+                </tr>
+            </table>
+            <figcaption>Bild 5. Aufbau einer einzelnen Stringvariable</figcaption>
+        </figure>
 
         <h3>Felder</h3>
 
@@ -136,6 +209,19 @@
 
         <p>Die Feldelemente werden direkt hinter dem Deskriptorblock in je 3 Byte gespeichert (Bild 6).</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <td>String 1 länge</td>
+                    <td>Zeiger 1 low/high</td>
+                    <td>String 2 länge</td>
+                    <td>Zeiger 2 low/high</td>
+                    <td>usw.</td>
+                </tr>
+            </table>
+            <figcaption>Bild 6. Lage der Feldelemente hinter dem Deskriptorblock</figcaption>
+        </figure>
+
         <p>Bei mehrdimensionalen Feldern wird die letzte Dimension als erste angelegt.</p>
 
         <h3>Funktionsvariable</h3>
@@ -147,6 +233,26 @@
         <p>Intern wird das höchstwertige Bit im ersten Namen-Byte gesetzt. Hat der Variablenname nur ein Zeichen, so ist das zweite Namen-Byte Null. Im Gegensatz zu den anderen Variablen gibt es aber hier keine Felder.</p>
 
         <p>Jede Funktionsvariable belegt 7 Byte und im oberen RAM-Bereich 2 + Länge der Funktionsvariablen. Ansonsten entspricht die Ablage der einen einfachen Stringvariablen (Bild 7).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>Name 1 + 128</td>
+                    <td>Name 2</td>
+                    <td>String-länge</td>
+                    <td colspan="2">Zeiger in RAM</td>
+                    <td>00</td>
+                    <td>00</td>
+                </tr>
+                <tr>
+                    <td colspan="3"></td>
+                    <td>low</td>
+                    <td>high</td>
+                    <td colspan="2"></td>
+                </tr>
+            </table>
+            <figcaption>Bild 7. Anordnung einer Funktionsvariablen</figcaption>
+        </figure>
 
         <p>Damit sind alle Variablentypen, die der C 128 kennt, dargestellt.</p>
 
