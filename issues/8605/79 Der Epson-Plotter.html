@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Epson-Plotter</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="V. Raum, og">
+    <meta name="64er.issue" content="5/86">
+    <meta name="64er.pages" content="79-81">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Der Epson-Plotter</h1>
+        <p class="intro">Natürlich ist es ein hochgestecktes Ziel, wenn man versucht, einem Matrix-Drucker die Fähigkeiten eines Plotters zu entlocken. Doch mit einer Dichte von über 90 (neunzig) Punkten pro Zentimeter läßt sich schon einiges anfangen.</p>
+
+        <p>Eine Hardcopy vom Grafikbildschirm des C 64 ist für den Ausdruck komplizierterer Funktionen oft zu klein und in der Auflösung zu ungenau. Das ändert sich jedoch schlagartig, wenn man die Grafiken nicht vom Bildschirm kopiert, sondern Zeile für Zeile berechnet und sofort ausdruckt. So entsteht aus einer Zeile mit einer Auflösung von 200 Punkten eine Zeile aus bis zu 1920 Punkten entlang der Y-Achse. Da dann die X-Achse in Richtung des Papiervorschubes, also vertikal gelegt ist, bedeutet dies einen nahezu beliebig großen Ausschnitt aus einer Funktion.</p>
+
+        <h2>Eingabehinweise</h2>
+
+        <p>Geben Sie zunächst das Maschinenprogramm »PLOTTER MASCH« (Listing 1) mit dem MSE ein und speichern Sie es. Dann tippen Sie das Hauptprogramm »EPSON PLOTTER« (Listing 2) mit dem Checksummer ein und speichern es ebenfalls. Beim Starten dieses Programms wird dann das Maschinenprogramm automatisch nachgeladen.</p>
+
+        <h2>Programmbeschreibung</h2>
+
+        <p>Hat man das Programm »Epson Plotter« geladen und gestartet, dann dauert es zunächst ein wenig, bis dann schließlich die Frage: »F(X) = ?«erscheint. Man gibt hierauf die Funktion ein, die man auf dem Drucker dargestellt haben will.</p>
+
+        <p>Man kann auch Scharen mit einem Parameter drucken lassen. Dieser Parameter muß »a« lauten, so zum Beispiel: sin(x) oder a*sin(x + a)</p>
+
+        <p>Die Eingabe muß in der üblichen Form vorgenommen werden, die der C 64 versteht (siehe Handbuch).</p>
+
+        <p>Hat man nun diese Eingabe beendet, wird man anschließend nach Definitions- und Wertebereich gefragt.</p>
+
+        <p>Man gibt zunächst die untere Grenze des Definitionsbereichs an, dann, gefolgt von einem Komma, die obere und drückt RETURN. Natürlich muß der untere Wert kleiner sein als der obere.</p>
+
+        <p>Genauso verfährt man mit dem Wertebereich. Der Epson-Drucker hat verschiedene Dichten zur Verfügung, in denen er horizontal drucken kann. Das Programm fragt jetzt nach dieser Auflösung. Es druckt dazu auf dem Bildschirm alle möglichen Auflösungen aus und versieht sie mit einer Nummer. Man gibt nun diese Nummer an (0 bis 5), und der Drucker wird nachher in der gewünschten Dichte drucken.</p>
+
+        <p>Da jeder Drucker mit Endlospapier in vertikaler Richtung beliebige Längen drucken kann, ist diese Möglichkeit im Programm integriert. Auf die Frage »Breite der X-Achse&hellip;« gibt man die Anzahl der Punkte an, die der Drucker vertikal druckt. Das heißt man bestimmt die Länge der X-Achse auf dem Papier.</p>
+
+        <p>Hatte man sich bei der Funktionseingabe dazu entschlossen, eine Schar-Funktion drucken zu lassen, so kann man jetzt die notwendigen Schar-Parameter eingeben. Man beantwortet die Frage »&hellip;Funktionenschar?« entweder mit »J« oder »N«. Hat man sich für Ja entschieden, so gibt man die Parameter ein.</p>
+
+        <p>Will man keinen Parameter mehr angeben, so wird durch die Eingabe »Ende« diese Eingabenserie beendet.</p>
+
+        <p>Der Computer ist nun bereit, die zu druckende Funktion in Form von Grafikdaten an den Drucker zu übermitteln. Er beginnt damit, nachdem man eine beliebige Taste gedrückt hat (siehe Bild 1).</p>
+
+        <h2>Anmerkungen</h2>
+
+        <p>Betreibt man seinen Drucker mit einem Software-Interface, dann muß man dabei folgendes beachten. Der Bereich $c000 bis $cfff wird vom »Epson-Plotter« fast vollständig genutzt. Das heißt ein solches Interface darf sich nicht in diesem Bereich befinden. Geeignet ist der Bereich $9000 bis $9fff, wobei dabei auch zu beachten ist, daß man ihn dann gegen Überschreiben durch Variablen schützt (Speicherstelle 55,56).</p>
+
+        <p>Wichtig ist auch, daß man ein Interface verwendet, das durch Öffnen des Kanals 4 den Drucker im Epson-Modus anspricht. Ansonsten muß die Zeile 176 entsprechend geändert werden.</p>
+
+        <p>Es wird grundsätzlich jede Funktion dargestellt. Auch solche, die an manchen Stellen nicht definiert sind oder gegen unendlich gehen. Der Trick hierbei ist, daß man den Fehlermeldungsvektor (768,769) auf einen RTS-Befehl zeigen läßt. (Nur im Programmodus möglich, sonst Absturz des C 64.) Dies hat zur Folge, daß jegliche Fehlermeldung unterdrückt, die Funktion an dieser Stelle nicht eingezeichnet und mit dem nächsten Funktionswert fortgefahren wird. Das Programm macht sich ferner eine Möglichkeit des Druckers zunutze, die es gestattet, in verschiedenen Matrixpunktdichten zu drucken. Dies bewirkt, daß eine Funktion mit uneingeschränktem Wertebereich noch genauer dargestellt werden kann. (Bei 1920 Punkten können zwei nebeneinanderliegende Punkte nicht gedruckt werden.)</p>
+
+        <p>Dadurch, daß man den Definitionsbereich frei wählen kann, wird es möglich, eine Funktion auf eine Länge von weit über 50 cm zu drucken. Das Maschinenprogramm bewirkt, daß bei jeder Auflösung das Ausgeben der Grafikdaten sehr schnell vonstatten geht.</p>
+
+        <address class="author">(V. Raum/og)</address>
+    </article>
+</body>
+
+</html>

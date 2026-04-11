@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Tricks zu Vizawrite 64 (Teil 5)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bertram Hafner, aw, Klaus Heck, aw">
+    <meta name="64er.issue" content="5/86">
+    <meta name="64er.pages" content="171-172">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Tricks zu Vizawrite 64 (Teil 5)</h1>
+        <p>Man kann die Textverarbeitungswelt auf dem C 64 in zwei Lager spalten: Diejenigen, die mit Vizawrite 64 arbeiten und die, denen andere Programme lieber sind. Die erste Gruppe wird unsere bisherigen Folgen sicherlich mit Aufmerksamkeit gelesen haben, und aus der anderen Gruppe hat sich möglicherweise so mancher entschlossen, auch mit diesem Programm zu arbeiten. Uns bleibt dabei aufgrund der großen Resonanz eigentlich nur übrig, diese Reihe fortzusetzen. Diesmal veröffentlichen wir zwei Hilfsprogramme, von denen das eine das englische Vizawrite 64 in ein deutsches verwandelt und das andere den Zugang zu Vizawrite-Texten ermöglicht. Damit wird Realität, was viele sich wünschen: Man kann Texte, die mit Vizawrite 64 erstellt wurden, auch mit anderen Programmen weiterverarbeiten oder sie, beispielsweise mit einem Terminalprogramm, in alle Welt verschicken.</p>
+
+        <h2>Ändern Sie mit »ZVIZA« den Zeichensatz von »Vizawrite 64«!</h2>
+
+        <p>Das Textprogramm Vizawrite 64 (englische Version) bietet die Möglichkeit, an den Drucker ASCII-Steuercodes zu senden. Besitzen Sie einen guten Drucker, so können Sie damit vom Programm aus einen beliebigen Zeichensatz definieren und abspeichern. Der Schönheitsfehler dabei: Auf dem Bildschirm ändern sich die Zeichen nicht.</p>
+
+        <p>Unabhängig davon kämpfen Sie eventuell überhaupt mit dem Problem, daß Qe nach Drucker und Interface) der gedruckte Zeichensatz nicht mit dem Bildschirm übereinstimmt. Konkret druckt zum Beispiel mein</p>
+
+        <p>Man kann Vizawrite 64 einfach »nur« benutzen oder aber universell einsetzen. Mit zwei Hilfsprogrammen erweitern wir das Leistungsspektrum dieses Textprogramm-Klassikers beträchtlich.</p>
+
+        <p>Panasonic-Drucker mit Print 64-Interface bei [ ein Ä, bei ] ein Ü etc.</p>
+
+        <p>Abhilfe schafft das abgedruckte Programm »ZVIZA« (Listing 1), welches geladen und gestartet wird, aber erst nach dem Laden und Starten von Vizawrite 64 den Zeichenspeicher im Computer überschreibt. Wie ist das möglich? — »ZVIZA« erzeugt ein interruptgesteuertes Maschinenprogramm, das erst nach zirka einer Minute in Aktion tritt. Zeit genug, das Textprogramm nachzuladen und zu starten.</p>
+
+        <p>Warum nicht Vizawrite selbst ändern? — Das erscheint bei Verwendung von verschiedenen Zeichensätzen umständlich: Man bräuchte ja für jeden eine eigene Version.</p>
+
+        <p>Nun ans Werk: Nach dem Abtippen des Programms speichern Sie es am besten auf der gleichen Diskette wie Vizawrite. Bevor Sie Ihre eigenen Zeichen definieren, sollten Sie es ausprobieren:</p>
+
+        <ul>
+            <li>LOAD"ZVIZA"</li>
+            <li>RUN</li>
+        </ul>
+
+
+        <p>Das Programm lädt Vizawrite selbst nach. Nach dem Start dauert es ein paar Sekunden, bis der Zeichensatz geändert ist. Sie können das verfolgen, wenn Sie sofort ein Dokument erstellen und zum Beispiel [ oder t eingeben. »ZVIZA« arbeitet übrigens nicht mit der deutschen Vizawrite-Version zusammen, da es für die englische Version geschrieben wurde.</p>
+
+        <p>Erstellen Sie nun Ihre Zeichen als Datazeilen ab Zeile 200. Sie möchten zum Beispiel für »*« ein »ü« auf dem Schirm sehen. »*« hat den Bildschirmcode 42 (siehe Handbuch), es ist also das 42. Zeichen im Speicher. Jedes Zeichen beansprucht 8 Bytes, der Zeichenspeicher beginnt bei 14336 ($3800), so daß sich die Zieladresse wie folgt berechnet:<br>
+            Zieladr = 8*42 + 14336 = 14672<br>
+            Hi = INT(14672/256) = 57<br>
+            Low = 14672 - 256*Hi = 80</p>
+
+        <p>Das Zeichen selbst erstellen Sie in der bekannten Weise (Bild 1).</p>
+
+        <p>Beachten Sie, daß die unterste Zeile normalerweise frei bleibt (Zeilenabstand) und daß waagrecht immer zwei Punkte nebeneinander gesetzt sind (wegen der schlechten Auflösung auf dem Bildschirm).</p>
+
+        <p>Als Ergebnis erhalten Sie die DATA-Zeile 270.</p>
+
+        <p>Noch eine Anmerkung: Erscheint Ihnen die Zeit, die das Programm wartet, zu lang oder zu kurz, so ändern Sie den Wert 12 in Zeile 100. »ZVIZA« wartet, bis der Timer den Wert 00/12/00 annimmt.</p>
+
+        <address class="author">(Bertram Hafner/aw)</address>
+
+        <h2>Vizawrite Texte umwandeln und durchleuchten</h2>
+
+        <p>Das Textverarbeitungsprogramm Vizawrite 64 gehört mit zu den besten, die auf dem C 64 laufen. Sein gut durchdachtes Konzept sowie die Vielzahl von Textbearbeitungsmöglichkeiten und nicht zuletzt die komfortable Druckersteuerung tragen hierzu bei.</p>
+
+        <p>Dennoch sind Anwendungsfälle denkbar, die sich innerhalb Vizawrite 64 nicht verwirklichen lassen. Man könnte zwar für solche Fälle eigene Programme in Basic oder Assembler schreiben, hat aber wenig Möglichkeiten, diese in Vizawrite 64 einzubinden.</p>
+
+        <p>Hier schafft das Programm READ VIZAWRITE (befindet sich auf der Programm-Service-Diskette) Abhilfe. Es liest einen durch Vizawrite 64 erstellten Text ein und gibt diesen als sequentielles File wieder aus. Dieses kann nunmehr bearbeitet und anschließend zum Beispiel mit einem Terminal-Programm übertragen werden.</p>
+
+        <p>Das Programm ist in Basic geschrieben, so daß man leicht eigene Programmvorstellungen einarbeiten kann.</p>
+
+        <p>Nach dem Start von »READ VIZAWRITE« wird als erste Eingabe der Name des zu bearbeitenden Textfiles erfragt. Ist eine solche Datei vorhanden, erfolgt im weiteren eine Abfrage nach der Ausgabeart. Es besteht die Möglichkeit, den Text auf dem Bildschirm anzuzeigen oder als sequentielle Datei abzulegen.</p>
+
+        <p>Entscheidet man sich für eine Datei, so wird diese mit dem Namen des Textes und einem vorangestellten »SEQ« angelegt.</p>
+
+        <p>Im weiteren Programmablauf wird nun der Vorspann eingelesen, der als Kopf jedem durch Vizawrite erstellten Text vorausgeht. Hier sind Angaben wie Anzahl der Zeichen und Anzahl der Textseiten sowie die Parameter für die Druckersteuerung abgelegt. Diese Informationen werden ausgewertet und am Bildschirm angezeigt. Eine Speicherung in der eventuell angelegten sequentiellen Datei erfolgt nicht, da diese Information beim Zurückspeichern in Vizawrite sowieso verloren gehen.</p>
+
+        <p>Die nächsten Eingaben entscheiden, ob die Arbeits-Kopf- oder Fußseiten des Textes in das sequentielle File mit übernommen werden oder nicht. Im Anschluß daran erfolgt die eigentliche Bearbeitung des Textes. Dieser wird mit dem GET-Befehl eingelesen und Zeichen für Zeichen ausgegeben, gleichgültig ob diese mit einem RETURN abgeschlossen oder durch das Zeilenende begrenzt wurden.</p>
+
+        <p>Da die Buchstaben, Ziffern und Zeichen in Vizawrite 64 im Bildschirmcode gespeichert werden, muß zunächst eine Umwandlung in ASCII-Zeichen erfolgen. Dies geschieht in reinen Basic-Anweisungen, die das Programm zwar verlangsamen, aber dafür für jeden Programmierer einsichtig sind. Es wird Zeile für Zeile bearbeitet und sofort ausgegeben.</p>
+
+        <p>Beim Umsetzen von Bildschirm- auf ASCII-Code werden auch die deutschen Umlaute und das »ß« mit umgerechnet. Diese Buchstaben sind anschließend als Grafikzeichen vorhanden (Tabelle 1). Hierdurchwirdzwar die Lesbarkeit auf dem Bildschirm und der Datei behindert, aber durch diese Darstellung wird sichergestellt, daß beim Zurücklesen des sequentiellen Files in Vizawrite 64, diese Buchstaben korrekt wiedergegeben werden.</p>
+
+        <p>Schwieriger wird es mit den Steuerzeichen, die in Vizawrite den Text einteilen und formatieren. Sie werden zwar auch mit ausgewertet und sind im erstellten File als Grafikzeichen vorhanden, verlieren aber nach einem Zurückspeichern des Textes in Vizawrite ihre Funktion. Diese läßt sich wiederherstellen, indem die nun revers vorhandenen Sonderzeichen mit Hilfe der »Ersetze«-Funktion in ihre eigentliche Aufgabe zurückgewandelt werden. Da dies durch Vizawrite 64 auch global durchgeführt werden kann, entsteht keine größere Arbeitsbelastung.</p>
+
+        <p>Ist der Text vollständig umgearbeitet, so endet das Programm, sofern die Global-Option im Druckermenü nicht gesetzt war. Ist hier allerdings ein »g« eingetragen und ein unter »FILE« angegebenes Textfile vorhanden, so erfolgt die Abfrage, ob dieses an die nun erstellte Datei angehängt werden soll. Bei positiver Antwort beginnt die Arbeit des Programms an diesen Text von neuem.</p>
+
+        <address class="author">(Klaus Heck/aw)</address>
+
+        <p class="source">Literatur: Vizawrite 64 Textverarbeitung mit dem Commodore 64, Deutsches Handbuch, 3. Auflage, 1984<br>
+            Hauck, Helmut: Alle Tasten-, Zeichen- und Steuercodes, Teil 3, 64er, 7/84<br>
+            Commodore 64-Handbuch<br>
+            Floppy Disk VC1541 Bedienungshandbuch</p>
+    </article>
+</body>
+
+</html>
