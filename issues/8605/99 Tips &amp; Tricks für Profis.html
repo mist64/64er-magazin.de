@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Achim Hübner, tr, Barnim König, tr, Dr. Peter Kittel, Hartmut Bützer, tr, Franz Schinagl, tr, Heden Wolfgang, tr, Rainer Perske, tr, Ralf Störmer, tr, Reinet Gebhardt, tr, Stefan Pohl, tr, Wolf Schenk, tr">
+    <meta name="64er.issue" content="5/86">
+    <meta name="64er.pages" content="99-100,102">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Wir können Ihnen als weltweit erste Computerzeitschrift eine wirklich vollständige POKE-Liste für den C 64 anbieten! Interessant ist auch ein Trick, um den $C000-Bereich für Basic-Programme zu nutzen.</p>
+
+        <p>Man möchte es nicht wahrhaben: Obwohl der C 64 nun schon drei Jahre alt ist, gibt es doch immer wieder ein paar unbekannte Tricks. Selbst die eingefleischten C 64-Profis geraten mitunter ins Staunen!</p>
+
+        <h2>Vollständige POKE-Liste für den C 64!</h2>
+
+        <p>Das in Listing 1 wiedergegebene Programm liefert dem Benutzer eine nach Wissen und Gewissen der Autoren wirklich vollständige Liste aller bekannten und unbekannten POKEs für den C 64. Es beantwortet damit die allerletzten Fragen der C 64-Fan-Gemeinde.</p>
+
+        <p>Programmtechnisch sei auf die aufwendige Seiten- und Zeilenformatierung hingewiesen, die ein angenehmes Druckbild auf dem (angeschlossenen) Drucker gewährleisten. Allerdings sollte dieser Drucker vor dem »RUN«-Befehl mit reichlich Papier versorgt werden. Abtipphinweise: Bitte gehen Sie bei der Eingabe dieses äußerst komplizierten Listings sorgfältig vor und verwenden Sie unbedingt den Checksummer. Nur dann kann ein fehlerfreier Programmlauf gewährleistet werden!</p>
+
+        <address class="author">(Dr. Peter Kittel, Hartmut Bützer/tr)</address>
+
+        <h2>»Device not present Error«</h2>
+
+        <p>Mit folgender Befehlsfolge können Sie überprüfen, ob Floppy oder Drucker am seriellen Bus angeschlossen und eingeschaltet sind:<br>
+            OPEN lf,ga,sa: CLOSE lf: IF ST &lt; 0 THEN PRINT"Fehler!":STOP</p>
+
+        <p>Bedeutung der Variablen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p class="source">lf: logische Filenummer; beliebig, sollte nicht anderweitig verwendet werden.<br>
+            ga: Geräteadresse des ^u überprüfenden Geräts, üblicherweise 4 für den Drucker, 8 oder 9 für die Floppy.<br>
+            sa: Sekundäradresse, darf bei der Floppy nicht 15 sein, da sonst der CLOSE-Befehl auch alle anderen Floppy-Kanäle schließt; kann beim Drucker entfallen.<br>
+            ST ist die Computer-interne Statusvariable, in der das Betriebssystem Fehler bei der Ein- und Ausgabe festhält.</p>
+
+        <p class="source">Funktionsweise: Der OPEN-Befehl aktualisiert, da kein Filename angegeben ist, nur die Computer-interne Tabelle der geöffneten Files. Daher kann der OPEN-Befehl auch niemals einen »DEVICE NOT PRESENT ERROR« nach sich ziehen. Entscheidend ist der CLOSE-Befehl: Da die in dieser Tabelle eingetragene Geräteadresse auf den seriellen Bus weist, wird auf jeden Fall auf den Bus zugegriffen und dabei festgestellt, daß das Gerät nicht angeschlossen beziehungsweise eingeschaltet ist. Dieser Zustand setzt Bit 7 der Statusvariablen ST. Der Basic-Interpreter verzichtet beim CLOSE-Befehl aufdie Überprüfung dieser Systemvariablen, also tritt kein »?device not present error« auf. Wird ST dann von Basic aus angesprochen, wird Bit 7 als Vorzeichenbit aufgefaßt, folglich enthält ST bei fehlendem/ausgeschaltetem Gerät einen negativen Wert und der IF-Befehl wird nach dem THEN fortgesetzt.</p>
+
+        <p>Übrigens: Kannten Sie schon diesen Betriebssystemfehler: Geben Sie bei ausgeschalteter Floppy ein:<br>
+            10 OPEN 1, 8, 15 : INPUT#1, E, E$<br>
+            RUN</p>
+
+        <p>Der Computer wartet, bis Sie die Floppy einschalten, und gibt dann erst »?device not present error« aus.</p>
+
+        <address class="author">(Rainer Perske/tr)</address>
+
+        <h2>Hardcopy für Star SG/10, 15</h2>
+
+        <p>Die »Hardcopyroutine auf Tastendruck für Epson-Drucker« aus 64’er, Ausgabe 1/86, läßt sich für den STAR SG/10,15-Drucker modifizieren.</p>
+
+        <p>Programm »Hardcopy.Obj.« mit,8,l laden, »SYS 49152« eingeben und danach im Direktmodus folgende POKEs eingeben:<br>
+            POKE49441,75 : POKE49442,27 : POKE49443,13 : POKE49444,49 : POKE 49445,27.</p>
+
+        <p>Soll noch statt der F1-Taste, die in vielen Programmen zur Auswahl in Menüs verwendet wird, eine andere Taste gewählt werden (ich verwende die»= «-Taste), so muß noch POKE 49168,53 eingegeben werden.</p>
+
+        <address class="author">(Heden Wolfgang/tr)</address>
+
+        <h2>Basic-Programm im $C000-Bereich?</h2>
+
+        <p>In der Tat kann es manchmal bei Verwaltung größerer Datenmengen beim C 64 sinnvoll sein, den für Basic-Programme normalerweise nicht zugänglichen Bereich $C000 bis $D000 (C 64) beziehungsweise $A000 bis $C000 (VC 20) mit dem Basic-Programm zu belegen und damit den Grundspeicher voll für Variablenfelder zur Verfügung zu haben. Für die Programmeingabe (beziehungsweise zum Laden) lautet die POKE-Kombination:<br>
+            POKE44,192:POKE56,208:POKE49152,0:NEW</p>
+
+        <p>Die Programmzeile 0 eines solchen Programms muß dann lauten:<br>
+            0 POKE56,PEEK(644):POKE45,3:POKE46,PEEK(642):CLR</p>
+
+        <p class="source">Achtung: Nach »RUN« kann zwar noch mit »LIST« das Programm abgefragt werden, aber Änderungen im Programmlisting führen unweigerlich zum Systemabsturz (hängt mit der Verschieberoutine für Basic-Zeilen zusammen)! Für den VC 20 gilt für die Programmverlegung nach $A000-$C000 (sofern dieser Bereich mit einer RAM-Erweiterung belegt ist) für die Programmeingabe die Befehlsfolge POKE 44,160:POKE 56, 192:POKE 40960,0: NEW. Die Zeile 0 gilt unverändert auch beim VC 20.</p>
+
+        <address class="author">(Barnim König/tr)</address>
+
+        <h2>Grafikzeichen in der ID</h2>
+
+        <p>Durch folgenden kleinen Trick ist es möglich, auch Grafikzeichen in der ID einer Diskette zu verwenden: Man schiebt beim Formatieren vor der ID noch ein Anführungszeichen (CHR$ (34)) ein:<br>
+            OPEN 1,8,15,"N:NAME" + CHR$(34) + ",ID":CLOSE1<br>
+            Der Kreativität sind keine Grenzen gesetzt.</p>
+
+        <address class="author">(Wolf Schenk/tr)</address>
+
+        <h2>Hypra-Platos und Görlitz-Interface</h2>
+
+        <p>Laden Sie nun zuerst einmal das Programm »2. PRG« mit dem MSE. Ist das geschehen, ist mit dem Befehl »CTRL-N« auf den Eingabemodus zu schalten. Als Startadresse geben Sie »9240« ein, tippen die Zeile »9240« aus Ausgabe 11/85 ab, jedoch mit dem Unterschied, daß Sie die vierte Zahl (0A) durch »0D« ersetzen. Als Prüfsumme ist statt 40 A0 einzusetzen. Mit der Zeile »9278« ist genauso zu verfahren. Ersetzen Sie hier das siebte Byte (0A) ebenfalls durch »0D«. Die Prüfsumme ändert sich. Statt »26« muß hier »32« eingesetzt werden. Speichern Sie das Programm. Als Sekundäradresse ist nun im Druckertreiber die $14 zu empfehlen.</p>
+
+        <address class="author">(Achim Hübner/tr)</address>
+
+        <h2>Computer-Logbuch</h2>
+
+        <p>Dieses Assemblerprogramm (Listing 2) dient dazu, die aktuelle Speicherstelle im Programmlauf in die linke obere Ecke des Bildschirms zu schreiben.</p>
+
+        <p>Mich hatte es gereizt, bei fremden Programmen in Maschinensprache die zu den verschiedenen Routinen gehörenden Adreßbereiche zu lokalisieren.</p>
+
+        <p>Ursprünglich wurde bei jedem zehnten Interrupt die Adresse aus den Speicherstellen 105 und 106 gelesen und in die oberste Zeile des Bildschirms geschrieben.</p>
+
+        <p>Durch den schnellen Wechsel der Anzeige war dies jedoch mühsam abzulesen. Aus diesem Grund habe ich jede zweite Ausgabe in die zweite Zeile umgeleitet. Nun ist die Ablesung kein Problem mehr. Es ist schon interessant, bei dieser Adressenfolge zuzuschauen. Besonders lehrreich ist es für Anfänger und Fortgeschrittene, zu sehen, welche Bereiche im Kernel angesprungen werden.</p>
+
+        <p>Wenn zum Beispiel der blinkende Cursor auf eine Eingabe wartet, so kann man in bunter Folge die Adressen zwischen $E5CA bis $E5D4 Revue passieren sehen.</p>
+
+        <p>Denkbar wäre noch, die Ablesung bei jedem Interrupt vorzunehmen, und die Adressen auf den Drucker zu geben. Dabei könnten alle Adressen im ROM-Bereich aussortiert werden, wenn man sich auf die Struktur eines noch unbekannten Programms konzentrieren möchte.</p>
+
+        <address class="author">(Ralf Störmer/tr)</address>
+
+        <h2>Absturz-POKES</h2>
+
+        <p>Durch »Verbiegen« diverser Vektoren lassen sich einige interessante Effekte erreichen:<br>
+            POKE768,226:POKE769,252 — Reset nach Programmfehler oder Programmende (nicht im Direktmodus verwenden!)<br>
+            POKE770,226:POKE771,252 — Reset nach Drücken der STOP-Taste (nicht im Direktmodus verwenden!)<br>
+            POKE816,226:POKE817,252 — Reset nach Eingabe des LOAD-Befehls</p>
+
+        <p>Mit diesem Trick lassen sich noch andere Zeiger verändern. Wo diese Zeiger im Speicher des C64 liegen, läßt sich aus der Speicherbelegungstabelle des Handbuchs (Anhang Q, Seite 160) entnehmen.</p>
+
+        <p>Eine andere Möglichkeit ist, anstatt eines Resets einen Overflow-Error auszulösen. Dafür muß man die Werte 92 und 189 anstatt 226 und 252 in die entsprechenden Speicherstellen POKEn. Das läßt sich gut bei LOAD (816/817) und SAVE (818/819) machen. Vorsicht bei 768/769 und 770/771! Bei diesen Speicherstellen funktioniert der Trick nicht. Bei 770/771 wird zum Beispiel nach der Ready-Meldung immer wieder die Overflow-Routine angesprungen!</p>
+
+        <address class="author">(Stefan Pohl/tr)</address>
+
+        <h2>Sortierroutine für zweidimensionale Felder</h2>
+
+        <p>Array-Sort (Listing 3) wird absolut geladen (Sekundäradresse 1) und steht dann im Bereich $C000 bis $C31B. Es ist wegen einiger JMPs und JSRs nicht relokatibel. Aufgerufen wird die Sortierung mit SYS49152, Variable, wobei das $-Zeichen nicht angegeben wird.</p>
+
+        <p class="source">Beispiele: SYS49152,A, oder SYS49152,NM, aber nicht SYS49152,A$. Bei zweidimensionalen Arrays muß vorher noch das Element der 2. Dimension, nach dem sortiert werden soll, in die Speicherstelle 780 gePOKEt werden.</p>
+
+        <p class="source">Beispiel:</p>
+
+        <p>Eine kleine Adreßverwaltung besteht aus Y$(X,0)=Vorname, Y$(X,l)=Nachname, Y$(X,2) = Straße und Y$(X,3) = Ort.</p>
+
+        <p>So wird nun mit »POKE780,l:SYS48152,Y« das Array nach den Nachnamen sortiert.</p>
+
+        <p>Der POKE darf nicht entfallen, da sich in Zelle 780 zufällige Werte befinden!</p>
+
+        <p>Sollte das Array nicht dimensioniert oder das Element das in 780gePOKEtwird, nicht vorhanden sein, soführtdaszu der Fehlermeldung »Bad Subscript«. Im Programm werden einige Zeropage-Adressen und Teile des Kassettenpuffers verwendet, was jedoch für Basic nicht sehr von Belang ist.</p>
+
+        <address class="author">(Franz Schinagl/tr)</address>
+
+        <h2>SMON verbessert</h2>
+
+        <p>Der Vergleichsbefehl des SMON läßt sich noch wesentlich optimieren: Dadurch bricht der SMON nicht bei dem ersten ungleichen Byte den Vergleich ab, sondern vergleicht solange, bis die Stop-Taste gedrückt wird.</p>
+
+        <p>Hierzu wird einfach aus dem »JMP $C323« bei Adresse »$CB0E« der Befehl »JSR $0323« gemacht. Zusätzlich müssen nur noch zwei Befehle in das SMON-Disassembler-Listing eingefügt werden. Daraus folgt, daß der SMON ab $CB11 um 6 Byte nach hinten verschoben werden muß und einige Speicherzellen ebenfalls geändert werden müssen.</p>
+
+        <p>Die zu ergänzenden 2 Befehle haben die Aufgabe, die Stop-Taste-Routine aufzurufen und den Vergleich weiterlaufen zu lassen.</p>
+
+        <p>Um dies möglichst einfach zu machen (Verschieben, Umrechnen und Einfügen von Befehlen), schildere ich nun die einfachste Methode.</p>
+
+        <ol>
+            <li>SMON $C000 laden und den Befehl NEW eingegeben.</li>
+            <li>Reassembler laden, nach $9000 verschieben und »NEW« eingeben.</li>
+            <li>Listing 4 eingeben und den Reassembler mit »SYS 36864, $C000, $CFEA : RUN« starten</li>
+            <li>Das erhaltene Quelltextprogramm speichern (zirka 119 Blocks)</li>
+            <li>Hypra-Ass laden und starten</li>
+            <li>Das Quelltextprogramm mit /l"name" laden</li>
+            <li>Listing 5 eintippen.</li>
+            <li>Hypra-Ass starten.</li>
+            <li>Wenn der Assembler fertig ist (nach 1 Minute), den neuen SMON starten und mit »S"NAME" C000 D000« speichern.</li>
+        </ol>
+
+
+        <p>SMON nach $9000 verschieben:</p>
+
+        <ol>
+            <li>W C000 D000 9000</li>
+            <li>V C000 D000 900 920B 9FD8</li>
+            <li>M 902B 906B :Injedemzweiten Byte das erste »C« in eine »9« umwandeln</li>
+            <li>FIC*,9000,9FFA :Die Befehle so umändern wie in der 64’er, Ausgabe 12/85 erwähnt. (Achtung: ab $9B00 stimmen die Adressen der Befehle mit den alten Adressen nicht mehr überein)</li>
+            <li>M 9FDE 9FEA :Wie unter »3«.</li>
+        </ol>
+
+
+        <address class="author">(Reinet Gebhardt/tr)</address>
+
+        <p>TODO ASIDE</p>
+
+        <p>Diverse POKEs</p>
+
+        <p>TODO TABLE</p>
+    </article>
+</body>
+
+</html>

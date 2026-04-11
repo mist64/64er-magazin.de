@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Character-Editor</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="R. Bartel, ah">
+    <meta name="64er.issue" content="5/86">
+    <meta name="64er.pages" content="81-85">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Character-Editor</h1>
+        <p class="intro">Mit diesem Programm können Sie einfach und schnell Ihren eigenen, ganz persönlichen Zeichensatz erstellen. Als Bonbon enthätt das Programm eine Routine, mit der sich Zeichensätze auf Diskette generieren lassen, die wie ganz normale Basic-Programme geladen und gestartet werden.</p>
+
+        <p>Character-Editor (Listing 1) ist ein Programm, mit dem sich leicht eigene Zeichensätze erstellen lassen. Nach dem Laden mit »LOAD"Name",8« wird das Programm durch den Befehl »RUN« gestartet. Anschließend stehen dem Benutzer die beiden originalen Zeichensätze des C 64 zur Bearbeitung zur Verfügung. Character-Editor verfügt über 21 Routinen, die das Erstellen eines neuen Zeichensatzes in sehr komfortabler Weise unterstützen. Die Routinen sind in einer Menü-Tafel innerhalb des Arbeitsbereichs durch die Cursor-Tasten frei anwählbar. Über verschiedene Tasten sind weitere Erstellhilfen gegeben. Character-Editor ist sehr übersichtlich gehalten. Das heißt, es wird immer das gerade zu bearbeitende Zeichen, dessen Code, die entsprechende 8x8-Matrix und der aktuelle Zeichensatz angezeigt. Das Hin- und Herspringen zwischen verschiedenen Menüs entfällt. Alle Ein- und Ausgaben werden in einer speziellen Zeile im unteren Teil des Bildschirms verarbeitet. Die Steuerung innerhalb der Routinen wurde ebenfalls auf die Cursor-Tasten gelegt, so daß Character-Editor mit wenigen Tasten schnell und einfach zu bedienen ist. Weiterhin verfügt Character-Editor über einen Test-Modus, in dem der Zeichensatz in der oberen Bildschirmhälfte eingeblendet ist und nun die komplette Tastaturbelegung ausprobiert werden kann. Die bearbeiteten Zeichensätze können auf Diskette gespeichert werden. Der fertig bearbeitete Zeichensatz läßt sich aber auch als eigenständiges Programm mit Basic-Start speichern. Er kann somit ganz einfach mit LOAD"Zeichensatzname",8 eingelesen und mit RUN gestartet werden.</p>
+
+        <p>Alles in allem wird dem C 64-Benutzer ein sehr leistungsfähiges Toolkit zur Verfügung gestellt, mit dem ein den individuellen Bedürfnissen und Wünschen angepaßter Zeichensatz erstellt werden kann.</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Bedienungsanleitung</h2>
+
+        <h3>Belegung der Tasten und deren Funktionen</h3>
+
+        <p>TODO TABLE</p>
+
+        <ul>
+            <li>Anwahl des zu bearbeitenden Zeichens durch Erhöhen des Zeichen-Codes um 1.<br>
+                — Anwahl des zu bearbeitenden Zeichens durch Erniedrigen des Zeichen-Codes um 1.<br>
+                £ Anwahl des zu bearbeitenden Zeichens durch Erhöhen beziehungsweise durch Erniedrigen des Zeichen-Codes um 128.<br>
+                t Schaltet den editierten Zeichensatz ein beziehungsweise aus. Die Meldung »ZEICHENSATZ NICHT AKTIVIERT« wird entsprechend im Bildschirm ein- oder ausgeblendet.<br>
+                — Kopiert die Zeichen der Character-Codes 0 bis 127 in die Zeichen mit den Character-Codes 128 bis 255 und invertiert sie.<br>
+                F1 Austausch der beiden zu bearbeitenden Zeichensätze.<br>
+                F3 Invertierung des aktuellen Zeichens.<br>
+                F4 Löschen des aktuellen Zeichens.<br>
+                F5 Sprung in Test-Modus. Zurück mit der »RETURN«-Taste.<br>
+                F7 Speichern des aktuellen Zeichens.<br>
+                F8 Übernehmen des gespeicherten Zeichens anstelle des aktuellen Zeichens.</li>
+        </ul>
+
+
+        <p>Diese Funktionen sind in jeder Bearbeitungsroutine frei wählbar.</p>
+
+        <h3>Anwahl der Bearbeitungsroutinen</h3>
+
+        <p>Die Abkürzungen der Bearbeitungsroutinen befinden sich in einer kleinen Menü-Tafel innerhalb des Bildschirms. Mit den Cursor-Tasten kann ein Pfeil» — « gesteuert werden, der immer auf die momentan angewählte Routine zeigt. Gleichzeitig wird der volle Text der angewählten Routine in einer speziellen Zeile im unteren Teil des Bildschirms angezeigt (Bild 1). Mit der »RETURN«-Taste gelangt man in die angewählte Routine. Der Pfeil verschwindet, und die Abkürzung der angewählten Routine wird revers dargestellt.</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Mit »RETURN« können die Routinen verlassen werden. Der Pfeil-Cursor »*-« erscheint dann wieder. Die reverse Darstellung der angewählten Routine wird wieder aufgehoben.</p>
+
+        <h2>Allgemeine Hinweise</h2>
+
+        <ul>
+            <li>Der Character-Editor ist vollkommen in Maschinensprache geschrieben und liegt bei $0801 bis $1BD2 (Basic-Start).</li>
+            <li>Es wird immer nur ein Zeichensatz editiert (256 Zeichen). Es kann aber zwischen den Zeichensätzen frei umgeschaltet werden.</li>
+            <li>Wird der Character-Code 255 um 1 erhöht, so wird er zu Character-Code 0. Wird der Character-Code 0 um 1 erniedrigt, so wird er zu Character-Code 255.</li>
+            <li>Die beiden in Bearbeitung stehenden Zeichensätze liegen bei $3000 bis $3FFE</li>
+            <li>Ist der momentan bearbeitete Zeichensatz nicht aktiviert, wird dies durch die Meldung »ZEICHENSATZ NICHT AKTIVIERT« im oberen Teil des Bildschirms angezeigt.</li>
+            <li>Sind Eingaben erforderlich, so erscheint in der letzten Bildschirmzeile »= >« und ein blauer Stern als Cursor. Diese Eingabezeile nimmt maximal 35 Zeichen auf. Steuertasten (außer DEL) und Grafikzeichen werden nicht bearbeitet. Eine leere Eingabe bewirkt einen Sprung zurück in den Menü-Modus.</li>
+            <li>Fehler bei Zugriffen auf das Floppy-Laufwerk werden abgefangen und angezeigt. Es wird überprüft ob das Floppy-Laufwerk mit der Laufwerksnummer 8 für Zugriffe zur Verfügung steht. Ist dies nicht der Fall, wird die Aufforderung »PLEASE SWITCH DRIVE #8 ONÜ!« ausgegeben. Nach Betätigen einer Taste wird wiederum überprüft, ob das Floppy-Laufwerk für Zugriffe zur Verfügung steht. Wenn ja, wird der Diskettenzugriff mit Ausgabe der Meldung »DISKOPERATION IN PROCESS. PLEASE WAIT« durchgeführt (außer DIR-Routine). Nach Beendigung des Diskettenzugriffs wird der Fehlerkanal ausgelesen und angezeigt.</li>
+            <li>Würde beim Einlesen und Anzeigen des Directories der Bildschirm nach oben gescrollt, wird der Einlesevorgang unterbrochen und erst nach Quittieren der Aufforderung »PRESS RETURN TO CONTINUE« mit der »RETURN«-Taste fortgesetzt.</li>
+            <li>Wer die geänderten Zeichensätze auf EPROM brennen will, kann den mit der SVC-Routine gespeicherten Zeichensatz laden und dann auf EPROM brennen.</li>
+            <li>Wenn man in Maschinensprache programmiert und eigene Zeichen verwenden will, so kann man die vom Character-Editor mit der SVC-Routine abgespeicherten Zeichensätze laden und mit der Befehlsfolge LDA #$lC, STA $D018 einschalten und mit der Befehlsfolge LDA #$15, STA $D018 ausschalten. Man muß nur darauf achten, daß der Bereich $3000 bis $3FFF nicht verwendet wird.</li>
+        </ul>
+
+
+        <h2>Wichtige Hinweise</h2>
+
+        <p>Wird das mit der CCP-Routine erzeugte Programm gelaen und gestartet, müssen Sie auf folgendes achten.</p>
+
+        <ul>
+            <li>Sie verfügen nur über einen Zeichensatz!!!</li>
+            <li>Bei Reset kann der Zeichensatz mit SYS 51200 erneut aktiviert werden.</li>
+            <li>Das Basic-RAM liegt bei $033C bis $9FFF (828 bis 40959). 40131 BYTES FREE</li>
+            <li>Der Kassetten-Puffer liegt bei $C851 bis $C910 (51281 bis 51472)</li>
+            <li>Der Bildschirm liegt bei $CC00 bis $CFF7 (52224 bis 53239)</li>
+            <li>Die Sprite-Pointer liegen bei $CFF8 bis $CFFF (53240 bis 53247)</li>
+            <li>Der Zeichensatz liegt bei $C000 bis $C7FF (49152 bis 51199)</li>
+            <li>Die Aktivierungsroutine liegt bei $C800 bis $C850 (51200 bis 51280)</li>
+            <li>RAM-TOP $C000 bis $CFFF ist für Maschinensprachroutinen nicht mehr verwendbar.</li>
+            <li>Vor dem Laden von Maschinenprogrammen mit normalem Basic-Start muß der Basic-Start durch POKE 43,l:POKE 44,8 auf $0801 (2049) gesetzt werden.</li>
+            <li>Wird eine Basic-Erweiterung zusammen mit dem Character-Programm benutzt, muß zuerst die Erweiterung aktiviert werden und dann der Zeichensatz mit SYS 51200. Die benutzte Erweiterung darf den Bereich $C000 bis $CFFF (49152 bis 53247) nicht benutzen.</li>
+        </ul>
+
+
+        <address class="author">(R. Bartel/ah)</address>
+    </article>
+</body>
+
+</html>
