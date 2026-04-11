@@ -132,13 +132,11 @@
 
         <p>Disassembliert schaut das so aus:</p>
 
-        <p>TODO PRE/TABLE</p>
-
-        <p>02A7 48 PHA<br>
-            02A8 AD 8D 02 LDA 028D<br>
-            02AB D0 FB BNE 02A8<br>
-            02AD 68 PLA<br>
-            02AE 4C 1A A7 JMP A71A</p>
+        <pre><code>02A7 48       PHA
+02A8 AD 8D 02 LDA 028D
+02AB D0 FB    BNE 02A8
+02AD 68       PLA
+02AE 4C 1A A7 JMP A71A</code></pre>
 
         <p>Zuerst wird der Akkumulator mit dem Inhalt der Speicherzelle 653 ($28D) geladen. Dort steht bekanntlich eine Zahl von 1 bis 7, je nachdem, ob die SHIFT-, CTRL- oder Commodore-Taste gedrückt ist. Ist dies der Fall, springt das Programm auf die Adresse 680 zurück und bildet so eine Dauerschleife, bis die Taste wieder losgelassen wird. Erst dann geht es weiter mit der ursprünglichen Zieladresse des Vektors in 774/775, nämlich $A71A (42778) beziehungsweise $C71A (50970) beim VC 20.</p>
 
@@ -220,292 +218,368 @@
 
         <address class="author">(Dr.H.Hauck/ah)</address>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Texteinschub #1<br>Indirekte Sprung-Vfektoren</h2>
 
-        <h2>Texteinschub #1<br>Indirekte Sprung-Vfektoren</h2>
+            <p>Mit »Vektor« wird ein Adressenpaar bezeichnet, dessen Inhalt in der Low/High-Byte-Darstellung wiederum eine Adresse angibt, ab der ein Maschinenprogramm beginnt.</p>
 
-        <p>Mit »Vektor« wird ein Adressenpaar bezeichnet, dessen Inhalt in der Low/High-Byte-Darstellung wiederum eine Adresse angibt, ab der ein Maschinenprogramm beginnt.</p>
+            <p>Wenn man nun mit dem Maschinencode-Befehl JMP (jump) auf die Adresse springt, die der Vektor angibt, läuft das Maschinenprogramm ab dieser Adresse los.</p>
 
-        <p>Wenn man nun mit dem Maschinencode-Befehl JMP (jump) auf die Adresse springt, die der Vektor angibt, läuft das Maschinenprogramm ab dieser Adresse los.</p>
+            <p>Bekanntlich stehen im nicht veränderbaren ROM-Speicher viele Unterprogramme (Routinen) des Basic-Übersetzers und des Betriebssystems, die auch für andere Programme verwendbar sind. Commodore hat nun die brillante Idee gehabt, mehrere dieser Routinen herauszusuchen und ihre Anfangsadressen zur leichten Verwendung benutzerfreundlich in einer Tabelle zusammenzustellen, wo sie mit dem schon genannten Sprungbefehl »angewählt« werden können.</p>
 
-        <p>Bekanntlich stehen im nicht veränderbaren ROM-Speicher viele Unterprogramme (Routinen) des Basic-Übersetzers und des Betriebssystems, die auch für andere Programme verwendbar sind. Commodore hat nun die brillante Idee gehabt, mehrere dieser Routinen herauszusuchen und ihre Anfangsadressen zur leichten Verwendung benutzerfreundlich in einer Tabelle zusammenzustellen, wo sie mit dem schon genannten Sprungbefehl »angewählt« werden können.</p>
+            <p>Diese Tabelle ist deshalb interessant, weil die Anfangsadressen der Routinen bei den einzelnen Commodore-Computern verschieden sind, obwohl sie eigentlich fast identische Übersetzer und Betriebssysteme haben. So beginntzum Beispiel die LOAD-Routine des C 64 ab Adresse 62622 ($F49E), beim VC 20 aber ab Adresse 62786 ($F542).</p>
 
-        <p>Diese Tabelle ist deshalb interessant, weil die Anfangsadressen der Routinen bei den einzelnen Commodore-Computern verschieden sind, obwohl sie eigentlich fast identische Übersetzer und Betriebssysteme haben. So beginntzum Beispiel die LOAD-Routine des C 64 ab Adresse 62622 ($F49E), beim VC 20 aber ab Adresse 62786 ($F542).</p>
+            <p>Um zu erreichen, daß Programme, die diese Routinen benutzen, trotzdem von einem Commodore-Computer auf einen anderen übertragbar sind, hat Commodore diese Tabelle geschaffen, welche den Sprung auf diese Routinen unabhängig vom Computertyp macht.</p>
 
-        <p>Um zu erreichen, daß Programme, die diese Routinen benutzen, trotzdem von einem Commodore-Computer auf einen anderen übertragbar sind, hat Commodore diese Tabelle geschaffen, welche den Sprung auf diese Routinen unabhängig vom Computertyp macht.</p>
+            <p>Sie liegt (bei allen Commodore-Typen) im Bereich 768 bis 779 für Routinen des Basic-Übersetzers und 788 bis 819 für Routinen des Betriebssystems.</p>
 
-        <p>Sie liegt (bei allen Commodore-Typen) im Bereich 768 bis 779 für Routinen des Basic-Übersetzers und 788 bis 819 für Routinen des Betriebssystems.</p>
+            <p>Diesen Zusammenhang zeige ich aber besser an einem Beispiel:<br>
+                Der Vektor auf die LOAD-Routine hat die Adresse 816/817.<br>
+                Wir schauen nach, was dort steht:<br>
+                PRINT PEEK(816) PEEK(817)<br>
+                Wir erhalten beim C 64 die Zahlen 158 und 244.<br>
+                Beim VC 20 lautet das Ergebnis 66 und 245<br>
+                Beide Zahlenpaare werden nach der üblichen Low/High-Byte Methode umgerechnet:<br>
+                158 + 256 * 244 ergibt 62622.<br>
+                66 + 256 * 245 ergibt 62786.</p>
 
-        <p>Diesen Zusammenhang zeige ich aber besser an einem Beispiel:<br>
-            Der Vektor auf die LOAD-Routine hat die Adresse 816/817.<br>
-            Wir schauen nach, was dort steht:<br>
-            PRINT PEEK(816) PEEK(817)<br>
-            Wir erhalten beim C 64 die Zahlen 158 und 244.<br>
-            Beim VC 20 lautet das Ergebnis 66 und 245<br>
-            Beide Zahlenpaare werden nach der üblichen Low/High-Byte Methode umgerechnet:<br>
-            158 + 256 * 244 ergibt 62622.<br>
-            66 + 256 * 245 ergibt 62786.</p>
+            <p>Das sind aber genau die weiter oben schon genannten Anfangsadressen der LOAD-Routine im Betriebssystem. Mit einem Sprung auf 816/817 landet ein Maschinenprogramm also immer zwangsläufig auf der LOAD-Routine. Kenner wissen, daß ein derartiger Sprung »indirekt« sein muß, also mit dem Code $6C, der nicht auf die angegebene Adresse, sondern auf die in ihr enthaltene Zieladresse springt.</p>
 
-        <p>Das sind aber genau die weiter oben schon genannten Anfangsadressen der LOAD-Routine im Betriebssystem. Mit einem Sprung auf 816/817 landet ein Maschinenprogramm also immer zwangsläufig auf der LOAD-Routine. Kenner wissen, daß ein derartiger Sprung »indirekt« sein muß, also mit dem Code $6C, der nicht auf die angegebene Adresse, sondern auf die in ihr enthaltene Zieladresse springt.</p>
+            <p>Diese indirekte Sprungmethode hat außer der schon erwähnten Unabhängigkeit vom Computertyp noch einen weiteren Vorteil:</p>
 
-        <p>Diese indirekte Sprungmethode hat außer der schon erwähnten Unabhängigkeit vom Computertyp noch einen weiteren Vorteil:</p>
+            <p>Da der Vektor, der auf die Zieladresse zeigt, im RAM-Speicher liegt, kann er verändert werden. Das bedeutet, daß dem Programmierer die Möglichkeit geboten wird, in ursprünglich »festgefrorene« Routinen des Übersetzers (Interpreter) und des Betriebssystems beliebige Änderungen und Varianten einzubauen. Ich will Ihnen das mit einem zwar nutzlosen, aber dennoch verblüffenden Beispiel zeigen. Bekanntlich meldet sich der Computer nach dem Befehl LOAD mit der Anweisung »PRESS PLAY ON TAPE«, weil der Vektor in 816/817 auf die Routine zeigt, die den LOAD-Befehl ausführt.</p>
 
-        <p>Da der Vektor, der auf die Zieladresse zeigt, im RAM-Speicher liegt, kann er verändert werden. Das bedeutet, daß dem Programmierer die Möglichkeit geboten wird, in ursprünglich »festgefrorene« Routinen des Übersetzers (Interpreter) und des Betriebssystems beliebige Änderungen und Varianten einzubauen. Ich will Ihnen das mit einem zwar nutzlosen, aber dennoch verblüffenden Beispiel zeigen. Bekanntlich meldet sich der Computer nach dem Befehl LOAD mit der Anweisung »PRESS PLAY ON TAPE«, weil der Vektor in 816/817 auf die Routine zeigt, die den LOAD-Befehl ausführt.</p>
+            <p>Jetzt verbiegen wir den Vektor so, daß er auf die SAVE-Routine zeigt. Diese Routine beginnt ab Speicherzelle ($E156) — beim VC 20 ab 57683 ($E153). Diese Adresse POKEn wir in Low/High-Byte Darstellung nach 816/817.<br>
+                POKE 816,86:POKE 817,22 5 (VC 20:POKE 816,83)</p>
 
-        <p>Jetzt verbiegen wir den Vektor so, daß er auf die SAVE-Routine zeigt. Diese Routine beginnt ab Speicherzelle ($E156) — beim VC 20 ab 57683 ($E153). Diese Adresse POKEn wir in Low/High-Byte Darstellung nach 816/817.<br>
-            POKE 816,86:POKE 817,22 5 (VC 20:POKE 816,83)</p>
+            <p>Wenn Sie jetzt LOAD eingeben, meldet sich der Computer mit »PRESS RECORD AND PLAY ON TAPE«, der Anweisung für SAVE.</p>
 
-        <p>Wenn Sie jetzt LOAD eingeben, meldet sich der Computer mit »PRESS RECORD AND PLAY ON TAPE«, der Anweisung für SAVE.</p>
+            <p>Weitere Beispiele dafür finden Sie im Kurs bei den entsprechenden Speicherzellen. Diese Art der Modifikation entspricht der oft genannten Wedge-Methode, die auch ich in diesem Kurs erwähnt habe, und zwar bei der Besprechung der Speicherzellen 115 bis 138 (Folge 9 in der Ausgabe 8/85). Aber der Einsatz der indirekten Sprung-Vektoren ist halt viel eleganter.</p>
 
-        <p>Weitere Beispiele dafür finden Sie im Kurs bei den entsprechenden Speicherzellen. Diese Art der Modifikation entspricht der oft genannten Wedge-Methode, die auch ich in diesem Kurs erwähnt habe, und zwar bei der Besprechung der Speicherzellen 115 bis 138 (Folge 9 in der Ausgabe 8/85). Aber der Einsatz der indirekten Sprung-Vektoren ist halt viel eleganter.</p>
+            <h2>Texteinschub #2<br>Die Kurzschrift von Basic</h2>
 
-        <h2>Texteinschub #2<br>Die Kurzschrift von Basic</h2>
+            <p>Immer wenn Sie eine Anweisung auf den Bildschirm schreiben, sei es als Programmzeile, sei es als Direkt-Eingabe, wird sie in den Tastaturpuffer gebracht. Sobald die Eingabe mit der RETURN-Taste abgeschlossen wird, werden die Anweisungen dieser Zeile entweder in den Programmspeicher gebracht oder aber direkt ausgeführt. Beides geschieht allerdings nicht sofort, da der Computer ja bekanntlich intern nicht mit Buchstaben und Dezimalziffern, sondern mit besonderen Codezahlen arbeitet. Deshalb wird der Text einer Zeile zuerst in diese Codewerte umgewandelt und in eine besondere Reihenfolge gebracht. Ziffern, Zeichen und Texte, die innerhalb von Gänsefüßen stehen, werden mit ihrem ASCII-Code abgespeichert. Basic-Befehle und Basic-Funktionen werden in Zahlen umgewandelt. Diese heißen in der Fachsprache »TOKEN«. Der Befehl PRINT wird also nicht als Folge von 5 ASCII-Werten, sondern als einzelnes Byte mit dem Wert 153 gespeichert. Da meines Wissens die Liste der Token nur im Programmierhandbuch des VC 20 und im 64’er, Ausgabe 9/84 im Kurs von Christoph Sauer veröffentlicht sind, gebe ich in der weiter unten folgenden Tabelle alle Werte noch einmal an. Bemerkenswert ist, daß für GET# kein eigener Token vorhanden ist, dafür aber einer (203) für einen Befehl, den es in den Handbüchern nicht gibt, nämlich GO. Das erklärt übrigens, warum der Befehl GOTO auch in der Form GO TO geschrieben werden darf. Die Routine, welche Basic-Befehle ausführt, erkennt nämlich die beiden Token an und kombiniert sie miteinander.</p>
 
-        <p>Immer wenn Sie eine Anweisung auf den Bildschirm schreiben, sei es als Programmzeile, sei es als Direkt-Eingabe, wird sie in den Tastaturpuffer gebracht. Sobald die Eingabe mit der RETURN-Taste abgeschlossen wird, werden die Anweisungen dieser Zeile entweder in den Programmspeicher gebracht oder aber direkt ausgeführt. Beides geschieht allerdings nicht sofort, da der Computer ja bekanntlich intern nicht mit Buchstaben und Dezimalziffern, sondern mit besonderen Codezahlen arbeitet. Deshalb wird der Text einer Zeile zuerst in diese Codewerte umgewandelt und in eine besondere Reihenfolge gebracht. Ziffern, Zeichen und Texte, die innerhalb von Gänsefüßen stehen, werden mit ihrem ASCII-Code abgespeichert. Basic-Befehle und Basic-Funktionen werden in Zahlen umgewandelt. Diese heißen in der Fachsprache »TOKEN«. Der Befehl PRINT wird also nicht als Folge von 5 ASCII-Werten, sondern als einzelnes Byte mit dem Wert 153 gespeichert. Da meines Wissens die Liste der Token nur im Programmierhandbuch des VC 20 und im 64’er, Ausgabe 9/84 im Kurs von Christoph Sauer veröffentlicht sind, gebe ich in der weiter unten folgenden Tabelle alle Werte noch einmal an. Bemerkenswert ist, daß für GET# kein eigener Token vorhanden ist, dafür aber einer (203) für einen Befehl, den es in den Handbüchern nicht gibt, nämlich GO. Das erklärt übrigens, warum der Befehl GOTO auch in der Form GO TO geschrieben werden darf. Die Routine, welche Basic-Befehle ausführt, erkennt nämlich die beiden Token an und kombiniert sie miteinander.</p>
+            <p>Interessant ist auch, daß die Befehle TAB und SPC in ihren Token gleich die linke Klammer mit einschließen. Nach dieser Tabelle sieht eine gespeicherte Zeile so aus:<br>
+                10 IF A=5THEN PRINT TAB(X)<br>
+                Link 10 0 139 65 178 53 167 32 153 32 163 88 41 0<br>
+                Zeilen-Nr.IF A = 5 THEN PRINT TAB(X)</p>
 
-        <p>Interessant ist auch, daß die Befehle TAB und SPC in ihren Token gleich die linke Klammer mit einschließen. Nach dieser Tabelle sieht eine gespeicherte Zeile so aus:<br>
-            10 IF A=5THEN PRINT TAB(X)<br>
-            Link 10 0 139 65 178 53 167 32 153 32 163 88 41 0<br>
-            Zeilen-Nr.IF A = 5 THEN PRINT TAB(X)</p>
+            <p>Diese Zahlen können Sie selbst überprüfen, indem Sie diese Zeile eingeben und dann den Anfang des Programmspeichers sichtbar machen:<br>
+                FOR J=1 TO 20:PRINT PEEK(2048)+J); :NEXT</p>
 
-        <p>Diese Zahlen können Sie selbst überprüfen, indem Sie diese Zeile eingeben und dann den Anfang des Programmspeichers sichtbar machen:<br>
-            FOR J=1 TO 20:PRINT PEEK(2048)+J); :NEXT</p>
+            <p>Beim VC 20 müssen Sie den von der Speichererweiterung abhängigen Anfang des Programmspeichers einsetzen. Sie werden dieselbe Zahlenreihe wie oben erhalten.</p>
 
-        <p>Beim VC 20 müssen Sie den von der Speichererweiterung abhängigen Anfang des Programmspeichers einsetzen. Sie werden dieselbe Zahlenreihe wie oben erhalten.</p>
+            <p>Die Technik, in einem Programm direkt die Token anstelle von Basic-Befehlswörtern zu verwenden, bieten dem Programmierer in Maschinensprache eine gute Möglichkeit, Speicherplatz zu sparen. Das kann insbesondere bei großen Textprogrammen, wie zum Beispiel bei Adventure-Spielen, nützlich sein. Der Vollständigkeit halber muß ich noch erwähnen, daß die Token bei dem LIST-Befehl wieder in ihre ursprüngliche Textform zurückgewandeltwerden. Die Vektoren für die Wandel- beziehungsweise Rückwandel-Routinen stehen in 772/773 und 774/775.</p>
 
-        <p>Die Technik, in einem Programm direkt die Token anstelle von Basic-Befehlswörtern zu verwenden, bieten dem Programmierer in Maschinensprache eine gute Möglichkeit, Speicherplatz zu sparen. Das kann insbesondere bei großen Textprogrammen, wie zum Beispiel bei Adventure-Spielen, nützlich sein. Der Vollständigkeit halber muß ich noch erwähnen, daß die Token bei dem LIST-Befehl wieder in ihre ursprüngliche Textform zurückgewandeltwerden. Die Vektoren für die Wandel- beziehungsweise Rückwandel-Routinen stehen in 772/773 und 774/775.</p>
+            <figure>
+                <table>
+                    <tr>
+                        <td>128</td>
+                        <td>END</td>
+                        <td>147</td>
+                        <td>LOAD</td>
+                        <td>166</td>
+                        <td>SPC(</td>
+                        <td>185</td>
+                        <td>POS</td>
+                    </tr>
+                    <tr>
+                        <td>129</td>
+                        <td>FOR</td>
+                        <td>148</td>
+                        <td>SAVE</td>
+                        <td>167</td>
+                        <td>THEN</td>
+                        <td>186</td>
+                        <td>SQR</td>
+                    </tr>
+                    <tr>
+                        <td>130</td>
+                        <td>NEXT</td>
+                        <td>149</td>
+                        <td>VERIFY</td>
+                        <td>168</td>
+                        <td>NOT</td>
+                        <td>187</td>
+                        <td>RND</td>
+                    </tr>
+                    <tr>
+                        <td>131</td>
+                        <td>DATA</td>
+                        <td>150</td>
+                        <td>DEF</td>
+                        <td>169</td>
+                        <td>STEP</td>
+                        <td>188</td>
+                        <td>LOG</td>
+                    </tr>
+                    <tr>
+                        <td>132</td>
+                        <td>INPUT#</td>
+                        <td>151</td>
+                        <td>POKE</td>
+                        <td>170</td>
+                        <td>+</td>
+                        <td>189</td>
+                        <td>EXP</td>
+                    </tr>
+                    <tr>
+                        <td>133</td>
+                        <td>INPUT</td>
+                        <td>152</td>
+                        <td>PRINT#</td>
+                        <td>171</td>
+                        <td>−</td>
+                        <td>190</td>
+                        <td>COS</td>
+                    </tr>
+                    <tr>
+                        <td>134</td>
+                        <td>DIM</td>
+                        <td>153</td>
+                        <td>PRINT</td>
+                        <td>172</td>
+                        <td>*</td>
+                        <td>191</td>
+                        <td>SIN</td>
+                    </tr>
+                    <tr>
+                        <td>135</td>
+                        <td>READ</td>
+                        <td>154</td>
+                        <td>CONT</td>
+                        <td>173</td>
+                        <td>/</td>
+                        <td>192</td>
+                        <td>TAN</td>
+                    </tr>
+                    <tr>
+                        <td>136</td>
+                        <td>LET</td>
+                        <td>155</td>
+                        <td>LIST</td>
+                        <td>174</td>
+                        <td>↑</td>
+                        <td>193</td>
+                        <td>ATN</td>
+                    </tr>
+                    <tr>
+                        <td>137</td>
+                        <td>GOTO</td>
+                        <td>156</td>
+                        <td>CLR</td>
+                        <td>175</td>
+                        <td>AND</td>
+                        <td>194</td>
+                        <td>PEEK</td>
+                    </tr>
+                    <tr>
+                        <td>138</td>
+                        <td>RUN</td>
+                        <td>157</td>
+                        <td>CMD</td>
+                        <td>176</td>
+                        <td>OR</td>
+                        <td>195</td>
+                        <td>LEN</td>
+                    </tr>
+                    <tr>
+                        <td>139</td>
+                        <td>IF</td>
+                        <td>158</td>
+                        <td>SYS</td>
+                        <td>177</td>
+                        <td>größer</td>
+                        <td>196</td>
+                        <td>STR$</td>
+                    </tr>
+                    <tr>
+                        <td>140</td>
+                        <td>RESTORE</td>
+                        <td>159</td>
+                        <td>OPEN</td>
+                        <td>178</td>
+                        <td>=</td>
+                        <td>197</td>
+                        <td>VAL</td>
+                    </tr>
+                    <tr>
+                        <td>141</td>
+                        <td>GOSUB</td>
+                        <td>160</td>
+                        <td>CLOSE</td>
+                        <td>179</td>
+                        <td>kleiner</td>
+                        <td>198</td>
+                        <td>ASC</td>
+                    </tr>
+                    <tr>
+                        <td>142</td>
+                        <td>RETURN</td>
+                        <td>161</td>
+                        <td>GET</td>
+                        <td>180</td>
+                        <td>SGN</td>
+                        <td>199</td>
+                        <td>CHR$</td>
+                    </tr>
+                    <tr>
+                        <td>143</td>
+                        <td>REM</td>
+                        <td>162</td>
+                        <td>NEW</td>
+                        <td>181</td>
+                        <td>INT</td>
+                        <td>200</td>
+                        <td>LEFT$</td>
+                    </tr>
+                    <tr>
+                        <td>144</td>
+                        <td>STOP</td>
+                        <td>163</td>
+                        <td>TAB(</td>
+                        <td>182</td>
+                        <td>ABS</td>
+                        <td>201</td>
+                        <td>RIGHT$</td>
+                    </tr>
+                    <tr>
+                        <td>145</td>
+                        <td>ON</td>
+                        <td>164</td>
+                        <td>TO</td>
+                        <td>183</td>
+                        <td>USR</td>
+                        <td>202</td>
+                        <td>MID$</td>
+                    </tr>
+                    <tr>
+                        <td>146</td>
+                        <td>WAIT</td>
+                        <td>165</td>
+                        <td>FN</td>
+                        <td>184</td>
+                        <td>FRE</td>
+                        <td>203</td>
+                        <td>GO</td>
+                    </tr>
+                </table>
+                <figcaption>Tabelle der Token und deren Werte</figcaption>
+            </figure>
 
-        <figure>
-            <table>
+            <h2>Texteinschub #3<br>Der vorbereitete SYS-Befehl</h2>
+
+            <p>Programme, die in Maschinensprache geschrieben sind, können von einem Basic-Programm aus mit dem SYS-Befehl angewählt und ausgeführt werden.</p>
+
+            <p>Im Prinzip gilt das auch für Routinen des Basic-Übersetzers (Interpreter) und des Betriebssystems, die fest im ROM-Speicher untergebracht sind.</p>
+
+            <p>Ein Beispiel dafür ist SYS 58260, der Sprung auf den Kaltstart — beim VC 20 ist es SYS 58232, der den Computer in die Ausgangslage zurücksetzt.</p>
+
+            <p>Die meisten dieser Routinen benötigen jedoch verschiedene Angaben — man nennt sie auch Parameter — die vor der Ausführung des SYS-Befehls richtig eingestellt sein müssen.</p>
+
+            <p>Die LOAD-Routine zum Beispiel, die ab Speicherzelle 62622 ($F49E) — beimVC 20 ab 62793 ($F549) — beginnt, können wir mit dem SYS 62622 nicht starten. Es fehlen die Angaben über Geräte-Nummer (8 für Floppy, 0 für Band), File-Namen, sowie Anfangsund Endadresse. Diese Parameter werden normalerweise nach dem Befehl LOAD von der Routine des Interpreters, die den LOAD-Befehl übersetzt, eingegeben. Wir geben ja nicht einfach LOAD ein, wenn wir ein Programm mit dem Namen »Test« auf Diskette speichern wollen, sondern wir schreiben LOAD "TEST",8.</p>
+
+            <p>Auch wenn wir nur LOAD eintippen, werden vom Übersetzer Parameter gesetzt, nämlich »namenlos« und 0 für Bandgerät. Ich hoffe, Ihnen ist geläufig, daß beim Weglassen aller Angaben der Übersetzer immer Kassettenoperationen durchführt. Natürlich können wir uns dasanschauen:</p>
+
+            <p>Die Routine des Übersetzers für den Basic-Befehl LOAD beginnt an Speicherzelle 57704 ($E168), beim VC 20 bei 57700 ($E164).</p>
+
+            <p>Mit SYS 57704 springen wir dorthin — und in der Tat, wir erhalten »PRESS PLAY ON TAPE«. Aber ein Programm auf diese Weise von der Floppy zu LOADen, gelingt uns nicht, es sei denn, wir können die fehlenden Parameter von Hand eingeben.</p>
+
+            <p>Genau das aber können wir, weil der SYS-Befehl sich diese Parameter aus den Speicherzellen 780 bis 783 holt und in die vier Register des Mikroprozessors schreibt.<br>
+                780 ist die Adresse des Akkumulators<br>
+                781 ist die Adresse des X-Registers<br>
+                782 ist die Adresse des Y-Registers<br>
+                783 ist die Adresse des Status-Registers.</p>
+
+            <p>Die Behandlung von A, X und Y ist unkompliziert, wie wir gleich sehen werden.</p>
+
+            <p>Das Status-Register, manchmal auch P-Register genannt, ist nicht so einfach zu verwenden, da es nicht Zahlenwerte, sondern Flaggen (Bitmuster) enthält. Im einzelnen bedeuten:</p>
+
+            <table class="plain">
                 <tr>
-                    <td>128</td><td>END</td>
-                    <td>147</td><td>LOAD</td>
-                    <td>166</td><td>SPC(</td>
-                    <td>185</td><td>POS</td>
+                    <th>BIT Nr.</th>
+                    <th>WERT</th>
+                    <th>FLAGGE</th>
+                    <th>ABKÜRZUNG</th>
                 </tr>
                 <tr>
-                    <td>129</td><td>FOR</td>
-                    <td>148</td><td>SAVE</td>
-                    <td>167</td><td>THEN</td>
-                    <td>186</td><td>SQR</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>Übertrag</td>
+                    <td>C(arry)</td>
                 </tr>
                 <tr>
-                    <td>130</td><td>NEXT</td>
-                    <td>149</td><td>VERIFY</td>
-                    <td>168</td><td>NOT</td>
-                    <td>187</td><td>RND</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>NULL</td>
+                    <td>Z(ero)</td>
                 </tr>
                 <tr>
-                    <td>131</td><td>DATA</td>
-                    <td>150</td><td>DEF</td>
-                    <td>169</td><td>STEP</td>
-                    <td>188</td><td>LOG</td>
+                    <td>2</td>
+                    <td>4</td>
+                    <td>Unterbrechung</td>
+                    <td>I(nterrupt)</td>
                 </tr>
                 <tr>
-                    <td>132</td><td>INPUT#</td>
-                    <td>151</td><td>POKE</td>
-                    <td>170</td><td>+</td>
-                    <td>189</td><td>EXP</td>
+                    <td>3</td>
+                    <td>8</td>
+                    <td>Dezimal</td>
+                    <td>D</td>
                 </tr>
                 <tr>
-                    <td>133</td><td>INPUT</td>
-                    <td>152</td><td>PRINT#</td>
-                    <td>171</td><td>−</td>
-                    <td>190</td><td>COS</td>
+                    <td>4</td>
+                    <td>16</td>
+                    <td>Abbruch</td>
+                    <td>B(reak)</td>
                 </tr>
                 <tr>
-                    <td>134</td><td>DIM</td>
-                    <td>153</td><td>PRINT</td>
-                    <td>172</td><td>*</td>
-                    <td>191</td><td>SIN</td>
+                    <td>5</td>
+                    <td>32</td>
+                    <td>nicht benutzt</td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td>135</td><td>READ</td>
-                    <td>154</td><td>CONT</td>
-                    <td>173</td><td>/</td>
-                    <td>192</td><td>TAN</td>
+                    <td>6</td>
+                    <td>64</td>
+                    <td>Überlauf</td>
+                    <td>V</td>
                 </tr>
                 <tr>
-                    <td>136</td><td>LET</td>
-                    <td>155</td><td>LIST</td>
-                    <td>174</td><td>↑</td>
-                    <td>193</td><td>ATN</td>
-                </tr>
-                <tr>
-                    <td>137</td><td>GOTO</td>
-                    <td>156</td><td>CLR</td>
-                    <td>175</td><td>AND</td>
-                    <td>194</td><td>PEEK</td>
-                </tr>
-                <tr>
-                    <td>138</td><td>RUN</td>
-                    <td>157</td><td>CMD</td>
-                    <td>176</td><td>OR</td>
-                    <td>195</td><td>LEN</td>
-                </tr>
-                <tr>
-                    <td>139</td><td>IF</td>
-                    <td>158</td><td>SYS</td>
-                    <td>177</td><td>größer</td>
-                    <td>196</td><td>STR$</td>
-                </tr>
-                <tr>
-                    <td>140</td><td>RESTORE</td>
-                    <td>159</td><td>OPEN</td>
-                    <td>178</td><td>=</td>
-                    <td>197</td><td>VAL</td>
-                </tr>
-                <tr>
-                    <td>141</td><td>GOSUB</td>
-                    <td>160</td><td>CLOSE</td>
-                    <td>179</td><td>kleiner</td>
-                    <td>198</td><td>ASC</td>
-                </tr>
-                <tr>
-                    <td>142</td><td>RETURN</td>
-                    <td>161</td><td>GET</td>
-                    <td>180</td><td>SGN</td>
-                    <td>199</td><td>CHR$</td>
-                </tr>
-                <tr>
-                    <td>143</td><td>REM</td>
-                    <td>162</td><td>NEW</td>
-                    <td>181</td><td>INT</td>
-                    <td>200</td><td>LEFT$</td>
-                </tr>
-                <tr>
-                    <td>144</td><td>STOP</td>
-                    <td>163</td><td>TAB(</td>
-                    <td>182</td><td>ABS</td>
-                    <td>201</td><td>RIGHT$</td>
-                </tr>
-                <tr>
-                    <td>145</td><td>ON</td>
-                    <td>164</td><td>TO</td>
-                    <td>183</td><td>USR</td>
-                    <td>202</td><td>MID$</td>
-                </tr>
-                <tr>
-                    <td>146</td><td>WAIT</td>
-                    <td>165</td><td>FN</td>
-                    <td>184</td><td>FRE</td>
-                    <td>203</td><td>GO</td>
+                    <td>7</td>
+                    <td>128</td>
+                    <td>Vorzeichen</td>
+                    <td>N(egativ)</td>
                 </tr>
             </table>
-            <figcaption>Tabelle der Token und deren Werte</figcaption>
-        </figure>
 
-        <h2>Texteinschub #3<br>Der vorbereitete SYS-Befehl</h2>
+            <p>Um eine der Flaggen des Status-Registers zu löschen, empfiehlt es sich, das ganze Register mit POKE 783,0 zu löschen. Umgekehrt muß man beim Setzen der Bits sehr aufpassen wegen der Unterbrechungsflagge I. Eine 1 in I entspricht dem Maschinen-Befehl SEI, der alle Interrupts ausschaltet, auch die der Tastatur-Abfrage, was natürlich sehr störend sein kann! Um alle Flaggen außer der Unterbrechungsflagge I zu setzen, muß POKE 783,247 eingegeben werden.</p>
 
-        <p>Programme, die in Maschinensprache geschrieben sind, können von einem Basic-Programm aus mit dem SYS-Befehl angewählt und ausgeführt werden.</p>
+            <p>So, jetzt wird es Zeit für ein Beispiel, wie vor dem SYS-Befehl Parameter eingegeben werden können. In der Literatur wird immer das Beispiel gewählt, den Cursor auf eine bestimmte Position zu setzen, beziehungsweise seine Position abzufragen. Dazu gibt es eine Routine, die bei beiden Computern ab Speicherzelle 65520 ($FFF0) beginnt.</p>
 
-        <p>Im Prinzip gilt das auch für Routinen des Basic-Übersetzers (Interpreter) und des Betriebssystems, die fest im ROM-Speicher untergebracht sind.</p>
+            <p>Sie nimmt die Zahl, die im X-Register steht, und verwendet sie als Zeilennummer; die Zahl des Y-Registers nimmt sie als Spaltennummer, setzt dann den Cursor an diese Stelle und bringt die beiden Werte in die Speicherzellen 209/210 und 211.</p>
 
-        <p>Ein Beispiel dafür ist SYS 58260, der Sprung auf den Kaltstart — beim VC 20 ist es SYS 58232, der den Computer in die Ausgangslage zurücksetzt.</p>
+            <p>Unser Beispiel hat die Aufgabe, den Cursor in die vierte Spalte der siebten Zeile zu setzen, dort das Dollar-Zeichen hinzuschreiben und es rot zu färben.<br>
+                5 PRINT CHR$(147)<br>
+                10 POKE 783,0<br>
+                20 POKE 781,6<br>
+                30 POKE 782,3<br>
+                40 SYS 65 520</p>
 
-        <p>Die meisten dieser Routinen benötigen jedoch verschiedene Angaben — man nennt sie auch Parameter — die vor der Ausführung des SYS-Befehls richtig eingestellt sein müssen.</p>
+            <p>Nach Löschen des Bildschirms werden zuerst alle Flaggen des Statusregisters gelöscht (Zeile 5). Dann kommt die Zeilennummer in das X-Register (Zeile 10) und die Spaltennummer in das Y-Register (Zeile 30). Nach dem Eingeben dieser Parameter können wir mit SYS auf die Routine springen.<br>
+                50 ZEILE=PEEK(209)+256*PEEK(210)<br>
+                60 ADRESSE = ZEILE + PEEK(211)<br>
+                70 POKE ADRESSE,36</p>
 
-        <p>Die LOAD-Routine zum Beispiel, die ab Speicherzelle 62622 ($F49E) — beimVC 20 ab 62793 ($F549) — beginnt, können wir mit dem SYS 62622 nicht starten. Es fehlen die Angaben über Geräte-Nummer (8 für Floppy, 0 für Band), File-Namen, sowie Anfangsund Endadresse. Diese Parameter werden normalerweise nach dem Befehl LOAD von der Routine des Interpreters, die den LOAD-Befehl übersetzt, eingegeben. Wir geben ja nicht einfach LOAD ein, wenn wir ein Programm mit dem Namen »Test« auf Diskette speichern wollen, sondern wir schreiben LOAD "TEST",8.</p>
+            <p>In Speicherzellen 209/210 können wir jetzt (zur Übung) die Zeilennummer ablesen. Die Adresse der Cursorposition im Bildschirmspeicher erhalten wir durch die Addition der Zeilennummer mit dem Inhalt der Speicherzelle 211. Dorthin POKEn wir den Bildschirmcode des Dollarzeichens, nämlich 36 (Zeile 70).<br>
+                8 0 SYS 59940<br>
+                90 FARBE=PEEK(243)+256*PEEK(244)<br>
+                100 POKE FARBE+PEEK(211),2</p>
 
-        <p>Auch wenn wir nur LOAD eintippen, werden vom Übersetzer Parameter gesetzt, nämlich »namenlos« und 0 für Bandgerät. Ich hoffe, Ihnen ist geläufig, daß beim Weglassen aller Angaben der Übersetzer immer Kassettenoperationen durchführt. Natürlich können wir uns dasanschauen:</p>
+            <p>Für das Färben des Dollarzeichens verwenden wir eine weitere Routine des Betriebssystems, die ab 59940 — beim VC 20 ab 60082 — beginnt. Sie ermittelt die Zeilenposition des Cursors im Farbspeicher und bringt diesen Wert in die Speicherzellen 243/244, wo wir ihn abfragen können (Zeile 90). Die Adresse der Cursorposition im Farbspeicher setzt sich aus diesem Wert plus der Spaltennummer zusammen, die wir wieder der Speicherzelle 211 entnehmen. Auf diesen Platz POKEn wir den Farbcode 2 für rot (Zeile 100). So leicht ist das, wenn man die Routinen und die Aufgaben der Speicherzellen kennt.</p>
 
-        <p>Die Routine des Übersetzers für den Basic-Befehl LOAD beginnt an Speicherzelle 57704 ($E168), beim VC 20 bei 57700 ($E164).</p>
-
-        <p>Mit SYS 57704 springen wir dorthin — und in der Tat, wir erhalten »PRESS PLAY ON TAPE«. Aber ein Programm auf diese Weise von der Floppy zu LOADen, gelingt uns nicht, es sei denn, wir können die fehlenden Parameter von Hand eingeben.</p>
-
-        <p>Genau das aber können wir, weil der SYS-Befehl sich diese Parameter aus den Speicherzellen 780 bis 783 holt und in die vier Register des Mikroprozessors schreibt.<br>
-            780 ist die Adresse des Akkumulators<br>
-            781 ist die Adresse des X-Registers<br>
-            782 ist die Adresse des Y-Registers<br>
-            783 ist die Adresse des Status-Registers.</p>
-
-        <p>Die Behandlung von A, X und Y ist unkompliziert, wie wir gleich sehen werden.</p>
-
-        <p>Das Status-Register, manchmal auch P-Register genannt, ist nicht so einfach zu verwenden, da es nicht Zahlenwerte, sondern Flaggen (Bitmuster) enthält. Im einzelnen bedeuten:</p>
-
-        <table class="plain">
-            <tr>
-                <th>BIT Nr.</th>
-                <th>WERT</th>
-                <th>FLAGGE</th>
-                <th>ABKÜRZUNG</th>
-            </tr>
-            <tr>
-                <td>0</td>
-                <td>1</td>
-                <td>Übertrag</td>
-                <td>C(arry)</td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2</td>
-                <td>NULL</td>
-                <td>Z(ero)</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>4</td>
-                <td>Unterbrechung</td>
-                <td>I(nterrupt)</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>8</td>
-                <td>Dezimal</td>
-                <td>D</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>16</td>
-                <td>Abbruch</td>
-                <td>B(reak)</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>32</td>
-                <td>nicht benutzt</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>64</td>
-                <td>Überlauf</td>
-                <td>V</td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td>128</td>
-                <td>Vorzeichen</td>
-                <td>N(egativ)</td>
-            </tr>
-        </table>
-
-        <p>Um eine der Flaggen des Status-Registers zu löschen, empfiehlt es sich, das ganze Register mit POKE 783,0 zu löschen. Umgekehrt muß man beim Setzen der Bits sehr aufpassen wegen der Unterbrechungsflagge I. Eine 1 in I entspricht dem Maschinen-Befehl SEI, der alle Interrupts ausschaltet, auch die der Tastatur-Abfrage, was natürlich sehr störend sein kann! Um alle Flaggen außer der Unterbrechungsflagge I zu setzen, muß POKE 783,247 eingegeben werden.</p>
-
-        <p>So, jetzt wird es Zeit für ein Beispiel, wie vor dem SYS-Befehl Parameter eingegeben werden können. In der Literatur wird immer das Beispiel gewählt, den Cursor auf eine bestimmte Position zu setzen, beziehungsweise seine Position abzufragen. Dazu gibt es eine Routine, die bei beiden Computern ab Speicherzelle 65520 ($FFF0) beginnt.</p>
-
-        <p>Sie nimmt die Zahl, die im X-Register steht, und verwendet sie als Zeilennummer; die Zahl des Y-Registers nimmt sie als Spaltennummer, setzt dann den Cursor an diese Stelle und bringt die beiden Werte in die Speicherzellen 209/210 und 211.</p>
-
-        <p>Unser Beispiel hat die Aufgabe, den Cursor in die vierte Spalte der siebten Zeile zu setzen, dort das Dollar-Zeichen hinzuschreiben und es rot zu färben.<br>
-            5 PRINT CHR$(147)<br>
-            10 POKE 783,0<br>
-            20 POKE 781,6<br>
-            30 POKE 782,3<br>
-            40 SYS 65 520</p>
-
-        <p>Nach Löschen des Bildschirms werden zuerst alle Flaggen des Statusregisters gelöscht (Zeile 5). Dann kommt die Zeilennummer in das X-Register (Zeile 10) und die Spaltennummer in das Y-Register (Zeile 30). Nach dem Eingeben dieser Parameter können wir mit SYS auf die Routine springen.<br>
-            50 ZEILE=PEEK(209)+256*PEEK(210)<br>
-            60 ADRESSE = ZEILE + PEEK(211)<br>
-            70 POKE ADRESSE,36</p>
-
-        <p>In Speicherzellen 209/210 können wir jetzt (zur Übung) die Zeilennummer ablesen. Die Adresse der Cursorposition im Bildschirmspeicher erhalten wir durch die Addition der Zeilennummer mit dem Inhalt der Speicherzelle 211. Dorthin POKEn wir den Bildschirmcode des Dollarzeichens, nämlich 36 (Zeile 70).<br>
-            8 0 SYS 59940<br>
-            90 FARBE=PEEK(243)+256*PEEK(244)<br>
-            100 POKE FARBE+PEEK(211),2</p>
-
-        <p>Für das Färben des Dollarzeichens verwenden wir eine weitere Routine des Betriebssystems, die ab 59940 — beim VC 20 ab 60082 — beginnt. Sie ermittelt die Zeilenposition des Cursors im Farbspeicher und bringt diesen Wert in die Speicherzellen 243/244, wo wir ihn abfragen können (Zeile 90). Die Adresse der Cursorposition im Farbspeicher setzt sich aus diesem Wert plus der Spaltennummer zusammen, die wir wieder der Speicherzelle 211 entnehmen. Auf diesen Platz POKEn wir den Farbcode 2 für rot (Zeile 100). So leicht ist das, wenn man die Routinen und die Aufgaben der Speicherzellen kennt.</p>
-
-        <p>Die letzteren lernen Sie in diesem Kurs. Die Beschreibung und Anwendung der Routinen muß, wie schon öfters erwähnt, einem eigenen Kurs vorbehalten bleiben.</p>
+            <p>Die letzteren lernen Sie in diesem Kurs. Die Beschreibung und Anwendung der Routinen muß, wie schon öfters erwähnt, einem eigenen Kurs vorbehalten bleiben.</p>
+        </aside>
     </article>
 </body>
 
