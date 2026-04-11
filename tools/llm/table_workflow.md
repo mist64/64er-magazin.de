@@ -213,6 +213,44 @@ Then leave the HTML alone and move on. A human can decide later — a deleted or
 
 Similarly, when a table cell's value is uncertain even after OCR + vision, prefer a best-effort guess with a LOG.md entry listing the unclear cells over `[ILLEGIBLE]` — but only if the semantic context makes one reading clearly more plausible than the alternatives. When in doubt, `[ILLEGIBLE]` is safer.
 
+## Prefer `pdftotext` when the PDF has embedded text
+
+Many 64'er PDFs have an embedded text layer. `pdftotext -layout file.pdf -` gives you cleaner output than tesseract on those pages: header rows stay aligned in columns, umlauts and special characters come through correctly, and the page number footers are easy to spot. Use it for the *first* pass and fall back to tesseract only for purely-rasterized PDFs or for tables hidden inside bordered boxes (tesseract sometimes picks up content that pdftotext's layout parser skips).
+
+Command sheet:
+
+```bash
+# Extract whole issue to one text file
+pdftotext -layout 64er_1986-05.pdf /tmp/8605_full.txt
+
+# Find every caption with one grep
+grep -nE "^\s*(Tabelle|Bild) [0-9]+[a-f]?\.\s" /tmp/8605_full.txt
+
+# Read a slice of that file directly (do NOT sed — use Read tool on the file)
+```
+
+Cross-check: tesseract's block-level bboxes from `ocr_issue.sh` tell you *where* on the page; pdftotext gives you the *text*. Use both — pdftotext for content, tesseract for geometry when you need to crop.
+
+## Reproduce multi-level headers with `colspan`/`rowspan`
+
+If the printed table has a header that spans multiple sub-columns (e.g. a single "Adresse" header above two sub-headers "Dez" and "Hex"), **reproduce that structure in HTML**. Do not flatten the spanning header into two separate columns — you lose the visual grouping and the semantic hierarchy.
+
+Use `rowspan="2"` on cells that sit beside a 2-level header section, and `colspan="N"` on the parent header:
+
+```html
+<tr>
+    <th rowspan="2">Label</th>
+    <th colspan="2">Adresse</th>
+    <th rowspan="2">Funktion</th>
+</tr>
+<tr>
+    <th>Dez</th>
+    <th>Hex</th>
+</tr>
+```
+
+Same rule applies inside data rows when a single cell visually spans multiple columns (e.g. a footnote row, a multi-byte matrix entry, or an L-shape layout like the Falk scheme in article 145).
+
 ## Common pitfalls
 
 - **Skipping Step 1 and jumping straight to vision.** Vision-only transcription on dense table text drops values, transposes digits, and silently invents cells. The second-pass OCR scaffold catches this.
