@@ -1,0 +1,488 @@
+# Body Text Extraction Workflow
+
+How to extract the main text flow of every article from a 1980s "64'er" magazine issue as plain HTML (`<h1>`, `<h2>`, `<p class="intro">`, `<p>`). **Body text only** — no figures, tables, listings, page headers, page footers, metadata, or author lines. Those are bolted on by other workflows (`img_workflow.md`, `table_workflow.md`, `prg_workflow.md`, `toc_title_workflow.md`, `index_workflow.md`).
+
+## Goal
+
+For every editorial article in the issue, produce a per-article HTML fragment containing only:
+
+```html
+<h1>Article title</h1>
+<p class="intro">Lead paragraph...</p>
+<p>Body paragraph...</p>
+<h2>Section heading</h2>
+<p>More body paragraph...</p>
+```
+
+Article boundaries are **derived** from per-page vision classification. No TOC, no CSV, no running-header clustering. A page is either an article start (has a title), a continuation, an ad, or a rubric page.
+
+## Why a three-phase hybrid
+
+Tesseract and vision agents have different strengths. Using each where it shines keeps cost low and accuracy high.
+
+| Concern | Tool | Why |
+|---|---|---|
+| Bulk body text (long running prose) | **tesseract** | Efficient, deterministic, handles German with `-l deu`, produces paragraph markers |
+| Article title, even when stylized / overlaid on hero image | **vision agent** | Stylized / graphic titles are invisible to OCR; tesseract misses them entirely |
+| Intro / lead paragraph (bold, different typography) | **vision agent** | Visual style separates intro from body — tesseract can't see style |
+| In-article section headings (`<h2>`) | **hOCR font-class + vision agent** | Two kinds: standalone-block headings detectable via `x_fsize`, inline bold headings detectable only via pixels |
+| Page classification (article_start / continuation / ad / rubric) | **vision agent** | Structural judgment needs visual layout, not text content |
+| OCR error correction against pixels | **vision agent** | Pixel ground truth fixes `1/l/I`, `O/0`, `rn/m`, Turkish dotless `ı` bleed |
+| Caption / header / footer / ad filtering | **vision agent** (pattern + position) | Purely mechanical; agent handles it as part of Phase 3 |
+
+**Font size is NOT a reliable title signal** (calibration data from issue 8606):
+- Running "C 64" rubric header: fsize ~70
+- Section heading inside body ("Der kleine Bruder des C 128"): fsize ~56
+- Ad headline ("Neu. ATARI 260 ST."): fsize ~271 — **bigger than most titles**
+- Real article title ("Der Neue"): rendered as stylized graphic overlay on hero photo — **fsize = none, OCR captures nothing**
+
+Ads can have bigger fsize than real titles. Real titles can be pixels-only with no fsize at all. Abandon fsize heuristics. Let vision decide.
+
+## Three-phase pipeline
+
+```
+Phase 1  agent (vision)     per page    →  page_meta.json  (kind, title, intro)
+Phase 2  script (tesseract) per page    →  body_raw.tsv    (all OCR blocks + bboxes)
+Phase 3  agent (vision+text) per page   →  page_NNN.html   (h1 + intro + body)
+Phase 4  script                         →  article_NNN.html (walks page_NNN.html, stitches)
+Phase 5  script                         →  cross-page dehyphenation + paragraph merges
+```
+
+Phases 1 and 3 are vision agent passes. Phase 2 is a plain script. Phases 4 and 5 are pure text work on the main thread.
+
+## Phase 1 — Vision overview (one sub-agent per page)
+
+Input: a 1400px-wide thumbnail of the page (`page_small.png`).
+
+Task: classify the page and describe structure. **Phase 1 does NOT transcribe title or intro text.** It returns only structural metadata plus bbox / block-reference hints. Text extraction happens in Phase 3, always from TSV first, with vision fallback only for blocks where TSV captured nothing (stylized graphic titles, image overlays). This eliminates Phase 1 transcription drift entirely — the agent never types title/intro words, so it can't paraphrase, drop, or mis-read them.
+
+Output: `page_meta.txt` per page.
+
+For `article_start`:
+
+```
+kind: article_start
+titles:
+  - source: ocr          # title text is in TSV — Phase 3 reads from there
+    bbox: 213,1222,663,1333   # approximate title region in 300-DPI coords (for Phase 3 to locate the right block)
+  - source: graphic      # OR: title is a stylized / image-rendered graphic
+    bbox: 0,0,2468,1844       # region for Phase 3 to vision-read
+intro:
+  present: true
+  bbox: 679,2265,1743,2504     # approximate intro region; Phase 3 extracts text from the TSV blocks inside it
+```
+
+Or `present: false` if no distinct intro paragraph.
+
+For a page with multiple titles (mixed article boundaries), return the `titles:` list with one entry per title, in top-to-bottom reading order.
+
+Other kinds:
+
+```
+kind: continuation
+```
+
+```
+kind: ad
+```
+
+```
+kind: rubric
+name: Leserforum
+```
+
+```
+kind: other
+note: table of contents
+```
+
+```
+kind: mixed
+# mixed pages MUST still be listed, with all titles + their regions
+titles:
+  - source: ocr
+    bbox: 213,1222,663,1333
+  - source: ocr
+    bbox: 1306,1623,2305,1703
+intro:
+  present: false
+```
+
+### Why no title/intro transcription in Phase 1
+
+Calibration findings across issue 8606:
+
+- **p70**: Phase 1 said `Software-Anpassung`, TSV + pixels said `Software-Ansteuerung` — Phase 1 misread the thumbnail.
+- **p92**: Phase 1 intro had 5 paraphrased words that disagreed with TSV (paraphrased `zur Nachschlagewerk` for `als Nachschlagewerk`, etc).
+- **p140**: Phase 1 intro said `Daher haben Sie…`, TSV + pixels said `Bisher haben Sie…`.
+- **p161**: Phase 1 intro was garbled beyond character-level fix; Phase 3 agent rebuilt from TSV.
+
+In every case, the title / intro was plain printed text fully present in the tesseract TSV — Phase 1 just transcribed it wrong because thumbnails lose pixel fidelity. The text was always in the OCR. **If Phase 1 never transcribes, it cannot drift.** Phase 3 gets the real text from the TSV block at the bbox Phase 1 pointed to.
+
+For genuinely graphic titles (like `Der Neue` on p19, rendered as stylized type overlaid on a photo), Phase 1 marks `source: graphic` and Phase 3 crops the title region and reads the pixels directly — still a small, bounded vision operation, but zero chance of intro-length paraphrasing drift.
+
+### Mandatory Phase 3 override
+
+Even when Phase 1 says `source: ocr`, Phase 3 MUST re-derive the title and intro from the TSV block(s) in the bbox, not trust any hint text from Phase 1. If Phase 1 accidentally includes a text hint (e.g. a comment describing the title in a report), Phase 3 must ignore it.
+
+The rule: **only two kinds of text ever come from vision transcription:**
+1. Graphic titles (bounded: a few words, verified against the picture)
+2. Drop caps that tesseract's word-level rows missed (bounded: one letter, verified against the pixels)
+
+Everything else in the output originates in a tesseract TSV row.
+
+### Page kinds
+
+| Kind | What it is | Downstream handling |
+|---|---|---|
+| `article_start` | Page opens a new article. Has a visible title in the body area. | Phase 2 + Phase 3 run normally. Title + intro come from Phase 1. |
+| `continuation` | Page carries body text of an article that started earlier. No title. | Phase 2 + Phase 3 extract body only. |
+| `ad` | Full-page advertisement. Commercial typography, product name, price, no editorial header. | Skip Phase 2 + Phase 3. Emit stub. |
+| `rubric` | Editorial rubric with internal structure unlike regular articles (Leserforum, Editorial, Impressum, TOC, Vorschau, Fehlerteufelchen). | Out of scope for this workflow. Skip or handle manually. |
+| `other` | Cover, masthead, back cover, unclassifiable. | Skip. |
+
+### Mixed pages
+
+If a page contains end-of-one-article plus start-of-another (rare but real), report:
+
+```
+kind: mixed
+title: Second Article Title
+intro: Optional intro of the second article
+```
+
+Phase 3 detects this and splits the body blocks spatially at the new title position.
+
+### Intro detection rules
+
+The intro is the lead / teaser paragraph that sits visually distinct from body, typically **bold**, often **wider measure** or spanning multiple body columns. It comes right after (or sometimes above) the title.
+
+- If no distinct lead paragraph exists, emit `intro: present: false`.
+- Do not promote the first body paragraph to intro unless it is visually distinguished.
+- When uncertain, omit — a false `intro` bbox pulls ordinary body text into a `<p class="intro">` and pollutes the article layout.
+- Phase 1 returns ONLY the bbox, not the text. Text comes from Phase 3 reading the TSV blocks inside that bbox.
+
+### Anti-memory rule (Phase 1)
+
+Phase 1 emits no transcribed text for title or intro — only `source: ocr|graphic` and the bbox. This structurally prevents transcription drift. The only text Phase 1 may emit is short structural labels that don't appear in the output HTML:
+
+- `name: Leserforum` (rubric identifier, used only to flag the page as rubric)
+- `note: table of contents` (free-form debug note)
+
+Neither of these leaks into article HTML, so even a misread rubric name or note description has zero effect on final output.
+
+## Phase 2 — Tesseract body extraction (script)
+
+For every page where Phase 1 said `article_start` or `continuation` (skip ads, rubrics, others):
+
+```bash
+magick <source>/PPP_600_cropped.png -resize 50% _work/pPPP/page_300.png
+tesseract _work/pPPP/page_300.png _work/pPPP/page \
+    -l deu --psm 1 -c hocr_font_info=1 tsv hocr
+```
+
+Outputs:
+- `_work/pPPP/page_300.png` — downscaled page
+- `_work/pPPP/page.tsv` — word-level OCR with bboxes
+- `_work/pPPP/page.hocr` — hOCR with font sizes (optional, for debug)
+
+### Why 600 → 300 DPI
+
+Tesseract's LSTM is trained around 300 DPI. Native 600 DPI triggers a Turkish-dotless-`ı` artifact and degrades accuracy. A clean 2:1 `magick -resize 50%` downscales without interpolation artifacts. Never upscale, never sharpen, never threshold — all make results worse.
+
+### Block geometry summary (optional, for Phase 3 debug)
+
+Produce a `blocks.txt` per page with bbox and first 120 chars of each block — useful for phase-3 agents that need a quick index of what's where:
+
+```bash
+awk -F'\t' 'NR>1 && $1==5 && $12!="" {
+  b=$3;
+  if (!(b in minL) || $7<minL[b]) minL[b]=$7;
+  if (!(b in minT) || $8<minT[b]) minT[b]=$8;
+  if (!(b in maxR) || $7+$9>maxR[b]) maxR[b]=$7+$9;
+  if (!(b in maxB) || $8+$10>maxB[b]) maxB[b]=$8+$10;
+  text[b]=text[b]" "$12; n[b]++;
+}
+END {
+  for (b in text) printf "block=%02d bbox=%dx%d+%d+%d nw=%d %s\n",
+    b, maxR[b]-minL[b], maxB[b]-minT[b], minL[b], minT[b], n[b], substr(text[b],1,120)
+}' _work/pPPP/page.tsv | sort > _work/pPPP/blocks.txt
+```
+
+### Scratch location
+
+All intermediates live in `issues/NNNN/_work/pPPP/` — **not** `/tmp/`. Tesseract sandboxing on macOS can't read `/tmp/` reliably.
+
+## Phase 3 — Reconciler agent (one per non-skip page)
+
+Input:
+- `page_meta.txt` from Phase 1 (kind + bbox hints for title / intro — NO transcribed text)
+- `page.tsv` + `blocks.txt` from Phase 2 (OCR blocks + bboxes)
+- `page_small.png` (1400px thumbnail for spatial context)
+- Per-block crops if needed (Phase 3 can generate them on demand from bbox data)
+
+Task:
+
+0. **Derive title and intro from TSV** (for `article_start` / `mixed` pages):
+
+   - For each `title` entry in page_meta with `source: ocr`: find the OCR block(s) inside the bbox, concatenate their text, and emit as `<h1>…</h1>`. This text comes from TSV — zero transcription drift possible.
+   - For each `title` entry with `source: graphic`: crop the bbox from the full-res page image, spawn a vision sub-agent that reads ONLY the title text (few words, bounded operation), and emit as `<h1>…</h1>`. Log the pixel-read in the report so downstream auditing knows the title was vision-derived.
+   - For `intro: present: true`: find the OCR block(s) inside the intro bbox and emit as `<p class="intro">…</p>`. Again, TSV is authoritative.
+   - For `intro: present: false`: emit no intro.
+
+   Do NOT trust any hint text that might appear in page_meta — always re-derive from TSV. If Phase 1 accidentally included a title string, ignore it.
+
+1. **Drop non-body blocks** mechanically:
+   - Blocks inside the title bbox(es) → already emitted as `<h1>`, drop from body.
+   - Blocks inside the intro bbox → already emitted as `<p class="intro">`, drop from body.
+   - Block text matches `^Bild [0-9]+[a-z]?\.` or `^Tabelle [0-9]+` or `^Listing [0-9]+` → drop (figure/table/listing caption).
+   - Block text matches `^Ausgabe [0-9]+/.*19[0-9]+$` → drop (page footer).
+   - Block is in the top ~5% of the page height and has fewer than 5 words → drop (running header).
+   - Block has ≥80% empty area (bbox minus text bbox) → drop (image).
+   - Block has fewer than 3 words AND sits isolated → drop (decorative rule, page number, stray mark).
+
+2. **Detect section headings (`<h2>`).** Two mechanisms:
+
+   **(a) Standalone heading blocks.** Tesseract's hOCR assigns a font-class index (`x_fsize`) to each word. Body text clusters around one dominant value (e.g. `x_fsize 4`). Blocks where all words share a *different* `x_fsize` AND the block is short (< 10 words) are section headings. Emit as `<h2>`.
+
+   Example from p020: block 10 "Der kleine Bruder des C 128" has `x_fsize 7`, body has `x_fsize 4`. Standalone block, 6 words → `<h2>`.
+
+   **(b) Inline bold headings inside body blocks.** Tesseract sometimes puts a short bold heading in its own `<p>` (paragraph) within a body block, followed by the body paragraph. The heading has the same `x_fsize` as body (tesseract can't see bold weight), but it is visually distinct on the page image: short (1-3 words), no punctuation, bold or heavier weight, separated by whitespace from the body below.
+
+   Example from p020: "Sprachregelung" is `par_1_2` inside block 6, followed by `par_1_3` body text. Same `x_fsize 4` — only detectable by visual inspection. Split it off as `<h2>Sprachregelung</h2>` and emit the following paragraph as `<p>`.
+
+   When uncertain whether a short paragraph is a heading or a fragment, prefer `<p>` (less destructive). Log the ambiguity in `LOG.md`.
+
+3. **Add inline formatting** by comparing the OCR scaffold to the block pixels. The vision agent marks up:
+   - `<strong>` — bold runs (heavier weight than surrounding body text)
+   - `<em>` — italic runs
+   - `<sub>` / `<sup>` — subscript / superscript (rare, mostly in technical articles)
+
+   Do NOT use tesseract's `x_fsize` for this — it's unreliable (font-class buckets split inconsistently). Vision is the authority on inline formatting.
+
+   `<strong>` wraps only phrase-level or word-level bold runs inside body paragraphs. Contiguous bold words = one `<strong>` span, not one per word.
+
+   **Do NOT wrap `<p class="intro">` content in `<strong>`.** The intro class already styles its content as bolder via CSS. Adding a nested `<strong>` is a double-bold. Intro paragraphs get their text plain inside the `<p class="intro">...</p>` tags — no inner formatting tag for the intro-level bold.
+
+   When uncertain whether text is bold or just slightly heavier due to scan quality, omit the tag. False positives are worse than missed formatting.
+
+4. **Correct OCR errors** against the pixels. **Character-level only.** Never change, add, remove, or substitute words. Never "fix" grammar, spelling, punctuation, or style. The only valid OCR fixes are single-character substitutions (`1/l/I`, `O/0`, `rn/m`, `cl/d`, `ı→i`), missing or extra whitespace between words (`dasalle` → `das alle`), missing/mangled accent marks or umlauts (`Anderungen` → `Änderungen`), and drop caps or leading characters the OCR dropped at paragraph starts. Every fix must be verifiable by looking at the exact pixel region for that word.
+
+   **Forbidden "corrections":**
+   - Adding a word the OCR missed that you think should grammatically be there (e.g. `behoben sein` → `behoben worden sein`). **Every word in the OCR is treated as correct unless the pixels show something else in its place.** If a sentence looks grammatically odd, that is how it was printed.
+   - Re-introducing a noun that appears to have been elided (e.g. `so kann diese jederzeit` → `so kann diese Diskette jederzeit`). If tesseract captured "diese" and the pixels show "diese", leave "diese". Do not infer omitted nouns from context.
+   - Modernizing spelling (`daß` → `dass`, `muß` → `muss`, `ß` → `ss`). Old German 1901-1996 spelling is preserved exactly.
+   - Fixing grammatical errors or typos in the printed original. The magazine's own mistakes are historical record — preserve them.
+   - Replacing "slightly wrong-looking" words with "more correct" ones based on context.
+   - Rewording awkward sentences.
+
+   **Rule of thumb:** if the change touches more than one character, or crosses a word boundary beyond whitespace, stop and verify the exact pixels for that word. If you are not sure the pixels show what you want to write, leave the OCR scaffold unchanged. Under-correction is safe; over-correction is a permanent content fabrication that cannot be traced back to the scan.
+
+   Recurring **legitimate** OCR fix patterns in 64'er OCR (from `tools/png2mag/WORKFLOW.md`):
+   - `»I«` → `»l«` (uppercase I misread for lowercase L in switch positions)
+   - `$1` / `Sl` / `S]` → `S1`
+   - `ı` → `i` (Turkish dotless i bleed)
+   - `abgeschaltetistund` → `abgeschaltet ist und` (compound word spacing)
+   - `rn` ↔ `m`, `cl` ↔ `d`, `1` ↔ `l` ↔ `I`, `O` ↔ `0`
+   - `©` → `C`
+   - Preserve old German spelling (`daß`, `muß`, `läßt`, `ß`) — do NOT modernize
+   - Preserve original typos (historical record)
+
+3. **Join broken paragraphs.** Tesseract often splits one paragraph into multiple blocks at column breaks. Join when the first character of the next block is lowercase and the previous block ended without terminal punctuation.
+
+4. **Emit the page HTML**:
+
+```html
+<!-- page 019 -->
+<h1>Der Neue</h1>
+<p class="intro">Commodore ist immer wieder für Überraschungen gut: …</p>
+<p>Freitag, den 11.4.1986 um 9 Uhr morgens wird eine einmalige Entscheidung getroffen: …</p>
+<p>…</p>
+```
+
+Rules:
+- `<h1>` comes first in the file regardless of physical position on the page (article titles often sit mid-page in 64'er; logical order wins over physical order).
+- `<p class="intro">` immediately after `<h1>` if Phase 1 emitted an `intro`.
+- `<h2>` section headings inline in the body flow at their natural reading position.
+- Body paragraphs follow in reading order.
+- Preserve paragraph indentation: default `<p>` for every paragraph. Use `<p class="noindent">` ONLY when the TSV geometry proves the paragraph is flush-left: the first word's `left` coordinate must be within ~5px of the block's left margin (at 300 DPI), AND the rest of the paragraph's first-line wrap confirms that position is the block's natural left edge (not a coincidental indent of a different paragraph). **Do NOT apply `noindent` by position heuristic** (e.g. "first paragraph after every heading"). In 64'er layouts, the first paragraph after an `<h2>` is usually indented the same as any other body paragraph. Real noindent cases are rare and must be verified per-paragraph from TSV data, not guessed. False positives are worse than false negatives — when in doubt, emit plain `<p>`.
+
+- **`<aside>`** — for "Texteinschub" sidebars / text insets: boxed or otherwise visually separated passages that belong to the current article but are set apart from the main text flow. Often titled with a heading like "Texteinschub #1:", "Hinweis", "Zur Erinnerung", or similar. Wrap the entire sidebar content (heading + body + any byline) in a single `<aside>…</aside>` at its natural reading position in the article. Headings inside the aside stay as `<h2>`. Do NOT promote a Texteinschub to its own article (no new `<h1>`); it is part of the parent article and continues the same author/topic.
+
+  Example:
+  ```html
+  <p>…main body continues…</p>
+  <aside>
+      <h2>Texteinschub: Dem Computer ins Wort fallen</h2>
+      <p>Sidebar body paragraph…</p>
+      <p>Another sidebar paragraph…</p>
+  </aside>
+  <p>…main body resumes…</p>
+  ```
+
+  Detect a Texteinschub visually: boxed/ruled border, inset column, distinct background shade, or a heading line starting with "Texteinschub". The content typically diverges from the main body topic (a digression, a related aside, a step-by-step instruction pulled out of the main flow).
+
+- **`<p class="source">`** — for paragraphs printed in smaller font than body. Typically appears at the end of an article or news item and carries vendor address, price, manufacturer info, reference URLs, or similar metadata that isn't part of the article narrative. Examples:
+  - `<p class="source">Info: Mannesmann Tally, Postfach 500749, 7000 Stuttgart 50, Tel: 0711/50390</p>`
+  - `<p class="source">Informationen über Geos können Sie beim Hersteller Berkeley Softworks erhalten. Die Adresse lautet: Berkeley Softworks, 2150 Shattuck Avenue, Berkeley, California 94704. Der Preis beträgt augenblicklich 59,95 Dollar.</p>`
+
+  Detection: the smaller-font paragraphs have a distinct `x_fsize` bucket in hOCR (typically one size bucket below body dominant), AND/OR are visibly smaller on the page. Usually the last 1–3 paragraphs of an article, or the last 1–2 paragraphs of each item in a news-roundup section.
+
+  Do NOT apply `source` to the article's own narrative body even if it's at the end. `source` is for metadata/reference blocks, not for the author's concluding paragraph. The author byline `(xx)` or `(xx/yy)` is NOT `source` — it's a short standalone `<p>(xx)</p>`.
+
+  A `<p class="source">` replaces what would otherwise be a plain `<p>`. `source` and `noindent` can combine: `<p class="source noindent">` if the source paragraph is also flush-left per TSV.
+- For `kind: continuation`: no `<h1>`, no `<p class="intro">`, just body `<p>`s and `<h2>`s.
+- For `kind: ad / rubric / other`: emit a single comment `<!-- page NNN: <kind> -->` and stop.
+
+### Anti-memory rule (Phase 3)
+
+- Every paragraph emitted must originate in an OCR block from Phase 2, corrected against the pixel crop.
+- If OCR is clearly missing text (gap in reading order, paragraph ends mid-sentence with no continuation visible in any following block), emit a `<p>[OCR-GAP]</p>` marker rather than composing plausible German. A reviewer will fill it in by hand.
+- If the agent sees text on the page that no OCR block captured (Tesseract missed a paragraph entirely), log the page to `LOG.md` and emit `[OCR-GAP]`. Do not transcribe from vision — that bypasses the "OCR → file → read → small edit" discipline.
+
+## Phase 4 — Article stitching (byte-level concatenation)
+
+**Phase 4 MUST be byte-level `cat`, not LLM generation.** Do not regenerate article content via the Write tool — the LLM will silently drift (auto-correct OCR artifacts, fill gaps, smooth punctuation) and that is a direct violation of the anti-memory rule.
+
+Correct procedure:
+
+1. Identify the per-page files that belong to one article (from Phase 1 `kind` + page sequence + any `jump_to` pointers in `page_meta.txt`).
+2. Concatenate them in reading order with `cat`:
+   ```bash
+   cat _work/p019/page_019.html \
+       _work/p020/page_020.html \
+       _work/p021/page_021.html \
+       ... \
+       _work/p043/page_043.html \
+       > _work/article_019.html
+   ```
+3. The result is byte-identical to the per-page files joined together. Every character is traceable to a Phase 3 output on disk.
+
+Do NOT use the `Write` tool with inlined content for Phase 4. Using `Write` with a multi-KB content string means the LLM regenerates every token from context — the probabilistic generation silently introduces drift even when the source text is fully in context. `cat` is the only safe concatenation operator.
+
+## Phase 5 — Cross-page fixups (targeted Edit, deterministic)
+
+After concatenation, the cat'd file contains `<!-- page NNN -->` markers at every page boundary. Phase 5 applies two classes of surgical fixup to the SAME cat'd file via the `Edit` tool — **not** Write, **not** Bash sed-in-place on large files.
+
+Two classes of edit:
+
+1. **Cross-page hyphenation.** When last word of previous page ends with `-` and first word of next page is lowercase, join them. Example match:
+
+   ```
+   Wenn Sie die-</p>
+   <!-- page 020 -->
+   <p>se Ausgabe
+   ```
+
+   Becomes:
+
+   ```
+   Wenn Sie diese Ausgabe
+   ```
+
+   One `Edit` call, one `old_string` / `new_string` pair. The `old_string` must contain enough surrounding context to be unique in the file (typically 2-4 words on each side of the join).
+
+   Do NOT join compound hyphens like `Ost-West` or `CD-ROM`. Detect compounds by context — if the joined form looks like a new word, join; if it's a real compound, leave the hyphen in place and still merge the paragraphs across the page boundary.
+
+2. **Cross-page paragraph merge.** When last `<p>` of previous page ends without terminal punctuation (`.`, `!`, `?`, `:`, `»`, `«`, `—`) and first `<p>` of next page starts lowercase (a continuation), merge the two into one `<p>` and strip the intervening `<!-- page NNN -->` comment and closing/opening `</p><p>` tags. Example:
+
+   ```
+   alle wichtigen Befehle, die sich</p>
+   <!-- page 022 -->
+   <p class="noindent">mit einem Filezugriff
+   ```
+
+   Becomes:
+
+   ```
+   alle wichtigen Befehle, die sich mit einem Filezugriff
+   ```
+
+   Again: one `Edit` call per boundary. The `Edit` tool is a literal string-replace, which is exactly the anti-memory-safe operation: you can only match what's already in the file, and you write only what you specify verbatim.
+
+3. **Strip remaining page comments.** After all joins are applied, any `<!-- page NNN -->` marker that survived (at clean paragraph breaks) should be removed by one more Edit per marker. Two or three Edits typically suffice for a multi-page article.
+
+When both signals conflict at a boundary (hyphen at end but next word is capitalized), log in `LOG.md` and leave alone — a human reviewer decides.
+
+### Why Edit, not Bash sed
+
+`sed -i` on a large file re-writes the whole file atomically and gives no change diff to review. `Edit` shows exactly which surrounding context matched and which new bytes replaced it, so every Phase 5 change is auditable in the harness log. Anti-memory discipline needs that auditability.
+
+### Forbidden tools for Phase 4 and 5
+
+- **Never use `Write` with multi-line article content.** Write is for creating fresh files, not for reproducing existing content. Even if the source file's bytes are in the LLM's context, regenerating them through the Write tool is LLM composition, not file copy.
+- **Never hand-type paragraphs into an Edit `new_string`.** Every Edit `new_string` at the page boundary must contain ONLY characters that were already in the file on at least one side of the boundary — the result of the join, not a fresh paragraph. A valid Phase 5 Edit takes a small range from the file and outputs the same characters in a slightly different arrangement (hyphen removed, page comment stripped, paragraph tags collapsed).
+- **Never use the main-thread LLM to "clean up" the article text** after cat. Phase 3 was the last legitimate place for content changes. Phases 4 and 5 are byte-level plumbing.
+
+## Delegation
+
+Main thread never Reads a page PNG. All pixel operations go through sub-agents:
+
+- Phase 1: one sub-agent per page (batchable, 10 pages per call is fine).
+- Phase 3: one sub-agent per non-skip page (parallelizable).
+- Scripts run on the main thread (Phase 2, 4, 5).
+
+Sub-agent prompts must be self-contained: page number, file paths, task, expected output format, anti-memory reminders.
+
+## Reference files that must NOT be used as content sources
+
+The issue directory may contain a pre-existing transcription file like `issues/NNNN/NNNN.md` (e.g. `issues/8606/8606.md`). These are historical reference material, possibly machine-OCR'd years ago, possibly hand-transcribed. **They are NOT the source of truth for this pipeline.**
+
+- **Phase 1 (title/intro vision)**: do not consult `NNNN.md`. Title and intro must come from the page pixels.
+- **Phase 3 (body reconciliation)**: do not consult `NNNN.md`. Body text must come from Phase 2 tesseract OCR, corrected against the page pixels.
+- **Investigation / boundary chasing only**: a sub-agent may consult `NNNN.md` to *locate* where an article continues (e.g. grep for a known phrase to find the continuation page), but must NOT copy text from it into any output file. Treat it like an index, not a database.
+- **Investigation reports must not quote content.** When the investigation agent reports its findings, it must return only page numbers, layout coordinates, and structural facts — NEVER string fragments from `NNNN.md`. Example:
+  - ✓ "MT-85 continues on p27, left column; page has a byline and an address paragraph at the bottom of that column."
+  - ✗ "MT-85 continues on p27 with h2 'Gemischte Gefühle' and ends with '(aw)' / Info: Mannesmann Tally, Postfach 500749…"
+  The second leaks text from `NNNN.md` into the main thread's context, from where it will end up in the next Phase 3 prompt and prime the extraction agent with expected content. That is an anti-memory violation by proxy: the Phase 3 agent's output is no longer a blind extraction, it's a confirmation of preloaded text.
+
+Using `NNNN.md` as a content source bypasses the entire OCR + pixel verification discipline. The anti-memory rule applies: every character in the output must originate in (a) pixels read by a vision agent, or (b) an OCR block verified against pixels. Text copied from `NNNN.md` — or even quoted from `NNNN.md` inside an investigation report — satisfies neither.
+
+## What NOT to do
+
+- Do not parse the TOC or annual index CSV to decide article boundaries.
+- Do not use font size as a title detector.
+- Do not include figures, tables, listings, or their captions.
+- Do not include running headers, page numbers, or issue footers.
+- Do NOT include section dingbats or pullquotes.
+- Author bylines like `(xx)` or `(xx/yy)` at the end of an article or section ARE kept as short standalone `<p>(xx)</p>` elements — they are part of the body flow. Do NOT drop them. Bylines appearing inline at the end of a paragraph (not on their own line) stay inside that paragraph.
+- Do not emit metadata, `<meta>` tags, or article shell HTML. Body extraction stops at `<h1>` + `<p class="intro">` + `<p>`; metadata is a later stamp step.
+- Do not use `/tmp/` for scratch files. Use `issues/NNNN/_work/`.
+- Do not Read page PNGs from the main thread.
+- Do not retype a block's text by hand. Read the file, correct in place.
+- Do not promote the first body paragraph to `<p class="intro">` unless it is visually distinct.
+
+## When you can't decide — log, don't delete
+
+If a page is ambiguous (article start or continuation? intro or body? full-page ad or editorial?), pick the less-destructive interpretation (prefer `continuation` over `ad`, prefer `body` over `skip`) and write an entry in `issues/NNNN/LOG.md`:
+
+- page number
+- what the page looks like
+- why it's ambiguous
+- what action a reviewer should take
+
+A dropped page is invisible in git history; a continuation page misclassified as ad can be fixed by re-running Phase 1 after editing the page kind.
+
+## Anti-memory rule (top priority)
+
+Never write article text from memory — not a word. Every character in the output must originate in either the page pixels (Phase 1, for title/intro) or an OCR block corrected against the pixels (Phase 3, for body). If text looks missing, emit `[OCR-GAP]` and log. Never compose plausible German to fill a gap. Same discipline as `tools/png2mag/WORKFLOW.md` and the root `MEMORY.md`.
+
+## Auditing agent output: verify against TSV, not against reports
+
+Agent self-reports use informal language that can sound like fabrication when it isn't. Example phrasings that look suspicious but are usually benign:
+
+- *"Added missing word 'Diskette'"* — usually means the agent rejoined a word that tesseract captured but placed in a separate TSV row at a line break. The word was in the OCR; the agent's "adding" was just un-splitting it.
+- *"Restored missing 'worden'"* — same thing: `beho-\nben worden sein` in TSV became `behoben worden sein` after rejoining across a hyphenated line break.
+- *"Pixel-recovered the initial F of 'Freitag'"* — a drop-cap the tesseract word-level rows missed; the letter is genuinely on the page, the agent read it from the image. Legitimate.
+
+Before reverting an apparent violation in an extraction agent's output, **grep the raw TSV for the disputed token**:
+
+```bash
+awk -F'\t' '$1==5 && $12!=""' _work/pNNN/page.tsv | awk '{print $12}' | grep -B3 -A3 "disputed_word"
+```
+
+If the word is in the TSV, the agent was right — don't revert. If the word is NOT in the TSV but the agent claims to have pixel-recovered it, crop the relevant block from `page_1900.png` and Read that crop via a sub-agent to verify the pixels show it. Only then is revert justified.
+
+**Never revert an agent's output based on the wording of its own report alone.** The agent is summarizing, not specifying. The ground truth is TSV + pixels, not the prose of the report. A revert that removes legitimately-sourced text is itself a content fabrication — you're deleting characters that originated in pixels.
+
+This rule applies recursively: if *this* workflow's main thread revises an agent's output, the same discipline holds — every edit must be a literal `Edit` that removes TSV-derived characters only when those characters actually didn't come from pixels.
