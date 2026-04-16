@@ -2,6 +2,14 @@
 
 How to extract the main text flow of every article from a 1980s "64'er" magazine issue as plain HTML (`<h1>`, `<h2>`, `<p class="intro">`, `<p>`). **Body text only** — no figures, tables, listings, page headers, page footers, metadata, or author lines. Those are bolted on by other workflows (`img_workflow.md`, `table_workflow.md`, `prg_workflow.md`, `toc_title_workflow.md`, `index_workflow.md`).
 
+## CRITICAL RULES (read before anything else)
+
+**1. NEVER promote an h2 section heading to h1 (new article).** An article is a single continuous editorial piece that starts with a title, runs across 1-10 pages, and ends with a byline or clean section break. Within that article, section headings (`<h2>`) divide the text into sub-topics. These h2 headings can be just as large and prominent as article titles — **do not mistake them for article starts.** If body text from the current article appears ABOVE a heading on the same page, that heading is an h2, not an h1. See "Distinguishing h1 from h2" below.
+
+**2. NEVER correct typos or add missing punctuation.** The printed magazine text is historical record. If the OCR says `Benutzeroberfäche` (missing L) and the pixels show the same, emit `Benutzeroberfäche`. If a sentence ends without a period and the pixels show no period, emit no period. Do not let your language model training "fix" what looks wrong. See "OCR fixes CHARACTER-LEVEL ONLY" in Phase 3.
+
+**3. Every character originates in OCR TSV or bounded pixel reads.** No composition, no paraphrasing, no inference from context. See "Anti-memory rule" in every phase section.
+
 ## Goal
 
 For every editorial article in the issue, produce a per-article HTML fragment containing only:
@@ -108,6 +116,30 @@ intro:
   present: false
 ```
 
+### Distinguishing h1 (article start) from h2 (section heading)
+
+This is the single most common classification mistake. A prominent heading on a continuation page can look like an article title but is actually a section heading within the running article. **Getting this wrong fragments articles and produces wrong output.**
+
+A heading is an **h1 (new article)** when ALL of these are true:
+- It is the **first editorial content** on the page (below the running header strip). No body text from any article precedes it in reading order.
+- OR: it appears below a clear horizontal rule or visual separator that ended the previous article (including byline, address block, empty space).
+- The **running header** (rubric name at top of page) is different from the previous page — indicating a new rubric section.
+- It has a **decorative opener**: drop-cap, hero image, bold intro paragraph, or stylized typography.
+
+A heading is an **h2 (section heading)** when ANY of these are true:
+- **Body text from the same article appears ABOVE it** on the same page. (This is the strongest signal. Body → heading = the heading is inside the article, not starting a new one.)
+- The **running header** is the same as the previous page (same rubric).
+- The heading is followed by body text that continues the same topic as the preceding paragraphs.
+- There is **no intro paragraph** after it — the next text is ordinary body.
+- There is **no byline or address block** between the preceding text and the heading (a byline signals article end; its absence means the article continues).
+
+**Calibration examples from issue 8606:**
+- p21 "Kein Gerät für Bastler", "Ganz der Alte", "Das neue Betriebssystem: »Geos«" — all h2s inside Der Neue article. Body text above each, same running header "Hardware-Test / C 64".
+- p41 "Vorsicht bei Aspirin und Schweinebraten" — h2 inside Datenbanken article. Body text above it, same running header "Daten verwalten".
+- p43 "Geos — ein Meisterwerk" — h2 inside Der Neue article (continuation from p24 via jump). Body text above it, same running header "Hardware-Test / C 64".
+
+**Wrong classification from v2 run:** These three h2s were promoted to h1 and given their own article files. Result: Datenbanken and Der Neue were fragmented. The fix: always check whether body text precedes the heading on the same page before classifying as article_start.
+
 ### Why no title/intro transcription in Phase 1
 
 Calibration findings across issue 8606:
@@ -135,7 +167,7 @@ Everything else in the output originates in a tesseract TSV row.
 
 | Kind | What it is | Downstream handling |
 |---|---|---|
-| `article_start` | Page opens a new article. Has a visible title in the body area. | Phase 2 + Phase 3 run normally. Title + intro come from Phase 1. |
+| `article_start` | Page opens a new article. Has a visible title in the body area. | Phase 2 + Phase 3 run normally. Title + intro bboxes come from Phase 1; actual text derived in Phase 3 from TSV/pixels. |
 | `continuation` | Page carries body text of an article that started earlier. No title. | Phase 2 + Phase 3 extract body only. |
 | `ad` | Full-page advertisement. Commercial typography, product name, price, no editorial header. | Skip Phase 2 + Phase 3. Emit stub. |
 | `rubric` | Editorial rubric with internal structure unlike regular articles (Leserforum, Editorial, Impressum, TOC, Vorschau, Fehlerteufelchen). | Out of scope for this workflow. Skip or handle manually. |
@@ -143,15 +175,20 @@ Everything else in the output originates in a tesseract TSV row.
 
 ### Mixed pages
 
-If a page contains end-of-one-article plus start-of-another (rare but real), report:
+If a page contains end-of-one-article plus start-of-another (~10% of body pages — common, not rare), report `kind: mixed` with `titles:` containing all title bboxes. Phase 3 splits the body blocks spatially at each title position.
 
-```
-kind: mixed
-title: Second Article Title
-intro: Optional intro of the second article
-```
+Mixed pages can be:
+- **Horizontal split**: old article ends at top, horizontal rule, new article below.
+- **Vertical split**: old article in left column(s), new article in right column(s).
+- **Buried start**: new article starts in a small column below a listing page, easy to miss if only looking for hero-image titles.
 
-Phase 3 detects this and splits the body blocks spatially at the new title position.
+### Mixed pages that look like continuation-only
+
+Some mixed pages don't have a prominent new-article title. The new article may start in a small column below a BASIC listing, or the page may carry a "Texteinschub" sidebar alongside the main article. Phase 1 can miss these if it only looks for big titles.
+
+**Verification step:** after Phase 1 is complete for the whole issue, scan for articles that end mid-sentence on one page with no continuation on the next page. If the next page is classified `ad`, `rubric`, or `other`, the article probably jumps (check for "Fortsetzung auf Seite N"). If the next page is `article_start`, check whether the old article's tail exists in a different column/position on that same page (the mixed-page case).
+
+**Pages commonly missed in testing:** p70 (small single-column article below a listing page), p148 (Texteinschübe alongside a multi-page reference article). Both have editorial body text that Phase 1 can miss if it only scans for hero-image titles.
 
 ### Intro detection rules
 
@@ -278,6 +315,12 @@ Task:
 
    **Rule of thumb:** if the change touches more than one character, or crosses a word boundary beyond whitespace, stop and verify the exact pixels for that word. If you are not sure the pixels show what you want to write, leave the OCR scaffold unchanged. Under-correction is safe; over-correction is a permanent content fabrication that cannot be traced back to the scan.
 
+   **Calibration failures from v2 run (independent extraction of the same issue):**
+   - `Benutzeroberfäche` was silently "corrected" to `Benutzeroberfläche` — but the original page actually printed `Benutzeroberfäche` (missing L, confirmed by pixel crop). The v2 agent's language model training auto-corrected what looked like a misspelling. **This is the exact failure mode this rule prevents.** The magazine's typos are historical record.
+   - `gefertigt` (no period) was changed to `gefertigt.` — the v2 agent's expectation that sentences end with periods overrode what the OCR actually captured. If the pixel shows no period, emit no period.
+   
+   Both of these are LLM-training-data bias overriding the scan evidence. When in doubt: **the scan wins, your expectations lose.**
+
    Recurring **legitimate** OCR fix patterns in 64'er OCR (from `tools/png2mag/WORKFLOW.md`):
    - `»I«` → `»l«` (uppercase I misread for lowercase L in switch positions)
    - `$1` / `Sl` / `S]` → `S1`
@@ -288,9 +331,9 @@ Task:
    - Preserve old German spelling (`daß`, `muß`, `läßt`, `ß`) — do NOT modernize
    - Preserve original typos (historical record)
 
-3. **Join broken paragraphs.** Tesseract often splits one paragraph into multiple blocks at column breaks. Join when the first character of the next block is lowercase and the previous block ended without terminal punctuation.
+5. **Join broken paragraphs.** Tesseract often splits one paragraph into multiple blocks at column breaks. Join when the first character of the next block is lowercase and the previous block ended without terminal punctuation.
 
-4. **Emit the page HTML**:
+6. **Emit the page HTML**:
 
 ```html
 <!-- page 019 -->
@@ -465,7 +508,7 @@ A dropped page is invisible in git history; a continuation page misclassified as
 
 ## Anti-memory rule (top priority)
 
-Never write article text from memory — not a word. Every character in the output must originate in either the page pixels (Phase 1, for title/intro) or an OCR block corrected against the pixels (Phase 3, for body). If text looks missing, emit `[OCR-GAP]` and log. Never compose plausible German to fill a gap. Same discipline as `tools/png2mag/WORKFLOW.md` and the root `MEMORY.md`.
+Never write article text from memory — not a word. Every character in the output must originate in either the page pixels (Phase 1, for title/intro) or an OCR block corrected against the pixels (Phase 3, for body). If text looks missing, emit `[OCR-GAP]` and log. Never compose plausible German to fill a gap. Same discipline as the root `MEMORY.md`.
 
 ## Auditing agent output: verify against TSV, not against reports
 
