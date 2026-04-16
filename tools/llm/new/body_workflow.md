@@ -175,7 +175,17 @@ A heading is an **h2 (section heading)** when ANY of these are true:
 - p41 "Vorsicht bei Aspirin und Schweinebraten" — h2 inside Datenbanken article. Body text above it, same running header "Daten verwalten".
 - p43 "Geos — ein Meisterwerk" — h2 inside Der Neue article (continuation from p24 via jump). Body text above it, same running header "Hardware-Test / C 64".
 
-**Wrong classification from v2 run:** These three h2s were promoted to h1 and given their own article files. Result: Datenbanken and Der Neue were fragmented. The fix: always check whether body text precedes the heading on the same page before classifying as article_start.
+**Wrong classification from v2 and v4 runs:** These h2s were promoted to h1 and given their own article files (v2: 49 articles instead of ~42; v4: same). Result: multi-page articles fragmented into 2-3 pieces. The fix: always check whether body text precedes the heading on the same page before classifying as article_start.
+
+### Post-Phase-1 sanity check on article count
+
+After classifying all pages, count the `article_start` pages. A typical 64'er issue has **30-45 articles** (including short news items). If your count exceeds 45, you are almost certainly over-splitting — h2 section headings are being misclassified as article starts.
+
+**Verification procedure:** for every `article_start` page, confirm that:
+1. No body text from a prior article appears above the title on that page, OR
+2. A byline / address block / horizontal rule clearly ends the prior article before the title.
+
+If neither condition holds, reclassify as `continuation` and demote the heading to h2.
 
 ### Why no title/intro transcription in Phase 1
 
@@ -448,15 +458,29 @@ Most entries in `novel_words.txt` are legitimate: cross-line hyphen rejoins (`Pr
 - Is a complete German word or phrase not derivable from any TSV token by the allowed fixes (e.g. `IBM PC` appearing where TSV has `8-Biter`)
 - Differs from a TSV word by more than one character AND the change is not whitespace/umlaut/drop-cap (e.g. TSV has `Benutzeroberfäche`, HTML has `Benutzeroberfläche` — that's an `l` insertion, not a single-char substitution)
 
-Write flagged words to `_work/pNNN/verify_flags.txt`. If any page has flags, it needs manual review before the article is considered done.
+Write flagged words to `_work/pNNN/verify_flags.txt`.
+
+### Phase 3.5b — Auto-revert flagged words (mandatory)
+
+For each page with a non-empty `verify_flags.txt`, **automatically revert every flagged word to its TSV form** using the Edit tool. Do NOT skip this step. Do NOT use judgment about whether the "correction" was reasonable.
+
+Procedure per flagged word:
+1. Find the word in `page_NNN.html`.
+2. Find the corresponding TSV token(s) for that position (grep the TSV for surrounding context words to locate the right row).
+3. If the TSV token differs from the HTML word: **replace the HTML word with the TSV token via Edit.** The TSV is authoritative.
+4. If the TSV token matches the HTML word (false positive from the diff — e.g. a legitimate hyphen rejoin): leave it.
+
+**Exception:** drop-cap restorations (e.g. `reitag` → `Freitag`) and whitespace joins (e.g. `dasalle` → `das alle`) are legitimate Phase 3 fixes. These appear as novel words because the joined/restored form doesn't exist as a single TSV token. To distinguish: if the novel word is constructible by concatenating adjacent TSV tokens (possibly with a hyphen removed), it's legitimate. If not, revert.
+
+This step is mechanical. The agent does not decide whether the "original" or "corrected" form is "better" — the TSV form wins unconditionally.
 
 ### Why this step exists
 
-Three independent extraction runs (v1, v2, v3) on the same issue all produced text that violated the anti-memory and typo-preservation rules despite those rules being prominently documented:
-- **v2 and v3** both "corrected" the printed typo `Benutzeroberfäche` → `Benutzeroberfläche`. The TSV has `Benutzeroberfäche`. A mechanical diff would have caught this instantly.
-- **v3** fabricated ~50 words in the "Geos — ein Meisterwerk" paragraph: `schneller als ein IBM PC` where the TSV has `schneller, als man es einem 8-Biter zutrauen würde`. A mechanical diff would have flagged every fabricated word.
+Four independent extraction runs (v1, v2, v3, v4) on the same issue all produced text that violated the anti-memory and typo-preservation rules despite those rules being prominently documented:
+- **v2, v3, and v4** all "corrected" the printed typo `Benutzeroberfäche` → `Benutzeroberfläche`. The TSV has `Benutzeroberfäche`. Phase 3.5 flagged it in v4 — but without 3.5b the agent ignored the flag.
+- **v3** fabricated ~50 words in the "Geos — ein Meisterwerk" paragraph: `schneller als ein IBM PC` where the TSV has `schneller, als man es einem 8-Biter zutrauen würde`. A mechanical diff would have flagged every fabricated word; auto-revert would have restored the TSV text.
 
-The rules alone are not sufficient. LLM training-data bias overrides explicit instructions when the "correct" form is strongly expected. Only a mechanical post-check catches it.
+The rules alone are not sufficient. LLM training-data bias overrides explicit instructions when the "correct" form is strongly expected. Flagging alone is not sufficient either — v4 proved that agents ignore their own flags. Only **mechanical auto-revert** closes the loop.
 
 ## Phase 4 — Article stitching (byte-level concatenation)
 
@@ -529,6 +553,18 @@ Two classes of edit:
    Again: one `Edit` call per boundary. The `Edit` tool is a literal string-replace, which is exactly the anti-memory-safe operation: you can only match what's already in the file, and you write only what you specify verbatim.
 
 3. **Strip remaining page comments.** After all joins are applied, any `<!-- page NNN -->` marker that survived (at clean paragraph breaks) should be removed by one more Edit per marker. Two or three Edits typically suffice for a multi-page article.
+
+4. **Verify: grep for residual unjoined hyphens and missing drop caps.** After all Phase 5 edits, run:
+   ```bash
+   grep -nE '\-</p>$' article_NNN.html    # trailing hyphen at paragraph end = missed join
+   grep -nE '^<p[^>]*>[a-z]' article_NNN.html  # paragraph starting lowercase = missed merge or drop cap
+   ```
+   Each hit is either:
+   - A cross-page hyphen Phase 5 missed → apply the join now.
+   - A drop cap the Phase 3 agent missed (e.g. `reitag,` for `Freitag,`) → restore the capital letter from the page image via a sub-agent Read of the block crop. One character, bounded.
+   - A legitimate mid-article continuation fragment that Phase 5 already merged but the lowercase is inside the `<p>` (false positive) → ignore.
+
+   Do NOT skip this grep. v4 left `aller-letzter`, `wer-den`, and `reitag,` in final output because Phase 5 only processed cross-page boundaries and missed within-page unjoined hyphens that Phase 3 should have caught.
 
 When both signals conflict at a boundary (hyphen at end but next word is capitalized), log in `LOG.md` and leave alone — a human reviewer decides.
 
