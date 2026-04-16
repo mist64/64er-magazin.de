@@ -2,6 +2,43 @@
 
 How to extract the main text flow of every article from a 1980s "64'er" magazine issue as plain HTML (`<h1>`, `<h2>`, `<p class="intro">`, `<p>`). **Body text only** — no figures, tables, listings, page headers, page footers, metadata, or author lines. Those are bolted on by other workflows (`img_workflow.md`, `table_workflow.md`, `prg_workflow.md`, `toc_title_workflow.md`, `index_workflow.md`).
 
+## How to run
+
+Point the agent at this file and provide three parameters:
+
+```
+Extract body text for issue YYMM per tools/llm/new/body_workflow.md.
+Scans: <path to NNN_600_cropped.png files>
+Pages: 1..NNN
+Output: issues/YYMM/_work/
+```
+
+**Inputs required:**
+- **Page scans**: 600 DPI cropped master PNGs, one per magazine page. Filename pattern: `NNN_600_cropped.png` (NNN = zero-padded page number).
+- **Page count**: total number of pages in the issue.
+- **Output directory**: `issues/YYMM/_work/`. The agent creates it, with `pNNN/` subdirectories per page and `articles/` for stitched output.
+
+**Final deliverable:** one file per article at `_work/articles/article_NNN.html` (NNN = start page). Each file contains `<h1>`, `<h2>`, `<aside>`, `<p>`, `<p class="intro">`, `<p class="source">`, and optional `<p class="noindent">` / inline `<strong>`, `<em>`, `<sub>`, `<sup>`. No `<html>` wrapper, no metadata, no article shell — body text fragment only.
+
+**Forbidden inputs:**
+- `issues/YYMM/YYMM.md` or any pre-existing transcription file — never read it.
+- Any `_work*/` directories from prior extraction runs — must not influence this run.
+
+**Execution:** proceed without asking for confirmation. Parallelize aggressively — spawn sub-agents for Phase 1 (batches of 10-15 pages) and Phase 3 (one per body page). Phase 2 is tesseract (script). Phases 4-5 are `cat` + `Edit`.
+
+**Expect:** ~50-60% of pages are body pages. ~30-50 articles per issue. Multi-hour job.
+
+**Pay special attention to:**
+- The h1 vs h2 distinction (CRITICAL RULE #1 below). A prominent heading on a continuation page is almost always an h2, not a new article. Check whether body text precedes it on the same page.
+- Never correcting typos or adding punctuation (CRITICAL RULE #2). The scan wins, your expectations lose.
+- Mixed pages (~10% of body pages). After classifying all pages, verify that no article ends mid-sentence without a continuation.
+
+**Report at the end with:**
+- Count and list of articles (start page + title).
+- Any `[OCR-GAP]` markers.
+- Any mixed pages, graphic titles, Texteinschübe, or jump pointers ("Fortsetzung auf Seite N").
+- No text excerpts — structural report only.
+
 ## CRITICAL RULES (read before anything else)
 
 **1. NEVER promote an h2 section heading to h1 (new article).** An article is a single continuous editorial piece that starts with a title, runs across 1-10 pages, and ends with a byline or clean section break. Within that article, section headings (`<h2>`) divide the text into sub-topics. These h2 headings can be just as large and prominent as article titles — **do not mistake them for article starts.** If body text from the current article appears ABOVE a heading on the same page, that heading is an h2, not an h1. See "Distinguishing h1 from h2" below.
