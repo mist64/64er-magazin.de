@@ -420,14 +420,62 @@ Rules:
 - If OCR is clearly missing text (gap in reading order, paragraph ends mid-sentence with no continuation visible in any following block), emit a `<p>[OCR-GAP]</p>` marker rather than composing plausible German. A reviewer will fill it in by hand.
 - If the agent sees text on the page that no OCR block captured (Tesseract missed a paragraph entirely), log the page to `LOG.md` and emit `[OCR-GAP]`. Do not transcribe from vision — that bypasses the "OCR → file → read → small edit" discipline.
 
+## Phase 3.5 — TSV verification (script, mandatory)
+
+After Phase 3 produces `page_NNN.html` for every body page, run a **mechanical verification** that diffs each page's output against the raw TSV. This catches two failure modes that the workflow rules forbid but agents violate anyway:
+
+1. **Hallucinated text** — words in the HTML that don't exist in the TSV. The agent composed them from context instead of extracting from OCR.
+2. **Silently corrected typos** — words in the HTML that differ from the TSV by more than the allowed character-level fixes (whitespace, single-char sub, umlaut, drop cap).
+
+### Procedure
+
+For each `page_NNN.html`:
+
+```bash
+# Extract words from the HTML output (strip tags)
+sed 's/<[^>]*>//g' _work/pNNN/page_NNN.html | tr -s '[:space:]' '\n' | grep -v '^$' | sort -u > /tmp/html_words.txt
+
+# Extract words from the TSV (level=5 rows only)
+awk -F'\t' '$1==5 && $12!="" {print $12}' _work/pNNN/page.tsv | sort -u > /tmp/tsv_words.txt
+
+# Words in HTML but not in TSV — candidates for hallucination or typo correction
+comm -23 /tmp/html_words.txt /tmp/tsv_words.txt > /tmp/novel_words.txt
+```
+
+Most entries in `novel_words.txt` are legitimate: cross-line hyphen rejoins (`Programmser` + `vice` → `Programmservice`), drop-cap restorations (`reitag` → `Freitag`), whitespace-joined compounds (`dasalle` → `das` + `alle` — the joined form was already both words). These are fine.
+
+**Flag for human review** any novel word that:
+- Is a complete German word or phrase not derivable from any TSV token by the allowed fixes (e.g. `IBM PC` appearing where TSV has `8-Biter`)
+- Differs from a TSV word by more than one character AND the change is not whitespace/umlaut/drop-cap (e.g. TSV has `Benutzeroberfäche`, HTML has `Benutzeroberfläche` — that's an `l` insertion, not a single-char substitution)
+
+Write flagged words to `_work/pNNN/verify_flags.txt`. If any page has flags, it needs manual review before the article is considered done.
+
+### Why this step exists
+
+Three independent extraction runs (v1, v2, v3) on the same issue all produced text that violated the anti-memory and typo-preservation rules despite those rules being prominently documented:
+- **v2 and v3** both "corrected" the printed typo `Benutzeroberfäche` → `Benutzeroberfläche`. The TSV has `Benutzeroberfäche`. A mechanical diff would have caught this instantly.
+- **v3** fabricated ~50 words in the "Geos — ein Meisterwerk" paragraph: `schneller als ein IBM PC` where the TSV has `schneller, als man es einem 8-Biter zutrauen würde`. A mechanical diff would have flagged every fabricated word.
+
+The rules alone are not sufficient. LLM training-data bias overrides explicit instructions when the "correct" form is strongly expected. Only a mechanical post-check catches it.
+
 ## Phase 4 — Article stitching (byte-level concatenation)
 
 **Phase 4 MUST be byte-level `cat`, not LLM generation.** Do not regenerate article content via the Write tool — the LLM will silently drift (auto-correct OCR artifacts, fill gaps, smooth punctuation) and that is a direct violation of the anti-memory rule.
 
 Correct procedure:
 
-1. Identify the per-page files that belong to one article (from Phase 1 `kind` + page sequence + any `jump_to` pointers in `page_meta.txt`).
-2. Concatenate them in reading order with `cat`:
+1. **Build the article→pages map.** Walk pages in order. Each `article_start` opens a new article; following `continuation` pages belong to it until the next `article_start`, `ad`, or `rubric`. For `mixed` pages, split the page's content between the ending article and the starting article.
+
+2. **Handle jumps ("Fortsetzung auf Seite N").** Some articles jump over ads/other content to continue on a later page. Detection:
+   - **Grep all per-page HTML for "Fortsetzung auf Seite"** — this is a printed navigation marker. The target page number tells you where to look.
+   - **Grep all page_meta.txt for `jump_to:` / `jump_from:`** if Phase 1 captured these.
+   - **Check for mid-sentence endings** at article boundaries: if an article's last page ends without terminal punctuation and the next page belongs to a different article, the original article probably jumps somewhere. Search later pages (by running header match or body-text continuity) for the continuation.
+   
+   When a jump is found, **include the target page(s) in the source article's page list**, not in whatever article the target page was adjacent to by page number. Example: Der Neue (p19-24) jumps to p43 bottom → article_019 includes p19-24 + p43 (bottom half). The Datenbanken article on p43 top gets its own extraction.
+
+   **Drop the "Fortsetzung auf/von Seite N" marker lines** from the HTML output — they are navigation, not body text.
+
+3. Concatenate in reading order with `cat`:
    ```bash
    cat _work/p019/page_019.html \
        _work/p020/page_020.html \
