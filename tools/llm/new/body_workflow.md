@@ -368,15 +368,45 @@ Task:
    
    Both of these are LLM-training-data bias overriding the scan evidence. When in doubt: **the scan wins, your expectations lose.**
 
-   Recurring **legitimate** OCR fix patterns in 64'er OCR (from `tools/png2mag/WORKFLOW.md`):
-   - `»I«` → `»l«` (uppercase I misread for lowercase L in switch positions)
-   - `$1` / `Sl` / `S]` → `S1`
-   - `ı` → `i` (Turkish dotless i bleed)
-   - `abgeschaltetistund` → `abgeschaltet ist und` (compound word spacing)
-   - `rn` ↔ `m`, `cl` ↔ `d`, `1` ↔ `l` ↔ `I`, `O` ↔ `0`
-   - `©` → `C`
-   - Preserve old German spelling (`daß`, `muß`, `läßt`, `ß`) — do NOT modernize
-   - Preserve original typos (historical record)
+   Recurring **legitimate** OCR fix patterns in 64'er magazines:
+
+   **Single-character substitutions** (the core of OCR correction):
+   - `1` ↔ `l` ↔ `I` — the #1 OCR error. Affects: `(Listing ])` → `(Listing 1)`, `(Bild ])` → `(Bild 1)`, `C 64 l` → `C 64 I`, `Fl-Taste` → `F1-Taste`, `S]` → `S1`
+   - `O` ↔ `0` — `$FICA` → `$F1CA`, `rO` → `r0`, `(Bild O)` → `(Bild 0)` or vice versa
+   - `rn` ↔ `m` — `Cornrnodore` → `Commodore`, `Programrn` → `Programm`
+   - `cl` ↔ `d` — `Mecdika-` → `Medika-`
+   - `ı` → `i` — Turkish dotless bleed from 600→300 DPI downscale
+   - `©` → `C` — tesseract reads the Commodore "C" as copyright symbol on nearly every page. `© 64` → `C 64`, `© 128` → `C 128`. Expect 5-20 of these per page.
+   - `»` / `«` mangling — guillemets become `>>`, `<<`, `„`, `"`, `$`, or vanish. Verify each against the pixel crop. If the pixel shows a guillemet, restore it.
+
+   **Drop caps** — the first letter of many article/section openings is a large decorative capital. Tesseract either misses it entirely or places it in a separate block. Symptoms:
+   - First word starts lowercase mid-word: `reitag,` (should be `Freitag,`), `ommodore` (should be `Commodore`), `ieht` (should be `Sieht`), `ndlich` (should be `Endlich`)
+   - First word is missing its initial: `as` (should be `Das`), `in` (should be `Ein`)
+   
+   Fix: read the drop cap from the pixel crop of the block. This is a single character — bounded, pixel-verifiable. If the drop cap is in a separate TSV block (level=5 row with just one large character), use that block's text.
+
+   **Compound word spacing** — tesseract frequently merges adjacent words:
+   - `dasalle` → `das alle`, `gibtes` → `gibt es`, `aufder` → `auf der`
+   - `Computergeschäften` might be a real compound OR `Computer- Geschäften` merged across a line break — check the TSV for a hyphen at line end
+
+   **Screenshot / listing / figure text bleeding into body blocks:**
+   - Tesseract captures text from screenshots (menu items like "choose printer", "alarm clock"), BASIC listings (line numbers, DATA statements), and figure labels alongside body text.
+   - Filter by **position**: if a block or word cluster sits inside a figure region (large bbox, low word count, high-`x_fsize` mismatch) or has monospaced-looking content (hex addresses, BASIC keywords), drop it.
+   - Filter by **content pattern**: lines matching `^[0-9]+ (REM|DATA|PRINT|GOTO|GOSUB|IF|FOR|NEXT|POKE|SYS|READ)` are BASIC listings. Lines matching `^[0-9a-f]{4} :` are hex dumps. Drop both.
+
+   **Column reading order reconstruction:**
+   - Tesseract's `--psm 1` auto-segmenter frequently gets column order wrong when images interrupt the column flow. Body text jumps from col 3 back to col 1.
+   - Fix: sort body blocks by column assignment (left x-coordinate → column bucket) then by top y-coordinate within each column. Columns read left → right. For a 2-column page at 300 DPI, the midpoint is ~1240px; for 3-column ~830/1660; for 4-column ~620/1240/1860.
+   - When a paragraph crosses a column break (last word in col 1, first word in col 2), the TSV will show the words in two different blocks with different x-coordinates but sequential y-coordinates at the column boundary. Join them.
+
+   **Massive single-block spanning multiple columns:**
+   - Occasionally tesseract produces one block with 1000+ words that spans the entire page width. The words inside are still position-tagged in the TSV, so you can split them by x-coordinate into columns.
+   - Use the same column-bucketing as above, but applied within the block's word list rather than across blocks.
+
+   **Preserve unconditionally:**
+   - Old German spelling (`daß`, `muß`, `läßt`, `ß`) — do NOT modernize
+   - Original typos (historical record)
+   - Printed punctuation exactly as OCR'd (no adding or removing periods, commas, quotes)
 
 5. **Retry tesseract on garbled blocks.** When a body block's OCR is garbled, missing, or clearly wrong (confidence <30, nonsense character sequences, block merged with adjacent column/listing), do NOT transcribe from vision. Instead, re-run tesseract on a tighter crop:
 
