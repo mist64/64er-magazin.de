@@ -290,12 +290,55 @@ awk -F'\t' 'NR>1 && $1==5 && $12!="" {
 END {
   for (b in text) printf "block=%02d bbox=%dx%d+%d+%d nw=%d %s\n",
     b, maxR[b]-minL[b], maxB[b]-minT[b], minL[b], minT[b], n[b], substr(text[b],1,120)
-}' _work/pPPP/page.tsv | sort > _work/pPPP/blocks.txt
+}' _work/pPPP/page.tsv | LC_ALL=C sort > _work/pPPP/blocks.txt
 ```
 
-### Scratch location
+### Environment notes
 
-All intermediates live in `issues/NNNN/_work/pPPP/` — **not** `/tmp/`. Tesseract sandboxing on macOS can't read `/tmp/` reliably.
+- **`LC_ALL=C` on all sort/awk commands.** German text with umlauts causes `Illegal byte sequence` errors on macOS without it. Use `LC_ALL=C sort` and `LC_ALL=C awk` everywhere. Silent data loss otherwise — blocks.txt comes out empty.
+- **Scratch location:** all intermediates live in `issues/NNNN/_work/pPPP/` — **not** `/tmp/`. Tesseract sandboxing on macOS can't read `/tmp/` reliably.
+- **ImageMagick on macOS Homebrew has no Freetype.** Do not try to draw text labels on overview images with `-font Helvetica` — it silently fails. Use block numbers from blocks.txt instead.
+
+### Quick listing-page detection
+
+~15% of pages are pure hex dumps or BASIC listings with zero body prose. Detect them early to skip Phase 3:
+
+```bash
+# After Phase 2, check if >80% of words are hex/numeric/BASIC keywords
+total=$(awk -F'\t' '$1==5 && $12!=""' _work/pPPP/page.tsv | wc -l)
+hexlike=$(awk -F'\t' '$1==5 && $12!="" && $12 ~ /^[0-9a-fA-F.:;$+\-*\/()]+$/' _work/pPPP/page.tsv | wc -l)
+ratio=$((hexlike * 100 / total))
+# If ratio > 80, it's a listing page — emit stub and skip Phase 3
+```
+
+Also check blocks.txt: if the largest block has >500 words and text preview starts with hex addresses (`a730 : Ze 85 fe`) or BASIC line numbers (`10 REM`, `100 DATA`), it's a listing page.
+
+### News roundup pages (Aktuelles, Neue Produkte)
+
+Some pages contain multiple short news items under a rubric header like "Aktuelles" or "Neue Produkte". Each item has its own bold sub-heading and sometimes its own byline. These are NOT separate articles — they are **one article** (the news roundup) with many `<h2>` sections. Treat the rubric page header as the `<h1>` and each news item heading as `<h2>`.
+
+Exception: if an item spans multiple pages and has its own intro paragraph + decorative opener, it may be a standalone article that happens to sit in the Aktuelles section. Use the h1/h2 distinction rules above.
+
+### Continuation across ad breaks without "Fortsetzung"
+
+Some articles span non-contiguous pages with ads in between but NO explicit "Fortsetzung auf Seite N" marker. Detection:
+- Article page N ends without terminal punctuation.
+- Page N+1 is an ad.
+- Page N+2 has the same running header as page N and starts with a lowercase continuation or `<p class="noindent">`.
+
+In this case, page N+2 is a continuation of the article from page N, not a new article. The ad simply interrupts.
+
+### Orchestration guidance
+
+**Phase 1 batching:** 10-15 pages per sub-agent call. Each reads thumbnails and writes page_meta.txt. ~12 batched calls cover 184 pages. Run them in parallel (up to 8 concurrent to avoid rate limits).
+
+**Phase 2:** run tesseract on all body pages. Use parallel Bash calls (up to 20 per message) or a single background script. ~90 pages × ~5 seconds = ~8 minutes serial, ~1 minute with 10-way parallelism.
+
+**Phase 3:** one sub-agent per body page, up to 8 concurrent. Each takes 2-5 minutes. ~90 pages / 8 = ~12 waves = ~30-60 minutes wall clock. This is the bottleneck.
+
+**Phase 3.5:** script, runs in seconds. No agents needed.
+
+**Phase 4+5:** main thread, ~1 minute per article for cat + Edit. ~40 articles = ~40 minutes.
 
 ## Phase 3 — Reconciler agent (one per non-skip page)
 
