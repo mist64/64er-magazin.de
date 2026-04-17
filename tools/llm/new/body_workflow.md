@@ -378,7 +378,28 @@ Task:
    - Preserve old German spelling (`daß`, `muß`, `läßt`, `ß`) — do NOT modernize
    - Preserve original typos (historical record)
 
-5. **Join broken paragraphs.** Tesseract often splits one paragraph into multiple blocks at column breaks. Join when the first character of the next block is lowercase and the previous block ended without terminal punctuation.
+5. **Retry tesseract on garbled blocks.** When a body block's OCR is garbled, missing, or clearly wrong (confidence <30, nonsense character sequences, block merged with adjacent column/listing), do NOT transcribe from vision. Instead, re-run tesseract on a tighter crop:
+
+   ```bash
+   # Crop the block region from the 600 DPI source (bbox from blocks.txt, coords ×2 for 600 DPI)
+   magick <source>/PPP_600_cropped.png -crop WxH+X+Y +repage _work/pPPP/retry_NN.png
+
+   # Re-run tesseract with a simpler page-segmentation mode
+   tesseract _work/pPPP/retry_NN.png _work/pPPP/retry_NN -l deu --psm 6 tsv
+   ```
+
+   PSM modes to try:
+   - `--psm 6` (single uniform block) — best for dense body text that auto-segmenter mangled
+   - `--psm 4` (single column) — for narrow columns or text squeezed beside an image
+   - `--psm 3` (fully automatic, no OSD) — alternative to the default `--psm 1`
+
+   Use the **600 DPI source** for retry crops, not the 300 DPI downscale — more detail helps on small or dense text. Multiply the 300-DPI bbox coordinates by 2 to get 600-DPI crop coordinates.
+
+   If the retry still produces garbage, emit `[OCR-GAP]`. Never fall back to vision transcription of body text — that bypasses the entire OCR verification discipline.
+
+   **Calibration:** in v1 testing, the p030 agent successfully recovered a drop-cap paragraph that `--psm 1` missed by re-running with `--psm 6` on a 600×500 crop. The retry text was clean OCR, not vision composition.
+
+6. **Join broken paragraphs.** Tesseract often splits one paragraph into multiple blocks at column breaks. Join when the first character of the next block is lowercase and the previous block ended without terminal punctuation.
 
 6. **Emit the page HTML**:
 
