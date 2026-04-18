@@ -468,9 +468,11 @@ Task:
 
    Use the **600 DPI source** for retry crops, not the 300 DPI downscale — more detail helps on small or dense text. Multiply the 300-DPI bbox coordinates by 2 to get 600-DPI crop coordinates.
 
+   **Persist retry TSV.** Save the retry output as `_work/pPPP/retry_NN.tsv` alongside `page.tsv`. Phase 3.5 verification needs BOTH files — the original `page.tsv` and any `retry_*.tsv` files — to build the complete word list. Without persisted retry TSV, Phase 3.5 flags every retry-recovered word as "novel" and auto-revert destroys legitimate recoveries.
+
    If the retry still produces garbage, emit `[OCR-GAP]`. Never fall back to vision transcription of body text — that bypasses the entire OCR verification discipline.
 
-   **Calibration:** in v1 testing, the p030 agent successfully recovered a drop-cap paragraph that `--psm 1` missed by re-running with `--psm 6` on a 600×500 crop. The retry text was clean OCR, not vision composition.
+   **Calibration:** in v1 testing, the p030 agent successfully recovered a drop-cap paragraph that `--psm 1` missed by re-running with `--psm 6` on a 600×500 crop. The retry text was clean OCR, not vision composition. In 8605 v1, the p158 agent violated this rule and read body from pixels — LOG.md flagged it, but Phase 3.5 could not auto-revert because no retry TSV existed.
 
 6. **Join broken paragraphs.** Tesseract often splits one paragraph into multiple blocks at column breaks. Join when the first character of the next block is lowercase and the previous block ended without terminal punctuation.
 
@@ -537,14 +539,17 @@ For each `page_NNN.html`:
 
 ```bash
 # Extract words from the HTML output (strip tags)
-sed 's/<[^>]*>//g' _work/pNNN/page_NNN.html | tr -s '[:space:]' '\n' | grep -v '^$' | sort -u > /tmp/html_words.txt
+sed 's/<[^>]*>//g' _work/pNNN/page_NNN.html | tr -s '[:space:]' '\n' | grep -v '^$' | LC_ALL=C sort -u > /tmp/html_words.txt
 
-# Extract words from the TSV (level=5 rows only)
-awk -F'\t' '$1==5 && $12!="" {print $12}' _work/pNNN/page.tsv | sort -u > /tmp/tsv_words.txt
+# Extract words from the original TSV AND any retry TSVs (level=5 rows only)
+cat _work/pNNN/page.tsv _work/pNNN/retry_*.tsv 2>/dev/null | \
+  awk -F'\t' '$1==5 && $12!="" {print $12}' | LC_ALL=C sort -u > /tmp/tsv_words.txt
 
-# Words in HTML but not in TSV — candidates for hallucination or typo correction
+# Words in HTML but not in any TSV — candidates for hallucination or typo correction
 comm -23 /tmp/html_words.txt /tmp/tsv_words.txt > /tmp/novel_words.txt
 ```
+
+The `cat ... retry_*.tsv` is critical: when Phase 3 retries tesseract on garbled blocks, the retry output goes into `retry_NN.tsv`. Without including these, every retry-recovered word gets flagged as "novel" and auto-revert destroys legitimate content.
 
 Most entries in `novel_words.txt` are legitimate: cross-line hyphen rejoins (`Programmser` + `vice` → `Programmservice`), drop-cap restorations (`reitag` → `Freitag`), whitespace-joined compounds (`dasalle` → `das` + `alle` — the joined form was already both words). These are fine.
 
