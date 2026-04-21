@@ -61,39 +61,114 @@ For every editorial article in the issue, produce a per-article HTML fragment co
 
 Article boundaries are **derived** from per-page vision classification. No TOC, no CSV, no running-header clustering. A page is either an article start (has a title), a continuation, an ad, or a rubric page.
 
-## Why a three-phase hybrid
+## Why a three-engine hybrid
 
-Tesseract and vision agents have different strengths. Using each where it shines keeps cost low and accuracy high.
+Three tools, each used where it shines:
 
 | Concern | Tool | Why |
 |---|---|---|
-| Bulk body text (long running prose) | **tesseract** | Efficient, deterministic, handles German with `-l deu`, produces paragraph markers |
-| Article title, even when stylized / overlaid on hero image | **vision agent** | Stylized / graphic titles are invisible to OCR; tesseract misses them entirely |
-| Intro / lead paragraph (bold, different typography) | **vision agent** | Visual style separates intro from body — tesseract can't see style |
-| In-article section headings (`<h2>`) | **hOCR font-class + vision agent** | Two kinds: standalone-block headings detectable via `x_fsize`, inline bold headings detectable only via pixels |
-| Page classification (article_start / continuation / ad / rubric) | **vision agent** | Structural judgment needs visual layout, not text content |
-| OCR error correction against pixels | **vision agent** | Pixel ground truth fixes `1/l/I`, `O/0`, `rn/m`, Turkish dotless `ı` bleed |
-| Caption / header / footer / ad filtering | **vision agent** (pattern + position) | Purely mechanical; agent handles it as part of Phase 3 |
+| **Layout detection + reading order** | **PPStructureV3** (PaddleOCR) | Detects text blocks, images, headers, footers, captions, section titles. Assigns `order_index` for correct column reading order. Solves the #1 Tesseract failure (column jumbling). |
+| **Word-level OCR + bboxes** | **Tesseract** | Word-level TSV with `(block, par, line, word)` hierarchy. German `deu` model handles old spelling (daß, muß). hOCR gives font-class info. Phase 3.5 verification needs word-level granularity. |
+| **Stylized titles + inline formatting + OCR correction** | **Vision agent** | Graphic titles invisible to both OCR engines. Bold/italic detection. Pixel-level correction of OCR errors. Drop-cap recovery. |
 
-**Font size is NOT a reliable title signal** (calibration data from issue 8606):
-- Running "C 64" rubric header: fsize ~70
-- Section heading inside body ("Der kleine Bruder des C 128"): fsize ~56
-- Ad headline ("Neu. ATARI 260 ST."): fsize ~271 — **bigger than most titles**
-- Real article title ("Der Neue"): rendered as stylized graphic overlay on hero photo — **fsize = none, OCR captures nothing**
+### What PPStructureV3 provides that replaces vision-agent work
 
-Ads can have bigger fsize than real titles. Real titles can be pixels-only with no fsize at all. Abandon fsize heuristics. Let vision decide.
+PPStructureV3 (`from paddleocr import PPStructureV3`) runs layout detection + OCR per block and returns:
 
-## Three-phase pipeline
-
-```
-Phase 1  agent (vision)     per page    →  page_meta.json  (kind, title, intro)
-Phase 2  script (tesseract) per page    →  body_raw.tsv    (all OCR blocks + bboxes)
-Phase 3  agent (vision+text) per page   →  page_NNN.html   (h1 + intro + body)
-Phase 4  script                         →  article_NNN.html (walks page_NNN.html, stitches)
-Phase 5  script                         →  cross-page dehyphenation + paragraph merges
+```python
+s = PPStructureV3(lang="german")
+for result in s.predict(page_image):
+    for block in result["parsing_res_list"]:
+        block.order_index   # reading order (int, or None for non-text)
+        block.label         # "text", "paragraph_title", "image", "figure_title",
+                            # "header", "footer", "number"
+        block.bbox          # [x1, y1, x2, y2]
+        block.content       # OCR text for this block
 ```
 
-Phases 1 and 3 are vision agent passes. Phase 2 is a plain script. Phases 4 and 5 are pure text work on the main thread.
+**Calibration on issue 8606 p023** (4-column page with screenshots):
+- 14 text blocks with correct column reading order (col1→col2→col3→col4)
+- `paragraph_title` label correctly identified "Zwei Programme gratis" (h2)
+- Images, captions, headers, footers labeled and separated
+- `Benutzeroberfäche` preserved (typo in original)
+- `daß`, `muß` handled correctly
+
+This mechanically replaces:
+- **Phase 1 page classification** — `header`/`footer`/`image`/`text` labels + presence of `paragraph_title` blocks distinguish article_start from continuation
+- **Phase 3 column reconstruction** — `order_index` gives correct reading order
+- **Phase 3 h2 detection** — `paragraph_title` label
+- **Phase 3 non-body filtering** — `image`/`figure_title`/`header`/`footer`/`number` labels
+
+**PPStructureV3 does NOT replace:**
+- **Stylized/graphic title reading** — still needs vision agent for image-rendered titles
+- **Word-level OCR** — PPStructureV3 gives block-level text, not word-level bboxes. Tesseract still needed for Phase 3.5 word-diff verification.
+- **Inline formatting** (`<strong>`, `<em>`) — still needs vision agent
+- **OCR error correction** — still needs vision agent for character-level fixes
+
+### Dependencies
+
+```bash
+# In a Python 3.10-3.12 venv (Python 3.13+ not yet supported by PaddlePaddle):
+pip install paddleocr paddlepaddle
+```
+
+PPStructureV3 downloads ~500MB of models on first run. Subsequent runs use cached models.
+
+## Pipeline
+
+```
+Phase 0  script (PPStructureV3)  per page  →  layout.json  (blocks + reading order + labels)
+Phase 1  agent (vision)          per page  →  page_meta.txt (kind, title bbox, intro bbox)
+Phase 2  script (tesseract)      per block →  block_NNN.tsv (word-level OCR within each text block)
+Phase 3  agent (vision+text)     per page  →  page_NNN.html (h1 + intro + body)
+Phase 3.5 script                            →  verify_flags.txt (TSV word diff)
+Phase 4  script                             →  article_NNN.html (cat)
+Phase 5  script                             →  cross-page dehyphenation + paragraph merges
+```
+
+Phase 0 is new (PPStructureV3 layout detection). Phase 2 now runs Tesseract per PPStructure block (not per page), which avoids the column-jumbling problem entirely. Phases 1, 3, 4, 5 are similar but simpler because layout is already solved.
+
+## Phase 0 — Layout detection (PPStructureV3, script)
+
+For every page:
+
+```python
+from paddleocr import PPStructureV3
+import json
+
+s = PPStructureV3(lang="german")
+
+for result in s.predict(page_300_path):
+    blocks = []
+    for b in result["parsing_res_list"]:
+        blocks.append({
+            "order": b.order_index,
+            "label": b.label,
+            "bbox": [int(x) for x in b.bbox],
+            "content": b.content  # PPStructure's own OCR (backup, not primary)
+        })
+    with open(layout_json_path, "w") as f:
+        json.dump(blocks, f, ensure_ascii=False, indent=2)
+```
+
+Output: `_work/pPPP/layout.json` per page.
+
+### What Phase 0 gives downstream phases
+
+- **Phase 1** reads `layout.json` to classify the page: presence of `paragraph_title` blocks = `article_start`; only `text` blocks = `continuation`; only `image`/`header` = `ad` or `rubric`. Phase 1 vision agent still needed for graphic titles and intro detection, but layout.json handles 80% of classification mechanically.
+
+- **Phase 2** iterates over `layout.json` blocks with `label == "text"` or `label == "paragraph_title"`. For each block, crops the bbox from the 600 DPI source and runs Tesseract with `--psm 6` (single block mode). This eliminates Tesseract's column-jumbling entirely — each block is a single-column region. Output: `_work/pPPP/block_NN.tsv` per text block.
+
+- **Phase 3** uses `order_index` for reading order instead of reconstructing columns from bbox coordinates. Uses `paragraph_title` labels for h2 detection instead of `x_fsize` heuristics. Vision agent focuses on what it's good at: inline formatting, OCR correction, graphic titles.
+
+### PPStructure's OCR vs Tesseract — use both
+
+PPStructureV3 runs its own OCR internally (stored in `block.content`). This is **backup text**, not the primary source. Tesseract remains primary because:
+1. Word-level bboxes (Phase 3.5 verification needs them)
+2. Better German old-spelling model
+3. Deterministic output for diffing
+
+But PPStructure's `block.content` serves as a **second opinion**: if Tesseract and PPStructure agree on a word, high confidence. If they disagree, flag for Phase 3 vision verification. This mechanically catches the `Benutzeroberfäche` dispute — if both engines say `oberfäche`, it's the print; if one says `oberfläche`, flag it.
 
 ## Phase 1 — Vision overview (one sub-agent per page)
 
@@ -255,20 +330,32 @@ Phase 1 emits no transcribed text for title or intro — only `source: ocr|graph
 
 Neither of these leaks into article HTML, so even a misread rubric name or note description has zero effect on final output.
 
-## Phase 2 — Tesseract body extraction (script)
+## Phase 2 — Tesseract per-block OCR (script)
 
-For every page where Phase 1 said `article_start` or `continuation` (skip ads, rubrics, others):
+For every page where Phase 0 produced text blocks in `layout.json`:
+
+```bash
+# For each text/paragraph_title block in layout.json:
+# 1. Crop the block region from the 600 DPI source (bbox ×2 for 600 DPI coords)
+magick <source>/PPP_600_cropped.png +repage -crop WxH+X+Y +repage _work/pPPP/block_NN.png
+
+# 2. Run Tesseract in single-block mode on the crop
+tesseract _work/pPPP/block_NN.png _work/pPPP/block_NN -l deu --psm 6 -c hocr_font_info=1 tsv hocr
+```
+
+**Key change from the original per-page approach:** Tesseract now runs with `--psm 6` (single uniform block) on each PPStructure block crop, not `--psm 1` (auto page segmentation) on the full page. This eliminates the column-jumbling problem entirely — each crop is a single-column region, so Tesseract can't get the reading order wrong.
+
+Also run Tesseract once on the full page with `--psm 1` to get `page.tsv` as a backup for Phase 3.5 verification:
 
 ```bash
 magick <source>/PPP_600_cropped.png -resize 50% _work/pPPP/page_300.png
-tesseract _work/pPPP/page_300.png _work/pPPP/page \
-    -l deu --psm 1 -c hocr_font_info=1 tsv hocr
+tesseract _work/pPPP/page_300.png _work/pPPP/page -l deu --psm 1 -c hocr_font_info=1 tsv hocr
 ```
 
-Outputs:
-- `_work/pPPP/page_300.png` — downscaled page
-- `_work/pPPP/page.tsv` — word-level OCR with bboxes
-- `_work/pPPP/page.hocr` — hOCR with font sizes (optional, for debug)
+Outputs per page:
+- `_work/pPPP/layout.json` — from Phase 0
+- `_work/pPPP/block_NN.png` + `block_NN.tsv` + `block_NN.hocr` — per text block
+- `_work/pPPP/page_300.png` + `page.tsv` + `page.hocr` — full-page backup
 
 ### Why 600 → 300 DPI
 
@@ -541,15 +628,26 @@ For each `page_NNN.html`:
 # Extract words from the HTML output (strip tags)
 sed 's/<[^>]*>//g' _work/pNNN/page_NNN.html | tr -s '[:space:]' '\n' | grep -v '^$' | LC_ALL=C sort -u > /tmp/html_words.txt
 
-# Extract words from the original TSV AND any retry TSVs (level=5 rows only)
-cat _work/pNNN/page.tsv _work/pNNN/retry_*.tsv 2>/dev/null | \
+# Extract words from ALL TSV sources: per-block TSVs, full-page TSV, retry TSVs
+cat _work/pNNN/block_*.tsv _work/pNNN/page.tsv _work/pNNN/retry_*.tsv 2>/dev/null | \
   awk -F'\t' '$1==5 && $12!="" {print $12}' | LC_ALL=C sort -u > /tmp/tsv_words.txt
+
+# Extract words from PPStructure's own OCR (second opinion)
+python3.12 -c "import json; blocks=json.load(open('_work/pNNN/layout.json'));
+[print(w) for b in blocks if b.get('content') for w in b['content'].split()]" 2>/dev/null | \
+  LC_ALL=C sort -u > /tmp/paddle_words.txt
 
 # Words in HTML but not in any TSV — candidates for hallucination or typo correction
 comm -23 /tmp/html_words.txt /tmp/tsv_words.txt > /tmp/novel_words.txt
+
+# Cross-check novel words against PPStructure — if PPStructure also has the word, lower concern
+comm -12 /tmp/novel_words.txt /tmp/paddle_words.txt > /tmp/novel_confirmed_by_paddle.txt
+comm -23 /tmp/novel_words.txt /tmp/paddle_words.txt > /tmp/novel_unconfirmed.txt
+# novel_unconfirmed.txt = high-priority flags (neither Tesseract nor PPStructure has the word)
+# novel_confirmed_by_paddle.txt = medium-priority (PPStructure agrees but Tesseract doesn't)
 ```
 
-The `cat ... retry_*.tsv` is critical: when Phase 3 retries tesseract on garbled blocks, the retry output goes into `retry_NN.tsv`. Without including these, every retry-recovered word gets flagged as "novel" and auto-revert destroys legitimate content.
+Three-way verification: Tesseract TSV (primary) + PPStructure content (second opinion) + HTML output. Words in HTML that neither engine captured are almost certainly hallucinated. Words that PPStructure confirms but Tesseract missed may be legitimate (different segmentation caught them).
 
 Most entries in `novel_words.txt` are legitimate: cross-line hyphen rejoins (`Programmser` + `vice` → `Programmservice`), drop-cap restorations (`reitag` → `Freitag`), whitespace-joined compounds (`dasalle` → `das` + `alle` — the joined form was already both words). These are fine.
 
