@@ -49,7 +49,7 @@
 
         <p>Durch ihn bestimmt man die Nummer des Bildschirms, den man anwählen will. Der Parameter »nr.« kann 0 oder 1 sein. Die Bitmap von Screen0 nimmt den Bereich von $A000-$BFFF ein und das Video-RAM den Bereich von $8C00-$8FFF.</p>
 
-        <p>Bei Screenl sind dies die Bereiche $E000-$FFFF für die Bitmap und $CC00-$CFFF für das Video-RAM.</p>
+        <p>Bei Screen1 sind dies die Bereiche $E000-$FFFF für die Bitmap und $CC00-$CFFF für das Video-RAM.</p>
 
         <p>Übrigens wird im Register »Scrnum« nicht die Nummer selbst abgelegt, wie man denken könnte, sondern das High-Byte der Bitmap-Anfangsadresse.</p>
 
@@ -73,15 +73,27 @@
 
         <h3>6. HICOL zf,hf(,c3)</h3>
 
-        <p>Der Befehl HICOL setzt die Farben im Video-RAM des mit SCREEN angewählten Bildschirms. Im HiRes-Modus brauchen nur die Parameter »zf« und »hf« für Zeichenfarbe und Hintergrundfarbe angegeben werden. Folgt noch ein Komma, so wird der Parameter »c3« geholt und damit das FarbRAM gefüllt. Dieser Parameter braucht nur im Multicolor-Modus angegeben zu werden. Dann gelten die drei Parameter als Zeichenfarben 1, 2 und 3.</p>
+        <p>Der Befehl HICOL setzt die Farben im Video-RAM des mit SCREEN angewählten Bildschirms. Im HiRes-Modus brauchen nur die Parameter »zf« und »hf« für Zeichenfarbe und Hintergrundfarbe angegeben werden. Folgt noch ein Komma, so wird der Parameter »c3« geholt und damit das Farb-RAM gefüllt. Dieser Parameter braucht nur im Multicolor-Modus angegeben zu werden. Dann gelten die drei Parameter als Zeichenfarben 1, 2 und 3.</p>
 
         <h3>7. MODE m</h3>
 
-        <p>Dieser Befehl gestattet es, die Wirkungsweise des PLOT-Befehls zu beeinflußen. Der Parameter »m« darf zwischen 0 und 2 liegen, wobei bedeuten: 0 = Punkt setzen 1 = Punkt löschen 2 = Punkt invertieren Damit der PLOT-Befehl zwischen den einzelnen Modi unterscheiden kann, wird das Register »Plotmode« durch einen Bit-Befehl abgefragt. Dabei gilt folgende Definition:<br>
-            0 = Punkt setzen (Z-Flag gesetzt)<br>
-            64 = Punkt löschen (V-Flag gesetzt)<br>
-            128 = Punkt invertieren (N-Flag gesetzt)<br>
-            Das Register »Plotmode« wird im MODE-Befehl 0 entsprechend gesetzt.</p>
+        <p>Dieser Befehl gestattet es, die Wirkungsweise des PLOT-Befehls zu beeinflußen. Der Parameter »m« darf zwischen 0 und 2 liegen, wobei bedeuten:</p>
+
+        <ul class="plain">
+            <li>0 = Punkt setzen</li>
+            <li>1 = Punkt löschen</li>
+            <li>2 = Punkt invertieren</li>
+        </ul>
+
+        <p class="noindent">Damit der PLOT-Befehl zwischen den einzelnen Modi unterscheiden kann, wird das Register »Plotmode« durch einen Bit-Befehl abgefragt. Dabei gilt folgende Definition:</p>
+
+        <ul class="plain">
+            <li>0 = Punkt setzen (Z-Flag gesetzt)</li>
+            <li>64 = Punkt löschen (V-Flag gesetzt)</li>
+            <li>128 = Punkt invertieren (N-Flag gesetzt)</li>
+        </ul>
+
+        <p class="noindent">Das Register »Plotmode« wird im MODE-Befehl 0 entsprechend gesetzt.</p>
 
         <h3>8. INK co</h3>
 
@@ -91,7 +103,7 @@
 
         <p>So, nun endlich kommen wir zum ersten interessanten Befehl, bei dem die Rechnerei in Maschinensprache anfängt.</p>
 
-        <p>Der PLOT-Befehl dient dazu, ein Bit in der Bitmap, das durch die Koordinaten »x« und »y« festgelegt wird, zu setzen, zu löschen oder zu invertieren. Die x-Koordinate darf sich dabei zwischen 0 und 319 bewegen, die y-Koordinate zwischenO und 199, wobei der Ursprung des Koordinatensystems in der linken oberen Bildschirmecke liegt. Nun ist es, wie Sie wohl wissen, nicht so einfach herauszufinden, welches Bit in welchem Byte zu einer bestimmten Bildschirmkoordinate gehört. Um das festzustellen, müssen wir uns den Aufbau der Bitmap anschauen (Bild 1).</p>
+        <p>Der PLOT-Befehl dient dazu, ein Bit in der Bitmap, das durch die Koordinaten »x« und »y« festgelegt wird, zu setzen, zu löschen oder zu invertieren. Die x-Koordinate darf sich dabei zwischen 0 und 319 bewegen, die y-Koordinate zwischen 0 und 199, wobei der Ursprung des Koordinatensystems in der linken oberen Bildschirmecke liegt. Nun ist es, wie Sie wohl wissen, nicht so einfach herauszufinden, welches Bit in welchem Byte zu einer bestimmten Bildschirmkoordinate gehört. Um das festzustellen, müssen wir uns den Aufbau der Bitmap anschauen (Bild 1).</p>
 
         <figure>
             <img src="29-1.png" alt="Schematische Darstellung des Bitmap-Aufbaus mit 40 Spalten und 25 Zeilen">
@@ -110,31 +122,36 @@
             <figcaption>Tabelle 2. Multicolor-Modus: x-Werte und Bytenummer für y=0</figcaption>
         </figure>
 
-        <p>Sie sehen, daß im HiRes-Modus die unteren drei Bit für die Byte-Nummer unwichtig sind und deshalb gelöscht werden müssen. Dies geschieht mit der AND-Funktion:<br>
-            xlo and #^11111000</p>
+        <p>Sie sehen, daß im HiRes-Modus die unteren drei Bit für die Byte-Nummer unwichtig sind und deshalb gelöscht werden müssen. Dies geschieht mit der AND-Funktion:
+            <code class="mono">xlo and #%11111000</code>
+        </p>
 
-        <p>Da die x-Werte größer als 255 sein können, müssen wir auch ein Highbyte berücksichtigen, bei dem allerdings nur das Bit 0 gesetzt sein kann, weil der höchste x-Wert319 = $013Fist. Fürdie HiRes-Grafik sähe der vorläufige Algorithmus also so aus:<br>
-            256 * xhi+(xlo and #248)</p>
+        <p>Da die x-Werte größer als 255 sein können, müssen wir auch ein Highbyte berücksichtigen, bei dem allerdings nur das Bit 0 gesetzt sein kann, weil der höchste x-Wert319 = $013Fist. Fürdie HiRes-Grafik sähe der vorläufige Algorithmus also so aus:
+            <code class="mono">256 * xhi+(xlo and #248)</code>
+        </p>
 
         <p>Da es im Multicolor-Modus nur 160 x-Werte gibt, brauchen wir dort kein Highbyte zu berücksichtigen. Sie sehen in Tabelle 2, daß beim Lowbyte die unteren zwei Bit keine Rolle spielen und gelöscht werden müssen: xlo and #%11111100</p>
 
-        <p>Mit dieser Berechnungsweise würden wir allerdings nur auf eine maximale Byte-Nummer von 156 kommen. Der Punkt würde also anstatt am rechten Bildrand in der Bildschirmmitte gesetzt. Deshalb müssen alle Byte-Nummern noch mit 2 multipliziert werden, um die richtige Byte-Nummer zu erhalten:<br>
-            2 * (xlo and #252)</p>
+        <p>Mit dieser Berechnungsweise würden wir allerdings nur auf eine maximale Byte-Nummer von 156 kommen. Der Punkt würde also anstatt am rechten Bildrand in der Bildschirmmitte gesetzt. Deshalb müssen alle Byte-Nummern noch mit 2 multipliziert werden, um die richtige Byte-Nummer zu erhalten:
+            <code class="mono">2 * (xlo and #252)</code>
+        </p>
 
         <p>Wie wirkt sich nun die y-Koordinate auf die Byte-Nummer aus?</p>
 
-        <p>Wenn diese nicht größer als 7 wird, kann sie direkt zur Byte-Nummer addiert werden. Wird y größer als 7, gelangen wir in eine neue Bildschirmzeile und müssen jeweils 320 Byte addieren. Um zu ermitteln, in welcher Zeile wir sind, müssen wir y durch 8 teilen und gelangen so zur Formel:<br>
-            (y and #7) +320 * (y/8)</p>
+        <p>Wenn diese nicht größer als 7 wird, kann sie direkt zur Byte-Nummer addiert werden. Wird y größer als 7, gelangen wir in eine neue Bildschirmzeile und müssen jeweils 320 Byte addieren. Um zu ermitteln, in welcher Zeile wir sind, müssen wir y durch 8 teilen und gelangen so zur Formel:
+            <code class="mono">(y and #7) +320 * (y/8)</code>
+        </p>
 
-        <p>Damit hätten wir die beiden Algorithmen zusammen. Sie lauten:<br>
-            1. Hires-Modus:<br>
-            Byte-Nummer = 256 * xhi + (xlo and #248) + (Y and #7) + 320 * (Y/8)<br>
-            2. Multi-Modus:<br>
-            Byte-Nummer = 2 * (xlo and #252) + (Yand #7) + 320 * (Y/8)</p>
+        <p>Damit hätten wir die beiden Algorithmen zusammen. Sie lauten:</p>
 
-        <p>Nun kommen wir zur Formulierung in Maschinensprache. Dazu legen wir erst fest, wie wir der Berechnungsroutine die Koordinaten übergeben. Und zwar soll der y-Wert im x-Register und der x-Wert in den Registern $14/$15 übergeben werden. Schauen sie sich nun die Routine »Hiplot« im Assemblerlisting an. Dies ist die Unterroutine zur Berechnung der Byte-Nummer im HiRes-Modus. Das Geheimnis der Routine liegtin der Art, wie der Term 320*y/8 berechnet wird. Diese Möglichkeit besteht allerdings nur dann, wenn der Multiplikant (320) konstant und der Multiplikator (y/8) in einem gewissen Bereich (hier 0 bis 24) schwankt. In so einem Fall berechnet man alle möglichen Ergebnisse vorher und legt diese in zwei Tabellen (Low- und Highbyte) ab. In der Berechnungsroutine braucht man dann nur noch den Multiplikator als Zeiger ins y-Register zu übertragen und lädt sich das benötigte Ergebnis aus der Tabelle. Hier sind die Ergebnisse in den Tabellen »Maltab« für die Lowbyte und »Maltabl« für die Highbyte abgelegt. Entscheidend bei der Berechnungsroutine ist weiterhin die Anordnung der einzelnen Summanden. Achten Sie außerdem immer auf den Zustand des Carry-Flags, das für die Addition wichtig ist! Die Nummer des Bytes in der Bitmap wird in den beiden Byte $F7/$F8 abgelegt. Am Ende der Routine wird noch die Bitposition innerhalb des Bytes errechnet. Dazu isolieren wir die x-Position mittels (xlo and # 7) und laden den Akku mit der Zweier-Potenz, die der x-Position entspricht. Diese Zweier-Potenzen sind ebenfalls in einer Tabelle (Hochtab) abgelegt.</p>
+        <ul class="plain mono">
+            <li>1. Hires-Modus: Byte-Nummer = 256 * xhi + (xlo and #248) + (Y and #7) + 320 * (Y/8)</li>
+            <li>2. Multi-Modus: Byte-Nummer = 2 * (xlo and #252) + (Y and #7) + 320 * (Y/8)</p></li>
+        </ul>
 
-        <p>Im Multi-Modus sieht das Feststellen der Bitposition etwas anders aus. Da wir hier nur vier x-Positionen in einem Byte haben, isolieren wir diese mittels (xlo and # 3). Dann laden wir den Akku mit dem Wert, bei dem die beiden Bits, die dieser x-Position entsprechen, gesetzt sind. Für die x-Position 0 wäre dies der Wert %11000000. Die vier Werte finden Sie in der Tabelle »Multab«.</p>
+        <p>Nun kommen wir zur Formulierung in Maschinensprache. Dazu legen wir erst fest, wie wir der Berechnungsroutine die Koordinaten übergeben. Und zwar soll der y-Wert im x-Register und der x-Wert in den Registern $14/$15 übergeben werden. Schauen sie sich nun die Routine »Hiplot« im Assemblerlisting an. Dies ist die Unterroutine zur Berechnung der Byte-Nummer im HiRes-Modus. Das Geheimnis der Routine liegt in der Art, wie der Term 320*y/8 berechnet wird. Diese Möglichkeit besteht allerdings nur dann, wenn der Multiplikant (320) konstant und der Multiplikator (y/8) in einem gewissen Bereich (hier 0 bis 24) schwankt. In so einem Fall berechnet man alle möglichen Ergebnisse vorher und legt diese in zwei Tabellen (Low- und Highbyte) ab. In der Berechnungsroutine braucht man dann nur noch den Multiplikator als Zeiger ins y-Register zu übertragen und lädt sich das benötigte Ergebnis aus der Tabelle. Hier sind die Ergebnisse in den Tabellen »Maltab« für die Lowbyte und »Maltab1« für die Highbyte abgelegt. Entscheidend bei der Berechnungsroutine ist weiterhin die Anordnung der einzelnen Summanden. Achten Sie außerdem immer auf den Zustand des Carry-Flags, das für die Addition wichtig ist! Die Nummer des Bytes in der Bitmap wird in den beiden Byte $F7/$F8 abgelegt. Am Ende der Routine wird noch die Bitposition innerhalb des Bytes errechnet. Dazu isolieren wir die x-Position mittels (xlo and #7) und laden den Akku mit der Zweier-Potenz, die der x-Position entspricht. Diese Zweier-Potenzen sind ebenfalls in einer Tabelle (Hochtab) abgelegt.</p>
+
+        <p>Im Multi-Modus sieht das Feststellen der Bitposition etwas anders aus. Da wir hier nur vier x-Positionen in einem Byte haben, isolieren wir diese mittels (xlo and #3). Dann laden wir den Akku mit dem Wert, bei dem die beiden Bits, die dieser x-Position entsprechen, gesetzt sind. Für die x-Position 0 wäre dies der Wert %11000000. Die vier Werte finden Sie in der Tabelle »Multab«.</p>
 
         <p>Jetzt kommen wir zur Besprechung der PLOT-Routine an sich. Nachdem die Koordinaten aus dem Basic-Text geholt wurden, wird auf Multicolor-Modus geprüft. Dann verlaufen in beiden Teilzweigen der Routine (HPLOT und MPLOT) die Wege ähnlich. Zuerst werden die Koordinaten auf ihre Richtigkeit überprüft. Falls sie den zulässigen Bereich überschreiten, wird die Routine frühzeitig mit gesetztem Carry-Flag verlassen. Ansonsten wird in den Unterroutinen »Hiplot« oder »Muplot« die Byte-Nummer berechnet und die Bit-Position im Akku bereitgestellt. Nun wird das Register »Plotmode« mittels BIT-Befehl abgefragt und je nach Modus verzweigt. Die einzelnen logischen Verknüpfungen machen Sie sich am besten an Hand von Beispielen klar (ausprobieren!).</p>
 
@@ -144,7 +161,7 @@
 
         <h3>Eingabehinweise</h3>
 
-        <p>Listing 2 ist zunächst mit dem MSE einzugben und zu speichern. Im Anschluß daran muß der C 64 aus- und wieder eingeschaltet werden. Laden Sie nun einen Assembler, tippen den Quellcode (Listing 1) ab, lassen ihn übersetzen und laden anschließend Listing 2 absolut (LOAD »PG-MSE«, 8,1). Jetzt muß der Speicherbereich von $800 bis $8574 mit einem Monitorgespeichertwerden. Das Programm läßt sich nun mit SYS 64738 aktivieren.</p>
+        <p>Listing 2 ist zunächst mit dem MSE einzugben und zu speichern. Im Anschluß daran muß der C 64 aus- und wieder eingeschaltet werden. Laden Sie nun einen Assembler, tippen den Quellcode (Listing 1) ab, lassen ihn übersetzen und laden anschließend Listing 2 absolut (LOAD »PG-MSE«, 8,1). Jetzt muß der Speicherbereich von $800 bis $8574 mit einem Monitor gespeichert werden. Das Programm läßt sich nun mit SYS 64738 aktivieren.</p>
 
         <address class="author">(Andreas Schömann/cg)</address>
 
