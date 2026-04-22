@@ -542,6 +542,7 @@ class Issue:
                   binaries.append(file_path)
 
       for root, dirs, files in os.walk(issue_directory_path):
+          dirs.clear()  # Don't recurse into subdirectories
           for file in files:
               if file.endswith('.html'):
                   article_path = os.path.join(root, file)
@@ -583,16 +584,15 @@ class Issue:
               issue_key = article.issue_key
           else:
               if issue_key != article.issue_key:
-                print("BAD", issue_key, article.issue_key)
-              assert(issue_key == article.issue_key)
+                  raise SystemExit(f"- [{issue_directory_path}] issue_key mismatch: '{issue_key}' vs '{article.issue_key}' in '{article.title}'")
 
       # verify that 64er.id is unique within the issue
       seen_ids = {}
       for article in articles:
           if not article.id:
-              raise AssertionError(f"- [{issue_directory_path}] article '{article.title}' has no 64er.id")
+              raise SystemExit(f"- [{issue_directory_path}] article '{article.title}' has no 64er.id")
           if article.id in seen_ids:
-              raise AssertionError(
+              raise SystemExit(
                   f"- [{issue_directory_path}] duplicate 64er.id '{article.id}': "
                   f"'{seen_ids[article.id]}' and '{article.title}'"
               )
