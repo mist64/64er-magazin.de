@@ -24,9 +24,11 @@ Output: issues/YYMM/_work/
 - `issues/YYMM/YYMM.md` or any pre-existing transcription file — never read it.
 - Any `_work*/` directories from prior extraction runs — must not influence this run.
 
-**Execution:** proceed without asking for confirmation. Parallelize aggressively — spawn sub-agents for Phase 1 (batches of 10-15 pages) and Phase 3 (one per body page). Phase 2 is tesseract (script). Phases 4-5 are `cat` + `Edit`.
+**Execution:** proceed without asking for confirmation. Parallelize aggressively — spawn sub-agents for Phase 1 (batches of 10-15 pages) and Phase 3 (one per body page). Phase 0 (PPStructureV3) and Phase 2 (Tesseract) are scripts. Phases 4-5 are `cat` + `Edit`.
 
 **Expect:** ~50-60% of pages are body pages. ~30-50 articles per issue. Multi-hour job.
+
+**PPStructureV3 is MANDATORY.** Do NOT skip Phase 0. Do NOT fall back to Tesseract-only if PPStructure is slow. PPStructure takes ~50 seconds per page (~2.5 hours for 184 pages). That is expected and acceptable. The layout detection and reading-order assignment it provides are critical for column reconstruction and h2 detection — without them, the pipeline produces significantly more errors. Speed is not a priority; accuracy is. Run Phase 0 on every body page, wait for it to finish, then proceed.
 
 **Pay special attention to:**
 - The h1 vs h2 distinction (CRITICAL RULE #1 below). A prominent heading on a continuation page is almost always an h2, not a new article. Check whether body text precedes it on the same page.
@@ -128,7 +130,9 @@ Verify installation:
 python3.12 -c "from paddleocr import PPStructureV3; print('OK')"
 ```
 
-PPStructureV3 downloads ~500MB of models on first run (cached in `~/.paddlex/`). Subsequent runs use cached models. First invocation takes ~30 seconds; subsequent pages ~5-10 seconds each.
+PPStructureV3 downloads ~500MB of models on first run (cached in `~/.paddlex/`). Subsequent runs use cached models.
+
+**Performance:** ~50 seconds per page on Apple Silicon (ARM64) CPU. ~2.5 hours for a 184-page issue. This is expected and non-negotiable — do NOT skip Phase 0 to save time. The layout detection quality justifies the cost. Run it overnight if needed.
 
 **Note on the `predict` API:** PaddleOCR 3.5+ uses `s.predict(path)` not the older `s.ocr(path)`. The old API is deprecated. Also use `PPStructureV3` (not plain `PaddleOCR`) — the plain class does not do layout detection or reading-order assignment.
 
