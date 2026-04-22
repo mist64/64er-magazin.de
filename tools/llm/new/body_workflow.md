@@ -107,12 +107,30 @@ This mechanically replaces:
 
 ### Dependencies
 
+**System (macOS):**
 ```bash
-# In a Python 3.10-3.12 venv (Python 3.13+ not yet supported by PaddlePaddle):
+brew install tesseract tesseract-lang   # Tesseract 5.x with German language pack
+brew install imagemagick                # For PNG cropping and resizing
+```
+
+**Python (PPStructureV3 / PaddleOCR):**
+
+PaddlePaddle does not yet support Python 3.13+. Use a 3.10-3.12 venv:
+
+```bash
+python3.12 -m venv .venv-paddle
+source .venv-paddle/bin/activate
 pip install paddleocr paddlepaddle
 ```
 
-PPStructureV3 downloads ~500MB of models on first run. Subsequent runs use cached models.
+Verify installation:
+```bash
+python3.12 -c "from paddleocr import PPStructureV3; print('OK')"
+```
+
+PPStructureV3 downloads ~500MB of models on first run (cached in `~/.paddlex/`). Subsequent runs use cached models. First invocation takes ~30 seconds; subsequent pages ~5-10 seconds each.
+
+**Note on the `predict` API:** PaddleOCR 3.5+ uses `s.predict(path)` not the older `s.ocr(path)`. The old API is deprecated. Also use `PPStructureV3` (not plain `PaddleOCR`) — the plain class does not do layout detection or reading-order assignment.
 
 ## Pipeline
 
