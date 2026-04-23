@@ -377,7 +377,21 @@ tesseract _work/pPPP/page_300.png _work/pPPP/page -l deu --psm 1 -c hocr_font_in
 Outputs per page:
 - `_work/pPPP/layout.json` — from Phase 0
 - `_work/pPPP/block_NN.png` + `block_NN.tsv` + `block_NN.hocr` — per text block
-- `_work/pPPP/page_300.png` + `page.tsv` + `page.hocr` — full-page backup
+- `_work/pPPP/page_300.png` + `page.tsv` + `page.hocr` — full-page Tesseract
+
+### Three OCR sources — use all three, never pick one
+
+Every body page now has three independent OCR sources:
+
+1. **Per-block Tesseract** (`block_NN.tsv`) — `--psm 6` on PPStructure block crops. Best for clean body prose in single columns.
+2. **Full-page Tesseract** (`page.tsv`) — `--psm 1` on the whole page. Better for inline code, formulas, and numbers that per-block crops split at block boundaries.
+3. **PPStructure content** (`layout.json` → `block.content`) — PaddleOCR's own recognition. Different model, catches different errors.
+
+Phase 3 agents should consult ALL THREE when assembling body text. Where all three agree → emit directly. Where they disagree → the Phase 3 agent resolves by pixel verification of the disputed region.
+
+**Calibration from 8605 v3:** per-block Tesseract split numbers (`1000`→`1 000`, `1024`→`1 024`) and garbled inline formulas (`$3FFE`, `xhi+(xlo`, `POKE49441,75`) that full-page Tesseract handled correctly. Full-page Tesseract jumbled column reading order that per-block got right. Neither alone was sufficient. Using both catches both failure modes.
+
+Phase 3.5 verification also checks all three sources — a word that appears in per-block TSV OR full-page TSV OR PPStructure content is considered "known" and not flagged as novel.
 
 ### Why 600 → 300 DPI
 
