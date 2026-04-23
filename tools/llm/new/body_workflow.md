@@ -41,6 +41,23 @@ Output: issues/YYMM/_work/
 - Any mixed pages, graphic titles, Texteinschübe, or jump pointers ("Fortsetzung auf Seite N").
 - No text excerpts — structural report only.
 
+## Quick-reference checklist (verify at each phase)
+
+- [ ] Phase 0: PPStructureV3 ran on EVERY body page (~50s/page, mandatory, do not skip)
+- [ ] Phase 1: article count is 30-45 (if >45, over-splitting — check h1 vs h2)
+- [ ] Phase 2: per-block Tesseract `--psm 6` AND full-page `--psm 1` both ran
+- [ ] Phase 3: title/intro from TSV not Phase 1 transcription; OCR fixes character-level only
+- [ ] Phase 3: no word additions, no word deletions, no reordering, no typo corrections
+- [ ] Phase 3: `<p class="intro">` has no nested `<strong>`
+- [ ] Phase 3.5a: novel-word flags generated (three-way: block TSV + page TSV + PPStructure)
+- [ ] Phase 3.5a+: n-gram order check ran
+- [ ] Phase 3.5b: auto-revert applied to ALL flags — no deferrals, no exceptions
+- [ ] Phase 4: articles stitched via `cat` only — no `Write` tool with content
+- [ ] Phase 4: "Fortsetzung auf Seite N" jumps handled, marker lines dropped
+- [ ] Phase 5: grep for residual `- </p>` and lowercase `<p>` starts — fix any found
+- [ ] Phase 5: all `<!-- page NNN -->` markers stripped
+- [ ] LOG.md: mixed pages, graphic titles, OCR-GAPs, ambiguities documented
+
 ## CRITICAL RULES (read before anything else)
 
 **1. NEVER promote an h2 section heading to h1 (new article).** An article is a single continuous editorial piece that starts with a title, runs across 1-10 pages, and ends with a byline or clean section break. Within that article, section headings (`<h2>`) divide the text into sub-topics. These h2 headings can be just as large and prominent as article titles — **do not mistake them for article starts.** If body text from the current article appears ABOVE a heading on the same page, that heading is an h2, not an h1. See "Distinguishing h1 from h2" below.
@@ -568,6 +585,13 @@ Task:
    **Massive single-block spanning multiple columns:**
    - Occasionally tesseract produces one block with 1000+ words that spans the entire page width. The words inside are still position-tagged in the TSV, so you can split them by x-coordinate into columns.
    - Use the same column-bucketing as above, but applied within the block's word list rather than across blocks.
+
+   **Special characters:**
+   - `…` (ellipsis) — tesseract often captures as `...` (three dots) or drops entirely. If the TSV has `...`, emit `…` (single Unicode ellipsis character). If the TSV has nothing but pixels show an ellipsis, emit `…`. Do NOT drop ellipses.
+   - `—` (em-dash) vs `–` (en-dash) vs `-` (hyphen) — tesseract frequently downgrades em-dashes to hyphens. If a standalone `-` sits between spaces where the pixel shows a long dash, emit `—`. Compound hyphens (`Chip-Maske`, `C 64-Platine`) stay as `-`.
+   - `»` `«` (guillemets) — preserve exactly as OCR'd. If mangled, pixel-verify and restore. German opening is `»`, closing is `«`. But if the print has `»disk»` (both right-pointing = typo in original), preserve that.
+   - `⟨⟩` (angle brackets in technical notation) — rare. If TSV has them, emit as `⟨` `⟩` (Unicode mathematical angle brackets, not `<` `>`).
+   - HTML entities: emit Unicode characters directly in the HTML, not entities. Use `…` not `&hellip;`, `—` not `&mdash;`, `&` stays as `&amp;` (HTML requirement), `<`/`>` stay as `&lt;`/`&gt;` if they appear in body text (not as HTML tags).
 
    **Preserve unconditionally:**
    - Old German spelling (`daß`, `muß`, `läßt`, `ß`) — do NOT modernize
