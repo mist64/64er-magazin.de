@@ -679,9 +679,36 @@ Most entries in `novel_words.txt` are legitimate: cross-line hyphen rejoins (`Pr
 
 Write flagged words to `_work/pNNN/verify_flags.txt`.
 
+### Phase 3.5a+ — Word ORDER verification (mandatory)
+
+The novel-word check catches hallucinated and corrected words. But it does NOT catch **reordered** words — where the agent moves an existing TSV word to a different position in the sentence. This is a subtle LLM composition failure: the word exists in both TSV and HTML, but in different positions, making the sentence read more "naturally" in modern German.
+
+**Calibration failure from 8605 v3 p018:** TSV and PPStructure both had `macht dann ein fertiges Platinenlayout oder eine fertige Chip-Maske daraus`. The Phase 3 agent emitted `macht daraus ein fertiges Platinenlayout oder eine fertige Chip-Maske` — moved `daraus` forward, dropped `dann`. Both readings are grammatically valid German. Both `dann` and `daraus` exist in the TSV. Novel-word check saw nothing wrong.
+
+**Detection:** extract word sequences (n-grams) from both TSV and HTML. Any 3-word sequence in the HTML that doesn't appear in the TSV is a reordering candidate:
+
+```bash
+# Extract 3-grams from HTML body
+sed 's/<[^>]*>//g' page_NNN.html | tr -s '[:space:]' '\n' | grep -v '^$' | \
+  awk 'NR>=3{print p2,p1,$0} {p2=p1;p1=$0}' | LC_ALL=C sort -u > /tmp/html_3grams.txt
+
+# Extract 3-grams from TSV (reading order)
+awk -F'\t' '$1==5 && $12!="" {print $12}' page.tsv | \
+  awk 'NR>=3{print p2,p1,$0} {p2=p1;p1=$0}' | LC_ALL=C sort -u > /tmp/tsv_3grams.txt
+
+# 3-grams in HTML but not in TSV — potential reorderings
+comm -23 /tmp/html_3grams.txt /tmp/tsv_3grams.txt > /tmp/novel_3grams.txt
+```
+
+Most novel 3-grams are from legitimate cross-block paragraph joins (the TSV has the words in separate blocks with different reading order). But any novel 3-gram whose individual words ALL exist in the same TSV block, in a different order, is a reordering violation. Flag those for manual review.
+
+This check is expensive (O(n²) matching) but catches the most dangerous failure mode: text that reads naturally but wasn't printed that way.
+
 ### Phase 3.5b — Auto-revert flagged words (mandatory)
 
-For each page with a non-empty `verify_flags.txt`, **automatically revert every flagged word to its TSV form** using the Edit tool. Do NOT skip this step. Do NOT use judgment about whether the "correction" was reasonable.
+For each page with a non-empty `verify_flags.txt`, **automatically revert every flagged word to its TSV form** using the Edit tool. Do NOT skip this step. Do NOT defer this step. Do NOT use judgment about whether the "correction" was reasonable.
+
+**No exceptions.** Prior runs (8605 v1, v3) deferred auto-revert with justifications like "most flags are legitimate rejoins" or "blanket revert would destroy recoveries." This resulted in word substitutions (`dann`→`daraus`), typo corrections (`Benutzeroberfäche`→`Benutzeroberfläche`), and sentence rewrites reaching the final output. The deferral excuse is always plausible-sounding and always wrong. Run the revert. If a legitimate rejoin gets reverted, it produces a broken word that is trivially re-fixable. If a hallucination survives, it is invisible and unfixable.
 
 Procedure per flagged word:
 1. Find the word in `page_NNN.html`.
