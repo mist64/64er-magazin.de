@@ -558,6 +558,16 @@ Some articles span non-contiguous pages with ads in between but NO explicit "For
 
 In this case, page N+2 is a continuation of the article from page N, not a new article. The ad simply interrupts.
 
+### Mixed pages with two articles where one continues on the next page
+
+A common layout in the Aktuelles/news section: page N has article A (top/left) and article B (bottom/right). Article A continues on page N+1, but article B is self-contained on page N.
+
+**Failure mode (v4, 8605 p12):** v4 read the page top-to-bottom and interleaved article B *inside* article A — Klangspektakel text appeared in the middle of Schnelle Floppy. Phase 4 stitch must respect article boundaries, not just page order.
+
+**Correct handling:** Phase 1 marks the page as `mixed` with bbox regions for each article. Phase 4 routes content to the correct article file based on which bbox region each block falls in. The continuation of article A on page N+1 attaches to article A, not to whatever article happens to be adjacent on page N.
+
+This requires Phase 1 to identify *which* bboxes on a mixed page belong to *which* article. For news roundup pages where all items are `<h2>` within one parent article, this is simpler — everything stays in order. The problem is specifically when two *separate* articles (different `<h1>`) share a page.
+
 ### Orchestration guidance
 
 **Phase 1 batching:** 10-15 pages per sub-agent call. Each reads thumbnails and writes page_meta.txt. ~12 batched calls cover 184 pages. Run them in parallel (up to 8 concurrent to avoid rate limits).
@@ -694,6 +704,15 @@ In this case, page N+2 is a continuation of the article from page N, not a new a
 - Old German spelling (`daß`, `muß`, `läßt`, `ß`)
 - Original typos (historical record)
 - Printed punctuation exactly as OCR'd
+
+**Systematic 1/l/I and 0/O confusion in technical articles:**
+These are the #1 and #2 OCR errors and they require *context-aware* correction, not mechanical substitution. v4 (8605) got these wrong systematically:
+- Hex addresses: `$AO`/`$EO` for `$A0`/`$E0`, `$1BFF` losing the `$` prefix
+- BASIC code: `PEEK(2%)` for `PEEK(254)`, `PHlNT` for `PRINT`, `,8,l` for `,8,1`
+- Superbase commands: `»&l7«` for `»&17«`, `»l«` for `»1«` (column number), `»O«` for `»0«`
+- Matrix formulas: `C(IJ)` for `C(I,J)`, `l,` for `1,`
+
+Rule of thumb: in hex/code context, standalone `l` is almost always `1`, standalone `O` is almost always `0`. In German prose context, the opposite. The Phase 3 agent must check context for every `l`/`1`/`I` and `O`/`0` substitution.
 
 **Calibration failures from prior runs:**
 - `Benutzeroberfäche` "corrected" to `Benutzeroberfläche` in v2/v3/v4. The page has `Benutzeroberfäche` (missing L). TSV has it. Pixels confirm it. The Edit-only model makes this harder: the draft already has the correct OCR form; the agent would have to actively Edit it wrong.
@@ -963,7 +982,8 @@ Using `NNNN.md` as a content source bypasses the entire OCR + pixel verification
 
 - Do not parse the TOC or annual index CSV to decide article boundaries.
 - Do not use font size as a title detector.
-- Do not include figures, tables, listings, or their captions.
+- Do not include figures (images), BASIC/assembler listings, or their captions.
+- **DO include editorial tables** that are part of the article body — product comparison tables, key/function mappings, program structure descriptions, specification tables. These are article content, not decorative elements. Emit them as `<table>` or as `<p>` with `<br>` depending on complexity. v4 (8605) incorrectly dropped editorial tables from p38, p63, p81, p91 — losing significant article content.
 - Do not include running headers, page numbers, or issue footers.
 - Do NOT include section dingbats or pullquotes.
 - Author bylines like `(xx)` or `(xx/yy)` at the end of an article or section ARE kept as short standalone `<p>(xx)</p>` elements — they are part of the body flow. Do NOT drop them. Bylines appearing inline at the end of a paragraph (not on their own line) stay inside that paragraph.
