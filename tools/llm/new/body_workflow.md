@@ -156,16 +156,18 @@ PPStructureV3 downloads ~500MB of models on first run (cached in `~/.paddlex/`).
 ## Pipeline
 
 ```
-Phase 0  script (PPStructureV3)  per page  →  layout.json  (blocks + reading order + labels)
-Phase 1  agent (vision)          per page  →  page_meta.txt (kind, title bbox, intro bbox)
-Phase 2  script (tesseract)      per block →  block_NNN.tsv (word-level OCR within each text block)
-Phase 3  agent (vision+text)     per page  →  page_NNN.html (h1 + intro + body)
-Phase 3.5 script                            →  verify_flags.txt (TSV word diff)
-Phase 4  script                             →  article_NNN.html (cat)
-Phase 5  script                             →  cross-page dehyphenation + paragraph merges
+Phase 0    script (PPStructureV3)   per page   →  layout.json
+Phase 1    agent (vision)           per page   →  page_meta.txt (kind, title bbox, intro bbox)
+Phase 2    script (tesseract)       per block  →  block_NN.tsv + page.tsv
+Phase 2.5  script (merge)           per page   →  merged_NNN.txt (three-way word vote)
+Phase 2.6  script (draft HTML)      per page   →  page_NNN_draft.html (body from OK words)
+Phase 3    agent (Edit only)        per page   →  page_NNN.html (resolve disputes + formatting)
+Phase 3.5  script (verify)          per page   →  verify_flags.txt
+Phase 4    script (cat)                        →  article_NNN.html
+Phase 5    script (Edit)                       →  cross-page dehyphenation + paragraph merges
 ```
 
-Phase 0 is new (PPStructureV3 layout detection). Phase 2 now runs Tesseract per PPStructure block (not per page), which avoids the column-jumbling problem entirely. Phases 1, 3, 4, 5 are similar but simpler because layout is already solved.
+**Key design principle: the agent never writes body text.** Phases 0–2.6 are entirely scripts — no LLM involved. The draft HTML is assembled mechanically from TSV tokens that all three OCR engines agreed on. Phase 3 agents only **Edit** the draft at marked locations (DISPUTE markers, graphic titles, formatting). This structurally eliminates LLM composition failures (word reordering, typo correction, hallucination) because the agent never generates a paragraph — it only patches specific words via the Edit tool.
 
 ## Phase 0 — Layout detection (PPStructureV3, script)
 
@@ -404,11 +406,77 @@ Every body page now has three independent OCR sources:
 2. **Full-page Tesseract** (`page.tsv`) — `--psm 1` on the whole page. Better for inline code, formulas, and numbers that per-block crops split at block boundaries.
 3. **PPStructure content** (`layout.json` → `block.content`) — PaddleOCR's own recognition. Different model, catches different errors.
 
-Phase 3 agents should consult ALL THREE when assembling body text. Where all three agree → emit directly. Where they disagree → the Phase 3 agent resolves by pixel verification of the disputed region.
+**Phase 3 agents do NOT assemble body text from these sources.** Phase 2.5 (merge script) does that mechanically. Phase 3 agents only resolve disputes. See Phase 2.5 and 2.6 below.
 
-**Calibration from 8605 v3:** per-block Tesseract split numbers (`1000`→`1 000`, `1024`→`1 024`) and garbled inline formulas (`$3FFE`, `xhi+(xlo`, `POKE49441,75`) that full-page Tesseract handled correctly. Full-page Tesseract jumbled column reading order that per-block got right. Neither alone was sufficient. Using both catches both failure modes.
+**Calibration from 8605 v3:** per-block Tesseract split numbers (`1000`→`1 000`, `1024`→`1 024`) and garbled inline formulas (`$3FFE`, `xhi+(xlo`, `POKE49441,75`) that full-page Tesseract handled correctly. Full-page Tesseract jumbled column reading order that per-block got right. Neither alone was sufficient. The merge script catches both failure modes via three-way voting.
 
-Phase 3.5 verification also checks all three sources — a word that appears in per-block TSV OR full-page TSV OR PPStructure content is considered "known" and not flagged as novel.
+## Phase 2.5 — Three-way merge (script, mandatory)
+
+For each body page, merge the three OCR sources into a single word-sequence file with per-word confidence.
+
+**Input:**
+- `layout.json` — PPStructure blocks with `order_index`, bbox, `content`
+- `block_NN.tsv` — per-block Tesseract words (block-local coordinates)
+- `page.tsv` — full-page Tesseract words (page coordinates)
+
+**Algorithm:**
+
+1. Walk PPStructure blocks in `order_index` order (correct reading sequence).
+2. For each text/paragraph_title block:
+   - Collect per-block TSV words (already within the block).
+   - Collect full-page TSV words whose bbox overlaps with this block's bbox (convert block-local coords to page coords using block offset).
+   - Split PPStructure `content` into words.
+3. Align the three word lists sequentially with fuzzy matching. Most words are identical. Where lengths diverge (one engine splits a compound, another doesn't), use sliding window to re-sync.
+4. Vote per aligned position:
+   - **All three agree** → `OK <word>`
+   - **Two agree, one differs** → `OK <majority_word>` (flag minority in comment)
+   - **All three differ** → `DISPUTE <block_word> <page_word> <paddle_word>`
+   - **Word missing from one source** → `PARTIAL <word> [missing_from: <source>]`
+
+**Output:** `_work/pPPP/merged_NNN.txt` — one line per word, annotated:
+
+```
+OK Eine
+OK sehr
+OK interessante
+OK Sache
+...
+OK Benutzeroberfäche  # 2/3 agree (block+paddle); page has fragment "zeroberfäche"
+...
+DISPUTE »diskTurbo«  block=»diskTurbo«  page=odiskTurbo«  paddle=»diskTurbo«
+...
+PARA_BREAK  # TSV paragraph boundary detected
+...
+BLOCK_BREAK order=5 label=paragraph_title  # new PPStructure block starts
+```
+
+Also annotate paragraph boundaries (from TSV `par_num` changes) and block transitions (from PPStructure `order_index`).
+
+## Phase 2.6 — Draft HTML assembly (script, mandatory)
+
+Convert `merged_NNN.txt` into `page_NNN_draft.html` — a complete HTML fragment where all OK words are assembled into paragraphs and all disputes are marked.
+
+**Rules:**
+- `BLOCK_BREAK label=paragraph_title` → `<h2>` (content from the OK words that follow)
+- `PARA_BREAK` → new `<p>` (or `<p class="noindent">` if TSV geometry proves flush-left)
+- `OK <word>` → emit the word directly
+- `DISPUTE ...` → emit `<!--DISPUTE block=X page=Y paddle=Z-->` as an HTML comment at that position, with the majority word (if any) as placeholder text
+- `PARTIAL ...` → emit the available word, flag in comment
+- For `article_start` pages: emit `<h1><!--TITLE: source=ocr|graphic, bbox=...--></h1>` placeholder from Phase 1 page_meta
+- For `article_start` pages with intro: emit `<p class="intro"><!--INTRO: bbox=...--></p>` placeholder
+
+**The draft HTML contains zero LLM-generated text.** Every word comes from OCR tokens via the merge script. Dispute markers are HTML comments that Phase 3 agents will resolve.
+
+**Output:** `_work/pPPP/page_NNN_draft.html`
+
+```html
+<!-- page 023 -->
+<p>und die Uhrzeit eingestellt werden (Bild 11). Der Benutzer kann die Daten auf die Systemdiskette abspeichern, wobei diese dann bei jedem Neustart von Geos initialisiert werden.</p>
+<p>Das Diskettenformat hat sich unter Geos kaum geändert. Soll eine Diskette bearbeitet werden, die im normalen C 64-Format beschrieben wurde, so kann diese Diskette jederzeit ohne Datenverlust ins Geos-Format <!--DISPUTE block=übernommen page=übernom- paddle=übernommen--> übernommen werden.</p>
+...
+<h2>Zwei Programme gratis</h2>
+<p>die Entwickler voll bewußt und schrieben noch zwei recht sinnvolle Anwendungsprogramme ...</p>
+```
 
 ### Why 600 → 300 DPI
 
@@ -496,204 +564,147 @@ In this case, page N+2 is a continuation of the article from page N, not a new a
 
 **Phase 2:** run tesseract on all body pages. Use parallel Bash calls (up to 20 per message) or a single background script. ~90 pages × ~5 seconds = ~8 minutes serial, ~1 minute with 10-way parallelism.
 
-**Phase 3:** one sub-agent per body page, up to 8 concurrent. Each takes 2-5 minutes. ~90 pages / 8 = ~12 waves = ~30-60 minutes wall clock. This is the bottleneck.
+**Phase 2.5+2.6:** scripts, run in seconds per page. No agents needed.
+
+**Phase 3:** one sub-agent per body page, up to 8 concurrent. Edit-only (resolve disputes + add formatting), so faster than old assembly model: ~1-3 minutes per page. ~90 pages / 8 = ~12 waves = ~15-30 minutes wall clock.
 
 **Phase 3.5:** script, runs in seconds. No agents needed.
 
 **Phase 4+5:** main thread, ~1 minute per article for cat + Edit. ~40 articles = ~40 minutes.
 
-## Phase 3 — Reconciler agent (one per non-skip page)
+## Phase 3 — Edit-only reconciler agent (one per non-skip page)
 
-Input:
-- `page_meta.txt` from Phase 1 (kind + bbox hints for title / intro — NO transcribed text)
-- `page.tsv` + `blocks.txt` from Phase 2 (OCR blocks + bboxes)
+**Fundamental constraint: the agent never writes body text.** Phase 2.6 already assembled every OK word into `page_NNN_draft.html`. The Phase 3 agent receives that draft and makes surgical changes via `Edit` only. It never uses `Write` with article content. It never assembles paragraphs from TSV tokens. Every word in the final `page_NNN.html` is traceable to either (a) the Phase 2.6 script output or (b) a specific `Edit` call resolving a dispute.
+
+### Input
+
+- `page_NNN_draft.html` from Phase 2.6 (body text with `<!--DISPUTE-->` markers)
+- `page_meta.txt` from Phase 1 (kind, title bbox, intro bbox — NO transcribed text)
 - `page_small.png` (1400px thumbnail for spatial context)
-- Per-block crops if needed (Phase 3 can generate them on demand from bbox data)
+- `page.tsv` + `blocks.txt` from Phase 2 (for reference during dispute resolution)
+- `layout.json` from Phase 0 (block bboxes for cropping)
 
-Task:
+### Task
 
-0. **Derive title and intro from TSV** (for `article_start` / `mixed` pages):
+1. **Copy draft to final.** Start by copying the draft:
+   ```bash
+   cp _work/pPPP/page_NNN_draft.html _work/pPPP/page_NNN.html
+   ```
+   All subsequent changes are `Edit` calls against `page_NNN.html`.
 
-   - For each `title` entry in page_meta with `source: ocr`: find the OCR block(s) inside the bbox, concatenate their text, and emit as `<h1>…</h1>`. This text comes from TSV — zero transcription drift possible.
-   - For each `title` entry with `source: graphic`: crop the bbox from the full-res page image, spawn a vision sub-agent that reads ONLY the title text (few words, bounded operation), and emit as `<h1>…</h1>`. Log the pixel-read in the report so downstream auditing knows the title was vision-derived.
-   - For `intro: present: true`: find the OCR block(s) inside the intro bbox and emit as `<p class="intro">…</p>`. Again, TSV is authoritative.
-   - For `intro: present: false`: emit no intro.
+2. **Resolve DISPUTE markers.** For each `<!--DISPUTE block=X page=Y paddle=Z-->` in the draft:
+   - Read the page image at the disputed word's location (crop from `page_small.png` using bbox from TSV/layout.json).
+   - Determine which OCR source matches the pixels.
+   - `Edit` the dispute comment + placeholder word → the pixel-verified word.
+   - If none of the three sources match the pixels and the agent can read the word clearly (bounded, few characters), use the pixel reading. Log it.
+   - If the word is unreadable, leave the majority-vote word and remove only the comment. Log the ambiguity.
 
-   Do NOT trust any hint text that might appear in page_meta — always re-derive from TSV. If Phase 1 accidentally included a title string, ignore it.
+3. **Resolve TITLE placeholders** (for `article_start` / `mixed` pages):
+   - `<!--TITLE: source=ocr, bbox=...-->`: find the OCR block(s) inside the bbox in `page.tsv`, concatenate their text, `Edit` the placeholder → `<h1>title text</h1>`.
+   - `<!--TITLE: source=graphic, bbox=...-->`: crop the bbox from the full-res page image, read ONLY the title text (few words, bounded operation), `Edit` the placeholder → `<h1>title text</h1>`. Log the pixel-read.
 
-1. **Drop non-body blocks** mechanically:
-   - Blocks inside the title bbox(es) → already emitted as `<h1>`, drop from body.
-   - Blocks inside the intro bbox → already emitted as `<p class="intro">`, drop from body.
-   - Block text matches `^Bild [0-9]+[a-z]?\.` or `^Tabelle [0-9]+` or `^Listing [0-9]+` → drop (figure/table/listing caption).
-   - Block text matches `^Ausgabe [0-9]+/.*19[0-9]+$` → drop (page footer).
-   - Block is in the top ~5% of the page height and has fewer than 5 words → drop (running header).
-   - Block has ≥80% empty area (bbox minus text bbox) → drop (image).
-   - Block has fewer than 3 words AND sits isolated → drop (decorative rule, page number, stray mark).
+4. **Resolve INTRO placeholders** (for `article_start` / `mixed` pages):
+   - `<!--INTRO: bbox=...-->`: find the OCR block(s) inside the bbox, concatenate their text, `Edit` the placeholder → `<p class="intro">intro text</p>`.
+   - **Do NOT wrap intro content in `<strong>`.** The intro CSS already makes it bolder.
 
-2. **Detect section headings (`<h2>`).** Two mechanisms:
-
-   **(a) Standalone heading blocks.** Tesseract's hOCR assigns a font-class index (`x_fsize`) to each word. Body text clusters around one dominant value (e.g. `x_fsize 4`). Blocks where all words share a *different* `x_fsize` AND the block is short (< 10 words) are section headings. Emit as `<h2>`.
-
-   Example from p020: block 10 "Der kleine Bruder des C 128" has `x_fsize 7`, body has `x_fsize 4`. Standalone block, 6 words → `<h2>`.
-
-   **(b) Inline bold headings inside body blocks.** Tesseract sometimes puts a short bold heading in its own `<p>` (paragraph) within a body block, followed by the body paragraph. The heading has the same `x_fsize` as body (tesseract can't see bold weight), but it is visually distinct on the page image: short (1-3 words), no punctuation, bold or heavier weight, separated by whitespace from the body below.
-
-   Example from p020: "Sprachregelung" is `par_1_2` inside block 6, followed by `par_1_3` body text. Same `x_fsize 4` — only detectable by visual inspection. Split it off as `<h2>Sprachregelung</h2>` and emit the following paragraph as `<p>`.
-
-   When uncertain whether a short paragraph is a heading or a fragment, prefer `<p>` (less destructive). Log the ambiguity in `LOG.md`.
-
-3. **Add inline formatting** by comparing the OCR scaffold to the block pixels. The vision agent marks up:
+5. **Add inline formatting** by comparing the draft text to the page pixels. The agent marks up:
    - `<strong>` — bold runs (heavier weight than surrounding body text)
    - `<em>` — italic runs
    - `<sub>` / `<sup>` — subscript / superscript (rare, mostly in technical articles)
 
-   Do NOT use tesseract's `x_fsize` for this — it's unreliable (font-class buckets split inconsistently). Vision is the authority on inline formatting.
+   Each formatting addition is one `Edit` call: `old_string` = the plain words, `new_string` = the same words wrapped in the tag. The words themselves do not change — only tags are added.
 
    `<strong>` wraps only phrase-level or word-level bold runs inside body paragraphs. Contiguous bold words = one `<strong>` span, not one per word.
 
-   **Do NOT wrap `<p class="intro">` content in `<strong>`.** The intro class already styles its content as bolder via CSS. Adding a nested `<strong>` is a double-bold. Intro paragraphs get their text plain inside the `<p class="intro">...</p>` tags — no inner formatting tag for the intro-level bold.
-
    When uncertain whether text is bold or just slightly heavier due to scan quality, omit the tag. False positives are worse than missed formatting.
 
-4. **Correct OCR errors** against the pixels. **Character-level only.** Never change, add, remove, or substitute words. Never "fix" grammar, spelling, punctuation, or style. The only valid OCR fixes are single-character substitutions (`1/l/I`, `O/0`, `rn/m`, `cl/d`, `ı→i`), missing or extra whitespace between words (`dasalle` → `das alle`), missing/mangled accent marks or umlauts (`Anderungen` → `Änderungen`), and drop caps or leading characters the OCR dropped at paragraph starts. Every fix must be verifiable by looking at the exact pixel region for that word.
+6. **Fix remaining OCR artifacts** via `Edit`. Character-level only:
+   - Single-char substitutions (`1/l/I`, `O/0`, `rn/m`, `cl/d`, `ı→i`, `©→C`)
+   - Whitespace fixes (`dasalle` → `das alle`)
+   - Umlaut restoration (`Anderungen` → `Änderungen`)
+   - Drop-cap restoration (`reitag` → `Freitag`) — read the single character from pixels
+   - Guillemet restoration (`>>` → `»`, `<<` → `«`) — verify against pixels
+   - Ellipsis normalization (`...` → `…`)
+   - Em-dash restoration (standalone `-` between spaces where pixels show long dash → `—`)
 
-   **Forbidden "corrections":**
-   - Adding a word the OCR missed that you think should grammatically be there (e.g. `behoben sein` → `behoben worden sein`). **Every word in the OCR is treated as correct unless the pixels show something else in its place.** If a sentence looks grammatically odd, that is how it was printed.
-   - Re-introducing a noun that appears to have been elided (e.g. `so kann diese jederzeit` → `so kann diese Diskette jederzeit`). If tesseract captured "diese" and the pixels show "diese", leave "diese". Do not infer omitted nouns from context.
-   - Modernizing spelling (`daß` → `dass`, `muß` → `muss`, `ß` → `ss`). Old German 1901-1996 spelling is preserved exactly.
-   - Fixing grammatical errors or typos in the printed original. The magazine's own mistakes are historical record — preserve them.
-   - Replacing "slightly wrong-looking" words with "more correct" ones based on context.
-   - Rewording awkward sentences.
+   Each fix is one `Edit` call. The `old_string` contains enough context to be unique.
 
-   **Rule of thumb:** if the change touches more than one character, or crosses a word boundary beyond whitespace, stop and verify the exact pixels for that word. If you are not sure the pixels show what you want to write, leave the OCR scaffold unchanged. Under-correction is safe; over-correction is a permanent content fabrication that cannot be traced back to the scan.
+   **Forbidden "corrections"** (same rules as before, now enforced structurally):
+   - Adding words the OCR missed (grammar completion, noun re-introduction)
+   - Modernizing spelling (`daß` → `dass`, `muß` → `muss`)
+   - Fixing printed typos (`Benutzeroberfäche` stays as-is)
+   - Reordering words for "better" German
+   - Adding or removing punctuation not supported by pixels
 
-   **Calibration failures from v2 run (independent extraction of the same issue):**
-   - `Benutzeroberfäche` was silently "corrected" to `Benutzeroberfläche` — but the original page actually printed `Benutzeroberfäche` (missing L, confirmed by pixel crop). The v2 agent's language model training auto-corrected what looked like a misspelling. **This is the exact failure mode this rule prevents.** The magazine's typos are historical record.
-   - `gefertigt` (no period) was changed to `gefertigt.` — the v2 agent's expectation that sentences end with periods overrode what the OCR actually captured. If the pixel shows no period, emit no period.
-   
-   Both of these are LLM-training-data bias overriding the scan evidence. When in doubt: **the scan wins, your expectations lose.**
+   Because the agent works via `Edit` on a file that already contains the OCR text, composition failures are structurally harder: the agent would have to deliberately change a word's spelling in an Edit, not just "write it differently" in a Write call. The Edit audit trail makes every character change visible.
 
-   Recurring **legitimate** OCR fix patterns in 64'er magazines:
+7. **Detect `<p class="source">` paragraphs.** Paragraphs printed in smaller font (vendor addresses, price info, reference metadata at article/item end). Detection: visibly smaller on the page image, or distinct `x_fsize` bucket in hOCR. `Edit` the `<p>` tag → `<p class="source">`.
 
-   **Single-character substitutions** (the core of OCR correction):
-   - `1` ↔ `l` ↔ `I` — the #1 OCR error. Affects: `(Listing ])` → `(Listing 1)`, `(Bild ])` → `(Bild 1)`, `C 64 l` → `C 64 I`, `Fl-Taste` → `F1-Taste`, `S]` → `S1`
-   - `O` ↔ `0` — `$FICA` → `$F1CA`, `rO` → `r0`, `(Bild O)` → `(Bild 0)` or vice versa
-   - `rn` ↔ `m` — `Cornrnodore` → `Commodore`, `Programrn` → `Programm`
-   - `cl` ↔ `d` — `Mecdika-` → `Medika-`
-   - `ı` → `i` — Turkish dotless bleed from 600→300 DPI downscale
-   - `©` → `C` — tesseract reads the Commodore "C" as copyright symbol on nearly every page. `© 64` → `C 64`, `© 128` → `C 128`. Expect 5-20 of these per page.
-   - `»` / `«` mangling — guillemets become `>>`, `<<`, `„`, `"`, `$`, or vanish. Verify each against the pixel crop. If the pixel shows a guillemet, restore it.
+8. **Detect `<aside>` Texteinschübe.** Boxed or visually separated sidebars. Wrap the sidebar content in `<aside>…</aside>` via Edit. Headings inside stay as `<h2>`.
 
-   **Drop caps** — the first letter of many article/section openings is a large decorative capital. Tesseract either misses it entirely or places it in a separate block. Symptoms:
-   - First word starts lowercase mid-word: `reitag,` (should be `Freitag,`), `ommodore` (should be `Commodore`), `ieht` (should be `Sieht`), `ndlich` (should be `Endlich`)
-   - First word is missing its initial: `as` (should be `Das`), `in` (should be `Ein`)
-   
-   Fix: read the drop cap from the pixel crop of the block. This is a single character — bounded, pixel-verifiable. If the drop cap is in a separate TSV block (level=5 row with just one large character), use that block's text.
-
-   **Compound word spacing** — tesseract frequently merges adjacent words:
-   - `dasalle` → `das alle`, `gibtes` → `gibt es`, `aufder` → `auf der`
-   - `Computergeschäften` might be a real compound OR `Computer- Geschäften` merged across a line break — check the TSV for a hyphen at line end
-
-   **Screenshot / listing / figure text bleeding into body blocks:**
-   - Tesseract captures text from screenshots (menu items like "choose printer", "alarm clock"), BASIC listings (line numbers, DATA statements), and figure labels alongside body text.
-   - Filter by **position**: if a block or word cluster sits inside a figure region (large bbox, low word count, high-`x_fsize` mismatch) or has monospaced-looking content (hex addresses, BASIC keywords), drop it.
-   - Filter by **content pattern**: lines matching `^[0-9]+ (REM|DATA|PRINT|GOTO|GOSUB|IF|FOR|NEXT|POKE|SYS|READ)` are BASIC listings. Lines matching `^[0-9a-f]{4} :` are hex dumps. Drop both.
-
-   **Column reading order reconstruction:**
-   - Tesseract's `--psm 1` auto-segmenter frequently gets column order wrong when images interrupt the column flow. Body text jumps from col 3 back to col 1.
-   - Fix: sort body blocks by column assignment (left x-coordinate → column bucket) then by top y-coordinate within each column. Columns read left → right. For a 2-column page at 300 DPI, the midpoint is ~1240px; for 3-column ~830/1660; for 4-column ~620/1240/1860.
-   - When a paragraph crosses a column break (last word in col 1, first word in col 2), the TSV will show the words in two different blocks with different x-coordinates but sequential y-coordinates at the column boundary. Join them.
-
-   **Massive single-block spanning multiple columns:**
-   - Occasionally tesseract produces one block with 1000+ words that spans the entire page width. The words inside are still position-tagged in the TSV, so you can split them by x-coordinate into columns.
-   - Use the same column-bucketing as above, but applied within the block's word list rather than across blocks.
-
-   **Special characters:**
-   - `…` (ellipsis) — tesseract often captures as `...` (three dots) or drops entirely. If the TSV has `...`, emit `…` (single Unicode ellipsis character). If the TSV has nothing but pixels show an ellipsis, emit `…`. Do NOT drop ellipses.
-   - `—` (em-dash) vs `–` (en-dash) vs `-` (hyphen) — tesseract frequently downgrades em-dashes to hyphens. If a standalone `-` sits between spaces where the pixel shows a long dash, emit `—`. Compound hyphens (`Chip-Maske`, `C 64-Platine`) stay as `-`.
-   - `»` `«` (guillemets) — preserve exactly as OCR'd. If mangled, pixel-verify and restore. German opening is `»`, closing is `«`. But if the print has `»disk»` (both right-pointing = typo in original), preserve that.
-   - `⟨⟩` (angle brackets in technical notation) — rare. If TSV has them, emit as `⟨` `⟩` (Unicode mathematical angle brackets, not `<` `>`).
-   - HTML entities: emit Unicode characters directly in the HTML, not entities. Use `…` not `&hellip;`, `—` not `&mdash;`, `&` stays as `&amp;` (HTML requirement), `<`/`>` stay as `&lt;`/`&gt;` if they appear in body text (not as HTML tags).
-
-   **Preserve unconditionally:**
-   - Old German spelling (`daß`, `muß`, `läßt`, `ß`) — do NOT modernize
-   - Original typos (historical record)
-   - Printed punctuation exactly as OCR'd (no adding or removing periods, commas, quotes)
-
-5. **Retry tesseract on garbled blocks.** When a body block's OCR is garbled, missing, or clearly wrong (confidence <30, nonsense character sequences, block merged with adjacent column/listing), do NOT transcribe from vision. Instead, re-run tesseract on a tighter crop:
-
+9. **Retry tesseract on `[OCR-GAP]` markers.** If Phase 2.6 left `[OCR-GAP]` markers (from blocks where all three sources disagreed badly), retry tesseract on a tighter crop:
    ```bash
-   # Crop the block region from the 600 DPI source (bbox from blocks.txt, coords ×2 for 600 DPI)
+   # Crop from 600 DPI source (bbox coords ×2)
    magick <source>/PPP_600_cropped.png -crop WxH+X+Y +repage _work/pPPP/retry_NN.png
-
-   # Re-run tesseract with a simpler page-segmentation mode
    tesseract _work/pPPP/retry_NN.png _work/pPPP/retry_NN -l deu --psm 6 tsv
    ```
+   If retry produces clean text, `Edit` the `[OCR-GAP]` → the retry text. **Persist retry TSV** as `retry_NN.tsv` so Phase 3.5 can verify.
 
-   PSM modes to try:
-   - `--psm 6` (single uniform block) — best for dense body text that auto-segmenter mangled
-   - `--psm 4` (single column) — for narrow columns or text squeezed beside an image
-   - `--psm 3` (fully automatic, no OSD) — alternative to the default `--psm 1`
+   If retry still fails, leave `[OCR-GAP]`. Never fall back to vision transcription of body text.
 
-   Use the **600 DPI source** for retry crops, not the 300 DPI downscale — more detail helps on small or dense text. Multiply the 300-DPI bbox coordinates by 2 to get 600-DPI crop coordinates.
+### Output
 
-   **Persist retry TSV.** Save the retry output as `_work/pPPP/retry_NN.tsv` alongside `page.tsv`. Phase 3.5 verification needs BOTH files — the original `page.tsv` and any `retry_*.tsv` files — to build the complete word list. Without persisted retry TSV, Phase 3.5 flags every retry-recovered word as "novel" and auto-revert destroys legitimate recoveries.
+`_work/pPPP/page_NNN.html` — identical to the draft except for:
+- DISPUTE comments resolved (removed, correct word in place)
+- TITLE/INTRO placeholders filled
+- Inline formatting tags added
+- Character-level OCR fixes applied
+- `source` classes and `aside` wrappers added
+- OCR-GAPs retried where possible
 
-   If the retry still produces garbage, emit `[OCR-GAP]`. Never fall back to vision transcription of body text — that bypasses the entire OCR verification discipline.
+### Output format rules
 
-   **Calibration:** in v1 testing, the p030 agent successfully recovered a drop-cap paragraph that `--psm 1` missed by re-running with `--psm 6` on a 600×500 crop. The retry text was clean OCR, not vision composition. In 8605 v1, the p158 agent violated this rule and read body from pixels — LOG.md flagged it, but Phase 3.5 could not auto-revert because no retry TSV existed.
+- `<h1>` comes first regardless of physical page position.
+- `<p class="intro">` immediately after `<h1>` if present.
+- `<h2>` section headings at natural reading position.
+- `<p class="noindent">` ONLY when TSV geometry proves flush-left (first word's `left` within ~5px of block margin). Do NOT apply by heuristic. When in doubt, plain `<p>`.
+- For `kind: continuation`: no `<h1>`, no `<p class="intro">`.
+- For `kind: ad / rubric / other`: emit `<!-- page NNN: <kind> -->` and stop.
+- Author bylines `(xx)` kept as standalone `<p>(xx)</p>`.
 
-6. **Join broken paragraphs.** Tesseract often splits one paragraph into multiple blocks at column breaks. Join when the first character of the next block is lowercase and the previous block ended without terminal punctuation.
+### Calibration data
 
-6. **Emit the page HTML**:
+**OCR fix patterns** recurring in 64'er magazines:
+- `©` → `C`: tesseract reads Commodore "C" as copyright symbol. `© 64` → `C 64`. Expect 5-20 per page.
+- `1` ↔ `l` ↔ `I`: #1 OCR error. `Fl-Taste` → `F1-Taste`, `(Bild ])` → `(Bild 1)`.
+- `O` ↔ `0`: `$FICA` → `$F1CA`.
+- `rn` ↔ `m`: `Cornrnodore` → `Commodore`, `Programrn` → `Programm`.
+- Drop caps: first letter missing. `reitag,` → `Freitag,`, `ommodore` → `Commodore`.
+- Guillemets mangled to `>>`, `<<`, `„`, `"`, `$`, or vanished.
+- `...` → `…` (Unicode ellipsis).
 
-```html
-<!-- page 019 -->
-<h1>Der Neue</h1>
-<p class="intro">Commodore ist immer wieder für Überraschungen gut: …</p>
-<p>Freitag, den 11.4.1986 um 9 Uhr morgens wird eine einmalige Entscheidung getroffen: …</p>
-<p>…</p>
-```
+**Special characters:**
+- `…` (ellipsis) — emit as Unicode `…`, not `&hellip;`.
+- `—` (em-dash) — emit as Unicode `—`, not `&mdash;`.
+- `»` `«` (guillemets) — preserve as-is. If `»disk»` (both right-pointing = original typo), preserve that.
+- `&` stays as `&amp;`, `<`/`>` as `&lt;`/`&gt;` in body text.
+- All other special chars: emit Unicode directly.
 
-Rules:
-- `<h1>` comes first in the file regardless of physical position on the page (article titles often sit mid-page in 64'er; logical order wins over physical order).
-- `<p class="intro">` immediately after `<h1>` if Phase 1 emitted an `intro`.
-- `<h2>` section headings inline in the body flow at their natural reading position.
-- Body paragraphs follow in reading order.
-- Preserve paragraph indentation: default `<p>` for every paragraph. Use `<p class="noindent">` ONLY when the TSV geometry proves the paragraph is flush-left: the first word's `left` coordinate must be within ~5px of the block's left margin (at 300 DPI), AND the rest of the paragraph's first-line wrap confirms that position is the block's natural left edge (not a coincidental indent of a different paragraph). **Do NOT apply `noindent` by position heuristic** (e.g. "first paragraph after every heading"). In 64'er layouts, the first paragraph after an `<h2>` is usually indented the same as any other body paragraph. Real noindent cases are rare and must be verified per-paragraph from TSV data, not guessed. False positives are worse than false negatives — when in doubt, emit plain `<p>`.
+**Preserve unconditionally:**
+- Old German spelling (`daß`, `muß`, `läßt`, `ß`)
+- Original typos (historical record)
+- Printed punctuation exactly as OCR'd
 
-- **`<aside>`** — for "Texteinschub" sidebars / text insets: boxed or otherwise visually separated passages that belong to the current article but are set apart from the main text flow. Often titled with a heading like "Texteinschub #1:", "Hinweis", "Zur Erinnerung", or similar. Wrap the entire sidebar content (heading + body + any byline) in a single `<aside>…</aside>` at its natural reading position in the article. Headings inside the aside stay as `<h2>`. Do NOT promote a Texteinschub to its own article (no new `<h1>`); it is part of the parent article and continues the same author/topic.
-
-  Example:
-  ```html
-  <p>…main body continues…</p>
-  <aside>
-      <h2>Texteinschub: Dem Computer ins Wort fallen</h2>
-      <p>Sidebar body paragraph…</p>
-      <p>Another sidebar paragraph…</p>
-  </aside>
-  <p>…main body resumes…</p>
-  ```
-
-  Detect a Texteinschub visually: boxed/ruled border, inset column, distinct background shade, or a heading line starting with "Texteinschub". The content typically diverges from the main body topic (a digression, a related aside, a step-by-step instruction pulled out of the main flow).
-
-- **`<p class="source">`** — for paragraphs printed in smaller font than body. Typically appears at the end of an article or news item and carries vendor address, price, manufacturer info, reference URLs, or similar metadata that isn't part of the article narrative. Examples:
-  - `<p class="source">Info: Mannesmann Tally, Postfach 500749, 7000 Stuttgart 50, Tel: 0711/50390</p>`
-  - `<p class="source">Informationen über Geos können Sie beim Hersteller Berkeley Softworks erhalten. Die Adresse lautet: Berkeley Softworks, 2150 Shattuck Avenue, Berkeley, California 94704. Der Preis beträgt augenblicklich 59,95 Dollar.</p>`
-
-  Detection: the smaller-font paragraphs have a distinct `x_fsize` bucket in hOCR (typically one size bucket below body dominant), AND/OR are visibly smaller on the page. Usually the last 1–3 paragraphs of an article, or the last 1–2 paragraphs of each item in a news-roundup section.
-
-  Do NOT apply `source` to the article's own narrative body even if it's at the end. `source` is for metadata/reference blocks, not for the author's concluding paragraph. The author byline `(xx)` or `(xx/yy)` is NOT `source` — it's a short standalone `<p>(xx)</p>`.
-
-  A `<p class="source">` replaces what would otherwise be a plain `<p>`. `source` and `noindent` can combine: `<p class="source noindent">` if the source paragraph is also flush-left per TSV.
-- For `kind: continuation`: no `<h1>`, no `<p class="intro">`, just body `<p>`s and `<h2>`s.
-- For `kind: ad / rubric / other`: emit a single comment `<!-- page NNN: <kind> -->` and stop.
+**Calibration failures from prior runs:**
+- `Benutzeroberfäche` "corrected" to `Benutzeroberfläche` in v2/v3/v4. The page has `Benutzeroberfäche` (missing L). TSV has it. Pixels confirm it. The Edit-only model makes this harder: the draft already has the correct OCR form; the agent would have to actively Edit it wrong.
+- `gefertigt` changed to `gefertigt.` — agent added a period. Edit audit trail would show this.
+- `dann` reordered to `daraus` (8605 v3 p018) — agent restructured sentence. In Edit-only model, this requires an explicit Edit swapping words, which is visible.
 
 ### Anti-memory rule (Phase 3)
 
-- Every paragraph emitted must originate in an OCR block from Phase 2, corrected against the pixel crop.
-- If OCR is clearly missing text (gap in reading order, paragraph ends mid-sentence with no continuation visible in any following block), emit a `<p>[OCR-GAP]</p>` marker rather than composing plausible German. A reviewer will fill it in by hand.
-- If the agent sees text on the page that no OCR block captured (Tesseract missed a paragraph entirely), log the page to `LOG.md` and emit `[OCR-GAP]`. Do not transcribe from vision — that bypasses the "OCR → file → read → small edit" discipline.
+- The agent starts from `page_NNN_draft.html` which contains ONLY OCR-derived words. Every Edit must preserve or correct these words — never replace them with composed text.
+- If OCR is missing text (gap in reading order, paragraph ends mid-sentence), the draft already has `[OCR-GAP]`. Retry tesseract. If retry fails, leave `[OCR-GAP]`. Never compose plausible German.
+- If the agent sees text on the page that no OCR block captured: log to `LOG.md`, leave `[OCR-GAP]`. Do not transcribe body text from vision.
 
 ## Phase 3.5 — TSV verification (script, mandatory)
 
@@ -929,8 +940,8 @@ When both signals conflict at a boundary (hyphen at end but next word is capital
 Main thread never Reads a page PNG. All pixel operations go through sub-agents:
 
 - Phase 1: one sub-agent per page (batchable, 10 pages per call is fine).
-- Phase 3: one sub-agent per non-skip page (parallelizable).
-- Scripts run on the main thread (Phase 2, 4, 5).
+- Phase 3: one sub-agent per non-skip page (Edit-only: resolve disputes + formatting). Parallelizable.
+- Scripts run on the main thread (Phase 0, 2, 2.5, 2.6, 3.5, 4, 5).
 
 Sub-agent prompts must be self-contained: page number, file paths, task, expected output format, anti-memory reminders.
 
