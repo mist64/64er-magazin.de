@@ -742,11 +742,51 @@ Most novel 3-grams are from legitimate cross-block paragraph joins (the TSV has 
 
 This check is expensive (O(n²) matching) but catches the most dangerous failure mode: text that reads naturally but wasn't printed that way.
 
-### Phase 3.5b — Auto-revert flagged words (mandatory)
+### Phase 3.5b — Smart auto-revert (mandatory)
 
-For each page with a non-empty `verify_flags.txt`, **automatically revert every flagged word to its TSV form** using the Edit tool. Do NOT skip this step. Do NOT defer this step. Do NOT use judgment about whether the "correction" was reasonable.
+For each page with a non-empty `verify_flags.txt`, classify each flagged word and act accordingly. Do NOT skip this step. Do NOT defer this step. Every prior run that deferred (v1, v3, v4) let word substitutions, typo corrections, and sentence rewrites reach the final output.
 
-**No exceptions.** Prior runs (8605 v1, v3) deferred auto-revert with justifications like "most flags are legitimate rejoins" or "blanket revert would destroy recoveries." This resulted in word substitutions (`dann`→`daraus`), typo corrections (`Benutzeroberfäche`→`Benutzeroberfläche`), and sentence rewrites reaching the final output. The deferral excuse is always plausible-sounding and always wrong. Run the revert. If a legitimate rejoin gets reverted, it produces a broken word that is trivially re-fixable. If a hallucination survives, it is invisible and unfixable.
+**Classification per flagged word:**
+
+A flagged word is "novel" — it's in the HTML but not in any TSV. Classify it:
+
+1. **Derivable from adjacent TSV tokens** → KEEP (legitimate rejoin)
+   - Hyphen rejoin: TSV has `Programm` + `service` on adjacent lines → HTML has `Programmservice` ✓
+   - Drop-cap restoration: TSV has `reitag` → HTML has `Freitag` (one char prepended) ✓
+   - Whitespace join: TSV has `das` + `alle` → HTML has `dasalle` wait no — that's the WRONG direction. TSV has `dasalle`, HTML has `das alle` (split). The split words `das` and `alle` ARE in the TSV individually? No — `dasalle` is in TSV as one token. The split form is novel. But it's a legitimate fix. → KEEP if both split parts exist as standalone TSV tokens elsewhere on the page, or if the joined form exists in TSV.
+   - Test: can the novel word be constructed by concatenating 2-3 adjacent TSV tokens (with optional hyphen removal)? If yes → KEEP.
+
+2. **Confirmed by PPStructure** → KEEP (second OCR engine agrees)
+   - The word is in `novel_confirmed_by_paddle.txt`. PPStructure's independent OCR captured the same word. Likely correct even though Tesseract missed it.
+
+3. **Single-char diff from a TSV token** → CHECK
+   - The novel word differs from a TSV word by exactly one character (substitution, not insertion/deletion). Could be a legitimate OCR fix (`©`→`C`) or an illegitimate typo correction (`Benutzeroberfäche`→`Benutzeroberfläche`).
+   - If the change is in the allowed character-level fix list (`1/l/I`, `O/0`, `rn/m`, `©/C`, `ı/i`, umlaut restoration) → KEEP.
+   - If the change is anything else (inserted `l` in `oberfläche`, changed `t` to `z` in `Aufsetzten`) → **REVERT to TSV form.**
+
+4. **Not derivable, not confirmed, not single-char** → **REVERT**
+   - The word is truly novel: not constructible from TSV tokens, PPStructure doesn't have it, and it's not a minor variant of any TSV word.
+   - This is hallucinated or reworded text. Replace with `[FLAG]` marker and log for human review. If the TSV has a plausible source word at the same position, revert to that word.
+
+```bash
+# Pseudocode for the classifier:
+for word in verify_flags.txt:
+    if is_adjacent_tsv_concat(word, tsv_words):
+        action = KEEP
+    elif word in paddle_words:
+        action = KEEP
+    elif closest_tsv_word = find_single_char_diff(word, tsv_words):
+        if diff_is_allowed_ocr_fix(word, closest_tsv_word):
+            action = KEEP
+        else:
+            action = REVERT to closest_tsv_word
+    else:
+        action = REVERT or FLAG
+```
+
+This classification is mechanical — no LLM judgment involved. It can be implemented as a Python script. The agent runs it, applies the reverts, and reports what was kept vs reverted.
+
+**The key insight:** prior runs deferred because "90% of flags are legitimate." This classifier keeps that 90% automatically and reverts only the ~10% that are actual violations. No reason to defer.
 
 Procedure per flagged word:
 1. Find the word in `page_NNN.html`.
