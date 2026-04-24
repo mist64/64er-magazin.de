@@ -331,7 +331,7 @@ Everything else in the output originates in a tesseract TSV row.
 | `article_start` | Page opens a new article. Has a visible title in the body area. | Phase 2 + Phase 3 run normally. Title + intro bboxes come from Phase 1; actual text derived in Phase 3 from TSV/pixels. |
 | `continuation` | Page carries body text of an article that started earlier. No title. | Phase 2 + Phase 3 extract body only. |
 | `ad` | Full-page advertisement. Commercial typography, product name, price, no editorial header. | Skip Phase 2 + Phase 3. Emit stub. |
-| `rubric` | Editorial rubric with internal structure unlike regular articles (Leserforum, Editorial, Impressum, TOC, Vorschau, Fehlerteufelchen). | Out of scope for this workflow. Skip or handle manually. |
+| `rubric` | Editorial rubric with internal structure unlike regular articles (Leserforum, Editorial, Impressum, TOC, Vorschau, Fehlerteufelchen). | Phase 2 + Phase 3 run normally. Treat as an article with its own `<h1>` and internal structure (see "Rubric handling" below). |
 | `other` | Cover, masthead, back cover, unclassifiable. | Skip. |
 
 ### Mixed pages
@@ -458,6 +458,28 @@ Also check blocks.txt: if the largest block has >500 words and text preview star
 Some pages contain multiple short news items under a rubric header like "Aktuelles" or "Neue Produkte". Each item has its own bold sub-heading and sometimes its own byline. These are NOT separate articles — they are **one article** (the news roundup) with many `<h2>` sections. Treat the rubric page header as the `<h1>` and each news item heading as `<h2>`.
 
 Exception: if an item spans multiple pages and has its own intro paragraph + decorative opener, it may be a standalone article that happens to sit in the Aktuelles section. Use the h1/h2 distinction rules above.
+
+### Rubric handling
+
+Rubric pages (Leserforum, Editorial, Impressum, Vorschau, Fehlerteufelchen, Einkaufsführer, etc.) are NOT skipped — they are extracted like any other article. Each rubric becomes one article file.
+
+**Structure per rubric type:**
+
+| Rubric | `<h1>` | Internal structure |
+|---|---|---|
+| **Leserforum** | `Leserforum` | `<h2>` per reader question (bold question heading), `<p>` for question + editorial answer. Often Q&A pairs. |
+| **Editorial** | The editorial title (e.g. "Mit Zuversicht …") | `<p>` body, usually one page, signed by editor. |
+| **Fehlerteufelchen** | `Fehlerteufelchen` | `<h3>` per errata item referencing the original article. `<p>` for the correction text. |
+| **Impressum** | `Impressum` | Structured contact/staff info. Emit as `<p>` paragraphs. |
+| **Vorschau** | `Vorschau` | Short blurbs about next issue. `<h2>` per topic, `<p>` body. |
+| **Einkaufsführer** | `Einkaufsführer` | Product listings. `<p>` per item or structured as the page shows. |
+| **Bücher** | `Bücher` | Book review roundup. `<h2>` per book, `<p>` review body. |
+
+**TOC pages** (Inhaltsverzeichnis, typically pages 6-7) are the only rubric that is genuinely skipped — they are navigation, not editorial content.
+
+**Computer-Markt / Kleinanzeigen** classified ads pages are also skipped — they are user-submitted classifieds, not editorial.
+
+All other rubric types are editorial content and must be extracted.
 
 ### Continuation across ad breaks without "Fortsetzung"
 
