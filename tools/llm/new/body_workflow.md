@@ -665,11 +665,43 @@ These are the #1 and #2 OCR errors and they require *context-aware* correction, 
 
 Rule of thumb: in hex/code context, standalone `l` is almost always `1`, standalone `O` is almost always `0`. In German prose context, the opposite. The Phase 3 agent must check context for every `l`/`1`/`I` and `O`/`0` substitution.
 
+**Systematic per-page OCR substitution patterns:**
+When the same character substitution appears 5+ times on one page, it's a systematic OCR misread for that page — not random noise. Detect the pattern and apply the fix consistently across the page. v6 (8605 p099) had `/` → `.` throughout a POKE reference table: `aus/einschalten` → `aus.einschalten`, `5-255` → `5..255`, `0...1` → `0.1`, repeated 10+ times. The agent emitted the garbled forms. Correct approach: notice the pattern after the second occurrence, verify against pixels once, then fix all instances.
+
 **Calibration failures from prior runs:**
 - `Benutzeroberfäche` "corrected" to `Benutzeroberfläche` in v2/v3/v4. The page has `Benutzeroberfäche` (missing L). TSV has it. Pixels confirm it.
+- `geringschäztig` "corrected" to `geringschätzig` in v6 (8605 p142). The print has `geringschäztig` (z instead of tz). The agent's language model auto-corrected what looked like a misspelling. Same failure mode as `Benutzeroberfäche`.
 - `gefertigt` changed to `gefertigt.` — agent added a period.
 - `dann` reordered to `daraus` (8605 v3 p018) — agent restructured sentence.
-- All three caught by Phase 3.5 novel-word + n-gram checks. Auto-revert would have fixed them mechanically.
+- All caught by Phase 3.5 novel-word + n-gram checks. Auto-revert fixes them mechanically.
+
+### Self-check before emitting (Phase 3)
+
+Before writing the final `page_NNN.html`, the agent MUST grep its own output for residual problems:
+
+```bash
+# Broken line-break hyphens (should be near zero)
+grep -nE '[a-zäöü]- [a-zäöü]' page_NNN.html
+
+# Running headers/footers that leaked in
+grep -nEi 'Ausgabe [0-9]+/' page_NNN.html
+
+# BASIC listing fragments
+grep -nE '^[0-9]+ (REM|DATA|PRINT|GOTO|FOR|NEXT)' page_NNN.html
+```
+
+Any hits must be fixed before the page is done. v6 left 21 broken hyphens and several leaked headers across 129 pages — these self-checks would have caught them.
+
+### `[OCR-GAP]` is a last resort
+
+Do not emit `[OCR-GAP]` if ANY of the three OCR sources captured the text. Try in order:
+1. Per-block TSV (primary)
+2. Full-page TSV for the same bbox region
+3. PPStructure `content` for the same block
+4. Retry tesseract with `--psm 6` on a tighter 600 DPI crop
+5. Retry with `--psm 4` (single column) or `--psm 3` (fully automatic)
+
+Only after ALL five fail → `[OCR-GAP]`. v6 (8605 p044) emitted an OCR-GAP where v4 had clean text from the same page — the agent gave up too early.
 
 ### Anti-memory rule (Phase 3)
 
