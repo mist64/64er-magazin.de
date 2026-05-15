@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Die CP/M-Ecke</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="H. Sanner, T. Langhammer, ev, ev">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="88-89">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Die CP/M-Ecke</h1>
+        <p class="intro">Durch CP/M eröffnen sich dem C 128-Besitzer neue Software-Dimensionen — vorausgesetzt, man weiß, wie es funktioniert. Die CP/M-Ecke ist das Forum für alle, die CP/M auf einem Commodore-Computer anwenden oder Programme dafür schreiben.</p>
+
+        <p>CP/M ist ganz groß im Kommen. Der Commodore 128 und die Schneider-Computer haben diesem Betriebssystem, dessen große Zeit (um 1982/83) schon vorbei schien, nochmals zu ungeahnter Blüte verholfen. War CP/M früher ein Betriebssystem in erster Linie für den kommerziellen und wissenschaftlichen Bereich (ein CP/M-System kostete damals leicht fünfstellige Summen), so ist es heute dank preiswerter, leistungsfähiger CP/M-Computer auch für den Privatmann oder für den semi-professionellen Einsatz geeignet. Die Professionalität von CP/M und von CP/M-Software hat jedenfalls nicht durch die rutschenden Preise gelitten.</p>
+
+        <p>Endgültig den neuerlichen Durchbruch hat CP/M im Heimcomputer-Sektor durch eine Initiative des Markt&amp;Technik-Verlages geschafft: Qualitätssoftware namhafter großer Software-Häuser wurde im Preis an die Hardware angepaßt, sprich stark verbilligt. Statt zwischen 800 und 1500 Mark zahlt der Besitzer eines C 128 oder Schneider-Computers nur etwa zwischen 140 und 200 Mark für wirklich professionell zu nennende Software-Produkte, und daß ohne Abstriche an der Qualität der Software oder an der Dokumentation.</p>
+
+        <p>Mit der CP/M-Ecke wollen wir diesem großen Interesse an CP/M ein Forum verschaffen. Sie finden hier Fragen und Antworten, Tips und Tricks und jede Menge interessanter Informationen über CP/M.</p>
+
+        <h2>Tips &amp; Tricks zu dBase II</h2>
+
+        <p>Wer bei dBase II schon einmal versucht hat, eine Datei nach einem Datumsfeld zu sortieren, der wird auf ein spezielles Problem gestoßen sein: Die Datensätze erscheinen in erster Linie fein säuberlich nach Tagesdatum sortiert, aber leider erst in zweiter Linie nach dem Monat und gar erst in dritter Linie nach dem Jahr. Von einer geordneten zeitlichen Folge kann also keine Rede sein. Dies ist allerdings kein Problem speziell von dBase II, sondern hängt einzig und allein mit dem verwendeten lexikografischen Sortierverfahren zusammen. Beim Sortieren schaut dBase also — bildlich gesprochen — zunächst auf das erste Zeichen des zu sortierenden Datensatzes, dann auf das zweite und so fort. Das heißt also in diesem Fall, daß jedes einzelne Zeichen des Datums Sortiermerkmal ist, was ja bei einem Lexikon oder einem Telefonbuch seine Berechtigung hat.</p>
+
+        <p>Hat man nun in einer Datei Sätze mit dem Feld DATUM und etwa die folgenden Inhalte:<br>
+            16.11.85<br>
+            02.01.86<br>
+            10.02.86<br>
+            06.04.86<br>
+            31.05.86</p>
+
+        <p>Dann ergibt die Anwendung eines Sortierbefehls auf das Feld Datum die Reihenfolge:<br>
+            02.01.86<br>
+            06.04.86<br>
+            10.02.86<br>
+            16.11.85<br>
+            31.05.86</p>
+
+        <p>Mit dBase II kann man aber natürlich auch solche Probleme recht elegant umschiffen. Die Zeichenketten-Funktionen von dBase schaffen hier Abhilfe, lassen sich allerdings nicht mit SORT, sondern nur mit INDEX verwenden. Da SORT aber extrem langsam arbeitet, empfiehlt sich sowieso die Verwendung von INDEX. Das funktioniert dann wie folgt:</p>
+
+        <p>Man definiert einen Index über dem Feld Datum in der richtigen Sortier-Reihenfolge:<br>
+            INDEX ON $(DATUM,7,2) + $(DATUM,4,2) + $(DATUM,1,2) TO XDAT</p>
+
+        <p>XDAT ist dabei der Name der erzeugten Indexdatei und kann natürlich beliebig gewählt werden. Der Trick funktioniert also so, daß man aus der achtstelligen Zeichenkette Datum die jeweils zweistelligen Teilketten Jahr, Monat und Tag entnimmt und diese in der Reihenfolge »JJMMTT« zu einem Index, also einem Sortierschlüssel, verkettet. Damit ist die Datei in aufsteigender Reihenfolge nach dem Datum sortiert. Ganz nebenbei ist das verwendete Trennzeichen zwischen Tag, Monat und Jahr für das Sortieren bedeutungslos geworden. Es ist also egal, ob man »29.03.86« oder »29/03/86« schreibt. Allerdings müssen führende Nullen unbedingt mitgeschrieben werden, ein Datum »29.3.86« würde nicht richtig einsortiert werden.</p>
+
+        <p>Für Zwecke der Dokumentation ist es oft nützlich zu wissen, wieviel Zeilen ein dBase-Programm hat. Man kann dies wie folgt ermitteln:</p>
+
+        <p>Als erstes wird eine Datenbank mit Namen ZEILEN angelegt.<br>
+            CREATE ZEILEN</p>
+
+        <p>Es wird nun folgende Struktur eingegeben:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>FIELD NAME TYPE WIDTH<br>
+            001 ZAEHL C 001</p>
+
+        <p>Das abgedruckte kleine dBase-Programm (Listing 1) druckt dann die Anzahl der im Programmfile SOURCE enthaltenen Zeilen. Für SOURCE setzten Sie natürlich den Namen des Sie interessierenden dBase-Programms ein.</p>
+
+        <p>Der INDEX-Befehl bei dBase II ist wesentlich schneller als der SORT-Befehl, hat aber den Nachteil, daß es nicht möglich ist, in absteigender Reihenfolge zu sortieren. Mit einem kleinen Trick kann man sich hier aber helfen:</p>
+
+        <p>Man definiert ein zusätzliches Feld LNR (am besten natürlich gleich beim CREATE-Kommando). Die Datei wird dann einfach ganz normal mit einem Index versehen und ist dadurch nach »USE datei INDEX indexdatei« in aufsteigender Reihenfolge des gewählten Schlüsselfeldes sortiert. Mit einem kleinen Programm (Listing 2) werden jetzt die laufenden Nummern der Sätze in umgekehrter Reihenfolge im Feld LNR eingetragen. Dann wird ein neuer Index, diesmal über das Feld LNR errichtet, und die gewünschte absteigende Sortierung ist erreicht.</p>
+
+        <address class="author">(H. Sanner, T. Langhammer/ev)</address>
+
+        <h2>CP/M-Programme automatisch starten</h2>
+
+        <p>Wer häufiger mit dBase II oder Wordstar arbeitet, wird sich sicher eine Hilfe wünschen, die das lästige immer wieder neue Starten des SETUP-Programms mit den Abfragen nach Zeichensatz und Drucker erspart. Hier ist eine Methode, mit der Sie nur noch die Diskette einlegen und den Boot-Befehl geben müssen — alles andere geht automatisch. Sie gelangen ohne weitere Tippereien in Ihr gewünschtes Programm, Wordstar, dBase II oder irgendein anderes. Die Methode ist universell einsetzbar. Am Beispiel dBase II soll die Vorgehensweise hier einmal demonstriert werden:</p>
+
+        <p>Sie erstellen sich mit ED oder einem Textprogramm unter CP/M (N-Option bei Wordstar) ein Programmfile mit Namen »PROFILE.SUB«. Der C 128 sucht nämlich direkt nach dem Booten des CP/M-Systems nach einer Stapeldatei dieses Namens und führt die darin enthaltenen Befehle aus. Dazu wird automatisch das Programm SUBMIT gestartet, um die PROFILE-Datei abzuarbeiten. Die Sache hat nur einen Haken: Man kann keine Eingabewerte übergeben, die ein solcher aufgerufener Befehl eventuell verlangt. Nach Aufruf von SETUP beispielsweise muß man von Hand die Eingaben »A« und »C« machen, wenn man den ASCII-Zeichensatz einstellen will und über einen Commodore-Drucker verfügt. Solche Eingaben können mit SUBMIT nicht bearbeitet werden. Hier kann man sich aber helfen, indem CP/M einfach angewiesen wird, sich alle weiteren Eingaben statt von der Tastatur aus einer weiteren Datei zu holen. Diese Anweisung besteht nur aus einer einzigen Zeile:<br>
+            GET CONSOLE INPUT FROM FILE DBASE.BAT [SYSTEM]</p>
+
+        <p>Diese Zeile bewirkt, daß alle weiteren Eingaben statt von der Konsole (Tastatur) aus einem File namens DBASE.BAT geholt werden. Damit ist das PROFILE-Programm bereits beendet. Da aber gerade die Tastaturabfrage zur Datei DBASE.BAT umgeleitet wurde, werden jetzt erst alle in dieser Datei enthaltenen Kommandos ausgeführt. Und hier können nun auch beliebige Eingaben während laufender Programme simuliert werden.</p>
+
+        <p>Deshalb erstellen wir als nächstes eine Programmdatei namens DBASE.BAT (BAT steht für Batch-Datei, also für Stapeldatei, DBASE heißt das Ganze, weil damit ja gerade dBase II gebootet werden soll). Wordstar-Anwender ersetzen einfach das DBASE durch WS. Der Inhalt von DBASE.BAT muß so aussehen:<br>
+            SETUP<br>
+            GC<br>
+            DBASE</p>
+
+        <p>Bei Abarbeitung dieser Eingaben geschieht folgendes: Zunächst wird SETUP gestartet, dann erfolgen (im SETUP-Programm) hintereinander die Eingaben »G« und »C« für deutschen Zeichensatz und Commodore-Drucker. Hier können Sie natürlich Ihre eigenen Einstellungen verwenden. Beachten Sie, daß »G« und »C« unmittelbar hintereinander stehen müssen, da das SETUP-Programm nicht auf das Drücken der RETURN-Taste wartet. Zum Schluß wird dann noch ganz einfach dBase aufgerufen (oder Wordstar, oder&hellip;).</p>
+
+        <p>Der Effekt des Ganzen: Nach dem Booten von CP/M werden automatisch alle Einstellungen vorgenommen und dBase II gestartet. Wenn das kein Fortschritt ist&hellip;</p>
+
+        <p>Natürlich sind Erweiterungen dieser Technik denkbar. Falls Sie beispielsweise ein dBase-Programm geschrieben haben, das automatisch gestartet werden soll, dann brauchen Sie nur den Namen dieses Programms an die letzte Zeile im DBASE.BAT-File anhängen. Nehmen wir an, das dBase-Programm verwaltet eine Kundenliste und heißt KUN-DE.CMD, dann brauchen Sie nur das BAT-File so zu ändern:<br>
+            SETUP<br>
+            GC<br>
+            DBASE KUNDE</p>
+
+        <p>Jetzt wird beim Booten von CP/M nicht nur dBase automatisch gestartet, sondern auch gleich das dBase-Programm KUNDE. Sie können also sofort mit der Arbeit loslegen.</p>
+
+        <address class="author">(ev)</address>
+
+        <h2>Small C-Compiler unter CP/M verfügbar</h2>
+
+        <p>Von Markt &amp; Technik gibt es jetzt das »Small C«-Entwicklungssystem, bestehend aus C-Compiler, 8080- und Z80-Makro-Assembler, Linker, Funktionenbibliothek für C plus komplette Library-Verwaltung zum Aufbau eigener C-Bibliotheken. Alle Programme, auch Compiler und Assembler, werden zusätzlich als C-Source-Files mitgeliefert. Zusätzlich gibt es ein Dutzend weiterer C-Programme, die sogenannten Small Tools (Editor und Text-Tools) im Source-Code dazu.</p>
+
+        <p>Der Small C-Compiler hat gegenüber Standard C einige Einschränkungen (keine Fließkommazahlen, keine Structures und Unions), ist aber für den Systemprogrammierer ein vollwertiges Werkzeug, da Pointer voll unterstützt werden.</p>
+
+        <h2>Neue alte CP/M-Software von Digital Research</h2>
+
+        <p>Der um sich greifende neue Erfolg des CP/M-Betriebssystems hat Digital Research (die Entwickler von CP/M) dazu veranlaßt, weitere professionelle CP/M-Software auszugraben. Im einzelnen ist jetzt erhältlich:</p>
+
+        <p><strong>Pascal/MT+</strong> — Ein Pascal-Compiler gemäß dem ISO-Standard, mit zahlreichen Erweiterungen für die Anwendungs- und Systemprogrammierung. Der Compiler erzeugt verschiebbaren Objekt-Code, aus dem der Linker ein direkt ausführbares Programm erzeugt. Preis 174 Mark.<br>
+            <strong>CBasic-Compiler</strong> — Texteditor, Compiler, Linker und Funktionsbibliothek für einen der mächtigsten Basic-Dialekte überhaupt. Viele kommerzielle Anwendungen wurden bereits in CBasic geschrieben. CBasic unterstützt besonders die modulare Software-Entwicklung. Preis 174 Mark.
+        </p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Kennen Sie CP/M?</h2>
+
+        <p>Das Betriebssystem CP/M wird immer beliebter. Arbeiten Sie unter CP/M in Z80-Assembler, Pascal, Small C, dBase II, Wordstar oder Multiplan? Kennen Sie Tips &amp; Tricks zu diesen Programmen oder zu CP/M ganz allgemein, die Sie anderen Lesern mitteilen wollen? Oder haben Sie gar ein umfangreiches Programm geschrieben, das Sie gerne veröffentlichen möchten? Wir suchen Tips und kleine Programme für die CP/M-Ecke sowie größere Programme für spezielle weitere Publikationen. Selbstverständlich gibt es für jede Veröffentlichung ein entsprechendes Honorar. Bitte senden Sie Ihre Unterlagen an<br>
+            Markt &amp; Technik Verlag AG<br>
+            Redaktion 64’er<br>
+            Stichwort CP/M<br>
+            Hans-Pinsel-Str. 2<br>
+            8013 Haar bei München</p>
+    </article>
+</body>
+
+</html>

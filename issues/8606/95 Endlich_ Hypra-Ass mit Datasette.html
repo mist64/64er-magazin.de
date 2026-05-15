@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Endlich: Hypra-Ass mit Datasette</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Edgar Bäumler, ah">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="95">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Endlich: Hypra-Ass mit Datasette</h1>
+        <p class="intro">Bisher war es nicht möglich, ein Maschinenprogramm direkt auf Kassette zu assemblieren. Mit diesem kleinen Programmzusatz wird das anders.</p>
+
+        <p>Für die Speicherung des Objektcodes auf Kassette ist der Pseudobefehl ».ob "file, p, w"« nur sehr eingeschränkt nutzbar. Man könnte durch Ändern der Geräte- und Sekundäradresse in der entsprechenden Routine den Objektcode als Datei aufzeichnen, was aber</p>
+
+        <ul>
+            <li>zu langsam vonstatten geht</li>
+            <li>eine Abspeicherung in den vorgegebenen Speicherbereich unmöglich macht und</li>
+            <li>bei der Rückspeicherung von der Kassette in den Computer zu umständlich wäre.</li>
+        </ul>
+
+
+        <p>Die dem ».ob«-Befehl zugeordnete Routine wurde deshalb von mir umgeschrieben. Den Pseudobefehl ».ob« habe ich, um eventuelle Unklarheiten zu vermeiden, gelöscht.</p>
+
+        <h3>Betroffene Speicherstellen/-bereiche des Hypra-Ass</h3>
+
+        <p>Die Liste der Pseudobefehle ist ab $149c, die dazugehörigen Adressen (-1) ab $14c8 abgelegt. Die ».ob«-Befehlsroutine liegt entsprechend von $1194 bis $llbc.</p>
+
+        <p>Der Rücksprung in den Anfangszustand nach erfolgter Assemblierung erfolgt mit dem Befehl »JMP $ aad7« ab Adresse $ 15d3.</p>
+
+        <p>Der Speicherbereich, in dem der Objektcode nach erfolgter Assemblierung abgelegt wird, ist folgendermaßen definiert:<br>
+            Anfangsadresse in $0970 und $0971<br>
+            Endadresse +1 in $00fb und $00fc</p>
+
+        <h3>Programm</h3>
+
+        <p>Das Programm wurde mit Hypra-Ass erstellt und dürfte sich wegen seiner Kürze und durch die angefügten Bemerkungen selbst erklären. Die verwendeten Kernel-Routinen sind zum Beispiel im Commodore Programmierhandbuch (Sachbuchreihe 1) ausreichend erläutert.</p>
+
+        <h3>Eingabehilfe</h3>
+
+        <ul>
+            <li>Laden des Programmes »Hypra-Ass +«</li>
+            <li>Starten des Programmes »Hypra-Ass +« mit RUN</li>
+            <li>Eintippen des Assembler-Listings</li>
+            <li>Assemblieren mit RUN</li>
+            <li>Anhalten des Programms nach Erscheinen der Aufforderung »press record &amp; play on tape« durch die RUN/STOP-Taste.</li>
+            <li>Abspeichern des modifizierten Programms unter dem Namen »Hypra-Ass/Cass« mit SYS 49152.</li>
+        </ul>
+
+
+        <p>Bei der Benutzung des so modifizierten Assemblers erscheint nach der normalen Ausgabemeldung die Aufforderung »press record &amp; play on tape«. Nach Drücken dieser Tasten wird der assemblierte Objektcode unter dem Namen »LI-STE$« direkt auf Band und zwar in den (mit .ba) vorgewählten Bereich gespeichert.</p>
+
+        <p>Ein Zurückladen dieses Objektcodes in den Computer kann durch einfaches LOAD beziehungsweise LOAD »Liste$« erfolgen. Soll der Objektcode nicht gespeichert werden, ist es möglich, durch Drücken der RUN/STOP-Taste den Assembler wieder in den Anfangszustand zurückzuversetzen.</p>
+
+        <address class="author">(Edgar Bäumler/ah)</address>
+    </article>
+</body>
+
+</html>

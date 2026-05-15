@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Cursor selbst gemacht</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Markus Wild, ah">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="90">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Cursor selbst gemacht</h1>
+        <p class="intro">Lassen Sie Ihrer Fantasie freien Lauf, konstruieren Sie sich Ihren eigenen, ganz persönlichen Cursor. »Wahl Cursor« stellt Ihnen das erforderliche Handwerkszeug zur Verfügung.</p>
+
+        <p>Mit dem Programm »Wahl Cursor« (Listing) kann jeder seinen eigenen Cursor gestalten. Es läßt sich jedes Zeichen mit Hilfe seines Bildschirm-Codes als Cursor-Zeichen definieren (voreingestellt das Zeichen 160, ein reverses »Blank«), Falls diese Auswahl nicht reichen sollte, kann auch ein eigenes Zeichen als Cursor-Zeichen realisiert werden.</p>
+
+        <h3>Bedienungsanleitung:</h3>
+
+        <p>Der neue Befehl hat die drei folgenden Grundstrukturen. Erstens:<br>
+            SYS 49152, Bildschirm-Code</p>
+
+        <p>Hiermit kann als Cursor-Zeichen jedes Zeichen des Originalzeichensatzes gewählt werden. Man übergibt dem Befehl einfach den Code des Zeichens (nachschlagen im Anhang des Handbuchs) und läßt sich überraschen.</p>
+
+        <p>Probieren wir das doch am besten mal aus. Tippen Sie ein:<br>
+            SYS 49152,100.</p>
+
+        <p>Na, da kommt doch ein Hauch PC herüber, denn wenn Sie alles richtig gemacht haben, sollte sich Ihr Cursor nun in einen Strich verwandelt haben (ASCII-Code 114, Bildschirm-Code 100). Unser normaler Cursor ist das Zeichen 160, ein invertiertes Leerzeichen. Wenn wir dieses Zeichen in den Befehl einsetzen, hat auf den ersten Blick alles seine Ordnung. Wird aber der Cursor über ein anderes Zeichen geführt, verschwindet es auf einmal. Abhilfe schafft hier die zweite Art des Befehls:<br>
+            SYS 49152, Bildschirm-Code, Operand</p>
+
+        <p>Der Grund für das anormale Verhalten liegt in der Art, wie der Cursor erzeugt wird. Klären wir also zuerst dieses Problem: Jedes Zeichen kommt im Zeichensatz des Computers zweimal vor, einmal normal und einmal in invertierter Form (die RVS-Zeichen). Die Funktion des Cursors besteht nun darin, in einem bestimmten Zeitabschnitt immer wieder das Zeichen, auf dem er steht, mit seinem Partner zu vertauschen.</p>
+
+        <p>Was dieses Programm macht, ist weiter nichts, als daß es neue RVS-Zeichen erstellt, und zwar kann es das auf zwei Arten:</p>
+
+        <p><strong>Operand\&lt;>0</strong>: Es kopiert das Muster des Cursor-Zeichens einfach über die Grundzeichen. Ist das Cursor-Zeichen also ein Block wie das Zeichen 160, so werden alle RVS-Zeichen zu Blöcken, der Effekt von vorhin!</p>
+
+        <p><strong>Operand=0</strong>: Es kopiert so, daß eine Art Negativ des Zeichens entsteht (Also in Richtung alter RVS-Zeichensatz).</p>
+
+        <p>Doch genug der Theorie, Computer einschalten und los geht’s!<br>
+            SYS 49152,160,0 bringt uns unsern alten Cursor wieder,<br>
+            SYS 49152,121,1 gibt einen Balken, der die Zeichen verdeckt,<br>
+            SYS 49152,121,0 liefert als Ergebnis einen Balken mit invertierten Zeichen. Hier hilft am besten ausprobieren!</p>
+
+        <p>Für alle, die schon immer ein Quadrat als Cursor wollten und nun enttäuscht seufzen: »das ist ja nicht im Originalzeichensatz enthalten«, die dritte Art des Befehls:<br>
+            SYS 49152,x,Operand, b0,b1,b2,b3,b4,b5,b6,b7</p>
+
+        <p>Das Zeichen (x) hat nun keine Bedeutung mehr, denn nun gestalten wir unseren Cursor selbst: Die Byte »b0« bis »b7« definieren ein Zeichen in einer 8*8 Bit-Matrix. Der Operand hat die gleiche Wirkung wie bei dem zuvor behandelten SYS-Aufrufen. Nun, machen wir uns einen Quadrat-Cursor:<br>
+            SYS 49152,0,1,255,129,129,129,129,129,129,255</p>
+
+        <p>Der eigenen Fantasie sind also wirklich keine Grenzen mehr gesetzt. Es kann jedes nur erdenkliche Zeichen als Cursor benutzt werden.</p>
+
+        <p>Nun noch eine Bemerkung zu den alten RVS-Zeichen: Es kann sein, daß gewisse Kontroll-Zeichen nun ein wenig fremd aussehen. Wen das stört, kann diealten Zeichen mit RUN/ STOP-RESTORE wieder einschalten und den neuen Cursor dann erst im Programm einsetzen, wo die seltsamen RVS-Zeichen kaum stören.</p>
+
+        <address class="author">(Markus Wild/ah)</address>
+    </article>
+</body>
+
+</html>

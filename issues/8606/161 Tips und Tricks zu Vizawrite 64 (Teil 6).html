@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Tricks zu Vizawrite 64 (Teil 6)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Josef Heid, Michael Janke,  Jürgen F. Hoffmann, bj">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="161-164,167">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Tricks zu Vizawrite 64 (Teil 6)</h1>
+        <p class="intro">In dieser Folge wollen wir Ihnen ein Konvertierungsprogramm vorstellen, das einen mit Vizawrite 64 erstellten Programmtext in ein lauffähiges Basic- beziehungsweise assemblierbares Assembler-Programm übersetzt, lösen das Geheimnis um Vizaspell und berichten über Vizastar.</p>
+
+        <p>Das Konvertierungsprogramm »VI-CO.cc« (Listing 1) zeichnet sich besonders durch die Möglichkeit der symbolischen Zeilenadressierung, der Bereitstellung aller Vorteile eines komfortablen Editors (Vizawrite 64) für die Programmerstellung in Basic und Assembler sowie seiner Benutzerfreundlichkeit (automatische Zeilennumerierung beim Generieren des Programmes, verschiedene Anwenderoptionen etc.) aus.</p>
+
+        <p>Durch dieses Konvertierungsprogramm wird es möglich, die hervorragenden Editiereigenschaften des Textverarbeitungsprogrammes Vizawrite 64 für die Erstellung von Programmen zu nutzen.</p>
+
+        <p>Es lassen sich mit »VI-CO.cc« Programmteile verschieben, kopieren, löschen, finden und austauschen. Das horizontale Scrolling führt kommentierenden Text innerhalb von Programmen seiner eigentlichen Funktion zu: Programme übersichtlich zu gestalten. Der Kommentar steht wie auf einem 80-Zeichen-Monitor neben dem Programmtext und nicht dazwischen. Bereits fertige, auf Diskette gespeicherte Lösungen für Teilfunktionen eines Programms können nicht nur an den Programmtext angehängt, sondern beliebig eingefügt werden. Dies gilt auch für normal editierte Programme, die als sequentielle Dateien geladen werden können.</p>
+
+        <p>Die Vorgehensweise bei bereits bestehenden Programmen oder Unterprogrammen ist wie folgt:</p>
+
+        <ul>
+            <li>Programm laden und im Direktmodus eingeben: »OPEN 1,8,2,"Name,S,W" :CMD1:LIST«</li>
+        </ul>
+
+
+        <p>Das Programm wird nun als sequentielle Datei auf Diskette geschrieben. Nachdem der Cursor wieder erscheint, geben Sie noch PRINT#1 und CLOSE1 ein, um die Datei ordnungsgemäß zu schließen. In Vizawrite 64 läßt sich dieses Programm mit Merge (CBM-Taste gefolgt von Shift/M) dort in den Text einfügen, wo der Cursor gerade steht. Erscheint in der Befehlszeile »Merge:«, so geben Sie lediglich den Programmnamen ein und schließen die Eingabe mit der Return-Taste ab. Die Frage nach der Anfangsseite beantworten Sie dann in diesem Fall mit »s« und der Return-Taste, bei der Endseite drücken Sie lediglich Return (es wird dann die gesamte Datei geladen). Nach dem Laden des Programmes in den Textspeicher von Vizawrite 64 sind noch die Zeilennummern zu korrigieren. Der erste Schritt besteht darin, alle Befehle, die sich auf Zeilennummern beziehen (zum Beispiel GOTO, GOSUB, THEN), mit dem Replace-Kommando zu berichtigen. Da »VI-CO.cc« die Möglichkeit der symbolischen Zeilenadressierung für Unterprogrammaufrufe und Programmverzweigungen bietet, kann beispielsweise GOSUB 2000 in GOSUB Textausgabe oder etwa GOSUB Unterprogl umgewandelt werden. Durch die symbolische Zeilenadressierung werden Programme übersichtlicher und dokumentieren sich selbst.</p>
+
+        <p>»VI-CO.cc« arbeitet mit allen Programmen zusammen, die in Basic 2.0, Simons Basic oder für den Assembler Profi-Ass geschrieben sind.</p>
+
+        <h2>Kompatibilität</h2>
+
+        <p>Grundsätzlich ist eine Kompatibilität mit allen Basic- und Assembler-Versionen, die den eingebauten Basic-Editor beziehungsweise seine Sprungvektoren benutzen, vorstellbar. Dabei ist zu beachten, daß »VI-CO.cc«</p>
+
+        <ul>
+            <li>den Kassettenpuffer und normalen Bildschirmspeicher ($033C-$07FF) als Speicher für die Symboltabelle benutzt</li>
+            <li>das eigentliche Programm ab $CC00 im RAM steht</li>
+        </ul>
+
+
+        <p>Diese Bereiche dürfen keine Programmteile beziehungsweise Systemvariablen der entsprechenden Basic- oder Assembler-Version beinhalten, können aber während der Ausführung von Programmen benutzt werden; so wird beispielsweise der Bereich ab $CC00 bei Simons-Basic als Farbspeicher für die HiRes-Bitmap benutzt.</p>
+
+        <h2>Handhabung</h2>
+
+        <p>Laden oder erstellen Sie ein Basic- oder Assembler-Programm mit Vizawrite 64; editieren Sie es und speichern das Programm auf Ihren Datenträger. Verlassen Sie danach Vizawrite 64 und nehmen gegebenenfalls Simons Basic oder den Profi-Ass in Betrieb. Laden Sie das Konvertierungsprogramm mit</p>
+
+        <p>)) LOAD "VI-CO.cc ",8,1(Return) NEW (Return) ((</p>
+
+        <p>Beim nun folgenden Programmaufruf können Sie dem Konverter einige Parameter übergeben, die im folgenden aufgeführt sind.</p>
+
+        <h2>Programmaufruf</h2>
+
+        <p>»VI-CO.cc« wird durch SYS (52224), "Filename", Startzeile, Abstand, Modus, Kommentaroption gestartet.</p>
+
+        <p>Erläuterung der einzelnen Parameter:</p>
+
+        <ul>
+            <li>"Filename" ist der Name eines mittels Vizawrite 64 abgespeicherten Textes, der in Basic- oder Assembler-Text umgewandelt werden soll.</li>
+            <li>Startzeile ist die gewünschte erste Basic-Zeilennummer</li>
+            <li>Abstand bedeutet der gewünschte Zeilenabstand (1-255)</li>
+            <li>Modus ist die gewünschte Betriebsart:<br>
+                0: Basic-Modus (voreingestellt)</li>
+        </ul>
+
+
+        <p>Strings, die nicht interpretiert werden können, werden als symbolische Zeilennummer aufgefaßt. Während des Ladens wird eine Symboltabelle angelegt, in der Strings am Anfang einer Basic-Zeile die hierzu vergebene Zeilennummer zugeordnet wird. Nach dem Laden wird der übrige Text nach diesen symbolischen Zeilennummern durchsucht und durch die wirklichen ersetzt.<br>
+            1: Assembler-Modus (wahlweise)</p>
+
+        <p>Der unter Basic-Modus beschriebene Vorgang wird nicht durchgeführt. Symbole bleiben im Programmtext erhalten.</p>
+
+        <ul>
+            <li>Kommentaroption<br>
+                0: Normalmodus (voreingestellt)</li>
+        </ul>
+
+
+        <p>Alle Zeichen hinter »ö« (erscheint nach dem Drücken der »;«-Taste) werden aus der Textdatei nicht übernommen. Das Programm steht dann ohne Kommentarzeilen im RAM.<br>
+            1: Kommentarmodus (wahlweise)</p>
+
+        <p>Im Basic- (oder Simons Basic-)Modus: »ö« wird als »:REM« ins RAM geschrieben. Der Text hinter »ö« wird übernommen. Es entsteht ein Basic-Programm einschließlich REM- Zeilen.</p>
+
+        <h2>Bemerkungen</h2>
+
+        <p>Im Assembler-Modus: »ö« wird als Semikolon (»;«) ins RAM geschrieben. Der Text hinter »ö« wird übernommen. Es entsteht ein Assembler-Programm einschließlich Kommentar im RAM.</p>
+
+        <p>Jede Programmzeile in Vizawrite 64 ist durch Drücken der Return-Taste abzuschließen.</p>
+
+        <p>Bei Zeilen mit mehr als 88 Zeichen wird eine Fehlermeldung ausgegeben und der Konvertiervorgang abgebrochen.</p>
+
+        <p>Bei Verwendung der Zeilensymbole ist folgendes zu beachten:</p>
+
+        <ul>
+            <li>Das erste Zeichen muß immer ein Buchstabe sein.</li>
+            <li>Alle weiteren Zeichen dürfen Zahlen und Buchstaben sein.</li>
+            <li>Teile des Symbols dürfen nicht mit Basic- (oder Simons Basic-)Statements identisch sein (beispielsweise würde bei Simons Basic die Variable »CHARLIE« nicht als Symbol interpretiert, sondern als Zeilennummer ersetzt, da »CHARLIE« den Simons-Basic-Befehl CHAR enthält).</li>
+            <li>Zur Unterscheidung der Symbole werden die ersten 14 Zeichen verwendet.</li>
+            <li>Ein Symbol darf nur einmal vergeben werden. Andernfalls wird ein Symbol durch die zuerst zugeordnete Zeilennummer ersetzt.</li>
+        </ul>
+
+
+        <h2>Beispiele</h2>
+
+        <p>Möchten Sie beispielsweise ein Assemblerprogramm für den Profi-Ass ohne Kommentarzeilen generieren, geben Sie etwa<br>
+            SYS (52224), "Name ", 5,5,1<br>
+            ein. Ein assemblierbares Programm mit Kommentar erhält man durch<br>
+            SYS(52224),"Name ",10,5,1,1</p>
+
+        <p>Nachdem Sie »VI-CO.cc« gestartet haben, erscheint die Systemmeldung und die Text-Datei wird auf der Diskette gesucht. Ist die Suche erfolgreich, wird der Bildschirm abgeschaltet. Nach Einfügen einer Zeile in den Basic-Text erklingt ein Gong. Nachdem sich der C 64 mit »Ready« zurückgemeldet hat, steht der lauffähige (beziehungsweise assemblierbare) Programmcode im Computer-Speicher.</p>
+
+        <h2>Ein Geheimnis wird gelüftet: Vizaspell</h2>
+
+        <p>Vizaspell ist ein Rechtschreibzusatzprogramm zum Textverarbeitungsprogramm Vizawrite 64 und ist alleine nicht lauffähig. Die nachfolgende Beschreibung basiert auf der derzeit einzig verfügbaren englischen Version von Viza Software, eine deutsche Fassung dieses Programmes ist jedoch beabsichtigt. Vizaspell umfaßt eine auf Vizawrite 64 aufbauende Rechtschreibüberprüfung, einen Wortschatz von etwa 30 000 englischen Worten sowie Hilfsprogramme zum Generieren und Kopieren der Bibliotheken. Leider verfügt Vizaspell nicht über deutsche Sonderzeichen; mehr noch: stößt Vizaspell auf Umlaute oder »ß«, so werden diese Buchstaben als Trennzeichen interpretiert, wodurch nur der Wortteil vor und/oder nach dem deutschen Sonderzeichen erkannt wird. Abhilfe schafft hier die Schreibweise »ue« für »ü«, »ss« für »ß« etc. Sofern im Vizawrite 64-Text Umlaute oder das »ß« enthalten sind, lassen sie sich auch problemlos durch die Replace-Funktion ersetzen. Da eine eigene Wortbibliothek vom Anwender aufgebaut werden kann, ist der mitgelieferte englische Wortschatz ebenfalls kein Hindernis.</p>
+
+        <p>An dieser Stelle muß generell gesagt werden, daß die derzeitige Vizaspell-Version nicht für den deutschen Markt geschrieben wurde. Die Anschaffung dieses Programms lohnt sich nur für den, der Vizawrite 64 etwas professioneller nutzt, da sich das »Dictionary« (das ist die Wortbibliothek, mit dessen Hilfe Vizaspell Texte vergleicht) erst mit jedem neuen Dokument weiter aufbaut. Derjenige, der Vizawrite nur ab und zu für kurze Briefe oder ähnliches nutzt, wird erst nach einiger Zeit eine ausreichende Wortschatzbibliothek erreichen. Für längere Dokumente und bei häufigem Gebrauch ist Vizaspell jedoch eine sehr große Hilfe!</p>
+
+        <p>Vizaspell sollte mit den im Lieferumfang befindlichen Hilfsprogrammen auf eine separate Diskette kopiert werden, da die Dictionary im Laufe der Zeit größere Ausmaße annimmt.</p>
+
+        <p>Nun zur Bedienung von Vizaspell:</p>
+
+        <p>Vizaspell kann nur eine im Textspeicher von Vizawrite vorhandene Textdatei verwenden. Der Text sollte aber, aus Sicherheitsgründen, vorher auf Diskette abgespeichert werden. Auf diese Weise kann man immer auf die Urform des Dokuments zurückgreifen.</p>
+
+        <p>Vor dem Aufruf von Vizawrite aus (mit CBM-Shift/Run), muß die Vizaspell-Diskette ins Laufwerk eingelegt werden, da sonst eine "file not found"-Fehlermeldung erfolgt. Nach dem Aufruf und dem Nachladen meldet sich Vizaspell mit dem ersten Menü:<br>
+            F1 — Spell Check Document<br>
+            F3 — Alphabetic Word List<br>
+            F5 — High Usage Word List<br>
+            F7 — Dictionary Search<br>
+            F8 — Return to Vizawrite</p>
+
+        <p>Unter dem Menü erscheint die Meldung:<br>
+            Preparing Word Lists&hellip;. please wait</p>
+
+        <p>Vizaspell sortiert nun alle im Textspeicher befindlichen Wörter alphabetisch und fertigt eine kleine Statistik, die dann anstatt der Meldung unter dem Menü erscheint. Man erkennt daraus sofort, wieviele Wörter (Words) mehrmalig oder einmalig (Unique Words) verwendet wurden. Außerdem werden die Anzahl der Sätze (Sentences), Absätze (Paragraphs) und Seiten (Pages) ausgegeben. Die Geschwindigkeit, mit der dies geschieht, ist erstaunlich. Für eine Datei mit zirka 1600 Wörtern und sieben Seiten benötigt es etwa 30 Sekunden.</p>
+
+        <p>Mit den Funktionstasten kann man nun die einzelnen Menüpunkte anwählen, je nachdem, ob man eine alphabetische Wortliste (Alphabetic Word List), eine Aufstellung der oft genutzten Wörter (High Usage Word List) mit Angabe der Häufigkeit braucht, oder in der vorhandenen Rechtschreibbibliothek nach der Schreibweise eines bestimmten Wortes sucht.</p>
+
+        <p>Die Fl-Taste ruft dann den Spell-Check auf, das heißt, das Programm vergleicht alle im Speicher vorhandenen Wörter mit der Bibliothek. Wörter, die es nicht kennt, werden auf dem Bildschirm revers hervorgehoben. Nach Abschluß des Spell-Check und Betätigen der Space-Taste meldet sich das zweite Menü:<br>
+            F1 — Unrecognised Words<br>
+            F3 — Alphabetic Word List<br>
+            F5 — High Usage Word List<br>
+            F7 — Dictionary Search<br>
+            F8 — Alter Document</p>
+
+        <p>Bis auf einen Punkt (F1) sind alle Funktionen des Menüs gleich geblieben, obwohl bei F8 ein anderer Text steht.</p>
+
+        <p>Die erste Funktionstaste gibt nun alle dem Programm unbekannten Wörter alphabetisch sortiert aus.</p>
+
+        <p>Nach dem Rücksprung ins Vizawrite-Dokument (mit F8), kann man alle vorhandenen Fehler oder die nicht bekannten Wörter editieren (mit CBM-V). Vorher jedoch sollte man an den Anfang des Briefes gehen (erstes vorhandenes Zeichen) und auf 40-Zeichen-Darstellung umgeschaltet werden (CBM-W). Nach dem Kommandoprompt "EDIT, ACCEPT, SKIP OR LEARN THIS WORD?" kann der Text bearbeitet werden. Der Cursor springt auf das erste unbekannte Wort und invertiert es. Mit "E" für EDIT wird korrigiert, wobei der Cursor am Anfang des Wortes steht.</p>
+
+        <p>Soll Vizaspell das Wort oder seine Schreibweise nicht beachten, drückt man "A" (für ACCEPT) oder "S" (für SKIP). ACCEPT bedeutet dabei, daß das Wort den ganzen Text über nicht mehr beachtet wird, während SKIP es nur überspringt und beim nächsten Vorkommen wieder meldet. Diese Funktion ist sehr praktisch bei Abkürzungen und dergleichen.</p>
+
+        <p>Für Vizaspell unbekannte Wörter ist "L" (LEARN) gedacht, nur sollte darauf geachtet werden, daß die Rechtschreibung stimmt, sonst wird das Wort in der falschen Schreibweise in das Dictionary aufgenommen.</p>
+
+        <p>Ist der Vergleich beendet, sollte gleich noch mal mit CBM-Shift/Run Vizaspell geladen werden. Dort meldet sich dann das dritte Menü, wo wiederum nur der erste Punkt (F1) anders ist:<br>
+            F1 — Add to Dictionary<br>
+            F3 — Alphabetic Word List<br>
+            F5 — High Usage Word List<br>
+            F7 — Dictionary Search<br>
+            F8 — Return to Vizawrite</p>
+
+        <p>Mit F1 muß nun die Rechtschreibbibliothek aktualisiert werden, das heißt, Vizaspell erweitert sie um die neuen, hinzugelernten Wörter.</p>
+
+        <p>Nach F8 kann dann das korrigierte Textfile von Vizawrite aus endgültig abgespeichert und ausgedruckt werden.</p>
+
+        <p>Soviel als erster Überblick zu Vizaspell. Welche Möglichkeiten in diesem Programm stecken, welche Aufgaben die Hilfsprogramme haben, wie man diese einsetzt und spezielle Tips und Tricks zu Vizaspell sind Bestandteil kommender Ausgaben.</p>
+
+        <h2>Vizastar</h2>
+
+        <p>Da die Leistungen von Vizastar sehr umfangreich sind, wird diese Einführung schrittweise von der leicht zugänglichen Nutzung des sogenannten Arbeitsblattes, über das Zusammenspiel verschiedener Datenbestände bis hin zur Beschreibung der Datenbank auf Ihrem C 64 führen.</p>
+
+        <p>Vizastar 64 gibt es in zwei Versionen:</p>
+
+        <p>Die kleinere heißt XL-4 und beinhaltet schon alle wichtigen Operationen, wie etwa Postenzähler, automatische Neuberechnung von Summen, Durchschnittswerten oder auch Balkengrafik und Datenbank.</p>
+
+        <p>Etwas teurer ist die XL-8-Version, die noch über etwas mehr Speicherkapazität im Modul verfügt und umfangreichere Darstellungsmöglichkeiten bietet. Die »explodierende Torte« und perspektivische Balkendiagramme in mehreren Reihen sind die Steigerung des Komforts. Die Entscheidung zwischen den beiden Versionen können Sie aufschieben. Wenn Ihnen die XL-4-Version zu klein wird, bekommen Sie im Tausch gegen Zahlung der Preisdifferenz die XL-8-Version. In jedem Fall erhalten Sie eine Programmdiskette und ein Modul, das auf den Expansionport des C 64 (rechts hinten) paßt.</p>
+
+        <p>Neben dem C 64 und dem Bildschirm brauchen Sie ein Commodore 1541-Diskettenlaufwerk. Ein farbiger Bildschirm ist angenehmer, aber nicht unbedingt notwendig. Den pfeilförmig dargestellten Cursor findet man auch gut auf einem Monochrom-Schirm. Wahrscheinlich wollen Sie Ihre Arbeitsergebnisse auch auf Papier sehen. Also ist noch vom Drucker zu sprechen: Hier haben Sie die freie Entscheidung, da selbst Drucker der gehobenen Klasse von Vizastar 64 einwandfrei gesteuert werden. Wenn der Drucker eine Parallel-Schnittstelle hat, hängen Sie ihn mit einem einfachen »Centronics-Kabel« an den User-Port des C 64 (hinten links) und es funktioniert. Für Drucker, die eine serielle Schnittstelle (RS232) haben, bekommen Sie beim Viza-Software-Händler ein passendes Interface, das Interpod. So brauchen Sie sich über die Eigenarten anderer Interfaces keine Gedanken zu machen.</p>
+
+        <p>Nun sollte Vizastar endlich geladen werden. Vor dem Einschalten stecken Sie das Vizastar-Modul in den Expansionport. Nach dem Einschalten drücken Sie die Leertaste und Vizastar wird geladen, es gibt also keine »LOAD«-Tipperei. Ihr Bildschirm zeigt nun den linken oberen Ausschnitt des Arbeitsblattes. Dies ist eine Matrix mit 64 Spalten und 1000 Zeilen, also insgesamt 64000 Zellen. Ein Teil davon reicht für jede Aufgabe. Jede Zelle nimmt in diesem Urzustand 8 Zeichen auf, kann schmaler gemacht werden — bis zur Mindestbreite für drei Zeichen, oder breiter — bis zur Höchstbreite für 100 Zeichen. Überschriften oder Texte können über die Zellenbegrenzung hinausgehen. Die Zellenbreite wird den vorgesehenen Zelleninhalten angepaßt. Hier sind jederzeit Korrekturen möglich.</p>
+
+        <p>Interessanter wird die Arbeit mit dem Arbeitsblatt, wenn Sie die Möglichkeit nutzen, Zahlen und Rechenbefehle in die Zellen einzugeben. Der Inhalt jeder Zelle hat beim Ausdruck seinen festen Platz auf dem Papier. Am Beispiel einer individuellen Fakturierung wollen wir nun Einzelpreise und die Berechnungsformeln für die Mehrwertsteuer, Skonto und die Multiplikation »Stückzahl mal Einzelpreis« sowie den Befehl zur Addition der Beträge einrichten. Erstellen wir hierfür ein neutrales »Formular«, welches Sie sich für jede Rechnung von der Diskette holen. Diese Einträge im »Formular« können Sie mit Vizastar-Befehlen vor versehentlichem Ändern oder Überschreiben schützen. Für die Berechnungen benutzen Sie den Befehl »auto«. Dann erscheinen automatisch die Ergebnisse in den entsprechenden Zellen »druckreif«. Sie geben in eine Zelle, die für die Stückzahl vorgesehen ist, die Menge ein. Der Preis für diese Menge, die Mehrwertsteuer und ähnliches, bis hin zum Endbetrag werden sofort ausgewiesen. Variieren Sie die Menge in dieser Zeile oder tragen Sie andere Werte in anderen Zellen ein, wird die Berechnung wiederholt. Sie sehen also sofort, welche Auswirkung das Ändern eines Parameters zur Folge hat!</p>
+
+        <p>Einfach ist auch die getrennte Erfassung unterschiedlicher Ausgaben. Sie legen die Gliederung an, und legen im Kopf oder am Fuß des Blattes Summenzeilen an. Nach jedem Eintrag erscheint die Summe der Ausgaben einer Art. Bis jetzt haben Sie ein Kontenblatt, welches selbständig addiert. Danach können Sie die Summe aller Ausgaben, die Anzahl aller Einträge (= Anzahl der Belege), Prozentanteile der Ausgaben einer Art an der Summe aller Ausgaben und — sofern Sie wollen — noch deren Durchschnittswerte berechnen. Wenn Sie zum Beispiel wöchentlich »buchen«, sagt Ihnen der Ausdruck, wo Sie finanziell stehen. Der letzte Stand wird auf der Diskette gespeichert und in der nächsten Woche zur anschließenden Buchungsarbeit wieder in den Arbeitsspeicher des Commodore 64 geholt.</p>
+
+        <h2>Speicherplatz</h2>
+
+        <p>Die Aufnahmefähigkeit des Speichers darf natürlich nicht außer acht gelassen werden. Aber auch dabei hilft Ihnen Vizastar. Auf dem Bildschirm sehen Sie jederzeit, welcher prozentuale Anteil des Speichers noch zur Verfügung steht. Bei der Eingabe vollständiger Adressen mit Telefonnummern etc. kommt man nach etwa 150 Adressen an die Grenze des Arbeitsspeichers. Wollen Sie mehr Adressen ordnen, speichern Sie die sortierten Adressen der ersten Eingabe ab, erfassen weitere Adressen in einer zweiten Eingabe und speichern diese ebenfalls sortiert ab. Dann laden Sie zum Beispiel aus beiden Eingaben den oberen Teil, vielleicht A - H und lassen wieder sortieren. Nun steht Ihr Adreßverzeichnis für den Bereich A - H. Dieselbe Prozedur für I - Z schließt die Arbeit ab.</p>
+
+        <p>Ähnlich verfahren Sie, wenn die Erfassung Ihrer Ausgaben eigentlich einen größeren Arbeitsspeicher erfordert. Nach drei oder sechs Monaten beginnen Sie eine »neue Seite« mit dem anfangs eingerichteten »Formular«, welches sich dann auf der Diskette befindet.</p>
+
+        <p>Nachdem Sie nun über Ihre Adressen und Ihre Ausgabenspezifikation, mit der Sie auch beim Finanzamt Anerkennung ernten, einen guten Überblick haben, werden Sie nach und nach Ihr Fahrtenbuch mit Vizastar schreiben oder die Reisekosten-Pauschalen automatisch errechnen und addieren lassen. Danach erstellen Sie sich vielleicht eine Kundenstatistik, Ihre Betriebswirtschaft mit variablen Kosten und Erlösen etc. — wie und wann Sie wollen!</p>
+
+        <p>Zudem lassen sich durch den Befehl »Export« CBM-ASCII-Dateien erzeugen, die beispielsweise von Vizawrite 64, anderen Textverarbeitungsprogrammen oder Ihren eigenen Programmen ausgewertet werden können. Entsprechend wird bei »Import« eine CBM-ASCII-Datei eingelesen, die durchaus von einem anderen Programm erstellt sein kann.</p>
+
+        <p>Auf diese Weise bleibt der Datenkontakt von und zu anderen Programmen gewahrt. Die Anwendungsmöglichkeiten dehnen sich dementsprechend auf Gebiete wie etwa das Mahnwesen aus (Serienbriefe durch ein Textverarbeitungsprogramm mit individuellen Daten aus Vizastar etc.). Die in der Datenbank von Vizastar gespeicherten Einträge lassen sich so in vielfältiger Weise ohne lästige Neueingabe in anderen Programmen verwerten, zumal die Datenbestände Vizastars auch nach beliebigen Kriterien ausgewählt und im schon erwähnten CBM-AS-CII-Format abgelegt werden können.</p>
+
+        <p>Die aufgeführten Beispiele zeigen, daß Sie durch Vizastar Ihren Commodore 64 sehr sinnvoll einsetzen können. Wir wollen Sie hierin auch künftig unterstützen.</p>
+
+        <p>Im Anschluß finden Sie das Listing zum Programm »Read Vizawrite« (Listing 2), welches aus Platzgründen im 64’er, Ausgabe 5/86, nicht mehr veröffentlicht werden konnte.</p>
+
+        <address class="author">(Josef Heid/Michael Janke/ Jürgen F. Hoffmann/bj)</address>
+    </article>
+</body>
+
+</html>

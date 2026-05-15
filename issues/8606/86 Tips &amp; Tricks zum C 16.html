@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 16</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Michael Schmand, tr">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="86-87">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 16</h1>
+        <p class="intro">Zum hervorragenden Basic des C16 bringen wir Ihnen noch vier wirklich nützliche Befehle. Außerdem zeigen wir, wie man mit einem kleinen Trick fast beliebig große Grafik-Textfenster erzeugen kann.</p>
+
+        <p>Unsere Tips &amp; Tricks-Kiste schreit nach C 16-Futter! Vor allem die Profis seien hier noch einmal dazu aufgerufen, uns ihren interessantesten POKE, die nützlichste Maschinenroutine oder das genialste Basic-Programm zu schicken. Jede brauchbare Einsendung wird veröffentlicht. (tr)</p>
+
+        <h2>Vier nützliche Basic-Befehle</h2>
+
+        <p>Das Programm »BASICTOOL« (Listing 1) ist ein sogenannter »DATA-Lader«, der vier kurze Maschinenprogramme erzeugt. Hierdurch werden einige zusätzliche Funktionen auf dem C 16 implementiert:</p>
+
+        <h3>OLD</h3>
+
+        <p>Mit diesem Befehl kann man Basic-Programme, die unbeabsichtigt durch »NEW« oder einen Reset gelöscht wurden, wieder lauffähig machen. Er hilft bisweilen auch, wenn Programme fehlerhaft von Kassette geladen wurden.</p>
+
+        <p>Aufgerufen wird er einfach mit: SYS 1618</p>
+
+        <h3>SWAP</h3>
+
+        <p>Dieser Befehl wurde für den C 64 bereits in der 64’er, Ausgabe 12/85 vorgestellt. Ich habe ihn für den C 16 umgeschrieben.</p>
+
+        <p>Er dient dazu, zwei Strings miteinander zu vertauschen. Dies geschieht durch Vertauschen der Stringdeskriptoren, es entsteht also kein »Stringmüll«. Die gefürchtete Garbage Collection wird verhindert.</p>
+
+        <p>Es gilt folgender Syntax für den Aufruf: SYS 1569 (A$,B$) A$ und B$ können hierbei zwei beliebige Stringvariable sein.</p>
+
+        <h3>BLOAD und BSAVE</h3>
+
+        <p>Diese Befehle simulieren die entsprechenden Befehle des C 128. Sie dienen dazu, von einem Basic-Programm aus einen ganzen Speicherblock zu laden oder zu speichern.</p>
+
+        <p>Man kann so zum Beispiel eine Grafik speichern oder ein Maschinenprogramm nachladen. Auch Programme, die mit dem S-Befehl des eingebauten Monitors gespeichert wurden, können geladen werden.</p>
+
+        <p>Es gilt folgende Syntax:<br>
+            BLOAD: SYS 1536 "name", g, 1<br>
+            BSAVE: SYS 1548 "name", g, 1, aa, ea+1</p>
+
+        <p>Hierbei ist g die Gerätenummer (1 oder 8 für Kassette oder Disk), aa die Anfangs- und ea die Endadresse des Speicherbereichs.</p>
+
+        <p class="source">Beispiel: aa = 8192, ea = 16384 zum Speichern der HiRes-Grafik.</p>
+
+        <address class="author">(Michael Schmand/tr)</address>
+
+        <h2>Beliebig große Grafikfenster</h2>
+
+        <p>Dieses Maschinenprogramm steuert einen Rasterzeilen-Interrupt, durch den man im »GRAPHIC 2«- oder »GRAPHIC 4«-Modus ein fast beliebig großes Grafik-Fenster erzeugen kann. Die hierzu notwendige Routine ist bereits im ROM des C 16 vorhanden, denn auch im normalen Split-Screen-Modus muß ja ein Raster-Interrupt stattfinden. Man kann also diese Routine einfach kopieren und ein wenig ändern. Wie dies am einfachsten geschieht, wird im folgenden beschrieben:</p>
+
+        <ol>
+            <li>Geben Sie zunächst die folgende Basic-Zeile ein:<br>
+                10 SYS 4293</li>
+        </ol>
+
+
+        <p>Dies wird der spätere Einsprung in die Initialisierungs-Routine. Achten Sie darauf, daß zwischen »SYS« und der Adresse höchstens ein Space steht, sonst kommen Sie mit dem Speicherplatz nicht hin.</p>
+
+        <ol>
+            <li>Rufen Sie jetzt den Monitor auf und geben Sie ein:<br>
+                T CEOE CEC4 100E</li>
+        </ol>
+
+
+        <p>Damit wird die Interrupt-Routine ins RAM kopiert. Hierbei bleibt das Low-Byte der Interrupt-Startadresse gleich ($OE), so daß später nur die High-Bytes der Interrupt-Vektoren geändert werden müssen, um den Interrupt auf unsere eigene Routine zu lenken.</p>
+
+        <ol>
+            <li>Machen Sie nun noch vom Monitor aus folgende Änderung: A 1015 JSR $1060.</li>
+        </ol>
+
+
+        <p>Damit wird der Raster-Interrupt auf die eigene Routine umgelenkt.</p>
+
+        <ol>
+            <li>Zur Initialisierung müssen Sie jetzt noch folgendes kurzes Maschinenprogramm eingeben:</li>
+        </ol>
+
+
+        <p>TODO TABLE</p>
+
+        <p>A 10C5 SEI<br>
+            A 10C6 LDA#$10 (Interrupt auf eigene Routine lenken)<br>
+            A 1008 STA$0313<br>
+            A 10CB STA$0315<br>
+            A 10CE CLI<br>
+            A 10CF LDA#$11 (Basic-Start auf $1100 heraufsetzen)<br>
+            A 10D1 STA $2C<br>
+            A 10D3 LDA#$00<br>
+            A 10D5 STA $1100<br>
+            A 10D8 PLA<br>
+            A 10D9 PLA<br>
+            A 10DA JMP $8A7B (NEW/CLR ausführen)</p>
+
+        <ol>
+            <li>Verlassen Sie jetzt den Monitor mit »X« und machen Sie im Direktmodus folgende Eingaben:<br>
+                POKE 4185,129:POKE 4203,131:POKE 4238,131</li>
+        </ol>
+
+
+        <p>Damit ist das kleinstmögliche Grafikfenster eingestellt.</p>
+
+        <ol>
+            <li>Rufen Sie wieder den Monitor auf. Speichern Sie das fertige Programm mit:<br>
+                S "GRAFIKFENSTER",8,1001,10DD</li>
+        </ol>
+
+
+        <p>Dadurch wird jetzt die vorher eingegebene Basic-Zeile zusammen mit der kopierten Maschinenroutine als zusammenhängendes Programm gespeichert und später als solches auch wieder geladen.</p>
+
+        <p>Kassettenbenutzer müssen statt der »8« natürlich eine »1« einsetzen.</p>
+
+        <p>Das so gespeicherte Programm können Sie nun einfach mit »LOAD ’’GRAFIKFENSTER" ,8« (beziehungsweise mit »LOAD "GRAFIKFENSTER",1 für Datasette) laden und mit »RUN« starten. Dabei wird automatisch der Basic-Start um 256 Byte nach oben gesetzt. Danach können Sie Basic-Programme eingeben oder laden, als ob nichts geschehen wäre. Sobald Sie aber »GRAPHIC 2« oder »GRAPHIC 4« eingeben, sehen Sie, daß jetzt nicht mehr fünf sondern neun Textzeilen sichtbar werden. Dies wurde durch die POKE-Befehle erreicht, die einfach dafür sorgen, daß bei einer früheren Rasterzeile als sonst in den Text-Modus zurückgeschaltet wird. Weitere POKE-Möglichkeiten entnehmen Sie bitte der Tabelle. Sie können damit jederzeit von Basic aus die Größe des Grafikfensters ändern.</p>
+
+        <h3>Wichtiger Hinweis:</h3>
+
+        <p>Sowohl bei der Eingabe als auch beim Laden des Programms muß der Basic-Start unbedingt auf seinem Normalwert sein! Ansonsten liegt die am Anfang eingegebene Basic-Zeile nicht an der richtigen Stelle im Speicher. Drücken Sie also am besten einmal auf den Reset-Knopf. Dies ist besonders wichtig für Besitzer eines Plus/4 oder eines C 16 mit RAM-Erweiterung, da hier beim erstmaligen Einschalten der Grafik der Basic-Start automatisch um 12 KByte heraufgesetzt wird!</p>
+
+        <h3>Tabelle:</h3>
+
+        <p>In nachfolgender Tabelle ist aufgeführt, welchen Effekt man erzielt, wenn man durch POKE-Befehle die Größe des Grafikfensters ändern will. Dazu müssen Sie jeweils in die Speicherstellen 4203 und 4238 den Wert von X, und in Speicherstelle 4185 den Wert von X minus 2 POKEn.</p>
+
+        <p>TODO TABLE</p>
+
+        <p>X Anzahl Textzeilen<br>
+            131 9 kleinstmögliches Grafikfenster<br>
+            139 8<br>
+            147 7<br>
+            155 6<br>
+            163 5 normal<br>
+            171 4<br>
+            179 3<br>
+            187 2</p>
+
+        <p>Ein besonderer Effekt läßt sich erzielen, wenn man den Wert in 4238 auf X plus 1 setzt. Hier wartet nämlich das Interrupt-Programm, bis der Rasterstrahl den eigentlichen Umschaltpunkt erreicht hat. Dadurch wird ein flimmerfreies Umschalten möglich. Erhöht man nun diesen Wert, so wartet der Interrupt mit dem Einschalten des Textbildschirms noch eine Rasterzeile »lang«, obwohl der Grafikbildschirm bereits ausgeschaltet wurde. Resultat ist eine schwarze Trennlinie zwischen Grafik und Text, die entsteht, während sich der Video-Chip im »Niemandsland« zwischen Text und Grafik befindet.</p>
+
+        <address class="author">(Michael Schmand/tr)</address>
+    </article>
+</body>
+
+</html>

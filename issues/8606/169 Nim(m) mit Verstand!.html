@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Nim(m) mit Verstand!</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Matthias Rosin, dm">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="169,172-173">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Nim(m) mit Verstand!</h1>
+        <p class="intro">Auch diesmal präsentieren wir Ihnen wieder ein Knobel-Problem mit der Aufforderung an Sie, dieses auf Ihren Computer umzusetzen.</p>
+
+        <p>In der ersten Folge hatten wir uns mit einer Computerstrategie für das Mancala-Spiel beschäftigt. Ohne näher auf die allgemeinen Grundlagen der Spieltheorie einzugehen, hatte ich das Verfahren der Minimaximierung vorgestellt und eine recht anspruchsvolle Knobelaufgabe gestellt. Für die Lösung dieser Aufgabe will ich Ihnen noch etwas Zeit lassen. Statt dessen soll diese Folge der Erstellung einfacher mathematischer Modelle von Spielstrukturen gewidmet sein. Diese wollen wir anhand einiger konkreter Beispiele betrachten. Wir beschäftigen uns mit einer bestimmten Gruppe von Spielen, die sich folgendermaßen klassifizieren lassen: — Es findet ein Wettkampf zwischen zwei Personen statt, der nach endlich vielen Zügen beendet ist.</p>
+
+        <ul>
+            <li>Der Spielverlauf wird ausschließlich durch Aktionen der Spieler bestimmt. Es fehlen Zufallselemente, wie Würfel oder Karten.</li>
+            <li>Beide Spieler haben ständig Einblick in die Aktionen des Gegners und in den aktuellen Spielstand.</li>
+        </ul>
+
+
+        <p>Spiele wie Mühle, Dame, Schach oder Mancala sind typische Vertreter dieser Klasse. So verschieden deren Spielregeln auch sein mögen, so lassen sie sich dennoch alle mit derselben mathematischen Vorgehensweise analysieren. Stellvertretend dazu soll uns ein Spiel dienen, das Bachet de Meriziac bereits 1612 in dem Werk »Problemes plaisants et delectables, &hellip;« beschrieben hat: Steine nehmen.</p>
+
+        <p>Auf einem Haufen befinden sich n Steine. Es wird eine Zahl k (k\&lt;n) vereinbart. Abwechselnd nehmen beide Spieler mindestens einen und höchstens k Steine von dem Haufen. Wer den letzten Stein nimmt, gewinnt.</p>
+
+        <p>Im Lauf der Jahre wurde eine enorme Vielzahl von Varianten aus diesen einfachen Grundregeln erdacht. Charles Leonard Bouton, Professor für Mathematik an der Harvard Universität, war es, der dem Spiel den Namen »Nim« gab. Er veröffentlichte 1901 eine exakte Analyse für eine Nim-Strategie mit beliebig vielen Steinen und Haufen. Darauf wollen wir später eingehen.</p>
+
+        <h3>Gewinn- und Verlustpositionen</h3>
+
+        <p>Zunächst soll uns die Strategie für »Nim mit einem Haufen« beschäftigen. Sehen wir uns hierzu eine beliebige Partie für n = 8 und k = 3 an (Tabelle 1). Offensichtlich ziehen beide Spieler ohne Konzept. Spieler A hat zwar die Partie für sich entschieden, bei näherem Hinsehen erkennt man jedoch, daß B leicht hätte gewinnen können. Wo liegt also der Fehler von B?</p>
+
+        <p>Eine Position mit drei und weniger Steinen führt zum Sieg. Deshalb ist die Position mit genau vier Steinen für den ziehenden Spieler eine garantierte Verlustposition. B wäre somit erfolgreich gewesen, wenn er bei Zug Nr. 2 drei Steine genommen hätte. Dementsprechend ist auch die Startposition mit acht Steinen eine garantierte Verlustposition, sofern der Gegner optimal zieht. Offenbar lassen sich die Spielpositionen nach einfachen Regeln in Gewinn- und Verlustpositionen einteilen.</p>
+
+        <p>Wenn wir uns eine grafische Übersicht über alle möglichen Spielverläufe schaffen, werden diese Zusammenhänge leicht erkennbar. Bild 1 zeigt einen entsprechenden »gerichteten Graph«. Jeder Spielposition ist ein Kreis, auch »Knoten« genannt, zugeordnet. Die Pfeile heißen »Kanten« des Graphen und stellen die Spielzüge dar. Ein Graph für Strategiespiele heißt auch »Positionsgraph«. Jede Partie stellt sich also als endlicher Weg durch den Graphen dar. Der Spielverlauf entsprechend der Tabelle 1 ist durch die dick gezeichneten Pfeile beschrieben. Zudem sind die Verlustpositionen ebenfalls dick umrandet.</p>
+
+        <p>Einen Spezialfall des gerichteten Graphen haben wir bereits in der letzten Folge kennengelernt: Bei einem »Baum« kann jeder Knoten nur auf genau einem Weg erreicht werden. Für Nim ist die Baumdarstellung deshalb nicht sinnvoll. Wir können als Endergebnis unserer Untersuchung festhalten, daß sich die Verlustpositionen für beliebig große n und k = 3 bei 0, 4, 8, 12, &hellip; befinden. Es ist unschwer zu erkennen, daß allgemein für »Nim mit einem Haufen« und beliebige k die Verlustpositionen durch die Vielfachen von k +1 gekennzeichnet sind.</p>
+
+        <p>Vor dem Weiterlesen sollten Sie zwischendurch einmal versuchen, die vorgestellte Strategie zu programmieren. Wem das zu einfach ist, dem seien folgende Varianten empfohlen:</p>
+
+        <ul>
+            <li>Es sei nicht erlaubt, die gleiche Anzahl Steine zu entnehmen, die der Gegner genommen hat.</li>
+            <li>Wer den letzten Stein nimmt, verliert das Spiel.</li>
+            <li>Ungerade gewinnt: n sei eine ungerade Zahl, k sei wieder beliebig. Das Spiel läuft wie gewohnt, gewonnen hat, wer am Ende eine ungerade Anzahl Steine besitzt. (Es empfiehlt sich bei dieser schwierigen Variante, zunächst für kleine Werte, zum Beispiel n = 5 und k = 2, den Positionsgraphen mit den Gewinn- und Verlustpositionen zu entwickeln!)</li>
+        </ul>
+
+
+        <h3>Nim mit mehreren Haufen</h3>
+
+        <p>Es werden mehrere Haufen angelegt. Dabei ist die Anzahl der Steine je Haufen beliebig. Ebenso können bei jedem Zug beliebig viele Steine (mindestens einer) entnommen werden, jedoch immer nur von genau einem Haufen. Sieger ist wieder, wer den letzten Stein entfernt. Um unserem Computer eine ernstzunehmende Strategie beizubringen, betrachten wir zunächst wieder einen einfachen Fall mit zwei Haufen (Tabelle 2).</p>
+
+        <p>Die Strategie von Spieler A läßt sich leicht erkennen. Er hat jeweils so viele Steine genommen, daß B immer gleichviele Steine in beiden Haufen vorfand. Demnach</p>
+
+        <p>läßt sich für »Nim mit zwei Haufen« eine einfache Gewinnstrategie formulieren: Jede Spielposition kann durch ein Zahlenpaar (m,n) gekennzeichnet werden. In unserem einfachen Beispiel ist jede Stellung mit m = n für den Ziehenden eine Verluststellung. Somit ist jede Spielposition mit m<sup>n</sup> eine Gewinnstellung. Die Strategie besteht darin, dem Gegner immer eine Verlustposition vorzulegen. Ob die Möglichkeit dazu besteht, kann anhand von drei einfachen Regeln überprüft werden:</p>
+
+        <ol>
+            <li>Eine Gewinnposition liegt vor, wenn mindestens ein Zug in eine Verlustposition führt.</li>
+            <li>Eine Stellung ist eine Verlustposition, wenn jeder Zug in eine Gewinnposition überführt.</li>
+            <li>Jede Endposition ist eine Verlust- oder Gewinnposition (abhängig von den jeweiligen Spielregeln).</li>
+        </ol>
+
+
+        <p>Diese Regeln lassen weitreichende Schlußfolgerungen für Strategiespiele zu. Ist zum Beispiel die Anfangsstellung eine Gewinnposition, so gewinnt der Anziehende garantiert, sofern er keinen Fehler macht. Rein theoretisch gelten diese Regeln auch für Spiele wie Schach oder Dame! Natürlich ist bei diesen Spielen die Zahl der möglichen Positionen so enorm groß, daß sich eindeutige Gewinnstrategien niemals werden aufstellen lassen. Kann man den Berechnungen hierzu Glauben schenken, so sind bei Schach sage und schreibe 2i85oo verschiedene Partien möglich!</p>
+
+        <p>Kehren wir aber vorerst von so schwindelerregenden Größen zu Nim zurück. Wir können unsere drei Grundregeln auch auf »Nim mit drei Haufen« anwenden. Ausgehend von der Endposition (0,0,0) können so alle Positionen als Gewinn- oder Verlustpositionen rekursiv bestimmt werden. Hierzu werden alle Spielpositionen konstruiert, die sich durch einen Zug in (0,0,0) überführen lassen. Da die Endposition (0,0,0) entsprechend den Spielregeln eine Verlustposition ist, sind alle Vorgänger Gewinnpositionen (vergleiche 1. Regel). Von jeder so gefundenen Gewinnposition werden alle Vorgänger als Verlustpositionen gekennzeichnet, sofern sie der 2. Regel genügen, alle anderen Stellungen sind als Gewinnpositionen zu kennzeichnen. Dieses Verfahren wird so lange wiederholt, bis alle Positionen markiert sind. Die Methode der Minimaximierung aus der letzten Folge und die Variante »Ungerade gewinnt« (siehe oben) beruhen auf dem gleichen Prinzip. Hat Ihnen die Programmierung der Mancala-Strategie bisher Schwierigkeiten bereitet? Die rekursive Nim-Programmierung bietet eine einfache und reizvolle Vorübung!</p>
+
+        <p>Eine ganz andere Methode, um eine Strategie für »Nim mit mehreren Haufen« zu programmieren, stammt von Charles L. Bouton. Sie ist eine Weiterentwicklung der bereits besprochenen Strategie für zwei Haufen und löst das Problem verblüffend einfach auf rechnerische Weise. Um eine Verlust- oder Gewinnposition zu ermitteln, werden die Anzahlen der Steine in jedem Haufen im Binärcode dargestellt und stellenweise (ohne Übertrag) addiert (Tabelle 3). Eine Verlustposition liegt vor, wenn die Summe in jeder Spalte Null ist, andernfalls handelt es sich um eine Gewinnposition. Tabelle 3 zeigt die Analyse einer Nim-Position mit vier Haufen. Da sich in den Spalten 2 und 3 als Summe jeweils eine Eins ergibt, handelt es sich bei (7,15,26,30) um eine Gewinnposition. Der von dieser Position ziehende Spieler hat genau drei verschiedene Möglichkeiten, seinem Gegner eine Verlustposition vorzulegen. Diese sollten Sie sich anhand der Tabelle 3 selbst überlegen.</p>
+
+        <p>Beachten Sie, daß pro Zug nur von genau einem Haufen eine beliebige Anzahl Steine genommen werden darf! Können Sie die Frage mühelos beantworten, so sollten Sie sich auch gleich auf die neue Knobelaufgabe stürzen: Programmieren Sie ein Nim-Spiel, bei dem sich möglichst viele der besprochenen Varianten anwählen lassen. Zögern Sie auch nicht, eigene Varianten in das Programm einzubauen. Zu guter Letzt: Lassen Sie Ihr Selbstgeschriebenes nicht in irgendeiner Schublade verschwinden. In den nächsten Folgen sollen die besten Nim- und Mancala-Programme an dieser Stelle vorgestellt werden. Computer-Knobeleien ist Ihr Kurs zum Mitmachen und Mitgestalten.</p>
+
+        <address class="author">(Matthias Rosin/dm)</address>
+    </article>
+</body>
+
+</html>

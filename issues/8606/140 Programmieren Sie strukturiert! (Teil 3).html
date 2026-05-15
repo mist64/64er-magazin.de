@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Programmieren Sie strukturiert! (Teil 3)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Prof. Burkhard Leuschner, cg, gk">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="140,142-144">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Programmieren Sie strukturiert! (Teil 3)</h1>
+        <p class="intro">Wer strukturiert programmieren will, braucht als Werkzeuge vernünftige Befehlsstrukturen. Bisher haben Sie Programmbausteine kennengelernt, die den Programmablauf steuern. Nun geht es um Prozeduren mit mehr als einem Ein-/Ausgang: um mehrfache Kommunikation.</p>
+
+        <p>Die bisherigen Beispiele für Prozeduren enthielten jeweils keine oder nur eine einzige Variable, das heißt: entweder gar keinen Durchgang oder einen Eingang oder einen Ausgang oder einen Ein-/Ausgang für Information. Die Anzahl der Durchlässe ist jedoch prinzipiell nicht beschränkt. Im Prinzip können so viele Variablen benutzt werden, wie der Programmierer wünscht. Und jede Variable kann einem anderen Typ angehören: IN oder OUT oder IN/OUT. Auf diese Weise entstehen neben den grundlegenden Prozedurtypen alle möglichen Mischtypen. Ein Beispiel für einen solchen Mischtyp sehen Sie in Bild 1.</p>
+
+        <h2>Prozeduren mit mehrfacher Kommunikation</h2>
+
+        <p>Die Prozedur INPUT’MIT’VORGABE soll zur Eingabe auffordern können (zum Beispiel »Wollen Sie weitermachen?«), soll eine Antwortmöglichkeit vorgeben können (die, die am ehesten zu erwarten ist, zum Beispiel »Ja«) und so lange um Antwort bitten, bis tatsächlich eine Eingabe gemacht worden ist.</p>
+
+        <p>Auf dem Bildschirm soll also folgendes erscheinen: »Wollen Sie weitermachen (Ja/Nein)? Ja«</p>
+
+        <p>Der Cursor blinkt auf dem J. Wenn Sie Ja eingeben wollen, brauchen Sie jetzt nur auf die RETURN-Taste zu drücken.</p>
+
+        <p>Die Prozedur braucht zwei Informationen von außen: Mit welchen Worten sie zur Eingabe auffordern und was sie vorgeben soll. Und sie gibt eine Information an die Außenwelt weiter: Nämlich das, was als Antwort eingegeben worden ist. Der Prozedurkopf wird deshalb drei Variablen enthalten, zwei für hereinkommende und eine für hinausgehende Daten. Eine Comal-Prozedur finden Sie in Listing 1.</p>
+
+        <p>Der Befehlsaufruf kann zum Beispiel lauten: input'mit'vorgabe("Was nun? "," ",eingabe$)</p>
+
+        <p>Ein paar Hinweise zur Comal-Prozedur »input’mit’vorgabe«:</p>
+
+        <p>ZONE bestimmt die Anzahl der Zeichen zwischen zwei Druckspalten; in der Prozedur wird ZONE vorsichtshalber auf 0 gesetzt, damit die Vorgabe in Zeile 9070 an die richtige Stelle kommt, nämlich direkt hinter den Aufforderungstext. Am Ende erhält ZONE wieder den Wert, den es vor dem Aufruf der Prozedur hatte.</p>
+
+        <p>CHR$(145) entspricht dem Steuerzeichen für »Cursor nach oben«.</p>
+
+        <p>In Comal kann man die Eingabeaufforderung als Variable dem INPUT-Befehl mitgeben, was in Basic ja nicht möglich ist (Zeile 9140).</p>
+
+        <p>Für die Eingabeschleife brauchten wir eigentlich eine LOOP-Schleife. Die steht aber in Comal 0.14 nicht zur Verfügung, weshalb wir sie (mit Hilfe einer REPEAT-UNTIL-Schleife) imitieren müssen.</p>
+
+        <p>Listing 2 zeigt eine entsprechende Prozedur in Basic.</p>
+
+        <p>Zeile 40070 bewirkt, daß hinter dem INPUT-Fragezeichen ein Anführungszeichen gedruckt wird, so daß auch Texte mit Komma und Doppelpunkt akzeptiert werden.</p>
+
+        <p>In Zeile 40130 werden die Aufforderungs- und die Vorgabevariablen geleert. Das macht es möglich, beim Aufruf der Prozedur eine oder beide Variablen wegzulassen, wenn sie nicht gebraucht werden. Beispiele:</p>
+
+        <p>uauff$="Wollen Sie weitermachen":uvorg$="JA"<br>
+            gosub 40000in$=ueingabe$<br>
+            uauff$="Was möchten Sie jetzt"gosub 40000: in$=ueingabe$ gosub 40000: in$=ueingabe$</p>
+
+        <p class="source">Anmerkung: In Comal ist die Anzahl der möglichen Variablen, die im Prozedurkopf erscheinen können, durch die Zeilenlänge begrenzt (Je kürzer die Variablennamen sind, um so größer ist ihre mögliche Anzahl). In Basic gilt diese Beschränkung nicht; der Befehlsaufruf ist hier ja eine Sequenz, die nicht unbedingt einzeilig zu sein braucht, sondern auch als Zeilenblock codiert werden kann (siehe Teil I), und ein solcher Zeilenblock kann so viele Zeilen enthalten wie nötig.</p>
+
+        <p>100 rem sequenz<br>
+            110 uauff$="Wollen Sie weitermachen?":uvorg$="Ja"<br>
+            120 gosub 40000: rem input’mit’vorgabe<br>
+            130 in$=ueingabe$<br>
+            140 rem ende sequenz</p>
+
+        <h2>Zusammenfassung: Prozedurtypen</h2>
+
+        <p>Wir haben, Comal imitierend, für Basic-Prozeduren folgende Befehlsstruktur vorgeschlagen (Bild 2):</p>
+
+        <p>Bei Variablen geben wir die Richtung, in die die Information geht, mit IN, OUT oder IN/OUT an. Sie beginnen immer mit U (für »Unterprogramm«). Außerhalb von Prozeduren werden Variablen mit U nicht verwendet.</p>
+
+        <p>Aufgerufen werden Prozeduren mit<br>
+            GOSUB Zeilennummer: REM Prozedurname</p>
+
+        <p>Wenn Informationen mitgegeben werden sollen, so werden sie den Prozedurvariablen unmittelbar vor dem GOSUB-Aufruf zugewiesen; wenn Informationen abgeholt werden sollen, werden diese den im Programm gültigen Variablen unmittelbar danach zugeordnet. Der Aufruf nimmt möglichst nur eine Zeile in Anspruch. Wo nötig, kann jedoch auch eine Sequenz aus mehreren Zeilen benutzt werden.</p>
+
+        <p>Vier grundlegende Prozedurtypen haben wir besprochen (Bild 3).</p>
+
+        <h2>Funktionen in Basic</h2>
+
+        <p>Funktionen in Comal gehorchen denselben Regeln wie Prozeduren.</p>
+
+        <p class="source">Beispiel: Die Funktion FRACTION soll den Bruchteil einer (positiven oder negativen) Zahl berechnen und »enthalten«.<br>
+            9000 FUNC fraction(zahl) CLOSED<br>
+            9010 bruchteil:=zahl-sgn(zahl)*int(abs(zahl))<br>
+            9020 RETURN bruchteil<br>
+            9030 ENDFUNC fraction</p>
+
+        <p>Funktionen unterscheiden sich in Comal von Prozeduren nur dadurch, daß sie den Befehl RETURN enthalten. Nach RETURN folgt der Wert, den die Funktion zur Verfügung stellen soll (als Zahl, als Variable, als mathematischer Ausdruck, sogar als Funktion). Die Funktion FRACTION kann so aufgerufen werden:<br>
+            PRINT fraction (3.57)</p>
+
+        <p>Dieses Beispiel macht noch einmal deutlich, daß Funktionsbefehle ähnlich benutzt werden wie Variablen.</p>
+
+        <p>So wie Prozeduren, haben auch Funktionen in Comal einen deutlich erkennbaren Rahmen. Für Basic-Funktionen müssen wir wieder einen verabreden. Der Funktionskopf soll so aussehen: REM FUNC Funktionsname (Variable)</p>
+
+        <p>Danach folgen eine oder mehrere Definitionen. Das Ende markieren wir mit<br>
+            REM ENDFUNC</p>
+
+        <p>Damit sieht die Funktion FRACTION in unserem selbststrukturierten Basic so aus:<br>
+            100 rem func: fraction (zahl: in)<br>
+            110 def fn frac (zahl)=zahl-sgn(zahl)*int(abs(zahl))<br>
+            120 rem endfunc</p>
+
+        <p>Aufgerufen wird die Funktion zum Beispiel so:<br>
+            print fn frac(3.57)</p>
+
+        <p>Bitte beachten Sie die erste Klammer in der Definitionszeile 110. Sie erlaubt es, wie in Comal, eine Information in das Funktionsinnere mitzugeben. Wie in Comal ist auch diese Variable lokal. Das bedeutet: Wir können beim Aufruf der Funktion irgendeine andere Variable in die Klammer schreiben (oder eine Zahl, wie oben, oder einen mathematischen Ausdruck, oder einen anderen Funktionsaufruf).</p>
+
+        <p>Wir haben übrigens hier, und wir wollen das auch weiterhin tun, den Funktionsnamen in der eigentlichen Definitionszeile verkürzt. Das scheint legitim, da ein ausführlicher Name in der Kopfzeile erscheint (FRACTION) und so der Kurzname FRAC ohne Schwierigkeiten verstanden werden kann.</p>
+
+        <p>Während eine Comal-Funktion beliebig viele Zeilen umfassen kann, sind Funktionsdefinitionen in Basic auf eine einzige Zeile beschränkt. Das ist oft zu wenig. Manchmal allerdings gibt es einen Ausweg. Zwar können wir keine mehrzeiligen Definitionen erfinden, aber wir können mehrere Funktionen hintereinander definieren, wobei die vorhergehende Funktion in eine spätere eingebettet wird.</p>
+
+        <p>Das folgende Programm wandelt Kleinbuchstaben in Großbuchstaben um.<br>
+            100 rem func ucase (zeichencode: in)<br>
+            110 def fn buch (zc) = abs ((zc > 64 and zc &lt; 93) or (zc > 192 and zc &lt; 222))<br>
+            120 def fn klein (zc) = abs ((zc &lt; 128))<br>
+            130 def fn ucase (zc) = zc + fn klein (zc) * fn buch (zc) * 128<br>
+            140 rem endfunc</p>
+
+        <p>Die Funktion UCASE (upper case) geht in drei Schritten vor.</p>
+
+        <p>Zunächst wird die eingebettete Funktion BUCH bearbeitet; sie überprüft, ob der Zeichencode ZC einem Buchstaben entspricht. Dann prüft die Funktion KLEIN, ob es sich um einen Kleinbuchstaben handeln könnte. Wenn beide Funktionen grünes Licht geben, dann wird der Zeichencode um 128 erhöht und damit zum ASCII-Wert für einen Großbuchstaben.</p>
+
+        <p>Beispiel für einen Aufruf der Funktion UCASE:<br>
+            print chr$(fn ucase(asc("a")))</p>
+
+        <p>Sehen Sie jetzt, daß es ganz sinnvoll ist, daß wir einen Rahmen für Funktionsdefinitionen erfunden haben (ich weiß, daß Sie zunächst daran zweifelten, ob sich der Aufwand überhaupt lohne)?</p>
+
+        <p>Lassen Sie uns nun kurz einige Funktionsbeispiele Revue passieren, um zu illustrieren, wie wir diesen Unterprogrammtyp in strukturierten Programmen einsetzen können. Wir wollen die Beispiele dabei wieder nach dem Gesichtspunkt ordnen, wie die Funktionen mit der Außenwelt kommunizieren. Diese Kommunikation ist allerdings in Basic eingeschränkt. Sie kann nur in einer Richtung stattfinden: von außen nach innen.</p>
+
+        <h2>Funktionen ohne Kommunikation</h2>
+
+        <p class="source">Beispiel: Cursorspalte<br>
+            9000 FUNC cursorspalte CLOSED<br>
+            9010 RETRUN PEEK(211)+1<br>
+            9020 ENDFUNC cursorspalte</p>
+
+        <p>Aufruf der Funktion CURSORSPALTE in Comal zum Beispiel:<br>
+            IF cursorspalte > 39 THEN PRINT</p>
+
+        <p>Dieselbe Funktion in Basic:<br>
+            100 rem func: cursorspalte<br>
+            110 def fn cs(x)=peek(211)+1<br>
+            120 rem endfunc</p>
+
+        <p>Aufruf der Funktion CURSORSPALTE in Basic:<br>
+            if fn cs(0) > 39 then print</p>
+
+        <p>In Comal zeigt eine Funktion, die nicht mit der Außenwelt kommuniziert, dies deutlich dadurch, daß sie keine Klammer benutzt. Dagegen braucht eine Basic-Funktion stets ihre Klammer sowie Parameter in den Klammern. Wir benutzen für Funktionen dieses Typs das nichtssagende X in der Definition und den Wert 0 beim Aufruf.</p>
+
+        <h2>Funktionen mit Einwegkommunikation</h2>
+
+        <p class="source">Beispiel: Umrechnung in Standard-ASCII</p>
+
+        <p>Die Funktion TRUE-ASCII soll den speziellen Commodore-ASCII-Code in Standard-ASCII umrechnen, wie ihn die meisten anderen Computer benutzen.<br>
+            9000 FUNC true'ascii(c64'zeichen$) CLOSED<br>
+            9010 c:=ORD(c64'zeichen$)<br>
+            9020 IF c > = 65 AND c &lt; = 90 THEN<br>
+            9030 RETURN c+32<br>
+            9040 ELIF c > = 193 AND c &lt; = 219 THEN<br>
+            9050 RETURN c-128<br>
+            9060 ELSE<br>
+            9070 RETURN c<br>
+            9080 ENDIF<br>
+            9090 ENDFUNC true'ascii</p>
+
+        <p>Diese Funktion (sie stammt aus der »Comal Library of Functions and Procedures«) kann in Basic nicht in derselben einfachen und verständlichen Weise codiert werden — Basic erlaubt nur mathematische Ausdrücke in Funktionsdefinitionen.</p>
+
+        <p>100 rem func: true ascii (c64-Zeichencode: in)<br>
+            110 def fn true(z) = z + abs (z > = 65 and z &lt; = 90) * 32 - abs(z > = 193 and z &lt; = 219) * 128<br>
+            120 rem endfunc</p>
+
+        <p>Statt der Mehrfachverzweigung wie in Comal benutzen wir in der Basic-Definition zwei Boolesche Ausdrücke. Wenn der erste dieser beiden Ausdrücke wahr ist, dann hat er, im Verein mit ABS, den Wert 1. Mit 32 multipliziert, erhält man den Wert 32, der zum Commodore-ASCII-Wert addiert wird. Der zweite Ausdruck ergibt in diesem Fall 0. Das Umgekehrte gilt für den Fall, daß es sich um einen kleinen Buchstaben handelt und deshalb der zweite Ausdruck wahr ist.</p>
+
+        <p>Diese Funktion illustriert eine weitere Beschränkung in bezug auf Basic-Funktionen. Während Comal auch eine Textvariable als Eingang akzeptiert, läßt Basic nur Zahlenvariablen zu. Dies führt zu unterschiedlichen Befehlsaufrufen unserer Funktion TRUEASCII in den beiden Sprachen:<br>
+            PRINT true'ascii("A")<br>
+            (Comal)<br>
+            print fn true (asc("A))<br>
+            (Basic)</p>
+
+        <h2>Funktionen mit mehrfacher Kommunikation</h2>
+
+        <p>Comal-Funktionen akzeptieren so viele Variablen wie nötig sind (und Platz in der Programmzeile enthalten ist).</p>
+
+        <p>Ein Beispiel mit zwei Variablen:<br>
+            <strong>Der größere Wert</strong>. Die Funktion MAX soll aus zwei Zahlen die größere ermitteln und ausgeben.<br>
+            9000 FUNC max(zahl1,zahl2) CLOSED<br>
+            9010 IF zahl1 > zahl2 THEN<br>
+            9020 RETURN zahl1<br>
+            9030 ELSE<br>
+            9040 RETURN zahl2<br>
+            9050 ENDIF<br>
+            9060 ENDFUNC max
+        </p>
+
+        <p>Hier zeigt sich erneut eine Beschränkung in den Möglichkeiten von Basic-Funktionen. In Basic kann nur eine einzige Variable mitgegeben werden. Man könnte nun so verfahren, daß man die eine Variable in Klammern mitgibt und die zweite erst beim Aufruf mitteilt zum Beispiel Z2 = 25: PRINT MAX (50). Als Ergebnis würde die Zahl 50 ausgedruckt, denn das ist die größere Zahl. Dies Verfahren wirkt jedoch erfahrungsgemäß verwirrend, und unser Ziel ist es ja nun gerade, mögliche Verwirrungen von vornherein zu vermeiden. Es scheint deshalb sinnvoll, wenn wir schon mehrere Variablen der Funktion mitgeben müssen, alle diese Variablen gleich zu behandeln. Das heißt aber, daß wir sie alle schon beim Aufruf der Funktion mitgeben. Der Funktion selbst werden keine Variablen mitgegeben. Wir müssen also denselben Funktionstyp benutzen wie bei Funktionen ohne Kommunikation.</p>
+
+        <p>Die Basic-Codierung der Funktion MAX lautet demnach so.<br>
+            100 rem func: max(u1: in, u2: in)<br>
+            110 def fn max(x) = abs(u1 > u2)*u1+abs(u1 &lt; = u2)*u2<br>
+            120 rem endfunc</p>
+
+        <p>Vor dem Aufruf weisen wir, ähnlich wie bei den Basic-Prozeduren, den Variablen U1 und U2 »von Hand« ihre Werte zu:<br>
+            u1=238: u2=21: print fn max(0)</p>
+
+        <p>Wieder einmal sind wir also in der Situation, wo wir selber dafür sorgen müssen, daß Variablen nur lokal gelten. Damit dies gewährleistet ist, benutzen wir, wie schon bei den Prozeduren, Variablennamen mit U (für »Unterprogramm«).</p>
+
+        <h3>Und wenn’s mit Funktionen nicht geht?</h3>
+
+        <p>Basic-Funktionen zeigen mancherlei Beschränkungen. Nicht jede Beschränkung kann aufgefangen werden. Was ist zu tun? Die Lösung ist einfach: Wenn eine Funktion nicht programmierbar ist, machen wir eine Prozedur. Wir erinnern uns: Funktionen sind nichts anderes als spezielle Prozeduren. Das ist zwar in Basic nicht ohne weiteres erkennbar, aber in Comal haben wir es dafür um so deutlicher sehen können.</p>
+
+        <p>Das Problem taucht nicht nur in Basic auf. Schauen wir uns kurz ein Beispiel an: <strong>String umdrehen</strong></p>
+
+        <p>Ein String soll in umgekehrter Zeichenfolge ausgegeben werden. Zum Beispiel COMPUTER soll sich in RETUPMOC verwandeln. (Man braucht dies zum Beispiel, wenn man Wörter nach dem Wortende sortieren will, etwa für ein Reimlexikon.)</p>
+
+        <p>Die Steckmodulversion Comal 2.01 macht es leicht, dies zu programmieren, denn dort gibt es Funktionen, die Strings ausgeben:<br>
+            9000 FUNC rueckwaerts$(original$) CLOSED 9010 umgedreht$=""<br>
+            9020 FOR i#=LEN(ORIGINAL$) TO 1 STEP -1 DO<br>
+            9030 umgedreht$:+original$ (i # )<br>
+            9040 ENDFOR i#<br>
+            9050 RETURN umgedreht$<br>
+            9060 ENDFUNC rueckwaerts$</p>
+
+        <p>Aufgerufen wird diese Funktion zum Beispiel so:<br>
+            PRINT rueckwaerts$("Computer")</p>
+
+        <p>In der etwas einfacheren Diskettenversion Comal 0.14 gibt es »nur« numerische Funktionen, das heißt solche, die Zahlen ausgeben. Schon hier also müssen wir uns mit einer Prozedur begnügen:<br>
+            9000 PROC umdrehen(original$, REF umgedreht$) CLOSED 9010 umgedreht$=""<br>
+            9020 FOR i#=LEN(ORIGINAL$) TO 1 STEP -1 DO<br>
+            9030 umgedreht$: =umgedreht$+original$ (i # )<br>
+            9040 ENDFOR i#<br>
+            9050 ENDPROC umdrehen</p>
+
+        <p>Und so rufen wir die Prozedur auf:<br>
+            umdrehen("Computer",neu$)<br>
+            PRINT neu$</p>
+
+        <p>In Basic müssen wir natürlich erst recht eine Prozedur programmieren:<br>
+            34000 rem proc: umdrehen (uoriginal$: in, umgedreht$: out)<br>
+            34010 umgedreht$=""<br>
+            34020 for ui= len(uoriginal$) to 1 step -1<br>
+            34030 umgedreht$=umgedreht$+mid$(uoriginal$,ui,1)<br>
+            34040 next<br>
+            34050 return</p>
+
+        <p>Der Basic-Aufruf:<br>
+            uoriginal$="Computer" : gosub 34000 : neu$=umgedreht$ print neu$</p>
+
+        <h2>Zusammenfassung: Funktionstypen</h2>
+
+        <p>Wir haben für Basic-Funktionen folgende Befehlsstruktur vorgeschlagen, wieder in Anlehnung an Comal (Bild 4).</p>
+
+        <p>Alle Variablen sind vom IN-Typ und werden entsprechend gekennzeichnet. Für Funktionen ohne Kommunikation benutzen wir X als Definitionsvariable und 0 als Klammerinhalt beim Aufruf. Bei Mehrfachkommunikation werden alle benötigten Informationen von Hand mitgegeben. Die dafür verwendeten Variablen beginnen wieder mit U, um sie lokal zu halten.</p>
+
+        <p>Drei Funktionstypen haben wir besprochen (Bild 5).</p>
+
+        <p>Weitere Informationen über Basic-Funktionen finden Sie in dem Aufsatz »Funktionen für Anfänger« im 64er, Ausgabe 5/85.</p>
+
+        <h3>Noch ein Tip zum Schluß: Namen für Unterprogramme</h3>
+
+        <p>Wir streben gut strukturierte Programme und ähnliches deshalb an, damit wir sie leichter lesen und verstehen können. Wie lesbar ein Programm ist, hängt entscheidend von den Namen ab, die wir unseren Variablen sowie unseren Prozeduren und Funktionen geben. Besonders wichtig sind dabei die letzteren. Der Name eines Unterprogramms soll so deutlich wie möglich ausdrücken, wofür das Unterprogramm da ist. Das ist aber, wie die Erfahrung zeigt, gar nicht immer so einfach. Deshalb hier ein paar Tips.</p>
+
+        <p>Beim Erfinden von Namen geht man am besten von <strong>Sätzen</strong> aus, die man dann auf die allerwesentlichsten Wörter <strong>reduziert</strong>. Was für Sätze man zugrundelegt, das hängt ab von der Art des Unterprogramms. Welche Wörter wesentlich sind, hängt einmal davon ab, was genau das Unterprogramm bewirkt, zum anderen aber auch vom Gesamtzusammenhang des Programms, in dem das Unterprogramm ein Element bildet.</p>
+
+        <p>Erstens zu den Sätzen: Prozeduren sind Handlungsbefehle; sie tun etwas. Die Sätze, aus denen Prozedurnamen abgeleitet werden, sollten deshalb Handlungen benennen. Beispiel: »Die Prozedur übersetzt einen Text vom Deutschen ins Englische«.</p>
+
+        <p>Funktionen erzeugen ein Ergebnis. Bei den Booleschen Funktionen ist dieses Ergebnis entweder 1 oder 0, das heißt ja oder nein, stimmt oder stimmt nicht, TRUE oder FALSE (um mit Comal zu »sprechen«). Funktionen dieses Typs »antworten« auf eine Ja/Nein-Frage. Sätze, die als Grundlagen für Namen von Booleschen Funktionen dienen sollen, müssen deshalb vom Typ »Ja/Nein-Frage« sein, zum Beispiel »Ist der Artikel preiswert?«</p>
+
+        <p>Alle anderen Funktionen erzeugen Ergebnisse, die weder von der Anzahl noch vom Inhalt her grundsätzlich festlegbar sind. Sie ermitteln Antworten auf Wer? Was? Wo-Fragen. Beispiel: »Welche Farbe hat das Kleid?« Da kann die Antwort »rot« sein oder »grün«, »blau«, »gelb«, »braun«, etc.</p>
+
+        <p class="source">Zweitens: Was genau bewirkt ein Unterprogramm und wie wirkt sich das auf den Befehlsnamen aus? Zunächst zu den Prozeduren: Welche Wörterjeweils in den Befehlsfolgen eingehen, hängt wesentlich davon ab, welcher Aspekt der Handlung im Mittelpunkt steht. Das kann die nackte Handlung sein, oder ihr Ergebnis, oder die Art und Weise, wie die Handlung abläuft, und anderes mehr. Beispiele: »Die Prozedur <strong>ersetzt</strong> in einem String einen Teilstring durch einen anderen.« — ERSETZEN; »Die Prozedur zeichnet einen <strong>Baum</strong>.« — BAUM; »Die Prozedur <strong>druckt</strong> einen Text besonders <strong>langsam</strong> aus.« — LANGSAM DRUCKEN.</p>
+
+        <h2>Für jede Funktion einen treffenden Namen</h2>
+
+        <p>Boolesche Funktionen informieren darüber, ob etwas zutrifft oder nicht. Die zugrundeliegende Frage enthält meistens ein Adjektiv (»richtig« in »Ist die Antwort <strong>richtig</strong>?«) oder ein Partizip (»gefunden« in »Ist das Wort <strong>gefunden</strong> worden?«). Boolesche Funktionen werden deshalb (meistens) mit Adjektiven (RICHTIG) oder Partizipien (GEFUNDEN) benannt. Ein Trick, falls Sie dabei Schwierigkeiten haben: Probieren Sie aus, ob Sie (fast menschensprachlich) sagen können: »IF richtig THEN&hellip;«, oder »IF NOT gefunden THEN&hellip;«. Wenn ja, haben Sie einen guten Namen, denn genau so werden Boolesche Funktionen oft verwendet.</p>
+
+        <p>Bei allen anderen Funktionen sind Substantive die angemessene Wahl oder Substantive mit vorausgehendem Adjektiv: »Was ist der <strong>Preis</strong>?« — PREIS; »Welches ist die <strong>größere Zahl</strong>?« — GROESSERE ZAHL.</p>
+
+        <p class="source">Drittens: Welchen Einfluß hat der Gesamtzusammenhang eines Programms auf die Wahl des Befehlsnamens? Beispielsatz: »Die Prozedur <strong>druckt</strong> einen <strong>Text</strong> auf dem <strong>Bildschirm</strong> aus«.</p>
+
+        <p>Die Prozedur wird DRUCKEN heißen, wenn es ausschließlich Texte zu drucken gibt. Wenn aber auch Bilder ausgedruckt werden können, sollte man sie TEXT DRUCKEN nennen, damit man sie von einer anderen Prozedur, die möglicherweise BILD DRUCKEN heißt, unterscheiden kann. Wenn ein Drucker angeschlossen ist und der Text sowohl auf den Drucker als auch auf den Bildschirm gegeben werden kann, heißt die Prozedur vielleicht besser TEXT AUF BILDSCHIRM.</p>
+
+        <p>Übrigens sollten Verben nicht in der Befehlsform stehen, sondern in der Grundform — Prozeduren wie LIES WORT oder BAUE WORT AUF — mit wem reden die? Solche Namen sind wohl aus dem Englischen übersetzt (READ WORD und BUILD WORD) und falsch verstanden. Tatsächlich handelt es sich bei »read« und »build« um Infinitive, und Infinitive sollten wir auch im Deutschen benutzen: WORT LESEN und WORT AUFBAUEN.</p>
+
+        <p>Eine letzte Bemerkung: Zuweilen macht man Unterprogramme, um Befehle zu simulieren, die in anderen Basic-Versionen oder gar in anderen Programmiersprachen vorhanden sind. Dann benutzt man gern die dort üblichen Namen. Der Zweck der Unterprogramme ist dann (zumindest für den Eingeweihten) auf Anhieb verständlich. Beispiele: FLASH, PRINT AT, PLOT, CIRCLE, UCASE, MAX (statt GROESSERE ZAHL), LINE (statt LINIE) oder REPLACE (statt ERSETZEN).</p>
+
+        <h2>Nur Vorschläge</h2>
+
+        <p>Wer strukturiert programmieren will, braucht als Werkzeuge dazu vernünftige Befehlsstrukturen. Solche Befehlsstrukturen sind die Steuerbausteine (insbesondere Wiederholungsschleifen und Verzweigungen) und die Unterprogramm-Bausteine (Prozeduren und Funktionen). Wo diese von der Programmiersprache nicht zur Verfügung gestellt werden, muß man sich selber helfen und entsprechende Strukturen herstellen. Vorschläge dazu werden in dieser Serie gemacht.</p>
+
+        <p>Diese Vorschläge sind jedoch nicht dazu gedacht, sklavisch befolgt zu werden. Sie sollenvielmehr Anregungen sein für eigene Anstrengungen und eigene Überlegungen. Vielleicht haben Sie bessere Ideen.</p>
+
+        <p>Noch allerdings haben wir nicht alle Werkzeuge besprochen. Noch fehlen umfassendere Bausteinstrukturen, nämlich die, aus denen schließlich Programme zusammengesetzt sind. Sie sollen »Modulbausteine« heißen und sind das Thema des nächsten, des letzten Teils dieser Serie.</p>
+
+        <address class="author">(Prof. Burkhard Leuschner/cg/gk)</address>
+    </article>
+</body>
+
+</html>

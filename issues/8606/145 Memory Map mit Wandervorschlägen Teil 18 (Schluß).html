@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Memory Map mit Wandervorschlägen Teil 18 (Schluß)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. H. Hauck, ah">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="145-146,148-149">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Memory Map mit Wandervorschlägen Teil 18 (Schluß)</h1>
+        <p class="intro">Bei der Wanderung durch die Speicherlandschaft erreichen wir heute unser Ziel, die Speicherzelle 1023. In diesem letzten Teil werden alle indirekten Sprungvektoren für das Betriebssystem behandelt.</p>
+
+        <p>Heute sind die indirekten Sprungvektoren auf Routinen des Betriebssystems an der Reihe, gefolgt vom Kasstettenpuffer. Das alles bringt uns ans Ziel der Reise durch die Speicherlandschaft.</p>
+
+        <h2>Adresse 788 bis 789 ($314 bis $315)</h2>
+
+        <h3>Vektor auf die IRQ-Interrupt-Routine des Betriebssystems</h3>
+
+        <p>Dieser Vektor zeigt auf die Adresse 59953 ($EA31) — beim VC 20 auf 60095 ($EABF). Ab hier beginnt die Routine des Betriebssystems, die den IRQ-Interrupt ausführt. Die Bedeutung der verschiedenen Interrupts (Unterbrechungen), ihre Auslöser und Abläufe sind als Übersicht im Texteinschub »Dem Computer ins Wort fallen« dargestellt.</p>
+
+        <p>Die IRQ-Routine wird vom Timer A des Ein-/Ausgabe-Bausteins CIA # 1 — beim VC 20 vom Timer 1 des Ein-/Ausgabe-Bausteins VIA # 2 — ausgelöst, und zwar periodisch 60mal in jeder • Sekunde. In der Programmpause werden die im Texteinschub beschriebenen »Haushaltsarbeiten« durchgeführt.</p>
+
+        <p>Dieser Vektor eignet sich hervorragend für eigene Programmierzwecke, da er durch das Verbiegen auf eine andere Adresse seine gleichmäßige und hochfrequente Wiederkehr nicht verliert. Mit seiner Hilfe können also eigene Maschinenprogramme 60mal in der Sekunde in ein Programm eingeschoben werden — eine Methode, die deswegen den englischen Namen »Wedge« = Keil erhalten hat. Zwei Vorbedingungen sind allerdings dabei zu erfüllen.</p>
+
+        <ol>
+            <li>Da ein IRQ mit Sicherheit während des Verbiegens auftritt, muß er vorher abgeschaltet werden. Den Schlüssel dazu bietet die Speicherzelle 56334, die mit 0 gePOKEt den Interrupt abschaltet und mit POKE 56334,1 ihn wieder zuläßt. Beim VC 20 ist dies POKE 37116,127 beziehungsweise POKE 37116,192. Aber Vorsicht!! Da während eines IRQ-Interrupts auch die Tastatur abgefragt wird, kann das Abschalten nur innerhalb eines Programms erfolgen — während der Abschaltung ist die Tastatur tot.</li>
+            <li>Am Ende eines »Wedge« muß der Sprung auf die alte IRQ-Adresse erfolgen, die ursprünglich in den Speicherzellen 788 bis 789 stand, damit — etwas verspätet zwar — die normalen Haushaltsarbeiten des IRQ nachgeholt werden können. Bei längeren Wedges wird daher die interne Uhr TI und TI$ etwas nachgehen.</li>
+        </ol>
+
+
+        <p>Ich habe lange nach einem Beispiel gesucht. Ich kenne viele: Abfrage der Joysticks, Lautstärke von Tönen mit Funktionstasten steuern, von Basic unabhängige Laufschrift, um ein paar zu nennen. Aber alle haben einen ziemlich langen Maschinensprache-Teil. Ich bringe daher hier das kürzeste Beispiel, das ich kenne. Es stammt aus dem CHIP-Sonderheft »C 64 PEEK + POKE Adreßbuch« von Rügheimer und Spanik.</p>
+
+        <p>Das Programm verändert dauernd die Farbe des Bildschirmrahmens:</p>
+
+        <p>TODO LISTING</p>
+
+        <p>Dieses Programm gilt nur für den C 64; für den VC 20 müßte es entsprechend umgeschrieben werden.</p>
+
+        <p>Die Zeilen 10 bis 30 lesen das Maschinenprogramm, das in den DATA-Zeilen 40 bis 60 steht, in die Speicherzellen 679 bis 699. Diese stehen, wie wir das letzte Mal gesehen haben, zur freien Verfügung — und sind daher ideal geeignet, ein kleines Maschinenprogramm ungestört aufzunehmen.</p>
+
+        <p>In Zeile 70 wird der IRQ-Interrupt unterbrochen. Jetzt kommt der wichtige Teil: Zeile 80 verbiegt den IRQ-Vektor zur Speicherzelle 176 + 256 * 2 = 679. Zeile 90 schaltet schließlich den IRQ-Interrupt wieder ein.</p>
+
+        <p>Jetzt passiert also folgendes: Jedesmal, wenn der Timer A den Haushalt-IRQ auslöst, springt der Computer zuerst einmal auf das Maschinenprogramm ab Speicherzelle 679 und schaltet die Rahmenfarbe um. Dann erst springt der letzte Befehl des Maschinenprogramms auf die ursprüngliche IRQ-Adresse 59953 ($EA31), von der aus das Betriebssystem weitermacht, als sei nichts geschehen.</p>
+
+        <p>Für Kenner gebe ich noch das Assembler-Listing des Maschinenprogramms an:</p>
+
+        <p>TODO LISTING</p>
+
+        <p>Es gibt noch eine kleine, erwähnenswerte Anwendung. Wenn der Vektor nicht auf den Anfang der IRQ-Routine bei 59953, sondern auf 59956 — also drei Stellen weiter — zeigt, übergeht die IRQ-Routine den Teil, welcher die STOP-Taste abfragt und die TI/TI$-Uhr weiterschaltet, wodurch effektiv die STOP-Taste ausgeschaltet wird. Das geht ganz schnell mit POKE 788,52. Mit POKE 788,49 wird das wieder rückgängig gemacht. Beim VC 20 sind es die Werte POKE 788,194 oder POKE 788,191.</p>
+
+        <h2>Adresse 790 bis 791 ($316 bis $317)</h2>
+
+        <h3>Vektor auf die BREAK-Interrupt-Routine des Betriebssystems</h3>
+
+        <p>Diese Routine ist im Texteinschub nicht erwähnt, weil sie ein Teil der NMI-Routine ist. Dieser Vektor zeigt auf die Adresse 65126 ($FE66) - beim VC 20 auf 65234 ($FED2). Die da beginnende Routine des Betriebssystems wird aufgerufen, wenn der Maschinenbefehl BRK ausgeführt wird. Er führt letztlich zu einem Warmstart, das heißt der Bildschirm wird gelöscht und der Cursor meldet sich mit READY. Diese Routine wird auch durch das gleichzeitige Drücken der STOP- und der RESTORE-Taste angestoßen.</p>
+
+        <h2>Adresse 702 bis 793 ($318 bis $319)</h2>
+
+        <h3>Vektor auf die NMI-Routine des Betriebssystems.</h3>
+
+        <p>Der NMI-Interrupt ist im Texteinschub »Dem Computer ins Wort fallen« näher beschrieben. Der Vektor zeigt auf den Beginn dieser Routine ab Speicherzelle 65095 ($FE4 7) - beim VC 20 ab 65197 ($FEAD).</p>
+
+        <p>Sobald ein NMI-Interrupt auftritt, wird zuerst durch Setzen der Interrupt-Abschalt-Flagge (Interrupt Disable Flag)jede Unterbrechung durch den IRQ-Interrupt unterbunden. Dann wird geprüft, wer den NMI-Interrupt ausgelöst hat, und zwar in der Reihenfolge: RS232-Schnittstelle, RESTORE-Taste; eingestecktes Modul und schließlich die STOP-Taste. Die letztere dient zum Sichern der RESTORE-Taste. Nur wenn beide gemeinsam gedrückt werden, kommt die NMI-Unterbrechung durch die RESTORE-Taste zur Auswirkung.</p>
+
+        <p>Da die RESTORE-Taste fast als erste abgefragt wird, kann sie und ihre Kombination mit der STOP-Taste durch Verbiegen des Vektors in Speicherzelle 792 bis 793 abgeschaltet werden. Beim C 64 geht das mit POKE 792,193. Wieder eingeschaltet wird mit POKE 792,71. Beim VC 20 geht das mit POKE 792,91 beziehungsweise POKE 792,173. Natürlich können Spezialisten durch Verbiegen des Vektors auf andere Adressen ihre eigenen NMI-Routinen bauen.</p>
+
+        <h2>Adresse 794 bis 795 ($31A bis $31B)</h2>
+
+        <h3>Vektor auf die OPEN-Routine des Betriebssystems</h3>
+
+        <p>Die Routine beginnt ab Adresse 62282 ($F34A) - beim VC 20 ab 62474 ($FEAD). Diese Routine prüft, ob eine Datei (File) eröffnet werden kann. Das geht immer dann, wenn die File-Nummer nicht 0 ist und wenn weniger als 10 andere Dateien bereits eröffnet sind. Für die serielle Schnittstelle (Geräte-Nummer 4, 5, 8 bis 11) wird an das angewählte Gerät zuerst der Befehl »Listen« gegeben und dann die Sekundär-Adresse des OPEN-Befehls.</p>
+
+        <p>Beim Bandgerät (Geräte-Nummer 1) prüft die Routine den Tape Header einer sequentiellen Datei beziehungsweise schreibt einen Tape Header auf das Band.</p>
+
+        <p>Bei Anwahl der RS232-Schnittstelle (Geräte-Nummer 2) aktiviert die Routine einige Leitungen und reserviert je einen Ein- und Ausgabe-Pufferspeicher am oberen Ende des Basic-Programmspeichers.</p>
+
+        <h2>Adresse 796 bis 797 ($31C bis $31D)</h2>
+
+        <h3>Vektor auf die CLOSE-Routine des Betriebssystems</h3>
+
+        <p>Dieser Vektor zeigt auf die Adresse 62097 ($F291) — beim VC 20 auf 62282 ($F34A). Ab hier beginnt eine Routine, die beim CLOSE-Befehl zuerst prüft, ob die Datei-Nummer in der Tabelle der eröffneten Datei enthalten ist. Dann holt sie die dazugehörige Geräte-Nummer und Sekundär-Adresse und schließt den Kanal und die Datei.</p>
+
+        <h2>Adresse 798 bis 799 ($31E bis $31F)</h2>
+
+        <h3>Vektor auf die CHKIN-Routine des Betriebssystems</h3>
+
+        <p>Diese Routine beginnt ab Adresse 61966 ($F20E) — beim VC 20 ab 62151 ($F2C7). Sie eröffnet einen Datenkanal zur Übernahme von Daten von dem Gerät, das durch den OPEN-Befehl angegeben worden ist.</p>
+
+        <h2>Adresse 800 bis 801 ($320 bis $321)</h2>
+
+        <h3>Vektor auf die CKOUT-Routine des Betriebssystems</h3>
+
+        <p>Dieser Vektor zeigt auf die Adresse 62032 ($F250) — beim VC 20 auf 62217 ($F309). Dort beginnt die Routine, welche einen Datenkanal zur Abgabe von Daten an das im OPEN-Befehl angegebene Gerät aufmacht.</p>
+
+        <h2>Adresse 802 bis 803 ($322 bis $323)</h2>
+
+        <h3>Vektor aufdie CLRCHN-Routine des Betriebssystems</h3>
+
+        <p>Der Name dieser Routine ist die Abkürzung für »clear channel«. Diese Routine, die ab Adresse 62259 ($F333) — beim VC 20 ab 62451 ($F3F3) - beginnt, setzt alle Kanäle in den Einschaltzustand zurück. Das heißt, das Eingabegerät ist die Tastatur, das Ausgabegerät ist der Bildschirm.</p>
+
+        <h2>Adresse 804 bis 805 ($324 bis $325)</h2>
+
+        <h3>Vektor auf die CHRIN-Routine des Betriebssystem</h3>
+
+        <p>Dieser Vektor zeigt auf die Adresse 61783 ($F157) - beim VC 20 auf 61966 ($F20E). Die hier beginnende Routine, deren Abkürzung »Character Input« bedeutet, holt das jeweils nächste Byte vom Eingabepuffer des angewählten Gerätes, sofern ein solcher eingerichtet ist (zum Beispiel Kassettenpuffer, RS232-Puffer).</p>
+
+        <p>Bei Eingabe von der Tastatur holt diese Routine so lange Bytes aus dem Tastaturpuffer und zeigt sie auf dem Bildschirm an, bis das Zeichen für ein unge-SHIFTetes RETURN auftritt. Erst dann gibt die Routine das erste Zeichen der logischen Zeile auf dem Bildschirm an den Basic-Übersetzer weiter.</p>
+
+        <h2>Adresse 806 bis 807 ($326 bis $327)</h2>
+
+        <h3>Vektor auf die CHROUT-Routine des Betriebssystems</h3>
+
+        <p>Die CHROUT-Routine entspricht der CHRIN-Routine in der anderen Richtung. Sie bedeutet »Character Output« und transferiert ein Byte, das im Akkumulator steht, in den Puffer des angewählten Ausgabegerätes. Sie beginnt ab Adresse 62898 ($FlCA), - beim VC 20 ab 62074 ($F27A).</p>
+
+        <h2>Adresse 808 bis 809 ($328 bis $329)</h2>
+
+        <h3>Vektor auf die STOP-Routine des Betriebssystems</h3>
+
+        <p>Der Vektor zeigt auf die Adresse 63213 ($F6ED) - beim VC 20 auf 63344 ($F770). Die dort beginnende Routine prüft, ob die STOP-Taste gedrückt ist. Durch Verbiegen dieses Vektors kann die STOP-Taste abgeschaltet werden. Beim C 64 geht dies mit POKE 808,239; wieder eingeschaltet wird die STOP-Taste mit POKE 808,237. Beim VC 20 sind die Werte POKE 808,100 beziehungsweise POKE 808,112.</p>
+
+        <h2>Adresse 810 bis 811 ($32A bis $32B)</h2>
+
+        <h3>Vektor auf die GETIN-Routine des Betriebssystems</h3>
+
+        <p>Diese Routine ist fast identisch mit der CHRIN-Routine (siehe Speicherzellen 804 bis 805). Sie holt genauso Zeichen von angewählten Geräten in die Eingabepuffer. Der einzige und damit wichtigste Unterschied liegt in der Behandlung der Tastatur-Eingabe. Im Gegensatz zu CHRIN holt sie ein Byte aus dem Tastaturpuffer sofort in den Akkumulator. Der Vektor zeigt auf den Anfang der Routine ab Speicherzelle 61785 ($F13E) - beim VC 20 ab 61941 ($FlF5).</p>
+
+        <h2>Adresse 812 bis 813 ($32C bis $32D)</h2>
+
+        <h3>Vektor auf die CLÄLL-Routine des Betriebssystems</h3>
+
+        <p>CLALL ist die Abkürzung für Close All (Channels and Files). Diese Routine, die ab Adresse 62255 ($F32F) - beim VC 20 ab 62447 ($F3EF) — beginnt, setzt die Speicherzelle 152 auf 0 und schließt so zwangsläufig alle Dateien und Kanäle.</p>
+
+        <h2>Adresse 814 bis 815 ($32E bis $32F)</h2>
+
+        <h3>Freier Vektor</h3>
+
+        <p>Nach dem Einschalten zeigt dieser Vektor auf die BREAK-Routine, genauso wie der Vektor in Speicherzelle 790/791. Er ist ein Überbleibsel aus dem PET-Betriebssystem, das aber beim VC 20 und C 64 keine Rolle spielt. Hier können also eigene Vektoren definiert und eingesetzt werden.</p>
+
+        <h2>Adresse 816 bis 817 ($330 bis $331)</h2>
+
+        <h3>Vektor auf die LOAD-Routine des Betriebssystems</h3>
+
+        <p>Dieser Vektor zeigt auf die Adresse 62622 ($F49E) — beim VC 20 auf 62793 ($F549). Die dort beginnende Routine transferiert Daten von einem Eingabegerät direkt in den RAM-Speicher. Sie kann auch zum VERIFYen durch Vergleich der geLOADeten mit den ursprünglichen Daten verwendet werden.</p>
+
+        <h2>Adresse 818 bis 819 ($332 bis $333)</h2>
+
+        <h3>Vektor auf die SAVE-Routine des Betriebssystems</h3>
+
+        <p>Diese Routine ist das Gegenstück zur LOAD-Routine. Sie beginnt ab Adresse 62941 ($F5DD) - beim VC 20 ab 63109 ($F685).</p>
+
+        <h2>Adresse 820 bis 827 ($334 bis $33B)</h2>
+
+        <h3>Freier Speicherbereich</h3>
+
+        <p>Diese 8 Byte stehen zur freien Verfügung.</p>
+
+        <h2>Adresse 828 bis 1019 ($33C bis $3FB)</h2>
+
+        <h3>Kassettenpuffer</h3>
+
+        <p>Diese 192 Byte beherbergen den Kassettenpuffer. Der Name kennzeichnet diesen Speicherbereich als Zwischenspeicher für Ein- und Ausgabe-Operationen von und auf Band.</p>
+
+        <p>Dabei unterscheiden sich die normalen LOAD-, SAVE- und VERIFY-Befehle von den Datei-Befehlen INPUT#, GET# und PRINT#.</p>
+
+        <p>Bei LOAD, SAVE und VERIFY steht im Kassettenpuffer lediglich der Vorspann, der auf englisch »Tape Header« heißt. Die Funktion und Zusammensetzung des Tape Headers habe ich schon bei den Speicherzellen 183 bis 187 in Ausgabe 10/85, genau gesagt im Texteinschub »Tape Header« auf Seite 140 detailliert beschrieben. Die eigentlichen Daten berühren den Kassettenpuffer nicht, sondern werden direkt von und in den RAM-Speicher transferiert.</p>
+
+        <p>Eine Ergänzung zu der Erklärung des Tape Headers möchte ich noch nachtragen. Die Kennzahl im ersten Byte kann nicht nur, wie beschrieben, die Werte 1 und 3, sondern auch 2, 4 und 5 annehmen. Die Kennzahl 4 bezeichnet den Datenblock als Header einer Basic-Datei (GET# und so weiter), die Kennzahl 2 die danach folgenden Datenblöcke. Die Kennzahl 5 signalisiert, daß der Block das logische Ende des Bandes darstellt, und daß das Betriebssystem nicht weiter suchen muß.</p>
+
+        <p>Bei GET#, INPUT# und PRINT# werden nicht nur der Tape Header, sondern auch alle Daten im Kassettenpuffer zwischengespeichert. Dieser blockweise Transport ist an den charakteristischen Unterbrechungen des Datasettenmotors leicht zu erkennen.</p>
+
+        <p>Der Kassettenpuffer kann durch Verbiegen der Zeiger in Speicherzelle 178 bis 179 auf beliebige Plätze des Speichers, aber nicht unterhalb 512, geschoben werden. Normalerweise gibt das keinen Sinn, es sei denn, der Speicherbereich 828 bis 1019 wurde mit einem eigenen Maschinenprogramm belegt.</p>
+
+        <h2>Adresse 1020 bis 1023 ($3K bis $3FF)</h2>
+
+        <h3>Freie Speicherplätze</h3>
+
+        <p>Auch diese 4 Byte stehen zur freien Verfügung.</p>
+
+        <p>Liebe Leser, wir sind am Ziel unserer Wanderung durch die Speicherlandschaft des C 64 beziehungsweise des VC 20 angelangt. Ich muß zugeben, es hat länger gedauert, als ich mir zu Beginn vorgestellt habe. Schuld daran war nicht die Länge des Weges — die war durch Start bei Speicherzelle 0 und Ziel bei Speicherzelle 1023 fest vorgegeben. Aber ich habe gebummelt, ich habe viele »Wandervorschläge« gemacht und mir bei sehenswerten Adressen Zeit genommen, sie genauer zu besichtigen.</p>
+
+        <p>Ich will den Wandervergleich nicht weiter strapazieren, sondern mich zum Schluß bei allen Lesern, die mir Zuschriften, Fragen, Vorschläge und Verbesserungen geschickt haben, recht herzlich bedanken.</p>
+
+        <address class="author">(Dr. H. Hauck/ah)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Texteinschub #1<br>Dem Computer ins Wort fallen</h2>
+
+        <p>Jedesmal, wenn ein Computer eingeschaltet wird, würden seine vielen Schaltkreise und Speicherzellen irgendwelche ungeordneten Zahlen enthalten, wenn nicht ein bestimmter Schaltkreis ein RESET-Signal erzeugte. Dieses spezielle Signal geht an alle wichtigen Teile des Computers, nämlich an den Mikroprozessor und an die Bausteine für Ein- und Ausgabe.</p>
+
+        <p>Dadurch wird der Computer in einen definierten Anfangszustand versetzt, in dem entweder das Betriebssystem oder, falls vorhanden, ein selbststartendes Steckmodul die Befehlsgewalt erhält.</p>
+
+        <p>Die fest vorgegebenen Programmschritte dieser beiden lassen jedoch ein Arbeiten mit dem Computer ohne weiteres nicht zu. Wir könnten nämlich kein Resultat an ein Ausgabegerät (Drucker, Floppy, Datasette, Bildschirm) geben, und wir könnten auch keine Daten eingeben (Tastatur, Floppy, Datasette).</p>
+
+        <p>Der Computer wäre nicht steuerbar, wenn wir ihn nicht in seinem vorgegebenen Programmablauf unterbrechen könnten.</p>
+
+        <p>Die Unterbrechungsmöglichkeit heißt in der Fachsprache »INTERRUPT«.</p>
+
+        <p>Im Gegensatz zu den Großrechenanlagen, die meistens mit vielen Klassen von Interrupts ausgerüstet sind, haben die Heim-Computer von Commodore nur zwei Arten:</p>
+
+        <ul>
+            <li>IRQ — der Interrupt Request</li>
+            <li>NMI — der Non Maskable Interrupt</li>
+        </ul>
+
+
+        <p>Ich habe nicht vor, Ihnen alle Details der Interrupt-Technik zu erklären. Das geht weit über den normalen Umfang meiner Texteinschübe hinaus. Sie können übrigens darüber in anderen Aufsätzen nachlesen, zum Beispiel von Helmut Welke in Ausgabe 11/84, Seite 84, oder im Assembler-Kurs von Heimo Ponnath in den Ausgaben 7 bis 9/85.</p>
+
+        <p>Aber einige Erklärungen, so hoffe ichjedenfalls, werden Ihnen auch hier das Interrupt-Prinzip deutlich machen.</p>
+
+        <p>Die beiden oben genannten Unterbrechungsarten unterscheiden sich sowohl dadurch, wer die Unterbrechung auslösen kann, als auch in der Art, wie sie gehandhabt werden.</p>
+
+        <h3>NMI-Auslöser</h3>
+
+        <p>sind Signale der RS232-Schnittstelle und der Autostart-Steckmodule. Dazu kommen noch die RESTORE-Taste, wenn sie gleichzeitig mit der RUN/STOP-Taste gedrückt wird, und der CIA # 2 beziehungsweise der VIA #1.</p>
+
+        <p>Wie gesagt, nähere Einzelheiten darüber finden Sie in den oben genannten Aufsätzen.</p>
+
+        <h3>IRQ-Auslöser</h3>
+
+        <p>ist 60mal in der Sekunde das Betriebssystem selbst, um die Werte von TI und TI$ höher zu setzen, um zu prüfen, ob die STOP-Taste gedrückt ist, um das Cursorblinken zu erzeugen, um die Tasten der Datasette und schließlich auch die Tastatur abzufragen. Ein IRQ-Interrupt kann aber auch durch Lesen oder Schreiben vom — beziehungsweise auf das — Band, durch die serielle Schnittstelle und durch die Rasterzeilen-Abtastung ausgelöst werden. Programmierbare IRQ-Interrupts sind möglich durch Sprite-Kollisionen, durch Lichtgriffel-Signale und durch den CIA # 1 beziehungsweise den VIA #2. Besonders durch die letzteren Ein-/ Ausgabe-Bausteine unterscheiden sich die Interrupts von C 64 und VC 20.</p>
+
+        <h3>NMI-Abläufe</h3>
+
+        <p>sind schon durch ihren Namen gekennzeichnet. »Non-Maskable« heißt soviel wie »nicht unterdrückbar«. Immer, wenn ein NMI-Signal ankommt, merkt sich der Computer, was er gerade macht, unterbindet alle IRQ-Signale und springt auf eine NMI-Routine, deren Beginn mit dem Vektor in Speicherzelle 792 bis 793 vorgegeben ist.</p>
+
+        <p>Herr Ponnath hat im Assembler-Kurs dies sehr treffend mit dem überkochenden Kessel auf dem Herd verglichen, der heruntergestellt werden muß, selbst wenn gerade die Türglocke klingelt, was uns normalerweise beim Lesen der Zeitung unterbrechen würde.</p>
+
+        <p>Erst in der NMI-Routine werden nach einer vorgegebenen Prioritätsliste alle NMI-Auslöser der Reihe nach abgefragt, bis der Verursacher gefunden ist.</p>
+
+        <h3>IRQ-Abläufe</h3>
+
+        <p>sind Maskable, das heißt sie können, wie gerade gesagt, unterdrückt werden, entweder durch programmiertes Abschalten — das entspricht dem Abstellen der Türglocke — oder durch ein NMI-Signal.</p>
+
+        <p>Bei einem IRQ-Signal wird zuerst der gerade laufende Befehl noch bearbeitet, dann startet die IRQ-Routine, deren Beginn durch den Vektor in Speicherzelle 788 bis 789 vorgegeben ist. In dieser Routine wird entschieden, ob der IRQ-Interrupt durch den Maschinencode-Befehl BRK (Break) oder duch angeschlossene Peripheriegeräte ausgelöst worden ist.</p>
+
+        <p>Wir sehen also, daß die Unterbrechungen einer festgelegten Priorität unterworfen sind. Ihre Steuerung aber erfolgt immer so, daß keine Interrupt-Anmeldung verloren geht, sondern jede in der gebührenden Reihenfolge abgearbeitet wird.</p>
+
+        <p>Schließlich sei noch hervorgehoben, daß der Sprung in die Interrupt-Routinen über die Vektoren die Möglichkeiten eröffnet, diese Routinen nach eigenem Geschmack abzuändern beziehungsweise durch eigene Routinen zu ersetzen.</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Texteinschub #2<br>Reparatur eines LOAD ERRORs</h2>
+
+        <p>Die Datasette — das Bandgerät von Commodore — ist sicher eines der sichersten und zuverlässigsten seiner Art.</p>
+
+        <p>Und doch weigert sie sich gelegentlich, ein Programm vom Band in den Computer zu laden. Alles, was der Computerfreund erhält, ist die Fehlermeldung LOAD ERROR auf dem Bildschirm.</p>
+
+        <p>Natürlich: die nächstliegende Maßnahme ist, den LOAD-Vorgang zu wiederholen. Bringt auch das keinen Erfolg, muß die Flinte noch lange nicht ins Korn geworfen werden. Eine kleine Diagnose und die Kenntnis des Tape Headers im Kassettenspeicher (Speicherzelle 828 bis 1023) kann in den meisten Fällen weiterhelfen.</p>
+
+        <h3>Die 1. Diagnose:</h3>
+
+        <p>Wenn ein Programm auf Band geSAVEt wird, tut das der C 64 und VC 20 zur Sicherheit gleich zweimal, mit zwei völlig identischen Blöcken. Beim Laden des Programms wird der erste Block in den Arbeitsspeicher des Computers geladen.</p>
+
+        <p>Anschließend wird Byte für Byte der zweite Block vom Band mit dem ersten Block im Speicher verglichen. Übersteigt die Anzahl der dabei gefundenen Fehler ein bestimmtes Maß, dann bricht der Computer mit LOAD ERROR ab.</p>
+
+        <p>!! Der erste Programmblock steht aber immer noch im Arbeitsspeicher !!</p>
+
+        <p>Um zu sehen, ob er in Ordnung oder halbwegs brauchbar ist, machen Sie bitte nach der Fehlermeldung gar nichts — kein RUN, kein RESTORE — und LISTen Sie lediglich das Programm. Besteht es nur aus verfälschten Zeilen und Symbolen, dann ist nicht mehr viel zu retten.</p>
+
+        <p>Ist es aber fast oder völlig intakt, können wir es retten. Doch auch jetzt ist noch Vorsicht geboten. Lassen Sie das Programm in Ruhe und heben Sie sich die Korrekturen etwaiger Fehler für später auf.</p>
+
+        <h3>Die 2. Diagnose:</h3>
+
+        <p>Sie betrifft den Tape Header. Vor dem Laden des ersten Programmblocks in den Arbeitsspeicher kommt der Tape Header in den Kassettenpuffer (siehe den Texteinschub »Tape Header« in Ausgabe 10/68, Seite 140).</p>
+
+        <p>In Speicherzelle 828 steht ein Kennzeichen-Byte, in 829/830 in Low/High-Byte-Darstellung die Adresse, ab der das Programm im Arbeitsspeicher steht.</p>
+
+        <p>Für uns ist aber die Adresse wichtig, die in Speicherzelle 831/832 steht. Sie nennt dem Betriebssystem nämlich die Endadresse des Programms im Arbeitsspeicher. Diese Adresse wird nach dem erfolgreichen Abschluß des Ladevorgangs in die Speicherzellen 45/46, 47/48 und 49/50 eingeschrieben.</p>
+
+        <p>Ich sagte: »nach dem erfolgreichen Ladevorgang«. Und das gerade ist ja leider nicht eingetreten — deswegen können wir den akzeptablen ersten Programmblock im Arbeitsspeicher nicht RUNen, korrigieren und sonstwie verarzten, nur LISTen.</p>
+
+        <h3>Reparatur:</h3>
+
+        <p>Da durch den Abbruch die Zeiger in oben genannten drei Speicherzellenpaaren nicht gesetzt worden sind, holen wir das ganz einfach manuell nach mit der folgenden Direkteingabe:<br>
+            POKE 45,PEEK(831): POKE 46,PEEK(832):<br>
+            POKE 47,PEEK(831): POKE 48,PEEK(832):<br>
+            POKE 49,PEEK(831): POKE 50,PEEK(832):</p>
+
+        <p>Das geht auch etwas eleganter und kürzer:<br>
+            FOR K=45 TO 49 STEP 2: POKE K,PEEK(831): POKE K+1,PEEK(832): NEXT</p>
+
+        <p>Damit sind die Zeiger richtig gesetzt, und Sie haben Ihr Programm wieder. Erst jetzt dürfen Sie eventuelle Fehler korrigieren.</p>
+
+        <p>Ich habe nicht erwähnt, was die Zeiger in 45/46, 47/48 und 49/50 bedeuten. Aber das steht ja schließlich in der Memory Map.</p>
+
+        <p>TODO TABLE</p>
+
+        <p>BIT Nr. WERT FLAGGE ABKÜRZUNG<br>
+            0 1 Übertrag C(arry)<br>
+            1 2 NULL Z(ero)<br>
+            2 4 Unterbrechung I(nterrupt)<br>
+            3 8 Dezimal D<br>
+            4 16 Abbruch B(reak)<br>
+            5 32 nicht benutzt<br>
+            6 64 Überlauf V<br>
+            7 128 Vorzeichen N(egativ)</p>
+
+        <p>Um eine der Flaggen des Status-Registers zu löschen, empfiehlt es sich, das ganze Register mit POKE 783,0 zu löschen. Umgekehrt muß man beim Setzen der Bits sehr aufpassen wegen der Unterbrechungsflagge I. Eine 1 in I entspricht dem Maschinen-Befehl SEI, der alle Interrupts ausschaltet, auch die der Tastatur-Abfrage, was natürlich sehr störend sein kann! Um alle Flaggen außer der Unterbrechungsflagge I zu setzten, muß POKE 783,247 eingegeben werden.</p>
+
+        <p>So, jetzt wird es Zeit für ein Beispiel, wie vor dem SYS-Befehl Parameter eingegeben werden können. In der Literatur wird immer das Beispiel gewählt, den Cursor auf eine bestimmte Position zu setzen, beziehungsweise seine Position abzufragen. Dazu gibt es eine Routine, die bei beiden Computern ab Speicherzelle 65520 ($FFF0) beginnt.</p>
+
+        <p>Sie nimmt die Zahl, die im X-Register steht, und verwendet sie als Zeilennummer; die Zahl des Y-Registers nimmt sie als Spaltennummer, setzt dann den Cursor an diese Stelle und bringt die beiden Werte in die Speicherzellen 209/210 und 211.</p>
+
+        <p>Unser Beispiel hat die Aufgabe, den Cursor in die vierte Spalte der siebten Zeile zu setzen, dort das Dollar-Zeichen hinzuschreiben und es rot zu färben.<br>
+            5 PRINT CHR$(147)<br>
+            10 POKE 783,0<br>
+            20 POKE 781,6<br>
+            30 POKE 782,3<br>
+            40 SYS 65520</p>
+
+        <p>Nach Löschen des Bildschirms werden zuerst alle Flaggen des Statusregisters gelöscht (Zeile 5). Dann kommt die Zeilennummer in das X-Register (Zeile 10) und die Spaltennummer in das Y-Register (Zeile 30). Nach dem Eingeben dieser Parameter können wir mit SYS auf die Routine springen.<br>
+            50 ZEILE=PEEK(209)+256*PEEK(210)<br>
+            60 ADRESSE = ZEILE + PEEK(211)<br>
+            70 POKE ADRESSE,36</p>
+
+        <p>In Speicherzellen 209/210 können wir jetzt (zur Übung) die Zeilennummer ablesen. Die Adresse der Cursorposition im Bildschirmspeicher erhalten wir durch die Addition der Zeilennummer mit dem Inhalt der Speicherzelle 211. Dorthin POKEn wir den Bildschirmcode des Dollarzeichens, nämlich 36 (Zeile 70).<br>
+            80 SYS 59940<br>
+            90 FARBE=PEEK(243)+256*PEEK(244)<br>
+            100 POKE FARBE+PEEK(211),2</p>
+
+        <p>Für das Färben des Dollarzeichens verwenden wir eine weitere Routine des Betriebssystems, die ab 59940 — beim VC 20 ab 60082 — beginnt. Sie ermittelt die Zeilenposition des Cursors im Farbspeicher und bringt diesen Wert in die Speicherzellen 243/244, wo wir ihn abfragen können (Zeile 90). Die Adresse der Cursorposition im Farbspeicher setzt sich aus diesem Wert plus der Spaltennummer zusammen, die wir wieder der Speicherzelle 211 entnehmen. Auf diesen Platz POKEn wir den Farbcode 2 für rot (Zeile 100). So leicht ist das, wenn man die Routinen und die Aufgaben der Speicherzellen kennt.</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Texteinschub #4<br>Das Mauerblümchen USR</h2>
+
+        <p>Hand aufs Herz: Haben Sie den USR-Befehl schon einmal benutzt? Ohne Zweifel gehört er zu den Mauerblümchen von Basic, obwohl sein Name — eine Abkürzung von USER (Verwender) — eigentlich genügend Anreiz bieten müßte. Da er ohne die Speicherzellen 784 bis 786 nicht auskommt, ist der heutige Teil des Kurses eine gute Gelegenheit, ihn Ihnen näher zu bringen.</p>
+
+        <p>USR hat im Grunde genommen dieselbe Funktion wie SYS. Er springt nämlich aus einem Basic-Programm direkt in ein Maschinen-Programm, arbeitet dieses so lange ab, bis er den Befehl RTS findet. RTS entspricht dem Basic-Befehl RETURN und springt in das Basic-Programm zurück.</p>
+
+        <p>Bei SYS steht die Sprungadresse gleich hinter dem Befehl.</p>
+
+        <p>Bei USR muß die Sprungadresse zuerst in die Speicherzellen 785/786 gePOKEt werden (beim VC 20 in 1/2).<br>
+            Beispiel: Sprung auf 56524 ($DCCC)<br>
+            mit SYS:SYS 56524<br>
+            mit USR: POKE 785,204 (204+256*220=56524)<br>
+            POKE 786,220<br>
+            X=USR(Y)</p>
+
+        <p>Kein Wunder, daß USR selten verwendet wird — ist er doch durch das POKEn der Sprungadresse in Low/High-Byte Darstellung aufgeblüht.</p>
+
+        <p>Das ist aber nicht unnütz, weil USR mehr Fähigkeiten hat als SYS. Im Hinblick auf die im anderen Texteinschub »Der vorbereitete SYS-Befehl« aufgezeigten Möglichkeiten des SYS-Befehls sollte ich besser sagen: USR hat andere Fähigkeiten als SYS.</p>
+
+        <p>USR ist eine Mischung von SYS und FN. Letzterer ist der Basic-Befehl zur Definition selbst erfundener Funktionen. Bei USR allerdings wird die Funktion als Unterprogramm in Maschinensprache geschrieben, auf die dann wie gesagt der USR-Befehl zur Ausführung springt. Der Pfiff dabei ist aber, daß Zahlenwerte in das Maschinenprogramm mitgenommen beziehungsweise Resultate aus ihm herausgeholt werden können.</p>
+
+        <p>Wie läuft das ab: Das Argument Y, das in der Klammer hinter dem Befehl steht, wird zuerst in den Gleitkomma-Akkumulator Nr. 1 (FAC 1) in den Speicherzellen 97 bis 102 gebracht. Als Gleitkommazahl wird es vom angesprungenen Maschinenprogramm weiterverarbeitet. Das Resultat kommt dann wieder in den FAC 1 und steht als Wert von X zur Verfügung.</p>
+
+        <p>Das Argument Y kann übrigens auch ein komplexer Ausdruck sein, zum Beispiel: X=USR(PEEK(A)+256*PEEK(B))</p>
+
+        <p>Ich möchte das an einem kleinen Beispiel demonstrieren.</p>
+
+        <p>Statt allerdings ein Maschinenprogramm selbst zu schreiben, verwende beziehungsweise springe ich auf eine Routine des Betriebssystems, die den Inhalt des FAC 1 für mathematische Operationen verwendet.</p>
+
+        <p>Als geeignete mathematische Operation habe ich die Routine für die Funktion INT gewählt, die im C 64 ab der Adresse 48332 ($BCCC) beginnt. Zuerst definieren wir einen Wert für die Variable Y, der in die INT-Routine gebracht werden soll:<br>
+            10 Y=14,35</p>
+
+        <p>Dann bestimmen wir die Sprungadresse für den USR-Befehl. Dazu teilen wir die Adresse 48332 auf in ein Low-Byte = 204 und ein High-Byte = 188. Diese POKEn wir nach 785/786:<br>
+            20 POKE 785,204<br>
+            30 POKE 786,188</p>
+
+        <p>Jetzt folgt nur noch der USR-Befehl selbst und das Ausdrucken des Resultats.<br>
+            40 X=USR(Y)<br>
+            50 PRINT X</p>
+
+        <p>Nach RUN erhalten wir das Resultat 14, wie das Gesetz für INT es befiehlt.</p>
+
+        <p>Sie können zur Übung statt INT auch COS verwenden, indem Sie auf die Adresse 57938 ($E264) beziehungsweise beim VC 20 auf 57935 ($E261) springen. Der Vergleich mit dem Befehl COS Y muß dasselbe Ergebnis bringen. Wer hat übrigens gemerkt, daß wir überhaupt nichts mit der Speicherzelle 784 (beziehungsweise 0) gemacht haben, obwohl sie doch angeblich am USR-Befehl beteiligt ist?</p>
+
+        <p>Sie ist es wirklich, doch ohne unser Zutun. In diese Adresse wird beim Einschalten des Computers die Zahl 76 ($4C) geschrieben. Das ist der Code für den Maschinenbefehl »JMP« (jump), der dieselbe Wirkung hat wie GOSUB.</p>
+
+        <p>Bei Ausführung von USR springt nämlich die entsprechende Routine zuerst auf die Speicherzelle 784 (beziehungsweise 0), findet dort den Sprungbefehl und in den beiden nachfolgenden Speicherzellen 785 und 786 (beziehungsweise 1 und 2) die Sprungadresse — und führt so den geplanten Sprung aus.</p>
+
+        <p>Ich finde, USR ist es wert, in Ihre Überlegungen mit einbezogen zu werden, besonders wenn Sie innerhalb Ihrer Basic-Programme extrem schnelle Unterprogramme in Maschinensprache eingebaut haben. Diese sind mit USR ganz elegant aufrufbar. Ich denke da zum Beispiel an eine Abfrage der Joysticks oder der Paddle.</p>
+    </article>
+</body>
+
+</html>
