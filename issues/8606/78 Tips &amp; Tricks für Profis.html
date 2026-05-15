@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christoph Dautzenberg, tr, Joachim und Michael Kreutzer, tr, Peter Gorgs, tr, Prof. Erich Pröve, tr, Robert Bartz, tr, Stefan Bültena, tr, Werner Tüllmann, tr, Wolf Dieter Busch, tr">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="78-80,82">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Wie nützt man am besten den $C000-Bereich für Basic-Programme? Wir zeigen Ihnen eine wirklich geniale Lösung und viele weitere interessante und trickreiche C 64-Leckerbissen.</p>
+
+        <p>Übrigens: Vor kurzem wollten wir in der Redaktion einen »too many files«-Error hervorrufen. Wir verwendeten dazu folgenden Einzeiler:<br>
+            10 FOR I = 1 TO 20 : OPEN I,2 : NEXT</p>
+
+        <p>Völlig ungläubig starrten wir auf die nach dem »RUN« ausgegebene Fehlermeldung unseres C 64. Sie lautete nämlich&hellip; Halt! Probieren Sie es selbst einmal aus. Kennen Sie die Erklärung? Auflösung folgt in der nächsten Ausgabe.</p>
+
+        <h2>Auffrisierter SYS-Befehl</h2>
+
+        <p>Wer selbst Basic-Erweiterungen programmiert, wird bei zeitkritischen Befehlen (zum Beispiel einer Plot-Routine) schnell an die Grenzen des SYS-Befehls mit Parameterübergabe stoßen. Er ist aufgrund der Adreßumrechnung (Sprungadresse aus dem Basic-Text holen, umrechnen, auf Fehler testen und einen JMP ausführen) manchmal zu langsam. Eine besonders geniale Methode bietet sich als Alternative an: die USR-Funktion. Sie ist um einen wesentlichen Faktor schneller als der SYS-Befehl und eine Parameterübergabe ist ebenso möglich (USR(x),y,z). Ein weiterer Vorteil: Manche Compiler verweigern den SYS-Befehl mit nachfolgenden Parametern. Ein Compiler, der die USR-Funktion nicht verarbeitet, ist uns hingegen nicht bekannt. Bei Befehlserweiterungen mit mehreren Befehlen kann dem Maschinenprogramm über den Übergabeparameter x mitgeteilt werden, welcher Befehl gewünscht wird. Übrigens: Der USR-Vektor steht in 785/786 dezimal. Das Maschinenprogramm müßte dann so aussehen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>JSR $B7F7 USR-Argument nach $0014/$0015 holen&hellip;<br>
+            LDA $14 und schon steht der Parameter x zur Weiterverarbeitung bereit!</p>
+
+        <p>Das High-Byte ($0015) der Übergabevariablen x wird bei dieser Methode natürlich nicht berücksichtigt, aber wer hat schon eine Befehlserweiterung mit mehr als 256 Befehlen&hellip; (Hartmut Kroos/tr)</p>
+
+        <h2>LOAD-Schutz einmal anders</h2>
+
+        <p>Kannten Sie den schon? Verwenden Sie zur Speicherung eines Programms auf Floppy folgenden Dateinamen:<br>
+            SAVE CHR$(34),8<br>
+            Im Directory erscheint dieses File dann mit dem Dateinamen "". Versuchen Sie nun einmal, dieses Programm wieder zu laden. Richtig! Dies geht nur mehr mit<br>
+            LOAD CHR$(34),8</p>
+
+        <address class="author">(Stefan Bültena/tr)</address>
+
+        <h2>Hilfe beim Programme-Abtippen</h2>
+
+        <p>Wenn man ein Programm abtippen möchte, sieht man sich öfters einer DATA-Wüste gegenüberstehen, beziehungsweise -sitzen. Das dabei am meisten vorkommende Zeichen ist zweifellos das Komma. Dieses liegt aber nun auf einer kleinen Taste auf der Tastatur, die, wenn man nicht dauernd auf die Tastatur schauen will, recht schwer zu erreichen ist. Die Folge ist: Man vertippt sich häufiger. Um das zu ändern, tue man folgendes:<br>
+            1) ROM ins RAM kopieren<br>
+            Zum Beispiel mit dem Einzeiler:<br>
+            FOR I = 0 TO 8191 : POKE 40960 + I, PEEK (40960 + I) : POKE 57344 + I,PEEK (57344 + I) : NEXT</p>
+
+        <p>Genialer geht es natürlich mit einem Maschinensprache-Monitor und einem Transfer-Befehl. Es müssen die Bereiche $A000 bis $BFFF nach $A000 und $E000 bis $FFFF nach $E000 verschoben werden.<br>
+            2) Umschalten mit POKE 1,53<br>
+            3) POKE 60349,44</p>
+
+        <p>Wenn man nun auf die SPACE-Taste drückt, entdeckt man, daß diese Kommanta produziert. Wer Lust hat, kann die Komma-Taste mit POKE 60336,32 mit der SPACE-Funktion belegen. Diese Umbelegung erleichtert das Abtippen um einiges.</p>
+
+        <address class="author">(Peter Gorgs/tr)</address>
+
+        <h2>Grafik-Erweiterung für den LoRes-Bildschirm</h2>
+
+        <p>Manchmal ist es aus Platzgründen sinnvoll, für grafische Darstellungen nicht die HiRes-Grafik zu verwenden. Unsere kleine Basic-Erweiterung in Listing 1 erlaubt es, mit einem einfachen SYS-Aufruf im normalen Text-Modus einen Pixel (4x4 Punkte) zu setzen.<br>
+            Syntax: SYS 49152,X-Wert,Y-Wert,Modus(,Farbe)</p>
+
+        <p>Für X sind Werte von 0 bis 79, für Y von 0 bis 49 zugelassen. »Modus« gibt an, ob der Punkt gesetzt (Modus = 1), gelöscht (Modus = 0), oder getestet (Modus = 255) werden soll. Bei Modus gleich 255 steht das Ergebnis des Tests (1 = gesetzt, 0 = gelöscht) in Speicherzelle 2. Für den Parameter »Farbe« gelten die normalen Farb-POKEs (0 bis 15). Wenn auf »Punkt gesetzt/gelöscht« geprüft werden soll, muß »,Farbe« entfallen. (Georg Brandt/Andreas Wellie/tr)</p>
+
+        <h2>Die verflixte Müllabfuhr</h2>
+
+        <p>Bei einer Garbage Collection zeigt der C 64 keine Reaktion mehr. Man weiß dann nie so genau, ob der Computer abgestürzt oder am Rechnen ist. Besonders schlimm ist diese Tatsache bei der Programmentwicklung oder bei gekauften Basic-Programmen, die viele Daten zu verarbeiten haben (Adreßverwaltung, Vokabelprogramm, Haushaltsbuchhaltung. .). Mit dem Programm »Garbage Anzeige» (Listing 2) wollen wir nun eine Möglichkeit angeben, diese Unsicherheit aus dem Weg zu räumen. Sobald der Computer dabei ist, den Stringmüll zu sortieren, zeigt das Programm automatisch einen Text. Ist die Garbage Collection beendet, sieht der Bildschirm genauso aus wie vorher, das heißt der überschriebene Text wird wieder in unveränderter Form auf den Bildschirm gebracht. Ferner kann man vorher genau bestimmen, wo der Text erscheinen soll (Spalte, Zeile). Zusätzlich wird bei jedem Aufruf die Rahmenfarbe um eins erhöht. Selbstverständlich wird diese bei Ende der Garbage Collection sofort wieder zurückgesetzt.</p>
+
+        <p>Will man die Rahmenfarbe jedoch belassen, so sind noch zwei POKEs einzugeben: POKE 53102,44: POKE 53119,44. Das Programm braucht nur einmal, aufgerufen zu werden und bleibt die ganze Zeit durch den Gebrauch der Interrupttechnik einsatzbereit. Nach RUN/STOP-RESTORE und RESET muß die Routine wieder initialisiert werden. Listing 3 demonstriert die Anwendung des Programms.<br>
+            Initialisierung mit: SYS 52992, Spalte, Zeile</p>
+
+        <address class="author">(Joachim und Michael Kreutzer/tr)</address>
+
+        <h2>43007 Bytes free!</h2>
+
+        <p>»BASIC $B000« (Listing 4) verschiebt den Basic-Interpreter von $A000-$BFFF nach $B000-$CFFF und ändert alle benötigten Parameter beziehungsweise Werte und Adressen. Somit meldet sich anschließend eine Basic-Version mit 43007 statt 38911 Bytes free. Der Vorteil gegenüber anderen Basic-RAM-Erweiterungen liegt darin, daß die 43007 Bytes an einem Stück liegen, und somit in einer beliebigen Aufteilung für Variablen oder Programm zur Verfügung stehen. Die zusätzlichen 4 KByte RAM sind für Adventures oder Datenverwaltungsprogramme äußerst nützlich. Als Beispielprogramm diene das Adventure »Buch der Weisheit« aus dem Sonderheft 3/85, Spiele. Dieses Adventure ist normalerweise nur in einer compilierten Fassung lauffähig, sonst meldet es sich mit einem »OUT OF MEMORY ERROR«. Mit Basic $B000 ist auch die Basic-Version lauffähig. Es muß allerdings darauf hingewiesen werden, daß nur reine Basic-Programme ohne Maschinen-Routinen mit Basic $B000 verwendet werden dürfen!</p>
+
+        <h3>Bedienungsanleitung:</h3>
+
+        <p>Wenn Sie mit Hypra-Load arbeiten wollen, so laden Sie dies zuerst und starten es. Ansonsten oder anschließend laden Sie »BASIC $B000« und starten es mit »RUN«. Danach wird »Bitte warten« ausgegeben, und nach zirka sieben Sekunden meldet sich »BASIC $B000« mit »43007 Bytes free«. Mit »SYS 64738«, also einem Software-Reset, wird nicht auf das normale Basic umgestellt, sondern »BASIC $B000« neu initialisiert. Nur mit einem Reset-Taster oder »POKE 1,55« kommt man wieder in den Normalmodus. Danach läßt sich das »BASIC $B000« nur mit einem erneuten Laden und Starten wiederbeleben. Da Turbo-Tape-Versionen einen Teil des Bereichs von $C000 bis $CFFF belegen, kann man diese leider nicht mit »BASIC $B000« verwenden, da es selbst diesen Bereich benötigt. Somit ist eine Benutzung von »BASIC $B000« nur mit einer Diskettenstation zu empfehlen. Bei einer Benutzung von Hypra-Load schalten Sie vorher bitte den Drucker aus und laden keine Programme über 169 Blocks beziehungsweise 43007 Bytes Länge.</p>
+
+        <address class="author">(Robert Bartz/tr)</address>
+
+        <h3>Hi-Eddi und Panasonic-Drucker</h3>
+
+        <p>Mit dieser geänderten Druckroutine läßt sich der KX-P1090 genauso wie ein Epson-Drucker ansprechen. Die Einstellung der DIP-Schalter ist bis auf Schalter 1 identisch mit der Originaleinstellung des Druckers.<br>
+            1. Änderungsmöglichkeit:</p>
+
+        <p>Im Basic-Lader aus der 64’er, Ausgabe 1/85, Seite 66, müssen in Zeile 580 zwei DATA-Werte geändert werden. Die neue Zeile heißt:<br>
+            580 DATA 27,75,255,255,255<br>
+            2. Änderungsmöglichkeit:</p>
+
+        <p>Bei dem Maschinenprogramm müssen die Adressen $0E75 und $0E76 überschrieben werden. Dies geschieht am besten mit dem SMON. SMON laden und starten. Die ursprüngliche HI-PRINT-Version laden.<br>
+            Nun eingeben: M0E70 0E77</p>
+
+        <p>Jetzt werden in der angezeigten Zeile das 6. und 7. Byte geändert in 4B und FF. Nachdem &lt;Return> gedrückt wurde, kann die geänderte Version auf Diskette gespeichert werden.</p>
+
+        <address class="author">(Werner Tüllmann/tr)</address>
+
+        <h2>Hypra-Platos und FX 80</h2>
+
+        <p>Für den FX 80 habe ich das »2. PRG« etwas verlängert, um die Zeichengenauigkeit in X-Richtungzu verbessern. Die Zeilenbreite von im Mittel genau 54o Zoll erreiche ich dadurch, daß der Vorschub innerhalb von fünf Zeilen dreimal den Wert 2%is Zoll (1., 3. und 4. Zeile) und zweimal den Wert 2<sup>6</sup> Zoll annimmt. Zusätzlich wird am Ende jeder Zeile LF ausgegeben. Dadurch kann beim Görlitz-Interface die Sekundäradresse 4 (Linearkanal) benutzt werden. (Falls das nicht erwünscht ist, überschreiben Sie $9CED bis $9CF1 mit EA (NOP).) Die dafür notwendigen Änderungen können mit dem MSE eingegeben werden.</p>
+
+        <p>Geändert werden muß die Zeile:<br>
+            9A74: 4C C2 9C EA EA 20 33 f3 0A<br>
+            und angefügt werden die Zeilen:<br>
+            9CC0: 00 16 EE C0 9C AD C0 9C 12<br>
+            9CC8: C9 02 F0 09 C9 05 D0 08 08<br>
+            9CD0: A9 00 8D C0 0C CE C1 9C 75<br>
+            9CD8: A9 1B 20 D2 FF A9 33 20 CC<br>
+            9CE0: D2 FF AD C1 9C 20 D2 FF 6B<br>
+            9CE8: A9 0D 20 D2 FF A9 0A 20 30<br>
+            9CF0: D2 FF A9 16 8D C1 9C 4C E1<br>
+            9CF8: 79 9A AD 66 95 C9 52 D0 89<br>
+            9D00: 03 4C 81 99 4C E4 9B 20 57</p>
+
+        <address class="author">(Prof. Erich Pröve/tr)</address>
+
+        <h2>»DEF FN« sinnvoll eingesetzt</h2>
+
+        <p>Eine der nützlichsten Funktionen des mageren C 64-Basic führt bei den meisten C 64-Fans zweifellos ein Schattendasein: die DEF FN-Funktion. Das kleine Demo-Programm in Listing 5 zeigt, wie sich fast ausschließlich mit dieser Funktion die Echtzeituhr der CIAs auslesen läßt.</p>
+
+        <p>Nebenbei bemerkt: Es gibt unglaublich viele Anwendungsbeispiele für die FN-Anweisung, und sei es nur die LoHi-Zerlegung einer Zahl. Die Joysticks lassen sich damit auslesen, Sprites steuern, Grafikpunkte setzen, und die Register des SID kann man durch gezielte Umrechnungen wesentlich komfortabler programmieren&hellip;</p>
+
+        <p>Listing 5 ist durch die REM-Zeilen ausreichend dokumentiert, so daß hier auf weitere Erklärungen verzichtet werden kann.</p>
+
+        <address class="author">(Wolf Dieter Busch/tr)</address>
+
+        <h2>Der Super-Autostart</h2>
+
+        <p>Darauf haben Sie schon lange gewartet: Einen Autostart-Generator, der viele sinnvolle Eigenschaften aufweist. Dazu gehören: Kurzes Listing (sowohl des Generator-Programms als auch des Autostarts selber), einfach in der Anwendung, RUN/STOP-RESTORE- und Reset-Schutz für das fertige Programm und eine eingebaute Codier- und Decodier-Funktion.</p>
+
+        <p>Der Autostart-Generator in Listing 6 hat alle genannten Funktionen. Die Anwendung ist äußerst einfach: Abtippen, speichern, absolut laden, »NEW« eintippen. Dann das zu bearbeitende (Basic-)Programm laden und den Autostart mit folgender Zeile aktivieren:</p>
+
+        <p>SYS 49152,Code, "Haupt-Name", "Lader-Name"</p>
+
+        <p>»Code« ist eine beliebige Zahl zwischen 0 und 255. »Haupt-Name« und »Lader-Name« sind die zukünftigen Namen des codierten Hauptteils beziehungsweise des Lade-Programms auf der Diskette. Der Lader ist später mit »,8,1« in den C 64 zu lesen.</p>
+
+        <p>Läßt man »,"Lader-Name"« weg, so wird nur der codierte Hauptteil neu gespeichert (wenn man Änderungen am Hauptteil vorgenommen hat). Wichtig ist dann nur, daß die Code-Zahl des Hauptprogramms mit der des Laders übereinstimmt. Im Zweifelsfall sollte man lieber den alten Lader löschen und beide Teile neu generieren.</p>
+
+        <address class="author">(Christoph Dautzenberg/tr)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Klein, dm, Herbert Kunz, dm, Holger Brömmelsiek, dm, Jürgen Strehle, dm, Sanjiv Singh, dm, Stefan Seidenberg, dm, Thomas Tschink, dm, Thorsten Wanschura, dm, Udo Miller, dm">
+    <meta name="64er.issue" content="6/86">
+    <meta name="64er.pages" content="82-85">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 128</h1>
+        <p class="intro">Weiter geht’s mit den Tips und Tricks. Diesmal dabei: Variablendump, ein FIND-Befehl, C 64-Modus im 2-MHz-Takt, ein Trick zur 1571 und vieles mehr.</p>
+
+        <p>Tips und Tricks nutzen jedem Anwender. Wie könnte man seine Maschine sonst ausnutzen, wenn man nicht die kleinen Kniffe wüßte, die dem Computer die Feinheiten entlocken. Lesen Sie hier, wie Sie Ihren C 128 bändigen.</p>
+
+        <h2>Cursor auch bei GET</h2>
+
+        <p>Mit dieser kleinen Zeile, die als Erste in einem Programm stehen muß, können Sie beim C 128 auf dem 80-Zeichen-Bildschirm den Cursor bei GET blinken lassen:<br>
+            0 PRINT CHR$(27)+"U"</p>
+
+        <address class="author">(Thomas Tschink/dm)</address>
+
+        <h2>Komfortable Joystick-Abfrage</h2>
+
+        <p>Dieses Programm ermöglicht eine komfortable Joystickabfrage. Statt umständlichen IF..THEN-Anweisungen werden einfach indizierte Variablen benutzt.</p>
+
+        <h3>Zum Programm</h3>
+
+        <p>In den Zeilen 40 und 50 werden die Variablen A(X) und B(X) definiert. Der Index X entspricht den Richtungen 1 bis 8 des Joysticks.</p>
+
+        <p>In Zeile 60 wird die Variable J mit dem Zustand des Joysticks in Port 1 belegt. Ist der Feuerknopf gedrückt (Richtung+128), springt das Programm wieder zu Zeile 60 (es würde sonst zu einer Fehlermeldung kommen).</p>
+
+        <p>In Zeile 70 werden jetzt die Werte der Variablen A(J) und B(J) zu der X- und Y-Position dazuaddiert. Dabei kommt uns ein Gesetz der Mathematik zugute: Addiert man zu einer positiven eine negative Zahl, kommt dies einer Subtraktion gleich (zum Beispiel: 100 + (-20) = 80).</p>
+
+        <p>Mit X und Y können jetzt Sprites, Shapes oder ähnliches bewegt werden (hier ist es ein Sprite).</p>
+
+        <h3>Ein Beispiel für die Arbeitsweise</h3>
+
+        <p>Wird der Joystick nach Rechts-Oben bewegt, ist J = 2; also ist A(J) = 1 und B(J)=-1. Angenommen, X = 100 und Y=90, so ist X + A(J) = 101 ((100 +1 = 101)) und Y+ B(J) = 89 ((90 + (-1) = 89)).</p>
+
+        <p>Es ist natürlich möglich, auch andere Schrittweiten als 1 zu nehmen, vorausgesetzt, X und Y sind nicht größer oder kleiner als die zugelassenen Werte.<br>
+            10 X=160:Y=100<br>
+            20 SPRDEF:SPRITE 1,1,2<br>
+            30 COLOR 0,1:COLOR 4,1<br>
+            40 A(1)=0:B(1)=-1:A(2)=1:B(2)=-1:A(3)=1<br>
+            50 B(3)=0:A(4)=1:B(4)=1:A(5)=0:B(5)=1<br>
+            60 A(6)=-1:B(6)=1:A(7)=-1:B(7)=0<br>
+            70 A(8)=-1:B(8)=-1<br>
+            80 J=JOY(2):IF J>127 THEN J=J-128<br>
+            90 X=X+A(J):Y=Y+B(J)<br>
+            100 MOVSPR 1,X,Y:GOTO 80</p>
+
+        <address class="author">(Thorsten Wanschura/dm)</address>
+
+        <h2>Eine Grafik-Routine</h2>
+
+        <p>Mit dem kleinen Programm<br>
+            10 GRAPHIC 1,1:COLOR 4,15<br>
+            20 COLOR 1,2:Color 0,8<br>
+            30 DO UNTIL E=180<br>
+            40 E=E+4<br>
+            50 CIRCLE 1,159,99,E,,,,E,72<br>
+            60 LOOP<br>
+            läßt sich mit wenig Aufwand eine schöne Grafik berechnen, die auf dem HiRes-Schirm dargestellt wird.</p>
+
+        <address class="author">(Jürgen Strehle/dm)</address>
+
+        <h2>Zwei nützliche Hilfsroutinen</h2>
+
+        <p>Das Programm UNDIM.VAR.DUMP (Listing 1) gibt auf dem aktuellen Ausgabegerät die nicht DIMensionierten Variablen aus. Der Aufruf erfolgt mit GOTO 63000.</p>
+
+        <p>Das Programm F.KEY-DISPLAY (Listing 2) stellt vier zusätzliche Bildschirmzeilen zur Verfügung, in denen die beim Aufruf gültige Belegung der Funktionstasten angezeigt werden. Es ist nötig, vor dem Start den 80-Zeichen-Modus eingeschaltet zu haben.</p>
+
+        <address class="author">(Christian Klein/dm)</address>
+
+        <h2>Auch im C 64-Modus mit 2 MHz</h2>
+
+        <p>Laut Auskunft bei Commodore ist es möglich, den C 128 im C 64-Modus mit 2 MHz arbeiten zu lassen. Diese wenigen Programmzeilen wirken wie FAST beim C 128 im 40-Zeichen-Modus.</p>
+
+        <p>Das bedeutet, der Computer arbeitet mit 2 MHz. Jedoch ist es nicht möglich, im C 64-Modus über die RGBI-Buchse zu gehen und somit die Arbeit am Bildschirm zu verfolgen.</p>
+
+        <p>Diese POKEs eignen sich also besonders für die Leute, die ihre eigenen Basic V2-Programme zwar nicht umschreiben, aber doch die volle Geschwindigkeit des C 128 nutzen wollen. Sie können sie als kleine Routine vor den Rechenteil Ihres Programmes setzen.</p>
+
+        <p>10 POKE 53265,PEEK (53265) AND 239: REM Video aus<br>
+            20 POKE 53296,PEEK (53296) OR 1: REM 2 MHz an<br>
+            30 FOR A = 1 TO 1000:NEXT A: REM Programmteil<br>
+            40 POKE 53296,PEEK (53296) AND 254: REM 1 MHz an<br>
+            50 POKE 53265,PEEK (53265) OR 16: REM Video an</p>
+
+        <address class="author">(Sanjiv Singh/dm)</address>
+
+        <h2>Ein FIND-Befehl</h2>
+
+        <p>Obwohl das Basic 7.0 des Commodore 128 viele neue Befehle beinhaltet, gibt es doch einige, die man vermißt. Ein solcher ist der von vielen Erweiterungen für den C 64 her bekannte Befehl FIND Der hier abgedruckte Basic-Lader (Listing 3) bringt dem C 128 eine solche Routine bei.</p>
+
+        <p>Aktiviert wird die Routine mit SYS DEC("1300"). Nun können Sie Ihr Basic-Programm nach einem Begriff durchsuchen. Als Befehlserkennung dient der Klammeraffe @. Danach schreiben Sie das Suchwort (zum Beispiel einen Befehl, einen String oder einen Variablennamen). Wenn eine Zeile gefunden wird, in der der Begriff auftaucht, so wird die komplette Zeile auf dem Bildschirm gelistet (mit OPEN l,4:CMD 1 auch auf dem Drucker).</p>
+
+        <p>Das Listen kann mit der Commodore-Taste verlangsamt und mit der NO SCROLL-Taste aufgehalten werden. Wenn der Klammeraffe in einer Zeile (Bildschirmzeile, nicht Programmzeile) steht, so ist davor ein Doppelpunkt einzugeben.</p>
+
+        <p>Hier noch einige Beispiele:<br>
+            : @DATA — listet alle DATA-Zeilen<br>
+            : @GOTO 10 — listet alle Zeilen, in denen GOTO 10 vorkommt, aber auch GOTO 100, GOTO 1000 etc.<br>
+            : @"MESSUNG " — alle Zeilen, in denen der String gefunden wird, werden gelistet.</p>
+
+        <address class="author">(Herbert Kunz/dm)</address>
+
+        <h2>Programme transferieren mit FLASHMOVE</h2>
+
+        <p>Spielen Sie folgenden Gedankengang einmal durch: Sie besitzen einen C 128 und eine Floppy 1570/1571. Diese Gerätekombination besitzt die gute Eigenschaft, daß im C 128-Modus lange Programme in wenigen Sekunden geladen werden können. Sie möchten aber Ihre C 64-Software aktiv weiterbenutzen. Also nichts wie GO 64 eingeben und das entsprechende Programm laden&hellip;</p>
+
+        <p>Man freut sich immer wieder, daß ein Programm im C 64-Modus nur so »reinfetzt«, was gewöhnlich bei längeren Programmen zu erfreulich »langen« Wartezeiten führt. Es muß also eine Programmroutine her, die es ermöglicht, ein im C 128-Modus geladenes Programm in den C 64-Modus umzuwandeln, so daß man es dort wie gewohnt weiterverwenden kann. Die Lösung: »Flashmove«.</p>
+
+        <p>Da Bank 0 sowohl im C 128- als auch im C 64-Modus für die Speicherungvon Basic-Programmen dient, der Basic-Anfang aber verschoben ist (C 128: $lC00, C 64: $0800), liegt es nahe, daß ein im C 128-Modus geladenes Programm nur noch verschoben werden muß, um es im C 64-Modus zu gebrauchen. Und eben das erledigt das Programm »Flashmove« (Listing 4).</p>
+
+        <p>Der einzige Nachteil der Sache ist, daß das Programm nicht länger als 45 KByte sein darf. Übrigens, wenn die Startadresse eines Programmes über $lC00 liegt, benötigt man Flashmove nicht.</p>
+
+        <p>Bank 0 wird durch GO 64 nur in die C 64-Speicherverwaltung umgeschaltet, aber nicht total gelöscht.</p>
+
+        <p>Und so benutzt man Flashmove im C 128-Modus:<br>
+            1) »Flashmove« (wird als % gespeichert) mit ,8,1 laden<br>
+            2)LOAD "beliebiges Programm" ,8<br>
+            3) GO 64<br>
+            4) »Flashmove« mit SYS 2060 starten, fertig</p>
+
+        <h3>Eingabehinweise</h3>
+
+        <p>Um den Maschinencode von Flashmove zu erhalten, geht man folgendermaßen vor:</p>
+
+        <ul>
+            <li>Zuerst geben Sie bitte das Listing »Flashmove« (Listing 4) ein und speichern es</li>
+            <li>Nach dem Start durch RUN wird auf zwei Bildschirmseiten die Funktion und Handhabung nochmals beschrieben</li>
+            <li>Schließlich wird man nach dem Namen gefragt, unter welchem Flashmove gespeichert werden soll (ACHTUNG: ist schon ein File mit gleichen Namen auf Diskette vorhanden, so wird dieses gelöscht)<br>
+                Mit dem »Autoboot Maker« (zu finden auf der 1570/1571 Test/Demo-Disk) kann man nun den abgespeicherten Maschinencode bootfähig machen:</li>
+            <li>»Autoboot Maker« laden und starten</li>
+            <li>Den Namen eingeben, unter dem das Maschinenprogramm von Flashmove gespeichert wurde</li>
+            <li>Die Frage nach dem Datentyp beantwortet man mit »binary«</li>
+        </ul>
+
+
+        <address class="author">(Stefan Seidenberg/dm)</address>
+
+        <h2>Sprites invertieren</h2>
+
+        <p>Dieses kleine Programm (Listing 5) (re)invertiert Sprites, die im Speicher abgelegt sind. Der Aufruf der Routine ist sehr einfach. Die Syntax lautet:<br>
+            SYS anfadr, sprnr</p>
+
+        <ul>
+            <li>anfadr steht für die Startadresse des Maschinenprogrammes im Speicher (zum Beispiel $0b00 bzw. dez. 2816)</li>
+            <li>sprnr steht für die Nummer des zu (re)invertierenden Sprites. Ist die Spritenummer größer 8 oder kleiner gleich 0, erfolgt ein ILLEGAL QUANTITY ERROR, auch im Programmmodus. Die fehlerhafte Zeile läßt sich dann mit HELP listen.</li>
+        </ul>
+
+
+        <p>Das Programm ist an keine bestimmte Adresse gebunden und kann durch Ändern der Startadresse oder dem T(ranslate)-Befehl des Monitors an eine andere Adresse verschoben werden.</p>
+
+        <p>Die Vorzüge der Routine liegen vor allem in der Geschwindigkeit, in der diese ausgeführt wird. Außerdem geht kein Basic-Speicher verloren. Für Assembler-Fans ist in Listing 6 der kommentierte Quellcode abgedruckt.</p>
+
+        <address class="author">(Udo Miller/dm)</address>
+
+        <h2>Noch ein kleiner Trick</h2>
+
+        <p>Der C 128 bietet ja eine variable Funktionstastenbelegung mit dem Befehl KEY. Will man eine selbsterstellte Belegung auf Diskette speichern, so kann man folgende Befehlsfolge benutzen: BSAVE"FUNKTIONS-T.",D0,U8,0NB0,P4096 TO P4352</p>
+
+        <p>Damit wird der Bereich der Funktionstasten (4096 bis 4352) gespeichert. Geladen wird er mit: BLOAD"FUNKTIONS-T."</p>
+
+        <address class="author">(Holger Brömmelsiek/dm)</address>
+    </article>
+</body>
+
+</html>
