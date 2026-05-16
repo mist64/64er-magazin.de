@@ -143,3 +143,22 @@ When in doubt, strip the claim and keep only the visual facts.
 - Do not change existing HTML structure beyond inserting `<figure>` blocks
 - Do not remove any existing content
 - Do not leave `XXXXXXXXX` placeholders in the final HTML
+
+## Final report — present a summary table
+
+After all placements, produce a summary table for the user listing what you did and what they may want to spot-check:
+
+| File | Figures placed | Notes |
+|---|---|---|
+| `19 Der Neue.html` | 15 (`19-0` … `19-14`) | Big spread, many unreferenced photos — verify ordering matches print |
+| `97 Bücher.html` | 3 book covers | No captions printed — `<figcaption>` omitted |
+| `30 Druckermöbel.html` | 6 (`30-0` … `30-5`) | `30-0` title spread; `30-1`…`30-5` as Bild 1–5 (unreferenced in body, placed by visual location) |
+| … | | |
+
+Also flag explicitly in the report:
+- Any `git mv` performed (image filename had wrong major page number).
+- Any `<figcaption>` omitted (no caption on the scan).
+- Any image whose placement was a judgment call (no `Bild N` reference; placed by visual location).
+- Any image whose caption was hard to read at 150 dpi (request a 600 dpi crop if you're not sure).
+
+The user will scan this table to decide where to spot-check. Without it they'd have to diff every article.
