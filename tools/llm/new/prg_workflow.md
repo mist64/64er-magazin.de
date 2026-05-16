@@ -162,7 +162,16 @@ Then `Read` the result to verify the splice. Do NOT use the Edit tool to insert 
 - **Captions must be verbatim** from the magazine scan — read from `png/*_600_cropped.png` files (scale with `magick -resize 25%` if 600dpi). When `pdftotext` and the scan disagree on a program name (typical OCR confusion in captions: `»RND«` vs `»FIND«`, `R` vs `F` in old print), **trust the article body's spelling** — the body prose mentions the name multiple times in unambiguous contexts.
 - **Listings with no `Listing N.` caption.** Some short programs are referenced from the article body simply as "(Listing)" or "(Assembler-Listing)" with no number. Use a verbatim caption from the scan that matches that style (`Listing: Caption text`, `Assembler-Listing: Caption text`) — don't invent a Listing-N number that doesn't exist in the print.
 - **Disk variants of the same listing** are common for multi-target programs (e.g. `block 1300_c 128.prg` and `block c000_c 64.prg` for the same BLOCK routine assembled at two load addresses). Place the main Hypra-Ass / BASIC version as the captioned `<figure>` and emit each target-address variant as a sibling `<div class="binary_download" data-filename="…" data-name="…">` immediately below. They share the article's listing slot but each gets its own download link.
-- **Transient pre-step listings not on disk.** Sometimes the article references a small Listing N (e.g. "Listing 1. Change MSE" in Master-Text) whose only purpose is to produce another file that ships on disk. The pre-step itself isn't on disk. Leave the article's `(Listing N)` reference untouched — the result file gets placed as the disk's hidden companion.
+- **Listings printed in the magazine but not on disk.** Some listings are printed in the magazine yet do NOT ship as a file on the disk — either because they're a one-shot pre-step that produces something else (e.g. "Listing 1. Change MSE" in Master-Text), or because the disk omitted them for space, or because the print is an assembler disassembly of an in-ROM routine. Even so, **emit a `<figure>` block with the verbatim caption and `<pre>TODO</pre>` as the body** so the gap is visible in the rendered HTML:
+  ```html
+  <figure>
+      <pre>TODO</pre>
+      <figcaption>Listing N. Caption from scan</figcaption>
+  </figure>
+  ```
+  This signals "the printed magazine had this listing, but it's not yet transcribed". A future pass can OCR the printed listing into the `<pre>` body. Do NOT skip the figure entirely — that would silently lose the printed Listing N from the article.
+
+- **The listings at the end of an article must be in printed Listing-number order.** When `prg_links.sh` emits `<figure>` blocks in the order it found them on the disk's directory, that order rarely matches the printed Listing N numbering. After placement, walk the article's tail-of-article listing block and reorder so the captions read `Listing 1`, `Listing 2`, `Listing 3`, … in sequence. Common case: `Listing 11` (Lader) and `Listing 12` (Install) often come off the disk reversed because the disk stores `install` before `lader` alphabetically.
 - **`data-name` must be unique** within an article; two listings can't share the same `data-name`
 - **`data-filename` base name max 16 chars** (C64 filename limit)
 - **`.txt` header line**: must be `;filename.prg ==ADDR==` matching the base name
