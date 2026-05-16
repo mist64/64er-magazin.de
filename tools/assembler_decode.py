@@ -99,6 +99,11 @@ def decode_bytes(data, topass=False):
         topass: if True, use Top-Ass directive names.
                 if False, use Hypra-Ass directive names.
                 Both modes decode BASIC tokens as 6502 mnemonics.
+
+    Hypra-Ass output is prefixed with the BASIC line number formatted as
+    'NNN -' to mirror the listing layout produced by Hypra-Ass's own LIST
+    routine (and by ``tools/hypra-ass-decode.py`` which decodes raw
+    Hypra-Ass .prg files directly).
     """
     pos = 0
     lines = []
@@ -106,6 +111,24 @@ def decode_bytes(data, topass=False):
     # Load address (skip)
     load_addr = data[pos] | (data[pos+1] << 8)
     pos += 2
+
+    # First pass (Hypra-Ass only): scan max line number to size the prefix
+    # column so '-' lines up across the whole listing.
+    num_col = 0
+    if not topass:
+        scan = pos
+        max_line = 0
+        while scan < len(data) - 1:
+            link = data[scan] | (data[scan + 1] << 8)
+            scan += 2
+            if link == 0:
+                break
+            max_line = max(max_line, data[scan] | (data[scan + 1] << 8))
+            scan += 2
+            while scan < len(data) and data[scan] != 0:
+                scan += 1
+            scan += 1
+        num_col = max(3, len(str(max_line))) + 1
 
     while pos < len(data) - 1:
         # Link address
@@ -145,13 +168,22 @@ def decode_bytes(data, topass=False):
                     text.append(petscii_char(b))
                 pos += 1
         else:
-            # Hypra-Ass: pure BASIC detokenization
+            # Hypra-Ass: source text is stored as tokenized BASIC, but the
+            # source code itself (after the BASIC starter line) is PETSCII
+            # text typed on the C64 — so shifted-PETSCII uppercase letters
+            # ($C1-$DA, also $CB) share byte values with BASIC tokens
+            # (LEFT$, RIGHT$, MID$, GO). Disambiguate by treating those
+            # ranges as letters, not tokens. Tokens $80-$C0 (SYS, '*' etc.)
+            # remain tokenized — these legitimately appear in the BASIC
+            # starter line and never collide with shifted-PETSCII letters.
             while pos < len(data) and data[pos] != 0:
                 b = data[pos]
-                if 0x80 <= b <= 0xcb:
+                if 0xc1 <= b <= 0xda:
+                    text.append(petscii_char(b))  # shifted PETSCII A-Z
+                elif 0x80 <= b <= 0xc0:
                     text.append(BASIC_TOKENS[b - 0x80])
                 elif b >= 0x80:
-                    text.append(chr(b & 0x7f))
+                    text.append(petscii_char(b))
                 else:
                     text.append(chr(b))
                 pos += 1
@@ -164,8 +196,15 @@ def decode_bytes(data, topass=False):
             formatted = format_line(line_text)
             lines.append(formatted)
         else:
-            # Hypra-Ass: text is already properly spaced from BASIC detokenization
-            lines.append(line_text)
+            # Hypra-Ass: text decoded from petcat-tokenized BASIC. The text
+            # comes in two flavors: 'jammed' (mnemonic and operand glued
+            # together, e.g. 'LDA#$0D;CR' — written in Hypra-Ass which
+            # stores everything densely) and 'pre-formatted' (whitespace
+            # already inserted by the author, e.g. taktzyklen.src). The
+            # formatter applies column layout to the jammed case and
+            # passes pre-formatted lines through almost unchanged.
+            formatted = format_hypra_ass_line(line_text)
+            lines.append(f"{str(line_num).ljust(num_col)}-{formatted}")
 
     return lines
 
@@ -222,6 +261,159 @@ def format_line(line_text):
             after = line_text[semi_pos:]
             line_text = before.ljust(25) + after
 
+    return line_text.rstrip()
+
+
+# --- Hypra-Ass listing formatter -------------------------------------------
+#
+# Used by both the live ``decode_bytes`` path (article 95, 8606) and the
+# standalone ``tools/hypra-ass-decode.py`` (article 134, 8606). Keep the
+# two callers in sync — both must produce the same column layout so BLOCK
+# (SWAP) listings and CASS listings look consistent in the rendered articles.
+
+_MNEMONIC_SET = set(MNEMONICS)
+
+# Short Hypra-Ass directive forms that may appear glued to their operand
+# in PETSCII source (no space inserted by the user). Mapping is identity
+# for forms we keep short; '.EQ' is special-cased to expand to '.DEFINE'
+# with '=' alignment, matching the BLOCK pipeline's output.
+_HYPRA_SHORT_DIRECTIVES = ('.BA', '.BY', '.WO', '.TX', '.OB', '.LI', '.OP')
+
+
+def _find_comment(s):
+    """Return index of the first ';' that is not inside double quotes, or -1."""
+    in_quotes = False
+    for i, c in enumerate(s):
+        if c == '"':
+            in_quotes = not in_quotes
+        elif c == ';' and not in_quotes:
+            return i
+    return -1
+
+
+def _is_jammed(body):
+    """Heuristic: does this line need column formatting inserted?
+
+    'Jammed' means the author wrote it in dense Hypra-Ass style with no
+    space between the mnemonic/directive and its operand (or between an
+    operand and its trailing ';' comment). 'Pre-formatted' means the
+    source already has columns (e.g. taktzyklen.src typed in a different
+    assembler that preserves whitespace).
+    """
+    if not body or body[0] == ';':
+        return False
+    if body[0] == '.':
+        # Find end of directive name (alphabetic chars after the dot).
+        i = 1
+        while i < len(body) and body[i].isalpha():
+            i += 1
+        # Jammed if there's an operand and it's glued (no space between
+        # the directive name and the operand). '.OPT OO' is not jammed;
+        # '.BA$15D3' is.
+        return i < len(body) and body[i] != ' '
+    if ' ' in body:
+        first, rest = body.split(' ', 1)
+        if first in _MNEMONIC_SET:
+            # 'OPC OPERAND...' — already spaced.
+            return False
+        # First token looks like a label; recurse on the rest.
+        return _is_jammed(rest.lstrip())
+    # No space anywhere — definitely jammed.
+    return True
+
+
+def format_hypra_ass_line(line_text):
+    """Format a Hypra-Ass source line with aligned columns.
+
+    Layout (after the 'NNN -' prefix prepended by decode_bytes):
+        col 0..9   label   (left-justified, 10 chars; blank when none)
+        col 10..12 opcode  (3 chars)
+        col 13     space
+        col 14..   operand
+        col 25..   comment (';...') aligned when feasible
+    '.DEFINE NAME = VAL' lines are rendered without a label column,
+    matching the BLOCK pipeline's output for .EQ-equivalent directives.
+    """
+    if not line_text:
+        return line_text
+
+    # Comment-only lines: pass through.
+    if line_text.startswith(';'):
+        return line_text
+
+    # Pre-formatted line (taktzyklen.src style): preserve the source's
+    # own columns but still right-trim trailing whitespace.
+    if not _is_jammed(line_text):
+        return line_text.rstrip()
+
+    # --- Jammed line: rebuild from scratch. ----------------------------
+
+    # .EQ NAME=VALUE  →  .DEFINE NAME    = VALUE  (match BLOCK output)
+    if line_text.startswith('.EQ'):
+        rest = line_text[3:]
+        semi = _find_comment(rest)
+        body = rest[:semi] if semi != -1 else rest
+        comment = rest[semi:] if semi != -1 else ''
+        eq = body.find('=')
+        if eq != -1:
+            name = body[:eq].strip()
+            value = body[eq + 1:].strip()
+            out = '.DEFINE ' + name.ljust(9) + '= ' + value
+        else:
+            out = '.DEFINE ' + body.strip()
+        out = out.rstrip()
+        if comment:
+            out = out.ljust(25) + comment
+        return out
+
+    # Other short Hypra-Ass directives '.BA', '.BY', etc. — keep the
+    # short form, just insert a space between '.XX' and the operand.
+    # Require the char after the 3-letter head to be non-alpha so e.g.
+    # '.OPT OO' is not mis-matched as '.OP' + 'T OO'.
+    if (any(line_text.startswith(d) for d in _HYPRA_SHORT_DIRECTIVES)
+            and (len(line_text) <= 3 or not line_text[3].isalpha())):
+        head = line_text[:3]
+        rest = line_text[3:]
+        semi = _find_comment(rest)
+        body = rest[:semi] if semi != -1 else rest
+        comment = rest[semi:] if semi != -1 else ''
+        body = body.strip()
+        out = head + ' ' + body if body else head
+        out = out.rstrip()
+        if comment:
+            out = out.ljust(25) + comment
+        return out
+
+    # Lines with a label: 'LABEL .TX"..."' or 'LABEL LDA#$00'.
+    space = line_text.find(' ')
+    if space != -1 and line_text[:space] not in _MNEMONIC_SET:
+        label = line_text[:space]
+        rest = line_text[space + 1:].lstrip()
+        formatted_rest = format_hypra_ass_line(rest)
+        # If rest was a directive line (.XX or .DEFINE) starting at col 0,
+        # we still want the label in front and then the directive body.
+        # Strip any leading spaces formatted_rest might carry and pad
+        # label to col 10.
+        return label.ljust(10) + formatted_rest.lstrip()
+
+    # Plain instruction: 'LDA#$0D;CR' or 'JSRCHROUT'.
+    # Split first 3 chars as opcode, rest as operand+comment.
+    if len(line_text) >= 3 and line_text[:3] in _MNEMONIC_SET:
+        opcode = line_text[:3]
+        rest = line_text[3:]
+        semi = _find_comment(rest)
+        operand = (rest[:semi] if semi != -1 else rest).strip()
+        comment = rest[semi:] if semi != -1 else ''
+        body = opcode
+        if operand:
+            body += ' ' + operand
+        out = ' ' * 10 + body
+        out = out.rstrip()
+        if comment:
+            out = out.ljust(25) + comment
+        return out
+
+    # Fallback: unknown shape, leave as-is.
     return line_text.rstrip()
 
 

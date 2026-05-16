@@ -1,82 +1,82 @@
 
 
 ;taktzyklen.src.prg ==0801==
-  100 sys9*4096
-  110 .opt oo
+  100 SYS9*4096
+  110 .OPT OO
   120 ;
   130 ;
-  140 ; taktzyklen eines
-  150 ; maschinenprogramms messen
+  140 ; TAKTZYKLEN EINES
+  150 ; MASCHINENPROGRAMMS MESSEN
   160 ;
   170 ;
-  180 ; von  mark richters
-  190 ;      allerstr.4
-  200 ;      2806 oyten
-  210 ;      tel. 04207/1870
+  180 ; VON  MARK RICHTERS
+  190 ;      ALLERSTR.4
+  200 ;      2806 OYTEN
+  210 ;      TEL. 04207/1870
   220 ;
   230 ;
-  240 *=$c000
+  240 *=$C000
   250 ;
-  260 fac      =$62   ;fliesskomma-akku
-  270 frmnum   =$ad8a ;ausdruck holen
-  280 chkcom   =$aefd ;auf komma pruefen
-  290 getadr   =$b7f7 ;2-byte integer
-  300 vicctrl  =$d011 ;reg. fuer bs aus
-  310 raster   =$d012 ;raster-zeile
-  320 timer    =$dd04 ;timer a lo-byte
-  330 cra      =$dd0e ;timer a control
-  340 crb      =$dd0f ;timer b control
+  260 FAC      =$62   ;FLIESSKOMMA-AKKU
+  270 FRMNUM   =$AD8A ;AUSDRUCK HOLEN
+  280 CHKCOM   =$AEFD ;AUF KOMMA PRUEFEN
+  290 GETADR   =$B7F7 ;2-BYTE INTEGER
+  300 VICCTRL  =$D011 ;REG. FUER BS AUS
+  310 RASTER   =$D012 ;RASTER-ZEILE
+  320 TIMER    =$DD04 ;TIMER A LO-BYTE
+  330 CRA      =$DD0E ;TIMER A CONTROL
+  340 CRB      =$DD0F ;TIMER B CONTROL
   350 ;---------------
-  360 jsr chkcom      ;startadresse der
-  370 jsr frmnum      ;zu messenden
-  380 jsr getadr      ;routine holen
-  390 sty jsubr+1     ;und als sprung-
-  400 sta jsubr+2     ;adresse speichern
+  360 JSR CHKCOM      ;STARTADRESSE DER
+  370 JSR FRMNUM      ;ZU MESSENDEN
+  380 JSR GETADR      ;ROUTINE HOLEN
+  390 STY JSUBR+1     ;UND ALS SPRUNG-
+  400 STA JSUBR+2     ;ADRESSE SPEICHERN
   410 ;
-  420 sei             ;irq sperren
-  430 lda #%00001011  ;bildschirm aus
-  440 sta vicctrl
-  450 wait lda raster ;warten bis bild-
-  460 bne wait        ;schirm ganz aus
+  420 SEI             ;IRQ SPERREN
+  430 LDA #%00001011  ;BILDSCHIRM AUS
+  440 STA VICCTRL
+  450 WAIT LDA RASTER ;WARTEN BIS BILD-
+  460 BNE WAIT        ;SCHIRM GANZ AUS
   470 ;
-  480 ldx #3          ;beide timer auf
-  490 lda #$ff        ;maximalwert
-  500 settimer sta timer,x
-  510 dex
-  520 bpl settimer
+  480 LDX #3          ;BEIDE TIMER AUF
+  490 LDA #$FF        ;MAXIMALWERT
+  500 SETTIMER STA TIMER,X
+  510 DEX
+  520 BPL SETTIMER
   530 ;
-  540 lda #%00010001  ;timer koppeln,
-  550 ldx #%01010001  ;laden und starten
-  560 stx crb
-  570 sta cra
+  540 LDA #%00010001  ;TIMER KOPPELN,
+  550 LDX #%01010001  ;LADEN UND STARTEN
+  560 STX CRB
+  570 STA CRA
   580 ;---------------
-  590 jsubr jsr $ffff ;sprung auf routine
+  590 JSUBR JSR $FFFF ;SPRUNG AUF ROUTINE
   600 ;---------------
-  610 ldy #0          ;beide timer stop
-  620 sty cra
-  630 sty crb
-  640 lda #%00011011  ;bildschirm wieder
-  650 sta vicctrl     ;an
-  660 cli             ;irq wieder frei-
+  610 LDY #0          ;BEIDE TIMER STOP
+  620 STY CRA
+  630 STY CRB
+  640 LDA #%00011011  ;BILDSCHIRM WIEDER
+  650 STA VICCTRL     ;AN
+  660 CLI             ;IRQ WIEDER FREI-
   670 ;
-  680 sec             ;4 timer-bytes
-  690 lda timer       ;umrechnen
-  700 eor #$ff        ;fuer aufruf be-
-  710 sbc #11         ;noetigte zyklen
-  720 sta fac+3       ;abziehen
-  730 ldx #3          ;und die restlichen
+  680 SEC             ;4 TIMER-BYTES
+  690 LDA TIMER       ;UMRECHNEN
+  700 EOR #$FF        ;FUER AUFRUF BE-
+  710 SBC #11         ;NOETIGTE ZYKLEN
+  720 STA FAC+3       ;ABZIEHEN
+  730 LDX #3          ;UND DIE RESTLICHEN
   740 ;
-  750 l1 lda timer+1,y;3 timer-werte
-  760 eor #$ff        ;anpassen
-  770 sbc #0
-  780 sta fac-1,x
-  790 iny
-  800 dex
-  810 bne l1
+  750 L1 LDA TIMER+1,Y;3 TIMER-WERTE
+  760 EOR #$FF        ;ANPASSEN
+  770 SBC #0
+  780 STA FAC-1,X
+  790 INY
+  800 DEX
+  810 BNE L1
   820 ;
-  830 sec
-  840 txa             ;4 byte werten
-  850 ldx #$a0        ;ohne vorzeichen
-  860 jsr $bc4f       ;in fliesskommazahl
-  870 jmp $bdd7       ;fac ausgeben/rts
+  830 SEC
+  840 TXA             ;4 BYTE WERTEN
+  850 LDX #$A0        ;OHNE VORZEICHEN
+  860 JSR $BC4F       ;IN FLIESSKOMMAZAHL
+  870 JMP $BDD7       ;FAC AUSGEBEN/RTS
 
