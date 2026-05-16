@@ -24,8 +24,8 @@ A short lowercase keyword used in two places by `generate.py`:
 
 The generator does not enforce a character set. By convention (look at other issues):
 
-- **Lowercase ASCII**, hyphens or underscores OK: `leserforum`, `tips_einsteiger`, `master-text`, `c128-reisebericht`.
-- **German umlauts ARE used in some recurring IDs**: `bücher` (canonical across `8501`, `8602`, `8604`, `8605`, etc.). Don't transliterate to `buecher` if the convention already uses `bücher` — match the convention.
+- **Lowercase**, hyphens or underscores OK: `leserforum`, `tips_einsteiger`, `master-text`, `c128-reisebericht`.
+- **German umlauts and `ß` are FINE** — use them. Don't transliterate to `oe`/`ae`/`ue`/`ss`. `druckermöbel`, `computerwäsche`, `floppyzubehör`, `bücher`, `schloß` are all preferred over their transliterated forms.
 - **Digits OK**: `1541`, `6510`, `c64`, `c128d`, `vc20`.
 - Short. Most IDs are 4–20 characters.
 
@@ -98,7 +98,7 @@ For articles that are neither a recurring column nor a single-program writeup, i
 - »Zwei fliegende Holländer« (Power Cart / Final Cart review) → `cartridges`
 - »Dem Täter auf der Spur« (Perry Mason + Borrowed Time adventures) → `spiele2` (paired with the `spiele1` Action-spiel article in the same issue)
 
-Don't romanize umlauts when they're part of a meaningful word (`computerwäsche` → `computerwaesche` is OK because no other issue used a different convention; `bücher` stays `bücher` because every previous issue used the umlaut form).
+Keep umlauts and `ß` — they're part of the language. `druckermöbel`, `computerwäsche`, `bücher` are correct; the transliterated forms `druckermoebel`, `computerwaesche`, `buecher` are wrong.
 
 ### Rule 4 — uniqueness within the issue
 
@@ -157,7 +157,7 @@ The `<meta name="64er.id">` is the LAST meta tag in `<head>`, after `toc_categor
 ## What NOT to do
 
 - Don't invent an ID for a recurring column without checking what the previous issue used. Continuity across issues is the whole point of the convention.
-- Don't transliterate `ü`/`ö`/`ä`/`ß` if the convention already keeps them (`bücher`).
+- Don't transliterate `ü`/`ö`/`ä`/`ß` — use them as-is. `bücher`, `druckermöbel`, `computerwäsche` are all correct.
 - Don't use `XXX` or any placeholder — the generator aborts.
 - Don't reuse the same ID for two articles in one issue, even if they cover related topics. Pair them with a discriminator (`spiele1` / `spiele2`).
 - Don't make the ID a full sentence. Short keyword, ideally fewer than 20 characters.
