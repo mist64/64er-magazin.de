@@ -116,6 +116,11 @@
 
         <p>Beiliegend finden Sie ein kleines Basic-Programm, das all diese Aufgaben übernimmt: »BLTUC BAS« (Listing 1)</p>
 
+        <figure>
+            <pre data-filename="bltuc bas" data-name="BLTUC BAS"></pre>
+            <figcaption>Listing 1. »BLTUC BAS« — Ein kleines Basic-Programm zum Testen der BLTUC-Routine</figcaption>
+        </figure>
+
         <p>BLTUC BAS zeigt die Funktion von BLTUC anhand des Bildschirmspeichers. In den Zeilen 40 und 50 wird in die erste Bildschirmzeile — ab Position 1025 — eine fortlaufende Reihe von verschiedenen Zeichen geschrieben, die wir im nachfolgenden verschieben werden. Damit diese Zeichen sichtbar werden, müssen einige ältere Versionen des C 64 auch den Farbspeicher beschreiben. Das geschieht in der Zeile 40. Die Zeilen 54 und 56 erzeugen das kleine Maschinenprogramm, das die Belegung der Abrufzellen $5F, $60 und den Sprung in die BLTUC-Routine ausführt. Sie lesen den Dezimalcode des Maschinenprogrammes aus der DATA-Zeile in den Speicher ab 49152. Nun bereiten wir die erste Verschiebung vor: Hier soll einfach der ganze Bereich von 1025 bis 1063 um eine Zeile weiter geschoben werden, also nun bei 1065 beginnen. Damit das alles nicht ganz so schnell geht, sind noch einige kleine Warteschleifen ins Programm eingebaut worden. In den Zeilen 90 bis 110 trennen wir die in 70 und 80 benannten Start- und Endadressen auf in die MSB- und LSB-Werte und schreiben sie in die erforderlichen Speicherstellen 88 bis 91, beziehungsweise 780 und 781 ein. Zeile 120 vollführt nun mittels des SYS-Aufrufes die Verschiebung, was Sie auf dem Bildschirm erkennen können.</p>
 
         <p>Auf Tastendruck gelangen Sie in den zweiten, den kritischen Teil des Programmes. Hier werden wir nun einen Fehler der BLTUC-Routine finden. Wir verschieben in diesem Teil den Inhalt des Speicherbereiches 1025 bis 1063 um eine Position abwärts, also in den Bereich 1024 bis 1062. Woran liegt es, daß hier plötzlich eine Fehlfunktion auftritt? Sehen wir uns dazu die BLTUC-Routine etwas genauer an. Als Programm BLTUC (Listing 2) finden Sie nachstehend ein Disassemblerlisting der BLTUC-Routine wie sie im C 64-Speicher ab $A3BF zu finden ist.</p>
@@ -168,6 +173,103 @@
 
         <p>Wie sollte ein Verschiebeprogramm aussehen, das allen Eventualitäten gerecht wird? Ganz einfach: Es müßte zunächst prüfen, ob eine Überlappung von Quell- und Zielbereich vorliegt und je nach Ergebnis dann zum entsprechenden Kopierteil verzweigen. Genau das tut das nachfolgend vorgestellte Programm BLOCK (Listing 3), welches sowohl auf dem C 64 als auch auf dem C 128 (dort aber nur innerhalb der gerade eingeschalteten Bank) arbeitet. L.A.Leventhal und W.Saville haben das Prinzip 1982 vorgestellt in »6502 Assembly Language Subroutines«. In Bild 5 finden Sie ein Flußdiagramm des Programmes BLOCK:</p>
 
+        <figure><pre>
+10  -;
+20  -;
+30  -.$1300;IN HYPRA-ASS: .BA $C000
+40  -;****************************************
+50  -; BLOCKVERSCHIEBEROUTINE OHNE FEHLER
+60  -;****************************************
+70  -.MVELEN=$FA;IN HYPRA-ASS WIRD STATT DER
+80  -.MVDEST=$FC; .DEFINE BEFEHLE JEWEILS DER BEFEHL
+90  -.MVSRCE=$FE; .EQ = $... VERWENDET
+100  -;
+110  -;IN MVELEN WIRD DIE LAENGE DER ZU VERSCHIEBENDEN BEREICHES ANGEGEBEN
+120  -;IN MVDEST DIE STARTADRESSE DES ZIELBEREICHES UND IN
+130  -;MVSRCE DIE STARTADRESSE DES QUELLBEREICHES.
+140  -;
+150  -;------ PROGRAMM ---------------------------------------------
+160  -;ALS ERSTES WIRD BESTIMMT, OB DER ZIELBEREICH OBERHALB DES
+170  -; QUELLBEREICHES LIEGT UND OB SICH DIE BEIDEN BEREICHE UEBER-
+180  -; LAPPEN. EINE UEBERLAPPUNG LIEGT DANN VOR, WENN DIE DIFFERENZ
+190  -; VON ZIELADRESSE MINUS QUELLADRESSE KLEINER ALS DIE ANZAHL DER
+200  -; ZU VERSCHIEBENDEN BYTES IST.
+210  -;
+220  -START     MV DEST       ;BERECHNUNG ZIEL MINUS QUELLE
+230  -          §
+240  -          MV SRCE
+250  -
+260  -          MV DEST+1
+270  -          MV SRCE+1
+280  -
+290  -                        ;V ERGLEICH MIT LAENGE DES VERSCHIEBEBEREICHES
+300  -          MV ELEN
+310  -
+320  -          MV ELEN+1
+330  -          ¶DO LEFT       ;VERZWEIGEN, WENN KEINE UEBERLAPPUNG
+340  -          MV ERHT       ;SONST ZUM UP FUER UEBERLAPPUNG
+350  -          EX IT
+360  -DOLEFT    MV ELFT       ;ZUM UP OHNE UEBERLAPPUNG
+370  -EXIT      ¤
+380  -;
+390  -;**** UP ZUM VERSCHIEBEN OHNE UEBERLAPPUNG: MVELFT ****
+400  -;
+410  -MVELFT    #0            ;INDEX AUF NULL
+420  -          MV ELEN+1     ;ANZAHL PAGES IN X
+430  -          ¸ML PART       ;FALLS KEINE GANZEN PAGES DANN REST
+440  -MLPAGE    (M VSRCE),Y   ;EIN BYTE VERSCHIEBEN
+450  -          (M VDEST),Y
+460  -                        ;N AECHSTES BYTE
+470  -          ·ML PAGE       ;BIS 256 BYTES VERSCHOBEN SIND
+480  -          MV SRCE+1     ;NAECHSTE PAGE DER QUELLE
+490  -          MV DEST+1     ; UND DES ZIELBEREICHES
+500  -          ¯              ;P AGEZAEHLER HERUNTERZAEHLEN
+510  -          ·ML PAGE       ;WEITERMACHEN BIS ALLE VOLLEN PAGES FERTIG
+520  -MLPART    MV ELEN       ;LAENGE DES RESTBEREICHES IN X
+530  -          ¸ML EXIT       ;ZURUECK, WENN REST GLEICH NULL
+540  -MLLAST    (M VSRCE),Y   ;EIN BYTE VERSCHIEBEN
+550  -          (M VDEST),Y
+560  -                        ;N AECHSTES BYTE
+570  -          ¯              ;Z AEHLER HERUNTERZAEHLEN
+580  -          ·ML LAST       ;WEITER BIS REST DURCHGEARBEITET IST
+590  -MLEXIT    ¤              ;Z URUECK ZUM HAUPTPROGRAMM
+600  -;
+610  -;**** UP ZUM VERSCHIEBEN MIT UEBERLAPPUNG : MVERHT ****
+620  -;
+630  -MVERHT    MV ELEN+1     ;ZEIGER AUF LETZTE QUELLPAGE RICHTEN
+640  -          ¦
+650  -          MV SRCE+1
+660  -          MV SRCE+1     ;FUER DAS MSB DER MAX. QUELLADRESSE
+670  -          MV ELEN+1     ;ZEIGER AUF LETZTE ZIELPAGE RICHTEN
+680  -          ¦
+690  -          MV DEST+1
+700  -          MV DEST+1     ;FUER DAS MSB DER MAX. ZIELADRESSE
+710  -          MV ELEN       ;LAENGE DES RESTES
+720  -          ¸MR PAGE       ;WENN NULL, DANN NUR GANZE PAGES
+730  -MR0       £              ;Z AEHLER MINUS EINS
+740  -          (M VSRCE),Y   ;EIN BYTE VERSCHIEBEN
+750  -          (M VDEST),Y
+760  -          #0            ;REST SCHON FERTIG ?
+770  -          ·MR 0          ;WEITER BIS DER GANZE REST VERSCHOBEN IST
+780  -MRPAGE    MV ELEN+1     ;ANZAHL PAGES ALS ZAEHLER NACH X
+790  -          ¸MR EXIT       ;WENN KEINE GANZEN PAGES DANN ENDE
+800  -MR1       MV SRCE+1     ;MSB QUELLADRESSE HERUNTERZAEHLEN
+810  -          MV DEST+1     ;EBENSO DAS MSB DER ZIELADRESSE
+820  -MR2       £              ;I NDEX Y HERUNTERZAEHLEN
+830  -          (M VSRCE),Y   ;EIN BYTE VERSCHIEBEN
+840  -          (M VDEST),Y
+850  -          #0            ;ZAEHLER SCHON NULL ?
+860  -          ·MR 2          ;WEITER BIS GANZE PAGE VERSCHOBEN IST
+870  -          ¯              ;P AGEZAEHLER HERUNTERZAEHLEN
+880  -          ·MR 1          ;WEITER BIS ALLE PAGES VERSCHOBEN SIND
+890  -MREXIT    ¤              ;Z URUECK ZUM HAUPTPROGRAMM
+900  -;
+</pre><figcaption>Listing 3. »BLOCK« - Programm zum fehlerfreien Verschieben von Speicherinhalten</figcaption></figure>
+        <div class="binary_download" data-filename="block.prg" data-name="BLOCK"></div>
+        <div class="binary_download" data-filename="block qu hypra.prg" data-name="BLOCK (Hypra-Ass/Top-Ass-Quelltext)"></div>
+        <div class="binary_download" data-filename="block 1300_c 128.prg" data-name="BLOCK ($1300, C 128)"></div>
+        <div class="binary_download" data-filename="block c000_c 64.prg" data-name="BLOCK ($C000, C 64)"></div>
+
         <p>Zum Ansteuern des Programmes werden drei Vektoren benötigt:<br>
             MVELEN $FA/B enthält die Länge des zu verschiebenden Bereiches;<br>
             MVDEST $FC/D enthält die Startadresse des Zielbereiches;<br>
@@ -180,6 +282,11 @@
         <p>Den Rest des Programmes bilden die beiden Transportschleifen. MVELFT kopiert aufwärts arbeitend, indem zunächst die ganzen Pages, danach dann der Rest übertragen wird. MVERHT berechnet zuerst aus der Länge und den beiden MSB der Startadressen (von Quelle und Ziel) die Adresse der letzten Page. Indem ins Y-Register das LSB der Länge gepackt und mittels der indirekt indizierten Adressierung gearbeitet wird, findet hier — abwärts zählend — als erstes die Übertragung des Restes und danach die der ganzen Pages statt.</p>
 
         <p>Damit Sie BLOCK auf Herz und Nieren prüfen können, finden Sie beiliegend noch ein kleines Basic-Aufrufprogramm namens »BLOCK BAS« (Listing 4).</p>
+
+        <figure>
+            <pre data-filename="block bas" data-name="BLOCK BAS"></pre>
+            <figcaption>Listing 4. »BLOCK BAS« — Basic-Programm zum Testen von BLOCK</figcaption>
+        </figure>
 
         <p>Ähnlich wie beim Programm BLTUC BAS finden alle Operationen der besseren Verfolgbarkeit wegen im Bildschirmspeicher statt. Auch hier ist wieder — weil ältere C 64-Modelle das benötigen — eine Zeile zum Belegen des Farb-RAM eingefügt worden (Zeile 60), die Sie dann weglassen können, wenn Sie einen neueren C 64 oder einen C 128 verwenden. In der Zeile 90 werden wieder die ersten 40 Zeichen — diesmal in die Bildschirmmitte (ab Speicherstelle 1504) — in den Bildschirmspeicher gePOKEt. Weiterhin haben Sie nun aber die freie Auswahl, wieviele Bytes Sie wohin verschieben möchten. Die Programmzeilen 140 bis 160 übernehmen die Berechnung der MSB und LSB der Adressen und der angegebenen Länge, Zeile 180 schließlich ruft unsere Verschiebe-Routine auf. Viel Spaß beim Ausprobieren!</p>
 
@@ -203,9 +310,105 @@
 
         <p>Damit hätten wir es dann. Hier finden Sie nun noch das Programm SWAP (Listing 5) abgedruckt.</p>
 
+        <figure><pre>
+10  -;
+20  -;
+30  -.$1300;IN HYPRA-ASS: .BA $C000
+40  -;********************************************
+50  -; VERTAUSCHEN ZWEIER SPEICHERBEREICHE (SWAP)
+60  -;********************************************
+70  -.MVELEN=$FA;IN HYPRA-ASS WIRD STATT DER
+80  -.MVDEST=$FC; .DEFINE BEFEHLE JEWEILS DER BEFEHL
+90  -.MVSRCE=$FE; .EQ = $... VERWENDET
+100  -.PRINT=$FFD2;BILDSCHIRMAUSGABE
+110  -;
+120  -;IN MVELEN WIRD DIE LAENGE DER ZU VERTAUSCHENDEN BEREICHE ANGEGEBEN
+130  -;IN MVDEST DIE STARTADRESSE DES 1. BEREICHES UND IN
+140  -;MVSRCE DIE STARTADRESSE DES 2. BEREICHES.
+150  -;
+160  -;------ PROGRAMM ---------------------------------------------
+170  -;ALS ERSTES WIRD BESTIMMT, OB DER ZIELBEREICH OBERHALB DES
+180  -; QUELLBEREICHES LIEGT UND OB SICH DIE BEIDEN BEREICHE UEBER-
+190  -; LAPPEN. EINE UEBERLAPPUNG LIEGT DANN VOR, WENN DIE DIFFERENZ
+200  -; VON ZIELADRESSE MINUS QUELLADRESSE KLEINER ALS DIE ANZAHL DER
+210  -; ZU VERSCHIEBENDEN BYTES IST.
+220  -;
+230  -START     MV DEST       ;BERECHNUNG ZIEL MINUS QUELLE
+240  -          §
+250  -          MV SRCE
+260  -
+270  -          MV DEST+1
+280  -          MV SRCE+1
+290  -
+300  -                        ;V ERGLEICH MIT LAENGE DES VERSCHIEBEBEREICHES
+310  -          MV ELEN
+320  -
+330  -          MV ELEN+1
+340  -          ¶DO LEFT       ;VERZWEIGEN, WENN KEINE UEBERLAPPUNG
+350  -          ME LDEN       ;SONST AUSGABE EINER FEHLERMELDUNG
+360  -          EX IT
+370  -DOLEFT    MV ELFT       ;ZUM UP OHNE UEBERLAPPUNG
+380  -EXIT      ¤
+390  -;
+400  -;**** UP ZUM VERSCHIEBEN OHNE UEBERLAPPUNG: MVELFT ****
+410  -;
+420  -MVELFT    #0            ;INDEX AUF NULL
+430  -          MV ELEN+1     ;ANZAHL PAGES IN X
+440  -          ¸ML PART       ;FALLS KEINE GANZEN PAGES DANN REST
+450  -MLPAGE    (M VSRCE),Y   ;EIN BYTE LESEN
+460  -                         ;S ICHERN DES BYTE
+470  -          (M VDEST),Y   ;BYTE AUS ANDEREM BEREICH LESEN
+480  -          (M VSRCE),Y   ;UND UMTRAGEN
+490  -          ¡              ;B YTE WIEDER ZURUECKHOLEN
+500  -          (M VDEST),Y   ;UND UMTRAGEN
+510  -                        ;N AECHSTES BYTE
+520  -          ·ML PAGE       ;BIS 256 BYTES VERSCHOBEN SIND
+530  -          MV SRCE+1     ;NAECHSTE PAGE DER QUELLE
+540  -          MV DEST+1     ; UND DES ZIELBEREICHES
+550  -          ¯              ;P AGEZAEHLER HERUNTERZAEHLEN
+560  -          ·ML PAGE       ;WEITERMACHEN BIS ALLE VOLLEN PAGES FERTIG
+570  -MLPART    MV ELEN       ;LAENGE DES RESTBEREICHES IN X
+580  -          ¸ML EXIT       ;ZURUECK, WENN REST GLEICH NULL
+590  -MLLAST    (M VSRCE),Y   ;EIN BYTE LESEN
+600  -                         ;S ICHERN DES BYTE
+610  -          (M VDEST),Y   ;BYTE AUS ANDEREM BEREICH LESEN
+620  -          (M VSRCE),Y   ;UND UMTRAGEN
+630  -          ¡              ;B YTE WIEDER ZURUECKHOLEN
+640  -          (M VDEST),Y   ;UND UMTRAGEN
+650  -                        ;N AECHSTES BYTE
+660  -          ¯              ;Z AEHLER HERUNTERZAEHLEN
+670  -          ·ML LAST       ;WEITER BIS REST DURCHGEARBEITET IST
+680  -MLEXIT    ¤              ;Z URUECK ZUM HAUPTPROGRAMM
+690  -;
+700  -;**** UP ZUR AUSGABE EINER FEHLERMELDUNG: MELDEN ****
+710  -;
+720  -MELDEN    #0            ;INDEX AUF NULL
+730  -WEITER    TE XT,Y       ;TEXTZEICHEN LADEN
+740  -          ¸EN DE         ;WENN NULLBYTE, DANN ZURUECK ZUM HAUPTPROGRAMM
+750  -          PR INT        ;SONST AUF BILDSCHIRM AUSGEBEN
+760  -                        ;I NDEX ERHOEHEN
+770  -          WE ITER       ;NAECHSTES ZEICHEN AUSGEBEN
+780  -ENDE      ¤              ;Z URUECK ZUM HAUPTPROGRAMM
+790  -;
+800  -TEXT      .1 3          ;HYPRA-ASS:  .BY 13
+810  -          ." UEBERSCHNEIDUNG !";HYPRA-ASS: .TX "UEBERSCHNEIDUNG !"
+820  -          .1 3,0        ;HYPRA-ASS: .BY 13,0
+830  -;
+850  -;
+</pre><figcaption>Listing 5. »SWAP« — SWAP tauscht Speicherinhalte gegeneinander aus</figcaption></figure>
+        <div class="binary_download" data-filename="swap.prg" data-name="SWAP"></div>
+        <div class="binary_download" data-filename="swap qu hypra.prg" data-name="SWAP (Hypra-Ass/Top-Ass-Quelltext)"></div>
+        <div class="binary_download" data-filename="swap 1300_c 128.prg" data-name="SWAP ($1300, C 128)"></div>
+        <div class="binary_download" data-filename="swap c000_c 64.prg" data-name="SWAP ($C000, C 64)"></div>
+
         <p>Wie Sie sicher erkennen können, haben wir das Programm BLOCK etwas umgeschrieben, nämlich um die eben vorgestellten Teile. Die Meldung, daß eine Überschneidung vorliegt, wird mittels einer kleinen Schleife aus einer Tabelle herausgelesen und durch die Kernel-Routine CHROUT (oder auch BSOUT genannt) auf dem Bildschirm ausgegeben. Diese Routine haben wir schon in der Folge 2 kennengelernt.</p>
 
         <p>Auch diesmal finden Sie anliegend noch ein kleines Basic-Programm (Listing 6), das sich der SWAP-Routine bedient. Die Belegung des Farb-RAM in Zeile 60 können sich Besitzer neuerer C 64 und auch des C 128 ersparen, für den alten C 64 ist diese Zeile wichtig. Ab Zeile 80 schreibt das Programm jeweils in die obere und die untere Bildschirmhälfte einen Text. Auf einen Tastendruck werden in den Zeilen 180 bis 240 die Adressen der beiden zu vertauschenden Bereiche und ihre Länge umgerechnet in MSB und LSB und danach in die Abrufspeicherstellen $FA bis $FF gePOKEt. Zeile 260 ruft SWAP auf, Zeile 270 führt den Programmlauf wieder zurück zur Tastaturabfrage in Zeile 160, von wo aus ein erneuter SWAP-Aufruf gestartet wird. Blitzartig wird bei jedem Tastendruck der untere gegen den oberen Text ausgetauscht.</p>
+
+        <figure>
+            <pre data-filename="swap bas" data-name="SWAP BAS"></pre>
+            <figcaption>Listing 6. »SWAP BAS« — Basic-Programm, das die Funktion von SWAP überprüft</figcaption>
+        </figure>
 
         <h2>Kombination von BLOCK und SWAP</h2>
 

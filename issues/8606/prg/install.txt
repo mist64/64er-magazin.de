@@ -1,0 +1,39 @@
+
+
+;install.prg ==0801==
+  100 dim typ$(5)
+  110 typ$(1)="normal"
+  120 typ$(2)="centronic"
+  130 typ$(3)="mps801"
+  140 typ$(4)="mps802"
+  150 typ$(5)="individuell"
+10000 poke53265,11:poke53281,0:poke53280,11:print"{clr}{swlc}{dish}{gry2}";
+10010 print"{rvon}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}";
+10020 print"{SHIFT--}{rvof}{wht}     +  +  +  T{$a0}{$a0}E{$a0}{$a0}X{$a0}{$a0}T{$a0}{$a0}+  +  +     {gry2}{rvon}{SHIFT--}";
+10030 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{rvof}"
+10040 print"{down}{rvon}     D{$a0}R{$a0}U{$a0}C{$a0}K{$a0}E{$a0}R{$a0}A{$a0}U{$a0}S{$a0}W{$a0}A{$a0}H{$a0}L        {rvof}"
+10050 print"{down}{down}{rght}{rght}{rght}{rght}1) NORMAL IEC-Bus + RS232  (ASCII)"
+10060 print"{down}{rght}{rght}{rght}{rght}2) CENTRONIC  (ASCII)          "
+10070 print"{down}{rght}{rght}{rght}{rght}3) MPS801 + VC1525  (CBM)          "
+10080 print"{down}{rght}{rght}{rght}{rght}4) MPS802 + VC1526  (CBM)  "
+10085 print"{down}{rght}{rght}{rght}{rght}5) INDIVIDUELL"
+10090 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}Waehlen Sie ? ";
+10100 poke53265,27
+10110 poke198,0:wait198,1:getx$
+10120 ifasc(x$)<49orasc(x$)>53then 10110
+10125 printx$
+10130 open1,8,3,"typ,s,r":open15,8,15:input#15,er
+10140 if er=62 then20000
+10150 input#1,typ
+10160 print#15,"r0:"typ$(typ)"=0:drucker        d"
+10170 close1:print#15,"s0:typ"
+20000 typ=val(x$)
+20010 close1:close15:open1,8,3,"typ,s,w"
+20020 print#1,typ
+20030 open15,8,15
+20040 print#15,"r0:drucker        d=0:"typ$(typ)"
+20050 close1:close15
+20060 print"{clr}load"chr$(34)"0:lader"chr$(34)",8"
+20070 print"{down}{down}{down}{down}run"
+20080 poke631,19:poke632,13:poke633,13:poke198,3
+

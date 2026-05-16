@@ -1,0 +1,86 @@
+
+
+;etiketten.src.prg ==0801==
+   10 dimb$(144),dl$(144),na$(144):l=1:z1$="                    "
+   20 poke53280,6:poke53281,6:poke198,0:goto70
+   30 print"{clr}{rvon}{grn}";:fori=1to8:printz1$;:next
+   40 print"{home}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}disketten etikettieren"
+   50 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}(c) 1986 by softside"
+   60 print"{rvon}{yel}";:fori=1to6:printz1$;:next:return
+   70 gosub30:print"{up}{up}{rght}{rght}{rght}{rvon}bitte diskette einlegen und return"
+   80 geta$:ifa$<>chr$(13)then80
+  100 print"{wht}{down}{down}{down}{rght}{rght}{rght}{rght}bitte warten, ich lese diskette."
+  110 i=0:b=0:gb=1:gt=1:close15:open15,8,15:close1:open1,8,0,"$0"
+  120 input#15,t,k$,o,o:ift<>0thenprint"{down}{rght}{rght}{rght}{rght}{rvon}floppyfehler:{rvof}";
+  130 ift<>0thenprint"  {rvon}";k$:print"{down}{rght}{rght}{rght}{rght}taste druecken":poke198,0:wait198,1:run
+  140 get#1,a$,f$
+  150 get#1,a$,f$:b$(i+1)="":get#1,a$,f$:c=0:l$="   ":ifa$<>""thenc=asc(a$)
+  160 iff$<>""thenc=c+asc(f$)*256
+  170 q$=mid$(str$(c),2):l$=left$(q$+l$,3)
+  180 get#1,f$:iff$=""thenza=i:goto300
+  190 iff$<>chr$(34)then180
+  200 get#1,f$:iff$<>chr$(34)thenb$(i+q)=b$(i+q)+f$:goto200
+  210 ifq=1thenb$(i+1)=""
+  220 get#1,f$:iff$=chr$(32)then220
+  230 c$=""
+  240 c$=c$+f$:get#1,f$:iff$<>""then240
+  250 ifgb=1thenid$=left$(c$,2):gb$=gc$:gb=0
+  260 b$(i+q)=left$(b$(i+q)+z1$,17)+left$(gb$,3)+left$(q$+"   ",3)
+  270 ifgt=1thengt=0:b$(i)="":goto150
+  280 ifq=1thenq=0:b$(i+1)=""
+  290 i=i+1:goto150
+  300 close1:close15:fr$=q$
+  310 gosub30:print"{up}{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}directory bearbeiten"
+  320 z1=0:z2=0
+  330 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{wht}"id$:input"{up}{rght}{rvon}id    ";id$
+  340 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}spiele":input"{up}{rght}{rvon}header";he$:he$=left$(he$+z1$,16)
+  350 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}1541":input"{up}{rght}{rvon}floppy";dr$
+  355 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}35":input"{up}{rght}{rvon}spuren";sp$
+  360 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}...............................":input"{up}{up}{rvon}{rght}text  ";te$
+  365 te$=left$(te$,31)
+  370 print"{home}{down}{down}{down}{down}{down}{down}{down}{yel}{rvon}";:fori=1to8:printz1$;:next
+  380 print"{up}{up}{up}{up}{rght}{rght}{rght}f1: name veraendern"
+  390 print"{rvon}{rght}{rght}{rght}f3: name nicht uebernehmen"
+  400 print"{rvon}{up}{rght}{rght}{rght}f5: name unveraendert uebernehmen"
+  410 print"{down}":fori=1to17:printz1$;:next
+  420 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}{rght}{rght}{rght}"left$(b$(z1),16):print"{home}{down}{down}{rght}{rght}{grn}{rvon}"z2
+  430 ifz1=zaorz2=27then490
+  440 getq$:ifq$=""then440
+  450 ifq$="{f3}"thenb$(z1)="":z1=z1+1:goto420
+  460 ifq$="{f5}"thenna$(z2)=left$(b$(z1)+z1$,17):z1=z1+1:z2=z2+1:goto420
+  470 ifq$="{f1}"theninput"{home}{wht}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{up}{up}";na$(z2):na$(z2)=left$(na$(z2)+z1$,17)
+  475 ifq$="{f1}"thenz2=z2+1:print"{up}{up}"z1$:z1=z1+1:goto420
+  480 goto440
+  490 gosub30:print"{up}{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}etikett ausdrucken"
+  495 fori=z2to28:na$(i)=left$(z1$,17):next
+  500 print"{wht}{down}{down}{rght}{rght}{rght}sitzt das etikett richtig (j/n) ?"
+  510 getq$:ifq$=""then510
+  520 ifq$<>"j"then510
+  530 print"{yel}{rvon}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} ausdruck beginnt "
+  540 close1:open1,4,1:print#1,chr$(27);"@";chr$(27);"e";
+  560 print#1,"  ";he$;"           ";id$:print#1,chr$(27);"@";
+  570 print#1,chr$(27);"a";chr$(5);
+  580 print#1,chr$(27);"s";chr$(0);chr$(15);
+  590 print#1,"   ";:fori=1to52:print#1,"-";:next:print#1
+  600 print#1,"   "na$(0);na$(13);" !  commodore 64
+  610 print#1,"   "na$(1);na$(14);" !  floppy: "dr$
+  620 print#1,"   "na$(2);na$(15);" !
+  630 print#1,"   "na$(3);na$(16);" !----------------
+  640 print#1,"   "na$(4);na$(17);" !
+  650 print#1,"   "na$(5);na$(18);" !
+  660 print#1,"   "na$(6);na$(19);" !   spuren: "sp$
+  670 print#1,"   "na$(7);na$(20);" !
+  680 print#1,"   "na$(8);na$(21);" !----------------
+  690 print#1,"   "na$(9);na$(22);" !
+  700 print#1,"   "na$(10);na$(23);" !  hauptprg."z2
+  710 print#1,"   "na$(11);na$(24);" !  gesamt:  "za
+  720 print#1,"   "na$(12);na$(26);" !
+  730 print#1,"   ";:fori=1to52:print#1,"-";:next:print#1
+  740 print#1,"   "te$"    !  free: "fr$" blk
+  750 print#1:print#1:close1
+  760 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{wht}noch eine diskette (j/n) ?
+  770 geta$:ifa$=""then770
+  780 ifa$="n"thenend
+  790 ifa$="j"thenrun
+  800 goto770
+

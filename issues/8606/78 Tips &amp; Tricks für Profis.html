@@ -71,12 +71,29 @@
 
         <p>Für X sind Werte von 0 bis 79, für Y von 0 bis 49 zugelassen. »Modus« gibt an, ob der Punkt gesetzt (Modus = 1), gelöscht (Modus = 0), oder getestet (Modus = 255) werden soll. Bei Modus gleich 255 steht das Ergebnis des Tests (1 = gesetzt, 0 = gelöscht) in Speicherzelle 2. Für den Parameter »Farbe« gelten die normalen Farb-POKEs (0 bis 15). Wenn auf »Punkt gesetzt/gelöscht« geprüft werden soll, muß »,Farbe« entfallen. (Georg Brandt/Andreas Wellie/tr)</p>
 
+        <figure>
+            <pre data-filename="lores.prg" data-name="LoRes" data-mse=mse1></pre>
+            <figcaption>Listing 1. Befehlserweiterung für eine 400-Punkte-Grafik im Textmodus</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="lores.prg" data-name="LoRes"></div>
+
         <h2>Die verflixte Müllabfuhr</h2>
 
         <p>Bei einer Garbage Collection zeigt der C 64 keine Reaktion mehr. Man weiß dann nie so genau, ob der Computer abgestürzt oder am Rechnen ist. Besonders schlimm ist diese Tatsache bei der Programmentwicklung oder bei gekauften Basic-Programmen, die viele Daten zu verarbeiten haben (Adreßverwaltung, Vokabelprogramm, Haushaltsbuchhaltung. .). Mit dem Programm »Garbage Anzeige» (Listing 2) wollen wir nun eine Möglichkeit angeben, diese Unsicherheit aus dem Weg zu räumen. Sobald der Computer dabei ist, den Stringmüll zu sortieren, zeigt das Programm automatisch einen Text. Ist die Garbage Collection beendet, sieht der Bildschirm genauso aus wie vorher, das heißt der überschriebene Text wird wieder in unveränderter Form auf den Bildschirm gebracht. Ferner kann man vorher genau bestimmen, wo der Text erscheinen soll (Spalte, Zeile). Zusätzlich wird bei jedem Aufruf die Rahmenfarbe um eins erhöht. Selbstverständlich wird diese bei Ende der Garbage Collection sofort wieder zurückgesetzt.</p>
 
         <p>Will man die Rahmenfarbe jedoch belassen, so sind noch zwei POKEs einzugeben: POKE 53102,44: POKE 53119,44. Das Programm braucht nur einmal, aufgerufen zu werden und bleibt die ganze Zeit durch den Gebrauch der Interrupttechnik einsatzbereit. Nach RUN/STOP-RESTORE und RESET muß die Routine wieder initialisiert werden. Listing 3 demonstriert die Anwendung des Programms.<br>
             Initialisierung mit: SYS 52992, Spalte, Zeile</p>
+
+        <figure>
+            <pre data-filename="g.c.-anzeige.prg" data-name="Garbage-Collection-Anzeige" data-mse=mse1></pre>
+            <figcaption>Listing 2. Zeigt an, wann der C 64 eine Garbage-Collection durchführt</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="g.c.-anzeige.prg" data-name="Garbage-Collection-Anzeige"></div>
+
+        <figure>
+            <pre data-filename="beispiel" data-name="Beispiel"></pre>
+            <figcaption>Listing 3. Demo-Programm zur »Garbage-Collection-Anzeige«</figcaption>
+        </figure>
 
         <address class="author">(Joachim und Michael Kreutzer/tr)</address>
 
@@ -87,6 +104,12 @@
         <h3>Bedienungsanleitung:</h3>
 
         <p>Wenn Sie mit Hypra-Load arbeiten wollen, so laden Sie dies zuerst und starten es. Ansonsten oder anschließend laden Sie »BASIC $B000« und starten es mit »RUN«. Danach wird »Bitte warten« ausgegeben, und nach zirka sieben Sekunden meldet sich »BASIC $B000« mit »43007 Bytes free«. Mit »SYS 64738«, also einem Software-Reset, wird nicht auf das normale Basic umgestellt, sondern »BASIC $B000« neu initialisiert. Nur mit einem Reset-Taster oder »POKE 1,55« kommt man wieder in den Normalmodus. Danach läßt sich das »BASIC $B000« nur mit einem erneuten Laden und Starten wiederbeleben. Da Turbo-Tape-Versionen einen Teil des Bereichs von $C000 bis $CFFF belegen, kann man diese leider nicht mit »BASIC $B000« verwenden, da es selbst diesen Bereich benötigt. Somit ist eine Benutzung von »BASIC $B000« nur mit einer Diskettenstation zu empfehlen. Bei einer Benutzung von Hypra-Load schalten Sie vorher bitte den Drucker aus und laden keine Programme über 169 Blocks beziehungsweise 43007 Bytes Länge.</p>
+
+        <figure>
+            <pre data-filename="basic $b000.prg" data-name="BASIC $B000" data-mse=mse1></pre>
+            <figcaption>Listing 4. Durch einen genialen Trick stehen Ihnen »echte« 43007 Bytes für Basic zur Verfügung.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="basic $b000.prg" data-name="BASIC $B000"></div>
 
         <address class="author">(Robert Bartz/tr)</address>
 
@@ -133,6 +156,11 @@
 
         <p>Listing 5 ist durch die REM-Zeilen ausreichend dokumentiert, so daß hier auf weitere Erklärungen verzichtet werden kann.</p>
 
+        <figure>
+            <pre data-filename="def fn sinnvoll" data-name="DEF FN sinnvoll"></pre>
+            <figcaption>Listing 5. Eine sinnvolle Anwendung der FN-Anweisung</figcaption>
+        </figure>
+
         <address class="author">(Wolf Dieter Busch/tr)</address>
 
         <h2>Der Super-Autostart</h2>
@@ -146,6 +174,12 @@
         <p>»Code« ist eine beliebige Zahl zwischen 0 und 255. »Haupt-Name« und »Lader-Name« sind die zukünftigen Namen des codierten Hauptteils beziehungsweise des Lade-Programms auf der Diskette. Der Lader ist später mit »,8,1« in den C 64 zu lesen.</p>
 
         <p>Läßt man »,"Lader-Name"« weg, so wird nur der codierte Hauptteil neu gespeichert (wenn man Änderungen am Hauptteil vorgenommen hat). Wichtig ist dann nur, daß die Code-Zahl des Hauptprogramms mit der des Laders übereinstimmt. Im Zweifelsfall sollte man lieber den alten Lader löschen und beide Teile neu generieren.</p>
+
+        <figure>
+            <pre data-filename="autostart.prg" data-name="Autostart" data-mse=mse1></pre>
+            <figcaption>Listing 6. Der Super-Autostart, den Sie schon immer suchten</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="autostart.prg" data-name="Autostart"></div>
 
         <address class="author">(Christoph Dautzenberg/tr)</address>
     </article>

@@ -1,0 +1,23 @@
+
+
+;block bas.prg ==0801==
+   10 rem ******* verschieben mit dem block-programm *******
+   20 printchr$(147):rem c 128 = wait0,1
+   30 poke53280,0:poke53281,5
+   40 poke241,1:rem c64 = poke646,1
+   50 rem ----- farbram belegen -----
+   60 for i=0 to 1000:poke55296+i,1:nexti:rem dauert ein wenig!
+   70 rem ----- bildschirm belegen -----
+   80 s=1504:rem startadresse quelle
+   90 for i=0 to 39:pokes+i,i:nexti
+  100 rem ----- parameter abfragen -----
+  110 input"wieviele bytes (sinnvoll 0 bis 40)";n
+  120 input"zielort (sinnvoll 1024 bis 1984)";z
+  130 rem ----- berechnen und uebergabe -----
+  140 a=int(s/256):poke255,a:poke254,s-256*a
+  150 a=int(z/256):poke253,a:poke252,z-256*a
+  160 a=int(n/256):poke251,a:poke250,n-256*a
+  170 rem ----- verschieben -----
+  180 sys4864:rem c64 = sys 49152
+  190 end
+

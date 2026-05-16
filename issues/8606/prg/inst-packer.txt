@@ -1,0 +1,72 @@
+
+
+;inst-packer.prg ==0801==
+   10 dimtyp$(5):dimdu$(5)
+   20 typ$(1)="normal"
+   30 typ$(2)="centronic":du$(2)="cen"
+   40 typ$(3)="mps801":du$(3)="umlaut1"
+   50 typ$(4)="mps802":du$(4)="umlaut2"
+   60 typ$(5)="individuell":du$(5)="indi"
+   70 gosub80:goto110
+   80 print"{clr}{swlc}{rvon}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}";
+   90 print"{SHIFT--}{rvof}{wht}     +  M{$a0}A{$a0}S{$a0}T{$a0}E{$a0}R{$a0}-{$a0}T{$a0}E{$a0}X{$a0}T   +     {gry2}{rvon}{SHIFT--}";
+  100 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{rvof}":return
+  110 print"{down}{rvon}     D{$a0}R{$a0}U{$a0}C{$a0}K{$a0}E{$a0}R{$a0}A{$a0}U{$a0}S{$a0}W{$a0}A{$a0}H{$a0}L        {rvof}"
+  120 print"{down}{down}{rght}{rght}{rght}{rght}1) NORMAL IEC-Bus + RS232  (ASCII)"
+  130 print"{down}{rght}{rght}{rght}{rght}2) CENTRONIC  (ASCII)          "
+  140 print"{down}{rght}{rght}{rght}{rght}3) MPS801 + VC1525  (CBM)          "
+  150 print"{down}{rght}{rght}{rght}{rght}4) MPS802 + VC1526  (CBM)  "
+  160 print"{down}{rght}{rght}{rght}{rght}5) INDIVIDUELL"
+  170 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}Waehlen Sie ? ";
+  180 poke198,0:wait198,1:getx$
+  190 ifasc(x$)<49orasc(x$)>53then180
+  200 typ=val(x$)
+  202 gosub80:print"Soll die Bildschirm-Farbe im 80 Z-Modus geaendert werden <j/n>"
+  203 wait198,1:getfb$
+  204 iffb$<>"j"then500
+  205 print"{down}{rvon} Farbwahl! ":input"{down} Hintergrundfarbe :";hf
+  206 input"{down} vordergrundfarbe :";vf
+  500 gosub80:print"Der Basic-Start wird generiert"
+  520 print"die Programmteile werden nachgeladen!"
+  540 gosub1000:z=2053
+  560 a=231:b=8:n$="t1":l=17+2279:gosub900:t3=c
+  580 n$="t3":l=997+c:gosub900
+  582 iffb$="j"thenpoket3+822,16*vf+hf
+  600 n$="t5":l=510+c:gosub900
+  620 n$="t4":l=2783+c:gosub900
+  640 n$="zeichensatz":l=4096+c:gosub900
+  660 n$="t2":l=7396+c:gosub900
+  680 n$=typ$(typ):l=768+c:gosub900
+  700 n$="formular*":l=249+c:gosub900
+  720 iftyp=1thenfori=2214to2234:pokei,234:next:goto780
+  740 n$=du$(typ):l=c:gosub900:pokez+4,a:pokez+9,b:ze=c-l+39424
+  760 ze%=ze/256:pokez+13,ze%:pokez+11,ze-(ze%*256)
+  780 gosub80:print"pO44,8:pO45,pE(174):pO46,pE(175)"
+  800 print"{down}{down}{down}Das Programm '"typ$(typ)"' kann jetzt"
+  820 print"{down}wie ein Basic-Programm behandelt werden"
+  840 print"{down}Auf Disk oder Kassette abspeichern,"
+  860 print"{down}oder mit 'RUN' starten!"
+  880 poke631,19:poke632,17:poke633,17:poke634,17:poke635,17:poke636,13:poke198,6
+  890 end
+  900 z=z+18:pokez,a:pokez+2,b
+  910 print"  "n$" nach "b*256+a
+  920 sys57812n$,8,0:poke780,0:poke781,a:poke782,b:sys65493
+  930 open1,8,15:input#1,e,f$,g,h:close1
+  940 ife=62thenprint"{rvon}"f$chr$(13)"{rvof}Disk mit "n$" einlegen <taste>"
+  950 ife=62thenpoke198,0:wait198,1:goto910
+  960 ife>2thenprinte;f$;g;h:end
+  965 a=peek(174):b=peek(175):c=b*256+a
+  970 d%=l/256:pokez+9,d%:pokez+4,l-(d%*256):return
+ 1000 forx=2049to2278:readi:pokex,i:next:return
+ 1010 data11,8,194,7,158,50,48,54,49,0,0,0,120,169,11,141,32,208,141,17,208,169
+ 1020 data0,160,0,162,0,32,214,8,169,0,160,77,162,3,32,221,8,169,0,160,0,162
+ 1030 data0,32,214,8,169,0,160,229,162,195,32,221,8,169,0,160,0,162,0,32,214
+ 1040 data8,169,0,160,254,162,203,32,221,8,169,0,160,0,162,0,32,214,8,169,0,160
+ 1050 data223,162,153,32,221,8,169,0,160,0,162,0,32,214,8,169,0,160,0,162,128
+ 1060 data32,221,8,169,0,160,0,162,0,32,214,8,169,0,160,228,162,188,32,221,8
+ 1070 data169,0,160,0,162,0,32,214,8,169,0,160,0,162,192,32,221,8,169,0,160,0
+ 1080 data162,0,32,214,8,169,0,160,249,162,4,32,221,8,169,0,160,0,162,0,32,214
+ 1090 data8,169,0,160,0,162,0,32,221,8,32,0,154,169,55,133,1,169,0,170,157,0
+ 1100 data200,232,224,41,208,248,141,33,208,169,12,141,134,2,88,76,0,192,133
+ 1110 data95,132,96,134,90,96,133,91,132,88,134,89,32,191,163,96
+
