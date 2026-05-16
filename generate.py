@@ -684,10 +684,16 @@ class Issue:
               if topass:
                   # Top-Ass: .prg in prg/ is the master
                   asm_bin = listings_bin[data_filename + '.prg'][0]
+                  lines = assembler_decode.decode_bytes(asm_bin, topass=True)
+              elif (data_filename + '.prg') in listings_bin:
+                  # Hypra-Ass raw .prg: decode tokens directly.
+                  asm_bin = listings_bin[data_filename + '.prg'][0]
+                  lines = assembler_decode.decode_prg_bytes(asm_bin)
               else:
-                  # Hypra-Ass: .txt in prg/ is the master, use petcat2prg binary
+                  # Hypra-Ass via petcat: .txt is the master, petcat2prg
+                  # gives us a synthetic tokenized stream to decode.
                   asm_bin, basicver = listings_bin[data_filename]
-              lines = assembler_decode.decode_bytes(asm_bin, topass=topass)
+                  lines = assembler_decode.decode_bytes(asm_bin, topass=False)
               listing = "\n".join(lines)
               listing = listing.replace("&", "&amp;")
               listing = listing.replace("<", "&lt;")

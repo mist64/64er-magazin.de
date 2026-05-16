@@ -8,7 +8,7 @@
     <meta name="author" content="Christian Klein, dm, Herbert Kunz, dm, Holger Brömmelsiek, dm, Jürgen Strehle, dm, Sanjiv Singh, dm, Stefan Seidenberg, dm, Thomas Tschink, dm, Thorsten Wanschura, dm, Udo Miller, dm">
     <meta name="64er.issue" content="6/86">
     <meta name="64er.pages" content="82-85">
-    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks zum C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
     <!-- <meta name="64er.toc_title" content="XXX"> -->
     <meta name="64er.id" content="tips_c128">
 </head>
@@ -186,7 +186,47 @@
         </figure>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>00b00 c9 00    cmp #$00      ;Akku(Spritenummer)= 0, wenn ja
+00b02 f0 06    beq $0b0a     ;dann Fehlermeldung
+00b04 c9 08    cmp #$08      ;Akku(Spritenummer)&lt;=8, dann
+00b06 90 07    bcc $0b0f     ;weiter ab $0b0f
+00b08 f0 05    beq $0b0f     ;sonst
+00b0a a2 0e    ldx #$0e      ;Fehlermeldung ($0e)
+00b0c 6c 00 03 jmp ($0300)   ;illegal quantity und STOP!!
+                             ;Beginn Hauptprogramm
+00b0f aa       tax           ;Zuweisung des Akku ins X-Register
+00b10 ca       dex           ;und um 1 verringern
+00b11 a9 00    lda #$00      ;Hilfszeiger mit
+00b13 86 fc    stx $fc       ;der Basisadresse des
+00b15 a0 00    ldy #$00      ;Spritedatenspeichers laden
+00b17 84 fa    sty $fa       ;und sichern
+00b19 a0 0e    ldy #$0e      ;
+00b1b 84 fb    sty $fb       ;
+00b1d e0 03    cpx #$03      ;wenn X-Register &lt;=3, dann
+00b1f f0 0b    beq $0b2c     ;Sprung nach $0b02,
+00b21 90 09    bcc $0b2c     ;andernfalls
+00b23 e6 fb    inc $fb       ;HI-Byte(Zeiger) um 1 erhöhen,
+00b25 a9 fb    lda #$fb      ;Akku mit #$fb laden und
+00b27 65 fc    adc $fc       ;in Zelle $fc addieren
+00b29 aa       tax           ;Zuweisung des Akku ins X-Register
+00b2a 86 fc    stx $fc       ;und sichern
+00b2c a0 00    ldy #$00      ;Y-Register und
+00b2e a9 00    lda #$00      ;Akku löschen
+00b30 c4 fc    cpy $fc       ;wenn Y-Register = Zelle $fc
+00b32 f0 07    beq $0b3b     ;weiter ab $0b3b, sonst
+00b34 c8       iny           ;Y-Register erhöhen und
+00b35 69 40    adc #$40      ;#$40 zum Akku addieren
+00b37 c4 fc    cpy $fc       ;wenn Y-Register &lt;&gt; Zelle $fc,
+00b39 d0 f9    bne $0b34     ;dann wieder zu $0b34
+00b3b 85 fa    sta $fa       ;LOW-Byte(Zeiger) sichern
+00b3d a0 00    ldy #$00      ;Y-Register löschen
+00b3f b1 fa    lda ($fa),y   ;Akku durch Hilgszeiger laden,
+00b41 49 ff    eor #$ff      ;invertieren und
+00b43 91 fa    sta ($fa),y   ;zurückschreiben
+00b45 c8       iny           ;Y-Register erhöhen und
+00b46 c0 40    cpy #$40      ;mit #$40 vergleichen,
+00b48 d0 f5    bne $0b3f     ;wenn &lt;&gt; dann zu $0b3f
+00b4a 60       rts           ;ENDE</pre>
             <figcaption>Listing 6. Der Quellcode zu Listing 5</figcaption>
         </figure>
 

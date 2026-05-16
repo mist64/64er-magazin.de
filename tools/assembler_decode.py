@@ -5,8 +5,22 @@ Top-Ass stores assembler source as tokenized BASIC. Tokens $81-$b8 encode
 6502 mnemonics; the same tokens preceded by '.' ($2e) encode assembler
 directives. This decoder reverses both mappings.
 
-Hypra-Ass uses the same storage format but without BASIC tokens — mnemonics
-are stored as plain ASCII text. Use --topass to enable Top-Ass token decoding.
+Hypra-Ass uses the same storage format. There are two source variants:
+
+1. **Raw Hypra-Ass .prg** — the file as written by Hypra-Ass on the C64.
+   Mnemonics are stored as BASIC tokens ($81-$B8); directives are stored
+   as `'.' + token`. Use ``decode_prg_bytes()``.
+
+2. **Petcat-detokenized .txt** — the same file run through petcat. Mnemonic
+   tokens have been expanded to plain ASCII text (so `'LDA'` etc. appears
+   in the byte stream). The text is then re-tokenized by `petcat2prg` to
+   give a synthetic PRG whose only BASIC tokens are the ones from the
+   original BASIC starter line (SYS, `*`, `=`, ...). Use
+   ``decode_bytes(..., topass=False)``.
+
+Top-Ass mode (``decode_bytes(..., topass=True)``) operates on raw Top-Ass
+.prg files directly — same byte layout as Hypra-Ass raw but with full
+directive names emitted (`.DEFINE` rather than `.EQ`).
 
 The mnemonic table was extracted from the interleaved string
 'LSLLCAASSICABLORRSCDEJJTTTTTTIPPPIDRNCSCSCCSRPDBBBBBBBBB
@@ -18,8 +32,10 @@ The directive table was extracted from the null-terminated string table
 starting at 'UNTIL' in the same binary.
 
 Usage:
-  hypra_ass_decode.py <file.prg>             # Hypra-Ass (plain ASCII, errors on tokens)
-  hypra_ass_decode.py --topass <file.prg>    # Top-Ass (decodes BASIC tokens)
+  assembler_decode.py <file.prg>             # Hypra-Ass raw .prg (decode tokens)
+  assembler_decode.py --petcat <file.prg>    # petcat-tokenized .txt (passed
+                                              # through petcat2prg first)
+  assembler_decode.py --topass <file.prg>    # Top-Ass raw .prg
 """
 
 import sys
@@ -417,17 +433,205 @@ def format_hypra_ass_line(line_text):
     return line_text.rstrip()
 
 
-def decode_prg(filename, topass=False):
+# --- Raw Hypra-Ass .prg decoder --------------------------------------------
+#
+# Raw Hypra-Ass .prg files (e.g. ``issues/8606/prg/block.prg``) store the
+# source as tokenized BASIC: tokens $81-$B8 for 6502 mnemonics, '.' + token
+# for assembler directives. This path bypasses petcat entirely — it decodes
+# the .prg's byte stream directly and runs the result through the column
+# formatter below. Output is byte-equivalent to the Hypra-Ass LIST printout
+# reproduced in 64'er magazine issues.
+
+# Hypra-Ass directives (short forms): byte $82 + index in DIRECTIVES, but
+# Hypra-Ass in practice only emits these. Names match the long Top-Ass
+# spellings, which is what the magazine listings print.
+_RAW_PRG_DIRECTIVES = {
+    0x8F: 'DEFINE',  # .EQ in Hypra-Ass short form
+    0x90: 'BASE',    # .BA
+    0x91: 'BYTE',    # .BY
+    0x92: 'WORD',
+    0x93: 'OBJECT',
+    0x94: 'OBJEND',
+    0x95: 'MACRO',
+}
+
+
+def _expand_raw_prg_tokens(text_bytes):
+    """Expand BASIC tokens in a raw Hypra-Ass line to mnemonic/directive text.
+
+    The byte preceding a token is inspected: '.' + directive byte expands to
+    '.<NAME> ' (trailing space), '.' + mnemonic byte (or a bare mnemonic
+    token) expands to '<MNEMONIC> ' (trailing space, so the operand is
+    separated from the opcode).
+    """
+    out = []
+    i = 0
+    n = len(text_bytes)
+    while i < n:
+        b = text_bytes[i]
+        if b == 0x2E and i + 1 < n and text_bytes[i + 1] in _RAW_PRG_DIRECTIVES:
+            out.append('.' + _RAW_PRG_DIRECTIVES[text_bytes[i + 1]] + ' ')
+            i += 2
+        elif 0x81 <= b <= 0xB8:
+            out.append(MNEMONICS[b - 0x81] + ' ')
+            i += 1
+        else:
+            out.append(chr(b))
+            i += 1
+    return ''.join(out)
+
+
+def _format_raw_prg_line(line_text):
+    """Format a raw Hypra-Ass .prg line with aligned columns.
+
+    Input is the output of ``_expand_raw_prg_tokens`` — each mnemonic or
+    directive token already has a trailing space inserted.
+
+    Layout (after the 'NNN -' prefix prepended by ``decode_prg_bytes``):
+        col 0..9   label   (left-justified, 10 chars; empty when none)
+        col 10..12 opcode  (3 chars)
+        col 13     space
+        col 14..   operand
+        col 25..   comment (';...') aligned when feasible
+    '.DEFINE NAME=VALUE' is reformatted as '.DEFINE NAME    = VALUE'.
+    """
+    if not line_text:
+        return line_text
+
+    # Comment-only lines: leave as-is.
+    if line_text.startswith(';'):
+        return line_text
+
+    # Directive lines (start with '.'): handle .DEFINE specially.
+    if line_text.startswith('.'):
+        semi = _find_comment(line_text)
+        body = line_text[:semi] if semi != -1 else line_text
+        comment = line_text[semi:] if semi != -1 else ''
+
+        if body.startswith('.DEFINE '):
+            after_dir = body[len('.DEFINE '):]
+            eq = after_dir.find('=')
+            if eq != -1:
+                name = after_dir[:eq].rstrip()
+                value = after_dir[eq + 1:].lstrip()
+                body = '.DEFINE ' + name.ljust(9) + '= ' + value
+        body = body.rstrip()
+        if comment:
+            body = body.ljust(25) + comment
+        return body
+
+    # Instruction line: split label / opcode / operand.
+    # The tokenizer emitted a single space after every mnemonic. Lines
+    # without a label start with one space (the original PRG had a single
+    # space before the token byte).
+    if line_text.startswith(' '):
+        label = ''
+        body = line_text[1:]
+    else:
+        space = line_text.find(' ')
+        if space == -1:
+            return line_text.rstrip()
+        label = line_text[:space]
+        body = line_text[space + 1:]
+
+    semi = _find_comment(body)
+    code = body[:semi] if semi != -1 else body
+    comment = body[semi:] if semi != -1 else ''
+    code = code.rstrip()
+
+    # Split opcode / operand. Opcode is the first 3 characters; if a space
+    # follows it, the rest is the operand.
+    if len(code) >= 4 and code[3] == ' ':
+        opcode = code[:3]
+        operand = code[4:]
+    else:
+        opcode = code
+        operand = ''
+
+    out = label.ljust(10) + opcode
+    if operand:
+        out += ' ' + operand
+    if comment:
+        out = out.ljust(25) + comment
+    return out.rstrip()
+
+
+def decode_prg_bytes(data):
+    """Decode raw Hypra-Ass .prg bytes, returning a list of formatted lines.
+
+    Lines are prefixed with the BASIC line number formatted as 'NNN -' to
+    mirror the listing layout produced by Hypra-Ass's own LIST routine, and
+    the column layout used by the magazine's printed listings.
+    """
+    pos = 2  # skip load address
+
+    # Determine width for right-aligned line numbers: same width as the
+    # largest line number in the file. Hypra-Ass listings in 64'er use
+    # 10..900-ish numbering, i.e. 3 digits.
+    max_line = 0
+    scan = pos
+    while scan < len(data) - 1:
+        link = data[scan] | (data[scan + 1] << 8)
+        scan += 2
+        if link == 0:
+            break
+        max_line = max(max_line, data[scan] | (data[scan + 1] << 8))
+        scan += 2
+        while scan < len(data) and data[scan] != 0:
+            scan += 1
+        scan += 1
+    num_col = max(3, len(str(max_line))) + 1
+
+    lines = []
+    while pos < len(data) - 1:
+        link = data[pos] | (data[pos + 1] << 8)
+        pos += 2
+        if link == 0:
+            break
+        line_num = data[pos] | (data[pos + 1] << 8)
+        pos += 2
+
+        text_start = pos
+        while pos < len(data) and data[pos] != 0:
+            pos += 1
+        raw = data[text_start:pos]
+        pos += 1  # skip NUL terminator
+
+        expanded = _expand_raw_prg_tokens(raw)
+        formatted = _format_raw_prg_line(expanded)
+        lines.append(f"{str(line_num).ljust(num_col)}-{formatted}")
+    return lines
+
+
+def decode_prg(filename, mode='hypra-raw'):
+    """CLI entry point. ``mode`` is one of:
+        'hypra-raw' — raw Hypra-Ass .prg (default)
+        'petcat'    — petcat-tokenized .txt fed through petcat2prg
+        'top-ass'   — raw Top-Ass .prg
+    """
     with open(filename, 'rb') as f:
         data = f.read()
-    for line in decode_bytes(data, topass=topass):
+    if mode == 'hypra-raw':
+        lines = decode_prg_bytes(data)
+    elif mode == 'top-ass':
+        lines = decode_bytes(data, topass=True)
+    else:  # petcat
+        lines = decode_bytes(data, topass=False)
+    for line in lines:
         print(line)
 
 
 if __name__ == '__main__':
-    topass = '--topass' in sys.argv
-    args = [a for a in sys.argv[1:] if a != '--topass']
+    args = sys.argv[1:]
+    mode = 'hypra-raw'
+    if '--topass' in args:
+        mode = 'top-ass'
+        args.remove('--topass')
+    if '--petcat' in args:
+        mode = 'petcat'
+        args.remove('--petcat')
     if len(args) != 1:
-        print(f"Usage: {sys.argv[0]} [--topass] <file.prg>", file=sys.stderr)
+        print(f"Usage: {sys.argv[0]} [--topass|--petcat] <file.prg>",
+              file=sys.stderr)
         sys.exit(1)
-    decode_prg(args[0], topass=topass)
+    decode_prg(args[0], mode=mode)
