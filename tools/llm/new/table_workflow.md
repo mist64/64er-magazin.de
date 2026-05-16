@@ -136,6 +136,17 @@ Choose the right HTML shape based on what the scan shows:
   - `Bild N: …` or `Bild N. …` (for tables that are labeled as numbered figures)
 
   Only these explicit caption markers count. **Do NOT promote section headings, bold titles above a table, or OCR'd fragments to `<figcaption>`.** A bold title like "Erklärung der einzelnen Bearbeitungsroutinen" sitting above a table is a heading, not a caption — leave it as-is in the surrounding HTML (typically an `<h3>` or nothing) and emit a bare `<table>`.
+
+  **The `<figcaption>` ALWAYS goes BELOW the table inside the `<figure>`**, even if the printed caption sits above the table on the scan. Project convention: caption follows the figure content.
+
+  ```html
+  <figure>
+      <table>
+          …
+      </table>
+      <figcaption>Tabelle N: Caption text</figcaption>
+  </figure>
+  ```
 - **Table with a heading or no marker at all** → bare `<table>`, no `<figure>`.
 
 Column count should match what's visually on the scan, not what's logically convenient. If a row label and its parenthetical full name share a single cell on the scan, keep them in one `<td>`; don't split into two columns.
