@@ -214,6 +214,25 @@ Then leave `prg.txt` and the HTML untouched for that entry and move on. A human 
 
 **Exception** — the "hidden companion" rule above resolves the common case where a file belongs to an article (per its D64 section separator) but has no printed listing. Use `<div class="binary_download">` or the hidden `<pre>` pattern directly; no LOG.md entry needed for that case.
 
+## Final report — present a summary table
+
+After all placements, produce a summary table for the user listing what you did and what they may want to spot-check:
+
+| Article | Listings placed | Binary companions | Notes |
+|---|---|---|---|
+| `55 Master-Text` | 11 (Listings 2–12) | 16 | Listing 1 (Change MSE) emitted as `<pre>TODO</pre>` — not on disk |
+| `134 Von Basic zu Assembler` | 5 (Listings 1, 3–6) | 8 (BLOCK/SWAP variants) | Listing 2 (BLTUC disasm) emitted as `<pre>TODO</pre>` — disassembly of in-ROM routine, not on disk |
+| `82 Tips C 128` | 5 (Listings 1–5) | — | Listing 6 (sprinv source) emitted as `<pre>TODO</pre>` — not on disk; Listing 3 was »FIND« not »RND« (OCR confusion in pdftotext) |
+| … | | | |
+
+Also flag explicitly in the report:
+- Every `<pre>TODO</pre>` placeholder, with the reason (printed-but-not-on-disk, transient pre-step, in-ROM disassembly, etc.) so a future pass knows what to OCR.
+- Every `(Listing N)` body reference for which you did NOT add a figure, and why (e.g. Fehlerteufelchen-column references to listings from previous issues).
+- The end-of-article listing order verification (`grep -A1 '<figure>' article.html | grep figcaption | grep -oE 'Listing [0-9]+'` should print Listing-N in ascending order).
+- Unplaced blocks in `prg.txt` and orphan files in `prg/` not referenced from any HTML (e.g. boot splash screens like `leser-info!`).
+
+The user will scan this table to decide where to spot-check. Without it they'd have to grep every article.
+
 ## Generator Integration (`generate.py`)
 
 - `prg/*.txt` → read into `listings[basename]` (text) and `listings_bin[basename]` (binary via petcat2prg)
