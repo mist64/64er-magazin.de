@@ -52,8 +52,7 @@ Match the convention established in 8601–8605:
 
             <div class="q">
                 <p>Question text…</p>
-                <p class="author">Reader Name</p>
-                <p class="noindent">Street 12, 9999 City</p>          <!-- if printed -->
+                <p class="author">Reader Name<br>Street 12, 9999 City</p>   <!-- address inside author, separated by <br> -->
                 <p class="noindent">Ausgabe N/YY</p>                  <!-- if printed -->
             </div>
 
@@ -110,8 +109,7 @@ In order:
   </div>
   ```
   Don't use `<ol>` — the (N) prefix in plain `<p>` is the convention.
-- `<p class="author">` for the asker. Convert ALL CAPS OCR import to Title Case (`HANS FUSS` → `Hans Fuss`). Preserve original punctuation and umlauts.
-- `<p class="noindent">` for the asker's address, if printed.
+- `<p class="author">` for the asker. Convert ALL CAPS OCR import to Title Case (`HANS FUSS` → `Hans Fuss`). Preserve original punctuation and umlauts. **If the asker's address is printed, append it inside the same `<p class="author">` after a `<br>`** — not a separate paragraph.
 - `<p class="noindent">` for the source-issue marker `Ausgabe N/YY`, if this is a follow-up to a prior question. Always last inside the `<div class="q">`.
 
 ### Inside `<div class="a">`
