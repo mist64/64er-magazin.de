@@ -155,7 +155,7 @@ Then `Read` the result to verify the splice. Do NOT use the Edit tool to insert 
 | `data-range` | Line number filter: `"100-200"`, `"100,200-300,400"` |
 | `data-checksummer` | Checksummer version number; enables dual petcat/checksummer view |
 | `data-availability` | Set to `"local"` to suppress download link |
-| `data-assembler` | `"hypra-ass"` for Hypra-Ass source listings (master file is `prg/<name>.txt`), or `"top-ass"` for Top-Ass source listings (master file is `prg/<name>.prg`) |
+| `data-assembler` | `"hypra-ass"` for Hypra-Ass source listings (master file is `prg/<name>.txt` _or_ `prg/<name>.prg` — see below), or `"top-ass"` for Top-Ass source listings (master file is `prg/<name>.prg`) |
 
 ## Rules
 
@@ -278,8 +278,10 @@ The user will scan this table to decide where to spot-check. Without it they'd h
 - `data-filename` without `.prg` suffix → BASIC listing path (petcat text, optional checksummer)
 - `data-filename` with `.prg` suffix → MSE or binary path
 - Normal BASIC rendering strips `;` comment lines, empty lines, and leading spaces
-- `data-assembler="hypra-ass"` → reads `prg/<filename>.txt` (petcat-text master), re-tokenizes with `petcat2prg`, then runs `tools/assembler_decode.py` `decode_bytes(..., topass=False)` to render the assembler listing
-- `data-assembler="top-ass"` → reads `prg/<filename>.prg` directly and runs `decode_bytes(..., topass=True)` (Top-Ass uses native BASIC tokenization for mnemonics)
+- `data-assembler="hypra-ass"` → master is either `prg/<filename>.prg` (raw Hypra-Ass `.prg` with tokenized mnemonics) or `prg/<filename>.txt` (petcat-detokenized source). The generator looks for the `.prg` first; if present it calls `tools/assembler_decode.py` `decode_prg_bytes(...)` directly on the raw byte stream. Otherwise it reads the `.txt`, re-tokenizes with `petcat2prg`, and calls `decode_bytes(..., topass=False)`. Both paths produce the same column-formatted output.
+- `data-assembler="top-ass"` → reads `prg/<filename>.prg` directly and runs `decode_bytes(..., topass=True)` (Top-Ass uses native BASIC tokenization for mnemonics).
+
+There is a single canonical decoder module — `tools/assembler_decode.py`. The standalone CLI `tools/hypra-ass-decode.py` is a thin wrapper that imports `decode_prg_bytes` from it; do not add a second column formatter elsewhere.
 
 ### Hypra-Ass / Top-Ass HTML pattern
 
@@ -290,13 +292,15 @@ The user will scan this table to decide where to spot-check. Without it they'd h
 </figure>
 ```
 
-The `<pre>` body stays empty — the generator auto-decodes from `prg/<filename>.txt` (Hypra-Ass) or `prg/<filename>.prg` (Top-Ass). For Hypra-Ass also place a binary download alongside the source listing if the assembled `.prg` is also published.
+The `<pre>` body stays empty — the generator auto-decodes from `prg/<filename>.prg` (raw Hypra-Ass `.prg`, preferred when both exist), `prg/<filename>.txt` (petcat-detokenized), or `prg/<filename>.prg` (Top-Ass). For Hypra-Ass also place a binary download alongside the source listing if the assembled `.prg` is also published.
 
 ### Decoder note: shifted PETSCII vs BASIC tokens
 
-`tools/assembler_decode.py` decodes the petcat-tokenized PRG byte stream. Two byte ranges share the same numeric values but have different meanings:
+`tools/assembler_decode.py` exposes two entry points:
 
-- **$80–$C0**: legitimate BASIC V2 tokens (SYS, `*`, `=`, FOR, etc.). These can appear in the magazine-style BASIC starter line of the source (e.g. `100 SYS9*4096`) and must be detokenized.
-- **$C1–$DA**: shifted-PETSCII uppercase letters `A`..`Z` (these are typed uppercase letters in the C64 source). They collide with the BASIC tokens `LEFT$` ($C8), `RIGHT$` ($C9), `MID$` ($CA), `GO` ($CB). In `topass=False` (Hypra-Ass) mode the decoder treats this range as PETSCII text, not tokens — otherwise `HYPRA-ASS` would decode as `LEFT$YPRA-ASS`.
+- `decode_prg_bytes(data)` — operates on raw Hypra-Ass `.prg` bytes. Mnemonic tokens are $81–$B8, directives are `'.' + token`. Outputs the `NNN -LABEL  OPC OPERAND  ;COMMENT` listing format used by BLOCK / SWAP / similar magazine listings.
+- `decode_bytes(data, topass=False/True)` — operates on the byte stream produced by `petcat2prg` from a petcat-detokenized `.txt` source. Mnemonics are NOT tokenized here (they're plain ASCII in the `.txt`), so the decoder reads them as text. Two byte ranges share the same numeric values but have different meanings:
+  - **$80–$C0**: legitimate BASIC V2 tokens (SYS, `*`, `=`, FOR, etc.). These can appear in the magazine-style BASIC starter line of the source (e.g. `100 SYS9*4096`) and must be detokenized.
+  - **$C1–$DA**: shifted-PETSCII uppercase letters `A`..`Z` (these are typed uppercase letters in the C64 source). They collide with the BASIC tokens `LEFT$` ($C8), `RIGHT$` ($C9), `MID$` ($CA), `GO` ($CB). In `topass=False` mode the decoder treats this range as PETSCII text, not tokens — otherwise `HYPRA-ASS` would decode as `LEFT$YPRA-ASS`.
 
-If you touch this decoder, keep this split in mind: any Hypra-Ass listing with uppercase letters will hit $C1–$DA. Top-Ass mode uses a different mnemonic table ($81–$B8) and a `.` + token disambiguator for directives, so the rule does not apply there.
+If you touch this decoder, keep both byte streams in mind: a raw `.prg` has tokenized mnemonics; a petcat-detokenized `.txt` does not. Top-Ass mode uses the same mnemonic table ($81–$B8) and a `.` + token disambiguator for directives, so the shifted-PETSCII rule does not apply there.

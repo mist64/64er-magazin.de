@@ -126,7 +126,41 @@
         <p>Auf Tastendruck gelangen Sie in den zweiten, den kritischen Teil des Programmes. Hier werden wir nun einen Fehler der BLTUC-Routine finden. Wir verschieben in diesem Teil den Inhalt des Speicherbereiches 1025 bis 1063 um eine Position abwärts, also in den Bereich 1024 bis 1062. Woran liegt es, daß hier plötzlich eine Fehlfunktion auftritt? Sehen wir uns dazu die BLTUC-Routine etwas genauer an. Als Programm BLTUC (Listing 2) finden Sie nachstehend ein Disassemblerlisting der BLTUC-Routine wie sie im C 64-Speicher ab $A3BF zu finden ist.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>., a3bf 38       sec
+., a3c0 a5 5a    lda $5a
+., a3c2 e5 5f    sbc $5f
+., a3c4 85 22    sta $22
+., a3c6 a8       tay
+., a3c7 a5 5b    lda $5b
+., a3c9 e5 60    sbc $60
+., a3cb aa       tax
+., a3cc e8       inx
+., a3cd 98       tya
+., a3ce f0 23    beq $a3f3
+., a3d0 a5 5a    lda $5a
+., a3d2 38       sec
+., a3d3 e5 22    sbc $22
+., a3d5 85 5a    sta $5a
+., a3d7 b0 03    bcs $a3dc
+., a3d9 c6 5b    dec $5b
+., a3db 38       sec
+., a3dc a5 58    lda $58
+., a3de e5 22    sbc $22
+., a3e0 85 58    sta $58
+., a3e2 b0 08    bcs $a3ec
+., a3e4 c6 59    dec $59
+., a3e6 90 04    bcc $a3ec
+., a3e8 b1 5a    lda ($5a),y
+., a3ea 91 58    sta ($58),y
+., a3ec 88       dey
+., a3ed d0 f9    bne $a3e8
+., a3ef b1 5a    lda ($5a),y
+., a3f1 91 58    sta ($58),y
+., a3f3 c6 5b    dec $5b
+., a3f5 c6 59    dec $59
+., a3f7 ca       dex
+., a3f8 d0 f2    bne $a3ec
+., a3fa 60       rts</pre>
             <figcaption>Listing 2. »BLTUC« — So steht die Block-Verschieberoutine im C 64-Betriebssystem</figcaption>
         </figure>
 
@@ -203,98 +237,7 @@
             <figcaption>Bild 5. Das Flußdiagramm des Programmes »BLOCK«</figcaption>
         </figure>
 
-        <figure><pre>
-10  -;
-20  -;
-30  -.BASE $1300              ;IN HYPRA-ASS: .BA $C000
-40  -;****************************************
-50  -; BLOCKVERSCHIEBEROUTINE OHNE FEHLER
-60  -;****************************************
-70  -.DEFINE MVELEN   = $FA   ;IN HYPRA-ASS WIRD STATT DER
-80  -.DEFINE MVDEST   = $FC   ; .DEFINE BEFEHLE JEWEILS DER BEFEHL
-90  -.DEFINE MVSRCE   = $FE   ; .EQ = $... VERWENDET
-100 -;
-110 -;IN MVELEN WIRD DIE LAENGE DER ZU VERSCHIEBENDEN BEREICHES ANGEGEBEN
-120 -;IN MVDEST DIE STARTADRESSE DES ZIELBEREICHES UND IN
-130 -;MVSRCE DIE STARTADRESSE DES QUELLBEREICHES.
-140 -;
-150 -;------ PROGRAMM ---------------------------------------------
-160 -;ALS ERSTES WIRD BESTIMMT, OB DER ZIELBEREICH OBERHALB DES
-170 -; QUELLBEREICHES LIEGT UND OB SICH DIE BEIDEN BEREICHE UEBER-
-180 -; LAPPEN. EINE UEBERLAPPUNG LIEGT DANN VOR, WENN DIE DIFFERENZ
-190 -; VON ZIELADRESSE MINUS QUELLADRESSE KLEINER ALS DIE ANZAHL DER
-200 -; ZU VERSCHIEBENDEN BYTES IST.
-210 -;
-220 -START     LDA MVDEST     ;BERECHNUNG ZIEL MINUS QUELLE
-230 -          SEC
-240 -          SBC MVSRCE
-250 -          TAX
-260 -          LDA MVDEST+1
-270 -          SBC MVSRCE+1
-280 -          TAY
-290 -          TXA            ;VERGLEICH MIT LAENGE DES VERSCHIEBEBEREICHES
-300 -          CMP MVELEN
-310 -          TYA
-320 -          SBC MVELEN+1
-330 -          BCS DOLEFT     ;VERZWEIGEN, WENN KEINE UEBERLAPPUNG
-340 -          JSR MVERHT     ;SONST ZUM UP FUER UEBERLAPPUNG
-350 -          JMP EXIT
-360 -DOLEFT    JSR MVELFT     ;ZUM UP OHNE UEBERLAPPUNG
-370 -EXIT      RTS
-380 -;
-390 -;**** UP ZUM VERSCHIEBEN OHNE UEBERLAPPUNG: MVELFT ****
-400 -;
-410 -MVELFT    LDY #0         ;INDEX AUF NULL
-420 -          LDX MVELEN+1   ;ANZAHL PAGES IN X
-430 -          BEQ MLPART     ;FALLS KEINE GANZEN PAGES DANN REST
-440 -MLPAGE    LDA (MVSRCE),Y ;EIN BYTE VERSCHIEBEN
-450 -          STA (MVDEST),Y
-460 -          INY            ;NAECHSTES BYTE
-470 -          BNE MLPAGE     ;BIS 256 BYTES VERSCHOBEN SIND
-480 -          INC MVSRCE+1   ;NAECHSTE PAGE DER QUELLE
-490 -          INC MVDEST+1   ; UND DES ZIELBEREICHES
-500 -          DEX            ;PAGEZAEHLER HERUNTERZAEHLEN
-510 -          BNE MLPAGE     ;WEITERMACHEN BIS ALLE VOLLEN PAGES FERTIG
-520 -MLPART    LDX MVELEN     ;LAENGE DES RESTBEREICHES IN X
-530 -          BEQ MLEXIT     ;ZURUECK, WENN REST GLEICH NULL
-540 -MLLAST    LDA (MVSRCE),Y ;EIN BYTE VERSCHIEBEN
-550 -          STA (MVDEST),Y
-560 -          INY            ;NAECHSTES BYTE
-570 -          DEX            ;ZAEHLER HERUNTERZAEHLEN
-580 -          BNE MLLAST     ;WEITER BIS REST DURCHGEARBEITET IST
-590 -MLEXIT    RTS            ;ZURUECK ZUM HAUPTPROGRAMM
-600 -;
-610 -;**** UP ZUM VERSCHIEBEN MIT UEBERLAPPUNG : MVERHT ****
-620 -;
-630 -MVERHT    LDA MVELEN+1   ;ZEIGER AUF LETZTE QUELLPAGE RICHTEN
-640 -          CLC
-650 -          ADC MVSRCE+1
-660 -          STA MVSRCE+1   ;FUER DAS MSB DER MAX. QUELLADRESSE
-670 -          LDA MVELEN+1   ;ZEIGER AUF LETZTE ZIELPAGE RICHTEN
-680 -          CLC
-690 -          ADC MVDEST+1
-700 -          STA MVDEST+1   ;FUER DAS MSB DER MAX. ZIELADRESSE
-710 -          LDY MVELEN     ;LAENGE DES RESTES
-720 -          BEQ MRPAGE     ;WENN NULL, DANN NUR GANZE PAGES
-730 -MR0       DEY            ;ZAEHLER MINUS EINS
-740 -          LDA (MVSRCE),Y ;EIN BYTE VERSCHIEBEN
-750 -          STA (MVDEST),Y
-760 -          CPY #0         ;REST SCHON FERTIG ?
-770 -          BNE MR0        ;WEITER BIS DER GANZE REST VERSCHOBEN IST
-780 -MRPAGE    LDX MVELEN+1   ;ANZAHL PAGES ALS ZAEHLER NACH X
-790 -          BEQ MREXIT     ;WENN KEINE GANZEN PAGES DANN ENDE
-800 -MR1       DEC MVSRCE+1   ;MSB QUELLADRESSE HERUNTERZAEHLEN
-810 -          DEC MVDEST+1   ;EBENSO DAS MSB DER ZIELADRESSE
-820 -MR2       DEY            ;INDEX Y HERUNTERZAEHLEN
-830 -          LDA (MVSRCE),Y ;EIN BYTE VERSCHIEBEN
-840 -          STA (MVDEST),Y
-850 -          CPY #0         ;ZAEHLER SCHON NULL ?
-860 -          BNE MR2        ;WEITER BIS GANZE PAGE VERSCHOBEN IST
-870 -          DEX            ;PAGEZAEHLER HERUNTERZAEHLEN
-880 -          BNE MR1        ;WEITER BIS ALLE PAGES VERSCHOBEN SIND
-890 -MREXIT    RTS            ;ZURUECK ZUM HAUPTPROGRAMM
-900 -;
-</pre><figcaption>Listing 3. »BLOCK« - Programm zum fehlerfreien Verschieben von Speicherinhalten</figcaption></figure>
+        <figure><pre data-filename="block" data-name="BLOCK (Quelltext)" data-assembler="hypra-ass"></pre><figcaption>Listing 3. »BLOCK« - Programm zum fehlerfreien Verschieben von Speicherinhalten</figcaption></figure>
         <div class="binary_download" data-filename="block.prg" data-name="BLOCK"></div>
         <div class="binary_download" data-filename="block qu hypra.prg" data-name="BLOCK (Hypra-Ass/Top-Ass-Quelltext)"></div>
         <div class="binary_download" data-filename="block 1300_c 128.prg" data-name="BLOCK ($1300, C 128)"></div>
@@ -340,92 +283,7 @@
 
         <p>Damit hätten wir es dann. Hier finden Sie nun noch das Programm SWAP (Listing 5) abgedruckt.</p>
 
-        <figure><pre>
-10  -;
-20  -;
-30  -.BASE $1300              ;IN HYPRA-ASS: .BA $C000
-40  -;********************************************
-50  -; VERTAUSCHEN ZWEIER SPEICHERBEREICHE (SWAP)
-60  -;********************************************
-70  -.DEFINE MVELEN   = $FA   ;IN HYPRA-ASS WIRD STATT DER
-80  -.DEFINE MVDEST   = $FC   ; .DEFINE BEFEHLE JEWEILS DER BEFEHL
-90  -.DEFINE MVSRCE   = $FE   ; .EQ = $... VERWENDET
-100 -.DEFINE PRINT    = $FFD2 ;BILDSCHIRMAUSGABE
-110 -;
-120 -;IN MVELEN WIRD DIE LAENGE DER ZU VERTAUSCHENDEN BEREICHE ANGEGEBEN
-130 -;IN MVDEST DIE STARTADRESSE DES 1. BEREICHES UND IN
-140 -;MVSRCE DIE STARTADRESSE DES 2. BEREICHES.
-150 -;
-160 -;------ PROGRAMM ---------------------------------------------
-170 -;ALS ERSTES WIRD BESTIMMT, OB DER ZIELBEREICH OBERHALB DES
-180 -; QUELLBEREICHES LIEGT UND OB SICH DIE BEIDEN BEREICHE UEBER-
-190 -; LAPPEN. EINE UEBERLAPPUNG LIEGT DANN VOR, WENN DIE DIFFERENZ
-200 -; VON ZIELADRESSE MINUS QUELLADRESSE KLEINER ALS DIE ANZAHL DER
-210 -; ZU VERSCHIEBENDEN BYTES IST.
-220 -;
-230 -START     LDA MVDEST     ;BERECHNUNG ZIEL MINUS QUELLE
-240 -          SEC
-250 -          SBC MVSRCE
-260 -          TAX
-270 -          LDA MVDEST+1
-280 -          SBC MVSRCE+1
-290 -          TAY
-300 -          TXA            ;VERGLEICH MIT LAENGE DES VERSCHIEBEBEREICHES
-310 -          CMP MVELEN
-320 -          TYA
-330 -          SBC MVELEN+1
-340 -          BCS DOLEFT     ;VERZWEIGEN, WENN KEINE UEBERLAPPUNG
-350 -          JSR MELDEN     ;SONST AUSGABE EINER FEHLERMELDUNG
-360 -          JMP EXIT
-370 -DOLEFT    JSR MVELFT     ;ZUM UP OHNE UEBERLAPPUNG
-380 -EXIT      RTS
-390 -;
-400 -;**** UP ZUM VERSCHIEBEN OHNE UEBERLAPPUNG: MVELFT ****
-410 -;
-420 -MVELFT    LDY #0         ;INDEX AUF NULL
-430 -          LDX MVELEN+1   ;ANZAHL PAGES IN X
-440 -          BEQ MLPART     ;FALLS KEINE GANZEN PAGES DANN REST
-450 -MLPAGE    LDA (MVSRCE),Y ;EIN BYTE LESEN
-460 -          PHA            ;SICHERN DES BYTE
-470 -          LDA (MVDEST),Y ;BYTE AUS ANDEREM BEREICH LESEN
-480 -          STA (MVSRCE),Y ;UND UMTRAGEN
-490 -          PLA            ;BYTE WIEDER ZURUECKHOLEN
-500 -          STA (MVDEST),Y ;UND UMTRAGEN
-510 -          INY            ;NAECHSTES BYTE
-520 -          BNE MLPAGE     ;BIS 256 BYTES VERSCHOBEN SIND
-530 -          INC MVSRCE+1   ;NAECHSTE PAGE DER QUELLE
-540 -          INC MVDEST+1   ; UND DES ZIELBEREICHES
-550 -          DEX            ;PAGEZAEHLER HERUNTERZAEHLEN
-560 -          BNE MLPAGE     ;WEITERMACHEN BIS ALLE VOLLEN PAGES FERTIG
-570 -MLPART    LDX MVELEN     ;LAENGE DES RESTBEREICHES IN X
-580 -          BEQ MLEXIT     ;ZURUECK, WENN REST GLEICH NULL
-590 -MLLAST    LDA (MVSRCE),Y ;EIN BYTE LESEN
-600 -          PHA            ;SICHERN DES BYTE
-610 -          LDA (MVDEST),Y ;BYTE AUS ANDEREM BEREICH LESEN
-620 -          STA (MVSRCE),Y ;UND UMTRAGEN
-630 -          PLA            ;BYTE WIEDER ZURUECKHOLEN
-640 -          STA (MVDEST),Y ;UND UMTRAGEN
-650 -          INY            ;NAECHSTES BYTE
-660 -          DEX            ;ZAEHLER HERUNTERZAEHLEN
-670 -          BNE MLLAST     ;WEITER BIS REST DURCHGEARBEITET IST
-680 -MLEXIT    RTS            ;ZURUECK ZUM HAUPTPROGRAMM
-690 -;
-700 -;**** UP ZUR AUSGABE EINER FEHLERMELDUNG: MELDEN ****
-710 -;
-720 -MELDEN    LDY #0         ;INDEX AUF NULL
-730 -WEITER    LDA TEXT,Y     ;TEXTZEICHEN LADEN
-740 -          BEQ ENDE       ;WENN NULLBYTE, DANN ZURUECK ZUM HAUPTPROGRAMM
-750 -          JSR PRINT      ;SONST AUF BILDSCHIRM AUSGEBEN
-760 -          INY            ;INDEX ERHOEHEN
-770 -          JMP WEITER     ;NAECHSTES ZEICHEN AUSGEBEN
-780 -ENDE      RTS            ;ZURUECK ZUM HAUPTPROGRAMM
-790 -;
-800 -TEXT      .BYTE 13       ;HYPRA-ASS:  .BY 13
-810 -          .BYTE "UEBERSCHNEIDUNG !";HYPRA-ASS: .TX "UEBERSCHNEIDUNG !"
-820 -          .BYTE 13,0     ;HYPRA-ASS: .BY 13,0
-830 -;
-850 -;
-</pre><figcaption>Listing 5. »SWAP« — SWAP tauscht Speicherinhalte gegeneinander aus</figcaption></figure>
+        <figure><pre data-filename="swap" data-name="SWAP (Quelltext)" data-assembler="hypra-ass"></pre><figcaption>Listing 5. »SWAP« — SWAP tauscht Speicherinhalte gegeneinander aus</figcaption></figure>
         <div class="binary_download" data-filename="swap.prg" data-name="SWAP"></div>
         <div class="binary_download" data-filename="swap qu hypra.prg" data-name="SWAP (Hypra-Ass/Top-Ass-Quelltext)"></div>
         <div class="binary_download" data-filename="swap 1300_c 128.prg" data-name="SWAP ($1300, C 128)"></div>
