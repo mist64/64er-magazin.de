@@ -20,6 +20,24 @@
 
         <p>Die bisherigen Beispiele für Prozeduren enthielten jeweils keine oder nur eine einzige Variable, das heißt: entweder gar keinen Durchgang oder einen Eingang oder einen Ausgang oder einen Ein-/Ausgang für Information. Die Anzahl der Durchlässe ist jedoch prinzipiell nicht beschränkt. Im Prinzip können so viele Variablen benutzt werden, wie der Programmierer wünscht. Und jede Variable kann einem anderen Typ angehören: IN oder OUT oder IN/OUT. Auf diese Weise entstehen neben den grundlegenden Prozedurtypen alle möglichen Mischtypen. Ein Beispiel für einen solchen Mischtyp sehen Sie in Bild 1.</p>
 
+        <figure>
+            <pre>Gemischter Prozedurtyp: INPUT'MIT'VORGABE
+Anfang Block
+    Länge Aufforderung + Vorgabe bestimmen
+    Länge überprüfen, eventuell Vorgabe streichen
+    Solange bis Eingabe ok
+        Vorgabe drucken
+        Länge überprüfen auf benötigte Anzahl Zeilen
+        Benötigte Anzahl Cursor hoch drucken
+        Aufforderung zur Eingabe drucken
+        Auf Eingabe warten
+        Eingabe überprüfen
+        Falls nicht ok zurück zum Schleifenanfang
+    Ende Schleife
+Ende Block</pre>
+            <figcaption>Bild 1: »Input« mit Eingabeaufforderung und Vorgabe</figcaption>
+        </figure>
+
         <h2>Prozeduren mit mehrfacher Kommunikation</h2>
 
         <p>Die Prozedur INPUT’MIT’VORGABE soll zur Eingabe auffordern können (zum Beispiel »Wollen Sie weitermachen?«), soll eine Antwortmöglichkeit vorgeben können (die, die am ehesten zu erwarten ist, zum Beispiel »Ja«) und so lange um Antwort bitten, bis tatsächlich eine Eingabe gemacht worden ist.</p>
@@ -64,6 +82,15 @@
 
         <p>Wir haben, Comal imitierend, für Basic-Prozeduren folgende Befehlsstruktur vorgeschlagen (Bild 2):</p>
 
+        <figure>
+            <pre>REM PROC Prozedurname (Variablen)
+...
+...
+...
+RETURN</pre>
+            <figcaption>Bild 2: Comal-artige Befehlsstruktur für Basic-»Prozeduren«</figcaption>
+        </figure>
+
         <p>Bei Variablen geben wir die Richtung, in die die Information geht, mit IN, OUT oder IN/OUT an. Sie beginnen immer mit U (für »Unterprogramm«). Außerhalb von Prozeduren werden Variablen mit U nicht verwendet.</p>
 
         <p>Aufgerufen werden Prozeduren mit<br>
@@ -72,6 +99,45 @@
         <p>Wenn Informationen mitgegeben werden sollen, so werden sie den Prozedurvariablen unmittelbar vor dem GOSUB-Aufruf zugewiesen; wenn Informationen abgeholt werden sollen, werden diese den im Programm gültigen Variablen unmittelbar danach zugeordnet. Der Aufruf nimmt möglichst nur eine Zeile in Anspruch. Wo nötig, kann jedoch auch eine Sequenz aus mehreren Zeilen benutzt werden.</p>
 
         <p>Vier grundlegende Prozedurtypen haben wir besprochen (Bild 3).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th rowspan="2">Kommunikationstyp</th>
+                    <th colspan="2">Prozedurtypen</th>
+                </tr>
+                <tr>
+                    <th>Definition</th>
+                    <th>Aufruf</th>
+                </tr>
+                <tr>
+                    <td>1 keine Kommunikation</td>
+                    <td></td>
+                    <td>GOSUB ZEILE</td>
+                </tr>
+                <tr>
+                    <td>2 Einwegkommunikation 1</td>
+                    <td>UV: IN</td>
+                    <td>UV=V:GOSUB ZEILE</td>
+                </tr>
+                <tr>
+                    <td>3 Einwegkommunikation 2</td>
+                    <td>UV: OUT</td>
+                    <td>GOSUB ZEILE:V=UV</td>
+                </tr>
+                <tr>
+                    <td>4 Zweiwegkommunikation</td>
+                    <td>UV: IN/OUT</td>
+                    <td>UV=V:GOSUB ZEILE:V=UV</td>
+                </tr>
+                <tr>
+                    <td colspan="3">Abkürzungen:<br>
+                        V = Variable (die außerhalb der Prozedur gilt),<br>
+                        UV = Unterprogrammvariable</td>
+                </tr>
+            </table>
+            <figcaption>Bild 3: Vier grundlegende Prozedurtypen — so ruft man sie auf</figcaption>
+        </figure>
 
         <h2>Funktionen in Basic</h2>
 
@@ -247,9 +313,53 @@
 
         <p>Wir haben für Basic-Funktionen folgende Befehlsstruktur vorgeschlagen, wieder in Anlehnung an Comal (Bild 4).</p>
 
+        <figure>
+            <pre>REM FUNC Funktionsname (Variable)
+    DEF FN Funktionsname (Variable)
+    DEF FN...
+    ...
+    ...
+REM ENDFUNC</pre>
+            <figcaption>Bild 4: Eine Comal-analoge Befehlsstruktur für Funktionen in Basic</figcaption>
+        </figure>
+
         <p>Alle Variablen sind vom IN-Typ und werden entsprechend gekennzeichnet. Für Funktionen ohne Kommunikation benutzen wir X als Definitionsvariable und 0 als Klammerinhalt beim Aufruf. Bei Mehrfachkommunikation werden alle benötigten Informationen von Hand mitgegeben. Die dafür verwendeten Variablen beginnen wieder mit U, um sie lokal zu halten.</p>
 
         <p>Drei Funktionstypen haben wir besprochen (Bild 5).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th rowspan="2">Kommunikationstyp</th>
+                    <th colspan="2">Funktionstypen</th>
+                </tr>
+                <tr>
+                    <th>Definition</th>
+                    <th>Aufruf z.B.</th>
+                </tr>
+                <tr>
+                    <td>1 keine Kommunikation</td>
+                    <td>DEF FN Name (X)</td>
+                    <td>Z=FN Name (0)</td>
+                </tr>
+                <tr>
+                    <td>2 Einwegkommunikation</td>
+                    <td>DEF FN Name (LV)</td>
+                    <td>Z=FN Name (V)</td>
+                </tr>
+                <tr>
+                    <td>3 Mehrfachkommunikation</td>
+                    <td>DEF FN Name (X)</td>
+                    <td>U1=Wert:U2=Wert :Z=FN Name (0)</td>
+                </tr>
+                <tr>
+                    <td colspan="3">Abkürzungen:<br>
+                        V = Variable, LV = Lokal gültige Variable<br>
+                        U1,U2 = Unterprogrammvariablen</td>
+                </tr>
+            </table>
+            <figcaption>Bild 5: Die drei Arten der Parameterübergabe in Funktionen</figcaption>
+        </figure>
 
         <p>Weitere Informationen über Basic-Funktionen finden Sie in dem Aufsatz »Funktionen für Anfänger« im 64er, Ausgabe 5/85.</p>
 
