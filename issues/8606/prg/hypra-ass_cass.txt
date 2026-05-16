@@ -1,84 +1,81 @@
-
-
 ;hypra-ass_cass.prg ==0801==
-  100 ;left$ypra-ass/lenass.
-  110 ;
-  120 ;
-  130 ;1. atnendern des err$prungvektors
-  140 ;
-  150  .ba$15d3
-  160  jmp$1194
-  170 ;
-  180 ;2. peekefehl .ob loeschen
-  190 ;
-  200  .ba$14a6
-  210  .by0,0
-  220 ;
-  230 ;3. err$atnresumeval routine fuer goassetten
-  240 ;
-  250  .ba$1194;err$tart
-  260 ;
-  270  .eqchrout=$ffd2
-  280  .eqsetlfs=$ffba
-  290  .eqsetnam=$ffbd
-  300  .eqsave=$ffd8
-  310  .eqnamlen=6
-  320 ;
-  330  lda#$0d;'lenhex$'
-  340  jsrchrout
-  350  lda#1;str$atei($ce52)
-  360  tax;chr$atn
-  370  tay;err$atn
-  380  jsrsetlfs
-  390  lda#namlen
-  400  ldx#<(name)
-  410  ldy#>(name)
-  420  jsrsetnam
-  430  lda$0970;atnnf.atndr
-  440  sta$9e
-  450  lda$0971
-  460  sta$9f
-  470  ldx$fb;valnd.atndr
-  480  ldy$fc
-  490  lda#$9e
-  500  jsrsave
-  510  rts
-  520 name .tx"liste$"
-  530 ;
-  540 ;4. atnbspeichern des modifizierten
-  550 ;   atnssemblers unter dem ($ce41)men
-  560 ;   'hypra-ass/cass.'
-  570 ;
-  580  .ba$c000
-  590  .eqlgtit=15
-  600  .eqende=$1fd8
-  610 ;
-  620  lda#1
-  630  tax
-  640  tay
-  650  jsrsetlfs
-  660  lda#lgtit
-  670  ldx#<(titel)
-  680  ldy#>(titel)
-  690  jsrsetnam
-  700  lda#0
-  710  sta$a8
-  720  lda#8
-  730  sta$a9
-  740  lda#$a8
-  750  ldx#<(ende)
-  760  ldy#>(ende)
-  770  jsrsave
-  780  rts
-  790 titel .tx"hypra-ass/cass."
-  800 ;
-  810 ;nach durchgefuehrter
-  820 ;atnssemblierung und dem valrscheinen
-  830 ;der rclreldung
-  840 ;'press record & play on tape'
-  850 ;druecken err$ie die 'err$instrjoyrdot'-instraste.
-  860 ;
-  870 ;err$ie koennen dann mit 'err$trofferr$ 49152'
-  880 ;den korrigierten atnssembler auf
-  890 ;goassette abspeichern
-
+100 ;HYPRA-ASS/CASS.
+110 ;
+120 ;
+130 ;1. AENDERN DES SPRUNGVEKTORS
+140 ;
+150  .BA$15D3
+160  JMP$1194
+170 ;
+180 ;2. BEFEHL .OB LOESCHEN
+190 ;
+200  .BA$14A6
+210  .BY0,0
+220 ;
+230 ;3. SAVE ROUTINE FUER KASSETTEN
+240 ;
+250  .BA$1194;START
+260 ;
+270  .EQCHROUT=$FFD2
+280  .EQSETLFS=$FFBA
+290  .EQSETNAM=$FFBD
+300  .EQSAVE=$FFD8
+310  .EQNAMLEN=6
+320 ;
+330  LDA#$0D;'CR'
+340  JSRCHROUT
+350  LDA#1;DATEINR
+360  TAX;GA
+370  TAY;SA
+380  JSRSETLFS
+390  LDA#NAMLEN
+400  LDX#<(NAME)
+410  LDY#>(NAME)
+420  JSRSETNAM
+430  LDA$0970;ANF.ADR
+440  STA$9E
+450  LDA$0971
+460  STA$9F
+470  LDX$FB;END.ADR
+480  LDY$FC
+490  LDA#$9E
+500  JSRSAVE
+510  RTS
+520 NAME .TX"LISTE$"
+530 ;
+540 ;4. ABSPEICHERN DES MODIFIZIERTEN
+550 ;   ASSEMBLERS UNTER DEM NAMEN
+560 ;   'HYPRA-ASS/CASS.'
+570 ;
+580  .BA$C000
+590  .EQLGTIT=15
+600  .EQENDE=$1FD8
+610 ;
+620  LDA#1
+630  TAX
+640  TAY
+650  JSRSETLFS
+660  LDA#LGTIT
+670  LDX#<(TITEL)
+680  LDY#>(TITEL)
+690  JSRSETNAM
+700  LDA#0
+710  STA$A8
+720  LDA#8
+730  STA$A9
+740  LDA#$A8
+750  LDX#<(ENDE)
+760  LDY#>(ENDE)
+770  JSRSAVE
+780  RTS
+790 TITEL .TX"HYPRA-ASS/CASS."
+800 ;
+810 ;NACH DURCHGEFUEHRTER
+820 ;ASSEMBLIERUNG UND DEM ERSCHEINEN
+830 ;DER MELDUNG
+840 ;'PRESS RECORD & PLAY ON TAPE'
+850 ;DRUECKEN SIE DIE 'STOP'-TASTE.
+860 ;
+870 ;SIE KOENNEN DANN MIT 'SYS 49152'
+880 ;DEN KORRIGIERTEN ASSEMBLER AUF
+890 ;KASSETTE ABSPEICHERN
