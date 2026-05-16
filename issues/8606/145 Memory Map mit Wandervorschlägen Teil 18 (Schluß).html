@@ -190,8 +190,6 @@
 
         <address class="author">(Dr. H. Hauck/ah)</address>
 
-        <p>TODO ASIDE</p>
-
         <h2>Texteinschub #1<br>Dem Computer ins Wort fallen</h2>
 
         <p>Jedesmal, wenn ein Computer eingeschaltet wird, würden seine vielen Schaltkreise und Speicherzellen irgendwelche ungeordneten Zahlen enthalten, wenn nicht ein bestimmter Schaltkreis ein RESET-Signal erzeugte. Dieses spezielle Signal geht an alle wichtigen Teile des Computers, nämlich an den Mikroprozessor und an die Bausteine für Ein- und Ausgabe.</p>
@@ -246,185 +244,183 @@
 
         <p>Schließlich sei noch hervorgehoben, daß der Sprung in die Interrupt-Routinen über die Vektoren die Möglichkeiten eröffnet, diese Routinen nach eigenem Geschmack abzuändern beziehungsweise durch eigene Routinen zu ersetzen.</p>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Texteinschub #2<br>Reparatur eines LOAD ERRORs</h2>
 
-        <h2>Texteinschub #2<br>Reparatur eines LOAD ERRORs</h2>
+            <p>Die Datasette — das Bandgerät von Commodore — ist sicher eines der sichersten und zuverlässigsten seiner Art.</p>
 
-        <p>Die Datasette — das Bandgerät von Commodore — ist sicher eines der sichersten und zuverlässigsten seiner Art.</p>
+            <p>Und doch weigert sie sich gelegentlich, ein Programm vom Band in den Computer zu laden. Alles, was der Computerfreund erhält, ist die Fehlermeldung LOAD ERROR auf dem Bildschirm.</p>
 
-        <p>Und doch weigert sie sich gelegentlich, ein Programm vom Band in den Computer zu laden. Alles, was der Computerfreund erhält, ist die Fehlermeldung LOAD ERROR auf dem Bildschirm.</p>
+            <p>Natürlich: die nächstliegende Maßnahme ist, den LOAD-Vorgang zu wiederholen. Bringt auch das keinen Erfolg, muß die Flinte noch lange nicht ins Korn geworfen werden. Eine kleine Diagnose und die Kenntnis des Tape Headers im Kassettenspeicher (Speicherzelle 828 bis 1023) kann in den meisten Fällen weiterhelfen.</p>
 
-        <p>Natürlich: die nächstliegende Maßnahme ist, den LOAD-Vorgang zu wiederholen. Bringt auch das keinen Erfolg, muß die Flinte noch lange nicht ins Korn geworfen werden. Eine kleine Diagnose und die Kenntnis des Tape Headers im Kassettenspeicher (Speicherzelle 828 bis 1023) kann in den meisten Fällen weiterhelfen.</p>
+            <h3>Die 1. Diagnose:</h3>
 
-        <h3>Die 1. Diagnose:</h3>
+            <p>Wenn ein Programm auf Band geSAVEt wird, tut das der C 64 und VC 20 zur Sicherheit gleich zweimal, mit zwei völlig identischen Blöcken. Beim Laden des Programms wird der erste Block in den Arbeitsspeicher des Computers geladen.</p>
 
-        <p>Wenn ein Programm auf Band geSAVEt wird, tut das der C 64 und VC 20 zur Sicherheit gleich zweimal, mit zwei völlig identischen Blöcken. Beim Laden des Programms wird der erste Block in den Arbeitsspeicher des Computers geladen.</p>
+            <p>Anschließend wird Byte für Byte der zweite Block vom Band mit dem ersten Block im Speicher verglichen. Übersteigt die Anzahl der dabei gefundenen Fehler ein bestimmtes Maß, dann bricht der Computer mit LOAD ERROR ab.</p>
 
-        <p>Anschließend wird Byte für Byte der zweite Block vom Band mit dem ersten Block im Speicher verglichen. Übersteigt die Anzahl der dabei gefundenen Fehler ein bestimmtes Maß, dann bricht der Computer mit LOAD ERROR ab.</p>
+            <p>!! Der erste Programmblock steht aber immer noch im Arbeitsspeicher !!</p>
 
-        <p>!! Der erste Programmblock steht aber immer noch im Arbeitsspeicher !!</p>
+            <p>Um zu sehen, ob er in Ordnung oder halbwegs brauchbar ist, machen Sie bitte nach der Fehlermeldung gar nichts — kein RUN, kein RESTORE — und LISTen Sie lediglich das Programm. Besteht es nur aus verfälschten Zeilen und Symbolen, dann ist nicht mehr viel zu retten.</p>
 
-        <p>Um zu sehen, ob er in Ordnung oder halbwegs brauchbar ist, machen Sie bitte nach der Fehlermeldung gar nichts — kein RUN, kein RESTORE — und LISTen Sie lediglich das Programm. Besteht es nur aus verfälschten Zeilen und Symbolen, dann ist nicht mehr viel zu retten.</p>
+            <p>Ist es aber fast oder völlig intakt, können wir es retten. Doch auch jetzt ist noch Vorsicht geboten. Lassen Sie das Programm in Ruhe und heben Sie sich die Korrekturen etwaiger Fehler für später auf.</p>
 
-        <p>Ist es aber fast oder völlig intakt, können wir es retten. Doch auch jetzt ist noch Vorsicht geboten. Lassen Sie das Programm in Ruhe und heben Sie sich die Korrekturen etwaiger Fehler für später auf.</p>
+            <h3>Die 2. Diagnose:</h3>
 
-        <h3>Die 2. Diagnose:</h3>
+            <p>Sie betrifft den Tape Header. Vor dem Laden des ersten Programmblocks in den Arbeitsspeicher kommt der Tape Header in den Kassettenpuffer (siehe den Texteinschub »Tape Header« in Ausgabe 10/68, Seite 140).</p>
 
-        <p>Sie betrifft den Tape Header. Vor dem Laden des ersten Programmblocks in den Arbeitsspeicher kommt der Tape Header in den Kassettenpuffer (siehe den Texteinschub »Tape Header« in Ausgabe 10/68, Seite 140).</p>
+            <p>In Speicherzelle 828 steht ein Kennzeichen-Byte, in 829/830 in Low/High-Byte-Darstellung die Adresse, ab der das Programm im Arbeitsspeicher steht.</p>
 
-        <p>In Speicherzelle 828 steht ein Kennzeichen-Byte, in 829/830 in Low/High-Byte-Darstellung die Adresse, ab der das Programm im Arbeitsspeicher steht.</p>
+            <p>Für uns ist aber die Adresse wichtig, die in Speicherzelle 831/832 steht. Sie nennt dem Betriebssystem nämlich die Endadresse des Programms im Arbeitsspeicher. Diese Adresse wird nach dem erfolgreichen Abschluß des Ladevorgangs in die Speicherzellen 45/46, 47/48 und 49/50 eingeschrieben.</p>
 
-        <p>Für uns ist aber die Adresse wichtig, die in Speicherzelle 831/832 steht. Sie nennt dem Betriebssystem nämlich die Endadresse des Programms im Arbeitsspeicher. Diese Adresse wird nach dem erfolgreichen Abschluß des Ladevorgangs in die Speicherzellen 45/46, 47/48 und 49/50 eingeschrieben.</p>
+            <p>Ich sagte: »nach dem erfolgreichen Ladevorgang«. Und das gerade ist ja leider nicht eingetreten — deswegen können wir den akzeptablen ersten Programmblock im Arbeitsspeicher nicht RUNen, korrigieren und sonstwie verarzten, nur LISTen.</p>
 
-        <p>Ich sagte: »nach dem erfolgreichen Ladevorgang«. Und das gerade ist ja leider nicht eingetreten — deswegen können wir den akzeptablen ersten Programmblock im Arbeitsspeicher nicht RUNen, korrigieren und sonstwie verarzten, nur LISTen.</p>
+            <h3>Reparatur:</h3>
 
-        <h3>Reparatur:</h3>
+            <p>Da durch den Abbruch die Zeiger in oben genannten drei Speicherzellenpaaren nicht gesetzt worden sind, holen wir das ganz einfach manuell nach mit der folgenden Direkteingabe:<br>
+                POKE 45,PEEK(831): POKE 46,PEEK(832):<br>
+                POKE 47,PEEK(831): POKE 48,PEEK(832):<br>
+                POKE 49,PEEK(831): POKE 50,PEEK(832):</p>
 
-        <p>Da durch den Abbruch die Zeiger in oben genannten drei Speicherzellenpaaren nicht gesetzt worden sind, holen wir das ganz einfach manuell nach mit der folgenden Direkteingabe:<br>
-            POKE 45,PEEK(831): POKE 46,PEEK(832):<br>
-            POKE 47,PEEK(831): POKE 48,PEEK(832):<br>
-            POKE 49,PEEK(831): POKE 50,PEEK(832):</p>
+            <p>Das geht auch etwas eleganter und kürzer:<br>
+                FOR K=45 TO 49 STEP 2: POKE K,PEEK(831): POKE K+1,PEEK(832): NEXT</p>
 
-        <p>Das geht auch etwas eleganter und kürzer:<br>
-            FOR K=45 TO 49 STEP 2: POKE K,PEEK(831): POKE K+1,PEEK(832): NEXT</p>
+            <p>Damit sind die Zeiger richtig gesetzt, und Sie haben Ihr Programm wieder. Erst jetzt dürfen Sie eventuelle Fehler korrigieren.</p>
 
-        <p>Damit sind die Zeiger richtig gesetzt, und Sie haben Ihr Programm wieder. Erst jetzt dürfen Sie eventuelle Fehler korrigieren.</p>
+            <p>Ich habe nicht erwähnt, was die Zeiger in 45/46, 47/48 und 49/50 bedeuten. Aber das steht ja schließlich in der Memory Map.</p>
 
-        <p>Ich habe nicht erwähnt, was die Zeiger in 45/46, 47/48 und 49/50 bedeuten. Aber das steht ja schließlich in der Memory Map.</p>
+            <table class="plain">
+                <tr>
+                    <th>BIT Nr.</th>
+                    <th>WERT</th>
+                    <th>FLAGGE</th>
+                    <th>ABKÜRZUNG</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>Übertrag</td>
+                    <td>C(arry)</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>NULL</td>
+                    <td>Z(ero)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>4</td>
+                    <td>Unterbrechung</td>
+                    <td>I(nterrupt)</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>8</td>
+                    <td>Dezimal</td>
+                    <td>D</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>16</td>
+                    <td>Abbruch</td>
+                    <td>B(reak)</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>32</td>
+                    <td>nicht benutzt</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>64</td>
+                    <td>Überlauf</td>
+                    <td>V</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>128</td>
+                    <td>Vorzeichen</td>
+                    <td>N(egativ)</td>
+                </tr>
+            </table>
 
-        <table>
-            <tr>
-                <th>BIT Nr.</th>
-                <th>WERT</th>
-                <th>FLAGGE</th>
-                <th>ABKÜRZUNG</th>
-            </tr>
-            <tr>
-                <td>0</td>
-                <td>1</td>
-                <td>Übertrag</td>
-                <td>C(arry)</td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2</td>
-                <td>NULL</td>
-                <td>Z(ero)</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>4</td>
-                <td>Unterbrechung</td>
-                <td>I(nterrupt)</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>8</td>
-                <td>Dezimal</td>
-                <td>D</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>16</td>
-                <td>Abbruch</td>
-                <td>B(reak)</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>32</td>
-                <td>nicht benutzt</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>64</td>
-                <td>Überlauf</td>
-                <td>V</td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td>128</td>
-                <td>Vorzeichen</td>
-                <td>N(egativ)</td>
-            </tr>
-        </table>
+            <p>Um eine der Flaggen des Status-Registers zu löschen, empfiehlt es sich, das ganze Register mit POKE 783,0 zu löschen. Umgekehrt muß man beim Setzen der Bits sehr aufpassen wegen der Unterbrechungsflagge I. Eine 1 in I entspricht dem Maschinen-Befehl SEI, der alle Interrupts ausschaltet, auch die der Tastatur-Abfrage, was natürlich sehr störend sein kann! Um alle Flaggen außer der Unterbrechungsflagge I zu setzten, muß POKE 783,247 eingegeben werden.</p>
 
-        <p>Um eine der Flaggen des Status-Registers zu löschen, empfiehlt es sich, das ganze Register mit POKE 783,0 zu löschen. Umgekehrt muß man beim Setzen der Bits sehr aufpassen wegen der Unterbrechungsflagge I. Eine 1 in I entspricht dem Maschinen-Befehl SEI, der alle Interrupts ausschaltet, auch die der Tastatur-Abfrage, was natürlich sehr störend sein kann! Um alle Flaggen außer der Unterbrechungsflagge I zu setzten, muß POKE 783,247 eingegeben werden.</p>
+            <p>So, jetzt wird es Zeit für ein Beispiel, wie vor dem SYS-Befehl Parameter eingegeben werden können. In der Literatur wird immer das Beispiel gewählt, den Cursor auf eine bestimmte Position zu setzen, beziehungsweise seine Position abzufragen. Dazu gibt es eine Routine, die bei beiden Computern ab Speicherzelle 65520 ($FFF0) beginnt.</p>
 
-        <p>So, jetzt wird es Zeit für ein Beispiel, wie vor dem SYS-Befehl Parameter eingegeben werden können. In der Literatur wird immer das Beispiel gewählt, den Cursor auf eine bestimmte Position zu setzen, beziehungsweise seine Position abzufragen. Dazu gibt es eine Routine, die bei beiden Computern ab Speicherzelle 65520 ($FFF0) beginnt.</p>
+            <p>Sie nimmt die Zahl, die im X-Register steht, und verwendet sie als Zeilennummer; die Zahl des Y-Registers nimmt sie als Spaltennummer, setzt dann den Cursor an diese Stelle und bringt die beiden Werte in die Speicherzellen 209/210 und 211.</p>
 
-        <p>Sie nimmt die Zahl, die im X-Register steht, und verwendet sie als Zeilennummer; die Zahl des Y-Registers nimmt sie als Spaltennummer, setzt dann den Cursor an diese Stelle und bringt die beiden Werte in die Speicherzellen 209/210 und 211.</p>
+            <p>Unser Beispiel hat die Aufgabe, den Cursor in die vierte Spalte der siebten Zeile zu setzen, dort das Dollar-Zeichen hinzuschreiben und es rot zu färben.<br>
+                5 PRINT CHR$(147)<br>
+                10 POKE 783,0<br>
+                20 POKE 781,6<br>
+                30 POKE 782,3<br>
+                40 SYS 65520</p>
 
-        <p>Unser Beispiel hat die Aufgabe, den Cursor in die vierte Spalte der siebten Zeile zu setzen, dort das Dollar-Zeichen hinzuschreiben und es rot zu färben.<br>
-            5 PRINT CHR$(147)<br>
-            10 POKE 783,0<br>
-            20 POKE 781,6<br>
-            30 POKE 782,3<br>
-            40 SYS 65520</p>
+            <p>Nach Löschen des Bildschirms werden zuerst alle Flaggen des Statusregisters gelöscht (Zeile 5). Dann kommt die Zeilennummer in das X-Register (Zeile 10) und die Spaltennummer in das Y-Register (Zeile 30). Nach dem Eingeben dieser Parameter können wir mit SYS auf die Routine springen.<br>
+                50 ZEILE=PEEK(209)+256*PEEK(210)<br>
+                60 ADRESSE = ZEILE + PEEK(211)<br>
+                70 POKE ADRESSE,36</p>
 
-        <p>Nach Löschen des Bildschirms werden zuerst alle Flaggen des Statusregisters gelöscht (Zeile 5). Dann kommt die Zeilennummer in das X-Register (Zeile 10) und die Spaltennummer in das Y-Register (Zeile 30). Nach dem Eingeben dieser Parameter können wir mit SYS auf die Routine springen.<br>
-            50 ZEILE=PEEK(209)+256*PEEK(210)<br>
-            60 ADRESSE = ZEILE + PEEK(211)<br>
-            70 POKE ADRESSE,36</p>
+            <p>In Speicherzellen 209/210 können wir jetzt (zur Übung) die Zeilennummer ablesen. Die Adresse der Cursorposition im Bildschirmspeicher erhalten wir durch die Addition der Zeilennummer mit dem Inhalt der Speicherzelle 211. Dorthin POKEn wir den Bildschirmcode des Dollarzeichens, nämlich 36 (Zeile 70).<br>
+                80 SYS 59940<br>
+                90 FARBE=PEEK(243)+256*PEEK(244)<br>
+                100 POKE FARBE+PEEK(211),2</p>
 
-        <p>In Speicherzellen 209/210 können wir jetzt (zur Übung) die Zeilennummer ablesen. Die Adresse der Cursorposition im Bildschirmspeicher erhalten wir durch die Addition der Zeilennummer mit dem Inhalt der Speicherzelle 211. Dorthin POKEn wir den Bildschirmcode des Dollarzeichens, nämlich 36 (Zeile 70).<br>
-            80 SYS 59940<br>
-            90 FARBE=PEEK(243)+256*PEEK(244)<br>
-            100 POKE FARBE+PEEK(211),2</p>
+            <p>Für das Färben des Dollarzeichens verwenden wir eine weitere Routine des Betriebssystems, die ab 59940 — beim VC 20 ab 60082 — beginnt. Sie ermittelt die Zeilenposition des Cursors im Farbspeicher und bringt diesen Wert in die Speicherzellen 243/244, wo wir ihn abfragen können (Zeile 90). Die Adresse der Cursorposition im Farbspeicher setzt sich aus diesem Wert plus der Spaltennummer zusammen, die wir wieder der Speicherzelle 211 entnehmen. Auf diesen Platz POKEn wir den Farbcode 2 für rot (Zeile 100). So leicht ist das, wenn man die Routinen und die Aufgaben der Speicherzellen kennt.</p>
 
-        <p>Für das Färben des Dollarzeichens verwenden wir eine weitere Routine des Betriebssystems, die ab 59940 — beim VC 20 ab 60082 — beginnt. Sie ermittelt die Zeilenposition des Cursors im Farbspeicher und bringt diesen Wert in die Speicherzellen 243/244, wo wir ihn abfragen können (Zeile 90). Die Adresse der Cursorposition im Farbspeicher setzt sich aus diesem Wert plus der Spaltennummer zusammen, die wir wieder der Speicherzelle 211 entnehmen. Auf diesen Platz POKEn wir den Farbcode 2 für rot (Zeile 100). So leicht ist das, wenn man die Routinen und die Aufgaben der Speicherzellen kennt.</p>
+            <h2>Texteinschub #4<br>Das Mauerblümchen USR</h2>
 
-        <p>TODO ASIDE</p>
+            <p>Hand aufs Herz: Haben Sie den USR-Befehl schon einmal benutzt? Ohne Zweifel gehört er zu den Mauerblümchen von Basic, obwohl sein Name — eine Abkürzung von USER (Verwender) — eigentlich genügend Anreiz bieten müßte. Da er ohne die Speicherzellen 784 bis 786 nicht auskommt, ist der heutige Teil des Kurses eine gute Gelegenheit, ihn Ihnen näher zu bringen.</p>
 
-        <h2>Texteinschub #4<br>Das Mauerblümchen USR</h2>
+            <p>USR hat im Grunde genommen dieselbe Funktion wie SYS. Er springt nämlich aus einem Basic-Programm direkt in ein Maschinen-Programm, arbeitet dieses so lange ab, bis er den Befehl RTS findet. RTS entspricht dem Basic-Befehl RETURN und springt in das Basic-Programm zurück.</p>
 
-        <p>Hand aufs Herz: Haben Sie den USR-Befehl schon einmal benutzt? Ohne Zweifel gehört er zu den Mauerblümchen von Basic, obwohl sein Name — eine Abkürzung von USER (Verwender) — eigentlich genügend Anreiz bieten müßte. Da er ohne die Speicherzellen 784 bis 786 nicht auskommt, ist der heutige Teil des Kurses eine gute Gelegenheit, ihn Ihnen näher zu bringen.</p>
+            <p>Bei SYS steht die Sprungadresse gleich hinter dem Befehl.</p>
 
-        <p>USR hat im Grunde genommen dieselbe Funktion wie SYS. Er springt nämlich aus einem Basic-Programm direkt in ein Maschinen-Programm, arbeitet dieses so lange ab, bis er den Befehl RTS findet. RTS entspricht dem Basic-Befehl RETURN und springt in das Basic-Programm zurück.</p>
+            <p>Bei USR muß die Sprungadresse zuerst in die Speicherzellen 785/786 gePOKEt werden (beim VC 20 in 1/2).<br>
+                Beispiel: Sprung auf 56524 ($DCCC)<br>
+                mit SYS:SYS 56524<br>
+                mit USR: POKE 785,204 (204+256*220=56524)<br>
+                POKE 786,220<br>
+                X=USR(Y)</p>
 
-        <p>Bei SYS steht die Sprungadresse gleich hinter dem Befehl.</p>
+            <p>Kein Wunder, daß USR selten verwendet wird — ist er doch durch das POKEn der Sprungadresse in Low/High-Byte Darstellung aufgeblüht.</p>
 
-        <p>Bei USR muß die Sprungadresse zuerst in die Speicherzellen 785/786 gePOKEt werden (beim VC 20 in 1/2).<br>
-            Beispiel: Sprung auf 56524 ($DCCC)<br>
-            mit SYS:SYS 56524<br>
-            mit USR: POKE 785,204 (204+256*220=56524)<br>
-            POKE 786,220<br>
-            X=USR(Y)</p>
+            <p>Das ist aber nicht unnütz, weil USR mehr Fähigkeiten hat als SYS. Im Hinblick auf die im anderen Texteinschub »Der vorbereitete SYS-Befehl« aufgezeigten Möglichkeiten des SYS-Befehls sollte ich besser sagen: USR hat andere Fähigkeiten als SYS.</p>
 
-        <p>Kein Wunder, daß USR selten verwendet wird — ist er doch durch das POKEn der Sprungadresse in Low/High-Byte Darstellung aufgeblüht.</p>
+            <p>USR ist eine Mischung von SYS und FN. Letzterer ist der Basic-Befehl zur Definition selbst erfundener Funktionen. Bei USR allerdings wird die Funktion als Unterprogramm in Maschinensprache geschrieben, auf die dann wie gesagt der USR-Befehl zur Ausführung springt. Der Pfiff dabei ist aber, daß Zahlenwerte in das Maschinenprogramm mitgenommen beziehungsweise Resultate aus ihm herausgeholt werden können.</p>
 
-        <p>Das ist aber nicht unnütz, weil USR mehr Fähigkeiten hat als SYS. Im Hinblick auf die im anderen Texteinschub »Der vorbereitete SYS-Befehl« aufgezeigten Möglichkeiten des SYS-Befehls sollte ich besser sagen: USR hat andere Fähigkeiten als SYS.</p>
+            <p>Wie läuft das ab: Das Argument Y, das in der Klammer hinter dem Befehl steht, wird zuerst in den Gleitkomma-Akkumulator Nr. 1 (FAC 1) in den Speicherzellen 97 bis 102 gebracht. Als Gleitkommazahl wird es vom angesprungenen Maschinenprogramm weiterverarbeitet. Das Resultat kommt dann wieder in den FAC 1 und steht als Wert von X zur Verfügung.</p>
 
-        <p>USR ist eine Mischung von SYS und FN. Letzterer ist der Basic-Befehl zur Definition selbst erfundener Funktionen. Bei USR allerdings wird die Funktion als Unterprogramm in Maschinensprache geschrieben, auf die dann wie gesagt der USR-Befehl zur Ausführung springt. Der Pfiff dabei ist aber, daß Zahlenwerte in das Maschinenprogramm mitgenommen beziehungsweise Resultate aus ihm herausgeholt werden können.</p>
+            <p>Das Argument Y kann übrigens auch ein komplexer Ausdruck sein, zum Beispiel: X=USR(PEEK(A)+256*PEEK(B))</p>
 
-        <p>Wie läuft das ab: Das Argument Y, das in der Klammer hinter dem Befehl steht, wird zuerst in den Gleitkomma-Akkumulator Nr. 1 (FAC 1) in den Speicherzellen 97 bis 102 gebracht. Als Gleitkommazahl wird es vom angesprungenen Maschinenprogramm weiterverarbeitet. Das Resultat kommt dann wieder in den FAC 1 und steht als Wert von X zur Verfügung.</p>
+            <p>Ich möchte das an einem kleinen Beispiel demonstrieren.</p>
 
-        <p>Das Argument Y kann übrigens auch ein komplexer Ausdruck sein, zum Beispiel: X=USR(PEEK(A)+256*PEEK(B))</p>
+            <p>Statt allerdings ein Maschinenprogramm selbst zu schreiben, verwende beziehungsweise springe ich auf eine Routine des Betriebssystems, die den Inhalt des FAC 1 für mathematische Operationen verwendet.</p>
 
-        <p>Ich möchte das an einem kleinen Beispiel demonstrieren.</p>
+            <p>Als geeignete mathematische Operation habe ich die Routine für die Funktion INT gewählt, die im C 64 ab der Adresse 48332 ($BCCC) beginnt. Zuerst definieren wir einen Wert für die Variable Y, der in die INT-Routine gebracht werden soll:<br>
+                10 Y=14,35</p>
 
-        <p>Statt allerdings ein Maschinenprogramm selbst zu schreiben, verwende beziehungsweise springe ich auf eine Routine des Betriebssystems, die den Inhalt des FAC 1 für mathematische Operationen verwendet.</p>
+            <p>Dann bestimmen wir die Sprungadresse für den USR-Befehl. Dazu teilen wir die Adresse 48332 auf in ein Low-Byte = 204 und ein High-Byte = 188. Diese POKEn wir nach 785/786:<br>
+                20 POKE 785,204<br>
+                30 POKE 786,188</p>
 
-        <p>Als geeignete mathematische Operation habe ich die Routine für die Funktion INT gewählt, die im C 64 ab der Adresse 48332 ($BCCC) beginnt. Zuerst definieren wir einen Wert für die Variable Y, der in die INT-Routine gebracht werden soll:<br>
-            10 Y=14,35</p>
+            <p>Jetzt folgt nur noch der USR-Befehl selbst und das Ausdrucken des Resultats.<br>
+                40 X=USR(Y)<br>
+                50 PRINT X</p>
 
-        <p>Dann bestimmen wir die Sprungadresse für den USR-Befehl. Dazu teilen wir die Adresse 48332 auf in ein Low-Byte = 204 und ein High-Byte = 188. Diese POKEn wir nach 785/786:<br>
-            20 POKE 785,204<br>
-            30 POKE 786,188</p>
+            <p>Nach RUN erhalten wir das Resultat 14, wie das Gesetz für INT es befiehlt.</p>
 
-        <p>Jetzt folgt nur noch der USR-Befehl selbst und das Ausdrucken des Resultats.<br>
-            40 X=USR(Y)<br>
-            50 PRINT X</p>
+            <p>Sie können zur Übung statt INT auch COS verwenden, indem Sie auf die Adresse 57938 ($E264) beziehungsweise beim VC 20 auf 57935 ($E261) springen. Der Vergleich mit dem Befehl COS Y muß dasselbe Ergebnis bringen. Wer hat übrigens gemerkt, daß wir überhaupt nichts mit der Speicherzelle 784 (beziehungsweise 0) gemacht haben, obwohl sie doch angeblich am USR-Befehl beteiligt ist?</p>
 
-        <p>Nach RUN erhalten wir das Resultat 14, wie das Gesetz für INT es befiehlt.</p>
+            <p>Sie ist es wirklich, doch ohne unser Zutun. In diese Adresse wird beim Einschalten des Computers die Zahl 76 ($4C) geschrieben. Das ist der Code für den Maschinenbefehl »JMP« (jump), der dieselbe Wirkung hat wie GOSUB.</p>
 
-        <p>Sie können zur Übung statt INT auch COS verwenden, indem Sie auf die Adresse 57938 ($E264) beziehungsweise beim VC 20 auf 57935 ($E261) springen. Der Vergleich mit dem Befehl COS Y muß dasselbe Ergebnis bringen. Wer hat übrigens gemerkt, daß wir überhaupt nichts mit der Speicherzelle 784 (beziehungsweise 0) gemacht haben, obwohl sie doch angeblich am USR-Befehl beteiligt ist?</p>
+            <p>Bei Ausführung von USR springt nämlich die entsprechende Routine zuerst auf die Speicherzelle 784 (beziehungsweise 0), findet dort den Sprungbefehl und in den beiden nachfolgenden Speicherzellen 785 und 786 (beziehungsweise 1 und 2) die Sprungadresse — und führt so den geplanten Sprung aus.</p>
 
-        <p>Sie ist es wirklich, doch ohne unser Zutun. In diese Adresse wird beim Einschalten des Computers die Zahl 76 ($4C) geschrieben. Das ist der Code für den Maschinenbefehl »JMP« (jump), der dieselbe Wirkung hat wie GOSUB.</p>
-
-        <p>Bei Ausführung von USR springt nämlich die entsprechende Routine zuerst auf die Speicherzelle 784 (beziehungsweise 0), findet dort den Sprungbefehl und in den beiden nachfolgenden Speicherzellen 785 und 786 (beziehungsweise 1 und 2) die Sprungadresse — und führt so den geplanten Sprung aus.</p>
-
-        <p>Ich finde, USR ist es wert, in Ihre Überlegungen mit einbezogen zu werden, besonders wenn Sie innerhalb Ihrer Basic-Programme extrem schnelle Unterprogramme in Maschinensprache eingebaut haben. Diese sind mit USR ganz elegant aufrufbar. Ich denke da zum Beispiel an eine Abfrage der Joysticks oder der Paddle.</p>
+            <p>Ich finde, USR ist es wert, in Ihre Überlegungen mit einbezogen zu werden, besonders wenn Sie innerhalb Ihrer Basic-Programme extrem schnelle Unterprogramme in Maschinensprache eingebaut haben. Diese sind mit USR ganz elegant aufrufbar. Ich denke da zum Beispiel an eine Abfrage der Joysticks oder der Paddle.</p>
+        </aside>
     </article>
 </body>
 
