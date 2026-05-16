@@ -49,7 +49,29 @@ Ende Block</pre>
         <p>Die Prozedur braucht zwei Informationen von außen: Mit welchen Worten sie zur Eingabe auffordern und was sie vorgeben soll. Und sie gibt eine Information an die Außenwelt weiter: Nämlich das, was als Antwort eingegeben worden ist. Der Prozedurkopf wird deshalb drei Variablen enthalten, zwei für hereinkommende und eine für hinausgehende Daten. Eine Comal-Prozedur finden Sie in Listing 1.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>9000 PROC input'mit'vorgabe(aufforderung$,vorgabe$,REF eingabe$) CLOSED
+9010 DIM up$ OF 2
+9020 z:=ZONE
+9030 ZONE 0
+9040 ok:=FALSE
+9050 laenge:=LEN(aufforderung$)+LEN(vorgabe$)
+9060 REPEAT
+9070 PRINT TAB(LEN(aufforderung$)+1),vorgabe$
+9080 IF laenge < 40 THEN
+9090 up$:=CHR$(145)
+9100 ELSE
+9110 up$:=CHR$(145)+CHR$(145)
+9120 ENDIF
+9130 PRINT up$
+9140 INPUT aufforderung$: eingabe$
+9150 IF eingabe$ < " " AND eingabe$ > "" THEN
+9160 ok:=TRUE
+9170 ELSE
+9180 PRINT up$
+9190 ENDIF
+9200 UNTIL ok
+9210 ZONE z
+9220 ENDPROC input'mit'vorgabe</pre>
             <figcaption>Listing 1. Comal-Prozedur zur Eingabe nach Aufforderung</figcaption>
         </figure>
 
@@ -68,7 +90,22 @@ Ende Block</pre>
         <p>Listing 2 zeigt eine entsprechende Prozedur in Basic.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>40000 rem proc: input mit vorgabe (uauff$: in, uvorg$: in, ueingabe$: out)
+40010   ul=len(uauff$)+len(uvorg$)
+40020 if ul > 76 then uvorg$=""
+40030 :
+40040 rem loop
+40050     print tab(4+len(uauff$));uvorg$
+40060     up$=chr$(145):if ul > 36 then up$=up$+up$
+40070     print up$;:input uauff$;
+40080     poke 198,3:poke631,34:poke632,34:poke633,20
+40090     input ueingabe$
+40100     if ueingabe$ > " " then 40120
+40110     printup$;
+40120     goto 40040
+40130 rem endloop
+40140   uauff$="" :uvorg$=""
+40150 return</pre>
             <figcaption>Listing 2. Basic-Programm zur Eingabe nach Aufforderung</figcaption>
         </figure>
 

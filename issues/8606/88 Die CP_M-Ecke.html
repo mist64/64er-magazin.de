@@ -78,12 +78,45 @@
         <p>Man definiert ein zusätzliches Feld LNR (am besten natürlich gleich beim CREATE-Kommando). Die Datei wird dann einfach ganz normal mit einem Index versehen und ist dadurch nach »USE datei INDEX indexdatei« in aufsteigender Reihenfolge des gewählten Schlüsselfeldes sortiert. Mit einem kleinen Programm (Listing 2) werden jetzt die laufenden Nummern der Sätze in umgekehrter Reihenfolge im Feld LNR eingetragen. Dann wird ein neuer Index, diesmal über das Feld LNR errichtet, und die gewünschte absteigende Sortierung ist erreicht.</p>
 
         <figure>
-            <pre>TODO</pre>
-            <figcaption>Listing 1. dBase II-Programm zum Berechnen der Zeilenzahl</figcaption>
+            <pre>** Programm zum zählen der Zeilen
+** in einem dBase II - Programm
+**
+
+* Eröffnen der Zählerdatenbank
+
+USE ZAEHLER
+
+* Löschen aller evtl. vorhandenen Einträge
+
+DELETE ALL
+PACK
+
+* Einlesen der Source-Code-Datei
+* (für SOURCE den gewünschten File-Namen einsetzen)
+
+APPEND FROM SOURCE.CMD SDF
+
+* Ausgabe der Zeilenzahl auf Bildschirm
+
+? "Das dBase-Programm hat" + STR(#,5) + " Zeilen"</pre>
+            <figcaption>Listing 1. dBase II-Programm zum Berechnen der Zeilenzahl anderer Programme</figcaption>
         </figure>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>** Programm zum Eintragen der "gegenläufigen"
+** Satznummern einer Datei in das Feld LNR
+** Bei n Datensätzen steht im i-ten LNR-Feld
+** der Wert n-i+1
+** Für DATEI und XLNR müssen die tatsächlich
+** verwendeten Namen eingesetzt werden
+
+USE DATEI
+GO BOTTOM
+STORE # TO N
+REPLACE ALL LNR WITH N-#+1
+INDEX ON LNR TO XLNR
+USE DATEI INDEX XLNR
+LIST ALL</pre>
             <figcaption>Listing 2. dBase II-Programm zum Indizieren einer Datei in absteigender Reihenfolge</figcaption>
         </figure>
 

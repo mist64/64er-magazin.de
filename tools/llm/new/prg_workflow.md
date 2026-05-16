@@ -180,6 +180,44 @@ Then `Read` the result to verify the splice. Do NOT use the Edit tool to insert 
 - **Placement**: in Tips & Tricks articles, place each listing at the end of its own section, not at the end of the entire article. For other articles, all listings go at the end before `</article>`.
 - **Files from external contributors** (e.g. `prg2/`): copy to `prg/`, fix header line to match filename, add credit line. For inline-only listings (Z80 asm, Pascal), embed directly in HTML.
 
+## Cropping listing regions from the page scan (for TODO transcription)
+
+When you need to fill a `<pre>TODO</pre>` placeholder by OCRing the printed listing, **don't guess the crop coordinates by trial-and-error.** Use the caption's bounding box from a layout-detected block file to crop the listing region in one shot.
+
+If `_work/p<NNN>/blocks.txt` already exists (produced by the body workflow's PaddleOCR PPStructureV3 pass), grep it:
+
+```bash
+grep -i "listing" _work/p072/blocks.txt
+# → block=22 bbox=825x84+195+1955 nw=12  Listing 1. Komprimierte Version ...
+# → block=45 bbox=840x39+1321+3256 nw=8   Listing 2. Hier die entwirrte ...
+```
+
+The bbox `WxH+X+Y` gives you the caption's column (`X`, width `W`) and top-edge (`Y`). The listing code sits **above** the caption in the same column. To find its bbox, walk preceding blocks in `blocks.txt` and pick those whose x-range overlaps with the caption's x-range — these are blocks in the same column. The topmost code-block above the caption is your crop's top edge.
+
+If `_work/` doesn't exist, regenerate it. The body workflow's Phase 0 PaddleOCR script produces `_work/p<NNN>/blocks.txt`, `page.tsv`, `page.hocr`, and rendered PNG scaffolds. A simpler standalone alternative for just this purpose (caption-bbox lookup) is plain tesseract:
+
+```bash
+tesseract <page>.png - -l deu tsv > /tmp/p.tsv
+awk -F'\t' '$1==5 && $12 ~ /^Listing$/ {
+  # word "Listing" found at column $7, row $8, in block $3
+  print "block="$3" left="$7" top="$8
+}' /tmp/p.tsv
+```
+
+Then group words by `block_num` to get the caption's full bbox, find adjacent code blocks above it, and crop. Tesseract's block segmentation is coarser than PaddleOCR's but suffices for caption-anchored cropping.
+
+**One-shot crop command:**
+
+```bash
+# For listing whose code starts at (CX, CY) with size CWxCH:
+magick _work/p<NNN>/page_300.png -crop <CW>x<CH>+<CX>+<CY> +repage /tmp/listing.png
+# Read with vision, transcribe.
+```
+
+Add ~50 px padding on each side to be safe; tesseract block-segmentation tends to undercount whitespace at the top of code blocks.
+
+**Why this matters:** iterative trial-and-error cropping (eyeballing `+Y` and `+H` until the image is right) costs 3–5 vision-read iterations per listing. The bbox-first approach makes the first crop right ~90% of the time, paying back the cost of one tesseract pass.
+
 ## Known `prg_links.sh` quirks
 
 - The script's per-file moves quote filenames properly, so individual files with spaces or unusual characters survive. However if the disk's section-separator filenames begin with `-` (e.g. `--------------NN`), some shells expand the bulk-move glob into arguments `mv` interprets as options. The script has been patched to use `mv ./*` instead of `mv *` to avoid this — but if you see "Processing files with petcat..." print zero lines for a disk and the resulting `prg/` is empty, this is the symptom. Try running each `.D64` separately as a workaround.
