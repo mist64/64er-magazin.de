@@ -140,8 +140,9 @@ for D64_FILE in "${D64_FILES[@]}"; do
         fi
     done
 
-    # Move remaining files (the kept ones) to parent directory
-    mv * .. 2>/dev/null
+    # Move remaining files (the kept ones) to parent directory.
+    # Use ./* so filenames starting with - aren't treated as mv options.
+    mv ./* .. 2>/dev/null
     cd ../..
 
     # Clean up tmp directory

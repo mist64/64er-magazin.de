@@ -1,0 +1,23 @@
+
+
+;def fn sinnvoll.prg ==0801==
+   10 td=56328:rem echtzeituhr sec/10-register
+   20 poketd+6,peek(td+6)and127:rem 50 hz einstellen
+   30 def fn u4(x) = (xand15):rem untere 4 bits von x
+   40 def fn o4(x)=(xand240)/16:rem obere 4 bits
+   50 def fn dc(x)=fn u4(x)+fn o4(x)*10:rem wert bei bcd-codierung
+   60 def fn di(x)=fn dc(peek(x)and127):rem bcd-inhalt von x ohne bit 7
+   70 def fn h(x)=fn di(td+3):rem stunden
+   80 def fn m(x)=fn di(td+2):rem minuten
+   90 def fn s(x)=fn di(td+1):rem sekunden
+  100 def fn dh(x)=x-int(x/10)*10+int(x/10)*16:rem dezimal nach bcd
+  110 input"uhrzeit hh,mm,ss";hh,mm,ss
+  120 ifhh>12thenhh=hh-12
+  130 poketd+3,fn dh(hh):rem uhr stellen
+  140 poketd+2,fn dh(mm)
+  150 poketd+1,fn dh(ss)
+  160 poketd+0,0
+  170 print"{clr}"
+  180 print"{home}"fn h(x)"{left}"fn m(x)"{left}"fn s(x)"{left}"peek(td)"{del}";
+  190 goto180
+

@@ -1,0 +1,38 @@
+
+
+;shopmaster.prg ==0801==
+   10 rem ***    shopmaster    ***
+   20 rem konvertiert printshop-grafik
+   30 rem zu printmaster-grafik
+   40 rem (c) 64'er, markt und technik
+   50 rem geschrieben von boris schneider
+   60 rem am 23.03.86 um 23.17 uhr
+   70 rem:
+   80 dim g$(572)
+   90 input "filename";a$
+  100 for i=1tolen(a$)
+  101 :b$=b$+chr$(asc(mid$(a$,i,1))+32)
+  102 nexti
+  110 b$=b$+".gra"
+  120 open 1,8,2,a$+",p,r"
+  130 get#1,x$:get#1,x$
+  140 fory=0to51
+  150 :forx=1to11
+  160 ::get#1,g$
+  161 ::g$(y*11+x)=chr$(asc(g$+chr$(0)))
+  170 :nextx
+  180 nexty
+  190 close1
+  191 print"{rvon}zieldiskette einlegen{rvof}"
+  192 gete$:ife$=""then192
+  200 open 1,8,2,b$+",p,w"
+  210 print#1,chr$(80)chr$(135)chr$(88)chr$(0)chr$(52)chr$(0)chr$(180)chr$(139);
+  220 for y=0to51
+  230 :forx=1to11
+  240 ::print#1,g$(y*11+x);
+  250 :nextx
+  260 :print#1,chr$(139);
+  270 nexty
+  280 close1
+  290 run
+

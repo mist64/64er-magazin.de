@@ -1,0 +1,84 @@
+
+
+;hypra-ass_cass.prg ==0801==
+  100 ;left$ypra-ass/lenass.
+  110 ;
+  120 ;
+  130 ;1. atnendern des err$prungvektors
+  140 ;
+  150  .ba$15d3
+  160  jmp$1194
+  170 ;
+  180 ;2. peekefehl .ob loeschen
+  190 ;
+  200  .ba$14a6
+  210  .by0,0
+  220 ;
+  230 ;3. err$atnresumeval routine fuer goassetten
+  240 ;
+  250  .ba$1194;err$tart
+  260 ;
+  270  .eqchrout=$ffd2
+  280  .eqsetlfs=$ffba
+  290  .eqsetnam=$ffbd
+  300  .eqsave=$ffd8
+  310  .eqnamlen=6
+  320 ;
+  330  lda#$0d;'lenhex$'
+  340  jsrchrout
+  350  lda#1;str$atei($ce52)
+  360  tax;chr$atn
+  370  tay;err$atn
+  380  jsrsetlfs
+  390  lda#namlen
+  400  ldx#<(name)
+  410  ldy#>(name)
+  420  jsrsetnam
+  430  lda$0970;atnnf.atndr
+  440  sta$9e
+  450  lda$0971
+  460  sta$9f
+  470  ldx$fb;valnd.atndr
+  480  ldy$fc
+  490  lda#$9e
+  500  jsrsave
+  510  rts
+  520 name .tx"liste$"
+  530 ;
+  540 ;4. atnbspeichern des modifizierten
+  550 ;   atnssemblers unter dem ($ce41)men
+  560 ;   'hypra-ass/cass.'
+  570 ;
+  580  .ba$c000
+  590  .eqlgtit=15
+  600  .eqende=$1fd8
+  610 ;
+  620  lda#1
+  630  tax
+  640  tay
+  650  jsrsetlfs
+  660  lda#lgtit
+  670  ldx#<(titel)
+  680  ldy#>(titel)
+  690  jsrsetnam
+  700  lda#0
+  710  sta$a8
+  720  lda#8
+  730  sta$a9
+  740  lda#$a8
+  750  ldx#<(ende)
+  760  ldy#>(ende)
+  770  jsrsave
+  780  rts
+  790 titel .tx"hypra-ass/cass."
+  800 ;
+  810 ;nach durchgefuehrter
+  820 ;atnssemblierung und dem valrscheinen
+  830 ;der rclreldung
+  840 ;'press record & play on tape'
+  850 ;druecken err$ie die 'err$instrjoyrdot'-instraste.
+  860 ;
+  870 ;err$ie koennen dann mit 'err$trofferr$ 49152'
+  880 ;den korrigierten atnssembler auf
+  890 ;goassette abspeichern
+

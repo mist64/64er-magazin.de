@@ -1,0 +1,33 @@
+
+
+;undim.var.dump.prg ==1c01==
+63000 fast:bank 1:fori=peek(47)+peek(48)*256topeek(49)+peek(50)*256-1step7
+63010 forii=0to6:s(ii)=peek(i+ii):next
+63020 if s(0)>128 and s(1)<128 then begin:rem def fn-variable
+63030 print"def fn";chr$(s(0)and127);chr$(s(1)and127)
+63040 bend
+63050 if s(0)>128 and s(1)>=128 then begin:rem integer-var
+63060 printchr$(s(0)and127);chr$(s(1)and127);"%";tab(4);"=";
+63070 s(4)=s(3)+s(2)*256:ifs(4)>32767 then s(4)=s(4)-65536
+63080 prints(4):bend
+63090 if s(0)<128 and s(1)<128 then begin:rem real
+63100 printchr$(s(0)and127);chr$(s(1)and127);tab(4);"=";
+63110 s(2)=s(2)-129
+63120 ifs(3)>127then s(3)=s(3)-128:ma=-1:else ma=1
+63130 s(3)=s(3)/128
+63140 s(4)=s(4)/128/256
+63150 s(5)=s(5)/128/256^2
+63160 s(6)=s(6)/128/256^3
+63170 s(0)=ma*2^s(2)*(1+s(3)+s(4)+s(5)+s(6))
+63180 prints(0)
+63190 bend
+63200 if s(0)<128 and s(1)>=128 then begin:rem string-var
+63210 printchr$(s(0)and127);chr$(s(1)and127)"$";tab(4);"= ";
+63220 printchr$(34);:s(0)=s(3)+s(4)*256
+63230 ifs(2)<>0then begin
+63240 for o=0tos(2)-1:printchr$(peek(s(0)+o));:next:printchr$(34)
+63250 bend:else printchr$(34)
+63260 bend
+63270 next
+63280 end
+

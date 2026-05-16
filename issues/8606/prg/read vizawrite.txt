@@ -1,0 +1,326 @@
+
+
+;read vizawrite.prg ==0801==
+   10 print"{clr}{down}{down}    ********************************"
+   20 print"    *                              *"
+   30 print"    *       read  vizawrite        *"
+   40 print"    *                              *"
+   50 print"    *       von  klaus heck        *"
+   60 print"    *                              *"
+   70 print"    ********************************"
+   80 :
+   90 rem ------------------------------
+  100 rem  vizawrite-file oeffnen
+  110 print"{down}{down}{down} welches vizawrite-file soll eingelesen    werden{down}"
+  120 inputna$
+  130 open15,8,15
+  140 open1,8,5,na$+",p,r"
+  150 gosub3190
+  160 print"{down}{down} textausgabe auf bildschirm : 3"
+  170 print" textausgabe auf seq-datei  : 8{down}"
+  180 getge$:ifge$=""then180
+  190 ge=val(ge$)
+  200 ifge=3thenopen2,ge
+  210 ifge=8thenopen2,ge,2,"@:seq "+na$+",s,w"
+  220 gosub3190
+  230 ifge<>3andge<>8then160
+  240 :
+  250 rem ------------------------------
+  260 rem  umschaltung gross/klein
+  270 print"{clr}"
+  280 poke53272,23
+  290 :
+  300 rem ------------------------------
+  310 rem  vorspann einlesen
+  320 :
+  330 rem pruefen auf vizawrite  (0-3)
+  340 get#1,a$:ifa$=""thena$=chr$(0)
+  350 gosub3190
+  360 ifasc(a$)<>86then3130
+  370 get#1,a$:ifa$=""thena$=chr$(0)
+  380 ifasc(a$)<>255then3130
+  390 get#1,a$:ifa$=""thena$=chr$(0)
+  400 ifasc(a$)<>86then3130
+  410 get#1,a$:ifa$=""thena$=chr$(0)
+  420 ifasc(a$)<>87then3130
+  430 :
+  440 rem anzahl zeichen  (4,5)
+  450 get#1,lb$:iflb$=""thenlb$=chr$(0)
+  460 get#1,hb$:ifhb$=""thenhb$=chr$(0)
+  470 ze=asc(lb$)+asc(hb$)*256
+  480 print" Anz. Zeichen im Text ";ze
+  490 :
+  500 rem anzahl seiten  (6,7)
+  510 get#1,lb$:iflb$=""thenlb$=chr$(0)
+  520 get#1,hb$:ifhb$=""thenhb$=chr$(0)
+  530 se=asc(lb$)+asc(hb$)*256
+  540 se=se-2
+  550 print" Anz. Textseiten      ";se
+  560 :
+  570 rem dummy  (8-14)
+  580 forj=8to14
+  590 get#1,a$:ifa$=""thena$=chr$(0)
+  600 next
+  610 :
+  620 rem dateinamen  (15-31)
+  630 i=14:aa$=""
+  640 get#1,a$:ifa$=""thena$=chr$(0)
+  650 i=i+1
+  660 ifasc(a$)=96then690
+  670 aa$=aa$+a$
+  680 goto640
+  690 print" Filename              {rvon}";aa$
+  700 i=i+1:ifi>30then750
+  710 forj=ito31
+  720 get#1,a$:ifa$=""thena$=chr$(0)
+  730 next
+  740 :
+  750 rem printer type  (32,33)
+  760 get#1,a$:ifa$=""thena$=chr$(0)
+  770 get#1,hb$:ifhb$=""thenhb$=chr$(0)
+  780 ifasc(a$)>0andasc(a$)<27thena$=chr$(asc(a$)+64):goto800
+  790 ifasc(a$)>64andasc(a$)<123thena$=chr$(asc(a$)+128)
+  800 print" Drucker Typ           ";a$
+  810 :
+  820 rem dummy  (34)
+  830 get#1,a$:ifa$=""thena$=chr$(0)
+  840 :
+  850 rem form feed  (35)
+  860 get#1,a$:ifa$=""thena$=chr$(0)
+  870 a$=chr$(asc(a$)+64)
+  880 print" Formular Vorschub     ";a$
+  890 :
+  900 rem auto l/feed  (36)
+  910 get#1,a$:ifa$=""thena$=chr$(0)
+  920 ifasc(a$)>0andasc(a$)<27thena$=chr$(asc(a$)+64):goto940
+  930 ifasc(a$)>64andasc(a$)<123thena$=chr$(asc(a$)+128)
+  940 print" Auto. Zeilenvorschub  ";a$
+  950 :
+  960 rem form length  (37,38)
+  970 get#1,lb$:iflb$=""thenlb$=chr$(0)
+  980 get#1,hb$:ifhb$=""thenhb$=chr$(0)
+  990 d=asc(lb$)+asc(hb$)*256
+ 1000 print" Formularlaenge       ";d
+ 1010 :
+ 1020 rem single  (39)
+ 1030 get#1,a$:ifa$=""thena$=chr$(0)
+ 1040 a$=chr$(asc(a$)+64)
+ 1050 print" Einzelblatt           ";a$
+ 1060 :
+ 1070 rem offset  (40,41)
+ 1080 get#1,lb$:iflb$=""thenlb$=chr$(0)
+ 1090 get#1,hb$:ifhb$=""thenhb$=chr$(0)
+ 1100 d=asc(lb$)+asc(hb$)*256
+ 1110 print" linker Druckrand ab  ";d
+ 1120 :
+ 1130 rem header  (42)
+ 1140 get#1,a$:ifa$=""thena$=chr$(0)
+ 1150 a$=chr$(asc(a$)+64)
+ 1160 print" Kopfzeile             ";a$
+ 1170 :
+ 1180 rem dummy  (43)
+ 1190 get#1,a$:ifa$=""thena$=chr$(0)
+ 1200 :
+ 1210 rem pitch  (44,45)
+ 1220 get#1,lb$:iflb$=""thenlb$=chr$(0)
+ 1230 get#1,hb$:ifhb$=""thenhb$=chr$(0)
+ 1240 d=asc(lb$)+asc(hb$)*256
+ 1250 print" Schriftart           ";d
+ 1260 :
+ 1270 rem lines/inch  (46,47)
+ 1280 get#1,lb$:iflb$=""thenlb$=chr$(0)
+ 1290 get#1,hb$:ifhb$=""thenhb$=chr$(0)
+ 1300 d=asc(lb$)+asc(hb$)*256
+ 1310 print" Zeilen/inch          ";d
+ 1320 :
+ 1330 rem justification  (48)
+ 1340 get#1,a$:ifa$=""thena$=chr$(0)
+ 1350 a$=chr$(asc(a$)+64)
+ 1360 print" Randausgleich         ";a$
+ 1370 :
+ 1380 rem global/fill  (49)
+ 1390 get#1,gf$:ifgf$=""thengf$=chr$(0)
+ 1400 ifasc(gf$)=32then1420
+ 1410 gf$=chr$(asc(gf$)+64)
+ 1420 print" Text anh./einf.       ";gf$
+ 1430 :
+ 1440 rem dateinamen  (50-66)
+ 1450 i=49:na$=""
+ 1460 get#1,a$:ifa$=""thena$=chr$(0)
+ 1470 i=i+1
+ 1480 ifasc(a$)=96then1530
+ 1490 ifasc(a$)>0andasc(a$)<27thena$=chr$(asc(a$)+64):goto1510
+ 1500 ifasc(a$)>64andasc(a$)<123thena$=chr$(asc(a$)+128)
+ 1510 na$=na$+a$
+ 1520 goto1460
+ 1530 print" naechstes File        ";na$
+ 1540 i=i+1:ifi>65then1580
+ 1550 forj=ito66
+ 1560 get#1,a$:ifa$=""thena$=chr$(0)
+ 1570 next
+ 1580 :
+ 1590 rem text colour  (67)
+ 1600 get#1,a$:ifa$=""thena$=chr$(0)
+ 1610 d=1:gosub2840
+ 1620 print" Farbe Text            ";col$
+ 1630 :
+ 1640 rem border colour  (68)
+ 1650 get#1,a$:ifa$=""thena$=chr$(0)
+ 1660 d=2:gosub2840
+ 1670 print" Farbe Rahmen          ";col$
+ 1680 :
+ 1690 rem background colour  (69)
+ 1700 get#1,a$:ifa$=""thena$=chr$(0)
+ 1710 d=3:gosub2840
+ 1720 print" Farbe Hintergrund     ";col$
+ 1730 :
+ 1740 rem dummy  (70-199)
+ 1750 forj=70to199
+ 1760 get#1,a$:ifa$=""thena$=chr$(0)
+ 1770 next
+ 1780 :
+ 1790 print"{down}{down} weiter ? >j< "
+ 1800 getjn$:ifjn$=""then1800
+ 1810 ifjn$<>"j"then2410
+ 1820 print"{clr}"
+ 1830 :
+ 1840 rem ------------------------------
+ 1850 rem  alle seiten uebernehmen ?
+ 1860 ip=-1:rem seitenzaehler
+ 1870 print"{down}{down}Soll WORK PAGE{$a0}mit uebertragen werden?     >j/n<"
+ 1880 getjn$:ifjn$=""then1880
+ 1890 ifjn$="n"thenwp=0
+ 1900 ifjn$="j"thenwp=1
+ 1910 ifjn$<>"j"andjn$<>"n"then1870
+ 1920 print"{down}{down}Soll HEADER{$a0}PAGE mit uebertragen werden?   >j/n<"
+ 1930 getjn$:ifjn$=""then1930
+ 1940 ifjn$="n"thenhp=0
+ 1950 ifjn$="j"thenhp=1
+ 1960 ifjn$<>"j"andjn$<>"n"then1920
+ 1970 print"{down}{down}Soll FOOTER{$a0}PAGE mit uebertragen werden?   >j/n<"
+ 1980 getjn$:ifjn$=""then1980
+ 1990 ifjn$="n"thenfp=0
+ 2000 ifjn$="j"thenfp=1
+ 2010 ifjn$<>"j"andjn$<>"n"then1970
+ 2020 print"{clr}"
+ 2030 :
+ 2040 rem ------------------------------
+ 2050 rem  text einlesen
+ 2060 ifge=8thenprint"{down}{down}      Bitte warten ich arbeite"
+ 2070 fl=0:rem spaltenzaehler formatzeile
+ 2080 i=0:rem spaltenzaehler textzeile
+ 2090 aa$="":rem textzeile
+ 2100 get#1,a$:ifa$=""thena$=chr$(0)
+ 2110 :
+ 2120 rem ------------------------------
+ 2130 rem  bildschirm-code -> ascii-code
+ 2140 ifasc(a$)=220thenaa$=aa$+a$:goto2270:rem return
+ 2150 ifasc(a$)=230then2730:rem format line
+ 2160 ifasc(a$)=241then2490:rem end page
+ 2170 ifasc(a$)=255then2310:rem end text
+ 2180 ifasc(a$)>=0andasc(a$)<32thena$=chr$(asc(a$)+64):goto2210
+ 2190 ifasc(a$)>=64andasc(a$)<128thena$=chr$(asc(a$)+128):goto2210
+ 2200 :
+ 2210 aa$=aa$+a$:i=i+1:rem zeile zusammenstellen
+ 2220 ifi=flthen2600:rem zeile ohne return abbrechen
+ 2230 goto2100
+ 2240 :
+ 2250 rem ------------------------------
+ 2260 rem textzeile ausgeben
+ 2270 ifwp=1thenprint#2,aa$
+ 2280 goto2080
+ 2290 :
+ 2300 rem ------------------------------
+ 2310 rem programmende
+ 2320 ifgf$<>"g"then2410:rem check global
+ 2330 print"{clr}{down}{down} soll File : {rvon}"na$:print"{down}  angehaengt werden?  >j/n<"
+ 2340 getjn$:ifjn$=""then2340
+ 2350 ifjn$<>"j"then2410
+ 2360 close1
+ 2370 open1,8,5,na$+",p,r"
+ 2380 gosub3190
+ 2390 print"{clr}"
+ 2400 goto310
+ 2410 poke53272,21:rem gross/grafik
+ 2420 close2
+ 2430 close1
+ 2440 close15
+ 2450 end
+ 2460 :
+ 2470 rem ------------------------------
+ 2480 rem  seitenuebernahme schalten
+ 2490 ifwp=1andi<>0thenprint#2,aa$
+ 2500 aa$=a$
+ 2510 ifip=-1andwp=0thenaa$=""
+ 2520 ip=ip+1
+ 2530 wp=1:rem wird als schalter benutzt
+ 2540 ifip=seandhp=0thenwp=0
+ 2550 ifip=se+1andfp=0thenwp=0
+ 2560 goto2270
+ 2570 :
+ 2580 rem ------------------------------
+ 2590 rem  zeilenende bestimmen
+ 2600 fi=fl
+ 2610 ifmid$(aa$,fi,1)=" "ormid$(aa$,fi,1)="-"then2660
+ 2620 fi=fi-1
+ 2630 iffi=1then2650
+ 2640 goto2610
+ 2650 fi=fl
+ 2660 print#2,left$(aa$,fi)
+ 2670 i=fl-fi
+ 2680 aa$=right$(aa$,i)
+ 2690 goto2100
+ 2700 :
+ 2710 rem ------------------------------
+ 2720 rem  laenge der formatzeile best.
+ 2730 fl=1
+ 2740 tab=0:rem ersten tabulator finden
+ 2750 aa$=aa$+a$
+ 2760 get#1,a$:ifa$=""thena$=chr$(0)
+ 2770 aa$=aa$+a$:fl=fl+1
+ 2780 iftab=0andasc(a$)=219thenfl=0:tab=1
+ 2790 ifasc(a$)=220then2270:rem return
+ 2800 goto2760
+ 2810 :
+ 2820 rem ------------------------------
+ 2830 rem  farbe bestimmen
+ 2840 a=asc(a$)
+ 2850 ifd=1then2870
+ 2860 ifd=2thena=a-240
+ 2870 ifa=0thencol$="schwarz"
+ 2880 ifa=1thencol$="weiss"
+ 2890 ifa=2thencol$="rot"
+ 2900 ifa=3thencol$="tuerkis"
+ 2910 ifa=4thencol$="violett"
+ 2920 ifa=5thencol$="gruen"
+ 2930 ifa=6thencol$="blau"
+ 2940 ifa=7thencol$="gelb"
+ 2950 ifa=8thencol$="orange"
+ 2960 ifa=9thencol$="braun"
+ 2970 ifa=10thencol$="hellrot"
+ 2980 ifa=11thencol$="grau 1"
+ 2990 ifa=12thencol$="grau 2"
+ 3000 ifa=13thencol$="hellgruen"
+ 3010 ifa=14thencol$="hellblau"
+ 3020 ifa=15thencol$="grau 3"
+ 3030 ifa=16thencol$="schwarz"
+ 3040 ifa=17thencol$="weiss"
+ 3050 ifa=18thencol$="rot"
+ 3060 ifa=35thencol$="tuerkis"
+ 3070 ifa=36thencol$="violett"
+ 3080 ifa=53thencol$="gruen"
+ 3090 return
+ 3100 :
+ 3110 rem ------------------------------
+ 3120 rem  fehlerbehandlung
+ 3130 print"{down}{down}{down}   fehler !!!"
+ 3140 print"{down}  dies ist kein durch vizawrite            erstellter text"
+ 3150 goto2410
+ 3160 :
+ 3170 rem ------------------------------
+ 3180 rem  fehlerkanal lesen
+ 3190 input#15,fw,fx$,fy,fz
+ 3200 iffw=0thenreturn
+ 3210 print"{down}{down}  fehler: ";fw;fx$
+ 3220 goto2410
+
