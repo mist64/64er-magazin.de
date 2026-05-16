@@ -159,7 +159,10 @@ Then `Read` the result to verify the splice. Do NOT use the Edit tool to insert 
 
 ## Rules
 
-- **Captions must be verbatim** from the magazine scan — read from `png/*_600_cropped.png` files (scale with `magick -resize 25%` if 600dpi)
+- **Captions must be verbatim** from the magazine scan — read from `png/*_600_cropped.png` files (scale with `magick -resize 25%` if 600dpi). When `pdftotext` and the scan disagree on a program name (typical OCR confusion in captions: `»RND«` vs `»FIND«`, `R` vs `F` in old print), **trust the article body's spelling** — the body prose mentions the name multiple times in unambiguous contexts.
+- **Listings with no `Listing N.` caption.** Some short programs are referenced from the article body simply as "(Listing)" or "(Assembler-Listing)" with no number. Use a verbatim caption from the scan that matches that style (`Listing: Caption text`, `Assembler-Listing: Caption text`) — don't invent a Listing-N number that doesn't exist in the print.
+- **Disk variants of the same listing** are common for multi-target programs (e.g. `block 1300_c 128.prg` and `block c000_c 64.prg` for the same BLOCK routine assembled at two load addresses). Place the main Hypra-Ass / BASIC version as the captioned `<figure>` and emit each target-address variant as a sibling `<div class="binary_download" data-filename="…" data-name="…">` immediately below. They share the article's listing slot but each gets its own download link.
+- **Transient pre-step listings not on disk.** Sometimes the article references a small Listing N (e.g. "Listing 1. Change MSE" in Master-Text) whose only purpose is to produce another file that ships on disk. The pre-step itself isn't on disk. Leave the article's `(Listing N)` reference untouched — the result file gets placed as the disk's hidden companion.
 - **`data-name` must be unique** within an article; two listings can't share the same `data-name`
 - **`data-filename` base name max 16 chars** (C64 filename limit)
 - **`.txt` header line**: must be `;filename.prg ==ADDR==` matching the base name
@@ -167,6 +170,11 @@ Then `Read` the result to verify the splice. Do NOT use the Edit tool to insert 
 - **Compiled/binary-only versions**: use only `binary_download` div, no `<pre>` display
 - **Placement**: in Tips & Tricks articles, place each listing at the end of its own section, not at the end of the entire article. For other articles, all listings go at the end before `</article>`.
 - **Files from external contributors** (e.g. `prg2/`): copy to `prg/`, fix header line to match filename, add credit line. For inline-only listings (Z80 asm, Pascal), embed directly in HTML.
+
+## Known `prg_links.sh` quirks
+
+- The script's per-file moves quote filenames properly, so individual files with spaces or unusual characters survive. However if the disk's section-separator filenames begin with `-` (e.g. `--------------NN`), some shells expand the bulk-move glob into arguments `mv` interprets as options. The script has been patched to use `mv ./*` instead of `mv *` to avoid this — but if you see "Processing files with petcat..." print zero lines for a disk and the resulting `prg/` is empty, this is the symptom. Try running each `.D64` separately as a workaround.
+- The `del/` subdirectory under `prg/` holds files the script decided NOT to publish as their own listing (typically: the `.prg` of a BASIC program that's been petcat-decoded to `.txt`). Don't delete `del/`; the generator may still resolve binary downloads from those files.
 
 ## Report files that belong nowhere — don't dump them in Impressum
 
