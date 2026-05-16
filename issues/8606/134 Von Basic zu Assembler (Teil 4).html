@@ -125,6 +125,11 @@
 
         <p>Auf Tastendruck gelangen Sie in den zweiten, den kritischen Teil des Programmes. Hier werden wir nun einen Fehler der BLTUC-Routine finden. Wir verschieben in diesem Teil den Inhalt des Speicherbereiches 1025 bis 1063 um eine Position abwärts, also in den Bereich 1024 bis 1062. Woran liegt es, daß hier plötzlich eine Fehlfunktion auftritt? Sehen wir uns dazu die BLTUC-Routine etwas genauer an. Als Programm BLTUC (Listing 2) finden Sie nachstehend ein Disassemblerlisting der BLTUC-Routine wie sie im C 64-Speicher ab $A3BF zu finden ist.</p>
 
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 2. »BLTUC« — So steht die Block-Verschieberoutine im C 64-Betriebssystem</figcaption>
+        </figure>
+
         <h2>Die Anatomie der BLTUC-Routine</h2>
 
         <p>Das ganze Programm besteht aus zwei Teilen. Im ersten davon werden Berechnungen angestellt über die Länge des zu transportierenden Bereiches und zwei Transportzeiger eingerichtet. Im zweiten Teil findet dann die eigentliche Verschiebung statt. Die erste 16-Bit-Subtraktion (Quelle bis Ende +1 minus Quelle-Start) legt das MSB der Länge ins X-Register (das enthält dann die Anzahl der zu transportierenden Pages) und das LSB ins Y-Register und in die Speicherstelle $22 (dort liegt dann die restliche Länge, die weniger als eine ganze Page beträgt). Der BEQ-Befehl stellt fest, ob überhaupt ein solcher Rest vorhanden ist und verzweigt ansonsten direkt in den Transportteil. Zwei weitere Subtraktionen (Quelle-Ende +1 minus Länge des Restes und Ziel-Ende +1 minus Länge des Restes) richten die Zeiger $5A/5B und $58/59 auf die Adressen der nächstniedrigeren ganzen Page. Der Rest befindet sich noch im Y-Register. Das X-Register dient als Page-Zähler. Der BCC-Befehl bei $A3E6 führt immer zum Sprung nach $A3EC, weil an dieser Stelle das Carry-Bit immer frei ist.</p>
@@ -149,15 +154,35 @@
 
         <p>Die Fälle 1 bis 4 bereiten keine Probleme. Hier bleibt es uns überlassen, wie wir eigene Verschiebungsprogramme organisieren wollen. Der BLTUC-Routinenanwendung entsprechen die Fälle 2 und 4. Sehen wir uns nun Fall 5 an (siehe dazu Bild 1).</p>
 
+        <figure>
+            <img src="134-1.png" alt="Diagramm der Verschiebung bei Fall 5">
+            <figcaption>Bild 1. Der Fall 5</figcaption>
+        </figure>
+
         <p>In Bild 1a ist die Ausgangslage abgebildet, wobei der besseren Übersicht halber Quell- und Zielbereich untereinander gezeichnet sind. Natürlich handelt es sich bei den untereinanderliegenden Kästchen immer um ein- und dieselbe Speicherstelle. In Bild 1b wird das erste Byte des Quellbereiches in die erste Speicherstelle des Zielbereiches kopiert. Das ist aber gleichzeitig das zweite Byte des Quellbereiches. Was nun geschieht, zeigen die Teilbilder 1c und schließlich 1d: Der gesamte Zielbereich füllt sich mit dem Inhalt der ersten Quellbereichs-Speicherstelle. Hätten Sie das gedacht?</p>
 
         <p>Bild 2 verdeutlicht uns den Fall 6.</p>
+
+        <figure>
+            <img src="134-2.png" alt="Diagramm der Verschiebung bei Fall 6">
+            <figcaption>Bild 2. Der Fall 6</figcaption>
+        </figure>
 
         <p>Es ist nach dem gleichen Schema wie Bild 2 aufgebaut. Sie sehen, daß nun aber von oben herunter gearbeitet wird. Die erste Verschiebung packt das letzte Byte des Quellbereiches in die letzte Speicherstelle des Zielbereiches (Teilbild b). An den folgenden Teilbildern c und d ist deutlich, daß diese Methode fehlerfrei funktioniert. Nach diesem Schema arbeitet die BLTUC-Routine, weshalb wir beim Aufwärtsverschieben von Speicherinhalten auch bei Überlappungen keine Störungen erwarten brauchen.</p>
 
         <p>Wenden wir uns nun dem Fall 7 zu. Bild 3 soll bei dieser Betrachtung wieder helfen:</p>
 
+        <figure>
+            <img src="134-3.png" alt="Diagramm der Verschiebung bei Fall 7">
+            <figcaption>Bild 3. Der Fall 7</figcaption>
+        </figure>
+
         <p>In Fall 7 liegt ja der Zielbereich unterhalb des Quellbereiches und es wird von unten gearbeitet, also die Register aufwärts gezählt. Aus Bild 4 ist — gleiches Schema wie bisher — zu entnehmen, daß keine Probleme auftreten. Zu guter Letzt hilft uns nun das Bild 4 zum Verstehen des Falls 8:</p>
+
+        <figure>
+            <img src="134-4.png" alt="Diagramm der Verschiebung bei Fall 8">
+            <figcaption>Bild 4. Der Fall 8</figcaption>
+        </figure>
 
         <p>Im Teilbild b erkennen Sie das Problem: Sobald das letzte Byte des Quellbereiches in die letzte Speicherstelle des Zielbereiches verschoben ist, haben wir das vorletzte Byte des Quellbereiches damit überschrieben, denn das ist ja gleichzeitig die letzte Speicherstelle des Zielbereiches. Jede weitere Verschiebung kopiert nun nur wieder diesen gleichen Inhalt, was Ihnen die Teilbilder c und d zeigen. Genau das macht die BLTUC-Routine, wie Sie im zweiten Teil des Programmes BLTUC BAS feststellen konnten. Man darf also diese Interpreter-Routine nicht anwenden, wenn der Zielbereich unterhalb des Quellbereiches liegt und beide sich überschneiden!</p>
 
@@ -172,6 +197,11 @@
         <h2>Fehlerfreies Verschieben mit BLOCK</h2>
 
         <p>Wie sollte ein Verschiebeprogramm aussehen, das allen Eventualitäten gerecht wird? Ganz einfach: Es müßte zunächst prüfen, ob eine Überlappung von Quell- und Zielbereich vorliegt und je nach Ergebnis dann zum entsprechenden Kopierteil verzweigen. Genau das tut das nachfolgend vorgestellte Programm BLOCK (Listing 3), welches sowohl auf dem C 64 als auch auf dem C 128 (dort aber nur innerhalb der gerade eingeschalteten Bank) arbeitet. L.A.Leventhal und W.Saville haben das Prinzip 1982 vorgestellt in »6502 Assembly Language Subroutines«. In Bild 5 finden Sie ein Flußdiagramm des Programmes BLOCK:</p>
+
+        <figure>
+            <img src="134-5.png" alt="Flußdiagramm der BLOCK-Routine">
+            <figcaption>Bild 5. Das Flußdiagramm des Programmes »BLOCK«</figcaption>
+        </figure>
 
         <figure><pre>
 10  -;
