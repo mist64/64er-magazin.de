@@ -84,9 +84,10 @@ If the article has no `<aside class="fehlerteufelchen">`, extract the erratum te
 Trailing comments:
 - `<!-- 64'er M/YYYY -->` — always; names the issue where the erratum appeared
 - One of the following status comments, ABOVE the `<!-- 64'er ... -->` line, when the erratum involves a code listing:
-  - `<!-- Korrektur im Programm angewendet -->` — the source `.txt` listing in `prg/` has been patched (Style A or B)
-  - `<!-- Disk-Version bereits korrigiert -->` — the print typo never propagated to the `.D64` disk; the `.txt`/`.prg` already match the corrected version (`.txt` may carry the same note `(...; Disk-Version bereits korrigiert)` in its header)
-- **Omit** the status comment when the erratum is not listing-related (hardware/figcaption/price corrections, reprints without the affected element, etc.) — i.e. when there's no `prg/<name>.txt` to apply the fix to.
+  - `<!-- Korrektur im Programm angewendet -->` — Case 1: real code bug, fixed in the source `.txt` listing in `prg/` (Style A or B)
+  - `<!-- Disk-Version bereits korrigiert -->` — Case 2: the `.D64` disk was patched after the print run, so the disk works even though the printed listing has the bug. The `.txt` may carry the same note `(...; Disk-Version bereits korrigiert)` in its header.
+  - `<!-- Reiner Druckfehler -->` — Case 3: print-only artifact (unreadable digit, mis-printed line that users were instructed to type differently, hardware schematic typo). The disk was never wrong; no `.txt` change applicable.
+- **Omit** the status comment entirely when the erratum is not about a code listing (hardware figure caption, prices, addresses, reprints without the affected element, etc.).
 
 If a `<!-- Fehlerteufelchen ... -->` placeholder comment already exists in the article (old convention), **remove** it after adding the aside (don't keep both).
 
