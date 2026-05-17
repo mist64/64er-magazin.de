@@ -20,17 +20,16 @@
 <body>
     <article>
         <h1>Tips und Tricks zu Vizawrite 64 (Teil 5)</h1>
+
+        <p class="intro">Man kann Vizawrite 64 einfach »nur« benutzen oder aber universell einsetzen. Mit zwei Hitfsprogrammen die erweitern wir das Leistungsspektrum dieses Textprogramm-Klassikers beträchtlich.</p>
+
         <p>Man kann die Textverarbeitungswelt auf dem C 64 in zwei Lager spalten: Diejenigen, die mit Vizawrite 64 arbeiten und die, denen andere Programme lieber sind. Die erste Gruppe wird unsere bisherigen Folgen sicherlich mit Aufmerksamkeit gelesen haben, und aus der anderen Gruppe hat sich möglicherweise so mancher entschlossen, auch mit diesem Programm zu arbeiten. Uns bleibt dabei aufgrund der großen Resonanz eigentlich nur übrig, diese Reihe fortzusetzen. Diesmal veröffentlichen wir zwei Hilfsprogramme, von denen das eine das englische Vizawrite 64 in ein deutsches verwandelt und das andere den Zugang zu Vizawrite-Texten ermöglicht. Damit wird Realität, was viele sich wünschen: Man kann Texte, die mit Vizawrite 64 erstellt wurden, auch mit anderen Programmen weiterverarbeiten oder sie, beispielsweise mit einem Terminalprogramm, in alle Welt verschicken.</p>
 
         <h2>Ändern Sie mit »ZVIZA« den Zeichensatz von »Vizawrite 64«!</h2>
 
         <p>Das Textprogramm Vizawrite 64 (englische Version) bietet die Möglichkeit, an den Drucker ASCII-Steuercodes zu senden. Besitzen Sie einen guten Drucker, so können Sie damit vom Programm aus einen beliebigen Zeichensatz definieren und abspeichern. Der Schönheitsfehler dabei: Auf dem Bildschirm ändern sich die Zeichen nicht.</p>
 
-        <p>Unabhängig davon kämpfen Sie eventuell überhaupt mit dem Problem, daß Qe nach Drucker und Interface) der gedruckte Zeichensatz nicht mit dem Bildschirm übereinstimmt. Konkret druckt zum Beispiel mein</p>
-
-        <p>Man kann Vizawrite 64 einfach »nur« benutzen oder aber universell einsetzen. Mit zwei Hilfsprogrammen erweitern wir das Leistungsspektrum dieses Textprogramm-Klassikers beträchtlich.</p>
-
-        <p>Panasonic-Drucker mit Print 64-Interface bei [ ein Ä, bei ] ein Ü etc.</p>
+        <p>Unabhängig davon kämpfen Sie eventuell überhaupt mit dem Problem, daß (je nach Drucker und Interface) der gedruckte Zeichensatz nicht mit dem Bildschirm übereinstimmt. Konkret druckt zum Beispiel mein Panasonic-Drucker mit Print 64-Interface bei [ ein Ä, bei ] ein Ü etc.</p>
 
         <p>Abhilfe schafft das abgedruckte Programm »ZVIZA« (Listing 1), welches geladen und gestartet wird, aber erst nach dem Laden und Starten von Vizawrite 64 den Zeichenspeicher im Computer überschreibt. Wie ist das möglich? — »ZVIZA« erzeugt ein interruptgesteuertes Maschinenprogramm, das erst nach zirka einer Minute in Aktion tritt. Zeit genug, das Textprogramm nachzuladen und zu starten.</p>
 
@@ -38,7 +37,7 @@
 
         <p>Nun ans Werk: Nach dem Abtippen des Programms speichern Sie es am besten auf der gleichen Diskette wie Vizawrite. Bevor Sie Ihre eigenen Zeichen definieren, sollten Sie es ausprobieren:</p>
 
-        <ul>
+        <ul class="mono">
             <li>LOAD"ZVIZA"</li>
             <li>RUN</li>
         </ul>
@@ -46,50 +45,53 @@
 
         <p>Das Programm lädt Vizawrite selbst nach. Nach dem Start dauert es ein paar Sekunden, bis der Zeichensatz geändert ist. Sie können das verfolgen, wenn Sie sofort ein Dokument erstellen und zum Beispiel [ oder t eingeben. »ZVIZA« arbeitet übrigens nicht mit der deutschen Vizawrite-Version zusammen, da es für die englische Version geschrieben wurde.</p>
 
-        <p>Erstellen Sie nun Ihre Zeichen als Datazeilen ab Zeile 200. Sie möchten zum Beispiel für »*« ein »ü« auf dem Schirm sehen. »*« hat den Bildschirmcode 42 (siehe Handbuch), es ist also das 42. Zeichen im Speicher. Jedes Zeichen beansprucht 8 Bytes, der Zeichenspeicher beginnt bei 14336 ($3800), so daß sich die Zieladresse wie folgt berechnet:<br>
-            Zieladr = 8*42 + 14336 = 14672<br>
-            Hi = INT(14672/256) = 57<br>
-            Low = 14672 - 256*Hi = 80</p>
+        <p>Erstellen Sie nun Ihre Zeichen als Datazeilen ab Zeile 200. Sie möchten zum Beispiel für »*« ein »ü« auf dem Schirm sehen. »*« hat den Bildschirmcode 42 (siehe Handbuch), es ist also das 42. Zeichen im Speicher. Jedes Zeichen beansprucht 8 Bytes, der Zeichenspeicher beginnt bei 14336 ($3800), so daß sich die Zieladresse wie folgt berechnet:</p>
+
+        <ul class="plain">
+            <li>Zieladr = 8*42 + 14336 = 14672</li>
+            <li>Hi = INT(14672/256) = 57</li>
+            <li>Low = 14672 - 256*Hi = 80</li>
+        </ul>
 
         <p>Das Zeichen selbst erstellen Sie in der bekannten Weise (Bild 1).</p>
 
         <figure>
-            <table>
-                <tr>
-                    <th>128</th><th>64</th><th>32</th><th>16</th><th>8</th><th>4</th><th>2</th><th>1</th>
-                    <th></th>
+            <table class="plain center">
+                <tr class="separator">
+                    <td>128</td><td>64</td><td>32</td><td>16</td><td>8</td><td>4</td><td>2</td><td>1</td>
+                    <td></td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td></td><td>X</td><td>X</td><td></td><td></td><td>X</td><td>X</td><td></td>
-                    <td>64 + 32 + 4 + 2 = 102</td>
+                    <td class="right">64+32+4+2 = 102</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td>0</td>
+                    <td class="right">0</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td></td><td>X</td><td>X</td><td></td><td></td><td>X</td><td>X</td><td></td>
-                    <td>102</td>
+                    <td class="right">102</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td></td><td>X</td><td>X</td><td></td><td></td><td>X</td><td>X</td><td></td>
-                    <td>102</td>
+                    <td class="right">102</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td></td><td>X</td><td>X</td><td></td><td></td><td>X</td><td>X</td><td></td>
-                    <td>102</td>
+                    <td class="right">102</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td></td><td>X</td><td>X</td><td></td><td></td><td>X</td><td>X</td><td></td>
-                    <td>102</td>
+                    <td class="right">102</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td></td><td></td><td>X</td><td>X</td><td>X</td><td></td><td>X</td><td>X</td>
-                    <td>32 + 16 + 8 + 2 + 1 = 59</td>
+                    <td class="right">32+16+8+2+1 = 59</td>
                 </tr>
                 <tr>
                     <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td>0</td>
+                    <td class="right">0</td>
                 </tr>
             </table>
             <figcaption>Bild 1. So definiert man neue Zeichen mit ZVIZA für Vizawrite 64</figcaption>
@@ -128,31 +130,31 @@
 
         <p>Da die Buchstaben, Ziffern und Zeichen in Vizawrite 64 im Bildschirmcode gespeichert werden, muß zunächst eine Umwandlung in ASCII-Zeichen erfolgen. Dies geschieht in reinen Basic-Anweisungen, die das Programm zwar verlangsamen, aber dafür für jeden Programmierer einsichtig sind. Es wird Zeile für Zeile bearbeitet und sofort ausgegeben.</p>
 
-        <p>Beim Umsetzen von Bildschirm- auf ASCII-Code werden auch die deutschen Umlaute und das »ß« mit umgerechnet. Diese Buchstaben sind anschließend als Grafikzeichen vorhanden (Tabelle 1). Hierdurchwirdzwar die Lesbarkeit auf dem Bildschirm und der Datei behindert, aber durch diese Darstellung wird sichergestellt, daß beim Zurücklesen des sequentiellen Files in Vizawrite 64, diese Buchstaben korrekt wiedergegeben werden.</p>
+        <p>Beim Umsetzen von Bildschirm- auf ASCII-Code werden auch die deutschen Umlaute und das »ß« mit umgerechnet. Diese Buchstaben sind anschließend als Grafikzeichen vorhanden (Tabelle 1). Hierdurch wird zwar die Lesbarkeit auf dem Bildschirm und der Datei behindert, aber durch diese Darstellung wird sichergestellt, daß beim Zurücklesen des sequentiellen Files in Vizawrite 64, diese Buchstaben korrekt wiedergegeben werden.</p>
 
         <figure>
-            <table>
-                <tr>
+            <table class="plain">
+                <tr class="separator">
                     <td>ä</td>
                     <td>— chr$(229)</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>ö</td>
                     <td>— chr$(182)</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>ü</td>
                     <td>— chr$(184)</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>Ä</td>
                     <td>— chr$(185)</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>Ö</td>
                     <td>— chr$(186)</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>Ü</td>
                     <td>— chr$(187)</td>
                 </tr>
@@ -170,10 +172,12 @@
 
         <address class="author">(Klaus Heck/aw)</address>
 
-        <p class="source">Literatur: Vizawrite 64 Textverarbeitung mit dem Commodore 64, Deutsches Handbuch, 3. Auflage, 1984<br>
-            Hauck, Helmut: Alle Tasten-, Zeichen- und Steuercodes, Teil 3, 64er, 7/84<br>
-            Commodore 64-Handbuch<br>
-            Floppy Disk VC1541 Bedienungshandbuch</p>
+        <ul class="plain source">
+            <li>Literatur: Vizawrite 64 Textverarbeitung mit dem Commodore 64, Deutsches Handbuch, 3. Auflage, 1984</li>
+            <li>Hauck, Helmut: Alle Tasten-, Zeichen- und Steuercodes, Teil 3, 64er, 7/84</li>
+            <li>Commodore 64-Handbuch</li>
+            <li>Floppy Disk VC1541 Bedienungshandbuch</li>
+        </ul>
     </article>
 </body>
 
