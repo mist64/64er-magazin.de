@@ -10,8 +10,8 @@
     <meta name="64er.pages" content="29-32">
     <meta name="64er.head1" content="Grafik">
     <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="<b>Fantastische Grafik für C 64<br>Hilfreiche Grundlagen: Grafik für Profis</b>">
     <meta name="64er.toc_category" content="Grafik">
-    <meta name="64er.toc_title" content="Hilfreiche Grundlagen: Grafik für Profis">
     <meta name="64er.index_title" content="Grafik für Profis (Teil 1)">
     <meta name="64er.index_category" content="Software-Grundlagen und Kurse|Grafik für Profis">
     <meta name="64er.id" content="profi-grafik">
@@ -26,7 +26,7 @@
 
         <p>Die meisten dieser Befehle enthalten bestimmte Rechenalgorithmen, die dazu dienen, die Koordinaten eines zu zeichnenden Punktes zu bestimmen. Eine gute Voraussetzung für diesen Grafikkurs sind die beiden Kurse »Reise durch die Wunderwelt der Grafik« und »Assembler ist keine Alchimie« von H. Ponnath. Wenn Sie diese beiden Kurse aufmerksam verfolgt haben, dann sind Sie mit den Grafikfähigkeiten des C 64 vertraut. Mit einigen der dort erworbenen Assemblerkenntnissen dürften Sie wohl in der Lage sein, die zum Zeichnen in der Hi-Res-Grafik wichtigen Befehle selbst in Maschinensprache zu formulieren.</p>
 
-        <p>Ein Ergebnis eines solchen Versuchs könnte etwa das Programm »HiRes-3« von H. Ponnath sein. Wenn Sie sich aber eine zeitlang intensiv mit diesem Programm beschäftigt haben, werden Sie merken, daß die Zeichengeschwindigkeit der meisten Befehle noch Wünsche offen läßt. Der Grund hierfür liegt nicht etwa darin, daß das Programm schlecht programmiert wurde, sondern das Problem liegt in der Berechnung der Algorithmen. Das betrifft besonders die Befehle, die mit der herkömmlichen 16-Bit-Arithmetik scheinbar nicht mehr zu bewältigen sind (Circle-Befehl). Gerade hierin aber zeigt sich die wahre Programmierkunst. Nämlich die Fähigkeit, mit einigen Programmierkniffen und mit etwas Fantasie das scheinbar Unmögliche doch noch möglich zu machen. Ich möchte versuchen, Ihnen in diesem Kurs einige dieser »Tricks« zu vermitteln. Dazu eignet sich meiner Ansicht nach nichts besser als das reizvolle Thema »Hochauflösende Grafik«. Dazu bekommen Sie nebenbei auch noch ein professionelles Grafikprogramm, mit dem es sich hervorragend arbeiten läßt. Ich möchte Ihnen nun dieses Programm, das der Hauptgegenstand dieses Kurses sein wird, etwas genauer vorstellen. »Profi-Grafik 64«, so der Name des Programms, besteht aus vielerlei Grafikroutinen, die der besseren Handhabung wegen zu einer Basic-Erweiterung zusammengefaßt wurden. Profi-Grafik 64 hat einige hervorstechende Merkmale:</p>
+        <p>Ein Ergebnis eines solchen Versuchs könnte etwa das Programm »HiRes-3« von H. Ponnath sein. Wenn Sie sich aber eine zeitlang intensiv mit diesem Programm beschäftigt haben, werden Sie merken, daß die Zeichengeschwindigkeit der meisten Befehle noch Wünsche offen läßt. Der Grund hierfür liegt nicht etwa darin, daß das Programm schlecht programmiert wurde, sondern das Problem liegt in der Berechnung der Algorithmen. Das betrifft besonders die Befehle, die mit der herkömmlichen 16-Bit-Arithmetik scheinbar nicht mehr zu bewältigen sind (Circle-Befehl). Gerade hierin aber zeigt sich die wahre Programmierkunst. Nämlich die Fähigkeit, mit einigen Programmierkniffen und mit etwas Fantasie das scheinbar Unmögliche doch noch möglich zu machen. Ich möchte versuchen, Ihnen in diesem Kurs einige dieser »Tricks« zu vermitteln. Dazu eignet sich meiner Änsicht nach nichts besser als das reizvolle Thema »Hochauflösende Grafik«. Dazu bekommen Sie nebenbei auch noch ein professionelles Grafikprogramm, mit dem es sich hervorragend arbeiten läßt. Ich möchte Ihnen nun dieses Programm, das der Hauptgegenstand dieses Kurses sein wird, etwas genauer vorstellen. »Profi-Grafik 64«, so der Name des Programms, besteht aus vielerlei Grafikroutinen, die der besseren Handhabung wegen zu einer Basic-Erweiterung zusammengefaßt wurden. Profi-Grafik 64 hat einige hervorstechende Merkmale:</p>
 
         <ul>
             <li>Es stehen zwei Grafikseiten zur Verfügung</li>
@@ -49,11 +49,11 @@
 
         <p>Durch ihn bestimmt man die Nummer des Bildschirms, den man anwählen will. Der Parameter »nr.« kann 0 oder 1 sein. Die Bitmap von Screen0 nimmt den Bereich von $A000-$BFFF ein und das Video-RAM den Bereich von $8C00-$8FFF.</p>
 
-        <p>Bei Screen1 sind dies die Bereiche $E000-$FFFF für die Bitmap und $CC00-$CFFF für das Video-RAM.</p>
+        <p>Bei Screenl sind dies die Bereiche $E000-$FFFF für die Bitmap und $CC00-$CFFF für das Video-RAM.</p>
 
         <p>Übrigens wird im Register »Scrnum« nicht die Nummer selbst abgelegt, wie man denken könnte, sondern das High-Byte der Bitmap-Anfangsadresse.</p>
 
-        <p>Dies ist deshalb möglich, weil die Bytes $A0 und $E0 bei einer Bit-Abfrage die Flags unterschiedlich beeinflussen. Dies wird beispielsweise beim HiRes-Befehl ausgenutzt.</p>
+        <p>Dies ist deshalb möglich, weil die Bytes $AO und $EO bei einer Bit-Abfrage die Flags unterschiedlich beeinflussen. Dies wird beispielsweise beim HiRes-Befehl ausgenutzt.</p>
 
         <h3>2. HIRES</h3>
 
@@ -91,7 +91,7 @@
 
         <p>So, nun endlich kommen wir zum ersten interessanten Befehl, bei dem die Rechnerei in Maschinensprache anfängt.</p>
 
-        <p>Der PLOT-Befehl dient dazu, ein Bit in der Bitmap, das durch die Koordinaten »x« und »y« festgelegt wird, zu setzen, zu löschen oder zu invertieren. Die x-Koordinate darf sich dabei zwischen 0 und 319 bewegen, die y-Koordinate zwischen 0 und 199, wobei der Ursprung des Koordinatensystems in der linken oberen Bildschirmecke liegt. Nun ist es, wie Sie wohl wissen, nicht so einfach herauszufinden, welches Bit in welchem Byte zu einer bestimmten Bildschirmkoordinate gehört. Um das festzustellen, müssen wir uns den Aufbau der Bitmap anschauen (Bild 1).</p>
+        <p>Der PLOT-Befehl dient dazu, ein Bit in der Bitmap, das durch die Koordinaten »x« und »y« festgelegt wird, zu setzen, zu löschen oder zu invertieren. Die x-Koordinate darf sich dabei zwischen 0 und 319 bewegen, die y-Koordinate zwischenO und 199, wobei der Ursprung des Koordinatensystems in der linken oberen Bildschirmecke liegt. Nun ist es, wie Sie wohl wissen, nicht so einfach herauszufinden, welches Bit in welchem Byte zu einer bestimmten Bildschirmkoordinate gehört. Um das festzustellen, müssen wir uns den Aufbau der Bitmap anschauen (Bild 1).</p>
 
         <figure>
             <img src="29-1.png" alt="Schematische Darstellung des Bitmap-Aufbaus mit 40 Spalten und 25 Zeilen">
@@ -111,9 +111,9 @@
         </figure>
 
         <p>Sie sehen, daß im HiRes-Modus die unteren drei Bit für die Byte-Nummer unwichtig sind und deshalb gelöscht werden müssen. Dies geschieht mit der AND-Funktion:<br>
-            xlo and #%11111000</p>
+            xlo and #^11111000</p>
 
-        <p>Da die x-Werte größer als 255 sein können, müssen wir auch ein Highbyte berücksichtigen, bei dem allerdings nur das Bit 0 gesetzt sein kann, weil der höchste x-Wert 319 = $013F ist. Für die HiRes-Grafik sähe der vorläufige Algorithmus also so aus:<br>
+        <p>Da die x-Werte größer als 255 sein können, müssen wir auch ein Highbyte berücksichtigen, bei dem allerdings nur das Bit 0 gesetzt sein kann, weil der höchste x-Wert319 = $013Fist. Fürdie HiRes-Grafik sähe der vorläufige Algorithmus also so aus:<br>
             256 * xhi+(xlo and #248)</p>
 
         <p>Da es im Multicolor-Modus nur 160 x-Werte gibt, brauchen wir dort kein Highbyte zu berücksichtigen. Sie sehen in Tabelle 2, daß beim Lowbyte die unteren zwei Bit keine Rolle spielen und gelöscht werden müssen: xlo and #%11111100</p>
@@ -130,9 +130,9 @@
             1. Hires-Modus:<br>
             Byte-Nummer = 256 * xhi + (xlo and #248) + (Y and #7) + 320 * (Y/8)<br>
             2. Multi-Modus:<br>
-            Byte-Nummer = 2 * (xlo and #252) + (Y and #7) + 320 * (Y/8)</p>
+            Byte-Nummer = 2 * (xlo and #252) + (Yand #7) + 320 * (Y/8)</p>
 
-        <p>Nun kommen wir zur Formulierung in Maschinensprache. Dazu legen wir erst fest, wie wir der Berechnungsroutine die Koordinaten übergeben. Und zwar soll der y-Wert im x-Register und der x-Wert in den Registern $14/$15 übergeben werden. Schauen sie sich nun die Routine »Hiplot« im Assemblerlisting an. Dies ist die Unterroutine zur Berechnung der Byte-Nummer im HiRes-Modus. Das Geheimnis der Routine liegt in der Art, wie der Term 320*y/8 berechnet wird. Diese Möglichkeit besteht allerdings nur dann, wenn der Multiplikant (320) konstant und der Multiplikator (y/8) in einem gewissen Bereich (hier 0 bis 24) schwankt. In so einem Fall berechnet man alle möglichen Ergebnisse vorher und legt diese in zwei Tabellen (Low- und Highbyte) ab. In der Berechnungsroutine braucht man dann nur noch den Multiplikator als Zeiger ins y-Register zu übertragen und lädt sich das benötigte Ergebnis aus der Tabelle. Hier sind die Ergebnisse in den Tabellen »Maltab« für die Lowbyte und »Maltabl« für die Highbyte abgelegt. Entscheidend bei der Berechnungsroutine ist weiterhin die Anordnung der einzelnen Summanden. Achten Sie außerdem immer auf den Zustand des Carry-Flags, das für die Addition wichtig ist! Die Nummer des Bytes in der Bitmap wird in den beiden Byte $F7/$F8 abgelegt. Am Ende der Routine wird noch die Bitposition innerhalb des Bytes errechnet. Dazu isolieren wir die x-Position mittels (xlo and # 7) und laden den Akku mit der Zweier-Potenz, die der x-Position entspricht. Diese Zweier-Potenzen sind ebenfalls in einer Tabelle (Hochtab) abgelegt.</p>
+        <p>Nun kommen wir zur Formulierung in Maschinensprache. Dazu legen wir erst fest, wie wir der Berechnungsroutine die Koordinaten übergeben. Und zwar soll der y-Wert im x-Register und der x-Wert in den Registern $14/$15 übergeben werden. Schauen sie sich nun die Routine »Hiplot« im Assemblerlisting an. Dies ist die Unterroutine zur Berechnung der Byte-Nummer im HiRes-Modus. Das Geheimnis der Routine liegtin der Art, wie der Term 320*y/8 berechnet wird. Diese Möglichkeit besteht allerdings nur dann, wenn der Multiplikant (320) konstant und der Multiplikator (y/8) in einem gewissen Bereich (hier 0 bis 24) schwankt. In so einem Fall berechnet man alle möglichen Ergebnisse vorher und legt diese in zwei Tabellen (Low- und Highbyte) ab. In der Berechnungsroutine braucht man dann nur noch den Multiplikator als Zeiger ins y-Register zu übertragen und lädt sich das benötigte Ergebnis aus der Tabelle. Hier sind die Ergebnisse in den Tabellen »Maltab« für die Lowbyte und »Maltabl« für die Highbyte abgelegt. Entscheidend bei der Berechnungsroutine ist weiterhin die Anordnung der einzelnen Summanden. Achten Sie außerdem immer auf den Zustand des Carry-Flags, das für die Addition wichtig ist! Die Nummer des Bytes in der Bitmap wird in den beiden Byte $F7/$F8 abgelegt. Am Ende der Routine wird noch die Bitposition innerhalb des Bytes errechnet. Dazu isolieren wir die x-Position mittels (xlo and # 7) und laden den Akku mit der Zweier-Potenz, die der x-Position entspricht. Diese Zweier-Potenzen sind ebenfalls in einer Tabelle (Hochtab) abgelegt.</p>
 
         <p>Im Multi-Modus sieht das Feststellen der Bitposition etwas anders aus. Da wir hier nur vier x-Positionen in einem Byte haben, isolieren wir diese mittels (xlo and # 3). Dann laden wir den Akku mit dem Wert, bei dem die beiden Bits, die dieser x-Position entsprechen, gesetzt sind. Für die x-Position 0 wäre dies der Wert %11000000. Die vier Werte finden Sie in der Tabelle »Multab«.</p>
 
@@ -144,7 +144,7 @@
 
         <h3>Eingabehinweise</h3>
 
-        <p>Listing 2 ist zunächst mit dem MSE einzugben und zu speichern. Im Anschluß daran muß der C 64 aus- und wieder eingeschaltet werden. Laden Sie nun einen Assembler, tippen den Quellcode (Listing 1) ab, lassen ihn übersetzen und laden anschließend Listing 2 absolut (LOAD »PG-MSE«, 8,1). Jetzt muß der Speicherbereich von $800 bis $8574 mit einem Monitor gespeichert werden. Das Programm läßt sich nun mit SYS 64738 aktivieren.</p>
+        <p>Listing 2 ist zunächst mit dem MSE einzugben und zu speichern. Im Anschluß daran muß der C 64 aus- und wieder eingeschaltet werden. Laden Sie nun einen Assembler, tippen den Quellcode (Listing 1) ab, lassen ihn übersetzen und laden anschließend Listing 2 absolut (LOAD »PG-MSE«, 8,1). Jetzt muß der Speicherbereich von $800 bis $8574 mit einem Monitorgespeichertwerden. Das Programm läßt sich nun mit SYS 64738 aktivieren.</p>
 
         <address class="author">(Andreas Schömann/cg)</address>
 
