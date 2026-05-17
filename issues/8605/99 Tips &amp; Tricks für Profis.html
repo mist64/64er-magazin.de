@@ -39,8 +39,9 @@
 
         <h2>»Device not present Error«</h2>
 
-        <p>Mit folgender Befehlsfolge können Sie überprüfen, ob Floppy oder Drucker am seriellen Bus angeschlossen und eingeschaltet sind:<br>
-            OPEN lf,ga,sa: CLOSE lf: IF ST &lt; 0 THEN PRINT"Fehler!":STOP</p>
+        <p>Mit folgender Befehlsfolge können Sie überprüfen, ob Floppy oder Drucker am seriellen Bus angeschlossen und eingeschaltet sind:
+            <code class="mono">OPEN lf,ga,sa: CLOSE lf: IF ST &lt; 0 THEN PRINT"Fehler!":STOP</code>
+        </p>
 
         <p>Bedeutung der Variablen:</p>
 
@@ -63,11 +64,13 @@
             </tr>
         </table>
 
-        <p>Funktionsweise: Der OPEN-Befehl aktualisiert, da kein Filename angegeben ist, nur die Computer-interne Tabelle der geöffneten Files. Daher kann der OPEN-Befehl auch niemals einen »DEVICE NOT PRESENT ERROR« nach sich ziehen. Entscheidend ist der CLOSE-Befehl: Da die in dieser Tabelle eingetragene Geräteadresse auf den seriellen Bus weist, wird auf jeden Fall auf den Bus zugegriffen und dabei festgestellt, daß das Gerät nicht angeschlossen beziehungsweise eingeschaltet ist. Dieser Zustand setzt Bit 7 der Statusvariablen ST. Der Basic-Interpreter verzichtet beim CLOSE-Befehl aufdie Überprüfung dieser Systemvariablen, also tritt kein »?device not present error« auf. Wird ST dann von Basic aus angesprochen, wird Bit 7 als Vorzeichenbit aufgefaßt, folglich enthält ST bei fehlendem/ausgeschaltetem Gerät einen negativen Wert und der IF-Befehl wird nach dem THEN fortgesetzt.</p>
+        <p>Funktionsweise: Der OPEN-Befehl aktualisiert, da kein Filename angegeben ist, nur die Computer-interne Tabelle der geöffneten Files. Daher kann der OPEN-Befehl auch niemals einen »DEVICE NOT PRESENT ERROR« nach sich ziehen. Entscheidend ist der CLOSE-Befehl: Da die in dieser Tabelle eingetragene Geräteadresse auf den seriellen Bus weist, wird auf jeden Fall auf den Bus zugegriffen und dabei festgestellt, daß das Gerät nicht angeschlossen beziehungsweise eingeschaltet ist. Dieser Zustand setzt Bit 7 der Statusvariablen ST. Der Basic-Interpreter verzichtet beim CLOSE-Befehl auf die Überprüfung dieser Systemvariablen, also tritt kein »?device not present error« auf. Wird ST dann von Basic aus angesprochen, wird Bit 7 als Vorzeichenbit aufgefaßt, folglich enthält ST bei fehlendem/ausgeschaltetem Gerät einen negativen Wert und der IF-Befehl wird nach dem THEN fortgesetzt.</p>
 
-        <p>Übrigens: Kannten Sie schon diesen Betriebssystemfehler: Geben Sie bei ausgeschalteter Floppy ein:<br>
-            10 OPEN 1, 8, 15 : INPUT#1, E, E$<br>
-            RUN</p>
+        <p>Übrigens: Kannten Sie schon diesen Betriebssystemfehler: Geben Sie bei ausgeschalteter Floppy ein:
+            <code class="mono">10 OPEN 1, 8, 15 : INPUT#1, E, E$
+                RUN
+            </code>
+        </p>
 
         <p>Der Computer wartet, bis Sie die Floppy einschalten, und gibt dann erst »?device not present error« aus.</p>
 
@@ -77,30 +80,34 @@
 
         <p>Die »Hardcopyroutine auf Tastendruck für Epson-Drucker« aus 64’er, Ausgabe 1/86, läßt sich für den STAR SG/10,15-Drucker modifizieren.</p>
 
-        <p>Programm »Hardcopy.Obj.« mit,8,l laden, »SYS 49152« eingeben und danach im Direktmodus folgende POKEs eingeben:<br>
-            POKE49441,75 : POKE49442,27 : POKE49443,13 : POKE49444,49 : POKE 49445,27.</p>
+        <p>Programm »<span class="mono">Hardcopy.Obj.</span>« mit,8,l laden, »<span class="mono">SYS 4915</span>2« eingeben und danach im Direktmodus folgende POKEs eingeben:
+            <code class="mono">POKE49441,75 : POKE49442,27 : POKE49443,13 : POKE49444,49 : POKE 49445,27.</code>
+        </p>
 
-        <p>Soll noch statt der F1-Taste, die in vielen Programmen zur Auswahl in Menüs verwendet wird, eine andere Taste gewählt werden (ich verwende die»= «-Taste), so muß noch POKE 49168,53 eingegeben werden.</p>
+        <p>Soll noch statt der F1-Taste, die in vielen Programmen zur Auswahl in Menüs verwendet wird, eine andere Taste gewählt werden (ich verwende die »=«-Taste), so muß noch <span class="mono">POKE 49168,53</span> eingegeben werden.</p>
 
         <address class="author">(Heden Wolfgang/tr)</address>
 
         <h2>Basic-Programm im $C000-Bereich?</h2>
 
-        <p>In der Tat kann es manchmal bei Verwaltung größerer Datenmengen beim C 64 sinnvoll sein, den für Basic-Programme normalerweise nicht zugänglichen Bereich $C000 bis $D000 (C 64) beziehungsweise $A000 bis $C000 (VC 20) mit dem Basic-Programm zu belegen und damit den Grundspeicher voll für Variablenfelder zur Verfügung zu haben. Für die Programmeingabe (beziehungsweise zum Laden) lautet die POKE-Kombination:<br>
-            POKE44,192:POKE56,208:POKE49152,0:NEW</p>
+        <p>In der Tat kann es manchmal bei Verwaltung größerer Datenmengen beim C 64 sinnvoll sein, den für Basic-Programme normalerweise nicht zugänglichen Bereich $C000 bis $D000 (C 64) beziehungsweise $A000 bis $C000 (VC 20) mit dem Basic-Programm zu belegen und damit den Grundspeicher voll für Variablenfelder zur Verfügung zu haben. Für die Programmeingabe (beziehungsweise zum Laden) lautet die POKE-Kombination:
+            <code class="mono">POKE44,192:POKE56,208:POKE49152,0:NEW</code>
+        </p>
 
-        <p>Die Programmzeile 0 eines solchen Programms muß dann lauten:<br>
-            0 POKE56,PEEK(644):POKE45,3:POKE46,PEEK(642):CLR</p>
+        <p>Die Programmzeile 0 eines solchen Programms muß dann lauten:
+            <code class="mono">0 POKE56,PEEK(644):POKE45,3:POKE46,PEEK(642):CLR</code>
+        </p>
 
-        <p>Achtung: Nach »RUN« kann zwar noch mit »LIST« das Programm abgefragt werden, aber Änderungen im Programmlisting führen unweigerlich zum Systemabsturz (hängt mit der Verschieberoutine für Basic-Zeilen zusammen)! Für den VC 20 gilt für die Programmverlegung nach $A000-$C000 (sofern dieser Bereich mit einer RAM-Erweiterung belegt ist) für die Programmeingabe die Befehlsfolge POKE 44,160:POKE 56, 192:POKE 40960,0: NEW. Die Zeile 0 gilt unverändert auch beim VC 20.</p>
+        <p>Achtung: Nach »RUN« kann zwar noch mit »LIST« das Programm abgefragt werden, aber Änderungen im Programmlisting führen unweigerlich zum Systemabsturz (hängt mit der Verschieberoutine für Basic-Zeilen zusammen)! Für den VC 20 gilt für die Programmverlegung nach $A000-$C000 (sofern dieser Bereich mit einer RAM-Erweiterung belegt ist) für die Programmeingabe die Befehlsfolge <span class="mono">POKE 44,160:POKE 56, 192:POKE 40960,0: NEW</span>. Die Zeile 0 gilt unverändert auch beim VC 20.</p>
 
         <address class="author">(Barnim König/tr)</address>
 
         <h2>Grafikzeichen in der ID</h2>
 
-        <p>Durch folgenden kleinen Trick ist es möglich, auch Grafikzeichen in der ID einer Diskette zu verwenden: Man schiebt beim Formatieren vor der ID noch ein Anführungszeichen (CHR$ (34)) ein:<br>
-            OPEN 1,8,15,"N:NAME" + CHR$(34) + ",ID":CLOSE1<br>
-            Der Kreativität sind keine Grenzen gesetzt.</p>
+        <p>Durch folgenden kleinen Trick ist es möglich, auch Grafikzeichen in der ID einer Diskette zu verwenden: Man schiebt beim Formatieren vor der ID noch ein Anführungszeichen (CHR$ (34)) ein:
+            <code>OPEN 1,8,15,"N:NAME" + CHR$(34) + ",ID":CLOSE1</code>
+            Der Kreativität sind keine Grenzen gesetzt.
+        </p>
 
         <address class="author">(Wolf Schenk/tr)</address>
 
@@ -134,10 +141,13 @@
 
         <h2>Absturz-POKES</h2>
 
-        <p>Durch »Verbiegen« diverser Vektoren lassen sich einige interessante Effekte erreichen:<br>
-            POKE768,226:POKE769,252 — Reset nach Programmfehler oder Programmende (nicht im Direktmodus verwenden!)<br>
-            POKE770,226:POKE771,252 — Reset nach Drücken der STOP-Taste (nicht im Direktmodus verwenden!)<br>
-            POKE816,226:POKE817,252 — Reset nach Eingabe des LOAD-Befehls</p>
+        <p>Durch »Verbiegen« diverser Vektoren lassen sich einige interessante Effekte erreichen:</p>
+
+        <ul class="plain">
+            <li><span class="mono">POKE768,226:POKE769,252</span> — Reset nach Programmfehler oder Programmende (nicht im Direktmodus verwenden!)</li>
+            <li><span class="mono">POKE770,226:POKE771,252</span> — Reset nach Drücken der STOP-Taste (nicht im Direktmodus verwenden!)</li>
+            <li><span class="mono">POKE816,226:POKE817,252</span> — Reset nach Eingabe des LOAD-Befehls</li>
+        </ul>
 
         <p>Mit diesem Trick lassen sich noch andere Zeiger verändern. Wo diese Zeiger im Speicher des C64 liegen, läßt sich aus der Speicherbelegungstabelle des Handbuchs (Anhang Q, Seite 160) entnehmen.</p>
 
@@ -149,17 +159,17 @@
 
         <p>Array-Sort (Listing 3) wird absolut geladen (Sekundäradresse 1) und steht dann im Bereich $C000 bis $C31B. Es ist wegen einiger JMPs und JSRs nicht relokatibel. Aufgerufen wird die Sortierung mit SYS49152, Variable, wobei das $-Zeichen nicht angegeben wird.</p>
 
-        <p>Beispiele: SYS49152,A, oder SYS49152,NM, aber nicht SYS49152,A$. Bei zweidimensionalen Arrays muß vorher noch das Element der 2. Dimension, nach dem sortiert werden soll, in die Speicherstelle 780 gePOKEt werden.</p>
+        <p>Beispiele: <span class="mono">SYS49152,A, oder SYS49152,NM,</span> aber nicht SYS49152,A$. Bei zweidimensionalen Arrays muß vorher noch das Element der 2. Dimension, nach dem sortiert werden soll, in die Speicherstelle 780 gePOKEt werden.</p>
 
         <p>Beispiel:</p>
 
-        <p>Eine kleine Adreßverwaltung besteht aus Y$(X,0)=Vorname, Y$(X,l)=Nachname, Y$(X,2) = Straße und Y$(X,3) = Ort.</p>
+        <p>Eine kleine Adreßverwaltung besteht aus Y$(X,0)=Vorname, Y$(X,1)=Nachname, Y$(X,2) = Straße und Y$(X,3) = Ort.</p>
 
-        <p>So wird nun mit »POKE780,l:SYS48152,Y« das Array nach den Nachnamen sortiert.</p>
+        <p>So wird nun mit »<span class="mono">POKE780,1:SYS48152,Y</span>« das Array nach den Nachnamen sortiert.</p>
 
         <p>Der POKE darf nicht entfallen, da sich in Zelle 780 zufällige Werte befinden!</p>
 
-        <p>Sollte das Array nicht dimensioniert oder das Element das in 780gePOKEtwird, nicht vorhanden sein, soführtdaszu der Fehlermeldung »Bad Subscript«. Im Programm werden einige Zeropage-Adressen und Teile des Kassettenpuffers verwendet, was jedoch für Basic nicht sehr von Belang ist.</p>
+        <p>Sollte das Array nicht dimensioniert oder das Element das in 780 gePOKEt wird, nicht vorhanden sein, so führt das zu der Fehlermeldung »Bad Subscript«. Im Programm werden einige Zeropage-Adressen und Teile des Kassettenpuffers verwendet, was jedoch für Basic nicht sehr von Belang ist.</p>
 
         <figure>
             <pre data-filename="array-sort.prg" data-name="Array-Sort" data-mse="mse1"></pre>
@@ -197,7 +207,7 @@
         <ol>
             <li>W C000 D000 9000</li>
             <li>V C000 D000 900 920B 9FD8</li>
-            <li>M 902B 906B :Injedemzweiten Byte das erste »C« in eine »9« umwandeln</li>
+            <li>M 902B 906B :In jedem zweiten Byte das erste »C« in eine »9« umwandeln</li>
             <li>FIC*,9000,9FFA :Die Befehle so umändern wie in der 64’er, Ausgabe 12/85 erwähnt. (Achtung: ab $9B00 stimmen die Adressen der Befehle mit den alten Adressen nicht mehr überein)</li>
             <li>M 9FDE 9FEA :Wie unter »3«.</li>
         </ol>
@@ -240,123 +250,123 @@
         <aside>
             <h2>Diverse POKEs</h2>
 
-            <table>
-                <tr>
+            <table class="plain">
+                <tr class="separator">
                     <td>POKE</td>
                     <td>53265,27</td>
                     <td>Bildschirm aus/einschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>204,0</td>
                     <td>Cursor-Blinken einschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>207,0 : POKE 204,1</td>
                     <td>Cursor-Blinken ausschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>56325,5-255</td>
                     <td>Cursor schnell/langsam</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>56334, PEEK (56334) OR 1</td>
                     <td>Interrupt ausschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>56334, PEEK (56334) AND 254</td>
                     <td>Interrupt einschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>788,52/49</td>
                     <td>RUN/STOP Taste aus/einschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>792,193/71</td>
                     <td>RESTORE Taste aus/einschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>651,255</td>
                     <td>Repeat um 4 Sekunden verzögern</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>646,0-15</td>
                     <td>Schriftfarbe setzen</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>199,0...1</td>
                     <td>Revers-Modus aus/ein</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>POKE</td>
                     <td>649,0...10</td>
                     <td>Tastatur ab/einschalten</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>SYS</td>
                     <td>65499</td>
                     <td>TI$="000000"</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>SYS</td>
                     <td>42115</td>
                     <td>END ohne READY.</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>SYS</td>
                     <td>44808</td>
                     <td>? SYNTAX ERROR</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>SYS</td>
                     <td>62255</td>
                     <td>Alle Files schließen</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>WAIT</td>
                     <td>653,1...2...4</td>
                     <td>Warten bis SHIFT/Commodore/CTRL gedrückt wird</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>WAIT</td>
                     <td>203,63</td>
                     <td>Warten auf Tastendruck</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>WAIT</td>
                     <td>203,64</td>
                     <td>Warten solange Taste gedrückt ist</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>PRINT</td>
                     <td>PEEK (152)</td>
                     <td>Anzahl der offenen Files</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>PRINT</td>
                     <td>PEEK (153)</td>
                     <td>Aktuelles Eingabegerät</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>PRINT</td>
                     <td>PEEK (154)</td>
                     <td>Aktuelles Ausgabegerät</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>PRINT</td>
                     <td>PEEK (184)</td>
                     <td>Aktuelle Filenummer</td>
                 </tr>
-                <tr>
+                <tr class="separator">
                     <td>PRINT</td>
                     <td>PEEK (185)</td>
                     <td>Aktuelle Sekundäradresse</td>
