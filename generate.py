@@ -16,6 +16,7 @@ import urllib.parse
 import pytz
 import argparse
 import gzip
+import csv
 import lunr
 from tools import mse, checksummer, assembler_decode
 from dataclasses import dataclass, field
@@ -966,10 +967,44 @@ def article_path(issue, article, prepend_issue_dir=False):
     article_path = optional_issue_prefix(article.out_filename(), issue, prepend_issue_dir)
     return article_path
 
-def article_link(db, article, title, prepend_issue_dir=False):
+def article_link(db, article, title, prepend_issue_dir=False, from_subdirectory=False):
     issue = db.issues[article.issue_key]
     path = article_path(issue, article, prepend_issue_dir)
+    if from_subdirectory:
+        path = "../" + path
     return f"<a href='{path}'>{title}</a>"
+
+_author_codes_cache = None
+
+def load_author_codes():
+    """Load the author code -> full name mapping from known_authors.csv (cached)."""
+    global _author_codes_cache
+    if _author_codes_cache is None:
+        author_codes = {}
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'known_authors.csv')
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            for row in csv.DictReader(f):
+                code = row['code'].strip()
+                name = row['name'].strip()
+                if code:
+                    author_codes[code] = name
+        _author_codes_cache = author_codes
+    return _author_codes_cache
+
+def resolve_meta_authors(soup, known_authors):
+    """Return the list of canonical author names from an article's
+    <meta name="author"> tags, resolving known editor codes to full names.
+
+    Articles for unsigned rubrics (Leserforum, Impressum, Vorschau,
+    Fehlerteufelchen, contest announcements, ...) have no author meta and
+    yield an empty list."""
+    authors = []
+    for meta in soup.find_all('meta', {"name": "author"}):
+        for author in meta.get("content", "").split(','):
+            author = author.strip()
+            if author and author != "XXX":
+                authors.append(known_authors.get(author, author))
+    return authors
 
 def prg_link(issue, download):
     label, url = download
@@ -1780,6 +1815,79 @@ def generate_course_navigation(article, course_series_map, db):
     return ''.join(nav_parts)
 
 
+def author_page_url(author_name):
+    """Absolute URL of a single author's page."""
+    return f"/{BASE_DIR}authors/{author_name.replace(' ', '_')}.html"
+
+def make_authors_clickable(soup):
+    """Turn the author bylines in <address class="author"> tags into links to
+    the per-author pages.
+
+    Matching is intentionally exact-only: a byline token is linked only if it
+    is a known editor code (resolved via known_authors.csv) or if it matches a
+    canonical author from this article's <meta name="author"> verbatim.
+    Anything else (guest authors with no dedicated page, unsigned rubrics with
+    no meta) is left as plain text. The original display text, parentheses and
+    German typography are preserved."""
+    known_authors = load_author_codes()
+
+    # Canonical authors for this article, resolved from the meta tags. Empty
+    # for unsigned rubrics (Leserforum, Impressum, Vorschau, ...).
+    canonical_authors = resolve_meta_authors(soup, known_authors)
+    canonical_by_lower = {a.lower(): a for a in canonical_authors}
+
+    def linked_target(token):
+        """Return the canonical author name to link to, or None."""
+        bare = re.sub(r'\([^)]*\)', '', token).strip()
+        if not bare:
+            return None
+        if bare in known_authors:
+            return known_authors[bare]
+        return canonical_by_lower.get(bare.lower())
+
+    for address in soup.find_all('address', class_='author'):
+        text = address.get_text().strip()
+        if not text:
+            continue
+
+        # An address that is wholly wrapped in a single pair of parentheses,
+        # e.g. "(bs)" or "(H. Ponnath/dm)": keep the parentheses, link inside.
+        if (text.startswith('(') and text.endswith(')')
+                and text.count('(') == 1 and text.count(')') == 1):
+            prefix, inner, suffix = '(', text[1:-1], ')'
+        else:
+            prefix, inner, suffix = '', text, ''
+
+        address.clear()
+        if prefix:
+            address.append(prefix)
+
+        # Keep the separators ('/' and ',') so the byline reads unchanged.
+        for part in re.split(r'([/,])', inner):
+            if part in ('/', ','):
+                address.append(part)
+                continue
+            if not part.strip():
+                address.append(part)
+                continue
+            target = linked_target(part.strip())
+            if target:
+                # Preserve leading/trailing whitespace around the name.
+                lead = part[:len(part) - len(part.lstrip())]
+                trail = part[len(part.rstrip()):]
+                if lead:
+                    address.append(lead)
+                link = soup.new_tag('a', href=author_page_url(target))
+                link.string = part.strip()
+                address.append(link)
+                if trail:
+                    address.append(trail)
+            else:
+                address.append(part)
+
+        if suffix:
+            address.append(suffix)
+
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link, course_series_map, db):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article.html
@@ -1825,6 +1933,9 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FUTURETEUFELCHEN, 'html.parser')
         aside.insert(0, ft_tag)
+
+    # Turn author bylines into links to the per-author pages
+    make_authors_clickable(soup)
 
     # Insert actions for downloading the pdf and tooting to mastooton
     download_pdf_html = f'''
@@ -1895,11 +2006,8 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
             else:
                 image_url = f"{RSS_BASE_URL}{BASE_DIR}{image_url}"
 
-        # author information
-        authors_meta_list = soup.find_all('meta', {"name": "author"})
-        authors_list = []
-        for authors_meta in authors_meta_list:
-            authors_list.extend([author.strip() for author in authors_meta["content"].split(',')])
+        # author information (editor codes resolved to full names)
+        authors_list = resolve_meta_authors(soup, load_author_codes())
 
         if authors_list:
             db.authors.update(authors_list)
@@ -2137,22 +2245,121 @@ def generate_search_json(db, out_directory):
     with gzip.open(os.path.join(out_directory, 'search_idx.json.gz'), 'wt') as f:
         json.dump(serialized_idx, f, ensure_ascii=False)
 
-def generate_author_pages(db, out_directory):
-    known_authors = {}
-    known_authors["aa"] = "Albert Absmeier"
-    known_authors["ev"] = "Volker Everts"
-    known_authors["gk"] = "Georg Klinge"
-    known_authors["kg"] = "Karin Gößlinghoff"
-    known_authors["py"] = "Michael M. Pauly"
-    known_authors["rg"] = "Christian Rogge"
-    known_authors["sc"] = "Michael Scharfenberger"
+def _author_display_name(author):
+    """'First Last' -> 'Last, First' for index display; pass through single tokens."""
+    parts = author.split()
+    if len(parts) < 2:
+        return author
+    return f"{parts[-1]}, {' '.join(parts[:-1])}"
 
-    # the shorthands that are in the magazine but not in the imprint and
-    # XXX is the marker for author tags that are not set
+def generate_single_author_page(db, author, articles, authors_dir, name_to_code):
+    """Generate the page for one author listing all their articles."""
+    articles = sorted(articles, key=lambda a: (db.issues[a.issue_key].pubdate, a.first_page_number()))
+
+    code = name_to_code.get(author)
+    page_title = f"{author} ({code})" if code else author
+
+    html_parts = []
+    html_parts.append("<main>\n")
+    html_parts.append(f"<h1>{html.escape(page_title)}</h1>\n")
+    html_parts.append(f'<p><a href="/{BASE_DIR}authors.html">&rarr; Alle Autoren</a></p>\n')
+    html_parts.append("<hr>\n")
+    html_parts.append(f"<p>{len(articles)} Artikel</p>\n")
+    html_parts.append("<hr>\n")
+
+    current_issue = None
+    for article in articles:
+        if article.issue_key != current_issue:
+            if current_issue is not None:
+                html_parts.append("</ul>\n")
+            current_issue = article.issue_key
+            html_parts.append(f"<h3>{LABEL_ISSUE} {current_issue}</h3>\n<ul>\n")
+        link = article_link(db, article, html.escape(index_title(article)), True, from_subdirectory=True)
+        html_parts.append(f"<li>{link} ({LABEL_PAGE} {article.pages})</li>\n")
+    if current_issue is not None:
+        html_parts.append("</ul>\n")
+    html_parts.append("</main>\n")
+
+    author_path = os.path.join(authors_dir, f"{author.replace(' ', '_')}.html")
+    write_full_html_file(db, author_path, f"{page_title} | {MAGAZINE_NAME}", None, ''.join(html_parts), 'one_author')
+
+def _author_index_body(authors, counts, name_to_code, by_count):
+    """Build the <main> body for an author index page."""
+    html_parts = []
+    html_parts.append("<main>\n")
+    html_parts.append("<h1>Alle Autoren</h1>\n")
+    html_parts.append(f"<p>{len(authors)} Autoren</p>\n")
+    html_parts.append("<hr>\n")
+
+    def list_item(author):
+        display = _author_display_name(author)
+        code = name_to_code.get(author)
+        if code:
+            display = f"{display} ({code})"
+        count = counts.get(author, 0)
+        if count > 1:
+            display = f"<b>{html.escape(display)}</b> ({count})"
+        else:
+            display = html.escape(display)
+        return f'<li><a href="{author_page_url(author)}">{display}</a></li>\n'
+
+    if by_count:
+        ordered = sorted(authors, key=lambda a: (-counts.get(a, 0), a.split()[-1].lower()))
+        html_parts.append("<ul>\n")
+        for author in ordered:
+            html_parts.append(list_item(author))
+        html_parts.append("</ul>\n")
+    else:
+        ordered = sorted(authors, key=lambda a: a.split()[-1].lower())
+        current_letter = None
+        for author in ordered:
+            letter = author.split()[-1][0].upper()
+            if letter != current_letter:
+                if current_letter is not None:
+                    html_parts.append("</ul>\n")
+                current_letter = letter
+                html_parts.append(f"<h2>{html.escape(current_letter)}</h2>\n<ul>\n")
+            html_parts.append(list_item(author))
+        if current_letter is not None:
+            html_parts.append("</ul>\n")
+    html_parts.append("</main>\n")
+    return ''.join(html_parts)
+
+def generate_author_pages(db, out_directory):
+    known_authors = load_author_codes()
+    name_to_code = {name: code for code, name in known_authors.items()}
+
+    # Codes that appear in bylines but aren't real authors / aren't in the
+    # imprint; XXX is the unset-author placeholder.
     unknown_authors = ["ai", "wg", "XXX"]
 
-    found_authors = [author for author in sorted(db.authors) if author not in unknown_authors]
-    #print(found_authors)
+    # Collect every article per (resolved) author from the meta tags.
+    author_to_articles = defaultdict(list)
+    for article in db.articles:
+        if not article.html:
+            continue
+        for author in resolve_meta_authors(article.html, known_authors):
+            if author and author not in unknown_authors:
+                author_to_articles[author].append(article)
+
+    authors = sorted(author_to_articles.keys())
+    counts = {a: len(arts) for a, arts in author_to_articles.items()}
+
+    authors_dir = os.path.join(out_directory, 'authors')
+    os.makedirs(authors_dir, exist_ok=True)
+
+    for author in authors:
+        generate_single_author_page(db, author, author_to_articles[author], authors_dir, name_to_code)
+
+    write_full_html_file(
+        db, os.path.join(out_directory, 'authors.html'),
+        f"Alle Autoren | {MAGAZINE_NAME}", None,
+        _author_index_body(authors, counts, name_to_code, by_count=False), 'all_authors')
+
+    write_full_html_file(
+        db, os.path.join(out_directory, 'authors_by_count.html'),
+        f"Alle Autoren | {MAGAZINE_NAME}", None,
+        _author_index_body(authors, counts, name_to_code, by_count=True), 'all_authors')
 
 
 if __name__ == '__main__':
