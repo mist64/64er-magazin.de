@@ -17,6 +17,7 @@ import pytz
 import argparse
 import gzip
 import csv
+import unicodedata
 import lunr
 from tools import mse, checksummer, assembler_decode
 from dataclasses import dataclass, field
@@ -974,6 +975,12 @@ def article_link(db, article, title, prepend_issue_dir=False, from_subdirectory=
         path = "../" + path
     return f"<a href='{path}'>{title}</a>"
 
+# Tokens that appear in author meta/bylines but are not real, page-bearing
+# authors: editorial pseudo-codes without an imprint entry and the
+# unset-author placeholder. No per-author page is generated for these, so
+# the byline linker must never resolve to them (would 404).
+UNKNOWN_AUTHORS = {"ai", "wg", "XXX"}
+
 _author_codes_cache = None
 
 def load_author_codes():
@@ -1819,31 +1826,143 @@ def author_page_url(author_name):
     """Absolute URL of a single author's page."""
     return f"/{BASE_DIR}authors/{author_name.replace(' ', '_')}.html"
 
+# Leading academic titles to ignore when comparing a byline token against a
+# canonical author name ("Dr. Helmuth Hauck" vs "Helmuth Hauck").
+_TITLE_RE = re.compile(
+    r'^(?:(?:dr|prof|ing|dipl|dipl[ -]ing|cand)\.?\s+)+', re.I)
+
+# A byline fragment that joins two or more people with "und" / "u." / "+" /
+# "&" (e.g. "M. und J. Heinz", "Frank Barcikowski + Holger Vocke") cannot be
+# linked to a single author page without cross-linking, so it is left plain.
+_MULTI_PERSON_RE = re.compile(r'\S+\s+(?:und|u\.|\+|&)\s+\S', re.I)
+
+def _author_norm(s):
+    """Fold a name for fuzzy comparison: lower-case, strip German diacritics
+    and ß, treat '.' and '-' as spaces, collapse whitespace. Keeps the
+    surname/initial structure intact while ignoring OCR-level punctuation and
+    accent noise ("M.Sandweg" == "M. Sandweg", "Dr.H. Hauck" sans title)."""
+    s = s.lower().replace('ß', 'ss')
+    s = unicodedata.normalize('NFKD', s)
+    s = ''.join(c for c in s if not unicodedata.combining(c))
+    s = s.replace('-', ' ').replace('.', ' ')
+    return ' '.join(s.split())
+
+def _surname_close(a, b):
+    """True if two normalised surnames are equal or differ by a single OCR
+    edit (only for words long enough that one edit is still the same name):
+    catches "Verder"/"Velder", "Konter"/"Konther" (one substitution/indel)
+    and "Wlodarzcyk"/"Wlodarczyk" (one adjacent transposition) without
+    collapsing genuinely different short names."""
+    if a == b:
+        return True
+    if min(len(a), len(b)) < 5 or abs(len(a) - len(b)) > 1:
+        return False
+    if len(a) == len(b):
+        diff = [i for i, (x, y) in enumerate(zip(a, b)) if x != y]
+        if len(diff) == 1:
+            return True  # single substitution
+        # single adjacent transposition (Damerau), e.g. ...rzc... / ...rcz...
+        if (len(diff) == 2 and diff[1] == diff[0] + 1
+                and a[diff[0]] == b[diff[1]] and a[diff[1]] == b[diff[0]]):
+            return True
+        return False
+    # length differs by one: a single insertion/deletion
+    short, lng = (a, b) if len(a) < len(b) else (b, a)
+    i = j = 0
+    skipped = False
+    while i < len(short) and j < len(lng):
+        if short[i] == lng[j]:
+            i += 1
+            j += 1
+        elif skipped:
+            return False
+        else:
+            skipped = True
+            j += 1
+    return True
+
 def make_authors_clickable(soup):
     """Turn the author bylines in <address class="author"> tags into links to
     the per-author pages.
 
-    Matching is intentionally exact-only: a byline token is linked only if it
-    is a known editor code (resolved via known_authors.csv) or if it matches a
-    canonical author from this article's <meta name="author"> verbatim.
-    Anything else (guest authors with no dedicated page, unsigned rubrics with
-    no meta) is left as plain text. The original display text, parentheses and
-    German typography are preserved."""
+    A byline token is resolved against this article's own canonical authors
+    (from <meta name="author">, codes expanded via known_authors.csv). The
+    resolver never links a token that joins two people ("M. und J. Heinz")
+    and never links to an author with no generated page, so it cannot
+    cross-link or 404. Matching tiers, all on a punctuation/diacritic-folded
+    form so OCR noise like "M.Sandweg" vs "M. Sandweg" still matches:
+    (1) editor code; (2) exact name (titles such as "Dr." ignored);
+    (3) substring containment (abbreviated bylines, e.g. "M. Kohlen" inside
+    "Manfred Kohlen"); (4) surname match — equal or one-OCR-edit apart —
+    disambiguated by the given-name initial when several canonical authors
+    share the surname, instead of giving up. Unsigned rubrics with no meta
+    resolve nothing. Original display text, parentheses and German
+    typography are preserved."""
     known_authors = load_author_codes()
 
     # Canonical authors for this article, resolved from the meta tags. Empty
-    # for unsigned rubrics (Leserforum, Impressum, Vorschau, ...).
-    canonical_authors = resolve_meta_authors(soup, known_authors)
-    canonical_by_lower = {a.lower(): a for a in canonical_authors}
+    # for unsigned rubrics (Leserforum, Impressum, Vorschau, ...). Drop
+    # entries with no generated author page (UNKNOWN_AUTHORS) so the linker
+    # can never point at a missing page.
+    canonical_authors = [a for a in resolve_meta_authors(soup, known_authors)
+                         if a not in UNKNOWN_AUTHORS]
+    canonical_by_norm = {}
+    for a in canonical_authors:
+        canonical_by_norm.setdefault(_author_norm(_TITLE_RE.sub('', a)), a)
 
     def linked_target(token):
         """Return the canonical author name to link to, or None."""
         bare = re.sub(r'\([^)]*\)', '', token).strip()
         if not bare:
             return None
+        # 0. Never link a fragment that names more than one person; any
+        #    single link would be a cross-link.
+        if _MULTI_PERSON_RE.search(bare):
+            return None
+        # 1. Editor code via CSV. Runs first so a 2-letter code can never
+        #    substring-match an unrelated name in the fuzzy tiers below.
+        #    A code with no page (ai/wg/XXX) resolves to nothing.
         if bare in known_authors:
-            return known_authors[bare]
-        return canonical_by_lower.get(bare.lower())
+            name = known_authors[bare]
+            return name if name not in UNKNOWN_AUTHORS else None
+        if bare in UNKNOWN_AUTHORS:
+            return None
+
+        bare_nt = _TITLE_RE.sub('', bare).strip()
+        nb = _author_norm(bare_nt)
+        if not nb:
+            return None
+        # 2. Exact match against this article's authors (folded, titles
+        #    stripped): "M.Sandweg" == "M. Sandweg", "Dr.H.Hauck" == meta
+        #    "Dr.H. Hauck".
+        if nb in canonical_by_norm:
+            return canonical_by_norm[nb]
+        # 3. Substring containment, either direction, on the folded form
+        #    (abbreviated bylines, e.g. "M. Kohlen" inside "Manfred Kohlen").
+        for canonical in canonical_authors:
+            cn = _author_norm(_TITLE_RE.sub('', canonical))
+            if cn and (cn in nb or nb in cn):
+                return canonical
+        # 4. Surname match (equal or one OCR edit apart). When more than one
+        #    canonical author shares the surname, disambiguate by the
+        #    given-name initial instead of abandoning the match.
+        nb_parts = nb.split()
+        if nb_parts:
+            b_sur = nb_parts[-1]
+            b_init = nb_parts[0][0] if len(nb_parts) > 1 else None
+            sur_matches = []
+            for canonical in canonical_authors:
+                cp = _author_norm(_TITLE_RE.sub('', canonical)).split()
+                if cp and _surname_close(cp[-1], b_sur):
+                    sur_matches.append((canonical, cp))
+            if len(sur_matches) == 1:
+                return sur_matches[0][0]
+            if len(sur_matches) > 1 and b_init is not None:
+                by_init = [c for c, cp in sur_matches
+                           if len(cp) > 1 and cp[0][0] == b_init]
+                if len(by_init) == 1:
+                    return by_init[0]
+        return None
 
     for address in soup.find_all('address', class_='author'):
         text = address.get_text().strip()
@@ -2329,17 +2448,13 @@ def generate_author_pages(db, out_directory):
     known_authors = load_author_codes()
     name_to_code = {name: code for code, name in known_authors.items()}
 
-    # Codes that appear in bylines but aren't real authors / aren't in the
-    # imprint; XXX is the unset-author placeholder.
-    unknown_authors = ["ai", "wg", "XXX"]
-
     # Collect every article per (resolved) author from the meta tags.
     author_to_articles = defaultdict(list)
     for article in db.articles:
         if not article.html:
             continue
         for author in resolve_meta_authors(article.html, known_authors):
-            if author and author not in unknown_authors:
+            if author and author not in UNKNOWN_AUTHORS:
                 author_to_articles[author].append(article)
 
     authors = sorted(author_to_articles.keys())
