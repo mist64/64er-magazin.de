@@ -2393,7 +2393,7 @@ def generate_single_author_page(db, author, articles, authors_dir, name_to_code)
                 html_parts.append("</ul>\n")
             current_issue = article.issue_key
             html_parts.append(f"<h3>{LABEL_ISSUE} {current_issue}</h3>\n<ul>\n")
-        link = article_link(db, article, html.escape(index_title(article)), True, from_subdirectory=True)
+        link = article_link(db, article, index_title(article), True, from_subdirectory=True)
         html_parts.append(f"<li>{link} ({LABEL_PAGE} {article.pages})</li>\n")
     if current_issue is not None:
         html_parts.append("</ul>\n")
