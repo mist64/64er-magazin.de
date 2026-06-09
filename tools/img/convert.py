@@ -164,7 +164,7 @@ color_w  = [201, 195, 188] # W = white
 
 input_image_path = sys.argv[1]
 # Load image and convert to numpy array
-img = Image.open(input_image_path)
+img = Image.open(input_image_path).convert("RGB")
 img_array = np.array(img, dtype=float)
 
 
