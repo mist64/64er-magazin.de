@@ -1,0 +1,24 @@
+
+
+;sim. c64_sim.bas.prg ==0801==
+  100 :  rem* simulation von schwingungsvorgaengen *
+  105 :  rem* fuer c64 bitte vorher simon's basic laden *
+  110 :  rem* oder graphikbefehle an eigenes system anpassen *
+  113 :
+  115 :
+  120 :  rem* kenngroessen des schwingungssystems *
+  130 efq=.01:d=0:a=0:wa=0
+  140 v=0:x=80: rem* anfangsbedingungen *
+  150 :  xm=1:c=0: rem* x-massstab *
+  160 :  ($64){CTRL-A}1,6: rem* graphik einschalten *
+  170 :  ($64){stop}0,100,319,100,1: rem* abszisse *
+  180 :  ($64){stop}0,0,0,199,1: rem* ordinate *
+  190 for n=0to319
+  200 v=v-d*v-efq*x-a*sin(wa*n):x=x+v
+  210 :  ifabs(x)>xm*100then250: rem* ($64){$7e}or vermeiden *
+  220 :  ifc=0then($64){CTRL-B}n,100-x/xm,1:c=1:goto240: rem* 1.punkt setzen *
+  230 :  ($64){stop}n-1,100-xl/xm,n,100-x/xm,1: rem* punkte verbinden *
+  240 :  xl=x: rem* letztes x merken *
+  250 next
+  260 :  goto260: rem* warteschleife. ausstieg mit stop-taste *
+
