@@ -1,7 +1,9 @@
-# 2 — Convert `.md` → `.html` (Discount / GFM)
+# 3 — Convert `.md` → `.html` (Discount / GFM) and replace .md with .html in git
 
 **Goal:** convert the OCR markdown to HTML using the same engine Marked 2
-uses (Discount, GFM mode), producing the `.html` next to the `.md`.
+uses (Discount, GFM mode), producing the `.html` next to the `.md`. After
+conversion, `git rm` the `.md` and `git add` the `.html`, so only the HTML
+lives in the repo from here on.
 
 ## Marked 2 GUI settings → Discount CLI flags
 
@@ -18,8 +20,10 @@ uses (Discount, GFM mode), producing the `.html` next to the `.md`.
 ## Usage
 
 ```bash
-tools/llm/rules/2_md_to_html.sh issues/8607/8607.md
-# writes issues/8607/8607.html next to the .md
+tools/llm/rules/3_md_to_html.sh issues/8607/8607.md
+# 1. writes issues/8607/8607.html next to the .md
+# 2. `git rm`s the .md (or plain `rm` if not yet tracked)
+# 3. `git add`s the .html
 ```
 
 ## Verification

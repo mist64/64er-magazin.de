@@ -16,3 +16,12 @@ markdown -G \
   "$tmp" > "$out"
 rm -f "$tmp"
 echo "wrote $out  ($(wc -l < "$out") lines)"
+# Replace the .md with the .html in git: drop the source, stage the result.
+# Tolerant on first run (md may not be tracked yet).
+if git ls-files --error-unmatch "$md" >/dev/null 2>&1; then
+  git rm --quiet "$md"
+else
+  rm -f "$md"
+fi
+git add "$out"
+echo "git: removed $md, staged $out"
