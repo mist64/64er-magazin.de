@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Neues zum Thema Sortieren</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="K. Sörensen, ks">
+    <meta name="64er.issue" content="7/86">
+    <meta name="64er.pages" content="142,144-146">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Neues zum Thema Sortieren</h1>
+<p class="intro">Die Krönung unseres Sortierkurses. Wir stellen Ihnen heute zwei optimierte Quicksort-Routinen in Basic und in Maschinensprache vor.</p>
+
+<p>In Listing 1 sehen Sie die Quicksort-Version von Kurt Sörensen, die ein Feld von 100 Elementen in nur noch 20 Sekunden sortiert, was eine Verkürzung der Sortierzeit um knapp 35 Prozent zur letzten Quicksort-Version bedeutet. Eine solche Sortierzeit ist natürlich von Programmen, wie Mischsort oder Supersort nicht mehr zu schlagen, weshalb wir an dieser Stelle nochmals ausdrücklich die Behauptungen in früheren Heften redigieren müssen, es gäbe ein schnelleres Sortierprogramm als Quicksort (Programme für Spezialanwendungen dürfen in diesem Wettbewerb natürlich nicht antreten; hier zählt einzig und allein der Grundgedanke eines Sortieralgorithmus, der ohne Zusätze oder »Tuning« geprüft wird).</p>
+
+<p>Nun zu einigen speziellen Problemen, die vielfach aufgetre-ten sind. Wir wollen an dieser Stelle einmal einige Antworten und Lösungsvorschläge geben.</p>
+
+<h2>Das Problem mit mehrdimensionalen Feldern</h2>
+
+<p>Zuerst zum Problem des Sortierens mehrdimensionaler Felder. Hier kamen einige Anfragen, die sich generell mit diesem Problem beschäftigten. An dieser Stelle muß dazu gesagt werden, daß es eine allgemeingültige Lösung nicht gibt; und zwar aus folgendem Grund: Ein mehrdimensionales Feld hat computerintern eine gewisse Reihenfolge, in der die Elemente abgelegt werden (siehe Bild 1). Nach dieser Reihenfolge könnte man ohne weiteres sortieren. Mehrdimensionale Felder werden jedoch in der Regel hierarchisch nach ganz anderen Gesichtspunkten sortiert, wobei in jeder Dimension des Feldes eine andere Art von Daten abgelegt werden (siehe Bild 2).</p>
+
+<p>Wollten Sie ein solches Feld, wie in Bild 2 dargestellt, sortieren, so bräuchten Sie für jede Anwendung ein Spezialsortierprogramm, das auf die ganz bestimmten Eigenheiten Ihres Feldes zugeschnitten ist. Im Prinzip ist es in so einem Fall einfacher, das gesamte Datenfeld in eindimensionale Felder zu zerlegen, und diese entweder einzeln oder in Abhängigkeit eines jeweils anderen Feldes zu sortieren. So etwas beherrscht »Ex-sort« aus der 64'er, Ausgabe 11, 1984. Eine Sortierung des mehrdimensionalen Feldes aus Bild 2, mit den Methoden, die in unserem Kurs vorgestellt wurden, könnte nur nach dem Gesichtspunkt der computerinternen Ordnung (Bild 1) geschehen und würde Ihnen ein Chaos, wie Sie es in Bild 3 sehen können, hinterlassen.</p>
+
+<p>Vermeiden Sie also prinzipiell die Anwendung mehrdimensionaler Felder, wenn Sie Sortierungen vornehmen wollen. Jedes mehrdimensionale Feld läßt sich nämlich auch durch entsprechende eindimensionale Felder ersetzen.</p>
+
+<h2>Die Anwendungen der Sortierprogramme</h2>
+
+<p>Unter vielen Anfragen zum Sortierkurs erreichten uns auch einige, die sich mit der Anwendung der Sortieralgorithmen selbst befaßten. Hier war oft unklar, wie die gezeigten Programme denn nun angewendet werden können. Nun, dieses Problem kann sehr einfach gelöst werden.</p>
+
+<p>Vielleicht ist Ihnen aufgefallen, daß alle abgedruckten Sortieralgorithmen die Zeilennummern 10000 bis höchstens 19999 besaßen. Diese Zeilennummern waren so gehalten, daß man die eingetippten Sortieralgorithmen sofort mit dem Hauptprogramm, das einige Male mit abgedruckt wurde, testen konnte. Dieses Hauptprogramm hatte nämlich bei den Zeilennummern 10000 bis 19999 keine Programmzeile und so mußte das Sortierprogramm lediglich dort eingefügt werden.</p>
+
+<p>Wollen Sie nun einen Sortieralgorithmus verwenden, weil er Ihnen zusagt, so müssen Sie einfach das Hauptprogramm weglassen und sich die Variablen ansehen, unter denen das Feld steht. Bei den Sortieralgorithmen war das zu sortierende Feld stets unter A$ und die Größe des A$-Feldes unter A gespeichert. Verwenden Sie andere Varia-blennamen, so müssen diese nur im Sortierprogramm entsprechend angepaßt werden, und schon läuft die ganze Sache. Vorsicht auch bei Variablen, die das Sortierprogramm verwendet und die unter Umständen mit Variablen in Ihrem Programm »kollidieren«. Die Sortieralgorithmen sind ja in der Regel sehr kurz, so daß Änderungen schnell gemacht sind.</p>
+
+<h2>Und immer wieder Quicksort</h2>
+
+<p>Noch eine Bemerkung zu Quicksort in Maschinensprache, das ebenfalls in Ausgabe 12/85 abgedruckt wurde. Es wurde damals schon erwähnt, daß es bei diesem Programm unbedingt notwendig ist, die zu sortierenden Daten in einem Stringarray (zum Beispiel A$,V$, oder ähnliche) abzulegen und dieses Feld als erstes im Basic-Pro-gramm zu dimensionieren. Wird das nicht gemacht, so kann es passieren, daß Quicksort-M die Variablenorganisation des Computers durcheinanderbringt, wobei ein »Aussteigen« des Computers die Folge ist. Wollen Sie das Quicksort-Programm als eigenes Maschinenprogramm stehen lassen, so müssen Sie es jeweils vor (!) dem Basic-Pro-gramm laden und danach »NEW« eintippen, um die Basic-Zeiger im Computer wieder herzustellen.</p>
+
+<p>Natürlich ist kein Programm absolut perfekt, und so finden sich immer wieder Leser, die ihre Ansprüche ein wenig höher stecken. Die Ergebnisse zeigen sich dann in der Regel in einer stark verbesserten Version von abgedruckten Programmen oder in Neuentwicklungen von Problemlösungen.</p>
+
+<p>So haben wir auch in diesem Artikel ein Bonbon für Sie vorbereitet. Es handelt sich, wie sollte es auch anders sein, um ein neues Quicksort in Maschinensprache, das uns Kurt Sörensen aus Hamburg zugesandt hat (Listing 2 und 3). Dieses Quicksort ist noch einmal mehr als viermal so schnell als unser Quicksort-M. Durch seine hohe Geschwindigkeit dürfte es wohl eines der schnellsten Sortierprogramme sein, die es für einen 6502-Mi-kroprozessor gibt. Zusätzlich zu diesen Vorteilen kommt noch dazu, daß das neue Quicksort-M um einiges kürzer ist als sein Vorgänger und selbst bei sehr komplizierten Datenfeldern keinen Stack-Überlauf mehr verursacht.</p>
+
+<p>Auch bei dem neuen Quicksort in Maschinensprache ist das zu sortierende Stringfeld stets das, das als erstes in einem Programm dimensioniert wurde. Das Starten des Sortiervorgangs erfolgt dabei mit »SYS 50000«.</p>
+
+<p>Das neue Quicksort-M dürfte wohl den allermeisten Anwendungen genügen. Wenn es jedoch jemanden gibt, der immer noch nicht das optimale Sortierprogramm gefunden hat, dem bleibt dann bloß noch die Eigeninitiative (vielleicht können wir irgendwann einmal das perfekte Sortierprogramm als »Listing des Monats« begrüßen?).</p>
+
+<address class="author">(K. Sörensen/ks)</address>
+    </article>
+</body>
+</html>

@@ -19,7 +19,7 @@ echo "wrote $out  ($(wc -l < "$out") lines)"
 # Replace the .md with the .html in git: drop the source, stage the result.
 # Tolerant on first run (md may not be tracked yet).
 if git ls-files --error-unmatch "$md" >/dev/null 2>&1; then
-  git rm --quiet "$md"
+  git rm -f --quiet "$md"   # -f so staged edits from earlier steps don't block removal
 else
   rm -f "$md"
 fi

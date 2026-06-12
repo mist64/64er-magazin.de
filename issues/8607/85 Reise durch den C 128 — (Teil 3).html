@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Reise durch den C 128 — (Teil 3)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, dm">
+    <meta name="64er.issue" content="7/86">
+    <meta name="64er.pages" content="85-88">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Reise durch den C 128 — (Teil 3)</h1>
+<p class="intro">Wieder hat uns — gerade noch rechtzeitig für diese Ausgabe — ein Bericht unseres Korrespondenten erreicht, der derzeit durch den unbekannten Kontinent C 128 reist. Diesmal hat er den Tastaturpuffer entdeckt und untersucht.</p>
+
+<p>Es gibt manches Mal Situationen, in denen Sie Eingaben per Tastatur nicht sofort bearbeiten können. Während eines Programmablaufes beispielsweise oder bei einem Ladevorgang. Lediglich einige wenige Tasten sind immer aktiv: Die STOP-Taste zum Beispiel. Trotzdem lohnt sich der Griff in die Tasten, denn es wird nichts vergessen: Die fraglichen Zeichen sind nur beiseite gelegt, bis sie bearbeitet werden können. Diese Ablage, in der sie warten, nennt man den Tastaturpuffer. Ist das beendet, was unseren C 128 davon abhielt, uns zuzuhören, dann wendet er sich diesem Pufferinhalt zu und arbeitet ihn durch.</p>
+
+<p>Der Puffer befindet sich im Speicherbereich von 842 bis 851 (also $034A bis 0353). Außerdem braucht unser Computer eine Speicherstelle, wo ihm gezeigt wird, wieviele Zeichen er im Puffer findet. DiesenJob hat die Zelle 208 (das ist $D0). Was können wir nun mit dieser Erkenntnis anfangen? Sie werden überrascht sein, welche Möglichkeiten sich uns da auftun!</p>
+
+<p>Lassen Sie uns zunächst einmal sehen, wie wir diesen Puffer nutzen können. Zunächst erschaffen wir den Zustand, daß der C 128 unsere Tastatureingaben nicht beachtet: Wir beschäftigen ihn mit einem Programm. Listigerweise wird das Programm etwas in seinen Tastaturpuffer schreiben:</p>
+
+<p>TODO PRE</p>
+
+<p>10 SCNCLR:PRINT:PRINT<br>
+20 POKE842,ASC("?")<br>
+30 POKE843,34<br>
+40 POKE844,ASC("H")<br>
+50 POKE845,ASC("I")<br>
+60 POKE846,ASC("! ")<br>
+70 POKE847,34<br>
+80 POKE848,13<br>
+90 P0KE208,7 .<br>
+100 END</p>
+
+<p>Geben Sie doch mal RUN ein und sehen Sie, was geschieht: Nach einem READY taucht die Zeile<br>
+?"HI!"<br>
+auf dem Bildschirm auf und darunter das Wort »HI!«. Weshalb? Weil wir das in den Tastaturpuffer gePOKEt haben (34 ist der ASCII-Code für das Anführungszeichen und 13 der Code für die RETURN-Taste). Der Computer hat unsere Eingaben per Programm so verstanden, als hätten wir sie ihm im Direktmodus vorgelegt: Wir haben somit die Möglichkeit, einen scheinbaren Widerspruch zwanglos zu umgehen, nämlich den programmierten Direktmodus!</p>
+
+<p>Nun müssen wir uns nur noch Gedanken darüber machen, was es im Direktmodus Interessantes gibt, das wir immer schon gerne per Programm erledigt hätten. Ihnen fällt bestimmt viel ein: Programmzeilen in ein bestehendes Programm einzufügen, den Monitor zu benutzen und so weiter.</p>
+
+<p>Übrigens sind wir nicht unbedingt auf die zehn Speicherstellen des Tastaturpuffers festgelegt. Weitere zehn, die sich daran anschließen, können im allgemeinen ebensogut mitbenutzt werden. Sie gehören zur Tabelle der Tabulator-Stopps, die aber — soweit ich das bisher wahrnehmen konnte — lediglich für die Tabulatorsprungfunktion mittels CTRL-I verwendet wird. Wenn man aber noch mehr Speicherplätze benutzt, kann es kritisch werden, denn da liegen einige wichtige Notizen des Computers und ab 896 könnte sogar der Lebensnerv, nämlich die CHRGET-Routine, zerstört werden. Also begnügen wir uns lieber mit 20 Plätzen im Tastaturpuffer.</p>
+
+<p>Im folgenden werden wir uns einige Anwendungen des programmierten Direktmodus ansehen (manchmal spricht man im englischen Sprachraum auch von »dynamic keyboard«, also von der »dynamischen Tastatur«). Die Programmbeispiele sollen als Module aufgebaut sein, die wir dann mittels der im Teil 2 vorgestellten MERGE-Funktion jederzeit in bestehende Programme einbauen können. Zuvor aber soll der Begriff des Programm-Moduls noch etwas erklärt werden.</p>
+
+<h3>Programm-Module</h3>
+
+<p>Es gibt — besonders als Ergebnis von Bemühungen der Basic-Programmierer — Programme, die wie ein lebender Organismus gewachsen sind: Da ist es — bei längeren Schöpfungen — mitunter schwierig zu ergründen, wie und warum sie überhaupt funktionieren und ebensowenig wie ein Bein oder ein Arm alleine sinnvoll sind, sind es dann Programmteile. Andere Programmsprachen fördern diese — doch auch irgendwie sympathische — Art der Programmlabyrinthe nicht: Da geht's oft streng nach der Reihe. Immer wieder gibt es auch mehr oder weniger erfolgreiche Versuche, Basic-Pro-gramme zu strukturieren und auch unser Computer beinhaltet einige Befehle, die dazu beitragen sollen. Ein weiterer Schritt in diese Richtung ist der Aufbau von Programmen aus Bausteinen, den Programm-Modulen.</p>
+
+<p>Die Zielvorstellung wäre ein Programm, das aus lauter solchen Modulen zusammengesetzt wäre (die hätte der erfahrene Programmierer dann alle schon fertig in einer Modulbibliothek auf Diskette vorliegen), die nur noch durch einen Rahmen zusammenzubinden wären. Wie müßte solch ein Modul aussehen und vor allem: Welche Angaben müßte die begleitende Dokumentation enthalten?</p>
+
+<p>Das Modul: Es sollte möglichst allgemein gehalten sein und daher vielseitig verwendbar. Nötige Anpassungen sollten leicht durchführbar sein, weshalb auch der Aufbau des Moduls überschaubar zu halten ist.</p>
+
+<p>Die Dokumentation: Nach mehr oder weniger langer Zeit hat jeder Programmierer vergessen, was er da geschrieben hat. In der Dokumentation muß daher enthalten sein:</p>
+
+<p>TODO INDENTATION</p>
+
+<p>1)  Was leistet das Modul?<br>
+2)  Welche Variablen werden wie verwendet?<br>
+a)  Variable, die ins Modul hineingegeben werden.<br>
+b)  Variable, die aus dem Modul herausgegeben werden.<br>
+c)  Variable, die im Modul erzeugt werden und entweder globale oder nur lokale Verwendung finden.<br>
+3)  Verwendung des Moduls:<br>
+a)  Wie wird es in das Bindeprogramm eingefügt und worauf ist dabei eventuell zu achten?<br>
+b)  Wie kann das Modul vom Hauptprogramm her in Betrieb genommen werden?</p>
+
+<p>Es gibt sicher noch weitere Punkte, die manchmal Bedeutung haben: Eine spezielle Angabe von Fehlern, die im Modul auftreten können oder einen Hinweis auf andere Module.</p>
+
+<p>Nach all diesen Vorbemerkungen sehen wir uns nun einige Module an, die den programmierten Direktmodus verwenden.</p>
+
+<h3>MODUL: Zeilen einfügen</h3>
+
+<p>1)  Was leistet das Modul?</p>
+
+<p>In ein bestehendes Programm werden durch programmierten Direktmodus zwei neue Zeilen eingefügt, die eine zuvor eingegebene Funktion definieren.<br>
+2)  Verwendung von Variablen:</p>
+
+<p>Die Variable Z1 muß in das Modul eingeführt werden. Z1 ist die Zeilennummer, in der wir den Funktionsstring abzulegen wünschen. Zl + 10 enthält die Funktionsdefinition und Zl-10 ist die Zeilennummer, mit der der Neustart (siehe bei Einbindung des Moduls) des Programmes erfolgt.</p>
+
+<p>Zwei weitere Variable und eine Funktion werden im Modul definiert:<br>
+F$ = String, welcher die Funktion enthält.<br>
+FN F(X) = Funktion, in welcher F$ verwendet wird.<br>
+X = Variable der Funktion.</p>
+
+<p>Alle Variablen (und die Funktion) haben globale Bedeutung.<br>
+3)  Einbindung des Moduls und Anwendung:</p>
+
+<p>Die Einbindung ist an jeder beliebigen Stelle des Programmes möglich, die nicht in einem Unterprogramm oder einer Schleife steht. Zuvor sollte noch ein Z1 definiert sein, das größer als 10 ist und sicherstellt, daß Z1 und Z1 +10 freie Zeilennummern sind.</p>
+
+<p>Das Modul kann sowohl im direkten Programmablauf als auch durch GOTO angesteuert werden. Dies ist die Funktionsweise:</p>
+
+<ul>
+<li>Der Bildschirm wird gelöscht und eine Funktion Y=F(X) abgefragt.</li>
+<li>Nach erneutem Löschen des Bildschirms und Angleichen der Zeichenfarbe an den Hintergrund (hier als Schwarz angenommen) wird in der dritten Bildschirmzeile gedruckt:<br>
+(Zeilennummer Z1) F$= "eingeg. Funktion"<br>
+In der 4.Zeile:<br>
+(Zeilennummer Zl + 10) DEF FN F(X)=-"-<br>
+In Zeile 5 schließlich:<br>
+RUN (Zeilennummer Z1 — 10)</li>
+</ul>
+
+
+<p>Der Cursor wandert in die Home-Position, schreibt drei RE-TURNs (das ist CHR$(13)) in den Tastaturpuffer und in die Speicherstelle 208 diese Anzahl von drei.</p>
+
+<p>Das Programm endet nun und auf dem Bildschirm erscheint (ebenfalls unsichtbar) READY. Der Cursor steht nun aufZeile 3. Der Tastaturpuffer wird abgearbeitet, was bedeutet, daß die Inhalte der Bildschirmzeilen 3 und 4 durch die zwei RETURNs übernommen und das RUN-Kommando ausgeführt wird.</p>
+
+<p>Dieser Neustart löscht den Bildschirm und setzt die Zeichenfarbe auf einen sichtbaren Wert (hier auf Weiß).</p>
+
+<p>Nach dieser ausführlichen Funktionsbeschreibung sollen Sie nun auch das Modul eintippen können. Als »ZEILEN EINF MOD« (Listing 1) finden Sie es hier noch zum Ausprobieren mit einer Zeile 1, die der Variablen Z1 den Wert 110 zuordnet:</p>
+
+<p>Mit Hilfe dieses und ähnlicher Module ist es möglich, selbstmodifizierende Programme zu realisieren. Bedenken Sie, daß wir damit bei jedem Durchlauf bis zu 20 neue Programmzeilen übernehmen könnten, daß wir in laufenden Programmen ganze Abschnitte umzuschreiben imstande sind,&hellip;</p>
+
+<h3>MODUL: Monitoraufruf</h3>
+
+<p>Normalerweise ist ein Basic-Programmablauf in dem Moment beendet, in dem der MONITOR-Befehl bearbeitet ist. Dann meldet sich der Monitor mit einer Registeranzeige und wir befinden uns im Direktmodus. Weil wir diesen aber nun per Programm beherrschen, können wir jetzt auch Funktionen des Monitors, wie in diesem Beispiel den Hexdump von Speicherteilen, in Programme einbinden.<br>
+1)  Was leistet das Modul?</p>
+
+<p>Es erlaubt die Verwendung des Monitor-Kommandos M zur Anzeige von Speicherinhalten.<br>
+2)  Variable:</p>
+
+<p>Lediglich zwei Stringvariable spielen eine Rolle. Sie werden vor dem Modulaufruf definiert und bezeichnen die erste anzuzeigende Speicherstelle in Hexadezimalform. Dabei ist Z0$ die im Monitor verwendete Bank-Kennziffer, also die vordere Stelle der Hex-Adresse. Beispielsweise ist bei $FD800 für Z0$ »F« zu setzen.</p>
+
+<p>Z1$ ist die vierstellige Hexzahl, die sich an Z0$ anschließt. Im obigen Beispiel also Z1$ = "D800".<br>
+3)  Einbindung und Verwendung des Moduls:</p>
+
+<p>Ebenso wie das vorhin vorgestellte Modul ist auch dieses anjede beliebige Stelle des Programmes zu plazieren, außer in Unterprogramme oder Schleifen.</p>
+
+<p>Es kann direkt im Programmlauf oder durch GOTO aktiviert werden.</p>
+
+<p>Hier nun die Erklärung des Ablaufes, die aber nicht ganz so ausführlich wie beim ersten Beispiel sein wird:</p>
+
+<p>Nach dem Löschen des Bildschirms und dem Überspringen der READY-Zeile werden nacheinander das Monitorkommando, der Monitorbefehl M, der Befehl zum Verlassen des Monitors X und ein RUN 100 auf den Bildschirm gedruckt. Eine bestimmte Anzahl von Leerzeilen ist hier nötig, um die Registeranzeige und die zu druckenden Zeilen der Speicherinhalte zu überspringen. Je nach verwendetem Bildschirm sind das letztere dann 4 Zeilen (80-Zeichen, hier werden 16 Kolonnen ausgegeben) oder 7 Zeilen (40-Zeichen, wobei wir nur 8 Kolonnen erhalten). Welcher Bildschirm aktiv ist, kann der Computer selbst herausfinden, indem er sich den Inhalt der Speicherstelle 238 ($EE) ansieht. Dort findet er die höchste Spaltenziffer: 79 beim 80-Zeichen-Betrieb und 39 im 40-Zeichen-Betrieb. In Programmzeile 50 fügt er im Bedarfsfall noch die nötige Anzahl von Cursor-Down-Kommandos hinzu.</p>
+
+<p>In Zeile 40 wird das M-Kommando gedruckt. Hier berechnet der Computer noch die zweite M-Adresse, die um $30 höher als die Startadresse gewählt wurde, um den gesamten Ausdruck aufden 40-Zeichen-Bildschirm bringen zu können. Falls Sie für eigene Anwendungen einmal einen anderen Wert als $30 benötigen, müssen Sie unter Umständen noch die Anzahl der CHR$(17)-Kommandos verändern.</p>
+
+<p>In Zeile 70 kann anstelle der Zahl 100 auch eine Variable eingefügt werden, die vor dem Modulaufruf zu definieren ist. Dadurch kann die weitere Verarbeitung nach dem Modulablauf noch flexibler gestaltet sein. Im hier abgedruckten Programm »MONITOR MOD« (Listing 2) sind — um es als Beispiel lauffähig zu machen — noch vier Zeilen hinzugefügt worden: Zeile 1, welche die Stringvariablen definiert und die Zeilen 100 bis 120. Die Voreinstellungen zeigen dann im Programmablauf den Anfang des Programmes als Hex-Listing.</p>
+
+<h3>MODUL: Transferbefehl</h3>
+
+<p>Im Monitor existiert ein besonders starker Befehl, das T-Kommando. Damit können beliebig große Speicherbereiche verschoben werden. Zwar gibt es auch in Basic 7.0 drei Befehle, die das können, nämlich STASH, FETCH und SWAP Leider aber sind diese Befehle nicht geeignet, Verschiebungen innerhalb der BANKs 0 und 1 oder der beiden untereinander vorzunehmen. Sie beziehen sich auf höhere BANKs, die erst mit den Speichererweiterungen erreichbar sind.</p>
+
+<p>Damit hat es nun ein Ende. Falls Sie einmal beispielsweise eine Bitmap aus BANK 0 nach BANK 1 verschieben möchten, können Sie das mit diesem Modul erledigen.<br>
+1)  Was leistet das Modul?</p>
+
+<p>Beliebige Speicherbereiche werden an beliebige Zieladressen kopiert.<br>
+2)  Variable:</p>
+
+<p>Insgesamt spielen sechs Variable eine Rolle, die vor dem Modul-Aufruf definiert sein müssen:</p>
+
+<p>Z0$ bis Z4$ sind Stringvariable, die die Adressen für den Transferbefehl enthalten, in Hexadezimalzahlen. Folgende Zuordnung ergibt sich aus dem Transferbeispiel:<br>
+T 02000 03030 12F00</p>
+
+<p>Das bedeutet, daß der Speicherbereich zwischen $02000 und $03030 nach oben verschoben (in Wirklichkeit:kopiert) wird — und zwar aus der BANK 0 in die BANK 1 — ab $12F00 und folgende<br>
+Z0$ = "0" BANK, aus der verschoben wird.<br>
+Z1$ = "2000" QuelleStartadresse.<br>
+Z2$ = "3030" QuelleEndadresse.<br>
+Z3$ = "1" BANK, in die hineinverschoben wird.<br>
+Z4$ = "2F00" ZielStartadresse.</p>
+
+<p>Eine weitere Variable ist Z:<br>
+Z ist die Zeilennummer, von der an das Programm sinnvollerweise neu gestartet wird.<br>
+3)  Einbindung und Verwendung:</p>
+
+<p>Das Modul kann an beliebiger Stelle eines Programmes eingesetzt werden, nur nicht in Unterprogrammen oder Schleifen.</p>
+
+<p>Im abgedruckten Listing »TRANSFER MOD« (Listing 3) sind vor das Modul zur Demonstration noch einige Grafikbefehle und die Definition der Variablen gehängt (Zeilen 1 bis 6). Ab Zeile 90 beginnt wieder das Hauptprogramm.</p>
+
+<p>Die Demonstration zeichnet einige Dinge auf die obere Hälfte des Grafik-Bildschirmes und kopiert sie dann durch das Transfer-Modul in die untere Hälfte. Auf diese Weise ist auch zu erkennen, daß es sich hier um ein KOPIEREN, nicht um ein wirkliches VERSCHIEBEN handelt, denn das Bild auf der oberen Hälfte bleibt ja erhalten.</p>
+
+<p>Das Demonstrationsprogramm ist für den Betrieb mit zwei Bildschirmen geschrieben. Sollten Sie lediglich mit dem 40-Zeichen-Monitor arbeiten, dann sollten Sie in Zeile 95 noch den Befehl GRAPHIC 0 einfügen.</p>
+
+<p>Ein Problem gibt es noch: Nach jedem RUN sind bekanntlich immer alle Variablen eines Programmes gelöscht. Häufig stört das nicht weiter, weil ohnehin die Modifikation zu Beginn eines Programmablaufes eingebaut wird oder man durch ein GOSUB in die Zeile mit den Variablendefinitionen schnell wieder voreingestellte Variable zurückholen kann. Manchmal — besonders, wenn man ohne an die besondere Eigenart der Module zu denken, diese irgendwo in einem Programm verwendet — kann es aber schon zur bösen Überraschung werden, plötzlich ohne alle Variablen dazustehen. Nichts hindert uns dann aber, statt durch RUN, das Programm durch GOTO neu anlaufen zu lassen. Ersetzen Sie in solchen Fällen also einfach die Zeile:<br>
+70 PRINT"RUN"Z</p>
+
+<p>(oder ähnliche)<br>
+durch:<br>
+70 PRINT"GOTO"Z</p>
+
+<p>Die Variablen sind dann alle noch präsent, ja man kann nun auch die Module innerhalb von Schleifen aufrufen!</p>
+
+<p><strong>2D-Funktionen</strong>: Ein Programm mit Modulen</p>
+
+<p>Als Beispiel für ein Programm mit solchen Modulen ist nachstehend das Listing »2D-FUNKTIONEN« (Listing 4) abgedruckt:</p>
+
+<p>Es erlaubt Ihnen — innerhalb gewisser Grenzen, damit das Listing nicht zu umfangreich wird — die grafische Darstellung beliebiger zweidimensionaler Funktionen. Ein weiteres Modul wird hier angewendet, das Modul »TRANSFORM MOD« (Listing 5):<br>
+Hier ist seine Beschreibung:<br>
+1)  Was leistet das Modul?</p>
+
+<p>Es erfragt vom Benutzer die Grenzwerte eines Koordinatensystems und erzeugt zwei Funktionen, die die Transformation beliebiger Punkte des angegebenen Systems in Bildschirmkoordinaten vornehmen können.<br>
+2)  Variable:</p>
+
+<p>Alle benötigten Variablen werden im Modul erzeugt:<br>
+XU,XO — kleinste und größte X-Koordinate<br>
+YU,YO — dasselbe für die Y-Koordinaten des gewünschten Systems.<br>
+SX,SY — interne Variable. Das sind die Skalierungsfaktoren in X- und in Y-Richtung.<br>
+TX,TY — ebenfalls interne Variable. Hier dreht es sich um die Translation in X- und in Y-Richtung.</p>
+
+<p>Um diese vier internen Variablen braucht man sich normalerweise nicht zu kümmern: Sie werden automatisch erzeugt und verwendet durch die beiden Funktionen:<br>
+FN TX(X) — Transformiert eingegebene Koordinaten des gewählten Systems (X) in Bildschirm-Koordinaten um,<br>
+FN TY(Y) — leistet dasselbe für die Y-Richtung.<br>
+3)  Einbau und Verwendung des Moduls:</p>
+
+<p>Das Modul ist an beliebiger Stelle in Programme einzusetzen, muß aber vor der Verwendung der Funktionen im Programmlauf angesteuert werden, weil sonst ein UNDEFN'D FUNCTION ERROR auftritt.</p>
+
+<p>Es kann auf beliebige Weise verwendet werden.</p>
+
+<p>Eine Erklärung der mathematischen Grundlagen an dieser Stelle wäre etwas umfangreich. Falls Sie daran interessiert sind, lesen Sie bitte in der Serie »Grafik-Streifzüge« in der Zeitschrift 64'er nach, wo alles Wissenswerte über Transformationen auf einfache Weise erklärt wird. (Sie lernen dort auch, wie sich mit einfachen Mitteln Rotationen ins Modul einbauen lassen.)</p>
+
+<p>Sehen wir uns nun nochmal das Programm »2D-FUNKTIONEN« an. Es ist gewissermaßen die Sparausführung eines solchen Grafikprogrammes. So kann man beispielsweise nicht bestimmte Bereiche beim Zeichnen ausklammern. Es wird immer von XU bis XO gezeichnet. Auch ist es nicht möglich, sowohl XU als auch XO als positive Werte einzugeben, ebensowenig, wie es möglich ist, YU und YO beide negativ anzugeben. Jedesmal müssen der untere und der obere Wert verschiedene Vorzeichen haben (aber auch noch die Null als höchster oder niedrigster Wert wird akzeptiert). Das Programm wurde für den Betrieb mit zwei Bildschirmen geschrieben. Sollten Sie lediglich den 40-Zeichen-Schirm verwenden, müssen Sie nur in Zeile 95 statt GRAPHIC5,1 nun GRAPHICO,1 schreiben und in Zeile 600 eine Zurückschaltung in den Grafik-Modus 0 veranlassen. Beim Zeichnen werden Sie bemerken, daß sich ein Teil des Koordinaten-Rasters verfärbt. Das liegt daran, daß unser Programm mehrere Farben verwendet und nicht im Multicolor-modus läuft, um keine Einbußen bei der Auflösung hinnehmen zu müssen. Weil aber die Farbgebung immer in 8 x 8 Bit-Feldern geschieht, wird eine alte Zeichnung immer dann neu gefärbt, wenn eine neue Linie in anderer Farbe durch dieses Feld läuft. Viel Spaß wünsche ich Ihnen beim Ausbauen dieser Sparversion zum professionellen 2D-Funktio-nen-Programm.</p>
+
+<p>Damit endet dieser Bericht unseres Korrespondenten. Es ist schon interessant, wozu der Tastaturpuffer so alles taugt, nicht wahr? Wir warten mit Spannung auf das nächste Lebenszeichen aus dem unbekannten Kontinent C 128.</p>
+
+<address class="author">(Heimo Ponnath/dm)</address>
+    </article>
+</body>
+</html>
