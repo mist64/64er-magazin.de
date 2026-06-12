@@ -16,156 +16,157 @@
 <body>
     <article>
         <h1>Tips &amp; Tricks für Profis</h1>
-<p class="intro">Diesmal sollen vor allem die Schachspieler unter den C 64-Fans mit einem äußerst nützlichen Programm bedacht werden. Weiterhin bringen wir zwei Tips zum Thema »Basic-Tokens«, eine Disketten-Refor-mat-Routine als Dreizeiler (!) und viele weitere Aha-Erlebnisse für Profis.</p>
+        <p class="intro">Diesmal sollen vor allem die Schachspieler unter den C 64-Fans mit einem äußerst nützlichen Programm bedacht werden. Weiterhin bringen wir zwei Tips zum Thema »Basic-Tokens«, eine Disketten-Refor-mat-Routine als Dreizeiler (!) und viele weitere Aha-Erlebnisse für Profis.</p>
 
-<p>In der letzten Ausgabe fragten wir Sie, warum der Einzeiler</p>
+        <p>In der letzten Ausgabe fragten wir Sie, warum der Einzeiler</p>
 
-<p>10 FOR 1 = 1 TO 20 : OPEN 1,2 : NEXT</p>
+        <p>10 FOR 1 = 1 TO 20 : OPEN 1,2 : NEXT</p>
 
-<p>keinen »too many files«-, sondern einen »next without for«-Error zur Folge hat. Haben Sie es erraten?</p>
+        <p>keinen »too many files«-, sondern einen »next without for«-Error zur Folge hat. Haben Sie es erraten?</p>
 
-<p>Der Grund liegt in der Sekundäradresse 2 des OPEN-Befehls. Sie besagt: »RS232-Kanal öffnen«. Undwennmanjetzt noch weiß, daß nach einem solchen OPEN-Befehl automatisch sämtliche Variablen, Rücksprungadressen für GOSUBs und FOR-NEXT-Schleifen gelöscht werden, hat man die Lösung schon. Der C 64 reserviert sich am Ende des Basic-Speichers etwas Platz für einen RS232-Puffer. Und sicherheitshalber löscht er dabei den kompletten Variablenspei-cher.</p>
+        <p>Der Grund liegt in der Sekundäradresse 2 des OPEN-Befehls. Sie besagt: »RS232-Kanal öffnen«. Undwennmanjetzt noch weiß, daß nach einem solchen OPEN-Befehl automatisch sämtliche Variablen, Rücksprungadressen für GOSUBs und FOR-NEXT-Schleifen gelöscht werden, hat man die Lösung schon. Der C 64 reserviert sich am Ende des Basic-Speichers etwas Platz für einen RS232-Puffer. Und sicherheitshalber löscht er dabei den kompletten Variablenspei-cher.</p>
 
-<p>Also: Beim Schreiben von Programmen, die RS232-Rou-tinen verwenden, immer darauf achten, daß der entsprechende OPEN-Befehl in der ersten Zeile des Programms steht! (tr)</p>
+        <p>Also: Beim Schreiben von Programmen, die RS232-Rou-tinen verwenden, immer darauf achten, daß der entsprechende OPEN-Befehl in der ersten Zeile des Programms steht! (tr)</p>
 
-<h2>Tokens im Klartext</h2>
+        <h2>Tokens im Klartext</h2>
 
-<p>1 P0KE769,177:FORI=lT076:P0KE73,255:P0KE781,I:SYS42794: PRINT, :NEXT:P0KE769,227</p>
+        <p>1 P0KE769,177:FORI=lT076:P0KE73,255:P0KE781,I:SYS42794: PRINT, :NEXT:P0KE769,227</p>
 
-<p>Dieser Einzeiler gibt sämtliche Basic-Befehle auf dem Bildschirm aus.</p>
+        <p>Dieser Einzeiler gibt sämtliche Basic-Befehle auf dem Bildschirm aus.</p>
 
-<p>Er benützt die Routine, die den Basic-Code in Klartext umwandelt ($A717). Diese Routine zieht von dem übergebenen Basic-Token 127 ab und schiebt das Ergebnis ins X-Register. Danach wird das Y-Register in der Speicherstelle $49 (73) gespeichert. Die Routine gibt nun den Basic-Befehl aus und springt nach $A6EF. Dort wird unter anderem das Y-Register mit dem Wert der Speicherstelle $49 (73) geladen und um eins erhöht. Ist das Ergebnis 0 wird zum Basic-Warmstart ($E386) verzweigt, dort wird über den Befehl »JMP ($0300)« nach $E38B gesprungen. Dabei steht in $0300 (768) der Wert $8B und in $0301 (769) der Wert $E3.</p>
+        <p>Er benützt die Routine, die den Basic-Code in Klartext umwandelt ($A717). Diese Routine zieht von dem übergebenen Basic-Token 127 ab und schiebt das Ergebnis ins X-Register. Danach wird das Y-Register in der Speicherstelle $49 (73) gespeichert. Die Routine gibt nun den Basic-Befehl aus und springt nach $A6EF. Dort wird unter anderem das Y-Register mit dem Wert der Speicherstelle $49 (73) geladen und um eins erhöht. Ist das Ergebnis 0 wird zum Basic-Warmstart ($E386) verzweigt, dort wird über den Befehl »JMP ($0300)« nach $E38B gesprungen. Dabei steht in $0300 (768) der Wert $8B und in $0301 (769) der Wert $E3.</p>
 
-<p>Der Einzeiler POKEt nun in einer FOR-NEXT-Schleife die Werte von 1 bis 76 (entspricht den Token -127) in die Speicherstelle 781. Der Wert dieser Speicherstelle wird beim SYS-Befehl in das X-Register geladen. Zusätzlich wird der Wert 255 in die Speicherstelle 73 ($49) gePOKEt und mit dem SYS 42794 nach $A72A gesprungen. Darauf wird der Basic-Befehl auf dem Bildschirm ausgegeben, das Y-Register mit dem Wert der Speicherstelle 73 ($49) geladen und um eins erhöht. Dadurch steht nun 0 im Y-Register und der Computer verzweigt zum Basic-Warmstart. Zuvor hat der Einzeiler das High-Byte des Warmstartvektors auf ein »RTS« umgebogen (statt $E38B auf $B18B). Deshalb wird anstatt zum Basic-Warmstart wieder zurück ins Basic-Programm gesprungen. Nach Beendigung der Schleife wird der Warmstartvektor auf den ursprünglichen Wert gebogen. Deshalb darf das Programm nicht unterbrochen werden!</p>
+        <p>Der Einzeiler POKEt nun in einer FOR-NEXT-Schleife die Werte von 1 bis 76 (entspricht den Token -127) in die Speicherstelle 781. Der Wert dieser Speicherstelle wird beim SYS-Befehl in das X-Register geladen. Zusätzlich wird der Wert 255 in die Speicherstelle 73 ($49) gePOKEt und mit dem SYS 42794 nach $A72A gesprungen. Darauf wird der Basic-Befehl auf dem Bildschirm ausgegeben, das Y-Register mit dem Wert der Speicherstelle 73 ($49) geladen und um eins erhöht. Dadurch steht nun 0 im Y-Register und der Computer verzweigt zum Basic-Warmstart. Zuvor hat der Einzeiler das High-Byte des Warmstartvektors auf ein »RTS« umgebogen (statt $E38B auf $B18B). Deshalb wird anstatt zum Basic-Warmstart wieder zurück ins Basic-Programm gesprungen. Nach Beendigung der Schleife wird der Warmstartvektor auf den ursprünglichen Wert gebogen. Deshalb darf das Programm nicht unterbrochen werden!</p>
 
-<address class="author">(Mathias Kühlewein/tr)</address>
+        <address class="author">(Mathias Kühlewein/tr)</address>
 
-<h2>Basic-Erweiterungen durchschaut</h2>
+        <h2>Basic-Erweiterungen durchschaut</h2>
 
-<p>In den meisten Basic-Dialekten/Basic-Erweiterungen werden die Schlüsselworte als l-Byte-Token gespeichert. Das kleine Programm (Listing 1) erzeugt eine vollständige Liste dieser Token und der zugehörigen Befehle, wenn Sie es unter dem zu untersuchenden Dialekt laden und starten. Die Werte der Token liegen im Bereich $80 bis $FF, das heißt 128 bis 255. Das Programm erzeugt daher zunächst Zeilen mit diesen Nummern und demjeweiligen Hex-Byte und POKEt dann die Token in die Zeile hinein.</p>
+        <p>In den meisten Basic-Dialekten/Basic-Erweiterungen werden die Schlüsselworte als l-Byte-Token gespeichert. Das kleine Programm (Listing 1) erzeugt eine vollständige Liste dieser Token und der zugehörigen Befehle, wenn Sie es unter dem zu untersuchenden Dialekt laden und starten. Die Werte der Token liegen im Bereich $80 bis $FF, das heißt 128 bis 255. Das Programm erzeugt daher zunächst Zeilen mit diesen Nummern und demjeweiligen Hex-Byte und POKEt dann die Token in die Zeile hinein.</p>
 
-<p>Am Schluß löscht das Hauptprogramm sich selbst (es muß daher vor dem ersten Start auf einem Datenträger gesichert werden), und im Programmspeicher verbleibt die Liste der Token und ihrer Bedeutung, die nun mit »LIST« abgerufen werden kann. In manchen Basic-Dialekten steigt der Computer beim Code 204 ($CC) aus. Durch Löschen der Zeile 204 kann dies umgangen werden.</p>
+        <p>Am Schluß löscht das Hauptprogramm sich selbst (es muß daher vor dem ersten Start auf einem Datenträger gesichert werden), und im Programmspeicher verbleibt die Liste der Token und ihrer Bedeutung, die nun mit »LIST« abgerufen werden kann. In manchen Basic-Dialekten steigt der Computer beim Code 204 ($CC) aus. Durch Löschen der Zeile 204 kann dies umgangen werden.</p>
 
-<p>»Tokenfinder« ist auch nützlich zum Auffinden von Schlüsselworten, die vielleicht im Handbuch verschwiegen wurden, denn man erhält ja eine Liste aller Schlüsselworte. Auch für Dialekte mit 2-Byte-Token (zum Beispiel Simons Basic) kann der Profi das Programm sicherlich leicht anpassen.</p>
+        <p>»Tokenfinder« ist auch nützlich zum Auffinden von Schlüsselworten, die vielleicht im Handbuch verschwiegen wurden, denn man erhält ja eine Liste aller Schlüsselworte. Auch für Dialekte mit 2-Byte-Token (zum Beispiel Simons Basic) kann der Profi das Programm sicherlich leicht anpassen.</p>
 
-<p>Bitte halten Sie sich genau an die angegebenen Zeilennummern, da die Routinen hierauf abgestimmt sind. Die Auto-Löschroutine steht in Zeile 600, welche in bekannter Einzeilermanier in abgekürzter Schreibweise eingegeben werden muß.</p>
+        <p>Bitte halten Sie sich genau an die angegebenen Zeilennummern, da die Routinen hierauf abgestimmt sind. Die Auto-Löschroutine steht in Zeile 600, welche in bekannter Einzeilermanier in abgekürzter Schreibweise eingegeben werden muß.</p>
 
-<address class="author">(Christian Jäkel/tr)</address>
+        <address class="author">(Christian Jäkel/tr)</address>
 
-<h2>Star SG-10 und Vizawrite</h2>
+        <h2>Star SG-10 und Vizawrite</h2>
 
-<p>Besitzer eines Star SG-10 mit original Star-Interface (Revision 2.2) werden Probleme haben, Umlaute über Vizawrite auszudrucken. Diese sind nämlich in der Größe vertauscht. Das heißt ein »ä« auf dem Bildschirm wird zum Beispiel zum »Ä« auf dem Drucker. Mit einem kleinen Trick kann hier Abhilfe geschaffen werden: Dazu wird zuerst Vizawrite geladen. Dann gibt man im Direktmodus folgende Befehle ein:<br>
-open 4,4,25:print#4 (return)</p>
+        <p>Besitzer eines Star SG-10 mit original Star-Interface (Revision 2.2) werden Probleme haben, Umlaute über Vizawrite auszudrucken. Diese sind nämlich in der Größe vertauscht. Das heißt ein »ä« auf dem Bildschirm wird zum Beispiel zum »Ä« auf dem Drucker. Mit einem kleinen Trick kann hier Abhilfe geschaffen werden: Dazu wird zuerst Vizawrite geladen. Dann gibt man im Direktmodus folgende Befehle ein:<br>
+            open 4,4,25:print#4 (return)</p>
 
-<p>Eine Sekundäradresse 5 bewirkt, daß die Zeichen unbeeinflußt vom Interface zum Drucker übertragen werden. 5 + 20 verriegelt das Interface, und nur durch Ausschalten wird es wieder freigegeben. Nun kann Vizawrite mit »RUN« gestartet werden. In den »Print Options« muß jedoch der Punkt »Printer Type« geändert werden: Statt »v« (für Commodore-Drucker) wird hier nun ein »a« (für ASCII-Druk-ker) eingetragen. Jetzt funktioniert alles ordnungsgemäß.</p>
+        <p>Eine Sekundäradresse 5 bewirkt, daß die Zeichen unbeeinflußt vom Interface zum Drucker übertragen werden. 5 + 20 verriegelt das Interface, und nur durch Ausschalten wird es wieder freigegeben. Nun kann Vizawrite mit »RUN« gestartet werden. In den »Print Options« muß jedoch der Punkt »Printer Type« geändert werden: Statt »v« (für Commodore-Drucker) wird hier nun ein »a« (für ASCII-Druk-ker) eingetragen. Jetzt funktioniert alles ordnungsgemäß.</p>
 
-<address class="author">(Stefan Paul/tr)</address>
+        <address class="author">(Stefan Paul/tr)</address>
 
-<h2>Division by Zero Error?</h2>
+        <h2>Division by Zero Error?</h2>
 
-<p>Mir ist kürzlich aufgefallen, daß bei meinem C 64 Null mit einer negativen Zahl exponiert Null ergibt, obwohl eigentlich ein DIVISION BY ZERO ERROR ausgegeben werden müßte. Es darf nämlich bekanntlicherweise nie durch Null dividiert werden. Als ich in der Schule beim VC 20 auf dasselbe Problem gestoßen bin, hat sich mein Verdacht gestärkt, daß hier jemand bei der Entwicklung des Betriebssystems geschlafen hat.</p>
+        <p>Mir ist kürzlich aufgefallen, daß bei meinem C 64 Null mit einer negativen Zahl exponiert Null ergibt, obwohl eigentlich ein DIVISION BY ZERO ERROR ausgegeben werden müßte. Es darf nämlich bekanntlicherweise nie durch Null dividiert werden. Als ich in der Schule beim VC 20 auf dasselbe Problem gestoßen bin, hat sich mein Verdacht gestärkt, daß hier jemand bei der Entwicklung des Betriebssystems geschlafen hat.</p>
 
-<p>Auch bei dem Programm »Mathemat« im Programmteil »Werteberechnung« wird dieser Fehler nicht abgefangen.</p>
+        <p>Auch bei dem Programm »Mathemat« im Programmteil »Werteberechnung« wird dieser Fehler nicht abgefangen.</p>
 
-<p>Beispiel:</p>
+        <p>Beispiel:</p>
 
-<p>TODO FORMULA</p>
+        <p>TODO FORMULA</p>
 
-<address class="author">(Jürgen Mayer/tr)</address>
+        <address class="author">(Jürgen Mayer/tr)</address>
 
-<h2>Klavierzauber und Resettaste</h2>
+        <h2>Klavierzauber und Resettaste</h2>
 
-<p>Tippen Sie folgendes ein:</p>
+        <p>Tippen Sie folgendes ein:</p>
 
-<p>10 S=54272: P0KES+24,15: POKES+1,110: POKES+5,9: POKES+6,9 POKES+4,17:POKES+4,16</p>
+        <p>10 S=54272: P0KES+24,15: POKES+1,110: POKES+5,9: POKES+6,9 POKES+4,17:POKES+4,16</p>
 
-<p>Nach »RUN« werden sie einen kurzen Ton hören, der dem eines Klaviers ähnlich ist. Tippen Sie noch folgendes dazu ein:</p>
+        <p>Nach »RUN« werden sie einen kurzen Ton hören, der dem eines Klaviers ähnlich ist. Tippen Sie noch folgendes dazu ein:</p>
 
-<p>20 GOTO 10</p>
+        <p>20 GOTO 10</p>
 
-<p>Normalerweise müßte dannja ein sehr langer, unendlicher Ton oder auch viele kurze hintereinander kommen. Aber es kommt etwas ganz anderes: Man kann viele, aber in vollkommen unregelmäßigen Abständen, Klaviertöne hören!</p>
+        <p>Normalerweise müßte dannja ein sehr langer, unendlicher Ton oder auch viele kurze hintereinander kommen. Aber es kommt etwas ganz anderes: Man kann viele, aber in vollkommen unregelmäßigen Abständen, Klaviertöne hören!</p>
 
-<p>Übrigens: mit zwei POKEs kann man die Restore-Taste als Reset-Taster mißbrauchen.</p>
+        <p>Übrigens: mit zwei POKEs kann man die Restore-Taste als Reset-Taster mißbrauchen.</p>
 
-<p>POKE 792,226:P0KE 793,252</p>
+        <p>POKE 792,226:P0KE 793,252</p>
 
-<p>Sie eignen sich auch als einfacher Programmschutz.</p>
+        <p>Sie eignen sich auch als einfacher Programmschutz.</p>
 
-<address class="author">(Markus Beinlich/tr)</address>
+        <address class="author">(Markus Beinlich/tr)</address>
 
-<h2>Datasette als Sirene</h2>
+        <h2>Datasette als Sirene</h2>
 
-<p>Tippen Sie doch mal folgendes kleines Listing ein:</p>
+        <p>Tippen Sie doch mal folgendes kleines Listing ein:</p>
 
-<p>10 DATA 234,165,1,41,247,133,1,32,22,144,165,1,9,8,133<br>
-20 DATA 1,32,22,144,76,1,144,230,2,166,2,232,208,253,96<br>
-30 DATA 0<br>
-40 FOR N=36864 T0 36894 : READ A : POKE I,A : NEXT<br>
-50 PRINT " &lt;RECORD&gt; UND &lt;PLAY&gt; DRUECKEN! "<br>
-60 SYS 36864</p>
+        <p>10 DATA 234,165,1,41,247,133,1,32,22,144,165,1,9,8,133<br>
+            20 DATA 1,32,22,144,76,1,144,230,2,166,2,232,208,253,96<br>
+            30 DATA 0<br>
+            40 FOR N=36864 T0 36894 : READ A : POKE I,A : NEXT<br>
+            50 PRINT " &lt;RECORD&gt; UND &lt;PLAY&gt; DRUECKEN! "<br>
+            60 SYS 36864</p>
 
-<p>Legen Sie eine Leerkassette in die Datasette und starten Sie das Programm mit »RUN«. Schalten Sie die Datasette auf Aufnahme und warten ein paar Minuten. Nun hören Sie sich das Ergebnis auf einem normalen Kassettenrecorder an.</p>
+        <p>Legen Sie eine Leerkassette in die Datasette und starten Sie das Programm mit »RUN«. Schalten Sie die Datasette auf Aufnahme und warten ein paar Minuten. Nun hören Sie sich das Ergebnis auf einem normalen Kassettenrecorder an.</p>
 
-<p>Die Erklärung ist ganz einfach: Das Bit Nr. 3 in der Speicherstelle 1 steuert das Schreibsignal der Datasette. Der Zeitabstand zwischen Setzen und Löschen dieses Bits ergibt die Frequenz des erzeugten Tones. Die Maschinenroutine ändert nun kontinuierlich den Zeitabstand zwischen Ein- und Ausschalten. Dadurch kommt der sirenenartige Ton zustande.</p>
+        <p>Die Erklärung ist ganz einfach: Das Bit Nr. 3 in der Speicherstelle 1 steuert das Schreibsignal der Datasette. Der Zeitabstand zwischen Setzen und Löschen dieses Bits ergibt die Frequenz des erzeugten Tones. Die Maschinenroutine ändert nun kontinuierlich den Zeitabstand zwischen Ein- und Ausschalten. Dadurch kommt der sirenenartige Ton zustande.</p>
 
-<address class="author">(Markus Nowak/tr)</address>
+        <address class="author">(Markus Nowak/tr)</address>
 
-<h2>Reformat als Dreizeiler</h2>
+        <h2>Reformat als Dreizeiler</h2>
 
-<p>Bei der Formatierung ohne ID werden nur die Bam und der Block 18/1 gelöscht. DerBlock 18/1 zeigt im Normalfall immer auf den Block 18/4, bei dem das Directory fortgesetzt wird. Wenn man auf die ersten acht Einträge verzichtet, kann man zumindest den Rest retten (bei 144 Einträgen immerhin 136).</p>
+        <p>Bei der Formatierung ohne ID werden nur die Bam und der Block 18/1 gelöscht. DerBlock 18/1 zeigt im Normalfall immer auf den Block 18/4, bei dem das Directory fortgesetzt wird. Wenn man auf die ersten acht Einträge verzichtet, kann man zumindest den Rest retten (bei 144 Einträgen immerhin 136).</p>
 
-<p>10 0PEN1,8,15:0PEN2,8,2, " # ":PRINT#1, "Ul 2 0 18 1"<br>
-20 PRINT#1, "M-W"CHR$(0)CHR$(5)CHR$(2)CHR$(18)CHR$(4)<br>
-30 PRINT#1, "U2 2 0 18 1" :PRINT#1, "V":CL0SE2:CL0SEl<br>
-Das Programm ändert die Zeiger des ersten Directory-Blocks, die danach wieder auf den Block 18/4 zeigen. Jetzt sind wieder, bis auf acht, alle Programme vorhanden. Schreibzugriffe jedoch könnten die Programme zerstören. Deshalb wird nun noch die Diskette validiert. Beim Validieren werden die Programme als belegt gekennzeichnet und sind somit vor dem Überschreiben geschützt.</p>
+        <p>10 0PEN1,8,15:0PEN2,8,2, " # ":PRINT#1, "Ul 2 0 18 1"<br>
+            20 PRINT#1, "M-W"CHR$(0)CHR$(5)CHR$(2)CHR$(18)CHR$(4)<br>
+            30 PRINT#1, "U2 2 0 18 1" :PRINT#1, "V":CL0SE2:CL0SEl<br>
+            Das Programm ändert die Zeiger des ersten Directory-Blocks, die danach wieder auf den Block 18/4 zeigen. Jetzt sind wieder, bis auf acht, alle Programme vorhanden. Schreibzugriffe jedoch könnten die Programme zerstören. Deshalb wird nun noch die Diskette validiert. Beim Validieren werden die Programme als belegt gekennzeichnet und sind somit vor dem Überschreiben geschützt.</p>
 
-<p>Hinweis: Das Programm kann nur Directories retten, bei denen der Track 18 zuvor nicht beschädigt oder zerstört war!</p>
+        <p>Hinweis: Das Programm kann nur Directories retten, bei denen der Track 18 zuvor nicht beschädigt oder zerstört war!</p>
 
-<address class="author">(Stefan Schäfer/tr)</address>
+        <address class="author">(Stefan Schäfer/tr)</address>
 
-<h2>Betrifft: Super-Einzeiler</h2>
+        <h2>Betrifft: Super-Einzeiler</h2>
 
-<p>Wenn man im Listing »Soft-Flash« (64'er, Ausgabe 4/86, Seite 79) die Zahl 240 in der zweituntersten Zeile (zwischen 169 und 141) in 4 ändert, kann man das Blinken nicht nur sehen, sondern auch hören! Keine Angst, der Floppy schadet der Gag nicht.</p>
+        <p>Wenn man im Listing »Soft-Flash« (64'er, Ausgabe 4/86, Seite 79) die Zahl 240 in der zweituntersten Zeile (zwischen 169 und 141) in 4 ändert, kann man das Blinken nicht nur sehen, sondern auch hören! Keine Angst, der Floppy schadet der Gag nicht.</p>
 
-<address class="author">(Kohli Reto/tr)</address>
+        <address class="author">(Kohli Reto/tr)</address>
 
-<h2>Hilfe für Schachspieler</h2>
+        <h2>Hilfe für Schachspieler</h2>
 
-<p>Mit diesem Maschinenprogramm (Listing 2) können Sie eine umfangreiche Sammlung von Schachpartien speichern, nachspielen und bei Bedarf auch ausdrucken.</p>
+        <p>Mit diesem Maschinenprogramm (Listing 2) können Sie eine umfangreiche Sammlung von Schachpartien speichern, nachspielen und bei Bedarf auch ausdrucken.</p>
 
-<p>Das Programm »CHESS« wird mit dem MSE eingegeben und dann absolut (mit »,8,1«) geladen. Der Start erfolgt mit »SYS 40287«. Sie sehen ein Mini-Menü mit fünf Punkten vor sich:<br>
-1. Partie eingeben<br>
-Zuerst müssen Sie die Namen der beiden Spieler, das Spieldatum und die Brettnummer eingeben. Die Eingabe der einzelnen Züge muß folgendes Format aufweisen: Figur Startfeld Zielfeld<br>
-Beispiele: Bb2-b3 oder Dhlxa8 »Bauer b2 nach b3« oder »Dame hl schlägt a8«.<br>
-Der Menüpunkt wird durch Eingabe eines Sternchens (*) bei Spieler Weiß beendet.<br>
-2. Partie ansehen<br>
-Zuerst erscheinen Namen der Spieler, Spieldatum und Brettnummer und der erste Zug. Nach jedem Druck auf die RETURN-Taste wird der nächste Zug angezeigt. Nach dem letzten Zug besteht die Möglichkeit, die Partie ausdrucken zu lassen. Beim Ausdrucken müssen Sie ebenfalls nach jedem Zug RETURN drücken.<br>
-3. Partie speichern<br>
-Nachdem Sie einen Namen eingegeben haben, wird die Partie auf Diskette gespeichert.<br>
-4. Partie laden<br>
-Verwenden Sie zum Laden den Namen, den Sie unter Punkt 3 verwendet haben.<br>
-5. Beenden<br>
-Sie können das Programm jederzeit durch »SYS 40287« wieder starten.</p>
+        <p>Das Programm »CHESS« wird mit dem MSE eingegeben und dann absolut (mit »,8,1«) geladen. Der Start erfolgt mit »SYS 40287«. Sie sehen ein Mini-Menü mit fünf Punkten vor sich:<br>
+            1. Partie eingeben<br>
+            Zuerst müssen Sie die Namen der beiden Spieler, das Spieldatum und die Brettnummer eingeben. Die Eingabe der einzelnen Züge muß folgendes Format aufweisen: Figur Startfeld Zielfeld<br>
+            Beispiele: Bb2-b3 oder Dhlxa8 »Bauer b2 nach b3« oder »Dame hl schlägt a8«.<br>
+            Der Menüpunkt wird durch Eingabe eines Sternchens (*) bei Spieler Weiß beendet.<br>
+            2. Partie ansehen<br>
+            Zuerst erscheinen Namen der Spieler, Spieldatum und Brettnummer und der erste Zug. Nach jedem Druck auf die RETURN-Taste wird der nächste Zug angezeigt. Nach dem letzten Zug besteht die Möglichkeit, die Partie ausdrucken zu lassen. Beim Ausdrucken müssen Sie ebenfalls nach jedem Zug RETURN drücken.<br>
+            3. Partie speichern<br>
+            Nachdem Sie einen Namen eingegeben haben, wird die Partie auf Diskette gespeichert.<br>
+            4. Partie laden<br>
+            Verwenden Sie zum Laden den Namen, den Sie unter Punkt 3 verwendet haben.<br>
+            5. Beenden<br>
+            Sie können das Programm jederzeit durch »SYS 40287« wieder starten.</p>
 
-<address class="author">(Ulf Schenk/tr)</address>
+        <address class="author">(Ulf Schenk/tr)</address>
 
-<h2>Das Super-Musikstück</h2>
+        <h2>Das Super-Musikstück</h2>
 
-<p>Verständlicherweise werden sich einige Leser beim Abtippen des Musikstückes »Shades« aus der 64'er, Ausgabe 6/86, über das Listing gewundert haben. Eigentlich hätten aus dem Lautsprecher nie dagewesene Klänge ertönen sollen.</p>
+        <p>Verständlicherweise werden sich einige Leser beim Abtippen des Musikstückes »Shades« aus der 64'er, Ausgabe 6/86, über das Listing gewundert haben. Eigentlich hätten aus dem Lautsprecher nie dagewesene Klänge ertönen sollen.</p>
 
-<p>Beim Montieren unserer Ausgabe 6/86 sind im Listing »Shades« auf Seite 173 zwei Druckseiten versehentlich vertauscht worden. Deshalb sind zwei Reihen von MSE-Daten einem anderen Programm entnommen. Wir bitten Sie, dies zu entschuldigen.</p>
+        <p>Beim Montieren unserer Ausgabe 6/86 sind im Listing »Shades« auf Seite 173 zwei Druckseiten versehentlich vertauscht worden. Deshalb sind zwei Reihen von MSE-Daten einem anderen Programm entnommen. Wir bitten Sie, dies zu entschuldigen.</p>
 
-<p>Im untenstehenden Listing 4 finden Sie die richtigen Teile des Programms. Falls Sie die vertauschte Version schon eingegeben haben, benutzen Sie diese zusammen mit dem MSE und der »GTRL-N«-Funktion,um die Zeilen neu einzugeben. Sie müssen lediglich die hier abgedruckten Daten neu eingeben. Achten Sie bitte auch auf die richtigen Programmadressen beim Eintippen. ' (tr)</p>
+        <p>Im untenstehenden Listing 4 finden Sie die richtigen Teile des Programms. Falls Sie die vertauschte Version schon eingegeben haben, benutzen Sie diese zusammen mit dem MSE und der »GTRL-N«-Funktion,um die Zeilen neu einzugeben. Sie müssen lediglich die hier abgedruckten Daten neu eingeben. Achten Sie bitte auch auf die richtigen Programmadressen beim Eintippen. ' (tr)</p>
 
-<h2>Raffinierter ON-ERROR-GOTO</h2>
+        <h2>Raffinierter ON-ERROR-GOTO</h2>
 
-<p>Wer dringend einen »ON ERROR GOTO«-Befehl benötigt und keine entsprechende Erweiterung hat, kann das mit ein paar POKEs simulieren.</p>
+        <p>Wer dringend einen »ON ERROR GOTO«-Befehl benötigt und keine entsprechende Erweiterung hat, kann das mit ein paar POKEs simulieren.</p>
 
-<p>Es werden ganz einfach die Charakterwerte des Wörtchens GOTO in den Tastaturpuffer ab 631 gePOKEt, anschließend die Werte der Zeilennummer und dann noch eine 13 für &lt; RETURN >. Zuletzt kommt in Speicherstelle 198 noch die Anzahl der in den Tastaturpuffer gePOKEten Werte. Dies funktioniert natürlich nicht bei Tastaturabfragen während des Programms, es sei denn, man initialisiert den Tastaturpuffer danach jedesmal wieder neu, zum Beispiel in einer Unterroutine.</p>
+        <p>Es werden ganz einfach die Charakterwerte des Wörtchens GOTO in den Tastaturpuffer ab 631 gePOKEt, anschließend die Werte der Zeilennummer und dann noch eine 13 für &lt; RETURN >. Zuletzt kommt in Speicherstelle 198 noch die Anzahl der in den Tastaturpuffer gePOKEten Werte. Dies funktioniert natürlich nicht bei Tastaturabfragen während des Programms, es sei denn, man initialisiert den Tastaturpuffer danach jedesmal wieder neu, zum Beispiel in einer Unterroutine.</p>
 
-<p>Dieses Verfahren kann man natürlich auch zu anderen Zwecken benutzen, wie zum Beispiel ein automatisches Listen bei einem Fehler oder Programmende.</p>
+        <p>Dieses Verfahren kann man natürlich auch zu anderen Zwecken benutzen, wie zum Beispiel ein automatisches Listen bei einem Fehler oder Programmende.</p>
 
-<address class="author">(J. Kohl/tr)</address>
+        <address class="author">(J. Kohl/tr)</address>
     </article>
 </body>
+
 </html>

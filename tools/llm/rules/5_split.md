@@ -16,6 +16,13 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
   directory name; e.g. `issues/8607/` → `7/86`)
 - **bylines** `<p>(name1/name2)</p>` → `<address class="author">(name1/name2)</address>`
   AND collected into `<meta name="author" content="name1, name2, …">`
+- each per-article file is beautified with **js-beautify** (same engine
+  Nova's `nova-beautify` extension uses), 4-space indent, no line wrapping
+  — so `<article>` children land at 8 spaces, `<ul>`/`<ol>` children at
+  12, `<br>`-continuation lines at +4 from their opener, and inline
+  elements (e.g. `<address class="author">(xy)</address>`) stay on a
+  single line. Requires Node/npm available on `PATH`; on first run `npx`
+  fetches `js-beautify` from the network.
 - a small text cleanup pass (idempotent with step 4 because the same
   substitutions are applied):
   - `<blockquote><p>` → `<p class="intro">`
