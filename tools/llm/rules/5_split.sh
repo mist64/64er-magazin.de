@@ -117,14 +117,25 @@ split_html(sys.argv[1], sys.argv[2])
 PY
 )
 
+# Beautify each per-article file in place using js-beautify
+# (same engine as Nova's nova-beautify extension). 4-space indent, no line
+# wrapping so OCR'd line breaks are preserved; inline elements stay on
+# their line.
+files=()
+while IFS= read -r name; do files+=("$dir/$name"); done < "$dir/.split_outputs"
+npx --yes js-beautify \
+  --type html \
+  --indent-size 4 \
+  --wrap-line-length 0 \
+  --replace "${files[@]}" >/dev/null
+echo "beautified ${#files[@]} file(s) via js-beautify"
+
 # git: drop the consolidated .html, stage the per-article files.
 if git ls-files --error-unmatch "$src" >/dev/null 2>&1; then
   git rm -f --quiet "$src"
 else
   rm -f "$src"
 fi
-while IFS= read -r name; do
-  git add "$dir/$name"
-done < "$dir/.split_outputs"
+for f in "${files[@]}"; do git add "$f"; done
 rm -f "$dir/.split_outputs"
 echo "git: removed $src, staged the per-article files"
