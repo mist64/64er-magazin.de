@@ -100,6 +100,62 @@
 
         <p>13 Arten der Adressierung gibt es im 6502-Assembler (der ja auch den 6510 des C 64 und den 8502 des C 128 programmiert), von denen ich im nachfolgenden aber nur einige häufiger benutzte vollständig erklären werde (siehe auch Tabelle 1):</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Adressierung</th>
+                    <th>Bytes</th>
+                    <th>Beispiel</th>
+                </tr>
+                <tr>
+                    <td>Implizit</td>
+                    <td>1</td>
+                    <td>TAX</td>
+                </tr>
+                <tr>
+                    <td>Absolut</td>
+                    <td>3</td>
+                    <td>LDA $C0A8</td>
+                </tr>
+                <tr>
+                    <td>Unmittelbar</td>
+                    <td>2</td>
+                    <td>LDA #$4F</td>
+                </tr>
+                <tr>
+                    <td>Indiziert</td>
+                    <td>3</td>
+                    <td>LDA $9000,X</td>
+                </tr>
+                <tr>
+                    <td>Indirekt Indiziert</td>
+                    <td>2</td>
+                    <td>LDA($02),Y</td>
+                </tr>
+                <tr>
+                    <td>Indiziert Indirekt</td>
+                    <td>2</td>
+                    <td>STA($01,X)</td>
+                </tr>
+                <tr>
+                    <td>Indirekt</td>
+                    <td>3</td>
+                    <td>JMP($,4301)</td>
+                </tr>
+                <tr>
+                    <td>Zeropage</td>
+                    <td>2</td>
+                    <td>LDA $80</td>
+                </tr>
+                <tr>
+                    <td>Relativ</td>
+                    <td>2</td>
+                    <td>BEQ $03</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Hier noch einmal die verschiedenen Arten der Adressierung</figcaption>
+        </figure>
+
         <h3>Implizit</h3>
 
         <p>Das ist eine Form der Adressierung, die nur bei bestimmten Befehlen möglich ist, nämlich bei solchen, in denen die Adressierung praktisch schon enthalten ist (das heißt ja implizit). Beispielsweise besagt der Befehl TAY, daß der Akkuinhalt ins Y-Register kopiert werden soll.</p>
@@ -123,14 +179,24 @@
 
         <p>Gehen wir erst mal von der absoluten Adressierung aus, also von LDA $C000. Das bedeutet ja, daß der Inhalt der Speicherzelle $C000 in den Akku geladen wird. Ist der Inhalt des Y-Regi-sters gleich Null, dann erfüllt LDA $C000,Y genau denselben Zweck. Der Inhalt des jeweiligen Indexregisters (also X oder Y) wird nämlich zur genannten Adresse hinzugezählt. LDA $C000,Y lädt daher den Inhalt der Speicherstelle $C005, wenn sich im Y-Register der Wert 5 befindet. Die vier verschiedenen reinen indizierten Adressierungsarten (jeweils mit Beispielen) sind:</p>
 
-        <p>TODO TABLE</p>
-
-        <p>LDA $C000,Y<br>
-            STA $C0FE,X<br>
-            CMP $2F,X<br>
-            LDX $A1,Y</p>
-
-        <p>Y-indiziert X-indiziert Zeropage-X-indiziert Zeropage-Y-indiziert</p>
+        <table class="plain">
+            <tr>
+                <td>LDA $C000,Y</td>
+                <td>Y-indiziert</td>
+            </tr>
+            <tr>
+                <td>STA $C0FE,X</td>
+                <td>X-indiziert</td>
+            </tr>
+            <tr>
+                <td>CMP $2F,X</td>
+                <td>Zeropage-X-indiziert</td>
+            </tr>
+            <tr>
+                <td>LDX $A1,Y</td>
+                <td>Zeropage-Y-indiziert</td>
+            </tr>
+        </table>
 
         <h3>Indirekt</h3>
 
@@ -169,17 +235,40 @@
 
         <p>Fließkommazahlen speichert der C 64 in zwei verschiedenen Formaten: Im MFLPT-Format (»Memory floating point«) in 5 Byte und im FLPT-Format (»Floating point«) in 6 Byte. Letzteres Format trifft man in den sogenannten Fließkomma-Akkumulatoren an. Davon gibt es deren zwei in unserem Computer, die FAC und ARG genannt werden (Manchmal liest man auch »Fließkomma-Akkumulator 1« und »2« dafür). Der FAC belegt beim C 64 die Speicherstellen 97 bis 102 ($61 bis $66), der ARG die von 105 bis 110 ($69 bis $6E). Die Belegung ist dabei folgende:</p>
 
-        <p>TODO TABLE</p>
-
-        <p>FAC ARG<br>
-            97 105 Exponent inklusive<br>
-            Exponentenvorzeichen<br>
-            98 106<br>
-            99 107 M a n t i s s e<br>
-            100 108 in vier Bytes<br>
-            101 109<br>
-            102 110 Vorzeichen der<br>
-            Mantisse</p>
+        <table class="plain">
+            <tr>
+                <th>FAC</th>
+                <th>ARG</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>97</td>
+                <td>105</td>
+                <td>Exponent inklusive Exponentenvorzeichen</td>
+            </tr>
+            <tr>
+                <td>98</td>
+                <td>106</td>
+                <td rowspan="4">Mantisse in vier Bytes</td>
+            </tr>
+            <tr>
+                <td>99</td>
+                <td>107</td>
+            </tr>
+            <tr>
+                <td>100</td>
+                <td>108</td>
+            </tr>
+            <tr>
+                <td>101</td>
+                <td>109</td>
+            </tr>
+            <tr>
+                <td>102</td>
+                <td>110</td>
+                <td>Vorzeichen der Mantisse</td>
+            </tr>
+        </table>
 
         <p>Was der normale Akkumulator bei l-Byte-Operationen ist, das leistet der FAC bei Operationen mit Fließkommazahlen. Über seine Bedeutung gewinnt man noch mehr Klarheit, wenn man sich die Tatsache ins Gedächtnis holt, daß nahezu alle Operationen mit Zahlen beim C 64 im Fließkommaformat durchgeführt werden. Wenn man beispielsweise den Sinus einer Zahl berechnen möchte, dann packt man das Argument in den FAC, ruft dann die Interpreter-Routine SIN auf und findet das Ergebnis wieder im FAC. Auf diese Weise kann man eine ganze Menge mathematischer Operationen mit der eingebauten Firmware erledigen. Der ARG kann oft verwendet werden bei Operationen mit zwei Zahlen (wie beispielsweise bei der Multiplikation). Die Handhabung der FLPT- und MFLPT-Formate ist — wie Sie sich sicher vorstellen können — nicht gerade einfach. Deshalb tut man als Assembler-Programmierer gut daran, dazu weitgehend Interpreter-Routinen zu gebrauchen, wenn es nicht gerade darum geht, Geschwindigkeitsrekorde zu brechen und deshalb eigene, schnellere Wege zu verfolgen, als die manchmal etwas umständlichen Serpentinen der Commodore-Firmware-Schöpfer. Auch hier muß ich Sie um etwas Geduld bitten: Interpreter-Routinen werden ebenfalls unser Thema im Kurs »Von Basic zu Assembler« sein. Sollten Sie aber nicht warten wollen, dann schauen Sie mal in das Buch von W. Kassera und F. Kassera, »C 64 Programmieren in Assembler«, erschienen im Markt &amp; Technik Verlag unter der Nummer MT 830. Eine Tatsache wird bei einigen dieser sieben Fragen wohl dem Leser deutlich: Oft sind es gerade die einfach scheinenden Fragen, die eine komplizierte Antwort erfordern. Manche Antworten führen sofort zu neuen Fragen: Eine Adresse in 2 Bytes aufzutrennen, ist nach der Antwort schon klar. Was aber ist eine Hex-Zahl und warum ist 1024 dasselbe wie $0400? In der nächsten Folge werden wir zuerst die Schleifenprogrammierung weiter behandeln mit einer selbstmodifizierenden Programmtechnik, uns dann aber den Zahlensystemen zuwenden und den Fragen danach, wie man sie ineinander umrechnen kann und wozu wir uns überhaupt mit ihnen auseinandersetzen müssen.</p>
 

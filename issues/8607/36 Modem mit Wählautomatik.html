@@ -35,6 +35,64 @@
             <figcaption>Bild 1. Die Schaltung des Modems</figcaption>
         </figure>
 
+        <figure>
+            <table>
+                <tr>
+                    <td>Transmitted Carrier</td>
+                    <td>(Pin 8): Dies ist das modulierte Ausgangssignal, das auf die Telefonleitung gegeben wird.</td>
+                </tr>
+                <tr>
+                    <td>Received Carrier</td>
+                    <td>(Pin 5): Von der Telefonleitung kommendes Eingangssignal; es wird im Modem-IC verarbeitet.</td>
+                </tr>
+                <tr>
+                    <td>Ring</td>
+                    <td>(Pin 1): Der Ring-Eingang bleibt in unserem Fall unbeschaltet, denn nur im galvanischen Modembetrieb dient das Wecker-Anruf-Signal des Telefons dazu, das Modem in den Antwort-Modus zu schalten.</td>
+                </tr>
+                <tr>
+                    <td>Reset</td>
+                    <td>(Pin 3): Mit Hilfe des IC-Gliedes wird an diesem Eingang beim Einschalten der Betriebsspannung ein Reset-Impuls erzeugt.</td>
+                </tr>
+                <tr>
+                    <td>Cap1 und Cap2</td>
+                    <td>(Pin 6 und 7): Dies sind die Anschlüsse für die externe Beschaltung des im Chip integrierten A/D-Wandlers.</td>
+                </tr>
+                <tr>
+                    <td>XTAL1 und XTAL2</td>
+                    <td>(Pin 23 und 24): Eingänge für das benötigte Taktsignal von einem Quarzoszillator (Q1); die Taktfrequenz beträgt 2,4576 MHz.</td>
+                </tr>
+                <tr>
+                    <td>Data Terminal Ready</td>
+                    <td>(Pin 16): Dieses vom Terminal kommende Signal zeigt dessen Betriebsbereitschaft an. Es muß solange logisch 0 bleiben, wie Daten zwischen Terminal und Modem ausgetauscht werden.</td>
+                </tr>
+                <tr>
+                    <td>Request To Send</td>
+                    <td>(Pin 12): Das Signal veranlaßt das IC, in den Sende-Modus umzuschalten, es muß während der Sendung logisch 0 bleiben.</td>
+                </tr>
+                <tr>
+                    <td>Back Request To Send</td>
+                    <td>(Pin 11): Schaltet beim Betriebsverfahren V.23-ORIG den Rückkanal in den Sende-Modus um. RTS und BRTS dürfen nicht gleichzeitig logisch 0 sein. Bei V.21 hat das Signal keine Bedeutung.</td>
+                </tr>
+                <tr>
+                    <td>Transmitted Data</td>
+                    <td>(Pin 10): An diesen Eingang wird das Datensignal gelegt, das über die Telefonleitung gesendet werden soll.</td>
+                </tr>
+                <tr>
+                    <td>Back Transmitted Data</td>
+                    <td>(Pin 28): Eingang für Daten, die für den Rückkanal bestimmt sind. Nur beim Betriebsverfahren V.23-ORIG; anderenfalls muß BTD logisch 1 sein</td>
+                </tr>
+                <tr>
+                    <td>Received Data</td>
+                    <td>(Pin 26): Von diesem Ausgang gelangen die empfangenen Daten zum Terminal.</td>
+                </tr>
+                <tr>
+                    <td>MC0&hellip;MC4</td>
+                    <td>(Pin 17&hellip;21): Die logischen Signale an diesen Eingängen bestimmen das Betriebsverfahren. Hier sind nur die Eingänge MC0, MC1 und MC2 mit dem DIL-Schalter verbunden, weil lediglich die Standards V.21 und V.23 bei unserem Modem verwendet werden. Die Schalterstellungen entnehmen Sie bitte der Tabelle 3.</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Beschreibung der Signale am Modem-IC (AM 7910)</figcaption>
+        </figure>
+
         <p>Für die Datenübertragung sind die beiden Anschlüsse des Modem-ICs RC (Received Carrier) und TC (Transmitted Carrier) über eine Gabelschaltung mit dem Übertrager verbunden. Das zu sendende Signal gelangt über den Kondensator C5 und den Widerstand R10 zum Übertrager. Da der für den Empfang notwendige Operationsverstärker (IC3) das Differenzsignal zwischen seinen beiden Eingängen (Pin 2 und 3) verstärkt und R10 im Vergleich zur Trafo-Impedanz niederohmig ist, gelangt das Sende-Signal nur sehr stark gedämpft zum Eingang des Modem-Chips (RC) zurück. Ankommende Signale erzeugen dagegen ein Differenzsignal an den Eingängen von IC3, denn der Ausgang (TC) von IC1 ist für ankommende Signale niederohmig. Das durch den Operationsverstärker aufbereitete Empfangssignal wird dem Eingang des Modem-Chips (RC) zugeführt.</p>
 
         <p>Die vier Z-Dioden neben dem Übertrager Ü1 sorgen dafür, daß eventuell auftretende Spannungsspitzen gekappt werden und damit eine Zerstörung von elektronischen Bauteilen verhindert wird.</p>
@@ -105,6 +163,181 @@
         <p>Dies sollten Sie beachten. Nachdem Sie die Platine mit Hilfe des Layouts (Bild 3) hergestellt und anschließend gebohrt haben, geht es daran, sie zu bestücken. Das Bild 4 zeigt Ihnen den Bestückungsplan. Die notwendigen Bauteile können Sie der Stückliste (Tabelle 2) entnehmen. Am zweckmäßigsten beginnen Sie mit dem Einlöten der Drahtbrücken. Die ICs sollten Sie auf jeden Fall sockeln. Ohne eine Fassung werden die Relais eingelötet. Achten Sie darauf, daß die Anschlußklemmleiste auf der Rückseite geschlossen ist. Bei beidseitig offenen Klemmleisten kann das metallische Gehäuse des dicht dahinterliegenden Relais leicht einen Kurzschluß verursachen. Sollten Sie keine Klemmleiste mit vier Anschlüssen bekommen, dann können Sie eine längere Klemmleiste entsprechend absägen.</p>
 
         <figure>
+            <table class="plain">
+                <tr>
+                    <th colspan="3">Stückliste</th>
+                </tr>
+                <tr>
+                    <th colspan="3">ICs</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>AM7910 oder AM7911</td>
+                    <td>IC1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>7905</td>
+                    <td>IC2</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>LM741</td>
+                    <td>IC3</td>
+                </tr>
+                <tr>
+                    <th colspan="3">Halbleiter</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>BC107 oder ähnlich (NPN)</td>
+                    <td>T1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2N4403 (PNP)</td>
+                    <td>T2</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>1N4148</td>
+                    <td>D1, D2, D3, D4, D10</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>ZPD4,7</td>
+                    <td>D8, D9</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>ZPD15</td>
+                    <td>D6, D7</td>
+                </tr>
+                <tr>
+                    <th colspan="3">Widerstände</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>100 Ω</td>
+                    <td>R5</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>330 Ω</td>
+                    <td>R11, R12</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>560 Ω</td>
+                    <td>R4, R10</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1 kΩ</td>
+                    <td>R7</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>4,7 kΩ</td>
+                    <td>R1, R3, R13, R15</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>22 kΩ</td>
+                    <td>R8, R9</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>130 kΩ</td>
+                    <td>R14</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1 MΩ</td>
+                    <td>R6</td>
+                </tr>
+                <tr>
+                    <th colspan="3">Kondensatoren</th>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>20pF</td>
+                    <td>C1, C2</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2nF</td>
+                    <td>C3</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>47nF</td>
+                    <td>C4</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>1μF</td>
+                    <td>C5, C10</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>10μF/25V Elko</td>
+                    <td>C6, C9</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>470μF/40V Elko</td>
+                    <td>C7, C8</td>
+                </tr>
+                <tr>
+                    <th colspan="3">Sonstiges</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">User-Port-Stecker</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Quarz 2,4576 MHz</td>
+                    <td>Q1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">Übertragerspule Ü1 (Fa. Steinkühler, Herford, Best. Nr. 210 051)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td colspan="2">Siemens-Kleinrelais Re1, Re2 Typ V23040-A0001-B201 5V-</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">Mini.-Kippschalter, 2 x Um S2</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">Digitaster, S1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">Vierfach-DIL-Schalter</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">Anschlußklemmleiste 4polig für gedruckte Schaltungen (Rückseite geschlossen)</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">IC-Fassung 28polig</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td colspan="2">IC-Fassung 8polig</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Die Bauteileliste für das Modem</figcaption>
+        </figure>
+
+        <figure>
             <img src="36-3.png" alt="Platinenlayout des Modems">
             <figcaption>Bild 3. Layout für das Modem</figcaption>
         </figure>
@@ -136,6 +369,88 @@
         <h2>Das Modem im Betrieb</h2>
 
         <p>Wenn Sie das fertig aufgebaute Modem an eine Haustelefonanlage anschließen, schalten Sie zuerst den DIL-Schalter 1 ein (wählen ein) und richten den Knebel von S2 vorn Übertrager weg (Modem ein, Telefon aus). Die Funktionen der DIL-Schalter finden Sie übrigens in der Tabelle 3 beschrieben. Als nächstes schrauben Sie die zwei ankommenden Drähte unter die Klemmen 1 und 3 (al und bl). Die beiden Ausgänge a2, b2 (Klemme 2 und 4) werden mit den Leitungen zum Telefon (in der Regel sind die Adern weiß und braun) verbunden.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="4">Funktionsbelegung der DIL-Schalter</th>
+                </tr>
+                <tr>
+                    <td>DIL 1:</td>
+                    <td colspan="3">Wählautomatik ein/aus</td>
+                </tr>
+                <tr>
+                    <td>DIL 2:</td>
+                    <td colspan="3">Steuersignal CCITT/Bell</td>
+                </tr>
+                <tr>
+                    <td>DIL 3:</td>
+                    <td colspan="3">Steuersignal 300/1200 bit/s</td>
+                </tr>
+                <tr>
+                    <td>DIL 4:</td>
+                    <td colspan="3">Steuersignal Originate/Answer</td>
+                </tr>
+                <tr>
+                    <th colspan="4">Steuereingänge</th>
+                </tr>
+                <tr>
+                    <th>DIL2</th>
+                    <th>DIL3</th>
+                    <th>DIL4</th>
+                    <th>Betriebsart</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>Bell 103 Originate, 300 bit/s Vollduplex</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>Bell 103 Answer, 300 bit/s Vollduplex</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>Bell 202 1200 bit/s Halbduplex</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>Bell 202 1200 bit/s Halbduplex mit Equalizer</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>CCITT V.21 Originate, 300 bit/s Vollduplex</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>CCITT V.21 Answer, 300 bit/s Vollduplex</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>CCITT V.23 Modus2, 1200 bit/s Halbduplex</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>CCITT V.23 Modus2, 1200 bit/s Halbduplex mit Equalizer</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Funktionsbelegung der DIL-Schalter</figcaption>
+        </figure>
 
         <p>Das Modem können Sie jetzt in den User-Port stecken. Laden Sie das Terminalprogramm »Proterm-64/XTW« und starten Sie es. Wie im Sonderheft 7/85 beschrieben, gelangen Sie über die Funktionstaste F4 in das Mailbox-Verzeichnis. Hier können Sie eine Mailbox aus Ihrer Datei »..param« heraussuchen. Wenn Sie nun die RETURN-Taste drücken, wird die in der Datei abgespeicherte Rufnummer automatisch gewählt.</p>
 
