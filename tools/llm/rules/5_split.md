@@ -16,6 +16,11 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
   directory name; e.g. `issues/8607/` → `7/86`)
 - **bylines** `<p>(name1/name2)</p>` → `<address class="author">(name1/name2)</address>`
   AND collected into `<meta name="author" content="name1, name2, …">`
+- **`64er.id` meta** = a unique placeholder `XXX<N>` per article, where `<N>`
+  starts at `0` and increments in the order the `<h1>` sections are walked
+  (first article → `XXX0`, second → `XXX1`, …). The sequence resets per
+  issue. This guarantees the build doesn't choke on duplicate `64er.id`
+  values and gives the meta-fill step a stable per-article handle.
 - each per-article file is beautified with **js-beautify** (same engine
   Nova's `nova-beautify` extension uses), 4-space indent, no line wrapping
   — so `<article>` children land at 8 spaces, `<ul>`/`<ol>` children at

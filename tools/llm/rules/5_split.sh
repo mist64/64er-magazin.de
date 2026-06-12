@@ -76,6 +76,7 @@ def split_html(input_file, issue):
                  '</head>\n\n<body>\n    <article>\n')
     tpl_end = '\n    </article>\n</body>\n</html>\n'
     written = []
+    idx = 0
     for i in range(1, len(sections), 2):
         h1 = sections[i]
         body = sections[i+1] if i+1 < len(sections) else ''
@@ -103,6 +104,9 @@ def split_html(input_file, issue):
         out = re.sub(r'<title>XXX</title>', f'<title>{h1_plain}</title>', out)
         out = re.sub(r'<meta name="64er.pages" content="XXX">',
                      f'<meta name="64er.pages" content="{pages}">', out)
+        out = re.sub(r'<meta name="64er.id" content="XXX">',
+                     f'<meta name="64er.id" content="XXX{idx}">', out)
+        idx += 1
         if authors:
             out = re.sub(r'<meta name="author" content="XXX">',
                          f'<meta name="author" content="{", ".join(sorted(authors))}">', out)
