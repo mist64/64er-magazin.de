@@ -1,0 +1,89 @@
+
+
+;small change.prg ==0801==
+   10 rem *** zeichensatzaenderung ***
+   20 rem *** fuer "the newsroom"  ***
+   30 rem ***    kleine schrift    ***
+   50 poke53280,3:poke53281,3:print"{clr}{blu}"
+  100 dimb(2000)
+  110 open 3,8,3,"sfnts,p,r"
+  115 print"{down}{down}{down}bitte geduld - pures basic"
+  120 an=an+1:gosub 1000:b(an)=a
+  130 if st=0 then120
+  140 close 3
+  200 for l=4to199
+  210 ifb(l)=0then 310
+  220 gosub2000:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+  230 fork=0to7
+  240 form=0to7
+  250 if(b(l*8+171+k)and2^m)=0then270
+  260 poke1080+k*40+(7-m),81
+  270 poke55352+k*40+(7-m),6
+  300 nextm,k
+  305 print"zeichen #:"l
+  310 print"{down}breite   :"b(l)
+  315 x=0:y=0:poke1080,peek(1080)or128
+  320 geta$:ifa$=""then320
+  325 ifa$="*"theninput"{down}{down}zeichen #:";l:goto210
+  326 ifa$="@"theninput"{down}{down}neue zeichen #:";l:gosub1700:goto410
+  330 if a$="^"thenl=199:goto410
+  340 if a$="{rght}"thengosub1100
+  350 if a$="{left}"thengosub1200
+  360 if a$="{down}"thengosub1300
+  370 if a$="{up}"thengosub1400
+  380 ifa$="="thengosub1600
+  390 ifa$=chr$(13)thengosub1700:goto410
+  395 ifa$=" "then 410
+  400 goto 320
+  410 nextl
+  420 open3,8,3,"@:newfonts,p,w"
+  430 forl=1toan
+  440 print#3,chr$(b(l));
+  450 next
+  460 close3
+  470 end
+  880 nextl:end
+ 1000 get#3,a$
+ 1010 ifa$=""thena=0:return
+ 1020 a=asc(a$):return
+ 1100 rem *** cursor rechts ***
+ 1110 gosub 1500
+ 1120 if x<6then x=x+1
+ 1130 gosub 1500
+ 1140 return
+ 1200 rem *** cursor links ***
+ 1210 gosub 1500
+ 1220 if x>0then x=x-1
+ 1230 gosub 1500
+ 1240 return
+ 1300 rem *** cursor runter ***
+ 1310 gosub 1500
+ 1320 if y<7then y=y+1
+ 1330 gosub 1500
+ 1340 return
+ 1400 rem *** cursor rauf ***
+ 1410 gosub 1500
+ 1420 if y>0then y=y-1
+ 1430 gosub 1500
+ 1440 return
+ 1500 rem *** cursor setzen/loeschen ***
+ 1510 ifpeek(1080+x+y*40)>128thenpoke1080+x+y*40,peek(1080+x+y*40)and127:return
+ 1520 poke1080+x+y*40,peek(1080+x+y*40)or128:return
+ 1600 rem *** punkt setzen/loeschen ***
+ 1610 if peek(1080+x+y*40)=160thenpoke1080+x+y*40,209:return
+ 1620 if peek(1080+x+y*40)=209thenpoke1080+x+y*40,160:return
+ 1700 rem *** neues zeichen ***
+ 1710 gosub1500:input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}breite   ";b(l)
+ 1720 fork=0to7:b(l*8+171+k)=0
+ 1730 form=0to7
+ 1740 ifpeek(1080+k*40+(7-m))=81thenb(l*8+171+k)=b(l*8+171+k)or2^m
+ 1750 nextm,k
+ 1760 return
+ 2000 rem *** bildschirmaufbau ***
+ 2010 print"{clr}               {rvon}         "
+ 2020 fork=1to8
+ 2030 print"               {rvon} {rght}{rght}{rght}{rght}{rght}{rght}{rght} "
+ 2040 next
+ 2050 print"               {rvon}         "
+ 2060 return
+
