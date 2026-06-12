@@ -34,6 +34,11 @@
 
         <p>Hierbei bezeichnet CHR$(27) den ESC-Wert, »*« die Wahl des Master-Grafikmodus (über diesen Befehl kann auf die gesamten Punkt-Grafik-Auflösungen des Druckers zugegriffen werden), mit »ml« entweder Normaldichte (480 Punkte/8 Zoll), doppelte Dichte (960 Punkte/8 Zoll), vierfache Dichte (1920 Punkte/8 Zoll), Plotmodus (576 Punkte/8 Zoll) oder den beiden Bildschirmgrafiken (640/720 Punkte/8 Zoll)); je nach Modus mit normaler oder halbierter Geschwindigkeit. Die nachfolgenden Daten »nl« + »n2« instruieren den Drucker, wieviele Grafik-Daten nachfolgen, das heißt wie lang der Grafik-Ausdruck (horizontal) wird. Hierbei wird der Wert der Länge in einen unteren- (nl) und oberen Wert (n2) zerlegt und an den Drucker übergeben. Dabei gilt: nl = (dz)-int(dz/256)*256 und n2 = int(dz/ 256), wobei »dz« die Anzahl der zu übertragenen Grafik-Daten ist. Die jetzt über die Schnittstelle geschickten Daten werden vom Drucker nur als Grafik-Daten erkannt und als solche gedruckt. Allerdings nur so lange, bis die maximale Datenzahl, die durch »nl« und »n2« übergeben worden ist, erreicht ist, oder die Druckzeile zu Ende ist. Dann wird der Drucker wieder auf den Normalzustand (Textdruck) zurückgestellt. Man sieht hier</p>
 
+        <figure>
+            <pre data-filename="graf.einf. fx-80" data-name="Grafikausdruck FX-80"></pre>
+            <figcaption>Listing 1. Einfacher Grafikausdruck mit dem Epson FX-80</figcaption>
+        </figure>
+
         <h2>Ein Befehl für Grafik</h2>
 
         <p>deutlich, daß man durch diese einfache ESC + »*«-Sequenz auf die gesamten Möglichkeiten des Grafikdrucks mit acht Nadeln zugreifen kann, ohne für jeden erwünschten Grafikmodus einen eigenen speziellen Befehl benutzen zu müssen. Aber selbstverständlich gibt es auch diese Befehle. Wie sie im einzelnen lauten, entnehmen Sie bitte der Tabelle. Nur wenig anders sehen die entsprechenden Befehle für den »normalen« Star-Modus (im Gegensatz zum IBM-Modus) aus. Hier entspricht zum Beispiel der ESC + »g«-Befehl dem ESC + »*« im IBM-Modus. In den allermeisten Fällen reicht für eine Grafik-Darstellung der 8-Nadeldruck aus, dennoch gibt es beim Epson die Möglichkeit alle neun Nadeln anzusprechen. Dieser Befehl lautet:<br>
@@ -41,15 +46,35 @@
 
         <p>Diesen Befehl kann man nur in zwei Grafik-Auflösungen verwenden, nämlich in 480 Punkte/8 Zoll und 960 Punkte/8 Zoll. Ebenfalls wird hier durch »m« der Grafik-Modus gewählt und durch »nl« und »n2« die Länge der nachfolgenden Datenkette angegeben. Anschließend findet die Übertragung der Grafik-Daten statt. Die ersten acht Nadeln (von oben an) werden entsprechend wie oben besprochen angesteuert. Diese ersten Daten über die zu druckenden Punkte werden an den Drucker geschickt. Jetzt geht es darum, wie man die noch fehlende neunte Nadel ansteuert. Hierfür wird einfach noch ein weiteres Byte mit Informationen an den Drucker gesandt. Das Byte enthält entweder den Wert »0« für nicht drucken oder den Wert »128« für drucken. Danach kann mit der Übergabe der Daten für die nächste Pixelreihe begonnen werden. Damit haben wir also die grundlegenden Erkenntnisse für die Grafik-Programmierung auf einem Epson gefestigt. Die Grafik-Befehle des Star »Normal«-Modus sehen ähnlich aus wie die des Epson (siehe Tabelle). Das Schöne an dieser Programmierung ist, daß man zum Beispiel beliebige Grafik-Modi in einer Druckzeile verwenden kann oder Text und Grafik sehr einfach mischen kann (Listing 2).</p>
 
+        <figure>
+            <pre data-filename="text_graf. fx-80" data-name="Text und Grafik FX-80"></pre>
+            <figcaption>Listing 2. Mischen von Text und Grafik mit dem FX-80</figcaption>
+        </figure>
+
         <h2>Grafik auf Commodore-Druckern</h2>
 
         <p>Nach diesem Abschnitt über die Grafik des Epson und Star wollen wir uns dem Kapitel Commodore-Drucker zuwenden. Bei ihnen werden alle Funktionen ohne ESC-Befehle gesteuert, da aufgrund der wenigen Drucker-Sonderbefehle ein Byte zur Übertragung genügt. Zusätzlich werden noch einige Sonderfunktionen über Sekundäradressen gesteuert. So auch beim Commodore MPS 801/803 (und Seikosha GP 500 VC), deren Grafik-Modus sehr leicht zu programmieren ist. Jeder vorhandenen Drucknadel, beim MPS 801 sind es leider nur sieben, wird wie beim Epson ein Wert zugeordnet, jedoch in umgekehrter Bit-Struktur. Im Klartext: die oberste Nadel bekommt den Wert »1« die zweite Nadel von oben den Wert »2« und so weiter, der untersten Nadel wird der Wert »64« zugeordnet. Aus dieser Bitmusterkombination ergibt sich ein Wert zwischen 0 und 127. Zu diesem Wert wird nochmals 128 addiert, damit der Drucker diese Daten als Grafik-Daten identifizieren kann. Der Grafik-Einschalt-Befehl CHR$(8) ist sehr einfach (nur ein Byte) und deshalb nicht an die Länge der Grafik-Daten gebunden (Listing 3). Er kann ebenso leicht mit CHR$(15) (Befehl für Normaltextmodus) unterbrochen werden. Auch hier läßt sich Text und Grafik sehr leicht mischen (Listing 4).</p>
+
+        <figure>
+            <pre data-filename="grafik mps801" data-name="Grafik MPS 801/803"></pre>
+            <figcaption>Listing 3. Fast noch einfacher als beim Epson — Grafik auf dem MPS 801/803</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="text_graf.mps801" data-name="Text und Grafik MPS 801/803"></pre>
+            <figcaption>Listing 4. Drucken von Text und Grafik mit dem MPS 801/803</figcaption>
+        </figure>
 
         <p>Nun kommen wir zu einem, na sagen wir einmal heiklen Thema, dem Thema MPS 802. Oft wird über diesen Drucker geschrieben, daß er keinen Grafik-Modus besitzt. Das stimmt leider und stellt gleichzeitig die Frage, was man in solch einem Fall machen kann? Wegwerfen auf keinen Fall! Das manchmal aufgetauchte Gerücht, daß man diesen Drucker durch Verbinden eines Pins des Betriebssystem-EPROMs mit Masse grafikfähig machen könnte, ist leider auch nicht zutreffend. Es gibt aber inzwischen zwei Lösungen für dieses Problem. Die erste ist die über die Sonderzeichenposition. Hierbei wird ein Sonderzeichen definiert (es ist leider nur eins möglich), ausgedruckt, die Druckposition gemerkt, ein Shift-Return CHR$(141) zum Drucker geschickt, dann werden so viele Leerzeichen gedruckt, bis die alte Druckposition wieder erreicht ist, und schließlich beginnt der Vorgang von neuem. Die Zuck-Bewegun-gen, die der Druckkopf bei diesem Manöver ausführt, sehen recht seltsam aus und tragen sicherlich nicht zur Verlängerung seiner Lebenszeit bei. Die zweite konkrete Lösung ist die Hardware-Lösung; man besorgt sich einfach ein neues Betriebssy-stem-ROM für seinen Drucker. Mit diesem ROM ist der MPS 802 dann in der Lagef Grafiken wie der MPS 801 zu verarbeiten. Es sind weiterhin sogar zwei Grafik-Punktdichten des Epson-Druk-ker möglich (siehe Info am Ende des Artikels). Doch wer sich selbst eine solche Hardcopy-Routine programmieren will, dem soll jetzt gezeigt werden wie man diese Grafik-Sonderzeichen-Definition durchführt. Die Programmierung des MPS 802 unterscheidet sich wesentlich von der des Epson FX-80 oder des MPS 801/803; die Daten für das neu definierte Zeichen werden in einer 8 x 8 Punkte-Matrix definiert (Wert der Spalte wie beim Epson, oberste Nadel hat den Wert »128«, die unterste Nadel den Wert »1«), und dann nicht mit vorangestelltem ESC-Befehl übersandt, sondern sie müssen über eine spezielle Sekundäradresse (sa = 5, zum Beispiel OPEN 5,4,5) dem Drucker mitgeteilt werden.</p>
 
         <h2>Grafik auf dem MPS 802</h2>
 
         <p>Jetzt werden die 8 Byte-Daten übertragen und schon ist ein Sonderzeichen definiert. Das hört sich alles recht kompliziert an, ist es aber nicht (Listing 5). Damit wäre der erste Schritt für eine Hardcopy-Programmierung gemacht. Das so definierte Zeichen kann man jetzt mit CHR$(254) aufrufen und ausdrucken. Da man aber bei der Grafik nicht mit nur einer immer gleichen 8 x 8-Matrix drucken kann, muß dieses Zeichen dann mehrere Male pro Zeile neu definiert werden. Hierbei ist noch zu beachten, daß man nur ein Zeichen pro Zeile definieren kann, das heißt um das nächste Zeichen definieren zu können, muß erst ein provisorisches Shift-Return (CHR$(141)) durchgeführt werden. Der Druckkopf muß dann wieder an die alte Position zurückgeführt werden, um das neue Zeichen zu drucken. Soviel zur Grafik des MPS 802 — sicherlich kein erschöpfendes Thema, aber dennoch nicht ganz ohne Reiz.</p>
+
+        <figure>
+            <pre data-filename="grafik mps802" data-name="Grafik MPS 802"></pre>
+            <figcaption>Listing 5. Der Trick mit dem Sonderzeichendruck</figcaption>
+        </figure>
 
         <p>Der nächste Teil unseres Kurses wird ganz im Zeichen der Star-Drucker stehen. Angefangen beim SG-10 über den SR-10 bis hin zum brandneuen NL-10 wollen wir einmal zeigen, was man mit diesen Druckern so alles machen kann. Besonderes Augenmerk liegt dabei darauf, die Unterschiede zu den Druk-kern nach ESC/P-Norm herauszustellen. Außerdem gibt es einige Tips zum Zusammenspiel dieser Drucker mit verschiedenen Programmen. Beachten Sie bitte das 64'er Extra in dieser Ausgabe, es steht ganz unter dem Motto »Druckersteuerung«.</p>
 
