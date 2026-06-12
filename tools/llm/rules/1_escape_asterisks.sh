@@ -15,7 +15,7 @@ s = open(fp, encoding='utf-8').read()
 def esc(m):
     n = len(m.group(0))
     return m.group(0) if n == 2 else '\\*' * n
-s = re.sub(r'\*+', esc, s)
+s = re.sub(r'(?<!\\)\*+', esc, s)   # (?<!\\) keeps idempotent: skip runs already preceded by '\'
 open(fp, 'w', encoding='utf-8').write(s)
 # report
 solo = len(re.findall(r'(?<!\\)(?<!\*)\*(?!\*)', s))
