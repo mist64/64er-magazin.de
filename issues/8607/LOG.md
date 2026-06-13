@@ -45,6 +45,10 @@ Audited every 8607 article for printed structural elements (Bild N., Tabelle N.,
 
 - `142 Neues zum Thema Sortieren.html` — added three `<figure>` blocks for `Bild 1. So sind dreidimensionale Felder im Computer angeordnet`, `Bild 2. So werden Feldelemente gerne vom Benutzer angeordnet, um einen einfachen Zugriff zu erreichen`, and `Bild 3. Würde man die Kartei von Bild 2 nach dem computerinternen Standard der Feldanlage sortieren, so könnte zum Beispiel folgendes passieren:` from print page 142 (mid-/right-column boxes). Emitted as `<pre>` inside `<figure>` because each Bild is a structured pseudo-code-style listing of array indices (Bild 1: linear storage order; Bild 2: hierarchical Eintrag groupings; Bild 3: re-sorted Kartei). Print uses `…` to indicate row elisions — preserved verbatim.
 
+## Listing-number sequence gaps (genuine print skip)
+
+- `79 Tips & Tricks für Profis.html` — print labels its listings 1 (Tokenfinder, p. 79), 2 (CHESS, p. 81), and 4 (Shades-Korrektur, p. 84). There is no Listing 3 in the print: the article body itself jumps from `Listing 2` to `untenstehenden Listing 4`. Treated as a genuine magazine-side numbering skip, not a placement bug. HTML comment added next to the Listing 4 figure to document the gap.
+
 ## Deferred audit findings (not extracted)
 
 - `49 Variosystem.html` — print page 49 has `Bild 1. Gregor Neumann (Variowrite) Bild 2. Thomas Kruse (Varioprint)` as a shared caption beneath the two author portraits in the top-right of the article. The article HTML already labels the Varioprint Hauptmenü screenshot as Bild 1 and the Variowrite Zeichensatz-Editor as Bild 2 (matching the print's renumbering on p56/p58). Adding the portrait captions as additional Bild 1/2 would create a duplicate-numbering conflict that the print itself contains. Left untouched: the portrait images are already placed inside `<aside>` C.A.C. author-bio sidebars with `<address class="author">` naming the subject.
