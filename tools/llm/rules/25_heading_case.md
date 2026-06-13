@@ -77,8 +77,15 @@ For every article HTML in `issues/<YYMM>/*.html`:
    the print's section banner typeface).
 4. Replace each match.
 5. Beautify (`npx --yes js-beautify …`).
-6. **Do not commit.** Return per-article table of headings touched
-   (before → after).
+6. **Rename the article HTML file to match the new h1.** Filenames
+   are emitted by rule 5 (split.py) from the h1 text, so when rule
+   25 lower-cases the h1 the filename also needs `git mv`. Match
+   the natural-case form (e.g.
+   `16 DER C 64 IN FORSCHUNG UND TECHNIK.html` →
+   `16 Der C 64 in Forschung und Technik.html`). Strip-trailing-
+   page-number convention from rule 5 still applies (`<startpage> <h1>.html`).
+7. **Do not commit.** Return per-article table of headings touched
+   (before → after) + per-file rename log.
 
 Critical guardrails:
 - **Don't change non-ALL-CAPS headings.** A heading that's already
