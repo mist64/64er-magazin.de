@@ -226,6 +226,38 @@ PY
 )" "$file"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every structural transformation the sub-agent applies
+to Leserforum must be backed by **runnable verifier evidence pasted
+verbatim into the report**:
+
+- For each `<section>` emitted, paste the topic heading (post-Title-
+  Case conversion) and the print page it came from.
+- For each ALL-CAPS → Title Case conversion (heading, asker name,
+  Guest replier), paste the verbatim original and the converted form,
+  e.g. `HANS FUSS → Hans Fuss`.
+- For each `<p class="source">Info: …</p>`, paste the verbatim
+  vendor/address line so the orchestrator can confirm no address was
+  modernised.
+- For each Pass-10 word-level OCR fix applied, paste the one-line
+  `pdftotext` cross-check (rule 27's evidence form) showing the
+  print's actual form is the corrected one, e.g.
+  ```
+  pdftotext -layout -f 16 -l 16 issues/<YYMM>/64er_19XX-XX.pdf - | grep -i Drucker
+  ```
+- Per-section count: paste the final `<section>` total + the
+  `<div class="q">` count, so the orchestrator can confirm no asker
+  was silently merged or dropped.
+
+**No verifier output, no claimed transformation.** A Q&A
+transformation reported without the per-section evidence is treated
+as un-applied; the orchestrator will re-dispatch. "Trust me, I
+preserved every asker" is never acceptable — dropped readers turn
+into invisible data loss.
+
 ## Notes / lessons
 
 - 8607's Leserforum had 27 sections (more than the median, which is

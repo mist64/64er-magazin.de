@@ -161,6 +161,37 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every heading-case change the sub-agent applies must
+be backed by **runnable verifier evidence pasted verbatim into the
+report**:
+
+- For each re-cased heading, paste the one-line `pdftotext` cross-
+  check (rule 27's evidence form) showing the print's actual case at
+  that position, e.g.
+  ```
+  pdftotext -layout -f 8 -l 8 issues/<YYMM>/64er_19XX-XX.pdf - | grep -i "PROGRAMMIERBARES RS232"
+  ```
+- For each retained proper noun / acronym / product name (`geoWrite`,
+  `dBase`, `RS232`, `C 64`, …), paste the article-body grep showing
+  that exact spelling in the prose, e.g.
+  ```
+  grep -h 'geoWrite' "issues/<YYMM>/<file>.html" | head -1
+  ```
+- For each `git mv` rename, paste the before/after filenames and the
+  matching `<title>` update.
+- For each OCR fix applied alongside the case change (`FÄRB` →
+  `Farb`), paste the rule-27-style `pdftotext` cross-check showing
+  the print actually has the corrected glyph.
+
+**No verifier output, no claimed re-casing.** A heading change
+reported without the `pdftotext` evidence is treated as a guess; the
+orchestrator will re-dispatch. "Trust me, the proper noun is …" is
+never acceptable.
+
 ## Notes / lessons
 
 - The 8606 conventions (`Europäische Gemeinschaft für Computer-

@@ -150,6 +150,33 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every `<pre>TODO</pre>` the sub-agent transcribes
+must be backed by **runnable verifier evidence pasted verbatim into
+the report**:
+
+- For each transcribed listing, paste the crop path used
+  (`/tmp/64er_<YYMM>_pages_300/p-NNN.png` + bbox from
+  `_tmp/blocks/p<NNN>.txt`) so the orchestrator can re-open the same
+  image and spot-check 2-3 lines against what landed in the `<pre>`.
+- For each listing, paste the first and last 2 lines of the splice
+  output (the lines that anchor the OCR to a specific position in the
+  print) so the orchestrator can confirm no header or trailer was
+  silently dropped.
+- For each `[ILLEGIBLE]` marker, paste the line number in the print
+  and a one-line reason ("smudge across columns at line 47").
+- For each unfilled placeholder, paste the page number and a one-line
+  reason it could not be located.
+
+**No verifier output, no claimed transcription.** A listing reported
+without the crop path + first/last line evidence is treated as
+un-applied; the orchestrator will re-dispatch. "Trust me, I OCR'd it"
+is never acceptable — multi-line code retyped from memory is the
+canonical anti-memory violation.
+
 ## Notes / lessons
 
 - The 8607 sweep transcribed 9 placeholders across 4 articles

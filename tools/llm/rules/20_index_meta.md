@@ -149,6 +149,37 @@ grep -hE '64er\.index_category" content=' "$dir"/*.html | \
 # for manual check.
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every `index_category` / `index_title` the sub-agent
+writes must be backed by **runnable verifier evidence pasted verbatim
+into the report**:
+
+- For each FILLED meta pair, paste the CSV row it came from, verbatim,
+  e.g.
+  ```
+  8605,18—24,Software-Grundlagen und Kurse,Grafik,Grafik und Computer-Animation
+  → file: 18 Grafik und Computer-Animation.html
+  → index_category="Software-Grundlagen und Kurse|Grafik"
+  → index_title="Grafik und Computer-Animation"
+  ```
+- For each manually-routed CSV row (apply.py emitted `NO FILE`),
+  paste the CSV row + the file the orchestrator picked + a one-line
+  reason (`p.96 start but actual article begins p.95`).
+- For each REMOVED `index_title` (because it equalled `<title>`),
+  paste the `<title>` line so the orchestrator can confirm the
+  duplication.
+- For each CSV typo fixed at application time, paste the verbatim
+  CSV cell and the corrected value, plus one line of justification
+  from the article body.
+
+**No verifier output, no claimed meta action.** An index meta reported
+without the CSV-row evidence is treated as a guess; the orchestrator
+will re-dispatch. "Trust me, I matched the CSV" is never acceptable —
+mis-routing is a known failure mode (the 8607 CP/M-Ecke case).
+
 ## Notes / lessons
 
 - 8607 had exactly 38 CSV rows → 38 applied entries → 36 files

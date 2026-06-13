@@ -263,6 +263,38 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). This rule has its own version
+of the same failure mode: the FT Bezugsquellen block toggled four
+times because each pass re-derived the judgment without recording
+which mechanical trigger fired. To make both failure modes impossible
+here, every `class="source"` add / remove must be backed by
+**runnable verifier evidence pasted verbatim into the report**:
+
+- For each TAGGED paragraph, paste the verifier-#4 (mechanical
+  section-tail trigger) post-fix output for that file, showing the
+  newly-tagged `<p class="source">` is followed by `<h2>` or
+  `</article>`, e.g.
+  ```
+  84 Fehlerteufelchen.html → no "mid-section <p class=source>" output
+  ```
+- For each UNTAGGED paragraph (false positive stripped), paste a
+  one-line classification from the rule's anti-pattern list
+  (`Q&A prose: "Antwort: …"`, `definition: "Pixel: …"`,
+  `mid-prose vendor mention`, …).
+- For each Pass-3 multi-paragraph footer kept, paste the
+  `</p>`-to-`<p class="source">` adjacency one-liner.
+
+**No verifier output, no claimed tag change.** A `class="source"`
+add or remove reported without the section-tail trigger evidence
+(for add) or the anti-pattern classification (for remove) is treated
+as un-applied; the orchestrator will re-dispatch. "Trust me, this
+reads like a footer" is never acceptable — the FT-Bezugsquellen
+oscillation was caused by exactly that framing, and the mechanical
+trigger replaces it.
+
 ## Notes / lessons
 
 - 64'er's `Aktuelles` column (and similar news roundups) is the

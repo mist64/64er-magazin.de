@@ -170,6 +170,36 @@ All five checks should pass. The orchestrator should also spot-read
 (not a placeholder, not paraphrased, not synthesised from body
 references).
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every image placement and every `git mv` the
+sub-agent applies must be backed by **runnable verifier evidence
+pasted verbatim into the report**:
+
+- For each `<figure>` placed, paste the body line containing the
+  first text reference (`Bild N` / `Bilder N und M`) the placement
+  was anchored to, e.g.
+  ```
+  133 Computer-Simulation.html → "…wie in Bild 4 dargestellt…"
+  ```
+  so the orchestrator can confirm the figure landed after that
+  paragraph's `</p>`.
+- For each `<figcaption>`, paste the sub-sub-agent's verbatim caption
+  read from the scan (the exact words the vision agent returned), so
+  the orchestrator can confirm no caption was paraphrased or invented.
+- For each `git mv`, paste a one-line statement of which page the
+  image was visually located on (`Read /tmp/64er_<YYMM>_pages/p-NN.png`)
+  and which article's column it sat in.
+- For each unplaced image, paste the one-line reason logged to
+  `LOG.md`.
+
+**No verifier output, no claimed placement.** A figure or rename
+reported without the body-anchor line / verbatim caption / page
+location evidence is treated as un-applied; the orchestrator will
+re-dispatch. "Trust me, I read the scan" is never acceptable.
+
 ## Notes / lessons
 
 - The 92-image 8607 placement run renamed exactly two files

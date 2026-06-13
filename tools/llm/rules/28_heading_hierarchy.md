@@ -162,6 +162,40 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). This rule has its own version
+of the same failure mode: bulk-audit passes (`b94e5876b`) re-derived
+the "orphan h3 must be promoted" heuristic and silently shipped 14
+wrong promotions because no per-heading scan evidence was required.
+To make both failure modes impossible here, every heading-level
+change the sub-agent applies must be backed by **runnable verifier
+evidence pasted verbatim into the report**:
+
+- For each promotion or demotion, paste the page + bbox of the
+  scan-band the decision came from, plus a one-line typographic
+  comparison against a known-h2 reference in the same issue, e.g.
+  ```
+  67 Die ideale Ergänzung.html "Editor" → p.68 crop bbox=420x60+580+1180
+  weight matches issue's known h2 banners (cf. 50 R.C.S. p.50 h2
+  "Anwendung des Monats") → kept h2
+  ```
+- For each candidate considered but LEFT UNCHANGED, paste the same
+  scan-band evidence so the orchestrator can confirm the default-
+  to-leave was a real comparison, not a skip-by-omission.
+- For each rule-15 structural override (`<h2>` inside `<aside>`
+  demoted to `<h3>`), paste the `<aside>…<h2>` line that triggered
+  the override.
+
+**No verifier output, no claimed heading change.** A heading-level
+change reported without the scan-band evidence is treated as a guess;
+the orchestrator will revert it and re-dispatch. The bulk-audit
+workflow is banned outright (see anti-pattern above); per-article
+changes only, with scan evidence per heading. "Trust me, this looks
+like h2 weight" is never acceptable — that's the exact framing that
+produced `b94e5876b`.
+
 ## Notes / lessons
 
 ### History of how this rule reached its current form

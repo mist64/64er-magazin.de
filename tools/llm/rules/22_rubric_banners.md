@@ -131,6 +131,36 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every banner the sub-agent inserts (or skips) must
+be backed by **runnable verifier evidence pasted verbatim into the
+report**:
+
+- For each banner inserted, paste the one-line
+  `_tmp/blocks/p<START>.txt` line (or the cropped block path) that
+  showed the banner's bbox, plus the rubric name verbatim from the
+  print band, e.g.
+  ```
+  84 Fehlerteufelchen.html → blocks/p084.txt block=3
+  bbox=900x420+580+200 text= Fehlerteufelchen
+  → crop saved as 84-0.png
+  ```
+- For each Editorial banner, paste the verbatim closing-signature
+  line the sub-sub-agent read from the article body (the source of
+  the `alt="Editor Name, Chefredakteur"` value).
+- For each rubric skipped as N/A, paste the
+  `ls "issues/<YYMM>/"*Rubric*.html` output showing zero matches.
+
+**No verifier output, no claimed banner.** A banner reported without
+the bbox / verbatim-name evidence is treated as a guess; the
+orchestrator will re-dispatch. "Trust me, that's the right
+illustration" is never acceptable — banner illustrations differ
+issue-to-issue (e.g. 7/86's B/W Fehlerteufelchen vs. earlier
+tinted versions).
+
 ## Notes / lessons
 
 - 7/86 (issue 8607) has no Bücher article — the rubric was skipped

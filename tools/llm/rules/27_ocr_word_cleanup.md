@@ -238,6 +238,34 @@ The sub-agent should explicitly NOT touch `<address class="author">`,
 `<pre>`, `<code>`, or `<meta>` content. Body `<p>`, `<h1>`/`<h2>`,
 `<li>`, `<td>`, `<figcaption>` are in scope.
 
+## Evidence-in-report requirement
+
+The `internsiv` regression happened because a prior sub-agent claimed
+to have verified each fix against the print but actually skipped the
+check. To make that failure mode impossible, every Pass-1 / Pass-2 /
+Pass-3 fix the sub-agent applies must be backed by **runnable verifier
+evidence pasted verbatim into the report**:
+
+- For each candidate the sub-agent decided to fix, include the one-line
+  `pdftotext` command + its grep output (showing the print carries the
+  **corrected** form or is silent), e.g.
+  ```
+  pdftotext -layout -f 176 -l 176 issues/8607/64er_1986-07.pdf - | grep -i intensiv
+  →  Bedienung des C 64'er sehr intensiv lesen
+  ```
+- For each candidate the sub-agent decided to SKIP because the print
+  carries the anomaly verbatim, include the same one-line command + its
+  grep output (showing the print's anomaly), e.g.
+  ```
+  pdftotext -layout -f 176 -l 176 issues/8607/64er_1986-07.pdf - | grep -i internsiv
+  →  Bedienung des C 64'er sehr internsiv lesen
+  ```
+
+**No verifier output, no claimed fix.** A fix reported without the
+`pdftotext` line is treated as un-applied; the orchestrator will revert
+it and re-dispatch. "Trust me, I checked" is never acceptable. Skipping
+a candidate is acceptable; claiming an unverified fix is not.
+
 ## Verification
 
 ```bash

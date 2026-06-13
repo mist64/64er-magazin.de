@@ -197,6 +197,39 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every `<meta name="author">` action the sub-agent
+performs must be backed by **runnable verifier evidence pasted
+verbatim into the report**:
+
+- For each FILLED meta, paste the body's byline count and the
+  `content="…"` entry count, e.g.
+  ```
+  8 Aktuelles.html → grep -c '<address class="author">' = 5
+                     meta content="bs, bs, hm, ev, hm" → 5 entries
+  ```
+  so the orchestrator can confirm the per-byline-expansion shape (or
+  the dedupe-for-tip-columns exception) is consistent.
+- For each REMOVED meta, paste the one-line classification
+  ("Leserforum: per-question authorship in `<p class="author">`",
+  "Sonderheft promo: Eigenanzeige, no body byline").
+- For each initial → full name expansion, paste the one-line grep
+  result from the previous issue's Impressum showing the source
+  mapping, e.g.
+  ```
+  grep -E '\(bs\)|Boris Schneider' issues/<PREV>/<NN> Impressum.html → "Boris Schneider (bs)"
+  ```
+
+**No verifier output, no claimed meta action.** An action reported
+without the byline-count evidence (for FILLED) or the rubric
+classification (for REMOVED) is treated as un-applied; the
+orchestrator will re-dispatch. "Trust me, I matched the bylines"
+is never acceptable — author meta is high-leverage editorial
+provenance.
+
 ## Notes / lessons
 
 - 8607's `16 DER C 64 IN FORSCHUNG UND TECHNIK.html` (first-person
