@@ -8,10 +8,44 @@ survive. Side-effect: a sweep also catches stray mid-body `(byline)`
 paragraphs that split.py missed and converts them to
 `<address class="author">`.
 
-The full policy lives in `tools/llm/new/author_meta_workflow.md` and
-is the authoritative reference (Rule 1 = fill from bylines, Rule 2 =
-unsigned rubrics get NO meta, Rule 3 = editorial gets the chief
-editor's name). This rule file is the dispatch + verification gate.
+## Three rules
+
+**Rule 1 — most articles fill from bylines.** For a normal article,
+`content` lists the bylines that appear in the body, in the order
+they appear. Use editor initials exactly as printed (`bs`, `hm`, `ev`,
+etc., or expanded to full names from the previous issue's Impressum:
+"Boris Schneider", "Harald Meyer", "Volker Everts"). External
+contributors come first if their full name is in the byline; in-house
+editor initials trail. Examples:
+```html
+<meta name="author" content="bs, bs, hm, ev, hm">      <!-- Aktuelles: 5 newsletter items by 4 editors -->
+<meta name="author" content="Heimo Ponnath, dm">       <!-- Basic→Assembler: guest author + in-house editor -->
+<meta name="author" content="Michael Scharfenberger">  <!-- editorial -->
+```
+Body byline `(bs/hm)` → meta `bs, hm`.
+
+**Rule 2 — unsigned articles get NO meta tag.** Delete the line
+entirely (don't leave empty `content=""`, don't leave `XXX`) for:
+- **Leserforum** (per-question authorship — each `<p class="author">`
+  inside the Q&A has its own asker)
+- **Impressum** (the body IS the masthead — every editor listed there)
+- **Vorschau** (unsigned editorial preview of next issue)
+- **Fehlerteufelchen** (corrections column, unsigned)
+- **»Anwendung des Monats«** call-for-entries (unsigned)
+- **»Listing des Monats«** call-for-entries (unsigned)
+- Other contest announcements (»Wettbewerb: Bewegte Grafik«, etc.)
+- **»Wie schicke ich meine Programme ein?«** (submission rules)
+- House ads / Sonderheft promos with no body byline (Eigenanzeigen)
+
+**Rule 3 — editorial gets the chief editor.** The editorial column
+is *unsigned-feeling* (no `(initials)` byline at the end), but the
+body ends with a chief-editor signature line. The meta lists that
+name. Chief-editor mapping: Michael M. Pauly through 8603,
+Michael Scharfenberger from 8604 onward.
+
+**Rule 4 — placeholder `XXX` is invalid.** Template ships with
+`content="XXX"`. Must be replaced with a real name or the line
+removed. Don't leave `XXX` in any article.
 
 ## Briefing for the sub-agent
 

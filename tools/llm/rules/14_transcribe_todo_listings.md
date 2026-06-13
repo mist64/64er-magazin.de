@@ -11,10 +11,42 @@ This rule fires after rule 10 (place_figures) has done its work — that
 step's "emit `<pre>TODO</pre>` for unfound listings" behaviour
 generates the placeholders.
 
-The full transcription spec lives in `tools/llm/new/prg_workflow.md`
-under "Listings printed in the magazine but not on disk" and
-"Cropping listing regions from the page scan". This rule is the
-dispatch + verification gate.
+## What `<pre>TODO</pre>` means
+
+Some listings are printed in the magazine but do NOT ship as a file
+on the disk — either because they're a one-shot pre-step that
+produces something else, the disk omitted them for space, the print
+is an assembler disassembly of an in-ROM routine, or the language is
+non-C64 (Pascal, Z80 asm). Even so, rule 10 emits a `<figure>` block
+with the verbatim caption and `<pre>TODO</pre>` as the body so the
+gap is visible in the rendered HTML. Rule 14's job is to OCR the
+printed listing into the `<pre>` body.
+
+## Cropping listing regions from the page scan
+
+Don't guess crop coordinates by trial-and-error. Find the caption's
+bounding box first, then crop the listing region above (or beside) it
+in one shot.
+
+Caption bbox via tesseract:
+```bash
+tesseract /tmp/<YYMM>_pages_300/p-NNN.png - -l deu tsv > /tmp/p.tsv
+awk -F'\t' '$1==5 && $12 ~ /^Listing$/ {
+  print "block="$3" left="$7" top="$8
+}' /tmp/p.tsv
+```
+
+The word "Listing" gives you a starting point in `block_num`. Group
+all words in that block to get the caption's full bbox, then look at
+preceding blocks whose x-range overlaps the caption's x-range —
+those are blocks in the same column. The topmost code-block above
+the caption is your crop's top edge. Add ~50 px padding.
+
+One-shot crop:
+```bash
+magick /tmp/<YYMM>_pages_300/p-NNN.png \
+  -crop <W>x<H>+<X>+<Y> +repage /tmp/listing.png
+```
 
 ## Briefing for the sub-agent
 

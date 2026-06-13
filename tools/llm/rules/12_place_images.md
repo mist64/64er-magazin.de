@@ -6,10 +6,68 @@ unhandled elsewhere) in the issue directory into a `<figure>` or
 verbatim from the print scan; alt text is a short German visual
 description.
 
-The full procedural spec lives in `tools/llm/new/img_workflow.md` and is
-the authoritative reference — read it once at the start of every
-issue. This rule file is the dispatch + verification gate around that
-workflow.
+## Mapping images to articles
+
+Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
+`145-9a.png`. The **major number** (before the first `-`) is the
+**start page of the article** the image belongs to.
+
+1. Extract major number from filename: `145-9a.png` → `145`.
+2. Find the article whose `<meta name="64er.pages" content="…">`
+   starts with that page, e.g. `content="145-153"`.
+3. Disambiguate collisions: when two articles share a start page,
+   Read the relevant pages from `/tmp/<YYMM>_pages/` to see which
+   article the figure actually sits on. The image may be on a later
+   page of the article, not the start page.
+4. Fix wrong filenames with `git mv` when visual verification shows
+   an image belongs to a different article. Renumber the minor part
+   to fit the target article's existing sequence.
+
+## Placement rules
+
+1. **Title/intro images** — filenames matching `-0*.png`: place
+   right after the intro paragraph(s) (`<p class="intro">`), before
+   the first body paragraph. These are title photos **without
+   captions** — **remove the `<figcaption>` line entirely** when
+   pasting.
+2. **Numbered Bild images** (`-1.png`, `-2.png`, …) always have
+   captions and go inline near their first text reference.
+3. **Find the first text reference** to each Bild/Tabelle in the
+   article body (e.g. "Bild 1", "Bilder 5 und 6", "Tabelle 4",
+   "das Bild 2").
+4. **Insert the `<figure>` block AFTER the `</p>`** of the paragraph
+   that first mentions it. **Never split a paragraph.** If the
+   first reference sits mid-paragraph, the figure still goes after
+   the *full* enclosing `</p>`.
+5. **Read the caption from the scan.** Open the corresponding page
+   PNG, find the caption printed under the image, type it verbatim
+   into `<figcaption>`. If no caption is visible, omit
+   `<figcaption>` entirely.
+6. **Multiple files for one Bild** (e.g. `133-4a.png`, `133-4b.png`):
+   put them in **ONE** `<figure>` with multiple `<img>` tags and one
+   `<figcaption>` for the whole group.
+7. **Plural references** ("Bilder 8 und 9"): place both figures
+   after that paragraph, each as a **separate** `<figure>`.
+8. **Don't duplicate** a `<figure>` already in the HTML.
+9. **Unreferenced images**: locate the image on the scan FIRST,
+   then work backwards to the HTML section. Don't pick a
+   plausible-looking HTML section and guess. Read the image to see
+   what it depicts; Read each page in the article's `64er.pages`
+   range; find the image on the scan by visual content match;
+   note which column + section heading it sits next to; only then
+   insert into the matching HTML section.
+10. **Inline portraits** (author bio photo) get
+    `<img class="inline" src="…" alt="…">` without `<figure>`
+    wrapper.
+
+## Alt text — describe only what is visible
+
+- **No identity claims** unless caption explicitly names the
+  person.
+- **No age / role / job inference.** `Person`, `Mann`, `Frau`, or
+  describe what they're doing.
+- **No interpretation.** "Person mit Programmlisting in der Hand
+  neben einem Drucker" beats "Autor präsentiert sein Werk".
 
 ## Briefing for the sub-agent
 
@@ -40,8 +98,11 @@ The sub-agent must:
      --wrap-line-length 0 --replace issues/<YYMM>/*.html
    ```
 6. Delete `images.txt` when it's empty.
-7. **Do not commit.** Return a per-article placement table (see
-   img_workflow.md's "Final report" section).
+7. **Do not commit.** Return a per-article placement table:
+   `File | Figures placed | Inline images | Notes` rows. Flag any
+   `git mv` performed, any `<figcaption>` omitted (no caption on
+   scan), any placement that was a judgment call, any caption hard
+   to read at 150 dpi (request a 600 dpi crop if uncertain).
 
 Tell the sub-agent explicitly:
 - Image reads belong in further sub-sub-agents (anti-memory + vision
