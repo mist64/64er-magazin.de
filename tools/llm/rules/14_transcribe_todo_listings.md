@@ -24,23 +24,20 @@ printed listing into the `<pre>` body.
 
 ## Cropping listing regions from the page scan
 
-Don't guess crop coordinates by trial-and-error. Find the caption's
-bounding box first, then crop the listing region above (or beside) it
-in one shot.
+Don't guess crop coordinates by trial-and-error. Use rule 0's
+"page block index" recipe to build `/tmp/p<NNN>_blocks.txt`, then
+grep for the `Listing` caption line:
 
-Caption bbox via tesseract:
 ```bash
-tesseract /tmp/<YYMM>_pages_300/p-NNN.png - -l deu tsv > /tmp/p.tsv
-awk -F'\t' '$1==5 && $12 ~ /^Listing$/ {
-  print "block="$3" left="$7" top="$8
-}' /tmp/p.tsv
+grep -i "listing" /tmp/p<NNN>_blocks.txt
+# → block=22 bbox=825x84+195+1955 text= Listing 1. Komprimierte Version ...
 ```
 
-The word "Listing" gives you a starting point in `block_num`. Group
-all words in that block to get the caption's full bbox, then look at
-preceding blocks whose x-range overlaps the caption's x-range —
-those are blocks in the same column. The topmost code-block above
-the caption is your crop's top edge. Add ~50 px padding.
+The bbox tells you the caption's column (`X`, width `W`) and
+top-edge (`Y`). The listing code sits **above** the caption in the
+same column. Walk preceding blocks whose x-range overlaps the
+caption's x-range — the topmost is your crop's top edge. Add ~50 px
+padding.
 
 One-shot crop:
 ```bash

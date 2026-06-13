@@ -120,6 +120,64 @@ When the completion notification arrives:
   orchestrator to make the call (or ask the user) and re-dispatch —
   not to accept the half-finished state.
 
+## Cross-cutting recipe: page block index (blocks.txt)
+
+Several rules (12 place_images, 13 fill_tables, 14 transcribe_listings,
+19 head_meta, 22 rubric_banners) need to know the bbox of a specific
+region on a rendered page — a caption, a listing block, a header
+strip, a banner illustration. The common primitive is a per-page
+**block index**: one line per layout block giving its bbox and a
+short text preview, derived from a tesseract TSV pass.
+
+Some older issues have a pre-computed `_work/p<NNN>/blocks.txt`
+(from `body_workflow.md`'s PaddleOCR PPStructureV3 pass). Most
+issues do NOT. Build it on demand into `/tmp`:
+
+```bash
+# render the page once
+mkdir -p /tmp/<YYMM>_pages_300
+pdftoppm -r 300 issues/<YYMM>/64er_19XX-XX.pdf \
+  /tmp/<YYMM>_pages_300/p -png -f <N> -l <N>
+
+# tesseract TSV → blocks index
+tesseract /tmp/<YYMM>_pages_300/p-<NNN>.png /tmp/p<NNN>_ocr -l deu tsv
+
+awk -F'\t' 'NR>1 && $1==5 && $12!="" {
+  b=$3;
+  if (!(b in minL) || $7<minL[b]) minL[b]=$7;
+  if (!(b in minT) || $8<minT[b]) minT[b]=$8;
+  if (!(b in maxR) || $7+$9>maxR[b]) maxR[b]=$7+$9;
+  if (!(b in maxB) || $8+$10>maxB[b]) maxB[b]=$8+$10;
+  text[b]=text[b]" "$12;
+}
+END {
+  for (b in text) {
+    printf "block=%s bbox=%dx%d+%d+%d text=%s\n",
+      b, maxR[b]-minL[b], maxB[b]-minT[b], minL[b], minT[b],
+      substr(text[b],1,200);
+  }
+}' /tmp/p<NNN>_ocr.tsv | sort > /tmp/p<NNN>_blocks.txt
+```
+
+The output lines look like:
+```
+block=22 bbox=825x84+195+1955 text= Listing 1. Komprimierte Version ...
+block=45 bbox=840x39+1321+3256 text= Tabelle 2. Hier die entwirrte ...
+```
+
+Grep for the caption / heading / header text you need:
+```bash
+grep -i "listing" /tmp/p<NNN>_blocks.txt
+grep -iE "tabelle|steckbrief" /tmp/p<NNN>_blocks.txt
+```
+
+Then read the `bbox=WxH+X+Y` and crop with `magick`. For listings
+and tables, the caption block tells you the column (X, width W);
+the code/table region usually sits **above** in the same column —
+walk preceding blocks whose x-range overlaps to find its top edge.
+
+`/tmp/p<NNN>_blocks.txt` is scratch — never commit it.
+
 ## Cross-cutting rule: OCR cleanup granularity
 
 Every rule that touches article body text inherits the same
