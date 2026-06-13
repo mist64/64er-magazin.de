@@ -161,3 +161,89 @@ match an article, they get reported, not placed.
     (`hypra-ass_cass`)
   - `issues/8606/134 Von Basic zu Assembler (Teil 4).html`
     (BLOCK / SWAP)
+
+## Remediation: Hypra-Ass / Top-Ass misclassified as BASIC
+
+**Hard rule:** a shipping `.prg` may **NEVER** live in `prg/del/`.
+`del/` is for files the site does not expose; anything in it is
+invisible to the generator's binary-download resolver. If you need
+the reader to be able to download a listing's PRG, the file must
+sit directly in `issues/<YYMM>/prg/`.
+
+### Signals of the misclassification
+
+`tools/prg_links.sh` runs every `.prg` that starts at `$0801` through
+petcat in default V2 mode. When the source is actually a Hypra-Ass
+or Top-Ass listing, the extractor wrongly stashes the raw `.prg`
+in `issues/<YYMM>/prg/del/<name>.prg` and emits a bogus
+`issues/<YYMM>/prg/<name>.txt` companion. Tells:
+
+- The `.txt` opens with `;<name>.prg ==0801==`.
+- The body contains jammed lowercase mnemonic+operand tokens like
+  `cpyverl`, `ldax80`, `bcsspr`, `stxstin`, `sbc#82`, `adc#1` —
+  petcat tokenised the 6502 mnemonics as if they were BASIC
+  keywords and ran them into their operands.
+- Line numbers are Hypra-Ass style (`900/901/902/…` /
+  `1100/1110/1120/…`), not BASIC's `10/20/30/…`.
+- The article's figcaption labels the listing
+  `Assembler-Listing` / `Assembler-Quelltext` / `Quellcode` /
+  any `Quelltext` variant.
+
+### Remediation steps
+
+1. Promote the `.prg` out of `del/` and drop the bogus `.txt`:
+   ```bash
+   git mv issues/<YYMM>/prg/del/<name>.prg issues/<YYMM>/prg/<name>.prg
+   git rm issues/<YYMM>/prg/<name>.txt
+   ```
+   (If the `.prg` is untracked, use plain `mv` instead of
+   `git mv` — git refuses to mv an untracked path.)
+2. Mark the article's `<pre>` with `data-assembler="hypra-ass"`
+   (or `top-ass`) **AND** add a sibling
+   `<div class="binary_download" data-filename="<name>.prg"
+   data-name="…">` so the reader gets a download link.
+   **Without the `binary_download` line the `.prg` is in the
+   repo but invisible to readers — the page renders the listing
+   text but no download link appears.**
+   ```html
+   <figure>
+       <pre data-filename="<name>" data-name="…" data-assembler="hypra-ass"></pre>
+       <figcaption>…</figcaption>
+   </figure>
+   <div class="binary_download" data-filename="<name>.prg" data-name="…"></div>
+   ```
+3. Beautify the edited article(s) with the project's standard
+   `js-beautify` invocation, then rebuild the issue
+   (`python3 generate.py --issues <YYMM>`) and verify:
+   - `out/<YYMM>/<slug>.html` contains an
+     `<aside class="downloads">…<a href="prg/<name>.prg">…</a></aside>`
+     entry;
+   - the rendered listing shows properly spaced mnemonics
+     (`CPY VERL`, `LDA #$0D`, `STX STIN`) — never the
+     run-together `cpyverl` / `ldax80` form.
+
+### Why this matters: generator routing
+
+`generate.py:683-698` (the `data-assembler` branch) picks the
+raw-PRG decoder via
+`assembler_decode.decode_prg_bytes(asm_bin)` iff
+`<data_filename>.prg` is present in the scanned `prg/`. The
+fallback path uses `assembler_decode.decode_bytes(asm_bin,
+topass=False)` against the petcat-tokenised txt, whose
+`format_hypra_ass_line` is **case-sensitive** on mnemonics —
+the lowercase petcat output misses the table and the listing
+comes out garbled. Never rely on the txt-fallback path for
+Hypra-Ass / Top-Ass; promote the raw `.prg` instead.
+
+### Canonical examples
+
+- `issues/8606/95 Endlich_ Hypra-Ass mit Datasette.html` —
+  `hypra-ass_cass.prg` (single source listing, single
+  `binary_download` line).
+- `issues/8607/142 Neues zum Thema Sortieren.html` —
+  `quicksort.ass.prg` (assembler source sits next to a separate
+  MSE compiled `.prg`; one `binary_download` line per file).
+- `issues/8606/134 Von Basic zu Assembler (Teil 4).html` —
+  BLOCK / SWAP precedent for the layout pattern (compiled `.prg`
+  plus source `.prg` ⇒ two `binary_download` lines under one
+  `<figure>`).
