@@ -7,7 +7,7 @@ proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 
 ## Extraction pipeline (per table)
 
-1. **Build the page block index** per rule 0's recipe → `/tmp/p<NNN>_blocks.txt`.
+1. **Build the page block index** per rule 0's recipe → `/tmp/64er_<YYMM>_p<NNN>_blocks.txt`.
 2. **Identify target block** by either grepping the blocks file for a known cell value (e.g. a row header from the article's prose), or visual cross-check via a low-res page thumbnail.
 3. **Crop just that block** with `magick … -crop WxH+X+Y` using the bbox from blocks.txt. If the crop exceeds 2000 px on any axis, also produce a resized copy for vision Read.
 4. **Second-pass OCR on the crop** with PSM hint: `--psm 6` for compact tables, `--psm 4` for narrow tables with variable row heights.
@@ -45,8 +45,8 @@ A pure `Tabelle …` grep is **not enough**. Use a layered sweep:
 
 **Pass 1 — explicit captions:**
 ```bash
-pdftotext -layout issues/<YYMM>/64er_19XX-XX.pdf /tmp/<YYMM>_full.txt
-grep -iE "Tabelle[ :.][^.]" /tmp/<YYMM>_full.txt | \
+pdftotext -layout issues/<YYMM>/64er_19XX-XX.pdf /tmp/64er_<YYMM>_full.txt
+grep -iE "Tabelle[ :.][^.]" /tmp/64er_<YYMM>_full.txt | \
   grep -vE "Farbtabelle|Steuersequenztabelle|[Ww]ertetabelle|Preistabelle|Linktabelle"
 ```
 Also sweep for `Bild N\.`, `STECKBRIEF`, and `^\s*Listing [0-9]+\.`.
@@ -65,9 +65,9 @@ Every `TODO TABLE` MUST be replaced. **Garbage adjacent to `TODO TABLE`** — th
 
 The sub-agent must:
 
-1. Render the issue PDF to `/tmp/<YYMM>_pages/p-NNN.png` at `-r 150`
+1. Render the issue PDF to `/tmp/64er_<YYMM>_pages/p-NNN.png` at `-r 150`
    (once, up front).
-2. Run `pdftotext -layout` on the PDF to `/tmp/<YYMM>_full.txt` for
+2. Run `pdftotext -layout` on the PDF to `/tmp/64er_<YYMM>_full.txt` for
    caption-sweep grep.
 3. Find work to do via the documented three passes:
    - Pass 1: `Tabelle [N]?[.:]`, `STECKBRIEF`, `Bild N` (the last for

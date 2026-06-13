@@ -114,7 +114,7 @@ as a normal `<aside>` between two `<section>` elements.
 The sub-agent must:
 
 1. Render the Leserforum start page at 600 dpi: `pdftoppm -r 600
-   issues/<YYMM>/64er_19XX-XX.pdf /tmp/<YYMM>_pages_600/p -png -f
+   issues/<YYMM>/64er_19XX-XX.pdf /tmp/64er_<YYMM>_pages_600/p -png -f
    <START> -l <START>`.
 2. Crop the banner image (`<START>-0.png`) from the page — envelope /
    letter motif at the top of page <START>. Verify by reading the
