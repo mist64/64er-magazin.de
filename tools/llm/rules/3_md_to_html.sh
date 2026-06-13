@@ -12,8 +12,11 @@ out="${md%.md}.html"
 tmp=$(mktemp)
 LC_ALL=C sed -e '1s/^\xEF\xBB\xBF//' "$md" > "$tmp"
 markdown -G \
-  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode,+autolink' \
+  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode' \
   "$tmp" > "$out"
+# +autolink is intentionally omitted: 1986 magazine text never has real
+# URLs, but Discount's autolinker wraps `news:`, `tel:`, `fax:`, etc.
+# in <a href="…"> as false positives (rule 26).
 rm -f "$tmp"
 echo "wrote $out  ($(wc -l < "$out") lines)"
 # Replace the .md with the .html in git: drop the source, stage the result.
