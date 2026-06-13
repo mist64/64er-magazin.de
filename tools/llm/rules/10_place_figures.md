@@ -92,16 +92,43 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
 - **Credit external contributors** — `;Eingetippt von Name` as the
   first line of contributor-typed `.txt`, or `<!-- Eingetippt von Name
   -->` for HTML-inline listings.
-- **Placement style.** The default is **all listings in a single
-  block before `</article>`**, after the body prose. This applies to
-  any article whose listings are pieces of one program / one
-  cohesive subject — including articles with internal `<h2>` sub-
-  sections that describe the program's modules (Editor, Hauptmenü,
-  Druckertreiber, etc.).
-  - The exception is a column of independent small programs (Tips &
-    Tricks, Aktuelles, CP/M-Ecke). There the sub-sections are
-    self-contained features, each with its own listing → listing
-    goes at end of its own tip section.
+- **Placement style.** Three article shapes, three placements:
+
+  1. **One big program** — article describes a single program with
+     multiple `<h2>` sub-sections covering its modules / facets
+     (e.g. `67 Die ideale Ergänzung` Master-Text-Drucker driver
+     suite, `50 Das Rhythm Construction Set (R.C.S.)`,
+     `73 Vectors`, `49 Variosystem`): **all listings in a single
+     block at the very end, after the byline, before
+     `</article>`** (or before a Fehlerteufelchen aside if
+     present).
+
+  2. **Sub-articles of small tools** — column of independent small
+     programs with their own bylines per sub-section (Tips &
+     Tricks Einsteiger / Profis / C 16, Aktuelles, CP/M-Ecke,
+     Hypra-Basic, Newsroom): **listing AFTER the tip's byline at
+     the very end of that tip section**. Pattern: tip body prose →
+     `<address class="author">(byline)</address>` → `<figure>`
+     listing + `<div class="binary_download">` companions → next
+     section's `<h2>`.
+
+  3. **Tutorial** — article teaches a concept or technique with
+     short illustrative snippets (Kurs / Hilfreiche Grundlagen /
+     Reise durch …): **small listings inline**, placed mid-prose
+     where the tutorial introduces them. The print typeset is the
+     ground truth: tutorial code snippets are usually 3-10 lines
+     and tightly interleaved with explanatory text. Don't move
+     them to the article tail — that breaks the pedagogical flow.
+     Examples: 133 Computer-Simulation, 136 Pascal-Kurs,
+     139 Basic zu Assembler, 150 Grafik für Profis, 85 Reise
+     durch den C 128.
+
+  **How to pick:**
+  - One author, one program → shape 1.
+  - Multiple `<h2>` sub-sections each with its own author/byline →
+    shape 2.
+  - "Kurs", "Teil N", "Grundlagen", "Reise durch …", inline body
+    code snippets that teach a concept → shape 3.
   - **Test:** are the article's `<h2>` sub-sections describing the
     SAME program's facets? Then end-of-article. Are they unrelated
     sub-programs with their own author / their own caption? Then
