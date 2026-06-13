@@ -44,12 +44,8 @@ leaves WITHOUT a label prefix:
   bitte … an:") is part of the same paragraph block.
 - A multi-line **vendor address block** without prefix ("Power
   Cartridge:<br>Kolff Computer Supplies bv, …<br>Lindy Elektronik
-  GmbH, …<br>The Final Cartridge:<br>H + P Computers, …") — these
-  are body content of a Fehlerteufelchen correction (errata that
-  the supplier list was missing), not a source footer. **Leave as
-  plain `<p>`** — the `Fehlerteufelchen` rubric has its own visual
-  treatment via the `<aside class="fehlerteufelchen">` wrapper, and
-  the corrected supplier addresses are the article's body.
+  GmbH, …<br>The Final Cartridge:<br>H + P Computers, …") — common
+  in Fehlerteufelchen Bezugsquellen lists.
 - A `(byline)`-like signature line printed in source-style typography
   is NOT `<p class="source">` — it's `<address class="author">`.
 
