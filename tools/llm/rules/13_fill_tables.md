@@ -82,6 +82,16 @@ For each candidate block:
 
 **Pass 3 must be REPORTED as done in the sub-agent's structured report**, including: pages walked, candidate blocks found, candidates extracted, candidates explicitly skipped (with reason). A sub-agent report that doesn't list Pass 3 explicitly = Pass 3 was skipped.
 
+**Mechanical Pass-3 check (don't trust verbal confirmation).** A
+sub-agent writing "Pass 3 done: 0 candidates" and moving on is a
+known failure mode — 8607's Pass 3 was rubber-stamped, and a
+second-look review later extracted 6 missed captioned tables (commit
+`8d9b2f7da`). After Pass 3, **always run** the mechanical counters in
+the Verification section (checks #6 and #7). If the `<table>` count
+in the issue trails the `Tabelle N` figcaption count by 6 or more, or
+if there are `<table>` blocks inside `<figure>` whose `<figcaption>`
+doesn't mention `Tabelle`, treat Pass 3 as incomplete and re-run.
+
 `TODO LISTING` is **NOT** a table — those are code listings (rule 14).
 
 ## Briefing for the sub-agent
@@ -196,9 +206,54 @@ for f in sorted(os.listdir(d)):
         print(f"  {f}: Tabelle {sorted(miss)} referenced but not placed")
 PY
 )" "$dir"
+
+# 6. Pass-3 sanity: count <table> elements and <figcaption>Tabelle …
+#    figcaptions across the issue. They won't match exactly (bare
+#    uncaptioned tables are legitimate), but a delta of 6+ tables found
+#    after Pass 3 "completed" signals Pass 3 was rubber-stamped (8607
+#    pattern, see commit 8d9b2f7da). Just emit the counts; the
+#    orchestrator decides whether to re-run Pass 3.
+python3 -c "$(cat <<'PY'
+import os, re, sys
+d = sys.argv[1]
+tables = 0; tabelle_caps = 0
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f)).read()
+    tables += len(re.findall(r'<table\b', s))
+    tabelle_caps += len(re.findall(
+        r'<figcaption[^>]*>(?:<[^>]+>)*\s*Tabelle\b', s, re.IGNORECASE))
+print(f"  <table>={tables}  <figcaption>Tabelle…</figcaption>={tabelle_caps}")
+PY
+)" "$dir"
+
+# 7. List every <table> inside a <figure> whose <figcaption> doesn't
+#    mention "Tabelle". A bare <table> outside <figure> is legitimate
+#    (uncaptioned inline data). A <figure>-wrapped table with a
+#    non-Tabelle caption is fine too (e.g. STECKBRIEF), but the list
+#    is for operator-eyeballing — confirm each one is intentional.
+python3 -c "$(cat <<'PY'
+import os, re, sys
+d = sys.argv[1]
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f)).read()
+    for m in re.finditer(r'<figure\b[^>]*>(.*?)</figure>', s, re.DOTALL):
+        body = m.group(1)
+        if '<table' not in body: continue
+        cap = re.search(r'<figcaption[^>]*>(.*?)</figcaption>',
+                        body, re.DOTALL)
+        if not cap:
+            print(f"  {f}: <figure><table> with no <figcaption>")
+            continue
+        if 'Tabelle' not in cap.group(1):
+            txt = re.sub(r'<[^>]+>', '', cap.group(1)).strip()[:60]
+            print(f"  {f}: <figure><table> caption not 'Tabelle …': {txt!r}")
+PY
+)" "$dir"
 ```
 
-All five checks should pass. Soft check (#5) may flag false positives
+All seven checks should pass. Soft check (#5) may flag false positives
 (prose mentioning "Tabelle N" of a previous issue, or a "Tabelle"
 that turns out to be a bullet list); the orchestrator should walk
 the flagged ones and decide.
@@ -220,3 +275,9 @@ the flagged ones and decide.
   If extraction is too large for the table pass, log to `LOG.md`.
 - Tables already placed as images (e.g. `174-t1.png`) are out of
   scope — never replace them with HTML tables.
+- **Pass 3 rubber-stamp failure (8607).** 8607's Pass 3 was reported
+  as "done, 0 candidates" by the sub-agent. A second-look review
+  later extracted 6 missed captioned tables (commit `8d9b2f7da`).
+  Verbal "Pass 3 done" confirmation is not enough — always run the
+  mechanical counters (Verification #6 and #7) and treat a
+  6+-table delta as a re-run signal, not as acceptable variance.

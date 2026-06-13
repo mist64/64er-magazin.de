@@ -7,6 +7,37 @@ import pipeline eagerly tagged based on a "colon after first word"
 heuristic but that aren't actually pointers get the `class="source"`
 **removed**.
 
+## DEFAULT: don't change `<p class="source">`
+
+Default action: leave `class="source"` exactly as it is. Tag a
+paragraph only when the **mechanical trigger** below fires. Untag a
+paragraph only when it clearly fails the trigger AND removing the
+class would make the article read better.
+
+Cross-reference: this mirrors rule 28's `DEFAULT: DON'T CHANGE HEADER
+LEVELS` framing. Both rules oscillated repeatedly during 8607 work
+because the test was framed as "judge by typographic feel"; both now
+default to "leave alone unless the mechanical trigger fires".
+
+### Mechanical trigger (replaces vague "sits at end of article" language)
+
+A paragraph qualifies as `<p class="source">` iff it is the **last
+content block before the next `<h2>` or before `</article>`** AND it
+functions as a pointer to a third party (vendor / distributor /
+author / book / address). This single trigger covers two article
+shapes:
+
+- **Single-topic article**: source is the last child of `<article>`
+  after `<address class="author">`.
+- **News-roundup article (Aktuelles, DFÜ-NEWS, Bücher, similar)**:
+  each `<h2>` sub-section is its own item. Each sub-section gets ONE
+  source-candidate slot at its own tail — the last block before the
+  next `<h2>` (or the article end).
+
+If the paragraph is NOT in that section-tail position, it does NOT
+qualify, no matter how source-y it reads (e.g. mid-prose vendor
+mention).
+
 ## What `<p class="source">` is for
 
 The site styles `<p class="source">` as a small italicised footer
@@ -61,6 +92,10 @@ footer. Leave as plain `<p>`:
   contest-entry-address case above. NOT `<p class="source">`.
 - A `(byline)`-like signature line printed in source-style typography
   is NOT `<p class="source">` — it's `<address class="author">`.
+- A **mid-section / mid-prose vendor mention** — fails the section-tail
+  trigger above. Drop the class. If it's not the last content block
+  before the next `<h2>` or `</article>`, it doesn't qualify, no
+  matter how source-y the prose reads.
 
 A paragraph qualifies as `<p class="source">` when **all** of the
 following hold:
@@ -199,6 +234,33 @@ for f in sorted(os.listdir(d)):
             print(f"  unclosed source p in {f} at offset {m.start()}")
 PY
 )" "$dir"
+
+# 4. mechanical section-tail trigger: every <p class="source"> must
+#    have its next sibling block be <h2> or </article>. Anything else
+#    means it's mid-section, not section-tail — likely false positive.
+python3 -c "$(cat <<'PY'
+import os, re, sys
+d = sys.argv[1]
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f)).read()
+    for m in re.finditer(r'<p class="source">.*?</p>', s, re.DOTALL):
+        tail = s[m.end():]
+        # next non-whitespace tag
+        nxt = re.match(r'\s*(<[^>]+>)', tail)
+        if not nxt:
+            continue
+        t = nxt.group(1)
+        # acceptable section-tail neighbours: <h2 …>, </article>,
+        # or a sibling <p class="source"> (multi-paragraph footer
+        # block — explicitly allowed by Pass 3 of this rule).
+        if (re.match(r'<h2\b', t) or
+            re.match(r'</article>', t) or
+            re.match(r'<p class="source"', t)):
+            continue
+        print(f"  {f}: mid-section <p class=\"source\"> followed by {t!r}")
+PY
+)" "$dir"
 ```
 
 ## Notes / lessons
@@ -229,3 +291,13 @@ PY
   vendor-address list inside a Fehlerteufelchen correction is body
   content of the correction (the addresses ARE the correction);
   leave as plain `<p>`. Future passes must not re-add the class.
+- **Oscillation history & the DEFAULT clause.** This rule oscillated
+  4+ times during 8607 work — the FT Bezugsquellen block alone
+  toggled across `a7cfd7bd3` / `da95ac771` / `ed32cf29e` /
+  `1e9da5ac8`. The root cause was the rule's loose "sits at end of
+  article" wording, which let each sub-agent re-derive a different
+  judgment call. The `DEFAULT: don't change` clause + the mechanical
+  section-tail trigger at the top of this file replace the
+  judgment-call framing. Future passes start from "leave alone" and
+  only flip the class when the trigger (last block before `<h2>` or
+  `</article>` AND functions as a third-party pointer) fires.

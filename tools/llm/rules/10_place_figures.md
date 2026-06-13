@@ -207,6 +207,45 @@ done
 
 # 5. Build the issue and confirm no listing-related errors:
 .venv/bin/python generate.py --issues 8607 --future local 2>&1 | grep -iE 'listing|prg|figure|binary_download' | head
+
+# 6. Every <figcaption>Listing N…</figcaption> must have a description
+#    after "Listing N.". Bare `<figcaption>Listing N</figcaption>` is
+#    the failure mode (8607/`96 Neues vom Hypra-Basic.html` shipped
+#    10 of these). The caption text after the listing label should be
+#    at least 3 words.
+python3 - issues/8607 <<'PY'
+import os, re, sys
+d = sys.argv[1]
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f)).read()
+    for m in re.finditer(
+            r'<figcaption[^>]*>(?:<[^>]+>)*\s*(Listing\s+\d+[a-z]?\.?)([^<]*)',
+            s, re.IGNORECASE):
+        rest = m.group(2).strip().lstrip('.').strip()
+        if not rest or len(rest.split()) < 3:
+            print(f"  {f}: short/empty caption after {m.group(1)!r}")
+PY
+
+# 7. Listing-N sequence must be gap-free per article. Per-article
+#    collect every Listing-N number from <figcaption>; if the sequence
+#    skips any integer between min and max, report. 8607 example:
+#    `79 Tips & Tricks für Profis.html` jumped 1→2→4 (Listing 3
+#    missing) before second-pass review.
+python3 - issues/8607 <<'PY'
+import os, re, sys
+d = sys.argv[1]
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f)).read()
+    nums = sorted(set(
+        int(m.group(1))
+        for m in re.finditer(r'<figcaption[^>]*>(?:<[^>]+>)*\s*Listing\s+(\d+)',
+                             s, re.IGNORECASE)))
+    if nums and nums != list(range(min(nums), max(nums)+1)):
+        missing = [n for n in range(min(nums), max(nums)+1) if n not in nums]
+        print(f"  {f}: listing-number gaps {missing}")
+PY
 ```
 
 ## End-of-session summary
@@ -225,3 +264,20 @@ list of:
 - every `prg/` file that ended up in no article, and why.
 
 Without this table the user can't pinpoint where to spot-check.
+
+## Notes / lessons
+
+- **Bare `Listing N` captions.** 8607's `96 Neues vom
+  Hypra-Basic.html` shipped 10 figcaptions of the form `<figcaption>
+  Listing N</figcaption>` with no description at all — the trailing
+  caption text was dropped during placement. Verifier #6 catches
+  this. Every print `Listing N.` caption in 64'er has a trailing
+  description; if you can't find one in the PDF text layer, fall
+  back to the scan.
+- **Listing-number sequence gaps.** 8607's `79 Tips & Tricks für
+  Profis.html` was placed with listings 1, 2, and 4 — Listing 3 was
+  silently omitted because no `prg/` file matched it. Verifier #7
+  catches this. When a gap is real (the print really does skip a
+  number), document it explicitly in the end-of-session summary or
+  in `LOG.md`; otherwise treat the gap as a placement bug and find
+  the missing listing.
