@@ -92,10 +92,23 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
 - **Credit external contributors** — `;Eingetippt von Name` as the
   first line of contributor-typed `.txt`, or `<!-- Eingetippt von Name
   -->` for HTML-inline listings.
-- **Placement style.** In a "Tips & Tricks" column with many small
-  programs, each listing goes at the end of its own tip section, not
-  at the article's tail. For ordinary articles, place all listings
-  in a block before `</article>`.
+- **Placement style.** The default is **all listings in a single
+  block before `</article>`**, after the body prose. This applies to
+  any article whose listings are pieces of one program / one
+  cohesive subject — including articles with internal `<h2>` sub-
+  sections that describe the program's modules (Editor, Hauptmenü,
+  Druckertreiber, etc.).
+  - The exception is a column of independent small programs (Tips &
+    Tricks, Aktuelles, CP/M-Ecke). There the sub-sections are
+    self-contained features, each with its own listing → listing
+    goes at end of its own tip section.
+  - **Test:** are the article's `<h2>` sub-sections describing the
+    SAME program's facets? Then end-of-article. Are they unrelated
+    sub-programs with their own author / their own caption? Then
+    per-section. In 8607 `67 Die ideale Ergänzung` (Master-Text-
+    Drucker) has sub-sections `Text via RS232 senden`,
+    `Der Zeichensatz-Editor`, `Editor`, `Hauptmenü` — all parts of
+    ONE driver suite → all 6 listings belong at end.
 - **Disk variants of the same program** (e.g. two load-address builds
   of the same BLOCK routine): the printable source goes in the
   `<figure>`; each variant's binary download goes as a sibling
