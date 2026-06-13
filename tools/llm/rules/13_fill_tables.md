@@ -7,13 +7,12 @@ proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 
 ## Extraction pipeline (per table)
 
-1. **Tesseract TSV on the full page** (`tesseract /tmp/<YYMM>_pages/p-NNN.png /tmp/p_ocr -l deu tsv`) — gives word-level bboxes grouped by block.
-2. **Summarize each block** — group rows by `block_num`, compute bbox, pull a short text preview. The block grouping is what locates the table region.
-3. **Identify target block** by either grepping the blocks file for a known cell value, or visual cross-check via a thumbnail.
-4. **Crop just that block** with `magick … -crop WxH+X+Y`. If the crop exceeds 2000 px on any axis, also produce a resized copy for vision Read.
-5. **Second-pass OCR on the crop** with PSM hint: `--psm 6` for compact tables, `--psm 4` for narrow tables with variable row heights.
-6. **Vision-corrected HTML assembly** — Read the cropped image + the second-pass OCR text in parallel. Walk through OCR row by row; fix substitutions (`1`↔`l`↔`I`, `O`↔`0`, `rn`↔`m`, `cl`↔`d`); preserve old German spelling (`daß`, `muß`); preserve printed typos (`TPYE`, `SHURE`). If a cell is illegible, write `[ILLEGIBLE]`.
-7. **Emit HTML** per the shape rules below.
+1. **Build the page block index** per rule 0's recipe → `/tmp/p<NNN>_blocks.txt`.
+2. **Identify target block** by either grepping the blocks file for a known cell value (e.g. a row header from the article's prose), or visual cross-check via a low-res page thumbnail.
+3. **Crop just that block** with `magick … -crop WxH+X+Y` using the bbox from blocks.txt. If the crop exceeds 2000 px on any axis, also produce a resized copy for vision Read.
+4. **Second-pass OCR on the crop** with PSM hint: `--psm 6` for compact tables, `--psm 4` for narrow tables with variable row heights.
+5. **Vision-corrected HTML assembly** — Read the cropped image + the second-pass OCR text in parallel. Walk through OCR row by row; fix substitutions (`1`↔`l`↔`I`, `O`↔`0`, `rn`↔`m`, `cl`↔`d`); preserve old German spelling (`daß`, `muß`); preserve printed typos (`TPYE`, `SHURE`). If a cell is illegible, write `[ILLEGIBLE]`.
+6. **Emit HTML** per the shape rules below.
 
 ## HTML shape per print type
 

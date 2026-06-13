@@ -99,10 +99,12 @@ grep -hE '64er\.head2" content=' "$dir"/*.html | \
   no machine label (decorative spreads, 64'er Extra pages, contest
   cover pages, CP/M-Ecke, etc.).
 - An apply.py script exists at `tools/llm/new/head_meta_apply.py`
-  that expects pre-computed `_work/p<NNN>/blocks.txt` per-page OCR
-  files. If those don't exist for the issue, skip the script and use
-  the vision-only sub-sub-agent crop approach above — faster than
-  rebuilding the OCR pipeline just for the header strip.
+  that expects pre-computed per-page block-index files (the
+  `blocks.txt` format from rule 0's "page block index" recipe). If
+  those exist, the script reads them directly. If they don't, build
+  them on demand (rule 0 recipe) OR skip the script and use the
+  vision-only sub-sub-agent crop approach above — vision is faster
+  when the header strip is the only thing you need from each page.
 - Spread headers for multi-page articles can drift: e.g. an article
   starting on a "section cover" page might have a different
   running header than its body pages. The start page's header is
