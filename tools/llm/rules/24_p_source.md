@@ -22,12 +22,32 @@ Info: FET-Füle Electronic Trading GmbH, Postfach 14 25, D-6057 Dietzenbach 1, T
 
 Common label words in 64'er:
 - `Info:` — most frequent
-- `Bezug:`, `Bezugsquelle:`, `Bezugsadresse:`
+- `Bezug:`, `Bezugsquelle:`, `Bezugsadresse:`, `Bezugsquellen:`
 - `Hersteller:`, `Vertrieb:`, `Anbieter:`
 - `Kontakt:`, `Adresse:`
 - `Preis:` when it stands alone as a footer line
-- `Literatur:` — for what-else-to-read pointers in articles that cite books
+- `Literatur:`, `Quelle:`, `Quellen:` — for what-else-to-read pointers / source citations
 - `Buchtitel:` / `Buchbesprechung:` — for a book the article reviews
+
+**Implicit / unlabelled footers also qualify** when the paragraph
+serves the same function as a labelled one — a pointer to a third
+party at the end of the article. Common shapes the OCR pipeline
+leaves WITHOUT a label prefix:
+
+- A book / journal **citation** with publisher + place ("Modellrechnung
+  der deutschen Bevölkerung im Statistischen Jahrbuch 1985<br>
+  Herausgegeben vom Statistischen Bundesamt, Wiesbaden, Verlag W.
+  Kohlhammer, Mainz") — implicit `Literatur:` reference.
+- A **contest entry address** ("Die Antworten auf alle drei Fragen
+  senden Sie bitte auf einer Postkarte an:<br>Markt&Technik AG<br>
+  …") — implicit `Kontakt:`. The lead-in sentence ("…senden Sie
+  bitte … an:") is part of the same paragraph block.
+- A multi-line **vendor address block** without prefix ("Power
+  Cartridge:<br>Kolff Computer Supplies bv, …<br>Lindy Elektronik
+  GmbH, …<br>The Final Cartridge:<br>H + P Computers, …") — common
+  in Fehlerteufelchen Bezugsquellen lists.
+- A `(byline)`-like signature line printed in source-style typography
+  is NOT `<p class="source">` — it's `<address class="author">`.
 
 A paragraph qualifies as `<p class="source">` when **all** of the
 following hold:
