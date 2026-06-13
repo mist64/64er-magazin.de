@@ -46,6 +46,16 @@ The sub-agent must:
     body (U→ll, lost spaces, `0` vs `O`, multi-hyphen artifacts).
     These are character-level OCR fixes per cleanup_workflow.md,
     not editorial rewrites.
+    **Granularity matters.** OCR cleanup is allowed at the
+    **word level only**. Reading a passage and replacing a single
+    bad token with the obvious correct word (`darsteUen` →
+    `darstellen`) is fine — that's a word-by-word OCR substitution
+    where the surrounding text confirms the fix. Reading a
+    paragraph and re-typing it from memory because it "reads
+    better" is forbidden, even if every word change individually
+    looks plausible. The boundary is **one word at a time**;
+    nothing larger. See `feedback_print_verbatim` memory for the
+    full rule.
 11. Beautify (`npx --yes js-beautify --type html --indent-size 4
     --wrap-line-length 0 --replace`).
 12. **Do not commit.** Return per-section Q&A summary table.

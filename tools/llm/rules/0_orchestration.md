@@ -119,3 +119,23 @@ When the completion notification arrives:
 - When a sub-agent says "I couldn't decide X", that's a signal to the
   orchestrator to make the call (or ask the user) and re-dispatch —
   not to accept the half-finished state.
+
+## Cross-cutting rule: OCR cleanup granularity
+
+Every rule that touches article body text inherits the same
+anti-memory granularity rule. Word-level OCR substitutions (e.g.
+`darsteUen` → `darstellen`, `0PEN` → `OPEN`, lost-space fixes,
+multi-hyphen artifacts) **are allowed** even when the agent recognises
+them from context — they're word-by-word fixes the surrounding text
+confirms. Re-typing a sentence or paragraph from memory because the
+result reads better is **forbidden**, no matter how plausible each
+individual change looks.
+
+The granularity boundary is **one word at a time, nothing larger**.
+If a passage seems to need broader cleanup, the answer is to OCR the
+scan again (or hand the section back to the user), not to compose a
+rewrite. See the `feedback_print_verbatim` memory for the full rule.
+
+Make this explicit in every sub-agent brief that involves body-text
+editing — it's the difference between a faithful archive and a
+modernised paraphrase.
