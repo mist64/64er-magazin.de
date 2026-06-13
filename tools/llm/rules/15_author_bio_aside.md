@@ -129,6 +129,30 @@ Fachredakteur portrait, and the Leserforum image are all valid
 `class="inline"` uses outside an `<aside>`. The flag is there so
 the orchestrator can verify the listed files match a known pattern.
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every `<aside>` the sub-agent wraps must be backed
+by **runnable verifier evidence pasted verbatim into the report**:
+
+- For each `<aside>` added, paste the page number and a one-line
+  scan-confirmation note (`p.50 → yellow boxed-off Lebenslauf
+  sidebar next to right column of body text`) showing the print
+  actually shows a callout box, not just biographical prose.
+- For each `<figure>` → `<img class="inline">` conversion, paste a
+  one-line note confirming the print has no `Bild N.` caption under
+  the portrait.
+- For each candidate considered but rejected (biographical-looking
+  prose that is NOT a boxed sidebar), paste the page number and a
+  one-line reason ("p.142 prose mentions `geboren in 1955` but the
+  print typesets it as running body text, no callout box").
+
+**No verifier output, no claimed aside.** An aside reported without
+the page-number scan-confirmation is treated as un-applied; the
+orchestrator will re-dispatch. "Trust me, I checked the scan" is
+never acceptable.
+
 ## Notes / lessons
 
 - 8607 had exactly one straight author bio (`50 R.C.S.` Lebenslauf

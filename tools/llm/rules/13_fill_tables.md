@@ -258,6 +258,34 @@ All seven checks should pass. Soft check (#5) may flag false positives
 that turns out to be a bullet list); the orchestrator should walk
 the flagged ones and decide.
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). Pass 3 has its own version of
+the same failure mode: the 8607 sub-agent reported "Pass 3 done, 0
+candidates" without running the mechanical counters, and a second-look
+review later extracted 6 missed tables. To make both failure modes
+impossible here, every table the sub-agent emits must be backed by
+**runnable verifier evidence pasted verbatim into the report**:
+
+- For each `<table>` placed, paste the pre-fix vs. post-fix counts
+  from verifier check #6 (`<table>=N <figcaption>Tabelle…=M`), so
+  the orchestrator sees Pass 3 actually advanced the totals.
+- For each Pass-3 candidate block walked (not just those extracted),
+  paste the one line from `_tmp/blocks/p<NNN>.txt` that flagged it
+  plus a one-line disposition (`extracted`, `already image`, `already
+  placed`, `false positive: bullet list`).
+- For each `<figcaption>` typed, paste the verbatim caption text the
+  sub-sub-agent returned from the cropped image OCR — so the
+  orchestrator can confirm no caption was paraphrased.
+- For each `[ILLEGIBLE]` cell, paste the crop path the sub-sub-agent
+  used so a 600 dpi re-crop can be attempted by the orchestrator.
+
+**No verifier output, no claimed table.** A table reported without the
+pre/post counts + per-candidate disposition is treated as un-applied;
+the orchestrator will re-dispatch Pass 3. "Pass 3 done, 0 candidates"
+without the per-block enumeration is the canonical failure shape.
+
 ## Notes / lessons
 
 - The 9-TODO-TABLE 8607 sweep also caught 6 captioned tables that

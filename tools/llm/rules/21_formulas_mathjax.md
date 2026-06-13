@@ -140,6 +140,32 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every formula the sub-agent renders must be backed
+by **runnable verifier evidence pasted verbatim into the report**:
+
+- For each formula resolved, paste the 600 dpi crop path that the
+  sub-sub-agent vision-read, e.g.
+  ```
+  133 Simulation.html formula #2 → crop
+  /tmp/64er_<YYMM>_pages_600/p-133.png + bbox 820x180+520+1240
+  → LaTeX: \frac{\mathrm{d}V}{\mathrm{d}t} = -\omega^2 X
+  ```
+- For each Unicode-vs-MathJax decision, paste the one-line
+  classification ("print shows real horizontal vinculum → MathJax",
+  "print shows inline `dV/dt` slash → Unicode").
+- For each `[ILLEGIBLE]` marker, paste the crop path so the
+  orchestrator can attempt a higher-resolution re-crop.
+
+**No verifier output, no claimed formula.** A formula reported
+without the crop-path evidence is treated as a guess; the orchestrator
+will re-dispatch. "Trust me, the LaTeX matches the print" is never
+acceptable — LaTeX from physics knowledge rather than from the scan
+is the canonical anti-memory failure for this rule.
+
 ## Notes / lessons
 
 - A single article often has both display and inline formulas (a

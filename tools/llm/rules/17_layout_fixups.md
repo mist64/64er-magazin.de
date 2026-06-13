@@ -98,6 +98,35 @@ PY
 )" "$dir"
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every TODO-marker resolution the sub-agent applies
+must be backed by **runnable verifier evidence pasted verbatim into
+the report**:
+
+- For each `TODO PRE` / `TODO INDENTATION` / `TODO INDENTED`
+  resolution, paste a one-line print-classification note: which page,
+  which marker, and which of {`<pre>`, `<ul>`, `<ol>`,
+  `&nbsp;`-flattened prose} the print's visual structure mandates.
+  E.g. `76 Tips & Tricks p.76 → indented monospace code, no bullet
+  glyph → <pre>`.
+- For each `TODO ASIDE` / `TODO BOX` resolution, paste a one-line
+  confirmation that the print shows a boxed callout (or, for the
+  `<pre>` fallback, that it shows indented monospace without a box).
+- For each prose→list conversion, paste the one-character bullet
+  glyph the print uses (dash, dot, em-dash) so the orchestrator can
+  confirm the marker exists. Per the lists-need-marker rule, no
+  marker means no `<ul>`/`<ol>`.
+- For each explicitly-skipped marker (`TODO FORMULA`, `TODO ALL
+  BOXES LIKE BELOW`, content stubs), paste a one-line reason.
+
+**No verifier output, no claimed resolution.** A resolution reported
+without the print-classification note is treated as un-applied; the
+orchestrator will re-dispatch. "Trust me, I looked at the scan" is
+never acceptable.
+
 ## Notes / lessons
 
 - 8607 had 4 TODO PRE markers in `76 Tips & Tricks für Einsteiger`

@@ -216,3 +216,13 @@ rewrite. See the `feedback_print_verbatim` memory for the full rule.
 Make this explicit in every sub-agent brief that involves body-text
 editing — it's the difference between a faithful archive and a
 modernised paraphrase.
+
+- **Any sub-agent dispatched to apply a per-candidate rule must include
+  verifier evidence inline in its report.** See the
+  `## Evidence-in-report requirement` section of each rule for the
+  rule-specific evidence form. A fix reported without evidence is
+  treated as un-applied and re-dispatched — the orchestrator does NOT
+  re-do the verification itself. This rule exists because of the
+  `internsiv` regression: a sub-agent claimed verbal verification it
+  never ran, and a print typo was "corrected" into something the print
+  never said.

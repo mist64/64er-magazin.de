@@ -91,6 +91,36 @@ grep -hE '64er\.head2" content=' "$dir"/*.html | \
 # eyeball — every line should look like a Commodore machine label.
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression). To make that failure mode
+impossible here, every `head1` / `head2` value the sub-agent writes
+must be backed by **runnable verifier evidence pasted verbatim into
+the report**:
+
+- For each article, paste a one-line note naming the cropped
+  header-strip image the sub-sub-agent inspected and what the
+  sub-sub-agent returned, e.g.
+  ```
+  16 Forschung.html → crop /tmp/64er_<YYMM>_pages_300/p-016.png band
+  0,0,FULLW,250 → head1="Hardware" head2="C 64"
+  ```
+- For empty `head2`, paste a one-line note confirming the print band
+  shows no machine label (`head2 absent: section-cover page, no
+  machine box on right`).
+- For each OCR-cleanup substitution applied (`C 64IC 128` →
+  `C 64/C 128`, etc.), paste the verbatim raw OCR output beside the
+  cleaned form so the orchestrator can confirm the substitution is
+  mechanical, not editorial.
+
+**No verifier output, no claimed head_meta.** A `head1` / `head2`
+value reported without the crop-band evidence is treated as a guess;
+the orchestrator will re-dispatch. "Trust me, I read the page header"
+is never acceptable — head_meta drives the rendered rubric banner
+and must come from the print, not from the article's
+`toc_category`.
+
 ## Notes / lessons
 
 - 44 of 47 article files in 8607 got `head1` (3 skipped:

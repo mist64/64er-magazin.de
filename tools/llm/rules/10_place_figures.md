@@ -248,6 +248,34 @@ for f in sorted(os.listdir(d)):
 PY
 ```
 
+## Evidence-in-report requirement
+
+A previous sub-agent on a different rule claimed verification it never
+ran (the `internsiv` OCR regression — print typo treated as OCR error
+because no `pdftotext` check was actually performed). To make that
+failure mode impossible here, every placement the sub-agent applies
+must be backed by **runnable verifier evidence pasted verbatim into
+the report**:
+
+- For each `<figure>` placed, paste the one body-text line that
+  contains the first `Listing N` mention (the placement anchor), e.g.
+  ```
+  79 Tips & Tricks für Profis.html → "…wie in Listing 1 zu sehen ist…"
+  ```
+  so the orchestrator can confirm the figure landed after that
+  paragraph's `</p>`.
+- For each article touched, paste the verifier's post-fix output from
+  check #4 (Listing-N sequence) and check #7 (gap detector) showing
+  the article's sequence is now contiguous (or that the gap is
+  intentionally documented in `LOG.md`).
+- For each `prg/` file left unplaced, paste one line stating which
+  section separator it sat under and why no article matched.
+
+**No verifier output, no claimed placement.** A figure placement
+reported without the body-text anchor line + the post-fix verifier
+output is treated as un-applied; the orchestrator will re-dispatch.
+"Trust me, I placed it correctly" is never acceptable.
+
 ## End-of-session summary
 
 When the placement pass is done, surface a table for spot-checking:
