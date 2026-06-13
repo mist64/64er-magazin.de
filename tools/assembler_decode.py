@@ -540,10 +540,16 @@ def _format_raw_prg_line(line_text):
     code = code.rstrip()
 
     # Split opcode / operand. Opcode is the first 3 characters; if a space
-    # follows it, the rest is the operand.
+    # follows it, the rest is the operand. Hypra-Ass source written on the
+    # C64 stores mnemonics as plain PETSCII (not as BASIC tokens) and never
+    # inserts the space, so 'STXSTIN' / 'LDA#$0D' / 'JSRCHROUT' arrive here
+    # jammed — recognise a known 3-letter mnemonic and split unconditionally.
     if len(code) >= 4 and code[3] == ' ':
         opcode = code[:3]
         operand = code[4:]
+    elif len(code) > 3 and code[:3] in _MNEMONIC_SET:
+        opcode = code[:3]
+        operand = code[3:]
     else:
         opcode = code
         operand = ''
