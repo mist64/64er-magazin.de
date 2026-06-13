@@ -17,9 +17,9 @@ All 9 `<p>TODO TABLE</p>` markers replaced.
 
 - `174 Computer-Knobeleien (3).html` — `Tabelle 1` is `<img src="174-t1.png">` inside `<figure>`. Per `table_workflow.md`'s "Skip tables already present as images" rule, left alone.
 
-## STECKBRIEF callouts not yet extracted
+## STECKBRIEF callouts extracted
 
-`166 Tips und Tricks zu Superbase (Teil 4).html` references 5 `SUPERBASE-Steckbrief` callouts in its intro (FIND, ENTER, SELECT, OUTPUT, PROG) — all printed as yellow callout boxes on print pages 166–167. None are currently represented in the HTML. They were not extracted in this pass; they need to be added in a follow-up session. The Centronics pinout `TODO TABLE` in this article was replaced.
+`166 Tips und Tricks zu Superbase (Teil 4).html` — all 5 `SUPERBASE-Steckbrief` callouts (FIND, ENTER, SELECT, OUTPUT, PROG) extracted from yellow callout boxes on print pages 166–167. Each emitted as `<figure><table class="plain">…</table><figcaption>SUPERBASE-Steckbrief: X-Menü</figcaption></figure>` and placed between the FIND-Modus discussion and the Centronics-Schnittstelle section. PROG-Menü figure additionally contains two subheading `<p>` markers ("Möglichkeiten der Befehlszeile:" and "Befehle der Datenbanksprache") plus the trailing "Anmerkung:" paragraph that explains the »I«/»II« primary/secondary command marker convention (the Anmerkung appears inside the same yellow box in print, so it stays inside the figure). PDEF x value in the PROG figure preserves the multi-line print layout via `<br>` (six lines for codes 0/1/2/5/6). Row counts: FIND 14, ENTER 10, SELECT 14, OUTPUT 19, PROG 5 (Befehlszeile) + 11 (Datenbanksprache). Print verbatim preserved: row 13 of FIND uses "Umgehung" while row 14 uses "Umgebung" — both kept as printed. Centronics pinout `TODO TABLE` was already replaced in the earlier pass.
 
 ## Pass 3 — UNCAPTIONED callouts extracted (rule 13 Pass 3 sweep)
 
