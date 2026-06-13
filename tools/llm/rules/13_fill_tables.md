@@ -57,7 +57,30 @@ grep -l "TODO TABLE" issues/<YYMM>/*.html
 ```
 Every `TODO TABLE` MUST be replaced. **Garbage adjacent to `TODO TABLE`** — the OCR pipeline sometimes drops a flattened prose representation in a `<p>…<br>…</p>` block right before or after. Delete that garbage when replacing.
 
-**Pass 3 — UNCAPTIONED tables.** Many tables have NO `Tabelle N.` caption and won't appear in Pass 1: bottom-half marketplace/comparison tables, yellow / tinted callout boxes, multi-page reference tables, fontspec/ASCII-code lookups, aside-style boxes. Walk every page in the issue visually; for each candidate confirm the article HTML doesn't already have it (no `<table>`, no `<img>` for it, no `TODO TABLE`). Then extract.
+**Pass 3 — UNCAPTIONED tables.** Many tables have NO `Tabelle N.` caption and won't appear in Pass 1. Patterns observed in 8607 alone that Pass 1 missed: `Verwendete Variable` callout (variable-reference list), `Monitor-/Fernseher-Eingangsnormen` + per-Stecker Pin/Signal tables, `Leistungen des Breitband-ISDN`, `Datenblatt des Seikosha MP-1300AI`, `Kurz belichtet — Melchers CPA-80X` test datasheet, `Funktionen der Sekundäradressen`. Other common shapes: bottom-half marketplace/comparison tables, yellow / tinted callout boxes, multi-page reference tables, fontspec/ASCII-code lookups, aside-style boxes.
+
+**This pass is MANDATORY. "Visually scan every page" is not enough — make it mechanical** using rule 23's blocks index:
+
+```bash
+# 1. Walk each page's blocks index for known callout heading words
+grep -hiE "Verwendete |Leistungen |Steckernormen|Belegung |Datenblatt|Kurz belichtet|Pin\s+Signal|Funktion: |Funktionen |Eingang|Kennummer" \
+  issues/<YYMM>/_tmp/blocks/p*.txt
+
+# 2. Walk for narrow-column multi-line blocks (sidebar callout shape):
+#    blocks whose width < 350 px AND text contains 4+ short newline-
+#    separated lines = strong candidate for tabular reference data.
+for f in issues/<YYMM>/_tmp/blocks/p*.txt; do
+  awk -F'[ =x+]' '/^block=/ { w=$5; if (w<350) print FILENAME": "$0 }' "$f"
+done | head -50
+```
+
+For each candidate block:
+1. Crop and view the page region (use rule 23's bbox).
+2. Decide if it's a `<table>` / `<aside>` / `<pre>` per the HTML shape rules.
+3. Confirm the article HTML doesn't already have it (no `<table>`, no `<img>` for it, no `TODO TABLE`).
+4. Extract verbatim.
+
+**Pass 3 must be REPORTED as done in the sub-agent's structured report**, including: pages walked, candidate blocks found, candidates extracted, candidates explicitly skipped (with reason). A sub-agent report that doesn't list Pass 3 explicitly = Pass 3 was skipped.
 
 `TODO LISTING` is **NOT** a table — those are code listings (rule 14).
 
