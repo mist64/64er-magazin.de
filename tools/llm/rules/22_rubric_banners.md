@@ -14,9 +14,6 @@ Fehlerteufelchen) or refreshes per issue (Editorial portrait):
 Each rubric's HTML wrapping is **different on purpose** — don't unify
 them. Match exactly what the prior issue's HTML did.
 
-The full procedural spec lives in `tools/llm/new/rubric_banner_workflow.md`.
-This rule is the dispatch + verification gate.
-
 Leserforum's banner is covered by rule 18 (the article also gets a full
 Q&A restructure, not just a banner).
 

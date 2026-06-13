@@ -5,9 +5,62 @@
 proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 `<figcaption>`; uncaptioned tables stay bare.
 
-The full procedural spec lives in `tools/llm/new/table_workflow.md`
-and is the authoritative reference. This rule file is the dispatch +
-verification gate around that workflow.
+## Extraction pipeline (per table)
+
+1. **Tesseract TSV on the full page** (`tesseract /tmp/<YYMM>_pages/p-NNN.png /tmp/p_ocr -l deu tsv`) — gives word-level bboxes grouped by block.
+2. **Summarize each block** — group rows by `block_num`, compute bbox, pull a short text preview. The block grouping is what locates the table region.
+3. **Identify target block** by either grepping the blocks file for a known cell value, or visual cross-check via a thumbnail.
+4. **Crop just that block** with `magick … -crop WxH+X+Y`. If the crop exceeds 2000 px on any axis, also produce a resized copy for vision Read.
+5. **Second-pass OCR on the crop** with PSM hint: `--psm 6` for compact tables, `--psm 4` for narrow tables with variable row heights.
+6. **Vision-corrected HTML assembly** — Read the cropped image + the second-pass OCR text in parallel. Walk through OCR row by row; fix substitutions (`1`↔`l`↔`I`, `O`↔`0`, `rn`↔`m`, `cl`↔`d`); preserve old German spelling (`daß`, `muß`); preserve printed typos (`TPYE`, `SHURE`). If a cell is illegible, write `[ILLEGIBLE]`.
+7. **Emit HTML** per the shape rules below.
+
+## HTML shape per print type
+
+- **Bordered data table with headers** → plain `<table>` with `<th>` header row.
+- **Borderless glossary / key list** → `<table class="plain">` with no header row.
+- **Table with a real caption** → wrap the whole `<table>` in `<figure>` with `<figcaption>`. A "real caption" is text printed on the scan in one of: `Tabelle: …`, `Tabelle N: …`/`Tabelle N. …`, `Bild N: …`/`Bild N. …` (for numbered figure-tables), or `STECKBRIEF: …` (yellow callout). **Do NOT promote section headings or bold titles above a table to `<figcaption>`** — a bold "Erklärung der einzelnen Bearbeitungsroutinen" above a table is a heading, not a caption.
+- **The `<figcaption>` ALWAYS goes BELOW the table** inside the `<figure>`, even if the print places it above. Project convention.
+- **Table with a heading or no caption marker** → bare `<table>`, no `<figure>`.
+
+## "Bild N" can be a table — or pseudo-code
+
+`Bild N.` on a scan doesn't always point at an image — 64'er routinely labels data tables AND structured pseudo-code boxes as `Bild N`. Sweep for these too, **but only if not already placed as an image**. For each `Bild` caption:
+- If a PNG file `<page>-<n>.png` already exists AND the article HTML references it via `<img>` → leave alone (image is ground truth).
+- If not → open the surrounding block. Decide visually:
+  - **Rectangular grid of cells (data table)** → `<table>` inside `<figure>`.
+  - **Indented pseudo-code or structured listing in a box** → `<pre>` inside `<figure>`. Preserve indentation as printed.
+  - **Photo, diagram, schematic** → fall back to image workflow (rule 12).
+
+## Multi-level headers
+
+If the print has a spanning header (e.g. "Adresse" above sub-headers "Dez"/"Hex"), reproduce with `colspan`/`rowspan`. Don't flatten.
+
+## Multi-page tables
+
+Tables spanning two or more pages need a join check: entries in continuous order; last row of page N and first row of page N+1 are not duplicates; sub-section headers emit `<tr><th colspan="N">SectionName</th></tr>` rows; skip the yellow page-banner ("64'er Extra", "Daten verwalten") at the top of each continuation page.
+
+## Sweeping captions across a whole issue
+
+A pure `Tabelle …` grep is **not enough**. Use a layered sweep:
+
+**Pass 1 — explicit captions:**
+```bash
+pdftotext -layout issues/<YYMM>/64er_19XX-XX.pdf /tmp/<YYMM>_full.txt
+grep -iE "Tabelle[ :.][^.]" /tmp/<YYMM>_full.txt | \
+  grep -vE "Farbtabelle|Steuersequenztabelle|[Ww]ertetabelle|Preistabelle|Linktabelle"
+```
+Also sweep for `Bild N\.`, `STECKBRIEF`, and `^\s*Listing [0-9]+\.`.
+
+**Pass 2 — explicit placeholders:**
+```bash
+grep -l "TODO TABLE" issues/<YYMM>/*.html
+```
+Every `TODO TABLE` MUST be replaced. **Garbage adjacent to `TODO TABLE`** — the OCR pipeline sometimes drops a flattened prose representation in a `<p>…<br>…</p>` block right before or after. Delete that garbage when replacing.
+
+**Pass 3 — UNCAPTIONED tables.** Many tables have NO `Tabelle N.` caption and won't appear in Pass 1: bottom-half marketplace/comparison tables, yellow / tinted callout boxes, multi-page reference tables, fontspec/ASCII-code lookups, aside-style boxes. Walk every page in the issue visually; for each candidate confirm the article HTML doesn't already have it (no `<table>`, no `<img>` for it, no `TODO TABLE`). Then extract.
+
+`TODO LISTING` is **NOT** a table — those are code listings (rule 14).
 
 ## Briefing for the sub-agent
 
@@ -26,9 +79,9 @@ The sub-agent must:
      marketplace / comparison / yellow-callout tables the prose
      introduces with "in der folgenden Übersicht", "wir haben
      zusammengefaßt", etc.
-4. For each target, run the `tesseract` block-summary → crop → second
-   tesseract pass pipeline (`table_workflow.md` Steps 1–6). Use sub-
-   sub-agents for image / vision reads.
+4. For each target, run the tesseract block-summary → crop → second
+   tesseract pass pipeline described above. Use sub-sub-agents for
+   image / vision reads.
 5. Emit:
    - bare `<table>` when the print has no caption marker;
    - `<figure><table>…</table><figcaption>…</figcaption></figure>` when

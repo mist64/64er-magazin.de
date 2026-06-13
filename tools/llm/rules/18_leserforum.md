@@ -7,8 +7,107 @@ for askers + guest repliers, `<p class="source">` for Info footers,
 banner image at the top), plus the `64er.head1` meta tag the
 generator needs to render the rubric banner.
 
-The full transformation spec is `tools/llm/new/leserforum_workflow.md`.
-This rule is the dispatch + verification gate.
+## Canonical HTML shape
+
+```html
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Leserforum</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="64er.issue" content="N/YY">
+    <meta name="64er.pages" content="16-17">
+    <meta name="64er.head1" content="Leserforum">
+    <meta name="64er.toc_category" content="Rubriken">
+    <meta name="64er.id" content="leserforum">
+</head>
+
+<body>
+    <article class="qa">
+        <header>
+            <img src="16-0.png" alt="Leserforum" title="Leserforum">
+        </header>
+
+        <section>
+            <h2>Topic title in Title Case?</h2>
+
+            <div class="q">
+                <p>Question text…</p>
+                <p class="author">Reader Name<br>Street 12, 9999 City</p>
+                <p class="noindent">Ausgabe N/YY</p>
+            </div>
+
+            <div class="a">
+                <p>Editor's reply…</p>
+                <p class="author">Guest Replier Name</p>
+            </div>
+
+            <p class="source">Info: vendor info, address, product details</p>
+        </section>
+
+        <!-- repeat <section> per topic -->
+    </article>
+</body>
+</html>
+```
+
+Required metas: `64er.head1=Leserforum`, `64er.toc_category=Rubriken`,
+`64er.id=leserforum`. **No `<meta name="author">`** — Leserforum has
+no overall author; per-question authorship lives inside each
+`<p class="author">`.
+
+## Per-section anatomy
+
+Inside each `<section>`:
+- `<h2>` — topic heading in **Title Case** (OCR import usually
+  delivers ALL CAPS; convert). Empty-headed tail letters (page-32
+  style) get a `<section>` with no `<h2>`.
+- One or more `<div class="q">` — questions. Multiple `<div class="q">`
+  per section when the editor groups two readers asking the same
+  thing.
+- Optionally one `<div class="a">` — the editor's reply (when
+  printed). Some questions are unanswered ("Wer kann helfen?" calls
+  for reader replies in the next issue).
+- Optionally one `<p class="source">` — Info / vendor address /
+  product footer.
+
+Inside `<div class="q">`:
+- One or more `<p>` for the question body. Multi-part questions use
+  plain-text `(1) / (2) / (3)` numbering as separate `<p>`s — NOT
+  `<ol>`.
+- `<p class="author">` for the asker. Convert ALL CAPS to Title Case
+  (`HANS FUSS` → `Hans Fuss`). If the asker's postal address is
+  printed, append it inside the **same** `<p class="author">` after
+  a `<br>` — not a separate paragraph.
+- `<p class="noindent">Ausgabe N/YY</p>` last, when this is a
+  follow-up to a prior issue's question.
+
+Inside `<div class="a">`:
+- One or more `<p>` for the reply body. Multi-part answers mirror
+  the question's `(1) / (2)` numbering.
+- Optionally one `<p class="author">` at the end if the reply is
+  signed by a guest expert (not the editorial team). Editorial
+  team's own answers are unsigned.
+
+`<p class="source">` goes after `</div>` of the last `<div class="a">`,
+inside the same `<section>`. Used for printed `Info:` blocks
+(vendor address + price + product details):
+```html
+<p class="source">Info: Vendor Name, Street 1, 12345 City<br>
+    Product Name, 49 Mark</p>
+```
+
+## Special cases
+
+**Long reader letters** (fan letter / opinion piece, not a question):
+treat like a single-question `<section>` — `<h2>` title,
+`<div class="q">` with all prose `<p>`s, `<p class="author">` at end,
+no `<div class="a">`.
+
+**Intro `<aside>`** ("Fragen Sie doch" submission rules): reproduce
+as a normal `<aside>` between two `<section>` elements.
 
 ## Briefing for the sub-agent
 
@@ -42,10 +141,16 @@ The sub-agent must:
 9. Add `<meta name="64er.head1" content="Leserforum">` if missing.
    Verify `64er.toc_category=Rubriken`, `64er.id=leserforum`, NO
    `<meta name="author">`.
-10. Apply the leserforum_workflow's OCR-fix list to headings and
-    body (U→ll, lost spaces, `0` vs `O`, multi-hyphen artifacts).
-    These are character-level OCR fixes per cleanup_workflow.md,
-    not editorial rewrites.
+10. Apply word-level OCR fixes to headings and body:
+    `U→ll` (`darsteUen` → `darstellen`), lost spaces
+    (`aufjedenfalls` → `auf jedenfalls`), `0` ↔ `O` confusions
+    inside letter runs, lost line-break hyphens (`Druk-ker` →
+    `Drucker`), multi-hyphen artifacts (only the LAST hyphen is a
+    line break unless the final segment starts uppercase). These
+    are character-level OCR fixes, not editorial rewrites.
+    OCR errors `0`/`O` confusion in heading: `Z80-MAKR0` →
+    `Z80-Makro`. Letter-letter: `INTEREACE` → `Interface`,
+    `PROIEKTOREN` → `Projektoren`, `DlN-A4` → `DIN-A4`.
     **Granularity matters.** OCR cleanup is allowed at the
     **word level only**. Reading a passage and replacing a single
     bad token with the obvious correct word (`darsteUen` →
