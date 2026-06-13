@@ -4,6 +4,44 @@
 typesets. Don't promote / demote on structure alone — judge against
 the print's typographic weight.
 
+## DEFAULT: DON'T CHANGE HEADER LEVELS
+
+**The OCR'd / post-step-0 markdown is the source of truth for heading
+levels. The default action is to leave heading levels alone. Trust
+the input.**
+
+The "compare print typographic weight" test in the rest of this file
+is for **exceptional** cases only — when there's a clear *structural*
+reason to suspect the input is wrong (e.g. the hierarchy makes the
+article malformed for the generator, or a structural rule like 15
+forces a specific level).
+
+Structural overrides that DO apply:
+
+- **Rule 15 (h2 inside aside → h3).** Always demote a top-level
+  heading inside `<aside>` to `<h3>`. This is structural, not a
+  typographic-weight judgement.
+
+### Anti-pattern — the heading-audit trap
+
+❌ **"This orphan h3 has no h2 parent — promote it."**
+❌ **"This h2 has only inline-bold sub-sections — demote it."**
+
+Both are the same trap. Both ignore the input's signal in favour of
+a structural-tidiness heuristic. Both have been re-introduced and
+manually reverted multiple times during 8607 work.
+
+❌ **Never run a heading-level audit pass.** "Walk every article and
+re-check the heading hierarchy" is banned as a workflow. Every bulk
+heading-hierarchy "audit" that was attempted during 8607 work
+re-introduced exactly the same wrong promotions and had to be
+manually reverted file by file. Per-article heading-level changes
+are only allowed when there's a specific structural defect in the
+*one* article being edited for an unrelated reason.
+
+If you find yourself wanting to "fix up" the heading hierarchy
+because it "looks odd": stop. The input is right. Move on.
+
 ## What the print actually shows
 
 64'er print uses (roughly) three heading weights inside an article:
@@ -13,8 +51,7 @@ the print's typographic weight.
 2. **Major section** (h2) — large bold heading. Often appears as
    a banner across one or more columns, with clear whitespace
    above. Articles like `133 Computer-Simulation` (`Die Eulersche
-   Methode`) or `49 Variosystem` (`Bedienungsanleitung`,
-   `Eingabehinweise`) use this weight.
+   Methode`) use this weight.
 3. **Sub-heading inside a section** (h3) — smaller bold, often
    inline with the column flow. The print may use h3 throughout
    an article without ever using h2 — and that's fine; it's the
@@ -122,11 +159,54 @@ PY
 
 ## Notes / lessons
 
-- 8607's audit promoted 3 h3→h2 incorrectly (174 Knobeleien × 3,
-  166 Superbase × 2) — the user manually reverted. Pattern: the
-  audit picked top-level h3s with no h2 in scope and promoted
-  them, but the print never used h2-banner weight in those
-  articles. Fixed by adding the "compare print weight" test.
+### History of how this rule reached its current form
+
+The rule started as "compare print weight" and only added "DEFAULT:
+don't change" after the third repetition of the same mistake.
+
+- **`b94e5876b`** ("8607: heading hierarchy audit — 20 articles
+  fixed"). Walked every 8607 article's hierarchy. 9 of the changes
+  were structural (rule-15 h2-in-aside demotions, kept). The other
+  ~14 were judgement-call promotions / demotions across 12 articles
+  (22, 49, 67, 73, 84, 85, 92, 136, 139, 150, 166, 174). All wrong.
+- **`70e6a5905`** ("8607: heading hierarchy + Grafik-Modi review
+  fixes"). User manually reverted 166 Superbase Centronics+Plotter,
+  168 Vizawrite Griechisch, 174 Knobeleien × 3, plus 150 body
+  promotions.
+- **`1e9da5ac8`** ("8607: revert FT h3→h2 promotions"). Reverted
+  84 Fehlerteufelchen × 6 sub-corrections. Added "FT rubric is
+  always h3" to this rule.
+- **This commit.** Reverted the remaining b94e5876b judgement
+  changes in 22, 49, 67, 73, 85, 92, 136, 139 (and the leftover
+  166 FIND-Suche change that hadn't been caught yet). 8 files.
+  Rewrote the top of this rule as "DEFAULT: don't change" and
+  banned the heading-audit pass workflow outright.
+
+The lesson is: every time the rule was framed as "compare print
+weight to decide", a sub-agent picking up the rule re-derived the
+"orphan h3 must be promoted" heuristic. The only way to stop the
+oscillation was to make "don't touch" the default, with the print-
+weight test reserved for genuinely exceptional cases.
+
+### Concrete examples already-burned-and-reverted
+
+- 174 Computer-Knobeleien: `Remis-Positionen` / `Kegeln mit dem
+  Computer` / `Tac Tix mit Taktik` are top-level sub-sections that
+  the print sets in h3-sized bold. They stay h3.
+- 166 Tips und Tricks zu Superbase: `FIND — gezielte Suche` /
+  `Die Centronics-Schnittstelle` / `Plotter VC 1520`. Inline sub-
+  sections within a column. h3.
+- 168 Tips und Tricks zu Vizawrite: `Griechisch für Vizawrite mit
+  dem SG-10`. Same.
+- 22 Wachstumspyramide: `Ausgangsdaten` / `Berechnungsmethode` /
+  `Bedienungsanleitung` / `Beispiele für die Anwendung`. Article
+  was written entirely in h3 sub-sections. h3.
+- 67 Die ideale Ergänzung: `Editor` / `Hauptmenü` are top-level
+  sections of the editor description. h2 as the input had them —
+  the audit demoted them on a "sub-sections of Zeichensatz-Editor"
+  heuristic. Wrong.
+- 73 Vectors, 85 C 128: top-level h3 sub-sections.
+- 84 Fehlerteufelchen: every sub-correction is h3.
 - **Fehlerteufelchen rubric — sub-correction headings are always
   `<h3>`.** The Fehlerteufelchen column is a list of corrections to
   previous issues; each sub-correction starts with a heading like
