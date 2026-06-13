@@ -21,7 +21,7 @@ are not.
   is 36").
 - `issues/<YYMM>/prg/` — the actual `.txt` / `.prg` files.
 - `issues/<YYMM>/64er_*.pdf` — for verbatim captions; one-time
-  `pdftotext -layout … /tmp/<YYMM>_full.txt` makes them grep-able.
+  `pdftotext -layout … /tmp/64er_<YYMM>_full.txt` makes them grep-able.
 - `issues/<YYMM>/<page> ….html` — the article files to receive
   figures.
 - The page-scan PNGs under `issues/<YYMM>/png/` (when the PDF text

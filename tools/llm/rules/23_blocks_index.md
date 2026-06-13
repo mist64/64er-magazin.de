@@ -32,16 +32,17 @@ work.
 ```bash
 issue=<YYMM>
 dir="issues/$issue"
+tmp="/tmp/64er_${issue}"        # all /tmp scratch lives under this prefix
 mkdir -p "$dir/_tmp/blocks"
-mkdir -p "/tmp/${issue}_pages_300"
+mkdir -p "${tmp}_pages_300"
 
 # 1. render every page to PNG at 300 dpi (once)
-pdftoppm -r 300 "$dir/64er_19XX-XX.pdf" "/tmp/${issue}_pages_300/p" -png
+pdftoppm -r 300 "$dir/64er_19XX-XX.pdf" "${tmp}_pages_300/p" -png
 
 # 2. tesseract TSV + awk block-grouper per page
-for png in /tmp/${issue}_pages_300/p-*.png; do
+for png in ${tmp}_pages_300/p-*.png; do
   page=$(basename "$png" .png | sed 's/^p-//')
-  tsv="/tmp/${issue}_p${page}_ocr.tsv"
+  tsv="${tmp}_p${page}_ocr.tsv"
   out="$dir/_tmp/blocks/p${page}.txt"
   tesseract "$png" "${tsv%.tsv}" -l deu tsv 2>/dev/null
   awk -F'\t' 'NR>1 && $1==5 && $12!="" {
@@ -70,7 +71,7 @@ block=45 bbox=840x39+1321+3256 text= Tabelle 2. Hier die entwirrte ...
 ```
 
 `<page>` is the zero-padded PDF page number (matching
-`/tmp/<YYMM>_pages_300/p-<page>.png`). PDF page may differ from
+`/tmp/64er_<YYMM>_pages_300/p-<page>.png`). PDF page may differ from
 magazine page — body pages typically use magazine page + an offset.
 
 Output location: `issues/<YYMM>/_tmp/blocks/`. The `_tmp/` directory
@@ -94,7 +95,7 @@ guarantees the index exists.
 dir=issues/<YYMM>
 
 # 1. one blocks file per rendered page
-n_pages=$(ls /tmp/<YYMM>_pages_300/p-*.png 2>/dev/null | wc -l | tr -d ' ')
+n_pages=$(ls /tmp/64er_<YYMM>_pages_300/p-*.png 2>/dev/null | wc -l | tr -d ' ')
 n_blocks=$(ls "$dir/_tmp/blocks/"p*.txt 2>/dev/null | wc -l | tr -d ' ')
 [ "$n_pages" = "$n_blocks" ] || \
   echo "  WARN: $n_pages pages rendered, $n_blocks block files"

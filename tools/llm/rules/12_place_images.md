@@ -16,7 +16,7 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
 2. Find the article whose `<meta name="64er.pages" content="…">`
    starts with that page, e.g. `content="145-153"`.
 3. Disambiguate collisions: when two articles share a start page,
-   Read the relevant pages from `/tmp/<YYMM>_pages/` to see which
+   Read the relevant pages from `/tmp/64er_<YYMM>_pages/` to see which
    article the figure actually sits on. The image may be on a later
    page of the article, not the start page.
 4. Fix wrong filenames with `git mv` when visual verification shows
@@ -73,7 +73,7 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
 
 The sub-agent must:
 
-1. Render the issue PDF to `/tmp/<YYMM>_pages/` at `-r 150` (once, up
+1. Render the issue PDF to `/tmp/64er_<YYMM>_pages/` at `-r 150` (once, up
    front).
 2. Generate `issues/<YYMM>/images.txt` worklist from the loose PNGs:
    ```bash

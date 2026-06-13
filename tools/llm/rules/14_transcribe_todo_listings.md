@@ -25,11 +25,11 @@ printed listing into the `<pre>` body.
 ## Cropping listing regions from the page scan
 
 Don't guess crop coordinates by trial-and-error. Use rule 0's
-"page block index" recipe to build `/tmp/p<NNN>_blocks.txt`, then
+"page block index" recipe to build `/tmp/64er_<YYMM>_p<NNN>_blocks.txt`, then
 grep for the `Listing` caption line:
 
 ```bash
-grep -i "listing" /tmp/p<NNN>_blocks.txt
+grep -i "listing" /tmp/64er_<YYMM>_p<NNN>_blocks.txt
 # → block=22 bbox=825x84+195+1955 text= Listing 1. Komprimierte Version ...
 ```
 
@@ -41,15 +41,15 @@ padding.
 
 One-shot crop:
 ```bash
-magick /tmp/<YYMM>_pages_300/p-NNN.png \
-  -crop <W>x<H>+<X>+<Y> +repage /tmp/listing.png
+magick /tmp/64er_<YYMM>_pages_300/p-NNN.png \
+  -crop <W>x<H>+<X>+<Y> +repage /tmp/64er_<YYMM>_listing.png
 ```
 
 ## Briefing for the sub-agent
 
 The sub-agent must:
 
-1. Render the issue PDF to `/tmp/<YYMM>_pages_300/p-NNN.png` at **`-r
+1. Render the issue PDF to `/tmp/64er_<YYMM>_pages_300/p-NNN.png` at **`-r
    300`** (higher resolution than the figure-placement pass — small
    monospace listing text needs every pixel).
 2. For every `<pre>TODO</pre>` placeholder in `issues/<YYMM>/*.html`:

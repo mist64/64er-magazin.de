@@ -140,12 +140,12 @@ hasn't been run yet (one-off table or listing OCR work):
 
 ```bash
 # render the page once
-mkdir -p /tmp/<YYMM>_pages_300
+mkdir -p /tmp/64er_<YYMM>_pages_300
 pdftoppm -r 300 issues/<YYMM>/64er_19XX-XX.pdf \
-  /tmp/<YYMM>_pages_300/p -png -f <N> -l <N>
+  /tmp/64er_<YYMM>_pages_300/p -png -f <N> -l <N>
 
 # tesseract TSV → blocks index
-tesseract /tmp/<YYMM>_pages_300/p-<NNN>.png /tmp/p<NNN>_ocr -l deu tsv
+tesseract /tmp/64er_<YYMM>_pages_300/p-<NNN>.png /tmp/64er_<YYMM>_p<NNN>_ocr -l deu tsv
 
 awk -F'\t' 'NR>1 && $1==5 && $12!="" {
   b=$3;
@@ -161,7 +161,7 @@ END {
       b, maxR[b]-minL[b], maxB[b]-minT[b], minL[b], minT[b],
       substr(text[b],1,200);
   }
-}' /tmp/p<NNN>_ocr.tsv | sort > /tmp/p<NNN>_blocks.txt
+}' /tmp/64er_<YYMM>_p<NNN>_ocr.tsv | sort > /tmp/64er_<YYMM>_p<NNN>_blocks.txt
 ```
 
 The output lines look like:
@@ -172,8 +172,8 @@ block=45 bbox=840x39+1321+3256 text= Tabelle 2. Hier die entwirrte ...
 
 Grep for the caption / heading / header text you need:
 ```bash
-grep -i "listing" /tmp/p<NNN>_blocks.txt
-grep -iE "tabelle|steckbrief" /tmp/p<NNN>_blocks.txt
+grep -i "listing" /tmp/64er_<YYMM>_p<NNN>_blocks.txt
+grep -iE "tabelle|steckbrief" /tmp/64er_<YYMM>_p<NNN>_blocks.txt
 ```
 
 Then read the `bbox=WxH+X+Y` and crop with `magick`. For listings
@@ -181,7 +181,7 @@ and tables, the caption block tells you the column (X, width W);
 the code/table region usually sits **above** in the same column —
 walk preceding blocks whose x-range overlaps to find its top edge.
 
-`/tmp/p<NNN>_blocks.txt` is scratch — never commit it.
+`/tmp/64er_<YYMM>_p<NNN>_blocks.txt` is scratch — never commit it.
 
 ## Cross-cutting rule: OCR cleanup granularity
 

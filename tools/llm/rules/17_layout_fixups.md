@@ -21,7 +21,7 @@ list, warning callouts.
 The sub-agent must:
 
 1. Render scans at 300 dpi if not already done: `pdftoppm -r 300
-   issues/<YYMM>/64er_19XX-XX.pdf /tmp/<YYMM>_pages_300/p -png`.
+   issues/<YYMM>/64er_19XX-XX.pdf /tmp/64er_<YYMM>_pages_300/p -png`.
 2. Walk every `<p>TODO …</p>` marker in `issues/<YYMM>/*.html`:
 
    | Marker | Action |

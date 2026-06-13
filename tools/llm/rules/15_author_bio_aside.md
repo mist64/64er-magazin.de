@@ -17,7 +17,7 @@ an inline `<img>`.
 
 The sub-agent must:
 
-1. Render the issue PDF to `/tmp/<YYMM>_pages/p-NNN.png` at `-r 150`
+1. Render the issue PDF to `/tmp/64er_<YYMM>_pages/p-NNN.png` at `-r 150`
    if not already done.
 2. Sweep every article in `issues/<YYMM>/*.html` for headings or
    paragraphs that look like an author bio: heading text in the set

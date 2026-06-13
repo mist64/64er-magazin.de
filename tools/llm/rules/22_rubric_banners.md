@@ -38,7 +38,7 @@ For each of the three rubrics:
    doesn't, skip the rubric and report N/A.
 2. **Render the start page** at 600 dpi for the banner crop:
    `pdftoppm -r 600 issues/<YYMM>/64er_19XX-XX.pdf
-   /tmp/<YYMM>_pages_600/p -png -f <START> -l <START>`.
+   /tmp/64er_<YYMM>_pages_600/p -png -f <START> -l <START>`.
 3. **Find and crop the banner** on the page (top of column for
    Bücher / top of page for Editorial / Fehlerteufelchen). Use rule
    0's "page block index" recipe + grep for the rubric name in the

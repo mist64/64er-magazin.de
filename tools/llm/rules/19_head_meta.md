@@ -27,7 +27,7 @@ article's category — the print is the source.
 The sub-agent must:
 
 1. Render scans at 300 dpi if not already done: `pdftoppm -r 300
-   issues/<YYMM>/64er_19XX-XX.pdf /tmp/<YYMM>_pages_300/p -png`.
+   issues/<YYMM>/64er_19XX-XX.pdf /tmp/64er_<YYMM>_pages_300/p -png`.
 2. Build article → start-page map from each file's
    `<meta name="64er.pages" content="N-M">`.
 3. Skip the rubrics: `editorial`, `impressum`, `inhalt`, `vorschau`
