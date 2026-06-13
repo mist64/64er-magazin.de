@@ -146,7 +146,105 @@
             2300 — 233D prüfen, ob Wählautomatik eingeschaltet ist.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>,2290   B1 63          LDA   (63),Y
+,2292   C9 31          CMP   #31
+,2294   F0 25          BEQ   22BB
+,2296   C9 32          CMP   #32
+,2298   F0 21          BEQ   22BB
+,229A   C9 33          CMP   #33
+,229C   F0 1D          BEQ   22BB
+,229E   C9 34          CMP   #34
+,22A0   F0 19          BEQ   22BB
+,22A2   C9 35          CMP   #35
+,22A4   F0 15          BEQ   22BB
+,22A6   C9 36          CMP   #36
+,22A8   F0 11          BEQ   22BB
+,22AA   C9 37          CMP   #37
+,22AC   F0 0D          BEQ   22BB
+,22AE   C9 38          CMP   #38
+,22B0   F0 09          BEQ   22BB
+,22B2   C9 39          CMP   #39
+,22B4   F0 05          BEQ   22BB
+,22B6   C9 30          CMP   #30
+,22B8   F0 03          BEQ   22BD
+,22BA   60             RTS
+---------------------------------
+,22BB   E9 0A          SBC   #0A
+,22BD   E9 26          SBC   #26
+,22BF   8D 58 23       STA   2358
+,22C2   4C 31 23       JMP   2331
+---------------------------------
+,22C5   8D 03 DD       STA   DD03
+,22C8   8D 01 DD       STA   DD01
+,22CB   A9 00          LDA   #00
+,22CD   8D 01 DD       STA   DD01
+,22D0   20 13 23       JSR   2313
+,22D3   A9 08          LDA   #08
+,22D5   8D 01 DD       STA   DD01
+,22D8   20 13 23       JSR   2313
+,22DB   A9 00          LDA   #00
+,22DD   8D 01 DD       STA   DD01
+,22E0   A2 20          LDX   #20
+,22E2   20 15 23       JSR   2315
+,22E5   AD 58 23       LDA   2358
+,22E8   AA             TAX
+,22E9   CA             DEX
+,22EA   8A             TXA
+,22EB   8D 58 23       STA   2358
+,22EE   D0 E3          BNE   22D3
+,22F0   A2 01          LDX   #01
+,22F2   20 15 23       JSR   2315
+,22F5   A2 01          LDX   #01
+,22F7   20 15 23       JSR   2315
+,22FA   A2 FF          LDX   #FF
+,22FC   20 15 23       JSR   2315
+,22FF   60             RTS
+---------------------------------
+,2300   48             PHA
+,2301   8A             TXA
+,2302   48             PHA
+,2303   98             TYA
+,2304   48             PHA
+,2305   AD 01 DD       LDA   DD01
+,2308   48             PHA
+,2309   AD 03 DD       LDA   DD03
+,230C   48             PHA
+,230D   20 90 22       JSR   2290
+,2310   4C 1E 23       JMP   231E
+---------------------------------
+,2313   A2 30          LDX   #30
+,2315   A0 FF          LDY   #FF
+,2317   88             DEY
+,2318   D0 FD          BNE   2317
+,231A   CA             DEX
+,231B   D0 F8          BNE   2315
+,231D   60             RTS
+---------------------------------
+,231E   68             PLA
+,231F   8D 03 DD       STA   DD03
+,2322   68             PLA
+,2323   8D 01 DD       STA   DD01
+,2326   68             PLA
+,2327   A8             TAY
+,2328   68             PLA
+,2329   AA             TAX
+,232A   68             PLA
+,232B   E8             INX
+,232C   C8             INY
+,232D   C0 28          CPY   #28
+,232F   60             RTS
+---------------------------------
+,2330   EA             NOP
+,2331   A9 00          LDA   #00
+,2333   8D 03 DD       STA   DD03
+,2336   AD 01 DD       LDA   DD01
+,2339   29 08          AND   #08
+,233B   F0 02          BEQ   233F
+,233D   60             RTS
+---------------------------------
+,233E   EA             NOP
+,233F   A9 08          LDA   #08
+,2341   4C C5 22       JMP   22C5</pre>
             <figcaption>Listing 1. Maschinenprogramm (Quellcode) für die Wählautomatik von »Proterm-64/XTW«</figcaption>
         </figure>
 
@@ -360,7 +458,28 @@
         <p>Nun ist es endlich so weit. Das Modem wird in den User-Port eingesteckt und der Rechner eingeschaltet. Laden Sie jetzt das kleine Basic-Programm »Modemtest« (Listing 2) und starten Sie es. Halten Sie den Digitaster auf der Platine gedrückt, und betätigen Sie gleichzeitig die Tasten auf dem C 64. Erscheinen die gedrückten Tasten auf dem Bildschirm, so haben Sie die Gewähr, daß zumindest das Modem-IC richtig angeschlossen ist. Der Digitaster (S1) ist ausschließlich für diesen Eigentest gedacht.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>10 REM       ****** MODEMTEST ********             <238>
+20 OPEN 1,2,0,CHR$(6+32+128)+CHR$(224)              <004>
+30 PRINT CHR$(14);CHR$(147);"(8SPACE)V24-M
+   ODEMEIGENTEST"                                   <025>
+40 GET A$:IF A$=""THEN 80                           <114>
+50 A%=ASC(A$):B%=0:IF A%<91 AND A%>64 THEN
+   B%=32                                            <204>
+60 IF A%=20 THEN A%=8                               <149>
+70 A%=A%+B%:PRINT#1,CHR$(A%);                       <066>
+80 GET#1,B$:IF B$=""THEN 40                         <002>
+90 B%=0:A%=ASC(B$):IF A%>91 AND A%<64 THEN
+   B%=128                                           <048>
+100 IF A%=96 THEN A%=A%-32                          <108>
+110 IF A%=8 THEN A%=20                              <024>
+120 A%=A%+B%:PRINT CHR$(A%);:GOTO 40                <086>
+130 REM IN ZEILE 1 WERDEN DIE                       <248>
+140 REM UEBERTRAGUNGSPARAMETER FEST-                <040>
+150 REM GELEGT 'CHR$(224)'                          <019>
+160 REM 300 BIT/S, 7 DATENBITS,                     <119>
+170 REM 2 STOPPBITS, VOLLDUPLEX,                    <154>
+180 REM KEIN HANDSHAKE, KEINE PARITY-               <090>
+190 REM PRUEFUNG UND 8. BIT=0                       <027></pre>
             <figcaption>Listing 2. Testprogramm für das Modem</figcaption>
         </figure>
 

@@ -61,13 +61,11 @@
 
         <p>Aufzählungstypen lassen sich sowohl als Indizes als auch als Komponenten verwenden:</p>
 
-        <p>TODO LISTING</p>
-
-        <p>TYPE TAG = (MO,DI,MI,DO,FR,SA,SO);<br>
-            UMSATZ = ARRAY [TAG] 0F REAL;<br>
-            WOCHE = ARRAY [-2..4] 0F TAG;<br>
-            VAR W: WOCHE;<br>
-            X: UMSATZ;</p>
+        <pre>TYPE TAG     = (MO,DI,MI,DO,FR,SA,SO);
+     UMSATZ  = ARRAY [TAG] OF REAL;
+     WOCHE   = ARRAY [-2..4] OF TAG;
+VAR  W: WOCHE;
+     X: UMSATZ;</pre>
 
         <p>Die Variable W ist ein Array mit sieben Komponenten, die alle vom Typ Real sind. Aufruf:<br>
             W[MO], W[DI], W[MI], W[D0], &hellip;.</p>
@@ -166,14 +164,81 @@
         <p>Der Array-Typ soll an zwei Programm-Beispielen demonstriert werden. Listing 1 zeigt einen einfachen Algorithmus zum Sortieren eines Arrays. Das Verfahren ist als Bubble-Sort bekannt und nicht besonders schnell. Jede Zahl wird mit der folgenden verglichen. Ist die folgende Zahl kleiner, werden die beiden Zahlen ausgetauscht. Dieses Verfahren wird so lange wiederholt, bis der Array sortiert ist.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>program bubble;
+const n=10;
+type vektor = array [1..n] of integer;
+var x : vektor;
+    i,c:integer;
+        b:boolean;
+begin
+(* 10 integer-werte werden in den array eingelesen *)
+writeln('bitte 10 integer-werte eingeben');
+for i:= 1 to 10 do begin
+   writeln(i,'-ter wert');
+   read(x[i])
+end;
+(*sortieren*)
+b:= true;
+while b do begin
+b:=false;
+for i:=1 to n-1 do begin
+  if x[i]>x[i+1] then begin
+   (*austausch*)
+   c:=x[i];
+   x[i]:=x[i+1];
+   x[i+1]:=c;
+   b:=true;
+(* b=true bedeutet, dass der austausch stattgefunden
+   hat. b wird erst dann false, wenn die folge sortiert ist *)
+  end;
+ end; (* for-schleife*)
+end; (* while-schleife*)
+(* ausgabe *)
+for i:= 1 to n do write (x[i]:6);
+writeln;
+writeln('minimum: ',x[1]);
+writeln('maximum: ',x[n]);
+end.</pre>
             <figcaption>Listing 1. Sortieren eines Arrays mit dem Bubble-Sort</figcaption>
         </figure>
 
         <p>Das Listing 2 zeigt, wie man eine positive, ganze Zahl in eine hexadezimale Zahl umwandeln kann. Die Komponenten des Arrays A können wegen der Modula-Division "A[I]: = X MOD 16" nur Werte zwischen 0 und 15 annehmen. Deshalb ist es (theoretisch) sinnvoll, die Variable A zu packen, um Speicherplatz zu sparen.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>program zahlenumwandlung;
+(* eine ganze positve zahl wird in eine
+   sedezimale zahl umgewandelt *)
+var x,y,i,j: integer;
+    a:packed array[1..20] of 0..15;
+begin
+  writeln('bitte postive ganze zahl eingeben');
+  READ(X);
+  while x>0 do begin
+i:=1;
+ repeat
+   y:=x div 16;
+   a[i]:=x mod 16;
+   i:=i+1;
+   x:=y;
+  until y=0;
+for j:=i-1 downto 1 do
+ begin
+  if a[j]>10 then
+   case a[j] of
+     10:write('a');
+     11:write('b');
+     12:write('c');
+     13:write('d');
+     14:write('e');
+     15:write('f')
+   end
+  else write(a[j]:1)
+end;
+writeln;
+writeln('bitte positve ganze zahl eingeben');
+read(x);
+end;
+end.</pre>
             <figcaption>Listing 2. Umwandlung von Zahlen in hexadezimale Form</figcaption>
         </figure>
 
@@ -282,7 +347,73 @@
         <p>Nun folgt ein ausführliches Programmbeispiel (Listing 3), das nochmals die Anwendung des Record-Typs zeigt. Eine Personalstatistik soll erstellt werden. Zunächst werden alle beschäftigten Personen erfaßt. Dann sucht das Programm die Namen der Personen, die älter als 40 Jahre sind und mehr als 20 Dienstjahre geleistet haben. Weiter interessiert, wieviel Frauen zu dieser Gruppe gehören.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>program personalstatistik;
+const jahr = 1986;
+type person=record
+              name : record
+                vorname:packed array[1..20] of char;
+                zuname: packed array[1..20] of char;
+              end;
+            adr:record
+                plz:1000..8999;
+                ort: packed array[1..30] of char;
+                str: packed array[1..30] of char;
+            end;
+            geburtsjahr:1900..jahr;
+            einstelljahr:1920..jahr;
+            geschlecht:(mann,frau);
+       end;
+var satz:array[1..100]of person;
+    i,j,x,y:integer;
+    c:packed array[1..20] of char;
+begin
+(* einlesen der personalsaetze*)
+i:=1;
+repeat
+writeln('vorname');
+writeln('eingabeende mit ''*''');
+readln(c);
+if c[1]<>'*' then begin
+ with satz[i] do begin
+  with name do begin
+   vorname:=c;
+   writeln('zuname ?');
+   readln(zuname);
+  end;
+  with adr do begin
+   writeln('plz? ort?');
+   readln(plz,ort);
+   writeln('strasse');
+   readln(str);
+  end;
+  writeln('geburtsjahr ? einstelljahr');
+  readln(geburtsjahr, einstelljahr);
+  writeln('geschlecht ? 0:mann 1:frau');
+  readln(j);
+  case j of
+   0:geschlecht:=mann;
+   1:geschlecht:=frau;
+  end;
+ end;
+i:=i+1;
+end;
+until (c[1]='*') or (i>100);
+(* ausgabe der personen, die aelter als 40 jahre sind
+   und mehr als 20 dienstjahre geleistet haben*)
+x:=0;
+y:=0;
+writeln('gesamtzahl der beschaeftigten: ',i-1);
+writeln('liste der personen, die aelter als 40 jahre sind');
+writeln('und mehr als 20 dienstjahre geleistet haben');
+for j:= 1 to i-1 do
+ with satz[j],name do
+  if (jahr-geburtsjahr>40) and (jahr-einstellungsjahr>20) then begin
+     writeln(zuname,' ',vorname);
+     x:=x+1;
+     if geschlecht=frau then y:=y+1;
+  end;
+writeln(x,' personen, davon ',y,' frauen')
+end.</pre>
             <figcaption>Listing 3. Auswertung einer Personalstatistik</figcaption>
         </figure>
 

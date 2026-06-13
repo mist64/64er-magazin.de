@@ -202,7 +202,97 @@
         <p>Als Beispiel für ein Programm mit solchen Modulen ist nachstehend das Listing »2D-FUNKTIONEN« (Listing 4) abgedruckt:</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>10 CLR : TRAP 650
+20 REM ******************************
+   ************************
+30 REM *
+                              *
+40 REM *      GRAFISCHE DARSTELLUNG BELIEBI
+   GER 2D-FUNKTIONEN              *
+50 REM *
+                              *
+60 REM *               HEIMO PONNATH   HAMBURG
+   1985                           *
+70 REM *
+                              *
+80 REM ******************************
+   ************************
+90 COLOR 0,1: COLOR 1,8: COLOR 4,1: COLOR 5,
+   2: COLOR 6,1: Z1=250
+95 GRAPHIC 1,1: GRAPHIC 5,1
+100 BANK 15: SYS 65520,,10,15: PRINT "GRAFIS
+    CHE DARSTELLUNG BELIEBIGER 2D-FUNKTIONEN
+    "
+110 BANK 15: SYS 65520,,15,10: PRINT "DIESE
+    FUNKTION IST PROGRAMMIERT:": K=1: GOSUB
+    250
+120 PRINT : PRINT "Y = F(X) ="F$: PRINT : PR
+    INT ,"SOLLS EINE ANDERE SEIN (J/N) ?";
+130 GET A$: IF A$<>"J" AND A$<>"N" THEN 130
+140 IF A$="N" THEN 240
+150 FOR I=1 TO 18: PRINT CHR$(27)+"Y": NEXT
+    I: BANK 15: SYS 65520,,10,10
+160 REM ***** MODUL ZEILEN EINFUEGEN *****
+170 PRINT "WELCHE FUNKTION ?": PRINT
+180 INPUT "Y = F(X) =";F$: FAST
+190 PRINT CHR$(147) CHR$(17) CHR$(144)
+200 PRINT Z1"F$=" CHR$(34)F$ CHR$(34)
+210 PRINT Z1+10"DEF FN F(X)="F$
+220 PRINT "RUN"Z1-10 CHR$(19);
+230 BANK 0: POKE 842,13: POKE 843,13: POKE 8
+    44,13: POKE 208,3: END
+240 PRINT CHR$(147) CHR$(5): SLOW : K=0
+250 F$="EXP(COS(1/X))"
+260 DEF FN F(X)=EXP(COS(1/X))
+270 IF K=1 THEN RETURN
+280 REM ***** MODUL TRANSFORMATION *****
+290 PRINT CHR$(17) CHR$(17)"SYSTEMGRENZWERTE
+    :" CHR$(17)
+300 INPUT "XU,XO,YU,YO=";XU,XO,YU,YO
+310 SX=319/(XO-XU): SY=-199/(YO-YU): TX=-XU*
+    SX: TY=-YO*SY
+320 DEF FN TX(X)=SX*X+TX
+330 DEF FN TY(Y)=SY*Y+TY
+340 REM ***** ZEICHNEN DES KOORDINATENSYSTEM
+    S *****
+350 GRAPHIC 1: COLOR 1,12
+360 IF (XO-XU)>30 THEN 420: ELSE BEGIN
+370 : FOR X=INT(XU) TO INT(XO)
+380 : : IF X=0 THEN 400
+390 : : DRAW 1,FN TX(X),FN TY(YU) TO FN TX(X
+    ),FN TY(YO)
+400 : NEXT X
+410 BEND
+420 IF (YO-YU)>30 THEN 480: ELSE BEGIN
+430 : FOR Y=INT(YU) TO INT(YO)
+440 : : IF Y=0 THEN 460
+450 : : DRAW 1,FN TX(XU),FN TY(Y) TO FN TX(X
+    O),FN TY(Y)
+460 : NEXT Y
+470 BEND
+480 COLOR 1,3: WIDTH 2
+490 DRAW 1,FN TX(XU),FN TY(0) TO FN TX(XO),F
+    N TY(0)
+500 DRAW 1,FN TX(0),FN TY(YU) TO FN TX(0),FN
+    TY(YO)
+510 WIDTH 1
+520 REM ***** ZEICHNEN DER FUNKTION *****
+530 COLOR 1,6: LOCATE FN TX(XU),FN TY(FN F(X
+    U))
+540 FOR X=XU TO XO STEP 1/SX
+550 : Y=FN F(X)
+560 : IF FN TY(Y)<0 OR FN TY(Y)>199 THEN 610
+570 : DRAW  TO FN TX(X),FN TY(Y)
+580 NEXT X
+590 CHAR 1,0,0,"Y="+F$,1
+600 END
+610 IF FN TY(Y)>199 THEN LOCATE FN TX(X+1/SX
+    ),FN TY(YU): ELSE BEGIN
+620 : LOCATE FN TX(X+1/SX),FN TY(YO)
+630 BEND
+640 GOTO 580
+650 REM ***** FEHLERBEHANDLUNG *****
+660 IF ER=14 THEN RESUME 580</pre>
             <figcaption>Listing 4. »2D-FUNKTIONEN« — Programm zur grafischen Darstellung von zweidimensionalen Funktionen</figcaption>
         </figure>
 
@@ -225,7 +315,14 @@
             3) Einbau und Verwendung des Moduls:</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>10 REM ***** MODUL TRANSFORMATION *****
+20 PRINT CHR$(147) CHR$(17)"SYSTEMGRENZWERTE
+   :"
+30 INPUT "XU,XO,YU,YO=";XU,XO,YU,YO
+40 SX=319/(XO-XU): SY=-199/(YO-YU): TX=-XU*S
+   X: TY=-YO*SY
+50 DEF FN TX(X)=SX*X+TX
+60 DEF FN TY(Y)=SY*Y+TY</pre>
             <figcaption>Listing 5. »TRANSFORM MOD« - Programm-Modul zur Transformation beliebiger Koordinatensysteme in das Bildschirmsystem</figcaption>
         </figure>
 
