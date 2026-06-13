@@ -27,6 +27,68 @@ Diagnostic test before every change: **count characters.** Same
 count, different glyph at one position → OCR; fix. Different count
 → either a real OCR add/drop (rare) or a print typo (leave alone).
 
+## Mandatory pre-fix check: `pdftotext` cross-check
+
+Before applying **any** word-level candidate in Pass 1, Pass 2, or Pass 3,
+run a one-line `pdftotext` query on the article's page to confirm that
+the print does NOT carry the same anomaly. The PDF's embedded text layer
+(or in its absence, pdftotext's own extraction) is the closest
+machine-readable proxy for the print's actual letterforms — closer than
+our HTML, which has been through Tesseract.
+
+```bash
+pdftotext -layout -f <page> -l <page> issues/<YYMM>/64er_19xx_xx.pdf - \
+  | grep -i '<candidate-word>'
+```
+
+Decision rule:
+
+- If `pdftotext` shows the **same** word/non-word/weird capitalisation
+  that's in the HTML → **the print IS that word**. It's a print typo.
+  **Do not touch.**
+- If `pdftotext` shows a **different** word that matches the proposed
+  fix → the print has the correct word, the HTML carries an OCR error,
+  **apply the fix**.
+
+Use `-layout` rather than the default reflowed mode for compound
+words and jammed-together tokens: the default reflow can fabricate
+spaces across column breaks and mislead the operator into thinking
+print has a space where it doesn't.
+
+### Anti-pattern: "it's not a German word, so it must be OCR"
+
+This is the trap that produced the 8607/21 `internsiv` regression. The
+1986 magazine **has print typos**, including non-words. The fact that
+a token isn't in the German dictionary is **not** evidence that the
+HTML is wrong — it is, at best, a signal worth checking. The decision
+between "fix" and "leave" is always made by `pdftotext` cross-check,
+never by dictionary lookup alone.
+
+Canonical example to remember:
+
+- **`internsiv`** in `issues/8607/21 Die Würfel sind gefallen.html`
+  on page 176. Pass 1 candidate `internsiv` → `intensiv` looks
+  irresistible. `pdftotext -f 176 -l 176 issues/8607/64er_1986-07.pdf -`
+  shows `64'er sehr internsiv lesen`. The magazine printed
+  `internsiv`. **Do NOT fix.**
+
+The same applies to jammed-together compounds. 8607/33's `Derdritte`
+and `angeschlossenwerden`, 8607/28's `aufgebautwerden`, 8607/49's
+`kannjetztzwischendeneinzelnen`, and 8607/139's `Akkumulatorl)` were
+all proposed Pass 1/Pass 3 fixes that `pdftotext -layout` confirms
+exist in the print verbatim. They are print typos. Leave them.
+
+### Verification step at the end of every Pass 1 / Pass 2 / Pass 3 candidate
+
+```bash
+pdftotext -layout -f <page> -l <page> issues/<YYMM>/64er_19xx_xx.pdf - \
+  | grep -i '<word>'
+```
+
+If grep returns the word as it appears in the HTML → leave it. Only
+when grep is silent (or returns the proposed corrected form) is the
+fix authorised.
+
 ## Pass 1 — line-break hyphen artifacts
 
 Find every `X-y` token where the second half starts lowercase:
