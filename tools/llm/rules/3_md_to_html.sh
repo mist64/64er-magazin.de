@@ -12,11 +12,16 @@ out="${md%.md}.html"
 tmp=$(mktemp)
 LC_ALL=C sed -e '1s/^\xEF\xBB\xBF//' "$md" > "$tmp"
 markdown -G \
-  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode' \
+  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty' \
   "$tmp" > "$out"
 # +autolink is intentionally omitted: 1986 magazine text never has real
 # URLs, but Discount's autolinker wraps `news:`, `tel:`, `fax:`, etc.
 # in <a href="…"> as false positives (rule 26).
+# -smarty disables Discount's smartypants substitutions: `(C)` → ©,
+# `(R)` → ®, `(TM)` → ™, plus quote curling. In 64'er text `(C)` is
+# body content (math like `SIN(C)*USR(A)`, curve labels like `Kurve (C)`),
+# never a copyright sign. Legitimate © (e.g. Impressum) stays via its
+# UTF-8 character.
 rm -f "$tmp"
 echo "wrote $out  ($(wc -l < "$out") lines)"
 # Replace the .md with the .html in git: drop the source, stage the result.
