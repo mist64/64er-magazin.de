@@ -120,6 +120,20 @@ When the completion notification arrives:
   orchestrator to make the call (or ask the user) and re-dispatch —
   not to accept the half-finished state.
 
+## Per-rule constraints the orchestrator must enforce
+
+- **Rule 5 (split): paired articles never get split.** Two h1-style
+  banners on non-adjacent pages can belong to one editorial unit (same
+  product/topic, same author, overview + deep-dive). The merged file
+  carries two `<p class="intro">`, two `<address class="author">`, and
+  a comma-joined `<meta name="64er.pages">`. See the *Paired articles
+  — never split* section in `tools/llm/rules/5_split.md` for the
+  signals, the merged-HTML shape, canonical examples in
+  `issues/8607/`, and the verification one-liner. Before dispatching
+  rule 5 (or any earlier rule that produces the consolidated `.md`),
+  brief the sub-agent on this constraint so it doesn't re-introduce a
+  second `<h1>` based on the printed banner alone.
+
 ## Cross-cutting recipe: page block index (blocks.txt)
 
 Several rules (12 place_images, 13 fill_tables, 14 transcribe_listings,
