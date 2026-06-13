@@ -108,3 +108,22 @@ match an article, they get reported, not placed.
 - The `.D64` images aren't in the repo. Pass the absolute path on the
   command line every time; do not copy the disk image into the issue
   directory.
+- **Non-V2 BASIC dialects need a re-decode.** `tools/prg_links.sh`
+  petcat-detokenises every `.prg` with default V2 mode. If the
+  source program uses Simons' BASIC, Final Cartridge BASIC, Speech
+  BASIC, Mighty BASIC, etc. (any of the `petcat -<dialect>` flags),
+  the extension tokens come out as garbled bytes
+  (`($64){CTRL-A}1,6` instead of `hires1,6`). The figcaption is the
+  signal — when the print says "mit Simons-Basic" / "Final
+  Cartridge" / etc., re-decode the `.prg` via the dialect flag:
+  ```bash
+  petcat -simon -- "issues/<YYMM>/prg/del/<name>.prg" \
+    > "issues/<YYMM>/prg/<name>.txt"
+  ```
+  Then add `;version=<dialect>` (`;version=simons`, `;version=f` for
+  Final Cartridge, etc.) as the SECOND line of the .txt, right after
+  the `;<file>.prg ==ADDR==` opener. The generator uses that tag to
+  pick the right tokeniser when materialising the binary download.
+  Existing examples: `issues/8412/prg/simons-axo.txt`,
+  `issues/8510/prg/xref simons bas..txt`. Full dialect list:
+  `petcat -help | grep -E "Basic v[0-9]"`.
