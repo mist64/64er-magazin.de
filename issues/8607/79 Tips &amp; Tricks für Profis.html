@@ -20,7 +20,7 @@
 <body>
     <article>
         <h1>Tips &amp; Tricks für Profis</h1>
-        <p class="intro">Diesmal sollen vor allem die Schachspieler unter den C 64-Fans mit einem äußerst nützlichen Programm bedacht werden. Weiterhin bringen wir zwei Tips zum Thema »Basic-Tokens«, eine Disketten-Refor-mat-Routine als Dreizeiler (!) und viele weitere Aha-Erlebnisse für Profis.</p>
+        <p class="intro">Diesmal sollen vor allem die Schachspieler unter den C 64-Fans mit einem äußerst nützlichen Programm bedacht werden. Weiterhin bringen wir zwei Tips zum Thema »Basic-Tokens«, eine Disketten-Reformat-Routine als Dreizeiler (!) und viele weitere Aha-Erlebnisse für Profis.</p>
 
         <p>In der letzten Ausgabe fragten wir Sie, warum der Einzeiler</p>
 
@@ -28,13 +28,13 @@
 
         <p>keinen »too many files«-, sondern einen »next without for«-Error zur Folge hat. Haben Sie es erraten?</p>
 
-        <p>Der Grund liegt in der Sekundäradresse 2 des OPEN-Befehls. Sie besagt: »RS232-Kanal öffnen«. Undwennmanjetzt noch weiß, daß nach einem solchen OPEN-Befehl automatisch sämtliche Variablen, Rücksprungadressen für GOSUBs und FOR-NEXT-Schleifen gelöscht werden, hat man die Lösung schon. Der C 64 reserviert sich am Ende des Basic-Speichers etwas Platz für einen RS232-Puffer. Und sicherheitshalber löscht er dabei den kompletten Variablenspei-cher.</p>
+        <p>Der Grund liegt in der Sekundäradresse 2 des OPEN-Befehls. Sie besagt: »RS232-Kanal öffnen«. Und wenn man jetzt noch weiß, daß nach einem solchen OPEN-Befehl automatisch sämtliche Variablen, Rücksprungadressen für GOSUBs und FOR-NEXT-Schleifen gelöscht werden, hat man die Lösung schon. Der C 64 reserviert sich am Ende des Basic-Speichers etwas Platz für einen RS232-Puffer. Und sicherheitshalber löscht er dabei den kompletten Variablenspeicher.</p>
 
-        <p>Also: Beim Schreiben von Programmen, die RS232-Rou-tinen verwenden, immer darauf achten, daß der entsprechende OPEN-Befehl in der ersten Zeile des Programms steht! (tr)</p>
+        <p>Also: Beim Schreiben von Programmen, die RS232-Routinen verwenden, immer darauf achten, daß der entsprechende OPEN-Befehl in der ersten Zeile des Programms steht! (tr)</p>
 
         <h2>Tokens im Klartext</h2>
 
-        <p>1 P0KE769,177:FORI=lT076:P0KE73,255:P0KE781,I:SYS42794: PRINT, :NEXT:P0KE769,227</p>
+        <p>1 POKE769,177:FORI=1TO76:POKE73,255:POKE781,I:SYS42794: PRINT, :NEXT:POKE769,227</p>
 
         <p>Dieser Einzeiler gibt sämtliche Basic-Befehle auf dem Bildschirm aus.</p>
 
@@ -66,7 +66,7 @@
         <p>Besitzer eines Star SG-10 mit original Star-Interface (Revision 2.2) werden Probleme haben, Umlaute über Vizawrite auszudrucken. Diese sind nämlich in der Größe vertauscht. Das heißt ein »ä« auf dem Bildschirm wird zum Beispiel zum »Ä« auf dem Drucker. Mit einem kleinen Trick kann hier Abhilfe geschaffen werden: Dazu wird zuerst Vizawrite geladen. Dann gibt man im Direktmodus folgende Befehle ein:<br>
             open 4,4,25:print#4 (return)</p>
 
-        <p>Eine Sekundäradresse 5 bewirkt, daß die Zeichen unbeeinflußt vom Interface zum Drucker übertragen werden. 5 + 20 verriegelt das Interface, und nur durch Ausschalten wird es wieder freigegeben. Nun kann Vizawrite mit »RUN« gestartet werden. In den »Print Options« muß jedoch der Punkt »Printer Type« geändert werden: Statt »v« (für Commodore-Drucker) wird hier nun ein »a« (für ASCII-Druk-ker) eingetragen. Jetzt funktioniert alles ordnungsgemäß.</p>
+        <p>Eine Sekundäradresse 5 bewirkt, daß die Zeichen unbeeinflußt vom Interface zum Drucker übertragen werden. 5 + 20 verriegelt das Interface, und nur durch Ausschalten wird es wieder freigegeben. Nun kann Vizawrite mit »RUN« gestartet werden. In den »Print Options« muß jedoch der Punkt »Printer Type« geändert werden: Statt »v« (für Commodore-Drucker) wird hier nun ein »a« (für ASCII-Drucker) eingetragen. Jetzt funktioniert alles ordnungsgemäß.</p>
 
         <address class="author">(Stefan Paul/tr)</address>
 
@@ -84,7 +84,7 @@
 
         <p>Tippen Sie folgendes ein:</p>
 
-        <p>10 S=54272: P0KES+24,15: POKES+1,110: POKES+5,9: POKES+6,9 POKES+4,17:POKES+4,16</p>
+        <p>10 S=54272: POKES+24,15: POKES+1,110: POKES+5,9: POKES+6,9 POKES+4,17:POKES+4,16</p>
 
         <p>Nach »RUN« werden sie einen kurzen Ton hören, der dem eines Klaviers ähnlich ist. Tippen Sie noch folgendes dazu ein:</p>
 
@@ -94,7 +94,7 @@
 
         <p>Übrigens: mit zwei POKEs kann man die Restore-Taste als Reset-Taster mißbrauchen.</p>
 
-        <p>POKE 792,226:P0KE 793,252</p>
+        <p>POKE 792,226:POKE 793,252</p>
 
         <p>Sie eignen sich auch als einfacher Programmschutz.</p>
 
@@ -119,11 +119,11 @@
 
         <h2>Reformat als Dreizeiler</h2>
 
-        <p>Bei der Formatierung ohne ID werden nur die Bam und der Block 18/1 gelöscht. DerBlock 18/1 zeigt im Normalfall immer auf den Block 18/4, bei dem das Directory fortgesetzt wird. Wenn man auf die ersten acht Einträge verzichtet, kann man zumindest den Rest retten (bei 144 Einträgen immerhin 136).</p>
+        <p>Bei der Formatierung ohne ID werden nur die Bam und der Block 18/1 gelöscht. Der Block 18/1 zeigt im Normalfall immer auf den Block 18/4, bei dem das Directory fortgesetzt wird. Wenn man auf die ersten acht Einträge verzichtet, kann man zumindest den Rest retten (bei 144 Einträgen immerhin 136).</p>
 
-        <p>10 0PEN1,8,15:0PEN2,8,2, " # ":PRINT#1, "Ul 2 0 18 1"<br>
+        <p>10 OPEN1,8,15:OPEN2,8,2, " # ":PRINT#1, "U1 2 0 18 1"<br>
             20 PRINT#1, "M-W"CHR$(0)CHR$(5)CHR$(2)CHR$(18)CHR$(4)<br>
-            30 PRINT#1, "U2 2 0 18 1" :PRINT#1, "V":CL0SE2:CL0SEl<br>
+            30 PRINT#1, "U2 2 0 18 1" :PRINT#1, "V":CLOSE2:CLOSE1<br>
             Das Programm ändert die Zeiger des ersten Directory-Blocks, die danach wieder auf den Block 18/4 zeigen. Jetzt sind wieder, bis auf acht, alle Programme vorhanden. Schreibzugriffe jedoch könnten die Programme zerstören. Deshalb wird nun noch die Diskette validiert. Beim Validieren werden die Programme als belegt gekennzeichnet und sind somit vor dem Überschreiben geschützt.</p>
 
         <p>Hinweis: Das Programm kann nur Directories retten, bei denen der Track 18 zuvor nicht beschädigt oder zerstört war!</p>
@@ -172,7 +172,7 @@
 
         <p>Beim Montieren unserer Ausgabe 6/86 sind im Listing »Shades« auf Seite 173 zwei Druckseiten versehentlich vertauscht worden. Deshalb sind zwei Reihen von MSE-Daten einem anderen Programm entnommen. Wir bitten Sie, dies zu entschuldigen.</p>
 
-        <p>Im untenstehenden Listing 4 finden Sie die richtigen Teile des Programms. Falls Sie die vertauschte Version schon eingegeben haben, benutzen Sie diese zusammen mit dem MSE und der »GTRL-N«-Funktion,um die Zeilen neu einzugeben. Sie müssen lediglich die hier abgedruckten Daten neu eingeben. Achten Sie bitte auch auf die richtigen Programmadressen beim Eintippen. ' (tr)</p>
+        <p>Im untenstehenden Listing 4 finden Sie die richtigen Teile des Programms. Falls Sie die vertauschte Version schon eingegeben haben, benutzen Sie diese zusammen mit dem MSE und der »CTRL-N«-Funktion,um die Zeilen neu einzugeben. Sie müssen lediglich die hier abgedruckten Daten neu eingeben. Achten Sie bitte auch auf die richtigen Programmadressen beim Eintippen. ' (tr)</p>
 
         <figure>
             <pre>0A01 : 24 22 1E E9 E7 DD 8E BA   B8
