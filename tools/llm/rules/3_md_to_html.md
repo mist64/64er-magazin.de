@@ -49,3 +49,14 @@ grep -c '<br'           issues/8607/8607.html             # >0 (intra-paragraph 
 - `==highlight==` isn't part of standard GFM and is not in Discount's flag list.
   If it ever appears in a `.md`, this script ignores it; add a post-pass at
   that point.
+- `+autolink` is intentionally omitted: 1986 magazine text never has real URLs,
+  but Discount's autolinker wraps `news:`, `tel:`, `fax:`, etc. in `<a href="…">`
+  as false positives (rule 26).
+- `-smarty` (leading minus = disable) suppresses Discount's smartypants
+  substitutions: `(C)` → ©, `(R)` → ®, `(TM)` → ™, plus quote curling
+  (`"x"` → "x"). In 64'er articles, `(C)` is body text — math formulas like
+  `SIN(C)*USR(A)` (8607/139), curve labels like `Dämpfung (C)` and
+  `(Kurve A) und größeren (C) Frequenzen` (8607/133), printed messages like
+  `DATA ERZEUGER FERTIG! (C) J. MATERNA` (SH8501/32). The Impressum's
+  legitimate `© 1986 Markt & Technik` carries the actual UTF-8 `©`
+  character, not the typed sequence `(C)`, so it is unaffected.
