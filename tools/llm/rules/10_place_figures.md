@@ -109,6 +109,17 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
     Drucker) has sub-sections `Text via RS232 senden`,
     `Der Zeichensatz-Editor`, `Editor`, `Hauptmenü` — all parts of
     ONE driver suite → all 6 listings belong at end.
+  - **Within a tip section, listing goes AFTER the byline at the
+    very end of that section**, never between body paragraphs.
+    Pattern: tip body prose → `<address class="author">(byline)</address>`
+    → `<figure>` listing + `<div class="binary_download">` companions
+    → next sub-section's `<h2>`. Don't break the body prose by
+    sticking the listing inline near the first `(Listing N)`
+    reference, even when the body refers to it inline — keep the
+    body block intact and append the listing after the byline.
+  - **At article scope, byline ends the prose, listings follow.**
+    Same shape: body → byline → listings → (Fehlerteufelchen aside
+    if present) → `</article>`.
 - **Disk variants of the same program** (e.g. two load-address builds
   of the same BLOCK routine): the printable source goes in the
   `<figure>`; each variant's binary download goes as a sibling
