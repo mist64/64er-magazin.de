@@ -38,3 +38,13 @@ No cells were marked `[ILLEGIBLE]`. All cell values were verified against the pr
 
 - `139 Von Basic zu Assembler.html` — Tabelle 1 row "Indirekt | 3 | JMP($,4301)" preserves the printed comma inside the parenthesis (likely a typesetting error in the magazine; kept as-is).
 - `89 Newsroom druckt deutsch.html` — Tabelle row "eck. Klammer l." uses lowercase `l` (the print shows lowercase L, not capital I); the previous HTML had `I` which was wrong.
+
+## Structural-elements audit sweep (post-rule-13)
+
+Audited every 8607 article for printed structural elements (Bild N., Tabelle N., Listing N., STECKBRIEF) that exist on the page but were absent in HTML.
+
+- `142 Neues zum Thema Sortieren.html` — added three `<figure>` blocks for `Bild 1. So sind dreidimensionale Felder im Computer angeordnet`, `Bild 2. So werden Feldelemente gerne vom Benutzer angeordnet, um einen einfachen Zugriff zu erreichen`, and `Bild 3. Würde man die Kartei von Bild 2 nach dem computerinternen Standard der Feldanlage sortieren, so könnte zum Beispiel folgendes passieren:` from print page 142 (mid-/right-column boxes). Emitted as `<pre>` inside `<figure>` because each Bild is a structured pseudo-code-style listing of array indices (Bild 1: linear storage order; Bild 2: hierarchical Eintrag groupings; Bild 3: re-sorted Kartei). Print uses `…` to indicate row elisions — preserved verbatim.
+
+## Deferred audit findings (not extracted)
+
+- `49 Variosystem.html` — print page 49 has `Bild 1. Gregor Neumann (Variowrite) Bild 2. Thomas Kruse (Varioprint)` as a shared caption beneath the two author portraits in the top-right of the article. The article HTML already labels the Varioprint Hauptmenü screenshot as Bild 1 and the Variowrite Zeichensatz-Editor as Bild 2 (matching the print's renumbering on p56/p58). Adding the portrait captions as additional Bild 1/2 would create a duplicate-numbering conflict that the print itself contains. Left untouched: the portrait images are already placed inside `<aside>` C.A.C. author-bio sidebars with `<address class="author">` naming the subject.
