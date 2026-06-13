@@ -38,16 +38,27 @@ leaves WITHOUT a label prefix:
   der deutschen Bevölkerung im Statistischen Jahrbuch 1985<br>
   Herausgegeben vom Statistischen Bundesamt, Wiesbaden, Verlag W.
   Kohlhammer, Mainz") — implicit `Literatur:` reference.
+
+**Implicit footers that DO NOT qualify** — these structurally look
+like multi-line address blocks (and tempt the import pipeline to
+tag them) but are body content of the article itself, not a pointer
+footer. Leave as plain `<p>`:
+
 - A **contest entry address** ("Die Antworten auf alle drei Fragen
   senden Sie bitte auf einer Postkarte an:<br>Markt&Technik AG<br>
   …") — even though structurally a multi-line address block, this
   is **body content of the contest itself** (the article IS the
-  contest), not a reference / vendor footer. **Leave as plain
-  `<p>`**, same pattern as Fehlerteufelchen Bezugsquellen.
-- A multi-line **vendor address block** without prefix ("Power
-  Cartridge:<br>Kolff Computer Supplies bv, …<br>Lindy Elektronik
-  GmbH, …<br>The Final Cartridge:<br>H + P Computers, …") — common
-  in Fehlerteufelchen Bezugsquellen lists.
+  contest), not a reference / vendor footer. Same pattern as
+  Fehlerteufelchen Bezugsquellen (next bullet).
+- A **Fehlerteufelchen Bezugsquellen / vendor-address list inside a
+  correction** ("Hier sind die fehlenden Bezugsquellen.<br>Power
+  Cartridge:<br>Kolff Computer Supplies bv, …<br>The Final
+  Cartridge:<br>H + P Computers, …") — even though structurally a
+  multi-line vendor address block, this is **body content of the
+  correction itself**: the very purpose of the Fehlerteufelchen
+  entry is to publish the addresses the original article omitted.
+  The addresses ARE the correction. Same pattern as the
+  contest-entry-address case above. NOT `<p class="source">`.
 - A `(byline)`-like signature line printed in source-style typography
   is NOT `<p class="source">` — it's `<address class="author">`.
 
@@ -210,3 +221,11 @@ PY
   `Preis:` appear as four short footer lines), tag all four as
   `<p class="source">` — they collectively form the book's
   bibliographic reference.
+- **Fehlerteufelchen Bezugsquellen — history of toggling.** The
+  vendor-address block in 8607's `84 Fehlerteufelchen.html` was
+  toggled twice during 8607 work: a7cfd7bd3 added `class="source"`
+  → da95ac771 added the rule-update + revert → ed32cf29e re-added
+  → now reverted permanently. Policy is final: a Bezugsquellen /
+  vendor-address list inside a Fehlerteufelchen correction is body
+  content of the correction (the addresses ARE the correction);
+  leave as plain `<p>`. Future passes must not re-add the class.
