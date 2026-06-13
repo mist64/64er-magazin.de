@@ -27,9 +27,51 @@ Diagnostic test before every change: **count characters.** Same
 count, different glyph at one position → OCR; fix. Different count
 → either a real OCR add/drop (rare) or a print typo (leave alone).
 
+## OCR vs print typo: character-count heuristic
+
+**The rule.** OCR is a character-level substitution / spacing
+operation: glyph confusion, line-break hyphen artifacts, lost
+spaces. It does NOT add or drop letters. If a candidate has the
+wrong number of letters compared to the German-correct form,
+that's a print typo, not OCR. **Leave it.** Apply this heuristic
+FIRST; if the candidate fails it, skip — don't even run `pdftotext`.
+
+**Valid OCR fixes** (same character count, or pure spacing / hyphen):
+
+- `Druk-ker` → `Drucker` (old German line-break `ck` → `k-k`)
+- `Uer` → `Ver`, `Uor` → `Vor` (U ↔ V)
+- `0` ↔ `O`, `1` ↔ `l`/`I` (digit/letter glyph confusion)
+- `Ghrom` → `Chrom` (G ↔ C)
+- `Pmsel` → `Pinsel` (`m` ↔ `in` ligature break)
+- `ausjedenfalls` → `aus jedenfalls` (lost space)
+- `C 64II` → `C 64 II` (lost space)
+- `Sinclair-Com-puter` → `Sinclair-Computer` (trailing line-break
+  hyphen drops; leading compound hyphen stays)
+
+**NOT OCR (leave alone)** — character counts disagree:
+
+- `internsiv` (extra `r` vs `intensiv`) — canonical 8607/21 example
+- `Akkumulatorl)` (extra trailing `l`) — 8607/139
+- `Prinzessinen` (missing `n`), `Anwätte` (`lt` ↔ `tt`),
+  `Egentlich` (missing `i`), `Löewe` (extra `e`)
+- `muß`, `daß`, `Adreß` (old German spelling, not a typo)
+
+**Compound-hyphen note.** For `X-Y-z` where final `z` starts
+lowercase, only the LAST hyphen is the OCR line-break; keep
+leading compound hyphens. `Sinclair-Com-puter` →
+`Sinclair-Computer` (NOT `SinclairComputer`).
+
+**Lost-space heuristic.** A lowercase→capital boundary inside a
+word (`derComputer`), or concatenated short German words
+(`derComputerdabeiist`), are lost spaces from OCR — DO fix those.
+The rejoined form matches the German letter count; only spacing
+changed.
+
 ## Mandatory pre-fix check: `pdftotext` cross-check
 
-Before applying **any** word-level candidate in Pass 1, Pass 2, or Pass 3,
+This is the **second** gate. The character-count heuristic above is
+the first; only candidates that survive it reach this step. Before
+applying **any** word-level candidate in Pass 1, Pass 2, or Pass 3,
 run a one-line `pdftotext` query on the article's page to confirm that
 the print does NOT carry the same anomaly. The PDF's embedded text layer
 (or in its absence, pdftotext's own extraction) is the closest
@@ -233,6 +275,16 @@ The sub-agent must:
 6. **Do not commit.** Return a per-article fix count + sample
    substitutions per article (no need to list every fix — the count
    + 5-10 samples is enough for the orchestrator to spot-check).
+
+For **every** candidate in Pass 1 / Pass 2 / Pass 3 the decision
+procedure is:
+
+1. **Character-count heuristic** (see section above). If the
+   candidate would add or drop letters vs the German-correct form,
+   it's a print typo. Skip — do not even run `pdftotext`.
+2. **`pdftotext` cross-check** (see mandatory pre-fix check). Only
+   if step 1 says "looks like OCR" does the agent run the
+   `pdftotext` grep and decide fix vs skip from its output.
 
 The sub-agent should explicitly NOT touch `<address class="author">`,
 `<pre>`, `<code>`, or `<meta>` content. Body `<p>`, `<h1>`/`<h2>`,
