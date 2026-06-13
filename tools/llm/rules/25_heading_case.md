@@ -84,8 +84,12 @@ For every article HTML in `issues/<YYMM>/*.html`:
    `16 DER C 64 IN FORSCHUNG UND TECHNIK.html` →
    `16 Der C 64 in Forschung und Technik.html`). Strip-trailing-
    page-number convention from rule 5 still applies (`<startpage> <h1>.html`).
-7. **Do not commit.** Return per-article table of headings touched
-   (before → after) + per-file rename log.
+7. **Update the `<title>` tag too.** Rule 5 emits `<title>{h1_plain}</title>`
+   from the same h1 text. When rule 25 rewrites the h1, the
+   `<title>` lags behind unless it's updated in the same pass.
+   Match `<title>` to the new natural-case h1.
+8. **Do not commit.** Return per-article table of headings touched
+   (before → after) + per-file rename log + `<title>` updates.
 
 Critical guardrails:
 - **Don't change non-ALL-CAPS headings.** A heading that's already
