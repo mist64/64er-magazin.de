@@ -40,8 +40,10 @@ leaves WITHOUT a label prefix:
   Kohlhammer, Mainz") — implicit `Literatur:` reference.
 - A **contest entry address** ("Die Antworten auf alle drei Fragen
   senden Sie bitte auf einer Postkarte an:<br>Markt&Technik AG<br>
-  …") — implicit `Kontakt:`. The lead-in sentence ("…senden Sie
-  bitte … an:") is part of the same paragraph block.
+  …") — even though structurally a multi-line address block, this
+  is **body content of the contest itself** (the article IS the
+  contest), not a reference / vendor footer. **Leave as plain
+  `<p>`**, same pattern as Fehlerteufelchen Bezugsquellen.
 - A multi-line **vendor address block** without prefix ("Power
   Cartridge:<br>Kolff Computer Supplies bv, …<br>Lindy Elektronik
   GmbH, …<br>The Final Cartridge:<br>H + P Computers, …") — common
