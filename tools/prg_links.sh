@@ -101,10 +101,22 @@ for D64_FILE in "${D64_FILES[@]}"; do
             fi
         fi
 
-        # Check if less than 3 content lines AND contains 'sys' followed by number
+        # No content lines at all -> petcat produced no BASIC listing
+        # (e.g. load addr $0801 but BASIC end-of-program marker immediately).
+        # File loads at $0801 but isn't really BASIC -> treat as binary/MSE.
+        if [ "$keep_txt" = true ] && [ ${#content_lines[@]} -eq 0 ]; then
+            keep_txt=false
+        fi
+
+        # Check if less than 3 content lines AND contains 'sys' followed by
+        # a number, optionally preceded by whitespace and/or '('. petcat
+        # renders the SYS token as "sys" and BASIC stubs come in both
+        # "sys 2061", "sys2061" and "sys(2061)" flavors -> all are boot
+        # stubs in front of a machine-language body, i.e. the printed
+        # listing is the MSE hex dump, not the petcat output.
         if [ "$keep_txt" = true ] && [ ${#content_lines[@]} -lt 3 ]; then
             for line in "${content_lines[@]}"; do
-                if [[ $line =~ sys[[:space:]]*[0-9]+ ]]; then
+                if [[ $line =~ sys[[:space:]\(]*[0-9]+ ]]; then
                     # Found sys with number, not a real BASIC program
                     keep_txt=false
                     break
