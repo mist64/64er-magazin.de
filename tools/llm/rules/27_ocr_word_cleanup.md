@@ -108,6 +108,28 @@ intervening space is almost always a missing-space artifact).
 The `C 64II` / `»C 641«` pattern: `C 64II` → `C 64 II`, `»C 641«`
 → `»C 64 I«` (digit `1` misread of Roman `I`, plus lost space).
 
+## Pass 2 hard exception: hex addresses and binary code
+
+The `0`/`O` and `1`/`l`/`I` substitution rules from Pass 2 **must
+NOT apply inside hex literals or assembler addresses**. Hex digits
+use the characters `0`-`9` and `A`-`F`; the letter `O` is not a
+valid hex digit. The same applies to binary digit `1`.
+
+**Skip Pass 2 substitution when:**
+- The token starts with `$` (assembler/hex literal: `$C0FE`, `$0801`,
+  `$E000`, …) — the `0`s are digits, leave them.
+- The token is inside a `<td>` cell whose surrounding row contains
+  assembler mnemonics (`STA`, `LDA`, `JSR`, `JMP`, `RTS`, etc.) —
+  the cell content is code, not prose.
+- The token is part of a number written without `$` but in a context
+  that's clearly numeric (an octal byte sequence, a memory dump line
+  like `1E15 20 00 23`).
+
+8607 regression caught: `<td>STA $C0FE,X</td>` was rewritten to
+`<td>STA $COFE,X</td>` by an over-eager Pass 2 sweep. The fix is
+the substitution rule itself — **lookback** to confirm the token is
+prose, not code, before applying `0`→`O`.
+
 ## What NOT to touch
 
 Per [[feedback-ocr-vs-typos]] and the print-verbatim rule:
