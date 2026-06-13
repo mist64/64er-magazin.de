@@ -47,6 +47,37 @@ Michael Scharfenberger from 8604 onward.
 `content="XXX"`. Must be replaced with a real name or the line
 removed. Don't leave `XXX` in any article.
 
+## Per-byline expansion vs. tip-column dedupe
+
+Two shapes exist in the wild and the rule used to leave the choice
+implicit; pin it explicitly here.
+
+**DEFAULT — per-byline expansion.** One entry in `content="…"` per
+`<address class="author">` in the body, **in body order, INCLUDING
+repeats**. Example: `<meta name="author" content="bs, bs, hm, ev,
+hm">` for Aktuelles with 5 newsletter items by 4 editors (bs writes
+two of them, hm writes two).
+
+**EXCEPTION — Tips & Tricks–style multi-byline articles.** In
+columns where each sub-section is its own mini-byline (Tips & Tricks
+für Profis / Einsteiger / C 16, similar), dedupe the OVERALL meta
+across sub-sections: **lead editor first** (the one bylined on the
+top-level article header / Foreword), then **unique sub-authors in
+first-appearance order**. Example: `79 Tips & Tricks für Profis`
+uses `tr, Name1, Name2, …` where `tr` is the column's lead editor
+(bylined on the column intro) and each `NameN` is a distinct tip
+author appearing in the order their tip is printed.
+
+**How to pick.** Apply the exception only when every / nearly every
+`<h2>`-or-`<h3>` sub-section has its own `<address class="author">`
+AND the article has a lead editor distinct from the tip authors. A
+news-roundup with shared editor initials (Aktuelles, DFÜ-NEWS) is
+NOT the exception — it's the default; repeat initials.
+
+**Anti-pattern.** Don't mix the two shapes within one article: don't
+dedupe inside an Aktuelles-style roundup, don't expand-with-repeats
+inside a Tips & Tricks column.
+
 ## Briefing for the sub-agent
 
 The sub-agent must:
@@ -137,6 +168,33 @@ PY
 #    name made of letters / spaces / dots
 grep -hE 'name="author" content=' "$dir"/*.html | \
   grep -vE 'content="[A-Za-zÄÖÜäöüß., ]+"' && echo "  FAIL: malformed content"
+
+# 5. shape consistency: an article whose meta `content` has duplicate
+#    entries must have a matching count of body bylines (per-byline
+#    expansion shape). If the meta has duplicates but the body has
+#    fewer (or no repeated) `<address class="author">` tokens, the
+#    article is using the wrong shape — likely the expansion shape
+#    applied to a tip-column article, or stale duplicates from an
+#    earlier pass.
+python3 -c "$(cat <<'PY'
+import os, re, sys
+d = sys.argv[1]
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f)).read()
+    m = re.search(r'<meta name="author" content="([^"]*)"', s)
+    if not m: continue
+    parts = [p.strip() for p in m.group(1).split(',') if p.strip()]
+    if len(parts) == len(set(parts)): continue  # no duplicates
+    # has duplicates → expansion shape expected; body byline count
+    # should be >= len(parts)
+    body_bylines = re.findall(r'<address class="author">', s)
+    if len(body_bylines) < len(parts):
+        print(f"  {f}: meta has {len(parts)} entries ({len(parts)-len(set(parts))} dup) "
+              f"but only {len(body_bylines)} body <address class=\"author\"> — "
+              f"shape mismatch (expansion vs dedupe)")
+PY
+)" "$dir"
 ```
 
 ## Notes / lessons

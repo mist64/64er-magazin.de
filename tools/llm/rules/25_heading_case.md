@@ -13,6 +13,38 @@ is what 8601-8605 used; later issues moved to natural case). New
 issues use **natural case for both** Leserforum and regular article
 headings.
 
+## DEFAULT: don't change heading text
+
+Heading text is whatever the OCR'd / post-step-0 markdown produced.
+**Default action: leave it.** Change a heading's case only when the
+ALL-CAPS detection trigger below fires unambiguously.
+
+Cross-reference: this mirrors rule 28's `DEFAULT: DON'T CHANGE HEADER
+LEVELS` framing. Rule 28 protects heading *levels*; this rule
+protects heading *text*. Both default to "trust the input"; both
+reserve change for a mechanically-detectable trigger.
+
+### "Predominantly ALL CAPS" trigger
+
+A heading qualifies for re-casing iff **all** of the following hold:
+
+1. Of all word-characters (letters) in the heading text, at least
+   **80 %** are uppercase.
+2. At least **3 of those uppercase characters appear in a row** (i.e.
+   the regex `[A-ZÄÖÜẞ]{3,}` matches somewhere in the heading).
+
+The 3-in-a-row clause excludes mixed-case headings where one
+Umlaut OCR'd as upper, or where a 2-letter acronym (`DR`, `IM`) sits
+adjacent to a real word — those are NOT predominantly ALL CAPS and
+must be left alone.
+
+### Anti-pattern
+
+❌ **"This heading reads HARD on the screen, let me re-case it."**
+That's an aesthetic call, not a print-typography decision. If the
+print set the heading in mixed case, the OCR delivered mixed case,
+and the 80 %/3-in-a-row trigger does not fire — leave it.
+
 ## What "German natural case" means
 
 German sentence case is NOT English Title Case. The rules:

@@ -71,6 +71,7 @@ substitutions:
 | `<<` / `>>` | brackets vs « » | `»BASIC $B000<<` → `»BASIC $B000«` |
 | Stray period | period vs space | `sicher.auch` → `sicher auch`, `Wer. selbst` → `Wer selbst`, `MSE.eingegeben` → `MSE eingegeben` |
 | `rn` vs `m`, `cl` vs `d` | classic ligature breaks | `Pmsel` → `Pinsel`, `clas` → `das` (only when context unambiguous) |
+| Final-position `l` for `t` | t vs l | Lowercase typewriter `t` with hooked descender OCRs as `l`, especially at word end: `Mini-Autostarl` → `Mini-Autostart` (8607/76). The common shape is `…stt` mis-read as `…sl`. Apply only when the t-form is a known German / 64'er-jargon word AND the l-form isn't (eyeball check, not memory): `Autostarl` is not a word, `Autostart` is. Same context-confirms test as the other Pass-2 substitutions. |
 
 ## Pass 3 — missing or extra spaces
 
@@ -213,3 +214,9 @@ grep -h "Übertragungsgeschwindigkeiten von" "$dir"/*.html >/dev/null && \
 - The discount engine's older `<` escaping sometimes leaves stray
   `&lt;` constructs (`<RETURN>` becomes literal text) — those are
   rule-2 (escape_tags) territory, not rule 27.
+- **t ↔ l word-end pair (8607).** Lowercase typewriter `t` with its
+  hooked descender OCRs as `l` at word ends. `Mini-Autostarl` in
+  8607/76 was the canonical instance. The shape to watch for is a
+  short common German suffix that ends in `t` (`-start`, `-art`,
+  `-port`, `-text`) showing up as `-starl`, `-arl`, `-porl`,
+  `-texl`. When the l-form isn't a word and the t-form is, fix.

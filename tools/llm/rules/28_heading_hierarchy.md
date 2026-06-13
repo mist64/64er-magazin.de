@@ -10,6 +10,11 @@ the print's typographic weight.
 levels. The default action is to leave heading levels alone. Trust
 the input.**
 
+Cross-reference: rule 25 (`heading_case`) carries a parallel
+`DEFAULT: don't change heading text` clause. This rule protects
+heading *levels*; rule 25 protects heading *text*. Both default to
+"trust the input" — keep them in sync.
+
 The "compare print typographic weight" test in the rest of this file
 is for **exceptional** cases only — when there's a clear *structural*
 reason to suspect the input is wrong (e.g. the hierarchy makes the
