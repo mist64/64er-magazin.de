@@ -127,6 +127,16 @@ PY
   audit picked top-level h3s with no h2 in scope and promoted
   them, but the print never used h2-banner weight in those
   articles. Fixed by adding the "compare print weight" test.
+- **Fehlerteufelchen rubric — sub-correction headings are always
+  `<h3>`.** The Fehlerteufelchen column is a list of corrections to
+  previous issues; each sub-correction starts with a heading like
+  "Der kleine Hobbit, Sonderheft 4/86, Seite 111 ff". Print sets
+  these in inline-bold weight, NOT h2-banner weight — uniformly
+  across every sub-correction. So the choice is uniformly `<h3>`.
+  This is the same orphan-h3 anti-pattern documented above: a
+  future agent will see h3s with no h2 parent and want to promote.
+  Don't. 8607's `84 Fehlerteufelchen.html` was toggled to h2 and
+  back to h3 during the issue's work — leave at h3.
 - Don't run a heading audit as a single batch action across the
   whole issue. Per-article decisions, scan crops, judgment.
   Bulk-applying any heading-promotion heuristic is risky.
