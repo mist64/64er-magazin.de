@@ -1,9 +1,34 @@
-# 21 — Render printed math formulas via MathJax (LaTeX)
+# 21 — Render printed math formulas via MathJax (LaTeX) — when needed
 
 **Goal:** every typeset math formula in the article HTML — every
 `<p>TODO FORMULA</p>` / `TODO FORMULAS` placeholder and every
-naturally-occurring inline formula — is rendered via MathJax in
-LaTeX syntax, not via Unicode + `<sub>`/`<sup>` HTML fallback.
+naturally-occurring inline formula — is rendered legibly. MathJax
+(LaTeX) is the right tool for **complex** formulas; **simple ones can
+stay as plain Unicode + `<sub>` / `<sup>`** when that already
+reproduces the print correctly.
+
+## When Unicode is enough vs when MathJax is needed
+
+**Unicode + `<sub>` / `<sup>` is fine for:**
+- Plain inline expressions that already render correctly with
+  Unicode chars and the standard sub/sup tags: `V<sub>0</sub>`,
+  `X<sup>2</sup>+Y<sup>2</sup>`, `2π`, `α·β`, `ω<sub>0</sub>²`,
+  `dV/dt`, `≈`, `∑`, `√(a²+b²)` (rendered as `√(a<sup>2</sup>+b<sup>2</sup>)`).
+- Anything that 8606 already ships verbatim (`<sup>2</sup>` for
+  squared, etc.).
+
+**MathJax (LaTeX) is needed for:**
+- Stacked fractions printed with a real horizontal vinculum (not a
+  slash) — `\frac{\mathrm{d}V}{\mathrm{d}t}`.
+- Square roots with a vinculum spanning multiple terms.
+- Summation / integral with limits below and above the symbol.
+- Multi-line aligned equations or anything else where layout
+  matters beyond "baseline glyph + superscript".
+
+The boundary is what the print **shows**. If the print typeset a
+fraction as a stacked numerator-over-denominator with a horizontal
+bar, that's MathJax. If the print just wrote `dV/dt` inline on one
+line, plain Unicode is enough — don't gold-plate it.
 
 The generator preloads MathJax globally
 (`generate.py` line ~1399 ships
@@ -39,20 +64,29 @@ inline `TODO FORMULA` tokens:
    for the formula itself. Small superscripts and subscripts need
    the 600 dpi pixel budget.
 2. Crop the formula region and dispatch a sub-sub-agent for the
-   OCR/vision read. Sub-sub-agent returns the formula in LaTeX
-   source (not in Unicode).
-3. Wrap the returned LaTeX:
-   - Standalone formula (was `<p>TODO FORMULA</p>`) →
-     `<p>\[…\]</p>` (display) **or** `<p>\(…\)</p>` (inline) per
-     the print's centring.
-   - Inline-token formula (was the embedded `TODO FORMULA` inside
-     running prose) → `\(…\)` substituted in place inside the
-     existing `<p>`.
-4. Use standard LaTeX: `\frac`, `\sqrt`, `\sum`, `\cdot`, `\omega`,
-   `\mathrm` for upright differentials (`\mathrm{d}t`), `_{}` for
-   subscripts, `^{}` for superscripts.
-5. Don't escape backslashes; raw LaTeX in HTML works once MathJax
-   sees the delimiters.
+   OCR/vision read. Sub-sub-agent returns:
+   - For a complex formula → the LaTeX source.
+   - For a simple formula that Unicode can reproduce → the Unicode +
+     `<sub>` / `<sup>` HTML version.
+3. **Make the per-formula Unicode-vs-MathJax decision** based on the
+   print:
+   - One-line expressions, no stacked fractions, no spanning roots
+     → emit Unicode HTML (`V<sub>0</sub>`, `X<sup>2</sup>+Y<sup>2</sup>`,
+     `dV/dt`, `2π`, `α·β`, `ω<sub>0</sub>²`, etc.).
+   - Stacked fractions, multi-term square roots, summations / integrals
+     with limits, multi-line aligned equations → emit LaTeX inside
+     MathJax delimiters.
+4. Wrap the returned content:
+   - **MathJax** standalone formula → `<p>\[…\]</p>` (display).
+   - **MathJax** inline token → `\(…\)` substituted into the existing
+     `<p>`.
+   - **Unicode** standalone → `<p>` containing the Unicode HTML.
+   - **Unicode** inline token → the Unicode HTML inserted into the
+     existing `<p>` directly.
+5. For LaTeX: use standard macros (`\frac`, `\sqrt`, `\sum`, `\cdot`,
+   `\omega`, `\mathrm` for upright differentials, `_{}` / `^{}` for
+   subscripts/superscripts). Don't escape backslashes — raw LaTeX in
+   HTML works once MathJax sees the delimiters.
 
 Anti-memory: the LaTeX source comes from reading the scan, not
 from physics knowledge or context. If the print shows a specific
@@ -66,8 +100,9 @@ dir=issues/<YYMM>
 # 1. no TODO FORMULA / FORMULAS markers survive
 grep -nE 'TODO FORMULA' "$dir"/*.html && echo "  FAIL: TODO FORMULA left"
 
-# 2. all newly-inserted math is wrapped in MathJax delimiters
-#    (a heuristic: any \frac / \sqrt / \cdot / \omega outside \( \) or
+# 2. any LaTeX outside MathJax delimiters is a bug — Unicode-only
+#    formulas should not contain LaTeX macros at all.
+#    (heuristic: any \frac / \sqrt / \cdot / \omega outside \( \) or
 #    \[ \] is suspicious)
 python3 -c "$(cat <<'PY'
 import os, re, sys
