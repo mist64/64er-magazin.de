@@ -127,3 +127,37 @@ match an article, they get reported, not placed.
   Existing examples: `issues/8412/prg/simons-axo.txt`,
   `issues/8510/prg/xref simons bas..txt`. Full dialect list:
   `petcat -help | grep -E "Basic v[0-9]"`.
+
+- **Hypra-Ass / Top-Ass source listings are NOT BASIC.** The
+  extractor falls back to petcat for any `.prg` that starts at
+  $0801 (BASIC's default load address), but Hypra-Ass and Top-Ass
+  source files often live there too — and petcat then tokenises
+  the 6502 mnemonics as if they were BASIC keywords, jamming them
+  into their operands. Signals:
+  - The figcaption labels the listing `Assembler-Listing` /
+    `Assembler-Quelltext` / `Quellcode` (or any "Quelltext"
+    variant).
+  - The petcat-decoded `.txt` contains directive lines like
+    `.ba 50000` / `.eq xadr=10` / `.by …` / `.wo …` mixed with
+    mnemonic+operand pairs that got run-together (`stxstin`,
+    `bcsspr`, `sbc#82`, `adc#1`).
+  - The line numbers in the petcat output are NOT 10/20/30/… —
+    Hypra-Ass uses 900/901/902/… / 1100/1110/1120/… style
+    numbering.
+  When you see those signals, **do not re-decode the .txt**. Mark
+  the HTML instead:
+  ```html
+  <pre data-filename="<name>" data-name="…" data-assembler="hypra-ass"></pre>
+  <div class="binary_download" data-filename="<name>.prg" data-name="…"></div>
+  ```
+  The generator routes through `tools/assembler_decode.py`
+  (canonical) which knows the Hypra-Ass mnemonic table ($81–$B8 +
+  `.`+token for directives). For Top-Ass, use
+  `data-assembler="top-ass"`. CLI tool for manual inspection:
+  `tools/hypra-ass-decode.py <file.prg>`.
+  Precedents:
+  - `issues/8604/85 Das Maß der Dinge.html` (`taktzyklen.src`)
+  - `issues/8606/95 Endlich_ Hypra-Ass mit Datasette.html`
+    (`hypra-ass_cass`)
+  - `issues/8606/134 Von Basic zu Assembler (Teil 4).html`
+    (BLOCK / SWAP)
