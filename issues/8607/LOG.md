@@ -21,6 +21,15 @@ All 9 `<p>TODO TABLE</p>` markers replaced.
 
 `166 Tips und Tricks zu Superbase (Teil 4).html` references 5 `SUPERBASE-Steckbrief` callouts in its intro (FIND, ENTER, SELECT, OUTPUT, PROG) — all printed as yellow callout boxes on print pages 166–167. None are currently represented in the HTML. They were not extracted in this pass; they need to be added in a follow-up session. The Centronics pinout `TODO TABLE` in this article was replaced.
 
+## Pass 3 — UNCAPTIONED callouts extracted (rule 13 Pass 3 sweep)
+
+- `22 Die Wachstumspyramide.html` — added `<aside><h3>Verwendete Variable</h3>` with three nested `<table class="plain">` blocks (a) Felder, b) Strings, c) Numerische Variable) from print page 24. Removed adjacent OCR-garbage occurrence of the literal heading "Verwendete Variable" that the prior import had dropped into the body paragraph immediately preceding the callout (was: "Eine stärker besetzte Verwendete Variable Elterngeneration bekommt").
+- `33 Selbstbau Das richtige Kabel zum Monitor.html` — added single `<aside>` with eight nested `<table class="plain">` Pin/Signal lookup blocks from print page 34 (Audio-/Video-Stecker, 6poliger AV-Stecker, 9poliger Cannon-Stecker, 6poliger AV-Stecker [second variant for C 128 80-Zeichen-Modus], Audio-/Video-Buchse, SCART-Stecker, "Belegung der 80-Zeichen-Videobuchse", SCART-Stecker [C 128 RGB variant]). Note: the Audio-/Video-Stecker row "Pin 2 = SND" is a print typo for GND, preserved verbatim per rule.
+- `28 Die totale Kommunikation.html` — added `<aside><h3>Leistungen des Breitband-ISDN</h3>` with one `<table class="plain">` (14 rows: Hörfunk/Fernsehen … Fernwirken (Temex)) from print page 40, inserted right after the Breitband-ISDN paragraph.
+- `42 Seikosha MP-1300 AI - Geschwindigkeit ist Trumpf.html` — added `<figure><table class="plain"> … <figcaption>Tabelle. Das Datenblatt des Seikosha MP-1300AI</figcaption></figure>` from print page 43 (17 data rows, mixed paired-/full-width layout).
+- `43 CRA-80X — der vielseitige Drucker.html` — added `<figure><table class="plain"> … <figcaption>Tabelle. Kurz belichtet — Melchers CPA-80X</figcaption></figure>` from print page 44 (17 data rows, same layout as Seikosha).
+- `147 Lernen Sie Ihren Drucker kennen!.html` — added captioned `<figure>` for `Tabelle. Übersicht über die möglichen Grafik-Modi bei Epson-, Star- und MPS-Druckern` (print page 149). The figure contains three sub-tables: (1) main grafik-modi grid with columns Modus | Epson | Star »IBM«-Modus | Star »Star«-Modus (8-Nadeln subsection + 9-Nadeln subsection), (2) two-column `<table class="plain">` for "Grafikmodus für MPS 801/803" + "Sonderzeichendefinition des MPS 802", (3) "Zusammenhang zwischen Daten und Matrixpunkt" Wert/Bit lookup table for Epson/Star vs MPS 801/803, plus the two `Beispiel:` lines as a `<p>` inside the same `<figure>`.
+
 ## No [ILLEGIBLE] cells
 
 No cells were marked `[ILLEGIBLE]`. All cell values were verified against the print scan or the on-disk OCR pipeline output.
