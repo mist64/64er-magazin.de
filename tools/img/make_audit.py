@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Build ONE audit sheet: every scan's bottom folio-strip, in logical page order,
+labelled with the ASSUMED page number (from the renumber.py saddle-stitch imposition).
+Eyeball it: where the printed folio != the red label, the page order is wrong there.
+
+Usage:
+  make_audit.py [--src DIR] [--out FILE] [--cols N] [--pages TOTAL]
+
+  --src    dir of Scan*.tiff (Scan.tiff = first slot). Default: thumbs
+  --out    output image. Default: audit_sheet.png
+  --cols   montage columns. Default: 4
+  --pages  total page count for the imposition. Default: file count (must be %4==0)
+
+Works on the 150-dpi thumbs (fast) or the full scans — folio is legible either way.
+"""
+import os, sys, re, glob, subprocess, tempfile, argparse
+
+def rmap(count):
+    """renumber.py: scan-slot src -> logical page, for a complete nested booklet."""
+    src=0; a=count; b=1; mid=a/2; which=0; m={}
+    while True:
+        if which==0:
+            m[src]=a
+            if a%2==0: which=1
+            a-=1
+        else:
+            m[src]=b
+            if b%2==0: which=0
+            b+=1
+        if a<mid+1 or b>mid+1: break
+        src+=1
+    return m
+
+def scan_file(src_dir, idx):
+    return os.path.join(src_dir, "Scan.tiff" if idx==0 else f"Scan {idx}.tiff")
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--src", default="thumbs")
+ap.add_argument("--out", default="audit_sheet.png")
+ap.add_argument("--cols", type=int, default=2)
+ap.add_argument("--height", type=int, default=10, help="strip height as %% of page (taller = more above the folio)")
+ap.add_argument("--pages", type=int, default=0)
+a = ap.parse_args()
+
+n_files = len(glob.glob(os.path.join(a.src, "Scan*.tiff")))
+count = a.pages or n_files
+if count % 4:
+    sys.exit(f"page count {count} not divisible by 4 (files found: {n_files}); pass --pages")
+
+M = rmap(count)                       # src -> page
+order = sorted(M.items(), key=lambda kv: kv[1])   # by logical page
+
+tmp = tempfile.mkdtemp(prefix="audit_")
+strips = []
+print(f"building {len(order)} strips from {a.src} (count={count})...")
+for src, page in order:
+    f = scan_file(a.src, src)
+    if not os.path.exists(f):
+        # missing scan slot -> red placeholder strip
+        sp = os.path.join(tmp, f"{page:03d}.png")
+        subprocess.run(f'magick -size 760x34 xc:"#ffdddd" -gravity West '
+                       f'-pointsize 22 -fill red -annotate +6+0 "{page:03d}  (no scan {src})" '
+                       f'-bordercolor gray -border 1 "{sp}"', shell=True)
+        strips.append(sp); continue
+    sp = os.path.join(tmp, f"{page:03d}.png")
+    # rotate upright, bottom folio strip, scale, prepend a yellow label box with the assumed page#
+    subprocess.run(
+        f'magick "{f}" -rotate -90 -gravity South -crop 100%x{a.height}%+0+0 +repage -resize 760x '
+        f'-gravity West -background "#fff3a0" -splice 84x0 '
+        f'-pointsize 30 -fill red -annotate +5+0 "{page:03d}" '
+        f'-bordercolor gray -border 1 "{sp}"', shell=True)
+    strips.append(sp)
+
+print(f"montaging -> {a.out} ({a.cols} cols)")
+subprocess.run(["montage", *strips, "-tile", f"{a.cols}x", "-geometry", "+2+2",
+                "-background", "white", a.out])
+sz = subprocess.run(f'identify -format "%wx%h" "{a.out}"', shell=True, capture_output=True, text=True)
+print(f"done: {a.out}  {sz.stdout}")
