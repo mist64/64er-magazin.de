@@ -20,9 +20,87 @@
 
         <p>Für die beiden hier vorgestellten aber auch für andere Programme in Superbase müssen Sie zunächst das Datenbankprogramm auf die übliche Weise laden. Anschließend legen Sie sich über das Startprogramm eine neue Datenbank mit einer neuen Datei an. Die Namen sind dabei ausnahmsweise ohne Bedeutung, denn im abgedruckten Listing werden die Befehle »DATABASE« und »FILE« nicht verwendet. Sie befinden sich jetzt automatisch im »FORMATI«-Modus. Informationen über das Datensatzlayout entnehmen Sie bitte Bild 1. Die Datensatzstruktur ist in Bild 2 wiedergegeben. Beieiner eventuellen Anderung des Layouts denken Sie bitte daran, daß die Feldnamen — hier nur Zahlen — und Feldlängen nicht verändert werden dürfen, ansonsten ist das Programm dieser Ausgabe nicht lauffähig. Jetzt können Sie, nachdem der »PROG« Modus über das zweite Menü angewählt wurde, die Listings eingeben. Innerhalb von Superbase müssen Sie leider ohne den bewährten Checksummer arbeiten.</p>
 
+        <figure>
+            <pre>Mode: Format
+      Tankbelege
+Buchungsnummer 01
+Tankdatum      02
+Kilometerstand 03 + # # # # #
+Benzin         04 + # # . # #
+Rechnung       05 + # # # . # #</pre>
+            <figcaption>Bild 1. Datensatzlayout</figcaption>
+        </figure>
+
+        <figure>
+            <p>Dateidefinition: auto/verbrauch</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Typ</th>
+                        <th>Format/Berechnung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>01</td>
+                        <td>Schlüsselfeld</td>
+                        <td>Länge 4</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>02</td>
+                        <td>Datumsfeld</td>
+                        <td>Länge 7</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>03</td>
+                        <td>Zahlenfeld</td>
+                        <td>+ # # # # #</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>04</td>
+                        <td>Zahlenfeld</td>
+                        <td>+ # # . # #</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>05</td>
+                        <td>Zahlenfeld</td>
+                        <td>+ # # # #. # #</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. Datensatzstruktur</figcaption>
+        </figure>
+
         <p>Das Programm »PKW« (Listing 1) erzeugt lediglich eine Variablendatei. Anschließend wird automatisch das Hauptprogramm nachgeladen und gestartet. Speichern Sie beide Programme wie üblich vor dem Starten ab. Die Variablendatei wird durch den Befehl »DUMP«-Name erzeugt. Alle Variablen, mit Ausnahme der Feldvariablen, werden auf die Diskette übertragen. Die mit dem vorliegenden Programm erzeugte Datei mit dem Namen »hpkw« wird für das Hauptprogramm benötigt, welches später wesentlich mehr Variablen abspeichert. Wenden Sie also das Programm »PKW« kein zweites Mal an (zumindest nicht auf der Diskette mit dem Datenbestand von »Verbrauch«). Übrigens wurde dem Dateinamen ein »h« vorangestellt, damit die Datei mitdem»HELP«Modus gelesen werden kann.</p>
 
-        <p>Nun zu einigen Einzelheiten des Programmes »Verbrauch« (Leistungsübersicht siehe Tabelle ]). Das Schlüsselfeld enthält die Buchungsnummer als String, wodurch sich Zeile 2040 erklärt. Die alte Buchungsnummer wurde mit anderen Variablen in Zeile 2010 durch den Befehl SET »Name« gelesen. Der Datensatz wird unter Umgehung des ENTER-Modus erstellt. In den Zeilen 4030 bis 4070 findet die Felderbelegung statt. Mit STORE wird der Datensatz gespeichert, mit CLEAR dagegen die Felder im Speicher — nicht auf der Diskette — gelöscht.</p>
+        <p>Nun zu einigen Einzelheiten des Programmes »Verbrauch« (Leistungsübersicht siehe Tabelle 1). Das Schlüsselfeld enthält die Buchungsnummer als String, wodurch sich Zeile 2040 erklärt. Die alte Buchungsnummer wurde mit anderen Variablen in Zeile 2010 durch den Befehl SET »Name« gelesen. Der Datensatz wird unter Umgehung des ENTER-Modus erstellt. In den Zeilen 4030 bis 4070 findet die Felderbelegung statt. Mit STORE wird der Datensatz gespeichert, mit CLEAR dagegen die Felder im Speicher — nicht auf der Diskette — gelöscht.</p>
+
+        <figure>
+            <p>Das Hauptprogramm »Verbrauch« (Listing 2) übernimmt folgende Aufgaben:</p>
+            <ul>
+                <li>Erfragen der Daten</li>
+                <li>Kontrolle dieser Daten</li>
+                <li>Automatische Bestimmung der Buchungsnummer</li>
+                <li>Abspeichern des Datensatzes</li>
+                <li>Errechnen der Liter getankten Benzins seit Bestehen der Datei</li>
+                <li>Errechnen der dabei aufgetretenen Kosten</li>
+                <li>Errechnen der gefahrenen Kilometer seit Bestehen der Datei</li>
+                <li>Errechnen der Kosten pro 100 Kilometer seit Bestehen der Datei</li>
+                <li>Errechnen der Kosten pro 100 Kilometer über die letzte Tankfüllung</li>
+                <li>Darstellung der Kostenentwicklung pro 100 Kilometer über die letzten vier Tankfüllungen</li>
+                <li>Errechnen des Benzinverbrauchs pro 100 Kilometer seit Bestehen der Datei</li>
+                <li>Errechnen des Benzinverbrauchs pro 100 Kilometer über die letzte Tankfüllung</li>
+                <li>Darstellung der Entwicklung des Benzinverbrauchs pro 100 Kilometer über die letzten vier Tankfüllungen</li>
+            </ul>
+            <p>Viel Spaß mit eigenen Anwendungen in Superbase.</p>
+        </figure>
 
         <p>Wenn Sie übrigens bei der Gestaltung einer Bildschirmseite in einem eigenen Superbase-Programm die Meldung »drücken Sie RE-TURN um fortzufahren Seitenende« erhalten, kann es daran liegen, daß Ihre DIS-PLAY-Programmzeile ohne »;« abschließt und Sie sie mit einer zweiten DISPLAY-Befehlszeile anspringen wollen. Anders verhält es sich dagegen mit Anspringen der Bildschirmzeile durch den ASK-Befehl.</p>
 
@@ -40,6 +118,67 @@
             <figcaption>Listing 2. »Verbrauch« erfaßt und liefert Ihnen alle wichtigen Daten über den Verbrauch, die Kosten und Kilometerleistung Ihres Autos.</figcaption>
         </figure>
         <div class="binary_download" data-filename="verbrauch.p.prg" data-name="Verbrauch"></div>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>WAIT</td>
+                    <td>Warten auf Tastendruck; I; auch »WAITa« oder »WAITa$«</td>
+                </tr>
+                <tr>
+                    <td>SET"Name"</td>
+                    <td>Abspeichern einer Variablendatei; I</td>
+                </tr>
+                <tr>
+                    <td>DUMP"Name"</td>
+                    <td>Laden einer Variablendatei; I</td>
+                </tr>
+                <tr>
+                    <td>CLEAR</td>
+                    <td>Löschen der Felder im Speicher; I</td>
+                </tr>
+                <tr>
+                    <td>STORE</td>
+                    <td>Abspeichern des Datensatzes; I</td>
+                </tr>
+                <tr>
+                    <td>ASKa$</td>
+                    <td>Abfrage einer Stringvariablen bis maximal 40 Zeichen; I; auch »ASKa«, »ASK[Feldname]«, »ASK»Text«;a$«; auch als Positionierungs- und Verkürzungsbefehl anwendbar</td>
+                </tr>
+                <tr>
+                    <td>DATEd$,d</td>
+                    <td>Zuordnung der Monatszahl der Variablen »d«; I; bei korrekter Datumseingabe ist »d« ungleich Null</td>
+                </tr>
+                <tr>
+                    <td>DATABASE"Name",x,y</td>
+                    <td>Datenbankauswahl; I; x = Gerätenummer, y = Laufwerknummer, Defaultwerte: 8,0</td>
+                </tr>
+                <tr>
+                    <td>DATABASE"$"</td>
+                    <td>Directory-Anzeige (wenn man sich nicht an den Datenbanknamen erinnert); I; Datenbanken erscheinen in Großbuchstaben</td>
+                </tr>
+                <tr>
+                    <td>FILE"Name"</td>
+                    <td>Dateiauswahl; I</td>
+                </tr>
+                <tr>
+                    <td>CONVERTa,a$</td>
+                    <td>Umwandlung einer Zahlenvariable in eine Stringvariable; I</td>
+                </tr>
+                <tr>
+                    <td>CONVERT[Datumfeld],d$</td>
+                    <td>Umwandlung eines Datums in eine String- oder auch eine Zahlenvariable; I</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Ausstieg aus Superbase; I</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Anmerkung: Das »I« im Steckbrief ist stellvertretend für »Primärbefehl« verwendet worden. Siehe hierzu auch die Steckbriefe aus Ausgabe 7/86.</td>
+                </tr>
+            </table>
+            <figcaption>SUPERBASE-Steckbrief: PROG-Modus (Fortsetzung)</figcaption>
+        </figure>
     </article>
 </body>
 
