@@ -42,12 +42,21 @@ mkdir -p "${tmp}_pages_300"
 pdftoppm -r 300 "$dir/64er_19XX-XX.pdf" "${tmp}_pages_300/p" -png
 
 # 2. tesseract TSV + awk block-grouper per page
+#
+# NOTE: feed the PNG to tesseract on STDIN (`tesseract - out … < png`),
+# not as a path argument. On this machine Leptonica cannot fopen image
+# files by path ("Error in fopenReadStream: failed to open locally with
+# tail …", then it misreads the PNG magic bytes as a filename) and every
+# page yields a header-only TSV (0 words → empty blocks). Stdin bypasses
+# Leptonica's file reader and works. Do NOT wrap the loop in `set -e`:
+# tesseract exits non-zero on a blank/near-blank page (cover, full-page
+# ad) and would abort the whole run.
 for png in ${tmp}_pages_300/p-*.png; do
   page=$(basename "$png" .png | sed 's/^p-//')
   tsv="${tmp}_p${page}_ocr.tsv"
   out="$dir/_tmp/blocks/p${page}.txt"
   [ -s "$out" ] && continue      # idempotent/resumable: skip pages already done
-  tesseract "$png" "${tsv%.tsv}" -l deu tsv 2>/dev/null
+  tesseract - "${tsv%.tsv}" -l deu tsv < "$png" 2>/dev/null || true
   awk -F'\t' 'NR>1 && $1==5 && $12!="" {
     b=$3;
     if (!(b in minL) || $7<minL[b]) minL[b]=$7;
@@ -62,7 +71,10 @@ for png in ${tmp}_pages_300/p-*.png; do
         b, maxR[b]-minL[b], maxB[b]-minT[b], minL[b], minT[b],
         substr(text[b],1,200);
     }
-  }' "$tsv" | sort > "$out"
+  }' "$tsv" | LC_ALL=C sort > "$out"   # LC_ALL=C: OCR garbage bytes make a
+                                       # locale-aware sort abort ("Illegal
+                                       # byte sequence") and emit an empty
+                                       # blocks file; raw-byte sort is safe.
 done
 ```
 
