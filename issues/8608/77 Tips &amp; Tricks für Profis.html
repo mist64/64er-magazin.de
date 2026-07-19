@@ -62,6 +62,23 @@
 
         <p>Jetzt geht man mit dem Monitor an die Speicherstellen ab $1B8D (enthält die Tastenbelegung des C 64) und findet auf dem Bildschirm eine Anordnung von Speicherstellen vor, die entsprechend dem Bild 1 aussehen, wobei diese Hardcopy schon die Anderungen enthält, so daß man beim Vergleich genau erkennen kann, welche Bytes vertauscht wurden. Die jeweiligen zu ändernden Zahlen stellen den Code des Zeichens in hexadezimaler Schreibweise dar.</p>
 
+        <figure>
+            <pre>$1b88 entspricht Speicherstelle $eb88
+
+.: 1b88 11 33 57 41 34 <u>59</u> 53 45
+.: 1b90 01 35 52 44 36 43 46 54
+.: 1b98 58 37 <u>5a</u> 47 38 42 48 55
+
+.: 1bc8 8b 91 23 d7 c1 24 <u>d9</u> d3
+.: 1bd0 c5 01 25 d2 c4 26 c3 c6
+.: 1bd8 d4 d8 27 <u>da</u> c7 28 c2 c8
+
+.: 1c08 8a 8b 91 96 b3 b0 97 <u>b7</u>
+.: 1c10 ae b1 01 98 b2 ac 99 bc
+.: 1c18 bb a3 bd 9a <u>ad</u> a5 9b bf</pre>
+            <figcaption>Bild 1. Die unterstrichenen Adressen müssen geändert werden</figcaption>
+        </figure>
+
         <address class="author">(Stefan Zellin/tr)</address>
 
         <h2>Schreiberling und Citizen 120 D</h2>
@@ -152,7 +169,40 @@
 
         <h3>Beschreibung des Programms »IRQ INIT«:</h3>
 
-        <p>TODO TABLE</p>
+        <table>
+            <tr>
+                <td>Zeile 10— 20</td>
+                <td>Lo- und Hi-Byte speichern.</td>
+            </tr>
+            <tr>
+                <td>Zeile 30—160</td>
+                <td>Suchen nach der Zahlenfolge 32,49,234, welche dem Maschinenbefehl »JSR $EA31«, beziehungsweise in Basic »SYS59953«, entspricht.</td>
+            </tr>
+            <tr>
+                <td>Zeile 170</td>
+                <td>Ändert »JSR $EA31« in »JMP $EA31« um (zum Interrupt verlassen).</td>
+            </tr>
+            <tr>
+                <td>Zeile 210</td>
+                <td>Setzt Speicher A auf 24696, dann steht in Adresse 828 der Wert 120 und in 829 der Wert 96. Dies entspricht den Befehlen »SEI« und »RTS«.</td>
+            </tr>
+            <tr>
+                <td>Zeile 220</td>
+                <td>Startet die zwei Befehle, um einen Interrupt zu verhindern.</td>
+            </tr>
+            <tr>
+                <td>Zeile 230—240</td>
+                <td>Interruptvektoren auf eigene Routine setzen.</td>
+            </tr>
+            <tr>
+                <td>Zeile 250</td>
+                <td>Wie Zeile 210, nur mit den Befehlen »CLI« und »RTS«.</td>
+            </tr>
+            <tr>
+                <td>Zeile 260</td>
+                <td>Interrupts wieder freigeben.</td>
+            </tr>
+        </table>
 
         <h3>Vorgehensweise:</h3>
 

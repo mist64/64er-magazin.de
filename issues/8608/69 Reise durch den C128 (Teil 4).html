@@ -26,6 +26,156 @@
 
         <p>Der VIC ist nämlich allen, die den Commodore 64 kennen, ein alter Bekannter. Dort heißt er genaugenommen MO®S 6566 Video-Interface-Controller. Im C 128 haben wir eine leicht geänderte Version dieses Chip vorliegen, den MOS 8564 Video-Interface-Controller, der sich aber — weil er auch im C 64-Modus verwendet wird — allem Anschein nach nur durch zwei zusätzliche Register vom 6566 unterscheidet. Bild 1 zeigt Ihnen alle Register, ihre Bedeutungen und von einigen auch die üblichen Inhalte:</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">Register</th>
+                        <th colspan="2">Adressen</th>
+                        <th colspan="8">Bit</th>
+                        <th colspan="3">Normaler Inhalt</th>
+                        <th rowspan="2">Bemerkung</th>
+                    </tr>
+                    <tr>
+                        <th>$</th>
+                        <th>dez</th>
+                        <th>7</th>
+                        <th>6</th>
+                        <th>5</th>
+                        <th>4</th>
+                        <th>3</th>
+                        <th>2</th>
+                        <th>1</th>
+                        <th>0</th>
+                        <th>Text-M.</th>
+                        <th>Hires-M.</th>
+                        <th>Multicolor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0–16</td>
+                        <td>D000–D010</td>
+                        <td>53248–53264</td>
+                        <td colspan="8">Sprite-Positionen</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>— Basic 7.0<br>— IRQ</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>D011</td>
+                        <td>53265</td>
+                        <td>msb Rasterregister</td>
+                        <td>verändert. Hintergrund-Modus = 1, normal = 0</td>
+                        <td>Bit-Map-Modus = 1, Text = 0</td>
+                        <td>Bildschirm an = 1, aus = 0</td>
+                        <td>Zeilenzahl 24 = 0, 25 = 1</td>
+                        <td colspan="3">Smooth Scrolling Y-Verschiebung</td>
+                        <td>$1B<br>abhängig</td>
+                        <td>$BB<br>von</td>
+                        <td>$BB<br>Bit 7</td>
+                        <td>— teilweise durch Basic 7.0<br>— IRQ</td>
+                    </tr>
+                    <tr>
+                        <td>18–21</td>
+                        <td>D012–D015</td>
+                        <td>53266–53269</td>
+                        <td colspan="8">LSB Rasterregister, Lichtgriffel, Sprites</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>— Basic 7.0<br>— IRQ</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>D016</td>
+                        <td>53270</td>
+                        <td colspan="2">unbenutzt, beide Bits = 1</td>
+                        <td>Reset 0 = VIC arbeitet</td>
+                        <td>Multicolormode = 1</td>
+                        <td>Spaltenzahl 39 = 0, 40 = 1</td>
+                        <td colspan="3">Smooth Scrolling X-Verschiebung</td>
+                        <td>$C8</td>
+                        <td>$C8</td>
+                        <td>$D8</td>
+                        <td>— teilweise durch Basic<br>— IRQ</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>D017</td>
+                        <td>53271</td>
+                        <td colspan="8">Sprite-Vergrößerung in Y-Richtung</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>— Basic 7.0<br>— IRQ</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">24</td>
+                        <td rowspan="2">D018</td>
+                        <td rowspan="2">53272</td>
+                        <td colspan="4" rowspan="2">Bildschirmspeicherstartadresse</td>
+                        <td colspan="3">Text: Zeichenmusterquelle</td>
+                        <td rowspan="2">unbenutzt, immer = 1</td>
+                        <td rowspan="2">$15</td>
+                        <td rowspan="2">$79</td>
+                        <td rowspan="2">$79</td>
+                        <td rowspan="2">— teilweise durch Basic 7.0<br>— IRQ<br>— Steuerbar 2064/5</td>
+                    </tr>
+                    <tr>
+                        <td>Bit-Map-Mode: 0 = Bit-Map unten, 1 = Bit-Map oben</td>
+                        <td colspan="2">unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>25,26</td>
+                        <td>D019–D01A</td>
+                        <td>53273–53274</td>
+                        <td colspan="8">VIC-Unterberechnungs-Register</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>— Basic 7.0<br>— IRQ</td>
+                    </tr>
+                    <tr>
+                        <td>27–46</td>
+                        <td>D01B–D02E</td>
+                        <td>53275–53294</td>
+                        <td colspan="8">Farb-Register: Hintergrund, Vordergrund, Multicolor, Sprites</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>— Basic 7.0<br>— teilw. IRQ</td>
+                    </tr>
+                    <tr>
+                        <td>47</td>
+                        <td>D02F</td>
+                        <td>53295</td>
+                        <td colspan="5">unbenutzt (alle = 1)</td>
+                        <td colspan="3">Tastaturerkennung</td>
+                        <td>$F8</td>
+                        <td>$F8</td>
+                        <td>$F8</td>
+                        <td>?</td>
+                    </tr>
+                    <tr>
+                        <td>48</td>
+                        <td>D030</td>
+                        <td>53296</td>
+                        <td colspan="6">unbenutzt (alle = 1)</td>
+                        <td>Test (?)</td>
+                        <td>Taktfrequenz: 1 MHz = 0, 2 MHz = 1</td>
+                        <td>$FC</td>
+                        <td>$FC</td>
+                        <td>$FC</td>
+                        <td>— Basic 7.0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 1. Die VIC-Register im C 128</figcaption>
+        </figure>
+
         <p>Die beiden neuen Register sind 47 ($DOZF, 53295) und 48 ($D030, 53296). 47 enthält — etwas rätselhaft — in den Bits 0 bis 2 eine Tastaturkennung. Interessanter scheint Register 48. Das Bit 0 dient dem Umschalten in den 2-MHz-Betrieb und das ist auch im C 64-Modus möglich. Allerdings ist dann auf dem 40-Zeichen-Bildschirm nichts mehr zu sehen (oder aber wüstes Geflimmer), weil der VIC diese doppelte Geschwindigkeit nicht mitmacht. Durch POKE 53296,1 kann der C 64 dannalle Operationen doppelt so schnell ausführen als sonst. Ein POKE 53296,0 läßt den Bildschirm wieder normal erscheinen und schaltet in den 1-MHz-Betrieb zurück.</p>
 
         <p>Nun aber kommt das Verwirrspiel: Dies ist das einzige VIC-Register, das sich auf diese Art — also einfach durch POKEs oder mittels des Monitors — verändernläßt. AlleanderenRegisterumbauten äußern sich bestenfalls in einem kurzen Aufflackern des 40-Zeichen-Bildschirmes... dann ist der Einheitszustand wieder hergestellt!</p>
@@ -49,6 +199,190 @@
 
         <p>Sowohl 2504 als auch 2605 entsprechen — bis auf das Bit 0, dasaber auch in 53272 ohne Bedeutung ist — exakt dem Register 24 im jeweiligen Modus (also Text- oder Bit-Map-Modus). Alle drei Speicherstellen werden von den Unterbrechungen nicht behelligt — jedenfalls nicht zu unserem Nachteil wie der VIC selbst. Das, was wir in diese Speicherstellen schreiben, wird flugs nach 53272 transportiert und somit beherrschen wir den Bildschirm, die Bit-Map und die Quelle der Zeichenmuster. Oder doch nicht so ganz? Aber dazu kommen wir später noch. Sehen wir uns zunächst einmal an, was die verschiedenen Inhalte von 53272, 2604 oder 2605 zu bewirken imstande sind. Die Bits 4 bis 7 legen die Startadresse desBildschirmspeichers fest. Dort findet sichim Einschaltzustand der binäre Inhalt 0001, in den Grafik-Modi aber der Inhalt Olll. Das Bild 2 zeigt die weiteren Möglichkeiten:</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="4">Speicherinhalt: binär in Bits</th>
+                        <th rowspan="2">W dezimal (Bits 0 bis 3 als 0 angenommen)</th>
+                        <th colspan="2">Bildschirmadresse</th>
+                        <th rowspan="2">Bemerkung</th>
+                    </tr>
+                    <tr>
+                        <th>7</th>
+                        <th>6</th>
+                        <th>5</th>
+                        <th>4</th>
+                        <th>dezimal</th>
+                        <th>$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>16</td>
+                        <td>1024</td>
+                        <td>400</td>
+                        <td>Text-Bildschirm</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>32</td>
+                        <td>2048</td>
+                        <td>800</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>48</td>
+                        <td>3072</td>
+                        <td>900</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>64</td>
+                        <td>4096</td>
+                        <td>1000</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>80</td>
+                        <td>5120</td>
+                        <td>1400</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>96</td>
+                        <td>6144</td>
+                        <td>1800</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>112</td>
+                        <td>7168</td>
+                        <td>1900</td>
+                        <td>Grafik-Bildschirm</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>128</td>
+                        <td>8192</td>
+                        <td>2000</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>144</td>
+                        <td>9216</td>
+                        <td>2400</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>160</td>
+                        <td>10240</td>
+                        <td>2800</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>176</td>
+                        <td>11264</td>
+                        <td>2900</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>192</td>
+                        <td>12288</td>
+                        <td>3000</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>208</td>
+                        <td>13312</td>
+                        <td>3400</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>224</td>
+                        <td>14336</td>
+                        <td>3800</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>240</td>
+                        <td>15360</td>
+                        <td>3900</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. Die Bildschirmspeicher-Startadressen bei verschiedenen Inhalten der Bits 4 bis 7 in 53272 2,2 2604 oder 2605.</figcaption>
+        </figure>
+
         <p>Erreichbar sind diese anderen Bildschirme durch die Kommandos:<br>
             POKE 2604, (PEEK(2604)AND15)OR W<br>
             im Text- und<br>
@@ -63,6 +397,65 @@
             16383 = 11 1111 1111 1111</p>
 
         <p>Das entspricht 16 KByte und davon befinden sich vier in einer BANK. Es gibt nun im C 64-Modus ein Register im CIA2, dem sogenannten NMI-CIA (das ist der »Complex Interface Adapter«, also ein Ein- und Ausgabe- -Baustein), welches festlegt, auf welchen 16-KByte-Bereich in einer BANK der VIC Zugriff hat. Es handelt sich um den DATA-Port A bei $DDO00 (das ist dezimal 56576). Nach allen Untersuchungen liegt an derselben Stelle auch im C 128-Modus dieser Chip, so daß man das Register auch hier benutzen kann. Der VIC-Zugriff wird durch die Bits O0 und 1 gesteuert. Was man mit den verschiedenen Belegungen erreicht, zeigt Ihnen das Bild 3:</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="3">Speicherinhalt binär in Bit/Dezimalwert</th>
+                        <th rowspan="2">Abschnitt</th>
+                        <th colspan="2">Speicherstellen (dezimal)</th>
+                        <th rowspan="2">Bemerkung</th>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <th>0</th>
+                        <th>I</th>
+                        <th>von</th>
+                        <th>bis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>3</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>16383</td>
+                        <td>Einschaltwert</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>2</td>
+                        <td>1</td>
+                        <td>16384</td>
+                        <td>32767</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>32768</td>
+                        <td>49151</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>3</td>
+                        <td>49152</td>
+                        <td>65535</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 3. Der 16-KByte-Zugriff des VIC in Zusammenhang mit dem Inhalt der Bit 0 und 1 von Port A des NMI-CIA (Speicherstelle 56576) (CIA = Complex Interface Adapter)</figcaption>
+        </figure>
 
         <p>Im Einschaltzustand steht hier 11, was den unteren 16-KByte-Bereich für den VIC freigibt.</p>
 
@@ -95,6 +488,101 @@
 
         <p>Sollten Sie malin der Verlegenheit sein, andere als die vorhandenen Zeichen unseres Computerszu benötigen, dann ist auch das möglich. In der Speicherstelle 2604 dienen die Bits 1 bis 3 der Festlegung der Startadresse des Zeichenmusterspeichers. Bild 4 schlüsselt die Zuordungen für den ersten 16-KByte-Bereich auf:</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="4">Speicherinhalt: binär in Bits/dezimal (Bit = 0)</th>
+                        <th colspan="2">Startadresse der Zeichenmuster</th>
+                        <th rowspan="2">Bemerkung</th>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <th>2</th>
+                        <th>1</th>
+                        <th>Z</th>
+                        <th>dezimal</th>
+                        <th>$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>2048</td>
+                        <td>800</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>4</td>
+                        <td>4096</td>
+                        <td>1000</td>
+                        <td>Einschaltzustand</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>6</td>
+                        <td>6144</td>
+                        <td>1800</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>8</td>
+                        <td>8192</td>
+                        <td>2000</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>10</td>
+                        <td>10240</td>
+                        <td>2800</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>12</td>
+                        <td>12288</td>
+                        <td>3000</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>14</td>
+                        <td>14336</td>
+                        <td>3800</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 4. Zusammenhang der Zeichenmusterquellen mit dem Inhalt der Bits 1 bis 3 in 2604</figcaption>
+        </figure>
+
         <p>Das Umschalten auf eine andere Zeichenmusterquelle geschieht dann mittels<br>
             POKE 2604, (PEEK(2604) AND240)OR Z<br>
             Dabei ist Z die Dezimalzahl in Spalte 4 des Bildes.</p>
@@ -119,6 +607,55 @@
 
         <p>Interessant ist, daß die Umschaltung auf den DIN-Zeichensatz keinen Einfluß auf die neuen Zeichen hat. Wenn vor dem Programmlauf schon der DIN-Zeichensatz eingeschaltet war, erscheint das dazugehörige A im neuen Gewand. Merkwürdig! Welchen Zeichensatz haben wir eigentlich bei $D000 herausgelesen? Wenn Sie durch gleichzeitiges Drücken der Commodore- und der Shift-Taste auf die kleinen Buchstaben umschalten, finden Sie das normale Zeichenbild. Der Grund dafür ist, daß wir in deren Zeichenmuster nicht eingegriffen haben, denn die liegen erst ab $3800. Bild 5 zeigt Ihnen, wo sich im Zeichen-ROM (und in gleicher Reihenfolge nach dem Kopieren ab $3000) welche Zeichen befinden:</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Block</th>
+                        <th>Startadresse ($)</th>
+                        <th>Inhalt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4">0</td>
+                        <td>D000</td>
+                        <td>große Buchstaben</td>
+                    </tr>
+                    <tr>
+                        <td>D200</td>
+                        <td>Grafikzeichen</td>
+                    </tr>
+                    <tr>
+                        <td>D400</td>
+                        <td>große Buchstaben (revers)</td>
+                    </tr>
+                    <tr>
+                        <td>D600</td>
+                        <td>Grafikzeichen (revers)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">1</td>
+                        <td>D800</td>
+                        <td>kleine Buchstaben</td>
+                    </tr>
+                    <tr>
+                        <td>DA00</td>
+                        <td>große Buchstaben, Grafikzeichen</td>
+                    </tr>
+                    <tr>
+                        <td>DC00</td>
+                        <td>kleine Buchstaben (revers)</td>
+                    </tr>
+                    <tr>
+                        <td>DE00</td>
+                        <td>große Buchstaben, Grafikzeichen (revers)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 5. Die Anordnung der Zeichenmuster im Zeichen-ROM (und nach dem Kopieren nach $3000)</figcaption>
+        </figure>
+
         <p>Ein Problem istesnoch, denrichtigen Ort für die neuen Zeichenmuster zu finden. Es sollte weder einer sein, der durch ein längeres Basic-Programm überschrieben werden kann (wie im Beispiel ZEICHENSATZ,), noch darfer in einem anderen 16-KByte-Abschnitt liegen als der Bildschirmspeicher, noch sollte er bei 4096 beginnen, denn dort greift der Computerimmer aufdas Zeichen-ROM zu. Ein Weg, das Problem zu lösen ist es, den Basic-Start nach $4000 hochzulegen und die Zeichenmuster ab $2000 oder $3000. Das Hochlegen des Programms nach $4000 besorgt einfach der GRAPHIC-Befehl für uns. Wir brauchen dazu im Programm ZEICHENSATZ lediglich eine Zeile einzufügen:<br>
             25 GRAPHIC1,1:GRAPHICO</p>
 
@@ -131,6 +668,34 @@
         <h2>Mehrere Bit-Maps</h2>
 
         <p>Die Speicherstelle 2605 haben wir bislang sträflich vernachlässigt. Die oberen 4 Bit haben hier dieselbe Bedeutung wie in 2604, nur daß in den Grafik-Modi der BildschirmspeicheralsFarb-RAM dient, wie wiresbeim COLOR-Befehl ausführlich kennenlernen. Das Bit 3 aber hat mit der Position der Bit-Map zu tun. Bild 6 zeigt Ihnen, was dadurch bewirkt wird (bezogen auf den unteren 16-KByte-Bereich):</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">Bit 3</th>
+                        <th colspan="2">Bit-Map in Abschnitt 0 (dezimal)</th>
+                    </tr>
+                    <tr>
+                        <th>von</th>
+                        <th>bis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>7999</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>8192</td>
+                        <td>16191</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 6. Wirkung des Bit 3 in 2605 auf die Lage der Bit-Map.</figcaption>
+        </figure>
 
         <p>Das Setzen dieses Bit 3 geschieht durch<br>
             POKE2605,PEEK(2605)OR8<br>

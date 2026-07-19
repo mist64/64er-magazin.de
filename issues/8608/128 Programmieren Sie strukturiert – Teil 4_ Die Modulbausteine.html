@@ -44,6 +44,58 @@
 
         <p>Der eigentliche Fortschritt von Basic 7.0 ist bei den Schleifen zu verzeichnen. Die Befehlselemente DO, LOOP UNTIL, WHILE und EXIT erlaubenes, sämtliche bisher fehlenden Schleifentypen zu bauen (Tabelle 1):</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>UNTIL</th>
+                        <th>WHILE</th>
+                        <th>LOOP</th>
+                        <th>ENDLOS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DO</td>
+                        <td>DO WHILE</td>
+                        <td>DO</td>
+                        <td>DO</td>
+                    </tr>
+                    <tr>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                    <tr>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>EXIT</td>
+                        <td>...</td>
+                    </tr>
+                    <tr>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                    <tr>
+                        <td>LOOP UNTIL</td>
+                        <td>LOOP</td>
+                        <td>LOOP</td>
+                        <td>LOOP</td>
+                    </tr>
+                    <tr>
+                        <td>vergleiche 160 bis 190</td>
+                        <td>vergleiche 40030</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Übersicht der Schleifentypen von Basic 7.0</figcaption>
+        </figure>
+
         <p>Ob der Befehlsname LOOP als Endmarkierung sehr geschickt gewählt ist, sei dahingestellt; man kann es lernen. Warum die Schleifen allerdings so fürchterlich langsam sein müssen (mehr als 10 Sekunden für 1000 Durchläufe), das ist nicht ganz einsichtig(Comal schafft es in einem Fünftel der Zeit!). Ubrigens kann UNTIL auch nach DO stehen und WHILE nach LOOP und eine Schleife kann sowohl EXIT enthalten als auch UNTIL und/oder WHILE. Das läßt dem Programmierer alle Freiheiten, aber bürdet ihm gleichzeitig die ganze Verantwortung auf. Das kann leicht gefährlich werden. Leidvoll erfahrenes Beispiel: Die UNTIL-Schleife ist an sich so definiert, daß sie auf jeden Fall einmal durchlaufen wird — so lange, bis die Bedingung erfüllt ist. Wenn man nun »DO UNTIL Bedingung« codiert (statt »LOOP UNTIL Bedingung«), dann wird die Bedingung vor dem Schleifendurchlauf überprüft und allerhand zunächst unerklärliche Fehler können auftreten.</p>
 
         <p>Was die Unterprogrammbausteine angeht, so hat sich nichts geändert. Wir müssen also weiterhin unsere hausgemachten Prozedur- und Funktionsstrukturen benutzen, wenn wir neue Befehle brauchen (vergleiche 64'er 2/86 und 4/86).</p>
@@ -271,6 +323,16 @@
 
         <p>Ich jedenfalls finde die Modulbausteine, die ich vorgestellt habe, für meine eigene Arbeit sehr hilfreich, arbeits- und denkerleichternd. Es waren die folgenden (Bild 3).</p>
 
+        <figure>
+            <pre>          ZENTRALMODUL
+       MODUL + NEBENMODUL
+           UNTERMODUL
+PROZEDURENMODUL   FUNKTIONENMODUL
+           DATENMODUL
+        INFORMATIONSMODUL</pre>
+            <figcaption>Bild 3. Die Modulbausteine</figcaption>
+        </figure>
+
         <h2>Strukturiertes Programmieren ist menschenfreundlich</h2>
 
         <p>Damit haben wir nunmehr alle Werkzeuge kennengelernt, die in dieser Serie als Hilfsmittel zum strukturierten Programmieren vorgestellt werden sollten. Diese Werkzeuge zu benutzen, damit zu programmieren, macht Spaß. Es macht immer Spaß, wenn man den Überblick behält, wenn man schnell vorankommt, wenn man am Ziel ankommen wird, das heißt wenn man sicher sein kann, daß man nicht irgendwo vorher im Schlamm komplexer und deshalb unlösbar scheinender Probleme steckenbleibt.</p>
@@ -299,7 +361,36 @@
 
         <address class="author">(Prof. Burkhard Leuschner/nj)</address>
 
-        <p>TODO TABELLE 2</p>
+        <figure>
+            <h2>Hinweise zu »Comalchen«</h2>
+            <p>Der Zweck des Programms COMALCHEN ist es, Fragen über Comal zu beantworten. Fragen können die Form von W-Fragen haben (Was ist..., Wieviel kostet..., Wer hat...) oder von Ja-Nein-Fragen (Ist..., kann..., bekommt man...).</p>
+            <p>Beobachtungen bei der Benutzung der ursprünglichen Version von COMALCHEN hatten gezeigt, daß die Benutzer selten beim Thema bleiben, entweder aus Vergeßlichkeit oder einfach aus Mutwillen.</p>
+            <p>Es ist also notwendig, nicht nur Eingaben zu berücksichtigen, die sich tatsächlich auf Comal beziehen, sondern (vor allem!) Eingaben, die sich nicht auf Comal beziehen. Daraus ergeben sich vier Typen von Eingaben:<br>
+                1. W-Fragen, 2. Ja-Nein-Fragen, 3. Eingaben mit »du«,<br>
+                4. Sonstige Eingaben: Aussagen (Nicht-Fragen)</p>
+            <p>Die Unterscheidung dieser Typen führt das Programm mit sehr einfachen Mitteln durch. Eingaben mit Fragezeichen am Ende sind Fragen. Wenn ein Fragewort enthalten ist, dann sind es W-Fragen, anderenfalls Ja-Nein-Fragen. Alles andere sind zunächst Aussagen. Wenn »du« enthalten ist, dann handelt es sich um eine Eingabe mit »du«, also um den dritten Typ. Alles andere gilt als Aussage des Typs 4. Die Antworttypen bestimmen sich nach mehreren Gesichtspunkten:<br>
+                Typ 1. nach dem Fragetyp<br>
+                Typ 2. nach der erfragten Information<br>
+                Typ 3. danach, ob der Computer mit der Frage etwas anfangen konnte, ob er sie »verstand«<br>
+                Typ 4. nach der Fragedisziplin des Benutzers</p>
+            <p>Die Antwortmöglichkeiten sind vom Programm vorgegeben. Sie können vom Computer nicht »erfunden«, sondern nur ausgewählt werden. Wo mir mehrere Antwortmöglichkeiten auf eine Frage einfielen, kann der Computer aus mehreren Antworten auswählen. Er tut dies nach dem Zufallsverfahren, achtet aber darauf, daß er erst alle Möglichkeiten erschöpft hat, ehe er eine schon einmal gegebene Antwort wiederholt. Die Antworten werden so gegeben, wie sie vorgegeben sind, mit einer Ausnahme: Manche Antworten sind »Rahmen«; der Rahmen ist vorgegeben, die Füllung des Rahmens hängt von der jeweiligen Eingabe ab, zum Beispiel »Was meinst du mit...?«</p>
+            <p>Die Auswahl einer Antwort geht so vor sich:</p>
+            <h3>Auswahl nach dem Fragewort (Typ 1)</h3>
+            <p>Jedem Fragetyp entspricht zunächst ein Antworttyp, das heißt W-Fragen werden mit Fakten beantwortet, Ja-Nein-Fragen mit »Ja«, »Nein«, »Zweifellos« oder ähnliche Eingaben, die »du« enthalten werden abgewehrt, sonstige Aussagen je nach Aussagetyp behandelt, »Adieu« führt zum Beispiel zur Beendigung des Programms.</p>
+            <h3>Auswahl nach der erfragten Information, also nach dem Inhalt der Frage (Typ 2)</h3>
+            <p>Wenn der Computer eine Frage überprüft, versucht er herauszufinden, worüber der Fragende etwas wissen will. Dazu sucht er nach »Schlüsselwörtern« in der Eingabe. Wenn zum Beispiel das Wort »Preis« enthalten ist, dann ist die Wahrscheinlickeit groß, daß der Benutzer wissen will, was COMAL kostet.</p>
+            <p>Wenn der Computer also eines dieser Schlüsselwörter findet, dann nimmt er an, daß die Frage den Preis betrifft. Er speichert dann »Preis« als Oberbegriff.</p>
+            <p>Es gibt im Datenmodul, getrennt durch Fragetypen, Gruppen solcher Oberbegriffe mit zugehörigen Schlüsselwörtern.</p>
+            <p>Wenn der Computer nun eine passende Antwort sucht, dann begibt er sich zunächst zu dem entsprechenden Antworttyp, zum Beispiel den Faktenantworten. Dort sucht er nach dem gespeicherten Oberbegriff, also zum Beispiel »Preis«. Aus den zugehörigen Antwortmöglichkeiten wählt er dann eine aus.</p>
+            <h3>Der Computer versteht die Frage nicht (Typ 3)</h3>
+            <p>Wenn der Computer keinen Oberbegriff gefunden hatte, kann er mit der Eingabe nichts anfangen. Wenn er eine Frage nicht verstanden hat, antwortet er mit »Ich weiß nicht« (oder einer alternativen Möglichkeit); wenn er eine Aussage nicht verstanden hat, sagt er: »Ich habe es nicht verstanden«.</p>
+            <h3>Der Benutzer verirrt sich (Typ 4)</h3>
+            <p>Manche Benutzer vergessen völlig, was das Thema ist. Um den Fragenden wieder auf die richtige Fährte zu bringen, wird gezählt, wie oft eine Eingabe nicht verstanden wurde. Nach dem dritten Mal wird an das Thema erinnert. Wenn der Benutzer trotzdem weiter das Thema verfehlt, bricht der Computer nach dem sechsten Mal die Unterhaltung ab.</p>
+            <p>Wie »natürlich« die Unterhaltung wirkt, hängt von der Logik des Fragers ab, aber auch von den Daten, das heißt den Schlüsselwörtern und den zugeordneten Antwortmöglichkeiten. Da kann noch unendlich viel verbessert und ergänzt werden. Normal ist, daß einem bei jedem Programmlauf eine neue Idee einfällt. Versuchen Sie zum Beispiel, eine Hilfe für denjenigen Benutzer einzubauen, der nicht mehr weiß, worüber er Fragen stellen könnte.</p>
+            <p>Falls Sie eigene Daten eingeben wollen — die Zahlen hinter den Oberbegriffen der Antwortdaten dienen dazu, die Liste zu führen, die registriert, welche Antwortmöglichkeiten jeweils schon »verbraucht« sind. Diese Zahlen brauchen nicht in numerischer Reihenfolge zu sein. Wenn Sie irgendwo eine neue Frage plus Antwortgruppe einfügen, geben Sie ihr einfach die nächste laufende Nummer. Hauptsache, jede Antwortgruppe hat ihre eigene Zahl. Achten Sie bei der Dimensionierung des Feldes LISTE$( ) darauf, daß das Feld auch groß genug ist.</p>
+            <p>Natürlich können Sie alle meine Daten hinauswerfen und eigene eingeben. Achten Sie aber bitte darauf, daß die Grundgruppierungen mit den bisherigen Zeilennummern erhalten bleiben, denn darauf springt das Programm mit RESTORE zu.</p>
+            <figcaption>Tabelle 2. Anmerkungen zum Programm »COMALCHEN«</figcaption>
+        </figure>
     </article>
 </body>
 
