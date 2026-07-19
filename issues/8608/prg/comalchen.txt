@@ -1,0 +1,759 @@
+
+
+;comalchen.prg ==1c01==
+   10 rem programm: comalchen
+   20 rem version:  1.1
+   25 rem datum:    27.2.86
+   30 rem computer: c128
+   40 rem sprache:  basic 7.0
+   50 rem autor:    burkhard leuschner
+   60 :
+  100 rem *******************************
+  110 rem zentralmodul
+  130 : gosub 1000 vorbereitung
+  140 : gosub 2000 begruessung
+  150 :
+  160 : do
+  170 :  gosub 3000 frage
+  180 :  gosub 4000 antwort
+  190 : loop until adieu
+  200 :
+  210 : gosub 5000 abschied
+  220 : gosub 6000 programmende
+  240 rem ende zentralmodul
+  250 rem *******************************
+  260 :
+  270 :
+ 1000 rem modul vorbereitung
+ 1010 : gosub 50000 system konfiguration
+ 1020 : gosub 51000 initialisierungen
+ 1030 : gosub 46000 funktionen
+ 1040 : gosub 52000 daten lesen
+ 1050 return
+ 1060 rem ende modul vorbereitung
+ 1070 :
+ 2000 rem modul begruessung
+ 2010 : gosub 10000 vorstellung
+ 2020 : gosub 10200 begruessen
+ 2030 : gosub 10500 beginn unterhaltung
+ 2040 return
+ 2050 rem ende modul begruessung
+ 2060 :
+ 3000 rem modul frage
+ 3010 : gosub 11000 eingabe frage
+ 3015 rem fast
+ 3020 : gosub 11300 fragentyp feststellen
+ 3030 : gosub 11500 schluesselwort suchen
+ 3040 return
+ 3050 ende modul frage
+ 3060 :
+ 4000 rem modul antwort
+ 4010 : gosub 15000 anworttyp festlegen
+ 4020 : gosub 15400 antwort waehlen
+ 4025 rem slow
+ 4030 : gosub 15600 antwort ausgeben
+ 4040 return
+ 4050 rem ende modul antwort
+ 4060 :
+ 4070 :
+ 5000 rem modul abschied
+ 5020 : gosub 29000 abschiedskommentar
+ 5030 return
+ 5040 rem ende modul abschied
+ 5050 :
+ 6000 rem modul programmende
+ 6005 : printchr$(12)
+ 6010 : end
+ 6020 ende modul programmende
+ 6030 :
+ 6040 rem ******************************
+ 6050 rem ******************************
+ 6060 :
+10000 rem nebenmodul begruessung
+10010 rem ----------------------
+10020 rem u-modul vorstellung
+10025 rem export: name$
+10030 : print chr$(147)
+10040 : print "Ich bin Comalchen - und wer bist du?
+10050 : print
+10060 : do
+10070 :  print
+10080 :  input name$
+10090 :  print "Ist ";name$;" dein Vorname?"
+10100 :  input mjn$
+10110 :  if instr("nN",left$(mjn$,1)) then begin
+10120 :   print
+10130 :   print"Ich moecht' aber doch gern deinen       Vornamen wissen!"
+10133 :   print
+10135 :   print"Wie heisst du also?"
+10140 :  bend
+10150 : loop until instr("jJ",left$(mjn$,1))
+10160 return
+10170 rem ende u-modul vorstellung
+10180 :
+10200 rem u-modul begruessen
+10210 rem import: name$
+10220 : do
+10230 :  print
+10240 :  print"Gruess Gott, ";name$;"."
+10250 :  print
+10260 :  input meingabe$
+10270 :  ueingabe$=meingabe$
+10280 :   gosub 40200 lowercase
+10290 :   gosub 40400 sonderzeichen
+10300 :  meingabe$=ueingabe$
+10310 :  restore 55830:rem gruss
+10320 :  do
+10330 :   read mgruss$
+10340 :   if not(mgruss$="&") then begin
+10350 :    if instr(meingabe$,mgruss$) then mok=true
+10355 :   bend
+10360 :  loop until mok or mgruss$="&"
+10370 : loop until mok
+10380 return
+10390 rem ende u-modul begruessen
+10400 :
+10500 rem u-modul beginn unterhaltung
+10510 : print
+10520 : print"Du willst dich also mit mir ueber COMAL unterhalten.
+10530 : print
+10540 : print"Ok. Schiess los. Was willst du wissen?
+10550 : print
+10670 return
+10680 ende u-modul beginn unterhaltung
+10700 rem ende nebenmodul begruessung
+10710 :
+10720 :
+11000 rem nebenmodul frage
+11010 rem ----------------
+11020 rem u-modul eingabe frage
+11030 rem export: frage$,eingabe$
+11040 : gosub 12000 eingabe
+11050 : eingabe$=frage$
+11060 : ueingabe$=eingabe$
+11070 :  gosub 12500 form standardisieren
+11080 : eingabe$=ueingabe$
+11090 return
+11100 rem ende u-modul eingabe frage
+11110 :
+11300 rem u-modul fragentyp feststellen
+11310 rem import: eingabe$
+11320 rem export: tpeingabe
+11330 : tpeingabe=0
+11340 : if right$(ei$,1)="?" then begin
+11350 :  gosub 13000 fragepronomen
+11360 :  if mgefunden then tpeingabe=1 : else tpeingabe=2
+11370 :  bend: else tpeingabe=4
+11380 : if tp=4 then if fn du drin(0) then tp=3
+11390 return
+11400 rem ende u-modul fragetyp feststellen
+11410 :
+11500 rem u-modul schluesselwort suchen
+11510 rem import: tpeingabe
+11520 rem export: oberbegriff$,ky
+11530 : gosub 14000 schluesselgruppe suchen
+11540 : gosub 14500 oberbegriff finden
+11550 return
+11560 rem ende u-modul schluesselwort suchen
+11570 :
+12000 rem proc: eingabe
+12010 rem export: frage$
+12020 : do
+12025 :  frage$=""
+12027 :   rem poke 208,3:poke ?,34:poke ?+1,34:poke ?+2,20: rem tastaturpuffer
+12028 :   rem soll anfuehrungszeichen             beim input erzeugen
+12030 :  input frage$
+12040 :  if frage$="" then print"Hast du was gesagt?"
+12050 : loop until frage$>""
+12060 return
+12070 :
+12500 rem proc: form standardisieren (ueingabe$:in/out)
+12510 : gosub 40000 leerzeichen
+12520 : gosub 40200 lowercase
+12530 : gosub 40400 sonderzeichen
+12540 return
+12550 :
+13000 rem proc: fragepronomen
+13010 rem import: eingabe$, pronomen$(),zahlpronomen
+13020 rem export: mgefunden,wh
+13030 : mgefunden=false:wh=false
+13040 : for ui=1 to zahl
+13050 :  if right$(eingabe$,len(pr$(ui))+1)=pr$(ui)+"?" then wh=true
+13060 :  if instr(ei$,pr$(ui)) then mg=true: ui=zahl
+13070 : next
+13080 return
+13090 :
+14000 rem proc schluesselgruppe suchen
+14010 rem import: tpeingabe
+14020 : rem case
+14030 : on tpeingabe goto 14040,14060,14080,14100:goto 14120
+14040 :  restore 55000:rem w-fragen
+14050 : goto 14120
+14060 :  restore 55400:rem j/n-fragen
+14070 : goto 14120
+14080 :  restore 55600:rem du
+14090 : goto 14120
+14100 :  restore 55800:rem aussage
+14110 : goto 14120
+14120 : rem endcase
+14130 return
+14140 :
+14500 rem proc: oberbegriff finden
+14510 rem import: eingabe$
+14520 rem export: oberbegriff$,ky
+14530 : do
+14540 :  read oberbegri ff$
+14550 :  if not(ob$="@@@")then begin
+14560 :   do
+14570 :    read uschluessl$
+14580 :    if not(us$="&") then begin
+14590 :     up os=instr(us$,"&")
+14600 :     if up=0 then ky=(instr(eingabe$,us$)<>0):else begin
+14610 :      uwo rt$(1)=left$(us$,up-1)
+14620 :      uwo rt$(2)=mid$(us$,up+1)
+14630 :      ky=(instr(ei$,uw$(1)) and instr(ei$,uw$(2))<>0)
+14640 :     bend
+14650 :    bend
+14660 :   loop until ky or us$="&"
+14670 :  bend
+14680 : loop until ky or ob$="@@@"
+14690 return
+14700 rem ende nebenmodul frage
+14710 :
+14720 :
+15000 rem nebenmodul antwort
+15010 rem ------------------
+15020 rem u-modul antworttyp festlegen
+15030 rem import: tpeingabe,ky
+15040 rem export: typantwort,oberbegriff$
+15050 : rem case
+15060 : on tpeingabe goto 15070,15110,15130,15150:goto15160
+15070 :  if wh then ky=0:ob$="nur fragepronomen":typantw=1:ni=0:else begin
+15080 :   if ky then typ=1:nichtthema=0:else typ=5:ni=ni+1:ob$="weissnicht"
+15090 :  bend
+15100 : goto 15160
+15110 :  if ky then typ=2:ni=0:else typ=5:ni=ni+1:oberbegri ff$="weissnicht
+15120 : goto 15160
+15130 :  typ=3:ni=ni+1
+15140 : goto 15160
+15150 :  if ky then typ=4:ni=0:else typ=6:ni=ni+1:ob$="verstehnicht"
+15160 : rem endcase
+15170 :
+15180 : if ni>6 then typantw=8:oberbegr$="abbruch":adieu=true:else begin
+15190 :  if nichtthema>3 then typantw=7:oberbegri ff$="themaverfehlt"
+15200 : bend
+15210 : if ob$="abschied" then adieu=true
+15220 return
+15230 rem ende u-modul antworttyp festlegen
+15240 :
+15400 rem u-modul antwort waehlen
+15410 rem import: typantwort
+15415 rem export: antwort
+15420 : gosub 16000 antwortgruppe finden
+15430 : gosub 43000 antwort aussuchen
+15440 return
+15450 rem ende u-modul antwort waehlen
+15460 :
+15600 rem u-modul antwort ausgeben
+15610 rem import: antwort$
+15620 : gosub 44000 anwort ergaenzen
+15630 : gosub 45000 antwort auf bildschirm
+15640 return
+15650 rem ende u-modul antwort ausgeben
+15660 :
+16000 rem proc antwortgruppe finden
+16010 rem import: typantwort
+16020 : rem case
+16030 : on typantw goto 16050,16070,16090,16110,16130,16150,16170,16190
+16040 : goto16200
+16050 :  restore 56000:rem faktenantw
+16060 : goto 16200
+16070 :  restore 56500:rem j/n-antw
+16080 : goto 16200
+16090 :  restore 56700:rem du
+16100 : goto 16200
+16110 :  restore 56800:rem aussage
+16120 : goto 16200
+16130 :  restore 57000:rem weiss nicht
+16140 : goto 16200
+16150 :  restore 57300:rem versteh nicht
+16160 : goto 16200
+16170 :  restore 57500:rem thema verfehlt
+16180 : goto 16200
+16190 :  restore 57800:rem abbruch
+16200 : rem endcase
+16220 return
+16240 rem ende nebenmodul antwort
+16250 :
+16260 :
+29000 rem nebenmodul abschied
+29010 rem -------------------
+29020 rem u-modul abschiedskommentar
+29030 : restore 57900
+29040 : oberbegri ff$="ende"
+29050 : gosub 43000 antwort aussuchen
+29060 : gosub 44000 antwort ergaenzen
+29070 : gosub 45000 antwort auf bildschirm
+29080 return
+29090 rem ende u-modul abschiedskommentar
+29110 ende nebenmodul abschied
+29120 :
+29130 :
+40000 rem prozedurenmodul
+40010 rem ===============
+40020 rem proc leerzeichen (ueingabe$: in/out)
+40030 : do while left$(ueingabe$,1)=" ":ue$=mid$(ue$,2):loop
+40040 : do while right$(ue$,1)=" ":ue$=left$(ue$,len(ue$)-1):loop
+40050 : do while instr(ue$,"  ")
+40060 :  up=instr(ue$,"  ")
+40070 :  ue$=left$(ue$,up-1)+mid$(ue$,up+1)
+40080 : loop
+40090 return
+40100 :
+40200 rem proc: lowercase (ueingabe$: in/out)
+40205 rem import klein$,gross$
+40210 : for ui=1 to len(ue$)
+40220 :  if instr(gr$,mid$(ue$,ui,1)) then begin
+40230 :   up=instr(gr$,mid$(ue$,ui,1))
+40240 :   ue$=left$(ue$,ui-1)+mid$(kl$,up,1)+mid$(ue$,ui+1)
+40250 :  bend
+40260 : next
+40270 return
+40280 :
+40400 rem proc: sonderzeichen (ueingabe$: in/out)
+40410 : uumlaute$    ="{CBM-V}{CBM-F}{CBM-C}{CBM-X}"
+40420 : usubstitutes$="ssaeoeue"
+40430 : for ui=1 to len(uum$)
+40440 :   uzeichen$=mid$(uum$,ui,1)
+40450 :  do while instr(ue$,uz$)
+40460 :   up=instr(ue$,uz$)
+40470 :   ue$=left$(ue$,up-1)+mid$(usub$,ui*2-1,2)+mid$(ue$,up+1)
+40480 :  loop
+40490 : next
+40500 return
+40510 :
+43000 rem proc antwort aussuchen
+43010 rem import: oberbegriff$,liste$(),null$
+43020 rem export: antwort$,liste$()
+43030 : uzaehler=0
+43040 : do
+43050 :  read utitel$
+43060 :  if not(ut$="@@@") then begin
+43070 :   if ut$=ob$ then begin
+43080 :    read unr lis te
+43100 :    do
+43110 :     uz=uz+1
+43120 :     read uantw$(uz)
+43130 :    loop until uantw$(uz)="&"
+43140 :    uz=uz-1
+43150 :   bend
+43155 :  bend
+43160 : loop until uantw$(uz+1)="&" or ut$="@@@"
+43180 :
+43190 : if instr(lis te$(unr),"0")=0 then li$(unr)=left$(null$,uz)
+43210 :
+43220 : do
+43230 :  up=fn zufall(uz)
+43240 : loop until mid$(li$(unr),up,1)="0"
+43250 :
+43260 : antwo rt$=uantw$(up)
+43270 : li$(unr)=left$(li$(unr),up-1)+"1"+mid$(li$(unr),up+1)
+43280 return
+43290 :
+44000 rem proc antwort ergaenzen
+44010 rem import: antwort$,frage$,name$
+44020 rem export: antwort$
+44030 : if instr(antw$,"+") then begin
+44040 :  up=instr(an$,"+name")
+44050 :  if up then an$=left$(an$,up-1)+name$+mid$(an$,up+5)
+44060 :  up=instr(an$,"+frage")
+44070 :  if up then an$=left$(an$,up-1)+frage$+mid$(an$,up+6)
+44080 : bend
+44090 return
+44100 :
+45000 rem proc: antwort auf bildschirm
+45010 rem import: antwort$
+45020 : print " ";antwo rt$
+45030 : print
+45040 return
+45060 rem ende prozedurenmodul
+45070 :
+45080 :
+46000 rem funktionenmodul
+46010 rem ===============
+46020 rem func du drin
+46025 : rem import: eingabe$
+46030 : def fn du(x)=abs(instr(ei$,"du ")>0 or instr(ei$," du")>0)
+46040 rem endfunc
+46050 :
+46060 rem func zufallszahl(obergrenze:in)
+46070 : udummy=rnd(-ti)
+46080 : def fn zufall(ob)=int(rnd(1)*ob)+1
+46090 rem endfunc
+46100 :
+46110 return
+46120 rem ende funktionenmodul
+46130 :
+46140 :
+50000 rem nebenmodul vorbereitung
+50010 rem -----------------------
+50020 rem u-modul system konfiguration
+50030 : print chr$(14):printchr$(11)
+50040 : color 0,9:color 4,9:color 5,2
+50090 return
+50100 rem ende u-modul system konfiguration
+50110 :
+51000 rem u-modul initialisierungen
+51010 : null$="00000000000000000000"
+51020 : gross$="ABCDEFGHIJKLMNOPQRSTUVWXYZ{SHIFT-+}{CBM--}{SHIFT--}"
+51030 : klein$="abcdefghijklmnopqrstuvwxyy{CBM-F}{CBM-C}{CBM-X}"
+51100 : true=1:false=0
+51110 : adieu=false
+51120 : zahlpro nomen=13
+51200 : dim pro nomen$(zahl),lis te$(40), uantwo rt$(20)
+51970 return
+51980 rem ende u-modul initialisierungen
+51990 :
+52000 rem u-modul daten lesen
+52010 : restore 58900: rem fragepronomen
+52020 : for ui=1 to zahl: read pro nomen$(ui):next
+52030 return
+52040 rem ende u-modul daten lesen
+52050 rem ende nebenmodul vorbereitung
+52060 :
+53990 :
+55000 rem datenmodul
+55005 rem ::::::::::
+55010 rem schluesselwoerter
+55020 rem -----------------
+55030 rem 1: w-fragen
+55040 data thema
+55045 data thema,worueber,&
+55050 data programmiersprache
+55060 data was&programmiersprache,&
+55080 data alter
+55090 data wie alt,wann,&
+55100 data erfinder
+55110 data wer&erfunden,wem&erfunden,wem&entwickelt,wer&entwickelt,erfind,&
+55120 data qualitaet
+55130 data gut,eigenschaft,besonder,vorteil,schnell,&
+55140 data herkunft
+55150 data woher,wo&her,land,&
+55160 data literatur
+55170 data literatur,info,lesen,erfahr,buch,buech,&
+55180 data preis
+55190 data kost,preis,wieviel,teuer,&
+55200 data quelle
+55210 data bezieh,bezugs,bezog,bekomm,krieg,kauf,von wem,&
+55220 data comalgruppen
+55230 data gruppe,adress,user,group,&
+55240 data implementierung
+55250 data computer,maschin,system,&
+55260 data versionen
+55270 data version,&
+55280 data name
+55290 data heiss&comal,bedeutet&comal,&
+55300 data strukturiert
+55310 data strukturiert,programmieren,programme,befehl,&
+55320 data warum nicht
+55330 data warum&nicht,&
+55340 data nichtverstanden
+55350 data wie&bitte,was&meinst,was&sag,,soll&heiss
+55351 data &
+55355 data definition
+55356 data was&comal,&
+55360 data @@@
+55370 :
+55400 rem 2: ja/nein-fragen
+55410 data qualitaet
+55420 data gut,besser&basic,besser&pascal,vorteil,&
+55430 data literatur
+55440 data literatur,info,lesen,erfahr,buch,buech,artikel,&
+55450 data preis
+55460 data preis,viel,teuer,&
+55470 data kauf
+55480 data kauf,schenk,&
+55490 data versionen
+55500 data disk,kasset,cass,cc,version,modul,rom,"ram "," ram",&
+55510 data strukturiert
+55520 data struktur,&
+55530 rem nachfrage
+55540 data meinstdu
+55550 data meinst&du,glaubst&du,sicher,wirklich,&
+55555 data comalgruppen
+55556 data gruppe,adress,user,group,&
+55560 data @@@
+55570 :
+55600 rem 3: du
+55610 data boese
+55620 data was&weisst,du&weisst,!,&
+55630 data du
+55640 data du,&
+55650 data @@@
+55660 :
+55800 rem 4: aussage
+55810 data abschied
+55820 data ade,adieu,wiederseh,ende,aufhoer,bis&spaet,tschues,tschau,&
+55830 data gruss
+55840 data tag, morgen,abend,hallo,gruess,gott,gruss,&
+55850 data ausruf
+55860 data !,&
+55870 data ja
+55880 data ja,mhm,ich&weiss,&
+55890 data nein
+55900 data nein,nicht&versteh,nicht&verstand,&
+55910 data dank
+55920 data dank,thank,merci,&
+55970 data @@@
+55980 :
+56000 rem antworten
+56005 rem ---------
+56010 rem 1: faktenantworten
+56015 data definition,1
+56020 data "COMAL ist eine Programmiersprache."
+56025 data &
+56030 data programmiersprache,2
+56035 data"Eine Programmiersprache dient dazu, ei-nen Computer zu programmieren.
+56040 data &
+56045 data alter,3
+56050 data "COMAL ist keineswegs neu."
+56055 data "COMAL ist schon 13 Jahre alt."
+56060 data "COMAL wurde schon 1973 entwickelt."
+56065 data &
+56070 data erfinder,4
+56075 data "Der 'Erfinder' von COMAL ist Borge      Christensen."
+56080 data "COMAL wurde von B. Christensen und      B. Loefstedt entwickelt."
+56085 data &
+56090 data qualitaet,5
+56095 data "COMAL ist eindeutig die Programmier-    sprache der Zukunft."
+56100 data "COMAL ist so gut wie BASIC und PASCAL  zusammen."
+56105 data "COMAL hat die guten Eigenschaften von   BASIC und PASCAL."
+56110 data "Wenn du COMAL hast, dann kannst du     BASIC vergessen."
+56115 data "Andere Sprachen wie FORTH, ELAN, PASCALverblassen vor COMAL."
+56120 data "COMAL ist eine Sprache, die v.a. auch  den Menschen ernst nimmt."
+56125 data "COMAL ist z.B. menschenfreundlich."
+56130 data &
+56135 data herkunft,6
+56140 data "COMAL kommt aus Daenemark."
+56145 data "Die Erfinder von COMAL sind Daenen."
+56150 data "COMAL kommt, wie auch andere gute Soft- ware, aus Europa."
+56155 data &
+56160 data literatur,7
+56165 data "Es gibt eine ganze Menge Literatur,    v.a. auf Englisch."
+56170 data "Der Erfinder von COMAL hat mehrere      Buecher geschrieben."
+56175 data "Heiko Wolgast uebersetzte  z.B.        Christensens 'C. from A-Z'"
+56180 data "Das COMAL 0.14 Handbuch, z.B.
+56185 data"Fuer Anfaenger: Christensen, 'Struktu- rierte Programmierung mit C.'"
+56190 data "Alles ueber COMAL enthaelt das 'COMAL  Handbook' von Len Lindsay."
+56195 data "Vera Birkenbihl schrieb 1964 das Buch 'Von Basic zu COMAL'."
+56200 data "1986 erscheint von Volker Fischer das  Buch 'COMAL in Beispielen'."
+56205 data "Im '64er' findet man seit August 1984  gelegentlich Informationen.
+56210 data &
+56215 data preis,8
+56220 data"COMAL 0.14 kostet fast nichts, das      Steckmodul (V. 2.0) DM 198."
+56225 data "Das Steckmodul mit COMAL 2.01 kostet DM 198.-, 0.14 ein paar Mark."
+56230 data &
+56235 data quelle,9
+56240 data "Bezugsquellen sind v.a. die beiden     deutschen COMAL Gruppen.
+56245 data &
+56250 data comalgruppen,10
+56255 data "Chr. Canisius, Freiheitstr. 30, 4000 D'd 12 / D. Belz, 2270 Utersum
+56260 data &
+56265 data implementierung,11
+56270 data "COMAL gibt's v.a. fuer Commodore Computer."
+56275 data "COMAL gibt's auch fuer den IBM PC und  Kompatible."
+56280 data "Ab Fruehjahr gibt's COMAL fuer 2.0 fast alle gaengigen Computer.
+56285 data &
+56290 data versionen,12
+56295 data "Die neueste Version ist 2.0 (z.B.als   Steckmodul fuer den C64)."
+56300 data "Die aelteste Version ist COMAL 0.11    (1981 fuer den PET)."
+56305 data "Die preiswerteste Version ist im Augen- blick die 0.14 (C64)."
+56310 data &
+56315 data name,13
+56320 data "'COMAL' bedeutet 'Common Algorithmic Language'."
+56325 data "Was der Name bedeutet, darauf kommt's  eigentlich gar nicht an."
+56330 data "Wichtig ist, was COMAL tut, nicht was  der Name meint."
+56335 data "'COMAL' ist eine Abkuerzung. aber die  macht nicht viel Sinn."
+56340 data &
+56345 data strukturiert,14
+56350 data "So programmieren, dass auch ein Mensch das Programm versteht."
+56355 data "Uebersichtlich programmieren.
+56360 data "Beim Programmieren auch an den Menschendenken.
+56365 data &
+56370 data warum nicht,15
+56375 data "Weil!","Nun ja ...","Das weisst du selber sehr wohl."
+56380 data &
+56385 data nichtverstanden,16
+56390 data "War ich so unklar?","Du hast mich nicht verstanden?"
+56395 data "Hab ich mich so undeutlich aus-        gedrueckt?"
+56400 data "Also, deutlicher kann ich's nicht mehr sagen."
+56405 data &
+56410 data nur fragepronomen,17
+56415 data "+frage{left} was?","+frage","Was meinst du mit '+frage{left}'?"
+56420 data "Schwierig, schwierig ..."
+56425 data "Als Computer habe ich Probleme, solche  Kurzfragen zu verstehen."
+56430 data &
+56435 data thema,18
+56440 data "COMAL natuerlich.","Wie bisher: COMAL."
+56445 data "Immer noch COMAL.","Glaub's oder glaub's nicht: COMAL!!!"
+56450 data &
+56485 data @@@
+56490 :
+56500 rem 2: ja/nein-antworten
+56505 data strukturiert,19
+56510 data "Wer strukturiert programmieren will,derist mit COMAL gut bedient.
+56515 data "Wenn du struktruriert denkst, hilft    COMAL beim Kodieren."
+56520 data "COMAL hat Prozeduren und Funktionen, umnur einiges zu nennen."
+56525 data "COMAL hat Repeat-, While- und For-      schleifen, z.B."
+56530 data "COMAL stellt u.a. If- und Case-Bloecke zur Verfuegung."
+56535 data "Mit COMAL strukturiert zu programmieren ist ein Gedicht."
+56540 data &
+56545 data qualitaet,20
+56550 data "Ja.","Eindeutig.","Ohne Zweifel."
+56555 data &
+56560 data literatur,21
+56565 data "Ja, eine ganze Menge, und nicht nur aufEnglisch, auch auf Deutsch.
+56570 data &
+56575 data preis,22
+56580 data "Kann man eigentlich nicht sagen.","Nicht recht eigentlich."
+56585 data &
+56590 data kauf,23
+56595 data "Die Version 0.14 bekommt man fast ge-  schenkt, die andern kosten.
+56600 data &
+56605 data versionen,24
+56610 data "Es gibt Versionen auf Diskette und im  ROM (z.B. C64-Steckmodul)."
+56615 data &
+56620 rem bestaetigung auf nachfrage
+56625 data meinstdu,25
+56630 data "Ich denk schon.","Warum nicht?","Was sollte dagegen sprechen?"
+56635 data "Gewiss doch.","Aber ja doch."
+56640 data &
+56642 data comalgruppen,26
+56643 data "Chr. Canisius, Freiheitstr. 30, 4000 D'd 12 / D. Belz, 2270 Utersum
+56644 data &
+56645 data @@@
+56650 :
+56700 rem 3: 'du'-antwort
+56705 data du,27
+56710 data "Ich bin voellig unwichtig."
+56715 data "Mich kannst du gern vergessen."
+56720 data "Ich bin doch nicht das Thema."
+56725 data "Lass ruhig mich aus dem Spiel."
+56730 data "Wir wollten doch nicht ueber mich      reden."
+56735 data &
+56740 :
+56745 data boese,28
+56750 data "Aber, ich bitte dich!","Reiss dich zusammen!"
+56755 data "Meinst du doch nicht im Ernst, oder?"
+56760 data "So was sagt man doch nicht!!!"
+56765 data "Was ficht dich ploetzlich an?"
+56770 data &
+56775 data @@@
+56780 :
+56800 rem 4: aussagen
+56810 data gruss,29
+56820 data "Ich fuerchte, du hast vorhin           geschlafen."
+56830 data "Haben wir uns nicht schon begruesst?"
+56840 data "Ich sag gern auch ein zweites Mal      'Guten Tag'!"
+56850 data &
+56860 data abschied,30
+56870 data "Wiedersehen, +name.","Ade.", "Tschuessle.","Adieu."
+56880 data "Du gehst schon? Na dann, Auf Wieder-   sehen, +name."
+56890 data &
+56900 data ausruf,31
+56910 data "Nimm's nicht so schwer.","Es sieht schlimmer aus, als es ist!"
+56920 data "Ist alles halb so schlimm.","Nur Mut!"
+56930 data "Keine Angst! Du wirst es schaffen.","Nimm's nicht so tragisch."
+56940 data &
+56950 data ja,32
+56955 data "Ach so.","Nun ja ...","Gut.","Schoen.","Dann bin ich beruhigt."
+56960 data &
+56965 data nein,33
+56970 data "Ach so?","Nun denn...","Nein?","Schad drum.","Wie du willst!"
+56975 data "Kann man nichts machen.","Na ja, was soll's ..."
+56980 data &
+56982 data dank,39
+56983 data "Bitte.","Bitte sehr.","Aber fuer dich tu ich doch alles."
+56984 data "Bitte schoen.","Ich bin dir immer gern behiflich."
+56985 data &
+56990 data @@@
+56995 :
+57000 rem 5: weiss nicht
+57010 data weissnicht,34
+57020 data "Keine Ahnung.","Darueber weiss ich leider nichts."
+57030 data "Da bin ich ueberfragt.","Da musst du schon einen Experten fragen."
+57040 data "Ich weiss eine ganze Menge, aber das   leider nicht, +name."
+57050 data "Davon hab ich nie was gehoert."
+57060 data "Tut mir leid, weiss ich nicht."
+57065 data "Wenn ich das wuesste ...","Das ist eine gute Frage, bloss ...
+57070 data &
+57080 data @@@
+57090 :
+57300 rem 6: versteh nicht
+57310 data verstehnicht,35
+57320 data "Wie bitte?","Was hast du gesagt?"
+57330 data "Verzeihung, ich hab wohl{rght}grad          geschlafen."
+57340 data "Koenntest du das noch mal in andern    Worten sagen?"
+57350 data "Ich versteh immer nur Bahnhof..."
+57360 data "Was meinst du damit?"
+57370 data "Vielleicht solltest du dich einfacher  ausdruecken."
+57380 data "Ich versteh nicht ganz - koenntest du  das noch einmal anders sagen?
+57390 data "Was meinst du mit: '+frage'???"
+57400 data "Was heisst '+frage'???"
+57410 data "'+frage' - das versteh ich nicht."
+57420 data &
+57430 data @@@
+57440 :
+57500 rem 7: thema verfehlt
+57510 data themaverfehlt,36
+57520 data "Weisst du ueberhaupt noch, worueber du redest?"
+57530 data "Hast wohl das Thema vergessen!?"
+57540 data "Wenn ich mich recht erinnere, wollten wir ueber COMAL reden!
+57550 data "COMAL war unser Thema, vergessen?"
+57560 data "Worueber redest du eigentlich?"
+57570 data "Vergiss das Thema nicht!"
+57580 data "COMAL ist unser Thema!"
+57590 data "Bitte lass uns beim Thema bleiben."
+57600 data &
+57610 data @@@
+57620 :
+57800 rem 8: abbrechen
+57810 data abbruch,37
+57820 data "Ich glaube, es hat keinen Sinn, mit dirueber COMAL zu reden.
+57830 data "Wir verstehen uns heute offenbar nicht.
+57840 data "Es hat keinen Zweck mit uns beiden!
+57850 data &
+57860 data @@@
+57870 :
+57900 rem abschiedskommmentar
+57905 data ende,38
+57910 data "Ich hab mich gern mit dir unterhalten, +name."
+57915 data "Hat mich gefreut, dich kennenzulernen."
+57920 data "Besuch mich mal wieder, +name."
+57925 data "Ich haett mich gern noch laenger mit    dir unterhalten."
+57930 data "Schad, dass du schon gehst, +name."
+57935 data &
+57940 data @@@
+57950 :
+57955 :
+58900 rem fragepronomen
+58910 data wer,was,wann,warum,wieso,wie,wem,wen,welch,wessen,woher,wo,&
+58980 :
+58990 rem ende datenmodul
+58995 :
+58996 :
+60000 rem informationsmodul
+60003 rem .................
+60005 rem frage- und antworttypen
+60007 :
+60010 rem nr eingabetyp  antworttyp
+60015 rem .............................
+60020 rem 1: w-frage     faktenantwort
+60030 rem 2: ja/nein-fr  ja/nein-antw
+60040 rem 3: enth 'du'   'du'-antwort
+60050 rem 4: aussage     aussage
+60070 rem 5:             weiss nicht
+60080 rem 6:             versteh nicht
+60090 rem 7:             thema verfehlt
+60100 rem 8:             abbruch
+

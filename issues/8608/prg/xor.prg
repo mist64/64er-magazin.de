@@ -1,0 +1,1 @@
+>  0  ;           ++ ØÏÒ - ÁNWEISUNG ++ >  1  Ï  É     0                        >  2  Ø  É     1                        >  3  ;                                 >  4  =  Ñ     0  ÅRGEBNIS              >  5  ;                                 >  6  Ï  Ñ     0  ÏUTPUT NEU LESEN !!!  >  7  =  ÑÎ    1  ÅRGEBNIS INVERTIERT   >  8  ;           ++ ÅNDE ++            ÅNDE

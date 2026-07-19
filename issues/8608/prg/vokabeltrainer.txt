@@ -1,0 +1,821 @@
+
+
+;vokabeltrainer.prg ==0801==
+ 1000 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 1010 rem"{SHIFT--}   Vokabeltrainer by:   {SHIFT--}
+ 1020 rem"{SHIFT--}    Alfred Schnabel     {SHIFT--}
+ 1030 rem"{SHIFT--} Anton-von-Wehner-Str.5 {SHIFT--}
+ 1040 rem"{SHIFT--} 8813 Schillingsfuerst  {SHIFT--}
+ 1050 rem"{SHIFT--}   Tel. (09868) 1030    {SHIFT--}
+ 1060 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+ 1070 :
+ 1080 poke53281,0:poke53280,0:poke646,0
+ 1090 print"{clr}"
+ 1100 gosub7370:gosub7520:rem"{SHIFT-*}{SHIFT-*} Init {SHIFT-*}{SHIFT-*}
+ 1110 :
+ 1120 poke650,128:gosub4000
+ 1130 :
+ 1140 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 1150 rem"{SHIFT--} Programm  *** Speeder ***  {SHIFT--}
+ 1160 rem"{SHIFT--}  Einzeiler aus der 64'er   {SHIFT--}
+ 1170 :
+ 1180 close1:open1,8,15,"m-w"+chr$(7)+chr$(28)+chr$(1)+chr$(15):close1
+ 1190 :
+ 1200 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+ 1210 :
+ 1220 rem"{SHIFT-*}{SHIFT-*} Grundmaske {SHIFT-*}{SHIFT-*}
+ 1230 :
+ 1240 poke53280,0:poke646,1:poke53265,32
+ 1250 qq=qq+1
+ 1260 poke53281,1:print"{clr}";:poke53281,6
+ 1270 fori=1063to1983step40:pokei,93:pokei+1,93:next
+ 1280 poke1024,112:poke1104,109:poke1144,112:poke1824,109
+ 1290 poke1864,112:poke1984,109
+ 1300 poke1063,110:poke1143,125:poke1183,110:poke1863,125
+ 1310 poke1903,110:poke2023,125
+ 1320 fori=1025to1062
+ 1330 : pokei,64:pokei+80,64: pokei+120,64:pokei+800,64
+ 1340 : pokei+840,64:pokei+960,64
+ 1350 next
+ 1360 ifqq=2then1390
+ 1370 gosub7650:rem"Hilf-Maske laden"
+ 1380 goto1250
+ 1390 poke53265,27
+ 1400 :
+ 1410 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 1420 rem"{SHIFT--}  Menue  {SHIFT--}
+ 1430 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+ 1440 :
+ 1450 t$="M e n u e"
+ 1460 gosub3660:gosub3770:rem"Titelb."
+ 1470 print"{home}{down}{down}{down}{down}{down}{rght}F1 = Neue Vokabeldatei einrichten"
+ 1480 print"{rght}F3 = Bestehende Vokabeldatei aendern"
+ 1490 print"{rght}F5 = Vokabeln abfragen"
+ 1500 print"{rght}F7 = Drucken"
+ 1510 print"{down}{rght}Disk-Menue:"
+ 1520 print"{rght}{rght}1 = Directory
+ 1530 print"{rght}{rght}2 = Filenamen aendern"
+ 1540 print"{rght}{rght}3 = Files loeschen"
+ 1550 print"{rght}{rght}4 = Formatieren"
+ 1560 print"{rght}{rght}5 = Validieren"
+ 1570 print"{rght}{rght}6 = Initialisieren"
+ 1580 print"{down}{rght}F8 = Ende"
+ 1590 poke211,1:poke214,22:sys58640
+ 1600 print"Bitte waehlen Sie einen Menuepunkt"
+ 1610 gosub3890: rem"get"
+ 1620 : if xx=133 then dn=1:goto1880
+ 1630 : if xx=134 then1720
+ 1640 : if xx=135 then2260
+ 1650 : if xx=136 then8800
+ 1660 : if xx=140 then8760
+ 1670 : xx=val(x$):if xx=0 or xx>6 then 1610
+ 1680 : on xx goto7920,7970,8260,8410,8600,8690
+ 1690 :
+ 1700 rem"{SHIFT-*}{SHIFT-*} Vokabeln eingeben/aendern
+ 1710 :
+ 1720 t$="Vokabeln aendern":gosub3660
+ 1730 gosub4820:rem"Datei laden"
+ 1740 if xe=140 then1410
+ 1750 if vn>99 theni=vn:xe=133:goto1920
+ 1760 if fe<>62 then1900
+ 1770 :
+ 1780 : gosub3810:rem"Hilfz"
+ 1790 : close2
+ 1800 : gosub3810:       rem"Hilfzeile"
+ 1810 : print"{up}{up}{rght}Datei {rvon} "n$" {rvof} existiert nicht."
+ 1820 : print"{rght}Soll Datei eingerichtet werden ? (j/n)"
+ 1830 gosub3890:               rem"get"
+ 1840 :   if x$="j" thendn=1:fi$=n$:gosub3660:       goto1910
+ 1850 :   if x$="n" then1410
+ 1860 goto1830
+ 1870 :
+ 1880 fi$="":t$="Neue Vokabeldatei"
+ 1890 gosub3660
+ 1900 if dn=0 then1920
+ 1910 i=1:vn=1
+ 1920 x$="Woerter bisher eingegeben"
+ 1930 gosub4460:rem"Vokabel-Maske"
+ 1940 gosub4530
+ 1950 gosub5980
+ 1960 if i>99 theni=vn:xe=134:goto6080
+ 1970 if xe=140 then2000
+ 1980 :
+ 1990 i=vn
+ 2000 : gosub5720:rem"Vok. erfassen"
+ 2010 : if xe<>140 then2060
+ 2020 : if d$(1)=". " then1410
+ 2030 : gosub7280
+ 2040 :   if x$="j" then2210
+ 2050 :   if x$="n" then1410
+ 2060 : if xe=139 then2140
+ 2070 : if xe=133 or xe=134 or xe=137 or xe=138 then6050
+ 2080 : ifxe= 136thenxe=134:goto6090
+ 2090 gosub4530:     rem"Vokabel-Maske"
+ 2100 i=i+1:vn=vn+1
+ 2110 if i<=99 then2000
+ 2120 goto2170
+ 2130 :
+ 2140 if d$(1)=". " then2000
+ 2150 goto2210
+ 2160 :
+ 2170 gosub3810:rem"Hilfzeile"
+ 2180 print"{up}{up}{rght}"spc(12)"{rvon} Datei voll {rvof}"
+ 2190 gosub3890:               rem"Get"
+ 2200 gosub5980:   rem"Hilfzeile Eing."
+ 2210 gosub7030:   rem"Datei speichern"
+ 2220 if xe=140 theni=vn:goto1940
+ 2230 clr:gosub7370:          rem"Init"
+ 2240 goto1410
+ 2250 :
+ 2260 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 2270 rem"{SHIFT--}  Vokabeln abfragen  {SHIFT--}
+ 2280 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+ 2290 :
+ 2300 t$="Vokabeln abfragen"
+ 2310 gosub3660:gosub3770:rem"Titelb."
+ 2320 x$="Vokabeln abgefragt"
+ 2330 gosub4490:     rem"Vokabel-Maske"
+ 2340 gosub4820:       rem"Datei laden"
+ 2350 : if xe=140 then1410
+ 2360 : if fe=0 then 2400
+ 2370 :   print"{rght}Datei existiert nicht"
+ 2380 :   gosub3890:           rem"Get"
+ 2390 :   goto2340
+ 2400 gosub3770:x$="Vokabeln abgefragt":gosub4490
+ 2410 gosub3810:         rem"Hilfzeile"
+ 2420 print"{up}{up}{rght}{rvon} f {rvof} Vokabeln frisch abfragen oder"
+ 2430 print"{rght}{rvon}{CBM-T}a{CBM-T}{rvof} so wie gespeichert ?"
+ 2440 gosub3890:               rem"Get"
+ 2450 : if x$="f" then3530
+ 2460 : if x$="a" then2490
+ 2470 goto2440
+ 2480 :
+ 2490 gosub3810:         rem"Hilfzeile"
+ 2500 print"{up}{up}{rght}{rvon} d {rvof} = Deutsch  -> Englisch   {rvon}!        {rvof}"
+ 2510 print"{rght}{rvon}{CBM-T}e{CBM-T}{rvof} = Englisch -> Deutsch    {rvon}!menue   "
+ 2520 gosub3890:               rem"get"
+ 2530 : if x$="e" then print"{up}{up}";:goto2570
+ 2540 : if x$="d" then print"{up}"; :goto2570
+ 2550 : if x$="{f8}" then2260
+ 2560 goto2520
+ 2570 print"{rght}Moment bitte, ich sortiere."
+ 2580 a$=x$
+ 2590 gosub4650:      rem"UP Sortieren"
+ 2600 gosub3810:         rem"Hilfzeile"
+ 2610 print"{up}{up}{rght}'RETURN' nicht gewusst"
+ 2620 print"{rght}'F1' Abfrage beenden"
+ 2630 :
+ 2640 i=1
+ 2650 poke211,2:poke214,5:sys58640
+ 2660 :printright$(str$(i),len(str$(i))-1);:ifi<10thenprint" "
+ 2670 :
+ 2680 rem"{SHIFT-*}{SHIFT-*} Vokabel aussuchen {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 2690 ifng=0then3330:   rem"Alle gewusst
+ 2700 k=int(rnd(1)*ng)+1
+ 2710 if a$="d" theny1=11:y2=16:xd$=d$(k):xe$=e$(k)
+ 2720 if a$="e" theny1=16:y2=11:xd$=e$(k):xe$=d$(k)
+ 2730 x=val(mid$(xd$,2,1))
+ 2740 xd$=right$(xd$,len(xd$)-2)
+ 2750 xe$=right$(xe$,len(xe$)-2)
+ 2760 if x>=5 thenx=x-1:goto3190
+ 2770 :
+ 2780 poke211,2:poke214,y1:sys58640
+ 2790 printxd$
+ 2800 poke211,2:poke214,y2:sys58640
+ 2810 en=36:po=p+y2*40+2:gosub4240:rem"Eing.
+ 2820 if xe=133 then 3610
+ 2830 :
+ 2840 rem"{SHIFT-*}{SHIFT-*} Gewusst oder nicht ? {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 2850 poke211,1:poke214,y2:sys58640
+ 2860 print"{grn}"x3$"{wht}":print"{up}{rght}{rght}";
+ 2870 printxe$:ifn$=""then3050
+ 2880 x$=xe$
+ 2890 j=1
+ 2900 : if mid$(x$,j,1)="(" then2940
+ 2910 j=j+1:if j<=len(x$) then2900
+ 2920 goto2960
+ 2930 :
+ 2940 x$=left$(x$,j-1)
+ 2950 if right$(x$,1)=" " then x$=left$(x$,len(x$)-1):goto2950
+ 2960 j=1
+ 2970 : if mid$(x$,j,1)=";" then3000
+ 2980 j=j+1:if j>len(x$) then3000
+ 2990 goto2970
+ 3000 if n$=left$(x$,j-1) then3160
+ 3010 if j>len(x$) then3050
+ 3020 x$=right$(x$,len(x$)-j)
+ 3030 goto2960
+ 3040 :
+ 3050 rem"{SHIFT-*}{SHIFT-*} Nicht gewusst {SHIFT-*}{SHIFT-*}
+ 3060 :
+ 3070 if x>0 then x=x-1
+ 3080 xd$="."+right$(str$(x),1)+xd$
+ 3090 ifa$="d"thend$(k)=xd$
+ 3100 ifa$="e"thene$(k)=xd$
+ 3110 poke211,13:poke214,y1-2:sys58640
+ 3120 print"Falsch "
+ 3130 poke198,0:wait198,1
+ 3140 goto3270
+ 3150 :
+ 3160 rem"{SHIFT-*}{SHIFT-*} Gewusst {SHIFT-*}{SHIFT-*}
+ 3170 :
+ 3180 x=x+1:if x=5 then x=8
+ 3190 xd$="="+right$(str$(x),1)+xd$
+ 3200 if a$="d" thenxe$=e$(k):d$(k)=d$(ng):e$(k)=e$(ng):d$(ng)=xd$:e$(ng)=xe$
+ 3210 if a$="e" thenxe$=d$(k):d$(k)=d$(ng):e$(k)=e$(ng):d$(ng)=xe$:e$(ng)=xd$
+ 3220 poke211,13:poke214,y1-2:sys58640
+ 3230 print"Richtig"
+ 3240 ng=ng-1
+ 3250 poke198,0:wait198,1
+ 3260 :
+ 3270 i=i+1
+ 3280 poke211,13:poke214,y1-2:sys58640
+ 3290 print"       "
+ 3300 gosub4530:      rem"Vokabelmaske"
+ 3310 goto2650
+ 3320 :
+ 3330 rem"{SHIFT-*}{SHIFT-*} Alle Vokabeln gewusst {SHIFT-*}{SHIFT-*}
+ 3340 :
+ 3350 for k=1 to vn-1
+ 3360 : if a$="d" thend$(k)="."+right$(d$(k),len(d$(k))-1)
+ 3370 : if a$="e" thene$(k)="."+right$(e$(k),len(e$(k))-1)
+ 3380 nextk
+ 3390 ng=vn-1
+ 3400 if a$="d" and left$(d$(1),2)=".8" then3440
+ 3410 if a$="e" and left$(e$(1),2)=".8" then3440
+ 3420 goto2650
+ 3430 :
+ 3440 rem"{SHIFT-*}{SHIFT-*} Alle Vok. 5 mal gewusst {SHIFT-*}{SHIFT-*}
+ 3450 :
+ 3460 gosub3810:         rem"Hilfzeile"
+ 3470 print"{up}{up}{rght}Sie beherrschen diese Lektion. Wollen"
+ 3480 print"{rght}Sie damit weiterarbeiten ? (j/n)"
+ 3490 gosub3890:               rem"Get"
+ 3500 : if x$="j" or x$="n" then3530
+ 3510 goto3490
+ 3520 :
+ 3530 fori=1tovn-1
+ 3540 : d$(i)=". "+right$(d$(i),len(d$(i))-2)
+ 3550 : e$(i)=". "+right$(e$(i),len(e$(i))-2)
+ 3560 nexti
+ 3570 ng=vn-1
+ 3580 if x$="n" then 3610
+ 3590 goto2490
+ 3600 :
+ 3610 rem"{SHIFT-*}{SHIFT-*} Datei neu saven {SHIFT-*}{SHIFT-*}
+ 3620 :
+ 3630 gosub7030:       rem"Datei saven"
+ 3640 goto1410
+ 3650 :
+ 3660 rem"{SHIFT-*}{SHIFT-*} UP Titelbild {SHIFT-*}{SHIFT-*}
+ 3670 :
+ 3680 poke211,0:poke214,1:sys58640
+ 3690 printx1$
+ 3700 if fi$="" then x=20-len(t$)/2
+ 3710 if fi$>"" then x=20-(len(fi$)+2)/2-len(t$)/2
+ 3720 poke211,x:poke214,1:sys58640
+ 3730 printt$;
+ 3740 if fi$>"" then poke211,37-len(fi$):poke214,1:sys58640:print"{rvon}["fi$"]{rvof}"
+ 3750 return
+ 3760 :
+ 3770 poke211,0:poke214,4:sys58640
+ 3780 for l=1 to15:printx1$:next
+ 3790 poke211,1:poke214,19:sys58640
+ 3800 print"{rvon}[_] = Hilfsfunktion                   {rvof}"
+ 3810 poke211,0:poke214,22:sys58640
+ 3820 printx1$:printx1$
+ 3830 return
+ 3840 :
+ 3850 poke211,0:poke214,22:sys58640
+ 3860 printx4$:printx4$
+ 3870 return
+ 3880 :
+ 3890 rem"{SHIFT-*}{SHIFT-*} UP get x$ {SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 3900 :
+ 3910 poke 198,0:poke53280,6
+ 3920 getx$:ifx$=""then3920
+ 3930 : xx=asc(x$)
+ 3940 : if x$="_" thensys49152:poke198,0:wait198,1:sys49152
+ 3950 poke53280,0
+ 3960 return
+ 3970 :
+ 3980 rem"{SHIFT-*}{SHIFT-*} UP Fehlerkanal auslesen {SHIFT-*}{SHIFT-*}
+ 3990 :
+ 4000 poke2,8:sys49194
+ 4010 : if peek(2)=0 then4080
+ 4020 : gosub3810:      rem"Hilfzeile"
+ 4030 : print"{up}{up}{rght}Bitte schalten Sie die Floppy ein"
+ 4040 : print"{rght}und legen Sie die Datendiskette ein."
+ 4050 : poke198,0:wait198,1
+ 4060 goto4000
+ 4070 :
+ 4080 input#9,fe,f$,t,s
+ 4090 : if fe=0 or fe=31 thenreturn
+ 4100 : gosub3810:      rem"Hilfzeile"
+ 4110 : print"{up}{up}{rght}"fe" {rvon} "f$" {rvof} "t;s
+ 4120 : if fe=1 then4140
+ 4130 : print"{rght}Fehler beseitigen und Taste druecken."
+ 4140 : gosub3890:            rem"Get"
+ 4150 goto3980
+ 4160 :
+ 4170 rem"{SHIFT-*}{SHIFT-*} UP Dateinamen eingeben {SHIFT-*}{SHIFT-*}
+ 4180 :
+ 4190 gosub3810:en=14:  rem"Hilfzeile"
+ 4200 print"{up}{up}{rght}Dateiname: "x5$"     {rvon}!director{rvof}"
+ 4210 print s$ spc(18)"{rvon}!menue   "
+ 4220 print"{up}{up}"spc(12);
+ 4230 qq=1:po=1916
+ 4240 rem"{SHIFT-*}{SHIFT-*} UP Texteingabe {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 4250 poke198,0
+ 4260 z=1:z1=128:n$=""
+ 4270 : pokepo,peek(po)+z1
+ 4280 : getx$:if x$="" then4280
+ 4290 : xe=asc(x$)
+ 4300 : ifxe=95 thensys49152:poke198,0:wait198,1:sys49152:poke198,0:goto4280
+ 4310 : ifxe=136 and qq=1 then gosub5200:goto4170
+ 4320 : qq=0
+ 4330 : if xe=13 or (xe>132 and xe<141) then pokepo,peek(po)-128:return
+ 4340 : if xe<>20 then4390
+ 4350 :   if z=1 then pokepo,peek(po)-128:goto4260
+ 4360 :     z=z-1  :pokepo,peek(po)-z1:po=po-1:print"{grn}.{left}{left}{wht}";
+ 4370 :     n$=left$(n$,len(n$)-1)
+ 4380 : goto4270
+ 4390 : if xe<31 or (xe>127andxe<161) then4280
+ 4400 : if xe=44 thenx$=";"
+ 4410 : n$=n$+x$:printx$;
+ 4420 z=z+1:po=po+1:if z<=en then4270
+ 4430 z=z-1:po=po-1:print"{left} {left}";:goto4370
+ 4440 return
+ 4450 :
+ 4460 rem"{SHIFT-*}{SHIFT-*} UP Vokabeln-Maske {SHIFT-*}{SHIFT-*}
+ 4470 :
+ 4480 gosub3770:        rem"Gundmaske"
+ 4490 poke211,0:poke214,4:sys58640
+ 4500 print"{rght}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 4510 print"{rght}{SHIFT--}    {SHIFT--} "x$
+ 4520 print"{rght}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+ 4530 poke211,0:poke214,8:sys58640
+ 4540 poke646,5
+ 4550 print"{rght}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}":print"{rght}{SHIFT--}Deutsch {SHIFT--}"
+ 4560 print"{rght}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}"left$(x2$,27)"{CBM-S}"
+ 4570 print"{rght}"x3$:print"{rght}{CBM-Z}"x2$"{CBM-X}"
+ 4580 poke211,0:poke214,13:sys58640:poke646,5
+ 4590 print"{rght}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}":print"{rght}{SHIFT--}Englisch{SHIFT--}"
+ 4600 print"{rght}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}"left$(x2$,27)"{CBM-S}"
+ 4610 print"{rght}"x3$:print"{rght}{CBM-Z}"x2$"{CBM-X}"
+ 4620 poke646,1
+ 4630 return
+ 4640 :
+ 4650 rem"{SHIFT-*}{SHIFT-*} UP{$a0}Sortieren {SHIFT-*}{SHIFT-*}
+ 4660 :
+ 4670 j=1:k=vn-1
+ 4680 if a$="e" then4710
+ 4690 : if left$(d$(j),1)="." then4770
+ 4700 : goto4720
+ 4710 : if left$(e$(j),1)="." then4770
+ 4720 : x$=d$(k):d$(k)=d$(j):d$(j)=x$
+ 4730 : x$=e$(k):e$(k)=e$(j):e$(j)=x$
+ 4740 : k=k-1
+ 4750 : if k=j then4800
+ 4760 goto4690
+ 4770 j=j+1
+ 4780 if j=k then4800
+ 4790 goto4690
+ 4800 return
+ 4810 :
+ 4820 rem"{SHIFT-*}{SHIFT-*} UP Datei laden {SHIFT-*}{SHIFT-*}
+ 4830 :
+ 4840 s$="{rght}[laden]    "
+ 4850 gosub4170:  rem"Dateiname eing."
+ 4860 if xe=140 thenreturn
+ 4870 if (xe= 13 and n$="") or xe<>13 then4840
+ 4880 if n$=fi$ then return
+ 4890 gosub3980:      rem"Fehlerkanal"
+ 4900 close2:open2,8,2,"vo."+n$+",s,r"
+ 4910 gosub4080:      rem"Fehlerkanal"
+ 4920 gosub3810:        rem"Hilfzeile"
+ 4930 print"{up}{up}{rght}Loading {rvon} "n$" {rvof}"
+ 4940 if fe>0 then return
+ 4950 dn=0
+ 4960 vn=0
+ 4970 fi$=n$
+ 4980 input#2,ng
+ 4990 : vn=vn+1
+ 5000 : input#2,d$(vn)
+ 5010 : input#2,e$(vn)
+ 5020 if (st and 64)<>64 then4990
+ 5030 close2
+ 5040 vn=vn+1
+ 5050 gosub3660:        rem"Titelbild"
+ 5060 return
+ 5070 :
+ 5080 rem"{SHIFT-*}{SHIFT-*} Directory anzeigen {SHIFT-*}{SHIFT-*}
+ 5090 :
+ 5100 d$="":s=0:xn$=""
+ 5110 gosub3850:  rem"Hilfzeile"
+ 5120 print"{up}{up}{rght}{rvon}ganze Dir!nur Datei"spc(11)xn$
+ 5130 printspc(31)"{rvon}zurueck{rvon}{home}"
+ 5140 gosub3890:              rem"get"
+ 5150 : if xx=136 then if s>0 then gosub3770:goto5210
+ 5160 : if xx=133 then d$="":goto5210
+ 5170 : if xx=134 then5200
+ 5180 : if xx=140 thenreturn
+ 5190 goto5140
+ 5200 d$="vo."
+ 5210 gosub3770:           rem"Titelb"
+ 5220 z=1:if xx=136 then print"{home}{down}{down}{down}":goto 5620
+ 5230 :
+ 5240 ft$(0)="..Del..":ft$(1)="Sequential":ft$(2)="Program":ft$(3)="User"
+ 5250 ft$(5)="Relative"
+ 5260 close2:dn$=""
+ 5270 print#9,"i"
+ 5280 gosub3980:      rem"Fehlerkanal"
+ 5290 gosub3810:        rem"Hilfzeile"
+ 5300 open2,8,2,"#"
+ 5310 print#9,"u1 2 0 18";s
+ 5320 print#9,"b-p 2 144"
+ 5330 fori=0to15:get#2,x$:if x$="{$a0}" then 5360
+ 5340 : rem"   ^='Shift'-'Space' !!"
+ 5350 : dn$=dn$+x$
+ 5360 nexti
+ 5370 print"{home}{down}"x1$"{home}{down}{rght}"dn$:print:print
+ 5380 :
+ 5390 s=1:bf=664
+ 5400 print#9,"u1 2 0 18";s
+ 5410 print#9,"b-p 2 0":by=0
+ 5420 get#2,x$:t=asc(x$+chr$(0))
+ 5430 get#2,x$:s=asc(x$+chr$(0))
+ 5440 dn$=""
+ 5450 by=by+5:print#9,"b-p 2";by
+ 5460 fori=0to15:get#2,x$:dn$=dn$+x$:nexti
+ 5470 if len(dn$)=0 then 5670
+ 5480 by=by+25:print#9,"b-p 2";by
+ 5490 get#2,x$:x=asc(x$+chr$(0))
+ 5500 get#2,x$:x=x+asc(x$+chr$(0))*256
+ 5510 if x< 10 then dn$=dn$+" "
+ 5520 if x<100 then dn$=dn$+" "
+ 5530 dn$=dn$+str$(x)+" Bl. "
+ 5540 bf=bf-x:if bf<0 then bf=0
+ 5550 by=by-28:print#9,"b-p 2";by
+ 5560 get#2,x$
+ 5570 dn$=dn$+ft$(asc(x$+chr$(0))and3)
+ 5580 if d$="vo."and left$(dn$,3)<>d$ then5620
+ 5590 print"{rght}"dn$
+ 5600 z=z+1:if z<16 then5620
+ 5610 xn$="{rvon}weiter":goto5110
+ 5620 by=by+30
+ 5630 if by<255 then 5440
+ 5640 if t=0 or t>35 then 5670
+ 5650 goto5400
+ 5660 :
+ 5670 close2:xn$="{rvon}      "
+ 5680 print"{home}{down}"spc(26) bf"Bl. free"
+ 5690 if qq=1 thenreturn
+ 5700 goto5100
+ 5710 :
+ 5720 rem"{SHIFT-*}{SHIFT-*} UP Vokabeln erfassen {SHIFT-*}{SHIFT-*}
+ 5730 :
+ 5740 poke211, 2:poke214, 5:sys58640
+ 5750 : printright$(str$(i),len(str$(i))-1);  : if i<10 thenprint" "
+ 5760 : poke211,2:poke214,11:sys58640
+ 5770 : en=36:po=1466:gosub4240:rem"Eingabe"
+ 5780 : if n$>"" then d$(i)=". "+n$
+ 5790 : if xe=139 or xe=133 or xe=134 or xe=137 or xe=138 or xe=140 thenreturn
+ 5800 : if xe=136 then5840
+ 5810 if xe=13 and po=1466 then goto6570
+ 5820 : if (xe=135 or xe=13) and n$="" thengoto5760
+ 5830 : goto5870
+ 5840 : if n$="" then return
+ 5850 : gosub4530:goto5760
+ 5860 :
+ 5870 poke211,2:poke214,16:sys58640
+ 5880 : en=36:po=1666:gosub4240:rem"Eingabe"
+ 5890 : e$(i)=". "+n$
+ 5900 : if xe=133 or xe=134 or xe=137 or xe=138 thenreturn
+ 5910 : if xe=136 then5950
+ 5920 : if (xe=13 or xe=135 or xe=139) and n$="" then5870
+ 5930 fi$=""
+ 5940 : return
+ 5950 : if n$="" then5850
+ 5960 gosub4580:goto5870
+ 5970 :
+ 5980 rem"{SHIFT-*}{SHIFT-*} UP Hilfszeile Vok.eingabe
+ 5990 :
+ 6000 gosub3850:rem"Hilfszeile"
+ 6010 print"{up}{up}{rght}{rvon} 1 vor   ! 1 rueck !aendern  !loeschen{rvof}"
+ 6020 print"{rght}{rvon}10 vor   !10 rueck !speichern!menue   {rvof}"
+ 6030 return
+ 6040 :
+ 6050 rem"{SHIFT-*}{SHIFT-*} UP Vokabeln blaettern {SHIFT-*}{SHIFT-*}
+ 6060 :
+ 6070 if xe=133 and i=vn then2000
+ 6080 if xe=133 theni=i+ 1:goto6120
+ 6090 if xe=134 theni=i- 1:goto6160
+ 6100 if xe=137 theni=i+10:goto6120
+ 6110 if xe=138 theni=i-10:goto6160
+ 6120 if i> 99 then i=99
+ 6130 if i>=vn then1940
+ 6140 goto6180
+ 6150 :
+ 6160 if i<1 theni=1:goto6130
+ 6170 :
+ 6180 poke211, 2:poke214, 5:sys58640
+ 6190 printright$(str$(i),len(str$(i))-1);:   if i<10 then print" "
+ 6200 gosub4530:     rem"Vokabelmaske"
+ 6210 poke211,2:poke214,11:sys58640
+ 6220 printright$(d$(i),len(d$(i))-2)
+ 6230 poke211,2:poke214,16:sys58640
+ 6240 printright$(e$(i),len(e$(i))-2)
+ 6250 gosub3890:              rem"get"
+ 6260 : xe=asc(x$)
+ 6270 : if xe=135 thenfi$="":goto6360
+ 6280 : if xe=136 thenfi$="":goto6390
+ 6290 : if xe=140 thengosub7280
+ 6300 :   if x$="j" then2210
+ 6310 :   if x$="n" then1410
+ 6320 : if xe=139 then2210
+ 6330 : if xe=133 or xe=134 or xe=137 or xe=138 then6080
+ 6340 goto6250
+ 6350 :
+ 6360 gosub5720:rem"Vokabeln erfassen"
+ 6370 goto6050
+ 6380 :
+ 6390 rem"{SHIFT-*}{SHIFT-*} Vokabel loeschen {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 6400 if i=1 and d$(i)="" then 6180
+ 6410 gosub3810:        rem"hilfzeile"
+ 6420 print"{up}{up}{rght}Wirklich loeschen ? (j/n)
+ 6430 gosub3890:              rem"get"
+ 6440 : if x$="j" then6470
+ 6450 : if x$="n" then6550
+ 6460 goto6430
+ 6470 if vn=100 then d$(99)="":e$(99)="":goto6520
+ 6480 if vn=2 then d$(1)="":e$(1)=""    :goto6520
+ 6490 for j=i tovn-1
+ 6500 : d$(j)=d$(j+1):e$(j)=e$(j+1)
+ 6510 next
+ 6520 : vn=vn-1:if i=vn then1940
+ 6530 : if vn<=1 then vn=1:goto1940
+ 6540 : if  i<=1 then  i=1
+ 6550 gosub5980
+ 6560 goto6180
+ 6570 :
+ 6580 rem"{SHIFT-*}{SHIFT-*} Suchroutine {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 6590 :
+ 6600 x$="Suchroutine":gosub4460
+ 6610 q9=i
+ 6620 poke211,2:poke214,11:sys58640
+ 6630 en=36:po=1466:gosub4240
+ 6640 x=len(n$)
+ 6650 i=1
+ 6660 :ifn$=""then6900
+ 6670 :gosub4530:d$=right$(d$(i),len(d$(i))-2):e$=right$(e$(i),len(e$(i))-2)
+ 6680 :poke211,2:poke214,11:sys58640
+ 6690 :printd$
+ 6700 :poke211,2:poke214,16:sys58640
+ 6710 :printe$
+ 6720 :poke211,2:poke214,5:sys58640:printi
+ 6730 :ifx>len(d$)then6760
+ 6740 :x$=d$:gosub6950
+ 6750 :ifj>0then6800
+ 6760 :ifx>len(e$)then6870
+ 6770 :x$=e$:gosub6950
+ 6780 :ifj=0then6870
+ 6790 rem gewusst
+ 6800 :poke211,2:poke214,22:sys58640
+ 6810 :print"weitersuchen (j/n) ?"
+ 6820 :gosub3890
+ 6830 :ifx$="j"thengosub3810:goto6870
+ 6840 :ifx$="n"then6920
+ 6850 :goto6820
+ 6860 :
+ 6870 i=i+1
+ 6880 ifi=100then6900
+ 6890 ifi<100andd$(i)>""then6670
+ 6900 i=q9:goto6920
+ 6910 :
+ 6920 x$="Woerter bisher eingegeben"
+ 6930 gosub4460:gosub5980:goto6120
+ 6940 :
+ 6950 j=1
+ 6960 ifn$=left$(x$,len(n$))thenreturn
+ 6970 ifmid$(x$,j,1)=";"then7000
+ 6980 j=j+1:ifj>len(x$)then7020
+ 6990 goto6970
+ 7000 x$=right$(x$,len(x$)-j)
+ 7010 goto6960
+ 7020 j=0:return
+ 7030 rem"{SHIFT-*}{SHIFT-*} UP Datei speichern {SHIFT-*}{SHIFT-*}
+ 7040 :
+ 7050 s$="{rght}[speichern]"
+ 7060 gosub4170:  rem"Dateiname eing."
+ 7070 if xe=140 thenreturn
+ 7080 gosub3980:      rem"Fehlerkanal"
+ 7090 close2:open2,8,2,"vo."+n$+",s,w"
+ 7100 gosub4080:      rem"Fehlerkanal"
+ 7110 if fe=0 then7200
+ 7120 : gosub3810:print"{up}{up}{rght}Datei existiert bereits !"
+ 7130 : print"{rght}Alte Datei ueberschreiben ? (j/n)
+ 7140 gosub3890:              rem"get"
+ 7150 ifx$="n"then7050
+ 7160 ifx$="j"thenprint#9,"s:vo."+n$:close2:open2,8,2,"vo."+n$+",s,w":goto7180
+ 7170 goto7140
+ 7180 gosub3810:       rem"Hilfszeile"
+ 7190 print"{up}{up}{rght}Saving {rvon} "n$" {rvof}"
+ 7200 print#2,vn-1
+ 7210 forj=1tovn-1
+ 7220 : print#2,d$(j)
+ 7230 : print#2,e$(j)
+ 7240 nextj
+ 7250 close2
+ 7260 return
+ 7270 :
+ 7280 rem"{SHIFT-*}{SHIFT-*} UP{$a0}Datei nicht gespeichert
+ 7290 :
+ 7300 gosub3810:        rem"Hilfzeile"
+ 7310 print"{up}{up}{rght}Datei ist noch nicht gespeichert !!"
+ 7320 print"{rght}Soll Datei gespeichert werden ? (j/n)"
+ 7330 gosub3890:              rem"get"
+ 7340 if x$<>"j" and x$<>"n" then7330
+ 7350 return
+ 7360 :
+ 7370 rem"{SHIFT-*}{SHIFT-*} UP Init Var. + Maschpge. {SHIFT-*}{SHIFT-*}
+ 7380 :
+ 7390 rem"{SHIFT-*}{SHIFT-*} Init Variablen {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 7400 :
+ 7410 dimd$(99),e$(99)
+ 7420 x1$="{rght}                                      "
+ 7430 x2$="{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 7440 x3$="{SHIFT--}................................... {SHIFT--}"
+ 7450 x4$="{rght}{rvon}         !         !         !        {rvof}"
+ 7460 x5$="............."
+ 7470 p=1024
+ 7480 printchr$(14)chr$(8);
+ 7490 close9:open9,8,15
+ 7500 return
+ 7510 :
+ 7520 rem"{SHIFT-*}{SHIFT-*} Init Masch.programme {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 7530 :
+ 7540 rem"bildschirmchanger"
+ 7550 data 169,0,133,87,169,4,133,88,169,56,133,89,169,199,133,90,160,0,177,87
+ 7560 data170,177,89,145,87,138,145,89,200,208,243,230,88,230,90,169,8,197,88
+ 7570 data 208,231,96
+ 7580 fori=49152to49193:readx:pokei,x:next
+ 7590 :
+ 7600 rem"floppy an/aus"
+ 7610 data 169,1,160,192,162,33,32,189,255,169,1,160,15,166,2,32,186,255,32
+ 7620 data 192,255,176,2,169,0,133,2,169,1,32,195,255,96,32
+ 7630 fori=49194to49227:readx:pokei,x:next
+ 7640 :
+ 7650 rem"{SHIFT-*}{SHIFT-*} UP Hilfsanzeige {SHIFT-*}{SHIFT-*}
+ 7660 :
+ 7670 print"{home}{down}"spc(14)"Hilfs-Tafel"
+ 7680 print"{down}{down}{rght}[F8] {rvon}menue{rvof} fuehrt in die letzte Anwen-
+ 7690 print"{rght}dung oder das letzte Menue zurueck."
+ 7700 print"{rght}--------------------------------------"
+ 7710 print"{rght}Im Disk-Menue ist jeweils der volle   "
+ 7720 print"{rght}Programmname zu verwenden. Ansonsten  "
+ 7730 print"{rght}wird bei Vokabeldateien die Kennung   "
+ 7740 print"{rght}{rvon} vo. {rvof} nicht mit eingegeben !!         "
+ 7750 print"{rght}--------------------------------------"
+ 7760 print"{rght}Tritt eine Fehlermeldung durch die    "
+ 7770 print"{rght}Floppy auf und werden keine Massnahmen"
+ 7780 print"{rght}erklaert, verfahren Sie bitte nach dem"
+ 7790 print"{rght}Bedienungshandbuch zur Floppy 1541.   "
+ 7800 print"{rght}--------------------------------------"
+ 7810 print"{down}{down}{rght}{rvon}[_] = zurueck ins Programm            {rvof}"
+ 7820 poke211,0:poke214,22:sys58640
+ 7830 print"{rght}{rvon}  [F1]   !  [F3]   !  [F5]   !  [F7]  {rvof}"
+ 7840 print"{rght}{rvon}  [F2]   !  [F4]   !  [F6]   !  [F8]  {rvof}"
+ 7850 sys49152
+ 7860 return
+ 7870 :
+ 7880 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 7890 rem"{SHIFT--}  Disketten-Menue  {SHIFT--}
+ 7900 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+ 7910 :
+ 7920 rem"{SHIFT-*}{SHIFT-*} Directory {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 7930 :
+ 7940 gosub5080: rem"Directory"
+ 7950 goto1410
+ 7960 :
+ 7970 rem"{SHIFT-*}{SHIFT-*} Filenamen aendern {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 7980 :
+ 7990 qq=1:gosub5080:qq=0:   rem"Dir."
+ 8000 gosub3810:        rem"Hilfzeile"
+ 8010 print"{up}{up}{rght}Bisheriger Name: "x5$"..."
+ 8020 poke211,18:poke214,22:sys58640
+ 8030 en=17:po=1922:gosub4240:rem"Eing.
+ 8040 if xe=140 then1410
+ 8050 if xe<>13 thenprint:goto8010
+ 8060 if n$="" then1410
+ 8070 a$=n$
+ 8080 print:print"{rght}Neuer Name     : "x5$"..."
+ 8090 poke211,18:poke214,23:sys58640
+ 8100 po=1962:gosub4240:  rem"Eingabe"
+ 8110 if xe=140 then1410
+ 8120 if xe<>13 thenprint"{up}";:goto8080
+ 8130 gosub3980:      rem"Fehlerkanal"
+ 8140 print#9,"r:"+n$+"="+a$
+ 8150 gosub4080:      rem"Fehlerkanal"
+ 8160 if fe=63 thenx$="bereits":goto8190
+ 8170 if fe=62 thenx$="nicht":goto8190
+ 8180 goto1410
+ 8190 : gosub3810:      rem"Hilfzeile"
+ 8200 : print"{up}{up}{rght}{rvon} File existiert "x$" !! {rvof}"
+ 8210 : print"{rght}[Bitte Taste druecken]"
+ 8220 : gosub3890:            rem"Get"
+ 8230 :
+ 8240 goto8000
+ 8250 :
+ 8260 rem"{SHIFT-*}{SHIFT-*} Files loeschen {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 8270 :
+ 8280 qq=1:gosub5080:qq=0:   rem"Dir."
+ 8290 gosub3810:        rem"Hilfzeile"
+ 8300 print"{up}{up}{rght}Loeschfile : "x5$"..."
+ 8310 print"{rght}[Wenn fertig, 'RETURN' druecken]."
+ 8320 poke211,14:poke214,22:sys58640
+ 8330 en=17:po=1918:gosub4240:rem"Eing.
+ 8340 if xe=140 then1410
+ 8350 if n$="" then 1410
+ 8360 gosub3980:      rem"Fehlerkanal"
+ 8370 print#9,"s:"+n$
+ 8380 gosub4080:      rem"Fehlerkanal"
+ 8390 goto8290
+ 8400 :
+ 8410 rem"{SHIFT-*}{SHIFT-*} Formatieren {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 8420 :
+ 8430 gosub3810:        rem"Hilfzeile"
+ 8440 print"{up}{up}{rght}Name:"x5$"...  ID:..  {rvon}!       "
+ 8450 printspc(31)"{rvon}! menue {rvof}{home}";
+ 8460 poke211,6:poke214,22:sys58640
+ 8470 en=17:po=1910:gosub4240:rem"Eing.
+ 8480 if xe=140 then1410
+ 8490 if xe<>13 thenprint:goto8430
+ 8500 a$=n$
+ 8510 poke211,27:poke214,22:sys58640
+ 8520 en=3:po=1931:gosub4240:rem"Eing.
+ 8530 if xe=140 then1410
+ 8540 if xe<>13 thenprint:goto8510
+ 8550 gosub3980:      rem"Fehlerkanal"
+ 8560 print#9,"n:"+a$+","+n$
+ 8570 gosub4080:      rem"Fehlerkanal"
+ 8580 goto1410
+ 8590 :
+ 8600 rem"{SHIFT-*}{SHIFT-*} Validieren {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 8610 :
+ 8620 gosub3980:      rem"Fehlerkanal"
+ 8630 gosub3810:      rem"Hilfzeile  "
+ 8640 print"{up}{up}"spc(13)"{rvon} Validieren "
+ 8650 print#9,"v"
+ 8660 gosub4080:      rem"Fehlerkanal"
+ 8670 goto1410
+ 8680 :
+ 8690 rem"{SHIFT-*}{SHIFT-*} Initialisieren {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 8700 :
+ 8710 gosub3980:      rem"Fehlerkanal"
+ 8720 print#9,"i"
+ 8730 gosub4080:      rem"Fehlerkanal"
+ 8740 goto1410
+ 8750 :
+ 8760 print"{clr}"x2$"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon}       P r o g r a m m - E n d e        {rvof}"x2$"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 8770 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 8780 poke 53280,6:end
+ 8790 :
+ 8800 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 8810 rem"{SHIFT--} Vokabeln drucken {SHIFT--}
+ 8820 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+ 8830 :
+ 8840 d1=14:d2=15:sl=72:ga=4:sa=7
+ 8850 t$="D r u c k e n"
+ 8860 gosub3660:gosub3770
+ 8870 gosub9140:if xe=140 then1410
+ 8880 gosub3850:print"{up}{up}{rght}{rvon}Drucken"spc(23)"{down}Menue"
+ 8890 gosub3890
+ 8900 : if xx=133 then8930
+ 8910 : if xx=140 then1410
+ 8920 goto8890
+ 8930 gosub3810:print"{up}{up}{rght}"spc(6)"Bitte Drucker vorbereiten "
+ 8940 print"{rght}Wenn fertig:Taste druecken (F8=zurueck"
+ 8950 gosub3890
+ 8960 if xx=140 then1410
+ 8970 gosub3850:print"{up}{up}{rght}{rvon}Pause"spc(25)"Abbruch"
+ 8980 poke2,4:sys49194
+ 8990 if peek(2)>0 then8930
+ 9000 zz=2:close2:open2,ga,sa
+ 9010 print#2,chr$(d1)"V o k a b e l d a t e i"chr$(d2)chr$(13)
+ 9020 fori=1 to vn-1
+ 9030 : print#2,right$(d$(i),len(d$(i))-2)" ";
+ 9040 :print#2,mid$(x3$,2,34-len(d$(i)))" ";
+ 9050 : print#2,right$(e$(i),len(e$(i))-2)
+ 9060 : getx$:xx=asc(x$+chr$(0)):ifxx=133thenpoke198,0:wait198,1
+ 9070 :   if xx=136 theni=999:nexti:goto8800
+ 9080 : zz=zz+1:if zz=sl-2 then print#2,chr$(13)chr$(13):zz=1
+ 9090 nexti
+ 9100 print#2,chr$(13)"*****"
+ 9110 close2
+ 9120 goto8800
+ 9130 :
+ 9140 fe=0:xx=0:gosub4820
+ 9150 if fe>0 then9140
+ 9160 return
+

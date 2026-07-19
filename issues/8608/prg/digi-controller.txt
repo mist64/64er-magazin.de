@@ -1,0 +1,492 @@
+
+
+;digi-controller.prg ==0801==
+   15 printchr$(147);:dimi$(65),q$(65),m$(65),o$(513)
+   80 o1$=" ":o2$="  ":o3$="   ":o4$="                     "
+   90 zl$="":po=3
+  100 printchr$(14)"{gry1}":poke53280,5 :poke53281,5
+  120 ko$="{rvon}Digit-Controller v. E. Merk (07309/6501){rvof}"
+  130 d$="digit1"
+  140 br$="{rvon}                                        {rvof}"
+  150 bl$="                                        "
+  160 kz$=".ZN..Opr.Op..Nr...Kommentar............."
+  180 li$="{rvon}CRSR{rvof}=ZN+/-  {rvon} E{rvof}ingabe  {rvon}F1{rvof}=List  {rvon}F7{rvof}=Menue{rvon} {rvof}"
+  200 o$="{rvon}Operation{rvof}  OR AND XOR JMP JI = ;  {rvon}Return{rvof}"
+  210 op$="{rvon}Operand{rvof} I(N) Q(N) M(N)  (N=Nicht) {rvon}Return{rvof}"
+  220 oe$="{rvon}Operanden- Nr.{rvof} J(512)      *(64)  {rvon}Return{rvof}"
+  230 km$="{rvon}Kommentar{rvof} 0-21 Zeichen            {rvon}Return{rvof}"
+  240 da$="{rvon} {rvof}{rght}{rght}{rght}{rvon}  {rvof}{rght}{rvon}  {rvof}{rght}{rght}{rvon}  "
+  242 da$=da$+"{rvof}{rght}{rght}{rght}{rvon}  {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} {rvof}"
+  250 la$="{rvon}      Anweisungsliste ausdrucken !      {rvof}"
+  260 z1$="Opr/Bit : 666665555555555444444444433333"
+  270 z2$="33333222222222211111111110000000000"
+  280 z3$="          432109876543210987654321098765"
+  290 z4$="43210987654321098765432109876543210"
+ 1000 rem ******************************
+ 1010 printchr$(147);ko$:print:print:print
+ 1020 print" M E N U E "
+ 1025 print"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}":print:print
+ 1040 print" A = Anweisungs- Programme loeschen":print
+ 1050 print" B = Anweisungsliste (AWL) v. Disk lesen"
+ 1060 print" C = Anweisungsliste (AWL) erstellen":print
+ 1070 print" D = Anweisungsliste (AWL) ausdrucken":print
+ 1080 print" E = Auswertung v. AWL ausdrucken":print
+ 1090 print" F = Ende"
+ 1100 gete$:ife$=""then1100
+ 1105 ife$="a"then21000
+ 1110 ife$="b"thenf2=0:goto1200
+ 1120 ife$="c"then1500
+ 1130 ife$="d"then4000
+ 1140 ife$="e"then5000
+ 1150 ife$="f"thenprintchr$(142)chr$(147)"{lblu}";:poke53280,14:poke53281,6:end
+ 1160 goto1100
+ 1200 rem ******************************
+ 1210 printchr$(147);ko$;bl$
+ 1225 print:print:print
+ 1230 print" Bitte Datendiskette einlegen und        {rvon}Return{rvof} druecken !":print:print
+ 1235 print" {rvon}F7    {rvof} = zurueck zum Menue":print
+ 1240 getee$:ifee$=""then1240
+ 1250 ifee$=chr$(13)thengosub53000:goto1300
+ 1260 ifee$=chr$(136)then1000
+ 1270 goto1240
+ 1300 iff2=0thenopen1,8,8,f$+",s,r":close1:gosub50000:rem floppy test
+ 1301 iff2=1thenopen1,8,8,"@:"+f$+",s,w":close1:gosub50000:rem floppy test
+ 1302 iff1=1then1200
+ 1303 iff2=0thenprint:printchr$(147)"{rvon} Liste wird geladen !                   {rvof}"
+ 1304 iff2=1thenprint:printchr$(147)"{rvon} Liste wird gespeichert !               {rvof}"
+ 1305 iff2=0thenopen1,8,8,"@:"+f$+",s,r"
+ 1306 iff2=1thenopen1,8,8,"@:"+f$+",s,w"
+ 1307 iff2=1then1330
+ 1309 rem ******************************
+ 1310 forj=0to512:o$(j)="":next
+ 1312 forj=0to512
+ 1315 e$="":input#1,e$:ife$="Ende"orst=64thenclose1:goto1360
+ 1320 k=val(mid$(e$,2,3))
+ 1322 o$(k)=e$:printo$(k);
+ 1325 next:close1:goto1360
+ 1329 rem ******************************
+ 1330 forj=0to512
+ 1335 ifo$(j)=""then1355
+ 1350 print#1,o$(j):printo$(j);
+ 1355 next:print#1,"Ende":close1
+ 1360 f2=0:goto1000
+ 1500 rem *** liste erstellen **********
+ 1550 printchr$(147);
+ 1560 printchr$(19);ko$;bl$;br$;li$;br$;bl$;kz$;br$;da$;br$;
+ 1570 zl$="  0":po=0:goto1700
+ 1600 e$="":gete$:ife$=""then1600
+ 1610 ife$=chr$(136)thenf2=1:goto1200
+ 1620 ife$=chr$(133)then1800
+ 1630 ife$=chr$(69)andright$(zl$,1)<>chr$(32)then2500
+ 1635 ife$>chr$(47)ande$<chr$(58)then1670
+ 1638 ife$=chr$(20)then1680
+ 1640 ife$=chr$(17)then2000
+ 1650 ife$=chr$(145)then2050
+ 1660 goto1600
+ 1670 zl$=right$(zl$,2)+e$:zl$=right$(zl$,3):po=po+1:
+ 1672 ifval(zl$)>500then1600
+ 1674 goto1700
+ 1675 ifpo>3thenpo=3:goto1700
+ 1680 zl$=chr$(32)+left$(zl$,2):zl$=left$(zl$,3):po=po-1
+ 1690 ifpo<1thenpo=1:goto1700
+ 1700 printchr$(19)"{down}{down}{down}{down}{down}{down}{down}{down}{rght}   ";:printchr$(19)"{down}{down}{down}{down}{down}{down}{down}{down}{rght}"zl$;
+ 1702 ifright$(zl$,1)<>chr$(32)then1710
+ 1704 goto 1600
+ 1710 zn=val(zl$)
+ 1720 ifo$(zn)=""theno$(zn)=bl$
+ 1730 o1$=mid$(o$(zn),7,1):print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}"o1$;
+ 1740 o2$=mid$(o$(zn),10,2):print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"o2$;
+ 1750 o3$=mid$(o$(zn),14,3):print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"o3$;
+ 1760 o4$=mid$(o$(zn),19,21):print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"o4$;
+ 1770 ifo$(zn)=bl$theno$(zn)=""
+ 1790 goto1600
+ 1800 rem *** list *********************
+ 1810 z=0:zn=val(zl$)
+ 1822 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";:forj=1to14:printbl$;:next
+ 1824 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 1830 forj=znto0step-1
+ 1840 ifo$(j)=""then1860
+ 1845 ifz>4then1900
+ 1850 printo$(j)"{up}{up}";:z=z+1
+ 1860 next
+ 1900 z=0:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 1920 ifzn=500then1600
+ 1930 zn=zn+1:forj=znto500
+ 1940 ifo$(j)=""then1960
+ 1945 ifz>4then1600
+ 1950 printo$(j);:z=z+1
+ 1960 next
+ 1970 goto1600
+ 2000 rem *** zeile+1 ******************
+ 2010 zn=val(zl$):zn=zn+1:ifzn>500thenzn=500
+ 2020 zl$=left$(bl$,4)+str$(zn):zl$=right$(zl$,3)
+ 2030 goto1700
+ 2050 rem *** zeile-1 ******************
+ 2060 zn=val(zl$):zn=zn-1:ifzn<0thenzn=0
+ 2070 zl$=left$(bl$,4)+str$(zn):zl$=right$(zl$,3)
+ 2080 goto1700
+ 2500 rem *** eingabe operation *******
+ 2510 print"{home}{down}{down}{down}";o$;:goto2580
+ 2520 e$="":gete$:ife$=""then2520
+ 2530 ife$=chr$(13)ando1$=""thenprint"{home}{down}{down}{down}"li$;:o$(val(zl$))="":goto2000
+ 2531 ife$=chr$(13)ando1$=";"thenprint"{home}{down}{down}{down}"li$;:o2$="  ":o3$="   ":goto3100
+ 2535 ife$=chr$(13)ando1$<>""then2600
+ 2540 ife$=chr$(79)ore$=chr$(65)ore$=chr$(74)ore$=chr$(61)ore$=chr$(20)then2560
+ 2545 ife$=chr$(88)ore$=chr$(59)then2560
+ 2550 goto2520
+ 2560 ife$=chr$(20)theno1$="":goto2580
+ 2565 ife$=chr$(61)theno1$=e$:goto2580
+ 2568 ife$=chr$(59)theno1$=e$:goto2580
+ 2570 fa=asc(e$)+128:e$=chr$(fa):o1$=e$:
+ 2580 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght} {left}";o1$;
+ 2590 goto2520
+ 2600 rem *** operand ****************
+ 2610 print"{home}{down}{down}{down}";op$;:goto2680
+ 2620 e$="":gete$:ife$=""then2620
+ 2625 ife$=chr$(73)ando1$=chr$(61)then2620
+ 2627 ife$=chr$(13)ando1$=chr$(74+128)then2740
+ 2630 ife$=chr$(13)ando2$=""then2500
+ 2635 ife$=chr$(13)ando2$<>""then2800
+ 2640 ifo1$<>chr$(74+128)thenife$=chr$(73)ore$=chr$(81)ore$=chr$(77)then2700
+ 2642 ife$=chr$(20)then2660
+ 2645 ife$=chr$(78)andlen(o2$)=1then2720
+ 2647 ifo1$=chr$(74+128)ande$=chr$(73)then2700
+ 2650 goto2620
+ 2660 iflen(o2$)=2theno2$=left$(o2$,1):goto2680
+ 2670 iflen(o2$)=1theno2$=""
+ 2680 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}  {left}{left}";o2$;
+ 2690 goto2620
+ 2700 fa=asc(e$)+128:e$=chr$(fa):o2$=e$:
+ 2710 goto2680
+ 2720 fa=asc(e$)+128:e$=chr$(fa):o2$=o2$+e$
+ 2730 goto2680
+ 2740 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}  {left}{left}";o2$;
+ 2750 goto2800
+ 2800 rem *** operanden- nummer ********
+ 2805 iflen(o2$)=1theno2$=o2$+left$(bl$,1)
+ 2807 ifo2$=""theno2$="  "
+ 2810 print"{home}{down}{down}{down}";oe$;:p1=3:goto2970
+ 2850 e$="":gete$:ife$=""then2850
+ 2860 ife$=chr$(13)andright$(o3$,1)=chr$(32)then2600
+ 2870 ife$=chr$(13)andright$(o3$,1)<>chr$(32)then3100
+ 2880 ife$>chr$(47)ande$<chr$(58)then2900
+ 2885 ife$=chr$(20)then2920
+ 2890 goto2850
+ 2900 o3$=right$(o3$,2)+e$:o3$=right$(o3$,3):p1=p1+1:
+ 2910 goto2954
+ 2920 ifp1>3thenp1=3:goto2954
+ 2930 o3$=chr$(32)+left$(o3$,2):o3$=left$(o3$,3):p1=p1-1
+ 2940 ifp1<1thenp1=1:
+ 2954 ifval(o3$)>512andleft$(o1$,1)=chr$(74+128)theno3$="   ":p1=3:goto2970
+ 2960 ifval(o3$)>64andleft$(o1$,1)<>chr$(74+128)theno3$="   ":p1=3:goto2970
+ 2970 printchr$(19)"{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}   {left}{left}{left}";o3$;
+ 2980 goto2850
+ 3100 rem *** kommentar ****************
+ 3110 print"{home}{down}{down}{down}"km$
+ 3120 p2=0:goto3220
+ 3150 e$="":gete$:ife$=""then3150
+ 3160 ife$=chr$(13)thenprint"{home}{down}{down}{down}"li$;:goto3300
+ 3165 ife$=chr$(58)ore$=chr$(44)then3150
+ 3170 ife$=chr$(20)thenp2=p2-1:goto3250
+ 3175 ife$>chr$(31)ande$<chr$(91)thenp2=p2+1:goto3200
+ 3180 ife$>chr$(31+128)ande$<chr$(91+128)thenp2=p2+1:goto3200
+ 3190 goto3150
+ 3200 ifp2>21thenp2=21
+ 3210 o4$=left$(o4$,p2-1)+e$+left$(bl$,21-p2)
+ 3220 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"o4$;
+ 3230 goto3150
+ 3250 ifp2<0thenp2=0
+ 3260 o4$=left$(o4$,p2)+left$(bl$,21-p2):
+ 3270 goto3220
+ 3300 rem *** eingabestring gesamt *****
+ 3302 ifright$(zl$,1)<>chr$(32)then3320
+ 3310 goto1700
+ 3320 zn=val(zl$)
+ 3330 o$(zn)=chr$(62)+zl$+"  "+o1$+"  "+o2$+"  "+o3$+"  "+o4$+" "
+ 3340 goto2000
+ 4000 rem *** liste ausdrucken *********
+ 4010 printchr$(147);ko$;bl$;la$
+ 4020 print" Druecke {rvon}B{rvof}ildschirm oder {rvon}D{rvof}rucker    ":print:print
+ 4030 e$="":gete$:ife$=""then4030
+ 4040 ife$=chr$(66)thenf3=0:goto4100
+ 4050 ife$=chr$(68)thenf3=1:goto4100
+ 4055 ife$=chr$(136)then1000
+ 4060 goto4030
+ 4100 iff3=1thenprint"{rvon}       Bitte Drucker einschalten !!!    {rvof}";
+ 4110 iff3=1thenprintbl$;
+ 4130 input"Von Zeile :     0{left}{left}{left}";o1$
+ 4140 input"bis Zeile :     512{left}{left}{left}{left}{left}";o2$
+ 4142 print
+ 4150 p1=val(o1$):p2=val(o2$):ifp1>p2then4000
+ 4160 ifp1<0orp1>512orp2<0orp2>512then4000
+ 4164 input"Datum :    Tg.Mo.Ja{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";ee$
+ 4170 print:print:print"{rvon}      F1= Start      F7= Menue          {rvof}":print:print
+ 4200 e$="":gete$:ife$=""then4200
+ 4210 ife$=chr$(136)then1000
+ 4220 ife$<>chr$(133)then4200
+ 4225 printchr$(147);
+ 4230 iff3=0thenclose1:open1,3,8
+ 4240 iff3=1thenclose1:open1,4,7
+ 4250 z=0:print#1,ko$;br$
+ 4260 iff3=1thenprint#1,"Datei- Name : ";f$:print#1,"Datum       : ";ee$:print#1
+ 4300 forj=p1top2
+ 4310 iff3=0andz>=20thengosub51000
+ 4320 gete$
+ 4330 ife$=chr$(136)thenclose1:goto1000
+ 4340 ifo$(j)=""then4360
+ 4350 z=z+1:print#1,o$(j);:iff3=1thenprint#1
+ 4360 next
+ 4370 iff3=0thengosub51000
+ 4380 print#1:print#1:print#1
+ 4390 close1:goto1000
+ 5000 rem *** auswertung ***************
+ 5010 printchr$(147)ko$;bl$:print:print
+ 5020 print" Bitte waehlen Sie :":print"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}":print
+ 5025 print" {rvon}T{rvof}race                 ohne Drucker   ":print
+ 5030 print" {rvon}E{rvof}inzelauswertung = I(0-64) manuell":print
+ 5040 print" {rvon}G{rvof}esamtauswertung = I(0-7)  automatisch":print:print:print:print
+ 5050 e$="":gete$:ife$=""then5050
+ 5055 ife$=chr$(84)then6500
+ 5060 ife$=chr$(71)then6000
+ 5070 ife$=chr$(69)then7000
+ 5080 goto5050
+ 6000 rem *** gesamtauswertung *********
+ 6002 input" Datum :    Tg.Mo.Ja{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";ee$:print:print
+ 6005 print"{rvon}#####  Bitte Drucker einschalten  ######{rvof}";
+ 6010 print"{rvon}#####  F1= Start       F7= Menue  ######{rvof}":print
+ 6020 e$="":gete$:ife$=""then6020
+ 6030 ife$=chr$(136)then1000
+ 6040 ife$<>chr$(133)then6020
+ 6090 m=0:ma=-1
+ 6100 open1,4,7
+ 6110 print#1,ko$;br$;"Datei- Name         : ";f$
+ 6115 print#1,"Gesamt - Auswertung : ";ee$:print#1
+ 6120 fore=0to512
+ 6125 p1=val(mid$(o$(e),14,3)):ifp1>7then6128
+ 6127 ifmid$(o$(e),10,1)="I"andp1>mthenm=p1
+ 6128 ifo$(e)<>""thenma=e
+ 6130 next
+ 6131 ifma<0thenprint#1,"Kein Programm vorhanden !":print#1:close1:goto1000
+ 6132 c=0:rem ******************************
+ 6135 ifc>(2^(m+1))-1then6340
+ 6140 forl=0to64:i$(l)=" ":m$(l)=" ":q$(l)=" ":next
+ 6150 z=c:forj=mto0step-1
+ 6160 ifz<2^jtheni$(j)="0":goto6180
+ 6170 z=z-2^j:i$(j)="1"
+ 6180 next
+ 6200 gosub9000
+ 6240 k$=right$(str$(c),3)
+ 6250 print#1,z1$;z2$;" ;Dez":print#1,z3$;z4$
+ 6280 q$="":m$="":i$="":ford=64to0step-1
+ 6290 q$=q$+q$(d):m$=m$+m$(d):i$=i$+i$(d)
+ 6300 next
+ 6305 print#1,"Input   I ";i$;" ;";left$(bl$,3-len(k$));k$
+ 6310 print#1,"Marker  M ";m$
+ 6320 print#1,"Output  Q ";q$:print#1
+ 6325 c=c+1
+ 6330 iff3<>2then6135
+ 6340 close1:goto1000
+ 6500 rem *** trace ********************
+ 6510 e$="+":printchr$(147)"{rvon}   ---   Compilat wird erstellt   ---   {rvof}";
+ 6515 print"{rvon}         F7 = Programm - Stop           {rvof}"
+ 6520 ma=-1:fork=0to512
+ 6530 ifo$(k)<>""thenma=k
+ 6540 ifk<65theni$(k)=" ":m$(k)=" ":q$(k)=" "
+ 6550 next
+ 6555 ifma<0thene$="":goto6650
+ 6590 f3=0:gosub9000
+ 6650 print:print:print"{rvon}     F1= weiter     Return= Abbruch     {rvof}"
+ 6660 ee$="":getee$:ifee$=""then6660
+ 6670 ifee$=chr$(13)then1000
+ 6690 ifee$=chr$(133)then6590
+ 6700 goto6660
+ 7000 rem *** einzelauswertung *********
+ 7002 input" Datum :    Tg.Mo.Ja{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";ee$:print:print
+ 7005 print"{rvon}#####  Bitte Drucker einschalten  ######{rvof}";
+ 7010 print"{rvon}#####  F1= Start       F7= Menue  ######{rvof}":print
+ 7020 e$="":gete$:ife$=""then7020
+ 7030 ife$=chr$(136)then1000
+ 7040 ife$<>chr$(133)then7020
+ 7090 ma=-1
+ 7100 printchr$(147)ko$;bl$
+ 7110 printbr$;"{rvon} CRSR{rvof}=Eing. {rvon}F1-F3{rvof}=Modus {rvon}Return{rvof} {rvon}F7{rvof}=Menue{rvon} {rvof}";br$
+ 7140 k=0:fb$="         ":
+ 7145 goto7700
+ 7150 b$="":getb$:ifb$=""then7150
+ 7160 ifb$=chr$(17)then7200
+ 7170 ifb$=chr$(145)then7250
+ 7180 ifb$=chr$(13)then7800
+ 7185 ifb$=chr$(133)orb$=chr$(134)orb$=chr$(135)then7300
+ 7190 ifb$=chr$(136)then1000
+ 7195 goto7150
+ 7200 rem *** input +1 *****************
+ 7210 k=k+1:ifk>64thenk=0
+ 7220 i$(k)=c$:goto7700
+ 7250 rem *** input -1 *****************
+ 7260 k=k-1:ifk<0thenk=64
+ 7270 i$(k)=c$:goto7700
+ 7300 rem *** modus ********************
+ 7310 ifb$=chr$(133)thenc$="1":fb$=" gesetzt":goto7270
+ 7320 ifb$=chr$(134)thenc$="0":fb$=" gesetzt":goto7270
+ 7330 ifb$=chr$(135)thenc$=" ":fb$="        ":goto7270
+ 7690 rem *** anzeige input ************
+ 7700 printchr$(19)"{down}{down}{down}{down}{down}{down}{down}{down}{rvon}Input  (I)  : {rvof}    {left}{left}{left}{left}"left$(bl$,3-len(str$(k)));k;
+ 7710 ifi$(k)=""thenprint"{rvon}  {rvof} {left}   {rvon} {rvof}";fb$:goto7150
+ 7720 print"{rvon}  {rvof} {left} ";i$(k);" {rvon} {rvof}";fb$
+ 7730 goto7150
+ 7800 printchr$(147)ko$;bl$;"Input - Uebersicht ( Dualwert ) :":print
+ 7810 fork=0to64
+ 7815 fb$=str$(k):fb$=mid$(fb$,2,2):fb$=left$(bl$,2-len(fb$))+fb$
+ 7820 print"I(";fb$;")= "i$(k),
+ 7830 next
+ 7840 print:print:print"{rvon}F1=zurueck Input Return=weiter  F7=Menue{rvof}";
+ 7850 b$="":getb$:ifb$=""then7850
+ 7860 ifb$=chr$(133)then7100
+ 7870 ifb$=chr$(136)then1000
+ 7880 ifb$<>chr$(13)then7850
+ 8270 printchr$(147)ko$;bl$"Einzel - Auswertung : "ee$:print
+ 8280 open1,4,7
+ 8285 print#1,ko$;br$;"Datei- Name         : ";f$
+ 8288 print#1,"Einzel - Auswertung : ";ee$:print#1
+ 8290 fork=0to512
+ 8291 ifk<65thenq$(k)=" ":m$(k)=" "
+ 8292 ifo$(k)<>""thenma=k
+ 8294 next
+ 8296 ifma<0thenprint#1,"Kein Programm vorhanden !":print#1:close1:goto1000
+ 8300 gosub9000
+ 8310 print#1,z1$;z2$:print#1,z3$;z4$
+ 8320 q$="":m$="":i$="":forl=64to0step-1
+ 8330 ifq$(l)=""thenq$(l)=" "
+ 8340 ifm$(l)=""thenm$(l)=" "
+ 8350 ifi$(l)=""theni$(l)=" "
+ 8370 q$=q$+q$(l):m$=m$+m$(l):i$=i$+i$(l)
+ 8380 nextl
+ 8390 print#1,"Input   I ";i$
+ 8400 print#1,"Marker  M ";m$
+ 8410 print#1,"Output  Q ";q$:print#1
+ 8420 close1:goto1000
+ 9000 rem *** compiler *****************
+ 9010 h=0:l=0:f3=0
+ 9060 rem
+ 9062 getb$:ifb$=chr$(136)thenf3=2:close1:return
+ 9070 ifl>mathenreturn
+ 9080 ifo$(l)=""ormid$(o$(l),7,1)=chr$(59)then20000
+ 9090 ife$="+"thenprintleft$(o$(l),4),
+ 9100 o1$=mid$(o$(l),7,1):o2$=mid$(o$(l),10,1):o3$=mid$(o$(l),14,3)
+ 9105 o4$=mid$(o$(l),11,1):rem negation
+ 9110 :
+ 9120 ifo1$="J"ando2$=" "thenl=val(o3$):goto9060
+ 9122 :
+ 9125 ifo1$="J"ando2$="I"and h=0 thenl=val(o3$):goto9060
+ 9126 :
+ 9130 :
+ 9140 ifo1$<>"="then9200
+ 9150 ifo4$="N"andh=0thenh=1:goto9170
+ 9160 ifo4$="N"andh=1thenh=0
+ 9170 ifo2$="Q"thenq$(val(o3$))=right$(str$(h),1):h=0:goto20000
+ 9180 ifo2$="M"thenm$(val(o3$))=right$(str$(h),1):h=0:goto20000
+ 9190 :
+ 9200 ifo1$<>"O"then9270
+ 9210 ifo2$="I"thenhh=val(i$(val(o3$)))
+ 9220 ifo2$="M"thenhh=val(m$(val(o3$)))
+ 9230 ifo2$="Q"thenhh=val(q$(val(o3$)))
+ 9240 ifo4$="N"thengosub52000
+ 9250 h=h or hh:goto20000
+ 9260 :
+ 9270 ifo1$<>"A"then9340
+ 9280 ifo2$="I"thenhh=val(i$(val(o3$)))
+ 9290 ifo2$="M"thenhh=val(m$(val(o3$)))
+ 9300 ifo2$="Q"thenhh=val(q$(val(o3$)))
+ 9310 ifo4$="N"thengosub52000
+ 9320 h=h and hh:goto20000
+ 9330 :
+ 9340 ifo1$<>"X"then9410
+ 9350 ifo2$="I"thenhh=val(i$(val(o3$)))
+ 9360 ifo2$="M"thenhh=val(m$(val(o3$)))
+ 9370 ifo2$="Q"thenhh=val(q$(val(o3$)))
+ 9380 ifo4$="N"thengosub52000
+ 9390 ifh=hhthenh=0:goto20000
+ 9400 ifh<>hhthenh=1
+ 9410 :
+20000 l=l+1:goto9060
+21000 rem *** programme loeschen ******
+21010 f2=2:p1=0:f3=-1
+21020 printchr$(147)"{rvon}   Anweisungs- Programme loeschen !!!   {rvof}";bl$
+21030 printbr$"{rvon}F1{rvof}=loeschen   {rvon}F5{rvof}=weiter   {rvon}F7{rvof}=Menue     {rvon} {rvof}";br$
+21040 close2:close15:gosub53010
+21045 gete$:ife$=chr$(136)then1000
+21050 iff3=-1then1000
+21060 goto21000
+22000 rem *** programm loeschen *******
+22010 close15:open15,8,15,"s:"+f$:close15:open15,8,15:f3=0:
+22020 ifp1=0thenp1=1:print"{rvon}"f$"{rvon}";:goto22040
+22030 p1=0:print:print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";"{rvon}"f$"{rvof}"
+22040 forl=1to1500:next:f$=""
+22050 goto21000
+50000 rem *** floppy- test ************
+50010 open15,8,15:input#15,fa,fb$,fc,fd
+50020 iffa=0thenf1=0:goto50100
+50030 printchr$(147)ko$;br$
+50040 print" Floppy - Fehler :":print:printfa;" "fb$" "fc" "fd:print:print
+50050 print" Bitte Fehler beheben und                {rvon}Return{rvof} druecken !":print:print
+50060 getee$:ifee$=""then50060
+50070 ifee$<>chr$(13)then50060
+50080 f1=1
+50100 close15:return
+51000 rem *** abfrage weiter / stop ***
+51010 z=0
+51020 print#1,chr$(19)"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+51030 print#1,"{rvon} Space = weiter        F7 = Menue       {rvon}";
+51050 e$="":gete$:ife$=""then51050
+51060 ife$=chr$(136)thenclose1:goto1000
+51070 ife$<>chr$(32)then51050
+51080 print#1,chr$(19):fork=1to24:print#1,bl$;:next
+51090 print#1,chr$(19);:return
+51990 rem *** negation ****************
+52000 ifhh=0thenhh=1:goto52020
+52010 ifhh=1thenhh=0
+52020 return
+52990 rem *** directory lesen *********
+53000 printchr$(147)"{gry1}";:close15:close2
+53002 iff2=0thenprint"{rvon}         Directory - Uebersicht :       {rvof}";bl$;
+53004 iff2=0thenprintbr$;"{rvon}F1{rvof}=Laden      {rvon}F5{rvof}=weiter    {rvon}F7{rvof}=Menue    {rvon} {rvof}";br$
+53005 iff2=1thenprintbr$;"{rvon} {rvof}       Anweisungen speichern !        {rvon} {rvof}";br$
+53007 iff2=1thenprint"{rvon}         Directory - Uebersicht :       {rvof}";bl$;
+53008 open15,8,15,"i":close15:gosub50000:iff1=1then1200
+53010 open15,8,15,"i":open2,8,2,"#"
+53020 t=18:s=1:p1=0
+53030 print#15,"b-r";2;0;t;s
+53040 print#15,"b-p";2;0
+53050 get#2,x$:ifx$=""thenx$=chr$(0)
+53060 t=asc(x$)
+53070 get#2,x$:ifx$=""thenx$=chr$(0)
+53080 s=asc(x$)
+53090 forx=0to7
+53100 print#15,"b-p";2;x*32
+53110 f$=""
+53120 fory=0to20
+53130 get#2,x$:ifx$=""thenx$=chr$(0)
+53140 ifasc(x$)=160then53160
+53150 ify>4thenf$=f$+x$
+53155 ify<5thenv(y)=asc(x$)
+53160 next
+53161 ifv(2)<>129orv(2)=0then53190
+53162 ifp1=0thenp1=1:printf$;:goto53170
+53164 p1=0:print:print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";f$
+53170 iff2=1then53190
+53180 gete$:ife$=""then53180
+53181 iff2=2ande$=chr$(133)thenclose2:close15:goto22000
+53182 ife$=chr$(133)thenclose15:close2:return
+53184 ife$=chr$(136)thenclose15:close2:f2=0:goto1000
+53186 ife$=chr$(135)then53190
+53188 goto53180
+53190 next
+53200 ift<>0then53030
+53210 close15:close2:print:iff2=2thenreturn
+53215 iff2=0then53000
+53219 ifp1=1thenprint
+53220 print"{gry1}{rvon}** Ende von Directory **  Return= Menue {rvof}":print:print
+53230 f$="":input"Dateiname : ";f$
+53240 iff$=""then1000
+53250 return
+
