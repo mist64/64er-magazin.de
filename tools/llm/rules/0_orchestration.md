@@ -143,13 +143,13 @@ strip, a banner illustration. The common primitive is a per-page
 **block index**: one line per layout block giving its bbox and a
 short text preview, derived from a tesseract TSV pass.
 
-**Build it ONCE per issue via rule 23.** That rule produces
+**Build it ONCE per issue via rule 9b.** That rule produces
 `issues/<YYMM>/_tmp/blocks/p<NNN>.txt` for every page. Run it after
 the PDF is in the issue dir and before any rule that needs bboxes
 dispatches. The cost is ~1-2 seconds per page, ~5 minutes for a
 full issue.
 
-The on-demand single-page recipe below is the fallback when rule 23
+The on-demand single-page recipe below is the fallback when rule 9b
 hasn't been run yet (one-off table or listing OCR work):
 
 ```bash

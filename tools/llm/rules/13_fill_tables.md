@@ -5,6 +5,15 @@
 proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 `<figcaption>`; uncaptioned tables stay bare.
 
+> **PREREQUISITE — the block index (rule 9b) must already be built.**
+> This rule's mandatory Pass 3 (uncaptioned tables) greps the per-page
+> block index at `issues/<YYMM>/_tmp/blocks/p<NNN>.txt`, built once per
+> issue by [rule 9b](9b_blocks_index.md) — which runs early (right after
+> the rule-9 D64 extraction), before this rule. If
+> `issues/<YYMM>/_tmp/blocks/` is missing, run rule 9b now before
+> continuing — do not substitute per-page on-demand OCR for the full
+> Pass-3 sweep, which is how Pass 3 gets under-covered.
+
 ## Extraction pipeline (per table)
 
 1. **Build the page block index** per rule 0's recipe → `/tmp/64er_<YYMM>_p<NNN>_blocks.txt`.
@@ -59,7 +68,7 @@ Every `TODO TABLE` MUST be replaced. **Garbage adjacent to `TODO TABLE`** — th
 
 **Pass 3 — UNCAPTIONED tables.** Many tables have NO `Tabelle N.` caption and won't appear in Pass 1. Patterns observed in 8607 alone that Pass 1 missed: `Verwendete Variable` callout (variable-reference list), `Monitor-/Fernseher-Eingangsnormen` + per-Stecker Pin/Signal tables, `Leistungen des Breitband-ISDN`, `Datenblatt des Seikosha MP-1300AI`, `Kurz belichtet — Melchers CPA-80X` test datasheet, `Funktionen der Sekundäradressen`. Other common shapes: bottom-half marketplace/comparison tables, yellow / tinted callout boxes, multi-page reference tables, fontspec/ASCII-code lookups, aside-style boxes.
 
-**This pass is MANDATORY. "Visually scan every page" is not enough — make it mechanical** using rule 23's blocks index:
+**This pass is MANDATORY. "Visually scan every page" is not enough — make it mechanical** using rule 9b's blocks index:
 
 ```bash
 # 1. Walk each page's blocks index for known callout heading words
@@ -75,7 +84,7 @@ done | head -50
 ```
 
 For each candidate block:
-1. Crop and view the page region (use rule 23's bbox).
+1. Crop and view the page region (use rule 9b's bbox).
 2. Decide if it's a `<table>` / `<aside>` / `<pre>` per the HTML shape rules.
 3. Confirm the article HTML doesn't already have it (no `<table>`, no `<img>` for it, no `TODO TABLE`).
 4. Extract verbatim.
