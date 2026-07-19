@@ -31,14 +31,17 @@ proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 - **The `<figcaption>` ALWAYS goes BELOW the table** inside the `<figure>`, even if the print places it above. Project convention.
 - **Table with a heading or no caption marker** → bare `<table>`, no `<figure>`.
 
-## "Bild N" can be a table — or pseudo-code
+## "Bild N" can be a table, pseudo-code, or a text box
 
-`Bild N.` on a scan doesn't always point at an image — 64'er routinely labels data tables AND structured pseudo-code boxes as `Bild N`. Sweep for these too, **but only if not already placed as an image**. For each `Bild` caption:
+`Bild N.` on a scan doesn't always point at an image — 64'er routinely labels data tables, structured pseudo-code boxes, AND plain boxed-text callouts as `Bild N`. Sweep for these too, **but only if not already placed as an image**. For each `Bild` caption:
 - If a PNG file `<page>-<n>.png` already exists AND the article HTML references it via `<img>` → leave alone (image is ground truth).
 - If not → open the surrounding block. Decide visually:
   - **Rectangular grid of cells (data table)** → `<table>` inside `<figure>`.
   - **Indented pseudo-code or structured listing in a box** → `<pre>` inside `<figure>`. Preserve indentation as printed.
+  - **Boxed text / worked example / annotated ASCII diagram** (prose or a monospace example in a ruled box — e.g. `Bild 1. Beispiel für »wahre« und »falsche« Aussagen`, `Bild 1. Die elementarsten Grundlagen von Prolog`) → this is the common one that isn't a photo and isn't a grid. Emit it inside `<figure>` with `<figcaption>Bild N. …</figcaption>` below: use **`<pre>`** when the box preserves monospace layout / alignment / line breaks (the dominant precedent — 8602/8603/8606/8607 all use `<pre>`), or a plain **`<p>`** when it's flowing prose with no significant whitespace. Never drop it just because it isn't a table.
   - **Photo, diagram, schematic** → fall back to image workflow (rule 12).
+
+A `Bild N` referenced in the body that is NONE of the above *and* has no crop is a gap, not a no-op: log it to `LOG.md` (as with a referenced-but-missing table) rather than silently skipping.
 
 ## Multi-level headers
 
