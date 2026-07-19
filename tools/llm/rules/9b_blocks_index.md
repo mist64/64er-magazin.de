@@ -1,4 +1,4 @@
-# 23 — Build the per-page blocks index (once per issue)
+# 9b — Build the per-page blocks index (once per issue)
 
 **Goal:** generate a lightweight per-page layout-block index for the
 issue, saved to `issues/<YYMM>/_tmp/blocks/p<NNN>.txt`. The index
@@ -8,9 +8,11 @@ transcribe_listings, 19 head_meta, 22 rubric_banners) use this index
 to locate captions, code blocks, header strips, and banner
 illustrations without re-running tesseract every time.
 
-**Run this early.** After the PDF is in `issues/<YYMM>/` and before
-rules 10/12/13/14/19/22 dispatch. The whole pass is fast
-(~1-2 seconds per page on tesseract, no model loading).
+**This is why it is numbered `9b`, not 23** — it is a *prerequisite*,
+not a late stage. Run it right after the D64 extraction (rule 9), as
+soon as the PDF is in `issues/<YYMM>/` and before rules
+10/12/13/14/19/22 dispatch. The whole pass is fast (~1-2 seconds per
+page on tesseract, no model loading).
 
 ## What this is NOT
 
@@ -18,7 +20,7 @@ It's NOT the rich PaddleOCR PPStructureV3 output produced by the
 body-text-extraction workflow (`tools/llm/new/body_workflow.md`).
 That output goes to `_work/p<NNN>/` and carries reading-order,
 column boundaries, and per-block hOCR — useful for body-text
-reconstruction but expensive (~50 s/page). Rule 23 is the cheap
+reconstruction but expensive (~50 s/page). Rule 9b is the cheap
 shorthand needed when you only want bbox + a few words of text per
 block.
 
@@ -123,7 +125,7 @@ head -1 "$dir/_tmp/blocks/"p050.txt 2>/dev/null
   petcat listing files — different content, different directory.
 - The body_workflow.md PPStructureV3 outputs (in `_work/p<NNN>/`)
   carry additional fields (column boundaries, reading-order
-  `order_index`, layout class) that rule 23 doesn't reproduce.
+  `order_index`, layout class) that rule 9b doesn't reproduce.
   Issues that already have those `_work/` outputs don't need rule
-  23 — but having both is fine; later rules prefer `_work/` when
+  9b — but having both is fine; later rules prefer `_work/` when
   present and fall back to `_tmp/blocks/`.
