@@ -1,0 +1,40 @@
+
+
+;bitmaptest.prg ==1c01==
+   10 rem ***** verlagerung von bildschirm und bit-map *****
+   20 rem **** neue werte eingeben ****
+   30 f=6:deffna(x)=50*sin(x/30)+100
+   40 printchr$(147)chr$(17)"eingabe der werte"chr$(17)
+   50 printchr$(17)"i(siehe tab.11) abschnitt-kennziffer"chr$(17)
+   60 print"w(siehe tab.12) bildschirm-kennziffer"chr$(17)
+   70 print"b=0,bit-map im unteren abschnitt-bereich"
+   80 print" =1,bit-map im oberen abschnitt-bereich"chr$(17)
+   90 printchr$(17):input"i,w,b=";i,w,b:a1=3-i:a2=w/16*1024+a1*16384
+  100 a3=a1*16384+b*8192
+  110 p=a2/256:printchr$(17)chr$(17)"mit diesen eingaben haben sie"
+  120 print"den abschnitt "a1" gewaehlt."
+  130 print"ihr bildschirm startet bei "a2
+  140 print"und ihre bit-map bei "a3
+  150 printchr$(17)"ist das so in ordnung?(j/n)"
+  160 geta$:ifa$=""then160
+  170 ifa$="n"then40
+  180 printchr$(147)
+  190 rem **** speicherumbauten ****
+  200 bank15:poke56576,(peek(56576)and252)ori
+  210 poke56578,peek(56578)or3
+  220 bank0:poke2605,(peek(2605)and15)orw
+  230 poke2619,p
+  240 graphic1
+  250 poke2605,peek(2605)or(8*b)
+  260 forj=0to7999:pokea3+j,0:nextj
+  270 forj=0to999:pokea2+j,f:nextj
+  280 forx=0to319:y=fna(x)
+  290 by=(xand504)+40*(yand248)+(yand7):bi=7-(xand7)
+  300 pokea3+by,peek(a3+by)or(2^bi):nextx
+  310 geta$:ifa$=""then310
+  320 rem **** normalzustand wiederherstellen ****
+  330 bank0:poke2604,20:poke2605,112:poke2619,4
+  340 bank15:poke56578,63:poke56576,199
+  350 graphic0:graphic5
+  360 printchr$(147):end
+
