@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Digi-Controller</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Ernst Merk, Ernst Merk, dm">
+    <meta name="64er.issue" content="8/86">
+    <meta name="64er.pages" content="50,59-65">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX17">
+</head>
+
+<body>
+    <article>
+        <h1>Digi-Controller</h1>
+        <p class="intro">Fehlersuche in Gatterschaltungen und Simulation von Digitalschaltungen. Mittels eines Testlaufes, der die Wahrheitstabelle durchprüft, kann dieses Programm funktionale Schwächen frühzeitig entdecken. Außerdem läßt sich dieses Programm zu Lernzwecken bei angehenden Digitaltechnikern einsetzen.</p>
+
+        <p>Durch fortschreitende Automatisierungstechnik werden immer größere Anforderungen an elektronische Steuerungen gestellt. Ein immer häufiger auftretendes Schlagwort ist in der Elektronikbranche zu vernehmen: »Digitale Steuerungstechnik« Dieser Beitrag wird Sie schrittweise in die modernen Automatisierungstechniken der Gegenwart einführen.</p>
+
+        <p>Zur Simulation und praxisgerechten Anwendung wurde das Programm »Digi-Controller« geschrieben, das der Grundversion einer speicherprogrammierbaren Steuerung (abgekürzt: SPS) entspricht. Dieser Begriff sagt schon sehr viel über die Funktionsweise moderner Steuerungsanlagen aus. In der Regel sind diese Steuerungen computerunterstützt.</p>
+
+        <p>Zunächst haben Sie sich sicher schon gefragt, wie Sie diese Technik im Hobbybereich einsetzen können. Zuerst sind einmal alle Modelleisenbahner angesprochen, die sich einen automatischen Ablauf ihrer Bahnsteuerung zwar vorstellen können, jedoch die Hardware-Kosten bei einem fehlerhaften Aufbau scheuen. Als nächstes können alle Einsteiger in die Digitaltechnik aufhorchen, die die mühsamen Hardware-Aufbauten von Digitallabors verschmähen. Ja sogar für den Profi-Anwender sei auf das Austesten von Änweisungslisten nach DIN 19239 SPS verwiesen, da das Programm alle Eingaben (Inputs), Merker (Marker) und Ausgaben (Outputs) zu Papier bringt.</p>
+
+        <p>Alle 64 Inputs sind voreinstellbar oder Input 0 bis 7 werden im Dualzahlensystem automatisch hochgezählt, das Programm nach der Anweisungsliste (AWL) abgearbeitet und die digitalen Zustände ausgedruckt. Es kann auch ein TRACH-Lauf der eingegebenen Schaltung simuliert werden. Maximal angesprochen werden können 64 Inputs, 64 Outputs und 64 Marker bei 512 Programmschritten.</p>
+
+        <p>Bild 1 zeigt Ihnen eine komplexe Schaltung, deren Funktion Sie anhand des Digi-Controllers durchspielen sollen. Die Schaltung soll als Ausgang eine 0 liefern. Versuchen Sie, die mögliche Kombination der Eingänge herauszufinden und auszutesten (die richtige Lösung finden Sie im Listing-Teil). Probieren Sie es doch einmal aus!</p>
+
+        <address class="author">(Ernst Merk/dm)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Lebenslauf</h2>
+
+        <p>Das Programmieren mit der Sprache Basic habe ich in zwei Basic-Kursen gelernt, die ich während meiner Berufsausbildung besuchte. Zu diesem Zeitpunkt hatte ich meinen ersten intensiven Kontakt zu Computern. Es blieb nicht bei diesen beiden Kursen: Bis vorletztes Jahr nahm ich in meiner Freizeit — abends oder samstags — an einem Lehrgang über freiprogrammierbare Steuerungen teil.</p>
+
+        <p>Ich bin verheiratet und habe einen Sohn von drei Jahren.</p>
+
+        <p>Mein Lebenslauf in Kürze:<br>
+            1957 geboren in Oberreichenbach bei Weißenhorn,<br>
+            1972 Hauptschulabschluß,<br>
+            1972-1975 Berufsausbildung zum Starkstromelektriker bei einer Mühlenbau-Firma mit anschließender Gesellenprüfung.<br>
+            Erwerb des Elektronikpasses 1-2 und 4a-4d, Grundlehrgänge in Basic, 1978-1984 Lehrgang für frei programmierbare Steuerungen.<br>
+            Seit 1979 Technischer Angestellter in einem Betrieb für schmiegsame Wärmegeräte.<br>
+            Hobbies: Schützen- und Veteranenverein, Programmieren.</p>
+
+        <address class="author">(Ernst Merk)</address>
+
+        <p class="intro">Simulieren und Austesten digitaler Schaltungen und speicherprogrammierbarer Steuerungen ohne unnötigen und teueren Hardwareaufwand — Dieses Programm erledigt das für Sie.</p>
+
+        <p>Jeder Bastler, Digitaltechniker oder Informatikstudent kennt das Problem: Man hat nach mühevollem Überlegen eine digitale Schaltung, etwa für eine Ampel-Tipptastensteuerung, entwickelt und muß nun diese Schaltung auf ihre Funktion testen. Hierzu überprüft man den Aufbau miteiner Wahrheitstabelle. Dies bedeutet, daß an die Eingänge verschiedene Bitkombinationen angelegt und die Zustände aller Gatter biszum Ausgang aufihre Pegel getestet werden. Haben Sie nun eine Schaltung mit vielen Eingängen und Gattern, so können Sie sich bestimmt vorstellen, wieviele Bitwerte da auftauchen. In dem Beispiel auf Seite 50 existieren 15 Eingänge, 20 Gatter und ein Ausgang. Das bedeutet, daß an den Eingängen 2<sup>15</sup> (32768) verschiedene Bibkombinationen anliegen können. In einer Wahrheitstabelle würde dies 15 Spalten bedeuten. Per Hand dürften Sie sicher einige Zeit dafür benötigen, doch wozu gibt es schließlich Computer?</p>
+
+        <p>Das Programm »Digi-Controller« (Listing 1) eignet sich zur Simulation und Fehlersuche in Digitalschaltungen. Die Wahrheitstabelle kann sowohl von komplexen Digitalschaltungsentwürfen als auch von Steueranweisungen speicherprogrammierbarer Steuerungen (SPS) erstellt werden. Der Anwendungsbereich reicht vom Hobby-Anwender, der eine Eisenbahnsteuerung entwirft, bis zum Profi, der Programmteile von SPS austestet (der Autor benutzt das Programm zur Kontrolle selbst entwickelter Prüfgeräte für betriebliche Zwecke).</p>
+
+        <p>Nach DIN-Norm 19239 sind mit Ausnahme der Timerfunktion alle Anweisungen zur Erstellung einer Anweisungsliste (AWL) enthalten. Jedoch besteht die Möglichkeit, durch Programmierung anstelle eines Timers einen Input-Befehl zu wählen. Der jeweilige Zeitablauf kann somit simuliert werden (es ist bestimmt nicht sinnvoll, während einer Simulation auf einen Timerablauf von zum Beispiel 30 Minuten zu warten). Das Programm ist mit einem Standard-Compiler übersetzbar, was die Verarbeitungsgeschwindigkeit des Programms merklich erhöht (auf der Programmservice-Diskette ist selbstverständlich auch eine compilierte Version enthalten).</p>
+
+        <p>Doch vor der eigentlichen Bedienungsanleitung noch einige Begriffserklärungen:<br>
+            Speicherprogrammierbare Steuerung — Elektronik-Steuerteil (Hardware)<br>
+            Anweisungsliste (AWL) — Programm einer SPS (Software)<br>
+            Eingänge einer SPS (Inputs) — Signalgeber (zum Beispiel Schalter)<br>
+            Merker einer SPS (Marker) — Zwischenspeicher digitaler Ergebnisse<br>
+            Ausgänge einer SPS (Outputs) — 2 (zum Beispiel Lampen)<br>
+            Binärstelle — ein Bit (Inhalt: 0 oder 1)</p>
+
+        <p>Für den Einsteiger in die Digitaltechnik soll hier noch die Definition binärer Signale aufgezeigt werden:</p>
+
+        <p>Spannung vorhanden — keine Spannung vorhanden<br>
+            Stromkreis geschlossen — Stromkreis geöffnet<br>
+            Schalter eingeschaltet — Schalter ausgeschaltet<br>
+            High-(oder 1-)Pegel — Low-(oder 0-)Pegel</p>
+
+        <p>Ordnet man diesen Zuständen Signale zu, so spricht man von binären (zweiwertigen) Signalen.</p>
+
+        <p>Die binäre Größe High/Low-Potential (abgekürzt H/L-Pegel) bedeutet, daß das elektrische Potential hoch (H, zum Beispiel +5V) oder niedrig (L, zum Beispiel OV) sein kann. Zu deren Darstellung können die binären Ziffern 0 und 1 herangezogen und als Signale bezeichnet werden. Eine binäre Stelle wird auch als »Bit« bezeichnet. Aus den binären Signalen läßt sich ein Dezimal-Dual-Zahlensystem aufbauen.</p>
+
+        <p>Wer sich intensiver mit dem Dualzahlensystem und dessen Anwendung beschäftigen möchte, der sei auf die überaus zahlreiche Literatur zu diesem Thema verwiesen.</p>
+
+        <p>Bevor es mit den Befehlen zur Erstellung einer Anweisungsliste losgeht, soll noch auf den Hardware-Aufwand für den Digi-Controller hingewiesen werden. Das Programm ist lauffähig auf einem C 64 mit Floppy 1541 und einem Epson RX/FX-80 mit Data-Becker-Interface. Andere Drucker sind über Änderung der Sekundäradresse im OPEN- und PRINT #-Befehl anpassungsfähig.</p>
+
+        <h2>Programmbeschreibung</h2>
+
+        <p>Für die Anweisungslisten (AWL,), die in den modernen SPS verschlüsselt abgelegt sind und mit denen auch der Digi-Controller arbeitet, gilt die DIN-Norm 19239. Hier sind den Operationen und Operanden anwenderspezifische Kurzzeichen in englisch und deutsch zugeordnet. Es werden folgende Abkürzungen verwendet:</p>
+
+        <p>Für die Operationen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>und für die Operanden:</p>
+
+        <p>TODO TABLE</p>
+
+        <h3>Aufbau einer Anweisungsliste (AWL)</h3>
+
+        <p>Die Anweisungsliste besteht im allgemeinen aus Anweisungs- und Kommentarzeilen.</p>
+
+        <p>Zeilennummer / Operation / Operand / Parameter / Kommentar</p>
+
+        <p>3stellig / 1stellig / 2stellig / 3stellig / 2lstellig</p>
+
+        <p>Die Zeilennummer kann mittels Eingabe von Ziffern oder durch die Cursor-Tasten eingestellt werden. Der Zeilennummernbereich umfaßt 512 Zeilen. Die Zeilen werden vom Compiler in aufsteigender Reihenfolge abgearbeitet. Ausnahme: Absolute oder indirekte Sprungbefehle.</p>
+
+        <p>Die Operation »;« kennzeichnet eine Kommentarzeile. Die Operatoren »O«, »A« und »X« stellen eine logische Verknüpfung zwischen Inputs, Markern und Outputs dar. Das »=« Zeichen weist das Ergebnis einer logischen Operation einem Marker oder Outputzu.»J«kennzeichneteinen Sprungbefehl.</p>
+
+        <p>Der Operand definiert Input, Marker oder Output. Durch hinzufügen eines»N«-Zeichens kann der Operand negiert (invertiert) werden. Wurde als Operation ein »J«Sprungbefehl definiert, so kann durch Angabe eines »I«-Zeichens im Operanden ein indirekter Sprungbefehl festgelegt werden.</p>
+
+        <p>Der Parameter legt die Nummer eines Inputs, Markers oder Outputs fest. Bei Sprungbefehlen wird hier die Zieladresse der nächsten Zeilennummer festgelegt.</p>
+
+        <p>Zulässige Eingabewerte:</p>
+
+        <p>0 bis 64 — Input, Marker, Output<br>
+            0 bis 512 — absolute Sprungadresse (Jump)<br>
+            0 bis 512 — indirekte Sprungadresse (Jump if)<br>
+            Der Kommentar dient der Programmdokumentation.</p>
+
+        <p>Bevor wir nun in die Programmierung eigener AWL einsteigen, hier noch eine detaillierte Beschreibung des Controllers. Vom Hauptmenü aus sind aufzurufen:</p>
+
+        <ul>
+            <li>Anweisungsprogramme löschen: Das zuletzt gelistete Programm (AWL) kann mittelsder &lt;F1&gt;-Taste gelöscht werden. Anzeige des nächsten Programms mit &lt;F5&gt;, Rückkehr ins Hauptmenü mittels &lt;F7&gt;.</li>
+            <li>Anweisungsliste von Disk lesen: Die Datendiskette mit den gespeicherten AWL kann auch die Programmdiskette des Controllers sein. Diskettenfehler werden ausgegeben. Inder Directory-Übersicht kann durch Drücken von:<br>
+                &lt;F1&gt; das zuletzt angezeigte AWL geladen;<br>
+                &lt;F5&gt; die nächste AWL angezeigt und<br>
+                &lt;F7&gt; in das Hauptmenü gesprungen werden.</li>
+            <li>Anweisungsliste erstellen: Das ist nun die Eingabeebene, von der aus die Anweisungs- und Kommentarzeilen erstellt und geändert werden. Die Eingaben sind jeweils mit &lt;RETURN&gt; zu quittieren. Unterhalb der Kopfzeile werden die Auswahlmöglichkeiten angezeigt. Um eine größere Programmübersicht zu erhalten, drücken Sie bitte &lt;Fl&gt;. Mit &lt;F7&gt; gelangen Sie in ein Untermenü, wobei Sie nun zwischen dem Rücksprung ins Hauptmenü oder Speichern der AWL wählen können. Es ist sinnvoll, die AWL gelegentlich zu speichern.</li>
+            <li>Anweisungsliste ausdrucken: Der Ausdruck kann auf Bildschirm oder Drucker gelenkt werden. Es ist auch möglich, die AWL nur teilweise auszugeben.</li>
+            <li>Auswertung von AWL ausdrucken (Wahrheitstabelle): Mittels der TRACE-Funktion werden die abgearbeiteten Zeilennummern der AWL angezeigt (Compilerlauf). Hierbei erkennt das Programm Endlosschleifen der AWL (bei »J«-Befehlen).</li>
+        </ul>
+
+
+        <p>Bei der Einzelauswertung können anfangs alle Bit-Kombinationen der einzelnen Inputs mit »0«, »l«oder einem Leerzeichen belegt werden. Spricht das Programm einen Input an, der mit einem Leerzeichen belegt ist, so wird der Inhalt des Inputs wie eine logische Null (0) behandelt. Im Ausdruck wird der Inhalt des Inputs ebenfalls mit einem Leerzeichen ausgegeben.</p>
+
+        <p>Wählen Sie die Gesamtauswertung, so wird zunächst der höchste Inputparameter (maximal Input 7) der AWL ermittelt. Das bedeutet: wurde zum Beispiel Input 0 bis 3in der AWL angesprochen, so generiert das Programm 2° = 16 Programmdurchläufe. Dabei setzt der Digi-Controller alle möglichen Bit-Zustände von Input O bis 3 automatisch. Diese arbeitet der Compiler ab und druckt sie aus (bei diesem Beispiel reichen die Bit-Zustände von 0000 bis 1111). Falls Zuweisungen an Marker oder Outputs übergeben wurden, so druckt das Programm auch diese Werte aus.</p>
+
+        <h3>Umsetzen digitaler Schaltungen in eine AWL</h3>
+
+        <p>Die Anzahl der Inputs aller logischen Schaltungen muß nicht drei sein, sondern kann je nach Bedarf bis 64 betragen (in unserem Beispiel auf Seite 50 existieren 15 Eingänge). Wichtig bei der Erstellung einer AWL ist:</p>
+
+        <p>Immer bei einer neuen AWL oder nach jeder Zuweisung (»=«) mit einer ODER-Anweisung als Operation beginnen. Zuerst muß ein internes Hilfsregister mit dem Inhalt eines Inputs (Bit = 1 oder 0) geladen werden. Dies ist nur mit der ODER-Anweisung möglich. Da das Hilfsregister nach jeder Zuweisung mit »=« gelöscht wird, ist es ebenfalls notwendig, das Hilfsregister mittels einer ODER-Anweisung zu laden.</p>
+
+        <p>Das Ergebnis einer logischen Verknüpfung ergibt sich aus dem Vergleich eines Inhalts von einem Input, Marker oder Output mit dem Inhalt des Hilfsregisters und wird im Hilfsregister abgelegt.</p>
+
+        <h3>Die ODER-Schaltung (Bild 1)</h3>
+
+        <p>Merksatz: Der Output Q0 führt H-Pegel, wenn mindestens an einem Input (IO bis I2) ein H-Pegel anliegt.</p>
+
+        <p>AWL:</p>
+
+        <pre>
+0 ;    \*OR-Verknüpfung mit 3 Inputs  
+1 0 I0 \*Hilfsregister mit Inhalt von I0 laden  
+2 0 I1 \*Inhalt Input I1 mit Inhalt Hilfsregister verknüpfen  
+3 0 I2 \*Inhalt Input I2 mit Inhalt Hilfsregister verknüpfen  
+4 ;    \*Ergebnis der Verknüpfung steht im Hilfsregister  
+5 = Q0 \*Inhalt Hilfsregister Output Q0 zuweisen  
+</pre>
+
+
+        <p></p>
+
+        <p>Bitte geben Sie diese Anweisungszeilen im Digi-Controller ein. Sie können nun die AWL ausdrucken und auf Richtigkeit überprüfen. Das Ergebnis Ihrer Arbeit können Sie als Auswertung (Gesamtausdruck) ausgeben lassen.</p>
+
+        <h3>Die UND-Schaltung (Bild 2)</h3>
+
+        <p>Merksatz: Der Output Q0 führt nur dann einen H-Pegel, wenn alle Inputs (IO bis I2) einen H-Pegel führen.</p>
+
+        <p>AWL:</p>
+
+        <pre>
+0 ;    \*AND-Verknüpfung mit 3 Inputs  
+1 0 I0 \*Hilfsregister mit Inhalt von Input I0 laden  
+2 A I1 \*Inhalt Input I1 mit Inhalt Hilfsregister verknüpfen  
+3 A I2 \*Inhalt Input I2 mit Inhalt Hilfsregister verknüpfen  
+4 ;    \*Ergebnis der Verknüpfung steht im Hilfsregister  
+5 = Q0 \*Inhalt Hilfsregister Output Q0 zuweisen  
+</pre>
+
+
+        <p></p>
+
+        <h3>Die EXCLUSIV-ODER-Schaltung (Bild 3)</h3>
+
+        <p>Merksatz: Der Output 00 führt nur dann einen H-Pegel, wenn an genau einem Input (IO/II) ein H-Pegel anliegt. Führt mehr als ein Input einen H-Pegel oder liegen alle Inputs auf L-Pegel, so steht am Ausgang Q0 ein L-Pegel.</p>
+
+        <p>AWL:</p>
+
+        <pre>
+0;     \*XOR-Schaltung mit zwei Inputs  
+1 0 I0 \*Hilfsregister mit Inhalt von Input IO laden  
+2 X I1 \*Inhalt Hilfsregister mit Inhalt Input I1 verknüpfen  
+3 ;    \*Ergebnis steht im Hilfsregister  
+4 = Q0 \*Inhalt Hilfsregister Output Q0 zuweisen  
+  
+</pre>
+
+
+        <p></p>
+
+        <h3>Die NICHT-Schaltung (Bild 4)</h3>
+
+        <p>Merksatz: Der Output 00 führt immer den umgekehrten Pegel des Inputs I0.</p>
+
+        <p>AWL<br>
+            0 ; *NICHT-Verknüpfung am Output<br>
+            1 0 IN1 *Inhalt Input Il invertiert in Hilfsregister laden<br>
+            2 = Q1 *Inhalt Hilfsregister Output Q1 zuweisen</p>
+
+        <h3>Sprung-Befehle</h3>
+
+        <p>Zum Einfügen und Austesten von Programmteilen können Sprungbefehle in der AWL programmiert werden. — Der JUMP-Befehl: Gibt im Parameter die nächste Zeilennummer an, die vom Compiler abgearbeitet werden soll. Damit ist es zum Beispiel möglich, aus dem Hauptprogramm an das Programmende zu springen, eingefügte Programmzeilen abzuarbeiten und wieder ins Hauptprogramm zurückzuspringen.</p>
+
+        <ul>
+            <li>Der JUMP IF-Befehl: Gibt im Parameter ebenfalls die nächste Zeilennummer an, die vom Compiler abgearbeitet werden soll. Jedoch wird der indirekte Sprungbefehl nur dann ausgeführt, wenn das Ergebnis der letzten Verknüpfung einen L-Pegel ergeben hat (Inhalt von Hilfsregister = L-Pegel).<br>
+                <strong>Achtung</strong>: Als Zieladresse nie auf eine UND-Anweisung mit indirektem Sprungbefehl springen.
+            </li>
+        </ul>
+
+
+        <p>AWL:</p>
+
+        <pre>
+0 ;    \*Sprungbefehle  
+1 0 I0 \*Hilfsregister mit Inhalt von Input I0 laden  
+2 J  5 \*Springe nach Zeilennummer 5  
+3 0 I1 \*ODER-Verknüpfung bei indirektem Sprung  
+4 ;    \*Kommentarzeile  
+5 0 I2 \*ODER-Verknüpfung mit Inhalt von Input I2  
+6 J I3 \*Springe nach Zeilennummer 3, wenn Hilfsregister = L-Pegel  
+7 = Q0 \*Ergebnis Output Q0 zuweisen  
+</pre>
+
+
+        <p></p>
+
+        <p>Die Sprünge werden solange wiederholt, bis ein Input (I1/I2) einen H-Pegel annimmt.</p>
+
+        <h3>Praktisches Anwendungsbeispiel:</h3>
+
+        <p>Steuerung für eine Treppenhausbeleuchtung:</p>
+
+        <p>In einem Treppenhaus soll die Beleuchtung von zwei Stellen unabhängig voneinander ein- und ausgeschaltet werden können (Wechselschaltung). Die Schalter IO und Il wirken über die logische Verknüpfungsschaltung auf zwei Lampen (00/QN), die parallel geschaltet sind.</p>
+
+        <p>Wahrheitstabelle:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>AWL: (Bild 5)</p>
+
+        <pre>
+0 ;      \*Treppenhausbeleuchtung  
+1 0 IN 0 \*Hilfsregister laden  
+2 A I  1 \*UND-Verknüpfung mit Hilfsregister  
+3 = M  0 \*Zwischenergebnis im Marker ablegen  
+4 0 IN 1 \*Hilfsregister neu laden  
+5 A I  0 \*UND-Verknüpfung mit Hilfsregister  
+6 ;      \*Ergebnis steht im Hilfsregister  
+7 0 M  0 \*ODER-Verknüpfung Hilfsregister und Marker  
+8 = Q  0 \*Ergebnis nach Output Q0 schreiben  
+</pre>
+
+
+        <p></p>
+
+        <p>Bitte AWL eingeben und das Ergebnis mittels Gesamtauswertung überprüfen.</p>
+
+        <p>Zum Testen Ihrer erworbenen Fähigkeiten noch eine kleine Aufgabe, bevor die AWL und die Lösung der auf Seite 50 vorgestellten Schaltung, die Sie mit dem Controller testen sollten, präsentiert wird.<br>
+            Aufgabe: Weichenstellung für Modelleisenbahn</p>
+
+        <p>Mittels dreier Schalter (IO bis I2) sollen sieben Weichen einer Modelleisenbahn umgestellt werden. Die Weichenstellung wird durch eine Umwandlung von Dual- in Dezimalcode erreicht.</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Und hier die Auflösung der auf Seite 50 abgebildeten Schaltung. Tabelle 1 zeigt die AWL, wie sie für einen OO = L-Pegel aussehen sollte. Tabelle 2 veranschaulicht den Testlauf, um zu sehen, ob die richtigen Pegel anliegen.</p>
+
+        <address class="author">(Ernst Merk/dm)</address>
+    </article>
+</body>
+
+</html>

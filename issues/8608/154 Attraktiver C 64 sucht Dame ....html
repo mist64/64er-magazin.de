@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Attraktiver C 64 sucht Dame ...</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Matthias Rosin, dm">
+    <meta name="64er.issue" content="8/86">
+    <meta name="64er.pages" content="154-155">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX37">
+</head>
+
+<body>
+    <article>
+        <h1>Attraktiver C 64 sucht Dame ...</h1>
+        <p>...zwecks kurzweiliger Bekanntschaft. Wie angekündigt krönen wir die Serie der Zweipersonenspiele diesmal mit einer Dame-Strategie.</p>
+
+        <p>In den vergangenen Folgen der Knobelecke habe ich gezeigt, daß die Programmierung von Strategien für einfache Zweipersonenspiele eine reizvolle Aufgabe darstellt. Sie hatten die Gelegenheit, grundlegende Programmiertechniken kennenzulernen. Bei den gezeigten Knobeleien war oft die Programmierung sehr viel aufregender als die anschließenden Mensch-Computer-Duelle. Das gilt insbesondere für fast unschlagbare Programme. Diese entstehen zwangsläufig aus einfachen Spielideen, bei denen viel simple Rechnerei dominiert.</p>
+
+        <h2>KByte kontra Intuition</h2>
+
+        <p>Eine harte Nuß für ein Programm ist es hingegen, sich bei Spielen wie Schach oder Dame wacker zu schlagen. Wenn Rechenregeln und Algorithmen mit menschlicher Intelligenz unmittelbar konkurrieren, so hat normalerweise die Maschine das Nachsehen. Dennoch, oder gerade deshalb, ist es ungeheuer spannend, sich mit der Programmierung anspruchsvoller Spiele zu beschäftigen.</p>
+
+        <p>Am weitesten verbreitet ist die 8 x 8-Version von Dame. Man kann es aber auch allgemein auf einem beliebig großen karierten Feld (Schachbrett) der Größe 2nx 2n spielen. Bei den Spielregeln für Damespiele n-ter Ordnung wollen wir uns an die internationalen Richtlinien halten:</p>
+
+        <p>Das Spielfeld muß so gedreht werden, daß sich unten links vor jedem Spieler ein schwarzes Feld befindet. Beide Spieler setzen nxn-n Steine auf die schwarzen Felder. Die beiden mittleren Reihen bleiben frei (Bild 1). Schwarz hat den ersten Zug. Ein Stein kann nur diagonal vorwärts auf ein angrenzendes leeres Feld ziehen. Ist das Feld durch einen gegnerischen Stein besetzt und das dahinterliegende Feld frei, so muß der betreffende Steinübersprungen und vom Brett genommen werden (Schlagzwang). Kann derselbe Stein nach dem Sprung nochmals schlagen, so muß er das tun. Erreicht ein Stein die gegenüberliegende Brettseite, so wird er in eine Dame umgewandelt. Eine Dame kann in alle vier diagonalen Richtungen ziehen und auch schlagen. Entgegen der in Deutschland üblichen Spielweise kann eine Dame nur jeweils ein Feld weiterziehen. Der Spielbaum, der vom Computer errechnet werden muß, verkleinert sich dadurch erheblich.</p>
+
+        <p>Gewonnen hat, wem es gelingt, seinen Gegner festzusetzen oder dessen sämtliche Steine zu schlagen.</p>
+
+        <p>Wie ich bereits im Ansatz gezeigt hatte, besteht ein Spielprogramm aus dem Zuggenerator, dem Stellungsbewerter und einer Minimaximierung. Nachdem der Zuggenerator den Spielbaum erzeugt hat, wertet der Stellungsbewerter das Ende eines jeden Astes aus. Die Minimaximierung bestimmt schließlich mit den Informationen des Stellungsbewerters den für das Programm günstigsten Zug. Für das Damespiel wollen wir nun die Arbeitsweise der drei Komponenten im einzelnen betrachten.</p>
+
+        <p>Der Zuggenerator muß als Eingabe eine Stellung erhalten und er muß wissen, wer am Zug ist. Mit diesen Informationen errechnet er den Spielbaum. Zur internen Darstellung der Spielstellungen bietet sich eine zweidimensionale Matrix an. Bild 2 zeigt einen möglichen Spielbaum-Ausschnittineinem4x 4-Damespiel (=zweiter Ordnung) und die entsprechenden Matrizen. Leere Felder erhalten dabei eine Null, ein gemeiner Spielstein erhält eine Eins, eine Dame eine Zwei. Durch die Vorzeichen erkennt der Zuggenerator, ob es sich um einen weißen oder schwarzen Spielstein handelt.</p>
+
+        <p>Betrachten wir nun Stellung 3 in Bild 2. Schwarz ist am Zug. Der Zuggenerator nimmt seine Arbeit auf, indem er jedes Feld auf einen schwarzen Stein (+1 oder +2) überprüft. In Reihe Drei, Spalte Zwei, kurz (3/2), Ist es so weit. Weil ein gewöhnlicher Spielstein vorliegt, untersucht der Zuggenerator die Felder (2/3) und (2/1). Feld (2/1) ist bereits besetzt und kann nicht geschlagen werden, jedoch (2/3) ist frei. Der Zuggenerator entwikkelt nun die Folge-Stellung, indem er eine neue Matrix schreibt (Bild 2, Stellung 7). Anschließend setzt er die Suche nach positiven Zahlen in der alten Matrix fort. So baut er Matrix für Matrix die nachfolgende Ebene einer Stellung auf. Außer der Matrix muß jeder Spielstellung eine fortlaufende Nummer sowie die Nummer der Vorgänger-Stellung zugeordnet werden. Dies ist wichtig, da das Programm später den Baum mehrfach vor- und rückwärts durchlaufen muß.</p>
+
+        <p>Zwei Ratschläge sollten Sie beim Programmieren des Zuggenerators beherzigen. Erstens: Treten zwei identische Stellungen in derselben Ebene (Zugtiefe) auf, so muß der Baum nur von einer dieser Stellungen fortgesetzt werden. Identische Stellungen in verschiedenen Ebenen lassen ein Remis erkennen.</p>
+
+        <p>Zweitens: Die Stellungen lassen sich platzsparend in einer eindimensionalen Matrix verschlüsseln. Die Erzeugung der Züge wird dabei etwas komplizierter. Außerdem entfällt die Null für weiße Spielfelder.</p>
+
+        <p>Ist eine gewisse Zugtiefe erreicht, übergibt der Zuggenerator sämtliche Stellungen der untersten durchsuchten Ebene an den Stellungsbewerter. Dieser errechnet für jede Stellung einen Zahlenwert. Die Größe dieser Zahl gibt je nach Vorzeichen die Gewinnchance für einen der beiden Spieler an. Zuverlässige Rechenkriterien für die Stellungsbewertung zu schaffen ist keine leichte Aufgabe. Hierbei spielen persönliche Erfahrungswerte eine große Rolle.</p>
+
+        <h2>Der Stellungsbewerter</h2>
+
+        <p>Im Folgenden werde ich einige Anhaltspunkte für die Bewertung geben, die aber durchaus änderbar und erweiterbar sind.</p>
+
+        <ol>
+            <li>Für jeden schwarzen Stein wird ein Punkt addiert, für jeden weißen einer subtrahiert. Damen erbringen entsprechend zwei Punkte.</li>
+            <li>Für jeden möglichen Zug von Schwarz wird ein halber Punkt addiert, weiße Züge verursachen den entsprechenden Abzug.</li>
+            <li>Für jede Reihe, die ein schwarzer Stein auf dem Spielfeld vorgerückt ist, wird ein halber Punkt addiert.</li>
+            <li>Eine angemessene Zahl ist für die zentrale Stellung schwarzer Steine zu addieren.</li>
+        </ol>
+
+
+        <p>Von der Gewichtung der Faktoren zueinander wird der Spielverlauf entscheidend beeinflußt. Natürlich ist keine Stellungsbewertung perfekt. Denkbar ist aber, daß das Programm nach der Analyse verlorener Partien die Faktoren selbständig korrigiert. Sollte der Leserwunsch bestehen, werde ich aufselbstlernende Programme in einer späteren Folge eingehen.</p>
+
+        <p>Nachdem jede Stellung der untersten Ebene ausgewertet ist, kommt die Minimaximierung zum Einsatz. Dabei werden aus den Werten der untersten Ebene den Stellungen der darüberliegenden Ebene Werte zugeordnet. Von den Nachfolgern (unterste Ebene) derselben Ausgangsstellung wird der Maximalwert auf die Ausgangsstellung übertragen, sofern Schwarz in der Ausgangsstellung am Zug war. War Weiß am Zug, so wird das Minimum übertragen. Der Grund hierfür ist einfach: Schwarz strebt immer ineine Stellung mit möglichst hoher Bewertung zu gelangen und umgekehrt. Die Zuordnung mit abwechselnder Maximierung und Minimierung erfolgt solange in die jeweils nächsthöhere Ebene, bis die »Baumwurzel« erreicht ist. In der Wurzel erscheint nach vollständiger Minimaximierung die Bewertung des aussichtsreichsten Zuges. Eine anschauliche Grafik zu diesem Verfahren zeigt Bild 5in der ersten Folge der Knobelecke in der Mai-Ausgabe.</p>
+
+        <p>An dieser Stelle besitzen Sie bereits ausreichende Informationen, um einen Dame-Algorithmus zu programmieren. Tasten Sie sich dabei am besten von den Damen kleinerer Ordnung zu den größeren vor. Da aber bei Damespielen höherer Ordnung und größerer Analysetiefe Zeit- und Speicherprobleme auftreten, werde ich abschließend ein Verfahren vorstellen, das die Minimaximierung abkürzt.</p>
+
+        <h2>Gestutzte Bäume</h2>
+
+        <p>Daß Spielbäume sehr schnell wachsen, wissen Sie bereits, Aber wissen Sie auch, daß einem Spielbaum das Beschneiden ebenso zugute kommt wie einem natürlich gewachsenen? Die Rede ist vom Alpha-Beta-Stutzen.</p>
+
+        <p>Betrachten Sie hierzu Bild 3. Schwarz ist am Zug. Die bisherige Suche hat für eine Stellungin Ebene 1 den Wert 9 ergeben. Ebenso wurde in Ebene 2 für Weiß bereits der Wert 8ermittelt. Gemäß den Regeln für die Minimaximierung wird in den freien Kasten in Ebene 1 eine Zahl kleiner oder gleich 8 eingetragen. Folglich ist die weitere Untersuchung dieses Astes sinnlos. Auf diese Weise können im Spielbaum viele Aste unbeachtet bleiben. Bei optimaler Nutzung der Prozedur wird das Dame-Programm etwa doppelt so schnell. Beachten Sie, daß die Analyse des Baumes beim Alpha-Beta-Stutzen zuerst in die Tiefe erfolgen muß, und nicht wie bisher, in die Breite.</p>
+
+        <p>Mit diesem Verfahren, das bereitshohe Anforderungen an Ihr Programmiergeschick stellt, beschließe ich die Reihe der Zweipersonenspiele und wünsche Ihnen zu unserem großen Programmierwettbewerb ebensoviel Sitzfleisch wie Glück.</p>
+
+        <address class="author">(Matthias Rosin/dm)</address>
+    </article>
+</body>
+
+</html>
