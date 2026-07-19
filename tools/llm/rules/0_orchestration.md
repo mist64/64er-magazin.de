@@ -149,6 +149,39 @@ the PDF is in the issue dir and before any rule that needs bboxes
 dispatches. The cost is ~1-2 seconds per page, ~5 minutes for a
 full issue.
 
+**Launch it EARLY and in the BACKGROUND — don't run it serially.**
+The block index is a pure function of the PDF alone; it has no
+dependency on the output of any rule 1–9. So the orchestrator should
+kick off the rule-9b build **as a background job the moment the PDF is
+in `issues/<YYMM>/`** (typically at rule 6, when the PDF first
+arrives), and let it run in parallel while the serial rules (6, 7, 8,
+9, and the editorial passes) proceed in the foreground. By the time
+rule 10/12/13/14/19/22 need bboxes, the index is already built and no
+one waits ~5 minutes at rule 13. This is the model case of the general
+policy below.
+
+## Parallelize long-running mechanical prerequisites
+
+Some steps are slow, purely mechanical, and depend only on a fixed
+input (the PDF, the D64) — never on an earlier rule's editorial output.
+The rule-9b block index is the archetype (~5 min of tesseract);
+whole-issue page renders (`pdftoppm`) and `pdftotext -layout` are
+similar. These should be **launched in the background as soon as their
+input exists** and left to run in parallel with the serial rules,
+rather than blocking the pipeline at the first rule that consumes them.
+
+Guidance:
+- Kick them off with a backgrounded Bash job (or a fire-and-forget
+  sub-agent) right after the PDF/D64 lands, and note the task id.
+- Make the job **idempotent and resumable** (skip pages whose output
+  already exists), so a re-launch is cheap and a crash mid-run costs
+  nothing.
+- Before dispatching the first consuming rule (10/13/…), check the
+  prerequisite actually finished (run its `## Verification`); only
+  block-and-wait if it hasn't.
+- Keep the recipe in its own rule doc (9b) as the single source — the
+  orchestrator schedules *when* it runs, the rule defines *what* runs.
+
 The on-demand single-page recipe below is the fallback when rule 9b
 hasn't been run yet (one-off table or listing OCR work):
 
