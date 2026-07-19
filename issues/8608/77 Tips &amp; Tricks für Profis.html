@@ -50,7 +50,8 @@
 
         <p>Durch Eingabe einer neuen MSE-Zeile (mit der MSE-Funktion »Control-N«) im Programm »2. PRG« kann man Hypra-Platos auf den inzwischen weit verbreiteten Star-Drucker SG 10 anpassen. Dies betrifft die Adresse 39289 ($9979). In dieser Speicherstelle wird die Größe des Zeilenvorschubs festgelegt. Er muß beim Star SG 10 den Wert $0E anstatt $16 (Epson-Drucker) besitzen.</p>
 
-        <p>TODO LISTING</p>
+        <pre>name : 2. prg          9100 9cba
+9978 : a9 0e 20 d2 ff 20 33 f3  40</pre>
 
         <address class="author">(Klaus Lilienthal/tr)</address>
 
@@ -108,7 +109,22 @@
 
         <p>Dieses Programm wird mit SYS 49152 aufgerufen. Der erste Teil schreibt in die Adresse $0308 und $0309 (Zeiger auf eine Routine, die CHRGET aufruft) die Adresse $COOB. Wenn nun der Interpreter ein neues Zeichen aus dem Basic-Programm holt, läuft er so lange durch eine Prüfschleife, bis Sie &lt;SHIFT&gt; gedrückt haben. Nun macht er normal weiter, bis ererneutein Zeichen holt. Um den Single-Step-Modus auszuschalten, müssen Sie das Maschinenprogramm ab $C01C aufrufen. Es schreibt in $0308 und $0309 wieder die alten Adressen. Nun aber zum Assembler-Listing:</p>
 
-        <p>TODO LISTING</p>
+        <pre>C000 LDA #$0B     ;Low-Byte von $C00B ...
+C002 STA $0308    ;auf $0308 ...
+C005 LDA #$C0     High-Byte von $C00B ...
+C007 STA $0309    ;auf $0309 ...
+C00A RTS          ;Rücksprung ins Basic.
+C00B LDA $028E    ; &lt;SHIFT&gt;-Muster von der Tastatur
+C00E BNE $C013    ;bei &lt;SHIFT&gt; nach $C013 ...
+C010 JMP $C00B    ;sonst nach $C00B zurück.
+C013 JSR $0073    ;Zeichen aus dem Basic-Programm;
+C016 JSR $A7ED    ;macht bei Commodore-Routine weiter;
+C019 JMP $A7AE    ;macht bei Commodore-Routine weiter;
+C01C LDA #$E4     ;Low-Byte von $A7E4 ...
+C01E STA $0308    ;auf $0308 ...
+C021 LDA #$A7     ;High-Byte von $A7E4 ...
+C023 STA $0309    ;auf $0309.
+C026 RTS          ;Rücksprung ins Basic.</pre>
 
         <address class="author">(Gabriel Range/tr)</address>
 
