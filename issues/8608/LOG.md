@@ -22,20 +22,20 @@ These are left in `issues/8608/prg/` (and `prg/del/`) and referenced in
 
 All 96 loose crops were placed. Findings the user should know:
 
-### Body "Bild N" references that have NO matching crop file
-- **82 Umschaltbares 64'er-DOS**: only 3 photo/layout crops exist
-  (82-1 = Bild 1, 82-5 = Bild 5, 82-7a = Bild 7a). The article's
-  schematic diagrams **Bild 2, 3, 4, 6, 7b, 8** are printed on the
-  scan (pages 87-89) and several are referenced in the body
-  (Bild 3 at "…gemäß Bild 3 mit einem Umschalter…", Bild 7b at
-  "…Bild 7b zeigt den Bestückungsplan…") but were **not cropped** —
-  no PNG exists, so they could not be placed. Not fabricated.
-- **154 Attraktiver C 64 sucht Dame**: only one crop exists
-  (154-1 = Bild 1, the Ausgangsstellung board, placed). The article
-  also prints **Bild 2** (9-board Spielbaum, page 154, referenced at
-  "…Stellung 3 in Bild 2…") and **Bild 3** (Alpha-Beta tree, page 155,
-  referenced at "Betrachten Sie hierzu Bild 3."). Neither Bild 2 nor
-  Bild 3 has a crop file — not placed.
+### Body "Bild N" references — crop gaps (RESOLVED)
+- **82 Umschaltbares 64'er-DOS**: on the first pass only 82-1/82-5/82-7a
+  existed; the schematic diagrams Bild 2, 3, 4, 6, 7b, 8 (scan pages
+  87-89) had no crop. The user then supplied `82-2, 82-3, 82-4, 82-6,
+  82-7b, 82-8` and they were placed (incremental pass). The article now
+  carries the full Bild 1, 2, 3, 4, 5, 6, 7a, 7b, 8 in ascending order.
+- **154 Attraktiver C 64 sucht Dame**: user supplied `154-2` (Bild 2,
+  4×4-Dame Spielbaum) and `154-3` (Bild 3, Alpha-Beta tree); both
+  placed. The article has exactly **Bild 1, 2, 3**. The body's
+  "Bild 5" is NOT a missing figure — it is a cross-reference to the
+  **first installment** of the Knobelecke in the May issue (8605):
+  "Eine anschauliche Grafik zu diesem Verfahren zeigt Bild 5 in der
+  ersten Folge der Knobelecke in der Mai-Ausgabe." No `154-5` exists
+  or is needed.
 
 ### Judgment calls / oddities (all placed, noted for review)
 - **22 So schnell wie der Wind (22-0)**: named like a caption-less
