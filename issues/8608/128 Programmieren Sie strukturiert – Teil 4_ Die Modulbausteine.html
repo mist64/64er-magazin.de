@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Programmieren Sie strukturiert – Teil 4: Die Modulbausteine</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Prof. Burkhard Leuschner, nj">
+    <meta name="64er.issue" content="8/86">
+    <meta name="64er.pages" content="128-132,134-136">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX30">
+</head>
+
+<body>
+    <article>
+        <h1>Programmieren Sie strukturiert – Teil 4: Die Modulbausteine</h1>
+        <p class="intro">Computerprogramme werden öfter gelesen als geschrieben. Deshalb müssen sie »menschenfreundlich« geschrieben sein. Das heißt: sie müssen strukturiert programmiert sein.</p>
+
+        <p>Strukturiertes Programmieren bedeutet zuerst strukturiertes Denken und anschließend daran strukturiertes Codieren. Zum ersten braucht man den gesunden Menschenverstand, zum letzteren spezielle Werkzeuge, genauer: spezielle Befehlsstrukturen. Bisher haben wir besprochen: die Steuerbausteine (Sequenzen, Schleifen, Verzweigungen), die den Programmfluß lenken, und die Unterprogrammbausteine (Prozeduren und Funktionen), mit deren Hilfe wir fehlende Befehle herstellen können. Steuerbausteine und Unterprogrammbausteine reichen allerdings nicht aus, um ein Programm menschenfreundlich zu gestalten. Es gibt Pascal-Programme, die sind so lesbar wie hethitische Tontafeln, und Comal-Programme, deren Wege sind so verschlungen, daß ein Spaghettiprogramm daneben klar wie Quellwasser wirkt — und doch gelten beide Sprachen als »strukturiert«. Ein Programm wird erst dann für den Menschen lesbar und verstehbar, wenn nicht nur die Teile durchstrukturiert sind, sondern auch das Programm als Ganzes. Das ist wie bei einem Zeitschriftenartikel — es genügt nicht, wenn die einzelnen Absätze zwarinsich stimmig, aber ansonsten wild durcheinandergewürfelt sind. Sie müssen vielmehr in einer sinnvollen Reihenfolge stehen und in Gruppen zusammengefaßt sein, zum Beispiel in Kapiteln.</p>
+
+        <h2>Das Programm »COMALCHEN«</h2>
+
+        <p>Was dem Zeitschriftenartikel seine Kapitel, das sind dem Computerprogramm seine Modulbausteine. Und so wie es verschiedene Typen von Kapiteln gibt (zum Beispiel Einleitungskapitel, Schlußkapitel, »normale« Kapitel), so gibt es auch verschiedene Typen von Modulbausteinen, die jeweils speziellen Zwecken dienen. Darum soll es heute gehen.</p>
+
+        <p>Zur Illustration benutzen wir ein Programm, das ich »COMALCHEN« genannt habe (Listing ). Die Anregung dazu stammt übrigens aus der 64er. Im Novemberheft 1984 wurde ein Programmwettbewerb ausgeschrieben. Gewünscht war ein »intelligentes« Programm, das offenbar die Einsamkeit der 64'er-Redakteure mildern sollte, jedenfalls wollten sie sich damit unterhalten können. Ich dachte, den Leuten muß geholfen werden und schrieb ein kleines Comal-Programm, mit dem man sich über Comal unterhalten kann, genauer, das man über Comal ausfragen kann. Leider vergaßich dann, das Programm auch einzureichen, und so sind mir vielleicht gar die tausend Mark Preisgeld durch die Lappen gegangen.</p>
+
+        <p>Aber hier ist das Programm nun endlich doch. Und diesmal in Basic. Im Basic 7.0 des Commodore 128. Ich dachte, es könnte vielleicht reizvoll sein, die Möglichkeiten des (gegenüber dem C 64) erweiterten Basic einmal zu testen.</p>
+
+        <p>Die neuen Möglichkeiten des C 128liegen zunächst im Bereich der Steuerbausteine (vergleiche 64'er 1/86). Neu ist zum Beispiel der Sequenzbaustein<br>
+            BEGIN — BEND</p>
+
+        <p>Dieser Baustein ist allerdings nur beschränkt einsetzbar, nur in einer einzigen Situation, nämlich innerhalb der IF-Struktur.</p>
+
+        <p>Was die IF-Struktur angeht, so ist diese nunmehr endlich durch ELSE-Befehl erweitert worden. Beides, das heißt der Sequenzbaustein und der ELSE-Befehl in Kombination, machen im neuen Basic eine einfache und einigermaßen übersichtliche Codierung von »Abstechern« und »Gabelungen« möglich (vergleiche zum Beispiel »COMALCHEN«, Zeilen 40220 bis 40250).</p>
+
+        <p>Was die Mehrfachverzweigung angeht (CASE- und IF ELIF-Struktur), so müssen wir weiterhin bei den selbstgestrickten Bausteintypen bleiben (vergleiche etwa 14020 bis 14120).</p>
+
+        <p>Der eigentliche Fortschritt von Basic 7.0 ist bei den Schleifen zu verzeichnen. Die Befehlselemente DO, LOOP UNTIL, WHILE und EXIT erlaubenes, sämtliche bisher fehlenden Schleifentypen zu bauen (Tabelle 1):</p>
+
+        <p>Ob der Befehlsname LOOP als Endmarkierung sehr geschickt gewählt ist, sei dahingestellt; man kann es lernen. Warum die Schleifen allerdings so fürchterlich langsam sein müssen (mehr als 10 Sekunden für 1000 Durchläufe), das ist nicht ganz einsichtig(Comal schafft es in einem Fünftel der Zeit!). Ubrigens kann UNTIL auch nach DO stehen und WHILE nach LOOP und eine Schleife kann sowohl EXIT enthalten als auch UNTIL und/oder WHILE. Das läßt dem Programmierer alle Freiheiten, aber bürdet ihm gleichzeitig die ganze Verantwortung auf. Das kann leicht gefährlich werden. Leidvoll erfahrenes Beispiel: Die UNTIL-Schleife ist an sich so definiert, daß sie auf jeden Fall einmal durchlaufen wird — so lange, bis die Bedingung erfüllt ist. Wenn man nun »DO UNTIL Bedingung« codiert (statt »LOOP UNTIL Bedingung«), dann wird die Bedingung vor dem Schleifendurchlauf überprüft und allerhand zunächst unerklärliche Fehler können auftreten.</p>
+
+        <p>Was die Unterprogrammbausteine angeht, so hat sich nichts geändert. Wir müssen also weiterhin unsere hausgemachten Prozedur- und Funktionsstrukturen benutzen, wenn wir neue Befehle brauchen (vergleiche 64'er 2/86 und 4/86).</p>
+
+        <p>Dazugekommen sind aber eine Reihe neuer Handlungsbefehle, wie RESTORE und Zeilennummer und Funktionsbefehle wie INSTR. Mit dem einen können wir das Programm zu einer bestimmten DATA-Zeile schikken, der andere findet heraus, ob ein String in einem anderen enthalten ist. Beide Befehle werden uns zustatten kommen. Daß sie vorgefertigt sind, erspart uns, selber Hand anzulegen, um sie zu erfinden.</p>
+
+        <p>Spezielle Modulbausteine sind in Basic 7.0 natürlich nicht verfügbar. Die wollen wir also nun entwickeln.</p>
+
+        <h2>Wir machen einen Plan</h2>
+
+        <p>Gehen wir zuerst in den Wilden Westen. Ein Fluß, fruchtbares Land, keiner erhebt Anspruch. Hier wollen wir unsere Hütte bauen. Als erstes zeichnen wir uns einen Plan.</p>
+
+        <p>Bild 1 zeigt, welchen Ausschnitt aus der weiten Landschaft wir uns für unser Grundstück vorstellen und welche Form es haben soll.</p>
+
+        <p>Damit haben wir einen vollständigen Plan unserer künftigen Heimstatt. Zugegeben, der Plan scheint nicht sehr informativ, aber das heißt nicht, daß er unvollständig wäre; alle Informationen sind im Plan enthalten. Sie sind nur noch nicht im Detail zu erkennen.</p>
+
+        <p>In ähnlicher Weise können wir unser Computerprogramm planen. Aus der unendlichen Weite der begrenzten Möglichkeiten schneiden wir einen kleinen Ausschnitt heraus, in dem wir uns niederlassen wollen und bezeichnen ihn (so wie wir oben unser Grundstück gezeichnet haben) mit einem der Umrisse andeutenden Wort: »COMAL-CHEN«. Unser Grundstücksplan ließ erkennen, wo das Grundstück liegen und wie es aussehen sollte. »COMALCHEN« informiert uns darüber, daß es um Comal gehen müßte.</p>
+
+        <p>Stecken wir in derselben Weise unseren Programmplan ab. Wir schalten den Computer an und tippen ein:<br>
+            10 REM comalchen</p>
+
+        <p>Und da ist auch schon unser Programm! Noch ist nicht viel von seiner künftigen Gestalt zu erkennen. Probieren Sie es aus: Geben Sie RUN ein, und wenn Sie keinen Tippfehler in REM gemacht haben, läuft es von Anfang bis Ende ohne Probleme durch. Haben Sie doch einen Tippfehler gemacht — er ist leicht zu finden und leicht zu ändern.</p>
+
+        <p>Ein vollkommenes Programm also, allerdingsnoch nicht fertig. Aber was heißt eigentlich »fertig«, wann ist ein Programm fertig?</p>
+
+        <h2>Ein Programm ist nie fertig</h2>
+
+        <p>Wann ist unser Zuhause fertig? Wenn unsere Hütte auf dem Grundstück steht? Wenn ein Bett drin ist? Wenn ein Kissen im Bett liegt? Wenn dasKissen einen Bezug hat? Wenn in dem Bezug ein rotes Herz eingestickt ist?</p>
+
+        <p>Wenn wir es genau bedenken, dann kann immer etwas Neues dazukommen, noch eine Einzelheit, noch ein Detail, davon wird aber der Gesamtplan nicht betroffen. Ob später einmal ein Herzchen auf dem Kissen prangt, berührt nicht die Form unseres Grundstücks.</p>
+
+        <p>Wenn es aber so ist, daß die letzten Details für den Umriß irrelevant sind, dann können wir grundsätzlich das Nachdenken darüber hinausschieben. Das hat einige Vorteile. Davon gleich.</p>
+
+        <p>Prinzipiell entwickeln wir also unseren Plan so, daß wir mit allgemeinen Umrissen anfangen und die Umrisse dann allmählich und schrittweise mit notwendigen Details auffüllen. Im Grundstücksplan zeichnen wir also als nächstes die Lage der Hütte ein, ohne unsschon darum zu bekümmern, wo die Türen, wo die Fenster sein sollen. Wir planen, daß der Rest des Grundstücks Garten sein soll, verschieben aber die Entscheidung, welche Bäume und Büsche dort wachsen sollen und vor allem, wo sie wachsen sollen, auf später. Kommt Zeit, kommt Rat. »COMALCHEN« wird folgendermaßen detailliert: 0. Vorbereitung<br>
+            1. Begruessung<br>
+            2. Fragen<br>
+            3. Antworten<br>
+            4. Abschied<br>
+            5. Programmende</p>
+
+        <p>Wir haben überlegt: Bevor das Programm anfangen kann, muß es Variablen festlegen, Felder dimensionieren, und was sonst noch alles nötig ist. Wir brauchen also einen Vorbereitungsprogrammteil. Was genau dort zu geschehen hat, das braucht uns noch nicht zu kümmern.</p>
+
+        <p>Daß Computer und Benutzer sich begrüßen werden, das gehört sich bei einem Programm, mit dem man sich unterhalten will. Also wird dafür ein Programmschritt »Begrüßung« vorgesehen — umrißhaft zunächst nur, denn wie die Begrüßung vor sich gehen wird, wissen wir zu diesem Zeitpunkt noch nicht, brauchen wir nicht zu wissen. Tatsächlich habe ich diesen Teil, alsich»COMALCHEN« schrieb, an allerletzter Stelle in Angriff genommen, als der Rest des Programms längst stand, will sagen: lief.</p>
+
+        <p>Das Gegenstück zur Begrüßung ist ein Programmteil »Abschied«, das Gegenstück zur Vorbereitung ist das geordnete Beenden des Programms, zum Beispiel das Zurücksetzen des Computers in den Normalzustand.</p>
+
+        <p>Zwischen Begrüßung und Abschied steht der Kern des Programms — der Benutzer gibt eine Frage ein und der Computer reagiert darauf mit einer Antwort. In diesem Programmbereich werden natürlich die größten Probleme liegen: Was mache ich mit der eingegebenen Frage? Wie analysiere ich sie? Wie bekomme ich den Computer dazu, eine Frage zu »verstehen« Was heißt eigentlich »verstehen® Wie entscheide ich, was für eine Antwort auf welche Frage erfolgen soll? Wo bekomme ich überhaupt Antworten her?</p>
+
+        <h2>Das Zentralmodul</h2>
+
+        <p>Bevor wir uns diesem Dickicht von Problemen weiter nähern, wollen wir erst den bisherigen Stand unseres Programmplans in die Wirklichkeit umsetzen. Die Idee, daß wir uns um Einzelheiten erst später kümmern, setzen wir so um, daß wir dafür Subroutinen benutzen. Unser Programm (Listing 2):</p>
+
+        <p>Damit haben wir auch schon unseren ersten Modulbausteintyp kennengelernt, den jedes Programm enthält: das ZENTRALMODUL.</p>
+
+        <p>Die Grundform eines solchen Zentralmoduls ist:<br>
+            REM zentralmodul<br>
+            ...<br>
+            ...<br>
+            REM ENDE zentralmodul</p>
+
+        <p>Es empfiehlt sich, bei jedem Modul, wenn man es eingetippt hat, immer gleich auszuprobieren, ob es ohne Fehler läuft und obestut, wases soll. Fehler sind dann leicht erkennbar, ihre Ursachen auf Anhieb auffindbar und ohne viel Aufwand behebbar. Und wenn dann das Programm »fertig« ist, macht es kaum noch Probleme, und die Phase des »debugging«, die oft ein Vielfaches der Zeit in Anspruch nimmt, die man für das »eigentliche« Programmieren benötigte, wird radikal verkürzt.</p>
+
+        <p>Damit wir unser Modul testen können, müssen wir dafür sorgen, daß die GOSUBSs jeweils ihr Ziel finden und heil wieder zurückkehren können. Wir versehen zu diesem Zweck die Zielzeilen einfach für den Augenblick mit dem Befehl RETURN, also<br>
+            1000 return<br>
+            2000 return</p>
+
+        <p>Der RUN-Test zeigt, daß unser Modul keinen Fehler enthält. Und das, obwohl ich einen kleinen Trick angewendet habe. Um der leichteren Lesbarkeit willen habe ich nicht codiert:<br>
+            gosub 3000 : rem fragen<br>
+            sondern so:<br>
+            gosub 3000 fragen</p>
+
+        <p>Mit diesem Verfahren könnte man die Zeile sogar fortsetzen: gosub 3000 fragen : gosub 4000 antwort was mit REM nicht funktionierte, da alles, was nach REM kommt, vom Programm ignoriert wird.</p>
+
+        <p>Eine Warnung allerdings am Platze. Dieser Trick funktioniert in Commodore-Basic und zum Beispiel auch auf dem IBM-PC. Er funktioniert aber nicht in vielen anderen BASICs, und Compiler steigen regelmäßig aus, wenn ihnen solcher Unverstand begegnet.</p>
+
+        <h2>Das Verfahren der schrittweisen Verfeinerung</h2>
+
+        <p>Die Methode, die wir beim Planen unseres Programms benutzen und bei der das Nachdenken über Details so lange wie möglich hinausgeschoben wird, ist das Verfahren der schrittweisen Verfeinerung, auch »top-down«-Programmierung genannt. Man zerlegt dabei ein Problem in seine Teilprobleme, die Teilprobleme wiederum in Teilprobleme, und so weiter, und so fort — das geschieht so lange, bis die Probleme so einfach geworden sind, daß ihre Lösung quasi auf der Hand liegt. Im Idealfall lassen sich die »letzten« Probleme durch die Anwendung eineseinzigen Computerbefehls lösen, zum Beispiel:<br>
+            Problem: Programm beenden<br>
+            Lösung: END</p>
+
+        <p>Versuchen wir, diesem Idealfall näherzukommen. Wir nehmen uns unseren Programmplan ein drittes Mal vor. Nach der neuen Bearbeitung sieht der Plan nunmehr so aus:</p>
+
+        <p>COMALCHEN<br>
+            0. VORBEREITUNG<br>
+            0.1 System konfigurieren<br>
+            0.2 Initialisierungen<br>
+            0.3 Funktionen definieren<br>
+            0.4 Daten lesen<br>
+            1. BEGRÜSSUNG<br>
+            1.1 Vorstellung<br>
+            1.2 Begrüssen<br>
+            1.3 Unterhaltung beginnen<br>
+            2. FRAGEN<br>
+            2.1 Eingabe Frage<br>
+            2.2 Fragentyp feststellen<br>
+            2.3 Schlüsselwort suchen<br>
+            3 ANTWORTEN<br>
+            3.1 Antworttyp festlegen<br>
+            3.2 Antwort wählen<br>
+            3.3 Antwort ausgeben<br>
+            4. ABSCHIED<br>
+            4.1 Abschiedskommentar geben<br>
+            5. PROGRAMMENDE</p>
+
+        <p>Eine solche Verfeinerung im Programmplan läßt sich übrigenssehr gut mit einem Textverarbeitungsprogramm durchführen, zum Beispiel mit Paperclip, mit dem man mit einem Tastendruck die Textzeilen für die Unterpunkte einfügen kann.</p>
+
+        <p>Natürlich wollen wir gleich sehen, wie die neuen Elemente unseres Plans in der Wirklichkeit des Programms aussehen. Am Beispiel des Punktes »2. FRAGEN« sei die Umsetzung demonstriert (Listing 3).</p>
+
+        <p>Man sieht: Der Programmtext ist zu diesem Zeitpunkt noch eine fast wörtliche Übernahme des Programmplans.</p>
+
+        <p>Listing 3 illustriert auch gleich den zweiten Modultyp, den wir benutzen wollen, das HAUPT-MODUL. Alle Hauptpunkte eines Programms führen zu Hauptmodulen. Die Hauptmodule von »COMALCHEN« finden Sie in den Zeilen 1000 bis 9999 des Gesamtlistings.</p>
+
+        <p>Die allgemeine Form des Hauptmoduls:<br>
+            REM modul<br>
+            ...<br>
+            ...<br>
+            RETURN<br>
+            REM ende modul</p>
+
+        <p>Hauptmodule (sowie einige andere Modultypen) enthalten den RETURN-Befehl: Da Basic keine spezielle Modulstruktur zur Verfügung stellt, müssen wir mit den Pfunden wuchern, die vorhanden sind. Das sind in diesem Fall die Befehlselemente der Subroutinenstruktur. Diese dienten uns auch schon als Steine beim Bau unserer selbstent- wickelten Prozedurstruktur.</p>
+
+        <h2>Neben- und Untermodule</h2>
+
+        <p>Jedes Hauptmodul hat als Pendant sein NEBENMODUL. Haupt- und Nebenmodul bilden eine Art Tandem.</p>
+
+        <p>TODO LISTING</p>
+
+        <p>Während im Hauptmodul bestimmt wird, was der Reihe nach getan werden muß, wird es im Nebenmodul tatsächlich getan. Das Hauptmodul gibt die Anweisung, zum Beispiel UNTERHALTUNG BEGINNEN; im Nebenmodul wird die Anweisung in die Tat umgesetzt, wird abgearbeitet. Die Arbeit wird von einer Gruppe von Basic-Befehlen durchgeführt. Diese Gruppe wird zusammengefaßt in einem UNTERMODUL. Die Anweisung UNTERHALTUNG BEGINNEN führt also zu einem Untermodul UNTERHALTUNG BEGINNEN. Listing 4 soll dies verdeutlichen. Die allgemeine Form des Untermoduls ist:</p>
+
+        <p>REM u-modul<br>
+            ...<br>
+            ...<br>
+            RETURN<br>
+            REM ende u-modul</p>
+
+        <p>Jeder GOSUB-Anweisung im Hauptmodul entspricht also ein Untermodul im zugehörigen Nebenmodul. Während das Hauptmodul aus einer Gruppe von GOSUB-Anweisungen besteht, ist das Nebenmodul parallel dazu aus einer Gruppe von Untermodulen aufgebaut.</p>
+
+        <p>Lassen Sie uns eine Zwischenbilanz machen: Ein Programm besteht aus einem Zentralmodul, das die grundlegenden Aufgaben definiert. Es enthält sodann eine Gruppe von Hauptmodulen, die fest mit zugehörigen Nebenmodulen verbunden sind. Bild 2 illustriert dies anhand des Programms »COMAL-CHEN« Den Punkt FRAGE schauen wir uns dabei mit einer schwach vergrößernden Lupe an.</p>
+
+        <p>Zur weiteren Verdeutlichung ein Beispiel aus dem Leben. Wir stellen uns eine Fabrik vor. Im Zentralmodul sitzt das Management; dort wird entschieden, was produziert werden soll, dort werden die grundlegenden Ablaufpläne erstellt. Die Gruppe der Haupt- und Nebenmodule sind die einzelnen Produktionsabteilungen. Im Hauptmodul sitztjeweils der Abteilungsleiter, der die Arbeiten anordnet, die im einzelnen zu erledigen sind. Das Nebenmodul ist das eigentliche Fabrikgebäude, hier wird die Arbeit gemacht. Das Fabrikgebäude ist in mehrere Werkstätten aufgegliedert, die jeweils Teilaufgaben erledigen, das sind die Untermodule Am Beispiel des Nebenmoduls FRAGE (11000 bis 14999): Die einzelnen Untermodule haben folgende Aufgaben zu lösen: 1. eine Frage entgegennehmen; 2. feststellen, zu welchem Typ sie gehört; 3. herausfinden, ob sie eines der Schlüsselwörter enthält, aus denen man schließen kann, worauf sich die Frage bezieht (vergleiche auch Bild 2).</p>
+
+        <p>Gelegentlich kann man auch einmal ohne Nebenmodul auskommen — wenn es Ökonomischer scheint, daß der Chefeine einfache Aufgabe gleich selber erledigt. Das ist zum Beispiel der Fall im Hauptmodul PROGRAMMENDE.</p>
+
+        <h2>Der Informationsfluß</h2>
+
+        <p>Die Teilaufgaben, dieineinem Untermodul zu erledigen sind, bestehen oft darin, Informationen, die hereinkommen, zu bearbeiten und auf diese Weise neue Informationen zu gewinnen, die dann weitergegeben werden. Das Untermodul FRA-GENTYP FESTSTELLEN etwa erhält die Eingabe (zum Beispiel »Was ist COMAL?«, untersucht sie und findet dabeiheraus, daß sie mit dem Fragewort »was« beginnt, daß sie somit zum Typ W-Fragen gehört.</p>
+
+        <p>In jeder Werkstatt muß man genau wissen, welche Information hereinkommt und welche wieder hinausgehen muß. Nur dann, wenn dies ganz klar ist, können eventuelle Fehler im Produktionsprozeß ohne großen Aufwand erkannt und ausgemerzt werden. Informationen, die hereinkommen und verarbeitet werden müssen oder die zur Arbeit notwendig sind, werden zu Beginn des Untermoduls in einer IMPORT-Liste ausgeführt. Informationen, die erzeugt worden sind und herausgehen, weil sie andernorts gebraucht werden, sind in der EXPORT-Liste enthalten. Vergleichen Sie als Beispiel das Untermodul ANTWORT WAEHLEN (15400 bis 15499):</p>
+
+        <p>15410 rem import: typantwort<br>
+            15415 rem export: antwort$</p>
+
+        <p>Zur Aufbewahrung von Informationen und zu ihrem Transport werden im Programm Variablen benutzt, wie wir wissen. Daher folgt nun ein Wort zur Form der Variablennamen an den verschiedenen Orten des Programms. Variablen, die Informationen enthalten, welche überall im Programm gelten (auf dem gesamten Fabrikgelände, in sämtlichen Gebäuden), heißen »global«. Sie erhalten »normale« Namen wie FRAGE$, ANTWORT$, TYPANTWORT und so weiter. Globale Variablen spielen auch in manchen Prozeduren und Funktionen eine Rolle. Wo dies der Fall ist, enthalten auch diese IMPORT und EXPORT-Listen (zum Beispiel die Prozedur ANTWORT ERGAENZEN, 44000 bis 44099).</p>
+
+        <p>Neben globalen Variablen gibt es auch solche, die nur innerhalb eines Untermoduls gelten, die also gewissermaßen werkstattintern gebraucht werden. Solche Variablen sind mit M (für Modul) gekennzeichnet. Im Untermodul BEGRUESSEN (10200 bis 10399) finden sich zum Beispiel folgende modulinterne Variablen: MEINGABE, MGRUSS, MOK. Wie wir ausder letzten Folge über die Unterprogrammbausteine wissen, bezeichnet man Variablen, deren Gültigkeitsbereich örtlich eingeschränkt ist, als»lokale« Variablen. Wir kannten sie allerdings bisher nur in Prozeduren, wo wir sie mit U gekennzeichnet haben. U-Variablen gibt es in diesem Programm natürlich auch. Vergleichen Sie etwa die Prozedur OBERBEGRIFF FINDEN (14500 bis 14799), wo folgende prozedurinterne Variablen vorkommen: USCHLUESSEL$, UPOSI-TION UWORT().</p>
+
+        <h2>Die Rolle von Prozeduren</h2>
+
+        <p>Zurück zu den Untermodulen, zu den Werkstätten im Fabrikgebäude des Nebenmoduls. Manchmal enthält ein Arbeitsauftrag Teile, die einen Spezialisten erfordern, derin der Werkstatt nicht zur Verfügung steht. Bevor man sich selbst damit abmüht, formuliert man besser einen Spezialauftrag und delegiertihn. Das geschieht zum Beispiel im Untermodul EINGABE FRAGE (11020 bis 11100), wo der eigentliche Eingabevorgang an die Prozedur EINGABE delegiert wird. Wenn wir eine Basic-Version benutzen würden, die einen entsprechenden vorgefertigten Befehl besitzt, Könnten wir die Aufgabe in der Werkstatt selbstlösen. So aber sind wir gezwungen, einen eigenen Befehl zu bauen, das heißt eine Prozedur zu schreiben.</p>
+
+        <p>Nachdem der Spezialauftrag erledigt, die Frage in der Werkstatt, im Untermodul, eingegangen ist, wird sie gleich einmal »außer Haus« gegeben. Sie soll so zurechtgehauen werden, daß sie einem bestimmten Standard entspricht. Dazu wird sie der Prozedur FORM STANDARDISIEREN zugeschoben. Mit diesem Trick hält man sich Programmprobleme, die immer noch zu komplex sind, als daß die Lösung schon deutlich auf der Hand läge, noch eine Weile länger vom Hals — und das ist ja unser Bestreben.</p>
+
+        <p>Es stellt sich dann heraus, daß die Aufgabe, die die Prozedur FORM STANDARDISIEREN (12500 bis 12599) zu erledigen hat, immer noch sehr komplex ist, so daß es sinnvoll erscheint, sie noch einmal in Teilaufgaben zu zergliedern: in die Behandlung von überflüssigen Leerzeichen; die Umwandlung aller Großbuchstaben in Kleinbuchstaben und die Umwandlung der Umlaute »ä», »ö«, »ü«und des »ß« in die Zeichenfolgen »ae«, »OE«, HUE«, »35« — denn es könnte ja sein, daß der Benutzer die DIN-Tastatur des Commodore 128 benutzt. Diese Teilaufgaben werden durch Prozeduren erledigt, die in den Zeilen 40000 bis 40500 definiert sind.</p>
+
+        <p>Wir haben eben gesehen, daß Nebenmodule auch Prozeduren enthalten. Es sind die Prozeduren, die nur im jeweiligen Nebenmodul gebraucht und zu Hilfe gerufen werden. Die Spezialisten arbeiten in dem Gebäude, in dem man sie braucht; das ist ökonomisch, spart Zeit und macht den Produktionsvorgang übersichtlich.</p>
+
+        <h3>Prozeduren- und Funktionenmodule</h3>
+
+        <p>Esgibtaber auch Spezialisten, die von mehreren Produktionsabteillungen zu wechselnden Zeiten angefordert werden, externe Zulieferbetriebe, die mal für diesen arbeiten, mal für jenen. Diese sind an einem anderen Ortzusammengefaßt. So entsteht ein weiterer Modultyp, das PROZEDURENMODUL (4000 bis 45999), das alle Prozeduren enthält, die nicht eindeutig einem bestimmten Nebenmodul zugeordnet werden können.</p>
+
+        <p>Analog zum Prozedurenmodul gibt es ein FUNKTIONENMO-DUL, das alle Funktionsdefinitionen enthält (46000 bis 46999). Die Form dieser beiden Module:</p>
+
+        <p>REM prozedurenmodul<br>
+            ...<br>
+            ...<br>
+            ...<br>
+            REM ende prozedurenmodul<br>
+            REM funktionenmodul<br>
+            ...<br>
+            ...<br>
+            ...<br>
+            RETURN REM ende funktionenmodul</p>
+
+        <p>Prozeduren- und Funktionenmodul fassen, so kann man sagen, die allgemeingültigen unserer selbstgestrickten Befehle zusammen.</p>
+
+        <h3>Datenmodul und Informationsmodul</h3>
+
+        <p>Bleibt noch das DATENMODUL zu erwähnen, das die DATA-Zeilen enthält (55000 bis 59999) und das INFORMA-TIONSMODUL (60000-) mit internen Informationen zum Programm.</p>
+
+        <p>Damit haben wir die Modultypen kennengelernt, aus denen das Programm »COMALCHEN« besteht. Sie fragen, woher eigentlich die Idee der Module kommt?</p>
+
+        <h2>»MODULES« — »PACKAGES«</h2>
+
+        <p>Die Anregung, Programme in Form von Modulen zu strukturieren, stammt aus einigen moderneren Programmiersprachen. So gibt esin Modula2 »modules« als strukturelle Einheiten für komplexere Aufgaben; ADA benutzt das Konzept der »packages«, und Comal 2.0 kennt »machine language packages«, die dazu dienen, eine Gruppe zusammengehöriger Assemblerprogramme zusammenzufassen. Mit ihren »modules« oder »packages« verfolgen die einzelnen Programmiersprachen unterschiedliche Ziele. Gemeinsam ist diesen Ideen aber die Erkenntnis, daß es über der Ebene der Prozeduren und Funktionen noch weitere höhere Programmstrukturen geben müsse, um die immer komplexer werdenden Programmierprobleme menschen- und wartungsfreundlich lösen zu können.</p>
+
+        <p>Es ist allein diese Grundidee, die dem Vorschlag, auch Basic-Programme mit Hilfe von Modulen leserfreundlicher zu gestalten, zugrundeliegt. Ansonsten haben die vorgeschlagenen Modultypen und ihre äußere Form weder etwas mit den »modules« in Modula2 noch mit den »packages« in ADA oder Comal zu tun.</p>
+
+        <p>Sie sind frei erfunden und Ähnlichkeiten sind eher zufällig als beabsichtigt.</p>
+
+        <p>Wenn aber die beschriebenen Modultypen von mir frei erfunden wurden, dann besteht kein Grund, warum Sie nicht Ihre eigenen erfinden sollten. Mein Vorschlagist ein Vorschlag — mehr nicht. Er kann ergänzt werden durch weitere Typen (in anderen Programmen benötigt man zum Beispiel zusätzlich ein Menümodul); die äußere Form der Module kann umgestaltet werden; eine gänzlich andere Gruppe von Modultypen könnte entwickelt werden — der Fantasie sind wieder einmal keine Grenzen gesetzt. Und jeder ist seines eigener Schmied.</p>
+
+        <p>Ich jedenfalls finde die Modulbausteine, die ich vorgestellt habe, für meine eigene Arbeit sehr hilfreich, arbeits- und denkerleichternd. Es waren die folgenden (Bild 3).</p>
+
+        <h2>Strukturiertes Programmieren ist menschenfreundlich</h2>
+
+        <p>Damit haben wir nunmehr alle Werkzeuge kennengelernt, die in dieser Serie als Hilfsmittel zum strukturierten Programmieren vorgestellt werden sollten. Diese Werkzeuge zu benutzen, damit zu programmieren, macht Spaß. Es macht immer Spaß, wenn man den Überblick behält, wenn man schnell vorankommt, wenn man am Ziel ankommen wird, das heißt wenn man sicher sein kann, daß man nicht irgendwo vorher im Schlamm komplexer und deshalb unlösbar scheinender Probleme steckenbleibt.</p>
+
+        <p>Natürlich macht man auch, wenn man strukturiert programmiert, Fehler — nicht nur einfache Tippfehler, sondern sogar Denkfehler — das ist normal und gehört zum kreativen Denken wie das »READY« auf dem Bildschirm. Aber solche Fehler lassen sich meist sofort nach dem Codieren eines Moduls (oder einer Prozedur oder einer Funktion) finden und beheben. Und wenn sich einmal ein Denkfehler wirklich erst dann zeigt, wenn das Programm eigentlich schon »fertig« ist, ist er auch dann noch schnell lokalisiert und ausgemerzt. Natürlicherweise kommen einem auch beim strukturierten Programmieren die besten Ideen erst dann, wenn es eigentlich schon »zu spät«ist. Auch kein Beinbruch, denn wenn ein Programm vernünftig durchstrukturiert ist, dann ist es nie wirklich zu spät. Verbesserungen betreffen ja immer Spezialaufgaben, und es ist ein Klacks, ein Modul oder eine Prozedur zu ergänzen oder eine neue Prozedur zu schreiben und einzufügen.</p>
+
+        <p>Strukturiertes Programmieren ist menschenfreundlich, es verringert den Programmieraufwand und macht das Programm lesbar, verstehbar und deshalb änderbar auch für den, der es nicht programmiert hat.</p>
+
+        <h2>Aber ist strukturiertes Programmieren auch computerfreundlich?</h2>
+
+        <p>Auf den ersten Blick scheint es, daß beides einander ausschließt. Denn wenn wir unser Programm laufen lassen, dann stellt sich heraus, daß es unerträglich langsam ist: Es gibt Antworten, auf die muß man mehr als 12 Sekunden lang warten. Und das ist sehr lang.</p>
+
+        <p>Wie kommt das? Das liegt erstens am Computer selbst, am C 128, dessen Basic-Version alles andere als ein Ausbund von Schnelligkeit ist. Das liegt zweitens aber am Basic an sich. Das Bestreben, in Basic strukturiert zu programmieren, führte ja dazu, daßich eine große Menge an REM-Zeilen benutzen mußte und viele GOSUBs. Ich habe weiterhin viele Leerzeichen verwendet (für Einrückungen und zur Trennung der einzelnen Befehlswörter) sowie lange Variablennamen. Der Computer, wenner das Programm abarbeitet, muß also viellesen, was zwar für den Menschen relevant, für ihn aber völlig redundant ist. Das braucht Zeit. Viel Zeit.</p>
+
+        <p>Es gibt aber Lösungsmöglichkeiten. Den C 128 kann man auf FAST schalten, wenn man einen 80-Zeichen-Bildschirm sein eigen nennt. (Wer einen solchen nicht hat, aber sich nicht daran stört, wenn zwischen Frage und Antwort ständig der Bildschirm wegschnappt, kann FAST in Zeile 3015 einsetzen und SLOW in Zeile 4025 und dadurch die Wartezeit um die Hälfte verkürzen). Das strukturierte Programm kann man weiterhin compilieren, wenn man einen Compiler hat — der ignoriert alle REMs und alle Leerzeichen und beschleunigt auch sonst die Verarbeitung. Man kann schließlich eine Basic-Erweiterung wie Makrobasic benutzen, was die Wartezeit um bis zu 20 Prozent verkürzen kann.</p>
+
+        <p>Oder man greift gleich zu einer radikalen Lösung: Man nehme eine Programmiersprache, die von vornherein so konzipiert ist, daß sowohl der Mensch seine Freude hat, als auch der Computer. Eine solche Sprache ist — nein, nicht Pascal, daist von Menschenfreundlichkeit wenig zu spüren. Nein, woran ich denke, ist Comal.</p>
+
+        <p>Ich habe unser C 128-Basic-Programm umgewandelt in ein C 64-Comal-Programm. Ich habe es nicht etwa neu geschrieben, sondern (mit einem Trick) von der Diskette direkt in Comal eingelesen und dann die notwendigen Anpassungen vorgenommen. Das Comal-Programm ist kürzer (statt 20174 nur 16433 Byte); es ist 5- bis 6mal so schnell, je nach der eingegebenen Frage (wo ich bei Basic 12,28 Sekunden auf eine bestimmte Antwort warten mußte, sind es jetzt nur noch 2,4 Sekunden). Das Programm könnte noch etwas schneller und kürzer sein, wenn ich es direkt in Comal geschrieben und nicht »wörtlich« aus Basic übersetzt hätte.</p>
+
+        <p>Menschenfreundliches und computerfreundliches Programmieren schließen einander also nicht prinzipiell aus. Comal beweist es. Den Namen Co- mal sollte man sich merken.</p>
+
+        <p>Wir waren einmal von der Frage ausgegangen, ob man auch in Basic strukturiert programmieren könne. Die Antwort war: Natürlich kann man.</p>
+
+        <p>Aber soll man auch? Die Antwort muß wiederum lauten: Natürlich soll man! Was für eine vernünftige Alternative gäbe es denn? Gut, es treten Probleme auf, vor allem, wenn ein Programm eine gewisse Länge überschreitet. Aber diese lassen sich lösen. Vorschläge dazu wurden gemacht. Die Alternative zum strukturierten Programmieren in Basic ist jedenfalls nicht unstrukturiertes Programmieren.</p>
+
+        <address class="author">(Prof. Burkhard Leuschner/nj)</address>
+
+        <p>TODO TABELLE 2</p>
+    </article>
+</body>
+
+</html>

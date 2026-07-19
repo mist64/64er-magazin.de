@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Reise durch den C128 (Teil 4)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, dm">
+    <meta name="64er.issue" content="8/86">
+    <meta name="64er.pages" content="69-72">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX21">
+</head>
+
+<body>
+    <article>
+        <h1>Reise durch den C128 (Teil 4)</h1>
+        <p class="intro">Unser Forscher ist weiter auf der Suche im GC 128. Diesmal hat er den Video-Chip entdeckt und sofort unter die Lupe genommen.</p>
+
+        <p>Zufallerlei obskuren Umwegen erhielten wir wieder einen Bericht unseres Korrespondenten, der sich derzeit auf einer beschwerlichen Forschungsreise durch den unbekannten Kontinent C 128 befindet. Arg zerzaust sei er, schreibt er, und daß er voll Freude meinte, bekanntes Territorium zu betreten, als er des VIC-Chips ansichtig wurde, daß er sich aber nun verwirrt fragt, ob er einer Fata Morgana aufgesessen sei oder ob dieser Chip der Kategorie der »Rühr mich nicht an«Wesen zugeordnet werden müsse.</p>
+
+        <h2>Der VIC ist ein VIC — ist kein VIC...</h2>
+
+        <p>Jetzt sind Sie schon zu Beginn ähnlich verwirrt, wie ich es war. Lassen Sie mich daher zunächst einmal die sicheren Tatsachen erzählen, damit wir wieder Boden unter den Füßen haben:</p>
+
+        <p>Der VIC ist nämlich allen, die den Commodore 64 kennen, ein alter Bekannter. Dort heißt er genaugenommen MO®S 6566 Video-Interface-Controller. Im C 128 haben wir eine leicht geänderte Version dieses Chip vorliegen, den MOS 8564 Video-Interface-Controller, der sich aber — weil er auch im C 64-Modus verwendet wird — allem Anschein nach nur durch zwei zusätzliche Register vom 6566 unterscheidet. Bild 1 zeigt Ihnen alle Register, ihre Bedeutungen und von einigen auch die üblichen Inhalte:</p>
+
+        <p>Die beiden neuen Register sind 47 ($DOZF, 53295) und 48 ($D030, 53296). 47 enthält — etwas rätselhaft — in den Bits 0 bis 2 eine Tastaturkennung. Interessanter scheint Register 48. Das Bit 0 dient dem Umschalten in den 2-MHz-Betrieb und das ist auch im C 64-Modus möglich. Allerdings ist dann auf dem 40-Zeichen-Bildschirm nichts mehr zu sehen (oder aber wüstes Geflimmer), weil der VIC diese doppelte Geschwindigkeit nicht mitmacht. Durch POKE 53296,1 kann der C 64 dannalle Operationen doppelt so schnell ausführen als sonst. Ein POKE 53296,0 läßt den Bildschirm wieder normal erscheinen und schaltet in den 1-MHz-Betrieb zurück.</p>
+
+        <p>Nun aber kommt das Verwirrspiel: Dies ist das einzige VIC-Register, das sich auf diese Art — also einfach durch POKEs oder mittels des Monitors — verändernläßt. AlleanderenRegisterumbauten äußern sich bestenfalls in einem kurzen Aufflackern des 40-Zeichen-Bildschirmes... dann ist der Einheitszustand wieder hergestellt!</p>
+
+        <p>Offensichtlich befinden sich die VIC-Register fest in der Hand des Unterbrechungszyklus, der eine Reihe weiterer Bestandteile des äußeren und inneren Erscheinungsbildes - unseres Computers ständig steuert. Das ist aber nur im C 128-Modus der Fall. Sobald Sie den C 64-Modus eingeschaltet haben, kann wieder jedes Register bedient werden. Nun ist dieshier kein Werk über die Grafik desC 64. Falls Sie mehr über die Programmierung aller Register des VIC erfahren möchten, verweise ich Sie auf mein Buch »C 64 Wunderland der Grafik«, Markt und Technik Verlag, München 1985, MT756. Das kann auch für den Assembler-Programmierer interessant sein, der es versteht, die Unterbrechungen zu beherrschen und der sich grafisch betätigen möchte.</p>
+
+        <p>Für den C 128-Modus ist es im allgemeinen auch kaum erforderlich, VIC-Register anzusteuern. Es bleibt nur wenig übrig, was dieses kraftvolle Basic nicht vermag:<br>
+            1) Der Textmodus mit verändertem Hintergrund existiert nirgends im Basic 7.0.<br>
+            2) Die Anzahl der Zeilen und Spalten ist nicht veränderbar. 3) Das »smooth scrolling« kann nicht einfach programmiert werden<br>
+            4) Der Bildschirmspeicher kann nicht verschoben werden, ebenso die Bit-Map und die Quelle der Zeichenmuster.</p>
+
+        <p>Wenn Sie nun nochmal Bild 1 ansehen, dann stellen Sie fest, daß diese Auslassungen drei Register betreffen: 17 ($DO1l, 53265), 22 ($D0I16, 53270) und 24 ($DOl8, 53272), von denen zweifellos das letzte das interessante ist. Was fängt man aber mit diesem »Rühr mich nicht an«-Chip an? Assembler-Spezis werden sagen, daß man eben einfach eine eigene Unterbrechungsroutine schreibt und den Vektor $314/$315 darauf richtet: Von da an können alle VIC-Spezialitäten freimütig verwendet werden. Was aber macht ein Basic-Programmierer?</p>
+
+        <h2>Ein Ausweg aus der Sackgasse?</h2>
+
+        <p>Ein gründliches Durchforsten der »erweiterten Zeropage« fördert schließlich einige interessante Speicherstellen zutage. Dem Register 24 nämlich — eben gerade dem erwähnten recht interessanten! — entsprechen zwei Speicherstellen:<br>
+            2604 $0A2C VIC Text-Basis<br>
+            2605 $0A2D VIC Bit-Map-Basis<br>
+            Außerdem gibt es da noch eine:<br>
+            2619 $0ASB Page des Bildschirm-Speichers (Im C 64-Modus ist letztere die Entsprechung zur Speicherstelle 648)</p>
+
+        <p>Sowohl 2504 als auch 2605 entsprechen — bis auf das Bit 0, dasaber auch in 53272 ohne Bedeutung ist — exakt dem Register 24 im jeweiligen Modus (also Text- oder Bit-Map-Modus). Alle drei Speicherstellen werden von den Unterbrechungen nicht behelligt — jedenfalls nicht zu unserem Nachteil wie der VIC selbst. Das, was wir in diese Speicherstellen schreiben, wird flugs nach 53272 transportiert und somit beherrschen wir den Bildschirm, die Bit-Map und die Quelle der Zeichenmuster. Oder doch nicht so ganz? Aber dazu kommen wir später noch. Sehen wir uns zunächst einmal an, was die verschiedenen Inhalte von 53272, 2604 oder 2605 zu bewirken imstande sind. Die Bits 4 bis 7 legen die Startadresse desBildschirmspeichers fest. Dort findet sichim Einschaltzustand der binäre Inhalt 0001, in den Grafik-Modi aber der Inhalt Olll. Das Bild 2 zeigt die weiteren Möglichkeiten:</p>
+
+        <p>Erreichbar sind diese anderen Bildschirme durch die Kommandos:<br>
+            POKE 2604, (PEEK(2604)AND15)OR W<br>
+            im Text- und<br>
+            POKE 2605, (PEEK(2605)AND15) OR W<br>
+            im Grafik-Modus. W ist dabei der Dezimalwert, der in Bild 2 angegeben wurde. Bevor Sie damit anfangen, alles mögliche auszuprobieren, hier noch ein paar Tips: Speichern Sie eventuell vorhandene Programme sicherheitshalber ab. Benutzen Sie — sofern vorhanden — beide Bildschirme, denn häufig verlieren Sie aus den verschiedensten Ursachen auf dem 40-Zeichen-Bildschirm jede Kontrolle über den Cursor und Befehlstexte. Davon wird dann der 80-Zeichen-Bildschirm seltener berührt, so daß Sie relativ gute Chancen haben, ohne RESET weiterzuarbeiten. Ein letzter Tip noch: Wundern Sie sich über nichts! Die Speicherkonstruktion unseres Computers ist derart vielfältig, daß man sich nie ganz sicher sein kann, woher eigentlich manche Bildschirmdarstellungen rühren.</p>
+
+        <p>Sie werden bemerkt haben, daß die höchste Bildschirmstartadresse bei 15360 liegt. Pro BANK haben wir aber 64 KByte zur Verfügung. Was können wir tun, um dieses Mißverhältnis zu beheben? Dazu müssen wir erst mal wissen, daß der VIC-Chip nur über 14 Adressenleitungen verfügt (im Gegensatz zum Prozessor, der 16 davon bedienen kann). Was bedeutet das? Die Wirkung ist, daß mit 16 Bits alle Adressen im Speicherraum zwischen<br>
+            0 = 0000 0000 0000 0000<br>
+            und<br>
+            65535 = 1111 1111 1111 1111<br>
+            ansteuerbar sind, mit 14 Bit aber liegt die Höchstgrenze bei<br>
+            16383 = 11 1111 1111 1111</p>
+
+        <p>Das entspricht 16 KByte und davon befinden sich vier in einer BANK. Es gibt nun im C 64-Modus ein Register im CIA2, dem sogenannten NMI-CIA (das ist der »Complex Interface Adapter«, also ein Ein- und Ausgabe- -Baustein), welches festlegt, auf welchen 16-KByte-Bereich in einer BANK der VIC Zugriff hat. Es handelt sich um den DATA-Port A bei $DDO00 (das ist dezimal 56576). Nach allen Untersuchungen liegt an derselben Stelle auch im C 128-Modus dieser Chip, so daß man das Register auch hier benutzen kann. Der VIC-Zugriff wird durch die Bits O0 und 1 gesteuert. Was man mit den verschiedenen Belegungen erreicht, zeigt Ihnen das Bild 3:</p>
+
+        <p>Im Einschaltzustand steht hier 11, was den unteren 16-KByte-Bereich für den VIC freigibt.</p>
+
+        <p>Durch Kombination der Bitwerte in 2604 (oder 2605) und derer aus Bild 3lassen sich nun theoretisch 64 Bildschirme definieren. Die Befehle zur Änderung des 16-KByte-Bereiches sind:</p>
+
+        <p>BANK15: POKE56576, (PEEK(56576)AND252)OR I<br>
+            oder<br>
+            BANK15: POKE56576, (PEEK(56576)AND252)OR 3</p>
+
+        <p>Dabei ist I der Dezimalwert der Bitkombinationin Bild 3und der zweite Befehl dient zur Wiederherstellung des Normalzustandes.</p>
+
+        <p>Sie finden hier noch das Programm BILDSCHIRMSP (Listing 1) abgedruckt, welches Ihnen das Durchprobieren sämtlicher Möglichkeiten erleichtern soll:</p>
+
+        <p>Aber: Speichern Sie es vor dem Starten unbedingt ab und beachten Sie die obigen Tips, denn datauchen allerlei Merkwürdigkeiten bei der Benutzung auf.</p>
+
+        <p>Sollten Sie nur mit dem 40- Zeichen-Bildschirm arbeiten, empfiehlt es sich, alle Operationen, die mit dem neuen Bildschirm löschender- oder druckenderweise geschehen, aus dem Programm herauszunehmen. Oder aber, Sie haben die Geduld, falls etwas schiefläuft, jedesmal nach einem RESET dasProgrammneu zuladen. Sehen wir uns nun einige Varlanten an:</p>
+
+        <p>I=3 und W=0 legt den Bildschirmspeicher genau auf die Speicherplätze 0 bis 999, also auf die erweiterte Zeropage. Man kann einigen Speicherstellen bei der Arbeit zusehen, beispielsweise dem Timer-Register in der Zeile 5 links. Falls Sie den 80-Zeichen-Bildschirm verwenden, können Sie dort allerleiKommandos eingeben und zusehen, wie sich aufdem 40-Zeichen-Bildschirm Speicherstellen verändern.</p>
+
+        <p>I=3 und W=16 erzeugt wieder den normalen Bildschirm, wohingegen I=3 und W=32 wieder Teile der erweiterten Zeropage von 2048 (Basic-Stapel) bis 3047 (Kassettenpuffer) zeigt. Auch hier gibt es wieder veränderliche Speicherstellen wie beispielsweise 2614 (das ist ein Korrekturzähler für den 50-Hz-Betrieb). Auch die beiden nächsten Kombinationen mit I=3, nämlich die mit W=48 und W=64 zeigen noch Teile des Systemspeichers. Die Kombination I=-3und W=112 sollte eigentlich den Start des Basic-RAM ab 7168 (bis 8167) auf dem Bildschirm erscheinen lassen, was dort aber zu sehen ist, ist nicht das Programm. Eines der noch nicht gelösten Rätsel im C 128!</p>
+
+        <p>Alle weiteren Orte des Bildschirmspeichers (W=128 bis W= 240) ergeben nutzbare Bildschirme, sofern nicht die Grafik eingeschaltet wird, die sich in diesem Gebiet tummelt. Wenn wir nun statt I=3 auch die Kombinationen mit I=2,1,0 verwenden, stellen wir fest, daß hier keine normalen Bildschirme möglich sind. Weder PRINT noch die Cursorbedienung läuft hier ohne Störung. Der eine oder andere Absturz kann auftreten. Bemüht man sich aber mal, mittels des Monitors in diese Speicherbereiche den Löschcode $20 zu schreiben (mit demF-Kommando) und POKEt dann den Bildschirmcode in den neuen Bildschirmspeicher hinein, dann funktioniert das einwandfrei, wenn man dabei die kritischen Speicherbereiche der /O-Bausteine zwischen $D000 und $DFFF und vor allem die MMU-Resgister bei $FF00 und folgende ausläßt. Dazu kommen wir nachher noch. Jedenfalls können — mit der Einschränkung, daß wir die Zeichen durch POKE-Kommandos einschreiben müssen — 51 Bildschirme inBANK 0 definiert werden.</p>
+
+        <h2>Eigene Zeichen benutzen</h2>
+
+        <p>Sollten Sie malin der Verlegenheit sein, andere als die vorhandenen Zeichen unseres Computerszu benötigen, dann ist auch das möglich. In der Speicherstelle 2604 dienen die Bits 1 bis 3 der Festlegung der Startadresse des Zeichenmusterspeichers. Bild 4 schlüsselt die Zuordungen für den ersten 16-KByte-Bereich auf:</p>
+
+        <p>Das Umschalten auf eine andere Zeichenmusterquelle geschieht dann mittels<br>
+            POKE 2604, (PEEK(2604) AND240)OR Z<br>
+            Dabei ist Z die Dezimalzahl in Spalte 4 des Bildes.</p>
+
+        <p>Interessanterweise deutet dieses Merkmal im Einschaltzustand auf die Speicherstelle $1000 (also 4096). Wenn wir uns aber ansehen, was dort per Monitor zu finden ist, dann liegt da die erweiterte Zeropage mit allerlei wichtigen Eintragungen. Wiedereines der ungelösten Rätsel. Dieses wurde übrigens auch schon beim C 64 gestellt und immer noch nicht ganz befriedigend beantwortet. Jedenfallsholt sich der Computer im Normalzustand seine Zeichenmuster aus dem Zeichen-ROM, was es nicht möglich erscheinen läßt, diese zu verändern.</p>
+
+        <p>Es geht aber doch:<br>
+            1) Wir kopieren den Inhalt des Zeichen-ROM in einen RAM-Bereich<br>
+            2) Wir richten den Wegweiser in den Bits 1 bis3 der Speicherstelle 2604 auf diesen RAM-Zeichenspeicher<br>
+            3) Wir verändern die Muster, die ja nun im RAM liegen.</p>
+
+        <p>Das Programm ZEICHENSATZ (Listing 2) soll Ihnen das am Beispiel des Buchstabens A erläutern.</p>
+
+        <p>Die Zeichen verschieben wir nach $3000 und folgende. Jeweils 8 Byte gehören zu einem Zeichenmuster. Bei 12288 beginnt der »Klammeraffe« als nulltes Zeichen, der Buchstabe A hat seine 8 Byte von 12296 bis 12303 liegen und dorthinein PO-KEn wir andere Inhalte. Starten Sie das Programm, dann sollten Sie sich mit etwas Geduld wappnen, denn das Kopieren der 4096 Bytes auf diesem Weg dauert eine Weile. Das Programm schaltet dann die Speicherstelle 2604 auf den neuen Zeichenbereich um und druckt auf den Bildschirm das Wort ABRAKADABRA. Einen Augenblick später erscheint das A im neuen Gewand. Gefällt es Ihnen?</p>
+
+        <p>Bei Ihnen hat das nicht funktioniert? Dann haben Sie alles auf dem 80-Zeichen-Bildschirm laufen lassen. Die Veränderungen spielen sich aber nur auf dem 40-Zeichen-Bildschirm ab.</p>
+
+        <p>Interessant ist, daß die Umschaltung auf den DIN-Zeichensatz keinen Einfluß auf die neuen Zeichen hat. Wenn vor dem Programmlauf schon der DIN-Zeichensatz eingeschaltet war, erscheint das dazugehörige A im neuen Gewand. Merkwürdig! Welchen Zeichensatz haben wir eigentlich bei $D000 herausgelesen? Wenn Sie durch gleichzeitiges Drücken der Commodore- und der Shift-Taste auf die kleinen Buchstaben umschalten, finden Sie das normale Zeichenbild. Der Grund dafür ist, daß wir in deren Zeichenmuster nicht eingegriffen haben, denn die liegen erst ab $3800. Bild 5 zeigt Ihnen, wo sich im Zeichen-ROM (und in gleicher Reihenfolge nach dem Kopieren ab $3000) welche Zeichen befinden:</p>
+
+        <p>Ein Problem istesnoch, denrichtigen Ort für die neuen Zeichenmuster zu finden. Es sollte weder einer sein, der durch ein längeres Basic-Programm überschrieben werden kann (wie im Beispiel ZEICHENSATZ,), noch darfer in einem anderen 16-KByte-Abschnitt liegen als der Bildschirmspeicher, noch sollte er bei 4096 beginnen, denn dort greift der Computerimmer aufdas Zeichen-ROM zu. Ein Weg, das Problem zu lösen ist es, den Basic-Start nach $4000 hochzulegen und die Zeichenmuster ab $2000 oder $3000. Das Hochlegen des Programms nach $4000 besorgt einfach der GRAPHIC-Befehl für uns. Wir brauchen dazu im Programm ZEICHENSATZ lediglich eine Zeile einzufügen:<br>
+            25 GRAPHIC1,1:GRAPHICO</p>
+
+        <p>Allerdings können wir dann keine Grafik-Befehle mehr verwenden, denn dann liegen die Zeichenmuster in der Bit-Mapundjede Änderung darin wirkt sich auf die Zeichen aus. Besonders verheerend wirkt ein SCNCLRI. Aber auch ein einfacher DRAW-Befehl kann Überraschendes bewirken. Probieren Sie doch mal<br>
+            DRAW1,9,0 TO 9,199<br>
+            nach dem Lauf unseres veränderten Programmes.</p>
+
+        <p>Übrigens: Ein Druck auf die STOP- und die RESTORE-Taste rückt alle Verhältnisse wieder ins normale Dasein zurück.</p>
+
+        <h2>Mehrere Bit-Maps</h2>
+
+        <p>Die Speicherstelle 2605 haben wir bislang sträflich vernachlässigt. Die oberen 4 Bit haben hier dieselbe Bedeutung wie in 2604, nur daß in den Grafik-Modi der BildschirmspeicheralsFarb-RAM dient, wie wiresbeim COLOR-Befehl ausführlich kennenlernen. Das Bit 3 aber hat mit der Position der Bit-Map zu tun. Bild 6 zeigt Ihnen, was dadurch bewirkt wird (bezogen auf den unteren 16-KByte-Bereich):</p>
+
+        <p>Das Setzen dieses Bit 3 geschieht durch<br>
+            POKE2605,PEEK(2605)OR8<br>
+            das Löschen mittels<br>
+            POKE2605,PEEK(2605)AND247</p>
+
+        <p>Nun rechnen wir rasch mal nach: Wir haben vier Bereiche zu je 16 KByte, auf die wir den VIC steuern können. In jeden dieser Bereiche passen zwei Bit-Maps (immer eine oben und eine unten). Dabei ist noch zu bedenken, daß der jeweilige Bildschirmspeicher im gleichen 16-KByte-Bereich liegen muß wie die Bit-Map. Damit Sie all diese verschiedenen Möglichkeiten ausprobieren können, wurde das Programm BIT-MAPTEST (Listing 3) geschrieben:</p>
+
+        <p>Nach dem RUN werden drei Zahlen abgefragt. Ientspricht dem Kennzeichen des jeweiligen 16-KByte-Abschnittes, W dem der Bildschirmstartadresse (bezogen auf den jeweiligen 16-KByte-Bereich) und B kann 0 oder 1 sein und legt die Bit-Map nach unten oder oben in dem jeweiligen 16-KByte-Abschnitt. Nach der Eingabe berechnet schaltet das Programm die neue Bit-Map und den neuen Bildschirm ein, löscht den Bereich und den Bildschirmspeicher und zeichnet eine Sinuskurve. Ein Tastendruck stellt wieder die normalen Verhältnisse her.</p>
+
+        <p>16-KByte-Abschnitt 0, oberer Bereich</p>
+
+        <p>Das ist zwar die normale Bit-Map. Die kann aber dadurch interessant werden, daß wir den Bildschirmspeicher und damit das Farb-RAM ändern können.</p>
+
+        <p>16-KByte-Abschnitt 1, oberer Bereich</p>
+
+        <p>Wenn der Bildschirm an das obere Ende des unteren Bereiches gelegt wird, damit er nicht dem bei $4000 beginnenden Basic-Text in die Quere kommt, funktioniert diese Kombination einwandfrei. Der untere Bereich ist für die Bit-Map ungeeignet, weil er das Basic-Programm beinhaltet. 16-KByte-Abschnitt 2, beide Bereiche. Hier sind sowohl unten als auch oben Bit-Maps möglich.</p>
+
+        <p>16-KByte-Abschnitt 3</p>
+
+        <p>Keiner der beiden Bereiche ist nutzbar, weil man im unteren Ein-und Ausgabebereich herumpfuscht, im oberen aber den Speicherteil ab $FF00 stört und damit unkontrollierte Verhältnisse im Computer schafft.</p>
+
+        <p>Der Bericht unseres Korrespondenten endet hier. Er wird sich auf die Suche nach der MMU machen, um uns dann davon zu erzählen.</p>
+
+        <address class="author">(Heimo Ponnath/dm)</address>
+    </article>
+</body>
+
+</html>

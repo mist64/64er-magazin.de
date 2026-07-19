@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hypra-Basic wird strukturiert</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="K. Visel, J. Haible, F. Gräf, S. Thiel, og">
+    <meta name="64er.issue" content="8/86">
+    <meta name="64er.pages" content="91-93">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX28">
+</head>
+
+<body>
+    <article>
+        <h1>Hypra-Basic wird strukturiert</h1>
+        <p class="intro">Durch neue Befehle ist es möglich, mit Hypra-Basic strukturiert zu programmieren. Für Einsteiger erklären wir ausführlich, wie man Module einbaut!</p>
+
+        <p>Zunächst einmal ein dickes Lob an unsere Leser. Die eingesandten Module sind wirklich gut. Das soll aber nicht heißen, das die Möglichkeiten von Hypra-Basic, dem Listing des Monats aus Ausgabe 4/85 auch nur annähernd ausgeschöpft wären. In Richtung Grafik und Sound zeigten sich noch keine Aktivitäten — obwohl gerade hier die Stärken des C 64 liegen. Unsere Aufforderung an alle Leser: Programmiert Grafik- und Sound-Module, denn hier gibt esein weites Betätigungsfeld.</p>
+
+        <p>Für alle diejenigen, die mit der Anleitung zu Hypra-Basic noch nicht zurechtkommen, zeigen wir Schritt für Schritt, wie man vom Äbtippen zur eigenen Erweiterung kommt (siehe Kasten).</p>
+
+        <address class="author">(K. Visel/J. Haible/F. Gräf/S. Thiel/og)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Module einbauen: so geht's</h2>
+
+        <p>Ba Besondere an Hypra-Basic ist sein modularer Aufbau, das heißt, Sie bauen sich Ihre persönliche Erweiterung, mit den Befehlen, die Sie wirklich benötigen. Um dies zu erreichen, sind einige Vereinbarungen notwendig. Jedes Modul muß einem bestimmten Format entspre_ chen. Auf der Diskette muß das Modul einen bestimmten Namen haben, und zu jedem Modul muß ein File mit den dazugehörigen Parametern existieren.</p>
+
+        <p>Auf der Diskette müssen sich »HYPRA-BASIC« (Haupt- programm), »BASIC .ASS« (Umrechnungsroutine und Interpreter-Erweiterung), sowie die Module mit ihren Parameter-Files befinden.</p>
+
+        <p>Die Namen der Module müssen dieses Format haben:<br>
+            "XERW ASS" »x«</p>
+
+        <p>ist die jeweilige Nummer Ge Moduls, zum Beispiel<br>
+            "38ERW .ASS". Das Leerzeichen vor ». ‚ASS« ist zu beachten.</p>
+
+        <p>Das dazugehörige müssen Sie aus den Angaben des Listing-Teils selbst erstellen. Dazu wählen Sie vom Hauptprogramm den Menüpunkt »PARAMETER EINGEBEN«, der mit F5 aufgerufen wird. Dann werden Sie zuerst nach der Modulnummer gefragt, die natürlich mit der entsprechenden Erweiterung übereinstimmen muß. Gleiches gilt für die Anzahl der Befehle. Sie ist im Listing-Teil immer angegeben. In diesem Beispiel sind es drei Befehle. Die nächste Eingabe ist der Name des ersten Befehls. Er ist beliebig, darf aber keine Basic-Schlüsselworte enthalten. In unserem Fall ist das »FRAME«. Die Startadresse des ersten Befehls ist 49152, das Ende liegt bei 49158. Daran angehängt sind 0 Datenbyte. Die Informationen für die anderen zwei Befehle entnehmen Sie Listing 1. Antworten Sie auf die Frage »Sind Sie sicher?« mit &lt;J&gt;, speichert Hypra-Basic die Parameter. Bei &lt;N&gt; wird in das Hauptmenü zurückgegangen.</p>
+
+        <p>Haben Sie alle Parameter-Files erstellt, können Sie sich die erste Erweiterung generieren. Wählen Sie also »ERWEITERUNG ERSTELLEN«. Dann geben Sie, jeweils durch &lt; RETURN> getrennt, die Nummern der gewünschten Module ein. Bei Eingabe von &lt; E> und nach Bestätigung der Sicherheitsabfrage werden die Parameter gelesen. Dann benötigt Hypra-Basic nur noch die Anfangsadresse der Erweiterung. Dabei wird zwischen »TABELLE« und »BEFEHLE« unterschieden. Die Tabelle darf nun nicht unter dem ROM liegen, der Bereich ab 49152 ist zunächst zu empfehlen. Gleichzeitig ist der Anfang der Tabelle die Startadresse der Erweiterung. Die Befehle selbst werden dann entweder daran angehängt, oder irgendwo unter das ROM gelegt. Meistens passen die Befehle hinter die Tabelle, so daß der Vorschlag von Hypra-Basic angenommen werden kann.</p>
+
+        <p>Hat der Computer die Erweiterung erstellt, dann steht sie lediglich im Speicher. Es empfiehlt sich also, diese jetzt zu speichern. Ist die Erweiterung gespeichert, brechen Sie das Programm mit RUN/STOP ab, und geben SYS 64738 ein. Laden Sie jetzt die Erweiterung mit »,8,l« und starten Sie sie mit SYS (Startadresse), hier mit »SYS 49152«.</p>
+
+        <h3>Schritt für Schritt:</h3>
+
+        <ul>
+            <li>Auf der Diskette müssen sich »HYPRA-BASIC« und »BA-SIC ASS« befinden.</li>
+            <li>Zu jedem Modul muß die entsprechende Parameterda-tei vorhanden sein. Diese wird unter Hypra-Basic erstellt.</li>
+            <li>Laden und starten Sie Hypra-Basic.</li>
+            <li>Wählen Sie den Menüpunkt »ERWEITERUNG ERSTEL-LEN«.</li>
+            <li>Geben Sie die Nummern der gewünschten Module, durch &lt; Return> voneinander getrennt, ein.</li>
+            <li>Beenden Sie die Eingabe mit &lt; E> und bestätigen Sie die Sicherheitsabfrage.</li>
+            <li>Wählen Sie die Startadresse der Erweiterung. Normalerweise ist das 49152.</li>
+            <li>Den Vorschlag für die Befehlstabelle können Sie über-nehmen, wenn nicht in den Bereich von 53248 bis 57343 geschrieben wird.</li>
+            <li>Speichern Sie dann die Erweiterung. Wenn Sie die Adresse für die Module übernommen haben, genügt die Eingabe eines Namens. Die Erweiterung wird dann mit », 8,1« geladen.</li>
+            <li>Das Aktivieren der neuen Befehle wird durch SYS 49152, also der Startadresse ausgelöst.</li>
+            <li>Die neuen Befehle stehen zur Verfügung</li>
+        </ul>
+    </article>
+</body>
+
+</html>

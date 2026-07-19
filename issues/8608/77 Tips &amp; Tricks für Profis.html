@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Angelika Bachhuber, tr, Curt Bauer, tr, Gabriel Range, tr, Henning Zipf, tr, Klaus Kuhl, tr, Klaus Lilienthal, tr, Michael Patra, tr, Stefan Zellin, tr, Thomas Froitzheim, tr, tr">
+    <meta name="64er.issue" content="8/86">
+    <meta name="64er.pages" content="77,80-81">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX24">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Endlich: Mit unserem Ascompiler aus der Ausgabe 1/86 und einem kleinen Trick ist es möglich, Interrupt-Routinen in Basic zu schreiben! Erwähnenswert ist auch das Windowing für den C 64!</p>
+
+        <p>Kannten Sie den schon? Wenn Sie ein Programm mit »SAVE CHR$(160) + CHR$(20) + "Name" + CHR$(34),8« auf Diskette speichern, so ist es nur noch mit genau derselben Zeichenfolge wieder in den Computer zu bekommen.</p>
+
+        <p>Ein »LOAD "??Name*" ‚8« weist die Floppy mit einem »file not found error« zurück. Für Nicht-Eingeweihte eine harte Nuß!</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>C 64-Programme auf den CBM-Computern</h2>
+
+        <p>Vorgehensweise:<br>
+            Laden des C 64-Programms (zum Beispiel von Kassette)<br>
+            sY 1024 eintippen (ruft den Monitor auf)<br>
+            .m 0400 0401 eintippen (genau ein Leerzeichen nach »m« ist wichtig!)<br>
+            Mit dem Cursor in die angezeigte Zeile hochgehen und ändern:<br>
+            .: 0400 00 01 08 00 00 00 ... Rest egal; mit &lt;RETURN&gt;verlassen!<br>
+            .X<br>
+            0<br>
+            Fertig!!!<br>
+            Zur Funktionsweise:</p>
+
+        <p>Mit dem Monitor wird eine leere Basic-Zeile 0 erzeugt. Der Zeiger auf die nächste Zeile wird auf den Anfang des C 64-Programms, nämlich $0801 gesetzt.</p>
+
+        <p>.x bewirkt einen Rücksprung in das normale Basic<br>
+            0 (RETURN) löscht diese Zeile 0 und verschiebt gleichzeitig das Programm an den im CBM üblichen Platz.</p>
+
+        <p>Diese Methode funktioniert auch dann noch, wenn das C 64-Programm bereits die Zeile 0 enthält.</p>
+
+        <address class="author">(Curt Bauer/tr)</address>
+
+        <h2>Hypra-Platos und Star SG 10</h2>
+
+        <p>Durch Eingabe einer neuen MSE-Zeile (mit der MSE-Funktion »Control-N«) im Programm »2. PRG« kann man Hypra-Platos auf den inzwischen weit verbreiteten Star-Drucker SG 10 anpassen. Dies betrifft die Adresse 39289 ($9979). In dieser Speicherstelle wird die Größe des Zeilenvorschubs festgelegt. Er muß beim Star SG 10 den Wert $0E anstatt $16 (Epson-Drucker) besitzen.</p>
+
+        <p>TODO LISTING</p>
+
+        <address class="author">(Klaus Lilienthal/tr)</address>
+
+        <h2>Y und Z dauerhaft getauscht</h2>
+
+        <p>Wer ärgert sich nicht über die vertauschte Anordnung der Buchstaben »Y« und »Z« auf dem C 64? Besonders diejenigen, die einen Schreibmaschinenkurs erfolgreich absolviert haben, sind gezwungen sich nun wieder umzustellen. Dabei müßte die Forderung heißen: Der Computer soll umgestellt werden!</p>
+
+        <p>Die meisten Textverarbeitungsprogramme, die auch deutsche Umlaute liefern, haben gleichzeitig die beiden oben genannten Zeichen DIN-Norm-gerecht vertauscht. Wenn man ein solches Textprogramm wieder ausschaltet, ist alles beim alten, das heißt die beiden Buchstaben liegen wieder an der falschen Stelle. Es gibt zwar einen Trick, wie man mit einem kleinen Programm die Tastatur softwaremäßig verändert, dieses Programm versagt aber bei dem weitverbreiteten Textprogramm »VIZAWRITE«, bei dem die Autoren beim Einbau der deutschen Umlauteleidernichtauch den Tausch von »Y« und »Z« vorgenommen haben. Daher wurde eine Lösung gesucht, wie man die Anderung dauerhaft vornehmen könnte: Man brennt sich einfach ein neues Kernel. Dazu verschiebt man es mit Hilfe der Transfer-Funktion eines Moni-Pa (zum Beispiel mit dem Befehl »T E000 FFFF 1000«) nach $1000.</p>
+
+        <p>Jetzt geht man mit dem Monitor an die Speicherstellen ab $1B8D (enthält die Tastenbelegung des C 64) und findet auf dem Bildschirm eine Anordnung von Speicherstellen vor, die entsprechend dem Bild 1 aussehen, wobei diese Hardcopy schon die Anderungen enthält, so daß man beim Vergleich genau erkennen kann, welche Bytes vertauscht wurden. Die jeweiligen zu ändernden Zahlen stellen den Code des Zeichens in hexadezimaler Schreibweise dar.</p>
+
+        <address class="author">(Stefan Zellin/tr)</address>
+
+        <h2>Schreiberling und Citizen 120 D</h2>
+
+        <p>Bei einer Computeranlage mit Drucker »Citizen 120 D« und Interface »Wiesemann 92000/G« müssen folgende Zeilen geändert werden:</p>
+
+        <p>Zeile 620 OPEN 1,4,1 : Z=PEKK(BZ)<br>
+            Zeile 800 POKE 768,61:OPEN 1,4,1:PRINT #1,1L$;:CLOSE 1:POKE 768,139</p>
+
+        <p>Mit dieser kleinen Änderung läuft der Schreiberling V2 (Ausgabe 2/86) nun fehlerfrei. Wir haben bei der ersten Version (Heft 10/85) alle OPEN-Befehle auf »1,4,1« geändert und auch diese Version läuft fehlerfrei.</p>
+
+        <p>Wir hoffen, daß wir mit diesem kleinen Tip manchem Freak helfen können.</p>
+
+        <address class="author">(Angelika Bachhuber/tr)</address>
+
+        <h2>Versteckspiel mit dem Directory</h2>
+
+        <p>Ein weiterer Trick beim Diskettenformatieren besteht in der Eingabe der Zeichen "N:" + CHR$(20) + CHR$(20) + CHR$(20) + CHR$(0) + CHR$(0) + CHR$(0) + "Name,ID" beim Formatieren.</p>
+
+        <p>So wird die normalerweise vor dem Disknamen stehende »Zeilennummer« O0 und der Anführungsstrich gleich nach dem Ausdrucken auf dem Bildschirm von den drei CHR$(20) (entsprechen dreimaligem Drücken der &lt;DELETE&gt; Taste) gelöscht. Danach wird durch drei Nullbytes das Programmende angenommen und das Directory-Listen abgebrochen. Dennoch lassen sich gespeicherte Programme wieder laden!</p>
+
+        <address class="author">(Henning Zipf/tr)</address>
+
+        <h2>Einzelschrittmodus für Basic-Programme</h2>
+
+        <p>Folgendes Listing (siehe weiter unten) ist wohl das kürzeste Single-Step-Programm der Welt.</p>
+
+        <p>Dieses Programm wird mit SYS 49152 aufgerufen. Der erste Teil schreibt in die Adresse $0308 und $0309 (Zeiger auf eine Routine, die CHRGET aufruft) die Adresse $COOB. Wenn nun der Interpreter ein neues Zeichen aus dem Basic-Programm holt, läuft er so lange durch eine Prüfschleife, bis Sie &lt;SHIFT&gt; gedrückt haben. Nun macht er normal weiter, bis ererneutein Zeichen holt. Um den Single-Step-Modus auszuschalten, müssen Sie das Maschinenprogramm ab $C01C aufrufen. Es schreibt in $0308 und $0309 wieder die alten Adressen. Nun aber zum Assembler-Listing:</p>
+
+        <p>TODO LISTING</p>
+
+        <address class="author">(Gabriel Range/tr)</address>
+
+        <h2>Abhilfe bei Resets durch Störimpulse</h2>
+
+        <p>Es hat sich bei mir mehrfach herausgestellt, daß der C 64 auf Störimpulse aus dem 220V-Netz mit einem Reset reagiert. Die »Überempfindlichkeit« des Computers kann sogar dazu führen, daß das Einschalten induktiver Lasten (Neonröhren in Nebenräumen) einen Reset des Computers bewirkt. Damit wird ein längeres Arbeiten mit dem Computer fast unmöglich. Erstaunlicherweise ist die Peripherie des C 64 dafür verantwortlich (was erklärt, warum das Problem oft erst längere Zeit nach dem Kauf des C 64 auftritt):</p>
+
+        <p>Es stellte sich nämlich heraus, daß die »UÜberempfindlichkeit« verschwand, wenn die Peripheriegeräte (Floppy, Drukker und Plotter) vom seriellen Bus des Computers entfernt wurden. Der Verdacht aufein zu langes Buskabel erwies sich aber als falsch. Mit einem Oszilloskop wurde nun insbesonders die Resetleitung des seriellen Busses mit, beziehungsweise ohne angeschlossene Peripheriegeräte beobachtet. Es zeigte sich dabei, daß die Geräte die Resetleitung (als sogenannter »activ low«-Eingang muß sie einen 5V-Pegel im Normalzustand haben) zusammen so belasteten, daß die Spannung schließlich bis auf fast den halben Wert absank.</p>
+
+        <p>Traten zusätzlich Störimpulse auf, so überlagerten sie sich auf die Resetspannung in Form hochfrequenter Nadelimpulse. Sie führten aber nur deswegen zu einem Reset, weil außerdem die Resetspannung durch die Belastung bereits zu niedrig war!</p>
+
+        <p>Die Abhilfe gegen die Störimpulse ist nun sehr einfach: Es muß nur erreicht werden, daß die Resetspannung auch bei Belastung nicht zu stark absinkt. Man schaltet dazu einfach einen Widerstand von der Resetleitung gegen +5V und eventuell zur Unterdrückung der Störimpulse parallel dazu noch zusätzlich einen Kondensator. Geeignete Werte hierfür sind zum Beispiel 1 Mikrofarad und 2,2 KQ.</p>
+
+        <p>Auf diese Weise lassen sich die offenbar verbreiteten Probleme mit Störimpulsen häufig beheben; dabei ist dieser Trick nichtsoteuer wie der Versuch, durch einen Entstörfilter Abhilfe zu schaffen.</p>
+
+        <address class="author">(Klaus Kuhl/tr)</address>
+
+        <h2>Windowing auf dem C 64</h2>
+
+        <p>Mit folgendem Einzeiler ist es möglich, Bildschirmfenster zu definieren, so daß sich sämtliche Bildschirmein- und -ausgaben nur noch in einem bestimmten Bereich abspielen:</p>
+
+        <p>20 POKE59639, (AN-1) AND255:POKE59652, EN: POKE59522, EN+L: POKE58719,EN:PRINT " (HOME) "</p>
+
+        <p>Die Variablen AN und EN geben die Zeilen an, von wo bis wo dasBildschirmfenster reichen soll. AN enthält die oberste Zeile des Bildschirmfensters, EN die unterste. Ein Beispiel: Das Bildschirmfenster soll von der zweiten bis zur zwölften Zeile reichen:</p>
+
+        <p>20 AN=2:EN=12:POKE59639, (AN-1) AND255:POKE59652, EN: POKE 59522, EN+1:POKE58719, EN: PRINT" (HOME) "</p>
+
+        <p>Hierbei muß man die im Handbuch aufgeführten Abkürzungen benutzen, da die Zeile sonst länger als die erlaubten achtzig Zeichen wird.</p>
+
+        <p>Die beiden Einzeiler setzen voraus, daß das Betriebssystem ins RAM kopiert wurde. Wenn man für diesen Zweck nicht auf Maschinensprache zurückgreifen will, kann man folgende Zeile benutzen.</p>
+
+        <p>10 A=16384: FORI=40960T049151: POKEI,PEEK(I) :POKEI+A, PEEK (I+A) :NEXT: POKE1, 53</p>
+
+        <p>Diese Art des Erzeugens von Bildschirmfenstern hat einen Nachteil. Die Taste &lt;CLR&gt; löscht auch den Bildschirm über dem Bildschirmfenster, die Taste &lt;CLR/HOME&gt; setzt den Cursor immer noch nach links oben in den Bildschirm und man kann das Bildschirmfenster mit Cursor-Up nach oben verlassen. Außerdem kann es unter Umständen geschehen, daß es zu Fehlfunktionen kommt, wenn der Cursor in der letzten Zeile des Bildschirmfensters steht und man nun über den rechten Rand schreibt. Diese Nachteile sind jedoch sehr leicht zu umgehen, da diese Funktionen selten nötig sind.</p>
+
+        <p>Die Bildschirmfenster können auch in Maschinensprache verwendet werden, wenn Ausgaben über die Kernelroutine »BSOUT« mit Einsprung $FFD2 erfolgen.</p>
+
+        <p>Um sich von den Möglichkeiten zu überzeugen, kann man die folgenden Zeilen eingeben:</p>
+
+        <p>30 POKE1,55:FORI=1T0999: PRINT"A"; :NEXT:PRINT"{ HOME, 4. DOWN} ":POKE1,53 40 PRINTSPC(RND(1)*25) "HALLO":GOTO4O</p>
+
+        <p>Eine mögliche Anwendung wäre zum Beispiel bei Adventures die Generierung eines Eingabe- und eines Ausgabefensters, so daß unten der Benutzer seine Eingaben macht, und im oberen Teil der Computer die Reaktionen zeigt.</p>
+
+        <address class="author">(Michael Patra/tr)</address>
+
+        <h2>IRQ-Routinen in Basic mit dem Ascompiler</h2>
+
+        <p>Mit dem Ascompiler hat der Basic-Programmierer die Möglichkeit, zeitkritische Unterprogramme in Maschinensprache zu realisieren. Manche Routinen (zum Beispiel Musik, Spritebewegung) hätte man aber schon gern als Interrupt. Dies ist mit dem Ascompiler leider nur durch Tricks möglich. Eine Methode werde ich nun beschreiben.</p>
+
+        <p>Beim Programmieren der Interruptroutine müssen folgende Regeln beachtet werden:</p>
+
+        <ul>
+            <li>Die Ablaufzeit eines Durchgangs sollte nicht zu lang werden (zum Beispiel bei Musik nicht erst am Ende des Stücks die Routine verlassen, sondern in regelmäßigen Abständen zwischen und während den einzelnen Tönen), da sonst die normale Arbeit des Computers sehr verlangsamt würde.</li>
+            <li>Die Interruptroutine wird mit »SYS59953« verlassen.</li>
+            <li>In der Interruptroutine darf nur einmal der Befehl »sys 59953« stehen. Zum Initialisieren der Interruptroutine muß sie vorher compiliert werden. Dann das Programm »IRQ INIT« eingeben, beziehungsweise laden (Listing 1), in Zeile 10 und in Zeile 20 das Lo- und Hi-Byte der Anfangsadresse der Interruptroutine ändern. Nun wird das Programm »IRO INIT« compiliert und gestartet. Der Interrupt sollte dann laufen. Wenn man ihn mit &lt;RUN/STOP-RESTORE&gt; stoppt, darf man das Programm »IRQ INIT« nicht nochmal aufrufen. Dann nimmt manzum lnitialisieren das compilierte Programm »IRQINIT2« (Listing 2), welches eine gekürzte Form der Routine »IRQ IN-IT« ist. Das Demo-Programm (Listing 3) zeigt, wie man eine Funktionstastenbelegung als Interrupt programmiert. Es fragt die Adresse 197 nach der zur Zeit gedrückten Taste ab. Wenn eseine Funktionstaste ist, wirdin den Tastaturpuffer eine Zeichenfolge gePOKEt.</li>
+        </ul>
+
+
+        <h3>Beschreibung des Programms »IRQ INIT«:</h3>
+
+        <p>TODO TABLE</p>
+
+        <h3>Vorgehensweise:</h3>
+
+        <ol>
+            <li>Programm »IRQ INIT2« laden und compilieren. Die Startadresse ist die Startadresse des fertigen Programms. »Endadresse + 1« aufschreiben.</li>
+            <li>Lo- und Hi-Byte im Programm »IRQ INIT2« auf die »Endadresse + l« ändern und noch mal compilieren.</li>
+            <li>Ihre eigene Interruptroutine laden und compilieren. Die Startadresse ist die aufgeschriebene »Endadresse + I«.</li>
+            <li>Programm »IRQ INIT«laden, Lo- und Hi-Byte ändern, compilieren und starten.</li>
+            <li>Fertiges Programm speichern.</li>
+        </ol>
+
+
+        <address class="author">(Thomas Froitzheim/tr)</address>
+    </article>
+</body>
+
+</html>
