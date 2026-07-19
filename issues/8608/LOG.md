@@ -64,10 +64,6 @@ All 96 loose crops were placed. Findings the user should know:
   printed on page 60, inside "50 Digi-Controller.html" (pages=50,59-65).
   Plain `mv` used (crop PNGs are untracked; only title.png is in git).
 
-## Un-transcribed table (dense +/-/x matrix)
-
-29 EDV für Lehrer: Tabelle 1 (Übersicht: Was kann mit einem Drucker ausgegeben werden, p31-32) left un-transcribed — dense 2-page +/-/x printer comparison matrix, OCR/vision not reliable enough for faithful transcription.
-
 ## Rule 13 (fill tables) — extraction & decisions
 
 All `TODO TABLE`/`TODO TABELLE` placeholders replaced; Pass-1 captioned,
@@ -125,9 +121,18 @@ Pass-3 uncaptioned/Bild/Steckbrief sweeps run. Placed tables and calls:
   verifier check #5 flags it — expected). SUPERBASE-Steckbrief PROG-
   Modus (Fortsetzung) extracted as a `<figure><table class="plain">`.
 
+- **29 EDV für Lehrer**: Tabelle 1 (»Eine Übersicht, was mit welchem
+  Drucker ausgegeben werden kann.« / p31–32 continuation »Übersicht: Was
+  kann mit einem Drucker ausgegeben werden (Schluß)«) — the dense 2-page
+  +/-/x printer-comparison matrix (12 printers × 73 capability rows,
+  9 sections) has now been transcribed from the 600-dpi scan and placed
+  as one merged `<figure><table>` (column-gridded per-cell vision read,
+  cross-checked against the 300-dpi render). Includes the numbered
+  printer key and the `(+ möglich, – nicht möglich, x verändert)` legend.
+  No cells left `[ILLEGIBLE]`. Blank cells in the print (many special-
+  character rows) are reproduced as empty cells verbatim.
+
 ### Left un-transcribed / out of scope
-- **29 EDV für Lehrer, Tabelle 1** — dense 2-page +/-/x printer matrix
-  (see entry above); not transcribable faithfully, left unplaced.
 - **84 64'er Extra** — the huge 5-language command-comparison table
   (364 rows) was placed, but the article's `<p class="intro">` is
   TRUNCATED mid-sentence in the import ("…Die folgende Übersicht") —
