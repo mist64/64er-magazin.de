@@ -217,6 +217,36 @@ Make this explicit in every sub-agent brief that involves body-text
 editing — it's the difference between a faithful archive and a
 modernised paraphrase.
 
+## Cross-cutting rule: resolve editorial ambiguity from prior issues
+
+Whenever a rule involves an **editorial judgment call** — category
+assignment, TOC wording/granularity, article pairing, banner/heading
+choices, byline handling, layout placement, and the like — and the
+current issue's inputs don't settle it, **look at how prior issues in
+`issues/*` handled the analogous case before deciding.** The already-
+published issues are the canonical precedent; the repo *is* the style
+guide.
+
+Procedure:
+
+1. **Grep the committed output of prior issues** for the analogous
+   article/section (by filename pattern, `<meta>` value, `toc.txt`
+   line, etc.). Prefer the most recent issues, but scan several — a
+   single neighbour can be an outlier.
+2. **Follow the dominant pattern**, not the first hit. If e.g. 8 of 9
+   issues categorise a call-for-submissions page as bare `Wettbewerbe`
+   and one uses a sub-line, the bare form wins; note the outlier but
+   don't copy it.
+3. **Only escalate to the user when precedent is absent or genuinely
+   conflicting** (no clear majority). When you do, present the
+   precedent you found and your recommendation — don't ask cold.
+4. Record the precedent you relied on in the sub-agent brief and in the
+   report, so the decision is auditable and the next issue inherits it.
+
+This is the default for *every* rule with an editorial degree of
+freedom. "Check the other issues" beats "ask the user" beats "guess" —
+in that order.
+
 - **Any sub-agent dispatched to apply a per-candidate rule must include
   verifier evidence inline in its report.** See the
   `## Evidence-in-report requirement` section of each rule for the
