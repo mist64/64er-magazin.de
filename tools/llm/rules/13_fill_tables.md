@@ -23,6 +23,42 @@ proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 5. **Vision-corrected HTML assembly** — Read the cropped image + the second-pass OCR text in parallel. Walk through OCR row by row; fix substitutions (`1`↔`l`↔`I`, `O`↔`0`, `rn`↔`m`, `cl`↔`d`); preserve old German spelling (`daß`, `muß`); preserve printed typos (`TPYE`, `SHURE`). If a cell is illegible, write `[ILLEGIBLE]`.
 6. **Emit HTML** per the shape rules below.
 
+## Dense mark-matrices (300 dpi tesseract + 600 dpi vision cross-check)
+
+Some tables are **+/–/x mark grids** (feature-vs-product comparison
+matrices — e.g. `29 EDV für Lehrer` Tabelle 1: 73 rows × 12 printers).
+tesseract is **useless for the cells** here — the `+`/`–`/`x` glyphs
+don't OCR (they come back as `.+++ .++* xer*`) and a single dropped
+space shifts every mark into the wrong column. Do NOT try to assemble
+these from OCR text. Instead:
+
+1. **tesseract (300 dpi) is only a structural scaffold** — use it to
+   read the *row labels* and *section headings* (they're real words),
+   never the mark cells. 300 dpi is tesseract's optimal input; never
+   feed it 600 dpi.
+2. **Read the mark cells from a 600 dpi vision crop**, column-gridded:
+   - Higher-res CMYK page scans live at
+     `~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff` (one per magazine
+     page; `031.tiff` = page 31). These are NOT pixel-aligned with the
+     `/tmp/…_pages_300` renders (different crop/offset) — locate the
+     table visually, don't reuse 300 dpi coordinates.
+   - Derive the column centres from the printed digit/name header, then
+     crop **per section** and, if needed, composite the digit header
+     directly above each sparse section so every mark's column is
+     unambiguous. Split into strips rather than downscaling — you need
+     per-cell legibility.
+   - Where the low-res overview and the 600 dpi read disagree on a
+     specific cell, the **600 dpi read wins**.
+3. **Sanity-anchor** the result: pick a column with a known pattern
+   (e.g. the specially-adapted printer that's `+` for almost everything,
+   or a daisy-wheel that's `–` for all graphics) and confirm it reads
+   that way top-to-bottom. Reproduce genuinely **blank** cells as empty
+   (many matrices leave "not applicable" blank, distinct from `–`).
+4. The orchestrator must **spot-verify at least one full section**
+   cell-by-cell against the 600 dpi scan before accepting a dense
+   matrix — a plausible-looking but column-shifted matrix is the
+   failure mode.
+
 ## HTML shape per print type
 
 - **Bordered data table with headers** → plain `<table>` with `<th>` header row.
