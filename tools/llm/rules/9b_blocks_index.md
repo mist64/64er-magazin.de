@@ -46,6 +46,7 @@ for png in ${tmp}_pages_300/p-*.png; do
   page=$(basename "$png" .png | sed 's/^p-//')
   tsv="${tmp}_p${page}_ocr.tsv"
   out="$dir/_tmp/blocks/p${page}.txt"
+  [ -s "$out" ] && continue      # idempotent/resumable: skip pages already done
   tesseract "$png" "${tsv%.tsv}" -l deu tsv 2>/dev/null
   awk -F'\t' 'NR>1 && $1==5 && $12!="" {
     b=$3;
