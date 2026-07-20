@@ -178,3 +178,13 @@ Pass-3 uncaptioned/Bild/Steckbrief sweeps run. Placed tables and calls:
 - **164 Vorschau** carries toc_title 'Vorschau 10/86' — verbatim from the
   TOC (the '10/86' is the print's own slip for 9/86; kept per
   print-verbatim policy).
+
+## 44 Urwald — Marktübersicht table recovered (single-pass, verify)
+
+The entire "Marktübersicht Programmiersprachen" table (pages 44-46,
+~39 language products × the a)/b)/c)-sub-field columns) was MISSING from
+the article — rule 13 Pass 3 didn't catch it (uncaptioned, spans 3
+pages, no crop existed). Recovered by scan transcription (600 dpi). The
+transcription agent stalled (infra stream timeout) BEFORE running its
+planned independent cross-check, so this table is a SINGLE-PASS read —
+spot-verify cells against the p44-46 scan before considering it final.
