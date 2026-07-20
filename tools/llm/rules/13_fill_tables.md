@@ -66,7 +66,7 @@ these from OCR text. Instead:
 - **Table with a real caption** → wrap the whole `<table>` in `<figure>` with `<figcaption>`. A "real caption" is text printed on the scan in one of: `Tabelle: …`, `Tabelle N: …`/`Tabelle N. …`, `Bild N: …`/`Bild N. …` (for numbered figure-tables), or `STECKBRIEF: …` (yellow callout). **Do NOT promote section headings or bold titles above a table to `<figcaption>`** — a bold "Erklärung der einzelnen Bearbeitungsroutinen" above a table is a heading, not a caption.
 - **The `<figcaption>` ALWAYS goes BELOW the table** inside the `<figure>`, even if the print places it above. Project convention.
 - **Table with a heading or no caption marker** → bare `<table>`, no `<figure>`.
-- **NEVER fabricate a caption.** A `<figcaption>` is only allowed when its exact text is printed on the scan; transcribe it verbatim. Do not compose a plausible-sounding descriptive title of your own — that is a fabrication (cf. the 8608/142 regression `Listing 1. Laufzeit-Testschleife in »C«`, invented and not in the print). When in doubt, emit a bare `<table>` with no caption rather than an invented one.
+- **NEVER fabricate a caption.** A `<figcaption>` is only allowed when its exact text is printed on the page (read it off the 9b blocks index or a 600 dpi scan crop; on scanned issues `pdftotext` is VOID per rule 27); transcribe it verbatim. Do not compose a plausible-sounding descriptive title of your own — that is a fabrication. When in doubt, emit a bare `<table>` with no caption rather than an invented one. (Conversely, don't delete a real caption as "invented" without checking the scan: 8608/142 `Listing 1. Laufzeit-Testschleife in »C«` IS printed in bold on p145.)
 
 ## "Bild N" can be a table, pseudo-code, or a text box
 
