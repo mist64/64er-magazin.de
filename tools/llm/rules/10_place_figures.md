@@ -54,6 +54,15 @@ For each `<figure>` block in `prg.txt`, in order:
    `N`). Use `pdftotext` first; if it disagrees with the scan on a
    program name, trust the article body's spelling (the body uses
    the name multiple times; the caption is a single OCR target).
+   **NEVER fabricate a caption.** Every word of the `<figcaption>`
+   must be read off the printed page (via `pdftotext` or the scan).
+   A plausible-sounding descriptive title you compose yourself is
+   still a fabrication and is forbidden — the 8608/142 regression
+   `Listing 1. Laufzeit-Testschleife in »C«` was made up and does
+   not appear in the print. If you cannot locate/read the printed
+   caption, do NOT invent one: leave a bare `Listing N.` (no title)
+   or the placeholder, and flag it in your report for a human.
+   "Reads plausibly" is not "is in the print."
 5. **Remove the placed block from `prg.txt`.** That keeps `prg.txt`
    as a running "remaining work" list. Drop the section comment too
    when its block is empty.
