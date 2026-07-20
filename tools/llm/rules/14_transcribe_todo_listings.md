@@ -87,6 +87,13 @@ principle):
   case opcode bytes, `>91 AND <64` impossible logical conditions).
 - Preserve BASIC checksummer brackets (`<238>`, `<004>`) on Checksummer
   listings.
+- **NEVER fabricate the `<figcaption>`.** The caption belongs to the
+  print, not to you. Transcribe it verbatim from the scan/`pdftotext`;
+  if you cannot read it, leave a bare `Listing N.` (no title) and flag
+  it — do not compose a plausible descriptive title. The 8608/142
+  regression `Listing 1. Laufzeit-Testschleife in »C«` was invented
+  and is not in the magazine. A made-up caption is a defect even when
+  it reads plausibly.
 - Preserve assembler comment columns and semicolons.
 - Pascal `:=`, `BEGIN`/`END`, `THEN`/`ELSE`, `ARRAY [n..m] OF`
   exactly.
