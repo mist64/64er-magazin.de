@@ -226,6 +226,38 @@ grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' issues/<YYMM>/*.html \
   | sort -u | head -200
 ```
 
+**CRITICAL: the capital-boundary regex above misses the most common
+jam class — lowercase-into-lowercase** (`dernoch`, `Sokann`,
+`Beieiner`, `wurdeindenC`, `denEEinsteig`, `Computereizu`,
+`neu zuladen`). These have NO internal capital, so the regex is blind
+to them, and an 8608 review found ~20 shipping after a Pass-3 run that
+relied on this regex alone. You MUST also detect these two ways:
+
+1. **Function-word-pair grep** — jams almost always fuse a short
+   function word to its neighbour. Sweep for a function word buried
+   inside a token (no space before/after it):
+   ```bash
+   grep -hoE '[a-zäöüß]{3,}(dem|den|der|die|das|ein|eine|und|oder|nicht|auch|nur|noch|man|sich|ist|zu|jeweils|keiner|gemacht|sein|ich|schon|hat|mit|von|auf|für)([a-zäöüß]|C 6|C 1)' \
+     issues/<YYMM>/*.html | sort -u
+   # and its mirror (function word + following word):
+   grep -hoE '(auf|mit|von|für|der|die|das|den|dem|ein|und|zu|so|da|bei|im|nach|wie)[a-zäöüß]{4,}' \
+     issues/<YYMM>/*.html | sort -u
+   ```
+   Each hit still goes through the two-gate procedure (char-count +
+   ground truth) — many are legit compounds (`aufwendig`, `damit`,
+   `sobald`, `dabei`) so DO NOT apply blind.
+2. **Word-stream diff against the 9b blocks index** (the most complete
+   method): tokenise the article body and the corresponding
+   `_tmp/blocks/p<NNN>.txt` and flag every position where the two
+   OCR engines disagree on a space. A disagreement is proof the print
+   has a boundary there (two engines never independently invent the
+   same split); settle the exact form with the block text or a crop.
+
+Because the two OCR engines sometimes drop the SAME space (the 8608
+`wurdeindenC 64ein` case — neither engine spaced it), the blocks index
+alone can't catch everything; a 600 dpi scan crop is the final
+tiebreaker for any function-word jam the greps surface.
+
 Most hits are legitimate CamelCase (`dBase`, `KByte`, `geoWrite`,
 `CompuServe`, `HiRes`, `MHz`, `gePOKEt`, `geSAVEt`, …) — skip those.
 Real fixes look like:

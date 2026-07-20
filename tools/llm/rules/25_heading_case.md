@@ -127,7 +127,7 @@ Critical guardrails:
 - **Don't change non-ALL-CAPS headings.** A heading that's already
   in natural case (e.g. 8606's `Universeller Programmcompressor`)
   stays untouched.
-- **Don't change `<h3>` Leserforum topic headings** — rule 18
+- **Don't change `<h2>` Leserforum topic headings** — rule 18
   handles those (their convention historically was Title Case;
   going forward Leserforum h2s should also be natural case, but
   that's rule 18's call).
