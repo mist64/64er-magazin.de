@@ -76,7 +76,47 @@ run a one-line `pdftotext` query on the article's page to confirm that
 the print does NOT carry the same anomaly. The PDF's embedded text layer
 (or in its absence, pdftotext's own extraction) is the closest
 machine-readable proxy for the print's actual letterforms — closer than
-our HTML, which has been through Tesseract.
+our HTML, which has been through Tesseract — **UNLESS the PDF text
+layer is itself OCR of the same scan, in which case it is void as
+evidence (see the independence test below).**
+
+### FIRST: test whether the PDF text layer is independent evidence
+
+This is the gate before the gate, run **once per issue**. A PDF text
+layer is only a valid print proxy if it was derived from the
+publisher's typesetting, NOT re-OCR'd from the scan. If it is re-OCR of
+the same scan, it reproduces the HTML's own OCR errors and can *never*
+say "print typo" — trusting it is circular (the 8608 failure: rule 27
+"confirmed" `WerhatErfahrungen mitdem` as print-faithful because
+pdftotext returned the same jam, but the 600 dpi scan clearly prints
+"Wer hat Erfahrungen mit dem").
+
+Independence test:
+```bash
+# sample ~15 known HTML anomalies (lost-space jams, glyph confusions)
+# and check how many pdftotext reproduces VERBATIM
+pdftotext -layout -f <pg> -l <pg> issues/<YYMM>/64er_19XX-XX.pdf - | grep -iE 'anomaly1|anomaly2|…'
+```
+If pdftotext reproduces most of the sampled anomalies identically →
+**the layer is the same OCR generation → VOID as evidence.** In that
+case:
+- pdftotext can NEVER authorise a "leave (print typo)" decision — it
+  only agrees with the HTML's own errors.
+- Settle every candidate instead by an **independent** source:
+  1. the rule-9b tesseract blocks index (`issues/<YYMM>/_tmp/blocks/p<NNN>.txt`)
+     — a DIFFERENT OCR engine on the same scan. When two OCR engines
+     drop *different* spaces / read *different* glyphs, the print has
+     the space/glyph the disagreement reveals — apply the fix.
+  2. for anything still ambiguous, a **600 dpi scan crop** read by a
+     sub-sub-agent (`~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff`).
+- The `internsiv` precedent (leave it) is valid ONLY when the text
+  layer is independent evidence; when the layer is non-independent,
+  `internsiv`-style tokens must be settled by the scan, not by the
+  circular proxy.
+
+Only when the independence test PASSES (pdftotext diverges from the
+HTML's anomalies) does the original `pdftotext`-as-proxy procedure
+below apply verbatim.
 
 ```bash
 pdftotext -layout -f <page> -l <page> issues/<YYMM>/64er_19xx_xx.pdf - \
@@ -338,9 +378,12 @@ grep -h "Übertragungsgeschwindigkeiten von" "$dir"/*.html >/dev/null && \
 
 ## Notes / lessons
 
-- This rule runs ONCE per issue, right after rule 5 (split). It
-  produces one big commit with many small word fixes; commit it
-  separately so the diff is reviewable.
+- This rule runs ONCE per issue, at its numbered position (27) — AFTER
+  the table/listing transcription rules (13/14) so their transcribed
+  text is also swept. (An earlier draft said "right after rule 5
+  (split)"; that was wrong — running before 13/14 would miss all
+  transcribed body text.) It produces one commit with many small word
+  fixes; commit it separately so the diff is reviewable.
 - Word-level only — see rule 0's "OCR cleanup granularity"
   cross-cutting rule and [[feedback-print-verbatim]]. Re-typing a
   sentence "more clearly" is forbidden even if every word change

@@ -9,7 +9,12 @@ collected from `(byline)` paragraphs.
 
 For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
 
-- **filename** = `<first-page> <h1-without-page-numbers>.html`
+- **filename** = `<first-page> <h1-without-page-numbers>.html`. The
+  filename derives from the **escaped HTML text** of the `<h1>` (the
+  raw markup, not the rendered text), so an entity like `&amp;`
+  appears **literally** in the filename (e.g. a file named
+  `… Tips &amp; Tricks.html`, not `… Tips & Tricks.html`).
+  Filesystem-illegal chars `? / :` are sanitised to `_`.
 - **`<title>`** = the cleaned `<h1>` text
 - **`64er.pages` meta** = the bracketed page numbers
 - **`64er.issue` meta** = the issue id passed in (or auto-derived from the
@@ -60,14 +65,21 @@ After the script:
 # 1. how many articles came out
 ls issues/8607/*.html | wc -l                          # expect dozens
 
-# 2. each file's <h1> matches its filename (modulo sanitisation)
+# 2. each file's <h1> matches its filename (modulo sanitisation).
+#    split sanitises the filesystem-illegal chars `? / :` → `_`, so
+#    apply the SAME substitution to the h1 before comparing — else a
+#    file `146 Billiges Vergnügen_.html` vs h1 `Billiges Vergnügen?`
+#    false-MISMATCHes.
 for f in issues/8607/*.html; do
   base=$(basename "$f" .html | sed -E 's/^[0-9]+ //')
-  h1=$(grep -oE '<h1>[^<]+</h1>' "$f" | head -1 | sed -E 's#</?h1>##g')
+  h1=$(grep -oE '<h1>[^<]+</h1>' "$f" | head -1 | sed -E 's#</?h1>##g' | tr '?/:' '_')
   [ "$base" = "$h1" ] || echo "MISMATCH: $f  (file:'$base'  h1:'$h1')"
 done
 
-# 3. no stray <h1> in the body (each file should have exactly one)
+# 3. no stray <h1> in the body (each file should have exactly one).
+#    DOCUMENTED EXCEPTION: Leserforum legitimately has ZERO <h1> —
+#    rule 18 restructures it with a <header> banner instead of an
+#    <h1>. Expect n=0 for the Leserforum file; that's not a failure.
 for f in issues/8607/*.html; do
   n=$(grep -c '<h1>' "$f"); [ "$n" -eq 1 ] || echo "n=$n  $f"
 done

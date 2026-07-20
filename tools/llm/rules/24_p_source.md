@@ -22,10 +22,13 @@ default to "leave alone unless the mechanical trigger fires".
 ### Mechanical trigger (replaces vague "sits at end of article" language)
 
 A paragraph qualifies as `<p class="source">` iff it is the **last
-content block before the next `<h2>` or before `</article>`** AND it
-functions as a pointer to a third party (vendor / distributor /
-author / book / address). This single trigger covers two article
-shapes:
+content block before the next `<h2>`, `<h3>`, `</section>`, or before
+`</article>`** AND it functions as a pointer to a third party (vendor
+/ distributor / author / book / address). The `<h3>` and `</section>`
+neighbours cover two more shapes: **Tips & Tricks columns** whose
+sub-sections are `<h3>` headings, and **Leserforum Info: footers**
+that sit before a closing `</section>`. This single trigger covers
+these article shapes:
 
 - **Single-topic article**: source is the last child of `<article>`
   after `<address class="author">`.
@@ -34,7 +37,8 @@ shapes:
   source-candidate slot at its own tail — the last block before the
   next `<h2>` (or the article end).
 
-If the paragraph is NOT in that section-tail position, it does NOT
+If the paragraph is NOT in that section-tail position (last block
+before `<h2>`, `<h3>`, `</section>`, or `</article>`), it does NOT
 qualify, no matter how source-y it reads (e.g. mid-prose vendor
 mention).
 
@@ -94,8 +98,8 @@ footer. Leave as plain `<p>`:
   is NOT `<p class="source">` — it's `<address class="author">`.
 - A **mid-section / mid-prose vendor mention** — fails the section-tail
   trigger above. Drop the class. If it's not the last content block
-  before the next `<h2>` or `</article>`, it doesn't qualify, no
-  matter how source-y the prose reads.
+  before the next `<h2>`, `<h3>`, `</section>`, or `</article>`, it
+  doesn't qualify, no matter how source-y the prose reads.
 
 A paragraph qualifies as `<p class="source">` when **all** of the
 following hold:
@@ -236,8 +240,9 @@ PY
 )" "$dir"
 
 # 4. mechanical section-tail trigger: every <p class="source"> must
-#    have its next sibling block be <h2> or </article>. Anything else
-#    means it's mid-section, not section-tail — likely false positive.
+#    have its next sibling block be <h2>, <h3>, </section> or
+#    </article>. Anything else means it's mid-section, not
+#    section-tail — likely false positive.
 python3 -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
@@ -251,10 +256,14 @@ for f in sorted(os.listdir(d)):
         if not nxt:
             continue
         t = nxt.group(1)
-        # acceptable section-tail neighbours: <h2 …>, </article>,
-        # or a sibling <p class="source"> (multi-paragraph footer
-        # block — explicitly allowed by Pass 3 of this rule).
+        # acceptable section-tail neighbours: <h2 …>, <h3 …>,
+        # </section>, </article>, or a sibling <p class="source">
+        # (multi-paragraph footer block — explicitly allowed by
+        # Pass 3 of this rule). <h3> covers Tips&Tricks sub-sections;
+        # </section> covers Leserforum Info: footers.
         if (re.match(r'<h2\b', t) or
+            re.match(r'<h3\b', t) or
+            re.match(r'</section>', t) or
             re.match(r'</article>', t) or
             re.match(r'<p class="source"', t)):
             continue

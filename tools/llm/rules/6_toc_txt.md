@@ -86,7 +86,7 @@ grep -nE '^$|[[:space:]]$|^[[:space:]]' issues/<YYMM>/toc.txt && echo "BAD"
 #    appears in toc.txt (run this once all toc_category metas are filled):
 python3 - <<'PY'
 import glob, re
-issue = '8607'
+issue = '<YYMM>'   # e.g. '8608' — set to the issue being built
 toc = set(line.strip() for line in open(f'issues/{issue}/toc.txt') if line.strip())
 missing = set()
 for f in glob.glob(f'issues/{issue}/*.html'):

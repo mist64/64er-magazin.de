@@ -155,10 +155,16 @@ The sub-agent must:
      pseudo-code / Bild-labelled tables).
    - Pass 2: `grep -l 'TODO TABLE' issues/<YYMM>/*.html` — every hit
      MUST be replaced.
-   - Pass 3: visually scan the page thumbnails for uncaptioned
-     marketplace / comparison / yellow-callout tables the prose
-     introduces with "in der folgenden Übersicht", "wir haben
-     zusammengefaßt", etc.
+   - Pass 3 (MANDATORY, mechanical — NOT a visual thumbnail scan):
+     sweep rule 9b's blocks index for uncaptioned tables, exactly as
+     the normative "Sweeping captions across a whole issue → Pass 3"
+     section above specifies. Run both blocks-index greps (known
+     callout heading words, and narrow-column multi-line blocks),
+     crop+decide each candidate, and REPORT the pages walked /
+     candidates found / extracted / skipped-with-reason. Then run
+     the mechanical Pass-3 counters (Verification #6 and #7). A
+     "visually scan the thumbnails" shortcut is NOT sufficient and
+     is how Pass 3 gets under-covered.
 4. For each target, run the tesseract block-summary → crop → second
    tesseract pass pipeline described above. Use sub-sub-agents for
    image / vision reads.

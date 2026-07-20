@@ -20,14 +20,21 @@ DFÜ-<a href="NEWS:">NEWS:</a> DATEX-P-PARAMETER
 The same misfire affects other "scheme-prefix"-like words: `TEL:`,
 `FAX:`, `MAILTO:`, `FTP:`, anything followed by a `:`.
 
-## Fix at source: rule 3
+## Fixed at source: rule 3 (already done)
 
-Rule 3 (`3_md_to_html.sh`) currently passes `+autolink` unconditionally.
-Drop it. 1986 article text never has a real URL, so we lose nothing.
+This was a one-time migration, now complete: `3_md_to_html.sh` no
+longer passes `+autolink` (its flags are
+`+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty`;
+the omission is documented in a comment in that script, and rule 3's
+notes explain why). **Do NOT re-instruct a sub-agent to edit rule 3's
+script** — that migration already happened.
 
-After the change, the discount flags become
-`+html,+github-listitem,+strikethrough,+tables,+fencedcode` —
-without `+autolink`.
+This rule's remaining job is therefore purely defensive:
+1. **Verify** rule 3 doesn't pass `+autolink` (this rule's
+   verification #2 does exactly that — a guard against regression).
+2. **Sweep for damage** only in issues that were converted *before* the
+   rule-3 fix; a freshly-converted issue will have zero `<a href>`
+   wrappers (verification #1 confirms), and this rule is a no-op for it.
 
 ## Fix existing damage in the issue
 
@@ -45,8 +52,9 @@ match in context).
 
 ## Briefing for the sub-agent
 
-1. Update `tools/llm/rules/3_md_to_html.sh`: drop `+autolink` from
-   the Discount flags.
+1. **Verify** `tools/llm/rules/3_md_to_html.sh` does NOT pass
+   `+autolink` (it already doesn't — this is a regression guard, not an
+   edit). Do not modify the script.
 2. Sweep every article in `issues/<YYMM>/*.html`:
    ```bash
    grep -nE '<a href="[^"]+">[^<]*</a>' issues/<YYMM>/*.html

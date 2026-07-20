@@ -10,6 +10,43 @@ The script is reusable across issues. The mapping itself is one-shot per
 issue — you build it from the printed TOC (see the previous step for the
 `toc.txt` it must agree with) and feed it to this script.
 
+## Sibling meta: `64er.toc_title` (also filled from the printed TOC here)
+
+Rule 5 (split) leaves a commented placeholder
+`<!-- <meta name="64er.toc_title" content="XXX"> -->` in every article.
+This meta carries **the article's wording as printed in the
+Inhaltsverzeichnis (TOC)** — which is often richer than the article's
+own `<h1>`/`<title>` (e.g. TOC `Die besten Spiele unter 15 Mark` vs
+article `Billiges Vergnügen?`; TOC `Neue Serie: C 64 selbst repariert`
+vs `Die Axt im Haus… (1)`). The site's issue page renders `toc_title`
+when present, falling back to `toc_category` then `<title>`.
+
+Because you are already reading the printed TOC page here to build the
+`toc_category` mapping, capture the TOC wording in the same pass:
+
+- For each article, set
+  `<meta name="64er.toc_title" content="<verbatim TOC wording>">`,
+  placed immediately **after** the `toc_category` line, **only when the
+  TOC wording differs from the article's `<title>`**. If they are the
+  same, DELETE the placeholder comment (don't ship a redundant
+  toc_title, and don't leave the `XXX` comment — same rule as
+  `index_title` in rule 20).
+- Recurring rubrics whose TOC line is just the rubric name
+  (Leserforum, Bücher, Vorschau, Fehlerteufelchen, Impressum, Editorial)
+  get no `toc_title` — delete the placeholder.
+- Verbatim from the TOC print (anti-memory): the TOC often abbreviates
+  or expands differently than the headline; type what the TOC page
+  shows, Title/natural-cased as the TOC prints it.
+
+Verification: no `<!-- <meta name="64er.toc_title" content="XXX"> -->`
+comment survives in any article, and every `toc_title` value is
+non-empty and not equal to that file's `<title>`.
+```bash
+grep -l 'toc_title" content="XXX"' issues/<YYMM>/*.html   # expect: none
+```
+(8608 shipped 44 stale `toc_title` placeholders because no rule owned
+this — that is the hole this section closes.)
+
 ## The mapping format
 
 A TSV stream on stdin: one row per article file, two tab-separated

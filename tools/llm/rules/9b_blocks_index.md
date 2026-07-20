@@ -75,6 +75,11 @@ for png in ${tmp}_pages_300/p-*.png; do
                                        # locale-aware sort abort ("Illegal
                                        # byte sequence") and emit an empty
                                        # blocks file; raw-byte sort is safe.
+  # Blank / ad / cover pages legitimately produce no blocks. Write a
+  # sentinel so (a) verifier #2 doesn't flag them as errors and (b) the
+  # `[ -s "$out" ] && continue` resume above treats them as done and
+  # doesn't re-OCR the blank page on every run.
+  [ -s "$out" ] || echo "# blank page (no OCR text)" > "$out"
 done
 ```
 
@@ -115,9 +120,13 @@ n_blocks=$(ls "$dir/_tmp/blocks/"p*.txt 2>/dev/null | wc -l | tr -d ' ')
 [ "$n_pages" = "$n_blocks" ] || \
   echo "  WARN: $n_pages pages rendered, $n_blocks block files"
 
-# 2. every blocks file is non-empty (a body page has many blocks)
+# 2. every blocks file is non-empty (a body page has many blocks).
+#    Blank/ad/cover pages carry only the "# blank page (no OCR text)"
+#    sentinel — those are legitimate, not errors, so exempt them.
 for f in "$dir/_tmp/blocks/"p*.txt; do
-  [ -s "$f" ] || echo "  empty: $f"
+  [ -s "$f" ] || { echo "  truly empty (no sentinel): $f"; continue; }
+  grep -q '^# blank page' "$f" && continue   # sentinel = legit blank page
+  grep -q '^block=' "$f" || echo "  no blocks and no sentinel: $f"
 done
 
 # 3. spot-check format: every line should be 'block=N bbox=WxH+X+Y text= ...'

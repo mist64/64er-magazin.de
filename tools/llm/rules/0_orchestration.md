@@ -108,6 +108,78 @@ When the completion notification arrives:
 5. Report to the user with: sub-agent summary + verification result
    + suggested next action (commit / re-dispatch / decision needed).
 
+## Commit & staging discipline (MANDATORY)
+
+Two real incidents on the 8608 build trace to loose staging:
+a rename-only commit that silently dropped four files' content edits
+(the `git mv` staged instantly, the content edits never got staged and
+were lost until re-applied), and 25 image crops swept into an unrelated
+commit by `git add -A`. Both are preventable:
+
+1. **Never `git add -A` / `git add .` during an issue build.** Stage by
+   **explicit pathspec** of the rule's expected file set. Several rule
+   scripts self-stage (`3_md_to_html.sh`, `5_split.sh`,
+   `7_toc_category.sh` run `git add`/`git rm`), so the index may already
+   be partly populated when you arrive — reconcile it deliberately, per
+   file, before committing.
+2. **Rules that BOTH edit content AND rename** (rule 25 is the prime
+   case: it rewrites the h1/`<title>` *and* `git mv`s the file) are the
+   danger zone. `git mv` records with 100% similarity ("0 insertions")
+   if the content matches; if you staged the rename before the content
+   edit landed, the content is silently lost. Stage the content edit
+   and the rename together, then verify (next step).
+3. **Post-commit verification is mandatory — verify HEAD, not the
+   working tree.** After every commit run:
+   ```bash
+   git show --stat HEAD          # file list matches the expected set?
+   git status --short            # MUST be clean; a dirty tree = something unstaged
+   ```
+   For a content+rename rule, additionally `git show HEAD -- "<new path>" | head`
+   and confirm the content diff is non-empty (not a bare rename).
+   Checking the *working tree* passed verification while the *commit*
+   was empty is exactly how the rule-25 loss went unnoticed.
+
+## Scope confinement (every sub-agent brief)
+
+Add to every dispatch: **the sub-agent may write only the files its
+rule owns.** All scratch/rendered artifacts go under
+`/tmp/64er_<YYMM>_*` or `issues/<YYMM>/_tmp/` — never loose in the issue
+directory. (8608 accumulated `Archive.zip`, `out.txt`,
+`png/{bw,c,…}/` and stray page crops in the issue dir from agents
+overstepping.) A sub-agent that renders/crops for its own OCR must
+delete or /tmp-scope those files; the issue dir holds only shippable
+content.
+
+## End-of-issue gates (run before declaring an issue done)
+
+The per-rule verifications catch per-rule failures; these catch what
+falls between rules:
+
+1. **No stray TODO.** `grep -rn 'TODO' issues/<YYMM>/*.html` must be
+   empty, OR every hit must be an entry in `LOG.md` explicitly
+   dispositioned (transcribed, or user-acknowledged permanent). Ad-hoc
+   markers (`TODO VERIFY LISTINGS ABOVE!`) are invisible to the
+   per-rule greps (which each match only their own marker vocabulary),
+   so only this generic sweep catches them.
+2. **Article-set completeness.** Compare the split article set against
+   the printed TOC page entries AND the previous issue's recurring
+   rubrics (Editorial, Aktuelles, Leserforum, Fehlerteufelchen, Bücher,
+   **Impressum**, Vorschau). Every printed-TOC entry must have a
+   matching start-page file. On 8608 the Impressum (printed p.163) was
+   dropped before rule 5 and nothing noticed — the next issue's rule 16
+   then has no Impressum to expand editor initials from.
+3. **LOG.md is the audit trail — every rule contributes.** Any rule
+   that finds a body-text gap, an un-transcribable region, a print
+   oddity, or a deferred decision writes it to `LOG.md`. At issue end,
+   **every `LOG.md` "known gap" must be explicitly dispositioned**
+   (fixed, or user-acknowledged as permanent) — a scope note like
+   "out of table scope, not repaired" must not be the final word on a
+   reader-visible defect (e.g. 8608's truncated `84` intro).
+4. **No unfilled placeholder comments.** Commented-out
+   `<!-- <meta name="…" content="XXX"> -->` templates left by rule 5
+   are either filled by their owning rule or deleted — they must not
+   ship as litter (8608 shipped 44 stale `toc_title` placeholders).
+
 ## Lessons / things to watch
 
 - A sub-agent without a verification gate is just a different opaque

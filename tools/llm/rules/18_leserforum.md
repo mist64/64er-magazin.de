@@ -31,7 +31,7 @@ generator needs to render the rubric banner.
         </header>
 
         <section>
-            <h2>Topic title in Title Case?</h2>
+            <h2>Topic title in natural case?</h2>
 
             <div class="q">
                 <p>Question text…</p>
@@ -61,9 +61,12 @@ no overall author; per-question authorship lives inside each
 ## Per-section anatomy
 
 Inside each `<section>`:
-- `<h2>` — topic heading in **Title Case** (OCR import usually
-  delivers ALL CAPS; convert). Empty-headed tail letters (page-32
-  style) get a `<section>` with no `<h2>`.
+- `<h2>` — topic heading in **German natural (sentence) case** (OCR
+  import usually delivers ALL CAPS; convert per rule 25's natural-case
+  rules — NOT English Title Case). Older issues (8601–8605) used Title
+  Case; new issues use natural case for both Leserforum and article
+  headings. Empty-headed tail letters (page-32 style) get a
+  `<section>` with no `<h2>`.
 - One or more `<div class="q">` — questions. Multiple `<div class="q">`
   per section when the editor groups two readers asking the same
   thing.
@@ -122,7 +125,7 @@ The sub-agent must:
 3. Add `<header><img src="<START>-0.png" alt="Leserforum"
    title="Leserforum"></header>` to the article.
 4. Change `<article>` to `<article class="qa">`.
-5. For every `<h2>` topic heading: ALL CAPS → Title Case; wrap
+5. For every `<h2>` topic heading: ALL CAPS → German natural case (rule 25); wrap
    topic in `<section>`. Empty-headed page-32-style tail letters
    get a `<section>` with no `<h2>`.
 6. Inside each `<section>`:
