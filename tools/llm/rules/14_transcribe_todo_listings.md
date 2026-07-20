@@ -88,12 +88,14 @@ principle):
 - Preserve BASIC checksummer brackets (`<238>`, `<004>`) on Checksummer
   listings.
 - **NEVER fabricate the `<figcaption>`.** The caption belongs to the
-  print, not to you. Transcribe it verbatim from the scan/`pdftotext`;
-  if you cannot read it, leave a bare `Listing N.` (no title) and flag
-  it — do not compose a plausible descriptive title. The 8608/142
-  regression `Listing 1. Laufzeit-Testschleife in »C«` was invented
-  and is not in the magazine. A made-up caption is a defect even when
-  it reads plausibly.
+  print, not to you. Transcribe it verbatim from the 9b blocks index
+  or a 600 dpi scan crop (on scanned issues `pdftotext` is VOID per
+  rule 27); if you cannot read it, leave a bare `Listing N.` (no
+  title) and flag it — do not compose a plausible descriptive title.
+  A made-up caption is a defect even when it reads plausibly. Equally,
+  do not delete a genuine caption as "invented" without a scan check:
+  8608/142 `Listing 1. Laufzeit-Testschleife in »C«` IS printed in
+  bold on p145, so it is correct, not a fabrication.
 - Preserve assembler comment columns and semicolons.
 - Pascal `:=`, `BEGIN`/`END`, `THEN`/`ELSE`, `ARRAY [n..m] OF`
   exactly.
