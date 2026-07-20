@@ -8,7 +8,7 @@ survive. Side-effect: a sweep also catches stray mid-body `(byline)`
 paragraphs that split.py missed and converts them to
 `<address class="author">`.
 
-## Three rules
+## Four rules
 
 **Rule 1 — most articles fill from bylines.** For a normal article,
 `content` lists the bylines that appear in the body, in the order
@@ -73,6 +73,15 @@ author appearing in the order their tip is printed.
 AND the article has a lead editor distinct from the tip authors. A
 news-roundup with shared editor initials (Aktuelles, DFÜ-NEWS) is
 NOT the exception — it's the default; repeat initials.
+
+**Bücher uses the DEFAULT (per-byline expansion), NOT the tip-column
+dedupe.** The Bücher column is a per-book structure: one `<h2>` per
+reviewed book, each followed by that book's own byline. It has **no
+lead editor** heading the whole column (unlike Tips & Tricks, whose
+column intro is bylined by the lead editor). So its meta lists **each
+book's byline in body order** (per-byline expansion, repeats
+included) — do NOT dedupe with a lead-editor-first entry, because
+there is no lead editor to put first.
 
 **Anti-pattern.** Don't mix the two shapes within one article: don't
 dedupe inside an Aktuelles-style roundup, don't expand-with-repeats

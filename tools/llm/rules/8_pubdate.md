@@ -58,8 +58,13 @@ datetime.date.fromisoformat(lines[0])   # raises if malformed
 print(f'{fp}: {lines[0]} OK')
 PY
 
-# Cross-check that the date matches the README schedule:
-grep -E "$(basename "$(dirname pubdate.txt)" | sed -E 's#^([0-9]{2})([0-9]{2})$#0\2/\1#')" README.md
+# Cross-check that the date matches the README schedule. README bullets
+# are "MM/YY: TT. Monat 20JJ" (e.g. "08/86: 19. Juli 2026"). Pass the
+# issue id EXPLICITLY — the old `dirname pubdate.txt` form was a no-op
+# (`dirname pubdate.txt` is always ".", so the sed produced nothing and
+# grep matched every line). For issue YYMM, grep "MM/YY":
+YYMM=8608                                  # this issue's id
+grep "${YYMM:2:2}/${YYMM:0:2}" README.md   # 8608 → grep "08/86" README.md
 ```
 
 A small build check (will refuse if pubdate is in the future without

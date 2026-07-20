@@ -26,9 +26,22 @@ absent from some issues (e.g. 7/86 has no Bücher article). The
 correct behavior is to verify the article exists, and if it doesn't,
 report it as N/A and move on.
 
-Test: `ls "issues/<YYMM>/"*[Bb]?cher*.html` (similar greps for
-`*Fachredakteur*`, `*Editorial*`, `*Fehlerteufelchen*`). If the glob
-matches nothing, that rubric doesn't exist in this issue.
+Test: `ls "issues/<YYMM>/"*[Bb]?cher*.html` (similar globs for
+`*Fachredakteur*`, `*Fehlerteufelchen*`). **Bücher and
+Fehlerteufelchen can stay filename-glob** — their article titles equal
+the rubric name, so the glob is reliable.
+
+**Editorial must NOT use a filename glob.** The editorial article is
+named by its headline, not by the word "Editorial" (8608's editorial
+is `8 Ja oder nein ….html`), so `ls *Editorial*.html` misses it.
+Detect Editorial by its stable `64er.id` instead:
+
+```bash
+grep -l '64er.id" content="editorial"' issues/<YYMM>/*.html
+```
+
+If that grep matches nothing, the issue has no editorial. Same clean
+skip applies.
 
 ## Briefing for the sub-agent
 
@@ -98,8 +111,10 @@ Critical guardrails:
 ```bash
 dir=issues/<YYMM>
 
-# For each present rubric, verify the banner + insertion
-for rub in Editorial Bücher Fehlerteufelchen Fachredakteur; do
+# Editorial is detected by stable id (its filename is a headline, not
+# the word "Editorial"); the other rubrics by filename glob.
+editorial=$(grep -l '64er.id" content="editorial"' "$dir"/*.html 2>/dev/null)
+for rub in Bücher Fehlerteufelchen Fachredakteur; do
   matches=$(ls "$dir/"*"$rub"*.html 2>/dev/null)
   if [ -z "$matches" ]; then
     echo "  $rub: N/A (no article in this issue)"
@@ -112,6 +127,16 @@ for rub in Editorial Bücher Fehlerteufelchen Fachredakteur; do
     grep -q "$page-0.png" "$f" || echo "  FAIL: $f doesn't reference banner"
   done
 done
+if [ -z "$editorial" ]; then
+  echo "  Editorial: N/A (no article in this issue)"
+else
+  for f in $editorial; do
+    page=$(basename "$f" | grep -oE '^[0-9]+')
+    banner="$dir/$page-0.png"
+    [ -f "$banner" ] || echo "  FAIL: $f has no banner $banner"
+    grep -q "$page-0.png" "$f" || echo "  FAIL: $f doesn't reference banner"
+  done
+fi
 
 # Per-rubric shape check
 python3 -c "$(cat <<'PY'

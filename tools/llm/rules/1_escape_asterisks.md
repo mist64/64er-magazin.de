@@ -36,7 +36,12 @@ print('**bold** pairs       :', len(re.findall(r'\\*\\*[^*]+?\\*\\*', s)))
 " issues/8607/8607.md
 ```
 
-Expected: zero solitary, zero 3+ runs, **bold** pair count unchanged from before.
+Expected: zero solitary, zero 3+ runs. The `**bold**` pair count is
+**invariant by construction** — the escape rule only rewrites runs of
+length ≠ 2, so it never touches a length-2 `**` delimiter. There's no
+"before" count to compare against; the invariant is that the escape
+pass cannot change it. (The count is printed only as a sanity readout,
+not a pass/fail check.)
 
 ## Notes / lessons
 

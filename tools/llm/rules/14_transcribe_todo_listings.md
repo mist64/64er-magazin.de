@@ -126,9 +126,11 @@ PY
 )" "$dir"
 
 # 4. spot-check: every transcribed BASIC listing has line numbers at
-#    the start of (most) lines. If a "BASIC" file has zero lines that
-#    look like a BASIC line-number prefix, the OCR may have eaten
-#    them.
+#    the start of MOST lines. A block that is CLEARLY BASIC (a majority
+#    of lines already start with a line number) but where a sizeable
+#    minority don't is the signal that OCR ate some line-number
+#    prefixes — flag it. Pure-asm / Pascal blocks (0% digit-starts)
+#    are NOT BASIC and are correctly left unflagged.
 python3 -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
@@ -139,13 +141,15 @@ for f in sorted(os.listdir(d)):
         body = m.group(1)
         if not body.strip(): continue
         lines = [l for l in body.splitlines() if l.strip()]
-        if len(lines) < 3: continue
-        # heuristic: > 60% of lines start with digit → likely BASIC
+        if len(lines) < 10: continue
         digit_starts = sum(1 for l in lines if re.match(r'\s*\d', l))
-        if digit_starts == 0 and len(lines) >= 10:
-            # 0 digit-prefixed lines in a 10+ line block → probably
-            # asm or Pascal; not a flag
-            pass
+        frac = digit_starts / len(lines)
+        # 0% → not BASIC (asm/Pascal), fine. >=60% → healthy BASIC.
+        # Between: looks like BASIC with some numbers eaten by OCR.
+        if 0 < frac < 0.6:
+            print(f"  {f}: <pre> looks like BASIC but only "
+                  f"{digit_starts}/{len(lines)} lines start with a digit "
+                  f"— OCR may have eaten line numbers")
 PY
 )" "$dir"
 ```

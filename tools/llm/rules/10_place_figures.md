@@ -45,7 +45,10 @@ For each `<figure>` block in `prg.txt`, in order:
 3. **Fill `data-name`.** Use the user-visible program name from the
    article body, not the raw on-disk filename
    (e.g. `data-name="Vectors"`, not `data-name="vectors.boot"`).
-   Must be unique within the article.
+   Must be unique within the article **per element kind** — a
+   listing's `<pre data-name="X">` and its sibling
+   `<div class="binary_download" data-name="X">` intentionally share
+   the name (they're the display + download of the same program).
 4. **Fill `<figcaption>`.** Take the verbatim caption from the
    magazine — typically `Listing N. …` (note the trailing dot after
    `N`). Use `pdftotext` first; if it disagrees with the scan on a
@@ -82,8 +85,14 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
 - **Captions are verbatim.** Trailing dot after `Listing N`, German
   typography (`»…«`), exact punctuation. Read from the PDF text layer
   first; fall back to scan-visual only when the layer is broken.
-- **`data-name` is unique per article.** Two figures in one HTML
-  can't share it.
+- **`data-name` is unique per article PER ELEMENT KIND.** Two
+  `<pre>` figures in one HTML can't share it, and two
+  `<div class="binary_download">` siblings can't share it — but a
+  listing's `binary_download` sibling **intentionally shares its
+  `data-name`** with the `<pre>` it downloads. Verifier #3 exempts
+  exactly that `<pre>`/`binary_download` pairing (see the `.sh`
+  implementation, which subtracts each div name once from the pre
+  count).
 - **`data-filename` base name max 16 characters** (the C 64 file
   system's hard limit).
 - **`.txt` header line** must be `;<filename>.prg ==ADDR==` with
@@ -166,12 +175,14 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
 ## Verification
 
 ```bash
+dir=issues/<YYMM>
+
 # 1. prg.txt is empty (every listing placed) — or only contains
 #    listings explicitly marked "no home in this issue" with a note.
-wc -l issues/8607/prg.txt
+wc -l "$dir/prg.txt"
 
 # 2. Every <figure>'s data-filename resolves to a file in prg/ or prg/del/:
-python3 - issues/8607 <<'PY'
+python3 - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]; pdir = os.path.join(d, 'prg'); ddir = os.path.join(pdir, 'del')
 have = set(os.listdir(pdir)) | (set(os.listdir(ddir)) if os.path.isdir(ddir) else set())
@@ -186,34 +197,55 @@ for f in os.listdir(d):
 for x in sorted(missing): print(x)
 PY
 
-# 3. Every <figure data-name> within an article is unique:
-python3 - issues/8607 <<'PY'
+# 3. Every <figure data-name> within an article is unique PER ELEMENT
+#    KIND. A <pre data-name="X"> and its sibling
+#    <div class="binary_download" data-name="X"> intentionally share
+#    the name — EXEMPT that pairing (this check counts <pre> and
+#    <div> names separately and allows each div name to cancel one
+#    pre name, matching 10_place_figures.sh's verifier #3):
+python3 - "$dir" <<'PY'
 import os, re, sys, collections
-for f in os.listdir(sys.argv[1]):
+d = sys.argv[1]
+for f in os.listdir(d):
     if not f.endswith('.html'): continue
-    names = re.findall(r'data-name="([^"]+)"', open(os.path.join(sys.argv[1],f)).read())
-    dup = [n for n,c in collections.Counter(names).items() if c > 1]
-    if dup: print(f"{f}: duplicate data-name {dup}")
+    s = open(os.path.join(d, f)).read()
+    pres = re.findall(r'<pre [^>]*data-name="([^"]+)"', s)
+    divs = re.findall(r'<div class="binary_download" [^>]*data-name="([^"]+)"', s)
+    pre_count = collections.Counter(pres)
+    for n in divs: pre_count[n] -= 1   # a div may share one pre's name (MSE pair)
+    dup = [n for n, c in pre_count.items() if c > 1]
+    if dup: print(f"{f}: duplicate <pre data-name> {dup}")
+    div_dup = [n for n, c in collections.Counter(divs).items() if c > 1]
+    if div_dup: print(f"{f}: duplicate binary_download data-name {div_dup}")
 PY
 
-# 4. Listing-N captions in each article are in print order:
-for f in issues/8607/*.html; do
-  ns=$(grep -oE 'Listing [0-9]+' "$f" | awk '{print $2}' )
-  prev=0; for n in $ns; do
-    [ "$n" -lt "$prev" ] && { echo "$f: Listing $n after $prev (out of order)"; break; }
-    prev=$n
-  done
-done
+# 4. Listing-N captions in each article are in print order. Grep ONLY
+#    figcaptions (like verifier #7) — a bare `Listing [0-9]+` grep also
+#    matches body prose ("siehe Listing 3") and false-flags out-of-order:
+python3 - "$dir" <<'PY'
+import os, re, sys
+d = sys.argv[1]
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f)).read()
+    prev = 0
+    for m in re.finditer(r'<figcaption[^>]*>(?:<[^>]+>)*\s*Listing\s+(\d+)',
+                         s, re.IGNORECASE):
+        n = int(m.group(1))
+        if n < prev:
+            print(f"{f}: Listing {n} after {prev} (out of order)"); break
+        prev = n
+PY
 
 # 5. Build the issue and confirm no listing-related errors:
-.venv/bin/python generate.py --issues 8607 --future local 2>&1 | grep -iE 'listing|prg|figure|binary_download' | head
+.venv/bin/python generate.py --issues <YYMM> --future local 2>&1 | grep -iE 'listing|prg|figure|binary_download' | head
 
 # 6. Every <figcaption>Listing N…</figcaption> must have a description
 #    after "Listing N.". Bare `<figcaption>Listing N</figcaption>` is
 #    the failure mode (8607/`96 Neues vom Hypra-Basic.html` shipped
 #    10 of these). The caption text after the listing label should be
 #    at least 3 words.
-python3 - issues/8607 <<'PY'
+python3 - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -232,7 +264,7 @@ PY
 #    skips any integer between min and max, report. 8607 example:
 #    `79 Tips & Tricks für Profis.html` jumped 1→2→4 (Listing 3
 #    missing) before second-pass review.
-python3 - issues/8607 <<'PY'
+python3 - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

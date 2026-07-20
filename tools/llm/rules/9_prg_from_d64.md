@@ -164,11 +164,22 @@ match an article, they get reported, not placed.
 
 ## Remediation: Hypra-Ass / Top-Ass misclassified as BASIC
 
-**Hard rule:** a shipping `.prg` may **NEVER** live in `prg/del/`.
-`del/` is for files the site does not expose; anything in it is
-invisible to the generator's binary-download resolver. If you need
-the reader to be able to download a listing's PRG, the file must
-sit directly in `issues/<YYMM>/prg/`.
+**Hard rule:** a shipping `.prg` may **NEVER** live in `prg/del/`
+**when the reader needs the RAW BINARY download**. `del/` is for files
+the site does not re-derive from anything else; the generator's
+binary-download resolver won't expose a raw `.prg` sitting in `del/`.
+So if the download the reader gets must be the raw binary (Hypra-Ass /
+Top-Ass source, MSE binaries, compiled programs), the `.prg` must sit
+directly in `issues/<YYMM>/prg/`.
+
+**Clarifying exception — BASIC `.prg`s stay in `del/`.** This hard
+rule does NOT contradict the normal BASIC flow. A BASIC listing ships
+as `prg/<name>.txt` (petcat text) and its `.prg` companion is moved to
+`prg/del/` **on purpose** — the reader's download is *materialised
+from the `.txt`* via `petcat2prg`, so the raw `.prg` in `del/` is
+never needed and correctly stays there. The hard rule only bites when
+there is no `.txt` to materialise from and the raw binary itself is
+the download.
 
 ### Signals of the misclassification
 

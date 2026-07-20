@@ -65,9 +65,18 @@ Critical guardrails:
 ```bash
 dir=issues/<YYMM>
 
-# 1. how many articles got head1
+# 1. how many articles got head1 — and make the target checkable by
+#    also printing the total article count and the exclusion list, so
+#    N should equal (article count − excluded). Excluded rubrics:
+#    editorial, impressum, inhalt, vorschau, leserforum.
 n=$(grep -lE '64er\.head1' "$dir"/*.html | wc -l | tr -d ' ')
-echo "  head1 in $n article(s)"
+total=$(ls "$dir"/*.html | wc -l | tr -d ' ')
+echo "  head1 in $n of $total article(s)"
+echo "  excluded (should NOT have head1):"
+grep -lE '64er\.id" content="(editorial|impressum|inhalt|vorschau)"' "$dir"/*.html
+# Leserforum is excluded too (rule 18 already set its head1 by hand);
+# it may still show a head1, so don't count it as a rule-19 target.
+echo "  → expect n ≈ total − (count of the excluded files above, plus Leserforum)"
 
 # 2. head1 / head2 placement is immediately before toc_category
 python3 -c "$(cat <<'PY'
