@@ -137,3 +137,25 @@ Pass-3 uncaptioned/Bild/Steckbrief sweeps run. Placed tables and calls:
   (364 rows) was placed, but the article's `<p class="intro">` is
   TRUNCATED mid-sentence in the import ("…Die folgende Übersicht") —
   a pre-existing body-text gap, NOT repaired here (out of table scope).
+
+## Round-1 review fixes (FABLE review disposition)
+
+- **B1 — Impressum (163) created.** Was missing entirely; the printed
+  TOC lists Impressum p.163. Transcribed the masthead from the p.163
+  600 dpi scan (matches 8607's masthead except the 8608-specific
+  Redaktionsassistenz: Lewandowski/Kaltenhauser/Pasternok). Metas per
+  8607's Impressum (id=impressum, toc_category=Rubriken, no author).
+- **B3 — Fehlerteufelchen (68) correction listings re-transcribed** from
+  the p.68 600 dpi scan; OCR glyphs fixed (0c09/`20 93`, IF D, ZV,
+  VF<>0, H2*H3, COS, A1=A1+FX/A2=A2+FY, 01 c8). `TODO VERIFY LISTINGS
+  ABOVE!` marker removed — RESOLVED. No illegible lines.
+- **B7 — 84 64'er Extra intro** truncation RESOLVED: recovered the tail
+  ("…zeigt den Befehlsvorrat einiger verbreiteter Sprachversionen,
+  erhebt jedoch keinen Anspruch auf Vollständigkeit.") from the p.84
+  600 dpi scan and spliced it.
+- **136 Streifzüge — bare `<figcaption>Listing 1</figcaption>`**: the
+  print (p.140, 600 dpi) genuinely captions it bare "Listing 1" (no
+  description, unlike the article's "Bild N. …" captions). Left as-is —
+  print-verbatim, confirmed.
+- **29 EDV — `Indexialschrift`** restored (print-verbatim; had been
+  over-normalised to Indexschrift).
