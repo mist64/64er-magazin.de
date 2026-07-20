@@ -258,6 +258,76 @@ Because the two OCR engines sometimes drop the SAME space (the 8608
 alone can't catch everything; a 600 dpi scan crop is the final
 tiebreaker for any function-word jam the greps surface.
 
+3. **aspell non-word + function-word-split detector (PREFERRED — run
+   this first).** The greps in method 1 are noisy (every `damit`,
+   `sobald`, `aufwendig` fires). A far cleaner automated sweep: take
+   every prose token, keep only the ones a German spell-checker rejects,
+   and among those flag the ones that split into two valid pieces where
+   one piece is a function word. That combination — *not a real word*
+   **and** *splits around a function word* — is almost always a genuine
+   lost-space jam, with very few false positives. This one pass found
+   **69 real jams in 8608 that all three earlier methods had missed**
+   (the R1 rule-27 sweep, the capital-boundary regex, and the
+   function-word greps). hunspell on macOS/Homebrew usually has NO
+   dictionary installed (`Can't open affix or dictionary files for
+   dictionary named "de_DE"`) — use **`aspell -d de`** instead
+   (`brew install aspell`; it ships the German dictionary).
+
+   ```python
+   # tools: aspell -d de (NOT hunspell — no dict on brew)
+   import re, glob, subprocess, os
+   os.chdir('issues/<YYMM>')
+   words = {}
+   for f in sorted(glob.glob('*.html')):
+       s = open(f, encoding='utf-8').read()
+       body = re.sub(r'<(pre|code|style|script|address)\b.*?</\1>', '', s, flags=re.S)
+       body = re.sub(r'<[^>]+>', ' ', body); body = re.sub(r'&[a-z]+;', ' ', body)
+       for w in re.findall(r"[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß'-]*", body):
+           words.setdefault(w, set()).add(f)
+   def miss(wl):  # aspell list-mode: echoes only the words it does NOT know
+       p = subprocess.run(['aspell','-d','de','--encoding=utf-8','list'],
+                          input='\n'.join(wl), capture_output=True, text=True)
+       return set(p.stdout.split())
+   bad = miss(sorted(words))
+   FW = set('der die das den dem des ein eine einen einem einer und oder aber '
+            'ist sind war hat man sich noch schon nur auch für mit von zu auf an '
+            'im am nach bei so da dann hier dort bereits jede jeder kann muß soll '
+            'wird will sei uns ihm ihn sie es dies wie'.split())
+   cand = [w for w in sorted(bad) if len(w) >= 7 and w.isalpha()]   # see blind spots below
+   pieces = {p for w in cand for i in range(3, len(w)-2) for p in (w[:i], w[i:])}
+   badpc  = miss(sorted(pieces))                                    # ONE batched call, not per-word
+   for w in cand:
+       for i in range(3, len(w)-2):
+           a, b = w[:i], w[i:]
+           if len(a) >= 2 and len(b) >= 2 and a not in badpc and b not in badpc \
+              and (a.lower() in FW or b.lower() in FW):
+               print(f'{w:24} = {a} + {b:12} :: {sorted(words.get(w, []))}'); break
+   ```
+
+   Then pull the on-page context for each hit (`grep -n`) and eyeball
+   the split before applying — a handful are false positives you must
+   SKIP: valid closed compounds the dict happens to miss
+   (`ausliegen`, `durchprüft`, `durchstrukturiert`, `voreinstellbar`),
+   **old-spelling forms** (`wieviel`, `jedesmal` — LEAVE per
+   [[feedback-ocr-vs-typos]]), company/product names (`Profisoft`),
+   Comal/BASIC variable identifiers (`MEINGABE`), and all-caps module
+   names (`NEBENMODUL`). Everything else — `aufihre`, `istjede`,
+   `dassonst`, `Somerktder`, `bereitshohe` — is a real lost space:
+   re-insert it (both words are physically present in the fused token,
+   so it is mechanical, not composition — no anti-memory violation).
+
+   **Two blind spots — cover them with a targeted grep afterwards:**
+   - *Tokens shorter than 7 chars* are filtered out (`nurim`, `desC`,
+     `soneu`, `Aderan`). Lower the threshold or grep the short
+     function-word pairs directly.
+   - *Jams where one half is itself a valid-but-not-in-dict compound*
+     never satisfy "both pieces valid" (`Sortierprogrammtun` =
+     Sortierprogramm+tun, `Zeitinvestiertwerden`, `Zuletztseinoch`).
+     Catch these by greping for a bare function word / finite verb glued
+     to the END of a long token (`…tun`, `…werden`, `…man`, `…noch`).
+   Both classes are why a single automated pass is never enough — always
+   finish with the method-2 blocks-index diff and a scan spot-check.
+
 Most hits are legitimate CamelCase (`dBase`, `KByte`, `geoWrite`,
 `CompuServe`, `HiRes`, `MHz`, `gePOKEt`, `geSAVEt`, …) — skip those.
 Real fixes look like:
