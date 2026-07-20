@@ -38,6 +38,21 @@ Because you are already reading the printed TOC page here to build the
   or expands differently than the headline; type what the TOC page
   shows, Title/natural-cased as the TOC prints it.
 
+**Escaping & join conventions (keep consistent within an issue):**
+- `toc_title` is an HTML attribute value — write `&` as `&amp;`
+  (`Tips &amp; Tricks zu Superbase`), matching how `<title>`/filenames
+  escape it. Don't ship a raw `&` in some files and `&amp;` in others.
+- **Multi-line TOC entries** (the TOC wraps one entry across two printed
+  lines, e.g. `Gesucht: Ihr Wunschdrucker / Tolle Preise zu gewinnen`,
+  or `20 Drucker für Schulen zu gewinnen`) are **joined into one
+  `toc_title`** — don't drop the second line.
+- **Kicker + title** (print sets a bold kicker line above the title,
+  e.g. `Anwendung des Monats:` over `Digi-Controller`): prior issues
+  (8607) mark this as `<b>kicker</b> title`. Match that markup rather
+  than inventing a colon-join the print doesn't show. (8608 used a
+  colon join in a few places — the `<b>…</b>` form is the convention;
+  don't diverge.)
+
 Verification: no `<!-- <meta name="64er.toc_title" content="XXX"> -->`
 comment survives in any article, and every `toc_title` value is
 non-empty and not equal to that file's `<title>`.
