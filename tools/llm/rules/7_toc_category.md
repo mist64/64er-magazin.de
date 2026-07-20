@@ -47,11 +47,11 @@ Because you are already reading the printed TOC page here to build the
   or `20 Drucker für Schulen zu gewinnen`) are **joined into one
   `toc_title`** — don't drop the second line.
 - **Kicker + title** (print sets a bold kicker line above the title,
-  e.g. `Anwendung des Monats:` over `Digi-Controller`): prior issues
-  (8607) mark this as `<b>kicker</b> title`. Match that markup rather
-  than inventing a colon-join the print doesn't show. (8608 used a
-  colon join in a few places — the `<b>…</b>` form is the convention;
-  don't diverge.)
+  e.g. `Anwendung des Monats:` over `Digi-Controller`): join into one
+  `toc_title`. Two acceptable forms — a **colon join**
+  (`Anwendung des Monats: Digi-Controller`) or 8607's **`<b>` markup**
+  (`<b>Anwendung des Monats:</b> Digi-Controller`). Pick ONE and use it
+  for every kicker entry in the issue; don't mix within an issue.
 
 Verification: no `<!-- <meta name="64er.toc_title" content="XXX"> -->`
 comment survives in any article, and every `toc_title` value is
