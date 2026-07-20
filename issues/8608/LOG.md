@@ -159,3 +159,22 @@ Pass-3 uncaptioned/Bild/Steckbrief sweeps run. Placed tables and calls:
   print-verbatim, confirmed.
 - **29 EDV — `Indexialschrift`** restored (print-verbatim; had been
   over-normalised to Indexschrift).
+
+## Round-1/2 review — OCR & meta passes
+
+- **B2 — rule 27 OCR word-cleanup, corrected.** The first run's
+  pdftotext cross-check was circular (this issue's PDF text layer is
+  itself OCR of the same scan, reproducing the HTML's own jams). Re-run
+  settled every candidate against independent evidence (rule-9b tesseract
+  blocks index + 600 dpi scan crops): 91 fixes across 32 files, then a
+  completion pass for the lowercase-into-lowercase jam class the Pass-3
+  capital-boundary regex is blind to. Rule 27 amended with an
+  independence test + lowercase-jam detection.
+- **B4 — 64er.toc_title filled from the printed TOC (pages 6-7).** 25
+  articles carry the verbatim TOC wording (incl. shorter forms like
+  'Übersicht Lernsoftware', 'Small C'); placeholders deleted where the
+  TOC line equals the title or is a bare rubric name. Closes the pipeline
+  hole where no rule owned toc_title (44 stale placeholders had shipped).
+- **164 Vorschau** carries toc_title 'Vorschau 10/86' — verbatim from the
+  TOC (the '10/86' is the print's own slip for 9/86; kept per
+  print-verbatim policy).
