@@ -50,6 +50,38 @@ Sheet 4 = slots 12–15 → `[170, 7, 8, 169]` (side A `{170,7}`, side B `{8,169
 > Always build the map with the **true** page count (e.g. 176), **not** the current file
 > count if files are missing — a short count produces a wrong mapping.
 
+## Deriving the true count from two folios on one sheet
+
+The whole reconstruction depends on the **true** count, and the file count is often wrong
+(missing + duplicate cancel). You can read the true count straight off the scans without
+knowing how many files are missing:
+
+**Any two pages on the same physical sheet are conjugates → their folios sum to `count+1`.**
+So `count = folio_a + folio_b − 1`.
+
+A "sheet" is one group of 4 consecutive scan slots (`4(j-1) .. 4j-1`); its four pages are
+two conjugate pairs `{2j-1, count+2-2j}` (side A) and `{2j, count+1-2j}` (side B). Pick a
+slot-group where two folios are legible (one low, one high), add them, subtract 1.
+
+> Read folios in **raw slot order** for this (a quick montage of `Scan*.tiff` straight, no
+> imposition) — you need two folios you *know* share a sheet, i.e. sit in the same group of
+> four slots. Cross-check with a second sheet; both pairs must give the same count.
+
+### Worked example — issue 8610 (Ausgabe 10/1986)
+
+204 files; `make_audit.py --pages 204` and `--pages 196` both produced scrambled sheets, so
+the count guess was wrong. Raw slot order showed slot 8/9 = folios **6 & 195** and slot
+12/13 = folios **8 & 193** — two same-sheet pairs:
+
+```
+6 + 195 − 1 = 200       8 + 193 − 1 = 200
+```
+
+→ true count **200** (not the 204 file count, not the ~196 the max folio suggested — pages
+196–200 are unfoliated back ads). With `--pages 200`, slots 0–7 (sheets 1–2) matched
+`rmap(200)` while `actual[s] = rmap[s+2]` from slot 8 → **sheet 3 side A (pages 196 & 5)
+missing**, with more missing/dup drift downstream. `204 = 200 − missing + dup`.
+
 ## Reading a folio
 
 Printed page number sits in the **bottom outer corner**: **even page → bottom-left,

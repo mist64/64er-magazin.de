@@ -32,13 +32,16 @@ if not pages:
 tmp = tempfile.mkdtemp(prefix="folio_")
 strips = []
 print(f"building {len(pages)} strips from {a.src}...")
-for f in pages:
+for i, f in enumerate(pages):
     pid = os.path.splitext(os.path.basename(f))[0]
     sp = os.path.join(tmp, f"{pid}.png")
-    # bottom folio strip, scale to common width, prepend yellow label box with filename page#
+    # labels in the center gutter: left column (even index) on the East, right on the West
+    side = "East" if i % a.cols == 0 else "West"
+    # bottom folio strip, scale to common width, splice yellow label box with filename page#
     subprocess.run(
-        f'magick "{f}" -gravity South -crop 100%x{a.height}%+0+0 +repage -resize 760x '
-        f'-gravity West -background "#fff3a0" -splice 84x0 '
+        f'magick "{f}" -gravity South -crop 100%x{a.height}%+0+0 +repage '
+        f'-gravity Center -crop 100%x50%+0+0 +repage -resize 760x '
+        f'-gravity {side} -background "#fff3a0" -splice 84x0 '
         f'-pointsize 30 -fill red -annotate +5+0 "{pid}" '
         f'-bordercolor gray -border 1 "{sp}"', shell=True)
     strips.append(sp)
