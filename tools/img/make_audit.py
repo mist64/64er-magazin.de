@@ -32,17 +32,26 @@ def rmap(count):
     return m
 
 def scan_file(src_dir, idx):
-    return os.path.join(src_dir, "Scan.tiff" if idx==0 else f"Scan {idx}.tiff")
+    base = "Scan" if idx==0 else f"Scan {idx}"
+    for ext in (".tiff", ".png", ".tif", ".jpg"):
+        p = os.path.join(src_dir, base + ext)
+        if os.path.exists(p):
+            return p
+    return os.path.join(src_dir, base + ".tiff")   # default (for the missing-slot message)
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--src", default="thumbs")
 ap.add_argument("--out", default="audit_sheet.png")
 ap.add_argument("--cols", type=int, default=2)
 ap.add_argument("--height", type=int, default=10, help="strip height as %% of page (taller = more above the folio)")
+ap.add_argument("--rotate", type=int, default=-90,
+                help="degrees to rotate each source upright before cropping the bottom strip. "
+                     "Use -90 for raw landscape scans (default), 0 for thumbs already rotated upright.")
 ap.add_argument("--pages", type=int, default=0)
 a = ap.parse_args()
 
-n_files = len(glob.glob(os.path.join(a.src, "Scan*.tiff")))
+n_files = sum(len(glob.glob(os.path.join(a.src, "Scan*"+e)))
+              for e in (".tiff", ".png", ".tif", ".jpg"))
 count = a.pages or n_files
 if count % 4:
     sys.exit(f"page count {count} not divisible by 4 (files found: {n_files}); pass --pages")
@@ -68,7 +77,7 @@ for i, (src, page) in enumerate(order):
     sp = os.path.join(tmp, f"{page:03d}.png")
     # rotate upright, bottom folio strip, scale, splice a yellow label box (gutter side) with the assumed page#
     subprocess.run(
-        f'magick "{f}" -rotate -90 -gravity South -crop 100%x{a.height}%+0+0 +repage '
+        f'magick "{f}" -rotate {a.rotate} -gravity South -crop 100%x{a.height}%+0+0 +repage '
         f'-gravity Center -crop 100%x50%+0+0 +repage -resize 760x '
         f'-gravity {side} -background "#fff3a0" -splice 84x0 '
         f'-pointsize 30 -fill red -annotate +5+0 "{page:03d}" '
