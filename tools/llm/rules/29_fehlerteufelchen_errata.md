@@ -86,6 +86,14 @@ it before running this rule. The essentials are distilled below.
      caption, prices, addresses, reprints).
    - If an old `<!-- Fehlerteufelchen … -->` placeholder comment exists,
      **delete it** — never ship both placeholder and aside.
+   - **Multiple corrections to the SAME article → ONE aside.** An
+     article corrected in more than one later issue (e.g. 8608's
+     `17 Leserforum`: a Lichtorgel Watt fix *and* an SX vendor-name fix,
+     both from 10/86) gets a single `<aside … id="fehlerteufelchen">`
+     with one `<p>` per correction — `id` must stay unique on the page,
+     and every in-text link (step 3) points at that one anchor. If the
+     corrections came from different issues, list each `<!-- 64'er
+     M/YYYY -->` trailer (one per correction, in issue order).
 
 3. **Wrap the affected element** with the link (do NOT wrap anything inside
    the aside — that self-references):

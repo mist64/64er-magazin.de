@@ -86,6 +86,22 @@ The sub-agent must:
 4. **Spot-check the applied values for CSV typos** (stuttered
    words, misspelled program names, missing letters). Fix at the
    point of application — don't rewrite the source CSV.
+
+   **A mismatch with the article's headline / TOC is NOT a CSV typo.**
+   `index_title` is *sourced from this CSV verbatim* and is *expected*
+   to differ from the article's `<h1>`/TOC wording — that is the whole
+   reason the field exists (the annual index re-titles articles for a
+   cumulative context). Do **not** "correct" a CSV value to match the
+   in-issue print. Only fix garble that is wrong *inside the CSV itself*
+   (a stutter like `Farbbdrucker`, a dropped letter, an OCR artifact in
+   the CSV file); a plausible German phrase that simply doesn't match
+   the headline is the index's deliberate wording — keep it verbatim.
+   Regression this guards against: 8608/142 `Small C: Drei C-Compiler
+   für Systemprogrammierer` was "fixed" to `Der C-Compiler` because the
+   article headline reads "der C-Compiler" — but the CSV row genuinely
+   says `Drei`, and the headline is not evidence the CSV is wrong. When
+   unsure, the CSV wins; see [[feedback_print_verbatim]] for the mirror
+   principle on body text.
 5. Articles in the issue with NO CSV row stay unchanged: the
    recurring rubrics (Editorial, Leserforum, Fehlerteufelchen,
    Impressum, Vorschau), contest filler, call-for-entries, and

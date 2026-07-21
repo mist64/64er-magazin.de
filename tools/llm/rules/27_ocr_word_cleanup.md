@@ -316,7 +316,7 @@ tiebreaker for any function-word jam the greps surface.
    re-insert it (both words are physically present in the fused token,
    so it is mechanical, not composition — no anti-memory violation).
 
-   **Two blind spots — cover them with a targeted grep afterwards:**
+   **Three blind spots — cover them with a targeted grep / a scan read:**
    - *Tokens shorter than 7 chars* are filtered out (`nurim`, `desC`,
      `soneu`, `Aderan`). Lower the threshold or grep the short
      function-word pairs directly.
@@ -325,8 +325,18 @@ tiebreaker for any function-word jam the greps surface.
      Sortierprogramm+tun, `Zeitinvestiertwerden`, `Zuletztseinoch`).
      Catch these by greping for a bare function word / finite verb glued
      to the END of a long token (`…tun`, `…werden`, `…man`, `…noch`).
-   Both classes are why a single automated pass is never enough — always
-   finish with the method-2 blocks-index diff and a scan spot-check.
+   - **Jams that are themselves a valid German word** — NO spell-checker
+     (aspell, hunspell, this detector) can EVER flag them, because the
+     fused token passes the dictionary. `Inder` is a real word (an
+     Indian) hiding `In der`; likewise `Sieirgend`, `dasjenige`-lookalikes.
+     8608 shipped a whole `…in`-class (`späterin`, `Meternin`, `Stellungin`,
+     `Inder Tat`) that every automated sweep missed. **Only reading the
+     prose in context / against the scan catches this class** — it is not
+     a tooling gap you can close, it is why an automated pass alone is
+     never sufficient.
+   All three are why a single automated pass is never enough — always
+   finish with a **contextual read** of the prose plus the method-2
+   blocks-index diff and a scan spot-check.
 
 Most hits are legitimate CamelCase (`dBase`, `KByte`, `geoWrite`,
 `CompuServe`, `HiRes`, `MHz`, `gePOKEt`, `geSAVEt`, …) — skip those.
