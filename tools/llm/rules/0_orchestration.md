@@ -138,6 +138,13 @@ commit by `git add -A`. Both are preventable:
    and confirm the content diff is non-empty (not a bare rename).
    Checking the *working tree* passed verification while the *commit*
    was empty is exactly how the rule-25 loss went unnoticed.
+4. **Commit large binary source assets in their OWN commit.** The scan
+   PDF (`64er_19xx-xx.pdf`, ~95 MB) and image-crop batches are permanent
+   git objects — don't let them ride along in a metadata/content commit.
+   On 8608 the 94 MB source PDF landed inside the "rule 7 toc_category"
+   commit, making a metadata change weigh 206 MB and muddying the diff.
+   Stage binaries deliberately, on their own, with a message that says so
+   — the commit boundary is the only place this stays legible in history.
 
 ## Scope confinement (every sub-agent brief)
 
@@ -351,6 +358,32 @@ Procedure:
 This is the default for *every* rule with an editorial degree of
 freedom. "Check the other issues" beats "ask the user" beats "guess" —
 in that order.
+
+## Cross-cutting rule: know which source is authoritative before "correcting"
+
+Before you change a value because it "looks wrong," identify **which
+source is the ground truth for that specific field**, and check *that*
+source — not a different one that merely looks related. Several
+near-misses and one real regression on 8608 all share this shape:
+"correcting" a value against the wrong authority.
+
+- `index_title` / `index_category` → the **Jahresinhaltsverzeichnis CSV**,
+  not the in-issue headline/TOC (rule 20). 8608/142 `Drei C-Compiler`
+  was wrongly "fixed" to `Der` from the headline.
+- A `<figcaption>` / `Listing N.` caption → the **scan** of that page,
+  not plausibility or `pdftotext` (rules 10/13/14). 8608/142's
+  `Listing 1. Laufzeit-Testschleife in »C«` was almost deleted as
+  "invented" — it is printed in bold on p145.
+- Body text wording, incl. impossible-looking values → the **scan**;
+  a genuine print typo (a backwards address range `49152-48165`, a
+  dropped digit) stays verbatim ([[feedback_print_verbatim]],
+  [[feedback_ocr_vs_typos]]).
+
+The failure mode is always the same: reasoning from a *related but
+non-authoritative* artifact (the headline, another OCR layer, "it reads
+wrong"). When the authoritative source and a related one disagree, that
+disagreement is usually *expected*, not an error — confirm against the
+right source before touching anything, and when unsure, leave it.
 
 - **Any sub-agent dispatched to apply a per-candidate rule must include
   verifier evidence inline in its report.** See the
