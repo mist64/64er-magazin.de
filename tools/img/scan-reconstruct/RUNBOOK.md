@@ -8,6 +8,12 @@ the "which commands, in what order, and the gotchas that cost hours" companion.
 Reference issues: **8608** (CMYK-converted, complete), **8609/8610** (reconstructed
 from scrambled saddle-stitch scans), **8611** (in progress).
 
+**Scripts in this dir** (`tools/img/scan-reconstruct/`):
+`thumbs.sh` (step 1), `raw_montage.sh` (step 2 true-count), `rotate.sh` (step 3).
+**Shared tools in the parent dir** (`tools/img/`): `make_audit.py`, `renumber.py`,
+`make_folio_montage.py`, `pipeline.sh`, `convert.py`, `detect_widths.py` — referenced
+below as `../<tool>`.
+
 ## Directory layout
 
 ```
@@ -34,28 +40,28 @@ df -g /Volumes/S | tail -1                           # need headroom (see Disk b
 Generate only 150-dpi thumbs, then verify page order. Never blind-rotate a whole issue
 at full res before confirming the set is complete and correctly ordered.
 
-`thumb9.sh <SRC> <OUT>` (12-way parallel, resumable):
-```bash
-#!/bin/bash
-SRC="$1"; OUT="$2"; mkdir -p "$OUT"; export OUT; export MAGICK_THREAD_LIMIT=2
-thumbone(){ f="$1"; b=$(basename "$f" .tiff)
-  [ -f "$OUT/$b.png" ] && { echo "skip $b"; return; }
-  magick "$f" -alpha off -scale 6.25% -units PixelsPerInch -density 150 -rotate 270 \
-    -define png:compression-level=9 "$OUT/$b.png"; echo "done $b"; }
-export -f thumbone
-find "$SRC" -maxdepth 1 -name 'Scan*.tiff' -print0 | xargs -0 -P 12 -I {} bash -c 'thumbone "$1"' _ "{}"
-echo "ALLDONE"
+**`thumbs.sh <SRC_DIR> <OUT_DIR>`** — 12-way parallel, resumable (skips existing).
+Run detached (see Durability):
 ```
-Run detached (see Durability): `nohup bash thumb9.sh /Volumes/S/scan/<ISSUE> /Volumes/S/scan/<ISSUE>/thumbs > log 2>&1 &`
-Thumbs are tiny in RAM → finish in a few minutes for a whole issue.
+nohup bash thumbs.sh /Volumes/S/scan/<ISSUE> /Volumes/S/scan/<ISSUE>/thumbs \
+      > /Volumes/S/scan/<ISSUE>_thumb.log 2>&1 &
+```
+Thumbs are tiny in RAM → finish in a few minutes for a whole issue. Note these thumbs
+are **already upright** (the script applies `-rotate 270`), so pass `--rotate 0` to
+`make_audit.py` / use `raw_montage.sh` as-is (both expect upright input).
 
 ### 2. Audit page order (see RENUMBERING.md → "Audit")
 ```
-make_audit.py --src thumbs --pages <TRUE_COUNT> --cols 2 --out audit_<ISSUE>.png
+../make_audit.py --src thumbs --rotate 0 --pages <TRUE_COUNT> --cols 2 --out audit_<ISSUE>.png
 ```
-- Derive **TRUE_COUNT** first if files are missing: read two folios that share a sheet in
-  raw slot order and use `count = folio_a + folio_b − 1` (RENUMBERING.md → "Deriving the
-  true count"). Do **not** trust the file count.
+- Derive **TRUE_COUNT** first if files are missing: build a raw slot-order montage with
+  **`raw_montage.sh <OUT.png> <FIRST_SLOT> <LAST_SLOT>`** (run from the scan dir), read two
+  folios that share a sheet (same group of 4 slots), and use `count = folio_a + folio_b − 1`
+  (RENUMBERING.md → "Deriving the true count"). Do **not** trust the file count. Cross-check
+  on a second sheet — both pairs must give the same count. *(8611: file count 188 but two
+  sheets both summed to 193 → TRUE_COUNT 192.)*
+- `--rotate 0` because `thumbs.sh` output is pre-rotated upright; use `-90` (default) only
+  on raw landscape scans. Missing slots render as red placeholders in the audit.
 - Read the montage: tag == printed folio everywhere → clean. `+2` run → missing side;
   re-sync later → duplicate absorbed it. Confirm dups by content:
   `magick compare -metric RMSE "thumbs/Scan A.png" "thumbs/Scan B.png" null:` (~0.004 = same).
@@ -64,25 +70,14 @@ make_audit.py --src thumbs --pages <TRUE_COUNT> --cols 2 --out audit_<ISSUE>.png
   arrive; the low page# goes in the first (side-A) slot.
 
 ### 3. Full-res rotate (expensive) — only once the set is clean
-`rot9.sh` (8-way parallel, resumable, writes full **and** thumb in one magick pass):
-```bash
-#!/bin/bash
-SRC=/Volumes/S/scan/<ISSUE>; OUT=/Volumes/S/scan/<ISSUE>-png
-mkdir -p "$OUT/thumb"; export OUT; export MAGICK_THREAD_LIMIT=4
-rotone(){ f="$1"; b=$(basename "$f" .tiff)
-  [ -f "$OUT/$b.png" ] && [ -f "$OUT/thumb/$b.png" ] && { echo "skip $b"; return; }
-  magick "$f" -alpha off -units PixelsPerInch -density 2400 \
-    \( -clone 0 -rotate 270 -define png:compression-level=9 +write "$OUT/$b.png" \) \
-    \( -clone 0 -scale 6.25% -units PixelsPerInch -density 150 -rotate 270 \
-       -define png:compression-level=9 +write "$OUT/thumb/$b.png" \) \
-    null:; echo "done $b"; }
-export -f rotone
-find "$SRC" -maxdepth 1 -name 'Scan*.tiff' -print0 | xargs -0 -P 8 -I {} bash -c 'rotone "$1"' _ "{}"
-echo "ALLDONE"
+**`rotate.sh <SRC_DIR> <OUT_DIR>`** — 8-way parallel, resumable, writes full **and** thumb
+from a single magick decode per file (`-clone` twice). Launch detached:
 ```
-The single-load-two-clones pattern emits full + thumb from one decode. Skip-check needs
-**both** outputs → a killed job resumes cleanly (an interrupted file, having only the full
-PNG, is redone). ~200 files at 8-way ≈ 80–90 min on this box.
+nohup bash rotate.sh /Volumes/S/scan/<ISSUE> /Volumes/S/scan/<ISSUE>-png \
+      > /Volumes/S/scan/<ISSUE>-png/rotate.log 2>&1 &
+```
+The skip-check needs **both** outputs → a killed job resumes cleanly (an interrupted file,
+having only the full PNG, is redone). ~200 files at 8-way ≈ 80–90 min on this box.
 
 ### 4. Verify, renumber, move
 ```
@@ -91,8 +86,8 @@ cd /Volumes/S/scan/<ISSUE>-png
 find . -name 'Scan*.png' -size 0
 # renumber.py counts argv but renames hardcoded Scan*.png in CWD by imposition.
 # Run it in the full dir AND the thumb dir separately:
-python3 <TOOLS>/renumber.py Scan*.png
-cd thumb && python3 <TOOLS>/renumber.py Scan*.png && cd ..
+python3 ../renumber.py Scan*.png
+cd thumb && python3 ../renumber.py Scan*.png && cd ..
 # verify 001..NNN complete in both, no Scan* left, then move into place:
 mv /Volumes/S/scan/<ISSUE>-png /Volumes/S/png/<ISSUE>
 ```
@@ -106,7 +101,7 @@ in reading order (RENUMBERING.md → "The imposition").
 - Then run the unified converter:
   ```
   cd /Volumes/S/png/<ISSUE>
-  bash <TOOLS>/pipeline.sh out --layout=standard
+  bash ../pipeline.sh out --layout=standard
   ```
   `pipeline.sh` (successor to `ALL.sh`) does: `convert.py` RGB→CMYK plane separation →
   per-channel `-level` contrast → resize → ICC (USWebCoatedSWOP→AdobeRGB) → crop →
