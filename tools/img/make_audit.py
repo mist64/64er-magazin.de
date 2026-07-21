@@ -53,20 +53,24 @@ order = sorted(M.items(), key=lambda kv: kv[1])   # by logical page
 tmp = tempfile.mkdtemp(prefix="audit_")
 strips = []
 print(f"building {len(order)} strips from {a.src} (count={count})...")
-for src, page in order:
+for i, (src, page) in enumerate(order):
+    # montage tiles left-to-right: even index -> left column, odd -> right column.
+    # put labels in the center gutter: left column labelled on the East, right on the West.
+    side = "East" if i % a.cols == 0 else "West"
     f = scan_file(a.src, src)
     if not os.path.exists(f):
         # missing scan slot -> red placeholder strip
         sp = os.path.join(tmp, f"{page:03d}.png")
-        subprocess.run(f'magick -size 760x34 xc:"#ffdddd" -gravity West '
+        subprocess.run(f'magick -size 760x34 xc:"#ffdddd" -gravity {side} '
                        f'-pointsize 22 -fill red -annotate +6+0 "{page:03d}  (no scan {src})" '
                        f'-bordercolor gray -border 1 "{sp}"', shell=True)
         strips.append(sp); continue
     sp = os.path.join(tmp, f"{page:03d}.png")
-    # rotate upright, bottom folio strip, scale, prepend a yellow label box with the assumed page#
+    # rotate upright, bottom folio strip, scale, splice a yellow label box (gutter side) with the assumed page#
     subprocess.run(
-        f'magick "{f}" -rotate -90 -gravity South -crop 100%x{a.height}%+0+0 +repage -resize 760x '
-        f'-gravity West -background "#fff3a0" -splice 84x0 '
+        f'magick "{f}" -rotate -90 -gravity South -crop 100%x{a.height}%+0+0 +repage '
+        f'-gravity Center -crop 100%x50%+0+0 +repage -resize 760x '
+        f'-gravity {side} -background "#fff3a0" -splice 84x0 '
         f'-pointsize 30 -fill red -annotate +5+0 "{page:03d}" '
         f'-bordercolor gray -border 1 "{sp}"', shell=True)
     strips.append(sp)
