@@ -9,7 +9,8 @@ Reference issues: **8608** (CMYK-converted, complete), **8609/8610** (reconstruc
 from scrambled saddle-stitch scans), **8611** (in progress).
 
 **Scripts in this dir** (`tools/img/scan-reconstruct/`):
-`thumbs.sh` (step 1), `raw_montage.sh` (step 2 true-count), `rotate.sh` (step 3).
+`thumbs.sh` (step 1), `raw_montage.sh` (step 2 true-count), `rotate.sh` (step 3 full-res),
+`thumbs_from_full.sh` (step 3b final thumbs + verification).
 **Shared tools in the parent dir** (`tools/img/`): `make_audit.py`, `renumber.py`,
 `make_folio_montage.py`, `pipeline.sh`, `convert.py`, `detect_widths.py` — referenced
 below as `../<tool>`.
@@ -70,14 +71,28 @@ are **already upright** (the script applies `-rotate 270`), so pass `--rotate 0`
   arrive; the low page# goes in the first (side-A) slot.
 
 ### 3. Full-res rotate (expensive) — only once the set is clean
-**`rotate.sh <SRC_DIR> <OUT_DIR>`** — 8-way parallel, resumable, writes full **and** thumb
-from a single magick decode per file (`-clone` twice). Launch detached:
+**`rotate.sh <SRC_DIR> <OUT_DIR>`** — 8-way parallel, resumable, writes the **full-res PNG
+only** (`-rotate 270`). Launch detached:
 ```
 nohup bash rotate.sh /Volumes/S/scan/<ISSUE> /Volumes/S/scan/<ISSUE>-png \
       > /Volumes/S/scan/<ISSUE>-png/rotate.log 2>&1 &
 ```
-The skip-check needs **both** outputs → a killed job resumes cleanly (an interrupted file,
-having only the full PNG, is redone). ~200 files at 8-way ≈ 80–90 min on this box.
+Resumable (skips any full PNG that already exists). ~200 files at 8-way ≈ 80–90 min. Accepts
+tiffs named `Scan*.tiff` (pre-renumber) or `NNN.tiff` (already renumbered) — output keeps the
+input basename.
+
+### 3b. Thumbnails from the full PNGs (final thumbs **+ verification**)
+**`thumbs_from_full.sh <DIR>`** — 12-way parallel; reads every full `NNN.png`/`Scan*.png` back
+and downscales to 150 dpi into `DIR/thumb/`. Do **not** reuse the step-1 audit thumbs here and
+do **not** emit thumbs inside `rotate.sh` from the in-memory buffer: generating the final thumbs
+by *re-reading the saved full PNGs* is what verifies each full PNG actually wrote correctly (a
+truncated/corrupt page fails or yields a garbage thumb; `grep FAIL` the log).
+```
+nohup bash thumbs_from_full.sh /Volumes/S/scan/<ISSUE>-png \
+      > /Volumes/S/scan/<ISSUE>-png/thumbs.log 2>&1 &
+grep -c FAIL /Volumes/S/scan/<ISSUE>-png/thumbs.log   # must be 0
+```
+Full PNGs are already upright + 2400 dpi, so this is a pure 6.25% downscale (no rotate).
 
 ### 4. Verify, renumber, move
 ```
@@ -163,8 +178,11 @@ between sessions**. So:
 - **`renumber.py` ignores argv contents** — it only counts them, then renames the literal
   `Scan.png` / `Scan N.png` in the CWD. Run it *inside* each target dir; run it separately
   for `thumb/`.
-- **Skip-check needs both full + thumb.** If you ever generate them in separate passes, a
-  half-done page won't be skipped — intended, but know it.
+- **Thumbs come from the full PNGs, not the tiffs.** `rotate.sh` writes full-res only;
+  `thumbs_from_full.sh` re-reads each full PNG to make the 150-dpi thumb. That read-back is
+  the verification the full PNG wrote correctly — don't shortcut it by emitting the thumb from
+  `rotate.sh`'s in-memory buffer (a bad write wouldn't be caught). The step-1 audit thumbs
+  (`thumbs.sh`, from tiffs, pre-rotate) are a *different* set for a different purpose.
 - **zsh `no matches found`** on globs like `Scan*.png` when a dir is empty is an error, not
   a warning — guard with `2>/dev/null` or test existence first.
 - **TRUE_COUNT ≠ file count.** Re-run the audit with the *derived* count; a wrong count
