@@ -18,9 +18,15 @@ Alpha is UNKNOWN, not white: nothing is fabricated here. A later fill/inpaint st
 what (if anything) goes into those pixels.
 
 Usage:
-  stack_render.py [pages...]        default: all 176
-  stack_render.py --montage         also write a downscaled contact sheet
-Output: OUT_DIR/NNN.png  (RGBA, 600 dpi, deskewed)
+  stack_render.py [pages...] [--jobs N]      default: all 176, N = cores-2
+  stack_render.py --measure                  alpha geometry only -- NO full-size writes
+  stack_render.py --montage                  also write a downscaled contact sheet
+Output: OUT_DIR/NNN.png  (RGBA, 600 dpi, deskewed), tmp/extents.json
+
+--measure is the RESEARCH path: it runs the identical detector stack but writes only the
+1-bit alpha and the per-page extents, skipping the ~90 MB RGBA PNG per page. Encoding that
+photographic RGBA is the dominant cost, so --measure is ~10x cheaper and answers "how does
+the window fit / how little alpha can we get" without producing 13 GB we then delete.
 """
 import os, sys, json, re, argparse
 import numpy as np
@@ -45,6 +51,7 @@ SPINE   = "/Users/mist/DNB/8609/tmp/shear_v8.json"
 CLIPJS  = "/Users/mist/DNB/8609/tmp/clip_holes.json"
 PRIORSF = os.path.join(HERE, "02-matte/priors.json")
 OUT_DIR = "/Users/mist/DNB/8609/tmp/stack600"
+ALPHA_DIR = "/Users/mist/DNB/8609/tmp/stack_alpha"
 
 DPI        = 600
 SPINE_OVER = 6      # cut this many px PAST the spine line toward the page, so the whole
@@ -69,11 +76,17 @@ SPINE_EXTRA = 12    # ADDITIONAL cut where shear_spine reports extra_cut, i.e. w
 # Its scatter is +/-44 px (1.9 mm) though, and on 48% of pages the true boundary lies
 # INBOARD of the holes -- so cutting exactly on the line would leave a neighbour sliver
 # about half the time. Hence the overcut below.
-HOLE_OVERCUT = 44   # cut this far INBOARD of the hole line (= 1 sigma of the measured
-                    #   scatter, 1.9 mm). Costs nothing: the logo-anchored A4 window's inner
-                    #   edge already sits ~7 mm inboard of the holes on every page, so these
-                    #   pixels are discarded by the crop regardless.
+# RULE 1 (hard): every neighbour pixel must go. Leaving any is a FAIL.
+# RULE 2: subject to that, cut as few of OUR pixels as possible.
+# The fold is never more than CLIP_WIN_MM from the hole line (the user's constraint, and
+# shear_spine enforces it). So where the hole line is all we have, cutting at hole + 5mm is
+# the TIGHTEST cut that PROVES rule 1 -- anything less can leave neighbour standing. The old
+# value (44px = 1 sigma of the measured scatter) was a coverage estimate, not a guarantee, and
+# under-cut on roughly a third of pages.
+HOLE_OVERCUT = int(5.0 / 25.4 * 600)   # = 118 px @600dpi
 HOLE_MIN     = 4    # need at least this many located holes to fit the fallback line
+A4_W = int(round(210.0 / 25.4 * DPI))     # 4961 px @600dpi
+A4_H = int(round(297.0 / 25.4 * DPI))     # 7016 px
 MONT_W     = 150    # per-page width in the contact sheet
 CHECKER    = 24     # checkerboard square size (px) used to VISUALISE alpha in the montage
 
@@ -96,34 +109,53 @@ def _cut_outboard(shape, inb, parity):
     return xx <= inb[:, None]                  # neighbour on the LEFT
 
 
-def spine_mask(shape, rec, parity, clip_entry):
-    """Cut the neighbour page off.
+def hole_line_inb(clip_entry, H, W, parity):
+    """Per-row inboard distance of the clip-hole line, or None."""
+    hs = [h for h in (clip_entry or {}).get("holes", []) if h[2]]
+    if len(hs) < HOLE_MIN:
+        return None
+    hx = np.array([h[0] for h in hs], float); hy = np.array([h[1] for h in hs], float)
+    coef, *_ = np.linalg.lstsq(np.stack([np.ones_like(hy), hy], 1), hx, rcond=None)
+    ys = np.arange(H, dtype=np.float32)
+    xline = coef[0] + coef[1] * ys
+    return (W - xline) if parity == "even" else xline
 
-    Preferred: the measured background-colour boundary. Where no colour difference exists
-    (cream-on-cream, ~130 of 176 pages) fall back to the CLIP-HOLE line -- see HOLE_OVERCUT
-    for why that is a sound estimator and why over-cutting there is free. Returns
-    (mask, source) where source is "colour", "holes" or "none".
+
+def spine_mask(shape, rec, parity, clip_entry):
+    """Cut the neighbour page off, at whichever estimator cuts DEEPER.
+
+    Two estimators, neither of which dominates:
+      * the measured background-colour boundary, when one exists;
+      * the clip-hole line, which the user reports may sit either side of the fold or dead
+        on it (our own measurement agrees: median offset -2.7px, 48% either way).
+
+    Where the fold itself is cream-on-cream the colour detector can only see the NEIGHBOUR's
+    own content edge, which lies outboard of the fold and leaves a strip behind -- p023 fired
+    2.75mm outboard of the hole line and left exactly that much neighbour showing.
+
+    We therefore take the INBOARD-most of the two. The costs are asymmetric: cutting too deep
+    only eats our own inner margin, which the logo-anchored A4 window discards anyway (its
+    inner edge already sits ~7mm inboard of the holes on every page), whereas cutting too
+    shallow leaves visible neighbour. Returns (mask, source).
     """
     H, W = shape
     ys = np.arange(H, dtype=np.float32)
+    hole_inb = hole_line_inb(clip_entry, H, W, parity)
 
     if rec and rec.get("found"):
         inb = rec["inboard_top"] + (rec["inboard_bot"] - rec["inboard_top"]) * (ys / max(1, H - 1))
-        over = SPINE_OVER + (SPINE_EXTRA if rec.get("extra_cut") else 0)
-        # NB the sign: `inb` is the distance INBOARD of the binding edge, so cutting further
-        # toward our own page means a LARGER inb. Subtracting here pulls the cut back toward
-        # the page edge and leaves a sliver of the neighbour standing (p007's red block edge
-        # was visible exactly this way, and every "overcut" made it worse, not better).
-        return _cut_outboard((H, W), inb + over, parity), ("colour+" if rec.get("extra_cut") else "colour")
+        inb = inb + SPINE_OVER + (SPINE_EXTRA if rec.get("extra_cut") else 0)
+        src = "colour+" if rec.get("extra_cut") else "colour"
+        if hole_inb is not None:
+            hi = hole_inb + HOLE_OVERCUT
+            if np.median(hi) > np.median(inb):
+                src = src + "/hole"
+            inb = np.maximum(inb, hi)
+        return _cut_outboard((H, W), inb, parity), src
 
-    hs = [h for h in (clip_entry or {}).get("holes", []) if h[2]]
-    if len(hs) < HOLE_MIN:
+    if hole_inb is None:
         return np.zeros((H, W), bool), "none"
-    hx = np.array([h[0] for h in hs], float); hy = np.array([h[1] for h in hs], float)
-    coef, *_ = np.linalg.lstsq(np.stack([np.ones_like(hy), hy], 1), hx, rcond=None)
-    xline = coef[0] + coef[1] * ys                      # absolute x of the hole line
-    inb = (W - xline) if parity == "even" else xline
-    return _cut_outboard((H, W), inb + HOLE_OVERCUT, parity), "holes"   # + = further inboard
+    return _cut_outboard((H, W), hole_inb + HOLE_OVERCUT, parity), "holes"
 
 
 def render(page, priors, skew, spine, clip, tmpl):
@@ -193,30 +225,127 @@ def montage(pages, out_path):
     print("montage ->", out_path, sheet.size)
 
 
+_CTX = {}
+
+
+def _init():
+    """Load the shared per-issue metadata once per worker process."""
+    _CTX["priors"] = json.load(open(PRIORSF))
+    _CTX["skew"] = load_skew()
+    _CTX["spine"] = json.load(open(SPINE)) if os.path.exists(SPINE) else {}
+    _CTX["clip"] = json.load(open(CLIPJS))
+
+
+def _one(args):
+    n, measure = args
+    try:
+        out, ang, frac, src = render(n, _CTX["priors"], _CTX["skew"], _CTX["spine"],
+                                     _CTX["clip"], None)
+        alpha = np.asarray(out)[:, :, 3]
+        depths = edge_depths(alpha)
+        if measure:
+            Image.fromarray((alpha > 0).astype(np.uint8) * 255).convert("1").save(
+                os.path.join(ALPHA_DIR, "%03d.png" % n), optimize=True)
+        else:
+            out.save(os.path.join(OUT_DIR, "%03d.png" % n))
+        return dict(page=n, ok=True, ang=ang, frac=frac, src=src,
+                    size=list(out.size), edges=depths)
+    except Exception as e:
+        return dict(page=n, ok=False, err=str(e))
+
+
+def edge_depths(alpha, pct=(50, 95, 100)):
+    """Leading alpha run from each border (left,right,top,bottom), at several percentiles
+    over scanlines.
+
+    NB the MAX is NOT a usable bound on a deskewed page: after rotation the extreme rows
+    are almost entirely alpha (only a corner sliver of page is in them), so the max leading
+    run is ~the page width and says nothing. Measured on p005: median 369 px, but 4318 px at
+    row 20 and 5123 px at row 7042. The window is therefore decided by alpha INSIDE the
+    candidate window (see window_alpha), not by these; they are kept only as a description
+    of the edges.
+    """
+    A = (alpha == 0)
+
+    def runs(M):
+        full = M.all(1)
+        r = np.where(M.any(1), M.argmin(1), 0)
+        r = np.where(full, M.shape[1], r)          # an all-alpha row is a FULL incursion
+        return [int(np.percentile(r, q)) for q in pct]
+
+    return dict(left=runs(A), right=runs(A[:, ::-1]),
+                top=runs(A.T), bottom=runs(A.T[:, ::-1]), pct=list(pct))
+
+
+def window_alpha(alpha, ax, ay, B, A_, S, parity):
+    """Alpha pixels inside the A4 window placed at the logo anchor.
+
+    This is the quantity the crop is chosen to minimise: the user accepts alpha inside the
+    final crop (it can be inpainted), so the question is not "does any alpha intrude" but
+    "how little alpha can a LOGO-ANCHORED window contain". Offsets are in 600-dpi px:
+      B  above the logo baseline, A_ below it   (B + A_ = A4_H)
+      S  horizontal offset of the binding-side window edge from the logo anchor
+    Returns (n_alpha, area, x0, y0).
+    """
+    H, W = alpha.shape
+    y0 = int(round(ay - B)); y1 = y0 + A4_H
+    if parity == "even":                      # logo left, binding right
+        x1 = int(round(ax + S)); x0 = x1 - A4_W
+    else:                                     # logo right, binding left
+        x0 = int(round(ax + S)); x1 = x0 + A4_W
+    xs0, ys0 = max(0, x0), max(0, y0)
+    xs1, ys1 = min(W, x1), min(H, y1)
+    inside = 0
+    if xs1 > xs0 and ys1 > ys0:
+        inside = int((alpha[ys0:ys1, xs0:xs1] == 0).sum())
+    outside = A4_W * A4_H - (xs1 - xs0) * (ys1 - ys0)   # window off the canvas = unknown too
+    return inside + max(0, outside), A4_W * A4_H, x0, y0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("pages", nargs="*", type=int)
     ap.add_argument("--montage", action="store_true")
+    ap.add_argument("--measure", action="store_true",
+                    help="alpha + extents only; skip the full-size RGBA writes")
+    ap.add_argument("--jobs", type=int, default=6,
+                    help="6 by default: each worker holds several full-size float32 copies, "
+                         "and 14 thrashed (1204s user vs 8050s system = mostly page faults)")
     a = ap.parse_args()
 
     os.makedirs(OUT_DIR, exist_ok=True)
-    priors = json.load(open(PRIORSF))
-    skew = load_skew()
-    spine = json.load(open(SPINE)) if os.path.exists(SPINE) else {}
-    clip = json.load(open(CLIPJS))
-    tmpl = None
+    os.makedirs(ALPHA_DIR, exist_ok=True)
     pages = a.pages or list(range(1, 177))
 
-    for n in pages:
-        try:
-            out, ang, frac, src = render(n, priors, skew, spine, clip, tmpl)
-            f = os.path.join(OUT_DIR, "%03d.png" % n)
-            out.save(f)
-            print("p%03d skew %+0.2f  unknown %5.2f%%  spine=%-6s %s"
-                  % (n, ang, 100 * frac, src, out.size))
-        except Exception as e:
-            print("p%03d FAILED: %s" % (n, e))
-    if a.montage:
+    res = []
+    if a.jobs > 1 and len(pages) > 1:
+        import multiprocessing as mp
+        with mp.get_context("fork").Pool(a.jobs, initializer=_init) as pool:
+            for r in pool.imap_unordered(_one, [(n, a.measure) for n in pages]):
+                res.append(r)
+                if r["ok"]:
+                    e = r["edges"]
+                    print("p%03d skew %+0.2f unknown %5.2f%% spine=%-11s edge med(l,r,t,b)=%d,%d,%d,%d"
+                          % (r["page"], r["ang"], 100 * r["frac"], r["src"],
+                             e["left"][0], e["right"][0], e["top"][0], e["bottom"][0]))
+                else:
+                    print("p%03d FAILED: %s" % (r["page"], r["err"]))
+                sys.stdout.flush()
+    else:
+        _init()
+        for n in pages:
+            r = _one((n, a.measure)); res.append(r)
+            print(r)
+
+    res.sort(key=lambda r: r["page"])
+    json.dump(res, open("/Users/mist/DNB/8609/tmp/stack_meta.json", "w"), indent=1)
+    ok = [r for r in res if r["ok"]]
+    if ok:
+        print("\nleading alpha run per edge (px @600dpi), median over scanlines:")
+        for e in ("left", "right", "top", "bottom"):
+            v = np.array([r["edges"][e][0] for r in ok], float)
+            print("   %-7s med %5.0f  p95 %5.0f  max %5.0f" % (e, np.median(v), np.percentile(v, 95), v.max()))
+    if a.montage and not a.measure:
         montage(pages, "/Users/mist/DNB/8609/tmp/stack600_montage.png")
 
 
