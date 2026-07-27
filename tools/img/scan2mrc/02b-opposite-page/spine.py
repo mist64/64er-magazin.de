@@ -88,6 +88,13 @@ STAPLE_MAX_RES_MM = 0.42  # ... nor is one whose own holes scatter more than thi
 
 N_PEAKS    = 4          # candidate edges offered per row (see step 2)
 PEAK_FRAC  = 0.25       # ... keeping only peaks at least this fraction of the row's best
+# Cream vs coloured, for the extra side cut the renderer applies. Measured at the boundary
+# over the fired pages: cream paper is L 195-210 with |R-G| <= 18, while every neighbour/ad
+# background is either dark (L 49-103) or saturated (|R-G| up to 161) -- the groups do not
+# overlap. Cutting at the 50% crossing leaves ~8px of the neighbour's ramp, which shows as a
+# fringe against cream but is invisible against a coloured background.
+CREAM_L_MIN  = 170.0
+CREAM_CHROMA = 25.0
 TOL_MM     = 0.5        # a row agrees with the line if its argmax is within this of it
 # FIRE needs BOTH, and the magnitude is the primary one:
 MIN_STEP   = 15.0       # the colour difference actually crossed by the fitted line (90th
@@ -208,6 +215,12 @@ def detect(page, clip_entry, issue_slant=0.0, thumb_dir=THUMB_DIR):
     step = float(np.percentile(np.linalg.norm(i_col - o_col, axis=1), 90))
     found = (step >= MIN_STEP) and (run_mm >= MIN_RUN_MM)
 
+    def _cream(c):
+        return bool(c[0] >= CREAM_L_MIN and abs(c[1]) / CHROMA_W <= CREAM_CHROMA
+                    and abs(c[2]) / CHROMA_W <= CREAM_CHROMA)
+    c_out = np.median(o_col, axis=0); c_in = np.median(i_col, axis=0)
+    ours_cream, neigh_cream = _cream(c_in), _cream(c_out)
+
     # -> 600-dpi page coordinates (inboard distance from the binding edge)
     k = SRC_DPI / WORK_DPI
     inb_top = (x0 + slope * (0 - yc)) * k
@@ -218,6 +231,8 @@ def detect(page, clip_entry, issue_slant=0.0, thumb_dir=THUMB_DIR):
                 inboard_mid=float((inb_top + inb_bot) / 2),
                 angle_deg=ang if parity == "odd" else -ang,
                 run_mm=round(run_mm, 2), step=round(step, 1),
+                ours_cream=ours_cream, neighbour_cream=neigh_cream,
+                extra_cut=bool(ours_cream or not neigh_cream),
                 inlier_frac=round(float(inl.mean()), 3),
                 W=W, H=H,
                 clip_inboard=None if hole_in is None else float(hole_in * k))

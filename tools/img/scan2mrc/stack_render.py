@@ -4,7 +4,7 @@
 Runs every detection stage that exists and bakes the result into one RGBA image per page:
 
   02  bed_matte    -> alpha 0 on the scanner bed / yellow backing at all four edges
-  02b shear_spine  -> alpha 0 beyond the background-colour boundary (neighbour page),
+  02b spine        -> alpha 0 beyond the background-colour boundary (neighbour page),
                       on pages where that boundary is detectable
   02b hole_masks   -> alpha 0 on the exact binder-clip hole shapes
   01  deskew       -> the whole RGBA is rotated by the page's measured angle, expanding
@@ -23,20 +23,29 @@ Usage:
   stack_render.py --montage                  also write a downscaled contact sheet
 Output: OUT_DIR/NNN.png  (RGBA, 600 dpi, deskewed), tmp/extents.json
 
---measure is the RESEARCH path: it runs the identical detector stack but writes only the
-1-bit alpha and the per-page extents, skipping the ~90 MB RGBA PNG per page. Encoding that
-photographic RGBA is the dominant cost, so --measure is ~10x cheaper and answers "how does
-the window fit / how little alpha can we get" without producing 13 GB we then delete.
+The per-page extents are computed on every run, so there is no "measurement mode" that skips
+the image: the full 600-dpi RGBA is always written (it is what you actually inspect, and the
+detectors have to run regardless). --measure only ADDS a 1-bit alpha per page, which is handy
+for scripted geometry work but is not a substitute for looking at the page.
 """
 import os, sys, json, re, argparse
+
+# Pin the BLAS/OpenMP pools to ONE thread each, BEFORE numpy is imported.
+# Each worker computes luma as a 37MP matmul, which BLAS parallelises internally. With 4
+# worker PROCESSES that becomes 4 x N threads on 16 cores: measured 30 min of CPU in 10 min
+# of wall time per worker, i.e. 3x oversubscription, and throughput collapsed from ~15s to
+# ~60min per page. One thread per worker; the parallelism is across pages.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "02-matte"))
 sys.path.insert(0, os.path.join(HERE, "02b-opposite-page"))
 from bed_matte import bed_matte
-import shear_spine as S
 import clip_holes as CH
 import hole_masks as HM
 
@@ -47,7 +56,7 @@ Image.MAX_IMAGE_PIXELS = None
 # --------------------------------------------------------------------------- #
 THUMB   = "/Users/mist/DNB/8609/thumbs_600"
 SKEW    = "/Users/mist/DNB/8609/tmp/skew_all.txt"
-SPINE   = "/Users/mist/DNB/8609/tmp/shear_v8.json"
+SPINE   = "/Users/mist/DNB/8609/tmp/spine_all.json"
 CLIPJS  = "/Users/mist/DNB/8609/tmp/clip_holes.json"
 PRIORSF = os.path.join(HERE, "02-matte/priors.json")
 OUT_DIR = "/Users/mist/DNB/8609/tmp/stack600"
@@ -57,7 +66,7 @@ DPI        = 600
 SPINE_OVER = 6      # cut this many px PAST the spine line toward the page, so the whole
                     #   neighbour goes; it only eats our own inner margin, which the A4
                     #   crop discards anyway.
-SPINE_EXTRA = 12    # ADDITIONAL cut where shear_spine reports extra_cut, i.e. where OUR
+SPINE_EXTRA = 12    # ADDITIONAL cut where spine.py reports extra_cut, i.e. where OUR
                     #   side of the boundary is cream, or where both sides are coloured.
                     #   A printed edge is not sharp: cutting at the 50% crossing leaves
                     #   ~8 px of the neighbour's ramp (measured on p014 -- L196 at -8 px,
@@ -79,7 +88,7 @@ SPINE_EXTRA = 12    # ADDITIONAL cut where shear_spine reports extra_cut, i.e. w
 # RULE 1 (hard): every neighbour pixel must go. Leaving any is a FAIL.
 # RULE 2: subject to that, cut as few of OUR pixels as possible.
 # The fold is never more than CLIP_WIN_MM from the hole line (the user's constraint, and
-# shear_spine enforces it). So where the hole line is all we have, cutting at hole + 5mm is
+# spine.py enforces it). So where the hole line is all we have, cutting at hole + 5mm is
 # the TIGHTEST cut that PROVES rule 1 -- anything less can leave neighbour standing. The old
 # value (44px = 1 sigma of the measured scatter) was a coverage estimate, not a guarantee, and
 # under-cut on roughly a third of pages.
@@ -87,6 +96,21 @@ HOLE_OVERCUT = int(5.0 / 25.4 * 600)   # = 118 px @600dpi
 HOLE_MIN     = 4    # need at least this many located holes to fit the fallback line
 A4_W = int(round(210.0 / 25.4 * DPI))     # 4961 px @600dpi
 A4_H = int(round(297.0 / 25.4 * DPI))     # 7016 px
+# --- review mode: TINT what would be cut, never remove it -------------------- #
+# While the detectors are still converging, an alpha render destroys the evidence: if a cut
+# ate real content the content is gone and the page merely looks smaller, so an over-cut and
+# a correct cut are indistinguishable. Tinting leaves the pixels in place -- content visible
+# UNDER the wash is a cut that went too far. This is the ACCEPTANCE.md --magenta convention,
+# generalised to every stage, and the colours match debug_stack.py so they read the same.
+# Lossless PNG at full 600 dpi: the defects being hunted are ~3px at 600dpi, and a lossy
+# codec would invent and erase features at exactly the hard edges we are judging.
+REVIEW_DIR = "/Users/mist/DNB/8609/tmp/review"
+BLEND      = 0.5    # tint opacity; the wash's own edge marks the cut line exactly
+COL_BED    = (255,   0, 255)   # 02  bed / yellow backing
+COL_SPINE  = (  0, 210, 255)   # 02b neighbour, MEASURED colour boundary
+COL_HOLECUT= ( 40,  90, 255)   # 02b neighbour, hole-line FALLBACK (inferred, not measured)
+COL_HOLES  = (255, 230,   0)   # 02b clip holes
+COL_WEDGE  = (255, 140,   0)   # 01  pixels added by the deskew rotation
 MONT_W     = 150    # per-page width in the contact sheet
 CHECKER    = 24     # checkerboard square size (px) used to VISUALISE alpha in the montage
 
@@ -122,79 +146,123 @@ def hole_line_inb(clip_entry, H, W, parity):
 
 
 def spine_mask(shape, rec, parity, clip_entry):
-    """Cut the neighbour page off, at whichever estimator cuts DEEPER.
+    """Cut the neighbour page off, using the BEST available signal.
 
-    Two estimators, neither of which dominates:
-      * the measured background-colour boundary, when one exists;
-      * the clip-hole line, which the user reports may sit either side of the fold or dead
-        on it (our own measurement agrees: median offset -2.7px, 48% either way).
+    The background-colour difference is the real boundary: where it exists it IS the fold,
+    measured directly. The clip-hole line is only a decent proxy -- the clips did not go in
+    at exactly the right spot, and they may sit either side of the fold or on it. So:
 
-    Where the fold itself is cream-on-cream the colour detector can only see the NEIGHBOUR's
-    own content edge, which lies outboard of the fold and leaves a strip behind -- p023 fired
-    2.75mm outboard of the hole line and left exactly that much neighbour showing.
+        colour boundary found  ->  cut there (+ the fringe margin)
+        otherwise              ->  cut on the hole line + 5mm
 
-    We therefore take the INBOARD-most of the two. The costs are asymmetric: cutting too deep
-    only eats our own inner margin, which the logo-anchored A4 window discards anyway (its
-    inner edge already sits ~7mm inboard of the holes on every page), whereas cutting too
-    shallow leaves visible neighbour. Returns (mask, source).
+    An earlier version took the INBOARD-MOST of the two, which is backwards: at hole+5mm the
+    proxy almost always cut deeper, so it overrode the exact signal on 32 of the 41 pages
+    where a boundary had actually been measured -- only 9/176 cuts were really colour-driven,
+    and up to 5mm of page was spent insuring against an uncertainty already resolved. That
+    union was introduced to contain p023, where the OLD detector fired 2.75mm outboard of the
+    fold; the current one lands within 0.08mm there, so the reason no longer exists. Fix the
+    detector, do not override every correct detection with a coarser estimator.
+
+    Returns (mask, source).
     """
     H, W = shape
     ys = np.arange(H, dtype=np.float32)
-    hole_inb = hole_line_inb(clip_entry, H, W, parity)
 
     if rec and rec.get("found"):
         inb = rec["inboard_top"] + (rec["inboard_bot"] - rec["inboard_top"]) * (ys / max(1, H - 1))
+        # NB the sign: inb is the distance INBOARD of the binding edge, so cutting further
+        # toward our own page means a LARGER inb.
         inb = inb + SPINE_OVER + (SPINE_EXTRA if rec.get("extra_cut") else 0)
-        src = "colour+" if rec.get("extra_cut") else "colour"
-        if hole_inb is not None:
-            hi = hole_inb + HOLE_OVERCUT
-            if np.median(hi) > np.median(inb):
-                src = src + "/hole"
-            inb = np.maximum(inb, hi)
-        return _cut_outboard((H, W), inb, parity), src
+        return _cut_outboard((H, W), inb, parity), ("colour+" if rec.get("extra_cut") else "colour")
 
+    hole_inb = hole_line_inb(clip_entry, H, W, parity)
     if hole_inb is None:
         return np.zeros((H, W), bool), "none"
     return _cut_outboard((H, W), hole_inb + HOLE_OVERCUT, parity), "holes"
 
 
-def render(page, priors, skew, spine, clip, tmpl):
+def _masks(page, priors, spine, clip, im):
+    """Per-STAGE masks in the raw scan frame, kept separate so review can colour them by
+    source and a wrong cut can be attributed to the detector that made it."""
     p = "%03d" % page
-    path = os.path.join(THUMB, p + ".png")
-    im = Image.open(path).convert("RGB")
     W, H = im.size
     parity = "even" if page % 2 == 0 else "odd"
 
-    unknown = np.zeros((H, W), bool)
+    bed_rgba, _, meta = bed_matte(im, DPI, priors=priors, page_no=page, return_meta=True)
+    m_bed = (np.asarray(bed_rgba)[:, :, 3] == 0)
 
-    # -- 02 bed / yellow backing ------------------------------------------------
-    bed_rgba, _, _ = bed_matte(im, DPI, priors=priors, page_no=page, return_meta=True)
-    unknown |= (np.asarray(bed_rgba)[:, :, 3] == 0)
+    m_spine, src = spine_mask((H, W), spine.get(p), parity, clip.get(p))
 
-    # -- 02b neighbour page beyond the background boundary ----------------------
-    sm, src = spine_mask((H, W), spine.get(p), parity, clip.get(p))
-    unknown |= sm
-
-    # -- 02b binder-clip holes (exact shapes) -----------------------------------
+    m_holes = np.zeros((H, W), bool)
     res = clip.get(p)
     if res:
-        gray = np.asarray(im.convert("L"), np.float32)
         try:
-            seg = HM.segment_hole_shapes(gray, res)
-            unknown |= seg["mask"].astype(bool)
-        except Exception as e:                 # a hole that cannot be segmented is left
+            m_holes = HM.segment_hole_shapes(np.asarray(im.convert("L"), np.float32),
+                                             res)["mask"].astype(bool)
+        except Exception as e:
             print("  p%s hole shapes failed: %s" % (p, e))
+    return m_bed, m_spine, m_holes, src, meta
 
-    # -- compose RGBA in the RAW frame -----------------------------------------
+
+def render(page, priors, skew, spine, clip, tmpl):
+    """ALPHA render: what would actually be cut, as transparency."""
+    im = Image.open(os.path.join(THUMB, "%03d.png" % page)).convert("RGB")
+    W, H = im.size
+    m_bed, m_spine, m_holes, src, _ = _masks(page, priors, spine, clip, im)
+    unknown = m_bed | m_spine | m_holes
+
     rgba = np.dstack([np.asarray(im), np.where(unknown, 0, 255).astype(np.uint8)])
     out = Image.fromarray(rgba, "RGBA")
-
-    # -- 01 deskew: rotate, expanding; rotation-added pixels are unknown too ----
     ang = skew.get(page, 0.0)
     if abs(ang) > 1e-3:
-        out = out.rotate(ang, resample=Image.BICUBIC, expand=True,
-                         fillcolor=(0, 0, 0, 0))
+        out = out.rotate(ang, resample=Image.BICUBIC, expand=True, fillcolor=(0, 0, 0, 0))
     return out, ang, float(unknown.mean()), src
+
+
+def render_review(page, priors, skew, spine, clip):
+    """REVIEW render: tint what WOULD be cut, remove nothing. See REVIEW_DIR."""
+    im = Image.open(os.path.join(THUMB, "%03d.png" % page)).convert("RGB")
+    W, H = im.size
+    m_bed, m_spine, m_holes, src, meta = _masks(page, priors, spine, clip, im)
+    rgb = np.asarray(im).copy()
+
+    def tint(mask, col):
+        if mask.any():
+            rgb[mask] = ((1 - BLEND) * rgb[mask] + BLEND * np.array(col)).astype(np.uint8)
+
+    # spine first, bed over it, holes last -- so where two stages overlap you see the one
+    # that is hardest to attribute otherwise
+    # Colour by WHICH ESTIMATOR SET THE LINE, not by which ones ran. spine_mask takes the
+    # inboard-most of the two, so a "colour+/hole" page had a colour boundary but the HOLE
+    # line cut deeper and won -- the operative cut there is inferred, not measured, and must
+    # not read as measured. (It did, until this was checked: p015 showed cyan while the hole
+    # line was what set its gutter.)
+    hole_won = src.endswith("/hole") or src == "holes"
+    tint(m_spine & ~m_bed, COL_HOLECUT if hole_won else COL_SPINE)
+    tint(m_bed, COL_BED)
+    tint(m_holes, COL_HOLES)
+
+    out = Image.fromarray(rgb)
+    valid = Image.new("L", (W, H), 255)
+    ang = skew.get(page, 0.0)
+    if abs(ang) > 1e-3:
+        out = out.rotate(ang, resample=Image.BICUBIC, expand=True, fillcolor=(0, 0, 0))
+        valid = valid.rotate(ang, resample=Image.NEAREST, expand=True, fillcolor=0)
+    a = np.asarray(out).copy()
+    a[np.asarray(valid) == 0] = COL_WEDGE          # pixels the rotation invented
+    out = Image.fromarray(a)
+
+    dep = {e: round(np.median(meta[e].get("median_depth", 0)))
+           for e in ("top", "bottom", "left", "right") if isinstance(meta.get(e), dict)}
+    rec = spine.get("%03d" % page, {})
+    dr = ImageDraw.Draw(out)
+    txt = ("p%03d  skew %+.2f  bed t%s b%s l%s r%s  spine=%s  step=%s run=%smm"
+           % (page, ang, dep.get("top"), dep.get("bottom"), dep.get("left"), dep.get("right"),
+              src, rec.get("step"), rec.get("run_mm")))
+    dr.rectangle([0, 0, 12 * len(txt), 40], fill=(0, 0, 0))
+    dr.text((10, 14), txt, fill=(255, 255, 255))
+    frac = float((m_bed | m_spine | m_holes).mean())
+    return out, ang, frac, src
 
 
 def montage(pages, out_path):
@@ -237,17 +305,25 @@ def _init():
 
 
 def _one(args):
-    n, measure = args
+    n, measure, review = args
     try:
+        if review:
+            out, ang, frac, src = render_review(n, _CTX["priors"], _CTX["skew"],
+                                                _CTX["spine"], _CTX["clip"])
+            out.save(os.path.join(REVIEW_DIR, "%03d.png" % n))
+            return dict(page=n, ok=True, ang=ang, frac=frac, src=src,
+                        size=list(out.size), edges={})
         out, ang, frac, src = render(n, _CTX["priors"], _CTX["skew"], _CTX["spine"],
                                      _CTX["clip"], None)
         alpha = np.asarray(out)[:, :, 3]
         depths = edge_depths(alpha)
+        # ALWAYS write the full 600-dpi RGBA: the extents are computed either way, and the
+        # only saving from skipping it was disk, which is not scarce -- while the cost was
+        # having nothing to actually look at. --measure adds the 1-bit alpha alongside.
+        out.save(os.path.join(OUT_DIR, "%03d.png" % n))
         if measure:
             Image.fromarray((alpha > 0).astype(np.uint8) * 255).convert("1").save(
                 os.path.join(ALPHA_DIR, "%03d.png" % n), optimize=True)
-        else:
-            out.save(os.path.join(OUT_DIR, "%03d.png" % n))
         return dict(page=n, ok=True, ang=ang, frac=frac, src=src,
                     size=list(out.size), edges=depths)
     except Exception as e:
@@ -306,6 +382,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("pages", nargs="*", type=int)
     ap.add_argument("--montage", action="store_true")
+    ap.add_argument("--review", action="store_true",
+                    help="tint what would be cut instead of removing it (the testing view)")
     ap.add_argument("--measure", action="store_true",
                     help="alpha + extents only; skip the full-size RGBA writes")
     ap.add_argument("--jobs", type=int, default=6,
@@ -315,32 +393,37 @@ def main():
 
     os.makedirs(OUT_DIR, exist_ok=True)
     os.makedirs(ALPHA_DIR, exist_ok=True)
+    os.makedirs(REVIEW_DIR, exist_ok=True)
     pages = a.pages or list(range(1, 177))
 
     res = []
     if a.jobs > 1 and len(pages) > 1:
         import multiprocessing as mp
         with mp.get_context("fork").Pool(a.jobs, initializer=_init) as pool:
-            for r in pool.imap_unordered(_one, [(n, a.measure) for n in pages]):
+            for r in pool.imap_unordered(_one, [(n, a.measure, a.review) for n in pages]):
                 res.append(r)
                 if r["ok"]:
                     e = r["edges"]
-                    print("p%03d skew %+0.2f unknown %5.2f%% spine=%-11s edge med(l,r,t,b)=%d,%d,%d,%d"
-                          % (r["page"], r["ang"], 100 * r["frac"], r["src"],
-                             e["left"][0], e["right"][0], e["top"][0], e["bottom"][0]))
+                    if e:
+                        print("p%03d skew %+0.2f tinted %5.2f%% spine=%-11s edge med(l,r,t,b)=%d,%d,%d,%d"
+                              % (r["page"], r["ang"], 100 * r["frac"], r["src"],
+                                 e["left"][0], e["right"][0], e["top"][0], e["bottom"][0]))
+                    else:
+                        print("p%03d skew %+0.2f tinted %5.2f%% spine=%s"
+                              % (r["page"], r["ang"], 100 * r["frac"], r["src"]))
                 else:
                     print("p%03d FAILED: %s" % (r["page"], r["err"]))
                 sys.stdout.flush()
     else:
         _init()
         for n in pages:
-            r = _one((n, a.measure)); res.append(r)
+            r = _one((n, a.measure, a.review)); res.append(r)
             print(r)
 
     res.sort(key=lambda r: r["page"])
     json.dump(res, open("/Users/mist/DNB/8609/tmp/stack_meta.json", "w"), indent=1)
     ok = [r for r in res if r["ok"]]
-    if ok:
+    if ok and ok[0]["edges"]:
         print("\nleading alpha run per edge (px @600dpi), median over scanlines:")
         for e in ("left", "right", "top", "bottom"):
             v = np.array([r["edges"][e][0] for r in ok], float)
