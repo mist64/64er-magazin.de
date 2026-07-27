@@ -212,8 +212,10 @@ the neighbour that bled into the A3 scan, and only that. Cream-on-cream is unobs
 is out of scope. "The line" is the 50% crossing of the printed colour step.
 
 NOTE on the sheet: most spreads are two pages on ONE folded sheet (no paper edge, no ridge),
-but NOT all — p020 clearly shows a PHYSICAL page edge with a separate sheet behind it whose
-content carries its own angle. Both cases exist; the estimator assumes neither.
+and this holds for EVERY page (confirmed by the user): each scan is half of an A3 flatbed
+scan with some overlap, always A3 sheets. There is no paper edge and no shadow ridge
+anywhere in the issue. (An earlier revision of this note claimed p020 was a physical page
+edge with a separate sheet behind it — that was a misreading and is false.)
 
 ### Two stages — detection and localisation want opposite things
 ```

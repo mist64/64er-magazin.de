@@ -10,10 +10,9 @@ where one background ends and the other begins.
   Parity:  EVEN page -> neighbour hugs the RIGHT edge
            ODD  page -> neighbour hugs the LEFT  edge
 
-NOTE on the sheet: most spreads are two pages printed on ONE folded sheet (no paper edge,
-no shadow ridge -- a purely printed step). But not all: p020 clearly shows a PHYSICAL page
-edge with a separate sheet behind it, whose content carries its own angle. Both cases exist
-in this issue and the estimator below does not assume either.
+NOTE on the sheet (confirmed by the user): EVERY page is half of an A3 flatbed scan with
+overlap -- always A3 sheets. The boundary is ALWAYS a printed step between two pages of the
+same sheet; there is no paper edge and no shadow ridge anywhere in this issue.
 
 This tool fires ONLY where the two backgrounds genuinely differ over at least part of the
 height. Cream-on-cream is unobservable and is explicitly NOT its job.
@@ -184,6 +183,19 @@ STAPLE_ANG_TOL = 0.5    # HARD CONSTRAINT (user): the boundary slant is within t
                         #   while our own free slant fit had 0.7 deg of noise -- larger
                         #   than the entire plausible range -- so this bound is pure gain.
 
+# --- cream vs coloured background (drives the extra side cut) --------------- #
+# Measured at the boundary over all fired pages: cream paper sits at L 195-210 with
+# |R-G| <= 18 and |G-B| <= 8, while every neighbour/ad background is either DARK
+# (L 49-103) or SATURATED (|R-G| up to 161). The two groups do not overlap.
+CREAM_L_MIN  = 170.0    # cream is at least this bright ...
+CREAM_CHROMA = 25.0     # ... and this close to neutral in both opponent channels
+# A printed edge is not infinitely sharp: cutting at the 50% crossing leaves ~8 px of the
+# neighbour's ramp behind (measured on p014: L196 at -8 px, 189 at -4, 165 at 0). Where OUR
+# side is cream that residue is visible as a fringe, so we cut a little further. Where our
+# side is the coloured one, the leftover is cream-on-cream and invisible -- and cutting
+# further would eat real content, so we do not. Both coloured -> cut further as well.
+#   extra  <=>  ours is cream  OR  the neighbour is not cream
+
 # --- decision --------------------------------------------------------------- #
 # z (accumulator peak in robust sigma) is REPORTED but is NOT a gate: it measures how
 # dominant the winning line is within the band, which is high for a crisp text-column edge
@@ -328,7 +340,7 @@ def refine_crossing(f, xl, sx):
     the band onto the axis joining them, and take the zero crossing of that projection.
     That is precisely "the 50% crossing of the printed step", with no threshold.
 
-    Returns (crossings, valid) in downscaled px, one per row.
+    Returns (crossings, valid, step_size, c_in, c_out); crossings in downscaled px.
     """
     h, w, _ = f.shape
     ys = np.arange(h)
@@ -352,7 +364,7 @@ def refine_crossing(f, xl, sx):
     n = float(np.median(mag[sel]))                    # step size, measured on those rows
     un = float(np.linalg.norm(u))
     if un < 1e-6 or n < 1e-6:
-        return None, None, 0.0
+        return None, None, 0.0, None, None
     u = u / un
     mid = (c_in + c_out) / 2.0
     p = (f - mid) @ u                                 # <0 outboard, >0 inboard
@@ -368,7 +380,7 @@ def refine_crossing(f, xl, sx):
             j = k[np.argmin(np.abs(k + a - xi[y]))]    # crossing nearest the coarse line
             d = seg[j + 1] - seg[j]
             cross[y] = a + j + (0.0 if d == 0 else -seg[j] / d)
-    return cross, np.isfinite(cross), float(n)
+    return cross, np.isfinite(cross), float(n), c_in, c_out
 
 
 def _pick_peak(Z):
@@ -468,7 +480,7 @@ def fit_band(f, sx, parity, clip_inb=None, staple_ang=None, rows=None):
 
     ys = np.arange(h, dtype=np.float32)
     xl = x_coarse + np.tan(np.deg2rad(ang)) * (ys - yc)
-    cross, ok, sep = refine_crossing(f, xl, sx)
+    cross, ok, sep, c_in, c_out = refine_crossing(f, xl, sx)
     if rows is not None and ok is not None:
         keep = np.zeros(h, bool); keep[rows] = True
         ok = ok & keep
@@ -519,7 +531,17 @@ def fit_band(f, sx, parity, clip_inb=None, staple_ang=None, rows=None):
 
     railed = bool(railed or x_peak <= xs[0] + 0.5 or x_peak >= xs[-1] - 0.5)
     return dict(x_peak=x_peak, sl=sl, ang=ang, z=z, step=sep, n_in=n_in,
-                ext=n_in / float(h), span=span, railed=railed, h=h)
+                ext=n_in / float(h), span=span, railed=railed, h=h,
+                c_in=None if c_in is None else [float(v) for v in c_in],
+                c_out=None if c_out is None else [float(v) for v in c_out])
+
+
+def is_cream(c):
+    """True if this background is the page's cream paper (bright and near-neutral)."""
+    if c is None:
+        return False
+    return (c[0] >= CREAM_L_MIN and abs(c[1]) / CHROMA_W <= CREAM_CHROMA
+            and abs(c[2]) / CHROMA_W <= CREAM_CHROMA)
 
 
 def detect(page, thumb_dir=THUMB_DIR, clip_inb=None, staple_ang=None):
@@ -536,7 +558,10 @@ def detect(page, thumb_dir=THUMB_DIR, clip_inb=None, staple_ang=None):
                 inboard_bot=float(inb_mid + r["sl"] * half),
                 angle_deg=float(ang_page), staple_deg=staple_ang, z=r["z"],
                 step=r["step"], vote_frac=r["ext"], n_vote=r["n_in"],
-                extent_span=r["span"], W=W, H=H, y_off=y0)
+                extent_span=r["span"], W=W, H=H, y_off=y0,
+                c_in=r["c_in"], c_out=r["c_out"],
+                ours_cream=is_cream(r["c_in"]), neighbour_cream=is_cream(r["c_out"]),
+                extra_cut=bool(is_cream(r["c_in"]) or not is_cream(r["c_out"])))
 
 
 def overlay(page, r, thumb_dir=THUMB_DIR, clip=None):
