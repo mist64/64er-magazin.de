@@ -51,6 +51,30 @@ WIN_LR_FRAC   = 0.16     # left/right  search-window depth as a fraction of imag
 PAGE_LUMA     = 120      # PAGE (paper) is LIGHT: luma above this ...
 PAGE_SAT      = 40       # ... AND NEUTRAL: saturation (max-min channel) below this. Yellow/blue backing
                          #     is saturated -> not page; black bed is dark -> not page.
+# --- POSITIVE BED TEST (replaces "page = light+neutral, backing = the rest") ---------------------
+# The old test defined PAGE as light AND neutral and took the first page pixel as the backing depth.
+# On a FULL-BLEED page there is no such pixel anywhere in the window, so every column read as
+# "no page" -> full-bleed -> LOW confidence -> the edge was left uncut. That is why p001 (dark teal
+# cover, sat 106) and p003 (black block) kept their bed. We now detect the BED POSITIVELY. Measured
+# medians (600-dpi thumbs):
+#     bed              L 31-44   sat  2-3    screen  6-10
+#     yellow insert    L 192     sat 137     screen  2.2
+#     p001 teal cover  L 128     sat 120     screen 14.6   <- kept by luma+sat
+#     p005 halftone    L  41     sat  40     screen  8.4   <- kept by SAT alone
+#     p047 dark ad     L  39     sat   7     screen 29.1   <- kept by SCREEN alone
+# All three terms are load-bearing: no two of them separate all of these cases.
+BED_LUMA      = 55       # bed is VERY dark ...
+BED_SAT       = 12       # ... and VERY neutral (this is what keeps p005's green halftone, sat 40) ...
+SCREEN_MAX    = 13       # ... and UNSCREENED. Printed ink carries the halftone; the scanner backing
+                         #     and the cardboard insert do not. Band-pass energy (L minus a 7px box
+                         #     mean, RMS over 7px) -- the only term that keeps p047's dark ad (29).
+INSERT_LUMA   = 150      # a COLOURED INSERT (cardboard) is also BRIGHT. Without this the solid teal
+                         #     of p001's cover (L 104, sat 103, unscreened at the top edge where it is
+                         #     a flat band) is indistinguishable from the yellow cardboard (L 192,
+                         #     sat 137) and the whole cover reads as backing. A dark saturated region
+                         #     is printed ink, not backing. NB: calibrated on this issue's yellow
+                         #     insert -- a genuinely DARK coloured insert would need this re-measured.
+SCREEN_BOX_600 = 7       # band-pass window @600dpi; ~the 150-lpi screen period is 4px there
 DARK_LUMA     = 70       # a backing-run pixel counts as "dark-neutral" if luma < this ...
 DARK_SAT      = 40       # ... and saturation < this (neutral). Covers lid black + backing sheet + shadow.
 SAT_BACK      = 60       # a backing-run pixel counts as "saturated" (colored insert) if saturation >= this.
@@ -90,12 +114,31 @@ EDGES = ("top", "bottom", "left", "right")
 
 
 # ---------------------------------------------------------------------------------------------------
-def _orient(lum, sat, edge, dtb, dlr, H, W):
-    """Return (L,S) with axis0 = along-edge (line index x), axis1 = depth from the border inward."""
-    if edge == "top":    return lum[:dtb].T,               sat[:dtb].T
-    if edge == "bottom": return lum[H-dtb:][::-1].T,       sat[H-dtb:][::-1].T
-    if edge == "left":   return lum[:, :dlr],              sat[:, :dlr]
-    if edge == "right":  return lum[:, W-dlr:][:, ::-1],   sat[:, W-dlr:][:, ::-1]
+def screen_energy(lum, dpi):
+    """Band-pass RMS: how much halftone screen this pixel sits in.
+
+    Printed ink is screened; the scanner backing and the cardboard insert are not. This is the
+    only signal that separates a full-bleed DARK NEUTRAL ad (p047: screen 29) from the bed
+    (screen 6-10), since those two are identical in luma and saturation."""
+    b = max(3, round(SCREEN_BOX_600 * dpi / 600))
+    hp = lum - ndi.uniform_filter(lum, b)
+    return np.sqrt(np.maximum(ndi.uniform_filter(hp * hp, b), 0))
+
+
+def _orient1(a, edge, dtb, dlr, H, W):
+    if edge == "top":    return a[:dtb].T
+    if edge == "bottom": return a[H-dtb:][::-1].T
+    if edge == "left":   return a[:, :dlr]
+    if edge == "right":  return a[:, W-dlr:][:, ::-1]
+
+
+def _orient(lum, sat, edge, dtb, dlr, H, W, scr=None):
+    """Return (L,S[,Sc]) with axis0 = along-edge (line index x), axis1 = depth from the border."""
+    L = _orient1(lum, edge, dtb, dlr, H, W)
+    S = _orient1(sat, edge, dtb, dlr, H, W)
+    if scr is None:
+        return L, S
+    return L, S, _orient1(scr, edge, dtb, dlr, H, W)
 
 
 def _deorient(mask_edge, edge, H, W, dtb, dlr):
@@ -108,11 +151,20 @@ def _deorient(mask_edge, edge, H, W, dtb, dlr):
     return m
 
 
-def _profile(L, S, dpi):
-    """Step 1: per-line backing profile. Return d (first-page depth), backing mask, nopage mask."""
+def _profile(L, S, dpi, Sc=None):
+    """Step 1: per-line backing profile. Return d (first-page depth), backing mask, nopage mask.
+
+    PAGE is now "not backing" under the positive bed/insert test (see BED_LUMA), so a full-bleed
+    dark or saturated page still yields a page pixel and the edge is analysable."""
     N, D = L.shape
     min_depth = max(2, round(MIN_DEPTH_600 * dpi / 600))
-    page = (L > PAGE_LUMA) & (S < PAGE_SAT)
+    if Sc is None:
+        page = (L > PAGE_LUMA) & (S < PAGE_SAT)
+    else:
+        unscreened = Sc < SCREEN_MAX
+        is_bed    = (L < BED_LUMA) & (S < BED_SAT) & unscreened
+        is_insert = (S >= SAT_BACK) & unscreened & (L >= INSERT_LUMA)   # bright smooth cardboard
+        page = ~(is_bed | is_insert)
     haspage = page.any(1)
     d = page.argmax(1)                                    # first page pixel; 0 if page at border
     idx = np.arange(D)[None, :]
@@ -179,14 +231,23 @@ def _brute_cut(d, backing, nopage, D, dpi):
     return cut_depth, metrics
 
 
-def _page_beyond(L, S, cut_depth, dpi, D):
-    """Step 3(a): fraction of the band just beyond the cut line (full width) that is clean PAGE."""
+def _page_beyond(L, S, cut_depth, dpi, D, Sc=None):
+    """Step 3(a): fraction of the band just beyond the cut line (full width) that is clean PAGE.
+
+    Uses the SAME page definition as _profile. With the old light+neutral test this returned ~0 on
+    a full-bleed page -- the teal beyond p001's bed is page, but it is neither light nor neutral --
+    so the edge could never reach HIGH confidence and was never cut."""
     beyond = max(3, round(BEYOND_600 * dpi / 600))
     idx = np.arange(D)[None, :]
     lo = np.clip(cut_depth.astype(int), 0, D - 1)
     hi = np.clip(cut_depth.astype(int) + beyond, 0, D)
     band = (idx >= lo[:, None]) & (idx < hi[:, None])
-    page = (L > PAGE_LUMA) & (S < PAGE_SAT)
+    if Sc is None:
+        page = (L > PAGE_LUMA) & (S < PAGE_SAT)
+    else:
+        unscreened = Sc < SCREEN_MAX
+        page = ~(((L < BED_LUMA) & (S < BED_SAT) & unscreened)
+                 | ((S >= SAT_BACK) & unscreened & (L >= INSERT_LUMA)))
     return float((page & band).sum() / max(1, band.sum()))
 
 
@@ -199,18 +260,18 @@ def _confidence(metrics):
     return "HIGH" if (a and b and c) else "LOW"
 
 
-def analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr):
+def analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr, scr=None):
     """Full per-edge analysis: returns (cut_depth, confidence, metrics). Pure measurement, no policy."""
-    L, S = _orient(lum, sat, edge, dtb, dlr, H, W)
+    L, S, Sc = _orient(lum, sat, edge, dtb, dlr, H, W, scr=scr)
     D = L.shape[1]
-    d, backing, nopage, satfrac = _profile(L, S, dpi)
+    d, backing, nopage, satfrac = _profile(L, S, dpi, Sc)
     if backing.sum() == 0:
         m = dict(page_cut=0.0, total_backing=0.0, slope=0.0, angle_deg=0.0, height=0.0,
                  backing_frac=0.0, nopage_frac=float(nopage.mean()), n_backing=0,
                  median_depth=0.0, page_beyond=0.0, sat_frac=0.0)
         return np.zeros(L.shape[0]), "NONE", m
     cut_depth, m = _brute_cut(d, backing, nopage, D, dpi)
-    m["page_beyond"] = _page_beyond(L, S, cut_depth, dpi, D)
+    m["page_beyond"] = _page_beyond(L, S, cut_depth, dpi, D, Sc)
     m["sat_frac"] = float(np.median(satfrac[backing]))
     conf = _confidence(m)
     return cut_depth, conf, m
@@ -223,13 +284,14 @@ def bed_matte(rgb, dpi, priors=None, page_no=None, return_meta=False):
     a = np.asarray(rgb)[..., :3].astype(np.float32); H, W, _ = a.shape
     lum = a @ np.array([0.299, 0.587, 0.114], np.float32)
     sat = a.max(2) - a.min(2)
+    scr = screen_energy(lum, dpi)
     dtb = int(WIN_TB_FRAC * H); dlr = int(WIN_LR_FRAC * W)
     parity = None if page_no is None else ("even" if page_no % 2 == 0 else "odd")
 
     mask = np.zeros((H, W), bool); meta = {}
     for edge in EDGES:
         D = dtb if edge in ("top", "bottom") else dlr
-        cut_depth, conf, m = analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr)
+        cut_depth, conf, m = analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr, scr=scr)
         apply = (conf == "HIGH")
         decision = conf
         if priors is not None and conf != "HIGH" and m["n_backing"] > 0:
