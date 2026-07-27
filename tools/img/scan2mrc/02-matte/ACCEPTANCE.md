@@ -19,9 +19,14 @@ the bottom; could be blue at the top for another magazine). It must NOT cut page
   far corner; YELLOW BOTTOM -> cut (yellow+black+transition up to page). Sides: flush -> no cut.
 - **089, 071**: centerfold -> one SIDE has a wide flat black BAR (outer) -> cut as a clean straight
   strip, no overshoot into the schematic/text; YELLOW BOTTOM -> cut. (089 bar = right; 071 = ?)
-- **047**: full-bleed dark ad (Star NG-10). TOP/SIDES = content -> LEAVE. YELLOW BOTTOM -> cut.
-- **005**: full-bleed GREEN HALFTONE comic. TOP/SIDES = content -> LEAVE (this is the hard one -- the
-  halftone's light gaps must not be mistaken for page). YELLOW BOTTOM -> cut.
+- **047**: full-bleed dark ad (Star NG-10). SIDES = content -> LEAVE. YELLOW BOTTOM -> cut.
+  TOP: there IS a thin bed wedge here (~15px @600). The original note said "leave the top" because the
+  old detector could not cut it without eating the ad; with the positive bed test it cuts the wedge and
+  stops exactly at the screened ink (verified at 4x with --magenta). The rule is "never cut content",
+  not "never cut this edge".
+- **005**: full-bleed GREEN HALFTONE comic. SIDES = content -> LEAVE (this is the hard one -- the
+  halftone's light gaps must not be mistaken for page). YELLOW BOTTOM -> cut. TOP: thin bed wedge
+  (~21px @600) -> cut, same as 047; the halftone below it is untouched.
 - (add more pages as needed: an even page with real LEFT bed; a clean text page with minimal bed.)
 
 ## How to judge
