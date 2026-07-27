@@ -116,7 +116,12 @@ def page_edges(args):
             med = np.median(db); mad = np.median(np.abs(db - med))
             core = backing & (d <= med + max(B.OUTLIER_K * 1.4826 * mad, B.FENCE_MIN_600))
             if core.any():
-                lo = float(np.clip(d - cut, 0, None)[core].max())
+                # p99.5, NOT max: a single column is not a stripe. p050's top failed on ONE
+                # column out of 5000 (0.02%, p99 = 0) and p003's on 0.32%, while the
+                # issue-wide audit -- which requires residue on >5% of an edge's lines --
+                # reports no stripe on either. audit_matte had this same max-over-lines bug
+                # and was fixed; this file was not.
+                lo = float(np.percentile(np.clip(d - cut, 0, None)[core], 99.5))
         out[edge] = (lo, float(np.median(cut)), float(backing.mean()),
                      meta.get(edge, {}).get("decision", "?"))
     return page, out
