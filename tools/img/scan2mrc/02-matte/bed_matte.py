@@ -81,6 +81,7 @@ SAT_BACK      = 60       # a backing-run pixel counts as "saturated" (colored in
 NONPAGE_FRAC  = 0.85     # a line is BACKING if >= this fraction of its run pixels are each dark-neutral
                          #     OR saturated (i.e. non-page). Yellow+black composite passes (~1.0); a run
                          #     riddled with mid-tone content pixels fails.
+STRIP_START_600 = 6      # the dark run must begin within this of the depth already found
 EDGE_STRIP_600 = 26      # after the cut line is fitted, extend it past a SHORT DARK RUN that
                          # starts within this distance beyond the cut and ENDS before it --
                          # the bed shadow between the page edge and the cardboard insert.
@@ -371,18 +372,33 @@ def _brute_cut(d, backing, nopage, D, dpi):
     return cut_depth, metrics
 
 
-def _extend_over_strip(L, S, cut_depth, dpi, D):
-    """Extend the cut past a thin dark strip sitting just beyond it (see EDGE_STRIP_600)."""
+def _extend_over_strip(L, S, depth, dpi, D):
+    """Extend the backing depth past a thin dark strip that CONTINUES the run.
+
+    The bed shadow between the page edge and the cardboard insert is dark, neutral, a few px
+    thick, and sits IMMEDIATELY beyond the backing already found (p001: insert -> a few px of
+    transition blur -> 6px of black bed -> page). Two requirements keep it from firing
+    elsewhere:
+      * the dark run must START within STRIP_START_600 of the current depth -- otherwise it is
+        unrelated content further in. Without this, a HALFTONE has dark dots everywhere in the
+        window and every column grew its own extension (p005's top went 38 -> 62px).
+      * the run must END inside the window -- a run that does not end is content, not a strip.
+    This corrects the PROFILE; the line fit then draws one smooth boundary through it.
+    """
     w = max(4, int(round(EDGE_STRIP_600 * dpi / 600)))
+    st = max(2, int(round(STRIP_START_600 * dpi / 600)))
     dark = (L < BED_LUMA) & (S < BED_SAT)
-    out = cut_depth.astype(np.float64).copy()
+    out = depth.astype(np.float64).copy()
     idx = np.arange(D)[None, :]
-    lo = np.clip(cut_depth.astype(int), 0, D - 1)
+    lo = np.clip(depth.astype(int), 0, D - 1)
+
+    near = (idx >= lo[:, None]) & (idx < np.minimum(lo + st, D)[:, None])
+    starts = (dark & near).any(1)                       # a dark run begins right where we are
     win = (idx >= lo[:, None]) & (idx < np.minimum(lo + w, D)[:, None])
     dw = dark & win
     has = dw.any(1)
-    last = np.where(has, (dw * idx).max(1), -1)          # deepest dark px inside the window
-    ends_inside = has & (last < (lo + w - 1))            # the run ENDS before the window does
+    last = np.where(has, (dw * idx).max(1), -1)
+    ends_inside = has & starts & (last < (lo + w - 1))
     out[ends_inside] = last[ends_inside] + 1
     return np.clip(out, 0, D)
 
@@ -428,13 +444,18 @@ def analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr, scr=None):
     Sc = screen_energy(L, dpi)
     D = L.shape[1]
     d, backing, nopage, satfrac = _profile(L, S, dpi, Sc)
+    # NB: a strip-extension pass used to run here (see _extend_over_strip, kept for the
+    # record). It is REMOVED because the positive material walk made it redundant where it
+    # helped and harmful where it fired: p001's bed strip is covered without it (cut 166 vs
+    # deepest bed-dark 165), while on p005's top the "dark run beyond the depth" is the GREEN
+    # HALFTONE COMIC, so it cut 37px of content (38 -> 62px). Applying it after the fit also
+    # combed the boundary per column, breaking ACCEPTANCE rule 1.
     if backing.sum() == 0:
         m = dict(page_cut=0.0, total_backing=0.0, slope=0.0, angle_deg=0.0, height=0.0,
                  backing_frac=0.0, nopage_frac=float(nopage.mean()), n_backing=0,
                  median_depth=0.0, page_beyond=0.0, sat_frac=0.0)
         return np.zeros(L.shape[0]), "NONE", m
     cut_depth, m = _brute_cut(d, backing, nopage, D, dpi)
-    cut_depth = _extend_over_strip(L, S, cut_depth, dpi, D)
     m["page_beyond"] = _page_beyond(L, S, cut_depth, dpi, D, Sc)
     m["sat_frac"] = float(np.median(satfrac[backing]))
     conf = _confidence(m)
