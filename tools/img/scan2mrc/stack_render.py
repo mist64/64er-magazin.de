@@ -41,7 +41,7 @@ Image.MAX_IMAGE_PIXELS = None
 # --------------------------------------------------------------------------- #
 THUMB   = "/Users/mist/DNB/8609/thumbs_600"
 SKEW    = "/Users/mist/DNB/8609/tmp/skew_all.txt"
-SPINE   = "/Users/mist/DNB/8609/tmp/shear_v7.json"
+SPINE   = "/Users/mist/DNB/8609/tmp/shear_v8.json"
 CLIPJS  = "/Users/mist/DNB/8609/tmp/clip_holes.json"
 PRIORSF = os.path.join(HERE, "02-matte/priors.json")
 OUT_DIR = "/Users/mist/DNB/8609/tmp/stack600"
@@ -50,6 +50,15 @@ DPI        = 600
 SPINE_OVER = 6      # cut this many px PAST the spine line toward the page, so the whole
                     #   neighbour goes; it only eats our own inner margin, which the A4
                     #   crop discards anyway.
+SPINE_EXTRA = 12    # ADDITIONAL cut where shear_spine reports extra_cut, i.e. where OUR
+                    #   side of the boundary is cream, or where both sides are coloured.
+                    #   A printed edge is not sharp: cutting at the 50% crossing leaves
+                    #   ~8 px of the neighbour's ramp (measured on p014 -- L196 at -8 px,
+                    #   189 at -4, 165 at 0), which shows as a fringe against cream but is
+                    #   invisible against a coloured background. Where OUR side is the
+                    #   coloured one we deliberately do NOT cut further: the residue is
+                    #   cream-on-cream and unnoticeable, and more cutting would eat real
+                    #   content (p047/p170/p045 are full-bleed ads running to the fold).
 
 # --- fallback for pages with no detectable background difference ------------ #
 # ~130 of 176 pages are cream-on-cream: the neighbour is there but is the same colour as
@@ -100,7 +109,12 @@ def spine_mask(shape, rec, parity, clip_entry):
 
     if rec and rec.get("found"):
         inb = rec["inboard_top"] + (rec["inboard_bot"] - rec["inboard_top"]) * (ys / max(1, H - 1))
-        return _cut_outboard((H, W), inb - SPINE_OVER, parity), "colour"
+        over = SPINE_OVER + (SPINE_EXTRA if rec.get("extra_cut") else 0)
+        # NB the sign: `inb` is the distance INBOARD of the binding edge, so cutting further
+        # toward our own page means a LARGER inb. Subtracting here pulls the cut back toward
+        # the page edge and leaves a sliver of the neighbour standing (p007's red block edge
+        # was visible exactly this way, and every "overcut" made it worse, not better).
+        return _cut_outboard((H, W), inb + over, parity), ("colour+" if rec.get("extra_cut") else "colour")
 
     hs = [h for h in (clip_entry or {}).get("holes", []) if h[2]]
     if len(hs) < HOLE_MIN:
@@ -109,7 +123,7 @@ def spine_mask(shape, rec, parity, clip_entry):
     coef, *_ = np.linalg.lstsq(np.stack([np.ones_like(hy), hy], 1), hx, rcond=None)
     xline = coef[0] + coef[1] * ys                      # absolute x of the hole line
     inb = (W - xline) if parity == "even" else xline
-    return _cut_outboard((H, W), inb - HOLE_OVERCUT, parity), "holes"
+    return _cut_outboard((H, W), inb + HOLE_OVERCUT, parity), "holes"   # + = further inboard
 
 
 def render(page, priors, skew, spine, clip, tmpl):

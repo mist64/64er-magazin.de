@@ -85,14 +85,28 @@ MIN_DEPTH_600 = 3        # ignore runs shallower than this (a flush paper edge, 
 
 SLOPE_MAX_DEG  = 4.0     # brute-force slope range for the straight cut line (+- this many degrees)
 SLOPE_STEP_DEG = 0.05    # slope grid step
-SLACK          = 0.01    # backing_left budget as a fraction of the CORE-backing depth (cover ~all backing)
+COVER_PCT      = 99.5    # place the cut line at this percentile of the CORE backing depth.
+                         # The old rule ("smallest height whose LEFTOVER AREA <= SLACK * total") is a
+                         # SUM criterion, and a thin strip spanning the full width is cheap by that
+                         # measure -- so the line landed on the MEDIAN backing depth and ~37% of
+                         # columns kept a visible stripe (p004: h=153 vs backing p95=170, max
+                         # shortfall 25px). ACCEPTANCE says the opposite: cover ALL the backing, and
+                         # a few px of over-cut into page margin is fine while under-cut is not.
+                         # The core is already MAD-fenced (OUTLIER_K) so a deep content box does not
+                         # drag this up; p99 of what remains is the real backing edge.
+SLACK          = 0.01    # (retained: still used as the feasibility budget in metrics reporting)
 OUTLIER_K      = 3.0     # containment: within the de-sloped frame, backing columns whose depth exceeds
                          #     median + OUTLIER_K*1.4826*MAD are treated as deep CONTENT outliers and are
                          #     EXCLUDED from the coverage constraint (so a black content box touching the
                          #     edge, e.g. p005 bottom, is LEFT while the bulk yellow is still covered
                          #     tightly). A widening bar is a LINEAR ramp -> uniform after de-sloping ->
                          #     small MAD -> NOT excluded -> fully covered.
-OVERCUT_600    = 2       # push the accepted line this many px past the backing (minimise white cut) @600
+OVERCUT_600    = 8       # push the accepted line this many px past the backing @600dpi. Was 2, which
+                         # left a 3-10px stripe on ~13% of columns even after COVER_PCT: the backing
+                         # edge is not perfectly straight and p99 of the core still clips the tail.
+                         # ACCEPTANCE permits "a couple px" of overshoot into page margin but no
+                         # stripe at all, and the A4 crop discards this margin regardless. 8px @600
+                         # = 0.34mm.
 
 BEYOND_600       = 30    # depth of the "just beyond the cut" band used for the page-beyond test @600dpi
 BEYOND_PAGE_FRAC = 0.50  # HIGH-conf (a): >= this fraction of that beyond-band (full width) must be PAGE
@@ -207,14 +221,8 @@ def _brute_cut(d, backing, nopage, D, dpi):
         if core_total <= 0 or len(eb) == 0:
             h = 0.0
         else:
-            csum = np.concatenate(([0.0], np.cumsum(eb)))  # prefix sums of sorted core eb
-            tot = csum[-1]
-            # smallest h with backing_left(h)=sum(eb[eb>h])-h*count(eb>h) <= budget (decreasing in h)
-            hs = np.unique(np.concatenate((eb, eb + 1))); hs = hs[hs >= 0]
-            k = np.searchsorted(eb, hs, side="right")
-            above = (tot - csum[k]) - hs * (len(eb) - k)
-            ok = np.where(above <= budget)[0]
-            h = float(hs[ok[0]]) if len(ok) else float(eb[-1])
+            # COVER the core backing rather than minimising the leftover AREA -- see COVER_PCT.
+            h = float(np.percentile(eb, COVER_PCT))
         # page_cut at this (slope,h): page pixels cut over all columns with a known page depth
         e_np = d_np - sl * (x_np - xc)
         page_cut = float(np.clip(h - e_np, 0, None).sum())
