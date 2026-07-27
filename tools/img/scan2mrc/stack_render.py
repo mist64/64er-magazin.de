@@ -50,6 +50,21 @@ DPI        = 600
 SPINE_OVER = 6      # cut this many px PAST the spine line toward the page, so the whole
                     #   neighbour goes; it only eats our own inner margin, which the A4
                     #   crop discards anyway.
+
+# --- fallback for pages with no detectable background difference ------------ #
+# ~130 of 176 pages are cream-on-cream: the neighbour is there but is the same colour as
+# our margin, so no colour boundary exists to find. There we cut on the CLIP-HOLE LINE.
+# That is justified by measurement, not convenience: over the 46 pages where the boundary
+# IS detectable, (boundary - hole column) has a median of -2.7 px = -0.12 mm, i.e. the hole
+# line is an UNBIASED estimator of the boundary. No systematic correction is needed.
+# Its scatter is +/-44 px (1.9 mm) though, and on 48% of pages the true boundary lies
+# INBOARD of the holes -- so cutting exactly on the line would leave a neighbour sliver
+# about half the time. Hence the overcut below.
+HOLE_OVERCUT = 44   # cut this far INBOARD of the hole line (= 1 sigma of the measured
+                    #   scatter, 1.9 mm). Costs nothing: the logo-anchored A4 window's inner
+                    #   edge already sits ~7 mm inboard of the holes on every page, so these
+                    #   pixels are discarded by the crop regardless.
+HOLE_MIN     = 4    # need at least this many located holes to fit the fallback line
 MONT_W     = 150    # per-page width in the contact sheet
 CHECKER    = 24     # checkerboard square size (px) used to VISUALISE alpha in the montage
 
@@ -63,22 +78,38 @@ def load_skew():
     return ang
 
 
-def spine_mask(shape, rec, parity):
-    """Alpha-0 everything OUTBOARD of the fitted boundary line (toward the binding edge)."""
+def _cut_outboard(shape, inb, parity):
+    """Alpha-0 everything OUTBOARD of the per-row inboard distance `inb`."""
     H, W = shape
-    m = np.zeros((H, W), bool)
-    if not rec or not rec.get("found"):
-        return m
-    ys = np.arange(H, dtype=np.float32)
-    # inboard distance at each row, linear between the reported top and bottom values
-    inb = rec["inboard_top"] + (rec["inboard_bot"] - rec["inboard_top"]) * (ys / max(1, H - 1))
-    inb = inb - SPINE_OVER
     xx = np.arange(W)[None, :]
     if parity == "even":                       # neighbour on the RIGHT
-        m = xx >= (W - inb[:, None])
-    else:                                      # neighbour on the LEFT
-        m = xx <= inb[:, None]
-    return m
+        return xx >= (W - inb[:, None])
+    return xx <= inb[:, None]                  # neighbour on the LEFT
+
+
+def spine_mask(shape, rec, parity, clip_entry):
+    """Cut the neighbour page off.
+
+    Preferred: the measured background-colour boundary. Where no colour difference exists
+    (cream-on-cream, ~130 of 176 pages) fall back to the CLIP-HOLE line -- see HOLE_OVERCUT
+    for why that is a sound estimator and why over-cutting there is free. Returns
+    (mask, source) where source is "colour", "holes" or "none".
+    """
+    H, W = shape
+    ys = np.arange(H, dtype=np.float32)
+
+    if rec and rec.get("found"):
+        inb = rec["inboard_top"] + (rec["inboard_bot"] - rec["inboard_top"]) * (ys / max(1, H - 1))
+        return _cut_outboard((H, W), inb - SPINE_OVER, parity), "colour"
+
+    hs = [h for h in (clip_entry or {}).get("holes", []) if h[2]]
+    if len(hs) < HOLE_MIN:
+        return np.zeros((H, W), bool), "none"
+    hx = np.array([h[0] for h in hs], float); hy = np.array([h[1] for h in hs], float)
+    coef, *_ = np.linalg.lstsq(np.stack([np.ones_like(hy), hy], 1), hx, rcond=None)
+    xline = coef[0] + coef[1] * ys                      # absolute x of the hole line
+    inb = (W - xline) if parity == "even" else xline
+    return _cut_outboard((H, W), inb - HOLE_OVERCUT, parity), "holes"
 
 
 def render(page, priors, skew, spine, clip, tmpl):
@@ -95,7 +126,8 @@ def render(page, priors, skew, spine, clip, tmpl):
     unknown |= (np.asarray(bed_rgba)[:, :, 3] == 0)
 
     # -- 02b neighbour page beyond the background boundary ----------------------
-    unknown |= spine_mask((H, W), spine.get(p), parity)
+    sm, src = spine_mask((H, W), spine.get(p), parity, clip.get(p))
+    unknown |= sm
 
     # -- 02b binder-clip holes (exact shapes) -----------------------------------
     res = clip.get(p)
@@ -116,7 +148,7 @@ def render(page, priors, skew, spine, clip, tmpl):
     if abs(ang) > 1e-3:
         out = out.rotate(ang, resample=Image.BICUBIC, expand=True,
                          fillcolor=(0, 0, 0, 0))
-    return out, ang, float(unknown.mean())
+    return out, ang, float(unknown.mean()), src
 
 
 def montage(pages, out_path):
@@ -163,10 +195,11 @@ def main():
 
     for n in pages:
         try:
-            out, ang, frac = render(n, priors, skew, spine, clip, tmpl)
+            out, ang, frac, src = render(n, priors, skew, spine, clip, tmpl)
             f = os.path.join(OUT_DIR, "%03d.png" % n)
             out.save(f)
-            print("p%03d skew %+0.2f  unknown %5.2f%%  %s" % (n, ang, 100 * frac, out.size))
+            print("p%03d skew %+0.2f  unknown %5.2f%%  spine=%-6s %s"
+                  % (n, ang, 100 * frac, src, out.size))
         except Exception as e:
             print("p%03d FAILED: %s" % (n, e))
     if a.montage:
