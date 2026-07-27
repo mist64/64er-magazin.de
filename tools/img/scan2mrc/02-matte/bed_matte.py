@@ -83,9 +83,20 @@ NONPAGE_FRAC  = 0.85     # a line is BACKING if >= this fraction of its run pixe
                          #     riddled with mid-tone content pixels fails.
 MIN_DEPTH_600 = 3        # ignore runs shallower than this (a flush paper edge, not backing) @600dpi
 
-SLOPE_MAX_DEG  = 4.0     # brute-force slope range for the straight cut line (+- this many degrees)
+SLOPE_MAX_DEG  = 1.1     # brute-force slope range for the cut line, degrees. DERIVED, not guessed:
+                         # the sheet edge is straight, so in the RAW (pre-deskew) frame its tilt is
+                         # the page skew, measured over all 176 pages as median 0.13, p95 0.34,
+                         # MAX 0.78 deg. A cut steeper than ~1.1 deg is therefore not a paper edge --
+                         # it is the line locking onto tilted CONTENT (p031's right edge drifted
+                         # 121px = 1.18 deg across the page under the old +-4 deg range).
 SLOPE_STEP_DEG = 0.05    # slope grid step
-COVER_PCT      = 99.5    # place the cut line at this percentile of the CORE backing depth.
+COVER_PCT      = 100.0   # place the cut line at this percentile of the CORE backing depth.
+                         # 100, not 99.5: rule 1 is absolute -- "ALWAYS cut 100% of the
+                         # neighbour/backing; not doing that is a FAIL". At 99.5 the deepest
+                         # 0.5% of core columns were by construction left uncovered, which
+                         # showed up as 5-9px (0.2-0.4mm) standing on p004/p003/p089. The core
+                         # is already outlier-fenced, so covering all of it does not chase a
+                         # content block.
                          # The old rule ("smallest height whose LEFTOVER AREA <= SLACK * total") is a
                          # SUM criterion, and a thin strip spanning the full width is cheap by that
                          # measure -- so the line landed on the MEDIAN backing depth and ~37% of
@@ -95,6 +106,28 @@ COVER_PCT      = 99.5    # place the cut line at this percentile of the CORE bac
                          # The core is already MAD-fenced (OUTLIER_K) so a deep content box does not
                          # drag this up; p99 of what remains is the real backing edge.
 SLACK          = 0.01    # (retained: still used as the feasibility budget in metrics reporting)
+CURVE_MIN_FRAC = 0.30    # fit the bow ONLY if at least this fraction of lines are backing.
+                         # A quadratic fitted to a handful of scattered columns and then
+                         # EXTRAPOLATED over the full edge explodes: on p015's right edge
+                         # (clean paper, backing 0.7%) it produced a cut of 822px = the whole
+                         # search window = 35mm of real page destroyed.
+CURVE_MAX_600  = 40      # max bow (px @600dpi) the quadratic term may add across the whole edge.
+                         # The sheet BOWS in the scanner: the backing boundary is not straight but a
+                         # shallow arc, measured at 8-13px across the width (p005 140/132/145,
+                         # p009 148/140/146). A straight line cannot follow a curve, so it left a few
+                         # px standing at BOTH ends -- visible only at the outer end, because the
+                         # binding end is already removed by the spine cut. That is why every page
+                         # reported had the residue in the same corner. Bounded so a wild fit cannot
+                         # invent a curve that eats content.
+FENCE_MIN_600  = 40      # floor on the outlier fence, px @600dpi (=1.7mm). The MAD fence alone
+                         # has no scale: on an edge where the bed is uniform the MAD is tiny, so
+                         # the fence sits a few px above the median and discards REAL bed that
+                         # merely varies along the edge. p003's top bed runs 12-43px; with
+                         # med 15 / mad 2 the fence was 24px, so the deep columns were treated as
+                         # content and 25px of bed was left standing. Bed depth genuinely varies
+                         # by ~1mm along an edge; a CONTENT block (p003's, p089's) is hundreds of
+                         # px deeper, so a floor at 1.7mm separates them without weakening
+                         # OUTLIER_K where the spread is real.
 OUTLIER_K      = 3.0     # containment: within the de-sloped frame, backing columns whose depth exceeds
                          #     median + OUTLIER_K*1.4826*MAD are treated as deep CONTENT outliers and are
                          #     EXCLUDED from the coverage constraint (so a black content box touching the
@@ -214,10 +247,9 @@ def _brute_cut(d, backing, nopage, D, dpi):
         # robust MAD fence: exclude deep content outliers (a black box touching the edge) from coverage,
         # but keep a uniform (or linearly-ramping, now de-sloped) backing band fully in the constraint.
         med = np.median(eb_raw); mad = np.median(np.abs(eb_raw - med))
-        fence = med + OUTLIER_K * 1.4826 * mad
+        fence = med + max(OUTLIER_K * 1.4826 * mad, FENCE_MIN_600 * dpi / 600)
         eb = np.sort(eb_raw[eb_raw <= fence])             # core backing to be covered
         core_total = float(np.clip(eb, 0, None).sum())
-        budget = SLACK * core_total
         if core_total <= 0 or len(eb) == 0:
             h = 0.0
         else:
@@ -230,7 +262,33 @@ def _brute_cut(d, backing, nopage, D, dpi):
             best = (page_cut, sl, h)
 
     page_cut, sl, h = best
-    cut_depth = np.clip(h + sl * (x - xc) + overcut, 0, D)
+
+    # ---- follow the BOW ---------------------------------------------------------------------
+    # The straight (slope,h) line above sets the overall position and tilt; the sheet itself is
+    # curved, so refit a QUADRATIC to the core backing depths around that line and cut on the
+    # curve. Without this a few px stand at both ends of every edge (see CURVE_MAX_600).
+    if backing.mean() >= CURVE_MIN_FRAC and backing.sum() >= 32:
+        eb_raw = db - sl * (xb - xc)
+        med = np.median(eb_raw); mad = np.median(np.abs(eb_raw - med))
+        keep = eb_raw <= med + max(OUTLIER_K * 1.4826 * mad, FENCE_MIN_600 * dpi / 600)
+        if keep.sum() >= 32:
+            xk = xb[keep]; dk = db[keep]
+            c2 = np.polyfit(xk - xc, dk, 2)
+            curve = np.polyval(c2, x - xc)
+            # bound the bow over the FULL range the curve is APPLIED to, not just over the
+            # points it was fitted to -- that was the guard's blind spot on p015.
+            bow = float(np.ptp(curve))
+            lin = h + sl * (x - xc)
+            if bow <= CURVE_MAX_600 * dpi / 600:
+                resid = dk - np.polyval(c2, xk - xc)
+                curve = curve + float(np.percentile(resid, COVER_PCT))
+                cut_depth = np.clip(np.maximum(curve, lin - overcut) + overcut, 0, D)
+            else:
+                cut_depth = np.clip(lin + overcut, 0, D)
+        else:
+            cut_depth = np.clip(h + sl * (x - xc) + overcut, 0, D)
+    else:
+        cut_depth = np.clip(h + sl * (x - xc) + overcut, 0, D)
     metrics = dict(page_cut=page_cut, total_backing=total_backing, slope=float(sl),
                    angle_deg=float(np.degrees(np.arctan(sl))), height=float(h),
                    backing_frac=float(backing.mean()), nopage_frac=float(nopage.mean()),
@@ -269,8 +327,14 @@ def _confidence(metrics):
 
 
 def analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr, scr=None):
-    """Full per-edge analysis: returns (cut_depth, confidence, metrics). Pure measurement, no policy."""
-    L, S, Sc = _orient(lum, sat, edge, dtb, dlr, H, W, scr=scr)
+    """Full per-edge analysis: returns (cut_depth, confidence, metrics). Pure measurement, no policy.
+
+    The band-pass is computed HERE, on the oriented edge band, not on the whole page. Doing it
+    page-wide allocated ~6x more than needed (a 37MP float32 plus filter temporaries, per
+    worker); with several workers that exhausted RAM and took the machine down. A box filter is
+    isotropic, so running it on the band gives the same values."""
+    L, S = _orient(lum, sat, edge, dtb, dlr, H, W)
+    Sc = screen_energy(L, dpi)
     D = L.shape[1]
     d, backing, nopage, satfrac = _profile(L, S, dpi, Sc)
     if backing.sum() == 0:
@@ -292,17 +356,21 @@ def bed_matte(rgb, dpi, priors=None, page_no=None, return_meta=False):
     a = np.asarray(rgb)[..., :3].astype(np.float32); H, W, _ = a.shape
     lum = a @ np.array([0.299, 0.587, 0.114], np.float32)
     sat = a.max(2) - a.min(2)
-    scr = screen_energy(lum, dpi)
     dtb = int(WIN_TB_FRAC * H); dlr = int(WIN_LR_FRAC * W)
     parity = None if page_no is None else ("even" if page_no % 2 == 0 else "odd")
 
     mask = np.zeros((H, W), bool); meta = {}
     for edge in EDGES:
         D = dtb if edge in ("top", "bottom") else dlr
-        cut_depth, conf, m = analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr, scr=scr)
+        cut_depth, conf, m = analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr)
         apply = (conf == "HIGH")
         decision = conf
-        if priors is not None and conf != "HIGH" and m["n_backing"] > 0:
+        # A near-empty edge is CLEAN PAGE, not a low-confidence cut: never let the prior
+        # path resurrect it. p015's right edge had 0.7% backing and was accepted as
+        # "PRIOR", cutting 35mm of real paper.
+        if m["backing_frac"] < MIN_BACKING_FRAC:
+            apply, decision = False, "CLEAN(no backing)"
+        elif priors is not None and conf != "HIGH" and m["n_backing"] > 0:
             pri = _lookup_prior(priors, edge, parity)
             if pri and pri.get("count", 0) >= 3:
                 med, ang = pri["median_depth"], pri["median_angle"]
