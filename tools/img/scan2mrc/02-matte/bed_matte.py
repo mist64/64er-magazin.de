@@ -38,7 +38,7 @@ edges are left for pass 2). WITH --priors it runs in PASS-2 MODE: it additionall
 edge whose candidate depth/angle match the learned typical for that edge+parity, and REJECTS an
 atypically-deep candidate (full-bleed). Pass-2 is built but lightly tested; pass-1 is the deliverable.
 """
-import argparse, json, numpy as np, scipy.ndimage as ndi
+import os, argparse, json, numpy as np, scipy.ndimage as ndi
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
 
@@ -90,7 +90,7 @@ SLOPE_MAX_DEG  = 1.1     # brute-force slope range for the cut line, degrees. DE
                          # it is the line locking onto tilted CONTENT (p031's right edge drifted
                          # 121px = 1.18 deg across the page under the old +-4 deg range).
 SLOPE_STEP_DEG = 0.05    # slope grid step
-COVER_PCT      = 100.0   # place the cut line at this percentile of the CORE backing depth.
+COVER_PCT      = float(os.environ.get('BM_COVER_PCT', 100.0))   # place the cut line at this percentile of the CORE backing depth.
                          # 100, not 99.5: rule 1 is absolute -- "ALWAYS cut 100% of the
                          # neighbour/backing; not doing that is a FAIL". At 99.5 the deepest
                          # 0.5% of core columns were by construction left uncovered, which
@@ -119,6 +119,19 @@ CURVE_MAX_600  = 40      # max bow (px @600dpi) the quadratic term may add acros
                          # binding end is already removed by the spine cut. That is why every page
                          # reported had the residue in the same corner. Bounded so a wild fit cannot
                          # invent a curve that eats content.
+# SMOOTH_D_600 (removed): median-smoothing the per-line depth before fitting made the cut
+# disagree with what it has to cover -- the line was fitted to smoothed depth while the real
+# backing still had its spikes, so rule-1 leftovers appeared that no coverage setting could
+# close. The over-cut it was meant to fix came from COVER_PCT/OVERCUT stacking instead.
+_UNUSED_SMOOTH_D_600 = 47   # kept only to document the attempt; not used
+                         # fitting/covering (47px @600dpi = 2mm). The backing boundary is
+                         # SMOOTH along an edge; single-column spikes are specks, a gradual
+                         # transition, or a speck of content -- not a stripe. Without this,
+                         # COVER_PCT=100 lifts the whole cut to clear the deepest single
+                         # column, so a handful of outliers cost the entire edge: p044 bottom
+                         # real depth p50=160 but cut 204 (+1.9mm), p044 top p50=20 cut 57.
+                         # Smoothing first keeps rule 1 (a few columns is not a stripe) while
+                         # not paying for them across the whole page.
 FENCE_MIN_600  = 40      # floor on the outlier fence, px @600dpi (=1.7mm). The MAD fence alone
                          # has no scale: on an edge where the bed is uniform the MAD is tiny, so
                          # the fence sits a few px above the median and discards REAL bed that
@@ -134,7 +147,7 @@ OUTLIER_K      = 3.0     # containment: within the de-sloped frame, backing colu
                          #     edge, e.g. p005 bottom, is LEFT while the bulk yellow is still covered
                          #     tightly). A widening bar is a LINEAR ramp -> uniform after de-sloping ->
                          #     small MAD -> NOT excluded -> fully covered.
-OVERCUT_600    = 8       # push the accepted line this many px past the backing @600dpi. Was 2, which
+OVERCUT_600    = int(os.environ.get('BM_OVERCUT', 4))       # push the accepted line this many px past the backing @600dpi. Was 2, which
                          # left a 3-10px stripe on ~13% of columns even after COVER_PCT: the backing
                          # edge is not perfectly straight and p99 of the core still clips the tail.
                          # ACCEPTANCE permits "a couple px" of overshoot into page margin but no

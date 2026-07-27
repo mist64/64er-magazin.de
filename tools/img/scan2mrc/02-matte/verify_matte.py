@@ -22,6 +22,15 @@ Usage:  verify_matte.py [--jobs N]
 Exit code is non-zero if any expectation fails, so it can gate a commit.
 """
 import os, sys, json, argparse
+
+# Pin BLAS/OpenMP to one thread per worker BEFORE numpy is imported. Without this each
+# worker parallelises its own 37MP matmul internally, so N processes become 2N+ runnable
+# threads and throughput collapses -- measured here at ~200% CPU per worker and 70 minutes
+# of CPU for a job that takes seconds. stack_render.py got this fix; this file did not.
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+           "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
+    os.environ.setdefault(_v, "1")
+
 import numpy as np
 from PIL import Image
 
