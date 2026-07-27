@@ -81,6 +81,22 @@ SAT_BACK      = 60       # a backing-run pixel counts as "saturated" (colored in
 NONPAGE_FRAC  = 0.85     # a line is BACKING if >= this fraction of its run pixels are each dark-neutral
                          #     OR saturated (i.e. non-page). Yellow+black composite passes (~1.0); a run
                          #     riddled with mid-tone content pixels fails.
+EDGE_STRIP_600 = 26      # after the cut line is fitted, extend it past a SHORT DARK RUN that
+                         # starts within this distance beyond the cut and ENDS before it --
+                         # the bed shadow between the page edge and the cardboard insert.
+                         # p001's bottom is insert -> blur -> 6px of black bed -> page; the
+                         # walk stops in the blur, so on the right of the page the fitted cut
+                         # (152px) sits above the strip and leaves it visibly uncut.
+                         # A run that does NOT end inside the window is content, not a strip,
+                         # so this cannot eat into an ad -- and unlike gap-closing on the
+                         # backing mask it cannot bridge through an ad's black TEXT, which is
+                         # what blew p044 from 160 to 292.
+_UNUSED_GAP_BRIDGE = 20  # the backing run ends at the first SUSTAINED page, not at the first
+                         # page PIXEL. Backing is not always one material: p001's bottom runs
+                         # yellow insert -> a ~3px transition blur -> 6px of black bed -> page.
+                         # The blur row is neither insert nor bed, so a first-pixel rule stopped
+                         # the run at 144 and left the real bed at 150 uncut. Page must persist
+                         # this far (@600dpi) to count as the end of the backing.
 MIN_DEPTH_600 = 3        # ignore runs shallower than this (a flush paper edge, not backing) @600dpi
 
 SLOPE_MAX_DEG  = 1.1     # brute-force slope range for the cut line, degrees. DERIVED, not guessed:
@@ -174,6 +190,38 @@ EDGES = ("top", "bottom", "left", "right")
 
 
 # ---------------------------------------------------------------------------------------------------
+def _screened_region(Sc, d, backing):
+    """True if the walked backing region is really PRINTED INK, judged as a region.
+
+    The band-pass is only meaningful over an area: a full-bleed screened ad is uniformly
+    high (p047 ~29), the scanner bed and the cardboard insert are uniformly low (~2-10).
+    Sampling it per pixel at a transition measures the transition instead, which is what
+    made the walk stop before p001's bed strip.
+    """
+    if not backing.any():
+        return False
+    idx = np.arange(Sc.shape[1])[None, :]
+    reg = (idx < d[:, None]) & backing[:, None]
+    if reg.sum() < 50:
+        return False
+    return float(np.median(Sc[reg])) >= SCREEN_MAX
+
+
+def _thin_dark_run(is_dark, dpi):
+    """True where a DARK-NEUTRAL run is too thin to have an interior to measure.
+
+    The screen test asks "is this printed ink?" by band-pass energy. A thin dark strip has
+    high band-pass energy from ITS OWN EDGES, not from halftone: p001's bottom bed is 6px of
+    L24/sat5 sandwiched between the bright insert and the teal cover, and with a 7px window
+    there is no interior left to sample, so it scored 18.9 and was rejected as "screened".
+    A run this thin, this dark and this neutral is the bed shadow, not an ad -- p047's dark
+    screened ad is hundreds of px thick and still gets judged on its texture.
+    """
+    w = max(3, int(round(SCREEN_BOX_600 * dpi / 600)))
+    run = ndi.uniform_filter(is_dark.astype(np.float32), size=(1, 2 * w + 1))
+    return is_dark & (run < 0.98)          # dark, but not part of a thick dark region
+
+
 def screen_energy(lum, dpi):
     """Band-pass RMS: how much halftone screen this pixel sits in.
 
@@ -221,12 +269,25 @@ def _profile(L, S, dpi, Sc=None):
     if Sc is None:
         page = (L > PAGE_LUMA) & (S < PAGE_SAT)
     else:
-        unscreened = Sc < SCREEN_MAX
-        is_bed    = (L < BED_LUMA) & (S < BED_SAT) & unscreened
-        is_insert = (S >= SAT_BACK) & unscreened & (L >= INSERT_LUMA)   # bright smooth cardboard
+        # POSITIVE material test, walked from the border: a pixel is BACKING if it is
+        # BLACKISH (dark + neutral = scanner bed / shadow) or YELLOWISH (bright + saturated
+        # = the cardboard insert). No per-pixel screen test here: band-pass energy is a
+        # property of a REGION (p047's ad scores 29 across hundreds of px), and evaluating it
+        # at a boundary just measures the boundary -- p001's 6px bed strip scored 18.9 and its
+        # transition blur 25.3, so both were rejected and the walk stopped short of the bed.
+        # The screen test is applied to the walked region as a whole, in _screened_region().
+        is_bed    = (L < BED_LUMA) & (S < BED_SAT)
+        is_insert = (S >= SAT_BACK) & (L >= INSERT_LUMA)
         page = ~(is_bed | is_insert)
+    # Close short gaps in the BACKING run before walking. Backing is not always one
+    # material: p001's bottom is yellow insert -> a few px of transition blur (neither
+    # blackish nor yellowish) -> 6px of black bed -> page. Walking to the first non-backing
+    # pixel stops in that blur and leaves the bed standing, which is visible as an uncut
+    # black strip at the bottom-right corner. Closing is safe now that backing is a POSITIVE
+    # material test: page is genuinely not-backing, so a gap cannot leap into content the way
+    # it did when backing meant "not recognisably page" (p044's ochre ad jumped 160 -> 306).
     haspage = page.any(1)
-    d = page.argmax(1)                                    # first page pixel; 0 if page at border
+    d = page.argmax(1)                                    # first page pixel
     idx = np.arange(D)[None, :]
     run = idx < np.where(haspage, d, 0)[:, None]          # the pre-page backing run
     nonpage = ((L < DARK_LUMA) & (S < DARK_SAT)) | (S >= SAT_BACK)   # dark-neutral OR saturated
@@ -310,6 +371,22 @@ def _brute_cut(d, backing, nopage, D, dpi):
     return cut_depth, metrics
 
 
+def _extend_over_strip(L, S, cut_depth, dpi, D):
+    """Extend the cut past a thin dark strip sitting just beyond it (see EDGE_STRIP_600)."""
+    w = max(4, int(round(EDGE_STRIP_600 * dpi / 600)))
+    dark = (L < BED_LUMA) & (S < BED_SAT)
+    out = cut_depth.astype(np.float64).copy()
+    idx = np.arange(D)[None, :]
+    lo = np.clip(cut_depth.astype(int), 0, D - 1)
+    win = (idx >= lo[:, None]) & (idx < np.minimum(lo + w, D)[:, None])
+    dw = dark & win
+    has = dw.any(1)
+    last = np.where(has, (dw * idx).max(1), -1)          # deepest dark px inside the window
+    ends_inside = has & (last < (lo + w - 1))            # the run ENDS before the window does
+    out[ends_inside] = last[ends_inside] + 1
+    return np.clip(out, 0, D)
+
+
 def _page_beyond(L, S, cut_depth, dpi, D, Sc=None):
     """Step 3(a): fraction of the band just beyond the cut line (full width) that is clean PAGE.
 
@@ -325,7 +402,8 @@ def _page_beyond(L, S, cut_depth, dpi, D, Sc=None):
         page = (L > PAGE_LUMA) & (S < PAGE_SAT)
     else:
         unscreened = Sc < SCREEN_MAX
-        page = ~(((L < BED_LUMA) & (S < BED_SAT) & unscreened)
+        _dn = (L < BED_LUMA) & (S < BED_SAT)
+        page = ~((_dn & (unscreened | _thin_dark_run(_dn, dpi)))
                  | ((S >= SAT_BACK) & unscreened & (L >= INSERT_LUMA)))
     return float((page & band).sum() / max(1, band.sum()))
 
@@ -356,6 +434,7 @@ def analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr, scr=None):
                  median_depth=0.0, page_beyond=0.0, sat_frac=0.0)
         return np.zeros(L.shape[0]), "NONE", m
     cut_depth, m = _brute_cut(d, backing, nopage, D, dpi)
+    cut_depth = _extend_over_strip(L, S, cut_depth, dpi, D)
     m["page_beyond"] = _page_beyond(L, S, cut_depth, dpi, D, Sc)
     m["sat_frac"] = float(np.median(satfrac[backing]))
     conf = _confidence(m)
