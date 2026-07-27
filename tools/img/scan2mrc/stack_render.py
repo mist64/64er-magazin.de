@@ -85,14 +85,14 @@ SPINE_EXTRA = 12    # ADDITIONAL cut where spine.py reports extra_cut, i.e. wher
 # Its scatter is +/-44 px (1.9 mm) though, and on 48% of pages the true boundary lies
 # INBOARD of the holes -- so cutting exactly on the line would leave a neighbour sliver
 # about half the time. Hence the overcut below.
-# RULE 1 (hard): every neighbour pixel must go. Leaving any is a FAIL.
-# RULE 2: subject to that, cut as few of OUR pixels as possible.
-# The fold is never more than CLIP_WIN_MM from the hole line (the user's constraint, and
-# spine.py enforces it). So where the hole line is all we have, cutting at hole + 5mm is
-# the TIGHTEST cut that PROVES rule 1 -- anything less can leave neighbour standing. The old
-# value (44px = 1 sigma of the measured scatter) was a coverage estimate, not a guarantee, and
-# under-cut on roughly a third of pages.
-HOLE_OVERCUT = int(5.0 / 25.4 * 600)   # = 118 px @600dpi
+# RULE 1 (hard): every neighbour pixel must go. RULE 2: cut as few of OUR pixels as possible.
+# Where no colour boundary exists we cut ON THE CLIP-HOLE LINE, as instructed -- not inboard
+# of it. An earlier version added 5mm here, reasoning that the fold could be up to 5mm inboard
+# of the holes and rule 1 wanted a guarantee. That was wrong twice over: it put the cut visibly
+# off the holes on all 135 fallback pages, and it confused two different uses of the 5mm. The
+# +/-5mm is how far from the holes the boundary may be SEARCHED FOR (spine.py's window); it is
+# not a margin to bolt on once we have given up finding it and are using the holes themselves.
+HOLE_OVERCUT = 0    # cut on the hole line
 HOLE_MIN     = 4    # need at least this many located holes to fit the fallback line
 A4_W = int(round(210.0 / 25.4 * DPI))     # 4961 px @600dpi
 A4_H = int(round(297.0 / 25.4 * DPI))     # 7016 px
