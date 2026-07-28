@@ -2,7 +2,9 @@
 # Render MRC PDFs for every page whose cached inputs have appeared, and keep watching for more.
 #
 # Per page:  mask the score with the sidecar  (unknown regions must not form clusters)
-#            -> build the RGB page the MRC render wants, from the cached display CMYK
+#            -> use the cached page RGB (built upstream to ALL.sh's contract: graded, NOT
+#               GCR'd, ICC SWOP->AdobeRGB -- a CMYK->RGB round trip is 45.8 levels off the scan
+#               against 31.7 for the real transform)
 #            -> mrcpipe mrc --bg-dpi 150
 #            -> delete the RGB page (173 MB, regenerable in ~20s)
 #
@@ -27,7 +29,7 @@ while :; do
   for i in $(seq 1 176); do
     n=$(printf "%03d" "$i")
     [ -s "$T/mrc/$n.pdf" ] && continue
-    if [ ! -s "$T/score/$n.npy" ] || [ ! -s "$T/render/deliver/${n}_cmyk_display_filled.tif" ]; then
+    if [ ! -s "$T/score/$n.npy" ] || [ ! -s "$T/render/deliver/${n}_page_rgb.png" ]; then
       pend=$((pend+1)); continue
     fi
     echo "$(date +%H:%M:%S) p$n mrc"
@@ -42,13 +44,11 @@ H, W = kn.shape; hy, hx = s.shape; cy, cx = H // hy, W // hx
 unk = 1 - kn[:hy * cy, :hx * cx].reshape(hy, cy, hx, cx).mean((1, 3))
 np.save(f"{T}/score/{n}m.npy", np.where(unk > 0.25, 0.0, s).astype(np.float32))
 shutil.copy(f"{T}/score/{n}_cov.npy", f"{T}/score/{n}m_cov.npy")
-Image.open(f"{T}/render/deliver/{n}_cmyk_display_filled.tif").convert("RGB").save(
-    f"{T}/render/deliver/{n}_page_rgb.png", compress_level=1)
 EOF
     $MP mrc "$T/render/deliver/${n}_page_rgb.png" "$T/score/${n}m.npy" "$T/mrc/$n.pdf" \
         --bg-dpi "$BGDPI" >/dev/null 2>&1 && echo "  p$n -> $(du -h "$T/mrc/$n.pdf" | cut -f1)" \
         || echo "  p$n MRC FAILED"
-    rm -f "$T/render/deliver/${n}_page_rgb.png" "$T/score/${n}m_cov.npy"
+    rm -f "$T/score/${n}m_cov.npy"     # keep the page RGB: it needs a full separation to rebuild
     did=$((did+1))
   done
   echo "$(date +%H:%M:%S) pass done: rendered $did, waiting on $pend"
