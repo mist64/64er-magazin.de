@@ -47,7 +47,7 @@ def one(args):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", type=int, default=4)
-    ap.add_argument("--method", default="mirror", choices=("mirror", "replicate"))
+    ap.add_argument("--method", default="mirror", choices=("mirror", "replicate", "mode"))
     ap.add_argument("pages", nargs="*", type=int)
     A = ap.parse_args()
     pages = A.pages or sorted(int(f[:3]) for f in os.listdir(SRC) if f.endswith(".png"))
