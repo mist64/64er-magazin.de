@@ -60,11 +60,27 @@ WIN_LR_FRAC   = 0.16     # left/right search depth as a fraction of image WIDTH 
 # the cream paper everywhere. The old BED_LUMA/BED_SAT/INSERT_LUMA/INSERT_SAT/INSERT_EDGES were
 # the same facts guessed instead of measured, and each broke somewhere (p044's ochre ad matched
 # "yellowish" on a left edge with no insert on it; p001's teal cover nearly did too).
+CHROMA_STAB   = 40.0     # chroma is compared as a RATIO to luma, stabilised by this offset.
+                         # An absolute chroma difference is wrong for a SATURATED material: as the
+                         # cardboard insert falls into shadow its luma drops and its chroma drops
+                         # with it, so a fixed chroma tolerance dropped the shadowed insert and the
+                         # bottom boundary wobbled again. Normalised, the same insert reads 6.4-6.6
+                         # from lit to shadowed, while the page ink that must be KEPT reads 16.7
+                         # (p069 ad), 23.5 (p005 comic) and 127.3 (p044 ochre), and the sheet-edge
+                         # shadow that must be CUT reads 2.7-5.9. The offset keeps the ratio stable
+                         # where luma is near zero (the bed itself sits at L5-40).
+GROW_L        = 3.0      # growth may reach this many measured luma-radii from the seed colour ...
+GROW_C        = 2.0      # ... but barely further in CHROMA. That asymmetry IS the discrimination:
+                         # the sheet-edge shadow that must be cut lies 33-37 from the bed in luma
+                         # and 1.3-3.8 in chroma, while page ink that must be kept lies a similar
+                         # 33-51 in luma but 10.6-144.7 in chroma. Loose in luma, tight in chroma.
 RING_600      = 3        # border ring used to refine a material on the page in front of us
 SEED_STEP     = 8        # quantisation for finding the ring's densest colour peak
 SPREAD_PCTL   = 90       # per-page radius = this percentile of the peak's own spread ...
+COVER_PCTL    = 99       # ... but after growth, a percentile that COVERS what was grown
 SPREAD_K      = 1.5      # ... times this
-RADIUS_FLOOR  = 12       # ... never tighter than this (scanner noise on a flat material)
+RADIUS_FLOOR_L = 12      # ... never tighter than this in luma (scanner noise) ...
+RADIUS_FLOOR_C = 3       # ... nor than this in chroma (normalised units)
 GROW_ITERS    = 2        # re-measure the material over its connected region this many times
 MIN_RING_FRAC = 0.02     # a material must hold this much of the ring to be present on this page
 DEEP_FRAC     = 0.75     # the deep part of the search window, used to re-run the calibration's
@@ -120,6 +136,7 @@ MIN_CONTRAST  = 10.0     # ... and the winning line must stand out from the typi
                          # scattered kind 1-6.
 MIN_VOTE_FRAC = 0.20     # a floor only, to keep linefit's deepest-preference from selecting a
                          # line almost no scanline supports.
+INK_ERODE_600 = 4        # erode the region this far from its boundary before judging it
 SCREEN_BOX_600 = 7       # band-pass window; the ~150lpi screen period is 4px @600dpi
 SCREEN_MAX    = 13       # a REGION whose band-pass energy exceeds this is printed ink, not
                          # backing (p047's ad ~29; bed and cardboard 2-10). Judged over the
@@ -157,95 +174,142 @@ def _deorient(mask_edge, edge, H, W, dtb, dlr):
 def page_materials(rgb_edge, edge, profile, dpi):
     """The backing materials PRESENT ON THIS PAGE at this edge, refined to this page's colours.
 
-    profile gives each material's issue-wide centre and a generous radius. On this page we look
-    at the border ring only, take the densest colour peak inside that radius, and measure the
-    peak's own spread -- so the accepted colour becomes as tight as the material actually is
-    here. That tightness is what tells the bed from the page's own black ink.
+    The profile gives each material's issue-wide centre and tolerances. Here we (1) seed on the
+    border ring of the page in front of us, (2) grow the material through connected pixels to its
+    real extent, and (3) accept the widest version that still stops at the sheet edge.
 
-    Returns [(centre, radius), ...]; empty if this edge shows no backing on this page.
+    (1) SEEDING PER PAGE is what separates bed from a page's own black ink. Across the issue the
+        two overlap completely (bed L5-51, ink L15-45); within one scan they are far apart
+        (p069: bed L20 against its ad at L40).
+    (2) GROWTH is needed because the ring is the most evenly lit part of the backing. Deeper in,
+        where the sheet lifts off the platen, the same material is shadowed: p015's bottom insert
+        ran to 135px in lit columns but the ring-derived tolerance saw only 41px in shadowed ones,
+        and the resulting +-45px "wobble" is what wrecked the line fit -- not any real waviness.
+        Growth is LOOSE IN LUMA AND TIGHT IN CHROMA (GROW_L / GROW_C), which is the whole trick:
+        the sheet-edge shadow band sits far away in luma but on top of the bed in chroma, while
+        page ink sits equally far in luma and far in chroma too.
+    (3) ACCEPTANCE is the calibration's own collapse test, re-run per page on the connected
+        region: real backing stops at the sheet edge, ink running to the border does not. It
+        bounds the growth as well -- without that, p069's top merged its bed strip into the ad
+        below and the whole edge was then dropped, leaving the strip standing.
+
+    Returns [(centre, radius_luma, radius_chroma), ...]; empty if this edge shows no backing.
     """
     ring = max(2, round(RING_600 * dpi / 600))
     r = rgb_edge[:, :ring].reshape(-1, 3)
+    dstart = int(DEEP_FRAC * rgb_edge.shape[1])
     out = []
-    for m in profile.get(edge, []):
-        if not m.get("backing"):
+    for spec in profile.get(edge, []):
+        if not spec.get("backing"):
             continue
-        c0, rad = np.array(m["centre"], np.float32), float(m["radius"])
-        sel = r[np.abs(r - c0).max(1) <= rad]
-        if sel.shape[0] < MIN_RING_FRAC * r.shape[0]:
+        c0 = np.array(spec["centre"], np.float32)
+        rl0, rc0 = float(spec["radius_l"]), float(spec["radius_c"])
+
+        dl, dc = dev(r, c0)
+        in0 = (dl <= rl0) & (dc <= rc0)
+        if in0.mean() < MIN_RING_FRAC:
             continue                                   # material absent from this page's edge
+        sel = r[in0]
+
         q = (sel // SEED_STEP).astype(np.int32)
         key = q[:, 0] * 4096 + q[:, 1] * 64 + q[:, 2]
         u, cnt = np.unique(key, return_counts=True)
         k = int(u[int(np.argmax(cnt))])
         peak = np.array([(k // 4096) * SEED_STEP, ((k // 64) % 64) * SEED_STEP,
                          (k % 64) * SEED_STEP], np.float32) + SEED_STEP / 2
-        near = sel[np.abs(sel - peak).max(1) <= max(RADIUS_FLOOR * 2, SEED_STEP * 3)]
+        near = sel[np.abs(sel - peak).max(1) <= max(RADIUS_FLOOR_L, SEED_STEP * 3)]
         if near.shape[0] < 32:
             near = sel
         centre = np.median(near, 0)
-        spread = float(np.percentile(np.abs(near - centre).max(1), SPREAD_PCTL))
-        radius = float(np.clip(SPREAD_K * spread, RADIUS_FLOOR, rad))
 
-        # GROW THE MATERIAL TO ITS OWN EXTENT. The ring is the most evenly lit part of the
-        # backing; deeper in, where the sheet lifts off the platen, the same cardboard is
-        # shadowed and falls outside a tolerance derived from the ring alone. Measured on p015's
-        # bottom that truncated the insert at 41px in shadowed columns against 135px in lit ones,
-        # and the "boundary" wobbled +-45px -- which is what destroyed the fit, not any real
-        # waviness (the scan shows a clean straight edge there).
-        # Re-measure the colour over the region actually CONNECTED to the border, twice. The
-        # issue-wide cluster radius stays the hard cap, so this can widen to cover a gradient but
-        # never wander off the material the calibration found.
-        # THE COLLAPSE TEST THE CALIBRATION USES, NOW ON THIS PAGE, AND IT IS ALSO WHAT STOPS THE
-        # GROWTH. A colour matching the issue's backing is backing HERE only if it too stops at
-        # the sheet edge. Ink that runs to the border keeps covering the deep band; bed cannot.
-        # Without it, a page whose border ring IS ink refines the "bed" onto its own ad -- p069's
-        # left ring peaked at L47 and the ad would have been cut as bed.
-        # Growth must obey the same rule. Grown blindly, p069's TOP merged its 30px flat-black bed
-        # strip into the textured near-black ad below it, the merged material no longer collapsed,
-        # and the edge was dropped with the strip left standing. So: keep the WIDEST tolerance
-        # that still collapses, and never a wider one.
-        deep = rgb_edge[:, int(DEEP_FRAC * rgb_edge.shape[1]):]
+        def _radii(px, c, pctl=SPREAD_PCTL):
+            a, b = dev(px, c)
+            return (float(np.clip(SPREAD_K * np.percentile(a, pctl),
+                                  RADIUS_FLOOR_L, rl0 * GROW_L)),
+                    float(np.clip(SPREAD_K * np.percentile(b, pctl),
+                                  RADIUS_FLOOR_C, rc0 * GROW_C)))
 
-        def collapses(c, rr):
-            cov_ring = float((np.abs(r - c).max(1) <= rr).mean())
-            cov_deep = float((np.abs(deep - c).max(2) <= rr).mean())
+        rl, rc = _radii(near, centre)
+
+        # the LOOSE envelope growth may explore, anchored on the ISSUE centre so it cannot drift:
+        # re-centring it each pass let p005's top walk off the neutral bed into the green comic
+        # beside it and cut 38px of artwork
+        dl_e, dc_e = dev(rgb_edge, c0)
+        loose = (dl_e <= rl0 * GROW_L) & (dc_e <= rc0 * GROW_C)
+
+        def region_collapses(mask):
+            """Does the connected region stop at the sheet edge? -- the physical statement.
+
+            Judged on the REGION, not on how often its colour occurs: p005's top does carry a
+            neutral shadow band to ~20px, but that page is a comic full of dark ink, so a
+            colour-frequency test failed and reverted the growth, leaving the band uncut."""
+            cov_ring = float(mask[:, :ring].mean())
+            cov_deep = float(mask[:, dstart:].mean())
             return (cov_ring + 1e-6) / (cov_deep + 1e-6) >= COLLAPSE_MIN
 
-        best = (centre, radius) if collapses(centre, radius) else None
+        def mask_for(c, a, b):
+            x, y = dev(rgb_edge, c)
+            return (x <= a) & (y <= b)
+
+        best = (centre, rl, rc) if region_collapses(mask_for(centre, rl, rc)) else None
         for _ in range(GROW_ITERS):
             if best is None:
                 break
-            m = np.abs(rgb_edge - centre).max(2) <= radius
-            lab, nl = ndi.label(m)
+            seed = mask_for(centre, rl, rc)
+            lab, nl = ndi.label(loose)
+            m = seed
             if nl:
-                keep = np.unique(lab[:, 0])                    # components touching the border
-                m &= np.isin(lab, keep[keep > 0])
-            if m.sum() < 64:
-                break
+                touch = np.unique(lab[:, 0])               # components touching the border ...
+                hit = np.unique(lab[seed])                 # ... that hold seed pixels
+                keep = np.intersect1d(touch[touch > 0], hit[hit > 0])
+                if keep.size:
+                    m = np.isin(lab, keep)
+            if m.sum() < 64 or not region_collapses(m):
+                break                                      # grew into the page: keep `best`
             px = rgb_edge[m]
             centre = np.median(px, 0)
-            spread = float(np.percentile(np.abs(px - centre).max(1), SPREAD_PCTL))
-            radius = float(np.clip(SPREAD_K * spread, RADIUS_FLOOR, rad))
-            if not collapses(centre, radius):
-                break                                          # grew into the page: keep `best`
-            best = (centre, radius)
+            # COVER the grown region, do not re-summarise it. A p90 refit threw the growth away
+            # again -- the insert's grown region was right (ring 0.95, deep 0.000) but its p90
+            # deviation is 6.7, so the refitted tolerance dropped exactly the shadowed tail that
+            # had just been captured and the bottom boundary went back to wobbling +-45px.
+            rl, rc = _radii(px, centre, COVER_PCTL)
+            best = (centre, rl, rc)
         if best is not None:
             out.append(best)
     return out
 
 
 def page_colours(profile, edge):
-    """The clusters the calibration judged to be PAGE (the paper): centre, radius."""
-    return [(np.array(m["centre"], np.float32), float(m["radius"]))
+    """The clusters the calibration judged to be PAGE (the paper): centre, luma r, chroma r."""
+    return [(np.array(m["centre"], np.float32), float(m["radius_l"]), float(m["radius_c"]))
             for m in profile.get(edge, []) if not m.get("backing")]
 
 
+def dev(px, centre):
+    """(luma deviation, luma-normalised chroma deviation) from a centre colour.
+
+    Two axes because one RGB distance cannot say "dark AND neutral", which is what the bed is;
+    and the chroma axis is normalised by luma so a shaded saturated material stays itself.
+    See CHROMA_STAB."""
+    px = np.asarray(px, np.float32)
+    c = np.asarray(centre, np.float32)
+    l = px.mean(-1)
+    l0 = float(c.mean())
+    n = l + CHROMA_STAB
+    n0 = l0 + CHROMA_STAB
+    dl = np.abs(l - l0)
+    dc = 100.0 * np.maximum(
+        np.abs((px[..., 0] - px[..., 1]) / n - (c[0] - c[1]) / n0),
+        np.abs((px[..., 1] - px[..., 2]) / n - (c[1] - c[2]) / n0))
+    return dl, dc
+
+
 def is_backing(rgb, mats):
-    """Positive material test: within tolerance of one of this page-edge's backing colours."""
+    """Positive material test: within tolerance of one of these colours (centre, r_luma, r_chroma)."""
     m = np.zeros(rgb.shape[:2], bool)
-    for centre, rad in mats:
-        m |= np.abs(rgb - centre).max(2) <= rad
+    for centre, rl, rc in mats:
+        dl, dc = dev(rgb, centre)
+        m |= (dl <= rl) & (dc <= rc)
     return m
 
 
@@ -301,15 +365,35 @@ def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
     # colour radius tightened: the blur stopped counting as backing and every real bed wedge was
     # rejected as MIXED. The page colours come from the same calibration.
     notpage = ~is_backing(E, page_colours(profile, edge))
-    cand = candidates(back, dpi)
     N = L.shape[0]
+
+    # THE BOUNDARY WE WANT IS WHERE THE PAGE BEGINS, not where the bed's exact colour ends.
+    # Between the two lies the sheet-edge shadow -- a blur that is neither. It is outside the
+    # sheet, so rule 1 says cut it; matching on backing colour alone stopped short of it and left
+    # it standing (p015's top: bed colour ends at 5px, the page starts at ~27px, and the audit
+    # rightly reported the 15px gap as residue on 63% of scanlines).
+    # Candidates are therefore notpage->page transitions, but ONLY on scanlines whose border
+    # actually shows backing. Without that restriction every line of body text deep in the page
+    # would offer candidates, since text is "not page" too.
+    ring = max(2, round(RING_600 * dpi / 600))
+    edge_has_backing = back[:, :ring].any(1)
+    cand = candidates(back, dpi)
+    cand[~edge_has_backing] = -1.0
     yy = np.arange(N, dtype=np.float64) - N / 2.0
     idx = np.arange(D)[None, :]
 
+    # JUDGED ONLY WHERE THE MATERIAL EXISTS. A bed wedge rarely spans the full edge, and on the
+    # scanlines it does not reach, ANY cut is pure page -- averaging those in made even a 4px cut
+    # look impure and rejected the edge (p144 top, p056 top). Overcutting clean scanlines is
+    # rule 2's business (the margin), not rule 1's; purity's job is only to stop a line running
+    # deep into content, which it still does: on a scanline that HAS bed, a 390px line encloses
+    # 20px of bed and 370px of page and fails just as before.
+    haslines = edge_has_backing if edge_has_backing.any() else np.ones(N, bool)
+
     def _pure(offset, slope):
-        """Is what this line encloses predominantly backing? (see BACKING_PURITY)"""
+        """Is what this line encloses predominantly NOT page? (see BACKING_PURITY)"""
         ln = np.clip(offset + slope * yy, 0, D)
-        inside = idx < ln[:, None]
+        inside = (idx < ln[:, None]) & haslines[:, None]
         n = int(inside.sum())
         return n > 0 and float(notpage[inside].mean()) >= BACKING_PURITY
 
@@ -321,23 +405,30 @@ def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
                                       accept=_pure)
     line = np.clip(line, 0, D)
 
-    backing_frac = float((cand >= 0).any(1).mean())
+    backing_frac = float(edge_has_backing.mean())
+    # SCREEN ENERGY IS A PROPERTY OF A REGION'S INTERIOR. Measured right up to the boundary it
+    # measures the boundary: on p006/p010/p012/p014/p042 the cut is a ~5px bed strip with no
+    # interior at all, the band-pass read 21-27 (i.e. "printed ink") and the veto threw away five
+    # real strips that the audit had been reporting as residue for weeks. Erode the region first,
+    # and if nothing survives, the region is too thin to carry a halftone -- so it cannot be the
+    # screened ad this test exists to protect, and the veto simply does not apply.
     Sc = screen_energy(L, dpi)
     sel = (np.arange(D)[None, :] < line[:, None]) & back
-    ink = float(np.median(Sc[sel])) if sel.any() else 0.0
+    core = ndi.binary_erosion(sel, np.ones((1, 2 * max(2, round(INK_ERODE_600 * dpi / 600)) + 1)))
+    ink = float(np.median(Sc[core])) if core.sum() >= 256 else 0.0
 
     m = dict(backing_frac=backing_frac, vote_frac=vote_frac, slope=float(sl),
              angle_deg=float(np.rad2deg(np.arctan(sl))),
              median_depth=float(np.median(line)), ink=ink, mats=len(mats),
              contrast=float(min(contrast, 1e6)),
-             mat_colours=[[round(float(x)) for x in c] + [round(r)] for c, r in mats])
+             mat_colours=[[round(float(x)) for x in c] + [round(a), round(b)] for c, a, b in mats])
 
     # What we are about to cut must actually BE backing. Without this the halftone's dark
     # dots pass the blackish test on most lines and yield a consistent shallow "boundary":
     # p005's right edge is the green comic running full-bleed, no bed at all, and it cut 17px
     # of it (backing_frac 0.93, vote 0.64, ink 8.4 -- under every other test). Purity is
     # rule 1 and rule 2 stated together: cut backing, and only backing.
-    _in = np.arange(D)[None, :] < line[:, None]
+    _in = (np.arange(D)[None, :] < line[:, None]) & haslines[:, None]
     m["purity"] = float(notpage[_in].mean()) if _in.any() else 0.0
     if backing_frac < MIN_BACKING_FRAC:
         return np.zeros(L.shape[0]), "CLEAN(no backing)", m

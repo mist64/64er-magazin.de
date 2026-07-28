@@ -62,9 +62,24 @@ COLLAPSE_MIN  = 3.0    # border coverage / interior coverage. Paper RISES (ratio
                        # and the insert fall by 5x and 3000x. Anything in between is not a
                        # material that stops at the sheet edge.
 MERGE_TOL     = 40     # bins within this max-channel distance are one material
-RADIUS_MIN    = 28     # a cluster's radius is its measured spread, but never tighter than this
-                       # (quantisation alone is +-8 per channel)
-RADIUS_PCTL   = 90     # radius = this percentile of member-pixel distance from the centre
+CHROMA_STAB   = 40.0   # chroma is compared as a RATIO to luma, stabilised by this offset.
+                       # An absolute chroma difference is wrong for a SATURATED material: as the
+                       # cardboard insert falls into shadow its luma drops and its chroma drops
+                       # with it, so a fixed chroma tolerance dropped the shadowed insert and the
+                       # bottom boundary wobbled again. Normalised, the same insert reads 6.4-6.6
+                       # from lit to shadowed, while the page ink that must be KEPT reads 16.7
+                       # (p069 ad), 23.5 (p005 comic) and 127.3 (p044 ochre), and the sheet-edge
+                       # shadow that must be CUT reads 2.7-5.9. The offset keeps the ratio stable
+                       # where luma is near zero (the bed itself sits at L5-40).
+RADIUS_PCTL   = 90     # a radius is this percentile of member-pixel deviation from the centre
+RADIUS_MIN_L  = 20     # ... never tighter than this in LUMA ...
+RADIUS_MIN_C  = 3      # ... nor than this in CHROMA (normalised units, see CHROMA_STAB)
+                       # TWO RADII, NOT ONE BALL. A single RGB distance cannot say "dark AND
+                       # neutral", which is exactly what the bed is. Measured against each page's
+                       # own bed: the sheet-edge shadow that MUST be cut sits 33-37 away in luma
+                       # but only 1.3-3.8 in chroma, while the page ink that must NOT be cut sits
+                       # a similar 33-51 in luma and 10.6-144.7 in chroma. One isotropic ball must
+                       # either lose the shadow or swallow the ink; separate axes keep both right.
 
 
 def _band(a, H, W, edge, lo, hi):
@@ -98,6 +113,25 @@ def _page(args):
                       .reshape(-1, 3)) for lo, hi in INNER_600]
         out[e] = (hits, _sub(b), inner)
     return out
+
+
+def dev(px, centre):
+    """(luma deviation, luma-normalised chroma deviation) from a centre colour.
+
+    Two axes because one RGB distance cannot say "dark AND neutral", which is what the bed is;
+    and the chroma axis is normalised by luma so a shaded saturated material stays itself.
+    See CHROMA_STAB."""
+    px = np.asarray(px, np.float32)
+    c = np.asarray(centre, np.float32)
+    l = px.mean(-1)
+    l0 = float(c.mean())
+    n = l + CHROMA_STAB
+    n0 = l0 + CHROMA_STAB
+    dl = np.abs(l - l0)
+    dc = 100.0 * np.maximum(
+        np.abs((px[..., 0] - px[..., 1]) / n - (c[0] - c[1]) / n0),
+        np.abs((px[..., 1] - px[..., 2]) / n - (c[1] - c[2]) / n0))
+    return dl, dc
 
 
 def _unkey(k):
@@ -138,10 +172,22 @@ def calibrate(paths, dpi=600, jobs=4, verbose=True):
             ws = np.array([m[1] for m in cl["members"]])
             centre = (cs * ws[:, None]).sum(0) / ws.sum()
             prev = float(max(ws))
-            # border coverage vs interior coverage of the SAME colour, both as pixel fractions
-            rad0 = max(RADIUS_MIN, MERGE_TOL)
-            border_cov = float((np.abs(border_px - centre).max(1) <= rad0).mean())
-            covs = [float((np.abs(px - centre).max(1) <= rad0).mean()) for px in inner_px]
+            # RADIUS IS MEASURED, not the merge tolerance. Using MERGE_TOL (40) as the cluster
+            # radius made the accepted colour far wider than the material actually is, and
+            # bed_matte's growth then walked from the neutral bed into an adjoining dark GREEN
+            # comic on p005's top (34.6 away from the neutral centre, so inside 40) and cut 38px
+            # of artwork. The spread of the cluster's own border pixels is the honest number.
+            dl0, dc0 = dev(border_px, centre)
+            sel0 = np.abs(border_px - centre).max(1) <= MERGE_TOL
+            rad_l = float(max(RADIUS_MIN_L, np.percentile(dl0[sel0], RADIUS_PCTL))) \
+                if sel0.sum() > 64 else float(RADIUS_MIN_L)
+            rad_c = float(max(RADIUS_MIN_C, np.percentile(dc0[sel0], RADIUS_PCTL))) \
+                if sel0.sum() > 64 else float(RADIUS_MIN_C)
+            border_cov = float(((dl0 <= rad_l) & (dc0 <= rad_c)).mean())
+            covs = []
+            for px in inner_px:
+                dl, dc = dev(px, centre)
+                covs.append(float(((dl <= rad_l) & (dc <= rad_c)).mean()))
             inner_cov = float(min(covs))
             collapse = (border_cov + 1e-6) / (inner_cov + 1e-6)
             rec = dict(centre=[round(float(x), 1) for x in centre],
@@ -149,17 +195,18 @@ def calibrate(paths, dpi=600, jobs=4, verbose=True):
                        border_cov=round(border_cov, 4),
                        inner_cov=round(inner_cov, 4),
                        collapse=round(collapse, 1),
-                       radius=float(rad0),
+                       radius_l=round(rad_l, 1), radius_c=round(rad_c, 1),
                        backing=bool(collapse >= COLLAPSE_MIN))
             kept.append(rec)
         profile[e] = kept
         if verbose:
             print("%-7s" % e)
             for r in kept:
-                print("   RGB(%5.1f,%5.1f,%5.1f)  on %3.0f%% of pages  border %.3f  inner %.3f"
-                      "  collapse %7.1fx  -> %s"
-                      % (*r["centre"], 100 * r["prevalence"], r["border_cov"], r["inner_cov"],
-                         r["collapse"], "BACKING" if r["backing"] else "page"))
+                print("   RGB(%5.1f,%5.1f,%5.1f) rL%5.1f rC%5.1f  on %3.0f%% of pages"
+                      "  border %.3f  inner %.3f  collapse %8.1fx  -> %s"
+                      % (*r["centre"], r["radius_l"], r["radius_c"], 100 * r["prevalence"],
+                         r["border_cov"], r["inner_cov"], r["collapse"],
+                         "BACKING" if r["backing"] else "page"))
     return profile
 
 
