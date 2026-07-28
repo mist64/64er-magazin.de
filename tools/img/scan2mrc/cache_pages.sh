@@ -25,10 +25,13 @@ mkdir -p "$T/score" "$T/screen_geom"
 first=${1:-1}; last=${2:-176}
 for n in $(seq -w "$first" "$last"); do
   n=$(printf "%03d" "$((10#$n))")
-  [ -s "$T/score/$n.npy" ] && { echo "$(date +%H:%M:%S) p$n cached, skip"; continue; }
+  # both must exist: the page RGB is what the MRC render consumes and cannot be
+  # reconstructed from the GCR'd CMYK afterwards (GCR is not invertible).
+  [ -s "$T/score/$n.npy" ] && [ -s "$T/render/deliver/${n}_page_rgb.png" ] && \
+    { echo "$(date +%H:%M:%S) p$n cached, skip"; continue; }
   det="$T/render/deliver/${n}_cmyk_detect.tif"
   echo "$(date +%H:%M:%S) p$n render"
-  $PY "$HERE/render_page.py" "$((10#$n))" --jobs 1 --inpaint --detect-too >/dev/null 2>&1 || \
+  $PY "$HERE/render_page.py" "$((10#$n))" --jobs 1 --inpaint --detect-too --page-rgb >/dev/null 2>&1 || \
     { echo "  p$n RENDER FAILED"; continue; }
   [ -s "$det" ] || { echo "  p$n no detect tif"; continue; }
   echo "$(date +%H:%M:%S) p$n geometry+detect"

@@ -28,7 +28,7 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
            "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(_v, "1")
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageCms
 import inpaint as IP
 
 Image.MAX_IMAGE_PIXELS = None
@@ -142,7 +142,7 @@ def alpha_for(geo, npz, xt, yt):
 
 
 def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
-        inpaint=False, detect_too=False):
+        inpaint=False, detect_too=False, page_rgb=False):
     t0 = time.time()
     geo = json.load(open(GEOJ))["pages"][str(page)]
     npz = np.load(os.path.join(GEOD, "%03d.npz" % page))
@@ -184,8 +184,13 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
     pa_m, pb_m = plane(COLOR_M, COLOR_CM, COLOR_MY), plane(COLOR_C, COLOR_Y, COLOR_W)
     pa_y, pb_y = plane(COLOR_Y, COLOR_CY, COLOR_MY), plane(COLOR_C, COLOR_M, COLOR_W)
 
-    def separate_grade(src, var):
-        """RGB -> graded, GCR'd CMYK for one grade variant."""
+    def separate_grade(src, var, gcr=True):
+        """RGB -> graded CMYK for one grade variant. GCR optional.
+
+        GCR is OUR analysis step (CLAUDE.md stage 1b), not part of the canonical grade: ALL.sh
+        goes convert.py -> per-channel levels -> ICC, and never moves the neutral into K. The
+        page the MRC renderer draws from must therefore be built from the graded but UN-GCR'd
+        CMYK, or the render is fed a page that never existed."""
         C = np.empty((H_out, W_out), np.uint8); M = np.empty_like(C)
         Y = np.empty_like(C); K = np.empty_like(C)
         lv = LEVELS[var]
@@ -200,9 +205,11 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
             sh = (y1 - y0, W_out)
             c = level(c.reshape(sh), *lv["c"]); mm = level(mm.reshape(sh), *lv["m"])
             yy = level(yy.reshape(sh), *lv["y"]); k = level(k.reshape(sh), *lv["k"])
-            neu = np.minimum(np.minimum(c, mm), yy)                    # GCR
-            C[y0:y1] = c - neu; M[y0:y1] = mm - neu; Y[y0:y1] = yy - neu
-            K[y0:y1] = np.clip(k.astype(np.int16) + neu, 0, 255).astype(np.uint8)
+            if gcr:
+                neu = np.minimum(np.minimum(c, mm), yy)
+                c = c - neu; mm = mm - neu; yy = yy - neu
+                k = np.clip(k.astype(np.int16) + neu, 0, 255).astype(np.uint8)
+            C[y0:y1] = c; M[y0:y1] = mm; Y[y0:y1] = yy; K[y0:y1] = k
         return C, M, Y, K
 
     # DETECT BEFORE FILL. The screening analysis must never see invented pixels: a mirrored band
@@ -229,6 +236,25 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
         rep_ip = round(time.time() - t_ip, 1)
 
     C, M, Y, K = separate_grade(rgb, variant)
+
+    # THE PAGE THE MRC RENDERER DRAWS FROM, built to ALL.sh's contract: graded CMYK, NOT GCR'd,
+    # converted to RGB through the ICC pair (US Web Coated SWOP -> AdobeRGB1998). PIL's naive
+    # 255-min(255,C+K) is not that transform: measured on p006's red photo it lands 45.8 levels
+    # from the scan against 33.5 for the ICC path, and inflates the std from 49 to 100.
+    if write and page_rgb:
+        Cn, Mn, Yn, Kn = separate_grade(rgb, variant, gcr=False)
+        prof = os.path.expanduser("~/Documents/git/64er-magazin.de/tools/img")
+        tf = ImageCms.buildTransform(
+            ImageCms.getOpenProfile(os.path.join(prof, "USWebCoatedSWOP.icc")),
+            ImageCms.getOpenProfile(os.path.join(prof, "AdobeRGB1998.icc")), "CMYK", "RGB")
+        out_rgb = np.empty((H_out, W_out, 3), np.uint8)
+        for y0 in range(0, H_out, STRIP):                    # strip-wise: the whole page as CMYK
+            y1 = min(y0 + STRIP, H_out)                      # plus RGB would be ~4GB at once
+            band = Image.merge("CMYK", [Image.fromarray(x[y0:y1]) for x in (Cn, Mn, Yn, Kn)])
+            out_rgb[y0:y1] = np.asarray(ImageCms.applyTransform(band, tf))
+        Image.fromarray(out_rgb).save(os.path.join(OUTD, "%03d_page_rgb.png" % page),
+                                      compress_level=1)
+        del Cn, Mn, Yn, Kn, out_rgb
 
     rep = {"page": page, "out_size": [W_out, H_out], "knorm": knorm, "variant": variant,
            "k_candidates": {k: [round(a, 2), round(b, 2)] for k, (a, b) in cand.items()},
@@ -260,6 +286,8 @@ if __name__ == "__main__":
     ap.add_argument("pages", nargs="+", type=int)
     ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
     ap.add_argument("--no-write", action="store_true")
+    ap.add_argument("--page-rgb", action="store_true",
+                    help="also write the ALL.sh-contract RGB page the MRC renderer consumes")
     ap.add_argument("--detect-too", action="store_true",
                     help="also write the UNFILLED detect-graded CMYK, for the screening analysis")
     ap.add_argument("--inpaint", action="store_true",
@@ -273,7 +301,7 @@ if __name__ == "__main__":
     A = ap.parse_args()
     out = []
     for p in A.pages:
-        r = run(p, A.knorm, not A.no_write, A.variant, A.keep_rgb, A.inpaint, A.detect_too)
+        r = run(p, A.knorm, not A.no_write, A.variant, A.keep_rgb, A.inpaint, A.detect_too, A.page_rgb)
         out.append(r)
         print(json.dumps(r))
     RPT = "/Users/mist/DNB/8609/tmp/fullres_report.json"   # merge, do not replace (see crop_a4)
