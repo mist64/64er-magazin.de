@@ -213,7 +213,10 @@ def run(page, knorm="known", write=True, variant="display"):
             os.path.join(OUTD, "%03d_cmyk_%s.tif" % (page, variant)), compression="tiff_lzw")
         Image.fromarray((~unk).astype(np.uint8) * 255).convert("1").save(
             os.path.join(OUTD, "%03d_known.png" % page), optimize=True)
-        Image.fromarray(rgb).save(os.path.join(OUTD, "%03d_rgb.png" % page))
+        # TIFF, not PNG: PNG deflate+filtering on a 557 MP image dominates the runtime, and
+        # this is a verification artifact that gets read straight back by verify_fullres.
+        Image.fromarray(rgb).save(os.path.join(OUTD, "%03d_rgb.tif" % page),
+                                  compression="tiff_lzw")
     return rep
 
 
@@ -231,4 +234,12 @@ if __name__ == "__main__":
         r = run(p, A.knorm, not A.no_write, A.variant)
         out.append(r)
         print(json.dumps(r))
-    json.dump(out, open("/Users/mist/DNB/8609/tmp/fullres_report.json", "w"), indent=1)
+    RPT = "/Users/mist/DNB/8609/tmp/fullres_report.json"   # merge, do not replace (see crop_a4)
+    prev = {}
+    if os.path.exists(RPT):
+        try:
+            prev = {(r["page"], r.get("variant", "display")): r for r in json.load(open(RPT))}
+        except Exception:
+            prev = {}
+    prev.update({(r["page"], r.get("variant", "display")): r for r in out})
+    json.dump([prev[k] for k in sorted(prev)], open(RPT, "w"), indent=1)

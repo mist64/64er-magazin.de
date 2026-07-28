@@ -38,7 +38,7 @@ def best_offset(a, b, rad=6):
 
 
 def check(page):
-    f = Image.open(os.path.join(FULL, "%03d_rgb.png" % page)).convert("RGB")
+    f = Image.open(os.path.join(FULL, "%03d_rgb.tif" % page)).convert("RGB")
     small = f.resize((f.width // 4, f.height // 4), Image.LANCZOS)
     ref = Image.open(os.path.join(REF, "%03d.png" % page))
     r = np.asarray(ref)
