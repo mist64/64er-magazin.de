@@ -113,10 +113,21 @@ def mirror_edges(rgb, known, method="mirror"):
 
     unk = ~known
     out = rgb.copy()
-    take_row = unk & (drow <= dcol)
-    take_col = unk & (dcol < drow)
+    take_row = unk & (drow <= dcol) & rowany[:, None]
+    take_col = unk & (dcol < drow) & colany[None, :]
     out[take_row] = rowf[take_row]
     out[take_col] = colf[take_col]
+
+    # DEAD CORNERS: a pixel whose row AND column are both entirely unknown has nothing to
+    # reflect from in either direction, and was left holding the raw scan -- i.e. bed. That is
+    # the black sliver in p008's bottom-left and p007's bottom-right (989 and 2831 px). Fill
+    # them from the nearest pixel that IS resolved; at the very corner of the sheet there is no
+    # better information, and leaving the bed there is the one clearly wrong answer.
+    dead = unk & ~rowany[:, None] & ~colany[None, :]
+    if dead.any():
+        from scipy import ndimage as ndi
+        _, (iy, ix) = ndi.distance_transform_edt(dead, return_indices=True)
+        out[dead] = out[iy[dead], ix[dead]]
     return out
 
 
