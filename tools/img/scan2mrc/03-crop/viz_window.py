@@ -50,17 +50,21 @@ def one(item):
     col = {"logo": COL_LOGO, "spine": COL_SPINE}.get(w["src"], COL_INTERP)
     x0, y0 = w["x0"], w["y0"]
     x1, y1 = x0 + w["w"], y0 + w["h"]
-    paint(a, y0, y0 + LINE, x0, x1, col)          # top
-    paint(a, y1 - LINE, y1, x0, x1, col)          # bottom
-    paint(a, y0, y1, x0, x0 + LINE, col)          # left
-    paint(a, y0, y1, x1 - LINE, x1, col)          # right
+    # the anchor marker goes down FIRST: on a spine-placed page the fold and the window's
+    # binding edge coincide to a couple of px (that is the point), and drawing the marker last
+    # simply hid the line it was meant to justify
     if w.get("anchor"):
         ax, ay = w["anchor"]
         paint(a, ay - 2, ay + 3, ax - 40, ax + 41, COL_ANCHOR)
         paint(a, ay - 40, ay + 41, ax - 2, ax + 3, COL_ANCHOR)
-    elif w.get("spine_x") is not None:            # mark the fold the window was placed from
+    elif w.get("spine_x") is not None:            # the fold the window was placed from, ticked
         sx = int(round(w["spine_x"]))
-        paint(a, y0, y1, sx - 2, sx + 3, COL_ANCHOR)
+        for ty in range(max(y0, 0), y1, 160):
+            paint(a, ty, ty + 80, sx - 3, sx + 4, COL_ANCHOR)
+    paint(a, y0, y0 + LINE, x0, x1, col)          # top
+    paint(a, y1 - LINE, y1, x0, x1, col)          # bottom
+    paint(a, y0, y1, x0, x0 + LINE, col)          # left
+    paint(a, y0, y1, x1 - LINE, x1, col)          # right
     os.makedirs(OUTD, exist_ok=True)
     Image.fromarray(a, "RGBA").save(os.path.join(OUTD, "%03d.png" % n))
     return n, w["src"], w.get("alpha_pct")

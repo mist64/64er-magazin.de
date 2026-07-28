@@ -69,7 +69,7 @@ if __name__ == "__main__":
         np.percentile(a, 50), np.percentile(a, 95), a.max()))
     print("off-canvas %%     : p50 %.2f  p95 %.2f  max %.2f" % (
         np.percentile(o, 50), np.percentile(o, 95), o.max()))
-    for lab in ("logo", "interpolated"):
+    for lab in ("logo", "spine", "interpolated"):
         g = [r for r in res if r["src"] == lab]
         if g:
             v = np.array([r["alpha_pct"] for r in g])
