@@ -60,8 +60,18 @@ if __name__ == "__main__":
     with Pool(A.jobs) as pool:
         for r in pool.imap_unordered(one, items):
             res.append(r)
-    res.sort(key=lambda r: r["page"])
-    json.dump(res, open("/Users/mist/DNB/8609/tmp/a4_report.json", "w"), indent=1)
+    # MERGE, never replace: a partial re-run (e.g. only the spine pages) used to overwrite the
+    # full 176-page record with its own handful, leaving a report that looked complete and was
+    # not -- the same silent staleness that made crop_windows.json untrustworthy.
+    RPT = "/Users/mist/DNB/8609/tmp/a4_report.json"
+    prev = {}
+    if os.path.exists(RPT):
+        try:
+            prev = {r["page"]: r for r in json.load(open(RPT))}
+        except Exception:
+            prev = {}
+    prev.update({r["page"]: r for r in res})
+    json.dump([prev[k] for k in sorted(prev)], open(RPT, "w"), indent=1)
     a = np.array([r["alpha_pct"] for r in res])
     o = np.array([r["offcanvas_pct"] for r in res])
     print("pages            : %d  (all %dx%d)" % (len(res), A4[0], A4[1]))
