@@ -25,18 +25,20 @@ import inpaint as IP
 
 Image.MAX_IMAGE_PIXELS = None
 SRC = "/Users/mist/DNB/8609/tmp/a4"
-OUT = "/Users/mist/DNB/8609/tmp/render/filled600"
+OUT = "/Users/mist/DNB/8609/tmp/render/filled600"   # +"_"+method for anything but mirror
 
 
-def one(n):
+def one(args):
+    n, method = args
     t0 = time.time()
     a = np.asarray(Image.open(os.path.join(SRC, "%03d.png" % n)))
     rgb = np.ascontiguousarray(a[..., :3])
     known = a[..., 3] > 0
     unk_before = float((~known).mean())
-    rgb, nh = IP.fill(rgb, known)
-    os.makedirs(OUT, exist_ok=True)
-    Image.fromarray(rgb).save(os.path.join(OUT, "%03d.tif" % n), compression=None)
+    rgb, nh = IP.fill(rgb, known, method=method)
+    outd = OUT if method == "mirror" else OUT + "_" + method
+    os.makedirs(outd, exist_ok=True)
+    Image.fromarray(rgb).save(os.path.join(outd, "%03d.tif" % n), compression=None)
     # did anything stay unfilled? (a fully-unknown row/column has nothing to mirror from)
     return {"page": n, "unknown_pct": round(100 * unk_before, 3), "holes_filled": nh,
             "secs": round(time.time() - t0, 2)}
@@ -45,13 +47,14 @@ def one(n):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--method", default="mirror", choices=("mirror", "replicate"))
     ap.add_argument("pages", nargs="*", type=int)
     A = ap.parse_args()
     pages = A.pages or sorted(int(f[:3]) for f in os.listdir(SRC) if f.endswith(".png"))
     with Pool(A.jobs) as pool:
-        res = pool.map(one, pages)
+        res = pool.map(one, [(p, A.method) for p in pages])
     res.sort(key=lambda r: r["page"])
-    json.dump(res, open("/Users/mist/DNB/8609/tmp/fill600_report.json", "w"), indent=1)
+    json.dump(res, open("/Users/mist/DNB/8609/tmp/fill600_report_%s.json" % A.method, "w"), indent=1)
     u = np.array([r["unknown_pct"] for r in res])
     h = np.array([r["holes_filled"] for r in res])
     s = np.array([r["secs"] for r in res])
