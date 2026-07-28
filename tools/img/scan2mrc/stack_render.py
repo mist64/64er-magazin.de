@@ -105,7 +105,10 @@ A4_H = int(round(297.0 / 25.4 * DPI))     # 7016 px
 # Lossless PNG at full 600 dpi: the defects being hunted are ~3px at 600dpi, and a lossy
 # codec would invent and erase features at exactly the hard edges we are judging.
 REVIEW_DIR = "/Users/mist/DNB/8609/tmp/review"
-BLEND      = 0.5    # tint opacity; the wash's own edge marks the cut line exactly
+BLEND      = float(os.environ.get("SR_BLEND", 0.30))
+                    # tint opacity; the wash's own edge marks the cut line exactly. 0.30 keeps
+                    # the page legible UNDER the wash, which is the whole point of review mode:
+                    # content still readable through the tint is a cut that went too far.
 COL_BED    = (255,   0, 255)   # 02  bed / yellow backing
 COL_SPINE  = (  0, 210, 255)   # 02b neighbour, MEASURED colour boundary
 COL_HOLECUT= ( 40,  90, 255)   # 02b neighbour, hole-line FALLBACK (inferred, not measured)
