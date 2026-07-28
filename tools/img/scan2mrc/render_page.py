@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Render a page through the whole front end and emit ALL THREE artifacts, always.
 
-    render/debug/NNN.png          600 dpi, nothing removed: magenta hairlines on every cut
+    tmp/render/debug/NNN.tif          600 dpi, nothing removed: magenta hairlines on every cut
                                   boundary + the A4 window rect. This is what you judge from --
                                   an alpha render destroys the evidence (if a cut ate content,
                                   the content is gone and the page merely looks smaller), so the
                                   debug view leaves every pixel in place and only draws lines.
-    render/a4_600/NNN.png         600 dpi RGBA, cropped to the A4 window. Alpha = UNKNOWN.
+    tmp/render/a4_600/NNN.tif         600 dpi RGBA, cropped to the A4 window. Alpha = UNKNOWN.
                                   The cheap view for checking placement across the whole issue.
-    render/deliver/NNN_cmyk_*.tif 2400 dpi CMYK, graded + GCR, sampled from the master in ONE
-    render/deliver/NNN_known.png  affine; plus the 1-bit sidecar, because CMYK has no alpha and
+    tmp/render/deliver/NNN_cmyk_*.tif 2400 dpi CMYK, graded + GCR, sampled from the master in ONE
+    tmp/render/deliver/NNN_known.png  affine; plus the 1-bit sidecar, because CMYK has no alpha and
                                   "unknown" is still true. Downstream MUST read the sidecar: a
                                   transparent region left as RGB(0,0,0) separates to solid K.
 
@@ -37,7 +37,7 @@ import emit_geometry as EG
 import apply_fullres as AF
 
 Image.MAX_IMAGE_PIXELS = None
-ROOT = "/Users/mist/DNB/8609/render"
+ROOT = "/Users/mist/DNB/8609/tmp/render"
 WINS = "/Users/mist/DNB/8609/tmp/crop_windows_v2.json"
 HAIR = 3                       # px @600dpi; 1px is dropped by the resampler when viewed whole
 COL_HAIR = (255, 0, 255)
@@ -95,7 +95,7 @@ def crop600(rgba, win):
     return Image.fromarray(out, "RGBA")
 
 
-def render(page, variant="display", knorm="known", skip_full=False):
+def render(page, variant="display", knorm="known", skip_full=False, keep_rgb=False):
     t0 = time.time()
     win = json.load(open(WINS))["windows"][str(page)]
     for d in ("debug", "a4_600", "deliver"):
@@ -103,9 +103,17 @@ def render(page, variant="display", knorm="known", skip_full=False):
 
     rgba, ang, frac, src = SR.render(page, _CTX["priors"], _CTX["skew"],
                                      _CTX["spine"], _CTX["clip"], None)
-    debug_png(rgba, win).save(os.path.join(ROOT, "debug", "%03d.png" % page))
+    # UNCOMPRESSED TIFF. These are local intermediates, not artifacts to ship, and the disk has
+    # room to spare -- so spending CPU to shrink them is spending the wrong resource. Measured on
+    # a 5155x7198 debug page: raw TIFF 0.05s/111MB against default PNG 8.5s/68MB. The encoder was
+    # more than TWICE the cost of the analysis it exists to show, to save 40MB.
+    #   raw TIFF  0.05s  111MB      PNG level 1  3.06s   72MB
+    #   PNG lvl 0 0.43s  111MB      PNG default  8.50s   68MB
+    # The 2400dpi CMYK deliverable is the one place compression stays on: raw would be 2.23GB a
+    # page, 392GB for the issue against ~180GB free, so there it buys something real.
+    debug_png(rgba, win).save(os.path.join(ROOT, "debug", "%03d.tif" % page), compression=None)
     c6 = crop600(rgba, win)
-    c6.save(os.path.join(ROOT, "a4_600", "%03d.png" % page))
+    c6.save(os.path.join(ROOT, "a4_600", "%03d.tif" % page), compression=None)
     a6 = np.asarray(c6)[..., 3]
 
     rep = {"page": page, "src": win["src"], "skew": ang, "spine": src,
@@ -113,7 +121,8 @@ def render(page, variant="display", knorm="known", skip_full=False):
     if not skip_full:
         AF.OUTD = os.path.join(ROOT, "deliver")
         rep.update({("full_" + k): v for k, v in
-                    AF.run(page, knorm=knorm, write=True, variant=variant).items()})
+                    AF.run(page, knorm=knorm, write=True, variant=variant,
+                           keep_rgb=keep_rgb).items()})
     rep["secs"] = round(time.time() - t0, 1)
     return rep
 
@@ -133,6 +142,8 @@ if __name__ == "__main__":
     ap.add_argument("pages", nargs="+", type=int)
     ap.add_argument("--variant", default="display", choices=("display", "detect"))
     ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
+    ap.add_argument("--keep-rgb", action="store_true",
+                    help="also write the 1.67GB pre-separation RGB (verify_fullres reads it)")
     ap.add_argument("--skip-full", action="store_true",
                     help="600 dpi views only (the 2400 dpi apply is ~2.5 min/page)")
     A = ap.parse_args()
@@ -150,4 +161,4 @@ if __name__ == "__main__":
             cur["pages"][str(r["page"])] = r
         json.dump(cur, open(EG.OUTJ, "w"), indent=1)
     for p in A.pages:
-        print(json.dumps(render(p, A.variant, A.knorm, A.skip_full)))
+        print(json.dumps(render(p, A.variant, A.knorm, A.skip_full, A.keep_rgb)))
