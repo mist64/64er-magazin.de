@@ -40,6 +40,7 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
     os.environ.setdefault(_v, "1")
 
 import numpy as np
+import scipy.ndimage as ndi
 from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -105,10 +106,12 @@ A4_H = int(round(297.0 / 25.4 * DPI))     # 7016 px
 # Lossless PNG at full 600 dpi: the defects being hunted are ~3px at 600dpi, and a lossy
 # codec would invent and erase features at exactly the hard edges we are judging.
 REVIEW_DIR = "/Users/mist/DNB/8609/tmp/review"
-BLEND      = float(os.environ.get("SR_BLEND", 0.30))
-                    # tint opacity; the wash's own edge marks the cut line exactly. 0.30 keeps
-                    # the page legible UNDER the wash, which is the whole point of review mode:
-                    # content still readable through the tint is a cut that went too far.
+COL_HAIR   = (255, 0, 255)     # magenta hairline on every cut boundary
+HAIRLINE_600 = int(os.environ.get("SR_HAIR", 3))
+                    # line width in px @600dpi (~0.13mm). Not 1: a single 600-dpi pixel is
+                    # dropped by the resampler as soon as the page is viewed fit-to-screen, so a
+                    # true 1px hairline is invisible exactly when the whole page is being judged.
+BLEND      = float(os.environ.get("SR_BLEND", 0.30))    # kept for the montage/alpha views
 COL_BED    = (255,   0, 255)   # 02  bed / yellow backing
 COL_SPINE  = (  0, 210, 255)   # 02b neighbour, MEASURED colour boundary
 COL_HOLECUT= ( 40,  90, 255)   # 02b neighbour, hole-line FALLBACK (inferred, not measured)
@@ -223,36 +226,38 @@ def render(page, priors, skew, spine, clip, tmpl):
 
 
 def render_review(page, priors, skew, spine, clip):
-    """REVIEW render: tint what WOULD be cut, remove nothing. See REVIEW_DIR."""
+    """REVIEW render: OUTLINE what WOULD be cut, remove nothing. Full page. See REVIEW_DIR.
+
+    Magenta hairlines, not a tint wash. A wash states the verdict but hides the evidence under
+    itself -- the pixels that decide whether a cut is right are the few on either side of the
+    line, and those are exactly the ones a 30% wash recolours. An outline leaves every pixel
+    untouched and puts the boundary where it can be compared against the scan directly.
+    """
     im = Image.open(os.path.join(THUMB, "%03d.png" % page)).convert("RGB")
     W, H = im.size
     m_bed, m_spine, m_holes, src, meta = _masks(page, priors, spine, clip, im)
-    rgb = np.asarray(im).copy()
+    cutmask = m_bed | m_spine | m_holes
 
-    def tint(mask, col):
-        if mask.any():
-            rgb[mask] = ((1 - BLEND) * rgb[mask] + BLEND * np.array(col)).astype(np.uint8)
-
-    # spine first, bed over it, holes last -- so where two stages overlap you see the one
-    # that is hardest to attribute otherwise
-    # Colour by WHICH ESTIMATOR SET THE LINE, not by which ones ran. spine_mask takes the
-    # inboard-most of the two, so a "colour+/hole" page had a colour boundary but the HOLE
-    # line cut deeper and won -- the operative cut there is inferred, not measured, and must
-    # not read as measured. (It did, until this was checked: p015 showed cyan while the hole
-    # line was what set its gutter.)
-    hole_won = src.endswith("/hole") or src == "holes"
-    tint(m_spine & ~m_bed, COL_HOLECUT if hole_won else COL_SPINE)
-    tint(m_bed, COL_BED)
-    tint(m_holes, COL_HOLES)
-
-    out = Image.fromarray(rgb)
+    out = im
     valid = Image.new("L", (W, H), 255)
     ang = skew.get(page, 0.0)
+    cut_im = Image.fromarray(cutmask.astype(np.uint8) * 255)
     if abs(ang) > 1e-3:
         out = out.rotate(ang, resample=Image.BICUBIC, expand=True, fillcolor=(0, 0, 0))
         valid = valid.rotate(ang, resample=Image.NEAREST, expand=True, fillcolor=0)
+        # NEAREST for the mask, and drawn AFTER the rotation: rotating an already-drawn line
+        # bicubically smears the very hairline the render exists to show
+        cut_im = cut_im.rotate(ang, resample=Image.NEAREST, expand=True, fillcolor=0)
     a = np.asarray(out).copy()
-    a[np.asarray(valid) == 0] = COL_WEDGE          # pixels the rotation invented
+    invalid = np.asarray(valid) == 0
+    cutrot = np.asarray(cut_im) > 127
+
+    hair = max(1, int(round(HAIRLINE_600 * DPI / 600)))
+    for mask in (cutrot, invalid):                 # the cut, and the rotation-invented wedge
+        if not mask.any():
+            continue
+        inner = ndi.binary_erosion(mask, np.ones((2 * hair + 1, 2 * hair + 1), bool))
+        a[mask & ~inner] = COL_HAIR
     out = Image.fromarray(a)
 
     dep = {e: round(np.median(meta[e].get("median_depth", 0)))
