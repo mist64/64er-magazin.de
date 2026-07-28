@@ -59,8 +59,23 @@ def _mirror_1d(line, known, max_reflect=None):
     return out
 
 
-def mirror_edges(rgb, known):
-    """Mirror-fill the unknown runs that reach the image border, rows then columns."""
+def _replicate_1d(line, known):
+    """Edge-clamp: hold the last KNOWN value outward. The comparison method for the mirror."""
+    n = known.shape[0]
+    if known.all() or not known.any():
+        return line
+    first = int(np.argmax(known))
+    last = n - 1 - int(np.argmax(known[::-1]))
+    if first > 0:
+        line[:first] = line[first]
+    if last < n - 1:
+        line[last + 1:] = line[last]
+    return line
+
+
+def mirror_edges(rgb, known, method="mirror"):
+    """Fill the unknown runs that reach the image border, rows then columns."""
+    fn = _mirror_1d if method == "mirror" else _replicate_1d
     out = rgb.copy()
     k = known.copy()
     H, W = k.shape
@@ -70,7 +85,7 @@ def mirror_edges(rgb, known):
         kn = k[y]
         if kn[0] and kn[-1]:
             continue                                   # no band at either end of this row
-        out[y] = _mirror_1d(out[y], kn)
+        out[y] = fn(out[y], kn)
     k_rows = k.copy()
     for y in rows:
         kn = k[y]
@@ -85,7 +100,7 @@ def mirror_edges(rgb, known):
         kn = k_rows[:, x]
         if kn[0] and kn[-1]:
             continue
-        out[:, x] = _mirror_1d(out[:, x], kn)
+        out[:, x] = fn(out[:, x], kn)
     return out
 
 
@@ -123,9 +138,9 @@ def diffuse_holes(rgb, known, radius=4, pad=24, max_area=None):
     return out, filled
 
 
-def fill(rgb, known, holes=True):
-    """Edge bands by mirroring, interior holes by diffusion. Returns (filled_rgb, n_holes)."""
-    out = mirror_edges(rgb, known)
+def fill(rgb, known, holes=True, method="mirror"):
+    """Edge bands by `method`, interior holes by diffusion. Returns (filled_rgb, n_holes)."""
+    out = mirror_edges(rgb, known, method)
     nh = 0
     if holes:
         out, nh = diffuse_holes(out, known)
