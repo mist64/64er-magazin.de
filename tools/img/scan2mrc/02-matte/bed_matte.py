@@ -69,7 +69,7 @@ CHROMA_STAB   = 40.0     # chroma is compared as a RATIO to luma, stabilised by 
                          # (p069 ad), 23.5 (p005 comic) and 127.3 (p044 ochre), and the sheet-edge
                          # shadow that must be CUT reads 2.7-5.9. The offset keeps the ratio stable
                          # where luma is near zero (the bed itself sits at L5-40).
-GROW_L        = 3.0      # growth may reach this many measured luma-radii from the seed colour ...
+GROW_L        = 2.0      # growth may reach this many measured luma-radii from the seed colour ...
 GROW_C        = 2.0      # ... but barely further in CHROMA. That asymmetry IS the discrimination:
                          # the sheet-edge shadow that must be cut lies 33-37 from the bed in luma
                          # and 1.3-3.8 in chroma, while page ink that must be kept lies a similar
@@ -84,6 +84,7 @@ RADIUS_FLOOR_C = 3       # ... nor than this in chroma (normalised units)
 GROW_ITERS    = 2        # re-measure the material over its connected region this many times
 MIN_RING_FRAC = 0.02     # a material must hold this much of the ring to be present on this page
 DEEP_FRAC     = 0.75     # the deep part of the search window, used to re-run the calibration's
+STOP_FRAC     = 0.5      # ... and must stop within the window on this fraction of lines
 COLLAPSE_MIN  = 3.0      # collapse test on THIS page (see page_materials)
                          # PER-PAGE REFINEMENT IS THE POINT. The issue-wide bed sits at L26, but
                          # a scan's bed and that same scan's blackest INK are different colours:
@@ -126,6 +127,8 @@ OVERCUT_600   = int(os.environ.get("BM_OVERCUT", 4))
 MIN_BACKING_FRAC = 0.15  # cut only if this fraction of lines shows any backing; below it the
                          # edge is clean page (p015's right edge is paper to the border, and a
                          # cut there destroys content nothing downstream can recover)
+OVERRUN_600   = 24       # a cut may exceed the material's p95 stop depth by this much
+SHALLOW_600   = 25       # a cut this shallow (~1mm) is allowed on weaker evidence
 MIN_CONTRAST  = 10.0     # ... and the winning line must stand out from the typical line by
                          # this factor (linefit's peak contrast). This REPLACES a vote-fraction
                          # gate, which measured nothing: with ~10 candidates per line an
@@ -238,18 +241,34 @@ def page_materials(rgb_edge, edge, profile, dpi):
         loose = (dl_e <= rl0 * GROW_L) & (dc_e <= rc0 * GROW_C)
 
         def region_collapses(mask):
-            """Does the connected region stop at the sheet edge? -- the physical statement.
+            """Does the material stop at the sheet edge on MOST scanlines?
 
-            Judged on the REGION, not on how often its colour occurs: p005's top does carry a
-            neutral shadow band to ~20px, but that page is a comic full of dark ink, so a
-            colour-frequency test failed and reverted the growth, leaving the band uncut."""
-            cov_ring = float(mask[:, :ring].mean())
-            cov_deep = float(mask[:, dstart:].mean())
-            return (cov_ring + 1e-6) / (cov_deep + 1e-6) >= COLLAPSE_MIN
+            Per line, not pooled. Pooled coverage is a global veto, and it threw away the majority
+            case: p003's top has a real 15px bed band on 57% of its scanlines, but the band also 
+            touches a large black block that runs the full depth on the other 41%, so pooled deep
+            coverage was 0.42 and the whole edge reported NO backing. Per line, 59% of scanlines
+            show the material stopping, which is exactly the evidence the line fit then uses --
+            while p069's left edge, where a full-bleed ad reaches the border on nearly every line,
+            still fails as it must."""
+            stops = ~mask[:, dstart:].any(1)
+            return float(stops.mean()) >= STOP_FRAC
 
         def mask_for(c, a, b):
+            """Pixels of this colour that are CONNECTED TO THE BORDER.
+
+            Connectivity is not optional even for the seed. Judged on the bare colour, a
+            text-heavy page counts its own black type as "this material, deep inside", and the
+            collapse ratio then fails on a perfectly real bed wedge: p003's top measured ring 0.52
+            against deep 0.18 = 2.9x, just under the bar, so the page reported NO backing at all
+            and 15px of bed went uncut. Type is not connected to the border; bed is."""
             x, y = dev(rgb_edge, c)
-            return (x <= a) & (y <= b)
+            m = (x <= a) & (y <= b)
+            lab, nl = ndi.label(m)
+            if nl:
+                keep = np.unique(lab[:, 0])
+                keep = keep[keep > 0]
+                m = np.isin(lab, keep) if keep.size else np.zeros_like(m)
+            return m
 
         best = (centre, rl, rc) if region_collapses(mask_for(centre, rl, rc)) else None
         for _ in range(GROW_ITERS):
@@ -279,10 +298,33 @@ def page_materials(rgb_edge, edge, profile, dpi):
     return out
 
 
-def page_colours(profile, edge):
-    """The clusters the calibration judged to be PAGE (the paper): centre, luma r, chroma r."""
-    return [(np.array(m["centre"], np.float32), float(m["radius_l"]), float(m["radius_c"]))
-            for m in profile.get(edge, []) if not m.get("backing")]
+def page_colours(profile, edge, rgb_edge=None, dpi=600):
+    """The PAPER colours, refined on this page when the edge is given.
+
+    The issue-wide paper cluster is not enough. Paper tone varies from page to page, and a page
+    whose margin is warmer than the issue mean then reads as "not page" -- which is how p157's
+    left edge, clean cream margin with no bed on it at all, scored purity 1.00 and had 241px
+    (10mm) of its own margin cut away. Refined against the page's OWN interior, that margin is
+    plainly paper. Measured from the deep band, where the paper is by definition."""
+    out = []
+    for m in profile.get(edge, []):
+        if m.get("backing"):
+            continue
+        c0 = np.array(m["centre"], np.float32)
+        rl, rc = float(m["radius_l"]), float(m["radius_c"])
+        if rgb_edge is not None:
+            deep = rgb_edge[:, int(DEEP_FRAC * rgb_edge.shape[1]):].reshape(-1, 3)
+            dl, dc = dev(deep, c0)
+            sel = deep[(dl <= rl * GROW_L) & (dc <= rc * GROW_C)]
+            if sel.shape[0] >= 256:
+                c0 = np.median(sel, 0)
+                a, b = dev(sel, c0)
+                rl = float(np.clip(SPREAD_K * np.percentile(a, COVER_PCTL),
+                                   RADIUS_FLOOR_L, rl * GROW_L))
+                rc = float(np.clip(SPREAD_K * np.percentile(b, COVER_PCTL),
+                                   RADIUS_FLOOR_C, rc * GROW_C))
+        out.append((c0, rl, rc))
+    return out
 
 
 def dev(px, centre):
@@ -364,7 +406,7 @@ def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
     # must NOT contain is PAGE. Testing "is backing" instead was too strict once the per-page
     # colour radius tightened: the blur stopped counting as backing and every real bed wedge was
     # rejected as MIXED. The page colours come from the same calibration.
-    notpage = ~is_backing(E, page_colours(profile, edge))
+    notpage = ~is_backing(E, page_colours(profile, edge, E, dpi))
     N = L.shape[0]
 
     # THE BOUNDARY WE WANT IS WHERE THE PAGE BEGINS, not where the bed's exact colour ends.
@@ -434,7 +476,29 @@ def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
         return np.zeros(L.shape[0]), "CLEAN(no backing)", m
     if m["purity"] < BACKING_PURITY:
         return np.zeros(L.shape[0]), "MIXED(not backing)", m
-    if contrast < MIN_CONTRAST:
+    # RULE 1 OUTRANKS RULE 2, so the evidence bar scales with what the cut COSTS. A deep line
+    # needs real proof; a 4px line that encloses nothing but backing costs 0.2mm of margin even
+    # if it is wrong, while refusing it leaves a visible stripe. Measured over the issue, the
+    # thin strips sit at contrast 8-10 with purity ~1.0 and the genuinely spurious deep lines at
+    # 2.0, so a single global bar had to sacrifice one or the other.
+    # RULE 2 SANITY: the cut may not run far past where the material actually STOPS. The fit can
+    # be dragged off by dark content when the real backing covers few scanlines -- p157's left has
+    # bed on 15% of lines that ends by ~10px, and the line landed at 237px, cutting 10mm of the
+    # page's own cream margin. Compare against where the material ends on the lines that have it.
+    run = max(2, round(MIN_RUN_600 * dpi / 600))
+    csb = np.concatenate([np.zeros((N, 1), np.int32), np.cumsum(back.astype(np.int32), 1)], 1)
+    dd = np.arange(D)[None, :]
+    solid = back & ((np.take_along_axis(csb, dd + 1, 1)
+                     - np.take_along_axis(csb, np.maximum(dd - run + 1, 0), 1))
+                    >= RUN_FRAC * np.minimum(run, dd + 1))
+    stop = np.where(solid.any(1), D - 1 - np.argmax(solid[:, ::-1], 1), -1)
+    have = stop >= 0
+    m["stop_p95"] = float(np.percentile(stop[have], 95)) if have.any() else 0.0
+    if float(np.median(line)) > m["stop_p95"] + OVERRUN_600 * dpi / 600:
+        return np.zeros(L.shape[0]), "OVERRUN(past material)", m
+
+    shallow = float(np.median(line)) <= SHALLOW_600 * dpi / 600
+    if contrast < MIN_CONTRAST and not (shallow and m["purity"] >= BACKING_PURITY):
         return np.zeros(L.shape[0]), "LOW(no line)", m
     if ink >= SCREEN_MAX:
         return np.zeros(L.shape[0]), "INK(screened)", m
