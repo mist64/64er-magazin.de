@@ -31,6 +31,8 @@ margin) is why tightening "cut less of our page" immediately broke "leave no str
 import warnings
 import numpy as np
 
+ACCEPT_TRIES = 24     # max accept() evaluations per fit (each can cost a full-window mask)
+
 
 def fit(cand, n_lines=None, tol=6.0, slope_max_deg=1.1, slope_step_deg=0.05,
         slope_center_deg=0.0, curve_max=0.0, min_frac=0.02, prefer_deepest=0.0,
@@ -109,13 +111,38 @@ def fit(cand, n_lines=None, tol=6.0, slope_max_deg=1.1, slope_step_deg=0.05,
                 cands.append((n, off, float(sl)))
                 if n > best[0]:
                     best = (n, off, float(sl))
-        if prefer_deepest > 0 and cands:
+        if cands and (prefer_deepest > 0 or accept is not None):
             thr = max(prefer_deepest * best[0], min_vote_frac * N)
-            deep = [c for c in cands if c[0] >= thr]
-            if accept is not None:
-                deep = [c for c in deep if accept(c[1], c[2])]
-            if deep:
-                best = max(deep, key=lambda c: c[1])
+            pool = [c for c in cands if c[0] >= thr]
+            # one accept() call can cost a full-window mask, so collapse near-duplicate lines
+            # and evaluate at most ACCEPT_TRIES of them, deepest (or best-supported) first
+            seen, uniq = set(), []
+            for c in sorted(pool, key=lambda c: (-c[1] if prefer_deepest > 0 else -c[0])):
+                k = round(c[1] / max(tol, 1e-9))     # by DEPTH only -- including the slope in
+                if k not in seen:                    # this key made 45 slope variants of one
+                    seen.add(k)                      # bad depth eat the whole try budget
+                    uniq.append(c)
+            ok_pool = [c for c in uniq[:ACCEPT_TRIES]
+                       if accept is None or accept(c[1], c[2])]
+            if ok_pool:
+                best = ok_pool[0] if prefer_deepest > 0 else max(ok_pool, key=lambda c: c[0])
+            elif accept is not None:
+                # NOTHING WELL-SUPPORTED IS ACCEPTABLE -- fall back to the best-supported line
+                # that IS, rather than dropping the edge. Dropping it was a rule-1 failure: on
+                # p130's top the deepest line ran 390px into the page, purity rightly vetoed it,
+                # and the edge was then left entirely uncut even though 90% of its scanlines
+                # showed real bed. A vetoed line means "not that one", never "cut nothing".
+                seen = set()
+                for c in sorted(cands, key=lambda c: -c[0]):
+                    k = round(c[1] / max(tol, 1e-9))
+                    if k in seen:
+                        continue
+                    seen.add(k)
+                    if len(seen) > ACCEPT_TRIES:
+                        break
+                    if accept(c[1], c[2]):
+                        best = c
+                        break
         _, x0, sl = best
 
         # least squares on the agreeing lines, twice

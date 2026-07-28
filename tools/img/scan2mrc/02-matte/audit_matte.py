@@ -75,7 +75,8 @@ def audit_page(page):
 
     out = {}
     for edge in EDGES:
-        L, S = B._orient(lum, sat, edge, dtb, dlr, H, W)
+        L = B._orient1(lum, edge, dtb, dlr, H, W)
+        S = B._orient1(sat, edge, dtb, dlr, H, W)
         A = B._orient1(alpha, edge, dtb, dlr, H, W)
         backish = ((L < DARK_L) & (S < DARK_S)) | ((L >= BRIGHT_L) & (S >= BRIGHT_S))
         # A full-bleed DARK AD is photometrically identical to bed (p069's right edge is
