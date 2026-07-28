@@ -140,7 +140,7 @@ def alpha_for(geo, npz, xt, yt):
     return unk
 
 
-def run(page, knorm="known", write=True, variant="display"):
+def run(page, knorm="known", write=True, variant="display", keep_rgb=False):
     t0 = time.time()
     geo = json.load(open(GEOJ))["pages"][str(page)]
     npz = np.load(os.path.join(GEOD, "%03d.npz" % page))
@@ -213,10 +213,11 @@ def run(page, knorm="known", write=True, variant="display"):
             os.path.join(OUTD, "%03d_cmyk_%s.tif" % (page, variant)), compression="tiff_lzw")
         Image.fromarray((~unk).astype(np.uint8) * 255).convert("1").save(
             os.path.join(OUTD, "%03d_known.png" % page), optimize=True)
-        # TIFF, not PNG: PNG deflate+filtering on a 557 MP image dominates the runtime, and
-        # this is a verification artifact that gets read straight back by verify_fullres.
-        Image.fromarray(rgb).save(os.path.join(OUTD, "%03d_rgb.tif" % page),
-                                  compression="tiff_lzw")
+    if write and keep_rgb:
+        # OPT-IN. Raw TIFF (PNG deflate on 557 MP dominated the whole apply), but 1.67 GB a page
+        # -- 294 GB for the issue against ~161 GB free -- so it is written only when something
+        # is going to read it back. verify_fullres is the only consumer.
+        Image.fromarray(rgb).save(os.path.join(OUTD, "%03d_rgb.tif" % page), compression=None)
     return rep
 
 
@@ -225,13 +226,15 @@ if __name__ == "__main__":
     ap.add_argument("pages", nargs="+", type=int)
     ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
     ap.add_argument("--no-write", action="store_true")
+    ap.add_argument("--keep-rgb", action="store_true",
+                    help="also write the 1.67GB pre-separation RGB, which verify_fullres reads")
     ap.add_argument("--variant", default="display", choices=("display", "detect"),
                     help="display = the canonical deliverable grade; detect = keeps shadows "
                          "for the screening analysis")
     A = ap.parse_args()
     out = []
     for p in A.pages:
-        r = run(p, A.knorm, not A.no_write, A.variant)
+        r = run(p, A.knorm, not A.no_write, A.variant, A.keep_rgb)
         out.append(r)
         print(json.dumps(r))
     RPT = "/Users/mist/DNB/8609/tmp/fullres_report.json"   # merge, do not replace (see crop_a4)
