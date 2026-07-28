@@ -35,7 +35,7 @@ Image.MAX_IMAGE_PIXELS = None
 MASTER = "/Users/mist/DNB/8609/master_2400"
 GEOJ = "/Users/mist/DNB/8609/tmp/page_geometry.json"
 GEOD = "/Users/mist/DNB/8609/tmp/page_geometry"
-OUTD = "/Users/mist/DNB/8609/tmp/cmyk_a4"
+OUTD = "/Users/mist/DNB/8609/tmp/render/deliver"
 STRIP = 2048                     # output rows per strip; bounds peak memory
 
 # --- convert.py anchor colours (identical to rust_pipeline/src/separate.rs) -------------------

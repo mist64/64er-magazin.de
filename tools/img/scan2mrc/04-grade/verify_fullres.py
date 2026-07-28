@@ -17,7 +17,7 @@ import numpy as np
 from PIL import Image
 
 Image.MAX_IMAGE_PIXELS = None
-FULL = "/Users/mist/DNB/8609/tmp/cmyk_a4"
+FULL = "/Users/mist/DNB/8609/tmp/render/deliver"
 REF = "/Users/mist/DNB/8609/tmp/a4"
 
 
