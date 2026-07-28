@@ -141,6 +141,9 @@ OVERCUT_600   = int(os.environ.get("BM_OVERCUT", 4))
 MIN_BACKING_FRAC = 0.15  # cut only if this fraction of lines shows any backing; below it the
                          # edge is clean page (p015's right edge is paper to the border, and a
                          # cut there destroys content nothing downstream can recover)
+EXT_GAP_600   = 8        # ... bridging transitions up to this wide between materials
+EXT_MAX_600   = 60       # the boundary may be finished through this much neutral shadow
+EXT_PCTL      = 90       # ... by this percentile of the per-line walk, applied uniformly
 OVERRUN_600   = 24       # a cut may exceed the material's p95 stop depth by this much
 SHALLOW_600   = 25       # a cut this shallow (~1mm) is allowed on weaker evidence
 MIN_CONTRAST  = 10.0     # ... and the winning line must stand out from the typical line by
@@ -510,6 +513,46 @@ def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
     m["stop_p95"] = float(np.percentile(stop[have], 95)) if have.any() else 0.0
     if float(np.median(line)) > m["stop_p95"] + OVERRUN_600 * dpi / 600:
         return np.zeros(L.shape[0]), "OVERRUN(past material)", m
+
+    # FINISH THE BOUNDARY. A material ends where its own colour ends, but outside the sheet there
+    # can be one more layer: at the bottom the insert is followed by the sheet-edge SHADOW, a
+    # neutral dark stripe the yellow material cannot include. Measured over the issue it left
+    # 7-16px standing on 92 pages. The walk is limited to the issue's own NEUTRAL DARK backing
+    # colour, so a saturated page ink abutting the boundary (p044's ochre) stops it at once, and
+    # the extension is applied UNIFORMLY at a robust percentile -- extending per line combed the
+    # boundary into the halftone the last time it was tried.
+    ext_mats = [(np.array(x["centre"], np.float32), float(x["radius_l"]) * GROW_L,
+                 float(x["radius_c"]) * GROW_C)
+                for edge_specs in profile.values() for x in edge_specs if x.get("backing")]
+    shadow = is_backing(E, ext_mats)
+    # bridge the short transition between the two materials -- on p129 the insert is followed by
+    # ~5px of mid-tone before the shadow proper, which stopped the walk on its first step. The
+    # bridge only lets the walk CONTINUE; the extension itself is trimmed back to the last pixel
+    # that genuinely matched, so a gap can never lengthen the cut by itself.
+    g = max(1, round(EXT_GAP_600 * dpi / 600))
+    bridged = ndi.binary_dilation(shadow, np.ones((1, 2 * g + 1), bool))
+    base = np.clip(line.astype(int), 0, D - 1)
+    rows = np.arange(N)
+    cur = base.copy()
+    alive = bridged[rows, cur]
+    walk = np.zeros(N, int)
+    last = np.zeros(N, int)
+    for step in range(1, int(EXT_MAX_600 * dpi / 600) + 1):
+        if not alive.any():
+            break
+        cur = np.minimum(base + step, D - 1)
+        alive &= bridged[rows, cur]
+        walk = np.where(alive, step, walk)
+        last = np.where(alive & shadow[rows, cur], step, last)
+    walk = last                                   # trim to the last real match
+    # ONLY LINES WHERE THE WALK TERMINATED. A shadow stripe ENDS and the page begins; a dark ad
+    # abutting the boundary does not, it just exhausts the budget. Counting those runaway lines
+    # pushed the tops of the ad pages from 23px to 49px.
+    done = ~alive
+    ext = float(np.percentile(walk[done], EXT_PCTL)) if done.any() else 0.0
+    line = np.clip(line + ext, 0, D)
+    m["ext"] = ext
+    m["median_depth"] = float(np.median(line))
 
     shallow = float(np.median(line)) <= SHALLOW_600 * dpi / 600
     if contrast < MIN_CONTRAST and not (shallow and m["purity"] >= BACKING_PURITY):
