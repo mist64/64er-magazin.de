@@ -42,7 +42,17 @@ COLOR_C = np.array([38., 140., 165.]);  COLOR_CM = np.array([36., 44., 79.])
 COLOR_CY = np.array([42., 109., 44.]);  COLOR_M = np.array([192., 37., 66.])
 COLOR_MY = np.array([185., 34., 31.]);  COLOR_Y = np.array([201., 159., 61.])
 COLOR_K = np.array([16., 17., 17.]);    COLOR_W = np.array([201., 195., 188.])
-LEVELS_DISPLAY = {"c": (50., 90.), "m": (30., 70.), "y": (30., 70.), "k": (90., 95.)}
+# Fixed grade constants for now; measuring them per issue is roadmap step 7 and is deliberately
+# NOT done here. Two variants exist in the 8608 pipeline and they are not interchangeable:
+#   display  the canonical grade (ALL.sh / CLAUDE.md stage 1a) -- the deliverable
+#   detect   keeps the shadows (lo=0) for the screening analysis, which needs tonal range that
+#            the display grade clips away
+# rust_pipeline's CLI defaults to `detect`; CLAUDE.md documents `display` as the grade. So the
+# variant is a REQUIRED choice here rather than an inherited default.
+LEVELS = {
+    "display": {"c": (50., 90.), "m": (30., 70.), "y": (30., 70.), "k": (90., 95.)},
+    "detect":  {"c": (0., 90.),  "m": (0., 70.),  "y": (0., 70.),  "k": (0., 95.)},
+}
 
 
 def plane(p1, p2, p3):
@@ -130,7 +140,7 @@ def alpha_for(geo, npz, xt, yt):
     return unk
 
 
-def run(page, knorm="known", write=True):
+def run(page, knorm="known", write=True, variant="display"):
     t0 = time.time()
     geo = json.load(open(GEOJ))["pages"][str(page)]
     npz = np.load(os.path.join(GEOD, "%03d.npz" % page))
@@ -183,13 +193,14 @@ def run(page, knorm="known", write=True):
         kv = np.clip(((d - dmin) / span * 255.0).astype(np.int64), 0, 255).astype(np.uint8)
         k = (255 - kv)
         sh = (y1 - y0, W_out)
-        c = level(c.reshape(sh), *LEVELS_DISPLAY["c"]); mm = level(mm.reshape(sh), *LEVELS_DISPLAY["m"])
-        yy = level(yy.reshape(sh), *LEVELS_DISPLAY["y"]); k = level(k.reshape(sh), *LEVELS_DISPLAY["k"])
+        lv = LEVELS[variant]
+        c = level(c.reshape(sh), *lv["c"]); mm = level(mm.reshape(sh), *lv["m"])
+        yy = level(yy.reshape(sh), *lv["y"]); k = level(k.reshape(sh), *lv["k"])
         neu = np.minimum(np.minimum(c, mm), yy)                    # GCR
         C[y0:y1] = c - neu; M[y0:y1] = mm - neu; Y[y0:y1] = yy - neu
         K[y0:y1] = np.clip(k.astype(np.int16) + neu, 0, 255).astype(np.uint8)
 
-    rep = {"page": page, "out_size": [W_out, H_out], "knorm": knorm,
+    rep = {"page": page, "out_size": [W_out, H_out], "knorm": knorm, "variant": variant,
            "k_candidates": {k: [round(a, 2), round(b, 2)] for k, (a, b) in cand.items()},
            "unknown_pct": round(100.0 * float(unk.mean()), 3),
            "gcr_ok": bool(int(np.minimum(np.minimum(C, M), Y).max()) == 0),
@@ -199,7 +210,7 @@ def run(page, knorm="known", write=True):
     if write:
         os.makedirs(OUTD, exist_ok=True)
         Image.merge("CMYK", [Image.fromarray(x) for x in (C, M, Y, K)]).save(
-            os.path.join(OUTD, "%03d_cmyk.tif" % page), compression="tiff_lzw")
+            os.path.join(OUTD, "%03d_cmyk_%s.tif" % (page, variant)), compression="tiff_lzw")
         Image.fromarray((~unk).astype(np.uint8) * 255).convert("1").save(
             os.path.join(OUTD, "%03d_known.png" % page), optimize=True)
         Image.fromarray(rgb).save(os.path.join(OUTD, "%03d_rgb.png" % page))
@@ -211,10 +222,13 @@ if __name__ == "__main__":
     ap.add_argument("pages", nargs="+", type=int)
     ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
     ap.add_argument("--no-write", action="store_true")
+    ap.add_argument("--variant", default="display", choices=("display", "detect"),
+                    help="display = the canonical deliverable grade; detect = keeps shadows "
+                         "for the screening analysis")
     A = ap.parse_args()
     out = []
     for p in A.pages:
-        r = run(p, A.knorm, not A.no_write)
+        r = run(p, A.knorm, not A.no_write, A.variant)
         out.append(r)
         print(json.dumps(r))
     json.dump(out, open("/Users/mist/DNB/8609/tmp/fullres_report.json", "w"), indent=1)
