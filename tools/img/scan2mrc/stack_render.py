@@ -217,12 +217,18 @@ def render(page, priors, skew, spine, clip, tmpl):
     m_bed, m_spine, m_holes, src, _ = _masks(page, priors, spine, clip, im)
     unknown = m_bed | m_spine | m_holes
 
-    rgba = np.dstack([np.asarray(im), np.where(unknown, 0, 255).astype(np.uint8)])
-    out = Image.fromarray(rgba, "RGBA")
     ang = skew.get(page, 0.0)
+    known = Image.fromarray(np.where(unknown, 0, 255).astype(np.uint8), "L")
+    rgb = im
     if abs(ang) > 1e-3:
-        out = out.rotate(ang, resample=Image.BICUBIC, expand=True, fillcolor=(0, 0, 0, 0))
-    return out, ang, float(unknown.mean()), src
+        # RGB bicubic, ALPHA NEAREST, rotated separately and recombined. Rotating the RGBA
+        # together interpolates the alpha into a soft fringe -- alpha here means UNKNOWN, and a
+        # half-transparent pixel is a claim nothing measured -- and it also blends the RGB of the
+        # transparent fill (black) into the page border underneath it.
+        rgb = im.rotate(ang, resample=Image.BICUBIC, expand=True, fillcolor=(0, 0, 0))
+        known = known.rotate(ang, resample=Image.NEAREST, expand=True, fillcolor=0)
+    out = Image.fromarray(np.dstack([np.asarray(rgb), np.asarray(known)]), "RGBA")
+    return out, ang, float((np.asarray(known) == 0).mean()), src
 
 
 def render_review(page, priors, skew, spine, clip):
