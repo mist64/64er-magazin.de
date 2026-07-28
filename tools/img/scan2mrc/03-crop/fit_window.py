@@ -161,9 +161,11 @@ def main():
                       "anchor": [ax, ay], "src": "logo", "alpha_pct": res[n]}
 
     # --- pages with NO logo: horizontal from the SPINE, vertical to maximise known pixels ---
-    # The distance from the fold to the window's binding edge is not chosen, it is MEASURED on
-    # the pages that do have a logo -- so a spine-placed page lands where a logo-placed one
-    # would have. Median per parity, because the two parities bind on opposite sides.
+    # The gap between the fold and the logo-anchored windows' binding edge is measured and
+    # reported below because it cross-checks the two detectors against each other, but it is
+    # NOT applied: "cropped from the spine" means the crop starts AT the spine. Propagating the
+    # logo pages' median would have put odd pages 18px (0.76mm) onto the NEIGHBOUR's side of the
+    # fold, inheriting an asymmetry (odd -18 vs even -1.5) that nothing here explains.
     gaps = {}
     for par in ("even", "odd"):
         g = [n for n in pages if (n % 2 == 0) == (par == "even")]
@@ -178,8 +180,7 @@ def main():
     for n in clr["no_logo"]:
         par = "even" if n % 2 == 0 else "odd"
         H, W = canvas[n]
-        x0 = int(round(bounds[n] + gaps[par] - A4_W)) if par == "even" \
-            else int(round(bounds[n] + gaps[par]))
+        x0 = int(round(bounds[n] - A4_W)) if par == "even" else int(round(bounds[n]))
         by, bv = None, None
         for y0 in range(-A4_H // 8, H - A4_H + A4_H // 8, 8):
             v = alpha_in_xy(masks[n], x0, y0)
@@ -188,7 +189,7 @@ def main():
         windows[n] = {"x0": x0, "y0": int(by), "w": A4_W, "h": A4_H,
                       "anchor": None, "src": "spine",
                       "alpha_pct": round(100.0 * bv / total, 4),
-                      "spine_x": round(bounds[n], 1)}
+                      "spine_x": round(bounds[n], 1), "gap_applied": 0}
     sp = [w["alpha_pct"] for w in windows.values() if w["src"] == "spine"]
     print("spine  n=%3d  alpha%% p50 %.3f  p95 %.3f  max %.3f" % (
         len(sp), np.percentile(sp, 50), np.percentile(sp, 95), max(sp)))
