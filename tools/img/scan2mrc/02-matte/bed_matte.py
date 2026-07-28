@@ -1,545 +1,414 @@
 #!/usr/bin/env python3
-"""Bed matte: clear the scanner-bed backing (lid black + backing sheet + colored inserts) as unknown
-(alpha 0) at each page edge, without cutting page content.
+"""Bed matte: mark the scanner backing at each page edge as unknown (alpha 0).
 
-NEW ALGORITHM (single unified backing run per edge -- replaces the old brittle two-path dark/insert
-version). Per edge (top/bottom/left/right), the array is oriented so axis1 runs from the BORDER inward.
+Backing = the scanner bed (lid / backing sheet / its shadow) and the coloured cardboard
+insert (yellow, at the bottom of this issue). The page must not be cut.
 
-  1. UNIFIED BACKING PROFILE d[x].  PAGE = light+neutral (luma>PAGE_LUMA AND saturation<PAGE_SAT,
-     saturation = max-min channel). d[x] = index of the FIRST page pixel from the border. The run
-     [0,d[x]) is the backing candidate and may be a MIX of black bed AND yellow insert AND their
-     transition -- it is treated as ONE run (this is what fixes the p071 composite: yellow then a thin
-     black shadow stripe then page -- the old insert path stopped at the end of the yellow and left the
-     black stripe). A line is "backing" if its run is non-page and roughly uniform, measured as: a high
-     fraction of run pixels are each dark-neutral OR saturated (NONPAGE_FRAC). We deliberately do NOT
-     gate on raw luma std, because a genuine yellow+black composite run has a huge luma std yet is all
-     backing; the non-page fraction is the correct "one uniform backing run" test. Flush column ->
-     page at the border -> d=0 (not backing). Full-bleed column -> no page found in the window -> d
-     marked "no page" (excluded from containment; counts against confidence).
+THE ALGORITHM -- three steps, one code path for all four edges, and the middle step is the
+SHARED core in ../linefit.py that 02b/spine.py also uses:
 
-  2. BRUTE-FORCE STRAIGHT CUT LINE over (slope,height). For a line L[x]=height+slope*(x-x_center):
-       page_cut(L)     = sum over non-nopage cols of max(0, L[x]-d[x])   (page pixels cut -> MINIMIZE)
-       backing_left(L) = sum over backing cols   of max(0, d[x]-L[x])   (backing left behind -> tiny)
-     For each slope we pick the SMALLEST height whose backing_left <= SLACK*total_backing (page_cut
-     grows with height, backing_left shrinks with height, so the smallest feasible height minimizes
-     page_cut for that slope), then keep the slope with the least page_cut. Exact & cheap on the 1-D
-     profile. Soft containment => a deep content-black outlier (e.g. p089 schematic ~558px vs the bar
-     ~60px) is LEFT automatically because containing it would cost far too much page_cut. The cut is
-     every pixel above the line over the whole edge (a couple px overcut into page margin is fine).
+  1. PER LINE, CANDIDATE TRANSITIONS. Orient the edge so axis1 runs from the border inward.
+     A pixel is BACKING if it is BLACKISH (dark AND neutral -> bed) or YELLOWISH (bright AND
+     saturated -> cardboard). Offer the first N_CAND backing->page transitions per line.
+  2. ROBUST LINE FIT (linefit.fit): the (offset, slope) most lines agree on, then LSQ on the
+     inliers, plus a bounded quadratic for the sheet's bow.
+  3. MARGIN AND DECISION, kept OUT of the fit: a fixed overcut, and independent tests for
+     whether this edge should be cut at all.
 
-  3. CONFIDENCE. HIGH iff (a) solid neutral PAGE just beyond the cut line across the full width
-     (>=BEYOND_PAGE_FRAC clean), AND (b) the best line's page_cut is ~0 relative to the backing
-     (<=PAGECUT_FRAC*total_backing -- a straight line contains the backing cheaply), AND (c) enough
-     backing columns (>=MIN_BACKING_FRAC) with few full-bleed no-page columns (<=MAX_NOPAGE_FRAC).
-     LOW = full-bleed (no page beyond, or many no-page cols), crowded/jagged (large page_cut), unusual.
+WHY THE REWRITE. The previous version walked to the FIRST non-backing pixel -- ONE candidate
+per line -- so a single anomalous pixel ruined that line, and the damage was repaired
+downstream with an outlier fence, a coverage percentile, depth smoothing, gap bridging and a
+strip extension. Each was a workaround for not having a robust fit, and they fought:
 
-TWO-PASS: WITHOUT --priors this runs in PASS-1 MODE and cuts ONLY high-confidence edges (ambiguous
-edges are left for pass 2). WITH --priors it runs in PASS-2 MODE: it additionally accepts a LOW-conf
-edge whose candidate depth/angle match the learned typical for that edge+parity, and REJECTS an
-atypically-deep candidate (full-bleed). Pass-2 is built but lightly tested; pass-1 is the deliverable.
+    walk stops in a transition blur -> gap bridging -> leapt through an ad's black TEXT
+                                                       (p044 bottom 160 -> 292)
+    deep outlier lines              -> MAD fence    -> too tight left bed standing on p003,
+                                                       too loose over-cut p044 by 44px
+    spiky depths                    -> smoothing    -> fit disagreed with what it must cover
+    bed strip after the blur        -> extension    -> combed p005's halftone per column
+
+A MODE fit needs none of it. Deleted here: OUTLIER_K, FENCE_MIN_600, COVER_PCT, SLACK,
+SMOOTH_D_600, GAP_BRIDGE_600, STRIP_*, PAGECUT_FRAC, and the learned-prior acceptance path.
+
+RULES (from the user):
+  1. every backing pixel must be cut -- leaving a stripe is a FAIL
+  2. subject to that, cut as few of OUR pixels as possible
+
+CONSTRAINT: full-bleed dark pages (p047, p069) have real black ink to the very edge, and
+SOLID black ink is separable from bed by neither colour nor texture. Those edges are left
+uncut deliberately -- see the INK and vote tests.
 """
-import os, argparse, json, numpy as np, scipy.ndimage as ndi
+import os, sys, json, argparse, numpy as np, scipy.ndimage as ndi
 from PIL import Image
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import linefit
+
 Image.MAX_IMAGE_PIXELS = None
 
 # ---------------------------------------------------------------------------------------------------
-# MAGIC CONSTANTS (all resolution-relative constants are given @600dpi and scaled by dpi/600)
+# CONSTANTS  (spatial values @600dpi, scaled by dpi/600)
 # ---------------------------------------------------------------------------------------------------
-WIN_TB_FRAC   = 0.08     # top/bottom search-window depth as a fraction of image HEIGHT
-WIN_LR_FRAC   = 0.16     # left/right  search-window depth as a fraction of image WIDTH (bars are wide)
+WIN_TB_FRAC   = 0.08     # top/bottom search depth as a fraction of image HEIGHT
+WIN_LR_FRAC   = 0.16     # left/right search depth as a fraction of image WIDTH (bars are wide)
 
-PAGE_LUMA     = 120      # PAGE (paper) is LIGHT: luma above this ...
-PAGE_SAT      = 40       # ... AND NEUTRAL: saturation (max-min channel) below this. Yellow/blue backing
-                         #     is saturated -> not page; black bed is dark -> not page.
-# --- POSITIVE BED TEST (replaces "page = light+neutral, backing = the rest") ---------------------
-# The old test defined PAGE as light AND neutral and took the first page pixel as the backing depth.
-# On a FULL-BLEED page there is no such pixel anywhere in the window, so every column read as
-# "no page" -> full-bleed -> LOW confidence -> the edge was left uncut. That is why p001 (dark teal
-# cover, sat 106) and p003 (black block) kept their bed. We now detect the BED POSITIVELY. Measured
-# medians (600-dpi thumbs):
-#     bed              L 31-44   sat  2-3    screen  6-10
-#     yellow insert    L 192     sat 137     screen  2.2
-#     p001 teal cover  L 128     sat 120     screen 14.6   <- kept by luma+sat
-#     p005 halftone    L  41     sat  40     screen  8.4   <- kept by SAT alone
-#     p047 dark ad     L  39     sat   7     screen 29.1   <- kept by SCREEN alone
-# All three terms are load-bearing: no two of them separate all of these cases.
-BED_LUMA      = 55       # bed is VERY dark ...
-BED_SAT       = 12       # ... and VERY neutral (this is what keeps p005's green halftone, sat 40) ...
-SCREEN_MAX    = 13       # ... and UNSCREENED. Printed ink carries the halftone; the scanner backing
-                         #     and the cardboard insert do not. Band-pass energy (L minus a 7px box
-                         #     mean, RMS over 7px) -- the only term that keeps p047's dark ad (29).
-INSERT_LUMA   = 150      # a COLOURED INSERT (cardboard) is also BRIGHT. Without this the solid teal
-                         #     of p001's cover (L 104, sat 103, unscreened at the top edge where it is
-                         #     a flat band) is indistinguishable from the yellow cardboard (L 192,
-                         #     sat 137) and the whole cover reads as backing. A dark saturated region
-                         #     is printed ink, not backing. NB: calibrated on this issue's yellow
-                         #     insert -- a genuinely DARK coloured insert would need this re-measured.
-SCREEN_BOX_600 = 7       # band-pass window @600dpi; ~the 150-lpi screen period is 4px there
-DARK_LUMA     = 70       # a backing-run pixel counts as "dark-neutral" if luma < this ...
-DARK_SAT      = 40       # ... and saturation < this (neutral). Covers lid black + backing sheet + shadow.
-SAT_BACK      = 60       # a backing-run pixel counts as "saturated" (colored insert) if saturation >= this.
-NONPAGE_FRAC  = 0.85     # a line is BACKING if >= this fraction of its run pixels are each dark-neutral
-                         #     OR saturated (i.e. non-page). Yellow+black composite passes (~1.0); a run
-                         #     riddled with mid-tone content pixels fails.
-STRIP_START_600 = 6      # the dark run must begin within this of the depth already found
-EDGE_STRIP_600 = 26      # after the cut line is fitted, extend it past a SHORT DARK RUN that
-                         # starts within this distance beyond the cut and ENDS before it --
-                         # the bed shadow between the page edge and the cardboard insert.
-                         # p001's bottom is insert -> blur -> 6px of black bed -> page; the
-                         # walk stops in the blur, so on the right of the page the fitted cut
-                         # (152px) sits above the strip and leaves it visibly uncut.
-                         # A run that does NOT end inside the window is content, not a strip,
-                         # so this cannot eat into an ad -- and unlike gap-closing on the
-                         # backing mask it cannot bridge through an ad's black TEXT, which is
-                         # what blew p044 from 160 to 292.
-_UNUSED_GAP_BRIDGE = 20  # the backing run ends at the first SUSTAINED page, not at the first
-                         # page PIXEL. Backing is not always one material: p001's bottom runs
-                         # yellow insert -> a ~3px transition blur -> 6px of black bed -> page.
-                         # The blur row is neither insert nor bed, so a first-pixel rule stopped
-                         # the run at 144 and left the real bed at 150 uncut. Page must persist
-                         # this far (@600dpi) to count as the end of the backing.
-MIN_DEPTH_600 = 3        # ignore runs shallower than this (a flush paper edge, not backing) @600dpi
+# --- step 1: what IS backing (positive material test) -----------------------------------------------
+# NOTHING about the backing is written here any more. WHICH materials are backing, WHAT colour
+# they are and WHICH edges they lie on come from calibrate_backing.py, which measures them over
+# the issue: backing is the material that covers the border ring and vanishes inboard. It found
+# the bed on top/left/right and the insert on the bottom of 176/176 pages, and correctly refused
+# the cream paper everywhere. The old BED_LUMA/BED_SAT/INSERT_LUMA/INSERT_SAT/INSERT_EDGES were
+# the same facts guessed instead of measured, and each broke somewhere (p044's ochre ad matched
+# "yellowish" on a left edge with no insert on it; p001's teal cover nearly did too).
+RING_600      = 3        # border ring used to refine a material on the page in front of us
+SEED_STEP     = 8        # quantisation for finding the ring's densest colour peak
+SPREAD_PCTL   = 90       # per-page radius = this percentile of the peak's own spread ...
+SPREAD_K      = 1.5      # ... times this
+RADIUS_FLOOR  = 12       # ... never tighter than this (scanner noise on a flat material)
+GROW_ITERS    = 2        # re-measure the material over its connected region this many times
+MIN_RING_FRAC = 0.02     # a material must hold this much of the ring to be present on this page
+DEEP_FRAC     = 0.75     # the deep part of the search window, used to re-run the calibration's
+COLLAPSE_MIN  = 3.0      # collapse test on THIS page (see page_materials)
+                         # PER-PAGE REFINEMENT IS THE POINT. The issue-wide bed sits at L26, but
+                         # a scan's bed and that same scan's blackest INK are different colours:
+                         # measured on p069, bed L20.0 against ad ink L39.7. One fixed threshold
+                         # can never split those (across the issue the two distributions overlap
+                         # completely: bed L5-51, ink L15-45); the same page's own ring splits
+                         # them easily. This is why the full-bleed dark pages were "irreducible".
+N_CAND        = 12       # ALL the backing->page transitions in the window (up to this many),
+                         # not the first few. Taking the FIRST transitions biases the histogram
+                         # toward the border: any texture starting at the page edge then yields
+                         # a spurious peak, which is how p005's right edge -- the green comic
+                         # running full-bleed, no bed at all -- produced a "line" at d=17 with
+                         # 0.63 agreement. With every transition offered, a screen gives
+                         # scattered candidates and no dominant peak, and a real bed edge still
+                         # gives one; the fit then tells bed from texture by itself.
+MIN_DEPTH_600 = 3        # ignore transitions shallower than this (a flush paper edge)
+MIN_RUN_600   = 8        # a candidate needs this much backing before it and page after it
+RUN_FRAC      = 0.7      # ... of which this fraction must match (grain tolerance, see below)
 
-SLOPE_MAX_DEG  = 1.1     # brute-force slope range for the cut line, degrees. DERIVED, not guessed:
-                         # the sheet edge is straight, so in the RAW (pre-deskew) frame its tilt is
-                         # the page skew, measured over all 176 pages as median 0.13, p95 0.34,
-                         # MAX 0.78 deg. A cut steeper than ~1.1 deg is therefore not a paper edge --
-                         # it is the line locking onto tilted CONTENT (p031's right edge drifted
-                         # 121px = 1.18 deg across the page under the old +-4 deg range).
-SLOPE_STEP_DEG = 0.05    # slope grid step
-COVER_PCT      = float(os.environ.get('BM_COVER_PCT', 100.0))   # place the cut line at this percentile of the CORE backing depth.
-                         # 100, not 99.5: rule 1 is absolute -- "ALWAYS cut 100% of the
-                         # neighbour/backing; not doing that is a FAIL". At 99.5 the deepest
-                         # 0.5% of core columns were by construction left uncovered, which
-                         # showed up as 5-9px (0.2-0.4mm) standing on p004/p003/p089. The core
-                         # is already outlier-fenced, so covering all of it does not chase a
-                         # content block.
-                         # The old rule ("smallest height whose LEFTOVER AREA <= SLACK * total") is a
-                         # SUM criterion, and a thin strip spanning the full width is cheap by that
-                         # measure -- so the line landed on the MEDIAN backing depth and ~37% of
-                         # columns kept a visible stripe (p004: h=153 vs backing p95=170, max
-                         # shortfall 25px). ACCEPTANCE says the opposite: cover ALL the backing, and
-                         # a few px of over-cut into page margin is fine while under-cut is not.
-                         # The core is already MAD-fenced (OUTLIER_K) so a deep content box does not
-                         # drag this up; p99 of what remains is the real backing edge.
-SLACK          = 0.01    # (retained: still used as the feasibility budget in metrics reporting)
-CURVE_MIN_FRAC = 0.30    # fit the bow ONLY if at least this fraction of lines are backing.
-                         # A quadratic fitted to a handful of scattered columns and then
-                         # EXTRAPOLATED over the full edge explodes: on p015's right edge
-                         # (clean paper, backing 0.7%) it produced a cut of 822px = the whole
-                         # search window = 35mm of real page destroyed.
-CURVE_MAX_600  = 40      # max bow (px @600dpi) the quadratic term may add across the whole edge.
-                         # The sheet BOWS in the scanner: the backing boundary is not straight but a
-                         # shallow arc, measured at 8-13px across the width (p005 140/132/145,
-                         # p009 148/140/146). A straight line cannot follow a curve, so it left a few
-                         # px standing at BOTH ends -- visible only at the outer end, because the
-                         # binding end is already removed by the spine cut. That is why every page
-                         # reported had the residue in the same corner. Bounded so a wild fit cannot
-                         # invent a curve that eats content.
-# SMOOTH_D_600 (removed): median-smoothing the per-line depth before fitting made the cut
-# disagree with what it has to cover -- the line was fitted to smoothed depth while the real
-# backing still had its spikes, so rule-1 leftovers appeared that no coverage setting could
-# close. The over-cut it was meant to fix came from COVER_PCT/OVERCUT stacking instead.
-_UNUSED_SMOOTH_D_600 = 47   # kept only to document the attempt; not used
-                         # fitting/covering (47px @600dpi = 2mm). The backing boundary is
-                         # SMOOTH along an edge; single-column spikes are specks, a gradual
-                         # transition, or a speck of content -- not a stripe. Without this,
-                         # COVER_PCT=100 lifts the whole cut to clear the deepest single
-                         # column, so a handful of outliers cost the entire edge: p044 bottom
-                         # real depth p50=160 but cut 204 (+1.9mm), p044 top p50=20 cut 57.
-                         # Smoothing first keeps rule 1 (a few columns is not a stripe) while
-                         # not paying for them across the whole page.
-FENCE_MIN_600  = 40      # floor on the outlier fence, px @600dpi (=1.7mm). The MAD fence alone
-                         # has no scale: on an edge where the bed is uniform the MAD is tiny, so
-                         # the fence sits a few px above the median and discards REAL bed that
-                         # merely varies along the edge. p003's top bed runs 12-43px; with
-                         # med 15 / mad 2 the fence was 24px, so the deep columns were treated as
-                         # content and 25px of bed was left standing. Bed depth genuinely varies
-                         # by ~1mm along an edge; a CONTENT block (p003's, p089's) is hundreds of
-                         # px deeper, so a floor at 1.7mm separates them without weakening
-                         # OUTLIER_K where the spread is real.
-OUTLIER_K      = 3.0     # containment: within the de-sloped frame, backing columns whose depth exceeds
-                         #     median + OUTLIER_K*1.4826*MAD are treated as deep CONTENT outliers and are
-                         #     EXCLUDED from the coverage constraint (so a black content box touching the
-                         #     edge, e.g. p005 bottom, is LEFT while the bulk yellow is still covered
-                         #     tightly). A widening bar is a LINEAR ramp -> uniform after de-sloping ->
-                         #     small MAD -> NOT excluded -> fully covered.
-OVERCUT_600    = int(os.environ.get('BM_OVERCUT', 4))       # push the accepted line this many px past the backing @600dpi. Was 2, which
-                         # left a 3-10px stripe on ~13% of columns even after COVER_PCT: the backing
-                         # edge is not perfectly straight and p99 of the core still clips the tail.
-                         # ACCEPTANCE permits "a couple px" of overshoot into page margin but no
-                         # stripe at all, and the A4 crop discards this margin regardless. 8px @600
-                         # = 0.34mm.
+# --- step 2: the shared robust fit ------------------------------------------------------------------
+SLOPE_MAX_DEG = 1.1      # DERIVED: the sheet edge is straight, so in the raw frame its tilt IS
+                         # the page skew -- measured over 176 pages: median 0.13, p95 0.34,
+                         # max 0.78 deg. Steeper is a lock onto tilted content.
+BACKING_PURITY = 0.90    # a DEEPER line is only accepted if this fraction of what it encloses
+                         # is actually backing. Votes alone do not justify going deeper: a deep
+                         # line inside the page collects them too (p015's top jumped 20 -> 395px
+                         # cutting content). p001's extra region is transition blur + bed strip,
+                         # i.e. all backing, so it qualifies; page content does not. This is
+                         # rule 1 stated directly -- extend the cut only over real backing.
+DEEPEST_FRAC  = 0.60     # among lines reaching this fraction of the best line's agreement,
+                         # take the DEEPEST -- see linefit.fit(prefer_deepest). p001's bottom
+                         # carries two real boundaries (insert, then a 6px bed strip past a
+                         # transition blur) and the plain mode picks the shallower one.
+VOTE_TOL_600  = 6        # a line agrees with the fit if a candidate is within this
+CURVE_MAX_600 = 40       # max bow across the range the curve is APPLIED to (the sheet bows in
+                         # the scanner: 8-13px measured along an edge)
 
-BEYOND_600       = 30    # depth of the "just beyond the cut" band used for the page-beyond test @600dpi
-BEYOND_PAGE_FRAC = 0.50  # HIGH-conf (a): >= this fraction of that beyond-band (full width) must be PAGE
-SAT_DOMINANT     = 0.60  # HIGH-conf (a) is ALSO satisfied if the backing runs are dominantly SATURATED
-                         #     (median saturated-fraction >= this): a colored insert (yellow/blue) is proven
-                         #     backing by its saturation, so clean page just beyond is not required -- this
-                         #     rescues crowded yellow bottoms (p030) where content sits right above the yellow.
-PAGECUT_FRAC     = 0.15  # HIGH-conf (b): page_cut <= this * total_backing (line contains backing cheaply)
-MIN_BACKING_FRAC = 0.15  # HIGH-conf (c): >= this fraction of columns are backing
-MAX_NOPAGE_FRAC  = 0.15  # HIGH-conf (c): <= this fraction of columns are full-bleed (no page in window)
-
-PRIOR_DEPTH_TOL  = 0.60  # PASS-2: accept a low-conf edge if |depth-median|/median <= this (depth match)
-PRIOR_ANGLE_TOL  = 2.0   # PASS-2: ... and |angle-median| <= this many degrees
-PRIOR_REJECT_MUL = 1.8   # PASS-2: REJECT (never cut) a candidate deeper than this * learned median depth
-
-MARGIN_600    = 1        # perpendicular safety dilation @600dpi
+# --- step 3: margin and decision (kept out of the fit) ----------------------------------------------
+OVERCUT_600   = int(os.environ.get("BM_OVERCUT", 4))
+MIN_BACKING_FRAC = 0.15  # cut only if this fraction of lines shows any backing; below it the
+                         # edge is clean page (p015's right edge is paper to the border, and a
+                         # cut there destroys content nothing downstream can recover)
+MIN_CONTRAST  = 10.0     # ... and the winning line must stand out from the typical line by
+                         # this factor (linefit's peak contrast). This REPLACES a vote-fraction
+                         # gate, which measured nothing: with ~10 candidates per line an
+                         # arbitrary offset agrees with 50-90% of lines by chance, so a screened
+                         # edge carrying no boundary scored 0.66 while p001's real insert edge
+                         # scored 0.45 and was thrown away. Measured over the issue the two
+                         # classes are far apart in contrast -- real boundaries 12-7000, the
+                         # scattered kind 1-6.
+MIN_VOTE_FRAC = 0.20     # a floor only, to keep linefit's deepest-preference from selecting a
+                         # line almost no scanline supports.
+SCREEN_BOX_600 = 7       # band-pass window; the ~150lpi screen period is 4px @600dpi
+SCREEN_MAX    = 13       # a REGION whose band-pass energy exceeds this is printed ink, not
+                         # backing (p047's ad ~29; bed and cardboard 2-10). Judged over the
+                         # region, NEVER per pixel: at a boundary it measures the boundary,
+                         # which is what rejected p001's 6px strip (18.9) and its blur (25.3).
 
 EDGES = ("top", "bottom", "left", "right")
 
 
 # ---------------------------------------------------------------------------------------------------
-def _screened_region(Sc, d, backing):
-    """True if the walked backing region is really PRINTED INK, judged as a region.
-
-    The band-pass is only meaningful over an area: a full-bleed screened ad is uniformly
-    high (p047 ~29), the scanner bed and the cardboard insert are uniformly low (~2-10).
-    Sampling it per pixel at a transition measures the transition instead, which is what
-    made the walk stop before p001's bed strip.
-    """
-    if not backing.any():
-        return False
-    idx = np.arange(Sc.shape[1])[None, :]
-    reg = (idx < d[:, None]) & backing[:, None]
-    if reg.sum() < 50:
-        return False
-    return float(np.median(Sc[reg])) >= SCREEN_MAX
-
-
-def _thin_dark_run(is_dark, dpi):
-    """True where a DARK-NEUTRAL run is too thin to have an interior to measure.
-
-    The screen test asks "is this printed ink?" by band-pass energy. A thin dark strip has
-    high band-pass energy from ITS OWN EDGES, not from halftone: p001's bottom bed is 6px of
-    L24/sat5 sandwiched between the bright insert and the teal cover, and with a 7px window
-    there is no interior left to sample, so it scored 18.9 and was rejected as "screened".
-    A run this thin, this dark and this neutral is the bed shadow, not an ad -- p047's dark
-    screened ad is hundreds of px thick and still gets judged on its texture.
-    """
-    w = max(3, int(round(SCREEN_BOX_600 * dpi / 600)))
-    run = ndi.uniform_filter(is_dark.astype(np.float32), size=(1, 2 * w + 1))
-    return is_dark & (run < 0.98)          # dark, but not part of a thick dark region
-
-
 def screen_energy(lum, dpi):
-    """Band-pass RMS: how much halftone screen this pixel sits in.
-
-    Printed ink is screened; the scanner backing and the cardboard insert are not. This is the
-    only signal that separates a full-bleed DARK NEUTRAL ad (p047: screen 29) from the bed
-    (screen 6-10), since those two are identical in luma and saturation."""
+    """Band-pass RMS: how much halftone screen a pixel sits in."""
     b = max(3, round(SCREEN_BOX_600 * dpi / 600))
     hp = lum - ndi.uniform_filter(lum, b)
     return np.sqrt(np.maximum(ndi.uniform_filter(hp * hp, b), 0))
 
 
 def _orient1(a, edge, dtb, dlr, H, W):
-    if edge == "top":    return a[:dtb].T
-    if edge == "bottom": return a[H-dtb:][::-1].T
+    """axis0 = along the edge, axis1 = depth inward from the border (extra axes preserved)."""
+    if edge == "top":    return a[:dtb].swapaxes(0, 1)
+    if edge == "bottom": return a[H - dtb:][::-1].swapaxes(0, 1)
     if edge == "left":   return a[:, :dlr]
-    if edge == "right":  return a[:, W-dlr:][:, ::-1]
-
-
-def _orient(lum, sat, edge, dtb, dlr, H, W, scr=None):
-    """Return (L,S[,Sc]) with axis0 = along-edge (line index x), axis1 = depth from the border."""
-    L = _orient1(lum, edge, dtb, dlr, H, W)
-    S = _orient1(sat, edge, dtb, dlr, H, W)
-    if scr is None:
-        return L, S
-    return L, S, _orient1(scr, edge, dtb, dlr, H, W)
+    if edge == "right":  return a[:, W - dlr:][:, ::-1]
 
 
 def _deorient(mask_edge, edge, H, W, dtb, dlr):
-    """Scatter an edge-oriented cut mask (N,D) back into a full (H,W) image mask."""
     m = np.zeros((H, W), bool)
-    if edge == "top":    m[:dtb]      = mask_edge.T
-    if edge == "bottom": m[H-dtb:]    = mask_edge.T[::-1]
-    if edge == "left":   m[:, :dlr]   = mask_edge
-    if edge == "right":  m[:, W-dlr:] = mask_edge[:, ::-1]
+    if edge == "top":      m[:dtb]        = mask_edge.T
+    if edge == "bottom":   m[H - dtb:]    = mask_edge.T[::-1]
+    if edge == "left":     m[:, :dlr]     = mask_edge
+    if edge == "right":    m[:, W - dlr:] = mask_edge[:, ::-1]
     return m
 
 
-def _profile(L, S, dpi, Sc=None):
-    """Step 1: per-line backing profile. Return d (first-page depth), backing mask, nopage mask.
+def page_materials(rgb_edge, edge, profile, dpi):
+    """The backing materials PRESENT ON THIS PAGE at this edge, refined to this page's colours.
 
-    PAGE is now "not backing" under the positive bed/insert test (see BED_LUMA), so a full-bleed
-    dark or saturated page still yields a page pixel and the edge is analysable."""
-    N, D = L.shape
-    min_depth = max(2, round(MIN_DEPTH_600 * dpi / 600))
-    if Sc is None:
-        page = (L > PAGE_LUMA) & (S < PAGE_SAT)
-    else:
-        # POSITIVE material test, walked from the border: a pixel is BACKING if it is
-        # BLACKISH (dark + neutral = scanner bed / shadow) or YELLOWISH (bright + saturated
-        # = the cardboard insert). No per-pixel screen test here: band-pass energy is a
-        # property of a REGION (p047's ad scores 29 across hundreds of px), and evaluating it
-        # at a boundary just measures the boundary -- p001's 6px bed strip scored 18.9 and its
-        # transition blur 25.3, so both were rejected and the walk stopped short of the bed.
-        # The screen test is applied to the walked region as a whole, in _screened_region().
-        is_bed    = (L < BED_LUMA) & (S < BED_SAT)
-        is_insert = (S >= SAT_BACK) & (L >= INSERT_LUMA)
-        page = ~(is_bed | is_insert)
-    # Close short gaps in the BACKING run before walking. Backing is not always one
-    # material: p001's bottom is yellow insert -> a few px of transition blur (neither
-    # blackish nor yellowish) -> 6px of black bed -> page. Walking to the first non-backing
-    # pixel stops in that blur and leaves the bed standing, which is visible as an uncut
-    # black strip at the bottom-right corner. Closing is safe now that backing is a POSITIVE
-    # material test: page is genuinely not-backing, so a gap cannot leap into content the way
-    # it did when backing meant "not recognisably page" (p044's ochre ad jumped 160 -> 306).
-    haspage = page.any(1)
-    d = page.argmax(1)                                    # first page pixel
-    idx = np.arange(D)[None, :]
-    run = idx < np.where(haspage, d, 0)[:, None]          # the pre-page backing run
-    nonpage = ((L < DARK_LUMA) & (S < DARK_SAT)) | (S >= SAT_BACK)   # dark-neutral OR saturated
-    cnt = np.clip(np.where(haspage, d, 0), 1, None)
-    npf = np.where(run, nonpage, 0).sum(1) / cnt          # fraction of run that is non-page
-    satfrac = np.where(run, S >= SAT_BACK, 0).sum(1) / cnt  # fraction of run that is saturated (insert)
-    backing = haspage & (d >= min_depth) & (npf >= NONPAGE_FRAC)
-    nopage = ~haspage
-    return d, backing, nopage, satfrac
+    profile gives each material's issue-wide centre and a generous radius. On this page we look
+    at the border ring only, take the densest colour peak inside that radius, and measure the
+    peak's own spread -- so the accepted colour becomes as tight as the material actually is
+    here. That tightness is what tells the bed from the page's own black ink.
 
-
-def _brute_cut(d, backing, nopage, D, dpi):
-    """Step 2: brute-force the best straight cut line. Return (cut_depth[N], metrics dict)."""
-    N = len(d)
-    x = np.arange(N, dtype=np.float64)
-    xc = N / 2.0
-    overcut = round(OVERCUT_600 * dpi / 600)
-    d = d.astype(np.float64)
-
-    db = d[backing]                                       # backing target depths
-    total_backing = float(db.sum())
-    cols_np = ~nopage                                     # columns with a known page depth
-    d_np = d[cols_np]
-    xb = x[backing]
-    x_np = x[cols_np]
-
-    slopes = np.tan(np.deg2rad(np.arange(-SLOPE_MAX_DEG, SLOPE_MAX_DEG + 1e-9, SLOPE_STEP_DEG)))
-    best = None
-    for sl in slopes:
-        eb_raw = db - sl * (xb - xc)                      # backing depths in the rotated (de-sloped) frame
-        # robust MAD fence: exclude deep content outliers (a black box touching the edge) from coverage,
-        # but keep a uniform (or linearly-ramping, now de-sloped) backing band fully in the constraint.
-        med = np.median(eb_raw); mad = np.median(np.abs(eb_raw - med))
-        fence = med + max(OUTLIER_K * 1.4826 * mad, FENCE_MIN_600 * dpi / 600)
-        eb = np.sort(eb_raw[eb_raw <= fence])             # core backing to be covered
-        core_total = float(np.clip(eb, 0, None).sum())
-        if core_total <= 0 or len(eb) == 0:
-            h = 0.0
-        else:
-            # COVER the core backing rather than minimising the leftover AREA -- see COVER_PCT.
-            h = float(np.percentile(eb, COVER_PCT))
-        # page_cut at this (slope,h): page pixels cut over all columns with a known page depth
-        e_np = d_np - sl * (x_np - xc)
-        page_cut = float(np.clip(h - e_np, 0, None).sum())
-        if best is None or page_cut < best[0]:
-            best = (page_cut, sl, h)
-
-    page_cut, sl, h = best
-
-    # ---- follow the BOW ---------------------------------------------------------------------
-    # The straight (slope,h) line above sets the overall position and tilt; the sheet itself is
-    # curved, so refit a QUADRATIC to the core backing depths around that line and cut on the
-    # curve. Without this a few px stand at both ends of every edge (see CURVE_MAX_600).
-    if backing.mean() >= CURVE_MIN_FRAC and backing.sum() >= 32:
-        eb_raw = db - sl * (xb - xc)
-        med = np.median(eb_raw); mad = np.median(np.abs(eb_raw - med))
-        keep = eb_raw <= med + max(OUTLIER_K * 1.4826 * mad, FENCE_MIN_600 * dpi / 600)
-        if keep.sum() >= 32:
-            xk = xb[keep]; dk = db[keep]
-            c2 = np.polyfit(xk - xc, dk, 2)
-            curve = np.polyval(c2, x - xc)
-            # bound the bow over the FULL range the curve is APPLIED to, not just over the
-            # points it was fitted to -- that was the guard's blind spot on p015.
-            bow = float(np.ptp(curve))
-            lin = h + sl * (x - xc)
-            if bow <= CURVE_MAX_600 * dpi / 600:
-                resid = dk - np.polyval(c2, xk - xc)
-                curve = curve + float(np.percentile(resid, COVER_PCT))
-                cut_depth = np.clip(np.maximum(curve, lin - overcut) + overcut, 0, D)
-            else:
-                cut_depth = np.clip(lin + overcut, 0, D)
-        else:
-            cut_depth = np.clip(h + sl * (x - xc) + overcut, 0, D)
-    else:
-        cut_depth = np.clip(h + sl * (x - xc) + overcut, 0, D)
-    metrics = dict(page_cut=page_cut, total_backing=total_backing, slope=float(sl),
-                   angle_deg=float(np.degrees(np.arctan(sl))), height=float(h),
-                   backing_frac=float(backing.mean()), nopage_frac=float(nopage.mean()),
-                   n_backing=int(backing.sum()),
-                   median_depth=float(np.median(d[backing])) if backing.any() else 0.0)
-    return cut_depth, metrics
-
-
-def _extend_over_strip(L, S, depth, dpi, D):
-    """Extend the backing depth past a thin dark strip that CONTINUES the run.
-
-    The bed shadow between the page edge and the cardboard insert is dark, neutral, a few px
-    thick, and sits IMMEDIATELY beyond the backing already found (p001: insert -> a few px of
-    transition blur -> 6px of black bed -> page). Two requirements keep it from firing
-    elsewhere:
-      * the dark run must START within STRIP_START_600 of the current depth -- otherwise it is
-        unrelated content further in. Without this, a HALFTONE has dark dots everywhere in the
-        window and every column grew its own extension (p005's top went 38 -> 62px).
-      * the run must END inside the window -- a run that does not end is content, not a strip.
-    This corrects the PROFILE; the line fit then draws one smooth boundary through it.
+    Returns [(centre, radius), ...]; empty if this edge shows no backing on this page.
     """
-    w = max(4, int(round(EDGE_STRIP_600 * dpi / 600)))
-    st = max(2, int(round(STRIP_START_600 * dpi / 600)))
-    dark = (L < BED_LUMA) & (S < BED_SAT)
-    out = depth.astype(np.float64).copy()
-    idx = np.arange(D)[None, :]
-    lo = np.clip(depth.astype(int), 0, D - 1)
+    ring = max(2, round(RING_600 * dpi / 600))
+    r = rgb_edge[:, :ring].reshape(-1, 3)
+    out = []
+    for m in profile.get(edge, []):
+        if not m.get("backing"):
+            continue
+        c0, rad = np.array(m["centre"], np.float32), float(m["radius"])
+        sel = r[np.abs(r - c0).max(1) <= rad]
+        if sel.shape[0] < MIN_RING_FRAC * r.shape[0]:
+            continue                                   # material absent from this page's edge
+        q = (sel // SEED_STEP).astype(np.int32)
+        key = q[:, 0] * 4096 + q[:, 1] * 64 + q[:, 2]
+        u, cnt = np.unique(key, return_counts=True)
+        k = int(u[int(np.argmax(cnt))])
+        peak = np.array([(k // 4096) * SEED_STEP, ((k // 64) % 64) * SEED_STEP,
+                         (k % 64) * SEED_STEP], np.float32) + SEED_STEP / 2
+        near = sel[np.abs(sel - peak).max(1) <= max(RADIUS_FLOOR * 2, SEED_STEP * 3)]
+        if near.shape[0] < 32:
+            near = sel
+        centre = np.median(near, 0)
+        spread = float(np.percentile(np.abs(near - centre).max(1), SPREAD_PCTL))
+        radius = float(np.clip(SPREAD_K * spread, RADIUS_FLOOR, rad))
 
-    near = (idx >= lo[:, None]) & (idx < np.minimum(lo + st, D)[:, None])
-    starts = (dark & near).any(1)                       # a dark run begins right where we are
-    win = (idx >= lo[:, None]) & (idx < np.minimum(lo + w, D)[:, None])
-    dw = dark & win
-    has = dw.any(1)
-    last = np.where(has, (dw * idx).max(1), -1)
-    ends_inside = has & starts & (last < (lo + w - 1))
-    out[ends_inside] = last[ends_inside] + 1
-    return np.clip(out, 0, D)
+        # GROW THE MATERIAL TO ITS OWN EXTENT. The ring is the most evenly lit part of the
+        # backing; deeper in, where the sheet lifts off the platen, the same cardboard is
+        # shadowed and falls outside a tolerance derived from the ring alone. Measured on p015's
+        # bottom that truncated the insert at 41px in shadowed columns against 135px in lit ones,
+        # and the "boundary" wobbled +-45px -- which is what destroyed the fit, not any real
+        # waviness (the scan shows a clean straight edge there).
+        # Re-measure the colour over the region actually CONNECTED to the border, twice. The
+        # issue-wide cluster radius stays the hard cap, so this can widen to cover a gradient but
+        # never wander off the material the calibration found.
+        # THE COLLAPSE TEST THE CALIBRATION USES, NOW ON THIS PAGE, AND IT IS ALSO WHAT STOPS THE
+        # GROWTH. A colour matching the issue's backing is backing HERE only if it too stops at
+        # the sheet edge. Ink that runs to the border keeps covering the deep band; bed cannot.
+        # Without it, a page whose border ring IS ink refines the "bed" onto its own ad -- p069's
+        # left ring peaked at L47 and the ad would have been cut as bed.
+        # Growth must obey the same rule. Grown blindly, p069's TOP merged its 30px flat-black bed
+        # strip into the textured near-black ad below it, the merged material no longer collapsed,
+        # and the edge was dropped with the strip left standing. So: keep the WIDEST tolerance
+        # that still collapses, and never a wider one.
+        deep = rgb_edge[:, int(DEEP_FRAC * rgb_edge.shape[1]):]
+
+        def collapses(c, rr):
+            cov_ring = float((np.abs(r - c).max(1) <= rr).mean())
+            cov_deep = float((np.abs(deep - c).max(2) <= rr).mean())
+            return (cov_ring + 1e-6) / (cov_deep + 1e-6) >= COLLAPSE_MIN
+
+        best = (centre, radius) if collapses(centre, radius) else None
+        for _ in range(GROW_ITERS):
+            if best is None:
+                break
+            m = np.abs(rgb_edge - centre).max(2) <= radius
+            lab, nl = ndi.label(m)
+            if nl:
+                keep = np.unique(lab[:, 0])                    # components touching the border
+                m &= np.isin(lab, keep[keep > 0])
+            if m.sum() < 64:
+                break
+            px = rgb_edge[m]
+            centre = np.median(px, 0)
+            spread = float(np.percentile(np.abs(px - centre).max(1), SPREAD_PCTL))
+            radius = float(np.clip(SPREAD_K * spread, RADIUS_FLOOR, rad))
+            if not collapses(centre, radius):
+                break                                          # grew into the page: keep `best`
+            best = (centre, radius)
+        if best is not None:
+            out.append(best)
+    return out
 
 
-def _page_beyond(L, S, cut_depth, dpi, D, Sc=None):
-    """Step 3(a): fraction of the band just beyond the cut line (full width) that is clean PAGE.
-
-    Uses the SAME page definition as _profile. With the old light+neutral test this returned ~0 on
-    a full-bleed page -- the teal beyond p001's bed is page, but it is neither light nor neutral --
-    so the edge could never reach HIGH confidence and was never cut."""
-    beyond = max(3, round(BEYOND_600 * dpi / 600))
-    idx = np.arange(D)[None, :]
-    lo = np.clip(cut_depth.astype(int), 0, D - 1)
-    hi = np.clip(cut_depth.astype(int) + beyond, 0, D)
-    band = (idx >= lo[:, None]) & (idx < hi[:, None])
-    if Sc is None:
-        page = (L > PAGE_LUMA) & (S < PAGE_SAT)
-    else:
-        unscreened = Sc < SCREEN_MAX
-        _dn = (L < BED_LUMA) & (S < BED_SAT)
-        page = ~((_dn & (unscreened | _thin_dark_run(_dn, dpi)))
-                 | ((S >= SAT_BACK) & unscreened & (L >= INSERT_LUMA)))
-    return float((page & band).sum() / max(1, band.sum()))
+def page_colours(profile, edge):
+    """The clusters the calibration judged to be PAGE (the paper): centre, radius."""
+    return [(np.array(m["centre"], np.float32), float(m["radius"]))
+            for m in profile.get(edge, []) if not m.get("backing")]
 
 
-def _confidence(metrics):
-    """Step 3: HIGH iff (clean page beyond OR saturated insert), cheap containment, enough backing."""
-    a = (metrics["page_beyond"] >= BEYOND_PAGE_FRAC) or (metrics["sat_frac"] >= SAT_DOMINANT)
-    tb = max(1.0, metrics["total_backing"])
-    b = metrics["page_cut"] <= PAGECUT_FRAC * tb
-    c = (metrics["backing_frac"] >= MIN_BACKING_FRAC) and (metrics["nopage_frac"] <= MAX_NOPAGE_FRAC)
-    return "HIGH" if (a and b and c) else "LOW"
+def is_backing(rgb, mats):
+    """Positive material test: within tolerance of one of this page-edge's backing colours."""
+    m = np.zeros(rgb.shape[:2], bool)
+    for centre, rad in mats:
+        m |= np.abs(rgb - centre).max(2) <= rad
+    return m
 
 
-def analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr, scr=None):
-    """Full per-edge analysis: returns (cut_depth, confidence, metrics). Pure measurement, no policy.
+def candidates(back, dpi):
+    """Step 1: up to N_CAND backing->page transition depths per line (-1 = unused)."""
+    N, D = back.shape
+    md = max(2, round(MIN_DEPTH_600 * dpi / 600))
+    # A CANDIDATE IS A BOUNDARY BETWEEN TWO SUSTAINED RUNS, not a pixel flip. The cardboard
+    # insert has visible grain, so a bare flip test fires all through it and the candidates
+    # scatter: measured over the issue, the bottom edge's peak contrast came out 1.2-1.8 (the
+    # true boundary standing out no better than any other depth) while the smooth bed gave
+    # 13-286. Requiring backing before AND page after for RUN px removes the grain, and unlike
+    # the old first-transition walk it introduces no bias toward the border.
+    run = max(2, round(MIN_RUN_600 * dpi / 600))
+    cs = np.concatenate([np.zeros((N, 1), np.int32),
+                         np.cumsum(back.astype(np.int32), 1)], 1)      # (N, D+1)
+    d = np.arange(D)[None, :]
+    lo = np.maximum(d - run + 1, 0)
+    before = np.take_along_axis(cs, d + 1, 1) - np.take_along_axis(cs, lo, 1)
+    hi = np.minimum(d + 1 + run, D)
+    after = np.take_along_axis(cs, hi, 1) - np.take_along_axis(cs, d + 1, 1)
+    trans = np.zeros_like(back)
+    trans[:, :-1] = back[:, :-1] & ~back[:, 1:]          # last backing px before page
+    # MAJORITY, not unanimity: the cardboard's grain and the odd speck knock single pixels out
+    # of the (deliberately tight) per-page colour tolerance, and an all-or-nothing run test then
+    # rejected the insert boundary outright -- the bottom edge's backing_frac fell from 0.99 to
+    # 0.09 and every insert cut was lost.
+    trans &= (before >= RUN_FRAC * np.minimum(run, d + 1)) & (after <= (1 - RUN_FRAC) * run)
+    trans &= np.arange(D)[None, :] >= md
+    out = np.full((N, N_CAND), -1.0)
+    rows = np.arange(N)
+    for k in range(N_CAND):
+        has = trans.any(1)
+        first = np.where(has, trans.argmax(1), 0)
+        out[:, k] = np.where(has, first + 1.0, -1.0)
+        trans[rows[has], first[has]] = False              # consume it, look for the next
+    return out
 
-    The band-pass is computed HERE, on the oriented edge band, not on the whole page. Doing it
-    page-wide allocated ~6x more than needed (a 37MP float32 plus filter temporaries, per
-    worker); with several workers that exhausted RAM and took the machine down. A box filter is
-    isotropic, so running it on the band gives the same values."""
-    L, S = _orient(lum, sat, edge, dtb, dlr, H, W)
-    Sc = screen_energy(L, dpi)
+
+def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
+    """Return (cut_depth per line, decision, metrics)."""
+    E = _orient1(rgb, edge, dtb, dlr, H, W)
+    L = _orient1(lum, edge, dtb, dlr, H, W)
     D = L.shape[1]
-    d, backing, nopage, satfrac = _profile(L, S, dpi, Sc)
-    # NB: a strip-extension pass used to run here (see _extend_over_strip, kept for the
-    # record). It is REMOVED because the positive material walk made it redundant where it
-    # helped and harmful where it fired: p001's bed strip is covered without it (cut 166 vs
-    # deepest bed-dark 165), while on p005's top the "dark run beyond the depth" is the GREEN
-    # HALFTONE COMIC, so it cut 37px of content (38 -> 62px). Applying it after the fit also
-    # combed the boundary per column, breaking ACCEPTANCE rule 1.
-    if backing.sum() == 0:
-        m = dict(page_cut=0.0, total_backing=0.0, slope=0.0, angle_deg=0.0, height=0.0,
-                 backing_frac=0.0, nopage_frac=float(nopage.mean()), n_backing=0,
-                 median_depth=0.0, page_beyond=0.0, sat_frac=0.0)
-        return np.zeros(L.shape[0]), "NONE", m
-    cut_depth, m = _brute_cut(d, backing, nopage, D, dpi)
-    m["page_beyond"] = _page_beyond(L, S, cut_depth, dpi, D, Sc)
-    m["sat_frac"] = float(np.median(satfrac[backing]))
-    conf = _confidence(m)
-    return cut_depth, conf, m
+    mats = page_materials(E, edge, profile, dpi)
+    if not mats:
+        return np.zeros(L.shape[0]), "CLEAN(no backing)", dict(
+            backing_frac=0.0, vote_frac=0.0, slope=0.0, angle_deg=0.0,
+            median_depth=0.0, ink=0.0, purity=0.0, mats=0, contrast=0.0)
+    back = is_backing(E, mats)
+    # What we may enclose is backing OR the sheet-edge blur between backing and paper -- what it
+    # must NOT contain is PAGE. Testing "is backing" instead was too strict once the per-page
+    # colour radius tightened: the blur stopped counting as backing and every real bed wedge was
+    # rejected as MIXED. The page colours come from the same calibration.
+    notpage = ~is_backing(E, page_colours(profile, edge))
+    cand = candidates(back, dpi)
+    N = L.shape[0]
+    yy = np.arange(N, dtype=np.float64) - N / 2.0
+    idx = np.arange(D)[None, :]
+
+    def _pure(offset, slope):
+        """Is what this line encloses predominantly backing? (see BACKING_PURITY)"""
+        ln = np.clip(offset + slope * yy, 0, D)
+        inside = idx < ln[:, None]
+        n = int(inside.sum())
+        return n > 0 and float(notpage[inside].mean()) >= BACKING_PURITY
+
+    line, vote_frac, sl, contrast = linefit.fit(cand, tol=max(2.0, VOTE_TOL_600 * dpi / 600),
+                                      slope_max_deg=SLOPE_MAX_DEG,
+                                      curve_max=CURVE_MAX_600 * dpi / 600,
+                                      prefer_deepest=DEEPEST_FRAC,
+                                      min_vote_frac=MIN_VOTE_FRAC,
+                                      accept=_pure)
+    line = np.clip(line, 0, D)
+
+    backing_frac = float((cand >= 0).any(1).mean())
+    Sc = screen_energy(L, dpi)
+    sel = (np.arange(D)[None, :] < line[:, None]) & back
+    ink = float(np.median(Sc[sel])) if sel.any() else 0.0
+
+    m = dict(backing_frac=backing_frac, vote_frac=vote_frac, slope=float(sl),
+             angle_deg=float(np.rad2deg(np.arctan(sl))),
+             median_depth=float(np.median(line)), ink=ink, mats=len(mats),
+             contrast=float(min(contrast, 1e6)),
+             mat_colours=[[round(float(x)) for x in c] + [round(r)] for c, r in mats])
+
+    # What we are about to cut must actually BE backing. Without this the halftone's dark
+    # dots pass the blackish test on most lines and yield a consistent shallow "boundary":
+    # p005's right edge is the green comic running full-bleed, no bed at all, and it cut 17px
+    # of it (backing_frac 0.93, vote 0.64, ink 8.4 -- under every other test). Purity is
+    # rule 1 and rule 2 stated together: cut backing, and only backing.
+    _in = np.arange(D)[None, :] < line[:, None]
+    m["purity"] = float(notpage[_in].mean()) if _in.any() else 0.0
+    if backing_frac < MIN_BACKING_FRAC:
+        return np.zeros(L.shape[0]), "CLEAN(no backing)", m
+    if m["purity"] < BACKING_PURITY:
+        return np.zeros(L.shape[0]), "MIXED(not backing)", m
+    if contrast < MIN_CONTRAST:
+        return np.zeros(L.shape[0]), "LOW(no line)", m
+    if ink >= SCREEN_MAX:
+        return np.zeros(L.shape[0]), "INK(screened)", m
+    return np.clip(line + round(OVERCUT_600 * dpi / 600), 0, D), "CUT", m
 
 
-# ---------------------------------------------------------------------------------------------------
-def bed_matte(rgb, dpi, priors=None, page_no=None, return_meta=False):
-    """Matte one page. PASS-1 (priors=None): cut only HIGH-confidence edges. PASS-2 (priors given):
-    also accept low-conf edges matching the learned typical, and reject atypically-deep candidates."""
-    a = np.asarray(rgb)[..., :3].astype(np.float32); H, W, _ = a.shape
+def load_profile(path=None):
+    """The issue's measured backing materials (calibrate_backing.py)."""
+    path = path or os.environ.get("BM_PROFILE") or os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "backing_profile.json")
+    with open(path) as f:
+        return json.load(f)["edges"]
+
+
+def bed_matte(rgb, dpi, priors=None, page_no=None, return_meta=False, profile=None):
+    """Matte one page.
+
+    `priors` / `page_no` are accepted for call compatibility and UNUSED: the decision is made
+    from the edge itself. The learned-prior acceptance path is gone -- it existed to rescue
+    low-confidence edges by matching a per-issue typical depth, and it is what let a
+    0.7%-backing edge on p015 be accepted and cut 35mm of clean paper.
+    """
+    if profile is None:
+        profile = load_profile()
+    a = np.asarray(rgb)[..., :3].astype(np.float32)
+    H, W, _ = a.shape
     lum = a @ np.array([0.299, 0.587, 0.114], np.float32)
-    sat = a.max(2) - a.min(2)
-    dtb = int(WIN_TB_FRAC * H); dlr = int(WIN_LR_FRAC * W)
-    parity = None if page_no is None else ("even" if page_no % 2 == 0 else "odd")
+    dtb, dlr = int(WIN_TB_FRAC * H), int(WIN_LR_FRAC * W)
 
-    mask = np.zeros((H, W), bool); meta = {}
+    mask = np.zeros((H, W), bool)
+    meta = {}
     for edge in EDGES:
         D = dtb if edge in ("top", "bottom") else dlr
-        cut_depth, conf, m = analyze_edge(lum, sat, edge, dpi, H, W, dtb, dlr)
-        apply = (conf == "HIGH")
-        decision = conf
-        # A near-empty edge is CLEAN PAGE, not a low-confidence cut: never let the prior
-        # path resurrect it. p015's right edge had 0.7% backing and was accepted as
-        # "PRIOR", cutting 35mm of real paper.
-        if m["backing_frac"] < MIN_BACKING_FRAC:
-            apply, decision = False, "CLEAN(no backing)"
-        elif priors is not None and conf != "HIGH" and m["n_backing"] > 0:
-            pri = _lookup_prior(priors, edge, parity)
-            if pri and pri.get("count", 0) >= 3:
-                med, ang = pri["median_depth"], pri["median_angle"]
-                if m["median_depth"] > PRIOR_REJECT_MUL * med:
-                    apply, decision = False, "REJECT(deep)"     # atypically deep -> full-bleed -> leave
-                elif med > 0 and abs(m["median_depth"] - med) / med <= PRIOR_DEPTH_TOL \
-                        and abs(m["angle_deg"] - ang) <= PRIOR_ANGLE_TOL \
-                        and ((m["page_beyond"] >= BEYOND_PAGE_FRAC) or (m["sat_frac"] >= SAT_DOMINANT)):
-                    apply, decision = True, "PRIOR"             # matches learned typical AND has bed
-                    #     evidence (clean PAGE just beyond, OR a saturated insert) -> accept. Without this
-                    #     evidence gate the depth/angle match alone clips the dark top row of a full-bleed
-                    #     image (p047 star, p005 halftone, p163 photo) whose depth happens to match the
-                    #     top-wedge prior; requiring page-beyond leaves those (they are content, rule 3).
-        if apply and cut_depth.max() > 0:
-            edge_mask = np.arange(D)[None, :] < cut_depth[:, None]
-            mask |= _deorient(edge_mask, edge, H, W, dtb, dlr)
-        meta[edge] = dict(confidence=conf, decision=decision, cut_px=float(np.median(cut_depth)),
-                          angle_deg=m["angle_deg"], **{k: m[k] for k in
-                          ("page_cut", "total_backing", "backing_frac", "nopage_frac",
-                           "n_backing", "median_depth", "page_beyond", "sat_frac")})
+        cut, decision, m = analyze_edge(a, lum, edge, dpi, H, W, dtb, dlr, profile)
+        m["decision"] = decision
+        m["cut_px"] = float(np.median(cut))
+        meta[edge] = m
+        if decision == "CUT":
+            mask |= _deorient(np.arange(D)[None, :] < cut[:, None], edge, H, W, dtb, dlr)
 
-    mask = ndi.binary_dilation(mask, iterations=max(1, round(MARGIN_600 * dpi / 600)))
     rgba = np.dstack([a.astype(np.uint8), np.where(mask, 0, 255).astype(np.uint8)])
-    pct = 100 * mask.mean()
-    return (rgba, pct, meta) if return_meta else (rgba, pct)
-
-
-def _lookup_prior(priors, edge, parity):
-    node = priors.get(edge, {})
-    if isinstance(node, dict) and parity in node:
-        return node[parity]
-    if isinstance(node, dict) and "median_depth" in node:
-        return node
-    return None
+    return (rgba, 100.0 * mask.mean(), meta) if return_meta else (rgba, 100.0 * mask.mean())
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("img"); ap.add_argument("out"); ap.add_argument("--dpi", type=int, default=600)
-    ap.add_argument("--magenta", action="store_true", help="50%% magenta overlay on cut regions")
-    ap.add_argument("--priors", help="priors.json -> PASS-2 mode (default: PASS-1, high-conf only)")
-    ap.add_argument("--page", type=int, help="page number (for parity in pass-2)")
+    ap.add_argument("img"); ap.add_argument("out", nargs="?")
+    ap.add_argument("--dpi", type=int, default=600)
+    ap.add_argument("--page", type=int)
+    ap.add_argument("--magenta", action="store_true", help="50%% magenta over the cut regions")
+    ap.add_argument("--priors", help="accepted and ignored (call compatibility)")
     A = ap.parse_args()
-    priors = json.load(open(A.priors)) if A.priors else None
-    rgba, pct, meta = bed_matte(Image.open(A.img).convert("RGB"), A.dpi, priors=priors,
+    rgba, pct, meta = bed_matte(Image.open(A.img).convert("RGB"), A.dpi,
                                 page_no=A.page, return_meta=True)
-    if A.magenta:
-        f = rgba.astype(np.float32); cut = f[..., 3] == 0
-        out = f[..., :3]; out[cut] = 0.5 * out[cut] + 0.5 * np.array([255, 0, 255], np.float32)
-        Image.fromarray(out.astype(np.uint8)).save(A.out)
-    else:
-        Image.fromarray(rgba, "RGBA").save(A.out)
-    mode = "PASS-2" if priors else "PASS-1"
-    print(f"{A.img}: [{mode}] bed cleared {pct:.3f}% -> {A.out}")
+    print("%s: bed cleared %.3f%%" % (A.img, pct))
     for e in EDGES:
         m = meta[e]
-        print(f"   {e:6s} {m['decision']:12s} cut~{m['cut_px']:.0f}px ang={m['angle_deg']:+.2f} "
-              f"pcut={m['page_cut']:.0f} tback={m['total_backing']:.0f} "
-              f"bk={m['backing_frac']:.2f} nop={m['nopage_frac']:.2f} beyond={m['page_beyond']:.2f}")
+        print("   %-7s %-18s depth %6.1f  backing %.2f  vote %.2f  ctr %5.1f  ink %5.1f  ang %+.2f  mats %s"
+              % (e, m["decision"], m["median_depth"], m["backing_frac"],
+                 m["vote_frac"], m["contrast"], m["ink"], m["angle_deg"], m.get("mat_colours", [])))
+    if A.out:
+        if A.magenta:
+            f = rgba.astype(np.float32); cut = f[..., 3] == 0
+            out = f[..., :3]
+            out[cut] = 0.5 * out[cut] + 0.5 * np.array([255, 0, 255], np.float32)
+            Image.fromarray(out.astype(np.uint8)).save(A.out)
+        else:
+            Image.fromarray(rgba, "RGBA").save(A.out)
