@@ -90,6 +90,10 @@ enum Cmd {
         out_pdf: String,
         #[arg(long, default_value_t = 6.0)]
         thr: f64,
+        /// background raster dpi (source assumed 2400 dpi). 200 was the old fixed value; the
+        /// measured screen ruling for this issue is 136-159 lpi, which is the real limit.
+        #[arg(long, default_value_t = 200.0)]
+        bg_dpi: f64,
     },
     /// FAST classify-only: page PNG + score npy -> per-cluster step-7 DIAG lines (stdout).
     /// Skips descreen/jbig2/PDF -- for sweeping classification features across pages.
@@ -206,9 +210,9 @@ fn main() -> Result<()> {
             imageio::write_bilevel_as_gray_png(&out_mask_png, m.w, m.h, &m.mask)?;
             eprintln!("cluster -> {} ({:.1}s)", out_mask_png, t.elapsed().as_secs_f64());
         }
-        Cmd::Mrc { page_png, score_npy, out_pdf, thr } => {
+        Cmd::Mrc { page_png, score_npy, out_pdf, thr, bg_dpi } => {
             let t = std::time::Instant::now();
-            mrc::run_mrc(&page_png, &score_npy, &out_pdf, thr as f32)?;
+            mrc::run_mrc(&page_png, &score_npy, &out_pdf, thr as f32, bg_dpi as f32)?;
             eprintln!("mrc -> {} ({:.1}s)", out_pdf, t.elapsed().as_secs_f64());
         }
         Cmd::Classify { page_png, score_npy, thr } => {
@@ -238,7 +242,7 @@ fn main() -> Result<()> {
             npy::write_u8(&format!("{}_cov.npy", base), &r.cov, &[4, r.ch4, r.cw])?;
             eprintln!("  [full] detect done ({:.1}s)", t.elapsed().as_secs_f64());
             // 3) MRC PDF from the graded RGB page + score
-            mrc::run_mrc(&page_png, &format!("{}.npy", base), &out_pdf, thr as f32)?;
+            mrc::run_mrc(&page_png, &format!("{}.npy", base), &out_pdf, thr as f32, 200.0)?;
             eprintln!("full -> {} ({:.1}s total)", out_pdf, t.elapsed().as_secs_f64());
         }
     }

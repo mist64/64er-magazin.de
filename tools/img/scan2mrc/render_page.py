@@ -101,7 +101,7 @@ def _one(args):
 
 
 def render(page, variant="display", knorm="known", skip_full=False, keep_rgb=False,
-           inpaint=False):
+           inpaint=False, detect_too=False):
     t0 = time.time()
     win = json.load(open(WINS))["windows"][str(page)]
     for d in ("debug", "a4_600", "deliver"):
@@ -128,7 +128,8 @@ def render(page, variant="display", knorm="known", skip_full=False, keep_rgb=Fal
         AF.OUTD = os.path.join(ROOT, "deliver")
         rep.update({("full_" + k): v for k, v in
                     AF.run(page, knorm=knorm, write=True, variant=variant,
-                           keep_rgb=keep_rgb, inpaint=inpaint).items()})
+                           keep_rgb=keep_rgb, inpaint=inpaint,
+                           detect_too=detect_too).items()})
     rep["secs"] = round(time.time() - t0, 1)
     return rep
 
@@ -149,6 +150,8 @@ if __name__ == "__main__":
     ap.add_argument("--variant", default="display", choices=("display", "detect"))
     ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
     ap.add_argument("--jobs", type=int, default=3)
+    ap.add_argument("--detect-too", action="store_true",
+                    help="also write the UNFILLED detect-graded CMYK for the screening analysis")
     ap.add_argument("--inpaint", action="store_true",
                     help="mirror-fill the edges and diffuse the holes in the deliverable")
     ap.add_argument("--keep-rgb", action="store_true",
@@ -172,7 +175,8 @@ if __name__ == "__main__":
     # 3 workers, not 4: the 2400dpi apply holds the sampled RGB (1.67GB), the unknown mask and
     # four CMYK planes at once, ~4.5GB per page. Four would be 18GB resident and this machine has
     # already been taken down once by over-parallelising image work.
-    args = [(p, A.variant, A.knorm, A.skip_full, A.keep_rgb, A.inpaint) for p in A.pages]
+    args = [(p, A.variant, A.knorm, A.skip_full, A.keep_rgb, A.inpaint, A.detect_too)
+            for p in A.pages]
     if A.jobs > 1 and len(args) > 1:
         with Pool(A.jobs, initializer=_init) as pool:
             for r in pool.imap_unordered(_one, args):

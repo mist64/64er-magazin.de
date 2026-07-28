@@ -535,7 +535,7 @@ pub fn run_classify(page_png: &str, score_npy: &str, thr: f32) -> Result<()> {
     Ok(())
 }
 
-pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32) -> Result<()> {
+pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi: f32) -> Result<()> {
     let src = imageio::read_rgb_png(page_png)?;
     let w = src.w;
     let h = src.h;
@@ -1015,9 +1015,15 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32) -> Resu
     }
     let kdata = jbig2(&work, "k", &black, mw, mh)?;
 
-    // ---- 200dpi colour bg ----
-    let bw = w / 12;
-    let bh = h / 12;
+    // ---- colour background, at bg_dpi ----
+    // The source page is 2400 dpi, so the divisor is 2400/bg_dpi (12 -> 200 dpi, 16 -> 150).
+    // The contone limit is set by the halftone, not by us: the screen discarded everything above
+    // ~ruling/2, so ~150-160 dpi carries all the information the paper still holds. Anything
+    // above that is empty interpolation that costs bytes -- and the background is ~94% of the
+    // file, so this is the only size knob that matters.
+    let div = (2400.0 / bg_dpi).round().max(1.0) as usize;
+    let bw = w / div;
+    let bh = h / div;
     let bg_r = resample_plane_f32(&clip_field(&drf), mw, mh, bw, bh, Filter::Box);
     let bg_g = resample_plane_f32(&clip_field(&dgf), mw, mh, bw, bh, Filter::Box);
     let bg_b = resample_plane_f32(&clip_field(&dbf), mw, mh, bw, bh, Filter::Box);
