@@ -38,8 +38,8 @@ def best_offset(a, b, rad=6):
 
 
 def check(page):
-    f = Image.open(os.path.join(FULL, "%03d_rgb.tif" % page)).convert("RGB")
-    small = f.resize((f.width // 4, f.height // 4), Image.LANCZOS)
+    # the proof is already x4-downscaled by the apply, with the same filter this used to apply
+    small = Image.open(os.path.join(FULL, "%03d_proof600.tif" % page)).convert("RGB")
     ref = Image.open(os.path.join(REF, "%03d.png" % page))
     r = np.asarray(ref)
     # compare on a central patch, on luma, where content (not margin) dominates
@@ -59,7 +59,7 @@ def check(page):
     return {"page": page, "corr": round(corr, 4), "offset_600px": [dx, dy],
             "offset_mm": [round(dx / 600 * 25.4, 3), round(dy / 600 * 25.4, 3)],
             "alpha_disagree_pct": round(100 * dis, 3),
-            "size_full": [f.width, f.height], "size_ref": [ref.width, ref.height]}
+            "size_proof": [small.width, small.height], "size_ref": [ref.width, ref.height]}
 
 
 if __name__ == "__main__":

@@ -29,6 +29,7 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
     os.environ.setdefault(_v, "1")
 import numpy as np
 from PIL import Image
+import inpaint as IP
 
 Image.MAX_IMAGE_PIXELS = None
 MASTER = "/Users/mist/DNB/8609/master_2400"
@@ -140,7 +141,8 @@ def alpha_for(geo, npz, xt, yt):
     return unk
 
 
-def run(page, knorm="known", write=True, variant="display", keep_rgb=False):
+def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
+        inpaint=False):
     t0 = time.time()
     geo = json.load(open(GEOJ))["pages"][str(page)]
     npz = np.load(os.path.join(GEOD, "%03d.npz" % page))
@@ -163,6 +165,18 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False):
         yt = TLt[1] + u[None, :] * ext[1] + v * eyt[1]
         unk[y0:y1] = (~inside) | alpha_for(geo, npz, xt, yt)
     del master
+
+    # FILL BEFORE SEPARATING, so the filled pixels are graded like everything else. `unk` is NOT
+    # updated: the sidecar keeps marking them unknown, so what was invented stays knowable and
+    # any later stage can still exclude it. The K normalisation below still uses only the
+    # ORIGINALLY known pixels, so a fill can never move the black point.
+    n_holes = 0
+    if inpaint:
+        t_ip = time.time()
+        rgb, n_holes = IP.fill(rgb, ~unk)
+        rep_ip = round(time.time() - t_ip, 1)
+    else:
+        rep_ip = 0.0
 
     # --- K normalisation: three candidates, one written ---------------------------------
     flat = rgb.reshape(-1, 3).astype(np.float32)
@@ -203,6 +217,7 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False):
     rep = {"page": page, "out_size": [W_out, H_out], "knorm": knorm, "variant": variant,
            "k_candidates": {k: [round(a, 2), round(b, 2)] for k, (a, b) in cand.items()},
            "unknown_pct": round(100.0 * float(unk.mean()), 3),
+           "inpaint": inpaint, "holes_filled": n_holes, "inpaint_secs": rep_ip,
            "gcr_ok": bool(int(np.minimum(np.minimum(C, M), Y).max()) == 0),
            "mean": {"C": round(float(C.mean()), 2), "M": round(float(M.mean()), 2),
                     "Y": round(float(Y.mean()), 2), "K": round(float(K.mean()), 2)},
@@ -210,14 +225,16 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False):
     if write:
         os.makedirs(OUTD, exist_ok=True)
         Image.merge("CMYK", [Image.fromarray(x) for x in (C, M, Y, K)]).save(
-            os.path.join(OUTD, "%03d_cmyk_%s.tif" % (page, variant)), compression="tiff_lzw")
+            os.path.join(OUTD, "%03d_cmyk_%s%s.tif" % (page, variant, "_filled" if inpaint else "")), compression="tiff_lzw")
         Image.fromarray((~unk).astype(np.uint8) * 255).convert("1").save(
             os.path.join(OUTD, "%03d_known.png" % page), optimize=True)
     if write and keep_rgb:
-        # OPT-IN. Raw TIFF (PNG deflate on 557 MP dominated the whole apply), but 1.67 GB a page
-        # -- 294 GB for the issue against ~161 GB free -- so it is written only when something
-        # is going to read it back. verify_fullres is the only consumer.
-        Image.fromarray(rgb).save(os.path.join(OUTD, "%03d_rgb.tif" % page), compression=None)
+        # A x4-DOWNSCALED proof, not the full-size RGB. The only consumer is verify_fullres, and
+        # the first thing it did was downscale by 4 -- so storing 1.67 GB to read back 104 MB was
+        # pure waste (294 GB an issue against ~160 GB free). Downscaled here with the same filter
+        # verify used, so the comparison is unchanged.
+        Image.fromarray(rgb).resize((W_out // 4, H_out // 4), Image.LANCZOS).save(
+            os.path.join(OUTD, "%03d_proof600.tif" % page), compression=None)
     return rep
 
 
@@ -226,15 +243,18 @@ if __name__ == "__main__":
     ap.add_argument("pages", nargs="+", type=int)
     ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
     ap.add_argument("--no-write", action="store_true")
+    ap.add_argument("--inpaint", action="store_true",
+                    help="mirror-fill the edge bands and diffuse the clip holes")
     ap.add_argument("--keep-rgb", action="store_true",
-                    help="also write the 1.67GB pre-separation RGB, which verify_fullres reads")
+                    help="also write the x4-downscaled pre-separation RGB proof (104MB) that "
+                         "verify_fullres compares against the 600dpi path")
     ap.add_argument("--variant", default="display", choices=("display", "detect"),
                     help="display = the canonical deliverable grade; detect = keeps shadows "
                          "for the screening analysis")
     A = ap.parse_args()
     out = []
     for p in A.pages:
-        r = run(p, A.knorm, not A.no_write, A.variant, A.keep_rgb)
+        r = run(p, A.knorm, not A.no_write, A.variant, A.keep_rgb, A.inpaint)
         out.append(r)
         print(json.dumps(r))
     RPT = "/Users/mist/DNB/8609/tmp/fullres_report.json"   # merge, do not replace (see crop_a4)
