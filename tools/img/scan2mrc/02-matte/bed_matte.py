@@ -1,42 +1,56 @@
 #!/usr/bin/env python3
 """Bed matte: mark the scanner backing at each page edge as unknown (alpha 0).
 
-Backing = the scanner bed (lid / backing sheet / its shadow) and the coloured cardboard
-insert (yellow, at the bottom of this issue). The page must not be cut.
+Backing = whatever lies OUTSIDE the sheet: the scanner bed (lid / backing sheet / its shadow)
+and the coloured cardboard insert. The page must not be cut.
+
+NOTHING ABOUT THE BACKING IS WRITTEN IN THIS FILE. calibrate_backing.py measures it over the
+issue -- backing is the material that covers the border ring and vanishes inboard -- and finds
+the bed on top/left/right, the insert on the bottom of 176/176 pages, and correctly refuses the
+cream paper everywhere. The old BED_LUMA / BED_SAT / INSERT_LUMA / INSERT_SAT / INSERT_EDGES
+were those same facts guessed rather than measured, and each was wrong somewhere.
 
 THE ALGORITHM -- three steps, one code path for all four edges, and the middle step is the
-SHARED core in ../linefit.py that 02b/spine.py also uses:
+SHARED core in ../linefit.py:
 
-  1. PER LINE, CANDIDATE TRANSITIONS. Orient the edge so axis1 runs from the border inward.
-     A pixel is BACKING if it is BLACKISH (dark AND neutral -> bed) or YELLOWISH (bright AND
-     saturated -> cardboard). Offer the first N_CAND backing->page transitions per line.
+  1. WHAT IS BACKING HERE, then PER-LINE CANDIDATE TRANSITIONS. The issue profile is refined on
+     the page in front of us and grown to the material's real extent (page_materials), then each
+     scanline offers the depths where that material ends (candidates).
   2. ROBUST LINE FIT (linefit.fit): the (offset, slope) most lines agree on, then LSQ on the
      inliers, plus a bounded quadratic for the sheet's bow.
   3. MARGIN AND DECISION, kept OUT of the fit: a fixed overcut, and independent tests for
      whether this edge should be cut at all.
 
-WHY THE REWRITE. The previous version walked to the FIRST non-backing pixel -- ONE candidate
-per line -- so a single anomalous pixel ruined that line, and the damage was repaired
-downstream with an outlier fence, a coverage percentile, depth smoothing, gap bridging and a
-strip extension. Each was a workaround for not having a robust fit, and they fought:
+TWO AXES, NOT ONE BALL. The bed and the sheet-edge shadow are one material family; page ink is
+not, and no single RGB distance can say so. Measured against each page's own bed, the shadow
+that MUST be cut sits 33-37 away in luma but 1.9-4.6 in chroma, while the ink that must be KEPT
+sits a similar 33-51 in luma and 12.7-127 in chroma. So tolerances are loose in luma and tight
+in chroma, and chroma is compared as a RATIO to luma (CHROMA_STAB) because a saturated material
+darkens into shadow -- an absolute chroma bound dropped the shaded insert and the bottom
+boundary "wobbled" +-45px, which was never real waviness.
+
+WHY THE FIT IS A MODE. The first version walked to the FIRST non-backing pixel -- one candidate
+per line -- so a single anomalous pixel ruined that line, and the damage was repaired downstream
+with an outlier fence, a coverage percentile, depth smoothing, gap bridging and a strip
+extension, each of which broke something else:
 
     walk stops in a transition blur -> gap bridging -> leapt through an ad's black TEXT
-                                                       (p044 bottom 160 -> 292)
-    deep outlier lines              -> MAD fence    -> too tight left bed standing on p003,
-                                                       too loose over-cut p044 by 44px
+    deep outlier lines              -> MAD fence    -> too tight left bed standing on p003
     spiky depths                    -> smoothing    -> fit disagreed with what it must cover
     bed strip after the blur        -> extension    -> combed p005's halftone per column
 
-A MODE fit needs none of it. Deleted here: OUTLIER_K, FENCE_MIN_600, COVER_PCT, SLACK,
-SMOOTH_D_600, GAP_BRIDGE_600, STRIP_*, PAGECUT_FRAC, and the learned-prior acceptance path.
+A mode needs none of it. Deleted: OUTLIER_K, FENCE_MIN_600, COVER_PCT, SLACK, SMOOTH_D_600,
+GAP_BRIDGE_600, STRIP_*, PAGECUT_FRAC, and the learned-prior acceptance path.
 
-RULES (from the user):
+RULES (from the user, in this order):
   1. every backing pixel must be cut -- leaving a stripe is a FAIL
   2. subject to that, cut as few of OUR pixels as possible
+The order matters and the code reflects it: the evidence bar scales with what a cut COSTS, so a
+4px line enclosing nothing but backing is allowed on weaker evidence than a deep one.
 
-CONSTRAINT: full-bleed dark pages (p047, p069) have real black ink to the very edge, and
-SOLID black ink is separable from bed by neither colour nor texture. Those edges are left
-uncut deliberately -- see the INK and vote tests.
+REMAINING LIMIT: where a full-bleed dark ad reaches the border on nearly every scanline (p047's
+top), the material never stops inside the window, so no boundary can be established and the edge
+is left uncut by design.
 """
 import os, sys, json, argparse, numpy as np, scipy.ndimage as ndi
 from PIL import Image
