@@ -142,7 +142,7 @@ def alpha_for(geo, npz, xt, yt):
 
 
 def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
-        inpaint=False):
+        inpaint=False, detect_too=False):
     t0 = time.time()
     geo = json.load(open(GEOJ))["pages"][str(page)]
     npz = np.load(os.path.join(GEOD, "%03d.npz" % page))
@@ -166,18 +166,6 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
         unk[y0:y1] = (~inside) | alpha_for(geo, npz, xt, yt)
     del master
 
-    # FILL BEFORE SEPARATING, so the filled pixels are graded like everything else. `unk` is NOT
-    # updated: the sidecar keeps marking them unknown, so what was invented stays knowable and
-    # any later stage can still exclude it. The K normalisation below still uses only the
-    # ORIGINALLY known pixels, so a fill can never move the black point.
-    n_holes = 0
-    if inpaint:
-        t_ip = time.time()
-        rgb, n_holes = IP.fill(rgb, ~unk)
-        rep_ip = round(time.time() - t_ip, 1)
-    else:
-        rep_ip = 0.0
-
     # --- K normalisation: three candidates, one written ---------------------------------
     flat = rgb.reshape(-1, 3).astype(np.float32)
     kd = np.sqrt(((flat - COLOR_K.astype(np.float32)) ** 2).sum(1))
@@ -196,28 +184,57 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
     pa_m, pb_m = plane(COLOR_M, COLOR_CM, COLOR_MY), plane(COLOR_C, COLOR_Y, COLOR_W)
     pa_y, pb_y = plane(COLOR_Y, COLOR_CY, COLOR_MY), plane(COLOR_C, COLOR_M, COLOR_W)
 
-    C = np.empty((H_out, W_out), np.uint8); M = np.empty_like(C)
-    Y = np.empty_like(C); K = np.empty_like(C)
-    for y0 in range(0, H_out, STRIP):
-        y1 = min(y0 + STRIP, H_out)
-        px = rgb[y0:y1].reshape(-1, 3).astype(np.float64)
-        c = cmy_channel(px, pa_c, pb_c); mm = cmy_channel(px, pa_m, pb_m)
-        yy = cmy_channel(px, pa_y, pb_y)
-        d = np.sqrt(((px - COLOR_K) ** 2).sum(1))
-        kv = np.clip(((d - dmin) / span * 255.0).astype(np.int64), 0, 255).astype(np.uint8)
-        k = (255 - kv)
-        sh = (y1 - y0, W_out)
-        lv = LEVELS[variant]
-        c = level(c.reshape(sh), *lv["c"]); mm = level(mm.reshape(sh), *lv["m"])
-        yy = level(yy.reshape(sh), *lv["y"]); k = level(k.reshape(sh), *lv["k"])
-        neu = np.minimum(np.minimum(c, mm), yy)                    # GCR
-        C[y0:y1] = c - neu; M[y0:y1] = mm - neu; Y[y0:y1] = yy - neu
-        K[y0:y1] = np.clip(k.astype(np.int16) + neu, 0, 255).astype(np.uint8)
+    def separate_grade(src, var):
+        """RGB -> graded, GCR'd CMYK for one grade variant."""
+        C = np.empty((H_out, W_out), np.uint8); M = np.empty_like(C)
+        Y = np.empty_like(C); K = np.empty_like(C)
+        lv = LEVELS[var]
+        for y0 in range(0, H_out, STRIP):
+            y1 = min(y0 + STRIP, H_out)
+            px = src[y0:y1].reshape(-1, 3).astype(np.float64)
+            c = cmy_channel(px, pa_c, pb_c); mm = cmy_channel(px, pa_m, pb_m)
+            yy = cmy_channel(px, pa_y, pb_y)
+            d = np.sqrt(((px - COLOR_K) ** 2).sum(1))
+            kv = np.clip(((d - dmin) / span * 255.0).astype(np.int64), 0, 255).astype(np.uint8)
+            k = (255 - kv)
+            sh = (y1 - y0, W_out)
+            c = level(c.reshape(sh), *lv["c"]); mm = level(mm.reshape(sh), *lv["m"])
+            yy = level(yy.reshape(sh), *lv["y"]); k = level(k.reshape(sh), *lv["k"])
+            neu = np.minimum(np.minimum(c, mm), yy)                    # GCR
+            C[y0:y1] = c - neu; M[y0:y1] = mm - neu; Y[y0:y1] = yy - neu
+            K[y0:y1] = np.clip(k.astype(np.int16) + neu, 0, 255).astype(np.uint8)
+        return C, M, Y, K
+
+    # DETECT BEFORE FILL. The screening analysis must never see invented pixels: a mirrored band
+    # carries duplicated screen and a flat one carries none, and Stage 3 classifies BY screen
+    # energy. So the detect-graded page is separated from the UNFILLED crop, and only then is the
+    # fill applied for the deliverable. Two separations rather than one -- the alternative,
+    # filling in CMYK space, risks breaking min(C,M,Y)=0 for any fill that averages pixels.
+    extra = {}
+    if detect_too:
+        Cd, Md, Yd, Kd = separate_grade(rgb, "detect")
+        if write:
+            os.makedirs(OUTD, exist_ok=True)
+            Image.merge("CMYK", [Image.fromarray(x) for x in (Cd, Md, Yd, Kd)]).save(
+                os.path.join(OUTD, "%03d_cmyk_detect.tif" % page), compression="tiff_lzw")
+        extra["detect_mean"] = {n: round(float(x.mean()), 2)
+                                for n, x in zip("CMYK", (Cd, Md, Yd, Kd))}
+        del Cd, Md, Yd, Kd
+
+    n_holes = 0
+    rep_ip = 0.0
+    if inpaint:
+        t_ip = time.time()
+        rgb, n_holes = IP.fill(rgb, ~unk)
+        rep_ip = round(time.time() - t_ip, 1)
+
+    C, M, Y, K = separate_grade(rgb, variant)
 
     rep = {"page": page, "out_size": [W_out, H_out], "knorm": knorm, "variant": variant,
            "k_candidates": {k: [round(a, 2), round(b, 2)] for k, (a, b) in cand.items()},
            "unknown_pct": round(100.0 * float(unk.mean()), 3),
            "inpaint": inpaint, "holes_filled": n_holes, "inpaint_secs": rep_ip,
+           **extra,
            "gcr_ok": bool(int(np.minimum(np.minimum(C, M), Y).max()) == 0),
            "mean": {"C": round(float(C.mean()), 2), "M": round(float(M.mean()), 2),
                     "Y": round(float(Y.mean()), 2), "K": round(float(K.mean()), 2)},
@@ -243,6 +260,8 @@ if __name__ == "__main__":
     ap.add_argument("pages", nargs="+", type=int)
     ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
     ap.add_argument("--no-write", action="store_true")
+    ap.add_argument("--detect-too", action="store_true",
+                    help="also write the UNFILLED detect-graded CMYK, for the screening analysis")
     ap.add_argument("--inpaint", action="store_true",
                     help="mirror-fill the edge bands and diffuse the clip holes")
     ap.add_argument("--keep-rgb", action="store_true",
@@ -254,7 +273,7 @@ if __name__ == "__main__":
     A = ap.parse_args()
     out = []
     for p in A.pages:
-        r = run(p, A.knorm, not A.no_write, A.variant, A.keep_rgb, A.inpaint)
+        r = run(p, A.knorm, not A.no_write, A.variant, A.keep_rgb, A.inpaint, A.detect_too)
         out.append(r)
         print(json.dumps(r))
     RPT = "/Users/mist/DNB/8609/tmp/fullres_report.json"   # merge, do not replace (see crop_a4)
