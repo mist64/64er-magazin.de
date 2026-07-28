@@ -74,33 +74,49 @@ def _replicate_1d(line, known):
 
 
 def mirror_edges(rgb, known, method="mirror"):
-    """Fill the unknown runs that reach the image border, rows then columns."""
+    """Fill the border-reaching unknown runs by reflecting about the ORIGINAL boundary.
+
+    Rows and columns are computed INDEPENDENTLY from the untouched mask, and each unknown pixel
+    takes whichever of the two is nearer to its own boundary. The previous version ran the row
+    pass, marked its own output as known, and then let the column pass reflect about that moved
+    axis using already-invented pixels as source -- so the result was not a reflection at all.
+    Checked directly on p083: |fill[first-1-k] - src[first+k]| should be 0 for a true mirror and
+    was 94, 89, 128, 72 ... Reflecting about the real boundary is what makes the fill continue
+    the page instead of smearing it.
+    """
     fn = _mirror_1d if method == "mirror" else _replicate_1d
-    out = rgb.copy()
-    k = known.copy()
-    H, W = k.shape
-    # rows first: handles left/right bands
-    rows = np.flatnonzero(~k.all(1) & k.any(1))
-    for y in rows:
-        kn = k[y]
-        if kn[0] and kn[-1]:
-            continue                                   # no band at either end of this row
-        out[y] = fn(out[y], kn)
-    k_rows = k.copy()
-    for y in rows:
-        kn = k[y]
+    H, W = known.shape
+
+    rowf = rgb.copy()
+    for y in np.flatnonzero(~known.all(1) & known.any(1)):
+        kn = known[y]
         if not (kn[0] and kn[-1]):
-            first = int(np.argmax(kn)) if kn.any() else 0
-            last = W - 1 - int(np.argmax(kn[::-1])) if kn.any() else -1
-            k_rows[y, :first] = True
-            k_rows[y, last + 1:] = True
-    # then columns: handles top/bottom bands and the corners the row pass could not reach
-    cols = np.flatnonzero(~k_rows.all(0) & k_rows.any(0))
-    for x in cols:
-        kn = k_rows[:, x]
-        if kn[0] and kn[-1]:
-            continue
-        out[:, x] = fn(out[:, x], kn)
+            rowf[y] = fn(rowf[y], kn)
+
+    colf = rgb.copy()
+    for x in np.flatnonzero(~known.all(0) & known.any(0)):
+        kn = known[:, x]
+        if not (kn[0] and kn[-1]):
+            colf[:, x] = fn(colf[:, x], kn)
+
+    # distance from each unknown pixel to its own row / column boundary; nearer one wins
+    ys, xs = np.arange(H)[:, None], np.arange(W)[None, :]
+    rowany, colany = known.any(1), known.any(0)
+    rfirst = np.where(rowany, np.argmax(known, 1), W)[:, None]
+    rlast = np.where(rowany, W - 1 - np.argmax(known[:, ::-1], 1), -1)[:, None]
+    cfirst = np.where(colany, np.argmax(known, 0), H)[None, :]
+    clast = np.where(colany, H - 1 - np.argmax(known[::-1], 0), -1)[None, :]
+    drow = np.where(xs < rfirst, rfirst - xs, np.where(xs > rlast, xs - rlast, 0))
+    dcol = np.where(ys < cfirst, cfirst - ys, np.where(ys > clast, ys - clast, 0))
+    drow = np.where(rowany[:, None], drow, 1 << 30)
+    dcol = np.where(colany[None, :], dcol, 1 << 30)
+
+    unk = ~known
+    out = rgb.copy()
+    take_row = unk & (drow <= dcol)
+    take_col = unk & (dcol < drow)
+    out[take_row] = rowf[take_row]
+    out[take_col] = colf[take_col]
     return out
 
 
