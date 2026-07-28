@@ -25,6 +25,12 @@ so what was invented stays knowable and any later stage can still exclude it.
 """
 import numpy as np
 
+HOLE_GROW = 3     # px @600dpi: the punch has a torn halo the detected mask misses
+MODE_MIN_WIN = 64  # a 5px band would otherwise be judged from a 5px sample
+MODE_BINS = 8      # quantisation for "most common colour"; fine enough not to merge ink & paper
+MODE_SMOOTH = 51   # median filter along the edge: without it every line picks independently and
+                   # the band steps from line to line. The real margin tone varies slowly.
+
 
 def _mirror_1d(line, known, max_reflect=None):
     """Fill the unknown run(s) at the ENDS of a 1-D line by reflecting the known part.
@@ -71,6 +77,85 @@ def _replicate_1d(line, known):
     if last < n - 1:
         line[last + 1:] = line[last]
     return line
+
+
+def _mode_line(win, bins=MODE_BINS):
+    """Most common colour of a window, quantised. Mode not median: a window near text is bimodal
+    (paper + ink), and the median lands on a mid-grey that exists nowhere on the page, while the
+    mode picks the majority colour, which is the paper."""
+    if win.shape[0] == 0:
+        return None
+    q = (win.astype(np.int32) // bins)
+    key = (q[:, 0] << 16) | (q[:, 1] << 8) | q[:, 2]
+    v, c = np.unique(key, return_counts=True)
+    k = int(v[int(np.argmax(c))])
+    sel = key == k
+    return win[sel].mean(0)
+
+
+def mode_edges(rgb, known, min_win=MODE_MIN_WIN, smooth=MODE_SMOOTH):
+    """Fill each border-reaching run with the dominant colour of the adjacent known window.
+
+    Per line, the window is as wide as the run itself (at least `min_win`), taken on the page
+    side of the boundary. This fabricates a flat patch rather than fake structure -- and unlike
+    mirror or replicate it resolves the full-bleed question by itself: where the adjacent window
+    IS an ad, the mode is the ad's colour and the band continues it; where it is margin, the mode
+    is paper. Neither of the other two could tell those apart.
+    """
+    from scipy.ndimage import median_filter
+    out = rgb.copy()
+    H, W = known.shape
+
+    def run_axis(img, kn, axis):
+        n_lines, n_px = kn.shape
+        lead = np.zeros((n_lines, 3), np.float32)
+        trail = np.zeros((n_lines, 3), np.float32)
+        anyk = kn.any(1)
+        first = np.where(anyk, np.argmax(kn, 1), n_px)
+        last = np.where(anyk, n_px - 1 - np.argmax(kn[:, ::-1], 1), -1)
+        for i in np.flatnonzero(anyk):
+            f, l = int(first[i]), int(last[i])
+            if f > 0:
+                w = max(f, min_win)
+                m = _mode_line(img[i, f:min(f + w, l + 1)])
+                if m is not None:
+                    lead[i] = m
+            if l < n_px - 1:
+                w = max(n_px - 1 - l, min_win)
+                m = _mode_line(img[i, max(l - w + 1, f):l + 1])
+                if m is not None:
+                    trail[i] = m
+        if smooth > 1:
+            lead = median_filter(lead, size=(smooth, 1))
+            trail = median_filter(trail, size=(smooth, 1))
+        return first, last, lead, trail, anyk
+
+    rf, rl, rlead, rtrail, ranyk = run_axis(out, known, 1)
+    cf, cl, clead, ctrail, canyk = run_axis(out.transpose(1, 0, 2), known.T, 0)
+
+    xs = np.arange(W)[None, :]
+    ys = np.arange(H)[:, None]
+    rfirst, rlast = rf[:, None], rl[:, None]
+    cfirst, clast = cf[None, :], cl[None, :]
+    drow = np.where(xs < rfirst, rfirst - xs, np.where(xs > rlast, xs - rlast, 0))
+    dcol = np.where(ys < cfirst, cfirst - ys, np.where(ys > clast, ys - clast, 0))
+    drow = np.where(ranyk[:, None], drow, 1 << 30)
+    dcol = np.where(canyk[None, :], dcol, 1 << 30)
+
+    unk = ~known
+    tr = unk & (drow <= dcol) & ranyk[:, None]
+    tc = unk & (dcol < drow) & canyk[None, :]
+    out[tr & (xs < rfirst)] = rlead[:, None, :].repeat(W, 1)[tr & (xs < rfirst)]
+    out[tr & (xs > rlast)] = rtrail[:, None, :].repeat(W, 1)[tr & (xs > rlast)]
+    out[tc & (ys < cfirst)] = clead[None, :, :].repeat(H, 0)[tc & (ys < cfirst)]
+    out[tc & (ys > clast)] = ctrail[None, :, :].repeat(H, 0)[tc & (ys > clast)]
+
+    dead = unk & ~ranyk[:, None] & ~canyk[None, :]
+    if dead.any():
+        from scipy import ndimage as ndi
+        _, (iy, ix) = ndi.distance_transform_edt(dead, return_indices=True)
+        out[dead] = out[iy[dead], ix[dead]]
+    return out
 
 
 def mirror_edges(rgb, known, method="mirror"):
@@ -131,27 +216,53 @@ def mirror_edges(rgb, known, method="mirror"):
     return out
 
 
-def diffuse_holes(rgb, known, radius=4, pad=24, max_area=None):
-    """cv2.inpaint each INTERIOR unknown component, on a small crop around it.
+def band_mask(known):
+    """The EDGE BANDS, defined geometrically: the leading/trailing unknown run of every row and
+    column. Not by connectivity -- a clip hole that happens to touch a band is 8-connected to it,
+    so a connectivity test merges the two and the hole then looks like part of the band and is
+    never treated as a hole. That is why p098 and p100 kept visible punch marks: their holes sit
+    against the crop's right edge."""
+    H, W = known.shape
+    band = np.zeros((H, W), bool)
+    xs = np.arange(W)[None, :]
+    ys = np.arange(H)[:, None]
+    rowany = known.any(1)
+    first = np.where(rowany, np.argmax(known, 1), W)[:, None]
+    last = np.where(rowany, W - 1 - np.argmax(known[:, ::-1], 1), -1)[:, None]
+    band |= (xs < first) | (xs > last)
+    colany = known.any(0)
+    cfirst = np.where(colany, np.argmax(known, 0), H)[None, :]
+    clast = np.where(colany, H - 1 - np.argmax(known[::-1], 0), -1)[None, :]
+    band |= (ys < cfirst) | (ys > clast)
+    return band & ~known
 
-    Interior = does not touch the image border; that is what separates a clip hole from an edge
-    band. Cropping matters: cv2.inpaint on a 557 MP page would be absurd, and the holes are a few
-    hundred px across.
+
+def diffuse_holes(rgb, known, radius=4, pad=24, max_area=None, grow=HOLE_GROW):
+    """cv2.inpaint every unknown region that is NOT part of an edge band, on a small crop.
+
+    The hole set is grown by `grow` px first: a clip punch has a torn, darker halo around the
+    core, the detected mask covers the core only, and leaving the halo behind is what still read
+    as a hole after filling.
     """
     import cv2
     from scipy import ndimage as ndi
     unk = ~known
     if not unk.any():
         return rgb, 0
-    lab, n = ndi.label(unk)
+    holes = unk & ~band_mask(known)
+    if grow:
+        holes = ndi.binary_dilation(holes, np.ones((2 * grow + 1, 2 * grow + 1), bool)) & unk
+    if not holes.any():
+        return rgb, 0
+    lab, n = ndi.label(holes)
     if n == 0:
         return rgb, 0
     H, W = known.shape
-    border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]])).tolist())
+    border = set()
     out = rgb
     filled = 0
     for sl, i in zip(ndi.find_objects(lab), range(1, n + 1)):
-        if sl is None or i in border:
+        if sl is None:
             continue
         area = int((lab[sl] == i).sum())
         if max_area is not None and area > max_area:
@@ -167,7 +278,7 @@ def diffuse_holes(rgb, known, radius=4, pad=24, max_area=None):
 
 def fill(rgb, known, holes=True, method="mirror"):
     """Edge bands by `method`, interior holes by diffusion. Returns (filled_rgb, n_holes)."""
-    out = mirror_edges(rgb, known, method)
+    out = mode_edges(rgb, known) if method == "mode" else mirror_edges(rgb, known, method)
     nh = 0
     if holes:
         out, nh = diffuse_holes(out, known)
