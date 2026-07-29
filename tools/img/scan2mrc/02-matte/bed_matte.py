@@ -144,6 +144,10 @@ MIN_BACKING_FRAC = 0.15  # cut only if this fraction of lines shows any backing;
 EXT_GAP_600   = 8        # ... bridging transitions up to this wide between materials
 EXT_MAX_600   = 60       # the boundary may be finished through this much neutral shadow
 EXT_PCTL      = 90       # ... by this percentile of the per-line walk, applied uniformly
+PEN_MAX_600   = 40       # ... and through this much of a CHROMATIC material's colour penumbra
+PEN_MAD_K     = 4.0      # penumbra = chroma above the page's own paper by this many robust sigma
+PEN_FLOOR     = 6.0      # ... never a tighter threshold than this (normalised chroma units), so a
+                         # perfectly uniform paper reference cannot drive the gate to zero
 OVERRUN_600   = 24       # a cut may exceed the material's p95 stop depth by this much
 SHALLOW_600   = 25       # a cut this shallow (~1mm) is allowed on weaker evidence
 MIN_CONTRAST  = 10.0     # ... and the winning line must stand out from the typical line by
@@ -363,6 +367,18 @@ def dev(px, centre):
     return dl, dc
 
 
+def chroma_vec(px):
+    """Per-pixel chroma as a 2-vector, in the same luma-normalised units dev() compares in.
+
+    dev() measures distance FROM a colour; this gives the colour's own chroma, so a material's hue
+    can be used as a DIRECTION -- which is what separates a yellow falloff from a blue ad sitting
+    at the same boundary."""
+    px = np.asarray(px, np.float32)
+    n = px.mean(-1) + CHROMA_STAB
+    return np.stack([100.0 * (px[..., 0] - px[..., 1]) / n,
+                     100.0 * (px[..., 1] - px[..., 2]) / n], -1)
+
+
 def is_backing(rgb, mats):
     """Positive material test: within tolerance of one of these colours (centre, r_luma, r_chroma)."""
     m = np.zeros(rgb.shape[:2], bool)
@@ -552,6 +568,59 @@ def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
     ext = float(np.percentile(walk[done], EXT_PCTL)) if done.any() else 0.0
     line = np.clip(line + ext, 0, D)
     m["ext"] = ext
+
+    # FINISH THROUGH THE MATERIAL'S OWN COLOUR PENUMBRA. The walk above ends where the material's
+    # COLOUR ends. A SATURATED backing also lays a colour falloff a little further in -- its hue at
+    # a fraction of its saturation -- which the (deliberately tight) chroma radius cannot include
+    # and must not, or the material would swallow the page. Measured on p062's bottom, the leftover
+    # carries the backing's luma (dl 4.0 against a radius of 20) with a tenth of its chroma (dc
+    # 28-36 against a radius of 3.5); it survives the grade as a visible yellow line, 0.28mm there
+    # and 0.75mm on p060, on 2 of the 33 pages checked.
+    # Only a CHROMATIC material has this kind of penumbra -- a neutral bed's falloff is a luma
+    # shadow, which the walk above already took. Two things keep this from eating the page: the
+    # test is DIRECTIONAL (a pixel's chroma projected on the material's own hue, so a blue ad
+    # abutting a yellow boundary projects to nothing), and the threshold comes from THIS page's own
+    # paper, deep in the same window. No colour is named here.
+    cv = chroma_vec(E)                                        # (N, D, 2)
+    deep = cv[:, int(D * DEEP_FRAC):]                         # page, past any backing
+    pen = np.zeros(E.shape[:2], bool)
+    for centre, _rl, _rc in mats:
+        u = chroma_vec(np.asarray(centre, np.float32)[None, None, :])[0, 0]
+        nrm = float(np.hypot(*u))
+        if nrm <= 0:
+            continue
+        u = u / nrm
+        proj = cv @ u
+        ref = deep @ u
+        med = float(np.median(ref))
+        thr = med + max(PEN_FLOOR, PEN_MAD_K * 1.4826 * float(np.median(np.abs(ref - med))))
+        if nrm <= thr:
+            continue                                          # neutral material: no colour penumbra
+        pen |= proj > thr
+    # NEVER WALK INTO SCREENED INK. On a FULL-BLEED page the content runs to the sheet edge, and
+    # warm content (a pink ad, a cream tint) carries a positive component along the yellow backing's
+    # hue -- so the directional test alone reads it as penumbra and the walk eats up to ~1mm of real
+    # ink (p163 grey halftone, p017 pink tint). A backing penumbra is a SMOOTH optical gradient;
+    # halftone is not, which is the same band-pass the INK decision above already uses. Measured
+    # over the flagged and clean pages the three populations are cleanly ordered and SCREEN_MAX
+    # already sits in the gap -- no new constant:
+    #     backing 1.5-2.7    paper margin 4.0-6.1    | 13 |    screened ink 13.6-27.9
+    pen &= Sc < SCREEN_MAX
+    pbridged = ndi.binary_dilation(pen, np.ones((1, 2 * g + 1), bool))
+    base = np.clip(line.astype(int), 0, D - 1)
+    cur = base.copy()
+    alive = pbridged[rows, cur]
+    last = np.zeros(N, int)
+    for step in range(1, int(PEN_MAX_600 * dpi / 600) + 1):
+        if not alive.any():
+            break
+        cur = np.minimum(base + step, D - 1)
+        alive &= pbridged[rows, cur]
+        last = np.where(alive & pen[rows, cur], step, last)
+    done = ~alive                                             # same runaway guard as the shadow walk
+    pext = float(np.percentile(last[done], EXT_PCTL)) if done.any() else 0.0
+    line = np.clip(line + pext, 0, D)
+    m["pen_ext"] = pext
     m["median_depth"] = float(np.median(line))
 
     shallow = float(np.median(line)) <= SHALLOW_600 * dpi / 600
