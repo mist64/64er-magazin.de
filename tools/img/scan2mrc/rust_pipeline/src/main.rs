@@ -6,6 +6,7 @@ mod imageio;
 mod mrc;
 mod ndimage;
 mod npy;
+mod record;
 mod resample;
 mod separate;
 
