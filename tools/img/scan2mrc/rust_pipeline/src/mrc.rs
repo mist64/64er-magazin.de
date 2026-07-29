@@ -72,7 +72,16 @@ const DARKFILL_DARK: f32 = 90.0;      // luma ceiling: dark neutral ink (the fil
 const DARKFILL_SAT: f32 = 60.0;       // sat ceiling: NEUTRAL (kills coloured red/blue boxes)
 const DARKFILL_MINPX: usize = 20000;  // min component px @600 (~0.06% page; > step-7's 8000 = a genuine FILL)
 const DARKFILL_FRAC: f64 = 0.45;      // dark_frac floor: dark ink fills the bbox
-const DARKFILL_FILLED: f64 = 0.70;    // filled_frac floor: solid shape after hole-fill
+// filled_frac floor: the hole-filled shape must essentially BE its bbox, i.e. a box. 0.70 also
+// admitted bold headline type -- a glyph with counters ("8", "O", "D", "a") reads as a dark shape
+// with enclosed bright content, so it was promoted to IMAGE, left the K stencil, and came back
+// soft from the 150 dpi background (p062 "zum C 128" lost its 8: dark 0.743, filled 0.812,
+// holes 0.069 -- inside every old gate). Measured over 34 promotions on 23 pages of 8609 the two
+// populations do not touch: headline glyphs 0.804-0.886, real reversed boxes 0.965-0.997
+// ("298.00", "WIMBLEDON/Kassette 25.-", "NEU", "ariolasoft"). 0.93 sits in that gap. Dark PHOTOS
+// (0.737-0.930) also stop being promoted, which costs nothing: they are screened, so step 7 puts
+// them in IMAGE anyway -- this promoter exists only for UNSCREENED solid fills.
+const DARKFILL_FILLED: f64 = 0.93;
 const DARKFILL_HOLES_LO: f64 = 0.05;  // enclosed-bright floor: reversed text present
 const DARKFILL_HOLES_HI: f64 = 0.55;  // enclosed-bright ceiling: not a hollow frame
 
