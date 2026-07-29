@@ -5,6 +5,7 @@
 use crate::imageio::{self, Rgb};
 use crate::ndimage;
 use crate::npy;
+use crate::record::Recorder;
 use crate::resample::{nearest_plane_u8, resample_plane_f32, Filter};
 use crate::fftutil;
 use anyhow::{Context, Result};
@@ -89,6 +90,12 @@ pub struct ClusterOut {
     pub w: usize, // NX
     pub h: usize, // NY
     pub mask: Vec<bool>,
+}
+
+/// Round to 4 decimals for the record. Full f64 precision would make every row noisy to diff for
+/// digits that carry no decision; 4 is finer than any gate in this file.
+fn r2(v: f64) -> f64 {
+    (v * 10000.0).round() / 10000.0
 }
 
 fn env_f(name: &str, def: f32) -> f32 {
@@ -424,155 +431,54 @@ fn lp_field(ch: &[f32], mw: usize, mh: usize, tap_shifted: &[f32]) -> Vec<f32> {
     data.iter().map(|c| c.re).collect()
 }
 
-/// The full MRC render.
-/// FAST classify-only path: cluster mask (steps 1-6) + step-7 per-cluster verdicts, printing the
-/// DIAG lines. Skips the chromatic-tint blurs, the bg-descreen FFT, the K/jbig2 ink layers and PDF
-/// assembly that run_mrc does -- for sweeping classification features across many pages quickly.
-/// NOTE: the step-7 logic here MIRRORS run_mrc's step 7 -- keep the two in sync.
-pub fn run_classify(page_png: &str, score_npy: &str, thr: f32) -> Result<()> {
-    let src = imageio::read_rgb_png(page_png)?;
-    let (w, h) = (src.w, src.h);
-    let (score, shape) = npy::read_f32(score_npy)?;
-    let (ny, nx) = (shape[0], shape[1]);
-    let luma_full = rgb_to_luma_full(&src);
-    let lt = luma_tiles(&luma_full, w, ny, nx);
-    let m_tile = build_cluster(&lt, &score, ny, nx, thr);
-    let (mw, mh) = (w / 4, h / 4);
-    let m_u8: Vec<u8> = m_tile.iter().map(|&b| if b { 255 } else { 0 }).collect();
-    let m600_u8 = nearest_plane_u8(&m_u8, nx, ny, mw, mh);
-    let m600: Vec<bool> = m600_u8.iter().map(|&v| v > 128).collect();
-    let (lblm, nmc) = ndimage::label(&m600, mw, mh);
 
-    let tcv = env_f("TCV", 30.0);
-    let ts = env_f("TS", 22.0);
-    let tt = env_f("TT", 14.0);
-    let vote = env_f("VOTE", 0.40);
-    let bk = env_f("BK", 32.0) as f64;
-    let objf = env_f("OBJF", 0.30) as f64;
-    let bc = env_f("BC", 34.0) as f64;
-    let cov_path = {
-        let p = score_npy.strip_suffix(".npy").unwrap_or(score_npy);
-        format!("{}_cov.npy", p)
-    };
-    let (cov, cshape) = npy::read_u8(&cov_path).with_context(|| format!("no cov cache {}", cov_path))?;
-    let (cmw, cmh) = (cshape[2], cshape[1]);
-    let plane = cmw * cmh;
-    let cf = |ci: usize| -> Vec<f32> { cov[ci * plane..(ci + 1) * plane].iter().map(|&v| v as f32).collect() };
-    let (c_, m_, y_, k_) = (cf(0), cf(1), cf(2), cf(3));
-    let neu: Vec<f32> = (0..plane).map(|i| c_[i].min(m_[i]).min(y_[i])).collect();
-    let ccx: Vec<f32> = (0..plane).map(|i| c_[i] - neu[i]).collect();
-    let mcx: Vec<f32> = (0..plane).map(|i| m_[i] - neu[i]).collect();
-    let ycx: Vec<f32> = (0..plane).map(|i| y_[i] - neu[i]).collect();
-    let lc = ndimage::local_std(&ccx, cmw, cmh, 37);
-    let lm = ndimage::local_std(&mcx, cmw, cmh, 37);
-    let lyc = ndimage::local_std(&ycx, cmw, cmh, 37);
-    let colorvar: Vec<f32> = (0..plane).map(|i| lc[i].max(lm[i]).max(lyc[i])).collect();
-    let maxcmy: Vec<f32> = (0..plane).map(|i| ccx[i].max(mcx[i]).max(ycx[i])).collect();
-    let satmean = ndimage::uniform_filter(&maxcmy, cmw, cmh, 37);
-    let kmedf = ndimage::median_filter(&k_, cmw, cmh, 25);
-    let tonevar = ndimage::local_std(&kmedf, cmw, cmh, 37);
-    let cand: Vec<bool> = (0..plane)
-        .map(|i| (colorvar[i] > tcv || (satmean[i] > ts && tonevar[i] > tt)) && m600.get(i).copied().unwrap_or(false))
-        .collect();
-    let midk: Vec<bool> = (0..plane).map(|i| k_[i] > 20.0 && k_[i] < 238.0 && m600.get(i).copied().unwrap_or(false)).collect();
-    let midc: Vec<bool> = (0..plane).map(|i| maxcmy[i] > 12.0 && m600.get(i).copied().unwrap_or(false)).collect();
-    let erk = ndimage::binary_erosion(&midk, cmw, cmh, 4);
-    let erc = ndimage::binary_erosion(&midc, cmw, cmh, 4);
-    let stdv = |idx: &[usize], vals: &[f32], mask: &[bool]| -> (f64, usize) {
-        let (mut s, mut s2, mut n) = (0.0f64, 0.0f64, 0usize);
-        for &i in idx {
-            if mask.get(i).copied().unwrap_or(false) {
-                let v = vals[i] as f64;
-                s += v;
-                s2 += v * v;
-                n += 1;
-            }
-        }
-        if n == 0 {
-            return (0.0, 0);
-        }
-        let m = s / n as f64;
-        ((s2 / n as f64 - m * m).max(0.0).sqrt(), n)
-    };
-    let mut comps: Vec<Vec<usize>> = vec![Vec::new(); nmc + 1];
-    for i in 0..mw * mh {
-        if lblm[i] != 0 {
-            comps[lblm[i] as usize].push(i);
-        }
-    }
-    let mut nb6 = 0;
-    for k in 1..=nmc {
-        let idx = &comps[k];
-        if idx.len() < 8000 {
-            continue;
-        }
-        let frac = idx.iter().filter(|&&i| cand.get(i).copied().unwrap_or(false)).count() as f64 / idx.len() as f64;
-        let mut is_img = frac >= vote as f64;
-        let (sdk, nk) = stdv(idx, &k_, &erk);
-        let objfk = nk as f64 / idx.len() as f64;
-        let (sdc, nc) = stdv(idx, &maxcmy, &erc);
-        if !is_img {
-            if nk > 200 && sdk >= bk && objfk >= objf {
-                is_img = true;
-                nb6 += 1;
-            } else if nc > 200 && sdc >= bc {
-                is_img = true;
-                nb6 += 1;
-            }
-        }
-        let (mut x0, mut y0, mut x1, mut y1) = (mw, mh, 0usize, 0usize);
-        for &i in idx {
-            let (x, y) = (i % mw, i / mw);
-            x0 = x0.min(x);
-            y0 = y0.min(y);
-            x1 = x1.max(x);
-            y1 = y1.max(y);
-        }
-        let n = idx.len() as f64;
-        let cvm = idx.iter().map(|&i| colorvar[i] as f64).sum::<f64>() / n;
-        let sm = idx.iter().map(|&i| satmean[i] as f64).sum::<f64>() / n;
-        let tvm = idx.iter().map(|&i| tonevar[i] as f64).sum::<f64>() / n;
-        println!(
-            "DIAG cid={} area={} bbox={:.4},{:.4},{:.4},{:.4} cx={:.3} cy={:.3} vote={:.2} cv={:.1} s={:.1} tv={:.1} bodyK={:.1} objfK={:.2} bodyC={:.1} verdict={}",
-            k, idx.len(),
-            x0 as f64 / mw as f64, y0 as f64 / mh as f64, x1 as f64 / mw as f64, y1 as f64 / mh as f64,
-            (x0 + x1) as f64 / 2.0 / mw as f64, (y0 + y1) as f64 / 2.0 / mh as f64,
-            frac, cvm, sm, tvm, sdk, objfk, sdc, if is_img { "IMAGE" } else { "TEXT" }
-        );
-    }
-    println!("  step7: {} clusters, +{} via bodyK (BK={} OBJF={} BC={})", nmc, nb6, bk, objf, bc);
-    Ok(())
+/// Everything the MRC pipeline DECIDES about a page, and the fields the render needs to act on it.
+///
+/// The split is deliberate: `analyze` decides, `run_mrc` renders. Both `mrc` and `classify` call
+/// `analyze`, so the cheap sweep and the shipping path make the same decisions BY CONSTRUCTION --
+/// they are not two implementations kept in sync. (They were, until this refactor: step 7 existed
+/// twice in this file, verbatim down to the format string, and darkfill existed only in the render
+/// path, which is why probing it needed a third copy in Python.)
+pub struct Analysis {
+    pub mw: usize,
+    pub mh: usize,
+    pub rgb600: Rgb600,
+    pub sat: Vec<f32>,
+    pub luma: Vec<f32>,
+    pub hue: Vec<f32>,
+    pub lumaf: Vec<f32>,
+    pub satf: Vec<f32>,
+    pub m600: Vec<bool>,
+    pub image: Vec<bool>,
+    pub tintmask: Vec<bool>,
+    pub black: Vec<bool>,
+    pub inkpix: Vec<bool>,
+    pub present: Vec<&'static str>,
 }
 
-pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi: f32) -> Result<()> {
-    let src = imageio::read_rgb_png(page_png)?;
+/// Decide everything: cluster mask (steps 1-6), chromatic tint, step 7 image-vs-text, the darkfill
+/// reversed-box promotion, the K mask and its despeckle, and which accent inks are present.
+///
+/// Deliberately excludes the expensive render-only work -- the descreen FFT, the jbig2 encodes and
+/// the PDF assembly -- which is what makes a full-issue decision sweep affordable.
+pub fn analyze(
+    src: &Rgb,
+    score: &[f32],
+    ny: usize,
+    nx: usize,
+    thr: f32,
+    score_npy: &str,
+    page: &str,
+    rec: &mut Recorder,
+) -> Result<Analysis> {
     let w = src.w;
     let h = src.h;
-    let (score, shape) = npy::read_f32(score_npy)?;
-    let ny = shape[0];
-    let nx = shape[1];
     let kmed = env_i("KMED", 5).max(1) as usize;
     let kopen = env_i("KOPEN", 0) as usize;
-
-    // work dir
-    let out_dir = std::path::Path::new(out_pdf)
-        .parent()
-        .map(|p| p.to_string_lossy().to_string())
-        .unwrap_or_default();
-    let stem = std::path::Path::new(out_pdf)
-        .file_stem()
-        .unwrap()
-        .to_string_lossy()
-        .to_string();
-    let work = if out_dir.is_empty() {
-        format!(".mrctmp_{}", stem)
-    } else {
-        format!("{}/.mrctmp_{}", out_dir, stem)
-    };
-    std::fs::create_dir_all(&work)?;
+    let _ = page;
 
     // ---- cluster mask M (steps 1-6) ----
-    let luma_full = rgb_to_luma_full(&src);
+    let luma_full = rgb_to_luma_full(src);
     let lt = luma_tiles(&luma_full, w, ny, nx);
     let m_tile = build_cluster(&lt, &score, ny, nx, thr);
 
@@ -586,7 +492,7 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
     let mut m600: Vec<bool> = m600_u8.iter().map(|&v| v > 128).collect();
 
     // ---- rgb @600 (LANCZOS) + sat/luma/hue ----
-    let rgb600 = rgb600_lanczos(&src, mw, mh);
+    let rgb600 = rgb600_lanczos(src, mw, mh);
     let (sat, luma) = compute_sat_luma(&rgb600);
     let hue = compute_hue(&rgb600.r, &rgb600.g, &rgb600.b);
     let lumaf = ndimage::median_filter(&luma, mw, mh, kmed);
@@ -693,34 +599,6 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
             }
         }
     }
-
-    // ---- DESCREEN ONCE: BOX 2400->600 then guard-band Hann low-pass ----
-    let mut rch = vec![0.0f32; w * h];
-    let mut gch = vec![0.0f32; w * h];
-    let mut bch = vec![0.0f32; w * h];
-    for i in 0..w * h {
-        rch[i] = src.data[i * 3] as f32;
-        gch[i] = src.data[i * 3 + 1] as f32;
-        bch[i] = src.data[i * 3 + 2] as f32;
-    }
-    let ir = resample_plane_f32(&rch, w, h, mw, mh, Filter::Box);
-    let ig = resample_plane_f32(&gch, w, h, mw, mh, Filter::Box);
-    let ib = resample_plane_f32(&bch, w, h, mw, mh, Filter::Box);
-    let t_y = tap(mw, mh, 80.0, 100.0);
-    let t_c = tap(mw, mh, 30.0, 50.0);
-    let yi: Vec<f32> = (0..mw * mh)
-        .map(|i| 0.299 * ir[i] + 0.587 * ig[i] + 0.114 * ib[i])
-        .collect();
-    let cbi: Vec<f32> = (0..mw * mh).map(|i| ib[i] - yi[i]).collect();
-    let cri: Vec<f32> = (0..mw * mh).map(|i| ir[i] - yi[i]).collect();
-    let dy = lp_field(&yi, mw, mh, &t_y);
-    let dcb = lp_field(&cbi, mw, mh, &t_c);
-    let dcr = lp_field(&cri, mw, mh, &t_c);
-    let drf: Vec<f32> = (0..mw * mh).map(|i| dy[i] + dcr[i]).collect();
-    let dbf: Vec<f32> = (0..mw * mh).map(|i| dy[i] + dcb[i]).collect();
-    let dgf: Vec<f32> = (0..mw * mh)
-        .map(|i| (dy[i] - 0.299 * drf[i] - 0.114 * dbf[i]) / 0.587)
-        .collect();
 
     // ---- step 7: image vs text-on-bg (per-cluster, pure CMYK) ----
     let tcv = env_f("TCV", 30.0);
@@ -829,19 +707,30 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
                     image[i] = true;
                 }
             }
+            // bbox + feature means: needed by the record ALWAYS (the differ cannot recover a gate
+            // value once the binary has changed), and by the DIAG print when it is on.
+            let (mut x0, mut y0, mut x1, mut y1) = (mw, mh, 0usize, 0usize);
+            for &i in idx {
+                let (x, y) = (i % mw, i / mw);
+                x0 = x0.min(x);
+                y0 = y0.min(y);
+                x1 = x1.max(x);
+                y1 = y1.max(y);
+            }
+            let n = idx.len() as f64;
+            let cvm = idx.iter().map(|&i| colorvar[i] as f64).sum::<f64>() / n;
+            let sm = idx.iter().map(|&i| satmean[i] as f64).sum::<f64>() / n;
+            let tvm = idx.iter().map(|&i| tonevar[i] as f64).sum::<f64>() / n;
+            rec.push(serde_json::json!({
+                "kind": "cluster", "page": page, "cid": k, "area": idx.len(),
+                "bbox": [x0, y0, x1, y1],
+                "layer": if is_img { "bg" } else { "k" },
+                "verdict": if is_img { "IMAGE" } else { "TEXT" },
+                "rescue": is_img && frac < vote as f64,
+                "vote": r2(frac), "cv": r2(cvm), "s": r2(sm), "tv": r2(tvm),
+                "bodyK": r2(sdk), "objfK": r2(objfk), "bodyC": r2(sdc),
+            }));
             if diag {
-                let (mut x0, mut y0, mut x1, mut y1) = (mw, mh, 0usize, 0usize);
-                for &i in idx {
-                    let (x, y) = (i % mw, i / mw);
-                    x0 = x0.min(x);
-                    y0 = y0.min(y);
-                    x1 = x1.max(x);
-                    y1 = y1.max(y);
-                }
-                let n = idx.len() as f64;
-                let cvm = idx.iter().map(|&i| colorvar[i] as f64).sum::<f64>() / n;
-                let sm = idx.iter().map(|&i| satmean[i] as f64).sum::<f64>() / n;
-                let tvm = idx.iter().map(|&i| tonevar[i] as f64).sum::<f64>() / n;
                 // bbox normalized to [0,1] in (mw,mh) = the page frame, for cluster cropping
                 eprintln!(
                     "DIAG cid={} area={} bbox={:.4},{:.4},{:.4},{:.4} cx={:.3} cy={:.3} vote={:.2} cv={:.1} s={:.1} tv={:.1} bodyK={:.1} objfK={:.2} bodyC={:.1} verdict={}",
@@ -888,6 +777,14 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
             let ba = (bw_ * bh_) as f64;
             let dark_frac = cpx as f64 / ba;
             if dark_frac <= darkfrac_env {
+                // recorded without filled/hole: the hole-fill is the expensive part and this
+                // candidate never reaches it, so those stay null rather than being invented.
+                rec.push(serde_json::json!({
+                    "kind": "darkfill", "page": page, "cid": k, "px": cpx,
+                    "bbox": [x0, y0, x1, y1], "layer": "k", "promoted": false,
+                    "dark_frac": r2(dark_frac),
+                    "filled_frac": serde_json::Value::Null, "hole_frac": serde_json::Value::Null,
+                }));
                 continue; // loose text / hollow frame -> skip
             }
             // build sub-mask of this component over its bbox, fill holes, count
@@ -903,7 +800,17 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
             let fp = filled.iter().filter(|&&b| b).count();
             let filled_frac = fp as f64 / ba;
             let hole_frac = (fp - cpx) as f64 / ba;
-            if filled_frac > filled_env && hole_frac > holes_lo && hole_frac < holes_hi {
+            let promote = filled_frac > filled_env && hole_frac > holes_lo && hole_frac < holes_hi;
+            // EVERY candidate is recorded, not just the promoted ones: the near-misses are how a
+            // gate change is judged, and the p062 "8" sat 0.12 inside a boundary nobody had looked at.
+            rec.push(serde_json::json!({
+                "kind": "darkfill", "page": page, "cid": k, "px": cpx,
+                "bbox": [x0, y0, x1, y1],
+                "layer": if promote { "bg" } else { "k" },
+                "promoted": promote,
+                "dark_frac": r2(dark_frac), "filled_frac": r2(filled_frac), "hole_frac": r2(hole_frac),
+            }));
+            if promote {
                 // Force the FILL's bbox into BOTH image (-> no K blob) AND m600 (-> the descreened
                 // contone bg is actually PAINTED here; otherwise the bg whiteout `bg[~m150]=255`
                 // would leave the box blank, since reversed fills sit OUTSIDE the screened mask M).
@@ -927,8 +834,6 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
         );
     }
 
-    let scrf: Vec<bool> = (0..mw * mh).map(|i| m600[i] && !image[i]).collect();
-
     // ---- K (black) layer ----
     let bgl = ndimage::maximum_filter(&luma, mw, mh, 9);
     let bgd = ndimage::minimum_filter(&luma, mw, mh, 3);   // darkest 3x3 neighbour (lone-dot support test)
@@ -949,6 +854,42 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
         let (lbk, nk) = ndimage::label(&black, mw, mh);
         if nk > 0 {
             let szk = ndimage::component_sizes(&lbk, nk);
+            // RECORD what the despeckle throws away. Most of it is single-pixel scan noise and
+            // recording each one would bury the file, so: an aggregate row always, plus an
+            // individual row per dropped component at or above KDROP_REC (default 4 px @600) --
+            // the size range where a drop could still be a real mark (a thin serif, a period)
+            // rather than a speck. Same gate that has already cost us one shipped bug at the
+            // cluster level, so it is worth being able to see it.
+            let recmin = env_i("KDROP_REC", 4) as u64;
+            let mut dropped = 0usize;
+            let mut cx = vec![0u64; nk + 1];
+            let mut cy = vec![0u64; nk + 1];
+            if rec.enabled() {
+                for (i, &l) in lbk.iter().enumerate() {
+                    if l != 0 && szk[l as usize - 1] < MIN_K as u64 {
+                        cx[l as usize] += (i % mw) as u64;
+                        cy[l as usize] += (i / mw) as u64;
+                    }
+                }
+            }
+            for k in 1..=nk {
+                let s = szk[k - 1];
+                if s >= MIN_K as u64 {
+                    continue;
+                }
+                dropped += 1;
+                if rec.enabled() && s >= recmin {
+                    rec.push(serde_json::json!({
+                        "kind": "kdrop", "page": page, "cid": k, "px": s,
+                        "centroid": [cx[k] / s, cy[k] / s],
+                        "layer": "dropped",
+                    }));
+                }
+            }
+            rec.push(serde_json::json!({
+                "kind": "kdrop_total", "page": page, "components": nk, "dropped": dropped,
+                "min_k": MIN_K, "recorded_above": recmin,
+            }));
             black = lbk
                 .iter()
                 .map(|&l| l != 0 && szk[l as usize - 1] >= MIN_K as u64)
@@ -980,6 +921,122 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
         }
     }
     eprintln!("present accent inks: {:?}", present);
+    rec.push(serde_json::json!({
+        "kind": "page", "page": page, "mw": mw, "mh": mh, "inks": present,
+        "image_frac": r2(image.iter().filter(|&&b| b).count() as f64 / (mw * mh) as f64),
+        "screen_frac": r2(m600.iter().filter(|&&b| b).count() as f64 / (mw * mh) as f64),
+        "tint_frac": r2(tintmask.iter().filter(|&&b| b).count() as f64 / (mw * mh) as f64),
+        "k_frac": r2(black.iter().filter(|&&b| b).count() as f64 / (mw * mh) as f64),
+    }));
+
+
+    Ok(Analysis { mw, mh, rgb600, sat, luma, hue, lumaf, satf, m600, image, tintmask, black, inkpix,
+                  present })
+}
+
+
+/// FAST classify-only path: runs `analyze` -- the identical decisions the render makes -- and
+/// writes the record, skipping the descreen FFT, the jbig2 ink layers and the PDF assembly. For
+/// sweeping decisions across the whole issue cheaply (~22s a page against ~47s for a full render).
+pub fn run_classify(page_png: &str, score_npy: &str, thr: f32) -> Result<()> {
+    let src = imageio::read_rgb_png(page_png)?;
+    let (score, shape) = npy::read_f32(score_npy)?;
+    let (ny, nx) = (shape[0], shape[1]);
+    let page = page_stem(page_png);
+    let mut rec = Recorder::new(record_path(score_npy, ".npy", "_classify.jsonl"));
+    let _a = analyze(&src, &score, ny, nx, thr, score_npy, &page, &mut rec)?;
+    rec.flush()?;
+    Ok(())
+}
+
+/// The page identity carried in every record row: the file stem with any of our suffixes stripped,
+/// so `154_page_rgb.png` and `154.png` record as the same page and their runs can be differed.
+fn page_stem(path: &str) -> String {
+    let s = std::path::Path::new(path)
+        .file_stem()
+        .map(|s| s.to_string_lossy().to_string())
+        .unwrap_or_default();
+    for suf in ["_page_rgb", "_rgb", "_page"] {
+        if let Some(t) = s.strip_suffix(suf) {
+            return t.to_string();
+        }
+    }
+    s
+}
+
+/// Where the record goes: MRC_RECORD if set, else derived from the output the run already names,
+/// so a baseline exists without anyone having to remember to ask for one.
+fn record_path(base: &str, strip: &str, add: &str) -> Option<String> {
+    if let Ok(p) = std::env::var("MRC_RECORD") {
+        return if p.is_empty() { None } else { Some(p) };
+    }
+    Some(format!("{}{}", base.strip_suffix(strip).unwrap_or(base), add))
+}
+
+
+pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi: f32) -> Result<()> {
+    let src = imageio::read_rgb_png(page_png)?;
+    let w = src.w;
+    let h = src.h;
+    let (score, shape) = npy::read_f32(score_npy)?;
+    let ny = shape[0];
+    let nx = shape[1];
+
+    // work dir
+    let out_dir = std::path::Path::new(out_pdf)
+        .parent()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let stem = std::path::Path::new(out_pdf)
+        .file_stem()
+        .unwrap()
+        .to_string_lossy()
+        .to_string();
+    let work = if out_dir.is_empty() {
+        format!(".mrctmp_{}", stem)
+    } else {
+        format!("{}/.mrctmp_{}", out_dir, stem)
+    };
+    std::fs::create_dir_all(&work)?;
+
+
+    // ---- DECIDE (shared with `classify`: one implementation, no sync to maintain) ----
+    let page = page_stem(page_png);
+    let mut rec = Recorder::new(record_path(out_pdf, ".pdf", ".jsonl"));
+    let Analysis { mw, mh, rgb600: _rgb600, sat, luma, hue, lumaf, satf, m600, image, tintmask,
+                   black, inkpix, present } =
+        analyze(&src, &score, ny, nx, thr, score_npy, &page, &mut rec)?;
+    let _ = (&sat, &luma, &lumaf, &satf);
+
+    // ---- DESCREEN ONCE: BOX 2400->600 then guard-band Hann low-pass ----
+    let mut rch = vec![0.0f32; w * h];
+    let mut gch = vec![0.0f32; w * h];
+    let mut bch = vec![0.0f32; w * h];
+    for i in 0..w * h {
+        rch[i] = src.data[i * 3] as f32;
+        gch[i] = src.data[i * 3 + 1] as f32;
+        bch[i] = src.data[i * 3 + 2] as f32;
+    }
+    let ir = resample_plane_f32(&rch, w, h, mw, mh, Filter::Box);
+    let ig = resample_plane_f32(&gch, w, h, mw, mh, Filter::Box);
+    let ib = resample_plane_f32(&bch, w, h, mw, mh, Filter::Box);
+    let t_y = tap(mw, mh, 80.0, 100.0);
+    let t_c = tap(mw, mh, 30.0, 50.0);
+    let yi: Vec<f32> = (0..mw * mh)
+        .map(|i| 0.299 * ir[i] + 0.587 * ig[i] + 0.114 * ib[i])
+        .collect();
+    let cbi: Vec<f32> = (0..mw * mh).map(|i| ib[i] - yi[i]).collect();
+    let cri: Vec<f32> = (0..mw * mh).map(|i| ir[i] - yi[i]).collect();
+    let dy = lp_field(&yi, mw, mh, &t_y);
+    let dcb = lp_field(&cbi, mw, mh, &t_c);
+    let dcr = lp_field(&cri, mw, mh, &t_c);
+    let drf: Vec<f32> = (0..mw * mh).map(|i| dy[i] + dcr[i]).collect();
+    let dbf: Vec<f32> = (0..mw * mh).map(|i| dy[i] + dcb[i]).collect();
+    let dgf: Vec<f32> = (0..mw * mh)
+        .map(|i| (dy[i] - 0.299 * drf[i] - 0.114 * dbf[i]) / 0.587)
+        .collect();
+
+    let scrf: Vec<bool> = (0..mw * mh).map(|i| m600[i] && !image[i]).collect();
 
     // build ink layers
     struct Layer {
@@ -1099,6 +1156,15 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
         present,
         std::fs::metadata(out_pdf)?.len() / 1024
     );
+    // Output sizes are a decision outcome too -- a fix that quietly doubles the K layer should be
+    // visible in the diff, not only in a directory listing.
+    rec.push(serde_json::json!({
+        "kind": "output", "page": page, "bg_dpi": bg_dpi,
+        "bytes": {"bg": bgdata.len(), "k": kdata.len(),
+                  "ink": layers.iter().map(|l| l.data.len()).sum::<usize>(),
+                  "pdf": std::fs::metadata(out_pdf)?.len()},
+    }));
+    rec.flush()?;
     Ok(())
 }
 
