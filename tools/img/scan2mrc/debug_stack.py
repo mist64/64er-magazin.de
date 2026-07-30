@@ -40,7 +40,6 @@ Image.MAX_IMAGE_PIXELS = None
 THUMB   = "/Users/mist/DNB/8609/thumbs_600"
 SKEW    = "/Users/mist/DNB/8609/tmp/skew_all.txt"
 CROP    = "/Users/mist/DNB/8609/tmp/crop_windows.json"
-PRIORSF = os.path.join(os.path.dirname(__file__), "02-matte/priors.json")
 OUT     = "/Users/mist/DNB/8609/tmp"
 
 SCALE       = 4                       # master 2400 -> 600 thumb
@@ -84,7 +83,6 @@ def main():
     Se, So   = S_m["even"] / SCALE, S_m["odd"] / SCALE
     W4       = A4_W_m / SCALE
 
-    priors = json.load(open(PRIORSF))
     skew   = load_skew()
     pages  = [int(x) for x in sys.argv[1:]] or DEFAULT
 
@@ -94,7 +92,7 @@ def main():
         H, W = rgb.shape[:2]
 
         # -- 02 bed matte + 02b spine, detected on the RAW thumb --------------- #
-        bed_rgba, _, _  = bed_matte(im, 600, priors=priors, page_no=n, return_meta=True)
+        bed_rgba, _, _  = bed_matte(im, 600, return_meta=True)
         spn_rgba, _, _  = spine_matte(im, 600, page_no=n, return_meta=True)
         bed_cut   = np.asarray(bed_rgba)[:, :, 3] == 0
         spine_cut = np.asarray(spn_rgba)[:, :, 3] == 0

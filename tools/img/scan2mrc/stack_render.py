@@ -59,7 +59,6 @@ THUMB   = "/Users/mist/DNB/8609/thumbs_600"
 SKEW    = "/Users/mist/DNB/8609/tmp/skew_all.txt"
 SPINE   = "/Users/mist/DNB/8609/tmp/spine_all.json"
 CLIPJS  = "/Users/mist/DNB/8609/tmp/clip_holes.json"
-PRIORSF = os.path.join(HERE, "02-matte/priors.json")
 OUT_DIR = "/Users/mist/DNB/8609/tmp/stack600"
 ALPHA_DIR = "/Users/mist/DNB/8609/tmp/stack_alpha"
 
@@ -187,14 +186,14 @@ def spine_mask(shape, rec, parity, clip_entry):
     return _cut_outboard((H, W), hole_inb + HOLE_OVERCUT, parity), "holes"
 
 
-def _masks(page, priors, spine, clip, im):
+def _masks(page, spine, clip, im):
     """Per-STAGE masks in the raw scan frame, kept separate so review can colour them by
     source and a wrong cut can be attributed to the detector that made it."""
     p = "%03d" % page
     W, H = im.size
     parity = "even" if page % 2 == 0 else "odd"
 
-    bed_rgba, _, meta = bed_matte(im, DPI, priors=priors, page_no=page, return_meta=True)
+    bed_rgba, _, meta = bed_matte(im, DPI, return_meta=True)
     m_bed = (np.asarray(bed_rgba)[:, :, 3] == 0)
 
     m_spine, src = spine_mask((H, W), spine.get(p), parity, clip.get(p))
@@ -210,11 +209,11 @@ def _masks(page, priors, spine, clip, im):
     return m_bed, m_spine, m_holes, src, meta
 
 
-def render(page, priors, skew, spine, clip, tmpl):
+def render(page, skew, spine, clip, tmpl):
     """ALPHA render: what would actually be cut, as transparency."""
     im = Image.open(os.path.join(THUMB, "%03d.png" % page)).convert("RGB")
     W, H = im.size
-    m_bed, m_spine, m_holes, src, _ = _masks(page, priors, spine, clip, im)
+    m_bed, m_spine, m_holes, src, _ = _masks(page, spine, clip, im)
     unknown = m_bed | m_spine | m_holes
 
     ang = skew.get(page, 0.0)
@@ -231,7 +230,7 @@ def render(page, priors, skew, spine, clip, tmpl):
     return out, ang, float((np.asarray(known) == 0).mean()), src
 
 
-def render_review(page, priors, skew, spine, clip):
+def render_review(page, skew, spine, clip):
     """REVIEW render: OUTLINE what WOULD be cut, remove nothing. Full page. See REVIEW_DIR.
 
     Magenta hairlines, not a tint wash. A wash states the verdict but hides the evidence under
@@ -241,7 +240,7 @@ def render_review(page, priors, skew, spine, clip):
     """
     im = Image.open(os.path.join(THUMB, "%03d.png" % page)).convert("RGB")
     W, H = im.size
-    m_bed, m_spine, m_holes, src, meta = _masks(page, priors, spine, clip, im)
+    m_bed, m_spine, m_holes, src, meta = _masks(page, spine, clip, im)
     cutmask = m_bed | m_spine | m_holes
 
     out = im
@@ -312,7 +311,6 @@ _CTX = {}
 
 def _init():
     """Load the shared per-issue metadata once per worker process."""
-    _CTX["priors"] = json.load(open(PRIORSF))
     _CTX["skew"] = load_skew()
     _CTX["spine"] = json.load(open(SPINE)) if os.path.exists(SPINE) else {}
     _CTX["clip"] = json.load(open(CLIPJS))
@@ -322,12 +320,12 @@ def _one(args):
     n, measure, review = args
     try:
         if review:
-            out, ang, frac, src = render_review(n, _CTX["priors"], _CTX["skew"],
+            out, ang, frac, src = render_review(n, _CTX["skew"],
                                                 _CTX["spine"], _CTX["clip"])
             out.save(os.path.join(REVIEW_DIR, "%03d.png" % n))
             return dict(page=n, ok=True, ang=ang, frac=frac, src=src,
                         size=list(out.size), edges={})
-        out, ang, frac, src = render(n, _CTX["priors"], _CTX["skew"], _CTX["spine"],
+        out, ang, frac, src = render(n, _CTX["skew"], _CTX["spine"],
                                      _CTX["clip"], None)
         alpha = np.asarray(out)[:, :, 3]
         depths = edge_depths(alpha)

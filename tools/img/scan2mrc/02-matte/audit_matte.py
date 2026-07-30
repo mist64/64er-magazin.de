@@ -63,14 +63,12 @@ def audit_page(page):
     lum = a @ np.array([0.299, 0.587, 0.114], np.float32)
     sat = a.max(2) - a.min(2)
     dtb, dlr = int(B.WIN_TB_FRAC * H), int(B.WIN_LR_FRAC * W)
-    priors = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                         "priors.json")))
     # Audit the FULL composed stack, not bed_matte alone. On a binding-side edge the
     # neighbour is removed by the SPINE cut, not by bed_matte, so auditing bed_matte in
     # isolation reported every binding edge as uncut residue -- which is why left/right
     # dominated the flagged list while bottom was clean (p108 even: its right edge is the
     # binding side and the neighbour is correctly gone via the cyan spine cut).
-    m_bed, m_spine, m_holes, src, meta = SR._masks(page, priors, _CTX_SPINE, _CTX_CLIP, im)
+    m_bed, m_spine, m_holes, src, meta = SR._masks(page, _CTX_SPINE, _CTX_CLIP, im)
     alpha = np.where(m_bed | m_spine | m_holes, 0, 255).astype(np.uint8)
 
     out = {}
