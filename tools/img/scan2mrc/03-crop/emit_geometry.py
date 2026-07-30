@@ -163,8 +163,20 @@ if __name__ == "__main__":
     with Pool(A.jobs, initializer=_init) as pool:
         res = pool.map(_one, items)
     res.sort(key=lambda r: r["page"])
-    json.dump({"dpi_out": DPI_OUT, "a4_out": [A4_W_OUT, A4_H_OUT],
-               "pages": {str(r["page"]): r for r in res}}, open(OUTJ, "w"), indent=1)
+    # MERGE, never replace. Writing only the pages just processed silently drops every other
+    # page's geometry -- and since render_page emits geometry ONLY for pages missing from this
+    # file, a dropped page would then be silently regenerated while a PRESENT one is never
+    # refreshed. That is exactly how the .npz profiles stayed on the pre-penumbra matte through a
+    # full 7-hour re-cache: the file said the page was known, so nothing recomputed it.
+    cur = {}
+    if os.path.exists(OUTJ):
+        try:
+            cur = json.load(open(OUTJ)).get("pages", {})
+        except Exception:
+            cur = {}
+    cur.update({str(r["page"]): r for r in res})
+    json.dump({"dpi_out": DPI_OUT, "a4_out": [A4_W_OUT, A4_H_OUT], "pages": cur},
+              open(OUTJ, "w"), indent=1)
     print("wrote %s and %d npz" % (OUTJ, len(res)))
     for r in res[:4]:
         print("  p%03d ang %+.2f  corners_master TL %s BR %s  %s/%s" % (

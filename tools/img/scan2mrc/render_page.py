@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Render a page through the whole front end and emit ALL THREE artifacts, always.
+"""THE 2400 dpi APPLY IS NOW `mrcpipe apply` (Rust, pixel-identical, 8x faster).
+This script is the 600 dpi review path plus geometry emission; it no longer separates or grades.
+
+Render a page through the whole front end and emit ALL THREE artifacts, always.
 
     tmp/render/debug/NNN.tif          600 dpi, nothing removed: magenta hairlines on every cut
                                   boundary + the A4 window rect. This is what you judge from --
@@ -35,7 +38,6 @@ sys.path.insert(0, os.path.join(HERE, "03-crop"))
 sys.path.insert(0, os.path.join(HERE, "04-grade"))
 import stack_render as SR
 import emit_geometry as EG
-import apply_fullres as AF
 
 Image.MAX_IMAGE_PIXELS = None
 ROOT = "/Users/mist/DNB/8609/tmp/render"
@@ -100,8 +102,7 @@ def _one(args):
     return render(*args)
 
 
-def render(page, variant="display", knorm="known", skip_full=False, keep_rgb=False,
-           inpaint=False, detect_too=False, page_rgb=False):
+def render(page):
     t0 = time.time()
     win = json.load(open(WINS))["windows"][str(page)]
     for d in ("debug", "a4_600", "deliver"):
@@ -124,12 +125,6 @@ def render(page, variant="display", knorm="known", skip_full=False, keep_rgb=Fal
 
     rep = {"page": page, "src": win["src"], "skew": ang, "spine": src,
            "alpha600_pct": round(100.0 * float((a6 == 0).mean()), 3)}
-    if not skip_full:
-        AF.OUTD = os.path.join(ROOT, "deliver")
-        rep.update({("full_" + k): v for k, v in
-                    AF.run(page, knorm=knorm, write=True, variant=variant,
-                           keep_rgb=keep_rgb, inpaint=inpaint,
-                           detect_too=detect_too, page_rgb=page_rgb).items()})
     rep["secs"] = round(time.time() - t0, 1)
     return rep
 
@@ -146,25 +141,12 @@ def _init():
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("pages", nargs="+", type=int)
-    ap.add_argument("--variant", default="display", choices=("display", "detect"))
-    ap.add_argument("--knorm", default="known", choices=("master", "crop", "known"))
     ap.add_argument("--jobs", type=int, default=3)
-    ap.add_argument("--detect-too", action="store_true",
-                    help="also write the UNFILLED detect-graded CMYK for the screening analysis")
-    ap.add_argument("--inpaint", action="store_true",
-                    help="mirror-fill the edges and diffuse the holes in the deliverable")
-    ap.add_argument("--page-rgb", action="store_true",
-                    help="also write the RGB page the MRC render consumes (ALL.sh's contract: "
-                         "graded CMYK, NOT GCR'd, through SWOP->AdobeRGB)")
-    ap.add_argument("--keep-rgb", action="store_true",
-                    help="also write the 1.67GB pre-separation RGB (verify_fullres reads it)")
-    ap.add_argument("--skip-full", action="store_true",
-                    help="600 dpi views only (the 2400 dpi apply is ~2.5 min/page)")
     A = ap.parse_args()
     _init()
     need = [p for p in A.pages
             if str(p) not in json.load(open(EG.OUTJ))["pages"]] if os.path.exists(EG.OUTJ) else A.pages
-    if need and not A.skip_full:
+    if need:
         print("emitting geometry for %s ..." % need)
         EG._init()
         recs = [(p, json.load(open(WINS))["windows"][str(p)]) for p in need]
@@ -177,8 +159,7 @@ if __name__ == "__main__":
     # 3 workers, not 4: the 2400dpi apply holds the sampled RGB (1.67GB), the unknown mask and
     # four CMYK planes at once, ~4.5GB per page. Four would be 18GB resident and this machine has
     # already been taken down once by over-parallelising image work.
-    args = [(p, A.variant, A.knorm, A.skip_full, A.keep_rgb, A.inpaint, A.detect_too, A.page_rgb)
-            for p in A.pages]
+    args = [(p,) for p in A.pages]
     if A.jobs > 1 and len(args) > 1:
         with Pool(A.jobs, initializer=_init) as pool:
             for r in pool.imap_unordered(_one, args):

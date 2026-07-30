@@ -872,6 +872,10 @@ pub struct Opts {
     pub inpaint: bool,
     pub detect_too: bool,
     pub cache: bool,
+    /// Also write the 2400 dpi page RGB PNG the CURRENT `mrc` reads. Kept so this command is a
+    /// drop-in replacement for the Python apply: `mrc` can move to the cached 600 dpi products
+    /// later as a pure optimisation rather than as a precondition for deleting the Python.
+    pub page_rgb: bool,
     pub write: bool,
 }
 
@@ -950,7 +954,7 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
         separate_grade(&wp.rgb, w, h, lv, dmin, dmax)
     });
     drop(wp.rgb);
-    let nog = if o.cache { Some(cm.clone_planes()) } else { None };
+    let nog = if o.cache || o.page_rgb { Some(cm.clone_planes()) } else { None };
     stage!(t0, "gcr", times, { gcr(&mut cm) });
 
     let gcr_ok = cm
@@ -992,6 +996,13 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
     if let Some(nog) = nog {
         let pagergb = stage!(t0, "icc transform", times, { icc_page_rgb(&nog, &o.profile_dir)? });
         drop(nog);
+        if o.page_rgb {
+            stage!(t0, "write page_rgb png", times, {
+                pilio::write_rgb_png_fast(
+                    &format!("{}/{:03}_page_rgb.png", o.out_dir, page), w, h, &pagergb)?
+            });
+        }
+        if o.cache {
         let (ny, nx) = (h / HOP, w / HOP);
         stage!(t0, "tile stats 2400", times, {
             let t = luma_tiles_2400(&pagergb, w, ny, nx);
@@ -1026,6 +1037,7 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
             format!("{}/{:03}_cache.json", o.out_dir, page),
             serde_json::to_string(&meta)?,
         )?;
+        }
     }
 
     Ok(serde_json::json!({
