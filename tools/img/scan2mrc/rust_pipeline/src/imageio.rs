@@ -30,6 +30,20 @@ impl Cmyk {
             k: vec![0; w * h],
         }
     }
+    /// A copy of all four planes. The apply needs the graded-but-NOT-GCR'd CMYK alongside the
+    /// GCR'd one (the MRC page is built from the former, the deliverable from the latter). They
+    /// are the same computation up to the GCR block, so it copies rather than separating a
+    /// 557 MP page a second time.
+    pub fn clone_planes(&self) -> Cmyk {
+        Cmyk {
+            w: self.w,
+            h: self.h,
+            c: self.c.clone(),
+            m: self.m.clone(),
+            y: self.y.clone(),
+            k: self.k.clone(),
+        }
+    }
     pub fn channel(&self, i: usize) -> &[u8] {
         match i {
             0 => &self.c,

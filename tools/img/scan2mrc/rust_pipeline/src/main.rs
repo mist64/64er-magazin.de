@@ -1,3 +1,4 @@
+mod apply;
 mod detect;
 mod fftutil;
 mod geometry;
@@ -6,6 +7,7 @@ mod imageio;
 mod mrc;
 mod ndimage;
 mod npy;
+mod pilio;
 mod record;
 mod resample;
 mod separate;
@@ -78,6 +80,36 @@ enum Cmd {
         /// measured screen ruling for this issue is 136-159 lpi, which is the real limit.
         #[arg(long, default_value_t = 200.0)]
         bg_dpi: f64,
+    },
+    /// master scan -> deskewed, matted, A4-cropped, graded CMYK (04-grade/apply_fullres.py).
+    ///
+    /// With --cache it ALSO writes what `mrc` consumes -- 2400 dpi tile statistics, 600 dpi
+    /// Lanczos RGB and 600 dpi Box RGB -- instead of a 200 MB page RGB PNG. See APPLY_PORT.md.
+    Apply {
+        pages: Vec<u32>,
+        #[arg(long, default_value = "/Users/mist/DNB/8609/master_2400")]
+        master: String,
+        #[arg(long, default_value = "/Users/mist/DNB/8609/tmp/page_geometry.json")]
+        geo: String,
+        #[arg(long, default_value = "/Users/mist/DNB/8609/tmp/page_geometry")]
+        geo_dir: String,
+        #[arg(long, default_value = "/Users/mist/DNB/8609/tmp/render/deliver")]
+        out: String,
+        #[arg(long, default_value = "/Users/mist/Documents/git/64er-magazin.de/tools/img")]
+        profiles: String,
+        #[arg(long, value_enum, default_value = "display")]
+        variant: GradeVariant,
+        /// mirror-fill the edge bands (the interior-hole Telea path is NOT ported)
+        #[arg(long)]
+        inpaint: bool,
+        /// also write the UNFILLED detect-graded CMYK the screening analysis reads
+        #[arg(long)]
+        detect_too: bool,
+        /// also write the cached MRC inputs (tile stats + 600 dpi Lanczos/Box RGB)
+        #[arg(long)]
+        cache: bool,
+        #[arg(long)]
+        no_write: bool,
     },
     /// The SAME decisions `mrc` makes (cluster mask, tint, step 7, darkfill, K despeckle, ink
     /// presence) plus the JSONL record, without the descreen FFT / jbig2 / PDF. ~22s a page
@@ -154,6 +186,36 @@ fn main() -> Result<()> {
             let t = std::time::Instant::now();
             mrc::run_mrc(&page_png, &score_npy, &out_pdf, thr as f32, bg_dpi as f32)?;
             eprintln!("mrc -> {} ({:.1}s)", out_pdf, t.elapsed().as_secs_f64());
+        }
+        Cmd::Apply {
+            pages,
+            master,
+            geo,
+            geo_dir,
+            out,
+            profiles,
+            variant,
+            inpaint,
+            detect_too,
+            cache,
+            no_write,
+        } => {
+            let o = apply::Opts {
+                master_dir: master,
+                geo_json: geo,
+                geo_dir,
+                out_dir: out,
+                profile_dir: profiles,
+                variant_display: matches!(variant, GradeVariant::Display),
+                inpaint,
+                detect_too,
+                cache,
+                write: !no_write,
+            };
+            for p in pages {
+                let r = apply::run(p, &o)?;
+                println!("{}", serde_json::to_string(&r)?);
+            }
         }
         Cmd::Classify { page_png, score_npy, thr } => {
             let t = std::time::Instant::now();

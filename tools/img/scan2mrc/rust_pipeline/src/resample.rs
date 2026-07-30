@@ -145,6 +145,55 @@ pub fn resample_plane_f32(
     out
 }
 
+/// Resample ONE channel of an interleaved 8-bit RGB image without materialising the full-res
+/// f32 plane first. Bit-for-bit the same as `resample_plane_f32` over that plane -- the
+/// accumulator is f64 either way and `u8 as f32 as f64 == u8 as f64` -- but a 2400 dpi page
+/// plane is 2.2 GB and the apply needs six of them.
+pub fn resample_rgb_channel(
+    src: &[u8],
+    ch: usize,
+    in_w: usize,
+    in_h: usize,
+    out_w: usize,
+    out_h: usize,
+    filter: Filter,
+) -> Vec<f32> {
+    use rayon::prelude::*;
+    let (ff, sup): (fn(f64) -> f64, f64) = match filter {
+        Filter::Box => (box_filter, box_support()),
+        Filter::Lanczos => (lanczos_filter, lanczos_support()),
+        Filter::Nearest => panic!("NEAREST has no coefficient path"),
+    };
+    let (hb, hw, hk) = precompute_coeffs(in_w, out_w, ff, sup);
+    let mut tmp = vec![0.0f32; out_w * in_h];
+    tmp.par_chunks_mut(out_w).enumerate().for_each(|(yy, orow)| {
+        let row = &src[yy * in_w * 3..(yy + 1) * in_w * 3];
+        for xx in 0..out_w {
+            let (xmin, n) = hb[xx];
+            let base = xx * hk;
+            let mut acc = 0.0f64;
+            for x in 0..n {
+                acc += row[(xmin + x) * 3 + ch] as f64 * hw[base + x];
+            }
+            orow[xx] = acc as f32;
+        }
+    });
+    let (vb, vw, vk) = precompute_coeffs(in_h, out_h, ff, sup);
+    let mut out = vec![0.0f32; out_w * out_h];
+    out.par_chunks_mut(out_w).enumerate().for_each(|(yy, orow)| {
+        let (ymin, n) = vb[yy];
+        let base = yy * vk;
+        for xx in 0..out_w {
+            let mut acc = 0.0f64;
+            for y in 0..n {
+                acc += tmp[(ymin + y) * out_w + xx] as f64 * vw[base + y];
+            }
+            orow[xx] = acc as f32;
+        }
+    });
+    out
+}
+
 fn nearest_plane_f32(
     src: &[f32],
     in_w: usize,

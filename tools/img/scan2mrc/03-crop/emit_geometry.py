@@ -115,11 +115,19 @@ def _one(args):
             pass
 
     os.makedirs(OUTD, exist_ok=True)
-    np.savez_compressed(os.path.join(OUTD, "%03d.npz" % n),
-                        bed_top=bed["top"], bed_bottom=bed["bottom"],
-                        bed_left=bed["left"], bed_right=bed["right"],
-                        spine_inb=np.asarray(inb, np.float32),
-                        holes=np.packbits(holes, axis=-1), holes_shape=np.array([H, W]))
+    arrs = {"bed_top": bed["top"], "bed_bottom": bed["bottom"],
+            "bed_left": bed["left"], "bed_right": bed["right"],
+            "spine_inb": np.asarray(inb, np.float32),
+            "holes": np.packbits(holes, axis=-1),
+            "holes_shape": np.array([H, W])}
+    np.savez_compressed(os.path.join(OUTD, "%03d.npz" % n), **arrs)
+    # ALSO as plain .npy, one per array, for the Rust apply. A .npz is a ZIP, and the Rust side
+    # has an .npy reader but no ZIP parser -- adding one to read our own sidecar would be the
+    # wrong dependency. Same arrays, same values; the .npz stays for the Python path.
+    d = os.path.join(OUTD, "%03d" % n)
+    os.makedirs(d, exist_ok=True)
+    for k, v in arrs.items():
+        np.save(os.path.join(d, k + ".npy"), v)
     return {
         "page": n, "angle_deg": ang, "parity": parity,
         "thumb_size": [W, H], "master_size": [mw, mh], "scale": [sx, sy],

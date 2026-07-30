@@ -99,6 +99,24 @@ pub fn read_f32(path: &str) -> Result<(Vec<f32>, Vec<usize>)> {
     Ok((data, shape))
 }
 
+/// int64 arrays. `holes_shape.npy` is one: numpy's `np.array([H, W])` defaults to int64, and
+/// reading it as f32 (or deriving the width from the packed byte count) is wrong -- `packbits`
+/// pads the last byte, so `bytes*8` overstates the width by up to 7 columns and every hole
+/// lookup lands on the wrong column.
+pub fn read_i64(path: &str) -> Result<(Vec<i64>, Vec<usize>)> {
+    let mut buf = Vec::new();
+    File::open(path)?.read_to_end(&mut buf)?;
+    let (descr, shape, off) = parse_header(&buf)?;
+    if !descr.contains("i8") {
+        bail!("expected i8 (int64), got {}", descr);
+    }
+    let data: Vec<i64> = buf[off..]
+        .chunks_exact(8)
+        .map(|c| i64::from_le_bytes([c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]]))
+        .collect();
+    Ok((data, shape))
+}
+
 pub fn read_u8(path: &str) -> Result<(Vec<u8>, Vec<usize>)> {
     let mut buf = Vec::new();
     File::open(path)?.read_to_end(&mut buf)?;
