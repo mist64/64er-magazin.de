@@ -172,11 +172,17 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
     known = (~unk).reshape(-1)
     cand = {"crop": (float(kd.min()), float(kd.max())),
             "known": (float(kd[known].min()), float(kd[known].max()))}
-    m = np.asarray(Image.open(os.path.join(MASTER, "%03d.png" % page)).convert("RGB"))
-    mf = m.reshape(-1, 3).astype(np.float32)
-    kdm = np.sqrt(((mf - COLOR_K.astype(np.float32)) ** 2).sum(1))
-    cand["master"] = (float(kdm.min()), float(kdm.max()))
-    del m, mf, kdm
+    if knorm == "master":
+        # ONLY when it is actually the chosen normalisation. This decodes the 596MP master a
+        # SECOND time and allocates ~11.4GB of temporaries (1.8 uint8 + 7.2 float32 + 2.4) for a
+        # single min/max pair -- measured 22.8s a page, and with three lanes it was a large part
+        # of the memory pressure. The default knorm is "known", so this was pure waste on every
+        # page of every run so far.
+        m = np.asarray(Image.open(os.path.join(MASTER, "%03d.png" % page)).convert("RGB"))
+        mf = m.reshape(-1, 3).astype(np.float32)
+        kdm = np.sqrt(((mf - COLOR_K.astype(np.float32)) ** 2).sum(1))
+        cand["master"] = (float(kdm.min()), float(kdm.max()))
+        del m, mf, kdm
     dmin, dmax = cand[knorm]
     span = max(dmax - dmin, 1e-12)
 
@@ -184,7 +190,7 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
     pa_m, pb_m = plane(COLOR_M, COLOR_CM, COLOR_MY), plane(COLOR_C, COLOR_Y, COLOR_W)
     pa_y, pb_y = plane(COLOR_Y, COLOR_CY, COLOR_MY), plane(COLOR_C, COLOR_M, COLOR_W)
 
-    def separate_grade(src, var, gcr=True):
+    def separate_grade(src, var, gcr=True, also_nogcr=False):
         """RGB -> graded CMYK for one grade variant. GCR optional.
 
         GCR is OUR analysis step (CLAUDE.md stage 1b), not part of the canonical grade: ALL.sh
@@ -193,6 +199,13 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
         CMYK, or the render is fed a page that never existed."""
         C = np.empty((H_out, W_out), np.uint8); M = np.empty_like(C)
         Y = np.empty_like(C); K = np.empty_like(C)
+        # `also_nogcr` returns the PRE-GCR planes alongside the GCR'd ones. They are the same
+        # computation -- everything above the GCR block is deterministic and identical -- so the
+        # page RGB no longer costs a second full separation of a 557MP page (three cmy_channel
+        # plane distances, a float64 sqrt over 557M pixels and four level() passes).
+        if also_nogcr:
+            Cn = np.empty_like(C); Mn = np.empty_like(C)
+            Yn = np.empty_like(C); Kn = np.empty_like(C)
         lv = LEVELS[var]
         for y0 in range(0, H_out, STRIP):
             y1 = min(y0 + STRIP, H_out)
@@ -205,12 +218,14 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
             sh = (y1 - y0, W_out)
             c = level(c.reshape(sh), *lv["c"]); mm = level(mm.reshape(sh), *lv["m"])
             yy = level(yy.reshape(sh), *lv["y"]); k = level(k.reshape(sh), *lv["k"])
+            if also_nogcr:
+                Cn[y0:y1] = c; Mn[y0:y1] = mm; Yn[y0:y1] = yy; Kn[y0:y1] = k
             if gcr:
                 neu = np.minimum(np.minimum(c, mm), yy)
                 c = c - neu; mm = mm - neu; yy = yy - neu
                 k = np.clip(k.astype(np.int16) + neu, 0, 255).astype(np.uint8)
             C[y0:y1] = c; M[y0:y1] = mm; Y[y0:y1] = yy; K[y0:y1] = k
-        return C, M, Y, K
+        return (C, M, Y, K, Cn, Mn, Yn, Kn) if also_nogcr else (C, M, Y, K)
 
     # DETECT BEFORE FILL. The screening analysis must never see invented pixels: a mirrored band
     # carries duplicated screen and a flat one carries none, and Stage 3 classifies BY screen
@@ -235,14 +250,17 @@ def run(page, knorm="known", write=True, variant="display", keep_rgb=False,
         rgb, n_holes = IP.fill(rgb, ~unk)
         rep_ip = round(time.time() - t_ip, 1)
 
-    C, M, Y, K = separate_grade(rgb, variant)
+    want_nogcr = bool(write and page_rgb)
+    if want_nogcr:
+        C, M, Y, K, Cn, Mn, Yn, Kn = separate_grade(rgb, variant, also_nogcr=True)
+    else:
+        C, M, Y, K = separate_grade(rgb, variant)
 
     # THE PAGE THE MRC RENDERER DRAWS FROM, built to ALL.sh's contract: graded CMYK, NOT GCR'd,
     # converted to RGB through the ICC pair (US Web Coated SWOP -> AdobeRGB1998). PIL's naive
     # 255-min(255,C+K) is not that transform: measured on p006's red photo it lands 45.8 levels
     # from the scan against 33.5 for the ICC path, and inflates the std from 49 to 100.
-    if write and page_rgb:
-        Cn, Mn, Yn, Kn = separate_grade(rgb, variant, gcr=False)
+    if want_nogcr:
         prof = os.path.expanduser("~/Documents/git/64er-magazin.de/tools/img")
         tf = ImageCms.buildTransform(
             ImageCms.getOpenProfile(os.path.join(prof, "USWebCoatedSWOP.icc")),
