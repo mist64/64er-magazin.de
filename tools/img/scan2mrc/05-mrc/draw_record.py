@@ -39,6 +39,8 @@ COL = {
     "bg":      (0, 200, 60),      # the 150 dpi contone background
     "k":       (90, 90, 255),     # the JBIG2 K stencil (only drawn with --all: it is most of a page)
     "dropped": (255, 40, 40),     # thrown away by the despeckle
+    "cut":     (255, 0, 255),     # 02-matte: the edge cut line (magenta, the existing convention)
+    "kept":    (0, 180, 255),     # 02-matte: an edge left uncut, drawn only with --all
 }
 # change palette for --diff
 COL_DIFF = {
@@ -63,7 +65,9 @@ def key(r):
     elif "centroid" in r:
         cx, cy = r["centroid"]
     else:
-        return (r["kind"], r.get("page"))
+        # no geometry: the row IS the unit. `edge` must be in the key or all four edges of a page
+        # collapse onto each other and the diff reads every one as changed.
+        return (r["kind"], r.get("page"), r.get("edge", ""), 0)
     return (r["kind"], r.get("page"), cx // 8, cy // 8)
 
 
@@ -87,6 +91,28 @@ def draw(rows, base, out, show_all=False, baseline=None, title=""):
         x, y = cx * sc, cy * sc
         d.ellipse([x - MARK_R, y - MARK_R, x + MARK_R, y + MARK_R], outline=colour, width=LINE_W)
 
+    def edge_line(r, colour):
+        """A matte cut is a LINE at `depth` in from one edge, not a box. Coordinates are in the
+        source frame the matte ran at (w/h in the row), so scale by that, not by SRC_DPI."""
+        W0, H0 = r.get("w"), r.get("h")
+        if not W0 or not H0:
+            return
+        kx, ky = im.size[0] / float(W0), im.size[1] / float(H0)
+        dp = float(r.get("depth") or 0.0)
+        if dp <= 0:
+            return
+        e = r.get("edge")
+        if e == "top":
+            d.line([(0, dp * ky), (im.size[0], dp * ky)], fill=colour, width=LINE_W)
+        elif e == "bottom":
+            y = im.size[1] - dp * ky
+            d.line([(0, y), (im.size[0], y)], fill=colour, width=LINE_W)
+        elif e == "left":
+            d.line([(dp * kx, 0), (dp * kx, im.size[1])], fill=colour, width=LINE_W)
+        elif e == "right":
+            x = im.size[0] - dp * kx
+            d.line([(x, 0), (x, im.size[1])], fill=colour, width=LINE_W)
+
     n = 0
     if baseline is not None:
         old = {key(r): r for r in baseline}
@@ -100,11 +126,11 @@ def draw(rows, base, out, show_all=False, baseline=None, title=""):
                 c = COL_DIFF["changed"]
             else:
                 continue
-            (box if "bbox" in r else mark)(r, c)
+            _draw_any(r, c, box, mark, edge_line)
             n += 1
         for k, r in old.items():
             if k not in new:
-                (box if "bbox" in r else mark)(r, COL_DIFF["removed"])
+                _draw_any(r, COL_DIFF["removed"], box, mark, edge_line)
                 n += 1
     else:
         for r in rows:
@@ -119,6 +145,10 @@ def draw(rows, base, out, show_all=False, baseline=None, title=""):
                 box(r, COL["bg"] if r.get("promoted") else COL["k"])
             elif kind == "kdrop":
                 mark(r, COL["dropped"])
+            elif kind == "edge":
+                if layer != "cut" and not show_all:
+                    continue
+                edge_line(r, COL.get(layer, (128, 128, 128)))
             else:
                 continue
             n += 1
@@ -126,6 +156,16 @@ def draw(rows, base, out, show_all=False, baseline=None, title=""):
     d.text((6, 6), title, fill=(0, 0, 0))
     im.save(out)
     return n, im.size
+
+
+def _draw_any(r, colour, box, mark, edge_line):
+    """Dispatch on what geometry the row actually carries."""
+    if "bbox" in r:
+        box(r, colour)
+    elif "centroid" in r:
+        mark(r, colour)
+    elif r.get("kind") == "edge":
+        edge_line(r, colour)
 
 
 def _guess_dpi(width_px):

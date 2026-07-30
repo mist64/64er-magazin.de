@@ -92,7 +92,7 @@ def main():
         H, W = rgb.shape[:2]
 
         # -- 02 bed matte + 02b spine, detected on the RAW thumb --------------- #
-        bed_rgba, _, _  = bed_matte(im, 600, return_meta=True)
+        bed_rgba, _, _  = bed_matte(im, 600, return_meta=True, page_no=n)
         spn_rgba, _, _  = spine_matte(im, 600, page_no=n, return_meta=True)
         bed_cut   = np.asarray(bed_rgba)[:, :, 3] == 0
         spine_cut = np.asarray(spn_rgba)[:, :, 3] == 0

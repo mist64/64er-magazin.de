@@ -29,13 +29,18 @@ import sys
 # feature fields compared per kind (the gates -- everything a decision actually turned on)
 FEATURES = {
     "cluster": ["vote", "cv", "s", "tv", "bodyK", "objfK", "bodyC"],
-    "darkfill": ["dark_frac", "filled_frac", "hole_frac"],
+    "darkfill": ["dark_frac", "filled_frac", "hole_frac", "n_holes", "hole_area_frac"],
     "kdrop": ["px"],
     "page": ["image_frac", "screen_frac", "tint_frac", "k_frac"],
     "output": [],
+    # front end (02-matte, via record.py) -- same format, same differ
+    "edge": ["depth", "median_depth", "ext", "pen_ext", "contrast", "backing_frac",
+             "purity", "ink", "angle_deg", "stop_p95"],
+    "page_matte": ["alpha_pct"],
 }
 # the field whose change means "this region went somewhere else"
-VERDICT = {"cluster": "verdict", "darkfill": "promoted", "kdrop": "layer", "page": "inks"}
+VERDICT = {"cluster": "verdict", "darkfill": "promoted", "kdrop": "layer", "page": "inks",
+           "edge": "decision"}
 QUANT = 8       # spatial key quantisation, px @600. Survives a small change in extent, still
                 # separates neighbouring regions.
 
@@ -62,7 +67,9 @@ def key(r):
     elif "centroid" in r:
         cx, cy = r["centroid"]
     else:
-        return (r["kind"], r.get("page"), 0, 0)
+        # no geometry: the row IS the unit (one per page, or per page-edge). `edge` must be part of
+        # the key or all four edges of a page collapse onto each other and every one reads changed.
+        return (r["kind"], r.get("page"), r.get("edge", ""), 0)
     return (r["kind"], r.get("page"), cx // QUANT, cy // QUANT)
 
 
@@ -118,9 +125,11 @@ def main():
         for o, r in sorted(flips, key=lambda t: (t[1].get("page", ""), -t[1].get("area", t[1].get("px", 0)))):
             kind = r["kind"]
             vf = VERDICT[kind]
-            print("p%s %-9s %s  %s -> %s   area=%s" % (
-                r.get("page"), kind, r.get("bbox") or r.get("centroid"),
-                o.get(vf), r.get(vf), r.get("area", r.get("px"))))
+            where = r.get("bbox") or r.get("centroid") or r.get("edge", "")
+            print("p%s %-10s %-22s  %s -> %s   %s" % (
+                r.get("page"), kind, where, o.get(vf), r.get(vf),
+                "area=%s" % r["area"] if "area" in r else
+                ("px=%s" % r["px"] if "px" in r else "depth=%s" % r.get("depth"))))
             print("      was: %s" % fmt(o, FEATURES.get(kind, [])))
             print("      now: %s" % fmt(r, FEATURES.get(kind, [])))
     if added or removed:

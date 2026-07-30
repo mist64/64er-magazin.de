@@ -193,7 +193,7 @@ def _masks(page, spine, clip, im):
     W, H = im.size
     parity = "even" if page % 2 == 0 else "odd"
 
-    bed_rgba, _, meta = bed_matte(im, DPI, return_meta=True)
+    bed_rgba, _, meta = bed_matte(im, DPI, return_meta=True, page_no=page)
     m_bed = (np.asarray(bed_rgba)[:, :, 3] == 0)
 
     m_spine, src = spine_mask((H, W), spine.get(p), parity, clip.get(p))

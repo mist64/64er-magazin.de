@@ -57,6 +57,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import linefit
+import record as REC
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -639,8 +640,13 @@ def load_profile(path=None):
         return json.load(f)["edges"]
 
 
-def bed_matte(rgb, dpi, return_meta=False, profile=None):
+def bed_matte(rgb, dpi, return_meta=False, profile=None, page_no=None):
     """Matte one page.
+
+    Set BM_RECORD to a directory to write the DECISION RECORD (one JSONL file per page, the same
+    format the Rust renderer writes) -- then `05-mrc/diff_record.py` gives a matte change the same
+    machine-readable before/after the MRC gates get, instead of a bespoke probe. `page_no` only
+    names that file; no decision reads it.
 
     The decision is made
     from the edge itself. The learned-prior acceptance path is gone -- it existed to rescue
@@ -666,6 +672,28 @@ def bed_matte(rgb, dpi, return_meta=False, profile=None):
             mask |= _deorient(np.arange(D)[None, :] < cut[:, None], edge, H, W, dtb, dlr)
 
     rgba = np.dstack([a.astype(np.uint8), np.where(mask, 0, 255).astype(np.uint8)])
+
+    rec = REC.Recorder(REC.path_from_env("BM_RECORD", page_no))
+    if rec.enabled:
+        # One row per EDGE: the decision, and every gate value it turned on. `depth` is what the
+        # overlay draws; the rest is what the differ compares.
+        for edge in EDGES:
+            m = meta[edge]
+            rec.push(kind="edge", page="%03d" % int(page_no), edge=edge, dpi=dpi, w=W, h=H,
+                     decision=m["decision"], layer="cut" if m["decision"] == "CUT" else "kept",
+                     depth=REC.r4(m.get("cut_px", 0.0)),
+                     median_depth=REC.r4(m.get("median_depth", 0.0)),
+                     ext=REC.r4(m.get("ext", 0.0)), pen_ext=REC.r4(m.get("pen_ext", 0.0)),
+                     contrast=REC.r4(m.get("contrast", 0.0)),
+                     backing_frac=REC.r4(m.get("backing_frac", 0.0)),
+                     vote_frac=REC.r4(m.get("vote_frac", 0.0)),
+                     purity=REC.r4(m.get("purity", 0.0)), ink=REC.r4(m.get("ink", 0.0)),
+                     slope=REC.r4(m.get("slope", 0.0)),
+                     angle_deg=REC.r4(m.get("angle_deg", 0.0)),
+                     stop_p95=REC.r4(m.get("stop_p95", 0.0)))
+        rec.push(kind="page_matte", page="%03d" % int(page_no), w=W, h=H, dpi=dpi,
+                 alpha_pct=REC.r4(100.0 * mask.mean()))
+        rec.flush()
     return (rgba, 100.0 * mask.mean(), meta) if return_meta else (rgba, 100.0 * mask.mean())
 
 
