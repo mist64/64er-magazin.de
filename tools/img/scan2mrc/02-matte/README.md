@@ -96,9 +96,11 @@ uncut.
     edge_sheet.py          all four edges per page with the applied cut drawn -> tmp/edges/
     dump_edges.py          per-edge metrics for every page -> tmp/edge_metrics.json
 
-    learn_priors.py        SUPERSEDED — the learned-prior acceptance path is gone. It is what let
-                           a 0.7%-backing edge on p015 be accepted and cut 35mm of clean paper.
-    top_matte.py           SUPERSEDED — early top-edge-only experiment
+DELETED (in git history if ever needed): learn_priors.py + priors.json — the learned-prior
+acceptance path is gone; it is what let a 0.7%-backing edge on p015 be accepted and cut 35mm of
+clean paper. bed_matte still ACCEPTED a `priors` argument and every caller loaded and threaded the
+176-entry file, but the value was discarded, so a reader reasonably assumed it mattered.
+Also deleted: top_matte.py, an early top-edge-only experiment.
 
 Verification is deliberately NOT shared with the fitter: `audit_matte.py` and `stripe_check.py`
 carry their own crude colour test, so a bug in the profile cannot hide from them, and

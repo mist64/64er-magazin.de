@@ -639,10 +639,10 @@ def load_profile(path=None):
         return json.load(f)["edges"]
 
 
-def bed_matte(rgb, dpi, priors=None, page_no=None, return_meta=False, profile=None):
+def bed_matte(rgb, dpi, return_meta=False, profile=None):
     """Matte one page.
 
-    `priors` / `page_no` are accepted for call compatibility and UNUSED: the decision is made
+    The decision is made
     from the edge itself. The learned-prior acceptance path is gone -- it existed to rescue
     low-confidence edges by matching a per-issue typical depth, and it is what let a
     0.7%-backing edge on p015 be accepted and cut 35mm of clean paper.
@@ -673,12 +673,9 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("img"); ap.add_argument("out", nargs="?")
     ap.add_argument("--dpi", type=int, default=600)
-    ap.add_argument("--page", type=int)
     ap.add_argument("--magenta", action="store_true", help="50%% magenta over the cut regions")
-    ap.add_argument("--priors", help="accepted and ignored (call compatibility)")
     A = ap.parse_args()
-    rgba, pct, meta = bed_matte(Image.open(A.img).convert("RGB"), A.dpi,
-                                page_no=A.page, return_meta=True)
+    rgba, pct, meta = bed_matte(Image.open(A.img).convert("RGB"), A.dpi, return_meta=True)
     print("%s: bed cleared %.3f%%" % (A.img, pct))
     for e in EDGES:
         m = meta[e]

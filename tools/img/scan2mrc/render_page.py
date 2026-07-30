@@ -107,7 +107,7 @@ def render(page, variant="display", knorm="known", skip_full=False, keep_rgb=Fal
     for d in ("debug", "a4_600", "deliver"):
         os.makedirs(os.path.join(ROOT, d), exist_ok=True)
 
-    rgba, ang, frac, src = SR.render(page, _CTX["priors"], _CTX["skew"],
+    rgba, ang, frac, src = SR.render(page, _CTX["skew"],
                                      _CTX["spine"], _CTX["clip"], None)
     # UNCOMPRESSED TIFF. These are local intermediates, not artifacts to ship, and the disk has
     # room to spare -- so spending CPU to shrink them is spending the wrong resource. Measured on
@@ -141,7 +141,6 @@ def _init():
     _CTX["skew"] = SR.load_skew()
     _CTX["spine"] = json.load(open(SR.SPINE)) if os.path.exists(SR.SPINE) else {}
     _CTX["clip"] = json.load(open(SR.CLIPJS))
-    _CTX["priors"] = json.load(open(SR.PRIORSF)) if os.path.exists(SR.PRIORSF) else {}
 
 
 if __name__ == "__main__":

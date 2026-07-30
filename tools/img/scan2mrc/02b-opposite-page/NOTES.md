@@ -10,13 +10,16 @@ Master = these ×4 (2400 dpi). EVEN page → neighbor overlap on the **RIGHT** e
 ODD page → **LEFT** edge (binding/spine side).
 
 Scripts here:
-- `probe_spine.py`   — first pass (luma-trough per band). Superseded; kept for reference.
-- `diag_profiles.py` — per-column signal profiles (paper60 luma / dark_frac / sat / specks)
-  plotted next to the band image. This is the diagnostic that settled which signal wins.
-- `overlay_spine.py` — multi-detector overlay (shadow/neighbor/specks) used mid-probe.
-- `spine_v2.py`      — **the prototype detector**. Neighbor-content-boundary + RANSAC line
-  fit + confidence gating + overlay. Run: `python spine_v2.py 010 011 ...`
-  (writes `/Users/mist/DNB/8609/tmp/spine_NNN.png`, prints JSON per page).
+- `spine.py`       — **production detector.** Supersedes everything below.
+- `spine_matte.py` — applies the spine line as alpha (hardened from the `spine_v2` prototype).
+- `bg_spine.py`, `clip_holes.py`, `hole_masks.py` — supporting analysis still in use.
+
+The probe that produced the findings below used five more scripts (`probe_spine.py`,
+`diag_profiles.py`, `overlay_spine.py`, `simple_spine.py`, `spine_v2.py`) plus
+`shear_spine.py` and its scorer `selfcheck.py`. All were superseded by `spine.py` and have
+been **deleted** — 1388 lines that no longer ran and that a reader had to rule out one by one.
+The findings they established are recorded below, which is the part worth keeping; the code
+itself is in git history if it is ever needed again.
 
 All outputs go to `/Users/mist/DNB/8609/tmp/` only.
 
