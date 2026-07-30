@@ -20,6 +20,13 @@ serde_json = "1"
 flate2 = "1"
 anyhow = "1"
 num-complex = "0.4"
+# The ICC pair (US Web Coated SWOP -> AdobeRGB1998) that turns the graded, NOT-GCR'd CMYK into
+# the page RGB. lcms2 is the SAME library PIL's ImageCms wraps, which is the point: another
+# engine would move every pixel of the page the MRC render draws from.
+lcms2 = "6"
+# zlib itself, not flate2: the 1-bit known.png must match PIL byte-for-byte, and PIL deflates it
+# at level 9 with strategy Z_FILTERED -- which flate2 does not expose.
+libz-sys = "1"
 
 [profile.release]
 opt-level = 3
