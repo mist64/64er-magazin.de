@@ -45,7 +45,11 @@ for i in $(seq "$first" "$last"); do
   [ -d "$T/page_geometry/$n" ] || { echo "  p$n NO GEOMETRY -- run emit_geometry first"; continue; }
   det="$T/render/deliver/${n}_cmyk_detect.tif"
   echo "$(date +%H:%M:%S) p$n apply"
-  "$MP" apply "$i" --out "$T/render/deliver" --inpaint --detect-too --page-rgb >/dev/null 2>&1 || \
+  # keep the per-page JSON report: it carries unknown_pct, gcr_ok, dead_px, holes_filled and the
+  # K-normalisation candidates, which is what a stage check reads. Discarding it was why the last
+  # run could not be audited after the fact.
+  "$MP" apply "$i" --out "$T/render/deliver" --inpaint --detect-too --page-rgb \
+      2>/dev/null | tail -1 >> "$T/apply_reports.jsonl" || \
     { echo "  p$n APPLY FAILED"; continue; }
   [ -s "$det" ] || { echo "  p$n no detect tif"; continue; }
   echo "$(date +%H:%M:%S) p$n geometry+detect"
