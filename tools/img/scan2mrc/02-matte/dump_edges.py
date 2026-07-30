@@ -16,7 +16,7 @@ PROF = BM.load_profile()
 
 def one(n):
     _, pct, meta = BM.bed_matte(Image.open("/Users/mist/DNB/8609/thumbs_600/%03d.png" % n).convert("RGB"),
-                                600, return_meta=True, profile=PROF)
+                                600, return_meta=True, profile=PROF, page_no=n)
     for e in meta:
         meta[e].pop("mat_colours", None)
     return n, pct, meta

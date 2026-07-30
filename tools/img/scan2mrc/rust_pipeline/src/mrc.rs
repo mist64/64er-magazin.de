@@ -73,16 +73,28 @@ const DARKFILL_DARK: f32 = 90.0;      // luma ceiling: dark neutral ink (the fil
 const DARKFILL_SAT: f32 = 60.0;       // sat ceiling: NEUTRAL (kills coloured red/blue boxes)
 const DARKFILL_MINPX: usize = 20000;  // min component px @600 (~0.06% page; > step-7's 8000 = a genuine FILL)
 const DARKFILL_FRAC: f64 = 0.45;      // dark_frac floor: dark ink fills the bbox
-// filled_frac floor: the hole-filled shape must essentially BE its bbox, i.e. a box. 0.70 also
-// admitted bold headline type -- a glyph with counters ("8", "O", "D", "a") reads as a dark shape
-// with enclosed bright content, so it was promoted to IMAGE, left the K stencil, and came back
-// soft from the 150 dpi background (p062 "zum C 128" lost its 8: dark 0.743, filled 0.812,
-// holes 0.069 -- inside every old gate). Measured over 34 promotions on 23 pages of 8609 the two
-// populations do not touch: headline glyphs 0.804-0.886, real reversed boxes 0.965-0.997
-// ("298.00", "WIMBLEDON/Kassette 25.-", "NEU", "ariolasoft"). 0.93 sits in that gap. Dark PHOTOS
-// (0.737-0.930) also stop being promoted, which costs nothing: they are screened, so step 7 puts
-// them in IMAGE anyway -- this promoter exists only for UNSCREENED solid fills.
-const DARKFILL_FILLED: f64 = 0.93;
+const DARKFILL_FILLED: f64 = 0.70;    // filled_frac floor: solid shape after hole-fill
+// GLYPH VETO. The failure mode of the gates above is BOLD DISPLAY TYPE: a letterform with counters
+// ("8", "O", "D", "a") is a dark shape with enclosed bright content, so it was promoted, left the K
+// stencil, and came back soft from the 150 dpi background (p062 "zum C 128" lost its 8).
+//
+// Raising DARKFILL_FILLED to 0.93 was tried and REVERTED: rectangularity does not separate these
+// populations. Measured over 123 pages it flipped 144 components on 59 pages, and among the first
+// 28 inspected it destroyed p061's reversed MENU BAR ("Dokument Text Suchen Gehe zu...", filled
+// 0.828) -- exactly the case this promoter exists for -- and pushed screened photos into bilevel K.
+// The two populations touch: a kept box measures 0.9298.
+//
+// What DOES separate them is the SHAPE OF THE INTERIOR, because a letterform has a couple of small
+// counters while a reversed box holds either many letters or one big panel. Measured over 37 kept
+// boxes and 28 flips:
+//     bold glyphs            holes 1-3    hole_area/comp 0.071-0.136
+//     everything to keep     holes 1-602  hole_area/comp 0.241-0.740   (p061 bar 38/0.256,
+//                                                                       p151 icon 2/0.241,
+//                                                                       p128 panel 1/0.740)
+// The AND of the two loose conditions below vetoes all 18 glyphs and none of the 37 boxes.
+const DARKFILL_GLYPH_HOLES: usize = 3;      // at most this many real counters ...
+const DARKFILL_GLYPH_HOLEFRAC: f64 = 0.18;  // ... AND interior this small relative to the ink
+const DARKFILL_HOLE_MIN: usize = 20;        // ignore speck holes (scan noise inside solid ink)
 const DARKFILL_HOLES_LO: f64 = 0.05;  // enclosed-bright floor: reversed text present
 const DARKFILL_HOLES_HI: f64 = 0.55;  // enclosed-bright ceiling: not a hollow frame
 
@@ -800,7 +812,19 @@ pub fn analyze(
             let fp = filled.iter().filter(|&&b| b).count();
             let filled_frac = fp as f64 / ba;
             let hole_frac = (fp - cpx) as f64 / ba;
-            let promote = filled_frac > filled_env && hole_frac > holes_lo && hole_frac < holes_hi;
+            // GLYPH VETO (see the constant block): count the REAL counters and how much of the ink
+            // they take up. Few AND small = a letterform, not a reversed box.
+            let holes: Vec<bool> = (0..bw_ * bh_).map(|i| filled[i] && !sub[i]).collect();
+            let (hlbl, hn) = ndimage::label(&holes, bw_, bh_);
+            let hsz = ndimage::component_sizes(&hlbl, hn);
+            let hmin = env_i("DARKFILL_HOLE_MIN", DARKFILL_HOLE_MIN as i64) as u64;
+            let n_holes = (1..=hn).filter(|&k| hsz[k - 1] >= hmin).count();
+            let hole_px: u64 = (1..=hn).map(|k| hsz[k - 1]).filter(|&s| s >= hmin).sum();
+            let hole_area_frac = hole_px as f64 / cpx as f64;
+            let glyph = n_holes <= env_i("DARKFILL_GLYPH_HOLES", DARKFILL_GLYPH_HOLES as i64) as usize
+                && hole_area_frac < env_f("DARKFILL_GLYPH_HOLEFRAC", DARKFILL_GLYPH_HOLEFRAC as f32) as f64;
+            let promote = filled_frac > filled_env && hole_frac > holes_lo && hole_frac < holes_hi
+                && !glyph;
             // EVERY candidate is recorded, not just the promoted ones: the near-misses are how a
             // gate change is judged, and the p062 "8" sat 0.12 inside a boundary nobody had looked at.
             rec.push(serde_json::json!({
@@ -809,6 +833,7 @@ pub fn analyze(
                 "layer": if promote { "bg" } else { "k" },
                 "promoted": promote,
                 "dark_frac": r2(dark_frac), "filled_frac": r2(filled_frac), "hole_frac": r2(hole_frac),
+                "n_holes": n_holes, "hole_area_frac": r2(hole_area_frac), "glyph_veto": glyph,
             }));
             if promote {
                 // Force the FILL's bbox into BOTH image (-> no K blob) AND m600 (-> the descreened
