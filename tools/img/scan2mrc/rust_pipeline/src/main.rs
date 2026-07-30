@@ -108,6 +108,9 @@ enum Cmd {
         /// also write the cached MRC inputs (tile stats + 600 dpi Lanczos/Box RGB)
         #[arg(long)]
         cache: bool,
+        /// also write the 2400 dpi page RGB PNG the current `mrc` reads (drop-in for the Python)
+        #[arg(long)]
+        page_rgb: bool,
         #[arg(long)]
         no_write: bool,
     },
@@ -198,6 +201,7 @@ fn main() -> Result<()> {
             inpaint,
             detect_too,
             cache,
+            page_rgb,
             no_write,
         } => {
             let o = apply::Opts {
@@ -210,6 +214,7 @@ fn main() -> Result<()> {
                 inpaint,
                 detect_too,
                 cache,
+                page_rgb,
                 write: !no_write,
             };
             for p in pages {
