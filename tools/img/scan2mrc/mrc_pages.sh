@@ -28,7 +28,8 @@ while :; do
   did=0; pend=0
   for i in $(seq 1 176); do
     n=$(printf "%03d" "$i")
-    [ -s "$T/mrc/$n.pdf" ] && continue
+    # FORCE=1 re-renders pages whose PDF exists (an upstream or gate change makes it stale).
+    [ "${FORCE:-0}" != "1" ] && [ -s "$T/mrc/$n.pdf" ] && continue
     if [ ! -s "$T/score/$n.npy" ] || [ ! -s "$T/render/deliver/${n}_page_rgb.png" ]; then
       pend=$((pend+1)); continue
     fi

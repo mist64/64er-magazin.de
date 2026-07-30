@@ -27,8 +27,14 @@ for n in $(seq -w "$first" "$last"); do
   n=$(printf "%03d" "$((10#$n))")
   # both must exist: the page RGB is what the MRC render consumes and cannot be
   # reconstructed from the GCR'd CMYK afterwards (GCR is not invertible).
-  [ -s "$T/score/$n.npy" ] && [ -s "$T/render/deliver/${n}_page_rgb.png" ] && \
-    { echo "$(date +%H:%M:%S) p$n cached, skip"; continue; }
+  # FORCE=1 re-runs a page whose outputs exist -- needed whenever an UPSTREAM stage changes, since
+  # the skip test can only see that a file is there, not that it is still current. The matte
+  # penumbra fix moved the bottom cut into the A4 window on 129 of 176 pages, which the existence
+  # check cannot notice.
+  if [ "${FORCE:-0}" != "1" ]; then
+    [ -s "$T/score/$n.npy" ] && [ -s "$T/render/deliver/${n}_page_rgb.png" ] && \
+      { echo "$(date +%H:%M:%S) p$n cached, skip"; continue; }
+  fi
   det="$T/render/deliver/${n}_cmyk_detect.tif"
   echo "$(date +%H:%M:%S) p$n render"
   $PY "$HERE/render_page.py" "$((10#$n))" --jobs 1 --inpaint --detect-too --page-rgb >/dev/null 2>&1 || \
