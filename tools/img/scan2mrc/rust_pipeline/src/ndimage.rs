@@ -310,6 +310,17 @@ fn erode_once_box(m: &[bool], w: usize, h: usize, sh: i64, sw: i64) -> Vec<bool>
     out
 }
 
+/// Dilation with a `np.ones((sh,sw))` structure -- scipy's default when a square structuring
+/// element is passed, which is NOT the same as iterating the 4-neighbour cross: the cross grows a
+/// DIAMOND and misses the corners.
+pub fn binary_dilation_box(m: &[bool], w: usize, h: usize, sh: i64, sw: i64, iters: usize) -> Vec<bool> {
+    let mut cur = m.to_vec();
+    for _ in 0..iters {
+        cur = dilate_once_box(&cur, w, h, sh, sw);
+    }
+    cur
+}
+
 pub fn binary_opening_box(m: &[bool], w: usize, h: usize, sh: i64, sw: i64, iters: usize) -> Vec<bool> {
     let mut cur = m.to_vec();
     for _ in 0..iters {

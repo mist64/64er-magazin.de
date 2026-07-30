@@ -452,6 +452,125 @@ fn runs(known_unknown: &[bool], w: usize, h: usize) -> Runs {
     Runs { rfirst, rlast, cfirst, clast, rowany, colany }
 }
 
+/// SEAM 7b -- INTERIOR HOLES, by Telea diffusion.
+///
+/// `mirror_edges` handles the border-reaching unknown runs. What is left are clip-punch holes in
+/// the middle of the sheet: 53 components across 18 of 176 pages, each tiny. The Python calls
+/// OpenCV's `cv2.inpaint(..., INPAINT_TELEA)` on a small crop around each; here the `inpaint`
+/// crate provides Telea (ported from Pyheal).
+///
+/// This CANNOT be bit-identical to OpenCV -- it is a different implementation of the same
+/// algorithm -- and that is accepted deliberately: the pixels being written are INVENTED, so
+/// "identical to OpenCV" is a reproducibility property, not a correctness one. The other 158
+/// pages remain byte-identical; on these 18 only the hole neighbourhoods differ.
+const HOLE_GROW: usize = 3; // px @600: the punch has a torn halo the detected mask misses
+const HOLE_PAD: usize = 24; // context around each hole handed to the diffusion
+const HOLE_RADIUS: i32 = 4; // Telea's sampling radius, as the Python passes
+
+/// The EDGE BANDS, defined GEOMETRICALLY: the leading/trailing unknown run of every row and
+/// column. Deliberately not by connectivity -- a clip hole touching a band is 8-connected to it,
+/// so a connectivity test merges the two, the hole then looks like part of the band and is never
+/// diffused. That is exactly why p098 and p100 kept visible punch marks.
+fn band_mask(unknown: &[bool], w: usize, h: usize) -> Vec<bool> {
+    let mut band = vec![false; w * h];
+    for y in 0..h {
+        let row = &unknown[y * w..(y + 1) * w];
+        let first = row.iter().position(|&u| !u);
+        let (first, last) = match first {
+            Some(f) => (f as i64, (w - 1 - row.iter().rev().position(|&u| !u).unwrap()) as i64),
+            None => (w as i64, -1i64),
+        };
+        for x in 0..w {
+            if (x as i64) < first || (x as i64) > last {
+                band[y * w + x] = true;
+            }
+        }
+    }
+    for x in 0..w {
+        let mut cfirst = h as i64;
+        let mut clast = -1i64;
+        for y in 0..h {
+            if !unknown[y * w + x] {
+                if cfirst == h as i64 {
+                    cfirst = y as i64;
+                }
+                clast = y as i64;
+            }
+        }
+        for y in 0..h {
+            if (y as i64) < cfirst || (y as i64) > clast {
+                band[y * w + x] = true;
+            }
+        }
+    }
+    for i in 0..w * h {
+        band[i] &= unknown[i];
+    }
+    band
+}
+
+/// Diffuse every unknown region that is NOT part of an edge band. Returns the number filled.
+pub fn diffuse_holes(rgb: &mut [u8], unknown: &[bool], w: usize, h: usize) -> usize {
+    let band = band_mask(unknown, w, h);
+    let holes: Vec<bool> = (0..w * h).map(|i| unknown[i] && !band[i]).collect();
+    if !holes.iter().any(|&b| b) {
+        return 0;
+    }
+    // grow to catch the torn halo, then clip back to genuinely unknown pixels.
+    // The structure is a SQUARE, np.ones((2*grow+1, 2*grow+1)) as the Python passes -- NOT
+    // `binary_dilation(.., HOLE_GROW)`, which iterates the 4-neighbour cross and grows a diamond
+    // that misses the corners. That difference split one of p130's holes into two components.
+    let side = (2 * HOLE_GROW + 1) as i64;
+    let grown_raw = crate::ndimage::binary_dilation_box(&holes, w, h, side, side, 1);
+    let grown: Vec<bool> = (0..w * h).map(|i| grown_raw[i] && unknown[i]).collect();
+    let (lbl, n) = crate::ndimage::label(&grown, w, h);
+    if n == 0 {
+        return 0;
+    }
+    let boxes = crate::ndimage::find_objects(&lbl, n, w, h);
+    let mut filled = 0usize;
+    for k in 1..=n {
+        let (y0, y1, x0, x1) = match boxes[k - 1] {
+            Some(b) => b,
+            None => continue,
+        };
+        let cy0 = y0.saturating_sub(HOLE_PAD);
+        let cy1 = (y1 + HOLE_PAD + 1).min(h);
+        let cx0 = x0.saturating_sub(HOLE_PAD);
+        let cx1 = (x1 + HOLE_PAD + 1).min(w);
+        let (ch, cw) = (cy1 - cy0, cx1 - cx0);
+        let mut sub = ndarray::Array3::<u8>::zeros((ch, cw, 3));
+        let mut msk = ndarray::Array2::<u8>::zeros((ch, cw));
+        for yy in 0..ch {
+            for xx in 0..cw {
+                let src = (cy0 + yy) * w + (cx0 + xx);
+                for c in 0..3 {
+                    sub[[yy, xx, c]] = rgb[src * 3 + c];
+                }
+                // this component only -- neighbouring holes keep their own pass
+                if lbl[src] as usize == k {
+                    msk[[yy, xx]] = 255;
+                }
+            }
+        }
+        if inpaint::telea_inpaint(&mut sub.view_mut(), &msk.view(), HOLE_RADIUS).is_err() {
+            continue;
+        }
+        for yy in 0..ch {
+            for xx in 0..cw {
+                let dst = (cy0 + yy) * w + (cx0 + xx);
+                if lbl[dst] as usize == k {
+                    for c in 0..3 {
+                        rgb[dst * 3 + c] = sub[[yy, xx, c]];
+                    }
+                }
+            }
+        }
+        filled += 1;
+    }
+    filled
+}
+
 /// Mirror-fill the border-reaching unknown runs, in place.
 ///
 /// Rows and columns are resolved INDEPENDENTLY from the untouched mask and each unknown pixel
@@ -816,9 +935,13 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
     }
 
     let mut n_dead = 0usize;
+    let mut n_holes = 0usize;
     if o.inpaint {
         n_dead = stage!(t0, "mirror inpaint", times, {
             mirror_edges(&mut wp.rgb, &wp.unknown, w, h)
+        });
+        n_holes = stage!(t0, "telea holes", times, {
+            diffuse_holes(&mut wp.rgb, &wp.unknown, w, h)
         });
     }
 
@@ -916,6 +1039,7 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
         },
         "unknown_pct": unknown_pct,
         "inpaint": o.inpaint,
+        "holes_filled": n_holes,
         "dead_px": n_dead,
         "gcr_ok": gcr_ok,
         "mean": {"C": means[0], "M": means[1], "Y": means[2], "K": means[3]},
