@@ -33,7 +33,8 @@ enum Cmd {
         input_png: String,
         output_tiff: String,
     },
-    /// CMYK TIFF -> graded (+optional crop +GCR) CMYK TIFF.
+    /// CMYK TIFF -> graded (+optional GCR) CMYK TIFF. Cropping is the FRONT END's job
+    /// (01-deskew -> 02-matte -> 03-crop, applied by 04-grade/apply_fullres.py as one affine).
     Grade {
         input_tiff: String,
         output_tiff: String,
@@ -41,24 +42,6 @@ enum Cmd {
         variant: GradeVariant,
         /// Apply GCR after grading.
         #[arg(long)]
-        gcr: bool,
-        /// A4 crop: provide widths.txt value and page id (parity decides gravity).
-        #[arg(long)]
-        crop_width: Option<usize>,
-        #[arg(long)]
-        page_id: Option<u32>,
-    },
-    /// Full graded+cropped+GCR CMYK from a master scan + widths value (mirrors make_*_cmyk.sh).
-    FullCmyk {
-        master_png: String,
-        output_tiff: String,
-        #[arg(long)]
-        crop_width: usize,
-        #[arg(long)]
-        page_id: u32,
-        #[arg(long, value_enum, default_value = "detect")]
-        variant: GradeVariant,
-        #[arg(long, default_value_t = true)]
         gcr: bool,
     },
     /// CMYK TIFF -> screen score npy (+ _chan, _cov). detect_screened.py.
@@ -84,7 +67,7 @@ enum Cmd {
         #[arg(long, default_value_t = 6.0)]
         thr: f64,
     },
-    /// page PNG + score npy -> MRC PDF (mrc_hyst8_perio.py).
+    /// page PNG + score npy -> MRC PDF.
     Mrc {
         page_png: String,
         score_npy: String,
@@ -96,28 +79,12 @@ enum Cmd {
         #[arg(long, default_value_t = 200.0)]
         bg_dpi: f64,
     },
-    /// FAST classify-only: page PNG + score npy -> per-cluster step-7 DIAG lines (stdout).
-    /// Skips descreen/jbig2/PDF -- for sweeping classification features across pages.
+    /// The SAME decisions `mrc` makes (cluster mask, tint, step 7, darkfill, K despeckle, ink
+    /// presence) plus the JSONL record, without the descreen FFT / jbig2 / PDF. ~22s a page
+    /// against ~47s -- for sweeping decisions across the whole issue.
     Classify {
         page_png: String,
         score_npy: String,
-        #[arg(long, default_value_t = 6.0)]
-        thr: f64,
-    },
-    /// Full pipeline: master PNG -> detect CMYK (separate+crop, no grade) -> detect score
-    /// -> graded RGB page -> MRC PDF. Mirrors the deploy chain end to end.
-    Full {
-        master_png: String,
-        /// graded RGB page (pages/NNN_2400_cropped.png) used by the MRC render.
-        page_png: String,
-        out_pdf: String,
-        #[arg(long)]
-        crop_width: usize,
-        #[arg(long)]
-        page_id: u32,
-        /// working dir for intermediate npy/tiff.
-        #[arg(long, default_value = ".")]
-        work: String,
         #[arg(long, default_value_t = 6.0)]
         thr: f64,
     },
@@ -138,8 +105,6 @@ fn main() -> Result<()> {
             output_tiff,
             variant,
             gcr,
-            crop_width,
-            page_id,
         } => {
             let t = std::time::Instant::now();
             let mut cmyk = imageio::read_cmyk_tiff(&input_tiff)?;
@@ -148,37 +113,11 @@ fn main() -> Result<()> {
                 GradeVariant::Detect => grade::GradeLevels::detect(),
             };
             grade::grade_in_place(&mut cmyk, lv);
-            if let (Some(cw), Some(pid)) = (crop_width, page_id) {
-                cmyk = grade::a4_crop(&cmyk, cw, pid);
-            }
             if gcr {
                 grade::gcr_in_place(&mut cmyk);
             }
             imageio::write_cmyk_tiff(&output_tiff, &cmyk)?;
             eprintln!("grade -> {} ({:.1}s)", output_tiff, t.elapsed().as_secs_f64());
-        }
-        Cmd::FullCmyk {
-            master_png,
-            output_tiff,
-            crop_width,
-            page_id,
-            variant,
-            gcr,
-        } => {
-            let t = std::time::Instant::now();
-            let rgb = imageio::read_rgb_png(&master_png)?;
-            let mut cmyk = separate::separate(&rgb);
-            let lv = match variant {
-                GradeVariant::Display => grade::GradeLevels::display(),
-                GradeVariant::Detect => grade::GradeLevels::detect(),
-            };
-            grade::grade_in_place(&mut cmyk, lv);
-            cmyk = grade::a4_crop(&cmyk, crop_width, page_id);
-            if gcr {
-                grade::gcr_in_place(&mut cmyk);
-            }
-            imageio::write_cmyk_tiff(&output_tiff, &cmyk)?;
-            eprintln!("full-cmyk -> {} ({:.1}s)", output_tiff, t.elapsed().as_secs_f64());
         }
         Cmd::Detect { cmyk_tiff, out_base, hop } => {
             let t = std::time::Instant::now();
@@ -220,31 +159,6 @@ fn main() -> Result<()> {
             let t = std::time::Instant::now();
             mrc::run_classify(&page_png, &score_npy, thr as f32)?;
             eprintln!("classify done ({:.1}s)", t.elapsed().as_secs_f64());
-        }
-        Cmd::Full {
-            master_png,
-            page_png,
-            out_pdf,
-            crop_width,
-            page_id,
-            work,
-            thr,
-        } => {
-            let t = std::time::Instant::now();
-            std::fs::create_dir_all(&work)?;
-            // 1) detection-input CMYK = separate + A4 crop (NO grade, matches make_cmyk_crop.sh)
-            let rgb = imageio::read_rgb_png(&master_png)?;
-            let cmyk = separate::separate(&rgb);
-            let cmyk = grade::a4_crop(&cmyk, crop_width, page_id);
-            // 2) detect -> score npy (+ _cov)
-            let r = detect::detect(&cmyk, 60);
-            let base = format!("{}/full_{:03}", work, page_id);
-            npy::write_f32(&format!("{}.npy", base), &r.fine, &[r.ny, r.nx])?;
-            npy::write_u8(&format!("{}_cov.npy", base), &r.cov, &[4, r.ch4, r.cw])?;
-            eprintln!("  [full] detect done ({:.1}s)", t.elapsed().as_secs_f64());
-            // 3) MRC PDF from the graded RGB page + score
-            mrc::run_mrc(&page_png, &format!("{}.npy", base), &out_pdf, thr as f32, 200.0)?;
-            eprintln!("full -> {} ({:.1}s total)", out_pdf, t.elapsed().as_secs_f64());
         }
     }
     Ok(())
