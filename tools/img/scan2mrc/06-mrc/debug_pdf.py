@@ -44,13 +44,16 @@ OUT_DPI = 150
 SRC_DPI = 600          # the record's bbox coordinate space (mw x mh in mrc.rs)
 PAGE_DPI = 2400        # the page RGB on disk
 LINE = 2
-DIM = 0.62             # fade the page so outlines read; outlines only, never fills
+DIM = 0.70             # fade the page so outlines read; outlines only, never fills
 
-COL_MEDIA = {"rgb": (0, 190, 60), "gray": (40, 110, 255)}
+# DARK outlines: these sit on scanned magazine pages that are mostly light but often carry
+# saturated ads, so a bright outline disappears into yellow/cyan artwork. Dark, saturated colours
+# read against both paper and full-bleed colour.
+COL_MEDIA = {"rgb": (0, 110, 30), "gray": (10, 40, 150)}
 # a reversed box (white lettering on a solid dark fill) also ends up in the contone background,
 # but by a different decision than step 7 -- worth its own colour so a wrong promotion is visible
-COL_DARKFILL = (255, 130, 0)
-COL_UNKNOWN_INK = (150, 150, 150)
+COL_DARKFILL = (170, 70, 0)
+COL_UNKNOWN_INK = (70, 70, 70)
 
 # Overlapping detections are the normal case -- an ink stencil sits inside a photo, a reversed box
 # sits inside a tint. Coincident outlines would hide each other, so each TYPE is nudged right and
@@ -67,14 +70,40 @@ def nudge_for(kind):
         return NUDGE * len(NUDGE_ORDER)
 
 
+DASH = 7        # px on
+GAP = 5         # px off
+
+
+def _dash_line(d, a, b, colour, width, phase):
+    """One dashed segment from a to b. PIL has no dash support, so the run is walked by hand."""
+    (x0, y0), (x1, y1) = a, b
+    dx, dy = x1 - x0, y1 - y0
+    n = max(abs(dx), abs(dy))
+    if n <= 0:
+        return
+    ux, uy = dx / n, dy / n
+    t = -(phase % (DASH + GAP))
+    while t < n:
+        s0 = max(t, 0.0)
+        s1 = min(t + DASH, n)
+        if s1 > s0:
+            d.line([x0 + ux * s0, y0 + uy * s0, x0 + ux * s1, y0 + uy * s1],
+                   fill=colour, width=width)
+        t += DASH + GAP
+
+
 def rect(d, bbox, sc, colour, kind, width):
+    """Dashed outline, nudged AND phase-shifted per type: the nudge separates boxes that merely
+    overlap, the phase keeps two exactly-coincident boxes both visible as alternating dashes."""
     o = nudge_for(kind)
-    x0, y0, x1, y1 = bbox
-    d.rectangle([x0 * sc + o, y0 * sc + o, x1 * sc + o, y1 * sc + o],
-                outline=colour, width=width)
+    ph = (nudge_for(kind) // NUDGE) * 4
+    x0, y0, x1, y1 = [v * sc + o for v in bbox]
+    for a, b in (((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)),
+                 ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0))):
+        _dash_line(d, a, b, colour, width, ph)
 # accent-ink outline colours: the ink's own hue, brightened enough to see on paper
-COL_INK = {"C": (0, 175, 210), "M": (225, 0, 140), "Y": (200, 165, 0),
-           "MY": (230, 60, 30), "MC": (140, 40, 200), "CY": (0, 160, 90)}
+COL_INK = {"C": (0, 95, 130), "M": (150, 0, 90), "Y": (120, 95, 0),
+           "MY": (155, 25, 10), "MC": (85, 20, 130), "CY": (0, 100, 55)}
 
 
 def one(page):
@@ -100,36 +129,49 @@ def one(page):
     rows = [json.loads(l) for l in open(rec)]
     n_img = n_ink = n_df = 0
     inks = set()
+    seen = []          # legend entries, in draw order, ONLY for what this page actually has
     for r in rows:
         if r["kind"] == "cluster" and r.get("layer") == "bg":
             m = r.get("media") or "rgb"
-            rect(d, r["bbox"], sc, COL_MEDIA.get(m, (128, 128, 128)), m, LINE)
+            c = COL_MEDIA.get(m, (128, 128, 128))
+            rect(d, r["bbox"], sc, c, m, LINE)
+            lbl_m = "RGB image" if m == "rgb" else "gray image"
+            if (lbl_m, c) not in seen:
+                seen.append((lbl_m, c))
             n_img += 1
         elif r["kind"] == "ink":
             nm = r["ink"]
             inks.add(nm)
-            rect(d, r["bbox"], sc, COL_INK.get(nm, COL_UNKNOWN_INK), nm, LINE)
+            c = COL_INK.get(nm, COL_UNKNOWN_INK)
+            rect(d, r["bbox"], sc, c, nm, LINE)
+            if ("ink " + nm, c) not in seen:
+                seen.append(("ink " + nm, c))
             n_ink += 1
         elif r["kind"] == "darkfill" and r.get("promoted"):
             rect(d, r["bbox"], sc, COL_DARKFILL, "darkfill", LINE)
+            if ("reversed box", COL_DARKFILL) not in seen:
+                seen.append(("reversed box", COL_DARKFILL))
             n_df += 1
 
-    # header: page number and a legend of what is actually on THIS page
+    # header: page number, counts, and a legend of ONLY what is on THIS page. A fixed legend
+    # lies twice over -- it names colours the page does not use, and (before this) omitted ones it
+    # does.
     d.rectangle([0, 0, im.size[0], 15], fill=(255, 255, 255))
-    lbl = "p%03d   %d image  %d ink  %d reversed-box" % (page, n_img, n_ink, n_df)
-    d.text((4, 3), lbl, fill=(0, 0, 0))
-    x = 250
-    for nm, c in (("RGB image", COL_MEDIA["rgb"]), ("gray image", COL_MEDIA["gray"]),
-                  ("reversed box", COL_DARKFILL)):
-        d.rectangle([x, 4, x + 9, 12], outline=c, width=2)
+    d.text((4, 3), "p%03d   %d image  %d ink  %d reversed-box" % (page, n_img, n_ink, n_df),
+           fill=(0, 0, 0))
+    x = 245
+    for nm, c in seen:
+        for yy in (4, 12):
+            d.line([x, yy, x + 3, yy], fill=c, width=2)
+            d.line([x + 6, yy, x + 9, yy], fill=c, width=2)
+        d.line([x, 4, x, 12], fill=c, width=2)
+        d.line([x + 9, 4, x + 9, 12], fill=c, width=2)
         d.text((x + 13, 3), nm, fill=(0, 0, 0))
-        x += 96
-    for nm in sorted(inks):
-        c = COL_INK.get(nm, (255, 140, 0))
-        d.rectangle([x, 4, x + 9, 12], outline=c, width=2)
-        d.text((x + 13, 3), nm, fill=(0, 0, 0))
-        x += 40
-    d.text((x + 6, 3), "(K not outlined)", fill=(90, 90, 90))
+        x += 20 + 7 * len(nm)
+    if not seen:
+        d.text((x, 3), "no image/ink/reversed-box regions on this page", fill=(90, 90, 90))
+    else:
+        d.text((x + 4, 3), "(K not outlined)", fill=(90, 90, 90))
     os.makedirs(PNG, exist_ok=True)
     im.save(out)
     return page, "%d img %d ink %d revbox" % (n_img, n_ink, n_df)
