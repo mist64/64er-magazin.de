@@ -92,8 +92,19 @@ const DARKFILL_FILLED: f64 = 0.70;    // filled_frac floor: solid shape after ho
 //                                                                       p151 icon 2/0.241,
 //                                                                       p128 panel 1/0.740)
 // The AND of the two loose conditions below vetoes all 18 glyphs and none of the 37 boxes.
-const DARKFILL_GLYPH_HOLES: usize = 3;      // at most this many real counters ...
-const DARKFILL_GLYPH_HOLEFRAC: f64 = 0.18;  // ... AND interior this small relative to the ink
+const DARKFILL_GLYPH_HOLES: usize = 3;      // at most this many real counters, AND EITHER ...
+const DARKFILL_GLYPH_HOLEFRAC: f64 = 0.18;  // ... a small interior (a tight counter: p062's "8"
+                                            //     is 0.069) ...
+const DARKFILL_GLYPH_HOLEPX: f64 = 2000.0;  // ... OR a HUGE mean counter. This second test was
+                                            // added after HOLEFRAC alone was found mis-calibrated:
+                                            // it came from glyphs measuring 0.071-0.136, but big
+                                            // round display letters (O D R 8) measure 0.199-0.694
+                                            // and sailed through, so ~20 of them across ~10 pages
+                                            // were promoted and softened. Mean counter area
+                                            // separates far better -- display glyphs p50 16697 px
+                                            // against real reversed boxes p50 ~850, a 20x gap,
+                                            // because a reversed LETTER is small by construction
+                                            // while a display glyph's counter is most of it.
 const DARKFILL_HOLE_MIN: usize = 20;        // ignore speck holes (scan noise inside solid ink)
 const DARKFILL_HOLES_LO: f64 = 0.05;  // enclosed-bright floor: reversed text present
 const DARKFILL_HOLES_HI: f64 = 0.55;  // enclosed-bright ceiling: not a hollow frame
@@ -844,8 +855,10 @@ pub fn analyze(
             let n_holes = (1..=hn).filter(|&k| hsz[k - 1] >= hmin).count();
             let hole_px: u64 = (1..=hn).map(|k| hsz[k - 1]).filter(|&s| s >= hmin).sum();
             let hole_area_frac = hole_px as f64 / cpx as f64;
+            let mean_hole_px = if n_holes > 0 { hole_px as f64 / n_holes as f64 } else { 0.0 };
             let glyph = n_holes <= env_i("DARKFILL_GLYPH_HOLES", DARKFILL_GLYPH_HOLES as i64) as usize
-                && hole_area_frac < env_f("DARKFILL_GLYPH_HOLEFRAC", DARKFILL_GLYPH_HOLEFRAC as f32) as f64;
+                && (hole_area_frac < env_f("DARKFILL_GLYPH_HOLEFRAC", DARKFILL_GLYPH_HOLEFRAC as f32) as f64
+                    || mean_hole_px > env_f("DARKFILL_GLYPH_HOLEPX", DARKFILL_GLYPH_HOLEPX as f32) as f64);
             let promote = filled_frac > filled_env && hole_frac > holes_lo && hole_frac < holes_hi
                 && !glyph;
             // EVERY candidate is recorded, not just the promoted ones: the near-misses are how a
@@ -857,6 +870,7 @@ pub fn analyze(
                 "promoted": promote,
                 "dark_frac": r2(dark_frac), "filled_frac": r2(filled_frac), "hole_frac": r2(hole_frac),
                 "n_holes": n_holes, "hole_area_frac": r2(hole_area_frac), "glyph_veto": glyph,
+                "mean_hole_px": r2(mean_hole_px),
             }));
             if promote {
                 // Force the FILL's bbox into BOTH image (-> no K blob) AND m600 (-> the descreened
