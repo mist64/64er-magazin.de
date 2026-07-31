@@ -455,8 +455,8 @@ def _fills_window(rgb, edge, dtb, dlr, H, W, profile):
     return float(is_backing(deep, mats).mean()) >= WIDE_TRIGGER
 
 
-def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
-    """Return (cut_depth per line, decision, metrics)."""
+def _analyze_edge_once(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
+    """One pass at a given window depth. Callers want `analyze_edge`, which retries wider."""
     E = _orient1(rgb, edge, dtb, dlr, H, W)
     L = _orient1(lum, edge, dtb, dlr, H, W)
     D = L.shape[1]
@@ -662,6 +662,27 @@ def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
     return np.clip(line + round(OVERCUT_600 * dpi / 600), 0, D), "CUT", m
 
 
+def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
+    """Return (cut_depth per line, decision, metrics).
+
+    Retries with a WIDER window when the calibrated backing still fills the deepest part of the
+    normal one -- see WIDE_FRAC. `meta["win"]` is the window depth the result is expressed in,
+    which a caller building a mask must use instead of assuming dtb/dlr.
+    """
+    D0 = dtb if edge in ("top", "bottom") else dlr
+    cut, dec, m = _analyze_edge_once(rgb, lum, edge, dpi, H, W, dtb, dlr, profile)
+    m["win"] = D0
+    if dec == "CLEAN(no backing)" and _fills_window(rgb, edge, dtb, dlr, H, W, profile):
+        wtb = int(WIDE_FRAC * H) if edge in ("top", "bottom") else dtb
+        wlr = int(WIDE_FRAC * W) if edge in ("left", "right") else dlr
+        cut2, dec2, m2 = _analyze_edge_once(rgb, lum, edge, dpi, H, W, wtb, wlr, profile)
+        if dec2 == "CUT":
+            m2["win"] = wtb if edge in ("top", "bottom") else wlr
+            m2["widened"] = True
+            return cut2, dec2, m2
+    return cut, dec, m
+
+
 def load_profile(path=None):
     """The issue's measured backing materials (calibrate_backing.py)."""
     path = path or os.environ.get("BM_PROFILE") or os.path.join(
@@ -693,22 +714,10 @@ def bed_matte(rgb, dpi, return_meta=False, profile=None, page_no=None):
     mask = np.zeros((H, W), bool)
     meta = {}
     for edge in EDGES:
-        D = dtb if edge in ("top", "bottom") else dlr
         cut, decision, m = analyze_edge(a, lum, edge, dpi, H, W, dtb, dlr, profile)
-        # WIDEN AND RETRY when the backing plainly runs past the window. See WIDE_FRAC.
-        if decision == "CLEAN(no backing)" and _fills_window(a, edge, dtb, dlr, H, W, profile):
-            wtb = int(WIDE_FRAC * H) if edge in ("top", "bottom") else dtb
-            wlr = int(WIDE_FRAC * W) if edge in ("left", "right") else dlr
-            cut2, dec2, m2 = analyze_edge(a, lum, edge, dpi, H, W, wtb, wlr, profile)
-            if dec2 == "CUT":
-                D = wtb if edge in ("top", "bottom") else wlr
-                dtb_e, dlr_e = wtb, wlr
-                cut, decision, m = cut2, dec2, m2
-                m["widened"] = True
-            else:
-                dtb_e, dlr_e = dtb, dlr
-        else:
-            dtb_e, dlr_e = dtb, dlr
+        D = m["win"]
+        dtb_e = D if edge in ("top", "bottom") else dtb
+        dlr_e = D if edge in ("left", "right") else dlr
         m["decision"] = decision
         m["cut_px"] = float(np.median(cut))
         meta[edge] = m

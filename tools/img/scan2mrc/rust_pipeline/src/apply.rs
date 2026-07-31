@@ -580,8 +580,45 @@ pub fn diffuse_holes(rgb: &mut [u8], unknown: &[bool], w: usize, h: usize) -> us
 ///
 /// Returns the number of DEAD pixels (row and column both entirely unknown) that had to fall
 /// back to the nearest-resolved-pixel rule.
+/// Beyond this distance from any known pixel, DO NOT MIRROR -- fill with the page's own paper.
+///
+/// Mirroring assumes the page plausibly continues just past the crop, which is true for a matte
+/// band (the deepest real cut on this issue is ~800px @2400, ~8mm). It is false for a large void:
+/// p003/p004 are bound-in reply cards narrower than A4, so ~44% of the page has no sheet behind it
+/// at all, and reflecting there fabricates a mirrored copy of the card -- which reads as real
+/// content and is worse than the black it replaced. 1200px @2400 = 12.7mm leaves generous room for
+/// any genuine band while being far below the 8596px void.
+const MIRROR_MAX_PX: i64 = 1200;
+
+/// The page's paper colour: the median of the KNOWN pixels in the lightest quartile. Measured per
+/// page rather than assumed, so a cream stock or a colour cast fills with its own white.
+fn paper_colour(rgb: &[u8], unknown: &[bool]) -> [u8; 3] {
+    let mut lum: Vec<(u16, usize)> = Vec::new();
+    for i in (0..unknown.len()).step_by(17) {
+        if unknown[i] {
+            continue;
+        }
+        let l = rgb[i * 3] as u16 + rgb[i * 3 + 1] as u16 + rgb[i * 3 + 2] as u16;
+        lum.push((l, i));
+    }
+    if lum.is_empty() {
+        return [255, 255, 255];
+    }
+    lum.sort_unstable();
+    let hi = &lum[lum.len() * 3 / 4..];
+    let mut ch = [0u32; 3];
+    for &(_, i) in hi {
+        for c in 0..3 {
+            ch[c] += rgb[i * 3 + c] as u32;
+        }
+    }
+    let n = hi.len() as u32;
+    [(ch[0] / n) as u8, (ch[1] / n) as u8, (ch[2] / n) as u8]
+}
+
 pub fn mirror_edges(rgb: &mut Vec<u8>, unknown: &[bool], w: usize, h: usize) -> usize {
     let r = runs(unknown, w, h);
+    let paper = paper_colour(rgb, unknown);
     // trailing-run reflected length per row / column (`m` in _mirror_1d)
     let row_tm: Vec<i64> = (0..h)
         .map(|y| {
@@ -636,6 +673,14 @@ pub fn mirror_edges(rgb: &mut Vec<u8>, unknown: &[bool], w: usize, h: usize) -> 
                 } else {
                     0
                 };
+                // TOO FAR TO MIRROR -- see MIRROR_MAX_PX. Nothing is being reflected here except
+                // invention, so fill with the page's own paper instead.
+                if std::cmp::min(drow, dcol) > MIRROR_MAX_PX {
+                    out_row[x * 3] = paper[0];
+                    out_row[x * 3 + 1] = paper[1];
+                    out_row[x * 3 + 2] = paper[2];
+                    continue;
+                }
                 if r.rowany[y] && drow <= dcol {
                     let sx = if xi < rf {
                         let m = std::cmp::min(rf, rl + 1 - rf);
