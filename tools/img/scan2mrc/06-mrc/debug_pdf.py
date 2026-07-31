@@ -38,13 +38,18 @@ PNG = os.path.join(T, "dbg", "debugpages")
 # so this tool never decodes the 426 MB page RGB itself -- one code path produces the pixels, one
 # consumes them. The local fallback below exists only for pages rendered before that landed.
 BASE = os.path.join(T, "mrc")
+BASE_SUF = "_base600.png"
+ALLOW_SLOW = os.environ.get("DEBUG_PDF_SLOW") == "1"
 OUT = os.path.join(T, "8609_debug.pdf")
 
-OUT_DPI = 150
+OUT_DPI = 600          # the record's own coordinate space: no scaling, and small regions are
+                       # legible rather than guessed at
 SRC_DPI = 600          # the record's bbox coordinate space (mw x mh in mrc.rs)
 PAGE_DPI = 2400        # the page RGB on disk
-LINE = 2
-DIM = 0.70             # fade the page so outlines read; outlines only, never fills
+LINE = 40       # 10x: a 4px line at 600 dpi is sub-pixel once the page is viewed whole
+DIM = 0.40             # fade the page HARD -- this is a decision view, not a proof of the
+                       # page. The outlines have to win against full-bleed colour ads. Outlines
+                       # only, never fills.
 
 # DARK outlines: these sit on scanned magazine pages that are mostly light but often carry
 # saturated ads, so a bright outline disappears into yellow/cyan artwork. Dark, saturated colours
@@ -59,19 +64,24 @@ COL_UNKNOWN_INK = (70, 70, 70)
 # sits inside a tint. Coincident outlines would hide each other, so each TYPE is nudged right and
 # down by its own multiple of NUDGE. Read the nesting order off the offsets: the outermost box is
 # the earliest type.
-NUDGE = 3
-NUDGE_ORDER = ["rgb", "gray", "darkfill", "C", "M", "Y", "MY", "MC", "CY"]
+NUDGE = 5       # A HINT, NOT A DISPLACEMENT. This is index*NUDGE, so with 9 types a large value
+                # puts an ink box hundreds of px from the region it describes -- the outline then
+                # lies about where the thing is, which is worse than two outlines overlapping.
+                # Coincident boxes are separated by the dash PHASE instead, which costs no space:
+                # two colours alternate along the same line.
 
 
-def nudge_for(kind):
-    try:
-        return NUDGE * NUDGE_ORDER.index(kind)
-    except ValueError:
-        return NUDGE * len(NUDGE_ORDER)
+def nudge_for(kind, seen_types):
+    """Rank among the types actually PRESENT on this page, not among all nine. A page with an
+    image and one ink then offsets by 0 and 5 px; ranking globally would offset that same ink by
+    up to 40 px for no reason, since the seven absent types cost nothing to skip."""
+    if kind not in seen_types:
+        seen_types.append(kind)
+    return NUDGE * seen_types.index(kind)
 
 
-DASH = 7        # px on
-GAP = 5         # px off
+DASH = 90       # px on -- scaled with LINE so it still reads as dashed, not as blobs
+GAP = 60        # px off
 
 
 def _dash_line(d, a, b, colour, width, phase):
@@ -92,11 +102,11 @@ def _dash_line(d, a, b, colour, width, phase):
         t += DASH + GAP
 
 
-def rect(d, bbox, sc, colour, kind, width):
+def rect(d, bbox, sc, colour, kind, width, seen_types):
     """Dashed outline, nudged AND phase-shifted per type: the nudge separates boxes that merely
     overlap, the phase keeps two exactly-coincident boxes both visible as alternating dashes."""
-    o = nudge_for(kind)
-    ph = (nudge_for(kind) // NUDGE) * 4
+    o = nudge_for(kind, seen_types)
+    ph = (o // NUDGE) * 4
     x0, y0, x1, y1 = [v * sc + o for v in bbox]
     for a, b in (((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)),
                  ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0))):
@@ -114,9 +124,14 @@ def one(page):
         return page, "missing input"
     # The 2400 dpi source is ~426 MB and decoding it dominates (41s of a 41s page), so the 150 dpi
     # rendition is cached: the overlay is the part that changes when a gate moves, not the page.
-    bcache = os.path.join(BASE, "%03d_base150.png" % page)
+    bcache = os.path.join(BASE, "%03d%s" % (page, BASE_SUF))
     if os.path.exists(bcache):
         im = Image.open(bcache).convert("RGB")
+    elif not ALLOW_SLOW:
+        # No base yet -- the render has not reached this page. Decoding the 426 MB 2400 dpi page
+        # instead would be ~40x slower and silently produce a DIFFERENT rendition than every other
+        # page, so skip and say so.
+        return page, "no base yet (render still running)"
     else:
         im = Image.open(src).convert("RGB")
         w, h = im.size
@@ -130,11 +145,12 @@ def one(page):
     n_img = n_ink = n_df = 0
     inks = set()
     seen = []          # legend entries, in draw order, ONLY for what this page actually has
+    seen_types = []    # nudge ranking, likewise page-local
     for r in rows:
         if r["kind"] == "cluster" and r.get("layer") == "bg":
             m = r.get("media") or "rgb"
             c = COL_MEDIA.get(m, (128, 128, 128))
-            rect(d, r["bbox"], sc, c, m, LINE)
+            rect(d, r["bbox"], sc, c, m, LINE, seen_types)
             lbl_m = "RGB image" if m == "rgb" else "gray image"
             if (lbl_m, c) not in seen:
                 seen.append((lbl_m, c))
@@ -143,12 +159,12 @@ def one(page):
             nm = r["ink"]
             inks.add(nm)
             c = COL_INK.get(nm, COL_UNKNOWN_INK)
-            rect(d, r["bbox"], sc, c, nm, LINE)
+            rect(d, r["bbox"], sc, c, nm, LINE, seen_types)
             if ("ink " + nm, c) not in seen:
                 seen.append(("ink " + nm, c))
             n_ink += 1
         elif r["kind"] == "darkfill" and r.get("promoted"):
-            rect(d, r["bbox"], sc, COL_DARKFILL, "darkfill", LINE)
+            rect(d, r["bbox"], sc, COL_DARKFILL, "darkfill", LINE, seen_types)
             if ("reversed box", COL_DARKFILL) not in seen:
                 seen.append(("reversed box", COL_DARKFILL))
             n_df += 1
@@ -156,22 +172,27 @@ def one(page):
     # header: page number, counts, and a legend of ONLY what is on THIS page. A fixed legend
     # lies twice over -- it names colours the page does not use, and (before this) omitted ones it
     # does.
-    d.rectangle([0, 0, im.size[0], 15], fill=(255, 255, 255))
-    d.text((4, 3), "p%03d   %d image  %d ink  %d reversed-box" % (page, n_img, n_ink, n_df),
-           fill=(0, 0, 0))
-    x = 245
+    d.rectangle([0, 0, im.size[0], 46], fill=(255, 255, 255))
+    from PIL import ImageFont
+    try:
+        fnt = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf", 26)
+    except Exception:
+        fnt = None
+    d.text((10, 9), "p%03d   %d image  %d ink  %d reversed-box" % (page, n_img, n_ink, n_df),
+           fill=(0, 0, 0), font=fnt)
+    x = 640
     for nm, c in seen:
-        for yy in (4, 12):
-            d.line([x, yy, x + 3, yy], fill=c, width=2)
-            d.line([x + 6, yy, x + 9, yy], fill=c, width=2)
-        d.line([x, 4, x, 12], fill=c, width=2)
-        d.line([x + 9, 4, x + 9, 12], fill=c, width=2)
-        d.text((x + 13, 3), nm, fill=(0, 0, 0))
-        x += 20 + 7 * len(nm)
+        for yy in (12, 34):
+            d.line([x, yy, x + 11, yy], fill=c, width=4)
+            d.line([x + 20, yy, x + 31, yy], fill=c, width=4)
+        d.line([x, 12, x, 34], fill=c, width=4)
+        d.line([x + 31, 12, x + 31, 34], fill=c, width=4)
+        d.text((x + 40, 9), nm, fill=(0, 0, 0), font=fnt)
+        x += 70 + 15 * len(nm)
     if not seen:
-        d.text((x, 3), "no image/ink/reversed-box regions on this page", fill=(90, 90, 90))
+        d.text((x, 9), "no image/ink/reversed-box regions on this page", fill=(90, 90, 90), font=fnt)
     else:
-        d.text((x + 4, 3), "(K not outlined)", fill=(90, 90, 90))
+        d.text((x + 10, 9), "(K not outlined)", fill=(90, 90, 90), font=fnt)
     os.makedirs(PNG, exist_ok=True)
     im.save(out)
     return page, "%d img %d ink %d revbox" % (n_img, n_ink, n_df)
