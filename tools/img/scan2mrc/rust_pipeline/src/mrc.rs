@@ -733,10 +733,22 @@ pub fn analyze(
             let cvm = idx.iter().map(|&i| colorvar[i] as f64).sum::<f64>() / n;
             let sm = idx.iter().map(|&i| satmean[i] as f64).sum::<f64>() / n;
             let tvm = idx.iter().map(|&i| tonevar[i] as f64).sum::<f64>() / n;
+            // MEDIA: an IMAGE region is drawn from the contone background either in colour or
+            // as neutral grey. `sm` is the mean of max(C,M,Y) after neutral removal, i.e. how much
+            // COLOURED ink the region carries -- so it separates a colour photo from a greyscale
+            // one, which is a distinction the destination layer alone does not express.
+            let media = if !is_img {
+                "text"
+            } else if sm >= env_f("MEDIA_SAT", 12.0) as f64 {
+                "rgb"
+            } else {
+                "gray"
+            };
             rec.push(serde_json::json!({
                 "kind": "cluster", "page": page, "cid": k, "area": idx.len(),
                 "bbox": [x0, y0, x1, y1],
                 "layer": if is_img { "bg" } else { "k" },
+                "media": media,
                 "verdict": if is_img { "IMAGE" } else { "TEXT" },
                 "rescue": is_img && frac < vote as f64,
                 "vote": r2(frac), "cv": r2(cvm), "s": r2(sm), "tv": r2(tvm),
@@ -754,8 +766,19 @@ pub fn analyze(
             }
         }
         eprintln!("  step7: {} clusters, +{} via bodyK (BK={} OBJF={} BC={})", nmc, nb6, bk, objf, bc);
+    } else if std::env::var("MRC_ALLOW_NO_COV").is_ok() {
+        eprintln!("WARNING: no cov cache ({}) -> step 7 disabled (MRC_ALLOW_NO_COV)", cov_path);
     } else {
-        eprintln!("WARNING: no cov cache ({}) -> step 7 disabled", cov_path);
+        // HARD ERROR, not a warning. Without the cov planes step 7 cannot run, every cluster stays
+        // TEXT, and the page silently renders with a completely different layer assignment -- on
+        // p154 that is image_frac 0.68 -> 0.00 and the K mask ballooning 0.009 -> 0.055. A run that
+        // produces a wrong page and exits 0 is worse than one that stops.
+        anyhow::bail!(
+            "no cov cache {} -- step 7 cannot run and the page would render wrong. \
+             The driver copies <score>_cov.npy to <score>m_cov.npy before calling mrc. \
+             Set MRC_ALLOW_NO_COV=1 only if a step-7-less render is genuinely wanted.",
+            cov_path
+        );
     }
 
     // === DARK-FILL (reversed graphics) -> IMAGE (issue G1). See constant block at top. Runs on the
@@ -1103,6 +1126,26 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
                 .collect();
         }
         if sel.iter().any(|&b| b) {
+            // RECORD WHERE EACH ACCENT INK LIVES. The page row lists WHICH inks are present; the
+            // debug overlay needs WHERE. K is deliberately excluded -- it is most of the page, so
+            // outlining it would bury everything else.
+            {
+                let (il, inn) = ndimage::label(&sel, mw, mh);
+                let isz = ndimage::component_sizes(&il, inn);
+                let ibx = ndimage::find_objects(&il, inn, mw, mh);
+                let minpx = env_i("INKREC_MINPX", 400) as u64;
+                for c in 1..=inn {
+                    if isz[c - 1] < minpx {
+                        continue;
+                    }
+                    if let Some((y0, y1, x0, x1)) = ibx[c - 1] {
+                        rec.push(serde_json::json!({
+                            "kind": "ink", "page": page, "ink": nm, "cid": c,
+                            "px": isz[c - 1], "bbox": [x0, y0, x1, y1], "layer": "ink",
+                        }));
+                    }
+                }
+            }
             let data = jbig2(&work, &format!("ink_{}", nm), &sel, mw, mh)?;
             layers.push(Layer {
                 col: canon(nm),
