@@ -34,7 +34,10 @@ T = "/Users/mist/DNB/8609/tmp"
 SRC = os.path.join(T, "render", "deliver")
 REC = os.path.join(T, "mrc")
 PNG = os.path.join(T, "dbg", "debugpages")
-BASE = os.path.join(T, "dbg", "debugbase")   # cached 150 dpi renditions of the graded page
+# The 150 dpi base is a SIDE EFFECT of `mrcpipe mrc` (written next to the PDF as NNN_base150.png),
+# so this tool never decodes the 426 MB page RGB itself -- one code path produces the pixels, one
+# consumes them. The local fallback below exists only for pages rendered before that landed.
+BASE = os.path.join(T, "mrc")
 OUT = os.path.join(T, "8609_debug.pdf")
 
 OUT_DPI = 150
@@ -48,6 +51,27 @@ COL_MEDIA = {"rgb": (0, 190, 60), "gray": (40, 110, 255)}
 # but by a different decision than step 7 -- worth its own colour so a wrong promotion is visible
 COL_DARKFILL = (255, 130, 0)
 COL_UNKNOWN_INK = (150, 150, 150)
+
+# Overlapping detections are the normal case -- an ink stencil sits inside a photo, a reversed box
+# sits inside a tint. Coincident outlines would hide each other, so each TYPE is nudged right and
+# down by its own multiple of NUDGE. Read the nesting order off the offsets: the outermost box is
+# the earliest type.
+NUDGE = 3
+NUDGE_ORDER = ["rgb", "gray", "darkfill", "C", "M", "Y", "MY", "MC", "CY"]
+
+
+def nudge_for(kind):
+    try:
+        return NUDGE * NUDGE_ORDER.index(kind)
+    except ValueError:
+        return NUDGE * len(NUDGE_ORDER)
+
+
+def rect(d, bbox, sc, colour, kind, width):
+    o = nudge_for(kind)
+    x0, y0, x1, y1 = bbox
+    d.rectangle([x0 * sc + o, y0 * sc + o, x1 * sc + o, y1 * sc + o],
+                outline=colour, width=width)
 # accent-ink outline colours: the ink's own hue, brightened enough to see on paper
 COL_INK = {"C": (0, 175, 210), "M": (225, 0, 140), "Y": (200, 165, 0),
            "MY": (230, 60, 30), "MC": (140, 40, 200), "CY": (0, 160, 90)}
@@ -61,16 +85,14 @@ def one(page):
         return page, "missing input"
     # The 2400 dpi source is ~426 MB and decoding it dominates (41s of a 41s page), so the 150 dpi
     # rendition is cached: the overlay is the part that changes when a gate moves, not the page.
-    os.makedirs(BASE, exist_ok=True)
-    bcache = os.path.join(BASE, "%03d.png" % page)
-    if os.path.exists(bcache) and os.path.getmtime(bcache) >= os.path.getmtime(src):
+    bcache = os.path.join(BASE, "%03d_base150.png" % page)
+    if os.path.exists(bcache):
         im = Image.open(bcache).convert("RGB")
     else:
         im = Image.open(src).convert("RGB")
         w, h = im.size
         k = OUT_DPI / PAGE_DPI
         im = im.resize((int(round(w * k)), int(round(h * k))), Image.LANCZOS)
-        im.save(bcache)
     im = Image.blend(Image.new("RGB", im.size, (255, 255, 255)), im, DIM)
     d = ImageDraw.Draw(im)
     sc = OUT_DPI / SRC_DPI
@@ -80,20 +102,16 @@ def one(page):
     inks = set()
     for r in rows:
         if r["kind"] == "cluster" and r.get("layer") == "bg":
-            c = COL_MEDIA.get(r.get("media"), (128, 128, 128))
-            x0, y0, x1, y1 = r["bbox"]
-            d.rectangle([x0 * sc, y0 * sc, x1 * sc, y1 * sc], outline=c, width=LINE)
+            m = r.get("media") or "rgb"
+            rect(d, r["bbox"], sc, COL_MEDIA.get(m, (128, 128, 128)), m, LINE)
             n_img += 1
         elif r["kind"] == "ink":
             nm = r["ink"]
             inks.add(nm)
-            c = COL_INK.get(nm, COL_UNKNOWN_INK)
-            x0, y0, x1, y1 = r["bbox"]
-            d.rectangle([x0 * sc, y0 * sc, x1 * sc, y1 * sc], outline=c, width=LINE)
+            rect(d, r["bbox"], sc, COL_INK.get(nm, COL_UNKNOWN_INK), nm, LINE)
             n_ink += 1
         elif r["kind"] == "darkfill" and r.get("promoted"):
-            x0, y0, x1, y1 = r["bbox"]
-            d.rectangle([x0 * sc, y0 * sc, x1 * sc, y1 * sc], outline=COL_DARKFILL, width=LINE)
+            rect(d, r["bbox"], sc, COL_DARKFILL, "darkfill", LINE)
             n_df += 1
 
     # header: page number and a legend of what is actually on THIS page
