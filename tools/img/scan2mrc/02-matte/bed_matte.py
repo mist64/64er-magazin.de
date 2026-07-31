@@ -66,6 +66,19 @@ Image.MAX_IMAGE_PIXELS = None
 # ---------------------------------------------------------------------------------------------------
 WIN_TB_FRAC   = 0.08     # top/bottom search depth as a fraction of image HEIGHT
 WIN_LR_FRAC   = 0.16     # left/right search depth as a fraction of image WIDTH (bars are wide)
+WIDE_FRAC     = 0.70     # RETRY depth when the backing fills the whole normal window. A bound-in
+                         # reply card is much narrower than A4 -- on p003/p004 the sheet edge sits
+                         # 90-93mm from the border while the window reaches only 35mm, so the
+                         # material never "vanishes inboard", region_collapses fails, and the edge
+                         # is reported CLEAN(no backing) with half the page left black. The retry
+                         # cannot invent a cut: it only helps when a real boundary exists further
+                         # in, because the same collapse test still has to pass in the wider window.
+                         # 0.70 rather than something tighter because region_collapses needs the
+                         # DEEPEST QUARTER of the window to lie past the sheet edge: 0.75*f*W >
+                         # 2141px on p003 means f > 0.56, and 0.55 missed by 21px.
+WIDE_TRIGGER  = 0.85     # ... retry only if this fraction of the window's DEEPEST part already
+                         # matches the calibrated backing, i.e. the material plainly continues
+                         # past where we stopped looking
 
 # --- step 1: what IS backing (positive material test) -----------------------------------------------
 # NOTHING about the backing is written here any more. WHICH materials are backing, WHAT colour
@@ -425,6 +438,23 @@ def candidates(back, dpi):
     return out
 
 
+def _fills_window(rgb, edge, dtb, dlr, H, W, profile):
+    """Does the calibrated backing still occupy the DEEPEST part of the search window?
+
+    If so the sheet edge is beyond where we looked, and `CLEAN(no backing)` is a window-size
+    artefact rather than a finding. Uses the ISSUE profile's radii, not the per-page refined ones:
+    the per-page refinement runs inside page_materials, which is exactly what failed here."""
+    E = _orient1(rgb, edge, dtb, dlr, H, W)
+    D = E.shape[1]
+    deep = E[:, int(DEEP_FRAC * D):]
+    mats = [(np.array(x["centre"], np.float32), float(x["radius_l"]) * GROW_L,
+             float(x["radius_c"]) * GROW_C)
+            for x in profile.get(edge, []) if x.get("backing")]
+    if not mats:
+        return False
+    return float(is_backing(deep, mats).mean()) >= WIDE_TRIGGER
+
+
 def analyze_edge(rgb, lum, edge, dpi, H, W, dtb, dlr, profile):
     """Return (cut_depth per line, decision, metrics)."""
     E = _orient1(rgb, edge, dtb, dlr, H, W)
@@ -665,11 +695,25 @@ def bed_matte(rgb, dpi, return_meta=False, profile=None, page_no=None):
     for edge in EDGES:
         D = dtb if edge in ("top", "bottom") else dlr
         cut, decision, m = analyze_edge(a, lum, edge, dpi, H, W, dtb, dlr, profile)
+        # WIDEN AND RETRY when the backing plainly runs past the window. See WIDE_FRAC.
+        if decision == "CLEAN(no backing)" and _fills_window(a, edge, dtb, dlr, H, W, profile):
+            wtb = int(WIDE_FRAC * H) if edge in ("top", "bottom") else dtb
+            wlr = int(WIDE_FRAC * W) if edge in ("left", "right") else dlr
+            cut2, dec2, m2 = analyze_edge(a, lum, edge, dpi, H, W, wtb, wlr, profile)
+            if dec2 == "CUT":
+                D = wtb if edge in ("top", "bottom") else wlr
+                dtb_e, dlr_e = wtb, wlr
+                cut, decision, m = cut2, dec2, m2
+                m["widened"] = True
+            else:
+                dtb_e, dlr_e = dtb, dlr
+        else:
+            dtb_e, dlr_e = dtb, dlr
         m["decision"] = decision
         m["cut_px"] = float(np.median(cut))
         meta[edge] = m
         if decision == "CUT":
-            mask |= _deorient(np.arange(D)[None, :] < cut[:, None], edge, H, W, dtb, dlr)
+            mask |= _deorient(np.arange(D)[None, :] < cut[:, None], edge, H, W, dtb_e, dlr_e)
 
     rgba = np.dstack([a.astype(np.uint8), np.where(mask, 0, 255).astype(np.uint8)])
 

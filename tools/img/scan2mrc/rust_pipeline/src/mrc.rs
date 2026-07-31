@@ -1090,25 +1090,20 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
         .map(|i| (dy[i] - 0.299 * drf[i] - 0.114 * dbf[i]) / 0.587)
         .collect();
 
-    // DEBUG BASE, as a side effect. 06-mrc/debug_pdf.py draws the decision overlay on the graded
-    // page at 150 dpi; without this it re-decodes the 426 MB page RGB that we have just decoded and
-    // downsampled here, at ~41s a page through a second code path. rgb600 is already in hand, so
-    // the base costs a resample and a small PNG. MRC_NO_BASE=1 skips it.
+    // DEBUG BASE, as a side effect, at 600 dpi -- the resolution the record's bboxes are already
+    // in, so the overlay needs no scaling and a small region can actually be read rather than
+    // guessed at. rgb600 IS the 600 dpi page, so this is a channel interleave and a PNG write,
+    // with no resample at all. MRC_NO_BASE=1 skips it.
     if std::env::var("MRC_NO_BASE").is_err() {
-        let (bw150, bh150) = ((mw as f64 * 150.0 / 600.0).round() as usize,
-                              (mh as f64 * 150.0 / 600.0).round() as usize);
-        let r = resample_plane_f32(&rgb600.r, mw, mh, bw150, bh150, Filter::Lanczos);
-        let g = resample_plane_f32(&rgb600.g, mw, mh, bw150, bh150, Filter::Lanczos);
-        let b = resample_plane_f32(&rgb600.b, mw, mh, bw150, bh150, Filter::Lanczos);
-        let mut px = vec![0u8; bw150 * bh150 * 3];
-        for i in 0..bw150 * bh150 {
-            px[i * 3] = crate::resample::clip8(r[i]);
-            px[i * 3 + 1] = crate::resample::clip8(g[i]);
-            px[i * 3 + 2] = crate::resample::clip8(b[i]);
+        let mut px = vec![0u8; mw * mh * 3];
+        for i in 0..mw * mh {
+            px[i * 3] = crate::resample::clip8(rgb600.r[i]);
+            px[i * 3 + 1] = crate::resample::clip8(rgb600.g[i]);
+            px[i * 3 + 2] = crate::resample::clip8(rgb600.b[i]);
         }
-        let base = format!("{}/{}_base150.png",
+        let base = format!("{}/{}_base600.png",
                            if out_dir.is_empty() { "." } else { &out_dir }, stem);
-        crate::pilio::write_rgb_png_fast(&base, bw150, bh150, &px)?;
+        crate::pilio::write_rgb_png_fast(&base, mw, mh, &px)?;
     }
 
     let scrf: Vec<bool> = (0..mw * mh).map(|i| m600[i] && !image[i]).collect();
