@@ -1045,7 +1045,13 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
     let ir = resample_plane_f32(&rch, w, h, mw, mh, Filter::Box);
     let ig = resample_plane_f32(&gch, w, h, mw, mh, Filter::Box);
     let ib = resample_plane_f32(&bch, w, h, mw, mh, Filter::Box);
-    let t_y = tap(mw, mh, 80.0, 100.0);
+    // COUPLE THE CUTOFF TO THE OUTPUT RATE. (80,100) was chosen for a 200 dpi background, whose
+    // Nyquist is exactly the 100 lp/in stop. With --bg-dpi 150 the Nyquist is 75, so everything the
+    // filter passed between 75 and 100 aliased when the field was resampled down -- the sampling
+    // rate was changed and the anti-alias filter was not. 0.4/0.5 x bg_dpi reproduces (80,100)
+    // exactly at 200, so this is the existing rule generalised rather than a new guess.
+    // The chroma tap needs no change: its 50 lp/in stop is already below the 150 dpi Nyquist.
+    let t_y = tap(mw, mh, 0.4 * bg_dpi as f64, 0.5 * bg_dpi as f64);
     let t_c = tap(mw, mh, 30.0, 50.0);
     let yi: Vec<f32> = (0..mw * mh)
         .map(|i| 0.299 * ir[i] + 0.587 * ig[i] + 0.114 * ib[i])
