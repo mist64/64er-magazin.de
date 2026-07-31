@@ -22,11 +22,14 @@ BGDPI=${BGDPI:-150}
 mkdir -p "$T/mrc"
 
 once=0
-[ "${1:-}" = "--once" ] && once=1
+[ "${1:-}" = "--once" ] && { once=1; shift; }
+# optional page range, so this can run in 2-3 lanes like cache_pages.sh. More lanes oversubscribe:
+# mrcpipe is internally rayon-parallel.
+first=${1:-1}; last=${2:-176}
 
 while :; do
   did=0; pend=0
-  for i in $(seq 1 176); do
+  for i in $(seq "$first" "$last"); do
     n=$(printf "%03d" "$i")
     # FORCE=1 re-renders pages whose PDF exists (an upstream or gate change makes it stale).
     [ "${FORCE:-0}" != "1" ] && [ -s "$T/mrc/$n.pdf" ] && continue

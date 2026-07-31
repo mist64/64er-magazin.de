@@ -116,3 +116,60 @@ Use pages that stress different content: see the A/B sample list in the descreen
 the stop). With `--bg-dpi 150` the Nyquist is 75, so the 75-100 lp/in band aliases. Fix:
 `tap(mw, mh, 0.4 * bg_dpi, 0.5 * bg_dpi)`, which reproduces (80,100) exactly at 200 dpi. The chroma
 tap (30,50) needs no change -- 50 is already below 75.
+
+
+---
+
+# OUTCOME (2026-07-31)
+
+Done and in production. `04-grade/apply_fullres.py` is deleted; `cache_pages.sh` drives
+`mrcpipe apply`.
+
+## Acceptance, as achieved
+
+| gate | result |
+|---|---|
+| byte identity, `known.png` | **byte-identical** (106,121 bytes, p002) |
+| pixel identity, display CMYK | **0 differing samples of 2,227,416,436** (p002, all four planes) |
+| pixel identity, page RGB | **0 differing samples of 556,854,109** (p002) |
+| decision identity | satisfied A FORTIORI -- identical pixels cannot produce different decisions, so the classify/diff_record run was not needed for the apply |
+| interior holes | 627 differing pixels on p130 (0.000113%), **all 627 inside the unknown mask** -- every one is invented content |
+
+The two `.tif` files differ by 1 byte inside the LZW stream (a compressor may reset its dictionary
+differently); all 10 TIFF tags match and the decoded image is bit-exact.
+
+## Timing, measured
+
+409s -> **30s** without the page RGB, **50s** with it. Per stage:
+
+| stage | Python | Rust |
+|---|---|---|
+| master decode | 18.4 | 4.8 |
+| affine warp + alpha | 100.7 | **0.8** |
+| knorm | 15.0 | 0.1 |
+| separate detect | 42.2 | 0.5 |
+| write detect tiff | 44.5 | 0.8 (now uncompressed) |
+| inpaint (mirror + Telea) | 36.1 | 0.4 + 3.0 |
+| separate display | 36.6 | 0.5 |
+| write display tiff | ~38 | 8.2 |
+| ICC transform | 31.9 | **5.0** |
+| write page RGB | 45.5 | 26.2 |
+
+## Where the spec was WRONG
+
+* **ICC.** Predicted "no gain, lcms2 is the library PIL wraps". It is **6x faster** -- the cost was
+  PIL's per-strip `Image.merge`, not the transform.
+* **Disk.** Option C was projected to cut 200 MB/page to ~35 MB. The two 600 dpi RGB planes are 58
+  and 64 MB as PNG, so it is 200 -> 124 MB. The TIME argument stands; the disk claim was oversold.
+* **Seams.** Seven were specified; **two more** were found while writing it, both real: numpy's
+  `np.round` is HALF TO EVEN (the hole lookup uses it), and `holes_shape` must be read as int64
+  rather than inferred from the packed width (packbits pads by up to 7 columns). A third was found
+  while testing: `ndimage::binary_dilation(m,w,h,n)` is n iterations of the 4-neighbour CROSS,
+  growing a diamond, where the Python uses `np.ones((7,7))`, a square -- fixed by adding
+  `binary_dilation_box`.
+
+## Still open
+
+`mrc` still reads the 2400 dpi page RGB rather than the cached tile stats + 600 dpi products.
+`apply --cache` writes them and they are verified present, but nothing consumes them yet, so the
+option-C speed-up on the render side (47s -> ~25s) is not realised. That is the last piece.
