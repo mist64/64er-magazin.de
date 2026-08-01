@@ -10,6 +10,7 @@ mod npy;
 mod pilio;
 mod record;
 mod resample;
+mod screenseg;
 mod separate;
 
 use anyhow::{Context, Result};
