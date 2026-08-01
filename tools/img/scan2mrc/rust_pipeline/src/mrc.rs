@@ -109,6 +109,12 @@ const DARKFILL_HOLE_MIN: usize = 20;        // ignore speck holes (scan noise in
 const DARKFILL_HOLES_LO: f64 = 0.05;  // enclosed-bright floor: reversed text present
 const DARKFILL_HOLES_HI: f64 = 0.55;  // enclosed-bright ceiling: not a hollow frame
 
+// Support floor for the text inpaint's normalized convolution: the fraction of the sigma=5
+// neighbourhood that must be non-K for num/den to mean anything. Below it there is no estimate to
+// make and the background falls back to paper. See the inpaint block for why returning 0 there is
+// destructive rather than merely wrong.
+const INPAINT_DEN_MIN: f32 = 0.02;
+
 pub struct ClusterOut {
     pub w: usize, // NX
     pub h: usize, // NY
@@ -620,6 +626,21 @@ pub fn analyze(
             for &i in idx {
                 tintmask[i] = true;
             }
+            // A tint region is a decision like any other -- it steers the solid-rect fill, which
+            // then REPLACES that part of the background with one flat colour. Record where, so a
+            // tint that grabbed a photo is visible as a box rather than inferred from a flat patch.
+            let (mut x0, mut y0, mut x1, mut y1) = (mw, mh, 0usize, 0usize);
+            for &i in idx {
+                let (x, y) = (i % mw, i / mw);
+                x0 = x0.min(x);
+                y0 = y0.min(y);
+                x1 = x1.max(x);
+                y1 = y1.max(y);
+            }
+            rec.push(serde_json::json!({
+                "kind": "tint", "page": page, "cid": k, "px": idx.len(),
+                "bbox": [x0, y0, x1, y1], "layer": "bg",
+            }));
         }
     }
 
@@ -861,6 +882,27 @@ pub fn analyze(
                     || mean_hole_px > env_f("DARKFILL_GLYPH_HOLEPX", DARKFILL_GLYPH_HOLEPX as f32) as f64);
             let promote = filled_frac > filled_env && hole_frac > holes_lo && hole_frac < holes_hi
                 && !glyph;
+            // IS THE DARK REGION SCREENED? Measured, not yet gated on -- this is the property that
+            // should decide the promotion, and it is recorded first so the decision can be made
+            // from data across the whole issue rather than from the two pages that prompted it.
+            //
+            // Promoting means "send this to the contone background". That is right for a dark area
+            // that is a PHOTOGRAPH (continuous tone, halftoned on the page: p069's discus thrower,
+            // which goes to blotches if forced bilevel) and wrong for one that is FLAT INK (p098's
+            // ad, which bilevel reproduces exactly and contone only softens). Screened vs not is
+            // exactly that distinction, and unlike filled_frac / hole count / aspect / ink
+            // thickness / ink uniformity -- all six of which were tried and none of which
+            // separated the cases -- it is a physical property of the region rather than another
+            // empirical threshold fitted to a handful of pages.
+            let mut scr_in = 0usize;
+            for yy in y0..=y1 {
+                for xx in x0..=x1 {
+                    if m600[yy * mw + xx] {
+                        scr_in += 1;
+                    }
+                }
+            }
+            let screen_frac = scr_in as f64 / (((x1 - x0 + 1) * (y1 - y0 + 1)) as f64).max(1.0);
             // EVERY candidate is recorded, not just the promoted ones: the near-misses are how a
             // gate change is judged, and the p062 "8" sat 0.12 inside a boundary nobody had looked at.
             rec.push(serde_json::json!({
@@ -870,7 +912,7 @@ pub fn analyze(
                 "promoted": promote,
                 "dark_frac": r2(dark_frac), "filled_frac": r2(filled_frac), "hole_frac": r2(hole_frac),
                 "n_holes": n_holes, "hole_area_frac": r2(hole_area_frac), "glyph_veto": glyph,
-                "mean_hole_px": r2(mean_hole_px),
+                "mean_hole_px": r2(mean_hole_px), "screen_frac": r2(screen_frac),
             }));
             if promote {
                 // Force the FILL's bbox into BOTH image (-> no K blob) AND m600 (-> the descreened
@@ -1221,13 +1263,65 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
     let tk = ndimage::binary_dilation(&tk0, bw, bh, 2);
     let wmask: Vec<f32> = tk.iter().map(|&b| if b { 0.0 } else { 1.0 }).collect();
     let den = ndimage::gaussian_filter(&wmask, bw, bh, 5.0);
+    // A normalized convolution is only defined where the neighbourhood HAS known pixels. Inside a
+    // large solid-K region -- a reversed ad, a black bar -- every pixel within sigma is also K, so
+    // den -> 0 and num -> 0, and `num / den.max(1e-6)` silently returns 0, i.e. BLACK. That is not
+    // an estimate, it is the absence of one, and it is destructive: K is drawn as a black-only
+    // ImageMask, so every white letter in the output comes from the background showing through a
+    // hole in K. Painting that background black erases the reversed lettering. It erased the body
+    // text of the p098 Hobby-Elektronik ad while leaving the display type -- big counters keep a
+    // known pixel within sigma, thin ones do not, which is exactly the observed pattern.
+    // Below DEN_MIN there is no support, so fall back to PAPER: the background beneath a bilevel
+    // stencil is paper unless something is known to be there.
+    // INPAINT_DEN_MIN=0 reproduces the old behaviour EXACTLY (the .max(1e-6) guard is kept in the
+    // else branch), so the before/after for this fix is one binary and one env var rather than two
+    // builds -- and the counter below says which pages the fallback touches at all, so the
+    // comparison only has to be rendered for those.
+    let den_min = env_f("INPAINT_DEN_MIN", INPAINT_DEN_MIN);
+    let mut fallback_px = 0usize;
     for c in 0..3 {
         let chan: Vec<f32> = (0..bw * bh).map(|i| bg[i * 3 + c] as f32 * wmask[i]).collect();
         let num = ndimage::gaussian_filter(&chan, bw, bh, 5.0);
         for i in 0..bw * bh {
             if tk[i] {
-                let v = num[i] / den[i].max(1e-6);
-                bg[i * 3 + c] = crate::resample::clip8(v);
+                bg[i * 3 + c] = if den[i] < den_min {
+                    if c == 0 {
+                        fallback_px += 1;
+                    }
+                    255
+                } else {
+                    crate::resample::clip8(num[i] / den[i].max(1e-6))
+                };
+            }
+        }
+    }
+    rec.push(serde_json::json!({
+        "kind": "inpaint", "page": page, "den_min": den_min,
+        "tk_px": tk.iter().filter(|&&b| b).count(),
+        "fallback_px": fallback_px, "bw": bw, "bh": bh,
+    }));
+    // WHERE the fallback fired, not just how much. These are the regions whose background the
+    // inpaint could not estimate -- the places the old code silently painted black, erasing any
+    // reversed lettering that sat there. They are exactly what wants outlining.
+    if fallback_px > 0 {
+        let fb: Vec<bool> = (0..bw * bh).map(|i| tk[i] && den[i] < den_min).collect();
+        let (fl, fnn) = ndimage::label(&fb, bw, bh);
+        let fsz = ndimage::component_sizes(&fl, fnn);
+        let fbx = ndimage::find_objects(&fl, fnn, bw, bh);
+        let fmin = env_i("INPAINT_REC_MINPX", 200) as u64;
+        let sx = mw as f64 / bw as f64;
+        let sy = mh as f64 / bh as f64;
+        for c in 1..=fnn {
+            if fsz[c - 1] < fmin {
+                continue;
+            }
+            if let Some((y0, y1, x0, x1)) = fbx[c - 1] {
+                rec.push(serde_json::json!({
+                    "kind": "inpaint_fallback", "page": page, "cid": c, "px": fsz[c - 1],
+                    "bbox": [(x0 as f64 * sx) as usize, (y0 as f64 * sy) as usize,
+                             (x1 as f64 * sx) as usize, (y1 as f64 * sy) as usize],
+                    "layer": "bg",
+                }));
             }
         }
     }
@@ -1242,7 +1336,20 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
     let rect = env_i("RECT", 1);
     if rect != 0 {
         let nr = solid_rects(&mut bg, bw, bh, &tintmask, &scrf, mw, mh);
-        eprintln!("solid rectangles: {}", nr);
+        eprintln!("solid rectangles: {}", nr.len());
+        // bboxes come back in bg_dpi space; the record's frame is 600 dpi (mw x mh) for every other
+        // kind, so convert here. An overlay that mixes two coordinate systems draws boxes in the
+        // wrong place, and then the picture is no longer evidence.
+        let sx = mw as f64 / bw as f64;
+        let sy = mh as f64 / bh as f64;
+        for (x0, y0, x1, y1, col, which) in &nr {
+            rec.push(serde_json::json!({
+                "kind": "rect", "page": page, "which": which,
+                "bbox": [(*x0 as f64 * sx) as usize, (*y0 as f64 * sy) as usize,
+                         (*x1 as f64 * sx) as usize, (*y1 as f64 * sy) as usize],
+                "rgb": [col[0], col[1], col[2]], "layer": "bg",
+            }));
+        }
     }
 
     // ---- PDF assembly ----
@@ -1285,8 +1392,11 @@ fn solid_rects(
     scrf: &[bool],
     mw: usize,
     mh: usize,
-) -> usize {
-    let mut nrect = 0usize;
+) -> Vec<(usize, usize, usize, usize, [u8; 3], &'static str)> {
+    // Returns the rects it filled, not a count: a solid fill REPLACES a region of the background
+    // with one colour, which is the most destructive thing in the render if it fires on the wrong
+    // region -- so it has to be visible in the overlay, and that needs bbox + colour.
+    let mut nrect: Vec<(usize, usize, usize, usize, [u8; 3], &'static str)> = Vec::new();
     let n = bw * bh;
     let bf_r: Vec<f32> = (0..n).map(|i| bg[i * 3] as f32).collect();
     let bf_g: Vec<f32> = (0..n).map(|i| bg[i * 3 + 1] as f32).collect();
@@ -1456,7 +1566,7 @@ fn solid_rects(
                     bg[i * 3 + 2] = col[2];
                 }
             }
-            nrect += 1;
+            nrect.push((px0, py0, px1, py1, col, "chroma"));
         }
     }
 
@@ -1612,7 +1722,7 @@ fn solid_rects(
                     bg[i * 3 + 2] = col[2];
                 }
             }
-            nrect += 1;
+            nrect.push((px0, py0, px1, py1, col, "grey"));
         }
     }
     nrect
