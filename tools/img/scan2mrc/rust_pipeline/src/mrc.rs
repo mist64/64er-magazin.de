@@ -868,7 +868,72 @@ pub fn analyze(
         let bm = screenseg::block_map(&kish, mw, mh, 600.0);
         let thr = env_f("SEG_THR", 40.0);
         let minb = env_i("SEG_MINBLOCKS", 12) as usize;
-        let amask = screenseg::areas(&bm, thr, minb);
+        let mut amask = screenseg::areas(&bm, thr, minb);
+
+        // THE THIRD DESTINATION. The rule has three, not two:
+        //     screened + uniform  -> flat fill      (exact, tiny, and the type on top stays crisp)
+        //     screened + varying  -> contone
+        //     not screened        -> bilevel
+        // Without this branch every grey header bar and tint panel went to contone, because a tint
+        // IS screened -- p007's "SOFTWARE-HILFEN", "GRUNDLAGEN", "KURSE" bars and the grey "9/86"
+        // numeral were swept into the background and softened along with the type on them.
+        //
+        // Judged PER BLOCK, not per area. A first attempt tested whole connected areas and never
+        // fired: a photograph and three tint bars merge into one component, and the merged thing
+        // is obviously varying. The block is the right unit here for the same reason it is the
+        // right unit for the screening test itself.
+        //
+        // Uniformity is measured on the DESCREENED tone (median-filtered luma). On the raw plane a
+        // halftone's own dots dominate the variance and everything looks varying.
+        {
+            let lo = ndimage::median_filter(&luma, mw, mh, kmed);
+            let uni_t = env_f("SEG_UNIFORM_STD", 9.0) as f64;
+            let mut flat_blocks = 0usize;
+            for by in 0..bm.ny {
+                for bx in 0..bm.nx {
+                    let bi = by * bm.nx + bx;
+                    if !amask[bi] {
+                        continue;
+                    }
+                    let y0 = by * screenseg::STEP;
+                    let x0 = bx * screenseg::STEP;
+                    let y1 = (y0 + screenseg::WIN).min(mh);
+                    let x1 = (x0 + screenseg::WIN).min(mw);
+                    let (mut sum, mut sq, mut cnt) = (0.0f64, 0.0f64, 0usize);
+                    let mut yy = y0;
+                    while yy < y1 {
+                        let mut xx = x0;
+                        while xx < x1 {
+                            let v = lo[yy * mw + xx] as f64;
+                            sum += v;
+                            sq += v * v;
+                            cnt += 1;
+                            xx += 4;
+                        }
+                        yy += 4;
+                    }
+                    if cnt < 16 {
+                        continue;
+                    }
+                    let mean = sum / cnt as f64;
+                    let std = (sq / cnt as f64 - mean * mean).max(0.0).sqrt();
+                    if std < uni_t {
+                        amask[bi] = false;   // leave it to solid_rects
+                        flat_blocks += 1;
+                    }
+                }
+            }
+            if flat_blocks > 0 {
+                eprintln!("SEG: {} uniform blocks left to the flat fill", flat_blocks);
+            }
+            rec.push(serde_json::json!({
+                "kind": "segflat", "page": page, "flat_blocks": flat_blocks,
+                "uniform_std": uni_t,
+            }));
+            // dropping blocks can shave a region to slivers; re-clean at block level
+            amask = screenseg::areas_from_mask(&amask, bm.nx, bm.ny, minb);
+        }
+
         let full = screenseg::expand(&amask, bm.ny, bm.nx, mw, mh);
         let before = image.iter().filter(|&&b| b).count();
         image.copy_from_slice(&full);
@@ -880,8 +945,27 @@ pub fn analyze(
             }
         }
         let after = image.iter().filter(|&&b| b).count();
+        // Record the areas SEG actually produced, and flag that step 7's cluster rows no longer
+        // describe the output. Without this the overlay draws step 7's verdicts -- p013 showed a
+        // green "image" outline around a 29 px scan sliver at the sheet edge that the render had
+        // already rejected. An overlay that disagrees with the render is worse than no overlay.
+        {
+            let (lb, n) = ndimage::label(&full, mw, mh);
+            if n > 0 {
+                let bx = ndimage::find_objects(&lb, n, mw, mh);
+                let sz = ndimage::component_sizes(&lb, n);
+                for c in 1..=n {
+                    if let Some((y0, y1, x0, x1)) = bx[c - 1] {
+                        rec.push(serde_json::json!({
+                            "kind": "segarea", "page": page, "cid": c, "px": sz[c - 1],
+                            "bbox": [x0, y0, x1, y1], "layer": "bg",
+                        }));
+                    }
+                }
+            }
+        }
         rec.push(serde_json::json!({
-            "kind": "seg", "page": page, "blocks": [bm.ny, bm.nx],
+            "kind": "seg", "page": page, "supersedes_step7": true, "blocks": [bm.ny, bm.nx],
             "thr": thr, "min_blocks": minb,
             "screened_blocks": amask.iter().filter(|&&b| b).count(),
             "image_px_step7": before, "image_px_seg": after,

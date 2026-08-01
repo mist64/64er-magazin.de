@@ -153,6 +153,22 @@ pub fn areas(bm: &BlockMap, thr: f32, min_blocks: usize) -> Vec<bool> {
     m
 }
 
+/// Re-clean a block mask after blocks have been removed from it: dropping the uniform ones can
+/// shave an area down to slivers, and a sliver is not a region worth routing anywhere.
+pub fn areas_from_mask(m: &[bool], nx: usize, ny: usize, min_blocks: usize) -> Vec<bool> {
+    let mut m = ndimage::binary_dilation(m, nx, ny, 1);
+    m = ndimage::binary_erosion(&m, nx, ny, 1);
+    let (lb, n) = ndimage::label(&m, nx, ny);
+    if n > 0 {
+        let sz = ndimage::component_sizes(&lb, n);
+        m = lb
+            .iter()
+            .map(|&l| l != 0 && sz[l as usize - 1] >= min_blocks as u64)
+            .collect();
+    }
+    m
+}
+
 /// Block mask -> full-resolution mask. Each block covers WIN px but is anchored every STEP px, so
 /// paint the centred STEP x STEP cell: adjacent blocks then tile without overlap.
 pub fn expand(mask: &[bool], ny: usize, nx: usize, w: usize, h: usize) -> Vec<bool> {
