@@ -6,6 +6,7 @@ use crate::imageio::{self, Rgb};
 use crate::ndimage;
 use crate::npy;
 use crate::record::Recorder;
+use crate::screenseg;
 use crate::resample::{nearest_plane_u8, resample_plane_f32, Filter};
 use crate::fftutil;
 use anyhow::{Context, Result};
@@ -987,6 +988,40 @@ pub fn analyze(
             "  darkfill(G1): {}/{} dark comps promoted to IMAGE (DARK={} SAT={} FRAC={:.2} FILLED={:.2} HOLES={:.2}-{:.2})",
             promoted, dn, dark_t, sat_t, darkfrac_env, filled_env, holes_lo, holes_hi
         );
+    }
+
+    // ---- SEGMENT BY SCREENING (SEG=1) ----------------------------------------------------------
+    // Replaces step 7's IMAGE/TEXT vote with the physical question: is there a halftone here.
+    // Runs on the 600 dpi K-ish plane, which still carries the screen (cov is descreened and would
+    // show nothing). Step 7 above has already run and RECORDED its verdicts -- they are left in the
+    // record so the two can be diffed -- but `image` is rebuilt from scratch here.
+    if env_i("SEG", 1) != 0 {
+        let kish: Vec<f32> = luma.iter().map(|&v| 255.0 - v).collect();
+        let bm = screenseg::block_map(&kish, mw, mh, 600.0);
+        let thr = env_f("SEG_THR", 40.0);
+        let minb = env_i("SEG_MINBLOCKS", 12) as usize;
+        let amask = screenseg::areas(&bm, thr, minb);
+        let full = screenseg::expand(&amask, bm.ny, bm.nx, mw, mh);
+        let before = image.iter().filter(|&&b| b).count();
+        image.copy_from_slice(&full);
+        // The background is only painted where m600 says "screened", so the new areas have to be
+        // in it too, or a promoted photo would come out blank -- the same coupling darkfill needed.
+        for i in 0..mw * mh {
+            if full[i] {
+                m600[i] = true;
+            }
+        }
+        let after = image.iter().filter(|&&b| b).count();
+        rec.push(serde_json::json!({
+            "kind": "seg", "page": page, "blocks": [bm.ny, bm.nx],
+            "thr": thr, "min_blocks": minb,
+            "screened_blocks": amask.iter().filter(|&&b| b).count(),
+            "image_px_step7": before, "image_px_seg": after,
+        }));
+        eprintln!("SEG: {} of {} blocks screened; image {:.1}% -> {:.1}%",
+            amask.iter().filter(|&&b| b).count(), amask.len(),
+            100.0 * before as f64 / (mw * mh) as f64,
+            100.0 * after as f64 / (mw * mh) as f64);
     }
 
     // A K-only page keeps everything bilevel: nothing is promoted to contone, and the background
