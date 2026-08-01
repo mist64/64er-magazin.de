@@ -109,11 +109,6 @@ const DARKFILL_HOLE_MIN: usize = 20;        // ignore speck holes (scan noise in
 const DARKFILL_HOLES_LO: f64 = 0.05;  // enclosed-bright floor: reversed text present
 const DARKFILL_HOLES_HI: f64 = 0.55;  // enclosed-bright ceiling: not a hollow frame
 
-// Support floor for the text inpaint's normalized convolution: the fraction of the sigma=5
-// neighbourhood that must be non-K for num/den to mean anything. Below it there is no estimate to
-// make and the background falls back to paper. See the inpaint block for why returning 0 there is
-// destructive rather than merely wrong.
-const INPAINT_DEN_MIN: f32 = 0.02;
 
 pub struct ClusterOut {
     pub w: usize, // NX
@@ -825,6 +820,12 @@ pub fn analyze(
         let dark_t = env_f("DARKFILL_DARK", DARKFILL_DARK);
         let sat_t = env_f("DARKFILL_SAT", DARKFILL_SAT);
         let minpx = env_i("DARKFILL_MINPX", DARKFILL_MINPX as i64) as usize;
+        // Snapshot of the screened mask as it stood BEFORE any promotion. A promotion writes m600
+        // true over its own bbox, so a candidate nested inside an earlier one would otherwise
+        // measure screen_frac against a mask this very loop had already rewritten and read 1.0 for
+        // an unscreened region. p098 showed exactly that: the flat-ink ad measures 0.114, but the
+        // two sub-regions inside it read 1.000.
+        let m600_pre = m600.clone();
         let dfill: Vec<bool> = (0..mw * mh).map(|i| luma[i] < dark_t && sat[i] < sat_t).collect();
         let (dlbl, dn) = ndimage::label(&dfill, mw, mh);
         let dsz = ndimage::component_sizes(&dlbl, dn);
@@ -897,7 +898,7 @@ pub fn analyze(
             let mut scr_in = 0usize;
             for yy in y0..=y1 {
                 for xx in x0..=x1 {
-                    if m600[yy * mw + xx] {
+                    if m600_pre[yy * mw + xx] {
                         scr_in += 1;
                     }
                 }
@@ -1256,75 +1257,41 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
             bg[i * 3 + 2] = 255;
         }
     }
-    // text inpaint (normalized convolution)
+    // The K stencil, at bg resolution -- kept because solid_rects measures the tint over pixels
+    // the stencil does NOT cover. Nothing else needs it any more.
     let black_u8: Vec<u8> = black.iter().map(|&b| if b { 255 } else { 0 }).collect();
     let tk_u8 = nearest_plane_u8(&black_u8, mw, mh, bw, bh);
     let tk0: Vec<bool> = tk_u8.iter().map(|&v| v > 128).collect();
     let tk = ndimage::binary_dilation(&tk0, bw, bh, 2);
-    let wmask: Vec<f32> = tk.iter().map(|&b| if b { 0.0 } else { 1.0 }).collect();
-    let den = ndimage::gaussian_filter(&wmask, bw, bh, 5.0);
-    // A normalized convolution is only defined where the neighbourhood HAS known pixels. Inside a
-    // large solid-K region -- a reversed ad, a black bar -- every pixel within sigma is also K, so
-    // den -> 0 and num -> 0, and `num / den.max(1e-6)` silently returns 0, i.e. BLACK. That is not
-    // an estimate, it is the absence of one, and it is destructive: K is drawn as a black-only
-    // ImageMask, so every white letter in the output comes from the background showing through a
-    // hole in K. Painting that background black erases the reversed lettering. It erased the body
-    // text of the p098 Hobby-Elektronik ad while leaving the display type -- big counters keep a
-    // known pixel within sigma, thin ones do not, which is exactly the observed pattern.
-    // Below DEN_MIN there is no support, so fall back to PAPER: the background beneath a bilevel
-    // stencil is paper unless something is known to be there.
-    // INPAINT_DEN_MIN=0 reproduces the old behaviour EXACTLY (the .max(1e-6) guard is kept in the
-    // else branch), so the before/after for this fix is one binary and one env var rather than two
-    // builds -- and the counter below says which pages the fallback touches at all, so the
-    // comparison only has to be rendered for those.
-    let den_min = env_f("INPAINT_DEN_MIN", INPAINT_DEN_MIN);
-    let mut fallback_px = 0usize;
-    for c in 0..3 {
-        let chan: Vec<f32> = (0..bw * bh).map(|i| bg[i * 3 + c] as f32 * wmask[i]).collect();
-        let num = ndimage::gaussian_filter(&chan, bw, bh, 5.0);
-        for i in 0..bw * bh {
-            if tk[i] {
-                bg[i * 3 + c] = if den[i] < den_min {
-                    if c == 0 {
-                        fallback_px += 1;
-                    }
-                    255
-                } else {
-                    crate::resample::clip8(num[i] / den[i].max(1e-6))
-                };
-            }
-        }
-    }
-    rec.push(serde_json::json!({
-        "kind": "inpaint", "page": page, "den_min": den_min,
-        "tk_px": tk.iter().filter(|&&b| b).count(),
-        "fallback_px": fallback_px, "bw": bw, "bh": bh,
-    }));
-    // WHERE the fallback fired, not just how much. These are the regions whose background the
-    // inpaint could not estimate -- the places the old code silently painted black, erasing any
-    // reversed lettering that sat there. They are exactly what wants outlining.
-    if fallback_px > 0 {
-        let fb: Vec<bool> = (0..bw * bh).map(|i| tk[i] && den[i] < den_min).collect();
-        let (fl, fnn) = ndimage::label(&fb, bw, bh);
-        let fsz = ndimage::component_sizes(&fl, fnn);
-        let fbx = ndimage::find_objects(&fl, fnn, bw, bh);
-        let fmin = env_i("INPAINT_REC_MINPX", 200) as u64;
-        let sx = mw as f64 / bw as f64;
-        let sy = mh as f64 / bh as f64;
-        for c in 1..=fnn {
-            if fsz[c - 1] < fmin {
-                continue;
-            }
-            if let Some((y0, y1, x0, x1)) = fbx[c - 1] {
-                rec.push(serde_json::json!({
-                    "kind": "inpaint_fallback", "page": page, "cid": c, "px": fsz[c - 1],
-                    "bbox": [(x0 as f64 * sx) as usize, (y0 as f64 * sy) as usize,
-                             (x1 as f64 * sx) as usize, (y1 as f64 * sy) as usize],
-                    "layer": "bg",
-                }));
-            }
-        }
-    }
+
+    // The TEXT INPAINT USED TO RUN HERE, and was deleted rather than repaired. It replaced every
+    // stencil-covered background pixel with a normalized-convolution average of its non-stencil
+    // neighbours, to stop a soft 200 dpi copy of each glyph haloing the crisp stencil above it.
+    // Measured against what this issue actually contains, it never did that job:
+    //
+    //   text on paper   the M150 white-out above has already whitened it. ~0.15% of pixels touched.
+    //   text on a tint  the flat tint fill is the right tool, and now works without this: p171
+    //                   renders identically at 0.21 MB with the inpaint gone, once solid_rects
+    //                   measures over non-K pixels.
+    //   text on a photo does not occur. p148 is BIT-IDENTICAL with and without; p117, the heaviest
+    //                   K-over-image page in the issue, differs by 0.126% in scattered specks.
+    //   photo in K      DESTRUCTIVE. Where step 7 misroutes a photograph into the stencil (p146:
+    //                   image_frac 0.000, the photo voted TEXT at 0.31 against a 0.40 threshold),
+    //                   this erased the photograph from the background too, leaving a posterized
+    //                   bilevel with no mid-tones.
+    //
+    // What remained was -6.5 MB across the issue (2.7%) on pages like p108/p040, where it erased
+    // screened line art the stencil redraws anyway -- invisible in the composite. That is not a
+    // saving to defend: the file was smaller because content had been deleted. Correctness first.
+    // If that 2.7% is ever wanted back it belongs in the white-out / flat-fill logic, which knows
+    // what the stencil already draws, not in a Gaussian convolution that cannot tell a photograph
+    // from a background.
+    //
+    // It also carried a bug for the whole life of the code: with no non-stencil neighbour within
+    // sigma, den -> 0 and `num / den.max(1e-6)` returned 0 = BLACK. Since K is a black-only
+    // ImageMask, every white letter comes from the background showing through a hole in the
+    // stencil, so that black welded the holes shut and erased reversed lettering, on 166 of 176
+    // pages. Deleting the stage retires the bug rather than shipping its repair.
 
     eprintln!(
         "image {:.1}%  screened {:.1}%  tint regions {}",
@@ -1335,7 +1302,7 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
     // ---- solid-rectangle fills ----
     let rect = env_i("RECT", 1);
     if rect != 0 {
-        let nr = solid_rects(&mut bg, bw, bh, &tintmask, &scrf, mw, mh);
+        let nr = solid_rects(&mut bg, bw, bh, &tintmask, &scrf, mw, mh, &tk);
         eprintln!("solid rectangles: {}", nr.len());
         // bboxes come back in bg_dpi space; the record's frame is 600 dpi (mw x mh) for every other
         // kind, so convert here. An overlay that mixes two coordinate systems draws boxes in the
@@ -1392,7 +1359,19 @@ fn solid_rects(
     scrf: &[bool],
     mw: usize,
     mh: usize,
+    kmask: &[bool],
 ) -> Vec<(usize, usize, usize, usize, [u8; 3], &'static str)> {
+    // kmask = where the bilevel K stencil covers this pixel, at bg resolution.
+    //
+    // A tint is a property of the INK AREA. Text sitting on top of it is drawn by an independent
+    // layer and says nothing about whether the tint underneath is uniform -- so the uniformity test
+    // and the colour median both measure over non-K pixels only.
+    //
+    // Measuring over all pixels made this stage depend on the text inpaint: type inside the region
+    // pushed the luma std over the gate, the fill declined, and only erasing the text from the
+    // background first let it fire. That is the wrong question asked expensively. p171 is the case:
+    // an index page of black type on a light-blue tint, "solid rectangles: 1" with the inpaint and
+    // "0" without, 0.20 MB against 1.97 MB.
     // Returns the rects it filled, not a count: a solid fill REPLACES a region of the background
     // with one colour, which is the most destructive thing in the render if it fires on the wrong
     // region -- so it has to be visible in the overlay, and that needs bbox + colour.
@@ -1526,12 +1505,18 @@ fn solid_rects(
             for yy in py0..py1 {
                 for xx in px0..px1 {
                     let i = yy * bw + xx;
+                    if kmask[i] {
+                        continue; // stencil pixel: belongs to the K layer, not to the tint
+                    }
                     tot += 1;
                     if colmask[i] {
                         fillc += 1;
                     }
                     lu_vals.push(lu[i]);
                 }
+            }
+            if lu_vals.is_empty() {
+                continue; // entirely covered by K -- nothing of the tint left to measure
             }
             let rfill = fillc as f64 / tot.max(1) as f64;
             if rfill < 0.70 || (px1 - px0) < 8 || (py1 - py0) < 8 {
@@ -1551,7 +1536,7 @@ fn solid_rects(
                 for yy in py0..py1 {
                     for xx in px0..px1 {
                         let i = yy * bw + xx;
-                        if colmask[i] {
+                        if colmask[i] && !kmask[i] {
                             vals.push(bg[i * 3 + c] as f32);
                         }
                     }
@@ -1591,7 +1576,10 @@ fn solid_rects(
             if idx.len() < 6000 {
                 continue;
             }
-            let mut lu_comp: Vec<f32> = idx.iter().map(|&i| lu[i]).collect();
+            let mut lu_comp: Vec<f32> = idx.iter().filter(|&&i| !kmask[i]).map(|&i| lu[i]).collect();
+            if lu_comp.is_empty() {
+                continue;
+            }
             let gmed = median_of(&mut lu_comp);
             let (mut y0, mut y1, mut x0, mut x1) = (bh, 0usize, bw, 0usize);
             for &i in idx {
@@ -1602,7 +1590,11 @@ fn solid_rects(
                 x0 = x0.min(x);
                 x1 = x1.max(x);
             }
-            let colmask: Vec<bool> = (0..n).map(|i| bs[i] < 25.0 && lu[i] < gmed + 10.0).collect();
+            // !kmask folded in here rather than at each use: colmask IS "pixels of this grey
+            // area", and a stencil pixel is not one of them. The three tests below (incol count,
+            // colour median, tone flatness) then all measure the tint rather than the type on it.
+            let colmask: Vec<bool> =
+                (0..n).map(|i| bs[i] < 25.0 && lu[i] < gmed + 10.0 && !kmask[i]).collect();
             // comp filled
             let mut compmask = vec![false; n];
             for &i in idx {
