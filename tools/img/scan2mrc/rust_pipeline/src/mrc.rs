@@ -651,6 +651,7 @@ pub fn analyze(
         format!("{}_cov.npy", p)
     };
     let mut image = vec![false; mw * mh];
+    let mut k_only_page = false;
     if let Ok((cov, cshape)) = npy::read_u8(&cov_path) {
         let cmw = cshape[2];
         let cmh = cshape[1];
@@ -663,6 +664,42 @@ pub fn analyze(
                 .collect()
         };
         let (c_, m_, y_, k_) = (cf(0), cf(1), cf(2), cf(3));
+
+        // IS THIS PAGE K-ONLY? Measured on the CMYK COVERAGE, never on RGB. The renderer's own
+        // saturation/hue tests run on the 600 dpi RGB page, and aged paper has a yellow cast, so
+        // every page reads slightly saturated: all 176 reported accent inks present, 141 of them
+        // emitting under 3 KB and many emitting literally nothing. p098 is a pure black-and-white
+        // page that was reported as ['MY','Y'] with two COLOUR contone regions. CLAUDE.md already
+        // requires C/M/Y/K-only detection for exactly this reason.
+        //
+        // The measurement separates cleanly, with a wide gap and nothing in it:
+        //     p098 0.0040  p118 0.0044  p061 0.0043  p092 0.0067   <- K only
+        //     p069 0.0405  p146 0.0841  p010 0.1454  p171 0.2501   <- real colour
+        // so the gate sits at 0.02, the middle of the gap. 100 of 176 pages are K-only.
+        //
+        // A K-only page keeps EVERYTHING as 600 dpi bilevel K: no contone promotion, no descreen.
+        // Its halftone is simply encoded as dots in the stencil rather than reconstructed. That is
+        // a deliberate simplification for now -- it also means such a page can never be damaged by
+        // the segmentation, whatever the detector does later, which is worth having given that
+        // every defect found today was segmentation misfiring on something it should not have
+        // touched.
+        let konly_t = env_f("KONLY_CMY", 0.02);
+        let cmy_frac = {
+            let n = plane as f32;
+            let f = |v: &Vec<f32>| v.iter().filter(|&&x| x > 60.0).count() as f32 / n;
+            f(&c_).max(f(&m_)).max(f(&y_))
+        };
+        let k_only = konly_t > 0.0 && cmy_frac < konly_t;
+        k_only_page = k_only;
+        rec.push(serde_json::json!({
+            "kind": "konly", "page": page, "cmy_frac": r2(cmy_frac as f64),
+            "threshold": konly_t, "k_only": k_only,
+        }));
+        if k_only {
+            eprintln!("K-ONLY page (max CMY coverage {:.4} < {:.4}) -> all 600 dpi bilevel",
+                      cmy_frac, konly_t);
+        }
+
         let neu: Vec<f32> = (0..plane).map(|i| c_[i].min(m_[i]).min(y_[i])).collect();
         let ccx: Vec<f32> = (0..plane).map(|i| c_[i] - neu[i]).collect();
         let mcx: Vec<f32> = (0..plane).map(|i| m_[i] - neu[i]).collect();
@@ -952,6 +989,18 @@ pub fn analyze(
         );
     }
 
+    // A K-only page keeps everything bilevel: nothing is promoted to contone, and the background
+    // whiteout below then blanks the whole background. Applied here, after every detector has run
+    // and recorded what it found, so the record still shows what WOULD have happened.
+    if k_only_page {
+        for v in image.iter_mut() {
+            *v = false;
+        }
+        for v in m600.iter_mut() {
+            *v = false;
+        }
+    }
+
     // ---- K (black) layer ----
     let bgl = ndimage::maximum_filter(&luma, mw, mh, 9);
     let bgd = ndimage::minimum_filter(&luma, mw, mh, 3);   // darkest 3x3 neighbour (lone-dot support test)
@@ -980,8 +1029,11 @@ pub fn analyze(
     // despeckle makes that visible instead of quietly tidying it away.
 
     let crisp: Vec<bool> = m600.iter().map(|&v| !v).collect();
+    // On a K-only page there are no accent inks BY MEASUREMENT (max CMY coverage below the gate),
+    // so the hue test is not consulted at all -- it is the RGB-based test that invented inks on
+    // every page in the first place.
     let inkpix: Vec<bool> = (0..mw * mh)
-        .map(|i| crisp[i] && !black[i] && sat[i] >= INK_SAT)
+        .map(|i| !k_only_page && crisp[i] && !black[i] && sat[i] >= INK_SAT)
         .collect();
 
     // present accent inks
