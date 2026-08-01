@@ -59,7 +59,9 @@ OUT_DPI = 600          # the record's own coordinate space: no scaling, and smal
                        # legible rather than guessed at
 SRC_DPI = 600          # the record's bbox coordinate space (mw x mh in mrc.rs)
 PAGE_DPI = 2400        # the page RGB on disk
-LINE = 40       # 10x: a 4px line at 600 dpi is sub-pixel once the page is viewed whole
+LINE = 40       # 10x: a 4px line at 600 dpi is sub-pixel once the page is viewed whole. This is
+                # the CEILING -- width_for() scales it down for small regions.
+MIN_LINE = 4    # floor, so a small region still gets a visible outline
 DIM = 0.40             # fade the page HARD -- this is a decision view, not a proof of the
                        # page. The outlines have to win against full-bleed colour ads. Outlines
                        # only, never fills.
@@ -128,11 +130,21 @@ def _dash_line(d, a, b, colour, width, phase):
         t += DASH + GAP
 
 
+def width_for(bbox, sc, width):
+    """Scale the outline to the region. A 40 px line is right for a full-page ad and absurd for a
+    60 px letter -- on p098's masthead the box was wider than the glyph it marked, so the outline
+    hid the thing being judged. Never thinner than MIN_LINE or it vanishes on a busy scan."""
+    w = (bbox[2] - bbox[0]) * sc
+    h = (bbox[3] - bbox[1]) * sc
+    return int(max(MIN_LINE, min(width, min(w, h) / 6.0)))
+
+
 def rect(d, bbox, sc, colour, kind, width, seen_types):
     """Dashed outline, nudged AND phase-shifted per type: the nudge separates boxes that merely
     overlap, the phase keeps two exactly-coincident boxes both visible as alternating dashes."""
     o = nudge_for(kind, seen_types)
     ph = (o // NUDGE) * 4
+    width = width_for(bbox, sc, width)
     x0, y0, x1, y1 = [v * sc + o for v in bbox]
     for a, b in (((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)),
                  ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0))):
@@ -143,6 +155,7 @@ COL_INK = {"C": (0, 95, 130), "M": (150, 0, 90), "Y": (120, 95, 0),
 
 
 def one(page):
+    show_all = os.environ.get("DBG_ALL") == "1"
     src = os.path.join(SRC, "%03d_page_rgb.png" % page)
     rec = os.path.join(REC, "%03d.jsonl" % page)
     out = os.path.join(PNG, "%03d.png" % page)
@@ -192,6 +205,10 @@ def one(page):
             n["ink"] += 1
         elif k == "darkfill":
             promoted = r.get("promoted")
+            # 1195 rejections issue-wide, most of them ordinary bold text: drawn always they bury
+            # the page (p027's headline and every drop cap). Same rule as rejected clusters.
+            if not promoted and not show_all:
+                continue
             c = COL_DARKFILL if promoted else COL_DARKFILL_REJ
             rect(d, r["bbox"], sc, c, "darkfill" if promoted else "darkfill_rej",
                  LINE, seen_types)
