@@ -68,11 +68,6 @@ const TONE: f32 = 150.0;
 //                 content inside (reversed white lettering): LO rejects a solid blob/rule with no
 //                 text; HI rejects a thin frame whose interior is mostly empty white (table/ad border).
 // Env-overridable. See env_f reads in run_mrc step 7.
-const DARKFILL_DARK: f32 = 90.0;      // luma ceiling: dark neutral ink (the fill)
-const DARKFILL_SAT: f32 = 60.0;       // sat ceiling: NEUTRAL (kills coloured red/blue boxes)
-const DARKFILL_MINPX: usize = 20000;  // min component px @600 (~0.06% page; > step-7's 8000 = a genuine FILL)
-const DARKFILL_FRAC: f64 = 0.45;      // dark_frac floor: dark ink fills the bbox
-const DARKFILL_FILLED: f64 = 0.70;    // filled_frac floor: solid shape after hole-fill
 // GLYPH VETO. The failure mode of the gates above is BOLD DISPLAY TYPE: a letterform with counters
 // ("8", "O", "D", "a") is a dark shape with enclosed bright content, so it was promoted, left the K
 // stencil, and came back soft from the 150 dpi background (p062 "zum C 128" lost its 8).
@@ -91,10 +86,7 @@ const DARKFILL_FILLED: f64 = 0.70;    // filled_frac floor: solid shape after ho
 //                                                                       p151 icon 2/0.241,
 //                                                                       p128 panel 1/0.740)
 // The AND of the two loose conditions below vetoes all 18 glyphs and none of the 37 boxes.
-const DARKFILL_GLYPH_HOLES: usize = 3;      // at most this many real counters, AND EITHER ...
-const DARKFILL_GLYPH_HOLEFRAC: f64 = 0.18;  // ... a small interior (a tight counter: p062's "8"
                                             //     is 0.069) ...
-const DARKFILL_GLYPH_HOLEPX: f64 = 2000.0;  // ... OR a HUGE mean counter. This second test was
                                             // added after HOLEFRAC alone was found mis-calibrated:
                                             // it came from glyphs measuring 0.071-0.136, but big
                                             // round display letters (O D R 8) measure 0.199-0.694
@@ -104,12 +96,9 @@ const DARKFILL_GLYPH_HOLEPX: f64 = 2000.0;  // ... OR a HUGE mean counter. This 
                                             // against real reversed boxes p50 ~850, a 20x gap,
                                             // because a reversed LETTER is small by construction
                                             // while a display glyph's counter is most of it.
-const DARKFILL_HOLE_MIN: usize = 20;        // ignore speck holes (scan noise inside solid ink)
-const DARKFILL_HOLES_LO: f64 = 0.05;  // enclosed-bright floor: reversed text present
 // Minimum fraction of a candidate rectangle that must NOT be under the K stencil for its
 // flatness/colour measurement to mean anything. See the coverage guard in solid_rects.
 const RECT_NONK: f32 = 0.5;
-const DARKFILL_HOLES_HI: f64 = 0.55;  // enclosed-bright ceiling: not a hollow frame
 
 
 pub struct ClusterOut {
@@ -847,148 +836,27 @@ pub fn analyze(
         );
     }
 
-    // === DARK-FILL (reversed graphics) -> IMAGE (issue G1). See constant block at top. Runs on the
-    // 600dpi luma/sat (raw, not median-filtered) regardless of step 7; promotes solid dark-fill
-    // reversed boxes into IMAGE so they descreen instead of becoming a solid-black K blob with the
-    // white text lost. ===
-    // OFF BY DEFAULT (DARKFILL=1 restores it). Darkfill promoted a solid dark fill out of the
-    // bilevel K layer and into the contone background, so its knocked-out lettering would survive.
-    // It existed to compensate for the text inpaint, which painted the background under a large
-    // solid-K region BLACK and welded the reversed letters shut. That inpaint is now deleted, and
-    // with it the reason for this: p098's ad renders crisper and at a third of the bytes with the
-    // promotion gone, because a flat-ink reversed box is exactly what a 600 dpi bilevel layer
-    // reproduces perfectly, and promoting it to a 200 dpi contone only softens it.
+    // DARK-FILL IS GONE. It promoted a solid dark fill out of the bilevel layer into the contone
+    // background so its knocked-out lettering would survive -- five fitted thresholds plus a
+    // counter-size veto, and the single largest source of special-case complexity in this file.
     //
-    // Kept as a flag rather than deleted because one case is unresolved: p069, a full-page dark ad
-    // built on a PHOTOGRAPH, was visibly better promoted. That was measured while the inpaint still
-    // existed, so it may have been the same artefact -- the background under the stencil being
-    // destroyed rather than the promotion being right. This run is what settles it.
-    if env_i("DARKFILL", 0) != 0 {
-        let darkfrac_env = env_f("DARKFILL_FRAC", DARKFILL_FRAC as f32) as f64;
-        let filled_env = env_f("DARKFILL_FILLED", DARKFILL_FILLED as f32) as f64;
-        let holes_lo = env_f("DARKFILL_HOLES", DARKFILL_HOLES_LO as f32) as f64;
-        let holes_hi = env_f("DARKFILL_HOLES_HI", DARKFILL_HOLES_HI as f32) as f64;
-        let dark_t = env_f("DARKFILL_DARK", DARKFILL_DARK);
-        let sat_t = env_f("DARKFILL_SAT", DARKFILL_SAT);
-        let minpx = env_i("DARKFILL_MINPX", DARKFILL_MINPX as i64) as usize;
-        // Snapshot of the screened mask as it stood BEFORE any promotion. A promotion writes m600
-        // true over its own bbox, so a candidate nested inside an earlier one would otherwise
-        // measure screen_frac against a mask this very loop had already rewritten and read 1.0 for
-        // an unscreened region. p098 showed exactly that: the flat-ink ad measures 0.114, but the
-        // two sub-regions inside it read 1.000.
-        let m600_pre = m600.clone();
-        let dfill: Vec<bool> = (0..mw * mh).map(|i| luma[i] < dark_t && sat[i] < sat_t).collect();
-        let (dlbl, dn) = ndimage::label(&dfill, mw, mh);
-        let dsz = ndimage::component_sizes(&dlbl, dn);
-        let dboxes = ndimage::find_objects(&dlbl, dn, mw, mh);
-        let mut promoted = 0usize;
-        for k in 1..=dn {
-            let cpx = dsz[k - 1] as usize;
-            if cpx < minpx {
-                continue;
-            }
-            let (y0, y1, x0, x1) = match dboxes[k - 1] {
-                Some(b) => b,
-                None => continue,
-            };
-            let bw_ = x1 - x0 + 1;
-            let bh_ = y1 - y0 + 1;
-            let ba = (bw_ * bh_) as f64;
-            let dark_frac = cpx as f64 / ba;
-            if dark_frac <= darkfrac_env {
-                // recorded without filled/hole: the hole-fill is the expensive part and this
-                // candidate never reaches it, so those stay null rather than being invented.
-                rec.push(serde_json::json!({
-                    "kind": "darkfill", "page": page, "cid": k, "px": cpx,
-                    "bbox": [x0, y0, x1, y1], "layer": "k", "promoted": false,
-                    "dark_frac": r2(dark_frac),
-                    "filled_frac": serde_json::Value::Null, "hole_frac": serde_json::Value::Null,
-                }));
-                continue; // loose text / hollow frame -> skip
-            }
-            // build sub-mask of this component over its bbox, fill holes, count
-            let mut sub = vec![false; bw_ * bh_];
-            for y in y0..=y1 {
-                for x in x0..=x1 {
-                    if dlbl[y * mw + x] as usize == k {
-                        sub[(y - y0) * bw_ + (x - x0)] = true;
-                    }
-                }
-            }
-            let filled = ndimage::binary_fill_holes(&sub, bw_, bh_);
-            let fp = filled.iter().filter(|&&b| b).count();
-            let filled_frac = fp as f64 / ba;
-            let hole_frac = (fp - cpx) as f64 / ba;
-            // GLYPH VETO (see the constant block): count the REAL counters and how much of the ink
-            // they take up. Few AND small = a letterform, not a reversed box.
-            let holes: Vec<bool> = (0..bw_ * bh_).map(|i| filled[i] && !sub[i]).collect();
-            let (hlbl, hn) = ndimage::label(&holes, bw_, bh_);
-            let hsz = ndimage::component_sizes(&hlbl, hn);
-            let hmin = env_i("DARKFILL_HOLE_MIN", DARKFILL_HOLE_MIN as i64) as u64;
-            let n_holes = (1..=hn).filter(|&k| hsz[k - 1] >= hmin).count();
-            let hole_px: u64 = (1..=hn).map(|k| hsz[k - 1]).filter(|&s| s >= hmin).sum();
-            let hole_area_frac = hole_px as f64 / cpx as f64;
-            let mean_hole_px = if n_holes > 0 { hole_px as f64 / n_holes as f64 } else { 0.0 };
-            let glyph = n_holes <= env_i("DARKFILL_GLYPH_HOLES", DARKFILL_GLYPH_HOLES as i64) as usize
-                && (hole_area_frac < env_f("DARKFILL_GLYPH_HOLEFRAC", DARKFILL_GLYPH_HOLEFRAC as f32) as f64
-                    || mean_hole_px > env_f("DARKFILL_GLYPH_HOLEPX", DARKFILL_GLYPH_HOLEPX as f32) as f64);
-            let promote = filled_frac > filled_env && hole_frac > holes_lo && hole_frac < holes_hi
-                && !glyph;
-            // IS THE DARK REGION SCREENED? Measured, not yet gated on -- this is the property that
-            // should decide the promotion, and it is recorded first so the decision can be made
-            // from data across the whole issue rather than from the two pages that prompted it.
-            //
-            // Promoting means "send this to the contone background". That is right for a dark area
-            // that is a PHOTOGRAPH (continuous tone, halftoned on the page: p069's discus thrower,
-            // which goes to blotches if forced bilevel) and wrong for one that is FLAT INK (p098's
-            // ad, which bilevel reproduces exactly and contone only softens). Screened vs not is
-            // exactly that distinction, and unlike filled_frac / hole count / aspect / ink
-            // thickness / ink uniformity -- all six of which were tried and none of which
-            // separated the cases -- it is a physical property of the region rather than another
-            // empirical threshold fitted to a handful of pages.
-            let mut scr_in = 0usize;
-            for yy in y0..=y1 {
-                for xx in x0..=x1 {
-                    if m600_pre[yy * mw + xx] {
-                        scr_in += 1;
-                    }
-                }
-            }
-            let screen_frac = scr_in as f64 / (((x1 - x0 + 1) * (y1 - y0 + 1)) as f64).max(1.0);
-            // EVERY candidate is recorded, not just the promoted ones: the near-misses are how a
-            // gate change is judged, and the p062 "8" sat 0.12 inside a boundary nobody had looked at.
-            rec.push(serde_json::json!({
-                "kind": "darkfill", "page": page, "cid": k, "px": cpx,
-                "bbox": [x0, y0, x1, y1],
-                "layer": if promote { "bg" } else { "k" },
-                "promoted": promote,
-                "dark_frac": r2(dark_frac), "filled_frac": r2(filled_frac), "hole_frac": r2(hole_frac),
-                "n_holes": n_holes, "hole_area_frac": r2(hole_area_frac), "glyph_veto": glyph,
-                "mean_hole_px": r2(mean_hole_px), "screen_frac": r2(screen_frac),
-            }));
-            if promote {
-                // Force the FILL's bbox into BOTH image (-> no K blob) AND m600 (-> the descreened
-                // contone bg is actually PAINTED here; otherwise the bg whiteout `bg[~m150]=255`
-                // would leave the box blank, since reversed fills sit OUTSIDE the screened mask M).
-                // Use the filled bbox SHAPE (not just the thin ink) so the reversed white lettering
-                // inside the box is covered too.
-                for yy in 0..bh_ {
-                    for xx in 0..bw_ {
-                        if filled[yy * bw_ + xx] {
-                            let i = (y0 + yy) * mw + (x0 + xx);
-                            image[i] = true;
-                            m600[i] = true;
-                        }
-                    }
-                }
-                promoted += 1;
-            }
-        }
-        eprintln!(
-            "  darkfill(G1): {}/{} dark comps promoted to IMAGE (DARK={} SAT={} FRAC={:.2} FILLED={:.2} HOLES={:.2}-{:.2})",
-            promoted, dn, dark_t, sat_t, darkfrac_env, filled_env, holes_lo, holes_hi
-        );
-    }
+    // It never fixed what it appeared to fix. The reversed lettering was being destroyed by the
+    // TEXT INPAINT, which painted the background under a large solid-K region black and welded the
+    // letters shut; promoting the region to contone dodged that at triple the bytes and with the
+    // artwork softened. With the inpaint deleted, both pages that justified darkfill render
+    // correctly without it, checked rather than assumed:
+    //
+    //   p118  "top completely broken" without darkfill, per the user, back when the background was
+    //         being painted black. Now every classified ad and both header bars are crisp. 180 KB.
+    //   p069  a full-page dark ad built on a photograph, visibly better promoted at the time.
+    //         Now the reversed type is sharp, the hand-and-diskettes photograph keeps its tone,
+    //         and the black is flat. The "ragged blotches" that argued for promotion were the
+    //         inpaint, not the missing promotion.
+    //
+    // A flat-ink reversed box is exactly what a 600 dpi bilevel layer reproduces perfectly, so
+    // there is nothing left for this to do. SEGMENTATION_PLAN.md expected to need an adjacency
+    // rule here (absorb solid-K into a neighbouring screened area); it turned out to be
+    // unnecessary, so it was not written.
 
     // ---- SEGMENT BY SCREENING (SEG=1) ----------------------------------------------------------
     // Replaces step 7's IMAGE/TEXT vote with the physical question: is there a halftone here.
