@@ -48,8 +48,6 @@ const MARK_LUMA: f32 = 165.0;     // mark ceiling (was 185): drops light-gray ed
 const MARK_CONTRAST: f32 = 60.0;  // mark must be this much darker than local-max bg (was 45)
 const SHARP_SUPPORT: f32 = 140.0; // `sharp` needs a dark 3x3 neighbour -> rejects lone screen dots
 const INK_SAT: f32 = 80.0;
-const MIN_CC: usize = 15;
-const MIN_K: usize = 6;
 const GROW: f32 = 4.0;
 const TONE: f32 = 150.0;
 
@@ -812,7 +810,19 @@ pub fn analyze(
     // 600dpi luma/sat (raw, not median-filtered) regardless of step 7; promotes solid dark-fill
     // reversed boxes into IMAGE so they descreen instead of becoming a solid-black K blob with the
     // white text lost. ===
-    {
+    // OFF BY DEFAULT (DARKFILL=1 restores it). Darkfill promoted a solid dark fill out of the
+    // bilevel K layer and into the contone background, so its knocked-out lettering would survive.
+    // It existed to compensate for the text inpaint, which painted the background under a large
+    // solid-K region BLACK and welded the reversed letters shut. That inpaint is now deleted, and
+    // with it the reason for this: p098's ad renders crisper and at a third of the bytes with the
+    // promotion gone, because a flat-ink reversed box is exactly what a 600 dpi bilevel layer
+    // reproduces perfectly, and promoting it to a 200 dpi contone only softens it.
+    //
+    // Kept as a flag rather than deleted because one case is unresolved: p069, a full-page dark ad
+    // built on a PHOTOGRAPH, was visibly better promoted. That was measured while the inpaint still
+    // existed, so it may have been the same artefact -- the background under the stencil being
+    // destroyed rather than the promotion being right. This run is what settles it.
+    if env_i("DARKFILL", 0) != 0 {
         let darkfrac_env = env_f("DARKFILL_FRAC", DARKFILL_FRAC as f32) as f64;
         let filled_env = env_f("DARKFILL_FILLED", DARKFILL_FILLED as f32) as f64;
         let holes_lo = env_f("DARKFILL_HOLES", DARKFILL_HOLES_LO as f32) as f64;
@@ -954,53 +964,18 @@ pub fn analyze(
     if kopen > 0 {
         black = ndimage::binary_opening(&black, mw, mh, kopen);
     }
-    // despeckle: drop components < MIN_K
-    {
-        let (lbk, nk) = ndimage::label(&black, mw, mh);
-        if nk > 0 {
-            let szk = ndimage::component_sizes(&lbk, nk);
-            // RECORD what the despeckle throws away. Most of it is single-pixel scan noise and
-            // recording each one would bury the file, so: an aggregate row always, plus an
-            // individual row per dropped component at or above KDROP_REC (default 4 px @600) --
-            // the size range where a drop could still be a real mark (a thin serif, a period)
-            // rather than a speck. Same gate that has already cost us one shipped bug at the
-            // cluster level, so it is worth being able to see it.
-            let recmin = env_i("KDROP_REC", 4) as u64;
-            let mut dropped = 0usize;
-            let mut cx = vec![0u64; nk + 1];
-            let mut cy = vec![0u64; nk + 1];
-            if rec.enabled() {
-                for (i, &l) in lbk.iter().enumerate() {
-                    if l != 0 && szk[l as usize - 1] < MIN_K as u64 {
-                        cx[l as usize] += (i % mw) as u64;
-                        cy[l as usize] += (i / mw) as u64;
-                    }
-                }
-            }
-            for k in 1..=nk {
-                let s = szk[k - 1];
-                if s >= MIN_K as u64 {
-                    continue;
-                }
-                dropped += 1;
-                if rec.enabled() && s >= recmin {
-                    rec.push(serde_json::json!({
-                        "kind": "kdrop", "page": page, "cid": k, "px": s,
-                        "centroid": [cx[k] / s, cy[k] / s],
-                        "layer": "dropped",
-                    }));
-                }
-            }
-            rec.push(serde_json::json!({
-                "kind": "kdrop_total", "page": page, "components": nk, "dropped": dropped,
-                "min_k": MIN_K, "recorded_above": recmin,
-            }));
-            black = lbk
-                .iter()
-                .map(|&l| l != 0 && szk[l as usize - 1] >= MIN_K as u64)
-                .collect();
-        }
-    }
+    // NO DESPECKLE. Components smaller than MIN_K px used to be deleted from the K stencil before
+    // JBIG2, ~17% of components on a median page (1251 of 7539). That was a size optimisation with
+    // a correctness risk and nothing else: small and unwanted are not the same thing -- a period, a
+    // thin serif, an umlaut dot are all small -- and the identical gate one level up has already
+    // shipped one bug, deleting small photos so they fell through to bilevel K as black blobs
+    // (p104). Deleting real marks to shrink a symbol dictionary is not a saving.
+    //
+    // It was also masking a defect rather than doing its stated job: on pages like p173 it was
+    // sweeping up 1176 components that are individual HALFTONE DOTS the K detector caught inside a
+    // screened region. Those dots have no business in the stencil in the first place; removing the
+    // despeckle makes that visible instead of quietly tidying it away.
+
     let crisp: Vec<bool> = m600.iter().map(|&v| !v).collect();
     let inkpix: Vec<bool> = (0..mw * mh)
         .map(|i| crisp[i] && !black[i] && sat[i] >= INK_SAT)
@@ -1190,14 +1165,10 @@ pub fn run_mrc(page_png: &str, score_npy: &str, out_pdf: &str, thr: f32, bg_dpi:
             .map(|i| inkpix[i] && near[i] && dd[i] < 30.0)
             .collect();
         // CC area gate
-        let (lblc, nc) = ndimage::label(&sel, mw, mh);
-        if nc > 0 {
-            let szc = ndimage::component_sizes(&lblc, nc);
-            sel = lblc
-                .iter()
-                .map(|&l| l != 0 && szc[l as usize - 1] >= MIN_CC as u64)
-                .collect();
-        }
+        // No MIN_CC despeckle here either -- the accent-ink stencils had the same size gate as the
+        // K layer, with the same trade and the same risk. An accent-ink mark is small BY NATURE
+        // (a spot-colour rule, a coloured bullet, a logo fragment), so a minimum-area filter is if
+        // anything more dangerous on these layers than on K.
         if sel.iter().any(|&b| b) {
             // RECORD WHERE EACH ACCENT INK LIVES. The page row lists WHICH inks are present; the
             // debug overlay needs WHERE. K is deliberately excluded -- it is most of the page, so
