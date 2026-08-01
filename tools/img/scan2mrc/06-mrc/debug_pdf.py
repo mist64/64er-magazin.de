@@ -12,11 +12,24 @@ picture cannot disagree with the numbers.
   debug_pdf.py --jobs 3
 
 WHAT THE COLOURS MEAN
-  green    RGB image      a colour photo/artwork region -> drawn from the 150 dpi contone background
+  green    RGB image      a colour photo/artwork region -> drawn from the contone background
   blue     gray image     a neutral continuous-tone region -> same background, no colour
   per-ink  single colour  an accent-ink stencil at 600 dpi (C, M, Y, MY, MC, ...)
+  orange   reversed box   a solid dark fill promoted to the background so its knocked-out
+                          lettering survives; grey = a candidate the gates turned down
+  dark red solid fill     a rectangle REPLACED by one flat colour -- the most destructive
+                          background write there is, so it is always outlined
+  teal     tint region    the chromatic-tint detection that steers the solid fill
+  magenta  inpaint->paper the text inpaint had no support here, so the background fell back to
+                          paper. This is where it used to paint BLACK and erase reversed
+                          lettering; it stays outlined so a recurrence is visible.
+  red ring K despeckled   a connected component the despeckle deleted (fixed-radius marker: at
+                          4 px @600 a scaled outline would show nothing)
   --       K              deliberately NOT drawn: the black stencil is most of the page, so
                           outlining it would bury everything else
+
+Paths come from the environment so a sweep directory can be drawn without editing this file:
+DBG_REC (records), DBG_BASE (600 dpi bases), DBG_PNG (output), DBG_OUT (pdf).
 """
 import argparse
 import glob
@@ -32,15 +45,15 @@ from PIL import Image, ImageDraw                                       # noqa: E
 Image.MAX_IMAGE_PIXELS = None
 T = "/Users/mist/DNB/8609/tmp"
 SRC = os.path.join(T, "render", "deliver")
-REC = os.path.join(T, "mrc")
-PNG = os.path.join(T, "dbg", "debugpages")
+REC = os.environ.get("DBG_REC") or os.path.join(T, "mrc")
+PNG = os.environ.get("DBG_PNG") or os.path.join(T, "dbg", "debugpages")
 # The 150 dpi base is a SIDE EFFECT of `mrcpipe mrc` (written next to the PDF as NNN_base150.png),
 # so this tool never decodes the 426 MB page RGB itself -- one code path produces the pixels, one
 # consumes them. The local fallback below exists only for pages rendered before that landed.
-BASE = os.path.join(T, "mrc")
+BASE = os.environ.get("DBG_BASE") or os.path.join(T, "mrc")
 BASE_SUF = "_base600.png"
 ALLOW_SLOW = os.environ.get("DEBUG_PDF_SLOW") == "1"
-OUT = os.path.join(T, "8609_debug.pdf")
+OUT = os.environ.get("DBG_OUT") or os.path.join(T, "8609_debug.pdf")
 
 OUT_DPI = 600          # the record's own coordinate space: no scaling, and small regions are
                        # legible rather than guessed at
@@ -58,7 +71,20 @@ COL_MEDIA = {"rgb": (0, 110, 30), "gray": (10, 40, 150)}
 # a reversed box (white lettering on a solid dark fill) also ends up in the contone background,
 # but by a different decision than step 7 -- worth its own colour so a wrong promotion is visible
 COL_DARKFILL = (170, 70, 0)
+COL_DARKFILL_REJ = (130, 130, 130)   # candidate the gates turned down; drawn so a MISSED reversed
+                                     # box is visible too, not only a wrong promotion
 COL_UNKNOWN_INK = (70, 70, 70)
+# The background is not only "descreened photo". Three other stages WRITE it, and each can be
+# wrong in a way that is invisible in the finished page because the result still looks like a
+# plausible flat area. Outlining them is the only way to tell a correct flat fill from a photo
+# that got flattened.
+COL_RECT = (140, 0, 0)        # solid-rectangle fill: REPLACES the region with one flat colour
+COL_TINT = (0, 120, 120)      # detected chromatic tint region: what steers the rect fill
+COL_INPAINT = (200, 0, 200)   # inpaint had no support here -> background fell back to paper.
+                              # This is where the old code silently painted black and ate any
+                              # reversed lettering, so it stays visible even now that it is fixed.
+COL_KDROP = (200, 0, 0)       # a component the K despeckle threw away
+KDROP_R = 14                  # fixed marker radius: a 4px@600 component is invisible if scaled
 
 # Overlapping detections are the normal case -- an ink stencil sits inside a photo, a reversed box
 # sits inside a tint. Coincident outlines would hide each other, so each TYPE is nudged right and
@@ -142,32 +168,53 @@ def one(page):
     sc = OUT_DPI / SRC_DPI
 
     rows = [json.loads(l) for l in open(rec)]
-    n_img = n_ink = n_df = 0
-    inks = set()
+    n = {"img": 0, "ink": 0, "df": 0, "rect": 0, "tint": 0, "fb": 0, "kdrop": 0}
     seen = []          # legend entries, in draw order, ONLY for what this page actually has
     seen_types = []    # nudge ranking, likewise page-local
+
+    def note(label, colour):
+        if (label, colour) not in seen:
+            seen.append((label, colour))
+
     for r in rows:
-        if r["kind"] == "cluster" and r.get("layer") == "bg":
+        k = r["kind"]
+        if k == "cluster" and r.get("layer") == "bg":
             m = r.get("media") or "rgb"
             c = COL_MEDIA.get(m, (128, 128, 128))
             rect(d, r["bbox"], sc, c, m, LINE, seen_types)
-            lbl_m = "RGB image" if m == "rgb" else "gray image"
-            if (lbl_m, c) not in seen:
-                seen.append((lbl_m, c))
-            n_img += 1
-        elif r["kind"] == "ink":
+            note("RGB image" if m == "rgb" else "gray image", c)
+            n["img"] += 1
+        elif k == "ink":
             nm = r["ink"]
-            inks.add(nm)
             c = COL_INK.get(nm, COL_UNKNOWN_INK)
             rect(d, r["bbox"], sc, c, nm, LINE, seen_types)
-            if ("ink " + nm, c) not in seen:
-                seen.append(("ink " + nm, c))
-            n_ink += 1
-        elif r["kind"] == "darkfill" and r.get("promoted"):
-            rect(d, r["bbox"], sc, COL_DARKFILL, "darkfill", LINE, seen_types)
-            if ("reversed box", COL_DARKFILL) not in seen:
-                seen.append(("reversed box", COL_DARKFILL))
-            n_df += 1
+            note("ink " + nm, c)
+            n["ink"] += 1
+        elif k == "darkfill":
+            promoted = r.get("promoted")
+            c = COL_DARKFILL if promoted else COL_DARKFILL_REJ
+            rect(d, r["bbox"], sc, c, "darkfill" if promoted else "darkfill_rej",
+                 LINE, seen_types)
+            note("reversed box" if promoted else "rev-box rejected", c)
+            n["df"] += 1 if promoted else 0
+        elif k == "rect":
+            rect(d, r["bbox"], sc, COL_RECT, "rect", LINE, seen_types)
+            note("solid fill (%s)" % r.get("which", "?"), COL_RECT)
+            n["rect"] += 1
+        elif k == "tint":
+            rect(d, r["bbox"], sc, COL_TINT, "tint", LINE, seen_types)
+            note("tint region", COL_TINT)
+            n["tint"] += 1
+        elif k == "inpaint_fallback":
+            rect(d, r["bbox"], sc, COL_INPAINT, "inpaint", LINE, seen_types)
+            note("inpaint->paper", COL_INPAINT)
+            n["fb"] += 1
+        elif k == "kdrop":
+            cx, cy = [v * sc for v in r["centroid"]]
+            d.ellipse([cx - KDROP_R, cy - KDROP_R, cx + KDROP_R, cy + KDROP_R],
+                      outline=COL_KDROP, width=LINE // 4 or 1)
+            note("K despeckled", COL_KDROP)
+            n["kdrop"] += 1
 
     # header: page number, counts, and a legend of ONLY what is on THIS page. A fixed legend
     # lies twice over -- it names colours the page does not use, and (before this) omitted ones it
@@ -178,9 +225,10 @@ def one(page):
         fnt = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf", 26)
     except Exception:
         fnt = None
-    d.text((10, 9), "p%03d   %d image  %d ink  %d reversed-box" % (page, n_img, n_ink, n_df),
-           fill=(0, 0, 0), font=fnt)
-    x = 640
+    hdr = "p%03d   %d image  %d ink  %d rev-box  %d fill  %d tint  %d inpaint  %d kdrop" % (
+        page, n["img"], n["ink"], n["df"], n["rect"], n["tint"], n["fb"], n["kdrop"])
+    d.text((10, 9), hdr, fill=(0, 0, 0), font=fnt)
+    x = 1150
     for nm, c in seen:
         for yy in (12, 34):
             d.line([x, yy, x + 11, yy], fill=c, width=4)
@@ -190,12 +238,13 @@ def one(page):
         d.text((x + 40, 9), nm, fill=(0, 0, 0), font=fnt)
         x += 70 + 15 * len(nm)
     if not seen:
-        d.text((x, 9), "no image/ink/reversed-box regions on this page", fill=(90, 90, 90), font=fnt)
+        d.text((x, 9), "no outlined regions on this page", fill=(90, 90, 90), font=fnt)
     else:
         d.text((x + 10, 9), "(K not outlined)", fill=(90, 90, 90), font=fnt)
     os.makedirs(PNG, exist_ok=True)
     im.save(out)
-    return page, "%d img %d ink %d revbox" % (n_img, n_ink, n_df)
+    return page, "%d img %d ink %d revbox %d fill %d tint %d inpaint %d kdrop" % (
+        n["img"], n["ink"], n["df"], n["rect"], n["tint"], n["fb"], n["kdrop"])
 
 
 def main():
