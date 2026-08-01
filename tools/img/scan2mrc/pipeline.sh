@@ -175,8 +175,17 @@ if want mrc; then
         > "$OUT/$n.log" 2>&1 \
       && echo "  p$n -> $(du -h "$OUT/$n.pdf" | cut -f1)" || echo "  p$n MRC FAILED (see $OUT/$n.log)"
     rm -rf "$OUT/.mrctmp_$n"
+    # Draw this page's overlay NOW, not after all 176. A debug page depends only on this page's
+    # record and its own 600 dpi base, both of which exist the moment the render returns -- so
+    # deferring them to a batch at the end just means nobody can look at page 3 until page 176 is
+    # done. Costs ~2 s a page. The `debug` stage below then only fills in what is missing.
+    if [ "${DBGLIVE:-1}" = "1" ] && [ -s "$OUT/$n.pdf" ]; then
+      mkdir -p "$DBGDIR"
+      OMP_NUM_THREADS=1 DBG_REC="$OUT" DBG_BASE="$OUT" DBG_PNG="$DBGDIR" \
+        "$PY" "$HERE/06-mrc/debug_pdf.py" --pages "$((10#$n))" --jobs 1 --png-only >/dev/null 2>&1
+    fi
   }
-  export -f mrc_one; export MP T OUT BGDPI FORCE
+  export -f mrc_one; export MP T OUT BGDPI FORCE DBGDIR PY HERE DBGLIVE
   pagelist | xargs -P "$LANES" -I{} bash -c 'mrc_one {}'
 fi
 

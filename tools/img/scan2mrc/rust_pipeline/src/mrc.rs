@@ -105,6 +105,9 @@ const DARKFILL_GLYPH_HOLEPX: f64 = 2000.0;  // ... OR a HUGE mean counter. This 
                                             // while a display glyph's counter is most of it.
 const DARKFILL_HOLE_MIN: usize = 20;        // ignore speck holes (scan noise inside solid ink)
 const DARKFILL_HOLES_LO: f64 = 0.05;  // enclosed-bright floor: reversed text present
+// Minimum fraction of a candidate rectangle that must NOT be under the K stencil for its
+// flatness/colour measurement to mean anything. See the coverage guard in solid_rects.
+const RECT_NONK: f32 = 0.5;
 const DARKFILL_HOLES_HI: f64 = 0.55;  // enclosed-bright ceiling: not a hollow frame
 
 
@@ -1486,8 +1489,16 @@ fn solid_rects(
                     lu_vals.push(lu[i]);
                 }
             }
-            if lu_vals.is_empty() {
-                continue; // entirely covered by K -- nothing of the tint left to measure
+            // COVERAGE GUARD. Excluding stencil pixels is right, but only if enough of the
+            // region survives to represent it. A photograph whose subject is dark has that subject
+            // in the stencil, so what remains is just its smooth backdrop and it reads "flat" --
+            // p010's toggle-switch photo was flat-filled pink for exactly this reason, and only
+            // once the despeckle was removed and the stencil grew to cover more of it. Neither
+            // change causes it alone.
+            let rect_area = ((py1 - py0) * (px1 - px0)) as f64;
+            let nonk_frac = tot as f64 / rect_area.max(1.0);
+            if nonk_frac < env_f("RECT_NONK", RECT_NONK) as f64 {
+                continue;
             }
             let rfill = fillc as f64 / tot.max(1) as f64;
             if rfill < 0.70 || (px1 - px0) < 8 || (py1 - py0) < 8 {
