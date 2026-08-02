@@ -176,3 +176,97 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
 
     pilio::write_rgb_png_fast(path, w, h, &px)
 }
+
+// ================================================================================================
+//  THE TYPE-OUTLINE VIEW
+// ================================================================================================
+
+/// Output scale for the outline view: stencil grid / this. 1 = the full 600 dpi stencil grid.
+///
+/// NOT REDUCIBLE. A body-text stroke is ~5 px wide at 600 dpi, so its boundary is 1 px of that and
+/// the outline reads as an outline. At 300 dpi the stroke is 2.5 px, its boundary is essentially all
+/// of it, and every glyph fills in solid -- which is the wash this view exists to replace. The page
+/// is ~10 MB; that is the correct trade for the one picture that shows whether a serif survived.
+const OUT_SHRINK: usize = 1;
+
+/// How dark the page is drawn under the outlines. Lighter than the destination view: here the page
+/// is the evidence, not the backdrop, and the outlines must not compete with it.
+const OUT_LIFT: f32 = 0.30;
+
+/// Outline colour per ink. Saturated, because these are hairlines on a light page.
+const OUT_RGB: [[f32; 3]; 4] = [
+    [0.00, 0.55, 0.95], // C
+    [0.95, 0.00, 0.55], // M
+    [0.85, 0.65, 0.00], // Y
+    [0.90, 0.10, 0.10], // K
+];
+
+/// EVERY MARK THE STENCIL WILL DRAW, OUTLINED RATHER THAN COVERED.
+///
+/// The destination view washes the stencil red, which answers "how much" but hides the one thing
+/// worth checking: WHICH marks. A wash over a paragraph looks identical whether the stencil has the
+/// glyphs or a solid rectangle over them. Outlining leaves the type legible inside its own outline,
+/// so a lost serif, a filled counter, a glyph that never made it into the layer, and a halftone dot
+/// that should not be there are all visible directly.
+///
+/// Drawn per ink, so a red heading shows a magenta AND a yellow outline where both plates carry it.
+/// That is how the p007 red-heading bug would have looked: yellow outlines with no magenta.
+pub fn write_outline_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
+    let (w, h) = (r.sw / OUT_SHRINK, r.sh / OUT_SHRINK);
+    let mut px = vec![255u8; w * h * 3];
+    let sdiv = (disp.w / r.sw).max(1);
+
+    // the page itself, in colour, lifted
+    for y in 0..h {
+        for x in 0..w {
+            let (sy, sx) = (y * OUT_SHRINK * sdiv, x * OUT_SHRINK * sdiv);
+            let si = sy.min(disp.h - 1) * disp.w + sx.min(disp.w - 1);
+            let (c, m, yv, k) = (
+                disp.c[si] as f32,
+                disp.m[si] as f32,
+                disp.y[si] as f32,
+                disp.k[si] as f32,
+            );
+            let f = |v: f32| {
+                let t = (1.0 - v / 255.0) * (1.0 - k / 255.0);
+                t + (1.0 - t) * OUT_LIFT
+            };
+            let i = (y * w + x) * 3;
+            px[i] = (f(c) * 255.0) as u8;
+            px[i + 1] = (f(m) * 255.0) as u8;
+            px[i + 2] = (f(yv) * 255.0) as u8;
+        }
+    }
+
+    // boundary pixels of each ink's stencil: set, with at least one unset 4-neighbour
+    for ci in 0..4 {
+        let m = &r.stencil[ci];
+        for sy in 0..r.sh {
+            for sx in 0..r.sw {
+                if !m[sy * r.sw + sx] {
+                    continue;
+                }
+                let edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
+                    let (y2, x2) = (sy as i64 + dy, sx as i64 + dx);
+                    y2 < 0
+                        || x2 < 0
+                        || y2 >= r.sh as i64
+                        || x2 >= r.sw as i64
+                        || !m[y2 as usize * r.sw + x2 as usize]
+                });
+                if !edge {
+                    continue;
+                }
+                let (y, x) = (sy / OUT_SHRINK, sx / OUT_SHRINK);
+                if y >= h || x >= w {
+                    continue;
+                }
+                let i = (y * w + x) * 3;
+                for k in 0..3 {
+                    px[i + k] = (OUT_RGB[ci][k] * 255.0) as u8;
+                }
+            }
+        }
+    }
+    pilio::write_rgb_png_fast(path, w, h, &px)
+}
