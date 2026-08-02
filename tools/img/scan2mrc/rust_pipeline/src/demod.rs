@@ -75,6 +75,9 @@ pub const CONTONE_FALLBACK_LPI: f64 = 150.0;
 pub const DIV_MIN: usize = 12;
 pub const DIV_MAX: usize = 20;
 
+/// Cap on the per-axis integration width, in multiples of the local cell. See `contone`.
+pub const CELL_MAX_MULT: f64 = 2.5;
+
 /// Gaussian smoothing applied to the demodulated field, in SCREEN PERIODS.
 ///
 /// This is the Gabor uncertainty dial. Small sigma localises well but is noisy; large sigma is
@@ -87,6 +90,23 @@ pub const COH_SIGMA_PERIODS: f64 = 1.5;
 /// Ink level below which coherence is not computed at all (the block is bare paper in this ink, and
 /// a ratio there is noise divided by noise).
 pub const MIN_INK: f32 = 8.0;
+
+/// Coherence at or above this counts as "explained by the screen" -- halftone, not a mark.
+///
+/// A PERFECT GRATING WOULD READ 1.0 AND A REAL HALFTONE DOES NOT. A halftone is a dot pattern, not
+/// a sinusoid: a square-ish dot puts only ~30-40% of its AC energy in the fundamental and the rest
+/// into harmonics, so the share sitting at the measured screen frequency tops out around a third.
+/// Measured medians over firing ink: p007 C 0.27, M 0.33, Y 0.36; p092 K 0.15. Against text, which
+/// is what this must reject: p007 K, almost all type, medians 0.05.
+///
+/// The first value tried was 0.30, chosen from theory rather than from the data. It sat exactly at
+/// the median of real screens, so half of every screen failed it -- on p092 the whole page went to
+/// the stencil, no contone pixel survived the mask, and every area reported "unmeasurable".
+///
+/// PROVISIONAL at 0.15: separates the measured populations (screen ~0.3, type ~0.05) with margin on
+/// both sides, but it is picked from four pages. It wants the treatment DEPTH got -- the
+/// distribution over the whole issue, split by whether the block is screened, valley located.
+pub const COHERENT: f32 = 0.15;
 
 // ================================================================================================
 
@@ -126,29 +146,75 @@ pub fn contone_divisor(f: &ScreenField) -> usize {
     ((screen::SRC_DPI / lpi).round() as usize).clamp(DIV_MIN, DIV_MAX)
 }
 
-/// TONE. Box-average each ink over one screen cell -> dot area at the screen's own rate.
+/// TONE. Average each ink over one local screen PERIOD PER AXIS -> dot area on a uniform grid.
 ///
-/// The divisor is the cell width in source pixels, so this is an exact integral over the cell and
-/// the screen fundamental lands on the box's first null. No window, no FFT, no per-block geometry:
-/// the ruling sets the width and that is the whole of it.
-pub fn contone(cmyk: &Cmyk, div: usize) -> Contone {
+/// THE BOX MUST BE SIZED BY THE PROJECTED PERIOD, NOT BY THE CELL. A separable box of width N nulls
+/// the frequency 1/N along each axis independently, so nulling a screen at angle t and ruling L
+/// requires widths 1/|fx| and 1/|fy| where (fx, fy) = L/dpi * (cos t, sin t) -- NOT L/dpi in both.
+/// For this issue's dominant 45/135 degree screens those differ by sqrt(2): a 134 lpi screen has a
+/// 17.9 px cell but a 25.3 px period along each axis, and an 18 px box leaves 12% of the screen
+/// amplitude standing. Measured on p007: a flat cyan tint bar arrived in the contone rippling +-25
+/// levels and was classed as a photograph. Sizing per axis nulls it.
+///
+/// The width is capped at CELL_MAX_MULT cells. The axis cut already keeps screens at least
+/// AXIS_DEG off the axes, so the projection can stretch a period by at most ~1/sin(12 deg) ~= 4.8x,
+/// and a box that wide would blur more tone than the residual screen costs.
+///
+/// The output grid spacing is the page's median cell (`div`), but the INTEGRATION WIDTH at each
+/// point is that ink's own cell where it is, taken from the field. That distinction is not a
+/// refinement, it is the difference between nulling the screen and not:
+///
+/// This issue carries two screen systems on one sheet -- process photos at ~150-160 lpi and design
+/// tints at ~133. A single box of 15 px nulls 160 lpi exactly and leaves the 133 lpi tint rippling,
+/// so p007's flat cyan bars came out of the contone with a dot-area spread of 29 levels and were
+/// classed as photographs. With the width following the local ruling, each screen lands on its own
+/// null. This is per-channel inverse halftoning in its simplest honest form.
+///
+/// Where an ink reported no screen, the page median is used: there is no cell to integrate over, and
+/// any width is as good as any other for solid ink or bare paper.
+pub fn contone(cmyk: &Cmyk, div: usize, f: &ScreenField, geo: &[Geometry]) -> Contone {
     let (w, h) = (cmyk.w / div, cmyk.h / div);
-    let n = (div * div) as u32;
     let ink: Vec<Vec<u8>> = (0..4)
         .map(|ci| {
             let src = cmyk.channel(ci);
             let mut out = vec![0u8; w * h];
             out.par_chunks_mut(w).enumerate().for_each(|(y, row)| {
                 for x in 0..w {
+                    let (sy0, sx0) = (y * div, x * div);
+                    // local cell width for THIS ink, from the block covering this sample
+                    let by = sy0.saturating_sub(screen::WIN / 2) / screen::STEP;
+                    let bx = sx0.saturating_sub(screen::WIN / 2) / screen::STEP;
+                    let bi = by.min(f.ny - 1) * f.nx + bx.min(f.nx - 1);
+                    let (wy, wx) = if geo[ci].known[bi] && geo[ci].lpi[bi] > 1.0 {
+                        let cell = screen::SRC_DPI / geo[ci].lpi[bi] as f64;
+                        let a = (geo[ci].ang[bi] as f64).to_radians();
+                        let cap = (cell * CELL_MAX_MULT).round() as usize;
+                        // period along each axis = 1 / |component of the screen frequency|
+                        let py = if a.sin().abs() > 1e-6 { cell / a.sin().abs() } else { f64::MAX };
+                        let px = if a.cos().abs() > 1e-6 { cell / a.cos().abs() } else { f64::MAX };
+                        let f = |v: f64| -> usize {
+                            if !v.is_finite() { cap } else { (v.round() as usize).clamp(DIV_MIN, cap) }
+                        };
+                        (f(py), f(px))
+                    } else {
+                        (div, div)
+                    };
+                    // centre the integration on the sample, so the tone does not shift when the
+                    // width changes between neighbouring samples
+                    let y0 = (sy0 + div / 2).saturating_sub(wy / 2);
+                    let x0 = (sx0 + div / 2).saturating_sub(wx / 2);
+                    let y1 = (y0 + wy).min(cmyk.h);
+                    let x1 = (x0 + wx).min(cmyk.w);
                     let mut acc: u32 = 0;
-                    for sy in 0..div {
-                        let base = (y * div + sy) * cmyk.w + x * div;
-                        for sx in 0..div {
-                            acc += src[base + sx] as u32;
+                    let mut n: u32 = 0;
+                    for yy in y0..y1 {
+                        let base = yy * cmyk.w;
+                        for xx in x0..x1 {
+                            acc += src[base + xx] as u32;
+                            n += 1;
                         }
                     }
-                    // round-half-up, so a flat field of value v returns exactly v
-                    row[x] = ((acc + n / 2) / n) as u8;
+                    row[x] = if n == 0 { 0 } else { ((acc + n / 2) / n) as u8 };
                 }
             });
             out
@@ -157,25 +223,92 @@ pub fn contone(cmyk: &Cmyk, div: usize) -> Contone {
     Contone { w, h, dpi: screen::SRC_DPI / div as f64, ink }
 }
 
+/// FILL THE GEOMETRY FIELD. A block only fires where the screen is clean enough to measure, and
+/// inside a real screened region many blocks do not: the window straddles the tint and the type on
+/// it, or the photograph's own solid shadow. Measured on p007, straight through a cyan tint bar,
+/// only 3 blocks of 40 fired while the rows above and below fired 18 -- so most of the bar fell back
+/// to the page's median cell, its 134 lpi screen was never nulled, and the "flat" tint arrived in
+/// the contone with a 25-level ripple and was classed as a photograph.
+///
+/// Geometry is a property of a REGION, not of a block, and a block that could not measure its own
+/// screen still sits on one. So an unfired block inherits the median ruling and angle of the fired
+/// blocks around it. This is the same argument as "halftone only exists in mid-tones" applied to the
+/// vector field rather than to the region mask.
+///
+/// Radius is in blocks. 4 spans ~5.4 mm at 2400 dpi -- far enough to cross a bar of type, short
+/// enough that a photograph does not inherit the ruling of the tint next to it.
+pub const FILL_RADIUS: i64 = 4;
+
+pub struct Geometry {
+    pub lpi: Vec<f32>,
+    pub ang: Vec<f32>,
+    /// true where a screen is known here, measured or inherited
+    pub known: Vec<bool>,
+}
+
+pub fn filled_geometry(f: &ScreenField, ci: usize) -> Geometry {
+    let (ny, nx) = (f.ny, f.nx);
+    let mut g = Geometry {
+        lpi: vec![0.0; ny * nx],
+        ang: vec![0.0; ny * nx],
+        known: vec![false; ny * nx],
+    };
+    for by in 0..ny {
+        for bx in 0..nx {
+            let i = by * nx + bx;
+            if screen::fired(f, ci, i) {
+                g.lpi[i] = f.ink[ci].lpi[i];
+                g.ang[i] = f.ink[ci].ang[i];
+                g.known[i] = true;
+                continue;
+            }
+            // inherit: median of the fired blocks within FILL_RADIUS
+            let mut ls: Vec<f32> = Vec::new();
+            let mut as_: Vec<f32> = Vec::new();
+            for dy in -FILL_RADIUS..=FILL_RADIUS {
+                for dx in -FILL_RADIUS..=FILL_RADIUS {
+                    let (ny2, nx2) = (by as i64 + dy, bx as i64 + dx);
+                    if ny2 < 0 || nx2 < 0 || ny2 >= ny as i64 || nx2 >= nx as i64 {
+                        continue;
+                    }
+                    let j = ny2 as usize * nx + nx2 as usize;
+                    if screen::fired(f, ci, j) {
+                        ls.push(f.ink[ci].lpi[j]);
+                        as_.push(f.ink[ci].ang[j]);
+                    }
+                }
+            }
+            if ls.is_empty() {
+                continue;
+            }
+            ls.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            as_.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            g.lpi[i] = ls[ls.len() / 2];
+            g.ang[i] = as_[as_.len() / 2];
+            g.known[i] = true;
+        }
+    }
+    g
+}
+
 /// The screen vector (cycles per source pixel, as (fy, fx)) for the block covering a source pixel,
 /// or None where that ink reported no screen there.
 ///
 /// Nearest block, not interpolated: between two blocks with different rulings the interpolated
 /// vector belongs to neither screen, and the magnitude we take afterwards is more forgiving of a
 /// hard switch than of a wrong frequency.
-fn vector_at(f: &ScreenField, ci: usize, sy: usize, sx: usize) -> Option<(f64, f64)> {
+fn vector_at(f: &ScreenField, g: &Geometry, sy: usize, sx: usize) -> Option<(f64, f64)> {
     let by = (sy / screen::STEP).min(f.ny.saturating_sub(1));
     let bx = (sx / screen::STEP).min(f.nx.saturating_sub(1));
     let bi = by * f.nx + bx;
-    if !screen::fired(f, ci, bi) {
+    if !g.known[bi] {
         return None;
     }
-    let ink = &f.ink[ci];
-    let lpi = ink.lpi[bi] as f64;
+    let lpi = g.lpi[bi] as f64;
     if lpi <= 0.0 {
         return None;
     }
-    let a = (ink.ang[bi] as f64).to_radians();
+    let a = (g.ang[bi] as f64).to_radians();
     let fr = lpi / screen::SRC_DPI; // cycles per source pixel
     Some((fr * a.sin(), fr * a.cos()))
 }
@@ -190,7 +323,7 @@ fn vector_at(f: &ScreenField, ci: usize, sy: usize, sx: usize) -> Option<(f64, f
 /// Normalised by the local AC RMS so the answer is a SHARE, not an amplitude -- amplitude is what
 /// stage A's depth gate is for, and mixing the two questions is what made stage A's first version
 /// fire on crosstalk.
-pub fn coherence(cmyk: &Cmyk, f: &ScreenField) -> Coherence {
+pub fn coherence(cmyk: &Cmyk, f: &ScreenField, geo: &[Geometry]) -> Coherence {
     let div = (screen::SRC_DPI / STENCIL_DPI).round() as usize; // 4
     let (w, h) = (cmyk.w / div, cmyk.h / div);
     let ink: Vec<Vec<f32>> = (0..4)
@@ -208,7 +341,7 @@ pub fn coherence(cmyk: &Cmyk, f: &ScreenField) -> Coherence {
                 .for_each(|(y, ((nrow, arow), brow))| {
                     for x in 0..w {
                         let (sy0, sx0) = (y * div, x * div);
-                        let vec_here = vector_at(f, ci, sy0, sx0);
+                        let vec_here = vector_at(f, &geo[ci], sy0, sx0);
                         let mut acc = Complex32::new(0.0, 0.0);
                         let (mut a, mut b) = (0.0f32, 0.0f32);
                         for sy in 0..div {

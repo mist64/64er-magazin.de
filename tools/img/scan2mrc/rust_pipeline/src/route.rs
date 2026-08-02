@@ -1,0 +1,477 @@
+//! STAGE C — routing. Where the four content classes are finally assigned, out of the two physical
+//! questions stages A and B measured. There is no classifier here and no vote; every branch below
+//! reads a measurement.
+//!
+//!     is there a screen?          stage A, per ink, per block
+//!     does its dot area vary?     stage B, per ink, over an area
+//!
+//!     screened + varying + colour inks  -> CLASS 1  colour photo      -> contone, CMYK
+//!     screened + varying + neutral only -> CLASS 2  greyscale photo   -> contone, K
+//!     screened + uniform                -> CLASS 3  tint / box        -> flat fill at measured ink %
+//!     not screened                      -> CLASS 4  type and line art -> per-ink bilevel stencil
+//!
+//! CLASS 4 IS NOT A REGION. The first three are areas on the page; the fourth is every pixel that
+//! carries ink the screen model cannot explain, wherever it is -- including inside a class 3 tint,
+//! which is the whole point. Lettering on a grey box is class 4 sitting on class 3, not a boundary
+//! dispute between them. So the stencil is computed per pixel and the areas are computed per block,
+//! and they deliberately overlap.
+//!
+//! UNIFORMITY IS JUDGED AT TWO SCALES, AND BOTH ARE NECESSARY.
+//!
+//!   WITHIN a block   separates a tint bar from the photograph beside it. A connected screened
+//!                    region routinely holds both -- on p092 the closing merges a header bar, two
+//!                    photographs and a reversed box into ONE component of 6688 blocks, and asking
+//!                    that component whether it is uniform is as meaningless as asking a cluster
+//!                    whether it was a photo or type (FINDINGS.md 3: the unit was wrong).
+//!   ACROSS an area   catches a smooth gradient. Inside 1.35 mm a soft photographic passage IS
+//!                    flat, so the block test alone called p007's Spindizzy artwork (M113 Y112
+//!                    K141) a flat fill. A real tint is flat locally AND from end to end; a
+//!                    photograph is flat locally and varies across itself.
+//!
+//! Neither test alone is safe, and the failure directions are opposite -- which is why both are
+//! applied and an area must pass both to be flattened.
+//!
+//! WHY AREAS MUST BE CLOSED AND HOLE-FILLED. A halftone only exists in mid-tones: a solid highlight
+//! or a solid shadow carries no dots at all, so a photograph's own flat passages correctly measure
+//! "not screened" and appear as gaps. Without closing and filling, every photograph comes out shot
+//! through with bilevel patches. This is measured behaviour on this issue, not a precaution
+//! (FINDINGS.md 1), and it is the reason the block, not the pixel, is the unit for areas.
+
+use crate::demod::{Coherence, Contone, COHERENT};
+use crate::imageio::Cmyk;
+use crate::ndimage;
+use crate::screen::{self, ScreenField};
+
+// ================================================================================================
+//  CONSTANTS
+// ================================================================================================
+
+/// Closing radius in BLOCKS, applied before hole filling. Bridges the dot-free gaps a halftone
+/// leaves in its own highlights and shadows. 2 blocks is ~2.7 mm at 2400 dpi -- wider than any
+/// specular highlight in this issue, narrower than the gap between two genuinely separate pictures.
+pub const CLOSE_BLOCKS: usize = 2;
+
+/// An area smaller than this is not a region worth routing anywhere. 12 blocks is ~22 mm^2.
+///
+/// DELIBERATELY SMALL, and it must stay that way. The old renderer used a size filter of
+/// 0.012 * page area (~1849 cells) to suppress detector bloom, and it discarded every product photo
+/// under about 1.9 cm -- p104's entire page of small ads went to bilevel because of it. Bloom is the
+/// wrong problem to solve with a size gate; this detector does not bloom (it attributes to the
+/// window centre and rejects followers), so the gate can be small enough to keep real small photos.
+pub const MIN_AREA_BLOCKS: usize = 12;
+
+/// Dot-area spread, in ink levels, below which an area is UNIFORM and becomes a flat fill rather
+/// than a raster. Measured over non-stencil pixels only -- type on a tint is drawn by its own layer
+/// and says nothing about whether the tint underneath is flat.
+///
+/// THIS IS A HALF-INTERDECILE RANGE, (p90 - p10) / 2, NOT A STANDARD DEVIATION. A tint bar is ~30
+/// contone pixels tall, so its two transition rows are ~7% of its area -- and a standard deviation
+/// weights that minority by the square of its distance, which put a perfectly flat bar at std 21
+/// against a threshold of 9. Percentiles ignore a small edge minority while still spanning a
+/// photograph's whole tonal range, which is the distinction being measured.
+///
+/// A per-block variance was considered instead and rejected: a smooth gradient (a sky, a soft
+/// backdrop) is flat WITHIN any one block and would be flattened into a single colour. The spread
+/// must be measured across the whole area.
+///
+/// PROVISIONAL: the one constant in this file not yet derived from the issue. It wants the same
+/// treatment the screen-field thresholds got -- the distribution over all 176 pages, valley located
+/// rather than assumed.
+pub const UNIFORM_STD: f32 = 9.0;
+
+/// The same spread, measured ACROSS an area rather than within a block: half the interdecile range
+/// of the per-block medians. A tint is the same colour from end to end; a photograph that is locally
+/// smooth still travels. Slightly looser than the within-block figure because a legitimate tint can
+/// carry a little press variation across a wide bar.
+pub const UNIFORM_ACROSS: f32 = 12.0;
+
+/// An area counts as carrying colour when a chromatic ink's mean dot area reaches this, in levels.
+/// Below it the area is neutral and renders as class 2 even if C/M/Y technically fired -- which they
+/// do on any neutral image, because before GCR a grey halftone puts near-equal ink in all four
+/// channels (FINDINGS.md 1).
+pub const COLOUR_INK: f32 = 12.0;
+
+/// Ink level (0-255) at or above which a pixel is considered to carry ink at all.
+pub const INK_PRESENT: f32 = 24.0;
+
+/// ...and it must be at least this fraction of the STRONGEST ink at that pixel to draw a stencil.
+///
+/// WHICH INK OWNS THE MARK. GCR moves the neutral component to K, but it only removes min(C,M,Y):
+/// a black mark separated as C 30 / M 40 / Y 10 / K 200 still leaves C 20 / M 30 behind. That
+/// residue is scan colour-fringing and plate misregistration around black type, not cyan ink, and
+/// without this test every black letter also draws a cyan and a magenta stencil. Measured on p092, a
+/// black-and-white page: the C stencil claimed 19.4% and the M stencil 22.2% of the sheet, against
+/// actual C coverage of 5.4% and M of 10.7% -- and the resulting mask then excluded so much of the
+/// page that no area could be measured at all.
+///
+/// 0.5 keeps a two-ink colour (C 150 + M 140, each above half the max) and rejects a residue beside
+/// a dominant K. Black type: K owns it. Cyan type: C owns it. A tint under type: neither, because
+/// coherence has already claimed it.
+pub const STENCIL_DOMINANCE: f32 = 0.5;
+
+/// A contone pixel counts as part of the screen when at least this fraction of its footprint is
+/// coherent. Half: the pixel is more screen than not. Bare paper has no coherence and drops out
+/// here without needing a separate ink test.
+pub const COHERENT_FRAC: f32 = 0.5;
+
+/// A block needs this FRACTION of its own contone pixels to survive the paper and stencil masks
+/// before its dot-area spread means anything, with an absolute floor as well.
+///
+/// It must be a fraction, not a count: the contone rate is derived per page from the measured
+/// ruling, so a block's cell is 8.5 x 8.5 contone pixels on a 160 lpi page and only 6.4 x 6.4 on a
+/// 102 lpi one. A fixed count of 32 was 44% of the cell on p007 and 78% of it on p092 -- so on p092
+/// almost no block could be measured at all, every area fell through to "unmeasurable", and the page
+/// reported five grey photographs with no statistics behind them.
+///
+/// Where a block cannot be measured it is NOT called uniform. A flat fill replaces a region with a
+/// single colour and is the most destructive thing the renderer does, so "I could not measure this"
+/// must fall to the contone side. The old renderer's equivalent default pointed at the destructive
+/// layer, which is how photographs ended up as solid bilevel blobs.
+pub const MIN_MEASURE_FRAC: f64 = 0.25;
+pub const MIN_MEASURE_FLOOR: usize = 8;
+
+// ================================================================================================
+
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum Class {
+    /// 1: screened, dot area varies, chromatic ink present
+    ColourPhoto,
+    /// 2: screened, dot area varies, neutral
+    GreyPhoto,
+    /// 3: screened, dot area uniform -- a tint or a box background
+    Flat,
+}
+
+impl Class {
+    pub fn name(self) -> &'static str {
+        match self {
+            Class::ColourPhoto => "colour-photo",
+            Class::GreyPhoto => "grey-photo",
+            Class::Flat => "flat",
+        }
+    }
+}
+
+pub struct Area {
+    pub id: usize,
+    pub class: Class,
+    /// bbox in block coordinates: y0, x0, y1, x1 inclusive
+    pub bbox: (usize, usize, usize, usize),
+    pub blocks: usize,
+    /// mean dot area per ink over the area, non-stencil pixels only (0-255)
+    pub mean: [f32; 4],
+    /// and its dot-area spread, (p90-p10)/2 -- the uniform/varying test. See UNIFORM_STD.
+    pub std: [f32; 4],
+    /// median ruling of whatever fired inside
+    pub lpi: f32,
+}
+
+pub struct Routing {
+    pub ny: usize,
+    pub nx: usize,
+    /// how many blocks fired, and how many of those could actually be measured on the contone.
+    /// Reported because "no area could be measured" is otherwise indistinguishable from "no screen
+    /// here", and the two want opposite fixes.
+    pub n_fired: usize,
+    pub n_measured: usize,
+    /// area id + 1 per block, 0 = not screened
+    pub label: Vec<u32>,
+    pub areas: Vec<Area>,
+    /// per ink at STENCIL resolution: ink present and NOT explained by a screen
+    pub stencil: Vec<Vec<bool>>,
+    pub sw: usize,
+    pub sh: usize,
+}
+
+/// Block covering a source pixel. The field's blocks are anchored every STEP px with the verdict at
+/// the window CENTRE, so the inverse of `centre_of` is offset by half a window.
+fn block_of_source(f: &ScreenField, sy: usize, sx: usize) -> usize {
+    let by = sy.saturating_sub(screen::WIN / 2) / screen::STEP;
+    let bx = sx.saturating_sub(screen::WIN / 2) / screen::STEP;
+    by.min(f.ny - 1) * f.nx + bx.min(f.nx - 1)
+}
+
+/// THE STENCIL. Per pixel, per ink: ink is present here AND it is not part of a periodic grid.
+///
+/// A mask, never a subtraction. Reconstructing the screen and subtracting it would leave the
+/// harmonic residue of a square-ish dot, which looks exactly like structure (FINDINGS.md 2).
+pub fn stencils(disp: &Cmyk, coh: &Coherence) -> (usize, usize, Vec<Vec<bool>>) {
+    let (w, h) = (coh.w, coh.h);
+    let div = (disp.w / w).max(1);
+    // Ink per stencil pixel per channel: the MAXIMUM over the source cell, not the mean. A hairline
+    // or a serif covers a fraction of a 4x4 cell, and averaging it with its own white surroundings
+    // is how thin strokes get lost.
+    let peak: Vec<Vec<u8>> = (0..4)
+        .map(|ci| {
+            let src = disp.channel(ci);
+            let mut m = vec![0u8; w * h];
+            for y in 0..h {
+                for x in 0..w {
+                    let mut ink = 0u8;
+                    for sy in 0..div {
+                        let base = (y * div + sy) * disp.w + x * div;
+                        for sx in 0..div {
+                            ink = ink.max(src[base + sx]);
+                        }
+                    }
+                    m[y * w + x] = ink;
+                }
+            }
+            m
+        })
+        .collect();
+    // A LOCATION IS SCREEN IF ANY INK IS COHERENT THERE, not only if this one is.
+    //
+    // Per-ink was wrong and the picture showed it: inside a colour photograph M can be coherent
+    // while C is present and incoherent, so C drew a stencil across the whole picture and p007's
+    // two photographs came out almost entirely claimed by the bilevel layer. Physically there is one
+    // sheet of paper: where a halftone exists, the ink at that spot IS the halftone. Type on a tint
+    // still works -- the letter covers the dots with solid ink, so no ink is coherent under it.
+    let screened: Vec<bool> = (0..w * h)
+        .map(|i| (0..4).any(|ci| coh.ink[ci][i] >= COHERENT))
+        .collect();
+    let out: Vec<Vec<bool>> = (0..4)
+        .map(|ci| {
+            (0..w * h)
+                .map(|i| {
+                    let v = peak[ci][i] as f32;
+                    if v < INK_PRESENT || screened[i] {
+                        return false;
+                    }
+                    let strongest = (0..4).map(|cj| peak[cj][i]).max().unwrap() as f32;
+                    v >= STENCIL_DOMINANCE * strongest
+                })
+                .collect()
+        })
+        .collect();
+    (w, h, out)
+}
+
+/// Group blocks into areas, measure each, and assign its class.
+pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> Routing {
+    let (ny, nx) = (f.ny, f.nx);
+
+    // ---- 1. which blocks carry a screen in any ink --------------------------------------------
+    let fired_mask: Vec<bool> = (0..ny * nx)
+        .map(|i| (0..4).any(|ci| screen::fired(f, ci, i)))
+        .collect();
+
+    // ---- 2. stencils (per pixel, independent of any area) -------------------------------------
+    let (sw, sh, stencil) = stencils(disp, coh);
+
+    // ---- 3. per-BLOCK dot-area spread, over the SCREEN's own pixels --------------------------
+    //
+    // A block's dot area is measured where the ink IS the screen -- that is, where coherence says
+    // so. Not "everywhere except the stencil": that was a second, different criterion for the same
+    // question, and the two disagreed. Inside a photograph its own fine detail reads as a mark, so
+    // excluding by stencil starved the sample (p092: 14 blocks measurable of 8381); falling back to
+    // the full sample then let paper and lettering in, and flat regions swallowed photographs. One
+    // criterion, applied the same way in both directions: coherent pixels are the screen, and the
+    // screen is what has a dot area.
+    let sdiv = (disp.w / sw).max(1);
+    let ty_per = (disp.h / tone.h).max(1);
+    let tx_per = (disp.w / tone.w).max(1);
+    let mut block_vals: Vec<[Vec<u8>; 4]> = (0..ny * nx)
+        .map(|_| [Vec::new(), Vec::new(), Vec::new(), Vec::new()])
+        .collect();
+    for ty in 0..tone.h {
+        for tx in 0..tone.w {
+            let (sy, sx) = (ty * ty_per, tx * tx_per);
+            let bi = block_of_source(f, sy, sx);
+            if !fired_mask[bi] {
+                continue;
+            }
+            // fraction of this contone pixel's footprint that is coherent, in the best ink
+            let (cy0, cx0) = (sy / sdiv, sx / sdiv);
+            let cy1 = ((sy + ty_per) / sdiv).min(sh).max(cy0 + 1);
+            let cx1 = ((sx + tx_per) / sdiv).min(sw).max(cx0 + 1);
+            let mut best = 0.0f32;
+            for ci in 0..4 {
+                if !screen::fired(f, ci, bi) {
+                    continue;
+                }
+                let (mut hit, mut tot) = (0u32, 0u32);
+                for cy in cy0..cy1.min(sh) {
+                    for cx in cx0..cx1.min(sw) {
+                        tot += 1;
+                        if coh.ink[ci][cy * sw + cx] >= COHERENT {
+                            hit += 1;
+                        }
+                    }
+                }
+                if tot > 0 {
+                    best = best.max(hit as f32 / tot as f32);
+                }
+            }
+            if best < COHERENT_FRAC {
+                continue;
+            }
+            for ci in 0..4 {
+                block_vals[bi][ci].push(tone.ink[ci][ty * tone.w + tx]);
+            }
+        }
+    }
+
+    // a block's cell in contone pixels, both axes
+    let cell_px = ((screen::STEP / ty_per).max(1) * (screen::STEP / tx_per).max(1)) as f64;
+    let min_measure = ((cell_px * MIN_MEASURE_FRAC) as usize).max(MIN_MEASURE_FLOOR);
+    let mut uniform = vec![false; ny * nx];
+    // measured[bi]: enough of this block is screen for its statistics to mean anything.
+    let mut measured = vec![false; ny * nx];
+    let mut bmean = vec![[0.0f32; 4]; ny * nx];
+    let mut bspread = vec![[0.0f32; 4]; ny * nx];
+    for bi in 0..ny * nx {
+        let n = block_vals[bi][0].len();
+        if n < min_measure {
+            continue;
+        }
+        measured[bi] = true;
+        let mut flat = true;
+        for ci in 0..4 {
+            let v = &mut block_vals[bi][ci];
+            v.sort_unstable();
+            bmean[bi][ci] = v[n / 2] as f32;
+            let p25 = v[n / 4] as f32;
+            let p75 = v[(n * 3 / 4).min(n - 1)] as f32;
+            bspread[bi][ci] = (p75 - p25) / 2.0;
+            if bspread[bi][ci] > UNIFORM_STD {
+                flat = false;
+            }
+        }
+        uniform[bi] = flat;
+    }
+
+    // ---- 4. group blocks of like verdict, separately ------------------------------------------
+    // Closing bridges the dot-free gaps a halftone leaves in its own highlights and shadows;
+    // fill_holes recovers a photograph's solid highlight enclosed by screen.
+    let mut areas: Vec<Area> = Vec::new();
+    let mut label = vec![0u32; ny * nx];
+    for pass in 0..2 {
+        let want_uniform = pass == 0;
+        let mut m: Vec<bool> = (0..ny * nx)
+            .map(|i| fired_mask[i] && uniform[i] == want_uniform && label[i] == 0)
+            .collect();
+        m = ndimage::binary_dilation(&m, nx, ny, CLOSE_BLOCKS);
+        m = ndimage::binary_erosion(&m, nx, ny, CLOSE_BLOCKS);
+        m = ndimage::binary_fill_holes(&m, nx, ny);
+        // never steal a block already claimed by the previous pass
+        for i in 0..ny * nx {
+            if label[i] != 0 {
+                m[i] = false;
+            }
+        }
+        let (lb, n) = ndimage::label(&m, nx, ny);
+        let sz = ndimage::component_sizes(&lb, n);
+        let bx = ndimage::find_objects(&lb, n, nx, ny);
+        for c in 1..=n {
+            if sz[c - 1] < MIN_AREA_BLOCKS as u64 {
+                continue;
+            }
+            let id = areas.len();
+            let (y0, y1, x0, x1) = bx[c - 1].unwrap();
+            // area statistics: the MEDIAN over its own blocks, which is what a flat fill will use
+            let mut mean = [0.0f32; 4];
+            let mut spread = [0.0f32; 4];
+            let mut lpis: Vec<f32> = Vec::new();
+            for ci in 0..4 {
+                let mut mv: Vec<f32> = Vec::new();
+                let mut sv: Vec<f32> = Vec::new();
+                for i in 0..ny * nx {
+                    if lb[i] == c as u32 && measured[i] {
+                        mv.push(bmean[i][ci]);
+                        sv.push(bspread[i][ci]);
+                    }
+                }
+                if !mv.is_empty() {
+                    mv.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                    sv.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                    mean[ci] = mv[mv.len() / 2];
+                    spread[ci] = sv[sv.len() / 2];
+                }
+            }
+            for i in 0..ny * nx {
+                if lb[i] == c as u32 {
+                    label[i] = id as u32 + 1;
+                    for ci in 0..4 {
+                        if screen::fired(f, ci, i) {
+                            lpis.push(f.ink[ci].lpi[i]);
+                        }
+                    }
+                }
+            }
+            lpis.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            // SECOND SCALE: a candidate flat area must also be flat ACROSS itself. Spread of the
+            // per-block medians, which is exactly the gradient a locally-flat photograph has and a
+            // tint does not.
+            let mut across = 0.0f32;
+            for ci in 0..4 {
+                let mut mv: Vec<f32> = (0..ny * nx)
+                    .filter(|&i| lb[i] == c as u32 && measured[i])
+                    .map(|i| bmean[i][ci])
+                    .collect();
+                if mv.len() < 4 {
+                    continue;
+                }
+                mv.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                let p10 = mv[mv.len() / 10];
+                let p90 = mv[(mv.len() * 9 / 10).min(mv.len() - 1)];
+                across = across.max((p90 - p10) / 2.0);
+            }
+            let colour = (0..3).any(|ci| mean[ci] >= COLOUR_INK);
+            areas.push(Area {
+                id,
+                class: if want_uniform && across <= UNIFORM_ACROSS {
+                    Class::Flat
+                } else if colour {
+                    Class::ColourPhoto
+                } else {
+                    Class::GreyPhoto
+                },
+                bbox: (y0, x0, y1, x1),
+                blocks: sz[c - 1] as usize,
+                mean,
+                std: spread,
+                lpi: if lpis.is_empty() { 0.0 } else { lpis[lpis.len() / 2] },
+            });
+        }
+    }
+
+    let n_fired = fired_mask.iter().filter(|&&b| b).count();
+    let n_measured = measured.iter().filter(|&&b| b).count();
+    Routing { ny, nx, n_fired, n_measured, label, areas, stencil, sw, sh }
+}
+
+/// One line per page for the terminal, printed as the page finishes.
+pub fn summarise(page: &str, r: &Routing) -> String {
+    let (mut c1, mut c2, mut c3) = (0, 0, 0);
+    for a in &r.areas {
+        match a.class {
+            Class::ColourPhoto => c1 += 1,
+            Class::GreyPhoto => c2 += 1,
+            Class::Flat => c3 += 1,
+        }
+    }
+    let sp: Vec<String> = (0..4)
+        .filter_map(|ci| {
+            let n = r.stencil[ci].iter().filter(|&&b| b).count();
+            if n == 0 {
+                return None;
+            }
+            Some(format!(
+                "{} {:.1}%",
+                ["C", "M", "Y", "K"][ci],
+                100.0 * n as f64 / (r.sw * r.sh) as f64
+            ))
+        })
+        .collect();
+    format!(
+        "p{} blocks {} fired / {} measured | areas: {} colour-photo, {} grey-photo, {} flat | stencil {}",
+        page,
+        r.n_fired,
+        r.n_measured,
+        c1,
+        c2,
+        c3,
+        if sp.is_empty() { "none".into() } else { sp.join(" ") }
+    )
+}
