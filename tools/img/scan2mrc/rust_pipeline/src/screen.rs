@@ -338,3 +338,25 @@ pub fn write_npy(path: &str, f: &ScreenField) -> Result<()> {
     }
     npy::write_f32(path, &all, &[4, 4, f.ny, f.nx])
 }
+
+/// Read a field back from the npy this stage wrote. The field is the cacheable artifact -- stages
+/// B and C consume it and never re-measure -- so this is the normal way in, not a debug path.
+pub fn read_npy(path: &str) -> Result<ScreenField> {
+    let (data, shape) = npy::read_f32(path)?;
+    if shape.len() != 4 || shape[0] != 4 || shape[1] != 4 {
+        anyhow::bail!("{}: expected [4][4][ny][nx], got {:?}", path, shape);
+    }
+    let (ny, nx) = (shape[2], shape[3]);
+    let n = ny * nx;
+    let mut ink = Vec::with_capacity(4);
+    for ci in 0..4 {
+        let b = ci * 4 * n;
+        ink.push(InkField {
+            prom: data[b..b + n].to_vec(),
+            depth: data[b + n..b + 2 * n].to_vec(),
+            lpi: data[b + 2 * n..b + 3 * n].to_vec(),
+            ang: data[b + 3 * n..b + 4 * n].to_vec(),
+        });
+    }
+    Ok(ScreenField { ny, nx, ink })
+}
