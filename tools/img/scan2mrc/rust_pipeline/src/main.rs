@@ -7,6 +7,8 @@ mod npy;
 mod pilio;
 mod record;
 mod resample;
+mod screen;
+mod screendbg;
 mod separate;
 
 use anyhow::Result;
@@ -42,6 +44,16 @@ enum Cmd {
         /// Apply GCR after grading.
         #[arg(long)]
         gcr: bool,
+    },
+    /// STAGE A: unclipped CMYK TIFF -> the per-ink screen field (npy) + a debug PNG.
+    ///
+    /// Measures only -- nothing is decided or routed here. Feed it the DETECT-grade (unclipped),
+    /// pre-GCR separation: the display grade throws away exactly the faint-screen energy this
+    /// stage exists to find. See screen.rs.
+    Screen {
+        cmyk_tiff: String,
+        /// output base: writes <base>.npy and <base>.png
+        out_base: String,
     },
     /// master scan -> deskewed, matted, A4-cropped, graded CMYK.
     ///
@@ -109,6 +121,18 @@ fn main() -> Result<()> {
             }
             imageio::write_cmyk_tiff(&output_tiff, &cmyk)?;
             eprintln!("grade -> {} ({:.1}s)", output_tiff, t.elapsed().as_secs_f64());
+        }
+        Cmd::Screen { cmyk_tiff, out_base } => {
+            let t = std::time::Instant::now();
+            let cmyk = imageio::read_cmyk_tiff(&cmyk_tiff)?;
+            let f = screen::measure(&cmyk);
+            screen::write_npy(&format!("{}.npy", out_base), &f)?;
+            let png = format!("{}.png", out_base);
+            screendbg::write_png(&png, &cmyk, &f)?;
+            let stem = std::path::Path::new(&cmyk_tiff)
+                .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+            println!("{}", screendbg::summarise(&stem, &f));
+            eprintln!("screen -> {} ({:.1}s)", png, t.elapsed().as_secs_f64());
         }
         Cmd::Apply {
             pages,
