@@ -90,6 +90,15 @@ Specifically rejected, each with data:
 * **Blank-white bloom fixes** (ink gate, gabor gate) — the bloom is invisible in the render (a blank
   cell descreens to white) and every fix cost real tint tone.
 
+**And one caution about the current direction.** A 2026-06 prototype compared per-channel inverse
+halftoning (demodulate each ink at its measured lpi) against the blanket YCbCr low-pass, pixel-zoomed
+on p027's product boxes: **essentially identical sharpness**. Demodulation was not a visible quality
+lever *for the descreened raster*. Do not sell it as one. Its value here is different and has to be
+argued on its own terms: it yields the per-ink DOT AREA (which is what a flat fill needs to say "20%
+C") and a coherence field that separates screen from line art — neither of which a low-pass gives at
+any quality. If those two do not materialise, the low-pass is a perfectly good descreen and the
+honest move is to keep it.
+
 The current design does not ask "photo or type" anywhere. That is deliberate, and it is why.
 
 ---
