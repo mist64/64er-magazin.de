@@ -13,9 +13,30 @@ Stages:
               one exists (41/176), clip-hole line as the fallback. DONE at thumb level.
   03-crop/    A4 window anchored on the 64'er wordmark; per-parity offsets fitted to minimise
               alpha inside the window. DONE at thumb level.
-  04-grade/   (todo) per-channel CMYK grade (levels detected per-issue).
-  05-detect/  (todo) screen-periodicity score.
-  06-mrc/     (todo) MRC render (existing rust_pipeline).
+  rust_pipeline/  `mrcpipe apply` — the full-res apply: one affine (deskew+matte+crop), then the
+              CMYK separation, the per-channel grade and GCR. Byte-identical to the Python it
+              replaced. This is the front end's endpoint AND the renderer's input: graded CMYK
+              @2400 dpi, channels separated, paper white.
+  06-mrc/     assemble_issue.py — per-page PDFs -> one lossless issue.
+
+## The renderer
+
+DELETED 2026-08-02, being rebuilt. Everything that decided what a region was — two disagreeing
+screen detectors, a per-cluster IMAGE/TEXT vote, a hue-based tint finder, a reversed-box promoter —
+is gone. **Read `FINDINGS.md` before writing a replacement.** It is the measured residue of all of
+it: what is physically on the paper, the traps in measuring it, and the things not to try again.
+
+The replacement, in one line: measure the halftone per ink at 2400 dpi and route on what is
+physically there, never on what a region looks like.
+
+    screened, tone varies   -> contone, demodulated dot area (CMYK, ~150 dpi)
+    screened, tone uniform  -> flat fill at the measured ink %
+    not screened            -> bilevel stencil per ink (~600 dpi, JBIG2)
+
+The four content classes fall out of that rather than out of a classifier: colour photo (screen in
+C/M/Y), b&w photo (screen in K only), tint or box background (screened, uniform), and pure-ink type
+and line art (no screen at all). K line art ON a K-screened tint is not a conflict to resolve — the
+demodulation explains the screen, and what it cannot explain is the line art.
 
 Metadata (small, git-able, per issue) is the contract between detection and apply:
 skew_deg, crop box, unknown mask spec, grade levels — never bake decisions into the pixels early.
