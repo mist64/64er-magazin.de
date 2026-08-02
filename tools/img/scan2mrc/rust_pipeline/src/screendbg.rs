@@ -243,3 +243,81 @@ pub fn summarise(page: &str, f: &ScreenField) -> String {
     }
     format!("p{} {}x{} blocks | {}", page, f.ny, f.nx, parts.join("  "))
 }
+
+// ================================================================================================
+//  THE CONFIDENCE FIELD
+// ================================================================================================
+
+/// Tile size in the confidence image, px. Each block is drawn as a solid square, because the block
+/// IS the unit of the measurement and pretending otherwise hides the quantisation.
+const PROB_TILE: usize = 6;
+
+/// HOW CONFIDENTLY EACH TILE SAYS "SCREEN", as a continuous field rather than a verdict.
+///
+/// A binary fired/not map cannot answer the question that actually matters when a region is missed:
+/// was it far below the bar, or a hair under it. So this draws the margin itself.
+///
+/// The value is `max over inks of min(prom / FIRE, depth / DEPTH)` -- the weaker of the two tests
+/// each ink has to pass, taken for whichever ink is most confident. 1.0 means exactly at threshold,
+/// so the green band IS the decision boundary and everything left of it was rejected:
+///
+///     dark blue  0.0   nothing there
+///     cyan       0.5   half way
+///     GREEN      1.0   the threshold
+///     yellow     1.5
+///     red        2.0+  unambiguous screen
+pub fn write_prob_png(path: &str, f: &ScreenField) -> Result<()> {
+    let (w, h) = (f.nx * PROB_TILE, f.ny * PROB_TILE);
+    let mut px = vec![255u8; w * h * 3];
+    // blue -> cyan -> green -> yellow -> red, with green pinned at the threshold
+    let ramp = |t: f32| -> [f32; 3] {
+        let stops = [
+            (0.00f32, [0.05f32, 0.10, 0.35]),
+            (0.50, [0.10, 0.65, 0.80]),
+            (1.00, [0.15, 0.80, 0.25]),
+            (1.50, [0.95, 0.90, 0.15]),
+            (2.00, [0.85, 0.12, 0.10]),
+        ];
+        let t = t.clamp(0.0, 2.0);
+        for i in 0..stops.len() - 1 {
+            let (a, ca) = stops[i];
+            let (b, cb) = stops[i + 1];
+            if t <= b {
+                let u = ((t - a) / (b - a)).clamp(0.0, 1.0);
+                return [
+                    ca[0] + (cb[0] - ca[0]) * u,
+                    ca[1] + (cb[1] - ca[1]) * u,
+                    ca[2] + (cb[2] - ca[2]) * u,
+                ];
+            }
+        }
+        stops[stops.len() - 1].1
+    };
+    for by in 0..f.ny {
+        for bx in 0..f.nx {
+            let i = by * f.nx + bx;
+            let mut conf = 0.0f32;
+            for ci in 0..4 {
+                // the follower rule is a rejection, not a margin, so a follower reads zero here --
+                // which is the honest answer: that ink is not evidence of a screen
+                if screen::is_follower(f, ci, i) {
+                    continue;
+                }
+                let p = f.ink[ci].prom[i] / screen::FIRE;
+                let d = f.ink[ci].depth[i] / screen::DEPTH;
+                conf = conf.max(p.min(d));
+            }
+            let c = ramp(conf);
+            for dy in 0..PROB_TILE {
+                for dx in 0..PROB_TILE {
+                    let (y, x) = (by * PROB_TILE + dy, bx * PROB_TILE + dx);
+                    let j = (y * w + x) * 3;
+                    px[j] = (c[0] * 255.0) as u8;
+                    px[j + 1] = (c[1] * 255.0) as u8;
+                    px[j + 2] = (c[2] * 255.0) as u8;
+                }
+            }
+        }
+    }
+    pilio::write_rgb_png_fast(path, w, h, &px)
+}
