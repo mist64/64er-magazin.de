@@ -921,6 +921,11 @@ pub struct Opts {
     /// drop-in replacement for the Python apply: `mrc` can move to the cached 600 dpi products
     /// later as a pure optimisation rather than as a precondition for deleting the Python.
     pub page_rgb: bool,
+    /// Also write the display-graded but NOT GCR'd CMYK (`NNN_cmyk_display_nogcr.tif`, uncompressed).
+    /// This is what the screening analysis wants (FINDINGS.md 2): GCR is our reconstruction choice,
+    /// the press laid physical C/M/Y/K dots. Written raw so cache-sizing measurements compare
+    /// against the same uncompressed baseline as `--detect-too`.
+    pub nogcr_too: bool,
     pub write: bool,
 }
 
@@ -999,7 +1004,18 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
         separate_grade(&wp.rgb, w, h, lv, dmin, dmax)
     });
     drop(wp.rgb);
-    let nog = if o.cache || o.page_rgb { Some(cm.clone_planes()) } else { None };
+    let nog = if o.cache || o.page_rgb || o.nogcr_too { Some(cm.clone_planes()) } else { None };
+    if o.nogcr_too && o.write {
+        let nog = nog.as_ref().unwrap();
+        stage!(t0, "write nogcr tiff", times, {
+            pilio::write_cmyk_tiff_raw(
+                &format!("{}/{:03}_cmyk_display_nogcr.tif", o.out_dir, page),
+                w,
+                h,
+                [&nog.c, &nog.m, &nog.y, &nog.k],
+            )?
+        });
+    }
     stage!(t0, "gcr", times, { gcr(&mut cm) });
 
     let gcr_ok = cm
@@ -1038,6 +1054,7 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
     };
     drop(cm);
 
+    let nog = if o.cache || o.page_rgb { nog } else { None };
     if let Some(nog) = nog {
         let pagergb = stage!(t0, "icc transform", times, { icc_page_rgb(&nog, &o.profile_dir)? });
         drop(nog);
