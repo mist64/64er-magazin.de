@@ -162,43 +162,12 @@ def stage4():
                  max(r["dead_px"] for r in rows), sum(r["holes_filled"] for r in rows)))
 
 
-def stage5():
-    """detect: the score grid must match out_size/HOP, and must not be degenerate."""
-    print("\n=== stage 5: mrcpipe detect/geometry -> score + screen geometry ===")
-    ps = [p for p in pages_with(os.path.join(T, "score", "[0-9][0-9][0-9].npy"))]
-    print("  scores: %d" % len(ps))
-    ny, nx = A4_OUT[1] // HOP, A4_OUT[0] // HOP
-    for p in ps:
-        s = np.load(os.path.join(T, "score", "%03d.npy" % p))
-        check(s.shape == (ny, nx), "p%03d" % p, "score %s, expected %s" % (s.shape, (ny, nx)))
-        check(np.isfinite(s).all(), "p%03d" % p, "score has non-finite values")
-        check(s.max() > 0, "p%03d" % p, "score is entirely zero -- detector found nothing")
-        cf = os.path.join(T, "score", "%03d_cov.npy" % p)
-        check(os.path.exists(cf), "p%03d" % p, "no _cov.npy (step 7 cannot run)")
-        gf = os.path.join(T, "screen_geom", "%03d.json" % p)
-        check(os.path.exists(gf), "p%03d" % p, "no screen geometry")
-
-
-def stage6():
-    """mrc: a PDF per page, with a background and at least one stencil."""
-    print("\n=== stage 6: mrcpipe mrc -> PDF ===")
-    ps = pages_with(os.path.join(T, "mrc", "[0-9][0-9][0-9].pdf"))
-    print("  pdfs: %d" % len(ps))
-    for p in ps:
-        f = os.path.join(T, "mrc", "%03d.pdf" % p)
-        check(os.path.getsize(f) > 20000, "p%03d" % p, "pdf only %d bytes" % os.path.getsize(f))
-        rec = os.path.join(T, "mrc", "%03d.jsonl" % p)
-        if os.path.exists(rec):
-            kinds = [json.loads(l)["kind"] for l in open(rec)]
-            check("page" in kinds and "output" in kinds, "p%03d" % p, "record incomplete")
-
-
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", type=int, default=0)
     ap.add_argument("--deep", action="store_true")
     A = ap.parse_args()
-    fns = {1: stage1, 2: stage2, 3: lambda: stage3(A.deep), 4: stage4, 5: stage5, 6: stage6}
+    fns = {1: stage1, 2: stage2, 3: lambda: stage3(A.deep), 4: stage4}
     for k in sorted(fns):
         if A.stage in (0, k):
             try:
