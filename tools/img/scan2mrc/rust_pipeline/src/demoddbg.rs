@@ -14,7 +14,7 @@
 //! This picture is the only honest way to judge stage B, because both failure directions are
 //! invisible in the contone alone.
 
-use crate::demod::{Coherence, Contone};
+use crate::demod::{Coherence, Contone, COHERENT};
 use crate::imageio::Cmyk;
 use crate::pilio;
 use anyhow::Result;
@@ -22,11 +22,6 @@ use anyhow::Result;
 // ================================================================================================
 //  CONSTANTS
 // ================================================================================================
-
-/// Coherence at or above this counts as "explained by the screen". Provisional, and deliberately
-/// only used by this drawer and by stage C -- the field itself is continuous, so it can be
-/// re-judged without re-measuring.
-pub const COHERENT: f32 = 0.30;
 
 /// Ink level (0-255) below which a pixel is treated as bare paper and left uncoloured. Well above
 /// scanner noise, well below any real mark.
@@ -159,7 +154,15 @@ pub fn summarise(page: &str, tone: &Contone, coh: &Coherence) -> String {
         if hi == 0 {
             continue;
         }
-        parts.push(format!("{} coh {:.1}%", nm, 100.0 * hi as f64 / n));
+        let mut v: Vec<f32> = c.iter().cloned().filter(|&x| x > 0.0).collect();
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let q = |f: f64| -> f32 {
+            if v.is_empty() { 0.0 } else { v[((v.len() - 1) as f64 * f) as usize] }
+        };
+        parts.push(format!(
+            "{} coh {:.1}% (nz {} p50 {:.2} p90 {:.2} max {:.2})",
+            nm, 100.0 * hi as f64 / n, v.len(), q(0.5), q(0.9), q(1.0)
+        ));
     }
     if parts.is_empty() {
         parts.push("no coherent ink".into());

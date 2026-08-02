@@ -9,6 +9,8 @@ mod npy;
 mod pilio;
 mod record;
 mod resample;
+mod route;
+mod routedbg;
 mod screen;
 mod screendbg;
 mod separate;
@@ -60,12 +62,19 @@ enum Cmd {
     /// STAGE B: unclipped CMYK + the stage-A field -> contone (dot area) + coherence, and the
     /// debug PNG that shows which ink is halftone and which is a mark. See demod.rs.
     Demod {
-        /// DISPLAY-graded, pre-GCR CMYK (from `apply --nogcr-too`): the contone comes from this.
+        /// DISPLAY-graded, GCR'd CMYK. Everything after stage A reads this: only the screen FIELD
+        /// needs the unclipped planes, and it is already measured by then.
         display_tiff: String,
-        /// DETECT-graded (unclipped) CMYK: coherence and the screen field come from this.
-        detect_tiff: String,
         field_npy: String,
         /// output base: writes <base>_tone.npy and <base>.png
+        out_base: String,
+    },
+    /// STAGE C: route every part of the page to its destination and draw it. See route.rs.
+    Route {
+        /// DISPLAY-graded, GCR'd CMYK
+        display_tiff: String,
+        field_npy: String,
+        /// output base: writes <base>.png
         out_base: String,
     },
     /// master scan -> deskewed, matted, A4-cropped, graded CMYK.
@@ -147,14 +156,14 @@ fn main() -> Result<()> {
             println!("{}", screendbg::summarise(&stem, &f));
             eprintln!("screen -> {} ({:.1}s)", png, t.elapsed().as_secs_f64());
         }
-        Cmd::Demod { display_tiff, detect_tiff, field_npy, out_base } => {
+        Cmd::Demod { display_tiff, field_npy, out_base } => {
             let t = std::time::Instant::now();
             let disp = imageio::read_cmyk_tiff(&display_tiff)?;
-            let det = imageio::read_cmyk_tiff(&detect_tiff)?;
             let f = screen::read_npy(&field_npy)?;
             let div = demod::contone_divisor(&f);
-            let tone = demod::contone(&disp, div);
-            let coh = demod::coherence(&det, &f);
+            let geo: Vec<demod::Geometry> = (0..4).map(|ci| demod::filled_geometry(&f, ci)).collect();
+            let tone = demod::contone(&disp, div, &f, &geo);
+            let coh = demod::coherence(&disp, &f, &geo);
             let cmyk = disp;
             let mut flat = Vec::with_capacity(4 * tone.w * tone.h);
             for pl in &tone.ink {
@@ -163,10 +172,34 @@ fn main() -> Result<()> {
             npy::write_u8(&format!("{}_tone.npy", out_base), &flat, &[4, tone.h, tone.w])?;
             let png = format!("{}.png", out_base);
             demoddbg::write_png(&png, &cmyk, &tone, &coh)?;
-            let stem = std::path::Path::new(&detect_tiff)
+            let stem = std::path::Path::new(&display_tiff)
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
             println!("{}", demoddbg::summarise(&stem, &tone, &coh));
             eprintln!("demod -> {} (div {}, {:.1}s)", png, div, t.elapsed().as_secs_f64());
+        }
+        Cmd::Route { display_tiff, field_npy, out_base } => {
+            let t = std::time::Instant::now();
+            let disp = imageio::read_cmyk_tiff(&display_tiff)?;
+            let f = screen::read_npy(&field_npy)?;
+            let div = demod::contone_divisor(&f);
+            let geo: Vec<demod::Geometry> = (0..4).map(|ci| demod::filled_geometry(&f, ci)).collect();
+            let tone = demod::contone(&disp, div, &f, &geo);
+            let coh = demod::coherence(&disp, &f, &geo);
+            let r = route::route(&f, &tone, &coh, &disp);
+            let png = format!("{}.png", out_base);
+            routedbg::write_png(&png, &disp, &r)?;
+            let stem = std::path::Path::new(&display_tiff)
+                .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+            println!("{}", route::summarise(&stem, &r));
+            for a in &r.areas {
+                println!(
+                    "   area {:3} {:12} blocks {:5} lpi {:5.0} mean C{:.0} M{:.0} Y{:.0} K{:.0} std {:.1}",
+                    a.id, a.class.name(), a.blocks, a.lpi,
+                    a.mean[0], a.mean[1], a.mean[2], a.mean[3],
+                    a.std.iter().cloned().fold(0.0f32, f32::max)
+                );
+            }
+            eprintln!("route -> {} ({:.1}s)", png, t.elapsed().as_secs_f64());
         }
         Cmd::Apply {
             pages,
