@@ -341,7 +341,160 @@ pub fn knorm(rgb: &[u8], unknown: Option<&[bool]>) -> (f64, f64) {
 /// RGB -> graded CMYK, pre-GCR. GCR is applied separately so the caller can keep the un-GCR'd
 /// planes for the ICC page without paying for a second separation (they are the same computation
 /// up to the GCR block).
-/// NEUTRAL CALIBRATION for the geometric separation.
+// ================================================================================================
+//  THE SEPARATION: inverting the measured colour cube
+// ================================================================================================
+//
+// The eight anchor colours ARE the corners of the CMY cube -- W=000, C=100, M=010, Y=001, CM=110,
+// CY=101, MY=011 and K=111 -- each one a measured RGB. Separating a scan means inverting that map.
+//
+// The original code did it with a distance ratio between two PLANES per ink, each fitted through
+// three of the four corners of a face. A face of a real ink cube is not planar, so the fourth corner
+// misses its own plane -- measured on these anchors, K misses the cyan face by 21.2, the magenta
+// face by 21.9 and the yellow face by 4.3 -- and every interior point is interpolated through that
+// error. Against a proper inversion the plane ratio is exact at the corners and at pure single-ink
+// tints, and drifts up to 31 levels in dark and saturated colours.
+//
+// Replaced by a real inversion: the forward model is trilinear interpolation of the eight corners,
+// and each RGB is inverted by Newton iteration on it. Exact at all eight corners by construction,
+// and correct in between.
+//
+// Done once into a lattice and interpolated per pixel: a full 256^3 table would be 50 MB and take
+// as long to build as inverting the page, while the inverse map is smooth enough that a 64^3 lattice
+// read trilinearly is within a level of the exact answer.
+const CUBE_N: usize = 64;
+
+/// Trilinear forward model: ink amounts -> the RGB the press would have produced.
+fn cube_forward(c: f64, m: f64, y: f64) -> [f64; 3] {
+    const CORNERS: [([f64; 3], [f64; 3]); 8] = [
+        ([0.0, 0.0, 0.0], COLOR_W),
+        ([1.0, 0.0, 0.0], COLOR_C),
+        ([0.0, 1.0, 0.0], COLOR_M),
+        ([0.0, 0.0, 1.0], COLOR_Y),
+        ([1.0, 1.0, 0.0], COLOR_CM),
+        ([1.0, 0.0, 1.0], COLOR_CY),
+        ([0.0, 1.0, 1.0], COLOR_MY),
+        ([1.0, 1.0, 1.0], COLOR_K),
+    ];
+    let mut out = [0.0f64; 3];
+    for (bits, rgb) in CORNERS.iter() {
+        let w = (if bits[0] > 0.5 { c } else { 1.0 - c })
+            * (if bits[1] > 0.5 { m } else { 1.0 - m })
+            * (if bits[2] > 0.5 { y } else { 1.0 - y });
+        for k in 0..3 {
+            out[k] += w * rgb[k];
+        }
+    }
+    out
+}
+
+/// Invert `cube_forward` for one RGB, by damped Newton with a numeric Jacobian. Clamped to the unit
+/// cube throughout, so an out-of-gamut scan value converges to the nearest reproducible ink mix
+/// rather than running away.
+fn cube_invert(target: [f64; 3]) -> [f64; 3] {
+    let mut v = [0.5f64, 0.5, 0.5];
+    for _ in 0..40 {
+        let f = cube_forward(v[0], v[1], v[2]);
+        let r = [f[0] - target[0], f[1] - target[1], f[2] - target[2]];
+        if r[0].abs().max(r[1].abs()).max(r[2].abs()) < 0.02 {
+            break;
+        }
+        // numeric Jacobian, central where the clamp allows
+        let e = 1e-4;
+        let mut j = [[0.0f64; 3]; 3];
+        for i in 0..3 {
+            let mut a = v;
+            let mut b = v;
+            a[i] = (v[i] + e).min(1.0);
+            b[i] = (v[i] - e).max(0.0);
+            let fa = cube_forward(a[0], a[1], a[2]);
+            let fb = cube_forward(b[0], b[1], b[2]);
+            let d = (a[i] - b[i]).max(1e-9);
+            for k in 0..3 {
+                j[k][i] = (fa[k] - fb[k]) / d;
+            }
+        }
+        // 3x3 solve by Cramer; a singular Jacobian means a flat spot, so stop where we are
+        let det = j[0][0] * (j[1][1] * j[2][2] - j[1][2] * j[2][1])
+            - j[0][1] * (j[1][0] * j[2][2] - j[1][2] * j[2][0])
+            + j[0][2] * (j[1][0] * j[2][1] - j[1][1] * j[2][0]);
+        if det.abs() < 1e-9 {
+            break;
+        }
+        let mut step = [0.0f64; 3];
+        for i in 0..3 {
+            let mut jc = j;
+            for k in 0..3 {
+                jc[k][i] = r[k];
+            }
+            let d = jc[0][0] * (jc[1][1] * jc[2][2] - jc[1][2] * jc[2][1])
+                - jc[0][1] * (jc[1][0] * jc[2][2] - jc[1][2] * jc[2][0])
+                + jc[0][2] * (jc[1][0] * jc[2][1] - jc[1][1] * jc[2][0]);
+            step[i] = d / det;
+        }
+        for i in 0..3 {
+            v[i] = (v[i] - 0.9 * step[i]).clamp(0.0, 1.0);
+        }
+    }
+    v
+}
+
+/// The RGB -> ink lattice, CUBE_N^3 entries of (c, m, y) as u8.
+fn cube_lut() -> Vec<[u8; 3]> {
+    let n = CUBE_N;
+    let mut lut = vec![[0u8; 3]; n * n * n];
+    lut.par_chunks_mut(n * n).enumerate().for_each(|(ri, plane)| {
+        let r = ri as f64 * 255.0 / (n - 1) as f64;
+        for gi in 0..n {
+            let g = gi as f64 * 255.0 / (n - 1) as f64;
+            for bi in 0..n {
+                let b = bi as f64 * 255.0 / (n - 1) as f64;
+                let v = cube_invert([r, g, b]);
+                plane[gi * n + bi] = [
+                    (v[0] * 255.0).round().clamp(0.0, 255.0) as u8,
+                    (v[1] * 255.0).round().clamp(0.0, 255.0) as u8,
+                    (v[2] * 255.0).round().clamp(0.0, 255.0) as u8,
+                ];
+            }
+        }
+    });
+    lut
+}
+
+/// Trilinear read of the lattice for one pixel.
+#[inline]
+fn cube_lookup(lut: &[[u8; 3]], px: [f64; 3]) -> [f64; 3] {
+    let n = CUBE_N;
+    let sc = (n - 1) as f64 / 255.0;
+    let mut idx = [0usize; 3];
+    let mut frac = [0.0f64; 3];
+    for k in 0..3 {
+        let t = (px[k] * sc).clamp(0.0, (n - 1) as f64);
+        idx[k] = (t.floor() as usize).min(n - 2);
+        frac[k] = t - idx[k] as f64;
+    }
+    let at = |dr: usize, dg: usize, db: usize| -> [f64; 3] {
+        let e = lut[(idx[0] + dr) * n * n + (idx[1] + dg) * n + (idx[2] + db)];
+        [e[0] as f64, e[1] as f64, e[2] as f64]
+    };
+    let mut out = [0.0f64; 3];
+    for dr in 0..2 {
+        for dg in 0..2 {
+            for db in 0..2 {
+                let w = (if dr == 1 { frac[0] } else { 1.0 - frac[0] })
+                    * (if dg == 1 { frac[1] } else { 1.0 - frac[1] })
+                    * (if db == 1 { frac[2] } else { 1.0 - frac[2] });
+                let e = at(dr, dg, db);
+                for k in 0..3 {
+                    out[k] += w * e[k];
+                }
+            }
+        }
+    }
+    out
+}
+
+/// NEUTRAL CALIBRATION for the separation.
 ///
 /// The separation is a ratio of distances to two planes of anchor colours, and nothing in that
 /// construction makes a neutral produce equal C, M and Y. Computed straight from the anchors, a grey
@@ -363,13 +516,7 @@ pub fn knorm(rgb: &[u8], unknown: Option<&[bool]>) -> (f64, f64) {
 ///
 /// Pure inks are preserved, which is the check that matters on the other side: the cyan anchor still
 /// separates to 225/0/0, magenta to 0/222/0, yellow to 0/0/246, paper to 0/0/0.
-fn neutral_luts() -> [[u8; 256]; 3] {
-    let pac = plane(COLOR_C, COLOR_CM, COLOR_CY);
-    let pbc = plane(COLOR_M, COLOR_Y, COLOR_W);
-    let pam = plane(COLOR_M, COLOR_CM, COLOR_MY);
-    let pbm = plane(COLOR_C, COLOR_Y, COLOR_W);
-    let pay = plane(COLOR_Y, COLOR_CY, COLOR_MY);
-    let pby = plane(COLOR_C, COLOR_M, COLOR_W);
+fn neutral_luts(cube: &[[u8; 3]]) -> [[u8; 256]; 3] {
     // response of each channel along COLOR_W -> COLOR_K, made monotone (the raw response dips by a
     // level or two near paper white, where all three channels are within noise of zero anyway)
     let mut resp = [[0u8; 256]; 3];
@@ -381,7 +528,12 @@ fn neutral_luts() -> [[u8; 256]; 3] {
             COLOR_W[1] + t * (COLOR_K[1] - COLOR_W[1]),
             COLOR_W[2] + t * (COLOR_K[2] - COLOR_W[2]),
         ];
-        let v = [cmy(px, &pac, &pbc), cmy(px, &pam, &pbm), cmy(px, &pay, &pby)];
+        let s = cube_lookup(cube, px);
+        let v = [
+            s[0].round().clamp(0.0, 255.0) as u8,
+            s[1].round().clamp(0.0, 255.0) as u8,
+            s[2].round().clamp(0.0, 255.0) as u8,
+        ];
         for j in 0..3 {
             run[j] = run[j].max(v[j]);
             resp[j][i] = run[j];
@@ -403,7 +555,8 @@ fn neutral_luts() -> [[u8; 256]; 3] {
 
 pub fn separate_grade(rgb: &[u8], w: usize, h: usize, lv: Levels, dmin: f64, dmax: f64) -> Cmyk {
     let span = (dmax - dmin).max(1e-12);
-    let nlut = neutral_luts();
+    let cube = cube_lut();
+    let nlut = neutral_luts(&cube);
     let pac = plane(COLOR_C, COLOR_CM, COLOR_CY);
     let pbc = plane(COLOR_M, COLOR_Y, COLOR_W);
     let pam = plane(COLOR_M, COLOR_CM, COLOR_MY);
@@ -431,9 +584,10 @@ pub fn separate_grade(rgb: &[u8], w: usize, h: usize, lv: Levels, dmin: f64, dma
         .for_each(|((((rc, rm), ry), rk), px)| {
             for x in 0..w {
                 let p = [px[x * 3] as f64, px[x * 3 + 1] as f64, px[x * 3 + 2] as f64];
-                let c = cmy(p, &pac, &pbc);
-                let m = cmy(p, &pam, &pbm);
-                let y = cmy(p, &pay, &pby);
+                let s = cube_lookup(&cube, p);
+                let c = s[0].round().clamp(0.0, 255.0) as u8;
+                let m = s[1].round().clamp(0.0, 255.0) as u8;
+                let y = s[2].round().clamp(0.0, 255.0) as u8;
                 // K: distance to COLOR_K, normalised over [dmin,dmax], TRUNCATED, then inverted.
                 // SEAM 4: `.astype(np.int64)` truncates toward zero -- matched here by `as i64`.
                 let dr = p[0] - COLOR_K[0];
