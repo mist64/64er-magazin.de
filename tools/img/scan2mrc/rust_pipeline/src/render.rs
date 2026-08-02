@@ -13,6 +13,19 @@
 //! instead of picking up the paper's yellow cast. The archival master is CMYK; a delivery tier that
 //! wants RGB converts once, here, at the point of writing.
 //!
+//! OVERPRINT IS REQUIRED TO VIEW THIS FILE CORRECTLY, and that is a real constraint, not a detail.
+//! Each stencil is a /Separation colourant painted with /OP /op true, so the layers add on the plate
+//! the way ink does instead of the later one replacing the earlier. Without it, red type -- M and Y
+//! together -- renders as pure yellow, measured on p007 at RGB (252, 201, 24) against (238, 35, 52)
+//! with overprint honoured.
+//!
+//! Ghostscript needs `-dOverprint=/simulate` (it ignores overprint by default on RGB devices);
+//! Acrobat needs Overprint Preview; a press RIP does it natively. For the ARCHIVAL master this is
+//! the correct and honest representation -- it is what the press physically did. A DELIVERY tier
+//! that must look right in any viewer should be flattened to composite CMYK or RGB at that point,
+//! which is exactly the two-tier split CLAUDE.md already specifies. Do not "fix" this by going back
+//! to opaque layers: that silently discards one of two overlapping inks.
+//!
 //! WHAT THIS DOES NOT DO YET, deliberately. A flat area is snapped inside the background raster
 //! rather than emitted as a vector fill, and type is JBIG2 rather than vector glyphs. Both are exact
 //! in VALUE at the stated resolution, which is what was asked for; both are resolution-independence
@@ -61,6 +74,8 @@ const INK_CMYK: [[f64; 4]; 4] = [
     [0.0, 0.0, 0.0, 1.0], // K
 ];
 const INK_NAME: [&str; 4] = ["C", "M", "Y", "K"];
+/// Standard PDF separation colourant names, so a RIP recognises these as the process inks.
+const INK_SEP: [&str; 4] = ["Cyan", "Magenta", "Yellow", "Black"];
 
 // ================================================================================================
 
@@ -295,17 +310,33 @@ pub fn write_pdf(
         "q {:.4} 0 0 {:.4} 0 {:.4} cm /Bg Do Q\n",
         bgw, bgh, ph - bgh
     );
-    for (n, (ci, _)) in layers.iter().enumerate() {
-        let c = INK_CMYK[*ci];
+    // OVERPRINT, because that is what the press did. Each stencil paints one ink opaquely, so where
+    // two of them overlap the later one REPLACES the earlier rather than adding to it -- and red
+    // type is M and Y together. Measured on p007: source ink M 234 / Y 198, rendered RGB
+    // (252, 201, 24), i.e. pure yellow, because Y is drawn after M. /Separation colourants plus an
+    // overprint ExtGState make each layer affect only its own plate, which is the physical truth
+    // being reconstructed and not a compositing trick.
+    content += "/GSop gs\n";
+    for (n, _) in layers.iter().enumerate() {
         content += &format!(
-            "q {:.3} {:.3} {:.3} {:.3} k {:.4} 0 0 {:.4} 0 {:.4} cm /S{} Do Q\n",
-            c[0], c[1], c[2], c[3], stw, sth, ph - sth, n
+            "q /Ink{} cs 1 scn {:.4} 0 0 {:.4} 0 {:.4} cm /S{} Do Q\n",
+            n, stw, sth, ph - sth, n
         );
     }
 
     let mut xobj = format!("/Bg {} 0 R", bg_obj);
     for (n, _) in layers.iter().enumerate() {
         xobj += &format!(" /S{} {} 0 R", n, ink_start + n);
+    }
+    // one Separation colourant per layer: tint 1 of that ink, everything else untouched
+    let mut csdict = String::new();
+    for (n, (ci, _)) in layers.iter().enumerate() {
+        let c = INK_CMYK[*ci];
+        csdict += &format!(
+            " /Ink{} [/Separation /{} /DeviceCMYK \
+             << /FunctionType 2 /Domain [0 1] /C0 [0 0 0 0] /C1 [{} {} {} {}] /N 1 >>]",
+            n, INK_SEP[*ci], c[0], c[1], c[2], c[3]
+        );
     }
 
     let mut objs: Vec<Vec<u8>> = Vec::new();
@@ -314,8 +345,10 @@ pub fn write_pdf(
     objs.push(
         format!(
             "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {:.3} {:.3}] \
-             /Resources << /XObject << {} >> >> /Contents {} 0 R >>",
-            pw, ph, xobj, content_obj
+             /Resources << /XObject << {} >> /ColorSpace <<{} >> \
+             /ExtGState << /GSop << /Type /ExtGState /OP true /op true /OPM 1 >> >> >> \
+             /Contents {} 0 R >>",
+            pw, ph, xobj, csdict, content_obj
         )
         .into_bytes(),
     );
