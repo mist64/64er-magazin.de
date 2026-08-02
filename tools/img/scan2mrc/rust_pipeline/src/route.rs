@@ -123,9 +123,19 @@ pub const STENCIL_DOMINANCE: f32 = 0.5;
 /// background paints the tint exactly where the stencil declines to draw.
 pub const FLAT_TOL: f32 = 2.0 * UNIFORM_STD;
 
-/// Largest enclosed hole the grouping will fill, in blocks. A photograph's specular highlight is a
-/// few blocks across; an enclosed column of body text is hundreds. 64 blocks is ~9x9 mm.
-pub const MAX_HOLE_BLOCKS: usize = 64;
+/// UNBOUNDED. An enclosed unscreened region inside a picture IS part of that picture, whatever its
+/// size -- a halftone has no dots in a solid highlight or a solid shadow, so those passages simply
+/// cannot fire (measured inside p073's photograph: blocks at ink 0-40 fire 15% with a median
+/// modulation of 2 levels, blocks at ink 160-255 fire 28% at 16 levels, against 74-79% for the
+/// mid-tones). Enclosure is the whole test; there is nothing a size adds.
+///
+/// This was briefly capped at 64 blocks, on the theory that an unbounded fill was swallowing the
+/// enclosed text column on p007. Measurement said otherwise -- the cap changed that symptom not at
+/// all, and the cause was the orphan-ink path in render.rs. Meanwhile the cap was silently blocking
+/// every large highlight, which is defect D: a photograph's light passages fell out of their own
+/// area, got no contone, and landed as white blocks. Kept as a named constant only to record that
+/// the bound was tried and was wrong.
+pub const MAX_HOLE_BLOCKS: usize = usize::MAX;
 
 /// ABSORPTION: MEAN ink level a block must reach to be absorbed into an adjacent screened area.
 ///
@@ -837,8 +847,44 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
         }
     }
 
+    // ---- 4c. extend every area one block outward ---------------------------------------------
+    //
+    // A block straddling a picture's edge contains part picture and part surround, so its screen
+    // signal is diluted and it often does not fire -- and enclosure cannot recover it, because a rim
+    // block is by definition not enclosed. Left out, the picture ends one block short of itself and
+    // the background paints nothing there: the ragged white staircase along p073's printer.
+    //
+    // The rim is recorded SEPARATELY from the interior. Inside a picture everything is contone, which
+    // is what keeps halftone dots out of the bilevel layer -- but that rule must not reach out over
+    // whatever the picture happens to abut. A caption 1.35 mm from a photograph would lose its
+    // stencil entirely. So a rim block buys contone coverage and spends no marks: the background
+    // paints it, and the stencil goes on deciding per pixel exactly as it does on open paper.
+    let interior = label.clone();
+    {
+        let snap = label.clone();
+        for by in 0..ny {
+            for bx in 0..nx {
+                let i = by * nx + bx;
+                if snap[i] != 0 {
+                    continue;
+                }
+                for (dy, dx) in [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)] {
+                    let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                    if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                        continue;
+                    }
+                    let j = y2 as usize * nx + x2 as usize;
+                    if snap[j] != 0 {
+                        label[i] = snap[j];
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     // ---- 5. stencils, now that the areas are known -------------------------------------------
-    let (sw2, sh2, stencil) = stencils(disp, coh, f, &label, &areas, &fired_mask, tone);
+    let (sw2, sh2, stencil) = stencils(disp, coh, f, &interior, &areas, &fired_mask, tone);
     debug_assert_eq!((sw, sh), (sw2, sh2));
 
     let n_fired = fired_mask.iter().filter(|&&b| b).count();
