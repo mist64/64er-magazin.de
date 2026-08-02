@@ -58,10 +58,18 @@ pub const WIN: usize = 256;
 pub const STEP: usize = 128;
 
 /// Screen band, lines per inch. Measured content on this issue: process photos 150-159, design
-/// tints 133-152, one-ink cyan tints ~133, pasted-in ad artwork 81-134. The band is deliberately
-/// wider than that range -- the old detector's 139-192 lpi band was blind to the 133 lpi tints and
-/// to the entire ad section, and caught them only through spectral leakage.
-pub const LO_LPI: f64 = 60.0;
+/// tints 133-152, one-ink cyan tints ~133, pasted-in ad artwork ~100-134. Wider than that range --
+/// the old detector's 139-192 lpi band was blind to the 133 lpi tints and to the entire ad section,
+/// and caught them only through spectral leakage.
+///
+/// THE LOW EDGE IS DERIVED, not padded. Over 20 pages, the ruling histogram of real content (blocks
+/// that are coherent and not a follower, N=102,697) is EMPTY between 55 and 95 lpi: 7 blocks, 0.01%.
+/// Below it sat 13,781 firing blocks whose angles were near-uniform across the admissible range,
+/// where real screens concentrate hard at 40-50 and 130-140 degrees -- the signature of broadband
+/// 1/f energy leaking into the band's low corner, not of a structure. A subharmonic-lock explanation
+/// was tested and disproved: only 5.4% of them had a cross-ink peak at 2x/2.5x/3x their own ruling.
+/// 75 sits inside that empty gap and removes 81% of the junk at zero cost in real content.
+pub const LO_LPI: f64 = 75.0;
 pub const HI_LPI: f64 = 220.0;
 
 /// Half-width of the rejected wedge around the horizontal and vertical axes, degrees.
@@ -79,11 +87,10 @@ pub const AXIS_DEG: f64 = 12.0;
 /// A block reports a screen when peak/median over the band exceeds this. Median, not mean: one
 /// strong peak drags a mean upward and shrinks its own prominence.
 ///
-/// PROVISIONAL. This is not yet derived from the page -- it wants to come from each page's own band
-/// statistics (FINDINGS.md, "derive don't hardcode"). It is used ONLY for the debug overlay and the
-/// summary; the field written to disk is continuous, so changing it later re-colours the picture
-/// without re-measuring anything.
-pub const FIRE: f32 = 8.0;
+/// Derived over 20 pages: real content's prominence 5th percentile is 17.1 against 13.0 for junk,
+/// so the old value of 8 was doing no work at all and nothing between 8 and 15 changes any verdict.
+/// 12 costs 2,671 blocks issue-wide. Do not raise it past ~15, where it starts cutting real screens.
+pub const FIRE: f32 = 12.0;
 
 /// ...AND the peak must be at least this deep, in ink levels (0-255).
 ///
@@ -95,11 +102,44 @@ pub const FIRE: f32 = 8.0;
 /// does not remove it (30% before, 30% after): GCR subtracts min(C,M,Y), and the per-channel
 /// residue that survives still carries the pattern, just at a few levels of amplitude.
 ///
-/// A real halftone swings between paper and near-solid ink, so its modulation is tens of levels.
-/// Crosstalk residue is single digits. Depth is what separates them, and it is the measurement that
-/// makes "which inks carry a screen here" -- the question the four content classes are a crossing
-/// of -- answerable at all.
-pub const DEPTH: f32 = 18.0;
+/// A real halftone swings between paper and near-solid ink; crosstalk residue is single digits.
+///
+/// BUT DEPTH IS THE WEAKER OF THE TWO DEFENCES, measured over 20 pages and 737,301 blocks. The
+/// crosstalk population runs to depth 34.6 and real screens live down at 8, so the two overlap by
+/// physics: a 5% tint modulates as little as a K echo does. Raising DEPTH far enough to cover the
+/// crosstalk costs more real content than it saves -- the marginal cost per artifact removed goes
+/// 0.93 blocks at 18->20, 1.64 at 20->22, then 4.03, 10.9, 38.3. The elbow is at 22, which is where
+/// this sits; the rest of the job belongs to the follower rule below, which is a GEOMETRIC test and
+/// separates the populations cleanly where amplitude cannot.
+pub const DEPTH: f32 = 22.0;
+
+/// FOLLOWER REJECTION -- the real defence against crosstalk, and the one rule here that is derived
+/// from the page rather than fixed.
+///
+/// The RGB->CMYK separation is geometric, so one plate's halftone leaves a faint echo of ITSELF in
+/// the other channels: same ruling, same angle, a fraction of the amplitude. An ink whose peak
+/// merely follows a stronger ink's peak at the same geometry is not evidence of a second screen.
+///
+/// Measured over 737,301 blocks: 25.6% are followers, their depths run to 34.6 and stop, and the
+/// histogram valley in depth begins at exactly 35-40. Two independent signals agreeing on the same
+/// boundary is what makes this a derivation rather than a fitted threshold. Applying it as a
+/// rejection keeps 56,540 MORE real blocks than raising DEPTH to 26 does, while leaving fewer
+/// artifacts behind.
+///
+/// It also cannot be fooled by page strength, because it references the page's own strongest
+/// co-located peak instead of any absolute level. Per-page DEPTH scaling was tested as an
+/// alternative and is actively harmful: it LOWERS the bar on exactly the pages that are weak
+/// because they have no screen at all (p086 has 4 coherent blocks at any threshold; scaled DEPTH
+/// would admit 1,419).
+///
+/// KNOWN GAP: it does not catch the p073 case, where C, M and K all report 181 lpi at 24 degrees
+/// with depths 21/27/31 -- within 1.8x of each other, so none is a follower of another. Three real
+/// plates cannot share an angle (they are set apart precisely to avoid moire), so that is one
+/// structure appearing in three channels. Whether 181 is a real ruling or the second harmonic of
+/// ~90 cannot be decided from the stored peak alone; `sub2` and `sub5` below exist to answer it.
+pub const FOLLOW_RATIO: f32 = 1.8;
+pub const FOLLOW_LPI_FRAC: f32 = 0.03;
+pub const FOLLOW_ANG_DEG: f32 = 3.0;
 
 // ================================================================================================
 
@@ -113,6 +153,12 @@ pub struct InkField {
     pub lpi: Vec<f32>,
     /// and its angle, degrees, folded to 0..180 (the dot grid is symmetric)
     pub ang: Vec<f32>,
+    /// band magnitude at HALF the peak frequency, same angle, over the band median. If the peak we
+    /// locked onto is really the 2nd harmonic of a coarser screen, the fundamental is sitting here.
+    pub sub2: Vec<f32>,
+    /// likewise at 2/5 of the peak frequency: the (2,1) lattice point of a screen at ~1/sqrt(5) of
+    /// the measured ruling, which is the other way an off-axis lattice can be misread.
+    pub sub5: Vec<f32>,
 }
 
 pub struct ScreenField {
@@ -224,17 +270,35 @@ fn refine(mag: &[f32], pk: usize) -> (f64, f64) {
     (py as f64 + dy, px as f64 + dx)
 }
 
+/// Bilinear sample of the shifted magnitude at a fractional bin position. Used to probe whether a
+/// coarser fundamental exists under the peak we locked onto.
+fn sample(mag: &[f32], ry: f64, rx: f64) -> f32 {
+    if ry < 0.0 || rx < 0.0 || ry >= (WIN - 1) as f64 || rx >= (WIN - 1) as f64 {
+        return 0.0;
+    }
+    let (y0, x0) = (ry.floor() as usize, rx.floor() as usize);
+    let (fy, fx) = ((ry - y0 as f64) as f32, (rx - x0 as f64) as f32);
+    let g = |y: usize, x: usize| mag[y * WIN + x];
+    let top = g(y0, x0) * (1.0 - fx) + g(y0, x0 + 1) * fx;
+    let bot = g(y0 + 1, x0) * (1.0 - fx) + g(y0 + 1, x0 + 1) * fx;
+    top * (1.0 - fy) + bot * fy
+}
+
 /// Measure one channel over the whole page.
 fn channel_field(plane: &[u8], w: usize, h: usize, b: &Band) -> (usize, usize, InkField) {
     let ny = if h >= WIN { (h - WIN) / STEP + 1 } else { 0 };
     let nx = if w >= WIN { (w - WIN) / STEP + 1 } else { 0 };
     if ny == 0 || nx == 0 {
-        return (0, 0, InkField { prom: vec![], depth: vec![], lpi: vec![], ang: vec![] });
+        return (
+            0,
+            0,
+            InkField { prom: vec![], depth: vec![], lpi: vec![], ang: vec![], sub2: vec![], sub5: vec![] },
+        );
     }
     // Bin centre in shifted coordinates, so a refined (row, col) can be turned back into a
     // frequency: bin i is (i - WIN/2)/WIN cycles per pixel.
     let c = (WIN / 2) as f64;
-    let out: Vec<(f32, f32, f32, f32)> = (0..ny * nx)
+    let out: Vec<(f32, f32, f32, f32, f32, f32)> = (0..ny * nx)
         .into_par_iter()
         .map(|bi| {
             let (by, bx) = (bi / nx, bi % nx);
@@ -270,7 +334,7 @@ fn channel_field(plane: &[u8], w: usize, h: usize, b: &Band) -> (usize, usize, I
                 }
             }
             if vals.is_empty() {
-                return (0.0, 0.0, 0.0, 0.0);
+                return (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             }
             vals.sort_by(|p, q| p.partial_cmp(q).unwrap());
             let med = vals[vals.len() / 2].max(1e-6);
@@ -282,7 +346,13 @@ fn channel_field(plane: &[u8], w: usize, h: usize, b: &Band) -> (usize, usize, I
             // A sinusoid of amplitude A, Hann-windowed, puts |X| = A/2 * sum(win) into each of its
             // two conjugate bins -- so this recovers A in ink levels.
             let depth = (2.0 * peak.0 as f64 / b.gain) as f32;
-            (peak.0 / med, depth, (r * SRC_DPI) as f32, a as f32)
+            // Probe for a coarser fundamental beneath this peak, along the SAME direction: at half
+            // the frequency (this peak would then be a 2nd harmonic) and at 2/5 of it (this peak
+            // would be the (2,1) lattice point of a screen 1/sqrt(5) as fine). Reported relative to
+            // the band median, so it is comparable with `prom`.
+            let sub2 = sample(&mag, c + (ry - c) * 0.5, c + (rx - c) * 0.5) / med;
+            let sub5 = sample(&mag, c + (ry - c) * 0.4, c + (rx - c) * 0.4) / med;
+            (peak.0 / med, depth, (r * SRC_DPI) as f32, a as f32, sub2, sub5)
         })
         .collect();
 
@@ -291,12 +361,16 @@ fn channel_field(plane: &[u8], w: usize, h: usize, b: &Band) -> (usize, usize, I
         depth: vec![0.0; ny * nx],
         lpi: vec![0.0; ny * nx],
         ang: vec![0.0; ny * nx],
+        sub2: vec![0.0; ny * nx],
+        sub5: vec![0.0; ny * nx],
     };
-    for (i, (p, d, l, a)) in out.into_iter().enumerate() {
+    for (i, (p, d, l, a, s2, s5)) in out.into_iter().enumerate() {
         f.prom[i] = p;
         f.depth[i] = d;
         f.lpi[i] = l;
         f.ang[i] = a;
+        f.sub2[i] = s2;
+        f.sub5[i] = s5;
     }
     (ny, nx, f)
 }
@@ -316,46 +390,77 @@ pub fn measure(cmyk: &Cmyk) -> ScreenField {
     ScreenField { ny, nx, ink }
 }
 
-/// True where this block carries a real screen in this ink: a concentrated spectral peak AND enough
-/// modulation to be ink rather than arithmetic. Both conditions, always -- see DEPTH.
-pub fn fired(f: &InkField, i: usize) -> bool {
-    f.prom[i] > FIRE && f.depth[i] > DEPTH
+/// Angular distance in degrees, on the 0..180 fold.
+fn angdiff(a: f32, b: f32) -> f32 {
+    let d = (a - b).abs() % 180.0;
+    d.min(180.0 - d)
 }
 
-/// Write the field as one `[4][4][ny][nx]` f32 npy: ink-major, then (prominence, depth, lpi, angle).
+/// True where this ink's peak in this block merely echoes a stronger ink's peak. See FOLLOW_RATIO.
+pub fn is_follower(f: &ScreenField, ci: usize, i: usize) -> bool {
+    let a = &f.ink[ci];
+    for cj in 0..4 {
+        if cj == ci {
+            continue;
+        }
+        let b = &f.ink[cj];
+        if b.depth[i] >= FOLLOW_RATIO * a.depth[i]
+            && (b.lpi[i] - a.lpi[i]).abs() <= FOLLOW_LPI_FRAC * a.lpi[i]
+            && angdiff(b.ang[i], a.ang[i]) <= FOLLOW_ANG_DEG
+        {
+            return true;
+        }
+    }
+    false
+}
+
+/// True where this block carries a real screen in this ink. Three conditions, all required: a
+/// concentrated spectral peak (FIRE), enough modulation to be ink rather than arithmetic (DEPTH),
+/// and not merely an echo of a stronger ink at the same geometry (is_follower).
+pub fn fired(f: &ScreenField, ci: usize, i: usize) -> bool {
+    let a = &f.ink[ci];
+    a.prom[i] > FIRE && a.depth[i] > DEPTH && !is_follower(f, ci, i)
+}
+
+/// Write the field as one `[4][6][ny][nx]` f32 npy: ink-major, then
+/// (prominence, depth, lpi, angle, sub2, sub5).
 ///
 /// This is the whole point of the stage. The field is a few hundred KB where the 2400 dpi planes it
 /// came from are gigabytes, so it is the artifact worth caching -- routing and rendering iterate
 /// against this and never touch full resolution again.
 pub fn write_npy(path: &str, f: &ScreenField) -> Result<()> {
     let n = f.ny * f.nx;
-    let mut all = Vec::with_capacity(4 * 4 * n);
+    let mut all = Vec::with_capacity(4 * 6 * n);
     for ink in &f.ink {
         all.extend_from_slice(&ink.prom);
         all.extend_from_slice(&ink.depth);
         all.extend_from_slice(&ink.lpi);
         all.extend_from_slice(&ink.ang);
+        all.extend_from_slice(&ink.sub2);
+        all.extend_from_slice(&ink.sub5);
     }
-    npy::write_f32(path, &all, &[4, 4, f.ny, f.nx])
+    npy::write_f32(path, &all, &[4, 6, f.ny, f.nx])
 }
 
 /// Read a field back from the npy this stage wrote. The field is the cacheable artifact -- stages
 /// B and C consume it and never re-measure -- so this is the normal way in, not a debug path.
 pub fn read_npy(path: &str) -> Result<ScreenField> {
     let (data, shape) = npy::read_f32(path)?;
-    if shape.len() != 4 || shape[0] != 4 || shape[1] != 4 {
-        anyhow::bail!("{}: expected [4][4][ny][nx], got {:?}", path, shape);
+    if shape.len() != 4 || shape[0] != 4 || shape[1] != 6 {
+        anyhow::bail!("{}: expected [4][6][ny][nx], got {:?}", path, shape);
     }
     let (ny, nx) = (shape[2], shape[3]);
     let n = ny * nx;
     let mut ink = Vec::with_capacity(4);
     for ci in 0..4 {
-        let b = ci * 4 * n;
+        let b = ci * 6 * n;
         ink.push(InkField {
             prom: data[b..b + n].to_vec(),
             depth: data[b + n..b + 2 * n].to_vec(),
             lpi: data[b + 2 * n..b + 3 * n].to_vec(),
             ang: data[b + 3 * n..b + 4 * n].to_vec(),
+            sub2: data[b + 4 * n..b + 5 * n].to_vec(),
+            sub5: data[b + 5 * n..b + 6 * n].to_vec(),
         });
     }
     Ok(ScreenField { ny, nx, ink })

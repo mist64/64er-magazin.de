@@ -18,11 +18,21 @@ Read this before adding any threshold, band, or window size.
 * Design tint boxes: screened per LAYOUT, not per ink. Two-ink tints sit on the **{45°, 75°} pair**
   at ~150–152 lpi, and which ink takes which angle flips per box (green C@76/Y@45, orange
   M@45/Y@75). One-ink cyan tints are coarser, **~133 lpi @ 45°**. Grey boxes are **K@45° only**.
-* Pasted-in ad artwork brings its own rulings: measured **81 and 102 lpi** on p092, **110–134 lpi**
-  (pitch 18–20 px @2400) across the ad/catalog section.
+* Pasted-in ad artwork brings its own rulings: **100–105 lpi** on p092, **110–134 lpi** across the
+  ad/catalog section, and a genuine **181 lpi @ 24°** full-page ad on p073.
+  (An earlier note claimed 81 lpi on p092. Re-measured directly on 8609 with the per-ink field: it
+  is 100–105, and nothing on that page sits at 80–90. The 81 was not corroborated — treat page
+  numbers inherited from the 8608 notes with the same suspicion.)
 
-So the useful band is roughly **80–200 lpi**, not the 139–192 the old detector used — it missed the
-133 lpi tints and the whole ad section, catching them only through spectral leakage.
+So the useful band is **75–220 lpi**. The old detector's 139–192 missed the 133 lpi tints and the
+whole ad section, catching them only through spectral leakage.
+
+**The low edge is derivable, and 75 is where the data puts it.** Over 20 pages, the ruling histogram
+of real content (coherent, non-follower blocks; N=102,697) is EMPTY between **55 and 95 lpi** — 7
+blocks, 0.01%. Below that sat 13,781 firing blocks whose angles were near-uniform across the
+admissible range, where real screens concentrate hard at 40–50° and 130–140°: broadband 1/f energy
+leaking into the band's low corner, not a structure. A subharmonic-lock explanation was tested and
+disproved — only 5.4% had a cross-ink peak at 2×/2.5×/3× their own ruling.
 
 **True Y is probably on-axis (~0/90°)** and is therefore removed by the axis cut that rejects type.
 What the old geometry stage reported as "Y@45" may be its diagonal or K bleed. Trust C/M/K angles.
@@ -30,6 +40,20 @@ What the old geometry stage reported as "Y@45" may be its diagonal or K bleed. T
 **A greyscale photo and a grey tint box have IDENTICAL geometry** (both K@45°). They differ only in
 whether the dot area varies. Geometry alone can never separate them — that is what the
 uniform/varying test is for.
+
+**Three plates cannot share an angle** — they are set apart precisely to avoid moiré. So when two or
+more inks report the same ruling AND angle in the same block, that is ONE structure appearing in
+several channels, never several screens. It happens two ways, and they need opposite responses:
+
+* *Crosstalk.* A strong plate's halftone echoes faintly into the other channels at a fraction of the
+  amplitude. Reject the weak ones — see the follower rule below.
+* *A neutral image.* Before GCR, a grey halftone puts near-equal ink in C, M, Y and K, so one screen
+  appears in all four at COMPARABLE depth. Measured on p073: C/M/K all 181 lpi @ 24°, depths
+  24/28/39. Do NOT reject these by geometry — that is the signature of a neutral (greyscale) region
+  and belongs to routing as "this is class 2", not to detection as "these are artifacts".
+
+The amplitude ratio is what tells the two apart, which is why the follower rule is a ratio test and
+not a pure geometry test.
 
 **Halftone exists only in mid-tones.** A solid highlight or solid shadow carries no dots at all, so
 a photograph's flat areas correctly measure "not screened". Any block-level screening test must
@@ -49,6 +73,15 @@ with unscreened patches. Load-bearing, not cosmetic.
 * **FFT argmax locks onto lattice harmonics.** At T=512 the screen-angle estimate landed on 45°,
   63.4°, 71.6° — the FFT lattice's own diagonals, not the screen fundamental. Any peak-picking needs
   sub-bin interpolation and a check that the peak is the fundamental, not a harmonic.
+  The check is cheap and worth storing: sample the band magnitude at HALF the peak frequency along
+  the same direction (and at 2/5 of it, the (2,1) lattice point). Two extra floats per block per ink
+  settle the question for a whole issue. Applied to p073's suspicious 181 lpi: the half-frequency
+  magnitude is 1.3–1.9× the band median, indistinguishable from p007's genuine 160 lpi screens
+  (1.3–1.7), so there is no fundamental beneath it and **181 lpi is real**.
+
+* **A ratio is not a measurement.** `peak/median` is scale-invariant, so a 5-level ripple scores like
+  a 200-level screen. Every prominence test needs an absolute amplitude test beside it. This cost a
+  full round: stage A's first version reported all four inks screened on a black-and-white page.
 * **A smaller analysis window is not tighter.** T=160 collapsed real-screen retention 22196 → 5175
   because a 133 lpi screen (pitch 18 px) needs the frequency resolution of a large window to be
   resolved at all. Bloom was T-independent. Do not shrink the window to localise.
