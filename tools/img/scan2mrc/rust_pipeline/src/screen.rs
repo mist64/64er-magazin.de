@@ -74,15 +74,24 @@ pub const HI_LPI: f64 = 220.0;
 
 /// Half-width of the rejected wedge around the horizontal and vertical axes, degrees.
 ///
-/// THIS IS WHAT SEPARATES TYPE FROM SCREEN. Body text is periodic -- it has a line rhythm -- and
-/// that rhythm is on-axis at 0 degrees. A halftone at 19/45/71 degrees is not. Measured on p092:
-/// the body type's spectral peak sits at 0 degrees and is rejected here, which is why this design
-/// needs no "is it a photo or is it type" classifier anywhere.
+/// NARROW, because this test is far weaker than it looks and was costing real content. It rejects
+/// only what is essentially EXACTLY on an axis -- upright stem rhythm, plus the page's own 0.35 deg
+/// skew.
 ///
-/// A true Y screen may be on-axis (~0/90) and would also be rejected. That is accepted: an
-/// axis-aligned screen is indistinguishable from line rhythm by this test, and Y is the ink whose
-/// geometry was least trustworthy in the old measurements anyway.
-pub const AXIS_DEG: f64 = 12.0;
+/// It was 12 degrees, and that deleted a genuine plate. Measured on p073's drop shadow: a real dot
+/// grid at 179 lpi @ 174 deg (6 deg off the axis) with prominence 51-60 in EVERY channel, and its
+/// orthogonal partner at 84 deg with prominence 33-37. The printer body that detects correctly is
+/// the same photograph at 185 lpi @ 24 deg with prominence only 10-18. So the shadow's screen is
+/// three times stronger than the one that works, and the wedge was throwing all of it away. That is
+/// not an edge case: different regions of one photograph are dominated by different plates depending
+/// on local colour, and sooner or later one of them lands near an axis.
+///
+/// THE WEDGE CANNOT BE TUNED TO SEPARATE THEM. Body text on the same page peaks at 6.3 deg off-axis
+/// and the shadow at 6.0 -- identical distance. What separates them is strength, not angle:
+/// prominence 60 against 5-14. So the wedge is left only wide enough for exactly-on-axis rhythm
+/// (measured text peaks at 0.0 and 6.3 deg, the first killed here and the second by FIRE at 6.1),
+/// and FIRE does the rest of the work.
+pub const AXIS_DEG: f64 = 3.0;
 
 /// A block reports a screen when peak/median over the band exceeds this. Median, not mean: one
 /// strong peak drags a mean upward and shrinks its own prominence.

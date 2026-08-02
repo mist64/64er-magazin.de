@@ -238,6 +238,12 @@ pub struct Area {
 pub struct Routing {
     pub ny: usize,
     pub nx: usize,
+    /// the four grouping stages, per block, each recording only what IT added. The debug drawer
+    /// shows them in four colours so a wrong shape can be attributed to the step that made it.
+    pub st_screen: Vec<bool>,
+    pub st_absorb: Vec<bool>,
+    pub st_fill: Vec<bool>,
+    pub st_rim: Vec<bool>,
     /// per block: did any ink report a screen here. The renderer needs it to tell "ink in a
     /// screened block that no stencil claimed" (which the background must draw) from "ink on bare
     /// paper" (which is the stencil's business alone).
@@ -530,356 +536,117 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
         }
     }
 
-    // ---- 2b. an unmeasurable block INHERITS its neighbours' verdict ---------------------------
+    // ---- 3. GROUP BY SCREENING, AND ONLY BY SCREENING -----------------------------------------
     //
-    // A block whose contone is mostly covered by a big glyph has almost no screen pixels left to
-    // measure, so it cannot be called uniform -- and "not uniform" meant "photograph", which
-    // suppressed the stencil there and drew the heading softly from the background instead. Measured
-    // on p007: "SOFTWARE-HILFEN" on its cyan bar came out with SOFTW crisp and ARE-HILFEN eroded,
-    // because the blocks under the second half were unmeasurable and pulled that stretch of the bar
-    // into a photo area.
+    // Screening is a property of a TILE: the block either carries a halftone or it does not. Whether
+    // a region is a flat fill or a photograph is a property of the WHOLE CONTIGUOUS CHUNK, and
+    // cannot be asked before the chunk exists. Deciding it per block and SEGMENTING on that verdict
+    // shattered a photograph into hundreds of one-block areas -- and destroyed the very test that
+    // separates a smooth photograph from a tint, since a one-block area has no "across itself".
+    // Same error as the deleted renderer's per-cluster vote at a different scale (FINDINGS.md 3).
     //
-    // Uniformity is a property of a REGION, exactly as the screen vector is (see
-    // demod::filled_geometry). A block that could not measure itself still sits on whatever its
-    // neighbours sit on, so it inherits their verdict. Inheriting requires a measured majority
-    // nearby; with none, nothing changes and the block stays non-uniform, which is still the safe
-    // direction.
-    for _ in 0..UNIFORM_FILL_ROUNDS {
-        let snap_u = uniform.clone();
-        let snap_m = measured.clone();
-        let mut grew = false;
-        for by in 0..ny {
-            for bx in 0..nx {
-                let i = by * nx + bx;
-                if snap_m[i] || !fired_mask[i] {
-                    continue;
-                }
-                let (mut yes, mut no) = (0, 0);
-                for dy in -1i64..=1 {
-                    for dx in -1i64..=1 {
-                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
-                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
-                            continue;
-                        }
-                        let j = y2 as usize * nx + x2 as usize;
-                        if snap_m[j] {
-                            if snap_u[j] {
-                                yes += 1;
-                            } else {
-                                no += 1;
-                            }
-                        }
-                    }
-                }
-                if yes + no == 0 {
-                    continue;
-                }
-                uniform[i] = yes > no;
-                measured[i] = true;
-                // the inherited region's colour, so a flat fill has a value to use
-                let mut cnt = 0.0f32;
-                let mut acc = [0.0f32; 4];
-                for dy in -1i64..=1 {
-                    for dx in -1i64..=1 {
-                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
-                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
-                            continue;
-                        }
-                        let j = y2 as usize * nx + x2 as usize;
-                        if snap_m[j] {
-                            for ci in 0..4 {
-                                acc[ci] += bmean[j][ci];
-                            }
-                            cnt += 1.0;
-                        }
-                    }
-                }
-                for ci in 0..4 {
-                    bmean[i][ci] = acc[ci] / cnt;
-                }
-                grew = true;
+    // Four steps, in this order, each recorded separately so the debug drawer can attribute a wrong
+    // shape to the step that made it:
+    //
+    //   1  screening        the tiles that measured a halftone
+    //   2  absorb solid     near-solid ink reachable from those tiles -- a picture's own shadow
+    //   3  fill             everything enclosed by the result -- a picture's own highlight
+    //   4  extend one tile  the rim, where the window straddles the picture's edge
+    let st_screen = fired_mask.clone();
+    let mut m = fired_mask.clone();
+
+    // 2 -- ABSORB. A halftone has no dots in a solid shadow, so those blocks never fire, and being
+    // connected to the page edge rather than enclosed the fill cannot reach them either. Propagate
+    // GEODESICALLY from the screened tiles through near-solid ink: a shadow is followed however far
+    // it runs, and paper stops it dead. Mean ink, not a coverage fraction -- a solid passage inks
+    // the whole block and means ~250, a block of body type is 30% covered and means ~76.
+    let st_absorb;
+    {
+        let mut inked = vec![false; ny * nx];
+        let mut sum = vec![0.0f32; ny * nx];
+        let mut cnt = vec![0u32; ny * nx];
+        for ty in 0..tone.h {
+            for tx in 0..tone.w {
+                let bi = block_of_source(f, ty * ty_per, tx * tx_per);
+                let strongest = (0..4).map(|ci| tone.ink[ci][ty * tone.w + tx]).max().unwrap_or(0);
+                sum[bi] += strongest as f32;
+                cnt[bi] += 1;
             }
         }
-        if !grew {
-            break;
+        for bi in 0..ny * nx {
+            inked[bi] = cnt[bi] > 0 && sum[bi] / cnt[bi] as f32 >= ABSORB_MEAN;
         }
+        let mask: Vec<bool> = (0..ny * nx).map(|i| inked[i] || m[i]).collect();
+        let reach = ndimage::binary_propagation(&m, &mask, nx, ny);
+        st_absorb = (0..ny * nx).map(|i| reach[i] && !m[i]).collect::<Vec<bool>>();
+        m = reach;
     }
 
-    // ---- 2c. clean the verdict field before segmenting on it ---------------------------------
-    //
-    // One block's uniform/varying verdict is noisy, because how much of a block a heading covers is
-    // an accident of where the block grid falls. Grouping directly on that field shatters one
-    // physical region into a CHECKERBOARD of one-block areas -- p007's "SOFTWARE-HILFEN" bar came
-    // out as alternating flat and photo squares, and since the stencil is suppressed inside a photo,
-    // the heading was stencilled in some squares and drawn softly in others: SOFTW crisp,
-    // ARE-HILFEN eroded.
-    //
-    // A majority filter is the right tool and not a fudge: it cannot merge a photograph into a tint
-    // (a photograph is many varying blocks in a row and keeps its majority) but it does remove the
-    // isolated flips that the block grid manufactures. Two passes, because a single pass leaves
-    // 2x2 clumps.
-    for _ in 0..UNIFORM_CLEAN_ROUNDS {
-        let snap = uniform.clone();
-        for by in 0..ny {
-            for bx in 0..nx {
-                let i = by * nx + bx;
-                if !fired_mask[i] {
-                    continue;
-                }
-                let (mut yes, mut no) = (0, 0);
-                for dy in -1i64..=1 {
-                    for dx in -1i64..=1 {
-                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
-                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
-                            continue;
-                        }
-                        let j = y2 as usize * nx + x2 as usize;
-                        if !fired_mask[j] {
-                            continue;
-                        }
-                        if snap[j] {
-                            yes += 1;
-                        } else {
-                            no += 1;
-                        }
-                    }
-                }
-                if yes + no >= 3 {
-                    uniform[i] = yes > no;
-                }
-            }
-        }
-    }
-
-    // ---- 3. group blocks of like verdict, separately ------------------------------------------
-    // Closing bridges the dot-free gaps a halftone leaves in its own highlights and shadows;
-    // fill_holes recovers a photograph's solid highlight enclosed by screen.
-    let mut areas: Vec<Area> = Vec::new();
-    let mut label = vec![0u32; ny * nx];
-    for pass in 0..2 {
-        let want_uniform = pass == 0;
-        let mut m: Vec<bool> = (0..ny * nx)
-            .map(|i| fired_mask[i] && uniform[i] == want_uniform && label[i] == 0)
-            .collect();
+    // 3 -- FILL. Close the halftone's own gaps, then take everything enclosed, at any size: a
+    // picture's specular highlight carries no dots and cannot fire, and enclosure is the whole test.
+    let st_fill;
+    {
+        let before = m.clone();
         let seed = m.clone();
         if CLOSE_BLOCKS > 0 {
             m = ndimage::binary_dilation(&m, nx, ny, CLOSE_BLOCKS);
             m = ndimage::binary_erosion(&m, nx, ny, CLOSE_BLOCKS);
         }
-        // A CLOSING IS EXTENSIVE: it can only ever ADD. `binary_erosion` treats outside-the-array as
-        // empty, so blocks within CLOSE_BLOCKS of the block-grid edge erode away and never come
-        // back -- 4 mm of every full-bleed photo and tint, stripped of its area and then, because
-        // label==0 turns off stencil suppression, redrawn as raw halftone dots in the bilevel layer.
-        // That is the p173 pathology in FINDINGS.md 4. Restoring the seed makes the operation a
-        // closing again.
+        // a closing is EXTENSIVE: it may only add. binary_erosion treats outside-the-array as empty,
+        // so without this the blocks within CLOSE_BLOCKS of the grid edge erode away and never
+        // return -- 4 mm off every full-bleed picture.
         for i in 0..ny * nx {
             if seed[i] {
                 m[i] = true;
             }
         }
-        // BOUNDED HOLE FILL. `binary_fill_holes` fills ANY enclosed region, and on a magazine page
-        // a column of body text is routinely enclosed by the graphics around it -- a headline above,
-        // a photograph beside, a tint below. Filling it labels the text as part of a picture, and
-        // then the background paints a soft 160 dpi copy of every glyph underneath the crisp stencil
-        // copy. Measured on p007: under "Das erste" the background reaches level 141 where under the
-        // neighbouring "Spiel das" it is a clean 255.
-        //
-        // What the fill is FOR is a photograph's own specular highlight, which carries no dots and
-        // is small. So bound it: fill an enclosed hole only if it is smaller than MAX_HOLE_BLOCKS.
-        {
-            let inv: Vec<bool> = m.iter().map(|&b| !b).collect();
-            let (hl, hn) = ndimage::label(&inv, nx, ny);
-            if hn > 0 {
-                let hs = ndimage::component_sizes(&hl, hn);
-                // a hole touching the border is outside, not enclosed
-                let mut border = vec![false; hn + 1];
-                for x in 0..nx {
-                    border[hl[x] as usize] = true;
-                    border[hl[(ny - 1) * nx + x] as usize] = true;
-                }
-                for y in 0..ny {
-                    border[hl[y * nx] as usize] = true;
-                    border[hl[y * nx + nx - 1] as usize] = true;
-                }
-                for i in 0..ny * nx {
-                    let c = hl[i] as usize;
-                    if c != 0 && !border[c] && hs[c - 1] <= MAX_HOLE_BLOCKS as u64 {
-                        m[i] = true;
-                    }
-                }
+        let inv: Vec<bool> = m.iter().map(|&b| !b).collect();
+        let (hl, hn) = ndimage::label(&inv, nx, ny);
+        if hn > 0 {
+            let mut border = vec![false; hn + 1];
+            for x in 0..nx {
+                border[hl[x] as usize] = true;
+                border[hl[(ny - 1) * nx + x] as usize] = true;
             }
-        }
-        // never steal a block already claimed by the previous pass
-        for i in 0..ny * nx {
-            if label[i] != 0 {
-                m[i] = false;
-            }
-        }
-        let (lb, n) = ndimage::label(&m, nx, ny);
-        let sz = ndimage::component_sizes(&lb, n);
-        let bx = ndimage::find_objects(&lb, n, nx, ny);
-        for c in 1..=n {
-            if sz[c - 1] < MIN_AREA_BLOCKS as u64 {
-                continue;
-            }
-            let id = areas.len();
-            let (y0, y1, x0, x1) = bx[c - 1].unwrap();
-            // area statistics: the MEDIAN over its own blocks, which is what a flat fill will use
-            let mut mean = [0.0f32; 4];
-            let mut spread = [0.0f32; 4];
-            let mut lpis: Vec<f32> = Vec::new();
-            for ci in 0..4 {
-                let mut mv: Vec<f32> = Vec::new();
-                let mut sv: Vec<f32> = Vec::new();
-                for i in 0..ny * nx {
-                    if lb[i] == c as u32 && measured[i] {
-                        mv.push(bmean[i][ci]);
-                        sv.push(bspread[i][ci]);
-                    }
-                }
-                if !mv.is_empty() {
-                    mv.sort_by(|a, b| a.partial_cmp(b).unwrap());
-                    sv.sort_by(|a, b| a.partial_cmp(b).unwrap());
-                    mean[ci] = mv[mv.len() / 2];
-                    spread[ci] = sv[sv.len() / 2];
-                }
+            for y in 0..ny {
+                border[hl[y * nx] as usize] = true;
+                border[hl[y * nx + nx - 1] as usize] = true;
             }
             for i in 0..ny * nx {
-                if lb[i] == c as u32 {
-                    label[i] = id as u32 + 1;
-                    for ci in 0..4 {
-                        if screen::fired(f, ci, i) {
-                            lpis.push(f.ink[ci].lpi[i]);
-                        }
-                    }
+                let c = hl[i] as usize;
+                if c != 0 && !border[c] {
+                    m[i] = true;
                 }
             }
-            lpis.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            // SECOND SCALE: a candidate flat area must also be flat ACROSS itself. Spread of the
-            // per-block medians, which is exactly the gradient a locally-flat photograph has and a
-            // tint does not.
-            // Default is NOT flat: an area with too few measured blocks to compute a spread has no
-            // evidence of uniformity, and a flat fill is the most destructive thing the renderer
-            // does. Unmeasurable falls to the contone side, as everywhere else in this file.
-            let mut across = f32::MAX;
-            let mut any_across = false;
-            for ci in 0..4 {
-                let mut mv: Vec<f32> = (0..ny * nx)
-                    .filter(|&i| lb[i] == c as u32 && measured[i])
-                    .map(|i| bmean[i][ci])
-                    .collect();
-                if mv.len() < 4 {
-                    continue;
-                }
-                mv.sort_by(|a, b| a.partial_cmp(b).unwrap());
-                let p10 = mv[mv.len() / 10];
-                let p90 = mv[(mv.len() * 9 / 10).min(mv.len() - 1)];
-                let v = (p90 - p10) / 2.0;
-                across = if any_across { across.max(v) } else { v };
-                any_across = true;
-            }
-            let colour = (0..3).any(|ci| mean[ci] >= COLOUR_INK);
-            areas.push(Area {
-                id,
-                class: if want_uniform && across <= UNIFORM_ACROSS {
-                    Class::Flat
-                } else if colour {
-                    Class::ColourPhoto
-                } else {
-                    Class::GreyPhoto
-                },
-                bbox: (y0, x0, y1, x1),
-                blocks: sz[c - 1] as usize,
-                mean,
-                std: spread,
-                lpi: if lpis.is_empty() { 0.0 } else { lpis[lpis.len() / 2] },
-            });
+        }
+        st_fill = (0..ny * nx).map(|i| m[i] && !before[i]).collect::<Vec<bool>>();
+    }
+
+    let (lb, nreg) = ndimage::label(&m, nx, ny);
+    let sz = ndimage::component_sizes(&lb, nreg);
+    let mut label: Vec<u32> = vec![0; ny * nx];
+    let mut region_of: Vec<u32> = vec![0; nreg + 1];
+    let mut nkept = 0u32;
+    for c in 1..=nreg {
+        if sz[c - 1] >= MIN_AREA_BLOCKS as u64 {
+            nkept += 1;
+            region_of[c] = nkept;
+        }
+    }
+    for i in 0..ny * nx {
+        if lb[i] != 0 {
+            label[i] = region_of[lb[i] as usize];
         }
     }
 
-    // ---- 4b. absorb the solid parts of a picture into their area -----------------------------
-    //
-    // A halftone exists only in mid-tones, so a photograph's own solid shadow carries no dots, never
-    // fires, and -- being connected to the page edge rather than enclosed -- is not recovered by
-    // `fill_holes` either. It joined no area, which switched OFF stencil suppression there, and the
-    // photograph's dark passages were handed to the bilevel layer. In the rendered PDF that is a
-    // ragged staircase of bare paper straight through p007's Spindizzy photograph.
-    // SEGMENTATION_PLAN.md predicted exactly this ("absorb solid-K regions into an adjacent screened
-    // area"); it is the one part of that plan that turned out to be necessary.
-    //
-    // GEODESIC, not a fixed number of dilations. The shadow is as big as it is, and growing by a
-    // bounded radius reaches part of it and leaves the rest -- which is what an earlier six-round
-    // version did. Propagating from the areas THROUGH inked blocks reaches all of a connected
-    // shadow and stops dead at paper, whatever the distance.
-    //
-    // COVERAGE is what separates a shadow from type: a solid passage inks essentially the whole
-    // block, a line of text inks 10-20% of it. Not darkness -- a block of bold type is dark too.
-    {
-        let mut inked = vec![false; ny * nx];
-        {
-            let mut sum = vec![0.0f32; ny * nx];
-            let mut cnt = vec![0u32; ny * nx];
-            for ty in 0..tone.h {
-                for tx in 0..tone.w {
-                    let bi = block_of_source(f, ty * ty_per, tx * tx_per);
-                    let strongest = (0..4)
-                        .map(|ci| tone.ink[ci][ty * tone.w + tx])
-                        .max()
-                        .unwrap_or(0);
-                    sum[bi] += strongest as f32;
-                    cnt[bi] += 1;
-                }
-            }
-            for bi in 0..ny * nx {
-                inked[bi] = cnt[bi] > 0 && sum[bi] / cnt[bi] as f32 >= ABSORB_MEAN;
-            }
-        }
-        let seed: Vec<bool> = label.iter().map(|&l| l != 0).collect();
-        let mask: Vec<bool> = (0..ny * nx).map(|i| inked[i] || seed[i]).collect();
-        let reach = ndimage::binary_propagation(&seed, &mask, nx, ny);
-        // spread labels into the reached blocks, to convergence
-        loop {
-            let mut grew = false;
-            let snap = label.clone();
-            for by in 0..ny {
-                for bx in 0..nx {
-                    let i = by * nx + bx;
-                    if snap[i] != 0 || !reach[i] {
-                        continue;
-                    }
-                    for (dy, dx) in [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)] {
-                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
-                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
-                            continue;
-                        }
-                        let j = y2 as usize * nx + x2 as usize;
-                        if snap[j] != 0 {
-                            label[i] = snap[j];
-                            grew = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if !grew {
-                break;
-            }
-        }
-    }
-
-    // ---- 4c. extend every area one block outward ---------------------------------------------
-    //
-    // A block straddling a picture's edge contains part picture and part surround, so its screen
-    // signal is diluted and it often does not fire -- and enclosure cannot recover it, because a rim
-    // block is by definition not enclosed. Left out, the picture ends one block short of itself and
-    // the background paints nothing there: the ragged white staircase along p073's printer.
-    //
-    // The rim is recorded SEPARATELY from the interior. Inside a picture everything is contone, which
-    // is what keeps halftone dots out of the bilevel layer -- but that rule must not reach out over
-    // whatever the picture happens to abut. A caption 1.35 mm from a photograph would lose its
-    // stencil entirely. So a rim block buys contone coverage and spends no marks: the background
-    // paints it, and the stencil goes on deciding per pixel exactly as it does on open paper.
+    // 4 -- EXTEND one tile, recorded separately from the interior. A block straddling a picture's
+    // edge holds part picture and part surround, so its screen signal is diluted and it often does
+    // not fire; enclosure cannot help it, being by definition not enclosed. The rim buys CONTONE
+    // COVERAGE and spends no marks: "inside a picture everything is contone" keeps halftone dots out
+    // of the bilevel layer, and that rule must not reach out over whatever the picture abuts -- a
+    // caption 1.35 mm away would lose its stencil.
     let interior = label.clone();
+    let st_rim;
     {
         let snap = label.clone();
         for by in 0..ny {
@@ -901,6 +668,82 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
                 }
             }
         }
+        st_rim = (0..ny * nx).map(|i| label[i] != 0 && snap[i] == 0).collect::<Vec<bool>>();
+    }
+
+    // ---- 4. NOW ask each complete chunk what it is ---------------------------------------------
+    //
+    // Two scales, both over the whole region, and a region must pass both to be called flat:
+    //   WITHIN  the median of its blocks' own dot-area spreads -- is it flat everywhere locally
+    //   ACROSS  the spread of its blocks' median dot areas     -- and is it the same colour throughout
+    // A tint bar is flat on both. A photograph is often flat WITHIN (a soft passage is smooth inside
+    // 1.35 mm) and never flat ACROSS, which is exactly what distinguishes them.
+    let mut areas: Vec<Area> = Vec::new();
+    for id in 1..=nkept {
+        let blocks: Vec<usize> = (0..ny * nx).filter(|&i| label[i] == id).collect();
+        if blocks.is_empty() {
+            continue;
+        }
+        let meas: Vec<usize> = blocks.iter().cloned().filter(|&i| measured[i]).collect();
+        let (mut y0, mut x0, mut y1, mut x1) = (ny, nx, 0usize, 0usize);
+        for &i in &blocks {
+            let (by, bx) = (i / nx, i % nx);
+            y0 = y0.min(by);
+            x0 = x0.min(bx);
+            y1 = y1.max(by);
+            x1 = x1.max(bx);
+        }
+        let mut mean = [0.0f32; 4];
+        let mut within = [0.0f32; 4];
+        let mut across = 0.0f32;
+        for ci in 0..4 {
+            if meas.is_empty() {
+                continue;
+            }
+            let mut mv: Vec<f32> = meas.iter().map(|&i| bmean[i][ci]).collect();
+            let mut sv: Vec<f32> = meas.iter().map(|&i| bspread[i][ci]).collect();
+            mv.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            sv.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            mean[ci] = mv[mv.len() / 2];
+            within[ci] = sv[sv.len() / 2];
+            if mv.len() >= 4 {
+                let p10 = mv[mv.len() / 10];
+                let p90 = mv[(mv.len() * 9 / 10).min(mv.len() - 1)];
+                across = across.max((p90 - p10) / 2.0);
+            } else {
+                // too few measured blocks to know whether it travels; a flat fill replaces a whole
+                // region with one colour, so "cannot tell" must fall to the contone side
+                across = f32::MAX;
+            }
+        }
+        let mut lpis: Vec<f32> = Vec::new();
+        for &i in &blocks {
+            for ci in 0..4 {
+                if screen::fired(f, ci, i) {
+                    lpis.push(f.ink[ci].lpi[i]);
+                }
+            }
+        }
+        lpis.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let flat = !meas.is_empty()
+            && (0..4).all(|ci| within[ci] <= UNIFORM_STD)
+            && across <= UNIFORM_ACROSS;
+        let colour = (0..3).any(|ci| mean[ci] >= COLOUR_INK);
+        areas.push(Area {
+            id: (id - 1) as usize,
+            class: if flat {
+                Class::Flat
+            } else if colour {
+                Class::ColourPhoto
+            } else {
+                Class::GreyPhoto
+            },
+            bbox: (y0, x0, y1, x1),
+            blocks: blocks.len(),
+            mean,
+            std: within,
+            lpi: if lpis.is_empty() { 0.0 } else { lpis[lpis.len() / 2] },
+        });
     }
 
     // ---- 5. stencils, now that the areas are known -------------------------------------------
@@ -909,7 +752,11 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
 
     let n_fired = fired_mask.iter().filter(|&&b| b).count();
     let n_measured = measured.iter().filter(|&&b| b).count();
-    Routing { ny, nx, n_fired, n_measured, fired: fired_mask, label, areas, stencil, sw, sh }
+    Routing {
+        ny, nx, n_fired, n_measured,
+        st_screen, st_absorb, st_fill, st_rim,
+        fired: fired_mask, label, areas, stencil, sw, sh,
+    }
 }
 
 /// One line per page for the terminal, printed as the page finishes.

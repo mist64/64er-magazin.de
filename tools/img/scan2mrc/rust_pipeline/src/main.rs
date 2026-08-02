@@ -159,6 +159,7 @@ fn main() -> Result<()> {
             screen::write_npy(&format!("{}.npy", out_base), &f)?;
             let png = format!("{}.png", out_base);
             screendbg::write_png(&png, &cmyk, &f)?;
+            screendbg::write_prob_png(&format!("{}_prob.png", out_base), &f)?;
             let stem = std::path::Path::new(&cmyk_tiff)
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
             println!("{}", screendbg::summarise(&stem, &f));
@@ -197,6 +198,7 @@ fn main() -> Result<()> {
             let png = format!("{}.png", out_base);
             routedbg::write_png(&png, &disp, &r)?;
             routedbg::write_outline_png(&format!("{}_type.png", out_base), &disp, &r)?;
+            routedbg::write_stages_png(&format!("{}_stages.png", out_base), &disp, &r)?;
             let stem = std::path::Path::new(&display_tiff)
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
             println!("{}", route::summarise(&stem, &r));

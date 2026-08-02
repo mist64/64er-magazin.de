@@ -4,20 +4,20 @@
 //! pixel -- which is the thing that goes wrong, and a question a human can answer at a glance
 //! without knowing any threshold.
 //!
-//!   GREEN   class 1, colour photo   -> contone CMYK at the screen's own rate
-//!   BLUE    class 2, greyscale photo-> contone, neutral
-//!   AMBER   class 3, flat tint/box  -> ONE measured ink percentage, no raster at all
-//!   RED     class 4, type/line art  -> per-ink bilevel stencil at 600 dpi
-//!   (none)  bare paper
+//! EVERYTHING IS AN OUTLINE. A wash states the verdict and hides the evidence: an area filled with
+//! green looks identical whether it holds a photograph or a paragraph, and the pixels that decide
+//! whether a boundary is right are precisely the ones a wash recolours. So the page stays legible
+//! and every decision is a line drawn on it.
 //!
-//! Red is drawn ON TOP of the area colours, because that is the truth of the output: lettering on a
-//! grey box is class 4 sitting on class 3, and both layers are really there. An amber box with red
-//! letters on it is the correct picture for a contents-page tint bar, and the single most
-//! informative thing this drawer can show.
+//!   thick GREEN   class 1, colour photo    -> contone CMYK at the screen's own rate
+//!   thick BLUE    class 2, greyscale photo -> contone, neutral
+//!   thick AMBER   class 3, flat tint/box   -> ONE measured ink percentage, no raster
+//!   thin per-ink  class 4, type/line art   -> the bilevel stencil, outlined in its own ink
+//!   (no line)     bare paper
 //!
-//! Areas are also OUTLINED, not only washed. A wash says what a region became; the outline says
-//! where the region ends, and region boundaries are where routing errors actually live -- a photo
-//! whose edge is one block short leaks its own frame into the stencil.
+//! The two kinds overlap on purpose: lettering on a grey box is class 4 sitting on class 3, and both
+//! layers really are there. An amber boundary round a bar with red letterforms outlined inside it is
+//! the correct picture for a contents-page tint, and the most informative thing this drawer shows.
 
 use crate::imageio::Cmyk;
 use crate::pilio;
@@ -29,15 +29,16 @@ use anyhow::Result;
 //  CONSTANTS
 // ================================================================================================
 
-/// Output scale: stencil grid / this. 600/4 = 150 dpi, a readable A4.
-const SHRINK: usize = 4;
+/// Output scale: stencil grid / this. 600/2 = 300 dpi -- fine enough that a stencil boundary is a
+/// line rather than a smear, coarse enough for a whole page to be looked at at once.
+const SHRINK: usize = 2;
 
-/// Area wash strength, and the stronger stencil wash drawn over it.
-const AREA_WASH: f32 = 0.42;
-const STENCIL_WASH: f32 = 0.80;
+/// Thickness of an area boundary, in output pixels.
+const AREA_LINE: usize = 2;
 
-/// Page grey is lifted toward white by this before washing.
-const LIFT: f32 = 0.45;
+/// How far the page is lifted toward white before the outlines go on. Enough that a saturated
+/// outline reads against a dark photograph, little enough that the page is still the page.
+const LIFT: f32 = 0.35;
 
 const COL_COLOUR: [f32; 3] = [0.10, 0.70, 0.30]; // class 1
 const COL_GREY: [f32; 3] = [0.15, 0.45, 0.95]; // class 2
@@ -51,49 +52,81 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
     let (w, h) = (r.sw / SHRINK, r.sh / SHRINK);
     let mut px = vec![255u8; w * h * 3];
     let sdiv = (disp.w / r.sw).max(1);
-
     let put = |px: &mut Vec<u8>, x: usize, y: usize, c: [f32; 3]| {
         let i = (y * w + x) * 3;
         px[i] = (c[0] * 255.0).clamp(0.0, 255.0) as u8;
         px[i + 1] = (c[1] * 255.0).clamp(0.0, 255.0) as u8;
         px[i + 2] = (c[2] * 255.0).clamp(0.0, 255.0) as u8;
     };
-    let get = |px: &Vec<u8>, x: usize, y: usize| -> [f32; 3] {
-        let i = (y * w + x) * 3;
-        [
-            px[i] as f32 / 255.0,
-            px[i + 1] as f32 / 255.0,
-            px[i + 2] as f32 / 255.0,
-        ]
-    };
-    let blend = |base: [f32; 3], c: [f32; 3], t: f32| -> [f32; 3] {
-        [
-            base[0] + (c[0] - base[0]) * t,
-            base[1] + (c[1] - base[1]) * t,
-            base[2] + (c[2] - base[2]) * t,
-        ]
-    };
 
-    // ---- the page, lifted -----------------------------------------------------------------
+    // ---- the page itself, in colour, lifted ------------------------------------------------
+    // OUTLINES, NOT WASHES. A wash states the verdict and hides the evidence underneath it: an
+    // area filled with green looks the same whether it holds a photograph or a paragraph. The
+    // pixels that decide whether a boundary is right are the ones either side of it, and a wash
+    // recolours exactly those. So the page stays legible and every decision is drawn as a line.
     for y in 0..h {
         for x in 0..w {
             let (sy, sx) = (y * SHRINK * sdiv, x * SHRINK * sdiv);
             let si = sy.min(disp.h - 1) * disp.w + sx.min(disp.w - 1);
-            let ink = disp.c[si] as f32 + disp.m[si] as f32 + disp.y[si] as f32
-                + disp.k[si] as f32 * 1.5;
-            let g = (1.0 - (ink / 420.0).min(1.0)).clamp(0.0, 1.0);
-            let g = g + (1.0 - g) * LIFT;
-            put(&mut px, x, y, [g, g, g]);
+            let (c, m, yv, k) = (
+                disp.c[si] as f32,
+                disp.m[si] as f32,
+                disp.y[si] as f32,
+                disp.k[si] as f32,
+            );
+            let f = |v: f32| {
+                let t = (1.0 - v / 255.0) * (1.0 - k / 255.0);
+                t + (1.0 - t) * LIFT
+            };
+            put(&mut px, x, y, [f(c), f(m), f(yv)]);
         }
     }
 
-    // ---- area washes, by class ------------------------------------------------------------
-    // Each block owns the STEP x STEP cell centred on its window, so adjacent blocks tile exactly.
+    // ---- stencil boundaries, per ink --------------------------------------------------------
+    // Drawn first so the area outlines sit on top of them at a shared edge.
+    for ci in 0..4 {
+        let m = &r.stencil[ci];
+        for sy in 0..r.sh {
+            for sx in 0..r.sw {
+                if !m[sy * r.sw + sx] {
+                    continue;
+                }
+                let edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
+                    let (y2, x2) = (sy as i64 + dy, sx as i64 + dx);
+                    y2 < 0
+                        || x2 < 0
+                        || y2 >= r.sh as i64
+                        || x2 >= r.sw as i64
+                        || !m[y2 as usize * r.sw + x2 as usize]
+                });
+                if edge {
+                    let (y, x) = (sy / SHRINK, sx / SHRINK);
+                    if y < h && x < w {
+                        put(&mut px, x, y, OUT_RGB[ci]);
+                    }
+                }
+            }
+        }
+    }
+
+    // ---- area boundaries, by class, drawn thick ---------------------------------------------
     let half = screen::STEP / 2;
+    let cell = (sdiv * SHRINK).max(1);
     for by in 0..r.ny {
         for bx in 0..r.nx {
             let l = r.label[by * r.nx + bx];
             if l == 0 {
+                continue;
+            }
+            let edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
+                let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                y2 < 0
+                    || x2 < 0
+                    || y2 >= r.ny as i64
+                    || x2 >= r.nx as i64
+                    || r.label[y2 as usize * r.nx + x2 as usize] != l
+            });
+            if !edge {
                 continue;
             }
             let col = match r.areas[(l - 1) as usize].class {
@@ -102,78 +135,23 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
                 Class::Flat => COL_FLAT,
             };
             let (cy, cx) = screen::centre_of(by, bx);
-            let y0 = cy.saturating_sub(half) / (sdiv * SHRINK);
-            let x0 = cx.saturating_sub(half) / (sdiv * SHRINK);
-            let y1 = ((cy + half) / (sdiv * SHRINK)).min(h);
-            let x1 = ((cx + half) / (sdiv * SHRINK)).min(w);
+            let y0 = cy.saturating_sub(half) / cell;
+            let x0 = cx.saturating_sub(half) / cell;
+            let y1 = ((cy + half) / cell).min(h);
+            let x1 = ((cx + half) / cell).min(w);
             for y in y0..y1 {
                 for x in x0..x1 {
-                    let b = get(&px, x, y);
-                    put(&mut px, x, y, blend(b, col, AREA_WASH));
-                }
-            }
-        }
-    }
-
-    // ---- area outlines --------------------------------------------------------------------
-    for by in 0..r.ny {
-        for bx in 0..r.nx {
-            let l = r.label[by * r.nx + bx];
-            if l == 0 {
-                continue;
-            }
-            let edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
-                let ny2 = by as i64 + dy;
-                let nx2 = bx as i64 + dx;
-                ny2 < 0
-                    || nx2 < 0
-                    || ny2 >= r.ny as i64
-                    || nx2 >= r.nx as i64
-                    || r.label[ny2 as usize * r.nx + nx2 as usize] != l
-            });
-            if !edge {
-                continue;
-            }
-            let (cy, cx) = screen::centre_of(by, bx);
-            let y0 = cy.saturating_sub(half) / (sdiv * SHRINK);
-            let x0 = cx.saturating_sub(half) / (sdiv * SHRINK);
-            let y1 = ((cy + half) / (sdiv * SHRINK)).min(h);
-            let x1 = ((cx + half) / (sdiv * SHRINK)).min(w);
-            for y in y0..y1 {
-                for x in x0..x1 {
-                    if y == y0 || x == x0 || y + 1 == y1 || x + 1 == x1 {
-                        put(&mut px, x, y, COL_EDGE);
+                    let on = y < y0 + AREA_LINE
+                        || x < x0 + AREA_LINE
+                        || y + AREA_LINE >= y1
+                        || x + AREA_LINE >= x1;
+                    if on {
+                        put(&mut px, x, y, col);
                     }
                 }
             }
         }
     }
-
-    // ---- the stencil, on top ---------------------------------------------------------------
-    // Maximum over the shrink cell, not the mean: a hairline covering one stencil pixel in sixteen
-    // must still be visible, or this drawer will report a clean page that is actually losing marks.
-    for y in 0..h {
-        for x in 0..w {
-            let mut hit = false;
-            'cell: for dy in 0..SHRINK {
-                for dx in 0..SHRINK {
-                    let (sy, sx) = (y * SHRINK + dy, x * SHRINK + dx);
-                    if sy >= r.sh || sx >= r.sw {
-                        continue;
-                    }
-                    if (0..4).any(|ci| r.stencil[ci][sy * r.sw + sx]) {
-                        hit = true;
-                        break 'cell;
-                    }
-                }
-            }
-            if hit {
-                let b = get(&px, x, y);
-                put(&mut px, x, y, blend(b, COL_STENCIL, STENCIL_WASH));
-            }
-        }
-    }
-
     pilio::write_rgb_png_fast(path, w, h, &px)
 }
 
@@ -264,6 +242,102 @@ pub fn write_outline_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
                 let i = (y * w + x) * 3;
                 for k in 0..3 {
                     px[i + k] = (OUT_RGB[ci][k] * 255.0) as u8;
+                }
+            }
+        }
+    }
+    pilio::write_rgb_png_fast(path, w, h, &px)
+}
+
+// ================================================================================================
+//  THE GROUPING STAGES, ONE PICTURE
+// ================================================================================================
+
+/// Colours for the four grouping steps. Chosen to be told apart at a glance and against a grey page.
+const ST_SCREEN: [f32; 3] = [0.10, 0.70, 0.25]; // 1 measured a halftone
+const ST_ABSORB: [f32; 3] = [0.10, 0.40, 0.95]; // 2 near-solid ink reached from those tiles
+const ST_FILL: [f32; 3] = [0.95, 0.60, 0.05];   // 3 enclosed by the result
+const ST_RIM: [f32; 3] = [0.85, 0.10, 0.75];    // 4 the one-tile rim
+
+/// How strongly a stage tints its tiles. Light: the page underneath is the evidence.
+const ST_WASH: f32 = 0.45;
+
+/// WHAT EACH GROUPING STEP CONTRIBUTED, in four colours on one page.
+///
+/// The finished region tells you nothing about how it was reached, and each of the four steps fails
+/// in its own way -- screening misses a tile, absorption walks into text, the fill swallows an
+/// enclosed column, the rim reaches over a caption. Tinting each step's OWN contribution separates
+/// them: a wrong shape can be attributed to the step that made it instead of guessed at.
+///
+/// Tiles are drawn as tiles, deliberately. The block grid is the unit these decisions are made in,
+/// and seeing it is the point -- a staircase on the block boundary is a fact about the method, not
+/// an artifact of the drawing.
+pub fn write_stages_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
+    let (w, h) = (r.sw / SHRINK, r.sh / SHRINK);
+    let mut px = vec![255u8; w * h * 3];
+    let sdiv = (disp.w / r.sw).max(1);
+    let cell = (sdiv * SHRINK).max(1);
+    let put = |px: &mut Vec<u8>, x: usize, y: usize, c: [f32; 3]| {
+        let i = (y * w + x) * 3;
+        px[i] = (c[0] * 255.0).clamp(0.0, 255.0) as u8;
+        px[i + 1] = (c[1] * 255.0).clamp(0.0, 255.0) as u8;
+        px[i + 2] = (c[2] * 255.0).clamp(0.0, 255.0) as u8;
+    };
+    let get = |px: &Vec<u8>, x: usize, y: usize| -> [f32; 3] {
+        let i = (y * w + x) * 3;
+        [px[i] as f32 / 255.0, px[i + 1] as f32 / 255.0, px[i + 2] as f32 / 255.0]
+    };
+
+    // the page, lifted
+    for y in 0..h {
+        for x in 0..w {
+            let (sy, sx) = (y * SHRINK * sdiv, x * SHRINK * sdiv);
+            let si = sy.min(disp.h - 1) * disp.w + sx.min(disp.w - 1);
+            let (c, m, yv, k) = (
+                disp.c[si] as f32,
+                disp.m[si] as f32,
+                disp.y[si] as f32,
+                disp.k[si] as f32,
+            );
+            let f = |v: f32| {
+                let t = (1.0 - v / 255.0) * (1.0 - k / 255.0);
+                t + (1.0 - t) * 0.30
+            };
+            put(&mut px, x, y, [f(c), f(m), f(yv)]);
+        }
+    }
+
+    // each stage's own tiles, in order, so a later step draws over an earlier one only where it
+    // genuinely added something
+    let half = screen::STEP / 2;
+    for (mask, col) in [
+        (&r.st_screen, ST_SCREEN),
+        (&r.st_absorb, ST_ABSORB),
+        (&r.st_fill, ST_FILL),
+        (&r.st_rim, ST_RIM),
+    ] {
+        for by in 0..r.ny {
+            for bx in 0..r.nx {
+                if !mask[by * r.nx + bx] {
+                    continue;
+                }
+                let (cy, cx) = screen::centre_of(by, bx);
+                let y0 = cy.saturating_sub(half) / cell;
+                let x0 = cx.saturating_sub(half) / cell;
+                let y1 = ((cy + half) / cell).min(h);
+                let x1 = ((cx + half) / cell).min(w);
+                for y in y0..y1 {
+                    for x in x0..x1 {
+                        let b = get(&px, x, y);
+                        // leave a one-pixel gutter so the tile grid stays visible
+                        let inner = y > y0 && x > x0 && y + 1 < y1 && x + 1 < x1;
+                        let t = if inner { ST_WASH } else { ST_WASH * 0.35 };
+                        put(&mut px, x, y, [
+                            b[0] + (col[0] - b[0]) * t,
+                            b[1] + (col[1] - b[1]) * t,
+                            b[2] + (col[2] - b[2]) * t,
+                        ]);
+                    }
                 }
             }
         }

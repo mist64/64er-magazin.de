@@ -1207,11 +1207,34 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
     let (dmin, dmax) = stage!(t0, "knorm", times, { knorm(&wp.rgb, Some(&wp.unknown)) });
     let (cmin, cmax) = knorm(&wp.rgb, None);
 
+    let mut n_dead = 0usize;
+    let mut n_holes = 0usize;
+    if o.inpaint {
+        n_dead = stage!(t0, "mirror inpaint", times, {
+            mirror_edges(&mut wp.rgb, &wp.unknown, w, h)
+        });
+        n_holes = stage!(t0, "telea holes", times, {
+            diffuse_holes(&mut wp.rgb, &wp.unknown, w, h)
+        });
+    }
+
+    // THE SCREENING INPUT: graded, and NOT GCR'd.
+    //
+    // GCR subtracts min(C,M,Y) and moves it to K. Once the separation is neutral-calibrated that
+    // minimum IS the whole of a neutral, so GCR ZEROES all three chromatic channels wherever the
+    // content is grey -- and a b&w photograph or a grey tint is exactly that. Feeding the detector
+    // GCR'd planes therefore deletes the screening it is meant to find: measured on p073, the left
+    // machine fired C 0 / M 0 / Y 0 of 1395 blocks and only K survived, and the printer's drop
+    // shadow C 0 / M 91 / Y 0. The dots were never weak; they had been subtracted before the
+    // detector saw them. FINDINGS.md 2 states this rule and the code was violating it.
+    //
+    // Written AFTER the inpaint as well, so the unknown regions (bed, neighbour page, clip holes)
+    // are filled in the detector's input exactly as they are in the renderer's, instead of the
+    // detector alone seeing raw scanner bed.
     if o.detect_too {
-        let mut d = stage!(t0, "separate detect", times, {
+        let d = stage!(t0, "separate detect", times, {
             separate_grade(&wp.rgb, w, h, Levels::detect(), dmin, dmax)
         });
-        gcr(&mut d);
         if o.write {
             stage!(t0, "write detect tiff", times, {
                 pilio::write_cmyk_tiff_raw(
@@ -1222,17 +1245,6 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
                 )?
             });
         }
-    }
-
-    let mut n_dead = 0usize;
-    let mut n_holes = 0usize;
-    if o.inpaint {
-        n_dead = stage!(t0, "mirror inpaint", times, {
-            mirror_edges(&mut wp.rgb, &wp.unknown, w, h)
-        });
-        n_holes = stage!(t0, "telea holes", times, {
-            diffuse_holes(&mut wp.rgb, &wp.unknown, w, h)
-        });
     }
 
     // THE CONTONE READS LINEAR. The level stretch is the only destructive step in the grade -- in
