@@ -196,6 +196,7 @@ fn main() -> Result<()> {
             let r = route::route(&f, &tone, &coh, &disp);
             let png = format!("{}.png", out_base);
             routedbg::write_png(&png, &disp, &r)?;
+            routedbg::write_outline_png(&format!("{}_type.png", out_base), &disp, &r)?;
             let stem = std::path::Path::new(&display_tiff)
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
             println!("{}", route::summarise(&stem, &r));

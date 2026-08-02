@@ -150,6 +150,13 @@ pub const COHERENT_FRAC: f32 = 0.5;
 /// single colour and is the most destructive thing the renderer does, so "I could not measure this"
 /// must fall to the contone side. The old renderer's equivalent default pointed at the destructive
 /// layer, which is how photographs ended up as solid bilevel blobs.
+/// How far a measured verdict may be inherited by unmeasurable blocks, in rounds of one block. 3 is
+/// ~4 mm: enough to cross a line of display type, short of crossing a whole picture.
+pub const UNIFORM_FILL_ROUNDS: usize = 3;
+
+/// Majority-filter passes over the uniform/varying field before it is segmented. See step 2c.
+pub const UNIFORM_CLEAN_ROUNDS: usize = 2;
+
 pub const MIN_MEASURE_FRAC: f64 = 0.25;
 pub const MIN_MEASURE_FLOOR: usize = 8;
 
@@ -416,11 +423,172 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
             let p25 = v[n / 4] as f32;
             let p75 = v[(n * 3 / 4).min(n - 1)] as f32;
             bspread[bi][ci] = (p75 - p25) / 2.0;
-            if bspread[bi][ci] > UNIFORM_STD {
-                flat = false;
+        }
+        let _ = flat;
+    }
+
+    // THE UNIFORM TEST IS A LOCAL GRADIENT ON A ROBUST STATISTIC, not a within-block spread.
+    //
+    // Within-block spread is contaminated by exactly the thing that must not matter: a bold heading
+    // on a tint bar covers a different fraction of each block, its edges leak into the sample, and
+    // the verdict then flips from block to block. p007's "SOFTWARE-HILFEN" bar came out as a
+    // checkerboard of flat and photo squares and the heading was stencilled in some and drawn softly
+    // in others -- SOFTW crisp, ARE-HILFEN eroded.
+    //
+    // The median dot area of a block is robust: whatever the glyphs do, the tint between them still
+    // reads ~50% cyan. So the question becomes "does this block's dot area match its neighbours'" --
+    // which is flat for a tint bar however the type falls across it, and varying for a photograph,
+    // whose whole nature is that neighbouring patches differ. It is also the same question the
+    // across-area test asks, now asked locally, so the two scales agree by construction.
+    for by in 0..ny {
+        for bx in 0..nx {
+            let i = by * nx + bx;
+            if !measured[i] {
+                continue;
+            }
+            let mut worst = 0.0f32;
+            let mut n = 0;
+            for dy in -1i64..=1 {
+                for dx in -1i64..=1 {
+                    let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                    if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                        continue;
+                    }
+                    let j = y2 as usize * nx + x2 as usize;
+                    if !measured[j] || j == i {
+                        continue;
+                    }
+                    n += 1;
+                    for ci in 0..4 {
+                        worst = worst.max((bmean[i][ci] - bmean[j][ci]).abs());
+                    }
+                }
+            }
+            // An isolated measured block has nothing to compare against; leave it non-uniform, the
+            // safe side.
+            uniform[i] = n > 0 && worst <= UNIFORM_STD;
+        }
+    }
+
+    // ---- 2b. an unmeasurable block INHERITS its neighbours' verdict ---------------------------
+    //
+    // A block whose contone is mostly covered by a big glyph has almost no screen pixels left to
+    // measure, so it cannot be called uniform -- and "not uniform" meant "photograph", which
+    // suppressed the stencil there and drew the heading softly from the background instead. Measured
+    // on p007: "SOFTWARE-HILFEN" on its cyan bar came out with SOFTW crisp and ARE-HILFEN eroded,
+    // because the blocks under the second half were unmeasurable and pulled that stretch of the bar
+    // into a photo area.
+    //
+    // Uniformity is a property of a REGION, exactly as the screen vector is (see
+    // demod::filled_geometry). A block that could not measure itself still sits on whatever its
+    // neighbours sit on, so it inherits their verdict. Inheriting requires a measured majority
+    // nearby; with none, nothing changes and the block stays non-uniform, which is still the safe
+    // direction.
+    for _ in 0..UNIFORM_FILL_ROUNDS {
+        let snap_u = uniform.clone();
+        let snap_m = measured.clone();
+        let mut grew = false;
+        for by in 0..ny {
+            for bx in 0..nx {
+                let i = by * nx + bx;
+                if snap_m[i] || !fired_mask[i] {
+                    continue;
+                }
+                let (mut yes, mut no) = (0, 0);
+                for dy in -1i64..=1 {
+                    for dx in -1i64..=1 {
+                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                            continue;
+                        }
+                        let j = y2 as usize * nx + x2 as usize;
+                        if snap_m[j] {
+                            if snap_u[j] {
+                                yes += 1;
+                            } else {
+                                no += 1;
+                            }
+                        }
+                    }
+                }
+                if yes + no == 0 {
+                    continue;
+                }
+                uniform[i] = yes > no;
+                measured[i] = true;
+                // the inherited region's colour, so a flat fill has a value to use
+                let mut cnt = 0.0f32;
+                let mut acc = [0.0f32; 4];
+                for dy in -1i64..=1 {
+                    for dx in -1i64..=1 {
+                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                            continue;
+                        }
+                        let j = y2 as usize * nx + x2 as usize;
+                        if snap_m[j] {
+                            for ci in 0..4 {
+                                acc[ci] += bmean[j][ci];
+                            }
+                            cnt += 1.0;
+                        }
+                    }
+                }
+                for ci in 0..4 {
+                    bmean[i][ci] = acc[ci] / cnt;
+                }
+                grew = true;
             }
         }
-        uniform[bi] = flat;
+        if !grew {
+            break;
+        }
+    }
+
+    // ---- 2c. clean the verdict field before segmenting on it ---------------------------------
+    //
+    // One block's uniform/varying verdict is noisy, because how much of a block a heading covers is
+    // an accident of where the block grid falls. Grouping directly on that field shatters one
+    // physical region into a CHECKERBOARD of one-block areas -- p007's "SOFTWARE-HILFEN" bar came
+    // out as alternating flat and photo squares, and since the stencil is suppressed inside a photo,
+    // the heading was stencilled in some squares and drawn softly in others: SOFTW crisp,
+    // ARE-HILFEN eroded.
+    //
+    // A majority filter is the right tool and not a fudge: it cannot merge a photograph into a tint
+    // (a photograph is many varying blocks in a row and keeps its majority) but it does remove the
+    // isolated flips that the block grid manufactures. Two passes, because a single pass leaves
+    // 2x2 clumps.
+    for _ in 0..UNIFORM_CLEAN_ROUNDS {
+        let snap = uniform.clone();
+        for by in 0..ny {
+            for bx in 0..nx {
+                let i = by * nx + bx;
+                if !fired_mask[i] {
+                    continue;
+                }
+                let (mut yes, mut no) = (0, 0);
+                for dy in -1i64..=1 {
+                    for dx in -1i64..=1 {
+                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                            continue;
+                        }
+                        let j = y2 as usize * nx + x2 as usize;
+                        if !fired_mask[j] {
+                            continue;
+                        }
+                        if snap[j] {
+                            yes += 1;
+                        } else {
+                            no += 1;
+                        }
+                    }
+                }
+                if yes + no >= 3 {
+                    uniform[i] = yes > no;
+                }
+            }
+        }
     }
 
     // ---- 3. group blocks of like verdict, separately ------------------------------------------
