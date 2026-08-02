@@ -1,4 +1,6 @@
 mod apply;
+mod demod;
+mod demoddbg;
 mod fftutil;
 mod grade;
 mod imageio;
@@ -53,6 +55,17 @@ enum Cmd {
     Screen {
         cmyk_tiff: String,
         /// output base: writes <base>.npy and <base>.png
+        out_base: String,
+    },
+    /// STAGE B: unclipped CMYK + the stage-A field -> contone (dot area) + coherence, and the
+    /// debug PNG that shows which ink is halftone and which is a mark. See demod.rs.
+    Demod {
+        /// DISPLAY-graded, pre-GCR CMYK (from `apply --nogcr-too`): the contone comes from this.
+        display_tiff: String,
+        /// DETECT-graded (unclipped) CMYK: coherence and the screen field come from this.
+        detect_tiff: String,
+        field_npy: String,
+        /// output base: writes <base>_tone.npy and <base>.png
         out_base: String,
     },
     /// master scan -> deskewed, matted, A4-cropped, graded CMYK.
@@ -133,6 +146,27 @@ fn main() -> Result<()> {
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
             println!("{}", screendbg::summarise(&stem, &f));
             eprintln!("screen -> {} ({:.1}s)", png, t.elapsed().as_secs_f64());
+        }
+        Cmd::Demod { display_tiff, detect_tiff, field_npy, out_base } => {
+            let t = std::time::Instant::now();
+            let disp = imageio::read_cmyk_tiff(&display_tiff)?;
+            let det = imageio::read_cmyk_tiff(&detect_tiff)?;
+            let f = screen::read_npy(&field_npy)?;
+            let div = demod::contone_divisor(&f);
+            let tone = demod::contone(&disp, div);
+            let coh = demod::coherence(&det, &f);
+            let cmyk = disp;
+            let mut flat = Vec::with_capacity(4 * tone.w * tone.h);
+            for pl in &tone.ink {
+                flat.extend(pl.iter().copied());
+            }
+            npy::write_u8(&format!("{}_tone.npy", out_base), &flat, &[4, tone.h, tone.w])?;
+            let png = format!("{}.png", out_base);
+            demoddbg::write_png(&png, &cmyk, &tone, &coh)?;
+            let stem = std::path::Path::new(&detect_tiff)
+                .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+            println!("{}", demoddbg::summarise(&stem, &tone, &coh));
+            eprintln!("demod -> {} (div {}, {:.1}s)", png, div, t.elapsed().as_secs_f64());
         }
         Cmd::Apply {
             pages,
