@@ -182,8 +182,8 @@ pub fn contone(cmyk: &Cmyk, div: usize, f: &ScreenField, geo: &[Geometry]) -> Co
                 for x in 0..w {
                     let (sy0, sx0) = (y * div, x * div);
                     // local cell width for THIS ink, from the block covering this sample
-                    let by = sy0.saturating_sub(screen::WIN / 2) / screen::STEP;
-                    let bx = sx0.saturating_sub(screen::WIN / 2) / screen::STEP;
+                    let by = (sy0 + screen::STEP / 2).saturating_sub(screen::WIN / 2) / screen::STEP;
+                    let bx = (sx0 + screen::STEP / 2).saturating_sub(screen::WIN / 2) / screen::STEP;
                     let bi = by.min(f.ny - 1) * f.nx + bx.min(f.nx - 1);
                     let (wy, wx) = if geo[ci].known[bi] && geo[ci].lpi[bi] > 1.0 {
                         let cell = screen::SRC_DPI / geo[ci].lpi[bi] as f64;
@@ -298,8 +298,14 @@ pub fn filled_geometry(f: &ScreenField, ci: usize) -> Geometry {
 /// vector belongs to neither screen, and the magnitude we take afterwards is more forgiving of a
 /// hard switch than of a wrong frequency.
 fn vector_at(f: &ScreenField, g: &Geometry, sy: usize, sx: usize) -> Option<(f64, f64)> {
-    let by = (sy / screen::STEP).min(f.ny.saturating_sub(1));
-    let bx = (sx / screen::STEP).min(f.nx.saturating_sub(1));
+    // Same inverse of `centre_of` as route.rs and render.rs. This used `sy / STEP`, which is a full
+    // block (1.35 mm) away from the mapping everything else uses -- so coherence was demodulated at
+    // the neighbouring block's frequency along every boundary between two rulings, and this issue
+    // has 134 lpi tints abutting 160 lpi photographs.
+    let by = ((sy + screen::STEP / 2).saturating_sub(screen::WIN / 2) / screen::STEP)
+        .min(f.ny.saturating_sub(1));
+    let bx = ((sx + screen::STEP / 2).saturating_sub(screen::WIN / 2) / screen::STEP)
+        .min(f.nx.saturating_sub(1));
     let bi = by * f.nx + bx;
     if !g.known[bi] {
         return None;
