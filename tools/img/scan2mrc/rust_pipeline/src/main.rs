@@ -73,6 +73,9 @@ enum Cmd {
         /// also write the 2400 dpi page RGB PNG the current `mrc` reads (drop-in for the Python)
         #[arg(long)]
         page_rgb: bool,
+        /// also write the display-graded but NOT GCR'd CMYK the screening analysis wants
+        #[arg(long)]
+        nogcr_too: bool,
         #[arg(long)]
         no_write: bool,
     },
@@ -119,6 +122,7 @@ fn main() -> Result<()> {
             detect_too,
             cache,
             page_rgb,
+            nogcr_too,
             no_write,
         } => {
             let o = apply::Opts {
@@ -132,6 +136,7 @@ fn main() -> Result<()> {
                 detect_too,
                 cache,
                 page_rgb,
+                nogcr_too,
                 write: !no_write,
             };
             for p in pages {
