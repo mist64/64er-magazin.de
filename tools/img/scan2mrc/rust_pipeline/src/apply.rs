@@ -42,10 +42,14 @@ pub struct Levels {
 }
 impl Levels {
     pub fn display() -> Self {
-        Levels { c: (50.0, 90.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0) }
+        // C, M and Y share one level pair -- that is what makes the grade neutral-preserving.
+        // C used to sit at (50,90) as a hand-compensation for the raw separation reading C far too
+        // high on neutrals; `neutral_luts` now corrects that at source, so keeping both would
+        // correct the same error twice. See grade.rs for the full note.
+        Levels { c: (30.0, 70.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0) }
     }
     pub fn detect() -> Self {
-        Levels { c: (0.0, 90.0), m: (0.0, 70.0), y: (0.0, 70.0), k: (0.0, 95.0) }
+        Levels { c: (0.0, 70.0), m: (0.0, 70.0), y: (0.0, 70.0), k: (0.0, 95.0) }
     }
 }
 
@@ -324,8 +328,69 @@ pub fn knorm(rgb: &[u8], unknown: Option<&[bool]>) -> (f64, f64) {
 /// RGB -> graded CMYK, pre-GCR. GCR is applied separately so the caller can keep the un-GCR'd
 /// planes for the ICC page without paying for a second separation (they are the same computation
 /// up to the GCR block).
+/// NEUTRAL CALIBRATION for the geometric separation.
+///
+/// The separation is a ratio of distances to two planes of anchor colours, and nothing in that
+/// construction makes a neutral produce equal C, M and Y. Computed straight from the anchors, a grey
+/// on this paper separates to wildly unequal ink -- at 45% density, C 128 / M 78 / Y 62 -- and the
+/// imbalance even reverses near white. GCR then cannot remove it, because GCR subtracts
+/// min(C,M,Y) and that identity assumes the very balance the separation does not provide. The
+/// visible result is that every neutral photograph comes out mauve, and further down the tone scale
+/// cyan (FINDINGS.md 2b).
+///
+/// The fix is to measure what the separation DOES to a neutral and undo exactly that. The neutral
+/// axis of this ink/paper system is the line from paper white COLOR_W to solid black COLOR_K, so
+/// sample it, record the response of each channel, and invert it. Afterwards a neutral of any
+/// density produces the SAME value in all three channels -- verified against the anchors: on-axis
+/// greys come out with a spread of 0-2 levels where the raw separation spread 50-90 -- so
+/// min(C,M,Y) becomes the true neutral component and GCR does what it says.
+///
+/// Derived entirely from the anchor constants. Nothing is fitted and there is no threshold: the
+/// curve IS the separation's own behaviour, read off and reversed.
+///
+/// Pure inks are preserved, which is the check that matters on the other side: the cyan anchor still
+/// separates to 225/0/0, magenta to 0/222/0, yellow to 0/0/246, paper to 0/0/0.
+fn neutral_luts() -> [[u8; 256]; 3] {
+    let pac = plane(COLOR_C, COLOR_CM, COLOR_CY);
+    let pbc = plane(COLOR_M, COLOR_Y, COLOR_W);
+    let pam = plane(COLOR_M, COLOR_CM, COLOR_MY);
+    let pbm = plane(COLOR_C, COLOR_Y, COLOR_W);
+    let pay = plane(COLOR_Y, COLOR_CY, COLOR_MY);
+    let pby = plane(COLOR_C, COLOR_M, COLOR_W);
+    // response of each channel along COLOR_W -> COLOR_K, made monotone (the raw response dips by a
+    // level or two near paper white, where all three channels are within noise of zero anyway)
+    let mut resp = [[0u8; 256]; 3];
+    let mut run = [0u8; 3];
+    for i in 0..256 {
+        let t = i as f64 / 255.0;
+        let px = [
+            COLOR_W[0] + t * (COLOR_K[0] - COLOR_W[0]),
+            COLOR_W[1] + t * (COLOR_K[1] - COLOR_W[1]),
+            COLOR_W[2] + t * (COLOR_K[2] - COLOR_W[2]),
+        ];
+        let v = [cmy(px, &pac, &pbc), cmy(px, &pam, &pbm), cmy(px, &pay, &pby)];
+        for j in 0..3 {
+            run[j] = run[j].max(v[j]);
+            resp[j][i] = run[j];
+        }
+    }
+    // invert: for a separated value v, the density of the neutral that would produce it
+    let mut lut = [[0u8; 256]; 3];
+    for j in 0..3 {
+        for v in 0..256 {
+            let mut lo = 0usize;
+            while lo < 256 && (resp[j][lo] as usize) < v {
+                lo += 1;
+            }
+            lut[j][v] = lo.min(255) as u8;
+        }
+    }
+    lut
+}
+
 pub fn separate_grade(rgb: &[u8], w: usize, h: usize, lv: Levels, dmin: f64, dmax: f64) -> Cmyk {
     let span = (dmax - dmin).max(1e-12);
+    let nlut = neutral_luts();
     let pac = plane(COLOR_C, COLOR_CM, COLOR_CY);
     let pbc = plane(COLOR_M, COLOR_Y, COLOR_W);
     let pam = plane(COLOR_M, COLOR_CM, COLOR_MY);
@@ -363,6 +428,9 @@ pub fn separate_grade(rgb: &[u8], w: usize, h: usize, lv: Levels, dmin: f64, dma
                 let d = (dr * dr + dg * dg + db * db).sqrt();
                 let kv = (((d - dmin) / span * 255.0) as i64).clamp(0, 255) as u8;
                 let k = 255 - kv;
+                let c = nlut[0][c as usize];
+                let m = nlut[1][m as usize];
+                let y = nlut[2][y as usize];
                 rc[x] = level(c, lc, ic);
                 rm[x] = level(m, lm, im);
                 ry[x] = level(y, ly, iy);

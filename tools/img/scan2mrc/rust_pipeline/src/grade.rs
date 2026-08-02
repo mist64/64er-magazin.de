@@ -36,7 +36,19 @@ pub struct GradeLevels {
 impl GradeLevels {
     pub fn display() -> Self {
         GradeLevels {
-            c: (50.0, 90.0),
+            // C, M and Y share one level pair, which is what makes the grade neutral-preserving.
+            //
+            // C used to sit at (50, 90) against M and Y at (30, 70). That was a hand-compensation
+            // for the raw separation reading C far too high on neutrals -- computed from the anchor
+            // constants, a mid grey separates to C 128 / M 78 / Y 62. The separation is now
+            // calibrated against its own neutral response (apply.rs::neutral_luts), so the
+            // compensation must go with it: keeping both corrects the same error twice and the page
+            // swings from mauve to red. Measured on p073's grey printer casing: with calibration
+            // alone and C still at (50,90), C clipped to 0.1 and the casing rendered RGB 192/109/116.
+            //
+            // K keeps its own levels. It is not a colour channel here -- it is the rich-black
+            // distance field, and (90, 95) is what turns it into an ink amount at all.
+            c: (30.0, 70.0),
             m: (30.0, 70.0),
             y: (30.0, 70.0),
             k: (90.0, 95.0),
@@ -44,7 +56,7 @@ impl GradeLevels {
     }
     pub fn detect() -> Self {
         GradeLevels {
-            c: (0.0, 90.0),
+            c: (0.0, 70.0),
             m: (0.0, 70.0),
             y: (0.0, 70.0),
             k: (0.0, 95.0),
