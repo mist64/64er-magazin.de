@@ -110,10 +110,10 @@ pub struct Coherence {
 /// cannot drag it.
 pub fn contone_divisor(f: &ScreenField) -> usize {
     let mut ls: Vec<f32> = Vec::new();
-    for ink in &f.ink {
+    for (ci, _ink) in f.ink.iter().enumerate() {
         for i in 0..f.ny * f.nx {
-            if screen::fired(ink, i) {
-                ls.push(ink.lpi[i]);
+            if screen::fired(f, ci, i) {
+                ls.push(f.ink[ci].lpi[i]);
             }
         }
     }
@@ -167,10 +167,10 @@ fn vector_at(f: &ScreenField, ci: usize, sy: usize, sx: usize) -> Option<(f64, f
     let by = (sy / screen::STEP).min(f.ny.saturating_sub(1));
     let bx = (sx / screen::STEP).min(f.nx.saturating_sub(1));
     let bi = by * f.nx + bx;
-    let ink = &f.ink[ci];
-    if !screen::fired(ink, bi) {
+    if !screen::fired(f, ci, bi) {
         return None;
     }
+    let ink = &f.ink[ci];
     let lpi = ink.lpi[bi] as f64;
     if lpi <= 0.0 {
         return None;

@@ -149,7 +149,7 @@ pub fn write_png(path: &str, cmyk: &Cmyk, f: &ScreenField) -> Result<()> {
             let mut mix = [0.0f32; 3];
             let mut best = (0.0f32, 0usize);
             for ci in 0..4 {
-                if !screen::fired(&f.ink[ci], bi) {
+                if !screen::fired(f, ci, bi) {
                     continue;
                 }
                 let p = f.ink[ci].prom[bi];
@@ -216,7 +216,7 @@ pub fn summarise(page: &str, f: &ScreenField) -> String {
     let mut parts = Vec::new();
     for (ci, nm) in ["C", "M", "Y", "K"].iter().enumerate() {
         let fired: Vec<usize> = (0..f.ny * f.nx)
-            .filter(|&i| screen::fired(&f.ink[ci], i))
+            .filter(|&i| screen::fired(f, ci, i))
             .collect();
         if fired.is_empty() {
             continue;
