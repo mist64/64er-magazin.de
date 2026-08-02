@@ -94,6 +94,52 @@ with unscreened patches. Load-bearing, not cosmetic.
 
 ---
 
+## 2b. THE GRADE IS NOT A VALID CONTONE INPUT — neutral content comes out mauve
+
+Measured on p073, whose printer photograph is neutral grey on paper:
+
+| | C | M | Y | K | naive RGB | B−G |
+|---|---|---|---|---|---|---|
+| raw scan | — | — | — | — | 122 / 113 / 110 | −3 (warm) |
+| display grade (C 50-90, M 30-70, Y 30-70, K 90-95) | 18.5 | 51.3 | **4.7** | 79.8 | 162 / 141 / 172 | **+31** |
+| detect grade (C 0-90, M 0-70, Y 0-70, K 0-95) | 35.6 | 38.2 | 2.8 | 231 | 19 / 20 / 23 | +3 |
+
+**The mechanism, in three steps, none of which is a bug on its own:**
+
+1. **The geometric separation is not neutral-preserving.** Computed directly from `separate.rs`'s anchor
+   constants, a pure grey maps to strongly unequal inks, and the imbalance *changes sign* along the
+   axis:
+
+   | grey | 200 | 170 | 140 | 120 | 100 | 80 | 60 | 40 |
+   |---|---|---|---|---|---|---|---|---|
+   | C | 2 | 48 | 94 | 125 | 156 | 188 | 220 | 252 |
+   | M | 3 | 20 | 48 | 72 | 102 | 140 | 189 | 255 |
+   | Y | 13 | 5 | 28 | 47 | 70 | 100 | 139 | 193 |
+
+2. **The display grade does not compensate for it** — it was fitted to make TYPE crisp (the K level
+   "clips moderate/rich-black K, keeping only near-solid black"), and nobody asked what it does to a
+   photograph. Y is already the smallest channel and its `lo` of 30% clips it to zero across most of
+   the mid-tones, while C and M survive.
+
+3. **GCR cannot repair it.** It subtracts `min(C,M,Y)`, which is 0 once Y has clipped, so it removes
+   nothing at all.
+
+Net: every neutral mid-tone in a photograph loses its yellow and renders blue/mauve. Blue is the
+absence of yellow.
+
+**Do NOT fix this by adjusting the Y level.** The C:M:Y ratio is not constant along the grey axis —
+at grey 200 Y is the LARGEST channel, at 170 C is ten times Y — so no single per-channel (lo, hi)
+pair can straighten it. It needs either a per-channel curve fitted to the separation's own grey-axis
+response, or a neutral-axis subtraction that replaces `min(C,M,Y)` with "the response this separation
+gives for a neutral of this lightness".
+
+**This is roadmap step 7** ("measure the real ink/paper colours → feed the grade instead of the
+hardcoded levels"), and it is a precondition for the contone layer being colour-correct at all. It is
+also the same lesson as the two grades in stage B: one grade fitted for the bilevel layer's benefit
+is not automatically valid for the contone layer. Two purposes, two inputs.
+
+---
+
 ## 3. Negative results — do not retry
 
 **Image-vs-text is not separable by any low-level CMYK statistic.** This is the single most
