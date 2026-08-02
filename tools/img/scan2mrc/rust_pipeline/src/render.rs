@@ -115,9 +115,18 @@ fn background(tone: &Contone, r: &Routing) -> Vec<u8> {
                 hit
             };
             if l == 0 {
-                // outside every area: paper, UNLESS there is ink here that no stencil draws
+                // Outside every area: paper, UNLESS there is ink here that no stencil draws AND
+                // this block actually carries a screen.
+                //
+                // The fired test is the important half. Without it the orphan path fires on ordinary
+                // text on bare paper wherever the stencil's footprint test disagrees with it by a
+                // pixel, and the background then paints a faint ghost of those glyphs under the
+                // crisp stencil copy -- p007 showed "r. Das er" in outline, and nothing else on the
+                // line. On bare paper the stencil is the only layer and the background has no
+                // business drawing anything; the orphan case is ink in a SCREENED block that no
+                // stencil claimed, which is what this was written for.
                 let total: u32 = (0..4).map(|ci| tone.ink[ci][y * w + x] as u32).sum();
-                if total < ORPHAN_INK || covered {
+                if total < ORPHAN_INK || covered || !r.fired[bi] {
                     px.copy_from_slice(&PAPER);
                 } else {
                     for ci in 0..4 {
@@ -231,6 +240,24 @@ pub fn write_pdf(
         }
         let p = path.strip_suffix(".pdf").unwrap_or(path);
         pilio::write_rgb_png_fast(&format!("{}_bg.png", p), tone.w, tone.h, &px)?;
+    }
+    // AND THE STENCIL, as a picture, for the same reason. Between them these two files answer
+    // "which layer drew this" directly, which is the question every render defect starts with and
+    // the one that has cost the most rounds of guessing.
+    {
+        let mut px = vec![255u8; r.sw * r.sh * 3];
+        for i in 0..r.sw * r.sh {
+            for ci in 0..4 {
+                if r.stencil[ci][i] {
+                    let c = INK_CMYK[ci];
+                    px[i * 3] = ((1.0 - c[0]) * (1.0 - c[3]) * 255.0) as u8;
+                    px[i * 3 + 1] = ((1.0 - c[1]) * (1.0 - c[3]) * 255.0) as u8;
+                    px[i * 3 + 2] = ((1.0 - c[2]) * (1.0 - c[3]) * 255.0) as u8;
+                }
+            }
+        }
+        let p = path.strip_suffix(".pdf").unwrap_or(path);
+        pilio::write_rgb_png_fast(&format!("{}_stencil.png", p), r.sw, r.sh, &px)?;
     }
     let bg = deflate(&raw_bg)?;
 
