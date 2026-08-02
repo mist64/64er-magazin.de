@@ -8,6 +8,7 @@ mod ndimage;
 mod npy;
 mod pilio;
 mod record;
+mod render;
 mod resample;
 mod route;
 mod routedbg;
@@ -76,6 +77,13 @@ enum Cmd {
         field_npy: String,
         /// output base: writes <base>.png
         out_base: String,
+    },
+    /// STAGE D: the MRC PDF -- CMYK contone background + per-ink JBIG2 stencils. See render.rs.
+    Mrc {
+        /// DISPLAY-graded, GCR'd CMYK
+        display_tiff: String,
+        field_npy: String,
+        out_pdf: String,
     },
     /// master scan -> deskewed, matted, A4-cropped, graded CMYK.
     ///
@@ -200,6 +208,26 @@ fn main() -> Result<()> {
                 );
             }
             eprintln!("route -> {} ({:.1}s)", png, t.elapsed().as_secs_f64());
+        }
+        Cmd::Mrc { display_tiff, field_npy, out_pdf } => {
+            let t = std::time::Instant::now();
+            let disp = imageio::read_cmyk_tiff(&display_tiff)?;
+            let f = screen::read_npy(&field_npy)?;
+            let div = demod::contone_divisor(&f);
+            let geo: Vec<demod::Geometry> = (0..4).map(|ci| demod::filled_geometry(&f, ci)).collect();
+            let tone = demod::contone(&disp, div, &f, &geo);
+            let coh = demod::coherence(&disp, &f, &geo);
+            let r = route::route(&f, &tone, &coh, &disp);
+            let stem = std::path::Path::new(&out_pdf)
+                .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+            let work = format!("{}/.mrctmp_{}",
+                std::path::Path::new(&out_pdf).parent()
+                    .map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|| ".".into()), stem);
+            println!("{}", route::summarise(&stem, &r));
+            let sz = render::write_pdf(&out_pdf, disp.w, disp.h, &tone, &r, &work)?;
+            let _ = std::fs::remove_dir_all(&work);
+            println!("{}", render::summarise(&stem, &sz, &tone));
+            eprintln!("mrc -> {} ({:.1}s)", out_pdf, t.elapsed().as_secs_f64());
         }
         Cmd::Apply {
             pages,
