@@ -39,17 +39,30 @@ pub struct Levels {
     pub m: (f64, f64),
     pub y: (f64, f64),
     pub k: (f64, f64),
+    /// Discard the separation's own K channel and let GCR define K entirely. See `linear`.
+    pub k_from_gcr: bool,
 }
 impl Levels {
+    /// LINEAR: no contrast stretch at all. See the note on `contone()` in demod.rs -- the stretch
+    /// is the only destructive step in the grade, and the contone must not pay it.
+    pub fn linear() -> Self {
+        Levels {
+            c: (0.0, 100.0),
+            m: (0.0, 100.0),
+            y: (0.0, 100.0),
+            k: (0.0, 100.0),
+            k_from_gcr: true,
+        }
+    }
     pub fn display() -> Self {
         // C, M and Y share one level pair -- that is what makes the grade neutral-preserving.
         // C used to sit at (50,90) as a hand-compensation for the raw separation reading C far too
         // high on neutrals; `neutral_luts` now corrects that at source, so keeping both would
         // correct the same error twice. See grade.rs for the full note.
-        Levels { c: (30.0, 70.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0) }
+        Levels { c: (30.0, 70.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0), k_from_gcr: false }
     }
     pub fn detect() -> Self {
-        Levels { c: (0.0, 70.0), m: (0.0, 70.0), y: (0.0, 70.0), k: (0.0, 95.0) }
+        Levels { c: (0.0, 70.0), m: (0.0, 70.0), y: (0.0, 70.0), k: (0.0, 95.0), k_from_gcr: false }
     }
 }
 
@@ -406,6 +419,7 @@ pub fn separate_grade(rgb: &[u8], w: usize, h: usize, lv: Levels, dmin: f64, dma
     let (lm, im) = lvl(lv.m);
     let (ly, iy) = lvl(lv.y);
     let (lk, ik) = lvl(lv.k);
+    let kzero = lv.k_from_gcr;
 
     let mut out = Cmyk::new(w, h);
     out.c
@@ -434,7 +448,7 @@ pub fn separate_grade(rgb: &[u8], w: usize, h: usize, lv: Levels, dmin: f64, dma
                 rc[x] = level(c, lc, ic);
                 rm[x] = level(m, lm, im);
                 ry[x] = level(y, ly, iy);
-                rk[x] = level(k, lk, ik);
+                rk[x] = if kzero { 0 } else { level(k, lk, ik) };
             }
         });
     out
@@ -1067,7 +1081,17 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
         });
     }
 
-    let lv = if o.variant_display { Levels::display() } else { Levels::detect() };
+    // THE CONTONE READS LINEAR. The level stretch is the only destructive step in the grade -- in
+    // p073's photograph it put 74.8% of C, 50.8% of Y and 35.4% of M hard on zero, which is also
+    // exactly why the page reads warm: C is clipped hardest and M least, so what survives is M and
+    // Y. Separation, neutral calibration and GCR all improve channel purity and cost nothing; only
+    // the stretch trades information for contrast, and the contone has no use for contrast.
+    //
+    // K comes from GCR alone. Once the calibration makes neutrals give equal C, M and Y, min(C,M,Y)
+    // IS the black-ink amount -- so the separation's own K channel is a second, cruder estimate of
+    // the same thing (it reads 231 across an ordinary mid-grey, being a raw distance-to-black), and
+    // adding it double-counts. `linear()` therefore grades K at (0,100) and GCR fills it.
+    let lv = if o.variant_display { Levels::linear() } else { Levels::detect() };
     let mut cm = stage!(t0, "separate display", times, {
         separate_grade(&wp.rgb, w, h, lv, dmin, dmax)
     });

@@ -100,8 +100,28 @@ pub const UNIFORM_ACROSS: f32 = 12.0;
 /// channels (FINDINGS.md 1).
 pub const COLOUR_INK: f32 = 12.0;
 
-/// Ink level (0-255) at or above which a pixel is considered to carry ink at all.
-pub const INK_PRESENT: f32 = 24.0;
+/// SOLIDITY. Ink level at or above which a pixel counts as solid ink and may be drawn by the 1-bit
+/// stencil. 128 = more ink than paper, which is where a bilevel mask's boundary belongs.
+///
+/// This is a solidity test, not a presence test, and the distinction is the whole point of the
+/// layer: a stencil can only draw ink at FULL strength, so it must claim only what the press laid at
+/// full strength. A 50% grey is ink too, but drawing it solid would be a lie -- it belongs to the
+/// contone.
+///
+/// The old value of 24 was calibrated against the display-graded planes, where the level stretch had
+/// already done the solidity test by clipping everything below 30% to zero. With the contone reading
+/// LINEAR planes that stretch is gone, so the test has to be stated here explicitly rather than
+/// hidden in a grade.
+///
+/// Well conditioned, unlike most thresholds in this project. Measured on p007's body text, the
+/// linear K histogram is sharply bimodal -- 11.2M pixels in 0-15 (paper), 1.57M in 240-255 (solid
+/// ink), and a flat ~15k per bin in between (glyph edges). Any value from 16 to 239 gives within
+/// half a percent of the same answer; 128 is the midpoint of that valley.
+///
+/// Solidity alone is not sufficient and is not asked to be: a tint's halftone dots are solid too
+/// (11.4% of p007's cyan bar reads >=200 in C). Coherence is what separates those -- the dots are
+/// periodic, the letters are not.
+pub const INK_PRESENT: f32 = 128.0;
 
 /// ...and it must be at least this fraction of the STRONGEST ink at that pixel to draw a stencil.
 ///
