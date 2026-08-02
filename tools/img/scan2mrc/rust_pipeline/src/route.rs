@@ -123,14 +123,23 @@ pub const STENCIL_DOMINANCE: f32 = 0.5;
 /// background paints the tint exactly where the stencil declines to draw.
 pub const FLAT_TOL: f32 = 2.0 * UNIFORM_STD;
 
-/// ABSORPTION: fraction of a block that must be near-solid ink for the block to be reachable from an
-/// adjacent screened area. See the geodesic step in `route`.
-pub const SOLID_FRAC: f32 = 0.35;
-/// Level at or above which a contone pixel counts as near-solid for SOLID_FRAC. Measured on the
-/// STRONGEST ink, not the sum: after GCR a solid black is K 255 with almost nothing else, so it
-/// sums to only ~265 and a sum-based threshold of 380 never fired at all. Solidity is a property of
-/// one ink laying down fully, not of several inks adding up.
-pub const SOLID_INK: u8 = 100;
+/// Largest enclosed hole the grouping will fill, in blocks. A photograph's specular highlight is a
+/// few blocks across; an enclosed column of body text is hundreds. 64 blocks is ~9x9 mm.
+pub const MAX_HOLE_BLOCKS: usize = 64;
+
+/// ABSORPTION: MEAN ink level a block must reach to be absorbed into an adjacent screened area.
+///
+/// The mean, not "fraction of pixels above a level". Both describe a dark block, but only the mean
+/// distinguishes the two kinds of dark: a photograph's solid shadow inks the WHOLE block and means
+/// ~250, while a block of body type is 30% covered at full strength with paper between the letters
+/// and means ~76. A fraction-above-threshold test scores both at ~0.3-1.0 and cannot tell them
+/// apart -- and when it absorbed a text block into a neighbouring area, the stencil was suppressed
+/// there and those words were drawn softly from the 160 dpi background. Visible directly: "Das
+/// erste" grey and blurred in the middle of a crisp paragraph.
+///
+/// Measured on the strongest ink, not the sum: after GCR a solid black is K 255 with almost nothing
+/// else beside it, so it sums to only ~265 and a sum-based threshold of 380 never fired at all.
+pub const ABSORB_MEAN: f32 = 150.0;
 
 /// A contone pixel counts as part of the screen when at least this fraction of its footprint is
 /// coherent. Half: the pixel is more screen than not. Bare paper has no coherence and drops out
@@ -199,6 +208,10 @@ pub struct Area {
 pub struct Routing {
     pub ny: usize,
     pub nx: usize,
+    /// per block: did any ink report a screen here. The renderer needs it to tell "ink in a
+    /// screened block that no stencil claimed" (which the background must draw) from "ink on bare
+    /// paper" (which is the stencil's business alone).
+    pub fired: Vec<bool>,
     /// how many blocks fired, and how many of those could actually be measured on the contone.
     /// Reported because "no area could be measured" is otherwise indistinguishable from "no screen
     /// here", and the two want opposite fixes.
@@ -327,6 +340,23 @@ pub fn stencils(
                 .map(|i| {
                     let v = peak[ci][i] as f32;
                     if v < INK_PRESENT || screened[i] {
+                        return false;
+                    }
+                    // WHERE THERE IS BLACK INK, THE COLOUR IS FRINGE. A black glyph's edge carries a
+                    // chromatic residue -- plate misregistration on the press plus the scanner's own
+                    // chromatic aberration -- and GCR does not remove it, because GCR subtracts
+                    // min(C,M,Y) and an edge fringe is usually one ink, not all three.
+                    //
+                    // NO LEVEL THRESHOLD CAN SEPARATE IT. Measured on p007's body text: at K-ramp
+                    // pixels the fringe reaches M p90 169, p99 224, while the genuinely red heading
+                    // has M p10 176. The populations overlap almost entirely. What separates them is
+                    // not how strong the colour is but whether black ink is there at all -- the
+                    // fringe exists only at a K edge, and a red glyph carries no K.
+                    //
+                    // This restores the deleted renderer's `inkpix = crisp && !black && ...` guard.
+                    // Losing it put coloured outlines around every black letter, which is a
+                    // regression and was reported as one.
+                    if ci != 3 && peak[3][i] as f32 >= INK_PRESENT {
                         return false;
                     }
                     let strongest = (0..4).map(|cj| peak[cj][i]).max().unwrap() as f32;
@@ -602,8 +632,10 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
             .map(|i| fired_mask[i] && uniform[i] == want_uniform && label[i] == 0)
             .collect();
         let seed = m.clone();
-        m = ndimage::binary_dilation(&m, nx, ny, CLOSE_BLOCKS);
-        m = ndimage::binary_erosion(&m, nx, ny, CLOSE_BLOCKS);
+        if CLOSE_BLOCKS > 0 {
+            m = ndimage::binary_dilation(&m, nx, ny, CLOSE_BLOCKS);
+            m = ndimage::binary_erosion(&m, nx, ny, CLOSE_BLOCKS);
+        }
         // A CLOSING IS EXTENSIVE: it can only ever ADD. `binary_erosion` treats outside-the-array as
         // empty, so blocks within CLOSE_BLOCKS of the block-grid edge erode away and never come
         // back -- 4 mm of every full-bleed photo and tint, stripped of its area and then, because
@@ -615,7 +647,38 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
                 m[i] = true;
             }
         }
-        m = ndimage::binary_fill_holes(&m, nx, ny);
+        // BOUNDED HOLE FILL. `binary_fill_holes` fills ANY enclosed region, and on a magazine page
+        // a column of body text is routinely enclosed by the graphics around it -- a headline above,
+        // a photograph beside, a tint below. Filling it labels the text as part of a picture, and
+        // then the background paints a soft 160 dpi copy of every glyph underneath the crisp stencil
+        // copy. Measured on p007: under "Das erste" the background reaches level 141 where under the
+        // neighbouring "Spiel das" it is a clean 255.
+        //
+        // What the fill is FOR is a photograph's own specular highlight, which carries no dots and
+        // is small. So bound it: fill an enclosed hole only if it is smaller than MAX_HOLE_BLOCKS.
+        {
+            let inv: Vec<bool> = m.iter().map(|&b| !b).collect();
+            let (hl, hn) = ndimage::label(&inv, nx, ny);
+            if hn > 0 {
+                let hs = ndimage::component_sizes(&hl, hn);
+                // a hole touching the border is outside, not enclosed
+                let mut border = vec![false; hn + 1];
+                for x in 0..nx {
+                    border[hl[x] as usize] = true;
+                    border[hl[(ny - 1) * nx + x] as usize] = true;
+                }
+                for y in 0..ny {
+                    border[hl[y * nx] as usize] = true;
+                    border[hl[y * nx + nx - 1] as usize] = true;
+                }
+                for i in 0..ny * nx {
+                    let c = hl[i] as usize;
+                    if c != 0 && !border[c] && hs[c - 1] <= MAX_HOLE_BLOCKS as u64 {
+                        m[i] = true;
+                    }
+                }
+            }
+        }
         // never steal a block already claimed by the previous pass
         for i in 0..ny * nx {
             if label[i] != 0 {
@@ -724,7 +787,7 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
     {
         let mut inked = vec![false; ny * nx];
         {
-            let mut hit = vec![0u32; ny * nx];
+            let mut sum = vec![0.0f32; ny * nx];
             let mut cnt = vec![0u32; ny * nx];
             for ty in 0..tone.h {
                 for tx in 0..tone.w {
@@ -733,14 +796,12 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
                         .map(|ci| tone.ink[ci][ty * tone.w + tx])
                         .max()
                         .unwrap_or(0);
+                    sum[bi] += strongest as f32;
                     cnt[bi] += 1;
-                    if strongest >= SOLID_INK {
-                        hit[bi] += 1;
-                    }
                 }
             }
             for bi in 0..ny * nx {
-                inked[bi] = cnt[bi] > 0 && hit[bi] as f32 / cnt[bi] as f32 >= SOLID_FRAC;
+                inked[bi] = cnt[bi] > 0 && sum[bi] / cnt[bi] as f32 >= ABSORB_MEAN;
             }
         }
         let seed: Vec<bool> = label.iter().map(|&l| l != 0).collect();
@@ -782,7 +843,7 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
 
     let n_fired = fired_mask.iter().filter(|&&b| b).count();
     let n_measured = measured.iter().filter(|&&b| b).count();
-    Routing { ny, nx, n_fired, n_measured, label, areas, stencil, sw, sh }
+    Routing { ny, nx, n_fired, n_measured, fired: fired_mask, label, areas, stencil, sw, sh }
 }
 
 /// One line per page for the terminal, printed as the page finishes.
