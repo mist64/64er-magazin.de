@@ -197,8 +197,11 @@ fn main() -> Result<()> {
             let r = route::route(&f, &tone, &coh, &disp);
             let png = format!("{}.png", out_base);
             routedbg::write_png(&png, &disp, &r)?;
-            routedbg::write_outline_png(&format!("{}_type.png", out_base), &disp, &r)?;
-            routedbg::write_stages_png(&format!("{}_stages.png", out_base), &disp, &r)?;
+            // The type-outline and four-stage views are diagnostic deep-dives, not part of a sweep:
+            // each is a 17 MB 600 dpi page, and over an issue that is 6 GB of pictures nobody asked
+            // for. Re-enable per page when chasing something specific.
+            let _ = routedbg::write_outline_png;
+            let _ = routedbg::write_stages_png;
             // The label map itself, as data. Measuring coverage by decoding colours out of a washed
             // debug image is unreliable -- p073's red banner reads as the rim's magenta -- and every
             // question about region shape wants exact numbers.
