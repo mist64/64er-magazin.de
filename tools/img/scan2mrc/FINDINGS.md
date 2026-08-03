@@ -140,6 +140,84 @@ is not automatically valid for the contone layer. Two purposes, two inputs.
 
 ---
 
+## 2c. WHAT THE DETECTOR MUST BE FED, and what actually separates a screen from type
+
+Measured 2026-08-02/03 over 12,812 hand-labelled blocks on p073, p007 and p092 (photographs, tint
+bars, body text, display type, solid ink, paper).
+
+**The input must be unclipped at BOTH ends, and must NOT be GCR'd.**
+
+* *GCR deletes the evidence.* It subtracts min(C,M,Y), and once the separation is neutral-calibrated
+  that minimum IS the whole of a neutral — so it zeroes all three chromatic channels wherever the
+  content is grey, which is exactly what a b&w photograph or a grey tint is. Feeding the detector
+  GCR'd planes took p073's left machine from C 27 / M 65 / Y 158 firing blocks to C 0 / M 0 / Y 0.
+* *Clipping destroys it.* With the old detect ceilings (C 90, M 70, Y 70, K 95), **37.6% of p073,
+  20% of p007 and 17.5% of p092** had the most-inked channel more than half saturated at 255, and
+  in those tiles the AC RMS collapses to 6.2 against 41 where detection works. A halftone clipped
+  flat has no modulation left and no statistic downstream can recover it.
+
+**What separates screened from unscreened, ranked by AUC on that set:**
+
+| statistic | AUC | per page | note |
+|---|---|---|---|
+| `agree` — fraction of the 8 neighbours measuring the same ruling and angle | **0.941** | .978/.969/.929 | the only one that is best on EVERY page |
+| `conc` — share of the block's AC energy at the peak | **0.920** | .872/.965/.935 | best purely local; no neighbourhood needed |
+| `prom` — peak/median in the band | 0.882 | .850/.941/.888 | swings by page |
+| `depth` — amplitude of the fundamental | 0.882 | .817/.947/.901 | **orders the classes backwards, see below** |
+| `harm` — fundamental + 2nd + 3rd harmonic | 0.871 | | rejected, see below |
+| `lpi` | 0.869 | .924/.974/.758 | an artifact of the band edge, do not use |
+| `acrms` | 0.616 | .507/.493/.705 | rejected, below chance on one page |
+
+`agree` matters because a page-portable ranking is the only kind that can carry a fixed threshold.
+It also encodes what a screen physically IS: a lattice covering an area. Type's rhythm belongs to the
+words in one tile and agrees with nothing.
+
+**`depth` is duty-cycle dependent and must not gate.** It measures the fundamental alone, and a light
+tint's narrow dots put their energy in harmonics. Measured on p073: the printer body, unambiguously
+screened, reads depth 2.9–7.9 while body text reads 8.8–15.4 — the wrong way round. Any threshold
+that accepts the body accepts text.
+
+**A peak AT the band edge is the band edge.** A spectrum whose energy merely rises toward low
+frequency — unscreened paper, soft background — has no interior maximum, so its peak lands wherever
+the band is cut off, and every such block reports a screen there. Analyse a wider band than you
+accept: 55–240 lpi analysed, 95–225 accepted. The gap is the measured empty stretch in the
+real-content ruling histogram (7 blocks of 102,697 between 55 and 95 lpi).
+
+**Absorption of adjacent solid ink is no longer needed** and is disabled. It existed because a
+photograph's solid shadow could never fire; with `conc` and `agree` it fires directly. Measured on
+p073, coverage against absorption reach: photo 1.00 and shadow 0.98 at reach 0, unchanged at reach 8,
+while the solid red banner — not a picture at all — goes from 0.03 to 0.48. Five points on one machine
+against forty-five points of false coverage.
+
+---
+
+## 2d. THE SEPARATION IS AN APPROXIMATION, and where it bends
+
+The eight anchors are the corners of the CMY cube (W=000 … K=111), each a measured RGB, and the
+separation inverts that map. Two things follow that cost real quality:
+
+* *The old plane-ratio inversion was wrong in the interior.* It fitted two planes per ink through
+  three of the four corners of a face; a real ink face is not planar, so the ignored corner misses
+  by up to 22 (K misses the cyan face by 21.2, magenta by 21.9, yellow by 4.3) and every interior
+  point is interpolated through that error. Replaced by a true trilinear inversion (Newton, 64³
+  lattice): exact at all eight corners, and differing from the plane ratio by up to 31 levels in dark
+  and saturated colours.
+* *A visually neutral grey is NOT an equal-CMY mix.* Under these anchors the model's equal-CMY locus
+  sits at R−G +22 while a real neutral measures R−G +9 — ordinary press grey balance, more cyan than
+  magenta and yellow. So `min(C,M,Y)` is not the neutral component, and GCR cannot find it. The
+  neutral calibration (sample the W→K axis, record each channel's response, invert it) is therefore
+  **grey-balance-aware GCR**, not a hack, and a proper cube inversion does not remove the need for it.
+  Substituting the measured paper for the W anchor makes the gap wider, not narrower — it is not
+  stale anchors.
+
+**The level stretch is the only destructive step in the grade.** In p073's photograph it put 74.8% of
+C, 50.8% of Y and 35.4% of M hard on zero — which is also why the page read warm, since C is clipped
+hardest and M least, so what survives is M and Y. Neither the contone nor the detector has any use
+for contrast. The aggressive K level (90,95) was never a grade at all: it was the STENCIL's solidity
+test wearing a grade's clothes, and belongs there explicitly.
+
+---
+
 ## 3. Negative results — do not retry
 
 **Image-vs-text is not separable by any low-level CMYK statistic.** This is the single most
