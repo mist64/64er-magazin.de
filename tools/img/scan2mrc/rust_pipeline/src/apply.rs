@@ -62,7 +62,19 @@ impl Levels {
         Levels { c: (30.0, 70.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0), k_from_gcr: false }
     }
     pub fn detect() -> Self {
-        Levels { c: (0.0, 70.0), m: (0.0, 70.0), y: (0.0, 70.0), k: (0.0, 95.0), k_from_gcr: false }
+        // NO CLIPPING AT EITHER END. The detector must see the separation as it is.
+        //
+        // The shadow clip was already gone; the HIGH clip was not, and it was destroying the dark
+        // half of every photograph. Measured: 37.6% of p073, 20% of p007 and 17.5% of p092 had the
+        // most-inked channel more than half saturated at 255 under the old ceilings (C 90, M 70,
+        // Y 70, K 95), and in those tiles the AC RMS collapses to 6.2 against 41 where detection
+        // works. A halftone whose dots are clipped flat has no modulation left to find, so no
+        // statistic downstream can recover it -- the fix has to be here.
+        //
+        // Same lesson as the contone, one stage earlier: a level stretch is the only step in the
+        // grade that destroys information, and neither the contone nor the detector has any use for
+        // contrast. GCR stays off for this variant too (FINDINGS.md 2).
+        Levels { c: (0.0, 100.0), m: (0.0, 100.0), y: (0.0, 100.0), k: (0.0, 100.0), k_from_gcr: false }
     }
 }
 
