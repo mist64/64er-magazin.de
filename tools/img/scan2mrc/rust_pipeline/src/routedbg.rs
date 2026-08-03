@@ -48,12 +48,18 @@ const OUTLINE_PX: usize = 5;
 /// Saturated yellow -- the one hue that is not otherwise on this paper in quantity.
 const OUTLINE_RGB: [f32; 3] = [1.0, 0.85, 0.0];
 
-/// The black-extension PREVIEW, in a second colour so it can never be mistaken for what was
-/// actually routed. Yellow is the screened region as it will be rendered; this azure is what
-/// extending that region into adjacent solid black WOULD claim, and is drawn for judgement only --
-/// see route::BLACK_EXTEND_BLOCKS. Chosen bright and cold because it is drawn mostly on top of
-/// solid black, where a warm colour disappears.
-const BLACK_RGB: [f32; 3] = [0.10, 0.80, 1.0];
+/// The black-extension PREVIEW, in colours that can never be mistaken for what was actually routed.
+/// Yellow is the screened region as it will be rendered. These two are the per-object enclosure
+/// test's verdict on the solid black beside it -- see route::BLACK_ENCLOSURE -- and are drawn for
+/// judgement only.
+///
+/// Both verdicts are drawn, not just the accepted one. A criterion that only shows what it took
+/// cannot be judged: the question is always whether it refused the right things, and on this paper
+/// the things it must refuse -- rules, banners, reversed panels -- sit right against the pictures it
+/// must accept. Green takes, red refuses; both are bright and cold or bright and warm against solid
+/// black, where a mid-tone would vanish.
+const BLACK_KEEP_RGB: [f32; 3] = [0.10, 1.0, 0.35];
+const BLACK_DROP_RGB: [f32; 3] = [1.0, 0.15, 0.15];
 
 /// How far the page is lifted toward white before the outlines go on. Enough that a saturated
 /// outline reads against a dark photograph, little enough that the page is still the page.
@@ -145,16 +151,17 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
             }
         }
     }
-    // the black-extension preview, outlined the same way in its own colour. Drawn after the yellow
-    // so that where the two coincide the preview is what shows -- the question being asked is what
-    // the extension adds, and a boundary it shares with the region is not an addition.
-    {
+    // the black-extension preview, outlined the same way in its own colours. Drawn after the yellow
+    // so that where they coincide the preview is what shows -- the question being asked is what the
+    // extension adds, and a boundary it shares with the region is not an addition. Refused objects
+    // are drawn first so that an accepted one abutting a refused one still reads as accepted.
+    for (mask, colour) in [(&r.st_black_drop, BLACK_DROP_RGB), (&r.st_black, BLACK_KEEP_RGB)] {
         let cell = (sdiv * SHRINK).max(1);
         let half_blk = screen::STEP / 2;
         let mut bp = vec![false; w * h];
         for by in 0..r.ny {
             for bx in 0..r.nx {
-                if !r.st_black[by * r.nx + bx] {
+                if !mask[by * r.nx + bx] {
                     continue;
                 }
                 let (cy, cx) = screen::centre_of(by, bx);
@@ -188,9 +195,9 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
                         let (yy, xx) = (y as i64 + dy, x as i64 + dx);
                         if yy >= 0 && xx >= 0 && (yy as usize) < h && (xx as usize) < w {
                             let i = (yy as usize * w + xx as usize) * 3;
-                            px[i] = (BLACK_RGB[0] * 255.0) as u8;
-                            px[i + 1] = (BLACK_RGB[1] * 255.0) as u8;
-                            px[i + 2] = (BLACK_RGB[2] * 255.0) as u8;
+                            px[i] = (colour[0] * 255.0) as u8;
+                            px[i + 1] = (colour[1] * 255.0) as u8;
+                            px[i + 2] = (colour[2] * 255.0) as u8;
                         }
                     }
                 }
