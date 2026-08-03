@@ -227,12 +227,45 @@ pub const ABSORB_BLOCKS: usize = 0;
 /// into the contone region is a real question, and the debug PNG has no way to show what the answer
 /// would cost. This mask answers it: it is exactly what an extension would claim.
 ///
-/// It walks the same bounded geodesic as ABSORB above, from the screened tiles outward, but only
-/// through blocks whose STRONGEST ink is K. That restriction is the point. Absorption as written
-/// follows any near-solid ink, which is how it crossed p073's solid red banner and merged it into a
-/// photograph; keyed on black it cannot do that. Blocks already covered are excluded, so what is
-/// drawn is the addition and nothing else.
-pub const BLACK_EXTEND_BLOCKS: usize = 8;
+/// It is asked PER OBJECT, which is the whole point. Absorption as written walks a bounded geodesic
+/// through any near-solid ink, and a leash is a crude proxy for the question actually being asked:
+/// a distance says nothing about whether the black BELONGS to the picture. Two facts settle that,
+/// and neither is a distance:
+///
+///   * a lobe of a picture -- a shadow, a dark panel within it -- is RINGED by the picture. Nearly
+///     all of its own boundary lies against screened tiles.
+///   * a rule, a banner, a reversed panel or a heading merely BRUSHES the picture in passing. Most
+///     of its boundary lies against paper or type, however close it comes.
+///
+/// So: take each connected component of solid black not already routed, measure the fraction of its
+/// own boundary that abuts the region, and keep it only above BLACK_ENCLOSURE. This is the lesson
+/// the fill step already learned the expensive way -- per object, never globally. A global rule
+/// merged three of p073's pictures into one region; a leash crossed p073's solid red banner into a
+/// photograph. Enclosure answers both without a distance in it anywhere.
+///
+/// Keyed on K as well: absorption followed any ink, which is how the red banner captured it.
+///
+/// NOT A FITTED NUMBER -- there is a real valley. Measured over 14 pages, chosen as the highest K
+/// stencil among pages carrying photographs, every solid-black object that touches a region:
+///
+///     enclosure    objects   blocks
+///     0.00-0.05          5    10395     reversed ad panels (p057 x2: 4373 + 2164, both 0.00)
+///     0.05-0.30         15     4622
+///     0.30-0.50          2      777     p123's NOVAGEN banner 0.41, p087 0.37
+///     0.50-0.70          3    18166     p069's photograph 0.65, p116 0.67 x2
+///     0.70-1.00        126     7615
+///
+/// NOTHING lies between 0.41 and 0.65 and this threshold sits in the middle of that gap. The two
+/// objects just below it are the case this test exists for: p123's is a solid black banner with
+/// knockout type abutting the Mercenary photograph -- p073's red banner exactly, in black -- and it
+/// is refused. The objects just above are photographs' own black. p057's two reversed ad panels,
+/// 6537 blocks of solid black with white type in them, score 0.00: absorbing those would have
+/// turned crisp knockout type into blurred contone.
+///
+/// The object must be labelled WHOLE, covered part included -- see below. Labelling only the
+/// unrouted black scored parts of one shape differently and split p166's drop-shadow into accepted
+/// and refused pieces.
+pub const BLACK_ENCLOSURE: f32 = 0.5;
 pub const BLACK_EXTEND_MEAN: f32 = 150.0;
 
 /// A contone pixel counts as part of the screen when at least this fraction of its footprint is
@@ -320,8 +353,13 @@ pub struct Routing {
     pub st_fill: Vec<bool>,
     pub st_rim: Vec<bool>,
     /// preview of what extending the region into adjacent solid black would claim; drawn in the
-    /// debug PNG, never routed. See BLACK_EXTEND_BLOCKS.
+    /// debug PNG, never routed. See BLACK_ENCLOSURE. `st_black` is what the enclosure test ACCEPTS,
+    /// `st_black_drop` the solid-black objects that touch the region and are refused -- drawn too,
+    /// because a criterion is only judgeable beside what it turned down.
     pub st_black: Vec<bool>,
+    pub st_black_drop: Vec<bool>,
+    /// (blocks, enclosure, kept) per candidate object, largest first.
+    pub black_objects: Vec<(u32, f32, bool)>,
     /// per block: is this block's dot area locally flat. Kept for inspection and for any future
     /// split of a mixed region -- a photograph abutting a tint is one connected screened area, and
     /// this is the only signal that says where one ends and the other begins.
@@ -868,21 +906,81 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
         st_rim = (0..ny * nx).map(|i| label[i] != 0 && snap[i] == 0).collect::<Vec<bool>>();
     }
 
-    // PREVIEW of the black extension. Computed from the FINISHED region, so what it holds is the
-    // addition and nothing that is already routed. See BLACK_EXTEND_BLOCKS. Nothing below reads it.
-    let st_black = {
+    // PREVIEW of the black extension, PER OBJECT. Computed from the FINISHED region, so what it
+    // holds is the addition and nothing that is already routed. Nothing below reads it.
+    // See BLACK_ENCLOSURE.
+    let (st_black, st_black_drop, black_objects) = {
         let covered: Vec<bool> = (0..ny * nx).map(|i| label[i] != 0).collect();
-        let mask: Vec<bool> = (0..ny * nx).map(|i| ksolid[i] || covered[i]).collect();
-        let mut reach = covered.clone();
-        for _ in 0..BLACK_EXTEND_BLOCKS {
-            let d = ndimage::binary_dilation(&reach, nx, ny, 1);
-            let next: Vec<bool> = (0..ny * nx).map(|i| d[i] && mask[i]).collect();
-            if next == reach {
-                break;
+        // THE OBJECT IS THE WHOLE BLACK SHAPE, covered part included. Labelling only the
+        // not-yet-routed black instead splits one shape wherever the region happens to cut across
+        // it, and then asks each fragment a question only the whole shape can answer: on p166 the
+        // wordmark's single drop-shadow arrived as several components and was accepted in one place
+        // and refused in another, which is the p022 instability again -- identical content, different
+        // verdicts. Enclosure is a property of an object, so the object has to be whole first.
+        let (blab, nobj) = ndimage::label(&ksolid, nx, ny);
+
+        // For each solid-black object, how much of its OWN boundary lies against the screened
+        // region. A lobe of a picture is ringed by the picture; a rule or a banner merely brushes
+        // it in passing. Contacts are counted per neighbouring block, so the measure is contact
+        // LENGTH -- a long object touching over a short stretch scores low however big it is.
+        // Off-page neighbours count as not-region: the sheet edge does not enclose anything.
+        let mut touch_region = vec![0u32; nobj + 1];
+        let mut touch_total = vec![0u32; nobj + 1];
+        let mut size = vec![0u32; nobj + 1];
+        for by in 0..ny {
+            for bx in 0..nx {
+                let i = by * nx + bx;
+                let l = blab[i] as usize;
+                if l == 0 {
+                    continue;
+                }
+                size[l] += 1;
+                for (dy, dx) in [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)] {
+                    let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                    if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                        touch_total[l] += 1;
+                        continue;
+                    }
+                    let j = y2 as usize * nx + x2 as usize;
+                    if blab[j] as usize == l {
+                        continue; // interior of the same object, not its boundary
+                    }
+                    touch_total[l] += 1;
+                    if covered[j] {
+                        touch_region[l] += 1;
+                    }
+                }
+                if covered[i] {
+                    // black that the region already holds is boundary against the region by
+                    // definition -- it IS in the picture. Counting it keeps a shape that runs
+                    // half inside a photograph from reading as barely enclosed.
+                    touch_region[l] += 1;
+                    touch_total[l] += 1;
+                }
             }
-            reach = next;
         }
-        (0..ny * nx).map(|i| reach[i] && !covered[i]).collect::<Vec<bool>>()
+
+        let mut keep = vec![false; nobj + 1];
+        let mut objects: Vec<(u32, f32, bool)> = Vec::new();
+        for l in 1..=nobj {
+            if touch_region[l] == 0 {
+                continue; // black that never meets a screen is not a candidate at all
+            }
+            let enc = touch_region[l] as f32 / touch_total[l].max(1) as f32;
+            keep[l] = enc >= BLACK_ENCLOSURE;
+            objects.push((size[l], enc, keep[l]));
+        }
+        objects.sort_by(|a, b| b.0.cmp(&a.0));
+
+        let kept: Vec<bool> =
+            (0..ny * nx).map(|i| !covered[i] && keep[blab[i] as usize]).collect();
+        let dropped: Vec<bool> = (0..ny * nx)
+            .map(|i| {
+                let l = blab[i] as usize;
+                !covered[i] && l != 0 && !keep[l] && touch_region[l] > 0
+            })
+            .collect();
+        (kept, dropped, objects)
     };
 
     // ---- 4. NOW ask each complete chunk what it is ---------------------------------------------
@@ -1020,7 +1118,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     let n_measured = measured.iter().filter(|&&b| b).count();
     Routing {
         ny, nx, n_fired, n_measured,
-        st_screen, st_absorb, st_fill, st_rim, st_black,
+        st_screen, st_absorb, st_fill, st_rim, st_black, st_black_drop, black_objects,
         fired: fired_mask, label, pix, uniform, measured_blk: measured, bmean, nvals, areas, stencil, sw, sh,
     }
 }
@@ -1061,13 +1159,14 @@ pub fn summarise(page: &str, r: &Routing) -> String {
     let cov = r.label.iter().filter(|&&l| l != 0).count();
     format!(
         "p{} blocks {} fired / {} measured | steps screen {} ({:.0}%) +absorb {} +fill {} +rim {} \
-         = covered {} ({:.0}%) | black-preview {} | areas: {} colour-photo, {} grey-photo, {} flat \
+         = covered {} ({:.0}%) | black keep {} drop {} | areas: {} colour-photo, {} grey-photo, {} flat \
          | stencil {}",
         page,
         r.n_fired,
         r.n_measured,
         sc, pc(sc), ab, fi, ri, cov, pc(cov),
         r.st_black.iter().filter(|&&b| b).count(),
+        r.st_black_drop.iter().filter(|&&b| b).count(),
         c1,
         c2,
         c3,
