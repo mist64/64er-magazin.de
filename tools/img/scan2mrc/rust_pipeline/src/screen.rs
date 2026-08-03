@@ -69,8 +69,24 @@ pub const STEP: usize = 128;
 /// 1/f energy leaking into the band's low corner, not of a structure. A subharmonic-lock explanation
 /// was tested and disproved: only 5.4% of them had a cross-ink peak at 2x/2.5x/3x their own ruling.
 /// 75 sits inside that empty gap and removes 81% of the junk at zero cost in real content.
-pub const LO_LPI: f64 = 75.0;
-pub const HI_LPI: f64 = 220.0;
+pub const LO_LPI: f64 = 55.0;
+pub const HI_LPI: f64 = 240.0;
+
+/// ...and the range a peak must land in to COUNT as a screen. Deliberately narrower than the band
+/// analysed above, and the distinction matters.
+///
+/// A spectrum whose energy simply rises toward low frequency -- which is what unscreened paper and
+/// soft page background look like -- has no interior maximum, so its peak lands wherever the band
+/// happens to be cut off. Measured on p073's page background below the C64: peaks at 81-83 lpi with
+/// the band starting at 75, firing on ink of M 34 / Y 26, i.e. nothing. A peak AT a boundary is an
+/// artifact of the boundary, not a measurement.
+///
+/// So the band is analysed wider than the content of interest, giving that low-frequency rise
+/// somewhere to sit, and only peaks in the interior are accepted. The gap is real and measured:
+/// FINDINGS.md 1 records the ruling histogram of genuine content as EMPTY between 55 and 95 lpi
+/// (7 blocks of 102,697), with this issue's coarsest real screens at 100-105 lpi on p092.
+pub const ACCEPT_LO_LPI: f32 = 95.0;
+pub const ACCEPT_HI_LPI: f32 = 225.0;
 
 /// Half-width of the rejected wedge around the horizontal and vertical axes, degrees.
 ///
@@ -569,6 +585,11 @@ pub fn is_follower(f: &ScreenField, ci: usize, i: usize) -> bool {
 pub fn fired(f: &ScreenField, ci: usize, i: usize) -> bool {
     let a = &f.ink[ci];
     if is_follower(f, ci, i) {
+        return false;
+    }
+    // A peak outside the accepted ruling range is not a screen, however concentrated it looks --
+    // see ACCEPT_LO_LPI.
+    if a.lpi[i] < ACCEPT_LO_LPI || a.lpi[i] > ACCEPT_HI_LPI {
         return false;
     }
     let local = a.conc[i] > CONC && a.prom[i] > FIRE;
