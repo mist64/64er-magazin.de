@@ -42,8 +42,11 @@ fn screen_block(r: &Routing, cy: usize, cx: usize) -> usize {
 /// line rather than a smear, coarse enough for a whole page to be looked at at once.
 const SHRINK: usize = 2;
 
-/// Thickness of an area boundary, in output pixels.
-const AREA_LINE: usize = 2;
+/// Thickness of the screening outline, in output pixels. 5 at 300 dpi is ~0.4 mm: heavy enough to
+/// read against a photograph without hiding what it encloses.
+const OUTLINE_PX: usize = 5;
+/// Saturated yellow -- the one hue that is not otherwise on this paper in quantity.
+const OUTLINE_RGB: [f32; 3] = [1.0, 0.85, 0.0];
 
 /// How far the page is lifted toward white before the outlines go on. Enough that a saturated
 /// outline reads against a dark photograph, little enough that the page is still the page.
@@ -57,22 +60,20 @@ const COL_EDGE: [f32; 3] = [0.05, 0.05, 0.05]; // area outline
 
 // ================================================================================================
 
+/// ONE LINE ROUND THE SCREENED CONTENT, and nothing else.
+///
+/// The page as scanned, with a thick yellow outline where the screened regions end. No class
+/// colours, no stencil outlines, no washes -- the single question this answers is "did we find the
+/// screening, and does the boundary sit where the screening actually stops".
+///
+/// The boundary is the PIXEL-refined one (see `Routing::pix`), so it follows the true contour at
+/// 600 dpi rather than staircasing round the 1.35 mm block grid.
 pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
     let (w, h) = (r.sw / SHRINK, r.sh / SHRINK);
     let mut px = vec![255u8; w * h * 3];
     let sdiv = (disp.w / r.sw).max(1);
-    let put = |px: &mut Vec<u8>, x: usize, y: usize, c: [f32; 3]| {
-        let i = (y * w + x) * 3;
-        px[i] = (c[0] * 255.0).clamp(0.0, 255.0) as u8;
-        px[i + 1] = (c[1] * 255.0).clamp(0.0, 255.0) as u8;
-        px[i + 2] = (c[2] * 255.0).clamp(0.0, 255.0) as u8;
-    };
 
-    // ---- the page itself, in colour, lifted ------------------------------------------------
-    // OUTLINES, NOT WASHES. A wash states the verdict and hides the evidence underneath it: an
-    // area filled with green looks the same whether it holds a photograph or a paragraph. The
-    // pixels that decide whether a boundary is right are the ones either side of it, and a wash
-    // recolours exactly those. So the page stays legible and every decision is drawn as a line.
+    // the page, as it is -- no lift, no wash. It is the evidence.
     for y in 0..h {
         for x in 0..w {
             let (sy, sx) = (y * SHRINK * sdiv, x * SHRINK * sdiv);
@@ -83,87 +84,55 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
                 disp.y[si] as f32,
                 disp.k[si] as f32,
             );
-            let f = |v: f32| {
-                let t = (1.0 - v / 255.0) * (1.0 - k / 255.0);
-                t + (1.0 - t) * LIFT
-            };
-            put(&mut px, x, y, [f(c), f(m), f(yv)]);
+            let f = |v: f32| ((1.0 - v / 255.0) * (1.0 - k / 255.0) * 255.0).clamp(0.0, 255.0) as u8;
+            let i = (y * w + x) * 3;
+            px[i] = f(c);
+            px[i + 1] = f(m);
+            px[i + 2] = f(yv);
         }
     }
 
-    // ---- stencil boundaries, per ink --------------------------------------------------------
-    // Drawn first so the area outlines sit on top of them at a shared edge.
-    for ci in 0..4 {
-        let m = &r.stencil[ci];
-        for sy in 0..r.sh {
-            for sx in 0..r.sw {
-                if !m[sy * r.sw + sx] {
-                    continue;
-                }
-                let edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
-                    let (y2, x2) = (sy as i64 + dy, sx as i64 + dx);
-                    y2 < 0
-                        || x2 < 0
-                        || y2 >= r.sh as i64
-                        || x2 >= r.sw as i64
-                        || !m[y2 as usize * r.sw + x2 as usize]
-                });
-                if edge {
-                    let (y, x) = (sy / SHRINK, sx / SHRINK);
-                    if y < h && x < w {
-                        put(&mut px, x, y, OUT_RGB[ci]);
-                    }
-                }
-            }
-        }
-    }
-
-    // ---- area boundaries, by class, at PIXEL scale ------------------------------------------
-    // Traced on the refined per-pixel membership, not the block grid, so the outline follows where
-    // the screen actually stops rather than the nearest 1.35 mm tile edge.
-    let cls_at = |cy: usize, cx: usize| -> Option<Class> {
-        if !r.pix[cy * r.sw + cx] {
-            return None;
-        }
-        let by = (cy * (r.sh / r.ny).max(1)).min(r.sh - 1);
-        let _ = by;
-        let bi = screen_block(r, cy, cx);
-        let l = r.label[bi];
-        if l == 0 {
-            None
-        } else {
-            Some(r.areas[(l - 1) as usize].class)
-        }
-    };
+    // the boundary of the screened area, thick
+    let inside = |cy: usize, cx: usize| -> bool { r.pix[cy * r.sw + cx] };
+    let mut edge = vec![false; w * h];
     for y in 0..h {
         for x in 0..w {
             let (cy, cx) = (y * SHRINK, x * SHRINK);
-            if cy >= r.sh || cx >= r.sw {
+            if cy >= r.sh || cx >= r.sw || !inside(cy, cx) {
                 continue;
             }
-            let here = cls_at(cy, cx);
-            if here.is_none() {
-                continue;
-            }
-            let edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
+            let is_edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
                 let (y2, x2) = (cy as i64 + dy * SHRINK as i64, cx as i64 + dx * SHRINK as i64);
-                if y2 < 0 || x2 < 0 || y2 >= r.sh as i64 || x2 >= r.sw as i64 {
-                    return true;
-                }
-                cls_at(y2 as usize, x2 as usize) != here
+                y2 < 0
+                    || x2 < 0
+                    || y2 >= r.sh as i64
+                    || x2 >= r.sw as i64
+                    || !inside(y2 as usize, x2 as usize)
             });
-            if !edge {
+            if is_edge {
+                edge[y * w + x] = true;
+            }
+        }
+    }
+    for y in 0..h {
+        for x in 0..w {
+            if !edge[y * w + x] {
                 continue;
             }
-            let col = match here.unwrap() {
-                Class::ColourPhoto => COL_COLOUR,
-                Class::GreyPhoto => COL_GREY,
-                Class::Flat => COL_FLAT,
-            };
-            for dy in 0..AREA_LINE {
-                for dx in 0..AREA_LINE {
-                    if y + dy < h && x + dx < w {
-                        put(&mut px, x + dx, y + dy, col);
+            // CENTRED on the boundary, not hung off it. Painting the brush at (x+dx, y+dy) for
+            // dx,dy in 0..N offsets the whole line N px right and down and never left or up, so it
+            // sits OUTSIDE the region on two sides and inside on none -- 0.42 mm of apparent bleed
+            // at 300 dpi, which reads exactly like the detector over-reaching.
+            let half = (OUTLINE_PX / 2) as i64;
+            for dy in -half..=half {
+                for dx in -half..=half {
+                    let (yy, xx) = (y as i64 + dy, x as i64 + dx);
+                    if yy >= 0 && xx >= 0 && (yy as usize) < h && (xx as usize) < w {
+                        let (yy, xx) = (yy as usize, xx as usize);
+                        let i = (yy * w + xx) * 3;
+                        px[i] = (OUTLINE_RGB[0] * 255.0) as u8;
+                        px[i + 1] = (OUTLINE_RGB[1] * 255.0) as u8;
+                        px[i + 2] = (OUTLINE_RGB[2] * 255.0) as u8;
                     }
                 }
             }
