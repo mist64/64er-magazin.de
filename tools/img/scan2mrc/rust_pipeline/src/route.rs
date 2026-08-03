@@ -655,16 +655,30 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
                 if snap[i] != 0 {
                     continue;
                 }
-                for (dy, dx) in [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)] {
-                    let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
-                    if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
-                        continue;
+                // EIGHT neighbours, not four. A picture whose edge runs at an angle to the block
+                // grid -- which is most of them; p073's C64 sits at about 30 degrees -- has a
+                // STAIRCASE boundary, and a 4-neighbour extension covers the flat of every step
+                // while leaving the outer CORNER of it bare. The result is a row of one-tile holes
+                // along every sloped edge, which is what "the C64 is missing a corner" looks like.
+                let mut found = 0u32;
+                'nb: for dy in -1i64..=1 {
+                    for dx in -1i64..=1 {
+                        if dy == 0 && dx == 0 {
+                            continue;
+                        }
+                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                            continue;
+                        }
+                        let j = y2 as usize * nx + x2 as usize;
+                        if snap[j] != 0 {
+                            found = snap[j];
+                            break 'nb;
+                        }
                     }
-                    let j = y2 as usize * nx + x2 as usize;
-                    if snap[j] != 0 {
-                        label[i] = snap[j];
-                        break;
-                    }
+                }
+                if found != 0 {
+                    label[i] = found;
                 }
             }
         }
