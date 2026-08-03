@@ -219,6 +219,22 @@ pub const ABSORB_MEAN: f32 = 150.0;
 /// because a picture looks short.
 pub const ABSORB_BLOCKS: usize = 0;
 
+/// PREVIEW ONLY -- this mask is drawn in the debug PNG and never joins a region.
+///
+/// A halftone carries no dots in solid ink, so where a screened graphic runs into a solid black
+/// passage -- p166's wordmark has a gradient fill behind a solid black 3-D extrusion -- the black
+/// does not fire, is not enclosed, and is left to the bilevel stencil. Whether it SHOULD be pulled
+/// into the contone region is a real question, and the debug PNG has no way to show what the answer
+/// would cost. This mask answers it: it is exactly what an extension would claim.
+///
+/// It walks the same bounded geodesic as ABSORB above, from the screened tiles outward, but only
+/// through blocks whose STRONGEST ink is K. That restriction is the point. Absorption as written
+/// follows any near-solid ink, which is how it crossed p073's solid red banner and merged it into a
+/// photograph; keyed on black it cannot do that. Blocks already covered are excluded, so what is
+/// drawn is the addition and nothing else.
+pub const BLACK_EXTEND_BLOCKS: usize = 8;
+pub const BLACK_EXTEND_MEAN: f32 = 150.0;
+
 /// A contone pixel counts as part of the screen when at least this fraction of its footprint is
 /// coherent. Half: the pixel is more screen than not. Bare paper has no coherence and drops out
 /// here without needing a separate ink test.
@@ -303,6 +319,9 @@ pub struct Routing {
     pub st_absorb: Vec<bool>,
     pub st_fill: Vec<bool>,
     pub st_rim: Vec<bool>,
+    /// preview of what extending the region into adjacent solid black would claim; drawn in the
+    /// debug PNG, never routed. See BLACK_EXTEND_BLOCKS.
+    pub st_black: Vec<bool>,
     /// per block: is this block's dot area locally flat. Kept for inspection and for any future
     /// split of a mixed region -- a photograph abutting a tint is one connected screened area, and
     /// this is the only signal that says where one ends and the other begins.
@@ -700,20 +719,28 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     // it runs, and paper stops it dead. Mean ink, not a coverage fraction -- a solid passage inks
     // the whole block and means ~250, a block of body type is 30% covered and means ~76.
     let st_absorb;
+    let mut ksolid = vec![false; ny * nx];
     {
         let mut inked = vec![false; ny * nx];
         let mut sum = vec![0.0f32; ny * nx];
+        let mut ksum = vec![0.0f32; ny * nx];
         let mut cnt = vec![0u32; ny * nx];
         for ty in 0..tone.h {
             for tx in 0..tone.w {
                 let bi = block_of_source(f, ty * ty_per, tx * tx_per);
                 let strongest = (0..4).map(|ci| tone.ink[ci][ty * tone.w + tx]).max().unwrap_or(0);
                 sum[bi] += strongest as f32;
+                ksum[bi] += tone.ink[3][ty * tone.w + tx] as f32;
                 cnt[bi] += 1;
             }
         }
         for bi in 0..ny * nx {
             inked[bi] = cnt[bi] > 0 && sum[bi] / cnt[bi] as f32 >= ABSORB_MEAN;
+        }
+        for bi in 0..ny * nx {
+            ksolid[bi] = cnt[bi] > 0
+                && ksum[bi] / cnt[bi] as f32 >= BLACK_EXTEND_MEAN
+                && ksum[bi] >= sum[bi] * 0.9;
         }
         // BOUNDED, not unlimited. Absorption exists to pick up a picture's OWN solid passages -- a
         // shadow, a dark panel -- which lie within a centimetre or so of the screen that proves the
@@ -840,6 +867,23 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
         }
         st_rim = (0..ny * nx).map(|i| label[i] != 0 && snap[i] == 0).collect::<Vec<bool>>();
     }
+
+    // PREVIEW of the black extension. Computed from the FINISHED region, so what it holds is the
+    // addition and nothing that is already routed. See BLACK_EXTEND_BLOCKS. Nothing below reads it.
+    let st_black = {
+        let covered: Vec<bool> = (0..ny * nx).map(|i| label[i] != 0).collect();
+        let mask: Vec<bool> = (0..ny * nx).map(|i| ksolid[i] || covered[i]).collect();
+        let mut reach = covered.clone();
+        for _ in 0..BLACK_EXTEND_BLOCKS {
+            let d = ndimage::binary_dilation(&reach, nx, ny, 1);
+            let next: Vec<bool> = (0..ny * nx).map(|i| d[i] && mask[i]).collect();
+            if next == reach {
+                break;
+            }
+            reach = next;
+        }
+        (0..ny * nx).map(|i| reach[i] && !covered[i]).collect::<Vec<bool>>()
+    };
 
     // ---- 4. NOW ask each complete chunk what it is ---------------------------------------------
     //
@@ -976,7 +1020,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     let n_measured = measured.iter().filter(|&&b| b).count();
     Routing {
         ny, nx, n_fired, n_measured,
-        st_screen, st_absorb, st_fill, st_rim,
+        st_screen, st_absorb, st_fill, st_rim, st_black,
         fired: fired_mask, label, pix, uniform, measured_blk: measured, bmean, nvals, areas, stencil, sw, sh,
     }
 }
@@ -1017,11 +1061,13 @@ pub fn summarise(page: &str, r: &Routing) -> String {
     let cov = r.label.iter().filter(|&&l| l != 0).count();
     format!(
         "p{} blocks {} fired / {} measured | steps screen {} ({:.0}%) +absorb {} +fill {} +rim {} \
-         = covered {} ({:.0}%) | areas: {} colour-photo, {} grey-photo, {} flat | stencil {}",
+         = covered {} ({:.0}%) | black-preview {} | areas: {} colour-photo, {} grey-photo, {} flat \
+         | stencil {}",
         page,
         r.n_fired,
         r.n_measured,
         sc, pc(sc), ab, fi, ri, cov, pc(cov),
+        r.st_black.iter().filter(|&&b| b).count(),
         c1,
         c2,
         c3,

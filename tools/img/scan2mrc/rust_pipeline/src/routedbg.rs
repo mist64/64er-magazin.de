@@ -48,6 +48,13 @@ const OUTLINE_PX: usize = 5;
 /// Saturated yellow -- the one hue that is not otherwise on this paper in quantity.
 const OUTLINE_RGB: [f32; 3] = [1.0, 0.85, 0.0];
 
+/// The black-extension PREVIEW, in a second colour so it can never be mistaken for what was
+/// actually routed. Yellow is the screened region as it will be rendered; this azure is what
+/// extending that region into adjacent solid black WOULD claim, and is drawn for judgement only --
+/// see route::BLACK_EXTEND_BLOCKS. Chosen bright and cold because it is drawn mostly on top of
+/// solid black, where a warm colour disappears.
+const BLACK_RGB: [f32; 3] = [0.10, 0.80, 1.0];
+
 /// How far the page is lifted toward white before the outlines go on. Enough that a saturated
 /// outline reads against a dark photograph, little enough that the page is still the page.
 const LIFT: f32 = 0.35;
@@ -133,6 +140,58 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
                         px[i] = (OUTLINE_RGB[0] * 255.0) as u8;
                         px[i + 1] = (OUTLINE_RGB[1] * 255.0) as u8;
                         px[i + 2] = (OUTLINE_RGB[2] * 255.0) as u8;
+                    }
+                }
+            }
+        }
+    }
+    // the black-extension preview, outlined the same way in its own colour. Drawn after the yellow
+    // so that where the two coincide the preview is what shows -- the question being asked is what
+    // the extension adds, and a boundary it shares with the region is not an addition.
+    {
+        let cell = (sdiv * SHRINK).max(1);
+        let half_blk = screen::STEP / 2;
+        let mut bp = vec![false; w * h];
+        for by in 0..r.ny {
+            for bx in 0..r.nx {
+                if !r.st_black[by * r.nx + bx] {
+                    continue;
+                }
+                let (cy, cx) = screen::centre_of(by, bx);
+                let y0 = cy.saturating_sub(half_blk) / cell;
+                let x0 = cx.saturating_sub(half_blk) / cell;
+                let y1 = ((cy + half_blk) / cell).min(h);
+                let x1 = ((cx + half_blk) / cell).min(w);
+                for y in y0..y1 {
+                    for x in x0..x1 {
+                        bp[y * w + x] = true;
+                    }
+                }
+            }
+        }
+        let half = (OUTLINE_PX / 2) as i64;
+        for y in 0..h {
+            for x in 0..w {
+                if !bp[y * w + x] {
+                    continue;
+                }
+                let is_edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
+                    let (y2, x2) = (y as i64 + dy, x as i64 + dx);
+                    y2 < 0 || x2 < 0 || y2 >= h as i64 || x2 >= w as i64
+                        || !bp[y2 as usize * w + x2 as usize]
+                });
+                if !is_edge {
+                    continue;
+                }
+                for dy in -half..=half {
+                    for dx in -half..=half {
+                        let (yy, xx) = (y as i64 + dy, x as i64 + dx);
+                        if yy >= 0 && xx >= 0 && (yy as usize) < h && (xx as usize) < w {
+                            let i = (yy as usize * w + xx as usize) * 3;
+                            px[i] = (BLACK_RGB[0] * 255.0) as u8;
+                            px[i + 1] = (BLACK_RGB[1] * 255.0) as u8;
+                            px[i + 2] = (BLACK_RGB[2] * 255.0) as u8;
+                        }
                     }
                 }
             }
