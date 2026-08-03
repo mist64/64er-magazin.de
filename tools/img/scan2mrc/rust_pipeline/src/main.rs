@@ -216,16 +216,24 @@ fn main() -> Result<()> {
                     u[i] = if !r.measured_blk[i] { -1.0 } else if r.uniform[i] { 1.0 } else { 0.0 };
                 }
                 npy::write_f32(&format!("{}_uniform.npy", out_base), &u, &[r.ny, r.nx])?;
+                let n = r.ny * r.nx;
+                let mut bm = vec![0.0f32; 5 * n];
+                for i in 0..n {
+                    for ci in 0..4 { bm[ci * n + i] = r.bmean[i][ci]; }
+                    bm[4 * n + i] = r.nvals[i] as f32;
+                }
+                npy::write_f32(&format!("{}_bmean.npy", out_base), &bm, &[5, r.ny, r.nx])?;
             }
             let stem = std::path::Path::new(&display_tiff)
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
             println!("{}", route::summarise(&stem, &r));
             for a in &r.areas {
                 println!(
-                    "   area {:3} {:12} blocks {:5} lpi {:5.0} mean C{:.0} M{:.0} Y{:.0} K{:.0} std {:.1}",
-                    a.id, a.class.name(), a.blocks, a.lpi,
+                    "   area {:3} {:12} blk {:5} meas {:5} lpi {:5.0} mean C{:.0} M{:.0} Y{:.0} K{:.0} within {:.1} across {:.1}",
+                    a.id, a.class.name(), a.blocks, a.n_meas, a.lpi,
                     a.mean[0], a.mean[1], a.mean[2], a.mean[3],
-                    a.std.iter().cloned().fold(0.0f32, f32::max)
+                    a.std.iter().cloned().fold(0.0f32, f32::max),
+                    a.across
                 );
             }
             eprintln!("route -> {} ({:.1}s)", png, t.elapsed().as_secs_f64());
