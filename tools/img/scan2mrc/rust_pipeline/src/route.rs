@@ -266,6 +266,11 @@ pub struct Routing {
     pub st_absorb: Vec<bool>,
     pub st_fill: Vec<bool>,
     pub st_rim: Vec<bool>,
+    /// per block: is this block's dot area locally flat. Kept for inspection and for any future
+    /// split of a mixed region -- a photograph abutting a tint is one connected screened area, and
+    /// this is the only signal that says where one ends and the other begins.
+    pub uniform: Vec<bool>,
+    pub measured_blk: Vec<bool>,
     /// PER PIXEL at the stencil grid: is this pixel inside its block's region.
     ///
     /// The block grid is 1.35 mm and a region's boundary quantised to it is both a staircase and a
@@ -367,7 +372,23 @@ pub fn stencils(
             let bi = block_of_source(f, sy, sx);
             // the refined per-pixel membership, not the block's
             let l = if pixmask[i] { label[bi] } else { 0 };
-            // INSIDE A PICTURE, EVERYTHING IS CONTONE. A photograph is drawn entirely by the
+            // INSIDE A PICTURE, EVERYTHING IS CONTONE -- and this is a KNOWN, MEASURED COMPROMISE,
+            // not a rule that is simply right. It costs every mark printed ON a picture: the cover
+            // renders with K stencil 0.0%, so its headlines come from the 150 dpi background, and
+            // about a quarter of the issue has a region covering more than half the page.
+            //
+            // Removing it was tried and is worse. Without it the cover's stencil fills with the
+            // photograph's own high-contrast detail -- the mandrill's eyes, nose ridges and fur
+            // arrive as hard black speckle drawn at 600 dpi over a soft contone image.
+            //
+            // The separators one would reach for do not work, measured on p001:
+            //   * ink level -- the photograph's shadows read K 236-250, exactly as solid as type
+            //   * coherence alone -- a photograph's solid passages carry no dots either, so they are
+            //     as incoherent as a glyph
+            // What is actually needed is "solid ink that IS the picture" vs "solid ink printed ON
+            // it", which is a thin-structure question, and FINDINGS.md 3 is the record of what
+            // happens when that is answered with low-level statistics. Left as it is until there is
+            // a measurement that separates them. A photograph is drawn entirely by the
             // background -- its dots, its solid shadows and its highlights alike -- so nothing in it
             // belongs to the stencil. Without this, every screened passage whose coherence dipped
             // handed its halftone DOTS to the bilevel layer: 288 KB of dots per page on p007, and
@@ -873,7 +894,7 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
     Routing {
         ny, nx, n_fired, n_measured,
         st_screen, st_absorb, st_fill, st_rim,
-        fired: fired_mask, label, pix, areas, stencil, sw, sh,
+        fired: fired_mask, label, pix, uniform, measured_blk: measured, areas, stencil, sw, sh,
     }
 }
 

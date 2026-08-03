@@ -211,6 +211,11 @@ fn main() -> Result<()> {
                     lab[i] = r.label[i] as f32;
                 }
                 npy::write_f32(&format!("{}_label.npy", out_base), &lab, &[r.ny, r.nx])?;
+                let mut u = vec![0.0f32; r.ny * r.nx];
+                for i in 0..r.ny * r.nx {
+                    u[i] = if !r.measured_blk[i] { -1.0 } else if r.uniform[i] { 1.0 } else { 0.0 };
+                }
+                npy::write_f32(&format!("{}_uniform.npy", out_base), &u, &[r.ny, r.nx])?;
             }
             let stem = std::path::Path::new(&display_tiff)
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
