@@ -236,12 +236,6 @@ fn main() -> Result<()> {
                     a.across
                 );
             }
-            for (n, enc, kept) in r.black_objects.iter().take(12) {
-                println!(
-                    "   black obj blk {:5} enclosure {:.2} {}",
-                    n, enc, if *kept { "KEEP" } else { "drop" }
-                );
-            }
             eprintln!("route -> {} ({:.1}s)", png, t.elapsed().as_secs_f64());
         }
         Cmd::Mrc { display_tiff, field_npy, out_pdf } => {

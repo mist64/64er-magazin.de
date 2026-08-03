@@ -353,13 +353,8 @@ pub struct Routing {
     pub st_fill: Vec<bool>,
     pub st_rim: Vec<bool>,
     /// preview of what extending the region into adjacent solid black would claim; drawn in the
-    /// debug PNG, never routed. See BLACK_ENCLOSURE. `st_black` is what the enclosure test ACCEPTS,
-    /// `st_black_drop` the solid-black objects that touch the region and are refused -- drawn too,
-    /// because a criterion is only judgeable beside what it turned down.
+    /// debug PNG, never routed. See BLACK_ENCLOSURE.
     pub st_black: Vec<bool>,
-    pub st_black_drop: Vec<bool>,
-    /// (blocks, enclosure, kept) per candidate object, largest first.
-    pub black_objects: Vec<(u32, f32, bool)>,
     /// per block: is this block's dot area locally flat. Kept for inspection and for any future
     /// split of a mixed region -- a photograph abutting a tint is one connected screened area, and
     /// this is the only signal that says where one ends and the other begins.
@@ -909,7 +904,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     // PREVIEW of the black extension, PER OBJECT. Computed from the FINISHED region, so what it
     // holds is the addition and nothing that is already routed. Nothing below reads it.
     // See BLACK_ENCLOSURE.
-    let (st_black, st_black_drop, black_objects) = {
+    let st_black = {
         let covered: Vec<bool> = (0..ny * nx).map(|i| label[i] != 0).collect();
         // THE OBJECT IS THE WHOLE BLACK SHAPE, covered part included. Labelling only the
         // not-yet-routed black instead splits one shape wherever the region happens to cut across
@@ -961,26 +956,15 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
         }
 
         let mut keep = vec![false; nobj + 1];
-        let mut objects: Vec<(u32, f32, bool)> = Vec::new();
         for l in 1..=nobj {
             if touch_region[l] == 0 {
                 continue; // black that never meets a screen is not a candidate at all
             }
             let enc = touch_region[l] as f32 / touch_total[l].max(1) as f32;
             keep[l] = enc >= BLACK_ENCLOSURE;
-            objects.push((size[l], enc, keep[l]));
         }
-        objects.sort_by(|a, b| b.0.cmp(&a.0));
-
-        let kept: Vec<bool> =
-            (0..ny * nx).map(|i| !covered[i] && keep[blab[i] as usize]).collect();
-        let dropped: Vec<bool> = (0..ny * nx)
-            .map(|i| {
-                let l = blab[i] as usize;
-                !covered[i] && l != 0 && !keep[l] && touch_region[l] > 0
-            })
-            .collect();
-        (kept, dropped, objects)
+        let _ = &size;
+        (0..ny * nx).map(|i| !covered[i] && keep[blab[i] as usize]).collect::<Vec<bool>>()
     };
 
     // ---- 4. NOW ask each complete chunk what it is ---------------------------------------------
@@ -1118,7 +1102,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     let n_measured = measured.iter().filter(|&&b| b).count();
     Routing {
         ny, nx, n_fired, n_measured,
-        st_screen, st_absorb, st_fill, st_rim, st_black, st_black_drop, black_objects,
+        st_screen, st_absorb, st_fill, st_rim, st_black,
         fired: fired_mask, label, pix, uniform, measured_blk: measured, bmean, nvals, areas, stencil, sw, sh,
     }
 }
@@ -1159,14 +1143,13 @@ pub fn summarise(page: &str, r: &Routing) -> String {
     let cov = r.label.iter().filter(|&&l| l != 0).count();
     format!(
         "p{} blocks {} fired / {} measured | steps screen {} ({:.0}%) +absorb {} +fill {} +rim {} \
-         = covered {} ({:.0}%) | black keep {} drop {} | areas: {} colour-photo, {} grey-photo, {} flat \
+         = covered {} ({:.0}%) | black {} | areas: {} colour-photo, {} grey-photo, {} flat \
          | stencil {}",
         page,
         r.n_fired,
         r.n_measured,
         sc, pc(sc), ab, fi, ri, cov, pc(cov),
         r.st_black.iter().filter(|&&b| b).count(),
-        r.st_black_drop.iter().filter(|&&b| b).count(),
         c1,
         c2,
         c3,
