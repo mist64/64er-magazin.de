@@ -86,15 +86,14 @@ pub const MIN_AREA_BLOCKS: usize = 4;
 /// than a raster. Measured over non-stencil pixels only -- type on a tint is drawn by its own layer
 /// and says nothing about whether the tint underneath is flat.
 ///
-/// THIS IS A HALF-INTERQUARTILE RANGE, (p75 - p25) / 2, NOT A STANDARD DEVIATION. A tint bar is ~30
-/// contone pixels tall, so its two transition rows are ~7% of its area -- and a standard deviation
-/// weights that minority by the square of its distance, which put a perfectly flat bar at std 21
-/// against a threshold of 9. Percentiles ignore a small edge minority while still spanning a
-/// photograph's whole tonal range, which is the distinction being measured. Quartiles rather than
-/// deciles because even after masking, a thin bar's transition rows survive as a minority: deciles
-/// put p007's flat bars at 9-15 against this threshold of 9, quartiles put them at 3.0-3.5. The
-/// value was calibrated against the quartile form; note that half-IQR is ~0.53x half-interdecile
-/// for Gaussian-ish data, so this gate is looser than the same number would be on deciles.
+/// THIS IS NOT A STANDARD DEVIATION but the half-width of the densest MODE_FRAC of the block's
+/// values -- see shortest_u8. A tint bar is ~30 contone pixels tall, so its two transition rows are
+/// ~7% of its area, and a standard deviation weights that minority by the square of its distance,
+/// which put a perfectly flat bar at std 21 against a threshold of 9. An interquartile range was the
+/// next attempt and is also wrong, for the reason shortest_u8 gives: a block carrying type holds two
+/// populations, and any range statistic straddles both, so it reports how much type the block has.
+/// Measured on p022's spec table, a three-line row of dense type read 10.0 against this threshold of
+/// 9 while its neighbours -- the identical tint, less text -- read 3.0.
 ///
 /// A per-block variance was considered instead and rejected: a smooth gradient (a sky, a soft
 /// backdrop) is flat WITHIN any one block and would be flattened into a single colour. The spread
@@ -105,10 +104,20 @@ pub const MIN_AREA_BLOCKS: usize = 4;
 /// rather than assumed.
 pub const UNIFORM_STD: f32 = 9.0;
 
-/// The same spread, measured ACROSS an area rather than within a block: half the interdecile range
-/// of the per-block medians. A tint is the same colour from end to end; a photograph that is locally
-/// smooth still travels. Slightly looser than the within-block figure because a legitimate tint can
-/// carry a little press variation across a wide bar.
+/// The same spread, measured ACROSS an area rather than within a block: the densest MODE_FRAC of the
+/// per-block medians. A tint is the same colour from end to end; a photograph that is locally smooth
+/// still travels. Slightly looser than the within-block figure because a legitimate tint can carry a
+/// little press variation across a wide bar.
+///
+/// The number did not move when the estimator was fixed, which is the point -- it was never the
+/// threshold that was wrong. Measured, max over inks, per region:
+///
+///                        tints (p022 x10, p001 x2)   photographs (p001, p002, p073 x2)
+///     half-interdecile         2.5 .. 34.0                  28.0 .. 124.5
+///     densest 70%              1.5 ..  7.0                  17.0 ..  61.0
+///
+/// The two populations overlapped under the old estimator -- a tint at 34 against a photograph at 28
+/// -- so no threshold could have separated them.
 pub const UNIFORM_ACROSS: f32 = 12.0;
 
 /// An area counts as carrying colour when a chromatic ink's mean dot area reaches this, in levels.
@@ -235,6 +244,12 @@ pub const UNIFORM_FILL_ROUNDS: usize = 3;
 /// Majority-filter passes over the uniform/varying field before it is segmented. See step 2c.
 pub const UNIFORM_CLEAN_ROUNDS: usize = 2;
 
+/// Fraction of the sample the "densest interval" estimator must cover. See shortest_u8.
+/// 0.7 and not 0.5: a region may not be called uniform because half of it happens to be, so a
+/// clear majority of the blocks must agree. Measured, the 70% gap between a tint and a
+/// photograph is 7.0 vs 20.0 -- wide enough that the existing threshold needs no refitting.
+pub const MODE_FRAC: f32 = 0.7;
+
 pub const MIN_MEASURE_FRAC: f64 = 0.25;
 pub const MIN_MEASURE_FLOOR: usize = 8;
 
@@ -270,6 +285,11 @@ pub struct Area {
     pub mean: [f32; 4],
     /// and its dot-area spread, (p75-p25)/2 -- the uniform/varying test. See UNIFORM_STD.
     pub std: [f32; 4],
+    /// spread of the per-block medians ACROSS the region, and how many blocks that was measured
+    /// over. Both are in the debug line: a class decision that cannot be read off the numbers
+    /// printed beside it is not auditable.
+    pub across: f32,
+    pub n_meas: usize,
     /// median ruling of whatever fired inside
     pub lpi: f32,
 }
@@ -288,6 +308,10 @@ pub struct Routing {
     /// this is the only signal that says where one ends and the other begins.
     pub uniform: Vec<bool>,
     pub measured_blk: Vec<bool>,
+    /// per-block median dot area per ink, and how many contone pixels that median came from.
+    /// Dumped as data so a class verdict can be audited against the blocks that produced it.
+    pub bmean: Vec<[f32; 4]>,
+    pub nvals: Vec<u32>,
     /// PER PIXEL at the stencil grid: is this pixel inside its block's region.
     ///
     /// The block grid is 1.35 mm and a region's boundary quantised to it is both a staircase and a
@@ -483,6 +507,52 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
         .map(|i| (0..4).any(|ci| screen::fired(f, ci, i)))
         .collect();
 
+/// Half-width of the SHORTEST interval containing `frac` of the sample -- the spread of the
+/// densest part of the distribution rather than of its extremes.
+///
+/// This is the estimator the class test needs, and the reason is physical, not statistical. A tint
+/// exists to carry type; every tint in the magazine has words on it. Type is a SECOND population in
+/// the same pixels: it adds ink (dark type on a light tint) or removes it (knockout type on a dark
+/// bar), so the values are bimodal and the contamination is one-sided -- but which side flips with
+/// the polarity of the type. An interdecile or interquartile range straddles both modes and so
+/// measures how much type the block carries; measured on p022, corr(block median, solid-ink
+/// coverage) = +0.62..+0.88 in all ten bands of one table, and identical tint rows read 4.5 to 34.
+/// The densest interval sits on whichever mode is the bulk, which for a tint is the tint.
+///
+/// A photograph has no dense mode to sit on -- its tone travels, so even the densest 70% is wide.
+/// Measured, per region, max over inks:
+///
+///     estimator      p022 (10 tint rows)   p001/p073 (3 photographs)
+///     p90-p10             4.5 .. 34.0           75.5 .. 124.0
+///     shortest 70%        2.5 ..  7.0           20.0 ..  59.5
+///
+/// The threshold did not move; only the estimator was wrong.
+fn shortest_u8(v: &[u8], frac: f32) -> f32 {
+    let n = v.len();
+    if n < 4 {
+        return 0.0;
+    }
+    let w = ((n as f32 * frac) as usize).max(2);
+    let mut best = f32::MAX;
+    for i in 0..=(n - w) {
+        best = best.min((v[i + w - 1] as f32) - (v[i] as f32));
+    }
+    best / 2.0
+}
+
+fn shortest_f32(v: &[f32], frac: f32) -> f32 {
+    let n = v.len();
+    if n < 4 {
+        return f32::MAX;
+    }
+    let w = ((n as f32 * frac) as usize).max(2);
+    let mut best = f32::MAX;
+    for i in 0..=(n - w) {
+        best = best.min(v[i + w - 1] - v[i]);
+    }
+    best / 2.0
+}
+
     // ---- 2. per-BLOCK dot-area spread, over the SCREEN's own pixels --------------------------
     //
     // A block's dot area is measured where the ink IS the screen -- that is, where coherence says
@@ -545,6 +615,7 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
     let mut measured = vec![false; ny * nx];
     let mut bmean = vec![[0.0f32; 4]; ny * nx];
     let mut bspread = vec![[0.0f32; 4]; ny * nx];
+    let nvals: Vec<u32> = (0..ny * nx).map(|bi| block_vals[bi][0].len() as u32).collect();
     for bi in 0..ny * nx {
         let n = block_vals[bi][0].len();
         if n < min_measure {
@@ -556,9 +627,7 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
             let v = &mut block_vals[bi][ci];
             v.sort_unstable();
             bmean[bi][ci] = v[n / 2] as f32;
-            let p25 = v[n / 4] as f32;
-            let p75 = v[(n * 3 / 4).min(n - 1)] as f32;
-            bspread[bi][ci] = (p75 - p25) / 2.0;
+            bspread[bi][ci] = shortest_u8(v, MODE_FRAC);
         }
         let _ = flat;
     }
@@ -807,15 +876,10 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
             sv.sort_by(|a, b| a.partial_cmp(b).unwrap());
             mean[ci] = mv[mv.len() / 2];
             within[ci] = sv[sv.len() / 2];
-            if mv.len() >= 4 {
-                let p10 = mv[mv.len() / 10];
-                let p90 = mv[(mv.len() * 9 / 10).min(mv.len() - 1)];
-                across = across.max((p90 - p10) / 2.0);
-            } else {
-                // too few measured blocks to know whether it travels; a flat fill replaces a whole
-                // region with one colour, so "cannot tell" must fall to the contone side
-                across = f32::MAX;
-            }
+            // shortest_f32 returns f32::MAX below four blocks: too few to know whether the tone
+            // travels, and a flat fill replaces a whole region with one colour, so "cannot tell"
+            // must fall to the contone side.
+            across = across.max(shortest_f32(&mv, MODE_FRAC));
         }
         let mut lpis: Vec<f32> = Vec::new();
         for &i in &blocks {
@@ -843,6 +907,8 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
             blocks: blocks.len(),
             mean,
             std: within,
+            across,
+            n_meas: meas.len(),
             lpi: if lpis.is_empty() { 0.0 } else { lpis[lpis.len() / 2] },
         });
     }
@@ -911,7 +977,7 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
     Routing {
         ny, nx, n_fired, n_measured,
         st_screen, st_absorb, st_fill, st_rim,
-        fired: fired_mask, label, pix, uniform, measured_blk: measured, areas, stencil, sw, sh,
+        fired: fired_mask, label, pix, uniform, measured_blk: measured, bmean, nvals, areas, stencil, sw, sh,
     }
 }
 
