@@ -25,6 +25,15 @@ use crate::route::{Class, Routing};
 use crate::screen;
 use anyhow::Result;
 
+/// Block index covering a pixel on the stencil grid.
+fn screen_block(r: &Routing, cy: usize, cx: usize) -> usize {
+    let sdiv = 4; // stencil grid is source/4
+    let (sy, sx) = (cy * sdiv, cx * sdiv);
+    let by = (sy + screen::STEP / 2).saturating_sub(screen::WIN / 2) / screen::STEP;
+    let bx = (sx + screen::STEP / 2).saturating_sub(screen::WIN / 2) / screen::STEP;
+    by.min(r.ny - 1) * r.nx + bx.min(r.nx - 1)
+}
+
 // ================================================================================================
 //  CONSTANTS
 // ================================================================================================
@@ -109,44 +118,52 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
         }
     }
 
-    // ---- area boundaries, by class, drawn thick ---------------------------------------------
-    let half = screen::STEP / 2;
-    let cell = (sdiv * SHRINK).max(1);
-    for by in 0..r.ny {
-        for bx in 0..r.nx {
-            let l = r.label[by * r.nx + bx];
-            if l == 0 {
+    // ---- area boundaries, by class, at PIXEL scale ------------------------------------------
+    // Traced on the refined per-pixel membership, not the block grid, so the outline follows where
+    // the screen actually stops rather than the nearest 1.35 mm tile edge.
+    let cls_at = |cy: usize, cx: usize| -> Option<Class> {
+        if !r.pix[cy * r.sw + cx] {
+            return None;
+        }
+        let by = (cy * (r.sh / r.ny).max(1)).min(r.sh - 1);
+        let _ = by;
+        let bi = screen_block(r, cy, cx);
+        let l = r.label[bi];
+        if l == 0 {
+            None
+        } else {
+            Some(r.areas[(l - 1) as usize].class)
+        }
+    };
+    for y in 0..h {
+        for x in 0..w {
+            let (cy, cx) = (y * SHRINK, x * SHRINK);
+            if cy >= r.sh || cx >= r.sw {
+                continue;
+            }
+            let here = cls_at(cy, cx);
+            if here.is_none() {
                 continue;
             }
             let edge = [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)].iter().any(|(dy, dx)| {
-                let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
-                y2 < 0
-                    || x2 < 0
-                    || y2 >= r.ny as i64
-                    || x2 >= r.nx as i64
-                    || r.label[y2 as usize * r.nx + x2 as usize] != l
+                let (y2, x2) = (cy as i64 + dy * SHRINK as i64, cx as i64 + dx * SHRINK as i64);
+                if y2 < 0 || x2 < 0 || y2 >= r.sh as i64 || x2 >= r.sw as i64 {
+                    return true;
+                }
+                cls_at(y2 as usize, x2 as usize) != here
             });
             if !edge {
                 continue;
             }
-            let col = match r.areas[(l - 1) as usize].class {
+            let col = match here.unwrap() {
                 Class::ColourPhoto => COL_COLOUR,
                 Class::GreyPhoto => COL_GREY,
                 Class::Flat => COL_FLAT,
             };
-            let (cy, cx) = screen::centre_of(by, bx);
-            let y0 = cy.saturating_sub(half) / cell;
-            let x0 = cx.saturating_sub(half) / cell;
-            let y1 = ((cy + half) / cell).min(h);
-            let x1 = ((cx + half) / cell).min(w);
-            for y in y0..y1 {
-                for x in x0..x1 {
-                    let on = y < y0 + AREA_LINE
-                        || x < x0 + AREA_LINE
-                        || y + AREA_LINE >= y1
-                        || x + AREA_LINE >= x1;
-                    if on {
-                        put(&mut px, x, y, col);
+            for dy in 0..AREA_LINE {
+                for dx in 0..AREA_LINE {
+                    if y + dy < h && x + dx < w {
+                        put(&mut px, x + dx, y + dy, col);
                     }
                 }
             }

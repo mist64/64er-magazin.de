@@ -95,7 +95,13 @@ fn background(tone: &Contone, r: &Routing) -> Vec<u8> {
             let by = sy.saturating_sub(screen::WIN / 2) / screen::STEP;
             let bx = sx.saturating_sub(screen::WIN / 2) / screen::STEP;
             let bi = by.min(r.ny - 1) * r.nx + bx.min(r.nx - 1);
-            let l = r.label[bi];
+            // membership at PIXEL scale, not block scale: a region's boundary is placed by coherence
+            // at 600 dpi rather than quantised to the 1.35 mm block grid
+            let l = {
+                let cy = ((y as f64 * sdiv_y) as usize).min(r.sh - 1);
+                let cx = ((x as f64 * sdiv_x) as usize).min(r.sw - 1);
+                if r.pix[cy * r.sw + cx] { r.label[bi] } else { 0 }
+            };
             let px = &mut bg[(y * w + x) * 4..(y * w + x) * 4 + 4];
             // does the stencil already draw here?
             let covered = {

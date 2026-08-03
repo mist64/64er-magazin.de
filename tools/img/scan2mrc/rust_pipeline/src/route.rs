@@ -266,6 +266,14 @@ pub struct Routing {
     pub st_absorb: Vec<bool>,
     pub st_fill: Vec<bool>,
     pub st_rim: Vec<bool>,
+    /// PER PIXEL at the stencil grid: is this pixel inside its block's region.
+    ///
+    /// The block grid is 1.35 mm and a region's boundary quantised to it is both a staircase and a
+    /// tile too wide. Blocks find the screen -- that needs the big window for frequency resolution --
+    /// but once the vector is known, COHERENCE answers "is this pixel part of that lattice" at 600
+    /// dpi with no window at all. So the boundary is placed at pixel scale by coherence, and only
+    /// the interior is taken wholesale.
+    pub pix: Vec<bool>,
     /// per block: did any ink report a screen here. The renderer needs it to tell "ink in a
     /// screened block that no stencil claimed" (which the background must draw) from "ink on bare
     /// paper" (which is the stencil's business alone).
@@ -306,6 +314,7 @@ pub fn stencils(
     coh: &Coherence,
     f: &ScreenField,
     label: &[u32],
+    pixmask: &[bool],
     areas: &[Area],
     fired_mask: &[bool],
     tone: &Contone,
@@ -356,7 +365,8 @@ pub fn stencils(
         .map(|i| {
             let (sy, sx) = ((i / w) * sdiv, (i % w) * sdiv);
             let bi = block_of_source(f, sy, sx);
-            let l = label[bi];
+            // the refined per-pixel membership, not the block's
+            let l = if pixmask[i] { label[bi] } else { 0 };
             // INSIDE A PICTURE, EVERYTHING IS CONTONE. A photograph is drawn entirely by the
             // background -- its dots, its solid shadows and its highlights alike -- so nothing in it
             // belongs to the stencil. Without this, every screened passage whose coherence dipped
@@ -799,8 +809,63 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
         });
     }
 
+    // ---- 4d. place the boundary at PIXEL scale ------------------------------------------------
+    //
+    // A block on the edge of a region has its whole 1.35 mm cell claimed, including whatever part of
+    // it lies past where the screen actually stops -- and the one-tile rim claims another 1.35 mm on
+    // top. Both are the same quantisation error, seen from either side of the edge.
+    //
+    // Coherence already measures, per pixel at 600 dpi, whether the ink there belongs to the lattice
+    // this block measured. So: interior blocks are taken whole (they are solidly inside, and asking
+    // per pixel there would only punch holes wherever a glyph sits on a tint), and EDGE blocks are
+    // resolved per pixel. The boundary then follows the screen instead of the grid.
+    //
+    // It cannot localise finer than coherence's own smoothing, ~1.5 screen periods or about 1 mm --
+    // but that is a soft, true edge instead of a hard, wrong one.
+    let pix = {
+        let mut edge = vec![false; ny * nx];
+        for by in 0..ny {
+            for bx in 0..nx {
+                let i = by * nx + bx;
+                if label[i] == 0 {
+                    continue;
+                }
+                let mut touches_out = false;
+                'e: for dy in -1i64..=1 {
+                    for dx in -1i64..=1 {
+                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                            touches_out = true;
+                            break 'e;
+                        }
+                        if label[y2 as usize * nx + x2 as usize] == 0 {
+                            touches_out = true;
+                            break 'e;
+                        }
+                    }
+                }
+                edge[i] = touches_out;
+            }
+        }
+        let mut m = vec![false; sw * sh];
+        for cy in 0..sh {
+            for cx in 0..sw {
+                let bi = block_of_source(f, cy * sdiv, cx * sdiv);
+                if label[bi] == 0 {
+                    continue;
+                }
+                m[cy * sw + cx] = if edge[bi] {
+                    (0..4).any(|ci| coh.ink[ci][cy * sw + cx] >= COHERENT)
+                } else {
+                    true
+                };
+            }
+        }
+        m
+    };
+
     // ---- 5. stencils, now that the areas are known -------------------------------------------
-    let (sw2, sh2, stencil) = stencils(disp, coh, f, &interior, &areas, &fired_mask, tone);
+    let (sw2, sh2, stencil) = stencils(disp, coh, f, &interior, &pix, &areas, &fired_mask, tone);
     debug_assert_eq!((sw, sh), (sw2, sh2));
 
     let n_fired = fired_mask.iter().filter(|&&b| b).count();
@@ -808,7 +873,7 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
     Routing {
         ny, nx, n_fired, n_measured,
         st_screen, st_absorb, st_fill, st_rim,
-        fired: fired_mask, label, areas, stencil, sw, sh,
+        fired: fired_mask, label, pix, areas, stencil, sw, sh,
     }
 }
 
