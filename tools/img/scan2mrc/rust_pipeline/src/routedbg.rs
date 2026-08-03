@@ -53,13 +53,13 @@ const OUTLINE_RGB: [f32; 3] = [1.0, 0.85, 0.0];
 /// test's verdict on the solid black beside it -- see route::BLACK_ENCLOSURE -- and are drawn for
 /// judgement only.
 ///
-/// Both verdicts are drawn, not just the accepted one. A criterion that only shows what it took
-/// cannot be judged: the question is always whether it refused the right things, and on this paper
-/// the things it must refuse -- rules, banners, reversed panels -- sit right against the pictures it
-/// must accept. Green takes, red refuses; both are bright and cold or bright and warm against solid
-/// black, where a mid-tone would vanish.
+/// Only what the test ACCEPTS is drawn. The refused objects were drawn too for a while, in red,
+/// while the criterion was being calibrated -- that is what showed the first version accepting
+/// everything, and what showed p123's banner and p057's reversed panels being turned down. Once
+/// the threshold was measured they stopped earning their place on the page: they mark black that
+/// changes nothing, since refused black goes exactly where it already goes, the K stencil.
+/// The measurement they produced is recorded at route::BLACK_ENCLOSURE.
 const BLACK_KEEP_RGB: [f32; 3] = [0.10, 1.0, 0.35];
-const BLACK_DROP_RGB: [f32; 3] = [1.0, 0.15, 0.15];
 
 /// How far the page is lifted toward white before the outlines go on. Enough that a saturated
 /// outline reads against a dark photograph, little enough that the page is still the page.
@@ -153,9 +153,9 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
     }
     // the black-extension preview, outlined the same way in its own colours. Drawn after the yellow
     // so that where they coincide the preview is what shows -- the question being asked is what the
-    // extension adds, and a boundary it shares with the region is not an addition. Refused objects
-    // are drawn first so that an accepted one abutting a refused one still reads as accepted.
-    for (mask, colour) in [(&r.st_black_drop, BLACK_DROP_RGB), (&r.st_black, BLACK_KEEP_RGB)] {
+    // extension adds, and a boundary it shares with the region is not an addition.
+    {
+        let (mask, colour) = (&r.st_black, BLACK_KEEP_RGB);
         let cell = (sdiv * SHRINK).max(1);
         let half_blk = screen::STEP / 2;
         let mut bp = vec![false; w * h];
