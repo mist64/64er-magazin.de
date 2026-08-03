@@ -199,6 +199,16 @@ fn main() -> Result<()> {
             routedbg::write_png(&png, &disp, &r)?;
             routedbg::write_outline_png(&format!("{}_type.png", out_base), &disp, &r)?;
             routedbg::write_stages_png(&format!("{}_stages.png", out_base), &disp, &r)?;
+            // The label map itself, as data. Measuring coverage by decoding colours out of a washed
+            // debug image is unreliable -- p073's red banner reads as the rim's magenta -- and every
+            // question about region shape wants exact numbers.
+            {
+                let mut lab = vec![0.0f32; r.ny * r.nx];
+                for i in 0..r.ny * r.nx {
+                    lab[i] = r.label[i] as f32;
+                }
+                npy::write_f32(&format!("{}_label.npy", out_base), &lab, &[r.ny, r.nx])?;
+            }
             let stem = std::path::Path::new(&display_tiff)
                 .file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
             println!("{}", route::summarise(&stem, &r));

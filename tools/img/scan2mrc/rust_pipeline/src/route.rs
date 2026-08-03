@@ -171,8 +171,27 @@ pub const MAX_HOLE_BLOCKS: usize = usize::MAX;
 /// else beside it, so it sums to only ~265 and a sum-based threshold of 380 never fired at all.
 pub const ABSORB_MEAN: f32 = 150.0;
 
-/// How far absorption may travel from a screened block, in blocks. See the note in `route`.
-pub const ABSORB_BLOCKS: usize = 8;
+/// How far absorption may travel from a screened block, in blocks. ZERO -- the step is disabled,
+/// by measurement.
+///
+/// Absorption existed because a photograph's solid shadow carries no dots and so could never fire.
+/// That was true of the old detector. It is no longer true: with `conc` and `agree` the shadow is
+/// detected directly, and the step now costs far more than it buys. Measured on p073, coverage of
+/// each region against the reach:
+///
+///     reach   photo   shadow   C64    RED BANNER (must be 0)
+///       0      1.00    0.98    0.73        0.03
+///       4      1.00    0.98    0.76        0.27
+///       8      1.00    0.98    0.78        0.48
+///
+/// Five points on the C64 against forty-five points of false coverage on a solid graphic that is
+/// not a picture at all -- and a graphic swallowed into a photo region loses its stencil, which is
+/// how p073's banner went from M 25.5% to 1.5%.
+///
+/// Left in place at 0 rather than deleted: it is one constant, and if detection ever regresses on
+/// solid passages this is the right repair. Raise it only with the table above re-measured, never
+/// because a picture looks short.
+pub const ABSORB_BLOCKS: usize = 0;
 
 /// A contone pixel counts as part of the screen when at least this fraction of its footprint is
 /// coherent. Half: the pixel is more screen than not. Bare paper has no coherence and drops out
@@ -602,8 +621,15 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
         m = reach;
     }
 
-    // 3 -- FILL. Close the halftone's own gaps, then take everything enclosed, at any size: a
-    // picture's specular highlight carries no dots and cannot fire, and enclosure is the whole test.
+    // 3 -- FILL, PER OBJECT. Close the halftone's own gaps, then take everything each object
+    // encloses BY ITSELF.
+    //
+    // Filling the union is wrong, and wrong in a way that only shows once detection is good: three
+    // separate pictures near each other -- p073 has a computer, a printer and a printout -- jointly
+    // ring the paper between them, so a global fill claims that paper and merges all three into one
+    // 16,000-block region spanning the whole photographic zone. "Fill all inner blocks" means inner
+    // to an OBJECT. A photograph's specular highlight is enclosed by that photograph; the gap
+    // between two photographs is enclosed by neither of them alone.
     let st_fill;
     {
         let before = m.clone();
@@ -620,25 +646,18 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
                 m[i] = true;
             }
         }
-        let inv: Vec<bool> = m.iter().map(|&b| !b).collect();
-        let (hl, hn) = ndimage::label(&inv, nx, ny);
-        if hn > 0 {
-            let mut border = vec![false; hn + 1];
-            for x in 0..nx {
-                border[hl[x] as usize] = true;
-                border[hl[(ny - 1) * nx + x] as usize] = true;
-            }
-            for y in 0..ny {
-                border[hl[y * nx] as usize] = true;
-                border[hl[y * nx + nx - 1] as usize] = true;
-            }
+        let (cl, cn) = ndimage::label(&m, nx, ny);
+        let mut filled = m.clone();
+        for c in 1..=cn {
+            let only: Vec<bool> = cl.iter().map(|&l| l == c as u32).collect();
+            let f = ndimage::binary_fill_holes(&only, nx, ny);
             for i in 0..ny * nx {
-                let c = hl[i] as usize;
-                if c != 0 && !border[c] {
-                    m[i] = true;
+                if f[i] {
+                    filled[i] = true;
                 }
             }
         }
+        m = filled;
         st_fill = (0..ny * nx).map(|i| m[i] && !before[i]).collect::<Vec<bool>>();
     }
 
@@ -816,11 +835,24 @@ pub fn summarise(page: &str, r: &Routing) -> String {
             ))
         })
         .collect();
+    // Per-step block counts, because "the region is too big" is not actionable but "the rim added
+    // 9000 blocks" is.
+    let n = (r.ny * r.nx) as f64;
+    let pc = |v: usize| 100.0 * v as f64 / n;
+    let (sc, ab, fi, ri) = (
+        r.st_screen.iter().filter(|&&b| b).count(),
+        r.st_absorb.iter().filter(|&&b| b).count(),
+        r.st_fill.iter().filter(|&&b| b).count(),
+        r.st_rim.iter().filter(|&&b| b).count(),
+    );
+    let cov = r.label.iter().filter(|&&l| l != 0).count();
     format!(
-        "p{} blocks {} fired / {} measured | areas: {} colour-photo, {} grey-photo, {} flat | stencil {}",
+        "p{} blocks {} fired / {} measured | steps screen {} ({:.0}%) +absorb {} +fill {} +rim {} \
+         = covered {} ({:.0}%) | areas: {} colour-photo, {} grey-photo, {} flat | stencil {}",
         page,
         r.n_fired,
         r.n_measured,
+        sc, pc(sc), ab, fi, ri, cov, pc(cov),
         c1,
         c2,
         c3,
