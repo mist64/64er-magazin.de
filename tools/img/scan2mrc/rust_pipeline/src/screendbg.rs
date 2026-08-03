@@ -257,8 +257,9 @@ const PROB_TILE: usize = 6;
 /// A binary fired/not map cannot answer the question that actually matters when a region is missed:
 /// was it far below the bar, or a hair under it. So this draws the margin itself.
 ///
-/// The value is `max over inks of min(prom / FIRE, depth / DEPTH)` -- the weaker of the two tests
-/// each ink has to pass, taken for whichever ink is most confident. 1.0 means exactly at threshold,
+/// The value is, per ink, the better of the two ways a block can qualify --
+/// `min(conc/CONC, prom/FIRE)` for the local test and `min(agree/AGREE, 2*conc/CONC)` for the
+/// neighbourhood one -- taken for whichever ink is most confident. 1.0 means exactly at threshold,
 /// so the green band IS the decision boundary and everything left of it was rejected:
 ///
 ///     dark blue  0.0   nothing there
@@ -303,9 +304,10 @@ pub fn write_prob_png(path: &str, f: &ScreenField) -> Result<()> {
                 if screen::is_follower(f, ci, i) {
                     continue;
                 }
-                let p = f.ink[ci].prom[i] / screen::FIRE;
-                let d = f.ink[ci].depth[i] / screen::DEPTH;
-                conf = conf.max(p.min(d));
+                let a = &f.ink[ci];
+                let local = (a.conc[i] / screen::CONC).min(a.prom[i] / screen::FIRE);
+                let nbr = (a.agree[i] / screen::AGREE).min(a.conc[i] / (screen::CONC * 0.5));
+                conf = conf.max(local.max(nbr));
             }
             let c = ramp(conf);
             for dy in 0..PROB_TILE {

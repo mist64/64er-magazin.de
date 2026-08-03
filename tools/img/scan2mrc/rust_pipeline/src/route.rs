@@ -171,6 +171,9 @@ pub const MAX_HOLE_BLOCKS: usize = usize::MAX;
 /// else beside it, so it sums to only ~265 and a sum-based threshold of 380 never fired at all.
 pub const ABSORB_MEAN: f32 = 150.0;
 
+/// How far absorption may travel from a screened block, in blocks. See the note in `route`.
+pub const ABSORB_BLOCKS: usize = 8;
+
 /// A contone pixel counts as part of the screen when at least this fraction of its footprint is
 /// coherent. Half: the pixel is more screen than not. Bare paper has no coherence and drops out
 /// here without needing a separate ink test.
@@ -576,8 +579,25 @@ pub fn route(f: &ScreenField, tone: &Contone, coh: &Coherence, disp: &Cmyk) -> R
         for bi in 0..ny * nx {
             inked[bi] = cnt[bi] > 0 && sum[bi] / cnt[bi] as f32 >= ABSORB_MEAN;
         }
+        // BOUNDED, not unlimited. Absorption exists to pick up a picture's OWN solid passages -- a
+        // shadow, a dark panel -- which lie within a centimetre or so of the screen that proves the
+        // picture is there. An unbounded geodesic walks through any chain of near-solid ink, and on
+        // p073 it crossed from the photograph into the solid red banner: the banner joined a photo
+        // region, and inside a non-flat region the stencil is suppressed, so the banner's own type
+        // stopped being drawn crisply (stencil M 25.5% -> 1.5%).
+        //
+        // ABSORB_BLOCKS is the leash. 8 blocks is 10.8 mm at 2400 dpi -- wider than any shadow on
+        // this paper, far short of the gap between two separate graphics.
         let mask: Vec<bool> = (0..ny * nx).map(|i| inked[i] || m[i]).collect();
-        let reach = ndimage::binary_propagation(&m, &mask, nx, ny);
+        let mut reach = m.clone();
+        for _ in 0..ABSORB_BLOCKS {
+            let d = ndimage::binary_dilation(&reach, nx, ny, 1);
+            let next: Vec<bool> = (0..ny * nx).map(|i| d[i] && mask[i]).collect();
+            if next == reach {
+                break;
+            }
+            reach = next;
+        }
         st_absorb = (0..ny * nx).map(|i| reach[i] && !m[i]).collect::<Vec<bool>>();
         m = reach;
     }
