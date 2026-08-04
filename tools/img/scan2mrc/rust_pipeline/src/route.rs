@@ -352,9 +352,12 @@ pub struct Routing {
     pub st_absorb: Vec<bool>,
     pub st_fill: Vec<bool>,
     pub st_rim: Vec<bool>,
-    /// preview of what extending the region into adjacent solid black would claim; drawn in the
-    /// debug PNG, never routed. See BLACK_ENCLOSURE.
+    /// preview of what extending the region into adjacent solid black would claim; never routed.
+    /// See BLACK_ENCLOSURE. `st_black` is the BLOCKS it would add, which is the honest count of the
+    /// addition; `black_obj` is every block of an accepted object, covered ones included, which is
+    /// what the debug drawer needs -- see the comment on the preview outline in routedbg.rs.
     pub st_black: Vec<bool>,
+    pub black_obj: Vec<bool>,
     /// per block: is this block's dot area locally flat. Kept for inspection and for any future
     /// split of a mixed region -- a photograph abutting a tint is one connected screened area, and
     /// this is the only signal that says where one ends and the other begins.
@@ -392,7 +395,7 @@ pub struct Routing {
 
 /// Block covering a source pixel. The field's blocks are anchored every STEP px with the verdict at
 /// the window CENTRE, so the inverse of `centre_of` is offset by half a window.
-fn block_of_source(f: &ScreenField, sy: usize, sx: usize) -> usize {
+pub fn block_of_source(f: &ScreenField, sy: usize, sx: usize) -> usize {
     // Block b is centred at b*STEP + WIN/2 and owns [centre - STEP/2, centre + STEP/2). Inverting
     // that needs the half-step, and without it the whole label map is translated STEP/2 = 64 px
     // (0.68 mm) down and to the right -- so every area boundary in the PDF sat two thirds of a
@@ -904,7 +907,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     // PREVIEW of the black extension, PER OBJECT. Computed from the FINISHED region, so what it
     // holds is the addition and nothing that is already routed. Nothing below reads it.
     // See BLACK_ENCLOSURE.
-    let st_black = {
+    let (st_black, black_obj) = {
         let covered: Vec<bool> = (0..ny * nx).map(|i| label[i] != 0).collect();
         // THE OBJECT IS THE WHOLE BLACK SHAPE, covered part included. Labelling only the
         // not-yet-routed black instead splits one shape wherever the region happens to cut across
@@ -964,7 +967,9 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
             keep[l] = enc >= BLACK_ENCLOSURE;
         }
         let _ = &size;
-        (0..ny * nx).map(|i| !covered[i] && keep[blab[i] as usize]).collect::<Vec<bool>>()
+        let obj: Vec<bool> = (0..ny * nx).map(|i| keep[blab[i] as usize]).collect();
+        let add: Vec<bool> = (0..ny * nx).map(|i| !covered[i] && obj[i]).collect();
+        (add, obj)
     };
 
     // ---- 4. NOW ask each complete chunk what it is ---------------------------------------------
@@ -1102,7 +1107,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     let n_measured = measured.iter().filter(|&&b| b).count();
     Routing {
         ny, nx, n_fired, n_measured,
-        st_screen, st_absorb, st_fill, st_rim, st_black,
+        st_screen, st_absorb, st_fill, st_rim, st_black, black_obj,
         fired: fired_mask, label, pix, uniform, measured_blk: measured, bmean, nvals, areas, stencil, sw, sh,
     }
 }

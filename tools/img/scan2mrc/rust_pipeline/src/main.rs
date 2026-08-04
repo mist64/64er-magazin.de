@@ -196,7 +196,7 @@ fn main() -> Result<()> {
             let coh = demod::coherence(&disp, &f, &geo);
             let r = route::route(&f, &tone, &coh, &disp);
             let png = format!("{}.png", out_base);
-            routedbg::write_png(&png, &disp, &r)?;
+            routedbg::write_png(&png, &disp, &r, &f)?;
             // The type-outline and four-stage views are diagnostic deep-dives, not part of a sweep:
             // each is a 17 MB 600 dpi page, and over an issue that is 6 GB of pictures nobody asked
             // for. Re-enable per page when chasing something specific.

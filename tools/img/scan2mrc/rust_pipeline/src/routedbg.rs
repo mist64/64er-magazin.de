@@ -20,9 +20,10 @@
 //! the correct picture for a contents-page tint, and the most informative thing this drawer shows.
 
 use crate::imageio::Cmyk;
+use crate::ndimage;
 use crate::pilio;
-use crate::route::{Class, Routing};
-use crate::screen;
+use crate::route::{self, Class, Routing};
+use crate::screen::{self, ScreenField};
 use anyhow::Result;
 
 /// Block index covering a pixel on the stencil grid.
@@ -61,6 +62,16 @@ const OUTLINE_RGB: [f32; 3] = [1.0, 0.85, 0.0];
 /// The measurement they produced is recorded at route::BLACK_ENCLOSURE.
 const BLACK_KEEP_RGB: [f32; 3] = [0.10, 1.0, 0.35];
 
+/// Ink level at which a pixel counts as solid for the preview outline. The same 128 the stencil
+/// uses for "ink present", from the bimodal histogram of this paper -- the preview must trace the
+/// same pixels the renderer would move, so it must ask the same question of them.
+const INK_SOLID: u8 = 128;
+
+/// Closing radius, in debug pixels, applied to the preview mask before outlining it. Removes
+/// sub-threshold speckle inside solid ink. 2 px at SHRINK=2 is 0.17 mm on the page -- smaller than
+/// any feature the preview is meant to show, larger than the noise it is meant to ignore.
+const SPECKLE_PX: usize = 2;
+
 /// How far the page is lifted toward white before the outlines go on. Enough that a saturated
 /// outline reads against a dark photograph, little enough that the page is still the page.
 const LIFT: f32 = 0.35;
@@ -81,7 +92,7 @@ const COL_EDGE: [f32; 3] = [0.05, 0.05, 0.05]; // area outline
 ///
 /// The boundary is the PIXEL-refined one (see `Routing::pix`), so it follows the true contour at
 /// 600 dpi rather than staircasing round the 1.35 mm block grid.
-pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
+pub fn write_png(path: &str, disp: &Cmyk, r: &Routing, f: &ScreenField) -> Result<()> {
     let (w, h) = (r.sw / SHRINK, r.sh / SHRINK);
     let mut px = vec![255u8; w * h * 3];
     let sdiv = (disp.w / r.sw).max(1);
@@ -155,27 +166,37 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing) -> Result<()> {
     // so that where they coincide the preview is what shows -- the question being asked is what the
     // extension adds, and a boundary it shares with the region is not an addition.
     {
-        let (mask, colour) = (&r.st_black, BLACK_KEEP_RGB);
-        let cell = (sdiv * SHRINK).max(1);
-        let half_blk = screen::STEP / 2;
+        let colour = BLACK_KEEP_RGB;
+        // AT PIXEL RESOLUTION, like the yellow beside it. Drawn per BLOCK the two outlines could not
+        // meet: yellow follows r.pix, refined pixel by pixel on coherence, while a block is 128 px =
+        // 1.35 mm. Solid black has no coherence, so the black inside a boundary block falls outside
+        // yellow, and it fell outside a per-block green too because that green drew only blocks the
+        // region had NOT yet claimed. On p166 that is 186 of 407 solid-black blocks belonging to
+        // neither outline -- a block-wide gap between them, which read as the two disagreeing when
+        // they do not. What the extension actually moves is PIXELS, from the stencil to the contone,
+        // so the preview is drawn as those pixels: solid ink, in an accepted object, not already
+        // screen. It meets the yellow exactly because between them there is nothing else.
         let mut bp = vec![false; w * h];
-        for by in 0..r.ny {
-            for bx in 0..r.nx {
-                if !mask[by * r.nx + bx] {
+        for y in 0..h {
+            for x in 0..w {
+                let (cy, cx) = (y * SHRINK, x * SHRINK);
+                if cy >= r.sh || cx >= r.sw || r.pix[cy * r.sw + cx] {
+                    continue; // already screen: the yellow speaks for it
+                }
+                let (sy, sx) = ((cy * sdiv).min(disp.h - 1), (cx * sdiv).min(disp.w - 1));
+                if !r.black_obj[route::block_of_source(f, sy, sx)] {
                     continue;
                 }
-                let (cy, cx) = screen::centre_of(by, bx);
-                let y0 = cy.saturating_sub(half_blk) / cell;
-                let x0 = cx.saturating_sub(half_blk) / cell;
-                let y1 = ((cy + half_blk) / cell).min(h);
-                let x1 = ((cx + half_blk) / cell).min(w);
-                for y in y0..y1 {
-                    for x in x0..x1 {
-                        bp[y * w + x] = true;
-                    }
+                if disp.k[sy * disp.w + sx] >= INK_SOLID {
+                    bp[y * w + x] = true;
                 }
             }
         }
+        // Solid ink on this paper is not solid at every pixel -- ink variation and scan noise leave
+        // scattered pixels under the threshold inside a black field. Each is a one-pixel hole and
+        // each would be outlined, speckling the preview with boundaries that mark nothing. A closing
+        // of SPECKLE_PX removes holes that small and leaves every real edge where it was.
+        let bp = ndimage::binary_closing(&bp, w, h, SPECKLE_PX);
         let half = (OUTLINE_PX / 2) as i64;
         for y in 0..h {
             for x in 0..w {
