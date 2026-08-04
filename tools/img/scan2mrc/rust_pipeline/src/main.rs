@@ -8,6 +8,7 @@ mod ndimage;
 mod npy;
 mod pilio;
 mod record;
+mod rectfit;
 mod render;
 mod resample;
 mod route;
@@ -196,7 +197,14 @@ fn main() -> Result<()> {
             let coh = demod::coherence(&disp, &f, &geo);
             let r = route::route(&f, &tone, &coh, &disp);
             let png = format!("{}.png", out_base);
-            routedbg::write_png(&png, &disp, &r, &f)?;
+            let rects = rectfit::fit(&disp, &r);
+            for q in rects.iter().filter(|q| q.blocks >= 20) {
+                println!(
+                    "   rect area {:3} blk {:5} fill {:.2} ring {:.2} y {:5}-{:5} x {:5}-{:5} {}",
+                    q.id, q.blocks, q.fill, q.ring, q.y0, q.y1, q.x0, q.x1, if q.ok { "SNAP" } else { "no" }
+                );
+            }
+            routedbg::write_png(&png, &disp, &r, &f, &rects)?;
             // The type-outline and four-stage views are diagnostic deep-dives, not part of a sweep:
             // each is a 17 MB 600 dpi page, and over an issue that is 6 GB of pictures nobody asked
             // for. Re-enable per page when chasing something specific.
