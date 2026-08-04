@@ -22,7 +22,6 @@
 use crate::imageio::Cmyk;
 use crate::ndimage;
 use crate::pilio;
-use crate::rectfit::Rect;
 use crate::route::{self, Class, Routing};
 use crate::screen::{self, ScreenField};
 use anyhow::Result;
@@ -98,7 +97,7 @@ const COL_EDGE: [f32; 3] = [0.05, 0.05, 0.05]; // area outline
 ///
 /// The boundary is the PIXEL-refined one (see `Routing::pix`), so it follows the true contour at
 /// 600 dpi rather than staircasing round the 1.35 mm block grid.
-pub fn write_png(path: &str, disp: &Cmyk, r: &Routing, f: &ScreenField, rects: &[Rect]) -> Result<()> {
+pub fn write_png(path: &str, disp: &Cmyk, r: &Routing, f: &ScreenField) -> Result<()> {
     let (w, h) = (r.sw / SHRINK, r.sh / SHRINK);
     let mut px = vec![255u8; w * h * 3];
     let sdiv = (disp.w / r.sw).max(1);
@@ -234,7 +233,7 @@ pub fn write_png(path: &str, disp: &Cmyk, r: &Routing, f: &ScreenField, rects: &
     // the fitted rectangles, as an outline in their own colour. Only the accepted ones: a refused
     // rectangle is a rectangle that will not be used, and the page already shows what happens
     // instead -- the region's own outline, in yellow, right there.
-    for q in rects.iter().filter(|q| q.ok) {
+    for q in r.rects.iter().filter(|q| q.ok) {
         let (y0, x0) = (q.y0 / SHRINK, q.x0 / SHRINK);
         let (y1, x1) = ((q.y1 / SHRINK).min(h - 1), (q.x1 / SHRINK).min(w - 1));
         let half = (OUTLINE_PX / 2) as i64;

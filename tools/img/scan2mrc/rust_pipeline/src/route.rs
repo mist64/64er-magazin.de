@@ -40,6 +40,7 @@
 use crate::demod::{Coherence, Contone, COHERENT};
 use crate::imageio::Cmyk;
 use crate::ndimage;
+use crate::rectfit;
 use crate::screen::{self, ScreenField};
 
 // ================================================================================================
@@ -363,6 +364,8 @@ pub struct Routing {
     /// what the debug drawer needs -- see the comment on the preview outline in routedbg.rs.
     pub st_black: Vec<bool>,
     pub black_obj: Vec<bool>,
+    /// fitted rectangles, drawn by the debug view; applied above when RECT_SNAP is on
+    pub rects: Vec<rectfit::Rect>,
     /// per block: is this block's dot area locally flat. Kept for inspection and for any future
     /// split of a mixed region -- a photograph abutting a tint is one connected screened area, and
     /// this is the only signal that says where one ends and the other begins.
@@ -1203,6 +1206,56 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     };
 
     // ---- 5. stencils, now that the areas are known -------------------------------------------
+    // ---- 4e. SNAP TO THE RECTANGLE ------------------------------------------------------------
+    //
+    // Applied to the PIXEL mask, after the class is decided and before the stencil is drawn, which
+    // is the only place it can go: the class must be judged on what was measured, and the stencil
+    // must see the boundary the renderer will use.
+    // BOTH DIRECTIONS OR IT IS NOT A FIT. Setting the rectangle's pixels and stopping there grows
+    // and never tightens, and a region is normally already LARGER than its own fitted rectangle --
+    // the rim alone adds a block all round -- so growing has nothing to add. Measured with only the
+    // grow half in place, the rendered page moved by 18 pixels on p055 and 0.04% on p051: a no-op
+    // wearing the shape of a feature. The region's pixels OUTSIDE its rectangle have to go too.
+    let rects = rectfit::fit(disp, &label, ny, nx, sw, sh);
+    let mut pix = pix;
+    if rectfit::RECT_SNAP {
+        let div = (disp.w / sw).max(1);
+        let mut inrect = vec![0u32; sw * sh];
+        let mut snapped = vec![false; (nkept + 1) as usize];
+        // FLAT REGIONS ONLY, because that is where the gain was measured and where the risk is
+        // absent. Comparing rendered pages with the fit on and off: p055's four grey boxes lost the
+        // mottled fringe their ragged boundary left below them, gained straight edges, and the page
+        // shrank 2.2%; p051's photographs and p166's wordmark moved by 0.1% with nothing visible
+        // either way. So a photograph gains nothing here, while tightening one can only clip a
+        // picture -- and a flat fill is a single colour whose edge IS the rectangle, with the
+        // stencil kept (see the stencil rule) so type printed on the box stays crisp at 600 dpi.
+        for q in rects.iter().filter(|q| q.ok) {
+            let id = (q.id + 1) as u32;
+            if areas.get((q.id) as usize).map(|a| a.class) != Some(Class::Flat) {
+                continue;
+            }
+            snapped[id as usize] = true;
+            for y in q.y0..=q.y1.min(sh - 1) {
+                for x in q.x0..=q.x1.min(sw - 1) {
+                    inrect[y * sw + x] = id;
+                }
+            }
+        }
+        for y in 0..sh {
+            for x in 0..sw {
+                let i = y * sw + x;
+                if inrect[i] != 0 {
+                    pix[i] = true;
+                    continue;
+                }
+                let l = label[block_of_source(f, y * div, x * div)] as usize;
+                if l != 0 && snapped[l] {
+                    pix[i] = false;
+                }
+            }
+        }
+    }
+
     let (sw2, sh2, stencil) = stencils(disp, coh, f, &interior, &pix, &areas, &fired_mask, tone);
     debug_assert_eq!((sw, sh), (sw2, sh2));
 
@@ -1210,7 +1263,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     let n_measured = measured.iter().filter(|&&b| b).count();
     Routing {
         ny, nx, n_fired, n_measured,
-        st_screen, st_absorb, st_fill, st_rim, st_black, black_obj,
+        st_screen, st_absorb, st_fill, st_rim, st_black, black_obj, rects,
         fired: fired_mask, label, pix, uniform, measured_blk: measured, bmean, nvals, areas, stencil, sw, sh,
     }
 }
