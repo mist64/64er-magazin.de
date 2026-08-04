@@ -30,7 +30,6 @@
 
 use crate::imageio::Cmyk;
 use crate::ndimage;
-use crate::route::Routing;
 use crate::screen;
 
 // ================================================================================================
@@ -98,9 +97,19 @@ pub struct Rect {
     pub blocks: usize,
 }
 
-/// Fit a rectangle to every region and say whether it may be trusted. Nothing here mutates routing.
-pub fn fit(disp: &Cmyk, r: &Routing) -> Vec<Rect> {
-    let (sw, sh) = (r.sw, r.sh);
+/// EXPERIMENT: whether an accepted rectangle actually replaces the region's pixel boundary, or is
+/// only drawn. See the header. With this off nothing here reaches the renderer.
+pub const RECT_SNAP: bool = true;
+
+/// Fit a rectangle to every region and say whether it may be trusted.
+pub fn fit(
+    disp: &Cmyk,
+    label: &[u32],
+    ny: usize,
+    nx: usize,
+    sw: usize,
+    sh: usize,
+) -> Vec<Rect> {
     let sdiv = (disp.w / sw).max(1);
     // strongest ink at each grid pixel, then averaged over a cell -- see PAPER_INK
     let mut peak = vec![0.0f32; sw * sh];
@@ -117,18 +126,18 @@ pub fn fit(disp: &Cmyk, r: &Routing) -> Vec<Rect> {
 
     // block -> coherence-grid pixel, via the block's own centre so this agrees with the label map
     let blk_px = (screen::STEP / sdiv).max(1);
-    let nregions = r.label.iter().cloned().max().unwrap_or(0) as usize;
+    let nregions = label.iter().cloned().max().unwrap_or(0) as usize;
     let mut out = Vec::new();
 
     for id in 1..=nregions {
         let (mut by0, mut bx0, mut by1, mut bx1) = (usize::MAX, usize::MAX, 0usize, 0usize);
         let mut nblk = 0usize;
-        for i in 0..r.ny * r.nx {
-            if r.label[i] as usize != id {
+        for i in 0..ny * nx {
+            if label[i] as usize != id {
                 continue;
             }
             nblk += 1;
-            let (by, bx) = (i / r.nx, i % r.nx);
+            let (by, bx) = (i / nx, i % nx);
             by0 = by0.min(by);
             bx0 = bx0.min(bx);
             by1 = by1.max(by);
