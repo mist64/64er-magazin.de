@@ -266,6 +266,11 @@ pub const ABSORB_BLOCKS: usize = 0;
 /// unrouted black scored parts of one shape differently and split p166's drop-shadow into accepted
 /// and refused pieces.
 pub const BLACK_ENCLOSURE: f32 = 0.5;
+
+/// Whether an accepted solid-black object MERGES the regions it lies between, rather than only
+/// being previewed. See the comment at step 3d. This changes routing; everything else about the
+/// black preview does not.
+pub const BLACK_MERGE: bool = true;
 pub const BLACK_EXTEND_MEAN: f32 = 150.0;
 
 /// A contone pixel counts as part of the screen when at least this fraction of its footprint is
@@ -864,7 +869,7 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
     // COVERAGE and spends no marks: "inside a picture everything is contone" keeps halftone dots out
     // of the bilevel layer, and that rule must not reach out over whatever the picture abuts -- a
     // caption 1.35 mm away would lose its stencil.
-    let interior = label.clone();
+    let mut interior = label.clone();
     let st_rim;
     {
         let snap = label.clone();
@@ -969,6 +974,104 @@ fn shortest_f32(v: &[f32], frac: f32) -> f32 {
         let _ = &size;
         let obj: Vec<bool> = (0..ny * nx).map(|i| keep[blab[i] as usize]).collect();
         let add: Vec<bool> = (0..ny * nx).map(|i| !covered[i] && obj[i]).collect();
+
+        // ---- 3d. MERGE ACROSS SOLID INK ------------------------------------------------------
+        //
+        // PAPER SEPARATES, INK DOES NOT. CLOSE_BLOCKS = 0 says never bridge a gap, and that is
+        // right for the gap it was measured on: white, put there by the layout to hold two things
+        // apart. A gap of SOLID INK is not that. The page did not leave it empty, it printed on it,
+        // and an accepted object -- one whose own boundary is ringed by the screen, see
+        // BLACK_ENCLOSURE -- is by that measurement part of what surrounds it.
+        //
+        // Measured on p166, which is what this is for. The wordmark's gradient arrives as five
+        // regions, split by the letterforms' own black bars: down one column of the "6" the ink
+        // reads K 159, 239, 159 across two blocks where neither M nor Y is screened, because black
+        // is not a screen and there is nothing there to detect. The fragments are then classed
+        // separately, and identically-toned parts of ONE gradient come out flat in the yellow and
+        // colour-photo in the red -- so a flat fill meets a contone ramp in the middle of a letter
+        // and leaves a hard seam across it, which is visible in the rendered PDF.
+        //
+        // Merging is done on the LABEL, not by moving pixels: the object's blocks join the region
+        // and every region the object touches is unioned with the rest. What the black is made of
+        // does not change, only which region it counts as part of when the class is decided.
+        if BLACK_MERGE {
+            fn root(p: &mut Vec<u32>, mut a: u32) -> u32 {
+                while p[a as usize] != a {
+                    p[a as usize] = p[p[a as usize] as usize];
+                    a = p[a as usize];
+                }
+                a
+            }
+            let mut parent: Vec<u32> = (0..=nkept).collect();
+            let mut touch: Vec<Vec<u32>> = vec![Vec::new(); nobj + 1];
+            for by in 0..ny {
+                for bx in 0..nx {
+                    let i = by * nx + bx;
+                    let l = blab[i] as usize;
+                    if l == 0 || !keep[l] {
+                        continue;
+                    }
+                    for (dy, dx) in [(-1i64, 0i64), (1, 0), (0, -1), (0, 1)] {
+                        let (y2, x2) = (by as i64 + dy, bx as i64 + dx);
+                        if y2 < 0 || x2 < 0 || y2 >= ny as i64 || x2 >= nx as i64 {
+                            continue;
+                        }
+                        let v = label[y2 as usize * nx + x2 as usize];
+                        if v != 0 {
+                            touch[l].push(v);
+                        }
+                    }
+                }
+            }
+            for l in 1..=nobj {
+                if !keep[l] || touch[l].is_empty() {
+                    continue;
+                }
+                let a = root(&mut parent, touch[l][0]);
+                for &t in &touch[l][1..] {
+                    let b = root(&mut parent, t);
+                    if a != b {
+                        parent[b as usize] = a;
+                    }
+                }
+            }
+            for i in 0..ny * nx {
+                if label[i] != 0 {
+                    label[i] = root(&mut parent, label[i]);
+                } else {
+                    let l = blab[i] as usize;
+                    if l != 0 && keep[l] && !touch[l].is_empty() {
+                        label[i] = root(&mut parent, touch[l][0]);
+                    }
+                }
+            }
+            // RENUMBER to a contiguous 1..n. Merging leaves the absorbed ids empty, and the stencil
+            // indexes `areas` by label - 1; without this a merged page reads past the end of it.
+            let mut remap = vec![0u32; (nkept + 1) as usize];
+            let mut next = 0u32;
+            for i in 0..ny * nx {
+                let l = label[i] as usize;
+                if l == 0 {
+                    continue;
+                }
+                if remap[l] == 0 {
+                    next += 1;
+                    remap[l] = next;
+                }
+                label[i] = remap[l];
+            }
+            // `interior` is a snapshot of the label taken before the rim, and the stencil indexes
+            // `areas` through it. It has to travel through the same union and the same renumbering,
+            // or it addresses regions that no longer exist.
+            for i in 0..ny * nx {
+                let l = interior[i];
+                if l != 0 {
+                    let rl = root(&mut parent, l);
+                    interior[i] = remap[rl as usize];
+                }
+            }
+            nkept = next;
+        }
         (add, obj)
     };
 
