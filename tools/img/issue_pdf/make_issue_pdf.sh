@@ -7,8 +7,10 @@ Build a searchable, just-under-100MB PDF/A-3B for one 64'er issue.
 
 Usage: make_issue_pdf.sh <input_dir> <output.pdf> <issue_tag>
 
-  input_dir   folder with 001..NNN as .tiff or .png (page scans, 600 dpi A4),
-              plus an optional title.png used as page 1's image
+  input_dir   folder with 001..NNN as .tiff or .png (page scans, 600 dpi A4)
+  TITLE_PNG=  optional cleaned 150 dpi cover replacing page 1's image; must be EXACTLY the
+              size page 1 reduces to (1240x1754 for a 4960x7015 page) or the build stops.
+              Defaults to <input_dir>/title.png; the repo keeps them at issues/NNNN/title.png
   output.pdf  output PDF path
   issue_tag   e.g. "09/86"  ->  PDF Title "64'er 09/86"
 
@@ -23,7 +25,12 @@ THE TWO RESOLUTIONS, because they look like an inconsistency and are not:
     the 402 dpi page PDF, so the text layer keeps its accuracy and the file keeps its size.
 
 CACHING: OCR output and 150 dpi rasters live in <input_dir>/.ocrcache and are reused, so
-re-running to re-tune quality only redoes guetzli. Delete the cache to force a full rebuild.
+re-running to re-tune quality only redoes the encode. Delete the cache to force a full rebuild.
+
+ENCODER=fast  use ImageMagick JPEG instead of guetzli. Same pipeline, same cache, same PDF/A,
+              minutes instead of hours -- at a worse bytes-for-quality ratio. Meant for getting
+              a PDF in hand today; re-run without it for the keeper, and since the OCR and the
+              150 dpi rasters are cached, that second run only redoes the encode.
 EOF
 }
 
@@ -38,9 +45,15 @@ PYBIN="$(ls -1d /opt/homebrew/Cellar/ocrmypdf/*/libexec/bin/python 2>/dev/null |
 SWAP="$(cd "$(dirname "$0")" && pwd)/swap_image.py"
 ICC="$(ls -1 /opt/homebrew/Cellar/ghostscript/*/share/ghostscript/iccprofiles/srgb.icc 2>/dev/null | tail -1)"
 CACHE="$IN/.ocrcache"
+# The cleaned 150 dpi cover that replaces page 1's image. Defaults to the input dir; the repo keeps
+# the real ones per issue (issues/NNNN/title.png), which is not where the scans live.
+TITLE_PNG="${TITLE_PNG:-$IN/title.png}"
 LOG="${OUT%.pdf}.build.log"
 LIMIT=$((100*1000*1000))        # 100 MB ceiling (decimal)
-QMIN=84; QMAX=97                # guetzli quality search range
+ENCODER="${ENCODER:-guetzli}"
+# Quality search range, per encoder -- the two scales are not comparable. guetzli below 84 starts
+# visibly smearing the halftone; ImageMagick's q70 is roughly where the screen begins to mottle.
+if [[ "$ENCODER" == "fast" ]]; then QMIN=70; QMAX=95; else QMIN=84; QMAX=97; fi
 LANG="deu"; PSM=3; OEM=3; OCRSCALE=67; DPITAG=402; IMGSCALE=25
 NCPU="$(sysctl -n hw.ncpu)"
 CREATOR="tesseract 5 + guetzli + Ghostscript"      # honest
@@ -86,9 +99,17 @@ dims=$(magick "$(src_of "$first")" -format "%[fx:round(w*$IMGSCALE/100)] %[fx:ro
 W1=${dims% *}; H1=${dims#* }
 for n in $pages; do
   [[ -s "$CACHE/${n}_150.png" ]] && continue
-  if [[ "$n" == "$first" && -f "$IN/title.png" ]]; then
-    echo "[embed] $n <- title.png (${W1}x${H1})"
-    magick "$IN/title.png" -resize ${W1}x${H1}! +repage -strip "$CACHE/${n}_150.png"
+  if [[ "$n" == "$first" && -f "$TITLE_PNG" ]]; then
+    # EXACT SIZE OR STOP. title.png is a 150 dpi cover that REPLACES page 1's image, so it has to
+    # be the size that page 1 reduces to. The old `-resize WxH!` forced whatever it was given onto
+    # that box -- a silent aspect-ratio distortion of the one page everybody looks at first.
+    td=$(magick identify -format "%wx%h" "$TITLE_PNG")
+    if [[ "$td" != "${W1}x${H1}" ]]; then
+      echo "title.png is $td, page $first at ${IMGSCALE}% is ${W1}x${H1} -- refusing to rescale it"
+      exit 1
+    fi
+    echo "[embed] $n <- $TITLE_PNG ($td, verbatim)"
+    magick "$TITLE_PNG" +repage -strip "$CACHE/${n}_150.png"
   else
     magick "$(src_of "$n")" -resize ${IMGSCALE}% +repage -strip "$CACHE/${n}_150.png"
   fi
@@ -110,11 +131,17 @@ EOF
 
 # build the full PDF/A at a given guetzli quality, return byte size
 build_at() {  # $1=quality
-  local q="$1" qd="$CACHE/q$1"
+  # NAMESPACED BY ENCODER: guetzli q88 and ImageMagick q88 are different images at the same path
+  # otherwise, and the cache would hand a fast run's JPEG to a guetzli run silently.
+  local q="$1" qd="$CACHE/$ENCODER-q$1"
   mkdir -p "$qd"
   for n in $pages; do
     [[ -s "$qd/$n.jpg" ]] && continue
-    ( guetzli --quality "$q" "$CACHE/${n}_150.png" "$qd/$n.jpg" 2>/dev/null ) &
+    if [[ "$ENCODER" == "fast" ]]; then
+      ( magick "$CACHE/${n}_150.png" -quality "$q" -strip -interlace none "$qd/$n.jpg" ) &
+    else
+      ( guetzli --quality "$q" "$CACHE/${n}_150.png" "$qd/$n.jpg" 2>/dev/null ) &
+    fi
     while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
   done; wait
   for n in $pages; do
@@ -136,7 +163,7 @@ while (( lo <= hi )); do
   mid=$(( (lo+hi)/2 ))
   sz=$(build_at "$mid")
   printf "[search] q=%d -> %d bytes (%.2f MB)\n" "$mid" "$sz" "$(awk "BEGIN{print $sz/1e6}")"
-  if (( sz <= LIMIT )); then best="$mid"; bestf="$CACHE/q$mid/out.pdf"; lo=$((mid+1)); else hi=$((mid-1)); fi
+  if (( sz <= LIMIT )); then best="$mid"; bestf="$CACHE/$ENCODER-q$mid/out.pdf"; lo=$((mid+1)); else hi=$((mid-1)); fi
 done
 [[ -n "$best" ]] || { echo "even q$QMIN exceeds $LIMIT"; exit 1; }
 cp "$bestf" "$OUT"
