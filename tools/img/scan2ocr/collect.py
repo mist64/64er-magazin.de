@@ -22,7 +22,10 @@ import os
 import shutil
 
 OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
-REVIEW_DIR = os.path.join(OUT_DIR, "review")
+# Deliberately OUTSIDE OUT_DIR.  OUT_DIR is a working directory -- json, digests,
+# per-page tsv leftovers, two kinds of overlay -- and a reviewer should not have
+# to pick the three files that matter out of nine hundred.
+REVIEW_DIR = "/Users/mist/DNB/8609/tmp/ocr/review"
 PAGES = range(1, 177)
 
 # A page earns a flag when its signals contradict each other.  These are triage

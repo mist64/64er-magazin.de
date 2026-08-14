@@ -31,7 +31,7 @@ import sys
 from collections import defaultdict
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
@@ -158,7 +158,29 @@ RESCUE_BLOCK_ID = 2000    # rescued words get block ids from here up
 #     stops acting as a bridge;
 #   * a component must FILL its own bounding box, which a compact panel does and
 #     a leaked web never does.
-RESCUE_MIN_NEIGHBOURS = 3
+# A region the main pass read BADLY must be redone, not merely topped up.  Its
+# ink is "covered", so the rescue used to skip it entirely.  MEASURED on p9's
+# boxed panel: the main pass returned garbled fragments at conf 56-71 ("36 des
+# oimmodore Amiga m", "nellen Beispielen ir Kunst"), the rescue then found only
+# the scraps between them and produced one block spanning BOTH panel columns with
+# their lines interleaved, which scored conf 56.5, was labelled noise, and took
+# the panel's whole opening paragraph out of the corpus with it.
+# So only CONFIDENT blocks mask the ink map.  Anything below this is treated as
+# uncovered, the region is re-OCR'd whole, and the original fragments are then
+# dropped in favour of the clean re-read.
+RESCUE_KEEP_CONF = 78.0
+# ...and a re-read supersedes any original block it substantially covers, however
+# confident that block was: p9's block 21 scored 96.7 while being a fragment of
+# the same paragraph, and keeping it would duplicate text.
+RESCUE_SUPERSEDE_FRAC = 0.6
+
+# A one-line HEADING is only one or two cells tall, so its interior cells have
+# just two text-like neighbours and a threshold of 3 erased them -- p9's panel
+# heading "Computerzeit für Grafikfreunde" vanished before the flood fill ever
+# saw it, though the cut and the OCR both handled it perfectly.  2 keeps thin
+# bands of type.  Solid rules are not a danger here anyway: a rule is uniformly
+# dark inside a cell, so it already fails the variance test that defines "texty".
+RESCUE_MIN_NEIGHBOURS = 2
 RESCUE_COVER_GROW = 1     # cells
 RESCUE_MIN_DENSITY = 0.40
 # psm 6 treats its crop as ONE uniform block, so a rescued region spanning two
@@ -175,8 +197,29 @@ RESCUE_GUTTER_MIN_PX = 24   # ~2 mm at 300 dpi; narrower than any column gutter
 # wherever there is actually type, so 5% clears the dirt while staying four times
 # below the lightest real column.
 RESCUE_GUTTER_INK = 0.05    # column ink fraction below which it is white space
-RESCUE_STRIP_MIN_PX = 120   # ignore slivers left over by the cut
+# A strip smaller than this is discarded as a leftover sliver.  It must stay
+# BELOW one line of type: at 300 dpi a text line is ~50 px tall, and a 120 px
+# floor silently threw away the heading band of every rescued panel -- p9's
+# "Computerzeit für Grafikfreunde" among them.  40 px is under a single line and
+# still well above the grit the cut leaves behind.
+RESCUE_STRIP_MIN_PX = 40
 RESCUE_CUT_DEPTH = 6        # recursion limit for the XY-cut
+# The XY-cut lands exactly on the ink, leaving a strip with no white margin, and
+# tesseract reads such a strip badly or not at all.  MEASURED on p9: the heading
+# band came out 42 px tall in the pipeline against 57 px when cropped by hand, and
+# psm 6 returned NOTHING from the tight version while reading "Computerzeit für
+# Grafikfreunde" perfectly from the padded one.  Each cut rectangle is therefore
+# grown before OCR, clamped to the crop.
+RESCUE_RECT_PAD = 8
+# Panels are printed over a SCREENED TINT, and at 300 dpi its dots survive as a
+# fine texture that fills every gutter.  MEASURED on p9's boxed panel: the longest
+# white run was 4 px across the columns and 2 px down the rows, so no cut was
+# possible and both columns were OCR'd as one interleaved block.  A 3x3 median
+# clears isolated dots and restores the gutters to 34 px and 41 px.  It is applied
+# ONLY to the geometry used for cutting and to the rescued crop -- the screen does
+# not hurt legibility (word accuracy was measured identical with and without it,
+# only confidence rose), so nothing else needs descreening.
+DESCREEN_MEDIAN = 3
 
 # A word below this confidence is the binarizer hallucinating letters out of a
 # halftone photo or a screened tint.  Blocks made mostly of such words are kept
@@ -318,6 +361,15 @@ PARA_GAP_RATIO = 1.45
 # printing density: the subheads run 1.6x to 2.1x the median while the body's own
 # 90th percentile only reaches 1.15x.
 BOLD_INK_RATIO = 1.35
+# A line that stops well short of the right margin was ended DELIBERATELY -- it is
+# a list item, a line of code, a line of an address -- and the next line starts a
+# new paragraph.  In justified body text every line except a paragraph's last
+# reaches the margin, so this cannot misfire on ordinary prose, and firing on a
+# paragraph's genuine last line is correct anyway.  MEASURED against vision
+# transcription, merging these was the largest single source of disagreement:
+# p55's printer-code table, p61's errata code lines and p8's numbered list all
+# came out as one paragraph where a reader sees several.
+SHORT_LINE_FRAC = 0.85
 
 # --- line-break hyphens ------------------------------------------------------
 # A hyphen at a line end is MARKED, not resolved -- see reflow() for why no local
@@ -519,7 +571,13 @@ def xy_cut(a, x0=0, y0=0, depth=0):
         for vertical in (True, False):         # column gutters first, then rows
             prof = ink.mean(axis=0) if vertical else ink.mean(axis=1)
             spans = _pieces(_gaps(prof), len(prof))
-            if len(spans) > 1:
+            # A single span still counts when it is SMALLER than the input: that
+            # is a margin being trimmed.  Treating it as "no split" was why p9's
+            # panel survived whole -- the row cut separated its heading from its
+            # body, left one span, and the recursion stopped before ever looking
+            # for the column gutter inside that body band.
+            trimmed = len(spans) == 1 and (spans[0][0] > 0 or spans[0][1] < len(prof))
+            if len(spans) > 1 or trimmed:
                 out = []
                 for s0, s1 in spans:
                     sub = a[:, s0:s1] if vertical else a[s0:s1, :]
@@ -546,7 +604,9 @@ def rescue_uncovered(im, blocks, stem, W, H):
     texty &= nb >= RESCUE_MIN_NEIGHBOURS
 
     g = RESCUE_COVER_GROW
-    for b in blocks:                                   # mask off what we have
+    for b in blocks:                                   # mask off what we READ WELL
+        if b["conf"] < RESCUE_KEEP_CONF:
+            continue
         x0, y0, x1, y1 = b["bbox"]
         texty[max(0, y0 // c - g):(y1 // c) + 1 + g, max(0, x0 // c - g):(x1 // c) + 1 + g] = False
 
@@ -579,8 +639,14 @@ def rescue_uncovered(im, blocks, stem, W, H):
             y0 = max(0, min(ys) * c - RESCUE_PAD)
             x1 = min(W, (max(xs) + 1) * c + RESCUE_PAD)
             y1 = min(H, (max(ys) + 1) * c + RESCUE_PAD)
-            crop = binarize(im.crop((x0, y0, x1, y1)))
+            crop = binarize(im.crop((x0, y0, x1, y1))
+                             .filter(ImageFilter.MedianFilter(DESCREEN_MEDIAN)))
+            cw, ch = crop.size
             for rx0, ry0, rx1, ry1 in xy_cut(np.asarray(crop, dtype=np.float32)):
+                rx0 = max(0, rx0 - RESCUE_RECT_PAD)
+                ry0 = max(0, ry0 - RESCUE_RECT_PAD)
+                rx1 = min(cw, rx1 + RESCUE_RECT_PAD)
+                ry1 = min(ch, ry1 + RESCUE_RECT_PAD)
                 strip = crop.crop((rx0, ry0, rx1, ry1))
                 tsv = _tess(strip, os.path.join(OUT_DIR, f"{stem}_resc{nid}"),
                             TESS_PSM_RESCUE, ["tsv"])["tsv"]
@@ -657,6 +723,8 @@ def paragraphs(line_list, line_txt, arr):
     x0s = [min(w["l"] for w in lw) for lw in line_list]
     base = statistics.median(x0s)
     tops = [statistics.median(w["t"] for w in lw) for lw in line_list]
+    rights = [max(w["l"] + w["w"] for w in lw) for lw in line_list]
+    right_edge = max(rights) if rights else 0
     inks = []
     for lw in line_list:
         lx0 = min(w["l"] for w in lw)
@@ -682,6 +750,9 @@ def paragraphs(line_list, line_txt, arr):
         # line packs its box tightly enough to pass the bold test on its own --
         # MEASURED, "sig." (the tail of "überflüs-/sig.") did exactly that -- so a
         # break is refused outright when the previous line ends mid-word.
+        # a deliberately short PREVIOUS line ends its paragraph here
+        if i and right_edge and rights[i - 1] < SHORT_LINE_FRAC * right_edge:
+            new_para = True
         if i and line_txt[i - 1].rstrip().endswith("-"):
             new_para = False
         if cur and new_para:
@@ -968,6 +1039,30 @@ def write_article(page, blocks, dest):
     return len(text)
 
 
+def drop_superseded(blocks):
+    """Remove main-pass blocks that a re-read now covers.  See RESCUE_KEEP_CONF."""
+    redone = [b for b in blocks if b["id"] >= RESCUE_BLOCK_ID]
+    if not redone:
+        return blocks
+    out = []
+    for b in blocks:
+        if b["id"] >= RESCUE_BLOCK_ID:
+            out.append(b)
+            continue
+        x0, y0, x1, y1 = b["bbox"]
+        area = max(1, (x1 - x0) * (y1 - y0))
+        cov = 0
+        for r in redone:
+            rx0, ry0, rx1, ry1 = r["bbox"]
+            w = min(x1, rx1) - max(x0, rx0)
+            h = min(y1, ry1) - max(y0, ry0)
+            if w > 0 and h > 0:
+                cov += w * h
+        if cov / area < RESCUE_SUPERSEDE_FRAC:
+            out.append(b)
+    return out
+
+
 def draw_overlay(png, blocks, dest):
     im = Image.open(png).convert("RGB")
     sc = OVERLAY_DPI / SRC_DPI
@@ -986,10 +1081,16 @@ def write_digest(page, blocks, dest):
     """Compact page brief for stage B.  Geometry first, then a text sample --
     the LLM's job is the layout judgement (is this right-hand half an ad?), not
     re-reading the whole page."""
-    out = [f"PAGE {page}", "id  label            x0    y0    x1    y1   lines  conf  text"]
+    out = [f"PAGE {page}",
+           "id  label            x0    y0    x1    y1   lines  conf  text",
+           "(text shown as  START ... END  -- the END matters: a block breaking",
+           " mid-sentence is continued by whichever block starts with the rest)"]
     for b in blocks:
         x0, y0, x1, y1 = b["bbox_frac"]
-        sample = b["text"].replace("\n", " / ")[:200]
+        # Both ends are shown, because reading order is decided by whether one
+        # block's last words are finished by another's first ones.
+        flat = " ".join(b["text"].split())
+        sample = flat if len(flat) <= 240 else f"{flat[:150]} ... {flat[-80:]}"
         out.append(f"{b['id']:<3} {b['label']:<16} {x0:<5.2f} {y0:<5.2f} {x1:<5.2f} {y1:<5.2f} "
                    f"{b['n_lines']:<6} {b['conf']:<5.0f} {sample}")
     open(dest, "w", encoding="utf-8").write("\n".join(out) + "\n")
@@ -1017,7 +1118,8 @@ def process(page):
     # second pass over anything the layout analysis skipped, then rebuild
     extra = rescue_uncovered(im, blocks, stem, W, H)
     if extra:
-        blocks = block_features(rejoin_dropcap_lines(words + extra), W, H, np.asarray(im))
+        blocks = drop_superseded(
+            block_features(rejoin_dropcap_lines(words + extra), W, H, np.asarray(im)))
     for b in blocks:
         b["label"] = heuristic_label(b, W, H)
     merge_listings(blocks, W, H)
