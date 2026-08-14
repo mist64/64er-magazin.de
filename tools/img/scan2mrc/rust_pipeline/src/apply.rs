@@ -1314,16 +1314,18 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
     if o.variant_master {
         let (mw, mh) = (w / 4, h / 4);
         let mut wrote = Vec::new();
-        // THE THREE CANDIDATES, in the order they answer the question:
-        //   allsh  ALL.sh end to end -- raw convert.py separation, C 50,90. The original master.
-        //   c50    ALL.sh's levels on the neutral-calibrated separation. Corrects C twice; here to
-        //          show what that costs, not as a candidate.
-        //   c30    neutral-calibrated separation, C 30,70. ALL.sh's intent, corrected once.
-        for (tag, lv) in [
-            ("allsh", Levels::master_allsh_raw()),
-            ("c50", Levels::master_allsh()),
-            ("c30", Levels::display()),
-        ] {
+        // DECIDED 2026-08-14, on p007 rendered all three ways: c30 -- the neutral-calibrated
+        // separation with C 30,70, ALL.sh's grade with its hand-compensation removed. It is the
+        // only one of the three that is neutral (page mean R-G +0.8, against allsh's +4.4 and
+        // c50's +7.5); allsh reproduces the original masters' warmth, which is the separation's
+        // cyan deficit only partly cancelled, not a colour decision anyone made.
+        //
+        // The other two stay one line away rather than deleted -- reinstating them is how the
+        // decision gets re-examined if a page ever argues against it. Rendering all three costs
+        // ~19 s and ~70 MB a page instead of ~8 s and ~23 MB.
+        //   ("allsh", Levels::master_allsh_raw())   ALL.sh end to end, raw separation, C 50,90
+        //   ("c50",   Levels::master_allsh())       ALL.sh's levels on the calibrated separation
+        for (tag, lv) in [("c30", Levels::display())] {
             let cm = stage!(t0, format!("separate {}", tag), times, {
                 separate_grade(&wp.rgb, w, h, lv, dmin, dmax)
             });
