@@ -371,6 +371,21 @@ BOLD_INK_RATIO = 1.35
 # came out as one paragraph where a reader sees several.
 SHORT_LINE_FRAC = 0.85
 
+# NOTE -- split_block_columns() below is written but NOT WIRED IN, deliberately.
+# Tesseract does sometimes put two neighbouring columns in one block, and then
+# every line spans both: MEASURED on p10, a block of vendor addresses read
+# "8910 Landsberg 2300 Kiel / DÜM: Dümnler Verlag Hal: Haller Verlag" -- across
+# instead of down, which is factually wrong text.  Cutting at a gutter no word
+# crosses fixes that, but MEASURED against vision it made the corpus worse
+# overall (recall 0.917 -> 0.913, precision 0.910 -> 0.895): once each address
+# sits in its own column, the short-line rule splits its three lines into three
+# paragraphs where a reader, and vision, see one entry.  Fixing the granularity
+# and the interleaving together needs one change, not this half of it, so the
+# function stays here unused rather than being deleted and rediscovered.
+BLOCK_GUTTER_PX = 30
+BLOCK_SPLIT_MIN_LINES = 3
+SPLIT_BLOCK_ID = 3000
+
 # --- line-break hyphens ------------------------------------------------------
 # A hyphen at a line end is MARKED, not resolved -- see reflow() for why no local
 # rule can separate a soft hyphen from a compound from a suspended one.  U+00AC
@@ -832,6 +847,48 @@ def rejoin_dropcap_lines(words):
             cy = w["t"] + w["h"] / 2
             if y_lo <= cy <= y_hi and x_lo <= w["l"] <= x_hi:
                 w["block"] = bid
+    return words
+
+
+def split_block_columns(words):
+    """Cut a block that holds two side-by-side columns.  See BLOCK_GUTTER_PX."""
+    by_block = defaultdict(list)
+    for w in words:
+        by_block[w["block"]].append(w)
+
+    nid = SPLIT_BLOCK_ID
+    for bid, ws in sorted(by_block.items()):
+        lines = {w.get("lkey", (w["block"], w["par"], w["line"])) for w in ws}
+        if len(lines) < BLOCK_SPLIT_MIN_LINES:
+            continue
+        x0 = min(w["l"] for w in ws)
+        x1 = max(w["l"] + w["w"] for w in ws)
+        covered = np.zeros(x1 - x0 + 1, dtype=bool)
+        for w in ws:
+            covered[w["l"] - x0: w["l"] + w["w"] - x0] = True
+
+        gaps, run = [], 0
+        for i, c in enumerate(covered):
+            if not c:
+                run += 1
+            else:
+                if run >= BLOCK_GUTTER_PX:
+                    gaps.append((i - run + x0, i + x0))
+                run = 0
+        if not gaps:
+            continue
+        # cut at every gutter; segments keep their reading order left to right
+        bounds = [x0] + [g[0] for g in gaps] + [x1 + 1]
+        for k in range(len(bounds) - 1):
+            lo, hi = bounds[k], bounds[k + 1]
+            seg = [w for w in ws if lo <= w["l"] < hi]
+            if not seg:
+                continue
+            if k == 0:
+                continue                      # first segment keeps the block id
+            for w in seg:
+                w["block"] = nid
+            nid += 1
     return words
 
 
