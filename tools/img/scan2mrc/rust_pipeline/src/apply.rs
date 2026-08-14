@@ -41,6 +41,11 @@ pub struct Levels {
     pub k: (f64, f64),
     /// Discard the separation's own K channel and let GCR define K entirely. See `linear`.
     pub k_from_gcr: bool,
+    /// Run the separation through `neutral_luts`. TRUE everywhere except the one variant that
+    /// exists to reproduce ALL.sh end-to-end: `convert.py` has no neutral correction of any kind
+    /// (verified -- same eight anchor colours, plane-distance ratio for C/M/Y, distance-to-black
+    /// for K, and nothing else), so an exact reproduction must not add one.
+    pub neutral: bool,
 }
 impl Levels {
     /// LINEAR: no contrast stretch at all. See the note on `contone()` in demod.rs -- the stretch
@@ -52,6 +57,7 @@ impl Levels {
             y: (0.0, 100.0),
             k: (0.0, 100.0),
             k_from_gcr: true,
+            neutral: true,
         }
     }
     pub fn display() -> Self {
@@ -59,7 +65,26 @@ impl Levels {
         // C used to sit at (50,90) as a hand-compensation for the raw separation reading C far too
         // high on neutrals; `neutral_luts` now corrects that at source, so keeping both would
         // correct the same error twice. See grade.rs for the full note.
-        Levels { c: (30.0, 70.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0), k_from_gcr: false }
+        Levels { c: (30.0, 70.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0), k_from_gcr: false, neutral: true }
+    }
+    /// ALL.sh LITERALLY: `-channel C -level 50%,90%`, M and Y 30,70, K 90,95.
+    ///
+    /// Kept next to `display()` because the pair is the open question, not a preference. ALL.sh
+    /// graded the RAW convert.py separation, which reads C far too high on a neutral (C 128 /
+    /// M 78 / Y 62 at 45% density), and C 50,90 clips exactly that excess back off. This code
+    /// separates through `neutral_luts`, which already removes it at source -- so C 50,90 here
+    /// corrects the same error a second time and should come out cyan-starved/warm, while
+    /// `display()` is the same grade with that hand-compensation removed. Both are rendered for
+    /// `--variant master` so the difference is looked at rather than argued about.
+    pub fn master_allsh() -> Self {
+        Levels { c: (50.0, 90.0), m: (30.0, 70.0), y: (30.0, 70.0), k: (90.0, 95.0), k_from_gcr: false, neutral: true }
+    }
+    /// ALL.sh END TO END: its levels on the separation it actually graded. `convert.py` applies no
+    /// neutral correction of any kind, so this is the only variant that REPRODUCES the original
+    /// 600 dpi master instead of approximating its intent -- C 50,90 is left doing the job it was
+    /// picked for, on the imbalance it was picked to cancel.
+    pub fn master_allsh_raw() -> Self {
+        Levels { neutral: false, ..Levels::master_allsh() }
     }
     pub fn detect() -> Self {
         // NO CLIPPING AT EITHER END. The detector must see the separation as it is.
@@ -74,7 +99,7 @@ impl Levels {
         // Same lesson as the contone, one stage earlier: a level stretch is the only step in the
         // grade that destroys information, and neither the contone nor the detector has any use for
         // contrast. GCR stays off for this variant too (FINDINGS.md 2).
-        Levels { c: (0.0, 100.0), m: (0.0, 100.0), y: (0.0, 100.0), k: (0.0, 100.0), k_from_gcr: false }
+        Levels { c: (0.0, 100.0), m: (0.0, 100.0), y: (0.0, 100.0), k: (0.0, 100.0), k_from_gcr: false, neutral: true }
     }
 }
 
@@ -568,7 +593,19 @@ fn neutral_luts(cube: &[[u8; 3]]) -> [[u8; 256]; 3] {
 pub fn separate_grade(rgb: &[u8], w: usize, h: usize, lv: Levels, dmin: f64, dmax: f64) -> Cmyk {
     let span = (dmax - dmin).max(1e-12);
     let cube = cube_lut();
-    let nlut = neutral_luts(&cube);
+    // IDENTITY when the variant asks for the raw convert.py separation -- gated here rather than at
+    // the call sites so every path still goes through one separation, not two.
+    let nlut = if lv.neutral {
+        neutral_luts(&cube)
+    } else {
+        let mut id = [[0u8; 256]; 3];
+        for ch in 0..3 {
+            for v in 0..256 {
+                id[ch][v] = v as u8;
+            }
+        }
+        id
+    };
     let pac = plane(COLOR_C, COLOR_CM, COLOR_CY);
     let pbc = plane(COLOR_M, COLOR_Y, COLOR_W);
     let pam = plane(COLOR_M, COLOR_CM, COLOR_MY);
@@ -1155,6 +1192,46 @@ fn rgb600(page: &[u8], w: usize, h: usize, mw: usize, mh: usize, f: Filter) -> V
     out
 }
 
+/// ---- THE 600 dpi MASTER (`--variant master`). Constants, not flags. -----------------------------
+///
+/// Reproduces `tools/img/ALL.sh`, which is the ORIGINAL deliverable recipe:
+///
+///     convert.py separation -> per-channel -level -> -resize 25% -> SWOP -> AdobeRGB -> 600 dpi
+///
+/// Three properties of it are deliberate here and are NOT improvements waiting to happen:
+///   * NO GCR. ALL.sh has none. GCR is the MRC renderer's reconstruction choice (CMY pure colour,
+///     K all neutral); the viewable master keeps the separation as graded.
+///   * The reduce runs on the CMYK, BEFORE the ICC transform -- ALL.sh's order. The transform is a
+///     nonlinear per-pixel map, so doing it after the reduce is a different image, not a faster
+///     route to the same one. It is also 16x cheaper (35 MP instead of 557).
+///   * 4:1 exactly. 19843/4 = 4960.75, so the output is 4960x7015 rather than A4-at-600's
+///     4961x7016 -- 0.03 mm short, and worth less than resampling on a non-integer ratio.
+const MASTER_DPI: u32 = 600;
+/// LANCZOS, matching ImageMagick's default for a downscale. Measured against BOX on p007: type is
+/// visibly crisper (`cmp_text`, `cmp_tint`), photo and screenshot indistinguishable, and no ringing
+/// halo on black-on-cyan headings -- which is where ringing shows first on this issue.
+const MASTER_FILTER: Filter = Filter::Lanczos;
+
+/// 600 dpi AdobeRGB from a 2400 dpi graded CMYK page: reduce each ink plane, then transform.
+/// One plane at a time -- a 2400 dpi f32 plane is 2.2 GB and there are four of them.
+fn master600(cm: &Cmyk, mw: usize, mh: usize, profile_dir: &str) -> Result<Vec<u8>> {
+    let mut small = Cmyk::new(mw, mh);
+    for ci in 0..4 {
+        let p = crate::resample::resample_plane_u8(
+            cm.channel(ci), cm.w, cm.h, mw, mh, MASTER_FILTER);
+        let dst = match ci {
+            0 => &mut small.c,
+            1 => &mut small.m,
+            2 => &mut small.y,
+            _ => &mut small.k,
+        };
+        for i in 0..mw * mh {
+            dst[i] = crate::resample::clip8(p[i]);
+        }
+    }
+    icc_page_rgb(&small, profile_dir)
+}
+
 pub struct Opts {
     pub master_dir: String,
     pub geo_json: String,
@@ -1162,6 +1239,9 @@ pub struct Opts {
     pub out_dir: String,
     pub profile_dir: String,
     pub variant_display: bool,
+    /// `--variant master`: the ALL.sh 600 dpi viewable master, and NOTHING else -- no 1 GB CMYK
+    /// TIFF, no detector cache. Writes both candidate grades (see `Levels::master_allsh`).
+    pub variant_master: bool,
     pub inpaint: bool,
     pub detect_too: bool,
     pub cache: bool,
@@ -1228,6 +1308,60 @@ pub fn run(page: u32, o: &Opts) -> Result<serde_json::Value> {
         n_holes = stage!(t0, "telea holes", times, {
             diffuse_holes(&mut wp.rgb, &wp.unknown, w, h)
         });
+    }
+
+    // ---- THE 600 dpi MASTER. Own exit: it shares the front end and nothing after it. ------------
+    if o.variant_master {
+        let (mw, mh) = (w / 4, h / 4);
+        let mut wrote = Vec::new();
+        // THE THREE CANDIDATES, in the order they answer the question:
+        //   allsh  ALL.sh end to end -- raw convert.py separation, C 50,90. The original master.
+        //   c50    ALL.sh's levels on the neutral-calibrated separation. Corrects C twice; here to
+        //          show what that costs, not as a candidate.
+        //   c30    neutral-calibrated separation, C 30,70. ALL.sh's intent, corrected once.
+        for (tag, lv) in [
+            ("allsh", Levels::master_allsh_raw()),
+            ("c50", Levels::master_allsh()),
+            ("c30", Levels::display()),
+        ] {
+            let cm = stage!(t0, format!("separate {}", tag), times, {
+                separate_grade(&wp.rgb, w, h, lv, dmin, dmax)
+            });
+            let rgb = stage!(t0, format!("reduce+icc {}", tag), times, {
+                master600(&cm, mw, mh, &o.profile_dir)?
+            });
+            drop(cm);
+            let name = format!("{:03}_master600_{}.png", page, tag);
+            stage!(t0, format!("write {}", tag), times, {
+                pilio::write_rgb_png_dpi(
+                    &format!("{}/{}", o.out_dir, name), mw, mh, &rgb, Some(MASTER_DPI))?
+            });
+            wrote.push(name);
+        }
+        if o.write {
+            stage!(t0, "write known png", times, {
+                let known: Vec<bool> = wp.unknown.par_iter().map(|&u| !u).collect();
+                pilio::write_png_1bit(&format!("{}/{:03}_known.png", o.out_dir, page), w, h, &known)?
+            });
+        }
+        let unknown_pct = {
+            let n = wp.unknown.par_iter().filter(|&&u| u).count();
+            (100.0 * n as f64 / (w * h) as f64 * 1000.0).round() / 1000.0
+        };
+        return Ok(serde_json::json!({
+            "page": page,
+            "variant": "master",
+            "out_size": [mw, mh],
+            "dpi": MASTER_DPI,
+            "src_size": [w, h],
+            "files": wrote,
+            "inpaint": o.inpaint,
+            "dead_px": n_dead,
+            "holes_filled": n_holes,
+            "unknown_pct": unknown_pct,
+            "secs": (t0.elapsed().as_secs_f64() * 10.0).round() / 10.0,
+            "stages": times,
+        }));
     }
 
     // THE SCREENING INPUT: graded, and NOT GCR'd.

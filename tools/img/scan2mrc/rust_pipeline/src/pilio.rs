@@ -493,6 +493,19 @@ pub fn write_png_1bit(path: &str, w: usize, h: usize, bit_set: &[bool]) -> Resul
 /// 8-bit RGB PNG for the cached 600 dpi products. Not byte-compared against anything, so the
 /// only requirement is that it round-trips exactly; deflate level 6 is the size/time knee here.
 pub fn write_rgb_png_fast(path: &str, w: usize, h: usize, data: &[u8]) -> Result<()> {
+    write_rgb_png_dpi(path, w, h, data, None)
+}
+
+/// The same, with a pHYs chunk so the file DECLARES its resolution. ALL.sh tagged every
+/// deliverable (`-density 600 -set units PixelsPerInch`); a 600 dpi page that claims 72 is a page
+/// every downstream tool places at the wrong size, and the scale is not recoverable from pixels.
+pub fn write_rgb_png_dpi(
+    path: &str,
+    w: usize,
+    h: usize,
+    data: &[u8],
+    dpi: Option<u32>,
+) -> Result<()> {
     let stride = w * 3;
     let mut raw = Vec::with_capacity((stride + 1) * h);
     let mut prev = vec![0u8; stride];
@@ -523,6 +536,15 @@ pub fn write_rgb_png_fast(path: &str, w: usize, h: usize, data: &[u8]) -> Result
     ihdr.extend_from_slice(&(h as u32).to_be_bytes());
     ihdr.extend_from_slice(&[8, 2, 0, 0, 0]);
     png_chunk(&mut f, b"IHDR", &ihdr)?;
+    if let Some(d) = dpi {
+        // pHYs: pixels per METRE, both axes, unit byte 1 (= metre). 600 dpi -> 23622.
+        let ppm = ((d as f64) / 0.0254).round() as u32;
+        let mut phys = Vec::with_capacity(9);
+        phys.extend_from_slice(&ppm.to_be_bytes());
+        phys.extend_from_slice(&ppm.to_be_bytes());
+        phys.push(1u8);
+        png_chunk(&mut f, b"pHYs", &phys)?;
+    }
     png_chunk(&mut f, b"IDAT", &comp)?;
     png_chunk(&mut f, b"IEND", b"")?;
     f.flush()?;

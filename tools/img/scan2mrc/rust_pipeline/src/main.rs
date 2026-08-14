@@ -31,6 +31,8 @@ struct Cli {
 enum GradeVariant {
     Display,
     Detect,
+    /// `apply` only: the ALL.sh 600 dpi viewable master (graded, no GCR, reduce then ICC).
+    Master,
 }
 
 #[derive(Subcommand)]
@@ -145,6 +147,10 @@ fn main() -> Result<()> {
             let lv = match variant {
                 GradeVariant::Display => grade::GradeLevels::display(),
                 GradeVariant::Detect => grade::GradeLevels::detect(),
+                // `master` is an APPLY variant: it names a whole recipe (grade + reduce + ICC +
+                // dpi tag), not a level set, so there is nothing coherent for this subcommand to do
+                // with it. Erroring beats silently grading as `display`.
+                GradeVariant::Master => anyhow::bail!("--variant master is only valid for `apply`"),
             };
             grade::grade_in_place(&mut cmyk, lv);
             if gcr {
@@ -287,6 +293,7 @@ fn main() -> Result<()> {
                 out_dir: out,
                 profile_dir: profiles,
                 variant_display: matches!(variant, GradeVariant::Display),
+                variant_master: matches!(variant, GradeVariant::Master),
                 inpaint,
                 detect_too,
                 cache,

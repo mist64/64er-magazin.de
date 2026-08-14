@@ -158,6 +158,32 @@ pub fn resample_rgb_channel(
     out_h: usize,
     filter: Filter,
 ) -> Vec<f32> {
+    resample_u8_strided(src, ch, 3, in_w, in_h, out_w, out_h, filter)
+}
+
+/// The same, for a SINGLE-channel u8 plane -- one CMYK separation. Stride 1, offset 0, and it
+/// shares the body below so a plane and an RGB channel cannot resample differently by accident.
+pub fn resample_plane_u8(
+    src: &[u8],
+    in_w: usize,
+    in_h: usize,
+    out_w: usize,
+    out_h: usize,
+    filter: Filter,
+) -> Vec<f32> {
+    resample_u8_strided(src, 0, 1, in_w, in_h, out_w, out_h, filter)
+}
+
+fn resample_u8_strided(
+    src: &[u8],
+    off: usize,
+    stride: usize,
+    in_w: usize,
+    in_h: usize,
+    out_w: usize,
+    out_h: usize,
+    filter: Filter,
+) -> Vec<f32> {
     use rayon::prelude::*;
     let (ff, sup): (fn(f64) -> f64, f64) = match filter {
         Filter::Box => (box_filter, box_support()),
@@ -167,13 +193,13 @@ pub fn resample_rgb_channel(
     let (hb, hw, hk) = precompute_coeffs(in_w, out_w, ff, sup);
     let mut tmp = vec![0.0f32; out_w * in_h];
     tmp.par_chunks_mut(out_w).enumerate().for_each(|(yy, orow)| {
-        let row = &src[yy * in_w * 3..(yy + 1) * in_w * 3];
+        let row = &src[yy * in_w * stride..(yy + 1) * in_w * stride];
         for xx in 0..out_w {
             let (xmin, n) = hb[xx];
             let base = xx * hk;
             let mut acc = 0.0f64;
             for x in 0..n {
-                acc += row[(xmin + x) * 3 + ch] as f64 * hw[base + x];
+                acc += row[(xmin + x) * stride + off] as f64 * hw[base + x];
             }
             orow[xx] = acc as f32;
         }

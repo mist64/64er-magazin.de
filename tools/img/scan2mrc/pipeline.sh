@@ -28,6 +28,7 @@
 #   window   03-crop/fit_window.py      -> crop_windows_v2.json  (the A4 window per page)
 #   geom     03-crop/emit_geometry.py   -> page_geometry.json + page_geometry/NNN/  (CUT PROFILES)
 #   cache    mrcpipe apply              -> graded CMYK @2400, known mask, per-page report
+#   master   mrcpipe apply --variant master -> the 600 dpi viewable master PNGs (see MASTER600.md)
 #
 # THE TRAP, stated because it has cost a 7-hour run once: `cache` reads the CUT PROFILES written by
 # `geom`, not the matte code. Changing bed_matte.py and re-running `cache` applies nothing. Any
@@ -47,8 +48,12 @@ T="${T:-/Users/mist/DNB/8609/tmp}"
 LANES="${LANES:-3}"
 JOBS="${JOBS:-3}"         # for the Python stages
 FORCE="${FORCE:-0}"
+# Which candidate grade the `final` stage publishes. See MASTER600.md for what separates the three;
+# `master` renders all of them, `final` picks one. Changing this and re-running `--only final` is
+# the whole cost of changing your mind -- the links are relinked, nothing is re-rendered.
+FINAL_GRADE="${FINAL_GRADE:-c30}"
 
-STAGES=(skew holes spine stack logo clear window geom cache)
+STAGES=(skew holes spine stack logo clear window geom cache master final)
 FROM=""; ONLY=""; PAGES=""
 
 while [ $# -gt 0 ]; do
@@ -193,4 +198,52 @@ if want cache; then
   pagelist | xargs -P "$LANES" -I{} bash -c 'cache_one {}'
 fi
 
-say done "cached=$(ls "$T"/render/deliver/*_known.png 2>/dev/null | wc -l | tr -d ' ')"
+# ------------------------------------------------------------------------------------------------
+# THE 600 dpi VIEWABLE MASTER. Reproduces ALL.sh: grade -> NO GCR -> reduce 4:1 lanczos on the CMYK
+# -> SWOP -> AdobeRGB -> pHYs 600. Independent of `cache` and of the renderer -- it reads the same
+# cut profiles `geom` wrote and returns before the 1 GB CMYK TIFF, so a page costs ~19 s and ~70 MB
+# instead of ~45 s and ~1 GB. Writes one PNG per candidate grade (allsh / c50 / c30); see
+# apply.rs `Levels::master_allsh_raw` for why there are three and what separates them.
+if want master; then
+  say master "600 dpi masters (${LANES} lanes)"
+  mkdir -p "$T/master600"
+  master_one() {
+    n=$(printf "%03d" "$1")
+    # gate on the LAST variant written, not the first: a run killed mid-page would otherwise look
+    # complete because its first PNG exists.
+    if [ "$FORCE" != "1" ] && [ -s "$T/master600/${n}_master600_c30.png" ]; then
+      return 0
+    fi
+    [ -d "$T/page_geometry/$n" ] || { echo "  p$n NO GEOMETRY -- run --from geom"; return 1; }
+    "$MP" apply "$1" --out "$T/master600" --inpaint --variant master \
+        2>/dev/null | tail -1 >> "$T/master_reports.jsonl" || { echo "  p$n MASTER FAILED"; return 1; }
+    echo "  p$n master"
+  }
+  export -f master_one; export MP T FORCE
+  pagelist | xargs -P "$LANES" -I{} bash -c 'master_one {}'
+fi
+
+# ------------------------------------------------------------------------------------------------
+# PUBLISH: the chosen grade, as plain NNN.png in one directory and nothing else in it.
+#
+# HARD LINKS, not copies: same filesystem, so a link costs an inode and no bytes, and 176 pages do
+# not become a second 4 GB of the same pixels. It also means changing FINAL_GRADE is instant --
+# unlink, relink, no re-render. Every link is remade every run so the directory can never hold a
+# stale mix of two grades, which a plain `ln -f` per page would silently allow.
+if want final; then
+  say final "publish ${FINAL_GRADE} -> master600/final/NNN.png"
+  mkdir -p "$T/master600/final"
+  n_ok=0; n_miss=0
+  for p in $(pagelist); do
+    n=$(printf "%03d" "$p")
+    src="$T/master600/${n}_master600_${FINAL_GRADE}.png"
+    if [ -s "$src" ]; then
+      ln -f "$src" "$T/master600/final/${n}.png" && n_ok=$((n_ok + 1))
+    else
+      n_miss=$((n_miss + 1))
+    fi
+  done
+  echo "  $n_ok published, $n_miss missing"
+fi
+
+say done "cached=$(ls "$T"/render/deliver/*_known.png 2>/dev/null | wc -l | tr -d ' ') masters=$(ls "$T"/master600/*_master600_c30.png 2>/dev/null | wc -l | tr -d ' ') final=$(ls "$T"/master600/final/*.png 2>/dev/null | wc -l | tr -d ' ')"
