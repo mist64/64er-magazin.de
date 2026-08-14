@@ -224,13 +224,24 @@ def process(page):
     # as article text (captions in or out, say) is a rebuild and not 176 fresh
     # LLM calls.  Delete NNN.labels.json to force the page to be judged again.
     cached = os.path.join(OUT_DIR, stem + ".labels.json")
+    verdict = None
     if os.path.exists(cached):
         old = json.load(open(cached, encoding="utf-8"))
-        verdict = {"page_kind": old.get("page_kind", "unknown"),
-                   "order": old.get("order"),
-                   "labels": {str(b["id"]): b["llm_label"] for b in old["blocks"]
-                              if b.get("llm_label")}}
-    else:
+        cand = {"page_kind": old.get("page_kind", "unknown"),
+                "order": old.get("order"),
+                "labels": {str(b["id"]): b["llm_label"] for b in old["blocks"]
+                           if b.get("llm_label")}}
+        # A cached verdict is only valid for the blocks it was made about.  If
+        # stage A has since renumbered them the cache is silently wrong: it was
+        # applied to a rerun whose ids had changed, most blocks fell back to the
+        # geometric guess, and the corpus scored 0.822 instead of 0.917 with no
+        # error anywhere.  Compare the id sets and re-ask when they differ.
+        now_ids = {str(b["id"]) for b in rec["blocks"]}
+        if set(cand["labels"]) == now_ids:
+            verdict = cand
+        else:
+            print(f"p{stem}: cached labels are for different blocks, re-asking", flush=True)
+    if verdict is None:
         verdict = call_llm(page, digest, overlay)
     labels = {str(k): v for k, v in verdict.get("labels", {}).items()}
 
