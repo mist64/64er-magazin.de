@@ -37,7 +37,18 @@ from PIL import Image, ImageDraw, ImageOps
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
 # ---------------------------------------------------------------------------
 
-SRC_DIR = "/Users/mist/DNB/8609/thumbs_600"
+# The DESKEWED, MATTED, A4-CROPPED, GRADED 600 dpi master -- not the raw thumbs.
+# Three reasons, in order of weight:
+#   * figure crops and text then share ONE coordinate system.  The raw thumbs are
+#     uncropped and each page has its own width (5245 / 5127 / 5197 px against a
+#     uniform 4960 here), so a block's page-fraction means something different on
+#     every page and any crop taken elsewhere needs a per-page remap.
+#   * an A4-cropped page HAS no facing page, which deletes the sliver problem
+#     rather than detecting around it.
+#   * MEASURED, the grade also reads better: unknown-word rate against a German
+#     dictionary over p8/p55/p58 fell 19.85% -> 19.08% and mean word confidence
+#     rose 88.1 -> 88.7.
+SRC_DIR = "/Users/mist/DNB/8609/tmp/master600/final"
 OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
 
 # thumbs_600 is ~600 dpi (5197x7188 for an A4-ish uncropped sheet).  Tesseract's
@@ -165,15 +176,16 @@ MIN_BLOCK_CONF = 55.0
 MIN_BLOCK_WORDS = 2
 MIN_BLOCK_AREA_FRAC = 0.00015
 
-# --- neighbour-page sliver ---------------------------------------------------
-# thumbs_600 is NOT cropped to the A4 window: most sheets carry a vertical strip
-# of the facing page at one edge (p5 left, p58/p61 right).  Its text is real
-# text, so confidence alone will not reject it -- geometry must.  A sliver block
-# is narrow AND hard against an outer edge.  Both conditions, never one alone: a
-# genuine narrow sidebar sits inboard, a genuine wide block touching the edge is
-# a bleed image.  MEASURED on p58/p61: slivers land at x >= 0.99, conf 3.8-40.
-SLIVER_EDGE_FRAC = 0.055   # within this fraction of page width of either edge
-SLIVER_MAX_W_FRAC = 0.075  # and no wider than this fraction of page width
+# --- neighbour-page sliver: NOT DETECTED, BY DESIGN --------------------------
+# The raw thumbs were uncropped and carried a strip of the FACING page at one
+# edge (p5 left, p58/p61 right, landing at x >= 0.99 with conf 3.8-40), which had
+# to be found geometrically because sliver text is real text that confidence
+# will not reject.  SRC_DIR is now the A4-cropped master, so no facing page is
+# present and the rule has nothing true left to find -- it could only misfire, on
+# genuine narrow content near a trim edge such as the vertical set price line in
+# p61's ad.  Dropping real text is the one error this pipeline must not make, so
+# the rule is gone rather than merely loosened.  The "sliver" LABEL is kept in the
+# vocabulary: stage B may still apply it if a page turns out to be uncropped.
 
 # --- running header / footer -------------------------------------------------
 # The single strongest signal in the magazine: every editorial page carries a
@@ -717,8 +729,6 @@ def heuristic_label(b, W, H):
     cx0, cx1 = x0 / W, x1 / W
     cy0, cy1 = y0 / H, y1 / H
 
-    if (cx0 < SLIVER_EDGE_FRAC or cx1 > (1.0 - SLIVER_EDGE_FRAC)) and b["w_frac"] <= SLIVER_MAX_W_FRAC:
-        return "sliver"
     if cy1 < HEADER_BAND:
         return "header"
     if cy0 > FOOTER_BAND or (cy0 > 0.90 and FOOTER_RE.search(b["text"])):

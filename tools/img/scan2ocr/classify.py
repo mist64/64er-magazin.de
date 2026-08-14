@@ -45,7 +45,7 @@ LANES = 4
 # (Captions are OUT by the user's decision -- apparatus attached to a figure, not
 # running text.  They are still LABELLED and kept in the JSON, so reversing that
 # is a rebuild, not a re-OCR.  Errata columns ARE article and stay in.)
-from ocr_blocks import ARTICLE_LABELS, reading_order   # noqa: E402
+from ocr_blocks import ARTICLE_LABELS, SRC_DIR, reading_order   # noqa: E402
 
 VALID_LABELS = ARTICLE_LABELS | {
     "listing-standalone", "ad", "kleinanzeige", "toc",
@@ -135,7 +135,11 @@ def redraw(page, blocks):
         return
     # The stage-A overlay is redrawn from the source thumb, so start from the
     # original page rather than stacking boxes on boxes.
-    im = Image.open(os.path.join("/Users/mist/DNB/8609/thumbs_150", f"{page:03d}.png")).convert("RGB")
+    # Drawn from the SAME image stage A measured.  thumbs_150 is uncropped, so
+    # using it here put every box at the wrong place on the page the moment the
+    # source became the A4-cropped master.
+    im = Image.open(os.path.join(SRC_DIR, f"{page:03d}.png")).convert("RGB")
+    im = im.resize((im.size[0] // 4, im.size[1] // 4), Image.BOX)
     W, H = im.size
     # Everything not going into the corpus is dimmed, so what remains at full
     # contrast IS the deliverable -- the overlay answers "what did we keep?" at a
