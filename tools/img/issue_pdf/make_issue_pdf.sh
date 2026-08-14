@@ -71,8 +71,15 @@ exec >> "$LOG" 2>&1
 echo "=== $(date '+%H:%M:%S') build $IN -> $OUT  title='$TITLE' ==="
 
 # page list 001..NNN, .tiff or .png (title.png is the page-1 image override, not a page itself)
-pages=$(ls -1 "$IN"/[0-9][0-9][0-9].tiff "$IN"/[0-9][0-9][0-9].png 2>/dev/null \
-        | xargs -n1 basename | sed 's/\.\(tiff\|png\)$//' | sort -u)
+# A shell loop, NOT `ls ... | xargs`: under `set -o pipefail` a glob that matches nothing (this
+# input dir holds PNGs, no TIFFs) makes ls exit non-zero and takes the whole build down before it
+# has listed one page. Which it did, at 22:22, with an empty log and exit 1.
+pages=""
+for f in "$IN"/[0-9][0-9][0-9].tiff "$IN"/[0-9][0-9][0-9].png; do
+  [[ -e "$f" ]] || continue
+  b="$(basename "$f")"; pages="$pages ${b%.*}"
+done
+pages=$(printf '%s\n' $pages | sort -u)
 [[ -n "$pages" ]] || { echo "no NNN.tiff or NNN.png in $IN"; exit 1; }
 echo "pages: $(echo $pages | wc -w)"
 
