@@ -104,7 +104,14 @@ ringing would show first on this issue. It also matches what ImageMagick's `-res
 
 ---
 
-## The three candidate grades
+## The grade — decided 2026-08-14: `c30`
+
+Rendered all three ways on p007 and chosen: **`c30`**, the neutral-calibrated separation with
+C 30,70. `apply.rs` now renders that alone; the other two sit commented one line above it, because
+reinstating them is how the decision gets re-examined rather than re-argued. `pipeline.sh`'s
+`FINAL_GRADE` publishes it. Everything below is the evidence.
+
+### The three candidates
 
 ALL.sh graded `C 50%,90%` and `M`/`Y` `30%,70%`, `K 90%,95%`. The M, Y and K values transfer
 unchanged. **C does not**, and the reason is worth keeping:
@@ -124,19 +131,23 @@ twice. All three variants are rendered so the difference is looked at rather tha
 |---|---|---|---|
 | `allsh` | raw, no neutral LUT | 50,90 | ALL.sh end to end — reproduces the original master |
 | `c50` | neutral-calibrated | 50,90 | corrects C twice; rendered to show the cost, not a candidate |
-| `c30` | neutral-calibrated | 30,70 | ALL.sh's intent, corrected once |
+| `c30` | neutral-calibrated | 30,70 | ALL.sh's intent, corrected once — **chosen** |
 
-Measured on p007 — `c50` is warm by the amount the double correction predicts, `c30` is neutral:
+Measured on p007. `allsh` lands *between* the other two and closer to `c50`, which is the finding
+that matters: the original masters were warm because C 50,90 only **partly** cancels the
+separation's cyan excess. That warmth is an artefact of an uncorrected separation, not a colour
+decision anyone made — so reproducing it would be reproducing a defect.
 
-| patch | c50 (R,G,B) | c30 (R,G,B) |
-|---|---|---|
-| whole page | 207.5, 200.1, 200.8 (**+7.5 R**) | 200.3, 199.5, 201.1 (**+0.8**) |
-| black "9/86" | 72.0, 70.8, 70.7 | 70.9, 70.6, 70.7 |
-| photo crop | 59.8, 22.4, 22.7 | 40.0, 24.6, 25.0 |
-| paper margin | 255, 255, 255 | 255, 255, 255 |
+| patch | allsh (R,G,B) | c50 (R,G,B) | c30 (R,G,B) |
+|---|---|---|---|
+| whole page | 205.7, 201.3, 202.8 (**+4.4 R**) | 207.5, 200.1, 200.8 (**+7.5**) | 200.3, 199.5, 201.1 (**+0.8**) |
+| black "9/86" | 71.7, 71.1, 71.3 | 72.0, 70.8, 70.7 | 70.9, 70.6, 70.7 |
+| photo crop | 54.7, 25.0, 23.9 | 59.8, 22.4, 22.7 | 40.0, 24.6, 25.0 |
+| paper margin | 255, 255, 255 | 255, 255, 255 | 255, 255, 255 |
 
 Visibly, `c50` turns the letterpress photo lurid red and the C64 screenshot's grey UI panel
-warm-pink with magenta sprites; `c30` keeps the panel grey and the sprites blue.
+warm-pink with magenta sprites; `allsh` does the same, less far; `c30` keeps the panel grey and the
+sprites blue.
 
 **Known non-reproduction.** ALL.sh ran `convert.py` on the *uncropped* master, so its K
 normalisation span came from the whole scan — bed, neighbour page and all. This code normalises
