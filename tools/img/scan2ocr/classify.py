@@ -93,7 +93,12 @@ Assign a final label to every block id. Valid labels:
   footer              folio line at the foot (page number, "Ausgabe 9/September 1986")
   sliver              text belonging to the FACING page, caught at the extreme
                       left or right edge because the scan is not cropped
-  noise               OCR garbage read out of a photo or a screened tint
+  noise               OCR garbage read out of a photo or a screened tint, AND
+                      text that is part of a FIGURE rather than of the prose --
+                      the contents of a screen dump, a character table, a
+                      labelled diagram, a boxed illustration. Such text is
+                      printed inside the picture, not written as running text,
+                      and does not belong in the corpus.
   other               anything else
 
 Rules:
@@ -108,9 +113,27 @@ Rules:
 - Do not judge by subject matter. An ad for a disk drive and an article about a
   disk drive read alike; the layout is what separates them.
 
+READING ORDER matters as much as the labels. The blocks are listed in the digest
+in the order tesseract happened to emit them, which is NOT the order a person
+reads the page. You decide the order.
+
+Work it out from the page image and from how the text itself runs:
+- A block that ends mid-sentence is continued by whichever block begins with the
+  rest of that sentence, even when it sits in another column or another panel.
+- Columns read top to bottom, then left to right, but a headline or standfirst
+  spanning the page reads before the columns underneath it.
+- A boxed panel or sidebar is its own self-contained run. Do not interleave it
+  with the main text it sits beside; place it whole, where a reader would take
+  it, and keep its own blocks together and in order.
+- A subhead reads immediately before the paragraph it introduces.
+
 Return ONLY a JSON object, no prose, no code fence:
-{{"page_kind": "<article|ad|mixed|toc|other>", "labels": {{"<id>": "<label>", ...}}}}
+{{"page_kind": "<article|ad|mixed|toc|other>",
+  "labels": {{"<id>": "<label>", ...}},
+  "order": [<id>, <id>, ...]}}
 Every id in the digest must appear in "labels".
+"order" lists ONLY the blocks whose label is body, heading or listing-inline --
+the ones whose text goes into the corpus -- in the order they should be read.
 
 DIGEST:
 {digest}
@@ -164,6 +187,33 @@ def redraw(page, blocks):
     im.save(dst)
 
 
+# A paragraph does not stop at a column break, but a block does.  The last
+# paragraph of one block and the first of the next are the same paragraph whenever
+# the earlier one stops mid-sentence.  MEASURED against vision transcription:
+# this was the single largest source of disagreement -- "...wie Kopierprogram" and
+# "me, Directory-Sorter und ähnliches" were being emitted as two paragraphs where
+# a reader sees one.
+SENTENCE_END = ".!?:»\"'\u201c"
+
+
+def join_runons(paras):
+    out = []
+    for p in paras:
+        if out:
+            prev = out[-1].rstrip()
+            head = p.lstrip()
+            # continue when the previous paragraph did not finish a sentence and
+            # this one does not begin like a new one
+            if prev and prev[-1] not in SENTENCE_END and head[:1].islower():
+                if prev.endswith("¬"):
+                    out[-1] = prev + head          # word split across the break
+                else:
+                    out[-1] = prev + " " + head
+                continue
+        out.append(p)
+    return out
+
+
 def process(page):
     stem = f"{page:03d}"
     rec = json.load(open(os.path.join(OUT_DIR, stem + ".json"), encoding="utf-8"))
@@ -177,6 +227,7 @@ def process(page):
     if os.path.exists(cached):
         old = json.load(open(cached, encoding="utf-8"))
         verdict = {"page_kind": old.get("page_kind", "unknown"),
+                   "order": old.get("order"),
                    "labels": {str(b["id"]): b["llm_label"] for b in old["blocks"]
                               if b.get("llm_label")}}
     else:
@@ -190,13 +241,33 @@ def process(page):
         # than silently dropping the block from the corpus.
         b["label"] = new if new in VALID_LABELS else b["label"]
     rec["page_kind"] = verdict.get("page_kind", "unknown")
+    rec["order"] = verdict.get("order")
 
     json.dump(rec, open(os.path.join(OUT_DIR, stem + ".labels.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
     redraw(page, rec["blocks"])
 
     keep = [b for b in rec["blocks"] if b["label"] in ARTICLE_LABELS]
-    text = "\n".join(b["text"].strip() for b in reading_order(keep) if b["text"].strip())
+    # The LLM decides the reading order: column flow, sentences continuing across
+    # a column break, a boxed panel that must stay whole rather than being woven
+    # into the text beside it.  Geometry alone cannot see any of that.  The
+    # geometric order remains only as a fallback, and any block the model forgot
+    # is appended in geometric order rather than silently dropped.
+    ordered, seen = [], set()
+    by_id = {b["id"]: b for b in keep}
+    for i in (rec.get("order") or []):
+        try:
+            bid = int(i)
+        except (TypeError, ValueError):
+            continue
+        if bid in by_id and bid not in seen:
+            seen.add(bid)
+            ordered.append(by_id[bid])
+    missing = [b for b in reading_order(keep) if b["id"] not in seen]
+    if missing and ordered:
+        print(f"p{stem}: {len(missing)} block(s) missing from LLM order, appended", flush=True)
+    ordered += missing
+    text = "\n".join(join_runons([b["text"].strip() for b in ordered if b["text"].strip()]))
     art = os.path.join(OUT_DIR, stem + ".article.txt")
     open(art, "w", encoding="utf-8").write(text + ("\n" if text else ""))
 
