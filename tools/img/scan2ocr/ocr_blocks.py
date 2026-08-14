@@ -133,6 +133,18 @@ RESCUE_CELL = 32          # px at 300 dpi (~2.7 mm) -- about one x-height
 RESCUE_STD = 25.0         # per-cell std above which a cell holds type
 RESCUE_MIN_CELLS = 12     # ignore specks; a real missed panel is far bigger
 RESCUE_PAD = 8            # px of margin around a rescued crop
+# Rescued crops are BINARISED (Otsu on the crop's own histogram), not merely
+# contrast-stretched.  A screened tint stays mid-grey under a stretch and
+# tesseract's global binarizer then eats into the type: MEASURED on p51, the
+# panel heading read "Chedksummer und MSE" stretched and "Checksummer und MSE"
+# binarised.  psm 6 is kept over psm 3 even though psm 3 recovers one extra short
+# line here, because psm 3 returns the panel out of reading order -- it put
+# "schweifte Klammern / was innerhalb der Klammern steht" near the top -- and
+# mangles more words.  Order and accuracy beat one line.
+# NOTE: binarising the WHOLE PAGE was tried and rejected. It does not make the
+# main pass find the panel (psm 1 still misses it) and it costs accuracy overall:
+# unknown-word rate over p8/p51/p55/p58 went 18.28% grey -> 18.69% Otsu -> 19.05%
+# Sauvola. The rescue pass is genuinely necessary; binarisation belongs only here.
 RESCUE_BLOCK_ID = 2000    # rescued words get block ids from here up
 # Uncovered text-like cells are not islands: column rules, box borders, photo
 # edges and the gutters just outside each block's bbox link them into one web
@@ -257,6 +269,20 @@ DROPCAP_H_RATIO = 2.2   # taller than this multiple of the median line height
 # it feeds two dashes into the same word.  A two-character limit rejected it and
 # the paragraph kept opening "it »Shrinksprite«" with a stray "M--" on line two.
 DROPCAP_MAX_CHARS = 4   # OCR attaches grit from the rule beside the cap
+# A drop cap also wrecks tesseract's BLOCK segmentation: the two or three lines
+# set beside the cap are indented away from the column edge, so they are emitted
+# as separate blocks from the rest of the paragraph.  MEASURED on p58, where the
+# opening paragraph came back as three blocks -- "it »Shrinksprite« ... Programm"
+# alone in one, "nennt, lassen sich ... ver-" swallowed by the standfirst above,
+# and "kleinern oder aber ..." in a third that the cap was then spliced onto,
+# giving "Mkleinern".  Words whose vertical centre lies within the cap's own span
+# and which sit to its right in the same column are therefore reassigned to the
+# cap's block before any features are measured.  That is a fact about how the
+# paragraph was set, not a repair of a threshold.
+# The reach must stop at the cap's OWN block, never past it.  A first attempt
+# allowed 1.15x the block width and at 0.076 + 1.15*0.43 that lands at 0.57 --
+# inside the RIGHT-hand column, which dragged "ler (Bild" and "noch einen" out of
+# the facing column and wove them into the paragraph.
 
 # --- paragraphs --------------------------------------------------------------
 # The corpus wants one line per PARAGRAPH, not one line per printed line, so the
@@ -274,6 +300,24 @@ PARA_INDENT_MIN_PX = 15
 # starting new ones, so anything indented past this ceiling is not a new
 # paragraph.
 PARA_INDENT_MAX_PX = 60
+# A subhead is not indented, so the indent test alone leaves it glued to the end
+# of the paragraph above ("...ist überflüssig. Zielblock").  What actually marks
+# it on the page is the EXTRA LEADING above it -- the compositor opened up the
+# space.  A line whose gap to the previous line exceeds this multiple of the
+# block's own median line pitch therefore starts a new paragraph too.  Measuring
+# the pitch per block keeps this valid at any type size.
+# ...except that MEASURED on p58 the leading above a subhead is not larger at
+# all: "Zielblock" sits at 0.81 of the block's line pitch and "Spritenummer" at
+# 0.98.  The compositor set them tight, so leading cannot find them.
+PARA_GAP_RATIO = 1.45
+# What DOES mark a subhead is that it is BOLD, and boldness is directly
+# measurable as ink coverage inside the line's own box.  MEASURED on p58:
+# subheads 0.401 / 0.427 / 0.522 against 119 body lines whose median is 0.248 and
+# whose MAXIMUM is 0.311 -- no overlap whatever.  The test is a ratio to the
+# block's own median line, not an absolute, so it holds at any type size or
+# printing density: the subheads run 1.6x to 2.1x the median while the body's own
+# 90th percentile only reaches 1.15x.
+BOLD_INK_RATIO = 1.35
 
 # --- line-break hyphens ------------------------------------------------------
 # A hyphen at a line end is MARKED, not resolved -- see reflow() for why no local
@@ -289,10 +333,21 @@ HYPHEN_MARK = "¬"
 # Captions are excluded by the user's decision; errata columns count as article.
 ARTICLE_LABELS = {"heading", "body", "listing-inline"}
 
-# Column assignment for reading order.  The magazine's columns are ~0.21 of the
-# page wide with ~0.02 gutters, so 0.06 groups a column without swallowing its
-# neighbour.
-COLUMN_TOL = 0.06
+# A block this wide spans the page rather than sitting in a column -- a headline
+# or a standfirst.  Column-major ordering alone put p58's headline LAST, because
+# its left edge (0.167) formed its own column bucket sorting after the body's
+# (0.076).  A full-width block instead ends one band and starts the next, so it
+# reads before the columns beneath it, which is the order a person reads.
+FULLWIDTH_FRAC = 0.55
+
+# Column membership is decided by how much a block OVERLAPS a column, not by how
+# close its left edge is.  A centred subhead is inset from the column edge --
+# p58's "Tips für Maschinenprogrammierer" starts at 0.601 against its column's
+# 0.527 -- so a left-edge test with any workable tolerance invents a phantom
+# column for it, which then sorts after the real one and drops the subhead to the
+# bottom of the page.  Overlap has no such failure: the subhead lies entirely
+# within its column.
+COLUMN_MIN_OVERLAP = 0.5   # fraction of the NARROWER block that must overlap
 
 # Overlay colours per heuristic label.
 COLOURS = {
@@ -406,6 +461,20 @@ def run_tesseract(png, stem):
     return full["tsv"], full["txt"], bar_tsv, origin, im, W, H
 
 
+def binarize(img):
+    """Otsu on the image's own histogram.  See the RESCUE_* notes for why a
+    rescued crop is binarised rather than merely contrast-stretched."""
+    a = np.asarray(img)
+    h = np.histogram(a, 256, (0, 256))[0].astype(float)
+    tot = h.sum()
+    w0 = np.cumsum(h)
+    w1 = tot - w0
+    m = np.cumsum(h * np.arange(256))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        var = (m[-1] * w0 / tot - m) ** 2 / (w0 * w1)
+    return Image.fromarray(((a > int(np.nanargmax(var))) * 255).astype(np.uint8))
+
+
 def _gaps(profile):
     """Runs of white in a 1-D ink profile, as [(start, end), ...]."""
     out, run = [], 0
@@ -510,7 +579,7 @@ def rescue_uncovered(im, blocks, stem, W, H):
             y0 = max(0, min(ys) * c - RESCUE_PAD)
             x1 = min(W, (max(xs) + 1) * c + RESCUE_PAD)
             y1 = min(H, (max(ys) + 1) * c + RESCUE_PAD)
-            crop = ImageOps.autocontrast(im.crop((x0, y0, x1, y1)))
+            crop = binarize(im.crop((x0, y0, x1, y1)))
             for rx0, ry0, rx1, ry1 in xy_cut(np.asarray(crop, dtype=np.float32)):
                 strip = crop.crop((rx0, ry0, rx1, ry1))
                 tsv = _tess(strip, os.path.join(OUT_DIR, f"{stem}_resc{nid}"),
@@ -581,16 +650,41 @@ def reflow(lines):
     return out
 
 
-def paragraphs(line_list, line_txt):
+def paragraphs(line_list, line_txt, arr):
     """Split a block's lines into paragraphs on the first-line indent."""
     if not line_list:
         return []
     x0s = [min(w["l"] for w in lw) for lw in line_list]
     base = statistics.median(x0s)
+    tops = [statistics.median(w["t"] for w in lw) for lw in line_list]
+    inks = []
+    for lw in line_list:
+        lx0 = min(w["l"] for w in lw)
+        lx1 = max(w["l"] + w["w"] for w in lw)
+        ly0 = min(w["t"] for w in lw)
+        ly1 = max(w["t"] + w["h"] for w in lw)
+        cell = arr[ly0:ly1, lx0:lx1]
+        inks.append(float((cell < 128).mean()) if cell.size else 0.0)
+    ink_med = statistics.median([i for i in inks if i > 0]) if any(inks) else 0.0
+    gaps = [tops[i] - tops[i - 1] for i in range(1, len(tops))]
+    pitch = statistics.median(gaps) if gaps else 0
+
     paras, cur = [], []
     for i, txt in enumerate(line_txt):
         indent = x0s[i] - base if i < len(x0s) else 0
-        if cur and PARA_INDENT_MIN_PX <= indent <= PARA_INDENT_MAX_PX:
+        gap = (tops[i] - tops[i - 1]) if i else 0
+        new_para = PARA_INDENT_MIN_PX <= indent <= PARA_INDENT_MAX_PX
+        if pitch and i and gap > PARA_GAP_RATIO * pitch:
+            new_para = True
+        if ink_med and inks[i] > BOLD_INK_RATIO * ink_med:   # a bold subhead
+            new_para = True
+        # ...but a paragraph cannot begin in the middle of a word.  A very short
+        # line packs its box tightly enough to pass the bold test on its own --
+        # MEASURED, "sig." (the tail of "überflüs-/sig.") did exactly that -- so a
+        # break is refused outright when the previous line ends mid-word.
+        if i and line_txt[i - 1].rstrip().endswith("-"):
+            new_para = False
+        if cur and new_para:
             paras.append(cur)
             cur = []
         cur.append(txt)
@@ -635,7 +729,42 @@ def stdev(xs):
     return statistics.pstdev(xs) if len(xs) > 1 else 0.0
 
 
-def block_features(words, W, H):
+def rejoin_dropcap_lines(words):
+    """Reattach lines set beside a drop cap to the cap's own block.  See
+    DROPCAP_COL_W_FRAC for why tesseract splits them off in the first place."""
+    # A line is identified by the block it was recognised in, not by par/line
+    # alone: those numbers restart per block, so once words are moved between
+    # blocks two unrelated printed lines share a key and get fused into one.
+    for w in words:
+        w.setdefault("lkey", (w["block"], w["par"], w["line"]))
+
+    by_block = defaultdict(list)
+    for w in words:
+        by_block[w["block"]].append(w)
+
+    for bid, ws in list(by_block.items()):
+        if len(ws) < 2:
+            continue
+        med_h = statistics.median(w["h"] for w in ws)
+        caps = [w for w in ws
+                if w["h"] > DROPCAP_H_RATIO * med_h
+                and len(w["text"]) <= DROPCAP_MAX_CHARS
+                and w["text"][:1].isupper()]
+        if not caps:
+            continue
+        cap = caps[0]
+        x_lo, x_hi = cap["l"], max(w["l"] + w["w"] for w in ws)
+        y_lo, y_hi = cap["t"], cap["t"] + cap["h"]
+        for w in words:
+            if w["block"] == bid:
+                continue
+            cy = w["t"] + w["h"] / 2
+            if y_lo <= cy <= y_hi and x_lo <= w["l"] <= x_hi:
+                w["block"] = bid
+    return words
+
+
+def block_features(words, W, H, arr):
     groups = defaultdict(list)
     for w in words:
         groups[w["block"]].append(w)
@@ -659,7 +788,7 @@ def block_features(words, W, H):
 
         lines = defaultdict(list)
         for w in ws:
-            lines[(w["par"], w["line"])].append(w)
+            lines[w.get("lkey", (w["block"], w["par"], w["line"]))].append(w)
         # sort by MEDIAN top, not min: a drop cap's tall bbox otherwise drags its
         # line above the line that visually precedes it (measured on p58).
         line_list = [sorted(lines[k], key=lambda x: x["l"])
@@ -703,7 +832,7 @@ def block_features(words, W, H):
             "hex_line_frac": round(hexd, 3),
             "klein_frac": round(klein, 3),
             # one line per PARAGRAPH, printed line breaks undone
-            "text": "\n".join(t for t in (reflow(p) for p in paragraphs(line_list, line_txt)) if t),
+            "text": "\n".join(t for t in (reflow(p) for p in paragraphs(line_list, line_txt, arr)) if t),
         })
     return blocks
 
@@ -799,18 +928,36 @@ def reading_order(blocks):
     """Column-major order.  The magazine sets 2-3 columns, so a plain
     top-to-bottom sort interleaves them into nonsense.  Blocks are grouped by
     left edge, groups run left to right, each group top to bottom."""
-    cols = []
-    for b in sorted(blocks, key=lambda b: b["bbox_frac"][0]):
-        x0 = b["bbox_frac"][0]
-        for c in cols:
-            if abs(c["x"] - x0) <= COLUMN_TOL:
-                c["items"].append(b)
-                break
+    # split into bands first: a page-wide block reads before the columns below it
+    bands, cur, band = [], [], 0
+    for b in sorted(blocks, key=lambda b: b["bbox_frac"][1]):
+        if b["w_frac"] >= FULLWIDTH_FRAC:
+            if cur:
+                bands.append(cur)
+            bands.append([b])
+            cur = []
         else:
-            cols.append({"x": x0, "items": [b]})
+            cur.append(b)
+    if cur:
+        bands.append(cur)
+
     out = []
-    for c in sorted(cols, key=lambda c: c["x"]):
-        out.extend(sorted(c["items"], key=lambda b: b["bbox_frac"][1]))
+    for items in bands:
+        cols = []
+        # widest first, so a full column is established before its insets are placed
+        for b in sorted(items, key=lambda b: -b["w_frac"]):
+            x0, x1 = b["bbox_frac"][0], b["bbox_frac"][2]
+            for c in cols:
+                ov = min(x1, c["x1"]) - max(x0, c["x0"])
+                if ov > 0 and ov >= COLUMN_MIN_OVERLAP * min(x1 - x0, c["x1"] - c["x0"]):
+                    c["items"].append(b)
+                    c["x0"] = min(c["x0"], x0)
+                    c["x1"] = max(c["x1"], x1)
+                    break
+            else:
+                cols.append({"x0": x0, "x1": x1, "items": [b]})
+        for c in sorted(cols, key=lambda c: c["x0"]):
+            out.extend(sorted(c["items"], key=lambda b: b["bbox_frac"][1]))
     return out
 
 
@@ -865,11 +1012,12 @@ def process(page):
             w["t"] += origin[1]
             words.append(w)
 
-    blocks = block_features(words, W, H)
+    words = rejoin_dropcap_lines(words)
+    blocks = block_features(words, W, H, np.asarray(im))
     # second pass over anything the layout analysis skipped, then rebuild
     extra = rescue_uncovered(im, blocks, stem, W, H)
     if extra:
-        blocks = block_features(words + extra, W, H)
+        blocks = block_features(rejoin_dropcap_lines(words + extra), W, H, np.asarray(im))
     for b in blocks:
         b["label"] = heuristic_label(b, W, H)
     merge_listings(blocks, W, H)
