@@ -398,7 +398,25 @@ BOLD_INK_RATIO = 1.35
 # came out as one paragraph where a reader sees several.
 SHORT_LINE_FRAC = 0.85
 
-# NOTE -- split_block_columns() below is written but NOT WIRED IN, deliberately.
+# NOTE -- split_block_columns() is written but NOT WIRED IN.  Tried TWICE and
+# reverted both times; do not wire it without reading this.
+#
+# The motive is real: tesseract sometimes puts two neighbouring columns in one
+# block and every line then spans both.  MEASURED on p10, "Kingsoft bringt mit der
+# Andere Sportarten sind Bobfah-" is the first line of the left column welded to
+# the first line of the right one, where a reader sees two paragraphs.
+#
+# It does not fix that, and it wrecks everything else.  Enabling it over all 176
+# pages: recall 0.942 -> 0.650, precision 0.945 -> 0.594, and FIFTY-TWO pages
+# began emitting text where vision sees none.  p10's welded line came out
+# unchanged, because the "SUPER-SPIEL FÜR C 16" heading spans both columns, so no
+# x-range is uncrossed and no gutter exists to cut at.
+#
+# The honest reading is that a whitespace corridor is the wrong instrument here.
+# Tesseract's own block segmentation is usually right; where it is wrong the
+# evidence is the TEXT reading across (a line ending mid-sentence in one column
+# and resuming in another), not the geometry.  That is a job for stage B, which
+# already sees the image and decides reading order.
 # Tesseract does sometimes put two neighbouring columns in one block, and then
 # every line spans both: MEASURED on p10, a block of vendor addresses read
 # "8910 Landsberg 2300 Kiel / DÜM: Dümnler Verlag Hal: Haller Verlag" -- across
@@ -1200,7 +1218,7 @@ def write_digest(page, blocks, dest):
     the LLM's job is the layout judgement (is this right-hand half an ad?), not
     re-reading the whole page."""
     out = [f"PAGE {page}",
-           "id  label            x0    y0    x1    y1   lines  conf  text",
+           "id  label            x0    y0    x1    y1   lines  conf  lineh  text",
            "(text shown as  START ... END  -- the END matters: a block breaking",
            " mid-sentence is continued by whichever block starts with the rest)"]
     for b in blocks:
@@ -1209,8 +1227,11 @@ def write_digest(page, blocks, dest):
         # block's last words are finished by another's first ones.
         flat = " ".join(b["text"].split())
         sample = flat if len(flat) <= 240 else f"{flat[:150]} ... {flat[-80:]}"
+        # line height is the printed TYPE SIZE, which is how heading levels are
+        # told apart; stage B is given it rather than having to guess from the
+        # image alone
         out.append(f"{b['id']:<3} {b['label']:<16} {x0:<5.2f} {y0:<5.2f} {x1:<5.2f} {y1:<5.2f} "
-                   f"{b['n_lines']:<6} {b['conf']:<5.0f} {sample}")
+                   f"{b['n_lines']:<6} {b['conf']:<5.0f} {b['line_h_frac']:<6.4f} {sample}")
     open(dest, "w", encoding="utf-8").write("\n".join(out) + "\n")
 
 
