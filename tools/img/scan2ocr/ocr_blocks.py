@@ -173,6 +173,15 @@ RESCUE_KEEP_CONF = 78.0
 # confident that block was: p9's block 21 scored 96.7 while being a fragment of
 # the same paragraph, and keeping it would duplicate text.
 RESCUE_SUPERSEDE_FRAC = 0.6
+# When a re-read and an original overlap, the more trustworthy one wins, and
+# trust is confidence.  MEASURED on p10: the main pass read "Ab sofort können auch
+# die Besitzer von C 128-Computern ver-" at conf 94.3, a rescue crop overlapped it
+# and produced a horizontally CLIPPED version missing the left half of every line,
+# and the original was deleted in favour of it.  Skipping such components outright
+# was tried first and was far worse -- it cost p51 its whole rescued sidebar
+# (recall 1.00 -> 0.60) and p9 its panel -- because a component's cells can be
+# genuinely uncovered while its bounding box still grazes a confident block.
+# So both readings are kept until the end, and then the loser is dropped.
 
 # A one-line HEADING is only one or two cells tall, so its interior cells have
 # just two text-like neighbours and a threshold of 3 erased them -- p9's panel
@@ -180,6 +189,15 @@ RESCUE_SUPERSEDE_FRAC = 0.6
 # saw it, though the cut and the OCR both handled it perfectly.  2 keeps thin
 # bands of type.  Solid rules are not a danger here anyway: a rule is uniformly
 # dark inside a cell, so it already fails the variance test that defines "texty".
+# Text on a SCREENED TINT must be re-read even where the main pass was confident,
+# because there tesseract is confidently WRONG.  MEASURED on p11's bottom-right
+# panel, it returned "die unterschied. der Organisation und de Ai Inhaltsverzei
+# nisses." at conf 91.0, which no confidence gate can catch.  What does separate
+# the cases is the background itself: the fraction of pixels that are pure white.
+# MEASURED -- tint panels 0.004 / 0.006 / 0.009 (p51, p9, p11), plain columns
+# 0.668 / 0.719.  Two orders of magnitude, so the threshold sits anywhere between.
+SCREEN_WHITE_FRAC = 0.10
+
 RESCUE_MIN_NEIGHBOURS = 2
 RESCUE_COVER_GROW = 1     # cells
 RESCUE_MIN_DENSITY = 0.40
@@ -627,12 +645,19 @@ def rescue_uncovered(im, blocks, stem, W, H):
              for dy in (-1, 0, 1) for dx in (-1, 0, 1) if (dy, dx) != (0, 0))
     texty &= nb >= RESCUE_MIN_NEIGHBOURS
 
+    # cells whose background is a screened tint rather than paper
+    screened = (cells == 255).mean(axis=(2, 3)) < SCREEN_WHITE_FRAC
+
     g = RESCUE_COVER_GROW
     for b in blocks:                                   # mask off what we READ WELL
         if b["conf"] < RESCUE_KEEP_CONF:
             continue
         x0, y0, x1, y1 = b["bbox"]
-        texty[max(0, y0 // c - g):(y1 // c) + 1 + g, max(0, x0 // c - g):(x1 // c) + 1 + g] = False
+        sl = (slice(max(0, y0 // c - g), (y1 // c) + 1 + g),
+              slice(max(0, x0 // c - g), (x1 // c) + 1 + g))
+        # a confident block masks its ink only where it sits on PAPER; on a tint
+        # its confidence means nothing and the region is re-read regardless
+        texty[sl] &= screened[sl]
 
     seen = np.zeros_like(texty)
     words = []
@@ -1107,28 +1132,46 @@ def write_article(page, blocks, dest):
     return len(text)
 
 
-def drop_superseded(blocks):
+def is_screened(arr, b):
+    """Is this block's background a screened tint rather than paper?"""
+    x0, y0, x1, y1 = b["bbox"]
+    cell = arr[y0:y1, x0:x1]
+    return cell.size > 0 and (cell == 255).mean() < SCREEN_WHITE_FRAC
+
+
+def drop_superseded(blocks, arr):
     """Remove main-pass blocks that a re-read now covers.  See RESCUE_KEEP_CONF."""
     redone = [b for b in blocks if b["id"] >= RESCUE_BLOCK_ID]
+    original = [b for b in blocks if b["id"] < RESCUE_BLOCK_ID]
     if not redone:
         return blocks
-    out = []
-    for b in blocks:
-        if b["id"] >= RESCUE_BLOCK_ID:
-            out.append(b)
-            continue
-        x0, y0, x1, y1 = b["bbox"]
-        area = max(1, (x1 - x0) * (y1 - y0))
-        cov = 0
+
+    def overlap(a, b):
+        ax0, ay0, ax1, ay1 = a["bbox"]
+        bx0, by0, bx1, by1 = b["bbox"]
+        w = min(ax1, bx1) - max(ax0, bx0)
+        h = min(ay1, by1) - max(ay0, by0)
+        return w * h if w > 0 and h > 0 else 0
+
+    drop = set()
+    for o in original:
+        ox0, oy0, ox1, oy1 = o["bbox"]
+        oarea = max(1, (ox1 - ox0) * (oy1 - oy0))
         for r in redone:
             rx0, ry0, rx1, ry1 = r["bbox"]
-            w = min(x1, rx1) - max(x0, rx0)
-            h = min(y1, ry1) - max(y0, ry0)
-            if w > 0 and h > 0:
-                cov += w * h
-        if cov / area < RESCUE_SUPERSEDE_FRAC:
-            out.append(b)
-    return out
+            rarea = max(1, (rx1 - rx0) * (ry1 - ry0))
+            ov = overlap(o, r)
+            if not ov:
+                continue
+            if ov >= RESCUE_SUPERSEDE_FRAC * oarea or ov >= RESCUE_SUPERSEDE_FRAC * rarea:
+                # the confident reading survives; ties go to the re-read, which
+                # was made with layout analysis off and the tint removed
+                if o["conf"] >= RESCUE_KEEP_CONF and o["conf"] > r["conf"] \
+                        and not is_screened(arr, o):
+                    drop.add(id(r))
+                else:
+                    drop.add(id(o))
+    return [b for b in blocks if id(b) not in drop]
 
 
 def draw_overlay(png, blocks, dest):
@@ -1186,8 +1229,9 @@ def process(page):
     # second pass over anything the layout analysis skipped, then rebuild
     extra = rescue_uncovered(im, blocks, stem, W, H)
     if extra:
+        arr = np.asarray(im)
         blocks = drop_superseded(
-            block_features(rejoin_dropcap_lines(words + extra), W, H, np.asarray(im)))
+            block_features(rejoin_dropcap_lines(words + extra), W, H, arr), arr)
     for b in blocks:
         b["label"] = heuristic_label(b, W, H)
     merge_listings(blocks, W, H)
