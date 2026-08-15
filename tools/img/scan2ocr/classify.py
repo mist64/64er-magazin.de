@@ -139,7 +139,13 @@ Rules:
   vertical OR horizontal. Judge each block by which side of the rule it sits on.
 - An ad is identified by its border, product photography, prices, an order coupon,
   a company logo and address, and by NOT being covered by the page's running head.
-- Editorial pages carry a running head; full-page ads carry none.
+- Editorial pages carry a running head; full-page ads carry none. This is the
+  single most reliable signal on the page and it OUTRANKS how promotional the
+  layout looks. If a running head names a section of the magazine -- "Wettbewerb",
+  "Software", "Grafik", "Aktuelles", "Anwendung des Monats" -- the page is
+  editorial, and its text is body even when it is set in big coloured panels with
+  prize money in display type. An advertiser cannot buy the magazine's own
+  section head.
 - Errata columns, editorials, interviews, reviews and news are editorial: body.
 - Do not judge by subject matter. An ad for a disk drive and an article about a
   disk drive read alike; the layout is what separates them.
