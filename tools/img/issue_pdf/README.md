@@ -53,9 +53,19 @@ Measured on 8609, per page, lossless JBIG2 against the guetzli JPEG it replaces:
 | photo | 399–433 KB | 479–503 KB | 1.2× — marginal |
 | screened | 706 KB | 554 KB | **bigger** |
 
-That last row is the whole design: **a halftone at 600 dpi is resolved dots, and dots are noise to
-a bilevel coder.** Hence two modes — `MODE=nohalftone` (default) takes only the pages that win,
-`MODE=allbw` takes every colour-free page and shows what the screened ones cost.
+That last row is why there are two modes: **a halftone at 600 dpi is resolved dots, and dots are
+noise to a bilevel coder.**
+
+- **`MODE=allbw` — the default.** Every colour-free page becomes JBIG2, halftone or not. On 8609
+  that is 96 of 176 pages against `nohalftone`'s 44, so far more of the issue gets crisp 600 dpi
+  type. The cost, accepted deliberately: a screened photograph thresholds badly — 8609 p092's
+  printer photo lost its grey background to solid black — and those pages get slightly *bigger*,
+  not smaller. **This is the way we build issues by default** (decided on 8609, 2026-08-15).
+- **`MODE=nohalftone`** — only colour-free pages with no halftone convert. The conservative
+  alternative, for an issue whose photographs matter more than its type.
+
+Both were built for 8609 and both fit: `allbw` 96.15 MB at guetzli q95, `nohalftone` 98.66 MB at
+q91. For comparison, pure guetzli could not fit at all — 103.31 MB at q84, its own floor.
 
 **Lossless, not symbol mode.** `jbig2 -s` was 4–5× smaller again (41 KB for a text page) but
 substitutes visually-similar symbols across the page — the failure that turned 6s into 8s in
