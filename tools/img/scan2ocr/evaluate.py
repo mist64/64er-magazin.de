@@ -37,8 +37,11 @@ import re
 import statistics
 import subprocess
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 from difflib import SequenceMatcher
+
+import llm
 
 SRC_DIR = "/Users/mist/DNB/8609/tmp/master600/final"
 OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
@@ -48,8 +51,22 @@ WORST = "/Users/mist/DNB/8609/tmp/ocr/WORST.txt"
 
 CLAUDE = "claude"
 # Replies that mean "the service did not answer", never "the page says this".
+# Auth expiry was added after an overnight run lost pages 84-176 to "Failed to
+# authenticate: OAuth session expired", which was counted as a per-page error and
+# still let the evaluation run and report a number.
 SERVICE_ERRORS = ("session limit", "usage limit", "rate limit",
-                  "Please run /login", "Invalid API key")
+                  "Please run /login", "Invalid API key",
+                  "Failed to authenticate", "OAuth session expired",
+                  "credit balance", "Overloaded")
+# ...of which these SELF-HEAL and are worth waiting out.  Four concurrent
+# `claude -p` processes share one credential file, and when the OAuth token comes
+# up for refresh they race: the losers get an expired token.  MEASURED once --
+# pages 84-176 of a run died that way at 23:17 and a plain test call succeeded
+# again by 23:45 with nothing done to fix it.  A usage limit is the opposite case
+# and must NOT be retried, since it resets on a clock, not on a wait.
+TRANSIENT_ERRORS = ("Failed to authenticate", "OAuth session expired", "Overloaded")
+RETRIES = 3
+RETRY_WAIT = 45   # seconds
 CLAUDE_TIMEOUT = 600
 LANES = 4
 
@@ -62,8 +79,7 @@ MATCH_MIN = 0.55
 # folio fragment is noise in the comparison, not evidence about the pipeline.
 MIN_TOKENS = 4
 
-TRUTH_PROMPT = """Transcribe the ARTICLE TEXT from the page image at {path}.
-Read the image with the Read tool first.
+TRUTH_PROMPT = """Transcribe the ARTICLE TEXT from the page image.
 
 This is a page of the German computer magazine "64'er", issue 9/September 1986.
 
@@ -84,8 +100,20 @@ EXCLUDE completely:
   list or credit the articles rather than being one, however much prose they
   carry. A page whose whole job is to point at other pages is not an article.
 
+Write the result as MARKDOWN, using exactly these conventions:
+- "# "   the headline of an article starting on this page. A page may carry two
+         articles and so two of these; a continuation page carries none.
+- "> "   the standfirst: the bold or larger paragraph between the headline and
+         the body, before the article proper begins.
+- "## "  a heading inside the article, set bold, above body text.
+- "### " a heading below section level, smaller or less prominent.
+- ```    fence a short code fragment quoted inside the prose.
+- plain  ordinary running prose.
+Judge the levels from the printed TYPE SIZE and prominence on the page.
+
 RULES:
 - ONE LINE PER PARAGRAPH. Undo the printed line breaks inside a paragraph.
+- Separate every paragraph from the next with a BLANK LINE.
 - Where a word is hyphenated across a line break, join it back together.
 - A boxed panel or sidebar is its own run of paragraphs; keep it whole and place
   it where a reader would take it, rather than interleaving it with the text
@@ -116,6 +144,21 @@ def paragraphs(text):
     return out
 
 
+HEADING_RE = re.compile(r"^(#{1,3})\s+(.*)$")
+
+
+def headings(text):
+    """[(level, tokens), ...] for the markdown headings in a document."""
+    out = []
+    for ln in text.splitlines():
+        m = HEADING_RE.match(ln.strip())
+        if m:
+            toks = norm_tokens(m.group(2))
+            if toks:
+                out.append((len(m.group(1)), toks))
+    return out
+
+
 def similarity(a, b):
     return SequenceMatcher(None, a, b, autojunk=False).ratio()
 
@@ -128,11 +171,8 @@ def build_truth(page):
     # Run FROM the image directory and name the file bare: a nested `claude -p`
     # refuses to read paths outside its working directory, and silently wrote the
     # refusal into the truth file instead of a transcription.
-    prompt = TRUTH_PROMPT.format(path=stem + ".png")
-    r = subprocess.run([CLAUDE, "-p", prompt, "--output-format", "text"],
-                       capture_output=True, text=True, timeout=CLAUDE_TIMEOUT,
-                       cwd=SRC_DIR)
-    out = r.stdout.strip()
+    out = llm.call(TRUTH_PROMPT, "Transcribe this page.",
+                   image_path=os.path.join(SRC_DIR, stem + ".png"), cwd=SRC_DIR)
     # A service message is not a transcription.  Hitting the account session
     # limit wrote "You've hit your session limit" into 165 truth files, and
     # because build_truth skips files that already exist, those would have been
@@ -190,8 +230,30 @@ def score(page):
                     dis += 1
         order = con / (con + dis) if (con + dis) else 1.0
 
+    # Structure: of the headings vision found, how many did we produce AT THE
+    # SAME LEVEL?  Scored separately from the text metrics because a wrong level
+    # is a different defect from missing text, and implies a different fix.
+    th, oh = headings(raw), headings(open(pp, encoding="utf-8").read())
+    used_h, same_level, matched_h = set(), 0, 0
+    for lvl, t in th:
+        best, bi = 0.0, None
+        for i, (olvl, o) in enumerate(oh):
+            if i in used_h:
+                continue
+            sc = similarity(t, o)
+            if sc > best:
+                best, bi = sc, i
+        if bi is not None and best >= MATCH_MIN:
+            used_h.add(bi)
+            matched_h += 1
+            if oh[bi][0] == lvl:
+                same_level += 1
+    head_score = (same_level / len(th)) if th else (1.0 if not oh else 0.0)
+
     return {
         "page": page,
+        "truth_headings": len(th), "our_headings": len(oh),
+        "headings_matched": matched_h, "headings": round(head_score, 3),
         "truth_paras": len(truth), "our_paras": len(ours), "matched": len(pairs),
         "recall": round(recall, 3), "precision": round(precision, 3),
         "order": round(order, 3),
@@ -216,13 +278,15 @@ def main(pages):
     if not rows:
         print("no pages scored")
         return
-    print(f"{'page':>5}{'recall':>8}{'prec':>7}{'order':>7}{'match':>7}  {'truth/ours':>10}")
+    print(f"{'page':>5}{'recall':>8}{'prec':>7}{'order':>7}{'head':>7}{'match':>7}  {'truth/ours':>10}")
     for r in sorted(rows, key=lambda r: (r["recall"], r["order"], r["precision"])):
         print(f"p{r['page']:03d}{r['recall']:>8.2f}{r['precision']:>7.2f}"
-              f"{r['order']:>7.2f}{r['mean_match']:>7.2f}  {r['truth_paras']:>4}/{r['our_paras']:<4}")
+              f"{r['order']:>7.2f}{r['headings']:>7.2f}{r['mean_match']:>7.2f}  "
+              f"{r['truth_paras']:>4}/{r['our_paras']:<4}")
     print(f"\nMEAN  recall={statistics.mean(r['recall'] for r in rows):.3f}  "
           f"precision={statistics.mean(r['precision'] for r in rows):.3f}  "
-          f"order={statistics.mean(r['order'] for r in rows):.3f}   ({len(rows)} pages)")
+          f"order={statistics.mean(r['order'] for r in rows):.3f}  "
+          f"headings={statistics.mean(r['headings'] for r in rows):.3f}   ({len(rows)} pages)")
 
     with open(WORST, "w", encoding="utf-8") as f:
         for r in sorted(rows, key=lambda r: (r["recall"], r["order"])):

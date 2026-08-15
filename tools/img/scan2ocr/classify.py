@@ -25,6 +25,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 from PIL import Image, ImageDraw
@@ -34,8 +35,23 @@ OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
 # `claude -p` rather than the API: this box has no ANTHROPIC_API_KEY, and the CLI
 # already carries the user's credentials.
 CLAUDE = "claude"
+# Replies that mean "the service did not answer", never "the page says this".
+# Auth expiry was added after an overnight run lost pages 84-176 to "Failed to
+# authenticate: OAuth session expired", which was counted as a per-page error and
+# still let the evaluation run and report a number.
 SERVICE_ERRORS = ("session limit", "usage limit", "rate limit",
-                  "Please run /login", "Invalid API key")
+                  "Please run /login", "Invalid API key",
+                  "Failed to authenticate", "OAuth session expired",
+                  "credit balance", "Overloaded")
+# ...of which these SELF-HEAL and are worth waiting out.  Four concurrent
+# `claude -p` processes share one credential file, and when the OAuth token comes
+# up for refresh they race: the losers get an expired token.  MEASURED once --
+# pages 84-176 of a run died that way at 23:17 and a plain test call succeeded
+# again by 23:45 with nothing done to fix it.  A usage limit is the opposite case
+# and must NOT be retried, since it resets on a clock, not on a wait.
+TRANSIENT_ERRORS = ("Failed to authenticate", "OAuth session expired", "Overloaded")
+RETRIES = 3
+RETRY_WAIT = 45   # seconds
 CLAUDE_TIMEOUT = 300
 # Each page is an independent call.  4 lanes keeps the box responsive; the
 # font_experiments agent shares this machine and swap-thrashes if crowded.
@@ -47,6 +63,7 @@ LANES = 4
 # (Captions are OUT by the user's decision -- apparatus attached to a figure, not
 # running text.  They are still LABELLED and kept in the JSON, so reversing that
 # is a rebuild, not a re-OCR.  Errata columns ARE article and stay in.)
+import llm                                                       # noqa: E402
 from ocr_blocks import ARTICLE_LABELS, SRC_DIR, reading_order   # noqa: E402
 
 # Every label the prompt offers must appear here.  "caption" was missing -- it is
@@ -99,8 +116,8 @@ issue 9/September 1986, so that its ARTICLE TEXT can be extracted into a corpus.
 Two inputs describe the same page:
 1. The block digest below. Coordinates are fractions of the page (0,0 = top left).
    The `label` column is a provisional guess made from geometry alone.
-2. The overlay image at {overlay}. READ THIS IMAGE FIRST with the Read tool.
-   Every block is outlined there with its id printed at the top-left corner.
+2. The overlay image of the same page. Every block is outlined there with its
+   id printed at the top-left corner.
 
 Assign a final label to every block id. Valid labels:
 
@@ -199,29 +216,40 @@ Work it out from the page image and from how the text itself runs:
   it, and keep its own blocks together and in order.
 - A subhead reads immediately before the paragraph it introduces.
 
+STRUCTURE. For every block you place in "order", also give it a role, so the
+corpus can be written as markdown. The digest lists each block's measured line
+height as a fraction of the page (`lineh`), which is the printed type size --
+use it, together with the image, to tell the levels apart.
+
+  title       the headline of an article starting on this page. Largest type on
+              the page, usually spanning columns. A page may carry two articles
+              and so two titles, and a continuation page carries none at all.
+  intro       the standfirst: the bold or larger paragraph between the headline
+              and the body, before the article proper begins.
+  section     a heading inside the article, set bold, above body text.
+  subsection  a heading below section level, smaller or less prominent.
+  code        a short code fragment quoted inside the prose.
+  body        ordinary running prose. Use this when in doubt.
+
 Return ONLY a JSON object, no prose, no code fence:
 {{"page_kind": "<article|ad|mixed|toc|other>",
   "labels": {{"<id>": "<label>", ...}},
-  "order": [<id>, <id>, ...]}}
+  "order": [<id>, <id>, ...],
+  "roles": {{"<id>": "<role>", ...}}}}
 Every id in the digest must appear in "labels".
 "order" lists ONLY the blocks whose label is body, heading or listing-inline --
 the ones whose text goes into the corpus -- in the order they should be read.
 
-DIGEST:
-{digest}
 """
 
 
 def call_llm(page, digest, overlay):
-    prompt = PROMPT.format(digest=digest, overlay=overlay)
-    r = subprocess.run([CLAUDE, "-p", prompt, "--output-format", "text"],
-                       capture_output=True, text=True, timeout=CLAUDE_TIMEOUT)
-    out = r.stdout.strip()
-    # Distinguish "the model answered badly" from "the service did not answer":
-    # only the first is worth retrying or investigating per page.
-    for m_ in SERVICE_ERRORS:
-        if m_ in out:
-            raise RuntimeError(f"SERVICE UNAVAILABLE: {out[:120]}")
+    # The instructions are the cache prefix and identical on every page; the
+    # digest and the overlay image are the per-page payload.
+    try:
+        out = llm.call(PROMPT, "DIGEST:\n" + digest, image_path=overlay)
+    except llm.ServiceUnavailable as e:
+        raise RuntimeError(f"SERVICE UNAVAILABLE: {e}")
     m = re.search(r"\{.*\}", out, re.S)
     if not m:
         raise RuntimeError(f"p{page}: no JSON in reply: {out[:300]}")
@@ -272,23 +300,44 @@ def redraw(page, blocks):
 # a reader sees one.
 SENTENCE_END = ".!?:»\"'\u201c"
 
+# How each role is written as markdown.  A standfirst becomes a blockquote: not
+# strictly a quotation, but it renders closest to the printed page and can be
+# turned into something else later.
+ROLE_PREFIX = {"title": "# ", "intro": "> ", "section": "## ", "subsection": "### "}
+VALID_ROLES = set(ROLE_PREFIX) | {"body", "code"}
+
 
 def join_runons(paras):
+    """paras is a list of (role, text).  Only ordinary prose is ever joined: a
+    heading must never be absorbed into the paragraph before it, however the
+    sentence happens to end."""
     out = []
-    for p in paras:
-        if out:
-            prev = out[-1].rstrip()
+    for role, p in paras:
+        if out and role == "body" and out[-1][0] == "body":
+            prev = out[-1][1].rstrip()
             head = p.lstrip()
             # continue when the previous paragraph did not finish a sentence and
             # this one does not begin like a new one
             if prev and prev[-1] not in SENTENCE_END and head[:1].islower():
-                if prev.endswith("¬"):
-                    out[-1] = prev + head          # word split across the break
-                else:
-                    out[-1] = prev + " " + head
+                joiner = "" if prev.endswith("¬") else " "   # word split across the break
+                out[-1] = (role, prev + joiner + head)
                 continue
-        out.append(p)
+        out.append((role, p))
     return out
+
+
+def render(paras):
+    """(role, text) pairs -> markdown.  Paragraphs are separated by a blank line."""
+    chunks = []
+    for role, text in paras:
+        text = text.strip()
+        if not text:
+            continue
+        if role == "code":
+            chunks.append("```\n" + text + "\n```")
+        else:
+            chunks.append(ROLE_PREFIX.get(role, "") + text)
+    return "\n\n".join(chunks)
 
 
 def process(page):
@@ -306,6 +355,7 @@ def process(page):
         old = json.load(open(cached, encoding="utf-8"))
         cand = {"page_kind": old.get("page_kind", "unknown"),
                 "order": old.get("order"),
+                "roles": old.get("roles"),
                 "labels": {str(b["id"]): b["llm_label"] for b in old["blocks"]
                            if b.get("llm_label")}}
         # A cached verdict is only valid for the blocks it was made about.  If
@@ -334,6 +384,7 @@ def process(page):
         b["label"] = new if new in VALID_LABELS else b["label"]
     rec["page_kind"] = verdict.get("page_kind", "unknown")
     rec["order"] = verdict.get("order")
+    rec["roles"] = verdict.get("roles")
 
     json.dump(rec, open(os.path.join(OUT_DIR, stem + ".labels.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
@@ -359,7 +410,22 @@ def process(page):
     if missing and ordered:
         print(f"p{stem}: {len(missing)} block(s) missing from LLM order, appended", flush=True)
     ordered += missing
-    text = "\n".join(join_runons([b["text"].strip() for b in ordered if b["text"].strip()]))
+    roles = {str(k): v for k, v in (verdict.get("roles") or {}).items()}
+    paras = []
+    for b in ordered:
+        role = roles.get(str(b["id"]), "body")
+        if role not in VALID_ROLES:
+            role = "body"
+        if b["label"] == "listing-inline":
+            role = "code"                     # the label already settled this
+        if role == "code":
+            paras.append((role, b["text"].strip()))
+        else:
+            # a block may hold several paragraphs; the role applies to each
+            for para in b["text"].split("\n"):
+                if para.strip():
+                    paras.append((role, para))
+    text = render(join_runons(paras))
     art = os.path.join(OUT_DIR, stem + ".article.txt")
     open(art, "w", encoding="utf-8").write(text + ("\n" if text else ""))
 
