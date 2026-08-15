@@ -39,6 +39,46 @@ image into a unit square scaled by the CTM — a different pixel count lands on 
    then a second `gs` pass with `-dPDFA=3` and an sRGB OutputIntent.
 5. **Title** — set with exiftool afterwards; see below.
 
+## The mixed build — JBIG2 for the bilevel pages
+
+`make_issue_pdf_mixed.sh` ships pages that carry only black ink as **600 dpi lossless JBIG2** and
+the rest as 150 dpi guetzli, then scales the JPEG quality to land under the ceiling. Those pages
+end up four times the resolution *and* a fraction of the bytes.
+
+Measured on 8609, per page, lossless JBIG2 against the guetzli JPEG it replaces:
+
+| page | JBIG2 @600 | guetzli q84 @160 | |
+|---|---|---|---|
+| clean type | 205–227 KB | 587–629 KB | ~3× smaller |
+| photo | 399–433 KB | 479–503 KB | 1.2× — marginal |
+| screened | 706 KB | 554 KB | **bigger** |
+
+That last row is the whole design: **a halftone at 600 dpi is resolved dots, and dots are noise to
+a bilevel coder.** Hence two modes — `MODE=nohalftone` (default) takes only the pages that win,
+`MODE=allbw` takes every colour-free page and shows what the screened ones cost.
+
+**Lossless, not symbol mode.** `jbig2 -s` was 4–5× smaller again (41 KB for a text page) but
+substitutes visually-similar symbols across the page — the failure that turned 6s into 8s in
+scanned Xerox documents. Not for an archival master.
+
+**The page test** is two conservative measurements on the 600 dpi master; anything ambiguous stays
+a JPEG. Both had a wrong first version worth remembering:
+* **colour** — absolute chroma (`max−min` of R,G,B) after a blur. HSB saturation is wrong here:
+  it is `(max−min)/max`, so an R10 G8 B6 *black* pixel reads 40% saturated and every text page
+  looks coloured. The blur is what removes the scanner's chromatic fringing on letter edges.
+* **halftone** — mid-tone area fraction at 150 dpi after a median filter and an erode. Text
+  survives only as thin edges, which the erode deletes; a screened region is a solid mid-tone
+  field that survives.
+
+**This build is not PDF/A**, and cannot be while gs is in the chain: gs transcodes every image it
+cannot pass through and it passes through only JPEG, so it destroys JBIG2. The document is
+assembled by `assemble_pdf.py` (pikepdf) instead, which writes the sRGB OutputIntent and the XMP
+but validates nothing.
+
+**Polarity gotcha:** JBIG2Decode is specified as emitting 1 = black, which reads as though
+`/Decode [1 0]` is needed to reconcile it with DeviceGray. It is not — adding the array renders
+every bilevel page as a negative (measured: page mean 0.13 with it, 0.86 without).
+
 ## Things that were learned the expensive way
 
 * **Never rotate.** `-dAutoRotatePages=/None` on every `gs` invocation. Some pages (e.g. 8609 p003,
