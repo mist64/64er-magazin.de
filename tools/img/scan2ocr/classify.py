@@ -56,6 +56,24 @@ from ocr_blocks import ARTICLE_LABELS, SRC_DIR, reading_order   # noqa: E402
 # captions and table titles were reinstated as article text by that silent
 # fallback, and no prompt wording could fix it because the model was right and its
 # answer was being discarded.
+# NOTE -- do not reintroduce a "this looks like prose, so it cannot be a listing"
+# veto.  It was tried and REVERTED after measuring the whole issue.
+# The motive was p51, whose standing sidebar "Der Checksummer und der MSE sind
+# Eingabehilfen für unsere Listings ..." stage B insists on calling a listing
+# because its SUBJECT is listings; no prompt wording, including quoting the
+# sidebar verbatim, moved it.  Two vetoes were tried.  Digit density failed
+# immediately: a BASIC listing built from string constants carries few digits, so
+# it reinstated 37 paragraphs of listing on p56.  German function-word density
+# looked perfect on the pages to hand -- p56's listing blocks score 0.000 every
+# one, p51's sidebar 0.276-0.333, body text 0.182-0.325, nothing in between -- and
+# it fixed p51 while leaving five listing pages clean.
+# Across all 176 pages it was a rout: recall 0.938 -> 0.863, precision 0.951 ->
+# 0.848, and FOURTEEN pages in the listings section at the back of the magazine
+# started emitting listing text again where vision sees none.  A REM-commented
+# listing carries plenty of German.  One page gained, fourteen lost.
+# The lesson is about method as much as about listings: a rule verified on the
+# handful of pages that motivated it is not verified.
+
 VALID_LABELS = ARTICLE_LABELS | {
     "caption", "listing-standalone", "ad", "kleinanzeige", "toc",
     "header", "footer", "sliver", "noise", "other",
@@ -95,10 +113,15 @@ Assign a final label to every block id. Valid labels:
                       the reader to key in. Usually boxed, usually captioned
                       "Listing 1. ...". NOT article text however long or short.
                       This label also covers the listing's APPARATUS: its title
-                      line, and any instruction attached to it such as "Das
-                      Programm bitte mit dem MSE abtippen", "Beachten Sie die
-                      Eingabehinweise auf Seite 51", "(Schluß)", or a REM line
-                      quoted out of the listing body. OCR often mangles the word
+                      line, and any SHORT note physically attached to it such as
+                      "Das Programm bitte mit dem MSE abtippen", "Beachten Sie
+                      die Eingabehinweise auf Seite 51", "(Schluß)", or a REM
+                      line quoted out of the listing body. Apparatus is a line or
+                      two sitting against a listing. A boxed sidebar running to
+                      several paragraphs is NOT apparatus even when its subject is
+                      listings: the standing explainer "Der Checksummer und der
+                      MSE sind Eingabehilfen für unsere Listings ..." is prose the
+                      magazine wrote for its readers, and it is body. OCR often mangles the word
                       "Listing" itself (it may read "Sting" or "Listin"), so
                       judge these from the image and from what the text says,
                       not from the spelling.
@@ -302,6 +325,10 @@ def process(page):
     for b in rec["blocks"]:
         new = labels.get(str(b["id"]))
         b["llm_label"] = new
+        # ...and only when stage A's own listing test also says no.  Without that
+        # condition the veto reinstated real listing bodies: a BASIC listing full
+        # of string constants can fall under the digit threshold, and p56 went
+        # from emitting nothing to emitting 37 paragraphs of listing.
         # An unknown or missing label falls back to the geometric guess rather
         # than silently dropping the block from the corpus.
         b["label"] = new if new in VALID_LABELS else b["label"]
