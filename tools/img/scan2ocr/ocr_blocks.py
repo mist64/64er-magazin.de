@@ -1163,14 +1163,21 @@ def drop_superseded(blocks, arr):
             ov = overlap(o, r)
             if not ov:
                 continue
-            if ov >= RESCUE_SUPERSEDE_FRAC * oarea or ov >= RESCUE_SUPERSEDE_FRAC * rarea:
-                # the confident reading survives; ties go to the re-read, which
-                # was made with layout analysis off and the tint removed
-                if o["conf"] >= RESCUE_KEEP_CONF and o["conf"] > r["conf"] \
-                        and not is_screened(arr, o):
-                    drop.add(id(r))
-                else:
-                    drop.add(id(o))
+            # Each block is judged on how much of ITSELF the other covers.  Using
+            # "either one" instead let a SMALL rescue block evict a LARGE original
+            # it merely dipped into: on p51 a rescue block spanning y 0.50-0.58
+            # deleted the whole Centronics column at y 0.17-0.57, and the page
+            # went from 13 paragraphs to 3.
+            o_covered = ov >= RESCUE_SUPERSEDE_FRAC * oarea
+            r_covered = ov >= RESCUE_SUPERSEDE_FRAC * rarea
+            # the confident reading survives, except on a tint where confidence
+            # means nothing; ties go to the re-read, made with the tint removed
+            keep_original = (o["conf"] >= RESCUE_KEEP_CONF and o["conf"] > r["conf"]
+                             and not is_screened(arr, o))
+            if keep_original and r_covered:
+                drop.add(id(r))
+            elif not keep_original and o_covered:
+                drop.add(id(o))
     return [b for b in blocks if id(b) not in drop]
 
 
