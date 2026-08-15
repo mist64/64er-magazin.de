@@ -254,6 +254,15 @@ HEADER_BAND = 0.075   # top fraction of the page
 # pattern).  0.93 is below the last body line on every test page.
 FOOTER_BAND = 0.93
 FOOTER_RE = re.compile(r"Ausgabe\s*9\s*/\s*September\s*1986|64.er", re.I)
+# Sitting low on the page is NOT enough to be a folio.  MEASURED on p146, the
+# closing "Info: Heinz Haarmann, Kosterstraße 92, 4630 Bochum 1" line of a review
+# starts at y=0.94 and was labelled footer on position alone, then dropped -- and
+# because stage B is told to trust geometry unless the image contradicts it, the
+# LLM kept that label.  A folio also has to LOOK like one: it names the issue, or
+# it is a couple of words carrying the page number.  Anything else down there is
+# the last line of a column.
+FOOTER_MAX_WORDS = 4
+FOOTER_MIN_DIGITS = 0.2
 
 # --- listing detection (geometric + lexical, never semantic) -----------------
 # BASIC type-in listings are monospace, unjustified and line-numbered; hex dumps
@@ -988,7 +997,9 @@ def heuristic_label(b, W, H):
 
     if cy1 < HEADER_BAND:
         return "header"
-    if cy0 > FOOTER_BAND or (cy0 > 0.90 and FOOTER_RE.search(b["text"])):
+    if cy0 > 0.90 and (FOOTER_RE.search(b["text"])
+                       or (cy0 > FOOTER_BAND and b["n_words"] <= FOOTER_MAX_WORDS
+                           and b["digit_frac"] >= FOOTER_MIN_DIGITS)):
         return "footer"
     if b["conf"] < MIN_BLOCK_CONF and not is_listing(b):
         return "noise"
