@@ -8,14 +8,19 @@ Build a searchable issue PDF that ships bilevel pages as 600 dpi JBIG2 and the r
 
 Usage: make_issue_pdf_mixed.sh <input_dir> <output.pdf> <issue_tag>
 
-  MODE=allbw       every colour-free page goes to JBIG2, halftone or not
-  MODE=nohalftone  only colour-free pages with NO halftone go to JBIG2 (default)
+  MODE=allbw       every colour-free page goes to JBIG2, halftone or not (DEFAULT)
+  MODE=nohalftone  only colour-free pages with NO halftone go to JBIG2
 
 WHY TWO MODES. A halftone at 600 dpi is resolved DOTS, and dots are noise to a bilevel coder:
 measured on 8609, lossless JBIG2 of a screened page came out 706 KB against 554 KB for the
-guetzli JPEG it would replace -- bigger, and it looks like dots. Clean type goes the other way,
-205 KB against 587 KB, at four times the resolution. `nohalftone` keeps only the pages that win;
-`allbw` is the experiment that shows what the halftone pages cost.
+guetzli JPEG it would replace -- bigger, and thresholding flattens a photograph's mid-greys
+(8609 p092's printer photo lost its grey background to solid black). Clean type goes the other
+way: 205 KB against 587 KB, at four times the resolution.
+
+`allbw` is the DEFAULT ANYWAY, decided on 8609 after seeing both: it converts 96 of 176 pages
+rather than 44, which buys crisper type across far more of the issue, and the tonal loss on the
+b&w photo pages is accepted. `nohalftone` is the conservative alternative when an issue's
+photographs matter more than its type.
 
 THE PAGE TEST, both parts measured on the 600 dpi master, both conservative -- anything ambiguous
 stays a JPEG:
@@ -44,7 +49,7 @@ fi
 
 IN="${1%/}"; OUT="$2"; TAG="$3"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-MODE="${MODE:-nohalftone}"
+MODE="${MODE:-allbw}"
 PYBIN="$(ls -1d /opt/homebrew/Cellar/ocrmypdf/*/libexec/bin/python 2>/dev/null | sort -V | tail -1)"
 ICC="$(ls -1 /opt/homebrew/Cellar/ghostscript/*/share/ghostscript/iccprofiles/srgb.icc 2>/dev/null | tail -1)"
 CACHE="$IN/.ocrcache"
