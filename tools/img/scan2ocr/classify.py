@@ -49,8 +49,15 @@ LANES = 4
 # is a rebuild, not a re-OCR.  Errata columns ARE article and stay in.)
 from ocr_blocks import ARTICLE_LABELS, SRC_DIR, reading_order   # noqa: E402
 
+# Every label the prompt offers must appear here.  "caption" was missing -- it is
+# offered to the model and excluded from the corpus, but was not listed as valid,
+# so every block the model correctly called a caption failed validation and fell
+# back to its GEOMETRIC label, which is "body".  Listing instructions, figure
+# captions and table titles were reinstated as article text by that silent
+# fallback, and no prompt wording could fix it because the model was right and its
+# answer was being discarded.
 VALID_LABELS = ARTICLE_LABELS | {
-    "listing-standalone", "ad", "kleinanzeige", "toc",
+    "caption", "listing-standalone", "ad", "kleinanzeige", "toc",
     "header", "footer", "sliver", "noise", "other",
 }
 
@@ -87,6 +94,14 @@ Assign a final label to every block id. Valid labels:
   listing-standalone  a type-in program: a BASIC listing or hex dump printed for
                       the reader to key in. Usually boxed, usually captioned
                       "Listing 1. ...". NOT article text however long or short.
+                      This label also covers the listing's APPARATUS: its title
+                      line, and any instruction attached to it such as "Das
+                      Programm bitte mit dem MSE abtippen", "Beachten Sie die
+                      Eingabehinweise auf Seite 51", "(Schluß)", or a REM line
+                      quoted out of the listing body. OCR often mangles the word
+                      "Listing" itself (it may read "Sting" or "Listin"), so
+                      judge these from the image and from what the text says,
+                      not from the spelling.
   ad                  advertising of any kind: display ads, advertorials, the
                       publisher's own subscription/order/club promotions, coupons
   kleinanzeige        small classified ad -- one placed BY A READER, in the
@@ -101,7 +116,11 @@ Assign a final label to every block id. Valid labels:
                       the contents of a screen dump, a character table, a
                       labelled diagram, a boxed illustration. Such text is
                       printed inside the picture, not written as running text,
-                      and does not belong in the corpus.
+                      and does not belong in the corpus. A TABLE OF DATA is the
+                      same case: a comparison table of models and specifications,
+                      with column headings like "Hersteller / Druckgeschwindigkeit
+                      / Schnittstellen", is a table a reader consults, not prose
+                      a reader reads. Its cells do not belong in the corpus.
   other               apparatus that belongs to no article -- a publisher's
                       notice among the classifieds, for instance. Use this
                       SPARINGLY. Never use it for text an article carries with
@@ -109,8 +128,13 @@ Assign a final label to every block id. Valid labels:
                       article and the text sits inside it, the label is body.
 
 Rules:
-- Keep the provisional label unless the image contradicts it. Geometry already
-  settled headers, footers, slivers and hex dumps reliably.
+- The provisional label is trustworthy ONLY for header, footer and listing-
+  standalone -- those come from measurements of the page (position, digit
+  density) that are reliable. A provisional "body" or "heading" means merely
+  "this is text we could read"; it carries NO evidence that the text is article
+  prose. Decide that yourself, from the image. Overriding a provisional body to
+  ad, listing-standalone, noise or other is expected and correct whenever the
+  page shows it is not article prose.
 - A page is often split: article on one side, an ad on the other. The split can be
   vertical OR horizontal. Judge each block by which side of the rule it sits on.
 - An ad is identified by its border, product photography, prices, an order coupon,
