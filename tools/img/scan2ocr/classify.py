@@ -34,6 +34,8 @@ OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
 # `claude -p` rather than the API: this box has no ANTHROPIC_API_KEY, and the CLI
 # already carries the user's credentials.
 CLAUDE = "claude"
+SERVICE_ERRORS = ("session limit", "usage limit", "rate limit",
+                  "Please run /login", "Invalid API key")
 CLAUDE_TIMEOUT = 300
 # Each page is an independent call.  4 lanes keeps the box responsive; the
 # font_experiments agent shares this machine and swap-thrashes if crowded.
@@ -87,7 +89,8 @@ Assign a final label to every block id. Valid labels:
                       "Listing 1. ...". NOT article text however long or short.
   ad                  advertising of any kind: display ads, advertorials, the
                       publisher's own subscription/order/club promotions, coupons
-  kleinanzeige        small classified ad
+  kleinanzeige        small classified ad -- one placed BY A READER, in the
+                      classifieds section, offering or seeking goods
   toc                 table of contents, cover, masthead/Impressum
   header              running head at the top (section name, machine tag)
   footer              folio line at the foot (page number, "Ausgabe 9/September 1986")
@@ -99,7 +102,11 @@ Assign a final label to every block id. Valid labels:
                       labelled diagram, a boxed illustration. Such text is
                       printed inside the picture, not written as running text,
                       and does not belong in the corpus.
-  other               anything else
+  other               apparatus that belongs to no article -- a publisher's
+                      notice among the classifieds, for instance. Use this
+                      SPARINGLY. Never use it for text an article carries with
+                      it, however list-like that text looks: if the page is an
+                      article and the text sits inside it, the label is body.
 
 Rules:
 - Keep the provisional label unless the image contradicts it. Geometry already
@@ -112,6 +119,18 @@ Rules:
 - Errata columns, editorials, interviews, reviews and news are editorial: body.
 - Do not judge by subject matter. An ad for a disk drive and an article about a
   disk drive read alike; the layout is what separates them.
+- An address or contact appendix that BELONGS TO an article is PART OF THAT
+  ARTICLE and must be labelled body. This includes an "Info: <company>,
+  <street>, <town>" line closing a review, and a long list of manufacturers or
+  distributors with their addresses printed at the end of a comparison test --
+  even when it runs to dozens of lines and looks like a directory. The magazine
+  wrote it as part of the piece and a reader reads it as part of the piece.
+  Do NOT label such a list "other" and do NOT label it "kleinanzeige". What makes
+  something a classified is that a READER placed it in the classifieds section,
+  never that it contains an address.
+- A notice the PUBLISHER prints among the classifieds -- warning advertisers
+  about pirated software, explaining the terms of placing an ad -- is apparatus
+  belonging to the ad section, not an article. Label it other.
 
 READING ORDER matters as much as the labels. The blocks are listed in the digest
 in the order tesseract happened to emit them, which is NOT the order a person
@@ -145,6 +164,11 @@ def call_llm(page, digest, overlay):
     r = subprocess.run([CLAUDE, "-p", prompt, "--output-format", "text"],
                        capture_output=True, text=True, timeout=CLAUDE_TIMEOUT)
     out = r.stdout.strip()
+    # Distinguish "the model answered badly" from "the service did not answer":
+    # only the first is worth retrying or investigating per page.
+    for m_ in SERVICE_ERRORS:
+        if m_ in out:
+            raise RuntimeError(f"SERVICE UNAVAILABLE: {out[:120]}")
     m = re.search(r"\{.*\}", out, re.S)
     if not m:
         raise RuntimeError(f"p{page}: no JSON in reply: {out[:300]}")

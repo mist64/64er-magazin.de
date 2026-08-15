@@ -47,6 +47,9 @@ REPORT = "/Users/mist/DNB/8609/tmp/ocr/report.jsonl"
 WORST = "/Users/mist/DNB/8609/tmp/ocr/WORST.txt"
 
 CLAUDE = "claude"
+# Replies that mean "the service did not answer", never "the page says this".
+SERVICE_ERRORS = ("session limit", "usage limit", "rate limit",
+                  "Please run /login", "Invalid API key")
 CLAUDE_TIMEOUT = 600
 LANES = 4
 
@@ -77,6 +80,9 @@ EXCLUDE completely:
 - figure and table captions ("Bild 3. ...", "Tabelle 1. ...")
 - standalone type-in listings: BASIC listings and hex dumps printed for the
   reader to key in, usually boxed and captioned "Listing 1. ..."
+- the table of contents ("Inhalt"), the cover, and the masthead/Impressum. These
+  list or credit the articles rather than being one, however much prose they
+  carry. A page whose whole job is to point at other pages is not an article.
 
 RULES:
 - ONE LINE PER PARAGRAPH. Undo the printed line breaks inside a paragraph.
@@ -126,7 +132,15 @@ def build_truth(page):
     r = subprocess.run([CLAUDE, "-p", prompt, "--output-format", "text"],
                        capture_output=True, text=True, timeout=CLAUDE_TIMEOUT,
                        cwd=SRC_DIR)
-    open(dest, "w", encoding="utf-8").write(r.stdout.strip() + "\n")
+    out = r.stdout.strip()
+    # A service message is not a transcription.  Hitting the account session
+    # limit wrote "You've hit your session limit" into 165 truth files, and
+    # because build_truth skips files that already exist, those would have been
+    # treated as ground truth for every future run.  Refuse to write anything
+    # that is not plausibly a page of text.
+    if not out or any(m in out for m in SERVICE_ERRORS):
+        raise RuntimeError(f"p{page}: not a transcription: {out[:120]}")
+    open(dest, "w", encoding="utf-8").write(out + "\n")
 
 
 def score(page):
