@@ -53,8 +53,8 @@ for c in '‘’“”„':
 
 ## Notes
 
-- `split.py` already performs the same `&lsquo;`/`&rsquo;`/`&ldquo;`/`&rdquo;`/`''` replacements
-  as part of its per-article cleanup. Doing it here too is harmless (split.py
+- `r080_split.sh`'s embedded splitter already performs the same `&lsquo;`/`&rsquo;`/`&ldquo;`/`&rdquo;`/`''` replacements
+  as part of its per-article cleanup. Doing it here too is harmless (step 080
   becomes a no-op for these) and keeps the pre-split HTML uniform if you ever
   want to look at it directly.
 - German guillemets `«` `»` `‹` `›` are NOT touched — they're the magazine's

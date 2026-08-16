@@ -56,9 +56,12 @@ def write_page(page):
         x0, y0, x1, y1 = (round(v * SCALE) for v in b["bbox"])
         f0, f1, f2, f3 = b["bbox_frac"]
         text = " ".join(b["text"].split())[:PREVIEW_CHARS]
+        # nw= is the word count: step 210 filters on it, and it is the one
+        # field the old per-issue blocks.txt carried that the JSON's own
+        # n_words makes free here.
         lines.append(f'block={b["id"]} label={b["label"]} '
                      f'bbox={x1 - x0}x{y1 - y0}+{x0}+{y0} '
-                     f'frac={f0},{f1},{f2},{f3} text= {text}')
+                     f'frac={f0},{f1},{f2},{f3} nw={b["n_words"]} text= {text}')
     os.makedirs(DEST_DIR, exist_ok=True)
     dest = os.path.join(DEST_DIR, f"p{page:03d}.txt")
     open(dest, "w", encoding="utf-8").write("\n".join(lines) + "\n")

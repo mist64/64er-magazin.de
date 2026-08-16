@@ -138,10 +138,10 @@ and must come from the print, not from the article's
   no machine label (decorative spreads, 64'er Extra pages, contest
   cover pages, CP/M-Ecke, etc.).
 - An apply.py script exists at `r210_head_meta_apply.py` (beside this file)
-  that expects pre-computed per-page block-index files (the
-  `blocks.txt` format from rule 000's "page block index" recipe). If
-  those exist, the script reads them directly. If they don't, build
-  them on demand (rule 000 recipe) OR skip the script and use the
+  that reads step 010's block index
+  (`<OUT_DIR>/blocks/pNNN.txt`) directly, falling back to the legacy per-issue
+  `_work/pNNN/blocks.txt` layout for issues built before the chains were merged.
+  Step 010 always writes the index, so there is nothing to build on demand OR skip the script and use the
   vision-only sub-sub-agent crop approach above — vision is faster
   when the header strip is the only thing you need from each page.
 - Spread headers for multi-page articles can drift: e.g. an article

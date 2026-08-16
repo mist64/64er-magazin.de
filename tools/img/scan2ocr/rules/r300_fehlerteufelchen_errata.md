@@ -122,7 +122,7 @@ Every erratum word must trace to the print: render the FT PDF page → OCR
 (tesseract + paddle) → **Read the PNG multimodally** → write to
 `_tmp/<issue>_ft.txt` → Read that file → edit the article. Never compose
 erratum text from memory. Preserve original typos and German spelling
-(`daß`, `muß`, »…«). See [[feedback_print_verbatim]] and
+(`daß`, `muß`, »…«). See
 the anti-memory rule in `r000_orchestration.md`.
 
 ## Asymmetry to watch (both sides!)

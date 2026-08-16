@@ -53,7 +53,7 @@ For each of the three rubrics:
    `pdftoppm -r 600 issues/<YYMM>/64er_19XX-XX.pdf
    /tmp/64er_<YYMM>_pages_600/p -png -f <START> -l <START>`.
 3. **Find and crop the banner** on the page (top of column for
-   Bücher / top of page for Editorial / Fehlerteufelchen). Use rule 000's "page block index" recipe + grep for the rubric name in the
+   Bücher / top of page for Editorial / Fehlerteufelchen). Grep step 010's block index (`<OUT_DIR>/blocks/pNNN.txt`) for the rubric name in the
    blocks file to find a starting bbox; the banner illustration
    typically sits adjacent in the same column. Save the crop as
    `issues/<YYMM>/<START>-0.png`.

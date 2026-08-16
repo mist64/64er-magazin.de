@@ -16,7 +16,7 @@ proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 
 ## Extraction pipeline (per table)
 
-1. **Build the page block index** per rule 000's recipe → `/tmp/64er_<YYMM>_p<NNN>_blocks.txt`.
+1. **The page block index is already built** — step 010 wrote it to `<OUT_DIR>/blocks/pNNN.txt`.
 2. **Identify target block** by either grepping the blocks file for a known cell value (e.g. a row header from the article's prose), or visual cross-check via a low-res page thumbnail.
 3. **Crop just that block** with `magick … -crop WxH+X+Y` using the bbox from blocks.txt. If the crop exceeds 2000 px on any axis, also produce a resized copy for vision Read.
 4. **Second-pass OCR on the crop** with PSM hint: `--psm 6` for compact tables, `--psm 4` for narrow tables with variable row heights.
