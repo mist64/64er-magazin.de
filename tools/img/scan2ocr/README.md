@@ -200,8 +200,8 @@ one for three different reasons and no local rule separates them —
 A case test gets the third wrong (`und` is lowercase, so "break before lowercase
 = soft hyphen" yields `Großund`). A hyphen *inside* a printed line stays a plain
 `-`, so the two are always tellable apart — which is the point of marking rather
-than guessing candidates with a regex, as
-`tools/llm/hyphenation_check_and_correct.sh` has to.
+than guessing candidates with a regex, which is what the old
+`hyphenation_check_and_correct.sh` had to do.
 
 **Stage D resolves them**, over the *distinct* broken words rather than the
 occurrences — the answer is a property of the word, and the issue's 4287 marks
@@ -268,15 +268,23 @@ message be written as data.
 
 ---
 
-## Related tools already in this repo
+## What used to live in `tools/llm/`
 
-- `tools/llm/hyphenation_check_and_correct.sh` — the natural consumer of the `¬`
-  marks. It currently *guesses* candidates with `grep -oE '\S*-[a-z]\S*|…'`,
-  which both misses cases and fires on mid-line hyphens; the marker makes that
-  set exact.
-- `tools/llm/ocr_error_correction.sh`, `spell_check_and_correct.sh` — the
-  remaining character-level errors are theirs to fix; see `FINDINGS.md` for why
-  they are not fixable here.
-- `tools/llm/ocr_issue.sh` — an earlier take on stage A (tesseract TSV per page,
-  block summaries with bbox and preview) at 150 dpi off the PDF, with no rescue
-  pass and no classification. Superseded for scan input; still fine for PDFs.
+That directory is gone. It held the generation of shell scripts and workflow
+notes that preceded the numbered chain, and keeping two homes for build
+machinery meant a rule could point outward for its own procedure — which
+contradicts r000's contract that a rule file is a sub-agent's complete
+instruction source.
+
+| was | now |
+|---|---|
+| `hyphenation_check_and_correct.sh` | **superseded** — step 030 resolves every `¬`, over the distinct broken words, and 0 markers survive |
+| `ocr_error_correction.sh`, `spell_check_and_correct.sh` | **superseded** by `rules/r280_ocr_word_cleanup.md` |
+| `ocr_issue.sh` | **superseded** by step 010 — an earlier take on it at 150 dpi off the PDF, with no rescue pass and no classification |
+| `apply_corrections.sh`, `extract_table.sh` | removed, referenced by nothing |
+| `new/*_workflow.md` | superseded by the numbered rules they became |
+| `new/fehlerteufelchen_workflow.md` | folded into `rules/r300_fehlerteufelchen_errata.md`, which needed it to be self-contained |
+| `new/head_meta_apply.py` | `rules/r210_head_meta_apply.py` |
+| `new/index_workflow_apply.py` | `rules/r220_index_meta_apply.py` |
+| `new/toc_title_apply.py` | `rules/r100_toc_title_apply.py` |
+| `new/index_meta_apply.py` | removed — an older duplicate of `index_workflow_apply.py`, same job, referenced by nothing |

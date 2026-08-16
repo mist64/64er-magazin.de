@@ -54,12 +54,12 @@ same article HTML.
 
 ## Apply script (optional but useful)
 
-A mechanical apply script exists: `tools/llm/new/index_workflow_apply.py`.
+A mechanical apply script exists: `r220_index_meta_apply.py` (beside this file).
 It matches each CSV row to an HTML file by start page and inserts the
 metas. The agent can run it then audit:
 
 ```bash
-python3 tools/llm/new/index_workflow_apply.py <YYMM> \
+python3 ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py <YYMM> \
   "Jahresinhaltsverzeichnis <YYYY>.csv"
 ```
 

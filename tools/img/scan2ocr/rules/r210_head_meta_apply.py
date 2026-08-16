@@ -17,9 +17,9 @@ For each article HTML the script:
      present.
 
 Usage:
-  python3 tools/llm/new/head_meta_apply.py 8606            # dry-run / report
-  python3 tools/llm/new/head_meta_apply.py 8606 --apply    # actually edit
-  python3 tools/llm/new/head_meta_apply.py 8606 --verify   # verify only
+  python3 tools/img/scan2ocr/rules/r210_head_meta_apply.py 8606            # dry-run / report
+  python3 tools/img/scan2ocr/rules/r210_head_meta_apply.py 8606 --apply    # actually edit
+  python3 tools/img/scan2ocr/rules/r210_head_meta_apply.py 8606 --verify   # verify only
 
 Run from repo root.
 """

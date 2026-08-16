@@ -23,9 +23,9 @@ The script:
      placeholder line with an active meta tag.
 
 Usage:
-  python3 tools/llm/new/toc_title_apply.py 8606            # dry-run / report
-  python3 tools/llm/new/toc_title_apply.py 8606 --apply    # actually edit
-  python3 tools/llm/new/toc_title_apply.py 8606 --verify   # verify only
+  python3 tools/img/scan2ocr/rules/r100_toc_title_apply.py 8606            # dry-run / report
+  python3 tools/img/scan2ocr/rules/r100_toc_title_apply.py 8606 --apply    # actually edit
+  python3 tools/img/scan2ocr/rules/r100_toc_title_apply.py 8606 --verify   # verify only
 
 Run from repo root.
 """

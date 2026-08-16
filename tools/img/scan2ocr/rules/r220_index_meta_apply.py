@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""
+r"""
 Apply index_category and index_title from Jahresinhaltsverzeichnis CSV to article HTMLs.
 
 Usage:
     cd issues/YYMM
-    python3 ../../tools/llm/new/index_workflow_apply.py YYMM ../../Jahresinhaltsverzeichnis\ YYYY.csv
+    python3 ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py YYMM ../../Jahresinhaltsverzeichnis\ YYYY.csv
 
 The script:
 1. Reads all CSV rows for the given issue code (e.g. 8605)

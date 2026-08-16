@@ -137,7 +137,7 @@ and must come from the print, not from the article's
   `head2` — the missing ~10 are articles where the print shows
   no machine label (decorative spreads, 64'er Extra pages, contest
   cover pages, CP/M-Ecke, etc.).
-- An apply.py script exists at `tools/llm/new/head_meta_apply.py`
+- An apply.py script exists at `r210_head_meta_apply.py` (beside this file)
   that expects pre-computed per-page block-index files (the
   `blocks.txt` format from rule 000's "page block index" recipe). If
   those exist, the script reads them directly. If they don't, build
