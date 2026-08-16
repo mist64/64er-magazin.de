@@ -463,6 +463,23 @@ def process(page):
               ensure_ascii=False, indent=1)
     redraw(page, rec["blocks"])
 
+    paras = page_paragraphs(rec, stem)
+    text = render(join_runons(paras))
+    art = os.path.join(OUT_DIR, stem + ".article.txt")
+    open(art, "w", encoding="utf-8").write(text + ("\n" if text else ""))
+
+    kept = sum(1 for b in rec["blocks"] if b["label"] in ARTICLE_LABELS)
+    print(f"p{stem}: kind={rec['page_kind']:<8} kept {kept}/{len(rec['blocks'])} blocks, "
+          f"{len(text)} chars", flush=True)
+
+
+def page_paragraphs(rec, stem=""):
+    """One page's classified blocks -> the paragraph list join_runons expects:
+    (role, text, starts_block, first_indent_px).
+
+    Stage D reassembles articles out of these across page boundaries, which is
+    why the build lives in its own function: defined twice, the per-page corpus
+    and the per-article one would eventually disagree."""
     keep = [b for b in rec["blocks"] if b["label"] in ARTICLE_LABELS]
     # The LLM decides the reading order: column flow, sentences continuing across
     # a column break, a boxed panel that must stay whole rather than being woven
@@ -489,7 +506,7 @@ def process(page):
     if missing and ordered:
         print(f"p{stem}: {len(missing)} block(s) missing from LLM order, appended", flush=True)
     ordered += missing
-    roles = {str(k): v for k, v in (verdict.get("roles") or {}).items()}
+    roles = {str(k): v for k, v in (rec.get("roles") or {}).items()}
     paras = []
     for b in ordered:
         role = roles.get(str(b["id"]), "body")
@@ -520,12 +537,7 @@ def process(page):
                     paras.append(("subsection", para, starts_block, indent))
                 else:
                     paras.append((role, para, starts_block, indent))
-    text = render(join_runons(paras))
-    art = os.path.join(OUT_DIR, stem + ".article.txt")
-    open(art, "w", encoding="utf-8").write(text + ("\n" if text else ""))
-
-    print(f"p{stem}: kind={rec['page_kind']:<8} kept {len(keep)}/{len(rec['blocks'])} blocks, "
-          f"{len(text)} chars", flush=True)
+    return paras
 
 
 def safe(page):
