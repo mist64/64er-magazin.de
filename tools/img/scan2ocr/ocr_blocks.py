@@ -444,6 +444,27 @@ BLOCK_GUTTER_PX = 30
 BLOCK_SPLIT_MIN_LINES = 3
 SPLIT_BLOCK_ID = 3000
 
+# --- blocks that hold two things side by side --------------------------------
+# The paragraph above is why stage A no longer DECIDES this.  It measures the
+# gutter, produces the two other readings alongside the default, and stage B --
+# which can read the text -- picks.  Geometry cannot: a table row and a woven
+# line are the same shape.
+#
+#   p55  "ESC chr$(108) chr$(10): setzt linken Rand auf 10"   across is correct
+#   p10  "8910 Landsberg 2300 Kiel"                           across is nonsense
+#
+# MEASURED over the issue: 10 corpus blocks are flagged, 3 wanting "down"
+# (p10, p126, p155) and 7 "rows" (p55, p62 x2, p63, p64, p70, p75).
+#
+# The gutter is scored by how many LINES have a word gap at a given x, NOT by
+# looking for an x that no word covers at all.  p10's gutter is 257 px wide and
+# the centred headline "SUPER-SPIEL FÜR C 16" is the single line crossing it --
+# the uncrossed test finds nothing there, which is exactly why the earlier
+# attempt could not fix the page it was written for.
+COLSPLIT_GAP_PX = 30        # a word gap this wide is a candidate gutter
+COLSPLIT_MIN_LINES = 3      # fewer lines than this is not evidence of a column
+COLSPLIT_MIN_SPAN = 0.7     # this fraction of the lines must have a gap there
+
 # --- line-break hyphens ------------------------------------------------------
 # A hyphen at a line end is MARKED, not resolved -- see reflow() for why no local
 # rule can separate a soft hyphen from a compound from a suspended one.  U+00AC
@@ -968,6 +989,77 @@ def split_block_columns(words):
     return words
 
 
+def column_gutter(line_list):
+    """The x at which most of a block's lines have an internal word gap, if a
+    strong majority of them do.  Returns (x, span_frac) or None.
+
+    Scored per line rather than per pixel-column of the whole block: see
+    COLSPLIT_* for why an x that no word covers is the wrong test."""
+    if len(line_list) < COLSPLIT_MIN_LINES:
+        return None
+    x0 = min(w["l"] for lw in line_list for w in lw)
+    x1 = max(w["l"] + w["w"] for lw in line_list for w in lw)
+    if x1 - x0 < 100:
+        return None
+    votes = np.zeros(x1 - x0 + 2, dtype=np.int32)
+    for lw in line_list:
+        sw = sorted(lw, key=lambda w: w["l"])
+        for a, b in zip(sw, sw[1:]):
+            lo, hi = a["l"] + a["w"], b["l"]
+            if hi - lo >= COLSPLIT_GAP_PX:
+                votes[lo - x0: hi - x0] += 1
+    if not votes.size or not votes.max():
+        return None
+    span = float(votes.max()) / len(line_list)
+    if span < COLSPLIT_MIN_SPAN:
+        return None
+    # the middle of the widest run at the winning vote count, so the cut sits in
+    # the gutter rather than against the last word of the left column
+    top = votes.max()
+    best, run, start = (0, 0), 0, 0
+    for i, v in enumerate(votes):
+        if v == top:
+            if not run:
+                start = i
+            run += 1
+            if run > best[1]:
+                best = (start + run // 2, run)
+        else:
+            run = 0
+    return best[0] + x0, round(span, 3)
+
+
+def read_down(line_list, arr):
+    """The same lines read as two columns, down the left one then down the right.
+
+    Each column gets its own paragraph analysis, because paragraphs() measures
+    the indent against the median left edge of the lines it is given -- across a
+    two-column block that median is one column's edge and the other column's
+    lines look indented by a column width."""
+    gut = column_gutter(line_list)
+    if not gut:
+        return None
+    mid = gut[0]
+    sides = ([], [])
+    for lw in line_list:
+        for side, keep in enumerate((lambda w: w["l"] + w["w"] / 2 < mid,
+                                     lambda w: w["l"] + w["w"] / 2 >= mid)):
+            part = [w for w in lw if keep(w)]
+            if part:
+                sides[side].append(part)
+    out = []
+    for part_lines in sides:
+        if not part_lines:
+            continue
+        txt = [" ".join(w["text"] for w in sorted(lw, key=lambda x: x["l"]))
+               for lw in part_lines]
+        for para, _bold in paragraphs(part_lines, txt, arr)[0]:
+            r = reflow(para)
+            if r:
+                out.append(r)
+    return "\n".join(out) if out else None
+
+
 def block_features(words, W, H, arr):
     groups = defaultdict(list)
     for w in words:
@@ -1021,6 +1113,18 @@ def block_features(words, W, H, arr):
 
         paras_meta, first_indent = paragraphs(line_list, line_txt, arr)
 
+        # A block whose lines all break at the same x holds two things side by
+        # side.  Stage A offers the other two readings and stage B chooses; see
+        # COLSPLIT_* for why this is not decided here.
+        gut = column_gutter(line_list)
+        alt = {}
+        if gut:
+            down = read_down(line_list, arr)
+            if down:
+                alt["down"] = down
+            alt["rows"] = "\n".join(t for t in line_txt if t.strip())
+            alt["span"] = gut[1]
+
         blocks.append({
             "id": bid,
             "bbox": [x0, y0, x1, y1],
@@ -1050,6 +1154,11 @@ def block_features(words, W, H, arr):
             # foot of the previous column.  Punctuation cannot tell these apart --
             # a paragraph can simply happen to end a sentence at the column foot.
             "first_indent_px": round(first_indent),
+            # present ONLY on a block with an internal gutter: the same lines
+            # read down the two columns, and read as one record per line.  Stage
+            # B picks; absent means there is nothing to pick and the default
+            # across-reading stands.
+            "read_alt": alt,
         })
     return blocks
 
@@ -1269,6 +1378,16 @@ def write_digest(page, blocks, dest):
         # image alone
         out.append(f"{b['id']:<3} {b['label']:<16} {x0:<5.2f} {y0:<5.2f} {x1:<5.2f} {y1:<5.2f} "
                    f"{b['n_lines']:<6} {b['conf']:<5.0f} {b['line_h_frac']:<6.4f} {sample}")
+        # a block with an internal gutter holds two things side by side; the
+        # alternatives are spelled out so stage B can compare them as text
+        alt = b.get("read_alt") or {}
+        if alt:
+            out.append(f"    ^ block {b['id']} BREAKS AT A GUTTER on "
+                       f"{alt.get('span')} of its lines. Choose its reading:")
+            for k in ("rows", "down"):
+                if alt.get(k):
+                    flat = " / ".join(alt[k].split("\n"))
+                    out.append(f"      {k:<5} = {flat[:300]}")
     open(dest, "w", encoding="utf-8").write("\n".join(out) + "\n")
 
 

@@ -236,11 +236,31 @@ use it, together with the image, to tell the levels apart.
   code        a short code fragment quoted inside the prose.
   body        ordinary running prose. Use this when in doubt.
 
+A block the digest marks "BREAKS AT A GUTTER" holds two things side by side, and
+the reflowed text you see for it reads ACROSS both. Sometimes that is right and
+sometimes it is nonsense, and only the text can tell:
+
+  across  the line is one statement that happens to be set in two parts -- a
+          table row ("ESC chr$(108) chr$(10): setzt linken Rand auf 10",
+          "0- 2048: Bildschirmspeicher"), or a listing line with its REM
+          comment. Keep this unless it plainly reads wrong. It is the default.
+  rows    across is right, but each LINE is a separate record and they must not
+          be reflowed into one paragraph -- a table of commands, addresses or
+          values.
+  down    across is nonsense: two independent columns were woven together
+          line by line, and the text must be read down one and then the other
+          ("8910 Landsberg 2300 Kiel" is two different addresses).
+
+Compare the "rows =" and "down =" readings printed under the block against the
+across-reading on the block's own line, and put your choice in "reads". Only
+gutter-marked ids may appear there; omit an id to leave it "across".
+
 Return ONLY a JSON object, no prose, no code fence:
 {{"page_kind": "<article|ad|mixed|toc|other>",
   "labels": {{"<id>": "<label>", ...}},
   "order": [<id>, <id>, ...],
-  "roles": {{"<id>": "<role>", ...}}}}
+  "roles": {{"<id>": "<role>", ...}},
+  "reads": {{"<id>": "<across|rows|down>", ...}}}}
 Every id in the digest must appear in "labels".
 "order" lists ONLY the blocks whose label is body, heading or listing-inline --
 the ones whose text goes into the corpus -- in the order they should be read.
@@ -352,7 +372,10 @@ def ends_dangling(text):
 # strictly a quotation, but it renders closest to the printed page and can be
 # turned into something else later.
 ROLE_PREFIX = {"title": "# ", "intro": "> ", "section": "## ", "subsection": "### "}
-VALID_ROLES = set(ROLE_PREFIX) | {"body", "code", "source"}
+# "row" is a body paragraph that is one RECORD of a table: it renders exactly
+# like body, but join_runons only ever joins body to body, so a table's rows can
+# never be reflowed back into one paragraph.
+VALID_ROLES = set(ROLE_PREFIX) | {"body", "code", "source", "row"}
 
 # Source notes -- "Info: Broderbund Software, 17 Paul Drive, ...", publisher
 # addresses, ISBN and price credits, "Fortsetzung von Seite 32" -- are set in a
@@ -393,6 +416,13 @@ def join_runons(paras):
         if (out and starts_block and role == "body" and out[-1][0] == "body"
                 and (indent < PARA_INDENT_MIN_PX
                      or ends_dangling(out[-1][1]))):
+            out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3])
+            continue
+        # A standfirst is never printed twice in a row, so two consecutive ones
+        # are always one that OCR split.  Unconditional, unlike the heading rule
+        # below: the break usually falls on a colon -- "Der Name des Freundes:" /
+        # "Print Shop Companion" -- and a colon counts as a finished sentence.
+        if out and role == "intro" and out[-1][0] == "intro":
             out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3])
             continue
         # A headline set over two lines arrives as two blocks, and rendering them
@@ -466,6 +496,7 @@ def process(page):
         cand = {"page_kind": old.get("page_kind", "unknown"),
                 "order": old.get("order"),
                 "roles": old.get("roles"),
+                "reads": old.get("reads"),
                 "labels": {str(b["id"]): b["llm_label"] for b in old["blocks"]
                            if b.get("llm_label")}}
         # A cached verdict is only valid for the blocks it was made about.  If
@@ -474,10 +505,17 @@ def process(page):
         # geometric guess, and the corpus scored 0.822 instead of 0.917 with no
         # error anywhere.  Compare the id sets and re-ask when they differ.
         now_ids = {str(b["id"]) for b in rec["blocks"]}
-        if set(cand["labels"]) == now_ids:
-            verdict = cand
-        else:
+        # ...and a verdict made before stage A started offering alternative
+        # readings has no opinion on them, which would silently leave every
+        # gutter block on the default.  An absent "reads" on a page that has one
+        # is a stale verdict, not a considered "across".
+        needs_reads = any(b.get("read_alt") for b in rec["blocks"])
+        if set(cand["labels"]) != now_ids:
             print(f"p{stem}: cached labels are for different blocks, re-asking", flush=True)
+        elif needs_reads and cand.get("reads") is None:
+            print(f"p{stem}: cached verdict predates the gutter readings, re-asking", flush=True)
+        else:
+            verdict = cand
     if verdict is None:
         verdict = call_llm(page, digest, overlay)
     labels = {str(k): v for k, v in verdict.get("labels", {}).items()}
@@ -495,6 +533,7 @@ def process(page):
     rec["page_kind"] = verdict.get("page_kind", "unknown")
     rec["order"] = verdict.get("order")
     rec["roles"] = verdict.get("roles")
+    rec["reads"] = verdict.get("reads")
 
     json.dump(rec, open(os.path.join(OUT_DIR, stem + ".labels.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
@@ -544,11 +583,22 @@ def page_paragraphs(rec, stem=""):
         print(f"p{stem}: {len(missing)} block(s) missing from LLM order, appended", flush=True)
     ordered += missing
     roles = {str(k): v for k, v in (rec.get("roles") or {}).items()}
+    reads = {str(k): v for k, v in (rec.get("reads") or {}).items()}
     paras = []
     for b in ordered:
         role = roles.get(str(b["id"]), "body")
         if role not in VALID_ROLES:
             role = "body"
+        # A block that breaks at an internal gutter holds two things side by
+        # side and stage A offered the alternatives; stage B picked one.  The
+        # default is the across-reading already in b["text"], so a block the
+        # model says nothing about is untouched.
+        alt = b.get("read_alt") or {}
+        pick = reads.get(str(b["id"]))
+        if alt and pick in ("rows", "down") and alt.get(pick):
+            b = dict(b, text=alt[pick], para_subhead=[])
+            if pick == "rows" and role == "body":
+                role = "row"
         if b["label"] == "listing-inline":
             role = "code"                     # the label already settled this
         indent = b.get("first_indent_px", 0)
