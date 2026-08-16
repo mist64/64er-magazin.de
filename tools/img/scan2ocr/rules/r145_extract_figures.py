@@ -104,6 +104,14 @@ INK_MIN_PX = 400        # too little ink to measure: fall back to a loose mask
 SAT_COLOUR = 50         # mean chroma of the INK above this -> colour
 SAT_STRONG = 60         # a pixel this chromatic is unambiguously coloured
 SAT_STRONG_FRAC = 0.06  # ...and this share of the ink being so makes it colour
+# MEASURED over every crop in the issue: the median-filter delta of a screened
+# halftone is 0.045-0.055 and of unscreened line art 0.002-0.029.  The old 0.055
+# sat at the very TOP of the screened cluster, so only two of the seven screened
+# chip diagrams reached the dots bucket and the rest fell through to gray.  0.035
+# is the middle of the measured gap.
+SCREEN_DELTA = 0.035    # median-filter delta above this -> screened halftone
+GRAY_LO, GRAY_HI = 90, 190   # the band a continuous tone actually lives in
+GRAY_MIDTONE_FRAC = 0.20     # ...over this share of the area -> greyscale
 
 # Screened-and-uniform is a tint, screened-and-varying is a picture.
 TONE_CELLS = 12         # coarse grid the halftone is averaged away over
@@ -472,11 +480,18 @@ def classify(crop):
     med = np.median(np.stack([np.roll(np.roll(gg, dy, 0), dx, 1)
                               for dy in (-1, 0, 1) for dx in (-1, 0, 1)]), axis=0)
     screen = float(np.abs(med - gg).mean() / 255)
-    mid = gg[(gg > 40) & (gg < 215)]
-    levels = len(np.unique(mid // 4)) if mid.size else 0
-    if screen > 0.055:
+    if screen > SCREEN_DELTA:
         return "dots"
-    if levels > 26 and mid.size > 0.15 * gg.size:
+    # CONTINUOUS TONE MEANS REAL MID-TONE AREA.  The old test asked for "more
+    # than 26 distinct grey levels in 40..215", and MEASURED across every crop
+    # in the issue that number is 44 -- for all of them, screened chip and clean
+    # line drawing alike.  It saturates, so it discriminated nothing, and the
+    # gray bucket collapsed to "has some non-extreme pixels": four bilevel
+    # dot-matrix printouts landed in it (54-1, 58-1, 79-1, 93-0) because
+    # scanner blur on their dots reads as grey.  A photograph carries mid-tone
+    # over a third of its area; nothing in this issue's line art exceeds 0.10.
+    truemid = float(((gg > GRAY_LO) & (gg < GRAY_HI)).mean())
+    if truemid > GRAY_MIDTONE_FRAC:
         return "gray"
     return "bw"
 
