@@ -58,7 +58,7 @@ Note the parent category (`Wettbewerbe`, `Listings zum Abtippen`) is listed AFTE
 
 ## What `64er.toc_category` is
 
-A per-article meta tag in each HTML `<head>`. Its content must exactly match a line in `toc.txt`, except for the editorial (see Rule 1).
+A per-article meta tag in each HTML `<head>`. Its content must exactly match a line in `toc.txt`, except for the editorial (see Rule 040).
 
 ```html
 <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks zum C 128">

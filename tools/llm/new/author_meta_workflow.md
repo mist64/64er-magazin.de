@@ -17,7 +17,7 @@ per tools/llm/new/author_meta_workflow.md.
 
 ## Rules
 
-### Rule 1 — most articles have a real author meta
+### Rule 040 — most articles have a real author meta
 
 For a normal article, the `content` lists the bylines that appear in the body, in the order they appear. Use the editor initials exactly as printed in the article (`bs`, `hm`, `ev`, etc., expanded to "Boris Schneider", "Harald Meyer", "Volker Everts" per the Impressum). External contributors come first if their full name is in the byline; in-house editor initials trail.
 
@@ -30,7 +30,7 @@ Examples (from 8606):
 
 If the body byline is `(bs/hm)`, the meta is `bs, hm`. If two articles by different authors are merged into one HTML (rare), include every byline in document order.
 
-### Rule 2 — unsigned articles get NO meta tag
+### Rule 050 — unsigned articles get NO meta tag
 
 Drop the `<meta name="author">` line entirely (don't leave it empty `content=""`, and don't write `XXX`) for these recurring rubrics and announcements:
 
@@ -47,7 +47,7 @@ Drop the `<meta name="author">` line entirely (don't leave it empty `content=""`
 
 Verify against the prior issue: every one of these has had no `<meta name="author">` for at least the last 5 issues (`8601`–`8605`).
 
-### Rule 3 — editorial DOES get a real author meta
+### Rule 060 — editorial DOES get a real author meta
 
 The editorial is *unsigned-feeling* (no `(initials)` byline at the end), but the body ends with a chief-editor signature line ("Michael Scharfenberger, Chefredakteur"). The `<meta name="author">` lists that name:
 
@@ -57,7 +57,7 @@ The editorial is *unsigned-feeling* (no `(initials)` byline at the end), but the
 
 Even though the editorial has a per-issue title (`Im neuen Gehäuse…`, `Mit Zuversicht…`, etc.), the author meta is always the chief editor for that issue (was `Michael M. Pauly` through 8603, `Michael Scharfenberger` from 8604 onward).
 
-### Rule 4 — placeholder `XXX` is invalid
+### Rule 070 — placeholder `XXX` is invalid
 
 The template ships with `<meta name="author" content="XXX">`. `XXX` must be replaced (with a real name) or the entire line removed. **Do not leave any `XXX` in any article.**
 
@@ -69,7 +69,7 @@ The template ships with `<meta name="author" content="XXX">`. `XXX` must be repl
    grep -L 'name="author"' *.html
    ```
 2. **Categorize each:**
-   - If it's an unsigned-rubric article (Rule 2 list) → remove the meta line.
+   - If it's an unsigned-rubric article (Rule 050 list) → remove the meta line.
    - If it's the editorial → set to the chief editor's name.
    - Otherwise → read the body bylines and fill the content with the matching initials/names.
 3. **Apply** with `sed`-free edits (use a small Python script with explicit per-file mapping, like the pattern used in `64er_id_workflow.md` and `toc_category_workflow.md`).

@@ -20,6 +20,7 @@ out/NNN.article.txt is the deliverable: article text and nothing else.  A page
 with no article content yields an empty file, which is a result, not a failure.
 """
 
+import hashlib
 import json
 import os
 import re
@@ -236,6 +237,14 @@ use it, together with the image, to tell the levels apart.
   code        a short code fragment quoted inside the prose.
   body        ordinary running prose. Use this when in doubt.
 
+A ROLE CANNOT CHANGE IN THE MIDDLE OF A SENTENCE. Tesseract ends a block wherever
+the type changes, and the magazine changes type inside a standfirst -- p39 sets
+"...Der Name des Freundes:" small and "Print Shop Companion", which finishes that
+sentence, large. Two blocks, one standfirst. So before assigning a role, read the
+END of the previous block in your reading order: if this block's text completes
+the sentence that one left unfinished, it has the SAME role, however differently
+it is set. Size and weight say what a block is only when it starts something new.
+
 A block the digest marks "BREAKS AT A GUTTER" holds two things side by side, and
 the reflowed text you see for it reads ACROSS both. Sometimes that is right and
 sometimes it is nonsense, and only the text can tell:
@@ -266,6 +275,10 @@ Every id in the digest must appear in "labels".
 the ones whose text goes into the corpus -- in the order they should be read.
 
 """
+
+
+# Identifies the question a cached verdict answered.  See process().
+PROMPT_KEY = hashlib.sha256(PROMPT.encode("utf-8")).hexdigest()[:16]
 
 
 def call_llm(page, digest, overlay):
@@ -387,9 +400,6 @@ VALID_ROLES = set(ROLE_PREFIX) | {"body", "code", "source", "row"}
 # clustering at 0.66-0.67; the 0.85-0.95 band is ordinary body, including
 # 26- and 28-line body blocks on p145. The ratio is per page because type size
 # varies between pages, and taken from the median so one odd block cannot move it.
-# Longest continuation a colon-ended standfirst may absorb.  See join_runons.
-INTRO_TAIL_MAX_CHARS = 80
-
 SOURCE_LINE_RATIO = 0.85
 SOURCE_MIN_BODY_BLOCKS = 2      # too few to take a median from
 SOURCE_HTML = '<p class="source">%s</p>'
@@ -426,17 +436,6 @@ def join_runons(paras):
         # below, because a standfirst legitimately ends on a full stop.
         if out and role == "intro" and out[-1][0] == "intro":
             out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3])
-            continue
-        # A standfirst ending on a COLON is grammatically unfinished, and what
-        # finishes it is set larger, so stage B reads it as a heading:
-        # "...Der Name des Freundes:" / "Print Shop Companion" (p39).  It is one
-        # sentence and belongs in one paragraph.  MEASURED: exactly one
-        # standfirst in the issue ends on a colon, and its continuation is 20
-        # characters -- the length cap is there so a future issue cannot swallow
-        # a body paragraph on the strength of a colon.
-        if (out and out[-1][0] == "intro" and out[-1][1].rstrip().endswith(":")
-                and len(p.strip()) <= INTRO_TAIL_MAX_CHARS):
-            out[-1] = ("intro", join_text(out[-1][1], p), out[-1][2], out[-1][3])
             continue
         # A headline set over two lines arrives as two blocks, and rendering them
         # separately produces two "# " lines where a reader sees one headline --
@@ -518,15 +517,16 @@ def process(page):
         # geometric guess, and the corpus scored 0.822 instead of 0.917 with no
         # error anywhere.  Compare the id sets and re-ask when they differ.
         now_ids = {str(b["id"]) for b in rec["blocks"]}
-        # ...and a verdict made before stage A started offering alternative
-        # readings has no opinion on them, which would silently leave every
-        # gutter block on the default.  An absent "reads" on a page that has one
-        # is a stale verdict, not a considered "across".
-        needs_reads = any(b.get("read_alt") for b in rec["blocks"])
+        # A cached verdict is only valid for the blocks it was made about AND
+        # for the question it was asked.  Keying on the blocks alone means every
+        # prompt improvement is silently discarded -- the answers keep coming
+        # from the cache and the sweep looks like the rule did nothing.  Same
+        # lesson as the stale block-id cache in FINDINGS; the fix is the same
+        # shape as stage D's boundary cache.
         if set(cand["labels"]) != now_ids:
             print(f"p{stem}: cached labels are for different blocks, re-asking", flush=True)
-        elif needs_reads and cand.get("reads") is None:
-            print(f"p{stem}: cached verdict predates the gutter readings, re-asking", flush=True)
+        elif old.get("prompt_key") != PROMPT_KEY:
+            print(f"p{stem}: cached verdict answers an older prompt, re-asking", flush=True)
         else:
             verdict = cand
     if verdict is None:
@@ -547,6 +547,7 @@ def process(page):
     rec["order"] = verdict.get("order")
     rec["roles"] = verdict.get("roles")
     rec["reads"] = verdict.get("reads")
+    rec["prompt_key"] = PROMPT_KEY
 
     json.dump(rec, open(os.path.join(OUT_DIR, stem + ".labels.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)

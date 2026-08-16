@@ -15,7 +15,7 @@ Clean up OCR artifacts in issues/YYMM/YYMM.md per tools/llm/new/cleanup_workflow
 
 ## CRITICAL RULES
 
-### Rule 1: Only fix OCR errors. Never fix original typos or old German spelling.
+### Rule 040: Only fix OCR errors. Never fix original typos or old German spelling.
 
 The magazine is a 1980s German publication. It uses pre-1996 orthography (`muß`, `daß`, `Adreß`, `Schnellade` with elided third L) and contains real-life author/editor typos. Both are part of the historical record and **must be preserved**.
 
@@ -35,7 +35,7 @@ Diagnostic test: count the characters. Same count, different glyph at one positi
 | Missing letter (original typo) | `Prinzessinen` (one n) | ❌ leave |
 | Extra letter (original typo) | `Nahrungsmittteln` (triple t), `Anwätte` for `Anwälte`, `Egentlich` for `Eigentlich`, `Löewe` for `Loewe` | ❌ leave |
 
-### Rule 2: Multi-hyphen words — only the last hyphen is the line break.
+### Rule 050: Multi-hyphen words — only the last hyphen is the line break.
 
 When a word `X-Y-z` has its final segment starting lowercase, only the **last** hyphen is a line-break artifact. The earlier hyphens are intentional compound hyphens — keep them.
 
@@ -44,7 +44,7 @@ When a word `X-Y-z` has its final segment starting lowercase, only the **last** 
 - ✅ `IBM-kom-patible` → `IBM-kompatible`
 - ✅ `QWER-TY-Reihe` → `QWERTY-Reihe` (when both internal segments form one acronym, judgment call from context)
 
-### Rule 3: `»` ↔ `«` direction is never OCR.
+### Rule 060: `»` ↔ `«` direction is never OCR.
 
 The German guillemets `»…«` open and close in fixed positions. If you see `»disk»` (both right-pointing), that is an **original typo**, not OCR. Do not "correct" it.
 
@@ -68,7 +68,7 @@ Also handle:
 - **Old German ck→k-k**: `Druk-ker`→`Drucker`, `Drük-ken`→`Drücken`, `Tük-ken`→`Tücken`. After joining, the bare form is **not** valid German (`Drukker` is wrong in any era).
 - **"X- und Y" enumeration**: `Hard-und` → `Hard- und`, `Adreß-oder` → `Adreß- oder`. The hyphen survived as a real compound hyphen; the space after it was lost.
 
-Repeat the scan on three-segment tokens (`X-Y-z` with trailing lowercase) per Rule 2.
+Repeat the scan on three-segment tokens (`X-Y-z` with trailing lowercase) per Rule 050.
 
 ### Pass 2 — Character-level confusions
 
