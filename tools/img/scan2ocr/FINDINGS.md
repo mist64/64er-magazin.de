@@ -341,5 +341,5 @@ token, which no local rule reaches.
   it. One page, left as a documented divergence.
 - **Character-level OCR errors** — `»/om` for `»Vom`, `aufein`, `dasursprüngliche
   Spritein`. Measured as unaffected by dpi, by `preserve_interword_spaces`, and by
-  binarisation. These are the recognizer's, and belong to
-  `tools/llm/ocr_error_correction.sh` and `spell_check_and_correct.sh`.
+  binarisation. These are the recognizer's, and belong to step 280
+  (`rules/r280_ocr_word_cleanup.md`).
