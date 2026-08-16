@@ -64,7 +64,8 @@ LANES = 4
 # running text.  They are still LABELLED and kept in the JSON, so reversing that
 # is a rebuild, not a re-OCR.  Errata columns ARE article and stay in.)
 import llm                                                       # noqa: E402
-from ocr_blocks import ARTICLE_LABELS, SRC_DIR, reading_order   # noqa: E402
+from ocr_blocks import (ARTICLE_LABELS, PARA_INDENT_MIN_PX,      # noqa: E402
+                        SRC_DIR, reading_order)
 
 # Every label the prompt offers must appear here.  "caption" was missing -- it is
 # offered to the model and excluded from the corpus, but was not listed as valid,
@@ -226,8 +227,11 @@ use it, together with the image, to tell the levels apart.
               and so two titles, and a continuation page carries none at all.
   intro       the standfirst: the bold or larger paragraph between the headline
               and the body, before the article proper begins.
-  section     a heading inside the article, set bold, above body text.
-  subsection  a heading below section level, smaller or less prominent.
+  section     a standalone heading inside the article: set on its own line in
+              display type, introducing a section of the piece.
+  subsection  a heading a level below that -- typically a short bold run-in
+              subhead opening a paragraph of body text, naming the thing the
+              next paragraphs describe.
   code        a short code fragment quoted inside the prose.
   body        ordinary running prose. Use this when in doubt.
 
@@ -298,7 +302,31 @@ def redraw(page, blocks):
 # this was the single largest source of disagreement -- "...wie Kopierprogram" and
 # "me, Directory-Sorter und ähnliches" were being emitted as two paragraphs where
 # a reader sees one.
-SENTENCE_END = ".!?:»\"'\u201c"
+SENTENCE_END = ".!?:»\"'\u201c\u00ab"
+
+# German function words. A paragraph CANNOT end on one of these -- "...zwischen
+# dem zwölften und dreizehnten Bit. Die" is not a paragraph, it is the first half
+# of one, whatever the punctuation and whatever case the continuation starts in.
+# MEASURED: this is the narrow, trivially-decidable class. Joining on "does not
+# end with a full stop" instead is far broader and over-joins -- it cost recall
+# 0.934 -> 0.908 across the issue for 0.007 precision -- because a list item, a
+# byline or a heading legitimately ends without one.
+DANGLING_WORDS = frozenset("""
+der die das den dem des ein eine einen einem einer eines und oder aber
+mit von zu zum zur im in am an auf aus bei nach vor über unter durch für ohne
+ist sind war waren wird werden kann können muss müssen soll sollen hat haben
+sich nicht auch noch nur wenn dass daß als wie so es er sie man
+dieser diese dieses jeder jede jedes
+""".split())
+
+
+def ends_dangling(text):
+    """Does this paragraph end on a word that cannot end a sentence?"""
+    text = text.rstrip()
+    if not text or text[-1] in SENTENCE_END:
+        return False
+    words = re.findall(r"[A-Za-zÄÖÜäöüß]+", text)
+    return bool(words) and words[-1].lower() in DANGLING_WORDS
 
 # How each role is written as markdown.  A standfirst becomes a blockquote: not
 # strictly a quotation, but it renders closest to the printed page and can be
@@ -308,11 +336,22 @@ VALID_ROLES = set(ROLE_PREFIX) | {"body", "code"}
 
 
 def join_runons(paras):
-    """paras is a list of (role, text).  Only ordinary prose is ever joined: a
+    """paras is a list of (role, text, starts_block, indent).  Only ordinary prose is ever joined: a
     heading must never be absorbed into the paragraph before it, however the
     sentence happens to end."""
     out = []
-    for role, p in paras:
+    for role, p, starts_block, indent in paras:
+        # A paragraph running over the foot of one column into the next is the
+        # normal case, and its continuation is NOT indented.  So the first
+        # paragraph of a block joins the previous one when it is flush, and
+        # stands alone when it is indented -- the page states which it is.
+        if (out and starts_block and role == "body" and out[-1][0] == "body"
+                and (indent < PARA_INDENT_MIN_PX
+                     or ends_dangling(out[-1][1]))):
+            prev = out[-1][1].rstrip()
+            joiner = "" if prev.endswith("¬") else " "
+            out[-1] = (role, prev + joiner + p.lstrip())
+            continue
         # A headline set over two lines arrives as two blocks, and rendering them
         # separately produces two "# " lines where a reader sees one headline --
         # MEASURED on p76: "# Module" / "# für Hypra-Basic" against vision's
@@ -329,8 +368,12 @@ def join_runons(paras):
         if out and role == "body" and out[-1][0] == "body":
             prev = out[-1][1].rstrip()
             head = p.lstrip()
-            # continue when the previous paragraph did not finish a sentence and
-            # this one does not begin like a new one
+            # Inside a block the splits come from indent, leading and boldness,
+            # and those are reliable -- a list item or a run-in subhead legitimately
+            # ends without a full stop, so missing punctuation must NOT rejoin them.
+            # Applied unconditionally it cost recall 0.934 -> 0.908 across the issue
+            # while gaining only 0.007 precision. The unfinished-sentence test now
+            # lives at the block boundary above, where the ambiguity actually is.
             if prev and prev[-1] not in SENTENCE_END and head[:1].islower():
                 joiner = "" if prev.endswith("¬") else " "   # word split across the break
                 out[-1] = (role, prev + joiner + head)
@@ -431,8 +474,9 @@ def process(page):
             role = "body"
         if b["label"] == "listing-inline":
             role = "code"                     # the label already settled this
+        indent = b.get("first_indent_px", 0)
         if role == "code":
-            paras.append((role, b["text"].strip()))
+            paras.append((role, b["text"].strip(), True, indent))
         else:
             # a block may hold several paragraphs; the role applies to each,
             # except paragraphs stage A measured as bold subheads -- those are
@@ -441,10 +485,15 @@ def process(page):
             for i, para in enumerate(b["text"].split("\n")):
                 if not para.strip():
                     continue
+                starts_block = (i == 0)
                 if role == "body" and i < len(subhead) and subhead[i]:
-                    paras.append(("section", para))
+                    # A bold run-in subhead sits a level BELOW a standalone
+                    # section heading: "Tips für Maschinenprogrammierer" is set
+                    # on its own line above a section, while "Ursprungsblock" and
+                    # "Zielblock" open a paragraph inside one.
+                    paras.append(("subsection", para, starts_block, indent))
                 else:
-                    paras.append((role, para))
+                    paras.append((role, para, starts_block, indent))
     text = render(join_runons(paras))
     art = os.path.join(OUT_DIR, stem + ".article.txt")
     open(art, "w", encoding="utf-8").write(text + ("\n" if text else ""))
