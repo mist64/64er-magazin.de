@@ -145,24 +145,50 @@ table, which is the whole difficulty of this step. Open
 
 ## Known limits — MEASURED, not guesses
 
-A vision pass over 71 of the finished crops scored **26 good, 17 cut, 26
-carrying something extra, 2 junk** — that was before frames tolerated broken
-rules, which lifted the kept count from 86 to 103 and cut the missing count from
-45 to 28. The proportions have not been re-measured at that scale. What remains, and why:
+**This step is not finished.** A vision census over a *proportional* sample of
+the 81 crops scored **11 good, 8 cut, 12 extra, 1 junk of 32 — 34% good**, and
+that split badly by bucket:
 
-- **A figure whose frame is not printed** falls back to the gap and scrap
-  sources, which are much weaker. Most "cut" and "extra" crops are these.
-- **Flowcharts with labelled nodes fragment.** Their nodes contain real text, so
-  the merge step refuses to join across it — correctly, by the rule that keeps
-  two figures with a caption between them apart. p31's printer-selection
-  flowchart is the standing example.
-- **Type is judged from the whole bounding box**, so a red badge on white can
-  read as `bw`, and a colour portrait against a desaturated background as
-  `gray`. 3 of 71 were misrouted.
-- **~45 figures per issue are reported missing** by the judge, which reports
-  what it can see with no box. That list is the honest recall measure and the
-  right input to the next round of work.
+| bucket | good |
+|---|---|
+| `c/` (photos, screenshots, covers) | 56% |
+| `gray/` | 1 of 1 |
+| `bw/` (line art, hardcopies, schematics) | **0 of 8** |
+| `dots/` (screened diagrams, pinouts) | **0 of 5** |
 
-The next mechanism worth building is frame detection that tolerates a broken or
-partial rule, since a printed frame is by far the most reliable signal here and
-everything else is a fallback.
+Earlier censuses read 45–53%, but they sampled `c/` heavily and `bw/`+`dots/`
+barely. Proportional sampling is the honest measure and it says half the corpus
+— every diagram, schematic and pinout — is currently unusable.
+
+### The one mechanism behind almost all of it
+
+**The rectangle is snapped to the page's column grid, not to the figure's own
+frame.** The census put it exactly: *every* cut edge is a straight vertical or
+horizontal line at a gutter or a page-head rule, and none is a ragged content
+edge. Both defect families fall out of that single fact:
+
+- a figure **narrower** than a column has its box widened to the column, so the
+  whole neighbouring text column rides along (EXTRA);
+- a figure **wider** than a column is stopped dead at the column boundary and
+  its remainder emitted as a separate crop (CUT) — which is also why one pinout
+  sheet still comes out as three sliding windows and one flowchart as two halves
+  whose arrows point into each other.
+
+The gap source takes its x-extent from the column a block belongs to. That is
+the line to cut: **a gap should be a page-wide band whose horizontal extent is
+set by where text actually is, not by column membership.** Frame detection
+already does the right thing when a rule exists; the gap fallback does not.
+
+### Smaller, separate
+
+- **Captions and page furniture are ink-dense**, so bold `Bild N.` lines and the
+  black `Aktuelles` / `Extra` banners read as figure content. `cut_captions()`
+  handles the labelled ones; these are the ones it misses.
+- **The recurring `64'er Test` badge** is extracted correctly but three or four
+  times per issue, once per article that carries it. It is page furniture, not a
+  figure, and wants dedup or exclusion.
+- **A multi-page foldout** (the C 64 schematic, pp. 86–91) yields one tile per
+  page. Their traces are severed in the *original*, so no per-page extractor can
+  fix it; they need stitching, or accepting as tiles.
+- No type errors were found in the last census: routing to `c/gray/bw/dots` is
+  working.
