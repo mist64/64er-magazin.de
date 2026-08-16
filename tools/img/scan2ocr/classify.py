@@ -366,7 +366,13 @@ VALID_ROLES = set(ROLE_PREFIX) | {"body", "code", "source"}
 # varies between pages, and taken from the median so one odd block cannot move it.
 SOURCE_LINE_RATIO = 0.85
 SOURCE_MIN_BODY_BLOCKS = 2      # too few to take a median from
-SOURCE_HTML = '<p class="source">%s</p>' 
+SOURCE_HTML = '<p class="source">%s</p>'
+# Consecutive source notes are ONE note the page set as several blocks: p10's
+# vendor list arrives as ten lines ("MVG: Moderne Verlagsgesellschaft," /
+# "Justus-von-Liebig-Str. 1," / "8910 Landsberg 2300 Kiel" ...), p146's as
+# twenty-one.  They become one <p class="source"> with the line breaks kept as
+# <br>, because the line breaks are the address's structure, not typesetting.
+SOURCE_JOIN = "<br>\n"
 
 
 def join_runons(paras):
@@ -420,18 +426,27 @@ def join_runons(paras):
 
 def render(paras):
     """(role, text, ...) tuples -> markdown.  Paragraphs separated by a blank line."""
-    chunks = []
+    chunks, source = [], []
+
+    def flush():
+        if source:
+            chunks.append(SOURCE_HTML % SOURCE_JOIN.join(source))
+            source.clear()
+
     for para in paras:
         role, text = para[0], para[1]
         text = text.strip()
         if not text:
             continue
+        if role == "source":
+            source.append(text)
+            continue
+        flush()
         if role == "code":
             chunks.append("```\n" + text + "\n```")
-        elif role == "source":
-            chunks.append(SOURCE_HTML % text)
         else:
             chunks.append(ROLE_PREFIX.get(role, "") + text)
+    flush()
     return "\n\n".join(chunks)
 
 
