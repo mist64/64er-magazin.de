@@ -54,7 +54,16 @@ Three sources, in order of how much they can be trusted:
    rule is the figure's own edge: it does not wander across a gutter the way an
    ink-grown box does, and it does not die where the picture goes pale. A
    rectangle needs a long horizontal rule, another below it with much the same
-   x-extent, and the two verticals that close them.
+   x-extent, and a vertical closing at least one end.
+
+   **Three sides, and a rule may be broken.** The scan nicks a rule, a caption
+   hides one, and sometimes the fourth is simply not printed. Demanding four
+   perfect sides found only immaculate frames and dropped everything else to the
+   weaker sources. MEASURED over the issue: closing nicks up to 24 px and
+   accepting three sides took the kept figures from 86 to **103** and the
+   judge's "I can see this but it has no box" count from 45 down to **28** --
+   and it is what finally cut the recurring `64'er Test` rubric badge, the
+   single most-repeated miss in every review.
 2. **Gaps between text.** A figure sits in a column-width slot between two
    pieces of text. The slot is the figure — bounding it by ink instead is what
    three rounds of vision review kept objecting to.
@@ -137,7 +146,9 @@ table, which is the whole difficulty of this step. Open
 ## Known limits — MEASURED, not guesses
 
 A vision pass over 71 of the finished crops scored **26 good, 17 cut, 26
-carrying something extra, 2 junk**. What remains, and why:
+carrying something extra, 2 junk** — that was before frames tolerated broken
+rules, which lifted the kept count from 86 to 103 and cut the missing count from
+45 to 28. The proportions have not been re-measured at that scale. What remains, and why:
 
 - **A figure whose frame is not printed** falls back to the gap and scrap
   sources, which are much weaker. Most "cut" and "extra" crops are these.

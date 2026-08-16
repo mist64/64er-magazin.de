@@ -80,6 +80,7 @@ FRAME_SEARCH_PX = 90    # how far outside a candidate to look for its printed ru
 FRAME_SPAN = 0.92       # a row/column this dark across the CANDIDATE is a rule
 CAPTION_GAP_PX = 10     # keep this clear of a caption's first row
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
+RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
 
 def _runs(profile, thresh, min_len):
@@ -239,6 +240,17 @@ def framed_rects(grey, W, H):
     """
     d = 4
     small = grey[::d, ::d] < BORDER_DARK
+    # A printed rule is not continuous: the scan breaks it, and where a figure
+    # meets its caption or another rule the corner drops out.  Close short gaps
+    # along each direction before looking for runs, so a rule interrupted by a
+    # few pixels is still one rule.  Without this only perfectly-printed frames
+    # were found, and every figure whose rule had a nick fell through to the
+    # much weaker gap and scrap sources.
+    h_closed = small.copy()
+    v_closed = small.copy()
+    for k in range(1, RULE_GAP_PX // d + 1):
+        h_closed |= np.roll(small, k, 1) & np.roll(small, -k, 1)
+        v_closed |= np.roll(small, k, 0) & np.roll(small, -k, 0)
     sh, sw = small.shape
     minlen = int(MIN_W_PX / d)
 
@@ -258,8 +270,8 @@ def framed_rects(grey, W, H):
                     start = None
         return out
 
-    h = runs_along(small, 0)
-    v = runs_along(small, 1)
+    h = runs_along(h_closed, 0)
+    v = runs_along(v_closed, 1)
     rects = []
     for a in range(len(h)):
         ya, xa0, xa1 = h[a]
@@ -271,9 +283,12 @@ def framed_rects(grey, W, H):
             if ov < FRAME_EDGE_MATCH * max(xa1 - xa0, xb1 - xb0):
                 continue
             x0, x1 = max(xa0, xb0), min(xa1, xb1)
-            left = any(abs(c - x0) <= 2 and r0 <= ya + 2 and r1 >= yb - 2 for c, r0, r1 in v)
-            right = any(abs(c - x1) <= 2 and r0 <= ya + 2 and r1 >= yb - 2 for c, r0, r1 in v)
-            if left and right:
+            # Three sides make a frame.  Requiring all four loses every figure
+            # whose fourth rule is broken, hidden under a caption, or simply not
+            # printed -- and a figure bounded on three sides is already located.
+            left = any(abs(c - x0) <= 3 and r0 <= ya + 3 and r1 >= yb - 3 for c, r0, r1 in v)
+            right = any(abs(c - x1) <= 3 and r0 <= ya + 3 and r1 >= yb - 3 for c, r0, r1 in v)
+            if left or right:
                 rects.append([x0 * d, ya * d, x1 * d, yb * d])
     # keep only the outermost of any nest
     rects.sort(key=lambda r: -(r[2] - r[0]) * (r[3] - r[1]))
