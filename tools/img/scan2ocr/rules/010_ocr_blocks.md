@@ -17,10 +17,16 @@ block. There is no editorial judgement in it and nothing to dispatch.
 ## Run
 
 ```bash
-cd tools/img/scan2ocr
-seq 1 176 | OMP_NUM_THREADS=1 xargs -P 6 -n 8 python ocr_blocks.py
-python blocks_index.py
+tools/img/scan2ocr/rules/010_ocr_blocks.sh          # all 176 pages
+tools/img/scan2ocr/rules/010_ocr_blocks.sh 39 41    # a page range
 ```
+
+The programs themselves live one level up in `tools/img/scan2ocr/` and keep
+importable names — a Python module cannot start with a digit, and `classify`
+imports `ocr_blocks`. The numbered `.sh` beside this file is the entry point,
+and it carries the parallelism, which is not a detail: numpy stages want
+`OMP_NUM_THREADS=1` and many lanes, and this box is shared with a job that
+swap-thrashes if crowded.
 
 ~15 minutes for 176 pages. Deterministic and local — no model is called.
 
@@ -73,8 +79,8 @@ of them** and leaves the choice to step 020, which can read the text:
 ## Verification
 
 ```bash
-cd tools/img/scan2ocr
-dir=$(python -c "import ocr_blocks; print(ocr_blocks.OUT_DIR)")
+cd "$(dirname "$0")/.." 2>/dev/null || cd tools/img/scan2ocr
+dir=$(python3 -c "import ocr_blocks; print(ocr_blocks.OUT_DIR)")
 
 # 1. every page produced a JSON, a digest and an overlay
 ls $dir/*.json | grep -vc 'labels' ; ls $dir/*.digest.txt | wc -l ; ls $dir/*_boxes.png | wc -l
@@ -83,7 +89,7 @@ ls $dir/*.json | grep -vc 'labels' ; ls $dir/*.digest.txt | wc -l ; ls $dir/*_bo
 ls $dir/blocks/p*.txt | wc -l
 
 # 3. no page silently produced nothing
-python - <<'PY'
+python3 - <<'PY'
 import glob, json, os
 import ocr_blocks as OB
 empty = [f for f in sorted(glob.glob(os.path.join(OB.OUT_DIR, "[0-9][0-9][0-9].json")))

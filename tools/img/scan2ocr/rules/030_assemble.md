@@ -26,8 +26,7 @@ question and only make sense together. Everything else here is deterministic.
 ## Run
 
 ```bash
-cd tools/img/scan2ocr
-python assemble.py
+tools/img/scan2ocr/rules/030_assemble.sh
 ```
 
 ## Outputs
@@ -61,7 +60,7 @@ A shared running head never merges by itself: `Tips & Tricks` runs over pages
 
 ```bash
 cd tools/img/scan2ocr
-python - <<'PY'
+python3 - <<'PY'
 import assemble as A
 stream, pi = A.page_stream()
 c = A.candidates(stream); v = A.ask_boundaries(stream, c, pi)

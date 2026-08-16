@@ -20,8 +20,7 @@ block ids are drawn on the overlay so the two can be tied together.
 ## Run
 
 ```bash
-cd tools/img/scan2ocr
-python classify.py $(seq 1 176)
+tools/img/scan2ocr/rules/020_classify.sh
 ```
 
 Four lanes, one model call per uncached page.
@@ -67,8 +66,8 @@ something new.
 
 ```bash
 cd tools/img/scan2ocr
-python evaluate.py $(seq 1 176)      # scores against a vision reading
-python collect.py                    # review bundle: pNNN.png + pNNN.txt
+python3 evaluate.py $(seq 1 176)      # scores against a vision reading
+python3 collect.py                    # review bundle: pNNN.png + pNNN.txt
 ```
 
 `evaluate.py` reports four numbers, deliberately **not** combined because they
