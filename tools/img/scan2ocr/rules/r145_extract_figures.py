@@ -68,6 +68,7 @@ MIN_H_PX = 240
 MARGIN_PX = 260         # page edge; a column's free space starts here
 # A box's own rule is one long thin region -- p8's editorial border came out
 # 564x5724.  No printed picture in this magazine is anywhere near that thin.
+MAX_CAPTIONS_INSIDE = 1   # more than this inside one box means it is two
 MAX_ASPECT = 6.0
 SCRAP_JOIN_PX = 260     # OCR scraps this close belong to one picture
 # Conversion type, measured over the INK rather than the paper.  Paper is most
@@ -727,8 +728,10 @@ def figures(page):
     for x0, y0, x1, y1 in clustered:
         if encloses_text(rec, x0, y0, x1, y1):
             continue
-        found.append({"bbox": [x0, y0, x1, y1], "ink": 0.0, "caption": None,
-                      "kind": None, "num": "0", "anchor": [x0, x1]})
+        for px0, py0, px1, py1 in gutter_pieces(marked, x0, y0, x1, y1):
+            found.append({"bbox": [px0, py0, px1, py1], "ink": 0.0,
+                          "caption": None, "kind": None, "num": "0",
+                          "anchor": [px0, px1]})
 
     out = []
     for f in sorted(found, key=lambda f: (f["bbox"][1], f["bbox"][0])):
@@ -746,6 +749,19 @@ def figures(page):
         # of pin labels sheared off a chip diagram, not a picture -- the rewrite
         # dropped this guard and they came straight back.
         if max(x1 - x0, y1 - y0) > MAX_ASPECT * min(x1 - x0, y1 - y0):
+            continue
+        # A BOX HOLDING TWO CAPTIONS IS TWO FIGURES.  The caption is what says
+        # how many figures there are, so a box that has swallowed two of them
+        # has swallowed two figures and everything between: 131-5 came out as
+        # four pinouts and two captions in one crop, while the same pinouts were
+        # ALSO emitted individually -- the census found the same artwork in
+        # three files.  Dropping the container leaves the per-caption boxes,
+        # which are the figures.  One caption inside is normal: 64'er sets some
+        # captions within the figure's own tint panel (p143).
+        inside = {tuple(c["bbox"]) for c in caps
+                  if x0 <= c["bbox"][0] and c["bbox"][2] <= x1
+                  and y0 <= c["bbox"][1] and c["bbox"][3] <= y1}
+        if len(inside) >= MAX_CAPTIONS_INSIDE + 1:
             continue
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
@@ -871,6 +887,36 @@ def cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1):
     if hi - lo < MIN_W_PX:
         return x0, y0, x1, y1
     return x0 + int(lo), y0, x0 + int(hi), y1
+
+
+def gutter_pieces(marked, x0, y0, x1, y1):
+    """Every printed object in the box, split at the paper strips between them.
+
+    cut_at_gutter keeps the piece the caption sits under, which is right when
+    there IS a caption to choose by.  With none -- two opening photographs
+    placed side by side, which the census kept reporting as one crop containing
+    two pictures -- choosing means throwing a real figure away.  So an
+    uncaptioned box yields all of its pieces and each becomes a figure.
+    """
+    cell = marked[y0:y1, x0:x1]
+    if cell.size == 0 or x1 - x0 < 2 * GUTTER_MIN_PX:
+        return [(x0, y0, x1, y1)]
+    blank = (~cell).mean(axis=0) > GUTTER_BLANK_FRAC
+    out, start = [], 0
+    run = None
+    for i, b in enumerate(list(blank) + [False]):
+        if b and run is None:
+            run = i
+        elif not b and run is not None:
+            if i - run >= GUTTER_MIN_PX:
+                if run - start >= MIN_W_PX:
+                    out.append((x0 + start, y0, x0 + run, y1))
+                start = i
+            run = None
+    end = len(blank)
+    if end - start >= MIN_W_PX:
+        out.append((x0 + start, y0, x0 + end, y1))
+    return out or [(x0, y0, x1, y1)]
 
 
 def trim_blank(marked, x0, y0, x1, y1):

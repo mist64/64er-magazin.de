@@ -67,7 +67,15 @@ def main():
                 n = used.get((start, "0"), 0)
                 used[(start, "0")] = n + 1
                 num = "0" * (n + 1)
-            typ = v.get("convert") or cands[i]["type"]
+            # THE BUCKET IS MEASURED, NOT JUDGED.  Colour and screening are
+            # physical facts about the ink: the extractor measures chroma and
+            # the halftone at full resolution, while the model sees a
+            # downscaled page overlay in which a small photo is a few hundred
+            # pixels.  Every bucket error the sixth census found was the model
+            # overriding a correct measurement -- 160-2 (a colour photo),
+            # 54-2 and 54-4 (black on a yellow tint) all measured "c" and were
+            # judged "bw"; 124-1 measured "gray" and was judged "dots".
+            typ = cands[i]["type"]
             if typ not in TYPES:
                 typ = cands[i]["type"]
             # Two figures can claim the same number -- two pages of one article
