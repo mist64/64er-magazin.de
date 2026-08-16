@@ -74,6 +74,19 @@ SCRAP_JOIN_PX = 260     # OCR scraps this close belong to one picture
 # of a framed figure and paper is neutral, so averaging the whole rectangle
 # drags every reading toward grey.
 PAPER_LEVEL = 215       # above this luminance is paper, not print
+# A strip of bare paper this wide, running the full height of a box, is the
+# boundary BETWEEN two printed objects -- nothing printed has one inside it.
+GUTTER_MIN_PX = 90      # ~3.8 mm at 600 dpi; narrower than any column gutter
+GUTTER_BLANK_FRAC = 0.995   # share of the column's height that must be paper
+# A tint panel IS the figure; its edge is where the tint stops.
+# MEASURED on p143's panel: a tinted row reads 0.60-0.82 marked, never 0.90 --
+# the black boxes and white fields printed ON it are part of the figure and are
+# not tint.  A row of body text on bare paper reads 0.1-0.3, so 0.55 separates
+# them with room on both sides.
+PANEL_TINT_FRAC = 0.55  # share of a row that must be marked to still be panel
+PANEL_STEP_PX = 4       # rows per step while following it
+PANEL_GAP_PX = 120      # unmarked run crossed if the tint resumes beyond it
+TINT_SAT = 22           # RGB max-min above this is ink/tint, not scanned paper
 INK_MIN_PX = 400        # too little ink to measure: fall back to a loose mask
 SAT_COLOUR = 18         # mean chroma of the INK above this -> colour
 SAT_STRONG = 60         # a pixel this chromatic is unambiguously coloured
@@ -85,6 +98,7 @@ TONE_MIN_STD = 11.0     # coarse tone flatter than this is a flat fill
 ENCLOSED_MIN_WORDS = 12 # a text block this big inside a region makes it text
 ENCLOSED_COVER = 0.60   # ...when this much of that block falls inside
 GROW_PX = 24            # step by which a scrap hull grows toward the text
+SETTLE_ROUNDS = 3         # alternations of find-top / grow-wide; converges by 3
 GROW_STEPS = 60
 JOIN_PX = 90            # two regions this close, with nothing between, are one
 OVERLAP_SAME = 0.55     # this much of the smaller region inside the larger = one figure
@@ -507,36 +521,55 @@ def figure_above(rects, cap, W, H):
     #
     # So the caption's measure is where the figure certainly is, and it then
     # grows left and right until real text stops it.
-    top = MARGIN_PX
-    for _ in range(GROW_STEPS):
-        moved = False
-        for side in (0, 1):
-            nx0 = cx0 - GROW_PX if side == 0 else cx0
-            nx1 = cx1 if side == 0 else cx1 + GROW_PX
-            if nx0 < MARGIN_PX or nx1 > W - MARGIN_PX:
-                continue
-            band = (nx0, top, nx1, bottom)
-            if any(min(band[2], rx1) - max(band[0], rx0) > 0
-                   and min(band[3], ry1) - max(band[1], ry0) > 0
-                   for (rx0, ry0, rx1, ry1), _l in rects):
-                continue
-            cx0, cx1 = nx0, nx1
-            moved = True
-        if not moved:
-            break
+    # THE BAND MUST BE THE FIGURE'S OWN HEIGHT, NOT THE WHOLE PAGE.
+    #
+    # Growing sideways against a band that ran from the page margin down to the
+    # caption meant ANY text above the caption -- the article's headline three
+    # columns up, body text at the top of the page -- blocked the growth.  A
+    # wide figure captioned under one column could therefore never widen, which
+    # is precisely the horizontal truncation a census pinned on 7 of 8 cut
+    # crops.  Height and width have to settle together: the top is found at the
+    # current width, the width then grows within that height, and a wider figure
+    # may meet something new above it, which raises the top again.  Three rounds
+    # converge on this issue.
+    def find_top(x0, x1):
+        t = MARGIN_PX
+        for (rx0, ry0, rx1, ry1), _lab in rects:
+            if ry1 >= bottom:
+                continue                        # not above the caption
+            overlap = min(x1, rx1) - max(x0, rx0)
+            if overlap < CAPTION_MEASURE_MATCH * min(x1 - x0, rx1 - rx0):
+                continue                        # not above this figure at all
+            t = max(t, int(ry1) + CAPTION_GAP_PX)
+        # A figure is not most of the page.  Where nothing is printed above the
+        # caption -- it opens the column -- the top would otherwise fall back to
+        # the page margin and take everything with it (p24 came out 4346x5684).
+        if bottom - t > MAX_FIGURE_FRAC * H:
+            t = int(bottom - MAX_FIGURE_FRAC * H)
+        return t
 
-    for (rx0, ry0, rx1, ry1), _lab in rects:
-        if ry1 >= bottom:
-            continue                            # not above the caption
-        overlap = min(cx1, rx1) - max(cx0, rx0)
-        if overlap < CAPTION_MEASURE_MATCH * min(cx1 - cx0, rx1 - rx0):
-            continue                            # not above this figure at all
-        top = max(top, int(ry1) + CAPTION_GAP_PX)
-    # A figure is not most of the page.  Where nothing is printed above the
-    # caption -- it opens the column -- the top would otherwise fall back to the
-    # page margin and take everything with it (p24 came out 4346x5684).
-    if bottom - top > MAX_FIGURE_FRAC * H:
-        top = int(bottom - MAX_FIGURE_FRAC * H)
+    top = find_top(cx0, cx1)
+    for _round in range(SETTLE_ROUNDS):
+        for _ in range(GROW_STEPS):
+            moved = False
+            for side in (0, 1):
+                nx0 = cx0 - GROW_PX if side == 0 else cx0
+                nx1 = cx1 if side == 0 else cx1 + GROW_PX
+                if nx0 < MARGIN_PX or nx1 > W - MARGIN_PX:
+                    continue
+                band = (nx0, top, nx1, bottom)
+                if any(min(band[2], rx1) - max(band[0], rx0) > 0
+                       and min(band[3], ry1) - max(band[1], ry0) > 0
+                       for (rx0, ry0, rx1, ry1), _l in rects):
+                    continue
+                cx0, cx1 = nx0, nx1
+                moved = True
+            if not moved:
+                break
+        ntop = find_top(cx0, cx1)
+        if ntop == top:
+            break
+        top = ntop
     return [cx0, top, cx1, bottom]
 
 
@@ -627,6 +660,13 @@ def figures(page):
     im = Image.open(os.path.join(OB.SRC_DIR, f"{page:03d}.png")).convert("RGB")
     W, H = im.size
     grey = np.asarray(im.convert("L"))
+    # PAPER IS BRIGHT *AND* NEUTRAL.  Luminance alone cannot see a yellow tint
+    # panel: yellow is the brightest ink there is and a 100% Y field measures
+    # 220+, well above PAPER_LEVEL, so `grey < PAPER_LEVEL` reported p143's
+    # panel as bare paper and every panel edge was invisible.  A tint is bright
+    # but COLOURED, and the scanned paper is not.
+    _rgb = np.asarray(im).astype(np.int16)
+    marked = (grey < PAPER_LEVEL) | ((_rgb.max(axis=2) - _rgb.min(axis=2)) > TINT_SAT)
     if rec.get("page_kind") in SKIP_PAGE_KINDS:
         return [], rec, im
 
@@ -668,7 +708,9 @@ def figures(page):
         else:
             box = figure_above(stoppers, cap, W, H)   # no illustration: fall back
         found.append({"bbox": box, "ink": 0.0, "caption": cap["text"],
-                      "kind": cap["kind"], "num": cap["num"]})
+                      "kind": cap["kind"], "num": cap["num"],
+                      "anchor": [cap["bbox"][0], cap["bbox"][2]],
+                      "cap_bbox": list(cap["bbox"])})
 
     # --- An illustration no caption claims is an opener, a cover or a badge.
     leftover = [r for i, r in enumerate(illus) if i not in claimed]
@@ -685,13 +727,18 @@ def figures(page):
     for x0, y0, x1, y1 in clustered:
         if encloses_text(rec, x0, y0, x1, y1):
             continue
-        found.append({"bbox": [x0, y0, x1, y1], "ink": 0.0,
-                      "caption": None, "kind": None, "num": "0"})
+        found.append({"bbox": [x0, y0, x1, y1], "ink": 0.0, "caption": None,
+                      "kind": None, "num": "0", "anchor": [x0, x1]})
 
     out = []
     for f in sorted(found, key=lambda f: (f["bbox"][1], f["bbox"][0])):
         x0, y0, x1, y1 = f["bbox"]
-        x0, y0, x1, y1 = trim_blank(grey, x0, y0, x1, y1)
+        x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
+        ax0, ax1 = f.get("anchor", [x0, x1])
+        x0, y0, x1, y1 = cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1)
+        y0, y1 = grow_to_panel(marked, x0, y0, x1, y1, H, stoppers,
+                               f.get("cap_bbox"))
+        x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
         x0, y0, x1, y1 = cut_inside_rule(grey, x0, y0, x1, y1)
         if x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
             continue
@@ -708,7 +755,125 @@ def figures(page):
     return out, rec, im
 
 
-def trim_blank(grey, x0, y0, x1, y1):
+def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
+    """Extend the box down and up over its own tint panel.
+
+    Where a figure is printed on a coloured panel, the PANEL is the object and
+    its edge is where the tint stops.  Neither the OCR's illustration region nor
+    the caption knows that: on p143 the region ended half way down the block
+    diagram and the caption is set INSIDE the panel beside the figure rather
+    than beneath it, so both the region union and the caption anchor cut the
+    Netz/Transformator/RAM boxes off the bottom.
+
+    Bare paper is the stop, which is why this cannot run away: over a picture on
+    white paper the very first row outside the box is already paper and nothing
+    moves.  Text is a stop too -- a tint panel that continues behind a body
+    column belongs to the page, not to the figure.
+    """
+    if x1 - x0 < MIN_W_PX:
+        return y0, y1
+    def tinted(y):
+        row = marked[y, x0:x1]
+        return row.size and row.mean() > PANEL_TINT_FRAC
+    def free(y):
+        # A figure's OWN caption does not bound it.  64'er sets some captions
+        # INSIDE the tint panel beside the artwork (p143) rather than beneath
+        # it, and stopping there cut the bottom quarter -- the Netz,
+        # Transformator and RAM boxes -- off the block diagram.
+        #
+        # ONLY its own, though.  Letting a panel through ANY caption let p040's
+        # calendar grow down across "Bild 2. Der obere Teil eines
+        # Kalender-Ausdrucks" and swallow the Graphic-Editor screenshot below
+        # it: a caption that belongs to a DIFFERENT figure is exactly the
+        # boundary between two figures.  Noise passes unconditionally -- it is
+        # text the OCR read OFF the picture, so it is evidence the figure
+        # continues.  Body text always stops it.
+        for (rx0, ry0, rx1, ry1), lab in stoppers:
+            if not (ry0 <= y <= ry1 and min(x1, rx1) - max(x0, rx0) > 0):
+                continue
+            if lab == "noise":
+                continue
+            if lab == "caption" and own_cap is not None \
+                    and min(ry1, own_cap[3]) - max(ry0, own_cap[1]) > 0 \
+                    and min(rx1, own_cap[2]) - max(rx0, own_cap[0]) > 0:
+                continue                        # its own caption
+            return False
+        return True
+    # A PANEL HAS WHITE ON IT.  The figure's own boxes are knocked out of the
+    # tint, so a strict row-by-row test stops at the first one: p143 halted at a
+    # row reading 0.435 marked -- the white field around a box, well inside the
+    # panel -- and left the Netz, Transformator and RAM boxes outside.  So a
+    # short unmarked run is crossed if the tint resumes beyond it, exactly as
+    # the rule detector already closes a nick in a printed rule.
+    def edge(y, step):
+        for d in range(0, PANEL_GAP_PX, PANEL_STEP_PX):
+            yy = y + d * step
+            if not (MARGIN_PX <= yy < H - MARGIN_PX):
+                return None
+            if tinted(yy) and free(yy):
+                return yy + step * PANEL_STEP_PX
+        return None
+
+    lim = int(MAX_FIGURE_FRAC * H)
+    while y1 - y0 < lim:
+        nxt = edge(y1, 1)
+        if nxt is None or nxt <= y1:
+            break
+        y1 = nxt
+    while y1 - y0 < lim:
+        nxt = edge(y0 - 1, -1)
+        if nxt is None or nxt >= y0:
+            break
+        y0 = nxt
+    return max(MARGIN_PX, y0), min(H - MARGIN_PX, y1)
+
+
+def cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1):
+    """Stop the box at a full-height strip of bare paper.
+
+    Growing sideways stops at TEXT RECTANGLES, and that is not the same thing as
+    stopping at the edge of the figure.  Where the OCR returned no rectangle --
+    a table set on a tint, which it reads poorly -- the growth ran straight
+    through it: p143's block diagram came out with the whole "Vergleichstabelle
+    C 128" riding along beside it.
+
+    The boundary the rectangles missed is physically on the paper.  Two printed
+    objects side by side are separated by a strip of bare paper running the full
+    height of both; no photograph, diagram or tint panel has one through its
+    middle.  So the box is split at any such strip and the piece the CAPTION
+    sits under is kept -- the caption is what says which of the two is ours.
+    """
+    cell = marked[y0:y1, x0:x1]
+    if cell.size == 0 or x1 - x0 < 2 * GUTTER_MIN_PX:
+        return x0, y0, x1, y1
+    # a gutter column carries essentially no mark over the box's whole height
+    blank = (~cell).mean(axis=0) > GUTTER_BLANK_FRAC
+    segs, run = [], None
+    for i, b in enumerate(list(blank) + [True]):
+        if b and run is None:
+            run = i
+        elif not b and run is not None:
+            if i - run >= GUTTER_MIN_PX:
+                segs.append((run, i))
+            run = None
+    if run is not None and len(blank) + 1 - run >= GUTTER_MIN_PX:
+        segs.append((run, len(blank)))
+    if not segs:
+        return x0, y0, x1, y1
+    # the anchor's centre picks the piece to keep
+    mid = (ax0 + ax1) / 2 - x0
+    lo, hi = 0, x1 - x0
+    for a, b in segs:
+        if b <= mid:
+            lo = max(lo, b)
+        elif a >= mid:
+            hi = min(hi, a)
+    if hi - lo < MIN_W_PX:
+        return x0, y0, x1, y1
+    return x0 + int(lo), y0, x0 + int(hi), y1
+
+
+def trim_blank(marked, x0, y0, x1, y1):
     """Shave blank PAPER off the edges, keeping everything that carries marks.
 
     Blank means bright, not merely low-contrast.  Testing for "no strokes
@@ -717,11 +882,16 @@ def trim_blank(grey, x0, y0, x1, y1):
     a quarter of every dark-bordered picture.  MEASURED on p172's game screen:
     a correct 2158x1473 box came out 1597x1469, losing 561 px of width, which
     is the whole of the "aspect 1.05 where a C 64 screen is 1.6" complaint.
-    Every build shared this function, so every build inherited the damage."""
-    cell = grey[y0:y1, x0:x1].astype(np.int16)
+    Every build shared this function, so every build inherited the damage.
+
+    It reads the same "marked" mask as the panel tests, and for the same reason:
+    a yellow tint is BRIGHTER than PAPER_LEVEL, so a luminance test called a
+    tint panel blank and shaved it off -- which is what silently undid the panel
+    growth on p143 until the mask was shared."""
+    cell = marked[y0:y1, x0:x1]
     if cell.size == 0:
         return x0, y0, x1, y1
-    ink = cell < PAPER_LEVEL
+    ink = cell
     st = ink.mean(axis=1)
     colp = ink.mean(axis=0)
     ry = np.where(st > EMPTY_FRAC)[0]
