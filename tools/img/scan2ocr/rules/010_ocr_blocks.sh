@@ -8,10 +8,10 @@
 # a detail: numpy stages want OMP_NUM_THREADS=1 and many lanes, and this box is
 # shared with a job that swap-thrashes if crowded.
 set -e
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-python3}"
 FIRST="${1:-1}"
 LAST="${2:-176}"
 cd "$DIR"
-seq "$FIRST" "$LAST" | OMP_NUM_THREADS=1 xargs -P 6 -n 8 "$PY" ocr_blocks.py
-"$PY" blocks_index.py
+seq "$FIRST" "$LAST" | OMP_NUM_THREADS=1 xargs -P 6 -n 8 "$PY" 010_ocr_blocks.py
+"$PY" 010_blocks_index.py

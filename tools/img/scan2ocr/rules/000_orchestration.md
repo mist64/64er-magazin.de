@@ -289,7 +289,7 @@ specific region on a page -- a caption, a listing block, a header strip, a
 banner illustration. The common primitive is a per-page **block index**: one
 line per layout block giving its bbox, its label and a short text preview.
 
-**It is an output of step 010**, written by `blocks_index.py` to
+**It is an output of step 010**, written by `010_blocks_index.py` to
 `out/blocks/pNNN.txt`. There is nothing to schedule and nothing to wait for:
 step 010 has already OCR'd every page and already knows every bbox, so the index
 is a projection of data we have rather than a second OCR pass. It costs no OCR

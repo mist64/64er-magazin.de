@@ -66,11 +66,11 @@ something new.
 
 ```bash
 cd tools/img/scan2ocr
-python3 evaluate.py $(seq 1 176)      # scores against a vision reading
-python3 collect.py                    # review bundle: pNNN.png + pNNN.txt
+python3 020_evaluate.py $(seq 1 176)      # scores against a vision reading
+python3 020_collect.py                    # review bundle: pNNN.png + pNNN.txt
 ```
 
-`evaluate.py` reports four numbers, deliberately **not** combined because they
+`020_evaluate.py` reports four numbers, deliberately **not** combined because they
 imply different fixes: recall (we are losing article text), precision (we are
 keeping non-article text), order (the flow is broken), headings (the markdown
 structure is wrong). It refuses to score pages that were never classified.
