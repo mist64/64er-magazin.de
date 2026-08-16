@@ -49,32 +49,29 @@ the working issue. Change them there, per issue; there is no flag.
 
 ## Running it
 
-Every script takes page numbers as arguments. Stage A is CPU-bound and
-parallelises; stages B/C call a model and self-parallelise.
+The pipeline is a numbered chain in [`rules/`](rules/), shared with the
+issue-build steps that follow it. Each step is `NNN_name.md` (the spec, with a
+mandatory Verification block) beside `NNN_name.sh` (the entry point).
 
 ```sh
-# Stage A — OCR + measurement (local, no model, ~15 min for 176 pages)
-seq 1 176 | OMP_NUM_THREADS=1 xargs -P 6 -n 8 python ocr_blocks.py
-
-# Stage B + C — classification, reading order, markdown (one model call per page)
-python classify.py $(seq 1 176)
-
-# Stage D — pages back into articles, one markdown file for the whole issue
-python assemble.py
-
-# Score against a vision reading (builds truth/ on first run, then scores)
-python evaluate.py $(seq 1 176)
-
-# Gather what a human should look at
-python collect.py
+rules/010_ocr_blocks.sh     # OCR + geometry + the block index   (~15 min, local)
+rules/020_classify.sh       # labels, reading order, roles       (one call per page)
+rules/030_assemble.sh       # pages -> articles -> <YYMM>.md     (one call per issue)
 ```
 
-**After any change to stage A, wipe `OUT_DIR` and start from page 1.** Stage B
-caches its verdict per page in `NNN.labels.json` and reuses it, which makes
-re-rendering the text free — but the cache is keyed to the block ids stage A
-produced, and it is discarded automatically if they no longer match.
+Then steps 040–300 take the `.md` on to the published HTML. Read
+[`rules/000_orchestration.md`](rules/000_orchestration.md) first — it defines
+how every step is run and verified, and carries the old→new number mapping for
+`LOG.md` entries written before the chains were merged.
 
----
+The Python programs live here rather than in `rules/` because a Python module
+cannot start with a digit and `classify` imports `ocr_blocks`; the numbered
+`.sh` beside each spec is the entry point.
+
+**After any change to step 010, wipe `OUT_DIR` and start from page 1.** Step 020
+caches its verdict per page, keyed on both the block ids step 010 produced *and*
+a hash of the prompt — so a prompt change re-asks rather than silently replaying
+the old answers.
 
 ## Stages and outputs
 
