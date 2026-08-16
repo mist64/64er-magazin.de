@@ -824,6 +824,7 @@ def paragraphs(line_list, line_txt, arr):
     gaps = [tops[i] - tops[i - 1] for i in range(1, len(tops))]
     pitch = statistics.median(gaps) if gaps else 0
 
+    first_indent = (x0s[0] - base) if x0s else 0
     paras, cur, cur_bold = [], [], False
     for i, txt in enumerate(line_txt):
         indent = x0s[i] - base if i < len(x0s) else 0
@@ -851,7 +852,7 @@ def paragraphs(line_list, line_txt, arr):
         cur.append(txt)
     if cur:
         paras.append((cur, cur_bold))
-    return paras
+    return paras, first_indent
 
 
 def splice_dropcap(line_list, line_txt, median_h):
@@ -1018,7 +1019,7 @@ def block_features(words, W, H, arr):
         hexd = sum(bool(HEX_LINE_RE.search(t)) for t in line_txt) / max(1, len(line_txt))
         klein = sum(bool(KLEIN_RE.search(t)) for t in line_txt) / max(1, len(line_txt))
 
-        paras_meta = paragraphs(line_list, line_txt, arr)
+        paras_meta, first_indent = paragraphs(line_list, line_txt, arr)
 
         blocks.append({
             "id": bid,
@@ -1042,6 +1043,13 @@ def block_features(words, W, H, arr):
             # which of those paragraphs are bold subheads, in the same order
             "para_subhead": [bool(bold and len(p) <= SUBHEAD_MAX_LINES)
                              for p, bold in paras_meta if reflow(p)],
+            # How far the block's FIRST line is indented from its own left edge.
+            # This is what decides whether a column break is a paragraph break: a
+            # column whose first line is indented starts a new paragraph, one
+            # whose first line is flush continues the paragraph that ran over the
+            # foot of the previous column.  Punctuation cannot tell these apart --
+            # a paragraph can simply happen to end a sentence at the column foot.
+            "first_indent_px": round(first_indent),
         })
     return blocks
 

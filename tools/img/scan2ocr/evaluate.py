@@ -105,8 +105,13 @@ Write the result as MARKDOWN, using exactly these conventions:
          articles and so two of these; a continuation page carries none.
 - "> "   the standfirst: the bold or larger paragraph between the headline and
          the body, before the article proper begins.
-- "## "  a heading inside the article, set bold, above body text.
-- "### " a heading below section level, smaller or less prominent.
+- "## "  a standalone heading inside the article: set on its own line in display
+         type, introducing a section of the piece.
+- "### " a heading one level below that: typically a short bold run-in subhead
+         opening a paragraph of body text and naming what the next paragraphs
+         describe. On this magazine's pages these are common -- a word or short
+         phrase in bold at the start of a paragraph, such as a parameter or
+         command name. Mark them "### ", not "## ".
 - ```    fence a short code fragment quoted inside the prose.
 - plain  ordinary running prose.
 Judge the levels from the printed TYPE SIZE and prominence on the page.
