@@ -116,7 +116,8 @@ which is factually wrong text. Cutting at a gutter no word crosses fixes that in
 principle. Over all 176 pages: **recall 0.942 → 0.650, precision 0.945 → 0.594,
 and 52 pages began emitting text where vision sees none.** It did not even fix
 p10, because the `SUPER-SPIEL FÜR C 16` heading spans both columns so no x-range
-is uncrossed. `split_block_columns()` is still in `ocr_blocks.py`, unwired.
+is uncrossed. `split_block_columns()` is still in `ocr_blocks.py`, unwired. **Superseded** --
+see §6, which acts on the same evidence without splitting anything.
 
 The lesson generalises: where tesseract's blocking is wrong, the evidence is the
 **text** reading across, not the geometry. That is stage B's job — it sees the
@@ -150,7 +151,47 @@ loser on confidence — with the tint exception from §2.
 
 ---
 
-## 6. Bugs worth recognising by their signature
+## 6. Two things side by side: measure, offer, let stage B choose
+
+A block holding two columns cannot be resolved by geometry, because **a table row
+and a woven line are the same shape**:
+
+    p55  "ESC chr$(108) chr$(10): setzt linken Rand auf 10"   across is correct
+    p10  "8910 Landsberg 2300 Kiel"                           across is nonsense
+
+So stage A decides nothing. It measures the gutter, emits the two other readings
+next to the default, and stage B -- which can read the text -- picks one of
+`across` / `rows` / `down`. `across` is the default and is exactly the old
+output, so an unflagged block, or one stage B says nothing about, is unchanged.
+That property is why this could not repeat the collapse in §5.
+
+**The gutter is scored per LINE, not per pixel column.** p10's gutter is 257 px
+wide and the centred headline `SUPER-SPIEL FÜR C 16` is the one line crossing
+it, so "an x no word covers" finds nothing on the very page the earlier attempt
+was written for. Scoring each x by how many lines have a word gap there finds it
+at 0.833.
+
+MEASURED over the issue: 226 blocks flagged, stage B choosing `down` 73 times and
+`rows` 89 times across 84 pages.
+
+| page | recall | paragraphs ours/truth |
+|---|---|---|
+| p75 | 0.500 -> **0.929** | 8/14 -> 13/14 |
+| p62 | 0.594 -> **0.969** | 25/32 -> 35/32 |
+| p55 | 0.647 -> **1.000** | 12/17 -> 18/17 |
+| p70 | 0.625 -> **0.812** | 21/32 -> 27/32 |
+| p10 | 0.857 -> 0.821 | precision 0.828 -> **0.920**; the addresses now read down |
+
+Whole issue: recall 0.939 -> **0.947**, precision 0.954 -> 0.952, order 0.996,
+and the paragraph count against truth 0.960 -> **0.993**.
+
+`rows` needs its own role. A table's records are body text, but if they stay
+`body` then `join_runons` reflows them back into one paragraph -- so they are
+emitted as role `row`, which renders identically and is never joined.
+
+---
+
+## 7. Bugs worth recognising by their signature
 
 **A label the prompt offers must be a label the code accepts.** `caption` was
 offered to stage B and excluded from the corpus, but was missing from
@@ -184,7 +225,7 @@ ten pages: 28 single-word blocks discarded, **14 at conf ≥ 90 and real**.
 
 ---
 
-## 7. The ground truth is not infallible
+## 8. The ground truth is not infallible
 
 On **p76** the vision transcription is wrong and the pipeline is right. The page
 documents four Hypra-Basic modules, each with `Funktion:` / `Syntax:` /
@@ -199,7 +240,7 @@ verdict.
 
 ---
 
-## 8. Assembling articles (stage D)
+## 9. Assembling articles (stage D)
 
 **The unit is the paragraph, not the page.** A page routinely holds the end of
 one article and the start of the next, so grouping whole pages into articles
@@ -284,14 +325,16 @@ token, which no local rule reaches.
 
 ---
 
-## 9. Known open defects
+## 10. Known open defects
 
-- **Paragraph granularity in list-like content.** Address lists and BASIC listing
-  lines arrive as one paragraph where a reader sees several (p133, p055, p075,
-  p062). The clearest case is p146: its 54-line manufacturer list is correctly
-  *included* but arrives as one or two paragraphs against vision's 18.
-- **p10's vendor addresses still read across two columns** — see §5 for why the
-  obvious fix is worse than the defect.
+- **Paragraph granularity in prose blocks that have NO gutter** — p68 (27
+  paragraphs against truth's 43), p136 (22/34), p133 (10/14). The gutter work in
+  §6 does not touch these and the cause is different: our indent test merges
+  paragraphs vision splits. Precision stays 0.96-1.00, so nothing wrong is
+  emitted, only merged. Unclear whether vision or we are right -- see §8 -- so
+  look at the page images before changing the paragraph rule.
+- **p133 scores order 0.429**, the worst in the issue. A reading-order bug, not a
+  granularity one.
 - **p091 / p089** — foldout schematic pages whose title never survives OCR.
 - **p167** — a `Wettbewerb` prize page; stage B calls it an ad, vision calls it
   editorial. The running head says editorial; three prompt attempts did not move

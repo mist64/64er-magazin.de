@@ -22,12 +22,12 @@ Measured against a vision reading of all 176 pages of issue 8609:
 
 | | |
 |---|---|
-| recall | 0.940 |
-| precision | 0.955 |
+| recall | 0.947 |
+| precision | 0.952 |
 | order | 0.996 |
-| headings | 0.874 |
+| headings | 0.876 |
 | corpus | ~412,000 chars over 91 pages |
-| assembled | 57 articles, ~396,000 chars |
+| assembled | 54 articles, ~398,000 chars |
 
 ⚠️ **Scores are only comparable within one set of `truth/` files.** Regenerating
 truth (any change to `TRUTH_PROMPT`) re-bases every number. When you regenerate,
@@ -123,6 +123,7 @@ Markdown, one line per **paragraph**, blank line between paragraphs:
 | `## ` | a standalone section heading, set on its own line |
 | `### ` | a bold run-in subhead opening a paragraph (`Ursprungsblock`, `Zielblock`) |
 | ` ``` ` | a short code fragment quoted inside the prose |
+| *(no prefix)* | role `row` — one record of a table. Renders like body but is never reflowed into the paragraph beside it |
 | `<p class="source">` | a source note set in a smaller face — `Info: …`, a publisher address, an ISBN/price credit, `Fortsetzung von Seite 32`. Markdown cannot express it, so it is emitted as HTML, which markdown passes through. **Consecutive source notes are one note**, joined with `<br>`: p10's vendor list is set as ten separate lines and p146's as twenty-one, and the line breaks are the address's structure rather than typesetting. 75 blocks over the issue become 32. |
 
 ---
