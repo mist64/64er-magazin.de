@@ -41,7 +41,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from difflib import SequenceMatcher
 
-import llm
+import r000_llm as llm
 
 SRC_DIR = "/Users/mist/DNB/8609/tmp/master600/final"
 OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
