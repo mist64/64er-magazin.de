@@ -99,7 +99,12 @@ MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 # Asymmetric on purpose -- see the merge in illustrations().
-ILLUS_JOIN_X = 300            # wide enough to cross a column gutter
+# MEASURED on p133, whose five chip pinouts sit side by side: the gaps BETWEEN
+# two different figures there are 248, 300 and 378 px.  At 300 the join merged
+# two separate chips into one box.  A fragment of a single object is separated
+# by far less than a figure is from its neighbour, so the tolerance has to sit
+# below the inter-figure gap, not above the gutter width.
+ILLUS_JOIN_X = 150            # below the smallest observed gap between figures
 ILLUS_JOIN_Y = 20             # narrow: only touching fragments, never past a caption
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
@@ -689,6 +694,11 @@ def figures(page):
         x0, y0, x1, y1 = trim_blank(grey, x0, y0, x1, y1)
         x0, y0, x1, y1 = cut_inside_rule(grey, x0, y0, x1, y1)
         if x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
+            continue
+        # No figure in this magazine is a ribbon.  A 350x2830 sliver is a column
+        # of pin labels sheared off a chip diagram, not a picture -- the rewrite
+        # dropped this guard and they came straight back.
+        if max(x1 - x0, y1 - y0) > MAX_ASPECT * min(x1 - x0, y1 - y0):
             continue
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
