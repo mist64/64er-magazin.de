@@ -65,8 +65,8 @@ LANES = 4
 # running text.  They are still LABELLED and kept in the JSON, so reversing that
 # is a rebuild, not a re-OCR.  Errata columns ARE article and stay in.)
 import llm                                                       # noqa: E402
-from ocr_blocks import (ARTICLE_LABELS, PARA_INDENT_MIN_PX,      # noqa: E402
-                        SRC_DIR, reading_order)
+from ocr_blocks import (ARTICLE_LABELS, HYPHEN_MARK,             # noqa: E402
+                        PARA_INDENT_MIN_PX, SRC_DIR, reading_order)
 
 # Every label the prompt offers must appear here.  "caption" was missing -- it is
 # offered to the model and excluded from the corpus, but was not listed as valid,
@@ -321,6 +321,25 @@ dieser diese dieses jeder jede jedes
 """.split())
 
 
+def join_text(prev, nxt):
+    """Join two pieces of one paragraph that the printed page broke apart.
+
+    A trailing hyphen at a COLUMN or PAGE break is the same physical fact as one
+    at a line break, so it is marked the same way and left for the hyphen pass
+    to resolve.  MEASURED: p8's "Jack Tramiel ver-" / "folgte in Amerika" came
+    out as "ver- folgte", because reflow() only sees the lines INSIDE a block
+    and this break was between two blocks.  145 such joins across the issue --
+    most of them genuine suspended hyphens ("Informations- und", "Fach- und")
+    that must keep the hyphen, the rest soft ones ("Pro- gramme", "vor- handen")
+    that must lose it.  Nothing local tells the two apart; the marker does."""
+    prev, nxt = prev.rstrip(), nxt.lstrip()
+    if prev.endswith(HYPHEN_MARK):
+        return prev + nxt
+    if prev.endswith("-"):
+        return prev[:-1] + HYPHEN_MARK + nxt
+    return prev + " " + nxt
+
+
 def ends_dangling(text):
     """Does this paragraph end on a word that cannot end a sentence?"""
     text = text.rstrip()
@@ -351,9 +370,14 @@ SOURCE_HTML = '<p class="source">%s</p>'
 
 
 def join_runons(paras):
-    """paras is a list of (role, text, starts_block, indent).  Only ordinary prose is ever joined: a
-    heading must never be absorbed into the paragraph before it, however the
-    sentence happens to end."""
+    """paras is a list of (role, text, starts_block, indent).  Only ordinary prose
+    is ever joined: a heading must never be absorbed into the paragraph before
+    it, however the sentence happens to end.
+
+    Returns the same shape it was given, keeping each surviving paragraph's own
+    indent.  Stage D needs it: whether a paragraph continues the one before is
+    decided by ITS first-line indent, and after a continuation splice the
+    paragraph being joined is not the first one on its page."""
     out = []
     for role, p, starts_block, indent in paras:
         # A paragraph running over the foot of one column into the next is the
@@ -363,9 +387,7 @@ def join_runons(paras):
         if (out and starts_block and role == "body" and out[-1][0] == "body"
                 and (indent < PARA_INDENT_MIN_PX
                      or ends_dangling(out[-1][1]))):
-            prev = out[-1][1].rstrip()
-            joiner = "" if prev.endswith("¬") else " "
-            out[-1] = (role, prev + joiner + p.lstrip())
+            out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3])
             continue
         # A headline set over two lines arrives as two blocks, and rendering them
         # separately produces two "# " lines where a reader sees one headline --
@@ -377,8 +399,7 @@ def join_runons(paras):
         if out and role in ROLE_PREFIX and out[-1][0] == role:
             prev = out[-1][1].rstrip()
             if prev and prev[-1] not in SENTENCE_END:
-                joiner = "" if prev.endswith("¬") else " "
-                out[-1] = (role, prev + joiner + p.lstrip())
+                out[-1] = (role, join_text(prev, p), out[-1][2], out[-1][3])
                 continue
         if out and role == "body" and out[-1][0] == "body":
             prev = out[-1][1].rstrip()
@@ -390,17 +411,18 @@ def join_runons(paras):
             # while gaining only 0.007 precision. The unfinished-sentence test now
             # lives at the block boundary above, where the ambiguity actually is.
             if prev and prev[-1] not in SENTENCE_END and head[:1].islower():
-                joiner = "" if prev.endswith("¬") else " "   # word split across the break
-                out[-1] = (role, prev + joiner + head)
+                out[-1] = (role, join_text(prev, head),      # word split across the break
+                              out[-1][2], out[-1][3])
                 continue
-        out.append((role, p))
+        out.append((role, p, starts_block, indent))
     return out
 
 
 def render(paras):
-    """(role, text) pairs -> markdown.  Paragraphs are separated by a blank line."""
+    """(role, text, ...) tuples -> markdown.  Paragraphs separated by a blank line."""
     chunks = []
-    for role, text in paras:
+    for para in paras:
+        role, text = para[0], para[1]
         text = text.strip()
         if not text:
             continue

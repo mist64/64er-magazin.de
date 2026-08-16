@@ -31,7 +31,7 @@ import sys
 
 import llm
 from classify import (OUT_DIR, PARA_INDENT_MIN_PX, ROLE_PREFIX, SOURCE_HTML,
-                      ends_dangling, join_runons, page_paragraphs)
+                      ends_dangling, join_runons, join_text, page_paragraphs)
 
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
@@ -117,11 +117,22 @@ Rules:
   running head are one article unless the head is a standing section name
   ("Aktuelles", "Tips & Tricks", "Software", "Hardware", "Kurs") under which
   many short items sit, each with its own headline.
-- A short news item with its own headline IS its own article. So is a single
-  reader's tip under "Tips & Tricks": each carries its own headline and its own
-  byline -- "Die Multifunktions-Taste ... (Harald Poxrucker/tr)", "SMON auf
-  Tastendruck ... (Jörg Ch. Ewert/tr)" -- and a different author every time.
-  Never fold those into the section they sit under.
+- A short news item with its own headline IS its own article -- the items under
+  "Aktuelles", each a separate piece of news.
+- BUT a recurring column is ONE article containing many items. When a headline
+  names the column itself -- "Tips & Tricks zum C 128", "Tips & Tricks für
+  Einsteiger", "Die CP/M-Ecke (Teil 3)" -- that headline is the article, and
+  every item headline under it ("Die Multifunktions-Taste", "Tip zum MSE",
+  "SMON auf Tastendruck", "Das Programm »KEYFIG«") is "continue", so it renders
+  as a section heading INSIDE the column. Each item having its own byline does
+  not make it an article. The column ends at the next column headline or at an
+  unrelated article.
+- A column name is a STANDING name that recurs issue to issue and names no
+  subject of its own. A headline that names a specific product, program, machine
+  or event is an article even when it shares a page with others -- "Professionell
+  und preiswert" (a Forth compiler test) and "Jetzt können sich die
+  Computer-Freaks in Österreich freuen" are articles, not sections. When in
+  doubt about a headline that names a subject, make it an article.
 - If the headline text is repeated in the candidate because OCR read it twice
   ("Professionell und preiswert - Professionell und preiswert"), give it once.
 - Many headlines are SET IN CAPITALS. Give those in normal German case, the way
@@ -202,16 +213,16 @@ def page_stream():
         heads = [b["text"].strip().replace("\n", " ")
                  for b in rec["blocks"] if b["label"] == "header"]
         toc = [b["text"].strip() for b in rec["blocks"] if b["label"] == "toc"]
-        pageinfo[page] = {
-            "heads": heads,
-            "toc": toc,
-            # page_paragraphs returns (role, text, starts_block, indent); the
-            # indent of the very first one is the cross-page signal.
-            "first_indent": paras[0][3] if paras else 0,
-        }
-        for role, text in join_runons(paras):
+        pageinfo[page] = {"heads": heads, "toc": toc}
+        # Each paragraph carries its OWN first-line indent, which is what says
+        # whether it continues the paragraph before it or opens a new one.  Not
+        # the page's first indent: after a continuation splice the paragraph
+        # being joined is not the first one on its page, and reading the page's
+        # instead welded the assembler course onto an unrelated notice on p140.
+        for role, text, _starts, indent in join_runons(paras):
             if text.strip():
-                stream.append({"page": page, "role": role, "text": text.strip()})
+                stream.append({"page": page, "role": role,
+                               "text": text.strip(), "indent": indent})
     return stream, pageinfo
 
 
@@ -390,7 +401,7 @@ def merge_continuations(segments):
     return out
 
 
-def join_across_pages(article, pageinfo):
+def join_across_pages(article):
     """A paragraph does not stop at a page break.  Same test as the column
     break inside a page -- the continuation is not indented, or the paragraph
     before it ends on a word that cannot end a sentence -- because it is the
@@ -405,11 +416,9 @@ def join_across_pages(article, pageinfo):
         last_page = p["page"]
         if (out and first_of_page and p["role"] == "body"
                 and out[-1]["role"] == "body"
-                and (pageinfo[p["page"]]["first_indent"] < PARA_INDENT_MIN_PX
+                and (p["indent"] < PARA_INDENT_MIN_PX
                      or ends_dangling(out[-1]["text"]))):
-            prev = out[-1]["text"].rstrip()
-            joiner = "" if prev.endswith("¬") else " "
-            out[-1] = dict(out[-1], text=prev + joiner + p["text"].lstrip())
+            out[-1] = dict(out[-1], text=join_text(out[-1]["text"], p["text"]))
             continue
         out.append(p)
     article["paras"] = out
@@ -525,7 +534,7 @@ def main():
     articles = merge_continuations(segments)
 
     for a in articles:
-        join_across_pages(a, pageinfo)
+        join_across_pages(a)
         split_bylines(a)
     n = dehyphenate(articles)
 
