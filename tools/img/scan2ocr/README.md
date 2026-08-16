@@ -22,11 +22,11 @@ Measured against a vision reading of all 176 pages of issue 8609:
 
 | | |
 |---|---|
-| recall | 0.932 |
-| precision | 0.959 |
+| recall | 0.940 |
+| precision | 0.955 |
 | order | 0.996 |
-| headings | 0.878 |
-| corpus | ~410,000 chars over 91 pages |
+| headings | 0.874 |
+| corpus | ~412,000 chars over 91 pages |
 
 ⚠️ **Scores are only comparable within one set of `truth/` files.** Regenerating
 truth (any change to `TRUTH_PROMPT`) re-bases every number. When you regenerate,
