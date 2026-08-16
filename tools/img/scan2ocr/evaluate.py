@@ -271,6 +271,23 @@ def main(pages):
         list(ex.map(lambda p: _safe(build_truth, p), pages))
 
     rows = [r for r in (score(p) for p in pages) if r]
+
+    # A page whose article.txt exists but whose labels.json does not was never
+    # classified -- its text is stage A's provisional guess, not the pipeline's
+    # output.  Scoring those and printing a mean reports a number for work that
+    # did not happen: MEASURED once, a stage B killed by a session limit left
+    # 174 unclassified pages and the evaluation still printed recall=0.505 as if
+    # it meant something.  Refuse to report instead.
+    unclassified = [p for p in pages
+                    if os.path.exists(os.path.join(OUT_DIR, f"{p:03d}.article.txt"))
+                    and not os.path.exists(os.path.join(OUT_DIR, f"{p:03d}.labels.json"))]
+    if unclassified:
+        print(f"REFUSING TO SCORE: {len(unclassified)} of {len(pages)} pages were "
+              f"never classified (stage B did not run or failed): "
+              f"{unclassified[:8]}{'...' if len(unclassified) > 8 else ''}")
+        print("Their .article.txt is stage A's provisional guess, so any mean "
+              "over them is meaningless. Re-run stage B, then score.")
+        return
     with open(REPORT, "w", encoding="utf-8") as f:
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")

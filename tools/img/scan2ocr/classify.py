@@ -313,6 +313,19 @@ def join_runons(paras):
     sentence happens to end."""
     out = []
     for role, p in paras:
+        # A headline set over two lines arrives as two blocks, and rendering them
+        # separately produces two "# " lines where a reader sees one headline --
+        # MEASURED on p76: "# Module" / "# für Hypra-Basic" against vision's
+        # "# Module für Hypra-Basic".  Consecutive blocks sharing a heading role
+        # are joined when the first does not finish a sentence.  Body is excluded
+        # here and handled below, so a heading is still never absorbed into the
+        # paragraph before it.
+        if out and role in ROLE_PREFIX and out[-1][0] == role:
+            prev = out[-1][1].rstrip()
+            if prev and prev[-1] not in SENTENCE_END:
+                joiner = "" if prev.endswith("¬") else " "
+                out[-1] = (role, prev + joiner + p.lstrip())
+                continue
         if out and role == "body" and out[-1][0] == "body":
             prev = out[-1][1].rstrip()
             head = p.lstrip()
@@ -421,9 +434,16 @@ def process(page):
         if role == "code":
             paras.append((role, b["text"].strip()))
         else:
-            # a block may hold several paragraphs; the role applies to each
-            for para in b["text"].split("\n"):
-                if para.strip():
+            # a block may hold several paragraphs; the role applies to each,
+            # except paragraphs stage A measured as bold subheads -- those are
+            # headings inside a body block, which a per-block role cannot express
+            subhead = b.get("para_subhead") or []
+            for i, para in enumerate(b["text"].split("\n")):
+                if not para.strip():
+                    continue
+                if role == "body" and i < len(subhead) and subhead[i]:
+                    paras.append(("section", para))
+                else:
                     paras.append((role, para))
     text = render(join_runons(paras))
     art = os.path.join(OUT_DIR, stem + ".article.txt")

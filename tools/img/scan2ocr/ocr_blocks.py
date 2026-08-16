@@ -245,8 +245,18 @@ DESCREEN_MEDIAN = 3
 # and stage B benefits from knowing a photo is there.
 MIN_BLOCK_CONF = 55.0
 
-# Blocks smaller than this are OCR grit, not content.
+# Blocks smaller than this are OCR grit, not content -- unless they are read
+# CONFIDENTLY, in which case a single word is a word.  MEASURED over 10 pages,
+# 28 single-word blocks were being discarded outright and 14 of them scored 90+
+# and were real: "Spalten", "wie", "Ausgabe", and p10's heading
+# "BETRIEBSSYSTEM-UMSCHALTUNG".  The loss is invisible because tesseract decides
+# where a block ends: on p40 it split the third column's first line, put the
+# opening word in a block of its own, and the word count rule then deleted it --
+# leaving the corpus reading "von Zeilen und sowie eine Fill-Funktion".
+# What stays excluded is the low-confidence grit this rule was written for
+# ("xB23>", "ZEICHE"), plus figure fragments, which stage B labels out anyway.
 MIN_BLOCK_WORDS = 2
+MIN_SINGLE_WORD_CONF = 90.0
 MIN_BLOCK_AREA_FRAC = 0.00015
 
 # --- neighbour-page sliver: NOT DETECTED, BY DESIGN --------------------------
@@ -388,6 +398,9 @@ PARA_GAP_RATIO = 1.45
 # printing density: the subheads run 1.6x to 2.1x the median while the body's own
 # 90th percentile only reaches 1.15x.
 BOLD_INK_RATIO = 1.35
+# ...and a bold paragraph is a SUBHEAD only if it is short.  A bold standfirst
+# runs several lines and is not a heading; a subhead is one line.
+SUBHEAD_MAX_LINES = 1
 # A line that stops well short of the right margin was ended DELIBERATELY -- it is
 # a list item, a line of code, a line of an address -- and the next line starts a
 # new paragraph.  In justified body text every line except a paragraph's last
@@ -784,7 +797,14 @@ def reflow(lines):
 
 
 def paragraphs(line_list, line_txt, arr):
-    """Split a block's lines into paragraphs on the first-line indent."""
+    """Split a block's lines into paragraphs on the first-line indent.
+
+    Returns [(lines, is_bold_subhead), ...].  The boldness is already measured
+    here to find paragraph breaks, and a bold one-line paragraph inside a body
+    block IS a subhead -- so the finding is carried out rather than recomputed.
+    Roles from stage B are per BLOCK, and these live inside a block, so without
+    this they render as ordinary prose: MEASURED on p58, vision reads six
+    headings and the corpus showed two."""
     if not line_list:
         return []
     x0s = [min(w["l"] for w in lw) for lw in line_list]
@@ -804,7 +824,7 @@ def paragraphs(line_list, line_txt, arr):
     gaps = [tops[i] - tops[i - 1] for i in range(1, len(tops))]
     pitch = statistics.median(gaps) if gaps else 0
 
-    paras, cur = [], []
+    paras, cur, cur_bold = [], [], False
     for i, txt in enumerate(line_txt):
         indent = x0s[i] - base if i < len(x0s) else 0
         gap = (tops[i] - tops[i - 1]) if i else 0
@@ -822,12 +842,15 @@ def paragraphs(line_list, line_txt, arr):
             new_para = True
         if i and line_txt[i - 1].rstrip().endswith("-"):
             new_para = False
+        bold = bool(ink_med and inks[i] > BOLD_INK_RATIO * ink_med)
         if cur and new_para:
-            paras.append(cur)
-            cur = []
+            paras.append((cur, cur_bold))
+            cur, cur_bold = [], False
+        if not cur:
+            cur_bold = bold          # a paragraph is a subhead if it OPENS bold
         cur.append(txt)
     if cur:
-        paras.append(cur)
+        paras.append((cur, cur_bold))
     return paras
 
 
@@ -962,7 +985,8 @@ def block_features(words, W, H, arr):
         # the word-count floor: "Aktuelles", "Grafik" and "Fehlerteufelchen" are
         # each a single word, and the floor silently discarded exactly the
         # section names the whole inverted pass exists to recover.
-        if (len(ws) < MIN_BLOCK_WORDS and bid < BAR_BLOCK_ID) \
+        confident = statistics.mean(w["conf"] for w in ws) >= MIN_SINGLE_WORD_CONF
+        if (len(ws) < MIN_BLOCK_WORDS and bid < BAR_BLOCK_ID and not confident) \
                 or (bw * bh) / (W * H) < MIN_BLOCK_AREA_FRAC:
             continue
 
@@ -994,6 +1018,8 @@ def block_features(words, W, H, arr):
         hexd = sum(bool(HEX_LINE_RE.search(t)) for t in line_txt) / max(1, len(line_txt))
         klein = sum(bool(KLEIN_RE.search(t)) for t in line_txt) / max(1, len(line_txt))
 
+        paras_meta = paragraphs(line_list, line_txt, arr)
+
         blocks.append({
             "id": bid,
             "bbox": [x0, y0, x1, y1],
@@ -1012,7 +1038,10 @@ def block_features(words, W, H, arr):
             "hex_line_frac": round(hexd, 3),
             "klein_frac": round(klein, 3),
             # one line per PARAGRAPH, printed line breaks undone
-            "text": "\n".join(t for t in (reflow(p) for p in paragraphs(line_list, line_txt, arr)) if t),
+            "text": "\n".join(t for t in (reflow(p) for p, _ in paras_meta) if t),
+            # which of those paragraphs are bold subheads, in the same order
+            "para_subhead": [bool(bold and len(p) <= SUBHEAD_MAX_LINES)
+                             for p, bold in paras_meta if reflow(p)],
         })
     return blocks
 
