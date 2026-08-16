@@ -64,8 +64,13 @@ SKIP_PAGES.update(range(180, 188))  # back matter / ads
 
 # ---------- block parsing ----------
 
+# Step 010's block index (the canonical source), and the legacy per-issue
+# blocks.txt that preceded it.  The new line is a superset of the old one --
+# same block/bbox/nw fields, plus label= and frac= -- so one pattern with
+# optional groups reads both rather than the script owning two parsers.
 BLOCK_RE = re.compile(
-    r"^block=(\d+)\s+bbox=(\d+)x(\d+)\+(\d+)\+(\d+)\s+nw=(\d+)\s*(.*)$"
+    r"^block=(\d+)\s+(?:label=\S+\s+)?bbox=(\d+)x(\d+)\+(\d+)\+(\d+)"
+    r"(?:\s+frac=\S+)?\s+nw=(\d+)\s*(?:text=)?\s*(.*)$"
 )
 
 
@@ -92,7 +97,19 @@ def parse_blocks(path):
 
 
 def find_blocks_file(issue_dir, page):
-    """Return first existing blocks.txt for `page` (int), trying _work, _work_v2, …."""
+    """Return the block index for `page`.
+
+    Step 010's index is canonical and is tried first; the per-issue _work dirs
+    are the legacy layout, kept so an issue built before the chains were merged
+    still resolves."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import r010_ocr_blocks as OB
+        cand = os.path.join(OB.OUT_DIR, "blocks", f"p{page:03d}.txt")
+        if os.path.isfile(cand):
+            return cand, "step 010"
+    except Exception:
+        pass
     for wd in WORK_DIRS:
         cand = os.path.join(issue_dir, wd, f"p{page:03d}", "blocks.txt")
         if os.path.isfile(cand):

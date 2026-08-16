@@ -284,8 +284,8 @@ falls between rules:
 
 ## Cross-cutting recipe: page block index (blocks/pNNN.txt)
 
-Several steps (130 place_figures, 150 place_images, 160 fill_tables,
-170 transcribe_listings, 210 head_meta, 240 rubric_banners) need the bbox of a
+Several steps (130 place_figures, 160 fill_tables,
+170 transcribe_todo_listings, 210 head_meta, 240 rubric_banners) need the bbox of a
 specific region on a page -- a caption, a listing block, a header strip, a
 banner illustration. The common primitive is a per-page **block index**: one
 line per layout block giving its bbox, its label and a short text preview.
@@ -371,7 +371,11 @@ individual change looks.
 The granularity boundary is **one word at a time, nothing larger**.
 If a passage seems to need broader cleanup, the answer is to OCR the
 scan again (or hand the section back to the user), not to compose a
-rewrite. See the `feedback_print_verbatim` memory for the full rule.
+rewrite.
+
+That is the whole rule; it is written out here rather than referenced, because a
+sub-agent is briefed with a rule file and cannot resolve a link to anyone's
+memory. Rules that need it link **here**.
 
 Make this explicit in every sub-agent brief that involves body-text
 editing — it's the difference between a faithful archive and a
@@ -424,8 +428,8 @@ near-misses and one real regression on 8608 all share this shape:
   "invented" — it is printed in bold on p145.
 - Body text wording, incl. impossible-looking values → the **scan**;
   a genuine print typo (a backwards address range `49152-48165`, a
-  dropped digit) stays verbatim ([[feedback_print_verbatim]],
-  [[feedback_ocr_vs_typos]]).
+  dropped digit) stays verbatim (r000 "OCR cleanup granularity",
+  r280 "it's not a German word, so it must be OCR").
 
 The failure mode is always the same: reasoning from a *related but
 non-authoritative* artifact (the headline, another OCR layer, "it reads

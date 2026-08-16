@@ -74,7 +74,7 @@ German sentence case is NOT English Title Case. The rules:
 | ALL CAPS print/OCR | Natural-case HTML |
 |---|---|
 | `PROGRAMMIERBARES RS232/V.24-KABEL` | `Programmierbares RS232/V.24-Kabel` |
-| `ERSTER FÄRB-DIGITIZER FÜR C 64` | `Erster Farb-Digitizer für C 64` (note: `FÄRB`→`Farb` is also an OCR fix per [[feedback-ocr-vs-typos]]) |
+| `ERSTER FÄRB-DIGITIZER FÜR C 64` | `Erster Farb-Digitizer für C 64` (note: `FÄRB`→`Farb` is also an OCR fix per r280 "it's not a German word, so it must be OCR") |
 | `COMPUTERCAMP` | `Computercamp` |
 | `PROFESSIONAL-1541-DOS` | `Professional-1541-DOS` |
 | `COMIC-GRUSEL MIT MOVIE MONSTER` | `Comic-Grusel mit Movie Monster` |
@@ -110,7 +110,7 @@ For every article HTML in `issues/<YYMM>/*.html`:
 4. Replace each match.
 5. Beautify (`npx --yes js-beautify …`).
 6. **Rename the article HTML file to match the new h1.** Filenames
-   are emitted by rule 080 (split.py) from the h1 text, so when rule 260 lower-cases the h1 the filename also needs `git mv`. Match
+   are emitted by rule 080 from the h1 text, so when rule 260 lower-cases the h1 the filename also needs `git mv`. Match
    the natural-case form (e.g.
    `16 DER C 64 IN FORSCHUNG UND TECHNIK.html` →
    `16 Der C 64 in Forschung und Technik.html`). Strip-trailing-

@@ -42,8 +42,9 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
 - strips any `id=` attribute that snuck in (Discount doesn't emit them, but
   this is defensive).
 
-The script is adapted from `tools/split.py`. The original still works on
-its own; this copy is the canonical version for the rules pipeline.
+The splitter is adapted from `tools/split.py` and **embedded inline in
+`r080_split.sh`** -- there is no `split.py` in this directory. The original
+still works standalone; the embedded copy is canonical for this chain.
 
 ## Usage
 
@@ -102,7 +103,7 @@ policy is to **merge them into a single `.html` file**: one `<article>`,
 one `<h1>`, both intros and both bodies preserved in print order.
 
 If the consolidated `.md` already has the two pieces collapsed into one
-`<h1>`-rooted section (the only correct upstream state), `split.py`
+`<h1>`-rooted section (the only correct upstream state), the splitter
 will Do The Right Thing automatically — there's only one `<h1>`, so
 only one file comes out. The trap is: **do not "fix" such a section by
 re-introducing a second `<h1>` because the printed page has a second
@@ -199,7 +200,7 @@ that file, not the rule.
 
 ## Notes / lessons
 
-- split.py's text replacements overlap with `r070_html_cleanup.sh`. That's
+- the embedded splitter's text replacements overlap with `r070_html_cleanup.sh`. That's
   intentional — running 070 first means the .html is already clean when split
   starts, and split's own replacements become no-ops. Either order is safe.
 - Bylines must look like `<p>(Author Name)</p>` or `<p>(Name1/Name2)</p>`
@@ -210,4 +211,4 @@ that file, not the rule.
 - **Paired articles never get split.** See the "Paired articles — never
   split" section above. If a consolidated `.md` section contains two
   intros / two bylines / two h1-banner-looking lines for the same
-  product, it stays one section (one `<h1>`) so split.py emits one file.
+  product, it stays one section (one `<h1>`) so the splitter emits one file.

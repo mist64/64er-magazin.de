@@ -24,13 +24,14 @@ printed listing into the `<pre>` body.
 
 ## Cropping listing regions from the page scan
 
-Don't guess crop coordinates by trial-and-error. Use rule 000's
-"page block index" recipe to build `/tmp/64er_<YYMM>_p<NNN>_blocks.txt`, then
-grep for the `Listing` caption line:
+Don't guess crop coordinates by trial-and-error. Step 010 already wrote the
+block index; grep it for the `Listing` caption line:
 
 ```bash
-grep -i "listing" /tmp/64er_<YYMM>_p<NNN>_blocks.txt
-# → block=22 bbox=825x84+195+1955 text= Listing 1. Komprimierte Version ...
+OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+grep -i "listing" "$OUT_DIR/blocks/p<NNN>.txt"
+# → block=22 label=body bbox=825x84+195+1955 frac=... text= Listing 1. Komprimierte ...
 ```
 
 The bbox tells you the caption's column (`X`, width `W`) and
@@ -39,19 +40,26 @@ same column. Walk preceding blocks whose x-range overlaps the
 caption's x-range — the topmost is your crop's top edge. Add ~50 px
 padding.
 
-One-shot crop:
+One-shot crop — **from the master, not from a PDF render**:
 ```bash
-magick /tmp/64er_<YYMM>_pages_300/p-NNN.png \
-  -crop <W>x<H>+<X>+<Y> +repage /tmp/64er_<YYMM>_listing.png
+SRC=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.SRC_DIR)')
+magick "$SRC/<NNN>.png" -crop <W>x<H>+<X>+<Y> +repage /tmp/64er_<YYMM>_listing.png
 ```
+
+The bbox is in the master's pixels. The master is deskewed and A4-cropped and
+the delivered PDF page is neither, so the two spaces differ by a rotation and an
+offset — cropping these coordinates out of a `pdftoppm` render lands in the
+wrong place. See r000, "page block index".
 
 ## Briefing for the sub-agent
 
 The sub-agent must:
 
-1. Render the issue PDF to `/tmp/64er_<YYMM>_pages_300/p-NNN.png` at **`-r
-   300`** (higher resolution than the figure-placement pass — small
-   monospace listing text needs every pixel).
+1. Crop from the graded **600 dpi master** (`SRC_DIR`), not from a PDF render:
+   the bboxes in the block index are in the master's pixel space, and 600 dpi
+   is more resolution than a `-r 300` render anyway — small monospace listing
+   text needs every pixel.
 2. For every `<pre>TODO</pre>` placeholder in `issues/<YYMM>/*.html`:
    - Read the adjacent `<figcaption>` to identify which listing + page.
    - tesseract-locate the caption's bbox in the rendered page.
@@ -171,8 +179,7 @@ must be backed by **runnable verifier evidence pasted verbatim into
 the report**:
 
 - For each transcribed listing, paste the crop path used
-  (`/tmp/64er_<YYMM>_pages_300/p-NNN.png` + bbox from
-  `<OUT_DIR>/blocks/p<NNN>.txt`) so the orchestrator can re-open the same
+  (the master page + the bbox from `<OUT_DIR>/blocks/p<NNN>.txt`) so the orchestrator can re-open the same
   image and spot-check 2-3 lines against what landed in the `<pre>`.
 - For each listing, paste the first and last 2 lines of the splice
   output (the lines that anchor the OCR to a specific position in the

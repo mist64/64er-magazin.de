@@ -58,9 +58,13 @@ A mechanical apply script exists: `r220_index_meta_apply.py` (beside this file).
 It matches each CSV row to an HTML file by start page and inserts the
 metas. The agent can run it then audit:
 
+Run it from the issue directory, which is what the script's own paths assume —
+its CSV argument is relative to that cwd, and so is the Verification block below:
+
 ```bash
+cd issues/<YYMM>
 python3 ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py <YYMM> \
-  "Jahresinhaltsverzeichnis <YYYY>.csv"
+  "../../Jahresinhaltsverzeichnis <YYYY>.csv"
 ```
 
 ## Briefing for the sub-agent
@@ -100,7 +104,7 @@ The sub-agent must:
    für Systemprogrammierer` was "fixed" to `Der C-Compiler` because the
    article headline reads "der C-Compiler" — but the CSV row genuinely
    says `Drei`, and the headline is not evidence the CSV is wrong. When
-   unsure, the CSV wins; see [[feedback_print_verbatim]] for the mirror
+   unsure, the CSV wins; see r000 "OCR cleanup granularity" for the mirror
    principle on body text.
 5. Articles in the issue with NO CSV row stay unchanged: the
    recurring rubrics (Editorial, Leserforum, Fehlerteufelchen,

@@ -5,7 +5,7 @@ filled `<meta name="author" content="…">` (signed by the bylines that
 appear in the body), OR the line is removed entirely (for the
 unsigned recurring rubrics). No `content="XXX"` placeholder may
 survive. Side-effect: a sweep also catches stray mid-body `(byline)`
-paragraphs that split.py missed and converts them to
+paragraphs that step 080 missed and converts them to
 `<address class="author">`.
 
 ## Four rules

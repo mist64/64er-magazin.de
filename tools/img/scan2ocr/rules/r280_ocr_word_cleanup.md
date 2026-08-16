@@ -15,7 +15,7 @@ substitutions the workflow's three passes cover.
 
 ## What word-level cleanup means
 
-Per the [[feedback-print-verbatim]] memory and rule 000's cross-cutting
+Per the r000 "OCR cleanup granularity" memory and rule 000's cross-cutting
 granularity rule:
 
 - **In scope:** single-token substitutions where the surrounding
@@ -306,7 +306,7 @@ tiebreaker for any function-word jam the greps surface.
    SKIP: valid closed compounds the dict happens to miss
    (`ausliegen`, `durchprüft`, `durchstrukturiert`, `voreinstellbar`),
    **old-spelling forms** (`wieviel`, `jedesmal` — LEAVE per
-   [[feedback-ocr-vs-typos]]), company/product names (`Profisoft`),
+   r280 "it's not a German word, so it must be OCR"), company/product names (`Profisoft`),
    Comal/BASIC variable identifiers (`MEINGABE`), and all-caps module
    names (`NEBENMODUL`). Everything else — `aufihre`, `istjede`,
    `dassonst`, `Somerktder`, `bereitshohe` — is a real lost space:
@@ -386,7 +386,7 @@ prose, not code, before applying `0`→`O`.
 
 ## What NOT to touch
 
-Per [[feedback-ocr-vs-typos]] and the print-verbatim rule:
+Per r280 "it's not a German word, so it must be OCR" and the print-verbatim rule:
 
 - Old German orthography (`ß`, `daß`, `muß`, `Adreß`, elided
   double-L like `Schnellade`).
@@ -402,7 +402,7 @@ Per [[feedback-ocr-vs-typos]] and the print-verbatim rule:
   deliberate (`zahl1`, `zahl2`).
 - The `[NNN-NNN]` page-range markers at the end of headers.
 - `<address class="author">` content (per
-  [[feedback-print-verbatim]] — bylines are never edited).
+  r000 "OCR cleanup granularity" — bylines are never edited).
 
 When unsure, **leave it**. Faithful OCR with original typos
 preserved is more valuable than a "corrected" rewrite that
@@ -495,7 +495,7 @@ grep -h "Übertragungsgeschwindigkeiten von" "$dir"/*.html >/dev/null && \
   transcribed body text.) It produces one commit with many small word
   fixes; commit it separately so the diff is reviewable.
 - Word-level only — see rule 000's "OCR cleanup granularity"
-  cross-cutting rule and [[feedback-print-verbatim]]. Re-typing a
+  cross-cutting rule and r000 "OCR cleanup granularity". Re-typing a
   sentence "more clearly" is forbidden even if every word change
   individually looks plausible.
 - Pass 1 over-fires on tokens like `C 64-Modus` and `RS232/V.24-Kabel`

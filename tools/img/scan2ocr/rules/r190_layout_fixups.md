@@ -13,11 +13,14 @@ like `<p>TODO two boxes with text</p>`. Those belong to a separate
 editorial pass.
 
 This rule handles every `<aside>` callout — methodology, contest,
-feature list, warning, and author bio alike. (Author bios used to be
-rule `15`'s own pass; that rule was removed, because a bio box is simply
-one more tinted box and the reliable evidence for a tinted box is the
-scan, not the prose inside it. See `tools/img/scan2ocr` — the import
-detects a screened background directly and can mark the region.)
+feature list, warning, and author bio alike. (Author bios used to be rule `15`'s own pass; that rule was removed, because a
+bio box is simply one more tinted box and the reliable evidence for a tinted box
+is the scan, not the prose inside it.
+
+⚠️ Step 010 *measures* a screened background — the pure-white pixel fraction is
+0.004–0.009 on a tint against 0.668–0.719 on paper, two orders of magnitude, see
+`FINDINGS.md` — but it does **not yet emit an aside marking** into the corpus.
+Until it does, finding the boxes is this rule's own job, from the scan.)
 
 ## Briefing for the sub-agent
 
