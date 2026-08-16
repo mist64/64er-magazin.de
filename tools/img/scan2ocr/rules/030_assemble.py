@@ -30,9 +30,17 @@ import re
 import sys
 
 import llm
-from classify import (OUT_DIR, PARA_INDENT_MIN_PX, ROLE_PREFIX,
-                      SOURCE_HTML, SOURCE_JOIN,
-                      ends_dangling, join_runons, join_text, page_paragraphs)
+import _step
+_cls = _step.load("020_classify")
+OUT_DIR = _cls.OUT_DIR
+PARA_INDENT_MIN_PX = _cls.PARA_INDENT_MIN_PX
+ROLE_PREFIX = _cls.ROLE_PREFIX
+SOURCE_HTML = _cls.SOURCE_HTML
+SOURCE_JOIN = _cls.SOURCE_JOIN
+ends_dangling = _cls.ends_dangling
+join_runons = _cls.join_runons
+join_text = _cls.join_text
+page_paragraphs = _cls.page_paragraphs
 
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)

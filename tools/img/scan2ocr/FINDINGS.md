@@ -116,7 +116,7 @@ which is factually wrong text. Cutting at a gutter no word crosses fixes that in
 principle. Over all 176 pages: **recall 0.942 → 0.650, precision 0.945 → 0.594,
 and 52 pages began emitting text where vision sees none.** It did not even fix
 p10, because the `SUPER-SPIEL FÜR C 16` heading spans both columns so no x-range
-is uncrossed. `split_block_columns()` is still in `ocr_blocks.py`, unwired. **Superseded** --
+is uncrossed. `split_block_columns()` is still in `010_ocr_blocks.py`, unwired. **Superseded** --
 see §6, which acts on the same evidence without splitting anything.
 
 The lesson generalises: where tesseract's blocking is wrong, the evidence is the
@@ -215,7 +215,7 @@ hit your session limit"* into 165 truth files, and because truth generation skip
 files that already exist, those would have been ground truth forever. Separately,
 an auth expiry killed pages 84–176 of a sweep, was counted as a per-page error,
 and the evaluation still **printed a mean built on 93 dead pages**. Both are
-guarded now; `evaluate.py` refuses to score pages that were never classified.
+guarded now; `020_evaluate.py` refuses to score pages that were never classified.
 
 **Single-word blocks are content.** `MIN_BLOCK_WORDS = 2` deleted them as grit.
 Tesseract decides where a block ends, so on p40 it split a column's opening line,
