@@ -199,7 +199,66 @@ verdict.
 
 ---
 
-## 8. Known open defects
+## 8. Assembling articles (stage D)
+
+**The unit is the paragraph, not the page.** A page routinely holds the end of
+one article and the start of the next, so grouping whole pages into articles
+cannot express the issue. Stage D cuts one flat paragraph stream at confirmed
+boundaries instead.
+
+**Candidate boundaries must include every page's first paragraph, not only the
+blocks stage B called headlines.** MEASURED: 133 candidates = 82 titles + 41
+page-starts + 10 continuation markers, and the page-starts recovered three real
+headlines the page pass had missed entirely — `THORN EMI GIBT AUF` (p11),
+`NEUE CP/M-SOFTWARE FÜR DEN C 128` (p12), `DIM-ANWEISUNG AUFHEBEN?` (p15).
+
+**`drop` matters as much as `start`.** A display headline arrives from OCR as
+fragments, sometimes across a page break — `Wie` / `funktioniert` (p124) then
+`ein` / `Comnuter?` (p125) — and a continuation page reprints the headline. 13
+of 133 candidates are drops. Without the action the corpus grows four spurious
+one-line articles out of one headline.
+
+**The boundary cache must be keyed on the prompt, not on the candidate count.**
+Three prompt revisions in a row would otherwise have replayed the first answer.
+Same failure class as stage B's block-id cache; the key is a hash of the whole
+question.
+
+**The table of contents must come from pages 6–7 only.** Stage B labels the
+cover `toc` as well, and the cover is nothing but OCR noise off display type;
+taking every `toc`-labelled block filled the evidence with 6 KB of garbage
+before the real contents were reached.
+
+**A continuation is confirmed in both directions.** "Fortsetzung auf Seite 146"
+is joined to page 146 only when the marker there points back. All five jumps in
+this issue (32↔146, 127↔169, 131↔133, 138↔142, 162↔164) are symmetric, so a
+one-way match would be evidence of a misread, not of a jump.
+
+**A page can resume an interrupted article AND finish a different one.** Page 146
+carries the second half of the p30 printer survey, then the end of the MPS 802
+review that ran onto it from p145 — resuming mid-word, `...in der La-` /
+`ge amerikanisch`, with nothing between the two but a change of subject. Every
+paragraph after a continuation marker is therefore a candidate, with a `resume`
+action for "the continuation ends here and the page goes back to what it
+interrupted". Without it the survey swallowed the review's ending.
+
+**After a cross-page join, the merged paragraph keeps the page it STARTED on.**
+Reading `out[-1]["page"]` to decide "is this the first paragraph of a new page"
+then answers yes for every remaining paragraph of that page, and the whole page
+merges into one. MEASURED on p146, whose second paragraph vanished into its
+first. Track the last page seen separately.
+
+**Hyphens are resolved over the distinct words, not the occurrences** — the
+answer is a property of the word, and the issue's 4287 marks are only 3459
+different words. Two 1986 traps, both present and both got right: pre-reform
+`ck` splits as `k-k` (`Druk¬ker` → `Drucker`, `Blök¬ken` → `Blöcken`) while
+`Druck¬kopf` is a genuine compound and stays `Druckkopf`; and pre-reform
+spelling is preserved, never modernised (`Jahres¬schluß` → `Jahresschluß`).
+`Ra¬darund` → `Radar- und` carries a soft hyphen and a suspended hyphen in one
+token, which no local rule reaches.
+
+---
+
+## 9. Known open defects
 
 - **Paragraph granularity in list-like content.** Address lists and BASIC listing
   lines arrive as one paragraph where a reader sees several (p133, p055, p075,

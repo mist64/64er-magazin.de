@@ -27,6 +27,7 @@ Measured against a vision reading of all 176 pages of issue 8609:
 | order | 0.996 |
 | headings | 0.874 |
 | corpus | ~412,000 chars over 91 pages |
+| assembled | 82 articles, ~397,000 chars |
 
 ⚠️ **Scores are only comparable within one set of `truth/` files.** Regenerating
 truth (any change to `TRUTH_PROMPT`) re-bases every number. When you regenerate,
@@ -58,6 +59,9 @@ seq 1 176 | OMP_NUM_THREADS=1 xargs -P 6 -n 8 python ocr_blocks.py
 # Stage B + C — classification, reading order, markdown (one model call per page)
 python classify.py $(seq 1 176)
 
+# Stage D — pages back into articles, one markdown file for the whole issue
+python assemble.py
+
 # Score against a vision reading (builds truth/ on first run, then scores)
 python evaluate.py $(seq 1 176)
 
@@ -85,6 +89,11 @@ B  classify.py     one model call per page (digest + overlay image)
                    -> NNN.labels.json  final label, role and reading order
                    -> NNN_final.png    overlay, non-corpus content dimmed
 C  classify.py     -> NNN.article.txt  the deliverable, overwriting A's guess
+
+D  assemble.py    ONE model call for the whole issue (article boundaries)
+                   -> 8609.md          every article, in issue order
+                   -> articles.json    the structure, machine-readable
+                   -> hyphens.json     resolved line-break hyphens (cache)
 
    evaluate.py     -> truth/NNN.txt    a vision reading of the same page
                    -> report.jsonl     per-page scores
@@ -116,7 +125,53 @@ Markdown, one line per **paragraph**, blank line between paragraphs:
 | ` ``` ` | a short code fragment quoted inside the prose |
 | `<p class="source">` | a source note set in a smaller face — `Info: …`, a publisher address, an ISBN/price credit, `Fortsetzung von Seite 32`. Markdown cannot express it, so it is emitted as HTML, which markdown passes through. |
 
-A hyphen at a line end is **marked, not resolved**: it becomes `¬`. German writes
+---
+
+## Stage D — pages back into articles
+
+Stage C answers "what is on this page". Stage D answers the three questions that
+only exist once the pages are back together:
+
+| question | how |
+|---|---|
+| where does an article begin and end? | one model call for the whole issue. A page can hold the end of one article and the start of the next, so the unit is the **paragraph**, not the page |
+| does a paragraph continue over the page break? | the same test as a column break — the continuation is not indented, or the paragraph before it ends on a German function word. Until this stage existed, **every page boundary was a false paragraph break** |
+| where does an interrupted article resume? | `Fortsetzung auf Seite 146`. Five such jumps in this issue, each confirmed in both directions before the two halves are joined |
+
+The model is shown every candidate boundary — each page's first paragraph, every
+block the page pass called a headline, every `Fortsetzung` cross-reference — with
+the running head above it, the text before it, and the issue's table of contents
+off pages 6–7. It returns `start` / `continue` / `drop` per candidate, plus a
+clean title for each start. Everything else in the stage is deterministic.
+
+`drop` matters as much as `start`: a display headline arrives from OCR as
+fragments (`Wie` / `funktioniert` / `ein` / `Comnuter?` across two pages), and a
+continuation page reprints the headline. The first fragment becomes the article
+title, the rest are dropped.
+
+The page range in the title — `# Wie funktioniert ein Computer? [124-127, 169-171]`
+— falls out of the grouping. A page carrying two articles appears in **both**
+ranges: lossy for that page, correct for both articles.
+
+**Bylines** sit in parentheses at the very end of the last paragraph, welded
+onto the sentence by OCR because that is how it is printed. Two forms, 41
+occurrences each: `(bs)` — an editor's initials, a news item written in house —
+and `(Knut Smoczyk/tr)` — a reader's name, then the editor who took it in. Both
+end in exactly two lowercase letters. Kept verbatim, always split into their own
+paragraph.
+
+**A reader's tip is its own article**, not a section of the `Tips & Tricks` page
+it sits under: each carries its own headline *and its own byline*, a different
+author every time. Stating that in the prompt is what keeps it stable — left to
+inference the model folded twelve of them into their parent page on one run and
+not the next.
+
+---
+
+## Hyphens
+
+A hyphen at a line end is **marked, not resolved** by stages A–C: it becomes `¬`.
+German writes
 one for three different reasons and no local rule separates them —
 
 | printed | reading | correct output |
@@ -127,9 +182,20 @@ one for three different reasons and no local rule separates them —
 
 A case test gets the third wrong (`und` is lowercase, so "break before lowercase
 = soft hyphen" yields `Großund`). A hyphen *inside* a printed line stays a plain
-`-`, so the two are always tellable apart, and
-`tools/llm/hyphenation_check_and_correct.sh` can resolve the marked ones exactly
-instead of guessing candidates with a regex.
+`-`, so the two are always tellable apart — which is the point of marking rather
+than guessing candidates with a regex, as
+`tools/llm/hyphenation_check_and_correct.sh` has to.
+
+**Stage D resolves them**, over the *distinct* broken words rather than the
+occurrences — the answer is a property of the word, and the issue's 4287 marks
+are only 3459 different words. Two 1986-specific traps, both present here:
+
+- Pre-reform orthography splits `ck` as `k-k`: `Druk¬ker` → `Drucker`,
+  `Blök¬ken` → `Blöcken`. But `Druck¬kopf` is a genuine compound and stays
+  `Druckkopf`. 13 such pairs in the issue; a naive joiner gets them all wrong.
+- Pre-reform spelling (`daß`, `muß`) must be **preserved**, never modernised.
+
+Results are cached in `hyphens.json`, so a re-render is free.
 
 ---
 
