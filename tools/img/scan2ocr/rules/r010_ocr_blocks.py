@@ -521,10 +521,14 @@ def _tess(img, base, psm, formats):
          "--dpi", str(OCR_DPI)] + formats,
         check=True, capture_output=True,
     )
-    out = {f: open(base + "." + f, encoding="utf-8").read() for f in formats}
-    os.remove(base + "_work.png")
+    # The renderer NAME is not always the file extension: alto writes .xml.
+    ext = {"alto": "xml"}
+    out = {}
     for f in formats:
-        os.remove(base + "." + f)
+        p = f"{base}.{ext.get(f, f)}"
+        out[f] = open(p, encoding="utf-8").read()
+        os.remove(p)
+    os.remove(base + "_work.png")
     return out
 
 
@@ -584,13 +588,21 @@ def find_bar(im, W, H):
 def run_tesseract(png, stem):
     """600 dpi png -> 300 dpi greyscale -> full-page TSV + txt, plus a tight
     inverted pass over the reversed-out section bar.
-    Returns (tsv, txt, bar_tsv, bar_origin, greyscale_image, W, H)."""
+    Returns (tsv, txt, alto, bar_tsv, bar_origin, greyscale_image, W, H).
+
+    The ALTO output is free -- it is the SAME OCR pass, asked for a second
+    renderer -- and it carries something the TSV throws away: tesseract's own
+    page-layout classification, which marks a region as <Illustration> (a
+    picture) or <GraphicalElement> (a rule) rather than text.  On p8 it returns
+    the portrait at 1388x1152+820+716 against a hand-measured 1355x1119+835+732.
+    Step 145 spent a long time reconstructing that from ink, gaps and frames
+    before anyone asked tesseract what it already knew."""
     im = Image.open(png).convert("L")
     im = im.resize((round(im.size[0] * SCALE), round(im.size[1] * SCALE)), Image.BOX)
     W, H = im.size
 
     base = os.path.join(OUT_DIR, stem + "_tess")
-    full = _tess(im, base, TESS_PSM, ["tsv", "txt"])
+    full = _tess(im, base, TESS_PSM, ["tsv", "txt", "alto"])
 
     # Tesseract read p55's "Anwendung des Monats" straight off the black bar at
     # conf 96 but missed p8's "Aktuelles" entirely, so the bar is OCR'd a second
@@ -604,7 +616,7 @@ def run_tesseract(png, stem):
         padded.paste(crop, (BAR_PAD, BAR_PAD))
         bar_tsv = _tess(padded, base + "_bar", TESS_PSM_BAND, ["tsv"])["tsv"]
         origin = (bx0 - BAR_PAD, by0 - BAR_PAD)
-    return full["tsv"], full["txt"], bar_tsv, origin, im, W, H
+    return full["tsv"], full["txt"], full.get("alto"), bar_tsv, origin, im, W, H
 
 
 def binarize(img):
@@ -1060,6 +1072,25 @@ def read_down(line_list, arr):
     return "\n".join(out) if out else None
 
 
+ALTO_REGION = re.compile(
+    r'<(Illustration|GraphicalElement)[^>]*HPOS="(\d+)"[^>]*VPOS="(\d+)"'
+    r'[^>]*WIDTH="(\d+)"[^>]*HEIGHT="(\d+)"')
+
+
+def alto_regions(alto):
+    """Tesseract's own verdict on which parts of the page are not text.
+
+    <Illustration> is a picture, <GraphicalElement> is a rule.  Both come out of
+    the layout analysis that already ran; the TSV simply does not carry them.
+    Coordinates are in the same OCR space as every bbox here."""
+    out = []
+    for m in ALTO_REGION.finditer(alto or ""):
+        kind, x, y, w, h = m.group(1), *(int(v) for v in m.groups()[1:])
+        out.append({"kind": "illustration" if kind == "Illustration" else "rule",
+                    "bbox": [x, y, x + w, y + h]})
+    return out
+
+
 def block_features(words, W, H, arr):
     groups = defaultdict(list)
     for w in words:
@@ -1394,7 +1425,7 @@ def write_digest(page, blocks, dest):
 def process(page):
     stem = f"{page:03d}"
     png = os.path.join(SRC_DIR, stem + ".png")
-    tsv, txt, bar_tsv, origin, im, W, H = run_tesseract(png, stem)
+    tsv, txt, alto, bar_tsv, origin, im, W, H = run_tesseract(png, stem)
 
     words = parse_words(tsv)
     if bar_tsv:
@@ -1420,7 +1451,9 @@ def process(page):
         b["label"] = heuristic_label(b, W, H)
     merge_listings(blocks, W, H)
 
-    rec = {"page": page, "ocr_size": [W, H], "ocr_dpi": OCR_DPI, "blocks": blocks}
+    rec = {"page": page, "ocr_size": [W, H], "ocr_dpi": OCR_DPI, "blocks": blocks,
+           # tesseract's own layout verdict, carried through for step 145
+           "regions": alto_regions(alto)}
     json.dump(rec, open(os.path.join(OUT_DIR, stem + ".json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
     open(os.path.join(OUT_DIR, stem + ".txt"), "w", encoding="utf-8").write(txt)

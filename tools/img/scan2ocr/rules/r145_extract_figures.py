@@ -93,7 +93,11 @@ OVERLAP_SAME = 0.55     # this much of the smaller region inside the larger = on
 FRAME_SEARCH_PX = 90    # how far outside a candidate to look for its printed rule
 FRAME_SPAN = 0.92       # a row/column this dark across the CANDIDATE is a rule
 CAPTION_GAP_PX = 10     # keep this clear of a caption's first row
-CAPTION_OPEN = re.compile(r"^(Bild|Tabelle|Abb\.?)\s*\d")
+CAPTION_OPEN = re.compile(r"^(Bild|Tabelle|Abb\.?)\s*(\d+)")
+CAPTION_MEASURE_MATCH = 0.25  # a block sharing this much width is above the figure
+MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
+TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
+FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
@@ -298,12 +302,14 @@ def framed_rects(grey, W, H):
             if ov < FRAME_EDGE_MATCH * max(xa1 - xa0, xb1 - xb0):
                 continue
             x0, x1 = max(xa0, xb0), min(xa1, xb1)
-            # Three sides make a frame.  Requiring all four loses every figure
-            # whose fourth rule is broken, hidden under a caption, or simply not
-            # printed -- and a figure bounded on three sides is already located.
+            # All four sides.  Three was right while frames were the PRIMARY
+            # source and recall mattered more than precision; now that captions
+            # carry the figures that have one, this path only has to catch the
+            # uncaptioned opener or badge, and a half-closed rectangle is far
+            # more often two rules that happen to line up.
             left = any(abs(c - x0) <= 3 and r0 <= ya + 3 and r1 >= yb - 3 for c, r0, r1 in v)
             right = any(abs(c - x1) <= 3 and r0 <= ya + 3 and r1 >= yb - 3 for c, r0, r1 in v)
-            if left or right:
+            if left and right:
                 rects.append([x0 * d, ya * d, x1 * d, yb * d])
     # keep only the outermost of any nest
     rects.sort(key=lambda r: -(r[2] - r[0]) * (r[3] - r[1]))
@@ -439,258 +445,210 @@ def classify(crop):
     return "bw"
 
 
+def caption_lines(rec):
+    """Every printed "Bild 3." / "Tabelle 2." line, with the box it sits in.
+
+    A caption block can carry more than one caption -- p23 sets "Bild 1." and
+    "Bild 3." in one block for two figures side by side -- so the block is split
+    by line and each caption keeps its own wording.
+    """
+    out = []
+    for b in rec["blocks"]:
+        lines = [" ".join(l.split()) for l in b["text"].split("\n") if l.strip()]
+        hits = [l for l in lines if CAPTION_OPEN.match(l[:24])]
+        if not hits:
+            continue
+        x0, y0, x1, y1 = (v * SCALE for v in b["bbox"])
+        for i, line in enumerate(hits):
+            m = CAPTION_OPEN.match(line[:24])
+            out.append({"text": line, "kind": m.group(1).title(), "num": m.group(2),
+                        "bbox": [int(x0), int(y0), int(x1), int(y1)],
+                        "share": len(hits), "index": i, "block": b["id"]})
+    return out
+
+
+def figure_above(rects, cap, W, H):
+    """The rectangle a caption belongs to: directly above it, at its measure.
+
+    This is the whole method, and it is the magazine's own typography rather
+    than a guess about pixels.  A figure is set to the width of its caption and
+    the caption is set immediately beneath it, so the caption gives the LEFT and
+    RIGHT edges and the BOTTOM edge outright.  Only the top has to be found, and
+    the first text above that shares the measure gives that.
+
+    Everything the segmentation approach got wrong -- boxes snapped to the
+    column grid, captions swallowed, figures split at a gutter, tables taken for
+    pictures -- came from deriving those edges from ink instead of reading them
+    off the page.
+    """
+    cx0, cx1 = cap["bbox"][0], cap["bbox"][2]
+    # A block holding several captions describes several figures side by side;
+    # each takes its share of the measure.
+    if cap["share"] > 1:
+        w = (cx1 - cx0) / cap["share"]
+        cx0, cx1 = int(cx0 + cap["index"] * w), int(cx0 + (cap["index"] + 1) * w)
+    bottom = cap["bbox"][1] - CAPTION_GAP_PX
+
+    # THE CAPTION GIVES A LOWER BOUND ON WIDTH, NOT THE WIDTH.
+    #
+    # A caption is typeset to one text column.  A figure that is WIDER than its
+    # caption -- a pinout or a screen dump spanning two columns, captioned under
+    # one -- was being clipped to the narrower measure, and everything outside
+    # that column was sliced away: 9 of 15 cut crops in a census, plus the cases
+    # where one wide figure came out as several column-wide slices.
+    #
+    # So the caption's measure is where the figure certainly is, and it then
+    # grows left and right until real text stops it.
+    top = MARGIN_PX
+    for _ in range(GROW_STEPS):
+        moved = False
+        for side in (0, 1):
+            nx0 = cx0 - GROW_PX if side == 0 else cx0
+            nx1 = cx1 if side == 0 else cx1 + GROW_PX
+            if nx0 < MARGIN_PX or nx1 > W - MARGIN_PX:
+                continue
+            band = (nx0, top, nx1, bottom)
+            if any(min(band[2], rx1) - max(band[0], rx0) > 0
+                   and min(band[3], ry1) - max(band[1], ry0) > 0
+                   for (rx0, ry0, rx1, ry1), _l in rects):
+                continue
+            cx0, cx1 = nx0, nx1
+            moved = True
+        if not moved:
+            break
+
+    for (rx0, ry0, rx1, ry1), _lab in rects:
+        if ry1 >= bottom:
+            continue                            # not above the caption
+        overlap = min(cx1, rx1) - max(cx0, rx0)
+        if overlap < CAPTION_MEASURE_MATCH * min(cx1 - cx0, rx1 - rx0):
+            continue                            # not above this figure at all
+        top = max(top, int(ry1) + CAPTION_GAP_PX)
+    # A figure is not most of the page.  Where nothing is printed above the
+    # caption -- it opens the column -- the top would otherwise fall back to the
+    # page margin and take everything with it (p24 came out 4346x5684).
+    if bottom - top > MAX_FIGURE_FRAC * H:
+        top = int(bottom - MAX_FIGURE_FRAC * H)
+    return [cx0, top, cx1, bottom]
+
+
+def illustrations(rec):
+    """Tesseract's own verdict on where the pictures are, in master pixels.
+
+    This is the primary source and it costs nothing: step 010's OCR pass already
+    computed it, and only the TSV renderer threw it away.  On p8 it returns the
+    portrait at 1452x1152+772+716 against a hand-measured 1355x1119+835+732 --
+    slightly generous, which is the right direction, because the surplus is the
+    printed rule and that is trimmed afterwards.
+    """
+    out = []
+    for r in rec.get("regions", ()):
+        if r["kind"] != "illustration":
+            continue
+        x0, y0, x1, y1 = (int(v * SCALE) for v in r["bbox"])
+        out.append([x0, y0, x1, y1])
+    return out
+
+
 def figures(page):
     lab = os.path.join(OB.OUT_DIR, f"{page:03d}.labels.json")
-    src = lab if os.path.exists(lab) else os.path.join(OB.OUT_DIR, f"{page:03d}.json")
+    raw = os.path.join(OB.OUT_DIR, f"{page:03d}.json")
+    src = lab if os.path.exists(lab) else raw
     rec = json.load(open(src, encoding="utf-8"))
+    # Labels come from step 020's record, but the LAYOUT REGIONS come from step
+    # 010's -- step 020 copies the blocks forward and a verdict written before
+    # regions existed carries none, so reading them from labels.json silently
+    # yields an empty list and every page returns no figures.
+    if not rec.get("regions") and os.path.exists(raw):
+        rec["regions"] = json.load(open(raw, encoding="utf-8")).get("regions", [])
     im = Image.open(os.path.join(OB.SRC_DIR, f"{page:03d}.png")).convert("RGB")
     W, H = im.size
     grey = np.asarray(im.convert("L"))
-
     if rec.get("page_kind") in SKIP_PAGE_KINDS:
         return [], rec, im
+
     blocks = [b for b in rec["blocks"] if b["label"] != "noise"]
     rects = [([v * SCALE for v in b["bbox"]], b["label"]) for b in blocks]
-    rects.sort(key=lambda r: (r[0][0], r[0][1]))
+    stoppers = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
+                if b.get("n_words", 0) >= TOP_STOP_MIN_WORDS]
 
-    cols = []
-    for r in rects:
-        for c in cols:
-            cx0 = min(q[0][0] for q in c); cx1 = max(q[0][2] for q in c)
-            ov = min(cx1, r[0][2]) - max(cx0, r[0][0])
-            if ov > COL_OVERLAP * min(cx1 - cx0, r[0][2] - r[0][0]):
-                c.append(r); break
+    illus = illustrations(rec)
+    caps = caption_lines(rec)
+    found, claimed = [], set()
+
+    # --- A caption names a figure; the illustrations under it ARE that figure.
+    #
+    # Tesseract over-segments a composite: p27's two greeting cards came back as
+    # eight illustrations and p31's one flowchart as five, because each panel and
+    # node is separately picture-like.  The caption is what says how many figures
+    # there really are, so every illustration sitting in a caption's band is
+    # unioned into one.
+    for cap in caps:
+        cx0, cy0, cx1, cy1 = cap["bbox"]
+        if cap["share"] > 1:
+            w = (cx1 - cx0) / cap["share"]
+            cx0, cx1 = int(cx0 + cap["index"] * w), int(cx0 + (cap["index"] + 1) * w)
+        band_top = cy0 - int(MAX_FIGURE_FRAC * H)
+        mine = [i for i, r in enumerate(illus)
+                if i not in claimed and r[3] <= cy0 + CAPTION_GAP_PX and r[3] >= band_top
+                and min(cx1, r[2]) - max(cx0, r[0]) > CAPTION_MEASURE_MATCH * min(cx1 - cx0, r[2] - r[0])]
+        if mine:
+            claimed.update(mine)
+            xs = [illus[i] for i in mine]
+            box = [min(r[0] for r in xs), min(r[1] for r in xs),
+                   max(r[2] for r in xs), max(r[3] for r in xs)]
         else:
-            cols.append([r])
+            box = figure_above(stoppers, cap, W, H)   # no illustration: fall back
+        found.append({"bbox": box, "ink": 0.0, "caption": cap["text"],
+                      "kind": cap["kind"], "num": cap["num"]})
 
-    found = []
-    for fx0, fy0, fx1, fy1 in framed_rects(grey, W, H):
-        if fx1 - fx0 < MIN_W_PX or fy1 - fy0 < MIN_H_PX:
-            continue
-        if encloses_text(rec, fx0, fy0, fx1, fy1):
-            continue
-        found.append({"bbox": [fx0 + BORDER_OVERCUT, fy0 + BORDER_OVERCUT,
-                               fx1 - BORDER_OVERCUT, fy1 - BORDER_OVERCUT],
-                      "ink": 0.0, "col": (fx0, fx1), "framed": True,
-                      "line_structure": bool(looks_like_text(grey, fx0, fy0, fx1, fy1)),
-                      "flat_tone": bool(uniform_tint(grey, fx0, fy0, fx1, fy1))})
-
-    # The candidate gaps in a column are not only the ones BETWEEN two text
-    # blocks: p8's portrait sits above the first block in its column, so no
-    # pair brackets it.  Bracket each column with the page's own margins.
-    top = MARGIN_PX
-    bot = H - MARGIN_PX
-    for c in cols:
-        c.sort(key=lambda r: r[0][1])
-        cx0, cx1 = min(q[0][0] for q in c), max(q[0][2] for q in c)
-        edge_a = ([cx0, top - MIN_GAP_PX - PAD, cx1, top], c[0][1])
-        edge_b = ([cx0, bot, cx1, bot + MIN_GAP_PX + PAD], c[-1][1])
-        for (a, la), (b, lb) in zip([edge_a] + c, c + [edge_b]):
-            if la not in ARTICLE_NEIGHBOURS and lb not in ARTICLE_NEIGHBOURS:
-                continue                       # an ad's own artwork
-            gy0, gy1 = a[3] + PAD, b[1] - PAD
-            if gy1 - gy0 < MIN_GAP_PX:
-                continue
-            cell = grey[int(gy0):int(gy1), int(cx0):int(cx1)]
-            if cell.size == 0:
-                continue
-            ink = float((cell < INK_LEVEL).mean())
-            if ink < MIN_INK:
-                continue
-            # THE GAP IS THE FIGURE.  Do not tighten to the ink: a picture is
-            # dark in places and light in others, so bounding it by ink cuts
-            # off every pale part and splits anything with two dark clusters.
-            # Three vision passes over 46 pages said the same sentence -- "the
-            # detector finds ink, not figures" -- and every CLIPPED and SPLIT
-            # they found is that one mistake.  A flowchart is the pure case:
-            # only its grey nodes are inked, so ink-bounding returns the nodes
-            # and loses the diagram.
-            #
-            # The magazine sets a picture in a column-width slot between two
-            # pieces of text.  That slot is the answer.  Only genuinely EMPTY
-            # margin comes off.
-            sx0, sy0 = int(cx0), int(gy0)
-            st = strokes(grey, sx0, sy0, int(cx1), int(gy1))
-            cols_p = (grey[sy0:int(gy1), sx0:int(cx1)].astype(np.int16)
-                      < np.median(grey[sy0:int(gy1), sx0:int(cx1)]) - STROKE_CONTRAST).mean(axis=0)
-            def edges(profile):
-                nz = np.where(profile > EMPTY_FRAC)[0]
-                return (int(nz[0]), int(nz[-1]) + 1) if nz.size else None
-            ey, ex = edges(st), edges(cols_p)
-            if not ey or not ex:
-                continue
-            x0 = sx0 + ex[0]; x1 = sx0 + ex[1]
-            y0 = sy0 + ey[0]; y1 = sy0 + ey[1]
-            x0, y0, x1, y1 = cut_inside_rule(grey, x0, y0, x1, y1)
-            if x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
-                continue
-            if max(x1 - x0, y1 - y0) > MAX_ASPECT * min(x1 - x0, y1 - y0):
-                continue
-            # encloses_text is a REJECT: a region swallowing a labelled
-            # paragraph is that paragraph.  looks_like_text and uniform_tint
-            # are only EVIDENCE -- half the figures in this magazine are
-            # pictures OF text (screenshots, hardcopies, character sets,
-            # flowcharts), and rejecting on line structure threw away p29's
-            # Newsroom printout, p32's flowchart and all four of p40's
-            # screenshots along with the data tables.  That is the question
-            # FINDINGS says no low-level statistic answers; step 020 reads the
-            # page and answers it.
-            if encloses_text(rec, x0, y0, x1, y1):
-                continue
-            found.append({"bbox": [x0, y0, x1, y1], "ink": round(ink, 3),
-                          "col": (int(cx0), int(cx1)),
-                          "line_structure": bool(looks_like_text(grey, x0, y0, x1, y1)),
-                          "flat_tone": bool(uniform_tint(grey, x0, y0, x1, y1))})
-
-    # A "noise" block is one scrap of garbage the OCR read off a picture, and a
-    # picture yields several -- p12's book cover produced three, p27's cards
-    # seven.  One box each shatters the figure; dropping them loses it entirely,
-    # because a picture whose neighbouring text sits in different columns is
-    # bracketed by no gap at all.  So CLUSTER them: scraps close together are
-    # one picture, and the cluster's hull is its rectangle.
-    scraps = []
-    for bb in rec["blocks"]:
-        if bb["label"] != "noise":
-            continue
-        x0, y0, x1, y1 = (int(v * SCALE) for v in bb["bbox"])
-        scraps.append([x0, y0, x1, y1])
-    def text_between(a, b):
-        """Is there real typesetting between these two rectangles?"""
-        ux0, uy0 = min(a[0], b[0]), min(a[1], b[1])
-        ux1, uy1 = max(a[2], b[2]), max(a[3], b[3])
-        for bb in rec["blocks"]:
-            if bb["label"] not in ARTICLE_NEIGHBOURS or bb.get("n_words", 0) < 3:
-                continue
-            tx0, ty0, tx1, ty1 = (v * SCALE for v in bb["bbox"])
-            if (min(ux1, tx1) - max(ux0, tx0) > 0.5 * (tx1 - tx0)
-                    and min(uy1, ty1) - max(uy0, ty0) > 0.5 * (ty1 - ty0)):
-                return True
-        return False
-
-    merged_scraps = []
-    for sc in sorted(scraps, key=lambda r: (r[1], r[0])):
-        for m in merged_scraps:
-            # Close together AND with nothing printed between them.  Without the
-            # second half a caption between two hardcopies is swallowed and the
-            # pair becomes one figure (p28); with only the first half a wide
-            # flowchart stays in column-slices (p31).
-            if (min(m[2], sc[2]) - max(m[0], sc[0]) > -SCRAP_JOIN_PX
-                    and min(m[3], sc[3]) - max(m[1], sc[1]) > -SCRAP_JOIN_PX
-                    and not text_between(m, sc)):
-                m[0] = min(m[0], sc[0]); m[1] = min(m[1], sc[1])
-                m[2] = max(m[2], sc[2]); m[3] = max(m[3], sc[3])
+    # --- An illustration no caption claims is an opener, a cover or a badge.
+    leftover = [r for i, r in enumerate(illus) if i not in claimed]
+    clustered = []
+    for r in sorted(leftover, key=lambda r: (r[1], r[0])):
+        for c in clustered:
+            if (min(c[2], r[2]) - max(c[0], r[0]) > -FRAME_CLUSTER_PX
+                    and min(c[3], r[3]) - max(c[1], r[1]) > -FRAME_CLUSTER_PX):
+                c[0], c[1] = min(c[0], r[0]), min(c[1], r[1])
+                c[2], c[3] = max(c[2], r[2]), max(c[3], r[3])
                 break
         else:
-            merged_scraps.append(list(sc))
-
-    article_ys = [(bb["bbox"][1] * SCALE, bb["bbox"][3] * SCALE)
-                  for bb in rec["blocks"] if bb["label"] in ARTICLE_NEIGHBOURS]
-    for x0, y0, x1, y1 in merged_scraps:
-        # NO size test yet.  A scrap MARKS a picture; it is not its size.  The
-        # recurring "64'er Test" rubric badge comes back as a 162x88 scrap
-        # reading 'Tes', so filtering before the growth step threw the badge
-        # away on every page that carries one -- the single most repeated miss
-        # in the vision reports.
-        if not any(abs(ay0 - y1) < 1200 or abs(y0 - ay1) < 1200 for ay0, ay1 in article_ys):
-            continue
-        if any(min(g["bbox"][2], x1) - max(g["bbox"][0], x0) > 0
-               and min(g["bbox"][3], y1) - max(g["bbox"][1], y0) > 0 for g in found):
-            continue
-        x0, y0, x1, y1 = grow_to_text(rects, grey, x0, y0, x1, y1, W, H)
-        if x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
-            continue
-        # The scrap path needs EVERY gate the gap path has.  Skipping the text
-        # test here is what let p22's "Datenblatt" through: a data table on a
-        # tint OCRs so badly that all 19 of its blocks come back labelled
-        # "noise", so it arrives as a cluster of scraps -- and the stroke test
-        # calls it text correctly the moment it is asked.
-        if max(x1 - x0, y1 - y0) > MAX_ASPECT * min(x1 - x0, y1 - y0):
-            continue
+            clustered.append(list(r))
+    for x0, y0, x1, y1 in clustered:
         if encloses_text(rec, x0, y0, x1, y1):
             continue
-        found.append({"bbox": [x0, y0, x1, y1], "ink": 0.0, "col": (x0, x1),
-                      "line_structure": bool(looks_like_text(grey, x0, y0, x1, y1)),
-                      "flat_tone": bool(uniform_tint(grey, x0, y0, x1, y1))})
-
-    # a picture split by text printed inside it is one picture
-    found.sort(key=lambda f: (f["col"], f["bbox"][1]))
-    merged = []
-    for f in found:
-        if merged:
-            g = merged[-1]
-            same_col = g["col"] == f["col"]
-            near = f["bbox"][1] - g["bbox"][3] < MERGE_GAP_PX
-            overlap = (min(g["bbox"][2], f["bbox"][2]) - max(g["bbox"][0], f["bbox"][0])) > 0
-            if same_col and near and overlap:
-                g["bbox"] = [min(g["bbox"][0], f["bbox"][0]), min(g["bbox"][1], f["bbox"][1]),
-                             max(g["bbox"][2], f["bbox"][2]), max(g["bbox"][3], f["bbox"][3])]
-                continue
-        merged.append(f)
-
-    # One last pass over EVERYTHING, gaps and scrap clusters alike: two regions
-    # that touch with nothing printed between them are one figure.  p31's
-    # printer-selection flowchart arrived as four vertical column slices, and
-    # the judge downstream can only accept or reject a rectangle -- it cannot
-    # merge two, so the geometry has to.
-    changed = True
-    while changed:
-        changed = False
-        for i in range(len(merged)):
-            for j in range(i + 1, len(merged)):
-                a, b = merged[i]["bbox"], merged[j]["bbox"]
-                # WHITE IS NOT THE SEPARATOR -- TEXT IS.
-                #
-                # One distance threshold cannot work: the same number is too
-                # generous between two figures (it bridges a caption and joins
-                # them) and too strict inside one (the wide white inside a
-                # schematic reads as a boundary, so pp.86-89's C 64 schematic
-                # and p30's flowchart came out as truncated slices).  A vision
-                # census put all 23 defects on that single constant.
-                #
-                # So two regions that share a row or a column band, with nothing
-                # PRINTED between them, are one figure however much paper lies
-                # in between.  What separates two figures is the caption set
-                # between them, and that is a text block.
-                overlap_x = min(a[2], b[2]) - max(a[0], b[0])
-                overlap_y = min(a[3], b[3]) - max(a[1], b[1])
-                # TWO RECTANGLES THAT OVERLAP ARE NEVER TWO FIGURES.  This is
-                # unconditional -- the text test does not get a say, because a
-                # caption lying inside the overlap is exactly what made the
-                # merge refuse.  p133 emitted five overlapping views of the same
-                # pinout sheet and p31 two competing partial merges of one
-                # flowchart; a segmenter that returns two rectangles for one
-                # figure has simply not finished.
-                if overlap_x > 0 and overlap_y > 0:
-                    inter = overlap_x * overlap_y
-                    small = min((a[2] - a[0]) * (a[3] - a[1]),
-                                (b[2] - b[0]) * (b[3] - b[1]))
-                    if small and inter > OVERLAP_SAME * small:
-                        merged[i]["bbox"] = [min(a[0], b[0]), min(a[1], b[1]),
-                                             max(a[2], b[2]), max(a[3], b[3])]
-                        merged.pop(j)
-                        changed = True
-                        break
-                if overlap_x <= 0 and overlap_y <= 0:
-                    continue
-                if text_between(a, b):
-                    continue
-                merged[i]["bbox"] = [min(a[0], b[0]), min(a[1], b[1]),
-                                     max(a[2], b[2]), max(a[3], b[3])]
-                merged.pop(j)
-                changed = True
-                break
-            if changed:
-                break
+        found.append({"bbox": [x0, y0, x1, y1], "ink": 0.0,
+                      "caption": None, "kind": None, "num": "0"})
 
     out = []
-    for f in sorted(merged, key=lambda f: (f["bbox"][1], f["bbox"][0])):
+    for f in sorted(found, key=lambda f: (f["bbox"][1], f["bbox"][0])):
         x0, y0, x1, y1 = f["bbox"]
+        x0, y0, x1, y1 = trim_blank(grey, x0, y0, x1, y1)
+        x0, y0, x1, y1 = cut_inside_rule(grey, x0, y0, x1, y1)
+        if x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
+            continue
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
                     "ink": f["ink"], "type": classify(crop),
-                    "line_structure": f.get("line_structure", False),
-                    "flat_tone": f.get("flat_tone", False), "crop": crop})
+                    "caption": f.get("caption"), "kind": f.get("kind"),
+                    "num": f.get("num"), "crop": crop})
     return out, rec, im
+
+
+def trim_blank(grey, x0, y0, x1, y1):
+    """Shave blank paper off the edges, keeping everything that carries marks."""
+    st = strokes(grey, x0, y0, x1, y1)
+    cell = grey[y0:y1, x0:x1].astype(np.int16)
+    if cell.size == 0:
+        return x0, y0, x1, y1
+    colp = (cell < np.median(cell) - STROKE_CONTRAST).mean(axis=0)
+    ry = np.where(st > EMPTY_FRAC)[0]
+    rx = np.where(colp > EMPTY_FRAC)[0]
+    if ry.size:
+        y0, y1 = y0 + int(ry[0]), y0 + int(ry[-1]) + 1
+    if rx.size:
+        x0, x1 = x0 + int(rx[0]), x0 + int(rx[-1]) + 1
+    return x0, y0, x1, y1
 
 
 def overlay(page, figs, im, dest):

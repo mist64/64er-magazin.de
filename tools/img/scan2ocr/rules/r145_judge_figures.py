@@ -53,6 +53,8 @@ A candidate is NOT a figure when it is:
 
 For each candidate that IS a figure, also give:
   - "number": the figure's number as printed in its caption. "3" for "Bild 3".
+    When a candidate says ANCHORED ON CAPTION, that caption is printed directly
+    beneath it and its number is the answer -- do not second-guess it.
     Use "t3" for "Tabelle 3" if a table is so complex it must stay an image.
     Use "0" when the figure has NO caption (an opening or title photograph).
   - "convert": how it must be converted, which depends on what it physically is:
@@ -111,9 +113,10 @@ def judge(page):
     lines = []
     for i, c in enumerate(cands):
         x0, y0, x1, y1 = c["bbox"]
+        anchor = (f"  ANCHORED ON CAPTION: {c['caption']!r}" if c.get("caption")
+                  else "  no caption -- an opening photo, cover or rubric badge")
         lines.append(f"[{i}] {c['w']}x{c['h']} px at x={x0} y={y0}  "
-                     f"measured_type={c['type']}  ink={c['ink']}  "
-                     f"line_structure={c['line_structure']}  flat_tone={c['flat_tone']}")
+                     f"measured_type={c['type']}{anchor}")
     prompt = PROMPT.format(page=page, cands="\n".join(lines),
                            caps="\n".join(caps) or "(none)")
     # Name the overlay BARE and run from its directory: the CLI transport is a
