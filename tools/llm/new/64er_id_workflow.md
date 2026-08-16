@@ -31,7 +31,7 @@ The generator does not enforce a character set. By convention (look at other iss
 
 ## Rules
 
-### Rule 1 — recurring columns keep the same ID across issues
+### Rule 040 — recurring columns keep the same ID across issues
 
 Whenever an article is part of a recurring series or department, its `64er.id` matches what previous issues used. The cross-issue index groups by ID.
 
@@ -66,7 +66,7 @@ Canonical IDs for the common recurring columns (verify against the most recent p
 
 Don't invent a new ID for a recurring article. `git grep '<meta name="64er.id"' issues/<prev-issue>/*.html` for the previous issue first.
 
-### Rule 2 — program-listing articles use the program's name
+### Rule 050 — program-listing articles use the program's name
 
 When an article is fundamentally **about a specific program/listing** (the kind that ships with `data-filename` in `<pre>`), its `64er.id` is the program's user-visible name, lowercased, with spaces/punctuation cleaned up.
 
@@ -88,7 +88,7 @@ This rule wins over the article's German title: the article "Cursor selbst gemac
 
 When in doubt, ask: "what's the name the reader will type or download?" — that's the ID.
 
-### Rule 3 — articles not in either category
+### Rule 060 — articles not in either category
 
 For articles that are neither a recurring column nor a single-program writeup, invent a short German keyword that captures the topic:
 
@@ -100,7 +100,7 @@ For articles that are neither a recurring column nor a single-program writeup, i
 
 Keep umlauts and `ß` — they're part of the language. `druckermöbel`, `computerwäsche`, `bücher` are correct; the transliterated forms `druckermoebel`, `computerwaesche`, `buecher` are wrong.
 
-### Rule 4 — uniqueness within the issue
+### Rule 070 — uniqueness within the issue
 
 `generate.py` raises `duplicate 64er.id 'XXX'` if two articles share an ID. After you fill all placeholders, run:
 
@@ -110,7 +110,7 @@ grep -h '64er\.id' issues/YYMM/*.html | sort | uniq -d
 
 Output should be empty. If a duplicate exists, prefix one with a discriminator (`spiele1` / `spiele2`, `mode_a` / `mode_b`).
 
-### Rule 5 — placeholder `XXX` is invalid
+### Rule 080 — placeholder `XXX` is invalid
 
 The article template ships with `<meta name="64er.id" content="XXX">`. `XXX` is not a valid ID — the generator will treat two `XXX`-articles as duplicates and abort. Every placeholder must be replaced before the generator runs successfully on the issue.
 
@@ -125,9 +125,9 @@ The article template ships with `<meta name="64er.id" content="XXX">`. `XXX` is 
    done
    ```
 2. **For each article**, decide its ID using the rules above, in priority order:
-   - Rule 1 (recurring column) — look up the predecessor issue with `grep '64er.id' issues/<prev>/*.html`
-   - Rule 2 (program-listing) — what's the program name?
-   - Rule 3 (topical keyword)
+   - Rule 040 (recurring column) — look up the predecessor issue with `grep '64er.id' issues/<prev>/*.html`
+   - Rule 050 (program-listing) — what's the program name?
+   - Rule 060 (topical keyword)
 3. **Build a mapping** in a one-shot Python script with explicit `MAPPING = {filename: id}`, including sanity checks:
    - Every HTML in the dir is mapped.
    - No two filenames map to the same ID.

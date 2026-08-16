@@ -43,7 +43,7 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g. `145-9a.png`.
 Work through `images.txt` top to bottom. For each `<figure>` block:
 
 1. Move it to the correct location in the article HTML (see placement rules below).
-2. Replace the `XXXXXXXXX` placeholder with the caption from the scan, or remove `<figcaption>` entirely if the image has no caption (see rule 1).
+2. Replace the `XXXXXXXXX` placeholder with the caption from the scan, or remove `<figcaption>` entirely if the image has no caption (see rule 040).
 3. **Fill the `alt` attribute.** Since you are looking at the image anyway to verify placement, write a short German description of what the image shows (e.g. `alt="Buchcover »C 64: Wunderland der Grafik«"`, `alt="Schaltplan des EPROM-Brenners"`, `alt="Screenshot des Hauptmenüs"`). Keep it concise — a phrase, not a sentence. Do not duplicate the figcaption text.
 4. Delete the block from `images.txt` **using the Edit tool, not a script**. Read `images.txt` (or the relevant slice) first, then remove exactly the 4-line `<figure>…</figure>` block for that image.
 

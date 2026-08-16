@@ -1,0 +1,96 @@
+# 26 — Strip Discount's `+autolink` false-positive `<a>` wrappers
+
+**Goal:** the article text in this project comes from 1986 magazine
+print. It does NOT contain real URLs. Any `<a href="…">…</a>` wrapper
+the markdown→HTML pass emits is a Discount `+autolink` false positive
+that needs to be stripped, and `+autolink` should be dropped from
+rule 060 to prevent the issue at source.
+
+## What goes wrong
+
+Discount with `+autolink` recognises a small set of URI schemes
+(`http:`, `https:`, `ftp:`, `mailto:`, `news:`, `telnet:`, …). When
+markdown source contains `…NEWS: DATEX-P-PARAMETER…`, Discount sees
+the `news:` scheme prefix and wraps the token as a link to itself:
+
+```html
+DFÜ-<a href="NEWS:">NEWS:</a> DATEX-P-PARAMETER
+```
+
+The same misfire affects other "scheme-prefix"-like words: `TEL:`,
+`FAX:`, `MAILTO:`, `FTP:`, anything followed by a `:`.
+
+## Fixed at source: rule 060 (already done)
+
+This was a one-time migration, now complete: `060_md_to_html.sh` no
+longer passes `+autolink` (its flags are
+`+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty`;
+the omission is documented in a comment in that script, and rule 060's
+notes explain why). **Do NOT re-instruct a sub-agent to edit rule 060's
+script** — that migration already happened.
+
+This rule's remaining job is therefore purely defensive:
+1. **Verify** rule 060 doesn't pass `+autolink` (this rule's
+   verification #2 does exactly that — a guard against regression).
+2. **Sweep for damage** only in issues that were converted *before* the
+   rule-3 fix; a freshly-converted issue will have zero `<a href>`
+   wrappers (verification #1 confirms), and this rule is a no-op for it.
+
+## Fix existing damage in the issue
+
+For every article HTML in `issues/<YYMM>/*.html` produced before
+rule 060's update:
+
+```bash
+grep -lE '<a href="[A-Z]+:">' issues/<YYMM>/*.html
+```
+
+For each match: replace `<a href="X:">Y</a>` with just `Y` (the
+visible text). Don't touch genuine `mailto:` or `http://` autolinks
+if they exist (none should in practice — verify by reading the
+match in context).
+
+## Briefing for the sub-agent
+
+1. **Verify** `tools/img/scan2ocr/rules/060_md_to_html.sh` does NOT pass
+   `+autolink` (it already doesn't — this is a regression guard, not an
+   edit). Do not modify the script.
+2. Sweep every article in `issues/<YYMM>/*.html`:
+   ```bash
+   grep -nE '<a href="[^"]+">[^<]*</a>' issues/<YYMM>/*.html
+   ```
+3. For each hit, replace the `<a href="…">TEXT</a>` with just
+   `TEXT`. Anti-memory: don't paraphrase TEXT; literally just unwrap
+   the anchor.
+4. Beautify touched files.
+5. **Do not commit.** Return per-article table: file, count of
+   wrappers stripped, sample of stripped TEXT.
+
+Critical: this is **structural unwrapping only** — the visible text
+between the open and close tags stays verbatim.
+
+## Verification
+
+```bash
+dir=issues/<YYMM>
+
+# 1. no <a href> wrappers survive
+grep -nE '<a href=' "$dir"/*.html && echo "  FAIL: <a href> left"
+
+# 2. rule 060 no longer emits +autolink
+grep -E '\+autolink' tools/img/scan2ocr/rules/060_md_to_html.sh && \
+  echo "  FAIL: rule 060 still passes +autolink"
+```
+
+## Notes / lessons
+
+- The visible-text TEXT is the same as the heading word, by Discount's
+  autolink design (`[scheme]:` wraps as `<a href="scheme:">scheme:</a>`).
+  So the unwrapping is mechanical.
+- The original 8607 instance was in `9 DFÜ-NEWS_ DATEX-P-PARAMETER.html`
+  on the `<h1>`: `DFÜ-<a href="NEWS:">NEWS:</a> DATEX-P-PARAMETER`
+  → `DFÜ-NEWS: DATEX-P-PARAMETER`. Rule 260 then converts the
+  heading to natural case.
+- If a future issue genuinely cites a URL (very unlikely for 1986
+  content), let the editor wrap it in `<a>` manually rather than
+  reinstating `+autolink`.

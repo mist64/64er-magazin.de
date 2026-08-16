@@ -1,0 +1,35 @@
+#!/bin/bash
+# Convert a 64'er OCR .md to .html via Discount in GFM mode (same engine
+# Marked 2 uses). Writes the .html next to the .md.
+set -e
+if [ -z "$1" ]; then
+  echo "usage: $0 <md-file>" >&2
+  exit 1
+fi
+md="$1"
+out="${md%.md}.html"
+# Strip a leading UTF-8 BOM if present (otherwise Discount emits <p>﻿</p>).
+tmp=$(mktemp)
+LC_ALL=C sed -e '1s/^\xEF\xBB\xBF//' "$md" > "$tmp"
+markdown -G \
+  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty' \
+  "$tmp" > "$out"
+# +autolink is intentionally omitted: 1986 magazine text never has real
+# URLs, but Discount's autolinker wraps `news:`, `tel:`, `fax:`, etc.
+# in <a href="…"> as false positives (rule 270).
+# -smarty disables Discount's smartypants substitutions: `(C)` → ©,
+# `(R)` → ®, `(TM)` → ™, plus quote curling. In 64'er text `(C)` is
+# body content (math like `SIN(C)*USR(A)`, curve labels like `Kurve (C)`),
+# never a copyright sign. Legitimate © (e.g. Impressum) stays via its
+# UTF-8 character.
+rm -f "$tmp"
+echo "wrote $out  ($(wc -l < "$out") lines)"
+# Replace the .md with the .html in git: drop the source, stage the result.
+# Tolerant on first run (md may not be tracked yet).
+if git ls-files --error-unmatch "$md" >/dev/null 2>&1; then
+  git rm -f --quiet "$md"   # -f so staged edits from earlier steps don't block removal
+else
+  rm -f "$md"
+fi
+git add "$out"
+echo "git: removed $md, staged $out"
