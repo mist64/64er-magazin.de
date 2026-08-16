@@ -23,6 +23,7 @@ with no article content yields an empty file, which is a result, not a failure.
 import json
 import os
 import re
+import statistics
 import subprocess
 import sys
 import time
@@ -332,7 +333,21 @@ def ends_dangling(text):
 # strictly a quotation, but it renders closest to the printed page and can be
 # turned into something else later.
 ROLE_PREFIX = {"title": "# ", "intro": "> ", "section": "## ", "subsection": "### "}
-VALID_ROLES = set(ROLE_PREFIX) | {"body", "code"}
+VALID_ROLES = set(ROLE_PREFIX) | {"body", "code", "source"}
+
+# Source notes -- "Info: Broderbund Software, 17 Paul Drive, ...", publisher
+# addresses, ISBN and price credits, "Fortsetzung von Seite 32" -- are set in a
+# smaller face than the body, usually at the end of an article. Markdown has no
+# way to say that, so they are emitted as an HTML block, which markdown passes
+# through untouched.
+# MEASURED over the issue, against each page's own median body line height:
+# every block below 0.85x is one of these (46 of 969), with the "Info:" lines
+# clustering at 0.66-0.67; the 0.85-0.95 band is ordinary body, including
+# 26- and 28-line body blocks on p145. The ratio is per page because type size
+# varies between pages, and taken from the median so one odd block cannot move it.
+SOURCE_LINE_RATIO = 0.85
+SOURCE_MIN_BODY_BLOCKS = 2      # too few to take a median from
+SOURCE_HTML = '<p class="source">%s</p>' 
 
 
 def join_runons(paras):
@@ -391,6 +406,8 @@ def render(paras):
             continue
         if role == "code":
             chunks.append("```\n" + text + "\n```")
+        elif role == "source":
+            chunks.append(SOURCE_HTML % text)
         else:
             chunks.append(ROLE_PREFIX.get(role, "") + text)
     return "\n\n".join(chunks)
@@ -452,6 +469,12 @@ def process(page):
     # into the text beside it.  Geometry alone cannot see any of that.  The
     # geometric order remains only as a fallback, and any block the model forgot
     # is appended in geometric order rather than silently dropped.
+    # A page's own body type size, to judge the source notes against.
+    body_heights = [b["line_h_frac"] for b in rec["blocks"]
+                    if b["label"] == "body" and b["n_lines"] >= 3]
+    body_median = (statistics.median(body_heights)
+                   if len(body_heights) >= SOURCE_MIN_BODY_BLOCKS else 0)
+
     ordered, seen = [], set()
     by_id = {b["id"]: b for b in keep}
     for i in (rec.get("order") or []):
@@ -475,6 +498,9 @@ def process(page):
         if b["label"] == "listing-inline":
             role = "code"                     # the label already settled this
         indent = b.get("first_indent_px", 0)
+        if (role == "body" and body_median
+                and b["line_h_frac"] < SOURCE_LINE_RATIO * body_median):
+            role = "source"
         if role == "code":
             paras.append((role, b["text"].strip(), True, indent))
         else:

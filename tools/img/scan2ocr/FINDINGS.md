@@ -68,11 +68,17 @@ on **paper**; on a tint the region is always re-read.
 | bold run-in subhead | ink coverage in the line's box | **0.401 / 0.427 / 0.522** against 119 body lines whose median is 0.248 and whose **maximum** is 0.311 |
 | listing vs prose | digit density | hex dump **0.50 / 0.63**; every body block on 7 pages **0.00–0.10** |
 | section bar | unbroken dark run + height | ~52 px tall; sheet-edge shadow 11–15 px; hairline rule ~8 px |
+| source note | line height vs the page's own **median body** line height | **below 0.85×** is uniformly a source note — 46 blocks of 969, the `Info:` lines clustering at **0.66–0.67**. The 0.85–0.95 band is ordinary body, including 26- and 28-line blocks on p145. |
 
 **Leading does not find subheads.** The obvious hypothesis — a subhead has extra
 space above it — is false here: `Zielblock` measures **0.81** of the block's line
 pitch and `Spritenummer` **0.98**. The compositor set them tight. Boldness works;
 leading does not.
+
+The source-note ratio is taken **per page** (type size varies between pages) and
+from the **median** (so one odd block cannot move it). A useful side effect: the
+same measurement catches every `Fortsetzung von/auf Seite N` cross-reference,
+which is the page-link signal article reconstruction needs.
 
 **Tesseract's own paragraph numbering is not usable.** It called p58's 11-line
 block one paragraph and p55's 26-line block one paragraph; both plainly contain

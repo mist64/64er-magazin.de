@@ -134,7 +134,11 @@ page; either transcribe it or output NO_ARTICLE_TEXT.
 """
 
 
+HTML_TAG_RE = re.compile(r"<[^>]+>")
+
+
 def norm_tokens(line):
+    line = HTML_TAG_RE.sub(" ", line)     # <p class="source"> is markup, not text
     line = line.replace("¬", "")          # the line-break hyphen marker
     line = re.sub(r"[^\w\s]", " ", line.lower())
     return [t for t in line.split() if t]
