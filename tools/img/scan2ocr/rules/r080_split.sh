@@ -4,7 +4,7 @@
 # directory, and post-split git management.
 #
 # Usage:
-#   tools/img/scan2ocr/rules/080_split.sh <html-file> [64er.issue]
+#   tools/img/scan2ocr/rules/r080_split.sh <html-file> [64er.issue]
 #
 # If [64er.issue] is omitted, derive it from the directory name (e.g.
 # `issues/8607/` -> "7/86"). For Sonderhefte and other naming schemes the

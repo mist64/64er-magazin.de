@@ -17,7 +17,7 @@ Patterns that already start with a non-letter (e.g. `< CBM >` with leading space
 ## Usage
 
 ```bash
-tools/img/scan2ocr/rules/050_escape_tags.sh issues/8607/8607.md
+tools/img/scan2ocr/rules/r050_escape_tags.sh issues/8607/8607.md
 ```
 
 Idempotent: lookbehinds for `\` (i.e., `(?<!\\)<` and `(?<!\\)>`) mean re-runs are no-ops.

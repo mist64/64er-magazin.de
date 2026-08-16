@@ -11,14 +11,14 @@ block. There is no editorial judgement in it and nothing to dispatch.
 ## Inputs
 
 - `SRC_DIR` — the graded 600 dpi masters, one PNG per page (constant at the top
-  of `010_ocr_blocks.py`; produced by `scan2mrc`'s `pipeline.sh --only master,final`)
+  of `r010_ocr_blocks.py`; produced by `scan2mrc`'s `pipeline.sh --only master,final`)
 - `tesseract` 5.x with the **`deu`** traineddata
 
 ## Run
 
 ```bash
-tools/img/scan2ocr/rules/010_ocr_blocks.sh          # all 176 pages
-tools/img/scan2ocr/rules/010_ocr_blocks.sh 39 41    # a page range
+tools/img/scan2ocr/rules/r010_ocr_blocks.sh          # all 176 pages
+tools/img/scan2ocr/rules/r010_ocr_blocks.sh 39 41    # a page range
 ```
 
 The programs themselves live one level up in `tools/img/scan2ocr/` and keep
@@ -71,7 +71,7 @@ of them** and leaves the choice to step 020, which can read the text:
 - a block whose lines all break at the same x holds two things side by side, and
   the block carries `read_alt` with the `rows` and `down` readings beside the
   default across-reading. A table row and a woven line are the same shape; only
-  the text tells them apart. See `COLSPLIT_*` in `010_ocr_blocks.py`.
+  the text tells them apart. See `COLSPLIT_*` in `r010_ocr_blocks.py`.
 - a hyphen at a line end becomes `¬` rather than being resolved. German writes
   one for three different reasons and no local rule separates them; step 030
   resolves them.
@@ -106,6 +106,6 @@ overlay before accepting it.
 - **Read `FINDINGS.md` before changing anything here.** It records what was
   measured on this paper and, more usefully, the ideas that looked obviously
   right and made the corpus worse.
-- Constants live at the top of `010_ocr_blocks.py`, heavily commented. No CLI knobs,
+- Constants live at the top of `r010_ocr_blocks.py`, heavily commented. No CLI knobs,
   no env knobs — different agents used an env surface differently once and
   produced numbers for files that never existed.

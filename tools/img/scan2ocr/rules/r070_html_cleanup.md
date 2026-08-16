@@ -28,7 +28,7 @@ quotation marks and stay verbatim.
 ## Usage
 
 ```bash
-tools/img/scan2ocr/rules/070_html_cleanup.sh issues/8607/8607.html
+tools/img/scan2ocr/rules/r070_html_cleanup.sh issues/8607/8607.html
 ```
 
 In-place rewrite, idempotent (re-running on a cleaned file is a no-op).

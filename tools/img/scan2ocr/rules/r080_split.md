@@ -49,10 +49,10 @@ its own; this copy is the canonical version for the rules pipeline.
 
 ```bash
 # auto-derive 64er.issue from the dir name (8607 -> 7/86):
-tools/img/scan2ocr/rules/080_split.sh issues/8607/8607.html
+tools/img/scan2ocr/rules/r080_split.sh issues/8607/8607.html
 
 # explicit (needed for Sonderhefte / unusual paths):
-tools/img/scan2ocr/rules/080_split.sh issues/SH8607/SH8607.html 'Sonderheft 7/86'
+tools/img/scan2ocr/rules/r080_split.sh issues/SH8607/SH8607.html 'Sonderheft 7/86'
 ```
 
 After the script:
@@ -199,7 +199,7 @@ that file, not the rule.
 
 ## Notes / lessons
 
-- split.py's text replacements overlap with `070_html_cleanup.sh`. That's
+- split.py's text replacements overlap with `r070_html_cleanup.sh`. That's
   intentional — running 4 first means the .html is already clean when split
   starts, and split's own replacements become no-ops. Either order is safe.
 - Bylines must look like `<p>(Author Name)</p>` or `<p>(Name1/Name2)</p>`

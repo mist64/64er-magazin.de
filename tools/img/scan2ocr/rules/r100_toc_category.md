@@ -101,7 +101,7 @@ file**, so the issue dir stays in a consistent state.
 ## Usage
 
 ```bash
-tools/img/scan2ocr/rules/100_toc_category.sh issues/8607 <<'TSV'
+tools/img/scan2ocr/rules/r100_toc_category.sh issues/8607 <<'TSV'
 # editorial gets ""
 8 Fachredakteur_ Hobby und Beruf&hellip;.html	
 
@@ -121,7 +121,7 @@ For an alternative invocation pattern, write the mapping to
 `issues/<YYMM>/toc_category_mapping.tsv` and run:
 
 ```bash
-tools/img/scan2ocr/rules/100_toc_category.sh issues/<YYMM> < issues/<YYMM>/toc_category_mapping.tsv
+tools/img/scan2ocr/rules/r100_toc_category.sh issues/<YYMM> < issues/<YYMM>/toc_category_mapping.tsv
 ```
 
 ## Verification

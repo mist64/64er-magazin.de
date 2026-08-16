@@ -17,7 +17,7 @@ That covers:
 ## Usage
 
 ```bash
-tools/img/scan2ocr/rules/040_escape_asterisks.sh issues/8607/8607.md
+tools/img/scan2ocr/rules/r040_escape_asterisks.sh issues/8607/8607.md
 ```
 
 The script rewrites the file in place. Idempotent: re-running is a no-op once it's clean (escaped `\*` doesn't match the unescape-eligible pattern).

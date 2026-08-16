@@ -5,4 +5,4 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-python3}"
 cd "$DIR"
-"$PY" 020_classify.py $(seq "${1:-1}" "${2:-176}")
+"$PY" r020_classify.py $(seq "${1:-1}" "${2:-176}")

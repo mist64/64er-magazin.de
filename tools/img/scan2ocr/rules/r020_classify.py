@@ -66,13 +66,8 @@ LANES = 4
 # running text.  They are still LABELLED and kept in the JSON, so reversing that
 # is a rebuild, not a re-OCR.  Errata columns ARE article and stay in.)
 import llm                                                       # noqa: E402
-import _step                                                    # noqa: E402
-_ocr = _step.load("010_ocr_blocks")
-ARTICLE_LABELS = _ocr.ARTICLE_LABELS
-HYPHEN_MARK = _ocr.HYPHEN_MARK
-PARA_INDENT_MIN_PX = _ocr.PARA_INDENT_MIN_PX
-SRC_DIR = _ocr.SRC_DIR
-reading_order = _ocr.reading_order
+from r010_ocr_blocks import (ARTICLE_LABELS, HYPHEN_MARK,        # noqa: E402
+                             PARA_INDENT_MIN_PX, SRC_DIR, reading_order)
 
 # Every label the prompt offers must appear here.  "caption" was missing -- it is
 # offered to the model and excluded from the corpus, but was not listed as valid,

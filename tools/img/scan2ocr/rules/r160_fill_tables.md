@@ -8,7 +8,7 @@ proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 > **PREREQUISITE — the block index (step 010) must already be built.**
 > This rule's mandatory Pass 3 (uncaptioned tables) greps the per-page
 > block index at `tools/img/scan2ocr/out/blocks/pNNN.txt`, built once per
-> issue by [step 010](010_ocr_blocks.md) — which runs early (right after
+> issue by [step 010](r010_ocr_blocks.md) — which runs early (right after
 > the rule-9 D64 extraction), before this rule. If
 > `tools/img/scan2ocr/out/blocks/` is missing, run step 010 now before
 > continuing — do not substitute per-page on-demand OCR for the full

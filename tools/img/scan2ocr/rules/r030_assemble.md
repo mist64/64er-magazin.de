@@ -26,7 +26,7 @@ question and only make sense together. Everything else here is deterministic.
 ## Run
 
 ```bash
-tools/img/scan2ocr/rules/030_assemble.sh
+tools/img/scan2ocr/rules/r030_assemble.sh
 ```
 
 ## Outputs

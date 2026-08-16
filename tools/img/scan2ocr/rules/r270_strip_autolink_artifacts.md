@@ -22,7 +22,7 @@ The same misfire affects other "scheme-prefix"-like words: `TEL:`,
 
 ## Fixed at source: rule 060 (already done)
 
-This was a one-time migration, now complete: `060_md_to_html.sh` no
+This was a one-time migration, now complete: `r060_md_to_html.sh` no
 longer passes `+autolink` (its flags are
 `+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty`;
 the omission is documented in a comment in that script, and rule 060's
@@ -52,7 +52,7 @@ match in context).
 
 ## Briefing for the sub-agent
 
-1. **Verify** `tools/img/scan2ocr/rules/060_md_to_html.sh` does NOT pass
+1. **Verify** `tools/img/scan2ocr/rules/r060_md_to_html.sh` does NOT pass
    `+autolink` (it already doesn't — this is a regression guard, not an
    edit). Do not modify the script.
 2. Sweep every article in `issues/<YYMM>/*.html`:
@@ -78,7 +78,7 @@ dir=issues/<YYMM>
 grep -nE '<a href=' "$dir"/*.html && echo "  FAIL: <a href> left"
 
 # 2. rule 060 no longer emits +autolink
-grep -E '\+autolink' tools/img/scan2ocr/rules/060_md_to_html.sh && \
+grep -E '\+autolink' tools/img/scan2ocr/rules/r060_md_to_html.sh && \
   echo "  FAIL: rule 060 still passes +autolink"
 ```
 

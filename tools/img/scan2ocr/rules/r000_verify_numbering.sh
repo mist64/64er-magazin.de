@@ -7,16 +7,17 @@ D=tools/img/scan2ocr/rules
 fail=0
 
 echo "1. file naming"
-# _step.py and llm.py are deliberately unnumbered: a loader and a transport,
-# shared by several steps and belonging to none of them.
-bad=$(ls $D | grep -v '^__pycache__$' | grep -vE '^([0-9]{3}_[a-z0-9_]+\.(md|sh|py)|_step\.py|llm\.py)$' | tr '\n' ' ')
+# llm.py is deliberately unnumbered: the transport steps 020 and 030 share,
+# belonging to neither.  The r prefix exists so that a step file is also a legal
+# Python module name -- 010_ocr_blocks is not, r010_ocr_blocks is.
+bad=$(ls $D | grep -v '^__pycache__$' | grep -vE '^(r[0-9]{3}_[a-z0-9_]+\.(md|sh|py)|llm\.py)$' | tr '\n' ' ')
 if [ -n "$bad" ]; then echo "   BAD NAMES: $bad"; fail=1
-else echo "   all $(ls $D | grep -v '^__pycache__$' | wc -l | tr -d ' ') files match NNN_name.{md,sh,py} (+ _step.py, llm.py)"; fi
+else echo "   all $(ls $D | grep -v '^__pycache__$' | wc -l | tr -d ' ') files match rNNN_name.{md,sh,py} (+ llm.py)"; fi
 
-echo "2. every NNN_name.{md,sh,py} reference resolves"
+echo "2. every rNNN_name.{md,sh,py} reference resolves"
 n=0
-for ref in $(grep -rhoI --exclude-dir=__pycache__ -E '\b[0-9]{3}_[a-z0-9_]+\.(md|sh|py)\b' $D tools/img/scan2ocr/README.md 2>/dev/null | sort -u); do
-  if [ ! -f "$D/$ref" ]; then echo "   DANGLING: $ref"; fail=1; else n=$((n+1)); fi
+for ref in $(grep -rhoI --exclude-dir=__pycache__ -E '[/ "(]r?[0-9]{3}_[a-z0-9_]+\.(md|sh|py)\b' $D tools/img/scan2ocr/README.md 2>/dev/null | sort -u); do
+  ref=${ref##*[/ \"(]}; if [ ! -f "$D/$ref" ]; then echo "   DANGLING: $ref"; fail=1; else n=$((n+1)); fi
 done
 echo "   $n distinct references resolve"
 
@@ -26,7 +27,7 @@ if [ -n "$old" ]; then echo "   OLD-STYLE REFS: $old"; fail=1; else echo "   non
 
 echo "4. every 'step NNN' reference resolves"
 for num in $(grep -rhoI --exclude-dir=__pycache__ -E '\b[Ss]tep [0-9]{3}\b' $D | grep -oE '[0-9]{3}' | sort -u); do
-  ls $D/${num}_* >/dev/null 2>&1 || { echo "   DANGLING step $num"; fail=1; }
+  ls $D/r${num}_* >/dev/null 2>&1 || { echo "   DANGLING step $num"; fail=1; }
 done
 echo "   ok"
 

@@ -13,5 +13,5 @@ PY="${PYTHON:-python3}"
 FIRST="${1:-1}"
 LAST="${2:-176}"
 cd "$DIR"
-seq "$FIRST" "$LAST" | OMP_NUM_THREADS=1 xargs -P 6 -n 8 "$PY" 010_ocr_blocks.py
-"$PY" 010_blocks_index.py
+seq "$FIRST" "$LAST" | OMP_NUM_THREADS=1 xargs -P 6 -n 8 "$PY" r010_ocr_blocks.py
+"$PY" r010_blocks_index.py

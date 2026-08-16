@@ -3,7 +3,7 @@
 # driven by a {filename -> category} mapping read from stdin.
 #
 # Usage:
-#   tools/img/scan2ocr/rules/100_toc_category.sh <issue-dir> < mapping.tsv
+#   tools/img/scan2ocr/rules/r100_toc_category.sh <issue-dir> < mapping.tsv
 #
 # Mapping rows: <filename>\t<category>
 # - empty category means "" (used for the editorial)

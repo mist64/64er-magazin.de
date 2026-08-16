@@ -5,4 +5,4 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-python3}"
 cd "$DIR"
-"$PY" 030_assemble.py
+"$PY" r030_assemble.py

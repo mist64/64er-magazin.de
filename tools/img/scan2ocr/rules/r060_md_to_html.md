@@ -20,7 +20,7 @@ lives in the repo from here on.
 ## Usage
 
 ```bash
-tools/img/scan2ocr/rules/060_md_to_html.sh issues/8607/8607.md
+tools/img/scan2ocr/rules/r060_md_to_html.sh issues/8607/8607.md
 # 1. writes issues/8607/8607.html next to the .md
 # 2. `git rm`s the .md (or plain `rm` if not yet tracked)
 # 3. `git add`s the .html
