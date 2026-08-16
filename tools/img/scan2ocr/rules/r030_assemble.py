@@ -241,6 +241,29 @@ def page_stream():
     return stream, pageinfo
 
 
+def continuation_links():
+    """Every "Fortsetzung auf Seite N", read off the page it is printed on.
+
+    Taken from ALL of stage A's blocks rather than from the classified stream,
+    because the marker is apparatus: step 020 has no reason to keep it in the
+    corpus and different runs decide differently.  MEASURED -- one sweep labelled
+    p127's "Fortsetzung auf Seite 169" a footer, it left the stream, and the
+    second half of "Wie funktioniert ein Computer?" was stranded on p169 as an
+    article of its own.  Whether a line is article text is a judgement; whether
+    it is printed on the page is not, and only the second may decide where an
+    article resumes."""
+    out = {}
+    for page in PAGES:
+        path = os.path.join(OUT_DIR, f"{page:03d}.labels.json")
+        if not os.path.exists(path):
+            continue
+        for b in json.load(open(path, encoding="utf-8"))["blocks"]:
+            for direction, target in FORTSETZUNG.findall(b.get("text", "")):
+                if direction.lower() == "auf":
+                    out[page] = int(target)
+    return out
+
+
 def candidates(stream):
     """Indices into the stream that could be where an article begins -- or, on a
     page that resumes an interrupted article, where it stops doing so.
@@ -382,7 +405,7 @@ def split_articles(stream, cands, verdict):
     return segments
 
 
-def merge_continuations(segments):
+def merge_continuations(segments, hands_off=None):
     """Splice each continuation into the article that hands off to its page.
 
     The link is between PARAGRAPHS, not pages: p142 carries the end of the
@@ -395,10 +418,16 @@ def merge_continuations(segments):
     Confirmed in both directions: the article that says "auf Seite 169" must
     also cover the page that page 169 points back to.  All five jumps in this
     issue are symmetric, so a one-way match is evidence of a misread."""
+    # An article hands off from whichever of its pages carries the marker, so
+    # the link survives step 020 dropping that block from the corpus.
+    hands_off = hands_off or {}
     resumes_on, out = {}, []
     for s in segments:
         if s.get("hands_to"):
             resumes_on[s["hands_to"]] = s
+        for pg in s.get("pages", ()):
+            if pg in hands_off and hands_off[pg] not in resumes_on:
+                resumes_on[hands_off[pg]] = s
     for s in segments:
         if s["kind"] == "article":
             out.append(s)
@@ -558,7 +587,7 @@ def main():
     segments = split_articles(stream, cands, verdict)
     n_cont = sum(1 for s in segments if s["kind"] == "cont")
     print(f'{len(segments) - n_cont} articles, {n_cont} continuations to splice', flush=True)
-    articles = merge_continuations(segments)
+    articles = merge_continuations(segments, continuation_links())
 
     for a in articles:
         join_across_pages(a)
