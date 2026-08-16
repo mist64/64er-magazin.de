@@ -98,6 +98,9 @@ CAPTION_MEASURE_MATCH = 0.25  # a block sharing this much width is above the fig
 MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
+# Asymmetric on purpose -- see the merge in illustrations().
+ILLUS_JOIN_X = 300            # wide enough to cross a column gutter
+ILLUS_JOIN_Y = 20             # narrow: only touching fragments, never past a caption
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
@@ -541,12 +544,67 @@ def illustrations(rec):
     slightly generous, which is the right direction, because the surplus is the
     printed rule and that is trimmed afterwards.
     """
-    out = []
+    raw = []
     for r in rec.get("regions", ()):
         if r["kind"] != "illustration":
             continue
         x0, y0, x1, y1 = (int(v * SCALE) for v in r["bbox"])
-        out.append([x0, y0, x1, y1])
+        raw.append([x0, y0, x1, y1])
+
+    # AN ILLUSTRATION IS A LAYOUT BLOCK, NOT AN OBJECT.
+    #
+    # Tesseract splits the page into columns first and classifies afterwards, so
+    # a picture wider than the column grid comes back as one fragment per column
+    # cell.  A census found this the dominant defect: 131-2 is exactly the left
+    # pin column of a chip whose body begins at the crop's edge, 30-2 a 690 px
+    # sliver of a flowchart cut on both sides, 172-00 a C 64 screen at aspect
+    # 1.05 where the real thing is 1.6.
+    #
+    # The fragments of one object touch.  Union them BEFORE anything else looks
+    # at them, so what leaves here is an object and not a cell of the grid.
+    # The tolerance is ASYMMETRIC, because the geometry is.
+    #
+    # Fragments of one object are separated HORIZONTALLY by a column gutter,
+    # which is wide; two different objects are separated VERTICALLY by a caption
+    # and its leading, which is narrow.  One distance for both axes gets it
+    # exactly backwards -- at 90 px each way the horizontal merge never fired
+    # (the gutter is wider) while the vertical one always did, so a figure was
+    # joined to the NEXT figure below it and still cut at the column wall.
+    # A census found both failures on one page: p131's pinouts came out as
+    # left-column slivers AND as a merged four-figure block.
+    caps_y = [([v * SCALE for v in b["bbox"]], b["label"]) for b in rec["blocks"]
+              if b["label"] == "caption"]
+
+    def caption_between(a, b):
+        lo, hi = min(a[3], b[3]), max(a[1], b[1])
+        for (cx0, cy0, cx1, cy1), _l in caps_y:
+            if lo <= cy0 <= hi and min(a[2], b[2]) - max(a[0], b[0]) > 0:
+                return True
+        return False
+
+    merged = []
+    for r in sorted(raw, key=lambda r: (r[1], r[0])):
+        for m in merged:
+            if (min(m[2], r[2]) - max(m[0], r[0]) > -ILLUS_JOIN_X
+                    and min(m[3], r[3]) - max(m[1], r[1]) > -ILLUS_JOIN_Y
+                    and not caption_between(m, r)):
+                m[0], m[1] = min(m[0], r[0]), min(m[1], r[1])
+                m[2], m[3] = max(m[2], r[2]), max(m[3], r[3])
+                break
+        else:
+            merged.append(list(r))
+
+    # A screened tint is picture-like to the layout analysis, so the page's own
+    # furniture -- the black section banner, the tint behind a headline --
+    # arrives as an illustration.  Those sit on a running head or a folio.
+    furniture = [[v * SCALE for v in b["bbox"]] for b in rec["blocks"]
+                 if b["label"] in ("header", "footer")]
+    out = []
+    for m in merged:
+        if any(min(m[2], f[2]) - max(m[0], f[0]) > 0
+               and min(m[3], f[3]) - max(m[1], f[1]) > 0 for f in furniture):
+            continue
+        out.append(m)
     return out
 
 
@@ -597,6 +655,11 @@ def figures(page):
             xs = [illus[i] for i in mine]
             box = [min(r[0] for r in xs), min(r[1] for r in xs),
                    max(r[2] for r in xs), max(r[3] for r in xs)]
+            # The caption is a grouping key and a name -- never content.  The
+            # union of several fragments reached past it and swallowed it whole
+            # (131-4 carried "Bild 2. Anschlußplan des Prozessors 6510" between
+            # two chips), so the box stops above the caption it belongs to.
+            box[3] = min(box[3], cy0 - CAPTION_GAP_PX)
         else:
             box = figure_above(stoppers, cap, W, H)   # no illustration: fall back
         found.append({"bbox": box, "ink": 0.0, "caption": cap["text"],
@@ -636,12 +699,21 @@ def figures(page):
 
 
 def trim_blank(grey, x0, y0, x1, y1):
-    """Shave blank paper off the edges, keeping everything that carries marks."""
-    st = strokes(grey, x0, y0, x1, y1)
+    """Shave blank PAPER off the edges, keeping everything that carries marks.
+
+    Blank means bright, not merely low-contrast.  Testing for "no strokes
+    relative to the local median" calls a uniformly DARK area blank, because a
+    dark region has no contrast against its own median -- and that quietly ate
+    a quarter of every dark-bordered picture.  MEASURED on p172's game screen:
+    a correct 2158x1473 box came out 1597x1469, losing 561 px of width, which
+    is the whole of the "aspect 1.05 where a C 64 screen is 1.6" complaint.
+    Every build shared this function, so every build inherited the damage."""
     cell = grey[y0:y1, x0:x1].astype(np.int16)
     if cell.size == 0:
         return x0, y0, x1, y1
-    colp = (cell < np.median(cell) - STROKE_CONTRAST).mean(axis=0)
+    ink = cell < PAPER_LEVEL
+    st = ink.mean(axis=1)
+    colp = ink.mean(axis=0)
     ry = np.where(st > EMPTY_FRAC)[0]
     rx = np.where(colp > EMPTY_FRAC)[0]
     if ry.size:
