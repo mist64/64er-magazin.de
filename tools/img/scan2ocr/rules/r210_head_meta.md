@@ -1,4 +1,4 @@
-# 19 — Fill `64er.head1` / `64er.head2` from page headers
+# 210 — Fill `64er.head1` / `64er.head2` from page headers
 
 **Goal:** every interior-page article gets the running-header text
 that's printed at the top of its start page captured into
@@ -75,7 +75,7 @@ echo "  head1 in $n of $total article(s)"
 echo "  excluded (should NOT have head1):"
 grep -lE '64er\.id" content="(editorial|impressum|inhalt|vorschau)"' "$dir"/*.html
 # Leserforum is excluded too (rule 200 already set its head1 by hand);
-# it may still show a head1, so don't count it as a rule-19 target.
+# it may still show a head1, so don't count it as a rule 210 target.
 echo "  → expect n ≈ total − (count of the excluded files above, plus Leserforum)"
 
 # 2. head1 / head2 placement is immediately before toc_category

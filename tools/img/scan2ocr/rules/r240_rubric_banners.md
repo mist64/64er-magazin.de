@@ -1,4 +1,4 @@
-# 22 — Add rubric banner images (Editorial / Bücher / Fehlerteufelchen)
+# 240 — Add rubric banner images (Editorial / Bücher / Fehlerteufelchen)
 
 **Goal:** add the stylized title-banner image at the top of each
 recurring-rubric article that uses one. Three rubrics carry a banner
@@ -164,7 +164,7 @@ be backed by **runnable verifier evidence pasted verbatim into the
 report**:
 
 - For each banner inserted, paste the one-line
-  `_tmp/blocks/p<START>.txt` line (or the cropped block path) that
+  `<OUT_DIR>/blocks/p<START>.txt` line (or the cropped block path) that
   showed the banner's bbox, plus the rubric name verbatim from the
   print band, e.g.
   ```
@@ -195,7 +195,7 @@ tinted versions).
 - The Editorial portrait's `alt` text in 8606 reads
   "Michael Scharfenberger, Chefredakteur" — preserve the role suffix.
   8607's Fachredakteur column uses a slightly different role
-  ("Porträt Michael Scharfenberger" — the rule-12 image-placement
+  ("Porträt Michael Scharfenberger" — the rule 150 image-placement
   agent set this); both work, but pick one and be consistent
   within the issue.
 - The Bücher banner image content is identical across the recent

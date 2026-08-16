@@ -2,7 +2,7 @@
 """
 Stage A of the article-corpus pipeline.
 
-thumbs_600/NNN.png
+master600/NNN.png
    -> 300 dpi greyscale
    -> tesseract TSV (+ an inverted pass over the header band, for reversed-out
       section bars that tesseract reads only intermittently)
@@ -51,7 +51,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageOps
 SRC_DIR = "/Users/mist/DNB/8609/tmp/master600/final"
 OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
 
-# thumbs_600 is ~600 dpi (5197x7188 for an A4-ish uncropped sheet).  Tesseract's
+# master600 is ~600 dpi (5197x7188 for an A4-ish uncropped sheet).  Tesseract's
 # sweet spot is 300 dpi: below that small ad/Kleinanzeigen type falls apart,
 # above it the engine gains nothing and the halftone screen starts aliasing into
 # the binarizer.  Exactly 0.5 keeps the resample a clean box filter.

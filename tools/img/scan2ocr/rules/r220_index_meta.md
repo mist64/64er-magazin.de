@@ -1,4 +1,4 @@
-# 20 — Fill `64er.index_category` / `64er.index_title` from the annual CSV
+# 220 — Fill `64er.index_category` / `64er.index_title` from the annual CSV
 
 **Goal:** every article that appears in the year's
 Jahresinhaltsverzeichnis (annual index) CSV gets its `index_category`

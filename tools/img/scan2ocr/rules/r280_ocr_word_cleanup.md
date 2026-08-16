@@ -1,4 +1,4 @@
-# 27 — Word-level OCR cleanup sweep across every article
+# 280 — Word-level OCR cleanup sweep across every article
 
 **Goal:** after rule 080 (split) has produced one HTML per article, sweep
 every `issues/<YYMM>/*.html` for the mechanical word-level OCR damage
@@ -34,7 +34,7 @@ operation: glyph confusion, line-break hyphen artifacts, lost
 spaces. It does NOT add or drop letters. If a candidate has the
 wrong number of letters compared to the German-correct form,
 that's a print typo, not OCR. **Leave it.** Apply this heuristic
-FIRST; if the candidate fails it, skip — don't even run `pdftotext`.
+FIRST; if the candidate fails it, skip — don't even open the block index.
 
 **Valid OCR fixes** (same character count, or pure spacing / hyphen):
 
@@ -67,75 +67,64 @@ word (`derComputer`), or concatenated short German words
 The rejoined form matches the German letter count; only spacing
 changed.
 
-## Mandatory pre-fix check: `pdftotext` cross-check
+## Mandatory pre-fix check: the two-engine cross-check
 
-This is the **second** gate. The character-count heuristic above is
-the first; only candidates that survive it reach this step. Before
-applying **any** word-level candidate in Pass 1, Pass 2, or Pass 3,
-run a one-line `pdftotext` query on the article's page to confirm that
-the print does NOT carry the same anomaly. The PDF's embedded text layer
-(or in its absence, pdftotext's own extraction) is the closest
-machine-readable proxy for the print's actual letterforms — closer than
-our HTML, which has been through Tesseract — **UNLESS the PDF text
-layer is itself OCR of the same scan, in which case it is void as
-evidence (see the independence test below).**
+This is the **second** gate. The character-count heuristic above is the first;
+only candidates that survive it reach this step. Before applying **any**
+word-level candidate in Pass 1, Pass 2 or Pass 3, confirm against an
+independent reading that the print does not carry the same anomaly.
 
-### FIRST: test whether the PDF text layer is independent evidence
+**Not `pdftotext`.** The delivered PDF's text layer is a re-OCR of the same
+scan, so it reproduces our own OCR's errors and can never say "print typo" --
+see r000, "the PDF has no usable text layer". This is not a theoretical
+objection: rule 280 once "confirmed" `WerhatErfahrungen mitdem` as
+print-faithful because `pdftotext` returned the same jam, while the 600 dpi
+scan plainly prints "Wer hat Erfahrungen mit dem".
 
-This is the gate before the gate, run **once per issue**. A PDF text
-layer is only a valid print proxy if it was derived from the
-publisher's typesetting, NOT re-OCR'd from the scan. If it is re-OCR of
-the same scan, it reproduces the HTML's own OCR errors and can *never*
-say "print typo" — trusting it is circular (the 8608 failure: rule 280
-"confirmed" `WerhatErfahrungen mitdem` as print-faithful because
-pdftotext returned the same jam, but the 600 dpi scan clearly prints
-"Wer hat Erfahrungen mit dem").
-
-Independence test:
-```bash
-# sample ~15 known HTML anomalies (lost-space jams, glyph confusions)
-# and check how many pdftotext reproduces VERBATIM
-pdftotext -layout -f <pg> -l <pg> issues/<YYMM>/64er_19XX-XX.pdf - | grep -iE 'anomaly1|anomaly2|…'
-```
-If pdftotext reproduces most of the sampled anomalies identically →
-**the layer is the same OCR generation → VOID as evidence.** In that
-case:
-- pdftotext can NEVER authorise a "leave (print typo)" decision — it
-  only agrees with the HTML's own errors.
-- Settle every candidate instead by an **independent** source:
-  1. step 010's block index (`tools/img/scan2ocr/out/blocks/pNNN.txt`)
-     — a DIFFERENT OCR engine on the same scan. When two OCR engines
-     drop *different* spaces / read *different* glyphs, the print has
-     the space/glyph the disagreement reveals — apply the fix.
-  2. for anything still ambiguous, a **600 dpi scan crop** read by a
-     sub-sub-agent (`~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff`).
-- The `internsiv` precedent (leave it) is valid ONLY when the text
-  layer is independent evidence; when the layer is non-independent,
-  `internsiv`-style tokens must be settled by the scan, not by the
-  circular proxy.
-
-Only when the independence test PASSES (pdftotext diverges from the
-HTML's anomalies) does the original `pdftotext`-as-proxy procedure
-below apply verbatim.
+The independent reading is **step 010's block index** -- a *different OCR
+engine* on the same paper:
 
 ```bash
-pdftotext -layout -f <page> -l <page> issues/<YYMM>/64er_19xx_xx.pdf - \
-  | grep -i '<candidate-word>'
+OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+grep -i '<candidate-word>' "$OUT_DIR/blocks/p<NNN>.txt"
 ```
+
+Read the disagreement, not the agreement:
+
+- the two engines **drop different spaces or read different glyphs** -> the
+  print has whatever the disagreement reveals. Apply the fix.
+- both engines produce the **same** oddity -> that is weak evidence for a print
+  typo and strong evidence of a shared failure mode (same paper, same screen,
+  same broken letterform). It does NOT authorise "leave (print typo)".
+- anything still ambiguous -> a **600 dpi crop of the master** at the block's
+  bbox, read with your own eyes. That is the only source that settles it:
+
+```bash
+grep '<candidate-word>' "$OUT_DIR/blocks/p<NNN>.txt"     # gives bbox=WxH+X+Y
+magick <SRC_DIR>/<NNN>.png -crop <W>x<H>+<X>+<Y> +repage /tmp/64er_check.png
+```
+
+`<SRC_DIR>` is the graded 600 dpi master, a constant at the top of
+`r010_ocr_blocks.py`. The bbox is in that image's pixels -- never crop a PDF
+render, the two spaces differ by a rotation and an offset.
+
+The `internsiv` precedent (leave it) stands only on a reading that is actually
+independent. It must be settled by the scan, never by a circular proxy.
+
 
 Decision rule:
 
-- If `pdftotext` shows the **same** word/non-word/weird capitalisation
-  that's in the HTML → **the print IS that word**. It's a print typo.
-  **Do not touch.**
-- If `pdftotext` shows a **different** word that matches the proposed
-  fix → the print has the correct word, the HTML carries an OCR error,
-  **apply the fix**.
+- The block index shows a **different** word matching the proposed fix -> the
+  two engines disagree, the print has the correct word, **apply the fix**.
+- The block index shows the **same** oddity -> undecided, NOT confirmed. Two OCR
+  passes over the same paper share failure modes, so agreement is not evidence.
+  Settle it on a 600 dpi crop before writing anything.
+- The crop shows the oddity in print -> **it is a print typo. Do not touch.**
 
-Use `-layout` rather than the default reflowed mode for compound
-words and jammed-together tokens: the default reflow can fabricate
-spaces across column breaks and mislead the operator into thinking
-print has a space where it doesn't.
+That middle branch is the one that used to be wrong. It read "the proxy agrees,
+therefore the print says it", which is how a shared OCR failure gets recorded as
+a 1986 typo.
 
 ### Anti-pattern: "it's not a German word, so it must be OCR"
 
@@ -143,33 +132,41 @@ This is the trap that produced the 8607/21 `internsiv` regression. The
 1986 magazine **has print typos**, including non-words. The fact that
 a token isn't in the German dictionary is **not** evidence that the
 HTML is wrong — it is, at best, a signal worth checking. The decision
-between "fix" and "leave" is always made by `pdftotext` cross-check,
-never by dictionary lookup alone.
+between "fix" and "leave" is always made against the scan, never by
+dictionary lookup alone.
 
 Canonical example to remember:
 
 - **`internsiv`** in `issues/8607/21 Die Würfel sind gefallen.html`
   on page 176. Pass 1 candidate `internsiv` → `intensiv` looks
-  irresistible. `pdftotext -f 176 -l 176 issues/8607/64er_1986-07.pdf -`
-  shows `64'er sehr internsiv lesen`. The magazine printed
-  `internsiv`. **Do NOT fix.**
+  irresistible; leaving it alone was the right call.
+
+  ⚠️ The evidence originally recorded for it was a `pdftotext` reading, which
+  this rule now treats as void. The *lesson* stands on its own — a non-word is
+  not proof of an OCR error — but the finding itself has never been settled
+  against the scan. **Re-verify it on a 600 dpi crop before citing it as
+  precedent for leaving another token alone.**
 
 The same applies to jammed-together compounds. 8607/33's `Derdritte`
 and `angeschlossenwerden`, 8607/28's `aufgebautwerden`, 8607/49's
 `kannjetztzwischendeneinzelnen`, and 8607/139's `Akkumulatorl)` were
-all proposed Pass 1/Pass 3 fixes that `pdftotext -layout` confirms
-exist in the print verbatim. They are print typos. Leave them.
+all proposed Pass 1/Pass 3 fixes that were left alone on a `pdftotext` reading.
+⚠️ Same caveat as `internsiv`: that evidence is void under this rule, so these
+are *undecided*, not confirmed print typos. Leaving them alone remains the safe
+default -- a fix needs positive evidence, a leave does not -- but do not cite
+them as confirmed until a crop settles them.
 
 ### Verification step at the end of every Pass 1 / Pass 2 / Pass 3 candidate
 
 ```bash
-pdftotext -layout -f <page> -l <page> issues/<YYMM>/64er_19xx_xx.pdf - \
-  | grep -i '<word>'
+OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+grep -i '<word>' "$OUT_DIR"/blocks/p<NNN>.txt
 ```
 
-If grep returns the word as it appears in the HTML → leave it. Only
-when grep is silent (or returns the proposed corrected form) is the
-fix authorised.
+If the block index returns the **corrected** form, the two engines disagree and
+the fix is authorised. If it returns the same oddity, the candidate is
+undecided -- settle it on a 600 dpi crop or leave it.
 
 ## Pass 1 — line-break hyphen artifacts
 
@@ -248,7 +245,7 @@ relied on this regex alone. You MUST also detect these two ways:
    `sobald`, `dabei`) so DO NOT apply blind.
 2. **Word-stream diff against step 010's block index** (the most complete
    method): tokenise the article body and the corresponding
-   `_tmp/blocks/p<NNN>.txt` and flag every position where the two
+   `<OUT_DIR>/blocks/p<NNN>.txt` and flag every position where the two
    OCR engines disagree on a space. A disagreement is proof the print
    has a boundary there (two engines never independently invent the
    same split); settle the exact form with the block text or a crop.
@@ -267,7 +264,7 @@ tiebreaker for any function-word jam the greps surface.
    **and** *splits around a function word* — is almost always a genuine
    lost-space jam, with very few false positives. This one pass found
    **69 real jams in 8608 that all three earlier methods had missed**
-   (the R1 rule-27 sweep, the capital-boundary regex, and the
+   (the R1 rule-280 sweep, the capital-boundary regex, and the
    function-word greps). hunspell on macOS/Homebrew usually has NO
    dictionary installed (`Can't open affix or dictionary files for
    dictionary named "de_DE"`) — use **`aspell -d de`** instead
@@ -433,10 +430,10 @@ procedure is:
 
 1. **Character-count heuristic** (see section above). If the
    candidate would add or drop letters vs the German-correct form,
-   it's a print typo. Skip — do not even run `pdftotext`.
-2. **`pdftotext` cross-check** (see mandatory pre-fix check). Only
-   if step 1 says "looks like OCR" does the agent run the
-   `pdftotext` grep and decide fix vs skip from its output.
+   it's a print typo. Skip — do not even open the block index.
+2. **Two-engine cross-check** (see mandatory pre-fix check). Only
+   if step 1 says "looks like OCR" does the agent grep the block
+   index and decide fix vs skip from what it returns.
 
 The sub-agent should explicitly NOT touch `<address class="author">`,
 `<pre>`, `<code>`, or `<meta>` content. Body `<p>`, `<h1>`/`<h2>`,
@@ -451,22 +448,23 @@ Pass-3 fix the sub-agent applies must be backed by **runnable verifier
 evidence pasted verbatim into the report**:
 
 - For each candidate the sub-agent decided to fix, include the one-line
-  `pdftotext` command + its grep output (showing the print carries the
-  **corrected** form or is silent), e.g.
+  block-index command + its grep output (showing the other engine read the
+  **corrected** form), e.g.
   ```
-  pdftotext -layout -f 176 -l 176 issues/8607/64er_1986-07.pdf - | grep -i intensiv
+  grep -i intensiv "$OUT_DIR"/blocks/p176.txt
   →  Bedienung des C 64'er sehr intensiv lesen
   ```
-- For each candidate the sub-agent decided to SKIP because the print
-  carries the anomaly verbatim, include the same one-line command + its
-  grep output (showing the print's anomaly), e.g.
+- For each candidate the sub-agent decided to SKIP, include the same one-line
+  command + its output, e.g.
   ```
-  pdftotext -layout -f 176 -l 176 issues/8607/64er_1986-07.pdf - | grep -i internsiv
-  →  Bedienung des C 64'er sehr internsiv lesen
+  grep -i internsiv "$OUT_DIR"/blocks/p176.txt
+  →  block=42 label=body ... text= Bedienung des C 64'er sehr internsiv lesen
   ```
+  Both engines reading it the same way is a SKIP, not a confirmation -- report
+  it as undecided, and say so in the summary.
 
 **No verifier output, no claimed fix.** A fix reported without the
-`pdftotext` line is treated as un-applied; the orchestrator will revert
+block-index line is treated as un-applied; the orchestrator will revert
 it and re-dispatch. "Trust me, I checked" is never acceptable. Skipping
 a candidate is acceptable; claiming an unverified fix is not.
 
@@ -490,8 +488,8 @@ grep -h "Übertragungsgeschwindigkeiten von" "$dir"/*.html >/dev/null && \
 
 ## Notes / lessons
 
-- This rule runs ONCE per issue, at its numbered position (27) — AFTER
-  the table/listing transcription rules (13/14) so their transcribed
+- This rule runs ONCE per issue, at its numbered position (280) — AFTER
+  the table/listing transcription rules (160/170) so their transcribed
   text is also swept. (An earlier draft said "right after rule 080
   (split)"; that was wrong — running before 13/14 would miss all
   transcribed body text.) It produces one commit with many small word
@@ -510,7 +508,7 @@ grep -h "Übertragungsgeschwindigkeiten von" "$dir"/*.html >/dev/null && \
   C.A.C. box), `Course of live` (also Variosystem).
 - The discount engine's older `<` escaping sometimes leaves stray
   `&lt;` constructs (`<RETURN>` becomes literal text) — those are
-  rule-2 (escape_tags) territory, not rule 280.
+  rule 050 (escape_tags) territory, not rule 280.
 - **t ↔ l word-end pair (8607).** Lowercase typewriter `t` with its
   hooked descender OCRs as `l` at word ends. `Mini-Autostarl` in
   8607/76 was the canonical instance. The shape to watch for is a

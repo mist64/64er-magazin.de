@@ -1,4 +1,4 @@
-# 13 — Extract and place data tables
+# 160 — Extract and place data tables
 
 **Goal:** turn every `<p>TODO TABLE</p>` placeholder, and every prose
 `Tabelle N` reference whose table is missing from the HTML, into a
@@ -7,10 +7,10 @@ proper `<table>` block. Captioned tables get wrapped in `<figure>` with
 
 > **PREREQUISITE — the block index (step 010) must already be built.**
 > This rule's mandatory Pass 3 (uncaptioned tables) greps the per-page
-> block index at `tools/img/scan2ocr/out/blocks/pNNN.txt`, built once per
-> issue by [step 010](r010_ocr_blocks.md) — which runs early (right after
-> the rule-9 D64 extraction), before this rule. If
-> `tools/img/scan2ocr/out/blocks/` is missing, run step 010 now before
+> block index at `<OUT_DIR>/blocks/pNNN.txt`, built once per
+> issue by [step 010](r010_ocr_blocks.md), which is the FIRST step in the
+> chain and therefore always already done by the time this rule runs. If
+> `<OUT_DIR>/blocks/` is missing, run step 010 now before
 > continuing — do not substitute per-page on-demand OCR for the full
 > Pass-3 sweep, which is how Pass 3 gets under-covered.
 
@@ -66,7 +66,7 @@ these from OCR text. Instead:
 - **Table with a real caption** → wrap the whole `<table>` in `<figure>` with `<figcaption>`. A "real caption" is text printed on the scan in one of: `Tabelle: …`, `Tabelle N: …`/`Tabelle N. …`, `Bild N: …`/`Bild N. …` (for numbered figure-tables), or `STECKBRIEF: …` (yellow callout). **Do NOT promote section headings or bold titles above a table to `<figcaption>`** — a bold "Erklärung der einzelnen Bearbeitungsroutinen" above a table is a heading, not a caption.
 - **The `<figcaption>` ALWAYS goes BELOW the table** inside the `<figure>`, even if the print places it above. Project convention.
 - **Table with a heading or no caption marker** → bare `<table>`, no `<figure>`.
-- **NEVER fabricate a caption.** A `<figcaption>` is only allowed when its exact text is printed on the page (read it off step 010's block index or a 600 dpi scan crop; on scanned issues `pdftotext` is VOID per rule 280); transcribe it verbatim. Do not compose a plausible-sounding descriptive title of your own — that is a fabrication. When in doubt, emit a bare `<table>` with no caption rather than an invented one. (Conversely, don't delete a real caption as "invented" without checking the scan: 8608/142 `Listing 1. Laufzeit-Testschleife in »C«` IS printed in bold on p145.)
+- **NEVER fabricate a caption.** A `<figcaption>` is only allowed when its exact text is printed on the page (read it off step 010's block index or a 600 dpi scan crop; the PDF text layer is void, see r000); transcribe it verbatim. Do not compose a plausible-sounding descriptive title of your own — that is a fabrication. When in doubt, emit a bare `<table>` with no caption rather than an invented one. (Conversely, don't delete a real caption as "invented" without checking the scan: 8608/142 `Listing 1. Laufzeit-Testschleife in »C«` IS printed in bold on p145.)
 
 ## "Bild N" can be a table, pseudo-code, or a text box
 
@@ -94,7 +94,9 @@ A pure `Tabelle …` grep is **not enough**. Use a layered sweep:
 
 **Pass 1 — explicit captions:**
 ```bash
-pdftotext -layout issues/<YYMM>/64er_19XX-XX.pdf /tmp/64er_<YYMM>_full.txt
+OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+cat "$OUT_DIR"/blocks/p*.txt > /tmp/64er_<YYMM>_full.txt
 grep -iE "Tabelle[ :.][^.]" /tmp/64er_<YYMM>_full.txt | \
   grep -vE "Farbtabelle|Steuersequenztabelle|[Ww]ertetabelle|Preistabelle|Linktabelle"
 ```
@@ -113,12 +115,12 @@ Every `TODO TABLE` MUST be replaced. **Garbage adjacent to `TODO TABLE`** — th
 ```bash
 # 1. Walk each page's blocks index for known callout heading words
 grep -hiE "Verwendete |Leistungen |Steckernormen|Belegung |Datenblatt|Kurz belichtet|Pin\s+Signal|Funktion: |Funktionen |Eingang|Kennummer" \
-  tools/img/scan2ocr/out/blocks/p*.txt
+  <OUT_DIR>/blocks/p*.txt
 
 # 2. Walk for narrow-column multi-line blocks (sidebar callout shape):
 #    blocks whose width < 350 px AND text contains 4+ short newline-
 #    separated lines = strong candidate for tabular reference data.
-for f in tools/img/scan2ocr/out/blocks/p*.txt; do
+for f in <OUT_DIR>/blocks/p*.txt; do
   awk -F'[ =x+]' '/^block=/ { w=$5; if (w<350) print FILENAME": "$0 }' "$f"
 done | head -50
 ```
@@ -149,7 +151,7 @@ The sub-agent must:
 
 1. Render the issue PDF to `/tmp/64er_<YYMM>_pages/p-NNN.png` at `-r 150`
    (once, up front).
-2. Run `pdftotext -layout` on the PDF to `/tmp/64er_<YYMM>_full.txt` for
+2. Concatenate step 010's block index to `/tmp/64er_<YYMM>_full.txt` for
    caption-sweep grep.
 3. Find work to do via the documented three passes:
    - Pass 1: `Tabelle [N]?[.:]`, `STECKBRIEF`, `Bild N` (the last for
@@ -327,7 +329,7 @@ impossible here, every table the sub-agent emits must be backed by
   from verifier check #6 (`<table>=N <figcaption>Tabelle…=M`), so
   the orchestrator sees Pass 3 actually advanced the totals.
 - For each Pass-3 candidate block walked (not just those extracted),
-  paste the one line from `_tmp/blocks/p<NNN>.txt` that flagged it
+  paste the one line from `<OUT_DIR>/blocks/p<NNN>.txt` that flagged it
   plus a one-line disposition (`extracted`, `already image`, `already
   placed`, `false positive: bullet list`).
 - For each `<figcaption>` typed, paste the verbatim caption text the

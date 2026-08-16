@@ -59,9 +59,9 @@ A shared running head never merges by itself: `Tips & Tricks` runs over pages
 ## Verification
 
 ```bash
-cd tools/img/scan2ocr
+cd tools/img/scan2ocr/rules
 python3 - <<'PY'
-import assemble as A
+import r030_assemble as A
 stream, pi = A.page_stream()
 c = A.candidates(stream); v = A.ask_boundaries(stream, c, pi)
 segs = A.split_articles(stream, c, v); arts = A.merge_continuations(segs)
@@ -83,6 +83,11 @@ dropped as a headline fragment, or a cross-reference. Unexplained loss must be
 Also confirm: no `¬` survives, and every `#` line carries a page range.
 
 ```bash
-grep -c '¬' <YYMM>.md                      # expect 0
-grep -c '^# .*\[[0-9]' <YYMM>.md           # expect = article count
+md=$(python3 -c "import sys; sys.path.insert(0,'tools/img/scan2ocr/rules'); import r030_assemble as A; print(A.ISSUE_MD)")
+grep -c '¬'            "$md"    # expect 0
+grep -c '^# .*\[[0-9]' "$md"    # expect = article count
 ```
+
+`ISSUE_MD` is a constant at the top of `r030_assemble.py` and points into the
+issue's working directory, not into the repo -- ask the module for it rather
+than assuming a path.

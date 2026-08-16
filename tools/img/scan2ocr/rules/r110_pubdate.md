@@ -1,4 +1,4 @@
-# 8 — `pubdate.txt` (publication date)
+# 110 — `pubdate.txt` (publication date)
 
 **Goal:** write the single-line publication date for the issue. The
 generator (`generate.py`) reads `issues/<YYMM>/pubdate.txt` and uses it

@@ -1,4 +1,4 @@
-# 4 — HTML cleanup: blockquote → intro, curly quotes → straight, `<br/>` → `<br>`
+# 070 — HTML cleanup: blockquote → intro, curly quotes → straight, `<br/>` → `<br>`
 
 **Goal:** turn the Discount output into the project's house style:
 - the leading "intro" paragraph in each article comes through as

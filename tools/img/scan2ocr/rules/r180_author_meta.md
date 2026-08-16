@@ -1,4 +1,4 @@
-# 16 — Fill or remove `<meta name="author">` per article
+# 180 — Fill or remove `<meta name="author">` per article
 
 **Goal:** every article in `issues/<YYMM>/` has either a correctly
 filled `<meta name="author" content="…">` (signed by the bylines that
@@ -10,7 +10,7 @@ paragraphs that split.py missed and converts them to
 
 ## Four rules
 
-**Rule 040 — most articles fill from bylines.** For a normal article,
+**Case A — most articles fill from bylines.** For a normal article,
 `content` lists the bylines that appear in the body, in the order
 they appear. Use editor initials exactly as printed (`bs`, `hm`, `ev`,
 etc., or expanded to full names from the previous issue's Impressum:
@@ -24,7 +24,7 @@ editor initials trail. Examples:
 ```
 Body byline `(bs/hm)` → meta `bs, hm`.
 
-**Rule 050 — unsigned articles get NO meta tag.** Delete the line
+**Case B — unsigned articles get NO meta tag.** Delete the line
 entirely (don't leave empty `content=""`, don't leave `XXX`) for:
 - **Leserforum** (per-question authorship — each `<p class="author">`
   inside the Q&A has its own asker)
@@ -37,13 +37,13 @@ entirely (don't leave empty `content=""`, don't leave `XXX`) for:
 - **»Wie schicke ich meine Programme ein?«** (submission rules)
 - House ads / Sonderheft promos with no body byline (Eigenanzeigen)
 
-**Rule 060 — editorial gets the chief editor.** The editorial column
+**Case C — editorial gets the chief editor.** The editorial column
 is *unsigned-feeling* (no `(initials)` byline at the end), but the
 body ends with a chief-editor signature line. The meta lists that
 name. Chief-editor mapping: Michael M. Pauly through 8603,
 Michael Scharfenberger from 8604 onward.
 
-**Rule 070 — placeholder `XXX` is invalid.** Template ships with
+**Case D — placeholder `XXX` is invalid.** Template ships with
 `content="XXX"`. Must be replaced with a real name or the line
 removed. Don't leave `XXX` in any article.
 
@@ -94,18 +94,18 @@ The sub-agent must:
 1. `grep -l 'name="author" content="XXX"' issues/<YYMM>/*.html` — get
    the placeholder set.
 2. `grep -L 'name="author"' issues/<YYMM>/*.html` — get the missing
-   set (should match the Rule-2 unsigned-rubric list; flag anything
+   set (should match the Case B unsigned-rubric list; flag anything
    else).
 3. For each placeholder:
-   - **Rule 050** (unsigned rubric: Leserforum, Impressum, Vorschau,
+   - **Case B** (unsigned rubric: Leserforum, Impressum, Vorschau,
      Fehlerteufelchen, Anwendung-des-Monats, Listing-des-Monats,
      other contest calls, »Wie schicke ich meine Programme ein?«,
      and house-ad / Sonderheft Eigenanzeigen with no byline) →
      **delete the meta line**.
-   - **Rule 060** (editorial column by the chief editor) → set
+   - **Case C** (editorial column by the chief editor) → set
      `content="Michael Scharfenberger"` (from 8604 onward; was
      Michael M. Pauly through 8603).
-   - **Rule 040** (normal article) → read the body's bylines
+   - **Case A** (normal article) → read the body's bylines
      (`<address class="author">(…)</address>`) and concatenate them
      in the order they appear. Expand initials → full names from
      the previous issue's Impressum (typically
@@ -141,7 +141,7 @@ grep -l 'name="author" content="XXX"' "$dir"/*.html && echo "  FAIL: XXX left"
 # 2. no empty content=""
 grep -lE 'name="author" content=""' "$dir"/*.html && echo "  FAIL: empty content"
 
-# 3. articles missing meta must match the Rule-2 unsigned list. Cross-
+# 3. articles missing meta must match the Case B unsigned list. Cross-
 #    check against the same article in the previous issue: if 8606's
 #    Leserforum has no meta, 8607's Leserforum should also have none.
 python3 -c "$(cat <<'PY'

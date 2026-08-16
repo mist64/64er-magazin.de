@@ -1,4 +1,4 @@
-# 18 — Restructure Leserforum into the Q&A shape + banner image
+# 200 — Restructure Leserforum into the Q&A shape + banner image
 
 **Goal:** turn the flat OCR-imported `Leserforum` article into the
 project's canonical Q&A HTML shape (`<article class="qa">`, per-topic
@@ -246,10 +246,12 @@ verbatim into the report**:
   vendor/address line so the orchestrator can confirm no address was
   modernised.
 - For each Pass-10 word-level OCR fix applied, paste the one-line
-  `pdftotext` cross-check (rule 280's evidence form) showing the
+  block-index cross-check (rule 280's evidence form) showing the
   print's actual form is the corrected one, e.g.
   ```
-  pdftotext -layout -f 16 -l 16 issues/<YYMM>/64er_19XX-XX.pdf - | grep -i Drucker
+  OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+  import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+  grep -i Drucker "$OUT_DIR/blocks/p016.txt"
   ```
 - Per-section count: paste the final `<section>` total + the
   `<div class="q">` count, so the orchestrator can confirm no asker

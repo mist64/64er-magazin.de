@@ -1,4 +1,4 @@
-# 21 — Render printed math formulas via MathJax (LaTeX) — when needed
+# 230 — Render printed math formulas via MathJax (LaTeX) — when needed
 
 **Goal:** every typeset math formula in the article HTML — every
 `<p>TODO FORMULA</p>` / `TODO FORMULAS` placeholder and every

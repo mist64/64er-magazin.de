@@ -1,4 +1,4 @@
-# 28 — Heading hierarchy (`<h1>` / `<h2>` / `<h3>`)
+# 290 — Heading hierarchy (`<h1>` / `<h2>` / `<h3>`)
 
 **Goal:** every article's heading hierarchy matches what the print
 typesets. Don't promote / demote on structure alone — judge against
@@ -185,7 +185,7 @@ evidence pasted verbatim into the report**:
 - For each candidate considered but LEFT UNCHANGED, paste the same
   scan-band evidence so the orchestrator can confirm the default-
   to-leave was a real comparison, not a skip-by-omission.
-- For each rule-15 structural override (`<h2>` inside `<aside>`
+- For each structural override (`<h2>` inside `<aside>`
   demoted to `<h3>`), paste the `<aside>…<h2>` line that triggered
   the override.
 
@@ -206,7 +206,7 @@ don't change" after the third repetition of the same mistake.
 
 - **`b94e5876b`** ("8607: heading hierarchy audit — 20 articles
   fixed"). Walked every 8607 article's hierarchy. 9 of the changes
-  were structural (rule-15 h2-in-aside demotions, kept). The other
+  were structural (h2-in-aside demotions, kept). The other
   ~14 were judgement-call promotions / demotions across 12 articles
   (22, 49, 67, 73, 84, 85, 92, 136, 139, 150, 166, 174). All wrong.
 - **`70e6a5905`** ("8607: heading hierarchy + Grafik-Modi review
