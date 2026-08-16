@@ -96,6 +96,10 @@ A candidate is one of:
 
 Actions:
   start     an article begins at this paragraph. Give its clean "title".
+            Normally the paragraph IS the headline and is consumed as the title.
+            For a DEPARTMENT (see below) the title is the running head instead
+            and the paragraph is the first item heading inside it, so add
+            "keep_heading": true and it stays in the text as a section heading.
   continue  no boundary; the paragraph stays where it is, rendered as it is.
   resume    only for "after-cont": the interrupted article's continuation ENDS
             before this paragraph, and from here the page goes back to the
@@ -114,19 +118,28 @@ Actions:
 
 Rules:
 - The running head is the strongest evidence. Consecutive pages under the same
-  running head are one article unless the head is a standing section name
-  ("Aktuelles", "Tips & Tricks", "Software", "Hardware", "Kurs") under which
-  many short items sit, each with its own headline.
-- A short news item with its own headline IS its own article -- the items under
-  "Aktuelles", each a separate piece of news.
-- BUT a recurring column is ONE article containing many items. When a headline
-  names the column itself -- "Tips & Tricks zum C 128", "Tips & Tricks für
-  Einsteiger", "Die CP/M-Ecke (Teil 3)" -- that headline is the article, and
-  every item headline under it ("Die Multifunktions-Taste", "Tip zum MSE",
-  "SMON auf Tastendruck", "Das Programm »KEYFIG«") is "continue", so it renders
-  as a section heading INSIDE the column. Each item having its own byline does
-  not make it an article. The column ends at the next column headline or at an
-  unrelated article.
+  running head normally belong together; a change of running head is almost
+  always a boundary. What the head does NOT settle is whether the run is one
+  department, one column, or several separate articles -- see the next rules.
+- A DEPARTMENT is one article, however many items it holds. A department is a
+  run of consecutive pages under the same standing running head, where the
+  magazine prints NO headline naming the department itself -- "Aktuelles"
+  (pages 8-12) and "Leserforum" are the two here. The department is one article
+  whose title is the running head, and every item headline inside it is
+  "continue", so it renders as a section heading. It ends where the running head
+  changes.
+  This is the ONE case where the running head becomes a title, because there is
+  no other headline for the whole run.
+- A COLUMN is likewise one article, but the magazine DOES print its headline:
+  "Tips & Tricks zum C 128", "Tips & Tricks für Einsteiger", "Die CP/M-Ecke
+  (Teil 3)". That printed headline is the article title, and the item headlines
+  under it ("Die Multifunktions-Taste", "Tip zum MSE", "SMON auf Tastendruck",
+  "Das Programm »KEYFIG«") are "continue" -> section headings. Each item having
+  its own byline does not make it an article. The column ends at the next column
+  headline or at an unrelated article.
+  Note the running head "Tips & Tricks" covers many pages that are NOT part of
+  any column -- full articles like "Module für Hypra-Basic" or "HiRes Colossal"
+  sit under it too. A shared running head alone never merges those.
 - A column name is a STANDING name that recurs issue to issue and names no
   subject of its own. A headline that names a specific product, program, machine
   or event is an article even when it shares a page with others -- "Professionell
@@ -144,16 +157,17 @@ Rules:
 - The title you return is what the READER sees, corrected for obvious OCR
   damage ("Comnuter" -> "Computer"). Do not invent, translate or expand it, and
   do not add the page number.
-- NEVER use the running head as the title. The running head is the section the
-  item sits in ("Leserforum", "Aktuelles", "Tips & Tricks"); the title is the
-  item's own headline. If the candidate paragraph IS the headline -- a short
-  line, often set in capitals -- that headline is the title, verbatim.
+- Outside the DEPARTMENT case above, never use the running head as the title:
+  it names the section, not the item. If the candidate paragraph IS the headline
+  -- a short line, often set in capitals -- that headline is the title.
 - Prefer "continue" when unsure. A missed boundary merges two articles; a false
   one cuts an article in half and strands its second half without a headline.
 
 Return ONLY a JSON object, no prose, no code fence:
-{{"boundaries": {{"<id>": {{"action": "start|continue|drop", "title": "..."}}, ...}}}}
-"title" is required for "start" and omitted otherwise. Every id must appear.
+{{"boundaries": {{"<id>": {{"action": "start|continue|resume|drop", "title": "...",
+                        "keep_heading": true}}, ...}}}}
+"title" is required for "start" and omitted otherwise; "keep_heading" only on a
+department's opening "start". Every id must appear.
 
 TABLE OF CONTENTS:
 {toc}
@@ -351,9 +365,11 @@ def split_articles(stream, cands, verdict):
             cur = {"kind": "article", "title": (a.get("title") or p["text"]).strip(),
                    "start": p["page"], "paras": [], "pages": []}
             segments.append(cur)
-            # The headline paragraph itself becomes the article title and is not
-            # repeated in the body.
-            if p["role"] == "title":
+            # The headline paragraph becomes the article title and is not
+            # repeated in the body -- unless this is a department, whose title is
+            # the running head ("Aktuelles"): there the paragraph is the first
+            # item heading and has to stay.
+            if p["role"] == "title" and not a.get("keep_heading"):
                 cur["pages"].append(p["page"])
                 continue
         if cur is None:
