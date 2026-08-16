@@ -41,14 +41,19 @@ A candidate IS a figure when it is:
   - a photograph (product shot, portrait, press photo)
   - a screen photograph or a printer hardcopy, even though it shows text
   - a diagram, schematic, flowchart, chart or graph
-  - line art, a drawing, a cartoon, a wordmark or a rubric logo/badge
+  - line art, a drawing or a cartoon
 A candidate is NOT a figure when it is:
   - body text, a headline, a standfirst, a caption
   - a DATA TABLE of typeset text (rows of specifications, prices, functions),
     even when it is set on a grey or yellow tint. These get transcribed as HTML
     tables elsewhere, not cropped.
   - a BASIC program listing printed for the reader to type in
-  - a page banner, a rule, or blank paper
+  - PAGE FURNITURE: a rubric badge or section logo ("64'er Test", "BUECHER",
+    "LESERFORUM", "Aktuelles"), a headline or headline banner, a running head, a
+    page number, a footer, a rule, or blank paper. These are printed once per
+    article by the magazine's layout, not placed as an illustration. They look
+    like line art and they are cropped cleanly, which is exactly why they keep
+    being kept -- judge them by their ROLE on the page, not their appearance.
   - anything belonging to an advertisement
 
 For each candidate that IS a figure, also give:
@@ -82,6 +87,9 @@ CAPTION LINES PRINTED ON THIS PAGE:
 """
 
 
+PROMPT_KEY = hashlib.sha256(PROMPT.encode("utf-8")).hexdigest()[:16]
+
+
 def judge(page):
     cand_path = f"{OUT}/p{page:03d}.json"
     if not os.path.exists(cand_path):
@@ -95,8 +103,12 @@ def judge(page):
     # a different list: indices no longer lined up, and 168 candidates produced
     # 22 figures with three of the four buckets empty.  Exactly the failure the
     # stage-020 label cache had, and the same fix.
+    # ...and on the PROMPT as well.  Keyed on the boxes alone, rewriting the
+    # instructions changed nothing: every page returned its old cached verdict
+    # and the change looked like it had no effect.  Stage 020 keeps a PROMPT_KEY
+    # for exactly this reason.
     key = hashlib.sha256(
-        json.dumps([c["bbox"] for c in cands], sort_keys=True).encode()
+        (json.dumps([c["bbox"] for c in cands], sort_keys=True) + PROMPT_KEY).encode()
     ).hexdigest()[:16]
     if os.path.exists(dest):
         old = json.load(open(dest))
@@ -114,7 +126,7 @@ def judge(page):
     for i, c in enumerate(cands):
         x0, y0, x1, y1 = c["bbox"]
         anchor = (f"  ANCHORED ON CAPTION: {c['caption']!r}" if c.get("caption")
-                  else "  no caption -- an opening photo, cover or rubric badge")
+                  else "  no caption -- an opening photo or a cover")
         lines.append(f"[{i}] {c['w']}x{c['h']} px at x={x0} y={y0}  "
                      f"measured_type={c['type']}{anchor}")
     prompt = PROMPT.format(page=page, cands="\n".join(lines),
