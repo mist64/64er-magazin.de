@@ -87,6 +87,7 @@ GUTTER_BLANK_FRAC = 0.995   # share of the column's height that must be paper
 PANEL_TINT_FRAC = 0.55  # share of a row that must be marked to still be panel
 PANEL_STEP_PX = 4       # rows per step while following it
 PANEL_GAP_PX = 120      # unmarked run crossed if the tint resumes beyond it
+PANEL_BARE_FRAC = 0.20  # ...but never across a row this bare: that is the edge
 TINT_SAT = 22           # RGB max-min above this is ink/tint, not scanned paper
 # Text printed ON a figure -- pin labels, a menu, a printout's edge digits --
 # is figure matter, not a boundary.  Body text sits on bare paper.
@@ -750,6 +751,15 @@ def figures(page):
     # big tint panel would otherwise disqualify its own body columns: labels are
     # short, paragraphs are not.
     def on_figure(b, bb):
+        # A CAPTION IS ALWAYS A BOUNDARY.  It is short, and where the figures
+        # are tint panels it sits against them, so it satisfied both halves of
+        # the on-figure test and stopped being a stopper -- which let a box grow
+        # straight up through the caption of the figure above and merge the two.
+        # The ninth census found nine such merges in the colour bucket alone
+        # (21-1, 27-2, 27-4, 39-3, 160-2, 172-0 stacked vertically).  Panel
+        # growth has its own, narrower exemption for a figure's OWN caption.
+        if b.get("label") == "caption":
+            return False
         if b.get("n_words", 0) > TINT_BLOCK_MAX_WORDS:
             return False
         x0, y0, x1, y1 = (int(v) for v in bb)
@@ -775,7 +785,21 @@ def figures(page):
         if cap["share"] > 1:
             w = (cx1 - cx0) / cap["share"]
             cx0, cx1 = int(cx0 + cap["index"] * w), int(cx0 + (cap["index"] + 1) * w)
+        # A CAPTION'S BAND STOPS AT THE CAPTION ABOVE IT.  Reaching 62% of the
+        # page upward, the band ran over the previous figure AND its caption, so
+        # one caption claimed the illustrations of the figure above and unioned
+        # both into a single crop.  The ninth census found nine of these merges
+        # in the colour bucket alone -- 27-2 came out 2151x5512 px, holding
+        # "Bild 1", its caption and "Bild 2".  A caption belongs to the figure
+        # above it, so the previous caption's foot is where this figure starts.
         band_top = cy0 - int(MAX_FIGURE_FRAC * H)
+        for other in caps:
+            oy1 = other["bbox"][3]
+            if oy1 >= cy0 or other is cap:
+                continue
+            if min(cx1, other["bbox"][2]) - max(cx0, other["bbox"][0]) <= 0:
+                continue                        # a different column
+            band_top = max(band_top, int(oy1) + CAPTION_GAP_PX)
         mine = [i for i, r in enumerate(illus)
                 if i not in claimed and r[3] <= cy0 + CAPTION_GAP_PX and r[3] >= band_top
                 and min(cx1, r[2]) - max(cx0, r[0]) > CAPTION_MEASURE_MATCH * min(cx1 - cx0, r[2] - r[0])]
@@ -910,6 +934,19 @@ def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
         for d in range(0, PANEL_GAP_PX, PANEL_STEP_PX):
             yy = y + d * step
             if not (MARGIN_PX <= yy < H - MARGIN_PX):
+                return None
+            row = marked[yy, x0:x1]
+            # BARE PAPER ENDS THE PANEL; A WHITE BOX ON IT DOES NOT.
+            #
+            # Crossing any short unmarked run let growth step over the gap
+            # BETWEEN two stacked figures, merging them -- p27's two greeting
+            # cards came out as one 2151x5512 crop.  Size cannot separate the
+            # two cases, but the paper can: a white field knocked out of a panel
+            # still has panel either side of it, while the gap between two
+            # figures is bare edge to edge.  MEASURED: p143's internal white
+            # field reads 0.435 marked across the box, p27's inter-card gap
+            # reads 0.00.
+            if row.size and row.mean() < PANEL_BARE_FRAC:
                 return None
             if tinted(yy) and free(yy):
                 return yy + step * PANEL_STEP_PX
