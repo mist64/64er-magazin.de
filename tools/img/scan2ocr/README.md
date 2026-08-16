@@ -27,7 +27,7 @@ Measured against a vision reading of all 176 pages of issue 8609:
 | order | 0.996 |
 | headings | 0.874 |
 | corpus | ~412,000 chars over 91 pages |
-| assembled | 82 articles, ~397,000 chars |
+| assembled | 72 articles, ~396,000 chars |
 
 ⚠️ **Scores are only comparable within one set of `truth/` files.** Regenerating
 truth (any change to `TRUTH_PROMPT`) re-bases every number. When you regenerate,
@@ -160,18 +160,26 @@ and `(Knut Smoczyk/tr)` — a reader's name, then the editor who took it in. Bot
 end in exactly two lowercase letters. Kept verbatim, always split into their own
 paragraph.
 
-**A reader's tip is its own article**, not a section of the `Tips & Tricks` page
-it sits under: each carries its own headline *and its own byline*, a different
-author every time. Stating that in the prompt is what keeps it stable — left to
-inference the model folded twelve of them into their parent page on one run and
-not the next.
+**A recurring column is ONE article containing many items.** `Tips & Tricks für
+Einsteiger` is the article; `Die Multifunktions-Taste`, `Tip zum MSE`, `SMON auf
+Tastendruck` are `##` sections inside it, each keeping its own byline. The same
+holds for `Die CP/M-Ecke`. A headline that names a specific product or event is
+an article even when it shares a page — `Professionell und preiswert` (a Forth
+compiler test) is not a section of the assembler comparison beside it.
+
+Left to inference this flipped twelve articles between runs, so both halves of
+it are stated in the prompt with examples.
 
 ---
 
 ## Hyphens
 
-A hyphen at a line end is **marked, not resolved** by stages A–C: it becomes `¬`.
-German writes
+A hyphen at a line end is **marked, not resolved** by stages A–C: it becomes `¬`
+— at a line break inside a block, and equally at a **column or page break**,
+which is the same physical fact. (p8's `Jack Tramiel ver-` / `folgte in Amerika`
+came out as `ver- folgte` while only line breaks were marked; 145 joins across
+the issue have a trailing hyphen, most of them genuine suspended hyphens that
+must keep it.) German writes
 one for three different reasons and no local rule separates them —
 
 | printed | reading | correct output |

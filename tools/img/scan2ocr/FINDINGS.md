@@ -247,6 +247,24 @@ then answers yes for every remaining paragraph of that page, and the whole page
 merges into one. MEASURED on p146, whose second paragraph vanished into its
 first. Track the last page seen separately.
 
+**A trailing hyphen at a COLUMN or PAGE break is a line-break hyphen too.**
+`reflow()` only sees the lines inside one block, so p8's `Jack Tramiel ver-` /
+`folgte in Amerika` — two blocks — was joined with a space into `ver- folgte`.
+145 joins across the issue carry a trailing hyphen; most are genuine suspended
+hyphens (`Informations- und`, `Fach- und`) that must keep it, the rest soft ones
+(`Pro- gramme`, `vor- handen`) that must lose it, and nothing local separates
+them. All three join sites now share one `join_text()` that marks it.
+
+**Each paragraph's own first-line indent decides whether it continues the one
+before — not its page's first indent.** After a continuation splice the joined
+paragraph is not the first on its page: reading the page's indent welded the
+assembler course onto an unrelated notice about the Austrian edition on p140.
+
+**A recurring column is one article.** `Tips & Tricks für Einsteiger` holds eight
+items, each with its own headline and its own byline by a different author; they
+are `##` sections, not articles. Left to inference this flipped twelve articles
+between runs, so the rule and its counter-examples are both in the prompt.
+
 **Hyphens are resolved over the distinct words, not the occurrences** — the
 answer is a property of the word, and the issue's 4287 marks are only 3459
 different words. Two 1986 traps, both present and both got right: pre-reform
