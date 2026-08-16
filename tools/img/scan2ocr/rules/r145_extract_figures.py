@@ -40,6 +40,7 @@ PAD = 8
 BORDER_DARK = 90
 BORDER_FRAC = 0.90
 BORDER_MAX_PX = 40
+BORDER_RULE_MAX_PX = 30   # thicker than this is content, not a printed rule
 BORDER_OVERCUT = 1
 
 # Body text tesseract failed to block looks exactly like a figure to a gap
@@ -437,13 +438,24 @@ def snap_to_frame(grey, x0, y0, x1, y1, W, H):
 
 def cut_inside_rule(grey, x0, y0, x1, y1):
     def band(profile):
+        """The first THIN dark band near the edge -- a printed rule.
+
+        A thickness limit is what makes this a rule detector rather than an
+        edge trimmer.  Without it, a screen photograph's solid status bar is a
+        full-width dark band at the bottom of the box, so the "frame" was found
+        inside the picture and everything below it discarded: bottom shear was
+        10 of 17 crops in the bw bucket, clipping exactly the last screen row
+        (39-4, 39-5), the status line (39-3b) or the frame's own bottom rule
+        (124-3).  A rule printed at 600 dpi is a few pixels; a status bar is
+        tens of them.
+        """
         first = None
         for i, v in enumerate(profile[:BORDER_MAX_PX]):
             if v >= BORDER_FRAC:
                 if first is None:
                     first = i
             elif first is not None:
-                return first, i
+                return None if i - first > BORDER_RULE_MAX_PX else (first, i)
         return None
     blk = grey[y0:y1, x0:x1] < BORDER_DARK
     t = band(blk.mean(axis=1)); b = band(blk.mean(axis=1)[::-1])
