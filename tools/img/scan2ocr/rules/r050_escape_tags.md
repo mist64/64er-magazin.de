@@ -1,4 +1,4 @@
-# 2 — Escape angle-bracket text that isn't a real HTML tag
+# 050 — Escape angle-bracket text that isn't a real HTML tag
 
 **Goal:** prevent the browser (and the markdown converter) from swallowing
 text like `<RETURN>`, `<SHIFT-RUN/STOP>`, `<F3>`, `<CBM>`, … by escaping

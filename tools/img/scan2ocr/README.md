@@ -50,8 +50,9 @@ the working issue. Change them there, per issue; there is no flag.
 ## Running it
 
 The pipeline is a numbered chain in [`rules/`](rules/), shared with the
-issue-build steps that follow it. Each step is `NNN_name.md` (the spec, with a
-mandatory Verification block) beside `NNN_name.sh` (the entry point).
+issue-build steps that follow it. Each step is `rNNN_name.md` — the spec, with a mandatory Verification block.
+Steps that are scripted carry an `rNNN_name.sh` beside it; the editorial ones
+are executed by a sub-agent from the spec, so they have none.
 
 ```sh
 rules/r010_ocr_blocks.sh     # OCR + geometry + the block index   (~15 min, local)
@@ -64,9 +65,9 @@ Then steps 040–300 take the `.md` on to the published HTML. Read
 how every step is run and verified, and carries the old→new number mapping for
 `LOG.md` entries written before the chains were merged.
 
-The Python programs live here rather than in `rules/` because a Python module
-cannot start with a digit and `classify` imports `ocr_blocks`; the numbered
-`.sh` beside each spec is the entry point.
+The programs live in `rules/` beside their specs and share their names. The `r`
+prefix is what allows that: a Python module name cannot start with a digit, so
+`r010_ocr_blocks` is importable by name where `010_ocr_blocks` was not.
 
 **After any change to step 010, wipe `OUT_DIR` and start from page 1.** Step 020
 caches its verdict per page, keyed on both the block ids step 010 produced *and*
@@ -76,7 +77,7 @@ the old answers.
 ## Stages and outputs
 
 ```
-A  r010_ocr_blocks.py   thumbs/NNN.png -> 300 dpi grey -> tesseract TSV
+A  r010_ocr_blocks.py   master600/NNN.png -> 300 dpi grey -> tesseract TSV
                    -> NNN.json         blocks: bbox, features, geometric label
                    -> NNN.digest.txt   compact page brief for stage B
                    -> NNN_boxes.png    overlay

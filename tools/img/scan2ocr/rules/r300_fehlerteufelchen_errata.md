@@ -1,4 +1,4 @@
-# 29 — Apply cross-issue Fehlerteufelchen errata to this issue's articles
+# 300 — Apply cross-issue Fehlerteufelchen errata to this issue's articles
 
 **Goal:** the "Fehlerteufelchen" was 64'er's errata column. Corrections
 for **this** issue's articles were printed in the Fehlerteufelchen rubric
@@ -12,15 +12,15 @@ freshly-built issue has **zero**: the errata live in issues that are
 imported later, so this step is a **cross-issue enrichment**, not a
 single-issue transform.
 
-## Run order — LAST (after rules 0–28)
+## Run order — LAST (after rules 000–290)
 
 This rule must run **after** every single-issue rule is done, because it:
 - wraps a **figure caption / listing caption / table cell / inline value**
-  in a link — so figures (rules 10/12), listings (rules 10/14) and tables
+  in a link — so figures (rules 130/150), listings (rules 130/170) and tables
   (rule 160) must already be placed, and
 - edits `prg/<name>.txt` — so the PRG extraction (rule 120) must be done, and
-- must not be disturbed by later text passes — so heading case (25),
-  autolink (26), OCR cleanup (27) and hierarchy (28) must already have run
+- must not be disturbed by later text passes — so heading case (260),
+  autolink (270), OCR cleanup (280) and hierarchy (290) must already have run
   (they would otherwise re-touch the wrapped element).
 
 It is also **re-run over old issues** whenever a new issue is imported, in
@@ -30,10 +30,10 @@ of **every issue after `YYNN`**.
 
 ## Full procedure
 
-That workflow doc is the authoritative, exhaustive procedure (finding the
-rubric page in each candidate issue, three-OCR-layer verification, building
-the `Fehlerteufelchen.md` index, the `prg/*.txt` Style A/B patterns). Read
-it before running this rule. The essentials are distilled below.
+The exhaustive procedure — finding the rubric page in each candidate issue,
+three-OCR-layer verification, building the `Fehlerteufelchen.md` index, the
+`prg/*.txt` Style A/B patterns — is the **appendix at the foot of this file**.
+Read it before running this rule. The essentials are distilled below.
 
 ## Inputs
 
@@ -42,7 +42,7 @@ it before running this rule. The essentials are distilled below.
   workflow doc from the later issues' Fehlerteufelchen rubrics.
 - `fehlerteufelchen_pages/<issue>.pdf` — single-page rubric extracts,
   **untracked; never `git add` them, never name them in a commit message**
-  (workflow doc step 10).
+  (appendix step 10).
 - The already-imported FT-source article HTML where available
   (`issues/<FT-issue>/<page> Fehlerteufelchen.html`) — the erratum text is
   transcribed from there / the scan, never composed from memory.
@@ -110,7 +110,7 @@ it before running this rule. The essentials are distilled below.
    still carries the correction.
 
 4. **Patch the source listing** `issues/<source-issue>/prg/<name>.txt` when
-   the erratum fixes numbered Basic code (workflow doc step 8): header
+   the erratum fixes numbered Basic code (appendix step 8): header
    `;inkl. Fehlerteufelchen N/YYYY` after the `;<file>.prg ==XXXX==` line,
    then Style A (single inline `;Zeile X neu entspr. …` marker above the
    fixed line) or Style B (comment the old line with `;`, corrected line
@@ -123,7 +123,7 @@ Every erratum word must trace to the print: render the FT PDF page → OCR
 `_tmp/<issue>_ft.txt` → Read that file → edit the article. Never compose
 erratum text from memory. Preserve original typos and German spelling
 (`daß`, `muß`, »…«). See [[feedback_print_verbatim]] and
-`tools/png2mag/WORKFLOW.md`.
+the anti-memory rule in `r000_orchestration.md`.
 
 ## Asymmetry to watch (both sides!)
 
@@ -160,13 +160,14 @@ the "Verification checklist" below.
   folded into Basic-Corner / Tips & Tricks / Reparaturecke — so for a 1986
   issue, later 1986–1987 issues are the primary hunting ground.
 - A cartoon-devil banner heads the rubric and is usually invisible to OCR —
-  always confirm the rubric page visually (workflow doc step 1).
+  always confirm the rubric page visually (appendix step 1).
 
 ---
 
 # Appendix — the procedure in full
 
-Folded in from what used to be `tools/llm/new/fehlerteufelchen_workflow.md`.
+Folded in from what used to be the separate fehlerteufelchen workflow doc,
+which lived outside the rules directory.
 A rule must be self-contained: r000 briefs a sub-agent with the rule file as its
 primary instruction source, so a rule that points outward for its actual
 procedure hands the sub-agent an incomplete spec.
@@ -349,5 +350,5 @@ Don't compose erratum text from memory or training knowledge — every word must
 ## Related
 
 - Errata items index: `/Fehlerteufelchen.md`
-- Standard PRG workflow: `tools/llm/new/prg_workflow.md`
-- Anti-memory enforcement: `tools/png2mag/WORKFLOW.md`
+- Standard PRG workflow: rule `r120_prg_from_d64.md`
+- Anti-memory enforcement: `r000_orchestration.md`, "OCR cleanup granularity"

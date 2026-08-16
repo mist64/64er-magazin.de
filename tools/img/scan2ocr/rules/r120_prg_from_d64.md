@@ -1,4 +1,4 @@
-# 9 — Extract listings from the disk image into `prg/`
+# 120 — Extract listings from the disk image into `prg/`
 
 **Goal:** decompose the issue's official `.D64` (or several, e.g. side A
 and side B) into a per-file directory `issues/<YYMM>/prg/` plus a

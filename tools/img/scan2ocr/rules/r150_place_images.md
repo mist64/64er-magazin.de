@@ -1,4 +1,4 @@
-# 12 — Place image figures into article HTML
+# 150 — Place image figures into article HTML
 
 **Goal:** turn every loose `<page>-<n><suffix>.png` (and `title.png` if
 unhandled elsewhere) in the issue directory into a `<figure>` or

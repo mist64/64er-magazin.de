@@ -1,4 +1,4 @@
-# 14 — Transcribe `<pre>TODO</pre>` listings from the printed scan
+# 170 — Transcribe `<pre>TODO</pre>` listings from the printed scan
 
 **Goal:** turn every `<pre>TODO</pre>` placeholder (and the lone
 `<p>TODO LISTING</p>` if any) into a verbatim transcription of the
@@ -64,7 +64,7 @@ The sub-agent must:
    - Splice the OCR text into the `<pre>` via the shell `head + cat +
      tail` pattern (NOT the Edit tool — multi-line code retyped via
      Edit is a memory write, forbidden).
-3. Also resolve any `<p>TODO LISTING</p>` (the rule-3 markdown→html
+3. Also resolve any `<p>TODO LISTING</p>` (the rule 060 markdown→html
    conversion sometimes emits this as a paragraph placeholder for
    inline declarations) — replace with an unwrapped `<pre>` block if
    the printed text is short and uncaptioned, or with a
@@ -89,8 +89,7 @@ principle):
   listings.
 - **NEVER fabricate the `<figcaption>`.** The caption belongs to the
   print, not to you. Transcribe it verbatim from step 010's block index
-  or a 600 dpi scan crop (on scanned issues `pdftotext` is VOID per
-  rule 280); if you cannot read it, leave a bare `Listing N.` (no
+  or a 600 dpi scan crop (the PDF text layer is void, see r000); if you cannot read it, leave a bare `Listing N.` (no
   title) and flag it — do not compose a plausible descriptive title.
   A made-up caption is a defect even when it reads plausibly. Equally,
   do not delete a genuine caption as "invented" without a scan check:
@@ -173,7 +172,7 @@ the report**:
 
 - For each transcribed listing, paste the crop path used
   (`/tmp/64er_<YYMM>_pages_300/p-NNN.png` + bbox from
-  `_tmp/blocks/p<NNN>.txt`) so the orchestrator can re-open the same
+  `<OUT_DIR>/blocks/p<NNN>.txt`) so the orchestrator can re-open the same
   image and spot-check 2-3 lines against what landed in the `<pre>`.
 - For each listing, paste the first and last 2 lines of the splice
   output (the lines that anchor the OCR to a specific position in the
@@ -197,7 +196,7 @@ canonical anti-memory violation.
   is the most common "not on disk" language in any issue — the disk
   format is C64-specific, so non-C64 source code never ships.
 - Watch out for the `<p>TODO LISTING</p>` pattern (single paragraph
-  placeholder) vs. the rule-10 `<figure><pre>TODO</pre>` pattern
+  placeholder) vs. the rule 130 `<figure><pre>TODO</pre>` pattern
   (full figure wrapper). They're emitted by different upstream
   steps and resolve to different shapes.
 - `js-beautify` is well-behaved with `<pre>` by default but worth

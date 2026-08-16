@@ -1,4 +1,4 @@
-# 7 — Fill `64er.toc_category` in every article from a mapping
+# 100 — Fill `64er.toc_category` in every article from a mapping
 
 **Goal:** replace the placeholder line
 `<!-- <meta name="64er.toc_category" content="XXX"> -->`

@@ -33,9 +33,49 @@ for num in $(grep -rhoI --exclude-dir=__pycache__ -E '\b[Ss]tep [0-9]{3}\b' $D |
 done
 echo "   ok"
 
-echo "5. no bare 'rule N' left in the old numbering"
-left=$(grep -rhoI --exclude-dir=__pycache__ -E '\b[Rr]ule [0-9]{1,2}b?\b' $D | sort -u | tr '\n' ' ')
-if [ -n "$left" ]; then echo "   REVIEW: $left"; else echo "   none"; fi
+echo "5. no old-numbering reference in any spelling"
+# The first renumber missed rule-9, rules 10/12, (27) and rules 0-28 because the
+# regex demanded "rule" + a space + one noun.  Every form the audit found is
+# covered here; a form that is not covered is a form that will silently rot.
+left=$(grep -rhoI --exclude-dir=__pycache__ --exclude="$(basename "${BASH_SOURCE[0]}")" -E \
+  "[Rr]ules?[- ][0-9]{1,2}([/,–-][0-9]{1,2})*\b" $D \
+  | grep -vE "[Rr]ules?[- ](0[0-9][0-9]|[0-9]{3})" | sort -u | tr '\n' ' ')
+if [ -n "$left" ]; then echo "   REVIEW: $left"; fail=1; else echo "   none"; fi
+
+echo "8. every H1 number matches its filename"
+python3 - "$D" <<'PY2' || fail=1
+import glob, os, re, sys
+d = sys.argv[1]; bad = []
+for f in sorted(glob.glob(os.path.join(d, "r[0-9][0-9][0-9]_*.md"))):
+    num = os.path.basename(f)[1:4]
+    first = open(f, encoding="utf-8").readline()
+    m = re.match(r"^# (\d+b?) ", first)
+    if not m or m.group(1) != num:
+        bad.append(f"{os.path.basename(f)} -> {first.strip()[:40]!r}")
+print("   " + ("; ".join(bad) if bad else "all H1 numbers match"))
+sys.exit(1 if bad else 0)
+PY2
+
+echo "9. every repo path a rule names exists"
+python3 - "$D" <<'PY3' || fail=1
+import glob, os, re, sys
+d = sys.argv[1]; root = os.path.abspath(os.path.join(d, "..", "..", "..", ".."))
+bad = set()
+pat = re.compile(r"`(tools/[A-Za-z0-9_./-]+)`")
+for f in sorted(glob.glob(os.path.join(d, "r*.md"))):
+    body = open(f, encoding="utf-8").read()
+    for p in pat.findall(body):
+        p = p.rstrip(".")
+        if not os.path.exists(os.path.join(root, p)):
+            bad.add(f"{os.path.basename(f)}: {p}")
+print("   " + ("; ".join(sorted(bad)) if bad else "all named tools/ paths exist"))
+sys.exit(1 if bad else 0)
+PY3
+
+echo "10. the three program steps' verification blocks import cleanly"
+(cd "$D" && python3 -c "
+import r010_ocr_blocks, r020_classify, r030_assemble, r010_blocks_index
+print('   4 step modules import')" ) || fail=1
 
 echo "6. nothing from issues/ or scan2mrc is staged"
 if git diff --cached --stat -- issues/ tools/img/scan2mrc/ | tail -1 | grep -q .; then

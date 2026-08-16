@@ -1,4 +1,4 @@
-# 24 — Tag every contact/reference footer with `<p class="source">`
+# 250 — Tag every contact/reference footer with `<p class="source">`
 
 **Goal:** every paragraph in an article that points the reader at an
 external party (where to buy, who to contact, what else to read)

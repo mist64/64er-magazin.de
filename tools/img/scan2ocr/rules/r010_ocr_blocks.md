@@ -21,12 +21,12 @@ tools/img/scan2ocr/rules/r010_ocr_blocks.sh          # all 176 pages
 tools/img/scan2ocr/rules/r010_ocr_blocks.sh 39 41    # a page range
 ```
 
-The programs themselves live one level up in `tools/img/scan2ocr/` and keep
-importable names — a Python module cannot start with a digit, and `classify`
-imports `ocr_blocks`. The numbered `.sh` beside this file is the entry point,
-and it carries the parallelism, which is not a detail: numpy stages want
-`OMP_NUM_THREADS=1` and many lanes, and this box is shared with a job that
-swap-thrashes if crowded.
+The programs sit beside this file and share its name. The `r` prefix is what
+makes that possible: a Python module name cannot start with a digit, so
+`r010_ocr_blocks` is importable by name where `010_ocr_blocks` was not. The
+numbered `.sh` is the entry point, and it carries the parallelism, which is not
+a detail: numpy stages want `OMP_NUM_THREADS=1` and many lanes, and this box is
+shared with a job that swap-thrashes if crowded.
 
 ~15 minutes for 176 pages. Deterministic and local — no model is called.
 
@@ -42,10 +42,10 @@ out/NNN.json          blocks: bbox, features, geometric label, text
 out/NNN.digest.txt    compact page brief for step 020
 out/NNN_boxes.png     overlay — every block outlined, id printed
 out/NNN.article.txt   PROVISIONAL text from geometry alone; step 020 overwrites it
-out/blocks/pNNN.txt   the block index: bbox in MASTER pixels + text preview
+<OUT_DIR>/blocks/pNNN.txt   the block index: bbox in MASTER pixels + text preview
 ```
 
-`out/blocks/pNNN.txt` replaces the old rule `9b`, which re-OCR'd the
+`<OUT_DIR>/blocks/pNNN.txt` replaces the old rule `9b`, which re-OCR'd the
 delivered PDF and reduced the TSV with awk. This step already OCR'd every page
 and already knows every bbox, so the index is a projection of data we have. It
 costs no OCR and cannot disagree with the corpus.
@@ -56,7 +56,7 @@ delivered PDF's page space; the PDF page is neither deskewed nor cropped, so the
 two differ by a rotation and an offset. Crop from the master:
 
 ```bash
-grep -iE "listing|tabelle|bild" out/blocks/p145.txt
+grep -iE "listing|tabelle|bild" <OUT_DIR>/blocks/p145.txt
 magick <SRC_DIR>/145.png -crop 2136x574+390+3736 +repage /tmp/64er_crop.png
 ```
 
@@ -79,8 +79,8 @@ of them** and leaves the choice to step 020, which can read the text:
 ## Verification
 
 ```bash
-cd "$(dirname "$0")/.." 2>/dev/null || cd tools/img/scan2ocr
-dir=$(python3 -c "import ocr_blocks; print(ocr_blocks.OUT_DIR)")
+cd tools/img/scan2ocr/rules
+dir=$(python3 -c "import r010_ocr_blocks as OB; print(OB.OUT_DIR)")
 
 # 1. every page produced a JSON, a digest and an overlay
 ls $dir/*.json | grep -vc 'labels' ; ls $dir/*.digest.txt | wc -l ; ls $dir/*_boxes.png | wc -l
@@ -91,7 +91,7 @@ ls $dir/blocks/p*.txt | wc -l
 # 3. no page silently produced nothing
 python3 - <<'PY'
 import glob, json, os
-import ocr_blocks as OB
+import r010_ocr_blocks as OB
 empty = [f for f in sorted(glob.glob(os.path.join(OB.OUT_DIR, "[0-9][0-9][0-9].json")))
          if not json.load(open(f, encoding="utf-8"))["blocks"]]
 print("pages with zero blocks:", [os.path.basename(f) for f in empty] or "none")

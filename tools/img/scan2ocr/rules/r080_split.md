@@ -1,4 +1,4 @@
-# 5 — Split the consolidated `.html` into one file per article
+# 080 — Split the consolidated `.html` into one file per article
 
 **Goal:** turn the single `issues/8607/8607.html` into one HTML file per
 article (e.g. `issues/8607/8 Aktuelles.html`, `issues/8607/19 Der Neue.html`,
@@ -33,7 +33,7 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
   elements (e.g. `<address class="author">(xy)</address>`) stay on a
   single line. Requires Node/npm available on `PATH`; on first run `npx`
   fetches `js-beautify` from the network.
-- a small text cleanup pass (idempotent with step 4 because the same
+- a small text cleanup pass (idempotent with step 070 because the same
   substitutions are applied):
   - `<blockquote><p>` → `<p class="intro">`
   - `</blockquote>` → *(removed)*
@@ -200,7 +200,7 @@ that file, not the rule.
 ## Notes / lessons
 
 - split.py's text replacements overlap with `r070_html_cleanup.sh`. That's
-  intentional — running 4 first means the .html is already clean when split
+  intentional — running 070 first means the .html is already clean when split
   starts, and split's own replacements become no-ops. Either order is safe.
 - Bylines must look like `<p>(Author Name)</p>` or `<p>(Name1/Name2)</p>`
   on their own paragraph. Bylines embedded mid-sentence won't be picked up.

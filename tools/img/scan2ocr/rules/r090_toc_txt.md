@@ -1,4 +1,4 @@
-# 6 — `toc.txt`: order of TOC categories for the issue
+# 090 — `toc.txt`: order of TOC categories for the issue
 
 **Goal:** produce `issues/<YYMM>/toc.txt`, the per-issue ordered list of
 allowed `64er.toc_category` values. The site generator reads this file

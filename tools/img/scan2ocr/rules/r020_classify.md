@@ -65,7 +65,7 @@ something new.
 ## Verification
 
 ```bash
-cd tools/img/scan2ocr
+cd tools/img/scan2ocr/rules
 python3 r020_evaluate.py $(seq 1 176)      # scores against a vision reading
 python3 r020_collect.py                    # review bundle: pNNN.png + pNNN.txt
 ```

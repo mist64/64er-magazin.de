@@ -1,4 +1,4 @@
-# 10 — Place `<figure>` tags for the extracted listings
+# 130 — Place `<figure>` tags for the extracted listings
 
 **Goal:** turn the worklist `issues/<YYMM>/prg.txt` into real, placed
 listing figures inside each per-article HTML, and finish each one with
@@ -21,7 +21,8 @@ are not.
   is 36").
 - `issues/<YYMM>/prg/` — the actual `.txt` / `.prg` files.
 - `issues/<YYMM>/64er_*.pdf` — for verbatim captions; one-time
-  `pdftotext -layout … /tmp/64er_<YYMM>_full.txt` makes them grep-able.
+  concatenating step 010's block index makes them grep-able:
+  `cat "$OUT_DIR"/blocks/p*.txt > /tmp/64er_<YYMM>_full.txt`.
 - `issues/<YYMM>/<page> ….html` — the article files to receive
   figures.
 - The page-scan PNGs under `issues/<YYMM>/png/` (when the PDF text
@@ -51,14 +52,13 @@ For each `<figure>` block in `prg.txt`, in order:
    the name (they're the display + download of the same program).
 4. **Fill `<figcaption>`.** Take the verbatim caption from the
    magazine — typically `Listing N. …` (note the trailing dot after
-   `N`). Use `pdftotext` first; if it disagrees with the scan on a
+   `N`). Use step 010's block index first; if it disagrees with the scan on a
    program name, trust the article body's spelling (the body uses
    the name multiple times; the caption is a single OCR target).
    **NEVER fabricate a caption.** Every word of the `<figcaption>`
    must be read off the printed page — step 010's block index or a
-   600 dpi scan crop (on a scanned issue like 8608, `pdftotext` is
-   VOID evidence per rule 280; use it only where the PDF has a real
-   text layer). A plausible-sounding descriptive title you compose
+   600 dpi scan crop (the PDF text layer is void --
+   see r000, "the PDF has no usable text layer"). A plausible-sounding descriptive title you compose
    yourself is still a fabrication and is forbidden. If you cannot
    locate/read the printed caption, do NOT invent one: leave a bare
    `Listing N.` (no title) or the placeholder, and flag it in your
@@ -297,7 +297,7 @@ PY
 
 A previous sub-agent on a different rule claimed verification it never
 ran (the `internsiv` OCR regression — print typo treated as OCR error
-because no `pdftotext` check was actually performed). To make that
+because no block-index check was actually performed). To make that
 failure mode impossible here, every placement the sub-agent applies
 must be backed by **runnable verifier evidence pasted verbatim into
 the report**:

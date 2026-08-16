@@ -1,4 +1,4 @@
-# 25 — Convert ALL-CAPS headings to German natural case
+# 260 — Convert ALL-CAPS headings to German natural case
 
 **Goal:** every `<h1>` and `<h2>` heading in the article HTML reads in
 **German sentence case**: first character of the heading capitalised,
@@ -168,11 +168,13 @@ impossible here, every heading-case change the sub-agent applies must
 be backed by **runnable verifier evidence pasted verbatim into the
 report**:
 
-- For each re-cased heading, paste the one-line `pdftotext` cross-
+- For each re-cased heading, paste the one-line block-index cross-
   check (rule 280's evidence form) showing the print's actual case at
   that position, e.g.
   ```
-  pdftotext -layout -f 8 -l 8 issues/<YYMM>/64er_19XX-XX.pdf - | grep -i "PROGRAMMIERBARES RS232"
+  OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+  import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+  grep -i "PROGRAMMIERBARES RS232" "$OUT_DIR/blocks/p008.txt"
   ```
 - For each retained proper noun / acronym / product name (`geoWrite`,
   `dBase`, `RS232`, `C 64`, …), paste the article-body grep showing
@@ -183,11 +185,11 @@ report**:
 - For each `git mv` rename, paste the before/after filenames and the
   matching `<title>` update.
 - For each OCR fix applied alongside the case change (`FÄRB` →
-  `Farb`), paste the rule-27-style `pdftotext` cross-check showing
+  `Farb`), paste the rule-280-style block-index cross-check showing
   the print actually has the corrected glyph.
 
 **No verifier output, no claimed re-casing.** A heading change
-reported without the `pdftotext` evidence is treated as a guess; the
+reported without that evidence is treated as a guess; the
 orchestrator will re-dispatch. "Trust me, the proper noun is …" is
 never acceptable.
 

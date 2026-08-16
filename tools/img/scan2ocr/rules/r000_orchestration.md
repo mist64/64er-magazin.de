@@ -1,4 +1,4 @@
-# 0 — Orchestration: how to execute every other rule in this dir
+# 000 — Orchestration: how to execute every other rule in this dir
 
 **Goal:** define the meta-process that every numbered rule in this
 directory is run under. Read this once at the start of an issue build;
@@ -21,10 +21,11 @@ to editorial steps; for a program step, "verify the sub-agent's work" becomes
 
 Numbers go in **tens**, zero-padded to three digits so they sort lexically.
 Tens so a step can be inserted forever without renumbering a single reference --
-which is exactly what `9b` and the missing `23` were symptoms of. Doing them in-line in the main
-conversation thread is the wrong shape: each one chews up context the
-user is paying for, and it skips the second pair of eyes the
-verification block in each rule was designed to provide.
+which is exactly what `9b` and the missing `23` were symptoms of.
+
+Running the editorial steps in-line in the main conversation thread is the wrong
+shape: each one chews up context the user is paying for, and it skips the second
+pair of eyes the verification block in each rule was designed to provide.
 
 
 ## The chain, and what the numbers used to be
@@ -205,7 +206,7 @@ commit by `git add -A`. Both are preventable:
    For a content+rename rule, additionally `git show HEAD -- "<new path>" | head`
    and confirm the content diff is non-empty (not a bare rename).
    Checking the *working tree* passed verification while the *commit*
-   was empty is exactly how the rule-25 loss went unnoticed.
+   was empty is exactly how the rule 260 loss went unnoticed.
 4. **Commit large binary source assets in their OWN commit.** The scan
    PDF (`64er_19xx-xx.pdf`, ~95 MB) and image-crop batches are permanent
    git objects — don't let them ride along in a metadata/content commit.
@@ -290,7 +291,17 @@ banner illustration. The common primitive is a per-page **block index**: one
 line per layout block giving its bbox, its label and a short text preview.
 
 **It is an output of step 010**, written by `r010_blocks_index.py` to
-`out/blocks/pNNN.txt`. There is nothing to schedule and nothing to wait for:
+`<OUT_DIR>/blocks/pNNN.txt`.
+
+`<OUT_DIR>` throughout the rules means the issue's working directory, which is a
+constant at the top of `r010_ocr_blocks.py` and is **not** inside the repo. Ask
+the module rather than assuming a path:
+
+```bash
+OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+ls "$OUT_DIR/blocks/" | head
+``` There is nothing to schedule and nothing to wait for:
 step 010 has already OCR'd every page and already knows every bbox, so the index
 is a projection of data we have rather than a second OCR pass. It costs no OCR
 and cannot disagree with the corpus.
@@ -309,7 +320,7 @@ block=1001 label=header bbox=564x116+2298+240 frac=0.4633,0.0342,0.577,0.0507 te
 Grep for the caption / heading / header text you need, then crop:
 
 ```bash
-grep -iE "listing|tabelle|bild" out/blocks/p145.txt
+grep -iE "listing|tabelle|bild" <OUT_DIR>/blocks/p145.txt
 magick <SRC_DIR>/145.png -crop 2136x574+390+3736 +repage /tmp/64er_<YYMM>_crop.png
 ```
 
@@ -325,6 +336,26 @@ the code or table region usually sits **above** it in the same column -- walk
 preceding blocks whose x-range overlaps to find its top edge.
 
 Everything under `out/` is scratch -- never commit it.
+
+## Cross-cutting rule: the PDF has no usable text layer
+
+The delivered PDF's text layer is a re-OCR of the same scan. It is **not**
+independent evidence, and on a scanned issue it is **void** -- agreeing with it
+proves nothing, and disagreeing with it proves nothing either.
+
+There are exactly two authoritative sources for what the print says:
+
+1. **step 010's block index** -- `<OUT_DIR>/blocks/pNNN.txt`, one line per block
+   with its bbox and text, produced by the pipeline's own OCR of the graded
+   master;
+2. **a 600 dpi crop of the master** at that bbox, read with your own eyes.
+
+Every rule that asks a sub-agent to evidence a word-level claim must ask for one
+of those two. Do not ask for a `pdftotext` cross-check: it is the thing being
+checked wearing a different hat. This is stated once, here, because it was
+previously restated per rule and the restatements disagreed -- two rules called
+`pdftotext` void while two others demanded it as the mandatory evidence form,
+each citing rule 280 as the authority.
 
 ## Cross-cutting rule: OCR cleanup granularity
 
@@ -388,7 +419,7 @@ near-misses and one real regression on 8608 all share this shape:
   not the in-issue headline/TOC (rule 220). 8608/142 `Drei C-Compiler`
   was wrongly "fixed" to `Der` from the headline.
 - A `<figcaption>` / `Listing N.` caption → the **scan** of that page,
-  not plausibility or `pdftotext` (rules 10/13/14). 8608/142's
+  not plausibility or `pdftotext` (rules 130/160/170). 8608/142's
   `Listing 1. Laufzeit-Testschleife in »C«` was almost deleted as
   "invented" — it is printed in bold on p145.
 - Body text wording, incl. impossible-looking values → the **scan**;

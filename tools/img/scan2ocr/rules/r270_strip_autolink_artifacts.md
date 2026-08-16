@@ -1,4 +1,4 @@
-# 26 — Strip Discount's `+autolink` false-positive `<a>` wrappers
+# 270 — Strip Discount's `+autolink` false-positive `<a>` wrappers
 
 **Goal:** the article text in this project comes from 1986 magazine
 print. It does NOT contain real URLs. Any `<a href="…">…</a>` wrapper
@@ -33,7 +33,7 @@ This rule's remaining job is therefore purely defensive:
 1. **Verify** rule 060 doesn't pass `+autolink` (this rule's
    verification #2 does exactly that — a guard against regression).
 2. **Sweep for damage** only in issues that were converted *before* the
-   rule-3 fix; a freshly-converted issue will have zero `<a href>`
+   rule 060 fix; a freshly-converted issue will have zero `<a href>`
    wrappers (verification #1 confirms), and this rule is a no-op for it.
 
 ## Fix existing damage in the issue
