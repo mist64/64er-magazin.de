@@ -123,6 +123,7 @@ CAPTION_GAP_PX = 10     # keep this clear of a caption's first row
 CAPTION_OPEN = re.compile(r"^(Bild|Tabelle|Abb\.?)\s*(\d+)")
 CAPTION_MEASURE_MATCH = 0.25  # a block sharing this much width is above the figure
 MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
+PANEL_MAX_FRAC = 0.92         # ...unless measured tint says so (see grow_to_panel)
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 # Asymmetric on purpose -- see the merge in illustrations().
@@ -899,18 +900,34 @@ def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
                 return yy + step * PANEL_STEP_PX
         return None
 
-    # ...AND ONLY WHEN THE PANEL ACTUALLY CONTINUES PAST IT.  A caption set
-    # INSIDE the panel (p143, beside the artwork) has more panel below it; the
-    # ordinary caption, set on bare paper beneath the figure, has nothing.
-    # Treating both alike ran the box straight down through the caption band and
-    # made "figure + its caption line" the largest single defect in the seventh
-    # census -- 137-2, 137-3, 160-3, 33-1, 33-2, 50-4, 145-1, 131-2, 124-3.
+    # ...AND ONLY WHEN THE CAPTION IS PRINTED ON THE PANEL.
+    #
+    # "Is there panel BELOW the caption" was the wrong question and the eighth
+    # census caught it being answered by the very thing it was meant to exclude:
+    # where two tint panels or two pinouts are stacked with a caption between
+    # them, the SECOND figure is the panel found below, so the box crossed the
+    # caption and swallowed it -- 8 of the 9 remaining caption defects, and the
+    # cause of every duplicate the census found.
+    #
+    # The question that actually separates the two layouts is whether the
+    # caption sits ON the tint.  p143's is set inside the panel beside the
+    # artwork, so its own rows are tinted; an ordinary caption is set on bare
+    # paper beneath the figure, so they are not.  It reads the caption itself
+    # rather than guessing from what lies beyond it.
     cap_inside = False
     if own_cap is not None:
-        below = int(own_cap[3]) + PANEL_STEP_PX
-        cap_inside = below < H - MARGIN_PX and tinted(below)
+        mid = int((own_cap[1] + own_cap[3]) / 2)
+        cap_inside = MARGIN_PX <= mid < H - MARGIN_PX and tinted(mid)
 
-    lim = int(MAX_FIGURE_FRAC * H)
+    # THE CLAMP HERE IS NOT THE ONE USED FOR A GUESS.  MAX_FIGURE_FRAC guards
+    # the caption fallback, where a figure with nothing printed above it would
+    # otherwise take the whole page.  Panel growth is not a guess -- every row
+    # it crosses is measured tint and every stopper still stops it -- so it
+    # inherited a cap it did not need, and cut a rectangle out of the middle of
+    # every figure larger than 62% of the page.  The eighth census found seven:
+    # 89-0, 39-1, 93-0, 58-2, 30-1, 30-2, 131-3.  This magazine prints
+    # near-full-page schematics (the C 64 foldout, pp. 86-91).
+    lim = int(PANEL_MAX_FRAC * H)
     while y1 - y0 < lim:
         nxt = edge(y1, 1)
         if nxt is None or nxt <= y1:
