@@ -11,6 +11,7 @@ One model call per page that has candidates.  The model sees the overlay with
 every candidate numbered, plus the page's own caption lines, which is what tells
 it a region is "Bild 3" rather than a table.
 """
+import hashlib
 import json
 import os
 import re
@@ -87,8 +88,19 @@ def judge(page):
     if not cands:
         return None
     dest = f"{OUT}/p{page:03d}.judged.json"
+    # A cached verdict is only valid for the candidates it was made about.
+    # Keyed on nothing, it survived a re-run of the extractor and was applied to
+    # a different list: indices no longer lined up, and 168 candidates produced
+    # 22 figures with three of the four buckets empty.  Exactly the failure the
+    # stage-020 label cache had, and the same fix.
+    key = hashlib.sha256(
+        json.dumps([c["bbox"] for c in cands], sort_keys=True).encode()
+    ).hexdigest()[:16]
     if os.path.exists(dest):
-        return json.load(open(dest))
+        old = json.load(open(dest))
+        if old.get("key") == key:
+            return old
+        print(f"p{page:03d}: cached verdict is for different candidates, re-asking", flush=True)
 
     rec = json.load(open(os.path.join(OB.OUT_DIR, f"{page:03d}.labels.json"), encoding="utf-8"))
     caps = []
@@ -116,6 +128,7 @@ def judge(page):
         print(f"p{page:03d}: no JSON in reply", flush=True)
         return None
     got = json.loads(m.group(0))
+    got["key"] = key
     json.dump(got, open(dest, "w"), ensure_ascii=False, indent=1)
     keep = sum(1 for v in got.get("figures", {}).values() if v.get("figure"))
     print(f"p{page:03d}: {keep}/{len(cands)} are figures"

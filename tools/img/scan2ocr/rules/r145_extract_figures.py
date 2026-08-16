@@ -14,6 +14,8 @@ import json
 import os
 import sys
 
+import re
+
 import numpy as np
 from PIL import Image, ImageDraw
 
@@ -85,9 +87,13 @@ ENCLOSED_COVER = 0.60   # ...when this much of that block falls inside
 GROW_PX = 24            # step by which a scrap hull grows toward the text
 GROW_STEPS = 60
 JOIN_PX = 90            # two regions this close, with nothing between, are one
+OVERLAP_SAME = 0.55     # this much of the smaller region inside the larger = one figure
+# 0.25 was too eager: two distinct figures that merely clip each other were
+# merged, and the judge's "I can see this but it has no box" count rose 28 -> 39.
 FRAME_SEARCH_PX = 90    # how far outside a candidate to look for its printed rule
 FRAME_SPAN = 0.92       # a row/column this dark across the CANDIDATE is a rule
 CAPTION_GAP_PX = 10     # keep this clear of a caption's first row
+CAPTION_OPEN = re.compile(r"^(Bild|Tabelle|Abb\.?)\s*\d")
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
@@ -320,7 +326,12 @@ def cut_captions(rec, x0, y0, x1, y1):
     lower half.
     """
     for b in rec["blocks"]:
-        if b["label"] != "caption":
+        # By label OR by what it says.  A caption is often labelled body, and
+        # the printed "Bild 3." / "Tabelle 2." opening is unmistakable -- these
+        # are the lines the crops kept swallowing on their way to the next
+        # figure.
+        first = " ".join(b["text"].split())[:24]
+        if b["label"] != "caption" and not CAPTION_OPEN.match(first):
             continue
         bx0, by0, bx1, by1 = (v * SCALE for v in b["bbox"])
         if min(x1, bx1) - max(x0, bx0) < 0.35 * (bx1 - bx0):
@@ -627,9 +638,39 @@ def figures(page):
         for i in range(len(merged)):
             for j in range(i + 1, len(merged)):
                 a, b = merged[i]["bbox"], merged[j]["bbox"]
-                gap_x = max(a[0], b[0]) - min(a[2], b[2])
-                gap_y = max(a[1], b[1]) - min(a[3], b[3])
-                if gap_x > JOIN_PX or gap_y > JOIN_PX:
+                # WHITE IS NOT THE SEPARATOR -- TEXT IS.
+                #
+                # One distance threshold cannot work: the same number is too
+                # generous between two figures (it bridges a caption and joins
+                # them) and too strict inside one (the wide white inside a
+                # schematic reads as a boundary, so pp.86-89's C 64 schematic
+                # and p30's flowchart came out as truncated slices).  A vision
+                # census put all 23 defects on that single constant.
+                #
+                # So two regions that share a row or a column band, with nothing
+                # PRINTED between them, are one figure however much paper lies
+                # in between.  What separates two figures is the caption set
+                # between them, and that is a text block.
+                overlap_x = min(a[2], b[2]) - max(a[0], b[0])
+                overlap_y = min(a[3], b[3]) - max(a[1], b[1])
+                # TWO RECTANGLES THAT OVERLAP ARE NEVER TWO FIGURES.  This is
+                # unconditional -- the text test does not get a say, because a
+                # caption lying inside the overlap is exactly what made the
+                # merge refuse.  p133 emitted five overlapping views of the same
+                # pinout sheet and p31 two competing partial merges of one
+                # flowchart; a segmenter that returns two rectangles for one
+                # figure has simply not finished.
+                if overlap_x > 0 and overlap_y > 0:
+                    inter = overlap_x * overlap_y
+                    small = min((a[2] - a[0]) * (a[3] - a[1]),
+                                (b[2] - b[0]) * (b[3] - b[1]))
+                    if small and inter > OVERLAP_SAME * small:
+                        merged[i]["bbox"] = [min(a[0], b[0]), min(a[1], b[1]),
+                                             max(a[2], b[2]), max(a[3], b[3])]
+                        merged.pop(j)
+                        changed = True
+                        break
+                if overlap_x <= 0 and overlap_y <= 0:
                     continue
                 if text_between(a, b):
                     continue
