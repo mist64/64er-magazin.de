@@ -48,37 +48,60 @@ r145_name_figures.py      named crops, sorted into png/{c,gray,bw,dots}/
 
 ## How a rectangle is found
 
-Three sources, in order of how much they can be trusted:
+**The caption is the anchor.** 64'er sets a figure to a measure and puts its
+caption immediately beneath, so `Bild 3.` gives the figure's bottom edge, its
+number, and a lower bound on its width outright. Only the top has to be found.
+Everything the earlier ink-segmentation approach got wrong -- boxes snapped to
+the column grid, captions swallowed, figures split at a gutter -- came from
+deriving those edges from pixels instead of reading them off the page.
 
-1. **Printed frames.** This magazine frames nearly every placed figure, and a
-   rule is the figure's own edge: it does not wander across a gutter the way an
-   ink-grown box does, and it does not die where the picture goes pale. A
-   rectangle needs a long horizontal rule, another below it with much the same
-   x-extent, and a vertical closing at least one end.
+Then four measurements decide where the rectangle actually stops. Each was
+forced by a defect a vision census named:
 
-   **Three sides, and a rule may be broken.** The scan nicks a rule, a caption
-   hides one, and sometimes the fourth is simply not printed. Demanding four
-   perfect sides found only immaculate frames and dropped everything else to the
-   weaker sources. MEASURED over the issue: closing nicks up to 24 px and
-   accepting three sides took the kept figures from 86 to **103** and the
-   judge's "I can see this but it has no box" count from 45 down to **28** --
-   and it is what finally cut the recurring `64'er Test` rubric badge, the
-   single most-repeated miss in every review.
-2. **Gaps between text.** A figure sits in a column-width slot between two
-   pieces of text. The slot is the figure — bounding it by ink instead is what
-   three rounds of vision review kept objecting to.
-3. **Clusters of OCR scraps.** Garbage the OCR read *off* a picture marks where
-   one is. A picture yields several scraps, so they are clustered, and never
-   across something printed between them.
+1. **Width and height settle together.** The caption's measure is a LOWER bound:
+   a figure spanning two columns is captioned under one. So the box grows
+   sideways until it meets text -- but the band it tests must be the figure's
+   own height. Testing a band from the page margin down to the caption let a
+   headline three columns up block the growth of a figure nowhere near it, and
+   no wide figure could ever widen. Find the top at the current width, grow the
+   width within that height, repeat. MEASURED: 84 boxes grew; p032's flowchart
+   690 -> 1903 px, p023's printer photo 1061 -> 2108 px.
 
-Then: captions are cut off (64'er sets them flush under the figure with no white
-gap), the printed rule is trimmed with one pixel to spare for scan blur, and
-regions that touch with nothing between them are merged.
+2. **Paper is bright AND neutral.** Yellow is the brightest ink there is -- a
+   solid Y tint measures 220+, above `PAPER_LEVEL` -- so every luminance test
+   in this file called a tint panel bare paper and could not see its edges at
+   all. One mask, dark OR chromatic, is built per page and shared by all of
+   them.
 
-**A figure is kept only on positive evidence that it is article matter** — the
-text above or below it is the magazine's own. Testing for the *absence* of an
-advertisement instead let 68 figures through on 32 advertising pages, because a
-gap between an ad and a page footer has no ad on both sides.
+3. **A strip of bare paper is a boundary.** Growth stops at TEXT RECTANGLES,
+   which is not the same as stopping at the figure. Where the OCR returns none
+   -- a table set on a tint, which it reads poorly -- growth ran straight
+   through: p143's block diagram came out with a whole comparison table beside
+   it. Two printed objects are separated by paper running the full height of
+   both; nothing printed has such a strip through its middle. The box is cut
+   there, and the caption says which piece is the figure. With no caption to
+   choose by, every piece becomes a figure instead -- discarding one would throw
+   a real picture away.
+
+4. **A tint panel IS the figure**, and its edge is where the tint stops --
+   something neither the OCR region nor the caption knows. On p143 the region
+   ended half way down and the caption is set INSIDE the panel beside the
+   artwork, so both cut the bottom quarter off. Two things this needs: a panel
+   has white printed on it, so a short unmarked run is crossed if the tint
+   resumes beyond it; and only the figure's OWN caption is transparent, because
+   a caption belonging to another figure is exactly the boundary between two.
+
+Where a caption gives nothing -- an opening photograph, a cover -- the source is
+tesseract's own ALTO `<Illustration>` regions, which step 010's OCR pass already
+computed and only the TSV renderer threw away. They over-segment a composite
+(p27's two greeting cards came back as eight), so they are joined; the join is
+narrower than the smallest measured gap between two different figures (248 px on
+p133) or it merges neighbours.
+
+Finally: **a box holding two captions is two figures** and is dropped in favour
+of the per-caption boxes, ribbons are rejected (no figure in this magazine is
+one), and boxes enclosing text are rejected (a photograph does not contain a
+text block; a frame does).
 
 ## Naming
 
