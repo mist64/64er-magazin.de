@@ -88,8 +88,20 @@ PANEL_TINT_FRAC = 0.55  # share of a row that must be marked to still be panel
 PANEL_STEP_PX = 4       # rows per step while following it
 PANEL_GAP_PX = 120      # unmarked run crossed if the tint resumes beyond it
 TINT_SAT = 22           # RGB max-min above this is ink/tint, not scanned paper
+# Text printed ON a figure -- pin labels, a menu, a printout's edge digits --
+# is figure matter, not a boundary.  Body text sits on bare paper.
+BLOCK_TINT_FRAC = 0.55  # marked share above this means the block sits on ink
+TINT_BLOCK_MAX_WORDS = 12   # ...and only a SHORT block; paragraphs are text
 INK_MIN_PX = 400        # too little ink to measure: fall back to a loose mask
-SAT_COLOUR = 18         # mean chroma of the INK above this -> colour
+# MEASURED over all 158 crops of this issue: mean ink chroma is bimodal, but
+# not around 18.  A genuinely coloured figure reads 120-171 with 73-89% of its
+# ink strongly saturated; a neutral one reads 1.5-3.3 with 0.0%.  Between them
+# sits a band of 46 crops at 18-45 with a saturated fraction of 0.000-0.012 --
+# grey artwork carrying the scanner's colour cast, which a threshold of 18 put
+# in the colour bucket.  That is why the dots bucket emptied when the bucket
+# stopped being taken from the model: every screened chip diagram measured 20-22
+# and was called colour before the screen test could run.
+SAT_COLOUR = 50         # mean chroma of the INK above this -> colour
 SAT_STRONG = 60         # a pixel this chromatic is unambiguously coloured
 SAT_STRONG_FRAC = 0.06  # ...and this share of the ink being so makes it colour
 
@@ -490,6 +502,36 @@ def caption_lines(rec):
     return out
 
 
+def widen(rects, x0, y0, x1, y1, W):
+    """Grow a box sideways within its own height until real text stops it.
+
+    An ALTO illustration region is a LOWER bound on a figure, the same way a
+    caption's measure is: tesseract marks the picture-like body of a chip
+    diagram and leaves the column of pin labels beside it outside, because a
+    column of small isolated glyphs is not picture-like.  The union of those
+    regions was used as the final box, so 131-3, 131-4 and 131-6 each came out
+    missing an entire pin column.  Growth is what turns a lower bound into an
+    edge, and now that a figure's own labels are no longer stoppers, it reaches
+    them.
+    """
+    for _ in range(GROW_STEPS):
+        moved = False
+        for side in (0, 1):
+            nx0 = x0 - GROW_PX if side == 0 else x0
+            nx1 = x1 if side == 0 else x1 + GROW_PX
+            if nx0 < MARGIN_PX or nx1 > W - MARGIN_PX:
+                continue
+            if any(min(nx1, rx1) - max(nx0, rx0) > 0
+                   and min(y1, ry1) - max(y0, ry0) > 0
+                   for (rx0, ry0, rx1, ry1), _l in rects):
+                continue
+            x0, x1 = nx0, nx1
+            moved = True
+        if not moved:
+            break
+    return x0, x1
+
+
 def figure_above(rects, cap, W, H):
     """The rectangle a caption belongs to: directly above it, at its measure.
 
@@ -673,8 +715,33 @@ def figures(page):
 
     blocks = [b for b in rec["blocks"] if b["label"] != "noise"]
     rects = [([v * SCALE for v in b["bbox"]], b["label"]) for b in blocks]
+    # A FIGURE'S OWN LABELS ARE NOT ITS BOUNDARY.
+    #
+    # A chip's pin names, a menu's text column, the row of digits down the edge
+    # of a printout: the OCR reads all of them as text, so growth stopped short
+    # and the rectangle closed INSIDE the figure.  That is 12 of the 20 cut
+    # crops in the seventh census -- 131-3, 131-4 and 131-6 lose an entire pin
+    # column, 39-4, 39-5 and 93-0 lose a menu, 58-1, 58-2, 74-3 and 79-1 lose a
+    # printout's right margin -- and it was the one defect five rounds of
+    # geometry never touched.
+    #
+    # What separates them from body text is physical, not typographic: the
+    # magazine's text is set on BARE PAPER, while a figure's labels sit on the
+    # figure -- a screened tint, a coloured panel, or a reversed screen
+    # photograph.  Measured with the same mask as everything else, a block of
+    # body text reads 0.1-0.3 marked and a label on tint or in reverse reads
+    # 0.6-1.0.  The word count is required as well, because a page that is one
+    # big tint panel would otherwise disqualify its own body columns: labels are
+    # short, paragraphs are not.
+    def on_figure(b, bb):
+        if b.get("n_words", 0) > TINT_BLOCK_MAX_WORDS:
+            return False
+        x0, y0, x1, y1 = (int(v) for v in bb)
+        cell = marked[max(0, y0):y1, max(0, x0):x1]
+        return cell.size > 0 and cell.mean() > BLOCK_TINT_FRAC
+
     stoppers = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
-                if b.get("n_words", 0) >= TOP_STOP_MIN_WORDS]
+                if b.get("n_words", 0) >= TOP_STOP_MIN_WORDS and not on_figure(b, bb)]
 
     illus = illustrations(rec)
     caps = caption_lines(rec)
@@ -706,6 +773,7 @@ def figures(page):
             # (131-4 carried "Bild 2. Anschlußplan des Prozessors 6510" between
             # two chips), so the box stops above the caption it belongs to.
             box[3] = min(box[3], cy0 - CAPTION_GAP_PX)
+            box[0], box[2] = widen(stoppers, box[0], box[1], box[2], box[3], W)
         else:
             box = figure_above(stoppers, cap, W, H)   # no illustration: fall back
         found.append({"bbox": box, "ink": 0.0, "caption": cap["text"],
@@ -788,6 +856,7 @@ def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
     """
     if x1 - x0 < MIN_W_PX:
         return y0, y1
+
     def tinted(y):
         row = marked[y, x0:x1]
         return row.size and row.mean() > PANEL_TINT_FRAC
@@ -809,10 +878,10 @@ def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
                 continue
             if lab == "noise":
                 continue
-            if lab == "caption" and own_cap is not None \
+            if lab == "caption" and cap_inside \
                     and min(ry1, own_cap[3]) - max(ry0, own_cap[1]) > 0 \
                     and min(rx1, own_cap[2]) - max(rx0, own_cap[0]) > 0:
-                continue                        # its own caption
+                continue                        # its own caption, INSIDE the panel
             return False
         return True
     # A PANEL HAS WHITE ON IT.  The figure's own boxes are knocked out of the
@@ -829,6 +898,17 @@ def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
             if tinted(yy) and free(yy):
                 return yy + step * PANEL_STEP_PX
         return None
+
+    # ...AND ONLY WHEN THE PANEL ACTUALLY CONTINUES PAST IT.  A caption set
+    # INSIDE the panel (p143, beside the artwork) has more panel below it; the
+    # ordinary caption, set on bare paper beneath the figure, has nothing.
+    # Treating both alike ran the box straight down through the caption band and
+    # made "figure + its caption line" the largest single defect in the seventh
+    # census -- 137-2, 137-3, 160-3, 33-1, 33-2, 50-4, 145-1, 131-2, 124-3.
+    cap_inside = False
+    if own_cap is not None:
+        below = int(own_cap[3]) + PANEL_STEP_PX
+        cap_inside = below < H - MARGIN_PX and tinted(below)
 
     lim = int(MAX_FIGURE_FRAC * H)
     while y1 - y0 < lim:

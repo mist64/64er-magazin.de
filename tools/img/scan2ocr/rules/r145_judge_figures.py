@@ -87,9 +87,6 @@ CAPTION LINES PRINTED ON THIS PAGE:
 """
 
 
-PROMPT_KEY = hashlib.sha256(PROMPT.encode("utf-8")).hexdigest()[:16]
-
-
 def judge(page):
     cand_path = f"{OUT}/p{page:03d}.json"
     if not os.path.exists(cand_path):
@@ -98,24 +95,6 @@ def judge(page):
     if not cands:
         return None
     dest = f"{OUT}/p{page:03d}.judged.json"
-    # A cached verdict is only valid for the candidates it was made about.
-    # Keyed on nothing, it survived a re-run of the extractor and was applied to
-    # a different list: indices no longer lined up, and 168 candidates produced
-    # 22 figures with three of the four buckets empty.  Exactly the failure the
-    # stage-020 label cache had, and the same fix.
-    # ...and on the PROMPT as well.  Keyed on the boxes alone, rewriting the
-    # instructions changed nothing: every page returned its old cached verdict
-    # and the change looked like it had no effect.  Stage 020 keeps a PROMPT_KEY
-    # for exactly this reason.
-    key = hashlib.sha256(
-        (json.dumps([c["bbox"] for c in cands], sort_keys=True) + PROMPT_KEY).encode()
-    ).hexdigest()[:16]
-    if os.path.exists(dest):
-        old = json.load(open(dest))
-        if old.get("key") == key:
-            return old
-        print(f"p{page:03d}: cached verdict is for different candidates, re-asking", flush=True)
-
     rec = json.load(open(os.path.join(OB.OUT_DIR, f"{page:03d}.labels.json"), encoding="utf-8"))
     caps = []
     for b in rec["blocks"]:
@@ -131,6 +110,21 @@ def judge(page):
                      f"measured_type={c['type']}{anchor}")
     prompt = PROMPT.format(page=page, cands="\n".join(lines),
                            caps="\n".join(caps) or "(none)")
+
+    # THE CACHE KEY IS THE PROMPT ITSELF.  Keyed on nothing, a verdict survived
+    # a re-run of the extractor and was applied to a different candidate list --
+    # indices no longer lined up and 168 candidates produced 22 figures with
+    # three buckets empty.  Keyed on the boxes, rewriting the instructions
+    # changed nothing.  Keyed on boxes plus the instructions, changing the
+    # EVIDENCE in the prompt changed nothing: every page returned its cached
+    # verdict after the measured types were corrected.  Three variants of one
+    # bug, so the key is now everything the model is actually shown.
+    key = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
+    if os.path.exists(dest):
+        old = json.load(open(dest))
+        if old.get("key") == key:
+            return old
+        print(f"p{page:03d}: prompt changed, re-asking", flush=True)
     # Name the overlay BARE and run from its directory: the CLI transport is a
     # nested `claude -p`, and it refuses to read a path outside its working
     # directory -- it comes back with "permission not granted, session
