@@ -68,6 +68,15 @@ MARGIN_PX = 260         # page edge; a column's free space starts here
 # 564x5724.  No printed picture in this magazine is anywhere near that thin.
 MAX_ASPECT = 6.0
 SCRAP_JOIN_PX = 260     # OCR scraps this close belong to one picture
+# Conversion type, measured over the INK rather than the paper.  Paper is most
+# of a framed figure and paper is neutral, so averaging the whole rectangle
+# drags every reading toward grey.
+PAPER_LEVEL = 215       # above this luminance is paper, not print
+INK_MIN_PX = 400        # too little ink to measure: fall back to a loose mask
+SAT_COLOUR = 18         # mean chroma of the INK above this -> colour
+SAT_STRONG = 60         # a pixel this chromatic is unambiguously coloured
+SAT_STRONG_FRAC = 0.06  # ...and this share of the ink being so makes it colour
+
 # Screened-and-uniform is a tint, screened-and-varying is a picture.
 TONE_CELLS = 12         # coarse grid the halftone is averaged away over
 TONE_MIN_STD = 11.0     # coarse tone flatter than this is a flat fill
@@ -385,10 +394,26 @@ def cut_inside_rule(grey, x0, y0, x1, y1):
 
 
 def classify(crop):
-    """One of the four types tools/convert-scans.sh knows."""
+    """One of the four types tools/convert-scans.sh knows.
+
+    Saturation is measured over the INK, not over the whole rectangle.  Paper is
+    most of a framed figure and paper is neutral, so averaging the rectangle
+    drags every measurement toward grey: the red "64'er Test" badge on white
+    came out `bw`, and a colour portrait against a desaturated background came
+    out `gray`.  What decides the conversion is what was PRINTED, so the paper
+    is excluded before asking.
+    """
     a = np.asarray(crop).astype(np.int16)
-    sat = float((a.max(axis=2) - a.min(axis=2)).mean())
-    if sat > 18:
+    lum = a.mean(axis=2)
+    inked = lum < PAPER_LEVEL
+    if inked.sum() < INK_MIN_PX:
+        inked = lum < 250                      # nearly blank: use what there is
+    chroma = (a.max(axis=2) - a.min(axis=2))
+    sat = float(chroma[inked].mean()) if inked.any() else 0.0
+    # ...and a colour figure need not be colourful everywhere: a red badge is
+    # mostly black type on white with one saturated field.
+    strong = float((chroma[inked] > SAT_STRONG).mean()) if inked.any() else 0.0
+    if sat > SAT_COLOUR or strong > SAT_STRONG_FRAC:
         return "c"
     gg = np.asarray(crop.convert("L"))
     med = np.median(np.stack([np.roll(np.roll(gg, dy, 0), dx, 1)
