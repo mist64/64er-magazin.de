@@ -23,8 +23,9 @@ forces a specific level).
 
 Structural overrides that DO apply:
 
-- **Rule 15 (h2 inside aside → h3).** Always demote a top-level
-  heading inside `<aside>` to `<h3>`. This is structural, not a
+- **h2 inside an aside → h3.** Always demote a top-level heading
+  inside `<aside>` to `<h3>`. An aside is a callout, so its internal
+  hierarchy starts at h3. This is structural, not a
   typographic-weight judgement.
 
 ### Anti-pattern — the heading-audit trap
@@ -101,7 +102,7 @@ To decide if an `<h3>` should be `<h2>` (or vice versa), ask:
    Aktuelles items, CP/M-Ecke entries). Those rarely need h2
    banners — print uses inline-flow h3.
 
-3. **Inside an `<aside>`?** Rule 15 says: the first heading inside
+3. **Inside an `<aside>`?** The first heading inside
    `<aside>` is always `<h3>`, regardless of what it would be at
    article scope. The aside is a callout, so its internal
    hierarchy starts at h3.
@@ -148,7 +149,7 @@ for f in sorted(os.listdir(d)):
 PY
 )" "$dir"
 
-# 2. no h2 inside <aside> (rule 15 violation)
+# 2. no h2 inside <aside>
 python3 -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]

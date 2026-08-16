@@ -12,9 +12,12 @@ BELOW` (needs fresh OCR of box content), and content placeholders
 like `<p>TODO two boxes with text</p>`. Those belong to a separate
 editorial pass.
 
-It also excludes the author-bio `<aside>` work — that is rule 15.
-This rule only handles non-bio asides: methodology, contest, feature
-list, warning callouts.
+This rule handles every `<aside>` callout — methodology, contest,
+feature list, warning, and author bio alike. (Author bios used to be
+rule 15's own pass; that rule was removed, because a bio box is simply
+one more tinted box and the reliable evidence for a tinted box is the
+scan, not the prose inside it. See `tools/img/scan2ocr` — the import
+detects a screened background directly and can mark the region.)
 
 ## Briefing for the sub-agent
 
@@ -28,7 +31,7 @@ The sub-agent must:
    |---|---|
    | `TODO PRE` | Look at the following `<p>…<br>…</p>` block. If the print shows monospace code, fold into `<pre>…</pre>`. If the print shows a real numbered/bulleted list, convert to `<ol>`/`<ul>` instead (and delete the marker). |
    | `TODO INDENTATION` / `TODO INDENTED` | Look at the print indentation. If code → `<pre>`. If prose with visual indent for nested enumeration → `&nbsp;`-prefixed `<br>` inside `<p>`. If real nested list → nested `<ul>`/`<ol>`. |
-   | `TODO ASIDE` (non-bio) | Wrap the following heading + paragraphs + closing `<address>` in `<aside>`. Delete the marker. Verify the section is NOT an author bio (that's rule 15). |
+   | `TODO ASIDE` | Wrap the following heading + paragraphs + closing `<address>` in `<aside>`. Delete the marker. Author bios included — they are asides like any other. |
    | `TODO BOX` | Same as TODO ASIDE if the print shows a boxed callout. If the print shows indented monospace code with no box border, use `<pre>` instead. |
    | `TODO FORMULA` / `TODO FORMULAS` | **SKIP** — editorial (math markup decision). Report unfilled. |
    | `TODO ALL BOXES LIKE BELOW` | **SKIP** content reconstruction — fresh OCR of multiple boxes is out of scope. |
@@ -55,8 +58,8 @@ Critical guardrails:
 - "Only convert to lists when print shows a marker glyph" — applies
   here exactly as it does in the markdown→HTML conversion rules.
   Enumeration-looking prose without a real bullet stays `<p>`/`<br>`.
-- Non-bio `<aside>` callouts (methodology, contest, feature list,
-  warning) are this rule's territory; author bios are rule 15's.
+- Every `<aside>` callout is this rule's territory — methodology,
+  contest, feature list, warning, author bio.
 
 ## Verification
 

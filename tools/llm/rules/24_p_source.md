@@ -2,10 +2,26 @@
 
 **Goal:** every paragraph in an article that points the reader at an
 external party (where to buy, who to contact, what else to read)
-ends up as `<p class="source">…</p>`. Conversely, paragraphs the
-import pipeline eagerly tagged based on a "colon after first word"
-heuristic but that aren't actually pointers get the `class="source"`
-**removed**.
+ends up as `<p class="source">…</p>`. Conversely, paragraphs tagged in
+error get the `class="source"` **removed**.
+
+### What the import already tagged, and how much to trust it
+
+Older imports guessed from a "colon after first word" heuristic, which
+is why this rule exists to untag as well as tag. The `scan2ocr` import
+(`tools/img/scan2ocr`) does not guess: it **measures the printed type
+size** and tags a paragraph whose line height is below **0.85x its own
+page's median body line height**. MEASURED over issue 8609: 46 of 969
+blocks fall below that, every one of them a source note, with the
+`Info:` lines clustering at **0.66-0.67x**; the 0.85-0.95 band is
+ordinary body, including 26- and 28-line body blocks. There is nothing
+in the gap.
+
+So for an issue imported by `scan2ocr`, an existing `class="source"`
+is physical evidence off the page, not a guess — **untag only on very
+strong grounds**. The tagging is still worth extending, because a
+source note set in ordinary body type is invisible to that measurement;
+that is what the mechanical trigger below is for.
 
 ## DEFAULT: don't change `<p class="source">`
 
