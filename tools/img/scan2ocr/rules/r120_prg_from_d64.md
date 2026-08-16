@@ -46,9 +46,9 @@ later.
 ## Usage
 
 ```bash
-tools/img/scan2ocr/rules/120_prg_from_d64.sh issues/<YYMM> ~/tmp/64er-Disketten/YYXX/<YYMM>.D64
+tools/img/scan2ocr/rules/r120_prg_from_d64.sh issues/<YYMM> ~/tmp/64er-Disketten/YYXX/<YYMM>.D64
 # or for an issue published as two disks:
-tools/img/scan2ocr/rules/120_prg_from_d64.sh issues/<YYMM> \
+tools/img/scan2ocr/rules/r120_prg_from_d64.sh issues/<YYMM> \
     ~/tmp/64er-Disketten/.../SideA.D64 \
     ~/tmp/64er-Disketten/.../SideB.D64
 ```

@@ -3,7 +3,7 @@
 # placed cleanly, delete the issue's prg.txt worklist.
 #
 # Usage:
-#   tools/img/scan2ocr/rules/130_place_figures.sh <issue-dir>
+#   tools/img/scan2ocr/rules/r130_place_figures.sh <issue-dir>
 #
 # Exits 0 if verification passes (and removes prg.txt). Exits non-zero
 # with the failing check if anything's off.

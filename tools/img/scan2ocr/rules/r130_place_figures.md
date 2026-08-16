@@ -215,7 +215,7 @@ PY
 #    <div class="binary_download" data-name="X"> intentionally share
 #    the name — EXEMPT that pairing (this check counts <pre> and
 #    <div> names separately and allows each div name to cancel one
-#    pre name, matching 130_place_figures.sh's verifier #3):
+#    pre name, matching r130_place_figures.sh's verifier #3):
 python3 - "$dir" <<'PY'
 import os, re, sys, collections
 d = sys.argv[1]

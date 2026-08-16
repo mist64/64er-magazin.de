@@ -28,9 +28,7 @@ import json
 import os
 import sys
 
-import _step
-_ocr = _step.load("010_ocr_blocks")
-OUT_DIR, OCR_DPI, SRC_DIR = _ocr.OUT_DIR, _ocr.OCR_DPI, _ocr.SRC_DIR
+from r010_ocr_blocks import OUT_DIR, OCR_DPI, SRC_DIR
 
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)

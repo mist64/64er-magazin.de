@@ -5,7 +5,7 @@
 # the repo root.
 #
 # Usage:
-#   tools/img/scan2ocr/rules/120_prg_from_d64.sh <issue-dir> <d64> [<d64>...]
+#   tools/img/scan2ocr/rules/r120_prg_from_d64.sh <issue-dir> <d64> [<d64>...]
 set -e
 if [ $# -lt 2 ]; then
   echo "usage: $0 <issue-dir> <d64> [<d64>...]" >&2

@@ -186,8 +186,8 @@ commit by `git add -A`. Both are preventable:
 
 1. **Never `git add -A` / `git add .` during an issue build.** Stage by
    **explicit pathspec** of the rule's expected file set. Several rule
-   scripts self-stage (`060_md_to_html.sh`, `080_split.sh`,
-   `100_toc_category.sh` run `git add`/`git rm`), so the index may already
+   scripts self-stage (`r060_md_to_html.sh`, `r080_split.sh`,
+   `r100_toc_category.sh` run `git add`/`git rm`), so the index may already
    be partly populated when you arrive — reconcile it deliberately, per
    file, before committing.
 2. **Rules that BOTH edit content AND rename** (rule 260 is the prime
@@ -274,7 +274,7 @@ falls between rules:
   product/topic, same author, overview + deep-dive). The merged file
   carries two `<p class="intro">`, two `<address class="author">`, and
   a comma-joined `<meta name="64er.pages">`. See the *Paired articles
-  — never split* section in `tools/img/scan2ocr/rules/080_split.md` for the
+  — never split* section in `tools/img/scan2ocr/rules/r080_split.md` for the
   signals, the merged-HTML shape, canonical examples in
   `issues/8607/`, and the verification one-liner. Before dispatching
   rule 080 (or any earlier rule that produces the consolidated `.md`),
@@ -289,7 +289,7 @@ specific region on a page -- a caption, a listing block, a header strip, a
 banner illustration. The common primitive is a per-page **block index**: one
 line per layout block giving its bbox, its label and a short text preview.
 
-**It is an output of step 010**, written by `010_blocks_index.py` to
+**It is an output of step 010**, written by `r010_blocks_index.py` to
 `out/blocks/pNNN.txt`. There is nothing to schedule and nothing to wait for:
 step 010 has already OCR'd every page and already knows every bbox, so the index
 is a projection of data we have rather than a second OCR pass. It costs no OCR

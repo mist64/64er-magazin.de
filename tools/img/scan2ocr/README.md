@@ -54,13 +54,13 @@ issue-build steps that follow it. Each step is `NNN_name.md` (the spec, with a
 mandatory Verification block) beside `NNN_name.sh` (the entry point).
 
 ```sh
-rules/010_ocr_blocks.sh     # OCR + geometry + the block index   (~15 min, local)
-rules/020_classify.sh       # labels, reading order, roles       (one call per page)
-rules/030_assemble.sh       # pages -> articles -> <YYMM>.md     (one call per issue)
+rules/r010_ocr_blocks.sh     # OCR + geometry + the block index   (~15 min, local)
+rules/r020_classify.sh       # labels, reading order, roles       (one call per page)
+rules/r030_assemble.sh       # pages -> articles -> <YYMM>.md     (one call per issue)
 ```
 
 Then steps 040–300 take the `.md` on to the published HTML. Read
-[`rules/000_orchestration.md`](rules/000_orchestration.md) first — it defines
+[`rules/r000_orchestration.md`](rules/r000_orchestration.md) first — it defines
 how every step is run and verified, and carries the old→new number mapping for
 `LOG.md` entries written before the chains were merged.
 
@@ -76,26 +76,26 @@ the old answers.
 ## Stages and outputs
 
 ```
-A  010_ocr_blocks.py   thumbs/NNN.png -> 300 dpi grey -> tesseract TSV
+A  r010_ocr_blocks.py   thumbs/NNN.png -> 300 dpi grey -> tesseract TSV
                    -> NNN.json         blocks: bbox, features, geometric label
                    -> NNN.digest.txt   compact page brief for stage B
                    -> NNN_boxes.png    overlay
                    -> NNN.article.txt  PROVISIONAL text, from geometry alone
 
-B  020_classify.py     one model call per page (digest + overlay image)
+B  r020_classify.py     one model call per page (digest + overlay image)
                    -> NNN.labels.json  final label, role and reading order
                    -> NNN_final.png    overlay, non-corpus content dimmed
-C  020_classify.py     -> NNN.article.txt  the deliverable, overwriting A's guess
+C  r020_classify.py     -> NNN.article.txt  the deliverable, overwriting A's guess
 
-D  030_assemble.py    ONE model call for the whole issue (article boundaries)
+D  r030_assemble.py    ONE model call for the whole issue (article boundaries)
                    -> 8609.md          every article, in issue order
                    -> articles.json    the structure, machine-readable
                    -> hyphens.json     resolved line-break hyphens (cache)
 
-   020_evaluate.py     -> truth/NNN.txt    a vision reading of the same page
+   r020_evaluate.py     -> truth/NNN.txt    a vision reading of the same page
                    -> report.jsonl     per-page scores
                    -> WORST.txt        pages whose signals disagree, worst first
-   020_collect.py      -> review/pNNN.png + review/pNNN.txt + review/INDEX.txt
+   r020_collect.py      -> review/pNNN.png + review/pNNN.txt + review/INDEX.txt
 ```
 
 Stage A is deterministic and local. Stage B is the only step that calls a model,
@@ -218,7 +218,7 @@ Results are cached in `hyphens.json`, so a re-render is free.
 
 ## The harness
 
-`020_evaluate.py` has a vision model transcribe each page under the same rules the
+`r020_evaluate.py` has a vision model transcribe each page under the same rules the
 pipeline follows, then scores us against it. Vision misreads characters too, so
 it is not truth in an absolute sense — but it fails in completely different ways
 from tesseract-plus-geometry, so where the two disagree is where the bugs are.
@@ -245,7 +245,7 @@ pipeline was right (see `FINDINGS.md`).
 in this pipeline's history looked perfect on their test pages and were reverted
 after a full sweep — details in `FINDINGS.md`.
 
-`020_evaluate.py` refuses to score pages that were never classified, rather than
+`r020_evaluate.py` refuses to score pages that were never classified, rather than
 printing a mean over stage A's provisional guesses.
 
 ---
