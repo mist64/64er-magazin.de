@@ -114,6 +114,7 @@ Markdown, one line per **paragraph**, blank line between paragraphs:
 | `## ` | a standalone section heading, set on its own line |
 | `### ` | a bold run-in subhead opening a paragraph (`Ursprungsblock`, `Zielblock`) |
 | ` ``` ` | a short code fragment quoted inside the prose |
+| `<p class="source">` | a source note set in a smaller face — `Info: …`, a publisher address, an ISBN/price credit, `Fortsetzung von Seite 32`. Markdown cannot express it, so it is emitted as HTML, which markdown passes through. |
 
 A hyphen at a line end is **marked, not resolved**: it becomes `¬`. German writes
 one for three different reasons and no local rule separates them —
