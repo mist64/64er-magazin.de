@@ -29,7 +29,7 @@ import os
 import re
 import sys
 
-import llm
+import r000_llm as llm
 from r020_classify import (OUT_DIR, PARA_INDENT_MIN_PX, ROLE_PREFIX,
                            SOURCE_HTML, SOURCE_JOIN, ends_dangling,
                            join_runons, join_text, page_paragraphs)

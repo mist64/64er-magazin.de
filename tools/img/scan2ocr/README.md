@@ -252,7 +252,7 @@ printing a mean over stage A's provisional guesses.
 
 ## Transport
 
-`llm.py` is the only place either stage talks to a model, and it picks:
+`rules/r000_llm.py` is the only place any step talks to a model, and it picks:
 
 - **API** (preferred) — the Anthropic SDK, when credentials resolve:
   `ANTHROPIC_API_KEY`, or an `ant auth login` profile the zero-arg client finds

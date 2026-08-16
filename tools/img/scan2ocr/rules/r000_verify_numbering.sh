@@ -7,12 +7,14 @@ D=tools/img/scan2ocr/rules
 fail=0
 
 echo "1. file naming"
-# llm.py is deliberately unnumbered: the transport steps 020 and 030 share,
-# belonging to neither.  The r prefix exists so that a step file is also a legal
-# Python module name -- 010_ocr_blocks is not, r010_ocr_blocks is.
-bad=$(ls $D | grep -v '^__pycache__$' | grep -vE '^(r[0-9]{3}_[a-z0-9_]+\.(md|sh|py)|llm\.py)$' | tr '\n' ' ')
+# Every file in here is rNNN_name.{md,sh,py}, with no exceptions.  000 is the
+# number for things that are not a step but apply to every step: the
+# orchestration spec, this check, and the model transport.  The r prefix exists
+# so that a step file is also a legal Python module name -- 010_ocr_blocks is
+# not importable by name, r010_ocr_blocks is.
+bad=$(ls $D | grep -v '^__pycache__$' | grep -vE '^r[0-9]{3}_[a-z0-9_]+\.(md|sh|py)$' | tr '\n' ' ')
 if [ -n "$bad" ]; then echo "   BAD NAMES: $bad"; fail=1
-else echo "   all $(ls $D | grep -v '^__pycache__$' | wc -l | tr -d ' ') files match rNNN_name.{md,sh,py} (+ llm.py)"; fi
+else echo "   all $(ls $D | grep -v '^__pycache__$' | wc -l | tr -d ' ') files match rNNN_name.{md,sh,py} -- no exceptions"; fi
 
 echo "2. every rNNN_name.{md,sh,py} reference resolves"
 n=0

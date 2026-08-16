@@ -65,7 +65,7 @@ LANES = 4
 # (Captions are OUT by the user's decision -- apparatus attached to a figure, not
 # running text.  They are still LABELLED and kept in the JSON, so reversing that
 # is a rebuild, not a re-OCR.  Errata columns ARE article and stay in.)
-import llm                                                       # noqa: E402
+import r000_llm as llm                                          # noqa: E402
 from r010_ocr_blocks import (ARTICLE_LABELS, HYPHEN_MARK,        # noqa: E402
                              PARA_INDENT_MIN_PX, SRC_DIR, reading_order)
 
