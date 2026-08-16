@@ -387,6 +387,9 @@ VALID_ROLES = set(ROLE_PREFIX) | {"body", "code", "source", "row"}
 # clustering at 0.66-0.67; the 0.85-0.95 band is ordinary body, including
 # 26- and 28-line body blocks on p145. The ratio is per page because type size
 # varies between pages, and taken from the median so one odd block cannot move it.
+# Longest continuation a colon-ended standfirst may absorb.  See join_runons.
+INTRO_TAIL_MAX_CHARS = 80
+
 SOURCE_LINE_RATIO = 0.85
 SOURCE_MIN_BODY_BLOCKS = 2      # too few to take a median from
 SOURCE_HTML = '<p class="source">%s</p>'
@@ -420,10 +423,20 @@ def join_runons(paras):
             continue
         # A standfirst is never printed twice in a row, so two consecutive ones
         # are always one that OCR split.  Unconditional, unlike the heading rule
-        # below: the break usually falls on a colon -- "Der Name des Freundes:" /
-        # "Print Shop Companion" -- and a colon counts as a finished sentence.
+        # below, because a standfirst legitimately ends on a full stop.
         if out and role == "intro" and out[-1][0] == "intro":
             out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3])
+            continue
+        # A standfirst ending on a COLON is grammatically unfinished, and what
+        # finishes it is set larger, so stage B reads it as a heading:
+        # "...Der Name des Freundes:" / "Print Shop Companion" (p39).  It is one
+        # sentence and belongs in one paragraph.  MEASURED: exactly one
+        # standfirst in the issue ends on a colon, and its continuation is 20
+        # characters -- the length cap is there so a future issue cannot swallow
+        # a body paragraph on the strength of a colon.
+        if (out and out[-1][0] == "intro" and out[-1][1].rstrip().endswith(":")
+                and len(p.strip()) <= INTRO_TAIL_MAX_CHARS):
+            out[-1] = ("intro", join_text(out[-1][1], p), out[-1][2], out[-1][3])
             continue
         # A headline set over two lines arrives as two blocks, and rendering them
         # separately produces two "# " lines where a reader sees one headline --
