@@ -30,7 +30,8 @@ import re
 import sys
 
 import llm
-from classify import (OUT_DIR, PARA_INDENT_MIN_PX, ROLE_PREFIX, SOURCE_HTML,
+from classify import (OUT_DIR, PARA_INDENT_MIN_PX, ROLE_PREFIX,
+                      SOURCE_HTML, SOURCE_JOIN,
                       ends_dangling, join_runons, join_text, page_paragraphs)
 
 # ---------------------------------------------------------------------------
@@ -519,14 +520,23 @@ def page_range(pages):
 
 def render_article(article):
     chunks = [f'# {article["title"]} {page_range(article["pages"])}']
+    source = []
+
+    def flush():
+        if source:
+            chunks.append(SOURCE_HTML % SOURCE_JOIN.join(source))
+            source.clear()
+
     for p in article["paras"]:
         role, text = p["role"], p["text"].strip()
         if not text:
             continue
+        if role == "source":
+            source.append(text)
+            continue
+        flush()
         if role == "code":
             chunks.append("```\n" + text + "\n```")
-        elif role == "source":
-            chunks.append(SOURCE_HTML % text)
         elif role == "byline":
             chunks.append(text)
         elif role == "title":
@@ -535,6 +545,7 @@ def render_article(article):
             chunks.append("## " + text)
         else:
             chunks.append(ROLE_PREFIX.get(role, "") + text)
+    flush()
     return "\n\n".join(chunks)
 
 

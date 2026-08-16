@@ -123,7 +123,7 @@ Markdown, one line per **paragraph**, blank line between paragraphs:
 | `## ` | a standalone section heading, set on its own line |
 | `### ` | a bold run-in subhead opening a paragraph (`Ursprungsblock`, `Zielblock`) |
 | ` ``` ` | a short code fragment quoted inside the prose |
-| `<p class="source">` | a source note set in a smaller face — `Info: …`, a publisher address, an ISBN/price credit, `Fortsetzung von Seite 32`. Markdown cannot express it, so it is emitted as HTML, which markdown passes through. |
+| `<p class="source">` | a source note set in a smaller face — `Info: …`, a publisher address, an ISBN/price credit, `Fortsetzung von Seite 32`. Markdown cannot express it, so it is emitted as HTML, which markdown passes through. **Consecutive source notes are one note**, joined with `<br>`: p10's vendor list is set as ten separate lines and p146's as twenty-one, and the line breaks are the address's structure rather than typesetting. 75 blocks over the issue become 32. |
 
 ---
 
