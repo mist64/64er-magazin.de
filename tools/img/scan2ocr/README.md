@@ -27,7 +27,7 @@ Measured against a vision reading of all 176 pages of issue 8609:
 | order | 0.996 |
 | headings | 0.874 |
 | corpus | ~412,000 chars over 91 pages |
-| assembled | 72 articles, ~396,000 chars |
+| assembled | 57 articles, ~396,000 chars |
 
 ⚠️ **Scores are only comparable within one set of `truth/` files.** Regenerating
 truth (any change to `TRUTH_PROMPT`) re-bases every number. When you regenerate,
@@ -160,15 +160,26 @@ and `(Knut Smoczyk/tr)` — a reader's name, then the editor who took it in. Bot
 end in exactly two lowercase letters. Kept verbatim, always split into their own
 paragraph.
 
-**A recurring column is ONE article containing many items.** `Tips & Tricks für
-Einsteiger` is the article; `Die Multifunktions-Taste`, `Tip zum MSE`, `SMON auf
-Tastendruck` are `##` sections inside it, each keeping its own byline. The same
-holds for `Die CP/M-Ecke`. A headline that names a specific product or event is
-an article even when it shares a page — `Professionell und preiswert` (a Forth
-compiler test) is not a section of the assembler comparison beside it.
+**A department or a column is ONE article containing many items**, and the two
+differ only in where the title comes from:
 
-Left to inference this flipped twelve articles between runs, so both halves of
-it are stated in the prompt with examples.
+| | title | example |
+|---|---|---|
+| **department** | the **running head** — the magazine prints no headline for the run | `Aktuelles [8-12]`, 22 news items as `##`; `Leserforum [15-16]`, 22 reader questions as `##` |
+| **column** | the **printed headline** | `Tips & Tricks für Einsteiger [64-65]`, 8 tips as `##`; `Die CP/M-Ecke (Teil 3)` |
+
+The department case is the one place the running head becomes a title, and it
+needs `keep_heading` on the opening boundary so the first item's headline is not
+swallowed as the title.
+
+A shared running head never merges by itself: `Tips & Tricks` runs over pages
+62–96, most of which carry full articles (`Module für Hypra-Basic`, `HiRes
+Colossal`). And a headline naming a specific product or event is an article even
+when it shares a page — `Professionell und preiswert` (a Forth compiler test) is
+not a section of the assembler comparison beside it.
+
+Left to inference this flipped a dozen articles between runs, so every part of
+it is stated in the prompt with examples.
 
 ---
 

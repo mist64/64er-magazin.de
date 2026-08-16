@@ -260,10 +260,18 @@ before — not its page's first indent.** After a continuation splice the joined
 paragraph is not the first on its page: reading the page's indent welded the
 assembler course onto an unrelated notice about the Austrian edition on p140.
 
-**A recurring column is one article.** `Tips & Tricks für Einsteiger` holds eight
-items, each with its own headline and its own byline by a different author; they
-are `##` sections, not articles. Left to inference this flipped twelve articles
-between runs, so the rule and its counter-examples are both in the prompt.
+**A department and a column are both one article; they differ in where the title
+comes from.** A *department* is a run of pages under a standing running head for
+which the magazine prints no headline at all — `Aktuelles` (p8–12, 22 news
+items), `Leserforum` (p15–16, 22 reader questions). Its title is the running
+head, which is the one place a running head may become a title, and the opening
+boundary needs `keep_heading` so the first item's headline survives as a `##`
+instead of being eaten as the title. A *column* prints its headline —
+`Tips & Tricks für Einsteiger`, `Die CP/M-Ecke (Teil 3)` — and that is the title.
+
+Neither follows from the running head alone: `Tips & Tricks` runs over p62–96,
+most of it full articles. Left to inference this flipped a dozen articles
+between runs.
 
 **Hyphens are resolved over the distinct words, not the occurrences** — the
 answer is a property of the word, and the issue's 4287 marks are only 3459
