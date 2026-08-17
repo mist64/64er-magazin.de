@@ -83,6 +83,12 @@ PAPER_LEVEL = 215       # above this luminance is paper, not print
 # boundary BETWEEN two printed objects -- nothing printed has one inside it.
 GUTTER_MIN_PX = 90      # ~3.8 mm at 600 dpi; narrower than any column gutter
 GUTTER_BLANK_FRAC = 0.995   # share of the column's height that must be paper
+# The vertical separation between two stacked figures is a DIFFERENT quantity
+# from a column gutter and needs its own measurement: the magazine sets figures
+# closer together down a column than the columns are apart.  MEASURED on p27,
+# whose two greeting cards are separated by bare runs of 75 and 48 rows -- both
+# below the 90 px gutter minimum, which is why they stayed merged.
+BAND_MIN_PX = 64        # bare rows that separate two stacked figures
 # A tint panel IS the figure; its edge is where the tint stops.
 # MEASURED on p143's panel: a tinted row reads 0.60-0.82 marked, never 0.90 --
 # the black boxes and white fields printed ON it are part of the figure and are
@@ -138,6 +144,7 @@ CAPTION_OPEN = re.compile(r"^(Bild|Tabelle|Abb\.?)\s*(\d+)")
 CAPTION_MEASURE_MATCH = 0.25  # a block sharing this much width is above the figure
 MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
 PANEL_MAX_FRAC = 0.92         # ...unless measured tint says so (see grow_to_panel)
+STRUCTURAL_LABELS = ("caption", "header", "footer")  # always bound a figure
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 # Asymmetric on purpose -- see the merge in illustrations().
@@ -846,8 +853,20 @@ def figures(page):
         cell = marked[max(0, y0):y1, max(0, x0):x1]
         return cell.size > 0 and cell.mean() > BLOCK_TINT_FRAC
 
+    # STRUCTURE IS NOT PROSE, SO THE WORD COUNT MUST NOT FILTER IT.
+    #
+    # The minimum exists to keep a stray two-word fragment from bounding a
+    # figure.  Applied to captions, running heads and folios it removed the very
+    # boundaries the layout is built from: MEASURED over this issue, 424
+    # headers, 229 footers and 19 captions were dropped -- "Bild 2." is two
+    # words.  The eleventh census named the consequence exactly, "caption is a
+    # stopper for starts, not for growth", and its other two defect forms are
+    # the same omission: boxes growing up into a rubric badge (24-1), a running
+    # head (27-3) or an article deck (30-0).
     stoppers = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
-                if b.get("n_words", 0) >= TOP_STOP_MIN_WORDS and not on_figure(b, bb)]
+                if (lab in STRUCTURAL_LABELS
+                    or b.get("n_words", 0) >= TOP_STOP_MIN_WORDS)
+                and not on_figure(b, bb)]
 
     illus = illustrations(rec, grey < BORDER_DARK)
     caps = caption_lines(rec)
@@ -956,6 +975,10 @@ def figures(page):
         x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
         ax0, ax1 = f.get("anchor", [x0, x1])
         x0, y0, x1, y1 = cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1)
+        cb = f.get("cap_bbox")
+        if cb is not None:
+            x0, y0, x1, y1 = cut_at_band(marked, x0, y0, x1, y1,
+                                         y1 - MIN_H_PX, y1)
         y0, y1 = grow_to_panel(marked, x0, y0, x1, y1, H, stoppers,
                                f.get("cap_bbox"))
         x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
@@ -1199,6 +1222,44 @@ def cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1):
     if hi - lo < MIN_W_PX:
         return x0, y0, x1, y1
     return x0 + int(lo), y0, x0 + int(hi), y1
+
+
+def cut_at_band(marked, x0, y0, x1, y1, ay0, ay1):
+    """The same cut as cut_at_gutter, across rows instead of columns.
+
+    A bare strip of paper separates two printed objects whichever way it runs,
+    but only the vertical case was implemented, so two figures stacked in one
+    column stayed merged.  Growth cannot catch these: the box is already
+    spanning the gap before any scan starts -- p27's box is clamped to 62% of
+    the page and lands with one greeting card above the gap and one below.  The
+    caption says which piece is the figure, exactly as it does sideways.
+    """
+    cell = marked[y0:y1, x0:x1]
+    if cell.size == 0 or y1 - y0 < 2 * BAND_MIN_PX:
+        return x0, y0, x1, y1
+    blank = (~cell).mean(axis=1) > GUTTER_BLANK_FRAC
+    segs, run = [], None
+    for i, b in enumerate(list(blank) + [True]):
+        if b and run is None:
+            run = i
+        elif not b and run is not None:
+            if i - run >= BAND_MIN_PX:
+                segs.append((run, i))
+            run = None
+    if run is not None and len(blank) + 1 - run >= BAND_MIN_PX:
+        segs.append((run, len(blank)))
+    if not segs:
+        return x0, y0, x1, y1
+    mid = (ay0 + ay1) / 2 - y0
+    lo, hi = 0, y1 - y0
+    for a, b in segs:
+        if b <= mid:
+            lo = max(lo, b)
+        elif a >= mid:
+            hi = min(hi, a)
+    if hi - lo < MIN_H_PX:
+        return x0, y0, x1, y1
+    return x0, y0 + int(lo), x1, y0 + int(hi)
 
 
 def gutter_pieces(marked, x0, y0, x1, y1):
