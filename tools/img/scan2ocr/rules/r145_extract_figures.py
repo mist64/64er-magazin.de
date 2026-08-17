@@ -291,6 +291,21 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # p79's band remains the one place printed content is lost, and recovering it
 # needs the caption to say "these fragments are one figure", not the pixels.
 #
+# TRIED AND REVERTED, iteration 24: dedup by shared frame.  131-2 holds the 6510
+# AND half the 6526 while 131-3 is exactly the 6526's detected frame, and the
+# area test never fires because the overlap is only half the smaller box -- so
+# the pair has survived every census.  "A box containing another figure's own
+# frame has swallowed it" is the right sentence, and it did not work, for a
+# reason that is about this loop rather than about the paper: the boxes are
+# emitted in top-then-left order, 131-2 comes first, and when it is processed the
+# framed box it swallowed does not exist yet.  A comparison against `out` can
+# only see what has already been emitted.
+#
+# Doing it properly means a second pass over the finished list rather than a test
+# inside the emit loop -- cheap, but a restructure, and this session has already
+# been bitten three times by adding a rule at the wrong point in this pass.
+# Left for the next iteration with the diagnosis written down.
+#
 # The structure that does separate them is the printed rule rectangle, which
 # exists on essentially every one of these figures.  framed_rects() below was
 # written for exactly that and is currently UNCALLED.  It is not ready: tested
