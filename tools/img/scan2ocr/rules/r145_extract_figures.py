@@ -204,6 +204,22 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # constant from 300 to 120 demonstrated it precisely: p79 stayed split (324 >
 # 120), p172 was newly split, and p74's three boxes still did not separate.
 #
+# A SECOND STRUCTURAL DEFECT, MEASURED AND NOT YET FIXED: caption binding is off
+# by one wherever the magazine sets captions ABOVE their figures.  This file
+# assumes the 64'er convention of a caption beneath its figure, and on p133's
+# two-column pinout spread they sit above -- so every binding slips one slot.
+# "Bild 2. Anschlussplan des Prozessors 6510" lands on the ROM, "Bild 3 ... des
+# CIA 6526" on the PLA, "Bild 6 ... der VIC" on the SID, while the 6510, the 6526
+# and the VIC come out captionless.  "A systematic off-by-one, not noise, and it
+# will not be fixed by any further gap tuning."
+#
+# TRIED AND REVERTED: binding to the nearest figure in EITHER direction, choosing
+# by distance.  It merged p133's five chips down to three, because downward
+# claiming is greedy where the figures are stacked.  The reviewer's other
+# suggestion is the one to build -- parse the printed NUMBER and match it to
+# figure order, so "Bild 3" binds to the third figure rather than to whatever is
+# nearest in pixels.
+#
 # The structure that does separate them is the printed rule rectangle, which
 # exists on essentially every one of these figures.  framed_rects() below was
 # written for exactly that and is currently UNCALLED.  It is not ready: tested
@@ -221,7 +237,14 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # The seventeenth census put it exactly: the fallback "converts missing into
 # merged on cluster-pass pages", and merges stayed at 8 while missing fell 9 to
 # 4.  Tesseract over-segments a composite, but the pieces of one figure TOUCH.
-FRAME_CLUSTER_PX = CLAIM_GAP_PX   # frames this close are one figure built of boxes
+# REVERTED to 300 after measurement.  Tightening it to the caption path's gap
+# was meant to stop separate figures merging; two independent reviews found it
+# stopped not one merge (131-2 still takes half the 6526, 74-3 is still three
+# figures) and DID create new splits -- p172's screen dump into 172-00 and
+# 172-000, p31's flowchart into 30-1 and 30-1b -- because a figure's own internal
+# band is wider than the gap between neighbours.  bw 55% -> 48%, dots 47% -> 41%,
+# and colour's 72.5% predates the change, so no bucket showed it helping.
+FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 # Asymmetric on purpose -- see the merge in illustrations().
 # MEASURED on p133, whose five chip pinouts sit side by side: the gaps BETWEEN
 # two different figures there are 248, 300 and 378 px.  At 300 the join merged
