@@ -1682,6 +1682,9 @@ def figures(page):
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
                     "ink": f["ink"], "type": classify(crop),
                     "caption": f.get("caption"), "kind": f.get("kind"),
+                    # carried through so the second pass can use a caption's
+                    # position, not just its text
+                    "cap_bbox": f.get("cap_bbox"),
                     "num": f.get("num"), "crop": crop})
     # --- SECOND PASS: A BOX THAT CONTAINS ANOTHER FIGURE'S OWN FRAME.
     #
@@ -1721,6 +1724,62 @@ def figures(page):
                 ax1 = int(bx0) - CAPTION_GAP_PX
             elif ax1 - bx1 >= MIN_W_PX:
                 ax0 = int(bx1) + CAPTION_GAP_PX
+            else:
+                continue
+            a["bbox"] = [ax0, ay0, ax1, ay1]
+            a["w"], a["h"] = ax1 - ax0, ay1 - ay0
+            a["crop"] = im.crop((ax0, ay0, ax1, ay1))
+            break
+
+    # --- AND TWO BOXES WITH DIFFERENT CAPTIONS ARE TWO FIGURES.
+    #
+    # 22-1 carries "Bild 1. Citizen LSP 10" and 22-2 carries "Bild 2.
+    # Schriftprobe des LSP 10", and both were grown over BOTH figures -- 85% of
+    # the smaller box is shared.  The area dedup would keep the larger and throw
+    # a numbered figure away, which is why this pair had to be left alone until
+    # there was a rule that separates rather than discards.
+    #
+    # Each caption owns the artwork on its own side of the other's caption: the
+    # magazine numbered them separately, so a boundary exists, and the captions
+    # say where.  Only for boxes that BOTH carry a caption and carry different
+    # ones -- one uncaptioned box overlapping a captioned one is the container
+    # case above, and two boxes with the same caption are a real duplicate.
+    for a in out:
+        ca = a.get("cap_bbox")
+        if ca is None:
+            continue
+        ax0, ay0, ax1, ay1 = a["bbox"]
+        for b in out:
+            cb = b.get("cap_bbox")
+            if b is a or cb is None or a.get("num") == b.get("num"):
+                continue
+            bx0, by0, bx1, by1 = b["bbox"]
+            iw = min(ax1, bx1) - max(ax0, bx0)
+            ih = min(ay1, by1) - max(ay0, by0)
+            if iw <= 0 or ih <= 0:
+                continue
+            if iw * ih < DUPLICATE_FRAC * min((ax1 - ax0) * (ay1 - ay0),
+                                              (bx1 - bx0) * (by1 - by0)):
+                continue
+            # WHICHEVER AXIS THE CAPTIONS SEPARATE ON.  On p23 the two captions
+            # sit side by side -- Bild 1's spans x=238..2360 and Bild 2's
+            # x=2482..3444 -- so the figures are left and right of each other,
+            # not above and below, and a rule that only trimmed a bottom edge
+            # left both boxes spanning both figures.  The captions' own
+            # geometry says which axis it is: if they overlap in x they are
+            # stacked, and if they overlap in y they are side by side.
+            axis_x = min(ca[2], cb[2]) - max(ca[0], cb[0]) <= 0
+            if axis_x:
+                if int(ca[0]) < int(cb[0]) and int(cb[0]) - ax0 >= MIN_W_PX:
+                    ax1 = min(ax1, int(cb[0]) - CAPTION_GAP_PX)
+                elif int(ca[0]) > int(cb[0]) and ax1 - int(cb[2]) >= MIN_W_PX:
+                    ax0 = max(ax0, int(cb[2]) + CAPTION_GAP_PX)
+                else:
+                    continue
+            elif int(ca[1]) > int(cb[1]) and ay1 - int(cb[3]) >= MIN_H_PX:
+                ay0 = max(ay0, int(cb[3]) + CAPTION_GAP_PX)
+            elif int(ca[1]) < int(cb[1]) and int(cb[1]) - ay0 >= MIN_H_PX:
+                ay1 = min(ay1, int(cb[1]) - CAPTION_GAP_PX)
             else:
                 continue
             a["bbox"] = [ax0, ay0, ax1, ay1]
