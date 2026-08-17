@@ -208,6 +208,7 @@ FOLIO_BAND_INK = 0.15    # sparser than this in the band means it is the folio
 FRAME_CLAMP_COVER = 0.80 # this much of a box inside a frame means the frame is its
 FRAME_CLAMP_GROW = 1.60  # ...and a frame bigger than this multiple is not
 FRAME_CLAMP_SLACK = 24   # a frame may sit this far inside the box and still enclose it
+FRAME_EAT_FRAC = 0.25    # this much of another figure's frame inside a box is a bite
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # THE MEASUREMENT THAT SAYS NO GAP THRESHOLD CAN WORK, recorded before the next
@@ -1682,6 +1683,51 @@ def figures(page):
                     "ink": f["ink"], "type": classify(crop),
                     "caption": f.get("caption"), "kind": f.get("kind"),
                     "num": f.get("num"), "crop": crop})
+    # --- SECOND PASS: A BOX THAT CONTAINS ANOTHER FIGURE'S OWN FRAME.
+    #
+    # 131-2 holds the 6510 AND half the 6526, while 131-3 is exactly the 6526's
+    # detected frame.  The area-overlap dedup never fires -- the shared part is
+    # only half the smaller box -- so this pair survived every census.  The
+    # frame is the magazine's own statement of where a figure ends, so the
+    # framed box IS that figure and the container has swallowed it; the
+    # container is trimmed back to what lies outside the frame, which keeps the
+    # 6510 instead of dropping it with the duplicate.
+    #
+    # It has to be a second pass.  Tried inside the emit loop it did nothing,
+    # because boxes are emitted top-then-left: 131-2 comes first, and the framed
+    # box it swallowed does not exist yet to be compared against.
+    for a in out:
+        ax0, ay0, ax1, ay1 = a["bbox"]
+        for b in out:
+            if b is a:
+                continue
+            bx0, by0, bx1, by1 = b["bbox"]
+            if min(ax1, bx1) - max(ax0, bx0) <= 0 or min(ay1, by1) - max(ay0, by0) <= 0:
+                continue
+            if not any(abs(r[0] - bx0) <= FRAME_CLAMP_SLACK
+                       and abs(r[1] - by0) <= FRAME_CLAMP_SLACK
+                       and abs(r[2] - bx1) <= FRAME_CLAMP_SLACK
+                       and abs(r[3] - by1) <= FRAME_CLAMP_SLACK for r in frames):
+                continue                        # b is not a detected frame
+            # OVERLAP, NOT CONTAINMENT.  The container does not hold the whole
+            # frame -- it holds part of it, which is the defect: p133's box runs
+            # to x=2554 while the 6526's frame runs 1812..3188, so it has eaten
+            # the chip's left half and stopped.  Requiring full containment
+            # matched nothing at all.
+            ov = min(ax1, bx1) - max(ax0, bx0)
+            if ov < FRAME_EAT_FRAC * (bx1 - bx0):
+                continue                        # barely touches b's frame
+            if bx0 - ax0 >= MIN_W_PX:
+                ax1 = int(bx0) - CAPTION_GAP_PX
+            elif ax1 - bx1 >= MIN_W_PX:
+                ax0 = int(bx1) + CAPTION_GAP_PX
+            else:
+                continue
+            a["bbox"] = [ax0, ay0, ax1, ay1]
+            a["w"], a["h"] = ax1 - ax0, ay1 - ay0
+            a["crop"] = im.crop((ax0, ay0, ax1, ay1))
+            break
+
     return out, rec, im
 
 
