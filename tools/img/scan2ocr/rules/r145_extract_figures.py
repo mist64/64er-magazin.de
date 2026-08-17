@@ -209,6 +209,9 @@ FRAME_CLAMP_COVER = 0.80 # this much of a box inside a frame means the frame is 
 FRAME_CLAMP_GROW = 1.60  # ...and a frame bigger than this multiple is not
 FRAME_CLAMP_SLACK = 24   # a frame may sit this far inside the box and still enclose it
 FRAME_EAT_FRAC = 0.25    # this much of another figure's frame inside a box is a bite
+# A photograph contains framed components; a figure's own frame is page-scale.
+FRAME_FIGURE_MIN_W = 1000   # px at 600 dpi, about a text column
+FRAME_FIGURE_MIN_H = 1000
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # THE MEASUREMENT THAT SAYS NO GAP THRESHOLD CAN WORK, recorded before the next
@@ -306,6 +309,21 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # inside the emit loop -- cheap, but a restructure, and this session has already
 # been bitten three times by adding a rule at the wrong point in this pass.
 # Left for the next iteration with the diagnosis written down.
+#
+# OPEN, DIAGNOSED, NOT YET FIXED (iteration 26): p24's two side-by-side
+# photographs come out as two narrow overlapping crops that each amputate the
+# picture -- 24-3 and 24-3b in the census -- and the real regions are dropped.
+# TRACED: ALTO proposes them correctly at x=356..2508 and x=2600..4758, and the
+# emitted boxes are 2880..3820 and 3460..4028, which match NEITHER.  They never
+# pass through snap_to_frame or trim_blank, so they are not the ALTO path at all
+# -- they come from the leftover-cluster path while the two real regions are
+# discarded somewhere before it.
+#
+# Ruled out this iteration, each by instrumenting the pass: the caption-axis
+# split (p24's single "Bild 2" spans both photos, and a shared caption is now
+# refused as a boundary), cut_at_gutter, gutter_pieces, snap_to_frame and
+# trim_blank.  What remains is why the two ALTO regions do not survive to
+# `found`, which is where the next iteration should start.
 #
 # The structure that does separate them is the printed rule rectangle, which
 # exists on essentially every one of these figures.  framed_rects() below was
@@ -1574,6 +1592,12 @@ def figures(page):
                 continue                        # does not enclose this box
             if frame_area > FRAME_CLAMP_GROW * box_area:
                 continue                        # far bigger: not this figure's
+            # ...and a frame INSIDE a photograph is not a figure boundary.  p24's
+            # drive interior contains a dozen framed components; two boxes each
+            # clamped to a different one and the same photo came out as two
+            # overlapping crops, each amputating chips mid-body.
+            if (r[2] - r[0]) < FRAME_FIGURE_MIN_W or (r[3] - r[1]) < FRAME_FIGURE_MIN_H:
+                continue
             if best is None or frame_area < best_area:
                 best, best_area = r, frame_area
         if best is not None:
@@ -1709,11 +1733,21 @@ def figures(page):
             bx0, by0, bx1, by1 = b["bbox"]
             if min(ax1, bx1) - max(ax0, bx0) <= 0 or min(ay1, by1) - max(ay0, by0) <= 0:
                 continue
+            # ...AND ONLY WHERE b's FRAME IS FIGURE-SIZED.
+            #
+            # A photograph contains rectangles: p24's drive interior has a dozen
+            # framed components inside it, and two boxes each landed on a
+            # different one, so each trimmed itself off the other and the same
+            # photo came out as 24-3 and 24-3b -- two overlapping crops that each
+            # amputate chips mid-body.  A frame that is a figure is a
+            # substantial part of the page; a frame inside a photograph is not.
             if not any(abs(r[0] - bx0) <= FRAME_CLAMP_SLACK
                        and abs(r[1] - by0) <= FRAME_CLAMP_SLACK
                        and abs(r[2] - bx1) <= FRAME_CLAMP_SLACK
-                       and abs(r[3] - by1) <= FRAME_CLAMP_SLACK for r in frames):
-                continue                        # b is not a detected frame
+                       and abs(r[3] - by1) <= FRAME_CLAMP_SLACK
+                       and (r[2] - r[0]) >= FRAME_FIGURE_MIN_W
+                       and (r[3] - r[1]) >= FRAME_FIGURE_MIN_H for r in frames):
+                continue                        # b is not a figure-sized frame
             # OVERLAP, NOT CONTAINMENT.  The container does not hold the whole
             # frame -- it holds part of it, which is the defect: p133's box runs
             # to x=2554 while the 6526's frame runs 1812..3188, so it has eaten
@@ -1770,6 +1804,15 @@ def figures(page):
             # left both boxes spanning both figures.  The captions' own
             # geometry says which axis it is: if they overlap in x they are
             # stacked, and if they overlap in y they are side by side.
+            # ONE CAPTION SPANNING BOTH FIGURES CANNOT SEPARATE THEM.  p24 sets
+            # two side-by-side photographs under a single "Bild 2" that runs the
+            # full measure, x=360..4706, over both.  Cutting at that caption's
+            # edges sliced each photo mid-body and emitted two overlapping crops
+            # -- 24-3 and 24-3b, each amputating chips while duplicating the
+            # middle.  Where the two boxes' captions are the same printed line,
+            # there is no boundary in them to use.
+            if abs(int(ca[0]) - int(cb[0])) < 4 and abs(int(ca[1]) - int(cb[1])) < 4:
+                continue
             axis_x = min(ca[2], cb[2]) - max(ca[0], cb[0]) <= 0
             if axis_x:
                 if int(ca[0]) < int(cb[0]) and int(cb[0]) - ax0 >= MIN_W_PX:
