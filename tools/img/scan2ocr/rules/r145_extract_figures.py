@@ -263,6 +263,26 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # nothing downstream is not worth carrying, and the blocker is now known to be
 # caption RECALL inside a figure, not frame recall.
 #
+# TRIED AND REVERTED, iteration 22: bridging a VERTICAL gap the way a horizontal
+# one is bridged -- two stacked regions with the figure's own line work running
+# between them are one figure.  It fixed the case it was written for: p79's
+# hardcopy, three fragments 324 px apart with the band between them ("Quadrate
+# 21*21 Dots", a dotted square, the top of a circle) in NO file, came back as one
+# figure.  It cost more than that: p42's three screenshots merged into one and
+# p43's two into one.
+#
+# Adding "unless type is set between them" did not save it.  p42's screenshots
+# have NO type between them -- they are stacked 168 px apart with only their own
+# borders in the gap -- so the ink test cannot tell one figure split in two from
+# two figures stacked close.  That is the same overlapping-populations problem
+# already recorded above for gap thresholds, in a different coordinate: the ink
+# in an intra-figure band and the ink in an inter-figure band look alike.
+#
+# A horizontal bridge works because a column gutter is bare BY CONSTRUCTION --
+# the magazine's grid guarantees it.  Nothing guarantees the vertical equivalent.
+# p79's band remains the one place printed content is lost, and recovering it
+# needs the caption to say "these fragments are one figure", not the pixels.
+#
 # The structure that does separate them is the printed rule rectangle, which
 # exists on essentially every one of these figures.  framed_rects() below was
 # written for exactly that and is currently UNCALLED.  It is not ready: tested
