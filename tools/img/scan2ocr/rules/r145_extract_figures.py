@@ -241,6 +241,19 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # are siblings rather than children.  That is a real piece of work, not a
 # threshold, and it is the honest next step.
 #
+# TRIED AND REVERTED, iteration 20: two more recall fixes to framed_rects --
+# pairing each top rule with the NEAREST bottom that closes it, and accepting a
+# BROKEN bottom rule by coverage as the vertical sides already are.  Both are
+# right in principle and both worked on the detector: p74 went 1 rect -> 2, its
+# real structure being three boxes at y 556-2184, 2256-4656 and 4728-6676.
+# Neither reached the pipeline, because p74 carries only ONE detected caption --
+# Bild 1's and Bild 2's are printed INSIDE their hardcopies and never come back
+# from the OCR as caption blocks, so the captioned-frame split cannot fire with
+# fewer than two.  Meanwhile the looser matching raised frame noise elsewhere
+# (p172 48 -> 58 rectangles).  Reverted: a change that costs precision and buys
+# nothing downstream is not worth carrying, and the blocker is now known to be
+# caption RECALL inside a figure, not frame recall.
+#
 # The structure that does separate them is the printed rule rectangle, which
 # exists on essentially every one of these figures.  framed_rects() below was
 # written for exactly that and is currently UNCALLED.  It is not ready: tested
@@ -296,6 +309,7 @@ FRAME_INSIDE_FRAC = 0.70  # this much of a frame inside a box means the box hold
 CAPTION_FRAME_NEAR = 90   # a caption this close to a frame's band belongs to it
 CAPTION_STEAL_BAND = 400  # a foreign caption this near a box's top is the one above's
 CAPTION_STEAL_OVERLAP = 0.60  # share of the caption's width the box must cover
+CAPTION_BELOW_NEAR = 260  # a caption this far under a frame is still that frame's
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
 
@@ -1284,7 +1298,17 @@ def figures(page):
             bx0, by0, bx1, by1 = c["bbox"]
             if min(r[2], bx1) - max(r[0], bx0) <= 0:
                 continue
+            # A caption may be set INSIDE the frame or BENEATH it, and both
+            # occur on one page: p74 sets Bild 1's and Bild 2's inside their
+            # frames and Bild 3's outside, below.  Requiring it inside declined
+            # the split on the exact case the rule was written for -- the census
+            # found all three printouts still in one crop, labelled only "Bild
+            # 3", with Bild 1 and Bild 2 having no figure entry anywhere.
+            # Beneath is the magazine's usual convention, so it gets the room a
+            # caption's own leading needs.
             if r[1] - CAPTION_FRAME_NEAR <= by0 and by1 <= r[3] + CAPTION_FRAME_NEAR:
+                return True
+            if r[3] <= by0 <= r[3] + CAPTION_BELOW_NEAR:
                 return True
         return False
 
