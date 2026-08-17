@@ -41,6 +41,8 @@ BORDER_DARK = 90
 BORDER_FRAC = 0.90
 BORDER_MAX_PX = 40
 BORDER_RULE_MAX_PX = 30   # thicker than this is content, not a printed rule
+BORDER_INSIDE_PX = 24     # look this far inside the band for the frame's margin
+BORDER_INSIDE_FRAC = 0.35 # ...darker than this inside means content, not a rule
 BORDER_OVERCUT = 1
 
 # Body text tesseract failed to block looks exactly like a figure to a gap
@@ -89,6 +91,7 @@ PANEL_TINT_FRAC = 0.55  # share of a row that must be marked to still be panel
 PANEL_STEP_PX = 4       # rows per step while following it
 PANEL_GAP_PX = 120      # unmarked run crossed if the tint resumes beyond it
 PANEL_BARE_FRAC = 0.20  # ...but never across a row this bare: that is the edge
+CAP_BESIDE_PX = 200     # panel this wide beside a caption means it is set INTO it
 TINT_SAT = 22           # RGB max-min above this is ink/tint, not scanned paper
 # Text printed ON a figure -- pin labels, a menu, a printout's edge digits --
 # is figure matter, not a boundary.  Body text sits on bare paper.
@@ -455,7 +458,21 @@ def cut_inside_rule(grey, x0, y0, x1, y1):
                 if first is None:
                     first = i
             elif first is not None:
-                return None if i - first > BORDER_RULE_MAX_PX else (first, i)
+                if i - first > BORDER_RULE_MAX_PX:
+                    return None
+                # A FRAME HAS PAPER INSIDE IT.  Thickness alone does not
+                # separate a rule from content: trim_blank has already removed
+                # the blank margin, so a genuine rule and a screen dump's own
+                # edge both sit flush at index 0.  What a frame has is the white
+                # margin printed INSIDE it before the artwork starts; a screen
+                # photograph's status bar has more picture immediately behind.
+                # MEASURED: the trim moved an edge on 83 of 191 boxes by a
+                # median of 10 px, which is precisely the "status line sliced
+                # mid-glyph" the tenth census found on 39-3, 39-4 and 93-0.
+                inside = profile[i:i + BORDER_INSIDE_PX]
+                if len(inside) and float(np.mean(inside)) > BORDER_INSIDE_FRAC:
+                    return None
+                return first, i
         return None
     blk = grey[y0:y1, x0:x1] < BORDER_DARK
     t = band(blk.mean(axis=1)); b = band(blk.mean(axis=1)[::-1])
@@ -825,6 +842,14 @@ def figures(page):
             # (131-4 carried "Bild 2. Anschlußplan des Prozessors 6510" between
             # two chips), so the box stops above the caption it belongs to.
             box[3] = min(box[3], cy0 - CAPTION_GAP_PX)
+            # ...and it cannot start above the caption of the figure above it.
+            # Bounding which regions may be CLAIMED is not enough: tesseract
+            # sometimes returns one region spanning both figures, and then the
+            # union is that single region.  p028's two greeting cards came back
+            # as one 2142x6000 box on a 7015 px page with "Bild 3." swallowed in
+            # the middle.  The band is a property of the figure, so it clips the
+            # box as well as the claim.
+            box[1] = max(box[1], band_top)
             box[0], box[2] = widen(stoppers, box[0], box[1], box[2], box[3], W)
         else:
             box = figure_above(stoppers, cap, W, H)   # no illustration: fall back
@@ -835,9 +860,30 @@ def figures(page):
 
     # --- An illustration no caption claims is an opener, a cover or a badge.
     leftover = [r for i, r in enumerate(illus) if i not in claimed]
+    # NEVER CLUSTER ACROSS SOMETHING PRINTED BETWEEN THE TWO.
+    #
+    # This is the path an uncaptioned figure takes, and it consulted no text at
+    # all: two regions close enough in both axes were merged whether or not a
+    # caption or a paragraph was set between them.  That is how p28's two
+    # greeting cards became one crop with the caption of the first swallowed in
+    # the middle -- and the tenth census found every remaining caption defect to
+    # be exactly this, an interior caption absorbed by a merge, after the
+    # trailing-caption case had been fixed everywhere else.
+    def parted(a, b):
+        lo, hi = (a, b) if a[3] <= b[1] else (b, a)
+        if lo[3] > hi[1]:
+            return False                        # they overlap vertically
+        for (rx0, ry0, rx1, ry1), _lab in stoppers:
+            if ry0 >= lo[3] and ry1 <= hi[1] and \
+                    min(hi[2], rx1) - max(hi[0], rx0) > 0:
+                return True
+        return False
+
     clustered = []
     for r in sorted(leftover, key=lambda r: (r[1], r[0])):
         for c in clustered:
+            if parted(c, r):
+                continue
             if (min(c[2], r[2]) - max(c[0], r[0]) > -FRAME_CLUSTER_PX
                     and min(c[3], r[3]) - max(c[1], r[1]) > -FRAME_CLUSTER_PX):
                 c[0], c[1] = min(c[0], r[0]), min(c[1], r[1])
@@ -878,9 +924,14 @@ def figures(page):
         # three files.  Dropping the container leaves the per-caption boxes,
         # which are the figures.  One caption inside is normal: 64'er sets some
         # captions within the figure's own tint panel (p143).
-        inside = {tuple(c["bbox"]) for c in caps
+        # Counted as LINES, not as blocks.  One block can set two captions side
+        # by side (p23 sets "Bild 1." and "Bild 3." together), and collapsing
+        # them by bounding box made a two-figure container look like a one-
+        # caption figure -- the tenth census found four such boxes whose caption
+        # text carries two "Bild N." matches.
+        inside = [c for c in caps
                   if x0 <= c["bbox"][0] and c["bbox"][2] <= x1
-                  and y0 <= c["bbox"][1] and c["bbox"][3] <= y1}
+                  and y0 <= c["bbox"][1] and c["bbox"][3] <= y1]
         if len(inside) >= MAX_CAPTIONS_INSIDE + 1:
             continue
         crop = im.crop((x0, y0, x1, y1))
@@ -960,7 +1011,19 @@ def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
             # reads 0.00.
             if row.size and row.mean() < PANEL_BARE_FRAC:
                 return None
-            if tinted(yy) and free(yy):
+            # A STOPPER ENDS THE SCAN; IT IS NOT SOMETHING TO LOOK PAST.
+            #
+            # Failing one step and continuing meant the gap window simply
+            # stepped OVER whatever blocked it, so a caption shorter than the
+            # window was jumped: p028's "Bild 3." is 64 px tall against a 120 px
+            # window, and the box ran from one greeting card through the caption
+            # to the next, 6000 px of a 7015 px page.  This is why the tenth
+            # census still found every remaining caption defect to be an
+            # interior caption absorbed by a merge -- the boundary was being
+            # tested and then skipped.
+            if not free(yy):
+                return None
+            if tinted(yy):
                 return yy + step * PANEL_STEP_PX
         return None
 
@@ -978,10 +1041,24 @@ def grow_to_panel(marked, x0, y0, x1, y1, H, stoppers, own_cap):
     # artwork, so its own rows are tinted; an ordinary caption is set on bare
     # paper beneath the figure, so they are not.  It reads the caption itself
     # rather than guessing from what lies beyond it.
+    # A CAPTION INSIDE A PANEL HAS PANEL BESIDE IT.
+    #
+    # "Its own rows are tinted" is true of a caption set between two STACKED
+    # tint figures as well -- it is printed on the card below it -- so p028's
+    # "Bild 3." passed the test and growth ran down through it into the next
+    # greeting card, 6000 px of a 7015 px page.  p143's caption is set into a
+    # corner of its panel and has artwork to its left at the same height;
+    # p028's spans the full measure with nothing beside it.  Looking sideways
+    # at the caption's own row separates them.
     cap_inside = False
     if own_cap is not None:
         mid = int((own_cap[1] + own_cap[3]) / 2)
-        cap_inside = MARGIN_PX <= mid < H - MARGIN_PX and tinted(mid)
+        if MARGIN_PX <= mid < H - MARGIN_PX and tinted(mid):
+            row = marked[mid, x0:x1]
+            beside = np.concatenate([row[:max(0, int(own_cap[0]) - x0)],
+                                     row[max(0, int(own_cap[2]) - x0):]])
+            cap_inside = (beside.size > CAP_BESIDE_PX
+                          and float(beside.mean()) > PANEL_TINT_FRAC)
 
     # THE CLAMP HERE IS NOT THE ONE USED FOR A GUESS.  MAX_FIGURE_FRAC guards
     # the caption fallback, where a figure with nothing printed above it would
