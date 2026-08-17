@@ -270,6 +270,7 @@ ILLUS_BRIDGE_TINT_FRAC = 0.55 # a tint field this present running through it
 ILLUS_BRIDGE_BAND_FRAC = 0.60 # ...between pieces sharing this much of a band
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 FRAME_NEST_FRAC = 0.60  # this much of a rect inside a bigger one -> same frame
+FRAME_SIDE_COVER = 0.75 # share of a box's height a side must be ruled over
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
 
@@ -478,10 +479,39 @@ def framed_rects(grey, W, H):
             # carry the figures that have one, this path only has to catch the
             # uncaptioned opener or badge, and a half-closed rectangle is far
             # more often two rules that happen to line up.
-            left = any(abs(c - x0) <= 3 and r0 <= ya + 3 and r1 >= yb - 3 for c, r0, r1 in v)
-            right = any(abs(c - x1) <= 3 and r0 <= ya + 3 and r1 >= yb - 3 for c, r0, r1 in v)
-            if left and right:
-                rects.append([x0 * d, ya * d, x1 * d, yb * d])
+            # A SIDE MAY BE BROKEN AND STILL BE A SIDE.  Requiring one unbroken
+            # vertical run to span the whole box is why p74 returned ZERO
+            # rectangles for three plainly framed printouts: their rules are
+            # interrupted wherever the hardcopy's own ink meets them, so the run
+            # splits and no single piece spans.  The horizontal rules were found
+            # perfectly well -- 4252 px at y=388, 2132 px at y=4728.  What
+            # matters is that the side is MOSTLY ruled over the box's height,
+            # which is what a broken rule still is and what a coincidental
+            # alignment of two short marks is not.
+            def side_covered(col):
+                span = yb - ya
+                if span <= 0:
+                    return False
+                hit = np.zeros(span + 1, dtype=bool)
+                for c, r0, r1 in v:
+                    if abs(c - col) > 3:
+                        continue
+                    a0, a1 = max(r0, ya), min(r1, yb)
+                    if a1 > a0:
+                        hit[a0 - ya:a1 - ya] = True
+                return float(hit.mean()) >= FRAME_SIDE_COVER
+
+            if not (side_covered(x0) and side_covered(x1)):
+                continue
+            # A FIGURE IS NOT THE PAGE.  Accepting a broken side raised recall
+            # and let the page's OWN column rules close a rectangle: p60 came
+            # back as one 4368x6284 box, essentially the whole sheet.  The same
+            # bound the caption fallback uses applies here for the same reason.
+            if (yb - ya) * d > MAX_FIGURE_FRAC * H:
+                continue
+            r = [x0 * d, ya * d, x1 * d, yb * d]
+            if r not in rects:
+                rects.append(r)
     # KEEP THE OUTERMOST OF ANY NEST -- BY OVERLAP, NOT BY CONTAINMENT.
     #
     # Every pair of long horizontal runs that a pair of verticals closes becomes
