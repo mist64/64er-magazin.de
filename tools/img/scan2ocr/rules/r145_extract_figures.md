@@ -196,6 +196,32 @@ for i, a in enumerate(rows):
 print("overlapping pairs:", bad or "none")
 OVERLAP
 
+# 6. EVERY CAPTION IS SOURCED.  The caption used to come from the model's
+#    reply, and the model reads the page image -- so where the OCR had missed a
+#    caption it supplied the real text, and where it could not read one it
+#    supplied a plausible one instead.  7 of 64 matched no OCR block on their
+#    page; one read "Bild 2. Anschlussbelegung des CIA 6526" for a chip printed
+#    "Bild 3. Die Pinbelegung des CIA 6526".  Invented metadata is worse than
+#    missing metadata because it is not visible as missing.
+python3 - "$OUT" <<'CAPS'
+import json, re, sys, unicodedata
+rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
+norm = lambda t: re.sub(r"[^a-z0-9]", "", unicodedata.normalize("NFKD", t).lower())
+bad, capped = [], 0
+for r in rows:
+    if not r.get("caption"):
+        continue
+    capped += 1
+    rec = json.load(open(f"{sys.argv[1]}/{r['page']:03d}.json", encoding="utf-8"))
+    page = norm(" ".join(b.get("text", "") for b in rec["blocks"]))
+    n = norm(r["caption"])
+    if not any(n[:k] and n[:k] in page for k in (40, 28, 20, 14)):
+        bad.append((r["name"], r["page"], r["caption"][:60]))
+print(f"figures with a caption {capped}; unsourced {len(bad)}")
+for n, p, c in bad:
+    print(f"   UNSOURCED {n} p{p} {c!r}")
+CAPS
+
 **Then LOOK at them.** The counts above cannot tell a photograph from a data
 table, which is the whole difficulty of this step. Open
 `$OUT/figures/png/c/` and read a sample, and read the overlays in
