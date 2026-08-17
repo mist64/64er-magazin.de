@@ -269,6 +269,7 @@ ILLUS_BRIDGE_ROW_FRAC = 0.10  # share of rows carrying dark ink across it
 ILLUS_BRIDGE_TINT_FRAC = 0.55 # a tint field this present running through it
 ILLUS_BRIDGE_BAND_FRAC = 0.60 # ...between pieces sharing this much of a band
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
+FRAME_NEST_FRAC = 0.60  # this much of a rect inside a bigger one -> same frame
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
 
@@ -481,12 +482,22 @@ def framed_rects(grey, W, H):
             right = any(abs(c - x1) <= 3 and r0 <= ya + 3 and r1 >= yb - 3 for c, r0, r1 in v)
             if left and right:
                 rects.append([x0 * d, ya * d, x1 * d, yb * d])
-    # keep only the outermost of any nest
+    # KEEP THE OUTERMOST OF ANY NEST -- BY OVERLAP, NOT BY CONTAINMENT.
+    #
+    # Every pair of long horizontal runs that a pair of verticals closes becomes
+    # a rectangle, so a densely ruled figure yields dozens of near-identical
+    # ones that differ by a few pixels and are NOT strictly contained in each
+    # other.  Requiring containment let them all through: 212 rectangles on
+    # p172.  Suppressing anything that mostly lies inside a larger kept
+    # rectangle is the same intent, stated in a way that survives a two-pixel
+    # difference in where a run ended.
     rects.sort(key=lambda r: -(r[2] - r[0]) * (r[3] - r[1]))
     keep = []
     for r in rects:
-        if any(r[0] >= k[0] - 8 and r[1] >= k[1] - 8
-               and r[2] <= k[2] + 8 and r[3] <= k[3] + 8 for k in keep):
+        area = max(1, (r[2] - r[0]) * (r[3] - r[1]))
+        if any(max(0, min(r[2], k[2]) - max(r[0], k[0]))
+               * max(0, min(r[3], k[3]) - max(r[1], k[1])) > FRAME_NEST_FRAC * area
+               for k in keep):
             continue
         keep.append(r)
     return keep
