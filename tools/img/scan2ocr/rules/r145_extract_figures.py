@@ -131,12 +131,15 @@ INK_MIN_PX = 400        # too little ink to measure: fall back to a loose mask
 SAT_COLOUR = 50         # mean chroma of the INK above this -> colour
 SAT_STRONG = 60         # a pixel this chromatic is unambiguously coloured
 SAT_STRONG_FRAC = 0.06  # ...and this share of the ink being so makes it colour
-# MEASURED over every crop in the issue: the median-filter delta of a screened
-# halftone is 0.045-0.055 and of unscreened line art 0.002-0.029.  The old 0.055
-# sat at the very TOP of the screened cluster, so only two of the seven screened
-# chip diagrams reached the dots bucket and the rest fell through to gray.  0.035
-# is the middle of the measured gap.
-SCREEN_DELTA = 0.035    # median-filter delta above this -> screened halftone
+# The press screen of this issue, measured: 133 lpi at 45 degrees.  A crop is
+# screened when its strongest periodicity sits at that ruling AND that angle;
+# unscreened crops peak at 0 degrees, on the printer's or the scanner's own grid.
+FFT_WIN = 256           # window the periodicity is measured in
+SCREEN_PERIOD_LO = 3.2  # 190 lpi at 600 dpi
+SCREEN_PERIOD_HI = 7.0  # 85 lpi
+SCREEN_ANGLE = 45.0     # the screen angle itself
+SCREEN_ANGLE_TOL = 6.0  # measured spread was 44.3-48.5 degrees
+SCREEN_PEAK_MIN = 40.0  # peak over local median; true 54-411, false 9-66 at 0 deg
 GRAY_LO, GRAY_HI = 90, 190   # the band a continuous tone actually lives in
 GRAY_MIDTONE_FRAC = 0.20     # ...over this share of the area -> greyscale
 
@@ -547,29 +550,51 @@ def classify(crop):
     strong = float((chroma[inked] > SAT_STRONG).mean()) if inked.any() else 0.0
     if sat > SAT_COLOUR or strong > SAT_STRONG_FRAC:
         return "c"
-    # MEASURED AT TWO SCALES.  A 3x3 median only sees a FINE screen: the coarse
-    # tint behind p31's flowchart diamonds and p125's block diagram measured
-    # 0.013-0.029, below the cut, and the eleventh census found five such crops
-    # in bw/ whose dot lattice it confirmed at 3x zoom -- "indistinguishable"
-    # from the screen in dots/131-2.  Halving the image turns a coarse screen
-    # into a fine one, so the larger of the two answers is the screen.
     gg = np.asarray(crop.convert("L"))
 
-    def med_delta(a):
-        m = np.median(np.stack([np.roll(np.roll(a, dy, 0), dx, 1)
-                                for dy in (-1, 0, 1) for dx in (-1, 0, 1)]), axis=0)
-        return float(np.abs(m - a).mean() / 255)
-
-    # THE LIMIT, MEASURED AND LEFT ALONE.  Two scales is as far as this method
-    # goes.  At quarter scale every crop scores high -- the known-clean bw
-    # printout 58-1 reaches 0.081 against the screened flowchart's 0.040 --
-    # because the downsampling itself manufactures a pattern.  At half scale the
-    # coarse-screen and clean classes overlap outright (39-3 and 30-1 both read
-    # 0.024).  Four crops the census confirmed screened at 3x zoom are therefore
-    # still called bw, and the honest fix is a periodicity measurement (an FFT
-    # peak IS what a screen is), not a threshold fitted to those four.
-    screen = max(med_delta(gg), med_delta(gg[::2, ::2]))
-    if screen > SCREEN_DELTA:
+    # THE SCREEN IS A PERIODICITY, SO IT IS MEASURED AS ONE.
+    #
+    # A median-filter delta was exhausted: at one scale it saw only fine
+    # screens, at two it overlapped the clean class outright, and at four the
+    # downsampling manufactured the pattern.  A halftone is not "high local
+    # variance", it is a LATTICE, and a lattice is a peak in the Fourier
+    # transform.  MEASURED over every crop in this issue, in the most toned
+    # 256 px window of each: the press screen is 4.4-4.5 px at 44-48 degrees --
+    # 133 lpi at 45 degrees, which is what a 1986 web-offset magazine screen is
+    # -- with a peak 78 to 411 times the local median.  Everything unscreened
+    # peaks at 0 degrees instead: the dot-matrix printer's own orthogonal grid,
+    # or the scanner's.  The separation is total, with no overlap anywhere.
+    #
+    # It also settles a disagreement in favour of the eye: a reviewer reported
+    # at 4x zoom that 151-0 and the p32 flowchart carried "an unambiguous press
+    # halftone lattice" where the median test called them clean.  They measure
+    # 4.5 px at 48.5 and 45.7 degrees.  They were screened.
+    screen = screen_angle = 0.0
+    if gg.shape[0] >= FFT_WIN and gg.shape[1] >= FFT_WIN:
+        best, cell = -1.0, None
+        for yy in range(0, gg.shape[0] - FFT_WIN + 1, max(1, (gg.shape[0] - FFT_WIN) // 6 or 1)):
+            for xx in range(0, gg.shape[1] - FFT_WIN + 1, max(1, (gg.shape[1] - FFT_WIN) // 6 or 1)):
+                c = gg[yy:yy + FFT_WIN, xx:xx + FFT_WIN]
+                mid = float(((c > 90) & (c < 215)).mean())
+                if mid > best:
+                    best, cell = mid, c
+        if cell is not None:
+            c = cell.astype(np.float64)
+            c = (c - c.mean()) * (np.hanning(FFT_WIN)[:, None] * np.hanning(FFT_WIN)[None, :])
+            F = np.abs(np.fft.fftshift(np.fft.fft2(c)))
+            m = FFT_WIN // 2
+            ry, rx = np.mgrid[0:FFT_WIN, 0:FFT_WIN]
+            rad = np.hypot(ry - m, rx - m)
+            per = np.where(rad > 0, FFT_WIN / np.maximum(rad, 1e-9), 1e9)
+            band = (per >= SCREEN_PERIOD_LO) & (per <= SCREEN_PERIOD_HI)
+            if band.any():
+                v = F[band]
+                i = int(np.argmax(v))
+                screen = float(v[i] / np.median(F[(per >= 3.0) & (per <= 20.0)]))
+                screen_angle = float(np.degrees(np.arctan2((ry - m)[band][i],
+                                                           (rx - m)[band][i])) % 90)
+    if screen > SCREEN_PEAK_MIN \
+            and abs(screen_angle - SCREEN_ANGLE) <= SCREEN_ANGLE_TOL:
         return "dots"
     # CONTINUOUS TONE MEANS REAL MID-TONE AREA.  The old test asked for "more
     # than 26 distinct grey levels in 40..215", and MEASURED across every crop
