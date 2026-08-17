@@ -200,6 +200,9 @@ FURNITURE_LABELS = ("header", "footer", "heading")   # the page's, never a figur
 FURNITURE_DOMINATES = 0.60  # furniture this much of a box's height means it IS furniture
 FOLIO_BAND_FRAC = 0.97   # measured: 237 footers put the folio band at 6808/7015
 FOLIO_BAND_INK = 0.15    # sparser than this in the band means it is the folio
+FRAME_CLAMP_COVER = 0.80 # this much of a box inside a frame means the frame is its
+FRAME_CLAMP_GROW = 1.60  # ...and a frame bigger than this multiple is not
+FRAME_CLAMP_SLACK = 24   # a frame may sit this far inside the box and still enclose it
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # THE MEASUREMENT THAT SAYS NO GAP THRESHOLD CAN WORK, recorded before the next
@@ -1591,6 +1594,48 @@ def figures(page):
                 ny1 = int(FOLIO_BAND_FRAC * H)
                 if ny1 - y0 >= MIN_H_PX:
                     x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, ny1)
+        # CLAMP TO THE FIGURE'S OWN FRAME WHERE ONE ENCLOSES IT.
+        #
+        # The box is the ink bounding box of the connected content, and a frame
+        # rule is a thin stroke separated from that content by internal white --
+        # so it falls outside the box, and everything outboard of it goes too.
+        # That one choice produces most of what is left: bottom rules missing on
+        # 131-4, 131-5, 131-7, 30-2 and 54-1, and with them the caption printed
+        # under the rule; and content BEHEADED above the first rule -- 27-t1's
+        # column headers, 93-0's title row, 124-2's label, 58-2's first sprite
+        # row.  It is also why protecting a figure's own header row changed
+        # nothing: that rule keeps a header the crop already contains, and these
+        # headers are lost before it can apply.
+        #
+        # framed_rects() already validates closure on all four sides, so where
+        # exactly one of its rectangles encloses this box it IS the figure's
+        # boundary and the box is clamped to it.  Only where the frame is a
+        # close fit: a frame much larger than the box is the page's, or a
+        # neighbour's, and snapping to it would merge.
+        best = None
+        for r in frames:
+            iw = min(x1, r[2]) - max(x0, r[0])
+            ih = min(y1, r[3]) - max(y0, r[1])
+            if iw <= 0 or ih <= 0:
+                continue
+            box_area = max(1, (x1 - x0) * (y1 - y0))
+            frame_area = max(1, (r[2] - r[0]) * (r[3] - r[1]))
+            # ENCLOSING ONLY, so this can never shrink a box.  A screen dump
+            # has rules INSIDE it -- p42's screenshots each contain a framed
+            # panel -- and snapping to one of those cost real picture: 2211x1534
+            # became 2108x1420.  A figure's boundary is the frame AROUND it.
+            if not (r[0] <= x0 + FRAME_CLAMP_SLACK and r[1] <= y0 + FRAME_CLAMP_SLACK
+                    and r[2] >= x1 - FRAME_CLAMP_SLACK and r[3] >= y1 - FRAME_CLAMP_SLACK):
+                continue
+            if iw * ih < FRAME_CLAMP_COVER * box_area:
+                continue                        # does not enclose this box
+            if frame_area > FRAME_CLAMP_GROW * box_area:
+                continue                        # far bigger: not this figure's
+            if best is None or frame_area < best_area:
+                best, best_area = r, frame_area
+        if best is not None:
+            x0, y0, x1, y1 = int(best[0]), int(best[1]), int(best[2]), int(best[3])
+
         if is_furniture or x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
             continue                            # nothing left that is a figure
         crop = im.crop((x0, y0, x1, y1))
