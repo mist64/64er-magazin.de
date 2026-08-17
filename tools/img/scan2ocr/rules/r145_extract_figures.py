@@ -185,7 +185,12 @@ OVERLAP_SAME = 0.55     # this much of the smaller region inside the larger = on
 # merged, and the judge's "I can see this but it has no box" count rose 28 -> 39.
 FRAME_SEARCH_PX = 90    # how far outside a candidate to look for its printed rule
 FRAME_SPAN = 0.92       # a row/column this dark across the CANDIDATE is a rule
-CAPTION_GAP_PX = 10     # keep this clear of a caption's first row
+# MEASURED by review: at 10 px the box bottom lands 1-2 px INSIDE the caption's
+# ascenders on 8-0000, 42-00, 137-2 and 135-t2 -- the OCR's caption box is tight
+# to the x-height, so the tallest letters rise above its stated top.  24 px
+# clears an ascender at this body size and costs nothing: the rows given up are
+# the white gap the magazine sets between a figure and its caption.
+CAPTION_GAP_PX = 24     # keep this clear of a caption's first row
 CAPTION_OPEN = re.compile(r"^(Bild|Tabelle|Abb\.?)\s*(\d+)")
 CAPTION_MEASURE_MATCH = 0.25  # a block sharing this much width is above the figure
 MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
@@ -1506,6 +1511,56 @@ def figures(page):
                        for (rx0, ry0, rx1, ry1), _l in stoppers):
                     continue
                 x0, y0, x1, y1 = nx0, ny0, nx1, ny1
+        # ORDER MATTERS: THE CLAMP RUNS FIRST, THEN THE TRIMS.
+        #
+        # It used to run last, and so re-expanded past the very caption the trim
+        # had just removed: 131-5 and 131-7 came out with their crop top at row 0
+        # while their own frame's top rule is at row 188, each carrying the
+        # PRECEDING figure's caption, and their own captions absent.  The clamp
+        # establishes the figure's boundary; the trims then remove what does not
+        # belong inside it.  Reversed, each undoes the other.
+        # CLAMP TO THE FIGURE'S OWN FRAME WHERE ONE ENCLOSES IT.
+        #
+        # The box is the ink bounding box of the connected content, and a frame
+        # rule is a thin stroke separated from that content by internal white --
+        # so it falls outside the box, and everything outboard of it goes too.
+        # That one choice produces most of what is left: bottom rules missing on
+        # 131-4, 131-5, 131-7, 30-2 and 54-1, and with them the caption printed
+        # under the rule; and content BEHEADED above the first rule -- 27-t1's
+        # column headers, 93-0's title row, 124-2's label, 58-2's first sprite
+        # row.  It is also why protecting a figure's own header row changed
+        # nothing: that rule keeps a header the crop already contains, and these
+        # headers are lost before it can apply.
+        #
+        # framed_rects() already validates closure on all four sides, so where
+        # exactly one of its rectangles encloses this box it IS the figure's
+        # boundary and the box is clamped to it.  Only where the frame is a
+        # close fit: a frame much larger than the box is the page's, or a
+        # neighbour's, and snapping to it would merge.
+        best = None
+        for r in frames:
+            iw = min(x1, r[2]) - max(x0, r[0])
+            ih = min(y1, r[3]) - max(y0, r[1])
+            if iw <= 0 or ih <= 0:
+                continue
+            box_area = max(1, (x1 - x0) * (y1 - y0))
+            frame_area = max(1, (r[2] - r[0]) * (r[3] - r[1]))
+            # ENCLOSING ONLY, so this can never shrink a box.  A screen dump
+            # has rules INSIDE it -- p42's screenshots each contain a framed
+            # panel -- and snapping to one of those cost real picture: 2211x1534
+            # became 2108x1420.  A figure's boundary is the frame AROUND it.
+            if not (r[0] <= x0 + FRAME_CLAMP_SLACK and r[1] <= y0 + FRAME_CLAMP_SLACK
+                    and r[2] >= x1 - FRAME_CLAMP_SLACK and r[3] >= y1 - FRAME_CLAMP_SLACK):
+                continue
+            if iw * ih < FRAME_CLAMP_COVER * box_area:
+                continue                        # does not enclose this box
+            if frame_area > FRAME_CLAMP_GROW * box_area:
+                continue                        # far bigger: not this figure's
+            if best is None or frame_area < best_area:
+                best, best_area = r, frame_area
+        if best is not None:
+            x0, y0, x1, y1 = int(best[0]), int(best[1]), int(best[2]), int(best[3])
+
         # A CAPTION BELONGS TO ONE FIGURE, SO NO OTHER FIGURE MAY CONTAIN IT.
         #
         # A box grown upward crosses the white gap above it and takes the
@@ -1591,51 +1646,20 @@ def figures(page):
         if y1 > FOLIO_BAND_FRAC * H:
             band = marked[int(FOLIO_BAND_FRAC * H):y1, x0:x1]
             if band.size and float(band.mean()) < FOLIO_BAND_INK:
+                # Walk UP out of the folio, not merely to the band's edge.  The
+                # band edge is a median over 237 footers; p130's folio starts at
+                # y=6794, above the 6805 edge, so cutting at the edge left the
+                # top third of the "130" digits behind -- "the density test moved
+                # the boundary into the glyphs instead of past them".  Sparse
+                # rows above the edge are the same folio, so they go too.
                 ny1 = int(FOLIO_BAND_FRAC * H)
+                while ny1 - y0 > MIN_H_PX:
+                    row = marked[ny1 - 1, x0:x1]
+                    if row.size and float(row.mean()) >= FOLIO_BAND_INK:
+                        break
+                    ny1 -= 1
                 if ny1 - y0 >= MIN_H_PX:
                     x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, ny1)
-        # CLAMP TO THE FIGURE'S OWN FRAME WHERE ONE ENCLOSES IT.
-        #
-        # The box is the ink bounding box of the connected content, and a frame
-        # rule is a thin stroke separated from that content by internal white --
-        # so it falls outside the box, and everything outboard of it goes too.
-        # That one choice produces most of what is left: bottom rules missing on
-        # 131-4, 131-5, 131-7, 30-2 and 54-1, and with them the caption printed
-        # under the rule; and content BEHEADED above the first rule -- 27-t1's
-        # column headers, 93-0's title row, 124-2's label, 58-2's first sprite
-        # row.  It is also why protecting a figure's own header row changed
-        # nothing: that rule keeps a header the crop already contains, and these
-        # headers are lost before it can apply.
-        #
-        # framed_rects() already validates closure on all four sides, so where
-        # exactly one of its rectangles encloses this box it IS the figure's
-        # boundary and the box is clamped to it.  Only where the frame is a
-        # close fit: a frame much larger than the box is the page's, or a
-        # neighbour's, and snapping to it would merge.
-        best = None
-        for r in frames:
-            iw = min(x1, r[2]) - max(x0, r[0])
-            ih = min(y1, r[3]) - max(y0, r[1])
-            if iw <= 0 or ih <= 0:
-                continue
-            box_area = max(1, (x1 - x0) * (y1 - y0))
-            frame_area = max(1, (r[2] - r[0]) * (r[3] - r[1]))
-            # ENCLOSING ONLY, so this can never shrink a box.  A screen dump
-            # has rules INSIDE it -- p42's screenshots each contain a framed
-            # panel -- and snapping to one of those cost real picture: 2211x1534
-            # became 2108x1420.  A figure's boundary is the frame AROUND it.
-            if not (r[0] <= x0 + FRAME_CLAMP_SLACK and r[1] <= y0 + FRAME_CLAMP_SLACK
-                    and r[2] >= x1 - FRAME_CLAMP_SLACK and r[3] >= y1 - FRAME_CLAMP_SLACK):
-                continue
-            if iw * ih < FRAME_CLAMP_COVER * box_area:
-                continue                        # does not enclose this box
-            if frame_area > FRAME_CLAMP_GROW * box_area:
-                continue                        # far bigger: not this figure's
-            if best is None or frame_area < best_area:
-                best, best_area = r, frame_area
-        if best is not None:
-            x0, y0, x1, y1 = int(best[0]), int(best[1]), int(best[2]), int(best[3])
-
         if is_furniture or x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
             continue                            # nothing left that is a figure
         crop = im.crop((x0, y0, x1, y1))
