@@ -198,6 +198,8 @@ FURNITURE_LABELS = ("header", "footer", "heading")   # the page's, never a figur
 # 419 px box, so anything above 0.29 spares it; 0.60 is well clear of a figure
 # that merely abuts a heading.
 FURNITURE_DOMINATES = 0.60  # furniture this much of a box's height means it IS furniture
+FOLIO_BAND_FRAC = 0.97   # measured: 237 footers put the folio band at 6808/7015
+FOLIO_BAND_INK = 0.15    # sparser than this in the band means it is the folio
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # THE MEASUREMENT THAT SAYS NO GAP THRESHOLD CAN WORK, recorded before the next
@@ -1146,7 +1148,19 @@ def figures(page):
     # Where the magazine's own caption says "Tabelle", anything printed on the
     # same tint is that table.  Body text is still a stopper: it sits on bare
     # paper, which is what on_figure() tests.
-    furniture_rects = [(bb, lab) for (bb, lab) in rects if lab in FURNITURE_LABELS]
+    # A FIGURE'S OWN HEADER ROW IS NOT THE PAGE'S FURNITURE.
+    #
+    # The page's running heads and folios sit on bare paper; a table's column
+    # headers, a screen's title bar and a diagram's label sit ON the figure --
+    # on its tint, or reversed out of its ink.  Both come back from step 020 as
+    # "heading", so stripping furniture by label alone would cut the figure's own
+    # head off: p27's comparison table would lose the "Print Shop" / "Print
+    # Master" column headers that make it readable at all.  The same test that
+    # keeps a chip's pin labels from bounding its figure keeps a figure's
+    # headers from being mistaken for the page's.
+    furniture_rects = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
+                       if lab in FURNITURE_LABELS
+                       and not on_figure(b, bb, any_length=True)]
 
     table_stoppers = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
                       if (lab in STRUCTURAL_LABELS
@@ -1535,6 +1549,28 @@ def figures(page):
                 # 963x419 candidate is a 122 px header with margin around it,
                 # and there is no figure in it to save by trimming.
                 is_furniture = True
+        # THE FOLIO IS NOT THE FIGURE'S INK.
+        #
+        # Trimming furniture by LABEL only reaches what step 020 labelled, and a
+        # reviewer caught the gap: p130's folio "130 64'er" sits in a block that
+        # step 020 called "noise", so the rule never saw it and my own metric --
+        # which counted header/footer/heading blocks -- reported it as clean.  It
+        # was not clean; the folio is plainly in the crop.  The honest metric is
+        # positional, and it is unambiguous: MEASURED over 237 labelled footers,
+        # the folio band begins at y=6808 of 7015, and exactly ONE emitted figure
+        # of 82 reaches into it -- 130-1, the reported one.
+        #
+        # The band cannot simply be cut off, because this magazine prints
+        # full-bleed photographs that run to the trimmed edge.  What separates
+        # them is density: a folio is a few small glyphs on bare paper, a
+        # full-bleed picture is solid.  Where the band is sparse the figure has
+        # already ended and its ink is the folio's.
+        if y1 > FOLIO_BAND_FRAC * H:
+            band = marked[int(FOLIO_BAND_FRAC * H):y1, x0:x1]
+            if band.size and float(band.mean()) < FOLIO_BAND_INK:
+                ny1 = int(FOLIO_BAND_FRAC * H)
+                if ny1 - y0 >= MIN_H_PX:
+                    x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, ny1)
         if is_furniture or x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
             continue                            # nothing left that is a figure
         crop = im.crop((x0, y0, x1, y1))
