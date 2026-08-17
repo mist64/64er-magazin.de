@@ -222,6 +222,38 @@ for n, p, c in bad:
     print(f"   UNSOURCED {n} p{p} {c!r}")
 CAPS
 
+# 7. EVERY CAPTION IS BOUND TO THE FIGURE IT IS PRINTED UNDER.  Sourcing is not
+#    enough: a caption can be real, OCR'd and present on the page and still be
+#    attached to the wrong figure.  131-2 held the 6510 with 131-3's "Bild 3" on
+#    it while its own "Bild 2" sat directly beneath the crop, and every check
+#    above passed.  A number bound to the wrong picture is worse than no number,
+#    because the article's text refers to it.
+python3 - "$OUT" <<'BIND'
+import json, sys
+rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
+bad = []
+for r in rows:
+    if not r.get("caption"):
+        continue
+    x0, y0, x1, y1 = r["bbox"]
+    rec = json.load(open(f"{sys.argv[1]}/{r['page']:03d}.labels.json", encoding="utf-8"))
+    hit = None
+    for b in rec["blocks"]:
+        if r["caption"][:18] not in b.get("text", ""):
+            continue
+        bx0, by0, bx1, by1 = (v * 2.0 for v in b["bbox"])   # 300 -> 600 dpi
+        hit = (bx0, by0, bx1, by1)
+        break
+    if hit is None:
+        continue                       # sourcing is check 6's job
+    bx0, by0, bx1, by1 = hit
+    if by0 < y0 or min(x1, bx1) - max(x0, bx0) < 0.5 * min(x1 - x0, bx1 - bx0):
+        bad.append((r["name"], r["caption"][:40]))
+print(f"captions bound below their figure and in its column: {len(rows) - len(bad)} ok, {len(bad)} misbound")
+for n, c in bad:
+    print(f"   MISBOUND {n} {c!r}")
+BIND
+
 **Then LOOK at them.** The counts above cannot tell a photograph from a data
 table, which is the whole difficulty of this step. Open
 `$OUT/figures/png/c/` and read a sample, and read the overlays in
