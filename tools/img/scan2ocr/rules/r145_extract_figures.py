@@ -193,6 +193,25 @@ PANEL_MAX_FRAC = 0.92         # ...unless measured tint says so (see grow_to_pan
 STRUCTURAL_LABELS = ("caption", "header", "footer")  # always bound a figure
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
+# THE MEASUREMENT THAT SAYS NO GAP THRESHOLD CAN WORK, recorded before the next
+# agent spends another round tuning one.  MEASURED across this issue:
+#
+#   white band INSIDE one figure   p79 hardcopy 324 px, p60 hardcopy ~430 px
+#   gap BETWEEN distinct figures   p52 boxes ~160 px, p74's three boxes ~110 px
+#
+# The intra-figure bands are LARGER than the inter-figure gaps, so the two
+# populations overlap and no single value separates them.  Changing this
+# constant from 300 to 120 demonstrated it precisely: p79 stayed split (324 >
+# 120), p172 was newly split, and p74's three boxes still did not separate.
+#
+# The structure that does separate them is the printed rule rectangle, which
+# exists on essentially every one of these figures.  framed_rects() below was
+# written for exactly that and is currently UNCALLED.  It is not ready: tested
+# over the issue it returns 0 rectangles on p74, whose three boxes are plainly
+# framed, and 212 nested duplicates on p172.  Recall and dedup have to be fixed
+# before it can carry the segmentation -- and it should carry it, because the
+# alternative is tuning a constant that provably cannot work.
+#
 # ONE RULE FOR "PIECES OF THE SAME FIGURE", USED IN BOTH PLACES.  A caption
 # claims only regions that touch (CLAIM_GAP_PX), but the uncaptioned path
 # clustered anything within 300 px -- so p42's three screenshots, 168 and 204 px
