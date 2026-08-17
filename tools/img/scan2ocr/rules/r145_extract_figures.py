@@ -294,6 +294,8 @@ FRAME_NEST_FRAC = 0.60  # this much of a rect inside a bigger one -> same frame
 FRAME_SIDE_COVER = 0.75 # share of a box's height a side must be ruled over
 FRAME_INSIDE_FRAC = 0.70  # this much of a frame inside a box means the box holds it
 CAPTION_FRAME_NEAR = 90   # a caption this close to a frame's band belongs to it
+CAPTION_STEAL_BAND = 400  # a foreign caption this near a box's top is the one above's
+CAPTION_STEAL_OVERLAP = 0.60  # share of the caption's width the box must cover
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
 
@@ -1412,6 +1414,33 @@ def figures(page):
                        for (rx0, ry0, rx1, ry1), _l in stoppers):
                     continue
                 x0, y0, x1, y1 = nx0, ny0, nx1, ny1
+        # A CAPTION BELONGS TO ONE FIGURE, SO NO OTHER FIGURE MAY CONTAIN IT.
+        #
+        # A box grown upward crosses the white gap above it and takes the
+        # caption of the figure before it.  The nineteenth census measured the
+        # consequence on p133: "Bild 3" appears in both 131-3 and 131-5 and
+        # "Bild 6" in both 131-6 and 131-7, while "Bild 4" and "Bild 5" -- the
+        # ROM's and the PLA's own -- appear in NO file, so three crops are
+        # labelled with the previous figure's number and the ROM crop literally
+        # reads "Bild 2. Anschlussplan des Prozessors 6510".  That poisons the
+        # figure-to-caption index downstream, which is the whole point of
+        # carrying the numbers.
+        #
+        # A caption sitting in the top band of a box it does not own is the
+        # figure above's, so the box starts below it.
+        own = f.get("cap_bbox")
+        for c in caps:
+            bx0, by0, bx1, by1 = (int(v) for v in c["bbox"])
+            if own is not None and abs(by0 - int(own[1])) < 4 and abs(bx0 - int(own[0])) < 4:
+                continue                        # its own caption
+            # Overlap, not containment: p133's caption starts two pixels left
+            # of the box that stole it, and strict containment missed every one.
+            if not (y0 <= by0 and by1 <= y1):
+                continue
+            if min(x1, bx1) - max(x0, bx0) < CAPTION_STEAL_OVERLAP * (bx1 - bx0):
+                continue
+            if by1 - y0 < CAPTION_STEAL_BAND and by1 + MIN_H_PX < y1:
+                y0 = by1 + CAPTION_GAP_PX
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
                     "ink": f["ink"], "type": classify(crop),
