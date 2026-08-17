@@ -174,8 +174,20 @@ FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 ILLUS_JOIN_X = 150            # below the smallest observed gap between figures
 ILLUS_JOIN_Y = 20             # narrow: only touching fragments, never past a caption
 # ...or any distance at all, when the figure's own line work crosses the gap.
-ILLUS_BRIDGE_MAX_PX = 700     # widest gutter a single figure is split across
+# The distance no longer gates the join, the PAPER does: a bridge needs either
+# line work crossing it or a solid tint running through it, and neither happens
+# by accident.  MEASURED: p40's calendar has 2000 px of unclaimed yellow field
+# between the two ink islands the layout analysis proposed, so a 700 px cap
+# rejected the only evidence that they are one figure.  Half the page width is
+# now the limit, which is simply "not the far side of the sheet".
+ILLUS_BRIDGE_MAX_PX = 700     # ...for line work, which reaches a gutter's width
+ILLUS_BRIDGE_TINT_MAX_PX = 2400   # ...for a tint field, which reaches its own edge
 ILLUS_BRIDGE_ROW_FRAC = 0.10  # share of rows carrying dark ink across it
+# MEASURED on p40's calendar, whose unclaimed middle reads 0.697: a tint field
+# is not solid, because the figure's own cells are knocked out of it in white.
+# A bare gutter between two neighbours reads ~0.0, so this separates cleanly.
+ILLUS_BRIDGE_TINT_FRAC = 0.55 # a tint field this present running through it
+ILLUS_BRIDGE_BAND_FRAC = 0.60 # ...between pieces sharing this much of a band
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
@@ -746,7 +758,7 @@ def figure_above(rects, cap, W, H):
     return [cx0, top, cx1, bottom]
 
 
-def illustrations(rec, dark):
+def illustrations(rec, dark, marked):
     """Tesseract's own verdict on where the pictures are, in master pixels.
 
     This is the primary source and it costs nothing: step 010's OCR pass already
@@ -815,12 +827,42 @@ def illustrations(rec, dark):
         gy0, gy1 = int(max(m[1], r[1])), int(min(m[3], r[3]))
         if gx1 - gx0 <= 0 or gy1 - gy0 <= 0:
             return True                         # they touch or overlap already
-        if gx1 - gx0 > ILLUS_BRIDGE_MAX_PX:
+        if gx1 - gx0 > ILLUS_BRIDGE_TINT_MAX_PX:
             return False
         strip = dark[gy0:gy1, gx0:gx1]
         if strip.size == 0:
             return False
-        return float(strip.any(axis=1).mean()) > ILLUS_BRIDGE_ROW_FRAC
+        # Line work reaches only as far as a column gutter: widening this to the
+        # tint bridge's span merged p27's two greeting cards, whose own rules
+        # are strong enough to look like a crossing at any distance.  The two
+        # tests get the reach their evidence justifies, not a shared constant.
+        if gx1 - gx0 <= ILLUS_BRIDGE_MAX_PX \
+                and float(strip.any(axis=1).mean()) > ILLUS_BRIDGE_ROW_FRAC:
+            return True
+        # A CONTINUOUS TINT FIELD IS ONE PRINTED OBJECT TOO.
+        #
+        # Line work is not the only thing that can run between two regions.
+        # Where the figure is a tint hardcopy, the layout analysis proposes only
+        # the ink islands ON the tint and leaves the flat field between them
+        # unclaimed, so the pieces never rejoin: p40's calendar came out as two
+        # narrow strips carrying the IDENTICAL caption, with the "SEPTEMBER 86"
+        # head and the whole grid -- some 80% of the figure -- written to no
+        # file at all.  The fourteenth census called this the mechanism that
+        # destroys content, as against the merges which are merely loud.
+        #
+        # Bare paper still separates: this asks whether the gap is INKED, and a
+        # gutter between two neighbours is not.  p133's chips each sit on their
+        # own tint with white paper between, so they stay apart.
+        # ...and only between pieces that share a BAND.  Two halves of one wide
+        # figure lie at the same height; a tint bridge without that condition
+        # reached between figures merely near each other and merged p27's two
+        # greeting cards.  The overlap is measured against the shorter piece, so
+        # a small island on a tint still joins the field it sits in.
+        span = min(m[3], r[3]) - max(m[1], r[1])
+        if span < ILLUS_BRIDGE_BAND_FRAC * min(m[3] - m[1], r[3] - r[1]):
+            return False
+        gap = marked[gy0:gy1, gx0:gx1]
+        return gap.size > 0 and float(gap.mean()) > ILLUS_BRIDGE_TINT_FRAC
 
     merged = []
     for r in sorted(raw, key=lambda r: (r[1], r[0])):
@@ -923,7 +965,7 @@ def figures(page):
                     or b.get("n_words", 0) >= TOP_STOP_MIN_WORDS)
                 and not on_figure(b, bb)]
 
-    illus = illustrations(rec, grey < BORDER_DARK)
+    illus = illustrations(rec, grey < BORDER_DARK, marked)
     caps = caption_lines(rec)
     found, claimed = [], set()
 
