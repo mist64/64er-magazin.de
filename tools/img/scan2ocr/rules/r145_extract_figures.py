@@ -153,7 +153,12 @@ INK_MIN_PX = 400        # too little ink to measure: fall back to a loose mask
 # and was called colour before the screen test could run.
 SAT_COLOUR = 50         # mean chroma of the INK above this -> colour
 SAT_STRONG = 60         # a pixel this chromatic is unambiguously coloured
-SAT_STRONG_FRAC = 0.06  # ...and this share of the ink being so makes it colour
+# MEASURED over every crop: the share of ink that is strongly chromatic is
+# bimodal -- neutral crops run 0.000-0.035, genuinely coloured ones 0.288-0.89.
+# At 0.06 the grey screened tint boxes of p55 landed in colour on 0.074, which
+# is scanner cast on a black-on-grey panel, not colour ink.  0.15 sits in the
+# empty middle of the measured gap.
+SAT_STRONG_FRAC = 0.15  # ...and this share of the ink being so makes it colour
 # The press screen of this issue, measured: 133 lpi at 45 degrees.  A crop is
 # screened when its strongest periodicity sits at that ruling AND that angle;
 # unscreened crops peak at 0 degrees, on the printer's or the scanner's own grid.
@@ -188,7 +193,16 @@ PANEL_MAX_FRAC = 0.92         # ...unless measured tint says so (see grow_to_pan
 STRUCTURAL_LABELS = ("caption", "header", "footer")  # always bound a figure
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
-FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
+# ONE RULE FOR "PIECES OF THE SAME FIGURE", USED IN BOTH PLACES.  A caption
+# claims only regions that touch (CLAIM_GAP_PX), but the uncaptioned path
+# clustered anything within 300 px -- so p42's three screenshots, 168 and 204 px
+# apart, became one cluster.  That cluster then failed the encloses-text test
+# and fell back to its members, which is why p42 came out right; p23's cluster
+# PASSED and was emitted whole, which is why its three figures came out as one.
+# The seventeenth census put it exactly: the fallback "converts missing into
+# merged on cluster-pass pages", and merges stayed at 8 while missing fell 9 to
+# 4.  Tesseract over-segments a composite, but the pieces of one figure TOUCH.
+FRAME_CLUSTER_PX = CLAIM_GAP_PX   # frames this close are one figure built of boxes
 # Asymmetric on purpose -- see the merge in illustrations().
 # MEASURED on p133, whose five chip pinouts sit side by side: the gaps BETWEEN
 # two different figures there are 248, 300 and 378 px.  At 300 the join merged
