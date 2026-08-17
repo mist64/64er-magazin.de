@@ -72,6 +72,7 @@ MARGIN_PX = 260         # page edge; a column's free space starts here
 # A box's own rule is one long thin region -- p8's editorial border came out
 # 564x5724.  No printed picture in this magazine is anywhere near that thin.
 MAX_CAPTIONS_INSIDE = 1   # more than this inside one box means it is two
+DUPLICATE_FRAC = 0.80     # this much of the smaller box shared -> same artwork
 MAX_ASPECT = 6.0
 SCRAP_JOIN_PX = 260     # OCR scraps this close belong to one picture
 # Conversion type, measured over the INK rather than the paper.  Paper is most
@@ -147,6 +148,9 @@ FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 # below the inter-figure gap, not above the gutter width.
 ILLUS_JOIN_X = 150            # below the smallest observed gap between figures
 ILLUS_JOIN_Y = 20             # narrow: only touching fragments, never past a caption
+# ...or any distance at all, when the figure's own line work crosses the gap.
+ILLUS_BRIDGE_MAX_PX = 700     # widest gutter a single figure is split across
+ILLUS_BRIDGE_ROW_FRAC = 0.10  # share of rows carrying dark ink across it
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
@@ -506,10 +510,28 @@ def classify(crop):
     strong = float((chroma[inked] > SAT_STRONG).mean()) if inked.any() else 0.0
     if sat > SAT_COLOUR or strong > SAT_STRONG_FRAC:
         return "c"
+    # MEASURED AT TWO SCALES.  A 3x3 median only sees a FINE screen: the coarse
+    # tint behind p31's flowchart diamonds and p125's block diagram measured
+    # 0.013-0.029, below the cut, and the eleventh census found five such crops
+    # in bw/ whose dot lattice it confirmed at 3x zoom -- "indistinguishable"
+    # from the screen in dots/131-2.  Halving the image turns a coarse screen
+    # into a fine one, so the larger of the two answers is the screen.
     gg = np.asarray(crop.convert("L"))
-    med = np.median(np.stack([np.roll(np.roll(gg, dy, 0), dx, 1)
-                              for dy in (-1, 0, 1) for dx in (-1, 0, 1)]), axis=0)
-    screen = float(np.abs(med - gg).mean() / 255)
+
+    def med_delta(a):
+        m = np.median(np.stack([np.roll(np.roll(a, dy, 0), dx, 1)
+                                for dy in (-1, 0, 1) for dx in (-1, 0, 1)]), axis=0)
+        return float(np.abs(m - a).mean() / 255)
+
+    # THE LIMIT, MEASURED AND LEFT ALONE.  Two scales is as far as this method
+    # goes.  At quarter scale every crop scores high -- the known-clean bw
+    # printout 58-1 reaches 0.081 against the screened flowchart's 0.040 --
+    # because the downsampling itself manufactures a pattern.  At half scale the
+    # coarse-screen and clean classes overlap outright (39-3 and 30-1 both read
+    # 0.024).  Four crops the census confirmed screened at 3x zoom are therefore
+    # still called bw, and the honest fix is a periodicity measurement (an FFT
+    # peak IS what a screen is), not a threshold fitted to those four.
+    screen = max(med_delta(gg), med_delta(gg[::2, ::2]))
     if screen > SCREEN_DELTA:
         return "dots"
     # CONTINUOUS TONE MEANS REAL MID-TONE AREA.  The old test asked for "more
@@ -662,7 +684,7 @@ def figure_above(rects, cap, W, H):
     return [cx0, top, cx1, bottom]
 
 
-def illustrations(rec):
+def illustrations(rec, dark):
     """Tesseract's own verdict on where the pictures are, in master pixels.
 
     This is the primary source and it costs nothing: step 010's OCR pass already
@@ -709,10 +731,39 @@ def illustrations(rec):
                 return True
         return False
 
+    def bridged(m, r):
+        """Does line work run from one region into the other?
+
+        An ALTO illustration is a LAYOUT block, so a figure wider than a column
+        comes back as one region per column and the join has to put them back
+        together.  Distance cannot decide it: the gutter between two halves of
+        p30's flowchart is wider than the 248 px between two SEPARATE chips on
+        p133, so any tolerance loose enough to repair the flowchart merges the
+        chips.  The eleventh census caught this by its signature -- complementary
+        pairs, 30-1 and 30-2 tiling one flowchart with the arrows severed at the
+        seam, 131-5 and 131-7 the same two chips shorn on opposite sides.
+
+        What separates the cases is on the paper: a split figure's own rules and
+        arrows CROSS the gutter, and two neighbours have bare paper between
+        them.  Measured on DARK ink rather than the marked mask, so that two
+        chips sharing one screened tint panel are not bridged by the tint.
+        """
+        lo, hi = (m, r) if m[2] <= r[0] else (r, m)
+        gx0, gx1 = int(lo[2]), int(hi[0])
+        gy0, gy1 = int(max(m[1], r[1])), int(min(m[3], r[3]))
+        if gx1 - gx0 <= 0 or gy1 - gy0 <= 0:
+            return True                         # they touch or overlap already
+        if gx1 - gx0 > ILLUS_BRIDGE_MAX_PX:
+            return False
+        strip = dark[gy0:gy1, gx0:gx1]
+        if strip.size == 0:
+            return False
+        return float(strip.any(axis=1).mean()) > ILLUS_BRIDGE_ROW_FRAC
+
     merged = []
     for r in sorted(raw, key=lambda r: (r[1], r[0])):
         for m in merged:
-            if (min(m[2], r[2]) - max(m[0], r[0]) > -ILLUS_JOIN_X
+            if ((min(m[2], r[2]) - max(m[0], r[0]) > -ILLUS_JOIN_X or bridged(m, r))
                     and min(m[3], r[3]) - max(m[1], r[1]) > -ILLUS_JOIN_Y
                     and not caption_between(m, r)):
                 m[0], m[1] = min(m[0], r[0]), min(m[1], r[1])
@@ -798,7 +849,7 @@ def figures(page):
     stoppers = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
                 if b.get("n_words", 0) >= TOP_STOP_MIN_WORDS and not on_figure(b, bb)]
 
-    illus = illustrations(rec)
+    illus = illustrations(rec, grey < BORDER_DARK)
     caps = caption_lines(rec)
     found, claimed = [], set()
 
@@ -934,6 +985,29 @@ def figures(page):
                   and y0 <= c["bbox"][1] and c["bbox"][3] <= y1]
         if len(inside) >= MAX_CAPTIONS_INSIDE + 1:
             continue
+        # TWO CAPTIONS CAN CLAIM THE SAME ARTWORK.  Where a figure carries more
+        # than one caption -- a pair of chips captioned "Bild 3." and "Bild 4."
+        # -- each caption unions the same regions and the same picture is cut
+        # twice, each copy shorn on a different side.  The eleventh census found
+        # 131-5 and 131-7 to be exactly this: the same two chips, one missing
+        # its right column and the other its left.  Keep the larger.
+        dup = None
+        for k, o in enumerate(out):
+            ox0, oy0, ox1, oy1 = o["bbox"]
+            iw = min(x1, ox1) - max(x0, ox0)
+            ih = min(y1, oy1) - max(y0, oy0)
+            if iw <= 0 or ih <= 0:
+                continue
+            inter = iw * ih
+            if inter > DUPLICATE_FRAC * min((x1 - x0) * (y1 - y0),
+                                            (ox1 - ox0) * (oy1 - oy0)):
+                dup = k
+                break
+        if dup is not None:
+            o = out[dup]
+            if (x1 - x0) * (y1 - y0) <= (o["bbox"][2] - o["bbox"][0]) * (o["bbox"][3] - o["bbox"][1]):
+                continue                        # the one already kept is bigger
+            out.pop(dup)
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
                     "ink": f["ink"], "type": classify(crop),
