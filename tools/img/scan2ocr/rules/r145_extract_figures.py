@@ -976,10 +976,11 @@ def figures(page):
         x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
         ax0, ax1 = f.get("anchor", [x0, x1])
         x0, y0, x1, y1 = cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1)
+        # A captioned box is anchored just above its caption; an uncaptioned one
+        # has only itself, and then the rule above takes the larger piece.
         cb = f.get("cap_bbox")
-        if cb is not None:
-            x0, y0, x1, y1 = cut_at_band(marked, x0, y0, x1, y1,
-                                         y1 - MIN_H_PX, y1)
+        ay0, ay1 = (y1 - MIN_H_PX, y1) if cb is not None else (y0, y1)
+        x0, y0, x1, y1 = cut_at_band(marked, x0, y0, x1, y1, ay0, ay1)
         y0, y1 = grow_to_panel(marked, x0, y0, x1, y1, H, stoppers,
                                f.get("cap_bbox"))
         x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
@@ -1236,7 +1237,20 @@ def cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1):
     if not segs:
         return x0, y0, x1, y1
     # the anchor's centre picks the piece to keep
+    # WHEN THE ANCHOR'S CENTRE FALLS IN THE GAP, NEITHER TEST FIRES.
+    #
+    # A caption that spans both figures -- or an uncaptioned box, whose anchor is
+    # the box itself -- has its midpoint in the very strip that separates them,
+    # and a strip is neither "before" nor "after" it, so no cut was made at all.
+    # MEASURED: every one of the five merges the twelfth census left had a
+    # qualifying bare run inside it (24-2 a 105 px gutter, 172-0 a 209 px band,
+    # 21-1 a 71 px band) and the splitter fired on none of them.  Falling in the
+    # gap means the anchor cannot choose, so the larger piece is taken.
     mid = (ax0 + ax1) / 2 - x0
+    for a, b in segs:
+        if a < mid < b:
+            mid = a if a > (x1 - x0) - b else b
+            break
     lo, hi = 0, x1 - x0
     for a, b in segs:
         if b <= mid:
@@ -1274,7 +1288,13 @@ def cut_at_band(marked, x0, y0, x1, y1, ay0, ay1):
         segs.append((run, len(blank)))
     if not segs:
         return x0, y0, x1, y1
+    # Same rule as cut_at_gutter: an anchor whose centre lands in the gap cannot
+    # choose a side, so the larger piece is taken rather than no cut at all.
     mid = (ay0 + ay1) / 2 - y0
+    for a, b in segs:
+        if a < mid < b:
+            mid = a if a > (y1 - y0) - b else b
+            break
     lo, hi = 0, y1 - y0
     for a, b in segs:
         if b <= mid:
