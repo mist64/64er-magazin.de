@@ -73,6 +73,7 @@ MARGIN_PX = 260         # page edge; a column's free space starts here
 # 564x5724.  No printed picture in this magazine is anywhere near that thin.
 MAX_CAPTIONS_INSIDE = 1   # more than this inside one box means it is two
 DUPLICATE_FRAC = 0.80     # this much of the smaller box shared -> same artwork
+FIT_PAD_PX = 40           # one x-height, for the hairlines outside the heavy ink
 MAX_ASPECT = 6.0
 SCRAP_JOIN_PX = 260     # OCR scraps this close belong to one picture
 # Conversion type, measured over the INK rather than the paper.  Paper is most
@@ -1031,6 +1032,29 @@ def figures(page):
             if (x1 - x0) * (y1 - y0) <= (o["bbox"][2] - o["bbox"][0]) * (o["bbox"][3] - o["bbox"][1]):
                 continue                        # the one already kept is bigger
             out.pop(dup)
+        # FITTING TO STRONG INK SHAVES THE THIN STROKES OUTSIDE IT.
+        #
+        # Frames and pin boxes are heavy; the labels beyond them are hairlines.
+        # A box fitted to the heavy structure leaves nothing for them, and the
+        # twelfth census found the damage to be a few pixels doing real harm:
+        # p133's PLA lost the vertical stems of "F7 F6 F5 F4", which read as
+        # "=7 =6 =5 =4", and "GND" sat on column 0 with its G cut.  The reviewer
+        # put the fix exactly: a pad of one x-height clears all of them.
+        #
+        # It can only ever add paper or the figure's own outlying marks, because
+        # it stops at a stopper -- the same boundary everything else here uses.
+        for _ in range(FIT_PAD_PX):
+            for side in range(4):
+                nx0, ny0, nx1, ny1 = x0 - (side == 0), y0 - (side == 1), \
+                                     x1 + (side == 2), y1 + (side == 3)
+                if nx0 < MARGIN_PX or ny0 < MARGIN_PX \
+                        or nx1 > W - MARGIN_PX or ny1 > H - MARGIN_PX:
+                    continue
+                if any(min(nx1, rx1) - max(nx0, rx0) > 0
+                       and min(ny1, ry1) - max(ny0, ry0) > 0
+                       for (rx0, ry0, rx1, ry1), _l in stoppers):
+                    continue
+                x0, y0, x1, y1 = nx0, ny0, nx1, ny1
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
                     "ink": f["ink"], "type": classify(crop),
