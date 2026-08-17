@@ -220,6 +220,27 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # figure order, so "Bild 3" binds to the third figure rather than to whatever is
 # nearest in pixels.
 #
+# FRAME-FIRST SEGMENTATION WAS TRIED, WITH THE RECALL FIX IN PLACE, AND IT FAILS
+# FOR A REASON WORTH WRITING DOWN.  Four reviews recommended it; the detector now
+# finds p74's frame and 18 rather than 212 on p172.  Using those frames only to
+# SPLIT a box that contains two or more of them -- the one job no gap threshold
+# can do -- shredded the figures instead:
+#
+#   p31's flowchart   1 figure  -> 4 fragments
+#   p172's screen dump 3        -> 8
+#
+# because A FLOWCHART'S DECISION BOXES ARE FRAMED RECTANGLES, and so are a
+# table's cells and a chip diagram's pin boxes.  Nothing about a rectangle says
+# whether it encloses a figure or sits inside one.  Meanwhile p74, the merge the
+# split was aimed at, did not separate at all: its three printouts yield one
+# detected frame between them.
+#
+# So the frame is necessary but not sufficient.  What would make it work is a
+# containment hierarchy -- take only the OUTERMOST frames that are not
+# themselves inside another frame, and require that a split frame's neighbours
+# are siblings rather than children.  That is a real piece of work, not a
+# threshold, and it is the honest next step.
+#
 # The structure that does separate them is the printed rule rectangle, which
 # exists on essentially every one of these figures.  framed_rects() below was
 # written for exactly that and is currently UNCALLED.  It is not ready: tested
