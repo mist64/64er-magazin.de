@@ -292,6 +292,8 @@ ILLUS_BRIDGE_BAND_FRAC = 0.60 # ...between pieces sharing this much of a band
 FRAME_EDGE_MATCH = 0.80 # two rules this aligned in x are one frame's top+bottom
 FRAME_NEST_FRAC = 0.60  # this much of a rect inside a bigger one -> same frame
 FRAME_SIDE_COVER = 0.75 # share of a box's height a side must be ruled over
+FRAME_INSIDE_FRAC = 0.70  # this much of a frame inside a box means the box holds it
+CAPTION_FRAME_NEAR = 90   # a caption this close to a frame's band belongs to it
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
 
@@ -1256,6 +1258,63 @@ def figures(page):
     # project has deleted real content by subtraction before.  Every piece is
     # emitted; the anchor's keeps the caption and its number, the others become
     # uncaptioned figures and are numbered like any opener.
+    # A BOX HOLDING TWO CAPTIONED FRAMES IS TWO FIGURES.
+    #
+    # No gap threshold can do this job -- MEASURED, a figure's own internal white
+    # band (324 px, ~430 px) is WIDER than the gap between two neighbours
+    # (~160 px, ~110 px), so the populations overlap.  A printed frame is the
+    # right structure but not sufficient on its own: splitting on frames alone
+    # shredded p31's flowchart into 4 and p172's screen dump into 8, because A
+    # FLOWCHART'S DECISION BOXES ARE FRAMED RECTANGLES and so are a table's cells
+    # and a chip's pin boxes.  Nothing about a rectangle says whether it encloses
+    # a figure or sits inside one.
+    #
+    # The magazine says it, though.  It NUMBERS its figures, and a decision box
+    # never carries a "Bild 3." -- so a frame with a caption of its own is a
+    # figure, and a frame without one is a part.  Both conditions together are
+    # what the split needs: two framed rectangles, each with its own printed
+    # number.  74-3 is three framed printouts captioned Bild 1, Bild 2 and Bild
+    # 3; a flowchart's nodes are captioned nothing.
+    frames = framed_rects(grey, W, H)
+
+    def own_caption(r):
+        for c in caps:
+            bx0, by0, bx1, by1 = c["bbox"]
+            if min(r[2], bx1) - max(r[0], bx0) <= 0:
+                continue
+            if r[1] - CAPTION_FRAME_NEAR <= by0 and by1 <= r[3] + CAPTION_FRAME_NEAR:
+                return True
+        return False
+
+    def captioned_frames(bx):
+        out = []
+        for r in frames:
+            iw = min(bx[2], r[2]) - max(bx[0], r[0])
+            ih = min(bx[3], r[3]) - max(bx[1], r[1])
+            if iw <= 0 or ih <= 0:
+                continue
+            if iw * ih <= FRAME_INSIDE_FRAC * max(1, (r[2] - r[0]) * (r[3] - r[1])):
+                continue
+            if own_caption(r):
+                out.append(r)
+        # outermost only: a captioned frame inside another captioned frame is a part
+        return [r for i, r in enumerate(out)
+                if not any(j != i and o[0] <= r[0] + 8 and o[1] <= r[1] + 8
+                           and o[2] >= r[2] - 8 and o[3] >= r[3] - 8
+                           and (o[2] - o[0]) * (o[3] - o[1]) > (r[2] - r[0]) * (r[3] - r[1])
+                           for j, o in enumerate(out))]
+
+    regrouped = []
+    for f in found:
+        inside = captioned_frames(f["bbox"])
+        if len(inside) >= 2:
+            for r in inside:
+                regrouped.append(dict(f, bbox=list(r), caption=None, kind=None,
+                                      num="0", cap_bbox=None, anchor=[r[0], r[2]]))
+        else:
+            regrouped.append(f)
+    found = regrouped
+
     split = []
     for f in sorted(found, key=lambda f: (f["bbox"][1], f["bbox"][0])):
         bx0, by0, bx1, by1 = trim_blank(marked, *f["bbox"])
