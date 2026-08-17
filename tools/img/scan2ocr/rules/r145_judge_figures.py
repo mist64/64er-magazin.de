@@ -47,6 +47,11 @@ A candidate is NOT a figure when it is:
   - a DATA TABLE of typeset text (rows of specifications, prices, functions),
     even when it is set on a grey or yellow tint. These get transcribed as HTML
     tables elsewhere, not cropped.
+    EXCEPTION, and it is not optional: a table that carries its OWN PRINTED
+    CAPTION -- "Tabelle 1.", "Tabelle 2." -- is one of the article's numbered
+    figures. The magazine numbered it, so it is referred to by that number in
+    the body text and has to exist as an image. Keep it, with number "t1" for
+    "Tabelle 1". Only an UNCAPTIONED typeset table is skipped.
   - a BASIC program listing printed for the reader to type in
   - PAGE FURNITURE: a rubric badge or section logo ("64'er Test", "BUECHER",
     "LESERFORUM", "Aktuelles"), a headline or headline banner, a running head, a
