@@ -191,6 +191,8 @@ CAPTION_MEASURE_MATCH = 0.25  # a block sharing this much width is above the fig
 MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
 PANEL_MAX_FRAC = 0.92         # ...unless measured tint says so (see grow_to_panel)
 STRUCTURAL_LABELS = ("caption", "header", "footer")  # always bound a figure
+FURNITURE_LABELS = ("header", "footer", "heading")   # the page's, never a figure's
+FURNITURE_DOMINATES = 0.25  # furniture this much of a box's height means it IS furniture
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # THE MEASUREMENT THAT SAYS NO GAP THRESHOLD CAN WORK, recorded before the next
@@ -1139,6 +1141,8 @@ def figures(page):
     # Where the magazine's own caption says "Tabelle", anything printed on the
     # same tint is that table.  Body text is still a stopper: it sits on bare
     # paper, which is what on_figure() tests.
+    furniture_rects = [(bb, lab) for (bb, lab) in rects if lab in FURNITURE_LABELS]
+
     table_stoppers = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
                       if (lab in STRUCTURAL_LABELS
                           or b.get("n_words", 0) >= TOP_STOP_MIN_WORDS)
@@ -1487,6 +1491,44 @@ def figures(page):
                 continue
             if by1 - y0 < CAPTION_STEAL_BAND and by1 + MIN_H_PX < y1:
                 y0 = by1 + CAPTION_GAP_PX
+
+        # ...AND NO FIGURE CONTAINS THE PAGE'S OWN FURNITURE.
+        #
+        # A running head, a folio and an article deck are stoppers, so nothing
+        # can GROW into them -- but a box does not have to grow into furniture
+        # to contain it: the seed region already spans it, and the stoppers only
+        # ever bounded growth.  That is the whole of the colour bucket's
+        # remaining furniture family, which four censuses reported unchanged:
+        # 130-1 carries the folio "130 64'er", 12-0 the article headline, 30-0
+        # three lines of the standfirst.
+        #
+        # Furniture is the magazine's, not the figure's, so it is trimmed off
+        # whichever band it sits in -- and only from a band, never from the
+        # middle, because a block in the middle of a box is something this rule
+        # does not understand and must not touch.
+        # Over the FURNITURE blocks themselves, not over the stopper list: a
+        # heading is not structural, so a short one ("Aktuelles", a two-word
+        # rubric) never enters that list, and those are exactly the ones that
+        # ride along inside a figure.
+        for (bx0, by0, bx1, by1), lab in furniture_rects:
+            bx0, by0, bx1, by1 = int(bx0), int(by0), int(bx1), int(by1)
+            # Against the NARROWER of the two, because a running head or an
+            # article heading is set to the full text measure and is wider than
+            # the figure under it -- measured against the block's own width the
+            # test failed on every one of p131's headings.
+            if min(x1, bx1) - max(x0, bx0) < \
+                    CAPTION_STEAL_OVERLAP * max(1, min(bx1 - bx0, x1 - x0)):
+                continue
+            if y0 <= by0 and by1 - y0 < CAPTION_STEAL_BAND and by1 + MIN_H_PX < y1:
+                y0 = by1 + CAPTION_GAP_PX
+            elif by1 <= y1 and y1 - by0 < CAPTION_STEAL_BAND and by0 - MIN_H_PX > y0:
+                y1 = by0 - CAPTION_GAP_PX
+            elif (by1 - by0) > FURNITURE_DOMINATES * (y1 - y0):
+                # Trimming it would leave nothing, which is the answer: a box
+                # that is mostly a running head IS the running head.  p93's
+                # 963x419 candidate is a 122 px header with margin around it,
+                # and there is no figure in it to save by trimming.
+                x1 = x0                         # drop below the size gate
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
                     "ink": f["ink"], "type": classify(crop),
