@@ -74,6 +74,11 @@ MARGIN_PX = 260         # page edge; a column's free space starts here
 MAX_CAPTIONS_INSIDE = 1   # more than this inside one box means it is two
 DUPLICATE_FRAC = 0.80     # this much of the smaller box shared -> same artwork
 FIT_PAD_PX = 40           # one x-height, for the hairlines outside the heavy ink
+# A figure's own frame is a better boundary than any pad: it is where the
+# magazine says the figure ends.  MEASURED: the internal margin is not constant,
+# so a fixed pad reaches the vertical rules and falls short of the horizontal.
+FRAME_SNAP_PX = 220       # how far out to look for the enclosing rule
+FRAME_RUN_FRAC = 0.80     # dark share of the box's width/height that IS a rule
 MAX_ASPECT = 6.0
 SCRAP_JOIN_PX = 260     # OCR scraps this close belong to one picture
 # Conversion type, measured over the INK rather than the paper.  Paper is most
@@ -448,6 +453,49 @@ def snap_to_frame(grey, x0, y0, x1, y1, W, H):
         y0, y1 = sy0 + t + BORDER_OVERCUT, sy0 + b - BORDER_OVERCUT
     if l is not None and r is not None:
         x0, x1 = sx0 + l + BORDER_OVERCUT, sx0 + r - BORDER_OVERCUT
+    return x0, y0, x1, y1
+
+
+def snap_to_frame(dark, x0, y0, x1, y1, W, H):
+    """Extend the box out to the figure's own enclosing rule, where there is one.
+
+    A box fitted to interior content sits INSIDE the frame that encloses it, and
+    a fixed pad cannot reach the rule because the figure's internal margin is
+    not a fixed distance -- it is larger vertically than horizontally in this
+    magazine's figures.  The thirteenth census measured the consequence exactly:
+    145-1, 58-1, 54-1 and 79-1 all keep both vertical rules and lose both
+    horizontal ones, and 145-1's overlay shows the crop inscribed in the printed
+    box, touching the verticals.  It also ruled out the lazy fix -- a bigger pad
+    pulls in captions, as it already did in 54-1.
+
+    A rule is what it looks like: a dark run across most of the box's own width
+    or height.  Only the outermost one within the search window is taken, and
+    only outward, so this can extend a box but never shrink one.
+    """
+    def scan(fixed_lo, fixed_hi, start, limit, axis):
+        best = None
+        for d in range(1, limit):
+            i = start - d if axis < 2 else start + d
+            if i < MARGIN_PX or i >= (H if axis in (1, 3) else W) - MARGIN_PX:
+                break
+            line = dark[i, fixed_lo:fixed_hi] if axis in (1, 3) \
+                else dark[fixed_lo:fixed_hi, i]
+            if line.size and float(line.mean()) >= FRAME_RUN_FRAC:
+                best = i
+        return best
+
+    t = scan(x0, x1, y0, FRAME_SNAP_PX, 1)
+    b = scan(x0, x1, y1 - 1, FRAME_SNAP_PX, 3)
+    l = scan(y0, y1, x0, FRAME_SNAP_PX, 0)
+    r = scan(y0, y1, x1 - 1, FRAME_SNAP_PX, 2)
+    if t is not None:
+        y0 = t
+    if b is not None:
+        y1 = b + 1
+    if l is not None:
+        x0 = l
+    if r is not None:
+        x1 = r + 1
     return x0, y0, x1, y1
 
 
@@ -1004,6 +1052,7 @@ def figures(page):
                                f.get("cap_bbox"))
         x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
         x0, y0, x1, y1 = cut_inside_rule(grey, x0, y0, x1, y1)
+        x0, y0, x1, y1 = snap_to_frame(grey < BORDER_DARK, x0, y0, x1, y1, W, H)
         if x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
             continue
         # No figure in this magazine is a ribbon.  A 350x2830 sliver is a column
