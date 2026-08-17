@@ -203,56 +203,91 @@ table, which is the whole difficulty of this step. Open
 
 ## Known limits — MEASURED, not guesses
 
-**This step is not finished.** Eleven vision censuses have scored the whole
-corpus, each looking at every crop and judging it GOOD / CUT / EXTRA / JUNK:
+**This step is not finished.** Eighteen vision censuses have scored the corpus,
+each looking at every crop and judging it GOOD / CUT / EXTRA / JUNK. Whole-corpus
+figures for the first twelve, then per bucket as the reviews were split up:
 
-| census | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| good % | 34 | 40 | 34 | 31 | 37 | 34 | 33 | 42 | 46 | 39 | — |
+| census | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| good % | 34 | 40 | 34 | 31 | 37 | 34 | 33 | 42 | 46 | 39 | 52 | 60 |
+
+| bucket | 13 | 14 | 15 | 16 | 17 | 18 |
+|---|---|---|---|---|---|---|
+| `c/` | 79 | 64 | 67 | 67 | 72 | 73 |
+| `bw/` | 33 | 32 | 50 | 55 | — | 48 |
+| `dots/` | 56 | 50 | 40 | 47 | — | 41 |
 
 The first seven are flat: five different detection methods, all inside one
-standard error of each other. What moved the number was not a better detector
-but finding, one at a time, the places where a boundary the paper *states* was
-either not consulted or consulted and then ignored.
+standard error. What moved the number was never a better detector — it was
+finding, one at a time, the places where a boundary the paper *states* was not
+consulted, or was consulted and then ignored.
 
-The buckets diverge sharply, and that is the honest headline:
+Read the percentages with care. Reviewers differ by ±5 points on the same build,
+the buckets stopped being comparable file-for-file once figures started moving
+between them, and the census that reported colour 73% did the arithmetic itself:
+"on the 49 files common to both runs the prior GOOD count was also 36 — the GOOD
+count did not move."
 
-| bucket | latest good % |
-|---|---|
-| `c/` colour photographs, covers, tint panels | ~52-65 |
-| `bw/` line art, hardcopies, screen dumps | 30 (doubled from 15) |
-| `dots/` screened diagrams and pinouts | 29 |
+### What is fixed, and verified
 
-Colour figures are close to usable. **Everything still broken is line art.**
-
-### What is left, as mechanisms
-
-- **Bottom loss on framed artwork** — 11 of 20 bw crops. The screen-dump case is
-  fixed and verified ("every screen photograph keeps its status line"); what
-  remains is thin frame rules and line drawings whose ink fades out at the edge.
-- **Label columns still sheared on four pinouts** — a chip's pin names sit
-  outside the screened body of the chip, and where the region and the caption
-  both stop at the body, nothing extends the box to them.
-- **Page furniture absorbed** — a screened headline banner is physically
-  indistinguishable from a figure's screened box fills, so `124-1` and `124-2`
-  pull in the banner and a body column with it.
-- **Coarse screens are not reliably detected.** See the note in `classify()`:
-  the median-delta method is exhausted at two scales, and a periodicity
-  measurement is the honest next step.
-
-### What was fixed, and what it cost to find
-
-Every one of these was a boundary already present on the paper:
+Each of these was a boundary already present on the paper:
 
 | the boundary | how it was being missed |
 |---|---|
 | a figure's own labels | read as text, so they bounded the figure instead of belonging to it |
 | paper is bright AND neutral | a yellow tint measures 220+, so luminance called every tint panel bare paper |
-| a strip of bare paper | growth stopped only at OCR rectangles, and ran through whatever had none |
-| a tint panel's edge | the region ended half way down and the caption was set inside the panel |
-| a caption | short and against a panel, so it passed the "sits on the figure" test and stopped bounding |
+| a strip of bare paper | growth stopped only at OCR rectangles and ran through whatever had none |
+| a tint panel's edge | the region ended half way down; the caption was set inside the panel |
+| a caption | short and against a panel, so it passed the "sits on the figure" test |
 | a caption above | its band reached 62% of the page up, over the previous figure |
 | a stopper | ended one step of the growth scan, which then looked past it |
-| a frame rule | any dark band near an edge, so a screen dump's status bar was trimmed as a frame |
+| a frame rule | any dark band near an edge, so a screen dump's status bar was trimmed as one |
 | line work across a gutter | distance alone cannot tell a split figure from two neighbours |
+| the page margin | a 260 px guard cut every figure that reached the trimmed edge |
+| a failed cluster | discarded the figures inside it instead of falling back to them |
+
+Two measurements are settled and independently confirmed:
+
+- **The press screen of this issue is 133 lpi at 45°** — 4.4–4.5 px pitch, peak
+  78–411× the local median, unscreened crops peaking at 0° every time. A
+  reviewer wrote its own FFT and agreed on the bucket of all 35 line-art crops.
+- **The right-edge clamp is gone** — 13 boxes once shared the edge 4700; now
+  zero do, and edges spread continuously to 4948.
+
+### What is left, and why a constant will not do it
+
+**No gap threshold can separate figures.** MEASURED: a figure's own internal
+white band runs 324 px (p79) and ~430 px (p60), while the gap *between* distinct
+figures runs ~160 px (p52) and ~110 px (p74's three boxes). The populations
+overlap. Changing the clustering gap from 300 to 120 proved it — it resolved not
+one merge, and created two new splits.
+
+That leaves one mechanism with two signs, about 20% of crops:
+
+- **the box is the hull of a contiguous ink/tint field, not of a figure.** Where
+  the field bridges two figures they merge (`22-2`, `27-7`, `42-000`, `137-4`,
+  `160-2`); where the figure extends past the field it is cut (`12-0`, `27-3`,
+  `39-2`, `142-t1`).
+
+Three things would address it, in order of expected value:
+
+1. **Frame-first segmentation.** `framed_rects()` exists, is documented, and is
+   *uncalled*. Four reviews have pointed at it. Its nest suppression is fixed
+   (p172: 212 rectangles → 34); what remains is recall — it returns **zero** on
+   p74, whose three boxes are plainly framed. Understand that and frames can
+   carry the segmentation, which is the only structure that separates the two
+   populations above.
+2. **Caption binding by number.** Where the magazine sets captions ABOVE their
+   figures (p133's two-column pinout spread) every binding slips one slot.
+   Binding to the nearest figure in either direction was tried and reverted — it
+   merged p133's five chips into three. Parse the printed number and match it to
+   figure order instead.
+3. **Non-rectangular masks.** `30-0` is an irregular cut-out photo with the
+   standfirst set into its concavity: no rectangle can contain the figure without
+   the text. This one is not a bug, it is a limit of the representation.
+
+Still absent entirely: four printed figures that get no box at all (p23's Bild 3,
+p40's charset specimen, p128's DFÜ cover, p168's labyrinth). All four are small
+high-contrast type or line items — a principled hard case for a screen-based
+detector, not a tuning miss.
 
