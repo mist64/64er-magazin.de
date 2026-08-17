@@ -68,15 +68,38 @@ SKIP_PAGE_KINDS = {"ad", "toc"}
 
 MIN_W_PX = 240
 MIN_H_PX = 240
-MARGIN_PX = 260         # page edge; a column's free space starts here
+# MEASURED over the issue, sampling every twelfth page: the blank margin around
+# the printed area is 0 to 73 px -- median 18 left, 48 right -- and the minimum
+# is ZERO on all four sides, because this magazine prints full-bleed opener
+# photographs that run to the trimmed edge.  Stage 03's A4 crop has already
+# removed the scanner bed and the sheet-edge shadow, so there is nothing here to
+# guard against, and 260 px was excluding real content from every figure that
+# reaches the outer margin.  The fifteenth census found the fingerprint: 13 of
+# 76 boxes ended at exactly x=4700, which is W - 260, shearing the right frame
+# rule off each one.
+MARGIN_PX = 12          # only enough to discount a one-pixel scan edge
 # A box's own rule is one long thin region -- p8's editorial border came out
 # 564x5724.  No printed picture in this magazine is anywhere near that thin.
 MAX_CAPTIONS_INSIDE = 1   # more than this inside one box means it is two
 DUPLICATE_FRAC = 0.80     # this much of the smaller box shared -> same artwork
 FIT_PAD_PX = 40           # one x-height, for the hairlines outside the heavy ink
-# A figure's own frame is a better boundary than any pad: it is where the
-# magazine says the figure ends.  MEASURED: the internal margin is not constant,
-# so a fixed pad reaches the vertical rules and falls short of the horizontal.
+# THE SNAP, AND WHY IT IS THE CLOSED-RECTANGLE FORM.  Measured three ways:
+#
+#            colour   bw
+#   none      79.5    33
+#   per-side  64.3    32
+#   closed    66.7    50
+#
+# Per-side snapping took whatever long dark run each edge met and made 13 crops
+# over-large.  Requiring a CLOSED rectangle killed that outright -- the review
+# that had found those 13 went looking again and reported "foreign-rule snaps:
+# none found", checking two suspects by hand and confirming both were the
+# figures' own rules.  It is what took the line-art bucket from 32% to 50%.
+#
+# I removed it once on the colour numbers alone and had to put it back: colour's
+# regression is its own merges (the calendar, p28's cards), which arrived in the
+# same build from the tint bridge, not from this.  Judging a shared change by
+# one bucket is how that mistake happens.
 FRAME_SNAP_PX = 220       # how far out to look for the enclosing rule
 FRAME_RUN_FRAC = 0.80     # dark share of the box's width/height that IS a rule
 FRAME_RULE_SEP_PX = 6     # runs closer than this are the same printed rule
@@ -164,6 +187,7 @@ MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
 PANEL_MAX_FRAC = 0.92         # ...unless measured tint says so (see grow_to_panel)
 STRUCTURAL_LABELS = ("caption", "header", "footer")  # always bound a figure
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
+CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 FRAME_CLUSTER_PX = 300        # frames this close are one figure built of boxes
 # Asymmetric on purpose -- see the merge in illustrations().
 # MEASURED on p133, whose five chip pinouts sit side by side: the gaps BETWEEN
@@ -996,9 +1020,33 @@ def figures(page):
             if min(cx1, other["bbox"][2]) - max(cx0, other["bbox"][0]) <= 0:
                 continue                        # a different column
             band_top = max(band_top, int(oy1) + CAPTION_GAP_PX)
-        mine = [i for i, r in enumerate(illus)
+        near = [i for i, r in enumerate(illus)
                 if i not in claimed and r[3] <= cy0 + CAPTION_GAP_PX and r[3] >= band_top
                 and min(cx1, r[2]) - max(cx0, r[0]) > CAPTION_MEASURE_MATCH * min(cx1 - cx0, r[2] - r[0])]
+        # A CAPTION NAMES ONE FIGURE, NOT EVERYTHING ABOVE IT.
+        #
+        # Claiming every region in the band unioned separate figures whenever a
+        # page carried one caption and several pictures: p42's three Spindizzy
+        # screenshots came out as a single box, and the fifteenth census found
+        # seven printed figures that existed in NO file for this reason -- two on
+        # p42, one on p43, three book covers on p128.  They were not dropped by
+        # any filter; they were absorbed.
+        #
+        # A figure may still arrive as several regions, because tesseract
+        # over-segments a composite -- but those pieces TOUCH.  So the claim
+        # starts at the region nearest the caption and grows only through gaps
+        # narrower than the space the magazine leaves between two figures.
+        # MEASURED on p42, whose three screenshots are 168 and 204 px apart.
+        mine = []
+        if near:
+            near.sort(key=lambda i: -illus[i][3])
+            mine = [near[0]]
+            lo, hi = illus[near[0]][1], illus[near[0]][3]
+            for i in near[1:]:
+                r = illus[i]
+                if min(hi, r[3]) - max(lo, r[1]) > -CLAIM_GAP_PX:
+                    mine.append(i)
+                    lo, hi = min(lo, r[1]), max(hi, r[3])
         if mine:
             claimed.update(mine)
             xs = [illus[i] for i in mine]
