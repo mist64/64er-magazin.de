@@ -1094,7 +1094,7 @@ def figures(page):
     # 0.6-1.0.  The word count is required as well, because a page that is one
     # big tint panel would otherwise disqualify its own body columns: labels are
     # short, paragraphs are not.
-    def on_figure(b, bb):
+    def on_figure(b, bb, any_length=False):
         # A CAPTION IS ALWAYS A BOUNDARY.  It is short, and where the figures
         # are tint panels it sits against them, so it satisfied both halves of
         # the on-figure test and stopped being a stopper -- which let a box grow
@@ -1104,7 +1104,7 @@ def figures(page):
         # growth has its own, narrower exemption for a figure's OWN caption.
         if b.get("label") == "caption":
             return False
-        if b.get("n_words", 0) > TINT_BLOCK_MAX_WORDS:
+        if not any_length and b.get("n_words", 0) > TINT_BLOCK_MAX_WORDS:
             return False
         x0, y0, x1, y1 = (int(v) for v in bb)
         cell = marked[max(0, y0):y1, max(0, x0):x1]
@@ -1124,6 +1124,25 @@ def figures(page):
                 if (lab in STRUCTURAL_LABELS
                     or b.get("n_words", 0) >= TOP_STOP_MIN_WORDS)
                 and not on_figure(b, bb)]
+
+    # A TABLE'S CONTENT IS TEXT, SO TEXT CANNOT BE ITS BOUNDARY.
+    #
+    # on_figure() lets a figure's own labels through by requiring them to be
+    # SHORT -- a pin name, a menu word -- so that a page which is one big tint
+    # panel cannot disqualify its own body columns.  A captioned TABLE breaks
+    # that: it is typeset text by definition, its columns run to many words, and
+    # they stayed stoppers.  So p143's "Vergleichstabelle C 128 - ASCII" was cut
+    # at its own ASCII column, and MEASURED, the columns immediately outside the
+    # crop read 0.72-0.82 marked -- not a faint edge fading into paper, but the
+    # rest of the table, solid and excluded.
+    #
+    # Where the magazine's own caption says "Tabelle", anything printed on the
+    # same tint is that table.  Body text is still a stopper: it sits on bare
+    # paper, which is what on_figure() tests.
+    table_stoppers = [(bb, lab) for (bb, lab), b in zip(rects, blocks)
+                      if (lab in STRUCTURAL_LABELS
+                          or b.get("n_words", 0) >= TOP_STOP_MIN_WORDS)
+                      and not (lab != "caption" and on_figure(b, bb, any_length=True))]
 
     illus = illustrations(rec, grey < BORDER_DARK, marked)
     caps = caption_lines(rec)
@@ -1201,9 +1220,12 @@ def figures(page):
             # the middle.  The band is a property of the figure, so it clips the
             # box as well as the claim.
             box[1] = max(box[1], band_top)
-            box[0], box[2] = widen(stoppers, box[0], box[1], box[2], box[3], W)
+            stop = table_stoppers if (cap.get("kind") or "").lower().startswith("tab") \
+                else stoppers
+            box[0], box[2] = widen(stop, box[0], box[1], box[2], box[3], W)
         else:
-            box = figure_above(stoppers, cap, W, H)   # no illustration: fall back
+            box = figure_above(table_stoppers if (cap.get("kind") or "").lower().startswith("tab")
+                               else stoppers, cap, W, H)   # no illustration: fall back
         found.append({"bbox": box, "ink": 0.0, "caption": cap["text"],
                       "kind": cap["kind"], "num": cap["num"],
                       "anchor": [cap["bbox"][0], cap["bbox"][2]],

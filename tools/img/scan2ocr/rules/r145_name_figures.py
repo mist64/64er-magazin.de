@@ -94,7 +94,26 @@ def main():
                 continue
             shutil.copy(src, f"{DEST}/{typ}/{name}")
             rows.append({"page": page, "start": start, "name": name, "type": typ,
-                         "bbox": cands[i]["bbox"], "caption": v.get("caption")})
+                         "bbox": cands[i]["bbox"],
+                         # THE CAPTION IS SOURCED, NEVER GENERATED.  It was
+                         # taken from the model's reply, and the model reads the
+                         # page image -- so where the OCR had missed a caption
+                         # printed inside a tint panel it supplied the real text
+                         # (p143's "Blockschaltbild eines Matrixdruckers" is
+                         # exactly what is printed), and where it could not read
+                         # one it supplied a plausible one instead.  On p133 it
+                         # produced "Bild 2. Anschlussbelegung des CIA 6526" for
+                         # a chip whose printed caption reads "Bild 3. Die
+                         # Pinbelegung des CIA 6526": wrong number, wrong words,
+                         # and indistinguishable from the real ones downstream.
+                         # 7 of 64 captions matched no OCR block on their page.
+                         #
+                         # A figure index built on invented text is worse than
+                         # one with holes in it, because the holes are visible.
+                         # The caption now comes from the extractor's own
+                         # caption_lines(), which is OCR of the printed line, and
+                         # is null when there is none to read.
+                         "caption": cands[i].get("caption")})
     # PAGE FURNITURE REPEATS; A FIGURE DOES NOT.
     #
     # The "64'er Test" and "BÜCHER" rubric badges are cut correctly and are not
