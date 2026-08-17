@@ -1094,20 +1094,35 @@ def figures(page):
                 return True
         return False
 
-    clustered = []
+    clustered, c_members = [], {}
     for r in sorted(leftover, key=lambda r: (r[1], r[0])):
         for c in clustered:
             if parted(c, r):
                 continue
             if (min(c[2], r[2]) - max(c[0], r[0]) > -FRAME_CLUSTER_PX
                     and min(c[3], r[3]) - max(c[1], r[1]) > -FRAME_CLUSTER_PX):
+                c_members.setdefault(id(c), [list(c)]).append(list(r))
                 c[0], c[1] = min(c[0], r[0]), min(c[1], r[1])
                 c[2], c[3] = max(c[2], r[2]), max(c[3], r[3])
                 break
         else:
             clustered.append(list(r))
-    for x0, y0, x1, y1 in clustered:
-        if encloses_text(rec, x0, y0, x1, y1):
+    # A CLUSTER THAT FAILS FALLS BACK TO ITS MEMBERS.  Rejecting the union threw
+    # away every figure inside it: p42's three screenshots were clustered into
+    # one box spanning two of them, that box enclosed the body text between
+    # them, and BOTH were discarded -- which is why the fifteenth and sixteenth
+    # censuses kept finding printed figures with "no box drawn on them at all"
+    # (two on p42, one on p43, three covers on p128, p23's Bild 3).  The union
+    # failing says the union is wrong, not that its parts are.
+    checked = []
+    for c in clustered:
+        if not encloses_text(rec, *c):
+            checked.append(c)
+            continue
+        checked.extend(m for m in c_members.get(id(c), ()) if not encloses_text(rec, *m))
+
+    for x0, y0, x1, y1 in checked:
+        if False:
             continue
         for px0, py0, px1, py1 in gutter_pieces(marked, x0, y0, x1, y1):
             found.append({"bbox": [px0, py0, px1, py1], "ink": 0.0,
