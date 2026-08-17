@@ -363,6 +363,8 @@ CAPTION_FRAME_NEAR = 90   # a caption this close to a frame's band belongs to it
 CAPTION_STEAL_BAND = 400  # a foreign caption this near a box's top is the one above's
 CAPTION_STEAL_OVERLAP = 0.60  # share of the caption's width the box must cover
 CAPTION_BELOW_NEAR = 260  # a caption this far under a frame is still that frame's
+CAPTION_BIND_MAX_PX = 320    # a caption this far below a figure is still its own
+CAPTION_BIND_OVERLAP = 0.55  # ...and must share this much of a column with it
 RULE_GAP_PX = 24        # a nick in a printed rule shorter than this is closed
 
 
@@ -1786,6 +1788,46 @@ def figures(page):
             a["w"], a["h"] = ax1 - ax0, ay1 - ay0
             a["crop"] = im.crop((ax0, ay0, ax1, ay1))
             break
+
+    # --- FINAL PASS: BIND EACH FIGURE TO THE CAPTION PRINTED UNDER IT.
+    #
+    # The caption a box carries has been whatever the box grew out of, and after
+    # the trims and splits that is often the wrong one: the twenty-fourth census
+    # found 131-2's pixels correct -- the 6510 alone, all four rules -- while its
+    # manifest still read "Bild 3", which is 131-3's, and found 131-5 and 131-7
+    # with no caption at all though theirs are printed 28 px below their crops.
+    # A figure index built on that is wrong for half the page, which is the whole
+    # point of carrying the numbers.
+    #
+    # The magazine's convention settles it: a caption sits BELOW its figure, in
+    # the same column.  MEASURED on p133, whose six chips make the rule visible
+    # -- row 1 spans y1502..4564 with its captions at y4422..4424, row 2 spans
+    # y4510..6552 with its captions at y6608..6610, and each caption's x-range
+    # sits under exactly one chip.  Assigning by that geometry gives every chip
+    # its own number.
+    for a in out:
+        ax0, ay0, ax1, ay1 = a["bbox"]
+        best, best_d = None, None
+        for c in caps:
+            cx0, cy0, cx1, cy1 = (int(v) for v in c["bbox"])
+            # "Below" measured from the figure's own top, not its bottom: the
+            # frame clamp can grow a box down PAST its caption -- p133's row-1
+            # chips end at y4564 while their captions are at y4422 -- and a
+            # strict below-the-bottom test then finds nothing.  A caption inside
+            # the lower part of the box is still the caption printed under the
+            # artwork; one above the box's top belongs to the figure before it.
+            if cy0 < ay0:
+                continue
+            d = abs(cy0 - ay1)
+            if d > CAPTION_BIND_MAX_PX:
+                continue
+            ov = min(ax1, cx1) - max(ax0, cx0)
+            if ov < CAPTION_BIND_OVERLAP * min(ax1 - ax0, cx1 - cx0):
+                continue                        # not in this figure's column
+            if best_d is None or d < best_d:
+                best, best_d = c, d
+        if best is not None:
+            a["caption"], a["kind"], a["num"] = best["text"], best["kind"], best["num"]
 
     return out, rec, im
 
