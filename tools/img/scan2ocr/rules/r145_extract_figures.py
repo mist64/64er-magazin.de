@@ -192,7 +192,12 @@ MAX_FIGURE_FRAC = 0.62        # no figure is taller than this share of the page
 PANEL_MAX_FRAC = 0.92         # ...unless measured tint says so (see grow_to_panel)
 STRUCTURAL_LABELS = ("caption", "header", "footer")  # always bound a figure
 FURNITURE_LABELS = ("header", "footer", "heading")   # the page's, never a figure's
-FURNITURE_DOMINATES = 0.25  # furniture this much of a box's height means it IS furniture
+# MEASURED: at 0.25 this dropped 17 real figures (84 -> 67) to remove 9
+# furniture inclusions, which is a bad trade -- a genuine figure can easily have
+# a heading overlapping a quarter of its height.  p93's header is 122 px of a
+# 419 px box, so anything above 0.29 spares it; 0.60 is well clear of a figure
+# that merely abuts a heading.
+FURNITURE_DOMINATES = 0.60  # furniture this much of a box's height means it IS furniture
 TOP_STOP_MIN_WORDS = 4        # fewer words than this may be lettering inside the figure
 CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # THE MEASUREMENT THAT SAYS NO GAP THRESHOLD CAN WORK, recorded before the next
@@ -1510,6 +1515,7 @@ def figures(page):
         # heading is not structural, so a short one ("Aktuelles", a two-word
         # rubric) never enters that list, and those are exactly the ones that
         # ride along inside a figure.
+        is_furniture = False
         for (bx0, by0, bx1, by1), lab in furniture_rects:
             bx0, by0, bx1, by1 = int(bx0), int(by0), int(bx1), int(by1)
             # Against the NARROWER of the two, because a running head or an
@@ -1528,7 +1534,9 @@ def figures(page):
                 # that is mostly a running head IS the running head.  p93's
                 # 963x419 candidate is a 122 px header with margin around it,
                 # and there is no figure in it to save by trimming.
-                x1 = x0                         # drop below the size gate
+                is_furniture = True
+        if is_furniture or x1 - x0 < MIN_W_PX or y1 - y0 < MIN_H_PX:
+            continue                            # nothing left that is a figure
         crop = im.crop((x0, y0, x1, y1))
         out.append({"bbox": [x0, y0, x1, y1], "w": x1 - x0, "h": y1 - y0,
                     "ink": f["ink"], "type": classify(crop),
