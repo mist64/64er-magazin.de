@@ -79,6 +79,8 @@ FIT_PAD_PX = 40           # one x-height, for the hairlines outside the heavy in
 # so a fixed pad reaches the vertical rules and falls short of the horizontal.
 FRAME_SNAP_PX = 220       # how far out to look for the enclosing rule
 FRAME_RUN_FRAC = 0.80     # dark share of the box's width/height that IS a rule
+FRAME_RULE_SEP_PX = 6     # runs closer than this are the same printed rule
+FRAME_MAX_CANDIDATES = 4  # rules to consider per side, nearest first
 MAX_ASPECT = 6.0
 SCRAP_JOIN_PX = 260     # OCR scraps this close belong to one picture
 # Conversion type, measured over the INK rather than the paper.  Paper is most
@@ -88,7 +90,14 @@ PAPER_LEVEL = 215       # above this luminance is paper, not print
 # A strip of bare paper this wide, running the full height of a box, is the
 # boundary BETWEEN two printed objects -- nothing printed has one inside it.
 GUTTER_MIN_PX = 90      # ~3.8 mm at 600 dpi; narrower than any column gutter
-GUTTER_BLANK_FRAC = 0.995   # share of the column's height that must be paper
+# A STRIP SOMETHING CROSSES IS NOT A SEPARATOR, so this is a COUNT of marks and
+# not a share of them.  As a share it scaled with the box: the rows that severed
+# p32's flowchart carried 6 or 7 marked pixels -- the connector arrow running
+# between two decision boxes -- which across a 1904 px row is 0.32%, inside a
+# 0.5% tolerance.  The census found the two halves emitted as 30-2 and 30-2b,
+# overlapping by 3 px, "four files, zero usable figures".  A printed stroke at
+# 600 dpi is at least four pixels, so anything above three is a crossing.
+BARE_MAX_PX = 3         # marked pixels a truly separating strip may carry
 # The vertical separation between two stacked figures is a DIFFERENT quantity
 # from a column gutter and needs its own measurement: the magazine sets figures
 # closer together down a column than the columns are apart.  MEASURED on p27,
@@ -413,89 +422,61 @@ def cut_captions(rec, x0, y0, x1, y1):
     return x0, y0, x1, y1
 
 
-def snap_to_frame(grey, x0, y0, x1, y1, W, H):
-    """Snap to the picture's own printed rule, when it has one.
-
-    Nearly every placed figure in this magazine sits inside a printed rule.
-    That rule is the object's real edge, and it is a far better boundary than
-    anything grown from ink: growth runs on where the ink stays dense (across
-    gutters, into captions) and dies where the picture goes sparse (the pale
-    half of a schematic, the head of a cartoon).  A rule does neither -- it is
-    exactly where the figure ends.
-
-    Searched only in a band around the candidate, and only accepted when a rule
-    is found on OPPOSITE sides: one long dark run is a paragraph underline or a
-    column rule, two facing each other is a frame.
-    """
-    sx0, sy0 = max(0, x0 - FRAME_SEARCH_PX), max(0, y0 - FRAME_SEARCH_PX)
-    sx1, sy1 = min(W, x1 + FRAME_SEARCH_PX), min(H, y1 + FRAME_SEARCH_PX)
-    win = grey[sy0:sy1, sx0:sx1]
-    if win.size == 0:
-        return x0, y0, x1, y1
-    # Measure a rule across the CANDIDATE's own extent, not the search window's.
-    # The window is deliberately wider than the figure, so a frame line spans
-    # only part of it and never reached FRAME_SPAN -- which is why snapping
-    # almost never fired and 61% of crops were still cut or over-grown.
-    dark = win < BORDER_DARK
-    rows = dark[:, x0 - sx0:x1 - sx0].mean(axis=1)
-    cols = dark[y0 - sy0:y1 - sy0, :].mean(axis=0)
-
-    def pick(profile, lo, hi):
-        """Outermost run that spans the window, one before `lo`, one after `hi`."""
-        idx = [i for i, v in enumerate(profile) if v >= FRAME_SPAN]
-        before = [i for i in idx if i <= lo]
-        after = [i for i in idx if i >= hi]
-        return (max(before) if before else None, min(after) if after else None)
-
-    t, b = pick(rows, y0 - sy0, y1 - sy0)
-    l, r = pick(cols, x0 - sx0, x1 - sx0)
-    if t is not None and b is not None:
-        y0, y1 = sy0 + t + BORDER_OVERCUT, sy0 + b - BORDER_OVERCUT
-    if l is not None and r is not None:
-        x0, x1 = sx0 + l + BORDER_OVERCUT, sx0 + r - BORDER_OVERCUT
-    return x0, y0, x1, y1
-
-
 def snap_to_frame(dark, x0, y0, x1, y1, W, H):
-    """Extend the box out to the figure's own enclosing rule, where there is one.
+    """Extend the box out to the figure's enclosing frame -- ALL FOUR SIDES OR NONE.
 
-    A box fitted to interior content sits INSIDE the frame that encloses it, and
-    a fixed pad cannot reach the rule because the figure's internal margin is
-    not a fixed distance -- it is larger vertically than horizontally in this
-    magazine's figures.  The thirteenth census measured the consequence exactly:
-    145-1, 58-1, 54-1 and 79-1 all keep both vertical rules and lose both
-    horizontal ones, and 145-1's overlay shows the crop inscribed in the printed
-    box, touching the verticals.  It also ruled out the lazy fix -- a bigger pad
-    pulls in captions, as it already did in 54-1.
+    A box fitted to interior content sits inside the frame that encloses it, and
+    no fixed pad can reach that frame because the figure's internal margin is
+    not a fixed distance.  The frame is, and it is where the magazine says the
+    figure ends.
 
-    A rule is what it looks like: a dark run across most of the box's own width
-    or height.  Only the outermost one within the search window is taken, and
-    only outward, so this can extend a box but never shrink one.
+    But a frame is ONE RECTANGLE, and snapping each side independently is not
+    the same thing.  Done per-side, every edge walks outward looking for a long
+    dark run and takes whatever it meets -- a neighbouring listing's bottom
+    rule, a page column rule, a running head, the previous figure's frame -- and
+    swallows everything in between.  The fourteenth census found thirteen crops
+    made over-large that way, and the same box taking a foreign top rule while
+    missing its own bottom one.  So four runs are sought together and accepted
+    only if they CLOSE: each side must be dark along the full extent of the
+    rectangle the other three describe.  Nearest first, and if nothing closes,
+    nothing moves.
     """
-    def scan(fixed_lo, fixed_hi, start, limit, axis):
-        best = None
-        for d in range(1, limit):
-            i = start - d if axis < 2 else start + d
-            if i < MARGIN_PX or i >= (H if axis in (1, 3) else W) - MARGIN_PX:
+    def candidates(fixed_lo, fixed_hi, start, horizontal, outward):
+        out = []
+        for d in range(1, FRAME_SNAP_PX):
+            i = start + d * outward
+            if i < MARGIN_PX or i >= (H if horizontal else W) - MARGIN_PX:
                 break
-            line = dark[i, fixed_lo:fixed_hi] if axis in (1, 3) \
+            line = dark[i, fixed_lo:fixed_hi] if horizontal \
                 else dark[fixed_lo:fixed_hi, i]
             if line.size and float(line.mean()) >= FRAME_RUN_FRAC:
-                best = i
-        return best
+                if not out or abs(out[-1] - i) > FRAME_RULE_SEP_PX:
+                    out.append(i)
+            if len(out) >= FRAME_MAX_CANDIDATES:
+                break
+        return out
 
-    t = scan(x0, x1, y0, FRAME_SNAP_PX, 1)
-    b = scan(x0, x1, y1 - 1, FRAME_SNAP_PX, 3)
-    l = scan(y0, y1, x0, FRAME_SNAP_PX, 0)
-    r = scan(y0, y1, x1 - 1, FRAME_SNAP_PX, 2)
-    if t is not None:
-        y0 = t
-    if b is not None:
-        y1 = b + 1
-    if l is not None:
-        x0 = l
-    if r is not None:
-        x1 = r + 1
+    tops = [y0] + candidates(x0, x1, y0, True, -1)
+    bots = [y1 - 1] + candidates(x0, x1, y1 - 1, True, 1)
+    lefts = [x0] + candidates(y0, y1, x0, False, -1)
+    rights = [x1 - 1] + candidates(y0, y1, x1 - 1, False, 1)
+
+    def closed(t, b, l, r):
+        for line, lo, hi, horiz in ((t, l, r + 1, True), (b, l, r + 1, True),
+                                    (l, t, b + 1, False), (r, t, b + 1, False)):
+            seg = dark[line, lo:hi] if horiz else dark[lo:hi, line]
+            if seg.size == 0 or float(seg.mean()) < FRAME_RUN_FRAC:
+                return False
+        return True
+
+    for t in tops:
+        for b in bots:
+            for l in lefts:
+                for r in rights:
+                    if (t, b, l, r) == (y0, y1 - 1, x0, x1 - 1):
+                        continue
+                    if closed(t, b, l, r):
+                        return l, t, r + 1, b + 1
     return x0, y0, x1, y1
 
 
@@ -1291,7 +1272,7 @@ def cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1):
     if cell.size == 0 or x1 - x0 < 2 * GUTTER_MIN_PX:
         return x0, y0, x1, y1
     # a gutter column carries essentially no mark over the box's whole height
-    blank = (~cell).mean(axis=0) > GUTTER_BLANK_FRAC
+    blank = cell.sum(axis=0) <= BARE_MAX_PX
     segs, run = [], None
     for i, b in enumerate(list(blank) + [True]):
         if b and run is None:
@@ -1343,7 +1324,7 @@ def cut_at_band(marked, x0, y0, x1, y1, ay0, ay1):
     cell = marked[y0:y1, x0:x1]
     if cell.size == 0 or y1 - y0 < 2 * BAND_MIN_PX:
         return x0, y0, x1, y1
-    blank = (~cell).mean(axis=1) > GUTTER_BLANK_FRAC
+    blank = cell.sum(axis=1) <= BARE_MAX_PX
     segs, run = [], None
     for i, b in enumerate(list(blank) + [True]):
         if b and run is None:
@@ -1379,7 +1360,7 @@ def band_pieces(marked, x0, y0, x1, y1):
     cell = marked[y0:y1, x0:x1]
     if cell.size == 0 or y1 - y0 < 2 * BAND_MIN_PX:
         return [(x0, y0, x1, y1)]
-    blank = (~cell).mean(axis=1) > GUTTER_BLANK_FRAC
+    blank = cell.sum(axis=1) <= BARE_MAX_PX
     out, start, run = [], 0, None
     for i, b in enumerate(list(blank) + [False]):
         if b and run is None:
@@ -1407,7 +1388,7 @@ def gutter_pieces(marked, x0, y0, x1, y1):
     cell = marked[y0:y1, x0:x1]
     if cell.size == 0 or x1 - x0 < 2 * GUTTER_MIN_PX:
         return [(x0, y0, x1, y1)]
-    blank = (~cell).mean(axis=0) > GUTTER_BLANK_FRAC
+    blank = cell.sum(axis=0) <= BARE_MAX_PX
     out, start = [], 0
     run = None
     for i, b in enumerate(list(blank) + [False]):
