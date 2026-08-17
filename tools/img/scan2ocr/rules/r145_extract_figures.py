@@ -325,6 +325,31 @@ CLAIM_GAP_PX = 120        # a caption's own figure reaches this far past a piece
 # trim_blank.  What remains is why the two ALTO regions do not survive to
 # `found`, which is where the next iteration should start.
 #
+# OPEN AND FULLY DIAGNOSED (iteration 27): p24's opened 1551 is ONE photograph
+# that the layout analysis returns as two regions, and it is emitted as two
+# half-photographs.  A census verified it numerically -- translation search gives
+# a single sharp minimum at dx=+1020, dy=0, RMSE 0.181 against a 0.32-0.50 floor
+# for genuinely different content -- and looking at the two crops side by side
+# settles it: the yellow chassis clips, the green board and the spindle continue
+# across the cut.
+#
+# THE MECHANISM IS KNOWN.  illustrations() correctly merges the two regions into
+# [356,5004,4758,6532]; gutter_pieces then splits them apart again at the bare
+# seam between them, because "a bare strip separates two objects" is right for
+# neighbours and wrong for one picture the analysis has cut in two.
+#
+# THE SIGNATURE THAT SEPARATES THE TWO CASES IS MEASURED.  At p24's seam the gap
+# is pure white (mean 255.0, chroma 0.0) with ink pressed flush against both
+# sides -- the columns just inside each half carry chroma 19.8 and 72.3.  Two
+# separate figures leave a paper margin inside their own edges, so their edge
+# columns are near-neutral.
+#
+# WHAT FAILED, so it is not retried blind: suppressing the cut alone.  Teaching
+# gutter_pieces to skip an inked seam made p24 emit only its LEFT half and made
+# p143 lose a figure outright -- not cutting is not the same as joining, and
+# dropping a piece is worse than splitting it.  The fix has to keep the merged
+# box whole through the pass, not merely decline to divide it.
+#
 # The structure that does separate them is the printed rule rectangle, which
 # exists on essentially every one of these figures.  framed_rects() below was
 # written for exactly that and is currently UNCALLED.  It is not ready: tested
