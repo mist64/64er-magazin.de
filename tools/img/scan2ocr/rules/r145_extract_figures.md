@@ -159,7 +159,42 @@ PY
 
 # 3. every crop is a real image file of plausible size
 find "$OUT/figures/png" -name '*.png' -size -2k | head
-```
+
+# 4. NO EDGE SITS ON A CONSTANT.  This is the check that caught the page-margin
+#    bug: thirteen boxes shared the right edge 4700, which was W - MARGIN_PX and
+#    not the page edge, and it had been shearing the right frame rule off every
+#    figure that reached the outer margin.  An edge value repeated across many
+#    figures is a clamp, not a boundary.
+python3 - "$OUT" <<'EDGES'
+import json, sys, collections
+rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
+for i, side in ((0, "left"), (2, "right"), (1, "top"), (3, "bottom")):
+    val, n = collections.Counter(r["bbox"][i] for r in rows).most_common(1)[0]
+    print(f"{side:<7} most common edge {val} x{n}"
+          + ("   <-- SUSPECT: an edge repeated this often is a clamp" if n > 5 else ""))
+EDGES
+
+# 5. NO FIGURE IS MOSTLY INSIDE ANOTHER.  Two captions claiming the same artwork,
+#    or a cluster emitted alongside its own members, both show up here.
+python3 - "$OUT" <<'OVERLAP'
+import json, sys
+rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
+bad = []
+for i, a in enumerate(rows):
+    for b in rows[i + 1:]:
+        if a["page"] != b["page"]:
+            continue
+        ax0, ay0, ax1, ay1 = a["bbox"]
+        bx0, by0, bx1, by1 = b["bbox"]
+        iw = min(ax1, bx1) - max(ax0, bx0)
+        ih = min(ay1, by1) - max(ay0, by0)
+        if iw <= 0 or ih <= 0:
+            continue
+        share = iw * ih / min((ax1 - ax0) * (ay1 - ay0), (bx1 - bx0) * (by1 - by0))
+        if share > 0.5:
+            bad.append((a["name"], b["name"], round(share, 2)))
+print("overlapping pairs:", bad or "none")
+OVERLAP
 
 **Then LOOK at them.** The counts above cannot tell a photograph from a data
 table, which is the whole difficulty of this step. Open
