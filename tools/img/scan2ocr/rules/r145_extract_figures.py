@@ -1430,6 +1430,15 @@ def figures(page):
                 continue
             if iw * ih <= FRAME_INSIDE_FRAC * max(1, (r[2] - r[0]) * (r[3] - r[1])):
                 continue
+            # ...AND ONLY FIGURE-SIZED FRAMES.  A photograph contains framed
+            # components -- p24's drive interior has a dozen -- and any of them
+            # near the page's one caption passes own_caption(), so the split
+            # replaced a correct 2152x1524 photograph with two component
+            # rectangles that each amputated it (24-3 and 24-3b in the census).
+            # The same floor the clamp uses: a frame that IS a figure is
+            # page-scale, a frame inside a photograph is not.
+            if (r[2] - r[0]) < FRAME_FIGURE_MIN_W or (r[3] - r[1]) < FRAME_FIGURE_MIN_H:
+                continue
             if own_caption(r):
                 out.append(r)
         # outermost only: a captioned frame inside another captioned frame is a part
