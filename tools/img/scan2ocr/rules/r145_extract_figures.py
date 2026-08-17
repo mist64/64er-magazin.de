@@ -970,17 +970,36 @@ def figures(page):
                           "caption": None, "kind": None, "num": "0",
                           "anchor": [px0, px1]})
 
-    out = []
+    # SPLITTING MUST NOT DELETE.  Keeping the anchor's piece and discarding the
+    # rest is right only when every other piece has a caption of its own to be
+    # found by.  Where it does not, the figure simply vanished: the thirteenth
+    # census caught p24's Knebellaufwerk photograph and p172's IMAGES hardcopy
+    # with no box and no file anywhere, and warned that the merge count had
+    # fallen partly because the content was gone rather than separated.  This
+    # project has deleted real content by subtraction before.  Every piece is
+    # emitted; the anchor's keeps the caption and its number, the others become
+    # uncaptioned figures and are numbered like any opener.
+    split = []
     for f in sorted(found, key=lambda f: (f["bbox"][1], f["bbox"][0])):
-        x0, y0, x1, y1 = f["bbox"]
-        x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
-        ax0, ax1 = f.get("anchor", [x0, x1])
-        x0, y0, x1, y1 = cut_at_gutter(marked, x0, y0, x1, y1, ax0, ax1)
-        # A captioned box is anchored just above its caption; an uncaptioned one
-        # has only itself, and then the rule above takes the larger piece.
+        bx0, by0, bx1, by1 = trim_blank(marked, *f["bbox"])
+        ax0, ax1 = f.get("anchor", [bx0, bx1])
         cb = f.get("cap_bbox")
-        ay0, ay1 = (y1 - MIN_H_PX, y1) if cb is not None else (y0, y1)
-        x0, y0, x1, y1 = cut_at_band(marked, x0, y0, x1, y1, ay0, ay1)
+        ay0, ay1 = (by1 - MIN_H_PX, by1) if cb is not None else (by0, by1)
+        keep = cut_at_gutter(marked, bx0, by0, bx1, by1, ax0, ax1)
+        keep = cut_at_band(marked, *keep, ay0, ay1)
+        for px0, py0, px1, py1 in gutter_pieces(marked, bx0, by0, bx1, by1):
+            for qx0, qy0, qx1, qy1 in band_pieces(marked, px0, py0, px1, py1):
+                mine = (qx0 <= keep[0] and keep[2] <= qx1
+                        and qy0 <= keep[1] and keep[3] <= qy1)
+                g = dict(f, bbox=list(keep) if mine else [qx0, qy0, qx1, qy1])
+                if not mine:
+                    g.update(caption=None, kind=None, num="0", cap_bbox=None,
+                             anchor=[qx0, qx1])
+                split.append(g)
+
+    out = []
+    for f in split:
+        x0, y0, x1, y1 = f["bbox"]
         y0, y1 = grow_to_panel(marked, x0, y0, x1, y1, H, stoppers,
                                f.get("cap_bbox"))
         x0, y0, x1, y1 = trim_blank(marked, x0, y0, x1, y1)
@@ -1304,6 +1323,27 @@ def cut_at_band(marked, x0, y0, x1, y1, ay0, ay1):
     if hi - lo < MIN_H_PX:
         return x0, y0, x1, y1
     return x0, y0 + int(lo), x1, y0 + int(hi)
+
+
+def band_pieces(marked, x0, y0, x1, y1):
+    """Every piece a bare horizontal band separates, top to bottom."""
+    cell = marked[y0:y1, x0:x1]
+    if cell.size == 0 or y1 - y0 < 2 * BAND_MIN_PX:
+        return [(x0, y0, x1, y1)]
+    blank = (~cell).mean(axis=1) > GUTTER_BLANK_FRAC
+    out, start, run = [], 0, None
+    for i, b in enumerate(list(blank) + [False]):
+        if b and run is None:
+            run = i
+        elif not b and run is not None:
+            if i - run >= BAND_MIN_PX:
+                if run - start >= MIN_H_PX:
+                    out.append((x0, y0 + start, x1, y0 + run))
+                start = i
+            run = None
+    if len(blank) - start >= MIN_H_PX:
+        out.append((x0, y0 + start, x1, y0 + len(blank)))
+    return out or [(x0, y0, x1, y1)]
 
 
 def gutter_pieces(marked, x0, y0, x1, y1):
