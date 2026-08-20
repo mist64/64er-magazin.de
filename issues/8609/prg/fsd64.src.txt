@@ -1,0 +1,1393 @@
+
+
+;fsd64.src.prg ==0801==
+ 1000 rem **** fast serial disk ****
+ 1005 rem save"@0:fsd64.src",8
+ 1010 open1,8,15,"s0:fsd64"
+ 1015 open8,8,1,"fsd64,p,w
+ 1020 open4,4
+ 1025 sys9*4096
+ 1030 .opt o8 ;profi-ass 64
+ 1035 ;" **** Fast Serial Disk 64 ****
+ 1040 ;"(c)1986 by D.Temme, V: 16061986
+ 1045 ;
+ 1050 ;"Hardware: Userport 6&7->Serial Port 1&5
+ 1055 ;" (Anschluss von SRQ/DATA an CNT2/SP2)
+ 1060 ;"fuer Centronics ausserdem:
+ 1065 ;" Userport C-L ->Centronics 2-9
+ 1070 ;"          B->1, M->11 (DATA, -STROBE, BUSY)
+ 1075 ;"Benutzter Bereich: Kassettenroutinen:
+ 1080 ;"  $e4b7-$e4d2:   28 Bytes (  28 belegt)
+ 1085 ;"  $f0d8-$f105:   46 Bytes (  41 belegt)
+ 1090 ;"  $f199-$f1ac:   20 Bytes (  20 belegt)
+ 1095 ;"  $f2c8-$f2ed:   38 Bytes (  38 belegt)
+ 1100 ;"  $f393-$f3d1:   63 Bytes (  59 belegt)
+ 1105 ;"  $f533-$f5a8:  118 Bytes ( 116 belegt)
+ 1110 ;"  $f659-$f68d:   53 Bytes (  53 belegt)
+ 1115 ;"  $f72c-$fcd0: 1434 Bytes (1433 belegt)
+ 1120 ;"  $fec2-$fed5:   20 Bytes (  19 belegt)
+ 1122 ;
+ 1125 ;"Tastatur-Funktionen:
+ 1130 ;"  ESC                      CHR$(27)
+ 1135 ;"  TAB/SHT-TAB   CTRL-+/-   U0>M1/0
+ 1140 ;"  ALT/SHT-ALT    C=-</>    CHR$(8)/CHR$(142)
+ 1145 ;"  HLP/SHT-HLP   CTRL-,/.   Centronics ein/aus
+ 1150 ;"   LF/SHT-LF   CTRL-=/RET  LF ein/aus
+ 1155 ;"   NO SCROLL     CTRL-S    Stop bis Taste
+ 1160 ;"      CTRL-DOWN/RIGHT      ASCII-Wandlung ein/aus
+ 1165 ;"          CTRL-*           OLD-Funktion
+ 1170 ;"          CTRL-/           Escape-Funktion
+ 1171 ;"bei Scrolling: <C=> haelt an
+ 1172 ;
+ 1175 ;"Der neue SYS-Befehl:
+ 1180 ;"  SYS               Disk-Status
+ 1185 ;"  SYS'$...'<,dv>    Directory anzeigen
+ 1190 ;"  SYS'befehl'<,dv>  Disk-Befehl geben
+ 1195 ;"  SYS'LSname'<,dv>  SEQ-File listen
+ 1200 ;"  SYS'LPname'<,dv>  PRG-File listen
+ 1205 ;"  SYSx (x=1..15)    fuehrt SYS x*4096 aus
+ 1210 ;"  SYS0              ergibt Soft-BRK
+ 1211 ;
+ 1215 ;"Der LOAD-Befehl:
+ 1220 ;"  LOAD              LOAD"*",8,1
+ 1225 ;"  LOAD"name",dv,7   kein Burst-Mode
+ 1230 ;"  LOAD"name",dv,9   nach Laden U0>M0 geben
+ 1235 ;"  LOAD"name",dv,5   APPEND (nur in BASIC)
+ 1240 ;"------------------------------------------------------
+ 1245 ;">>> BASIC-LOADER (ab $0801)
+ 1250 start =$f299 ;"(nicht anders moeglich)
+ 1255 *=start
+ 1260 temp =$55
+ 1265 .byt $0b,$08
+ 1270 .wor 1986
+ 1275 .byt $9e
+ 1280 .asc "2061"
+ 1285 .byt 0,0,0
+ 1290 ldy #0
+ 1295 sty temp
+ 1300 ldx #$40
+ 1305 lda #$80
+ 1310 sta temp+1
+ 1315 copy1 lda (temp),y
+ 1320 sta (temp),y
+ 1325 iny
+ 1330 bne copy1
+ 1335 inc temp+1
+ 1340 dex
+ 1345 bne copy1
+ 1350 ldx #$20
+ 1355 lda #$e0
+ 1360 sta temp+1
+ 1365 copy2 lda (temp),y
+ 1370 sta (temp),y
+ 1375 iny
+ 1380 bne copy2
+ 1385 inc temp+1
+ 1390 dex
+ 1395 bne copy2
+ 1400 lda #8
+ 1405 sta $f387 ;"Kein Tape OPEN
+ 1410 lda #$f7
+ 1415 sta $f4b7 ;"Kein Tape LOAD
+ 1420 sta $f5f9 ;"Kein Tape SAVE
+ 1425 copy3 lda begprg
+ 1430 sta $f72c
+ 1435 inc copy3-start+$801+1
+ 1440 bne copy4
+ 1445 inc copy3-start+$801+2
+ 1450 copy4 inc copy3-start+$801+4
+ 1455 bne copy5
+ 1460 inc copy3-start+$801+5
+ 1465 copy5 lda copy3-start+$801+1
+ 1470 cmp #<endprg
+ 1475 bne copy3
+ 1480 lda copy3-start+$801+2
+ 1485 cmp #>endprg
+ 1490 bne copy3
+ 1495 ;"Neue Farben installieren
+ 1500 lda #11 ;d grey
+ 1505 ldx #11
+ 1510 ldy #1 ;white
+ 1515 sta $ecd9 ;rom border
+ 1520 stx $ecda ;rom ground
+ 1525 sty $e535 ;rom cursor
+ 1530 sta $d020 ;vic border
+ 1535 stx $d021 ;vic ground
+ 1540 sty $0286 ;ram cursor
+ 1545 lda #$4c
+ 1550 ;"LOAD installieren
+ 1555 ldx #<newlod
+ 1560 ldy #>newlod
+ 1565 sta $f4c1
+ 1570 stx $f4c2
+ 1575 sty $f4c3
+ 1580 ldx #<ldend
+ 1585 ldy #>ldend
+ 1590 sta $f5aa
+ 1595 stx $f5ab
+ 1600 sty $f5ac
+ 1605 ;"TALK/LISTEN installieren
+ 1610 ldx #<newtlk
+ 1615 ldy #>newtlk
+ 1620 sta $ed27
+ 1625 stx $ed28
+ 1630 sty $ed29
+ 1635 ;"IECOUT installieren
+ 1640 ldx #<no1
+ 1645 ldy #>no1
+ 1650 stx $ed4a
+ 1655 sty $ed4b
+ 1660 ldx #<no2
+ 1665 ldy #>no2
+ 1670 sta $ed5a
+ 1675 stx $ed5b
+ 1680 sty $ed5c
+ 1685 ldx #<no3
+ 1690 ldy #>no3
+ 1695 sta $ed94
+ 1700 stx $ed95
+ 1705 sty $ed96
+ 1710 ldx #<no4
+ 1715 ldy #>no4
+ 1720 stx $edb3
+ 1725 sty $edb4
+ 1730 ;"TALK/LISTEN/IECOUT kopieren
+ 1735 pha
+ 1740 ldy #117
+ 1745 lda xnwtlk-start+$801,y
+ 1750 sta newtlk,y
+ 1755 dey
+ 1760 bpl *-7
+ 1765 pla
+ 1770 ;"UNLISTEN/UNTALK-Ende installieren
+ 1775 ldx #<unlend
+ 1780 ldy #>unlend
+ 1785 stx $ee11
+ 1790 sty $ee12
+ 1795 ;"ACPTR installieren+kopieren
+ 1800 ldx #<ni1
+ 1805 ldy #>ni1
+ 1810 stx $ee19
+ 1815 sty $ee1a
+ 1820 pha
+ 1825 ldy #70
+ 1830 lda nacptr-start+$801,y
+ 1835 sta $ee22,y
+ 1840 dey
+ 1845 bpl *-7
+ 1850 ldy #52
+ 1855 lda xntest-start+$801,y
+ 1860 sta ntest,y
+ 1865 dey
+ 1870 bpl *-7
+ 1875 pla
+ 1880 ;"SECTLK installieren
+ 1885 ldx #<newstk
+ 1890 ldy #>newstk
+ 1895 sta $edc9
+ 1900 stx $edca
+ 1905 sty $edcb
+ 1910 ;"UNLSN installieren
+ 1915 ldx #<nunlsn
+ 1920 ldy #>nunlsn
+ 1925 stx $ee01
+ 1930 sty $ee02
+ 1935 ;"UNLSN/ACPTR/NEWNMI kopieren
+ 1940 pha
+ 1945 ldy #37
+ 1950 lda xni1-start+$801,y
+ 1955 sta ni1,y
+ 1960 dey
+ 1965 bpl *-7
+ 1970 pla
+ 1975 ;"KEY installieren
+ 1980 ldx #<newkey
+ 1985 ldy #>newkey
+ 1990 sta $ea93
+ 1995 stx $ea94
+ 2000 sty $ea95
+ 2005 ldx #<newget
+ 2010 ldy #>newget
+ 2015 stx $eb77
+ 2020 sty $eb78
+ 2025 ldx #<newfnc
+ 2030 ldy #>newfnc
+ 2035 sta $eae4
+ 2040 stx $eae5
+ 2045 sty $eae6
+ 2050 ldx #240
+ 2055 stx $ec78+$d
+ 2060 inx
+ 2065 stx $ec78+$28
+ 2070 inx
+ 2075 stx $ec78+$2b
+ 2080 inx
+ 2085 stx $ec78+$2f
+ 2090 inx
+ 2095 stx $ec78+$2c
+ 2100 inx
+ 2105 stx $ec78+7
+ 2110 inx
+ 2115 stx $ec78+2
+ 2120 inx
+ 2125 stx $ec78+$35
+ 2130 inx
+ 2135 stx $ec78+1
+ 2140 inx
+ 2145 stx $ec78+$31
+ 2150 inx
+ 2155 stx $ec78+$37
+ 2156 ldx #19
+ 2157 stx $ec78+$33 ;"CTRL-HOME -> HOME
+ 2158 ldx #14
+ 2159 stx $ec03+$2f ;"C=-'<' -> chr$(14)
+ 2160 ldx #14+128
+ 2161 stx $ec03+$2c ;"C=-'>' -> chr$(142)
+ 2162 ldx #31
+ 2163 stx $ecb1
+ 2164 ;"Centronics installieren
+ 2165 ldx #<centlk
+ 2170 ldy #>centlk
+ 2175 sta $ed24
+ 2180 stx $ed25
+ 2185 sty $ed26
+ 2190 ldx #<cenout
+ 2195 ldy #>cenout
+ 2200 sta $ed41
+ 2205 stx $ed42
+ 2210 sty $ed43
+ 2215 ;"TOASC+NEWCHK kopieren
+ 2220 pha
+ 2225 ldy #58
+ 2230 lda xtoasc-start+$801,y
+ 2235 sta toasc,y
+ 2240 dey
+ 2245 bpl *-7
+ 2250 pla
+ 2255 ;"NMI installieren
+ 2260 ldx #<newnmi
+ 2265 ldy #>newnmi
+ 2270 stx $ff7e
+ 2275 sty $ff7f
+ 2280 ;"SYS installieren
+ 2285 ldx #<newsys
+ 2290 ldy #>newsys
+ 2295 sta $e12a
+ 2300 stx $e12b
+ 2305 sty $e12c
+ 2310 ;"SAVE@ installieren
+ 2315 ldx #<newrpl
+ 2320 ldy #>newrpl
+ 2325 stx $f606
+ 2330 sty $f607
+ 2335 ;"APPEND installieren
+ 2340 ldx #<append
+ 2345 ldy #>append
+ 2350 stx $e176
+ 2355 sty $e177
+ 2360 ;"Scroll installieren
+ 2365 ldx #<scrolu
+ 2370 ldy #>scrolu
+ 2375 sta $e8ea
+ 2380 stx $e8eb
+ 2385 sty $e8ec
+ 2390 ldx #<scrole
+ 2395 ldy #>scrole
+ 2400 sta $e962
+ 2405 stx $e963
+ 2410 sty $e964
+ 2415 ldx #<scrold
+ 2420 ldy #>scrold
+ 2425 sta $e981
+ 2430 stx $e982
+ 2435 sty $e983
+ 2436 ldy #6
+ 2437 lda scrhlt-start+$801,y
+ 2438 sta $e942,y
+ 2439 dey
+ 2440 bpl *-7
+ 2441 ;"Verschiedenes kopieren
+ 2445 ldy #45
+ 2450 lda xgetdn-start+$801,y
+ 2455 sta getdn,y
+ 2460 dey
+ 2465 bpl *-7
+ 2470 ldy #19
+ 2475 lda xopen-start+$801,y
+ 2480 sta open,y
+ 2485 dey
+ 2490 bpl *-7
+ 2495 ldy #19
+ 2500 lda xnewst-start+$801,y
+ 2505 sta newstk,y
+ 2510 dey
+ 2515 bpl *-7
+ 2520 ldy #27
+ 2525 lda xscrol-start+$801,y
+ 2530 sta scrolu,y
+ 2535 dey
+ 2540 bpl *-7
+ 2545 ;"FSDFLG schuetzen+Repeat setzen
+ 2550 lda #$80
+ 2555 ldx #$ea
+ 2560 sta $e3d9
+ 2565 stx $e3df
+ 2570 lda #$8d
+ 2575 ldx #<650
+ 2580 ldy #>650
+ 2585 sta $e3dc
+ 2590 stx $e3dd
+ 2595 sty $e3de
+ 2600 ;"LSV-Default auf "*",8,1 setzen
+ 2605 ldx #8
+ 2610 ldy #1
+ 2615 stx $e1da
+ 2620 sty $e1dc
+ 2625 lda #$01
+ 2630 ldx #<setast
+ 2635 ldy #>setast
+ 2640 sta $e1d5
+ 2645 stx $e1d7
+ 2650 sty $e1d8
+ 2655 ;"OPEN-Default auf ,8,15 setzen
+ 2660 ldx #8
+ 2665 ldy #15
+ 2670 stx $e228
+ 2675 sty $e22a
+ 2680 ;"Neue LSV-Get-Routine installieren
+ 2685 ldx #<newchk
+ 2690 ldy #>newchk
+ 2695 stx $e1e7
+ 2700 sty $e1e8
+ 2705 stx $e1f4
+ 2710 sty $e1f5
+ 2715 ;"'RUN'-Taste aendern
+ 2720 ldx #"U"
+ 2725 ldy #":"
+ 2730 stx $eced
+ 2735 sty $ecee
+ 2740 ;"Startmeldung installieren
+ 2745 ldy #7
+ 2750 lda tabtxt-start+$801,y
+ 2755 sta $e49b,y
+ 2760 dey
+ 2765 bpl *-7
+ 2770 lda #">
+ 2775 ldy #3
+ 2780 sta $e479,y
+ 2785 dey
+ 2790 bpl *-4
+ 2795 lda #"<
+ 2800 ldy #3
+ 2805 sta $e494,y
+ 2810 dey
+ 2815 bpl *-4
+ 2820 lda #5
+ 2825 sta $01 ;"Kernal im RAM
+ 2830 jmp $e39a
+ 2835 tabtxt .asc "dte fsd-"
+ 2840 ;"------------------------------------------------------
+ 2845 ;">>> Variablendefinition
+ 2850 begprg =$f72c-start+$801
+ 2855 ;"ZEROPAGE-Bereich
+ 2860 fsdflg =$03
+ 2865 ;"Belegung des FSDFLG: b7   FSD aktiv
+ 2870 ;"                     b6   FSD moeglich
+ 2875 ;"                     b5/4 Tastatur inaktiv
+ 2880 ;"                     b3   CENTRONICS CRLF
+ 2885 ;"                     b2   CENTRONICS ASCII
+ 2890 ;"                     b1   CENTRONICS aktiv
+ 2895 ;"                     b0   CENTRONICS erlaubt
+ 2900 numflg =$0d
+ 2905 index =$22
+ 2910 txttab =$2b
+ 2915 vartab =$2d
+ 2920 chrgot =$79
+ 2925 status =$90
+ 2930 ldvflg =$93
+ 2935 iecbyt =$95
+ 2940 ldadr =$ae
+ 2945 cnter =$b4
+ 2950 fnlen =$b7
+ 2955 sa =$b9
+ 2960 dn =$ba
+ 2965 fnadr =$bb
+ 2970 oldadr =$c3
+ 2975 numkey =$c6
+ 2980 rvsflg =$c7
+ 2985 keynum =$cb
+ 2990 quote =$d4
+ 2995 insert =$d8
+ 3000 buf =$0200
+ 3005 shtflg =$028d
+ 3010 ;"BASIC-Bereich
+ 3015 error =$a437
+ 3020 lnkprg =$a533
+ 3025 outcr =$aad7
+ 3030 frmevl =$ad9e
+ 3035 snerr =$af08
+ 3040 getadr =$b7f7
+ 3045 linprt =$bdcd
+ 3050 ;"I/O-Bereich
+ 3055 vicprt =$d02f
+ 3060 c1pra =$dc00
+ 3065 c1prb =$dc01
+ 3070 c1icr =$dc0d
+ 3075 c2pra =$dd00
+ 3080 c2prb =$dd01
+ 3085 c2ddrb =$dd03
+ 3090 c2t1l =$dd04
+ 3095 c2t1h =$dd05
+ 3100 c2sdr =$dd0c ;"Datenregister
+ 3105 c2icr =$dd0d ;"b3: SDR voll/leer
+ 3110 c2cra =$dd0e
+ 3115 ;"KERNAL-Bereich
+ 3120 outscr =$e716
+ 3125 talk =$ed09
+ 3130 lstn =$ed0c
+ 3135 seclsn =$edb9
+ 3140 sectlk =$edc7
+ 3145 iecout =$eddd
+ 3150 untalk =$edef
+ 3155 unlstn =$edfe
+ 3160 iecin =$ee13
+ 3165 clkhig =$ee85
+ 3170 clklow =$ee8e
+ 3175 dathig =$ee97
+ 3180 datlow =$eea0
+ 3185 datain =$eea9
+ 3190 iecopn =$f3d5
+ 3195 getend =$f5a9
+ 3200 outsrc =$f5af
+ 3205 outldv =$f5d2
+ 3210 ieccls =$f646
+ 3215 ioerr4 =$f704
+ 3220 ioerr5 =$f707
+ 3225 setst =$fe1c
+ 3230 tststp =$ffe1
+ 3231 udtim =$ffea
+ 3232 ;"------------------------------------------------------
+ 3233 ;"bei Scroll und <C=> anhalten (7)
+ 3234 scrhlt beq *+9
+ 3235 cmp #223 ;"C=-Taste
+ 3236 beq *-9
+ 3237 nop
+ 3240 ;"------------------------------------------------------
+ 3245 ;">>> FSD: Geaenderte ACPTR-Routine (an Original-Stelle)
+ 3250 nacptr jmp ntest
+ 3255 nac1 ldx #8
+ 3260 txa
+ 3265 and c2icr
+ 3270 bne nac6
+ 3275 nac2 lda c2pra
+ 3280 cmp c2pra
+ 3285 bne nac2
+ 3290 asl
+ 3295 bpl nac1
+ 3300 nac3 ror $a4
+ 3305 nac4 lda c2pra
+ 3310 cmp c2pra
+ 3315 bne nac4
+ 3320 asl
+ 3325 bmi nac4
+ 3330 dex
+ 3335 beq nac7
+ 3340 nac5 lda c2pra
+ 3345 cmp c2pra
+ 3350 bne nac5
+ 3355 asl
+ 3360 bpl nac5
+ 3365 bmi nac3
+ 3370 nac6 lda c2sdr
+ 3375 sta $a4
+ 3380 lda fsdflg
+ 3385 ora #$c0
+ 3390 sta fsdflg
+ 3395 nac7 ldx $a3
+ 3400 jmp $ee76 ;68
+ 3405 ;"------------------------------------------------------
+ 3410 ;">>> Verschiedenes (44/46)
+ 3415 getdn =$f0d8
+ 3420 xgetdn lda dn
+ 3425 cmp #8
+ 3430 bcs dnok
+ 3435 lda #8
+ 3440 dnok rts
+ 3445 scrtxt =*-xgetdn+getdn
+ 3450 .byt 13
+ 3455 .asc "scratching"
+ 3460 .byt 160
+ 3465 incadr =*-xgetdn+getdn
+ 3470 dec fnlen
+ 3475 beq *+11
+ 3480 inc fnadr
+ 3485 bne *+4
+ 3490 inc fnadr+1
+ 3495 lda (fnadr),y
+ 3500 rts
+ 3505 ldx #8 ;"?MISS FILE NAME
+ 3510 jmp error
+ 3515 clrst =*-xgetdn+getdn
+ 3520 ldy #0
+ 3525 sty status
+ 3530 rts
+ 3535 ;"------------------------------------------------------
+ 3540 ;">>> Geaenderte SECTALK-Routine (Korrektur, 13)
+ 3545 newstk =$f199
+ 3550 xnewst jsr $ed36
+ 3555 bit status
+ 3560 bmi *+5
+ 3565 jmp $edcc
+ 3570 jmp $ee03
+ 3575 ;">>> LSV-Default auf "*" setzen (7)
+ 3580 setast =*-xnewst+newstk
+ 3585 ldx #<astric
+ 3590 ldy #>astric
+ 3595 jmp $ffbd
+ 3600 ;"------------------------------------------------------
+ 3605 ;">>> Geaenderte Scroll-Routine (14/28)
+ 3610 scrolu =$e4b7
+ 3615 xscrol sei
+ 3620 lda $ac
+ 3625 pha
+ 3630 jmp $e8ed
+ 3635 scrold =*-xscrol+scrolu
+ 3640 sei
+ 3645 lda $ac
+ 3650 pha
+ 3655 jmp $e984
+ 3660 ;">>> FileNotFound-Test (14)
+ 3665 fnftst =*-xscrol+scrolu
+ 3670 ldx status
+ 3675 cpx #66
+ 3680 beq *+5
+ 3685 cpx #0
+ 3690 rts
+ 3695 ldx #4 ;"?File Not Found
+ 3700 jmp error
+ 3705 ;"------------------------------------------------------
+ 3710 ;">>> FSD: Teil der neuen ACPTR-Routine (52)
+ 3715 ntest =$f659
+ 3720 xntest ldx #13
+ 3725 lda c2pra
+ 3730 and #$df
+ 3735 sta c2pra
+ 3740 nt1 lda c2pra
+ 3745 cmp c2pra
+ 3750 bne nt1
+ 3755 asl
+ 3760 bpl ntend
+ 3765 dex
+ 3770 bne nt1
+ 3775 lda $a5
+ 3780 bne ntneoi
+ 3785 jsr datlow
+ 3790 jsr clkhig
+ 3795 lda #$40
+ 3800 jsr setst
+ 3805 inc $a5
+ 3810 bne xntest
+ 3815 ntneoi ldx $a3
+ 3820 lda #2
+ 3825 jmp $edb2
+ 3830 ntend jmp $ee25
+ 3835 ;">>> FSD: Rest ACPTR-Routine (15)
+ 3840 ni1 =$f2c8
+ 3845 xni1 bit c2icr
+ 3850 stx $a3
+ 3855 lda status
+ 3860 and #$bd
+ 3865 sta status
+ 3870 jmp clkhig
+ 3875 ;">>> FSD: Neue UNTALK/UNLISTEN-Routine (11)
+ 3880 nunlsn =*-xni1+ni1
+ 3885 pha
+ 3890 lda fsdflg
+ 3895 and #$7f
+ 3900 sta fsdflg
+ 3905 pla
+ 3910 jmp $ed11
+ 3915 ;">>> Geaenderte NMI-Routine (6)
+ 3920 newnmi =*-xni1+ni1
+ 3925 jsr allon
+ 3930 jmp clklow
+ 3935 ;">>> Rest Error-Routine (6)
+ 3940 newerr =*-xni1+ni1
+ 3945 pla
+ 3950 pla
+ 3955 txa
+ 3960 jmp $e0f9
+ 3965 ;"------------------------------------------------------
+ 3970 ;">>> Centronics-Umwandlung (48)
+ 3975 toasc =$f393
+ 3980 xtoasc pha
+ 3985 lda fsdflg
+ 3990 and #4
+ 3995 beq taend
+ 4000 pla
+ 4005 cmp #$40 ;"ASCII-Wandlung
+ 4010 bcc taend2
+ 4015 cmp #$60
+ 4020 bcs tanot
+ 4025 adc #32
+ 4030 tanot cmp #$c0
+ 4035 bcc taend2
+ 4040 cmp #$e0
+ 4045 bcs taend2
+ 4050 sbc #127
+ 4055 taend2 pha
+ 4060 taend lda fsdflg
+ 4065 and #8 ;"bei CR auch LF senden
+ 4070 beq taend3
+ 4075 pla
+ 4080 cmp #13
+ 4085 bne taend4
+ 4090 jsr cenprt
+ 4095 dec c2ddrb
+ 4100 lda #10
+ 4105 taend4 rts
+ 4110 ;">>> Geaenderte LSV-Get-Routine (10)
+ 4115 newchk =*-xtoasc+toasc
+ 4120 jsr chrgot
+ 4125 cmp #","
+ 4130 beq taend4
+ 4135 pla
+ 4140 taend3 pla
+ 4145 rts
+ 4150 ;">>> Rest geaenderte Scroll-Routine (4)
+ 4155 scrole =*-xtoasc+toasc
+ 4160 sta $ac
+ 4165 cli
+ 4170 rts
+ 4175 ;"------------------------------------------------------
+ 4180 ;">>> FSD: Neue TALK/LISTEN-Routine (26)
+ 4185 newtlk =$f533
+ 4190 xnwtlk lda c2pra
+ 4195 and #8
+ 4200 bne netend
+ 4205 jsr setit
+ 4210 lda #$ff
+ 4215 sta c2sdr
+ 4220 jsr watset
+ 4225 txa
+ 4230 ldx #$14
+ 4235 net1 dex
+ 4240 bne net1
+ 4245 tax
+ 4250 netend jmp $ed2e
+ 4255 ;">>> FSD: Neue IECOUT-Routine (90)
+ 4260 no1 =*-xnwtlk+newtlk
+ 4265 bit c2icr
+ 4270 jmp clkhig
+ 4275 noold jmp $ed62
+ 4280 no2 =*-xnwtlk+newtlk
+ 4285 xno2 lda c2pra
+ 4290 cmp c2pra
+ 4295 bne xno2
+ 4300 pha
+ 4305 lda c2icr
+ 4310 and #8
+ 4315 beq notfsd
+ 4320 lda fsdflg
+ 4325 ora #$c0
+ 4330 sta fsdflg
+ 4335 notfsd pla
+ 4340 bpl xno2
+ 4345 ora #$10
+ 4350 sta c2pra
+ 4355 and #8
+ 4360 bne noold
+ 4365 bit fsdflg
+ 4370 bpl noold
+ 4375 jsr setit
+ 4380 lda iecbyt
+ 4385 sta c2sdr
+ 4390 jsr watset
+ 4395 no3 =*-xnwtlk+newtlk
+ 4400 txa
+ 4405 pha
+ 4410 ldx #$22
+ 4415 no3wat jsr datain
+ 4420 bcs no3hig
+ 4425 pla
+ 4430 tax
+ 4435 cli
+ 4440 rts
+ 4445 no3hig dex
+ 4450 bne no3wat
+ 4455 pla
+ 4460 tax
+ 4465 jmp $edb0
+ 4470 no4 =*-xnwtlk+newtlk
+ 4475 pha
+ 4480 lda fsdflg
+ 4485 and #$7f
+ 4490 sta fsdflg
+ 4495 pla
+ 4500 jmp setst
+ 4505 ;"------------------------------------------------------
+ 4510 ;">>> Hilfsroutine zum Oeffnen (19/20)
+ 4515 open =$fec2
+ 4520 xopen jsr open+9
+ 4525 bcc *+9
+ 4530 tax
+ 4535 jmp newerr
+ 4540 jsr iecopn
+ 4545 rts
+ 4550 putdn =*-xopen+open
+ 4555 jsr getdn
+ 4560 sta dn
+ 4565 rts
+ 4570 astric =*-xopen+open
+ 4575 .byt "*"
+ 4580 ;"------------------------------------------------------
+ 4585 ;">>> FSD: Neue LOAD-Routine (ab $f72c)
+ 4590 nlold jsr allon
+ 4595 jmp $f4c4
+ 4600 newlod stx $b
+ 4605 jsr outsrc
+ 4610 cpx #7
+ 4615 beq nlold
+ 4620 lda fsdflg
+ 4625 and #%10111111
+ 4630 ora #16
+ 4635 sta fsdflg
+ 4640 ldy #0
+ 4645 lda (fnadr),y
+ 4650 cmp #"$"
+ 4655 beq nlold
+ 4660 lda dn
+ 4665 jsr lstn
+ 4670 lda #$6f
+ 4675 jsr seclsn
+ 4680 lda status
+ 4685 bpl nldvpr
+ 4687 jsr allon
+ 4690 jmp ioerr5
+ 4695 nldvpr ldy #3
+ 4700 nl2 lda txu0ld-1,y
+ 4705 jsr iecout
+ 4710 dey
+ 4715 bne nl2
+ 4720 jsr iecopn+$27 ;"Filename ausgeben
+ 4750 bit fsdflg
+ 4755 bvc nlold
+ 4760 sei
+ 4765 jsr clkhig
+ 4770 jsr setout
+ 4775 bit c2icr
+ 4780 jsr clkinv
+ 4785 jsr nlgbyt
+ 4790 cmp #2
+ 4795 bne nlfnd
+ 4800 jsr clkhig
+ 4805 jsr allon
+ 4810 jmp ioerr4
+ 4815 nlfnd pha
+ 4820 cmp #$1f
+ 4825 bne nlnlsf
+ 4830 jsr clkinv
+ 4835 jsr nlgbyt
+ 4840 sta cnter
+ 4845 jmp nlnerr
+ 4850 nlnlsf cmp #2
+ 4855 bcc nlnerr
+ 4860 pla
+ 4865 bcs nlderr
+ 4870 nlnerr jsr outldv
+ 4875 jsr allon
+ 4880 jsr clkinv
+ 4885 jsr nlgbyt
+ 4890 sta ldadr
+ 4895 jsr clkinv
+ 4900 jsr nlgbyt
+ 4905 sta ldadr+1
+ 4910 txa
+ 4915 bne nlabs
+ 4920 lda oldadr
+ 4925 sta ldadr
+ 4930 lda oldadr+1
+ 4935 sta ldadr+1
+ 4940 nlabs pla
+ 4945 cmp #$1f
+ 4950 beq nllstb
+ 4955 jsr clkinv
+ 4960 lda #$fc
+ 4965 nlrnxt sta cnter
+ 4970 jsr udtim
+ 4975 jsr tststp
+ 4980 beq nlstp
+ 4985 sec
+ 4990 jmp nlrblk
+ 4995 rdends jsr nlgbyt
+ 5000 cmp #2
+ 5005 bcc nlok
+ 5010 cmp #$1f
+ 5015 beq nllst
+ 5020 bne nlderr
+ 5025 nlok jsr clkinv
+ 5030 lda #$fe
+ 5035 bne nlrnxt
+ 5040 nllst jsr clkinv
+ 5045 jsr nlgbyt
+ 5050 sta cnter
+ 5055 nllstb jsr clkinv
+ 5060 clc
+ 5065 jmp nlrblk
+ 5070 rdendc lda #$40
+ 5075 jsr setst
+ 5080 jsr clkhig
+ 5085 cli
+ 5090 clc
+ 5095 ldend php
+ 5100 ldx $b
+ 5105 cpx #9
+ 5110 bne nlnom0
+ 5115 jsr u0m0
+ 5120 nlnom0 plp
+ 5125 ldx $ae
+ 5130 ldy $af
+ 5135 rts
+ 5140 nlderr lda #2
+ 5145 jsr setst
+ 5150 jsr clkhig
+ 5155 lda #29
+ 5160 sec
+ 5165 rts
+ 5170 nlstp jsr clkhig
+ 5175 jmp $f633
+ 5180 nlgbyt lda #8
+ 5185 nlg1 bit c2icr
+ 5190 beq nlg1
+ 5195 lda c2sdr
+ 5200 rts
+ 5205 nlrblk rol $b
+ 5210 lda #8
+ 5215 nlr1 bit c2icr
+ 5220 beq nlr1
+ 5225 ldy c2sdr
+ 5230 lda c2pra
+ 5235 eor #$10
+ 5240 sta c2pra
+ 5245 tya
+ 5250 ldy #0
+ 5255 ldx ldvflg
+ 5260 beq nlrlod
+ 5265 cmp (ldadr),y
+ 5270 beq nlrinc
+ 5275 lda #$10
+ 5280 jsr setst
+ 5285 .byt $2c
+ 5290 nlrlod sta (ldadr),y
+ 5295 nlrinc inc ldadr
+ 5300 bne nlrnoc
+ 5305 inc ldadr+1
+ 5310 nlrnoc dec cnter
+ 5315 bne nlrblk+2
+ 5320 lsr $b
+ 5325 bcs rdend
+ 5330 jmp rdendc
+ 5335 rdend jmp rdends
+ 5340 clkinv lda c2pra
+ 5345 eor #$10
+ 5350 sta c2pra
+ 5355 rts
+ 5360 txu0ld .byt 31+128,"0","u"
+ 5365 watset lda c2icr
+ 5370 and #8
+ 5375 beq watset
+ 5380 setout lda c2cra
+ 5385 and #$80
+ 5390 ora #8
+ 5395 sta c2cra
+ 5400 rts
+ 5405 setit lda #$7f
+ 5410 sta c2icr
+ 5415 lda #0
+ 5420 sta c2t1h
+ 5425 lda #4
+ 5430 sta c2t1l
+ 5435 lda c2cra
+ 5440 and #$80
+ 5445 ora #$55
+ 5450 sta c2cra
+ 5455 bit c2icr
+ 5460 rts
+ 5465 ;">>> Erweiterte Tastatur-Routinen
+ 5470 newkey sta vicprt
+ 5475 ldy #$ff
+ 5480 sty c1pra
+ 5485 ldx c1prb
+ 5490 cpx #$ff
+ 5495 beq nkend
+ 5500 lda vicprt
+ 5505 bpl nkend ;"nur" ein normaler c-64
+ 5510 lda #$fe
+ 5515 nxtrow ldx #8
+ 5520 sta vicprt
+ 5525 nkwait lda c1prb
+ 5530 cmp c1prb
+ 5535 bne nkwait
+ 5540 nxtkey lsr
+ 5545 dex
+ 5550 bpl nkok
+ 5555 lda vicprt
+ 5560 sec
+ 5565 rol
+ 5570 cmp #$f7
+ 5575 bne nxtrow
+ 5580 jmp nkend
+ 5585 nkok iny
+ 5590 bcs nxtkey
+ 5595 tya
+ 5600 adc #65
+ 5605 sta keynum
+ 5610 ldx #$ff
+ 5615 stx vicprt
+ 5620 ldy #0
+ 5625 sty c1pra
+ 5630 jmp $ea9b
+ 5635 nkend ldx #$ff
+ 5640 stx vicprt
+ 5645 lda #0
+ 5650 sta c1pra
+ 5655 ldx c1prb
+ 5660 jmp $ea96
+ 5665 ngold jmp $eae0
+ 5670 newget ldx keynum
+ 5675 cpx #65
+ 5680 bcc ngold
+ 5685 lda ktab1-65,x
+ 5690 ldy shtflg
+ 5695 beq ngnorm
+ 5700 lda ktab2-65,x
+ 5705 cpy #1
+ 5710 beq ngnorm
+ 5715 lda #$ff
+ 5720 ngnorm ldy keynum
+ 5725 jmp $eae4
+ 5730 newfnc tax
+ 5732 cpx #241
+ 5735 bcs notnrm
+ 5740 jmp notc0
+ 5745 notnrm cpx #255
+ 5750 beq *-5
+ 5755 cpx #249
+ 5760 bne notold
+ 5765 old lda #1
+ 5770 tay
+ 5775 sta (txttab),y
+ 5780 jsr lnkprg
+ 5785 lda index
+ 5790 ldy index+1
+ 5795 clc
+ 5800 adc #2
+ 5805 bcc *+3
+ 5810 iny
+ 5815 sta vartab
+ 5820 sty vartab+1
+ 5825 bne wat2
+ 5830 notold cpx #250
+ 5835 bne notesc
+ 5840 lda #0
+ 5845 sta rvsflg
+ 5850 sta insert
+ 5855 sta quote
+ 5860 sta numkey
+ 5865 lda #8
+ 5870 sta dn
+ 5875 bne endfnc
+ 5885 notesc lda fsdflg
+ 5890 and #48
+ 5895 bne endfnc
+ 5905 cpx #241 ;m1
+ 5910 beq itsm1
+ 5915 cpx #242 ;m0
+ 5920 bne notm0
+ 5925 u0m0 lda #"0"
+ 5930 .byt $2c
+ 5935 itsm1 lda #"1"
+ 5940 pha
+ 5945 jsr getdn
+ 5950 jsr lstn
+ 5955 lda #$6f
+ 5960 jsr seclsn
+ 5965 ldy #3
+ 5970 outmod lda txu0m,y
+ 5975 jsr iecout
+ 5980 dey
+ 5985 bpl outmod
+ 5990 pla
+ 5995 jsr iecout
+ 6000 jsr unlstn
+ 6005 sei
+ 6010 wat2 jsr noscrl
+ 6015 endfnc jmp $eb42
+ 6020 noscrl lda #0
+ 6025 sta vicprt
+ 6030 sta c1pra
+ 6035 modwat lda c1prb
+ 6040 cmp c1prb
+ 6045 bne modwat
+ 6050 and #%11111011
+ 6055 eor #%11111011
+ 6060 bne modwat
+ 6065 ldx #$ff
+ 6070 stx vicprt
+ 6075 stx c1pra
+ 6080 rts
+ 6085 txu0m .byt "m",158,"0","u"
+ 6090 notm0 lda #1
+ 6095 cpx #243 ;c1
+ 6100 bne notc1
+ 6105 setflg ora fsdflg
+ 6115 sta fsdflg
+ 6120 jmp $eb42
+ 6125 notc1 cpx #244 ;c0
+ 6130 bne notc0
+ 6135 clrflg eor #$ff
+ 6145 and fsdflg
+ 6150 sta fsdflg
+ 6155 jmp $eb42
+ 6160 notc0 cpx #240
+ 6165 bne notnsc
+ 6170 jsr noscrl
+ 6175 lda #0
+ 6180 sta vicprt
+ 6185 sta c1pra
+ 6190 scrwat lda c1prb
+ 6195 cmp c1prb
+ 6200 bne scrwat
+ 6205 and #$fb
+ 6210 eor #$fb
+ 6215 beq scrwat
+ 6220 jmp wat2
+ 6225 notnsc lda #4
+ 6230 cpx #245 ;a1
+ 6235 beq setflg
+ 6240 cpx #246 ;a0
+ 6245 beq clrflg
+ 6250 lda #8
+ 6255 cpx #247 ;l1
+ 6260 beq setflg
+ 6265 cpx #248 ;l0
+ 6270 beq clrflg
+ 6275 txa
+ 6277 ldx shtflg
+ 6280 cpx #5
+ 6285 bne noshct
+ 6290 ora #$80
+ 6295 noshct tax
+ 6300 cpy $c5
+ 6305 jmp $eae7
+ 6310 ktab1 .byt 243,"8","5",241,"2","4","7","1",027,"+","-",247
+ 6315 .byt 013,"6","9","3",014,"0",".",145,017,157,029,240
+ 6320 ktab2 .byt 244,"{CBM-R}","{SHIFT-+}",242,"{CBM-E}","{CBM-Q}","{CBM-A}","{CBM-Z}",027,"*","/",248
+ 6325 .byt "=","{CBM-W}","{CBM-S}","{CBM-X}",142,"{SHIFT--}","{SHIFT-*}",145,017,157,029,240
+ 6330 ;">>> CENTRONICS: Neue Druck-Routine
+ 6335 centlk pha
+ 6340 lda #1
+ 6345 sta $12
+ 6350 lda fsdflg
+ 6351 and #$fd
+ 6352 sta fsdflg
+ 6365 lsr
+ 6370 bcs ctnend
+ 6375 pla
+ 6380 ctend pha
+ 6385 cmp #$20
+ 6390 bcc ctend2
+ 6395 cmp #$60
+ 6400 bcs ctend2
+ 6405 and #$1f
+ 6410 cmp #$1f
+ 6415 beq ctend2
+ 6420 jsr keyoff
+ 6425 dec $12
+ 6430 ctend2 pla
+ 6435 jsr dathig
+ 6440 jmp $ed27
+ 6449 ctnend pla
+ 6450 cmp #$24
+ 6455 bne ctend
+ 6460 jsr keyoff
+ 6465 lda fsdflg
+ 6470 ora #2
+ 6475 sta fsdflg
+ 6480 clc
+ 6485 rts
+ 6490 cenout lda fsdflg
+ 6495 and #3
+ 6500 cmp #3
+ 6505 bne coend
+ 6510 lda #$ff
+ 6515 sta c2ddrb
+ 6520 lda iecbyt
+ 6525 jsr toasc
+ 6530 cenprt sta c2prb
+ 6535 lda c2pra
+ 6540 and #$fb
+ 6545 sta c2pra
+ 6550 ora #4
+ 6555 sta c2pra
+ 6560 cenwat lda #$7f
+ 6565 sta c1pra
+ 6570 cmp c1prb
+ 6575 beq censtp
+ 6580 lda c2icr
+ 6585 and #$10
+ 6590 beq cenwat
+ 6595 clc
+ 6600 censtp inc c2ddrb
+ 6605 cli
+ 6610 rts
+ 6615 coend jsr dathig
+ 6620 jmp $ed44
+ 6625 ;">>> Geaenderter SYS-Befehl
+ 6630 newsys jsr chrgot
+ 6635 beq getds
+ 6640 jsr frmevl
+ 6645 bit numflg
+ 6650 bmi putcmd
+ 6655 jsr getadr
+ 6660 tax
+ 6665 bne oldsys
+ 6670 cpy #16
+ 6675 bcs oldsys
+ 6680 tya
+ 6685 stx $14
+ 6690 asl
+ 6695 asl
+ 6700 asl
+ 6705 asl
+ 6710 bne *+3
+ 6715 brk
+ 6720 sta $15
+ 6725 oldsys jmp $e130
+ 6730 getds jsr clrst
+ 6735 jsr getdn
+ 6740 jsr talk
+ 6745 lda #$6f
+ 6750 jsr sectlk
+ 6755 ldy status
+ 6760 bmi pcmerr
+ 6765 gds1 jsr iecin
+ 6770 jsr outscr
+ 6775 cmp #13
+ 6780 bne gds1
+ 6785 jmp untalk
+ 6790 putcmd jsr $e25a
+ 6795 jsr $e1e6
+ 6800 jsr clrst
+ 6805 lda (fnadr),y
+ 6810 cmp #"$"
+ 6815 beq sysdir
+ 6820 cmp #"l"
+ 6825 bne *+5
+ 6830 jmp syslst
+ 6835 jsr getdn
+ 6840 jsr lstn
+ 6845 lda #$6f
+ 6850 jsr seclsn
+ 6855 bit status
+ 6860 bmi pcmerr
+ 6865 jmp iecopn+$21
+ 6870 pcmerr lda #5 ;ill dev err
+ 6875 jmp $e0f9
+ 6880 sysdir sty sa
+ 6885 jsr putdn
+ 6890 jsr open
+ 6895 lda dn
+ 6900 jsr talk
+ 6905 lda #$60
+ 6910 jsr sectlk
+ 6915 ldy #5
+ 6920 .byt $2c
+ 6925 sdi1 ldy #3
+ 6930 sdi2 jsr iecinf
+ 6935 bne sdiend
+ 6940 dey
+ 6945 bne sdi2
+ 6950 tax
+ 6955 jsr iecin
+ 6960 jsr linprt
+ 6965 lda #" "
+ 6970 sdi3 jsr outscr
+ 6975 jsr iecinf
+ 6976 bne sdiend
+ 6977 tax
+ 6980 bne sdi3
+ 6985 jsr outcr
+ 6990 jsr tststp
+ 6995 beq sdiend
+ 7000 bne sdi1
+ 7005 sdiend ldy #0
+ 7010 sty numkey
+ 7015 jmp ieccls
+ 7020 ;
+ 7025 putscr ldx #1
+ 7030 stx $d4 ;"Quote-Mode =1
+ 7035 stx $d8 ;"Inserts =1
+ 7040 jmp outscr
+ 7045 iecinf jsr iecin
+ 7050 jmp fnftst
+ 7055 ;
+ 7060 ;">>> Alte Adress-Kopierung
+ 7065 *=$fb8e
+ 7070 lda $c2
+ 7075 sta $ad
+ 7080 lda $c1
+ 7085 sta $ac
+ 7090 rts
+ 7095 ;
+ 7100 ;">>> Geaendertes SAVE@
+ 7105 newrpl ldy #0
+ 7110 lda (fnadr),y
+ 7115 cmp #"@"
+ 7120 bne oldsav
+ 7125 lda #"s"
+ 7130 sta (fnadr),y
+ 7135 lda $9d
+ 7140 bpl nrnout
+ 7145 ldy #scrtxt-$f0bd
+ 7150 jsr $f12b
+ 7155 ldy #1
+ 7160 lda (fnadr),y
+ 7165 cmp #":"
+ 7170 bne *+3
+ 7175 iny
+ 7180 jsr $f5c7
+ 7185 nrnout lda #$6f
+ 7190 sta sa
+ 7195 jsr open
+ 7200 ldy #0
+ 7205 lda #"@"
+ 7210 sta (fnadr),y
+ 7215 lda #$61
+ 7220 sta sa
+ 7225 clc
+ 7230 nragai jsr incadr
+ 7235 bcs oldsav
+ 7240 cmp #":"
+ 7245 beq nragai
+ 7250 oldsav jmp open
+ 7255 ;">>> FSD: UNTALK/UNLISTEN Ende
+ 7260 unlend dec $12
+ 7265 bne unlok
+ 7270 jsr dathig
+ 7275 jsr keyon
+ 7280 unlok jmp dathig
+ 7285 ;">>> FSD: Tastensperrung ein/aus
+ 7290 keyoff lda fsdflg
+ 7295 ora #32
+ 7300 bne keyon+4
+ 7305 allon lda fsdflg
+ 7310 and #$ef
+ 7315 .byt $2c
+ 7320 keyon lda fsdflg
+ 7325 and #$df
+ 7330 sta fsdflg
+ 7335 rts
+ 7340 ;">>> Append-Routine
+ 7345 append pha
+ 7350 cmp #0
+ 7355 bne normld
+ 7360 lda sa
+ 7365 cmp #5 ;"Append?
+ 7370 bne normld
+ 7375 lda #0
+ 7380 sta sa
+ 7385 lda vartab ;"BASIC-Ende -2
+ 7390 ldy vartab+1
+ 7395 sbc #2
+ 7400 bcs *+3
+ 7405 dey
+ 7410 tax
+ 7415 normld pla
+ 7420 jmp $ffd5 ;"LOAD-Routine
+ 7425 ;">>> SYS-List-Routine
+ 7430 syslst jsr incadr
+ 7435 pha
+ 7440 jsr incadr
+ 7445 pla
+ 7450 cmp #"p"
+ 7455 beq sysprg
+ 7460 cmp #"s"
+ 7465 beq sysseq
+ 7470 jmp snerr
+ 7475 sysseq clc
+ 7477 lda #$6e ;"Kanal 14
+ 7478 .byt $2c
+ 7480 sysprg lda #$60 ;"LOAD-Kanal
+ 7482 php
+ 7490 sta sa
+ 7495 jsr putdn
+ 7500 jsr open
+ 7505 lda dn
+ 7510 jsr talk
+ 7515 lda sa
+ 7520 jsr sectlk
+ 7525 plp
+ 7530 bcs sysp1
+ 7535 syss1 jsr iecinf
+ 7540 bne syscls
+ 7545 jsr putscr
+ 7550 jsr tststp
+ 7555 bne syss1
+ 7560 syscls jmp ieccls
+ 7565 sysp1 ldy #3
+ 7570 .byt $2c
+ 7575 sysp2 ldy #2
+ 7580 sysp3 jsr iecinf
+ 7585 bne sysret
+ 7590 sta $49
+ 7595 jsr iecinf
+ 7600 bne sysret
+ 7605 dey
+ 7610 bne sysp3
+ 7615 ldx $49
+ 7620 jsr linprt
+ 7625 ldy #>buf
+ 7630 sty $60
+ 7635 dey
+ 7640 sty $49
+ 7645 dey
+ 7650 sty $0b ;"(Exbasic-Fehler)
+ 7655 sty $0f
+ 7660 sty $5f
+ 7665 sty buf+1
+ 7670 sysp4 jsr iecinf
+ 7675 bne sysret
+ 7680 iny
+ 7685 beq sysret
+ 7690 sta buf+1,y
+ 7695 tax
+ 7700 bne sysp4
+ 7705 lda $0300
+ 7710 sta $0100
+ 7715 lda $0301
+ 7720 sta $0101
+ 7725 lda #<syspx
+ 7730 ldy #>syspx
+ 7735 sta $0300 ;"Rueckkehr sichern
+ 7740 sty $0301
+ 7745 lda $0303
+ 7750 cmp #$81 ;"Exb LII?
+ 7755 beq *+5
+ 7760 jmp $a6ed ;"BASIC LIST
+ 7765 jsr $9623 ;"Exbasic LII LIST
+ 7770 syspx lda $0100
+ 7775 sta $0300
+ 7780 lda $0101
+ 7785 sta $0301
+ 7790 jsr outcr
+ 7795 jsr tststp
+ 7800 bne sysp2
+ 7805 sysret jsr ieccls
+ 7810 lda chrgot+2 ;=txtptr+1
+ 7815 cmp #>(buf+$100)
+ 7820 bcs $fcd0
+ 7825 jsr $a82c ;"<STOP>?
+ 7830 jmp $e386
+ 7835 endprg =*-start+$801
+

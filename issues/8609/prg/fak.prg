@@ -1,0 +1,1 @@
+program fakultaet;var n:integer;function rekursiv(n:integer):integer;begin   if n=0 then rekursiv:=1      else rekursiv:=rekursiv(n-1)*nend;function iterativ(n:integer):integer;var i,f:integer;begin   f:=1;   for i:=2 to n do f:=f*i;   iterative:=fend;begin   n:=3;   writeln(rekursive(n));   writeln(iterative(n))end.

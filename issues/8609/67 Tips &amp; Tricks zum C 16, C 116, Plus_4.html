@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 16, C 116, Plus/4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. U. Lotter, tr, tr">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="67-68">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64, C 16, Plus/4">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks zum C 16">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C 16, 116, Plus/4|Verschiedenes">
+    <meta name="64er.id" content="tips_c16">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 16, C 116, Plus/4</h1>
+        <p class="intro">Die interessantesten Tips &amp; Tricks zu einem Computer sind immer die, die nicht im Handbuch stehen. Exklusiv für unsere Leser haben wir einige nützliche Programmierhinweise zum C 16 herausgesucht.</p>
+
+        <p>Mittlerweile ist es kein Geheimnis mehr, daß der preislich enorm günstige Plus/4-Computer von Commodoreinhohem Maße kompatibel zum © 16/C 116 ist. Was jedoch noch nicht genau untersucht wurde, ist eben dieses Maß an Kompatibilität.</p>
+
+        <p>Deshalb unser Aufruf an alle C 16, C 116- und Plus/4 Besitzer: Forschen Sie nach den Unterschieden zwischen diesen Computern. Dabei sind weniger die Gehäuse und die Anzahl an freien Byte-RAM gemeint, sondern vielmehr die internen Unterschiede: Was muß man beachten, wenn man ein C 16-Programm auf einem Plus/4 laufen lassen möchte? Welche POKEs funktionieren auf dem einen; und welche SYS-Aufrufe nur auf dem anderen Computer?</p>
+
+        <p>Ein weiteres interessantes Thema: Beim Einbau einer Speichererweiterung in den © 16/C 116 verändern sich die Basic-Startadressen. Wenn zusätzlich noch die Grafik eingeschaltet wird, ändert sich wiederum die Startadresse. Wie sieht die Speichereinteilung bei der jeweiligen Konfiguration aus? Wie kann man sich in einem (Maschinen-) Programm auf die geänderten Adressen einstellen?</p>
+
+        <p>Lassen Sie Ihrem Entdecker-Drang freien Lauf! Sie geben damit jedem Besitzer dieser Computer nützliches Wissen an die Hand.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>Das, was vom Handbuch verschwiegen wird...</h2>
+
+        <p>In dem Computer C 16 (beziehungsweise C 116) steckt mehr, als man ihm auf den ersten Blick ansieht. Das mitgelieferte Handbuch beschränkt sich auf das Allernotwendigste und wird damit der Leistungsfähigkeit, die das Betriebssystem mit dem komfortablen Basic 3.5, den Bildschirmfensterbefehlen und dem Monitor »TEDMON« aufweist, nicht gerecht. Mangels Information bleiben daher dem Benutzer viele interessante Möglichkeiten und Anwendungen verborgen.</p>
+
+        <p>Im folgenden sollen daher einige Tips und Tricks mitgeteilt werden, die der Autor bei der eigenen Programmierarbeit oder durch Analogieschlüsse von anderen Heimcomputer gefunden hat. i</p>
+
+        <h3>Cursor setzen:</h3>
+
+        <p>Die meisten Bildschirmbefehle des C 16 werden von der Stelle auf dem Bildschirm aus durchgeführt, wo sich mehr oder weniger gewollt der Cursor befindet. Dies gilt sowohl für Ausgaben mit »PRINT« oder »PRINT USING« als auch für die Eingabeaufforderung von »INPUT«-Befehlen und schließlich für das Setzen der Ecken eines Bildschirmfensters. Der C 16 bietet zwei Möglichkeiten, durch Befehle den Cursor an eine bestimmte Stelle zu setzen. Meistens reicht der Befehl »CHAR 1, 8,2, " "«(S = Spalte, Z = Zeile) aus, aber zum Beispiel nicht für das Definieren eines Bildschirmfensters. Immer geht es mit der Befehlsfolge</p>
+
+        <p>POKE 205, Z: POKE 202, S: SYS 55464, die unmittelbar eine Routine des Betriebssystems aufruft.</p>
+
+        <h3>Bildschirmfenster setzen</h3>
+
+        <p>Ein Bildschirmfenster läßt sich nicht nur im Direktmodus setzen, wie im Handbuch auf Seite 61 beschrieben ist, sondern auch von Basic-Programmen aus. Dazu bringt man mit Hilfe der erwähnten Betriebssystemroutine zunächst den Cursor auf die linke obere Ecke und schließt den Befehl PRINT CHR$ (27) + "T" an. Dann setzt man in gleicher Weise den Cursor auf die linke untere Ecke und führt</p>
+
+        <p>PRINT CHR$ (27) + "B" aus. Mit der Char-Methode zum Cursor-Setzen funktioniert das übrigens nicht.</p>
+
+        <h3>Escape-Tastenfunktionen</h3>
+
+        <p>Die auf Seite 63 des Handbuches beschriebenen Escape-Tastenfunktionen für Bildschirmfenster lassen sich auch für den normalen Bildschirm ohne Installation eines Fensters anwenden.</p>
+
+        <p>Im Direktmodus, zum Beispiel bei der Eingabe und Eiditierung von Programmen, sind die Escape-Tastenfunktionen »Zeile einfügen« (I), »Zeile löschen« (D), »Cursor an Anfang« (J) oder »Ende« (K) der Zeile setzen, »Einfügungsmodus beginnen« (A) oder »beenden« (C) besonders wertvolle Hilfen, die die normalen Editierungsmöglichkeiten erheblich ausweiten.</p>
+
+        <p>Auch in Basic-Programmen können diese Escape-Befehle eingebaut werden: Hier ist besonders interessant das Löschen von Einzelzeilen (D) an der Cursorposition oder das Löschen von Zeilen vom Cutsor (Q) bis zum Zeilenende. Für Trickeffekte kann der Bildschirminhalt nach oben (V) oder nach unten (W) gescrollt werden. Betätigt werden die Escape-Funktionen durch</p>
+
+        <p>CHAR 1, S, Z, CHR$ (27) + "Befehlszeichen".</p>
+
+        <p>Dabei wird die Cursorposition gleichzeitig auf die Zeile Z und die Spalte S festgelegt.</p>
+
+        <h3>Zugriff auf Monitorfunktionen von Basic-Programmen aus</h3>
+
+        <p>Der Monitor »TEDMON« ist eigentlich nur im Direktmodus zugänglich. Für eine Reihe von Anwendungsfällen wäre es aber interessant, auch von Basic-Programmen aus auf Monitorfunktionen zugreifen und anschließend wieder in den Programmablauf zurückkehren zu können. Denkbare Anwendungsbeispiele sind das Kopieren von ROM-Bereichen (zum Beispiel Zeichensatz) in das RAM mit dem T-Befehl oder Laden und Sichern von Maschinenroutinen mit den L- oder S-Befehlen.</p>
+
+        <p>Nach folgendem Rezept läßt sich unsere Aufgabe lösen: a) Löschen des Bildschirmes und Setzen des Cursors in Home-Stellung, zum Beispiel mit</p>
+
+        <p>PRINT " {HOME} " b) Ausdrucken der erforderlichen Kommandbotexte auf dem Bildschirm durch die Befehlsfolge</p>
+
+        <p>PRINT "MONITOR"</p>
+
+        <p>CHAR, 2, 6, "Befehlsstring"</p>
+
+        <p>CHAR, 1, Z, "X" (Zeile Z so wählen, daß »X« nicht von Monitorantworten überschrieben wird) CHAR, 2, 2 +2, "GOTO XXX"</p>
+
+        <p>(XXX = Zeilennummer, an der das Programm nach Beenden der Monitor-Befehle fortgesetzt werden soll.) c) Damit diese Befehlsfolge abgearbeitet wird, müssen die »RETURNs«, die im Direktmodus von Hand eingegeben werden (also das Drücken der &lt;RETURN&gt;-Taste), nun vom Basic-Programm betätigt werden. Dazu lädt man die passende Anzahl »N« an »RETURNs« in den Tastaturpuffer mit FOR I=1TON: POKE 1318 +1I, 13 : NEXT</p>
+
+        <p>. Die erforderliche Anzahl von »RETURNs« kann man durch Probieren finden.</p>
+
+        <p>d) Die Anzahl »N«muß dem Computer noch mitgeteilt werden durch</p>
+
+        <p>POKE 239, N</p>
+
+        <p>Typische Befehlsstrings, die sich bewährt haben, sind zum Beispiel</p>
+
+        <p>"S" + CHR$ (34) + A$ + CHR$ (34) + "1, 3600, 3BFF" (sichert den Bereich 3600 bis 3BFF unter dem in A$ gespeicherten Filenamen auf einer Kassette. »CHR$ (34% erzeugt die im Format erforderlichen Anführungsstriche) "1" +CHR$ (34) +A$ + CHR$ + "1"</p>
+
+        <p>(entsprechend für Laden)</p>
+
+        <p>"77 +4$+""+E8$+"""7+N$</p>
+
+        <p>(kopiert den Inhalt des Bereiches mit Anfangs- und Endadresse aus A$ beziehungsweise E$ in den Bereich mit Anfangsadresse N$)</p>
+
+        <h3>Aneinanderladen von Programmen (Merge)</h3>
+
+        <p>Will man zu einem Basic-Programm im Programmspeicher ein zweites Programm dazuhaben, so wird normalerweise das erste Programm ganz oder teilweise überschrieben und steht damit nicht mehr zur Verfügung. Durch einen einfachen Trick kann man aber den Interpreter so überlisten, daß er das zweite Programm an das Ende des ersten lädt. Dabei ist nur zu beachten, daß das zweite Programm höhere Zeilennummern als das erste aufweist.</p>
+
+        <p>Vorgehensweise:</p>
+
+        <p>Nachdem das erste Programm geladen wurde, legt man zunächst den Beginn des Basic-Speichers vorübergehend an das Programmende. Dazu geben wir ein: POKE 44, INT ((PEEK (45) + 256% PEEK (46) - 2)/256): POKE 43, (PEEK (45) + 256% PEEK (46) - 2) AND 255: NEW</p>
+
+        <p>Mit &lt;RETURN&gt; wird diese Befehlsfolge ausgeführt. Dann laden wir das zweite Programm. Nach dem Laden wird mit POKE 43, 1: POKE 44, 16: CLR der Originalzustand des Basic-Speichers wiederhergestellt, und es steht nun ein Gesamtprogramm, das beide Teile umfaßt, zur Verfügung.</p>
+
+        <address class="author">(Dr. U. Lotter/tr)</address>
+    </article>
+</body>
+
+</html>

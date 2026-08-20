@@ -1,0 +1,127 @@
+
+
+;ean-codes.prg ==0801==
+    1 rem ------------------------------
+    2 rem ------- ean 13 / ean 8 -------
+    3 rem ------------------------------
+    4 rem ------- dirk henckels --------
+    5 rem ---- julius-leber-str. 26 ----
+    6 rem ------ 4018  langenfeld ------
+    7 rem ------ tel. 02173/73369 ------
+    8 rem ------------------------------
+    9 :
+   10 poke53280,0:poke53281,0:poke788,52:poke792,226:poke793,252:gosub65
+   11 print"{clr}{lblu}","{left}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+   12 print,"{left}{rvon} ean-barcodes  8 / 13 "
+   13 printtab(4)"{yel}{down}ean-stellenzahl (13 bzw. 8) : {wht}{down}{CBM-T}{CBM-T}{up}{left}{left}";
+   14 gosub100
+   15 print"{down}{lred}   anzahl zu druckende etiketten: {wht}{down}{CBM-T}{CBM-T}{CBM-T}{up}{left}{left}{left}";
+   16 gosub110:n$="4026600":c=7:l=5
+   17 ifean=8thenn$=left$(n$,5):c=5:l=2
+   18 printtab(14-ean/2)"{down}{lgrn}ean-code:  {wht}"n$spc(l+1)"{lgrn}p{wht}"
+   19 ifean=13thenprinttab(18)"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{up}{left}{left}{left}{left}{left}";
+   20 ifean=8thenprint,,"{rght}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{up}{left}{left}";
+   21 gosub119
+   22 :
+   23 c1=3
+   24 forc=ean-1to1step-1
+   25 :s=s+(val(mid$(n$,c,1))*c1)
+   26 :ifc1=1thenc1=3:goto28
+   27 :c1=1
+   28 next
+   29 p$=right$(str$((int(s/10)+1)*10-s),1)
+   30 print" {lgrn}";p$
+   31 n$=n$+p$
+   32 :
+   33 ifean=13thenzs$=zs$(val(left$(n$,1)))+"cccccc"
+   34 ifean=8thenzs$="aaaacccc"
+   35 :
+   36 b$="101"
+   37 ifean=13thenforc=2to13:c1=c-1
+   38 ifean=8thenforc=1to8:c1=c
+   39 :b$=b$+z$(val(mid$(n$,c,1)),asc(mid$(zs$,c1,1))-65)
+   40 :if(c=7andean=13)or(c=4andean=8)thenb$=b$+"01010"
+   41 next
+   42 b$=b$+"101"
+   43 :
+   44 c=0
+   45 forc1=1to95
+   46 :iflen(d$(c))=>250thenc=c+1
+   47 :ifmid$(b$,c1,1)="1"thend$(c)=d$(c)+f$:goto49
+   48 :d$(c)=d$(c)+l$
+   49 next
+   50 :
+   51 open1,4,4:rem g\rlitz-interface ohne umcodierung
+   52 rc=17:ifean=8thenrc=12
+   53 forc=1toe:print#1,"{esc}@{esc}"chr$(108)chr$(15);
+   54 forc0=1torc:forc1=1to2
+   55 print#1,d$(0)d$(1)d$(2);
+   56 ifc1=1thenprint#1,"{esc}3{CTRL-A}"chr$(13)chr$(10);:goto58
+   57 ifc0<rcthenprint#1,"{esc}1"chr$(13)chr$(10);
+   58 next:next
+   59 :
+   60 print#1,"{esc}2"chr$(13)chr$(10)"{esc}m{esc}g";
+   61 ifean=8thenprint#1," {esc}w1"left$(n$,4)" {esc}w0 {esc}w1"right$(n$,4);:goto64
+   62 print#1,"{esc}w1"left$(n$,2)"{esc}w0 {esc}w1"mid$(n$,3,5)"{esc}w0 {esc}w1";
+   63 print#1,mid$(n$,8,5)"{esc}w0 {esc}w1"right$(n$,1);
+   64 print#1,chr$(13)chr$(10)chr$(10);:next:print#1,"{esc}@":close1:run
+   65 :
+   66 :
+   67 : rem unterprogramme
+   68 :
+   69 : rem vorbereitung & titel
+   70 :
+   71 printchr$(142)"{clr}{dish}{wht} {rvon}  {CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvof}{CBM-V}{CBM-I}{rvon}    {rvof}{CBM-I}      {rvon}{CBM-K} {rvof}{CBM-K}  {rvon}{CBM-I}  {CBM-I}  {CBM-I}{rvof}"
+   72 print" {rvon}  {rvof}          {CBM-I}{rvon} {CBM-D}{rvof}{CBM-V}{rvon}  {rvof}{CBM-C}{rvon}{CBM-F} {rvof}{CBM-I}    {rvon}{CBM-K} {rvof}{CBM-K}  v{rvon}er{rvof}s{rvon}io{rvof}n"
+   73 print" {rvon}  {rvof}        {CBM-I}{rvon} {CBM-D}{rvof}{CBM-V}  {rvon}  {rvof}  {CBM-C}{rvon}{CBM-F} {rvof}{CBM-I}  {rvon}{CBM-K} {rvof}{CBM-K}   {rvon}  {rvof} {rvon}  {rvof}"
+   74 print" {rvon}  {CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvof}{CBM-V}{CBM-I}{rvon} {CBM-D}{rvof}{CBM-V} {rvon}{CBM-I}{CBM-I}{CBM-I}  {rvof}    {CBM-C}{rvon}{CBM-F} {rvof}{CBM-I}{rvon}{CBM-K} {rvof}{CBM-K}   {rvon}  {rvof} {rvon}  {rvof}"
+   75 print" {rvon}  {rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon} {CBM-D}{rvof}{CBM-V}      {rvon}  {rvof}      {CBM-C}{rvon}{CBM-F}  {rvof}{CBM-K}  {CBM-I}{rvon}  {rvof}{CBM-I}{rvon}  {rvof}{CBM-I}"
+   76 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{lblu}written 1986 by d.henckels"
+   77 print,"{down}all rights reserved."
+   78 data"0001101","0100111","1110010"
+   79 data"0011001","0110011","1100110"
+   80 data"0010011","0011011","1101100"
+   81 data"0111101","0100001","1000010"
+   82 data"0100011","0011101","1011100"
+   83 data"0110001","0111001","1001110"
+   84 data"0101111","0000101","1010000"
+   85 data"0111011","0010001","1000100"
+   86 data"0110111","0001001","1001000"
+   87 data"0001011","0010111","1110100"
+   88 data"aaaaaa","aababb","aabbab","aabbba","abaabb"
+   89 data"abbaab","abbbaa","ababab","ababba","abbaba"
+   90 dimz$(9,2),zs$(9),d$(2)
+   91 forc=0to9:forc1=0to2:readz$(c,c1):next:next
+   92 forc=0to9:readzs$(c):next
+   93 f$=chr$(255)+chr$(255):f$=f$+f$+f$
+   94 l$=chr$(0)+chr$(0):l$=l$+l$+l$
+   95 d$(0)=chr$(27)+"*"+chr$(3)+chr$(58)+chr$(2):d$(1)="":d$(2)=""
+   96 forc=1to5000:next:poke198,0:wait198,1:return
+   97 :
+   98 : rem eingabe ean-groesse
+   99 :
+  100 print"R {left}{left}";
+  101 getn$:ifn$<>"1"andn$<>"8"goto101
+  102 ifn$="1"thenn$="13"
+  103 ean=val(n$):printn$;:poke211,34
+  104 getn$:ifn$<>chr$(13)andn$<>chr$(20)then104
+  105 ifn$=chr$(20)thenpoke211,34:goto100
+  106 print:return
+  107 :
+  108 : rem eingabe anzahl codes
+  109 :
+  110 c=0:n$=""
+  111 getx$:ifc<3thenprint"R{left}";
+  112 ifx$=chr$(13)andcthenprint" ":e=val(n$):return
+  113 ifx$=chr$(20)andcthenc=c-1:n$=left$(n$,c):printx$;:goto111
+  114 ifx$=>"0"andx$<="9"andc<3thenc=c+1:n$=n$+x$:printx$;
+  115 goto111
+  116 :
+  117 : rem eingabe klartext
+  118 :
+  119 getx$:ifc<ean-1thenprint"R{left}";
+  120 ifx$=chr$(13)andc=ean-1thenreturn
+  121 ifx$=chr$(20)andcthenc=c-1:n$=left$(n$,c):print"{left}R {left}{left}";:goto119
+  122 ifx$=>"0"andx$<="9"andc<ean-1thenc=c+1:n$=n$+x$:printx$;
+  123 goto119
+

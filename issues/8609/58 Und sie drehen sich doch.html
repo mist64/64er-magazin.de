@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Und sie drehen sich doch</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="B. Reike, ah">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="58, 60">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks: Sprites drehen">
+    <meta name="64er.index_title" content="Und sie drehen sich doch (Sprite-Tool)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
+    <meta name="64er.id" content="shrinksprite">
+</head>
+
+<body>
+    <article>
+        <h1>Und sie drehen sich doch</h1>
+        <p class="intro">Leicht und komfortabel lassen sich beliebige Sprites um die X- und Y-Achse drehen. Auch das Verkleinern und Vergrößern dieser kleinen Kunstwerke ist kein Problem. Das spart Arbeit und Zeit.</p>
+
+        <p>Mit »Shrinksprite« (Listing 1), wie sich dieses Programm nennt, lassen sich Sprites horizontal und vertikal verkleinern oder aber an der X- und Y-Achse drehen. Da die veränderten Sprites in einem neuen Sprite-Block zwischengespeichert werden, bleibt das ursprüngliche Sprite in seiner vollen Pracht erhalten. Auf Wunsch läßt sich der entsprechende Sprite-Zeiger auf den neuen Block umschalten. Dadurch wird eine kontinuierliche, flimmerfreie Verformung ermöglicht.</p>
+
+        <p>Shrinksprite ist mit einem einfachen SYS-Aufruf mit Parameterübergabe zu starten:</p>
+
+        <p>
+        <pre><code>SYS 49152 ‚ Ursprungsblock, Zielblock, vertikale Stauchung, horizontale Stauchung, Spritenummer  
+</code></pre>
+        </p>
+
+        <h3>Ursprungsblock</h3>
+
+        <p>Nach dem SYS-Aufruf und einem Komma folgt der zu behandelnde Sprite-Block (0 bis 255). Dadurch ist das Errechnen der Adresse ab der das Sprite gespeichert ist überflüssig.</p>
+
+        <h3>Zielblock</h3>
+
+        <p>Hier ist die Nummer des Blocks anzugeben, in den das geänderte Sprite gespeichert werden soll. Dieser Block darf mit dem Ursprungsblock identisch sein. Allerdings ist dann das ursprüngliche Sprite unwiderruflich verloren. Daher ist es ratsam, sich zu jedem behandelten Sprite einen anderen Zielblock zu suchen.</p>
+
+        <h3>Vertikale und horizontale Stauchung</h3>
+
+        <p>Um die horizontale und vertikale Stauchung zu verstehen, läßt sich die Stauchung des Sprites als Drehung um die eigene Achse interpretieren. Bei vertikaler Stauchung liegt die Drehachse auf der elften Bytereihe und bei der horizontalen Stauchung zwischen dem zwölften und dreizehnten Bit. Die Drehachsen teilen das Sprite in jeweils zwei gleiche Hälften (Bild 1). Sind die beiden angegebenen Drehfaktoren für die horizontale und vertikale Stauchung auf Null gesetzt, dann sieht das erzeugte Sprite genauso aus wie das ursprüngliche Sprite. Es hat sich also nichts geändert. Was aber passiert wenn der Drehfaktor größer wird? Bei vertikaler Drehung wird das Sprite mit zunehmendem Drehfaktor immer schmaler (Bild 2). Ist der Drehfaktor auf 10 gesetzt, sieht man nur noch einen vertikalen Strich. Das Sprite wurde um 90 Grad gedreht. Wird der Drehfaktor weiter bis maximal 20 erhöht, so wird das Sprite nicht nur breiter, sondern gleichzeitig an der Drehachse gespiegelt. Durch diesen Effekt läßt sich das Sprite tatsächlich von Null bis 180 Grad drehen.</p>
+
+        <figure>
+            <img src="58-1.png" alt="Gerastertes Koordinatengitter mit nummerierten Achsen und den Markierungen X und Y">
+            <figcaption>Bild 1. Um diese Achsen können Sie Ihre Sprites drehen</figcaption>
+        </figure>
+
+        <figure>
+            <img src="58-2.png" alt="Vier Reihen gestauchter Gesichts-Sprites, beschriftet mit Vertikal und Horizontal">
+            <figcaption>Bild 2. Durch die Kombination beider Stauchungen lassen sich effektvolle Bewegungen realisieren</figcaption>
+        </figure>
+
+        <h3>Spritenummer</h3>
+
+        <p>Die Spritenummer läßt das automatische Umschalten der Sprite-Zeiger auf bestimmte Sprites zu. So kann man eine kontinuierliche Bewegung erzeugen. Wird eine Sprite-Nummer zwischen Null und Sieben gewählt, schaltet der entsprechende Sprite-Zeiger um (bei Null wäre dies die Speicherzelle 2040, bei Eins 2041 und so weiter).</p>
+
+        <p>Die Wirkungs- und Funktionsweise von »Shrinksprite« ist in dem Demo (Listing 2) beschrieben. Laden Sie zuerst das Programm mit dem Namen »Loader« (Listing 3) und starten es mit RUN. Der Rest wird vom Programm erledigt.</p>
+
+        <h2>Tips für Maschinenprogrammierer</h2>
+
+        <p>Das Programm (Listing 1) belegt den Speicherbereich von $C000 bis $C33D plus 126 Byte für zwei Sprite-Puffer. Soll die Routine in ein Maschinenprogramm integriert werden, müssen die Speicherzellen $FB, $FC, $FD, $FE und $02 folgende Werte enthalten:</p>
+
+        <p>$FB -> Ursprungsblock</p>
+
+        <p>$FC -> Zielblock</p>
+
+        <p>$FD -> vertikale Stauchung</p>
+
+        <p>Anschließend muß »Shrinksprite« mit »J)MP $C01% oder »JSR $C01% aufgerufen werden.</p>
+
+        <p>
+        <pre><code>$FE -&gt; horizontale Stauchung $02 -&gt; Sprite-Nummer  
+</code></pre>
+        </p>
+
+        <h2>Wia funktianiart'e</h2>
+
+        <p>'Nach der Parameterübergabe und deren Prüfung auf Richtigkeit wird zuerst das zu verändernde Sprite horizontal gestaucht und im ersten Sprite-Puffer gespeichert. Anschließend wird der Inhalt des Puffers vertikal gestaucht und im zweiten Sprite-Puffer gespeichert. Das Programm kopiert dann den Inhalt des zweiten Sprite-Puffers in den Zielblock und setzt den Sprite-Zeiger auf den Zielblock.</p>
+
+        <address class="author">(B. Reike/ah)</address>
+
+        <figure>
+            <pre data-filename="shrinksprite.prg" data-name="Shrinksprite" data-mse=mse1></pre>
+            <figcaption>Listing 1. Hauptprogramm »Shrinksprite«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="shrinksprite.prg" data-name="Shrinksprite"></div>
+        <figure>
+            <pre data-filename="demo" data-name="Demo"></pre>
+            <figcaption>Listing 2. Demoprogramm zu »Shrinksprite«. Bitte die Eingabehinweise auf Seite 51 beachten.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="loader" data-name="Loader"></pre>
+            <figcaption>Listing 3. »Lader« für das Demoprogramm</figcaption>
+        </figure>
+
+    </article>
+</body>
+
+</html>

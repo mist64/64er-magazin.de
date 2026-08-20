@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Die 1570/71 gibt Gas</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="D. Temme, ks, tr">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="50-52">
+    <meta name="64er.head1" content="Listing des Monats">
+    <meta name="64er.head2" content="C 64/C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Listing des Monats">
+    <meta name="64er.toc_title" content="Listing des Monats: Die 1570/71 gibt Gas">
+    <meta name="64er.id" content="fsd-listing">
+</head>
+
+<body>
+    <article>
+        <h1>Die 1570/71 gibt Gas</h1>
+        <p class="intro">Bei unserem neuen »Listing des Monats« handelt es sich um einen Floppy-Beschleuniger. Dieses Mal ist es die 1570/71, die nun auch am C 64 so schnell wird, wie am C 128.</p>
+
+        <p>Die schnellen Diskettenlaufwerke 1570 und 1571 in Verbindung mit einem C 128 werden wieder zur langsamen 1541, wenn man sie am C 64 oder am C 128 im C 64-Modus betreibt. Das vorliegende »FSD-System« #FSD« steht für »Fast Serial Disk«) ermöglicht bei geringem Hardware-Aufwand einen schnellen Disketten-Betrieb. Dabei wird beim Laden bis zum Neunfachen der Originalgeschwindigkeit erreicht, und auch die übrigen Operationen werden mehr oder weniger stark beschleunigt. Zusätzlich bietet das »FSD-System« einen Befehlssatz für den Diskettenbetrieb, die volle Tastaturbenutzung beim C© 128 im C 64-Modus (Zehnerblock und so weiter) und einige Sonderfunktionen sowie eine (zuschaltbare) Centronics-Schnittstelle am User-Port.</p>
+
+        <h2>Beschleunigte serielle Übertragung</h2>
+
+        <p>Die Einstellung für das Standardgerät bei LOAD, SAVE und VERIFY ist jetzt»" *",8,1« (siehe auch Bild ]). Das heißt die Eingabe LOAD wird vom Computer als »LOAD '" *" 8,l« interpretiert. Somit ist das Laden aus dem Directory jetzt ein Kinderspiel: Directory mit SYS"$" (siehe unten) anzeigen lassen, mit dem Cursor in die gewünschte Zeile »fahren« und LOAD &lt;RETURN&gt; eingeben oder einfach &lt;SHIFT-RUN/STOP&gt; drücken. Istdasabsolute Laden an die Originaladresse nicht gewünscht, wird LOAD'"name'",8 eingegeben.</p>
+
+        <p>Als weiteren Zusatz im »FSD-System« kennt der LOAD/ VERIFY-Befehl jetzt die Angabe weiterer Sekundäradressen: Wird eine 9 als Sekundäradresse angegeben, so sendet der Computer nach dem Laden des Programms automatisch ein» U0>M0« an das Diskettenlaufwerk, so daß auch Programme, die den 1571-Modus der Floppy nicht vertragen, geladen werden können (Beispiel: »EX-DOS«. Wählt man die Sekundäradresse 7, so wird der Burst-Modus der Floppy nicht angesprochen. Die Lade/Vergleichsbeschleunigung beträgt jetzt nur den Faktor 3. Dabei ist die Kompatibilität jetzt aber am höchsten im Vergleich zur Original-Routine. Der Faktor 3 ist auch gleichzeitig die Beschleunigung beim Datei-Lesen in Maschinensprache; in Basic ist sie jedoch praktisch nicht erreichbar.</p>
+
+        <p>Eine weitere Neuerung ist der (nicht von Maschinensprache erreichbare) APPEND-Befehl, der mit LOAD"name'",dv,5 ausgeführt wird. Hierbei wird das Programm "name" an das im Speicher stehende Programm angehängt. Für die ordnungsgemäße Ausführung des Programms ist darauf zu achten, daß die Zeilennummern aufsteigend angeordnet sind (gegebenenfalls auch mittels Basic-Erweiterung ein RENUMBER ausführen).</p>
+
+        <p>Der Befehl SAVE" @:name" wurde umgeändert in ein automatisches Löschen und Speichern (Anzeige auf dem Bildschirm: »SCRATCHING name« und danach »SAVING name«, um versehentliches Zerstören der Daten auf der Diskette zu verhindern, was durch einen Betriebssystem-Fehler der Floppystation möglich ist.</p>
+
+        <p>Für den interessierten Leser hier die Erklärung: Wird bei SAVE mit dem »@« keine Laufwerksnummer angegeben, so überprüft die Floppystation intern, welches Laufwerk (0 oder ]) sie ansprechen soll. Dazu muß erklärt werden, daß die 1541/70/71 intern noch als Doppellaufwerk funktioniert, da das Betriebssystem von dem CBM 4040 Doppellaufwerk abstammt und für die 1541 (und damit auch für die 1570/71) nur geringfügig geändert wurde. Der Test auf eine eingelegte Diskette in Laufwerk 1 führt (intern) zu einem Fehler, der zur Folge hat, daß auf Laufwerk 0 gespeichert wird. Nun wäre alles in Ordnung, wenn nicht für »Replace« alle verfügbaren Puffer der 1541/70/7] benötigt würden. Durch den Laufwerk-I-Test wird jedoch ein Puffer belegt und nicht wieder freigegeben. Dies führt dazu, daß dem Laufwerk ein Puffer fehlt, es aber (natürlich) nicht weiß, daß einer unnötig belegt wurde, und durch eine interne Logik einen Puffer »zufällig« auswählt. Das kann nun der BAM-Puffer sein, der dadurch zerstört wird und der Floppystation falsche Blockbelegungen vorgibt. Ein Verlust wichtiger Daten auf der Diskette ist dann kaum mehr zu vermeiden.</p>
+
+        <p>Vorsicht geboten ist beim Formatieren im »FSD-System« (nicht bei der 1570): Ist das Diskettenlaufwerk im 1571-Modus, so werden immer beide Disketten-Seiten formatiert, was oft nicht erwünscht ist, weil die Diskette als» Wende-Diskette« genutzt wird. Dabei würde eine genutzte Rückseite gelöscht; man sollte vor dem Formatieren erst &lt;SHIFT+TAB&gt; drücken: Dann wird nur eine Seite formatiert.</p>
+
+        <p>Umgekehrt kann es aber natürlich auch nützlich sein, beide Seiten benutzen zu können, da dann die doppelte Speicher-Kapazität zur Verfügung steht.</p>
+
+        <h2>Befehle für das Diskettenlaufwerk</h2>
+
+        <p>Das »FSD-System« wandelt die Verarbeitung des SYS-Befehls um. Keine Angst, die Original-Funktion des Befehls bleibt natürlich erhalten. Zusätzlich wird bei Argumenten im Bereich von 1 bis 15 jedoch automatisch mit dem Wert 4096 multipliziert, so daß eine Erweiterung zum Beispiel bei $C000 nunmehr statt mit SYS49152 auch mit SYS12 gestartet werden kann. Das erspart einem ein wenig Tipparbeit. SYS0O ergibt einen »Software-Break«, womit ein Maschinensprache-Monitor gestartet werden kann, falls er zuvor eingeladen und initialisiert wurde (Sprungvektor bei $0316/$0317).</p>
+
+        <p>Nun zu den Befehlen für das Diskettenlaufwerk: ein einfaches SYS ergibt die Status-Meldung des zuletzt angesprochenen Laufwerks. SYS" $" sorgt für die Ausgabe des Disketten-Inhaltsverzeichnisses des aktuellen Diskettenlaufwerks.</p>
+
+        <p>Zusätzich können natürlich auch Kriterien wie »$:name*=p«angegeben werden (Näheres siehe Handbuch zum Laufwerk). Der Directory-Befehl kann mit &lt;CTRL+S&gt; oder &lt;NO SCROLL&gt; angehalten, wieder gestartet und mit der &lt;STOP&gt;-Taste abgebrochen werden. Zudem lassen sich mit »SYS diskbefehl« die üblichen DOS-Befehle ausgeben.</p>
+
+        <p>Ein besonderer Leckerbissen sind die LIST-Funktionen des SYS-Befehls: Durch SYS" LSname" wird das File ""name" auf dem Bildschirm geLISTet. Diese Funktion dient zur Ansicht von ASCII-Dateien. Einen ähnlichen Befehl gibt es für Basic-Programme: SYS" LPname" LISTet das Programm-File "name" von Diskette. Das Basic-Programm im Speicher wird nicht zerstört. Mit der &lt;STOP&gt;-Taste besteht die Möglichkeit, das LISTen abzubrechen und die auf dem Bildschirm sichtbaren Zeilen zu übernehmen. Der LIST-Befehl ist so ausgelegt, daß sich viele Basic-Erweiterungen mit ihm vertragen (wenn diese im Speicher sind). »Exbasic Level II«, das eine eigene LIST-Routine benutzt, wurde eigens implementiert. Wird der Befehl SYS"LP.." im Direktmodus ausgeführt, so werden nachfolgende Befehle ignoriert. Wird bei den SYS" Lx.."-Befehlen das spezifizierte File nicht gefunden, so wird ein »®FILE NOT FOUND ERROR« gemeldet.</p>
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>LOAD</td>
+                    <td>LOAD"*",8,1</td>
+                </tr>
+                <tr>
+                    <td>LOAD"name",dv,5</td>
+                    <td>APPEND (nur in BASIC)</td>
+                </tr>
+                <tr>
+                    <td>LOAD"name", dv,7</td>
+                    <td>nicht im Burst-Mode laden</td>
+                </tr>
+                <tr>
+                    <td>LOAD/VERIFY"name",dv,9</td>
+                    <td>nach Laden/Vergleichen "U0&gt;M0" an Floppy ausgeben</td>
+                </tr>
+                <tr>
+                    <td>SYS 0</td>
+                    <td>führt BRK aus evtl. Sprung in Monitor)</td>
+                </tr>
+                <tr>
+                    <td>SYS x (x = 1..15)</td>
+                    <td>führt SYS x*4096 aus</td>
+                </tr>
+                <tr>
+                    <td>SYS</td>
+                    <td>zeigt Floppy-Status an</td>
+                </tr>
+                <tr>
+                    <td>SYS"$..."(,dv)</td>
+                    <td>zeigt Directory an</td>
+                </tr>
+                <tr>
+                    <td>SYS"befehl"(,dv)</td>
+                    <td>gibt "befehl" an Floppy</td>
+                </tr>
+                <tr>
+                    <td>SYS"LSname"(,dv)</td>
+                    <td>listet Datei auf</td>
+                </tr>
+                <tr>
+                    <td>SYS"LPname"(,dv)</td>
+                    <td>listet Programm auf</td>
+                </tr>
+            </table>
+            <figcaption>Bild 1. LOAD- und SYS-Befehl</figcaption>
+        </figure>
+
+
+        <p>Bei allen SYS-Befehlen mit Parametern kann der Parameter auch ein Stringausdruck (zum Beispiel die Variable V$) sein, so daß eine universelle Anwendbarkeit in Programmen möglich wird. Zusätzlich kann hier eine Laufwerksnummer — durch Komma getrennt — angegeben werden (zum Beispiel SYS"$0" ,9), die fortan als aktuelle Laufwerks-Nummer angenommen wird. Die Befehlsgruppe LOAD/SAVE/VERIFY setzt jedoch die Nummer wieder auf 8 zurück, wie auch der Tasten-Befehl &lt;CTRL+/&gt; (siehe Bild 2).</p>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>C-128</th>
+                        <th>C-64</th>
+                        <th>Belegung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>&lt;ESC&gt;</td>
+                        <td>&lt;CTRL+[&gt;</td>
+                        <td>CHR$(27)</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;TAB&gt;/&lt;SHT+TAB&gt;</td>
+                        <td>&lt;CTRL++&gt;/&lt;-&gt;</td>
+                        <td>FSD ein/aus (Floppyseitig)</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;ALT&gt;/&lt;SHT+ALT&gt;</td>
+                        <td>&lt;C=+,&gt;/&lt;.&gt;</td>
+                        <td>CHR$ (14)/CHR$(142)</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;HLP&gt;/&lt;SHT+HLP&gt;</td>
+                        <td>&lt;CTRL+,&gt;/&lt;.&gt;</td>
+                        <td>Centronics ein/aus</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">&lt;CTRL+DOWN&gt;/&lt;CTRL+RIGHT&gt;</td>
+                        <td>Centronics-ASCII ein/aus</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;LFD&gt;/&lt;SHT+LFD&gt;</td>
+                        <td>&lt;CTRL+=&gt;/&lt;RET&gt;</td>
+                        <td>Centronics-LF-Ausgabe nach CR ein/aus</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;NO SCROLL&gt;</td>
+                        <td>&lt;CTRL+S&gt;</td>
+                        <td>Computer wartet bis Taste gedrückt wird</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">&lt;CTRL+*&gt;</td>
+                        <td>OLD-Befehl</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">&lt;CTRL+/&gt;</td>
+                        <td>löscht Anführungszeichen-Modus und setzt Floppy-Default auf 8 zurück</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. Tastaturbelegung bei den Tastenbefehlen</figcaption>
+        </figure>
+
+
+        <p>Ist bei den SYS-Befehlen das angesprochene (aktuelle) Laufwerk nicht ansprechbar (sprich: nicht angeschlossen), so wird mit»?DEVICE NOT PRESENT ERROR« abgebrochen.</p>
+
+        <p>Die eingebaute Centronics-Schnittstelle ist wie üblich am User-Port ausgeführt und wird durch Tasten-Funktionen ein- und ausgeschaltet und programmiert. Ist der Drucker nicht angeschlossen, so kann die Ausgabe-Routine mit der &lt;STOP&gt;-Taste verlassen werden. Die Centronics-Schnittstelle bietet die Möglichkeit, Commodore- oder ASCII-Code auszugeben (für Grafikprogramme ungeeignet) sowie nach einem »Carriage Return« (CHR$(3)) automatisch ein »Linefeed« (CHR$(10)) hinterherzuschicken.</p>
+
+        <p>Softwareseitig ist die Centronics-Routine in die IEC-Routinen eingebunden, so daß selbst alle Programme, die direkt in die Routinen einspringen, funktionieren werden. Nur ein »Spooling« von der Diskette direkt auf den Drucker kann nicht erfolgen, da der Drucker nicht an demselben Bus wie das Diskettenlaufwerk angeschlossen ist.</p>
+
+        <h3>Tastatur-Funktionen</h3>
+
+        <p>Während beim Commodore 128 die Zehnertastatur und weitere Zusatztasten zur Verfügung stehen und das Arbeiten mit dem Computer erleichtern, sind diese im C 64-Modus nicht ansprechbar. Das »FSD-System« schafft hier Abhilfe. Fast alle Zusatzfunktionen können beim »normalen« C 64 jedoch auch durch die Kombination &lt;CTRL&gt;-Taste erreicht werden (Bild 2. Angaben für den C 64 sind in Klammern dargestellt).</p>
+
+        <p>Das Ein- und Ausschalten des »FSD-Modus« für das Laufwerk erfolgt durch &lt;TAB&gt; und &lt;SHIFTTAB&gt; (&lt;CTRL++&gt; und &lt;CTRL+-&gt;). Dabei wird an die 1570/71 der Befehl »U0>Ml« beziehungsweise »U0>M0« gesendet. Ist gleichzeitig der Bus belegt, so ist die Ausgabe der Codes über den Bus gesperrt, um Fehlfunktionen (zum Beispiel beim Laden oder bei der Anzeige des Directory) zu verhindern. Sollten einmal die Tastenfunktionen außer Betrieb sein, so lassen sie sich mittels &lt;STOP + RESTORE&gt; wieder einschalten. der Befehl »U0>Ml« beziehungsweise »U0>MO« gesendet. Ist gleichzeitig der Bus belegt, so ist die Ausgabe der Codes über den Bus gesperrt, um Fehlfunktionen (zum Beispiel beim Laden oder bei der Anzeige des Directory) zu verhindern. Sollten einmal die Tastenfunktionen außer Betrieb sein, so lassen sie sich mittels &lt;STOP + RESTORE&gt; wieder einschalten.</p>
+
+        <h2>Checksummer und MSE</h2>
+
+        <p>Der Checksummer und der MSE sind Eingabehilfen für unsere Listings.</p>
+
+        <p>Der Checksummer zeigt für jede eingegebene Basic-Zeile eine Prüfsumme auf dem Bildschirm, die mit der in der 64'er abgedruckten Zahl (am Zeilenende) übereinstimmen muß. Diese Zahlen dürfen Sie beim Eintippen nicht mit eingeben. Unterstrichene Zeichen sind zusammen mit der &lt;SHIFT&gt;-Taste, überstrichene zusammen mit der &lt;C=&gt;-Taste einzugeben. Wenn im Listing geschweifte Klammern ({CLR}) auftauchen, dürfen Sie das, was innerhalb der Klammern steht, nicht eintippen, sondern müssen die entsprechenden Tasten drücken {zum Beispiel &lt;CLR&gt;).</p>
+
+        <p>Der MSE dient zur Eingabe von Maschinenspracheprogrammen. Auch er erzeugt zu jeder eingegebenen Zeile eine Prüfsumme. Diese »MSE-Listings« können Sie auch mit einem normalen Maschinensprache-Monitor eingeben. Dabei müssen Sie jedoch die letzte Spalte (Prüfsumme) weglassen.</p>
+
+        <p>Der Checksummer wurde zuletzt in der Ausgabe 3/86 auf Seite 55, der MSE in Ausgabe 2/86 auf Seite 57 veröffentlicht. Beide sind auch auf jeder Programmservice-Diskette enthalten. Gegen Einsendung eines mit 1,80 Mark frankierten Rückumschlages (Format DIN A4) senden wir Ihnen die Listings mit Beschreibung auch gerne zu.</p>
+
+        <address class="author">(tr)</address>
+
+        <p>Die &lt;ALT&gt;-Taste (&lt;CBM+,&gt; und -&lt;.>) ergibt den Code 14 (Kleinschrif), mit &lt;SHIFT&gt; den Code 142 (Großschrift/Grafik). Die Taste &lt;ESC&gt; ergibt den Code 27 und ist für die Druckerprogrammierung (siehe Druckerhandbuch) von Bedeutung.</p>
+
+        <p>&lt;HELP&gt; &lt;CTRL+t&gt; und &lt;,> schaltet den Centronics-Drucker auf Geräteadrese 4 ein, &lt;SHIFT+HELP&gt; (&lt;CTRL+.&gt;) schaltet Adresse 4 wieder auf den seriellen Bus. Mit &lt;CTRL+CURSOR DOWN &gt; wird der ASCII-Modus für den Centronics-Drucker ein- und mit &lt;CTRL+CURSOR RIGHT&gt; wieder abgeschaltet. Die &lt;LINEFEED&gt;-Taste (&lt;CTRL+ = &gt;) schaltet die automatische Linefeed-Ausgabe ein beziehungsweise mit &lt;SHIFT&gt; (&lt;CTRL+RETURN&gt;) wieder aus.</p>
+
+        <p>&lt;NOSCROLL&gt; oder &lt;CTRL+S&gt; hält den Computer bis zum nächsten Tastendruck an (nützlich bei schnellen Bildschirmausgaben oder zur Unterbrechung von Spielen). Wird dennoch ein &lt;CTRL+S&gt; benötigt und die &lt;HOME&gt; Taste alleine versagt (zum Beispiel Save-Funktion beim »MSE«), so kann man sich mit &lt;CTRL+HOME&gt; behelfen.</p>
+
+        <p>Die Cursor-Tasten oberhalb des Feldes und der Zehnerblock haben jetzt die Funktion, die auf den Kappen auch draufsteht. Betätigt man eine Zahlentaste des Zehnerblocks zusammen mit &lt;SHIFT&gt;, so werden die Tabellen-Grafikzeichen in logischer Anordnung ausgegeben. Auf &lt;+>, &lt;-> und &lt;ENTER&gt; liegen bei gleichzeitigem Drücken von &lt;SHIFT&gt; die Zeichen »*«, »/« und » = «. Somit hat man alle Rechenzeichen im Zehnerblock vereint. Dies vereinfacht das Eintippen, da die Suche auf dem Tastenfeld entfällt.</p>
+
+        <p>Außerdem gibt es noch zwei Sonderfunktionen: Die oft vermißte OLD-Funktion wird mit &lt;CTRL+ *&gt; angesprochen. Wird ein Programm versehentlich mit NEW gelöscht oder der Computer per (Software- oder Hardware-) Reset in den Ausgangszustand versetzt, so steht das gelöschte Basic-Programm immer noch im Speicher. Die OLD-Funktion holt es wieder hervor.</p>
+
+        <p>Zum zweiten wird mit &lt;CTRL+/&gt; der manchmal störende Anführungszeichen-Modus zurückgesetzt und die aktuelle Adresse des Laufwerks wieder auf 8 gesetzt, womit die SYS-Befehle wieder an das Standard-Laufwerk gehen.</p>
+
+        <p>Das Eingeben des Programms Listing geschieht wie üblich mit dem »MSE«. Nach dem Laden und Starten (mit RUN) des gespeicherten »fsd64.obj« wird das Betriebssystem des C 64, beziehungsweise des C 128 im C 64-Modus, geändert. Das Einschalten der Erweiterung (im RAM) geschieht mit POKE 15, das Abschalten mit POKE 17 oder mit &lt;RUN/STOP +RESTORE&gt;. Es ist ratsam, sich das Betriebssystem in ein EPROM zu »brennen«, so daß die Erweiterung direkt nach dem Einschalten des Systems verfügbar ist. Beim Commodore 128ist das Basic und das Kernel des C 64-Modus in einem 16-K-ROM oder -EPROM untergebracht (Steckplatz U32, ganz links, untere Reihe der ROMs). Hier kann direkt ein EPROM vom Typ 27128 eingesetzt werden. Bei einem C 64 ist Basic und Kernel getrennt in je einem ROM 23864 (Steckplatz U4) untergebracht, was zur Folge hat, daß für ein Ersatz-EPROM durch die unterschiedliche Pinbelegung ein Adapter-Sockel nötig ist, der aber zum Beispiel in der 64'er, 3/86 (Seite 63) zum Selbstbau beschrieben wurde. (Auf die Richtung der EPROM-Kerbe achten!).</p>
+
+        <p>Die nötige Hardware beschränkt sich auf zwei Drähte, die man im Computer an folgende Anschlüsse anlöten muß: User-Port Pin 6 an seriellen Port Pin 1 und User-Port Pin 7an seriellen Port Pin 5 (siehe Bild 3). Der Anschluß erfolgt mit Absicht am vom C 128 nicht für den Burst-Modus benutzten CIA 6526-2, da der andere durch die hardwaremäßige Beschaltung(MMU und 74LS244) im © 64-Modus unbenutzbar geworden ist. Die Erkennung einer angeschlossenen schnellen Floppy erfolgt automatisch durch das Betriebssystem, indem vom Floppy beziehungsweise Computer entsprechende Anforderungs-Codes gesendet werden, die aber den langsamen seriellen Bus nicht beeinträchtigen. Die Centronics-Schnittstelle benötigt ein abgeschirmtes Kabel (Verdrahtung ersichtlich aus Bild 3).</p>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User-Port</th>
+                        <th></th>
+                        <th>serieller Port</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pin 6</td>
+                        <td>CLK</td>
+                        <td>Pin 1</td>
+                    </tr>
+                    <tr>
+                        <td>Pin 7</td>
+                        <td>DATA</td>
+                        <td>Pin 5</td>
+                    </tr>
+                    <tr>
+                        <th>User-Port</th>
+                        <th></th>
+                        <th>Centronics-Stecker<br>(36-pol. Amphenol)</th>
+                    </tr>
+                    <tr>
+                        <td>Pin B</td>
+                        <td>BUSY</td>
+                        <td>Pin 11</td>
+                    </tr>
+                    <tr>
+                        <td>Pin C</td>
+                        <td>DATA1</td>
+                        <td>Pin 2</td>
+                    </tr>
+                    <tr>
+                        <td>Pin D</td>
+                        <td>DATA2</td>
+                        <td>Pin 3</td>
+                    </tr>
+                    <tr>
+                        <td>Pin E</td>
+                        <td>DATA3</td>
+                        <td>Pin 4</td>
+                    </tr>
+                    <tr>
+                        <td>Pin F</td>
+                        <td>DATA4</td>
+                        <td>Pin 5</td>
+                    </tr>
+                    <tr>
+                        <td>Pin H</td>
+                        <td>DATA5</td>
+                        <td>Pin 6</td>
+                    </tr>
+                    <tr>
+                        <td>Pin J</td>
+                        <td>DATA6</td>
+                        <td>Pin 7</td>
+                    </tr>
+                    <tr>
+                        <td>Pin K</td>
+                        <td>DATA7</td>
+                        <td>Pin 8</td>
+                    </tr>
+                    <tr>
+                        <td>Pin L</td>
+                        <td>DATA8</td>
+                        <td>Pin 9</td>
+                    </tr>
+                    <tr>
+                        <td>Pin M</td>
+                        <td>-STROBE</td>
+                        <td>Pin 1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 3. Hardware-Änderungen</figcaption>
+        </figure>
+
+
+        <h2>Anforderungen und Einschränkungen</h2>
+
+        <p>Alle Betriebssystem-Erweiterungen, die Kassettenroutinen ersetzen (zum Beispiel viele Floppybeschleuniger wie Hypra-Load) sind nicht lauffähig (Ladebeschleuniger sind aber nicht mehr nötig, da das FSD-System noch schneller laden kann). Die Tastenbelegung des Zehnerblocks auf dem C 128 ist noch einmal in Bild 4 dargestellt.</p>
+
+        <figure>
+            <img src="50-4.png" alt="Rasterzeichnung eines Zehnerblocks mit den Ziffern 0 bis 9, Rechenzeichen und ENTER-Taste">
+            <figcaption>Bild 4. Belegung des Zehnerblocks der Tastatur des C 128</figcaption>
+        </figure>
+
+        <p>Zusätzlich wird im Computer die Speicherstelle 3 benutzt. Jedes Bit dieser Zeropage-Adresse hat eine eigene Bedeutung. Das Verändern durch Fremdsoftware kann die Ausgabe auf den Centronics-Drucker ein- oder ausschalten; jedoch läßt sich das nicht vermeiden, denn irgendwo muß der Computer schließlich seine Daten ablegen.</p>
+
+        <address class="author">(D. Temme/ks)</address>
+        <figure>
+            <pre data-filename="fsd64.obj.prg" data-name="FSD-System" data-mse=mse1></pre>
+            <figcaption>Listing. Das Programm »fsd64.obj« bitte mit dem »MSE« abtippen. Hinweise siehe Seite 51</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="fsd64.obj.prg" data-name="FSD-System"></div>
+
+        <div style="display: none;">
+            <pre data-filename="fsd64.src" data-name="FSD-System (Assembler-Quelltext)"></pre>
+        </div>
+
+    </article>
+</body>
+
+</html>

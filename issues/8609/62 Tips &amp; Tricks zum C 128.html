@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heino Velder, dm, Thorsten Wewers, dm">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="62-64">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C 128|Verschiedenes">
+    <meta name="64er.id" content="tips_c128">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 128</h1>
+        <p class="intro">Tips &amp; Tricks sind das Salz in der Suppe. Hier wieder ein paar Kniffe, um Ihrem C 128 beizukommen. Diesmal finden Sie hier einen kleinen Kurs, der Sie mit Hilfe einer Befehlserweiterung Einblick in den Video-Chip des C 128 gewähren läßt. Ebenfalls zu finden: Eine etwas andere Anwendung des WINDOW-Befehls.</p>
+
+        <h2>WINDOW-Befehl einmal anders</h2>
+
+        <p>Das Programm »WDGRAF V1.01« (Listing 1) demonstriert eine ungewöhnliche Anwendung des WINDOW-Befehls im Revers-Modus des 80-Zeichen-Modus auf dem C 128. Auf den 40-Zeichen-Bildschirm hat das Programm keine Wirkung.</p>
+
+        <p>Es stellt Werte zwischen 1 und 24 als Balkendiagramm dar. Dies geschieht durch den WINDOW-Befehl, der den Balken bildet und dann schließlich mit einer Farbe auffüllt. . Die einzelnen Größen der Balken sind in Zeile 410 in Form von DATAs abgelegt und sollten bei Veränderungen im Bereich von 1 bis 24 liegen. j</p>
+
+        <p>Die Breite der Balken ist in der Variablen GR (Zeile 150) abgelegt und kann beliebig verändert werden. Man sollte aber die Anzahl der einzulesenden DATAs (Variable AZ, Zeile 160) in Zeile 410 mit berücksichtigen und sie entsprechend ändern.</p>
+
+        <p>Versuchen Sie doch einmal für die Variable GR in Zeile 150 Werte zwischen 1 und 5. Wie man aus dem Programm ersieht, kann der WINDOW-Befehl des Basic 7.0 durchaus sinnvoll in Programmen verwendet werden, obwohl die Wahl der Parameter doch sehr beschränkt ist und die Windows auch nicht zwischengespeichert werden.</p>
+
+        <address class="author">(Udo Miller/dm)</address>
+
+        <figure>
+            <pre data-filename="wdgraf v1.01" data-name="WDGRAF V1.01"></pre>
+            <figcaption>Listing 1. »WDGRAF V1.01«</figcaption>
+        </figure>
+
+        <h2>Ausgabe eines Textes bei einem Reset</h2>
+
+        <p>Reset-Text (Listing 2) erlaubt die Ausgabe eines beliebigen Testes bei einem Reset, insofern eine Diskette mit diesem Programm in der Floppystation liegt. Das Programm ist lauffähig im C 128-Modus mit einer Floppy 1541, 1570 oder 1571. Der Start des Programms erfolgt durch RUN.</p>
+
+        <p>Eine Programmbeschreibung entnehmen Sie bitte den REM-Zeilen im Programm (Listing 2), die nicht mit eingegeben werden müssen, da sie nicht angesprungen werden.</p>
+
+        <p>Sinnvolle Texte zum Ausgeben wären beispielsweise RUN':*" oder GO64. Sie brauchen nach einem Reset nur noch mit &lt;RETURN&gt; quittiert zu werden.</p>
+
+        <address class="author">(Thorsten Wewers/dm)</address>
+
+        <figure>
+            <pre data-filename="reset-text.prg" data-name="Reset-Text" data-mse=mse1></pre>
+            <figcaption>Listing 2. »Reset-Text«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="reset-text.prg" data-name="Reset-Text"></div>
+
+        <h2>Video-Experimente</h2>
+
+        <p>Neben den 128 KByte RAM und der schnellen Laufwerk-Schnittstelle gehört die 80-Zeichen-Darstellung sicherlich zu den erfreulichsten Aspekten des C 128.</p>
+
+        <p>Um die 80 Zeichen auf dem Bildschirm darzustellen, besitzt der C 128 einen speziellen Video-Controller. Dieser verfügt über einen Speicher von 16 KByte, so daß für die Bildschirmdarstellung kein Basic-Speicherraum verlorengeht. Dieser positive Aspekt wird jedoch getrübt, da die Adressierung dieser 16 KByte über ein Nadelöhr von nur 2 Byte erfolgt.</p>
+
+        <p>Der Video-Chip (VIC) besitzt ein Auswahlregister, mit dem — durch POKEs — eines von insgesamt 32 internen Registern angesprochen werden kann. Eine Liste dieser Register und deren Funktionen finden Sie im Anhang E des C 128-Handbuchs.</p>
+
+        <p>Nach der Adressierung über die Speicherstelle 54784 ($D600) kann man in das Register neue Werte hineinschreiben (POKE) oder den aktuellen Wert über PEEK abfragen. Diese Ein/Ausgabe-Operation erfolgt über das zweite Nadelöhr, der Adresse 54785 ($D60]).</p>
+
+        <p>Nach diesen Erläuterungen nun ein Beispiel, wie Sie die 16 KByte des Video-Speichers ansprechen können:</p>
+
+        <p>
+        <pre><code>10 AR=54784 REM Auswahl-Register  
+20 EA=54785 REM Ein-/Ausgabe-Reg.  
+30 AD=80 REM Adresse (2. Zeile)  
+</code></pre>
+
+        <pre><code>40 H=INT (AD/256) REM High berechnen  
+50 L=AD-H\*256 REM Low berechnen  
+60 POKE AR,18:POKE EA,H REM High-Adr.  
+70 POKE AR,19:POKE EA.L REM Low-Adr.  
+80 GETKEY A$:?CHR$ (147) REM Zeichen-Eingabe  
+90 D=ASC(A$) AND 63 REM in Bildschirm-Code  
+100 POKE AR,31:POKE EA,D REM ins DATA-Register  
+110 POKE AR,30:POKE EA,1 REM Wort-Zaehler = 1  
+120 GOTO 60 REM erneut  
+</code></pre>
+
+        In den ersten beiden Zeilen werden die Adressen des Register- und Ein/Ausgabe-Bytes definiert. Mit der Variablen AD legt das Programm die Zieladresse fest. Wie eingangs erwähnt, umfaßt das RAM des VIC 16 KByte. Da sich mit einem Byte jedoch nur 256 Speicherzellen adressieren lassen, sind — um den vollständigen Speicherbereich anzu- . sprechen — zwei Bytes nötig. Mit dem ersten Wert erfolgt im Grunde eine grobe Annäherung in Sprüngen zu je 256 Bytes (High-Byte). Den verbleibenden Rest bezeichnet man als Low-Byte. In den Zeilen 60 und 70 werden diese Werte in die Adreßregister gePOKEt. Der erste POKE wählt das Register an, der zweite beschreibt anschließend dieses Register.</p>
+
+        <p>In den Zeilen 80 und 90 folgt nun eine Eingabe, die (mit AND 63) in den Bildschirmcode umgewandelt wird. Das Zeichen landet anschließend im Daten-Register (30). Über diese Adresse erfolgen alle Ein- und Ausgaben des Video-Speichers. Mit der letzten Zeile wird dann das Wortzähler-Register angesprochen. Dies legt einerseits fest, wie oft das Zeichen im Daten-Register ausgeben werden soll. Außerdem startet die Adressierung automatisch die Befehlsausführung (in diesem Beispiel die Ausgabe eines Zeichen in der zweiten Bildschirmzeile).</p>
+
+        <p>Starten Sie das Programm. Sobald Sie eine Taste drücken, wird dieses Zeichen in den Bildschirmspeicher gePOKE:t. Sie werden jedoch schnell feststellen, daß die Zeichen nicht immer an der gleichen Bildschirmposition ausgegeben werden, sondern oft um eine Stelle nach rechts verschoben sind. Vermutlich ist es unmöglich, eine entsprechende Basic-Routine zu schreiben.</p>
+
+        <p>Hier hilft das nächste Programm (Listing 3), das Sie nun bitte eingeben. Da jede DATA-Zeile mit einer Prüfsumme endet, meldet das Programm sofort Eingabefehler mit der dazugehörigen Zeilennummer. Nachdem das Ladeprogramm (bitte zuerst speichern) korrekt abgelaufen ist, können Sie durch SYS 4864 vier neue Basic-Befehle aufrufen.</p>
+
+        <h3>Einfacher mit PEEK% und POKE%</h3>
+
+        <p>Falls Sie nun eines der 32 VIC-Register adressieren möchten, dann müssen Sie nach jedem PEEK- oder POKE-Befehl ein »%« hinzufügen. Indem Sie die folgenden Zeilen ändern, können Sie das kleine Test-Programm etwas vereinfachen:</p>
+
+        <p>60 POKE% 18,H</p>
+
+        <p>70 POKE% 19,L</p>
+
+        <p>100 POKE% 31.D</p>
+
+        <p>110 POKE% 30,1</p>
+
+        <p>Nach dem Programmstart werden Sie zwar feststellen, daß das Zeichen nun nicht mehr hin- und herspringt. Dafür erscheinen aber meist zwei Zeichen auf dem Bildschirm. Dies ist offenkundig ein Hardware-Fehler des Chips, dem man aber mit einem Trick begegnen kann. Falls Sie — an Stelle des POKE-Befehls in den Wort-Zähler — eines der Adreßregister (18,19) ansprechen, dann gibt der VIC ebenfalls das Zeichen aus, und diesmal nur einmal. Übrigens wird dieser Trick auch im Betriebssystem des C 128 angewendet.</p>
+
+        <p>Ändern Sie hierzu die Zeile 110 in:</p>
+
+        <p>110 POKE 18,H REM Adresse erneut</p>
+
+        <p>Anschließend erhalten Sie eine Routine, mit der Sie die 16 KByte des Videospeichers gezielt verändern können. Betrachten Sie dies jedoch nur als Beispiel, da Sie das kleine Basic-Grab durch zwei weitere spezielle PEEK- /POKE-Anweisungen ersetzen können.</p>
+
+        <p>Folgt auf einen PEEK- oder POKE-Befehl ein »#«-Zeichen, dann führt die Anweisung direkt in das Video-RAM des C</p>
+
+        <h3>128.</h3>
+
+        <p>Um es nochmals zu verdeutlichen: PEEK% und POKE% verändern lediglich die 32 Register des VIC. Mit den zwei Anweisungen PEEK #(..) und POKE#(..) hingegen gelangen Sie direkt in das Video-RAM. Sollten Sie aber hinter dem VIC mehr als 16 KByte RAM vermuten (zum Beispiel POKE 20453,12), dann meldet sich der Computer mit einem »ILLEGAL QUANTITY ERROR«.</p>
+
+        <p>Ausgehend von diesen vier Anweisungen (normale PEEKs und POKEs bleiben Ihnen natürlich erhalten) können Sie nun sehr einfach den Video-Controller des C 128 erforschen.</p>
+
+        <h2>Die VIC-Speicheraufteilung</h2>
+
+        <p>Grundsätzlich gliedert sich der VIC-Speicher in vier Abschnitte von zwei oder vier KByte Länge. Die Adreßpositionen dieser Teile können über entsprechende Register des Controllers verschoben werden. Nach dem Einschalten legt der Computer folgende Einteilung fest:</p>
+
+        <table class="plain">
+            <tr>
+                <td>0 – 2048 :</td>
+                <td>Bildschirmspeicher</td>
+            </tr>
+            <tr>
+                <td>2049 – 4095 :</td>
+                <td>Farbspeicher</td>
+            </tr>
+            <tr>
+                <td>4096 – 8191 :</td>
+                <td>Frei</td>
+            </tr>
+            <tr>
+                <td>8192 – 12287 :</td>
+                <td>Zeichensatz A</td>
+            </tr>
+            <tr>
+                <td>12288 – 16383 :</td>
+                <td>Zeichensatz B</td>
+            </tr>
+        </table>
+
+        <p>Der Befehl POKE # 0,1 schreibt beispielsweise ein A in die linke obere Bildschirmecke.</p>
+
+        <p>Wesentlich interessanter ist jedoch der Attributspeicher. Wie Sie der nachfolgenden Tabelle entnehmen können, hat dabei jedes Bit eine spezielle Bedeutung.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Bit :</th>
+                    <th>Wert :</th>
+                    <th>Funktion</th>
+                    <th>Bit :</th>
+                    <th>Wert :</th>
+                    <th>Funktion</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>Intensität</td>
+                    <td>4</td>
+                    <td>16</td>
+                    <td>Blinken</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>Blau</td>
+                    <td>5</td>
+                    <td>32</td>
+                    <td>Unterstreichen</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>4</td>
+                    <td>Grün</td>
+                    <td>6</td>
+                    <td>64</td>
+                    <td>Invers</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>8</td>
+                    <td>Rot</td>
+                    <td>7</td>
+                    <td>128</td>
+                    <td>Zeichensatz A/B</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Hierzu ein Beispiel: Schreiben Sie ein Zeichen in die linke obere Bildschirmecke. Wenn Sie nun POKE# 2048,16+32 eingeben, blinkt das Zeichen, wird jedoch zusätzlich unterstrichen.</p>
+
+        <p>Interessant ist auch das siebte Bit. Vielleicht haben Sie sich schon einmal gewundert, daß Grafikzeichen — nach dem Umschalten auf Groß/Kleinschreibung — weiterhin auf dem Bildschirm sichtbar bleiben. Die Auswahl zwischen den beiden Zeichensätzen erfolgt über das siebte Bit des Attributspeichers, so daß der C 128 gleichzeitig 512 unterschiedliche Zeichen darstellen kann.</p>
+
+        <p>Der Umgang mit den Zeichensätzen ist jedoch etwas umständlich. Jedem Zeichen sind acht Bytes im Video-Speicher zugeordnet. Die Startadresse eines Zeichens ermitteln Sie einfach, indem Sie den Bildschirmcode mit 16 multiplizieren. Zu diesem Wert müssen Sie anschließend noch die Startadresse des Zeichensatzes addieren. Ausgehend von dieser Adresse legen die folgenden Bytes das Aussehen dieser acht »Mikro-Zeilen« eines Zeichens fest. ,</p>
+
+        <p>Mit POKE 8192 + 2*16 + 7,255 wird beispielsweise die unterste »Zeile«desB(l. Zeichensatz) mit einer Linie versehen. Das Zeichen erscheint anschließend unterstrichen auf dem Bildschirm.</p>
+
+        <p>Vielleicht schreibt einer der Leser ein Programm, mit dem man neue Zeichensätze entwerfen kann. Allerdings sollte das Programm einen Zusatz enthalten, damit man diese Daten leicht mit anderen Programmen verbinden kann.</p>
+
+        <p>Zuletzt noch zwei Anregungen. Das Register 7 des VIC bestimmt die Vertikal-Synchron-Position des Controllers. Den Originalwert können Sie mit PRINT PEEK%(7) abfragen (Wert = 32). Falls Ihr Bildschirm etwas nach unten verschoben ist, können Sie dies einfach mit POKE% 7,33 korrigieren. Bei kleineren Werten rutscht der Bildschirm entsprechend nach unten.</p>
+
+        <p>Versuchen Sie auch einmal POKE% 9,8 (Originalwert = 7).</p>
+
+        <address class="author">(Heino Velder/dm)</address>
+
+        <figure>
+            <pre data-filename="video-experim..prg" data-name="Video-Experimente" data-mse=mse1></pre>
+            <figcaption>Listing 3. Eine Befehlserweiterung, die den Video-Chip unterstützt</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="video-experim..prg" data-name="Video-Experimente"></div>
+
+    </article>
+</body>
+
+</html>

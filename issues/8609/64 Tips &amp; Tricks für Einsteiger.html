@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Einsteiger</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Harald Poxruckerf, tr, Jörg Ch. Ewert, tr, Knut Smoczyk, tr, Marcus Werner, tr, Stefan Wichmann, tr, tr">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="64-65">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64/C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_category" content="Einsteiger|Tips &amp; Tricks">
+    <meta name="64er.id" content="tips_einsteiger">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Einsteiger</h1>
+        <p class="intro">Wie lese ich innerhalb eines Basic-Programms das Disketteninhaltsverzeichnis ein? Wie berechne ich mit dem C 64 Primzahlen? Wie rechne ich mit hexadezimalen Zahlen? Auf diese und einige weitere Fragen sollen Sie hier Antwort bekommen.</p>
+
+        <p>Häufig bekommen wir von unseren Lesern Anfragen, wie man von einem Basic-Programm aus das Inhaltsverzeichnis einer Diskette einlesen kann. Die wirklich einfachste Lösung soll hier einmal vorgestellt werden. Sie kann problemlos in eigene Basic-Programme eingebaut und mit »GOSUB 1000« aufgerufen werden:</p>
+
+        <p>1000 OPEN 1,8,0,"$" : GET#1,A$,A$</p>
+
+        <p>1010 GET#1,A$,A$ : IF ST=64 THEN CLOSE 1 : RETURN</p>
+
+        <p>1020 GET#1,A$,B$ : PRINT ASC(A$+CHR$(0) )+256%ASC (B$+ CHR$(0));</p>
+
+        <p>1030 GET#1,A$ : PRINTA$; : IFA$&lt; >" " THEN 1030 1040 PRINT : GOTO 1010</p>
+
+        <p>Wem es gelingt, eine bessere Version zu entwerfen, soll uns sofort schreiben!</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>Ein paar kleine Effekte</h2>
+
+        <ol>
+            <li>Diese Routine gibt einen vorher festgelegten Namen in dreieckiger Form auf dem Bildschirm aus.</li>
+        </ol>
+
+
+        <p>
+        <pre><code>0 A=53270: Aß="PETER" :L=LEN(A$)  
+1 FOR R=1 TOL : PRINT TAB(20)MID$(A$,R,L):POKE A,R:NEXT R  
+</code></pre>
+
+        Der Ausdruck (Bildschirm) sieht folgendermaßen aus: PETER</p>
+
+        <p>ETER</p>
+
+        <p>TER</p>
+
+        <p>ER</p>
+
+        <p>R</p>
+
+        <p>Der Name ist also horizontal und vertikal lesbar. 2. Mit dieser Routine wird folgendes erreicht: a) Diskname und ID werden extern eingegeben, das heißt beide können fest im Programm gespeichert werden. b) Diskname und ID erscheinen beim Listen des Directory untereinander!</p>
+
+        <p>
+        <pre><code>10 INPUT "NAME" ;N$  
+20 INPUT "ID"; I$  
+30 OPEN 1,8,15,"N:0"+N$+","+I$:CLOSE 1  
+</code></pre>
+
+        Das Zeichen »D\« erhält man folgendermaßen: Geben Sie ein: OPEN 1,8,15,'N!"</p>
+
+        <p>Zurückfahren auf das zweite Anführungszeichen (Cursor nach links) und &lt;CTRL+9, SHIFT+M, CTRL+0&gt; drücken. 3. Dieser Trick erlaubt das Anhängen von Buchstaben an Directory-Namen.</p>
+
+        <p>
+        <pre><code>OPEN 1,8,15, "R:Prgname[shift-space} Buchstaben = Prgname"  
+</code></pre>
+
+        Prgname = Programmname</p>
+
+        <p>Natürlich funktioniert das auch beim Speichern:</p>
+
+        <p>
+        <pre><code>SAVE "Programmname [shift+space] Buchstaben" ‚8,1  
+</code></pre>
+
+        Beim Laden braucht nur der Programmname angegeben zu werden.</p>
+
+        <address class="author">(Stefan Wichmann/tr)</address>
+
+        <h2>Input-Zeichen selbst wählen</h2>
+
+        <p>Wenn man bei INPUT ein anderes Zeichen als das »% haben möchte, muß man vor dem INPUT-Befehl folgende POKEs eingeben:</p>
+
+        <p>
+        <pre><code>POKE 631,20: POKE 632,20:POKE 633, ASC( " gewünschtes Zeichen"): POKE 634,32:POKE 198,4  
+</code></pre>
+
+        (Axel Stämmler/tr)</p>
+
+        <h2>Schnelles Primzahlenprogramm in Basic</h2>
+
+        <p>Das Programm (Listing 1) arbeitet nach dem Prinzip des Eratosthenes. Hierbei werden die geraden Zahlen gar nicht erst gestrichen, sondern durch einen STEP-Befehl übersprungen. Nun werden alle Vielfachen der Zahlen gestrichen. Alle Zahlen, die übrigbleiben, sind Primzahlen.</p>
+
+        <p>Die Primzahl 2 wird nur deshalb ohne Rechnung ausgegeben (Zeile 30), daes sich um die einzige gerade Primzahl handelt. Man müßte sonst in der Ausgabeschleife mit einer Verzögerung rechnen.</p>
+
+        <p>Übrigens ist in der IF-Abfrage in Zeile 30 der Punkt hinter dem Gleichheitszeichen kein Fehler. Der Computer rechnet hier mit dem Punkt schneller als mit einer Null. Das Programm benötigt für die Primzahlen bis 1000 weniger als 9,Sekunden. Da mit Feldvariablen gearbeitet wird, können nun Primzahlen bis 19300 ausgerechnet werden.</p>
+
+        <address class="author">(Marcus Werner/tr)</address>
+
+        <figure>
+            <pre data-filename="primzahlen" data-name="Primzahlen"></pre>
+            <figcaption>Listing 1. Die schnellste Primzahlenberechnung in Basic</figcaption>
+        </figure>
+
+
+        <h2>Die Multifunktions-Taste</h2>
+
+        <p>Bei der Auswahl aus einem Menü störte mich immer die umständliche Sucherei nach der richtigen Taste. Ich habe mir deshalb eine kleine Routine ausgedacht, die einer Taste mehrere Funktionen zuweist und diese Taste zur »Auswahltaste« macht. Je nachdem, ob die »Auswahltaste« (hier: &lt; t >) einmal oder kurz hintereinander zwei-, drei-, viermal und so weiter gedrückt wird, werden die verschiedenen Menüpunkte angewählt. Bei bis zu sechs Wahlmöglichkeiten ist ein durchaus komfortables Arbeiten möglich.</p>
+
+        <h3>Programmbeschreibung:</h3>
+
+        <p>Im Prinzip besteht das Programm (Listing 2) aus zwei hintereinandergeschalteten GET-Befehlen (Zeilen 40 und 60). Mittels einer entsprechend dimensionierten FOR(K)-NEXT-Schleife verweilt das Programm beim zweiten GET aber nur sehr kurz. (Dauer einstellbar in Zeile 50; die Zahl 35 hat sich als ideal erwiesen.)</p>
+
+        <p>Je nachdem wieviel Funktionen zugewiesen wurden (Variable x in Zeile 6), so oft wird das zweite GET mit seiner »Verweilschleife« mittels einer weiteren FOR(A)-NEXT-Schleife durchlaufen — das aber nur, wenn jeweils rechtzeitig die »Auswahltaste« (festgelegt in Zeile 5) gedrückt wird. Ansonsten dringt das Programm nach Zeile 90 vor. Dort verzweigt es sich, je nachdem, wie oft die FOR(A)-NEXT-Schleife durchlaufen wurde (= wie oft die »Auswahltaste« gedrückt wurde).</p>
+
+        <p>Durch die Zeilen 70 und 30 ist das Programm gegen Fehlbedienung geschützt.</p>
+
+        <address class="author">(Harald Poxruckerf/tr)</address>
+
+        <figure>
+            <pre data-filename="multi-taste" data-name="Multifunktions-Taste"></pre>
+            <figcaption>Listing 2. Auswahlmenü mit einer einzigen Taste</figcaption>
+        </figure>
+
+
+        <h2>Tip zum MSE</h2>
+
+        <p>In der Adresse 3586 steht die Gerätenummer der Datasette. Wenn Sie zum Beispiel zwei Diskettenlaufwerke mit den Geräteadressen 8 und 9 haben, lohnt sich ein POKE 35869. Dadurch wird beim Speichern und Laden auf »TAPE« das Laufwerk 9 angesprochen.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>Vereinfachte Joystick-Abfrage</h2>
+
+        <p>Mit »SYS 49152, Richtung, Programmzeile« wird die Joystick-Stellung abgefragt. Wenn »Stellung« mit »Richtung« übereinstimmt, verzweigt der Befehl zur angegebenen Zeilen-Nummer. Für die Richtung gilt:</p>
+
+        <table class="plain">
+            <tr>
+                <td>1</td>
+                <td>oben</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>unten</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>links</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>rechts</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>Feuer</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>links oben</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>links unten</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>rechts oben</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>rechts unten</td>
+            </tr>
+        </table>
+
+        <p>Nachfolgend der Basic-Lader:</p>
+
+        <p>
+        <pre><code>10 FORA=0TO 41: READ B: POKE 49152+A,B: NEXT 20 DATA 32,115,0,32,138,173,32,247,183,173,0,220,37, 20,234,208,3,76,30,192  
+30 DATA 32,115,0,32,138,173,32,247,183,96,32,115,0,32, 138,173,32,247,183,76  
+40 DATA 163,168  
+(Ralf Stumm/tr)  
+</code></pre>
+        </p>
+
+        <h2>SMON auf Tastendruck</h2>
+
+        <p>Wenn man die &lt;RUN/STOP + RESTORE &gt; -Tasten betätigt, so führt der Computer einen Interrupt (NMI) aus und springt zu einem Maschinenprogramm, dessen Startadresse in den Speicherzellen 792 und 793 gespeichert wurde.</p>
+
+        <h3>Anwendung:</h3>
+
+        <p>Man kann die Startadresse von einem eigenen Maschinenprogramm in 792 und 793speichern und damit das Programm mit Drücken der (RESTORE)-Taste starten. In der Speicherzelle 792 muß das Low-Byte und in 793 das High-Byte der Startadresse stehen.</p>
+
+        <h3>Beispiel:</h3>
+
+        <p>POKE 792,0:POKE 793,192 startet SMON C000 (das Programm muß vorher geladen werden).</p>
+
+        <p>POKE 792,226: POKE 793,252 Es wird ein Reset ausgeführt.</p>
+
+        <address class="author">(Jörg Ch. Ewert/tr)</address>
+
+        <h2>Das Hexadezimal-System</h2>
+
+        <ol>
+            <li>Hexadezimalzahl in Dezimalzahl umformen</li>
+        </ol>
+
+
+        <p>1 z=0: fors=1t04:a=asc(mid$(h$,s,1)):asa-48+(a>64)%7:2=2z+a* 161 (4-s) :next</p>
+
+        <p>In der Stringvariablen h$ muß zunächst die vierstellige (I) Hexadezimalzahl abgelegt werden, also zum Beispiel C000, ABCD, 0001 etc. Die Dezimalzahl befindet sich dann in der Variablen z.</p>
+
+        <ol>
+            <li>Dezimalzahl in Hexadezimalzahl umformen 1 h$=" ":fors=1t04:m=161 (4-s) :a=int(z/m) :z=2mta:h$=h$+chr$ (ar48-(a>9)*7):next</li>
+        </ol>
+
+
+        <p>Hier muß zunächst eine Dezimalzahl in der Variablen z abgelegt werden. Die Hexadezimalzahl liegt danach in h$.</p>
+
+        <address class="author">(Knut Smoczyk/tr)</address>
+    </article>
+</body>
+
+</html>

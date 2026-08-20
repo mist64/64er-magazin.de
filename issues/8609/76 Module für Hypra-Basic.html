@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Module für Hypra-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M.Blunier, J.Stelling, M.Michaelis, og">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="76-77">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C 64|Programmierung">
+    <meta name="64er.id" content="hypra-basic">
+</head>
+
+<body>
+    <article>
+        <h1>Module für Hypra-Basic</h1>
+        <p class="intro">Neue Basic-Tools und komfortable Befehle zur Unterstützung von menügesteuerten Programmen sind die besonderen Leckerbissen, die wir Ihnen diesmal für Ihr Hypra-Basic anbieten.</p>
+
+        <p>Immer mehr Programmierer finden Gefallen an Hypra-Basic, dem Listing des Monats aus der Ausgabe 4/86.</p>
+
+        <p>Daraus entstehen Programme wie RENUMBER und MERGE, an deren Qualität kaum ein professionelles Programm heranreichen kann.</p>
+
+        <p>Zum einfachen Aufbau von Menüs stehen Window-Befehle und formatierte Ein- und Ausgabekommandos zur Verfügung. Alle vier Module halten sich an die Vorgaben von Hypra-Basic.</p>
+
+        <p>Sollten Unklarheiten bei der Arbeit mit Hypra-Basic auftauchen, finden Sie deren Lösung vielleicht in Ausgabe 8/86, Seite 91. Dort haben wir den Einbau eines Moduls am konkreten Beispiel erklärt.</p>
+
+        <p>(M.Blunier/J.Stelling/M.Michaelis/og) RENUM 49152-50105,0</p>
+
+        <p>Funktion: Umnumerierung eines Basic-Programms inklusive Sprungbefehle. Bereichsangabe ist möglich. Alle Fehleingaben werden abgefangen.</p>
+
+        <p>Syntax: RENUM neu, step, von-bis</p>
+
+        <p>Parameter:</p>
+
+        <p>neu: neue Zeilennummer für die erste Zeile des ausgewählten Bereiches. step: Schrittweite, um die »neu« jeweils erhöht wird. Darf nicht 0 oder größer als 255 sein!</p>
+
+        <p>von bis: wählt den Programmbereich aus, der neu numeriert werden soll. Die Eingabe wird genau gleich interpretiert wie beim LIST-Befehl. Es können beliebig viele Parameter weggelassen werden, welche dann durch sogenannte Default-Werte ersetzt werden: Defaults: neu = 100 step = 10 von = Programmanfang bis = Programmende</p>
+
+        <p>Beispiele: RENUM 123 numeriert das ganze Programm, beginnend mit 123 in 10er-Schritten. RENUM 1000,1 numeriert ebenfalls das ganze Programm, wobei mit 1000 begonnen und jeweils um 1 weitergezählt wird.</p>
+
+        <p>RENUM 100,10, 33- numeriert alle Zeilen ab Zeile 33. RENUM 100,10,-33 numeriert nur die Zeilen bis und mit 33. 1) WINDOW 49152-50304,,4</p>
+
+        <p>Funktion: Definition eines Windows. Alle folgenden Ein-/Ausgabe-Befehle beziehen sich auf das Window. Verlassen des Windows durch zweimal hintereinander &lt;HOME&gt;, entweder durch zweimaligen Tastendruck oder die Anweisung »PRINT CHR$(19) CHR$(19);«.</p>
+
+        <p>Syntax: WINDOW AZ, AS,HO,BR</p>
+
+        <p>AZ: Nummer der Zeile der linken oberen Ecke des Windows (0-24)</p>
+
+        <p>AS: Nummer der Spalte der linken oberen Ecke (0-39)</p>
+
+        <p>HO: Höhe des Windows in Zeilen. AZ + HO muß kleiner gleich 24 sein.</p>
+
+        <p>BR: Breite des Windows in Spalten. AS + BR muß kleiner gleich 39 sein.</p>
+
+        <p>Beispiel: WINDOW 5,5,10,20</p>
+
+        <p>Ein Window mit 10 Zeilen Höhe und 20 Spalten Breite, dessen obere linke Ecke in Zeile 5 und Spalte 5 liegt, wird definiert. 1) MERGEA 49152-49186, 0</p>
+
+        <p>Funktion: Anhängen eines Basic-Programnms auf Diskette oder Kassette an ein Basic-Programm im Speicher. Syntax: MERGEA Filename, Gerätenumner Die Parameter entsprechen denen des LOAD-Befehls. Beispiel:</p>
+
+        <p>Programm im Speicher : 10 fort =1 to 100</p>
+
+        <p>Programm unter »TEST« auf : 20 print t</p>
+
+        <p>Diskette gespeichert 30 nextt</p>
+
+        <p>MERGEA " TEST ",8</p>
+
+        <p>Programm im Speicher</p>
+
+        <p>: 10 fort =1 to 100 20 print t 30 nextt</p>
+
+        <p>2) MERGEE 49187-49307,0</p>
+
+        <p>Funktion: Zeilenweises Einfügen des Basic-Programms auf Diskette oder Kassette in ein Basic-Programm im Speicher. Syntax: MERGEE Filename, Gerätenummer</p>
+
+        <p>Beispiel:</p>
+
+        <p>Programm im Speicher : 20 printt Programm unter »TEST« auf : 10 fort = 1 to 100 Diskette gespeichert 20 print t*t 30 nextt</p>
+
+        <p>MERGEE " TEST ",8</p>
+
+        <p>Programm im Speicher : 10 fort =1 to 100 20 print t*#t 30 nextt</p>
+
+        <p>Bei diesem Befehl ist unbedingt darauf zu achten, daß erstens das einzufügende Programm nicht länger als 8 KByte ist und zweitens das RAM unter dem Basic-ROM ungenutzt ist, da dieser Speicherbereich zur Zwischenspeicherung benutzt wird. 1) WOUTP 49152-49157,0 Funktion: Ausgabe eines Textes in ein Bildschirmfenster.</p>
+
+        <p>Syntax: WOUTP x10,y10,xru,yru,Druckliste xlo/ylo = Koordinaten der linken oberen Ecke des Bildschirmfensters (Zeile, Spalte). xru/yru = siehe oben für rechte untere Ecke.</p>
+
+        <p>Die Zeilenangaben müssen zwischen O und 24 liegen, die Spaltenangaben zwischen 0 und 39. Das Fenster selbst darf höchstens 255 Zeichen groß sein. Druckliste = Liste der auszugebenden Zeichen. Innerhalb dieser Liste dürfen keine Steuerzeichen vorkommen. Ist die Liste kleiner als das Fenster, wird das Fenster mit Leerzeichen aufgefüllt. Ist die Liste größer als das Fenster, wird ein Teil der Liste nicht ausgegeben. Beispiel: WOUTP 0,24,39,24,Text</p>
+
+        <p>Ausgabe eines Textes in die unterste Bildschirmzeile (ohne 2) WINP 49158-49995, 256 Funktion: Syntax: Eingabe eines Textes innerhalb eines Bildschirmfensters. j WINP Koordinaten, Vorgabe, Zeichen, F-Tasten; Variable siehe WOUTP</p>
+
+        <p>String, wird als vorläufiger Eingabetext ins Eingabefeld übertragen</p>
+
+        <p>String, beinhaltet die Zeichen, die zur Eingabe zugelassen sind. Ausgenommen sind Steuerzeichen. Um die Definition zu erleichtern, haben folgende Zeichen eine spezielle Funktion:</p>
+
+        <p>chr$(133) (&lt;F1&gt;)- alle Ziffern sind zur Eingabe zugelassen. chr$(134) (&lt;F2&gt;)- dito für alle Buchstaben.</p>
+
+        <p>chr$(135) (&lt;F3&gt;)- dito für alle geSHIFTeten Buchstaben. Koordinaten Vorgabe Zeichen Dieser String darf höchstens 196 Zeichen lang sein. Tasten Anzahl der Funktionstasten, mit denen WOUTP beendet werden kann (0-8). Also bedeutet z.B.</p>
+
+        <p>O0 - keine Funktionstasten</p>
+
+        <p>2- &lt;F1l&gt; + &lt;P3&gt;</p>
+
+        <p>8 - alle Funktionstasten Variable Stringvariable, unter der die Eingabe gespeichert wird. Beispiele: WINP 0,24,39,24, "test "," (&lt;F3&gt;) (&lt;P5&gt;) ",1;5a$</p>
+
+        <p>Eingabe in der untersten Bildschirmzeile mit " test " als Vorgabe. Alle Buchstaben und geshifteten Buchstaben sind zur Eingabe zugelassen, Beendigung der Eingabe mit RETURN und F1. Eingabetext wird in die Variable A$ geschrieben. WINP 0,0,9,2;a$</p>
+
+        <p>Eingabe in einem 10 Zeichen breiten und 3 Zeilen hohen Fenster in der linken oberen Ecke des Bildschirms. Eingabetext wird in der Variable A$ gespeichert, sonstige Parameter wie bei letzter Definition. Grundsätzlich gilt für WINP:</p>
+
+        <p>Es können je nach Fenstergröße zwischen O0 und 255 Zeichen eingegeben werden. Nach Beendigung der Eingabe wird in der Statusvariablen ST die Nummer der beendigenden Taste übergeben. Hierbei gilt:</p>
+
+        <p>0 &lt;RETURN&gt;</p>
+
+        <p>1-8 — ASCII-Code der Funktionstaste 133, zum Beispiel 4 für F2</p>
+
+        <p>Angabe von Vorgabetext sowie Zeichen- und Funktionstasten-Definition sind optional. Bei fehlender Vorgabe wird das Fenster mit Leerzeichen gefüllt. Bei fehlender Zeichen- und Funktionstastendefinition bleiben die Werte der letzten Definition erhalten.</p>
+
+        <p>Dabei ist zu beachten, daß bei diesen drei Parametern nur von rechts anfangend Parameter weggelassen werden dürfen.</p>
+
+        <p>Die Funktion der Steuertasten</p>
+
+        <p>&lt;INST/DEL&gt; , &lt;CLR/HOME&gt; , &lt;SHIFT+RETURN&gt; und der Cursortasten bleibt, auf das Eingabefenster beschränkt, erhalten. Außerdem findet kein Scrollen statt. Für alle Parameter können selbstverständlich Variablen benutzt werden.</p>
+
+        <p>Leerzeichen am Ende des Eingabetextes werden beim Übertragen in die Variable abgeschnitten.</p>
+
+        <p>Da die Tabelle der zugelassenen Zeichen im Kassettenpuffer liegt, werden diese Daten bei jedem Kassettenzugriff überschrieben.</p>
+        <figure>
+            <pre data-filename="36erw .ass.prg" data-name="Modul 36" data-mse=mse1></pre>
+            <figcaption>Listing 1. Komfortabler RENUMBER-Befehl für Hypra-Basic</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="36erw .ass.prg" data-name="Modul 36"></div>
+        <figure>
+            <pre data-filename="37erw .ass.prg" data-name="Modul 37" data-mse=mse1></pre>
+            <figcaption>Listing 2. Mit dieser Erweiterung läßt sich ein Window definieren</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="37erw .ass.prg" data-name="Modul 37"></div>
+        <figure>
+            <pre data-filename="38erw .ass.prg" data-name="Modul 38" data-mse=mse1></pre>
+            <figcaption>Listing 3. MERGE: Anhängen eines Basic-Programms an ein anderes. Geben Sie die Listings 1 bis 4 bitte mit dem MSE ein. Hinweise dazu finden Sie auf Seite 51.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="38erw .ass.prg" data-name="Modul 38"></div>
+        <figure>
+            <pre data-filename="39erw .ass.prg" data-name="Modul 39" data-mse=mse1></pre>
+            <figcaption>Listing 4. Schreiben eines Textes in ein definiertes Bildschirm-Fenster</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="39erw .ass.prg" data-name="Modul 39"></div>
+
+    </article>
+</body>
+
+</html>
