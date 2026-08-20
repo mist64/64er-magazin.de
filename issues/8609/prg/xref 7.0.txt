@@ -1,0 +1,271 @@
+
+
+;xref 7.0.prg ==1c01==
+   10 rem *******************
+   20 rem *     xref 7.0    *
+   30 rem *******************
+   72 rem @i=i,j,ps,sp,va,x,x2,y,y1,y2,y3,y4,y6,ob
+   80 clr:fast:goto150
+   90 x2=x:get#1,a$:x=asc(a$):if(64andst)=0thenreturn
+   95 ifds>0then1300
+  100 dclose#1:ifpa%thenpa%=0:goto520
+  110 goto970
+  120 gosub90:x1=x:gosub90:x1=x1+256*x:return
+  130 ifsp<obandva<obandps<obthenreturn:rem ** grenzen erreicht ? **
+  140 print:print"bitte die variable ob  in zeile 150 vergroessern.":goto1310
+  150 ob=1500:dimsp$(ob),ps$(ob),va$(ob),s%(30,2)
+  160 rem ** ob ist die obergrenze der anzahl der spruenge und variablen **
+  170 color6,7:color5,2
+  180 ll$=chr$(27)+"q"
+  190 le$="                                                         "
+  200 printchr$(147)chr$(142)
+  210 printtab(20)"{rvon}          cross-referenz-lister         "
+  220 print"{down}{down}ausgabe auf ":print"{down}{rvon}b{rvof}ildschirm oder {rvon}d{rvof}rucker{up}{up}{up}"
+  230 printspc(12);
+  240 geta$:ifa$<>"b"anda$<>"d"then240
+  250 ifa$="b"thenprint"bildschirm.":dv%=3:goto270
+  260 print"drucker.":dv%=4
+  270 print"{down}"ll$;
+  280 open1,0:print"programmname: ";:input#1,na$:close1:print
+  290 dopen#1,(na$+",p,r"),d0,u8:ifds>0then1300
+  295 gosub120
+  296 print"{down}ausgabe folgender listen moeglich:{down}"
+  297 print"zeilenreferenz von -> ziel  (j/n) ";
+  298 geta$:ifa$<>"j"anda$<>"n"then298
+  299 ifa$="j"thenprint"ja":zr%=0:elseprint"nein":zr%=-1
+  300 print"zeilenreferenz ziel <- von  (j/n) ";
+  301 geta$:ifa$<>"j"anda$<>"n"then301
+  302 ifa$="j"thenprint"ja":zs%=0:elseprint"nein":zs%=-1
+  303 print"variablen + zeilennummern   (j/n) ";
+  304 geta$:ifa$<>"j"anda$<>"n"then304
+  305 ifa$="j"thenprint"ja":zt%=0:elseprint"nein":zt%=-1
+  306 print"variablen o. zeilennummern  (j/n) ";
+  307 geta$:ifa$<>"j"anda$<>"n"then307
+  308 ifa$="j"thenprint"ja":zu%=0:elseprint"nein":zu%=-1
+  309 :
+  310 rem ************************
+  311 rem   pass 1 sprungtabelle
+  312 rem ************************
+  313 :
+  314 ifzr%andz4%thendclose#1:goto720
+  315 print"{clr}pass 1 (suche nach zeilenreferenzen){down}":pa%=1
+  320 gosub120:gosub120:ze$=right$("     "+str$(x1),5):print"{home}{down}{down}"ze$
+  325 y=0:y2=0
+  330 gosub90
+  331 ifx=0then320
+  332 ifx=34theny2=not y2
+  333 ify2then330
+  334 ifx=137orx=138orx=140orx=141orx=167orx=203or(x>212andx<216)then354
+  336 ifx=254thenbegin
+  337 : gosub90:ifx<>23then353
+  343 : gosub90:ifx=0then500
+  344 : ifx=34theny2=not y2
+  345 : ify2then343
+  346 : ifx=58then500
+  349 ifx<>44then343:else354
+  352 bend
+  353 goto330
+  354 s1$="":y1=0:y2=0:y4=0
+  355 ifx=203theny=1
+  356 ifx=167orx=213theny1=1
+  360 gosub90:ifx=32orx=164andythen360
+  370 ifx>=48andx<=57thens1$=s1$+a$:goto360
+  380 ifs1$=""then470
+  390 s1$=right$("      "+s1$,6)
+  400 ifleft$(sp$(sp),5)<>ze$thensp=sp+1:gosub130:sp$(sp)=ze$+":"
+  410 iflen(sp$(sp))>70thensp=sp+1:gosub130:sp$(sp)=ze$+":"
+  420 ifright$(sp$(sp),6)<>s1$thensp$(sp)=sp$(sp)+s1$
+  430 fori=1tops
+  440 ifleft$(ps$(i),6)<>s1$thennext:ps=i:gosub130:ps$(i)=s1$+":"
+  450 iflen(ps$(i))<70then460
+  455 ifright$(ps$(i),5)=ze$then470
+  458 next:ps=ps+1:i=ps:gosub130:ps$(i)=s1$+":"+ze$:goto470
+  460 ifright$(ps$(i),5)<>ze$thenps$(i)=ps$(i)+" "+ze$
+  470 ifx=0then320
+  480 ifx=44thens1$="":goto360
+  490 ifx=58orx>64andx<91then330
+  495 ify1thenifx=137orx=138orx=140orx=141orx=203orx=214then355
+  496 ify1thenifx=254then336
+  498 ifx>127then330
+  500 print:print"{down}fehler im quellprogramm. zeile:"ze$:goto1310
+  502 :
+  504 :
+  506 rem *****************************************
+  510 rem sortieren der zeilenreferenzen (feld ps$)
+  515 rem *****************************************
+  516 :
+  520 ifps=0thenbegin
+  521 : print"{down}keine zeilenreferenzen vorhanden!"
+  522 : print"{down}taste <w> druecken":goto700
+  523 bend
+  524 s1%=1:s%(1,1)=1:s%(1,2)=ps
+  525 do whiles1%<>0
+  526 : l%=s%(s1%,1):r%=s%(s1%,2):s1%=s1%-1
+  527 : do whiler%>l%
+  528 :  i%=l%:j%=r%:h$=ps$(int(l%+r%)/2)
+  530 :  do whilei%<=j%
+  532 :   ifps$(i%)<h$theni%=i%+1:goto532
+  534 :   ifps$(j%)>h$thenj%=j%-1:goto534
+  536 :   ifi%<=j%thenbegin
+  538 :    ps$(0)=ps$(i%):ps$(i%)=ps$(j%):ps$(j%)=ps$(0):i%=i%+1:j%=j%-1
+  540 :   bend
+  542 :  loop
+  544 :  ifr%-i%>j%-l%thenbegin
+  546 :   ifl%<j%thens1%=s1%+1:s%(s1%,1)=l%:s%(s1%,2)=j%
+  548 :   l%=i%
+  550 :  bend:else begin
+  552 :   ifi%<r%thens1%=s1%+1:s%(s1%,1)=i%:s%(s1%,2)=r%
+  554 :   r%=j%
+  556 :  bend
+  558 : loop
+  560 loop
+  574 :
+  575 rem **************************
+  576 rem  ausgabe zeilenreferenzen
+  577 rem **************************
+  578 :
+  580 open1,dv%:print#1,"programmname: "na$:print#1
+  590 print#1,"zeilenreferenz          "
+  600 print#1,"------------------------"
+  604 ifzr%then645
+  605 print#1,"zeile :   referenz auf zeile    ":print#1
+  610 fori=1tosp
+  620 ifleft$(sp$(i-1),5)=left$(sp$(i),5)thenprint#1,spc(7)mid$(sp$(i),7):goto640
+  630 print#1," "sp$(i)
+  640 nexti:print#1
+  645 ifzs%then685
+  646 print#1,"zeile :   wird angesprochenin"
+  650 print#1
+  655 ps$(0)="":fori=1tops
+  660 ifleft$(ps$(i+1),6)<>left$(ps$(i),6)thenprint#1,ps$(i):goto680
+  670 print#1,spc(6);mid$(ps$(i),7)
+  680 nexti:close1
+  685 ifdv%=4then720
+  690 print"{down}{rvon}n{rvof}ochmals/{rvon}w{rvof}eiter"
+  700 geta$:ifa$<>"n"anda$<>"w"then700
+  710 ifa$="n"then580
+  712 :
+  714 :
+  715 rem ************************
+  716 rem  pass 2 variable suchen
+  718 rem ************************
+  719 :
+  720 ifzt%andzzu%then1310
+  725 print"{clr}pass 2 (suchen der variablen) {down}"
+  730 dopen#1,(na$+",p,r"),d0,u8:ifds>0then1300
+  735 gosub120
+  740 gosub120:gosub120:ze$=right$("     "+str$(x1),5):print"{home}{down}{down}"ze$
+  745 y=0:y2=0:y3=0
+  746 y4=0:y6=1
+  750 y1=0:ify3=0thengosub90
+  760 y3=0:ifx=0then740
+  762 ifx=34theny2=not y2
+  764 ify2theny=1:goto750
+  766 ify4andy6then820
+  769 ifx=131orx=143then800
+  770 ifx>237andx<247theny4=1:y6=1:goto810
+  771 ifx=254thenbegin
+  772 : gosub90:if(x<12orx>21andx<>27)orx=18then780
+  774 : y4=1:y6=1:ifx>12andx<16theny6=0
+  775 bend
+  780 ifx>64andx<91then850
+  790 goto750
+  800 ifx=131theny=1
+  810 gosub90:ifx=0then740
+  820 ifx=34theny2=not y2
+  825 ify2then810
+  830 ifx=58andythen746
+  832 ifx=58andy4then746
+  835 ify4andx=40theny6=0:goto780
+  840 goto810
+  850 v1$=a$
+  855 ifx=69thenifx2>47andx2<58orx2=46then750
+  860 gosub90
+  865 ifx=34theny3=1:goto890
+  870 ifx=36orx=37thenv1$=v1$+a$:gosub90:y3=1:goto880
+  875 ifx>47andx<58orx>64andx<91then952
+  880 ifx=40thenv1$=v1$+a$
+  890 v1$=left$(v1$+"    ",4)
+  900 fori=1tova
+  910 ifleft$(va$(i),4)<>v1$thennext:va=i:gosub130:va$(i)=v1$+"  :"
+  920 iflen(va$(i))<50then930
+  925 ifright$(va$(i),5)=ze$then940
+  928 next:va=va+1:gosub130:va$(i)=v1$+"  :"+ze$:goto940
+  930 ifright$(va$(i),5)<>ze$thenva$(i)=va$(i)+" "+ze$
+  940 ifx=0then740:elseifx=58then746
+  945 ify4theny6=1:goto820
+  950 goto750
+  952 ify1=0thenv1$=v1$+a$:y1=1
+  954 goto860
+  956 rem ************************************
+  960 rem  sortieren der variablen (feld va$)
+  965 rem ************************************
+  968 :
+  970 ifva=0thenprint"{down}keine variablen vorhanden!":goto1310
+  972 s1%=1:s%(1,1)=1:s%(1,2)=va
+  973 do whiles1%<>0
+  974 : l%=s%(s1%,1):r%=s%(s1%,2):s1%=s1%-1
+  976 : do whiler%>l%
+  978 :  i%=l%:j%=r%:h$=va$(int(l%+r%)/2)
+  980 :  do whilei%<=j%
+  982 :   ifva$(i%)<h$theni%=i%+1:goto982
+  984 :   ifva$(j%)>h$thenj%=j%-1:goto984
+  986 :   ifi%<=j%thenbegin
+  988 :    va$(0)=va$(i%):va$(i%)=va$(j%):va$(j%)=va$(0):i%=i%+1:j%=j%-1
+  990 :   bend
+  992 :  loop
+  994 :  ifr%-i%>j%-l%thenbegin
+  996 :   ifl%<j%thens1%=s1%+1:s%(s1%,1)=l%:s%(s1%,2)=j%
+  998 :   l%=i%
+ 1000 :  bend:else begin
+ 1002 :   ifi%<r%thens1%=s1%+1:s%(s1%,1)=i%:s%(s1%,2)=r%
+ 1004 :   r%=j%
+ 1006 :  bend
+ 1008 : loop
+ 1010 loop
+ 1020 i=2
+ 1025 :
+ 1030 print"{clr}wollen sie zu den variablen bemerkungen eingeben?  ";
+ 1040 geta$:ifa$="n"then1180
+ 1050 ifa$<>"j"then1040
+ 1060 print"{clr}blaettern : <{rvon}crsr up/down{rvof}>   eingeben: <{rvon}return{rvof}>   ende: <{rvon}e{rvof}>"
+ 1070 print"{home}{down}{down}{down}{down}{down}{down}variablenname: ";left$(va$(i),4);ll$;
+ 1071 ifleft$(va$(i),4)=left$(va$(i-1),4)thenprintspc(10)"{rvon}vielfach zeilen{rvof} !";
+ 1073 print:printll$;va$(i)"{down}{down}"
+ 1080 geta$:ifa$<>"{up}"anda$<>"{down}"anda$<>chr$(13)anda$<>"e"then1080
+ 1090 ifa$="{down}"theni=i+1:ifi>vatheni=2
+ 1100 ifa$="{up}"theni=i-1:ifi<2theni=va
+ 1105 ifa$="e"then1180
+ 1110 ifa$<>chr$(13)then1070
+ 1125 print"{down}{down}      ";:forj=1to25:print"{CBM-U}";:next:print:print"{up}{up}text: ";
+ 1126 iflen(va$(i))>57thenbegin
+ 1127 : printmid$(va$(i),57)
+ 1128 : print"{up}"tab(6);
+ 1129 bend
+ 1130 open1,0:input#1,te$:print:close1:te$=left$(te$,25)
+ 1140 print"{up}"ll$:printll$
+ 1150 ifte$<>left$(le$,25)thenva$(i)=left$(va$(i)+le$,57)+te$
+ 1160 goto1070
+ 1175 rem ******************
+ 1176 rem  ausgabe variable
+ 1177 rem ******************
+ 1180 print:open1,dv%:print#1
+ 1190 print#1,"liste der variablen     :"
+ 1200 print#1,"-------------------------"
+ 1205 ifzt%then1268
+ 1210 fori=2tova
+ 1220 ifleft$(va$(i),4)<>left$(va$(i-1),4)thenprint#1,va$(i):goto1240
+ 1230 print#1,spc(6);mid$(v$(i),7)
+ 1240 nexti
+ 1268 ifzu%then1310
+ 1269 print#1:print#1:print#1,"variablenliste ohne zeilennummer"
+ 1270 print#1,"---------------------------------"
+ 1271 fori=2tova
+ 1272 iflen(va$(i))>70thenprint#1,left$(va$(i),8);right$(va$(i+1),25):goto1275
+ 1273 ifleft$(va$(i+1),4)=left$(va$(i),4)then1275
+ 1274 print#1,left$(va$(i),8)
+ 1275 nexti
+ 1280 goto1310
+ 1300 print:print"disk-error: ";ds$
+ 1310 close1:close2:end
+

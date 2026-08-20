@@ -1,0 +1,36 @@
+
+
+;wdgraf v1.01.prg ==1c01==
+  100 rem ****************************************************************
+  110 rem *                  copyright 1986 by udo miller                *
+  120 rem ****************************************************************
+  130 :
+  140 fast:rem                        fast-modus einschalten
+  150 gr=4: rem                       breite der balken festlegen
+  160 az=10:dima(az):rem              az balken aus datas(zeile 270) lesen
+  170 color5,rclr(6):rem              zeichenfarbe auf rahmenfarbe
+  180 printchr$(27)+"r":rem           reversmodus einschalten
+  190 printchr$(27)+"m":rem           'no-scroll modus' einschalten
+  200 f=1:scnclr       :rem           farbe auf weiss und screen loeschen
+  210 :
+  220 fori=1toaz:reada(i):next:rem    einlesen der balkenwerte(groesse)
+  230 :
+  240 x=1:y=23:rem                    festlegung der x und y koordinate
+  250 :
+  260 b=0:do until b=az:rem           auswertung
+  270 b=b+1
+  280 windowx,y-(a(b)-1),x+gr,y:rem   balken erzeugen
+  290 iff>15thenf=1
+  300 f=f+1:color5,f:scnclr:rem       window mit zeichenfarbe auffuellen
+  310 char1,0,rwindow(0),"":rem       cursor positionieren
+  320 printusing"##";a(b):rem         groesse des balken ausgeben
+  330 x=x+gr*2:rem                    verschiebung x-achse berechnen
+  340 loop
+  350 getkeya$:rem                    auf taste warten
+  360 printchr$(27)+"l":rem           'no-scroll modus' aufheben
+  370 printchr$(19);chr$(19);:rem     window verlassen
+  380 end
+  390 :
+  400 rem                             daten balkengroesse
+  410 data8,14,7,11,21,6,13,22,12,18
+

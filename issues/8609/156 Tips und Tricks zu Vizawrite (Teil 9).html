@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Tricks zu Vizawrite (Teil 9)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="nj">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="156, 158">
+    <meta name="64er.head1" content="Software-Hilfe">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software-Hilfen">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks zu Vizawrite (Teil 9)">
+    <meta name="64er.index_title" content="Tips &amp; Tricks zu Vizawrite 64 (Teil 9)">
+    <meta name="64er.index_category" content="Tips &amp; Tricks Anwenderprogramme|Textverarbeitung">
+    <meta name="64er.id" content="tips_vizawrite">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Tricks zu Vizawrite (Teil 9)</h1>
+        <p class="intro">Gibt es etwas, das Sie an Vizawrite 64 noch verbessern möchten? Wünschen Sie sich beispielsweise eine DIN-Tastatur? Dann ändern Sie doch einfach die Tastaturbelegung! Viele Anderungen und Erweiterungen können Sie nun leicht selbst vornehmen. Weiterhin zeigen wir Ihnen die einfachste und eleganteste Möglichkeit, ein nicht gespeichertes Dokument nach einem versehentlichen »QUIT« zu retten.</p>
+
+        <p>Ein besonders großer Nachteil für »Blindschreiber« ist, daß bei Vizawrite 64 zwar die deutschen Umlaute an die richtigen Stellen der Tastatur gelegt wurden, die Buchstaben »X« und »Y«jedoch vertauscht sind. Auch das »ß« befindet sich auf einer unüblichen Taste. Nichts ist also naheliegender als die nachträgliche Installation einer DIN-Tastaturbelegung.</p>
+
+        <p>Vizawrite 64 ließ sich bislang nur sehr eingeschränkt verändern, da das Programm mit einem Autostart versehen und &lt;RUN/ STOP+RESTORE&gt; abgeschaltet ist. Die einzige Möglichkeit für eine nachträgliche Änderung am Programm selbst ist, Vizawrite 64 zunächst mit einem Hardware-Reset zu verlassen. Hierbei werden jedoch im Normalfall wichtige Speicherstellen gelöscht, so daß ein Neustart des veränderten Programms mit einem SYS-Befehl aussichtslos wäre (lediglich modifizierte Betriebssysteme einiger Floppy-Speeder bieten einen Reset, der weitgehend alle Speicherinhalte unbeeinflußt läßt). Vor einem erfolgreichen Neustart von Vizawrite 64 ist es deshalb unbedingt notwendig, einige Speicherstellen zu »restaurieren«. Listing 1 übernimmt diese wichtige Aufgabe. Dieser Basic-Lader erzeugt ein kurzes Maschinenprogramm, das automatisch auf Diskette gespeichert wird. Dieses kann nun bei Bedarf mit »LOAD'VIZA.PATCH" ‚8l« in den Bildschirmspeicher geladen und mit »SYS 1024« gestartet werden (löschen Sie bitte vor dem Laden den Bildschirm &lt;SHIFT+CLR&gt;). Das Programm verändert einige Speicherstellen und schaltet auf den Vizawrite-Zeichensatz um (siehe Assembler-Programm Listing 2). Danach meldet sich der Computer mit dem bekannten »READY.«. Mit SYS 2100 gelangen Sie nun zurück ins Vizawrite-Hauptmenü. Wollen Sie in den Editor, ohne das darin enthaltene Dokument zu löschen, geben Sie bitte SYS 5103 ein (SYS 5072 bei der englischen Version) und drücken &lt;RETURN&gt;. Dieser Einsprung funktioniert jedoch nur dann fehlerfrei, wenn sich auch tatsächlich Text im Speicher befindet. In vielen Fällen wird hierbei vor dem Text eine zusätzliche Formatzeile eingefügt, die Sie am besten sofort löschen. Danach sollten Sie das Dokument besser speichern und zum weiteren Überarbeiten Vizawrite 64 erneut laden, da bei diesem Warmstart nicht für die Funktion aller Vizawrite-Routinen garantiert werden kann.</p>
+
+        <p>Wollen Sie Änderungen an Vizawrite 64 vornehmen, müssen Sie im Prinzip wie folgt vorgehen:</p>
+
+        <ol>
+            <li>
+                <p>Vizawrite 64 laden und mit Reset verlassen.</p>
+            </li>
+            <li>
+                <p>Veränderungen vornehmen.</p>
+            </li>
+            <li>
+                <p>VIZA.PATCH laden und mit SYS 1024 starten.</p>
+            </li>
+            <li>
+                <p>Vizawrite 64 mit SYS 2100 erneut starten.</p>
+            </li>
+        </ol>
+
+
+        <p>Die Punkte 2 bis 4 lassen sich jedoch auch zusammenfassen. In diesem Fall brauchen Sie nach dem Reset lediglich ein Programm nachzuladen, das die gewünschten Änderungen vornimmt, den Original-Inhalt der Speicherstellen vor dem Reset wiederherstellt und Vizawrite 64 danach automatisch startet. Als Beispiel hierfür dient die oben angekündigte Vertauschung der Tasten &lt;X&gt; und &lt;Y&gt; (Listing 3).</p>
+
+        <h2>Installation einer DIN-Tastatur</h2>
+
+        <p>Dieses Vorhaben wird durch die deutsche Version von Vizawrite 64 selbst unterstützt, da eine Tastentausch-Routine bereits im Programm enthalten ist. Jedes Zeichen, das von der Tastatur empfangen wird, wird von Vizawrite 64 zunächst mit einigen Bytes einer Tabelle (87546 bis $7552) verglichen und gegebenenfalls umgewandelt. Drücken Sie beispielsweise die &lt;£>-Taste, die ebenfalls in dieser Tabelle enthalten ist, übernimmt Vizawrite 64 anstelle dessen den ASCII-Code des »ß«. Dieser Wert befindet sich in einer zweiten, entsprechenden Tabelle von $7554 bis $7560.</p>
+
+        <p>Wollen Sie weitere Tasten vertauschen, brauchen Sie lediglich eine erweiterte Tabelle in einen nicht genutzten Speicherbereich zu legen und Vizawrite 64 mitzuteilen, wo sich diese Tabelle befindet. Das kurze Maschinenspracheprogramm (Listing 3) enthält die Initialisierungs-Routine von »VIZA.PATCH« und darüber hinaus die erweiterten Tabellen mit den alten und neuen Werten für »X« und »Y«. Diese Tabellen können Sie, wenn Sie wollen, sogar noch um weitere Zeichen erweitern. Sie brauchen hierzu lediglich die ASCII-Werte der zu tauschenden Zeichen an die erste Tabelle (ab $03A9) und die Werte der gewünschten, neuen Zeichen an die zweite anzufügen (ab $03D]). Überschreiben Sie hierzu einfach die notwendige Anzahl von Nullbytes mit den entsprechenden ASCII-Werten und speichern das erweiterte Programm hinterher auf Diskette. Dies ist mit einem Monitor (zum Beispiel SMON) leicht zu bewerkstelligen.</p>
+
+        <p>Laden Sie dieses Programm bitte nach dem Reset von Vizawrite 64 mit LOAD"VIZA.KEY" 81 und _ starten es mit SYS 828. Vizawrite 64 wird automatisch neu gestartet und steht Ihnen mit veränderter Tastaturbelegung zur Verfügung. Gleichzeitig können Sie nun auch die spitzen Klammern verwenden (&lt;SHIFT+ &gt; &lt;SHIFT— &gt;). Falls Sie diese Zeichen benutzen wollen, ohne den Tastentausch, können Sie auch nach einem Reset im Direktmodus eingeben: »POKE 300043,60: POKE 30045,62«.</p>
+
+        <p>Wollen Sie kleinere Routinen einbinden, ist es für Sie wichtig, zu wissen, wie Vizawrite 64 den Speicher des C 64 nutzt:</p>
+
+        <p>$033C — $0364 genutzt als Zwischenspeicher 50365 — $03f7 ungenutzt (Kassettenpuffer)</p>
+
+        <p>$0800 — $7917 Vizawrite 64 Programmspeicher $7918 — $FES3D Textspeicher $FESE — $FFFF vielfältig genutzt</p>
+
+        <p>Wie Sie aus dieser Aufstellung ersehen können, kann im Normalfall lediglich der größte Teil des Kassettenpuffers für eigene Erweiterungen genutzt werden. Mit einem kleinen Trick ist es jedoch möglich, den Textspeicher von Vizawrite 64 beliebig zu verkleinern und so beispielsweise den Bereich $E000 bis $FESD für eigene Routinen zu nutzen. Es steht dann zwar weniger Speicherplatz für Texte zur Verfügung, was aber nahezu bedeutungslos is, da man Vizawrite-Dokumente bekanntliich mit dem »GLOBAL«-Befehl verknüpfen kann. Listing 4 rechnet das gewünschte neue Textspeicherende in das notwendige LO/HI-Format um. Die ausgegebenen Werte müssen vor dem Neustart von Vizawrite 64 in die Speicheradressen 45/46 ($2D/$2E) geschrieben werden. Am besten ändern Sie aber zur Verkleinerung des Textspeichers die entsprechenden Befehle in »VIZA.PATCH« (Listing 2, Zeile 1140 und 1160 oder in Listing 1 das 10. und 14. DATA-Element der Zeile 100).</p>
+
+        <p>Wenn Sie bisher Schwierigkeiten hatten, Umlaute korrekt auf Ihrem Drucker auszugeben, obwohl er dazu hardwaremäßig in der Lage wäre, und die herkömmlichen Methoden versagten, können Sie mit Listing 5 die Druckercodes für die Umlaute anpassen. Dies ist im Prinzip auch per POKE möglich. Die Tabelle mit diesen Werten befindet sich beider deutschen Version von Vizawrite 64 (Versionsnummer Bl) in der Reihenfolge »öOäAüUß« ab Adresse $75B0 (dezimal 30128) im Speicher. Wenn Sie nach der Veränderung Vizawrite 64 wie oben beschrieben erneut starten, werden die neudefinierten Umlaute an den Drucker gesendet.</p>
+
+        <h2>Eigene Programme in Vizawrite 64</h2>
+
+        <p>Alle bisher in Tips und Tricks zu Vizawrite 64 veröffentlichten Veränderungen, Anpassungen und Verbesserungen arbeiten nach einem gemeinsamen Schema. Die neue Routine wird beispielsweise in den Kassettenpuffer gelegt und ein Standardvektor (zum Beispiel der OUTPUTVektor $0326/0327) auf dieses Unterprogramm »verbogen«. In der vorliegenden Ausgabe haben Sie eine Möglichkeit kennengelernt, Vizawrite 64 direkt durch Überschreiben zu verändern und erneut zu starten. Es gibt jedoch noch einen weit interessanteren Weg. Wie Sie sicherlich bereits wissen, versucht Vizawrite 64 nach der Tastenkombination &lt;CBM&gt; + &lt;SHIFT&gt; &lt;RUN/STOP&gt; eine Programmdatei mit dem Namen »VIZA*« (Vizaspell) nachzuladen und bei Erfolg zu starten. Genau hier können Sie einsetzten. Denn wenn sich auf der Diskette nicht Vizaspell, sondern ein anderes Programm befindet, das aber die gleichen Kennzeichen besitzt, wird dieses von Vizawrite 64 sebstverständlich auf die gleiche Weise behandelt. Es ist also theoretisch möglich, eigene Maschinenprogramme innerhalb des Texteditors zu benutzen. Doch wie ist dies zu erreichen? — Das Programm muß in einem ganz bestimmten Speicherbereich ($5DBC-$752F) lauffähig und mit SYS 24000 (MP $5DC0) startbar sein. — Die ersten vier Bytes müssen der Vizaspell-Kennung entsprechen ($53 $FF $00 $00).</p>
+
+        <p>— Das Programm darf möglichst keinen anderen Speicherbereich beeinflussen. — Das Programm muß mit der folgenden Befehlsfolge enden:</p>
+
+        <p>LDX #803 ]JSR 0849 JMP $083A (Rücksprung zu Vizawrite 64).</p>
+
+        <p>Beachten Sie bitte bei der Erstellung eigener Programme innerhalb Vizawrite 64, daß das Register 1 der Zeropage beim Start von Vizaspell den Wert 48 ($30) enthält. Das heißt, wenn Betriebssystem- oder Basic-Interpreter-Routinen verwendet werden sollen, muß dieses Register entsprechend verändert werden. Auch die CHRGET-Routine wird von Vizawrite 64 für eigene Zwecke geändert: Das Register $7b der Zeropage enthält den Wert $08 anstelle der normalerweise notwendigen $02.</p>
+
+        <h2>Völlig neue Dimensionen</h2>
+
+        <p>Vizawrite 64 ist auch ohne Ergänzung eines der leistungsfähigsten Textverarbeitungsprogramme für den C 64. Es ist jedoch damit zu rechnen, daß in Zukunft Programme unserer Leser das bisher Unglaubliche wahr machen. Grafikfähigkeit, 80-Zeichendarstellung, Rechen- und DFÜU-Option in Vizawrite müssen nicht länger Illusion bleiben. Lassen Sie sich überraschen. Bereits in den nächsten Ausgaben werden wir die ersten Erweiterungen veröffentlichen.</p>
+
+        <address class="author">(nj)</address>
+
+        <figure>
+            <pre data-filename="viza.patch.bas" data-name="VIZA.PATCH (Basic-Lader)"></pre>
+            <figcaption>Listing 1. Dieser Basic-Lader speichert »VIZA.PATCH« als Maschinenprogramm auf Diskette</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="viza.patch.quell" data-name="VIZA.PATCH (Assembler-Listing)"></pre>
+            <figcaption>Listing 2. Assembler-Listing von »VIZA.PATCH«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="viza.patch.obj.prg" data-name="VIZA.PATCH (Maschinenprogramm)"></div>
+        <figure>
+            <pre data-filename="viza.key.prg" data-name="VIZA.KEY" data-mse=mse1></pre>
+            <figcaption>Listing 3. Maschinenprogramm zur Installation einer DIN-Tastatur.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="viza.key.prg" data-name="VIZA.KEY"></div>
+        <figure>
+            <pre data-filename="listing 4" data-name="Textspeicher-Berechnung"></pre>
+            <figcaption>Listing 4. Basic-Programm zur Berechnung der notwendigen POKEs für die Textspeicher-Dezimierung</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="viza.umlaute.prg" data-name="VIZA.UMLAUTE" data-mse=mse1></pre>
+            <figcaption>Listing 5. Maschinenprogramm zur Veränderung der ASCII-Codes für die deutschen Sonderzeichen.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="viza.umlaute.prg" data-name="VIZA.UMLAUTE"></div>
+
+    </article>
+</body>
+
+</html>

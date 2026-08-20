@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Chris Hülsbek, tr, Henning Stöcklein, tr, Markus Schmitz, tr, Thomas Seip, tr">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="66-67">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C 64|Profis">
+    <meta name="64er.id" content="tips_profis">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Hätten Sie gedacht, daß es mittels dreier POKE-Befehle möglich ist, einen Block-Zeichensatz auf den Bildschirm zu zaubern? Oder daß ein »POKE 1,0« doch nicht zum Absturz des C 64 führt?</p>
+
+        <h2>Print-Shop, Riteman C + und SpeedDos</h2>
+
+        <p>Das Problem ist wie folgt: Der Riteman-Drucker (sicher auch einige andere sogenannte Epson-kompatible) gibt nach jeder vollendeten Zeile ein»Carriage Return« mit »Line Feed« aus. Nun wird von »Print-Shop« aus ebenfalls ein »Line Feed« gesendet, da die Epson-Drucker lediglich das »Carriage Return« selbsttätig ausführen. Dies hat zur Folge, daß der gesamte Ausdruck immer mit einer Leerzeile nach jeder gedruckten Zeile erfolgt. Dieser Fehler läßt sich (zumindest beim Riteman C +) folgendermaßen beheben:</p>
+
+        <p>l) Im Direktmodus folgende Sequenz an den Drucker senden:</p>
+
+        <p>OPEN 4,4:PRINT # 4,CHR$(27);" (" ;CHR$(O)</p>
+
+        <p>Hierdurch wird die Carriage-Return-Funktion des Druckers ausgeschaltet.</p>
+
+        <p>2) »Print-Shop« wie gewohnt laden und starten</p>
+
+        <p>Zur Beachtung sei gesagt, daß als Drucker-Setup seitens »Print-Shop« die »Epson«-Serie eingestellt sein sollte, und daß diese Prozedur nach jedem Ausschalten des Druckers wiederholt werden muß.</p>
+
+        <address class="author">(Thomas Seip/tr)</address>
+
+        <h2>Giga-CAD und MPS 803</h2>
+
+        <p>Da ich den Drucker MPS 803 besitze, mußte ich feststellen, daß es mir nicht möglich sein sollte, Grafiken in vier- oder zehnfacher Auflösung auszudrucken. Wie ich im Directory sehen konnte, werden Bilder in vierfacher Auflösung als vier einzelne Bilder gespeichert. Im gleichen Sonderheft, 6/86, in dem »Giga-CAD« abgedruckt war, ist auf Seite 155 ein Hardcopy-Programm, das vier Bilder nahtlos aneinanderdruckt. Ich probierte es gleich aus und siehe da, es funktionierte prächtig. Ich hatte mit dem MPS 803 ein Bild von»Giga-CAR« in vierfacher Auflösung gedruckt. Was vierfach möglich ist, müßte auch zehnfach klappen. Man müßte in drei Arbeitsgängen vorgehen (erst Bilder 1 bis 4, dann 5bis8und zum Schluß 9 und 10). Die entstandenen drei Bilder habe ich anschließend zusammengeklebt. Und fertig war mein Bild in ‚zehnfacher Auflösung. (Andreas Tschescheftr)</p>
+
+        <h2>Blocksatz-Schrift</h2>
+
+        <p>Warum denn für eigene Spiele immer gleich einen neuen Zeichensatz erstellen? Mit drei POKEs und einer Farbumschaltung auf Braun geht's genauso:</p>
+
+        <p>10 PRINT CHR$(149) : POKE 53334,24 : POKE 53281,0 : POKE 53280, 6</p>
+
+        <address class="author">(Markus Schmitz/tr)</address>
+
+        <h2>Hypra-Platos verbessert</h2>
+
+        <p>Das wirklich sehr gute Platinen-Layout-Programm »Hypra-Platos« aus der 64'er, Ausgabe 11/85, hat einen kleinen Nachteil:</p>
+
+        <p>Da man den Programmnamen für das Matrix-File auf Diskette nicht selbst bestimmen kann, muß man für jede neue Matrix eine neue Diskette verwenden.</p>
+
+        <p>Durch zwei Änderungen (Listing 1 und 2) am »0. PRG« kann man das Leerzeichen im Filenamen »MATRIX FILE« durch eine Zahl zwischen 0 und 9 ersetzen.</p>
+
+        <p>Um die Änderungen durchzuführen, gehen Sie wie folgt vor:</p>
+
+        <p>— Laden Sie »0. PRG« in den © 64.</p>
+
+        <p>— Starten Sie die Entpackroutine mit RUN. — Sobald der Bildschirm dunkelblau wird, drücken Sie die &lt;RUN/STOP &gt;-Taste und warten, bis sich der Computer mit »BREAK IN 43210« meldet.</p>
+
+        <p>— Die nun entpackte Version speichern Sie unter dem Namen »HYPLATOS%« wieder auf Diskette (sie sollte 46 Blöcke belegen).</p>
+
+        <p>— Laden und starten Sie den MSE.</p>
+
+        <p>— Laden Sie »HYPLATOS2« in den MSE (auf die Frage nach der Startadresse »L« eingeben).</p>
+
+        <p>— Drücken Sie &lt;CTRL+N&gt; und geben Sie als Adresse 0E40 ein.</p>
+
+        <p>— Geben Sie Listing 1 ein.</p>
+
+        <p>— Drücken Sie erneut &lt;CTRL+N&gt; und geben diesmal als Adresse 345C ein.</p>
+
+        <p>— Tippen Sie Listing 2 ab.</p>
+
+        <p>— Drücken Sie &lt;CTRL+S&gt; und speichern die neue Version auf Diskette.</p>
+
+        <p>— Fertig!</p>
+
+        <p>Ab jetzt laden Sie zum Starten von Hypra-Platos nicht mehr das »0. PRG« sondern die eben erstellte Version »HYPLATOS2«. Wenn Sie nun in den Menüpunkt »Matrix speichern« oder »Matrix laden« gehen, erscheint die Frage nach der gewünschten Filenummer (Zahlen von 0 bis 9). Wenn Sie &lt;SPACE&gt; drücken, können Sie die »alten« Matrix-Files laden.</p>
+
+        <address class="author">(Henning Stöcklein/tr)</address>
+
+        <figure>
+            <pre>Name : hyplatos 2        0801 3591
+----------------------------------
+0e40 : 20 44 e5 a9 e0 a0 69 20  2a
+0e48 : 1e ab 20 3e f1 f0 fb c9  36
+0e50 : 20 f0 09 c9 30 30 f3 c9  4c
+0e58 : 39 b0 ef ea 20 d2 ff 8d  f6
+0e60 : 20 90 a9 0d 20 d2 ff 20  ad
+0e68 : d2 ff 60 00 00 00 00 00  52
+0e70 : 20 4e 55 4d 4d 45 52 20  3f
+0e78 : 44 45 53 20 4d 41 54 52  0d
+0e80 : 49 58 46 49 4c 45 53 20  2d
+0e88 : 28 30 2d 39 2f 53 50 43  90
+0e90 : 29 20 3f 20 00 00 00 00  9d</pre>
+            <figcaption>Listing 1. Teil 1 der Erweiterung zu Hypra-Platos</figcaption>
+        </figure>
+        <figure>
+            <pre>Name : hyplatos 2        0801 3591
+----------------------------------
+345c : 20 b0 69 a9 69 a0 68 20  e1</pre>
+            <figcaption>Listing 2. Teil 2 der Erweiterung zu Hypra-Platos</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="hyplatos 2.prg" data-name="Hypra-Platos 2 (fertig geänderte Fassung)"></div>
+
+
+        <h2>Klangqualität bei »Shades« verbessert</h2>
+
+        <p>Eigentlich sollte ein C 64 genauso funktionieren wie jeder andere C 64, aber die Hersteller spielen einem da einen Streich: Die Filter im SID des C 64 werden analog, extern von zwei Kondensatoren erzeugt und digital (über POKEs) gesteuert! Diese Kondensatoren haben bei manchen C 64 andere Kapazitäten, was zur Folge hat, daß die Filter bei gleichen POKEs auf dem einen Gerät ansprechen, auf einem anderen nicht! Das Musikstück »Shades« (Ausgabe 6/86, Seite 173und Ausgabe 7/86, Seite 84) wurde auf einem C 64 programmiert, dessen Filter schon bei einem geringen Wert ansprechen! Auf einem C 64, der mit einem hohen Wert anspricht, läuft »Shades« nicht einwandfrei! Das vorliegende Programm (Listing 3) ändert die Werte beliebig und macht es möglich, »Shades« auf jedem C 64 perfekt wiederzugeben!</p>
+
+        <p>Zum Programm:</p>
+
+        <ol>
+            <li>
+                <p>Wenn Sie »Shades-Control« abgetippt und gespeichert haben, laden Sie »Shades« und starten es! 2. Sobald Sie den ersten Ton hören, unterbrechen Sie die Musik mit &lt;RUN/STOP +RESTORE &gt;! (Damit ist gewährleistet, daß sich die Daten an der richtigen Stelle im Speicher befinden.) .</p>
+            </li>
+            <li>
+                <p>Laden Sie »Shades-Control«!</p>
+            </li>
+            <li>
+                <p>Nach dem Start stehen Ihnen die Tasten &lt;+> und &lt;—> zur Verfügung, um die Filter zu korrigieren! (Empfohlene Werte: 77 bis 127)</p>
+            </li>
+        </ol>
+
+
+        <p>Wenn Sie die Musik mit den für Ihren SID optimalen Werten neu speichern wollen, benötigen Sie einen Monitor: Speichern Sie von $4ec0 bis $7a00. Später können Sie das Programm mit »LOAD&lt; Name > ,8,1« laden und mit »SYS7*4096« starten! Viel Spaß noch beim Anhören!</p>
+
+        <address class="author">(Chris Hülsbek/tr)</address>
+
+        <figure>
+            <pre data-filename="shades control" data-name="Shades-Control"></pre>
+            <figcaption>Listing 3. Mit »Shades-Control« können Sie die Filterwerte des Musikstückes »Shades« ändern.</figcaption>
+        </figure>
+
+
+        <h2>POKE 1,0 ???</h2>
+
+        <p>Mit diesem Trick können Sie jeden verblüffen, der die Bedeutung der Adresse 1 des C 64 kennt:</p>
+
+        <p>Was passiert, wenn Sie »POKE 1,0« eingeben? Der C 64 stürzt ab? Nicht, wenn Sie vorher »POKE 0,0« eingeben. Denn die Adresse 0 enthält das Datenrichtungsregister des Prozessor-Ports, also der Adresse 1. Und wenn Sie dieses auf 0, also auf Eingang schalten, werden sämtliche Schreibzugriffe (also POKEs) auf die Adresse 1 vom C 64 ignoriert.</p>
+
+        <p>Aber: Durch Drücken von &lt;RUN/STOP+RESTORE&gt; wird das Datenrichtungsregister wieder auf seinen Normalwert 47 geschaltet. .</p>
+
+        <h3>(Michael Birkelbach/tr)</h3>
+    </article>
+</body>
+
+</html>

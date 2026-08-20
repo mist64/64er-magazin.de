@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>HiRes Colossal</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="F. Gräf, og">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="82">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64/Simons Basic">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik Simons Basic">
+    <meta name="64er.id" content="hires-colossal">
+</head>
+
+<body>
+    <article>
+        <h1>HiRes Colossal</h1>
+        <p class="intro">Vier Grafik-Bildschirme gleichzeitig unter Simons Basic. Grafiken mit bis zu 640 x 400 Punkten Auflösung. Die Befehle bleiben von Simons Basic voll erhalten.</p>
+
+        <p>32 KByte RAM Grafik für Simons Basic! Mit »HiRes Colossal« (Listing ]) kann man unter Simons Basic vier unabhängige Grafikschirme verwalten. Drei der Schirme werden in den</p>
+
+        <h3>Puffern</h3>
+
+        <p>$ 2000 — $ 3FFF</p>
+
+        <p>$ 4000 — $5FFF</p>
+
+        <p>$ 6000 — $ TFFF gespeichert, und immer einer wird im Anzeigespeicher $ E000 — $FFFF abgelegt. Dieser eine kann dann betrachtet und mit den HiRes-Befehlen verändert werden.</p>
+
+        <p>Durch SYS 52225,0 wird dem Computer mitgeteilt, daß man im Speicher Platz für die Puffer reservieren will. Am Beginn eines Programms, das »HiRes Colossal« benutzt (zum Beispiel eines Zeichenprogramms), sollte immer stehen:</p>
+
+        <p>
+        <pre><code>10 SYS 52225,0:CLR  
+</code></pre>
+
+        Für ein Basic-Programm verbleiben dann noch etwa 6,1 KByte.</p>
+
+        <p>Mit SYS 52225,1,x veranlaßt man, daß der Bildschirm mit der Nummer xin den Anzeigespeicher kopiert wird, und der momentane Inhalt des Anzeigespeichers in den freigewordenen Puffer übertragen wird. Das heißt, der Inhalt des Anzeigespeichers und der Inhalt eines Buffers werden vertauscht. Für x können die Zahlen von 1 bis 4 eingesetzt werden. Jeder Schirm hat eine feste Nummer in diesem Bereich. Um die Verwaltung der Buffer, das heißt welcher Schirm zur Zeit in welchem Buffer ist, braucht man sich nicht zu kümmern. Das erledigt »HiRes Colossal« automatisch.</p>
+
+        <p>Als Leckerbissen bietet »HiRes Colossal« die Möglichkeit, mehrere Grafikschirme übereinander zu blenden. SYS 52225,2,x blendet den Schirm x über den Schirm, der sich im Anzeigespeicher befindet. Im Anzeigespeicher ist nun ein neues Bild, gemischt aus den beiden Grafiken.</p>
+
+        <p>Speichern der Grafikschirme: »SYS 52225,4,1,8,2, "name, P,W"« speichert den Schirm im Anzeigespeicher auf Diskette. Die Parameter ab der »l« entsprechen denen des OPEN-Befehls. Man kann jeden der vier Grafikbereiche speichern, indem man ihn zuerst mit »SYS 52225,1,x«in den Anzeigespeicher kopiert und dann mit dem obigen Befehl speichert.</p>
+
+        <p>Die Grafiken können mit »SYS 52225,4,"name",gerät« wieder geladen werden. Für»gerät«muß die entsprechende Gerätenummer eingesetzt werden (l oder 8). Die Grafik wird in den Anzeigespeicher eingelesen. Sollen mehrere Grafiken geladen werden, so muß man nach dem Laden einer Grafik wieder einen freien Speicherbereich in den Anzeigespeicherrufen, damit die nächste Grafik nicht die gerade geladene überschreibt. Zum Beispiel: j</p>
+
+        <p>SYS 52225,1,1 ersten Bildschirm aufrufen</p>
+
+        <p>‚SYS 52225,4, "GRAFIK1" ,8 erste Grafik in den Bildschirm 1 laden</p>
+
+        <p>SYS 52225,1,2 zweiten Bildschirm aufrufen</p>
+
+        <p>SYS 52225,4, "GRAFIK2,8 zweite Grafik in den Bildschirm 2 laden</p>
+
+        <h3>Die Demoprogramme:</h3>
+
+        <p>»Demo I« (Listing 2) demonstriert die verschiedenen Funktionen von »HiRes Colossal«. An einer Stelle des Programms werden die erzeugten Bilder auf Diskette gespeichert. Deswegen sollte sich im Laufwerk eine Diskette mit mindestens 132 freien Blöcken befinden.</p>
+
+        <p>»Demo 2« (Listing 3) zeichnet drei geometrische Figuren, deren Koordinaten so gewählt sind, daß sie sich über alle vier Grafikschirme erstrecken. Die »Punkt-Routine« schaltet beim Setzen eines Punktes automatisch den richtigen Bildschirm ein. Es ist also möglich, Grafiken mit der Größe von 640 x 400 Punkten zu erstellen.</p>
+
+        <p>Mit den Tasten 1 bis 4 können nun die verschiedenen Teile des Riesenbildes betrachtet werden.</p>
+
+        <p>Die Unterprogramme »PUNKT« »LINIE« »BOX« und »KREIS« können in eigene Programme zur Erstellung übergroßer Grafiken übernommen werden. Allerdings ist zu beachten, daß man nicht nur zum Beispiel »LINIE« übernimmt, sondern auch »PUNKTI«, weil »LINIE« den »PUNKT«-Befehl als Unterprogramm braucht. So braucht auch »KREIS« den »PUNK'I«-Befehl und »BOX« braucht die Befehle »LINIE« und »PUNKT«.</p>
+
+        <p>»HiRes Colossal« ermöglicht es, mehrere Grafiken im Speicher zu halten oder garübergroße Bilder mit einer Auflösung von 640 x 400 Punkten zu erstellen. Mit den neuen Befehlen kann extrem schnell und bequem zwischen den vier Grafikseiten hin und her geschaltet werden, wobei alle Vorteile von Simons Basic erhalten bleiben.</p>
+
+        <address class="author">(F. Gräf/og)</address>
+
+        <figure>
+            <pre data-filename="hires-colossal.prg" data-name="HiRes Colossal" data-mse=mse1></pre>
+            <figcaption>Listing 1. »HiRes Colossal« geben Sie bitte mit dem MSE ein</figcaption>
+        </figure>
+
+        <div class="binary_download" data-filename="hires-colossal.prg" data-name="HiRes Colossal"></div>
+
+        <div style="display: none;">
+            <pre data-filename="hires.src" data-name="HiRes Colossal (Assembler-Quelltext)"></pre>
+        </div>
+        <figure>
+            <pre data-filename="demo 1" data-name="Demo 1"></pre>
+            <figcaption>Listing 2. Demo 1 für »HiRes Colossal«. Bitte vorher Simons Basic laden und starten.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="demo 2" data-name="Demo 2"></pre>
+            <figcaption>Listing 3. Demo 2 für »HiRes Colossal«. Mit den Tasten &lt;1&gt; bis &lt;4&gt; kann zwischen den Bildschirmen umgeschaltet werden.</figcaption>
+        </figure>
+
+    </article>
+</body>
+
+</html>

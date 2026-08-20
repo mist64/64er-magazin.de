@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Wettstreit der Assembler</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="bs">
+    <meta name="64er.issue" content="9/86">
+    <meta name="64er.pages" content="148-150">
+    <meta name="64er.head1" content="Software-Test">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software-Test">
+    <meta name="64er.index_category" content="Software-Test|Assembler">
+    <meta name="64er.id" content="assembler-test">
+</head>
+
+<body>
+    <article>
+        <h1>Wettstreit der Assembler</h1>
+        <p class="intro">Gier Wer den C 64 bis aufs letzte ausreizen möchte, muß ihn leider in Maschinensprache programmieren. Wir testen das nötige Handwerkszeug, zwei der besten Assembler. Sie sind die idealen Werkzeuge für Programmier-Profis.</p>
+
+        <figure>
+            <img src="148-0.png" alt="Fotomontage mit Bildschirmen voller Hex-Zahlen und Assembler-Quelltext, rotes Leuchten auf blauer Fläche">
+        </figure>
+
+        <p>n den letzten Monaten sind die Assembler in der</p>
+
+        <p>64'er etwas zu kurz gekommen. Es hat sich auch nicht viel auf dem Markt getan. Das einzige größere Ereignis war das Erscheinen von TurboAss, der von den Entwicklern als der schnellste Assembler für den C 64 bezeichnet wird. TurboAss hat sich in den letzten Monaten glänzend bewährt, während ein »Oldie« die Bühne der Assemblerwelt wieder betreten hat. Dabei ist das Wort Oldie in keiner Weise abfälliggemeint, dennschon im 64'er Ausgabe 1/85 konnte ASSI/M ein hervorragendes Testergebnis erzielen. Im Laufe der Monate sind an ASSI/M einige Veränderungen vorgenommen worden, so daß jetzt eine erheblich verbesserte Version vorliegt, die sicherlich einiges verspricht.</p>
+
+        <p>Eines gleich vorweg: Wir können die beiden Assembler nicht direkt miteinander vergleichen und einen Testsieger ermitteln. Dazu sind beide Assembler von ihrem Konzept her zu unterschiedlich aufgebaut. TurboAss ist ein auf Geschwindigkeit und Speicherbedarf hin optimierter Assembler, der meistens ohne jeden Diskettenzugriff auskommt. Bei kleineren Programmen sind die Assemblierungszeiten derart kurz, daß man sich fragt, ob überhaupt assembliert wurde. Auch längere Programme zu assemblieren, ist eher eine Frage von Sekunden als Minuten. Ein anders Konzept verfolgt ASSI, das Flaggschiff der Assembler. Er arbeitet rein diskettenorientiert und ist dadurch zwangsläufig um ein Vielfaches langsamer als Turbo-Ass. Doch das Hauptargument für ASSI/M ist nicht seine Geschwindigkeitsondern seine Vielzahl von gut durchdachten Assembler-Anweisungen, die das Programmieren erleichtern und übersichtlicher machen. Deswegen muß jeder Anwender und Programmierer für sich selber entscheiden, welches Programm seinen Anforderungen besser angepaßt ist.</p>
+
+        <p>Beide Assembler werden zusammen mit einem Editor ausgeliefert, so daß der normale Basic-Editor des C 64 nicht verwendet werden muß. Beide sind sogenannte Full-Screen-Editoren: Der eingegebene Quelltext kann .mit den Cursor-Tasten nach oben und unten gescrollt werden, Änderungen im Quelltext werden ausgeführt, ohne daß man &lt;RETURN&gt; drücken muß.</p>
+
+        <p>Beide Editoren bieten derart viele ähnliche Funktionen, daß selbst eine Kurzbeschreibung mehrere Seiten benötigt. Wir können hier aus Platzgründen leider keine kompletten Befehlslisten drucken — es gibt einfach zu viele Anweisungen. Es fehlt Wettstreit Assembler keine wichtige Funktion, praktisch alle Wünsche des Benutzers werden erfüllt. Deswegen sind sich die Editoren auch in mancher Hinsicht ähnlich. Ihr größter Unterschied liegt jedoch in der Speicherung des Quelltextes, denn hier zeigt sich auch das unterschiedliche Konzept der beiden Assembler. TurboAss hält aus Geschwindigkeitsgründen Editor, Assembler, Quelltext und den Objectcode gleichzeitig im Speicher des C 64. Der Quelltext wird deswegen in gepackter Form gespeichert, da sonst zu wenig Platz für den Objectcode wäre. Also wird jede Zeile Quelltext bei der Eingabe »tokenisiert«, das heißt, daß die Zeile gleich auf korrekte Syntax überprüft und dann in einen kompakten Code übersetzt wird. Dieser Code benötigt wesentlich weniger Speicher als die ASCII-Codes der Zeile und kann vom Assembler auch um ein Vielfaches schneller abgearbeitet werden. Anders verhält es sich beim ASSI/M: Editor und Assembler sind zwei völlig voneinander getrennte Programme. Der Quelltext wird mit dem Editor geschrieben und dann auf Diskette gespeichert, der Assembler holt sich den Quelltext während der Assemblierung von der Diskette. Dadurch kann der Quelltext praktisch beliebig lang werden. Der Editor mit dem Namen FSE übersetzt den Quelltext also nicht in einen Code, sondern behandelt ihn als ganz normales ASCII-File. Das hat den Vorteil, daß der FSE universell einsetzbar ist. So kann man ihn auch im beschränkten Maße zur Textverarbeitung verwenden. Der TurboAss-Editor weist dagegen alle für ihn unsinnigen Zeilen mit einer Fehlermeldung zurück. Das hat natürlich den Vorteil, daß beim eigentlichen Assembliervorgang keine Syntax-Fehler auftauchen können, da diese ja schon bei der Quelltexteingabe eliminiert werden. Beim ASSI kann man sich schon mal, ohne es zu merken, vertippen und muß dann nach dem Assembliervorgang den Editor laden, den Quelltext laden, ändern und speichern, den Assembler laden und die Assemblierung erneut starten. Bei der langsamen 1541 ist das sicher kein Vergnügen.</p>
+
+        <p>TurboAss und ASSYM sind Zwei-Pass-Makro-Assembler. Sie bieten derart viele Funktionen, daß mancher Anfänger recht wenig mit ihnen anfangen kann. Selbst Profis werden die Assembler in den seltensten Fällen voll ausschöpfen können. Damit Sie einen Überblick über die speziellen Befehle der Assembler erhalten, haben wir in Tabelle 1 die Anweisungen der beiden zusammengefaßt. Eine Erklärung einzelner Spezialbegriffe, die bei anderen Assemblern meist nicht auftauchen, finden Sie im Textkasten. Im weiteren wollen wir uns nur auf die Merkmale beschränken, die die beiden aus der breiten Masse der Assembler herausheben.</p>
+
+        <h2>Von Label, Makros, und Symbolen</h2>
+
+        <p>Beide Assembler erlauben die Übergabe textueller Parameter in Makros. Ein Beispiel: Sie wollen in einem Makro einen Sprung ausführen, der allerdings vom Makroaufruf abhängig sein soll. Mit anderen Worten: Mal soll im Makro BEQ stehen, mal BNE und mal BVC. Das Makro kann so programmiert werden, daß der Sprungbefehl erst noch durch einen Parameter ergänzt werden muß. Als Parameter wird dann entsprechend »EQ«, »NE« oder »/C« übergeben, der das »B« im Makro zum entsprechenden Befehl vervollständigt. Diese komfortable Art der Makroprogrammierung findet man nur bei sehr wenigen Assemblern.</p>
+
+        <p>ASSU/M hat in diesem Bereich aber noch ein paar Funktionen, die TurboAss nicht kennt: Ein Parameter kann, wie ein String in Basic, vor der Assemblierung des Makros noch analysiert werden. Als nicht gerade sinnvolles, aber dafür umso interessanteres Beispiel befindet sich auf der ASSI-Diskette ein Makro, das arithmetische Ausdrücke compilieren kann. Bei Übergabe eines Parameters wie »4+ 12x23-7« wird ein Objectcode erzeugt, der genau diese Rechenoperation ausführt. Um diese Makroprogrammierung aber sinnvoll anwenden zu können, muß man sich schon näher mit Maschinensprache-Programmierung beschäftigt haben.</p>
+
+        <p>Kurzes Fazit: Beide Assembler haben alle Standardanweisungen und dazu noch ein ganzes Paket an Extras, die andere Assembler nicht bieten. ASSI erscheint uns dabei noch komfortabler, da er einige Assemblerfunktionen mehr als TurboAss bietet, was man allerdings mit längeren Assemblierzeiten hinnehmen muß.</p>
+
+        <p>Beide Pakete werden zusammen mit einem Monitor ausgeliefert. Bei TurboAss ist es der X-MON, ein recht leistungsfähiger Monitor mit allen Standardbefehlen und eingebautem Diskmonitor. Leider fehlen beim X-MON wichtige Debugging-Befehle wie beispielsweise Trace. Dafür erhält man zum X-MON den kompletten Quelltext, so daß der Benutzer ihn an eigene Bedürfnisse anpassen und beliebig erweitern kann.</p>
+
+        <p>Zusammen mit ASSI erhält man den Demon, einen Monitor, der auch alle Standardbefehle bietet, darüberhinaus aber auf das »Debuggen« von Programmen abgerichtet ist. So bietet er verschiedene Trace-Modi und komfortable Breakpoint-Abfragen. Besonders interessant ist der Backtrace-Modus, der ein Programm schrittweise abarbeitet und in einem weiteren Speicherbereich eine Aufzeichnung der durchgeführten Schritte erstellt. Diese Aufzeichnung kann man dann später in Ruhe durchsehen und analysieren. Beim Tracen kann man sich übrigens auf dem Bildschirm die aktuellen Adressen, die oberen Bytes des Stacks und, vom Benutzer bestimmbare Adressen ständig anzeigen lassen, sodaß man stets volle Kontrolle über seine Programme hat. Ebenso komfortabel sind die User-Breakpoints, mit denen der Programmierer einen Testlauf machen kann, der unter definierten Bedingungen abgebrochen werden kann. So kann man testen, warum beispielsweise bestimmte Daten zerstört werden oder wieso eine Routine in einer Endlosschleife endet. Demon bietet noch viele weitere Analyse-Möglichkeiten, die ihn zum besten Debugging-Monitor machen, den wir kennen.</p>
+
+        <p>Mit Editor, Assembler und Monitor gaben sich die Autoren der Programme aber nicht zufrieden. Auf den jeweiligen Disketten befinden sich noch andere nützliche Programme und Routinen.</p>
+
+        <p>Bei TurboAss erhält man beispielsweise einen leistungsfähigen Re-Assembler mitgeliefert. Er kann in über 90 Prozent der Fälle korrekt zwischen Datenbytes und echtem Programm unterscheiden. Zusammen mit einem Name-Replacer, der aus einem re-assemblierten Quelltext wichtige Speicherstellen erkennt und diese gegen vernünftige Label austauscht, ist dieser Re-Assembler das ideale Werkzeug zur Analyse von Programmen, zu denen man keinen Quelltext auftreiben kann. Leider ist beim ASSY/YM kein solcher Re-Assembler enthalten.</p>
+
+        <p>Dafür gibt es beim ASSY/M umsonst eine Spezialversion, die Editor, Assembler und Monitor gekoppelt in einem Programm enthält. Diese hat aber die Tücke, das maximal bis zu 4 KByte Objektcode assembliert werden können. Dafür steigt die Arbeitsgeschwindigkeit aber gewaltig, da sämtliche Nachladezeiten von Diskette entfallen. Für kleinere Projekte ist die gekoppelte Version durchaus zu empfehlen.</p>
+
+        <p>Einer der großen Pluspunkte von ASSI sind aber die mitgelieferten Makro-Bibliotheken. Diese Bibliotheken sind eine wahre Fundgrube für jeden ambitionierten Programmierer, da er einerseits viele Tips und Tricks für den Einsatz von Makros erhält, andererseits aber auch wirklich sinnvolle Werkzeuge in die Hand bekommt. Immer noch ungeschlagen sind die Makros zur strukturierten Programmierung. Mit dieser Bibliothek kann man in Assembler mit Pascal-ähnlichen Strukturen wie REPEAT.UNTIL oder IF..ELSE..ENDIF programmieren, was einerseits die Übersicht über die Programme erhöht, andererseits aber auch das Programmieren sehr vereinfacht. Weitere Bibliotheken befassen sich mit der 16-Bit-Arithmetik und Input/Output-Routinen.</p>
+
+        <p>Sehr wichtig: Beide Programme sind nicht kopiergeschützt. Kopien des Turbo-Ass funktionieren allerdings nur mit einem mitgelieferten Schutzstecker (Dongle).</p>
+
+        <p>ASSI/M ist nach dem »Offenen Konzept« programmiert und dokumentiert worden. Für alle drei Programme werden wichtige Adreßbereiche kommentiert angegeben, so daß der Benutzer Assembler und Editor in Grenzen und den Monitor sogar komplett verändern und erweitern kann.</p>
+
+        <p>ASSI und TurboAss werden mit recht ausführlichen und verständlichen Handbüchern ausgeliefert. Sie setzen allerdings schon gute Kenntnisse der Maschinensprache-Programmierung voraus.</p>
+        <p>Einige Leser wird sicherlich interessieren, daß es den ASSI/M für fast alle Commodore-Computer, vom VC 20 bis zum CBM 8000 gibt. Nähere Informationen über die anderen Versionen erhalten Sie beim Autor, (Adresse siehe Tabelle 2).</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>TurboAss</th>
+                        <th>ASSI/M</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Editor</th>
+                        <td>Full-Screen-Editor mit eingebautem Tokeniser — nur für TurboAss-Sourcefiles verwendbar (in Assembler integriert)</td>
+                        <td>Full-Screen-Editor (FSE) für alle ASCII-Dateien.</td>
+                    </tr>
+                    <tr>
+                        <th>Monitor</th>
+                        <td>Mitgeliefert: X-MON, Monitor mit Standard-Funktionen, kompletter Quelltext zum Erweitern</td>
+                        <td>Mitgeliefert: Demon, Monitor mit allen Standard-Funktionen und sehr guten Debugging-Funktionen</td>
+                    </tr>
+                    <tr>
+                        <th>Reassembler</th>
+                        <td>Omikron-Reass mit automatischer Tabellen-Erkennung.</td>
+                        <td>kein Reassembler im Lieferumfang enthalten</td>
+                    </tr>
+                    <tr>
+                        <th>Quelltexte</th>
+                        <td>einige Demos, kompletter Quelltext zum X-MON</td>
+                        <td>ein Makro-Demo, mehrere sehr nützliche Makro-Bibliotheken für strukt. Programmieren, 16-Bit-Arithmetik und Input/Output-Funktionen</td>
+                    </tr>
+                    <tr>
+                        <th>Handbuch</th>
+                        <td>Handbuch mit Ergänzung, zusammen etwa 70 Seiten</td>
+                        <td>mehrere Handbücher (Editor, Ass., Monitor, Quelltexte) zusammen etwa 100 Seiten, Reference Card (FSE)</td>
+                    </tr>
+                    <tr>
+                        <th>Preis</th>
+                        <td>139 Mark inkl. Dongle (Schutzstecker) und Reset-Taster</td>
+                        <td>220 Mark (normal)<br>250 Mark (inkl. Editor-Erweiterung FSX)</td>
+                    </tr>
+                    <tr>
+                        <th>Bezugsquelle</th>
+                        <td>Omikron Software<br>Erlachstr. 15<br>7534 Birkenfeld 2</td>
+                        <td>Dirk Zabel<br>Stresemannstr. 50<br>1000 Berlin 61</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Das ist jeweils im Lieferumfang enthalten</figcaption>
+        </figure>
+
+        <p>Beide Assembler-Systeme haben sich schon viele Male im Praxis-Einsatz bewährt, so wurden die aktuellen Versionen mit Hilfe ihrer älteren Vorgänger programmiert. Wir können beide allen ernsthaften Programmierern empfehlen.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tabellen</th>
+                        <th>TurboAss</th>
+                        <th>ASSI/M</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Einzelne Bytes</td>
+                        <td>.byte</td>
+                        <td>.byte</td>
+                    </tr>
+                    <tr>
+                        <td>ASCII-Texte</td>
+                        <td>.text<br>.null<br>.shift</td>
+                        <td>.text</td>
+                    </tr>
+                    <tr>
+                        <td>Bildschirmcode</td>
+                        <td>—</td>
+                        <td>.scrn</td>
+                    </tr>
+                    <tr>
+                        <td>16-Bit-Worte</td>
+                        <td>.word</td>
+                        <td>.word<br>.dbyte</td>
+                    </tr>
+                    <tr>
+                        <td>Rücksprungaddr.</td>
+                        <td>.rta</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Label/Symbol-Befehle</th>
+                    </tr>
+                    <tr>
+                        <td>Label umdefinieren</td>
+                        <td>—</td>
+                        <td>.reset</td>
+                    </tr>
+                    <tr>
+                        <td>Variable definieren</td>
+                        <td>.var</td>
+                        <td>.var</td>
+                    </tr>
+                    <tr>
+                        <td>Variableninh. ändern</td>
+                        <td>.var</td>
+                        <td>.set</td>
+                    </tr>
+                    <tr>
+                        <td>Symboltabelle speichern</td>
+                        <td>(im Editor)</td>
+                        <td>.puts</td>
+                    </tr>
+                    <tr>
+                        <td>Symboltabelle laden</td>
+                        <td>—</td>
+                        <td>.gets</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Makro-Befehle</th>
+                    </tr>
+                    <tr>
+                        <td>Start Makro-Definition</td>
+                        <td>.macro</td>
+                        <td>.macro</td>
+                    </tr>
+                    <tr>
+                        <td>Start Segment-Def.</td>
+                        <td>.segment</td>
+                        <td>.segment</td>
+                    </tr>
+                    <tr>
+                        <td>Ende der Definition</td>
+                        <td>.endm</td>
+                        <td>.mend</td>
+                    </tr>
+                    <tr>
+                        <td>Analyse der Makro-Param.</td>
+                        <td>—</td>
+                        <td>&amp;len, &amp;cmp, &amp;instr</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Bedingte Assemblierung</th>
+                    </tr>
+                    <tr>
+                        <td>Bedingungen:</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>ungleich Null</td>
+                        <td>.if</td>
+                        <td>.if, .ifne</td>
+                    </tr>
+                    <tr>
+                        <td>gleich null</td>
+                        <td>.ifeq</td>
+                        <td>.ifeq</td>
+                    </tr>
+                    <tr>
+                        <td>positiv</td>
+                        <td>.ifpl</td>
+                        <td>.ifpl</td>
+                    </tr>
+                    <tr>
+                        <td>negativ</td>
+                        <td>.ifmi</td>
+                        <td>.ifmi</td>
+                    </tr>
+                    <tr>
+                        <td>Assembler-Pass 1</td>
+                        <td>—</td>
+                        <td>.ifp1</td>
+                    </tr>
+                    <tr>
+                        <td>Pass 2</td>
+                        <td>—</td>
+                        <td>.ifp2</td>
+                    </tr>
+                    <tr>
+                        <td>Ende If-Anweisung</td>
+                        <td>.endif</td>
+                        <td>.cend</td>
+                    </tr>
+                    <tr>
+                        <td>Umdrehen der Bedingung</td>
+                        <td>—</td>
+                        <td>.else</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Interaktive Assemblierung</th>
+                    </tr>
+                    <tr>
+                        <td>Ausgabe eines Textes</td>
+                        <td>—</td>
+                        <td>.prnt</td>
+                    </tr>
+                    <tr>
+                        <td>Eingabe eines Symbolwertes</td>
+                        <td>—</td>
+                        <td>.inpt</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Assemblerschleifen</th>
+                    </tr>
+                    <tr>
+                        <td>Start der Schleife</td>
+                        <td>.lbl</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>Rücksprung</td>
+                        <td>.goto</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Listing-Ausgabe</th>
+                    </tr>
+                    <tr>
+                        <td>Listing ausgeben</td>
+                        <td>.pron</td>
+                        <td>.pron</td>
+                    </tr>
+                    <tr>
+                        <td>Listing nicht ausgeben</td>
+                        <td>.proff</td>
+                        <td>.prof</td>
+                    </tr>
+                    <tr>
+                        <td>Symboltabelle ausgeben</td>
+                        <td>(im Editor)</td>
+                        <td>.syms</td>
+                    </tr>
+                    <tr>
+                        <td>Symbolt. nicht ausgeben</td>
+                        <td>—</td>
+                        <td>.nosy</td>
+                    </tr>
+                    <tr>
+                        <td>Makros in voller Länge ausg.</td>
+                        <td>.showmac</td>
+                        <td>.xpnd</td>
+                    </tr>
+                    <tr>
+                        <td>nur Makroaufruf ausg.</td>
+                        <td>.hidemac</td>
+                        <td>.noxp</td>
+                    </tr>
+                    <tr>
+                        <td>Leerzeichen ausg.</td>
+                        <td>—</td>
+                        <td>.skip</td>
+                    </tr>
+                    <tr>
+                        <td>Seitenvorschub</td>
+                        <td>—</td>
+                        <td>.page</td>
+                    </tr>
+                    <tr>
+                        <td>Seitenlänge definieren</td>
+                        <td>—</td>
+                        <td>.plen</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Sonstiges</th>
+                    </tr>
+                    <tr>
+                        <td>Block öffnen</td>
+                        <td>.block</td>
+                        <td>.blck</td>
+                    </tr>
+                    <tr>
+                        <td>Block schließen</td>
+                        <td>.bend</td>
+                        <td>.bend</td>
+                    </tr>
+                    <tr>
+                        <td>Assembl. beenden</td>
+                        <td>.end</td>
+                        <td>.end</td>
+                    </tr>
+                    <tr>
+                        <td>Offset</td>
+                        <td>.offs</td>
+                        <td>.offs</td>
+                    </tr>
+                    <tr>
+                        <td>mit neuem File weiterassemblieren</td>
+                        <td>—</td>
+                        <td>.file</td>
+                    </tr>
+                    <tr>
+                        <td>Sourcecode von Disk einf.</td>
+                        <td>.include</td>
+                        <td>.lib</td>
+                    </tr>
+                    <tr>
+                        <td>Objectcode von Disk einf.</td>
+                        <td>—</td>
+                        <td>.link</td>
+                    </tr>
+                    <tr>
+                        <td>neues Objektfile beginnen</td>
+                        <td>—</td>
+                        <td>.nobj</td>
+                    </tr>
+                    <tr>
+                        <td>eigene Fehlermeldung ausg.</td>
+                        <td>—</td>
+                        <td>.perr</td>
+                    </tr>
+                    <tr>
+                        <td>Umschaltung CBM-ASCII — »echtes« ASCII</td>
+                        <td>—</td>
+                        <td>.cset</td>
+                    </tr>
+                    <tr>
+                        <td>Standard-Zahlenbasis setzen</td>
+                        <td>—</td>
+                        <td>.base</td>
+                    </tr>
+                    <tr>
+                        <td>Prüfsumme Objectcode berechn.</td>
+                        <td>—</td>
+                        <td>.csum</td>
+                    </tr>
+                    <tr>
+                        <td>ASSI-spezifische Syntax-Schalter</td>
+                        <td></td>
+                        <td>.mold, .mnew<br>.bold, .bnew</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Gegenüberstellung der Assembler-Anweisungen</figcaption>
+        </figure>
+
+
+
+        <h2>Kleines Assembler-Lexikon: TurboAss- und ASSI/M-Besonderheiten</h2>
+
+        <p>Block — Ein Block ist ein lokaler Abschnitt eines Quelltextes. Alle Label und Symbole, die innerhalb eines Blocks definiert werden, sind außerhalb dieses Blocks unbekannt. Ein und dasselbe Label kann also, je nach Block, verschiedene Adressen kennzeichnen.</p>
+
+        <p>Bedingte Assemblierung — Ein Teil des Quelltextes wird nur dann assembliert, wenn bestimmte Bedingungen erfüllt sind. Sinnvoll insbesondere bei Makros, die sich selber aufrufen und bei Programmen, die während des Assemblierens an bestimmte Systeme angepaßt werden sollen.</p>
+
+        <p>Interaktive Assemblierung — Möglichkeit der Eingabe von Werten während des Assembliervorgangs. Der Quelltext kann also ohne Editor nachträglich vom Benutzer in Grenzen geändert werden. Sinnvoll, wenn ein und dieselbe Routine mehrere Male kurz hintereinander mit kleinen Änderungen assembliert werden soll.</p>
+
+        <p>Assemblerschleifen — Ein und dieselbe Befehlsfolge muß mehrere Male hintereinander im Objectcode stehen. Die Schleife assembliert den entsprechenden Quelltext also mehrmals hintereinander. Nützlich beispielsweise für schnelle Busroutinen.</p>
+
+        <p>Variable — Label, die immer neue Werte zugewiesen bekommen können. Nützlich beispielsweise als Zähler bei Makros, die sich selber aufrufen.</p>
+
+        <address class="author">(bs)</address>
+    </article>
+</body>
+
+</html>
