@@ -446,3 +446,32 @@ right source before touching anything, and when unsure, leave it.
   `internsiv` regression: a sub-agent claimed verbal verification it
   never ran, and a print typo was "corrected" into something the print
   never said.
+
+## End-of-issue gate: the coverage check
+
+Before an issue is called finished, run the omission gate:
+
+```bash
+tools/img/scan2ocr/rules/r030_coverage_check.py issues/<YYMM> <ocr-out-dir>
+```
+
+Every block the classifier kept must appear in the article claiming its page.
+Investigate each `UNACCOUNTED` hit and record the disposition — a hit is either
+content that was dropped, or an explainable false positive (a restored drop-cap,
+a deliberately deleted duplicate, a table whose cells now split the text).
+
+This exists because **omission is the one defect class that reads as correct.**
+Every other check in the chain — spell-checks, markup greps, beautify, tag
+balance, the build — passes cleanly on an article that is missing a paragraph, a
+table, a heading or its last line. 8609 shipped with all four before a
+page-by-page read found them, and reading every page by hand does not scale.
+
+Two cheaper companions worth running at the same time:
+
+- **page coverage**: every page in the issue is claimed by an article, or is
+  knowingly an ad / classifieds page. Gaps are missing articles; the annual
+  `Jahresinhaltsverzeichnis` gives the authoritative page range per article and
+  caught two understated ranges in 8609 (71-74, 82-84).
+- **dangling cross-references**: text that says `Bild 3` / `Tabelle 2` /
+  `Listing 4` while the article has no such caption. A reference with no target
+  usually means the figure and its caption were dropped together.
