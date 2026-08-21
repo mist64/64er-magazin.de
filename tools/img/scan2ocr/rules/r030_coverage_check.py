@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Reconcile the OCR blocks the CLASSIFIER KEPT against the published HTML.
 
 Stage B (r020) decides which blocks on a page are article content and records
