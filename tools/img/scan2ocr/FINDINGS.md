@@ -65,7 +65,8 @@ on **paper**; on a tint the region is always re-read.
 |---|---|---|
 | paragraph opening | first-line indent | **+31 to +35 px**; continuation lines 0 ± 2 |
 | line beside a drop cap | same | **+121 px** — indented, but *not* a new paragraph |
-| bold run-in subhead | ink coverage in the line's box | **0.401 / 0.427 / 0.522** against 119 body lines whose median is 0.248 and whose **maximum** is 0.311 |
+| bold subhead | **stroke weight** — mean length of a horizontal ink run — against the block's own median line | body-weight lines **0.80–1.40×**, genuinely bold lines **1.74–3.93×**, over all 176 pages. Empty gap; the gate sits at 1.6 |
+| standalone subhead vs bold **run-in** term | how many of the line's words are bold | a glossary run-in (`**Portbaustein** — Siehe CIA.`) is bold in **0.33–0.50** of its words; every true subhead in the issue, in **1.00** |
 | listing vs prose | digit density | hex dump **0.50 / 0.63**; every body block on 7 pages **0.00–0.10** |
 | section bar | unbroken dark run + height | ~52 px tall; sheet-edge shadow 11–15 px; hairline rule ~8 px |
 | source note | line height vs the page's own **median body** line height | **below 0.85×** is uniformly a source note — 46 blocks of 969, the `Info:` lines clustering at **0.66–0.67**. The 0.85–0.95 band is ordinary body, including 26- and 28-line blocks on p145. |
@@ -74,6 +75,30 @@ on **paper**; on a tint the region is always re-read.
 space above it — is false here: `Zielblock` measures **0.81** of the block's line
 pitch and `Spritenummer` **0.98**. The compositor set them tight. Boldness works;
 leading does not.
+
+**Ink coverage is not boldness.** The first version of the subhead test measured
+ink coverage inside the line's own bounding box, and it was calibrated on p58,
+where every line is a full justified measure. On a **short** line that measure is
+inflated by two things that say nothing about weight: a one- or two-word line
+carries no inter-word spaces (in justified body type those are stretched to ~15 %
+of the box) and a line with no descenders has a box 20–30 % shorter. Together
+they lift plain body type to **1.35–1.65×** the block median — through the 1.35
+gate that was meant to catch display type. That is where every false heading in
+the corpus came from: `Puffern` 1.50, `MHz.` 1.65, `8000.` 1.46, `Tabellen` 1.41
+— all of them a paragraph's orphan line at the foot of a column. No threshold
+separates them, because true subheads measure 1.74–2.58 on the same scale and the
+two ranges interleave. Stroke weight is immune to both effects and separates them
+cleanly (§3). **51 of the corpus's 80 `###` were this bug.**
+
+**A face change opens a paragraph; it does not open one per line.** Applied per
+line, the bold test cut p54's seven-line standfirst into seven paragraphs and
+p137's two-line headline into two, and `SUBHEAD_MAX_LINES` then promoted
+whichever fragment happened to stand alone. Inside a bold run the short lines,
+hanging indents and leading are the compositor breaking **lines**; the leading
+test in particular is being asked about the wrong type, since the pitch it
+compares against is the block's median and the block holds a 62 px standfirst
+above 42 px body. A run ends where the face changes back, and that is its only
+boundary.
 
 The source-note ratio is taken **per page** (type size varies between pages) and
 from the **median** (so one odd block cannot move it). A useful side effect: the
