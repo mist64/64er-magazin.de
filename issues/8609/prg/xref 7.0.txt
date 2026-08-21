@@ -1,7 +1,5 @@
-
-
 ;xref 7.0.prg ==1c01==
-;vor Fehlerteufelchen 1/1987
+;inkl. Fehlerteufelchen 1/1987 (Zeilen 710, 720, 1125, 1130, 1150, 1272, 1273)
    10 rem *******************
    20 rem *     xref 7.0    *
    30 rem *******************
@@ -144,14 +142,18 @@
   685 ifdv%=4then720
   690 print"{down}{rvon}n{rvof}ochmals/{rvon}w{rvof}eiter"
   700 geta$:ifa$<>"n"anda$<>"w"then700
-  710 ifa$="n"then580
+;vor Fehlerteufelchen 1/1987
+; 710 ifa$="n"then580
+  710 ifa$="n"thenclose1:goto580
   712 :
   714 :
   715 rem ************************
   716 rem  pass 2 variable suchen
   718 rem ************************
   719 :
-  720 ifzt%andzzu%then1310
+;vor Fehlerteufelchen 1/1987
+; 720 ifzt%andzzu%then1310
+  720 ifzt%andzu%then1310
   725 print"{clr}pass 2 (suchen der variablen) {down}"
   730 dopen#1,(na$+",p,r"),d0,u8:ifds>0then1300
   735 gosub120
@@ -238,14 +240,20 @@
  1100 ifa$="{up}"theni=i-1:ifi<2theni=va
  1105 ifa$="e"then1180
  1110 ifa$<>chr$(13)then1070
- 1125 print"{down}{down}      ";:forj=1to25:print"{CBM-U}";:next:print:print"{up}{up}text: ";
+;vor Fehlerteufelchen 1/1987
+; 1125 print"{down}{down}      ";:forj=1to25:print"{CBM-U}";:next:print:print"{up}{up}text: ";
+ 1125 print"{down}{down}      ";:forj=1to23:print"{CBM-U}";:next:print:print"{up}{up}text: ";
  1126 iflen(va$(i))>57thenbegin
  1127 : printmid$(va$(i),57)
  1128 : print"{up}"tab(6);
  1129 bend
- 1130 open1,0:input#1,te$:print:close1:te$=left$(te$,25)
+;vor Fehlerteufelchen 1/1987
+; 1130 open1,0:input#1,te$:print:close1:te$=left$(te$,25)
+ 1130 open1,0:input#1,te$:print:close1:te$=left$(te$,23)
  1140 print"{up}"ll$:printll$
- 1150 ifte$<>left$(le$,25)thenva$(i)=left$(va$(i)+le$,57)+te$
+;vor Fehlerteufelchen 1/1987
+; 1150 ifte$<>left$(le$,25)thenva$(i)=left$(va$(i)+le$,57)+te$
+ 1150 ifte$<>left$(le$,23)thenva$(i)=left$(va$(i)+le$,57)+te$
  1160 goto1070
  1175 rem ******************
  1176 rem  ausgabe variable
@@ -262,8 +270,12 @@
  1269 print#1:print#1:print#1,"variablenliste ohne zeilennummer"
  1270 print#1,"---------------------------------"
  1271 fori=2tova
- 1272 iflen(va$(i))>70thenprint#1,left$(va$(i),8);right$(va$(i+1),25):goto1275
- 1273 ifleft$(va$(i+1),4)=left$(va$(i),4)then1275
+;vor Fehlerteufelchen 1/1987
+; 1272 iflen(va$(i))>70thenprint#1,left$(va$(i),8);right$(va$(i+1),25):goto1275
+ 1272 iflen(va$(i))>70thenprint#1,left$(va$(i),8);mid$(va$(i),57):goto1275
+;vor Fehlerteufelchen 1/1987
+; 1273 ifleft$(va$(i+1),4)=left$(va$(i),4)then1275
+ 1273 ifleft$(va$(i-1),4)=left$(va$(i),4)then1275
  1274 print#1,left$(va$(i),8)
  1275 nexti
  1280 goto1310
