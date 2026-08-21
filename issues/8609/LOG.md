@@ -102,9 +102,13 @@ Note: `Fehlerteufelchen.md` records the XREF 7.0 target as *Ausgabe 9/86, Seite
   **pre-correction** version; all seven corrected lines differ. Marked
   `;vor Fehlerteufelchen 1/1987`.
 
-  **OPEN — needs the user's sign-off.** The user has asked for the erratum to be
-  applied, keeping each superseded line as a `;` comment. Not done yet: the
-  1/87 errata text must be re-read at high magnification first (one line,
-  `zzu%` vs `ZU%`, is already suspect), and the patched listing must be run in
-  x128 before it is committed. Until then the aside on `71` carries no
-  disposition comment rather than a false one.
+  **APPLIED** at the user's request. All seven lines re-read at 3x on a 400 dpi
+  render of the 1/87 errata page, each superseded line kept as a `;` comment in
+  the 8607 style, header now `;inkl. Fehlerteufelchen 1/1987 (Zeilen 710, 720,
+  1125, 1130, 1150, 1272, 1273)`. The suspect `zzu%` is confirmed a genuine bug:
+  the program sets `zu%` at line 308 and tests it at 1268, so line 720's
+  `zzu%` was an undeclared variable — always zero, so that branch never fired.
+  Verified: tokenises as BASIC 7.0 at $1C01, petcat round-trip byte-exact (0 of
+  267 lines differ), loads and runs on a C128 without error. A full functional
+  test is not possible here — XREF prompts for a filename on the 80-column
+  screen and this VICE build cannot inject keystrokes.
