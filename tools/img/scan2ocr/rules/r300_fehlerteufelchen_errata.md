@@ -364,3 +364,37 @@ transposed; `prg/ean-codes.txt` line 85 already reads
 So: add the aside (it records what the printed listing got wrong), and **do not
 touch the `.txt`**. Only when the disk file also carries the error is there a
 listing to repair, and that is a separate decision.
+
+## Record the errata state in the listing's own `;` header
+
+The `.txt` listings carry a `;` comment block after the `;name.prg ==addr==`
+header, and the corpus already has a settled vocabulary for errata state. Use
+it — do not invent wording, and do not leave the state unrecorded:
+
+```
+;vor Fehlerteufelchen 1/1987
+;inkl. Fehlerteufelchen 8/1986 (Zeile 20; Disk-Version bereits korrigiert)
+;inkl. Fehlerteufelchen 9/1986 (Zeile 230; Zeile 190 in der Disk-Version bereits korrigiert)
+;Zeile 391 neu entspr. Fehlerteufelchen 4/1986
+;Fehlerteufelchen 2/1985 (Zeile 3040) wurde darauf angewandt
+```
+
+So the two branches both have a home:
+
+- **the disk already carries the fix** → `;inkl. Fehlerteufelchen N/YYYY (Zeile
+  X; Disk-Version bereits korrigiert)`, and the `.txt` is left untouched
+- **the disk is the pre-correction version** → `;vor Fehlerteufelchen N/YYYY`,
+  and the `.txt` is left as the disk shipped; or, if the correction is applied,
+  `;Zeile X neu entspr. Fehlerteufelchen N/YYYY` naming each changed line
+
+Default to recording rather than patching: readers typed these programs from the
+disk, so the disk state is the historical fact and the aside on the article
+already documents what the print got wrong. Patch only deliberately, and then
+say which lines changed.
+
+Placement is after the `==addr==` header, before the first program line
+(`8607/prg/farbenspiel.txt` is the model).
+
+The other `;` forms in use, worth preserving when they exist: `;Quelle: <disk or
+URL>`, `;Eingetippt von <name>`, `;version=simons`, `;*** Machine language part
+skipped. ***`.
