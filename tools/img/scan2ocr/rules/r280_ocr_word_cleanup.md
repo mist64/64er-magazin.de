@@ -571,3 +571,27 @@ indents the remainder. That is typography, not program structure — join it:
 
 This applies even when the wrap falls inside a string literal (p61's line 420
 breaks between `H2$+"` and `"+MID$`).
+
+## Model names always carry a space
+
+`C 64`, `C 128`, `C 16`, `C 116`, `Plus/4` — the magazine sets a space in the
+model name, and the OCR frequently loses it (`C64`, `C128`). Normalise, but run
+it as a **verify pass against the page, not a blind replace**: where the print
+genuinely omits the space, the print wins (period typos stay).
+
+## Bold lead-ins are content, not headings
+
+Glossary-style paragraphs set their opening term in bold and continue in body
+text on the same line (`**Quartz (18)** — Damit das System …`). Two failure
+modes, both in 8609's `124 Wie funktioniert ein Computer?`: the bold is dropped
+entirely (term arrives as plain text), or the whole line is promoted to a
+heading. Wrap the bolded run in `<strong>` and keep the paragraph a paragraph —
+the sibling entries show which it should be.
+
+## Listing/prose separation inside a paragraph
+
+A monospace program line is often glued to the prose around it:
+`POKE 2088,1:POKE 2100, 252 Jetzt endlich können Sie …` is a `<pre>` line
+followed by a new sentence. Split at the boundary where the typeface changes in
+print, and mind that the OCR also inserts a space inside the numeric argument
+(`2100, 252` for `2100,252`).

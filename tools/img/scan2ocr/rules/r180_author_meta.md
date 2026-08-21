@@ -271,3 +271,29 @@ Sweep for it — 8609 had three that survived every other pass, including one
 inside a `Lebenslauf` box and one where the OCR ate the slash
 (`(Andreas Tschescheftr)` for `(Andreas Tschesche/tr)`). Exception: the
 Impressum body legitimately contains `Name (xx)` as masthead text.
+
+## A missing byline means LOOK AT THE PAGE — a line is probably missing
+
+Do not conclude "unsigned" from the HTML. In this corpus a missing byline is
+usually a symptom: the OCR dropped the article's **last line**, and the byline
+went with it. Two 8609 cases:
+
+- `96 »Hardmaker« für Epson` ended `…die neue Version des Hardmaker` — the print
+  continues `speichern.` and then `(M. Wilhelm/og)` on the same line, right-set.
+- `34 Punkt für Punkt` ended `…in der letzten Spalte.` with the printed `(do/aw)`
+  simply absent from the HTML.
+
+So: for every article with no `<address class="author">`, render the last page
+and read the end of the text. Only after seeing the printed page end without a
+signature may the article be treated as a Case B unsigned rubric.
+
+The byline is often set flush right on the same line as the closing sentence,
+which is why the OCR either loses it or glues it to the paragraph.
+
+## Check every editor abbreviation against the ones already seen
+
+Editor initials are a small closed set per era. Before accepting a new one,
+grep the published issues for it. `(Holger Brömmelsiek/t` is not an
+abbreviation, it is a truncated `/bj`; `(Andreas Tschescheftr)` is `/tr` with
+the slash eaten. An abbreviation that appears exactly once in an issue and
+nowhere in the corpus is almost always an OCR artefact, not a new editor.

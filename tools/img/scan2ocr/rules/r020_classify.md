@@ -84,3 +84,24 @@ truth re-bases every number.
 **Verify on all 176, never on the handful that motivated the change.** Two rules
 in this pipeline's history looked perfect on their test pages and were reverted
 after a full sweep; the numbers are in `FINDINGS.md`.
+
+## Known false positive: a paragraph's orphan line labelled as a heading
+
+When the print leaves a short final (or initial) line of a paragraph alone in
+the column, the segmenter makes it its own block and the classifier labels it
+`heading`/`title`; step 030 then writes it into the Markdown as `### …`, and it
+reaches the article as an `<h3>`.
+
+The signature is that the "heading" is the **grammatical continuation** of the
+neighbouring paragraph. From 8609: `### Puffern` (…werden in den Puffern),
+`89 Mark.`, `MHz.`, `128.`, `8000.`, `Codes drucken kann, zeigt dieses
+Programm.`, plus a BASIC continuation line (`LB = BY-HB*256`) and a layout
+pointer (`Listing und Beschreibung ab Seite 54`).
+
+Real headings in this magazine are set in a heavy sans display face,
+noticeably larger than body text; the false positives are body-face text at
+body size. Word count is NOT the discriminator — `HiRes Colossal` (2 words) is
+a real heading on the same page where `Puffern` (1 word) is not.
+
+Until the classifier distinguishes them, step 290 must catch the residue: see
+its "A heading that is really a paragraph tail" section.
