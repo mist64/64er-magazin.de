@@ -78,3 +78,26 @@ Three later issues correct 9/86 articles; asides added from
 
 Note: `Fehlerteufelchen.md` records the XREF 7.0 target as *Ausgabe 9/86, Seite
 25*; the printed page reads **Seite 71**, which is where XREF 7.0 actually is.
+
+## Deliberate deviations from print
+
+- **`148 Wettstreit der Assembler`** — p150 sets a single heading *"Kleines
+  Assembler-Lexikon: TurboAss- und ASSI/M-Besonderheiten"* over the Lexikon
+  box. The second half belongs to the two comparison tables, not to the box.
+  Split: `<h2>TurboAss- und ASSI/M-Besonderheiten</h2>` now sits above the
+  tables and the aside keeps `Kleines Assembler-Lexikon`. Marked in the file at
+  both ends. Do not restore the printed form.
+
+## Errata state of the listings
+
+- **`prg/ean-codes.txt`** (Bar-Codes, erratum 11/86 p99) — the disk already
+  carries the corrected line 85. Recorded in the file's `;` header as
+  `;inkl. Fehlerteufelchen 11/1986 (Zeile 85; Disk-Version bereits korrigiert)`.
+- **`prg/viza.key.prg`** (Vizawrite Teil 9, erratum 10/86 p80) — **the disk
+  binary is already the corrected version.** All five corrected rows from the
+  printed erratum match byte for byte at $033C, $034C, $0354, $035C and $0364
+  (load $033C, 150 bytes, end $03D1). Nothing to patch. A `.prg` cannot carry a
+  `;` header, so the record is here plus the aside on the article.
+- **`prg/xref 7.0.txt`** (XREF 7.0, erratum 1/87) — the disk is the
+  **pre-correction** version; all seven corrected lines differ. Marked
+  `;vor Fehlerteufelchen 1/1987`.

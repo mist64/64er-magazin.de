@@ -475,3 +475,57 @@ Two cheaper companions worth running at the same time:
 - **dangling cross-references**: text that says `Bild 3` / `Tabelle 2` /
   `Listing 4` while the article has no such caption. A reference with no target
   usually means the figure and its caption were dropped together.
+
+## Deliberate deviations from print must be marked in place
+
+The standing rule is that the printed page wins, and every review pass is told
+so. That makes an intentional departure fragile: the next pass verifies against
+the page, sees a mismatch, and faithfully undoes it.
+
+So when the editor decides to depart from the print — a typesetting error worth
+correcting rather than preserving — record it **in the file, at the point of
+the change**, as an HTML comment saying what the print has and that the
+difference is intentional:
+
+```html
+<!-- deviates from print, deliberately: p150 sets one heading
+     "Kleines Assembler-Lexikon: TurboAss- und ASSI/M-Besonderheiten"
+     over the Lexikon box, but the second half belongs to these two
+     tables. Split here; do not "restore" it to the printed form. -->
+```
+
+Mark both ends when the change moves text between two places, so whichever end a
+reviewer looks at first explains itself. Note it in the issue's `LOG.md` too.
+
+This is the counterpart to preserving genuine print typos: `eröfffnet`,
+`Machin Lightning` and `WOUTP x10,y10` stay because nobody decided otherwise —
+a deviation only exists where someone deliberately made one, and then it needs
+to be legible as such.
+
+## Never declare an issue complete without the user signing off
+
+An issue is finished when **the user says it is**, not when the checks pass.
+The rule chain, r310, the coverage gate and a green build together establish
+that nothing *detectable* is outstanding — they do not establish that the issue
+is right. Every substantive defect class in 8609 was found by a human looking
+at a page after the automated checks were already green.
+
+So: report status, list what is still open, and wait. Do not write "the issue is
+complete" or upload on your own judgement.
+
+## Changing a listing ALWAYS goes to the user first
+
+`prg/*.txt` are the programs readers typed in. Editing one — applying an
+erratum, correcting a line, renumbering — is not a markup fix and is never
+routine:
+
+- **Tell the user before doing it, and show the exact before/after lines.**
+- Record it in the file's `;` header in the corpus vocabulary (see r300), so
+  the change is legible to the next reader.
+- Keep the superseded line as a `;` comment rather than deleting it, so the
+  disk's original state is recoverable from the file itself.
+- **Test the result** — the listing must still load and run. See r320 for the
+  x128 harness.
+
+The default remains: record the errata state, do not patch. Patch only when the
+user asks for it.

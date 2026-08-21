@@ -398,3 +398,18 @@ Placement is after the `==addr==` header, before the first program line
 The other `;` forms in use, worth preserving when they exist: `;Quelle: <disk or
 URL>`, `;Eingetippt von <name>`, `;version=simons`, `;*** Machine language part
 skipped. ***`.
+
+## Binary listings: check the bytes, record in LOG.md
+
+An MSE/machine-code listing is stored as a `.prg`, which cannot carry a `;`
+header. Two consequences:
+
+1. **Check the bytes directly** rather than guessing. The printed erratum gives
+   the corrected rows with their addresses; read the `.prg`'s load address from
+   its first two bytes and compare each row. 8609's `viza.key.prg` matched the
+   10/86 erratum at all five addresses, so the disk had shipped corrected and
+   there was nothing to patch — settled in one command, no judgement needed.
+2. **Record the finding in the issue's `LOG.md`**, since the file itself cannot
+   hold the note. The `<aside class="fehlerteufelchen">` on the article still
+   carries what the print got wrong; the LOG entry carries what the disk state
+   is.
