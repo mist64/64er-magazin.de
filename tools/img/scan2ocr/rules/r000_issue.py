@@ -92,7 +92,7 @@ REQUIRED_KEYS = ("id", "kind", "binding", "pages", "scan_dir", "thumb_150",
 # ...and the ones that may be absent or null.  `colors` is the measured colour
 # profile for the sheet; without it the grade falls back to its built-in anchor
 # set, so an issue with no profile still renders.
-OPTIONAL_KEYS = ("colors",)
+OPTIONAL_KEYS = ("colors", "masters600")
 
 # `kind` is editorial (it decides how the issue is titled and dated downstream),
 # `binding` is mechanical: it selects which variant of step 005 runs, and the
@@ -113,6 +113,14 @@ BINDINGS = ("spread",   # the frame holds a clipped SPREAD  -> r005_masters_spre
 # of scan2mrc's several master renderings", a distinction that no longer exists
 # now that step 005 owns everything between the raw scan and r010's input.
 MASTERS_SUBDIR = "masters600"
+
+# ...with ONE escape hatch, `masters600` in the descriptor.  8609's masters were
+# rendered years before step 005 existed and sit in the old scan2mrc layout at
+# <tmp>/master600/final.  Re-rendering 176 pages to satisfy a directory name
+# would be silly, and worse, it would make the "8609 is unchanged" gate compare
+# new pixels against an old corpus -- the gate's whole point is that the pixels
+# did NOT move.  So an issue may name the directory its masters already live in.
+# New issues never set this; they get the derived path and step 005 fills it.
 
 # The OCR working directory and everything in it.  OUT_DIR is a working
 # directory -- json, digests, per-page tsv leftovers, two kinds of overlay --
@@ -166,7 +174,8 @@ class Issue:
         self.pdf_path = os.path.join(issue_dir, self.pdf)
 
         # --- the derived working layout --------------------------------------
-        self.masters600 = os.path.join(self.tmp, MASTERS_SUBDIR)
+        override = d.get("masters600")
+        self.masters600 = override or os.path.join(self.tmp, MASTERS_SUBDIR)
         self.ocr_dir = os.path.join(self.tmp, OCR_SUBDIR)
         self.out_dir = os.path.join(self.ocr_dir, OUT_SUBDIR)
         self.truth_dir = os.path.join(self.ocr_dir, TRUTH_SUBDIR)
