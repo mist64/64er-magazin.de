@@ -30,6 +30,33 @@ markdown -G \
 # never a copyright sign. Legitimate © (e.g. Impressum) stays via its
 # UTF-8 character.
 rm -f "$tmp"
+
+# Post-pass: Discount emits INVALID nesting for a fenced code block —
+# it opens a <p>, puts the <pre> inside it, and then swallows the whole
+# following paragraph into the same <p>:
+#
+#   <p><pre><code>CODE
+#   </code></pre>
+#
+#   Next paragraph.</p>
+#
+# The paragraph break after the listing is lost, which is why prose kept
+# arriving glued to the end of a code block. Indented code blocks do NOT
+# have this problem, only fenced ones (+fencedcode), and it is independent
+# of -G. Issue 8609 had 19 occurrences.
+python3 - "$out" <<'UNWRAP'
+import io, re, sys
+p = sys.argv[1]
+s = io.open(p, encoding="utf-8").read()
+
+def fix(m):
+    pre, tail = m.group(1), m.group(2).strip()
+    return pre + ("\n\n<p>" + tail + "</p>" if tail else "")
+
+s, n = re.subn(r"<p>(<pre><code>.*?</code></pre>)(.*?)</p>", fix, s, flags=re.S)
+io.open(p, "w", encoding="utf-8").write(s)
+print(f"  unwrapped {n} <p><pre> nestings (Discount fenced-code bug)")
+UNWRAP
 echo "wrote $out  ($(wc -l < "$out") lines)"
 # Replace the .md with the .html in git: drop the source, stage the result.
 # Tolerant on first run (md may not be tracked yet).

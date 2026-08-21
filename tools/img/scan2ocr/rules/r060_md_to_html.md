@@ -44,11 +44,47 @@ construct is almost never a list:
 So: `<ol type="a">` in a converted file is a **bug signature**, not a style.
 Grep for it after conversion and check every hit against the print.
 
+## Discount emits invalid nesting for fenced code — the post-pass is mandatory
+
+This is the root cause of the "prose glued to the end of a listing" defect.
+Given well-formed Markdown:
+
+```
+Beispiel:
+
+​```
+CODE
+​```
+
+Nächster Absatz.
+```
+
+Discount produces:
+
+```html
+<p><pre><code>CODE
+</code></pre>
+
+Nächster Absatz.</p>
+```
+
+The `<pre>` is put *inside* a `<p>`, and the following paragraph is swallowed
+into the same `<p>` — so the paragraph break after every listing is lost, and
+the prose arrives glued to the code. Independent of `-G`; **indented** code
+blocks are fine, only fenced ones (`+fencedcode`) do this. Issue 8609 had 19
+occurrences, which surfaced as `54`'s ESC table, `82`'s SYS line, `58`'s
+Shrinksprite parameters, `96`'s POKE line and six in `135`.
+
+`r060_md_to_html.sh` therefore runs a post-pass that rewrites
+`<p><pre>…</pre>TAIL</p>` into `<pre>…</pre>` + `<p>TAIL</p>`.
+
 ## Verification
 
 - A literal `(\*\*\*)` in the .md renders as `(***)` in the HTML.
 - A line ending in a single LF inside a paragraph becomes `…<br/>` in the HTML.
 - `**bold**` becomes `<strong>bold</strong>`.
+- **No `<p><pre>` anywhere**: `grep -c '<p>\s*<pre>' issues/<YYMM>/*.html` → 0.
+  A hit means the fenced-code post-pass did not run.
 - **No `<ol type="a">` anywhere**: `grep -c 'ol type="a"' issues/<YYMM>/*.html` → 0.
   A hit means an abbreviated forename or an OCR'd `1.` was parsed as a list marker
   and its first token deleted.

@@ -65,24 +65,21 @@
 
         <p>Nach diesen Erläuterungen nun ein Beispiel, wie Sie die 16 KByte des Video-Speichers ansprechen können:</p>
 
-        <p>
-        <pre><code>10 AR=54784 REM Auswahl-Register  
-20 EA=54785 REM Ein-/Ausgabe-Reg.  
-30 AD=80 REM Adresse (2. Zeile)  
+        <pre><code>10 AR=54784               REM Auswahl-Register
+20 EA=54785               REM Ein-/Ausgabe-Reg.
+30 AD=80                  REM Adresse (2. Zeile)
+40 H=INT(AD/256)          REM High berechnen
+50 L=AD-H*256             REM Low berechnen
+60 POKE AR,18:POKE EA,H   REM High-Adr.
+70 POKE AR,19:POKE EA,L   REM Low-Adr.
+80 GETKEY A$:?CHR$(147)   REM Zeichen-Eingabe
+90 D=ASC(A$)AND 63        REM in Bildschirm-Code
+100 POKE AR,31:POKE EA,D  REM ins DATA-Register
+110 POKE AR,30:POKE EA,1  REM Wort-Zaehler = 1
+120 GOTO 60               REM erneut
 </code></pre>
 
-        <pre><code>40 H=INT (AD/256) REM High berechnen  
-50 L=AD-H*256 REM Low berechnen  
-60 POKE AR,18:POKE EA,H REM High-Adr.  
-70 POKE AR,19:POKE EA.L REM Low-Adr.  
-80 GETKEY A$:?CHR$ (147) REM Zeichen-Eingabe  
-90 D=ASC(A$) AND 63 REM in Bildschirm-Code  
-100 POKE AR,31:POKE EA,D REM ins DATA-Register  
-110 POKE AR,30:POKE EA,1 REM Wort-Zaehler = 1  
-120 GOTO 60 REM erneut  
-</code></pre>
-
-        In den ersten beiden Zeilen werden die Adressen des Register- und Ein/Ausgabe-Bytes definiert. Mit der Variablen AD legt das Programm die Zieladresse fest. Wie eingangs erwähnt, umfaßt das RAM des VIC 16 KByte. Da sich mit einem Byte jedoch nur 256 Speicherzellen adressieren lassen, sind — um den vollständigen Speicherbereich anzu- . sprechen — zwei Bytes nötig. Mit dem ersten Wert erfolgt im Grunde eine grobe Annäherung in Sprüngen zu je 256 Bytes (High-Byte). Den verbleibenden Rest bezeichnet man als Low-Byte. In den Zeilen 60 und 70 werden diese Werte in die Adreßregister gePOKEt. Der erste POKE wählt das Register an, der zweite beschreibt anschließend dieses Register.</p>
+        <p>In den ersten beiden Zeilen werden die Adressen des Register- und Ein/Ausgabe-Bytes definiert. Mit der Variablen AD legt das Programm die Zieladresse fest. Wie eingangs erwähnt, umfaßt das RAM des VIC 16 KByte. Da sich mit einem Byte jedoch nur 256 Speicherzellen adressieren lassen, sind — um den vollständigen Speicherbereich anzu- . sprechen — zwei Bytes nötig. Mit dem ersten Wert erfolgt im Grunde eine grobe Annäherung in Sprüngen zu je 256 Bytes (High-Byte). Den verbleibenden Rest bezeichnet man als Low-Byte. In den Zeilen 60 und 70 werden diese Werte in die Adreßregister gePOKEt. Der erste POKE wählt das Register an, der zweite beschreibt anschließend dieses Register.</p>
 
         <p>In den Zeilen 80 und 90 folgt nun eine Eingabe, die (mit AND 63) in den Bildschirmcode umgewandelt wird. Das Zeichen landet anschließend im Daten-Register (30). Über diese Adresse erfolgen alle Ein- und Ausgaben des Video-Speichers. Mit der letzten Zeile wird dann das Wortzähler-Register angesprochen. Dies legt einerseits fest, wie oft das Zeichen im Daten-Register ausgeben werden soll. Außerdem startet die Adressierung automatisch die Befehlsausführung (in diesem Beispiel die Ausgabe eines Zeichen in der zweiten Bildschirmzeile).</p>
 
@@ -211,10 +208,9 @@
         <address class="author">(Heino Velder/dm)</address>
 
         <figure>
-            <pre data-filename="video-experim..prg" data-name="Video-Experimente" data-mse=mse1></pre>
+            <pre data-filename="video-experim." data-name="Video-Experimente"></pre>
             <figcaption>Listing 3. Eine Befehlserweiterung, die den Video-Chip unterstützt</figcaption>
         </figure>
-        <div class="binary_download" data-filename="video-experim..prg" data-name="Video-Experimente"></div>
 
     </article>
 </body>
