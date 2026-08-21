@@ -224,3 +224,22 @@ A caption that ends in `▶` / `►` / `◀` / `▲` / `▼` is pointing the rea
 artwork placed somewhere awkward on the page (`Bild 3. Der fünffach vergrößerte
 Buchstabe »A« ►`). In the HTML the caption sits with its figure, so the arrow is
 meaningless — strip it.
+
+## Vorschau teasers: the image goes at the END of its section
+
+The Vorschau is a run of `<h2>` teasers, some of which carry a picture. The
+picture belongs **after that teaser's text**, immediately before the next `<h2>`
+— not directly under the heading.
+
+Measured across all 30 Vorschau pages in the corpus: 25 issues place every
+figure after the text, 4 place them all under the heading (8409, 8412, 8502,
+8607), and none mixes the two. So the convention is settled and the outliers
+are old defects, not a variant style.
+
+The failure mode to watch for is subtler than "wrong end": the OCR tends to emit
+the figure just BEFORE its heading, which makes it read as the tail of the
+*previous* teaser. 8609 had the acoustic-coupler photo trailing "C 64 — die
+Musikmaschine" when it belongs to "DFÜ für Sie", and the Beverly Hills (Axel F)
+still trailing Vizawrite when it belongs to "Hardcopies in Farbe und ganz
+klein". Match each picture to its teaser by subject, then place it at the foot
+of that section.
