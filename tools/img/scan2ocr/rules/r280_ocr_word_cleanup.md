@@ -595,3 +595,16 @@ A monospace program line is often glued to the prose around it:
 followed by a new sentence. Split at the boundary where the typeface changes in
 print, and mind that the OCR also inserts a space inside the numeric argument
 (`2100, 252` for `2100,252`).
+
+## Scan speckles read as punctuation
+
+A speck of dirt in the left margin OCRs as a leading `.` or `'` on the line, so
+a paragraph arrives as `. Die erforderliche Anzahl…` or `'Nach der
+Parameterübergabe…`. It is not punctuation and must not be re-attached to the
+previous sentence — delete it.
+
+How to tell: look for the same mark at the same x-position on other lines of
+the same column, where no punctuation is grammatically possible. In 8609's `67`
+an identical speck sits before `durch` and before `cherten`; in `58` before
+`Nach`. A genuine sentence-final period is at the END of the preceding line,
+not floating at the start of the next.

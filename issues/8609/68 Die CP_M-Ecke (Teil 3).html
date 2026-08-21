@@ -5,7 +5,7 @@
     <title>Die CP/M-Ecke (Teil 3)</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="Holger Brömmelsiek, bj, Manfred Roldo, bj">
+    <meta name="author" content="Holger Brömmelsiek, bj, Hans-Dieter Lohnis, bj, Holger Brömmelsiek, bj, Manfred Roldo, bj">
     <meta name="64er.issue" content="9/86">
     <meta name="64er.pages" content="68, 70">
     <meta name="64er.head1" content="Tips &amp; Tricks">
@@ -22,16 +22,68 @@
 
         <p>Unter Turbo-Pascal hat man Zugriff auf die CP/M-Ebene mit dem Befehl BDOS (x,pa), wobei x die Funktionsnummer und »pa« ein Parameter ist. Nachfolgend eine kleine Liste der nützlichsten BDOS-Funktionen mit Anwendungsbeispielen:</p>
 
-        <p>Mit dieser Funktion werden alle angeschlossenen Diskettenlaufwerke in den Schreib-Lese-Betrieb umgeschaltet, sofern sie im Nur-Lese-Modus waren.<br>
-            Mit dieser Funktion kann man ein anderes Standardlaufwerk als A: definieren (Syntax: bdos (14,x)), wobei in x die Nr. des neuen Standardlaufwerks steht. Beispiel: bdos (14,1) schaltet b: als Standardlaufwerk ein.<br>
-            Diese Funktion stellt fest, welches Laufwerk gerade das Standardlaufwerk ist (Syntax: x ::=bdos (28)), wobei x die Laufwerksnummer angibt (bei x=0 ist es A:, beix=1B: und so weiter). .<br>
-            Diese Funktion stellt das Standardlaufwerk in den Nur-Lese-Modus um. Schreibzugriffe auf die Diskette können nun nicht mehr stattfinden (Syntax: bdos (28)). Diese Funktion bestimmt den gegenwärtigen User (0 bis 18). Um innerhalb eines Programms die Usernummer zu verändern, muß man bdos (32, u) eingeben, wobei u die neue Usernummer ist.</p>
+        <aside>
+            <h2>BDOS-Funktionen in Turbo-Pascal</h2>
 
-        <p>(Holger Brömmelsiek/t</p>
+            <table class="plain">
+                <thead>
+                    <tr>
+                        <th>BDOS-Nr.</th>
+                        <th>Funktion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>Das CP/M-System wird zurückgesetzt, wobei die Kontrolle an den Kommandointerpreter abgegeben wird. Erzwingt einen sofortigen Ausstieg aus jedem Programm.</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Einlesen eines Zeichens von der Tastatur (Syntax: z := bdos(2)). Wenn z=0 ist, wurde keine Taste gedrückt. Das Zeichen wird gleichzeitig auf dem Bildschirm ausgegeben.</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Ausgabe eines Zeichens auf dem Bildschirm. (Syntax: bdos(2,z) ), wobei z der chr-code des auszugebenden Zeichens ist.</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Hat die gleiche Funktion und Syntax wie BDOS-Nr. 2</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Feststellen, ob Taste gedrückt wurde (Syntax: t := bdos (11)). Wenn t=1 ist, wurde eine Taste gedrückt. Ansonsten ist t=0. Welche Taste gedrückt wurde, erfahren Sie mit BDOS-Nr. 2.</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>Mit dieser Funktion werden alle angeschlossenen Diskettenlaufwerke in den Schreib-Lese-Betrieb umgeschaltet, sofern sie im Nur-Lese-Modus waren.</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>Mit dieser Funktion kann man ein anderes Standardlaufwerk als A: definieren (Syntax: bdos (14,x)), wobei in x die Nr. des neuen Standardlaufwerks steht. Beispiel: bdos (14,1) schaltet b: als Standardlaufwerk ein.</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>Diese Funktion stellt fest, welches Laufwerk gerade das Standardlaufwerk ist (Syntax: x := bdos (25)), wobei x die Laufwerksnummer angibt (bei x=0 ist es A:, bei x=1 B: und so weiter).</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>Diese Funktion stellt das Standardlaufwerk in den Nur-Lese-Modus um. Schreibzugriffe auf die Diskette können nun nicht mehr stattfinden (Syntax: bdos (28)).</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>Diese Funktion bestimmt den gegenwärtigen User (0 bis 15). Um innerhalb eines Programms die Usernummer zu verändern, muß man bdos (32,u) eingeben, wobei u die neue Usernummer ist.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </aside>
+
+        <address class="author">(Holger Brömmelsiek/bj)</address>
 
         <h2>Mehrspaltige Proportionalschrift in Wordstar 3.0</h2>
 
-        <p class="intro">Vielleicht standen auch Sie schon vor dem Problem, mehrere Texte in Proportionalschrift nebeneinander setzen zu wollen, das Textsystem stellte jedoch keine derartige Funktion zur Verfügung. Durch einen kleinen Trick läßt sich dieser Wunsch in Wordstar 3.0 dennoch realisieren. Man schaltet dabei zuerst mit &lt;CTRL+K&gt; und &lt;N&gt; ('KN) den Spaltenblock ein. Nun werden die Blockbegrenzer mit &lt;CTRL+K&gt; und &lt;B&gt; ('KB für Blockanfang) beziehungsweise &lt;CTRL+K&gt; und &lt;K&gt; (KK für Blockende) gesetzt. Dies wird durch Wordstar 3.0 dadurch belegt, daß er am Anfang jeder Zeile das Zeichen &lt;B&gt; und am Ende das Zeichen &lt;K&gt; ausgibt, welche sich im Spaltenblock befinden. Nach dieser Vorbereitung wird der Cursor auf die Stelle gesetzt, an der das erste Zeichen (&lt;B&gt;) stehen soll. Danach kopiert man die markierte Textstelle mit &lt;CTRL+K&gt; und &lt;C&gt;, um verbessern zu können. Der Text sollte allerdings schon korrigiert und auf die richtige Zeilenbreite gebracht sein. Ein nachträgliches Formatieren ist nicht möglich. Sie müßten in diesem Fall das Original verbessern, die Blockbegrenzer setzen, formatieren, und nochmals kopieren. Der Text hat nun ein professionelles Aussehen, das Sie etwa von Zeitungen und Zeitschriften her kennen.</p>
+        <p>Vielleicht standen auch Sie schon vor dem Problem, mehrere Texte in Proportionalschrift nebeneinander setzen zu wollen, das Textsystem stellte jedoch keine derartige Funktion zur Verfügung.</p>
+
+        <p>Durch einen kleinen Trick läßt sich dieser Wunsch in Wordstar 3.0 dennoch realisieren. Man schaltet dabei zuerst mit &lt;CTRL+K&gt; und &lt;N&gt; (^KN) den Spaltenblock ein. Nun werden die Blockbegrenzer mit &lt;CTRL+K&gt; und &lt;B&gt; (^KB für Blockanfang) beziehungsweise &lt;CTRL+K&gt; und &lt;K&gt; (^KK für Blockende) gesetzt. Dies wird durch Wordstar 3.0 dadurch belegt, daß er am Anfang jeder Zeile das Zeichen &lt;B&gt; und am Ende das Zeichen &lt;K&gt; ausgibt, welche sich im Spaltenblock befinden. Nach dieser Vorbereitung wird der Cursor auf die Stelle gesetzt, an der das erste Zeichen (&lt;B&gt;) stehen soll. Danach kopiert man die markierte Textstelle mit &lt;CTRL+K&gt; und &lt;C&gt;, um verbessern zu können. Der Text sollte allerdings schon korrigiert und auf die richtige Zeilenbreite gebracht sein. Ein nachträgliches Formatieren ist nicht möglich. Sie müßten in diesem Fall das Original verbessern, die Blockbegrenzer setzen, formatieren, und nochmals kopieren. Der Text hat nun ein professionelles Aussehen, das Sie etwa von Zeitungen und Zeitschriften her kennen.</p>
 
         <address class="author">(Hans-Dieter Lohnis/bj)</address>
 
@@ -39,21 +91,30 @@
 
         <p>Die Farben nach dem Booten des Systems (Rahmen ist hellbraun, Zeichen sind purpur) sind wirklich nicht augenfreundlich. Eine Taste zum Verstellen gibt es auch nicht. Dennoch kann sich jeder seine Lieblingsfarbe beziehungsweise die augenfreundlichste Farbkombination einstellen.</p>
 
-        <p>Man ändert mit dem Programm »KEYFIGCOM«einfach die Zuordnungen zwischen logischen und physikalischen Farben und speichert das Ganze ab. Nach dem nächsten Booten wird sofort die neue Farbbelegung aktiv. Hier die Zuordnungen:</p>
+        <p>Man ändert mit dem Programm »KEYFIG.COM« einfach die Zuordnungen zwischen logischen und physikalischen Farben und speichert das Ganze ab. Nach dem nächsten Booten wird sofort die neue Farbbelegung aktiv. Hier die Zuordnungen:</p>
 
-        <p>Rahmen: logische Farbe j</p>
-
-        <p>Bildschirm: logische Farbe a</p>
-
-        <p>Zeichen: logische Farbe e</p>
+        <table class="plain">
+            <tr>
+                <td>Rahmen:</td>
+                <td>logische Farbe j</td>
+            </tr>
+            <tr>
+                <td>Bildschirm:</td>
+                <td>logische Farbe a</td>
+            </tr>
+            <tr>
+                <td>Zeichen:</td>
+                <td>logische Farbe e</td>
+            </tr>
+        </table>
 
         <p>Diesen Farben kann man nun nach Belieben andere physikalische Farben zuordnen.</p>
 
         <p>Im einzelnen sieht dies folgendermaßen aus:</p>
 
-        <p>Fertigen Sie sich als erstes eine Kopie Ihrer CP/M-Systemdiskette an. Danach laden Sie »KEYFIG« und wählen den zweiten Menüpunkt »Definitions on the CP/M boot disk« an. Nun wählen Sie wiederum den zweiten Menüpunkt »Set up logical&lt; — > physical colors« und legen dann fest, ob sich die Farben auf den 40- oder 80-Zeichen-Bildschirm beziehen sollen. Nachdem Sie die Farben nach Wunsch zusammengestellt haben, speichern Sie die neuen Werte auf der Diskette (nicht auf der Original-CP/M-Systemdiskette!).</p>
+        <p>Fertigen Sie sich als erstes eine Kopie Ihrer CP/M-Systemdiskette an. Danach laden Sie »KEYFIG« und wählen den zweiten Menüpunkt »Definitions on the CP/M boot disk« an. Nun wählen Sie wiederum den zweiten Menüpunkt »Set up logical &lt;—&gt; physical colors« und legen dann fest, ob sich die Farben auf den 40- oder 80-Zeichen-Bildschirm beziehen sollen. Nachdem Sie die Farben nach Wunsch zusammengestellt haben, speichern Sie die neuen Werte auf der Diskette (nicht auf der Original-CP/M-Systemdiskette!).</p>
 
-        <p>Die Möglichkeiten dieses Programmes gehen jedoch weit über das Ändern der Bildschirmfarben hinaus. Man kann beispielsweise auch Tasten mit anderen Funktionen belegen, beispielsweise auf &lt;Fl&gt; die Spezialfunktion »Boot128« (hexadezimaler Code: FF). Sobald man dann &lt;Fl&gt; drückt, springt der C 128 in den 128er-Modus und beginnt mit dem booten (Systemreset).</p>
+        <p>Die Möglichkeiten dieses Programmes gehen jedoch weit über das Ändern der Bildschirmfarben hinaus. Man kann beispielsweise auch Tasten mit anderen Funktionen belegen, beispielsweise auf &lt;F1&gt; die Spezialfunktion »Boot128« (hexadezimaler Code: FF). Sobald man dann &lt;F1&gt; drückt, springt der C 128 in den 128er-Modus und beginnt mit dem booten (Systemreset).</p>
 
         <p>Da man die einzelnen Tasten auch mehrfach und mit Zeichenfolgen belegen kann, besteht durchaus die Möglichkeit, sich bei der Arbeit unter CP/M eine Menge Tipparbeit zu ersparen.</p>
 
@@ -64,31 +125,49 @@
         <p>Aufgrund zahlreicher Zuschriften wollen wir die Erstellung der Stapelverarbeitungsdatei »PROFILE.SUB« etwas ausführlicher beschreiben. Hierzu nun ein Beispiel wie man eine Wordstar-Arbeitsdiskette einrichten kann:</p>
 
         <ol>
-            <li>Man kopiert von der CP/M-Systemdisk die Dateien CPM +.SYS, CCPCOM, SHOWCOM, DIRCOM, SETUPCOM und SUBMITCOM.</li>
-            <li>Von der Wordstar-Systemdiskette werden die Dateien WSOVLYLOVR, WSMSGSOVR und ein installierter Wordstar (WSCOM) benötigt.</li>
+            <li>Man kopiert von der CP/M-Systemdisk die Dateien CPM+.SYS, CCP.COM, SHOW.COM, DIR.COM, SETUP.COM und SUBMIT.COM.</li>
+            <li>Von der Wordstar-Systemdiskette werden die Dateien WSOVLY1.OVR, WSMSGS.OVR und ein installierter Wordstar (WS.COM) benötigt.</li>
             <li>Legen Sie nun die CP/M-Systemdiskette ein und starten den Editor ED mit ED E:PROFILE.SUB &lt;RETURN&gt;. Nach der Aufforderung zum Diskettenwechsel legen Sie die Arbeitsdisk ein und drücken &lt;RETURN&gt;.</li>
-            <li>ED meldet nun mit »*« seine Bereitschaft. Als nächstes geben Sie »I« (für Insert = Einfügen) ein und drücken wiederum &lt;RETURN&gt; ..Sie befinden sich nun im Editor, der sich mit »1:« meldet.</li>
+            <li>ED meldet nun mit »*« seine Bereitschaft. Als nächstes geben Sie »I« (für Insert = Einfügen) ein und drücken wiederum &lt;RETURN&gt;. Sie befinden sich nun im Editor, der sich mit »1:« meldet.</li>
         </ol>
 
         <p>Geben Sie nun folgendes ein:</p>
 
-        <p>Eingabe Abschluß Bedeutung</p>
+        <table class="plain">
+            <thead>
+                <tr>
+                    <th>Eingabe</th>
+                    <th>Abschluß</th>
+                    <th>Bedeutung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1: SETUP</td>
+                    <td>&lt;RETURN&gt;</td>
+                    <td>Setup laden</td>
+                </tr>
+                <tr>
+                    <td>2: &lt;GU</td>
+                    <td>&lt;RETURN&gt;</td>
+                    <td>G = deutscher Zeichensatz;<br>U = Drucker am Userport</td>
+                </tr>
+                <tr>
+                    <td>3: WS</td>
+                    <td>&lt;RETURN&gt;</td>
+                    <td>installierten Wordstar laden</td>
+                </tr>
+                <tr>
+                    <td>4: &lt;H2</td>
+                    <td>&lt;CTRL+Z&gt;</td>
+                    <td>H = Hilfsstufe anwählen;<br>2 = Hilfsstufe 2</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <p>1LSETUP &lt;RETURN&gt; Setup laden</p>
+        <p>Nachdem Sie &lt;CTRL+Z&gt; gedrückt haben, befinden Sie sich nicht mehr im Editier-Modus. Geben Sie nun »E« und &lt;RETURN&gt; ein. Die Datei »PROFILE.SUB« wird nun auf Ihre Arbeitsdiskette geschrieben. Wenn Sie jetzt einen Systemreset (zum Beispiel durch &lt;CTRL/ENTER&gt;) durchführen, wird zuerst das CP/M Betriebssystem gebootet und anschließend die Datei »SETUP« geladen. Nun werden die Anweisungen mit dem vorangestellten »&lt;« der Reihe nach abgearbeitet, stellvertretend für Tastatureingaben (siehe hierzu auch CP/M-Handbuch, Kapitel 7 bis 122). Wie aus dem obigen Beispiel hervorgeht, arbeitet »PROFILE.SUB« mit Wordstar quasi im Dialog. Dieses Beispiel soll nur einen Anreiz für eigene Versuche mit »PROFILE.SUB« darstellen. Noch ein Tip zum Abschluß: Sofern Sie öfter Dateien erstellen und nicht mit Wordstar 3.0 arbeiten, sollten Sie sich mit den ED-Kommandos ausführlicher beschäftigen (siehe Handbuch zum CP/M-Modus). Dies erspart Ihnen besonders bei der Textkorrektur eine Menge Zeit.</p>
 
-        <p>2A&lt;CGU &lt;RETURN&gt; G = deutscher Fhoneate:</p>
-
-        <p>U = Drucker am Userport</p>
-
-        <p>3: WS &lt;RETURN&gt; installierten Wordstar laden</p>
-
-        <p>4 &lt;H2 H = Hilfsstufe anwählen;</p>
-
-        <p>&lt;CTRL+Z&gt; 2 = Hilfsstufe2</p>
-
-        <p>Nachdem Sie &lt;CTRL+Z&gt; gedrückt haben, befinden Sie sich nicht mehr im Editier-Modus. Geben Sie nun »E« und &lt;RETURNS&gt; ein. Die Datei»PROFILE.SUB« wird nun auf Ihre Arbeitsdiskette geschrieben. Wenn Sie jetzt einen Systemreset (zum Beispiel durch &lt;CTRL/ENTER&gt;) durchführen, wird zuerst das CP/M-Betriebssystem gebootet und anschließend die Datei»SETUP« geladen. Nun werden die Anweisungen mit dem vorangestellten »&lt;« der Reihe nach abgearbeitet, stellvertretend für Tastatureingaben (siehe hierzu auch CP/M-Handbuch, Kapitel 7 bis 122). Wie aus dem obigen Beispiel hervorgeht, arbeitet»PROFILE.SUB« mit Wordstar quasi im Dialog. Dieses Beispiel soll nur einen Anreiz für eigene Versuche mit »PROFILE.SUB« darstellen. Noch ein Tip zum Abschluß: Sofern Sie öfter Dateien erstellen und nicht mit Wordstar 3.0 arbeiten, sollten Sie sich mit den ED-Kommandos ausführlicher beschäftigen (siehe Handbuch zum CP/M-Modus). Dies erspart Ihnen besonders bei der Textkorrektur eine Menge Zeit.</p>
-
-        <p>Eine weitere Erleichterung bei der Arbeit mit CP/M stellen die ».SUB«-Dateien dar. Mit der gleichen Technik wie oben beschrieben, lediglich unter einem anderen Namen und der Dateikennung ».sub« lassen sich für immer wiederkehrende, größere Kommandostrukturen Makro-Befehle definieren, die dann der Reihe nach abgearbeitet werden. Einzige Voraussetzung hierfür ist das Vorhandensein des Programmes »SUBMITCOM« auf der entsprechenden Diskette. Und nun viel Spaß bei eigenen Experimenten.</p>
+        <p>Eine weitere Erleichterung bei der Arbeit mit CP/M stellen die ».SUB«-Dateien dar. Mit der gleichen Technik wie oben beschrieben, lediglich unter einem anderen Namen und der Dateikennung ».sub« lassen sich für immer wiederkehrende, größere Kommandostrukturen Makro-Befehle definieren, die dann der Reihe nach abgearbeitet werden. Einzige Voraussetzung hierfür ist das Vorhandensein des Programmes »SUBMIT.COM« auf der entsprechenden Diskette. Und nun viel Spaß bei eigenen Experimenten.</p>
 
         <address class="author">(Manfred Roldo/bj)</address>
     </article>
