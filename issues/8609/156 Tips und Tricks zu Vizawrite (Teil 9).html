@@ -50,7 +50,7 @@
 
         <p>Dieses Vorhaben wird durch die deutsche Version von Vizawrite 64 selbst unterstützt, da eine Tastentausch-Routine bereits im Programm enthalten ist. Jedes Zeichen, das von der Tastatur empfangen wird, wird von Vizawrite 64 zunächst mit einigen Bytes einer Tabelle (87546 bis $7552) verglichen und gegebenenfalls umgewandelt. Drücken Sie beispielsweise die &lt;£>-Taste, die ebenfalls in dieser Tabelle enthalten ist, übernimmt Vizawrite 64 anstelle dessen den ASCII-Code des »ß«. Dieser Wert befindet sich in einer zweiten, entsprechenden Tabelle von $7554 bis $7560.</p>
 
-        <p>Wollen Sie weitere Tasten vertauschen, brauchen Sie lediglich eine erweiterte Tabelle in einen nicht genutzten Speicherbereich zu legen und Vizawrite 64 mitzuteilen, wo sich diese Tabelle befindet. Das kurze Maschinenspracheprogramm (Listing 3) enthält die Initialisierungs-Routine von »VIZA.PATCH« und darüber hinaus die erweiterten Tabellen mit den alten und neuen Werten für »X« und »Y«. Diese Tabellen können Sie, wenn Sie wollen, sogar noch um weitere Zeichen erweitern. Sie brauchen hierzu lediglich die ASCII-Werte der zu tauschenden Zeichen an die erste Tabelle (ab $03A9) und die Werte der gewünschten, neuen Zeichen an die zweite anzufügen (ab $03D]). Überschreiben Sie hierzu einfach die notwendige Anzahl von Nullbytes mit den entsprechenden ASCII-Werten und speichern das erweiterte Programm hinterher auf Diskette. Dies ist mit einem Monitor (zum Beispiel SMON) leicht zu bewerkstelligen.</p>
+        <p>Wollen Sie weitere Tasten vertauschen, brauchen Sie lediglich eine erweiterte Tabelle in einen nicht genutzten Speicherbereich zu legen und Vizawrite 64 mitzuteilen, wo sich diese Tabelle befindet. Das kurze Maschinenspracheprogramm (Listing 3) enthält die Initialisierungs-Routine von »VIZA.PATCH« und darüber hinaus die erweiterten Tabellen mit den alten und neuen Werten für »X« und »Y«. Diese Tabellen können Sie, wenn Sie wollen, sogar noch um weitere Zeichen erweitern. Sie brauchen hierzu lediglich die ASCII-Werte der zu tauschenden Zeichen an die erste Tabelle (ab $03A9) und die Werte der gewünschten, neuen Zeichen an die zweite anzufügen (ab $03D1). Überschreiben Sie hierzu einfach die notwendige Anzahl von Nullbytes mit den entsprechenden ASCII-Werten und speichern das erweiterte Programm hinterher auf Diskette. Dies ist mit einem Monitor (zum Beispiel SMON) leicht zu bewerkstelligen.</p>
 
         <p>Laden Sie dieses Programm bitte nach dem Reset von Vizawrite 64 mit LOAD"VIZA.KEY" 81 und _ starten es mit SYS 828. Vizawrite 64 wird automatisch neu gestartet und steht Ihnen mit veränderter Tastaturbelegung zur Verfügung. Gleichzeitig können Sie nun auch die spitzen Klammern verwenden (&lt;SHIFT+ &gt; &lt;SHIFT— &gt;). Falls Sie diese Zeichen benutzen wollen, ohne den Tastentausch, können Sie auch nach einem Reset im Direktmodus eingeben: »POKE 300043,60: POKE 30045,62«.</p>
 
@@ -70,7 +70,12 @@
 
         <p>— Das Programm darf möglichst keinen anderen Speicherbereich beeinflussen. — Das Programm muß mit der folgenden Befehlsfolge enden:</p>
 
-        <p>LDX #803 ]JSR 0849 JMP $083A (Rücksprung zu Vizawrite 64).</p>
+        <pre><code>LDX  #$03
+JSR  $0849
+JMP  $083A
+</code></pre>
+
+        <p>(Rücksprung zu Vizawrite 64).</p>
 
         <p>Beachten Sie bitte bei der Erstellung eigener Programme innerhalb Vizawrite 64, daß das Register 1 der Zeropage beim Start von Vizaspell den Wert 48 ($30) enthält. Das heißt, wenn Betriebssystem- oder Basic-Interpreter-Routinen verwendet werden sollen, muß dieses Register entsprechend verändert werden. Auch die CHRGET-Routine wird von Vizawrite 64 für eigene Zwecke geändert: Das Register $7b der Zeropage enthält den Wert $08 anstelle der normalerweise notwendigen $02.</p>
 
@@ -104,6 +109,22 @@
         </figure>
         <div class="binary_download" data-filename="viza.umlaute.prg" data-name="VIZA.UMLAUTE"></div>
 
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h3>Fehlerteufelchen</h3>
+
+            <p>Im MSE-Listing (VIZA.KEY) befinden sich einige Fehler. Die folgenden Zeilen (Listing 1) sind deshalb wie abgedruckt zu korrigieren. Hinweise zum MSE finden Sie in dieser Ausgabe.</p>
+
+            <pre>PROGRAMM : VIZA.KEY        033C 03D2
+------------------------------------
+033C : A9 18 85 2B A9 79 85 2C   8D
+034C : A9 2D 8D 19 03 8D 17 03   11
+0354 : A9 98 8D 18 03 8D 16 03   AB
+035C : A9 B1 8D F8 07 A9 78 8D   1B
+0364 : 00 D0 A9 34 8D 01 D0 A9   35</pre>
+
+            <!-- Reiner Druckfehler -->
+            <!-- 64'er 10/1986 -->
+        </aside>
     </article>
 </body>
 
