@@ -2,7 +2,11 @@
 """
 Stage A of the article-corpus pipeline.
 
-master600/NNN.png
+masters600/NNN.png     what step 005 wrote -- r005_masters_sheet or
+                       r005_masters_spread, whichever the issue's `binding`
+                       selected.  Both variants write the SAME contract, so this
+                       stage never learns whether the scan held a loose sheet or
+                       a clipped spread.
    -> 300 dpi greyscale
    -> tesseract TSV (+ an inverted pass over the header band, for reversed-out
       section bars that tesseract reads only intermittently)
@@ -33,9 +37,17 @@ from collections import defaultdict
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
+import r000_issue
+
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
 # ---------------------------------------------------------------------------
+
+# The ONE per-issue knob in this file.  Everything with a path in it is derived
+# from issues/<ISSUE>/issue.json -- see r000_issue.py for why the five absolute
+# paths this chain used to carry are gone.
+ISSUE = "SH8601"
+ISS = r000_issue.load(ISSUE)
 
 # The DESKEWED, MATTED, A4-CROPPED, GRADED 600 dpi master -- not the raw thumbs.
 # Three reasons, in order of weight:
@@ -48,10 +60,13 @@ from PIL import Image, ImageDraw, ImageFilter, ImageOps
 #   * MEASURED, the grade also reads better: unknown-word rate against a German
 #     dictionary over p8/p55/p58 fell 19.85% -> 19.08% and mean word confidence
 #     rose 88.1 -> 88.7.
-SRC_DIR = "/Users/mist/DNB/8609/tmp/master600/final"
-OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
+# That master is step 005's output and nothing else reads or writes it: the
+# levelling, the cut and the grade all happened there, one directory per issue,
+# one variant of 005 per binding.
+SRC_DIR = ISS.masters600
+OUT_DIR = ISS.out_dir
 
-# master600 is ~600 dpi (5197x7188 for an A4-ish uncropped sheet).  Tesseract's
+# masters600 is ~600 dpi (5197x7188 for an A4-ish uncropped sheet).  Tesseract's
 # sweet spot is 300 dpi: below that small ad/Kleinanzeigen type falls apart,
 # above it the engine gains nothing and the halftone screen starts aliasing into
 # the binarizer.  Exactly 0.5 keeps the resample a clean box filter.
@@ -345,6 +360,16 @@ LISTING_CAPTION_GAP_FRAC = 0.04   # caption within this fraction of page height
 # opening paragraph.  Lines are therefore sorted by MEDIAN word top, and the cap
 # is spliced back onto the first word of the first line ("M" + "it" -> "Mit").
 DROPCAP_H_RATIO = 2.2   # taller than this multiple of the median line height
+DROPCAP_MAX_H_RATIO = 8.0   # a cap spans 2-4 body lines.  MEASURED: 8609's four
+                            # real caps are 3.69-4.21x the block median word
+                            # height; p88's schematic wire is 22.36x.  A ceiling,
+                            # not an aspect test, so a narrow I or J cap survives
+                            # (8609's real J is 0.46 w/h).
+DROPCAP_MIN_LINES   = 3     # a cap HAS text beside it, so its block is >= 3
+                            # lines.  Rejects p153's single-line form box.
+DROPCAP_MAX_DX      = 12    # flush with the block's LEFT edge (px @ 300 dpi)
+DROPCAP_MAX_DY      = 25    # flush with its TOP edge.  A cap OPENS the
+                            # paragraph; the false ones sat on lines 5 and 8.
 # MEASURED on p58: the cap came back as "M--", because the inverted rule beside
 # it feeds two dashes into the same word.  A two-character limit rejected it and
 # the paragraph kept opening "it »Shrinksprite«" with a stray "M--" on line two.
@@ -990,13 +1015,30 @@ def paragraphs(line_list, line_txt, arr):
 
 def splice_dropcap(line_list, line_txt, median_h):
     """Remove a drop cap word and prepend its letter to the first line."""
+    # Gate on what an ornamental initial physically IS.  The previous test took
+    # any word >= DROPCAP_H_RATIO x median height, <= 4 chars, starting
+    # uppercase, ANYWHERE in the block -- then prepended its first letter to
+    # line 0 and DELETED the word it matched.  MEASURED over all 176 pages of
+    # 8609: it fired 173 times and was right 4 times.  It produced the visible
+    # doublings (WWichtig, DDer, BBrillant, EEPSON) and, far worse, silent word
+    # DELETIONS that leave grammatical text -- "Bild 2 Schriftbildtest" became
+    # "B2 Schritildtest" on p21, and IBM/DM/Bei/Wir vanished elsewhere.
+    if len(line_list) < DROPCAP_MIN_LINES:
+        return line_txt
+    bx0 = min(x["l"] for lw in line_list for x in lw)
+    by0 = min(x["t"] for lw in line_list for x in lw)
     cap = None
     for li, lw in enumerate(line_list):
         for w in lw:
-            if w["h"] > DROPCAP_H_RATIO * median_h and len(w["text"]) <= DROPCAP_MAX_CHARS \
-                    and w["text"][0].isupper():
-                cap = (li, w)
-                break
+            if len(w["text"]) != 1 or not w["text"][0].isupper():
+                continue
+            ratio = w["h"] / median_h if median_h else 0
+            if not (DROPCAP_H_RATIO < ratio <= DROPCAP_MAX_H_RATIO):
+                continue
+            if w["l"] - bx0 > DROPCAP_MAX_DX or abs(w["t"] - by0) > DROPCAP_MAX_DY:
+                continue
+            cap = (li, w)
+            break
         if cap:
             break
     if not cap:
