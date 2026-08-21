@@ -101,3 +101,10 @@ Note: `Fehlerteufelchen.md` records the XREF 7.0 target as *Ausgabe 9/86, Seite
 - **`prg/xref 7.0.txt`** (XREF 7.0, erratum 1/87) — the disk is the
   **pre-correction** version; all seven corrected lines differ. Marked
   `;vor Fehlerteufelchen 1/1987`.
+
+  **OPEN — needs the user's sign-off.** The user has asked for the erratum to be
+  applied, keeping each superseded line as a `;` comment. Not done yet: the
+  1/87 errata text must be re-read at high magnification first (one line,
+  `zzu%` vs `ZU%`, is already suspect), and the patched listing must be run in
+  x128 before it is committed. Until then the aside on `71` carries no
+  disposition comment rather than a false one.
