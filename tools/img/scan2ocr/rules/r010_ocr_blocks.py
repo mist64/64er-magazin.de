@@ -390,17 +390,56 @@ PARA_INDENT_MAX_PX = 60
 # all: "Zielblock" sits at 0.81 of the block's line pitch and "Spritenummer" at
 # 0.98.  The compositor set them tight, so leading cannot find them.
 PARA_GAP_RATIO = 1.45
-# What DOES mark a subhead is that it is BOLD, and boldness is directly
-# measurable as ink coverage inside the line's own box.  MEASURED on p58:
-# subheads 0.401 / 0.427 / 0.522 against 119 body lines whose median is 0.248 and
-# whose MAXIMUM is 0.311 -- no overlap whatever.  The test is a ratio to the
-# block's own median line, not an absolute, so it holds at any type size or
-# printing density: the subheads run 1.6x to 2.1x the median while the body's own
-# 90th percentile only reaches 1.15x.
-BOLD_INK_RATIO = 1.35
+# What DOES mark a subhead is that it is BOLD -- but boldness is a property of
+# the STROKE, not of how much of a box the line happens to fill.  The first
+# version of this test used ink coverage inside the line's own bounding box, and
+# it was measured only on p58, where every line is a full justified measure.  On
+# a SHORT line the box-fill measure is wrong for two reasons that have nothing to
+# do with weight:
+#   * a one- or two-word line carries no inter-word spaces, and in justified body
+#     type those spaces are stretched to fill the measure -- ~15% of the box.
+#   * a line with no descenders (and often no ascenders) has a shorter box, so
+#     the denominator shrinks by another 20-30% while the ink stays put.
+# Together they lift a body-weight orphan line to 1.35-1.65x the block median --
+# straight through the old 1.35 gate.  MEASURED over all 176 pages, that is where
+# essentially every false heading in the corpus came from: "Puffern" (1.50x),
+# "89 Mark." (1.40x), "MHz." (1.65x), "128." (1.38x), "8000." (1.46x), "Tabellen"
+# (1.41x), "lesbar." (1.38x) -- all of them plain body type left alone at the foot
+# of a column, none of them a heading.  Raising the threshold cannot separate
+# them: true subheads run 1.74-2.58x on the same measure and the two ranges
+# interleave.
+#
+# Stroke weight is immune to both effects: it is the MEAN LENGTH OF A HORIZONTAL
+# INK RUN inside the line's box.  Word spaces contribute no runs at all, and a
+# missing descender removes blank rows, not runs.  MEASURED against each block's
+# own median line, over the 80 paragraphs the corpus emitted as headings:
+#   body-weight orphan lines   0.80 - 1.40x   (max: "Problemen erhält." 1.40)
+#   genuinely bold lines       1.74 - 3.93x   (min: the run-in "Portbaustein" 1.74,
+#                                              lowest STANDALONE subhead 2.06)
+# The gap is empty. 1.6 sits in the middle of it.
+BOLD_STROKE_RATIO = 1.6
 # ...and a bold paragraph is a SUBHEAD only if it is short.  A bold standfirst
-# runs several lines and is not a heading; a subhead is one line.
-SUBHEAD_MAX_LINES = 1
+# runs several lines and is not a heading; a subhead is one line -- or two, since
+# a bold run is now ONE paragraph rather than one paragraph per line, and a head
+# too long for the measure hangs onto a second.  MEASURED over the issue, of the
+# 295 bold runs the 2-line ones are p61's errata heads ("EDV für Lehrer, Ausgabe
+# 8/86, Seite 29ff" and eight more like it, all genuine); the things that are NOT
+# headings start at 3 -- p16's bold reader questions (3, 6 and 9 lines) and p54's
+# standfirst (7).
+SUBHEAD_MAX_LINES = 2
+# ...and only if the WHOLE line is set in the bold face.  A glossary entry or a
+# lexicon column opens with a bold run-in term and finishes in body type on the
+# same line -- p124 "**Arbeitsspeicher** — Siehe RAM", p126 "**Portbaustein** —
+# Siehe CIA." -- which is a paragraph with an emphasised first word, not a
+# heading.  It only ever looked like one because such an entry that happens to
+# fit on ONE line passed SUBHEAD_MAX_LINES while its two-line siblings did not.
+# MEASURED per word against the block's median line stroke: a run-in term has
+# 1 bold word out of 2-3 (0.33-0.50 of the line), while every one of the 24 true
+# subheads in the issue is bold in every word (1.00).  Punctuation-only tokens
+# ("—", "=") are excluded from the count: a rule or an equals sign is one long
+# horizontal run by construction and measures "bold" whatever face it is in.
+SUBHEAD_MIN_BOLD_WORD_FRAC = 0.8
+SUBHEAD_WORD_MIN_CHARS = 2
 # A line that stops well short of the right margin was ended DELIBERATELY -- it is
 # a list item, a line of code, a line of an address -- and the next line starts a
 # new paragraph.  In justified body text every line except a paragraph's last
@@ -829,15 +868,34 @@ def reflow(lines):
     return out
 
 
+def stroke_weight(cell):
+    """Mean length, in pixels, of a horizontal run of ink in this patch.
+
+    This is how heavy the TYPE is, as against how much of a box it fills: a stem
+    contributes its own thickness however short the line is, word spaces
+    contribute no run at all, and a missing descender removes blank rows rather
+    than runs.  Ink area over the number of runs, with the runs counted as
+    False->True transitions so nothing has to be materialised."""
+    if cell.size == 0:
+        return 0.0
+    b = cell < 128
+    area = int(b.sum())
+    if not area:
+        return 0.0
+    starts = int(b[:, 0].sum()) + int((b[:, 1:] & ~b[:, :-1]).sum())
+    return area / starts if starts else 0.0
+
+
 def paragraphs(line_list, line_txt, arr):
     """Split a block's lines into paragraphs on the first-line indent.
 
-    Returns [(lines, is_bold_subhead), ...].  The boldness is already measured
-    here to find paragraph breaks, and a bold one-line paragraph inside a body
-    block IS a subhead -- so the finding is carried out rather than recomputed.
-    Roles from stage B are per BLOCK, and these live inside a block, so without
-    this they render as ordinary prose: MEASURED on p58, vision reads six
-    headings and the corpus showed two."""
+    Returns [(lines, is_bold_subhead), ...].  The face is already measured here
+    to find paragraph breaks -- a change of face IS a paragraph break -- and a
+    short paragraph set wholly in the bold face inside a body block IS a subhead,
+    so the finding is carried out rather than recomputed.  Roles from stage B are
+    per BLOCK, and these live inside a block, so without this they render as
+    ordinary prose: MEASURED on p58, vision reads six headings and the corpus
+    showed two."""
     if not line_list:
         return []
     x0s = [min(w["l"] for w in lw) for lw in line_list]
@@ -845,43 +903,85 @@ def paragraphs(line_list, line_txt, arr):
     tops = [statistics.median(w["t"] for w in lw) for lw in line_list]
     rights = [max(w["l"] + w["w"] for w in lw) for lw in line_list]
     right_edge = max(rights) if rights else 0
-    inks = []
+    strokes, word_strokes = [], []
     for lw in line_list:
         lx0 = min(w["l"] for w in lw)
         lx1 = max(w["l"] + w["w"] for w in lw)
         ly0 = min(w["t"] for w in lw)
         ly1 = max(w["t"] + w["h"] for w in lw)
-        cell = arr[ly0:ly1, lx0:lx1]
-        inks.append(float((cell < 128).mean()) if cell.size else 0.0)
-    ink_med = statistics.median([i for i in inks if i > 0]) if any(inks) else 0.0
+        strokes.append(stroke_weight(arr[ly0:ly1, lx0:lx1]))
+        word_strokes.append([stroke_weight(arr[w["t"]:w["t"] + w["h"],
+                                               w["l"]:w["l"] + w["w"]])
+                             for w in lw])
+    stroke_med = statistics.median([s for s in strokes if s > 0]) if any(strokes) else 0.0
     gaps = [tops[i] - tops[i - 1] for i in range(1, len(tops))]
     pitch = statistics.median(gaps) if gaps else 0
+
+    # Which WORDS are set in the bold face.  Per word, not per line, because the
+    # magazine sets run-in terms: "**Portbaustein** — Siehe CIA." is bold at the
+    # head and body type after it, and a line-level answer cannot say that.
+    # Punctuation-only tokens are dropped -- a dash or an equals sign is one long
+    # horizontal run whatever face it is in, and counting one would make every
+    # glossary entry look like display type.
+    bold_words = [[s > BOLD_STROKE_RATIO * stroke_med
+                   for w, s in zip(lw, ws)
+                   if sum(c.isalnum() for c in w["text"]) >= SUBHEAD_WORD_MIN_CHARS]
+                  for lw, ws in zip(line_list, word_strokes)]
+
+    def opens_bold(i):
+        return bool(stroke_med and bold_words[i] and bold_words[i][0])
+
+    def closes_bold(i):
+        return bool(stroke_med and bold_words[i] and bold_words[i][-1])
+
+    def bold_word_frac(i):
+        if not (stroke_med and bold_words[i]):
+            return 0.0
+        return sum(bold_words[i]) / len(bold_words[i])
 
     first_indent = (x0s[0] - base) if x0s else 0
     paras, cur, cur_bold = [], [], False
     for i, txt in enumerate(line_txt):
         indent = x0s[i] - base if i < len(x0s) else 0
         gap = (tops[i] - tops[i - 1]) if i else 0
+        # Is this line the continuation of a bold run the line above began?  That
+        # is the only question the face can answer about a LINE break, and both
+        # rules below turn on it.
+        in_run = bool(i and opens_bold(i) and closes_bold(i - 1))
         new_para = PARA_INDENT_MIN_PX <= indent <= PARA_INDENT_MAX_PX
         if pitch and i and gap > PARA_GAP_RATIO * pitch:
             new_para = True
-        if ink_med and inks[i] > BOLD_INK_RATIO * ink_med:   # a bold subhead
+        # A change of face starts a new paragraph -- so the break belongs where the
+        # bold run BEGINS, and nowhere else in it.  Fired on every bold line, it
+        # cut a bold standfirst into one paragraph per line (p54: seven) and a
+        # headline set over two into two (p137 "Wie zählen die / Zweifingerlinge?"),
+        # after which SUBHEAD_MAX_LINES promoted whichever fragment stood alone.
+        if opens_bold(i) and not in_run:
             new_para = True
-        # ...but a paragraph cannot begin in the middle of a word.  A very short
-        # line packs its box tightly enough to pass the bold test on its own --
-        # MEASURED, "sig." (the tail of "überflüs-/sig.") did exactly that -- so a
-        # break is refused outright when the previous line ends mid-word.
+        # ...but a paragraph cannot begin in the middle of a word, so a break is
+        # refused outright when the previous line ends mid-word.
         # a deliberately short PREVIOUS line ends its paragraph here
         if i and right_edge and rights[i - 1] < SHORT_LINE_FRAC * right_edge:
             new_para = True
+        # ...and INSIDE the run none of those tests applies: a standfirst's last
+        # line is short because the copy ran out, a two-line head's second line
+        # hangs where it fits, and the leading test is being asked about the wrong
+        # type -- pitch is the BLOCK's median, so where a 62 px standfirst sits
+        # above 42 px body every standfirst line clears 1.45 x 42 by a pixel or
+        # two and the run shatters.  MEASURED on p54: the seven-line standfirst
+        # arrived as 2 + 5 and the two-line half was promoted to a heading, the
+        # same defect one line further along.  The run ends where the face changes
+        # back, and that is the only boundary it has.
+        if in_run:
+            new_para = False
         if i and line_txt[i - 1].rstrip().endswith("-"):
             new_para = False
-        bold = bool(ink_med and inks[i] > BOLD_INK_RATIO * ink_med)
         if cur and new_para:
             paras.append((cur, cur_bold))
             cur, cur_bold = [], False
         if not cur:
-            cur_bold = bold          # a paragraph is a subhead if it OPENS bold
+            # a paragraph is a subhead if it OPENS bold, in every word
+            cur_bold = bold_word_frac(i) >= SUBHEAD_MIN_BOLD_WORD_FRAC
         cur.append(txt)
     if cur:
         paras.append((cur, cur_bold))

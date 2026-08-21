@@ -85,23 +85,30 @@ truth re-bases every number.
 in this pipeline's history looked perfect on their test pages and were reverted
 after a full sweep; the numbers are in `FINDINGS.md`.
 
-## Known false positive: a paragraph's orphan line labelled as a heading
+## A paragraph's orphan line labelled as a heading — fixed in step 010
 
 When the print leaves a short final (or initial) line of a paragraph alone in
-the column, the segmenter makes it its own block and the classifier labels it
-`heading`/`title`; step 030 then writes it into the Markdown as `### …`, and it
-reaches the article as an `<h3>`.
-
-The signature is that the "heading" is the **grammatical continuation** of the
-neighbouring paragraph. From 8609: `### Puffern` (…werden in den Puffern),
+the column, the corpus used to emit it as `### …`, and it reached the article as
+an `<h3>`. The signature is that the "heading" is the **grammatical continuation**
+of the neighbouring paragraph. From 8609: `### Puffern` (…werden in den Puffern),
 `89 Mark.`, `MHz.`, `128.`, `8000.`, `Codes drucken kann, zeigt dieses
 Programm.`, plus a BASIC continuation line (`LB = BY-HB*256`) and a layout
 pointer (`Listing und Beschreibung ab Seite 54`).
 
-Real headings in this magazine are set in a heavy sans display face,
-noticeably larger than body text; the false positives are body-face text at
-body size. Word count is NOT the discriminator — `HiRes Colossal` (2 words) is
-a real heading on the same page where `Puffern` (1 word) is not.
+**This is not the model's doing.** MEASURED over the 8609 corpus, 107 of the 110
+paragraphs that reached the Markdown as `### ` were marked by stage A's
+`para_subhead`, not by a `subsection` role the model assigned — and every one of
+the false ones came from stage A measuring boldness as ink coverage of the line's
+bounding box, which a short line inflates whatever face it is in. The fix is in
+`r010_ocr_blocks.py` (stroke weight, measured per word); see its rule file and
+`FINDINGS.md` §3. After it, `###` over the issue went **80 → 39**, with `#` and
+`##` unchanged, precision 0.958 → 0.962 and recall unmoved.
 
-Until the classifier distinguishes them, step 290 must catch the residue: see
-its "A heading that is really a paragraph tail" section.
+Word count is NOT the discriminator, and neither is anything else the model can
+see in the digest — `HiRes Colossal` (2 words) is a real heading on the same page
+where `Puffern` (1 word) is not. Do not try to fix this class in the prompt.
+
+What is left for step 290: a headline whose two halves are separated by OCR
+garbage off an adjacent graphic still arrives split — p137's
+`Wie zählen die ® .. ®` + `### Zweifingerlinge?`. See its "A heading that is
+really a paragraph tail" section.

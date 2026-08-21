@@ -76,6 +76,33 @@ of them** and leaves the choice to step 020, which can read the text:
   one for three different reasons and no local rule separates them; step 030
   resolves them.
 
+## Paragraphs and subheads inside a block — where `###` comes from
+
+Roles from step 020 are per **block**, but a body block can hold headings, so
+this step splits each block into paragraphs and marks which of them are subheads.
+That mark is what step 030 writes as `### `, so a wrong mark here becomes an
+`<h3>` in the published article.
+
+The measurement is the **face**, made per word: `stroke_weight()` is the mean
+length of a horizontal ink run, compared against the block's own median line.
+Three rules follow from it, and all three exist because of a defect they fixed:
+
+- **A word is bold, or it is not.** Weight is a property of the stroke. The
+  earlier test used ink coverage of the line's bounding box, which a short line
+  inflates through missing word spaces and missing descenders — that alone
+  produced 51 of the 80 `###` in the 8609 corpus, every one of them a paragraph's
+  orphan line (`### Puffern`, `### MHz.`, `### 89 Mark.`). See `FINDINGS.md` §3.
+- **A change of face opens a paragraph — once.** The break belongs where the bold
+  run begins; inside the run the short lines, hanging indents and leading are the
+  compositor breaking lines. Per line it cut standfirsts into one paragraph per
+  line and promoted the leftover fragment to a heading.
+- **A subhead is bold in every word**, and at most `SUBHEAD_MAX_LINES` long. A
+  glossary entry that opens with a bold run-in term and finishes in body type is
+  a paragraph, not a heading.
+
+Constants: `BOLD_STROKE_RATIO`, `SUBHEAD_MIN_BOLD_WORD_FRAC`, `SUBHEAD_MAX_LINES`,
+each with its measurement in the comment above it.
+
 ## Verification
 
 ```bash
