@@ -94,28 +94,6 @@ def main(d):
             if mm.group(0).count('<br') < 2: S('<br> in a running Info: footer — column wrap?', f)
         for mm in re.finditer(r'[^<>]{15,}\((?:[a-z]{2,3}|[A-ZÄÖÜ][^()<>]{2,28}/[a-z]{2,3})\)</p>', body):
             S('byline glued to a paragraph (FP: Impressum masthead)', f, mm.group(0)[-34:])
-        # dangling cross-reference: text cites "Bild 3"/"Tabelle 2"/"Listing 4"
-        # with no such caption. A reference with no target usually means the
-        # figure and its caption were dropped together.
-        # EXEMPT: an article with exactly ONE such caption, left unnumbered by
-        # the print, satisfies a reference to "<kind> 1" — 8609's 95 cites
-        # "(Listing 1)" (confirmed on p95) while its sole caption reads
-        # "Listing »Hardcopy« …". That mismatch is the magazine's own.
-        caps = ' '.join(re.findall(r'<figcaption>(.*?)</figcaption>', body, re.S))
-        nocap = re.sub(r'<figcaption>.*?</figcaption>', '', body, flags=re.S)
-        # an erratum aside cites the CORRECTING issue's listings, not this
-        # article's ("Folgende Zeilen (Listing 2) …" in a 1/87 erratum)
-        nocap = re.sub(r'<aside class="fehlerteufelchen".*?</aside>', '', nocap, flags=re.S)
-        for kind in ('Bild', 'Tabelle', 'Listing'):
-            refs = {m.group(1) for m in re.finditer(kind + r'\s+(\d{1,2})\b', nocap)}
-            have = {m.group(1) for m in re.finditer(kind + r'\s+(\d{1,2})\b', caps)}
-            n_caps = len(re.findall(kind + r'\b', caps))
-            if refs and not have and n_caps == 1 and refs == {'1'}:
-                continue                      # the sole unnumbered caption IS "1"
-            for miss in sorted(refs - have):
-                if have:                      # only meaningful once some are numbered
-                    S(f'refers to {kind} {miss} but no such caption', f)
-
         if 'name="author"' not in s and '<address class="author">' not in body:
             S('no author at all — read the last page, a dropped final line takes the byline (r180)', f)
 

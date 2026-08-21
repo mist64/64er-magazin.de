@@ -58,9 +58,24 @@ Known false-positive sources, excluded or expected:
   ad/classifieds page. The annual `Jahresinhaltsverzeichnis` gives the
   authoritative range per article; it caught two understated ones in 8609
   (71-74, 82-84).
-- **dangling cross-references** — text citing `Bild 3` / `Tabelle 2` /
-  `Listing 4` with no such caption. A reference with no target usually means the
-  figure and its caption were dropped together.
+- **dangling cross-references — TRIED AND REJECTED.** Text citing `Bild 3` with
+  no such caption sounds like a good proxy for "the figure and its caption were
+  dropped together". It is not, in a serialised magazine. Implemented and run
+  over five issues it produced five candidates and **every one checked against
+  the PDF was a cross-issue reference**, i.e. correct as printed:
+
+  | case | what the print says |
+  |---|---|
+  | 8607/150 Listing 2 | "Listing 2 **(Ausgabe 5/86)** wird zuerst …" |
+  | 8608/154 Bild 5 | "… zeigt Bild 5 **in der ersten Folge … in der Mai-Ausgabe**" |
+  | 8607/79 Listing 3 | the print itself skips it — already noted in the file |
+  | 8607/168 Bild 2 | opens "zwei Druckfehlerteufelchen **aus Ausgabe 3/86** berichtigen:" three paragraphs earlier |
+
+  The qualifier that identifies a foreign reference is often several paragraphs
+  upstream, so no local rule finds it; successive attempts either missed the
+  qualifier or grew broad enough to hide real gaps. **And the check is
+  redundant**: a dropped caption is a `caption` block, which this coverage gate
+  already reconciles. Use the gate; do not rebuild the reference check.
 
 ## Why omission needs its own gate at all
 
