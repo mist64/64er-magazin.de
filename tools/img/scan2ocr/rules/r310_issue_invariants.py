@@ -75,7 +75,11 @@ def main(d):
             t = mm.group(2).rstrip()
             # an ellipsis is legitimate and the magazine sets it both ways:
             # "Die LED brennt, aber..." and "Farbausfall, Bildausfall . . ."
-            if t.endswith('.') and not re.search(r'\.\s?\.\s?\.$', t):
+            # legitimate endings: an ellipsis ("Die LED brennt, aber...",
+            # "Farbausfall, Bildausfall . . .") and a trailing abbreviation
+            # ("1. SCREEN nr." heads a numbered command list in 8605/29)
+            if t.endswith('.') and not re.search(r'\.\s?\.\s?\.$', t) \
+                    and not re.search(r'\b[A-Za-zÄÖÜäöü]{1,3}\.$', t):
                 H('heading is a paragraph tail (r290)', f, t[:40])
 
         # --- SOFT: triage, each with a documented FP population -------------
