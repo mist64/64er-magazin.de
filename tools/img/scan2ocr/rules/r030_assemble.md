@@ -91,3 +91,44 @@ grep -c '^# .*\[[0-9]' "$md"    # expect = article count
 `ISSUE_MD` is a constant at the top of `r030_assemble.py` and points into the
 issue's working directory, not into the repo -- ask the module for it rather
 than assuming a path.
+
+## The coverage gate — catching content that was DROPPED
+
+The defect this step cannot see by inspection is **omission**: if a block never
+made it out of the OCR, the article still reads perfectly, and no spell-check,
+markup grep or beautifier will ever flag it. Issue 8609 shipped with two whole
+ratings boxes, a function table, four `<h2>`s and two truncated article endings
+missing before anyone noticed — all found by reading pages against the HTML,
+which does not scale.
+
+`r030_coverage_check.py` makes it mechanical. Stage B records the blocks it
+selected as article content in `<page>.labels.json` as `order`. The invariant:
+
+> **every block the classifier kept must appear in the article that claims its
+> page.**
+
+```bash
+tools/img/scan2ocr/rules/r030_coverage_check.py issues/<YYMM> <ocr-out-dir>
+```
+
+It prints `pages N   kept prose blocks N   UNACCOUNTED n (x%)` and then each
+unaccounted block with its page, label, match fraction and opening words.
+
+Run it after step 030 and again at the end of the issue. **Investigate every
+hit.** On 8609 after the full review pass it reports 3 of 613 (0.5%), and all
+three are explainable false positives:
+
+- a block whose text begins where a drop-cap was eaten (`as tun` vs the restored
+  `Was tun`) — our own correction moving the text away from the OCR
+- a listing fragment deliberately deleted as a duplicate of the placed listing
+- a table whose cells now split the text, so the 4-word probes straddle cells
+
+Known false-positive sources, all excluded or expected:
+- **listing blocks** are skipped — the disk `.txt` is the correct petcat
+  rendering while the OCR reading of the printed listing is garbled (`mps 891`
+  for `mps 801`), so they never match
+- **ads and non-article matter** are already excluded by using `order` rather
+  than every block on the page; before that filter, p140's Markt&Technik job ad
+  produced six spurious hits
+- **our own OCR corrections** move HTML text away from the OCR, which is why the
+  threshold is a low fraction of probes rather than an exact match
