@@ -21,47 +21,60 @@ listings belonging to any 9/86 article. Not placed:
   `portamento     s.prg`, `spaceblow    s13.prg`, `supersynth     s.prg`,
   `special 1     s3.prg`, `axel f..prg` — Soundmonitor sound/tune files.
 
-## Rule 130 — printed listings with no separate disk file (`<pre>TODO</pre>`)
+## Resolved — the gaps recorded above are all closed
 
-- `66 Tips & Tricks für Profis.html`, section *Hypra-Platos verbessert*:
-  the print carries **Listing 1** (patch at $0E40) and **Listing 2** (patch at
-  $345C), both shown under the name `hyplatos 2`. The disk holds only the
-  **already-patched** program `hyplatos 2.prg` (0801–3591, 11666 bytes), which
-  is offered as a `binary_download`. The two printed patch fragments are not
-  separate files, so both figures carry `<pre>TODO</pre>` pending an OCR pass.
+Kept here as the record of what was open and how each was settled.
 
-## Rule 130 — classification note for a later pass
+- **`66 Tips & Tricks für Profis` — two `<pre>TODO</pre>` patch fragments.**
+  RESOLVED. Both patches transcribed from the print and verified byte-identical
+  against `prg/hyplatos 2.prg` at `$0E40` and `$345C`; the string at `$0E70`
+  decodes to `" NUMMER DES MATRIXFILES (0-9/SPC) ? "`.
 
-- `hires-colossal` (article `82 HiRes Colossal.html`) is a **machine-language**
-  program (load address $CC01) and is printed as an **MSE hex listing**
-  ("Name : hires-colossal cc01 cd27"). The extraction step classified it as a
-  BASIC listing, so the master lives in `prg/hires-colossal.txt` and the
-  petcat rendering is meaningless. Fix: move `prg/del/hires-colossal.prg` to
-  `prg/` and switch the figure to
-  `<pre data-filename="hires-colossal.prg" data-mse=mse1>` + a
-  `binary_download` sibling.
-- `shades control` (article `66 Tips & Tricks für Profis.html`) is likewise
-  printed as an MSE hex listing, but it *is* a BASIC program, so the petcat
-  rendering is correct and readable — only the presentation differs from print.
+- **`hires-colossal` classified as BASIC.** RESOLVED. `prg/hires-colossal.prg`
+  moved into `prg/`, the `.txt` retired to `prg/del/`, and the figure switched to
+  `<pre data-filename="hires-colossal.prg" data-name="HiRes Colossal" data-mse=mse1>`
+  with a `binary_download` sibling. Renders as MSE hex with address and checksum
+  columns.
 
-## Rule 160 — notes from the table pass
+- **`34 Marktübersicht Drucker` `64er.pages`.** RESOLVED — now `34-39`.
 
-- `34 Marktübersicht Drucker.html` — the market table actually runs over
-  **pages 35–39**, and page 39 carries a **second** table
-  (*Matrix-Tintenstrahldrucker*). Both are now placed. The `<head>` meta
-  `64er.pages` still says `34` and needs widening to `34-39` — not touched
-  here because the head-meta pass owns that file region.
-- `54 Bar-Codes selbst gemacht.html` — the two-column block *Verwendete Codes
-  zur Druckeransteuerung* (p55) is already placed, but as a `<pre><code>`
-  with OCR damage (`%ıs Zoll`, `chr$()`). Left as-is by the table pass; it is
-  a transcription fix (rule 170/280), not a missing table.
-- `155 Tips und Tricks zum Startexter (Teil 1).html` — the body still reads
-  `(siehe Tabelle ])` (OCR of `Tabelle 1`). The box it points at is printed
-  with the caption *Übersicht über die Druckerfunktionen beim StarTexter*, so
-  there is no `Tabelle 1.` figcaption to match it. Word-level fix belongs to
-  rule 280.
-- `148 Wettstreit der Assembler.html` — the *Kleines Assembler-Lexikon* box on
-  p150 has **five** entries in print (Block, Bedingte Assemblierung,
-  **Interaktive Assemblierung**, Assemblerschleifen, Variable); the HTML has
-  only four. The *Interaktive Assemblierung* paragraph was dropped by the OCR
-  import and still needs to be transcribed.
+- **`54 Bar-Codes` ESC-code block.** RESOLVED. Rebuilt from scan p55: the
+  fractions read `1/216`, `7/72` and `1/6 Zoll`, `chr$()` is `chr$(1)`, and the
+  invalid `<p><pre>` nesting is gone.
+
+- **`155 …StarTexter` `(siehe Tabelle ])`.** RESOLVED — the print reads
+  `(siehe Tabelle 1)`; confirmed on the scan. Part of a wider `]`-for-`1` sweep
+  (see below).
+
+- **`148 Wettstreit der Assembler` missing lexicon entry.** RESOLVED. The
+  *Interaktive Assemblierung* text was present but glued to the end of the
+  *Bedingte Assemblierung* paragraph; split into its own `<p>`, so the box now
+  carries all five entries.
+
+## Rule 080 — two articles merged, per the Listing/Anwendung-des-Monats convention
+
+The magazine prints the *Listing des Monats* and *Anwendung des Monats* overview
+apart from the listing/description, on non-adjacent pages. We combine them into
+one article, as the `Jahresinhaltsverzeichnis` does:
+
+- `48 Bar-Codes selbst gemacht.html` — `pages="48,54-55"` (was 48 + 54)
+- `46 Vollgas für die Floppy 1570_71.html` — `pages="46,50-52"` (was 46 + 50)
+
+## Rule 280 — the `]`-for-`1` OCR class
+
+The serif `1` in this typeface is read as `]` by the OCR. Swept issue-wide: 27
+occurrences fixed (`Bild ]`, `Listing ]`, `Tabelle ]`, `VR]`, `CHR$(n])`,
+`($D60])`, `1541/70/7]`, `Monitor 190]`, `33] Seiten`, …). 8608 has none, so
+this is specific to how 9/86 was scanned.
+
+## Rule 300 — forward errata
+
+Three later issues correct 9/86 articles; asides added from
+`fehlerteufelchen_pages/`:
+
+- 10/86 p80 → `156 Tips und Tricks zu Vizawrite (Teil 9)` (VIZA.KEY MSE listing)
+- 11/86 p99 → `48 Bar-Codes selbst gemacht` (DATA line 85)
+- 1/87 → `71 Cross-Referenz-Liste C128` (XREF 7.0)
+
+Note: `Fehlerteufelchen.md` records the XREF 7.0 target as *Ausgabe 9/86, Seite
+25*; the printed page reads **Seite 71**, which is where XREF 7.0 actually is.
