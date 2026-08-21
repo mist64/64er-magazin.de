@@ -366,3 +366,20 @@ without the per-block enumeration is the canonical failure shape.
   Verbal "Pass 3 done" confirmation is not enough — always run the
   mechanical counters (Verification #6 and #7) and treat a
   6+-table delta as a re-run signal, not as acceptable variance.
+
+## `class="plain"` is decided by the printed rules, not by the content
+
+- The print sets the table **without ruled separators** → `<table class="plain">`
+- The print sets a **ruled grid / boxed table** → `<table>`
+
+This is a look-at-the-page decision. 8609 shipped an unruled bit-layout table in
+`62 Tips & Tricks zum C 128` as a plain `<table>`.
+
+## A spanning header row that labels a section is a heading, not a row
+
+Where the print puts a section label above a table (*Matrix-Nadeldrucker*,
+*Matrix-Tintenstrahldrucker*), the OCR sometimes lands it inside the table as
+`<tr><th colspan="N">…</th></tr>` and sometimes outside as an `<h2>`. Make them
+consistent: **the section label becomes an `<h2>` before its table**; only
+labels that group *rows within* one table (a manufacturer name spanning the
+row, say) stay as a spanning `<th>`.

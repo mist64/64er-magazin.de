@@ -516,3 +516,58 @@ grep -h "Übertragungsgeschwindigkeiten von" "$dir"/*.html >/dev/null && \
   short common German suffix that ends in `t` (`-start`, `-art`,
   `-port`, `-text`) showing up as `-starl`, `-arl`, `-porl`,
   `-texl`. When the l-form isn't a word and the t-form is, fix.
+
+## The badge beside a teaser bleeds into the intro
+
+Pages that carry the »64'er / Test« badge next to the stand-first get the badge
+OCR'd into the front of `<p class="intro">`. It surfaces as a stray word or
+digit before the real first word:
+
+```
+<p class="intro">Gier Können Sie sich ein Programm vorstellen …   -> drop "Gier "
+<p class="intro">Test Nun gibt es auch ein eigenes …              -> drop "Test "
+<p class="intro">9 Wie gut sind die Hardcopy-Module …             -> drop "9 "
+<p class="intro">-F] Mit dem neuen Matrixdrucker …                -> drop "-F] "
+```
+
+`Gier` is the OCR of the 64'er wordmark. It is not universal — pages 21, 22, 42
+and 151 carry the same badge and came through clean — so grep, do not assume:
+an intro starting with `Gier `, `Test `, `64'er `, a bare digit, or punctuation
+is suspect.
+
+## Drop-cap sweeps must not bound the word length
+
+The ornamental initial is dropped by the OCR, so the paragraph begins mid-word.
+When sweeping for it, match the whole word: a regex capping the tail at ~12
+characters silently misses `loppybeschleuniger` (18) → `Floppybeschleuniger`.
+Better: check EVERY article opening against the page, since the defect also
+appears as a wrong initial (`Bin Computer` → `Ein Computer`) or as junk in place
+of the letter (`h n dieser` → `In dieser`, `i m Jahre` → `Im Jahre`), none of
+which a lowercase-start grep can find.
+
+## `®` is an OCR'd `?`
+
+`»®FILE NOT FOUND ERROR«` is `»?FILE NOT FOUND ERROR«` — CBM BASIC prints its
+errors with a leading `?`. The same substitution turns up in headings. Note the
+`®` is already present in the OCR `.md`, so it is a scan misread and NOT
+Discount's smartypants `(R)` expansion (that is disabled via `-smarty`).
+
+## A `<br>` inside a running footer is a column wrap
+
+`<p class="source">Info: Berthold Trenkel, Schlesienstr. 10,<br> 7320
+Göppingen` — the break is where the narrow column wrapped, not structure. Join
+it with a space. Keep `<br>` where it separates genuinely distinct entries (two
+different `Info:` sources, a multi-company address block).
+
+## Code lines wrapped by the column are ONE logical line
+
+Where a listing line is too wide for the column, the magazine breaks it and
+indents the remainder. That is typography, not program structure — join it:
+
+```
+50 BY=J+Y : HB=INT(BY/256) :
+   LB=BY-HB*256                 ->  50 BY=J+Y : HB=INT(BY/256) : LB=BY-HB*256
+```
+
+This applies even when the wrap falls inside a string literal (p61's line 420
+breaks between `H2$+"` and `"+MID$`).

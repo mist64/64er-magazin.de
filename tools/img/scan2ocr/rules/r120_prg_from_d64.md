@@ -258,3 +258,22 @@ Hypra-Ass / Top-Ass; promote the raw `.prg` instead.
   BLOCK / SWAP precedent for the layout pattern (compiled `.prg`
   plus source `.prg` ⇒ two `binary_download` lines under one
   `<figure>`).
+
+## Sanity-check every extracted file — a directory sector is not a program
+
+8609 shipped `prg/video-experim..prg` as the master for *Listing 3. Eine
+Befehlserweiterung, die den Video-Chip unterstützt*. It is not a program at all:
+254 bytes, containing `$A0`-padded CBM directory entries (`FAK`, `XREF 7.0`) and
+then zeros — i.e. a raw **directory sector** that the extraction wrote out under
+a file name. It rendered as an MSE hex dump while the print shows BASIC, which
+is how it was caught.
+
+Checks worth running over every extracted `prg/`:
+
+- **exactly 254 bytes** (a single sector, minus the two link bytes) is a red flag
+- a run of `$A0` padding bytes in the first 32 bytes is a directory entry, not
+  code or tokenised BASIC
+- the load address (first two bytes, little-endian) should be plausible:
+  `$0801` for BASIC, or the address the article/caption states
+- the rendering must match what the print shows — a listing typeset as BASIC
+  must not come out as an MSE hex dump, and vice versa

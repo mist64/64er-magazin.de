@@ -352,3 +352,15 @@ Don't compose erratum text from memory or training knowledge — every word must
 - Errata items index: `/Fehlerteufelchen.md`
 - Standard PRG workflow: rule `r120_prg_from_d64.md`
 - Anti-memory enforcement: `r000_orchestration.md`, "OCR cleanup granularity"
+
+## When an erratum corrects a listing, check the disk file FIRST
+
+The Programm-Service disk usually carries the **already-corrected** program, so
+an erratum that fixes a listing line often describes a defect that exists only
+in print. 8609's Bar-Codes erratum (11/86) says line 85 has two digits
+transposed; `prg/ean-codes.txt` line 85 already reads
+`85 data"0111011","0010001","1000100"` — exactly the corrected form.
+
+So: add the aside (it records what the printed listing got wrong), and **do not
+touch the `.txt`**. Only when the disk file also carries the error is there a
+listing to repair, and that is a separate decision.

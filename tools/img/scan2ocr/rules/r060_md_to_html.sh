@@ -12,8 +12,15 @@ out="${md%.md}.html"
 tmp=$(mktemp)
 LC_ALL=C sed -e '1s/^\xEF\xBB\xBF//' "$md" > "$tmp"
 markdown -G \
-  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty' \
+  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty,-alphalist' \
   "$tmp" > "$out"
+# -alphalist disables Discount's alphabetic ordered lists (`a.` / `A.` →
+# <ol type="a">). In 1986 magazine text a capital letter followed by a period
+# at the start of a line is an ABBREVIATED FORENAME, not a list marker:
+# `M. Grewe: »Nein, …«` became `<ol type="a"><li>Grewe: »Nein, …«` and the
+# `M.` was SWALLOWED as the marker — silent text loss, not just wrong markup.
+# It also fires when the OCR reads a digit `1.` as a letter `l.`, so a real
+# numbered list turns into <ol type="a"> with its first number eaten.
 # +autolink is intentionally omitted: 1986 magazine text never has real
 # URLs, but Discount's autolinker wraps `news:`, `tel:`, `fax:`, etc.
 # in <a href="…"> as false positives (rule 270).

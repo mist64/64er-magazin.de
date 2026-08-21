@@ -265,3 +265,28 @@ weight test reserved for genuinely exceptional cases.
   decision in a clearly-tricky article (multi-h2 article like
   Aktuelles or a tutorial with internal sub-sub-sections), a
   second opinion is worth the time.
+
+## A "heading" that is really a paragraph tail
+
+The OCR promotes stray text to a heading whenever a line stands alone in the
+column. Signatures of the defect, all seen in 8609:
+
+- **ends with a period**: `<h3>89 Mark.</h3>`, `<h3>MHz.</h3>`, `<h3>128.</h3>`,
+  `<h3>8000.</h3>` — each is the tail of the preceding sentence, cut at a column
+  break. Rejoin it to the previous `<p>` with a space.
+- **is a bare number or unit**: same cases as above. A heading consisting only
+  of digits, a currency amount or a unit is never a heading.
+- **is a mid-sentence fragment**: `<h3>Codes drucken kann, zeigt dieses
+  Programm.</h3>` was the end of the article's intro.
+- **is half of a two-line heading**: p137 prints *"Wie zählen die
+  Zweifingerlinge?"* over two lines; it arrived as
+  `<p>Wie zählen die ® .. ®</p>` + `<h3>® Zweifingerlinge?</h3>`. Join the
+  halves and drop the grit.
+
+Check: no `<h2>`–`<h6>` may end in `.` (an ellipsis `...` is fine), consist only
+of non-letters, or start lowercase.
+
+## `<h2>` inside `<aside>` is CORRECT
+
+Earlier versions of this rule flagged `<h2>` inside an `<aside>` as a defect.
+It is not: a set-off box's heading is an `<h2>`. Do not "fix" it to `<h3>`.
