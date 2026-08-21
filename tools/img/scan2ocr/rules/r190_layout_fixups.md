@@ -195,3 +195,26 @@ between the final paragraph and the byline.
 
 Check: walking the article in document order, no `<figure>`/`<table>` may sit
 between the last body `<p>` and the trailing `<address>`/`<p class="source">`.
+
+## Interview speaker labels are bold
+
+In an interview the magazine sets the speaker label in **bold italic, including
+the colon**, and the turn runs on in roman:
+
+```html
+<p><strong>64'er:</strong> Commodore ist der erfolgreichste Anbieter …</p>
+<p><strong>Winfried Hoffmann:</strong> Das hat sicherlich viele Gründe. …</p>
+```
+
+The OCR drops the face, so the labels arrive as plain text and the turns look
+like ordinary paragraphs. Mark every label — the interviewer's (`64'er:`) as
+well as each interviewee's.
+
+**Do not take the absence of this markup elsewhere as precedent.** The corpus
+carries 24 plain `<p>64'er: ` across earlier issues; that is the same defect
+propagating, not a house style. A review agent on 8609 left the labels
+unmarked for exactly that reason and was wrong. When an existing issue and the
+printed page disagree, the page wins.
+
+Related: the abbreviated forename in a speaker label (`M. Grewe:`) is the
+construct that Discount's alpha-list extension eats — see r060.
