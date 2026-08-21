@@ -49,3 +49,22 @@ Roulette C128 · CP/M auf dem C128 · Multiplan · dBase II · Der etwas andere 
 Das ist der Commodore 128 · Basic 7.0 – Programme strukturiert · Software für den
 C128 · Der C128 am Telefon · Der Basic-Interpreter des C128 · Tips & Tricks zum
 C128 · C128 um 35% schneller · Rätselfreunde aufgepaßt!
+
+## Resolution status, checked 2026-08-21
+
+Every claimed source monthly is published in this repo, so the comparison has
+something to compare against. Resolving each lead by page number:
+
+| lead | resolves to | note |
+|---|---|---|
+| 8506/16 + 8507/17 | *Erster ausführlicher Test PC 128 (Teil 1)* / *… C 128, Teil 2* | a two-part C128 test; the Sonderheft's *Rundgang durch die Hardware des C128* would be drawn from both, retitled |
+| 8601/43 | *Der C128 D im ersten Test* | title matches |
+| 8510/16 | *Ein Monitor ist genug* | title matches exactly |
+| 8512/78 | *80-Zeichen-Grafik für den C 128* | title matches |
+| 8601/47 | *Gestatten: Wordstar* | retitled to *Test: WordStar* here, plausible |
+| 8511/30 | *Turbo-Pascal auf dem C 128* | title matches |
+| 8506/16 → *Basic 7.0 – das starke Basic* | **does not resolve** | 8506/16 is the C128 test above, and 8506 carries no Basic 7.0 article at all (its only Basic piece is *Macro-Basic* on p137). This lead points two different Sonderheft articles at one page and is almost certainly wrong |
+
+The last row is the reason these are leads and not findings: **confirm every one
+against the printed page before diffing**, and be ready to conclude that an
+article is not a reprint at all.
