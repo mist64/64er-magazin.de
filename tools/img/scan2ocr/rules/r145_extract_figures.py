@@ -484,7 +484,7 @@ def encloses_text(rec, x0, y0, x1, y1):
 def uniform_tint(grey, x0, y0, x1, y1):
     """Screened and UNIFORM is a tint panel; screened and VARYING is a picture.
 
-    This is the project's own physics (see scan2mrc/CLAUDE.md): the press
+    This is the project's own physics (see FINDINGS.md §11): the press
     screened a continuous-tone original, so a photograph's dot area varies
     across it, while a flat tint is one ink percentage everywhere.  Averaging
     the halftone away leaves that difference standing -- a tint collapses to a

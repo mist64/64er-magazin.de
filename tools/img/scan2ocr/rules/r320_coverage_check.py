@@ -14,14 +14,23 @@ they never match and would drown the signal.
 """
 import glob, io, json, re, sys
 
-ISSUE = sys.argv[1] if len(sys.argv) > 1 else '/Users/mist/Documents/git/64er-magazin.de/issues/8609'
-OCR   = sys.argv[2] if len(sys.argv) > 2 else '/Users/mist/DNB/8609/tmp/ocr/out'
+import r000_issue
+from r000_issue import ISSUE
+
+# The ONE per-issue knob, imported from r000_issue as everywhere in scan2ocr.
+# Both sides of the reconciliation come from it, which is the point: comparing
+# one issue's OCR against another issue's HTML reports a coverage figure that
+# means nothing, and it cannot happen while there is a single name to get wrong.
+ISS = r000_issue.load(ISSUE)
+
+ISSUE_DIR = sys.argv[1] if len(sys.argv) > 1 else ISS.issue_dir
+OCR       = sys.argv[2] if len(sys.argv) > 2 else ISS.out_dir
 SHINGLE, MIN_WORDS, THRESH = 4, 12, 0.25
 
 norm = lambda t: re.sub(r'[^a-z0-9]+', ' ', t.lower()).split()
 
 page2art, arttext = {}, {}
-for f in sorted(glob.glob(ISSUE + '/*.html')):
+for f in sorted(glob.glob(ISSUE_DIR + '/*.html')):
     s = io.open(f, encoding='utf-8').read()
     m = re.search(r'64er\.pages" content="([^"]*)"', s)
     if not m: continue
@@ -34,7 +43,7 @@ for f in sorted(glob.glob(ISSUE + '/*.html')):
         for p in rng: page2art.setdefault(p, []).append(f)
 
 listings = ' '.join(' '.join(norm(io.open(f, encoding='utf-8', errors='replace').read()))
-                    for f in glob.glob(ISSUE + '/prg/*.txt'))
+                    for f in glob.glob(ISSUE_DIR + '/prg/*.txt'))
 
 missing, kept_total = [], 0
 for p, arts in sorted(page2art.items()):

@@ -5,4 +5,6 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-python3}"
 cd "$DIR"
-"$PY" r020_classify.py $(seq "${1:-1}" "${2:-176}")
+# Last page from the ISSUE constant in r020_classify.py, not repeated here.
+LAST="${2:-$("$PY" -c 'import r020_classify as m; print(m.ISS.pages)')}"
+"$PY" r020_classify.py $(seq "${1:-1}" "$LAST")

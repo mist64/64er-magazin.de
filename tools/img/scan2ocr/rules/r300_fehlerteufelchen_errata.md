@@ -1,5 +1,7 @@
 # 300 — Apply cross-issue Fehlerteufelchen errata to this issue's articles
 
+**Applies to:** all — **this is a correction to the spec's first pass.** The rule does not build a Fehlerteufelchen rubric — it applies errata printed in LATER monthlies to THIS issue's articles, and later monthlies corrected Sonderheft articles too. 26 articles across `SH8501`-`SH8508` already carry `<aside class="fehlerteufelchen">`, and the rule's own step 1 already routes `Sonderheft N/YY → issues/SH<YY><NN>/`.
+
 **Goal:** the "Fehlerteufelchen" was 64'er's errata column. Corrections
 for **this** issue's articles were printed in the Fehlerteufelchen rubric
 of **later** issues. This rule harvests every such correction and applies
@@ -11,6 +13,13 @@ This is why prior issues carry 2–7 of these asides each (8601–8607) while a
 freshly-built issue has **zero**: the errata live in issues that are
 imported later, so this step is a **cross-issue enrichment**, not a
 single-issue transform.
+
+**It applies to Sonderhefte as well** — this rule builds no rubric, it consumes
+one. A Sonderheft article can be corrected by a later monthly's Fehlerteufelchen
+just like a monthly's can, and 26 articles across `SH8501`-`SH8508` already
+carry the resulting aside. Step 1 below already routes
+`Sonderheft N/YY → issues/SH<YY><NN>/`; that is not an edge case, it is half the
+point of scanning every later issue's rubric.
 
 ## Run order — LAST (after rules 000–290)
 

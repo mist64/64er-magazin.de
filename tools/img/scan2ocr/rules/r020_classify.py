@@ -32,7 +32,20 @@ from concurrent.futures import ThreadPoolExecutor
 
 from PIL import Image, ImageDraw
 
-OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
+import r000_issue
+from r000_issue import ISSUE
+
+# ---------------------------------------------------------------------------
+# CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
+# ---------------------------------------------------------------------------
+
+# `ISSUE` is imported from r000_issue rather than declared here.  This stage
+# reads the blocks step 010 measured, so it MUST name the same issue 010 ran --
+# which is now automatic, both steps reading the one constant.  See
+# r000_issue.py.
+ISS = r000_issue.load(ISSUE)
+
+OUT_DIR = ISS.out_dir
 
 # `claude -p` rather than the API: this box has no ANTHROPIC_API_KEY, and the CLI
 # already carries the user's credentials.
@@ -68,6 +81,12 @@ LANES = 4
 import r000_llm as llm                                          # noqa: E402
 from r010_ocr_blocks import (ARTICLE_LABELS, HYPHEN_MARK,        # noqa: E402
                              PARA_INDENT_MIN_PX, SRC_DIR, reading_order)
+
+# SRC_DIR comes from step 010 rather than from ISS, so that the overlay is drawn
+# on the exact image the boxes were measured on.  That used to need a check that
+# 010 and this file named the same issue; both now read the single `ISSUE` in
+# r000_issue, so the two SRC_DIRs cannot be about different issues and the check
+# has nothing left to compare.
 
 # Every label the prompt offers must appear here.  "caption" was missing -- it is
 # offered to the model and excluded from the corpus, but was not listed as valid,
@@ -301,9 +320,10 @@ def redraw(page, blocks):
         return
     # The stage-A overlay is redrawn from the source thumb, so start from the
     # original page rather than stacking boxes on boxes.
-    # Drawn from the SAME image stage A measured.  thumbs_150 is uncropped, so
-    # using it here put every box at the wrong place on the page the moment the
-    # source became the A4-cropped master.
+    # Drawn from the SAME image stage A measured -- SRC_DIR, the masters600
+    # directory step 005 wrote: levelled, cut to the page, graded, 600 dpi.
+    # Drawing on anything else put every box at the wrong place, because a box
+    # is stored as a fraction of THAT page and no other image shares its frame.
     im = Image.open(os.path.join(SRC_DIR, f"{page:03d}.png")).convert("RGB")
     im = im.resize((im.size[0] // 4, im.size[1] // 4), Image.BOX)
     W, H = im.size

@@ -1,5 +1,7 @@
 # 150 — Place image figures into article HTML
 
+**Applies to:** all — every issue has figures to place. The Vorschau-teaser section is one rubric's placement convention, inert when the issue has no Vorschau.
+
 **Goal:** turn every loose `<page>-<n><suffix>.png` (and `title.png` if
 unhandled elsewhere) in the issue directory into a `<figure>` or
 `<img class="inline">` inside the article it belongs to. Captions are

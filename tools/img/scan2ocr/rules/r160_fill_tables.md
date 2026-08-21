@@ -1,5 +1,7 @@
 # 160 — Extract and place data tables
 
+**Applies to:** all — tables are printed in both kinds.
+
 **Goal:** turn every `<p>TODO TABLE</p>` placeholder, and every prose
 `Tabelle N` reference whose table is missing from the HTML, into a
 proper `<table>` block. Captioned tables get wrapped in `<figure>` with

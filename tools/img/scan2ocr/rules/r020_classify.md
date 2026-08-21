@@ -1,5 +1,7 @@
 # 020 — Label every block, decide reading order, render per-page markdown
 
+**Applies to:** all — geometry and per-page role judgement. Nothing in it knows what a Leserforum or a Sonderheft is.
+
 **Goal:** ask a model the one question geometry cannot answer — is this block
 editorial matter the magazine wrote, or advertising / apparatus? — then let it
 decide **reading order**, assign each kept block a **role**, and choose the

@@ -368,3 +368,40 @@ token, which no local rule reaches.
   Spritein`. Measured as unaffected by dpi, by `preserve_interword_spaces`, and by
   binarisation. These are the recognizer's, and belong to step 280
   (`rules/r280_ocr_word_cleanup.md`).
+
+---
+
+## 11. The press physics behind the tint/picture test
+
+Kept here because `r145_extract_figures.py` rests on it and this directory must
+stand on its own. Measured on this corpus by the retired MRC work; only what
+`r145` actually uses is reproduced.
+
+**The press screened a continuous-tone original.** So a photograph's *dot area*
+varies from place to place across it, while a flat tint is one ink percentage
+everywhere. Average the halftone away over a coarse grid and that difference
+stands: a tint collapses to a constant, a photograph does not. This is what
+`uniform_tint()` measures, and it is the only thing that separates a data table
+on a grey panel from a photograph — no measure of ink can, because both are
+screened and both are dark.
+
+Routing follows from what is physically on the paper, never from what a region
+looks like:
+
+    screened, tone varies   -> continuous-tone image (photo, illustration)
+    screened, tone uniform  -> flat fill at the measured ink %
+    not screened            -> pure-ink type and line art
+
+**A greyscale photo and a grey tint box have IDENTICAL geometry** — both are the
+K screen at 45°. They differ *only* in whether the dot area varies. Geometry
+alone can never separate them; that is what the uniform/varying test is for.
+
+**Halftone exists only in mid-tones.** A solid highlight or solid shadow carries
+no dots at all, so a photograph's flat areas correctly measure "not screened".
+Any block-level screening test must therefore close gaps and fill holes before
+it forms regions, or every photo comes out shot through with unscreened patches.
+Load-bearing, not cosmetic.
+
+(This issue's own screen, measured by `r145` at 600 dpi: **133 lpi at 45°**,
+spread 44.3–48.5°. Unscreened crops peak at 0°, on the printer's or the
+scanner's own grid.)

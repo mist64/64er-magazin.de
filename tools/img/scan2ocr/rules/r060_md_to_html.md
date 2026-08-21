@@ -1,5 +1,7 @@
 # 060 — Convert `.md` → `.html` (Discount / GFM) and replace .md with .html in git
 
+**Applies to:** all — a format conversion; no issue-specific input.
+
 **Goal:** convert the OCR markdown to HTML using the same engine Marked 2
 uses (Discount, GFM mode), producing the `.html` next to the `.md`. After
 conversion, `git rm` the `.md` and `git add` the `.html`, so only the HTML

@@ -77,8 +77,8 @@ echo "10. the three program steps' verification blocks import cleanly"
 import r010_ocr_blocks, r020_classify, r030_assemble, r010_blocks_index
 print('   4 step modules import')" ) || fail=1
 
-echo "6. nothing from issues/ or scan2mrc is staged"
-if git diff --cached --stat -- issues/ tools/img/scan2mrc/ | tail -1 | grep -q .; then
+echo "6. nothing from issues/ is staged"
+if git diff --cached --stat -- issues/ | tail -1 | grep -q .; then
   echo "   STAGED history/unrelated!"; fail=1
 else echo "   clean"; fi
 

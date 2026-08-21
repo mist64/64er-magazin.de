@@ -1,5 +1,7 @@
 # 070 — HTML cleanup: blockquote → intro, curly quotes → straight, `<br/>` → `<br>`
 
+**Applies to:** all — house-style substitutions on the converted HTML; no issue-specific input.
+
 **Goal:** turn the Discount output into the project's house style:
 - the leading "intro" paragraph in each article comes through as
   `<blockquote><p>…</p></blockquote>`; convert to `<p class="intro">…</p>`

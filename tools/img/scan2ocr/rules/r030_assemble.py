@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Stage D of the article-corpus pipeline: 176 pages -> one issue markdown.
+Stage D of the article-corpus pipeline: an issue's pages -> one issue markdown.
 
-    out/NNN.labels.json  ->  8609.md   every article, in issue order
+    out/NNN.labels.json  ->  <ID>.md   every article, in issue order
                          ->  articles.json   the structure, machine-readable
 
 Stage C answers "what is on THIS page".  Stage D answers the questions that
@@ -13,7 +13,8 @@ only exist once the pages are put back together:
   2. A paragraph running over a page break is one paragraph.  Every page
      boundary was a false paragraph break until this stage existed.
   3. An article interrupted by twenty pages of listings resumes later --
-     "Fortsetzung auf Seite 146".  Five such jumps in this issue.
+     "Fortsetzung auf Seite 146".  However many the issue prints; each is
+     confirmed in BOTH directions before it is joined.
   4. A hyphen at a line end was left as a marker by stage A because no local
      rule resolves it.  Here it finally gets resolved.
 
@@ -29,8 +30,10 @@ import os
 import re
 import sys
 
+import r000_issue
+from r000_issue import ISSUE
 import r000_llm as llm
-from r020_classify import (OUT_DIR, PARA_INDENT_MIN_PX, ROLE_PREFIX,
+from r020_classify import (PARA_INDENT_MIN_PX, ROLE_PREFIX,
                            SOURCE_HTML, SOURCE_JOIN, ends_dangling,
                            join_runons, join_text, page_paragraphs)
 
@@ -38,12 +41,20 @@ from r020_classify import (OUT_DIR, PARA_INDENT_MIN_PX, ROLE_PREFIX,
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
 # ---------------------------------------------------------------------------
 
-PAGES = range(1, 177)
-ISSUE_MD = "/Users/mist/DNB/8609/tmp/ocr/8609.md"
-ARTICLES_JSON = "/Users/mist/DNB/8609/tmp/ocr/articles.json"
+# The ONE knob, and it lives in r000_issue -- imported above, not declared
+# here.  Everything below is derived from issues/<ID>/issue.json, so there is no
+# second path, and no second ISSUE, to forget when the issue changes.  See
+# r000_issue.py.
+ISS = r000_issue.load(ISSUE)
+
+PAGES = ISS.page_range
+OUT_DIR = ISS.out_dir
+ISSUE_MD = ISS.issue_md
+ARTICLES_JSON = ISS.articles_json
 # Resolved hyphens are cached, because the answer for a given broken word never
-# changes and the issue holds 3459 distinct ones.  Delete to re-ask.
-HYPHEN_CACHE = "/Users/mist/DNB/8609/tmp/ocr/hyphens.json"
+# changes and one issue holds thousands of distinct ones (3459 in 8609).
+# Delete to re-ask.
+HYPHEN_CACHE = ISS.hyphen_cache
 
 # The magazine's own cross-reference, printed at the foot of a page whose
 # article resumes later and at the head of the page where it does.  Both are
@@ -53,10 +64,24 @@ HYPHEN_CACHE = "/Users/mist/DNB/8609/tmp/ocr/hyphens.json"
 FORTSETZUNG = re.compile(r"Fortsetzung\s+(auf|von)\s+Seite\s+(\d+)", re.I)
 
 # The issue's contents, the one place that names the major articles and the page
-# each starts on.  Stage B labels the cover "toc" as well, and the cover is
-# nothing but OCR noise off display type -- taking every toc-labelled block in
-# the issue fills the model's evidence with garbage, so it is these two pages.
-TOC_PAGES = (6, 7)
+# each starts on.  It is NOT a fixed page pair and must not be compiled in: 8609
+# sets it on 6-7, older monthlies on 4-5, and a Sonderheft wherever its front
+# matter happens to end (SH8507's first article is page 3).  So the pages are
+# FOUND, from stage B's own labels, by toc_pages() below.
+#
+# Two things make finding them harder than "every toc-labelled block":
+#   - stage B labels the COVER "toc" as well, and the cover is nothing but OCR
+#     noise off display type;
+#   - a page deep in the back matter can carry far MORE toc-labelled text than
+#     the contents page does -- 8609's p171 (the year's index) scores 7973
+#     characters against the real contents pages' 2129 and 2079.
+# Both are excluded by looking only in the front matter, after the cover.  A
+# score threshold alone would pick the wrong page; a "highest score" alone would
+# pick the back matter.
+TOC_FRONT_MATTER = 16    # last page that can plausibly hold the contents
+TOC_SKIP_COVER = 1       # page 1 is the cover: display type, not a contents list
+TOC_MIN_CHARS = 300      # a contents page is dense; a stray toc label is not
+TOC_MAX_PAGES = 4        # a contents spread, generously; more means the label is wrong
 
 # The byline in this magazine sits in parentheses at the very end of the last
 # paragraph, welded onto the sentence by the OCR because that is how it is
@@ -77,8 +102,38 @@ PREV_SNIPPET = 90
 # calls, small enough that one bad reply costs little.
 HYPHEN_BATCH = 200
 
+# What `kind` licenses the model to EXPECT.  Not what to find: the evidence
+# still decides, and the note says so in both branches.  A monthly is a bundle
+# of departments, standing columns and features; a Sonderheft is one theme end
+# to end, where the running head names the section of the book and every piece
+# under it prints its own headline -- so nearly everything is an article and a
+# department would be the exception.  Getting this backwards is expensive in one
+# direction only: a missed boundary merges two articles, a false one strands the
+# second half of an article with no headline.
+KIND_NOTES = {
+    "monthly": (
+        "This is a MONTHLY issue: expect several DEPARTMENTS and standing "
+        "COLUMNS (a news run, a reader-mail rubric, tips columns) among the "
+        "feature articles. Expect, do not assume -- the evidence below decides."),
+    "sonderheft": (
+        "This is a SONDERHEFT (special issue): one theme from cover to cover. "
+        "The running head normally names the SECTION OF THE BOOK, and every "
+        "piece under it prints its own headline, so nearly every unit is an "
+        "ARTICLE and a DEPARTMENT is the exception rather than the rule. It is "
+        "still possible -- but it needs the same evidence as anywhere else, "
+        "namely a run with no headline of its own."),
+}
+
+# The prompt is issue-AGNOSTIC.  Everything that is true of one issue only --
+# which runs are departments, which are columns, what the columns are called --
+# is EVIDENCE, and reaches the model through {toc} and {candidates}, which are
+# read off this issue's own contents page and running heads.  It used to name
+# 8609's departments and columns inline; that is a compiled-in answer to the
+# question being asked, and it is wrong for every other issue -- a Sonderheft
+# has neither.  {kind_note} says what shape to EXPECT, never what to find.
 BOUNDARY_PROMPT = """You are reassembling one issue of the German home-computer magazine
-"64'er", 9/September 1986, from its pages back into its articles.
+"64'er" (issue {issue_id}) from its pages back into its articles.
+{kind_note}
 
 Below is one entry per CANDIDATE ARTICLE BOUNDARY, in reading order, together with
 the running head printed on that page and the table of contents. Decide for each
@@ -115,7 +170,8 @@ Actions:
               and every following fragment "drop".
             - a headline repeated on a continuation page.
             - a "Fortsetzung von/auf Seite N" cross-reference.
-            - a section divider that is not an article ("64'er Extra").
+            - a section divider that is not an article: a page or banner that
+              only names the part of the magazine that follows.
 
 Rules:
 - The running head is the strongest evidence. Consecutive pages under the same
@@ -124,37 +180,52 @@ Rules:
   department, one column, or several separate articles -- see the next rules.
 - A DEPARTMENT is one article, however many items it holds. A department is a
   run of consecutive pages under the same standing running head, where the
-  magazine prints NO headline naming the department itself -- "Aktuelles"
-  (pages 8-12) and "Leserforum" are the two here. The department is one article
-  whose title is the running head, and every item headline inside it is
-  "continue", so it renders as a section heading. It ends where the running head
-  changes.
+  magazine prints NO headline naming the department itself -- typically a news
+  run or a reader-mail rubric. The department is one article whose title is the
+  running head, and every item headline inside it is "continue", so it renders
+  as a section heading. It ends where the running head changes.
   This is the ONE case where the running head becomes a title, because there is
-  no other headline for the whole run.
-- A COLUMN is likewise one article, but the magazine DOES print its headline:
-  "Tips & Tricks zum C 128", "Tips & Tricks für Einsteiger", "Die CP/M-Ecke
-  (Teil 3)". That printed headline is the article title, and the item headlines
-  under it ("Die Multifunktions-Taste", "Tip zum MSE", "SMON auf Tastendruck",
-  "Das Programm »KEYFIG«") are "continue" -> section headings. Each item having
-  its own byline does not make it an article. The column ends at the next column
-  headline or at an unrelated article.
-  Note the running head "Tips & Tricks" covers many pages that are NOT part of
-  any column -- full articles like "Module für Hypra-Basic" or "HiRes Colossal"
-  sit under it too. A shared running head alone never merges those.
-- A column name is a STANDING name that recurs issue to issue and names no
-  subject of its own. A headline that names a specific product, program, machine
-  or event is an article even when it shares a page with others -- "Professionell
-  und preiswert" (a Forth compiler test) and "Jetzt können sich die
-  Computer-Freaks in Österreich freuen" are articles, not sections. When in
-  doubt about a headline that names a subject, make it an article.
+  no other headline for the whole run. Decide it from the evidence below: if
+  some paragraph or contents line DOES name the run, it is not a department.
+- A COLUMN is likewise one article, but the magazine DOES print its headline.
+  That printed headline is the article title, and the item headlines under it
+  are "continue" -> section headings. Each item having its own byline does not
+  make it an article. The column ends at the next column headline or at an
+  unrelated article.
+  A shared running head alone never merges anything: a head can cover many pages
+  that are NOT part of any column, with full articles of their own sitting under
+  it. Merge on the headline, not on the head.
+- A column or department name is a STANDING name: it names no subject of its
+  own and reads as the name of a section of the magazine. A headline that names
+  a specific product, program, machine, person or event is an ARTICLE even when
+  it shares a page with others. When in doubt about a headline that names a
+  subject, make it an article.
+- WORKED EXAMPLE, from a DIFFERENT issue (a 1986 monthly). Read it for the
+  shape of the reasoning, not for its names -- none of these names is evidence
+  about the issue you are reassembling:
+    * "Aktuelles" ran pages 8-12 under that running head with no headline of its
+      own anywhere -> ONE department, titled from the head, 22 news items as
+      section headings.
+    * "Tips & Tricks für Einsteiger" printed its own headline over eight tips,
+      each with its own byline -> ONE column, titled from the printed headline,
+      the eight tips as section headings. The bylines did not make them articles.
+    * The running head "Tips & Tricks" ALSO covered pages 62-96, most of which
+      carried full articles ("Module für Hypra-Basic", "HiRes Colossal"). The
+      shared head merged none of them.
+    * "Professionell und preiswert" (a Forth compiler test) and "Jetzt können
+      sich die Computer-Freaks in Österreich freuen" name a subject, so they
+      were articles even though they shared pages with other matter.
 - If the headline text is repeated in the candidate because OCR read it twice
   ("Professionell und preiswert - Professionell und preiswert"), give it once.
 - Many headlines are SET IN CAPITALS. Give those in normal German case, the way
   the contents page prints them: "DIE 1541 IM NEUEN KLEID" -> "Die 1541 im
   neuen Kleid". Leave a headline that is already mixed case exactly as it is.
-- The table of contents lists the major articles and their starting pages. Use
-  it to fix titles and starting pages, but do NOT assume it is complete: it
-  omits short items.
+- The table of contents below is THIS issue's own, transcribed from its printed
+  contents page. It lists the major articles and their starting pages. Use it to
+  fix titles and starting pages, and read it as the issue's own statement of
+  which names are sections and which are articles. Do NOT assume it is complete:
+  it omits short items. If it is empty, this issue's contents page did not
+  survive OCR -- go by the running heads and the headlines alone.
 - The title you return is what the READER sees, corrected for obvious OCR
   damage ("Comnuter" -> "Computer"). Do not invent, translate or expand it, and
   do not add the page number.
@@ -294,11 +365,37 @@ def candidates(stream):
     return out
 
 
+def toc_pages(pageinfo):
+    """Which pages of THIS issue hold its printed contents.
+
+    Front matter only, cover excluded, dense pages only, at most a spread's
+    worth -- see the TOC_* constants for why each of those is needed.  Returns
+    page numbers in reading order, or () when the contents did not survive OCR,
+    which is reported rather than papered over: the boundary call is markedly
+    worse without them and the operator should know which run this was."""
+    scored = []
+    for page, info in pageinfo.items():
+        if not (TOC_SKIP_COVER < page <= TOC_FRONT_MATTER):
+            continue
+        n = sum(len(t) for t in info.get("toc", ()))
+        if n >= TOC_MIN_CHARS:
+            scored.append((n, page))
+    scored.sort(reverse=True)
+    return tuple(sorted(p for _, p in scored[:TOC_MAX_PAGES]))
+
+
 def brief(stream, cands, pageinfo):
     """The one payload the model sees: every candidate with the evidence around
     it, plus the issue's table of contents."""
+    pages = toc_pages(pageinfo)
+    if pages:
+        print(f"contents page(s): {', '.join(str(p) for p in pages)}", flush=True)
+    else:
+        print("WARNING: no contents page found in the front matter -- the "
+              "boundary call runs on running heads and headlines alone",
+              flush=True)
     toc = []
-    for page in TOC_PAGES:
+    for page in pages:
         toc += pageinfo.get(page, {}).get("toc", [])
     # what each page ended on, so a paragraph that resumes an article broken off
     # at the foot of the previous page can be recognised as one
@@ -331,7 +428,9 @@ def ask_boundaries(stream, cands, pageinfo):
     """One LLM call for the whole issue.  Cached in articles.json's sidecar so a
     re-render costs nothing; delete the cache to re-ask."""
     toc, cand_text = brief(stream, cands, pageinfo)
-    prompt = BOUNDARY_PROMPT.format(toc=toc, candidates=cand_text)
+    prompt = BOUNDARY_PROMPT.format(issue_id=ISS.id,
+                                    kind_note=KIND_NOTES[ISS.kind],
+                                    toc=toc, candidates=cand_text)
     # Keyed on the whole question, not just its length.  A cached verdict is
     # only valid for the exact stream AND the exact prompt it answered -- stage
     # B lost a whole sweep to a cache that survived a change it should not have.

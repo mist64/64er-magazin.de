@@ -1,5 +1,7 @@
 # 120 — Extract listings from the disk image into `prg/`
 
+**Applies to:** all — Sonderhefte shipped a Programm-Service disk as well — every `issues/SH85*/prg/` in the repo is the output of this step.
+
 **Goal:** decompose the issue's official `.D64` (or several, e.g. side A
 and side B) into a per-file directory `issues/<YYMM>/prg/` plus a
 worklist `issues/<YYMM>/prg.txt` containing one `<figure>` HTML snippet

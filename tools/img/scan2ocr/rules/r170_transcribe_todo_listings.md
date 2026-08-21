@@ -1,5 +1,7 @@
 # 170 — Transcribe `<pre>TODO</pre>` listings from the printed scan
 
+**Applies to:** all — listings printed but not shipped on disk occur in both kinds.
+
 **Goal:** turn every `<pre>TODO</pre>` placeholder (and the lone
 `<p>TODO LISTING</p>` if any) into a verbatim transcription of the
 printed listing from the magazine scan. These are listings that the

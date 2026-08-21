@@ -1,5 +1,7 @@
 # 180 — Fill or remove `<meta name="author">` per article
 
+**Applies to:** all — bylines are printed in both kinds. Cases B and C name the monthly rubrics because that is where unsigned rubric text occurs; a Sonderheft simply has fewer of them (its Vorwort is the Case C analogue, its Impressum the Case B one).
+
 **Goal:** every article in `issues/<YYMM>/` has either a correctly
 filled `<meta name="author" content="…">` (signed by the bylines that
 appear in the body), OR the line is removed entirely (for the

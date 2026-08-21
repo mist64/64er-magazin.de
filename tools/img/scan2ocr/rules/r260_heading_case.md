@@ -1,5 +1,7 @@
 # 260 — Convert ALL-CAPS headings to German natural case
 
+**Applies to:** all — the print sets headings in caps in both kinds.
+
 **Goal:** every `<h1>` and `<h2>` heading in the article HTML reads in
 **German sentence case**: first character of the heading capitalised,
 proper nouns + product names + abbreviations capitalised, everything

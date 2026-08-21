@@ -41,13 +41,28 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from difflib import SequenceMatcher
 
+import r000_issue
+from r000_issue import ISSUE
 import r000_llm as llm
 
-SRC_DIR = "/Users/mist/DNB/8609/tmp/master600/final"
-OUT_DIR = "/Users/mist/DNB/8609/tmp/ocr/out"
-TRUTH_DIR = "/Users/mist/DNB/8609/tmp/ocr/truth"
-REPORT = "/Users/mist/DNB/8609/tmp/ocr/report.jsonl"
-WORST = "/Users/mist/DNB/8609/tmp/ocr/WORST.txt"
+# ---------------------------------------------------------------------------
+# CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
+# ---------------------------------------------------------------------------
+
+# `ISSUE` is imported from r000_issue, not declared here.  It names the issue
+# whose corpus is being scored, and getting that wrong does not crash: it would
+# score one issue's article text against another issue's vision reading and
+# report a number for it.  With one constant for the chain there is no second
+# value for this one to drift away from -- see r000_issue.py.
+ISS = r000_issue.load(ISSUE)
+
+# Vision reads the page off the SAME master the pipeline OCR'd, so that a
+# disagreement is about reading and never about which pixels each side saw.
+SRC_DIR = ISS.masters600
+OUT_DIR = ISS.out_dir
+TRUTH_DIR = ISS.truth_dir
+REPORT = ISS.report
+WORST = ISS.worst
 
 CLAUDE = "claude"
 # Replies that mean "the service did not answer", never "the page says this".

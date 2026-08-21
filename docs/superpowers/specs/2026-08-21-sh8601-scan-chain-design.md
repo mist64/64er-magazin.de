@@ -149,9 +149,22 @@ Traps, each one paid for during the prototype:
 **Accepted loss, decided explicitly:** where the tear ran into the type area,
 those characters are gone. Accepted — it is a fact about this copy.
 
-**Known defect, open:** on p092 a sliver of bed and prop survives in one corner,
-where two fitted lines meet and the bed component reads as mostly inside.
-006, 041, 056 are clean.
+**Closed:** the p092 corner sliver, and a band of prop at the foot of several
+pages. Both had one cause -- the yellow prop is (237,205,111), city-block
+distance **108** from the old paper white, INSIDE the 110 threshold, so the paper
+mask counted the prop as paper. A hue test separates them (G-B is 11-26 on
+paper, 99-107 on the prop). Fixing it also moved the traced pages from ~210x301
+to **true A4, 210x297**.
+
+**Three sheet classes, not one.** The size gate must know them apart:
+
+| class | pages | edge finding |
+|---|---|---|
+| interior A4 sheet | 003-148 | paper vs bed |
+| A3 cover sheet, full bleed | 001 (218 mm), 002 (224 mm) | **no paper visible** -- ink vs bed |
+| bound-in payment card, blue stock | 149-152 (~143 x 204 mm) | its own window |
+
+(117 measures 163 x 278 and is still to be classified.)
 
 **Gate:** the torn side must match parity on all 152 pages. It is measurable on
 the thumbs (the torn side has high variance in where paper starts down the
@@ -191,6 +204,42 @@ separation:
 |---|---|---|
 | `masters600/NNN.png` | `r010` OCR | contrast: type to black, paper to white. Clipping is a feature |
 | the unclipped ICC render | `r145` figure cuts | fidelity: no clipped highlight, no crushed shadow |
+
+**The measured profile, 2026-08-21.** Both of `colors.txt`'s halves were wrong,
+and in the same direction: the file described paper cleaner than this paper is.
+The values as found are kept beside it as `colors_asfound.txt`.
+
+- **White point `W 214 195 186` -> `209 175 157`.** `W` is the DENSITY
+  REFERENCE: everything is `-log10(rgb/W)`, so paper lighter than `W` clamps to
+  zero ink and paper darker than it **is reported as ink**. Clean paper measures
+  `217 192 179` at p50 and `209 175 157` at its yellowed 5th percentile, so the
+  old anchor -- bluer than the paper -- forced the solver to explain the gap as
+  yellow ink. That was the yellow in the corners. Taking the yellowed end as the
+  reference puts corner paper at 255,255,255 (corner pure-white 50% -> 72% on
+  p006) and costs one level of ink.
+- **Levels `LC 50 90 / LM 30 70 / LY 30 70 / LK 90 95` -> `LC 5 100 / LM 4 100 /
+  LY 5 100 / LK 3 100`.** The `high` points are all 100 because nothing measures
+  below full: the anchors round-trip to C 255, M 255, Y 249, K 245. The `low`
+  points are the p99 of that ink over bare INTERIOR paper (the aged rim is
+  browner and must never set them).
+
+**The OCR curve: `-level 30%,100%`, ONE ISSUE-WIDE CONSTANT.** Never per page --
+every page of an issue gets the same numbers. Chosen on the WORST page:
+
+| level | glyph p50, 006 / 041 / 056 / 092 | paper p50 |
+|---|---|---|
+| none | 69 / 54 / 53 / 72 | 255 / 255 / 255 / 254 |
+| 25% | 14 / 1 / 0 / 18 | 255 / 255 / 254 / 254 |
+| **30%** | **1 / 0 / 0 / 4** | 255 / 255 / 254 / 254 |
+| 35% | 0 / 0 / 0 / 0 | 255 / **254** / 254 / 254 |
+
+25% was tuned on the easiest page and left two pages grey at 14 and 18. At 35%
+paper starts coming down, which is the curve eating paper rather than blur.
+
+**A master must record the profile that made it.** Three of the four test
+masters were silently stale after the profile changed, and it took a human
+eye noticing yellow edges to catch it. The per-page report carries the profile
+path, its anchors, its levels and the OCR constant.
 
 ### 3.4 `kind` drives the editorial steps
 

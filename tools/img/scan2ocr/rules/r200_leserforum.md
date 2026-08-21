@@ -1,5 +1,7 @@
 # 200 — Restructure Leserforum into the Q&A shape + banner image
 
+**Applies to:** monthly — the Leserforum is a monthly reader-mail rubric. No Sonderheft in the repo has one: `ls issues/SH85*/*eserforum*` is empty and `grep -l 'article class="qa"' issues/SH85*/*.html` finds zero files.
+
 **Goal:** turn the flat OCR-imported `Leserforum` article into the
 project's canonical Q&A HTML shape (`<article class="qa">`, per-topic
 `<section>`, `<div class="q">`, `<div class="a">`, `<p class="author">`

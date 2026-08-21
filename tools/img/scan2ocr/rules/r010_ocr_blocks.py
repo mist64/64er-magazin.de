@@ -38,15 +38,18 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 import r000_issue
+from r000_issue import ISSUE
 
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
 # ---------------------------------------------------------------------------
 
-# The ONE per-issue knob in this file.  Everything with a path in it is derived
-# from issues/<ISSUE>/issue.json -- see r000_issue.py for why the five absolute
-# paths this chain used to carry are gone.
-ISSUE = "SH8601"
+# The per-issue knob is NOT declared here.  `ISSUE` is imported from
+# r000_issue, the one place in the chain that names an issue, and everything
+# with a path in it is derived from issues/<ISSUE>/issue.json -- see
+# r000_issue.py for why the five absolute paths this chain used to carry are
+# gone, and why the constant that replaced them is stated once for the chain
+# rather than once per program.
 ISS = r000_issue.load(ISSUE)
 
 # The DESKEWED, MATTED, A4-CROPPED, GRADED 600 dpi master -- not the raw thumbs.

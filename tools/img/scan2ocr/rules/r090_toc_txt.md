@@ -1,5 +1,7 @@
 # 090 — `toc.txt`: order of TOC categories for the issue
 
+**Applies to:** all — every issue has a printed Inhaltsverzeichnis and its own closed category set. A Sonderheft's set is simply its own (`SH8507`: Vorwort, Eintipphilfen, Anwendung, … Rubriken).
+
 **Goal:** produce `issues/<YYMM>/toc.txt`, the per-issue ordered list of
 allowed `64er.toc_category` values. The site generator reads this file
 and (a) controls the rendering order of categories on the issue page,

@@ -1,5 +1,7 @@
 # 220 — Fill `64er.index_category` / `64er.index_title` from the annual CSV
 
+**Applies to:** monthly — the annual Jahresinhaltsverzeichnis CSVs are keyed by monthly `YYMM` only — none of the three at the repo root contains a Sonderheft row, so a Sonderheft has no input at all. Seven of the eight published Sonderhefte carry zero `index_category` (`SH8501` is the lone outlier and looks like a mis-route off the monthly `8501` rows).
+
 **Goal:** every article that appears in the year's
 Jahresinhaltsverzeichnis (annual index) CSV gets its `index_category`
 (and an `index_title` when the index title differs from the article's
@@ -12,6 +14,20 @@ The annual index CSVs live at the repo root:
 - `Jahresinhaltsverzeichnis 1984-85.csv`
 - `Jahresinhaltsverzeichnis 1985.csv`
 - `Jahresinhaltsverzeichnis 1986.csv`
+
+Every row is keyed by a **monthly** `YYMM`. There is no Sonderheft row in any of
+the three:
+
+```bash
+cut -d, -f1 Jahresinhaltsverzeichnis*.csv | sort -u | grep -c SH   # → 0
+```
+
+That is why this rule is `Applies to: monthly`. On a Sonderheft it is recorded
+`not applicable — kind` and no meta is written. **Do not fall back to the
+same-numbered monthly's rows** — `SH8501` in the repo carries 27
+`index_category` values that appear to have come from the monthly `8501` rows,
+which is the mis-route this note exists to prevent; the other seven published
+Sonderhefte correctly carry none.
 
 Each row: `YYMM,pages,category,subcategory,title`. Pages use em-dash
 `—` as range separator. Category + subcategory become

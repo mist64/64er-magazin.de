@@ -1,5 +1,7 @@
 # 110 — `pubdate.txt` (publication date)
 
+**Applies to:** all — the README's release table carries the Sonderheft dates too, and the file format is identical.
+
 **Goal:** write the single-line publication date for the issue. The
 generator (`generate.py`) reads `issues/<YYMM>/pubdate.txt` and uses it
 to (a) schedule when the issue becomes public on

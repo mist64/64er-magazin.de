@@ -1,5 +1,7 @@
 # 080 — Split the consolidated `.html` into one file per article
 
+**Applies to:** all — one file per `<h1>` in any issue. The *Listing/Anwendung des Monats* case is the monthlies' commonest instance of the paired-article rule, not the rule itself — a Sonderheft's multi-part features (`SH8506` HI-EDDI, Hypra-Load/Hypra-Save) are the same shape.
+
 **Goal:** turn the single `issues/8607/8607.html` into one HTML file per
 article (e.g. `issues/8607/8 Aktuelles.html`, `issues/8607/19 Der Neue.html`,
 …) with the per-article `<head>` template, derived metadata, and authors

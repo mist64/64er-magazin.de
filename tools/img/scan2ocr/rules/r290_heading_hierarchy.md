@@ -1,5 +1,7 @@
 # 290 — Heading hierarchy (`<h1>` / `<h2>` / `<h3>`)
 
+**Applies to:** all — heading levels follow the print's typographic weight in both kinds.
+
 **Goal:** every article's heading hierarchy matches what the print
 typesets. Don't promote / demote on structure alone — judge against
 the print's typographic weight.

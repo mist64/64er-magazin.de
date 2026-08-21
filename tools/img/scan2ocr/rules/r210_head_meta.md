@@ -1,5 +1,7 @@
 # 210 — Fill `64er.head1` / `64er.head2` from page headers
 
+**Applies to:** all — Sonderhefte print running heads too, and the published corpus captures them — `SH8507` has `head1` on 27 of 28 articles (Anwendung, Statistik, Finanzen, …), `SH8506` on 31 of 32. If a given issue's print carries no header band, the rule's own per-page evidence requirement yields no meta; that is a per-page fact, not a kind fact.
+
 **Goal:** every interior-page article gets the running-header text
 that's printed at the top of its start page captured into
 `<meta name="64er.head1">` (section / column name) and

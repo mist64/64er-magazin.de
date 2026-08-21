@@ -1,5 +1,7 @@
 # 130 — Place `<figure>` tags for the extracted listings
 
+**Applies to:** all — placing the extracted listings into their articles is kind-independent.
+
 **Goal:** turn the worklist `issues/<YYMM>/prg.txt` into real, placed
 listing figures inside each per-article HTML, and finish each one with
 the actual program name (`data-name`) and verbatim caption

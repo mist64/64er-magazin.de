@@ -1,5 +1,7 @@
 # 250 — Tag every contact/reference footer with `<p class="source">`
 
+**Applies to:** all — contact/reference footers occur in both kinds.
+
 **Goal:** every paragraph in an article that points the reader at an
 external party (where to buy, who to contact, what else to read)
 ends up as `<p class="source">…</p>`. Conversely, paragraphs tagged in

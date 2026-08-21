@@ -1,5 +1,7 @@
 # 000 — Orchestration: how to execute every other rule in this dir
 
+**Applies to:** all — the meta-rule itself; it defines the `Applies to:` contract below and is read at the start of every issue of either kind.
+
 **Goal:** define the meta-process that every numbered rule in this
 directory is run under. Read this once at the start of an issue build;
 re-read whenever a new agent or session takes over.
@@ -26,6 +28,140 @@ which is exactly what `9b` and the missing `23` were symptoms of.
 Running the editorial steps in-line in the main conversation thread is the wrong
 shape: each one chews up context the user is paying for, and it skips the second
 pair of eyes the verification block in each rule was designed to provide.
+
+## `Applies to:` — the issue-kind contract
+
+Not every step exists for every issue. A **monthly** (`8609`) carries a
+Leserforum and gets errata columns; a **Sonderheft** (`SH8601`) is one theme
+end to end, with its own table-of-contents categories and none of the monthly's
+recurring rubrics. Steps written for one and run against the other used to be
+"skipped", which is indistinguishable in the record from a step nobody got to.
+
+So **every `rNNN_*.md` in this directory carries an `Applies to:` line in its
+header**, on its own line immediately under the H1 and before `**Goal:**`:
+
+```
+# 220 — Fill `64er.index_category` / `64er.index_title` from the annual CSV
+
+**Applies to:** monthly — the Jahresinhaltsverzeichnis CSVs are keyed by
+monthly `YYMM`; no Sonderheft has a row in any of them.
+
+**Goal:** …
+```
+
+The value is exactly one of `all`, `monthly`, `sonderheft`, optionally followed
+by ` — ` and the one-line reason. Machine-readable:
+
+```bash
+# -m1: the header line is the first hit in every file, so the illustrative
+# examples further down THIS file do not pollute the listing.
+grep -m1 -H '^\*\*Applies to:\*\*' tools/img/scan2ocr/rules/r[0-9][0-9][0-9]_*.md
+```
+
+The issue's kind comes from **`issues/<ID>/issue.json`**, field `kind`, loaded by
+`r000_issue.py`. Never from the issue id, never from the directory name, never
+from the orchestrator's memory of what this issue is.
+
+### A kind mismatch is a RECORDED OUTCOME, never a silent skip
+
+When the rule's `Applies to:` value is neither `all` nor the issue's `kind`, the
+orchestrator does **not** dispatch it — and does **not** just move on. It writes
+the outcome into `issues/<ID>/LOG.md`, in the same place and shape every other
+step's result goes, before advancing to the next number:
+
+```markdown
+## Step 220 (index_meta) — not applicable — kind
+
+Rule header: `Applies to: monthly`. `issues/SH8601/issue.json` → `"kind": "sonderheft"`.
+Evidence: `grep -c '^SH8601,' Jahresinhaltsverzeichnis\ 1986.csv` → 0.
+No files touched.
+```
+
+Three things are mandatory in that entry and all three are checkable:
+
+1. **The literal phrase `not applicable — kind`** in the heading, so the whole
+   chain's dispositions can be counted with one grep. Any other wording
+   ("skipped", "N/A", "does not apply") is a defect — it makes the audit trail
+   ungreppable.
+2. **Both sides of the comparison, quoted**: the rule's `Applies to:` value and
+   the descriptor's `kind`. A reader must be able to re-derive the decision
+   without opening either file.
+3. **One line of positive evidence that the step really had nothing to do** —
+   the empty glob, the zero row count, the absent rubric. `Applies to:` says
+   what we *expect*; the evidence line says what we *found*. This is what makes
+   it a verified outcome rather than a declaration: the same discipline as every
+   `## Verification` block in this directory. If the evidence line comes back
+   NON-empty — a Sonderheft that does turn out to carry the thing — the
+   classification in the rule header is wrong. Stop, tell the user, and fix the
+   header; do not run the step behind the contract's back.
+
+At the end of the issue, every number in the chain has exactly one `LOG.md`
+disposition: ran-and-verified, or `not applicable — kind`. A number with
+neither is an unfinished issue, and that is precisely the state the old silent
+skip made invisible.
+
+`Applies to:` is a property of the RULE, not of the issue at hand. Do not edit a
+rule's header to make a particular build go through. A rule that turns out to
+apply to both kinds is re-classified `all` **with the evidence in the commit
+message**, permanently, for every issue after it too.
+
+## VARIANTS — two programs at one step number
+
+A step can exist in **two mutually exclusive variants** that do the same job for
+physically different input. They live at the SAME number, distinguished by a
+descriptive suffix on the name:
+
+| file | for | selected when |
+|---|---|---|
+| `r005_masters_spread` | the scan frame holds a clipped SPREAD (the monthlies) | `"binding": "spread"` |
+| `r005_masters_sheet` | the scan frame holds one loose SHEET, torn off a glued spine (SH8601) | `"binding": "sheet"` |
+
+The closed set of legal values lives in `r000_issue.py` (`BINDINGS`), which
+rejects anything else at load time — a typo'd `binding` would otherwise match
+neither variant, or worse, be read as the other one.
+
+Both write the identical contract — `<tmp>/masters600/NNN.png`, 600 dpi,
+levelled, cut, graded, one per page — so every downstream step reads one
+directory and neither knows nor cares which variant filled it.
+
+**The selector is the issue descriptor's `binding` field**, from
+`issues/<ID>/issue.json`, read via `r000_issue.py`. Exactly one variant runs for
+a given issue. The other is recorded in `LOG.md` exactly like a kind mismatch,
+with `binding` in place of `kind`:
+
+```markdown
+## Step 005 (masters_spread) — not applicable — binding
+
+Variant selector: `issues/SH8601/issue.json` → `"binding": "sheet"` → the
+`masters_sheet` variant runs. No files touched.
+```
+
+### This is NOT the `9b` mistake
+
+The `9b` suffix, and the missing `23`, are why this directory numbers in tens
+(see above). It is worth being explicit about the difference, because the two
+look alike from a distance and only one of them is allowed:
+
+|  | `9b` — forbidden | a variant suffix — allowed |
+|---|---|---|
+| what it meant | a step **inserted after** another one, once the numbers had run out | two **alternatives at one step**, one of which runs |
+| how many run | both, in sequence | exactly one, chosen by the descriptor |
+| why the suffix | there was no free number left | the number is right; the suffix names *which* variant |
+| the fix | renumber in tens — done | nothing to fix; this is the intended shape |
+
+A suffix that means "and then also do this" is a numbering failure: insert it at
+its own number in tens. A suffix that means "or, for this kind of input, this
+one instead" is a variant, and belongs at the shared number.
+
+**The numbering-in-tens rule is unchanged.** Variants do not consume extra
+numbers and do not license a `b` step. A third variant of the same step is
+another suffix at the same number; a genuinely new step is the next free ten.
+
+Naming: `rNNN_<step>_<variant>` — the step name first so the variants sort
+together, the variant last and descriptive. Never `a`/`b`, never a number: the
+suffix has to say what the variant is *for*, because the orchestrator picks it
+from the descriptor and has to recognise it on sight.
+
 
 
 ## The chain, and what the numbers used to be

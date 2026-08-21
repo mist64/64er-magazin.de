@@ -6,8 +6,10 @@ type-in listings, no facing-page slivers. One `.md`-shaped `.txt` per page; a
 page carrying no article yields an empty file, which is a result and not a
 failure.
 
-Sibling of `scan2mrc/`. Same conventions: constants at the top of each file
-heavily commented, no CLI knobs, no env knobs, a debug overlay for every page.
+Self-contained: the chain starts at the raw scan and ends at published HTML, so
+the 600 dpi page masters it reads are made by its own step 005. Conventions
+throughout: constants at the top of each file heavily commented, no CLI knobs,
+no env knobs, a debug overlay for every page.
 
 **Before changing anything, read [`FINDINGS.md`](FINDINGS.md).** It holds what
 was measured on this issue, and — more usefully — the things that were tried,
@@ -39,8 +41,12 @@ re-measure the baseline before claiming an improvement against an older figure.
 
 - `tesseract` 5.x with the **`deu`** traineddata (`brew install tesseract tesseract-lang`)
 - Python 3.11+ with `pillow`, `numpy`; `anthropic` optional (see *Transport*)
-- Input: the deskewed, matted, A4-cropped, graded **600 dpi** masters produced by
-  `scan2mrc` (`pipeline.sh --only master,final`), one PNG per page
+- Input: the levelled, cut, graded **600 dpi** masters produced by **step 005 of
+  this chain**, one PNG per page. Step 005 has two mutually exclusive variants —
+  `r005_masters_spread` where the frame holds a clipped spread, `r005_masters_sheet`
+  where it holds one loose glued sheet — chosen by the issue descriptor's
+  `binding` field. Both write the same contract, so nothing after 005 knows which
+  ran.
 
 Paths are constants at the top of each file — `SRC_DIR`, `OUT_DIR` — pointing at
 the working issue. Change them there, per issue; there is no flag.
@@ -77,7 +83,10 @@ the old answers.
 ## Stages and outputs
 
 ```
-A  r010_ocr_blocks.py   master600/NNN.png -> 300 dpi grey -> tesseract TSV
+0  r005_masters_*.py    scan_dir/NNN.png -> masters600/NNN.png
+                   ONE variant runs, per `binding`; 600 dpi, levelled, cut, graded
+
+A  r010_ocr_blocks.py   masters600/NNN.png -> 300 dpi grey -> tesseract TSV
                    -> NNN.json         blocks: bbox, features, geometric label
                    -> NNN.digest.txt   compact page brief for stage B
                    -> NNN_boxes.png    overlay

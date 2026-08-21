@@ -1,5 +1,7 @@
 # 240 — Add rubric banner images (Editorial / Bücher / Fehlerteufelchen)
 
+**Applies to:** monthly — all three banners it owns belong to monthly recurring rubrics. No Sonderheft in the repo carries a rubric banner: zero `<page>-0.png` on any Editorial/Vorwort, Bücher or Fehlerteufelchen article across `SH8501`-`SH8508`, and no Sonderheft has a Fehlerteufelchen article at all. See *Sonderhefte: there is no rubric banner*.
+
 **Goal:** add the stylized title-banner image at the top of each
 recurring-rubric article that uses one. Three rubrics carry a banner
 that reuses the same illustration issue-to-issue (Bücher,
@@ -16,6 +18,32 @@ them. Match exactly what the prior issue's HTML did.
 
 Leserforum's banner is covered by rule 200 (the article also gets a full
 Q&A restructure, not just a banner).
+
+## Sonderhefte: there is no rubric banner
+
+This rule is `Applies to: monthly`, and on a `"kind": "sonderheft"` issue the
+orchestrator records it `not applicable — kind` rather than running it. The
+evidence, from the published corpus:
+
+- **Fehlerteufelchen** — no Sonderheft has the article at all
+  (`ls issues/SH85*/*ehlerteufelchen*` → no matches). Errata that correct a
+  Sonderheft article are printed in a later MONTHLY and arrive via step 300,
+  as an aside on the article, not as a rubric with a banner.
+- **Bücher** — one Sonderheft carries the article (`SH8508/104 Bücher.html`)
+  and it has NO `104-0.png`: its illustrations are ordinary numbered figures.
+  The recurring stack-of-books banner is a monthly fixture.
+- **Editorial** — a Sonderheft's opening piece is a Vorwort, and the two that
+  carry `64er.id="editorial"` (`SH8501/3 Warum ein Sonderheft.html`,
+  `SH8502/3 Abenteuer total.html`) hold no image at all: no editor portrait,
+  no `3-0.png`.
+
+Nothing is lost by not running here. A Sonderheft's `<page>-0.png` files are
+title images for ordinary feature articles (`SH8502` has seven, one per
+adventure), and **step 150 places them** — this rule was never their route.
+
+If a future Sonderheft DOES print one of these three banners, that is the
+`Applies to:` contract's evidence line coming back non-empty: re-classify this
+rule `all` with the evidence, don't run it behind the contract's back.
 
 ## Critical: rubric absence is a clean skip
 

@@ -1,5 +1,7 @@
 # 050 — Escape angle-bracket text that isn't a real HTML tag
 
+**Applies to:** all — a character-class transform on the `.md`; no issue-specific input.
+
 **Goal:** prevent the browser (and the markdown converter) from swallowing
 text like `<RETURN>`, `<SHIFT-RUN/STOP>`, `<F3>`, `<CBM>`, … by escaping
 them so they render as literal text. Keep real HTML tags (`<br>`, `<sub>`,

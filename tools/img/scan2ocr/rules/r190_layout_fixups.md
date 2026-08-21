@@ -1,5 +1,7 @@
 # 190 — Fix line breaks, lists, indentation, inline callouts
 
+**Applies to:** all — mechanical formatting markers, no issue-specific input.
+
 **Goal:** resolve the mechanical formatting TODO markers the OCR/import
 pipeline leaves behind: `<p>TODO PRE</p>`, `<p>TODO INDENTATION</p>`,
 `<p>TODO INDENTED</p>`, `<p>TODO ASIDE</p>` (non-bio), `<p>TODO

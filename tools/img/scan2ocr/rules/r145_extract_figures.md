@@ -1,5 +1,7 @@
 # 145 — Cut the article figures out of the masters
 
+**Applies to:** all — cutting figures out of the masters is kind-independent.
+
 **Goal:** every photograph, screenshot, hardcopy, diagram, chart, cartoon and
 rubric badge belonging to an article, cut from the graded 600 dpi master as its
 own PNG, named the way step 150 expects and sorted into the four buckets

@@ -1,5 +1,7 @@
 # 320 — Omission checks (terminal, needs the OCR intermediates)
 
+**Applies to:** all — omission is the defect class that reads as correct in any issue. Its page-coverage companion leans on the Jahresinhaltsverzeichnis, which has no Sonderheft rows — for a Sonderheft use the printed TOC's page numbers instead; the omission gate itself is unaffected.
+
 **Run order — LAST, with r310.** r310 answers "does the finished issue satisfy
 its structural invariants" and needs only `issues/<YYMM>/`. This one answers
 "is anything MISSING", and needs the scan intermediates as well.

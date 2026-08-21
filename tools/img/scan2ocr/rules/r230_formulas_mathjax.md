@@ -1,5 +1,7 @@
 # 230 — Render printed math formulas via MathJax (LaTeX) — when needed
 
+**Applies to:** all — typeset formulas occur in both kinds.
+
 **Goal:** every typeset math formula in the article HTML — every
 `<p>TODO FORMULA</p>` / `TODO FORMULAS` placeholder and every
 naturally-occurring inline formula — is rendered legibly. MathJax

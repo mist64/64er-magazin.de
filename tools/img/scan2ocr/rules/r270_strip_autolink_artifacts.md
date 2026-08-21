@@ -1,5 +1,7 @@
 # 270 — Strip Discount's `+autolink` false-positive `<a>` wrappers
 
+**Applies to:** all — a converter artifact, not a magazine fact.
+
 **Goal:** the article text in this project comes from 1986 magazine
 print. It does NOT contain real URLs. Any `<a href="…">…</a>` wrapper
 the markdown→HTML pass emits is a Discount `+autolink` false positive

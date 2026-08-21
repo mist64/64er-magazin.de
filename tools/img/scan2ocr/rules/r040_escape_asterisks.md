@@ -1,5 +1,7 @@
 # 040 — Escape literal `*` in the OCR `.md`
 
+**Applies to:** all — a character-class transform on the `.md`; no issue-specific input.
+
 **Goal:** prevent the markdown→HTML converter from interpreting literal asterisks (BASIC multiplication, ESC sequences, wildcards, "(***)" markers, …) as emphasis. Keep real `**bold**` spans intact.
 
 ## Rule

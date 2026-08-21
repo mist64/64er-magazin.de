@@ -28,7 +28,7 @@ import json
 import os
 import sys
 
-from r010_ocr_blocks import OUT_DIR, OCR_DPI, SRC_DIR
+from r010_ocr_blocks import ISS, OUT_DIR, OCR_DPI, SRC_DIR
 
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
@@ -69,6 +69,11 @@ def write_page(page):
 
 
 if __name__ == "__main__":
-    pages = [int(a) for a in sys.argv[1:]] or range(1, 177)
+    # Named pages, or the whole issue.  Its length comes from the same
+    # descriptor step 010 loaded: the literal range(1, 177) this replaces
+    # was 8609's, and indexed nothing at all for a shorter issue's
+    # nonexistent pages 153..176 -- silently, since a missing NNN.json is
+    # skipped.
+    pages = [int(a) for a in sys.argv[1:]] or ISS.page_range
     total = sum(write_page(p) for p in pages)
     print(f"{total} blocks -> {DEST_DIR}/pNNN.txt   (crop source: {SRC_DIR})")
