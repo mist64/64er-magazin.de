@@ -452,7 +452,7 @@ right source before touching anything, and when unsure, leave it.
 Before an issue is called finished, run the omission gate:
 
 ```bash
-tools/img/scan2ocr/rules/r030_coverage_check.py issues/<YYMM> <ocr-out-dir>
+tools/img/scan2ocr/rules/r320_coverage_check.py issues/<YYMM> <ocr-out-dir>
 ```
 
 Every block the classifier kept must appear in the article claiming its page.
