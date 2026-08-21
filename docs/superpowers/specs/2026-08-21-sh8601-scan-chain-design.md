@@ -35,6 +35,7 @@ The sheets were **torn off a glued spine**, one A4 sheet per scan. Measured:
 | | |
 |---|---|
 | residual skew | up to **1.08 deg** (`092`), typically 0.1-0.7 deg — the pages are NOT levelled |
+| edge tilt AFTER levelling on text | 0.14-1.12 deg — the sheet was guillotined at its own angle, so paper edges are NOT parallel to the type |
 | page width | varies **1254-1288** px at 150 dpi between scanning batches |
 | outer edge | guillotine-clean, straight, hard contrast against a near-black bed |
 | inner edge | **torn**: a fringe of fibres standing proud of the paper body, wandering down the page |
@@ -50,6 +51,16 @@ Consequences, stated because each one killed a simpler design:
 - There are **no binder-clip holes and no neighbour page in frame**. The 8609
   inner-boundary method (colour boundary against the facing page, clip holes as
   fallback) has no input here, and hole inpainting has nothing to fill.
+- Levelling the text leaves the paper edges tilted, so an axis-aligned crop
+  inscribed in the page gives up **0.5-3.6 mm per edge** (measured on 041, 056,
+  092). The edges are therefore TRACED as lines, and what falls outside them is
+  filled with paper white. Cropping to them was tried first and cost too much.
+- The two torn sides are not the same problem. On a **verso** the tear sits
+  inside the frame and wanders: it must be traced. On a **recto** the tear is
+  flush with the frame edge: a few px cut perfectly vertically is always enough,
+  and a fitted line there fits noise (it claimed +0.62 deg on p041).
+- Paper white is **uniform across the sheet** (3x3 grid of paper p90 varies by
+  <=4 levels): there is no vignette to correct. The cast is global, R/B 1.163.
 
 ## 3. Design
 
@@ -84,12 +95,13 @@ New first step, inside scan2ocr, owning everything between the raw scan and
 
 | variant | for | inner boundary |
 |---|---|---|
-| `r005A_masters_clipped` | clip-bound issues (8609 and the monthlies) | facing-page colour boundary, clip holes as fallback, holes inpainted |
-| `r005B_masters_glued` | glued issues (SH8601) | the torn fringe, cut inward by a fixed margin |
+| `r005_masters_spread` | the frame holds a clipped SPREAD (8609, the monthlies) | facing-page colour boundary, clip holes as fallback, holes inpainted |
+| `r005_masters_sheet` | the frame holds one loose SHEET (SH8601) | the torn fringe: traced on a verso, a flush vertical cut on a recto |
 
-**The letter suffix means variant, not insertion.** `r000_orchestration.md` must
-say this explicitly, because this directory's history has letters (`9b`) as the
-symptom of bad numbering. Exactly one variant runs for a given issue; the other
+**The suffix names the variant, it is not an insertion.** `r000_orchestration.md` must
+say this explicitly, because this directory's history has suffixes (`9b`) as the
+symptom of bad numbering. Here the two variants are alternatives at ONE step,
+chosen by the descriptor, never a step inserted after another. Exactly one variant runs for a given issue; the other
 is recorded in `LOG.md` as not applicable. Both write the same contract:
 
 ```
@@ -98,35 +110,89 @@ is recorded in `LOG.md` as not applicable. Both write the same contract:
 
 `r010` and `r145` read that directory and are otherwise untouched.
 
-**`r005B`, the path we build now:**
+**`r005_masters_sheet`, the path we build now.** Prototyped and verified on
+pages 006, 041, 056, 092 (prototype: `trace.py` in the session scratchpad):
 
 ```
 scan_dir/NNN.png
-  -> measure skew (projection variance on the 150 dpi thumb; scale-invariant)
-  -> rotate to level
-  -> classify every edge: paper / bed / prop   (paper is warm-light, bed near-black,
-                                                prop saturated yellow — all far apart)
-  -> outer, top, bottom: cut at the clean edge, a small fixed margin inside
-  -> inner: find the fringe, cut INWARD BY A FIXED MARGIN
-  -> grade (colors.txt when named, built-in anchors otherwise)
-  -> 8:1 reduce to 600 dpi
-  -> masters600/NNN.png
+  -> measure skew on the 150 dpi thumb (projection variance; scale-invariant)
+  -> rotate to level, then VERIFY residual ~0            [see the sign trap below]
+  -> paper mask: distance from the colors.txt paper white
+  -> TRACE each edge as a line, robust:
+       clean edges  -> band medians of the per-row/col paper boundary
+       verso fringe -> band 5th percentile of per-row paper ends
+       recto fringe -> NOT traced: one vertical line, p95 of paper starts + ~1 mm
+  -> fill everything outside the traced page with paper white
+  -> drop bed components that touch the frame AND lie mostly outside the page
+  -> separate to CMYK with tools/img/cmyk_reconstruction (see 3.3)
+  -> two renders: an OCR master and an unclipped figure master
+  -> masters600/NNN.png (+ the CMYK archival form)
 ```
 
-The fringe is reduced to one x per page from the per-row paper-start
-distribution (a high percentile, not the extreme — one stray fibre must not move
-the cut), then the fixed margin is applied inward from it.
+Traps, each one paid for during the prototype:
 
-**Accepted loss, decided explicitly:** on pages where the tear ran deep, the
-fixed margin cuts into printed gutter. Those characters are gone. This is
-accepted — it is a fact about this copy, and no re-render recovers it.
+- **The rotation sign.** scipy (which measures) and PIL (which applies) rotate in
+  opposite directions. Applying the measured sign DOUBLED the skew to -1.28 deg
+  on p056. The rule must re-measure residual skew and assert it is ~0.
+- **Per-column extremes are not an edge.** "Last paper row in this column" is
+  dragged out by a few paper-coloured pixels in the bed transition and left
+  **3.8 mm of bed** at the foot of p056. Clean edges come from the row/column
+  paper FRACTION; only the fringe is per-row.
+- **Rows that cross full-bleed art are not edge samples.** Their "last paper
+  pixel" collapses inward and tilted p056's traced fringe by +2.56 deg. Drop
+  samples more than ~12 mm off the median before fitting.
+- **A bed flood must not eat a photo.** p006's board picture bleeds into the torn
+  edge and connects to the bed through its own black chips; an unconstrained
+  connectivity pass erased a third of it. A component is only dropped if MOST OF
+  IT lies outside the traced page.
+
+**Accepted loss, decided explicitly:** where the tear ran into the type area,
+those characters are gone. Accepted — it is a fact about this copy.
+
+**Known defect, open:** on p092 a sliver of bed and prop survives in one corner,
+where two fitted lines meet and the bed component reads as mostly inside.
+006, 041, 056 are clean.
 
 **Gate:** the torn side must match parity on all 152 pages. It is measurable on
 the thumbs (the torn side has high variance in where paper starts down the
 column; the cut side has almost none). A disagreeing page is misfiled or
 mis-rotated, and finding that after a full-res sweep is expensive.
 
-### 3.3 `kind` drives the editorial steps
+### 3.3 The grade — reuse the CMYK converter, render twice
+
+`tools/img/cmyk_reconstruction/` already does the hard part, and `colors.txt` was
+written for it: 8 RGB anchors (W C M Y R G B K) plus 4 per-ink level lines. It
+works in the DENSITY domain -- `d = -log10(rgb/W)`, six polynomial features, a
+least-squares solve against the seven ink targets, then full GCR
+(`K = min(C,M,Y)`, subtracted from each). Because the paper white is the density
+reference, the global R/B 1.163 cast falls out for free.
+
+Measured on p056, same traced page:
+
+| grade | paper p50 | pure white | ink p50 | crushed |
+|---|---|---|---|---|
+| naive linear map | 254,253,251 | 56% | 20,9,8 | 3.8% |
+| CMYK + colors.txt levels | 255,255,255 | 88% | 71,69,70 | 0% |
+| CMYK, levels neutralised | 254,254,251 | 65% | 66,66,71 | 0% |
+
+Two conclusions:
+
+- **The level lines in SH8601's `colors.txt` are not usable as written.**
+  `LK 90 95` maps K's 229-242 window onto the full range, so ordinary black text
+  falls below the low point and is clipped toward zero ink; it also snapped 88%
+  of the page to pure white. They must be re-measured per issue and proven.
+- **Ink at ~66 is not a bug, it is honesty.** 100% SWOP black is not RGB 0. The
+  naive map's 20,9,8 is a contrast boost.
+
+The two consumers want different images, so the step renders both from ONE
+separation:
+
+| render | for | wants |
+|---|---|---|
+| `masters600/NNN.png` | `r010` OCR | contrast: type to black, paper to white. Clipping is a feature |
+| the unclipped ICC render | `r145` figure cuts | fidelity: no clipped highlight, no crushed shadow |
+
+### 3.4 `kind` drives the editorial steps
 
 Every `rNNN_*.md` gains an `Applies to:` header — `all` / `monthly` /
 `sonderheft`. A step whose kind does not match is **recorded in `LOG.md` as
@@ -136,7 +202,7 @@ First pass: `r200_leserforum` and `r300_fehlerteufelchen_errata` are
 monthly-only. `r100_toc_category` and `r030_assemble`'s department /
 running-head logic take their facts from the descriptor instead of from 8609.
 
-### 3.4 Cutting scan2mrc loose
+### 3.5 Cutting scan2mrc loose
 
 Seven sites reference it. Renames are not enough at two of them:
 
@@ -150,7 +216,7 @@ Seven sites reference it. Renames are not enough at two of them:
 | `rules/r000_verify_numbering.sh` | 80-81 | the staging check becomes "nothing from `issues/` is staged" |
 | `rules/r020_classify.py` | 304 | comment refers to `thumbs_150`; say what `r005` produces |
 
-### 3.5 Reprints
+### 3.6 Reprints
 
 Seven of this issue's articles are claimed reprints of monthlies
 (`REPRINTS.md`). They are **OCR'd and built like every other article** —
@@ -180,7 +246,7 @@ never "fixes" the source.
 - **The issue PDF.** `generate.py` warns and continues without one
   (`generate.py:616`). 8609's came from the old MRC route, whose renderer was
   deleted. `tools/img/issue_pdf/` exists; wiring it up is separate work.
-- **`r005A`.** Written as a spec and a home for the clipped path, but the
-  monthlies already have their masters. Implementing it is not needed to publish
-  SH8601.
+- **`r005_masters_spread`.** Written as a spec and a home for the clipped path,
+  but the monthlies already have their masters. Implementing it is not needed to
+  publish SH8601.
 - **`pubdate.txt` for SH8601.** A publishing decision, not a pipeline one.
