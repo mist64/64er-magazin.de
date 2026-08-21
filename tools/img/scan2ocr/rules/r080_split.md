@@ -146,6 +146,29 @@ banner to an `<h2>` at the seam, so the file keeps exactly one `<h1>`.
   legitimately separate; the non-adjacent layout is the editorial
   fingerprint of a deliberate pair.
 
+
+### Heading SIZE decides article vs. section — measure it, don't guess
+
+Within a rubric like *Aktuelles* the news items carry small headings while a
+full article on the same spread carries a **display headline several times
+larger**, usually with its own bold stand-first. The OCR flattens both to the
+same `<h2>`, so the distinction is invisible in the text and must be read off
+the page:
+
+- 8609 p8 sets the editorial and *Commodore Deutschland — auf Erfolg
+  ausgerichtet* side by side. The latter is a display-headline interview with a
+  bold intro and its own `(aw)` — a separate article — while the Aktuelles items
+  that follow on p9 have small headings. It shipped buried inside `8 Aktuelles`.
+- Corollary: after splitting, the rubric article's own `64er.pages` and filename
+  usually move (Aktuelles became `9 Aktuelles.html`, pages `9-12`).
+
+**The `<h1>` may not be typeset as text at all.** Where the opening spread is a
+full-bleed image, the title is set *inside the artwork* and the OCR never sees
+it: `34 Marktübersicht Drucker` should be `<h1>Punkt für Punkt</h1>`. When the
+h1 looks like a rubric label rather than a title, check
+`64er.index_title` — the annual index records the real one (here already
+`Punkt für Punkt (Druckerübersicht)`).
+
 ### What the merged HTML looks like
 
 - **One `<article>`, one `<h1>`.** Use the longer / more topical title

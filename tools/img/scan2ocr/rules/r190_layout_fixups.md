@@ -149,3 +149,36 @@ never acceptable.
   10 `TODO FORMULA` placeholders are explicitly out of scope and
   must be left for an editorial pass — flagging them in the report
   is enough.
+
+
+## Set-off boxes become `<aside>` — decided by BACKGROUND, not by content
+
+The magazine sets sidebars apart visually and the OCR keeps only the words, so
+this can only be settled by looking at the page. Any block printed on a **grey
+background** or inside a **ruled border** is an `<aside>`:
+
+- grey box: *Computerzeit für Grafikfreunde* (8609 p9), *Floppy und
+  Dateiverwaltung* (p11), the manufacturer-address block of the printer
+  market survey (p146)
+- ruled box: *Die Kuriositätenecke* (p11), and **every `Lebenslauf`** — the
+  author-biography box that accompanies a *Listing/Anwendung des Monats* is
+  always a bordered box, so always an `<aside>`
+
+Shape rules:
+- The aside's heading is an **`<h2>`**.
+- **An aside need not have a heading at all** — the p146 address block is a
+  grey box with no title; wrap it in a bare `<aside>` rather than inventing one
+  or tagging it `<p class="source">`.
+- Two adjacent boxes are two asides. A dropped heading makes them look like one:
+  *Floppy und Dateiverwaltung* had lost its heading and was swallowed by the
+  *Kuriositätenecke* box above it. If an aside contains a second
+  `<address class="author">`, suspect a merged neighbour.
+
+## Never split the last paragraph from its `<p class="source">`
+
+An image or table must not be emitted between an article's final paragraph and
+its source/`Info:` footer — they belong together. Put the `<figure>` or
+`<table>` **after** the source line.
+
+Check: for every `<p class="source">`, the block immediately before it must not
+be a `<figure>` or `<table>`.

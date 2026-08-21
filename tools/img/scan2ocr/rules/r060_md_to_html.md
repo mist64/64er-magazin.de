@@ -15,6 +15,7 @@ lives in the repo from here on.
 | Generate IDs on headlines | default for Discount |
 | Render GitHub checkboxes | `+github-listitem` |
 | Render `~~delete~~` | `+strikethrough` |
+| *(not a Marked 2 setting)* | `-alphalist` — **required**, see below |
 | Render `==highlight==` | **not** in Discount; would need post-pass (n/a here) |
 
 ## Usage
@@ -26,11 +27,31 @@ tools/img/scan2ocr/rules/r060_md_to_html.sh issues/8607/8607.md
 # 3. `git add`s the .html
 ```
 
+## `-alphalist` is mandatory
+
+Discount treats a letter followed by a period at the start of a line as an
+**alphabetic ordered list** (`a.` → `<ol type="a">`). In this corpus that
+construct is almost never a list:
+
+- **Abbreviated forenames.** `M. Grewe: »Nein, …«` in an interview became
+  `<ol type="a"><li>Grewe: »Nein, …«</li></ol>` — and the `M.` was **eaten as
+  the list marker**. That is silent text loss, not merely wrong markup, and it
+  survives every structural check because the result is valid HTML.
+- **OCR'd numbers.** A printed `1.` read as the letter `l.` produces the same
+  `<ol type="a">` with the number swallowed, turning one real numbered list
+  into a chain of one-item lists.
+
+So: `<ol type="a">` in a converted file is a **bug signature**, not a style.
+Grep for it after conversion and check every hit against the print.
+
 ## Verification
 
 - A literal `(\*\*\*)` in the .md renders as `(***)` in the HTML.
 - A line ending in a single LF inside a paragraph becomes `…<br/>` in the HTML.
 - `**bold**` becomes `<strong>bold</strong>`.
+- **No `<ol type="a">` anywhere**: `grep -c 'ol type="a"' issues/<YYMM>/*.html` → 0.
+  A hit means an abbreviated forename or an OCR'd `1.` was parsed as a list marker
+  and its first token deleted.
 
 Quick spot-check (paste into shell after running the script):
 

@@ -249,3 +249,25 @@ provenance.
   `<p>oder</p>` as bylines in the mid-body sweep.
 - The chief-editor mapping changed in 8604: through 8603 it was
   Michael M. Pauly, from 8604 it's Michael Scharfenberger.
+
+## The editorial byline has its own shape
+
+The editorial is signed under a facsimile signature, on its own line, with the
+**full name and the role** and **no parentheses**:
+
+```html
+<address class="author">Michael Scharfenberger, Chefredakteur</address>
+```
+
+Not `(Michael Scharfenberger)`, not a plain `<p>`. The OCR leaves it glued to
+the end of the last paragraph (`… — Sie auch ? Michael Scharfenberger,
+Chefredakteur`), so it has to be cut out and tagged. The `<meta name="author">`
+carries the **bare name** without the role (`content="Michael Scharfenberger"`).
+
+## Bylines glued to a paragraph tail
+
+Any `(xx)` or `(Name/xx)` sitting at the end of a `<p>` is an untagged byline.
+Sweep for it — 8609 had three that survived every other pass, including one
+inside a `Lebenslauf` box and one where the OCR ate the slash
+(`(Andreas Tschescheftr)` for `(Andreas Tschesche/tr)`). Exception: the
+Impressum body legitimately contains `Name (xx)` as masthead text.

@@ -215,3 +215,21 @@ canonical anti-memory violation.
   step's sub-agent can produce is useful follow-up data — sometimes
   the OCR pipeline dropped a whole listing, not just left a TODO
   placeholder.
+
+## Listing captions: drop the "how to type this in" pointer
+
+The print appends a cross-reference to the MSE/Checksummer instructions, which
+live on a page that does not exist as such in the HTML:
+
+```
+Listing. Das Programm »fsd64.obj« bitte mit dem »MSE« abtippen. Hinweise siehe Seite 51
+Listing 2. Demoprogramm zu »Shrinksprite«. Bitte die Eingabehinweise auf Seite 51 beachten.
+Listing »Copy 1520« geben Sie bitte mit dem MSE (siehe Seite 51) ein
+```
+
+Keep the instruction ("bitte mit dem MSE eingeben"), drop the page pointer
+(`Hinweise siehe Seite 51`, `… auf Seite 51 beachten`, `(siehe Seite 51)`).
+
+Same for standalone continuation pointers in the body — `Listing und
+Beschreibung ab Seite 54`, `Fortsetzung auf Seite …` — these are layout
+navigation and are omitted entirely.

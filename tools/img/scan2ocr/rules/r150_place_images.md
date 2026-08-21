@@ -217,3 +217,10 @@ re-dispatch. "Trust me, I read the scan" is never acceptable.
   same paragraph.
 - Always delegate scan reads to sub-sub-agents — the main thread
   should never load page PNGs directly.
+
+## Layout arrows in captions are typesetting pointers, not text
+
+A caption that ends in `▶` / `►` / `◀` / `▲` / `▼` is pointing the reader at
+artwork placed somewhere awkward on the page (`Bild 3. Der fünffach vergrößerte
+Buchstabe »A« ►`). In the HTML the caption sits with its figure, so the arrow is
+meaningless — strip it.
