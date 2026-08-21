@@ -68,6 +68,7 @@ def main(d):
         # --- HARD: OCR classes with no legitimate population -----------------
         for mm in re.finditer(r'\b(?:Bild|Tabelle|Listing)\s+\]', prose): H('"] " for digit 1 (r280)', f)
         for mm in re.finditer(r'®', prose):                                H('® for ? (r280)', f)
+
         for mm in re.finditer(r'<p class="intro">(?:Gier|Test|64\'er|\d{1,2}|-F\])\s', body):
             H('badge bled into the intro (r280)', f)
         for mm in re.finditer(r'<h([2-6])>([^<]*)</h\1>', body):
@@ -82,6 +83,11 @@ def main(d):
             S('paragraph starts lowercase — eaten drop cap? (FP: keyword lists)', f, mm.group(1))
         for mm in re.finditer(r'\b[A-Za-zÄÖÜäöüß]{3,}[a-zß](?=[A-ZÄÖÜ])[A-ZÄÖÜ][a-zäöüß]{3,}', prose):
             if mm.group(0) not in OK_JAM: S('lost space? (FP: product names)', f, mm.group(0))
+        # OCR over-segmentation of one initial glyph: DDer, WWichtig, BBrillant.
+        # SOFT, not HARD — a legitimate population exists (command mnemonics with
+        # a placeholder tail, e.g. 8606's "Rechten Rand setzen RRxxx").
+        for mm in re.finditer(r'\b([A-ZÄÖÜ])\1[a-zäöüß]{2,}', prose):
+            S('doubled initial capital — OCR split one glyph? (FP: RRxxx mnemonics)', f, mm.group(0)[:24])
         for mm in re.finditer(r'\bC(?:64|128|16|116)\b', prose):
             S('model name without space (FP: print really omits it)', f, mm.group(0))
         for mm in re.finditer(r'<p class="source">(?:(?!</p>).)*?<br(?:(?!</p>).)*?</p>', body, re.S):
