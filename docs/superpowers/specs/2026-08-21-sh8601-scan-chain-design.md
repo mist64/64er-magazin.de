@@ -69,7 +69,7 @@ Consequences, stated because each one killed a simpler design:
 One file per issue, `issues/<ID>/issue.json`, read by every step:
 
 ```json
-{ "id": "SH8601", "kind": "sonderheft", "binding": "glued", "pages": 152,
+{ "id": "SH8601", "kind": "sonderheft", "binding": "sheet", "pages": 152,
   "scan_dir": "/Users/mist/DNB/SH8601/master_2400/SH8601",
   "thumb_150": "/Users/mist/DNB/SH8601/master_2400/SH8601/thumb",
   "tmp":       "/Users/mist/DNB/SH8601/tmp",
@@ -198,9 +198,32 @@ Every `rNNN_*.md` gains an `Applies to:` header — `all` / `monthly` /
 `sonderheft`. A step whose kind does not match is **recorded in `LOG.md` as
 "not applicable — kind"**: a verified outcome, never a silent skip.
 
-First pass: `r200_leserforum` and `r300_fehlerteufelchen_errata` are
-monthly-only. `r100_toc_category` and `r030_assemble`'s department /
-running-head logic take their facts from the descriptor instead of from 8609.
+Classified by reading all 32 rules. **Three of them corrected my first pass**,
+and the evidence is recorded in each rule's own header:
+
+| rule | verdict | why |
+|---|---|---|
+| `r200_leserforum` | monthly | no Sonderheft has one: zero `article class="qa"` across `SH85*` |
+| `r220_index_meta` | monthly | the Jahresinhaltsverzeichnis CSVs are keyed by monthly `YYMM`; **0** Sonderheft rows. 7 of 8 published Sonderhefte carry no `index_category`; `SH8501`'s 27 look mis-routed off monthly `8501` |
+| `r240_rubric_banners` | monthly | all three banners are monthly rubrics; no Sonderheft carries a rubric banner |
+| `r300_fehlerteufelchen_errata` | **all — my spec was WRONG** | it does not build a rubric, it applies errata printed in LATER monthlies to this issue, and later monthlies corrected Sonderheft articles too: **26** articles across `SH8501`-`SH8508` already carry the aside. Marking it monthly would have silently dropped that |
+| everything else | all | |
+
+**No rule is `sonderheft`-only** — an honest outcome. Nothing in the editorial
+chain exists only for a Sonderheft; the Sonderheft-specific work is step 005,
+selected by `binding`, not by `kind`.
+
+`r210_head_meta` stays `all` despite my "no department running heads" claim:
+Sonderhefte do print running heads and the corpus captures them (`SH8507` has
+`head1` on 27 of 28 articles). Whether SH8601's print has them is a per-page
+fact the rule already tests for, not a kind fact.
+
+`r100_toc_category` and `r030_assemble` take their facts from the descriptor and
+from the issue's own TOC instead of from 8609. In `r030` the compiled-in
+`TOC_PAGES = (6, 7)` is replaced by discovery from step 020's own `toc` labels —
+with two traps handled: the cover is labelled `toc` (display type), and 8609's
+p171 back-matter index outscores the real contents pages 7973 to 2129, so
+neither "highest score" nor a plain threshold works.
 
 ### 3.5 Cutting scan2mrc loose
 
