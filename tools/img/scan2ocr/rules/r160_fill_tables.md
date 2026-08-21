@@ -383,3 +383,17 @@ Where the print puts a section label above a table (*Matrix-Nadeldrucker*,
 consistent: **the section label becomes an `<h2>` before its table**; only
 labels that group *rows within* one table (a manufacturer name spanning the
 row, say) stay as a spanning `<th>`.
+
+## Text printed as a table must not stay a run of paragraphs
+
+Recurring in 8609: two- and three-column material arrives as consecutive `<p>`s
+(sometimes with the columns interleaved in the wrong reading order). Examples
+that had to be rebuilt by hand — printer-command lists, prize lists
+(`1. Preis 500 Mark` / `2. Preis 250 Mark` …, printed two-up so the OCR order
+was 1,3,2,4), colour assignments (`Rahmen: logische Farbe …`), and
+`Eingabe / Abschluß / Bedeutung` command tables.
+
+Signature: a run of short paragraphs that share a common shape (`X: Y`,
+`CMD  description`, `N. item`). Check the page — if it is set as a table, build
+a table; if it is set as display lines inside a flowing paragraph, use one `<p>`
+with `<br>`.

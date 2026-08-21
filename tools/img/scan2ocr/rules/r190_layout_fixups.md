@@ -182,3 +182,16 @@ its source/`Info:` footer — they belong together. Put the `<figure>` or
 
 Check: for every `<p class="source">`, the block immediately before it must not
 be a `<figure>` or `<table>`.
+
+## An image or table must never break text from its byline or source
+
+Extending the rule above: the closing run of an article — **last paragraph →
+`<address class="author">` → `<p class="source">`** — is a unit. A `<figure>`
+or `<table>` may not be emitted anywhere inside it. Move the figure/table
+**after** the closing run.
+
+Seen in 8609 on `124 Wie funktioniert ein Computer?`, where Bild 3 landed
+between the final paragraph and the byline.
+
+Check: walking the article in document order, no `<figure>`/`<table>` may sit
+between the last body `<p>` and the trailing `<address>`/`<p class="source">`.
