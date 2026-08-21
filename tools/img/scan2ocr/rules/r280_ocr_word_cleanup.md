@@ -628,12 +628,17 @@ is a separate object of a different size, so the segmenter either drops it
 (`asin Ausgabe 4/86` for `Das in …`) or emits it twice (`DDer`). Both classes
 cluster at paragraph starts for the same reason.
 
-**The pipeline already knows the answer in some cases.** Blocks carry a
-`read_alt` field — an alternative reading — and for p157's `DDer` the
-alternative contains the correct `Der`. Where primary and alternative differ
-only by a doubled leading character, the alternative is right. Preferring it is
-a real fix at stage A rather than cleanup afterwards, and it uses data that is
-currently computed and discarded.
+**`read_alt` is NOT a way to fix this** — I initially thought it was, and it is
+not. It holds an alternative *column segmentation* of a block: `rows` (read
+straight across, interleaving columns) versus `down` (column by column), plus a
+`span` score. It exists on 226 of 6308 blocks (3.6%), essentially all
+multi-column matter such as advertisements. The p157 block that suggested the
+idea is a two-column Fujitsu ad whose `down` reading happens not to duplicate
+the `D`; that is coincidence, not a per-character alternative.
+
+A real stage-A fix would need character-level confidence or the glyph boxes,
+which the block JSON does not retain. Worth knowing before anyone tries: the
+data to do it properly is not currently kept.
 
 **Until then**, r310 flags `\b([A-ZÄÖÜ])\1[a-zäöüß]{2,}` as SOFT. It is not
 HARD because a legitimate population exists: command mnemonics with a
