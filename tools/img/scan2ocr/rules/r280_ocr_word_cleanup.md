@@ -1,5 +1,7 @@
 # 280 — Word-level OCR cleanup sweep across every article
 
+**Applies to:** all — OCR damage is a property of the scan, not of the issue kind.
+
 **Goal:** after rule 080 (split) has produced one HTML per article, sweep
 every `issues/<YYMM>/*.html` for the mechanical word-level OCR damage
 that the import pipeline leaves behind: line-break hyphen rejoins,
@@ -615,8 +617,12 @@ not floating at the start of the next.
 `WWichtig`, `POKESs`, `geLlISTet`, `Rüickumschlages`, `Eiditierung` — this class
 recurs across every issue and had been cleaned up by hand each time.
 
-**Where it comes from.** The OCR over-segments a single glyph into two
-candidate characters and emits both. Measured on 8609's block JSON: 11
+**Where it comes from — CORRECTED.** I first wrote that the OCR over-segments
+one glyph into two candidates and emits both. That is **wrong** for the
+word-initial cases. Raw tesseract reads those lines correctly; our own
+`splice_dropcap()` in r010 corrupted them (see r010's rule file). It is fixed at
+source. Mid-word doublings (`Programmiierung`, `Rüickumschlages`, `MO®S`) ARE
+genuine tesseract misreads and remain a manual matter. Measured on 8609's block JSON: 11
 occurrences, **7 of them at the very first character of a block**. That is where
 the initial is largest (display type, a bold stand-first, a drop cap) and where
 the first glyph has no left neighbour to constrain segmentation. A speck on the

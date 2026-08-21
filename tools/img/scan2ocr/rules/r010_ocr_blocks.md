@@ -11,7 +11,10 @@ block. There is no editorial judgement in it and nothing to dispatch.
 ## Inputs
 
 - `SRC_DIR` — the graded 600 dpi masters, one PNG per page (constant at the top
-  of `r010_ocr_blocks.py`; produced by `scan2mrc`'s `pipeline.sh --only master,final`)
+  of `r010_ocr_blocks.py`; produced by step 005 of this chain — `r005_masters_spread`
+  or `r005_masters_sheet`, whichever the issue descriptor's `binding` selects. Both
+  variants write the same `masters600/NNN.png` contract, so this step is unaffected
+  by which one ran.)
 - `tesseract` 5.x with the **`deu`** traineddata
 
 ## Run
@@ -136,3 +139,43 @@ overlay before accepting it.
 - Constants live at the top of `r010_ocr_blocks.py`, heavily commented. No CLI knobs,
   no env knobs — different agents used an env surface differently once and
   produced numbers for files that never existed.
+
+## The drop-cap splice was corrupting text — gated 2026-08
+
+`splice_dropcap()` removes an ornamental initial's word and prepends its letter
+to the paragraph's first line. Its test accepted **any** word taller than
+`DROPCAP_H_RATIO x median`, up to 4 characters, starting uppercase, **anywhere
+in the block** — then prepended the letter to line 0 regardless of where the
+match was found, and **deleted the word it matched**.
+
+MEASURED over all 176 pages of 8609: it fired **173 times and was correct 4
+times.**
+
+The visible symptom was doubled initials (`WWichtig`, `DDer`, `BBrillant`,
+`EEPSON`). The serious symptom was silent word **deletion**, which leaves
+grammatical text that no spell-check or markup gate can see:
+
+```
+p21  "Bild 2 Schriftbildtest …"  ->  "B2 Schritildtest …"
+p92  IBM        p87  DM        p102 Bei        p129 Wir
+```
+
+The gate tests what an ornamental initial physically is: exactly one character,
+flush with the block's top-left, 2–4 body lines tall, in a block of >= 3 lines.
+`DROPCAP_MAX_CHARS` is retired — taking `text[0]` of a 4-character token is what
+let `'WW:'` (confidence 0.0) and `'De'` (9.2) through.
+
+Validation: stage A re-run over all 176 pages before and after. 158 blocks
+change, every one a corruption removal; no correct text is altered. Applying the
+result to issue 8609 required **no** article edits — the hand review had already
+caught every corruption that reached published text.
+
+**Not changed: `rejoin_dropcap_lines()`** (same file) uses the same loose test.
+It only reattaches lines to a block — geometry, not text — so a false positive
+there merges lines rather than deleting words. It is a candidate for the same
+gate, but it was identical in both validation runs, so tightening it would be
+unvalidated. Do that as its own before/after experiment.
+
+Note this does NOT fix drop caps the OCR never detects at all (`asin Ausgabe
+4/86` for `Das in Ausgabe 4/86`), nor mid-word doublings (`Programmiierung`,
+`Rüickumschlages`, `MO®S`), which are genuine tesseract misreads.
