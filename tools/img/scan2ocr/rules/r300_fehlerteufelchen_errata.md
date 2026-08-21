@@ -413,3 +413,37 @@ header. Two consequences:
    hold the note. The `<aside class="fehlerteufelchen">` on the article still
    carries what the print got wrong; the LOG entry carries what the disk state
    is.
+
+## Every aside carries a disposition comment
+
+An erratum aside says what the print got wrong. It must ALSO say what happened
+to the program, as an HTML comment immediately before the `<!-- 64'er N/YYYY -->`
+source marker. The corpus vocabulary — use it verbatim, do not invent wording:
+
+| comment | meaning |
+|---|---|
+| `<!-- Reiner Druckfehler -->` | the error exists only in the print; no program is affected (a wrong figure number, a garbled sentence) |
+| `<!-- Disk-Version bereits korrigiert -->` | a program IS affected, but the Programm-Service disk already shipped the corrected version — nothing was patched |
+| `<!-- Korrektur im Programm angewendet -->` | the correction was applied to the listing in `prg/` |
+
+```html
+        <!-- Disk-Version bereits korrigiert -->
+        <!-- 64'er 10/1986 -->
+    </aside>
+```
+
+The three are mutually exclusive and the choice is a **finding, not a guess**:
+
+- for a `.txt` listing, diff the erratum's corrected lines against the file
+- for a `.prg`, read the load address from the first two bytes and compare the
+  erratum's rows byte for byte at their printed addresses
+
+8609: `viza.key.prg` matched the 10/86 erratum at all five addresses and
+`ean-codes.txt` already had the corrected line 85 — both
+`Disk-Version bereits korrigiert`. `xref 7.0.txt` differs on all seven lines of
+the 1/87 erratum, so it is NOT one of those two, and stays unmarked until the
+listing is either patched (`Korrektur im Programm angewendet`) or the decision
+is taken to leave it.
+
+Getting this wrong is not cosmetic: `Reiner Druckfehler` on an erratum that
+does affect a program tells a future reader no listing needs checking.
