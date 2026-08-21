@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-    <title>Hardmaker mit Epson-Software-Interface</title>
+    <title>Hardmaker mit Epson Software-Interface</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="R. Ernstberger, og">
@@ -18,18 +18,23 @@
 
 <body>
     <article>
-        <h1>Hardmaker mit Epson-Software-Interface</h1>
+        <h1>Hardmaker mit Epson Software-Interface</h1>
         <p class="intro">Mit dieser kleinen Zusatzroutine funktioniert der Hardmaker aus Ausgabe 4/86 auch mit dem Epson Software-Interface EC-64.</p>
 
         <p>Besitzer des Software-Interfaces EC-64 von Epson können eine Hardcopy von LowRes- und HiRes-Bildschirmen ganz einfach erstellen:</p>
 
-        <pre><code>OPEN x,7
-x=beliebige Filenummer, 7=Gerätenummer!
-PRINT#x,CHR$(A)
-A=0 Hardcopy, A=1 inverse Hardcopy CLOSEx
-</code></pre>
+        <table class="plain">
+            <tr>
+                <td class="pre">OPEN x,7</td>
+                <td>x=beliebige Filenummer, 7=Gerätenummer!</td>
+            </tr>
+            <tr>
+                <td class="pre">PRINT#x,CHR$(A)</td>
+                <td>A=0 Hardcopy, A=1 inverse Hardcopy CLOSEx</td>
+            </tr>
+        </table>
 
-        <p>Um diese Befehle in den »Hardmaker« einzubauen, müssen sie in Form eines Maschinenprogramms ans Ende des »Hardmakers« ab $13AO angehängt werden. Am einfachsten lädt man den »Hardmaker« mit einem Monitor-Programm, überschreibt den Bereich von $13A0 bis $13C3 mit der Routine (Listing 1) und speichert dann den Bereich von $0801 bis $13C4 als neuen »Hardmaker« mit dem Monitor. Der Bereich ab $13C4 bis zum Ende des alten »Hardmaker« kann wegfallen (Speicherersparnis von zwei Blocks).</p>
+        <p>Um diese Befehle in den »Hardmaker« einzubauen, müssen sie in Form eines Maschinenprogramms ans Ende des »Hardmakers« ab $13A0 angehängt werden. Am einfachsten lädt man den »Hardmaker« mit einem Monitor-Programm, überschreibt den Bereich von $13A0 bis $13C3 mit der Routine (Listing 1) und speichert dann den Bereich von $0801 bis $13C4 als neuen »Hardmaker« mit dem Monitor. Der Bereich ab $13C4 bis zum Ende des alten »Hardmaker« kann wegfallen (Speicherersparnis von zwei Blocks).</p>
 
         <p>Nach Laden, Starten und Abbruch des Programms mit einer Reset-Taste kann das Software-Interface und dann der »Hardmaker« geladen werden. Um jedoch keine Bilder mit dem Software-Interface zu überschreiben, sollte nach dem Reset der »Hardmaker« erst einmal ohne das EC-64-Interface geladen werden, um zu sehen, welcher Bereich keine Bilder enthält und somit frei für das Interface ist. Dann sollte man das Ganze wie oben beschrieben mit einer der für verschiedene Speicherbereiche zur Verfügung stehenden EC-64-Routinen durchführen. Eine der vier Möglichkeiten paßt bestimmt.</p>
 
@@ -39,9 +44,12 @@ A=0 Hardcopy, A=1 inverse Hardcopy CLOSEx
 
         <p>Nach Laden von »Simons Basic« kann ein mit »Hardmaker« gespeichertes Bild mit</p>
 
-        <p>SYS57812"name",8,0:POKE 780,0:POKE782,224:POKE 781,0: SYS65493 absolut in den Speicherbereich der »Simons Basic«-Bilder geladen werden. Setzt man vorher mit»Multi« drei Farben für die Multi-Color-Grafik und ruft mit »CSET 2« den Grafikbildschirm auf, kann man das Wirken der »Ladezeile« am Bildschirm mitverfolgen. j</p>
+        <pre><code>SYS57812"name",8,0:POKE 780,0:POKE782,224:POKE 781,0:SYS65493
+</code></pre>
 
-        <p>Umgekehrt können Bilder aus »Simons Basic« mit dem »Hardmaker« bearbeitet werden. Sie sind mit der Taste &lt;6> erreichbar.</p>
+        <p>absolut in den Speicherbereich der »Simons Basic«-Bilder geladen werden. Setzt man vorher mit »Multi« drei Farben für die Multi-Color-Grafik und ruft mit »CSET 2« den Grafikbildschirm auf, kann man das Wirken der »Ladezeile« am Bildschirm mitverfolgen.</p>
+
+        <p>Umgekehrt können Bilder aus »Simons Basic« mit dem »Hardmaker« bearbeitet werden. Sie sind mit der Taste &lt;6&gt; erreichbar.</p>
         <figure>
             <pre data-filename="hardcopy.prg" data-name="Hardcopy" data-mse=mse1></pre>
             <figcaption>Listing »Hardcopy« für den »Hardmaker« mit dem EC-64-Interface</figcaption>

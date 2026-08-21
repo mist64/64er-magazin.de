@@ -23,26 +23,26 @@
 
         <p>Software-Tools wie TRACE, HELP und so weiter, gibt es in Hülle und Fülle. Eine komfortable Dump-Routine, die neben den normalen Variablen auch die Systemvariablen (TI$, TI, ST) und die Arrayvariablen ausgibt, haben wir bisher leider in keiner einzigen Basic-Erweiterung finden können. Aber gerade durch falsche Wertzuweisungen an Variable innerhalb von Basic-Programmen können Fehler auftreten, die nur sehr schwer zu orten sind. Des Rätsels Lösung ist eine Routine, die auf Tastendruck oder durch SYS-Aufruf einen Variablen-Dump auf Drucker oder Bildschirm zaubert.</p>
 
-        <p>Nachdem »Dump« mit dem MSE eingegeben wurde und auf der Diskette gespeichert ist, muß das Programm mit LOAD "DUMP"" ‚8,1 absolut geladen werden. Die anschließende Eingabe von NEW&lt;RETURN&gt; sorgt dafür, daß die Basic-Zeiger auf die richtigen Werte eingestellt werden.</p>
+        <p>Nachdem »Dump« mit dem MSE eingegeben wurde und auf der Diskette gespeichert ist, muß das Programm mit LOAD "DUMP" ,8,1 absolut geladen werden. Die anschließende Eingabe von NEW&lt;RETURN&gt; sorgt dafür, daß die Basic-Zeiger auf die richtigen Werte eingestellt werden.</p>
 
-        <p>Folgende Ausgabemöglichkeiten existieren: Nach der Initialisierung mit SYS 51968 (hex $CB00) kann ein Basic-Programm geladen und gestartet werden. Das Basic-Programm darf den Bereich von $CB00 bis $CFFF nicht benutzen, da sonst Dump zerstört wird. Schalten Sie nun auch Ihren Drucker ein. Durch gleichzeitiges Drücken von &lt;CTRL+Fl&gt; wird ein Dump der Systemvariablen, der normalen und der Arrayvariablen auf dem Drucker ausgegeben. Die Ausgabe kann mit der &lt;CTRL&gt;-Taste verlangsamt, mit der &lt;CBM&gt;-Taste angehalten und durch Drücken der &lt;SHIFT&gt;-Taste abgebrochen werden. Gibt man vor dem Starten des Basic-Programms »POKE 52025,3« ein, so geht die Ausgabe beim Drücken von &lt;CTRL+Fl&gt;auf den Bildschirm. Diese Option ist für die Nichtbesitzer von Druckern gedacht. Dabei wird jedoch der bestehende Bildschirminhalt zerstört. Im Normalfall enthält die Speicherstelle 52025 den Wert 4.</p>
+        <p>Folgende Ausgabemöglichkeiten existieren: Nach der Initialisierung mit SYS 51968 (hex $CB00) kann ein Basic-Programm geladen und gestartet werden. Das Basic-Programm darf den Bereich von $CB00 bis $CFFF nicht benutzen, da sonst Dump zerstört wird. Schalten Sie nun auch Ihren Drucker ein. Durch gleichzeitiges Drücken von &lt;CTRL+F1&gt; wird ein Dump der Systemvariablen, der normalen und der Arrayvariablen auf dem Drucker ausgegeben. Die Ausgabe kann mit der &lt;CTRL&gt;-Taste verlangsamt, mit der &lt;CBM&gt;-Taste angehalten und durch Drücken der &lt;SHIFT&gt;-Taste abgebrochen werden. Gibt man vor dem Starten des Basic-Programms »POKE 52025,3« ein, so geht die Ausgabe beim Drücken von &lt;CTRL+F1&gt; auf den Bildschirm. Diese Option ist für die Nichtbesitzer von Druckern gedacht. Dabei wird jedoch der bestehende Bildschirminhalt zerstört. Im Normalfall enthält die Speicherstelle 52025 den Wert 4.</p>
 
         <p>Die Ausgabe erfolgt in der Reihenfolge System-, String-, Real-, Integervariablen und die entsprechenden Arrays. Nach der Ausgabe wird das Basic-Programm fortgesetzt, als wäre nichts geschehen. Während ein Basic-Programm auf Diskette zugreift, sollte diese Art der Dump-Ausgabe vermieden werden, da sich sonst die verschiedenen Kanäle (Drucker, Floppystation) ins Gehege kommen können. In einem solchen Fall sind die Dump-Routinen mittels SYS-Befehle aufzurufen. Unter Simons Basic sind ebenfalls nur Ausgaben auf diese Art möglich, da die Basic-Erweiterung den Interruptvektor verstellt.</p>
 
         <p>Durch entsprechende Aufrufe mit SYS-Befehlen können selbstverständlich auch einzelne Variablentypen angezeigt werden. Der Aufruf der verschiedenen Dump-Routinen ist im Direktmodus und natürlich auch innerhalb von Basic-Programmen möglich:</p>
 
-        <pre><code>SYS 52071: Ausgabe aller Variablen  
-SYS 52083: Nur Arrayvariablen  
-SYS 52093: Ausgabe von TI$, TI, ST  
-SYS 52273: Stringvariablen  
-SYS 52287: Realvariablen  
-SYS 52300: Integervariablen  
-SYS 52429: String-Arrays  
-SYS 52443: Real-Arrays  
-SYS 52456: Integer-Arrays  
+        <pre><code>SYS 52071:  Ausgabe aller Variablen
+SYS 52083:  Nur Arrayvariablen
+SYS 52093:  Ausgabe von TI$, TI, ST
+SYS 52273:  Stringvariablen
+SYS 52287:  Realvariablen
+SYS 52300:  Integervariablen
+SYS 52429:  String-Arrays
+SYS 52443:  Real-Arrays
+SYS 52456:  Integer-Arrays
 </code></pre>
 
-        <p>Auf diese Weise können an einer bestimmten Stelle des Basic-Programms alle bis dahin definierten Variablen überprüft werden. Auch hier kann die Ausgabe mit der &lt;CTRL&gt;-Taste verlangsamt, mit der Commodore-Taste angehalten und durch Drücken von &lt;SHIFT&gt;abgebrochen werden. Wenn Sie vor einem Dump-Aufruf einen Druckerkanal, zum Beispiel mit»OPEN 1,4,0: CMD Ik«öffnen, kann die Variablenausgabe auf einen Drucker gelenkt werden.</p>
+        <p>Auf diese Weise können an einer bestimmten Stelle des Basic-Programms alle bis dahin definierten Variablen überprüft werden. Auch hier kann die Ausgabe mit der &lt;CTRL&gt;-Taste verlangsamt, mit der Commodore-Taste angehalten und durch Drücken von &lt;SHIFT&gt;abgebrochen werden. Wenn Sie vor einem Dump-Aufruf einen Druckerkanal, zum Beispiel mit »OPEN 1,4,0: CMD 1« öffnen, kann die Variablenausgabe auf einen Drucker gelenkt werden.</p>
 
         <address class="author">(Martin Pietsch/ah)</address>
 

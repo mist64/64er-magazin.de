@@ -297,3 +297,19 @@ grep the published issues for it. `(Holger Brömmelsiek/t` is not an
 abbreviation, it is a truncated `/bj`; `(Andreas Tschescheftr)` is `/tr` with
 the slash eaten. An abbreviation that appears exactly once in an issue and
 nowhere in the corpus is almost always an OCR artefact, not a new editor.
+
+## A full-name signature takes NO parentheses
+
+The rule that the editorial's `Michael Scharfenberger, Chefredakteur` is set
+without parentheses is not special to the editorial — it is how the magazine
+sets **any** signature given as a full name on its own right-aligned line:
+
+```html
+<address class="author">Dieter Temme</address>          <!-- Lebenslauf box -->
+<address class="author">Michael Scharfenberger, Chefredakteur</address>
+```
+
+Parentheses belong to the compact byline form only — `(bs)`, `(Dirk
+Henckels/tr)` — which is set inline at the end of the closing sentence. So
+before wrapping a signature, check which form the print uses. Across the corpus
+every full-name signature is paren-less (2164 bylines checked).

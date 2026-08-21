@@ -27,10 +27,10 @@
 
         <p>Eine Prozedur besteht aus einer Kopfzeile und einem Block. Die Kopfzeile enthält das reservierte Wort »PROCEDURE«, einen Prozedurnamen und eine Liste von Parametern. Diese darf auch entfallen:</p>
 
-        <pre><code>PROCEDURE Prozedurnanmen;  
+        <pre><code>PROCEDURE Prozedurnamen;  
 </code></pre>
 
-        <p>Der Block einer Prozedur ist genauso wie beim Hauptprogramm aufgebaut. Es gibt lediglich einen kleinen Unterschied: Am Ende des Hauptprogramms steht ein ».«, am Ende einer Prozedur oder Funktion ein »;«. Der Definitionstel des Prozedurblocks kann somit selbst wieder Prozedur- und Funktionsvereinbarungen enthalten. Ist dies der Fall, sprichtt man auch von Schachtelung.</p>
+        <p>Der Block einer Prozedur ist genauso wie beim Hauptprogramm aufgebaut. Es gibt lediglich einen kleinen Unterschied: Am Ende des Hauptprogramms steht ein ».«, am Ende einer Prozedur oder Funktion ein »;«. Der Definitionsteil des Prozedurblocks kann somit selbst wieder Prozedur- und Funktionsvereinbarungen enthalten. Ist dies der Fall, spricht man auch von Schachtelung.</p>
 
         <p>Eine Funktion besteht ebenfalls aus einer Kopfzeile und einem Block. Die Kopfzeile enthält das reservierte Wort »FUNCTION«, einen Funktionsnamen, eine Parameterliste, einen Doppelpunkt und den Funktionstyp. Die Parameterliste kann auch entfallen. Die allgemeine Form der Kopfzeile lautet:</p>
 
@@ -45,7 +45,7 @@
 
         <p>Globale und lokale Variablen können gleiche Namen haben. Sobald eine lokale Variable mit gleichem Namen wie eine globale Variable definiert wird, tritt folgende Regel in Kraft:</p>
 
-        <p>In dem Block, in dem eine lo‚kale Variable mit gleichem Namen wie eine globale Variable vereinbart wird, ist lediglich die lokale Variable bekannt. Die globale Variable ist in diesem Block nicht mehr verfügbar. Von Wertzuweisungen an die lokale Variable bleibt die globale Variable unberührt.</p>
+        <p>In dem Block, in dem eine lokale Variable mit gleichem Namen wie eine globale Variable vereinbart wird, ist lediglich die lokale Variable bekannt. Die globale Variable ist in diesem Block nicht mehr verfügbar. Von Wertzuweisungen an die lokale Variable bleibt die globale Variable unberührt.</p>
 
         <h2>Globale und lokale Variablen</h2>
 
@@ -55,13 +55,15 @@
 
         <h2>Die Kommunikation zwischen den Blöcken</h2>
 
-        <p>Wasinunseren Überlegungen noch fehlt, ist die Übergabe von einem Block an einen anderen. Diese Übergabe erfolgt durch Parameterlisten. Jede Funktion oder Prozedur kann mit verschiedenen Eingangsgrößen berechnet werden. Aus diesen Eingangsgrößen berechnet das Unterprogramm Ergebnisse, die an den aufrufenden Block zurückgegeben werden können. Bei Funktionen ist eine solche Größe immer vorhanden: der Funktionswert. Beispiel für eine Funktion mit Parameterliste!</p>
+        <p>Was in unseren Überlegungen noch fehlt, ist die Übergabe von einem Block an einen anderen. Diese Übergabe erfolgt durch Parameterlisten. Jede Funktion oder Prozedur kann mit verschiedenen Eingangsgrößen berechnet werden. Aus diesen Eingangsgrößen berechnet das Unterprogramm Ergebnisse, die an den aufrufenden Block zurückgegeben werden können. Bei Funktionen ist eine solche Größe immer vorhanden: der Funktionswert. Beispiel für eine Funktion mit Parameterliste:</p>
 
-        <pre><code>FUNCTION  
-ITERATIV(N: INTEGER) : INTEGER;  
+        <pre><code>FUNCTION ITERATIV(N:INTEGER):INTEGER;
 </code></pre>
 
         <p>In dieser Parameterliste werden die zu übergebenden Parameter formal definiert. Beim Aufruf der Funktion ersetzt man die formalen Parameter durch aktuelle:</p>
+
+        <pre><code>Y:=ITERATIV(5);
+</code></pre>
 
         <p>Ist mehr als ein Parameter vorhanden, müssen die aktuellen Parameter mit den formalen Parametern bezüglich Reihenfolge und Datentyp übereinstimmen. Es existieren drei Formen von Parametern:</p>
 
@@ -75,9 +77,12 @@ ITERATIV(N: INTEGER) : INTEGER;
 
         <p>Ein Beispiel dazu:</p>
 
+        <pre><code>FUNCTION EUCLID(A:INTEGER):INTEGER;
+</code></pre>
+
         <p>Beim Aufruf ist die Angabe des Typs nicht erforderlich. Es dürfen auch Ausdrücke als aktuelle Parameter übergeben werden. Mit Wertparametern können keine Daten an aufrufende Blöcke zurückgegeben werden. Dazu bedient man sich der Variablenparameter. Diese müssen in der formalen Parameterliste mit (VAR) gekennzeichnet werden:</p>
 
-        <pre><code>PROCEDURE POT (X:REAL;Y: IN TEGER; VAR Z:REAL);  
+        <pre><code>PROCEDURE POT (X:REAL;Y:INTEGER; VAR Z:REAL);
 </code></pre>
 
         <p>Wird jetzt der Wert des formalen Parameters im Unterprogramm verändert, ändert sich auch der aktuelle Parameter des aufrufenden Blocks. Der aktuelle Parameter muß daher eine Variable und darf kein Ausdruck sein.</p>
@@ -217,24 +222,29 @@ end.</pre>
 
         <p>Bevor ein Block von einem anderen aufgerufen werden kann, muß er vereinbart worden sein. Es gibt jedoch die Möglichkeit, von dieser Regel abzuweichen. Man bedient sich dazu der »FORWARD«-Definition. Dabei wird die Kopfzeile der Prozedur einschließlich der Parameterliste hingeschrieben und mit »FORWARD« gekennzeichnet:</p>
 
-        <pre><code>PROCEDURE A1(X,Y:REAL); FOR WARD;  
+        <pre><code>PROCEDURE A1(X,Y:REAL); FORWARD;
 </code></pre>
 
         <p>Später, bei der eigentlichen Definition des Unterprogramms, entfällt dann die Parameterliste:</p>
 
-        <pre><code>PROCEDURE A1; BEGIN  
+        <pre><code>PROCEDURE A1;
+  BEGIN
+  ......
+  END;
 </code></pre>
 
         <h2>Rekursion</h2>
 
-        <p>Rekursion bedeutet, daß Prozeduren und Funktionen sich selber aufrufen. Bei der direkten Rekursion ruft ein Block sich selbst auf. Beiderindirekten Rekursion ruft ein Block einen nebengeordneten Block auf und über diesen wieder sich selbst.</p>
+        <p>Rekursion bedeutet, daß Prozeduren und Funktionen sich selber aufrufen. Bei der direkten Rekursion ruft ein Block sich selbst auf. Bei der indirekten Rekursion ruft ein Block einen nebengeordneten Block auf und über diesen wieder sich selbst.</p>
 
         <p>Das klassische Beispiel für Rekursion ist die Fakultät. Die rekursive Definition lautet:</p>
 
-        <p>n! = n*(n-1)!<br>
+        <p>n! = n * (n-1)!<br>
             0! = 1</p>
 
-        <p>Die Fakultät kann man aber auch iterativ definieren: n!=1x2x...... xn</p>
+        <p>Die Fakultät kann man aber auch iterativ definieren:</p>
+
+        <p>n! = 1 x 2 x ....... x n</p>
 
         <p>Die Iteration läßt sich mit Wiederholungen realisieren (FOR, REPEAT, WHILE). Zur Rekursion benötigt man Unterprogramme, die einen Namen tragen und sich daher selbst aufrufen können.</p>
 
