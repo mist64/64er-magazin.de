@@ -608,3 +608,33 @@ the same column, where no punctuation is grammatically possible. In 8609's `67`
 an identical speck sits before `durch` and before `cherten`; in `58` before
 `Nach`. A genuine sentence-final period is at the END of the preceding line,
 not floating at the start of the next.
+
+## Doubled letters are one glyph split in two, not a typing slip
+
+`DDer`, `WWichtig`, `BBrillant`, `EEprom`, `FFunktion`, `PPas`, `MO®S`,
+`WWichtig`, `POKESs`, `geLlISTet`, `Rüickumschlages`, `Eiditierung` — this class
+recurs across every issue and had been cleaned up by hand each time.
+
+**Where it comes from.** The OCR over-segments a single glyph into two
+candidate characters and emits both. Measured on 8609's block JSON: 11
+occurrences, **7 of them at the very first character of a block**. That is where
+the initial is largest (display type, a bold stand-first, a drop cap) and where
+the first glyph has no left neighbour to constrain segmentation. A speck on the
+paper does the same thing mid-word: p69 of 8608 prints `MOS 6566` with a mark on
+the O, and the OCR emitted `MO®S`.
+
+Note the same root cause produces the OPPOSITE defect too. An ornamental initial
+is a separate object of a different size, so the segmenter either drops it
+(`asin Ausgabe 4/86` for `Das in …`) or emits it twice (`DDer`). Both classes
+cluster at paragraph starts for the same reason.
+
+**The pipeline already knows the answer in some cases.** Blocks carry a
+`read_alt` field — an alternative reading — and for p157's `DDer` the
+alternative contains the correct `Der`. Where primary and alternative differ
+only by a doubled leading character, the alternative is right. Preferring it is
+a real fix at stage A rather than cleanup afterwards, and it uses data that is
+currently computed and discarded.
+
+**Until then**, r310 flags `\b([A-ZÄÖÜ])\1[a-zäöüß]{2,}` as SOFT. It is not
+HARD because a legitimate population exists: command mnemonics with a
+placeholder tail, e.g. 8606's `Rechten Rand setzen RRxxx`.
