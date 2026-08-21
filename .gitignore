@@ -4,10 +4,41 @@ cache
 **/_tmp/
 **/_work/
 **/_work_v?/
+**/_cache/
+**/_work.zip
 .venv
 .DS_Store
 tools/__pycache__
 __pycache__
 target
-**/_cache/
-**/_work.zip
+
+# ---------------------------------------------------------------------------
+# issues/ is WHITELIST-governed, not blacklist.
+#
+# Blacklisting failed twice in one day: `git add issues/8605 issues/8606
+# issues/8607` for three edits committed 634 files, including an 8.9 GB
+# _work.zip that GitHub silently refused for every push afterwards.  A
+# blacklist only stops the intermediate you already thought of; the build
+# writes new ones (_cache/, png/, png2/, Archive.zip, *.tsv) whenever a stage
+# is added.  So: ignore everything one level inside an issue dir, then name
+# what a PUBLISHED issue actually consists of.
+#
+# Note `*` does not cross `/` in gitignore, so `issues/*/*` matches only the
+# entries directly inside an issue dir -- prg/ contents stay visible once the
+# directory itself is re-included.
+# ---------------------------------------------------------------------------
+issues/*/*
+!issues/*/*.html
+!issues/*/*.png
+!issues/*/*.svg
+!issues/*/*.txt
+!issues/*/*.pdf
+!issues/*/prg/
+
+# REPRINTS.md is editorial content (which Sonderheft article is a reprint of
+# what), not a work log like LOG.md -- it belongs to the issue.
+!issues/*/REPRINTS.md
+
+# site assets live beside the issues, same depth
+!issues/fonts/*
+!issues/fav/*
