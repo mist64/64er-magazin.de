@@ -213,6 +213,7 @@ substitutions:
 | Stray period | period vs space | `sicher.auch` → `sicher auch`, `Wer. selbst` → `Wer selbst`, `MSE.eingegeben` → `MSE eingegeben` |
 | `rn` vs `m`, `cl` vs `d` | classic ligature breaks | `Pmsel` → `Pinsel`, `clas` → `das` (only when context unambiguous) |
 | Final-position `l` for `t` | t vs l | Lowercase typewriter `t` with hooked descender OCRs as `l`, especially at word end: `Mini-Autostarl` → `Mini-Autostart` (8607/76). The common shape is `…stt` mis-read as `…sl`. Apply only when the t-form is a known German / 64'er-jargon word AND the l-form isn't (eyeball check, not memory): `Autostarl` is not a word, `Autostart` is. Same context-confirms test as the other Pass-2 substitutions. |
+| `]` for `1` | serif 1 vs ] | The serif digit `1` in this typeface is regularly read as `]`. Sweep `grep -n ']' ` over the whole issue, not just figure references — 8609 had 27, 8608 zero, so it is scan-specific and easy to miss entirely. Hits look like `Bild ]`, `Listing ]`, `Tabelle ]`, `(0 oder ])`, `VR]`, `CHR$(n])`, `($D60])`, `1541/70/7]`, `Monitor 190]`, `33] Seiten`, `&lt;]>`. Confirm the digit rather than assuming `1`: check the article's own figure list (a `Bild ]` in an article whose captions run Bild 1–3 is only `Bild 1` if the sentence fits Bild 1), or read the line on the scan. |
 
 ## Pass 3 — missing or extra spaces
 

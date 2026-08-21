@@ -114,6 +114,23 @@ per-product / per-topic.
 
 Any **one** of these is sufficient to treat the pair as a single article:
 
+**»Listing des Monats« and »Anwendung des Monats« are ALWAYS this case.**
+The magazine prints the overview blurb and the listing/description apart, on
+non-adjacent pages, essentially every issue. **We always combine them into one
+article.** Do not treat the split as editorial intent and do not wait for the
+other signals to confirm it — if `head1` reads *Listing des Monats* or
+*Anwendung des Monats* on two pieces about the same program, they are one
+article. The `Jahresinhaltsverzeichnis` agrees: it carries a single row with a
+page range spanning both (`8609,48—56` for Bar-Codes, `8609,46—54` for the
+1570/71 FSD-System). A tell that the split slipped through: only the first
+piece carries `index_category`, and the two ids read like `foo-system` /
+`foo-listing`.
+
+When the two banners carry **different** titles, use the
+`Jahresinhaltsverzeichnis` title for `<h1>` (e.g. *Vollgas für die Floppy
+1570/1571*, not the deep-dive's *Die 1570/71 gibt Gas*) and demote the other
+banner to an `<h2>` at the seam, so the file keeps exactly one `<h1>`.
+
 - **Same product/topic name in both banners**, literally or near-literally
   (e.g. *"Variosystem — die gelungene Erweiterung von Vizawrite 64"* on
   p.49 and *"Variosystem druckt für Sie"* on p.56; *"Das Rhythm Construction
