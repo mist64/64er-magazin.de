@@ -26,6 +26,26 @@ def articles(d):
         i = s.find('<article')
         yield f, s, (s[i:s.rfind('</article>')] if i >= 0 else s)
 
+def opening_paragraphs(body, n=2):
+    """The article's first n prose paragraphs, tags stripped.
+
+    An ornamental initial that OCR never recovered leaves the ARTICLE'S FIRST
+    WORDS truncated (`enn beim`, `ur Programmierung`), which is valid HTML and
+    grammatical-looking German -- no markup or spelling gate can see it.  The
+    window is two paragraphs, not one: the truncated one is usually the first
+    body paragraph AFTER a standfirst, and a standfirst is sometimes marked
+    `class="intro"` and sometimes a bare <p>, so neither "the first" nor "the
+    first non-intro" alone finds them all.  MEASURED on SH8601: two catches all
+    17, one catches 1, first-non-intro catches 15.
+    """
+    out = []
+    for mm in re.finditer(r'<p(?: class="intro")?>(.*?)</p>', body, re.S):
+        t = re.sub(r'<[^>]+>', '', mm.group(1)).strip()
+        if t: out.append(t)
+        if len(out) >= n: break
+    return out
+
+
 def unbalanced(html):
     class P(HTMLParser):
         def __init__(self): super().__init__(); self.st = []
@@ -71,6 +91,16 @@ def main(d):
 
         for mm in re.finditer(r'<p class="intro">(?:Gier|Test|64\'er|\d{1,2}|-F\])\s', body):
             H('badge bled into the intro (r280)', f)
+        # An adjudicated exception is expressed IN THE FILE, next to the thing
+        # it excuses.  A heading whose trailing period was READ off the master
+        # carries an HTML comment saying so within the 400 characters before it;
+        # without this, a verified-printed period can never be cleared and the
+        # gate can never honestly reach zero, which is how a gate stops being
+        # read.  The word PRINTED (upper case, in a comment) is the marker, and
+        # it must state what was verified and how -- see r290.
+        printed_ok = lambda pos: bool(
+            re.search(r'<!--(?:(?!-->).)*\bPRINTED\b(?:(?!-->).)*-->\s*$',
+                      body[max(0, pos - 400):pos], re.S))
         for mm in re.finditer(r'<h([2-6])>([^<]*)</h\1>', body):
             t = mm.group(2).rstrip()
             # an ellipsis is legitimate and the magazine sets it both ways:
@@ -80,7 +110,30 @@ def main(d):
             # ("1. SCREEN nr." heads a numbered command list in 8605/29)
             if t.endswith('.') and not re.search(r'\.\s?\.\s?\.$', t) \
                     and not re.search(r'\b[A-Za-zÄÖÜäöü]{1,3}\.$', t):
-                H('heading is a paragraph tail (r290)', f, t[:40])
+                if printed_ok(mm.start()):
+                    S('heading ends "." — annotated as PRINTED, verified (r290)', f, t[:40])
+                else:
+                    H('heading is a paragraph tail (r290)', f, t[:40])
+
+        # --- the article's opening: a drop cap the OCR never saw -------------
+        # MEASURED on SH8601: 17 of 29 articles opened with a truncated first
+        # word.  r010's splice only repairs an initial tesseract DETECTED; where
+        # it detected none, the letter is simply absent and everything downstream
+        # reads as valid prose.
+        for t in opening_paragraphs(body):
+            # No legitimate population in 1724 published articles: a stray sigil
+            # or a letter+colon standing where the initial belongs.  SH8601 had
+            # `$ ie glauben` for `Sie glauben` and `D: große` for `Die große`.
+            if re.match(r'[$&%§#@*]\s', t) or re.match(r'[A-ZÄÖÜ][:;]\s', t):
+                H('article opens with an initial stub (r010 drop cap)', f, t[:34])
+            # Lowercase openings DO have a legitimate population -- the magazine
+            # runs a headline into its first sentence (`Warum...` / `sieht die
+            # 64'er diesmal`, `3D-Joystick-Grafik` / `ist ein Programm fuer`).
+            # 10 in 1724 articles, 7 of them that idiom -- so SOFT, but read
+            # every one: the same sweep found `esonders dem` for `Besonders dem`
+            # in a published issue.
+            elif re.match(r'[a-zäöüß]', t):
+                S('article opens lowercase — drop cap never OCR\'d? (FP: headline runs into the text)', f, t[:34])
 
         # --- SOFT: triage, each with a documented FP population -------------
         for mm in re.finditer(r'<p(?: class="intro")?>([a-zäöüß][a-zäöüß]*)\b', body):

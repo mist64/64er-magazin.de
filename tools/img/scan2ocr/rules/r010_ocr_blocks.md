@@ -183,3 +183,35 @@ unvalidated. Do that as its own before/after experiment.
 Note this does NOT fix drop caps the OCR never detects at all (`asin Ausgabe
 4/86` for `Das in Ausgabe 4/86`), nor mid-word doublings (`Programmiierung`,
 `Rüickumschlages`, `MO®S`), which are genuine tesseract misreads.
+
+### The undetected drop cap is the COMMON case, and r310 now gates it
+
+MEASURED on SH8601: **17 of 29 articles** opened with a truncated first word
+(`enn beim`, `ur Programmierung`, `abellenkalkulationen`). The splice above can
+only repair an initial tesseract DETECTED; where it detected none, the letter is
+simply absent — and what is left is valid HTML and grammatical German, so it
+passed r310, r320 and the site build untouched, and reached the review as a
+finished issue.
+
+It is caught by reading the article's **opening**, not its prose: r310 tests the
+first two prose paragraphs of every article. Two, because the truncated one is
+usually the first body paragraph after a standfirst, and a standfirst is
+sometimes `class="intro"` and sometimes a bare `<p>` — on SH8601 the two-paragraph
+window found all 17 where "the first paragraph" found 1 and "the first non-intro
+paragraph" found 15.
+
+Two forms, and they are gated differently because their populations differ:
+
+- **a stub where the initial belongs** — `$ ie glauben` for `Sie glauben`,
+  `D: große` for `Die große`. **HARD**: zero legitimate instances in 1724
+  published articles.
+- **a lowercase opening** — **soft**, because the magazine runs a headline into
+  its first sentence: `Warum…` / *sieht die 64'er diesmal…*, `3D-Joystick-Grafik`
+  / *ist ein Programm für den VC 20*. 10 in 1724 articles, 7 of them that idiom.
+  Read every one anyway: the same sweep found `esonders dem
+  Maschinensprache-Anfänger` for `Besonders dem` in an already-published issue.
+
+**The letter is READ, never inferred.** Six SH8601 articles open `Der C 128` and
+the seventh opens `Ist der C 128` — and that glyph is a plain slanted bar that
+had to be zoomed to tell an `I` from a `1`. Where the initial is present,
+check it against the page too: a WRONG initial is the same defect.

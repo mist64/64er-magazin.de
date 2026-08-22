@@ -288,6 +288,29 @@ column. Signatures of the defect, all seen in 8609:
 Check: no `<h2>`–`<h6>` may end in `.` (an ellipsis `...` is fine), consist only
 of non-letters, or start lowercase.
 
+**But the magazine sometimes really prints the period**, and an exception that
+lives only in a log is an exception the gate cannot see. SH8601 p039 sets
+`2. Sprites und Windows.` with a printed full stop, measured on the master —
+and r310 went on failing it after the finding was adjudicated, so its HARD count
+could not honestly reach zero. A gate that always reports two failures stops
+being read.
+
+**Write the adjudication into the file, immediately above the heading**, as an
+HTML comment containing the word `PRINTED` in upper case, saying what was read
+and from where. r310 honours it within the 400 characters before the heading and
+demotes the finding to soft:
+
+```html
+<!-- The trailing period is PRINTED: verified against the 600 dpi master
+     by step 290.  r310 flags a heading ending in "." as a possible
+     paragraph tail; here it is the page's own typography. -->
+<h3>2. Sprites auf Diskette und Kassette.</h3>
+```
+
+The comment is the evidence, not a silencer: it must name the page and how the
+glyph was read, exactly as a LOG line would. No marker, no exemption — proved by
+stripping the comments from a copy of the issue, which restores the failure.
+
 ## `<h2>` inside `<aside>` is CORRECT
 
 Earlier versions of this rule flagged `<h2>` inside an `<aside>` as a defect.
