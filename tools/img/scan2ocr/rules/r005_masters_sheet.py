@@ -1239,6 +1239,15 @@ def process(page):
         # the page and not at the fabricated margin needs this box, and
         # recovering it from the pixels means guessing which white is which.
         "page-px": f"{x1 - x0} {y1 - y0}",
+        # ...and WHERE that box sat in the levelled SHEET.  `page-px` gives its
+        # size only, and the master is the page already moved to the canvas
+        # origin, so the move is gone from it.  Step 005b needs it: a page that
+        # carries no 64'er wordmark has its A4 window placed from this box, and
+        # the window lives in the sheet frame.  Recovering it afterwards means
+        # correlating the master back against sheets600 -- which does work, to
+        # 0.995+, and is a search standing in for a number that was in hand
+        # here.  It costs eleven characters in a text file.
+        "sheet-box": f"{x0} {y0} {x1} {y1}",
         "canvas-px": f"{cw} {ch}",
         "notes": "; ".join(notes) if notes else "(none)",
         "edge-finder": f"{finder} (paper frac {paper_frac:.3f})",
