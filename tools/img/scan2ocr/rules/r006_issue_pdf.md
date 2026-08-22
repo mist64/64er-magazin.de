@@ -52,6 +52,26 @@ ready to build. Ask for it; do not substitute the raw master, because then the
 published PDF and the published cover image disagree about what the cover
 looks like.
 
+## THE 150 dpi INPUTS ARE REVIEWED BEFORE THE PDF IS COMPILED — ALWAYS
+
+The delivered image in every page of the PDF is a **150 dpi raster**, and that
+raster is what the reader sees. **Do not compile until the issue owner has
+looked at those 150 dpi pages and said they are good.** Not the masters, not a
+sample — the actual files that will be embedded.
+
+This is not a formality and it is not conditional on how the run went:
+
+- the compile is expensive (hours, with a quality binary search over the whole
+  issue) and every defect found afterwards costs the whole build again;
+- a grading or cutting mistake is obvious at 150 dpi and invisible in a log;
+- the cover is hand-made and must be checked in the same pass, since it is
+  page 1's image rather than a re-derivation.
+
+**How to present them:** the prepared 150 dpi pages, in page order, as files the
+owner can open — plus a contact sheet for the sweep. Say where they are on
+disk. Then WAIT. A build started without that review is to be stopped, not
+finished; SH8601's first two builds were.
+
 ## Inputs
 
 - `<tmp>/masters600/NNN.png` — every page of the issue, 600 dpi
