@@ -155,6 +155,23 @@ for f in sorted(os.listdir(d)):
     for m in re.finditer(r'<h([12])>([^<]+)</h\1>', s):
         h = m.group(2).strip()
         if not h: continue
+        # A heading may legitimately open with something that is not an
+        # uppercase letter, and skipping ahead to the first LETTER gets both
+        # cases wrong:
+        #   "1541 - der Oldtimer"   a model number, and German correctly
+        #                           lowercases the word after it
+        #   "dBase II - die ..."    the product's own capitalisation
+        # So: if the heading starts with a digit, the case of the word after
+        # it is not this check's business; and a known product name that
+        # starts lowercase is exempt (this rule's Notes list them).
+        # A MODEL NUMBER specifically -- three or four digits, as in "1541 -
+        # der Oldtimer".  Not any digit: SH8601's "60 64 wie kompatibel ist
+        # der c128?" also starts with one, and there the digits are OCR damage
+        # of "GO 64", which this check should keep catching.
+        if re.match(r'\d{3,4}\b', h):
+            continue
+        if re.match(r'(dBase|iX|pASCAL|c\'t)\b', h):
+            continue
         first = next((c for c in h if c.isalpha()), None)
         if first and not first.isupper():
             print(f"  lowercase first letter in {f}: {h!r}")
