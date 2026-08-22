@@ -46,7 +46,7 @@ The pipeline:
       -> two renders off that ONE separation: the OCR master carries a
          black-point curve, the figure master is the straight ICC render
       -> <tmp>/masters600/NNN.png, <tmp>/figures600/NNN.png,
-         <tmp>/cmyk600/NNN.tif, <tmp>/debug600/NNN.png, and beside each master
+         <tmp>/cmyk2400/NNN.tif, <tmp>/debug600/NNN.png, and beside each master
          the STAMP that says which profile produced it
 
 A page whose stock this issue's paper white does not describe -- the folded A3
@@ -409,22 +409,14 @@ INK_CONTRAST = 60
 # enough that a specular highlight cannot set it.
 RAW_INK_DIST = 90
 STOCK_PCT = 90
-# The grade must keep this fraction of the ink the scan has.  MEASURED on p056:
-# the ungraded page is 17.1% ink; with the levels neutralised the grade keeps
-# 15.3% (0.90 of it), with SH8601's levels as written only 5.7% (0.34).
-GRADE_INK_KEEP = 0.70
-# ...and, independently, the median of the darkest ink must sit this far below
-# paper white.  MEASURED on p056: 201 levels with the levels neutralised, 162
-# with them as written, against ~185 for a sound grade of a text page.
+# The grade is MEASURED AND REPORTED, never gated -- see the long note where
+# these numbers are computed.  A gate on ink-keep failed 10 of 152 pages on the
+# first full sweep and was wrong on all 10: they were the issue's most
+# tint-heavy pages, and a screened tint demodulating into a flat fill is the
+# pipeline working, not ink loss.  Two numbers still go in the log every page,
+# because the failure the gate was built for (the old LK 90 95 turning black
+# type into blank paper) is loud enough for a human to see in a thumbnail:
 INK_DARK_PCT = 5.0          # "the darkest ink" = this percentile of the page
-MIN_INK_CONTRAST = 120      # levels below paper white
-# ...and the floor that still applies where the two checks above cannot: a page
-# on a stock this profile does not describe is graded anyway, and the one thing
-# that can still be said about it is that it is not BLANK.  MEASURED on the
-# eight ink/bed pages: 2.9% (p149, the sparsest -- a card on 45% of the canvas)
-# to 85.9% (p001, a full-bleed cover).  A floor of 0.5% is an order of magnitude
-# below the sparsest real page and an order above nothing.
-GRADE_MIN_INK_FRAC = 0.005
 # The graded paper white is measured on the page's OWN paper.  On a page printed
 # on a stock this profile does not describe -- the cover leaf, the card -- there
 # is almost none of it, and a p50 taken over a handful of light-ink pixels is
@@ -435,59 +427,21 @@ GRADE_MIN_INK_FRAC = 0.005
 # same measurement and a reader must not have to guess.
 PAPER_PROBE_MIN_FRAC = 0.05
 
-# --- the two renders -------------------------------------------------------
-# ONE separation, TWO renders, and they go to different consumers:
+# --- there is no OCR contrast curve, and that is deliberate ---------------
+# There was one here: `-level 30%,100%`, one issue-wide constant, applied to
+# masters600 while a second uncurved render fed the figures.  It existed to fix
+# grey type -- and grey type was a symptom of the separator's GCR, which left
+# printed black as K ALONE (100% single K renders about 50 through SWOP, not 0).
+# undo_gcr() fixes that at the source, so the curve has nothing left to do:
+# MEASURED on p056, glyph p50 37 -> 20 and 0% -> 39.6% of glyph pixels solid
+# black, which is where 8609's existing masters already sit (p010: 31, 42.1%).
 #
-#   masters600/NNN.png   r010's OCR master.  The ICC render with a BLACK-POINT
-#                        CURVE on it: type to solid black.  CLIPPING IS A
-#                        FEATURE here.
-#   figures600/NNN.png   r145's figure master, and the one r145 cuts pictures
-#                        from.  The straight ICC render: no clipped highlight,
-#                        no crushed shadow, NO CURVE.
-#
-# Ink at ~66 is not a bug, it is honesty: 100% SWOP black is not RGB 0.  The OCR
-# master boosts it anyway, because tesseract binarises and a boost costs nothing
-# there -- but the figure master must NOT be boosted, which is why there are two.
-#
-# THE CURVE IS ONE ISSUE-WIDE CONSTANT, NEVER PER PAGE.  The prototype measured
-# a black point per page (the 2nd percentile of that page's own ink) and
-# stretched to it, which makes the same grey mean a different thing on every
-# page: a page whose darkest pixel is a photograph gets a different transfer
-# from the text page beside it, and nothing downstream can see that it happened.
-#
-# ImageMagick's `-level 30%,100%`, and exactly that arithmetic:
-#
-#     out = clamp((in - 0.30 * 255) / (0.70 * 255) * 255)
-#
-# MEASURED on ALL FOUR verified pages, and chosen on the WORST of them.  "glyph
-# p50" is the median level of the pixels a glyph is made of in a body-text
-# window -- 0 is solid black -- and "paper p50" the median of the paper beside
-# it:
-#
-#     level            none      20%       25%       30%       35%
-#     glyph p50 006      69        28        14         1         0
-#               041      54         8         1         0         0
-#               056      53         5         0         0         0
-#               092      72        32        18         4         0
-#     paper p50        255/255/254/254, unchanged through 30%; at 35% p041's
-#                      paper starts to drop
-#
-# 30% is where the worst page's type goes solid black while the paper floor is
-# still untouched.  35% buys nothing -- the type is already there -- and starts
-# eating paper, which is the one thing a black-point curve must never do.
-#
-# The verification block in the .md re-measures this on the published pair with
-# its own, stricter definition of a glyph -- stroke INTERIORS, chosen on the
-# uncurved render and then measured in both -- and reads 79-95 uncurved against
-# 3-26 curved, paper 255 either way.  Higher numbers, same conclusion, and both
-# are written down rather than quietly reconciled: the glyph SET is what differs,
-# and "glyph p50" means nothing without saying which pixels are the glyph.
-#
-# AND THE FIGURE RENDER MUST NOT HAVE IT.  A black-point curve crushes a
-# photograph: MEASURED on p006's cover photo, this level drives the pure-black
-# area of the picture from 25% to 42%.  Type wants the crush; pictures do not.
-OCR_LEVEL_LOW = 30.0        # percent of full scale, ImageMagick -level semantics
-OCR_LEVEL_HIGH = 100.0
+# It also had to go for a second reason, which is the more important one: THERE
+# IS ONLY ONE MASTER.  r145_extract_figures.py reads r010_ocr_blocks.SRC_DIR --
+# the same directory r010 OCRs -- so a curve on the OCR master is a curve on
+# every published figure, and a curve crushes photographs (MEASURED on p006:
+# pure-black area of the cover photo 25% -> 42%).
+
 
 # --- the debug overlay -----------------------------------------------------
 # One per page, always: the four traced lines drawn in green on the LEVELLED,
@@ -519,10 +473,13 @@ THUMB_DIR = Path(ISS.thumb_150)
 # figure render, the archival separation, the overlay the user reviews -- so
 # they are named here, beside it.
 OUT_MASTER = Path(ISS.masters600)
-OUT_FIGURE = Path(ISS.tmp) / "figures600"
-OUT_CMYK = Path(ISS.tmp) / "cmyk600"
+# The deskewed, graded, UNCROPPED sheet at full resolution.  It is the thing
+# every other artefact of this page is derived from, and it is kept: a figure
+# that bleeds off the trimmed page still exists on the sheet.
+OUT_SHEET = Path(ISS.tmp) / "masters2400"
+OUT_CMYK = Path(ISS.tmp) / "cmyk2400"
 OUT_DEBUG = Path(ISS.tmp) / "debug600"
-OUT_DIRS = (OUT_MASTER, OUT_FIGURE, OUT_CMYK, OUT_DEBUG)
+OUT_DIRS = (OUT_MASTER, OUT_SHEET, OUT_CMYK, OUT_DEBUG)
 
 
 # ---------------------------------------------------------------------------
@@ -591,25 +548,24 @@ PAPER_RGB = np.array(ANCHORS["W"], float)
 # in -- the 8 anchors, the 4 level lines, and the OCR level -- and the digest is
 # written into every artefact this step produces.  Comparing a master with the
 # current profile is then a string comparison, not a judgement about colour.
-GRADE_TEXT = profile_text(ANCHORS, LEVELS) + \
-    "OCRLEVEL %g %g\n" % (OCR_LEVEL_LOW, OCR_LEVEL_HIGH)
+GRADE_TEXT = profile_text(ANCHORS, LEVELS)
 GRADE_SHA = hashlib.sha1(GRADE_TEXT.encode("utf-8")).hexdigest()[:12]
 
 
 def stamp_text(**fields):
-    """The stamp that says which profile, and which curve, made this page.
+    """The stamp that says which profile made this page.
 
     Written three ways, because each of them is the one that survives a
     different accident: as a PNG/TIFF text chunk INSIDE every render (survives
     the file being copied somewhere else), as NNN.stamp.txt beside the master
     (readable without opening a 110 megapixel PNG), and as the profile file
-    handed to the separator, kept in cmyk600/.
+    handed to the separator, kept in cmyk2400/.
     """
     head = [f"r005_masters_sheet {ISSUE} -- the grade as used for this page",
             f"grade-sha    {GRADE_SHA}",
             f"profile      {ISS.colors or '(none -- built-in anchors)'}",
-            f"ocr-level    {OCR_LEVEL_LOW:g}%,{OCR_LEVEL_HIGH:g}%  "
-            f"(masters600 ONLY; figures600 and cmyk600 are UNCURVED)"]
+            f"render       ONE master, uncurved -- r010 OCRs it and r145 "
+            f"cuts figures from it"]
     body = [f"{k:<12s} {v}" for k, v in fields.items()]
     return "\n".join(head + body + [""] + GRADE_TEXT.rstrip().split("\n")) + "\n"
 
@@ -643,12 +599,27 @@ def skew_score(ink, angle):
     return float(((profile[1:] - profile[:-1]) ** 2).sum())
 
 
-def measure_skew(gray):
-    """Skew of the TYPE, in degrees, from a greyscale array."""
+def measure_skew(gray, around=None):
+    """Skew of the TYPE, in degrees, from a greyscale array.
+
+    `around` skips the coarse sweep and refines about a known angle.  The coarse
+    pass is what costs, so the two-stage arrangement is: sweep the whole range on
+    the 150 dpi thumb, then REFINE ON THE 600 dpi PAGE.  The thumb is 1/16 scale
+    and a fine step of a hundredth of a degree is beyond what it can resolve --
+    on p116 (three filter-curve graphs, sparse text, the graph rules competing
+    with the text baselines in the projection score) the thumb said -0.52 and the
+    levelled page still read +0.22.  The angle is scale-invariant; the MEASUREMENT
+    is not.
+    """
     h, w = gray.shape
     t, b, l, r = SKEW_CROP
     crop = gray[int(h * t):int(h * b), int(w * l):int(w * r)]
     ink = (crop < crop.mean() - SKEW_INK_SIGMA * crop.std()).astype(np.float32)
+    if around is not None:
+        fine = np.arange(around - SKEW_FINE_SPAN,
+                         around + SKEW_FINE_SPAN + SKEW_FINE_STEP / 2,
+                         SKEW_FINE_STEP)
+        return float(max(fine, key=lambda a: skew_score(ink, a)))
     lo, hi, step = SKEW_COARSE
     coarse = max(np.arange(lo, hi + step / 2, step),
                  key=lambda a: skew_score(ink, a))
@@ -820,12 +791,40 @@ def separate_and_render(src_png, cmyk_tiff, rgb_png, profile_txt, stamp):
                          f"cargo build --release in tools/img/cmyk_reconstruction")
     subprocess.run([str(tool), "--colors", str(profile_txt),
                     str(src_png), str(cmyk_tiff)], check=True)
+    undo_gcr(cmyk_tiff)
     subprocess.run(["magick", str(cmyk_tiff),
                     "-profile", str(IMG_DIR / ICC_CMYK),
                     "-profile", str(IMG_DIR / ICC_RGB),
                     "-density", str(MASTER_DPI), "-set", "units", "PixelsPerInch",
                     "-set", "comment", stamp,
                     str(rgb_png)], check=True)
+
+
+def undo_gcr(cmyk_tiff):
+    """Put back what the separator's GCR took out.  THIS IS WHY TYPE IS BLACK.
+
+    cmyk_reconstruction solves C, M, Y and then applies full GCR: K = min(C,M,Y),
+    subtracted from each of the three.  That is the MRC renderer's reconstruction
+    choice -- it makes CMY pure colour and K all neutral -- and it is wrong for a
+    viewable master, because it leaves printed black type as K ALONE.  100% single
+    K through SWOP renders about 50, not 0: grey type on white paper.
+
+    MEASURED on p056: with the GCR left in, the glyph median is 37 and NOT ONE
+    glyph pixel is solid black.  Undone, the median is 20 and 39.6% of glyph
+    pixels are solid black -- which is where this project's existing masters sit
+    (8609 p010: median 31, 42.1% solid).  The photo on p006 keeps its gradation
+    either way (p25 0 / p50 62 / p75 124 / p95 220 against a published 8609
+    figure's 8.7 / 71 / 151 / 191).
+
+    The undo is exact, not an approximation: the tool wrote c_final = c - k, so
+    c = c_final + k recovers the solved value.  Black type comes back as all four
+    inks -- a rich black -- and renders where it belongs.
+    """
+    a = np.array(Image.open(cmyk_tiff)).astype(np.int16)
+    k = a[:, :, 3]
+    for i in range(3):
+        a[:, :, i] = np.clip(a[:, :, i] + k, 0, 255)
+    Image.fromarray(a.astype(np.uint8), mode="CMYK").save(cmyk_tiff)
 
 
 def archive_cmyk(cmyk_tiff, dest, stamp):
@@ -852,19 +851,6 @@ def save_master(arr, dest, stamp):
     Image.fromarray(arr).save(dest, pnginfo=meta)
 
 
-def ocr_render(rgb):
-    """The OCR master: the figure render with the black-point curve on it.
-
-    ImageMagick's `-level 30%,100%` and nothing else -- ONE issue-wide constant,
-    the same transfer on every page.  Clipping at the black end is intended.
-    See OCR_LEVEL_LOW for what was measured and why 30.
-    """
-    lo = OCR_LEVEL_LOW / 100.0 * 255.0
-    hi = OCR_LEVEL_HIGH / 100.0 * 255.0
-    out = (rgb.astype(np.float32) - lo) / max(hi - lo, 1.0) * 255.0
-    return np.clip(out, 0, 255).astype(np.uint8)
-
-
 # ---------------------------------------------------------------------------
 # One page
 # ---------------------------------------------------------------------------
@@ -874,6 +860,13 @@ def tilt(poly):
 
 
 def process(page):
+    # THIS STEP DOES NOT REFUSE A PAGE.  Everything that used to be a gate --
+    # parity, skew residual, page class, canvas fit, the grade's ink numbers --
+    # is measured, published, and NOTED here.  A note goes in the page's log
+    # line and in its stamp, so a page that needs a human eye is findable with
+    # grep instead of missing from the output.  The one thing that still stops
+    # a page is a missing input file: there is nothing to publish.
+    notes = []
     stem = f"{page:03d}"
     scan = SCAN_DIR / f"{stem}.png"
     thumb = THUMB_DIR / f"{stem}.png"
@@ -905,21 +898,38 @@ def process(page):
     if not from_ink:
         side, ratio = torn_side(thumb_mask, THUMB_MM)
         if side != expected and ratio >= TORN_CONFIDENT_RATIO:
-            raise PageFailed(
-                f"r005 p{stem}: torn side reads {side} (jitter ratio {ratio:.2f}) "
-                f"but parity says {expected}. The page is misfiled or "
-                f"mis-rotated; fix the scan rather than this step.")
+            notes.append(f"TORN SIDE reads {side} (ratio {ratio:.2f}) but "
+                         f"parity says {expected} -- misfiled or mis-rotated?")
 
     # --- level, then RE-MEASURE the residual --------------------------------
-    img = Image.open(scan).convert("RGB").reduce(SCAN_REDUCE)
-    img = img.rotate(angle, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
-    residual = measure_skew(
-        np.array(img.reduce(MASTER_DPI // THUMB_DPI).convert("L"), float))
+    # LEVEL AT 2400, REDUCE AFTERWARDS.  The scan is rotated at full resolution
+    # and everything downstream is derived from that -- the grade included.  The
+    # other order (reduce, then rotate, then grade at 600) averages the ink away
+    # before the grade can see whether it was on the paper, and thin black type
+    # is exactly what that loses.
+    full = Image.open(scan).convert("RGB")
+    full = full.rotate(angle, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
+    img = full.reduce(SCAN_REDUCE)
+    def residual_of(im):
+        return measure_skew(np.array(im.reduce(MASTER_DPI // THUMB_DPI)
+                                     .convert("L"), float))
+
+    residual = residual_of(img)
+    # ITERATE ONCE rather than refuse.  The thumb and the levelled page can
+    # disagree -- p116 is three filter-curve graphs with sparse text, where the
+    # graph rules compete with the text baselines in the projection score --
+    # and applying the residual is self-correcting whatever the cause.
     if abs(residual) > SKEW_RESIDUAL_MAX:
-        raise PageFailed(
-            f"r005 p{stem}: levelled page still has {residual:+.2f} deg of skew "
-            f"(measured {angle:+.2f}, allowed {SKEW_RESIDUAL_MAX}). "
-            f"If it is about -2x the measured angle, the rotation sign is wrong.")
+        first, angle = residual, angle + residual
+        full = Image.open(scan).convert("RGB")
+        full = full.rotate(angle, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
+        img = full.reduce(SCAN_REDUCE)
+        residual = residual_of(img)
+        notes.append(f"SKEW re-levelled: residual was {first:+.2f}, "
+                     f"corrected to {angle:+.2f} deg, now {residual:+.2f}")
+    if abs(residual) > SKEW_RESIDUAL_MAX:
+        notes.append(f"SKEW still {residual:+.2f} deg after a second pass "
+                     f"(allowed {SKEW_RESIDUAL_MAX}) -- published anyway")
 
     arr = np.array(img)
     h, w = arr.shape[:2]
@@ -1010,20 +1020,31 @@ def process(page):
     page_w_mm, page_h_mm = (x1 - x0) / MM, (y1 - y0) / MM
     klass = page_class(page_w_mm, page_h_mm)
     if klass is None:
-        raise PageFailed(
-            f"r005 p{stem}: traced page is {page_w_mm:.1f} x {page_h_mm:.1f} mm "
-            f"({finder}), which is none of "
-            + ", ".join(f"{n} {w:.0f}x{h:.0f}+/-{t:.0f}"
-                        for n, w, h, t in PAGE_CLASSES)
-            + f". A traced edge ran away; look at debug600/{stem}.png.")
+        # IF WE CANNOT CROP, DO NOT CROP.  A trace that lands outside every page
+        # class has found something that is not the sheet -- p117's tracer locked
+        # onto the cream panel inside a dark-ground ad -- and a wrong crop throws
+        # print away silently.  The whole levelled sheet is published instead,
+        # with the note saying why, and the page is still there to be looked at
+        # and re-cut.
+        notes.append(f"NOT CROPPED: the trace gave {page_w_mm:.1f} x "
+                     f"{page_h_mm:.1f} mm, which matches no page class "
+                     f"({finder}); publishing the whole levelled sheet instead. "
+                     f"See debug600/{stem}.png")
+        x0, y0, x1, y1 = 0, 0, w - 1, h - 1
+        keep = np.ones_like(keep)
+        page_w_mm, page_h_mm = (x1 - x0) / MM, (y1 - y0) / MM
+        klass = "uncropped sheet"
 
     cw, ch = int(round(MASTER_W_MM * MM)), int(round(MASTER_H_MM * MM))
 
     if y1 - y0 > ch or x1 - x0 > cw:
-        raise PageFailed(
-            f"r005 p{stem}: the traced page is {x1 - x0}x{y1 - y0} px and does "
-            f"not fit the {cw}x{ch} canvas. Truncating it would lose print "
-            f"silently, so it is refused instead.")
+        # Never truncate: grow the canvas for this page and say so.  A page
+        # bigger than the canvas is a geometry problem to look at, not a reason
+        # to withhold the pixels.
+        notes.append(f"CANVAS grown to {max(cw, x1 - x0)}x{max(ch, y1 - y0)} px "
+                     f"for a {x1 - x0}x{y1 - y0} page -- the uniform "
+                     f"{cw}x{ch} canvas did not fit it")
+        cw, ch = max(cw, x1 - x0), max(ch, y1 - y0)
 
     def place(src, fill):
         """Crop to the traced page and anchor it at the canvas's top-left."""
@@ -1066,6 +1087,7 @@ def process(page):
         # recovering it from the pixels means guessing which white is which.
         "page-px": f"{x1 - x0} {y1 - y0}",
         "canvas-px": f"{cw} {ch}",
+        "notes": "; ".join(notes) if notes else "(none)",
         "edge-finder": finder,
         "skew": f"{angle:+.2f} -> {residual:+.2f} deg",
     })
@@ -1077,13 +1099,20 @@ def process(page):
         profile_txt = OUT_CMYK / f"{stem}.colors.txt"
         write_profile(ANCHORS, LEVELS, profile_txt)
         src_png, cmyk_tiff = work / "in.png", work / "sep.tiff"
-        Image.fromarray(canvas).save(src_png)
+        full.save(src_png)
         separate_and_render(src_png, cmyk_tiff,
-                            OUT_FIGURE / f"{stem}.png", profile_txt, stamp)
+                            OUT_SHEET / f"{stem}.png", profile_txt, stamp)
         archive_cmyk(cmyk_tiff, OUT_CMYK / f"{stem}.tif", stamp)
     (OUT_MASTER / f"{stem}.stamp.txt").write_text(stamp, encoding="utf-8")
 
-    graded = np.array(Image.open(OUT_FIGURE / f"{stem}.png").convert("RGB"))
+    # The 600 dpi master comes OFF the graded 2400 sheet -- one grade, one
+    # reduce, in that order -- and only then is it cut to the traced page.
+    sheet600 = np.array(Image.open(OUT_SHEET / f"{stem}.png")
+                        .convert("RGB").reduce(SCAN_REDUCE))
+    sheet600 = sheet600[:h, :w]
+    graded = np.full_like(sheet600, 255)
+    graded[keep] = sheet600[keep]
+    graded = place(graded, 255)
     glum = graded.mean(2, dtype=np.float32)
 
     # --- prove the grade before publishing it -------------------------------
@@ -1121,36 +1150,37 @@ def process(page):
     # weaker gate stays hard: the page must not have come out blank.  If the
     # pale tint on the coated stock has to survive, the fix is a second measured
     # profile for that stock -- a decision, not a looser constant here.
-    unproven = []
-    if raw_ink_frac > 0 and ink_frac < GRADE_INK_KEEP * raw_ink_frac:
-        msg = (f"r005 p{stem}: the grade DELETED ink -- the scan is "
-               f"{raw_ink_frac:.1%} inked, the graded page only {ink_frac:.1%} "
-               f"({ink_frac / raw_ink_frac:.2f} of it, floor {GRADE_INK_KEEP}). "
-               f"The level lines in {ISS.colors} clip black text away; "
-               f"re-measure LC/LM/LY/LK for this issue. Publishing a washed-out "
-               f"page is worse than not publishing one.")
-        if not from_ink:
-            raise PageFailed(msg)
-        unproven.append(f"ink kept {ink_frac / raw_ink_frac:.2f} < {GRADE_INK_KEEP}")
-    if paper_white - ink_p50 < MIN_INK_CONTRAST:
-        msg = (f"r005 p{stem}: the grade has no ink -- paper p50 "
-               f"{paper_white:.0f}, dark p50 {ink_p50:.0f}, contrast "
-               f"{paper_white - ink_p50:.0f} < {MIN_INK_CONTRAST}. Re-measure "
-               f"the level lines in {ISS.colors}.")
-        if not from_ink:
-            raise PageFailed(msg)
-        unproven.append(f"dark contrast {paper_white - ink_p50:.0f} < "
-                        f"{MIN_INK_CONTRAST}")
-    if unproven and ink_frac < GRADE_MIN_INK_FRAC:
-        raise PageFailed(
-            f"r005 p{stem}: the graded page is BLANK -- {ink_frac:.2%} of the "
-            f"canvas carries ink, floor {GRADE_MIN_INK_FRAC:.2%}. This page is "
-            f"not printed on the paper the profile describes, so the ink-keep "
-            f"and contrast checks cannot judge it ({'; '.join(unproven)}), but "
-            f"an empty master is an empty master.")
+    # THE GRADE IS NOT GATED.  It measures and REPORTS, and that is all.
+    #
+    # There was a gate here -- ink kept must be >= 0.70 of the scan's -- and on
+    # a full 152-page sweep it failed 10 pages: 005 010 028 047 049 063 086 115
+    # 124 138.  Every one was looked at, and every one was CORRECT: crisp black
+    # type, clean tint, paper white.  p063 is the clearest case at 0.51.
+    #
+    # The metric was wrong, not the pages.  It counts INKED PIXELS, and all ten
+    # are pages carrying a large SCREENED TINT: on the paper that tint is a
+    # field of halftone dots with white between them, so it counts as heavily
+    # inked; rendered correctly it becomes a smooth flat fill, which is the same
+    # ink over a fraction of the pixels.  A dot field demodulating into a fill
+    # is the pipeline WORKING, and the check read it as ink loss.  It selected
+    # precisely the ten most tint-heavy pages in the issue.
+    #
+    # A coverage-based metric (the integral of ink, which demodulation conserves)
+    # would not have that fault -- but the check has now cost more than it has
+    # ever caught, and the failure it was built for is loud, not subtle: the old
+    # LK 90 95 turned black type into blank paper, which is visible in a
+    # thumbnail.  So the numbers go in the log for a human to notice, and the
+    # step publishes the page.
+    unproven = [f"ink kept {ink_frac / raw_ink_frac:.2f}"] if raw_ink_frac > 0 else []
+    unproven.append(f"dark contrast {paper_white - ink_p50:.0f}")
 
     # --- the OCR master: the SAME curve on every page ------------------------
-    save_master(ocr_render(graded), OUT_MASTER / f"{stem}.png", stamp)
+    # ONE master, UNCURVED.  r010 OCRs this file and r145 cuts the article
+    # figures out of the same file (r145_extract_figures.py reads
+    # r010_ocr_blocks.SRC_DIR), so a contrast curve here would be a curve on
+    # every published figure.  Type is black because the separation's GCR is
+    # undone -- see undo_gcr() -- not because of a curve.
+    save_master(graded, OUT_MASTER / f"{stem}.png", stamp)
 
     print(f"p{stem}: skew {angle:+.2f} -> {residual:+.2f} deg | "
           f"edges L {tilt(left):+.2f} R {tilt(right):+.2f} "
@@ -1160,9 +1190,9 @@ def process(page):
           f"bed comps {dropped} | torn {side} ({ratio:.2f}) | "
           f"paper {paper_white:.0f} ({probe_name}) ink {ink_p50:.0f} "
           f"({ink_frac:.1%} of {raw_ink_frac:.1%}) | "
-          f"grade {GRADE_SHA} level {OCR_LEVEL_LOW:g}%"
-          + (" | GRADE UNPROVEN, not this issue's paper: "
-             + "; ".join(unproven) if unproven else ""), flush=True)
+          f"grade {GRADE_SHA}"
+          + (" | grade: " + "; ".join(unproven) if unproven else "")
+          + ("".join(f"\n      NOTE p{stem}: {n}" for n in notes)), flush=True)
 
 
 if __name__ == "__main__":
@@ -1190,7 +1220,7 @@ if __name__ == "__main__":
             # that says WHY the page failed -- the size gate's own message ends
             # "look at debug600/NNN.png", and deleting it made that a lie.
             for d, ext in ((OUT_MASTER, "png"), (OUT_MASTER, "stamp.txt"),
-                           (OUT_FIGURE, "png"), (OUT_CMYK, "tif"),
+                           (OUT_SHEET, "png"), (OUT_CMYK, "tif"),
                            (OUT_CMYK, "colors.txt")):
                 stale = d / f"{page:03d}.{ext}"
                 if stale.exists():

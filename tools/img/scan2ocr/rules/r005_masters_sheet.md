@@ -89,8 +89,8 @@ directory mixing two runs is not something any downstream check can see.
 <tmp>/masters600/NNN.png         the OCR master — r010 reads this   (the contract)
 <tmp>/masters600/NNN.stamp.txt   which profile and which curve made that master
 <tmp>/figures600/NNN.png         the figure master — r145 reads this
-<tmp>/cmyk600/NNN.tif            the CMYK archival form, deflate-compressed
-<tmp>/cmyk600/NNN.colors.txt     the profile the separator was actually run with
+<tmp>/cmyk2400/NNN.tif            the CMYK archival form, deflate-compressed
+<tmp>/cmyk2400/NNN.colors.txt     the profile the separator was actually run with
 <tmp>/debug600/NNN.png           the overlay: the four traced lines, in green
 ```
 
@@ -140,7 +140,7 @@ scan_dir/NNN.png
   -> two renders off that ONE separation: masters600 carries the black-point
      curve, figures600 does not
   -> masters600/NNN.png + NNN.stamp.txt, figures600/NNN.png,
-     cmyk600/NNN.tif + NNN.colors.txt, debug600/NNN.png
+     cmyk2400/NNN.tif + NNN.colors.txt, debug600/NNN.png
 ```
 
 ### Why the edges are TRACED and not cropped to
@@ -420,8 +420,8 @@ those — plus what was decided about the page's geometry:
 | `masters600/NNN.png` | a PNG `tEXt` chunk keyed `r005` |
 | `masters600/NNN.stamp.txt` | the same text, readable without opening a 110 megapixel PNG |
 | `figures600/NNN.png` | PNG `Comment` |
-| `cmyk600/NNN.tif` | TIFF `ImageDescription` |
-| `cmyk600/NNN.colors.txt` | the profile file the separator was **actually run with**, kept rather than deleted with the scratch directory |
+| `cmyk2400/NNN.tif` | TIFF `ImageDescription` |
+| `cmyk2400/NNN.colors.txt` | the profile file the separator was **actually run with**, kept rather than deleted with the scratch directory |
 | the run's log | the whole block once at the top, and `grade <sha> level 30%` on every page line |
 
 Three copies because each survives a different accident: the chunk survives the

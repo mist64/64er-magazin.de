@@ -139,8 +139,16 @@ def _call_cli(instructions, payload, image_path, cwd):
     if image_path:
         prompt += f"\n\nRead the image at {image_path} with the Read tool first."
     prompt += "\n\n" + payload
+    # The CLI only reads inside its working directory, and this project's
+    # scans and OCR working files live outside the repo (the issue descriptor
+    # points at /Users/mist/DNB/<ISSUE>/tmp).  Without this the classify pass
+    # fails on every page with "outside working dir, permission not granted"
+    # and falls back to judging the digest with no picture at all.
+    argv = [CLAUDE, "-p", prompt, "--output-format", "text"]
+    if image_path:
+        argv[1:1] = ["--add-dir", str(os.path.dirname(os.path.abspath(image_path)))]
     for attempt in range(RETRIES):
-        r = subprocess.run([CLAUDE, "-p", prompt, "--output-format", "text"],
+        r = subprocess.run(argv,
                            capture_output=True, text=True,
                            timeout=CLAUDE_TIMEOUT, cwd=cwd)
         out = r.stdout.strip()
