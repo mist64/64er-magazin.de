@@ -484,9 +484,20 @@ grep -hoE '[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+' "$dir"/*.html | sort -u | hea
 grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' "$dir"/*.html | sort -u | head
 # legitimate CamelCase only.
 
-# 3. spot a known fix landed
-grep -h "Übertragungsgeschwindigkeiten von" "$dir"/*.html >/dev/null && \
-  echo "  Übertragungsgeschwindigkeit … fix landed ✓"
+# 3. spot a known fix landed.
+#
+# PICK THE CANARY FROM THE ISSUE YOU ARE RUNNING ON.  The string below was
+# 8608's, and on any other issue this check fails by construction: SH8601
+# contains it zero times, so the whole verification block exited 1 on a run
+# where nothing was wrong.  A canary is only evidence if it is a repair YOU
+# made on THIS issue -- take one from your own worklist, quote its corrected
+# form here, and say which page it is on so the next reader can check it.
+#
+#   8608 used: "Übertragungsgeschwindigkeiten von"
+#   SH8601 used: "Fehlerbehandlung ohne Programmabbruch"   (p101 banner,
+#                which OCR gave as "fehlerbehandlung c Programmabbhru ohne")
+CANARY="<the corrected string, from this issue>"
+grep -h "$CANARY" "$dir"/*.html >/dev/null && echo "  canary fix landed ✓"
 ```
 
 ## Notes / lessons
