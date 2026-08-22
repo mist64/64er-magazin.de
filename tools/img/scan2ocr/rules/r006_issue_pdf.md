@@ -122,12 +122,19 @@ guetzli, quality binary-searched to land under 100 MB.
    at a QUARTER the resolution — which buys nine quality steps on the other
    104 pages, q95 against q86. Do not "fix" this by switching to the plain
    build; a plain PDF/A build exists and is the worse artefact.
-4. **THE DELIVERED PDF IS EXACT A4 — 210 x 297 mm, every page.**
+4. **THE DELIVERED PDF IS EXACT A4 — 210 x 297 mm, every page OF THE ISSUE.**
+
+   **A bound-in insert that is physically smaller keeps its own size**, as an
+   image and as a PDF page. SH8601's Zahlkarte (149-152) measures ~144 x 205
+   mm: padding it onto A4 would fabricate 53% of the page and tell the reader
+   the card is A4-sized, which it is not. The issue's own leaves are A4; an
+   insert is what it is, and its measured size is recorded in the stamp.
 
    ```
    600 dpi   4961 x 7016 px
    150 dpi   1240 x 1754 px      <- the size every issue's title.png already is
    ```
+
 
    That is the archive's geometry and it does not vary by issue or by sheet.
    Step 005 measures what each sheet physically is — this issue's interior

@@ -118,6 +118,14 @@ Image.MAX_IMAGE_PIXELS = None
 
 DPI = 600
 A4_W = int(round(210.0 / 25.4 * DPI))          # 4961
+# A column with less ink than this is blank paper -- used to decide which side
+# of an oversize sheet carries the fold flap, and whether an insert is smaller
+# than the issue's leaf on its own merits rather than by assumption.
+BLANK_COL_INK = 0.002
+# An insert this much smaller than A4 in BOTH axes is delivered AT ITS OWN
+# SIZE, not padded: SH8601's Zahlkarte is 144 x 205 mm, and an A4 page would
+# be 53% fabricated and would tell the reader the card is A4.
+INSERT_MARGIN_PX = int(round(5.0 / 25.4 * DPI))
 A4_H = int(round(297.0 / 25.4 * DPI))          # 7016
 
 # --- the template ----------------------------------------------------------
@@ -502,11 +510,30 @@ def place(rec, off, entry):
         bx0, by0, bx1, by1 = rec["sheet_box"]
         bw, bh = bx1 - bx0, by1 - by0
         if bw > A4_W:
-            # Wider than A4: the surplus is the cover leaf's fold flap, which
-            # is on the BINDING side -- a verso is bound on the right, a recto
-            # on the left.  Trim it there and keep the outer trim flush;
-            # centring would take half the flap off the printed outer edge.
-            x0 = bx0 if page % 2 else bx1 - A4_W
+            # Wider than A4: the surplus is the cover leaf's fold flap.  TRIM
+            # THE BLANK SIDE, MEASURED -- do not infer it from parity.  On
+            # SH8601 p002 the parity rule right-aligned the window, clipping
+            # printed content off the LEFT while keeping the flap's white on
+            # the right: the flap is on the right on that verso, the opposite
+            # of what the binding side predicts.  The ink profile says which
+            # side is blank and cannot be wrong about it.
+            g = np.asarray(Image.open(MASTERS / f"{page:03d}.png").convert("L"))
+            box = g[max(by0, 0):by1, max(bx0, 0):bx1]
+            col = (box < 235).mean(0)
+            surplus = bw - A4_W
+            blank_l = int(np.argmax(col > BLANK_COL_INK))
+            blank_r = int(np.argmax(col[::-1] > BLANK_COL_INK))
+            x0 = bx0 + surplus if blank_l >= blank_r else bx0
+        elif (A4_W - bw > INSERT_MARGIN_PX) and (A4_H - bh > INSERT_MARGIN_PX):
+            # AN INSERT KEEPS ITS OWN SIZE.  SH8601's Zahlkarte measures
+            # 144 x 205 mm; an A4 page would be 53% fabricated and would tell
+            # the reader the card is A4-sized.  A4 is the geometry of the
+            # ISSUE'S LEAVES, not of everything bound between them.
+            a = alpha_at(entry, bx0, by0)
+            return {"x0": int(bx0), "y0": int(by0), "w": int(bw), "h": int(bh),
+                    "src": SRC_TRACED, "anchor": None, "score": rec["score"],
+                    "side": rec["side"], "insert": True,
+                    "alpha_pct": round(100.0 * a / CELLS, 4)}
         else:
             x0 = bx0 - (A4_W - bw) // 2
         y0 = by0 - (A4_H - bh) // 2
@@ -550,22 +577,23 @@ def cut(page, win, rec, out_dir=None):
     src = np.asarray(Image.open(MASTERS / f"{page:03d}.png").convert("RGB"))
     H, W = src.shape[:2]
     bx0, by0 = rec["sheet_box"][0], rec["sheet_box"][1]
-    out = np.full((A4_H, A4_W, 3), 255, np.uint8)
+    ow, oh = win.get("w", A4_W), win.get("h", A4_H)
+    out = np.full((oh, ow, 3), 255, np.uint8)
     x0, y0 = win["x0"] - bx0, win["y0"] - by0          # sheet frame -> master
     sx0, sy0 = max(x0, 0), max(y0, 0)
-    sx1, sy1 = min(x0 + A4_W, W), min(y0 + A4_H, H)
-    off = A4_W * A4_H
+    sx1, sy1 = min(x0 + ow, W), min(y0 + oh, H)
+    off = ow * oh
     if sx1 > sx0 and sy1 > sy0:
         out[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = src[sy0:sy1, sx0:sx1]
-        off = A4_W * A4_H - (sx1 - sx0) * (sy1 - sy0)
+        off = ow * oh - (sx1 - sx0) * (sy1 - sy0)
     # What is FABRICATED: the part of the window that is not inside step 005's
     # traced page.  Not "how white is it" -- most of a text page is white paper
     # and that number says nothing.  Measured against the traced page's BOX, so
     # it is a lower bound: the wedges between the box and the fitted edge lines
     # are fabricated too, and `alpha` above is the measure that includes them.
     bw, bh = rec["sheet_box"][2] - bx0, rec["sheet_box"][3] - by0
-    ix = max(0, min(x0 + A4_W, bw) - max(x0, 0))
-    iy = max(0, min(y0 + A4_H, bh) - max(y0, 0))
+    ix = max(0, min(x0 + ow, bw) - max(x0, 0))
+    iy = max(0, min(y0 + oh, bh) - max(y0, 0))
     fab = 1.0 - (ix * iy) / float(A4_W * A4_H)
     meta = PngImagePlugin.PngInfo()
     stamp = (f"r005b a4_window  page {page:03d} of {ISSUE}\n"

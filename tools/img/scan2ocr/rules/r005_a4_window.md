@@ -89,6 +89,12 @@ glue-bound issue has no spine, so for `binding: sheet` the order is:
    bound-in card such as SH8601's Zahlkarte, which are not body pages and have
    no wordmark to register to.
 
+**And an insert smaller than the issue's leaf keeps its measured size** rather
+than being centred on an A4 window: SH8601's Zahlkarte is ~144 x 205 mm, and
+padding it to A4 would fabricate 53% of the page. A4 is the geometry of the
+ISSUE's leaves. The cover leaf is the opposite case and is trimmed, not
+padded — its 223 mm width is a fold flap, not a larger page.
+
 Record per page which of the three was used, beside the grade stamp, so a page
 whose type sits differently from its neighbours can be explained rather than
 re-derived.
