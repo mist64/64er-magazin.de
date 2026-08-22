@@ -21,6 +21,40 @@
 
         <figure>
             <img src="6-0.png" alt="Farbfoto der ausgebauten Platine des C 128 mit Bauteilen und Anschlüssen; 32 rot umkreiste Ziffern markieren einzelne Bereiche">
+            <ol>
+                <li>User-Port</li>
+                <li>Der RGB-Ausgang ist anschlußkompatibel zu IBM-Farb- und Schwarzweiß-Monitoren. Die 80-Zeichendarstellung geht nur über diesen Ausgang.</li>
+                <li>HF-Modulator. Hier wird ein Hochfrequenz-Bildsignal erzeugt, das ein normaler Fernseher »versteht«.</li>
+                <li>Der Video-Audio-Port entspricht dem des C 64. Er dient zur 40-Zeichen- und Grafikdarstellung.</li>
+                <li>Der serielle Port des C 128 entspricht dem des C 64. Im C 128-Modus arbeitet er aber etwa 8mal schneller.</li>
+                <li>Kassetten-Port.</li>
+                <li>Expansion-Port für den C 64- und C 128-Modus.</li>
+                <li>Netzteilanschluß.</li>
+                <li>Ein-/Ausschalter.</li>
+                <li>Reset-Taster.</li>
+                <li>CIA 2. I/O-Baustein für den User-Port und den seriellen Bus.</li>
+                <li>32 KByte ROM. Frei für eigene ROMs.</li>
+                <li>16 KByte ROM. C 128, Betriebssystem (Kernel) und 40/80-Zeicheneditor.</li>
+                <li>RGB-Teil. Links der 80-Zeichen-Videocontroller 8563 (RGB). Rechts unten, das 16-KByte/8-Bit-Video-RAM für den 8563.</li>
+                <li>Composite-Video-Teil. Rechts der VIC 8564, der dem VIC aus dem C 64 beinahe identisch ist. Er enthält einen eigenen Grafikprozessor.</li>
+                <li>Der inzwischen schon altbekannte SID, der 6581 aus dem C 64.</li>
+                <li>Die MMU bestimmt aus welchem Speicherteil der nächste Zugriff stattfinden soll.</li>
+                <li>Entprell-Kondensatoren für Control-Ports.</li>
+                <li>Control-Port 2.</li>
+                <li>Control-Port 1.</li>
+                <li>Betriebssystem- und Basic-ROM für den C 64-Modus. 16 KByte ROM.</li>
+                <li>16 KByte ROM. C 128, Basic Teil 2.</li>
+                <li>16 KByte ROM. C 128, Basic Teil 1.</li>
+                <li>Unter dieser »abenteuerlichen« Konstruktion befindet sich der deutsche und der ASCII-Zeichensatz.</li>
+                <li>Die PLA, ein 8721. Die PLA ist ein Gatterbaustein mit programmierbaren Logikfunktionen. Sie bestimmt, neben der MMU, welche ROMs aktiviert werden.</li>
+                <li>Der 8502-Prozessor.</li>
+                <li>Die Z80B-CPU.</li>
+                <li>CIA 1. Hier werden die gedrückten Tasten festgestellt und die Control-Ports abgefragt.</li>
+                <li>Entprell-Kondensatoren der Tastatur.</li>
+                <li>128 KByte RAM. 16 8-KByte/8-Bit-RAMs.</li>
+                <li>2-KByte/8-Bit-CMOS-RAM. Der Farbspeicher für den VIC 8564.</li>
+                <li>Tastatur-Steckerliste.</li>
+            </ol>
             <figcaption>Bild 1. Die Platine des C 128. Unsere Wanderung beginnt rechts oben beim Anschluß des Netzteils.</figcaption>
         </figure>
 
@@ -36,6 +70,50 @@
 
         <figure>
             <img src="6-2.png" alt="Strichzeichnung einer neunpoligen D-Sub-Buchse, Pins von 1 bis 9 durchnumeriert">
+            <table>
+                <tr>
+                    <th>Pin</th>
+                    <th>Signal</th>
+                    <th>Bemerkung</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>JOYA0</td>
+                    <td rowspan="9">MAX. 100mA</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>JOYA1</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>JOYA2</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>JOYA3</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>POT AY</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>BUTTON A/LP</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>+5V</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>GND</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>POT AX</td>
+                </tr>
+            </table>
             <figcaption>Bild 2. Die Anschlußbelegung der Control-Ports</figcaption>
         </figure>
 
@@ -52,6 +130,138 @@
         </figure>
 
         <p>Wenden wir unsere Aufmerksamkeit aber einmal nach links. Dort sehen wir in ihrem relativ großen Gehäuse einen sehr wichtigen Baustein des C128, die »Memory-Management-Unit« oder kurz MMU (Tabelle 1). Memory-Management-Unit bedeutet Speicherverwaltungs-Einheit, woraus auch schon die Funktion dieses eigens für den C128 entwickelten Chips hervorgeht. Der C128 verfügt über 128KByte RAM. Sie werden sich sicherlich gefragt haben, wie der 8502 und der Z80 (Tabelle 2) überhaupt auf einen solch großen Speicherraum zugreifen können. Beide sind ja bekanntlich wegen ihrer 16 Adreßleitungen nur zur Adressierung von 216 = 65536 Byte fähig. Commodores Entwickler haben deshalb zu einem Trick gegriffen, um 128 KByte RAM adltessieren zu können, ohne einen leistungsfähigeren Prozessor einzusetzen. Die Lösung heißt »Bank-Switching«. Der Speicher von 128 KByte wird in zwei Speicher-Bänke von je 64 KByte unterteilt. Der Prozessor greiftdann wechselweise auf die eine oder andere Speicherbank zu. Hier ist auch die Hauptaufgabe der MMU zu finden. Sie sorgt dafür, daß der Prozessor stets die richtige Speicherbank vorfindet.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="2">Mode Configuration Register</th>
+                </tr>
+                <tr>
+                    <th>Bits</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Stellung des 40/80-Zeichen-Schalters<br>0 = Schalter geschlossen<br>1 = Schalter offen</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Betriebsart<br>0 = C128<br>1 = C64</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Bidirektionaler Port<br>Eingang : /EXROM<br>Ausgang : Farb-RAM-Bank während VIC aktiv</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Bidirektionaler Port<br>Eingang : /GAME<br>Ausgang : Farb-RAM-Bank während CPU aktiv</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>FSDIR (Fast ser. disk) Kontrollbit<br>Eingang : Fast serial disk enable<br>Ausgang : für FSD-Hardware</td>
+                </tr>
+                <tr>
+                    <td>2,1</td>
+                    <td>Nicht benutzt</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>CPU-Einstellung<br>0 = Z80<br>1 = 8502</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Page Pointer, höherwertiges Byte</th>
+                </tr>
+                <tr>
+                    <th>Bits</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>7,6,5,4</td>
+                    <td>ohne Bedeutung</td>
+                </tr>
+                <tr>
+                    <td>3,2,1,0</td>
+                    <td>gewählte Bank (auch ROM möglich !)</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Page Pointer, niederwertiges Byte</th>
+                </tr>
+                <tr>
+                    <th>Bits</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>7 bis 0</td>
+                    <td>Speicherseite innerhalb der 64K-Bank</td>
+                </tr>
+                <tr>
+                    <th colspan="2">System Version Register</th>
+                </tr>
+                <tr>
+                    <th>Bits</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>7,6,5,4</td>
+                    <td>verfügbare 64K-Bänke</td>
+                </tr>
+                <tr>
+                    <td>3,2,1,0</td>
+                    <td>Versionsnummer der MMU</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Configuration Register</th>
+                </tr>
+                <tr>
+                    <th>Bits</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>7,6</td>
+                    <td>RAM-Bank-Auswahl<br>00 = Bank 0<br>01 = Bank 1<br>10 = Bank 2<br>11 = Bank 3</td>
+                </tr>
+                <tr>
+                    <td>5,4</td>
+                    <td>Speicherbereich $C000-$FFF<br>00 = SYSTEM ROM (KERNAL, Char. ROM - I/O)<br>01 = INTERNAL FUNCTION ROM (hi)<br>10 = EXTERNAL FUNCTION ROM (hi)<br>11 = RAM</td>
+                </tr>
+                <tr>
+                    <td>3,2</td>
+                    <td>Speicherbereich $8000-$BFFF<br>00 = BASIC ROM (hi)<br>01 = INTERNAL FUNCTION ROM (lo)<br>10 = EXTERNAL FUNCTION ROM (lo)<br>11 = RAM</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Speicherbereich $4000-$7FFF<br>0 = BASIC ROM (lo)<br>1 = RAM</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Speicherbereich $D000-$DFFF<br>0 = I/O<br>1 = RAM/ROM (abhängig von Bits 4 und 5)</td>
+                </tr>
+                <tr>
+                    <th colspan="2">RAM Configuration Register</th>
+                </tr>
+                <tr>
+                    <th>Bits</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>7,6</td>
+                    <td>RAM-Bank des VIC (Bit 7 für Erweiterung)<br>x0 = RAM-Bank 0<br>x1 = RAM-Bank 1</td>
+                </tr>
+                <tr>
+                    <td>5,4</td>
+                    <td>Nicht benutzt (für Erweiterung auf 1 MByte)</td>
+                </tr>
+                <tr>
+                    <td>3,2</td>
+                    <td>Lage der gemeinsamen Speicherbereiche<br>00 = keine gemeinsamen Speicherbereiche<br>01 = Speicheranfang<br>10 = Speicherende<br>11 = Speicheranfang und -Ende</td>
+                </tr>
+                <tr>
+                    <td>1,0</td>
+                    <td>Größe des/der gemeinsamen Speicherbereiche<br>00 = 1 KByte<br>01 = 4 KByte<br>10 = 8 KByte<br>11 = 16 KByte</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die Register der MMU</figcaption>
+        </figure>
 
         <figure>
             <img src="6-t2.png" alt="Übersicht der Z-80-Register: Primärregister A/F, B/C, D/E, H/L, die Sekundärregister sowie I, R, IX, IY, SP und PC mit ihren Bezeichnungen">
@@ -77,7 +287,7 @@
 
         <p>Die nächsten beiden Bits, 4 und 5, haben die gleiche Funktion wie Bit 2 und 3, nur bestimmen sie den Speicheraufbau im Bereich von $C000 bis $FFFF. Zu bemerken ist, daß der Speicherbereich von $D000 bis $DFFF ein »ROM-Loch« darstellt. Man kann die Bits 4 und 5 setzen wie man will, der Computer entscheidet, ob V/O-Bereich oder das Zeichensatz-ROM in diesem Bereich eingeblendet wird. Es ist also bei einem Steckmodul zu berücksichtigen, daß der Bereich von $D000 bis $DFFF tabu ist. Es können bis zu 32 KByte ROM eingeblendet werden, doppeltso viel wie beim C64. Bit 6 und 7 schließlich selektieren die RAM-Bank. Für die 128 KByte-Version des C 128 ist nur Bit 6 wichtig. Ist es »0«, so ist Bank 0 ausgewählt, ist es »l«, Bank 1.</p>
 
-        <p>Welche CPU und welche Betriebsart (C64, C128 oder CP/M) eingeschaltet ist, kann mit dem »Mode Configuration Register« eingestellt werden (Tabelle ]). Mitden »Page-Pointer-Registern« wurde im C128 ein Verlagern von Zero-Page und Stack (normalerweise von $0000 bis $O0OFF beziehungsweise $0100 bis $0IFF) in beliebige andere Speicherseiten ermöglicht. Dadurch wächst der Speicherbereich mit der schnellen Zero-Page-Adressierung und auch der Datenbereich des Stacks beträchtlich an. Eine Neubesetzung der Page-Pointer muß immer zuerst am höherwertigen Byte erfolgen. Zu guter Letzt sei noch das Version Register beschrieben, das einzige Register, aus dem für die Betriebssoftware die Größe des verfügbaren Speichers ersichtlich ist. Außerdem ist hier auch noch die Versionsnummer der MMU untergebracht. Wie aus dieser Beschreibung hervorgeht, ist die MMU also keinesfalls ein toter Baustein.</p>
+        <p>Welche CPU und welche Betriebsart (C64, C128 oder CP/M) eingeschaltet ist, kann mit dem »Mode Configuration Register« eingestellt werden (Tabelle 1). Mitden »Page-Pointer-Registern« wurde im C128 ein Verlagern von Zero-Page und Stack (normalerweise von $0000 bis $O0OFF beziehungsweise $0100 bis $0IFF) in beliebige andere Speicherseiten ermöglicht. Dadurch wächst der Speicherbereich mit der schnellen Zero-Page-Adressierung und auch der Datenbereich des Stacks beträchtlich an. Eine Neubesetzung der Page-Pointer muß immer zuerst am höherwertigen Byte erfolgen. Zu guter Letzt sei noch das Version Register beschrieben, das einzige Register, aus dem für die Betriebssoftware die Größe des verfügbaren Speichers ersichtlich ist. Außerdem ist hier auch noch die Versionsnummer der MMU untergebracht. Wie aus dieser Beschreibung hervorgeht, ist die MMU also keinesfalls ein toter Baustein.</p>
 
         <p>Unser Rundgang nähert sich jetzt immer mehr dem unteren Platinenrand. Dabei sehen wir rechts die Anschlußleiste für die Tastatur. Links davon haben wir einen weiteren wichtigen Baustein, den Complex Interface Adapter CIA 6526, von dessen Sorte übrigens zwei im C 128eingebautsind. Die ClA istein Input/Output-Baustein. Der Prozessor kann über Bausteine mit seiner übrigen Umwelt in Verbindung treten. Die CIA besitzt zwei, voneinander unabhängige, bitweise auf Ein- oder Ausgang programmierbare Ports, die jeweils 8 Bit »breit« sind. Außerdem sind in einer CIA noch zwei 16-Bit-Timer integriert. Ein serielles Schieberegister fehlt ebensowenig wie eine 24-Stunden-Echtzeituhr.</p>
 
@@ -108,6 +318,48 @@
 
         <figure>
             <img src="6-7.png" alt="Strichzeichnung einer neunpoligen D-Sub-Buchse mit den Pins 1 bis 9">
+            <table>
+                <tr>
+                    <th>Pin</th>
+                    <th>Signal</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Masse</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Masse</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Rot</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Grün</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Blau</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Intensität</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Monochrom-Signal</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Horizontale Synchronisation</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>Vertikale Synchronisation</td>
+                </tr>
+            </table>
             <figcaption>Bild 7. Die Belegung der RGB-Buchse</figcaption>
         </figure>
 
@@ -118,12 +370,559 @@
 
         <figure>
             <img src="6-9.png" alt="Strichzeichnung einer runden achtpoligen DIN-Buchse mit den Kontakten 1 bis 8">
+            <table>
+                <tr>
+                    <th>Pin</th>
+                    <th>Signal</th>
+                    <th>Pin</th>
+                    <th>Signal</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>LUMINANCE</td>
+                    <td>6</td>
+                    <td>CROMINANZ</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>GND</td>
+                    <td>7</td>
+                    <td>O. BELEGUNG</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>AUDIO OUT</td>
+                    <td>8</td>
+                    <td>O. BELEGUNG</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>VIDEO OUT</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>AUDIO IN</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
             <figcaption>Bild 9. Die Belegung der Video/Audio-Buchse</figcaption>
         </figure>
 
         <p>Der zweite und gewichtigere Grund für die Verwendung des VDC 8563 ist der, daß der VIC 8564 bei einer Taktfrequenz von über 1 MHz »nicht mehr mitkommt«. Das würde für den Rennwagen bedeuten, nun gänzlich ohne Antrieb dazustehen. Manche werden sich sicherlich fragen, wozu denn eigentlich der VIC dannnoch daist. Die Antwort fälltnichtschwer: Ohne den VIC wäre der C 128 nicht mehr voll kompatibel zum C64. Daß der VIC bei höheren Taktfrequenzen nicht mehr mitkommt liegt daran, daß er die Taktlücken des Prozessors ausnutzt, um seine Bildwiederholinformation aus dem Speicher zu holen. Mit steigender Frequenz werden diese Taktlücken natürlich kürzer, und damit zu kurz für den VIC. Der VDC besitzt aber ein eigenes, 16 KByte großes RAM und ist damitnichtmehr aufdie Taktlücken des Prozessors angewiesen. In diesem Speicherbereich sind für den 8563 alle Daten gespeichert. Dieses RAM ist jedoch nicht im Speicherbelegungsplan des C 128 zu finden, sondern direkt an den VDC angeschlossen. Ansprechbar ist dieses RAM indirekt über zwei Register des VDC.</p>
 
         <p>Der VDC 8568 besitzt 37 Steuerregister (Tabelle 2), deren Beschreibung den Rahmen dieses Artikels sprengen würde. Interessant ist jedoch, daß die Register des VDC nicht einfach direkt anzusprechen sind wie beispielsweise bei der CIA oder dem VIC. Es reicht also nicht, einfach die Basisadresse (beim VDC $D600) und die Registernummer zu addieren. Die Adressierung der Register erfolgt relativ. Man schreibt in die Adresse $D600 die Nummer des angesprochenen Registers und erhält im Gegenzug vom VDC in Adresse $D601 den Inhalt des angesprochenen Recgisters. Soll der Inhalt eines Registers geändert werden, schreibt man in Adresse $D601 den betreffenden Wert ein, nachdem das Register mit $D600 spezifiziert wurde. Will man zum Beispiel eine Adresse des VDC-eigenen RAMs ändern, verfährt man folgendermaBen:</p>
+
+        <!-- The print numbers TWO different tables "Tabelle 2": the Z-80 register set
+             on p11 and the VDC 8563 registers here on p13. That is the magazine's own
+             error, verified on both 600 dpi masters; do not "fix" it. -->
+        <figure>
+            <table>
+                <tr>
+                    <th>REG #</th>
+                    <th colspan="9"></th>
+                </tr>
+                <tr>
+                    <th>0</th>
+                    <td>HT7</td>
+                    <td>HT6</td>
+                    <td>HT5</td>
+                    <td>HT4</td>
+                    <td>HT3</td>
+                    <td>HT2</td>
+                    <td>HT1</td>
+                    <td>HT0</td>
+                    <td>Horizontal Total</td>
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <td>HD7</td>
+                    <td>HD6</td>
+                    <td>HD5</td>
+                    <td>HD4</td>
+                    <td>HD3</td>
+                    <td>HD2</td>
+                    <td>HD1</td>
+                    <td>HD0</td>
+                    <td>Horizontal Displayed</td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td>HP7</td>
+                    <td>HP6</td>
+                    <td>HP5</td>
+                    <td>HP4</td>
+                    <td>HP3</td>
+                    <td>HP2</td>
+                    <td>HP1</td>
+                    <td>HP0</td>
+                    <td>Horizontal Sync Position</td>
+                </tr>
+                <tr>
+                    <th>3</th>
+                    <td>VW3</td>
+                    <td>VW2</td>
+                    <td>VW1</td>
+                    <td>VW0</td>
+                    <td>HW3</td>
+                    <td>HW2</td>
+                    <td>HW1</td>
+                    <td>HW0</td>
+                    <td>Vert/Horz Sync width</td>
+                </tr>
+                <tr>
+                    <th>4</th>
+                    <td>VT7</td>
+                    <td>VT6</td>
+                    <td>VT5</td>
+                    <td>VT4</td>
+                    <td>VT3</td>
+                    <td>VT2</td>
+                    <td>VT1</td>
+                    <td>VT0</td>
+                    <td>Vertical Total</td>
+                </tr>
+                <tr>
+                    <th>5</th>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>VA4</td>
+                    <td>VA3</td>
+                    <td>VA2</td>
+                    <td>VA1</td>
+                    <td>VA0</td>
+                    <td>Vertical Total Adjust</td>
+                </tr>
+                <tr>
+                    <th>6</th>
+                    <td>VD7</td>
+                    <td>VD6</td>
+                    <td>VD5</td>
+                    <td>VD4</td>
+                    <td>VD3</td>
+                    <td>VD2</td>
+                    <td>VD1</td>
+                    <td>VD0</td>
+                    <td>Vertical Displayed</td>
+                </tr>
+                <tr>
+                    <th>7</th>
+                    <td>VP7</td>
+                    <td>VP6</td>
+                    <td>VP5</td>
+                    <td>VP4</td>
+                    <td>VP3</td>
+                    <td>VP2</td>
+                    <td>VP1</td>
+                    <td>VP0</td>
+                    <td>Vertical Sync Position</td>
+                </tr>
+                <tr>
+                    <th>8</th>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>IM1</td>
+                    <td>IM0</td>
+                    <td>Interlace Mode</td>
+                </tr>
+                <tr>
+                    <th>9</th>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>CTV4</td>
+                    <td>CTV3</td>
+                    <td>CTV2</td>
+                    <td>CTV1</td>
+                    <td>CTV0</td>
+                    <td>Character Total Vertical</td>
+                </tr>
+                <tr>
+                    <th>10</th>
+                    <td>&ndash;</td>
+                    <td>CM1</td>
+                    <td>CM0</td>
+                    <td>CS4</td>
+                    <td>CS3</td>
+                    <td>CS2</td>
+                    <td>CS1</td>
+                    <td>CS0</td>
+                    <td>Cursor Mode Start Scan</td>
+                </tr>
+                <tr>
+                    <th>11</th>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>CE4</td>
+                    <td>CE3</td>
+                    <td>CE2</td>
+                    <td>CE1</td>
+                    <td>CE0</td>
+                    <td>Cursor End Scan Line</td>
+                </tr>
+                <tr>
+                    <th>12</th>
+                    <td>DS15</td>
+                    <td>DS14</td>
+                    <td>DS13</td>
+                    <td>DS12</td>
+                    <td>DS11</td>
+                    <td>DS10</td>
+                    <td>DS9</td>
+                    <td>DS8</td>
+                    <td>Display Start Address high</td>
+                </tr>
+                <tr>
+                    <th>13</th>
+                    <td>DS7</td>
+                    <td>DS6</td>
+                    <td>DS5</td>
+                    <td>DS4</td>
+                    <td>DS3</td>
+                    <td>DS2</td>
+                    <td>DS1</td>
+                    <td>DS0</td>
+                    <td>Display Start Address low</td>
+                </tr>
+                <tr>
+                    <th>14</th>
+                    <td>CP15</td>
+                    <td>CP14</td>
+                    <td>CP13</td>
+                    <td>CP12</td>
+                    <td>CP11</td>
+                    <td>CP10</td>
+                    <td>CP9</td>
+                    <td>CP8</td>
+                    <td>Cursor Position high</td>
+                </tr>
+                <tr>
+                    <th>15</th>
+                    <td>CP7</td>
+                    <td>CP6</td>
+                    <td>CP5</td>
+                    <td>CP4</td>
+                    <td>CP3</td>
+                    <td>CP2</td>
+                    <td>CP1</td>
+                    <td>CP0</td>
+                    <td>Cursor Position low</td>
+                </tr>
+                <tr>
+                    <th>16</th>
+                    <td>LPV7</td>
+                    <td>LPV6</td>
+                    <td>LPV5</td>
+                    <td>LPV4</td>
+                    <td>LPV3</td>
+                    <td>LPV2</td>
+                    <td>LPV1</td>
+                    <td>LPV0</td>
+                    <td>Light Pen Vertical</td>
+                </tr>
+                <tr>
+                    <th>17</th>
+                    <td>LPH7</td>
+                    <td>LPH6</td>
+                    <td>LPH5</td>
+                    <td>LPH4</td>
+                    <td>LPH3</td>
+                    <td>LPH2</td>
+                    <td>LPH1</td>
+                    <td>LPH0</td>
+                    <td>Light Pen Horizontal</td>
+                </tr>
+                <tr>
+                    <th>18</th>
+                    <td>UA15</td>
+                    <td>UA14</td>
+                    <td>UA13</td>
+                    <td>UA12</td>
+                    <td>UA11</td>
+                    <td>UA10</td>
+                    <td>UA9</td>
+                    <td>UA8</td>
+                    <td>Update Address high</td>
+                </tr>
+                <tr>
+                    <th>19</th>
+                    <td>UA7</td>
+                    <td>UA6</td>
+                    <td>UA5</td>
+                    <td>UA4</td>
+                    <td>UA3</td>
+                    <td>UA2</td>
+                    <td>UA1</td>
+                    <td>UA0</td>
+                    <td>Update Address low</td>
+                </tr>
+                <tr>
+                    <th>20</th>
+                    <td>AA15</td>
+                    <td>AA14</td>
+                    <td>AA13</td>
+                    <td>AA12</td>
+                    <td>AA11</td>
+                    <td>AA10</td>
+                    <td>AA9</td>
+                    <td>AA8</td>
+                    <td>Attribute Start Adr high</td>
+                </tr>
+                <tr>
+                    <th>21</th>
+                    <td>AA7</td>
+                    <td>AA6</td>
+                    <td>AA5</td>
+                    <td>AA4</td>
+                    <td>AA3</td>
+                    <td>AA2</td>
+                    <td>AA1</td>
+                    <td>AA0</td>
+                    <td>Attribute Start Adr low</td>
+                </tr>
+                <tr>
+                    <th>22</th>
+                    <td>CTH3</td>
+                    <td>CTH2</td>
+                    <td>CTH1</td>
+                    <td>CTH0</td>
+                    <td>CDH3</td>
+                    <td>CDH2</td>
+                    <td>CDH1</td>
+                    <td>CDH0</td>
+                    <td>Character Tot (h) Dsp (v)</td>
+                </tr>
+                <tr>
+                    <th>23</th>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>CDV4</td>
+                    <td>CDV3</td>
+                    <td>CDV2</td>
+                    <td>CDV1</td>
+                    <td>CDV0</td>
+                    <td>Character Dsp (v)</td>
+                </tr>
+                <tr>
+                    <th>24</th>
+                    <td>COPY</td>
+                    <td>RVS</td>
+                    <td>CBRATE</td>
+                    <td>VSS4</td>
+                    <td>VSS3</td>
+                    <td>VSS2</td>
+                    <td>VSS1</td>
+                    <td>VSS0</td>
+                    <td>Vertical smooth scroll</td>
+                </tr>
+                <tr>
+                    <th>25</th>
+                    <td>TEXT</td>
+                    <td>ATB</td>
+                    <td>SEMI</td>
+                    <td>D8L</td>
+                    <td>HSS3</td>
+                    <td>HSS2</td>
+                    <td>HSS1</td>
+                    <td>HSS0</td>
+                    <td>Horizontal smooth scroll</td>
+                </tr>
+                <tr>
+                    <th>26</th>
+                    <td>FG3</td>
+                    <td>FG2</td>
+                    <td>FG1</td>
+                    <td>FG0</td>
+                    <td>BG3</td>
+                    <td>BG2</td>
+                    <td>BG1</td>
+                    <td>BG0</td>
+                    <td>Foregnd/Bgnd Color</td>
+                </tr>
+                <tr>
+                    <th>27</th>
+                    <td>AI7</td>
+                    <td>AI6</td>
+                    <td>AI5</td>
+                    <td>AI4</td>
+                    <td>AI3</td>
+                    <td>AI2</td>
+                    <td>AI1</td>
+                    <td>AI0</td>
+                    <td>Address Increment/Row</td>
+                </tr>
+                <tr>
+                    <th>28</th>
+                    <td>CB15</td>
+                    <td>CB14</td>
+                    <td>CB13</td>
+                    <td>RAM</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>Character Base Address</td>
+                </tr>
+                <tr>
+                    <th>29</th>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>UL4</td>
+                    <td>UL3</td>
+                    <td>UL2</td>
+                    <td>UL1</td>
+                    <td>UL0</td>
+                    <td>Underline scan line</td>
+                </tr>
+                <tr>
+                    <th>30</th>
+                    <td>WC7</td>
+                    <td>WC6</td>
+                    <td>WC5</td>
+                    <td>WC4</td>
+                    <td>WC3</td>
+                    <td>WC2</td>
+                    <td>WC1</td>
+                    <td>WC0</td>
+                    <td>Word Count</td>
+                </tr>
+                <tr>
+                    <th>31</th>
+                    <td>DA7</td>
+                    <td>DA6</td>
+                    <td>DA5</td>
+                    <td>DA4</td>
+                    <td>DA3</td>
+                    <td>DA2</td>
+                    <td>DA1</td>
+                    <td>DA0</td>
+                    <td>Data</td>
+                </tr>
+                <tr>
+                    <th>32</th>
+                    <td>BA15</td>
+                    <td>BA14</td>
+                    <td>BA13</td>
+                    <td>BA12</td>
+                    <td>BA11</td>
+                    <td>BA10</td>
+                    <td>BA9</td>
+                    <td>BA8</td>
+                    <td>Block Start Address high</td>
+                </tr>
+                <tr>
+                    <th>33</th>
+                    <td>BA7</td>
+                    <td>BA6</td>
+                    <td>BA5</td>
+                    <td>BA4</td>
+                    <td>BA3</td>
+                    <td>BA2</td>
+                    <td>BA1</td>
+                    <td>BA0</td>
+                    <td>Block Start Address low</td>
+                </tr>
+                <tr>
+                    <th>34</th>
+                    <td>DEB7</td>
+                    <td>DEB6</td>
+                    <td>DEB5</td>
+                    <td>DEB4</td>
+                    <td>DEB3</td>
+                    <td>DEB2</td>
+                    <td>DEB1</td>
+                    <td>DEB0</td>
+                    <td>Display Enable Begin</td>
+                </tr>
+                <tr>
+                    <th>35</th>
+                    <td>DEE7</td>
+                    <td>DEE6</td>
+                    <td>DEE5</td>
+                    <td>DEE4</td>
+                    <td>DEE3</td>
+                    <td>DEE2</td>
+                    <td>DEE1</td>
+                    <td>DEE0</td>
+                    <td>Display Enable End</td>
+                </tr>
+                <tr>
+                    <th>36</th>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>&ndash;</td>
+                    <td>DRR3</td>
+                    <td>DRR2</td>
+                    <td>DRR1</td>
+                    <td>DRR0</td>
+                    <td>DRAM Refresh Rate</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>&ndash;<br>STATUS</td>
+                    <td>&ndash;<br>LP</td>
+                    <td>R5<br>VBLANK</td>
+                    <td>R4<br>&ndash;</td>
+                    <td>R3<br>&ndash;</td>
+                    <td>R2<br>&ndash;</td>
+                    <td>R1<br>&ndash;</td>
+                    <td>R0<br>&ndash;</td>
+                </tr>
+                <tr>
+                    <td>D7</td>
+                    <td>D6</td>
+                    <td>D5</td>
+                    <td>D4</td>
+                    <td>D3</td>
+                    <td>D3</td>
+                    <td>D2</td>
+                    <td>D0</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>ALT</td>
+                    <td>RVS</td>
+                    <td>UL</td>
+                    <td>FLASH</td>
+                    <td>R</td>
+                    <td>G</td>
+                    <td>B</td>
+                    <td>I</td>
+                </tr>
+            </table>
+            <p>Beschreibung der MAPPED-Register:<br>
+                $D600: Lesezugriff ergibt STATUS<br>
+                Schreibzugriff setzt Registerinhalt<br>
+                $D601: Daten: Ein-/Ausgabe</p>
+            <table class="plain">
+                <tr>
+                    <td>Zeichen-Speicher:</td>
+                    <td>$0000...$07CF</td>
+                </tr>
+                <tr>
+                    <td>Attribut-Speicher:</td>
+                    <td>$0800...$0FCF</td>
+                </tr>
+                <tr>
+                    <td>Zeichengenerator:</td>
+                    <td>$2000...$3FFF</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Die 37 Register des VDC 8563</figcaption>
+        </figure>
 
         <p>l. POKE 54784,18 - als Register wird 18 ausgewählt. Register 18 und 19 bestimmen im High/Low-Byte-Format die angesprochene RAM-Adresse.</p>
 

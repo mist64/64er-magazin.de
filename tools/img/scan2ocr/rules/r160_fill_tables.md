@@ -218,6 +218,11 @@ bad = 0
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
+    # Strip comments first: `<table[\s>]` matches inside one and `</table>`
+    # does not, so a comment MENTIONING a table reported a mismatch on a
+    # perfectly balanced file.  A rule that records its reasoning in comments
+    # must not be failed by its own prose.
+    s = re.sub(r'<!--.*?-->', '', s, flags=re.S)
     o = len(re.findall(r'<table[\s>]', s)); c = len(re.findall(r'</table>', s))
     if o != c: print(f"  mismatch {f}: <table>={o} </table>={c}"); bad += 1
 sys.exit(1 if bad else 0)
