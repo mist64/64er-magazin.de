@@ -52,12 +52,26 @@ ready to build. Ask for it; do not substitute the raw master, because then the
 published PDF and the published cover image disagree about what the cover
 looks like.
 
-## THE 150 dpi INPUTS ARE REVIEWED BEFORE THE PDF IS COMPILED — ALWAYS
+## THE PAGE INPUTS ARE REVIEWED BEFORE THE PDF IS COMPILED — ALWAYS
 
-The delivered image in every page of the PDF is a **150 dpi raster**, and that
-raster is what the reader sees. **Do not compile until the issue owner has
-looked at those 150 dpi pages and said they are good.** Not the masters, not a
-sample — the actual files that will be embedded.
+**Do not compile until the issue owner has looked at the exact files that will
+be embedded and said they are good.** Not the masters, not a sample, not a
+uniform rendering of them — the embedded images themselves.
+
+**They are not all the same resolution, and the review must show each page as
+it will ship.** The mixed build sends each page down one of two paths:
+
+| page | what is embedded | what to show |
+|---|---|---|
+| carries colour | 150 dpi guetzli raster | the 150 dpi file |
+| black ink only | 600 dpi lossless JBIG2 bilevel | the 600 dpi bilevel |
+
+MEASURED on SH8601: 48 of 152 pages are colour-free (098-146 minus 117, one
+contiguous block — the listing and reference back half), so nearly a third of
+the issue ships at 600 dpi bilevel. Reviewing those at 150 dpi greyscale shows
+the owner something the reader will never see, and hides exactly the defects
+bilevel conversion introduces — a thin rule dropped, halftone gone to noise,
+type thinned at the threshold.
 
 This is not a formality and it is not conditional on how the run went:
 
