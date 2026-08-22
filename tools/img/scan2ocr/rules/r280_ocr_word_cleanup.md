@@ -217,6 +217,35 @@ substitutions:
 | Final-position `l` for `t` | t vs l | Lowercase typewriter `t` with hooked descender OCRs as `l`, especially at word end: `Mini-Autostarl` → `Mini-Autostart` (8607/76). The common shape is `…stt` mis-read as `…sl`. Apply only when the t-form is a known German / 64'er-jargon word AND the l-form isn't (eyeball check, not memory): `Autostarl` is not a word, `Autostart` is. Same context-confirms test as the other Pass-2 substitutions. |
 | `]` for `1` | serif 1 vs ] | The serif digit `1` in this typeface is regularly read as `]`. Sweep `grep -n ']' ` over the whole issue, not just figure references — 8609 had 27, 8608 zero, so it is scan-specific and easy to miss entirely. Hits look like `Bild ]`, `Listing ]`, `Tabelle ]`, `(0 oder ])`, `VR]`, `CHR$(n])`, `($D60])`, `1541/70/7]`, `Monitor 190]`, `33] Seiten`, `&lt;]>`. Confirm the digit rather than assuming `1`: check the article's own figure list (a `Bild ]` in an article whose captions run Bild 1–3 is only `Bild 1` if the sentence fits Bild 1), or read the line on the scan. |
 
+### Pass 2 must sweep PUNCTUATION, not only letters
+
+MEASURED on SH8601, AFTER a full 280 run and after r310/r320 and the site build
+had all passed: **100 mis-read glyphs across 20 of 29 articles.** The sweep
+above is written around letters and digits, and the damage that survived it was
+mostly quotation marks and one lookalike capital:
+
+| what OCR gave | what the page prints | count |
+|---|---|---|
+| `©` | `C` — `im © 128-Modus`, `© 64` | 17 |
+| `»SYS DEC(...)` | closing `«` simply gone | 9 |
+| `%` | `?«` at the end of a quoted question | 4 |
+| `s` / `$` | `»` — `sentprellen`, `sewig`, `$sprite«`, `$TRIM«` | 6 |
+| `&` | nothing — a `&` in prose the page does not print | 1 |
+| `O`/`0`, `l`/`1` | `$FFOO`, `$IFFF`, `157l`, `»l28er«`, `Z8OROM`, `Cl6` | ~40 |
+
+Two cheap sweeps find nearly all of it, and neither needs a candidate list:
+**count `»` against `«` per sentence**, and **grep the issue for `©`** (the
+magazine's own copyright line in the Impressum is the only legitimate
+population). Both are mechanical; neither existed before this issue.
+
+**The printed population is real, and reading is what separates them.** SH8601
+prints `»MANDELBROT1»` and `»Punkt löschen»` closing with a second `»`; prints
+a `%` where the DIN charset would take `§`; and sets `lösch: O BS` with a wide
+round capital `O` that is NOT a zero — the narrow zero of `textz: 0-24` sits
+four lines below on the same page and settles it. Every one of these was
+proposed as a fix and rejected AT 400% MAGNIFICATION. Nothing in this class may
+be changed from the HTML alone.
+
 ## Pass 3 — missing or extra spaces
 
 Find words with internal lowercase→uppercase boundaries:
