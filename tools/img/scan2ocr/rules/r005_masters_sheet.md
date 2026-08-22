@@ -14,10 +14,85 @@ This is a **program step**: the orchestrator runs it, checks the exit status and
 runs the Verification block below. There is no editorial judgement in it and
 nothing to dispatch.
 
+## The first action — TWO QUESTIONS, asked before anything is graded
+
+Step 005 is the chain's first step, and **its first action is to ask**. Two
+properties of the physical copy decide everything below; neither can be
+recovered from the pixels; and guessing either produces a **plausible-looking
+wrong result that nothing downstream can see**:
+
+| question, in the owner's terms | descriptor key | what it decides |
+|---|---|---|
+| **How is this issue bound?** A3 sheets held with **clips**, or A4 sheets torn off a **glued** spine? | `binding` | the **edge maths** — which variant of step 005 runs |
+| **Which pages are printed on which paper?** the good white stock, or the cheap interior stock? | `paper` | the **grade**, per page |
+
+If the descriptor carries no answer, the step prints the question — both options
+in one line each, the evidence for answering it, and the JSON to paste back —
+and **exits non-zero having written nothing**. No scan is opened, no output
+directory is made. `first_action()` runs before the page list is even parsed.
+
+**This is the ONE thing step 005 refuses over.** Everything else — parity, skew
+residual, page class, canvas fit, every number the grade reports — it publishes
+and *notes*, because everything else is a defect of a page that a human can see
+in the artefact it published (see *A failed page leaves nothing publishable
+behind*). An unanswered question is not a page defect and not a measurement: it
+is a decision only the owner can make, with the copy in hand.
+
+The two questions are asked **together**, and they are asked **before the
+variant is chosen** — they are questions about the *issue*, they are the same
+two whichever variant ends up running, and a descriptor with no `binding` cannot
+be routed to a variant at all. The `binding != "sheet"` check ("this issue
+belongs to `r005_masters_spread`") is the second half of the same function, and
+runs after them.
+
+### What the step offers as evidence
+
+For the paper question it measures both of these on the 150 dpi thumbs, about
+0.1 s a page — cheap enough to print for the whole issue, so the question comes
+with the means to answer it rather than as a bare demand:
+
+- **which pages took the ink-vs-bed edge finder** — the fraction of the frame's
+  rows/columns that this issue's paper white can see, below
+  `FULLBLEED_PAPER_FRAC`. This is the strongest signal the step has, and it is
+  **one-sided**: it finds pages whose stock the paper mask is *blind* to, which
+  is the same fact that makes the grade wrong on them. A good stock the mask
+  happens to see will not show up, which is why the answer is the owner's and
+  not this measurement's.
+- **each page's own white** — the `STOCK_PCT` percentile of its non-bed pixels,
+  printed against the low profile's `W`. On SH8601 the eight non-interior pages
+  read 240–250 across the board; the interior reads 217 192 179.
+
+The step pre-fills `high_pages` with what the edge-finder evidence points at and
+says, in the output, that it is a guess to be checked against the copy.
+
+### The answer, recorded
+
+```json
+"binding": "sheet",
+"paper": {
+  "high": null,
+  "low":  "/Users/mist/DNB/SH8601/master_2400/SH8601/colors.txt",
+  "high_pages": [1, 2, 147, 148, 149, 150, 151, 152] }
+```
+
+`null` means **the built-in anchor set** (`BUILTIN_ANCHORS`, `W 201 195 188`,
+identity levels) — not "missing". A path that does not exist is a **loud
+error**, not a fallback: the whole point of the map is that nothing is graded
+against numbers nobody chose. Validation lives in `r000_issue.py` and every
+failure is a `SystemExit` — unknown key, wrong type, a page number outside
+`1..pages`, a duplicate, or a descriptor carrying both `paper` and the legacy
+`colors`.
+
+SH8601's answer is above: **1, 2, 147, 148** (the folded A3 cover wrapper) and
+**149–152** (the bound-in Zahlkarte) are high quality; the other 144 pages are
+the interior stock.
+
 ## The two variants, and why the suffix is not an insertion
 
 Step 005 exists in two **mutually exclusive** variants, chosen by the issue
-descriptor's `binding`:
+descriptor's `binding` — which is **asked for** as the first action above, never
+assumed. The field existed before the question did, and an absent or wrong value
+selected the wrong edge maths in silence:
 
 | variant | the frame holds | inner boundary |
 |---|---|---|
@@ -55,7 +130,9 @@ nothing to fill, which is why the two variants exist at all.
 ## Inputs
 
 - the issue descriptor, `issues/<ISSUE>/issue.json`, read through
-  `r000_issue.py` — `scan_dir`, `thumb_150`, `tmp`, `colors`, `binding`, `pages`
+  `r000_issue.py` — `scan_dir`, `thumb_150`, `tmp`, `pages`, and the two
+  **answers**, `binding` and `paper` (`paper.low` replaces the old whole-issue
+  `colors`, which still loads for an issue that has not been migrated)
 - `tools/img/cmyk_reconstruction/target/release/cmyk_reconstruction`, built
   (`cargo build --release` in `tools/img/cmyk_reconstruction`)
 - the ICC pair in `tools/img/`: `USWebCoatedSWOP.icc`, `AdobeRGB1998.icc`
@@ -244,6 +321,15 @@ lie about *why* the page is different and would not survive a re-scan;
 `FULLBLEED_PAPER_FRAC` sits at 0.10, in the middle of a gap five times its own
 width.
 
+The **grade** on those eight pages is a page number, and deliberately so: it
+comes from the descriptor's `paper.high_pages`, which is the owner's answer and
+not a measurement. There is nothing to defer to — the paper mask cannot see that
+stock at all, which is the same fact that makes the grade wrong there. The two
+are cross-checked every page: a page that takes the ink-vs-bed finder while the
+map calls it `low` (or the reverse) gets a `PAPER MAP:` note in its log line and
+in its stamp. A **note**, never a refusal — the map is the answer and this step
+does not overrule it.
+
 Two things had to be got right:
 
 - **Fill the holes.** A photograph's own blacks are as dark as the bed. They are
@@ -307,11 +393,51 @@ cmyk_reconstruction --colors <profile> <in.png> <out.tiff>
 magick <out.tiff> -profile USWebCoatedSWOP.icc -profile AdobeRGB1998.icc <rgb.png>
 ```
 
-`colors` is **optional** in the descriptor. With no profile the grade falls back
-to the **built-in anchor set** — the eight anchors the old separation compiled
-in, copied into `BUILTIN_ANCHORS` rather than imported, because `scan2mrc` is
-retired and `scan2ocr` must not reference it — and to identity levels, because a
-level line is a per-ink contrast decision that must be measured, not guessed.
+### Two papers, two profiles
+
+**One white point cannot serve two stocks.** `W` is the *density reference*:
+`d = -log10(rgb/W)`. Grade a good white sheet against a profile measured off
+yellowed paper and every light tone is reported as carrying **less ink than it
+does** — highlights clamp to zero — and mid-tone hue skews, because each channel
+is normalised by a differently wrong number.
+
+SH8601 was graded end to end with one profile, measured off the **interior**
+stock: `W 209 175 157` with `LC 5 100 / LM 4 100 / LY 5 100 / LK 3 100`. That
+white point is the *yellowed 5th percentile* of the interior paper and was
+chosen to stop yellow corners — the right answer for 144 pages and the wrong one
+for the other eight. Measured on p151, the white Zahlkarte, under that profile:
+**ink kept 0.36, dark contrast 91**, on a master that is excellent by eye. The
+step already said so in every log line; what it could not do was fix it, and the
+note in the code said the fix was *a second measured profile for that stock — a
+decision, not a looser constant here*.
+
+**That decision was taken.** The descriptor names a profile per paper class and
+`grade_for(page)` picks it per page:
+
+| class | what it is | profile |
+|---|---|---|
+| `high` | white stock that was white when new — the folded cover wrapper, a bound-in card or insert | the **built-in anchor set**: `W 201 195 188, C 38 140 165, M 192 37 66, Y 201 159 61, K 16 17 17` and its overprints, with **identity levels** |
+| `low` | the cheap interior stock, yellowish-grey from the start and browner now | this issue's **measured** `colors.txt` |
+
+The built-in anchors are the eight the old separation compiled in, copied into
+`BUILTIN_ANCHORS` rather than imported (`scan2mrc` is retired and `scan2ocr` must
+not reference it). They are not a fallback here — they *are* the high-quality
+paper's profile, by the owner's decision: `W 201 195 188` is a white sheet, which
+is what a cover wrapper and a card are. The levels stay the identity because
+nobody has measured that stock; a level line is a per-ink contrast decision that
+must be measured, not guessed. Either class may name a `colors.txt` of its own
+once one is measured — `"high": null` is an answer, not a gap.
+
+**The paper mask is a different question with a different answer.** It uses the
+**low** class's `W` on every page, including the high-quality ones, because its
+job is to find *this issue's own paper* against the bed and to notice the pages
+that are not on it — which is exactly what the ink-vs-bed switch reads. A mask
+that could see both stocks would see no difference between them and the switch
+would have nothing to switch on.
+
+An issue whose descriptor has no `paper` map is not graded at all: see *The
+first action*. The legacy whole-issue `colors` key still loads, for an issue not
+yet migrated, and means what it always meant.
 
 ### One separation, two renders
 
@@ -397,12 +523,15 @@ test — and grades to 254, because relative to a `W` that is yellower and darke
 than this card it has almost no density. The ratio reads **0.31** and the master
 is, by eye, excellent: crisp blue type, the pale field gone to paper.
 
-So on the eight `ink/bed` pages the two checks **report instead of refusing**,
-the page's log line carries `GRADE UNPROVEN, not this issue's paper: …`, and one
-weaker gate stays hard — the graded page must not have come out **blank**
-(`GRADE_MIN_INK_FRAC`, 0.5 % of the canvas against a measured 2.9–85.9 %). If
-the pale tint on the coated stock has to survive, the fix is a second measured
-profile for that stock. That is a decision, not a looser constant here.
+That was the state of it while **one** profile graded the whole issue. With the
+paper map both sides of the ratio use the same paper on every page, because
+every page is graded with its own stock's profile — see *Two papers, two
+profiles*. The numbers still **report and never gate**: a gate on ink-keep
+failed 10 of 152 pages on the first full sweep and was wrong on all 10 (they
+were the issue's most tint-heavy pages, and a screened tint demodulating into a
+flat fill is the pipeline working, not ink loss). Both numbers go in every log
+line, because the failure they were built for — the old `LK 90 95` turning black
+type into blank paper — is loud enough for a human to see in a thumbnail.
 
 ## The stamp — every artefact says which grade made it
 
@@ -412,8 +541,23 @@ standing in `masters600/` were now stale, and it took a **human eye noticing
 yellow corners** to find out. Nothing mechanical could have.
 
 So everything this step writes carries the grade's fingerprint — the 8 anchors,
-the 4 level lines, the OCR level constant, and a 12-hex `grade-sha` over exactly
-those — plus what was decided about the page's geometry:
+the 4 level lines, and a 12-hex `grade-sha` over exactly those — plus
+**`paper-class`**, the name of the class whose profile made this page, plus what
+was decided about the page's geometry.
+
+The class is deliberately **not** in the digest. `grade-sha` answers *"were
+these pixels made with these numbers?"*, which is a string comparison;
+`paper-class` answers *"why those numbers?"*. A mixed-stock issue has **two
+current grades**, and "is this master stale?" is only answerable once you know
+which of them was supposed to make it — so both lines sit in the head of every
+stamp:
+
+```
+grade-sha    cec3ff863b36
+paper-class  high
+profile      (none -- the built-in anchors, identity levels)
+```
+
 
 | where | how |
 |---|---|
@@ -575,8 +719,11 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
     side = (R.OUT_MASTER / f.replace(".png", ".stamp.txt")).read_text()
     chunk = Image.open(R.OUT_MASTER / f).info.get("r005", "")
     sha = re.search(r"^grade-sha\s+(\S+)$", side, re.M).group(1)
-    print(f, sha,
-          "CURRENT" if sha == R.GRADE_SHA else "*** STALE -- re-run this page ***",
+    # PER PAGE, not per issue: a mixed-stock issue has one current grade per
+    # paper class, and the page's class decides which one this master owes.
+    want = R.grade_for(int(f[:3]))
+    print(f, sha, want.klass,
+          "CURRENT" if sha == want.sha else "*** STALE -- re-run this page ***",
           "| chunk == sidecar" if chunk == side else "| *** CHUNK DISAGREES ***",
           "|", re.search(r"^edge-finder\s+(.*)$", side, re.M).group(1))
 PY

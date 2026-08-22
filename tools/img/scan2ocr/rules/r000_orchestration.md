@@ -105,6 +105,120 @@ rule's header to make a particular build go through. A rule that turns out to
 apply to both kinds is re-classified `all` **with the evidence in the commit
 message**, permanently, for every issue after it too.
 
+## THE CHAIN'S FIRST ACTION — ask which binding, and which pages are which paper
+
+**Before step 005 grades anything — before a scan is opened, before an output
+directory is made — the operator is asked two questions about the physical
+copy.** They are the first thing that happens in an issue build. Step 005 asks
+them itself (`first_action()` in `r005_masters_sheet.py`) and **exits non-zero
+having written nothing** if the descriptor does not carry the answers.
+
+| question, in the owner's terms | descriptor key | what it decides |
+|---|---|---|
+| **How is this issue bound?** A3 sheets held with **clips**, or A4 sheets torn off a **glued** spine? | `binding` | the **edge maths** — which variant of step 005 runs |
+| **Which pages are printed on which paper?** the good white stock, or the cheap interior stock? | `paper` | the **grade** — which colour profile makes each page |
+
+This is the **only** thing step 005 refuses over. Everything else it publishes
+and notes: parity, skew residual, page class, canvas fit, every number the grade
+reports. Those are defects of a page, visible to a human in the artefact it
+published. These two are neither defects nor measurements — they are decisions
+only the owner can make, with the copy in hand, and **guessing either produces a
+plausible-looking wrong result that no downstream check can see.**
+
+### 1. `binding` — clip-bound or glue-bound
+
+```
+"spread"   CLIP-BOUND -- A3 sheets held with clips. The frame holds a facing
+           pair; the inner edge is the facing page's colour boundary, with the
+           clip holes as the fallback, and the holes get inpainted.
+           -> r005_masters_spread          (8609 and the monthlies)
+"sheet"    GLUE-BOUND -- A4 sheets torn off a glued spine. The frame holds one
+           loose sheet; there is no facing page and no clip hole, and the inner
+           edge is a torn fringe (verso) or a flush cut (recto).
+           -> r005_masters_sheet           (SH8601)
+```
+
+The field is not new — `r000_issue.py` has validated it against that closed set
+all along, and the VARIANTS section below is built on it. What was missing is
+that **nothing asked for it**: an absent or wrong value picked the other
+variant's edge maths in silence, and the other variant traces the facing page's
+outer edge as this page's inner one, or hunts a torn fringe on a sheet that has
+none. So `binding` is now optional in the *loader* — precisely so that step 005
+gets to ask the question rather than the loader dying with "missing binding" —
+and present-but-wrong is still fatal on the spot.
+
+### 2. `paper` — which pages are on the good stock
+
+**A magazine issue is not printed on one stock, and one white point cannot serve
+two.** The separation works in the density domain, `d = -log10(rgb/W)`, so `W`
+is the reference every tone is measured against. Grade a good white sheet
+against a profile measured off yellowed paper and every light tone is reported
+as carrying **less ink than it does** (highlights clamp to zero), and mid-tone
+hue skews, because each channel is normalised by a differently wrong number.
+
+The measurements this rule came out of, from SH8601:
+
+- The whole issue was graded with **one** profile, measured off the **interior**
+  stock: `W 209 175 157` with `LC 5 100 / LM 4 100 / LY 5 100 / LK 3 100`. That
+  white point is the *yellowed 5th percentile* of the interior paper, chosen to
+  stop yellow corners. Right for 144 pages.
+- The interior is cheap paper that was **yellowish-grey when new** and has
+  browned further. The **cover** is a folded A3 wrapper on high-quality stock —
+  pages **001, 002, 147, 148** — and pages **149–152** are a bound-in Zahlkarte
+  on high-quality white card.
+- On those eight pages the profile is wrong, and step 005 **already said so**
+  every run: they are the eight that take the ink-vs-bed edge finder, because a
+  coated white sits 100+ city-block from that `W` and the paper mask cannot see
+  them as paper at all. p151 (Zahlkarte) reported **ink kept 0.36, dark contrast
+  91** on a master that is excellent by eye. The code's own note said the fix
+  was *a second measured profile for that stock — a decision, not a looser
+  constant here.*
+
+**The decision:** two classes, one profile each, chosen per page.
+
+| class | what it is | profile |
+|---|---|---|
+| `high` | white stock that was white when new — a cover wrapper, a bound-in card or insert | the **built-in anchor set**: `W 201 195 188, C 38 140 165, M 192 37 66, Y 201 159 61, K 16 17 17` and its overprints, with identity levels |
+| `low` | the cheap interior stock, yellowish-grey from the start | the issue's **measured** `colors.txt` |
+
+In the descriptor, `issues/<ID>/issue.json`:
+
+```json
+"binding": "sheet",
+"paper": {
+  "high": null,
+  "low":  "/Users/mist/DNB/SH8601/master_2400/SH8601/colors.txt",
+  "high_pages": [1, 2, 147, 148, 149, 150, 151, 152] }
+```
+
+- `high` / `low` — a path to a `colors.txt`, or `null` meaning **the built-in
+  anchors with identity levels**. `null` is an answer, not a gap; a path that
+  does not exist is a loud error rather than a silent fallback.
+- `high_pages` — the printed page numbers on the good stock, 1-based, cover
+  counted as 1. Everything not in the list is `low`. It is a **list and not a
+  measurement** on purpose: the paper mask is blind to the other stock, which is
+  the same fact that makes the grade wrong there, so there is nothing to defer
+  to. `r000_issue.py` validates all of it loudly — unknown key, wrong type, a
+  page outside `1..pages`, a duplicate, or a descriptor carrying both `paper`
+  and the legacy whole-issue `colors`.
+
+Every artefact step 005 writes stamps `grade-sha` **and** `paper-class`, so a
+mixed-stock issue stays auditable: a master is stale when its `grade-sha` does
+not match the current grade **of its own class**.
+
+### What the operator gets asked with
+
+The question is not a bare demand. Step 005 measures, on the 150 dpi thumbs and
+in about 0.1 s a page, the evidence for answering it: **which pages took the
+ink-vs-bed edge finder** (the strongest signal there is — and one-sided, since
+it finds only the pages the paper mask is blind to) and **each page's own
+white** against the low profile's `W`. It pre-fills `high_pages` from that and
+says in the output that it is a guess to be checked against the copy.
+
+Record both answers in `LOG.md` with the rest of step 005's disposition. A
+descriptor that already carries them is not asked again — the questions are per
+issue, not per run.
+
 ## VARIANTS — two programs at one step number
 
 A step can exist in **two mutually exclusive variants** that do the same job for
@@ -117,7 +231,8 @@ descriptive suffix on the name:
 | `r005_masters_sheet` | the scan frame holds one loose SHEET, torn off a glued spine (SH8601) | `"binding": "sheet"` |
 
 The closed set of legal values lives in `r000_issue.py` (`BINDINGS`), which
-rejects anything else at load time — a typo'd `binding` would otherwise match
+rejects a wrong one at load time and leaves an ABSENT one to step 005's opening
+question — a typo'd `binding` would otherwise match
 neither variant, or worse, be read as the other one.
 
 Both write the identical contract — `<tmp>/masters600/NNN.png`, 600 dpi,
@@ -125,8 +240,9 @@ levelled, cut, graded, one per page — so every downstream step reads one
 directory and neither knows nor cares which variant filled it.
 
 **The selector is the issue descriptor's `binding` field**, from
-`issues/<ID>/issue.json`, read via `r000_issue.py`. Exactly one variant runs for
-a given issue. The other is recorded in `LOG.md` exactly like a kind mismatch,
+`issues/<ID>/issue.json`, read via `r000_issue.py` — and it is **asked for as
+the chain's first action** (see above), never assumed and never inferred from
+the scans. Exactly one variant runs for a given issue. The other is recorded in `LOG.md` exactly like a kind mismatch,
 with `binding` in place of `kind`:
 
 ```markdown

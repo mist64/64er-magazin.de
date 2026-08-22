@@ -78,6 +78,24 @@ brown ground (170 x 115 mm).  It fails the size gate, which is the right
 outcome; it is one A4 page that cannot be traced, not a size class.  See
 r005_masters_sheet.md.
 
+THE FIRST THING THIS STEP DOES IS ASK.  Two properties of the physical copy
+decide everything below and neither can be recovered from the pixels:
+
+    binding   clip-bound (A3 sheets held with clips, scanned as facing pairs)
+              or glue-bound (A4 sheets torn off a glued spine, one per frame).
+              It picks the EDGE MATHS, i.e. which variant of step 005 runs.
+    paper     which pages are on the good white stock and which on the cheap
+              interior stock.  It picks the GRADE, per page.
+
+Both are asked as the chain's FIRST ACTION -- before a page is opened, before a
+directory is created -- and an unanswered one stops the step with the question
+and a non-zero exit.  This is the ONE thing this step refuses over.  Everything
+else it publishes and NOTES, because everything else is a defect of a page that
+a human can see in the artefact; these two are decisions only the owner can
+make, and guessing either produces a plausible-looking wrong result that no
+downstream check can see.  See r005_masters_sheet.md, "Two papers, two
+profiles", for the measurements behind the paper question.
+
 No CLI flags, no environment knobs -- see the README.  The only per-issue knob is
 ISSUE below; everything else comes from the issue descriptor.  Page numbers are
 positional arguments purely so the work can be split across processes, exactly
@@ -90,6 +108,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import textwrap
 from pathlib import Path
 
 import numpy as np
@@ -368,10 +387,18 @@ CMYK_TOOL = "cmyk_reconstruction/target/release/cmyk_reconstruction"
 ICC_CMYK = "USWebCoatedSWOP.icc"
 ICC_RGB = "AdobeRGB1998.icc"
 
-# `colors` is OPTIONAL in the descriptor.  With no profile the grade falls back
-# to the built-in anchor set -- the eight anchors the old separation compiled in
-# -- so an issue without a measured profile still renders.  They are COPIED here
-# rather than imported: scan2mrc is retired and scan2ocr must not reference it.
+# THE BUILT-IN ANCHOR SET -- the eight anchors the old separation compiled in.
+# They are COPIED here rather than imported: scan2mrc is retired and scan2ocr
+# must not reference it.  Named in cmyk_reconstruction's vocabulary, where
+# R = M+Y, G = C+Y, B = C+M.
+#
+# This is not only a fallback for an issue with no measured profile.  It is the
+# PROFILE OF THE HIGH-QUALITY PAPER, by the owner's decision: W 201 195 188 is a
+# white sheet, which is what a cover wrapper and a bound-in card are, and it is
+# what the descriptor's `"high": null` selects.  The measured per-issue profile
+# describes the CHEAP stock -- SH8601's W is 209 175 157, the yellowed 5th
+# percentile of the interior sheet -- and grading white card against it reports
+# every light tone as less ink than it carries.  See first_action().
 # Named in cmyk_reconstruction's vocabulary, where R = M+Y, G = C+Y, B = C+M.
 BUILTIN_ANCHORS = {
     "W": (201, 195, 188),
@@ -383,9 +410,11 @@ BUILTIN_ANCHORS = {
     "B": (36, 44, 79),       # was COLOR_CM
     "K": (16, 17, 17),
 }
-# ...and with no profile there is nothing measured to stretch by, so the levels
-# are the identity.  A level line is a per-ink contrast decision and must be
-# MEASURED per issue; guessing one is how a page gets washed out.
+# ...and there is nothing MEASURED to stretch by, so the levels are the identity.
+# A level line is a per-ink contrast decision and must be measured per issue and
+# per stock; guessing one is how a page gets washed out.  The high-quality stock
+# has no measured levels of its own and gets these, which change nothing -- the
+# honest position for a stock nobody has sampled.
 BUILTIN_LEVELS = {"LC": (0, 100), "LM": (0, 100), "LY": (0, 100), "LK": (0, 100)}
 
 # THE LEVELS ARE NOT TRUSTED, THEY ARE PROVEN.  SH8601's colors.txt as written
@@ -460,11 +489,12 @@ HERE = Path(__file__).resolve().parent                   # .../scan2ocr/rules
 IMG_DIR = HERE.parents[1]                                # .../tools/img
 
 ISS = r000_issue.load(ISSUE)
-if ISS.binding != BINDING:
-    raise SystemExit(
-        f"r005_masters_sheet: {ISSUE} has binding={ISS.binding!r}, not "
-        f"{BINDING!r}. This issue belongs to r005_masters_spread. Record this "
-        f"variant in its LOG.md as not applicable rather than forcing it.")
+# The binding check is NOT here any more; it is the second half of first_action()
+# below, which runs before anything is written.  The order matters: the two
+# questions are about the ISSUE and are the same two whichever variant ends up
+# running, and a descriptor with no `binding` at all cannot be routed to a
+# variant in the first place -- so the questions come first and the routing
+# after them.
 
 SCAN_DIR = Path(ISS.scan_dir)
 THUMB_DIR = Path(ISS.thumb_150)
@@ -527,7 +557,74 @@ def profile_text(anchors, levels):
         ["%s %g %g\n" % ((k,) + tuple(levels[k])) for k in LEVEL_KEYS])
 
 
-def write_profile(anchors, levels, dest):
+class Grade:
+    """The numbers ONE paper class is graded with, and their fingerprint.
+
+    There is one of these per class in the descriptor's paper map, not one per
+    issue, because an issue is printed on more than one stock and W is the
+    DENSITY REFERENCE: d = -log10(rgb/W).  Measuring a white sheet against the
+    interior's yellowed W reports every light tone as carrying less ink than it
+    does -- highlights clamp to zero -- and skews mid-tone hue, because each
+    channel is normalised by a differently wrong number.  MEASURED on SH8601's
+    p151 (Zahlkarte, white card) under the interior profile: ink kept 0.36,
+    dark contrast 91.
+    """
+
+    def __init__(self, klass, source):
+        self.klass = klass                 # "high" | "low" | None (legacy)
+        self.source = source               # a colors.txt path, or None
+        self.anchors, self.levels, self.measured = read_profile(source)
+        # Everything that can change a pixel goes into the fingerprint -- the 8
+        # anchors and the 4 level lines -- and nothing else does.  The CLASS is
+        # deliberately NOT in it: the digest answers "were these pixels made
+        # with these numbers", which is a string comparison; the class answers
+        # "why these numbers", and is written beside it in every stamp.
+        self.text = profile_text(self.anchors, self.levels)
+        self.sha = hashlib.sha1(self.text.encode("utf-8")).hexdigest()[:12]
+        self.paper_rgb = np.array(self.anchors["W"], float)
+
+    @property
+    def source_name(self):
+        return self.source or "(none -- the built-in anchors, identity levels)"
+
+    def __repr__(self):
+        return f"<Grade {self.klass} {self.sha} {self.source_name}>"
+
+
+def build_grades():
+    """{class: Grade} from the descriptor's paper map.
+
+    With no map there is one nameless grade built from the legacy `colors` key,
+    so that this module still IMPORTS -- the verification snippets in the .md
+    import it, and so does anyone poking at a function.  Nothing may be GRADED
+    with it: first_action() refuses the run before any page is opened.
+    """
+    if ISS.paper is None:
+        return {None: Grade(None, ISS.colors)}
+    return {k: Grade(k, ISS.paper.profiles[k])
+            for k in r000_issue.PAPER_CLASSES}
+
+
+GRADES = build_grades()
+
+
+def grade_for(page):
+    """The Grade that makes THIS page -- its paper class's profile."""
+    return GRADES[ISS.paper.klass(page)] if ISS.paper else GRADES[None]
+
+
+# The PAPER MASK's white, which is a different question from the grade's and has
+# a different answer.  The mask exists to find THIS ISSUE'S OWN PAPER against the
+# bed, and to notice the pages that are not on it -- that is what the ink/bed
+# switch reads (see FULLBLEED_PAPER_FRAC, whose 0.10 floor was measured with this
+# W).  So it is always the LOW class's white, on every page, including the pages
+# the grade treats as high quality.  A mask that could see both stocks would see
+# no difference between them, and the switch would have nothing to switch on.
+LOW_GRADE = GRADES["low"] if ISS.paper else GRADES[None]
+PAPER_RGB = np.array(LOW_GRADE.anchors["W"], float)
+
+
+def write_profile(grade, dest):
     """The profile cmyk_reconstruction will actually be run with, written out.
 
     It is written even when it came from a colors.txt, and it is KEPT beside the
@@ -539,25 +636,12 @@ def write_profile(anchors, levels, dest):
     """
     with open(dest, "w", encoding="utf-8") as fh:
         fh.write(f"# {ISSUE} -- profile as used by r005_masters_sheet\n")
-        fh.write(f"# source: {ISS.colors or 'built-in anchors, identity levels'}\n")
-        fh.write(profile_text(anchors, levels))
+        fh.write(f"# paper:  {grade.klass or '(no paper map -- legacy single profile)'}\n")
+        fh.write(f"# source: {grade.source or 'built-in anchors, identity levels'}\n")
+        fh.write(grade.text)
 
 
-ANCHORS, LEVELS, HAVE_PROFILE = read_profile(ISS.colors)
-PAPER_RGB = np.array(ANCHORS["W"], float)
-
-# THE GRADE'S FINGERPRINT.  A finished master carries no record of which numbers
-# produced it, and this issue proved what that costs: colors.txt was re-measured,
-# three of the four masters beside it were now stale, and it took a human eye
-# noticing yellow corners to find out.  Everything that can change a pixel goes
-# in -- the 8 anchors, the 4 level lines, and the OCR level -- and the digest is
-# written into every artefact this step produces.  Comparing a master with the
-# current profile is then a string comparison, not a judgement about colour.
-GRADE_TEXT = profile_text(ANCHORS, LEVELS)
-GRADE_SHA = hashlib.sha1(GRADE_TEXT.encode("utf-8")).hexdigest()[:12]
-
-
-def stamp_text(**fields):
+def stamp_text(grade, **fields):
     """The stamp that says which profile made this page.
 
     Written three ways, because each of them is the one that survives a
@@ -565,14 +649,19 @@ def stamp_text(**fields):
     the file being copied somewhere else), as NNN.stamp.txt beside the master
     (readable without opening a 110 megapixel PNG), and as the profile file
     handed to the separator, kept in cmyk2400/.
+
+    `paper-class` is in the head beside `grade-sha` because a mixed-stock issue
+    has TWO current grades and "is this master stale?" is only answerable once
+    you know which of them was supposed to make it.
     """
     head = [f"r005_masters_sheet {ISSUE} -- the grade as used for this page",
-            f"grade-sha    {GRADE_SHA}",
-            f"profile      {ISS.colors or '(none -- built-in anchors)'}",
+            f"grade-sha    {grade.sha}",
+            f"paper-class  {grade.klass or '(no paper map -- legacy single profile)'}",
+            f"profile      {grade.source_name}",
             f"render       ONE master, uncurved -- r010 OCRs it and r145 "
             f"cuts figures from it"]
     body = [f"{k:<12s} {v}" for k, v in fields.items()]
-    return "\n".join(head + body + [""] + GRADE_TEXT.rstrip().split("\n")) + "\n"
+    return "\n".join(head + body + [""] + grade.text.rstrip().split("\n")) + "\n"
 
 
 class PageFailed(Exception):
@@ -644,6 +733,38 @@ def paper_mask(rgb):
     """True where the pixel is paper: near the paper white, and not the prop."""
     near = np.abs(rgb.astype(int) - PAPER_RGB).sum(2) < PAPER_DIST
     return near & ~prop_mask(rgb)
+
+
+def frame_paper_frac(rgb):
+    """How much of this frame the ISSUE'S OWN paper white can see.
+
+    The fraction of the frame's rows, and of its columns, that are more than
+    BODY_PAPER_FRAC paper; the smaller of the two.  It is what picks the edge
+    finder (FULLBLEED_PAPER_FRAC), and it is the evidence first_action() offers
+    for the paper question, because a page the paper mask cannot see is a page
+    printed on another stock -- the same fact that makes the grade wrong there.
+    """
+    return mask_paper_frac(paper_mask(rgb))
+
+
+def mask_paper_frac(m):
+    """The same number, off a paper mask that has already been computed."""
+    return float(min((m.mean(1) > BODY_PAPER_FRAC).mean(),
+                     (m.mean(0) > BODY_PAPER_FRAC).mean()))
+
+
+def own_white(rgb):
+    """This sheet's OWN white: the STOCK_PCT percentile of its non-bed pixels.
+
+    The same statistic process() uses for `stock_rgb`, taken over the whole
+    frame instead of the traced page because first_action() runs before
+    anything has been traced.  On a 150 dpi thumb it costs about 0.1 s, which is
+    what makes it cheap enough to print for every page of the issue.
+    """
+    a = rgb[::2, ::2].reshape(-1, 3).astype(np.int16)
+    keep = a.mean(1) >= BED_LUM
+    a = a[keep] if keep.any() else a
+    return np.percentile(a, STOCK_PCT, axis=0)
 
 
 def _edges(mask, rows, cols):
@@ -877,6 +998,12 @@ def process(page):
     # a page is a missing input file: there is nothing to publish.
     notes = []
     stem = f"{page:03d}"
+    # THE PAGE'S PAPER, hence THE PAGE'S PROFILE.  From the descriptor's paper
+    # map, which the operator answered before this step ever ran; see
+    # first_action().  Everything in this function that touches paper white --
+    # the fill outside the traced page, the canvas margin, the stock reference,
+    # the separation itself -- uses THIS grade and not a module constant.
+    grade = grade_for(page)
     scan = SCAN_DIR / f"{stem}.png"
     thumb = THUMB_DIR / f"{stem}.png"
     for p in (scan, thumb):
@@ -892,10 +1019,27 @@ def process(page):
     # 0.2 s there instead of 45.  See FULLBLEED_PAPER_FRAC: how much of this
     # frame the profile's paper white can see decides it, not the page number.
     thumb_mask = paper_mask(np.array(thumb_rgb))
-    body_h = (thumb_mask.mean(1) > BODY_PAPER_FRAC).mean()
-    body_w = (thumb_mask.mean(0) > BODY_PAPER_FRAC).mean()
-    from_ink = min(body_h, body_w) < FULLBLEED_PAPER_FRAC
+    paper_frac = mask_paper_frac(thumb_mask)
+    from_ink = paper_frac < FULLBLEED_PAPER_FRAC
     finder = "ink/bed" if from_ink else "paper/bed"
+
+    # ...and the same measurement is a CROSS-CHECK on the answer.  The two are
+    # independent: the finder is measured off this frame, the class was decided
+    # by the owner with the copy in hand.  They should agree -- a page the paper
+    # mask cannot see is a page on another stock -- so a disagreement is worth an
+    # eye on either the map or the scan.  It is a NOTE and never a refusal: the
+    # map is the answer and this step does not overrule it.
+    if from_ink and grade.klass == "low":
+        notes.append(f"PAPER MAP: this page took the ink/bed edge finder "
+                     f"(paper frac {paper_frac:.3f} < {FULLBLEED_PAPER_FRAC}), "
+                     f"i.e. this issue's paper white cannot see its stock -- "
+                     f"but the map calls it LOW quality and grades it with "
+                     f"{grade.source_name}")
+    if not from_ink and grade.klass == "high":
+        notes.append(f"PAPER MAP: the map calls this page HIGH quality, but "
+                     f"the paper mask sees {paper_frac:.3f} of the frame as "
+                     f"this issue's own paper -- high-quality stock normally "
+                     f"reads well under {FULLBLEED_PAPER_FRAC}")
 
     # --- the parity gate, off the same thumb -------------------------------
     # It reads the jitter of the PAPER boundary, so it can only be asked where
@@ -1066,14 +1210,14 @@ def process(page):
     # solver sees exactly zero density there rather than a near-white it has to
     # resolve into some faint ink.
     filled = arr.copy()
-    filled[~keep] = PAPER_RGB.astype(np.uint8)
+    filled[~keep] = grade.paper_rgb.astype(np.uint8)
     canvas = place(filled, 0)
     canvas_paper = place(mask & keep, False)
     # See STOCK_PCT: what counts as ink is a distance from the paper THIS SHEET
     # is printed on, which is only the profile's W where the profile describes
     # the sheet.  Sampled 1 pixel in 16 -- a percentile of 2 million pixels and
     # of 30 million is the same percentile, and one of them costs nothing.
-    stock_rgb = PAPER_RGB
+    stock_rgb = grade.paper_rgb
     if from_ink:
         small = arr[::4, ::4][keep[::4, ::4]]
         if len(small):
@@ -1082,11 +1226,11 @@ def process(page):
                        & keep, False)
     # the canvas margin is fabricated paper, not scan -- it is neither
     canvas_page = place(np.ones((h, w), bool), False)
-    canvas[~canvas_page] = PAPER_RGB.astype(np.uint8)
+    canvas[~canvas_page] = grade.paper_rgb.astype(np.uint8)
 
     # The stamp every artefact of this page carries.  Built BEFORE the render,
     # because it describes what the render is about to be done with.
-    stamp = stamp_text(**{
+    stamp = stamp_text(grade, **{
         "page": f"{stem} of {ISSUE}",
         "page-class": klass,
         "page-size": f"{page_w_mm:.1f} x {page_h_mm:.1f} mm",
@@ -1097,7 +1241,7 @@ def process(page):
         "page-px": f"{x1 - x0} {y1 - y0}",
         "canvas-px": f"{cw} {ch}",
         "notes": "; ".join(notes) if notes else "(none)",
-        "edge-finder": finder,
+        "edge-finder": f"{finder} (paper frac {paper_frac:.3f})",
         "skew": f"{angle:+.2f} -> {residual:+.2f} deg",
     })
 
@@ -1106,7 +1250,7 @@ def process(page):
         # KEPT, not thrown away with `work`: this is the profile the separator
         # was actually run with, sitting beside the archive it produced.
         profile_txt = OUT_CMYK / f"{stem}.colors.txt"
-        write_profile(ANCHORS, LEVELS, profile_txt)
+        write_profile(grade, profile_txt)
         src_png, cmyk_tiff = work / "in.png", work / "sep.tiff"
         full.save(src_png)
         separate_and_render(src_png, cmyk_tiff,
@@ -1145,23 +1289,19 @@ def process(page):
     dark = glum[glum <= np.percentile(glum, INK_DARK_PCT)]
     ink_p50 = float(np.median(dark))
 
-    # BOTH CHECKS ARE STATEMENTS ABOUT THE LEVEL LINES, AND THE LEVEL LINES WERE
-    # MEASURED ON THIS ISSUE'S PAPER.  On an ink/bed page they are not: the raw
-    # side is measured against the SHEET'S OWN white (STOCK_PCT) and the graded
-    # side against what the profile's W grades to, which are two different
-    # papers, so the ratio between them is not the quantity the gate was built
-    # to read.  MEASURED on p149: the card's pale cyan field sits 52 city-block
-    # from its own stock -- ink by the raw test -- and grades to 254, because
-    # relative to a W that is yellower and darker than this card it has almost
-    # no density.  The ratio reads 0.31 and the master is, by eye, excellent:
-    # crisp blue type, the pale field gone to paper.  Failing it there would be
-    # a false diagnosis pointing at LC/LM/LY/LK, which are not the problem.
+    # BOTH NUMBERS ARE STATEMENTS ABOUT THE LEVEL LINES, AND THE LEVEL LINES
+    # WERE MEASURED ON ONE PAPER.  This is what the paper map fixed.  While the
+    # whole issue was graded with the interior profile they were meaningless on
+    # the eight pages that are not printed on it -- the raw side measured ink as
+    # a distance from the SHEET'S OWN white (STOCK_PCT) and the graded side from
+    # what a yellower, darker W grades to, two different papers -- and p151 read
+    # ink kept 0.36, dark contrast 91 for a master that is excellent by eye.
+    # The note there said the fix was a second measured profile for that stock,
+    # a decision rather than a looser constant here.  THAT DECISION WAS TAKEN:
+    # the descriptor names a profile per paper class and grade_for() picks it
+    # per page, so both sides of the ratio now use the same paper on every page.
     #
-    # So on those eight pages the two checks REPORT instead of refusing, and one
-    # weaker gate stays hard: the page must not have come out blank.  If the
-    # pale tint on the coated stock has to survive, the fix is a second measured
-    # profile for that stock -- a decision, not a looser constant here.
-    # THE GRADE IS NOT GATED.  It measures and REPORTS, and that is all.
+    # THE GRADE IS STILL NOT GATED.  It measures and REPORTS, and that is all.
     #
     # There was a gate here -- ink kept must be >= 0.70 of the scan's -- and on
     # a full 152-page sweep it failed 10 pages: 005 010 028 047 049 063 086 115
@@ -1201,22 +1341,246 @@ def process(page):
           f"bed comps {dropped} | torn {side} ({ratio:.2f}) | "
           f"paper {paper_white:.0f} ({probe_name}) ink {ink_p50:.0f} "
           f"({ink_frac:.1%} of {raw_ink_frac:.1%}) | "
-          f"grade {GRADE_SHA}"
+          f"grade {grade.sha} ({grade.klass or 'single'} paper)"
           + (" | grade: " + "; ".join(unproven) if unproven else "")
           + ("".join(f"\n      NOTE p{stem}: {n}" for n in notes)), flush=True)
 
 
+# ---------------------------------------------------------------------------
+# THE CHAIN'S FIRST ACTION -- ask, before anything is graded
+#
+# Two properties of the physical copy decide everything this step does, and
+# neither can be recovered from the pixels with any confidence:
+#
+#   binding   clip-bound or glue-bound.  It picks the EDGE MATHS -- which
+#             variant of step 005 runs -- and the two cut the page apart in
+#             incompatible ways.  Run the wrong one and it traces the facing
+#             page's outer edge as this page's inner one, or looks for a torn
+#             fringe on a sheet that has none, and the result is a page.
+#   paper     which pages are on the good white stock and which on the cheap
+#             interior stock.  It picks the GRADE, per page.  W is the density
+#             reference, so one white point cannot serve two stocks: a white
+#             sheet measured against a yellowed W reports every light tone as
+#             carrying less ink than it does, and the result is a page.
+#
+# So this step STOPS AND ASKS rather than guessing, and it does so before a scan
+# is opened or a directory is made.  THIS IS THE ONE THING STEP 005 REFUSES
+# OVER.  Everything else it publishes and NOTES -- see process() -- because
+# everything else is a defect of a page that a human can see in the artefact it
+# publishes.  These two are not defects and not measurements: they are decisions
+# only the owner can make, from the copy in hand.
+# ---------------------------------------------------------------------------
+
+def paper_evidence():
+    """(page, paper fraction, own white) for every readable thumb.
+
+    Cheap on purpose -- 150 dpi thumbs, subsampled, about 0.1 s a page -- so the
+    question can be asked WITH the evidence for answering it rather than as a
+    bare demand.  Two numbers per page, and they say different things:
+
+      paper frac   how much of the frame this issue's paper white can see.  It
+                   is what picks the edge finder, and a page below
+                   FULLBLEED_PAPER_FRAC is one whose stock the paper mask cannot
+                   see at all -- a strong signal of a different paper, and the
+                   only signal the mask can give, since it is blind to it.
+      own white    the sheet's own STOCK_PCT white.  Read it against the low
+                   profile's W: a stock 100+ city-block away from it is not the
+                   paper that profile describes.
+    """
+    rows = []
+    for page in ISS.page_range:
+        thumb = THUMB_DIR / f"{page:03d}.png"
+        if not thumb.exists():
+            continue
+        rgb = np.array(Image.open(thumb).convert("RGB"))
+        rows.append((page, frame_paper_frac(rgb), own_white(rgb)))
+    return rows
+
+
+def _wrap(text, indent, hang=None):
+    """One long sentence as lines that fit a terminal, hanging-indented."""
+    return textwrap.wrap(text, width=76, initial_indent=indent,
+                         subsequent_indent=hang or " " * len(indent))
+
+
+def _pagelist(pages, per_line=12):
+    out, pages = [], list(pages)
+    for i in range(0, len(pages), per_line):
+        out.append("       " + " ".join(f"{p:03d}" for p in pages[i:i + per_line]))
+    return out
+
+
+def ask_text(unanswered):
+    """The question this step refuses over, with the evidence for answering it."""
+    L = ["", "=" * 78,
+         f"r005 -- STEP 005 IS THE CHAIN'S FIRST STEP, AND THIS IS ITS FIRST",
+         f"ACTION: {len(unanswered)} question(s) about {ISSUE} that only you can answer.",
+         f"Nothing has been written.  No scan has been opened.",
+         "=" * 78, ""]
+
+    # --- 1. the binding ----------------------------------------------------
+    L += ["1. HOW IS THIS ISSUE BOUND?   issues/%s/issue.json -> \"binding\"" % ISSUE]
+    if "binding" in unanswered:
+        L += ["   *** UNANSWERED ***", "",
+              "   It selects the edge maths, and the two are not "
+              "interchangeable.", ""]
+        for b, variant in (("spread", "r005_masters_spread"),
+                           ("sheet", "r005_masters_sheet")):
+            L += _wrap(f'{chr(34) + b + chr(34):<9s} '
+                       f'{r000_issue.BINDING_PROSE[b]}', "     ", " " * 15)
+            L += [f"               -> {variant}"
+                  + ("   (this program)" if b == BINDING else ""), ""]
+    else:
+        L += _wrap(f"answered: {ISS.binding!r} -- "
+                   f"{r000_issue.BINDING_PROSE[ISS.binding]}",
+                   "   ", " " * 13) + [""]
+
+    # --- 2. the paper ------------------------------------------------------
+    L += [f"2. WHICH PAGES ARE PRINTED ON WHICH PAPER?   "
+          f"issues/{ISSUE}/issue.json -> \"paper\""]
+    if "paper" not in unanswered:
+        for k in r000_issue.PAPER_CLASSES:
+            n = len(ISS.paper.pages_of(k, ISS.page_range))
+            L += [f"   answered: {k:<4s} {n:3d} pages, "
+                  f"{ISS.paper.profiles[k] or 'the built-in anchors'}"]
+        return "\n".join(L + [""])
+
+    L += ["   *** UNANSWERED ***", "",
+          "   An issue is not printed on one stock, and ONE WHITE POINT CANNOT",
+          "   SERVE TWO.  The separation works in the density domain,",
+          "   d = -log10(rgb/W), so W is the reference every tone is measured",
+          "   against: grade a good white sheet against a profile measured off",
+          "   yellowed paper and every light tone is reported as carrying less",
+          "   ink than it does -- highlights clamp to zero -- and mid-tone hue",
+          "   skews, because each channel is normalised by a differently wrong",
+          "   number.  MEASURED on SH8601's p151 (a white Zahlkarte graded with",
+          "   the interior profile, W 209 175 157): ink kept 0.36, dark contrast",
+          "   91, on a master that is excellent by eye.  Two classes, one line",
+          "   each:", ""]
+    for k in r000_issue.PAPER_CLASSES:
+        L += _wrap(f"{k:<5s} {r000_issue.PAPER_PROSE[k]}", "     ", " " * 11)
+    L += ["",
+          "     high is graded with the BUILT-IN ANCHOR SET (W %g %g %g and"
+          % BUILTIN_ANCHORS["W"],
+          "          identity levels), which is what \"high\": null selects.",
+          "     low  is graded with this issue's MEASURED colors.txt.",
+          "     Either may name a colors.txt of its own once one is measured.",
+          ""]
+
+    # --- the evidence ------------------------------------------------------
+    rows = paper_evidence()
+    if not rows:
+        L += [f"   NO EVIDENCE: there are no thumbs at {THUMB_DIR}, so the",
+              f"   per-page paper measurement could not be made.  Answer from",
+              f"   the copy.", ""]
+    else:
+        w = PAPER_RGB
+        L += [f"   EVIDENCE, measured just now on the 150 dpi thumbs "
+              f"({len(rows)} of {ISS.pages} readable), against",
+              f"   W {w[0]:.0f} {w[1]:.0f} {w[2]:.0f} from "
+              f"{LOW_GRADE.source or 'the built-in anchors'}:", ""]
+        if ISS.binding not in (None, BINDING):
+            L += [f"   (measured with the SHEET variant's masks on an issue whose",
+                  f"   binding says {ISS.binding!r} -- read the numbers as a hint,",
+                  f"   not as a measurement of its geometry.)", ""]
+        ink = [r for r in rows if r[1] < FULLBLEED_PAPER_FRAC]
+        rest = [r for r in rows if r[1] >= FULLBLEED_PAPER_FRAC]
+        L += [f"   a) THE PAGES THAT TOOK THE INK-vs-BED EDGE FINDER -- paper",
+              f"      fraction below {FULLBLEED_PAPER_FRAC}, i.e. the paper mask cannot see",
+              f"      their stock AT ALL.  That is the strongest signal this step",
+              f"      has, and it is one-sided: it finds pages the mask is blind",
+              f"      to, and a good stock the mask happens to see is not on it.",
+              ""]
+        if ink:
+            L += _pagelist(p for p, _, _ in ink)
+            L += [""] + [f"       p{p:03d}  frac {f:.3f}   own white "
+                         f"{c[0]:3.0f} {c[1]:3.0f} {c[2]:3.0f}"
+                         for p, f, c in ink]
+        else:
+            L += ["       (none -- every page's stock is one the paper mask sees)"]
+        if rest:
+            med = np.median(np.array([c for _, _, c in rest]), axis=0)
+            far = sorted(rest, key=lambda r: -abs(r[2] - med).sum())[:8]
+            L += ["",
+                  f"   b) THE OTHER {len(rest)} PAGES: own white p50 "
+                  f"{med[0]:.0f} {med[1]:.0f} {med[2]:.0f}.  The 8 furthest from",
+                  f"      that, in case a second stock hides among them:", ""]
+            L += [f"       p{p:03d}  frac {f:.3f}   own white "
+                  f"{c[0]:3.0f} {c[1]:3.0f} {c[2]:3.0f}   "
+                  f"(city-block {abs(c - med).sum():.0f} from p50)"
+                  for p, f, c in far]
+        L += [""]
+
+    # --- how to answer -----------------------------------------------------
+    high = [p for p, f, _ in rows if f < FULLBLEED_PAPER_FRAC] if rows else []
+    L += ["-" * 78,
+          f"TO ANSWER: put this in issues/{ISSUE}/issue.json and run this step",
+          "again.  The page numbers are the PRINTED ones, 1-based, cover as 1.",
+          ""]
+    if "binding" in unanswered:
+        L += ["  \"binding\": \"sheet\",            <- or \"spread\"", ""]
+    L += ["  \"paper\": {",
+          "    \"high\": null,                  <- the built-in anchors, or a path",
+          f"    \"low\":  {(ISS.colors and chr(34) + ISS.colors + chr(34)) or 'null'},",
+          "    \"high_pages\": [%s] }" % ", ".join(str(p) for p in high),
+          "",
+          "  (high_pages is pre-filled above with the pages the edge-finder",
+          "   evidence points at -- CHECK IT AGAINST THE COPY.  It is your",
+          "   answer that gets recorded, not this step's guess: a bound-in card",
+          "   the mask happens to see would not appear in that list.)",
+          "-" * 78, ""]
+    return "\n".join(L)
+
+
+def first_action():
+    """Ask the two questions, then route to the right variant.  In that order.
+
+    The questions come first because they are about the ISSUE and are the same
+    two whichever variant ends up running -- and because a descriptor with no
+    `binding` cannot be routed to a variant at all.  Both exits are non-zero and
+    neither writes anything.
+    """
+    unanswered = [k for k in r000_issue.ASK_KEYS if getattr(ISS, k) is None]
+    if unanswered:
+        print(ask_text(unanswered), flush=True)
+        raise SystemExit(
+            f"r005: {ISSUE} has {len(unanswered)} unanswered question(s) "
+            f"({', '.join(unanswered)}) -- see above. Nothing was written. This "
+            f"is the one thing step 005 refuses over: a decision only the owner "
+            f"can make, not a defect of a page.")
+    if ISS.binding != BINDING:
+        raise SystemExit(
+            f"r005_masters_sheet: {ISSUE} has binding={ISS.binding!r}, not "
+            f"{BINDING!r}. This issue belongs to r005_masters_spread. Record this "
+            f"variant in its LOG.md as not applicable rather than forcing it.")
+
+
 if __name__ == "__main__":
-    if not HAVE_PROFILE:
-        print(f"r005: {ISSUE} has no colors profile -- grading with the built-in "
-              f"anchor set and identity levels", flush=True)
-    # The grade, in full, once per run and before any page is written: the eight
-    # anchors, the four level lines and the OCR level are what decide every pixel
-    # published below, and a run whose log does not name them cannot be audited
-    # afterwards.  The same text goes into every artefact; see stamp_text.
-    print(stamp_text(**{"run": f"{len(sys.argv[1:]) or ISS.pages} page(s)"}),
-          flush=True)
+    # BEFORE ANYTHING ELSE.  Not after the page list is parsed, not after the
+    # output directories are made: the answers decide what a master IS, and a
+    # run that starts without them has already written the wrong thing.
+    first_action()
+
     pages = [int(a) for a in sys.argv[1:]] or list(ISS.page_range)
+
+    # The grade, in full, once per run and before any page is written: the eight
+    # anchors and the four level lines are what decide every pixel published
+    # below, and a run whose log does not name them cannot be audited
+    # afterwards.  ONE BLOCK PER PAPER CLASS THIS RUN TOUCHES, because a
+    # mixed-stock issue has two of them and "the grade" is not a single answer.
+    # The same text goes into every artefact; see stamp_text.
+    for klass in sorted({grade_for(p).klass for p in pages}, key=str):
+        grade = GRADES[klass]
+        mine = [p for p in pages if grade_for(p).klass == klass]
+        if not grade.measured:
+            print(f"r005: the {klass or 'single'} paper class has no measured "
+                  f"colors.txt -- grading its {len(mine)} page(s) with the "
+                  f"built-in anchor set and identity levels", flush=True)
+        print(stamp_text(grade, **{
+            "run": f"{len(mine)} of {len(pages)} page(s) in this run",
+            "pages": " ".join(f"{p:03d}" for p in mine),
+        }), flush=True)
+
     failed = []
     for page in pages:
         try:
