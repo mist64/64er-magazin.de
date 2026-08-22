@@ -321,6 +321,7 @@ them through this table.
 | now | was | step |
 |---|---|---|
 | 005 | — | masters — the raw scan to the 600 dpi masters (variant by `binding`) |
+| 005b | — | a4_window — the A4 crop, anchored on the 64'er logo (see r005_a4_window.md) |
 | 006 | — | issue_pdf — the searchable issue PDF, built from those masters. **Blocks on a hand-made `title.png`** — see below |
 | 010 | — | ocr_blocks — OCR the scans into measured blocks |
 | 020 | — | classify — labels, reading order, roles, per-page markdown |
@@ -811,7 +812,14 @@ at a page after the automated checks were already green.
 So: report status, list what is still open, and wait. Do not write "the issue is
 complete" or upload on your own judgement.
 
-## Changing a listing ALWAYS goes to the user first
+## Changing a PROGRAM FILE always goes to the user first
+
+**This is about `prg/*.txt` — the runnable programs — and nothing else.** A
+`<pre>` block inside an article is transcription of the printed page like any
+other text: when it disagrees with the master, read the 600 dpi crop and
+correct it, exactly as for prose. Do not escalate that. (SH8601's chain
+escalated four such lines and should not have; they were fixed from the page
+in the end.)
 
 `prg/*.txt` are the programs readers typed in. Editing one — applying an
 erratum, correcting a line, renumbering — is not a markup fix and is never
@@ -822,8 +830,10 @@ routine:
   the change is legible to the next reader.
 - Keep the superseded line as a `;` comment rather than deleting it, so the
   disk's original state is recoverable from the file itself.
-- **Test the result** — the listing must still load and run. See r320 for the
-  x128 harness.
+- **Test the result** — the listing must still load and run, in the emulator
+  for the machine the program is FOR: `x128` for a C128 program, `x64` for a
+  C64 one, `xplus4` for a Plus/4, and so on. The harness is in r320; the
+  machine is a property of the listing, not of the harness.
 
 The default remains: record the errata state, do not patch. Patch only when the
 user asks for it.

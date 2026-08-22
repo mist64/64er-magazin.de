@@ -246,8 +246,16 @@ use it, together with the image, to tell the levels apart.
   title       the headline of an article starting on this page. Largest type on
               the page, usually spanning columns. A page may carry two articles
               and so two titles, and a continuation page carries none at all.
-  intro       the standfirst: the bold or larger paragraph between the headline
-              and the body, before the article proper begins.
+  intro       the standfirst -- and it is a TYPOGRAPHIC fact, not a positional
+              one.  The block must be SET DIFFERENTLY from the page's body:
+              its `lineh` in the digest larger than the body blocks around it,
+              or visibly bolder in the overlay.  NOT EVERY ARTICLE HAS ONE.
+              The paragraph that merely happens to sit between the headline and
+              the body is BODY unless the type says otherwise.
+              MEASURED, SH8601 p003: three paragraphs all at lineh 0.0089, the
+              page's body value, and two of them were called intro on position
+              alone.  The page has no standfirst; the article opens in body
+              type.  If the lineh matches the body median, the answer is body.
   section     a standalone heading inside the article: set on its own line in
               display type, introducing a section of the piece.
   subsection  a heading a level below that -- typically a short bold run-in
