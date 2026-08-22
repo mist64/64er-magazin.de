@@ -1035,6 +1035,11 @@ def share_on_mastodon_link(title, url):
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
 def optional_issue_prefix(path, issue, prepend_issue_dir=False):
+    # `path` is None when the issue has no scan PDF, which is legitimate: an
+    # issue built from page scans has none until one is assembled.  Callers
+    # decide whether to offer a download; this one just must not crash.
+    if path is None:
+        return None
     if prepend_issue_dir:
         path = os.path.join(issue.issue_dir_name, path)
     return path
@@ -2057,7 +2062,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     make_authors_clickable(soup)
 
     # Insert actions for downloading the pdf and tooting to mastooton
-    download_pdf_html = f'''
+    download_pdf_html = '' if not pdf_path else f'''
 <div class="article_action">
 <a href="{pdf_path}">
 <img src="/{BASE_DIR}pdf.svg" alt="PDF">
@@ -2282,7 +2287,10 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
             pages = article.pages
 
-            # create PDF with just the article
+            # create PDF with just the article -- when the issue HAS one.
+            # Without this initialisation the next call crashes with
+            # UnboundLocalError on any PDF-less issue.
+            pdf_path = None
             if pdf_filename:
                 source_pdf_path = os.path.join(issue_source_path, pdf_filename)
                 pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
