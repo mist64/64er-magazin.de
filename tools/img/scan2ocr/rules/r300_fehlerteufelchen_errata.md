@@ -146,8 +146,13 @@ the article aside AND the `prg/*.txt` fix exist.
 dir=issues/<YYMM>
 # every aside is well-formed and anchored
 grep -rl 'aside class="fehlerteufelchen" id="fehlerteufelchen"' "$dir"/*.html
-# every aside names its source issue
-for f in $(grep -rl 'class="fehlerteufelchen"' "$dir"/*.html); do
+# every aside names its source issue.
+# NUL-separated, and read without word-splitting: EVERY article filename in
+# this repo contains spaces ("62 Roulette C 128.html"), so `for f in $(grep
+# -rl ...)` splits each one into fragments and reports a dozen missing files
+# per issue.  It fails identically on issues that have been correct for
+# months -- run it over SH8501's eight known-good asides and watch.
+grep -rlZ 'class="fehlerteufelchen"' "$dir"/*.html | while IFS= read -r -d '' f; do
   grep -q "<!-- 64'er " "$f" || echo "  $f: aside missing <!-- 64'er M/YYYY --> trailer"
 done
 # no orphan links (link present but no aside in same file)
