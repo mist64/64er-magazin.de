@@ -298,6 +298,18 @@ and `issue_pdf`'s README records the measurement that at 300 dpi tesseract
 truncates words at the image edges. Where the corpus shows a column-edge
 truncation, that text layer often has the word.
 
+### The one page a human always makes
+
+The cover is cut and graded by step 005 like every other page, and then the
+issue owner makes a cleaned-up `title.png` **at 150 dpi** from it by hand.
+That single file serves twice: it is the cover the site shows, and it is
+**page 1's image in the issue PDF** — not re-derived from the master, but used
+as the 150 dpi master for that page. Every other page of the PDF comes
+straight from step 005.
+
+Step 006 therefore waits for it. A PDF built without it disagrees with the
+published cover about what the cover looks like.
+
 ## The chain, and what the numbers used to be
 
 The scan-to-corpus steps and the issue-build rules were two chains that met at
@@ -309,7 +321,7 @@ them through this table.
 | now | was | step |
 |---|---|---|
 | 005 | — | masters — the raw scan to the 600 dpi masters (variant by `binding`) |
-| 006 | — | issue_pdf — the searchable issue PDF, built from those masters |
+| 006 | — | issue_pdf — the searchable issue PDF, built from those masters. **Blocks on a hand-made `title.png`** — see below |
 | 010 | — | ocr_blocks — OCR the scans into measured blocks |
 | 020 | — | classify — labels, reading order, roles, per-page markdown |
 | 030 | — | assemble — pages back into articles, one `<YYMM>.md` |
@@ -597,7 +609,9 @@ magick <SRC_DIR>/145.png -crop 2136x574+390+3736 +repage /tmp/64er_<YYMM>_crop.p
 ```
 
 **COORDINATE SPACE -- read before cropping.** The bboxes are in pixels of the
-graded **600 dpi master** (`SRC_DIR`), which is deskewed and A4-cropped. They are
+graded **600 dpi master** (`SRC_DIR`), which is deskewed and cut to the
+sheet's own traced edges on the issue canvas -- NOT exact A4; that is the
+delivered PDF's geometry. They are
 **not** in the delivered PDF's page space: the PDF page is neither deskewed nor
 cropped, so the two differ by a rotation and an offset. Crop from the master,
 never from a `pdftoppm` render. `frac=` is the same box as a fraction of the
@@ -609,11 +623,23 @@ preceding blocks whose x-range overlaps to find its top edge.
 
 Everything under `out/` is scratch -- never commit it.
 
-## Cross-cutting rule: the PDF has no usable text layer
+## Cross-cutting rule: the PDF's text layer is a CANDIDATE SOURCE, not authority
 
-The delivered PDF's text layer is a re-OCR of the same scan. It is **not**
-independent evidence, and on a scanned issue it is **void** -- agreeing with it
-proves nothing, and disagreeing with it proves nothing either.
+**Since step 006 the delivered PDF does carry a text layer**, and it is not
+the same OCR this chain runs: `issue_pdf` renders at **402 dpi** where step
+010 reads **300**, and its README records why -- at 300 dpi tesseract
+truncates words at the image edges.
+
+So it is worth consulting and worth distrusting in equal measure. MEASURED on
+SH8601 over 38 column-edge truncation candidates, anchored on the preceding
+word so a longer form elsewhere on the page could not count: **10 recovered,
+7 unchanged, 21 undecidable**. And on p090 it is actively worse -- `--psm 3`
+interleaved a tinted box with the surrounding body columns and scrambled the
+reading order, so a truncation there would be traded for an unknown
+reordering.
+
+Use it to GENERATE a candidate for a damaged word, then confirm that
+candidate against the master crop. Never quote it as what the print says.
 
 There are exactly two authoritative sources for what the print says:
 

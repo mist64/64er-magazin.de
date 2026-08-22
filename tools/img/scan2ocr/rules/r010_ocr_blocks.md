@@ -1,6 +1,8 @@
 # 010 — OCR the scans into measured blocks
 
-**Goal:** turn the deskewed, matted, A4-cropped, graded **600 dpi masters** into
+**Goal:** turn the deskewed, cut and graded **600 dpi masters** (step 005 traces each
+sheet's own edges and places it on the issue canvas; exact A4 is the
+*delivered PDF's* geometry, not the master's) into
 one JSON per page describing every block on it: bbox, printed type size, indent,
 ink density, a geometric label, and the block's text with the printed line
 breaks undone. Plus the per-page block index every later bbox step reads.
@@ -54,7 +56,9 @@ and already knows every bbox, so the index is a projection of data we have. It
 costs no OCR and cannot disagree with the corpus.
 
 **Coordinate space — read before cropping.** The bboxes are in pixels of the
-graded 600 dpi master, which is deskewed and A4-cropped. They are **not** in the
+graded 600 dpi master, which is deskewed and cut to the sheet's own traced
+edges (exact A4 is the delivered PDF's geometry, not the master's). They are
+**not** in the
 delivered PDF's page space; the PDF page is neither deskewed nor cropped, so the
 two differ by a rotation and an offset. Crop from the master:
 
