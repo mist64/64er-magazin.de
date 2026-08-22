@@ -477,9 +477,14 @@ OUT_MASTER = Path(ISS.masters600)
 # every other artefact of this page is derived from, and it is kept: a figure
 # that bleeds off the trimmed page still exists on the sheet.
 OUT_SHEET = Path(ISS.tmp) / "masters2400"
+# ...and the same sheet at 600 dpi.  Deskewed and graded, NOT cropped: this is
+# the file figures are cut from, by hand or by step 145, because a figure that
+# bleeds off the trimmed page still exists on the sheet.  A straight 4:1 reduce
+# of the 2400 sheet -- one grade, and the reduce after it.
+OUT_SHEET600 = Path(ISS.tmp) / "sheets600"
 OUT_CMYK = Path(ISS.tmp) / "cmyk2400"
 OUT_DEBUG = Path(ISS.tmp) / "debug600"
-OUT_DIRS = (OUT_MASTER, OUT_SHEET, OUT_CMYK, OUT_DEBUG)
+OUT_DIRS = (OUT_MASTER, OUT_SHEET, OUT_SHEET600, OUT_CMYK, OUT_DEBUG)
 
 
 # ---------------------------------------------------------------------------
@@ -848,7 +853,11 @@ def save_master(arr, dest, stamp):
     """
     meta = PngImagePlugin.PngInfo()
     meta.add_text("r005", stamp)
-    Image.fromarray(arr).save(dest, pnginfo=meta)
+    # ...and a pHYs chunk, so the file states its own resolution.  Without it a
+    # 600 dpi master reads as "72, undefined" to everything downstream, and a
+    # page whose scale is a guess is a page that gets placed at the wrong size.
+    Image.fromarray(arr).save(dest, pnginfo=meta,
+                              dpi=(MASTER_DPI, MASTER_DPI))
 
 
 # ---------------------------------------------------------------------------
@@ -1107,8 +1116,10 @@ def process(page):
 
     # The 600 dpi master comes OFF the graded 2400 sheet -- one grade, one
     # reduce, in that order -- and only then is it cut to the traced page.
-    sheet600 = np.array(Image.open(OUT_SHEET / f"{stem}.png")
-                        .convert("RGB").reduce(SCAN_REDUCE))
+    sheet_img = Image.open(OUT_SHEET / f"{stem}.png").convert("RGB") \
+                     .reduce(SCAN_REDUCE)
+    save_master(np.array(sheet_img), OUT_SHEET600 / f"{stem}.png", stamp)
+    sheet600 = np.array(sheet_img)
     sheet600 = sheet600[:h, :w]
     graded = np.full_like(sheet600, 255)
     graded[keep] = sheet600[keep]
@@ -1220,7 +1231,8 @@ if __name__ == "__main__":
             # that says WHY the page failed -- the size gate's own message ends
             # "look at debug600/NNN.png", and deleting it made that a lie.
             for d, ext in ((OUT_MASTER, "png"), (OUT_MASTER, "stamp.txt"),
-                           (OUT_SHEET, "png"), (OUT_CMYK, "tif"),
+                           (OUT_SHEET, "png"), (OUT_SHEET600, "png"),
+                           (OUT_CMYK, "tif"),
                            (OUT_CMYK, "colors.txt")):
                 stale = d / f"{page:03d}.{ext}"
                 if stale.exists():

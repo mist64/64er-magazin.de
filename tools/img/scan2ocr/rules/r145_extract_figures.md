@@ -1,5 +1,20 @@
 # 145 — Cut the article figures out of the masters
 
+> ## DISABLED — 2026-08-22
+>
+> **Do not run this step.** The figures are cut by hand instead, by the person
+> who owns the issue, and an automatic pass would only produce candidates that
+> then have to be checked and undone.
+>
+> Nothing downstream is blocked by this being off: step 150 places whatever
+> figure files are present, so the articles publish without images and gain
+> them when the hand-cut files land. The step's own machinery is intact and
+> unchanged — delete this block to turn it back on.
+>
+> On SH8601 it had measured 150 of 152 pages and proposed 117 candidates
+> before it was stopped; the judging and naming halves never ran, so nothing
+> was written to the issue.
+
 **Applies to:** all — cutting figures out of the masters is kind-independent.
 
 **Goal:** every photograph, screenshot, hardcopy, diagram, chart, cartoon and

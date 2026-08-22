@@ -10,6 +10,9 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-python3}"
 cd "$DIR"
-seq "${1:-1}" "${2:-176}" | OMP_NUM_THREADS=1 xargs -P 6 -n 8 "$PY" r145_extract_figures.py
+# The page count follows the chain's ISSUE constant, asked of the program
+# rather than repeated here -- the literal 176 this replaces was 8609's, and
+# would have run 24 pages past the end of a 152-page Sonderheft.
+seq "${1:-1}" "${2:-$("$PY" -c 'import r010_ocr_blocks as m; print(m.ISS.pages)')}" | OMP_NUM_THREADS=1 xargs -P 6 -n 8 "$PY" r145_extract_figures.py
 "$PY" r145_judge_figures.py
 "$PY" r145_name_figures.py
