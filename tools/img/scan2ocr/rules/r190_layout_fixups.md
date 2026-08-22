@@ -72,8 +72,10 @@ Critical guardrails:
 dir=issues/<YYMM>
 
 # 1. no in-scope TODO marker survives
+# `sort` exits 0 on empty input, so piping into it and testing THAT printed
+# the FAIL line unconditionally -- including on a clean issue.  Test the grep.
 grep -hoE 'TODO (PRE|INDENTATION|INDENTED|ASIDE|BOX)' "$dir"/*.html \
-  | sort -u && echo "  FAIL: in-scope TODO survived"
+  | sort -u | grep . && echo "  FAIL: in-scope TODO survived"
 
 # 2. expected-skip TODO markers may still exist
 grep -lE 'TODO FORMULA|TODO ALL BOXES|TODO two boxes' "$dir"/*.html \

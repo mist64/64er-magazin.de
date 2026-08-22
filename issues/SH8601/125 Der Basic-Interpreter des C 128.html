@@ -173,12 +173,12 @@
 
         <p>Da ich es wirklich beeindruckend finde, wieviel Vorbereitungen erspart werden können, indem man die für die jeweilige Aufgabe optimal geeignete Routine aufruft, stelle ich nun noch ein kleines Programm vor, das die Übergabe einer Adresse (16-Bit) und eines Bytes nur mit Hilfe der grundlegenden Routinen CHKKOM, FRNUM, ADRFOR und GETBYT vollzieht:</p>
 
-        <pre><code>a 0b30 jsr $795c ; CHKKOM  
-a 0b33 jsr $7747 ; FRNUM  
-a 0b36 jsr $8815 ; ADRFOR  
-a 0b39 jsr $795c ;CHKKOM  
-a Ob3c jsr $87f4 ;GETBYT  
-a Ob3f brk  
+        <pre><code>a 0b30 jsr $795c ; CHKKOM
+a 0b33 jsr $7747 ; FRNUM
+a 0b36 jsr $8815 ; ADRFOR
+a 0b39 jsr $795c ;CHKKOM
+a Ob3c jsr $87f4 ;GETBYT
+a Ob3f brk
 </code></pre>
 
         <p>Wenn Sie diese Serie von Aufrufen mit einem einzigen Aufruf von ADRBYT vergleichen, stellen Sie fest, daß es sich wirklich lohnt, über die verschiedenen Routinen zur Übergabe von numerischen Variablen Bescheid zu wissen, um die jeweils geeignetste einsetzen zu können.</p>
@@ -229,7 +229,7 @@ a Ob3f brk
 
         <p>In $12002 befindet sich das High-Byte (Null), in $12003 das Lowbyte ($0A=10) der Integerzahl 10.</p>
 
-        <pre><code>2.NEW:A(@2)=10:SYS DEC ("0B90"),0,0,0,0,A(2)M 49. Ergebnis: 00049 11 20...... M 12011. Ergebnis: 12011 84 20 00 00 00 (=Fließkommadarstellung von 10).  
+        <pre><code>2.NEW:A(@2)=10:SYS DEC ("0B90"),0,0,0,0,A(2)M 49. Ergebnis: 00049 11 20...... M 12011. Ergebnis: 12011 84 20 00 00 00 (=Fließkommadarstellung von 10).
 </code></pre>
 
         <p>3.NEW:A$(2)= "C128":SYS DEC ("0B90"),0,0,0,0,A$(2) M 49. Ergebnis: 00049 OD 20...... M 1200D. Ergebnis: 1200D 05 F9FE....... M IFEF9.Ergebnis: IFEF9 43 2D 3l..... (= ASCII-Darstellung von »C 128«)</p>
@@ -254,11 +254,11 @@ a Ob3f brk
 
         <p>;Low-Byte speichern</p>
 
-        <pre><code>a 00bab DO 01 bes $0bae  
-;Unterlauf? .  
-a 00bad 88 dey  
-;High-Byte dekrementieren  
-a 00bae 84 fc sty $fe  
+        <pre><code>a 00bab DO 01 bes $0bae
+;Unterlauf? .
+a 00bad 88 dey
+;High-Byte dekrementieren
+a 00bae 84 fc sty $fe
 </code></pre>
 
         <p>;High-Byte speichern a 00bb0 20 5e 79 jsr $795c</p>
@@ -293,31 +293,31 @@ a 00bae 84 fc sty $fe
 
         <p>Mit dem eingebauten Monitor ist ein solcher Zugriff sehr einfach, da vor der eigentlichen Adresse nur eine Eins (Bank ]) angegeben werden muß und der Monitor dann selbsttätigaufdie gewünschte Bank schaltet. In unseren eigenen Programmen müssen wir jedoch »per Hand« zwischen Bank 0 und Bank | umschalten. Ich stelle nun ein erweitertes Initialisierungs-Programm vor, in dem zwei Umschaltroutinen vorhanden sind:</p>
 
-        <pre><code>a  
-a 00603 48 pha  
-a 00604 a9 00 lda #$00  
-a 00606 8d 00 ff sta $ff0O  
-a 00609 ad 06 d5 1da $d506  
-a 00bOc 09 06 ora #306  
-a 00b0e 8d 06 d5 sta $d506  
-a 00b11 68 pla  
-a 00b12 8d 00 ff sta $ffOO  
-a 00615 60 rts  
-a 00b16 08 php  
-a 00617 48 pha  
-a 00b18 a9 00 lda #$00  
-a 00bla 8d 00 ff sta $ffOO  
-a 00b1d 68 pla  
-a 00ble 28 plp  
-a 00b1f 60 rts  
-a 00b20 08 php  
-a 00b21 48 pha  
-a 00b22 a9 7f lda #$7f  
-a  
-a 00627 68 pla  
-a 00b28 28 plp  
-a 00629 60 rts  
-Dieses . erweiterte _lInitialisie-  
+        <pre><code>a
+a 00603 48 pha
+a 00604 a9 00 lda #$00
+a 00606 8d 00 ff sta $ff0O
+a 00609 ad 06 d5 1da $d506
+a 00bOc 09 06 ora #306
+a 00b0e 8d 06 d5 sta $d506
+a 00b11 68 pla
+a 00b12 8d 00 ff sta $ffOO
+a 00615 60 rts
+a 00b16 08 php
+a 00617 48 pha
+a 00b18 a9 00 lda #$00
+a 00bla 8d 00 ff sta $ffOO
+a 00b1d 68 pla
+a 00ble 28 plp
+a 00b1f 60 rts
+a 00b20 08 php
+a 00b21 48 pha
+a 00b22 a9 7f lda #$7f
+a
+a 00627 68 pla
+a 00b28 28 plp
+a 00629 60 rts
+Dieses . erweiterte _lInitialisie-
 </code></pre>
 
         <p>rungs-Programm enthält eine Routine zum Umschalten auf Bank 0 ab $0Bl6 und eine zweite zum Umschalten aufBank 1 ab $0B20. In beiden Fällen wird der Inhalt der beiden Register, die beim Ablauf verändert werden, Akku und Status, gerettet und nach beendetem Umschalten zurückgeholt. Beide Routinen können Sie daher in Ihren eigenen Programmen an beliebigen Stellen aufrufen, ohne sich Gedanken darüber zu machen, welche momentan benötigten Registerinhalte verändert werden könntenund daher vor dem Aufrufgerettet werden müssen.</p>
@@ -330,18 +330,18 @@ Dieses . erweiterte _lInitialisie-
 
         <p>Zum Anlegen einer Integervariablen genügen die bereits besprochenen Routinen des Basic-Interpreters. Wir gehen davon aus, daß unser Programm zum Beispiel nach dem Durchsuchen eines Arrays den Index eines Elementes, das dem von Basic übergebenen Suchkriterium entspricht, in einer Variablen an das Basic zurücküber-</p>
 
-        <pre><code>geben soll:  
-a 00630 20 5ce 79 jsr $795c  
-a 00633 20 af 7a jsr $7aaf  
-a 00636 20 20 Ob jsr $0b20  
-a 00639 a0 00 ldy #300  
-a 00b3b a9 02 lda #$02  
-a 00b3d 9149 sta ($49),y  
-a 00b3f c8 iny  
-a 00640 a9 04 lda #804  
-a 00b42 91 49 sta ($49),y  
-a 00b44 20 16 Ob jsr $0b16  
-a 00647 60 rts  
+        <pre><code>geben soll:
+a 00630 20 5ce 79 jsr $795c
+a 00633 20 af 7a jsr $7aaf
+a 00636 20 20 Ob jsr $0b20
+a 00639 a0 00 ldy #300
+a 00b3b a9 02 lda #$02
+a 00b3d 9149 sta ($49),y
+a 00b3f c8 iny
+a 00640 a9 04 lda #804
+a 00b42 91 49 sta ($49),y
+a 00b44 20 16 Ob jsr $0b16
+a 00647 60 rts
 </code></pre>
 
         <p>Rufen Sie dieses Programm mit »5YS DEC("0B30"),0,0,0,0,1%« auf. Denken Siejedoch daran, zuvor das erweiterte Initialisierungs-Programm einzugeben!</p>
@@ -350,14 +350,13 @@ a 00647 60 rts
 
         <p>Geben Sie bitte »PRINT I%« ein, nachdem die Routine bearbeitet wurde. Jedem, der nun erwartet, daß der Wert 1026 ausgegeben wird, empfehle ich, den kleinen Exkurs über die Variablenabspeicherung nachzulesen. Integervariablen werden in der ungewohnten Form »High/Low« abgelegt. Die als Wert eingetragenen Zahlen $02, $04 entsprechen somit dem Wert</p>
 
-        <pre><code>00600 ad 00 ff Ida $ffOO  
+        <pre><code>00600 ad 00 ff Ida $ffOO
 </code></pre>
 
-        <p>
-        <pre><code>00b24 8d 00 ff sta $ff0O  
+        <pre><code>00b24 8d 00 ff sta $ff0O
 </code></pre>
 
-        $0204 beziehungsweise der ausgegebenen Dezimalzahl 516.</p>
+        <p>$0204 beziehungsweise der ausgegebenen Dezimalzahl 516.</p>
 
         <h3>Anlegen einer Realvariablen</h3>
 
@@ -365,23 +364,23 @@ a 00647 60 rts
 
         <p>a 00650 20 5c 79 jsr $795c</p>
 
-        <pre><code>a 00653 20 af 7a jsr $7aaf  
-a 00656 20 20 Ob jsr $0b20  
-a 00659 a0 00 ldy #$00  
-a 00b5b a9 84 lda #$84  
-a 00b5d 9149 sta ($49),y  
-a 00b5f c8 iny  
-a 00b60 a9 20 lda #$20  
-a 00662 9149 sta ($49),y  
-a 00b64 a9 00 1da #$00  
-a 00666 c&amp;8 iny  
-a 00667 9149 sta ($49),y  
-a 00669 c8 iny  
-a 00b6a 91 49 sta ($49),y  
-a 00b6c c&amp; iny  
-a 00b6d 9149 sta ($49),y  
-a 00b6f 20 16 Ob jsr $0b16  
-a 00672 60 rts  
+        <pre><code>a 00653 20 af 7a jsr $7aaf
+a 00656 20 20 Ob jsr $0b20
+a 00659 a0 00 ldy #$00
+a 00b5b a9 84 lda #$84
+a 00b5d 9149 sta ($49),y
+a 00b5f c8 iny
+a 00b60 a9 20 lda #$20
+a 00662 9149 sta ($49),y
+a 00b64 a9 00 1da #$00
+a 00666 c&amp;8 iny
+a 00667 9149 sta ($49),y
+a 00669 c8 iny
+a 00b6a 91 49 sta ($49),y
+a 00b6c c&amp; iny
+a 00b6d 9149 sta ($49),y
+a 00b6f 20 16 Ob jsr $0b16
+a 00672 60 rts
 </code></pre>
 
         <p>Starten Sie dieses Programm mit »SYS DEC("0B50"),0,0,0,0,R«. Geben Sie anschließend ein: »PRINT R«. Wir erhalten den Dezimalwert 10 oder in Fließkommadarstellung: »84 20 00 00 00«.</p>
@@ -434,11 +433,11 @@ a 00672 60 rts
 
         <p>Wurde hingegen eine Stringvariable gelesen, laden wir das Y-Register mit dem Wert $02. lda $0f bne string lda $10 bne integer ldy #804 bne weiter integer 1dy #801 bne weiter string 1dy #302 weiter jsr $0b20 Soweit der prinzipielle Ablauf, den ich jedoch in ein kürzeres Programm umgesetzt habe:</p>
 
-        <pre><code>a 00b44 a5 0f Ida $0f  
-00646 dO 0a bne $0b52  
-00b48 a5 10 lda $10  
-00b4a dO 03 bne $0b4f  
-00b4c a0 04 ldy #804  
+        <pre><code>a 00b44 a5 0f Ida $0f
+00646 dO 0a bne $0b52
+00b48 a5 10 lda $10
+00b4a dO 03 bne $0b4f
+00b4c a0 04 ldy #804
 </code></pre>
 
         <p>00b4e 2c a0 01 bit $01a0</p>
@@ -463,17 +462,17 @@ a 00672 60 rts
 
         <h3>Vertauschen der Variablen</h3>
 
-        <pre><code>(-zeiger)  
-a 00657 b1 49 lda ($49),y  
-a 00659 aa tax  
-a 00b5a bi fb lda ($fb),y  
-a 00b5e 91 49 sta ($49),y  
-a 00b5e 8a txa  
-a 00b5f 91 fb sta ($fb),y  
-a 00b61 88 dey  
-a 00662 10 f3 bpl $0657  
-a 00664 20 16 Ob jsr $0b16  
-a 00667 60 rts  
+        <pre><code>(-zeiger)
+a 00657 b1 49 lda ($49),y
+a 00659 aa tax
+a 00b5a bi fb lda ($fb),y
+a 00b5e 91 49 sta ($49),y
+a 00b5e 8a txa
+a 00b5f 91 fb sta ($fb),y
+a 00b61 88 dey
+a 00662 10 f3 bpl $0657
+a 00664 20 16 Ob jsr $0b16
+a 00667 60 rts
 </code></pre>
 
         <p>Das Vertauschen der beiden Variablen geschieht analog zu den erwähnten Basic-Befehlen, jedoch byteweise. Als Zwischenspeicher dient das X-Register.</p>
@@ -482,39 +481,38 @@ a 00667 60 rts
 
         <h3>Komplettes Listing von »SWAP« a 00630 20 5c 79 jsr $795c</h3>
 
-        <pre><code>00633 20 af 7a jsr $7aaf  
-00636 a5 49 lda $49  
-00638 a6 4a ldx $4a  
-00b3a 85 fb sta $fb  
-00b3c 86 fc stx $fe  
-00b3e 20 5c 79 jsr $795c  
-00b41 20 af 7a jsr $7aaf  
-00b44 a5 Of lda $0f  
-00b46 dO 0a bne $0b52  
-00b48 a5 10 lda $10  
-00b4a dO 03 bne $0b4f  
-00b4c a0 04 ldy #804  
+        <pre><code>00633 20 af 7a jsr $7aaf
+00636 a5 49 lda $49
+00638 a6 4a ldx $4a
+00b3a 85 fb sta $fb
+00b3c 86 fc stx $fe
+00b3e 20 5c 79 jsr $795c
+00b41 20 af 7a jsr $7aaf
+00b44 a5 Of lda $0f
+00b46 dO 0a bne $0b52
+00b48 a5 10 lda $10
+00b4a dO 03 bne $0b4f
+00b4c a0 04 ldy #804
 </code></pre>
 
-        <p>
-        <pre><code>00b4e 2c a0 01 bit $01a0  
-00651 2c a0 02 bit $02a0  
-00654 20 20 Ob jsr $0b20  
+        <pre><code>00b4e 2c a0 01 bit $01a0
+00651 2c a0 02 bit $02a0
+00654 20 20 Ob jsr $0b20
 </code></pre>
 
-        <pre><code>00657 b1 49 lda ($49),y  
-00659 aa tax  
-00b5a b1 fb Ida ($fp),y  
-00b5e 91 49 sta ($49),y  
-00b5e 8a txa  
-00b5f 91 fb sta ($fb),y  
-00b61 88 dey  
-00b62 10 f3 bpl $0b57  
-00b64 20 16 Ob jsr $0b16  
-00667 60 rts  
+        <pre><code>00657 b1 49 lda ($49),y
+00659 aa tax
+00b5a b1 fb Ida ($fp),y
+00b5e 91 49 sta ($49),y
+00b5e 8a txa
+00b5f 91 fb sta ($fb),y
+00b61 88 dey
+00b62 10 f3 bpl $0b57
+00b64 20 16 Ob jsr $0b16
+00667 60 rts
 </code></pre>
 
-        Zum Testen des Programms geben Sie bitte ein:</p>
+        <p>Zum Testen des Programms geben Sie bitte ein:</p>
 
         <p>A$="C128":B$="C64"</p>
 
@@ -557,16 +555,16 @@ a 00667 60 rts
 
         <p>Zeropageadressen %%*ZEROPAGEADRESSEN* STREND = $35 ;ZEIGER AUF ENDE DES STRINGSTACKS</p>
 
-        <pre><code>ZEIGER = $49 ;ZEIGER AUF DESCRIPTOREN SPALTE = $EC ;CURSORSPALTE  
+        <pre><code>ZEIGER = $49 ;ZEIGER AUF DESCRIPTOREN SPALTE = $EC ;CURSORSPALTE
 </code></pre>
 
         <p>ZEILPOI = $EO ;ZEIGER:SPALTE O DER MOMENTANEN CURSORZEILE STREND zeigt immer das momentane Ende des Stringstacks, der bekanntlich von »oben« ($FFFF) nach unten wächst. ZEIGER ist der von GETPOS übergebene Zeiger auf die Descriptoren einer ausdem Basic-Text gelesenen Variablen. In SPALTE ist - bei Benutzung der Betriebssystem-Routinen zur Zeichenausgabe - die momentane Cursorspalte enthalten, und ZEIGER weist aufden Anfang der aktuellen Zeile, in der sich der Cursor befindet. Die aktuelle Cursorposition ergibt sich somit aus ZEIGER + SPALTE.</p>
 
         <h3>Eigene Variablen *%EIGENE VARIABLEN**</h3>
 
-        <pre><code>BANKO = $0B16  
-BANK1 = $0B20  
-ZLAENGE = $FB ;LAENGE DES STRINGS MIT DEN ZUGEL.ZEICHEN POSIT = $FC ;ZEIGER:POS. DES STRINGS MIT DEN ZUGEL.ZEICHEN STARTPOS = $A3 ;ZEIGER: STARTPOSITION DER EINGABE LAENGE = $A5 ;EINGABEL.MAX.  
+        <pre><code>BANKO = $0B16
+BANK1 = $0B20
+ZLAENGE = $FB ;LAENGE DES STRINGS MIT DEN ZUGEL.ZEICHEN POSIT = $FC ;ZEIGER:POS. DES STRINGS MIT DEN ZUGEL.ZEICHEN STARTPOS = $A3 ;ZEIGER: STARTPOSITION DER EINGABE LAENGE = $A5 ;EINGABEL.MAX.
 </code></pre>
 
         <p>BANKO und BANK] sind die Einsprungadressen für unsere Unterprogramme zur Bankumschaltung. In ZLAENGE und in POSIT, POSIT+1 werden die Descriptoren des Strings gespeichert, in dem die als Eingabe zulässigen Zeichen abgelegt wurden. STARTPOS, STARTPOS+1 ist die beim Aufruf übergebene Bildschirmposition, bei der die Eingabe beginnen soll. In LAENGE legen wir die ebenfalls vom Basic-Programm übergebene maximale Eingabelänge ab.</p>
@@ -579,34 +577,32 @@ ZLAENGE = $FB ;LAENGE DES STRINGS MIT DEN ZUGEL.ZEICHEN POSIT = $FC ;ZEIGER:POS.
 
         <p>;ZEICHEN AUS</p>
 
-        <pre><code>BASIN = $FFCF  
-LOG. DATEI HOLEN  
-CHKKOM = $795C ;AUF KOMMA PRUEFEN  
-;DESCRIPTOREN POS. EINER VARIABLEN HOLEN  
-;SPEICHERPLATZ RESERVIEREN ;ZEICHEN HOLEN ;CURSOR SETZEN ;DATEI OEFFNEN  
+        <pre><code>BASIN = $FFCF
+LOG. DATEI HOLEN
+CHKKOM = $795C ;AUF KOMMA PRUEFEN
+;DESCRIPTOREN POS. EINER VARIABLEN HOLEN
+;SPEICHERPLATZ RESERVIEREN ;ZEICHEN HOLEN ;CURSOR SETZEN ;DATEI OEFFNEN
 </code></pre>
 
-        <p>
-        <pre><code>GETPOS  
+        <pre><code>GETPOS
 </code></pre>
 
-        <pre><code>$7AAF  
+        <pre><code>$7AAF
 </code></pre>
 
-        <pre><code>STRRES  
+        <pre><code>STRRES
 </code></pre>
 
-        <pre><code>39299  
+        <pre><code>39299
 </code></pre>
 
-        <pre><code>GETIN = $FFE4 SETCRS = $FFFO OPEN = $FFCO  
+        <pre><code>GETIN = $FFE4 SETCRS = $FFFO OPEN = $FFCO
 </code></pre>
 
-        <pre><code>CLOSE = $FFC3 ;DATEI  
-SCHLIESSEN CHKIN = $FFC6 ;EINGABE AUF LOG. DATEI LEGEN CLRCH = $FFCC ;EINGABE AUF TASTATUR LEGEN SETFLS = $FFBA ;FILEPARAMETER SETZEN  
-SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START  
+        <pre><code>CLOSE = $FFC3 ;DATEI
+SCHLIESSEN CHKIN = $FFC6 ;EINGABE AUF LOG. DATEI LEGEN CLRCH = $FFCC ;EINGABE AUF TASTATUR LEGEN SETFLS = $FFBA ;FILEPARAMETER SETZEN
+SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 </code></pre>
-        </p>
 
         <h3>Parameter retten/Cursor setzen</h3>
 
@@ -761,12 +757,12 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>*CURSOR AUF STARTPOSITION* set-</p>
 
-        <pre><code>RETURN PLA ;GERETTETE  
-TAY ;STARTPOSITION  
-PLA ;HOLEN  
-TAX  
-CLC ;UND CURSOR  
-JSR SETCRS ;DARAUF SETZEN  
+        <pre><code>RETURN PLA ;GERETTETE
+TAY ;STARTPOSITION
+PLA ;HOLEN
+TAX
+CLC ;UND CURSOR
+JSR SETCRS ;DARAUF SETZEN
 </code></pre>
 
         <p>Ein Pointer auf diese Startposition wird nun errechnet, indem, wie bereits erwähnt, die momentane Cursorspalte zum Zeiger auf den Beginn der momentanen Cursorzeile addiert wird:</p>
@@ -793,9 +789,9 @@ JSR SETCRS ;DARAUF SETZEN
 
         <p>Im ersten Fall wurden nur vier Zeichen eingegeben, die von unserem Programm alle übernommen werden sollen. Die bis zur maximalen Länge folgenden Spaces auf dem Bildschirm sollen jedoch nicht mit in den anzulegenden String übernommen werden (ebensowenig wie beim Basic-Befehl INPUT). Als echte Eingabelänge muß daher eine Vier ermittelt werden. Im zweiten Beispiel wurden zwölf Zeichen eingegeben. Da die maximale Eingabelänge jedoch zehn beträgt und weitere Zeichen nicht übernommen werden sollen, muß unsere Routine als echte Länge eine Zehn ermitteln. *ECHTE EINGABELAENGE ERMITTELN* STARTP LDY LAENGE</p>
 
-        <pre><code>DEY  
-LECHT LDA (STARTPOS),Y CMP #32  
-BNE OKAY ;NACHFOLGENDE DEY ;SPACES cPY #255 ; ABSCHNEIDEN BNE LECHT  
+        <pre><code>DEY
+LECHT LDA (STARTPOS),Y CMP #32
+BNE OKAY ;NACHFOLGENDE DEY ;SPACES cPY #255 ; ABSCHNEIDEN BNE LECHT
 </code></pre>
 
         <p>Die Schleife beginnt mit einem TWert von Länge-l (DEY), das heißt im Beispiel ist Y=9. Zuerst wird daher auf das neunte Zeichen hinter der Startposition zugegriffen, also aufdaszehnte Zeichen derEingabe. Nun wird dieses Zeichen mit SPACE (=Code 32) verglichen. Ist es ungleich SPACE, wird das vorangehende Zeichen mit SPACE verglichen und so weiter.</p>
@@ -806,16 +802,15 @@ BNE OKAY ;NACHFOLGENDE DEY ;SPACES cPY #255 ; ABSCHNEIDEN BNE LECHT
 
         <p>Da das Y-Register die Länge minus eins enthält, erfolgt zuerst eine Korrektur (INY), bevor die echte Länge in LAENGE gespeichert wird. Anschließend werden CHKKOM und GETPOS aufgeru'fen, wir erhalten also in den Speicherzellen $49, $4A einen Zeiger auf die Descriptoren des Strings, in dem dieEingabe an das Basic übergeben werden soll.</p>
 
-        <pre><code>\*UEBERNAHMEVORBEREITUNGEN\* OKAY INY  
+        <pre><code>\*UEBERNAHMEVORBEREITUNGEN\* OKAY INY
 </code></pre>
 
-        <p>
-        <pre><code>STY LAENGE ;LECHT RETTEN  
-JSR CHKKOM ;=) ZEIGER AUF  
-JSR GETPOS ;UEBERN.STRING  
+        <pre><code>STY LAENGE ;LECHT RETTEN
+JSR CHKKOM ;=) ZEIGER AUF
+JSR GETPOS ;UEBERN.STRING
 </code></pre>
 
-        Platz für den anzulegend&amp;fi"String reservieren (STRRS = $9299)</p>
+        <p>Platz für den anzulegend&amp;fi"String reservieren (STRRS = $9299)</p>
 
         <p>LDA LAENGE</p>
 
@@ -877,7 +872,7 @@ JSR GETPOS ;UEBERN.STRING
 
         <p>BNE LIES</p>
 
-        <pre><code>LIES  
+        <pre><code>LIES
 </code></pre>
 
         <h3>Datei schließen /Standardeingabe setzen</h3>
@@ -894,21 +889,20 @@ JSR GETPOS ;UEBERN.STRING
 
         <p>Ängenommen, als Übergabestring wurde vom Basic-Programm A$ angegeben. Die Stringdescriptoren von A$ weisen unverändert auf dessen alte Position und beinhalten dessen alte Länge. Wir müssen daher diese Descriptoren noch aktualisieren, also den Längendescriptor mit der Länge und den Positionszeiger mit der Position unseres Strings versehen. Die Länge istin LAENGE enthalten und die Position entspricht der geänderten Untergrenze STREND des Stringstack, ab der wir unseren String anlegten.</p>
 
-        <pre><code>\*DESCRIPTOREN AKTUALISIEREN\* JSR BANK1 LDY #0  
-LDA LAENGE STA (ZEIGER),Y LDA STREND,Y INY  
-STA (ZEIGER) ,‚Y cPY #2  
-BNE DAKT  
-JSR BANKO RTS ;ZURUECK INS BASIC  
+        <pre><code>\*DESCRIPTOREN AKTUALISIEREN\* JSR BANK1 LDY #0
+LDA LAENGE STA (ZEIGER),Y LDA STREND,Y INY
+STA (ZEIGER) ,‚Y cPY #2
+BNE DAKT
+JSR BANKO RTS ;ZURUECK INS BASIC
 </code></pre>
 
-        <p>
-        <pre><code>DESAKT  
+        <pre><code>DESAKT
 </code></pre>
 
-        <pre><code>DAKT  
+        <pre><code>DAKT
 </code></pre>
 
-        Die Eingabe wurde nun komplett übernommen und das Programm kehrt ins Basic zurück. Zur Erinnerung noch einmal das Format des Aufrufs:</p>
+        <p>Die Eingabe wurde nun komplett übernommen und das Programm kehrt ins Basic zurück. Zur Erinnerung noch einmal das Format des Aufrufs:</p>
 
         <p>SYS DEC("0D00"),Länge,Zeile, Spalte,0,Zeichen$, Rückgabe$ Wie Sie wissen, kann GETPOS beliebige Variablentypen verarbeiten. Sie können daher als Zeichensatz- und als Rückgabestring auch Strings aus einem Stringarray angeben.</p>
 
@@ -936,8 +930,8 @@ JSR BANKO RTS ;ZURUECK INS BASIC
 
         <p>Wichtig für uns ist, daß jeder Fließkomma-Akkumulator gleich aufgebaut ist. Für unsere ÄAnwendungsbeispiele benötigen wir folgende Adressen:</p>
 
-        <pre><code>363 = FAC, Exponent $64-867 = FAC, Mantisse 368 = FAC, Vorzeichen  
-$6A = ARG, Exponent $6B-$6E = ARG, Mantisse $6F -= ARG, Vorzeichen  
+        <pre><code>363 = FAC, Exponent $64-867 = FAC, Mantisse 368 = FAC, Vorzeichen
+$6A = ARG, Exponent $6B-$6E = ARG, Mantisse $6F -= ARG, Vorzeichen
 </code></pre>
 
         <p>In den folgenden Beispielen werde ich drei Fließkommazahlen verwenden, mit denen die ver-</p>
@@ -964,31 +958,31 @@ $6A = ARG, Exponent $6B-$6E = ARG, Mantisse $6F -= ARG, Vorzeichen
 
         <p>Die folgende Maschinenroutine rettet den Inhalt des Fließkommaakkus Nummer |, der beim Aufruf des Monitors durch diesen verändert wird:</p>
 
-        <pre><code>a 00630 a2 04 ldx #804  
-a 00b32 b5 63 lda $63,x  
-a 00634 9d 00 Od sta $0d00,x  
-a 00637 ca dex  
-a 00b38 10 f8 bpl $0b32  
-a 00b3a 60 rts  
-136  
+        <pre><code>a 00630 a2 04 ldx #804
+a 00b32 b5 63 lda $63,x
+a 00634 9d 00 Od sta $0d00,x
+a 00637 ca dex
+a 00b38 10 f8 bpl $0b32
+a 00b3a 60 rts
+136
 </code></pre>
 
         <h3>Fließkomma nach Integer wandeln ($8CC7)</h3>
 
         <p>Diese Routine wandelt einen Fließkommawert, der sich im FAC befindet, in eine Zwei-Byte-Integerzahl, die wiederum im FAC abgelegt wird (in $66/$867 =</p>
 
-        <pre><code>High/Low).  
-a 00b40 a2.04 ldx #804  
-a 00b42 bd 50 Ob 1da $0b50,x  
-a 00645 95 63 sta $863,x  
-a 00647 ca dex  
-a 00b48 10 f8 bp1 $0b42  
-a 00b4a 20 c7 8c jsr $8cc7  
-a 00b4d 4c 30 Ob jmp $0b30  
-a 00650 84 a0 sty $a0  
-a 00652 00 brk  
-a 00653 00 brk  
-a 00b54 00 brk  
+        <pre><code>High/Low).
+a 00b40 a2.04 ldx #804
+a 00b42 bd 50 Ob 1da $0b50,x
+a 00645 95 63 sta $863,x
+a 00647 ca dex
+a 00b48 10 f8 bp1 $0b42
+a 00b4a 20 c7 8c jsr $8cc7
+a 00b4d 4c 30 Ob jmp $0b30
+a 00650 84 a0 sty $a0
+a 00652 00 brk
+a 00653 00 brk
+a 00b54 00 brk
 </code></pre>
 
         <p>Da das Ende dieses Listings ein wenig ungewöhnlich erscheinen mag, will ich die letzten Befehle genauer erläutern: Um eine Integerzahl in eine Fließkommazahl oder eine Fließkommazahl in eine Integerzahl zu wandeln, muß erstereim FAC #1 abgelegt sein. In diesem Beispiel verwende ich die Dezimalzahl zehn, die sich, im Fließkommaformat abgelegt, am Programmende befindet: m 0b50 84 a0 00 00 00</p>
@@ -1007,13 +1001,13 @@ a 00b54 00 brk
 
         <p>Die Integerzahl wird dieser Routine in den Speicherzellen $64, $65 (High/Low) übergeben. Das X-Register muß vor dem Aufruf unmittelbar mit $90 geladen werden:</p>
 
-        <pre><code>a 00b60 a9 01 lda #$01  
-a 00b62 a2 00 ldx #$00  
-a 00b64 85 64 sta $64  
-a 00b66 86 65 stx 865  
-a 00b68 a2 90 1dx #$90  
-a 00b6a 20 70 8c jsr $8c70  
-a 00b6d 4c 30 Ob jmp $0b30  
+        <pre><code>a 00b60 a9 01 lda #$01
+a 00b62 a2 00 ldx #$00
+a 00b64 85 64 sta $64
+a 00b66 86 65 stx 865
+a 00b68 a2 90 1dx #$90
+a 00b6a 20 70 8c jsr $8c70
+a 00b6d 4c 30 Ob jmp $0b30
 </code></pre>
 
         <p>Nach dem Aufruf mit »SYS DEC ("0B60")« befindet sich die übergebene Zahl +$0100 im Fließkommaformat im FAC #1. Die Routine $0B30 überträgt sie nach $0DOO bis $0D04, wovon Sie sich wiederummit dem Monitor überzeugen können.</p>
@@ -1022,14 +1016,14 @@ a 00b6d 4c 30 Ob jmp $0b30
 
         <p>Wahrscheinlich werden Sie diese Routine, die die üblichen positiven Integerwerte ins Fließkommaformat wandelt, häufiger in Ihren Programmen verwenden. Auch dieser Routine wird die zu wandelnde Integerzahl in den Speicherzellen $64, $65 übergeben und auch das X-Register vor dem Aufruf unmittelbar mit $90 geladen. Weiterhin muß das Carry-Flag vor dem Einsprung gesetzt werden.</p>
 
-        <pre><code>a 00680 a9 ff lda #$ff  
-a 00b82 a2 01 ldx #801  
-a 00b84 85 64 sta 864  
-a 00686 86 65 stx $65  
-a 00b88 a2 90 1dx #890  
-a 00b8a 38 sec  
-a 00b8b 20 75 8c jsr 88075  
-a 00b8e 4c 30 Ob jmp $0b30  
+        <pre><code>a 00680 a9 ff lda #$ff
+a 00b82 a2 01 ldx #801
+a 00b84 85 64 sta 864
+a 00686 86 65 stx $65
+a 00b88 a2 90 1dx #890
+a 00b8a 38 sec
+a 00b8b 20 75 8c jsr 88075
+a 00b8e 4c 30 Ob jmp $0b30
 </code></pre>
 
         <p>Dieses Demoprogramm übergibt den Wert $FFOl. Nach dem Aufruf mit »SYS DEC("0B80") befindet sich die gerettete Fließkommazahl in $0D00 bis $0D04: m 0d00 90 ff 01 00 00</p>
@@ -1048,15 +1042,15 @@ a 00b8e 4c 30 Ob jmp $0b30
 
         <p>Zuerst übergeben wir eine positive Integerzahl an die Speicherzellen $64, $65 und rufen $8C75 auf, die die Wandlung ins Fließkommaformat vornimmt. Anschließend wird $8E42 aufgerufen und die Zahl dadurch in einen String umgewandelt, der mit $55E2 ab der momentanen Cursorposition ausgegeben wird:</p>
 
-        <pre><code>a 00ba0 a9 ff lda #$ff  
-a 00ba2 a2 01 ldx #801  
-a 00ba4 85 64 sta $64  
-a 00ba6 86 65 stx 865  
-a 00ba8 a2 90 ldx #390  
-a 00Obaa 38 sec  
-a 00bab 20 75 8c jsr $8c75  
-a 00bae 20 42 8e jsr $8e42  
-a 00bb1 4c e2 55 jmp $55e2  
+        <pre><code>a 00ba0 a9 ff lda #$ff
+a 00ba2 a2 01 ldx #801
+a 00ba4 85 64 sta $64
+a 00ba6 86 65 stx 865
+a 00ba8 a2 90 ldx #390
+a 00Obaa 38 sec
+a 00bab 20 75 8c jsr $8c75
+a 00bae 20 42 8e jsr $8e42
+a 00bb1 4c e2 55 jmp $55e2
 </code></pre>
 
         <p>Das Demoprogramm verwendet die Zahl $FFO1, also dezimal 65281. Wenn Sie esmit»SYS DEC("0BAO"%« starten, wird eben diese Zahl auf dem Bildschirm ausgegeben. Außerst angenehm an diesen Routinen ist, daß Sie zwar nicht ohne das Fließkommaformat auskommen, der Programmierer selbst mit diesem jedoch nicht im geringsten in Berührung kommt, sondern nur eine Integerzahl übergibt.</p>
@@ -1079,41 +1073,40 @@ a 00bb1 4c e2 55 jmp $55e2
 
         <p>Diese Routine addiertzweiin FAC #1 (=FAC) und FAC #2 (=ARG) hinterlegte Fließkommazahlen. a 00bd0 a2 04 ldx #804</p>
 
-        <pre><code>a 00be2 a2 01  
+        <pre><code>a 00be2 a2 01
 </code></pre>
 
-        <p>
-        <pre><code>a 00bd2 ba e8 Ob 1da $Obe8,x  
-a 00bd5 95 63 sta $63,x  
-a 00bd7 bd ed Ob Ida $Obed,x  
-a 00bda 95 6a sta $6a,x  
-a 00Obde ca dex  
-a 00bdd 10 £3 bpl $0bd2  
-a 0O0bdf 20 48 88 jsr 88848  
-;FAC = FAC + ARG  
-a 0O0be2 20 42 8e jsr $8e42  
-a 00be5 4c e2 55 jmp $55e2  
-a 00be8 84 80 sty $80  
-a 00bea 00 brk  
-a 00beb 00 brk  
-a 00Obec 00 brk  
-a 00bed 8d 80 10 sta $1080  
-a 00bf0O 00 brk  
-a 00bf1 00 brk  
+        <pre><code>a 00bd2 ba e8 Ob 1da $Obe8,x
+a 00bd5 95 63 sta $63,x
+a 00bd7 bd ed Ob Ida $Obed,x
+a 00bda 95 6a sta $6a,x
+a 00Obde ca dex
+a 00bdd 10 £3 bpl $0bd2
+a 0O0bdf 20 48 88 jsr 88848
+;FAC = FAC + ARG
+a 0O0be2 20 42 8e jsr $8e42
+a 00be5 4c e2 55 jmp $55e2
+a 00be8 84 80 sty $80
+a 00bea 00 brk
+a 00beb 00 brk
+a 00Obec 00 brk
+a 00bed 8d 80 10 sta $1080
+a 00bf0O 00 brk
+a 00bf1 00 brk
 </code></pre>
 
-        Rufen Sie die Routine mit »SYS DEC("O0BD0O"') auf. Die Fließkommazahlen ($08=8 und $1002= 4098) befinden sich am Ende des Programms und werden in einer Schleife anden FAC und ARG übergeben. Anschließend wird die Additions-Routine die ASCII-Wandlungs- und die Ausgabe-Routine aufgerufen. Wir erhalten die Ausgabe der Zahl 4106 = 8 + 4098.</p>
+        <p>Rufen Sie die Routine mit »SYS DEC("O0BD0O"') auf. Die Fließkommazahlen ($08=8 und $1002= 4098) befinden sich am Ende des Programms und werden in einer Schleife anden FAC und ARG übergeben. Anschließend wird die Additions-Routine die ASCII-Wandlungs- und die Ausgabe-Routine aufgerufen. Wir erhalten die Ausgabe der Zahl 4106 = 8 + 4098.</p>
 
         <h3>FAC = ARG - FAC ($8831)</h3>
 
         <p>Auch diese Routine benötigt zwei in FAC und ARG hinterlegte Fließkommazahlen. Achten Sie bitte darauf, daß FAC von ARG subtrahiert wird und nicht umgekehrt. Um die Anwendung zu demonstrieren, ersetzen Sie bitte einfach im letzten Programm den Befehl »jsr 8848 durch »jsr 8831«:</p>
 
-        <pre><code>a 0Obde ca dex  
-a 00Obdd 10 £3 bp1l $0bd2  
-a 0O0bdf 20 48 88 jsr $8848  
-;FAC = FAC - ARG .  
-a 0O0be2 20 42 8e jsr $8e42  
-a 00be5 4c e2 55 jmp $55e2  
+        <pre><code>a 0Obde ca dex
+a 00Obdd 10 £3 bp1l $0bd2
+a 0O0bdf 20 48 88 jsr $8848
+;FAC = FAC - ARG .
+a 0O0be2 20 42 8e jsr $8e42
+a 00be5 4c e2 55 jmp $55e2
 </code></pre>
 
         <p>Als Ergebnis erhalten wir 4090 = 4098 - 8.</p>
@@ -1122,12 +1115,12 @@ a 00be5 4c e2 55 jmp $55e2
 
         <p>Der Aufruf unterscheidet sich in keiner Weise von den vorangehenden Arithmetik-Routinen. Ersetzen Sie daher »jsr 8848« durch »jsr 8a27«:</p>
 
-        <pre><code>a 0Obde ca dex  
-a 00bdd 10 £f3 bpl $0bd2  
-a 00bdf 20 48 88 jsr $8a27  
-;FAC = FAC \* ARG  
-a 00be2 20 42 8e jsr $8e42  
-a 00be5 4c e2 55 jmp $55e2  
+        <pre><code>a 0Obde ca dex
+a 00bdd 10 £f3 bpl $0bd2
+a 00bdf 20 48 88 jsr $8a27
+;FAC = FAC \* ARG
+a 00be2 20 42 8e jsr $8e42
+a 00be5 4c e2 55 jmp $55e2
 </code></pre>
 
         <p>Als Ausgabe erhalten wir 32784 = 8 * 4098.</p>
@@ -1136,12 +1129,12 @@ a 00be5 4c e2 55 jmp $55e2
 
         <p>Ändern Sie nun »jsr 8427« ab in »jsr 8b4c«. Sie erhalten die Ausgabe von 512.25 = 4098 / 8. Achten Sie bitte wie bei der Subtraktion auch hier auf die Reihenfolge von Dividend und Divisor:</p>
 
-        <pre><code>a O0Obde ca dex  
-a 00bdd 10 £3 bpl $0bd2  
-a 00bdf 20 48 88 jsr $8b4c  
-;FAC = ARG / FAC  
-a 00be2 20 42 8e jsr $8e42  
-a 00be5 4c e2 55 jmp $55e2  
+        <pre><code>a O0Obde ca dex
+a 00bdd 10 £3 bpl $0bd2
+a 00bdf 20 48 88 jsr $8b4c
+;FAC = ARG / FAC
+a 00be2 20 42 8e jsr $8e42
+a 00be5 4c e2 55 jmp $55e2
 </code></pre>
 
         <p>Zum Abschluß möchte ich noch zwei Spezialroutinen vorstellen, die in den entsprechenden Fällen zum einen weniger Vorbereitungen benötigen und zum anderen erheblich schneller arbeiten als die Benutzung von FAC=FAC*ARG oder FAC= ARG/FAC.</p>
@@ -1150,40 +1143,41 @@ a 00be5 4c e2 55 jmp $55e2
 
         <p>Sollte in Ihren Programmen eine entsprechende Anwendung gegeben sein, so ersparen Sie sich mit dieser Routine die Wandlung von Zehn ins Fließkommaformat.</p>
 
-        <pre><code>a 00bd0 a2 04 ldx #804  
-a 00bd2 hd e8 Ob 1da $Obe3,x  
-a 00bd5 95 63 sta $63,x  
-a 00bd7 ca dex  
-a 00bd8 10 £3 bpl $0bd2  
-a 00bda 20 48 88 jsr $8b17  
-;FAC = FAC \* 10  
-a 00bdd 20 42 8e jsr $8e42  
-a 00be0 4c e2 55 jmp $55e2  
-a 00be3 84 80 sty $80  
-a 00be5 00 brk  
-a 00be6 00 brk  
-a 00be7 00 brk  
+        <pre><code>a 00bd0 a2 04 ldx #804
+a 00bd2 hd e8 Ob 1da $Obe3,x
+a 00bd5 95 63 sta $63,x
+a 00bd7 ca dex
+a 00bd8 10 £3 bpl $0bd2
+a 00bda 20 48 88 jsr $8b17
+;FAC = FAC \* 10
+a 00bdd 20 42 8e jsr $8e42
+a 00be0 4c e2 55 jmp $55e2
+a 00be3 84 80 sty $80
+a 00be5 00 brk
+a 00be6 00 brk
+a 00be7 00 brk
 </code></pre>
 
         <p>Der Aufruf mit »SYS DEC("0BD0O") führt zur Ausgabe von 80 = 8* 10.</p>
 
         <h3>FAC = FAC / 10 ($8B38)</h3>
 
-        <pre><code>a 00bd7 ca dex  
-a 00bd8 10 £3 bpl $0bd2  
-a 00bda 20 48 88 jsr $8b17  
-;FAC = FAC \* 10  
-a DObdd 20 42 8e jsr $8e42  
-a 00be0O 4c e2 55 jmp $55e2 |  
+        <pre><code>a 00bd7 ca dex
+a 00bd8 10 £3 bpl $0bd2
+a 00bda 20 48 88 jsr $8b17
+;FAC = FAC \* 10
+a DObdd 20 42 8e jsr $8e42
+a 00be0O 4c e2 55 jmp $55e2 |
 </code></pre>
 
         <p>Nach dem Aufruferhalten wir die Ausgabe von 0,8 = 8/ 10.</p>
 
         <p>Wollen Sie sich die Fließkommaarithmetik auch fürdasRechnenmit Integerzahlen zunutze machen, sieht der Ablauf prinzipiell wie folgt aus:</p>
 
-        <p>l. Akku und X-Register mit dem ersten Wert laden</p>
-
         <ol>
+            <li>
+                <p>Akku und X-Register mit dem ersten Wert laden</p>
+            </li>
             <li>
                 <p>Eine eigene Unterroutine aufrufen, die die Registerinhalte benutzt, um sie der Wandlungsroutine INTEGER nach FLIESSKOMMA zu übergeben und diese aufruft</p>
             </li>
@@ -1199,28 +1193,23 @@ a 00be0O 4c e2 55 jmp $55e2 |
             <li>
                 <p>Die entsprechende Arithmetik-Routine aufrufen</p>
             </li>
+            <li>
+                <p>Ein eigenes Unterprogramm aufrufen, das die Wandlungsroutine FLIESSKOMMA nach INTEGER aufruft und den Inhalt der Speicherzellen $66, $67 dem Hauptprogramm im Akku und im X-Register übergibt</p>
+            </li>
         </ol>
-
-
-        <p>7.Ein eigenes Unterprogramm aufrufen, das die Wandlungsroutine FLIESSKOMMA nach INTEGER aufruft und den Inhalt der Speicherzellen $66, $67 dem Hauptprogramm im Akku und im X-Register übergibt</p>
 
         <p>Nachdem Sie diese kleinen Unterprogramme geschrieben haben, genügen zur Multiplikation von $00A5 mit $02B2 folgende Befehle:</p>
 
-        <p>LDA #$B2</p>
-
-        <p>LDX #802</p>
-
-        <p>JSR ROUTINE1 ;$02b2 nach Fließkomma wandeln</p>
-
-        <pre><code>JSR ROUTINE2 ;FAC in ARG kopieren LDA #845  
-LDX #800  
-JSR ROUTINE1 ;$00a5 nach Fließkomma wandeln JSR ARITHMETIKROUTINE ;Operation durchführen  
-</code></pre>
-
-        <pre><code>JSR ROUTINE3 ;Fließkomma nach Integer wandeln  
-</code></pre>
-
-        <pre><code>und nach A,X  
+        <pre><code>LDA #$B2
+LDX #802
+JSR ROUTINE1 ;$02b2 nach Fließkomma wandeln
+JSR ROUTINE2 ;FAC in ARG kopieren
+LDA #845
+LDX #800
+JSR ROUTINE1 ;$00a5 nach Fließkomma wandeln
+JSR ARITHMETIKROUTINE ;Operation durchführen
+JSR ROUTINE3 ;Fließkomma nach Integer wandeln
+und nach A,X
 </code></pre>
 
         <address class="author">(S. Baloui / ah)</address>

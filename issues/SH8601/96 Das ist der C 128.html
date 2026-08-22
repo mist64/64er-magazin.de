@@ -64,17 +64,14 @@
 
         <p>Während der C64 bei jedem auftretenden Fehler unerbittlich sein Programm mit einer entsprechenden Meldung beendet, bietet der C 128hier einiges mehr an Flexibilität. Mit der TRAP-Anweisung können alle auftretenden Fehler während des Programmablaufs abgefangen werden. Zum Beispiel wird nach der Anweisung »TRAP 500« beim Auftreten eines Fehlers das Programm nicht unterbrochen, sondern es wird in eine Fehlerbehandlungsroutine (hier ab Zeile 500) verzweigt. Alle wichtigen Daten über den Fehler werden in Systemvariablen gespeichert und können von der (vom Programmierer zu schreibenden) Basic-Routine ab Zeile 500 ausgewertet werden: EL enthält die Zeilennummer, in der der Fehler auftrat, ER enthält die Fehlernummer und ERR$ liefert die Fehlermeldung im Klartext. Die Fehlerbehandlungsroutine kann diese Variablen auswerten, um gezielte Maßnahmen zu ergreifen. AnschlieRend sollte das Programm natürlich weiter fortgesetzt werden können. Dazu dient die RESUME-Anweisung, die eine Fehlerbehandlung abschließt (vergleichbar mit RETURN bei Unterprogrammen). RESUME kann auf drei verschiedene Arten verwendet werden. RESUME ohne weitere Parameter kehrt zu der Anweisung zurück, die den Fehler verursacht hat und setzt das Programm dort ganz normal fort. In diesem Falle muß natürlich in der Fehlerbehandlungsroutine die Fehlerursache behoben worden sein, sonst trittder Fehler sofort wieder auf. Ein gutes Beispiel ist der 'lest, ob der Drucker eingeschaltet ist:</p>
 
-        <pre><code>10 TRAP 90 20 PRINT#1, "DRUCKER OK" 30 END  
+        <pre><code>10 TRAP 90 : OPEN 1,4
+20 PRINT#1, "DRUCKER OK"
+30 END
+90 IF ER=5 AND EL=10 THEN PRINT "BITTE DRUCKER EINSCHALTEN UND TASTE DRUECKEN" : GETKEY A$
+95 RESUME
 </code></pre>
 
-        <p>
-        <pre><code>: OPEN 1,4  
-</code></pre>
-
-        <pre><code>90 IF ER=5 AND EL=10 THEN PRINT "BITTE DRUCKER EINSCHALTEN UND TASTE DRUECKEN" : GETKEY A$ 95 RESUME  
-</code></pre>
-
-        Dieses kleine Demo-Programm gibt den Text »Drucker OK« auf einem angeschlossenen Drucker aus. Falls der Drucker nicht eingeschaltet sein sollte, würde der OPEN-Befehl in Zeile 10 normalerweise zur Fehlermeldung »Device not present« führen. Diese Meldung wird aber durch den TRAP-Befehl im Falle eines Falles abgefangen und statt dessen zur Zeile 90 verzweigt, wo nach Überprüfung auf Fehlernummer und -zeile der Benutzer höflich aufgefordert wird, doch bitteschön den Drucker einzuschalten. Der Befehl GETKEY wartet anschließend auf einen Tastendruck, worauf das Programm durch den RESUME-Befehl wieder zum OPEN-Kommando zurückkehrt.</p>
+        <p>Dieses kleine Demo-Programm gibt den Text »Drucker OK« auf einem angeschlossenen Drucker aus. Falls der Drucker nicht eingeschaltet sein sollte, würde der OPEN-Befehl in Zeile 10 normalerweise zur Fehlermeldung »Device not present« führen. Diese Meldung wird aber durch den TRAP-Befehl im Falle eines Falles abgefangen und statt dessen zur Zeile 90 verzweigt, wo nach Überprüfung auf Fehlernummer und -zeile der Benutzer höflich aufgefordert wird, doch bitteschön den Drucker einzuschalten. Der Befehl GETKEY wartet anschließend auf einen Tastendruck, worauf das Programm durch den RESUME-Befehl wieder zum OPEN-Kommando zurückkehrt.</p>
 
         <p>Soll das zum Fehler führende Kommando nicht nochmals ausgeführt werden, dann muß die Fehlerbehandlungsroutine mit RESUME NEXT abgeschlossen werden, wodurch mit dem nächsten Befehl nach der Fehlerursache weitergemacht wird. In besonderen Fällen kann es nach einem Fehler nützlich sein, ganz woanders im Programm fortzufahren. IneinemsolchenFallekann hinter RESUME eine Zeilennummer angegeben werden, an der das Programm fortgesetzt werden soll.</p>
 
@@ -92,9 +89,9 @@
 
         <p>Das 7.0 Basic bietet eine ganze Reihe spezieller Schleifen- und Strukturbefehle zur GOTO-freien, strukturierten Programmierung. Da wäre zunächst einmal die Erweiterung der IF..THEN-Abfrage um die ELSE-Klausel. Bisher mußte man beispielsweise alternative Entscheidungen wie folgt programmieren:</p>
 
-        <pre><code>10 IF A$="N" THEN PRINT "NEIN" : GOTO 30  
-20 PRINT "JA"  
-30 REM HIER GEHT'S WEITER.  
+        <pre><code>10 IF A$="N" THEN PRINT "NEIN" : GOTO 30
+20 PRINT "JA"
+30 REM HIER GEHT'S WEITER.
 </code></pre>
 
         <p>Im 7.0 Basic reicht dazu eine Zeile, und die ist noch um einiges leichter verständlich:</p>
@@ -107,7 +104,12 @@
 
         <p>Alle zwischen BEGIN und BEND stehenden Basic-Zeilen stellen einen Block dar, der vom Basic-Interpreter genauso wie eine einzelne Zeile behandelt wird. Deshalb wird BEGIN..BEND besonders vorteilhaft bei IF-Abfragen benutzt:</p>
 
-        <pre><code>10 INPUT "HEISST DEIN COMPUTER COMMODORE ODER SCHNEIDER? ";C$ 20 IF C$="COMMODORE" THEN BEGIN 30: PRINT "C 128 KAUFEN!" 40: BEND: ELSE BEGIN 50: PRINT "VERRÄTER! " 60 BEND  
+        <pre><code>10 INPUT "HEISST DEIN COMPUTER COMMODORE ODER SCHNEIDER? ";C$
+20 IF C$="COMMODORE" THEN BEGIN
+30: PRINT "C 128 KAUFEN!"
+40: BEND: ELSE BEGIN
+50: PRINT "VERRÄTER! "
+60 BEND
 </code></pre>
 
         <p>Man beachte, daß sich die IF Anweisung insgesamt von Zeile 20 bis Zeile 60 erstreckt. In diesem Beispiel erhält man den Ratschlag, sich einen C 128 zu kaufen, falls der Computer »Commodore« heißt. Hat man jedoch »Schneiden (oder etwas anderes) als Namen angegeben, wird man sofort als »Verräter« tituliert.</p>
@@ -118,9 +120,11 @@
 
         <p>Aber nicht nur Verzweigungen lassen sich derart elegant programmieren, besonders bei Schleifen, also bei Wiederholungen von bestimmten Programmteilen, spielt das7.0Basic seine Stärken erstrichtig aus. Es ist ja vom C64 her bekannt, daß eine FOR..NEXT-Schleife um einiges schneller ist als die gleiche Schleife mittels IF und GOTO programmiert. Nachteilig bei der FOR...Next Schleife ist, daß die Anzahl der Schleifendurchläufe schon bei Eintritt in die Schleife bekannt sein muß. Dieser Nachteil wird durch die neue, schnelle DO..LOOP-Schleifenstruktur behoben. Wie FOR...NEXT umklammert auch DO..LOOP einen beliebig großen Programmteil. Die Wirkung des DO-Befehls besteht einfach darin, daß der Basic-Interpreter sich den Anfang der Schleife »merkt«. Bei Erreichen des zugehörigen LOOP wird dann sehr schnell, ohne Suchzeiten, zu DO zurückgesprungen. Es ergibt sich also eine »unendliche Schleife« zwischen DO und LOOP Um diese Schleife dennoch verlassen zu können, ist der EXIT-Befehl vorgesehen. Die Wirkung von EXIT besteht einfach darin, die Programmausführung hinter LOOP ganz normal fortzusetzen. Normalerweise wird EXIT daher von einer Bedingung abhängig gemacht. Beispiel:</p>
 
-        <pre><code>10 X=1  
-20 DO  
-30 : X=X%2 : PRINT X 40 : IF X &gt; 1500 THEN EXIT 50 LOOP  
+        <pre><code>10 X=1
+20 DO
+30 : X=X%2 : PRINT X
+40 : IF X &gt; 1500 THEN EXIT
+50 LOOP
 </code></pre>
 
         <p>Der Wert X wird hier solange verdoppelt und ausgedruckt, bis der Wert 1500 überschritten wird. Neben dieser unbedingten DO...LOOP-Schleife sind noch zwei von Bedingungen abhängige Formen vorgesehen. DO WHILE.. LOOP wird so lange ausgeführt, wie eine nach WHILE stehende Bedingung wahr ist: 10 DO WHILE A$=" ":GET A$:LOOP</p>
@@ -261,29 +265,31 @@
 
         <p>Im C128-Modus kann man zwischen ASCI- und DIN-Tastatur über eine Umschalttaste oder über POKE-Befehle vom Programm aus wählen. Diese Umschaltung steht dem Benutzer auch im C64-Modus zur Verfügung. Die DIN-Taste funktioniert auch im C64-Modus. Allerdings wird im C64-Modus nur der Zeichensatz, nicht aber die Tastaturcodes geändert. Dadurch kommt eine etwas merkwürdige Tastenbelegung zustande. Im Programm wird diese Umschaltung (ASCI nach DIN) folgendermaßen vorgenommen:</p>
 
-        <pre><code>POKE 0, PEEK(0) OR 64: POKE1,0  
+        <pre><code>POKE 0, PEEK(0) OR 64: POKE1,0
 </code></pre>
 
         <p>Im C128-Modus kann der Benutzer mitdem FAST-Befehl vom 1-MHz Takt auf den 2-MHz-Takt umschalten. Hierdurch kann eine erhebliche Steigerung der Verarbeitungsgeschwindigkeit erreicht werden. Dies ist auch im C64-Modus möglich. Falls Sie bereits einen C128 besitzen, geben Sie einmal folgendes Programm ein:</p>
 
-        <pre><code>10 POKE 53265, PEEK (53265)  
-and 239  
-20 POKE 53296, PEEK (53296) OR 1 30 FOR I=1 TO 1000:PRINT"A":NEXT 40 POKE 53296, PEEK (53296) AND 254  
-50 POKE 53265, PEEK (53265) OR 16  
+        <pre><code>10 POKE 53265, PEEK (53265)
+and 239
+20 POKE 53296, PEEK (53296) OR 1
+30 FOR I=1 TO 1000:PRINT"A":NEXT
+40 POKE 53296, PEEK (53296) AND 254
+50 POKE 53265, PEEK (53265) OR 16
 </code></pre>
 
         <p>Im Vergleich zwischen dem C64 und dem C 128 im C 64-Modus mit 2 MHzwird die Ausgabe von 1000 mal »A« von 35 Sekunden auf 20 Sekunden verkürzt. Hierbei wird allerdings auch der Bildschirm abgeschaltet. Diese Routine kann für alle zeitaufwendigen Programmschritte genutzt werden, bei denen keine Bildschirmausgabe erfolgt.</p>
 
         <p>Der dritte Unterschied zum C64 taucht bei Benutzung der C 157 I-Floppy-Station auf. In C128-Mode wird die Diskette doppelseitig genutzt. Durch den Befehl</p>
 
-        <pre><code>OPEN 15,8,15,"UO &gt; M1":CLOSE 15  
+        <pre><code>OPEN 15,8,15,"UO &gt; M1":CLOSE 15
 </code></pre>
 
         <p>ist dies auch im C64-Modus möglich. Formatieren Sie jetzt eine Diskette und lassen sich das Directory auflisten, werden Sie mit der Meldung »1328 Blocks free« überrascht. Sie haben also den Speicherplatz auf der Diskette verdoppelt.</p>
 
         <p>Sind die Disketten schon einseitig beschrieben (zum Beispiel vom C 64) und man möchte die Rückseite nutzen, muß folgender Befehl eingegeben werden:</p>
 
-        <pre><code>OPEN 15,8,15,"U0 &gt; H1"  
+        <pre><code>OPEN 15,8,15,"U0 &gt; H1"
 </code></pre>
 
         <p>Das Laufwerk gibt dann zwar ein starkes Rattern von sich, nutzt die Diskette aber von der Rückseite. Ist die Diskette neu formatiert, so unterbleibt das Rattern.</p>
