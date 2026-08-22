@@ -58,7 +58,18 @@ TITLE_TAG = re.compile(r"<title>(.*?)</title>", re.I | re.S)
 
 # A hyphen followed by whitespace between two word characters, the lowercase
 # continuation marking it as a broken word rather than a compound.
-SOFT_HYPHEN = re.compile(r"(\w)[-‐­]\s+([a-zäöüßéèàçñ])")
+#
+# EXCEPT the German SUSPENDED hyphen, which is lowercase too and is NOT a break:
+# `RGB- und Composite-Signal`, `Ein- und Ausgabe`, `Kaypro- etc.`.  Joining those
+# produced `RGBund` / `Einund` / `Kayproetc.` -- harmless where both sides do it,
+# but it FABRICATES a difference wherever the block exists on one side only, and
+# it makes the diff read as our error where the HTML is right.  MEASURED on
+# SH8601 r330.  The list is the closed set of words that can follow one.
+SOFT_HYPHEN = re.compile(
+    r"(\w)[-‐­]\s+"
+    r"(?!(?:und|oder|bzw|beziehungsweise|sowie|wie|etc|usw)\b)"
+    r"([a-zäöüßéèàçñ])"
+)
 
 TOKEN = re.compile(r"\w+|[^\w\s]", re.UNICODE)
 

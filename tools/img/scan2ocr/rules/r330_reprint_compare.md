@@ -202,7 +202,14 @@ is the whole point of having it:
   `<br>` becomes a space;
 - **end-of-line hyphenation** — `Approximations- schleife` → `Approximationsschleife`,
   but **only** hyphen + whitespace + lowercase continuation, never a compound
-  like `Assembler-Programm`. The joins are **counted and reported** at the foot
+  like `Assembler-Programm`, **and never a German SUSPENDED hyphen**:
+  `RGB- und Composite`, `Ein- und Ausgabe`, `Kaypro- etc.` have a lowercase
+  continuation and are still not broken words. MEASURED on SH8601: joining them
+  gave `RGBund` / `Einund` / `Kayproetc.` — harmless where both sides carry the
+  block, but it FABRICATES a difference wherever the block exists on one side
+  only, and it makes the diff read as our error where the HTML is right. The
+  continuation word is tested against a closed set (`und oder bzw sowie wie etc
+  usw`). The joins are **counted and reported** at the foot
   of the diff rather than silently swallowed: a word left broken in published
   HTML is its own defect, so it must not vanish, but it must also not generate
   a difference on every wrapped line;
@@ -333,8 +340,8 @@ originals gets two rows):
 
 | verdict | this issue | claimed | monthly file | D | OURS | THEIRS | PRINT | UNRESOLVED |
 |---|---|---|---|---|---|---|---|---|
-| CONFIRMED | `issues/SH8601/NN Ein Monitor ist genug.html` | 8510/16 | `issues/8510/16 Ein Monitor ist genug.html` | 12 | 1 | 0 | 11 | 0 |
-| PARTIAL | `issues/SH8601/12 Rundgang durch die Hardware des C128.html` | 8506/16 | `issues/8506/16 Erster ausführlicher Test PC 128 (Teil 1).html` | 41 | 3 | 1 | 36 | 1 |
+| CONFIRMED | `issues/SH8601/NN Ein Monitor ist genug.html` | 8510/16 | `issues/8510/16 Ein Monitor ist genug.html` | 12 | 0 | 0 | 12 | 0 |
+| PARTIAL | `issues/SH8601/12 Rundgang durch die Hardware des C128.html` | 8506/16 | `issues/8506/16 Erster ausführlicher Test PC 128 (Teil 1).html` | 41 | 0 | 1 | 39 | 1 |
 | PARTIAL | `issues/SH8601/12 Rundgang durch die Hardware des C128.html` | 8507/17 | `issues/8507/17 Erster ausführlicher Test_ C 128, Teil 2.html` | 28 | 0 | 0 | 28 | 0 |
 | CONFIRMED | `issues/SH8601/NN Test_ WordStar.html` | 8601/47 | `issues/8601/47 Gestatten_ Wordstar.html` | 19 | 0 | 2 | 17 | 0 |
 | NOT-A-REPRINT | `issues/SH8601/NN Welche Floppy für den C128_.html` | 8601/44 | — | — | — | — | — | — |
@@ -352,13 +359,34 @@ Then one `###` subsection per diffed pair, its heading naming this issue's
 
 - D-001 PRINT — SH re-set standfirst; SH p12 crop and 8506 p16 crop both match
   their own page.
-- D-014 OURS — SH p13 reads `Rasterbildschirm`; ours had `Rasterbildsdirm`.
-  Fixed (one word).
 - D-022 THEIRS — 8506 p18 reads `32 KByte`; the published 8506 HTML has
   `32 KByto`. REPORTED, not applied.
 - D-031 UNRESOLVED — 8507 p21 is a full-bleed photo spread in our render;
   cannot read the caption. Left open.
 ```
+
+**The `OURS` column is 0 once the work is done, and that is correct.** A fix
+CLOSES its difference: `verify` re-runs the diff against the repaired HTML, so
+a difference we fixed is no longer reported and cannot carry a `D-NNN`
+disposition — and because the numbering is positional, fixing anything
+RENUMBERS every difference after it. So never write `- D-NNN OURS …`: the
+number will not survive the fix that the line describes, and `verify` will
+reject it as a disposition for a difference that no longer exists.
+
+Record the repairs instead as their own table in the same `###` subsection,
+NOT in `- D-NNN` form, which `verify` parses:
+
+```markdown
+**OURS fixes applied** — 3, each read off the printed page:
+
+| was | is | read from |
+|---|---|---|
+| `Rasterbildsdirm` | `Rasterbildschirm` | SH p13, 600 dpi crop of block 14 |
+| `$lfff` | `$1fff` | SH p60, crop of the table cell |
+| `eitetwa` | `Seit etwa` | SH p87, drop cap plus the lost word space |
+```
+
+MEASURED on SH8601: 105 fixes, and every `OURS` column in the table is 0.
 
 **A lead whose page resolved to more than one article must show its work in the
 same subsection**, one line per candidate that was *not* chosen:
