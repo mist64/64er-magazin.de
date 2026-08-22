@@ -178,7 +178,7 @@ PY
 # 4. every meta name=author content has at least one comma-separated
 #    name made of letters / spaces / dots
 grep -hE 'name="author" content=' "$dir"/*.html | \
-  grep -vE 'content="[A-Za-zÄÖÜäöüß., ]+"' && echo "  FAIL: malformed content"
+  grep -vE 'content="[A-Za-zÄÖÜäöüß.,\- ]+"' && echo "  FAIL: malformed content"
 
 # 5. shape consistency: an article whose meta `content` has duplicate
 #    entries must have a matching count of body bylines (per-byline
