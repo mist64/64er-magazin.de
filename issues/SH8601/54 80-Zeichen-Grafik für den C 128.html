@@ -38,26 +38,29 @@
 
         <p>Für jedes Pixel (Grafikpunkt) wird ein Bit benötigt. Das macht acht Pixel pro Byte oder 80 Byte für eine waagerechte Bildzeile bei einer horizontalen Auflösung von 640 Pixels. In vertikaler Richtung erreicht der VDC 200 Zeilen Auflösung, das heißt insgesamt werden 80x200=1600 Byte Video-RAM von einem Bild belegt. Ein Farb-RAM ist nicht vorgesehen. Der VDC kann hochauflösende Grafik nur in einer einzigen Farbe darstellen, ein entscheidender Nachteil des VDC gegenüber dem VIC. Auch in der Adressierung der einzelnen Pixels unterscheiden sich VDC und VIC. Ein Byte beim VDC beschreibt acht nebeneinanderliegende Pixels, während ein Byte beim VIC acht untereinanderliegende Pixels kontrolliert. Anders ausgedrückt: Das Pixel mit den Koordinaten 7,0 wird von Bit 0 (!) der ersten Bildschirmspeicherstelle repräsentiert, das Pixel 0,7 von der (7x80=) 560. Speicherstelle. Daraus ergibt sich die folgende Formel zur Berechnung ein gegebenes Koordinatenpaar</p>
 
-        <pre><code>ADR= Y\*80
-</code></pre>
+        <p>ADR= Y*80 + INT (X/8)</p>
 
-        <pre><code>INT (X/8)
-</code></pre>
+        <p>Zur Berechnung des Bitwertes innerhalb dieser Speicherstelle erhältman (genauso wie beim VIC):</p>
 
-        <p>Zur Berechnung des Bitwertes innerhalb dieser Speicherstelle erhältman (genauso wie beim VIC): BIT =</p>
+        <p>BIT = 2↑ (7 - (»Low-Byte von x« AND 7))</p>
 
-        <p>2t (7 - »Low-Byte von x« AND 7)) Eine Routine »Punkt setzen« könnte man dann formulieren als: ADR = 6Inhalt von ADR«) OR BIT Die entsprechend formulierte Formel für »Punkt löschen» lautet: ADR = 6Inhalt von ADRQ AND (NOT BIT)</p>
+        <p>Eine Routine »Punkt setzen« könnte man dann formulieren als:</p>
+
+        <p>ADR = (»Inhalt von ADR«) OR BIT</p>
+
+        <p>Die entsprechend formulierte Formel für »Punkt löschen» lautet:</p>
+
+        <p>ADR = (»Inhalt von ADR«) AND (NOT BIT)</p>
 
         <p>Und schließlich wird noch eine Routine »Punkt testen« für den PAINT-Befehl benötigt:</p>
 
-        <pre><code>ERGIBT = (Inhalt von ADR« AND BIT
-</code></pre>
+        <p>ERGIBT = (»Inhalt von ADR«) AND BIT</p>
 
         <p>»ERGIBTI« wird Null, wenn der Punkt nicht gesetzt ist, und wird ungleich, wenn der Punkt gesetzt ist. Mit diesen Formeln ist ein Programm zum Setzen, Löschen oder Testen eines Bildpunktes auf dem VDC-HirRes-Bildschirm vollständig beschrieben. Das als Listing 3 abgedruckte Maschinenprogramm »setpoint« ist die für das hier beschriebene Grafik-Paket verwendete praktische Formulierung dieses Programms. Dabei wird das Produkt»y*80«nicht berechnet, sondern aus einer Tabelle geladen. Das ist die wahrscheinlich schnellste Möglichkeit, die richtige Bildschirm-RAM-Adresse zu errechnen. Kurze Rechenzeiten aber sind nötig, wenn man bedenkt, wie häufig die Routine aufgerufen werden muß, um eine einzige Kurve auf den Bildschirm zu zeichnen. Alle anderen Teile dieses Programms enthalten keine Besonderheiten. Für den interessierten Leser wurde das Assemblerlisting mit ausführlichen Kommentaren versehen. So dürfte es keine Schwierigkeiten bereiten, eigene Änderungen oder Erweiterungen vorzunehmen.</p>
 
         <h2>Komfortable Zeichenhefehle</h2>
 
-        <p>Bis hierhin wurde recht ausführlich besprochen, wie man den Orafikschirm einschaltet und Punkte setzt. Nun wird sofort der. Wunsch wach, Linien, Kreise oder andere Figuren zu zeichnen. Dazu sind schon recht anspruchsvolle Berechnungen nötig. Doch alle Rechenroutinen sind im Basic-ROM des C 128 enthalten. Allen Routinen istgemeinsam, daß sie im Unterprogramm »Punkt setzen« münden. Die ROM-Routine dafür kann nur Punkte für den VIC-Bildschirm berechnen. Die oben beschriebene Routine bewirkt das gleiche für den VDC-Chip. Der Gedanke liegt nun nahe, in Routinen wie CIRCLE oder DRAW, die Zeiger, die auf das Unterprogramm »Punkt setzen, löschen, testen« zeigen, auf das eigene »Punkt-setzen-Programm« zu »verbiegen« das den VDC anspricht. Im ROM ist das zwar leider nicht möglich, und die meisten C 128-Benutzer werden iihren neuen l28Ser nicht gleich mit neuen EPROMS versehen wollen, aber es geht ja auch viel einfacher: Man kopiert einfach die entscheidenden Programmteile ins RAM, paßt die besagten Zeiger an und teilt ERGIBT BIT (Inhalt von ADR«) AN] zuletzt noch dem Interpreter mit, daß er fortan beim Aufruf der Grafik-Befehle die neuen Routinen »anspringen« soll, wenn der 80-Zeichen-Bildschirm eingeschaltet ist. Die Lösung dieser Aufgabe ist das abgedruckte Basic-Programm (Listing 1). Es stellt alle Programmteile zusammen, die benötigt werden, um die Befehle GRAPHIC, BOX, CIRCLE, DRAW und PAINT auch für den VDC wirksam werden zu lassen. Alle Befehle für den 640x200-Punkte-Bildschirm sind nur im Programm-Modus ausführbar. Dasist deshalb so eingerichtet, weil der 80-Zeichen-Bildschirm im HiRes-Modus zwangsläufig zerstört wird (siehe oben). Die Befehle können im Direkt-Modus also gar nicht vom Bildschirm geholt und interpretiert werden. Man erhielte lediglich »Dreckflecken« auf dem HiRes-Bild.</p>
+        <p>Bis hierhin wurde recht ausführlich besprochen, wie man den Orafikschirm einschaltet und Punkte setzt. Nun wird sofort der. Wunsch wach, Linien, Kreise oder andere Figuren zu zeichnen. Dazu sind schon recht anspruchsvolle Berechnungen nötig. Doch alle Rechenroutinen sind im Basic-ROM des C 128 enthalten. Allen Routinen istgemeinsam, daß sie im Unterprogramm »Punkt setzen« münden. Die ROM-Routine dafür kann nur Punkte für den VIC-Bildschirm berechnen. Die oben beschriebene Routine bewirkt das gleiche für den VDC-Chip. Der Gedanke liegt nun nahe, in Routinen wie CIRCLE oder DRAW, die Zeiger, die auf das Unterprogramm »Punkt setzen, löschen, testen« zeigen, auf das eigene »Punkt-setzen-Programm« zu »verbiegen« das den VDC anspricht. Im ROM ist das zwar leider nicht möglich, und die meisten C 128-Benutzer werden iihren neuen l28Ser nicht gleich mit neuen EPROMS versehen wollen, aber es geht ja auch viel einfacher: Man kopiert einfach die entscheidenden Programmteile ins RAM, paßt die besagten Zeiger an und teilt zuletzt noch dem Interpreter mit, daß er fortan beim Aufruf der Grafik-Befehle die neuen Routinen »anspringen« soll, wenn der 80-Zeichen-Bildschirm eingeschaltet ist. Die Lösung dieser Aufgabe ist das abgedruckte Basic-Programm (Listing 1). Es stellt alle Programmteile zusammen, die benötigt werden, um die Befehle GRAPHIC, BOX, CIRCLE, DRAW und PAINT auch für den VDC wirksam werden zu lassen. Alle Befehle für den 640x200-Punkte-Bildschirm sind nur im Programm-Modus ausführbar. Dasist deshalb so eingerichtet, weil der 80-Zeichen-Bildschirm im HiRes-Modus zwangsläufig zerstört wird (siehe oben). Die Befehle können im Direkt-Modus also gar nicht vom Bildschirm geholt und interpretiert werden. Man erhielte lediglich »Dreckflecken« auf dem HiRes-Bild.</p>
 
         <p>Probieren Sie einfach einmal im Direkt-Modus die Befehlsfolge »POKE 54784,25: POKE 54785,128« aus! Man kann sehr viel über die Funktionsweise des VDC im Text-Modus lernen. RUN/STOP-RESTORE rückt die Register wieder zurecht.</p>
 
