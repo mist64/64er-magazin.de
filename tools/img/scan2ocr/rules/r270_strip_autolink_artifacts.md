@@ -79,9 +79,12 @@ dir=issues/<YYMM>
 # 1. no <a href> wrappers survive
 grep -nE '<a href=' "$dir"/*.html && echo "  FAIL: <a href> left"
 
-# 2. rule 060 no longer emits +autolink
-grep -E '\+autolink' tools/img/scan2ocr/rules/r060_md_to_html.sh && \
-  echo "  FAIL: rule 060 still passes +autolink"
+# 2. rule 060 no longer emits +autolink.
+#    Match the FLAG LINE, not the file: r060 carries a comment explaining
+#    that +autolink is deliberately omitted, so a bare grep matches its own
+#    explanation and reports a regression that does not exist.
+grep -E "^\s*-f '" tools/img/scan2ocr/rules/r060_md_to_html.sh \
+  | grep -E '\+autolink' && echo "  FAIL: rule 060 still passes +autolink"
 ```
 
 ## Notes / lessons

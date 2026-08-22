@@ -22,7 +22,7 @@
 
         <p>Reine Maschinenprogramme kommen üblicherweise ohne jede Stringbehandlung aus. Bei einer Textverarbeitung zum Beispiel liegt der Text am Stück im Speicher und der Programmierer verwaltet selbst seine Zeiger auf die momentane Textstelle, auf die Seitenanfänge und so weiter.</p>
 
-        <p>Problematischer sind jedoch Unterprogramme in Maschinensprache, die zeitkritische Basic-Teile ersetzen sollen. In diesen Fällen soll oftmals das Ergebnis der Maschinenroutine in Form einer Variablen an das aufrufende Basic-Programm zurückübergeben werden. Wenn die Routine komfortabel ‚aufzurufen sein soll, kann das Basic-"Programm beim Aufruf mit »SYS...., (Variablenname)« angeben, in welcher Variablen das Ergebnis abgelegt werden soll. \</p>
+        <p>Problematischer sind jedoch Unterprogramme in Maschinensprache, die zeitkritische Basic-Teile ersetzen sollen. In diesen Fällen soll oftmals das Ergebnis der Maschinenroutine in Form einer Variablen an das aufrufende Basic-Programm zurückübergeben werden. Wenn die Routine komfortabel ‚aufzurufen sein soll, kann das Basic-"Programm beim Aufruf mit »SYS...., (Variablenname)« angeben, in welcher Variablen das Ergebnis abgelegt werden soll.</p>
 
         <p>In beiden Fällen, der Übergabe einer Variablen an das Maschinenprogramm und der Rückübergabe des Ergebnisses in Form einer Variablen, benötigen wir verschiedene Routinen des Basic-Interpreters. Es gibt eine Vielzahl von Anwendungen, in denen diese Routinen benötigt werden:</p>
 
@@ -797,13 +797,13 @@ BNE OKAY ;NACHFOLGENDE DEY ;SPACES cPY #255 ; ABSCHNEIDEN BNE LECHT
 
         <p>Die Schleife beginnt mit einem TWert von Länge-1 (DEY), das heißt im Beispiel ist Y=9. Zuerst wird daher auf das neunte Zeichen hinter der Startposition zugegriffen, also aufdaszehnte Zeichen der Eingabe. Nun wird dieses Zeichen mit SPACE (=Code 32) verglichen. Ist es ungleich SPACE, wird das vorangehende Zeichen mit SPACE verglichen und so weiter.</p>
 
-        <p>Bei dem ersten »Nicht-SPACE« . wird der Vergleich abgebrochen und zu OKAY gesprungen. Im Y-Register ist die echte Eingabelänge minus eins enthalten. \</p>
+        <p>Bei dem ersten »Nicht-SPACE« . wird der Vergleich abgebrochen und zu OKAY gesprungen. Im Y-Register ist die echte Eingabelänge minus eins enthalten.</p>
 
         <h3>Stringdescriptoren des Übernahmestring holen</h3>
 
         <p>Da das Y-Register die Länge minus eins enthält, erfolgt zuerst eine Korrektur (INY), bevor die echte Länge in LAENGE gespeichert wird. Anschließend werden CHKKOM und GETPOS aufgeru'fen, wir erhalten also in den Speicherzellen $49, $4A einen Zeiger auf die Descriptoren des Strings, in dem die Eingabe an das Basic übergeben werden soll.</p>
 
-        <pre><code>\*UEBERNAHMEVORBEREITUNGEN\* OKAY INY
+        <pre><code>*UEBERNAHMEVORBEREITUNGEN* OKAY INY
 </code></pre>
 
         <pre><code>STY LAENGE ;LECHT RETTEN
@@ -890,7 +890,7 @@ JSR GETPOS ;UEBERN.STRING
 
         <p>Angenommen, als Übergabestring wurde vom Basic-Programm A$ angegeben. Die Stringdescriptoren von A$ weisen unverändert auf dessen alte Position und beinhalten dessen alte Länge. Wir müssen daher diese Descriptoren noch aktualisieren, also den Längendescriptor mit der Länge und den Positionszeiger mit der Position unseres Strings versehen. Die Länge ist in LAENGE enthalten und die Position entspricht der geänderten Untergrenze STREND des Stringstack, ab der wir unseren String anlegten.</p>
 
-        <pre><code>\*DESCRIPTOREN AKTUALISIEREN\* JSR BANK1 LDY #0
+        <pre><code>*DESCRIPTOREN AKTUALISIEREN* JSR BANK1 LDY #0
 LDA LAENGE STA (ZEIGER),Y LDA STREND,Y INY
 STA (ZEIGER) ,‚Y cPY #2
 BNE DAKT
@@ -1119,7 +1119,7 @@ a 00be5 4c e2 55 jmp $55e2
         <pre><code>a 0Obde ca dex
 a 00bdd 10 £f3 bpl $0bd2
 a 00bdf 20 48 88 jsr $8a27
-;FAC = FAC \* ARG
+;FAC = FAC * ARG
 a 00be2 20 42 8e jsr $8e42
 a 00be5 4c e2 55 jmp $55e2
 </code></pre>
@@ -1150,7 +1150,7 @@ a 00bd5 95 63 sta $63,x
 a 00bd7 ca dex
 a 00bd8 10 £3 bpl $0bd2
 a 00bda 20 48 88 jsr $8b17
-;FAC = FAC \* 10
+;FAC = FAC * 10
 a 00bdd 20 42 8e jsr $8e42
 a 00be0 4c e2 55 jmp $55e2
 a 00be3 84 80 sty $80
@@ -1166,7 +1166,7 @@ a 00be7 00 brk
         <pre><code>a 00bd7 ca dex
 a 00bd8 10 £3 bpl $0bd2
 a 00bda 20 48 88 jsr $8b17
-;FAC = FAC \* 10
+;FAC = FAC * 10
 a DObdd 20 42 8e jsr $8e42
 a 00be0O 4c e2 55 jmp $55e2 |
 </code></pre>
