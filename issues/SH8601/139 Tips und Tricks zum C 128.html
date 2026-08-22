@@ -40,13 +40,13 @@
 
         <p>Da ich zusammen mit einem Programmiererkollegen kürzlich vor der Aufgabe stand, ein Basic-Programm, das verschiedene Assembler-Routinen verwendet, vom C 64 auf den C 128 umzuschreiben, waren wir gezwungen, uns mit diesen - für uns völligungewohnten - Problemen auseinanderzusetzen. In diesem Artikel werde ich beschreiben, welche Lösungswege wir sahen, wieder verwarfen, und wie es uns nach unzähligen Fehlschlägen tatsächlich gelang, alle benötigten Routinen umzuschreiben. Ich bin der Ansicht, daß unsere Vorgehensweise typisch war und dieser Artikel es vielen C 128-»Neulingen« erspart, unsere zum Großteil frustrierenden Erfahrungen nachzuvollziehen.</p>
 
-        <p>Begonnen hatte alles mit einem C 128, dem Handbuch und einem Exemplar des »C 128 Intern«. Unser erster Schritt war ein Testprogramm, mit dem das Umschalten zwischen den Speicherbänken erprobt werden sollte. Das Programm sollte eine Speicherstelle in Bank 1 lesen. Wirgabenesmitdem integrierten Monitor in Bank O ein, und legten es - wie vom C 64 gewohnt - nach $C000. Nach dem Aufruf sollte es durch Beschreiben des Konfigurationsregisters $FFOO auf Bank 1 umschalten, die gewünschte Speicherstelle in den Akku einlesen und mit einem BRK in den Monitor zurückkehren.</p>
+        <p>Begonnen hatte alles mit einem C 128, dem Handbuch und einem Exemplar des »C 128 Intern«. Unser erster Schritt war ein Testprogramm, mit dem das Umschalten zwischen den Speicherbänken erprobt werden sollte. Das Programm sollte eine Speicherstelle in Bank 1 lesen. Wirgabenesmitdem integrierten Monitor in Bank 0 ein, und legten es - wie vom C 64 gewohnt - nach $C000. Nach dem Aufruf sollte es durch Beschreiben des Konfigurationsregisters $FF00 auf Bank 1 umschalten, die gewünschte Speicherstelle in den Akku einlesen und mit einem BRK in den Monitor zurückkehren.</p>
 
-        <p>Nachdem wir feststellen mußten, daß dieses einfache Testprogramm abstürzte, war klar, daß uns C 64-Programmierern gewaltige Umstellungen bevorstanden. Der Grund für den Absturz war schnell gefunden: nach dem Beschreiben von $FFOO und damit dem Umschalten auf Bank 1 folgte der Befehl »LDA $1000«, der den Inhalt dieser Speicherstelle lesen sollte. Da unser Programm jedoch in Bank 0 lag, sägten wir uns mit dem Umschalten auf Bank 1 gewissermaßen »den eigenen Ast ab«, da unser Programm -und damit auch der Ladebefehl - nach dem Umschalten auf Bank 1 für den Prozessor nicht mehr existent war.</p>
+        <p>Nachdem wir feststellen mußten, daß dieses einfache Testprogramm abstürzte, war klar, daß uns C 64-Programmierern gewaltige Umstellungen bevorstanden. Der Grund für den Absturz war schnell gefunden: nach dem Beschreiben von $FF00 und damit dem Umschalten auf Bank 1 folgte der Befehl »LDA $1000«, der den Inhalt dieser Speicherstelle lesen sollte. Da unser Programm jedoch in Bank 0 lag, sägten wir uns mit dem Umschalten auf Bank 1 gewissermaßen »den eigenen Ast ab«, da unser Programm -und damit auch der Ladebefehl - nach dem Umschalten auf Bank 1 für den Prozessor nicht mehr existent war.</p>
 
         <p>Dieser Mißerfolg machte uns immerhin klar, daß wir zu naiv an den neuen Computer herangegangen waren. Wir hatten keine Chance, ohne nähere Kenntnis des C 128, unsere Routinen umzuschreiben. Nachdem wir einige Zeit damit verbrachten, das Handbuch und das C 128 Intern zu studieren, war klar, daß es prinzipiell zwei Methoden gibt, auf verschiedene Speicherbänke zuzugreifen, ohne daß ein Programm unmittelbar nach dem Umschalten abstürzt: l. Benutzung der Routinen FETCH, STASH und CMPARE:</p>
 
-        <p>Diese Routinen benutzt auch der Basic-Interpreter. Nach dem Einschalten des Computers ist der Bereich $0000 bis $03SFF als gemeinsamer Bereich von Bank 0 und Bank 1 definiert. Unabhängig davon, welche Bank eingeschaltet ist, »sieht« der Prozessor immer die gleichen Programme beziehungsweise Daten in diesem Bereich. Dieses Konzept der gemeinsamen Speicherbereiche kann man sich durch die Vorstellung veranschaulichen, daß jede Änderung des Bereichs $0000 bis $03FF in der einen Bank sofort in die andere Bank kopiert wird, die Inhalte daher in jedem Moment identisch sind. Dieses Konzept entspricht zwar nicht dem tatsächlichen physischen Ablauf, ist jedoch eine für die Praxis völlig ausreichende Vorstellung.</p>
+        <p>Diese Routinen benutzt auch der Basic-Interpreter. Nach dem Einschalten des Computers ist der Bereich $0000 bis $03FF als gemeinsamer Bereich von Bank 0 und Bank 1 definiert. Unabhängig davon, welche Bank eingeschaltet ist, »sieht« der Prozessor immer die gleichen Programme beziehungsweise Daten in diesem Bereich. Dieses Konzept der gemeinsamen Speicherbereiche kann man sich durch die Vorstellung veranschaulichen, daß jede Änderung des Bereichs $0000 bis $03FF in der einen Bank sofort in die andere Bank kopiert wird, die Inhalte daher in jedem Moment identisch sind. Dieses Konzept entspricht zwar nicht dem tatsächlichen physischen Ablauf, ist jedoch eine für die Praxis völlig ausreichende Vorstellung.</p>
 
         <p>Die genannten Routinen werden nach dem Einschalten des Computers aus dem ROM in diesen gemeinsamen Bereich kopiert. Ihre Benutzung erfordert eine recht langwierige Parameterübergabe. Unter anderem wird die gewünschte Speicherkonfiguration übergeben, auf die zugegriffen werden soll. Nach der Parameterübergabe und dem Aufruf schaltet die jeweilige Routine die benötigte Konfiguration ein, führt in der ausgewählten -Bank die gewünschte Operation aus (Lesen, Schreiben, Vergleichen) und schaltet danach auf die alte Speicherkonfiguration zurück.</p>
 
@@ -81,11 +81,11 @@
 
         <p>Wie Sie sehen - und auch wir einsehen mußten - ist es ohne größeren Aufwand nicht möglich, ein Assemblerprogramm, das Kernel-Routinen verwendet, unter eben dieses Kernel zu legen. Die Umschaltung zwischen Kernel und darunterliegendem Programm führt zu sehr umständlichen Routinen.</p>
 
-        <p>Die einzige von uns gefundene Möglichkeit, kleinere Assembler-Routinen auf dem C 128 zu schreiben, ohne an derartigen Problemen zu scheitern, besteht darin, die Programme in einen Bereich zu legen, der nicht vom ROM - das eventuell benötigt wird -überlagert und als gemeinsamer Bereich von Bank O0 und Bank 1 deklariert wird.</p>
+        <p>Die einzige von uns gefundene Möglichkeit, kleinere Assembler-Routinen auf dem C 128 zu schreiben, ohne an derartigen Problemen zu scheitern, besteht darin, die Programme in einen Bereich zu legen, der nicht vom ROM - das eventuell benötigt wird -überlagert und als gemeinsamer Bereich von Bank 0 und Bank 1 deklariert wird.</p>
 
         <h2>Bankswitching</h2>
 
-        <p>Ein solcher Bereich, der für die meisten Assembler-Routinen ausreichend Platz bietet und unbenutzt ist, ist der Bereich von $1300 bis $17FF. Um Probleme mit dem Umschalten zwischen den Bänken zu vermeiden, wird ein gemeinsamer Bereich definiert, der von $0000 bis $IFFF reicht. Da der Basic-Text jedoch ab $1C00 beginnt, muß der Zeiger auf den Basic-Anfang auf $2000 verstellt werden, um Überschneidungen zwischen dem Basic-Text in Bank 0 und den Variablen in Bank 1 zu vermeiden.</p>
+        <p>Ein solcher Bereich, der für die meisten Assembler-Routinen ausreichend Platz bietet und unbenutzt ist, ist der Bereich von $1300 bis $17FF. Um Probleme mit dem Umschalten zwischen den Bänken zu vermeiden, wird ein gemeinsamer Bereich definiert, der von $0000 bis $1FFF reicht. Da der Basic-Text jedoch ab $1C00 beginnt, muß der Zeiger auf den Basic-Anfang auf $2000 verstellt werden, um Überschneidungen zwischen dem Basic-Text in Bank 0 und den Variablen in Bank 1 zu vermeiden.</p>
 
         <p>Zusätzlich muß auch der Zeiger auf den Beginn der Variablentabelle verstellt werden - auch auf $2000 -, da diese ab $0800 beginnt und ebenfalls ab $0800, jedoch in Bank 0, der Bildschirmspeicher liegt. Überschneidungen zwischen Variablentabelle und Bildschirmspeicher führen sonst bei jeder Ausgabe auf dem Bildschirm zu Anderungen der Variablentabelle, also zu ihrer Zerstörung.</p>
 
@@ -127,19 +127,19 @@ a00bl2 8A 00 ff sta $ff0O
 a 00b15 60 rts
 </code></pre>
 
-        <p>Dieses kleine Maschinenprogramm rettet zuerst die aktuelle Speicherkonfiguration, blendet nun den VO-Bereich ein und definiert im RAM-Konfigurationsregister den Bereich $0000 bis $IFFF als gemeinsamen Bereich von Bank 0 und Bank 1. Vor dem Rücksprung aus der Routine wird die gerettete Speicherkonfiguration wieder hergestellt. Diese Routine liegt im Kassettenpuffer. Sollten Sie mit der Datasette arbeiten, legen Sie sie bitte nach $0D00, in den RS232-Eingabepuffer.</p>
+        <p>Dieses kleine Maschinenprogramm rettet zuerst die aktuelle Speicherkonfiguration, blendet nun den I/O-Bereich ein und definiert im RAM-Konfigurationsregister den Bereich $0000 bis $1FFF als gemeinsamen Bereich von Bank 0 und Bank 1. Vor dem Rücksprung aus der Routine wird die gerettete Speicherkonfiguration wieder hergestellt. Diese Routine liegt im Kassettenpuffer. Sollten Sie mit der Datasette arbeiten, legen Sie sie bitte nach $0D00, in den RS232-Eingabepuffer.</p>
 
         <p>Wenn Sie beide Programme eingegeben und gespeichert haben, können Sie mit der Assemblerprogrammierung beginnen. Bis Sie selbst eine komfortablere Lösung gefunden haben, gehen Sie beider Assemblerprogrammierung bitte wie folgt vor:</p>
 
         <ol>
             <li>Basic-Programm laden und starten.</li>
-            <li>Maschinenprogramm laden und mit »SYS DEC("0B00") aufrufen.</li>
+            <li>Maschinenprogramm laden und mit »SYS DEC("0B00")« aufrufen.</li>
         </ol>
 
 
         <p>Für Ihre Maschinenprogramme steht Ihnen nun der Bereich $1300 bis $17FF (ab $1800 beginnt der für die Funktionstastenbelegung benötigte Bereich) zur Verfügung. Eventuell können Sie auch weitere Bereiche nutzen, zum Beispiel $0C00 bis $0DFF, wenn Sie die RS232-Schnittstelle, oder den Bereich von $0B00 bis $0BFF, wenn Sie den Kassettenpuffer nicht benötigen.</p>
 
-        <p>Die Nutzung aller Bereiche unterhalb $2000 ist theoretisch möglich. Probleme durch das »Absägen des eigenen Astes« werden dank dem bis $IFFF reichenden, gemeinsamen Speicherbereich nicht auftreten.</p>
+        <p>Die Nutzung aller Bereiche unterhalb $2000 ist theoretisch möglich. Probleme durch das »Absägen des eigenen Astes« werden dank dem bis $1FFF reichenden, gemeinsamen Speicherbereich nicht auftreten.</p>
 
         <p>Um wirklich problemlos in Assembler arbeiten zu können, benötigen Sie zwei weitere Routinen, die zwischen Bank 0 und Bank l umschalten. Diese Routinen wurden von mir in das Initialisierungs-Programm integriert.</p>
 

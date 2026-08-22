@@ -26,7 +26,7 @@
 
         <h2>Sprites</h2>
 
-        <p>Sollten Sie Ihnen noch nicht begegnet sein, die kleinen Kobolde $sprite« ist englisch und heißt auf deutsch »Kobold« oder »Gespenst«), dann seien sie hiermit kurz vorgestellt. Es handelt sich um bewegliche grafische Objekte (daher auch der Ausdruck MOB=movable objectss, der manchmal verwendet wird), die sowohl als mehr- als auch als einfarbige (dann hochaufgelöste) Figuren ohne Rücksicht auf den gerade eingeschalteten Grafikmodus munter über Text- und Grafikbildschirm huschen können. Die gesamte Verwaltung der Sprites geschieht durch den VIC-Chip, was ihr Auftreten auf den 40-Zeichen-Bildschirm beschränkt. Bevor Sie die folgenden Beispielprogramme ausprobieren, sollten Sie Listing 1 »Alle Sprites« abgetippt und gestartet haben.</p>
+        <p>Sollten Sie Ihnen noch nicht begegnet sein, die kleinen Kobolde (»sprite« ist englisch und heißt auf deutsch »Kobold« oder »Gespenst«), dann seien sie hiermit kurz vorgestellt. Es handelt sich um bewegliche grafische Objekte (daher auch der Ausdruck MOB=movable objects, der manchmal verwendet wird), die sowohl als mehr- als auch als einfarbige (dann hochaufgelöste) Figuren ohne Rücksicht auf den gerade eingeschalteten Grafikmodus munter über Text- und Grafikbildschirm huschen können. Die gesamte Verwaltung der Sprites geschieht durch den VIC-Chip, was ihr Auftreten auf den 40-Zeichen-Bildschirm beschränkt. Bevor Sie die folgenden Beispielprogramme ausprobieren, sollten Sie Listing 1 »Alle Sprites« abgetippt und gestartet haben.</p>
 
         <h2>Die Befehle zur $priteprogrammierung</h2>
 
@@ -79,7 +79,7 @@
 
         <p>Zwei Optionen werden merkwürdigerweise im Handbuch nicht erwähnt, die recht nützlich sind:</p>
 
-        <p>C: Das ist eine Kopierfunktion. Nach Tastendruck erscheint die Frage »Copy from %. Nach Eingabe einer Spritenummer wird das dazugehörige Muster in das aktuelle Sprite kopiert und dieses dabei überschrieben. Das ist ganz sinnvoll, wenn man mehrere ähnliche Sprites erzeugen möchte.</p>
+        <p>C: Das ist eine Kopierfunktion. Nach Tastendruck erscheint die Frage »Copy from?«. Nach Eingabe einer Spritenummer wird das dazugehörige Muster in das aktuelle Sprite kopiert und dieses dabei überschrieben. Das ist ganz sinnvoll, wenn man mehrere ähnliche Sprites erzeugen möchte.</p>
 
         <h2>Was nicht im Handbuch steht</h2>
 
@@ -203,7 +203,7 @@
 
         <p>Ohne Fehlermeldung sind Eingaben möglich zwischen -65535 und +65535. Sinnvoll scheint das aber allenfalls in einer Schleife, die ständige Richtungswechsel durchführt, zumal negative Werte und Angaben größer als 33024 keine vernünftige Reaktion ergeben.</p>
 
-        <p>Auch für die Geschwindigkeit V sind Angaben zwischen -65535 und 65535 möglich. Als sinnvoll erweisen sich hier nur Werte zwischen 0 und 15. O0 stoppt die Bewegung und 15 ist die höchste erreichbare Geschwindigkeit. Für höhere V-Werte ergibt sich die Geschwindigkeit dann zu modulo(l6). (Damit ist der Rest gemeint, der bei Division der eingegebenen Zahl durch 16 verbleibt. So ergibt V=30 dieselbe Geschwindigkeit wie V=14)</p>
+        <p>Auch für die Geschwindigkeit V sind Angaben zwischen -65535 und 65535 möglich. Als sinnvoll erweisen sich hier nur Werte zwischen 0 und 15. 0 stoppt die Bewegung und 15 ist die höchste erreichbare Geschwindigkeit. Für höhere V-Werte ergibt sich die Geschwindigkeit dann zu modulo(16). (Damit ist der Rest gemeint, der bei Division der eingegebenen Zahl durch 16 verbleibt. So ergibt V=30 dieselbe Geschwindigkeit wie V=14)</p>
 
         <p>Eine Eigenart dieser MOVSPR-Variante ist es, daß die Wirkung dieses Befehls anhält, bis die Bewegung ausdrücklich durch MOVSPR n,‚W #0 auf Null gesetzt wird. Auch ein abgeschaltetes Sprite wandert weiter, was Sie leicht mal ausprobieren können.</p>
 
@@ -290,9 +290,9 @@
 
         <p>A = 2: gerade vorhandene Geschwindigkeit</p>
 
-        <p>Leider gibt es da eine kleine Unstimmigkeit gegenüber dem Befehl MOVSPR: Gleichgültig, welches Sprite-Koordinatensystem wir dort durch SCALE festgelegt haben, RSPPOS liefert immer die Werte des normalen Systems. RSPPOS(0) liegt daher immer zwischen O0 und 511, RSPPOS() immer zwischen 0 und 255. Sollten Sie bei normalem System mittels MOVSPR höhere Werte eingegeben haben, dann wird hier immer modulo(512) für die X- und modulo(256) für die Y-Koordinate ausgegeben.</p>
+        <p>Leider gibt es da eine kleine Unstimmigkeit gegenüber dem Befehl MOVSPR: Gleichgültig, welches Sprite-Koordinatensystem wir dort durch SCALE festgelegt haben, RSPPOS liefert immer die Werte des normalen Systems. RSPPOS(0) liegt daher immer zwischen 0 und 511, RSPPOS(1) immer zwischen 0 und 255. Sollten Sie bei normalem System mittels MOVSPR höhere Werte eingegeben haben, dann wird hier immer modulo(512) für die X- und modulo(256) für die Y-Koordinate ausgegeben.</p>
 
-        <p>Auch die Sache mit der aktuellen Geschwindigkeit hat einen Haken: Falls Sie nämlich den Sprite mal auf andere Weise als durch MOVSPR n,W #V bewegen, erhalten Sie den Wert Oals Ausgabe von RSPPOS(). RSPRITE</p>
+        <p>Auch die Sache mit der aktuellen Geschwindigkeit hat einen Haken: Falls Sie nämlich den Sprite mal auf andere Weise als durch MOVSPR n,W #V bewegen, erhalten Sie den Wert 0 als Ausgabe von RSPPOS(2). RSPRITE</p>
 
         <p>Hier haben wir das Pendant zum SPRITE-Befehl vorliegen. Alle dort verwendeten Parameter können hier durch</p>
 
@@ -339,7 +339,7 @@
 
         <p>Noch flüchtiger ist die Existenz der Daten im String, der durch SPRSAV gebildet wird. Schon ein CLR macht der Kunst den Garaus. In jeweils 67 Byte (die letzten vier enthalten immer die Werte 23, 0, 20, 0) finden sich dort die Bitmuster. Sollten Sie einmal versuchen, so einen String (z.B. A$) durch PRINT A$ auf dem Bildschirm zu zeigen, dann müssen Sie sich auf allerhand Überraschungen gefaßt machen: Alle Bytewerte von 0 bis 255 können auftreten und wirken so, als wären sie mittels CHR$(Wert) zur Ausgabe aufgerufen worden. Wenn also der Wert 147 zufällig dabei sein sollte, dann wird der Bildschirm gelöscht, etc. Jedes RUN führt übrigens ebenfalls ein CLR aus. Auch das ist daher nicht die richtige Methode, die mühselig konstruierten Sprites etwaslängeram Leben zu erhalten.</p>
 
-        <p>Sowohl im Speicher als auch im String haben die Sprite-Daten genau dasselbe Format (bis auf die letzten Bytes, die im einen Fall aus einer O0, im anderen aus den Zahlen 23,0,20,0 bestehen). Das können Sie selbst nachprüfen am Programm "VERGLEICH SPRDT"" (Listing 5).</p>
+        <p>Sowohl im Speicher als auch im String haben die Sprite-Daten genau dasselbe Format (bis auf die letzten Bytes, die im einen Fall aus einer 0, im anderen aus den Zahlen 23,0,20,0 bestehen). Das können Sie selbst nachprüfen am Programm "VERGLEICH SPRDT" (Listing 5).</p>
 
         <p>Nach dem Start werden zunächst die Spritedaten von der Diskette geladen und dann in Strings eingelesen. Anschließend erscheinen auf dem Bildschirm Sprite für Sprite die Bytewerte sowohl aus dem Speicher als auch aus dem String.</p>
 
@@ -434,7 +434,7 @@
 
         <p>SSHAPE A$,X1Y1,X2Y2</p>
 
-        <p>A$ ist hier dann eine beliebige Stringvariable, auch ein Array kann Verwendung finden. X1l bis Y2 bezeichnet die Eckkoordinaten des Rechteckes, dessen Inhalt als Shape definiert werden soll. Bild 6 soll das etwas verdeutlichen:</p>
+        <p>A$ ist hier dann eine beliebige Stringvariable, auch ein Array kann Verwendung finden. X1 bis Y2 bezeichnet die Eckkoordinaten des Rechteckes, dessen Inhalt als Shape definiert werden soll. Bild 6 soll das etwas verdeutlichen:</p>
 
         <figure>
             <img src="32-6.png" alt="Diagramm eines Rechtecks, dessen linke obere Ecke mit (X1, Y1) und dessen rechte untere Ecke mit (X2, Y2) beschriftet ist">
@@ -469,7 +469,7 @@
 
         <p>Natürlich können Sie jedesmal, wenn Sie ein Shape erstellen, von dem Sie argwöhnen, es könne zu groß sein für den String, unsere Formeln anwenden. Eine Hilfe soll Ihnen Listing 9 »SSHAPE-TABELLE« geben. In der vorliegenden Form druckt es eine Liste aus, in deren linker Spalte Werte für eine Y-Differenz stehen. Rechts daneben sind die maximal zulässigen DX-Werte angegeben sowie die sich ergebende Stringlänge. Auf diese Weise können Sie - ausgehend von DY mit einem Blick erkennen, wie groß DX sein darf. Es empfiehlt sich, noch drei weitere Tabellen auszudrucken. Da ist zunächst einmal interessant, wie der Maximalwert von DY bei gegebenem DX aussieht. Zu diesem Zweck ist lediglich die Reihenfolge des Ausdruckes und der Rechenoperationen zu ändern:</p>
 
-        <p>In Zeile 20 kommt dann X-DIFF vor Y-DIFF, Zeile 40 enthält X=0, in Zeile 50 schreiben wir DO UNTIL X=320, in der nächsten Zeile 60 steht: X=X+1Y=0. Zeile 70 wird zu DO UNTIL Y=200 und Zeile 80 zu Y=Y+1l. Schließlich wird auch in Zeile 90 noch die Reihenfolge des Ausdruckes umgestellt zu PRINT #1X1Y1Z.</p>
+        <p>In Zeile 20 kommt dann X-DIFF vor Y-DIFF, Zeile 40 enthält X=0, in Zeile 50 schreiben wir DO UNTIL X=320, in der nächsten Zeile 60 steht: X=X+1:Y=0. Zeile 70 wird zu DO UNTIL Y=200 und Zeile 80 zu Y=Y+1. Schließlich wird auch in Zeile 90 noch die Reihenfolge des Ausdruckes umgestellt zu PRINT #1,X1,Y1,Z.</p>
 
         <p>Diese beiden Tabellen beziehen sich auf Shapes im Hochauflösungsmodus. Zwei weitere Tabellen für den Multicolormodus bekommen Sie, wenn Sie in Zeile 30 die vorhin angegebene Berechnungsfunktion zu diesem Modus einfügen. Nur die Zahl 8muß dazu in eine 4 verändert werden.</p>
 

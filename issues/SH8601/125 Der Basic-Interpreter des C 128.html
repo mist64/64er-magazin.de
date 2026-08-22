@@ -30,7 +30,7 @@
 
         <p>b) die beliebten INPUT-Routinen, die den eingebauten Befehl »INPUT X$« ersetzen sollen. Komfortablen INPUT-Routinen sollen zum Beispiel folgende Parameter übergeben werden können: Spalte und Zeile an der die Eingabe beginnt; Länge des Eingabefeldes; als Eingabe zugelassene Zeichen; Zeichen, die die Eingabe beenden; String, in dem die Eingabe an das Basic übergeben werden soll. Eine INPUT-Routine darf die Eingabe selbst natürlich nicht an beliebiger Stelle im Speicher ablegen, sondern muß einen Stringanlegen, der die Eingabe enthält und den das Basic-Programm weiterverarbeiten kann.</p>
 
-        <p>c) Suchroutinen, die ein beliebiges Array (Strings oder numerische Variablen) nach einer vorgegebenen Zeichenkette oder Zahl durchsuchen sollen, zum Beispiel die im Speicher gehaltene Indexdatei in einer Dateiverwaltung. In diesem Fall muß die Assemblerroutine auf das entsprechende Array zugreifen (womöglich sogar erst ab einem vorgegebenen Index, der den Start der Routine bestimmen soll), jedes Arrayfeld mit dem Suchkriterium vergleichen und nach Abschluß der Suche eine numerische Variable anlegen, der das Ergebnis mitgeteilt wird, zum Beispiel »x"%% =5« (das fünfte Arrayelement entspricht dem übergebenen Suchkriterim).</p>
+        <p>c) Suchroutinen, die ein beliebiges Array (Strings oder numerische Variablen) nach einer vorgegebenen Zeichenkette oder Zahl durchsuchen sollen, zum Beispiel die im Speicher gehaltene Indexdatei in einer Dateiverwaltung. In diesem Fall muß die Assemblerroutine auf das entsprechende Array zugreifen (womöglich sogar erst ab einem vorgegebenen Index, der den Start der Routine bestimmen soll), jedes Arrayfeld mit dem Suchkriterium vergleichen und nach Abschluß der Suche eine numerische Variable anlegen, der das Ergebnis mitgeteilt wird, zum Beispiel »x% = 5« (das fünfte Arrayelement entspricht dem übergebenen Suchkriterium).</p>
 
         <p>Da ich selbst kürzlich vor der Aufgabe stand, solche und andere Routinen vom C 64 auf den C 128 umzuschreiben und daher gezwungen war, die besprochenen Basic-Interpreter-Routinen des C 128 zu untersuchen, bietet es sich an, mein frisch erworbenes Wissen weiterzugeben. Es dürfte manchem Assemblerprogrammierer schlaflose Nächte ersparen, in denen er sich anhand des eingebauten Monitors durch das Basic-ROM des C 128 »hindurchwühlt«.</p>
 
@@ -94,7 +94,7 @@
 
         <p>l. Ein Komma einlesen: a 0b20 20 5ce 79 jmp $795c Nach dem Aufruf mit DEC("0B20"),0,0,0,0,« oder DEC("0B20"),,,« erhalten wir die Meldung READY. Der SYS-Befehl hat alle vier Parameter gelesen, anschließend erfolgte der Sprung zu unserem eigenen Assemblerprogramm, das ein zusätzliches Komma las und danach die Rückkehr ins Basic. Ein zusätzlicher Befehl RTS entfällt, da sich dieser am Ende des Unterprogramms CHKKOM befindet. Beachten Sie bitte, daß bei der Verwendung der Interpreter-Routinen zur Übergabe von Parametern zuerst alle vier möglichen Parameter, die der SYS-Befehl einlesen kann, angegeben werden müssen. Würden wir unser Programm zum Beispiel mit »SYS DEC("0B20")« aufrufen, wäre ein SYNTAX ERROR die Folge, da der SYS-Befehl nach dem Komma den ersten Standardparameter (Akku) lesen will und nicht findet. 2. Drei Kommas einlesen: a 00620 20 5e 79 jsr $795c a 00623 20 5c 79 jsr $795c a 00626 4c 5c 79 jmp $795c Aufruf mit</p>
 
-        <p>»SYS DEC("0B20"),0,0,0,0,,« oder »SYS DEC("OB20"),,,,,%.</p>
+        <p>»SYS DEC("0B20"),0,0,0,0,,,« oder »SYS DEC("0B20"),,,,,,,«.</p>
 
         <p>Jeder andere Aufruf, der von dieser Form (Übergabe der Standardparameter und der einzulesenden Anzahl Kommata) abweicht, führt zu einem SYNTAX ERROR. Die Routine CHKKOM bietet daher eine hervorragende Absicherung gegen Fehleingaben beim Aufruf einer Assemblerroutine.</p>
 
@@ -657,7 +657,7 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>Wir lesen nacheinander alle drei Descriptor-Bytes (Stringlänge; Low- und High-Byte der Stringposition) und übertragen sie nach ZLAENGE und ZLAENGE, ZLAENGE +1 beziehungsweise POSIT und POSIT+1 (ZLAENGE+1=POSIT und ZLAENGE-+2=POSIT +1,siehe Deklaration eigener Variablen).</p>
 
-        <p>Achten Sie bitte darauf, daß diese Routine unbedingt die © 128-spezifische Eigenschaft des Bankswitching berücksichtigen muß! Beim Lesen der Descriptoren greifen wir auf die Variablentabelle in Bank 1 und müssen daher unbedingt BANK] aufrufen, unser Unterprogramm zum Umschalten auf diese Bank. Da nach der Rückkehr aus GETPOS Bank 0 eingeschaltet ist, würden wir sonst anstelle der Variablentabelle die Bytes an den entsprechenden Adressen in Bank 0 lesen. Nach dem Beenden der Routine schalten wir wieder auf die Standardbank 0 zurück.</p>
+        <p>Achten Sie bitte darauf, daß diese Routine unbedingt die C 128-spezifische Eigenschaft des Bankswitching berücksichtigen muß! Beim Lesen der Descriptoren greifen wir auf die Variablentabelle in Bank 1 und müssen daher unbedingt BANK1 aufrufen, unser Unterprogramm zum Umschalten auf diese Bank. Da nach der Rückkehr aus GETPOS Bank 0 eingeschaltet ist, würden wir sonst anstelle der Variablentabelle die Bytes an den entsprechenden Adressen in Bank 0 lesen. Nach dem Beenden der Routine schalten wir wieder auf die Standardbank 0 zurück.</p>
 
         <h3>Eingabeschleife/Zeichen unter Cursor invertieren</h3>
 
@@ -791,7 +791,7 @@ JSR CHKKOM ;=) ZEIGER AUF
 JSR GETPOS ;UEBERN.STRING
 </code></pre>
 
-        <p>Platz für den anzulegend&amp;fi"String reservieren (STRRS = $9299)</p>
+        <p>Platz für den anzulegenden String reservieren (STRRS = $9299)</p>
 
         <p>LDA LAENGE</p>
 
@@ -966,7 +966,7 @@ a 00b54 00 brk
 
         <p>Das Programm überträgt diese Werte nach FAC #1. Nach dem Aufruf der Routine $8CC7 befindet sich die entsprechende Integerzahl in den Adressen $66, $67 (High/Low) und wird durch das Unterprogramm $0B30 nach $0D00 bis $0DO4 übertragen und vor dem Überschreiben durch den Monitor gerettet.</p>
 
-        <p>Rufen Sie die Routine mit »SYS DEC("0B40") auf und schauen Sie sich $0D00... mit dem Monitor an: m 0d00 84 00 00 00 AO</p>
+        <p>Rufen Sie die Routine mit »SYS DEC("0B40")« auf und schauen Sie sich $0D00... mit dem Monitor an: m 0d00 84 00 00 00 AO</p>
 
         <p>In $0D03 und $0D04 befindet sich die Integerzahl $00A0.</p>
 
@@ -1003,7 +1003,7 @@ a 00b8b 20 75 8c jsr 88075
 a 00b8e 4c 30 Ob jmp $0b30
 </code></pre>
 
-        <p>Dieses Demoprogramm übergibt den Wert $FFOl. Nach dem Aufruf mit »SYS DEC("0B80") befindet sich die gerettete Fließkommazahl in $0D00 bis $0D04: m 0d00 90 ff 01 00 00</p>
+        <p>Dieses Demoprogramm übergibt den Wert $FF01. Nach dem Aufruf mit »SYS DEC("0B80")« befindet sich die gerettete Fließkommazahl in $0D00 bis $0D04: m 0d00 90 ff 01 00 00</p>
 
         <p>Wenn Sie in Ihren Programmen nur mit Integerzahlen rechnen, werden Sie sich fragen, was Sie mit Routinen zur Umwandlung von Integer- in Fließkommazahlen anfangen sollen. Zum Beispiel, die Integerzahl auf dem Bildschirm ausgeben. Eine solche Ausgabe ist unter Verwendung von zwei weiteren Routinen möglich, jedoch erst, nachdem die Integerzahl ins Fließkommaformat gewandelt wurde:</p>
 
@@ -1038,7 +1038,7 @@ a 00bb1 4c e2 55 jmp $55e2
 
         <p>a 00bc0 a9 ff lda #$ff ldx #$01 a 00bec4 4c 00 00 jmp $8e32</p>
 
-        <p>Diese drei Programmzeilen besitzen die gleiche Funktion wie das vorige Demoprogramm. Sie geben ebenfalls den Wert $FFOl, also die Dezimalzahl 65281 auf dem Bildschirm aus. Der Aufruf erfolgt mit »SYS DEC("0OBCO"'%.</p>
+        <p>Diese drei Programmzeilen besitzen die gleiche Funktion wie das vorige Demoprogramm. Sie geben ebenfalls den Wert $FF01, also die Dezimalzahl 65281 auf dem Bildschirm aus. Der Aufruf erfolgt mit »SYS DEC("0BC0")«.</p>
 
         <p>Alle im folgenden beschriebenen Routinen führen Berechnungen mit zwei Fließkommazahlen durch (Addition, Division etc.), die sich in FAC #1 und FAC #2 befinden und speichern das Ergebnis im FAC #1. Da uns nun bekannt ist, auf welche Weise Integerzahlen ins Fließkommaformat gewandelt werden, können wir sie ebenso für Berechnungen mit zwei Integerzahlen verwenden, indem wir diese mit den ent sprechenden Routinen ins Fließkommaformat wandeln.</p>
 
@@ -1072,11 +1072,11 @@ a 00bf0O 00 brk
 a 00bf1 00 brk
 </code></pre>
 
-        <p>Rufen Sie die Routine mit »SYS DEC("O0BD0O"') auf. Die Fließkommazahlen ($08=8 und $1002= 4098) befinden sich am Ende des Programms und werden in einer Schleife an den FAC und ARG übergeben. Anschließend wird die Additions-Routine die ASCII-Wandlungs- und die Ausgabe-Routine aufgerufen. Wir erhalten die Ausgabe der Zahl 4106 = 8 + 4098.</p>
+        <p>Rufen Sie die Routine mit »SYS DEC("0BD0")« auf. Die Fließkommazahlen ($08=8 und $1002= 4098) befinden sich am Ende des Programms und werden in einer Schleife an den FAC und ARG übergeben. Anschließend wird die Additions-Routine die ASCII-Wandlungs- und die Ausgabe-Routine aufgerufen. Wir erhalten die Ausgabe der Zahl 4106 = 8 + 4098.</p>
 
         <h3>FAC = ARG - FAC ($8831)</h3>
 
-        <p>Auch diese Routine benötigt zwei in FAC und ARG hinterlegte Fließkommazahlen. Achten Sie bitte darauf, daß FAC von ARG subtrahiert wird und nicht umgekehrt. Um die Anwendung zu demonstrieren, ersetzen Sie bitte einfach im letzten Programm den Befehl »jsr 8848 durch »jsr 8831«:</p>
+        <p>Auch diese Routine benötigt zwei in FAC und ARG hinterlegte Fließkommazahlen. Achten Sie bitte darauf, daß FAC von ARG subtrahiert wird und nicht umgekehrt. Um die Anwendung zu demonstrieren, ersetzen Sie bitte einfach im letzten Programm den Befehl »jsr 8848« durch »jsr 8831«:</p>
 
         <pre><code>a 0Obde ca dex
 a 00Obdd 10 £3 bp1l $0bd2
@@ -1135,7 +1135,7 @@ a 00be6 00 brk
 a 00be7 00 brk
 </code></pre>
 
-        <p>Der Aufruf mit »SYS DEC("0BD0O") führt zur Ausgabe von 80 = 8* 10.</p>
+        <p>Der Aufruf mit »SYS DEC("0BD0")« führt zur Ausgabe von 80 = 8* 10.</p>
 
         <h3>FAC = FAC / 10 ($8B38)</h3>
 
