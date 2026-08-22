@@ -269,6 +269,11 @@ for f in sorted(os.listdir(d)):
     s = open(os.path.join(d, f)).read()
     for m in re.finditer(r'<p class="source">.*?</p>', s, re.DOTALL):
         tail = s[m.end():]
+        # An HTML COMMENT is not the next block.  Rules 160 and 190 record
+        # their reasoning in comments right where they acted, and `<[^>]+>`
+        # happily matches `<!-- ... -->`, so a note followed by a provenance
+        # comment was reported as mid-section.  Strip comments first.
+        tail = re.sub(r'<!--.*?-->', '', tail, flags=re.S)
         # next non-whitespace tag
         nxt = re.match(r'\s*(<[^>]+>)', tail)
         if not nxt:
@@ -279,8 +284,12 @@ for f in sorted(os.listdir(d)):
         # (multi-paragraph footer block — explicitly allowed by
         # Pass 3 of this rule). <h3> covers Tips&Tricks sub-sections;
         # </section> covers Leserforum Info: footers.
+        # `<aside>` belongs here too: rule 190 boxes the printed grey panels,
+        # and a source footer commonly sits immediately before one.  This list
+        # predates those panels -- 8 of SH8601's 29 articles end in an aside.
         if (re.match(r'<h2\b', t) or
             re.match(r'<h3\b', t) or
+            re.match(r'<aside\b', t) or
             re.match(r'</section>', t) or
             re.match(r'</article>', t) or
             re.match(r'<p class="source"', t)):
