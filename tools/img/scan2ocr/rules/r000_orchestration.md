@@ -280,6 +280,24 @@ from the descriptor and has to recognise it on sight.
 
 
 
+## Where the issue PDF comes from
+
+Step 006 owns it, and **the recipe is not in this directory**: it lives in
+`tools/img/issue_pdf/README.md` beside the scripts that implement it —
+searchable PDF/A, OCR rendered at 402 dpi, the delivered image 150 dpi
+guetzli, quality binary-searched to land under 100 MB, with a JBIG2 variant
+for pages carrying only black ink. `r006_issue_pdf.md` says when it runs and
+what is checked; it deliberately does not restate the recipe, because two
+copies of a measured procedure drift.
+
+Two things about its position. It comes **after 005**, because its only input
+is the graded masters and re-grading a page makes every PDF page built from it
+stale. It comes **before the editorial chain**, because the PDF's text layer
+is an INDEPENDENT OCR of the same pages at 402 dpi where step 010 reads 300 —
+and `issue_pdf`'s README records the measurement that at 300 dpi tesseract
+truncates words at the image edges. Where the corpus shows a column-edge
+truncation, that text layer often has the word.
+
 ## The chain, and what the numbers used to be
 
 The scan-to-corpus steps and the issue-build rules were two chains that met at
@@ -290,6 +308,8 @@ them through this table.
 
 | now | was | step |
 |---|---|---|
+| 005 | — | masters — the raw scan to the 600 dpi masters (variant by `binding`) |
+| 006 | — | issue_pdf — the searchable issue PDF, built from those masters |
 | 010 | — | ocr_blocks — OCR the scans into measured blocks |
 | 020 | — | classify — labels, reading order, roles, per-page markdown |
 | 030 | — | assemble — pages back into articles, one `<YYMM>.md` |
