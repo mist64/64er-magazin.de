@@ -17,6 +17,10 @@
         <h1>Sprites und Shapes auf dem C 128</h1>
         <p class="intro">Grafik und C128: Das heißt optimales Zusammenspiel von Computer und AÄnwendung. Wie einfach Shapes und Sprites in der Handhabung sind, werden wir Ihnen auf den nächsten Seiten zeigen.</p>
 
+        <figure>
+            <img src="32-0.png" alt="Airbrush-Grafik mit schwarz-weiß gekacheltem Boden, überlappenden roten Kreisscheiben, einem gelben Dreieck und einem helllila Viereck vor dunklem Hintergrund">
+        </figure>
+
         <p>m die Programmierung der Sprites auf dem C64 zu erklären, ist schon viel Druckerschwärze verbraucht worden. Fast schien es eher die Aufgabe von Assembler-Programmierern zu sein, durch die POKE-Wüsten und Zahlensysteme zu gelangen um schließlich das Ziel - ein bewegtes Sprite auf dem Bildschirm - zu erreichen. Im C128-Modus erspart uns das Basic 7.0 all diese Strapazen: Sprites zu erstellen und zu verwalten wird zum Vergnügen. Nachfolgend lernen wir die dazu nötigen Befehle bis in ihre Feinheiten kennen. Außerdem wird uns eine neue Gruppe von Grafikobjekten beschäftigen: die Shapes.</p>
 
         <h2>Sprites</h2>
@@ -67,7 +71,6 @@
                 <p>Im Mehrfarbenmodus tragen die Bits paarweise zur Farbgebung bei. Deshalb ist hier der Spritecursor auch doppelt so breit.</p>
             </li>
         </ul>
-
 
         <p>CONTROL 1-8</p>
 
@@ -163,6 +166,11 @@
 
         <p>DasSprite mitder Nummern wird an den Ort mit den Koordinaten X,Y gesetzt. Als Bezugspunkt beim Sprite dient die linke obere Ecke (auch wenn diese unsichtbar ist). Bild 1 zeigt Ihnen das normale Sprite-Koordinatensystem, das in allen Grafik-Modi gültig ist.</p>
 
+        <figure>
+            <img src="32-1.png" alt="Diagramm eines Koordinatensystems mit X-Achse nach rechts und Y-Achse nach unten; ein gerastertes Rechteck ist mit »sichtbar« beschriftet, der Randbereich mit »scheinbares Spritekoordinatensystem«">
+            <figcaption>Bild 1. Das normale Spritekoordinatensystem</figcaption>
+        </figure>
+
         <p>Der sichtbare Bildschirm erstreckt sich von X=24 bis 344 undin der Vertikalen reicht er von 50 bis 250. Für X und Y dürfen Werte zwischen 0 und 65535 eingesetzt werden. Bild 1 skizziert auch, bei welchen Koordinatenangaben ein Sprite voll sichtbar ist:</p>
 
         <p>Links oben müssen dazu die Koordinaten (24/50) gewählt werden. Ein normales Sprite ist bei X=320, einin X-Richtung gedehntesbeiX = 296 gerade noch voll sichtbar. Entsprechend gilt für die YWerte: Normales Sprite bis Y= 229, in YRichtung gedehntes bis Y= 208.</p>
@@ -190,6 +198,11 @@
         <p>c: MOVSPRnW#V</p>
 
         <p>Diese Variante des Spritebewegungs-Befehls ist eine feine Sache: Unabhängig vom sonstigen Programmgeschehen wird das Sprite mit der Nummer n mit einem Richtungswinkel W und der Geschwindigkeit V über den Bildschirm gesteuert. Der Winkel W wird in Grad angegeben. Bild 2 zeigt die möglichen Richtungen, die der Kompaßrose entsprechen:</p>
+
+        <figure>
+            <img src="32-2.png" alt="Kompaßrosen-Diagramm: ein Kreis mit acht sternförmigen Zacken, beschriftet mit 0, 45, 90, 135, 180, 225, 270 und 315">
+            <figcaption>Bild 2. Die Kompaßrose: MOVSPR</figcaption>
+        </figure>
 
         <p>Ohne Fehlermeldung sind Eingaben möglich zwischen -65535 und +65535. Sinnvoll scheint das aber allenfalls in einer Schleife, die ständige Richtungswechsel durchführt, zumal negative Werte und Angaben größer als 33024 keine vernünftige Reaktion ergeben.</p>
 
@@ -251,6 +264,11 @@
 
         <p>Die Zahl, die auf diese Weise erhalten wird, muß allerdings erst entschlüsselt werden (siehe da, ein alter Bekannter aus dem C64-Modus), denn jedem Sprite ist ein Bit zugeordnet: Sprite 1 hängt mit Bit 0, Sprite 2 mit Bit 1 zusammen und so weiter bis zu Sprite 8, welches mit Bit 7 geht. Findet nun die Kollision statt, dann schalten die Bits der kollidierten Sprites auf »I«. Bild 3 zeigt Ihnen diese Zusammenhänge und einige Rechenbeispiele.</p>
 
+        <figure>
+            <img src="32-3.png" alt="Tabellendiagramm mit den Zeilen Bits, Bitwerte und Sprites sowie einer Beispieltabelle mit fünf Bitmustern und ihren Ergebnissen">
+            <figcaption>Bild 3. Das Ergebnis der BUMP(A)-Abfrage</figcaption>
+        </figure>
+
         <p>Ein Supercrash unter Beteiligung aller acht Sprites würde dann also die Zahl 255 ergeben. Ein kleines Testprogramm (Listing 3) soll das Vorgehen dabei illustrieren.</p>
 
         <p>Besonders die Zeilen 90 und 100 sind sicherlich für Sie interessant, weil man mit ihnen die Nummern der beteiligten Sprites feststellen kann.</p>
@@ -298,6 +316,11 @@
         <p>Bevor wir uns die Bedeutung der Abfrageergebnisse ansehen, noch eine Warnung: Offensichtlich entspricht der Feuerknopfin Port 1 der Taste F8, so daß im Direktmodus immer der Maschinensprachemonitor angesprungen wird, wenn man den Feuerknopf drückt. Beim Port 2 gibt es dieses Problem nicht.</p>
 
         <p>Die mittels JOY ausgelesenen Werte haben folgende Bedeutung: 0 = Ruhestellung 1-8 = Richtungen (siehe Bild 4) 128 = Ruhestellung, Feuerknopf gedrückt 129-136 = Richtungen mit gedrücktem Feuerknopf (siehe Bild 4)</p>
+
+        <figure>
+            <img src="32-4.png" alt="Kreisdiagramm mit drei konzentrischen Ringen, den Achsenbeschriftungen UP, DOWN, LEFT und RIGHT und den Werten 1 bis 8 sowie 129 bis 136">
+            <figcaption>Bild 4. Schema zur JOY-Abfrage</figcaption>
+        </figure>
 
         <p>Auf diese Weise können wir bequem Sprites mit dem Joystick steuern:</p>
 
@@ -363,6 +386,11 @@
 
         <p>Sollten Sie ein komplexeres grafisches Gebilde erzeugen wollen als es mit einem Sprite möglich ist, dann können Sie auch mehrere Sprites koppeln. Am Beispiel von vier Sprites zeigt Ihnen Bild 5 die dazu nötigen Koordinatenwerte:</p>
 
+        <figure>
+            <img src="32-5.png" alt="Diagramm aus vier aneinandergrenzenden Rechtecken mit den Beschriftungen SPRITE 1 bis SPRITE 4 und den Koordinaten ihrer Eckpunkte">
+            <figcaption>Bild 5. Koppeln von vier Sprites</figcaption>
+        </figure>
+
         <p>Das Prinzip ist einfach: Weil jedes Sprite in X-Richtung 24 Bit breit ist, ergibt sich für die X-Koordinate des Nachbarsprites bei nahtloser Verbindung ein um 24 größerer Wert. 21 Bit mißt ein MOB in der Vertikalen, wodurch sich Y+21 für ein unterhalb des ersten gelegenes Sprite berechnet als Y-Koordinate. Das Programm »VIER SPRITES« (Listing 7) demonstriert die Verhältnisse.</p>
 
         <p>Zunächst wächst ein grafisches Objekt aus vier Sprites zusammen. Dieses kann dann mit dem Joystick in Port 2 (nach Druck auf den Feuerknopf) über den Bildschirm gesteuert werden (Zeile 300). Ein weiterer Druck aufden Feuerknopf beendet das Programm. Wenn Sie bei bestimmten Richtungen genau hinsehen, werden Sie eine leichte Unstimmigkeit in der Bewegung feststellen. Bei noch größeren Objekten scheint Basic für diese Steuerung doch etwas zu langsam zu werden und man muß auf Maschinensprache umsteigen um eine flüssige Bewegung zu erreichen.</p>
@@ -404,6 +432,11 @@
         <p>SSHAPE A$,X1Y1,X2Y2</p>
 
         <p>A$ ist hier dann eine beliebige Stringvariable, auch ein Array kann Verwendung finden. X1l bis Y2 bezeichnet die Eckkoordinaten des Rechteckes, dessen Inhalt als Shape definiert werden soll. Bild 6 soll das etwas verdeutlichen:</p>
+
+        <figure>
+            <img src="32-6.png" alt="Diagramm eines Rechtecks, dessen linke obere Ecke mit (X1, Y1) und dessen rechte untere Ecke mit (X2, Y2) beschriftet ist">
+            <figcaption>Bild 6. Zur Syntax des SSHAPE-Befehls</figcaption>
+        </figure>
 
         <p>(X1Y1) gehören zum linken oberen und (X2Y2) zum rechten unteren Eckpunkt. Es ist auch möglich, X2 und Y2 wegzulassen. In diesem Fall werden durch den SSHAPE-Befehl einfach die aktuellen Koordinaten des Grafik-Cursors eingesetzt.</p>
 
@@ -583,7 +616,6 @@
                 <p>Objekte, bei denen kein starr festgelegter Raster zugrundegelegt wird, können Shapes sein.</p>
             </li>
         </ul>
-
 
         <p>Nun sind Ihrer Phantasie keine Grenzen gesetzt: Bauen Sie sich ein Menü, in dem mit einem Sprite in Pfeil- oder Handform auf Symbole (Shapes) gedeutet wird, oder basteln Sie sich Schaltpläne aus vorgefertigten Einzelteilen (Shapes) zusammen, die Sie mit einem Kran-Sprite aussuchen und plazieren oder, oder.</p>
 

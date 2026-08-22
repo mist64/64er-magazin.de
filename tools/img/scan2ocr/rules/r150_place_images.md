@@ -124,7 +124,11 @@ dir=issues/<YYMM>
 # 1. every loose PNG (excluding title.png) is referenced by exactly
 #    one <img src=…> across the article HTMLs
 loose=$(ls "$dir"/*.png | grep -v '/title\.png$' | wc -l | tr -d ' ')
-refs=$(grep -hoE 'src="[0-9]+-[0-9a-z]+\.png"' "$dir"/*.html | sort -u | wc -l | tr -d ' ')
+# The class needs `_`: a single photo carrying two printed captions is cut as
+# one file named for both (SH8601's 26-5_9.png, Bild 9 and Bild 6 of the same
+# plug).  Without it the check reported 105 files against 104 references and
+# looked like a lost image.
+refs=$(grep -hoE 'src="[0-9]+-[0-9a-z_]+\.png"' "$dir"/*.html | sort -u | wc -l | tr -d ' ')
 [ "$loose" = "$refs" ] || echo "  FAIL: $loose loose PNGs vs $refs unique src refs"
 
 # 2. no XXXXXXXXX placeholder left in any figcaption
