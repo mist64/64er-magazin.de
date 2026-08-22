@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der etwas andere C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="bs">
+    <meta name="64er.issue" content="SH8601">
+    <meta name="64er.pages" content="94-95">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX18">
+</head>
+
+<body>
+    <article>
+        <h1>Der etwas andere C 64</h1>
+        <p class="intro">Im Zusammenhang mit dem C64-Modus des C128 wird immer von »Vollkompatibilität« geredet. Daß dem doch nicht so ist, beweisen wir Ihnen hier.</p>
+
+        <p>st der C128 wirklich vollkompatibel zum C64 % fragten uns schon viele Leser. Nach Lektüre dieses Artikels darf man zumindest nicht mehr mit ruhigem Gewissen »Ja« sagen sondern nur ein »Ja, aber...«. Denn einige Speicherstellen sind etwas anders belegt als beim C64. Wir zeigen Ihnen im folgenden, welche Speicherstellen dassind, welche Folgen dashatund welche Programme deswegen nicht laufen.</p>
+
+        <h2>Der neue Videochip</h2>
+
+        <p>Im C 128 befindet sich für die 40-Zeichen-Darstellung eine modifizierte Version des VIC-Chips aus dem C64. Es sind nämlich zwei neue Register hinzugekommen. Die Speicherzelle 53295 dient zur Tastaturabfrage. Ein POKE 53295, 248 schaltet zum Beispiel die Zehnertastatur und die zusätzlichen Tasten in der oberen Reihe wieder ein. Allerdings erhältmannur»Müll«auf dem Bildschirm, wenn man eine der Tasten drückt. Grund dafür ist, daß der Editor im C64 mit den Tastaturcodes dieser Tasten überhaupt nichts anzufangen weiß. Ein Programm, mit dem sich diese Tasten auch im C64-Modus »vernünftig« benutzen lassen, finden Sie in diesem Sonderheft.</p>
+
+        <p>Viel interessanter ist aber die zweite Speicherstelle 53296. Dort sind die ersten beiden Bits belegt. Das Bit 0 steuert die Taktfrequenz des Systems. Damit läßt sich also der C64 auch unter 2 Megahertz fahren, also doppelt so schnell wie üblich. Allerdings kommt der Video-Chip dann mit dem Bildaufbau nicht mehr nach: Auf dem Bildschirm erscheint nur wirres Rauschen, als ob ein Fernseher auf einen Kanal ohne Programm eingestellt worden wäre. Das zweite Bit, Bit 1, schaltet den Bildschirm und die Farberzeugung vollkommen aus. Man siehtalsonureinenleeren Bildschirm, der entweder schwarz, weiß oder grau ist, je nach eingestellter Randfarbe.</p>
+
+        <p>Zusammengefaßt:</p>
+
+        <p>POKE 53296,1 : 2 Megahertz einschalten</p>
+
+        <p>POKE 53296,2 : Bildschirm und Farbe aus</p>
+
+        <p>POKE 53296,3 : 2 Megahertz und Bildschirm aus</p>
+
+        <p>POKE 53296,0 : alles normal</p>
+
+        <p>»Schön und gut«, werden manche jetzt sagen, »Der neue Videochip hat halt ein paar zusätzliche Register. Deswegen läuft doch die Software, oder%. Ja, 99,99 Prozent laufen. Aber Ausnahmen bestätigen die Regel: Das Spiel »Rescue on Fractalus« von Lucasfilms/Activision setzt zum Beispiel aus Versehen das Bit für den 2 Megahertz-Modus - und ein C 128 im C64-Modus verabschiedet sich mit weißem Rauschen. Andere Fälle sind uns noch nicht bekannt, können aber durchaus noch vorhanden sein.</p>
+
+        <h2>Der deutsche Zeichensatz</h2>
+
+        <p>Das zweite Kompatibilitätsproblem ist der zweite eingebaute Zeichensatz. Im C64-Modus kann man ihn ja durch Drücken der »Caps Lock«-Iaste ein- und wieder ausschalten. Das Einschalten geht allerdings auch softwaremäßig und das wird manchen Programmen zum Verhängnis. Der deutsche Zeichensatz wurde, gelinde gesagt, etwas wüst im Computer »verdrahtet« und wird vom Prozessorport, der hauptsächlich für Kassettenoperationen und Memory-Mapping verantwortlich ist, mitgesteuert. Zur Verdeutlichung: Mit POKE 0,PEEK(0) OR 64 setztman ein Bitim Steuerregister, das die Leitung, die den zweiten Zeichensatz steuert, von Ein- auf Ausgabe umschaltet.; Mit POKE 155 wird nun der deutsche Zeichensatz eingeschaltet und läßt sich nicht mehr über die Taste »Caps Lock« abschalten! Hier hilft nur POKE 1,19, der wieder den Normalzustand herstellt.</p>
+
+        <p>Das wäre ja im Prinzip nicht allzu schlimm. Doch beim C64 schalten die meisten Programme mit POKE 1,55 das Basic-ROM ein, und nicht mitPOKE 1,119, wie esaufdemC 128 im C64-Modus nötig wäre. Sollte nun aus irgendwelchen Gründen das eine Bit in Speicherzelle 0 gesetzt sein, hat man den deut schen Zeichensatz auf dem Bildschirm und kriegt ihn so schnell nichtmehr da weg. Beim deutschen Zeichensatz fehlen einige Grafikzeichen, die durch die Umlaute ersetzt worden sind, so daß bei Programmen, die die Grafikzeichen verwenden, schon mal Seltsames aufdemBildschirm entstehenkann. Dies geschieht zum Beispiel bei dem Platinenlayout-System »Platine64« von Data Becker und bei einigen Spielen, die den Original-Commodore-Zeichensatz verwenden (Jumpjet«.</p>
+
+        <p>Außerdem scheint dies irgendwelche Auswirkungen auf den Kassettenbetrieb zu haben. So können manche Originalprogramme aus England beim besten Willen und korrekt eingestellter Datasette nicht geladen werden. Die Turbo-Lader der Kassettenhängensich an irgendeiner Hardwareänderung auf, wir können nur vermuten, daß es sich hier ebenfalls um den angezapften Prozessorport handelt. Probleme gab es namentlich mit einigen wenigen Programmen der Firmen »Ocean« und »U.S. Gold«. Allerdingshandelteessich hier auch nur um Ausnahmefälle.</p>
+
+        <h2>Geisterbilder</h2>
+
+        <p>Und.noch ein Letztes stimmt nicht zwischen C64 und C128 im C64-Modus überein. Der C64 hat im $D-Bereich sogenannte Geisterbilder der einzelnen Bausteine. Als Beispiel: Der Video-Chip sitzt normalerweise auf $D000. Allerdings befindet sich an den Adressen $D100, $D200 und $D300 nochmals der Video-Chip, das heißt: POKEt man einen Wert nach $D100, befindet er sich in $D000, etc. Ähnlich geht es mit dem Sound- und den /O-Chips. Beim C128 sind aber nicht alle Geisterbilder vorhanden, so steht bei $D600 der 80-Zeichen-Video-Chip. Dort ist beim C64 ein Geisterbild des Sound-Chips. Wir kennen zwar kein Programm, das auf diese Geisterbilder zugreift, es wären allerdings welche denkbar und die würden auf dem C 128/C64 natürlich abstürzen.</p>
+
+        <p>Also ist der C128 im C64-Modus nicht vollkompatibel zum C64. Die Kompatibilität beschränkt sich auf 99,95 Prozent der lieferbaren Software. Das rechtfertigt dann aber vollkommen den Begriff der Kompatibilität, denn kompatibel heißt ja</p>
+
+        <h2>Und was nun?</h2>
+
+        <p>nicht identisch. Man kann sogar sehr froh sein, daß so wenige Änderungen an so unüblichen Stellen vorgenommen wurden. Denn es ist wie gesagt nur ein sehr geringer Bruchteil der Software betroffen, andererseits passen nun alle Software-Hersteller auf, daß ihre Programme nicht auf diese kleinen Tricks hereinfallen. Außerdem versprachen auf Anfrage die meisten Hersteller schon für die nächsten Wochen neue Versionen der betroffenen Programme, die dann einwandfrei auf dem C1l28 im C64-Modus laufen werden. Und wen die 99,95 Prozent jetzt nicht reichen, der kann ja immer noch auf den bewährten C 64 zurückgreifen, der volle Kompatibilität zu sich selbst verspricht.</p>
+
+        <address class="author">(bs)</address>
+    </article>
+</body>
+
+</html>

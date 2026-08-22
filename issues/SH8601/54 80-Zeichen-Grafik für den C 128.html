@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>80-Zeichen-Grafik für den C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Th. Rumbach, D. Winkler, ev">
+    <meta name="64er.issue" content="SH8601">
+    <meta name="64er.pages" content="54, 57-62">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX10">
+</head>
+
+<body>
+    <article>
+        <h1>80-Zeichen-Grafik für den C 128</h1>
+        <p class="intro">Auf dieses Grafikpaket für eine 640x 200-Punkte-Auflösung auf dem 80-Zeichen-Bildschirm haben C 128-Besitzer gewartet! Alle Grafikbefehle des Basic 7.0 stehen damit für den neuen Modus zur Verfügung.</p>
+
+        <p>er neue Basic-Interpreter des D:== 128 enthält 26 Befehle, mit deren Hilfe man einfach und schnell auch komplizierte Grafik-Programme erstellen kann. Leider unterstützen diese Befehle nur die Programmierung des VIC-Chips mit der schon vom C 64 her bekannten Auflösung. Der zusätzlich eingebaute 80-Zeichen-Chip »/VDC« wird nur zum Aufbau eines 80-Zeichen-Text-Bildschirms genutzt. Wer auch diesen Bildschirm für grafische Darstellungen benutzen will, der muß seine eigenen Routinen schreiben. Doch gibt es wie der vorliegende Artikel zeigt eine recht einfache Lösung für dieses Problem. Das abgedruckte Basic-Programm (Listing 1) baut ein Maschinenprogramm für den »User-RAM-Bereich« von $1300 bis $lbff auf. Nach dem Initialisieren dieses Maschinenprogramms mit »SYS DEC ("1303"% stehen die Befehle GRAFIK, BOX, CIRCLE, DRAW und PAINT auch für den VDC-Chip zur Verfügung. Die Befehle LOCATE, SCALE und SCNCLR und die Funktionen RCLR, RDOT und RGR können ohne Einschränkung im 640x200-Grafik-Modus benutzt werden. Beide Bildschirme können gleichzeitig im HiRes-Modus arbeiten, beim Aufruf eines Grafikbefehls prüft der Interpreter selbständig, welcher Video-Chip gerade angesprochen ist.</p>
+
+        <h2>$o programmiert man den 80-Zeichen-Chip</h2>
+
+        <p>Der 8563-Video-Chip ist ein erweiterter »Abkömmling« des viel verwendeten 6845-CRT-Controllers. Er verfügt (im © 128) über 16 KByte eigenen Bildschirm-RAM und ist nur über zwei Register unter den Adressen 54784 ($d600) und 54785 ($4601) mit den anderen Bausteinen des Computers verbunden. Alle Register und der gesamte Video-RAM-Bereich müssen über diese beiden Adressen angesprochen werden. Das »Einblenden« des Video-RAMs in den Adressenbereich der CPU ist nicht vorgesehen. Willman einen Wert in eines der 36 Register des 8563 übertragen, so muß man zunächst die Nummer des anzusprechenden Resgisters in die Speicherstelle 54784 und dann den zu übertragenden Wert in die Speicherstelle 54785 schreiben. Genauso geht es beim Lesen eines Registerinhaltes: »POKE 54784, Registernummer: PRINT PEEK (84785): REM Registerinhalt«.</p>
+
+        <h2>Die HiRes-Grafik-Register</h2>
+
+        <p>Für die Grafikprogrammierung sind von den 36 Registern des VDC vor allem die Register 18, 19, 31, 25 und 26 interessant. Der Inhalt von Register 26 bestimmt (im Grafikmodus!) Vorder- und Hintergrundfarbe. Über Bit 0 bis 3 kann man 16 verschiedene Hintergrundfarben, über Bit4bis7 16 verschiedene Vordergrundfarben anwählen.</p>
+
+        <p>Ein Beispiel: die Befehlsfolge »POKE 54784,26:POKE 54785, (3*16 + 2)« bewirkt, daß im HiRes-Modus eine rote Zeichenfarbe auf weißem Grund erscheint. Im Textmodus wird mit diesem Befehl nur die Hintergrundfarbe verändert. Register 25 ist ein mehrfach belegtes Register. Über die Bits 0 bis 3 kann man den Bildschirm um maximal 16 Pixels horizontal nach links verschieben. Mit Bit 4 kann man zwischen einfacher (0) und doppelter (1) Pixelgröße wählen. Mit den Bits 5 bis 7 kann man zwischen den drei Betriebsarten Text (Bit 6=]), Semigrafik (Bit 5=1) und Grafik (Bit 7=]) wählen.</p>
+
+        <p>Für uns ist hier nur interessant, daß man durch Beschreiben von Register 25 mit dem Wert 128 den HiRes-Modus wählen und durch Beschreiben des Registers mit dem Wert 64 wieder in den Text-Modus zurückkehren kann. Alle anderen Bits sind standardmäßig mit Null besetzt. Über die Register 18,19 und 3l wird das Video-RAM angesprochen. Man besetzt in der beschriebenen Weise zunächst Register 18 mit dem High-Byte und Register 19 mit dem Low-Byte der gewünschten Bildschirmspeicheradresse vor.</p>
+
+        <p>‚Durch Schreiben in Register 31 kann man dann einen Wert in die gewählte Speicherstelle schreiben, durch Auslesen von Register 31 erhält man den Inhalt dieser Speicherstelle Aber Vorsicht! Nach jeder Schreib- oder Leseoperation wird der RAM-Zeiger in Register 18/19 automatisch einen Schritt erhöht! Will man also einen Wert aus dem Video-RAM auslesen und anschließend (verändert) wieder zurückschreiben, so muß man die Zeiger 18/19 zweimal setzen. Das erscheint Zwar sehr umständlich, doch hat diese Arbeitsweise einen überzeugenden Vorteil: 10mal »PEEK (Reg. 3]1)« ergibt die 10 Bytes von Zeiger 18/19 bis Zeiger 18/19 + 9. Der Zeiger 18/19 muß nur einmal gesetzt werden. Das Auslesen oder Vorbesetzen größerer Speicherbereiche wird so erheblich beschleunigt. Man überlege sich einmal, um wieviel langsamer die Eingabeschleiffe des Bildschirmeditors würde, wenn Register 18 und 19 auf jedes Zeichen einzeln gesetzt werden müßten.</p>
+
+        <h2>Organisation des Grafik-Bildschirms</h2>
+
+        <p>Für jedes Pixel (Grafikpunkt) wird ein Bit benötigt. Das macht acht Pixel pro Byte oder 80 Byte für eine waagerechte Bildzeile bei einer horizontalen Auflösung von 640 Pixels. In vertikaler Richtung erreicht der VDC 200 Zeilen Auflösung, das heißt insgesamt werden 80x200=1600 Byte Video-RAM von einem Bild belegt. Ein Farb-RAM ist nicht vorgesehen. Der VDC kann hochauflösende Grafik nur in einer einzigen Farbe darstellen, ein entscheidender Nachteil des VDC gegenüber dem VIC. Auch in der Adressierung der einzelnen Pixels unterscheiden sich VDC und VIC. Ein Byte beim VDC beschreibt acht nebeneinanderliegende Pixels, während ein Byte beim VIC acht untereinanderliegende Pixels kontrolliert. Anders ausgedrückt: Das Pixel mit den Koordinaten 7,0 wird von Bit 0 (!) der ersten Bildschirmspeicherstelle repräsentiert, das Pixel 0,7 von der (7x80=) 560. Speicherstelle. Daraus ergibt sich die folgende Formel zur Berechnung ein gegebenes Koordinatenpaar</p>
+
+        <pre><code>ADR= Y\*80  
+</code></pre>
+
+        <p>
+        <pre><code>INT (X/8)  
+</code></pre>
+
+        Zur Berechnung des Bitwertes innerhalb dieser Speicherstelle erhältman (genauso wie beim VIC): BIT =</p>
+
+        <p>2t (7 - »Low-Byte von x« AND 7)) Eine Routine »Punkt setzen« könnte man dann formulieren als: ADR = 6Inhalt von ADR«) OR BIT Die entsprechend formulierte Formel für »Punkt löschen» lautet: ADR = 6Inhalt von ADRQ AND (NOT BIT)</p>
+
+        <p>Und schließlich wird noch eine Routine »Punkt testen« für den PAINT-Befehl benötigt:</p>
+
+        <pre><code>ERGIBT = (Inhalt von ADR« AND BIT  
+</code></pre>
+
+        <p>»ERGIBTI« wird Null, wenn der Punkt nicht gesetzt ist, und wird ungleich, wenn der Punkt gesetzt ist. Mit diesen Formeln ist ein Programm zum Setzen, Löschen oder Testen eines Bildpunktes auf dem VDC-HirRes-Bildschirm vollständig beschrieben. Das als Listing 3 abgedruckte Maschinenprogramm »setpoint« ist die für das hier beschriebene Grafik-Paket verwendete praktische Formulierung dieses Programms. Dabei wird das Produkt»y*80«nicht berechnet, sondern aus einer Tabelle geladen. Das ist die wahrscheinlich schnellste Möglichkeit, die richtige Bildschirm-RAM-Adresse zu errechnen. Kurze Rechenzeiten aber sind nötig, wenn man bedenkt, wie häufig die Routine aufgerufen werden muß, um eine einzige Kurve auf den Bildschirm zu zeichnen. Alle anderen Teile dieses Programms enthalten keine Besonderheiten. Für den interessierten Leser wurde das Assemblerlisting mit ausführlichen Kommentaren versehen. So dürfte es keine Schwierigkeiten bereiten, eigene Änderungen oder Erweiterungen vorzunehmen.</p>
+
+        <h2>Komfortable Zeichenhefehle</h2>
+
+        <p>Bis hierhin wurde recht ausführlich besprochen, wie man den Orafikschirm einschaltet und Punkte setzt. Nun wird sofort der. Wunsch wach, Linien, Kreise oder andere Figuren zu zeichnen. Dazu sind schon recht anspruchsvolle Berechnungen nötig. Doch alle Rechenroutinen sind im Basic-ROM des C 128 enthalten. Allen Routinen istgemeinsam, daß sie im Unterprogramm »Punkt setzen« münden. Die ROM-Routine dafür kann nur Punkte für den VIC-Bildschirm berechnen. Die oben beschriebene Routine bewirkt das gleiche für den VDC-Chip. Der Gedanke liegt nun nahe, in Routinen wie CIRCLE oder DRAW, die Zeiger, die auf das Unterprogramm »Punkt setzen, löschen, testen« zeigen, auf das eigene »Punkt-setzen-Programm« zu »verbiegen« das den VDC anspricht. Im ROM ist das zwar leider nicht möglich, und die meisten C 128-Benutzer werden iihren neuen l28Ser nicht gleich mit neuen EPROMS versehen wollen, aber es geht ja auch viel einfacher: Man kopiert einfach die entscheidenden Programmteile ins RAM, paßt die besagten Zeiger an und teilt ERGIBT BIT (Inhalt von ADR«) AN] zuletzt noch dem Interpreter mit, daß er fortan beim Aufruf der Grafik-Befehle die neuen Routinen »anspringen« soll, wenn der 80-Zeichen-Bildschirm eingeschaltet ist. Die Lösung dieser Aufgabe ist das abgedruckte Basic-Programm (Listing 1). Es stellt alle Programmteile zusammen, die benötigt werden, um die Befehle GRAPHIC, BOX, CIRCLE, DRAW und PAINT auch für den VDC wirksam werden zu lassen. Alle Befehle für den 640x200-Punkte-Bildschirm sind nur im Programm-Modus ausführbar. Dasist deshalb so eingerichtet, weil der 80-Zeichen-Bildschirm im HiRes-Modus zwangsläufig zerstört wird (siehe oben). Die Befehle können im Direkt-Modus also gar nicht vom Bildschirm geholt und interpretiert werden. Man erhielte lediglich »Dreckflecken« auf dem HiRes-Bild.</p>
+
+        <p>Probieren Sie einfach einmal im Direkt-Modus die Befehlsfolge »POKE 54784,25: POKE 54785,128« aus! Man kann sehr viel über die Funktionsweise des VDC im Text-Modus lernen. RUN/STOP-RESTORE rückt die Register wieder zurecht.</p>
+
+        <h2>Der neue GRAPHIC-Befehl</h2>
+
+        <p>Der GRAPHIC-Befehl wurde um die Funktionen GRAPHIC 6,0 und GRAPHIC 6,1 erweitert. GRAPHIC 6 schaltet den 8563-HiRes-Modus ein. Folgt der »6« eine »I«, so wird der Bildschirm gelöscht, folgt eine »0«, so bleibt der Bildschirm wie er ist. Der Befehl GRAPHIC 6,1 ersetzt auch den in dieser Implementation nicht vorgesehenen Befehl SCNCLR 6. Alle übrigen Informationen zur Implementation dieses Befehls sind in den ebenfalls abgedruckten ausführlich kommentierten Assemblerlistings des Befehls enthalten (Listing 4).</p>
+
+        <p>Die »Originalroutine« im ROM befindet sich im Speicherbereich ab $6bB3a.</p>
+
+        <h2>Die Befehle BOX, CIRCLE, DRAW und PAINT</h2>
+
+        <p>Diese Befehle funktionieren im 8563-Modus genauso wie es im Bedienungshandbuch für die VIC-Grafik beschrieben ist. Einzige Änderung: Die x-Koordinaten dürfen nun im Bereich von 0 bis 639 liegen. Auch die Implementierung dieser Befehle ist denkbar einfach: Nacheinander werden die Programmteille PAINT ($6la8 bis $62b6), BOX ($62b7 his $6388), DRAW ($6797 bis $67d6) und CIRCLE ($668e bis $674c) in den RAM-Bereich ab $1672 kopiert (Basic-Programm Zeile 5000 bis 5340). Darunter, in den RAM-Bereich ab $1952, wird der Programmteil »Strecke zeichnen« aus ROM $9b30 bis $9c18 kopiert. Als nächstes werden die neuen Adressen für Unterprogrammaufrufe eingesetzt (WHILE-DO-Schleife). Es folgt schließlich der neue GRAPHIC-Befehl. Im Basic-Programm ist er in Form von DATA-Zeilen abgelegt. Ebenfalls in Form von DATA-Zeilen sind die schon besprochene Routine »setpoint« (RAM $1400 bis $167]) und die Erweiterung der Interpreterschleife im Basic-Text enthalten.</p>
+
+        <h2>Die Interpreterschleife</h2>
+
+        <p>Wie teile ich nun dem Interpreter mit, daß er beim Aufruf der Grafikbefehle nun nicht mehr zu den ROM-, sondern zu unseren neuen RAM-Routinen springen soll? Beim Starten eines Programms holt sich der Interpreter - genauso wie beim C 64 - die Adresse, die in den Speicherstellen $308 und $309 abgelegt ist. Er arbeitet dann das Programm ab, das bei dieser Adresse beginnt.</p>
+
+        <p>Setzt man in die Speicherstelle $308/09 nun die Adresse des eigenen Programms ein, dann beginnt der Interpreter nach dem Starten eines Programms mit RUN seine Arbeit bei der neuen Adresse. Eben dieses »Verbiegen« des Interpretervektors bewirkt der Befehl SYS DEC ("1303"). Und noch eine wichtige Kleinigkeit enthält die Initialisierungsroutine: die ins RAM kopierten Programmteile enthalten zahlreiche Unterprogrammsprünge (JSR) in ROM-Routinen. Der Prozessor kann diese Sprünge nurrichtig ausführen, wenn ihm der RAM-Speicherbereich, indemunser Programm liegt, und die angesprochenen ROM-Adtressen als ein zusammenhängender 64-KByte-Block erscheinen. Für die Zusammenstellung solcher gemeinsamer Bereiche ist die MMU zuständig (siehe Bedienungshandbuch Anhang B). Die Initialisierungsroutine sorgt dafür, daß die MMU im Bereich von $0 bis $lfff immer die RAMs einschaltet, auf der auch unser Programm liegt. Anders ausgedrückt: Auch wenn man über den BANK-Befehl die ROM-Bank 15 ausgewählt hat, nach dem Durchlaufen unserer Initialisierungsroutine liest die CPU die Adressen zwischen $0 uns $lfff immer aus dem RAM-Bereich in Bank O0 aus.</p>
+
+        <p>Und da taucht nun gleich eine neue Schwierigkeit auf. Wenn die CPU - egal, welche Bank ausgewählt wurde - im Bereich von $0 bis $1fff nur Bytes aus Bank 0 erreicht, dann können auch die aufBank lin eben diesem Bereich abgelegten Variablen nicht mehr gelesen werden. Und umgekehrt, beim Anlegen neuer Variablen, würde unser Programm in Bank 0 überschrieben, weil der Interpreter nicht wissen kann, daß er, obwohl er in Bank l schreiben will, in Wirklichkeit doch in Bank 0 schreibt. Deshalb muß der Anfangdes Variablenspeicherbereichs auf $2000 gesetzt werden. Das bedeutet den Verlust von 7 KByte Variablenspeicherbereich (mit »FRE(l)« überprüfbar!); aber anders geht es leider nicht, wenn man ständiges zeitraubendes Umschalten zwischen den Speicherbänken vermeiden will.</p>
+
+        <p>Doch nun zur eigentlichen Interpreterschleife. Zunächst wird ein Zeichen aus dem Basic-Text geholt und geprüft, ob es sich um ein Token der in Frage kommenden Grafikbefehle handelt. Ist das nicht der Fall, so fährt das Programm einfach in der alten Interpreterschleife im ROM fort. Ist ein GrafikToken gefunden, so testet das Programm als nächstes, ob der VIC oder ob der VDC aktiviert ist. Ist der VIC aktiv, solegt sich das Programm die dem Token entsprechende ROM-Adresse zurecht (selbstveränderlicher Code hinter dem »JSR« von »JSR $0000«), arbeitet die normale ROM-Routine ab und kehrt in die Interpreterschleife zurück. Ist der VDC aktiv, so werden die den neuen Befehlen entsprechenden RAM-Adıressen geholt. Assemblerlisting 5zeigt die fertige Maschinenroutine für Init und Interpreterprogramm.</p>
+
+        <p>Der aufmerksame Leser wird sich wohl schon gefragt haben, warum die Grafik-Routinen gerade in den Bereich ab $1300 »gequetscht« wurden. Ein Grund dafür wurde schon genannt: Die Routinen enthalten sehr viele Sprünge in ROM-Unterprogramme, die es erforderlich machen, daß die gesamten 48 KByte ROM-V/O ab $4000 eingeblendet sind. Will man umständliche und vor allem zeitraubende Bank-Umschaltungen (SRFAR im Kernel $ff6e) vermeiden, so muß man das Programm in den RAM-Bereich unterhalb von $4000 legen. Es soll jedoch möglich sein, auf beiden Grafik-Bildschirmen gleichzeitig zu arbeiten. Dann verbietet es sich auch noch, den Bereich von $1c00 bis $4000 zu benutzen, dadortderFarb-undder Bildschirmspeicher für die VIC-HiRes-Grafik angeordnet sind. Bleibt als der einzige freie RAM-Bereich der Bereich von $1300 bis $lnff.</p>
+
+        <h2>Das »Kochrezept«</h2>
+
+        <p>Wer bishier aufmerksam gelesen hat, wird gleichsam als Belohnung eine Menge interessanter Details zur Programmierung seines C 128 erfahren haben. Aber auch ungeduldige Leser sollten spätestens hier einhalten, es folgt die Bedienungsanleitung für das Programm »Graphik-80«:</p>
+
+        <p>) Tippen Sie das Basic-Programm »Graphik 80« (Listing ]) sorgfältig.ein! Für diese Arbeit sollten Sie sich Zeit nehmen, damit Ihnen das»DATA-Grab« am Ende des Programms nicht zur Falle wird. Wer einen Assembler zur Verfügung hat - ein C 64-Assembler genügt -, der kann auch die drei Assemblerlistings abtippen, die fertigen Maschinenprogramme speichern und dann die Zeilen 5000 bis 5340 und 10000 bis 14070 durch drei BLOAD-Befehle ersetzen. Die abgedruckten Assemblerlistings (Listings 3 bis 5) können mit dem »Profi Ass«-Assembler direkt übernommen werden, bei anderen Assemblern dürfen in der Regel die Basic-Befehle und die Hochpfeile nicht verwendet werden.</p>
+
+        <p>2) Speichern Sie das Basic-Programm auf Diskette. Wenn Sie später Änderungen am Grafik-Paket vornehmen wollen, brauchen Sie es wieder.</p>
+
+        <p>3) Starten Sie das Programm mit »RUN«! Das Diskettenlaufwerk (1541 oder 1570/1571) muß beim Start des Programms eingeschaltet und mit einer Diskette versehen sein.</p>
+
+        <p>4) Wenn keine Fehlermeldungen aufgetreten sind, und Ihnen auch keine Fehler beim Abschreiben der DATA-Zeilen unterlaufen sind, dann befindet sich jetzt das fertige »Graphik-80«-Paket unter dem Namen »graphik-80.m« auf Diskette und fertig initialisiert im Speicher. Mit Hilfe des kleinen Testprogramms (Listing 2), das noch mit abgedruckt ist, können Sie leicht überprüfen, ob alles richtig gelaufen ist. Von jetzt ab brauchen Sie nur noch als erste (!) Programmzeile »bload "graphik-80.m": sys dec ("1303")« einzugeben und das Grafik-Paket ist aktiviert. Alle Grafik-Befehle beziehen sich jetzt auf den 80-Zeichen-Schirm.</p>
+
+        <address class="author">(Th. Rumbach/D. Winkler/ev)</address>
+    </article>
+</body>
+
+</html>

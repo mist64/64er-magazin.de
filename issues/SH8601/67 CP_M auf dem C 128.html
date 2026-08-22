@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>CP/M auf dem C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Udo Reetz, ev">
+    <meta name="64er.issue" content="SH8601">
+    <meta name="64er.pages" content="67-69">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX12">
+</head>
+
+<body>
+    <article>
+        <h1>CP/M auf dem C 128</h1>
+        <p class="intro">Der C128 ist mit dem professionellen 8-Bit-Betriebssystem CP/M ausgestattet. Doch was ist eigentlich dieses CP/M und was kann man damit anfangen?</p>
+
+        <p>it dem C128 können auch Commodore-Besitzer nun CP/M nutzen; das ist etwas, was bisher im Konzept dieses Herstellers gefehlt hat, läßt man einmal den Versuch außer acht, den C64 mit Hilfe eines Z80-Steckmoduls CP/M-fähig zu machen. Dies scheiterte zum einen am Bildschirmformat (nur 40 Zeichen) und zum anderen an der 1541, die nicht in der Lage war und ist, verschiedene Diskettenformate zu lesen. Dadurch können zwar die von Commodore gelieferten CP/M-Systemdisketten und auch andere CP/M-Disketten im 1541-Format gelesen werden, aber es ist leider kein allzu breites Software-Angebot in diesem (CP/M-unüblichen) Format vorhanden. So ist CP/M zwar auch mit der 1541-Station möglich, aber es gibt nur wenig Software dafür.</p>
+
+        <p>Beide Nachteile sind beim C128 in Verbindung mit der 1570/71-Floppy nicht mehr vorhanden. Der C128 ist mit der neuesten CP/M-Version, nämlich mit dem CP/M 3.0 (auch CP/M plus genannt) ausgestattet. Dieser Artikel soll keine komplette Einführungin CP/M sein, er soll vielmehr kurz und vollständig erklären, welches Handwerkszeug der Anwender mit dem Betriebssystem CP/M aufdemC 128in die Hände bekommen hat.</p>
+
+        <h2>Was ist eigentlich CP/M?</h2>
+
+        <p>CP/M ist ein Betriebssystem und keine »Computersprache«, wie vielfach irrtümlicherweise angenommen wird. Übersetzt heißt es sinngemäß »Kontrollprogramm für Mikroprozessoren«. Dieses Programm kontrolliert nun folgende Funktionen des Computers.</p>
+
+        <ul>
+            <li>Erkennen und Ausführen aller</li>
+        </ul>
+
+
+        <p>Eingaben</p>
+
+        <ul>
+            <li>Steuerung von Tastatur, Bildschirm, Drucker, Floppy etc. - Komplette Verwaltung aller</li>
+        </ul>
+
+
+        <p>Daten auf der Diskette</p>
+
+        <ul>
+            <li>Ausführung von Änwender-Programmen.</li>
+        </ul>
+
+
+        <p>Das CP/M-System ist praktisch eine universelle Schnittstelle zwischen Änwenderprogramm und Computerhardware. Unter CP/M laufende Programme greifen daher nie direkt auf die Hardware zu, sondern wickeln alle Ein- und Ausgaben indirekt ab, nämlich durch Aufruf einer speziellen Betriebssystemroutine dem sogenannten »BDOS CALlL«. CP/M wurde ursprünglich für den 8080-Prozessor von Intel entwickelt, heutzutage wird allerdings wegen seiner größeren Leistungsfähigkeit fast ausschließlich Zilogs Z80 verwendet.</p>
+
+        <h2>Der Aufbau von CP/M</h2>
+
+        <p>Das eigentliche Betriebssystem besteht aus drei Hauptteilen, die beim »BOOTEN« des CP/M-Systemsin den Speicher geladen werden. Dazu kommen eine Reihe sogenannter »transienter« Kommandos, das sind Dienstprogramme, die nur bei Bedarf in den Speicher geladen werden.</p>
+
+        <p>Der speicherresidente Teil setzt sich zusammen aus dem BDOS (Basic Disk Operating System), einem Grundsystem zur Disketten-, verwaltung; dem BIOS (Basic Input/Output System), einem Anpassungsprogramm an die Hardware des Systems, und dem CCP (Console Command Processor), dem Kommando-Interpreter, der für die Ausführung von Benutzerkommandos verantwortlich ist. Unter CP/M laufende Programme sind ohne Schwierigkeiten an jedes Mikrocomputersystem anzupassen, das mit einem Z80-Prozessor läuft. Die große Verbreitung von CP/M hat dazu geführt, daß eine Vielzahl von Programmen zu allen Anwendungsbereichen zu finden ist, ob Textverarbeitung, Datenbanken oder Compiler, für die meisten Programmiersprachen - unter CP/M ist fast alles zu haben.</p>
+
+        <p>Um nun mit CP/M zu arbeiten, muß man das System BOOTen. Darunter wird das Kopieren der Systemspuren von der Disketteinden Arbeitsspeicher verstanden. Dazu muß die CP/M-Systemdiskette im Laufwerk A sein. Nach dem Einschalten oder auch nach einem Reset überprüft nun der Computer, ob sich auf der eingelegten Diskette eine CP/M-Spur befindet. Wenn ja, wird weiterhin geprüft, ob die Systemfiles CPM + und CCP vorhanden sind. Danach werden diese beiden Files in den Speicher geladen und das System steht dem Anwender zur Verfügung. Erst ab diesem Zeitpunkt sind die CP/M-Befehle und die Hilfsprogramme verfügbar.</p>
+
+        <p>Das ist für viele Anwender bestimmt ungewohnt, aber wie sich noch herausstellen wird, bietet diese Methode, die Diskettenstation als zentrale Anlaufstelle zu benutzen, fast nur Vorteile. Aus diesem Grund kann CP/M auch bis zu vier Diskettenlaufwerke ansprechen; sie werden mit A bis D bezeichnet. Durch die Systemmeldung erfährt der Benutzer, mit welchem Laufwerk er gerade arbeitet. So bedeutet zum Beispiel »B«, daß das gerade angemeldete Laufwerk die Diskettenstation B ist. Ein weiterer Grund, immer wieder auf die Diskette zuzugreifen, ist die Art und Weise, wie CP/M Kommandos bearbeitet und ausführt. Im Speicher befindet sich nämlich neben BDOS, BIOS und dem CCP nur ein Minimalbefehlssatz, die sogenannten residenten Befehle. Diese Befehle sind die meistgebrauchten, deshalb wollen wir sie einmal näher betrachten:</p>
+
+        <h3>DIR</h3>
+
+        <p>Mit diesem Befehl wird das Inhaltsverzeichnis der gerade angesprochenen Diskette angezeigt. Dieser Befehl ist vergleichbar mit den Basic-Befehlen DIRECTORY oder »LOAD'"$" ‚8.</p>
+
+        <h3>DIRSYS</h3>
+
+        <p>" Entspricht DIR, zeigt aber nur die Systemdateien an.</p>
+
+        <h3>ERASE</h3>
+
+        <p>Mit diesem Befehl werden Files auf der Diskette gelöscht; entspricht SCRATCH. RENAME</p>
+
+        <p>Umbenennen eines Filenames; entspricht dem gleichnamigen Basic-Befehl</p>
+
+        <h3>TYPE</h3>
+
+        <p>Dieser Befehl zeigt den Inhalt einer Datei an; so können zum Beispiel Text-Files oder Pascal-Files durchgesehen werden, ohne erst großartig ein Textverarbeitungsprogramm einzuladen.</p>
+
+        <h3>USER</h3>
+
+        <p>Mit diesem Befehl ist es möglich, die Diskette in unterschiedlichen Benutzerbereichen anzusprechen.</p>
+
+        <p>Die zweite Gruppe des CP/M-Befehlssatzes sind die transienten Befehle, das heißt, diese Befehle werden nur von Diskette geladen, wenn sie gebraucht werden. Haben sie dann ihre Aufgabe erfüllt, so wird der von ihnen belegte Speicherplatz wieder frei. Solche Befehle erkennt man an der Dateikennzeichnung »COM«. Diese Befehle können aber auch schon größere Programme mit recht komplexen Aufgaben sein, so zum Beispiel der Befehl PIP. Mit ihm ist es möglich, einzelne Dateien oder ganze Disketten zu kopieren oder Dateien auf den Drucker auszugeben. Dazu später mehr.</p>
+
+        <p>Weiterhin ist es möglich, den Befehlen sogenannte Optionen mit auf den Weg zu geben; diese ermöglichen dann eine weitere Vielzahl von Operationen, beispielsweise beim SHOW-Kommando die Anzeige von Einzelheiten über Dateien, ob sie schreibgeschützt sind, wann sie erstellt wurden etc.</p>
+
+        <p>Im nun folgenden Teil werden die transienten Befehle des CP/M 3.0 etwas näher erläutert, so daß man sich leicht einen Überblick über die Leistungsfähigkeit des Befehlssatzes verschaffen kann. DATE und INITDIR</p>
+
+        <p>Mit diesen zwei Befehlen kann man Protokoll führen, wann aufeine Diskette oder eine Datei das letzte Mal zugegriffen worden ist. Weiterhin läßt sich beim C 128 die interne Uhr damit umstellen.</p>
+
+        <h3>DEVICE</h3>
+
+        <p>Mit diesem Hilfsprogramm lassen sich die Ein- und Ausgabekanäle, das Bildschirmformat oder die Baudrateändern und anzeigen. DUMP</p>
+
+        <p>Der Inhalt eines Files wird in ASCI- oder in Hexadezimal-Darstellung angezeigt.</p>
+
+        <h3>ED</h3>
+
+        <p>Dieses Programm erlaubt das Erstellen und/oder Ändern von Dateien. Gerade in Verbindung mit SUBMIT wird der Befehl sehr häufig gebraucht.</p>
+
+        <h3>FORMAT</h3>
+
+        <p>Wie der Name schon sagt, werden damit Disketten formatiert. Beim C128 bietet FORMAT mehrere mögliche Formate an, die vollständig menügesteuert angewählt werden können. GET und PUT</p>
+
+        <p>Mit GET werden alle Befehle, die sonst von der Tastatur kommen, aus einer Diskettendatei genommen. Bei PUT wird jegliche Ausgabe (Drucker, Bildschirm) in eine Diskettendatei geleitet.</p>
+
+        <h3>PATCH</h3>
+
+        <p>Damit ist es möglich, eventuelle Fehler in Programmen zu beheben oder selbst neue Befehle zu installieren. Beides setzt jedoch eine genaue Kenntnis von CP/M voraus.</p>
+
+        <h3>PIP</h3>
+
+        <p>Eines der wichtigsten Dienstprogramme überhaupt. Hauptaufgabe istdasKopieren von Files. Imletzten Abschnitt wird der genaue Umgangmitdiesem Programm anhand eines Beispieles erklärt.</p>
+
+        <h3>SUBMIT</h3>
+
+        <p>Ofttauchen Befehlsfolgen auf, die sich immer wieder gleichen, zum Beispiel das Laden mehrerer Files hintereinander oder ähnliches. Die Befehlsfolge wird in einer Datei abgelegt, die die Dateibezeichnung »SUB« trägt. Wird jetzt SUBMIT aufgerufen, so wird die entsprechende SUB-Datei automatisch ausgeführt. Erstellt werden die Dateien zum Beispiel mit ED oder einer Textverarbeitung.</p>
+
+        <h3>SID</h3>
+
+        <p>Ein symbolischer Debugger zum Auffinden von Fehlern in Programmabläufen.</p>
+
+        <h3>SHOW</h3>
+
+        <p>Wem der DIR-Befehl zuwenig Informationen über die Diskette gibt, der bekommt eine ganze Menge Zusatzinformationen wie freier Platz etc.</p>
+
+        <h3>SET</h3>
+
+        <p>Mit diesem Befehl ist es unter anderem möglich, Files als schreibgeschützt zu kennzeichnen, Datumseinträge vorzunehmen oder ein Paßwort zu definieren.</p>
+
+        <h3>SETDEF</h3>
+
+        <p>Suchkriterien und Laufwerksbezeichnungen können nach Vorgaben des Benutzers einander zugeordnet werden. Die Speicherung von Teilen des Speichers wird damit durchgeführt; es lassen sich zum Beispiel Maschinenprogramme auf diese Art abspeichern.</p>
+
+        <h3>LINK</h3>
+
+        <p>Damit werden Programmteile zu einem lauffähigen Ganzen verbunden.</p>
+
+        <h3>MAC, RMAC, HEXCOM, XREF</h3>
+
+        <p>Diese Dienstprogramme sind für den erfahrenen Programmierer von Nutzen, mit ihnen wird die Programmierung des Z80 unter CP/M ermöglicht.</p>
+
+        <p>Diese Kurzbeschreibung erhebt keinen Anspruch auf Vollständigkeit, sie soll jedoch einen kurzen Überblick über die vielfältigen Möglichkeiten des CP/M 3.0 geben. Die detaillierte Beschreibung zu allen Befehlen geben zum Teil die Handbücher, zum Teil die zu CP/M erschienene Literatur.</p>
+
+        <h2>Kopieren leichtgemacht</h2>
+
+        <p>Für den Anwender stellt sich oft das Problem, eigene bootfähige Disketten herzustellen. Der Computer verlangt nach dem Einschalten die Dateien »CPM +.SYS« und »CCPCOM«. Sind beide Files auf der Diskette vorhanden, so wird CP/M plus geladen.</p>
+
+        <p>Um beide Files zu kopieren, benutzt man PIPCOM. Dieses Programm eignet sich hervorragend, um eine ganze Diskette oder einzelne Files zu kopieren. In den nun folgenden Schritten wird zuerst ein kompletter Backup der Systemdiskette und dann das Anlegen einer bootfähigen Diskette (für eigene Anwendungen) beschrieben.</p>
+
+        <p>Als erstes ist festzustellen, daß die beschriebenen Arbeitsschritte sowohl für die 1541 als auch für die 1570/71 ihre Gültigkeit haben, der einzige Unterschied liegt in den unterschiedlichen Ausführungszeiten, die in der untenstehenden Tabelle zu finden sind. Eine weitere Voraussetzung ist das Vorhandensein einer im jeweiligen Format fertig formatierten leeren Diskette. Sollte das noch nicht geschehen sein, so erstellt man sich eine mit Hilfe des COM-Files FORMAT.</p>
+
+        <p>Daß eine Mehrzahl der Anwender nur über ein Laufwerk verfügt, spielt im folgenden keine Rolle, da das CP/M des C 128 in der Lage ist, ein »virtuelles« Laufwerk E anzusprechen, was praktisch einen Diskettenwechsel darstellt.</p>
+
+        <p>Nachdem PIPCOM geladen wurde, wird nun »e:=a:**« eingegeben. : Das »e« bedeutet hier das Ersatzlaufwerk, sprich Diskettenwechsel. Sobald sich PIPnach dem Kopieren wieder mit »*« meldet, ist eine Kopie der Systemdiskette erstellt.</p>
+
+        <p>Soll aber nur eine bootfähige Diskette erstellt werden, so genügt es, wenn sich auf der Diskette die Files CPM+.SYS und CCPCOM befinden. Um diese zu kopieren, wird wieder PIP geladen. Mit »e:=a: cpm+.sys« und »e:=a:ccp.com« werden die beiden Files auf eine leere, aber schon formatierte Diskette kopiert. Diese Diskette wird jetzt vom Computer als Boot-Diskette anerkannt und CP/M wird nach dem Einschalten und bei eingelegter Diskette geBOOTet.</p>
+
+        <p>Im übrigen ist das obengenannte Verfahren nicht nur auf diese beiden Files anwendbar, sondern so lassen sich beliebige Files kopieren, so daß der Anwender seine Disketten beliebig gestalten kann.</p>
+
+        <address class="author">(Udo Reetz/ev)</address>
+    </article>
+</body>
+
+</html>

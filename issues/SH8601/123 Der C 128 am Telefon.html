@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der C 128 am Telefon</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="zu">
+    <meta name="64er.issue" content="SH8601">
+    <meta name="64er.pages" content="123-124">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX23">
+</head>
+
+<body>
+    <article>
+        <h1>Der C 128 am Telefon</h1>
+        <p class="intro">Über Akustikkoppler oder Modem mit Mailboxen in Verbindung treten. Das kann der Commodore 128 auch!</p>
+
+        <p>Im C64-Modus behandelt der Commodore 128 den User-Port und damit die RS232-Schnittstelle wie gewohnt. Gute Bekannte wie das Datenfernübertragungs-Programm »Proterm 64« (64'er Sonderheft 7/1985) versehen einwandfrei ihren Dienst. Wie aber verhält sich der User-Port im 128-Modus?</p>
+
+        <p>Der User-Port des C 128 wird vorwiegend für den Druckeranschluß oder für den Anschluß eines Akustikkopplers genutzt. Dazu wird entweder eine parallele oder serielle Schnittstelle am User-Port simuliert. Um Daten mit dem Telefon zu übertragen, ist meist die serielle RS 232-Schnittstelle erforderlich. Mit dieser Schnittstelle werden acht Byte nicht gleichzeitig nebeneinander, sondern Bit für Bit hintereinander gesendet. Dadurch wird zwar die Geschwindigkeit wesentlich geringer als bei der parallelen Datenübertragung, aber man kommt mit viel weniger Leitungen aus. Und gerade im Telefon-Verkehr ist die serielle Übertragung die einzig mögliche.</p>
+
+        <p>Der Commodore 128 ist von Haus aus im Betriebssystem mit der erforderlichen Software zum Betrieb einer seriellen RS232-Schnittstelle ausgerüstet. Die RS232-Schnittstelle selbst muß noch mit einem Modul hardwaremäßig am User-Port simuliert werden. Dazu gibt es in der 64'er, Ausgabe 3/85 einen kleinen Bausatz für 25 Mark, der den Normpegel am User-Port (TTL-Pegel von +5V) auf den RS232-Pegel (+3V bis +15V) umwandelt.</p>
+
+        <p>Die RS232-Schnittstelle hat im C128 die Geräteadresse 2 bekommen. Dadurch wird diese Schnittstelle wie ein Floppy-Laufwerk oder ein Drucker angesprochen.</p>
+
+        <p>Eröffnet man beim Commodore 128 ein User-Port-File mit der OPEN-Anweisung, so legt der C 128 zwei Daten-Buffer von je 256 Byte an. In den Eingabebuffer, der ab der Adresse $0C00 Hex liegt, werden alle über die RS232-Schnittstelle hereinkommenden Daten gesammelt. Der Ausgabebuffer ab der Adresse $0D00 nimmt die an die RS232-Schnittstelle auszugebenden Daten auf.</p>
+
+        <p>Um die Datenübertragung zu organisieren gibt es zwei spezielle Register: das Kontrollregister und das Befehlsregister. Diese werden automatisch mit der Eröffnung des logischen Files (Geräteadresse 2) definiert. .. Das Befehlsregister bestimmt die Übertragungsart, die Parität und die Art der Verbindung (Handshake). Im Kontrollregister wird die Baud-Rate definiert und die Anzahl der Daten- und Stop-Bits.</p>
+
+        <p>Die Datenübertragungsrate beträgt bei den meisten C64-Mailboxen 300 Baud bei sieben Daten-Bits und einem Stop-Bit. Das Stop-Bit kennzeichnet das UÜbertragungsende von Daten-Bits. Die Baud-Rate darf beim C 128 den Wert von 2400 nicht übersteigen, da die interne Software des C 128-Betriebssytems nicht schneller arbeitet.</p>
+
+        <p>Alle Parameter werden in der OPEN-Anweisung übergeben. Die Syntax für den OPEN-Befehl lautet: »OPEN Filenummer, Geräteadresse, Sekundäradresse, Kontrollregister, Befehlsregister«. Eine Eröffnung des Datenkanals mit allen Parametern sieht beispielsweise folgendermaßen aus:</p>
+
+        <pre><code>»OPEN 2,2,0CHR$ (6+32+0)+ CHR$(0+0+0)«  
+</code></pre>
+
+        <p>Damit haben wir folgende Parameter programmiert:</p>
+
+        <ul>
+            <li>
+                <p>logisches File 2 öffnen</p>
+            </li>
+            <li>
+                <p>Geräteadresse 2 ansprechen - Sekundäradresse 0 setzen</p>
+            </li>
+            <li>
+                <p>300 Baud Übertragung</p>
+            </li>
+            <li>
+                <p>7 Daten-Bits</p>
+            </li>
+            <li>
+                <p>1 Stop-Bit</p>
+            </li>
+            <li>
+                <p>3-Draht-Leitung</p>
+            </li>
+            <li>
+                <p>Vollduplex</p>
+            </li>
+            <li>
+                <p>keine Parität (kein 8. Daten-Bit) Bits 5,6 und 7 die Parität bestimmt (siehe Tabelle 2).</p>
+            </li>
+        </ul>
+
+
+        <p>Selbstverständlich können bei der Datenübertragung mit der RS 232-Schnittstelle Fehler vorkommen. Dafür gibt es das sogenannte Status-Register, dasallerdingsnach dem Auslesen sofort gelöscht wird. Man sollte diese Statusvariable ST immer in einer Variablen ablegen. Die Bedeutung der einzelnen Bits der Statusvariablen ST sind der Tabelle 3 zu entnehmen.</p>
+
+        <p>Das Kontrollregister, das Befehlsregister und die Statusvariable kann man auch direkt aus der Zeropage auslesen. Für die RS232-Routine nach einem Moment wieder »vernünftigen« Text liefern.</p>
+
+        <p>Wesentlich mehr Komfort und Geschwindigkeit bringen in Maschinensprache geschriebene Terminalprogramme. Da nur kleine Änderungen der Speicheradtessierung vorzunehmen sind, wird sicherlich demnächst mitmehreren</p>
+
+        <p>Datenfernübertragungsprogrammen zu rechnen sein, die auch im C128-Modus des Commodore 128 laufen. Nur steht diesen dann wesentlich mehr Speicherplatz für die Protokollführung zur Verfügung. Dann kann man sich mit dem C128 Programme übertragen las-</p>
+
+        <p>Wie man sieht, wird das Befehls- und Kontrollregister mit dem OPEN-Befehl definiert. Dazu haben wir nach der Adreß-Definition zwei Byte mit Hilfe der CHR$-Anweisung übergeben.</p>
+
+        <p>Einige Bits dieser beiden Register haben wichtige Funktionen. Die ersten vier Bit des Kontrollregisters bestimmen die Baud-Rate, Bit 5 und 6 die Anzahl der Datenbits und Bit 7 die Anzahl der Stop-Bits (siehe Tabelle )).</p>
+
+        <p>Das zweite Byte wird in das Befehlsregister geschrieben und bestimmt mit Bit 0 die Art des Handshake-Betriebs. Die darauffolgenden dLrei Bit sind von untergeordneter Bedeutung. Mit Bit 4 wird die Übertragungsart und über die Schnittstelle sind die Adressen $0A0OF Hex bis $0AIlB Hex wichtig (siehe Tabelle 4).</p>
+
+        <p>Daß ein Programm für die RS232-Schnittstelle nicht umfangreich sein muß, beweist unser kleines C 128-Terminalprogramm (siehe Listing). Mit ihm kann mit jeder Mailbox kommuniziert werden.</p>
+
+        <p>Leider ist der Basic 7.0 Interpreter etwas langsamer als der Dateneingang über die RS232-Schnittstelle. Wenn kontinuierlich Daten hereinkommen, läuft der Datenpuffer nach einiger Zeit über, weil der Computer mit dem Auslesen nicht mehr nachkommt. Die Folge ist, daß der Text plötzlich unleserlich wird. Erst wenn der Partnercomputer eine Pause macht, kann die Basicsen, für die der Speicher des C64 zu klein war.</p>
+
+        <address class="author">(zu)</address>
+
+        <p class="source">Quelle: Commodore 128 Intern von Data Becker, ISBN 3-89011-098-3<br>
+            Das Commodore 128 Handbuch von Markt&Technik. Verlag, ISBN 3-89090-171-9</p>
+
+
+        <p></p>
+    </article>
+</body>
+
+</html>

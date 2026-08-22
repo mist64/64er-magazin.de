@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>C 128 um 35% schneller</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Andreas Zeller, tr">
+    <meta name="64er.issue" content="SH8601">
+    <meta name="64er.pages" content="142-143">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX26">
+</head>
+
+<body>
+    <article>
+        <h1>C 128 um 35% schneller</h1>
+        <p class="intro">Hier haben wir zwei Leckerbissen für Besitzer des C 128: Ein Programm, das die Benutzung aller C 128-Tasten im C 64-Modus gestattet und ein Programm, das den Commodore 128 im C 64-Modus um 35 Prozent beschleunigt.</p>
+
+        <p>ill man einen Commodore 128 im C 64-Modus betreiben, muß man auf vieles verzichten, wasim © 128-Modus bereitsteht. Die Zehnertastatur läßt sich nicht benutzen und der FAST Befehl, der den Commodore 128 um 100 Prozent beschleunigt, istnur auf dem 80-Zeichen-Monitor anwendbar, der vom C 64 nicht unterstützt wird.</p>
+
+        <p>Zwei Programme schaffen hier Abhilfe. Das erste namens »key 128« (Listing ]) gestattet die Benutzung sämtlicher C 128'Tasten im C64-Modus, bis auf die Taste ASCIV/ DIN, deren Zustand in Speicherzelle | steht und die Taste 40/80 DISPLAY, die im © 64-Modus nicht abgefragt werden kann.</p>
+
+        <p>»key12&amp; wird als Basic-Lader und nicht als MSE-Listing abgedruckt, was den Vorteil hat, daß es sich an jede beliebige legen läßt. Nach dem Programmlauf werden SYS-Befehle für Ein- und Ausschalten der C 128 Tastatur angegeben. Die Tasten geben, mit</p>
+
+        <p>»GET A$« abgefragt, folgende</p>
+
+        <p>ASCII-Codes zurück:</p>
+
+        <p>Taste: Code: Shift:</p>
+
+        <p>ESC: chr$(27), chr$(27)</p>
+
+        <p>TAB: chr$(9), chr$(24)</p>
+
+        <p>ALT: chr$(14), chr$(142)</p>
+
+        <p>HELP: chr$(8), chr$(9)</p>
+
+        <p>Speicherstelle LINE FEED: chr$(10), chr$(10)</p>
+
+        <p>NO SCROLL:chr$(3), chr$(@)</p>
+
+        <p>Mit Hilfe des zweiten Programms »fast64« (Listing 2) läuft ein Commodore 128 im © 64-Modus um 35 Prozent schneller. Dies geschieht mit Hilfe der Taktumschaltung von 1 MHz auf 2 MHz. Normalerweise erscheint bei der Umschaltung auf 2 MHz »Speichermüll« auf dem Bildschirm, da der Video-Chip nicht mehr auf den Speicher zugreifen kann. Deswegen wird beim Commodore 128 beim FAST-Befehl der 40-Zeichen-Videochip auch einfach abgeschaltet. Unser Programm umgeht diese Einschränkung so, daß der 2 MHz-Modus nur eingeschaltet wird, wenn der Videochip den Rahmen oben und unten aufbaut und ohnehin nicht auf den Speicher zugreift.</p>
+
+        <p>Während die Beschleunigung wirksam ist, können Peripheriegeräte nicht korrekt benutzt werden (das hängt mit der IRQ-Routine zusammen). Vor Laden/Speichern auf Diskette oder Cassette sowie Drucken sollte das Programm deshalb wieder abgeschaltet werden (Listing 2, Zeile 440)!</p>
+
+        <p>Auch dieses Programm wird als Basic-Lader veröffentlicht und läßt sich somit in jeden beliebigen Speicherbereich legen. Beide Programme sind gegen RUN/STOF-RESTORE geschützt, das heißt, daß sie auch nach dem Drücken dieser Tastenkombination noch aktiviert sind. Sie laufen über den IRQ-Vektor. Wenn beide Programme gleichzeitig benutzt werden, sollten Sie dieimListinginden REM-Zeilen angegebenen Änderungen vornehmen. Diese Zeilen müssen Sie natürlich nicht mit abtippen. »fast 64« muß zuletzt aktiviert werden.</p>
+
+        <p>Wenn Sie diese Hilfen in Ihren eigenen Programmen benutzen wollen, sollte es keinerlei Anpassungsprobleme geben; esseidenn, Sie arbeiten mit Interrupt-Steuerung. In diesem Fall sollten 'Sie die Programme erst aktivieren, nachdem Ihr Interrupt eingerichtet ist. Dasselbe gilt natürlich auch für Spiele und kommerzielle Programme. Hier wird man in den meisten Fällen nicht umhin kommen, das jeweilige Programm mit Hilfe eines Monitors auf Veränderungen des IRQ-Vektors zu untersuchen.</p>
+
+        <p>Noch ein Hinweis: Beide Programme verwenden indirekte Sprungbefehle bei denen der 6510/8510-Prozessor unter gewissen Umständen (beim Verwenden von kritischen Adressen, zum Beispiel JMP($20FF) oder JMP($21FF) etc.) Fehler macht. Der 6502-Befehl JMP (addr) funktioniert nämlich nur so lange korrekt, wie das Lo-Byte von »addr« ungleich $FF ist. Ansonsten wird die Adresse nicht aus »addr/addr + l« gehof, sondern aus »addr/addr-S$FF«!</p>
+
+        <p>Beispiel: JMP ($0103) springt zur Adresse, die in ($0103/$0104) steht, aber JMP ($01FF) springt zur Adresse, die in ($01FF/$0100) steht! Sollte ein Programm nicht laufen, erhöhen Sie die Startadresse um |. Die im Listing angegebenen Startadressen sind selbstverständlich geprüft.</p>
+
+        <p>Anmerkung: Die Beschleunigung um 35 Prozent läßt sich auch im C128-Modus programmieren. Wann erscheint das erste Listing dazu? Profis mögen uns schreiben!</p>
+
+        <address class="author">(Andreas Zeller/tr)</address>
+    </article>
+</body>
+
+</html>
