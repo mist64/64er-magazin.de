@@ -372,6 +372,23 @@ look at `git status` first.
    across the issue and confirm each is non-empty and is that page's text, not
    the previous one's.
 
+   **REAL AND PAGE-CORRECT IS THE WHOLE TEST. It is NOT expected to be clean,
+   and its errors are NOT a defect to fix.** This layer is raw tesseract over
+   the page image — nothing edits it, and it never sees the corrected
+   transcription the editorial chain produces. On SH8601's p016 it reads
+   `er C128 im professionellen` and `Spitznamenhaterauchschon` where the
+   published article correctly reads `Der C 128 im professionellen` and
+   `Einen Spitznamen hat er auch schon` — a lost drop cap and lost word spaces
+   that were repaired in the HTML and, by design, not in the PDF.
+
+   r000's cross-cutting rule *the PDF's text layer is a CANDIDATE SOURCE, not
+   authority* is the reason: it exists to generate candidates for damaged
+   words, and **is never quoted as what the print says.** So do not read a
+   mangled sentence in it as a finding, do not "fix" it, and do not propose
+   deriving it from the finished HTML as if the mismatch were a bug — the two
+   artefacts are produced differently on purpose. The HTML is the transcription;
+   the PDF is the paper, with a search aid attached.
+
    **2a. PAGE 1 IS THE HAND-MADE COVER — COMPARE PIXELS, NOT SHAPE.** Extract
    page 1's image and diff it against `issues/<ID>/title.png`:
 
