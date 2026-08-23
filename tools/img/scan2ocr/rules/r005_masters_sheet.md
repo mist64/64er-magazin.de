@@ -220,6 +220,47 @@ scan_dir/NNN.png
      cmyk2400/NNN.tif + NNN.colors.txt, debug600/NNN.png
 ```
 
+### The fill: MIRROR the page into the band, do not paint a constant
+
+**This is the older process's rule, ported here because it never was.** The
+scan2mrc crop step fills a band that reaches the page border by **reflecting the
+page's own pixels into it**, and only paints where reflection is not defensible.
+Its two constants are the whole rule:
+
+```
+MIRROR_MAX_PX = 1200        # @2400 dpi = 12.7 mm
+```
+
+> *Beyond this distance from any known pixel, DO NOT MIRROR — fill with the
+> page's own paper. Mirroring assumes the page plausibly continues just past the
+> crop, which is true for a matte band. It is false for a large void: p003/p004
+> are bound-in reply cards narrower than A4, so ~44% of the page has no sheet
+> behind it at all, and reflecting there fabricates a mirrored copy of the card
+> — which reads as real content and is worse than the black it replaced.*
+
+And the fallback colour is **measured, not assumed**: the median of the KNOWN
+pixels in the lightest quartile, per page, so a cream stock or a colour cast
+fills with its own white rather than with 255.
+
+**Both halves matter, and the second one is the one this chain gets wrong
+today:** step 005 fills outside the traced page with the profile's `W` and the
+A4 window pads with a literal `255`.
+
+**Why SH8601 was NOT re-run to change this, measured rather than argued.** On
+the delivered 150 dpi pages the fabricated strip is **0.0–1.4 mm**, and the real
+graded paper immediately inside it sits at **p50 255, sd 2.3–4.8** — this
+issue's grading already maps its paper to pure white, so a mirrored strip and a
+painted strip differ by under three grey levels on a band a millimetre wide, and
+the issue's 48 bilevel pages threshold both to the same white. Re-grading,
+re-cutting and rebuilding a 152-page PDF for that is not worth it.
+
+**It is worth it where the paper still has tone.** A matte or cream stock, a
+band left by a deep cut into the fringe (this issue's deepest real cut is ~8 mm,
+well inside the 12.7 mm cap), or any issue delivered without this issue's
+aggressive white point will show a flat band against textured paper. Implement
+the mirror there, with the cap and the measured-paper fallback, and record which
+of the two filled each band.
+
 ### Why the edges are TRACED and not cropped to
 
 Levelling the text leaves the paper edges tilted, so an axis-aligned crop

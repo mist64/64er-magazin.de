@@ -111,6 +111,134 @@ owner can open — plus a contact sheet for the sweep. Say where they are on
 disk. Then WAIT. A build started without that review is to be stopped, not
 finished; SH8601's first two builds were.
 
+## The PDF's metadata is a house standard — and it is NOT set by the scripts
+
+The 38 published issue PDFs in `issues/*/` agree on four things, across three
+different producing toolchains and eighteen years of files. That agreement is
+the standard; it was never written down, so this is where it lives now.
+
+### The four fields the corpus fixes
+
+| field | value | evidence |
+|---|---|---|
+| `/Title` (DocInfo) **and** `dc:title` (XMP) | monthly `64'er MM/YY`; **Sonderheft `64'er Sonderheft NN/YY`** | 30/30 monthlies, 8/8 Sonderhefte |
+| `/Author` (DocInfo) | `Markt & Technik` | 38/38 |
+| `/Subject`, `/Keywords` | **absent — never written** | 0/38 carry either |
+| `/CreationDate` = `/ModDate` | the build's own timestamp | 37/38 (`8609` is the only file without them) |
+
+**The title names the Sonderheft's number within its year, zero-padded, over a
+two-digit year — and nothing else.** `64'er Sonderheft 01/85` … `08/85`, one
+per Sonderheft of 1985, in the same shape as the monthly's `64'er 08/85`. It
+does **not** carry the theme, the long year, or the repo's `SH` prefix. That is
+also how the archive's own index names them: `Gesamtinhaltsverzeichnis
+Sonderhefte.csv` cites a Sonderheft article as `1/86`. So `SH8601` is
+`64'er Sonderheft 01/86`.
+
+The reason the shape matters: `64'er ` + issue tag is the only string a reader,
+a library catalogue or a file manager ever sees for the document, and it is the
+one place a monthly and a Sonderheft of the same month are told apart. `64'er
+01/86` and `64'er Sonderheft 01/86` are two different 1986 issues; `64'er SH
+1/86` sorts and reads as neither.
+
+**Subject and Keywords are deliberately empty.** Not one file in the corpus
+sets them — not the 2008 ABBYY 9 file, not the 2025 ABBYY runs, not our own
+builds. Do not start now: a keyword list nobody maintains ages into a lie, and
+the article-level metadata that would populate it already lives in the HTML.
+
+### The fields the corpus leaves to the tool — do not standardise them
+
+`/Creator`, `/Producer`, `dc:format`, `pdfaid:*`, `xmpMM:DocumentID` and
+`/Lang` are whatever the producing tool wrote, and they disagree across the
+corpus precisely because the tools do:
+
+| producer | `/Creator` | `/Producer` | `pdfaid` |
+|---|---|---|---|
+| ABBYY FineReader PDF (most of the corpus) | `ABBYY FineReader PDF` | — | part 3 / conformance A |
+| `8404` (2008) | — | `ABBYY FineReader 9.0 Professional Edition` | part 1 / A |
+| `SH8507` (pdftk re-assembly) | `pdftk-java 3.3.3` | `itext-paulo-155 …` | — |
+| `8608` (our gs build) | `tesseract 5 + guetzli + Ghostscript` | `GPL Ghostscript 10.07.1` | part 3 / **B** |
+| `8609`, `SH8601` (our mixed build) | `tesseract 5 + guetzli + jbig2enc + pikepdf` | same | — |
+
+`/Creator` names the toolchain **honestly** — that is the rule the scripts
+already follow (`CREATOR="tesseract 5 + guetzli + Ghostscript"  # honest`), and
+it is why the mixed build's string differs from the plain build's. Leave it
+alone. Likewise `pdfaid`: its absence on a mixed build is correct and already
+argued for above — the file is not PDF/A and must not claim to be.
+
+`/Lang` is an ABBYY artefact and is not even self-consistent there (`de-DE` on
+`SH8502`/`SH8508`, `en-US` on `SH8501`/`SH8503`–`SH8506` — for German
+magazines). Our builds set none. Nothing to copy.
+
+### What the build scripts actually set
+
+**The Sonderheft-vs-monthly distinction is not in the scripts at all.** Both
+build scripts hold
+
+```sh
+TITLE="64'er $TAG"        # $TAG is argv[3], typed by the operator
+AUTHOR="Markt & Technik"
+```
+
+and neither reads `issue.json`, so nothing knows an `SH…` issue is a
+Sonderheft. **The tag you type IS the standard being applied or broken.** For a
+Sonderheft it must be `"Sonderheft 01/86"`, not `"SH 1/86"`.
+
+| field | `make_issue_pdf.sh` (gs, PDF/A) | `make_issue_pdf_mixed.sh` → `assemble_pdf.py` (pikepdf) |
+|---|---|---|
+| DocInfo `/Title` | pdfmark `/DOCINFO`, then **re-set with `exiftool`** — gs's PDF/A pass silently drops it | `out.docinfo[/Title]` |
+| DocInfo `/Author` | pdfmark `/DOCINFO` | `out.docinfo[/Author]` |
+| DocInfo `/Creator` | pdfmark `/DOCINFO` | `out.docinfo[/Creator]` |
+| DocInfo `/CreationDate`, `/ModDate` | pdfmark `/DOCINFO`, `$NOW` | **NOT SET** |
+| XMP `dc:title` | `exiftool -XMP-dc:Title` | `meta["dc:title"]` |
+| XMP `dc:creator` | gs, from `/Author` | `meta["dc:creator"] = [author]` |
+| XMP `pdf:Producer`, `xmp:CreatorTool` | gs | set explicitly |
+| XMP `xmp:CreateDate`/`ModifyDate`/`MetadataDate` | gs | **NOT SET** |
+| XMP `dc:format`, `pdfaid`, `xmpMM:*` | gs's PDF/A machinery | **NOT SET** |
+| `/Subject`, `/Keywords` | never | never |
+
+So: **`Title` and `Author` are automatic and correct only if the tag is
+correct; the dates are automatic on the plain build and simply missing on the
+mixed build.** Nothing else is set by hand today, and nothing validates any of
+it — which is how `SH8601` shipped as `64'er SH 1/86`.
+
+**The mixed build's missing dates are a real gap, not a choice.** Every other
+published file in the archive says when it was made; `8609` and `SH8601` are
+the two that do not, and both came out of `assemble_pdf.py`. Until the script
+writes them, set them by hand with the file's own mtime.
+
+### Verification
+
+```sh
+pdfinfo "$PDF" | grep -E '^(Title|Author|Subject|Keywords|CreationDate|ModDate):'
+```
+
+- `Title` is `64'er Sonderheft NN/YY` (Sonderheft) or `64'er MM/YY` (monthly),
+  and `pdfinfo -meta` shows the same string in `dc:title`
+- `Author` is `Markt & Technik`
+- no `Subject`, no `Keywords`
+- `CreationDate` and `ModDate` present and equal
+
+### Fixing a shipped file without re-encoding it
+
+`exiftool` writes a PDF as an **incremental update** — it appends a new trailer
+and leaves every existing object, including all 152 page images, byte-for-byte
+alone. It is the same tool `make_issue_pdf.sh` already uses for the title, so
+this is not a foreign edit. Measured on `SH8601`'s delivery: 98,568,266 →
+98,572,396 bytes, +4,130 bytes, and `Author`/`Creator`/`Producer`/
+`xmp:CreatorTool` all survived untouched.
+
+```sh
+T="64'er Sonderheft 01/86"
+D="2026:08:23 07:29:50+02:00"        # the file's own mtime
+exiftool -overwrite_original \
+  -Title="$T" -XMP-dc:Title="$T" \
+  -PDF:CreateDate="$D" -PDF:ModifyDate="$D" \
+  -XMP-xmp:CreateDate="$D" -XMP-xmp:ModifyDate="$D" "$PDF"
+```
+
+Never re-run the build for a metadata fix: the guetzli quality search is hours,
+and a rebuild changes the pixels for nothing.
+
 ## Inputs
 
 - `<tmp>/masters600/NNN.png` — every page of the issue, 600 dpi
