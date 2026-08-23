@@ -239,6 +239,35 @@ exiftool -overwrite_original \
 Never re-run the build for a metadata fix: the guetzli quality search is hours,
 and a rebuild changes the pixels for nothing.
 
+## RE-CUTTING A PAGE MEANS RE-OCR'ING IT — the OCR layer carries the geometry
+
+**The PDF's page box comes from `.ocrcache/NNN.pdf`, not from the PNG.** So a
+page that is re-cut to a different size and rebuilt WITHOUT re-running its OCR
+keeps its OLD box, and the build reports success.
+
+MEASURED on SH8601: after step 005b unified the four Zahlkarte pages to one
+size, two consecutive rebuilds emitted a PDF whose insert pages were still
+407.5 / 408.5 / 409.3 / 409.6 pt wide — the byte count did not change at all,
+which is the only visible sign that nothing happened.
+
+Three caches sit behind a page, and **all of them are keyed on existence**, so
+a re-cut invalidates none of them by itself:
+
+| cache | what it holds | when it must be dropped |
+|---|---|---|
+| `.ocrcache/NNN.pdf` | the OCR text layer **and the page box** | the page was re-cut, at all |
+| `.ocrcache/NNN_150.png` | the 150 dpi raster | the page's pixels changed |
+| `.ocrcache/<enc>-q<N>/NNN.jpg`, `NNN_g.pdf`, `merged.pdf`, `out.pdf` | the encoded page and the assembly | either of the above changed |
+
+Re-OCR exactly the affected pages with the recipe's own parameters — they are
+one line in `make_issue_pdf.sh`: `-resize 67%`, `-l deu --psm 3 --oem 3 --dpi
+402`.
+
+**And check for hardlinks first.** A comparison tree built by copying the cache
+may share inodes with the delivery's (`stat -f%l` reports the link count):
+writing into one then silently rewrites the other. Unlink before regenerating —
+`rm` the entry and make a new file, never edit in place.
+
 ## Inputs
 
 - `<tmp>/masters600/NNN.png` — every page of the issue, 600 dpi
