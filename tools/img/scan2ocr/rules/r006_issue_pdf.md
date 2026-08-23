@@ -285,6 +285,83 @@ pages carrying only black ink: it ships those as 600 dpi lossless JBIG2 and
 the rest as 150 dpi guetzli. The plain script ships every page at 150 dpi
 guetzli, quality binary-searched to land under 100 MB.
 
+### The whole procedure, in order
+
+Written out because SH8601 was rebuilt SIX times before it was right, and every
+wrong build looked like a success. `<tmp>` is the issue's tmp dir, `<A4>` the
+delivered A4 pages (`<tmp>/a4600`), `<repo>` this repository.
+
+**1. The pages must be the ones the owner reviewed** — see the review rule
+above. The A4 cut comes from step 005b, and re-cutting anything means going
+through step 3 below for those pages.
+
+**2. Build the OCR cache and the 150 dpi rasters — WITH THE COVER.** The
+default `TITLE_PNG` points into the scans dir, where the cover does not live;
+pass it explicitly or the build now refuses:
+
+```sh
+TITLE_PNG=<repo>/issues/<ID>/title.png \
+  tools/img/issue_pdf/make_issue_pdf.sh <A4> <tmp>/scratch.pdf "<tag>"
+```
+
+This populates `<A4>/.ocrcache/`, which is what the mixed build consumes. Its
+own output PDF is a by-product here.
+
+**3. If any page was re-cut after that, refresh ITS THREE CACHES** — the OCR
+layer carries the page box, so skipping it silently keeps the old geometry (see
+the section above). For each affected page `NNN`:
+
+```sh
+magick <A4>/NNN.png -resize 25% +repage -strip <A4>/.ocrcache/NNN_150.png
+rm -f <A4>/.ocrcache/NNN.pdf                 # unlink: it may be a hardlink
+magick <A4>/NNN.png -resize 67% +repage -strip <A4>/.ocrcache/NNN_o.png
+tesseract <A4>/.ocrcache/NNN_o.png <A4>/.ocrcache/NNN \
+          -l deu --psm 3 --oem 3 --dpi 402 pdf
+rm -f <A4>/.ocrcache/NNN_o.png \
+      <A4>/.ocrcache/guetzli-q<N>/NNN.jpg <A4>/.ocrcache/guetzli-q<N>/NNN_g.pdf \
+      <A4>/.ocrcache/guetzli-q<N>/merged.pdf <A4>/.ocrcache/guetzli-q<N>/out.pdf
+```
+
+**4. Assemble.** `QMIN=QMAX=<q>` pins the quality to one encode instead of the
+multi-hour binary search — use it for a rebuild whose q is already known, and
+let the search run for a first build or after a grading change:
+
+```sh
+TITLE_PNG=<repo>/issues/<ID>/title.png QMIN=95 QMAX=95 \
+  tools/img/issue_pdf/make_issue_pdf_mixed.sh <A4> <tmp>/<name>.pdf "Sonderheft NN/YY"
+```
+
+Watch for `[cover] page 001 carries .../title.png (N grey levels)` in the log.
+Its absence means the build died — check the log, not the exit status of a
+pipeline.
+
+**5. Stamp the metadata.** The scripts write no dates and take the title from
+argv, so the house standard is applied afterwards (exiftool writes an
+incremental update — no re-encode, ~4 KB):
+
+```sh
+D=$(date -r <tmp>/<name>.pdf "+%Y:%m:%d %H:%M:%S%z" | sed 's/\(..\)$/:\1/')
+T="64'er Sonderheft NN/YY"          # or "64'er MM/YY" for a monthly
+exiftool -overwrite_original -Title="$T" -XMP-dc:Title="$T" \
+  -Author="Markt & Technik" \
+  -PDF:CreateDate="$D" -PDF:ModifyDate="$D" \
+  -XMP-xmp:CreateDate="$D" -XMP-xmp:ModifyDate="$D" <tmp>/<name>.pdf
+```
+
+**6. Run the Verification below**, then copy it into the repo under the name
+`issue.json`'s `pdf` key gives — that name and no other, because `generate.py`
+looks it up there:
+
+```sh
+cp <tmp>/<name>.pdf <repo>/issues/<ID>/$(python3 -c \
+   "import json;print(json.load(open('<repo>/issues/<ID>/issue.json'))['pdf'])")
+```
+
+**Never `git add -A` an issue directory to commit it.** That is how SH8601's
+first, worst build entered history: a 99.8 MB PDF with the wrong cover and the
+wrong insert geometry, swept in by a wildcard add. Add the path explicitly, and
+look at `git status` first.
+
 ## Verification
 
 1. **Page count** — the PDF has exactly `issue.json`'s `pages` pages, and page
