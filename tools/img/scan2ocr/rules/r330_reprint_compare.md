@@ -326,6 +326,176 @@ a **figure caption or table cell** (the two issues may genuinely print different
 captions), and a difference in a **number** (r000: a genuine print typo such as
 a backwards address range stays verbatim). Flag those to the user as such.
 
+## Step 7 — the reprint carries a reference to its original
+
+A `CONFIRMED` or `PARTIAL` reprint is published on this site twice, in two
+issues, with no way for a reader of either copy to know the other exists. So
+once the verdict is settled, the reprint **links to the article it reprints**.
+This is the only step of this rule that adds anything to the page; it runs after
+the dispositions are recorded, for the numbering reason in *What the credit must
+never do* below.
+
+### The markup — copy it, do not design it
+
+The corpus already has this component. `SH8508` carries it on 12 paragraphs
+across 7 articles, and it is the only form in the corpus that states "this
+article previously appeared in issue X, page Y":
+
+```html
+<p><strong>Nachdruck aus <a href="../8404/drawline.html">64'er 4/84, S. 65</a>.</strong></p>
+```
+
+(`issues/SH8508/167 Ein schneller Drawline-Algorithmus.html:23`.) Every part of
+it is fixed:
+
+- **A plain `<p><strong>`.** No class, no `<aside>`, no `<meta>`. There is no
+  reprint `<meta>` in the corpus — the nine `64er.*` names are `id`, `issue`,
+  `pages`, `head1`, `head2`, `toc_title`, `toc_category`, `index_title`,
+  `index_category`, and none of them is provenance. A `<meta>` nobody displays
+  is not a reference to the reader, which is the whole point of the credit.
+- **Not `<p class="source">`.** Rule 250 owns that class and defines it as a
+  *third-party* pointer (vendor, publisher, address) in **section-tail**
+  position. The credit is neither: it points at this site, and it sits at the
+  head. Rule 250's verifier #4 walks every `<p class="source">` and reports the
+  ones whose next block is not `<h2>`/`<h3>`/`<aside>`/`</section>`/`</article>`
+  — a credit tagged `source` after the standfirst fires it on every reprint.
+- **`href="../<YYMM>/<64er.id>.html"`.** The published filename is
+  `out_filename() = <64er.id> + ".html"` (`generate.py:488`), not the
+  `NN Title.html` the repo stores, so the link is built from the original's
+  `<meta name="64er.id">` and resolves only after the build. This is the one
+  place `64er.id` is the right key; step 2's *never match by `64er.id`* is about
+  **finding** an article from a page number, where the slug repeats across
+  issues. Here the issue directory is already known, so the slug is unique
+  within it — **check that**, and if two articles in the target issue share the
+  id, stop and report it rather than linking to whichever one wins.
+- **`64'er M/YY, S. P`** as the link text, ASCII apostrophe, the issue label
+  taken verbatim from the original's `<meta name="64er.issue">` and `P` the
+  **start page of the original article** — the lead page, the one the LOG's
+  `claimed` column holds. Not the Sonderheft's page, and not the page the
+  reprinted passage happens to fall on.
+- **Directly after `<p class="intro">`**, one blank line either side. That is
+  where `SH8508` puts it, and it is where a reader looks for provenance —
+  before the article, not buried after it.
+
+The same corpus-wide convention shows up in every other kind of cross-issue
+reference, which is why nothing here is invented: errata link the same way
+(`issues/8405/22 Druckfehlerteufelchen.html:31`,
+`<h3><a href="../8404/sx64.html">SX 64 im Test, Seite 32</a></h3>`), so do inline
+cross-references (`issues/8405/14 Ein Wolf im Schafspelz – der 264.html:43`,
+`<a href="../8404/264_364.html">Ausgabe 4, Seite 9 ff</a>`) and series
+continuations (`issues/8407/154 Strubs …(Teil 4).html:226`,
+`<a href="../8405/strubs.html">Teil 2 auf S. 121</a>`).
+
+### The wording — `CONFIRMED` and `PARTIAL` say different things
+
+A full reprint gets the bare house sentence, one link:
+
+```html
+<p><strong>Nachdruck aus <a href="../8510/monitor.html">64'er 10/85, S. 16</a>.</strong></p>
+```
+
+A `PARTIAL` must not say that, because it is not true of the article as a whole.
+It opens `Teilweiser Nachdruck aus`, names **every** original the LOG gives it a
+row for, says after each one **which part** was re-set, and says what the rest of
+the article is:
+
+```html
+<p><strong>Teilweiser Nachdruck aus <a href="../8506/pc128.html">64'er 6/85, S. 16</a>
+(nur der Abschnitt über MMU und Konfigurationsregister) und
+<a href="../8507/c128.html">64'er 7/85, S. 17</a>
+(nur Schlußfolgerung und Z80-Registertabelle).
+Der übrige Artikel ist für dieses Sonderheft neu geschrieben.</strong></p>
+```
+
+The restriction in each parenthesis is the same fact the pair's `**Verdict
+evidence.**` paragraph in `LOG.md` already states, in the same words — it is
+copied from there, not re-derived, so the page and the log cannot drift apart.
+`SH8508` words a multi-original credit the same way, with the restriction in a
+parenthesis after the link: `(Teil 1, nur Kap. 3-6)` in
+`issues/SH8508/4 Assembler ist keine Alchimie.html:26`.
+
+**The failure this prevents** is the one a bare `Nachdruck aus` on a `PARTIAL`
+would cause: a reader clicks through to a two-part hardware test, finds that
+nine tenths of the Sonderheft article is not in it, and concludes the reference
+is wrong. It is not wrong; it was over-claimed. `PARTIAL` is a verdict about
+*how much*, and the credit is the only place the reader ever sees it.
+
+`NOT-A-REPRINT` and `UNRESOLVED` get **no credit at all.** An `UNRESOLVED` lead
+is precisely one where nobody knows what the original is, and a credit is a
+claim; if the verdict later becomes `CONFIRMED`, the credit is added then.
+
+### What the credit must never do: appear in the diff
+
+The credit is **site apparatus, not transcribed prose**. It is printed on
+neither page, so it can carry no disposition — `PRINT` would claim both pages
+print it, which is false, and there is no fifth word. It is therefore excluded
+from the comparison in `r330_reprint_compare.py`, next to `<pre>`/`<code>` and
+for the same reason:
+
+```python
+REPRINT_CREDIT = re.compile(r"^(Teilweiser\s+)?Nachdruck\s+aus\b", re.I)
+```
+
+tested in `_Extractor._flush`, so a block whose text *begins* with the credit
+sentence never becomes a `Block`.
+
+This is not tidiness. **MEASURED**, and the reason the exclusion exists: adding
+the credit to `issues/SH8601/70 Test_ WordStar.html` without it inserted a
+`BLOCK ONLY IN SH8601` at D-006, moved the real `WordStar`/`Wordstar` difference
+from D-006 to D-007, and shifted **every** disposition after it by one. `verify`
+did not catch the shift — it matches a difference to its disposition **by
+number, not by text** — so all it reported was one missing line at the end. In
+the WordStar pair alone that is 93 lines (D-006 through D-098) describing their
+neighbour, and the issue records 2047 dispositions in total (961 + 715 + 35 +
+25 + 84 + 98 + 129), nearly all of them after their own article's credit. That is the same shape as this rule's `THEIRS` trap: an artifact that
+looks authoritative used as one.
+
+Two consequences follow, and both are binding:
+
+1. **Add the credit only after the pair's dispositions are written**, then
+   re-run `verify` and confirm it still passes. If a credit ever has to change,
+   re-run `verify` again — the exclusion makes that a no-op, and a no-op is what
+   you must see.
+2. **The exclusion is anchored at the start of the block.** Prose that merely
+   contains the word stays compared — `Es sei … mit Nachdruck darauf
+   hingewiesen` in `issues/8605/16 Leserforum.html` is body text and is still a
+   `Block`. Verify that with a negative control before trusting the filter;
+   a filter that swallows too much deletes findings, which is worse than the
+   problem it solves.
+
+### Verification for this step
+
+```bash
+ID=SH8601
+# a. every CONFIRMED/PARTIAL row in the LOG has a credit in that file, and
+#    nothing else does.  Two traps, both hit on the first run of this check:
+#    a row names TWO backticked paths (this issue's, then the monthly's), so
+#    the sed must anchor on the FIRST -- `[^`]*` before it, not `.*`; and the
+#    basenames contain spaces, so `xargs -n1 basename` shreds them into words.
+grep -E '^\| (CONFIRMED|PARTIAL) \|' "issues/$ID/LOG.md" \
+  | sed 's/^[^`]*`issues\/[^/]*\/\([^`]*\)`.*/\1/' | sort -u > /tmp/rows.txt
+grep -l 'Nachdruck aus' "issues/$ID"/*.html | sed 's|.*/||' | sort -u > /tmp/creds.txt
+diff /tmp/rows.txt /tmp/creds.txt || echo "  credit set != CONFIRMED/PARTIAL set"
+
+# b. every link target resolves to exactly one article in the target issue
+#    (the published name is <64er.id>.html, so match on the meta, not the file)
+grep -ho 'href="\.\./[0-9]\{4\}/[^"]*\.html"' "issues/$ID"/*.html | sort -u \
+  | sed 's/href="\.\.\///;s/\.html"//' | while IFS=/ read -r d i; do
+      n=$(grep -l "content=\"$i\"" "issues/$d"/*.html 2>/dev/null | wc -l)
+      [ "$n" = 1 ] || echo "  BAD ../$d/$i.html -> $n candidate(s)"
+    done
+
+# c. the credit is invisible to the diff -- verify must be unchanged by it
+python3 tools/img/scan2ocr/rules/r330_reprint_compare.py verify "issues/$ID"
+```
+
+Check (a) fails when a confirmed reprint has no credit **or** an article that is
+not a reprint has one. Check (b) is the one that catches a credit written from
+the repo filename instead of `64er.id`: the link would 404 only after the build,
+in a directory this rule never opens. Check (c) is the numbering guard — it must
+report the same pair count and the same `D` totals as before the credits were
+added, and if it does not, the exclusion is not working.
+
 ## Recording the result in `LOG.md`
 
 One section, `## Step 330 (reprint_compare)`, in `issues/<ID>/LOG.md`. It is the
@@ -542,12 +712,17 @@ three of its dispositions against the `LOG.md` lines.
   agreement proves nothing and their diff finds no transcription errors. This
   issue transcribes independently — that independence *is* the evidence, and
   it is why `REPRINTS.md` insists nothing be copied over.
-- `SH8508` also carries a printed-source credit,
-  `<p><strong>Nachdruck aus <a href="../8510/smon.html">64'er 10/85, S. 87</a>.</strong></p>`,
-  on 14 articles. This rule neither adds nor removes one: whether SH8601's pages
-  print such a credit is a transcription fact owned by the earlier steps. If a
-  confirmed reprint here does print one, note it in the report — the user may
-  want the convention applied — but do not add it on your own judgement.
+- **`SH8508`'s `Nachdruck aus` credit is now step 7, and it is editorial, not
+  transcribed.** An earlier version of this note told the executor to record
+  such a credit if the *page* printed one and otherwise leave it alone. That
+  framing was wrong on the facts: a printed page cannot print an `<a href>`, the
+  page numbers in `SH8508`'s credits are the site's resolved start pages, and
+  `issues/SH8508/4 Assembler ist keine Alchimie.html:24` carries an
+  `<em>Hinweis: Die Reihenfolge der Teile im Sonderheft weicht von der
+  ursprünglichen Veröffentlichung ab…</em>` that is plainly a note written from
+  the comparison, not set in 1985. The credit is **added by this rule** from the
+  verdict, per step 7. Nothing about it is a transcription fact, so no earlier
+  step owns it and none of them will produce it.
 - The `ALIGNED:` percentage in the diff header separates the cases cleanly in
   practice (100% for the same text, 4–5% for two unrelated articles), which is
   exactly why it is tempting to use as the confirmation. It is not the
