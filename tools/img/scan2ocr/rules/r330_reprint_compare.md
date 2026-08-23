@@ -302,6 +302,30 @@ phrase across from the monthly is re-typing from another source, not
 transcribing our page. If a passage needs more than word-level repair, hand it
 back: OCR the region again, or escalate.
 
+### A SYSTEMATIC RENAME DEFEATS A SIMILARITY SCORE
+
+Before concluding from a low score that an article was rewritten, **read the
+aligned blocks.** A single token substituted throughout one printing drags
+word-identity down far more than it should.
+
+MEASURED on SH8601's *Das ist der C 128* against 8506/16: only **~9% of words
+byte-identical**, which reads like a different article — and it is a full
+reprint. The monthly calls the machine `PC 128`, the Sonderheft `C 128`; it was
+renamed between the two printings, and that token sits in nearly every
+paragraph. Figure and table numbers are renumbered with it, and the prose
+carries light editorial polish.
+
+The measures that DID show it, and are worth checking first when a score
+disappoints:
+
+- **headings** — 14 of 18 `<h2>` verbatim across the two monthly parts;
+- **aligned block count** — 256 of 549, where identity said 10;
+- **the shape of the differences** — one substituted token per block, the same
+  token every time, is a rename; scattered unrelated wording is a rewrite.
+
+This lead had been recorded as NOT a reprint on the strength of the score, and
+its evidence sentence filed under a different article. Both were wrong.
+
 ## Step 6 — a `THEIRS` finding is REPORTED, never applied
 
 A fix to the monthly's published HTML changes an **already-published issue**.
