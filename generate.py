@@ -2170,6 +2170,60 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True, head_html)
 
+def copy_and_annotate_issue_pdf(issue, source_path, dest_path):
+    first_page = lambda pr: int(re.split(r'[-,]', pr)[0])
+    # replace <br> and <li> tags in title with a NL, all others with space
+    clean_title = lambda t: re.sub(r' +', ' ', re.sub(r'<\/?[a-z]+>', ' ', re.sub(r'<br>|<li>', '\n', t))).strip(' :')
+
+    # the standard issues have a predictable page for the toc
+    toc_page = 6
+
+    is_special = issue.issue_dir_name.startswith('SH')
+
+    reader = PdfReader(os.path.join(source_path, issue.pdf_filename))
+    writer = PdfWriter()
+    # for some reason this doesn't work when using clone_reader_document_root()
+    writer.add_metadata(reader.metadata)
+    writer.append_pages_from_reader(reader)
+    writer.add_outline_item("Titel", 0)
+    if not is_special: # special issues lack a consistent toc page
+        writer.add_outline_item("Inhalt", toc_page-1)
+    group_cache = {}
+
+    # Go through toc categories and add 
+    for toc_category in [''] + issue.toc_order:
+        for article in issue.articles:
+            if article.toc_category != toc_category:
+                continue
+
+            page = first_page(article.pages)
+            title = clean_title(article.toc_title or article.title)
+            parent = None
+
+            if toc_category != '':
+                parts = toc_category.split('|')
+
+                # add parent group headers as needed
+                for p in range(len(parts)):
+                    key = '|'.join(parts[:p+1])
+                    node = group_cache.get(key)
+                    if node == None: # node doesn't exist yet
+                        # make group headers link to first article in group,
+                        # except "Rubriken" in standard issues, which links to
+                        # the issue's toc pages.
+                        if toc_category != 'Rubriken' or is_special:
+                            link = page
+                        else:
+                            link = toc_page
+                        node = writer.add_outline_item(clean_title(parts[p]), link-1, parent)
+                        group_cache[key] = node
+                    parent = node
+
+            writer.add_outline_item(title, page-1, parent)
+
+    with open(os.path.join(dest_path, issue.pdf_filename), 'wb') as f:
+        writer.write(f)
+
 def copy_articles_and_assets(db, in_directory, out_directory):
     if not os.path.exists(out_directory):
         os.makedirs(out_directory)
@@ -2236,8 +2290,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
         pdf_filename = issue.pdf_filename
         if pdf_filename:
-            # Copy full PDF
-            shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
+            copy_and_annotate_issue_pdf(issue, issue_source_path, issue_dest_path)
 
         # Create .PRG from Petcat listings
         for key, listing in issue.listings.items():
