@@ -79,6 +79,27 @@ for f in "$IN"/[0-9][0-9][0-9].png "$IN"/[0-9][0-9][0-9].tiff; do
   b="$(basename "$f")"; pages="$pages ${b%.*}"
 done
 pages=$(printf '%s\n' $pages | sort -u)
+
+# ---- THE COVER IS THE HAND-MADE FILE, AND THIS BUILD MUST PROVE IT ------------------------------
+# This script does not build the 150 dpi pages -- it consumes the cache make_issue_pdf.sh left
+# behind.  So a cache built without the cover silently ships a machine reduction of the cover
+# master as page 1.  MEASURED on SH8601: exactly that shipped, and every verification passed,
+# because the derived page has the same size (1240x1754) and the same codec as the real cover.
+# Compare the PIXELS.  Shape proves nothing here.
+TITLE_PNG="${TITLE_PNG:-$IN/title.png}"
+first="$(echo $pages | awk '{print $1}')"
+if [[ -f "$TITLE_PNG" ]]; then
+  mae=$(magick compare -metric MAE "$TITLE_PNG" "$CACHE/${first}_150.png" null: 2>&1 | awk '{print $1+0}')
+  if awk "BEGIN{exit !($mae > 1)}"; then
+    echo "cached page $first does not carry $TITLE_PNG (MAE $mae)" >&2
+    echo "  rebuild the cache with the cover:  TITLE_PNG=$TITLE_PNG make_issue_pdf.sh $IN ..." >&2
+    exit 1
+  fi
+  echo "[cover] page $first carries $TITLE_PNG (MAE $mae)"
+elif [[ "${COVER_OPTIONAL:-0}" != "1" ]]; then
+  echo "no cover at $TITLE_PNG -- see make_issue_pdf.sh; COVER_OPTIONAL=1 to build without one" >&2
+  exit 1
+fi
 echo "pages: $(echo $pages | wc -w)"
 
 src_of() { if [[ -f "$IN/$1.png" ]]; then echo "$IN/$1.png"; else echo "$IN/$1.tiff"; fi; }

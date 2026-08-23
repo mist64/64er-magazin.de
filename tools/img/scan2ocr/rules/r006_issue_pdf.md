@@ -52,6 +52,31 @@ ready to build. Ask for it; do not substitute the raw master, because then the
 published PDF and the published cover image disagree about what the cover
 looks like.
 
+**AND THE COVER MUST BE HANDED TO THE BUILD EXPLICITLY.** `make_issue_pdf.sh`
+defaults `TITLE_PNG` to `$IN/title.png` — the **scans** directory — and the
+cover lives in the **repo**, `issues/<ID>/title.png`. Those are never the same
+place. Always pass it:
+
+```sh
+TITLE_PNG=<repo>/issues/<ID>/title.png tools/img/issue_pdf/make_issue_pdf.sh ...
+```
+
+MEASURED on SH8601, and this is why both scripts now refuse to build without
+one: the default pointed at a file that does not exist, so `[[ -f "$TITLE_PNG" ]]`
+was simply false and page 1 fell through to the machine reduction of the cover
+master. **A 152-page PDF shipped with the wrong cover and every check passed.**
+The loud guard beside that branch (`EXACT SIZE OR STOP`) only fires when the
+file IS found, so a missing cover was the one case that said nothing.
+
+Two further traps found with it, both now closed in the scripts:
+
+- the 150 dpi cache is keyed on **existence** (`[[ -s "$CACHE/NNN_150.png" ]] &&
+  continue`), so a cover retouched after the last build never reached the PDF.
+  Page 1's cache entry is now invalidated by a newer `title.png`.
+- **the mixed build does not make the 150 dpi pages at all** — it consumes the
+  plain script's cache. It now compares page 1's cached pixels against
+  `title.png` (MAE ≤ 1) and refuses to assemble otherwise.
+
 ## THE PAGE INPUTS ARE REVIEWED BEFORE THE PDF IS COMPILED — ALWAYS
 
 **Do not compile until the issue owner has looked at the exact files that will
@@ -112,6 +137,20 @@ guetzli, quality binary-searched to land under 100 MB.
 2. **The text layer is real** — extract text from a handful of pages spread
    across the issue and confirm each is non-empty and is that page's text, not
    the previous one's.
+
+   **2a. PAGE 1 IS THE HAND-MADE COVER — COMPARE PIXELS, NOT SHAPE.** Extract
+   page 1's image and diff it against `issues/<ID>/title.png`:
+
+   ```sh
+   pdfimages -f 1 -l 1 -png "$PDF" /tmp/cover && \
+     magick compare -metric MAE /tmp/cover-000.png issues/<ID>/title.png null:
+   ```
+
+   A few grey levels is JPEG error and passes; anything more is a different
+   image. **"1240x1754 /DCTDecode" is NOT this check** — the machine-derived
+   page has exactly that size and codec, which is precisely how SH8601's wrong
+   cover passed review. Measured there: the shipped page 1 differed from the
+   hand-made cover by MAE 4676 while matching the derived cache file to 2.49.
 3. **Size** — under the 100 MB ceiling the build targets.
 
    **The shipped PDF is NOT PDF/A, and that is expected.** The mixed build

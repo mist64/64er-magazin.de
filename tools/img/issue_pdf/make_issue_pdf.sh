@@ -48,6 +48,25 @@ CACHE="$IN/.ocrcache"
 # The cleaned 150 dpi cover that replaces page 1's image. Defaults to the input dir; the repo keeps
 # the real ones per issue (issues/NNNN/title.png), which is not where the scans live.
 TITLE_PNG="${TITLE_PNG:-$IN/title.png}"
+# A MISSING COVER IS AN ERROR, NOT A DEFAULT.  The hand-made cover IS page 1's image
+# (r006: "The title page is made BY HAND, always"), and the branch below only guards the
+# case where the file is FOUND -- so an unset or wrong TITLE_PNG used to fall silently
+# through to the machine reduction of the cover master.  MEASURED on SH8601: it shipped a
+# 152-page PDF whose page 1 was the derived master, at exactly the right size and codec,
+# so every verification passed.  Say so and stop; COVER_OPTIONAL=1 is the deliberate
+# escape hatch for an issue that genuinely has no cleaned cover yet.
+if [[ ! -f "$TITLE_PNG" ]]; then
+  if [[ "${COVER_OPTIONAL:-0}" == "1" ]]; then
+    echo "[cover] NONE -- COVER_OPTIONAL=1, page 1 will be the machine-derived master"
+  else
+    echo "no cover at $TITLE_PNG" >&2
+    echo "  page 1's image is the HAND-MADE cover, not a reduction of the master." >&2
+    echo "  The scans dir is not where it lives -- the repo keeps it per issue:" >&2
+    echo "    TITLE_PNG=<repo>/issues/<ID>/title.png $0 ..." >&2
+    echo "  Set COVER_OPTIONAL=1 only if this issue deliberately has none." >&2
+    exit 1
+  fi
+fi
 LOG="${OUT%.pdf}.build.log"
 LIMIT=$((100*1000*1000))        # 100 MB ceiling (decimal)
 ENCODER="${ENCODER:-guetzli}"
@@ -105,6 +124,12 @@ first=$(echo $pages | awk '{print $1}')
 dims=$(magick "$(src_of "$first")" -format "%[fx:round(w*$IMGSCALE/100)] %[fx:round(h*$IMGSCALE/100)]" info:)
 W1=${dims% *}; H1=${dims#* }
 for n in $pages; do
+  # The cache is keyed on EXISTENCE, so a cover retouched after the last build would never
+  # reach the PDF.  Page 1 is therefore also invalidated by an newer TITLE_PNG.
+  if [[ "$n" == "$first" && -f "$TITLE_PNG" && "$TITLE_PNG" -nt "$CACHE/${n}_150.png" ]]; then
+    echo "[cover] $TITLE_PNG is newer than the cached page $first -- rebuilding it"
+    rm -f "$CACHE/${n}_150.png"
+  fi
   [[ -s "$CACHE/${n}_150.png" ]] && continue
   if [[ "$n" == "$first" && -f "$TITLE_PNG" ]]; then
     # EXACT SIZE OR STOP. title.png is a 150 dpi cover that REPLACES page 1's image, so it has to
