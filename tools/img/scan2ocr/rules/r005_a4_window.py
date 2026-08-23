@@ -84,6 +84,12 @@ RUN
     python r005_a4_window.py              measure every page, fit, cut every page
     python r005_a4_window.py 056 063 110  measure every page, fit, cut ONLY these
 
+    FILL=mirror A4_OUT=<tmp>/a4600_mirror python r005_a4_window.py
+        the same windows, with the fabricated band REFLECTED from the page
+        instead of painted 255 -- see r005_masters_sheet.md, "The fill: MIRROR
+        the page into the band".  FILL defaults to `paint`, which is what the
+        delivery shipped, so the default output is unchanged byte for byte.
+
 Positional pages restrict the CUT, never the measurement and never the fit: a
 per-parity offset fitted on three pages is not the offset, and the original's
 recorded footgun was exactly this -- running its detector on a subset REWROTE
@@ -201,6 +207,40 @@ SRC_LOGO = "logo"
 SRC_PAPER = "paper-edge"
 SRC_TRACED = "traced-edge"
 
+# --- HOW THE FABRICATED PART OF THE WINDOW IS FILLED -----------------------
+# Two knobs, and they are knobs precisely so the DELIVERED behaviour stays
+# reproducible byte for byte while the better one can be measured against it:
+#
+#   FILL=paint   (DEFAULT, and what shipped)  the fabricated part of the window
+#                is a literal 255.
+#   FILL=mirror  r005_masters_sheet.md, "The fill: MIRROR the page into the
+#                band, do not paint a constant" -- the band is filled by
+#                REFLECTING the page's own pixels across the page border into
+#                it, capped at MIRROR_MAX_PX from the nearest known pixel;
+#                beyond the cap the fill is the page's OWN measured paper.
+#   A4_OUT=<dir> write somewhere other than <tmp>/a4600, so a comparison run
+#                cannot touch the delivery.
+#
+# THE CAP IS THE WHOLE SECOND HALF OF THE RULE.  Mirroring assumes the page
+# plausibly continues just past the crop, which is true for a matte band a
+# millimetre or two wide and FALSE for a large void: reflecting across a void
+# fabricates a mirrored copy of real content, which reads as real and is worse
+# than the flat fill it replaced.  So the reflection is bounded and the rest is
+# paper.  The constant below is the older process's, converted from its frame:
+# 1200 px @2400 dpi = 12.7 mm = 300 px here.
+FILL = os.environ.get("FILL", "paint")
+if FILL not in ("paint", "mirror"):
+    raise SystemExit(f"r005b: FILL={FILL!r} -- expected 'paint' or 'mirror'")
+MIRROR_MAX_MM = 12.7
+MIRROR_MAX_PX = int(round(MIRROR_MAX_MM / 25.4 * DPI))      # 300 @600 dpi
+# The fallback colour is MEASURED, not assumed: the median of the KNOWN pixels
+# in the lightest quartile, per page, so a cream stock or a colour cast fills
+# with its own white rather than with 255.  Measured on a 4x-decimated grid --
+# a page is ~35 Mpx and the quartile of a quarter-million samples is the same
+# number to well inside the noise the fill is being judged against.
+PAPER_LIGHTEST_Q = 75.0
+PAPER_SUBSAMPLE = 4
+
 # ---------------------------------------------------------------------------
 # PATHS
 # ---------------------------------------------------------------------------
@@ -212,7 +252,7 @@ SHEETS = Path(ISS.tmp) / "sheets600"
 # finders traced it), and both are answers this step would otherwise have to
 # guess at.  See sheet_box_of().
 MASTERS = Path(ISS.masters600)
-OUT_A4 = Path(ISS.tmp) / "a4600"
+OUT_A4 = Path(os.environ.get("A4_OUT") or (Path(ISS.tmp) / "a4600"))
 # The measurement cache: one record per page, MERGED never replaced.
 CACHE = Path(ISS.tmp) / "a4win"
 OUT_OVERLAY = CACHE / "preview"
@@ -550,6 +590,79 @@ def place(rec, off, entry):
 # ---------------------------------------------------------------------------
 
 
+def paper_of(known):
+    """The page's OWN paper: median of the KNOWN pixels in the lightest quartile.
+
+    MEASURED, never assumed.  255 is this issue's answer because this issue's
+    grading maps its paper to pure white; a matte or cream stock answers with
+    its own white, and that is the entire point of measuring it.
+    """
+    a = known[::PAPER_SUBSAMPLE, ::PAPER_SUBSAMPLE].reshape(-1, 3)
+    if not len(a):
+        return np.array([255, 255, 255], np.uint8)
+    lum = a.astype(np.uint16).sum(1)
+    sel = a[lum >= np.percentile(lum, PAPER_LIGHTEST_Q)]
+    if not len(sel):
+        sel = a
+    return np.clip(np.median(sel, 0).round(), 0, 255).astype(np.uint8)
+
+
+def mirror_cut(src, x0, y0, ow, oh, bw, bh, insert=False):
+    """The window with every fabricated band filled by REFLECTION, not by 255.
+
+    `src` is the master, (x0, y0) the window's origin IN THE MASTER FRAME, and
+    (bw, bh) step 005's traced page box in that same frame -- the box starts at
+    the master's origin because the master IS the traced page moved there.  So
+    the KNOWN region of the output is one rectangle, and the fabricated region
+    is the up-to-four bands around it plus the corners where two bands meet.
+
+    The corners are handled by reflecting in BOTH axes, which is what a single
+    `np.pad(mode="reflect")` on the known rectangle does: a corner is filled by
+    the diagonal reflection of the page's own corner, which is the only answer
+    consistent with the two bands that meet there.
+
+    The cap is applied per band, from the page border -- the nearest known
+    pixel.  Beyond it the fill is `paper_of()`.  Returns (out, report).
+    """
+    kx0, ky0 = max(0, -x0), max(0, -y0)
+    kx1, ky1 = min(ow, bw - x0), min(oh, bh - y0)
+    if kx1 <= kx0 or ky1 <= ky0:
+        out = np.full((oh, ow, 3), 255, np.uint8)
+        return out, {"known": [0, 0, 0, 0], "paper": [255, 255, 255],
+                     "bands": {}, "capped_px": 0,
+                     "note": "NO known pixels in this window -- nothing to "
+                             "reflect; the whole page is 255"}
+    K = src[y0 + ky0:y0 + ky1, x0 + kx0:x0 + kx1]
+    paper = paper_of(K)
+    out = np.empty((oh, ow, 3), np.uint8)
+    out[:] = paper
+    out[ky0:ky1, kx0:kx1] = K
+    rep = {"known": [int(kx0), int(ky0), int(kx1), int(ky1)],
+           "paper": [int(v) for v in paper], "bands": {}, "capped_px": 0,
+           "note": ""}
+    if insert:
+        # AN INSERT IS NOT AN A4 LEAF WITH BANDS.  The window IS the traced
+        # card, so there is nothing outside it in this output at all -- and if
+        # the card were ever padded to A4 the void would be ~44% of the page,
+        # exactly the case the rule forbids reflecting into.  Say so rather
+        # than letting a zero-width band imply the question never came up.
+        rep["note"] = ("insert: the window IS the traced card, delivered at its "
+                       "own size -- there is no band and nothing is reflected")
+        return out, rep
+    kh, kw = ky1 - ky0, kx1 - kx0
+    cap = MIRROR_MAX_PX
+    pl, pt = min(kx0, cap, kw - 1), min(ky0, cap, kh - 1)
+    pr, pb = min(ow - kx1, cap, kw - 1), min(oh - ky1, cap, kh - 1)
+    if pl or pr or pt or pb:
+        out[ky0 - pt:ky1 + pb, kx0 - pl:kx1 + pr] = np.pad(
+            K, ((pt, pb), (pl, pr), (0, 0)), mode="reflect")
+    for lab, band, pad in (("L", kx0, pl), ("R", ow - kx1, pr),
+                           ("T", ky0, pt), ("B", oh - ky1, pb)):
+        rep["bands"][lab] = [int(band), int(pad)]
+        rep["capped_px"] += int(band - pad)
+    return out, rep
+
+
 def cut(page, win, rec, out_dir=None):
     """Write the A4 page.  EXACTLY A4, and the window is NEVER clamped.
 
@@ -578,23 +691,31 @@ def cut(page, win, rec, out_dir=None):
     H, W = src.shape[:2]
     bx0, by0 = rec["sheet_box"][0], rec["sheet_box"][1]
     ow, oh = win.get("w", A4_W), win.get("h", A4_H)
-    out = np.full((oh, ow, 3), 255, np.uint8)
+    bwm, bhm = rec["sheet_box"][2] - bx0, rec["sheet_box"][3] - by0
     x0, y0 = win["x0"] - bx0, win["y0"] - by0          # sheet frame -> master
     sx0, sy0 = max(x0, 0), max(y0, 0)
     sx1, sy1 = min(x0 + ow, W), min(y0 + oh, H)
     off = ow * oh
     if sx1 > sx0 and sy1 > sy0:
-        out[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = src[sy0:sy1, sx0:sx1]
         off = ow * oh - (sx1 - sx0) * (sy1 - sy0)
+    if FILL == "mirror":
+        out, fill_rep = mirror_cut(src, x0, y0, ow, oh, bwm, bhm,
+                                   bool(win.get("insert")))
+    else:
+        fill_rep = None
+        out = np.full((oh, ow, 3), 255, np.uint8)
+        if sx1 > sx0 and sy1 > sy0:
+            out[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = src[sy0:sy1, sx0:sx1]
     # What is FABRICATED: the part of the window that is not inside step 005's
     # traced page.  Not "how white is it" -- most of a text page is white paper
     # and that number says nothing.  Measured against the traced page's BOX, so
     # it is a lower bound: the wedges between the box and the fitted edge lines
     # are fabricated too, and `alpha` above is the measure that includes them.
-    bw, bh = rec["sheet_box"][2] - bx0, rec["sheet_box"][3] - by0
+    bw, bh = bwm, bhm
     ix = max(0, min(x0 + ow, bw) - max(x0, 0))
     iy = max(0, min(y0 + oh, bh) - max(y0, 0))
     fab = 1.0 - (ix * iy) / float(A4_W * A4_H)
+    fab_own = 1.0 - (ix * iy) / float(ow * oh)
     meta = PngImagePlugin.PngInfo()
     stamp = (f"r005b a4_window  page {page:03d} of {ISSUE}\n"
              f"  anchor   {win['src']}"
@@ -609,13 +730,29 @@ def cut(page, win, rec, out_dir=None):
                f"\n  fabricated {100.0 * fab:.2f}% of the delivered page lies "
                f"outside the traced page, of which "
                f"{100.0 * off / (A4_W * A4_H):.2f}% is off the master canvas\n")
+    if fill_rep is not None:
+        mm = 25.4 / DPI
+        bands = "  ".join(
+            "%s %.2fmm(%.2f mirrored)" % (k, v[0] * mm, v[1] * mm)
+            for k, v in sorted(fill_rep["bands"].items()))
+        stamp += (f"  fill     MIRROR, cap {MIRROR_MAX_PX} px = {MIRROR_MAX_MM} mm"
+                  f"\n           bands (of the {ow}x{oh} delivered page): "
+                  f"{bands or '(none)'}"
+                  f"\n           beyond the cap: this page's OWN measured paper "
+                  f"{tuple(fill_rep['paper'])} "
+                  f"({fill_rep['capped_px']} px of band depth past the cap)"
+                  f"\n           fabricated {100.0 * fab_own:.2f}% of the "
+                  f"{ow}x{oh} page actually delivered"
+                  + (f"\n           NOTE {fill_rep['note']}"
+                     if fill_rep["note"] else "") + "\n")
     meta.add_text("r005b", stamp)
     Image.fromarray(out).save(out_dir / f"{page:03d}.png", pnginfo=meta,
                               dpi=(DPI, DPI))
     (out_dir / f"{page:03d}.stamp.txt").write_text(stamp, encoding="utf-8")
     return {"page": page, "src": win["src"], "fab_pct": round(100.0 * fab, 3),
             "offcanvas_pct": round(100.0 * off / (A4_W * A4_H), 3),
-            "alpha_pct": win["alpha_pct"]}
+            "alpha_pct": win["alpha_pct"], "fill": FILL,
+            "fab_own_pct": round(100.0 * fab_own, 3), "fill_rep": fill_rep}
 
 
 def overlay(page, win, out_dir=None):
@@ -662,6 +799,52 @@ def _measure_one(p):
         return None
 
 
+def unify_inserts(wins):
+    """ONE INSERT IS ONE OBJECT: every page of it gets ONE size.
+
+    A bound-in card is a single physical thing, scanned once per side.  Tracing
+    it four times produces four boxes that differ by tracing error, and
+    delivering those verbatim tells the reader the same card is four different
+    sizes.  MEASURED on SH8601's Zahlkarte (149-152): 3395x4829, 3404x4834,
+    3410x4846, 3413x4808 px -- a spread of 0.76 x 1.61 mm across pages that are
+    the front and back of one card.
+
+    TAKE THE MAX, per axis, for the same reason the A4 rule pads a sheet that
+    measures short: a box that traced short has CUT INTO the card, and content
+    lost to a short trace cannot be recovered later, while padding costs at most
+    the spread -- here 0.76 x 1.61 mm of the card's own paper.  The padding is
+    symmetric so the card's content stays where it sits on the card.
+
+    Insert pages are grouped by CONTIGUOUS RUN, not lumped together: an issue
+    may bind in two different cards, and unifying across them would invent a
+    size neither one is.
+    """
+    ins = sorted(p for p, w in wins.items() if w.get("insert"))
+    if not ins:
+        return
+    runs = [[ins[0]]]
+    for p in ins[1:]:
+        if p == runs[-1][-1] + 1:
+            runs[-1].append(p)
+        else:
+            runs.append([p])
+    for run in runs:
+        W = max(wins[p]["w"] for p in run)
+        H = max(wins[p]["h"] for p in run)
+        for p in run:
+            w = wins[p]
+            dw, dh = W - w["w"], H - w["h"]
+            if not (dw or dh):
+                continue
+            w["x0"] -= dw // 2
+            w["y0"] -= dh // 2
+            w["w"], w["h"] = W, H
+            w["note"] = (w.get("note", "") + " padded %+d/%+d px to the insert's "
+                         "common size %dx%d" % (dw, dh, W, H)).strip()
+        print("insert pages %d-%d unified to %dx%d px (%.2f x %.2f mm)" % (
+            run[0], run[-1], W, H, W * 25.4 / DPI, H * 25.4 / DPI), flush=True)
+
+
 def main():
     pages = [int(a) for a in sys.argv[1:]]
     all_pages = [p for p in ISS.page_range if (SHEETS / f"{p:03d}.png").exists()]
@@ -696,6 +879,7 @@ def main():
                   o["alpha_p50"], o["alpha_p95"], o["alpha_max"]), flush=True)
 
     wins = {r["page"]: place(r, off, entries[r["page"]]) for r in order}
+    unify_inserts(wins)
     OUT_A4.mkdir(parents=True, exist_ok=True)
     json.dump({"A4": [A4_W, A4_H], "offsets": off,
                "windows": {str(k): v for k, v in sorted(wins.items())}},
@@ -705,13 +889,28 @@ def main():
     print("windows: " + "  ".join("%s %d" % (k, v) for k, v in
                                   sorted(Counter(w["src"] for w in wins.values()).items())))
     done = []
+    print("fill: %s -> %s" % (FILL, OUT_A4), flush=True)
     for p in (pages or all_pages):
         r = cut(p, wins[p], recs[p])
-        overlay(p, wins[p])
+        # The overlay draws the WINDOW on the sheet, and the fill does not move
+        # the window -- so a comparison run writing elsewhere would rewrite 152
+        # previews of the delivery with pixel-identical copies of themselves,
+        # for minutes of I/O.  Only the delivery's own run refreshes them.
+        if OUT_A4 == Path(ISS.tmp) / "a4600":
+            overlay(p, wins[p])
         done.append(r)
-        print("p%03d %-11s alpha %5.2f%%  fabricated %5.2f%%  (off-canvas %.2f%%)"
+        extra = ""
+        if r["fill_rep"] is not None:
+            mm = 25.4 / DPI
+            extra = ("  bands " + " ".join(
+                "%s%.2f/%.2f" % (k, v[0] * mm, v[1] * mm)
+                for k, v in sorted(r["fill_rep"]["bands"].items()))
+                + "  paper %s" % (tuple(r["fill_rep"]["paper"]),)
+                + ("  [%s]" % r["fill_rep"]["note"]
+                   if r["fill_rep"]["note"] else ""))
+        print("p%03d %-11s alpha %5.2f%%  fabricated %5.2f%%  (off-canvas %.2f%%)%s"
               % (p, r["src"], r["alpha_pct"], r["fab_pct"],
-                 r["offcanvas_pct"]), flush=True)
+                 r["offcanvas_pct"], extra), flush=True)
     for lab in (SRC_LOGO, SRC_PAPER, SRC_TRACED):
         g = [r["fab_pct"] for r in done if r["src"] == lab]
         if g:

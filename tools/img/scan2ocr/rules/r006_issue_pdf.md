@@ -294,7 +294,15 @@ guetzli, quality binary-searched to land under 100 MB.
    **A bound-in insert that is physically smaller keeps its own size**, as an
    image and as a PDF page. SH8601's Zahlkarte (149-152) measures ~144 x 205
    mm: padding it onto A4 would fabricate 53% of the page and tell the reader
-   the card is A4-sized, which it is not. The issue's own leaves are A4; an
+   the card is A4-sized, which it is not.
+
+   **AND EVERY PAGE OF THAT INSERT IS THE SAME SIZE AS THE OTHERS** — check it
+   in the delivered PDF, not only in the masters. SH8601's first delivery shipped
+   its four Zahlkarte pages at 407.5, 408.5, 409.3 and 409.6 pt wide by 579.4,
+   580.1, 581.6 and 576.9 tall: one card, four sizes, because each side was
+   traced independently. Step 005b now unifies a contiguous insert run to the
+   max of its own pages; a PDF whose insert pages differ from one another means
+   that pass did not run. The issue's own leaves are A4; an
    insert is what it is, and its measured size is recorded in the stamp.
 
    ```

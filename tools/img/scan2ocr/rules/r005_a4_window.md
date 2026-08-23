@@ -92,7 +92,23 @@ glue-bound issue has no spine, so for `binding: sheet` the order is:
 **And an insert smaller than the issue's leaf keeps its measured size** rather
 than being centred on an A4 window: SH8601's Zahlkarte is ~144 x 205 mm, and
 padding it to A4 would fabricate 53% of the page. A4 is the geometry of the
-ISSUE's leaves. The cover leaf is the opposite case and is trimmed, not
+ISSUE's leaves.
+
+**ONE INSERT IS ONE OBJECT, AND ALL ITS PAGES ARE THE SAME SIZE.** A bound-in
+card is a single physical thing, scanned once per side. Tracing it four times
+gives four boxes that differ by tracing error, and shipping those verbatim tells
+the reader the same card is four different sizes. MEASURED on SH8601's
+Zahlkarte (149-152): `3395x4829`, `3404x4834`, `3410x4846`, `3413x4808` px — a
+spread of **0.76 x 1.61 mm across the front and back of one card**.
+
+Take the **max per axis**, for the same reason the A4 rule pads a sheet that
+measures short: a box that traced short has CUT INTO the card, and content lost
+to a short trace cannot be recovered downstream, while padding costs at most the
+spread — 0.76 x 1.61 mm of the card's own paper. Pad **symmetrically**, so the
+content stays where it sits on the card.
+
+Group by **contiguous run**, never all inserts at once: an issue may bind in two
+different cards, and unifying across them invents a size neither one is. The cover leaf is the opposite case and is trimmed, not
 padded — its 223 mm width is a fold flap, not a larger page.
 
 Record per page which of the three was used, beside the grade stamp, so a page
