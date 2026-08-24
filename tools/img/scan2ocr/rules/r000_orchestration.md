@@ -657,6 +657,58 @@ previously restated per rule and the restatements disagreed -- two rules called
 `pdftotext` void while two others demanded it as the mandatory evidence form,
 each citing rule 280 as the authority.
 
+## Cross-cutting rule: A CHECK YOU HAVE NOT SEEN FAIL IS NOT A CHECK
+
+**Before trusting any check, prove it can fail.** Run it against data that
+should trip it — the pre-edit tree (`git archive HEAD`), a copy with the defect
+reintroduced, a deliberately wrong input — and confirm it reports. A check that
+has only ever printed "clean" has not been shown to test anything.
+
+This is not caution. It is the single most repeated failure in this chain:
+**fourteen separate verification checks have been wrong on first contact with
+real data**, each written by someone confident it was right.
+
+| check | what it actually did |
+|---|---|
+| r180 | name regex excluded a hyphen — 43 false failures |
+| r190 | piped through `sort`, which exits 0, so the gate was an unconditional FAIL |
+| r150 | filename regex excluded an underscore |
+| r160 | counted `<table` inside HTML comments |
+| r210 | id list was monthly-only, so `vorwort` never matched |
+| r250 | counted comments as tags, and missed `<aside>` entirely |
+| r260 | tested the first *letter* against German model numbers (`C 128`) |
+| r270 | matched its own explanatory comment |
+| r280 | canary string hardcoded from a different issue — 0 hits by construction |
+| r300 | `for f in $(grep -rl …)` word-split on filenames containing spaces |
+| r310 | flagged an adjudicated printed period it could never clear, so HARD could not reach 0 |
+| drop-cap | examined only the first non-intro paragraph, and tested `islower()` alone — found 15 of 17 |
+| r330 `verify` | matched dispositions by NUMBER, not text, so a renumbering silently re-pointed 2047 of them |
+| cover guard | `magick compare` exits non-zero when images differ, so under `set -euo pipefail` it killed the build with an empty log — plus a threshold on the raw metric (~0.005 of a grey level) and a parse that rejected scientific notation |
+
+The pattern is always the same: the check encodes what its author expected the
+data to look like. The data is a 40-year-old magazine.
+
+**Corollary — a gate that always reports the same number stops being read.**
+Where a finding is adjudicated and correct as printed, record the adjudication
+where the CHECK can see it (r290's `PRINTED` comment beside the heading), not
+only in LOG.md. Otherwise the count never reaches zero and nobody looks again.
+
+## Cross-cutting rule: SAY WHAT TO READ SEPARATELY FROM WHAT TO EDIT
+
+When briefing a sub-agent, scope of ATTENTION and scope of MODIFICATION are two
+different things, and collapsing them silently shrinks the work.
+
+MEASURED on SH8601: a glyph sweep was briefed "do NOT touch … headings",
+meaning *do not restructure them*. It read that as *do not look there*, so 247
+headings went unswept — and `<h2>Die Befehle zur $priteprogrammierung</h2>`
+survived a pass that fixed 100 instances of exactly that defect elsewhere in the
+same issue.
+
+So write both, explicitly: **"read everything including headings and table
+cells; edit only the words, never the structure."** The same applies to the
+other axis — which FILES may be touched — when several agents work one issue at
+once.
+
 ## Cross-cutting rule: OCR cleanup granularity
 
 Every rule that touches article body text inherits the same
