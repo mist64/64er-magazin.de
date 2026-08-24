@@ -41,15 +41,17 @@
 
         <p>Der User-Port des C 128 wird vorwiegend für den Druckeranschluß oder für den Anschluß eines Akustikkopplers genutzt. Dazu wird entweder eine parallele oder serielle Schnittstelle am User-Port simuliert. Um Daten mit dem Telefon zu übertragen, ist meist die serielle RS 232-Schnittstelle erforderlich. Mit dieser Schnittstelle werden acht Byte nicht gleichzeitig nebeneinander, sondern Bit für Bit hintereinander gesendet. Dadurch wird zwar die Geschwindigkeit wesentlich geringer als bei der parallelen Datenübertragung, aber man kommt mit viel weniger Leitungen aus. Und gerade im Telefon-Verkehr ist die serielle Übertragung die einzig mögliche.</p>
 
-        <p>Der Commodore 128 ist von Haus aus im Betriebssystem mit der erforderlichen Software zum Betrieb einer seriellen RS232-Schnittstelle ausgerüstet. Die RS232-Schnittstelle selbst muß noch mit einem Modul hardwaremäßig am User-Port simuliert werden. Dazu gibt es in der 64'er, Ausgabe 3/85 einen kleinen Bausatz für 25 Mark, der den Normpegel am User-Port (TTL-Pegel von +5V) auf den RS232-Pegel (+3V bis +15V) umwandelt.</p>
+        <p>Der Commodore 128 ist von Haus aus im Betriebssystem mit der erforderlichen Software zum Betrieb einer seriellen RS232-Schnittstelle ausgerüstet. Die RS232-Schnittstelle selbst muß noch mit einem Modul hardwaremäßig am User-Port simuliert werden. Dazu gibt es in der 64'er, Ausgabe 3/85 einen kleinen Bausatz für 25 Mark, der den Normpegel am User-Port (TTL-Pegel von +5V) auf den RS232-Pegel (±3V bis ±15V) umwandelt.</p>
 
         <p>Die RS232-Schnittstelle hat im C 128 die Geräteadresse 2 bekommen. Dadurch wird diese Schnittstelle wie ein Floppy-Laufwerk oder ein Drucker angesprochen.</p>
 
         <p>Eröffnet man beim Commodore 128 ein User-Port-File mit der OPEN-Anweisung, so legt der C 128 zwei Daten-Buffer von je 256 Byte an. In den Eingabebuffer, der ab der Adresse $0C00 Hex liegt, werden alle über die RS232-Schnittstelle hereinkommenden Daten gesammelt. Der Ausgabebuffer ab der Adresse $0D00 nimmt die an die RS232-Schnittstelle auszugebenden Daten auf.</p>
 
-        <p>Um die Datenübertragung zu organisieren gibt es zwei spezielle Register: das Kontrollregister und das Befehlsregister. Diese werden automatisch mit der Eröffnung des logischen Files (Geräteadresse 2) definiert. .. Das Befehlsregister bestimmt die Übertragungsart, die Parität und die Art der Verbindung (Handshake). Im Kontrollregister wird die Baud-Rate definiert und die Anzahl der Daten- und Stop-Bits.</p>
+        <p>Um die Datenübertragung zu organisieren gibt es zwei spezielle Register: das Kontrollregister und das Befehlsregister. Diese werden automatisch mit der Eröffnung des logischen Files (Geräteadresse 2) definiert.</p>
 
-        <p>Die Datenübertragungsrate beträgt bei den meisten C 64-Mailboxen 300 Baud bei sieben Daten-Bits und einem Stop-Bit. Das Stop-Bit kennzeichnet das UÜbertragungsende von Daten-Bits. Die Baud-Rate darf beim C 128 den Wert von 2400 nicht übersteigen, da die interne Software des C 128-Betriebssytems nicht schneller arbeitet.</p>
+        <p>Das Befehlsregister bestimmt die Übertragungsart, die Parität und die Art der Verbindung (Handshake). Im Kontrollregister wird die Baud-Rate definiert und die Anzahl der Daten- und Stop-Bits.</p>
+
+        <p>Die Datenübertragungsrate beträgt bei den meisten C 64-Mailboxen 300 Baud bei sieben Daten-Bits und einem Stop-Bit. Das Stop-Bit kennzeichnet das Übertragungsende von Daten-Bits. Die Baud-Rate darf beim C 128 den Wert von 2400 nicht übersteigen, da die interne Software des C 128-Betriebssytems nicht schneller arbeitet.</p>
 
         <p>Alle Parameter werden in der OPEN-Anweisung übergeben. Die Syntax für den OPEN-Befehl lautet: »OPEN Filenummer, Geräteadresse, Sekundäradresse, Kontrollregister, Befehlsregister«. Eine Eröffnung des Datenkanals mit allen Parametern sieht beispielsweise folgendermaßen aus:</p>
 
@@ -60,167 +62,15 @@
 
         <ul>
             <li>logisches File 2 öffnen</li>
-            <li>Geräteadresse 2 ansprechen - Sekundäradresse 0 setzen</li>
+            <li>Geräteadresse 2 ansprechen</li>
+            <li>Sekundäradresse 0 setzen</li>
             <li>300 Baud Übertragung</li>
             <li>7 Daten-Bits</li>
             <li>1 Stop-Bit</li>
             <li>3-Draht-Leitung</li>
             <li>Vollduplex</li>
-            <li>keine Parität (kein 8. Daten-Bit) Bits 5,6 und 7 die Parität bestimmt (siehe Tabelle 2).</li>
+            <li>keine Parität (kein 8. Daten-Bit)</li>
         </ul>
-
-        <figure>
-            <table>
-                <tr>
-                    <th>Bit</th>
-                    <th>0</th>
-                    <th></th>
-                    <th></th>
-                    <th>dezimal</th>
-                    <th>Handshake</th>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>0</td>
-                    <td></td>
-                    <td></td>
-                    <td>0</td>
-                    <td>3-Draht-Handshake</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>1</td>
-                    <td></td>
-                    <td></td>
-                    <td>1</td>
-                    <td>X-Draht-Handshake</td>
-                </tr>
-                <tr>
-                    <th>Bit</th>
-                    <th>4</th>
-                    <th></th>
-                    <th></th>
-                    <th>dezimal</th>
-                    <th>Übertragungsart</th>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>0</td>
-                    <td></td>
-                    <td></td>
-                    <td>0</td>
-                    <td>Vollduplex</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>1</td>
-                    <td></td>
-                    <td></td>
-                    <td>16</td>
-                    <td>Halbduplex</td>
-                </tr>
-                <tr>
-                    <th>Bit</th>
-                    <th>7</th>
-                    <th>6</th>
-                    <th>5</th>
-                    <th>0</th>
-                    <th>Paritätsprüfung</th>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>X</td>
-                    <td>X</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>keine Paritätsprüfung<br>kein 8. Datenbit</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>32</td>
-                    <td>ungerade Parität</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>96</td>
-                    <td>gerade Parität</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>160</td>
-                    <td>8. Datenbit immer 1<br>keine Paritätsprüfung</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>224</td>
-                    <td>8. Datenbit immer 0</td>
-                </tr>
-            </table>
-            <figcaption>Tabelle 2. Bit-Belegung des Befehlsregisters</figcaption>
-        </figure>
-
-
-        <p>Selbstverständlich können bei der Datenübertragung mit der RS 232-Schnittstelle Fehler vorkommen. Dafür gibt es das sogenannte Status-Register, dasallerdingsnach dem Auslesen sofort gelöscht wird. Man sollte diese Statusvariable ST immer in einer Variablen ablegen. Die Bedeutung der einzelnen Bits der Statusvariablen ST sind der Tabelle 3 zu entnehmen.</p>
-
-        <figure>
-            <table>
-                <tr>
-                    <th>Bit</th>
-                    <th>Beschreibung</th>
-                </tr>
-                <tr>
-                    <td>0</td>
-                    <td>Paritätsfehler</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>Rahmenfehler</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Empfängerbuffer voll</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Empfängerbuffer leer</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>CTS (Clear To Send) Signal fehlt</td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>unbenutzt</td>
-                </tr>
-                <tr>
-                    <td>6</td>
-                    <td>DSR (Data Set Ready) Signal fehlt</td>
-                </tr>
-                <tr>
-                    <td>7</td>
-                    <td>Break-Signal empfangen</td>
-                </tr>
-            </table>
-            <figcaption>Tabelle 3. Die Statusvariablen ST</figcaption>
-        </figure>
-
-        <p>Das Kontrollregister, das Befehlsregister und die Statusvariable kann man auch direkt aus der Zeropage auslesen. Für die RS232-Routine nach einem Moment wieder »vernünftigen« Text liefern.</p>
-
-        <p>Wesentlich mehr Komfort und Geschwindigkeit bringen in Maschinensprache geschriebene Terminalprogramme. Da nur kleine Änderungen der Speicheradressierung vorzunehmen sind, wird sicherlich demnächst mit mehreren</p>
-
-        <p>Datenfernübertragungsprogrammen zu rechnen sein, die auch im C 128-Modus des Commodore 128 laufen. Nur steht diesen dann wesentlich mehr Speicherplatz für die Protokollführung zur Verfügung. Dann kann man sich mit dem C 128 Programme übertragen las-</p>
 
         <p>Wie man sieht, wird das Befehls- und Kontrollregister mit dem OPEN-Befehl definiert. Dazu haben wir nach der Adreß-Definition zwei Byte mit Hilfe der CHR$-Anweisung übergeben.</p>
 
@@ -457,7 +307,155 @@
             <figcaption>Tabelle 1. Die Bit-Funktionen des Kontrollregisters</figcaption>
         </figure>
 
-        <p>Das zweite Byte wird in das Befehlsregister geschrieben und bestimmt mit Bit 0 die Art des Handshake-Betriebs. Die darauffolgenden drei Bit sind von untergeordneter Bedeutung. Mit Bit 4 wird die Übertragungsart und über die Schnittstelle sind die Adressen $0A0F Hex bis $0A1B Hex wichtig (siehe Tabelle 4).</p>
+        <p>Das zweite Byte wird in das Befehlsregister geschrieben und bestimmt mit Bit 0 die Art des Handshake-Betriebs. Die darauffolgenden drei Bit sind von untergeordneter Bedeutung. Mit Bit 4 wird die Übertragungsart und über die Bits 5,6 und 7 die Parität bestimmt (siehe Tabelle 2).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit</th>
+                    <th>0</th>
+                    <th></th>
+                    <th></th>
+                    <th>dezimal</th>
+                    <th>Handshake</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td></td>
+                    <td></td>
+                    <td>0</td>
+                    <td>3-Draht-Handshake</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td>1</td>
+                    <td>X-Draht-Handshake</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <th>4</th>
+                    <th></th>
+                    <th></th>
+                    <th>dezimal</th>
+                    <th>Übertragungsart</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td></td>
+                    <td></td>
+                    <td>0</td>
+                    <td>Vollduplex</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td>16</td>
+                    <td>Halbduplex</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <th>7</th>
+                    <th>6</th>
+                    <th>5</th>
+                    <th>0</th>
+                    <th>Paritätsprüfung</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>keine Paritätsprüfung<br>kein 8. Datenbit</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>32</td>
+                    <td>ungerade Parität</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>96</td>
+                    <td>gerade Parität</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>160</td>
+                    <td>8. Datenbit immer 1<br>keine Paritätsprüfung</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>224</td>
+                    <td>8. Datenbit immer 0</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Bit-Belegung des Befehlsregisters</figcaption>
+        </figure>
+
+        <p>Selbstverständlich können bei der Datenübertragung mit der RS 232-Schnittstelle Fehler vorkommen. Dafür gibt es das sogenannte Status-Register, das allerdings nach dem Auslesen sofort gelöscht wird. Man sollte diese Statusvariable ST immer in einer Variablen ablegen. Die Bedeutung der einzelnen Bits der Statusvariablen ST sind der Tabelle 3 zu entnehmen.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit</th>
+                    <th>Beschreibung</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Paritätsfehler</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Rahmenfehler</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Empfängerbuffer voll</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Empfängerbuffer leer</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>CTS (Clear To Send) Signal fehlt</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>unbenutzt</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>DSR (Data Set Ready) Signal fehlt</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Break-Signal empfangen</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Die Statusvariablen ST</figcaption>
+        </figure>
+
+        <p>Das Kontrollregister, das Befehlsregister und die Statusvariable kann man auch direkt aus der Zeropage auslesen. Für die RS232-Schnittstelle sind die Adressen $0A0F Hex bis $0A1B Hex wichtig (siehe Tabelle 4).</p>
 
         <figure>
             <table>
@@ -527,12 +525,14 @@
 
         <p>Daß ein Programm für die RS232-Schnittstelle nicht umfangreich sein muß, beweist unser kleines C 128-Terminalprogramm (siehe Listing). Mit ihm kann mit jeder Mailbox kommuniziert werden.</p>
 
-        <p>Leider ist der Basic 7.0 Interpreter etwas langsamer als der Dateneingang über die RS232-Schnittstelle. Wenn kontinuierlich Daten hereinkommen, läuft der Datenpuffer nach einiger Zeit über, weil der Computer mit dem Auslesen nicht mehr nachkommt. Die Folge ist, daß der Text plötzlich unleserlich wird. Erst wenn der Partnercomputer eine Pause macht, kann die Basicsen, für die der Speicher des C 64 zu klein war.</p>
+        <p>Leider ist der Basic 7.0 Interpreter etwas langsamer als der Dateneingang über die RS232-Schnittstelle. Wenn kontinuierlich Daten hereinkommen, läuft der Datenpuffer nach einiger Zeit über, weil der Computer mit dem Auslesen nicht mehr nachkommt. Die Folge ist, daß der Text plötzlich unleserlich wird. Erst wenn der Partnercomputer eine Pause macht, kann die Basic-Routine nach einem Moment wieder »vernünftigen« Text liefern.</p>
+
+        <p>Wesentlich mehr Komfort und Geschwindigkeit bringen in Maschinensprache geschriebene Terminalprogramme. Da nur kleine Änderungen der Speicheradressierung vorzunehmen sind, wird sicherlich demnächst mit mehreren Datenfernübertragungsprogrammen zu rechnen sein, die auch im C 128-Modus des Commodore 128 laufen. Nur steht diesen dann wesentlich mehr Speicherplatz für die Protokollführung zur Verfügung. Dann kann man sich mit dem C 128 Programme übertragen lassen, für die der Speicher des C 64 zu klein war.</p>
 
         <address class="author">(zu)</address>
 
         <p class="source">Quelle: Commodore 128 Intern von Data Becker, ISBN 3-89011-098-3<br>
-            Das Commodore 128 Handbuch von Markt&Technik. Verlag, ISBN 3-89090-171-9</p>
+            Das Commodore 128 Handbuch von Markt&Technik Verlag, ISBN 3-89090-171-9</p>
 
 
         <figure>
