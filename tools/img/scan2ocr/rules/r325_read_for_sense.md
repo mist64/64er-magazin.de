@@ -46,8 +46,47 @@ Everything in the article except listings:
 - screen dumps, monitor dumps and command syntax that sit in `<p>` rather than
   `<pre>` — they are prose as far as the markup is concerned.
 
-**NOT `<pre>` content.** Once r120/r130 have run, listings come from the disk
-and the disk owns them; there is nothing to proofread there.
+**`<pre>` — ONLY THE DISK'S IS OUT OF SCOPE.** The distinction is the attribute,
+not the tag:
+
+| | source | proofread? |
+|---|---|---|
+| `<pre data-filename="…">` | the generator fills it from `prg/` | **no** — the disk owns it |
+| `<pre>` with text in the file | somebody typed it from the page | **YES — it is transcription like any other** |
+
+MEASURED on SH8601: 31 blocks are disk-backed and **68 are hand transcriptions**
+— 44 of them in one article. They are the monitor dumps, screen dumps and short
+code examples the magazine sets INSIDE the body text, and no listing is missing
+on their account: every `Listing N` the articles cite has its own figure.
+
+**A brief that says "skip `<pre>`" therefore leaves the least-checked text in the
+issue unchecked.** Mine did, and the blocks it excused read `1da` for `lda`,
+`#804` for `#$04`, `bp1` for `bpl`, `a 00645` for `a 00b45`. Say
+"skip `<pre data-filename>`" instead.
+
+### An assembler dump CHECKS ITSELF — use that, do not eyeball hex
+
+A wrong byte is indistinguishable from a right one by reading. But a monitor
+dump carries the same information twice, so the two halves can be cross-checked
+mechanically before anyone looks at a page:
+
+```
+a 00b40  a2 04     ldx #$04
+  ^addr  ^bytes    ^mnemonic + operand
+```
+
+1. **The bytes encode the mnemonic.** Disassemble `a2 04` — it must be
+   `ldx #$04`. A mismatch is either OCR damage or a magazine error, and either
+   way it is a candidate that a reader would never have spotted.
+2. **Addresses advance by instruction length.** `a 00b40` + 2 bytes must be
+   followed by `a 00b42`. A gap or a repeat localises the damage to one line.
+
+Run both over every dump, THEN take the survivors to the page. This is how a
+hex pass reaches accuracy that reading cannot: the machine finds the candidates,
+and vision decides each one — the same division of labour as everywhere else in
+this chain, applied to material where human reading is weakest.
+
+
 
 ## What to look for
 
