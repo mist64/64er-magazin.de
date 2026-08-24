@@ -28,6 +28,16 @@
 
         <p>Sollten Sie Ihnen noch nicht begegnet sein, die kleinen Kobolde (»sprite« ist englisch und heißt auf deutsch »Kobold« oder »Gespenst«), dann seien sie hiermit kurz vorgestellt. Es handelt sich um bewegliche grafische Objekte (daher auch der Ausdruck MOB=movable objects, der manchmal verwendet wird), die sowohl als mehr- als auch als einfarbige (dann hochaufgelöste) Figuren ohne Rücksicht auf den gerade eingeschalteten Grafikmodus munter über Text- und Grafikbildschirm huschen können. Die gesamte Verwaltung der Sprites geschieht durch den VIC-Chip, was ihr Auftreten auf den 40-Zeichen-Bildschirm beschränkt. Bevor Sie die folgenden Beispielprogramme ausprobieren, sollten Sie Listing 1 »Alle Sprites« abgetippt und gestartet haben.</p>
 
+        <figure>
+            <pre data-filename="alle sprites" data-name="ALLE SPRITES"></pre>
+            <figcaption>Listing 1. Alle »ALLE SPRITES« Dieser DATA-Lader erzeugt auf der Diskette die in den Beispielprogrammen benötigten Sprite-Files.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="sprites1.prg" data-name="SPRITES1"></div>
+        <div class="binary_download" data-filename="sprites2.prg" data-name="SPRITES2"></div>
+        <div class="binary_download" data-filename="scene1.prg" data-name="SCENE1"></div>
+        <div class="binary_download" data-filename="scene2.prg" data-name="SCENE2"></div>
+        <div class="binary_download" data-filename="scene3.prg" data-name="SCENE3"></div>
+
         <h2>Die Befehle zur $priteprogrammierung</h2>
 
         <p>Zehn Basic-Befehle dienen zum Erstellen und Verwalten von Sprites:</p>
@@ -241,6 +251,11 @@
 
         <p>Nicht immer ist es sinnvoll, so zu verfahren (also die Kollisionsabfrage am Ende der Routine wieder einzuschalten); Falls beispielsweise der Typ 1 (Sprite/Sprite-Zusammenstoß) als Auslöser definiert ist, muß bedacht werden, daß die Überlappung zweier Sprites einige Zeit andauert und deshalb das Unterprogramm mehrfach angesteuert wird. Im einem Testprogramm (Listing 2) ist dieser Effekt deutlich an den vielen Textwiederholungen zu erkennen.</p>
 
+        <figure>
+            <pre data-filename="testprogramm 1" data-name="Testprogramm 1 (COLLISION)"></pre>
+            <figcaption>Listing 2. Kollision von Sprites</figcaption>
+        </figure>
+
         <p>Unter welchen Umständen wird eine Kollision erkannt? Immer dann, wenn sich sichtbare Teile von Sprites gegenseitig oder mit Bildschirmobjekten (bei Typ 2) überlagern. Abgeschaltete Sprites werden nicht berücksichtigt, wohl aber Zusammenstöße außerhalb des sichtbaren Bereiches (das Handbuch behauptet das Gegenteil).</p>
 
         <p>Probieren Sie doch einmal, in Zeile 40 von Listing 1 die Spritepositionierung:</p>
@@ -267,6 +282,11 @@
         </figure>
 
         <p>Ein Supercrash unter Beteiligung aller acht Sprites würde dann also die Zahl 255 ergeben. Ein kleines Testprogramm (Listing 3) soll das Vorgehen dabei illustrieren.</p>
+
+        <figure>
+            <pre data-filename="testprogramm 2" data-name="Testprogramm 2 (BUMP)"></pre>
+            <figcaption>Listing 3. Ein Programm zur BUMP-Abfrage</figcaption>
+        </figure>
 
         <p>Besonders die Zeilen 90 und 100 sind sicherlich für Sie interessant, weil man mit ihnen die Nummern der beteiligten Sprites feststellen kann.</p>
 
@@ -325,6 +345,11 @@
 
         <p>Im Testprogramm (Listing 4) ist eine mögliche Variante dazu gezeigt.</p>
 
+        <figure>
+            <pre data-filename="testprogramm 3" data-name="Testprogramm 3 (JOY)"></pre>
+            <figcaption>Listing 4. Steuern mittels JOY</figcaption>
+        </figure>
+
         <p>Damit haben wir alle im Basic 7.0 enthaltenen Sprite-Befehle behandelt. Allerdings sind noch einige Fragen offen geblieben, die uns nun weiter beschäftigen werden.</p>
 
         <h2>Wie kann man Sprites der Nachwelt erhalten?</h2>
@@ -341,12 +366,17 @@
 
         <p>Sowohl im Speicher als auch im String haben die Sprite-Daten genau dasselbe Format (bis auf die letzten Bytes, die im einen Fall aus einer 0, im anderen aus den Zahlen 23,0,20,0 bestehen). Das können Sie selbst nachprüfen am Programm "VERGLEICH SPRDT" (Listing 5).</p>
 
+        <figure>
+            <pre data-filename="vergleich sprdt" data-name="VERGLEICH SPRDT"></pre>
+            <figcaption>Listing 5. »VERGLEICH SPRDT«. Programm zum Vergleichen von Spritemustern im Speicher und im String</figcaption>
+        </figure>
+
         <p>Nach dem Start werden zunächst die Spritedaten von der Diskette geladen und dann in Strings eingelesen. Anschließend erscheinen auf dem Bildschirm Sprite für Sprite die Bytewerte sowohl aus dem Speicher als auch aus dem String.</p>
 
         <!-- The trailing period is PRINTED: verified against the 600 dpi master
              by step 290.  r310 flags a heading ending in "." as a possible
              paragraph tail; here it is the page's own typography. -->
-            <h3>2. Sprites auf Diskette und Kassette.</h3>
+        <h3>2. Sprites auf Diskette und Kassette.</h3>
 
         <p>a. BSAVE</p>
 
@@ -376,6 +406,11 @@
 
         <p>Dazu haben wir ein kleines Programm »SPRITEDATAS« gestrickt (Listing 6), das Sie mit der MERGE-Funktion an Ihr eigenes fertiges Spriteprogramm anhängen können. Noch eine Warnung: Wenn Sie SPRITDATAS abgetippt haben, speichern Sie es unbedingt vor einem RUN ab, denn es verabschiedet sich am Ende des Programmlaufes aus Ihrem Basicspeicher. Nun also zur Verwendung des Programmes. Man startet es durch RUN63000. Das Auslesen des Sprite-Datenspeichers geschieht im FAST-Modus (der 40-Zeichen-Bildschirm verabschiedet sich vorübergehend), danach erscheinen jeweils zwei Programmzeilen (mit Zeilennummern ab 63020) und darunter ein GOTO 63009. Außerdem meldet sich ein BREAK und READY. Mittels der HOME-Taste und 3 aufeinanderfolgenden RETURNSs übernehmen Sie die Zeilen ins Programm und erzeugen den nächsten Bildschirm, wo das Spielchen dann ebenso weitergeht. Insgesamt machen wir das achtmal (für 8 Sprites). Zu guter Letzt wird in Zeile 63040 noch eine Einleseschleife übernommen und es meldet sich der Befehl DELETE 63000-683011. Haben Sie auch das mit HOME und zwei RETURNs übernommen, dann ist der DATA-Generator gelöscht und an Ihr Programm wurde die gesamte DATA-Sequenz angehängt. Als letzte Zeile finden Sie beim Listen noch die Einleseschleife, zu der Sie nun nur noch an passender Stelle Ihres Programmes mittels GOSUB 63040 springen müssen.</p>
 
+        <figure>
+            <pre data-filename="spritedatas" data-name="SPRITEDATAS"></pre>
+            <figcaption>Listing 6. »SPRITEDATAS«. Erzeugen von DATA-Zeilen aus Spritedaten</figcaption>
+        </figure>
+
         <p>Es gibt sicherlich elegantere Möglichkeiten, DATA-Zeilen zu generieren. So könnten wir auch den Tastaturpuffer verwenden. Das aber überlassen wir Ihrer Schöpferkraft.</p>
 
         <p>b. Aus den Strings in DATAs</p>
@@ -393,11 +428,21 @@
 
         <p>Das Prinzip ist einfach: Weil jedes Sprite in X-Richtung 24 Bit breit ist, ergibt sich für die X-Koordinate des Nachbarsprites bei nahtloser Verbindung ein um 24 größerer Wert. 21 Bit mißt ein MOB in der Vertikalen, wodurch sich Y+21 für ein unterhalb des ersten gelegenes Sprite berechnet als Y-Koordinate. Das Programm »VIER SPRITES« (Listing 7) demonstriert die Verhältnisse.</p>
 
+        <figure>
+            <pre data-filename="vier sprites" data-name="VIER SPRITES"></pre>
+            <figcaption>Listing 7. »VIER SPRITES«. Demonstration zum Koppeln von Sprites</figcaption>
+        </figure>
+
         <p>Zunächst wächst ein grafisches Objekt aus vier Sprites zusammen. Dieses kann dann mit dem Joystick in Port 2 (nach Druck auf den Feuerknopf) über den Bildschirm gesteuert werden (Zeile 300). Ein weiterer Druck auf den Feuerknopf beendet das Programm. Wenn Sie bei bestimmten Richtungen genau hinsehen, werden Sie eine leichte Unstimmigkeit in der Bewegung feststellen. Bei noch größeren Objekten scheint Basic für diese Steuerung doch etwas zu langsam zu werden und man muß auf Maschinensprache umsteigen um eine flüssige Bewegung zu erreichen.</p>
 
         <h2>Mehr als acht Sprites</h2>
 
         <p>Hier soll nicht die Rede sein von trickreichen Anwendungen der Unterbrechungsprogrammierung per Assembler, die es tatsächlich zuläßt, mehr als acht Sprites GLEICHZEITIG auf dem Bildschirm zu zeigen. Vielmehr geht es uns um die schnelle, nacheinander ausgeführte Abbildung. Sehen Sie sich dazu zuerst einmal das Programm »SPRITE-TRICK« ( Listing 8) an. Hier liegen acht Spritemuster vor, die nacheinander - mit programmierter Verzögerung, weil's sonst zu schnell ginge - auf derselben Bildschirmstelle gezeigt werden. Es ergibt sich ein kleiner Trickfilm.</p>
+
+        <figure>
+            <pre data-filename="sprite-trick" data-name="SPRITE-TRICK"></pre>
+            <figcaption>Listing 8. »SPRITE-TRICK«. Ein kleiner Trickfilm</figcaption>
+        </figure>
 
         <p>Nun sind acht Teilbilder ein etwas ärmlicher Bewegungseffekt. Um wirklich längere Passagen zu zeigen, müßten wir anders verfahren. Das soll im Programm »24 SPRITES« demonstriert werden.</p>
 
@@ -418,7 +463,7 @@
         <!-- The trailing period is PRINTED: verified against the 600 dpi master
              by step 290.  r310 flags a heading ending in "." as a possible
              paragraph tail; here it is the page's own typography. -->
-            <h3>2. Sprites und Windows.</h3>
+        <h3>2. Sprites und Windows.</h3>
 
         <p>Ebensowenig wie sich Sprites um den Splitscreen kümmern, scheren sie sich um Windows. Probieren Sie es mal aus, indem Sie in Zeile 130 des Programmes »VIER SPRITES« noch ein Window definieren (zum Beispiel mit WINDOW 5,5,20,10). Unbeirrt von allen Einschränkungen, denen unser Text unterworfen ist (hier die Aufforderung zum Benutzen des Port 2), läßt sich unser Spritegebilde kreuz und quer verschieben.</p>
 
@@ -469,6 +514,11 @@
 
         <p>Natürlich können Sie jedesmal, wenn Sie ein Shape erstellen, von dem Sie argwöhnen, es könne zu groß sein für den String, unsere Formeln anwenden. Eine Hilfe soll Ihnen Listing 9 »SSHAPE-TABELLE« geben. In der vorliegenden Form druckt es eine Liste aus, in deren linker Spalte Werte für eine Y-Differenz stehen. Rechts daneben sind die maximal zulässigen DX-Werte angegeben sowie die sich ergebende Stringlänge. Auf diese Weise können Sie - ausgehend von DY mit einem Blick erkennen, wie groß DX sein darf. Es empfiehlt sich, noch drei weitere Tabellen auszudrucken. Da ist zunächst einmal interessant, wie der Maximalwert von DY bei gegebenem DX aussieht. Zu diesem Zweck ist lediglich die Reihenfolge des Ausdruckes und der Rechenoperationen zu ändern:</p>
 
+        <figure>
+            <pre data-filename="sshape-tabelle" data-name="SSHAPE-TABELLE"></pre>
+            <figcaption>Listing 9. »SSHAPE-TABELLE«. Eine Hilfe für Shapes: Eine Tabelle wird gedruckt</figcaption>
+        </figure>
+
         <p>In Zeile 20 kommt dann X-DIFF vor Y-DIFF, Zeile 40 enthält X=0, in Zeile 50 schreiben wir DO UNTIL X=320, in der nächsten Zeile 60 steht: X=X+1:Y=0. Zeile 70 wird zu DO UNTIL Y=200 und Zeile 80 zu Y=Y+1. Schließlich wird auch in Zeile 90 noch die Reihenfolge des Ausdruckes umgestellt zu PRINT #1,X1,Y1,Z.</p>
 
         <p>Diese beiden Tabellen beziehen sich auf Shapes im Hochauflösungsmodus. Zwei weitere Tabellen für den Multicolormodus bekommen Sie, wenn Sie in Zeile 30 die vorhin angegebene Berechnungsfunktion zu diesem Modus einfügen. Nur die Zahl 8muß dazu in eine 4 verändert werden.</p>
@@ -517,6 +567,11 @@
 
         <p>Die Modi 2, 3, 4sind etwas schwer vorstellbar. Zur Verdeutlichung finden Sie hier ein kleines Demonstrationsprogramm namens »GSHAPE-MODI« (Listing 10). Hier wird zuerst ein Shape definiert, dann der gesamte Bildschirm quergestreift und schließlich das soeben erstellte Shape in allen fünf Modi darauf dargestellt. Die Wirkung ist auf diese Weise ganz gut zu erkennen, besonders bei den Modi 2, 3 und 4.</p>
 
+        <figure>
+            <pre data-filename="gshape-modi" data-name="GSHAPE-MODI"></pre>
+            <figcaption>Listing 10. »GSHAPE-MODI«. Die 5 Shape-Darstellungsformen</figcaption>
+        </figure>
+
         <p>Der Modus 4 ist aufgrund der EOR-Behandlung interessant: Wird nämlich auf dieselbe Stelle noch einmal das Shape im Modus 4 gezeichnet, dann verschwindet es ganz und der Bildschirmhintergrund ist wieder vorhanden. Will man Shapes bewegen, ohne Bildschirmobjekte zu zerstören, dann ist diese Darstellungsweise ganz gut dazu geeignet.</p>
 
         <p>Die Frage, wieviele Shapes man definieren und auch darstellen könne, erübrigt sich fast: Beliebig viele, solange der Speicherplatz für die Stringsreicht. Und davon haben wir eine ganze Menge! Man könnte sich also eine ganze Bibliothek von Hochauflösungs- oder Multicolorobjekten zulegen und diese dann bei Bedarf abrufen. Sollte für ein Objekt der String zu kurz sein, können - ebenso wie wir es bei den Sprites schon praktiziert haben mehrere Shapes gekoppelt werden. Sie erkennen schon: Auch hier sind die Möglichkeiten sehr breit.</p>
@@ -557,6 +612,11 @@
 
         <p>Ebenfalls bei den Sprites wurde diese Möglichkeit schon angedeutet: den Shape-Stfing auseinander zu nehmen und jedes Byte in Form seines ASCII-Wertes zu speichern. Eine Variante dieses Verfahrens zeigt Ihnen das Listing 11 »SHAPE SPEICHERN«. Hier wird zuerst ein Shape (einfach ein Kreis) erzeugt und in A$ abgelegt. Ein Unterprogramm druckt auf dem Textbildschirm (für Benutzer von 2 Bildschirmen sofort, für andere erst später sichtbar) die ASCII-Werte des Strings aus. In Zeile 40 wird der alte File SHAPEI gelöscht und dann ab Zeile 50 der neue auf Diskette abgelegt. Benutzen Sie eine Datasette, dannsindlediglich in den Zeilen 60, 80, 120 und 180 die DOPEN und DCLOSE gegen OPEN und CLOSE mit den entsprechenden Gerätenummern auszutauschen. Nun sind wir eigentlich schon fertig: In Zeile 100 löschen wir alle Variablen, den Grafikbildschirm und starten den zweiten Teil des Programmes, der nur zur Kontrolle den File einliest und unser Shape abbildet. Zusätzlich werden auf dem Textbildschirm wieder die Stringlänge und die eingelesenen ASCII-Werte abgebildet. Beide Ausdrucke lassen sich gut vergleichen (Benutzer eines Bildschirmes kommen in diesen Genuß, wennsienach Ende des Programmes durch GRAPHICO den Textbildschirm einschalten). c. Eine unorthodoxe Lösung</p>
 
+        <figure>
+            <pre data-filename="shape speichern" data-name="SHAPE SPEICHERN"></pre>
+            <figcaption>Listing 11. »SHAPE SPEICHERN«. Shapes retten auf Diskette oder Kassette</figcaption>
+        </figure>
+
         <p>Etwas exotisch und daher hier nur kurz skizziert ist die folgende Vorgehensweise: Mittels des POINTER-Befehls (hier also POINTER(A$)) sucht man in BANK 1 den Stringdescriptor. Die dort genannte Adresse und Länge verhilft uns dazu, den Speicherbereich, indem wir unseren String stehen haben, durch BSAVE abzuspeichern.</p>
 
         <p>Beim Wiedereinladen müßte man zunächst einen String definieren, dann durch BLOAD dessen Inhalt an eine beliebige Speicherstelle packen und den Stringdesciptor darauf richten.</p>
@@ -572,6 +632,11 @@
         <p>b. Shapes in DATA-Zeilen</p>
 
         <p>Ähnlich wie wir bei Sprites einen DATA-Generator verwendet haben, der sich nach seiner Verwendung selbsttätig löscht, geschieht das nun hier auch. Im Programm »SHAPE DATA «(Listing 12) ist außerdem noch ein kleiner Testteil enthalten.</p>
+
+        <figure>
+            <pre data-filename="shape data" data-name="SHAPE DATA"></pre>
+            <figcaption>Listing 12. »SHAPE DATA«. Shapes in DATA-Zeilen ablegen</figcaption>
+        </figure>
 
         <p>Wie gehabt, wird hier zuerst ein Shape (ein Kreis) erzeugt, dann endet das Programm an einem STOP in Zeile 6. Wenn Sie mit dem 40-Zeichen-Bildschirm arbeiten, dann fügen Sie bitte vor das STOP-Kommando noch ein GRAPHIC 0 ein, denn alles, was nun folgt, ist Text. Das STOP-Kommando wurde eingebaut, um Ihnen die Möglichkeit zu geben, an dem Shape vor dem Aufruf des DATA-Generators noch etwas zu verändern. Istallesin Ordnung, dann geben Sie bitte CONT ein. Der DATA-Generator erzeugt nun acht Zeilen mit DATAs und dazu noch das Einleseunterprogramm sowie die Löschanweisung DELETE 63000-63012.</p>
 
@@ -601,6 +666,11 @@
 
         <p>Ein kleines Demoprogramm (Listing 13) namens »SHAPE UND SPRITE« spielt diese Option durch. Zunächst wird ein Multicolorshape erzeugt und in Sprite 1 geschrieben. Eine Umstellung vom Multicolor- in den Hochauflösungsmodus zeigt, daß das Sprite seine Farben behält, das Shape dagegen nicht. Ein zweites Shape erzeugt Sprite 2, die beide über den Bildschirm bewegt werden. Falls Sie nach Programmende mittels GRAPHIC O noch auf den Textbildschirm (40 Zeichen) umschalten, sehen Sie noch einen Unterschied zwischen Shapes und Sprites: Letztere bleiben auch hier aktiv.</p>
 
+        <figure>
+            <pre data-filename="shape und sprite" data-name="SHAPE UND SPRITE"></pre>
+            <figcaption>Listing 13. »SHAPE UND SPRITE«. Shapes werden zu Sprites</figcaption>
+        </figure>
+
         <h3>Shapes aus Sprites bauen</h3>
 
         <p>Natürlich ist auch der umgekehrte Weg möglich: Nämlich Shapes aus Sprites zu konstruieren. Fügen Sie einfach mal an unser letztes Programm aus Listing 13 »SHAPE UND SPRITE« folgende Zeilen an:</p>
@@ -614,6 +684,11 @@
         <h3>Wenn Shapes und Sprites zusammenstoßen</h3>
 
         <p>Kollisionen von Sprites mit Shapes werden vom Computer ebenso registriert, als wären es Zusammenstöße mit Textbestandteilen. Sowohl der COLLISION- als auch der BUMP Befehl können verwendet werden. In einer erweiterten Version unseres Programmes »SHAPE UND SPRITE« namens »SHAPE/ SPR-KOLL« (Listing 14) werden alle Möglichkeiten, die wir in den letzten Abschnitten besprochen haben, ausprobiert. Dabei findet der COLLISION-Befehl Anwendung und Sprite 1 ist durch einen Joystick in Port 2 steuerbar. Bei jedem Zusammenstoß wechselt das Sprite die Farben.</p>
+
+        <figure>
+            <pre data-filename="shape_spr-koll" data-name="SHAPE/SPR-KOLL"></pre>
+            <figcaption>Listing 14. »SHAPE/SPR-KOLL«. Zusammenspiel von Sprites und Shapes</figcaption>
+        </figure>
 
         <h3>Wann Shapes und wann Sprites?</h3>
 
@@ -633,6 +708,11 @@
             <h2>Fehlerteufelchen</h2>
 
             <p>In diesem Artikel wurde das Listing »24 SPRITES« vergessen. Das holen wir jetzt nach (s. List.).</p>
+
+            <figure>
+                <pre data-filename="24 sprites" data-name="24 SPRITES"></pre>
+                <figcaption>Listing »24 SPRITES«</figcaption>
+            </figure>
 
             <!-- 64'er 4/1986 -->
         </aside>
