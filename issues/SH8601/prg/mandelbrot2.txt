@@ -1,0 +1,48 @@
+
+
+;mandelbrot2.prg ==1c01==
+    1 n%=0:nm%=0:x=0:y=0:r=0:i=0:d=0:v=0:u=0:a=0:b=0:da=0:db=0
+    2 iu=0:io=0:ru=0:ro=0:f1%=1:f2%=1:f3%=1:f4%=1
+    3 a$="":b$=""
+    4 def fn md(x)=x-int(x/3)*3
+   10 rem *********************************
+   20 rem *                               *
+   30 rem *    programm zur grafischen    *
+   40 rem *        darstellung von        *
+   50 rem *                               *
+   60 rem *m a n d e l b r o t m e n g e n*
+   70 rem *                               *
+   80 rem *  heimo ponnath  hamburg 1985  *
+   90 rem *                               *
+  100 rem*********************************
+  110 color0,1:color4,1:color5,6:graphic3,1:graphic0,1
+  120 print:print:print:print chr$(18)"mandelbrotmengen als grafik"chr$(146)
+  130 print:print:print"parameter der gaussebene:":input"ru,ro,iu,io=";ru,ro,iu,io
+  140 print:print:print"maximale iterationen:":input"nmax=";nm%
+  150 print:print:print"farben nach steigendem n:":input"f1,f2,f3,f4=";f1%,f2%,f3%,f4%
+  160 print:print:print"es wird jetzt eine ganze weile dauern!!"
+  170 sleep5:graphic3:fast:color0,f4%:color4,f4%:color1,f3%:color2,f2%:color3,f1%
+  180 da=(ro-ru)/159:db=(io-iu)/199
+  190 b=iu-db
+  200 for u=0 to 199
+  210 :b=b+db:a=ru-da
+  220 :for v=0 to 159
+  230 ::a=a+da
+  240 ::n%=0:r=0:i=0:d=0
+  250 ::do while d<4
+  260 :::x=r:y=i
+  270 :::r=x*x-y*y+a:i=2*x*y+b:d=r*r+i*i
+  280 :::n%=n%+1
+  290 ::::if n%=nm% then exit
+  300 ::loop
+  310 ::if n%=nm% then draw0,v,u:else draw(fnmd(n%))+1,v,u
+  330 nextv:nextu
+  340 slow
+  390 getkeya$:ifa$<>"_"then390
+  400 graphic0:print:print"bild abspeichern?(j/n)"
+  410 getkeya$:if a$="j" then begin
+  420 :input"bildname";b$
+  430 :bsave(b$),onb0,p7168top16383
+  440 bend
+  450 end
+

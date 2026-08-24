@@ -1,0 +1,239 @@
+
+
+;setpoint-128.3.a.prg ==1c01==
+    1 rem "                         Setpoint-128.a
+    2 :
+    3 rem " zeichnet, l{CBM-C}scht oder testet einen Punkt auf dem 8563-HIRES-Bildschirm
+    4 :
+    5 rem "                           (c) by KRW
+    6 :
+    7 rem "                              1985
+    8 :
+    9 rem "                          version 1.03
+   10 :
+   11 :
+   20 n$="setpoint-128.3.m"
+   30 open 15,8,15,"s0:"+n$: gosub 60100
+   40 open 2,8,2,n$+",p,w": gosub 60100
+   70 :
+   80 sys 9*4096
+   90 ;
+  100 .opt o2
+  110 ;
+  120 ; "*** Varible ***"
+  130 ;
+  140 x1l    = $1131          ; "Koordinaten
+  150 x1h    = $1132          ; "vgl. c-128-Anleitung  S. H-22 !
+  160 y1     = $1133
+  165 yh     = $1134
+  170 zero   = $fd            ; "2-Byte-Zeiger  (fd/fe)
+  180 zux    = $fc            ; "Arbeitsspeicherstelle"
+  190 vdc0   = $d600          ; "Adressen der beiden VDC-Register
+  200 vdc1   = $d601
+  202 colsel = $83            ; "{CBM-X}ber COLOR-Befehl gew{CBM-F}hlte Zeichenfarbe
+  204 ramfig = $9e            ; "Zwischenspeicher f{CBM-X}r RAM-Konfiguration
+  210 ;
+  211 xlim     = 639          ; "Bereichsgrenzen
+  212 ylim     = 199
+  215 ;
+  220 ; "*** ROM- Unterprogramme ***"
+  230 ;
+  240 setreg   =  $cdcc      ; vdc setzen x=registernummer a=inhalt des registers
+  250 fechreg  =  $cdd8      ; wert reg. 31 des vdc in akku
+  270 ;
+  300 *= $1400
+  310 ;
+  900 ^        jmp setpnt    ; "setzt (colsel<>0) oder l{CBM-C}scht (colsel=0) Punkt
+  910 ^        jmp initram   ; "s. Zeile 920f. !
+  915 ^        jmp testpnt   ; "pr{CBM-X}ft, ob Punkt gesetzt
+  920 initram  lda $ff00     ; "Init-RAM schaltet RAM-Konfiguration
+  930 ^        pha           ; "auf gemeinsamen RAM-Bereich von $0 bis $3fff
+  940 ^        lda #$00
+  950 ^        sta $ff00
+  960 ^        lda #$07
+  970 ^        sta $d506     ; "RAM-Konfigurations-Register
+  980 ^        pla
+  990 ^        sta $ff00
+  995 ^        rts
+ 1000 zeiger  lda $ff00     ; "alte RAM-Konfiguration merken
+ 1004 ^       sta ramfig
+ 1006 ^       lda #$00      ; "Bank 15 einschalten
+ 1008 ^       sta $ff00
+ 1010 ^       sta zero      ; "Arbeitsspeicherstelle l{CBM-C}schen
+ 1020 ^       sta zero+1
+ 1022 ^       lda yh
+ 1024 ^       bne ende
+ 1025 ^       lda #<ylim
+ 1026 ^       cmp y1
+ 1027 ^       bcc ende
+ 1029 ^       lda #<xlim    ; "Zeile 1022-1033: Bereichsgrenzen pr{CBM-X}fen
+ 1030 ^       sbc x1l
+ 1031 ^       lda #>xlim
+ 1032 ^       sbc x1h
+ 1033 ^       bcc ende
+ 1038 ^       ldy y1        ; "Koordinaten in Bildschirm-RAM-Adresse umrechnen:
+ 1040 ^       lda faklow,y  ; "1) y-Anteil auswerten
+ 1050 ^       sta zero      ; "y-Anteil = y-Koordinate * 80
+ 1060 ^       lda fakhigh,y ; "low-Byte aus Tabelle faklow
+ 1070 ^       sta zero+1    ; "high-Byte aus Tabelle fakhigh
+ 1140 ;
+ 1150 setpt1  ldx x1h       ; "2) x-Anteil auswerten und zum y-Anteil addieren
+ 1151 ^       lda x1l   ;   ; "low-x = int(x1l/8) <Zeile 1151-1155>
+ 1152 ^       and #%11111000
+ 1153 ^       lsr
+ 1154 ^       lsr
+ 1155 ^       lsr
+ 1157 ^       clc           ; "x-Anteil = low-x + high-x = zux
+ 1160 ^       adc divtab,x  ; "high-x aus Tabelle
+ 1170 ^       sta zux
+ 1250 ^       clc           ; "Zeilen 1250 bis 1290:
+ 1260 ^       lda zero      ; "3)  RAM-Adresse = (zero/zero+1) + zux
+ 1270 ^       adc zux
+ 1275 ^       sta zero      ; "Zeilen 1300 bis 1330:
+ 1280 ^       lda zero+1    ; "Berechnetes Byte aus 8563-Bildschirm-RAM holen
+ 1281 ^       adc #$00
+ 1290 ^       sta zero+1    ; "Wichtig: erst high-Byte, dann low-Byte !!!
+ 1300 ^       ldx #$12
+ 1305 ^       jsr setreg    ; "high-Byte der RAM-Adresse setzen
+ 1310 ^       ldx #$13
+ 1315 ^       lda zero
+ 1320 ^       jsr setreg    ; "low-Byte der RAM-Adresse setzen
+ 1330 ^       jsr fechreg   ; "Byte holen
+ 1340 ^       sta zux       ; "und merken
+ 1350 ^       lda x1l       ; "Zeile 1350 bis 1380: Bitzeiger berechen
+ 1360 ^       and #7
+ 1370 ^       tax           ; "bit = 2^((7-x) and 7)
+ 1380 ^       lda hoch2,x   ; "A enth{CBM-F}lt bit-Wert
+ 1390 ^       clc
+ 1400 ^       rts
+ 1410 ;
+ 1500 ende    sec           ; "Ende, wenn Bereichsgrenzen {CBM-X}berschritten
+ 1510 ^       rts
+ 1540 ;
+ 1700 hoch2   .byt $80, $40, $20, $10
+ 1710 ^       .byt $08, $04, $02, $01
+ 1720 ;
+ 1730 divtab  .byt $00,$20,$40
+ 1740 ;
+ 3000 faklow  .byt   <0*80,  <1*80,  <2*80,  <3*80,  <4*80,  <5*80
+ 3010 ^       .byt   <6*80,  <7*80,  <8*80,  <9*80, <10*80, <11*80
+ 3020 ^       .byt  <12*80, <13*80, <14*80, <15*80, <16*80, <17*80
+ 3030 ^       .byt  <18*80, <19*80, <20*80, <21*80, <22*80, <23*80
+ 3040 ^       .byt  <24*80, <25*80, <26*80, <27*80, <28*80, <29*80
+ 3050 ^       .byt  <30*80, <31*80, <32*80, <33*80, <34*80, <35*80
+ 3060 ^       .byt  <36*80, <37*80, <38*80, <39*80, <40*80, <41*80
+ 3070 ^       .byt  <42*80, <43*80, <44*80, <45*80, <46*80, <47*80
+ 3080 ^       .byt  <48*80, <49*80, <50*80, <51*80, <52*80, <53*80
+ 3090 ^       .byt  <54*80, <55*80, <56*80, <57*80, <58*80, <59*80
+ 3100 ^       .byt  <60*80, <61*80, <62*80, <63*80, <64*80, <65*80
+ 3110 ^       .byt  <66*80, <67*80, <68*80, <69*80, <70*80, <71*80
+ 3120 ^       .byt  <72*80, <73*80, <74*80, <75*80, <76*80, <77*80
+ 3130 ^       .byt  <78*80, <79*80, <80*80, <81*80, <82*80, <83*80
+ 3140 ^       .byt  <84*80, <85*80, <86*80, <87*80, <88*80, <89*80
+ 3150 ^       .byt  <90*80, <91*80, <92*80, <93*80, <94*80, <95*80
+ 3160 ^       .byt  <96*80, <97*80, <98*80, <99*80,<100*80,<101*80
+ 3170 ^       .byt <102*80,<103*80,<104*80,<105*80,<106*80,<107*80
+ 3180 ^       .byt <108*80,<109*80,<110*80,<111*80,<112*80,<113*80
+ 3190 ^       .byt <114*80,<115*80,<116*80,<117*80,<118*80,<119*80
+ 3200 ^       .byt <120*80,<121*80,<122*80,<123*80,<124*80,<125*80
+ 3210 ^       .byt <126*80,<127*80,<128*80,<129*80,<130*80,<131*80
+ 3220 ^       .byt <132*80,<133*80,<134*80,<135*80,<136*80,<137*80
+ 3230 ^       .byt <138*80,<139*80,<140*80,<141*80,<142*80,<143*80
+ 3240 ^       .byt <144*80,<145*80,<146*80,<147*80,<148*80,<149*80
+ 3250 ^       .byt <150*80,<151*80,<152*80,<153*80,<154*80,<155*80
+ 3260 ^       .byt <156*80,<157*80,<158*80,<159*80,<160*80,<161*80
+ 3270 ^       .byt <162*80,<163*80,<164*80,<165*80,<166*80,<167*80
+ 3280 ^       .byt <168*80,<169*80,<170*80,<171*80,<172*80,<173*80
+ 3290 ^       .byt <174*80,<175*80,<176*80,<177*80,<178*80,<179*80
+ 3300 ^       .byt <180*80,<181*80,<182*80,<183*80,<184*80,<185*80
+ 3310 ^       .byt <186*80,<187*80,<188*80,<189*80,<190*80,<191*80
+ 3320 ^       .byt <192*80,<193*80,<194*80,<195*80,<196*80,<197*80
+ 3330 ^       .byt <198*80,<199*80,<200*80,<201*80,<202*80,<203*80
+ 3340 ^       .byt <204*80
+ 3390 ;
+ 3400 fakhigh .byt   >0*80,  >1*80,  >2*80,  >3*80,  >4*80,  >5*80
+ 3410 ^       .byt   >6*80,  >7*80,  >8*80,  >9*80, >10*80, >11*80
+ 3420 ^       .byt  >12*80, >13*80, >14*80, >15*80, >16*80, >17*80
+ 3430 ^       .byt  >18*80, >19*80, >20*80, >21*80, >22*80, >23*80
+ 3440 ^       .byt  >24*80, >25*80, >26*80, >27*80, >28*80, >29*80
+ 3450 ^       .byt  >30*80, >31*80, >32*80, >33*80, >34*80, >35*80
+ 3460 ^       .byt  >36*80, >37*80, >38*80, >39*80, >40*80, >41*80
+ 3470 ^       .byt  >42*80, >43*80, >44*80, >45*80, >46*80, >47*80
+ 3480 ^       .byt  >48*80, >49*80, >50*80, >51*80, >52*80, >53*80
+ 3490 ^       .byt  >54*80, >55*80, >56*80, >57*80, >58*80, >59*80
+ 3500 ^       .byt  >60*80, >61*80, >62*80, >63*80, >64*80, >65*80
+ 3510 ^       .byt  >66*80, >67*80, >68*80, >69*80, >70*80, >71*80
+ 3520 ^       .byt  >72*80, >73*80, >74*80, >75*80, >76*80, >77*80
+ 3530 ^       .byt  >78*80, >79*80, >80*80, >81*80, >82*80, >83*80
+ 3540 ^       .byt  >84*80, >85*80, >86*80, >87*80, >88*80, >89*80
+ 3550 ^       .byt  >90*80, >91*80, >92*80, >93*80, >94*80, >95*80
+ 3560 ^       .byt  >96*80, >97*80, >98*80, >99*80,>100*80,>101*80
+ 3570 ^       .byt >102*80,>103*80,>104*80,>105*80,>106*80,>107*80
+ 3580 ^       .byt >108*80,>109*80,>110*80,>111*80,>112*80,>113*80
+ 3590 ^       .byt >114*80,>115*80,>116*80,>117*80,>118*80,>119*80
+ 3600 ^       .byt >120*80,>121*80,>122*80,>123*80,>124*80,>125*80
+ 3610 ^       .byt >126*80,>127*80,>128*80,>129*80,>130*80,>131*80
+ 3620 ^       .byt >132*80,>133*80,>134*80,>135*80,>136*80,>137*80
+ 3630 ^       .byt >138*80,>139*80,>140*80,>141*80,>142*80,>143*80
+ 3640 ^       .byt >144*80,>145*80,>146*80,>147*80,>148*80,>149*80
+ 3650 ^       .byt >150*80,>151*80,>152*80,>153*80,>154*80,>155*80
+ 3660 ^       .byt >156*80,>157*80,>158*80,>159*80,>160*80,>161*80
+ 3670 ^       .byt >162*80,>163*80,>164*80,>165*80,>166*80,>167*80
+ 3680 ^       .byt >168*80,>169*80,>170*80,>171*80,>172*80,>173*80
+ 3690 ^       .byt >174*80,>175*80,>176*80,>177*80,>178*80,>179*80
+ 3700 ^       .byt >180*80,>181*80,>182*80,>183*80,>184*80,>185*80
+ 3710 ^       .byt >186*80,>187*80,>188*80,>189*80,>190*80,>191*80
+ 3720 ^       .byt >192*80,>193*80,>194*80,>195*80,>196*80,>197*80
+ 3730 ^       .byt >198*80,>199*80,>200*80,>201*80,>202*80,>203*80
+ 3740 ^       .byt >204*80
+ 3900 ;
+ 4000 setpnt  jsr zeiger    ; "Adresse des zu {CBM-F}ndernden Bytes im
+ 4005 ^       bcs ende1
+ 4010 ^       ldx colsel    ; "Bildschirm-RAM ausrechnen, bit-Wert nach A
+ 4020 ^       bne orflag    ; "wenn Farbe = Hintergrundfarbe, dann l{CBM-C}schen
+ 4030 ^       eor #$ff
+ 4040 ^       and zux
+ 4050 ^       .byt $2c
+ 4060 orflag  ora zux       ; "Vordergrundfarbe gew{CBM-F}hlt, dann setzen
+ 4070 ^       sta zux       ; "ge{CBM-F}ndertes Byte zwischenspeichern
+ 4080 ^       ldx #$12      ; "Register setzen  s.o. !
+ 4090 ^       lda zero+1
+ 4100 ^       jsr setreg
+ 4110 ^       ldx #$13
+ 4120 ^       lda zero
+ 4130 ^       jsr setreg
+ 4140 ^       ldx #$1f
+ 4150 ^       lda zux       ; "ge{CBM-F}ndertes Byte in Bildschirm-RAM
+ 4160 ^       jsr setreg
+ 4170 ende1   lda ramfig    ; "alte RAM-Konfiguration wiederherstellen
+ 4180 ^       sta $ff00
+ 4190 ^       rts           ; "fertig.
+ 4200 ;
+ 5000 testpnt jsr zeiger    ; "Koordinaten nach Bildschirm-RAM-Adresse,
+ 5005 ^       bcs ende1
+ 5010 ^       and zux       ; "bit-Wert nach A
+ 5020 ^       beq ende2     ; "Punkt gesetzt ?
+ 5030 ^       jsr ende1     ; "ja, dann RAM-Konfig. wiederherstellen
+ 5040 ^       ldx #0
+ 5050 ^       rts           ; "zur{CBM-X}ck mit gesetztem Zero-Flag
+ 5060 ende2   jsr ende1     ; "nein, dann RAM-Konfig. wiederherstellen
+ 5070 ^       ldx #255
+ 5080 ^       rts           ; "zur{CBM-X}ck mit Zero-Flag = 0
+ 5090 ;
+ 8000 .end
+ 9000 end
+10000 :
+60000 zz$="setpoint-128.3.a": un=8
+60010 open 15,un,15,"s0:"+zz$
+60020 gosub 60100
+60030 save zz$,un
+60040 gosub 60100
+60050 verify zz$,un
+60060 close 15
+60070 end
+60100 input#15, s1, s$, s2, s3
+60110 if s1=1 then print s2; s$
+60120 if s1<20 then return
+60130 print s1 ", " s$ "," s2; "," s3
+60140 close 15
+

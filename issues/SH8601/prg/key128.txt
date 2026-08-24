@@ -1,0 +1,93 @@
+
+
+;key128.prg ==0801==
+   10 rem key128 v19-10-85
+   20 rem von andreas zeller, hanau
+   30 :
+   40 rem aufgabe: 128er-tasten im
+   50 rem          64er-modus bedienen.
+   60 :
+   70 rem durch aendern der zeile 170
+   80 rem kann das programm in beliebige
+   90 rem bereiche gelegt werden.
+  100 :
+  110 rem wenn das programm zusammen mit
+  120 rem "fast64" laufen soll, muss
+  130 rem 395 poke code+74,44
+  140 rem eingefuegt werden.
+  150 :
+  160 :
+  170 code=49152:rem startadresse
+  180 :
+  190 poke53265,11:poke53296,1
+  200 :
+  210 dim p(12):forj=0to12:readp:p(j)=code+p:next
+  220 :
+  230 data 0,74,110,171,195,213,232,233,234,235,236,224,225
+  240 :
+  250 fori=0to284:readx$
+  260 :
+  270 rem umwandlung adressen
+  280 a$=right$(x$,1):b$=left$(x$,1)
+  290 ifa$="+"thenp=p(asc(b$)-65):x=p/256:goto360
+  300 ifa$="-"thenp=p(asc(b$)-65):x=(p/256-int(p/256))*256:goto360
+  310 :
+  320 rem umwandlung hex => dec
+  330 :
+  340 x=asc(a$)+(a$>"@")*55+(a$<":")*48
+  350 x=x+(asc(b$)+(b$>"@")*55+(b$<":")*48)*16
+  360 pokecode+i,x:next
+  370 :
+  380 poke53296,0:poke53265,27
+  390 :
+  400 print">das programm benutzt den bereich"
+  410 print" von"code"-"code+284"."
+  420 print
+  430 print">tabelle normal ab:"code+237";
+  440 print"      mit shift ab:"code+261".
+  450 print
+  460 print">tasten an mit: sys"code";"
+  470 print"       aus mit: sys"code+80"."
+  480 :
+  490 :
+  500 end
+  510 :
+  520 :
+  530 :
+ 1000 data  08,48,78,ad,14,03,c9,c-
+ 1010 data  ad,15,03,e9,c+,f0,0c,ad
+ 1020 data  14,03,8d,g-,g+,ad,15,03
+ 1030 data  8d,h-,h+,ad,02,03,c9,b-
+ 1040 data  ad,03,03,e9,b+,f0,0c,ad
+ 1050 data  02,03,8d,i-,i+,ad,03,03
+ 1060 data  8d,j-,j+,a9,c-,8d,14,03
+ 1070 data  a9,c+,8d,15,03,a9,b-,8d
+ 1080 data  02,03,a9,b+,8d,03,03,68
+ 1090 data  28,60,20,a-,a+,6c,i-,i+
+ 1100 data  08,48,78,ad,g-,g+,8d,14
+ 1110 data  03,ad,h-,h+,8d,15,03,ad
+ 1120 data  i-,i+,8d,02,03,ad,j-,j+
+ 1130 data  8d,03,03,68,28,60,a9,40
+ 1140 data  85,cb,29,00,8d,2f,d0,09
+ 1150 data  ff,8d,00,dc,cd,01,dc,f0
+ 1160 data  42,a0,59,a9,fb,8d,2f,d0
+ 1170 data  48,ad,01,dc,cd,01,dc,d0
+ 1180 data  f8,a2,08,0a,b0,02,84,cb
+ 1190 data  88,c0,41,90,07,ca,d0,f3
+ 1200 data  68,4a,10,e1,68,ad,8d,02
+ 1210 data  0a,c9,08,90,02,a9,06,aa
+ 1220 data  bd,l-,l+,85,f5,bd,m-,m+
+ 1230 data  85,f6,20,f-,f+,20,e0,ea
+ 1240 data  20,f-,f+,a9,ff,8d,2f,d0
+ 1250 data  29,7f,8d,00,dc,a4,cb,8c
+ 1260 data  k-,k+,6c,g-,g+,a5,c5,ae
+ 1270 data  k-,k+,8d,k-,k+,86,c5,60
+ 1280 data  d-,d+,e-,e+,e-,e+,d-,d+
+ 1290 data  31,ea,83,a4,40
+ 1300 data  08,38,35,09,32,34,37,31
+ 1310 data  1b,2b,2d,0a,0d,36,39,33
+ 1320 data  0e,30,2e,91,11,9d,1d,03
+ 1330 data  09,38,35,18,32,34,37,31
+ 1340 data  1b,2b,2d,0a,0d,36,39,33
+ 1350 data  8e,30,2e,91,11,9d,1d,03
+

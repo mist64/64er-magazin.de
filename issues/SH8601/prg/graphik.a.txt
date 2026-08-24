@@ -1,0 +1,105 @@
+
+
+;graphik.a.prg ==1c01==
+    1 rem "                   Graphik
+    2 :
+    3 rem "        ver{CBM-F}ndert Ausf{CBM-X}hrung des graphic-Befehls
+    4 :
+    5 rem "                 (c) by KRW
+    6 :
+    7 rem "                     1985
+    8 :
+    9 rem "                 version 1.00
+   10 :
+   11 :
+   20 n$="graphik.m"
+   30 open 15,8,15,"s0:"+n$: gosub 60100
+   40 open 2,8,2,n$+",p,w": gosub 60100
+   70 :
+   80 sys 9*4096
+   90 ;
+  100 .opt o2
+  110 ;
+  220 ; "*** Unterprogramme ***"
+  230 ;
+  240 setreg  = $cdcc
+  250 charrom = $ce0c
+  270 ;
+  900 *= $1a3e
+  910 ;
+ 1000 ^       cmp #$9e        ; "folgt CLR ?
+ 1010 ^       bne graph1
+ 1020 ^       jsr $a022       ; "ja, dann normale Speicheraufteilung zur{CBM-X}ck
+ 1030 ^       jsr $0380       ; "chrget
+ 1040 ^       lda #$00
+ 1050 ^       sta $d8         ; "Flag f{CBM-X}r Text-Modus setzen
+ 1060 ^       rts
+ 1070 graph1  jsr $87f4       ; "Graphik-Modus holen
+ 1080 ^       cpx #$06        ; "GRAPHIC 6 ?
+ 1090 ^       beq graphik     ; "ja, dann Sprung
+ 1100 ^       bcs error       ; "X>6, dann 'illegal quantity'
+ 1110 ^       txa
+ 1120 ^       pha             ; "X merken
+ 1140 ^       lda #$00        ; "bank 15 einschalten
+ 1150 ^       sta $ff00
+ 1160 ^       ldx #25         ; "80-Zeichen-Bildschirm auf Text-Modus schalten
+ 1170 ^       lda #$40
+ 1180 ^       jsr setreg
+ 1190 ^       jsr charrom     ; "{CBM-X}ber Taste 'ASCII/DIN' gew{CBM-F}hlten Zeichensatz
+ 1200 ^       lda $d7         ; "ins 8563-CHARRAM kopieren
+ 1210 ^       pha
+ 1220 ^       lda #$80        ; "Zeile 1200 bis 1260:
+ 1230 ^       sta $d7         ; "80-Zeichen-Bildschirm l{CBM-C}schen
+ 1240 ^       jsr $c142       ; "kernal-Routine clear
+ 1250 ^       pla
+ 1260 ^       sta $d7
+ 1340 ^       pla             ; "X 'zerst{CBM-C}rungsfrei' aus Stack laden
+ 1350 ^       pha
+ 1360 ^       tax
+ 1370 ^       jmp $6b6e       ; "weiter mit normalem GRAPHIC-Befehl
+ 1380 error   jmp $7d28       ; "'illegal quantity'
+ 1390 ;
+ 1400 graphik lda #$00        ; "bank 15 einschalten
+ 1430 ^       sta $ff00
+ 1460 ^       ldx #25
+ 1470 ^       lda #$80        ; "8563-HIRES-Mode einschalten
+ 1480 ^       jsr setreg
+ 1500 ^       jsr $9e1c       ; "chkcom, byte-Wert nach X
+ 1502 ^       lda #$00        ; "wieder auf bank 15
+ 1504 ^       sta $ff00
+ 1510 ^       cpx #$02        ; "X>1, dann illegal quantity
+ 1520 ^       bcs error
+ 1525 ^       cpx #$00        ; "Hires ein ohne L{CBM-C}schen des Bildschirms ?
+ 1530 ^       beq ende        ; "dann fertig
+ 1540 ^       ldy #$40        ; "Zeile 1540 bis 1670: HIRES-Bild l{CBM-C}schen
+ 1550 ^       sty $08         ; "$08: 'Blockz{CBM-F}hler': 40*256 bytes
+ 1560 ^       ldy #$00
+ 1570 ^       tya
+ 1580 ^       ldx #$12        ; "RAM-Zeiger high
+ 1590 ^       jsr setreg      ; "und
+ 1600 ^       ldx #$13        ; "RAM-Zeiger low
+ 1610 ^       jsr setreg      ; "auf Anfang = $0000 setzen
+ 1620 ^       ldx #31         ; "$00 in gew{CBM-F}hlte RAM-Speicherstelle
+ 1630 empty   jsr setreg      ; "RAM-Zeiger z{CBM-F}hlt nach 'sta' selbst einen
+ 1640 ^       dey             ; "Schritt weiter !
+ 1650 ^       bne empty
+ 1660 ^       dec $08
+ 1670 ^       bne empty
+ 1680 ende    rts             ; "fertig
+ 6100 ;
+ 8000 .end
+ 9000 end
+60000 zz$="graphik.a": un=8
+60010 open 15,un,15,"s0:"+zz$
+60020 gosub 60100
+60030 save zz$,un
+60040 gosub 60100
+60050 verify zz$,un
+60060 close 15
+60070 end
+60100 input#15, s1, s$, s2, s3
+60110 if s1=1 then print s2; s$
+60120 if s1<20 then return
+60130 print s1 ", " s$ "," s2; "," s3
+60140 close 15
+

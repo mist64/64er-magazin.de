@@ -1,0 +1,81 @@
+
+
+;fast64.prg ==0801==
+   10 rem fast64 v19-10-85
+   20 rem von andreas zeller, hanau
+   30 :
+   40 rem aufgabe: 128er im 64er-modus
+   50 rem          um 35% beschleunigen.
+   60 :
+   70 rem durch aendern der zeile 170
+   80 rem kann das programm in beliebige
+   90 rem bereiche gelegt werden.
+  100 :
+  110 rem wenn das programm zusammen mit
+  120 rem "keys128" laufen soll, muss
+  130 rem folgende zeile eingefuegt werden:
+  140 rem 395 poke code+110,44
+  150 :
+  160 :
+  170 code=49440:rem startadresse
+  180 :
+  190 poke53265,11:poke53296,1
+  200 :
+  210 dim p(6):forj=0to6:readp:p(j)=code+p:next
+  220 :
+  230 data 0,110,159,216,217,218,219
+  240 :
+  250 fori=0to219:readx$
+  260 :
+  270 rem umwandlung adressen
+  280 a$=right$(x$,1):b$=left$(x$,1)
+  290 ifa$="+"thenp=p(asc(b$)-65):x=p/256:goto360
+  300 ifa$="-"thenp=p(asc(b$)-65):x=(p/256-int(p/256))*256:goto360
+  310 :
+  320 rem umwandlung hex => dec
+  330 :
+  340 x=asc(a$)+(a$>"@")*55+(a$<":")*48
+  350 x=x+(asc(b$)+(b$>"@")*55+(b$<":")*48)*16
+  360 pokecode+i,x:next
+  370 :
+  380 poke53296,0:poke53265,27
+  390 :
+  400 print">das programm benutzt den bereich"
+  410 print" von"code"-"code+219"."
+  420 print
+  430 print">schnell mit: sys"code";"
+  440 print"  normal mit: sys"code+116"."
+  450 :
+  460 end
+  470 :
+  480 :
+  490 :
+ 1000 data  08,48,78,ad,14,03,c9,c-
+ 1010 data  ad,15,03,e9,c+,f0,0c,ad
+ 1020 data  14,03,8d,d-,d+,ad,15,03
+ 1030 data  8d,e-,e+,ad,02,03,c9,b-
+ 1040 data  ad,03,03,e9,b+,f0,0c,ad
+ 1050 data  02,03,8d,f-,f+,ad,03,03
+ 1060 data  8d,g-,g+,a9,c-,8d,14,03
+ 1070 data  a9,c+,8d,15,03,a9,b-,8d
+ 1080 data  02,03,a9,b+,8d,03,03,a9
+ 1090 data  00,8d,30,d0,ad,12,d0,d0
+ 1100 data  fb,a9,31,8d,12,d0,ad,11
+ 1110 data  d0,29,7f,8d,11,d0,a9,01
+ 1120 data  8d,30,d0,ad,1a,d0,09,01
+ 1130 data  8d,1a,d0,68,28,60,20,a-
+ 1140 data  a+,6c,f-,f+,08,48,78,ad
+ 1150 data  1a,d0,29,fe,8d,1a,d0,a9
+ 1160 data  00,8d,30,d0,ad,d-,d+,8d
+ 1170 data  14,03,ad,e-,e+,8d,15,03
+ 1180 data  ad,f-,f+,8d,02,03,ad,g-
+ 1190 data  g+,8d,03,03,68,28,60,ac
+ 1200 data  19,d0,30,07,ad,0d,dc,58
+ 1210 data  6c,d-,d+,98,4a,90,f9,8c
+ 1220 data  19,d0,ad,30,d0,49,01,8d
+ 1230 data  30,d0,4a,b0,03,a9,fa,2c
+ 1240 data  a9,31,8d,12,d0,68,a8,ba
+ 1250 data  bd,04,01,d0,03,de,05,01
+ 1260 data  de,04,01,68,aa,68,28,60
+ 1270 data  31,ea,83,a4
+
