@@ -22,13 +22,13 @@
 
         <p>Reine Maschinenprogramme kommen üblicherweise ohne jede Stringbehandlung aus. Bei einer Textverarbeitung zum Beispiel liegt der Text am Stück im Speicher und der Programmierer verwaltet selbst seine Zeiger auf die momentane Textstelle, auf die Seitenanfänge und so weiter.</p>
 
-        <p>Problematischer sind jedoch Unterprogramme in Maschinensprache, die zeitkritische Basic-Teile ersetzen sollen. In diesen Fällen soll oftmals das Ergebnis der Maschinenroutine in Form einer Variablen an das aufrufende Basic-Programm zurückübergeben werden. Wenn die Routine komfortabel ‚aufzurufen sein soll, kann das Basic-"Programm beim Aufruf mit »SYS...., (Variablenname)« angeben, in welcher Variablen das Ergebnis abgelegt werden soll.</p>
+        <p>Problematischer sind jedoch Unterprogramme in Maschinensprache, die zeitkritische Basic-Teile ersetzen sollen. In diesen Fällen soll oftmals das Ergebnis der Maschinenroutine in Form einer Variablen an das aufrufende Basic-Programm zurückübergeben werden. Wenn die Routine komfortabel aufzurufen sein soll, kann das Basic-Programm beim Aufruf mit »SYS...., (Variablenname)« angeben, in welcher Variablen das Ergebnis abgelegt werden soll.</p>
 
         <p>In beiden Fällen, der Übergabe einer Variablen an das Maschinenprogramm und der Rückübergabe des Ergebnisses in Form einer Variablen, benötigen wir verschiedene Routinen des Basic-Interpreters. Es gibt eine Vielzahl von Anwendungen, in denen diese Routinen benötigt werden:</p>
 
-        <p>a)Sortierroutinen, dieinder Lage sein sollten, beliebige Arraytypen zu sortieren und denen der Name des gewünschten Arrays übergeben werden muß. Weiterhin müssen Sortierroutinen über noch zu besprechende Routinen des Basic-Interpreters Anfang und Ende dieses Arrays erkennen können.</p>
+        <p>a) Sortierroutinen, die in der Lage sein sollten, beliebige Arraytypen zu sortieren und denen der Name des gewünschten Arrays übergeben werden muß. Weiterhin müssen Sortierroutinen über noch zu besprechende Routinen des Basic-Interpreters Anfang und Ende dieses Arrays erkennen können.</p>
 
-        <p>b) die beliebten INPUT-Routinen, die den eingebauten Befehl »INPUT X$« ersetzen sollen. Komfortablen INPUT-Routinen sollen zum Beispiel folgende Parameter übergeben werden können: Spalte und Zeile an der die Eingabe beginnt; Länge des Eingabefeldes; als Eingabe zugelassene Zeichen; Zeichen, die die Eingabe beenden; String, in dem die Eingabe an das Basic übergeben werden soll. Eine INPUT-Routine darf die Eingabe selbst natürlich nicht an beliebiger Stelle im Speicher ablegen, sondern muß einen Stringanlegen, der die Eingabe enthält und den das Basic-Programm weiterverarbeiten kann.</p>
+        <p>b) die beliebten INPUT-Routinen, die den eingebauten Befehl »INPUT X$« ersetzen sollen. Komfortablen INPUT-Routinen sollen zum Beispiel folgende Parameter übergeben werden können: Spalte und Zeile an der die Eingabe beginnt; Länge des Eingabefeldes; als Eingabe zugelassene Zeichen; Zeichen, die die Eingabe beenden; String, in dem die Eingabe an das Basic übergeben werden soll. Eine INPUT-Routine darf die Eingabe selbst natürlich nicht an beliebiger Stelle im Speicher ablegen, sondern muß einen String anlegen, der die Eingabe enthält und den das Basic-Programm weiterverarbeiten kann.</p>
 
         <p>c) Suchroutinen, die ein beliebiges Array (Strings oder numerische Variablen) nach einer vorgegebenen Zeichenkette oder Zahl durchsuchen sollen, zum Beispiel die im Speicher gehaltene Indexdatei in einer Dateiverwaltung. In diesem Fall muß die Assemblerroutine auf das entsprechende Array zugreifen (womöglich sogar erst ab einem vorgegebenen Index, der den Start der Routine bestimmen soll), jedes Arrayfeld mit dem Suchkriterium vergleichen und nach Abschluß der Suche eine numerische Variable anlegen, der das Ergebnis mitgeteilt wird, zum Beispiel »x% = 5« (das fünfte Arrayelement entspricht dem übergebenen Suchkriterium).</p>
 
@@ -40,9 +40,9 @@
 
         <p>Beim Aufruf können daher bereits Ein-Byte-Werte übergeben werden, mit denen der Akku und die verschiedenen Register geladen werden. Im weiteren Verlauf dieses Artikels wird das Statusregister jedoch nicht verwendet werden. Bedenken Sie, daß die Abfrage des Statusregisters nur unter »Verrenkungen« möglich ist, indem die verschiedenen Flaggen getestet werden, wobei bei einigen Bits ein Test nicht möglich ist. Ich werde mich daher auf die Übergabe von maximal drei Werten im Akku, im X- und im Y-Register beschränken.</p>
 
-        <p>Ein Beispiel: Geben Sie mit dem eingebauten Monitor ein: A 0BOO BRK</p>
+        <p>Ein Beispiel: Geben Sie mit dem eingebauten Monitor ein: A 0B00 BRK</p>
 
-        <p>Geben Sie nun im Direktmodus ein: , SYS DEC( "0B00"),1,2,3 Nach dem BRK wird der Monitor die übergebenen Werte in den Registern anzeigen: Akku: 1; X-Register: 2; Y-Register: 3</p>
+        <p>Geben Sie nun im Direktmodus ein: SYS DEC( "0B00"),1,2,3 Nach dem BRK wird der Monitor die übergebenen Werte in den Registern anzeigen: Akku: 1; X-Register: 2; Y-Register: 3</p>
 
         <p>Sie sind keineswegs gezwungen, beim Aufruf immer alle Parameter anzugeben. Wollen Sie zum Beispiel nur im Akku den Wert 20 und im X-Register eine 53 übergeben, genügt der Aufruf mit: SYS DEC( "0B00"),20,53 Soll ein Register »übergangen«, also nicht mit einem definierten Wert geladen werden, können Sie den entsprechenden Parameter einfach weglassen.</p>
 
@@ -50,7 +50,7 @@
 
         <p>SYS DEC("0B00"),15,,87</p>
 
-        <p>Für viele Anwendungen ist diese Form der Übergabe jedoch unzureichend, zum Beispiel für die Übergabe eines Zwei-Byte-Wertes oder einer Stringvariablen. Auch dann, wenn zwar ausschließlich Ein-Byte-Werte übergeben werden sollen, die Anzahl der Parameter jedoch größer drei ist, benötigen wir Routinen, die uns weitere Parameter aus dem Basic-IText holen. Die erste und einfachste dieser Routinen ist GETBYT, die einen Ein-Byte-Wert aus dem Basic-Text holt und im X-Register übergibt.</p>
+        <p>Für viele Anwendungen ist diese Form der Übergabe jedoch unzureichend, zum Beispiel für die Übergabe eines Zwei-Byte-Wertes oder einer Stringvariablen. Auch dann, wenn zwar ausschließlich Ein-Byte-Werte übergeben werden sollen, die Anzahl der Parameter jedoch größer drei ist, benötigen wir Routinen, die uns weitere Parameter aus dem Basic-Text holen. Die erste und einfachste dieser Routinen ist GETBYT, die einen Ein-Byte-Wert aus dem Basic-Text holt und im X-Register übergibt.</p>
 
         <p>Bevor ich nun die Routine GETBYT beschreibe, geben Sie bitte die folgende Programmzeile ein, speichern Sie das Programm, und starten Sie es:</p>
 
@@ -82,7 +82,7 @@
 
         <p>Speichern Sie auch dieses Programm und rufen Sie es mit »SYS DEC("0B00")« auf.</p>
 
-        <p>Ein Problem bei der Programmierung des C 128 in Assembler ist das Bankswitching. Die Routinen des Basic-Interpreters schalten ständig zwischen Bank O0 (Basic-Text) und Bank 1 (Variablenbank) um. Unsere Programme legen wir in Bank 0. Wenn wir nun eine Routine des Basic-Interpreters aufrufen, nach deren Ausführung auf Bank 1 umgeschaltet ist, ist unser in Bank 0 liegendes Programm für den Prozessor nicht existent. Die Folge ist zwangsläufig ein Absturz.</p>
+        <p>Ein Problem bei der Programmierung des C 128 in Assembler ist das Bankswitching. Die Routinen des Basic-Interpreters schalten ständig zwischen Bank 0 (Basic-Text) und Bank 1 (Variablenbank) um. Unsere Programme legen wir in Bank 0. Wenn wir nun eine Routine des Basic-Interpreters aufrufen, nach deren Ausführung auf Bank 1 umgeschaltet ist, ist unser in Bank 0 liegendes Programm für den Prozessor nicht existent. Die Folge ist zwangsläufig ein Absturz.</p>
 
         <p>Das Initialisierungsprogramm hat die Aufgabe, den Bereich $0000 -$1FFF als gemeinsamen Speicherbereich zu definieren. Egal, ob bei der Rückkehr aus einer Interpreter-Routine Bank 0 oder Bank 1 eingeschaltet ist. Unser Programm existiert immer in der jeweiligen Bank und kann daher weiter ausgeführt werden.</p>
 
@@ -92,13 +92,13 @@
 
         <p>Bevor wir, wie beabsichtigt, einen zusätzlichen Parameter aus dem Basic-Text holen, benötigen wir die Routine CHKKOM. Sie liest das nächste Zeichen des Basic-Textes (ausgehend von dem momentanen Stand des Programmzeigers der CHRGET/CHRGOT-Routine) und inkrementiert den Programmzeiger. Bei dem gelesenen Zeichen wird überprüft, ob es sich um ein Komma handelt. Wenn ja, ist alles in Ordnung und es erfolgt ein RTS. Handelte es sich um ein anderes Zeichen, wird in die Routine zur Fehlerausgabe gesprungen und ein »SYNTAX ERROR« ausgegeben. Da es üblich ist, zur Trennung mehrerer Übergabeparameter - ebenso wie die SYS-Routine - Kommata zu benutzen, bietet es sich an, diese Routine vor dem Aufruf von GETBYT zu verwenden.</p>
 
-        <p>l. Ein Komma einlesen: a 0b20 20 5ce 79 jmp $795c Nach dem Aufruf mit DEC("0B20"),0,0,0,0,« oder DEC("0B20"),,,« erhalten wir die Meldung READY. Der SYS-Befehl hat alle vier Parameter gelesen, anschließend erfolgte der Sprung zu unserem eigenen Assemblerprogramm, das ein zusätzliches Komma las und danach die Rückkehr ins Basic. Ein zusätzlicher Befehl RTS entfällt, da sich dieser am Ende des Unterprogramms CHKKOM befindet. Beachten Sie bitte, daß bei der Verwendung der Interpreter-Routinen zur Übergabe von Parametern zuerst alle vier möglichen Parameter, die der SYS-Befehl einlesen kann, angegeben werden müssen. Würden wir unser Programm zum Beispiel mit »SYS DEC("0B20")« aufrufen, wäre ein SYNTAX ERROR die Folge, da der SYS-Befehl nach dem Komma den ersten Standardparameter (Akku) lesen will und nicht findet. 2. Drei Kommas einlesen: a 00620 20 5e 79 jsr $795c a 00623 20 5c 79 jsr $795c a 00626 4c 5c 79 jmp $795c Aufruf mit</p>
+        <p>1. Ein Komma einlesen: a 0b20 20 5ce 79 jmp $795c Nach dem Aufruf mit »SYS DEC("0B20"),0,0,0,0,« oder »SYS DEC("0B20"),,,,,« erhalten wir die Meldung READY. Der SYS-Befehl hat alle vier Parameter gelesen, anschließend erfolgte der Sprung zu unserem eigenen Assemblerprogramm, das ein zusätzliches Komma las und danach die Rückkehr ins Basic. Ein zusätzlicher Befehl RTS entfällt, da sich dieser am Ende des Unterprogramms CHKKOM befindet. Beachten Sie bitte, daß bei der Verwendung der Interpreter-Routinen zur Übergabe von Parametern zuerst alle vier möglichen Parameter, die der SYS-Befehl einlesen kann, angegeben werden müssen. Würden wir unser Programm zum Beispiel mit »SYS DEC("0B20"),« aufrufen, wäre ein SYNTAX ERROR die Folge, da der SYS-Befehl nach dem Komma den ersten Standardparameter (Akku) lesen will und nicht findet. 2. Drei Kommas einlesen: a 00620 20 5e 79 jsr $795c a 00623 20 5c 79 jsr $795c a 00626 4c 5c 79 jmp $795c Aufruf mit</p>
 
         <p>»SYS DEC("0B20"),0,0,0,0,,,« oder »SYS DEC("0B20"),,,,,,,«.</p>
 
         <p>Jeder andere Aufruf, der von dieser Form (Übergabe der Standardparameter und der einzulesenden Anzahl Kommata) abweicht, führt zu einem SYNTAX ERROR. Die Routine CHKKOM bietet daher eine hervorragende Absicherung gegen Fehleingaben beim Aufruf einer Assemblerroutine.</p>
 
-        <h3>GETBYT ($87F4 ($87F1)) ,</h3>
+        <h3>GETBYT ($87F4 ($87F1))</h3>
 
         <p>GETBYT verwendet auch der SYS-Befehl zur Übergabe der Standardparameter. Diese Routine holt einen Ein-Byte-Wert aus dem Basic-Text und übergibt ihn im X-Register. Liegt der gelesene Wert außerhalb der zulässigen Grenzen (0-255), wird ein ILLEGAL QUANTITY ERROR ausgegeben.</p>
 
@@ -110,17 +110,17 @@
 
         <p>Für alle »Bytesparer« stelle ich dennoch ein kleines Beispielprogramm vor, das diesen Einsprung zum Lesen von fünf Parametern verwendet:</p>
 
-        <p>00b40 8d 00 Od sta $0d0O</p>
+        <p>a 00b40 8d 00 0d sta $0d00</p>
 
-        <p>00643 8e 01 Od stx $0d01</p>
+        <p>a 00b43 8e 01 0d stx $0d01</p>
 
-        <p>00646 8c 02 Od sty $0d02</p>
+        <p>a 00b46 8c 02 0d sty $0d02</p>
 
-        <p>00649 20 f1 87 jsr $87f1</p>
+        <p>a 00b49 20 f1 87 jsr $87f1</p>
 
-        <p>00b4c 8e 03 Od stx $0d403</p>
+        <p>a 00b4c 8e 03 0d stx $0d03</p>
 
-        <p>00b4Af 20 fi 87 jsr $87f1 a 00652 00 brk</p>
+        <p>a 00b4f 20 f1 87 jsr $87f1 a 00b52 00 brk</p>
 
         <p>Nach dem Aufruf mit »SYS DEC("0B40"),1,2,3,0,4,5« befindet sich im X-Register der zuletzt übergebene Wert fünf und die zuvor übergebenen Parameter in $0D00 bis $0D03.</p>
 
@@ -136,7 +136,7 @@
 
         <p>20 H=INT(X/256)</p>
 
-        <p>30 L=X-H*X256</p>
+        <p>30 L=X-H*256</p>
 
         <p>40 SYS DEC( "0B00"),L,H</p>
 
@@ -146,7 +146,7 @@
 
         <h3>FRNUM ($77D7)</h3>
 
-        <p>Die Routine FRNUM holt einen beliebigen numerischen Ausdruck aus dem Basic-Text und wertet ihn aus. Das Ergebnis wird im Fließkommaformat im Fließkommaakku Nummer 1 hinterlegt (FAC #)).</p>
+        <p>Die Routine FRNUM holt einen beliebigen numerischen Ausdruck aus dem Basic-Text und wertet ihn aus. Das Ergebnis wird im Fließkommaformat im Fließkommaakku Nummer 1 hinterlegt (FAC #1).</p>
 
         <h3>ADRFOR ($8815)</h3>
 
@@ -154,19 +154,19 @@
 
         <p>Wenn wir beide Routinen nacheinander aufrufen (nachdem mit CHKKOM das Trennzeichen zur vorherigen Variablen gelesen wurde), erhalten wir sowohl in den Registern als auch in den genannten Speicherzellen einen Zwei-Byte-Wert:</p>
 
-        <p>a 00b60 20 5c 79 jsr $795c a 00663 20 d7 77 jsr $7747 a 00b66 20 15 88 jsr $8815 a 00669 00 brk</p>
+        <p>a 00b60 20 5c 79 jsr $795c a 00b63 20 d7 77 jsr $77d7 a 00b66 20 15 88 jsr $8815 a 00b69 00 brk</p>
 
-        <p>Rufen Sie diese Routine mit »SYS DEC(" 0B60"),0,0,0,0,1026« oder mit »SYS DEC("0B60"),,,1026« auf. Zuerst wird das Komma eingelesen, danach mit FRNUM der numerische Ausdruck geholt und im FAC #1 abgelegt, anschließend mit ADRFOR der FAC #l-Inhalt ins Adreßformat gewandelt. Im Akku befindet sich nun eine vier und im Y-Register der Wert zwei (hex: $0402; dezimal:1026). Die gleichen Werte finden Sie in $16, $17 in der Form: Lowbyte, Highbyte.</p>
+        <p>Rufen Sie diese Routine mit »SYS DEC(" 0B60"),0,0,0,0,1026« oder mit »SYS DEC("0B60"),,,,,1026« auf. Zuerst wird das Komma eingelesen, danach mit FRNUM der numerische Ausdruck geholt und im FAC #1 abgelegt, anschließend mit ADRFOR der FAC #1-Inhalt ins Adreßformat gewandelt. Im Akku befindet sich nun eine vier und im Y-Register der Wert zwei (hex: $0402; dezimal:1026). Die gleichen Werte finden Sie in $16, $17 in der Form: Lowbyte, Highbyte.</p>
 
-        <h3>GETADR ($880F')</h3>
+        <h3>GETADR ($880F)</h3>
 
         <p>Die Routinen FRNUM und ADR-FOR können Sie selbstverständlich auch einzeln für andere Zwecke als das Einlesen eines Zwei-Byte-Wertes einsetzen. Für diesen Zweck ist es empfehlenswerter, die Routine $GETADR einzusetzen. Diese Routine ruft nacheinander CHKKOM, FRNUM und ADRFOR auf. Das Einlesen des Zwei-Byte-Wertes aus dem vorherigen Beispiel vereinfacht sich dadurch erheblich. Beachten Sie, daß das Einlesen des Trennkommas mit CHKKOM entfällt, da auch diese Routine von GETADR aufgerufen wird:</p>
 
-        <p>a 00670 20 Of 88 jsr $880f a 00673 00 brk Rufen Sie diese Routine mit »SYS DEC("0B70"),0,0,0,0,1026« auf. Sie erhalten die gleichen Werte wie zuvor sowohl in den Registern als auch in den Speicherzellen $16, $17.</p>
+        <p>a 00b70 20 0f 88 jsr $880f a 00b73 00 brk Rufen Sie diese Routine mit »SYS DEC("0B70"),0,0,0,0,1026« auf. Sie erhalten die gleichen Werte wie zuvor sowohl in den Registern als auch in den Speicherzellen $16, $17.</p>
 
         <h3>ADRBYT ($8803)</h3>
 
-        <p>ADRBYT ruft nacheinander die Routinen GETADR, CHKKOM und GETBYT auf. Diese Routine liest daher in einem Zuge sowohl einen Zwei-Byte-Wert als auch einen folgenden Ein-Byte-Wert ein und ist damit hervorragend geeignet, um zum Beispiel Grafikroutinen aufzurufen und ihnen sowohl eine X-Koordinate (16-Bit) als auch eine Y-Koordinate (8-Bit) zu übergeben: a 00680 20 5c 79 jsr $795c a 00683 20 03 88 jsr $8803 a 00686 00 brk Aufruf:</p>
+        <p>ADRBYT ruft nacheinander die Routinen GETADR, CHKKOM und GETBYT auf. Diese Routine liest daher in einem Zuge sowohl einen Zwei-Byte-Wert als auch einen folgenden Ein-Byte-Wert ein und ist damit hervorragend geeignet, um zum Beispiel Grafikroutinen aufzurufen und ihnen sowohl eine X-Koordinate (16-Bit) als auch eine Y-Koordinate (8-Bit) zu übergeben: a 00b80 20 5c 79 jsr $795c a 00b83 20 03 88 jsr $8803 a 00b86 00 brk Aufruf:</p>
 
         <p>»SYS DEC("0B80"),0,0,0,0,513,15«</p>
 
@@ -190,19 +190,19 @@ a Ob3f brk
 
         <p>Im Unterschied zu diesen Routinen kann GETPOS sowohl in Verbindung mit numerischen Variablen (Integer oder Fließkomma) als auch in Verbindung mit Stringvariablen eingesetzt werden. GETPOS holt keinen Wert, sondern liefert einen Zeiger auf eine Variable, genauer einen Zeiger auf die Variablentabelle.</p>
 
-        <p>Jede Variable ist in der Variablentabelle beschrieben, die normalerweise beim C 128 ab $0400 beginnt und in Bank 1 liegt, ebenso wie die Variablen selbst. Jeder Eintrag in dieser Tabelle ist bei nicht dimensionierten Variablen sieben Byte lang. Die ersten zwei Byte sind die beiden Zeichen des Variablennamens, wobei bei Integerzahlen in beiden Byte Bit sieben, bei Stringvariablen Bit sieben nur im zweiten Byte des Namens gesetzt ist, und Realzahlen durch ein in beiden Bytes gelöschtes Bit sieben erkannt werden. Die restlichen fünf Byte (3 bis 7) haben folgende Bedeutung: a) Real: (5 Byte Fließkommadarstellung) b) Int: (High-Byte)(Low-Byte)(3 Byte ungenutzt) c) String:(l Byte Stringlänge)(2 Byte Stringadresse)(2 Byte ungenutzt)</p>
+        <p>Jede Variable ist in der Variablentabelle beschrieben, die normalerweise beim C 128 ab $0400 beginnt und in Bank 1 liegt, ebenso wie die Variablen selbst. Jeder Eintrag in dieser Tabelle ist bei nicht dimensionierten Variablen sieben Byte lang. Die ersten zwei Byte sind die beiden Zeichen des Variablennamens, wobei bei Integerzahlen in beiden Byte Bit sieben, bei Stringvariablen Bit sieben nur im zweiten Byte des Namens gesetzt ist, und Realzahlen durch ein in beiden Bytes gelöschtes Bit sieben erkannt werden. Die restlichen fünf Byte (3 bis 7) haben folgende Bedeutung: a) Real: (5 Byte Fließkommadarstellung) b) Int: (High-Byte)(Low-Byte)(3 Byte ungenutzt) c) String:(1 Byte Stringlänge)(2 Byte Stringadresse)(2 Byte ungenutzt)</p>
 
         <p>Beachten Sie unbedingt, daß eine Integerzahl im - für Assemblerprogrammierer ungewohnten - Format: »High-Byte/Low-Byte« abgelegt wird.</p>
 
-        <p>Dimensionierte Arrays werden folgendermaßen verwaltet: Der Variablenname (2 Byte) befindet sich nur am Arraybeginn. Danach folgen zwei Byte, die den belegten Speicherplatz angeben, ein weiteres Byte, das die Dimensionierung enthält und zwei Byte mit der Anzahl der Arrayelemente. Erst anschließend folgt das Array: a) Real: (5 Byte Fließkommadarstellung) b) Int: (High-Byte)(Low-Byte) c) String:(l Byte Stringlänge)(2 Byte Stringadresse)</p>
+        <p>Dimensionierte Arrays werden folgendermaßen verwaltet: Der Variablenname (2 Byte) befindet sich nur am Arraybeginn. Danach folgen zwei Byte, die den belegten Speicherplatz angeben, ein weiteres Byte, das die Dimensionierung enthält und zwei Byte mit der Anzahl der Arrayelemente. Erst anschließend folgt das Array: a) Real: (5 Byte Fließkommadarstellung) b) Int: (High-Byte)(Low-Byte) c) String:(1 Byte Stringlänge)(2 Byte Stringadresse)</p>
 
-        <p>GETPOS liefert in jedem dieser Fälle einen Zeiger auf das erste Byte des Descriptors der jeweiligen Variablen, das heißt, bei nicht dimensionierten Variablen einen Zeiger aufdaserste Byte des Variablennamens, bei dimensionierten Variablen entweder - numerische Variablen - einen Zeiger auf das erste Byte der Zahl selbst, oder aber - Stringvariablen - einen Zeiger auf die Länge der jeweiligen Stringvariablen.</p>
+        <p>GETPOS liefert in jedem dieser Fälle einen Zeiger auf das erste Byte des Descriptors der jeweiligen Variablen, das heißt, bei nicht dimensionierten Variablen einen Zeiger auf das erste Byte des Variablennamens, bei dimensionierten Variablen entweder - numerische Variablen - einen Zeiger auf das erste Byte der Zahl selbst, oder aber - Stringvariablen - einen Zeiger auf die Länge der jeweiligen Stringvariablen.</p>
 
         <p>Dieser Zeiger wird sowohl an die Register (Akku=Low/Y=High), als auch an die Speicherzellen $49, $4A (Low-/Highbyte) übergeben.</p>
 
         <p>Da GETPOS alle Variablentypen verarbeitet, genügt ein winziges Beispielprogramm, um den Zugriff auf numerische und Stringvariablen, sowohl dimensioniert als auch nicht dimensioniert, zu demonstrieren:</p>
 
-        <p>a 00690 20 5e 79 jsr $795c a 00693 20 af 7a jsr $7aaf a 00696 00 brk</p>
+        <p>a 00b90 20 5c 79 jsr $795c a 00b93 20 af 7a jsr $7aaf a 00b96 00 brk</p>
 
         <p>Die folgenden Beispiele können Sie im Direktmodus eingeben:</p>
 
@@ -214,42 +214,46 @@ a Ob3f brk
 
         <p>M 49. Ergebnis: 00049 02 20 ...... Der Zeiger $49, $4A weist somit auf $2002 (in Bank 1, der Variablenbank). Geben Sie ein:</p>
 
-        <p>M 12002. Ergebnis: 12002 00 OA ....... In $12002 befindet sich das High-Byte (Nul)), in $12003 das Lowbyte ($0A =10) der Integerzahl 10. 2.NEW:A=10:SYS</p>
+        <p>M 12002. Ergebnis: 12002 00 0A ....... In $12002 befindet sich das High-Byte (Null), in $12003 das Lowbyte ($0A =10) der Integerzahl 10. 2.NEW:A=10:SYS</p>
 
         <p>DEC(" 0B90"),0,0,0,0,A</p>
 
         <p>M 49. Ergebnis: 00049 02 20 ....... M 12002. Ergebnis: 12002 84 20 00 00 00 (=Fließkommadarstellung von 10).</p>
 
-        <p>3.NEW:A$= ""BASICINTERPRE TER'":SYS DEC("0B90"),0,0,0,0,A$ M 49. Ergebnis: 00049 02 20 ...... M 12002. Ergebnis: 12002 10 EEFE</p>
+        <p>3.NEW:A$= "BASICINTERPRE TER":SYS DEC("0B90"),0,0,0,0,A$ M 49. Ergebnis: 00049 02 20 ...... M 12002. Ergebnis: 12002 10 EE FE</p>
 
-        <p>Im Unterschied zu numerischen Variablen zeigt der Zeiger $49, $4A bei Stringvariablen nicht unmittelbar auf die Variable selbst, sondern auf das erste Descriptorbyte (Stringlänge). Die beiden folgenden Bytes geben die Adresse des Strings an. Geben Sie daher ein: M IFEEE. Ergebnis: IFEEE 42 41 53 BEER (= ASCII-Darstellung von 'BASICINTERPRETER'). b) dimensionierte Variablen 1.NEW:A%(2)=10:SYS DEC("0B90"), 0,0,0,0,A%(2)</p>
+        <p>Im Unterschied zu numerischen Variablen zeigt der Zeiger $49, $4A bei Stringvariablen nicht unmittelbar auf die Variable selbst, sondern auf das erste Descriptorbyte (Stringlänge). Die beiden folgenden Bytes geben die Adresse des Strings an. Geben Sie daher ein: M 1FEEE. Ergebnis: 1FEEE 42 41 53 ..... (= ASCII-Darstellung von 'BASICINTERPRETER').</p>
 
-        <p>M 49. Ergebnis: 00049 OB 20...... M 1200B. Ergebnis:</p>
+        <h3>b) dimensionierte Variablen</h3>
 
-        <p>1200B 00 OA......</p>
+        <p>1.NEW:A%(2)=10:SYS DEC("0B90"), 0,0,0,0,A%(2)</p>
+
+        <p>M 49. Ergebnis: 00049 0B 20...... M 1200B. Ergebnis:</p>
+
+        <p>1200B 00 0A......</p>
 
         <p>In $12002 befindet sich das High-Byte (Null), in $12003 das Lowbyte ($0A=10) der Integerzahl 10.</p>
 
         <pre><code>2.NEW:A(@2)=10:SYS DEC ("0B90"),0,0,0,0,A(2)M 49. Ergebnis: 00049 11 20...... M 12011. Ergebnis: 12011 84 20 00 00 00 (=Fließkommadarstellung von 10).
 </code></pre>
 
-        <p>3.NEW:A$(2)= "C 128":SYS DEC ("0B90"),0,0,0,0,A$(2) M 49. Ergebnis: 00049 OD 20...... M 1200D. Ergebnis: 1200D 05 F9FE....... M IFEF9.Ergebnis: IFEF9 43 2D 3l..... (= ASCII-Darstellung von »C 128«)</p>
+        <p>3.NEW:A$(2)= "C 128":SYS DEC ("0B90"),0,0,0,0,A$(2) M 49. Ergebnis: 00049 0D 20...... M 1200D. Ergebnis: 1200D 05 F9 FE....... M 1FEF9.Ergebnis: 1FEF9 43 2D 31..... (= ASCII-Darstellung von »C 128«)</p>
 
         <p>Wie Sie sehen, ist diese Routine außerordentlich universell einsetzbar. Merken Sie sich folgende Punkte, die sowohl für einzelne als auch für Arrayvariablen gelten: Der Zeiger in den Speicherzellen $49, $4A zeigt bei numerischen Variablen auf das erste Byte der Zahl selbst, bei Stringvariablen auf den Längendescriptor des Strings, hinter dem in Form von Lowbyte/Highbyte die Stringadresse folgt.</p>
 
         <p>Weiterhin ist eventuell von Interesse für Sie, daß beim Aufruf dieser Routine in den Speicherzellen $47, $48 der Variablenname übergeben wird und daß GETPOS eine Variable anlegt, wenn sie noch nicht definiert wurde. Daher besteht keine Veranlassung, darauf zu achten, daß beim Aufruf einer eigenen Assemblerroutine, die GETPOS verwendet wird. Ein Absturz ist dank des Anlegens der Variablen nicht möglich!</p>
 
-        <p>Einen Nachteil besitzt dagegen diese Routine gegenüber ihrem Aquivalent auf dem C 64: GETPOS liefert auf dem C 64 einen zweiten Zeiger auf den Anfangeines Arrays bei Verwendung dimensionierter Variablen. Dieser Zeiger kann zum Beispiel bei Suchroutinen sehr nützlich sein, die ein Arrayfeld nach einem bestimmten Wert oder String durchsuchen müssen. Eine solche Routine muß wissen, wann das Arrayende erreicht wird und die Suche beendet werden muß. Dieses Arrayende kann über den erwähnten Zeiger ermittelt werden, indem der Arraydescriptor (Speicherplatz, den das Array benötigt), der in der Arraybeschreibung steht, zum Arraybeginn addiert wird (=Ende des Arrays).</p>
+        <p>Einen Nachteil besitzt dagegen diese Routine gegenüber ihrem Äquivalent auf dem C 64: GETPOS liefert auf dem C 64 einen zweiten Zeiger auf den Anfang eines Arrays bei Verwendung dimensionierter Variablen. Dieser Zeiger kann zum Beispiel bei Suchroutinen sehr nützlich sein, die ein Arrayfeld nach einem bestimmten Wert oder String durchsuchen müssen. Eine solche Routine muß wissen, wann das Arrayende erreicht wird und die Suche beendet werden muß. Dieses Arrayende kann über den erwähnten Zeiger ermittelt werden, indem der Arraydescriptor (Speicherplatz, den das Array benötigt), der in der Arraybeschreibung steht, zum Arraybeginn addiert wird (=Ende des Arrays).</p>
 
-        <p>GETPOS auf dem C 128 besitzt diesen Zeiger zwar ebenfalls, er wird jedoch vor der Rückkehr aus GEIPOS durch andere Werte überschrieben. Um dennoch auf die Descriptoren eines Arrays zuzugreifen, kann ein Trick verwendet werden. Beispiel: Eine Routine soll ein Stringarray ab Element A$(53) durchsuchen. Das Arrayende kann durch folgende Form des Aufrufs ermittelt werden:</p>
+        <p>GETPOS auf dem C 128 besitzt diesen Zeiger zwar ebenfalls, er wird jedoch vor der Rückkehr aus GETPOS durch andere Werte überschrieben. Um dennoch auf die Descriptoren eines Arrays zuzugreifen, kann ein Trick verwendet werden. Beispiel: Eine Routine soll ein Stringarray ab Element A$(53) durchsuchen. Das Arrayende kann durch folgende Form des Aufrufs ermittelt werden:</p>
 
-        <p>SYS DEC("0BA0"),0,0,0,0,A$(0) ‚As$(83) Die aufgerufene Assemblerroutine lautet:</p>
+        <p>SYS DEC("0BA0"),0,0,0,0,A$(0) ,A$(53) Die aufgerufene Assemblerroutine lautet:</p>
 
         <p>a 00ba0 20 5c 79 jsr $795c</p>
 
         <p>; CHKKOM a 00ba3 20 af 7a jsr $7aaf</p>
 
-        <p>;GETPOS von A$(0) a 00ba6 38 sec a 00ba7 e9 07 sbe #$07</p>
+        <p>;GETPOS von A$(0) a 00ba6 38 sec a 00ba7 e9 07 sbc #$07</p>
 
         <p>;7 von Low-Byte subtrahieren a 00ba9 85 fb sta $fb</p>
 
@@ -262,7 +266,7 @@ a 00bad 88 dey
 a 00bae 84 fc sty $fe
 </code></pre>
 
-        <p>;High-Byte speichern a 00bb0 20 5e 79 jsr $795c</p>
+        <p>;High-Byte speichern a 00bb0 20 5c 79 jsr $795c</p>
 
         <p>; CHKKOM a 00bb3 20 af 7a jsr $7aaf</p>
 
@@ -272,7 +276,7 @@ a 00bae 84 fc sty $fe
 
         <p>Dieser neue Zeiger wird in $FB, $FC gespeichert und anschließend GETPOS auf das eigentlich interessierende Startelement A$(53) angewendet, um dessen Länge und Adresse zu holen.</p>
 
-        <p>Da $FB, $FC nun aufdaserste Element der Arraybeschreibung weist, kann durch Addition des vom Array benötigten Speicherplatzes zum Arrayanfang dessen Ende +1, das heißt, der Beginn des nächsten Arrays, ermittelt werden. Da die Speicherbelegung in Bytezweiund drei der Arraybeschreibung enthalten ist (Low-Byte/High-Byte), kann mit indirekt indizierter Adressierung daraufzugegriffen werden.</p>
+        <p>Da $FB, $FC nun auf das erste Element der Arraybeschreibung weist, kann durch Addition des vom Array benötigten Speicherplatzes zum Arrayanfang dessen Ende +1, das heißt, der Beginn des nächsten Arrays, ermittelt werden. Da die Speicherbelegung in Byte zwei und drei der Arraybeschreibung enthalten ist (Low-Byte/High-Byte), kann mit indirekt indizierter Adressierung darauf zugegriffen werden.</p>
 
         <h3>Prinzip:</h3>
 
@@ -290,7 +294,7 @@ a 00bae 84 fc sty $fe
 
         <p>Speicherplatzes</p>
 
-        <p>Wir kommen nun zum Anlegen von Variablen aller Art. Zum Anlegen müssen wir jedoch auf die Variablentabelle und - bei Stringvariablen - auf den Stringstack zugreifen. Sollten Sie anderer Meinung sein, da die Variablentabelle normalerweise ab $0400 beginnt und der Bereich $0000 bis $IFFF von unserem Initialisierungsprogramm als gemeinsamer Bereich von Bank 0 und Bank 1 definiert wurde, so schauen Sie sich bitte mit dem Monitor die Speicherzellen $2F,$2E an, den Zeiger auf den Anfang der Variablentabelle. Dieser Zeiger weist auf $2000, ein Ergebnis des Basic-Initialisierungs-Programms. Damit liegt der Variablenbereich außerhalb des gemeinsamen Bereichs. Beim Zugriff auf die Tabelle muß zuvor auf Bank 1 umgeschaltet werden.</p>
+        <p>Wir kommen nun zum Anlegen von Variablen aller Art. Zum Anlegen müssen wir jedoch auf die Variablentabelle und - bei Stringvariablen - auf den Stringstack zugreifen. Sollten Sie anderer Meinung sein, da die Variablentabelle normalerweise ab $0400 beginnt und der Bereich $0000 bis $1FFF von unserem Initialisierungsprogramm als gemeinsamer Bereich von Bank 0 und Bank 1 definiert wurde, so schauen Sie sich bitte mit dem Monitor die Speicherzellen $2F,$2E an, den Zeiger auf den Anfang der Variablentabelle. Dieser Zeiger weist auf $2000, ein Ergebnis des Basic-Initialisierungs-Programms. Damit liegt der Variablenbereich außerhalb des gemeinsamen Bereichs. Beim Zugriff auf die Tabelle muß zuvor auf Bank 1 umgeschaltet werden.</p>
 
         <p>Mit dem eingebauten Monitor ist ein solcher Zugriff sehr einfach, da vor der eigentlichen Adresse nur eine Eins (Bank 1) angegeben werden muß und der Monitor dann selbsttätig auf die gewünschte Bank schaltet. In unseren eigenen Programmen müssen wir jedoch »per Hand« zwischen Bank 0 und Bank 1 umschalten. Ich stelle nun ein erweitertes Initialisierungs-Programm vor, in dem zwei Umschaltroutinen vorhanden sind:</p>
 
@@ -318,10 +322,9 @@ a
 a 00627 68 pla
 a 00b28 28 plp
 a 00629 60 rts
-Dieses . erweiterte _lInitialisie-
 </code></pre>
 
-        <p>rungs-Programm enthält eine Routine zum Umschalten auf Bank 0 ab $0Bl6 und eine zweite zum Umschalten auf Bank 1 ab $0B20. In beiden Fällen wird der Inhalt der beiden Register, die beim Ablauf verändert werden, Akku und Status, gerettet und nach beendetem Umschalten zurückgeholt. Beide Routinen können Sie daher in Ihren eigenen Programmen an beliebigen Stellen aufrufen, ohne sich Gedanken darüber zu machen, welche momentan benötigten Registerinhalte verändert werden könnten und daher vor dem Aufrufgerettet werden müssen.</p>
+        <p>Dieses erweiterte Initialisierungs-Programm enthält eine Routine zum Umschalten auf Bank 0 ab $0B16 und eine zweite zum Umschalten auf Bank 1 ab $0B20. In beiden Fällen wird der Inhalt der beiden Register, die beim Ablauf verändert werden, Akku und Status, gerettet und nach beendetem Umschalten zurückgeholt. Beide Routinen können Sie daher in Ihren eigenen Programmen an beliebigen Stellen aufrufen, ohne sich Gedanken darüber zu machen, welche momentan benötigten Registerinhalte verändert werden könnten und daher vor dem Aufruf gerettet werden müssen.</p>
 
         <p>Wichtig ist dieses Retten der Register dann, wenn Sie zum Beispiel einen Wert aus der Variablentabelle holen wollen: jsr bank 1 lda vartab,x cmp vartab,y jsr bank 0</p>
 
@@ -329,10 +332,9 @@ Dieses . erweiterte _lInitialisie-
 
         <h3>Integervariable anlegen</h3>
 
-        <p>Zum Anlegen einer Integervariablen genügen die bereits besprochenen Routinen des Basic-Interpreters. Wir gehen davon aus, daß unser Programm zum Beispiel nach dem Durchsuchen eines Arrays den Index eines Elementes, das dem von Basic übergebenen Suchkriterium entspricht, in einer Variablen an das Basic zurücküber-</p>
+        <p>Zum Anlegen einer Integervariablen genügen die bereits besprochenen Routinen des Basic-Interpreters. Wir gehen davon aus, daß unser Programm zum Beispiel nach dem Durchsuchen eines Arrays den Index eines Elementes, das dem von Basic übergebenen Suchkriterium entspricht, in einer Variablen an das Basic zurückübergeben soll:</p>
 
-        <pre><code>geben soll:
-a 00630 20 5ce 79 jsr $795c
+        <pre><code>a 00630 20 5ce 79 jsr $795c
 a 00633 20 af 7a jsr $7aaf
 a 00636 20 20 Ob jsr $0b20
 a 00639 a0 00 ldy #300
@@ -345,7 +347,7 @@ a 00b44 20 16 Ob jsr $0b16
 a 00647 60 rts
 </code></pre>
 
-        <p>Rufen Sie dieses Programm mit »5YS DEC("0B30"),0,0,0,0,1%« auf. Denken Sie jedoch daran, zuvor das erweiterte Initialisierungs-Programm einzugeben!</p>
+        <p>Rufen Sie dieses Programm mit »SYS DEC("0B30"),0,0,0,0,I%« auf. Denken Sie jedoch daran, zuvor das erweiterte Initialisierungs-Programm einzugeben!</p>
 
         <p>Unsere Routine liest nun das Komma ein und ruft GETPOS auf, die in den Speicherzellen $49, $4A einen Zeiger auf die - neu angelegte - Variable liefert, das heißt, auf das erste Byte der Integerzahl selbst, die momentan natürlich Null ist. Nachdem auf Bank 1, die Variablenbank, umgeschaltet wurde, schreiben wir in das erste Byte dieser Zahl eine $02, in das zweite Byte den Wert $04. Zum Abschluß schalten wir wieder auf Bank 0 um.</p>
 
@@ -363,7 +365,7 @@ a 00647 60 rts
 
         <p>Wenn wir einem aufrufenden Basic-Programm ein Realergebnis mitteilen wollen, legen wir auch diese Realvariable analog dem eben geschilderten Ablauf an: Wir holen die Variablenadresse, schalten auf Bank 1 um, legen die Realzahl im Fließkommaformat ab der angezeigten Adresse ab und schalten wieder auf Bank 0:</p>
 
-        <p>a 00650 20 5c 79 jsr $795c</p>
+        <p>a 00b50 20 5c 79 jsr $795c</p>
 
         <pre><code>a 00653 20 af 7a jsr $7aaf
 a 00656 20 20 Ob jsr $0b20
@@ -392,7 +394,7 @@ a 00672 60 rts
 
         <p>Bevor wir uns nun dem Anlegen von Strings zuwenden, will ich zuvor zwei wichtige Zeropageadressen erwähnen, $0F und $10. Wenn wir die Routine GETPOS aufrufen, erhalten wir in diesen beiden Speicherzellen Informationen über die Art der gelesenen Variablen.</p>
 
-        <p>Wie es bereits im Handbuch steht, enthält $OF den Wert $00 bei numerischen Variablen und $80 bei Stringvariablen.</p>
+        <p>Wie es bereits im Handbuch steht, enthält $0F den Wert $00 bei numerischen Variablen und $80 bei Stringvariablen.</p>
 
         <p>$10 enthält im Falle einer Integervariablen den Wert $80 und $00 im Fall einer Realvariablen.</p>
 
@@ -402,37 +404,39 @@ a 00672 60 rts
 
         <p>SWAP A$(2),A$(7) ist zum einen schneller als die herkömmliche Methode:</p>
 
-        <p>S$ = A$(2):A$(2)= AUN:AHN=S$ und der zweite, fast noch wesentlichere Vorteil besteht darin, daß bei der Vertauschung von Stringvariablen die Strings nicht am unteren Ende des Stringstacks neu angelegt werden müssen, sondern daß die Vertauschung der Stringdescriptoren genügt.</p>
+        <p>S$ = A$(2):A$(2)= A$(7):A$(7)=S$ und der zweite, fast noch wesentlichere Vorteil besteht darin, daß bei der Vertauschung von Stringvariablen die Strings nicht am unteren Ende des Stringstacks neu angelegt werden müssen, sondern daß die Vertauschung der Stringdescriptoren genügt.</p>
 
         <p>Die Arbeit einer Sortierroutine, die einen derartigen Befehl verwendet, wird daher weitaus seltener durch eine nötige Garbage Collection unterbrochen, so daß sich die Sortierzeit erheblich verkürzt.</p>
 
         <p>Bevor Sie die folgenden Programmzeilen eingeben, vergewissern Sie sich bitte, daß sich das neuere Initialisierungs-Programm im Speicher befindet. Unsere Routine wird die darin enthaltenen Unterprogramme zum Umschalten der Speicherbänke benötigen.</p>
 
-        <h3>Zeiger auf die Variablen holen a 00630 20 5e 79 jsr $795c</h3>
+        <h3>Zeiger auf die Variablen holen</h3>
 
-        <p>00633 20 af 7a jsr $7aaf</p>
+        <p>a 00b30 20 5c 79 jsr $795c</p>
 
-        <p>00636 a5 49 lda $49</p>
+        <p>a 00b33 20 af 7a jsr $7aaf</p>
 
-        <p>00638 a6 4a ldx $4a</p>
+        <p>a 00b36 a5 49 lda $49</p>
 
-        <p>00b3a 85 fb sta $fb</p>
+        <p>a 00b38 a6 4a ldx $4a</p>
 
-        <p>00b3c 86 fc stx $fe</p>
+        <p>a 00b3a 85 fb sta $fb</p>
 
-        <p>00b3e 20 5e 79 jsr $795c</p>
+        <p>a 00b3c 86 fc stx $fc</p>
 
-        <p>00b41 20 af 7a jsr $7aaf</p>
+        <p>a 00b3e 20 5c 79 jsr $795c</p>
 
-        <p>Der erste Programmteil bietet nur bereits Bekanntes. Nach dem Aufruf mit zum Beispiel »SYS DEC("0B30"),0,0,0,0,A8,B$« wird ein Zeiger auf A$ mit Hilfe von GETPOS geholt. Dieser Zeiger wird nach $FB, $FC kopiert, da anschließend ein Zeiger auf B$ geholt wird und sich in den Speicherzellen $49, $4A nun der Zeiger auf die Descriptoren dieser Variablen befinden.</p>
+        <p>a 00b41 20 af 7a jsr $7aaf</p>
+
+        <p>Der erste Programmteil bietet nur bereits Bekanntes. Nach dem Aufruf mit zum Beispiel »SYS DEC("0B30"),0,0,0,0,A$,B$« wird ein Zeiger auf A$ mit Hilfe von GETPOS geholt. Dieser Zeiger wird nach $FB, $FC kopiert, da anschließend ein Zeiger auf B$ geholt wird und sich in den Speicherzellen $49, $4A nun der Zeiger auf die Descriptoren dieser Variablen befinden.</p>
 
         <h3>Typflags auswerten</h3>
 
-        <p>Die Auswertung verläuft nach dem abgebildeten Schema: Wenn $0F gleich Null ist, handelt es sich um eine numerische Variable und es wird geprüft, ob $10 ebenfalls den Wert Null enthält. Wenn ja, wurde eine Realvariable gelesen und wir laden das Y-Register mit $04, dem Startwert für eine Schleife, die von Y bisinklusive Null läuft und die einzelnen Bytes beider Variablen (beziehungsweise bei Strings deren Descriptoren) vertauscht.</p>
+        <p>Die Auswertung verläuft nach dem abgebildeten Schema: Wenn $0F gleich Null ist, handelt es sich um eine numerische Variable und es wird geprüft, ob $10 ebenfalls den Wert Null enthält. Wenn ja, wurde eine Realvariable gelesen und wir laden das Y-Register mit $04, dem Startwert für eine Schleife, die von Y bis inklusive Null läuft und die einzelnen Bytes beider Variablen (beziehungsweise bei Strings deren Descriptoren) vertauscht.</p>
 
         <p>War $0F gleich Null, $10 jedoch ungleich Null, wird das Y-Register mit $01 geladen (Integervariable).</p>
 
-        <p>Wurde hingegen eine Stringvariable gelesen, laden wir das Y-Register mit dem Wert $02. lda $0f bne string lda $10 bne integer ldy #804 bne weiter integer 1dy #801 bne weiter string 1dy #302 weiter jsr $0b20 Soweit der prinzipielle Ablauf, den ich jedoch in ein kürzeres Programm umgesetzt habe:</p>
+        <p>Wurde hingegen eine Stringvariable gelesen, laden wir das Y-Register mit dem Wert $02. lda $0f bne string lda $10 bne integer ldy #$04 bne weiter integer ldy #$01 bne weiter string ldy #$02 weiter jsr $0b20 Soweit der prinzipielle Ablauf, den ich jedoch in ein kürzeres Programm umgesetzt habe:</p>
 
         <pre><code>a 00b44 a5 0f Ida $0f
 00646 dO 0a bne $0b52
@@ -441,11 +445,11 @@ a 00672 60 rts
 00b4c a0 04 ldy #804
 </code></pre>
 
-        <p>00b4e 2c a0 01 bit $01a0</p>
+        <p>a 00b4e 2c a0 01 bit $01a0</p>
 
-        <p>00b51 2c a0 02 bit $02a0</p>
+        <p>a 00b51 2c a0 02 bit $02a0</p>
 
-        <p>00654 20 20 Ob jsr $0b20</p>
+        <p>a 00b54 20 20 0b jsr $0b20</p>
 
         <p>Dieser Programmteil wird für erfahrene 6502/8502 - Programmierer auf Anhieb verständlich sein, für weniger erfahrene jedoch wahrscheinlich ein unlösbares Rätsel darstellen.</p>
 
@@ -455,16 +459,15 @@ a 00672 60 rts
 
         <p>Der BIT-Befehl hat keinerlei Auswirkungen auf das Y-Register. Da anschließend wiederum Byte $2C folgt, werden auch die folgenden beiden Bytes als Adresse eines BIT-Befehls interpretiert.</p>
 
-        <p>Seltsamerweise springt unser Programm mitten in den BIT-Befehl »hinein«, wenn eine Integervariable übergeben wurde (a 00b4a dO 03 bne $0b4f). Geben Sie bitte mit dem Monitor ein:</p>
+        <p>Seltsamerweise springt unser Programm mitten in den BIT-Befehl »hinein«, wenn eine Integervariable übergeben wurde (a 00b4a d0 03 bne $0b4f). Geben Sie bitte mit dem Monitor ein:</p>
 
-        <p>a 0bAf. Erinterpretiertdie auf den BIT-Code folgenden Bytes als: »LDY #$0l«, wodurch das Y-Register wie im Falle einer Integervariablen gewünscht - mit einer Eins geladen wird.</p>
+        <p>d 0b4f. Er interpretiert die auf den BIT-Code folgenden Bytes als: »LDY #$01«, wodurch das Y-Register - wie im Falle einer Integervariablen gewünscht - mit einer Eins geladen wird.</p>
 
-        <p>Soviel zu den Einsatzmöglichkeiten des BIT-Befehls. Daß diese Anwendung üblich ist, zeigt der ständige Einsatz dieser Methode im "ROM des C 128.</p>
+        <p>Soviel zu den Einsatzmöglichkeiten des BIT-Befehls. Daß diese Anwendung üblich ist, zeigt der ständige Einsatz dieser Methode im ROM des C 128.</p>
 
-        <h3>Vertauschen der Variablen</h3>
+        <h3>Vertauschen der Variablen (-zeiger)</h3>
 
-        <pre><code>(-zeiger)
-a 00657 b1 49 lda ($49),y
+        <pre><code>a 00657 b1 49 lda ($49),y
 a 00659 aa tax
 a 00b5a bi fb lda ($fb),y
 a 00b5e 91 49 sta ($49),y
@@ -480,9 +483,10 @@ a 00667 60 rts
 
         <p>Beachten Sie, daß die Routine nicht überprüft, ob beide übergebenen Variablen vom gleichen Typ sind, was Grundbedingung für eine sinnvolle Vertauschung ist.</p>
 
-        <h3>Komplettes Listing von »SWAP« a 00630 20 5c 79 jsr $795c</h3>
+        <h3>Komplettes Listing von »SWAP«</h3>
 
-        <pre><code>00633 20 af 7a jsr $7aaf
+        <pre><code>a 00b30 20 5c 79 jsr $795c
+00633 20 af 7a jsr $7aaf
 00636 a5 49 lda $49
 00638 a6 4a ldx $4a
 00b3a 85 fb sta $fb
@@ -517,56 +521,60 @@ a 00667 60 rts
 
         <p>A$="C 128":B$="C 64"</p>
 
-        <p>SYS DEC("0B30"),,,,A$,B$</p>
+        <p>SYS DEC("0B30"),,,,,A$,B$</p>
 
         <p>PRINT A$,B$ und Sie erhalten auf dem Bildschirm die vertauschten Stringinhalte:</p>
 
         <p>C 64 C 128</p>
 
-        <h2>Anlegen einer Stringvoeriablen</h2>
+        <h2>Anlegen einer Stringvariablen</h2>
 
         <p>Die bisherigen Programmbeispiele dieses Artikels wurden so einfach wie möglich gehalten und dürften keine Verständnisschwierigkeiten hervorrufen. Das Anlegen einer Stringvariablen werde ich nun an einem komplexeren Beispielprogramm erläutern, einer INPUT-Routine.</p>
 
         <p>Bei der Entwicklung dieser Routine werden viele der beschriebenen Interpreter-Routinen benötigt. Außerdem werden weitere Routinen und spezielle Zeropageadressen beschrieben, ohne die das Anlegen eines Strings nicht möglich ist.</p>
 
-        <p>Das Niveau dieses Artikels wird _ durch das komplexere Programm zwar deutlich höher werden, dafür haben Sie jedoch am Ende dieses Abschnitts eine lauffähige Eingaberoutine in Ihren Händen, die Sie jederzeit ausbauen können und kennen das Anlegen von Strings auf dem C 128, das in den verschiedensten Routinen von Bedeutung ist. Einsatzbeispiel sind wie erwähnt Sortierroutinen, INPUT-Routinen; eine Vielzahl weiterer Routinen, die Strings bearbeiten, sind denkbar. Eine nette Aufgabe könnte zum Beispiel eine INPUT #-Routine sein, die Strings mit bis zu 255 beliebigen Zeichen einliest und damit die Beschränkungen des INPUT #-Befehls aufhebt. Die INPUT-Routine soll folgendes leisten:</p>
+        <p>Das Niveau dieses Artikels wird durch das komplexere Programm zwar deutlich höher werden, dafür haben Sie jedoch am Ende dieses Abschnitts eine lauffähige Eingaberoutine in Ihren Händen, die Sie jederzeit ausbauen können und kennen das Anlegen von Strings auf dem C 128, das in den verschiedensten Routinen von Bedeutung ist. Einsatzbeispiel sind wie erwähnt Sortierroutinen, INPUT-Routinen; eine Vielzahl weiterer Routinen, die Strings bearbeiten, sind denkbar. Eine nette Aufgabe könnte zum Beispiel eine INPUT #-Routine sein, die Strings mit bis zu 255 beliebigen Zeichen einliest und damit die Beschränkungen des INPUT #-Befehls aufhebt. Die INPUT-Routine soll folgendes leisten:</p>
 
-        <p>l. Vor Beginn der Eingabe den Cursor auf eine angegebene Position setzen.</p>
+        <p>1. Vor Beginn der Eingabe den Cursor auf eine angegebene Position setzen.</p>
 
-        <ol>
+        <ol start="2">
             <li>Während der Eingabe nur Zeichen zulassen, die in einem als Parameterübergebenen String enthalten sind.</li>
             <li>Prinzipiell - soweit nicht durch Punkt 2 verhindert - alle Zeichen zulassen, auch solche, die beim INPUT-Befehl zu einem »REDO FROM START«-Error führen.</li>
             <li>Die Eingabe vom Bildschirm übernehmen und in einem vom Basic-Programm frei wählbaren String an dieses übergeben.</li>
         </ol>
 
 
-        <p>Da als Eingabezeichen nur die in dem übergebenen String enthaltenen zugelassen werden sollen, ist es nötig, diesen String um: CHR$@9) = Cursor-right, CHR$(57) = Cursor-left, CHR$(20) = Delete und CHR$(148) = Insert zu erweitern, um die gleichen Editiermöglichkeiten wie beim INPUT-Befehl zu erhalten.</p>
+        <p>Da als Eingabezeichen nur die in dem übergebenen String enthaltenen zugelassen werden sollen, ist es nötig, diesen String um: CHR$(29) = Cusor-right, CHR$(157) = Cursor-left, CHR$(20) = Delete und CHR$(148) = Insert zu erweitern, um die gleichen Editiermöglichkeiten wie beim INPUT-Befehl zu erhalten.</p>
 
         <p>Beispiel:</p>
 
-        <p>2$= " 1234567890" +CHR$@9)+ CHR$(157) + CHR$(20) + CHR$(148) läßt Ziffern und Editiertasten als Eingabe zu.</p>
+        <p>Z$= " 1234567890" +CHR$(29)+ CHR$(157) + CHR$(20) + CHR$(148) läßt Ziffern und Editiertasten als Eingabe zu.</p>
 
         <p>Da dieses Programm deutlich umfangreicher und damit schwieriger zu verstehen ist als die bisherigen Programmbeispiele, werde ich den Programmablauf diesmal anhand eines Assemblerlistings erklären. Zum Abtippen mit dem eingebauten Monitor finden Sie im Anschluß an die Erläuterungen das Programm in der gewohnten disassemblierten Form.</p>
 
-        <p>Zeropageadressen %%*ZEROPAGEADRESSEN* STREND = $35 ;ZEIGER AUF ENDE DES STRINGSTACKS</p>
+        <h3>Zeropageadressen</h3>
+
+        <p>**ZEROPAGEADRESSEN* STREND = $35 ;ZEIGER AUF ENDE DES STRINGSTACKS</p>
 
         <pre><code>ZEIGER = $49 ;ZEIGER AUF DESCRIPTOREN SPALTE = $EC ;CURSORSPALTE
 </code></pre>
 
         <p>ZEILPOI = $EO ;ZEIGER:SPALTE O DER MOMENTANEN CURSORZEILE STREND zeigt immer das momentane Ende des Stringstacks, der bekanntlich von »oben« ($FFFF) nach unten wächst. ZEIGER ist der von GETPOS übergebene Zeiger auf die Descriptoren einer aus dem Basic-Text gelesenen Variablen. In SPALTE ist - bei Benutzung der Betriebssystem-Routinen zur Zeichenausgabe - die momentane Cursorspalte enthalten, und ZEIGER weist auf den Anfang der aktuellen Zeile, in der sich der Cursor befindet. Die aktuelle Cursorposition ergibt sich somit aus ZEIGER + SPALTE.</p>
 
-        <h3>Eigene Variablen *%EIGENE VARIABLEN**</h3>
+        <h3>Eigene Variablen</h3>
+
+        <p>**EIGENE VARIABLEN**</p>
 
         <pre><code>BANKO = $0B16
 BANK1 = $0B20
 ZLAENGE = $FB ;LAENGE DES STRINGS MIT DEN ZUGEL.ZEICHEN POSIT = $FC ;ZEIGER:POS. DES STRINGS MIT DEN ZUGEL.ZEICHEN STARTPOS = $A3 ;ZEIGER: STARTPOSITION DER EINGABE LAENGE = $A5 ;EINGABEL.MAX.
 </code></pre>
 
-        <p>BANKO und BANK] sind die Einsprungadressen für unsere Unterprogramme zur Bankumschaltung. In ZLAENGE und in POSIT, POSIT+1 werden die Descriptoren des Strings gespeichert, in dem die als Eingabe zulässigen Zeichen abgelegt wurden. STARTPOS, STARTPOS+1 ist die beim Aufruf übergebene Bildschirmposition, bei der die Eingabe beginnen soll. In LAENGE legen wir die ebenfalls vom Basic-Programm übergebene maximale Eingabelänge ab.</p>
+        <p>BANK0 und BANK1 sind die Einsprungadressen für unsere Unterprogramme zur Bankumschaltung. In ZLAENGE und in POSIT, POSIT+1 werden die Descriptoren des Strings gespeichert, in dem die als Eingabe zulässigen Zeichen abgelegt wurden. STARTPOS, STARTPOS+1 ist die beim Aufruf übergebene Bildschirmposition, bei der die Eingabe beginnen soll. In LAENGE legen wir die ebenfalls vom Basic-Programm übergebene maximale Eingabelänge ab.</p>
 
         <h3>Verwendete Kernelroutinen</h3>
 
-        <p>Zu diesen Routinen dürfte keine weitere Erläuterung nötig sein, da sie den entsprechenden C 64-Routinen äquivalent sind und sich dank der Sprungtabelle auch die Einsprungadressen nicht verändern. %%*KERNELROUTINEN**</p>
+        <p>Zu diesen Routinen dürfte keine weitere Erläuterung nötig sein, da sie den entsprechenden C 64-Routinen äquivalent sind und sich dank der Sprungtabelle auch die Einsprungadressen nicht verändern. **KERNELROUTINEN**</p>
 
         <p>BSOUT = $FFD2 ;ZEICHEN IM AKKU AUSGEBEN</p>
 
@@ -607,11 +615,11 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>Beispiel:</p>
 
-        <p>SYS DEC( "0D00"),20,10,5,0,2$,A$ bedeutet: die maximale Eingabelänge beträgt 20 Zeichen, die Eingabe soll ab Spalte 5 in Zeile 10 beginnen, nur die in Z$ enthaltenen Zeichen werden als Eingabe zugelassen, und die Eingabe selbst soll dem Basic-Programm in A$übergeben werden (vergessen Sie bei der Definition von Z$ die Editiertasten nicht).</p>
+        <p>SYS DEC( "0D00"),20,10,5,0,Z$,A$ bedeutet: die maximale Eingabelänge beträgt 20 Zeichen, die Eingabe soll ab Spalte 5 in Zeile 10 beginnen, nur die in Z$ enthaltenen Zeichen werden als Eingabe zugelassen, und die Eingabe selbst soll dem Basic-Programm in A$übergeben werden (vergessen Sie bei der Definition von Z$ die Editiertasten nicht).</p>
 
         <p>Die in den Registern übergebenen Parameter Länge/Zeile/Spalte müssen für eine spätere Verwendung gerettet werden:</p>
 
-        <p>*%%PARAMETER RETTEN*</p>
+        <p>**PARAMETER RETTEN*</p>
 
         <p>STA LAENGE</p>
 
@@ -635,13 +643,13 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>Der nächste Schritt besteht darin, die Descriptoren für den String mit den als Eingabe zulässigen Zeichen zu holen:</p>
 
-        <p><strong>ZEIGER:DESCR.ZEICHEN$ HOLEN</strong> JSR CHKKOM</p>
+        <p>**ZEIGER:DESCR.ZEICHEN$ HOLEN** JSR CHKKOM</p>
 
         <p>JSR GETPOS</p>
 
-        <p>JISR BANK1</p>
+        <p>JSR BANK1</p>
 
-        <p>, IDY #2</p>
+        <p>LDY #2</p>
 
         <p>HOLDES LDA (ZEIGER),Y</p>
 
@@ -655,7 +663,7 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>Zuerst wird das Komma hinter den Standardparametern gelesen, anschließend GETPOS aufgerufen, die uns in den Speicherzellen $49, $4A (=ZEIGER) einen Zeiger auf den nachfolgenden String (im Beispielaufruf Z$) liefert beziehungsweise diesen String zugleich anlegt, wenn er noch nicht existiert.</p>
 
-        <p>Wir lesen nacheinander alle drei Descriptor-Bytes (Stringlänge; Low- und High-Byte der Stringposition) und übertragen sie nach ZLAENGE und ZLAENGE, ZLAENGE +1 beziehungsweise POSIT und POSIT+1 (ZLAENGE+1=POSIT und ZLAENGE-+2=POSIT +1,siehe Deklaration eigener Variablen).</p>
+        <p>Wir lesen nacheinander alle drei Descriptor-Bytes (Stringlänge; Low- und High-Byte der Stringposition) und übertragen sie nach ZLAENGE und ZLAENGE, ZLAENGE +1 beziehungsweise POSIT und POSIT+1 (ZLAENGE+1=POSIT und ZLAENGE+2=POSIT +1,siehe Deklaration eigener Variablen).</p>
 
         <p>Achten Sie bitte darauf, daß diese Routine unbedingt die C 128-spezifische Eigenschaft des Bankswitching berücksichtigen muß! Beim Lesen der Descriptoren greifen wir auf die Variablentabelle in Bank 1 und müssen daher unbedingt BANK1 aufrufen, unser Unterprogramm zum Umschalten auf diese Bank. Da nach der Rückkehr aus GETPOS Bank 0 eingeschaltet ist, würden wir sonst anstelle der Variablentabelle die Bytes an den entsprechenden Adressen in Bank 0 lesen. Nach dem Beenden der Routine schalten wir wieder auf die Standardbank 0 zurück.</p>
 
@@ -663,7 +671,7 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>Die Aufgabe der Eingabeschleife ist schnell erklärt: Sie ruft GETIN auf, eine Routine, die analog dem Basic-Befehl GET ist, das heißt, ein Zeichen von der Tastatur liest, jedoch nicht wartet, wenn keine Taste gedrückt ist. Das Zeichen wird im Akku übergeben. Die Eingabeschleife wird erst verlassen, wenn der Akkuinhalt ungleich Null ist, das heißt, wenn eine Taste gedrückt wurde.</p>
 
-        <p>%%*EINGABESCHLEIFE**</p>
+        <p>**EINGABESCHLEIFE**</p>
 
         <p>GET JSR INVERT ;ZEICHEN INVERT. GET1 JSR GETIN</p>
 
@@ -673,7 +681,7 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>INVERT stellt ein Unterprogramm dar, das das Zeichen an der momentanen Cursorposition invertiert. Vor einer Eingabe wird das jeweilige Zeichen durch den Aufruf von INVERT daher revers dargestellt, nach einer Eingabe wieder invertiert, das heißt normal dargestellt. Diese Routine ist nötig, da GETIN ebenso wie GET keinen blinkenden Cursor erzeugt. Durch INVERT ergibt sich zwar ebenfalls kein blinkender, jedoch zumindest ein stehender Cursor, der dem Benutzer die momentane Eingabeposition angibt.</p>
 
-        <p>*%Z.UNTER CRS.INVERTIEREN** INVERT PHA</p>
+        <p>**Z.UNTER CRS.INVERTIEREN** INVERT PHA</p>
 
         <p>LDY SPALTE LDA (ZEILPOI),Y EOR #128</p>
 
@@ -685,9 +693,9 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <h3>Zeichenüberprüfung</h3>
 
-        <p>Nach der Eingabe eines Zeichens muß überprüft werden, obes sich um Carriage Return (RETURN = Code $0D) handelt. Wenn ja, ist die Eingabe beendet und der String mit den eingegebenen Zeichen wird angelegt (Routine RETURN).</p>
+        <p>Nach der Eingabe eines Zeichens muß überprüft werden, ob es sich um Carriage Return (RETURN = Code $0D) handelt. Wenn ja, ist die Eingabe beendet und der String mit den eingegebenen Zeichen wird angelegt (Routine RETURN).</p>
 
-        <p>**RETURN?%*%*</p>
+        <p>**RETURN?**</p>
 
         <p>CMP #$0D</p>
 
@@ -695,7 +703,7 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>Wurde nicht RETURN gedrückt, muß überprüft werden, ob ein im Zeichenstring (im Beispiel Z$) enthaltenes Zeichen eingegeben wurde.</p>
 
-        <p><strong>ZULAESSIGES ZEICHEN?</strong> LDY ZLAENGE DEY COMPARE JSR BANK1 CMP (ZPOSIT),Y JSR BANKO BEQ AUSGABE DEY</p>
+        <p>**ZULAESSIGES ZEICHEN?** LDY ZLAENGE DEY COMPARE JSR BANK1 CMP (ZPOSIT),Y JSR BANKO BEQ AUSGABE DEY</p>
 
         <p>BPL COMPARE BMI GET ;ABS.SPRUNG</p>
 
@@ -707,7 +715,7 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <p>Ist das eingegebene Zeichen jedoch im Zeichenstring enthalten, erfolgt ein Sprung zur Zeichenausgabe:</p>
 
-        <p>%%*ZEICHENAUSGABEX*</p>
+        <p>**ZEICHENAUSGABE**</p>
 
         <p>AUSGABE JSR BSOUT</p>
 
@@ -717,11 +725,11 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
 
         <h2>Übernahme der eingegebenen Zeichen:</h2>
 
-        <p>Nun folgen die für Sie wohl interessantesten Programmteile. Bisher wurden nur bereits erläuterte Routinen des Basic-Interpreters benutzt. Neu war nur die praktische AÄnwendung des Umschaltens zwischen Bank O und Bank 1. Im folgenden lernen Sie jedoch, wie ein String auf dem C 128 angelegt wird und welche Routinen und Zeropageadressen hierfür benötigt werden. Die Übernahme der eingegebenen Zeichen erfolgt in mehreren Schritten:</p>
+        <p>Nun folgen die für Sie wohl interessantesten Programmteile. Bisher wurden nur bereits erläuterte Routinen des Basic-Interpreters benutzt. Neu war nur die praktische Anwendung des Umschaltens zwischen Bank O und Bank 1. Im folgenden lernen Sie jedoch, wie ein String auf dem C 128 angelegt wird und welche Routinen und Zeropageadressen hierfür benötigt werden. Die Übernahme der eingegebenen Zeichen erfolgt in mehreren Schritten:</p>
 
-        <p>l. Cursor auf Startposition der Eingabe setzen und einen Pointer auf diese Startposition errechnen</p>
+        <p>1. Cursor auf Startposition der Eingabe setzen und einen Pointer auf diese Startposition errechnen</p>
 
-        <ol>
+        <ol start="2">
             <li>Die echte Eingabelänge ermitteln, das heißt alle nachfolgenden Spaces abschneiden, als echte Länge jedoch nur einen Wert akzeptieren, der maximal so groß ist wie die als Parameter übergebene maximale Eingabelänge</li>
             <li>CHKKOM und GETPOS aufrufen, das heißt einen Zeiger auf die Stringdescriptoren jenes Strings holen, in dem die Eingabe an das Basic übergeben werden soll</li>
             <li>Speicherplatz für den anzulegenden String reservieren beziehungsweise prüfen, ob ausreichend Platz vorhanden ist</li>
@@ -732,11 +740,11 @@ SETNAM = $FFBD ;FILENAME SETZEN .BA $0D00 ; PROGRAMM-START
         </ol>
 
 
-        <h3>Cursor auf Startposition zen/Pointer errechnen</h3>
+        <h3>Cursor auf Startposition setzen/Pointer errechnen</h3>
 
         <p>Spalte und Zeile des Eingabebeginns wurden am Programmanfang auf den Stack gerettet. Diese Werte werden nun zurückgeholt und der Cursor auf die dadurch definierte Position gesetzt:</p>
 
-        <p>*CURSOR AUF STARTPOSITION* set-</p>
+        <p>*CURSOR AUF STARTPOSITION*</p>
 
         <pre><code>RETURN PLA ;GERETTETE
 TAY ;STARTPOSITION
@@ -775,13 +783,13 @@ LECHT LDA (STARTPOS),Y CMP #32
 BNE OKAY ;NACHFOLGENDE DEY ;SPACES cPY #255 ; ABSCHNEIDEN BNE LECHT
 </code></pre>
 
-        <p>Die Schleife beginnt mit einem TWert von Länge-1 (DEY), das heißt im Beispiel ist Y=9. Zuerst wird daher auf das neunte Zeichen hinter der Startposition zugegriffen, also aufdaszehnte Zeichen der Eingabe. Nun wird dieses Zeichen mit SPACE (=Code 32) verglichen. Ist es ungleich SPACE, wird das vorangehende Zeichen mit SPACE verglichen und so weiter.</p>
+        <p>Die Schleife beginnt mit einem T-Wert von Länge-1 (DEY), das heißt im Beispiel ist Y=9. Zuerst wird daher auf das neunte Zeichen hinter der Startposition zugegriffen, also auf das zehnte Zeichen der Eingabe. Nun wird dieses Zeichen mit SPACE (=Code 32) verglichen. Ist es ungleich SPACE, wird das vorangehende Zeichen mit SPACE verglichen und so weiter.</p>
 
-        <p>Bei dem ersten »Nicht-SPACE« . wird der Vergleich abgebrochen und zu OKAY gesprungen. Im Y-Register ist die echte Eingabelänge minus eins enthalten.</p>
+        <p>Bei dem ersten »Nicht-SPACE« wird der Vergleich abgebrochen und zu OKAY gesprungen. Im Y-Register ist die echte Eingabelänge minus eins enthalten.</p>
 
         <h3>Stringdescriptoren des Übernahmestring holen</h3>
 
-        <p>Da das Y-Register die Länge minus eins enthält, erfolgt zuerst eine Korrektur (INY), bevor die echte Länge in LAENGE gespeichert wird. Anschließend werden CHKKOM und GETPOS aufgeru'fen, wir erhalten also in den Speicherzellen $49, $4A einen Zeiger auf die Descriptoren des Strings, in dem die Eingabe an das Basic übergeben werden soll.</p>
+        <p>Da das Y-Register die Länge minus eins enthält, erfolgt zuerst eine Korrektur (INY), bevor die echte Länge in LAENGE gespeichert wird. Anschließend werden CHKKOM und GETPOS aufgerufen, wir erhalten also in den Speicherzellen $49, $4A einen Zeiger auf die Descriptoren des Strings, in dem die Eingabe an das Basic übergeben werden soll.</p>
 
         <pre><code>*UEBERNAHMEVORBEREITUNGEN* OKAY INY
 </code></pre>
@@ -805,13 +813,13 @@ JSR GETPOS ;UEBERN.STRING
         </ol>
 
 
-        <p>Bildschirm als logische Datei öffnen/Eingabe auf logische Datei legen</p>
+        <h3>Bildschirm als logische Datei öffnen/Eingabe auf logische Datei legen</h3>
 
-        <p>Es erscheint ziemlich umständlich, zum Einlesen der eingegebenen Zeichen den Bildschirm als logische Datei zu definieren und die Eingabe auf diese Datei zu legen. Würde jedoch die beim C 64 von den meisten INPU'T-Routinen her verwendete Methode benutzt, die Zeichen ohne Verwendung von Betriebssystem-Routinen direkt vom Bildschirm zu lesen, wäre der Aufwand beim C 128 noch um ein: Vielfaches höher: die vom Bildschirm gelesenen Zeichen müssen vor dem AÄbspeichern im Stringstack in das ASCII-Format konvertiert werden.</p>
+        <p>Es erscheint ziemlich umständlich, zum Einlesen der eingegebenen Zeichen den Bildschirm als logische Datei zu definieren und die Eingabe auf diese Datei zu legen. Würde jedoch die beim C 64 von den meisten INPUT-Routinen her verwendete Methode benutzt, die Zeichen ohne Verwendung von Betriebssystem-Routinen direkt vom Bildschirm zu lesen, wäre der Aufwand beim C 128 noch um ein Vielfaches höher: die vom Bildschirm gelesenen Zeichen müssen vor dem Abspeichern im Stringstack in das ASCII-Format konvertiert werden.</p>
 
         <p>Beim C 64 genügt hierzu eine sehr einfache Wandlungsroutine. Der C 128 besitzt jedoch mehrere Zeichensätze - denken Sie an die Umlaute, Akzente, mathematischen Sonderzeichen etc. -, durch die die Wandlung ganz außerordentlich kompliziert und umständlich wird. Es ist daher auf dem C 128 einfacher, wenn möglich die Betriebssystem-Routinen zu verwenden, die diese Wandlung automatisch vornehmen.</p>
 
-        <p>*BILDSCHIRM: LOG.DATEI EROEFF.* IDA #3</p>
+        <p>*BILDSCHIRM: LOG.DATEI EROEFF.* LDA #3</p>
 
         <p>TAX</p>
 
@@ -833,7 +841,7 @@ JSR GETPOS ;UEBERN.STRING
 
         <h3>Eingabe lesen/String anlegen</h3>
 
-        <p>BASIN liest die Zeichen ab der momentanen Cursorposition vom Bildschirm und übergibt sie im Akku. In einer Schleife wird BASIN entsprechend der echten Eingabelänge aufgerufen und das gelesene Zeichen ab der aktualisierten neuen Untergrenze des Stringstacks (STREND) gespeichert. Vor dem Speichern eines gelesenen Zeichens wird auf Bank 1 und anschließend auf Bank 0 geschaltet. Beachten Sie bitte, daß das einmalige und daher zweifellos schnellere Umschalten auf Bank 1 vor der Schleife nicht genügt, da BASIN auf den Bildschirm zugreift, der in Bank O0 liegt und daher auf diese Bank umschaltet. *LESEN/STRING ANLEGEN* LDY #0</p>
+        <p>BASIN liest die Zeichen ab der momentanen Cursorposition vom Bildschirm und übergibt sie im Akku. In einer Schleife wird BASIN entsprechend der echten Eingabelänge aufgerufen und das gelesene Zeichen ab der aktualisierten neuen Untergrenze des Stringstacks (STREND) gespeichert. Vor dem Speichern eines gelesenen Zeichens wird auf Bank 1 und anschließend auf Bank 0 geschaltet. Beachten Sie bitte, daß das einmalige und daher zweifellos schnellere Umschalten auf Bank 1 vor der Schleife nicht genügt, da BASIN auf den Bildschirm zugreift, der in Bank 0 liegt und daher auf diese Bank umschaltet. *LESEN/STRING ANLEGEN* LDY #0</p>
 
         <p>JSR BASIN</p>
 
@@ -852,15 +860,15 @@ JSR GETPOS ;UEBERN.STRING
         <pre><code>LIES
 </code></pre>
 
-        <h3>Datei schließen /Standardeingabe setzen</h3>
+        <h3>Datei schließen/Standardeingabe setzen</h3>
 
-        <p>Durch CLRCH wird die Eingabe wieder auf das Standardgerät, die Tastatur, gelegt und die geöffnete Datei geschlossen.</p>
+        <p>Durch CLRCH wird die Eingabe wieder auf das Standardgerät, die Tastatur, gelegt und die geöffnete Datei anschließend mit CLOSE geschlossen.</p>
 
         <p>*DATEI SCHLIESSEN/STAND.EING.* JSR CLRCH</p>
 
         <p>LDA #3</p>
 
-        <p>JSR CLOSE anschließend mit CLOSE:</p>
+        <p>JSR CLOSE</p>
 
         <h3>Descriptoren aktualisieren</h3>
 
@@ -885,11 +893,11 @@ JSR BANKO RTS ;ZURUECK INS BASIC
 
         <p>Die Beschreibung dieser INPUT-Routine ist nun beendet. Sie können auf Ihrem C 128 nun sowohl beliebige Parameter aus dem Basic-Text holen, als auch beliebige Variablen von Maschinensprache aus anlegen. Als Test zum Umgang mit den Basic-Interpreter-Routinen könnten Sie nun zum Beispiel das vorgestellte Programm komfortabler gestalten.</p>
 
-        <p>Eine vernünftige INPU'T-Routine läßt zum Beispiel - im Gegensatz zu dieser Routine, die zeigen soll, wie mit den entsprechenden Interpreter-Routinen umzugehen ist - keine Cursorbewegungen zu, die aus der vorgegebenen Eingabezone herausführen. Wenn die maximale Eingabelänge, zum Beispiel zehn Zeichen beträgt, dürften nur Cursorbewegungen zwischen der Startposition und den nächsten neun Spalten zugelassen werden.</p>
+        <p>Eine vernünftige INPUT-Routine läßt zum Beispiel - im Gegensatz zu dieser Routine, die zeigen soll, wie mit den entsprechenden Interpreter-Routinen umzugehen ist - keine Cursorbewegungen zu, die aus der vorgegebenen Eingabezone herausführen. Wenn die maximale Eingabelänge, zum Beispiel zehn Zeichen beträgt, dürften nur Cursorbewegungen zwischen der Startposition und den nächsten neun Spalten zugelassen werden.</p>
 
-        <p>Zudem sollten INSERT und DELETE nur die Zeichen in der Eingabezone verschieben, ohne die restlichen Zeichen in der Zeile zu beeinflussen und ein Endezeichenstring von Basic übergeben. Nicht nur, wenn RETURN, sondern eine beliebige in diesem String enthaltene Taste gedrückt wird, soll die Eingabe übernommen werden. Wenn das betreffende Zeichen, zum Beispiel CURSOR UP oder CURSOR DOWN dem Basic-Programm in einem String oder einer Integervariablen (ASCII-Code des Zeichens) übergeben wird, lassen sich sehr komfortable Eingabemasken gestalten. Zum Testen dieser Routine geben Sie bitte ein: j</p>
+        <p>Zudem sollten INSERT und DELETE nur die Zeichen in der Eingabezone verschieben, ohne die restlichen Zeichen in der Zeile zu beeinflussen und ein Endezeichenstring von Basic übergeben. Nicht nur, wenn RETURN, sondern eine beliebige in diesem String enthaltene Taste gedrückt wird, soll die Eingabe übernommen werden. Wenn das betreffende Zeichen, zum Beispiel CURSOR UP oder CURSOR DOWN dem Basic-Programm in einem String oder einer Integervariablen (ASCII-Code des Zeichens) übergeben wird, lassen sich sehr komfortable Eingabemasken gestalten. Zum Testen dieser Routine geben Sie bitte ein:</p>
 
-        <p>2$= "1234567890" + CHR$(29) + CHR$(157) + CHR$(20) + CHR$(148) SYS DEC("0D00"),10,20,5,0,2$,A$</p>
+        <p>Z$= "1234567890" + CHR$(29) + CHR$(157) + CHR$(20) + CHR$(148) SYS DEC("0D00"),10,20,5,0,Z$,A$</p>
 
         <p>Der Cursor wird auf Spalte fünf der Zeile 20 gesetzt; Sie können beliebige Ziffern eingeben und die Eingabe mit CURSOR-RIGHT, CURSOR-LEFT, DEL und INST editieren. Nach RETURN werden maximal zehn Ziffern in die Variable A$ übernommen.</p>
 
@@ -897,15 +905,15 @@ JSR BANKO RTS ;ZURUECK INS BASIC
 
         <p>In weniger zeitkritischen Programmteilen bietet es sich jedoch an, die bereits vorhandenen Routinen zu nutzen. Die Rechenroutinen des Interpreters arbeiten üblicherweise im Fließkommaformat. In reinen Assemblerprogrammen genügen oftmals Berechnungen, die ausschließlich mit Integerwerten durchgeführt werden. Auch in diesen Fällen können die Interpreter-Routinen genutzt werden, da wir im folgenden Routinen kennenlernen, die Integerwerte ins Fließkommaformat wandeln und weitere, mit denen nach beendeter Berechnung das Ergebnis wieder in einen Integerwert gewandelt wird.</p>
 
-        <p>Außer den reinen Rechenroutinen ist für viele Anwendungen eine weitere Routine sehr hilfreich, die einen Fließkommawert auf dem Bildschirm ausgibt. Überlegen Sie sich bitte, welchen Aufwand es erfordert, zum Beispiel die Spalte (Ein-Byte-Integer) und die Zeile (Zwei-Byte-Integer) des Cursors in einer Textverarbeitung ständig »per Handk« in einer Informationszeile auszugeben. Eine weitere Anwendung ist die ständige Ausgabe der momentan erreichten Punktzahl in einem Videospiel.</p>
+        <p>Außer den reinen Rechenroutinen ist für viele Anwendungen eine weitere Routine sehr hilfreich, die einen Fließkommawert auf dem Bildschirm ausgibt. Überlegen Sie sich bitte, welchen Aufwand es erfordert, zum Beispiel die Spalte (Ein-Byte-Integer) und die Zeile (Zwei-Byte-Integer) des Cursors in einer Textverarbeitung ständig »per Hand« in einer Informationszeile auszugeben. Eine weitere Anwendung ist die ständige Ausgabe der momentan erreichten Punktzahl in einem Videospiel.</p>
 
         <p>Da ich beide Anwendungsbeispiele selbst programmiert habe, bevor ich die entsprechenden Interpreter-Routinen kannte, weiß ich deren Vorhandensein nun umso mehr zu schätzen, und auch Ihnen könnte eines Tages ein entsprechendes Problem begegnen.</p>
 
         <p>Alle Rechenroutinen laufen in den sogenannten »Fließkommaakkumulatoren« ab (FAC #1 und FAC #2). FAC #1 befindet sich beim C 128 an Adresse $63 bis $69 und FAC #2 an Adresse $6A bis $71. Oftmals wird FAC #1 als FAC und FAC #2 als ARG bezeichnet, da letzterer bei Rechenoperationen mit zwei Fließkommawerten mit dem Argument versehen wird. Im folgenden werde ich diese Bezeichnungen übernehmen.</p>
 
-        <p>Auf die Fließkommadarstellung von Zahlen möchte ich in diesem Artikel nicht weiter eingehen, da deren exakte Erläuterung für die Anwendung der Rechenroutinen nicht unbedingt nötig ist und ich selbst zugegebenermaßen mit der Fließkommaarithmetik ‚nicht sonderlich vertraut bin.</p>
+        <p>Auf die Fließkommadarstellung von Zahlen möchte ich in diesem Artikel nicht weiter eingehen, da deren exakte Erläuterung für die Anwendung der Rechenroutinen nicht unbedingt nötig ist und ich selbst zugegebenermaßen mit der Fließkommaarithmetik nicht sonderlich vertraut bin.</p>
 
-        <p>Wichtig für uns ist, daß jeder Fließkomma-Akkumulator gleich aufgebaut ist. Für unsere ÄAnwendungsbeispiele benötigen wir folgende Adressen:</p>
+        <p>Wichtig für uns ist, daß jeder Fließkomma-Akkumulator gleich aufgebaut ist. Für unsere Anwendungsbeispiele benötigen wir folgende Adressen:</p>
 
         <pre><code>363 = FAC, Exponent $64-867 = FAC, Mantisse 368 = FAC, Vorzeichen
 $6A = ARG, Exponent $6B-$6E = ARG, Mantisse $6F -= ARG, Vorzeichen
@@ -921,7 +929,7 @@ $6A = ARG, Exponent $6B-$6E = ARG, Mantisse $6F -= ARG, Vorzeichen
 
         <p>8 $08 84 80 00 00 00</p>
 
-        <p>10 $AO 84 AO 00 00 00</p>
+        <p>10 $A0 84 A0 00 00 00</p>
 
         <p>4098 $1002 8D 80 00 00 00</p>
 
@@ -946,7 +954,7 @@ a 00b3a 60 rts
 
         <h3>Fließkomma nach Integer wandeln ($8CC7)</h3>
 
-        <p>Diese Routine wandelt einen Fließkommawert, der sich im FAC befindet, in eine Zwei-Byte-Integerzahl, die wiederum im FAC abgelegt wird (in $66/$867 =</p>
+        <p>Diese Routine wandelt einen Fließkommawert, der sich im FAC befindet, in eine Zwei-Byte-Integerzahl, die wiederum im FAC abgelegt wird (in $66/$67 =</p>
 
         <pre><code>High/Low).
 a 00b40 a2.04 ldx #804
@@ -964,17 +972,17 @@ a 00b54 00 brk
 
         <p>Da das Ende dieses Listings ein wenig ungewöhnlich erscheinen mag, will ich die letzten Befehle genauer erläutern: Um eine Integerzahl in eine Fließkommazahl oder eine Fließkommazahl in eine Integerzahl zu wandeln, muß erstere im FAC #1 abgelegt sein. In diesem Beispiel verwende ich die Dezimalzahl zehn, die sich, im Fließkommaformat abgelegt, am Programmende befindet: m 0b50 84 a0 00 00 00</p>
 
-        <p>Das Programm überträgt diese Werte nach FAC #1. Nach dem Aufruf der Routine $8CC7 befindet sich die entsprechende Integerzahl in den Adressen $66, $67 (High/Low) und wird durch das Unterprogramm $0B30 nach $0D00 bis $0DO4 übertragen und vor dem Überschreiben durch den Monitor gerettet.</p>
+        <p>Das Programm überträgt diese Werte nach FAC #1. Nach dem Aufruf der Routine $8CC7 befindet sich die entsprechende Integerzahl in den Adressen $66, $67 (High/Low) und wird durch das Unterprogramm $0B30 nach $0D00 bis $0D04 übertragen und vor dem Überschreiben durch den Monitor gerettet.</p>
 
-        <p>Rufen Sie die Routine mit »SYS DEC("0B40")« auf und schauen Sie sich $0D00... mit dem Monitor an: m 0d00 84 00 00 00 AO</p>
+        <p>Rufen Sie die Routine mit »SYS DEC("0B40")« auf und schauen Sie sich $0D00... mit dem Monitor an: m 0d00 84 00 00 00 A0</p>
 
         <p>In $0D03 und $0D04 befindet sich die Integerzahl $00A0.</p>
 
-        <p>2-Byte-Integer (vorzeichenbehaftet) nach Fließkomma wandeln ($8C70)</p>
+        <h3>2-Byte-Integer (vorzeichenbehaftet) nach Fließkomma wandeln ($8C70)</h3>
 
         <p>Es gibt zwei Arten der Darstellung von Integerzahlen: vorzeichenbehaftet und positiv. Als Assemblerprogrammierer benötigen Sie üblicherweise nur die positive Darstellung, bei der alle 16 Bits für den Absolutwert einer Zahl verwendet werden, die damit im Bereich zwischen $0000 bis $FFFF liegen kann.</p>
 
-        <p>Bei der vorzeichenbehafteten Darstellung wird Bit-16 als Vorzeichen betrachtet (gesetzt= negativ). Eine Vorzeichenbehaftete Zwei-Byte-Integerzahl besitzt daher einen Wert zwischen -$7FFF und +S$7FFF. Diese Routine wird zum Beispiel beim C 64 zur Ausgabe von FRE(0) verwendet, in diesem Fall leider fälschlicherweise, da jeder C 64-Programmierer das Problem kennt, daß bei Werten, die größer sind als $7FFF der freie Speicherplatz angeblich negativ ist.</p>
+        <p>Bei der vorzeichenbehafteten Darstellung wird Bit-16 als Vorzeichen betrachtet (gesetzt= negativ). Eine Vorzeichenbehaftete Zwei-Byte-Integerzahl besitzt daher einen Wert zwischen -$7FFF und +$7FFF. Diese Routine wird zum Beispiel beim C 64 zur Ausgabe von FRE(0) verwendet, in diesem Fall leider fälschlicherweise, da jeder C 64-Programmierer das Problem kennt, daß bei Werten, die größer sind als $7FFF der freie Speicherplatz angeblich negativ ist.</p>
 
         <p>Die Integerzahl wird dieser Routine in den Speicherzellen $64, $65 (High/Low) übergeben. Das X-Register muß vor dem Aufruf unmittelbar mit $90 geladen werden:</p>
 
@@ -987,9 +995,9 @@ a 00b6a 20 70 8c jsr $8c70
 a 00b6d 4c 30 Ob jmp $0b30
 </code></pre>
 
-        <p>Nach dem Aufruf mit »SYS DEC ("0B60")« befindet sich die übergebene Zahl +$0100 im Fließkommaformat im FAC #1. Die Routine $0B30 überträgt sie nach $0DOO bis $0D04, wovon Sie sich wiederum mit dem Monitor überzeugen können.</p>
+        <p>Nach dem Aufruf mit »SYS DEC ("0B60")« befindet sich die übergebene Zahl +$0100 im Fließkommaformat im FAC #1. Die Routine $0B30 überträgt sie nach $0D00 bis $0D04, wovon Sie sich wiederum mit dem Monitor überzeugen können.</p>
 
-        <p>2-Byte-Integer (positiv) nach Fließkommaformat wandeln ($8C75)</p>
+        <h3>2-Byte-Integer (positiv) nach Fließkommaformat wandeln ($8C75)</h3>
 
         <p>Wahrscheinlich werden Sie diese Routine, die die üblichen positiven Integerwerte ins Fließkommaformat wandelt, häufiger in Ihren Programmen verwenden. Auch dieser Routine wird die zu wandelnde Integerzahl in den Speicherzellen $64, $65 übergeben und auch das X-Register vor dem Aufruf unmittelbar mit $90 geladen. Weiterhin muß das Carry-Flag vor dem Einsprung gesetzt werden.</p>
 
@@ -1011,11 +1019,11 @@ a 00b8e 4c 30 Ob jmp $0b30
 
         <p>Diese Routine legt eine Fließkommazahl, die sich im FAC #1 befindet, als String (ASCII-Format) ab, der sich wiederum im FAC #1 befindet. Interessant wird diese Wandlung in Verbindung mit einer weiteren Routine:</p>
 
-        <h3>StringinFAC #1 ausgeben ($55E2)</h3>
+        <h3>String in FAC #1 ausgeben ($55E2)</h3>
 
         <p>$55E2 gibt einen String, der sich im FAC #1 befindet, auf dem Bildschirm ab der momentanen Cursorposition aus.</p>
 
-        <p>Beide Routinen benötigen zur Vorbereitung nur die Fließkommazahl in FAC #1 ($8E42) beziehungsweise den Stringin FAC #1 ($55E2) und können ohne Übergabe weiterer Parameter aufgerufen werden. Wir besitzen nun alle erforderlichen Kenntnisse, um eine beliebige Integerzahl auf dem Bildschirm auszugeben, wie es für jede Textverarbeitung erforderlich ist.</p>
+        <p>Beide Routinen benötigen zur Vorbereitung nur die Fließkommazahl in FAC #1 ($8E42) beziehungsweise den String in FAC #1 ($55E2) und können ohne Übergabe weiterer Parameter aufgerufen werden. Wir besitzen nun alle erforderlichen Kenntnisse, um eine beliebige Integerzahl auf dem Bildschirm auszugeben, wie es für jede Textverarbeitung erforderlich ist.</p>
 
         <p>Zuerst übergeben wir eine positive Integerzahl an die Speicherzellen $64, $65 und rufen $8C75 auf, die die Wandlung ins Fließkommaformat vornimmt. Anschließend wird $8E42 aufgerufen und die Zahl dadurch in einen String umgewandelt, der mit $55E2 ab der momentanen Cursorposition ausgegeben wird:</p>
 
@@ -1030,17 +1038,17 @@ a 00bae 20 42 8e jsr $8e42
 a 00bb1 4c e2 55 jmp $55e2
 </code></pre>
 
-        <p>Das Demoprogramm verwendet die Zahl $FFO1, also dezimal 65281. Wenn Sie es mit »SYS DEC("0BAO"%« starten, wird eben diese Zahl auf dem Bildschirm ausgegeben. Außerst angenehm an diesen Routinen ist, daß Sie zwar nicht ohne das Fließkommaformat auskommen, der Programmierer selbst mit diesem jedoch nicht im geringsten in Berührung kommt, sondern nur eine Integerzahl übergibt.</p>
+        <p>Das Demoprogramm verwendet die Zahl $FF01, also dezimal 65281. Wenn Sie es mit »SYS DEC("0BA0")« starten, wird eben diese Zahl auf dem Bildschirm ausgegeben. Äußerst angenehm an diesen Routinen ist, daß Sie zwar nicht ohne das Fließkommaformat auskommen, der Programmierer selbst mit diesem jedoch nicht im geringsten in Berührung kommt, sondern nur eine Integerzahl übergibt.</p>
 
         <h3>2-Byte-Integer (positiv) ausgeben ($8E32)</h3>
 
         <p>Die Wandlungs- und Ausgaberoutinen, die zur Ausgabe einer Integerzahl nacheinander aufgerufen werden, können selbstverständlich unabhängig voneinander auch für andere Zwecke eingesetzt werden. Zur Ausgabe einer Integerzahl auf dem Bildschirm gibt es eine weitere, besser geeignete Routine, die ab der Adresse $8E32 liegt. Dieser Routine wird die betreffende Integerzahl im Akku und im X-Register übergeben (Akku=Low- X=High-Byte). Sie legt diese Werte in den Speicherzellen $64, $65 ab und ruft die beschriebenen Routinen in der zur Bildschirmausgabe notwendigen Reihenfolge auf. Die Ausgabevorbereitungen beschränken sich daher auf das Laden dieser Register. Danach kann die Routine aufgerufen werden:</p>
 
-        <p>a 00bc0 a9 ff lda #$ff ldx #$01 a 00bec4 4c 00 00 jmp $8e32</p>
+        <p>a 00bc0 a9 ff lda #$ff a 00bc2 a2 01 ldx #$01 a 00bc4 4c 00 00 jmp $8e32</p>
 
         <p>Diese drei Programmzeilen besitzen die gleiche Funktion wie das vorige Demoprogramm. Sie geben ebenfalls den Wert $FF01, also die Dezimalzahl 65281 auf dem Bildschirm aus. Der Aufruf erfolgt mit »SYS DEC("0BC0")«.</p>
 
-        <p>Alle im folgenden beschriebenen Routinen führen Berechnungen mit zwei Fließkommazahlen durch (Addition, Division etc.), die sich in FAC #1 und FAC #2 befinden und speichern das Ergebnis im FAC #1. Da uns nun bekannt ist, auf welche Weise Integerzahlen ins Fließkommaformat gewandelt werden, können wir sie ebenso für Berechnungen mit zwei Integerzahlen verwenden, indem wir diese mit den ent sprechenden Routinen ins Fließkommaformat wandeln.</p>
+        <p>Alle im folgenden beschriebenen Routinen führen Berechnungen mit zwei Fließkommazahlen durch (Addition, Division etc.), die sich in FAC #1 und FAC #2 befinden und speichern das Ergebnis im FAC #1. Da uns nun bekannt ist, auf welche Weise Integerzahlen ins Fließkommaformat gewandelt werden, können wir sie ebenso für Berechnungen mit zwei Integerzahlen verwenden, indem wir diese mit den entsprechenden Routinen ins Fließkommaformat wandeln.</p>
 
         <p>Diese Anwendung kann vor allem in Maschinenprogrammen, in denen häufig multipliziert und dividiert werden muß, das Schreiben eigener Routinen ersparen. Bei zeitkritischen Programmteilen sollte die Verwendung der Fließkommaarithmetik jedoch unbedingt vermieden werden, da die Integerzahlen zuerst aufwendig gewandelt werden müssen und anschließend die noch weit aufwendigeren Fließkommarechenoperationen erfolgen. In solchen Fällen ist es angebrachter, eigene Integer-Rechenroutinen zu schreiben.</p>
 
@@ -1048,7 +1056,7 @@ a 00bb1 4c e2 55 jmp $55e2
 
         <h3>FAC = FAC + ARG ($8848)</h3>
 
-        <p>Diese Routine addiertzweiin FAC #1 (=FAC) und FAC #2 (=ARG) hinterlegte Fließkommazahlen. a 00bd0 a2 04 ldx #804</p>
+        <p>Diese Routine addiert zwei in FAC #1 (=FAC) und FAC #2 (=ARG) hinterlegte Fließkommazahlen. a 00bd0 a2 04 ldx #804</p>
 
         <pre><code>a 00be2 a2 01
 </code></pre>
@@ -1072,7 +1080,7 @@ a 00bf0O 00 brk
 a 00bf1 00 brk
 </code></pre>
 
-        <p>Rufen Sie die Routine mit »SYS DEC("0BD0")« auf. Die Fließkommazahlen ($08=8 und $1002= 4098) befinden sich am Ende des Programms und werden in einer Schleife an den FAC und ARG übergeben. Anschließend wird die Additions-Routine die ASCII-Wandlungs- und die Ausgabe-Routine aufgerufen. Wir erhalten die Ausgabe der Zahl 4106 = 8 + 4098.</p>
+        <p>Rufen Sie die Routine mit »SYS DEC("0BD0")« auf. Die Fließkommazahlen ($08=8 und $1002= 4098) befinden sich am Ende des Programms und werden in einer Schleife an den FAC und ARG übergeben. Anschließend wird die Additions-Routine, die ASCII-Wandlungs- und die Ausgabe-Routine aufgerufen. Wir erhalten die Ausgabe der Zahl 4106 = 8 + 4098.</p>
 
         <h3>FAC = ARG - FAC ($8831)</h3>
 
@@ -1088,7 +1096,7 @@ a 00be5 4c e2 55 jmp $55e2
 
         <p>Als Ergebnis erhalten wir 4090 = 4098 - 8.</p>
 
-        <h3>FAC = ARG * FAC ($8 A27)</h3>
+        <h3>FAC = ARG * FAC ($8A27)</h3>
 
         <p>Der Aufruf unterscheidet sich in keiner Weise von den vorangehenden Arithmetik-Routinen. Ersetzen Sie daher »jsr 8848« durch »jsr 8a27«:</p>
 
@@ -1104,7 +1112,7 @@ a 00be5 4c e2 55 jmp $55e2
 
         <h3>FAC = ARG / FAC ($8B4C)</h3>
 
-        <p>Ändern Sie nun »jsr 8427« ab in »jsr 8b4c«. Sie erhalten die Ausgabe von 512.25 = 4098 / 8. Achten Sie bitte wie bei der Subtraktion auch hier auf die Reihenfolge von Dividend und Divisor:</p>
+        <p>Ändern Sie nun »jsr 8a27« ab in »jsr 8b4c«. Sie erhalten die Ausgabe von 512.25 = 4098 / 8. Achten Sie bitte wie bei der Subtraktion auch hier auf die Reihenfolge von Dividend und Divisor:</p>
 
         <pre><code>a O0Obde ca dex
 a 00bdd 10 £3 bpl $0bd2
@@ -1147,7 +1155,7 @@ a DObdd 20 42 8e jsr $8e42
 a 00be0O 4c e2 55 jmp $55e2 |
 </code></pre>
 
-        <p>Nach dem Aufruferhalten wir die Ausgabe von 0,8 = 8/ 10.</p>
+        <p>Nach dem Aufruf erhalten wir die Ausgabe von 0,8 = 8/ 10.</p>
 
         <p>Wollen Sie sich die Fließkommaarithmetik auch für das Rechnen mit Integerzahlen zunutze machen, sieht der Ablauf prinzipiell wie folgt aus:</p>
 
