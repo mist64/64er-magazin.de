@@ -9,6 +9,38 @@ it to the affected article here: an `<aside class="fehlerteufelchen">` at
 the end of the article, an in-text link to it, and — for code errata — a
 matching fix in the `prg/*.txt` listing.
 
+## AN ERRATUM ALSO REACHES A REPRINT OF THE CORRECTED PAGE
+
+**The erratum names a page. Ask who ELSE prints that page.**
+
+An erratum's heading cites the original — `Der C 128D im ersten Test, Ausgabe
+1/86, Seite 43 und 44` — so step 1's routing sends it to `issues/8601/` and
+stops. But a Sonderheft that reprints those pages reprints the error with them,
+and its reader never sees the correction: the Sonderheft is where the wrong
+figure is, and the erratum is three issues away in a magazine they may not own.
+
+MEASURED on SH8601: `16 Der C 128 D im ersten Test` is the reprint of 8601
+pp 43-44, and 8605's Fehlerteufelchen corrects Bild 2 of exactly those pages —
+the RESET button labelled 3 is the DRIVE's reset, and item 4 is the hardware
+reset, not the mains switch. `issues/8601/43` carries the aside. The reprint
+carried the uncorrected caption `3-Resettaste; 4-Netzschalter` and no aside at
+all, because nothing routed the erratum across.
+
+**So after routing an erratum to its article, check `REPRINTS.md` (and the
+r330 verdicts) for any article in THIS issue that reprints the cited pages, and
+give it the same aside.** Its trailing comment names the erratum's own issue as
+usual, and then says why it is here:
+
+```html
+<!-- 64'er 5/1986. Das Fehlerteufelchen nennt »Ausgabe 1/86, Seite 43
+     und 44«; dieser Artikel ist der Nachdruck ebendieser Seiten, und
+     Bild 2 ist hier unverändert übernommen. -->
+```
+
+This is not a licence to edit the other issue — see r000, *the issue you are
+working on is the scope*. The monthly already has its own aside; what is being
+fixed is the REPRINT's missing one.
+
 This is why prior issues carry 2–7 of these asides each (8601–8607) while a
 freshly-built issue has **zero**: the errata live in issues that are
 imported later, so this step is a **cross-issue enrichment**, not a

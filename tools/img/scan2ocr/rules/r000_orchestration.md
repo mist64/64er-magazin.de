@@ -657,6 +657,32 @@ previously restated per rule and the restatements disagreed -- two rules called
 `pdftotext` void while two others demanded it as the mandatory evidence form,
 each citing rule 280 as the authority.
 
+## Cross-cutting rule: CONSISTENCY WITH THE PAGE BEATS CONSISTENCY WITH ITSELF
+
+Where the magazine is inconsistent, **the transcription is inconsistent in the
+same places.** Match the page, site by site; do not normalise.
+
+The standing example is the machine names. The magazine sets `C 64` and `C64`,
+`C 128` and `C128`, and switches between them within one issue and sometimes
+within one article — SH8601 has 344 sites of the closed-up form. Normalising
+them all to the spaced form would make the archive tidier than the paper, which
+is the one thing it must not be. **DECIDED 2026-08 by the issue owner:
+consistency with the page.**
+
+It follows from the rule this chain already lives by — *typos in print remain
+typos in the HTML* — and it costs something real: the published text stays
+uneven, and a reader may think we were careless. That is the correct trade. The
+archive's claim is that it reproduces what was printed; a house style applied
+over the top quietly breaks that claim everywhere it touches, and leaves no
+record that it did.
+
+The same reasoning governs `gibt's`/`gibt’s`, `Graphic`/`Grafik`, and any other
+pair the paper does not settle: read the page, set what it sets.
+
+**This is not a licence to preserve OUR errors.** A glyph we mis-read is ours
+and gets fixed; a form the magazine chose is the magazine's and stays. The test
+is always the crop, never the corpus frequency.
+
 ## Cross-cutting rule: THE ISSUE YOU ARE WORKING ON IS THE SCOPE
 
 Work on the issue in hand. **Do not take on work in another issue unless THIS
