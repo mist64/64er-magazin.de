@@ -657,6 +657,31 @@ previously restated per rule and the restatements disagreed -- two rules called
 `pdftotext` void while two others demanded it as the mandatory evidence form,
 each citing rule 280 as the authority.
 
+## Cross-cutting rule: THE ISSUE YOU ARE WORKING ON IS THE SCOPE
+
+Work on the issue in hand. **Do not take on work in another issue unless THIS
+issue touches it.**
+
+"Touches it" is a real relationship, not a pretext:
+
+- this issue REPRINTS an article from another one, so the two transcriptions of
+  one printed text disagree and the comparison names the error (r330 — SH8601
+  fixed 14 such errors in 8510, 8511, 8512 and 8601);
+- an erratum in another issue corrects a page THIS issue reprints;
+- a shared tool, rule or template that this issue's work has proven wrong.
+
+What does NOT qualify, however tempting: a defect merely *noticed* while working
+here, and a corpus-wide gate result. MEASURED: running r310 over the whole
+archive reports **327 HARD findings across 33 published issues** — 143 of them
+one missing `</html>`, 61 `<li>` wrapping `<p>`, 62 a Discount `<ol type=>` bug.
+Most are markup that predates the gate: r310 was written 2026-08-21, and 8409
+was published in the repo 2024-08-20. **That is a corpus cleanup project with
+its own decision to make, not this issue's tail.**
+
+Report what you noticed, with evidence, and move on. Fixing another issue's
+published HTML on your own judgement is the same mistake as fixing the
+magazine's typos — you are changing something whose owner did not ask you to.
+
 ## Cross-cutting rule: A CHECK YOU HAVE NOT SEEN FAIL IS NOT A CHECK
 
 **Before trusting any check, prove it can fail.** Run it against data that
