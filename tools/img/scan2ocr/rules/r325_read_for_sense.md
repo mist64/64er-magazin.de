@@ -103,6 +103,19 @@ Warte- / stehenden             p104      GRAFIK (for GRAPHIC)    p054
 You are finding OUR misreadings of the page. You are never correcting the
 magazine. When the page prints the odd thing, record it as printed and move on.
 
+## A MAGAZINE ERROR THAT MISLEADS IS A FUTURETEUFELCHEN CANDIDATE — RECORD IT
+
+*Typos in print remain typos in the HTML* is about the TEXT, and it does not
+change. But where the page is not merely mis-set but actually MISLEADING — an
+arithmetic result that is wrong, a cross-reference to something that does not
+exist, a figure numbered against its own caption — the archive has a place to
+say so beside the text without altering it: `<aside class="futureteufelchen">`,
+see r300.
+
+**You do not add one.** Reading is how candidates are found; adding one is the
+issue owner's call, case by case. Record the passage, what appears wrong, and
+the crop — then move on. A list of candidates is a report, never a worklist.
+
 ## Granularity
 
 Word-level substitutions only — r000's *OCR cleanup granularity* applies in

@@ -29,6 +29,39 @@ It may also record a repair we made to a `prg/*.txt` listing — 8406/117's says
 HTML* still holds: the page's error stays where the reader can see it, and the
 Futureteufelchen stands beside it saying what is actually true.
 
+### A FUTURETEUFELCHEN IS NEVER YOURS TO ADD — IT COMES FROM THE ISSUE OWNER
+
+**This section is knowledge, not a worklist.** A Fehlerteufelchen is mechanical:
+the magazine printed a correction, you route it and apply it. A Futureteufelchen
+is an editorial statement in the archive's own voice, saying *the magazine was
+wrong and here is what is true* — and that is a judgement about the subject
+matter, not about the scan.
+
+So: **find them, record them, and stop.** Never add one on your own judgement,
+never add one in bulk, never treat a list of candidates as work to be worked
+through. Each one is decided case by case, by the issue owner.
+
+What to hand over: the passage, what appears to be wrong, and the crop that
+shows the page really prints it — the same evidence any other finding carries.
+
+**What qualifies, from SH8601's reading pass** (all verified as printed, all
+recorded, NONE acted on):
+
+| page | what the magazine printed | why it is a candidate |
+|---|---|---|
+| p054 | `80x200 = 1600 Byte` | the arithmetic is wrong; it is 16000 |
+| p032 | `»SHAPE DATA 2« (Listing 13)` | no such listing exists — p046's Listing 13 is `»SHAPE UND SPRITE«`, and no such file is on the disk |
+| p018/020 | `maximal 200 KByte` | contradicts `170 KByte` two pages earlier in the same article |
+| p145 | crossword clue `(92)` | the grid HAS a cell 92; the printed clue list jumps 90 -> 93 |
+| p109 | `(acht Zeilen Länge)` | *Zeichen* is meant, not *Zeilen* |
+| p026 | Bild 14/15 caption vs text | the magazine's own figure numbering disagrees with its prose |
+
+And what does NOT qualify, however wrong it looks: a plain typo. `Beipielprogramm`,
+`nebenanderliegene`, `»MANDELBROT1»`, `zwischen $0 uns $1fff` — the reader can
+see what was meant, and an aside would say nothing they do not already know.
+A Futureteufelchen earns its place by telling the reader something the page
+misleads them about.
+
 ### A REPRINT of a corrected page needs a Futureteufelchen, not a copy of the Fehlerteufelchen
 
 When an erratum corrected the ORIGINAL printing but this issue reprints the
