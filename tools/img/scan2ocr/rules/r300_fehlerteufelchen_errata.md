@@ -9,37 +9,63 @@ it to the affected article here: an `<aside class="fehlerteufelchen">` at
 the end of the article, an in-text link to it, and — for code errata — a
 matching fix in the `prg/*.txt` listing.
 
-## AN ERRATUM ALSO REACHES A REPRINT OF THE CORRECTED PAGE
+## TWO KINDS OF DEVIL: Fehlerteufelchen is THEIRS, Futureteufelchen is OURS
 
-**The erratum names a page. Ask who ELSE prints that page.**
+Both already exist in this site — CSS, an SVG each, and generator handling in
+`generate.py` (`aside.fehlerteufelchen` / `aside.futureteufelchen`). 17 published
+articles carry a Futureteufelchen.
 
-An erratum's heading cites the original — `Der C 128D im ersten Test, Ausgabe
-1/86, Seite 43 und 44` — so step 1's routing sends it to `issues/8601/` and
-stops. But a Sonderheft that reprints those pages reprints the error with them,
-and its reader never sees the correction: the Sonderheft is where the wrong
-figure is, and the erratum is three issues away in a magazine they may not own.
+| | who found it | when | what it is |
+|---|---|---|---|
+| `<aside class="fehlerteufelchen">` | the magazine | 1984-86 | a correction 64'er itself printed in a later issue's errata column |
+| `<aside class="futureteufelchen">` | **us** | **2026** | an error in the printed magazine that **was never corrected back then**, found while making this archive |
 
-MEASURED on SH8601: `16 Der C 128 D im ersten Test` is the reprint of 8601
-pp 43-44, and 8605's Fehlerteufelchen corrects Bild 2 of exactly those pages —
-the RESET button labelled 3 is the DRIVE's reset, and item 4 is the hardware
-reset, not the mains switch. `issues/8601/43` carries the aside. The reprint
-carried the uncorrected caption `3-Resettaste; 4-Netzschalter` and no aside at
-all, because nothing routed the erratum across.
+A Futureteufelchen is signed by the modern finder where there is one
+(`<address class="author">(Endurion, goloMAK)</address>`); most carry no byline.
+It may also record a repair we made to a `prg/*.txt` listing — 8406/117's says
+`Die folgenden Fehler wurden im Basic-Lader behoben:` and lists them.
 
-**So after routing an erratum to its article, check `REPRINTS.md` (and the
-r330 verdicts) for any article in THIS issue that reprints the cited pages, and
-give it the same aside.** Its trailing comment names the erratum's own issue as
-usual, and then says why it is here:
+**It does NOT change the article text.** *Typos in print remain typos in the
+HTML* still holds: the page's error stays where the reader can see it, and the
+Futureteufelchen stands beside it saying what is actually true.
+
+### A REPRINT of a corrected page needs a Futureteufelchen, not a copy of the Fehlerteufelchen
+
+When an erratum corrected the ORIGINAL printing but this issue reprints the
+uncorrected page, the finding — *this reprint is still wrong* — is **ours, made
+now**. The magazine never said it. So it is a Futureteufelchen.
+
+**ADAPT the wording; do not paste the original erratum.** It was written about
+the other issue and cites ITS page numbers, which are meaningless here. Drop
+them and describe the figure as it appears in THIS article, then say where the
+original correction ran:
 
 ```html
-<!-- 64'er 5/1986. Das Fehlerteufelchen nennt »Ausgabe 1/86, Seite 43
-     und 44«; dieser Artikel ist der Nachdruck ebendieser Seiten, und
-     Bild 2 ist hier unverändert übernommen. -->
+<aside class="futureteufelchen" id="futureteufelchen">
+    <h2>Futureteufelchen</h2>
+    <p>Die in Bild 2 mit der Nummer 3 bezeichnete RESET-Taste ist in
+       Wirklichkeit die RESET-Taste für das Diskettenlaufwerk. …</p>
+    <p>Die 64'er hat diesen Fehler im Fehlerteufelchen der Ausgabe 5/86 für den
+       Erstdruck in Ausgabe 1/86 richtiggestellt. Dieser Nachdruck übernimmt
+       Bild 2 jedoch unverändert, so daß die Korrektur hier nie erschienen
+       ist.</p>
+</aside>
 ```
 
-This is not a licence to edit the other issue — see r000, *the issue you are
-working on is the scope*. The monthly already has its own aside; what is being
-fixed is the REPRINT's missing one.
+MEASURED on SH8601: `16 Der C 128 D im ersten Test` reprints 8601 pp 43-44;
+8605's Fehlerteufelchen corrects Bild 2 of exactly those pages — the button
+labelled 3 is the DRIVE's reset, item 4 the hardware reset, not the mains
+switch. `issues/8601/43` carries the Fehlerteufelchen. The reprint carried
+`3-Resettaste; 4-Netzschalter` and nothing else, so its reader saw a
+known-wrong figure with the correction three issues away.
+
+**Routing is why it was missed:** the erratum's heading names `Ausgabe 1/86,
+Seite 43 und 44`, so step 1 sends it to the monthly and stops. After routing an
+erratum, check `REPRINTS.md` and the r330 verdicts for an article in THIS issue
+that reprints the cited pages.
+
+Do not edit the other issue — r000, *the issue you are working on is the scope*.
+The monthly already has its own aside; what is missing is the reprint's.
 
 This is why prior issues carry 2–7 of these asides each (8601–8607) while a
 freshly-built issue has **zero**: the errata live in issues that are
