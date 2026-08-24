@@ -38,6 +38,11 @@ def fmt(m,f,ops,pc):
     if f=='zp':  return f"{m} ${ops[0]:02x}"
     if f=='zpx': return f"{m} ${ops[0]:02x},x"
     if f=='zpy': return f"{m} ${ops[0]:02x},y"
+    # Indirect modes.  Their ABSENCE was a real bug: fmt() raised, the caller
+    # swallowed it with `except: continue`, and the skipped `prev` update made
+    # the NEXT line report a phantom address gap -- 12 of them on SH8601.
+    if f=='indx': return f"{m} (${ops[0]:02x},x)"
+    if f=='indy': return f"{m} (${ops[0]:02x}),y"
     if f=='rel': 
         d=ops[0]-256 if ops[0]>127 else ops[0]
         return f"{m} ${(pc+2+d)&0xffff:04x}"
@@ -81,7 +86,10 @@ def check(path):
             if len(bb)!=n+1:
                 out.append((path,raw.strip(),f"{bb[0]:02x} ({m2}) takes {n} operand byte(s), {len(bb)-1} printed")); continue
             try: exp=fmt(m2,f,bb[1:],a)
-            except Exception: continue
+            except Exception as e:
+                out.append((path,raw.strip(),f"CHECKER BUG: cannot format {f} ({e})"))
+                prev=a+n+1
+                continue
             pn=printed.replace(' ','').replace('$','$')
             en=exp.replace(' ','')
             if pn!=en:
