@@ -261,6 +261,24 @@ aggressive white point will show a flat band against textured paper. Implement
 the mirror there, with the cap and the measured-paper fallback, and record which
 of the two filled each band.
 
+### THE MASTER KEEPS THE PAPER'S OWN SIZE — A4 IS A DELIVERY CONVENTION
+
+**DECIDED 2026-08 by the issue owner: keep.** `masters600/NNN.png` stays at
+whatever the sheet physically measures; exact A4 is imposed later, by step 005b's
+window, and only on what ships.
+
+The question was whether to make the master itself exact A4 so every later step
+inherits one geometry. It is tempting — it would remove a class of downstream
+arithmetic — and it is wrong, for the same reason print typos stay: **the master
+is the record of the paper.** SH8601's interior sheets run 209.2-212.1 x
+296.0-298.6 mm, the cover leaf is 223 mm wide with its fold flap, and the
+Zahlkarte is 144 x 205 mm. "This sheet measures 211.4 mm" is a fact about the
+object; A4 is a decision about the delivery. Overwriting the first with the
+second discards evidence to save arithmetic.
+
+It would also have cost a re-run of r010, r020 and r030 on an issue already
+verified — a real price for a change that improves nothing the reader sees.
+
 ### Why the edges are TRACED and not cropped to
 
 Levelling the text leaves the paper edges tilted, so an axis-aligned crop
