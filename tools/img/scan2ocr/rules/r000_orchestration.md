@@ -353,6 +353,7 @@ them through this table.
 | 280 | 27 | ocr_word_cleanup |
 | 290 | 28 | heading_hierarchy |
 | 300 | 29 | fehlerteufelchen_errata |
+| 325 | — | read_for_sense (added 2026-08, SH8601) |
 
 Two rules were removed rather than renumbered:
 
@@ -808,6 +809,13 @@ The rule chain, r310, the coverage gate and a green build together establish
 that nothing *detectable* is outstanding — they do not establish that the issue
 is right. Every substantive defect class in 8609 was found by a human looking
 at a page after the automated checks were already green.
+
+**r325 exists to narrow that gap, and cannot close it.** Every automated pass
+is pattern-driven or diff-driven: it confirms suspicions and cannot have
+suspicions of its own. r325 reads the whole issue for sense precisely because
+of that, but it is still a reading — SH8601's `$priteprogrammierung` sat in an
+`<h2>` through r280, r310, r320, r330 and a green build, and was found by the
+owner opening the article.
 
 So: report status, list what is still open, and wait. Do not write "the issue is
 complete" or upload on your own judgement.
