@@ -73,6 +73,47 @@ invent what the print does not set:
 | `monthly` | several departments and standing columns — the news run, the reader-mail rubric, the tips columns — plus feature articles |
 | `sonderheft` | one theme end to end. Typically **no departments and no standing columns**: the running head names the section of the book (`Anwendung`, `Statistik`, `Finanzen` in `SH8507`) and every piece under it prints its own headline, so every piece is an **article**. A `sonderheft` that shows a department is possible; it just needs the same evidence as any other — no headline for the run — and not a memory of how the monthlies look. |
 
+## A TINTED BOX ACROSS THE COLUMNS SCRAMBLES THE READING ORDER
+
+**Twice proven on SH8601, and it is this chain's most dangerous failure**,
+because the damage reads as ordinary German.
+
+When a band of tinted boxes or tables cuts across the text columns, tesseract's
+`--psm 3` treats each half-column as an independent block and emits them in the
+wrong order. Step 030 then joins them in that order, welding the head of one
+column onto the tail of another. MEASURED:
+
+- **p090** — a tinted box interleaved with the surrounding body columns; the
+  reading order was scrambled and a truncation there would have been traded for
+  an unknown reordering (recorded in r000).
+- **p124** — three columns, each cut in half by a band of four tinted tables
+  (Tabellen 1-4). The six half-columns came out in the wrong order, so the
+  published article read:
+
+  > Für die RS232-Routine nach einem Moment wieder »vernünftigen« Text liefern.
+  > …kann die Basicsen, für die der Speicher des C 64 zu klein war.
+
+  Two sentences, each half from one column and half from another. **Both are
+  grammatical enough to survive every gate in this chain** — r310's invariants,
+  r320's coverage count, a green build — and both are meaningless. They were
+  found by a human reading the article (r325).
+
+**So: whenever a page has a tinted box or table band interrupting its columns,
+verify the reading order against the page BEFORE trusting the assembled text.**
+The block index gives the geometry; column x-positions and band y-ranges are
+enough to establish the true order:
+
+```
+p124: columns at x ≈ 330 / 1815 / 3305, bands at y ≈ 520-2020 / 4880-6650
+      order = col1-upper, col1-lower, col2-upper, col2-lower, col3-upper, col3-lower
+```
+
+Confirm every join by reading the two fragments as ONE SENTENCE on the 600 dpi
+master. A join that does not read as a sentence is the wrong join.
+
+**Coverage counting cannot see this.** r320 asks whether every block survived,
+and every block does survive — in the wrong place. The only detector is meaning.
+
 ## Where the issue-specific facts come from
 
 Nothing in this step is allowed to be true only of one issue. Each fact has a
