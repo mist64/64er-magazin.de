@@ -708,6 +708,43 @@ Report what you noticed, with evidence, and move on. Fixing another issue's
 published HTML on your own judgement is the same mistake as fixing the
 magazine's typos — you are changing something whose owner did not ask you to.
 
+## Cross-cutting rule: CHANGING A TOOL MEANS MEASURING BEFORE AND AFTER, AND RECONCILING THE DIFFERENCE
+
+**Never change a checker, a detector or a converter without running it both ways
+over the same real data and accounting for every finding that appeared or
+disappeared.** The delta is the evidence that the change did what you claim; a
+new version whose output you have not diffed against the old is an assertion.
+
+Three things the reconciliation must produce, and all three are load-bearing:
+
+1. **The counts, before and after**, on the whole corpus the tool covers — not
+   on the example that motivated the change.
+2. **An explanation for every difference.** A finding that VANISHED is either a
+   false positive correctly removed, or a real defect you have just gone blind
+   to. A finding that APPEARED is either a real defect newly visible, or a false
+   positive you have just introduced. There is no third case, and "the number
+   got better" is not an explanation.
+3. **The delta applied.** Newly visible defects get fixed, or recorded with
+   their evidence. A tool change that surfaces work and leaves it unrecorded is
+   worse than no change.
+
+MEASURED on SH8601, each of these actually happened:
+
+| change | before | after | what the delta was |
+|---|---|---|---|
+| dump cross-check: hand table -> `da65` | 13 | 13 | *the same 13* — two independent disassemblers agreeing, which is why the swap was trustworthy |
+| `da65` symbol lines not skipped | 13 | 63 | 50 phantom mismatches: `L795C := $795C` is a definition, not an instruction |
+| indirect addressing added | 25 | 13 | 12 phantom address gaps — `fmt()` raised, the caller swallowed it, `prev` never advanced |
+| absolute operands padded | 15 | 13 | 2 syntax-rendering differences, `sta $fb,y` against the monitor's `sta $00fb,y` |
+| layout pass on article 125 | 13 | 16 | 2 magazine errors that had been INVISIBLE inside `<p>`, plus 1 real tool fault — holding the count at 13 would have meant re-hiding them |
+| bold detector: threshold 1.35 -> 1.50 | 4 found | 3 found | **a false negative**: a genuine `Composite.` at exactly 1.50 was lost, so the change was reverted |
+| bold detector: paragraph-initial filter | 10 | 4 | 6 mid-sentence short words; all 4 survivors are the real terms |
+
+Note the sixth row. A change can make the number look better and be wrong:
+raising a threshold removed noise AND a real find. **Prefer a false positive to
+a false negative wherever a human confirms each hit** — the confirming crop is
+cheap, and a defect the tool stops reporting is invisible forever.
+
 ## Cross-cutting rule: A CHECK YOU HAVE NOT SEEN FAIL IS NOT A CHECK
 
 **Before trusting any check, prove it can fail.** Run it against data that
