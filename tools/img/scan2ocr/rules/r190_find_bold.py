@@ -43,7 +43,20 @@ MIN_PX = 6            # ignore specks
 MIN_WORDS_PER_LINE = 3  # a median over one or two words means nothing
 
 def listing_boxes(master):
-    """Bboxes of blocks the pipeline classified as listings, at master scale.
+    """Bboxes of every block that does NOT reach the article, at master scale.
+
+    EXCLUDE BY LABEL -- `listing` and `ad` -- NOT by absence from `order`.
+    Testing `order` looks more principled ("only text that reaches the article")
+    and is wrong: it cost 15 of p077's 25 CONFIRMED-BOLD Multiplan command names,
+    which sit in blocks the classifier had labelled `noise` while their text
+    still reached the article by another route.  A misclassified block is not a
+    reason to go blind to it.
+
+    The two excluded classes are where the false positives actually live:
+    advertisements set product names in heavy display type (p095's `PROTEXT`,
+    p053's `dBASE II`), the Zahlkarte insert's printed pattern reads 63x, and a
+    monospace listing line is mostly digits, which a proportional-face median
+    calls bold.
 
     MONOSPACE LISTING TEXT IS NOT COMPARABLE.  A BASIC line number in a listing
     reads 1.6-2.5x its line median on stroke weight alone, because a monospace
@@ -61,8 +74,9 @@ def listing_boxes(master):
     except Exception:
         return []
     out = []
+    SKIP = ('listing', 'ad')
     for b in d.get('blocks', []):
-        if str(b.get('label', '')).startswith('listing'):
+        if str(b.get('label', '')).startswith(SKIP):
             x, y, w, h = b.get('bbox', [0, 0, 0, 0])
             out.append((x, y, x + w, y + h))
     return out
