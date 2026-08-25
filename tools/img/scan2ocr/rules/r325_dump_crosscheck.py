@@ -61,6 +61,14 @@ def check(path):
             if exp is None:
                 out.append((path,raw.strip(),"da65 could not disassemble these bytes")); continue
             printed = re.sub(r'\s+','', (mn+rest).strip().lower())
+            # da65 writes ABSOLUTE operands in assembler shorthand and drops a
+            # zero high byte: `99 fb 00` (STA abs,y -- there IS no zp,y form for
+            # $99) renders as `sta $fb,y`, where the C128 monitor prints all
+            # four digits, `sta $00fb,y`.  Same instruction, different syntax.
+            # Pad da65's operand back to four digits for 3-byte encodings before
+            # comparing, or every such line is a phantom finding.
+            if len(bb) == 3:
+                exp = re.sub(r'\$([0-9a-f]{2})\b', lambda m: '$00'+m.group(1), exp)
             if printed != exp:
                 out.append((path,raw.strip(),f"bytes say  {exp}"))
             if prev is not None and a!=prev:

@@ -877,7 +877,112 @@ JSR BANKO RTS ;ZURUECK INS BASIC
 
         <p>Eine vernünftige INPUT-Routine läßt zum Beispiel - im Gegensatz zu dieser Routine, die zeigen soll, wie mit den entsprechenden Interpreter-Routinen umzugehen ist - keine Cursorbewegungen zu, die aus der vorgegebenen Eingabezone herausführen. Wenn die maximale Eingabelänge, zum Beispiel zehn Zeichen beträgt, dürften nur Cursorbewegungen zwischen der Startposition und den nächsten neun Spalten zugelassen werden.</p>
 
-        <p>Zudem sollten INSERT und DELETE nur die Zeichen in der Eingabezone verschieben, ohne die restlichen Zeichen in der Zeile zu beeinflussen und ein Endezeichenstring von Basic übergeben. Nicht nur, wenn RETURN, sondern eine beliebige in diesem String enthaltene Taste gedrückt wird, soll die Eingabe übernommen werden. Wenn das betreffende Zeichen, zum Beispiel CURSOR UP oder CURSOR DOWN dem Basic-Programm in einem String oder einer Integervariablen (ASCII-Code des Zeichens) übergeben wird, lassen sich sehr komfortable Eingabemasken gestalten. Zum Testen dieser Routine geben Sie bitte ein:</p>
+        <p>Zudem sollten INSERT und DELETE nur die Zeichen in der Eingabezone verschieben, ohne die restlichen Zeichen in der Zeile zu beeinflussen und ein Endezeichenstring von Basic übergeben. Nicht nur, wenn RETURN, sondern eine beliebige in diesem String enthaltene Taste gedrückt wird, soll die Eingabe übernommen werden. Wenn das betreffende Zeichen, zum Beispiel CURSOR UP oder CURSOR DOWN dem Basic-Programm in einem String oder einer Integervariablen (ASCII-Code des Zeichens) übergeben wird, lassen sich sehr komfortable Eingabemasken gestalten.</p>
+
+        <h3>INPUT-Routine</h3>
+
+        <pre><code>a 00d00 85 a5 sta $a5
+a 00d02 8a txa
+a 00d03 48 pha
+a 00d04 98 tya
+a 00d05 48 pha
+a 00d06 18 clc
+a 00d07 20 f0 ff jsr $fff0
+a 00d0a 20 5c 79 jsr $795c
+a 00d0d 20 af 7a jsr $7aaf
+a 00d10 20 20 0b jsr $0b20
+a 00d13 a0 02 ldy #$02
+a 00d15 b1 49 lda ($49),y
+a 00d17 99 fb 00 sta $00fb,y
+a 00d1a 88 dey
+a 00d1b 10 f8 bpl $0d15
+a 00d1d 20 16 0b jsr $0b16
+a 00d20 20 bf 0d jsr $0dbf
+a 00d23 20 e4 ff jsr $ffe4
+a 00d26 f0 fb beq $0d23
+a 00d28 20 bf 0d jsr $0dbf
+a 00d2b c9 0d cmp #$0d
+a 00d2d f0 18 beq $0d47
+a 00d2f a4 fb ldy $fb
+a 00d31 88 dey
+a 00d32 20 20 0b jsr $0b20
+a 00d35 d1 fc cmp ($fc),y
+a 00d37 20 16 0b jsr $0b16
+a 00d3a f0 05 beq $0d41
+a 00d3c 88 dey
+a 00d3d 10 f3 bpl $0d32
+a 00d3f 30 df bmi $0d20
+a 00d41 20 d2 ff jsr $ffd2
+a 00d44 4c 20 0d jmp $0d20
+a 00d47 68 pla
+a 00d48 a8 tay
+a 00d49 68 pla
+a 00d4a aa tax
+a 00d4b 18 clc
+a 00d4c 20 f0 ff jsr $fff0
+a 00d4f a5 e1 lda $e1
+a 00d51 85 a4 sta $a4
+a 00d53 a5 e0 lda $e0
+a 00d55 18 clc
+a 00d56 65 ec adc $ec
+a 00d58 85 a3 sta $a3
+a 00d5a 90 02 bcc $0d5e
+a 00d5c e6 a4 inc $a4
+a 00d5e a4 a5 ldy $a5
+a 00d60 88 dey
+a 00d61 b1 a3 lda ($a3),y
+a 00d63 c9 20 cmp #$20
+a 00d65 d0 05 bne $0d6c
+a 00d67 88 dey
+a 00d68 c0 ff cpy #$ff
+a 00d6a d0 f5 bne $0d61
+a 00d6c c8 iny
+a 00d6d 84 a5 sty $a5
+a 00d6f 20 5c 79 jsr $795c
+a 00d72 20 af 7a jsr $7aaf
+a 00d75 a5 a5 lda $a5
+a 00d77 20 99 92 jsr $9299
+a 00d7a a9 03 lda #$03
+a 00d7c aa tax
+a 00d7d a8 tay
+a 00d7e 20 ba ff jsr $ffba
+a 00d81 a9 00 lda #$00
+a 00d83 20 bd ff jsr $ffbd
+a 00d86 20 c0 ff jsr $ffc0
+a 00d89 a2 03 ldx #$03
+a 00d8b 20 c6 ff jsr $ffc6
+a 00d8e a0 00 ldy #$00
+a 00d90 20 cf ff jsr $ffcf
+a 00d93 20 20 0b jsr $0b20
+a 00d96 91 35 sta ($35),y
+a 00d98 20 16 0b jsr $0b16
+a 00d9b c8 iny
+a 00d9c c4 a5 cpy $a5
+a 00d9e d0 f0 bne $0d90
+a 00da0 20 cc ff jsr $ffcc
+a 00da3 a9 03 lda #$03
+a 00da5 20 c3 ff jsr $ffc3
+a 00da8 20 20 0b jsr $0b20
+a 00dab a0 00 ldy #$00
+a 00dad a5 a5 lda $a5
+a 00daf 91 49 sta ($49),y
+a 00db1 b9 35 00 lda $0035,y
+a 00db4 c8 iny
+a 00db5 91 49 sta ($49),y
+a 00db7 c0 02 cpy #$02
+a 00db9 d0 f6 bne $0db1
+a 00dbb 20 16 0b jsr $0b16
+a 00dbe 60 rts
+a 00dbf 48 pha
+a 00dc0 a4 ec ldy $ec
+a 00dc2 b1 e0 lda ($e0),y
+a 00dc4 49 80 eor #$80
+a 00dc6 91 e0 sta ($e0),y
+a 00dc8 68 pla
+a 00dc9 60 rts
+</code></pre>
+
+        <p>Zum Testen dieser Routine geben Sie bitte ein:</p>
 
         <p>Z$= "1234567890" + CHR$(29) + CHR$(157) + CHR$(20) + CHR$(148) SYS DEC("0D00"),10,20,5,0,Z$,A$</p>
 
