@@ -44,7 +44,9 @@
 
         <p>Nachdem wir feststellen mußten, daß dieses einfache Testprogramm abstürzte, war klar, daß uns C 64-Programmierern gewaltige Umstellungen bevorstanden. Der Grund für den Absturz war schnell gefunden: nach dem Beschreiben von $FF00 und damit dem Umschalten auf Bank 1 folgte der Befehl »LDA $1000«, der den Inhalt dieser Speicherstelle lesen sollte. Da unser Programm jedoch in Bank 0 lag, sägten wir uns mit dem Umschalten auf Bank 1 gewissermaßen »den eigenen Ast ab«, da unser Programm - und damit auch der Ladebefehl - nach dem Umschalten auf Bank 1 für den Prozessor nicht mehr existent war.</p>
 
-        <p>Dieser Mißerfolg machte uns immerhin klar, daß wir zu naiv an den neuen Computer herangegangen waren. Wir hatten keine Chance, ohne nähere Kenntnis des C 128, unsere Routinen umzuschreiben. Nachdem wir einige Zeit damit verbrachten, das Handbuch und das C 128 Intern zu studieren, war klar, daß es prinzipiell zwei Methoden gibt, auf verschiedene Speicherbänke zuzugreifen, ohne daß ein Programm unmittelbar nach dem Umschalten abstürzt: 1. Benutzung der Routinen FETCH, STASH und CMPARE:</p>
+        <p>Dieser Mißerfolg machte uns immerhin klar, daß wir zu naiv an den neuen Computer herangegangen waren. Wir hatten keine Chance, ohne nähere Kenntnis des C 128, unsere Routinen umzuschreiben. Nachdem wir einige Zeit damit verbrachten, das Handbuch und das C 128 Intern zu studieren, war klar, daß es prinzipiell zwei Methoden gibt, auf verschiedene Speicherbänke zuzugreifen, ohne daß ein Programm unmittelbar nach dem Umschalten abstürzt:</p>
+
+        <p>1. Benutzung der Routinen FETCH, STASH und CMPARE:</p>
 
         <p>Diese Routinen benutzt auch der Basic-Interpreter. Nach dem Einschalten des Computers ist der Bereich $0000 bis $03FF als gemeinsamer Bereich von Bank 0 und Bank 1 definiert. Unabhängig davon, welche Bank eingeschaltet ist, »sieht« der Prozessor immer die gleichen Programme beziehungsweise Daten in diesem Bereich. Dieses Konzept der gemeinsamen Speicherbereiche kann man sich durch die Vorstellung veranschaulichen, daß jede Änderung des Bereichs $0000 bis $03FF in der einen Bank sofort in die andere Bank kopiert wird, die Inhalte daher in jedem Moment identisch sind. Dieses Konzept entspricht zwar nicht dem tatsächlichen physischen Ablauf, ist jedoch eine für die Praxis völlig ausreichende Vorstellung.</p>
 
@@ -56,10 +58,7 @@
 
         <p>Ich erspare es mir, diese Routinen mit allen übergebenen und rückübergebenen Parametern zu beschreiben, da inzwischen mehrere Bücher kompetenterer Programmierer auf dem Markt sind, die das Innenleben des C 128 detailliert beschreiben.</p>
 
-        <ol>
-            <li>Assembler-Routinen in einen gemeinsamen Speicherbereich legen:</li>
-        </ol>
-
+        <p>2. Assembler-Routinen in einen gemeinsamen Speicherbereich legen:</p>
 
         <p>Wie erwähnt, wird beim Einschalten des C 128 ein bestimmter Speicherbereich als gemeinsam definiert. Über das Register $D506, das im I/O-Bereich liegt, kann der Programmierer jedoch selbst bestimmen, ob er gemeinsame Bereiche definieren will, wo und wie groß diese sein sollen.</p>
 
@@ -89,10 +88,9 @@
 
         <p>Ich möchte Ihnen nun zwei kleine Initialisierungs-Routinen vorstellen, die die gewünschten Aufgaben erledigen, eine Basic- und eine Assembler-Routine:</p>
 
-        <ol>
-            <li>Beginn des Basic-Textes und der Variablentabelle verschieben: 10 poke 46,dec("20"):poke 48,dec ("20")</li>
-        </ol>
+        <p>1. Beginn des Basic-Textes und der Variablentabelle verschieben:</p>
 
+        <p>10 poke 46,dec("20"):poke 48,dec ("20")</p>
 
         <p>20 poke dec("2000"),0</p>
 
@@ -102,12 +100,7 @@
 
         <p>Wenn Sie dieses Basic-Programm eingeben und starten, beginnt sowohl der Basic-Text als auch die Variablentabelle ab $2000.</p>
 
-        <ol>
-            <li>Definition eines gemeinsamen</li>
-        </ol>
-
-
-        <p>Speicherbereiches:</p>
+        <p>2. Definition eines gemeinsamen Speicherbereiches:</p>
 
         <pre><code>a 00b00  ad  00 ff  lda $ff00
 a 00b03  48         pha
@@ -129,7 +122,6 @@ a 00b15  60         rts
             <li>Basic-Programm laden und starten.</li>
             <li>Maschinenprogramm laden und mit »SYS DEC("0B00")« aufrufen.</li>
         </ol>
-
 
         <p>Für Ihre Maschinenprogramme steht Ihnen nun der Bereich $1300 bis $17FF (ab $1800 beginnt der für die Funktionstastenbelegung benötigte Bereich) zur Verfügung. Eventuell können Sie auch weitere Bereiche nutzen, zum Beispiel $0C00 bis $0DFF, wenn Sie die RS232-Schnittstelle, oder den Bereich von $0B00 bis $0BFF, wenn Sie den Kassettenpuffer nicht benötigen.</p>
 
@@ -171,12 +163,11 @@ a 00b29  60         rts
 
         <p>Im Laufe der Zeit werden sicherlich auch elegantere Lösungen der genannten Probleme entdeckt werden. Dieser Artikel sollte nur zeigen, worauf Sie bei der Assemblerprogrammierung des C 128 achten müssen:</p>
 
-        <p>1. Probleme beim Umschalten zwischen den Speicherbänken. 2. Probleme mit Überschneidungen zwischen als gemeinsam definierten Speicherbereichen, zum Beispiel Bildschirm und Variablentabelle.</p>
-
         <ol>
+            <li>Probleme beim Umschalten zwischen den Speicherbänken.</li>
+            <li>Probleme mit Überschneidungen zwischen als gemeinsam definierten Speicherbereichen, zum Beispiel Bildschirm und Variablentabelle.</li>
             <li>Probleme bei dem Zugriff auf Betriebssystem-Routinen, deren Lösung davon abhängt, in welchen Bereich die Programme gelegt werden, unter das ROM oder in einen reinen RAM-Bereich.</li>
         </ol>
-
 
         <p>Wie Sie sehen, ist es bei der Programmierung des C 128 in Assembler außerordentlich wichtig, alle Zugriffe, die im späteren Programm sowohl auf verschiedene RAM-Bänke als auch auf ROM-Routinen erfolgen sollen, von vornherein einzuplanen. Ich möchte C 128 Besitzer keinesfalls frustrieren, aber meiner Ansicht nach ist dieser Computer bei der Programmierung in Maschinensprache außerordentlich unkomfortabel und stellt weit höhere Anforderungen an den Programmierer als zum Beispiel der C 64.</p>
 
