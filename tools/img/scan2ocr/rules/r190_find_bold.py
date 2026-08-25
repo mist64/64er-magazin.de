@@ -20,6 +20,29 @@ MEASURED on SH8601 p023, where `Pal` opens a bold run-in definition:
     every other word on the page          0.78x - 1.30x
 A threshold of 1.35 isolates it with nothing else near.
 
+CALIBRATE BEFORE USING THIS ON A NEW ISSUE.  The MEASUREMENT transfers -- it is
+relative to each word's own text line, so point size, scan exposure, paper grey
+and page skew all cancel.  THE THRESHOLD DOES NOT.  It depends on how slanted
+that issue's italic actually is, and this archive spans a decade in which the
+magazine changed typeface more than once.
+
+Evidence: run unchanged on 8610 p162, this detector returns 32 hits of which the
+top ones are `nn`, `en`, `w`, `A`, `70` -- short-token noise, which is exactly
+what an uncalibrated threshold looks like.  On SH8601 the same code returns the
+FORMAT option names and little else.
+
+So, per issue, before trusting a single hit:
+  1. find one page whose emphasis you can confirm by eye,
+  2. measure it and the roman text around it,
+  3. set the threshold from that gap, and record the numbers in the issue's LOG,
+  4. re-check that a known-emphasised word still survives -- a threshold that
+     silences the noise by also silencing the real hits is the failure this
+     chain has already made once (r000, "changing a tool means measuring before
+     and after").
+
+The listing/ad exclusion additionally needs `<tmp>/ocr/out/NNN.labels.json`,
+which only exists once the issue has been through step 020.
+
 This REPORTS candidates; it does not edit.  Confirm each on the crop before
 wrapping it in <strong> -- a drop cap, a heading that leaked into a body block,
 and a word sitting over a rule or a figure edge all read heavy for reasons that
