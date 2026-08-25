@@ -78,6 +78,24 @@ def main(d):
         # "1. 2. 1.".  MEASURED on SH8601: four in `139 Tips und Tricks`, one in
         # `6 Rundgang`.  A one-item <ol> is the tell -- the magazine does not
         # print numbered lists of one.
+        #
+        # THE GATE SAYS THERE IS A TEAR; IT DOES NOT SAY WHICH REPAIR.  Two
+        # different printed shapes produce the same one-item <ol>:
+        #   * a CONTIGUOUS list -- items back to back after an intro ending in a
+        #     colon.  Repair: one <ol>, printed markers stripped.
+        #   * numbered RUN-IN HEADINGS -- each item is a flush-left line ending
+        #     in a colon whose own explanation (paragraphs, a listing, even an
+        #     <h2>) follows before the next item.  Repair: plain <p> keeping the
+        #     printed numeral, as article 125 already sets them.  Merging these
+        #     into one <ol> would drag item 2 up over its own explanation and
+        #     silently REORDER the article.
+        # MEASURED on SH8601: five tears, two contiguous and three run-in.  READ
+        # THE PAGE before choosing.
+        #
+        # Verified across the corpus: all 16 hits are real tears -- each has a
+        # preceding <p> ending in a colon, or is a numbered step.  8606/86 is
+        # the extreme case, SIX consecutive one-item <ol> rendering as "1." six
+        # times.
         for mm in re.finditer(r'<ol[^>]*>((?:(?!</ol>).)*)</ol>', body, re.S):
             if len(re.findall(r'<li\b', mm.group(1))) == 1:
                 H('<ol> with a single <li> — numbered list torn in half? (r060)', f)
