@@ -27,7 +27,7 @@ have nothing to do with weight.
 
 usage:  r190_find_bold.py <masters600 dir> <page> [page ...]
 """
-import csv, subprocess, sys, tempfile, os
+import csv, json, subprocess, sys, tempfile, os
 from collections import defaultdict
 import numpy as np
 from PIL import Image
@@ -42,7 +42,34 @@ MIN_CHARS = 3         # short words are noisy: 'man', 'aus', 'zu' hit 1.36-1.49
 MIN_PX = 6            # ignore specks
 MIN_WORDS_PER_LINE = 3  # a median over one or two words means nothing
 
+def listing_boxes(master):
+    """Bboxes of blocks the pipeline classified as listings, at master scale.
+
+    MONOSPACE LISTING TEXT IS NOT COMPARABLE.  A BASIC line number in a listing
+    reads 1.6-2.5x its line median on stroke weight alone, because a monospace
+    face sets digits far heavier than the surrounding proportional prose -- and
+    a listing line is mostly digits.  MEASURED on SH8601: 194 hits issue-wide
+    fell to 30 once listing blocks were excluded, and the ~164 removed were all
+    line numbers on pages 43-46, 52, 55-57, 64-66 and 76-77.  Listings are
+    <pre> and out of scope for run-in emphasis anyway.
+    """
+    lab = os.path.join(os.path.dirname(master),
+                       '..', 'ocr', 'out',
+                       os.path.basename(master).replace('.png', '.labels.json'))
+    try:
+        d = json.load(open(os.path.normpath(lab)))
+    except Exception:
+        return []
+    out = []
+    for b in d.get('blocks', []):
+        if str(b.get('label', '')).startswith('listing'):
+            x, y, w, h = b.get('bbox', [0, 0, 0, 0])
+            out.append((x, y, x + w, y + h))
+    return out
+
+
 def page_bold(master):
+    skip = listing_boxes(master)
     im = Image.open(master).convert('L')
     g = np.asarray(im, np.uint8)
     ink = g < 128
@@ -53,6 +80,7 @@ def page_bold(master):
         rows = list(csv.DictReader(open(base + '.tsv'), delimiter='\t',
                                    quoting=csv.QUOTE_NONE))
     lines = defaultdict(list)
+    drop_lines = set()      # any line with a word inside a listing goes ENTIRELY
     first_of_par = set()          # (block,par,line,wordnum) that opens a paragraph
     seen_par = set()
     for r in rows:
@@ -61,6 +89,10 @@ def page_bold(master):
         l, t, w, h = (int(r[k]) for k in ('left', 'top', 'width', 'height'))
         if w < MIN_PX or h < MIN_PX:
             continue
+        cx, cy = l + w // 2, t + h // 2
+        if any(x0 <= cx <= x1 and y0 <= cy <= y1 for x0, y0, x1, y1 in skip):
+            drop_lines.add((r['block_num'], r['par_num'], r['line_num']))
+            continue
         key = (r['block_num'], r['par_num'])
         if key not in seen_par:
             seen_par.add(key)
@@ -68,8 +100,16 @@ def page_bold(master):
         lines[(r['block_num'], r['par_num'], r['line_num'])].append(
             (r['text'].strip(), float(ink[t:t+h, l:l+w].mean()), (l, t, w, h),
              (r['block_num'], r['par_num'], r['line_num'], r['word_num']) in first_of_par))
+    # DROP THE WHOLE LINE, not the individual words.  Removing only the words
+    # that fall inside a listing box CHANGES THAT LINE'S MEDIAN, so different
+    # borderline words cross the threshold and the noise merely moves.
+    # MEASURED on SH8601 p055: per-word exclusion swapped one set of BASIC line
+    # numbers (`S888`, `4208`) for another (`4848`, `SO6B`, `5188`) and added a
+    # phantom hit on p058.  Per-line exclusion removes the class.
     out = []
-    for ws in lines.values():
+    for key, ws in lines.items():
+        if key in drop_lines:
+            continue
         if len(ws) < MIN_WORDS_PER_LINE:
             continue
         med = float(np.median([f for _, f, _, _ in ws]))
