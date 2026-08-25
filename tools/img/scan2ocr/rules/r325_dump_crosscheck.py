@@ -47,7 +47,11 @@ def check(path):
                 t=raw.strip()
                 # A line that LOOKS like a dump but will not parse is itself a
                 # finding: silence is this checker's only real failure mode.
-                if re.match(r'^[a.]?\s*[0-9a-fA-FlO]{4,5}\s', t) and not re.match(r'^\d{3,5}\s+[A-Z"]', t):
+                # Guard against VALUE TABLES, which look like dumps but are not:
+                # `4098 $1002 8D 80 00 00 00` is a decimal/hex row, and its
+                # second column starting with `$` is the tell.  Without this the
+                # table rows are reported as unreadable dump lines.
+                if re.match(r'^[a.]?\s*[0-9a-fA-FlO]{4,5}\s', t) and not re.match(r'^\d{3,5}\s+[A-Z"$]', t):
                     skipped.append((path,t,"UNPARSEABLE — read this line on the page"))
                 continue
             addr,byts,mn,rest=m.groups()
