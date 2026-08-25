@@ -71,6 +71,21 @@ def main(d):
         for _ in re.finditer(r'<ol[^>]*type=', body):  H('<ol type=> (Discount alpha-list bug, r060)', f)
         for _ in re.finditer(r'<p>\s*<pre', body):     H('<p><pre> (Discount fenced-code bug, r060)', f)
         for _ in re.finditer(r'<li>\s*<p>', body):     H('<li> wraps <p>', f)
+        # NEVER SPLIT THE AUTHOR AWAY FROM THE TEXT THEY WROTE -- not by a
+        # listing, a table, an image or an aside.  The byline belongs directly
+        # after the article's last paragraph; anything the layout floats in
+        # between belongs before that paragraph or after the byline.
+        # r190 had this for images and tables only, which is why five cases
+        # survived here -- <pre> and <aside> were not covered.
+        # MEASURED on SH8601: 5, separated by <pre>, <figure>, <table> and
+        # combinations of them.
+        for mm in re.finditer(r'<address class="author">', body):
+            pre_ = body[:mm.start()]
+            lastp = pre_.rfind('</p>')
+            if lastp < 0: continue
+            broke = re.findall(r'<(figure|table|pre|aside)\b', pre_[lastp + 4:], re.I)
+            if broke:
+                H('<%s> splits the byline from its text (r190)' % broke[0], f)
         # A NUMBERED LIST TORN IN HALF.  The OCR hands r030 a numbered list as
         # one prose blob; Discount then promotes whichever item happens to fall
         # at a line start into an <ol> and leaves the rest inline in the <p>.
