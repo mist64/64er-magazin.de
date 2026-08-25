@@ -71,6 +71,16 @@ def main(d):
         for _ in re.finditer(r'<ol[^>]*type=', body):  H('<ol type=> (Discount alpha-list bug, r060)', f)
         for _ in re.finditer(r'<p>\s*<pre', body):     H('<p><pre> (Discount fenced-code bug, r060)', f)
         for _ in re.finditer(r'<li>\s*<p>', body):     H('<li> wraps <p>', f)
+        # A NUMBERED LIST TORN IN HALF.  The OCR hands r030 a numbered list as
+        # one prose blob; Discount then promotes whichever item happens to fall
+        # at a line start into an <ol> and leaves the rest inline in the <p>.
+        # Which item that is depends on arbitrary wrapping, so the reader sees
+        # "1. 2. 1.".  MEASURED on SH8601: four in `139 Tips und Tricks`, one in
+        # `6 Rundgang`.  A one-item <ol> is the tell -- the magazine does not
+        # print numbered lists of one.
+        for mm in re.finditer(r'<ol[^>]*>((?:(?!</ol>).)*)</ol>', body, re.S):
+            if len(re.findall(r'<li\b', mm.group(1))) == 1:
+                H('<ol> with a single <li> — numbered list torn in half? (r060)', f)
         n1 = len(re.findall(r'<h1>', body))
         if n1 != 1 and 'Leserforum' not in f:          H(f'h1 count = {n1}', f)
         m = re.search(r'64er\.id" content="([^"]*)"', s)
