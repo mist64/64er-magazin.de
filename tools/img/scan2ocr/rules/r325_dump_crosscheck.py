@@ -1,57 +1,37 @@
 import re,io,glob,os,sys
 # 6502 opcode table: opcode -> (mnemonic, operand-bytes, format)
-OPS={}
-def add(o,m,n,f): OPS[o]=(m,n,f)
-rows="""69 adc 1 imm|65 adc 1 zp|75 adc 1 zpx|6d adc 2 abs|7d adc 2 absx|79 adc 2 absy|61 adc 1 indx|71 adc 1 indy
-29 and 1 imm|25 and 1 zp|35 and 1 zpx|2d and 2 abs|3d and 2 absx|39 and 2 absy|21 and 1 indx|31 and 1 indy
-0a asl 0 acc|06 asl 1 zp|16 asl 1 zpx|0e asl 2 abs|1e asl 2 absx
-90 bcc 1 rel|b0 bcs 1 rel|f0 beq 1 rel|30 bmi 1 rel|d0 bne 1 rel|10 bpl 1 rel|50 bvc 1 rel|70 bvs 1 rel
-24 bit 1 zp|2c bit 2 abs|00 brk 0 imp|18 clc 0 imp|d8 cld 0 imp|58 cli 0 imp|b8 clv 0 imp
-c9 cmp 1 imm|c5 cmp 1 zp|d5 cmp 1 zpx|cd cmp 2 abs|dd cmp 2 absx|d9 cmp 2 absy|c1 cmp 1 indx|d1 cmp 1 indy
-e0 cpx 1 imm|e4 cpx 1 zp|ec cpx 2 abs|c0 cpy 1 imm|c4 cpy 1 zp|cc cpy 2 abs
-c6 dec 1 zp|d6 dec 1 zpx|ce dec 2 abs|de dec 2 absx|ca dex 0 imp|88 dey 0 imp
-49 eor 1 imm|45 eor 1 zp|55 eor 1 zpx|4d eor 2 abs|5d eor 2 absx|59 eor 2 absy|41 eor 1 indx|51 eor 1 indy
-e6 inc 1 zp|f6 inc 1 zpx|ee inc 2 abs|fe inc 2 absx|e8 inx 0 imp|c8 iny 0 imp
-4c jmp 2 abs|6c jmp 2 ind|20 jsr 2 abs
-a9 lda 1 imm|a5 lda 1 zp|b5 lda 1 zpx|ad lda 2 abs|bd lda 2 absx|b9 lda 2 absy|a1 lda 1 indx|b1 lda 1 indy
-a2 ldx 1 imm|a6 ldx 1 zp|b6 ldx 1 zpy|ae ldx 2 abs|be ldx 2 absy
-a0 ldy 1 imm|a4 ldy 1 zp|b4 ldy 1 zpx|ac ldy 2 abs|bc ldy 2 absx
-4a lsr 0 acc|46 lsr 1 zp|56 lsr 1 zpx|4e lsr 2 abs|5e lsr 2 absx|ea nop 0 imp
-09 ora 1 imm|05 ora 1 zp|15 ora 1 zpx|0d ora 2 abs|1d ora 2 absx|19 ora 2 absy|01 ora 1 indx|11 ora 1 indy
-48 pha 0 imp|08 php 0 imp|68 pla 0 imp|28 plp 0 imp
-2a rol 0 acc|26 rol 1 zp|36 rol 1 zpx|2e rol 2 abs|3e rol 2 absx
-6a ror 0 acc|66 ror 1 zp|76 ror 1 zpx|6e ror 2 abs|7e ror 2 absx
-40 rti 0 imp|60 rts 0 imp
-e9 sbc 1 imm|e5 sbc 1 zp|f5 sbc 1 zpx|ed sbc 2 abs|fd sbc 2 absx|f9 sbc 2 absy|e1 sbc 1 indx|f1 sbc 1 indy
-38 sec 0 imp|f8 sed 0 imp|78 sei 0 imp
-85 sta 1 zp|95 sta 1 zpx|8d sta 2 abs|9d sta 2 absx|99 sta 2 absy|81 sta 1 indx|91 sta 1 indy
-86 stx 1 zp|96 stx 1 zpy|8e stx 2 abs|84 sty 1 zp|94 sty 1 zpx|8c sty 2 abs
-aa tax 0 imp|a8 tay 0 imp|ba tsx 0 imp|8a txa 0 imp|9a txs 0 imp|98 tya 0 imp"""
-for part in rows.replace('\n','|').split('|'):
-    p=part.split()
-    if len(p)==4: add(p[0],p[1],int(p[2]),p[3])
+import subprocess, tempfile
 
-def fmt(m,f,ops,pc):
-    if f=='imp': return m
-    if f=='acc': return m
-    if f=='imm': return f"{m} #${ops[0]:02x}"
-    if f=='zp':  return f"{m} ${ops[0]:02x}"
-    if f=='zpx': return f"{m} ${ops[0]:02x},x"
-    if f=='zpy': return f"{m} ${ops[0]:02x},y"
-    # Indirect modes.  Their ABSENCE was a real bug: fmt() raised, the caller
-    # swallowed it with `except: continue`, and the skipped `prev` update made
-    # the NEXT line report a phantom address gap -- 12 of them on SH8601.
-    if f=='indx': return f"{m} (${ops[0]:02x},x)"
-    if f=='indy': return f"{m} (${ops[0]:02x}),y"
-    if f=='rel': 
-        d=ops[0]-256 if ops[0]>127 else ops[0]
-        return f"{m} ${(pc+2+d)&0xffff:04x}"
-    a=ops[0]|(ops[1]<<8)
-    return {'abs':f"{m} ${a:04x}",'absx':f"{m} ${a:04x},x",'absy':f"{m} ${a:04x},y",'ind':f"{m} (${a:04x})"}[f]
+# DISASSEMBLY IS DELEGATED TO da65 (cc65).  A hand-rolled opcode table is one
+# more thing that can be wrong -- and mine WAS: it had no indirect-addressing
+# case, which produced 12 phantom findings on SH8601 before anyone noticed.
+# da65 is the reference implementation; if it disagrees with the page, the page
+# is what needs looking at.
+DA65 = "da65"
 
-# Mnemonic is deliberately PERMISSIVE: the whole point is to catch `1da` for
-# `lda` and `bp1` for `bpl`, so a strict [a-zA-Z] pattern would skip exactly the
-# damaged lines.  Byte tokens tolerate a trailing stray period/comma.
+def disasm(addr, byts):
+    """One instruction at `addr` from `byts` -> normalised text, or None."""
+    with tempfile.NamedTemporaryFile(suffix=".bin", delete=False) as fh:
+        fh.write(bytes(byts)); path = fh.name
+    try:
+        out = subprocess.run([DA65, "--start-addr", hex(addr), path],
+                             capture_output=True, text=True, timeout=20).stdout
+    except Exception:
+        return None
+    finally:
+        os.unlink(path)
+    for ln in out.splitlines():
+        ln = ln.strip()
+        # da65 emits `L795C := $795C` for targets outside the loaded bytes --
+        # a symbol definition, not an instruction.  Skipping these was NOT
+        # optional: without it every jsr/branch reported a phantom mismatch.
+        if not ln or ln.startswith(";") or ln.startswith(".") or ":=" in ln: continue
+        ln = re.sub(r"^L[0-9A-Fa-f]{4}:\s*", "", ln)      # drop a leading label
+        if not ln: continue
+        ln = re.sub(r"\bL([0-9A-Fa-f]{4})\b", r"$\1", ln)  # branch target -> $addr
+        return re.sub(r"\s+", " ", ln).lower().replace(" ", "")
+    return None
+
 LINE=re.compile(r'^\s*[a.]?\s*([0-9a-fA-FlO]{4,5})\s+((?:[0-9a-fA-FlOSB][0-9a-fA-FlOSB][.,]?\s+){1,3})([a-zA-Z0-9]{3})\b(.*)$')
 def norm(h): return h.lower().rstrip('.,').replace('l','1').replace('o','0').replace('s','5').replace('b','b')
 
@@ -77,26 +57,15 @@ def check(path):
             try: bb=[int(norm(b),16) for b in bs]
             except: continue
             if not re.search(r'[a-zA-Z]', mn): continue   # pure-digit run, not a mnemonic
-            op=OPS.get(f"{bb[0]:02x}")
-            printed=(mn+rest).strip().lower()
-            printed=re.sub(r'\s+',' ',printed)
-            if op is None:
-                out.append((path,raw.strip(),"opcode %02x unknown"%bb[0])); continue
-            m2,n,f=op
-            if len(bb)!=n+1:
-                out.append((path,raw.strip(),f"{bb[0]:02x} ({m2}) takes {n} operand byte(s), {len(bb)-1} printed")); continue
-            try: exp=fmt(m2,f,bb[1:],a)
-            except Exception as e:
-                out.append((path,raw.strip(),f"CHECKER BUG: cannot format {f} ({e})"))
-                prev=a+n+1
-                continue
-            pn=printed.replace(' ','').replace('$','$')
-            en=exp.replace(' ','')
-            if pn!=en:
+            exp = disasm(a, bb)
+            if exp is None:
+                out.append((path,raw.strip(),"da65 could not disassemble these bytes")); continue
+            printed = re.sub(r'\s+','', (mn+rest).strip().lower())
+            if printed != exp:
                 out.append((path,raw.strip(),f"bytes say  {exp}"))
             if prev is not None and a!=prev:
                 out.append((path,raw.strip(),f"address gap: expected {prev:05x}"))
-            prev=a+n+1
+            prev = a + len(bb)
     return out+skipped
 tot=[]
 for f in sorted(glob.glob('/Users/mist/Documents/git/64er-magazin.de/issues/SH8601/*.html')):
