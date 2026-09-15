@@ -258,6 +258,82 @@ def fit_fold(holes, h):
             "span": float((pts[inl, 1].max() - pts[inl, 1].min()) / h)}
 
 
+# --- the fold fallback: the neighbour's content boundary ------------------
+# 8609's winning spine signal, kept as the FALLBACK for a page whose holes do
+# not fit a line: where the neighbour bled in, dark fraction and saturation
+# step up together at one x, and the clean margin between is a band of
+# neither.  Per horizontal band, the content block NEAREST the inner border
+# that starts within NB_BORDER_NEAR_MM of it (rejects this page's own type),
+# is at least NB_BLOCK_MIN_MM wide (rejects specks) and does not reach the
+# interior limit (rejects full-bleed / merged) gives one boundary point; a
+# robust line through the points is the boundary.  It finds a fold only where
+# the neighbour has content -- blank margin gives NO boundary, correctly.
+NB_BANDS = 28
+NB_STRIP_MM = 50.0           # the inner search strip
+NB_DARK_LUM = 95
+NB_DARK_FRAC = 0.05
+NB_SAT_MIN = 0.17            # (max-min)/255 of a column's mean colour
+NB_BLOCK_MIN_MM = 0.85       # ~20 px @600
+NB_BORDER_NEAR_MM = 10.0     # the block must START this close to the border
+NB_RESID_MM = 1.9            # ~45 px @600: iterative reject
+NB_MIN_BANDS = 6
+NB_TILT_MAX = 1.5            # deg
+NB_PRIOR_MM = 5.0            # within this of the issue's median fold, if known
+
+
+def neighbour_boundary(rgb, par, prior_x=None):
+    h, w = rgb.shape[:2]
+    strip_w = int(NB_STRIP_MM * MM)
+    if par == "even":
+        strip = rgb[:, w - strip_w:]
+        to_x = lambda i: w - strip_w + i          # strip index -> sheet x
+        inward = lambda cols: cols[::-1]          # border-first order
+    else:
+        strip = rgb[:, :strip_w]
+        to_x = lambda i: i
+        inward = lambda cols: cols
+    lum = strip.mean(2, dtype=np.float32)
+    pts = []
+    for band in np.array_split(np.arange(h), NB_BANDS):
+        b = strip[band]
+        dark = (lum[band] < NB_DARK_LUM).mean(0)
+        mean = b.mean(0, dtype=np.float32)
+        sat = (mean.max(1) - mean.min(1)) / 255.0
+        content = (dark > NB_DARK_FRAC) | (sat > NB_SAT_MIN)
+        c = inward(content)                        # index 0 = at the border
+        # first content run from the border
+        i = 0
+        while i < len(c) and not c[i]:
+            i += 1
+        if i >= len(c) or i > NB_BORDER_NEAR_MM * MM:
+            continue
+        j = i
+        while j < len(c) and c[j]:
+            j += 1
+        if j - i < NB_BLOCK_MIN_MM * MM or j >= len(c):    # too thin, or full-bleed
+            continue
+        edge = j                                    # page-facing edge, border-first index
+        x = to_x(strip_w - 1 - edge) if par == "even" else to_x(edge)
+        pts.append((band.mean(), x))
+    if len(pts) < NB_MIN_BANDS:
+        return None
+    pts = np.array(pts)
+    keep = np.ones(len(pts), bool)
+    for _ in range(5):
+        poly = np.polyfit(pts[keep, 0], pts[keep, 1], 1)
+        res = np.abs(pts[:, 1] - np.polyval(poly, pts[:, 0]))
+        new = res < NB_RESID_MM * MM
+        if new.sum() < NB_MIN_BANDS or (new == keep).all():
+            break
+        keep = new
+    if keep.sum() < NB_MIN_BANDS or abs(tilt(poly)) > NB_TILT_MAX:
+        return None
+    if prior_x is not None and abs(np.polyval(poly, h / 2) - prior_x) > NB_PRIOR_MM * MM:
+        return None
+    return {"poly": poly, "n": int(keep.sum()),
+            "residual_mm": float(res[keep].mean() / MM)}
+
+
 # ---------------------------------------------------------------------------
 # measure, part 1: level and grade  (verbatim from the sheet variant)
 # ---------------------------------------------------------------------------

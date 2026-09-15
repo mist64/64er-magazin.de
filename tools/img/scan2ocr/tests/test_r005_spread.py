@@ -89,3 +89,35 @@ def test_fit_fold_refuses_three_holes():
                       ys_mm=(30, 43, 130))
     assert S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even"),
                       a.shape[0]) is None
+
+
+def test_neighbour_boundary_finds_colour_step():
+    a = synthetic_frame("even", fold_from_edge_mm=18.0, neighbour_rgb=(90, 120, 200))
+    h, w = a.shape[:2]
+    nb = S.neighbour_boundary(a, "even")
+    assert nb is not None
+    assert abs(np.polyval(nb["poly"], h / 2) - (w - 18.0 * MM)) < 1.0 * MM
+
+
+def test_neighbour_boundary_finds_colour_step_odd():
+    # mirrors the even-parity test above: same fold depth, opposite side.  The
+    # even path indexes its strip border-first (`inward = cols[::-1]`) and
+    # maps back with `to_x(strip_w - 1 - edge)`; the odd path uses the strip
+    # order directly and `to_x(edge)`.  A mirror bug in either mapping would
+    # only show up on the parity it belongs to, so both are exercised here.
+    a = synthetic_frame("odd", fold_from_edge_mm=18.0, neighbour_rgb=(90, 120, 200))
+    h, w = a.shape[:2]
+    nb = S.neighbour_boundary(a, "odd")
+    assert nb is not None
+    assert abs(np.polyval(nb["poly"], h / 2) - 18.0 * MM) < 1.0 * MM
+
+
+def test_neighbour_boundary_none_on_blank_margin():
+    a = synthetic_frame("even", neighbour_rgb=PAPER)
+    assert S.neighbour_boundary(a, "even") is None
+
+
+def test_neighbour_boundary_rejects_far_from_prior():
+    a = synthetic_frame("even", fold_from_edge_mm=18.0, neighbour_rgb=(90, 120, 200))
+    h, w = a.shape[:2]
+    assert S.neighbour_boundary(a, "even", prior_x=w - 40.0 * MM) is None
