@@ -46,7 +46,9 @@ re-measure the baseline before claiming an improvement against an older figure.
   `r005_masters_spread` where the frame holds a clipped spread, `r005_masters_sheet`
   where it holds one loose glued sheet — chosen by the issue descriptor's
   `binding` field. Both write the same contract, so nothing after 005 knows which
-  ran.
+  ran. `r005_masters_spread` runs in two phases — `measure` per page, `cut`
+  once for the issue — because its A4 window is one fit per parity over the
+  wordmark anchors of every page. `r005_masters_spread.sh` runs both.
 
 Paths are constants at the top of each file — `SRC_DIR`, `OUT_DIR` — pointing at
 the working issue. Change them there, per issue; there is no flag.
