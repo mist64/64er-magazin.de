@@ -293,15 +293,47 @@ FOLD_TILT_MAX = 1.0          # deg
 # inlier within HOLE_TEMPLATE_TOL_MM, and the RMS of those offsets; the
 # best hypothesis is the line's score.  Matches, then RMS, then inliers,
 # then residual decide; under HOLE_TEMPLATE_MIN matches a line is not a
-# fold.  A neighbour column fakes at most 5 matches at RMS 0.31-0.45 (the
-# six pages where it reaches 5: p084, 086, 091, 187, 189, 193), the holes
-# score 6 there, and 5 true holes fit at RMS <= 0.30.  Four matches replace
-# the old half-height span rule: pairs 1+2 span 103 mm and are the clip
-# (p092, p109, p124 -- their other holes are off the line or under type);
-# four random specks in 0.75 mm of four template positions are not.
+# fold.  Four matches replace the old half-height span rule: pairs 1+2 span
+# 103 mm and are the clip (p092, p109, p124 -- their other holes are off
+# the line or under type).
+#
+# WHAT THE TEMPLATE DOES AND DOES NOT TELL APART.  On 8610 a neighbour
+# column fakes at most 5 matches, at RMS 0.31-0.45 (the six pages where it
+# reaches 5: p084, 086, 091, 187, 189, 193); the holes score 6 there, and
+# where only 5 holes are seen they fit at RMS <= 0.30 and win on RMS.  That
+# 0.30-vs-0.31 margin is a fact about 8610's fragments -- line ends are
+# ragged, so the column's y's are IRREGULAR and match the template only by
+# chance -- not a property of the scorer.  A perfectly REGULAR column at
+# body-text pitch is a different thing: the template's gaps (13.35, 76.27,
+# 13.30, 66.44, 13.59) are near-multiples of some pitches, and a synthetic
+# column alone at 4.5 mm pitch scores 4 at RMS 0.24, at 4.7 mm scores 6 at
+# RMS 0.41; 8 of the 26 pitches from 3.5 to 6.0 mm pass HOLE_TEMPLATE_MIN
+# (tests: the known-accepting case).  Where the holes are also seen it still
+# loses on matches or RMS; alone -- the holes torn, inked over, or off the
+# line -- it would be reported as the fold.  The test that would refuse it
+# is a regularity test on the inliers' y spacing (a clip has six marks,
+# type has a pitch), not built: no page of 8610 needed it.
+#
+# THE ABSOLUTE PRIOR.  The clip is one rigid object and it sat on the same
+# stop of the scanner for every sheet: MEASURED over the 196 pages with a
+# hole fold, the best template shift (hole 1's y in the frame) is 58.05-
+# 59.97 mm on 192 of them (mean 58.91), and the four outside are the pages
+# where it was arbitrary -- p005 / p038 / p163 (a screen or a cracked crease
+# dense enough that any shift matches) and p084 (the fake, at 65.9).  So a
+# hypothesis is only counted if its shift is within HOLE_TEMPLATE_Y0_TOL_MM
+# of HOLE_TEMPLATE_Y0_MM: 3 mm is three times the measured spread, and a
+# levelling rotation of 0.5 deg about the sheet's centre moves y at the fold
+# by under 1 mm.  This kills a chance match (p084) and pins the dense pages'
+# shift on their real holes; it does NOT kill a regular column, whose
+# fitting shifts recur every pitch, so one always lands inside +-3 mm.  It
+# is a fact about the operator's placement, re-measured per issue like the
+# template; an issue whose clip sat elsewhere reports `fold none` on every
+# page, and checks 5 and 8 say so.
 HOLE_TEMPLATE_MM = (0.0, 13.35, 89.62, 102.92, 169.36, 182.95)
 HOLE_TEMPLATE_TOL_MM = 0.75  # measured max 0.41, p95 0.30
 HOLE_TEMPLATE_MIN = 4        # matches; 6 on an ordinary page, 4-5 with a torn or inked-over hole
+HOLE_TEMPLATE_Y0_MM = 59.0   # hole 1's y in the frame: measured 58.05-59.97 (p5-p95), mean 58.91
+HOLE_TEMPLATE_Y0_TOL_MM = 3.0
 
 
 def find_holes(gray, par):
@@ -342,10 +374,15 @@ def find_holes(gray, par):
 
 def template_score(ys):
     """(matches, rms_mm) of the clip template on the inlier y's (px): the best
-    over every 'inlier k is template hole j' shift."""
+    over every 'inlier k is template hole j' shift whose hole 1 lands within
+    HOLE_TEMPLATE_Y0_TOL_MM of HOLE_TEMPLATE_Y0_MM; (0, 0.0) if no shift does."""
     ys = np.sort(np.asarray(ys, float) / MM)
     t = np.asarray(HOLE_TEMPLATE_MM)
-    pos = (ys[:, None] - t[None, :]).ravel()[:, None] + t[None, :]   # (n*6, 6)
+    shifts = (ys[:, None] - t[None, :]).ravel()
+    shifts = shifts[np.abs(shifts - HOLE_TEMPLATE_Y0_MM) <= HOLE_TEMPLATE_Y0_TOL_MM]
+    if not len(shifts):
+        return 0, 0.0
+    pos = shifts[:, None] + t[None, :]                                # (k, 6)
     idx = np.searchsorted(ys, pos)
     lo = ys[np.clip(idx - 1, 0, len(ys) - 1)]
     hi = ys[np.clip(idx, 0, len(ys) - 1)]

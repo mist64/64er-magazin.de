@@ -58,9 +58,10 @@ def test_outer_edges_fullbleed_uses_frame_and_prop():
     assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 1e-9
     assert abs(np.polyval(e["bot"], w / 2) - (h - 7.0 * MM)) < 3
     assert abs(S.tilt(e["bot"])) < 0.05
+    assert list(S.outer_edges(a, "even")["outer"]) == [0.0, 0.0]
 
 
-def test_outer_edges_ink_to_the_trim_takes_the_frame_for_that_edge_only():
+def test_outer_edges_ink_band_at_the_top_takes_the_frame_for_the_top_only():
     """p092 on the sweep: a 0.80-paper page with a red band across its top
     15 mm; the trace put the top 15 mm down and the master lost the band.
     The band is ink, not bed: the top comes from the frame, the other two
@@ -75,13 +76,37 @@ def test_outer_edges_ink_to_the_trim_takes_the_frame_for_that_edge_only():
     assert list(e["top"]) == [0.0, 0.0]
     assert abs(np.polyval(e["bot"], w / 2) - (h - 7.0 * MM)) < 3
     assert abs(np.polyval(e["outer"], h / 2) - 0) < 3
-    # p149: a black column on the outer side -- the outer edge is the frame
+
+
+def test_outer_edges_ink_column_outside_takes_the_frame_for_the_outer_only():
+    """p149: a black column 14 mm wide on the outer side -- the trace ran
+    13.5 mm in; the outer edge is the frame, top and bottom stay traced."""
     a = synthetic_frame("odd")
+    h, w = a.shape[:2]
     a[:, w - int(14.0 * MM):] = (20, 20, 20)
     e = S.outer_edges(a, "odd")
+    assert e["source"] == "paper"
     assert [r[0] for r in e["replaced"]] == ["outer"]
+    assert 13 < e["replaced"][0][1] < 15
     assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 1e-9
-    assert list(S.outer_edges(a, "even")["outer"]) == [0.0, 0.0]
+    assert abs(np.polyval(e["top"], w / 2) - 1.0 * MM) < 2 * MM * 0.1 + 3
+    assert abs(np.polyval(e["bot"], w / 2) - (h - 7.0 * MM)) < 3
+
+
+def test_outer_edges_tilted_trace_takes_the_frame():
+    """p057: the outer trace ran into a photo at -1.49 deg, only 3.9 mm in
+    -- within EDGE_OUTER_MAX_MM, but a levelled page's trim is level, so
+    the tilt alone gives the edge to the frame."""
+    a = synthetic_frame("odd")
+    h, w = a.shape[:2]
+    yy, xx = np.mgrid[:h, :w]
+    edge = w - 1.0 * MM - (7.0 * MM) * yy / h                # 1 mm in at the top, 8 at the foot: 1.35 deg
+    a[(xx > edge) & (yy > 1.0 * MM) & (yy < h - 7.0 * MM)] = (20, 20, 20)
+    e = S.outer_edges(a, "odd")
+    assert [r[0] for r in e["replaced"]] == ["outer"]
+    assert e["replaced"][0][1] < S.EDGE_OUTER_MAX_MM           # not the depth...
+    assert abs(e["replaced"][0][2]) > S.EDGE_TILT_MAX           # ...the tilt
+    assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 1e-9
 
 
 CLIP_YS_MM = tuple(59.0 + t for t in S.HOLE_TEMPLATE_MM)   # the clip, where 8610's pages have it
@@ -169,6 +194,36 @@ def test_fit_fold_prefers_the_clip_to_a_neighbour_column():
     fold = S.fit_fold(holes)
     assert fold is not None and fold["template"] == 6 and fold["n"] == 6
     assert abs(np.polyval(fold["poly"], h / 2) - x) < 0.2 * MM
+
+
+def test_fit_fold_accepts_a_regular_column_alone_KNOWN_LIMITATION():
+    """What the template does NOT tell apart: a perfectly REGULAR column of
+    fragments at a body-text pitch that divides the template's gaps.  At
+    4.7 mm pitch it scores 6 matches (at 4.5 mm, 4); 8 of the 26 pitches
+    from 3.5 to 6.0 mm pass HOLE_TEMPLATE_MIN, and the absolute-y prior
+    does not help -- a fitting shift recurs every pitch.  With the holes on
+    the page it loses to them on matches or RMS (the previous test); ALONE,
+    as here, it is reported as the fold.  No page of 8610 was this; the
+    refusal would be a regularity test on the inliers' spacing."""
+    a = synthetic_frame("even", neighbour_rgb=PAPER)
+    h, w = a.shape[:2]
+    for y_mm in np.arange(20.0, 280.0, 4.7):
+        y = int(y_mm * MM)
+        cx = w - int(1.5 * MM)
+        a[y:y + int(1.0 * MM), cx - int(0.4 * MM):cx + int(0.4 * MM)] = (20, 18, 18)
+    holes = S.find_holes(a.mean(2).astype(np.uint8), "even")
+    fold = S.fit_fold(holes)
+    assert fold is not None and fold["template"] >= S.HOLE_TEMPLATE_MIN     # accepted -- the limitation
+    assert abs(np.polyval(fold["poly"], h / 2) - (w - 1.5 * MM)) < 0.3 * MM
+
+
+def test_fit_fold_prior_rejects_the_clip_at_the_wrong_height():
+    """The absolute prior: six holes at the clip's spacing but 20 mm below
+    where 8610's clip sits are not this issue's clip (and an issue whose
+    clip sits elsewhere reports fold none on every page -- the safe way)."""
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even",
+                      ys_mm=tuple(y + 20.0 for y in CLIP_YS_MM))
+    assert S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even")) is None
 
 
 def test_neighbour_boundary_finds_colour_step():

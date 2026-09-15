@@ -316,21 +316,41 @@ inlier count, the template matches and RMS, the mean residual and the tilt;
 the hole list records every candidate, inlier or not, because `cut` fills all
 of them.
 
-Measured against the fakes: a neighbour column reaches at most **5** matches
-(RMS 0.31–0.45 on the six pages that get there: p084, 086, 091, 187, 189,
-193), the holes score 6 on those pages, and where only five holes are seen
-they fit at RMS ≤ 0.30 and win on RMS. The one residual is **p084**: its four
-detected holes are not collinear within 0.8 mm (no true line exists) and the
-column's 5 matches stand — a logo page, so the master is unaffected. Two
-pages are neither: p005/p196, one sheet with a coarse-screened picture across
-the fold, 643 / 1156 dot candidates, every dot column matches the template —
-the line reported there (10.6 / 10.0 mm) is a dot column near the crease, not
-a measurement, and the master is placed by the wordmark on both. If the class
-recurs, the next thing to measure is the holes' **absolute** y in the frame
-(59.0 / 72.4 / 148.6 / 161.9 / 228.4 / 242.0 mm, sd 0.6, over the same 75
-pages — the clip sits against the same stop on every scan), which no column
-fragment matches by chance; it is not used, because it is a fact about the
-operator's placement and the spec asked for the relative template.
+**What the template does and does not tell apart.** Measured on 8610, a
+neighbour column reaches at most **5** matches, at RMS 0.31–0.45 (the six
+pages that get there: p084, 086, 091, 187, 189, 193); the holes score 6 on
+those pages, and where only five holes are seen they fit at RMS ≤ 0.30 and
+win on RMS. That 0.30-against-0.31 margin is a fact about **8610's
+fragments** — line ends are ragged, so a column's y's are irregular and
+match the template only by chance — and not a property of the scorer. A
+perfectly **regular** column at body-text pitch is a different thing: the
+template's gaps (13.35 / 76.27 / 13.30 / 66.44 / 13.59 mm) are near-multiples
+of some pitches, and a synthetic column alone at 4.5 mm pitch scores 4
+matches at RMS 0.24, at 4.7 mm **6** at RMS 0.41 — 8 of the 26 pitches from
+3.5 to 6.0 mm pass `HOLE_TEMPLATE_MIN` (the unit test
+`…regular_column_alone_KNOWN_LIMITATION` keeps the case). Where the holes are
+also on the page it still loses to them on matches or RMS; alone — the holes
+torn, inked over or off the line — it would be reported as the fold. The
+refusal would be a regularity test on the inliers' spacing (a clip has six
+marks, type has a pitch); not built, because no page of 8610 was that.
+
+**The absolute prior.** The clip is one rigid object and it sat against the
+same stop of the scanner for every sheet: over the 196 pages with a hole
+fold, the best template shift — hole 1's y in the frame — is 58.05–59.97 mm
+on 192 of them (mean 58.91), and the four outside were the pages where the
+shift was arbitrary: p005 / p038 / p163 (a screen or a cracked crease dense
+enough that any shift matches) and **p084 at 65.9 — the one fake that had
+stood**. So a hypothesis counts only if its shift is within
+`HOLE_TEMPLATE_Y0_TOL_MM` = 3 mm (three times the spread; a 0.5° levelling
+rotation about the sheet's centre moves y at the fold by under 1 mm) of
+`HOLE_TEMPLATE_Y0_MM` = 59.0. Replayed over the 200 stored candidate lists
+it changed two pages: p084's fake lost its shift and the four true holes,
+which fit at 0.8 mm, became the fold at 12.9 mm; p005's shift pinned on its
+real holes (10.33 → 10.28 mm). It does **not** kill a regular column — its
+fitting shifts recur every pitch, so one always lands inside ±3 mm. It is a
+fact about the operator's placement, re-measured per issue like the
+template; an issue whose clip sat elsewhere reports `fold none` on every
+page, and checks 5 and 8 say so.
 
 ### The fold fallback — the neighbour's colour boundary
 
@@ -539,7 +559,15 @@ Everything the master should not show is painted **255 white** on the page's
 - every hole candidate's disc — its own radius (half its longest extent) plus
   `HOLE_FILL_R_MM` = 0.4 mm — every candidate, not only the line's inliers,
   because a candidate is by construction a hole-shaped dark mark in the fold
-  band whether or not it sat on the line;
+  band whether or not it sat on the line. **Measured on the sweep, that
+  argument fails on a screen:** 42 pages carry candidates on the page side
+  of the fold beyond the six holes — crease specks and cracks, ≤ 38 discs
+  and ≤ 73 mm² a page on 41 of them — and on **p005**, whose coarse-screened
+  picture starts at the crease, 518 dots of the picture are painted white,
+  1137 mm², the first ~5 mm of the picture along the inner edge (*What it
+  read*). The fill that would not do this paints the line's inliers within
+  2 mm of a template position (the holes and their torn fragments) and
+  nothing else; not changed on this sweep, recorded as p005's gap;
 - and, in the master, wherever the window overhangs the frame.
 
 A page with `fold: none` has no inner fill: its master shows whatever of the
@@ -751,9 +779,12 @@ percentile in check 5 and on the contact sheet, not here. Check 5's three
 
 ## What it read, on the full sweep
 
-2026-09-15, all 200 pages of 8610, `r005_masters_spread.sh` (6 lanes, ~2.5 h),
-then the Verification block; then two changes on its evidence, 89 pages
-re-measured and every page cut again; then the block again. Grade
+2026-09-15, all 200 pages of 8610, `r005_masters_spread.sh` (6 lanes, 12:46 →
+17:03, 4.3 h wall-clock against the wrapper's 2.5 h estimate), then the
+Verification block; then three changes on its evidence — the template, the
+edge gates, the prior — 88 distinct pages re-measured (86 for the fold, 057
+and 149 for the edges, 005 and 084 again for the prior) and every page cut
+again; then the block again. Grade
 `cec3ff863b36`. No `FAILED`, no `SKEW` NOTE on any page (the residual after
 levelling is ≤ 0.02° on all 200).
 
@@ -772,9 +803,9 @@ levelling is ≤ 0.02° on all 200).
    (every one an ad or cover whose own ink reads as "bed"; the prop column is <= 0.015 everywhere but p001 0.099,
    p005 0.090, p002 0.049 -- prop-coloured ink: the cover's orange banner, a yellow ad ground)
 7  debug_contact.png
-8  hole folds: x mm p5 7.4 p50 9.8 p95 13.4 | n == 6: 112 | template 6/5/4: 131/51/14
-   LOOK AT x < 5 mm: (82, 0.9, colour), (84, 1.5, n=58, template 5), (119, 1.7, colour)
-   LOOK AT n > 12: 001 002 005 014 021 024 038 041 082 084 160 163 177 180 187 196 199 200
+8  hole folds: x mm p5 7.4 p50 9.8 p95 13.4 | n == 6: 112 | template 6/5/4: 131/50/15
+   LOOK AT x < 5 mm: (82, 0.9, colour), (119, 1.7, colour)
+   LOOK AT n > 12: 001 002 005 014 021 024 038 041 082 160 163 177 180 187 196 199 200
 ```
 
 The fit: 8609's was even S=568 B=6892, odd S=4416 B=6900; 8610's odd S is
@@ -801,7 +832,8 @@ fullbleed` 9 (001 003 004 151 163 187 194 198 200); `FOLD not found` 4 (083
 111 117 137); `FOLD from the neighbour's colour boundary` 1 (064, at −0.1 mm
 — the frame edge); `SKEW` none.
 
-Two classes appeared, both fixed on measurement, both in *`measure`* above:
+Two classes appeared, both fixed on measurement, both in *`measure`* above
+(the prior came in a review round after them, on p084's evidence):
 
 1. **The neighbour's column as the fold** (*Which line*): 25 pages, found by
    tabulating fold x over the 200 JSONs (now check 8). The template was
@@ -812,7 +844,7 @@ Two classes appeared, both fixed on measurement, both in *`measure`* above:
    149 177 (the four > 4 % pages) and 057; the frame gates were measured
    and added; the five re-measured.
 
-The 111 pages neither change touched were not re-measured; their
+The 112 pages no change touched were not re-measured; their
 `geometry/NNN.json` was given the two new keys (`fold.template`,
 `fold.template_rms_mm` from `fit_fold` over the stored candidates, asserted
 to return the stored line to 1e-9; `edges.replaced = []`, asserted against
@@ -821,15 +853,16 @@ was wiped and `cut` run over all 200.
 
 ### The pages looked at (overlay and master, 12 %; the inner 40 mm at 1/5; strips at 600 dpi where it mattered)
 
-Right / wrong is about the master. **Wrong at the end: p111 only** (and p084's
-report). 62 pages:
+Right / wrong is about the master. **Wrong at the end: p111 (placement) and
+p005 (the fill)**. 62 pages:
 
 | page | what it is, what happened | verdict |
 |---|---|---|
 | p001 | front cover, odd, full-bleed (body 0.03): frame + prop edges; the crease cracks through the art, 25 candidates on it, template 4 at 14.3 mm; edges anchor | right |
 | p002 | Computerspiel-Riesen ad, even, no wordmark; first pass locked 18 crease specks at 10.5 mm, now the six holes (template 6) at 10.0 | right |
 | p003 / p004 | the inside-cover sheet, a black card of order forms, full-bleed (0.00): frame + prop; 6 holes at 12.7 / 10.3 | right |
-| p005 / p196 | one sheet; a coarse-screened picture across the fold — 643 / 1156 dot candidates, 216 / 204 inliers; the line is a dot column near the crease (10.3 / 10.0 mm), a lock but not a measurement; both have the wordmark, the master is placed by it | right (fold x not trusted) |
+| p005 | ad, odd, **no wordmark**, a coarse-screened picture whose left edge **is** the crease: 643 dot candidates (all at 8–16 mm — the picture; the neighbour's side is blank), 205 inliers on the line; looked at in 600 dpi strips at the three pair rows, the six holes sit on the picture's edge at 10.0–10.6 mm and the line runs through them (template 6, and with the prior its shift is on them): the fold is a measurement, 10.3 mm. The window is placed on it: the master's left edge is the picture's edge, its right edge 2.67 mm white (the outer trim is off the 217.8 mm frame). **What is wrong is the fill**: every candidate is painted white, and 518 of them are dots of the picture on the page side — 1137 mm², the picture's first ~5 mm along the whole inner edge scalloped away (55 % of the master's inner 8 mm is white); unknown 3.69 %, the sweep's highest | **wrong** — the fill, not the placement |
+| p196 | its sheet-mate, even, logo 0.95; the same picture in its frame at 0–11 mm from the inner edge, 1156 candidates, 204 inliers, the six holes among them at 9.8–10.6; 102 candidate discs on its own side — the picture's ~1 mm of bleed past the fold, gutter | right |
 | p009 | article, odd, logo 0.95; a satellite speck had joined the six (n=7, x 9.1); now the six, 10.5 | right |
 | p010, p093, p110, p150 | controls, ordinary logo pages: 6 / 5 / 6 / 6 holes at 8.1 / 9.8 / 8.8 / 13.0 | right |
 | p013 | maxell ad, odd, no wordmark; edges anchor, 6 holes at 10.2; the ad's address line sits on its trim | right |
@@ -847,7 +880,7 @@ report). 62 pages:
 | p067 | C64-Bibel ad, odd, no wordmark, **edges-anchored on a fold at 1.5 mm** (43 fragments) — the master was shifted 9 mm; now the six holes at 10.8 | wrong, then right |
 | p082 | article, even, logo 0.89; the column (5 fragments at 0.6) beat three scattered true holes; now no hole line and the colour fallback at 0.9 mm — the neighbour's column edge again, not the fold; the master is placed by the wordmark and the window takes the strip out | right (fold x wrong, harmless) |
 | p083 / p117 | article / classifieds, odd, logo 0.96 / 0.97; `fold none` at 0.5 (four holes, 0.8–0.9 across) → holes n=4 template 4 at 8.8 / 10.1 | right |
-| p084 | article, even, logo 0.93; the neighbour's column, 58 inliers at 1.5 mm, template 5 rms 0.36 — its four true holes are not collinear within 0.8 mm; **the one residual false lock**, harmless to the master | right (report wrong) |
+| p084 | article, even, logo 0.93; the neighbour's column, 58 inliers at 1.5 mm, template 5 rms 0.36 with its shift at 65.9 mm — the one fake the template let stand; the absolute prior (review round) refused that shift and the four true holes, collinear at 0.8 mm, are the fold at 12.9 mm, template 4 | right |
 | p086 | article, even, logo 0.93; 152 fragments, the column at 1.9 → the six at 13.5 | right |
 | p091 | article, odd; 36 at 0.7 → the six at 9.5 | right |
 | p092 | Interface-Inclusive ad, even, no wordmark: **a red band across the top, the top traced 15.2 mm down** and the band went white; the four true holes (pairs 1+2, span 103 mm) had been refused by the span rule. Now top from the frame, holes n=4 template 4 at 7.8 | wrong, then right |
@@ -878,9 +911,10 @@ the issue's median fold would reject those, and `measure` has no median; the
 hole fold's p5–p95 on this issue is 7.4–13.4 mm. Not changed: both pages
 have the wordmark and the fallback never decided a master here.
 
-**The 8609 reference** for the unknown percentiles stands; and the one page
-this variant cannot place is the one with no fold, no wordmark and a blank
-neighbour — p111 — which the report names.
+**The 8609 reference** for the unknown percentiles stands. Two masters are
+wrong at the end and the report names both: p111, the one page this variant
+cannot place (no fold, no wordmark, a blank neighbour), and p005, placed
+right and bitten by the fill along its inner 5 mm.
 
 ## Notes
 
