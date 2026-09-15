@@ -1,5 +1,7 @@
 # 010 — OCR the scans into measured blocks
 
+**Applies to:** all — every issue is OCR'd the same way; nothing in it knows the kind.
+
 **Goal:** turn the deskewed, matted, A4-cropped, graded **600 dpi masters** into
 one JSON per page describing every block on it: bbox, printed type size, indent,
 ink density, a geometric label, and the block's text with the printed line
