@@ -1739,7 +1739,7 @@ Watch `grep -c '^p[0-9]' /tmp/64er_8610_r005.log` and `df -h /tmp`. When done: `
 
 - [ ] **Step 6: Run the Verification block; look at every LOOK AT page**
 
-Run every numbered check from Step 2. For each page the fit report lists — no logo, no fold, unknown > 4 % — open `debug600/NNN.png` and `masters600/NNN.png` (scaled) and write one line per page into the rule's *What it read* section: what the page is, what happened, whether it is right. Typical: covers and full-page ads have no wordmark (fold+top anchor is expected); a page whose neighbour is a full-bleed ad may have `fold colour`.
+Run every numbered check from Step 2. For each page the fit report lists — no logo, no fold, unknown > 4 % — open `debug600/NNN.png` and `masters600/NNN.png` (scaled) and write one line per page into the rule's *What it read* section: what the page is, what happened, whether it is right. Typical: covers and full-page ads have no wordmark (the edges anchor is expected); a page whose neighbour is a full-bleed ad may have `fold colour`.
 
 If a class of failure appears (e.g. > 10 pages with `fold none`, or a logo false-positive locking onto a headline), that is a constant to re-measure or the template scoring from the spec to add — do it, re-run `measure` on the affected pages (`r005_masters_spread.py measure N …`), then `cut`, then re-verify. Record the numbers in the constant's comment.
 
@@ -1750,7 +1750,7 @@ If a class of failure appears (e.g. > 10 pages with `fold none`, or a logo false
 ## Step 005 (masters_spread) — ran and verified
 
 <date>. 200/200 masters at 4961x7016, grade <sha>. Fit: even S=… B=…, odd S=… B=….
-Anchor: logo N / fold+top N. Fold: holes N / colour N / none N. Unknown p50/p95: even …/…, odd …/….
+Anchor: logo N / edges N. Fold: holes N / colour N / none N. Unknown p50/p95: even …/…, odd …/….
 Pages looked at: … (one line each, in r005_masters_spread.md "What it read").
 
 ## Step 005 (masters_sheet) — not applicable — binding
