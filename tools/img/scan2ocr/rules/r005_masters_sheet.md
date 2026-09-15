@@ -126,7 +126,8 @@ scan_dir/NNN.png
   -> paper mask: distance from the profile's paper white
   -> is there enough paper here to trace from?          [picks the edge finder]
   -> check the torn side against parity                     [the parity gate]
-  -> rotate to level, then RE-MEASURE the residual and assert it is ~0
+  -> rotate to level, then RE-MEASURE the residual; still too high after one
+     retry, NOTE it and publish anyway
   -> TRACE each page edge as a line, robustly:
        PAPER vs BED, 144 pages:
          clean edges  -> band MEDIANS of the per-row/col paper boundary
@@ -136,9 +137,11 @@ scan_dir/NNN.png
        INK vs BED, the 8 pages not printed on this issue's paper:
          all four edges -> band MEDIANS of the sheet's own boundary against
                            the bed, the sheet found as one connected region
-  -> fill everything outside the traced page with paper white
+  -> fill everything outside the traced page with paper white -- AFTER the
+     2400 dpi separation, on the 600 dpi reduce, not before it
   -> drop bed components that touch the frame AND lie mostly outside the page
-  -> the traced page must match one of PAGE_CLASSES          [the size gate]
+  -> the traced page is checked against PAGE_CLASSES -- no match publishes
+     NOT CROPPED instead of a crop
   -> separate to CMYK with tools/img/cmyk_reconstruction at 2400, UNDO its GCR
      (printed black is all four inks, not K alone — that is why type is black)
   -> ONE render, uncurved: masters2400, reduced 4:1 to sheets600, cut to the
@@ -318,10 +321,11 @@ the same file `r010` OCRs, so a curve on the master is a curve on every
 published figure, and a curve crushes photographs. The uncurved render is the
 master; the `-level 30%,100%` curve and the second render are gone.
 
-**The grade is measured and REPORTED, never gated.** Two numbers go in every
-page's log line — ink kept vs the raw scan, and the darkest ink's contrast to
-paper. A gate on ink-keep once failed 10 of 152 pages and was wrong on all 10
-(tint-heavy pages whose screened tint correctly demodulated into a flat fill).
+**The grade is measured and REPORTED, never gated.** Up to two numbers go in
+every page's log line — ink kept vs the raw scan (only when the raw scan had
+ink to measure), and the darkest ink's contrast to paper. A gate on ink-keep
+once failed 10 of 152 pages and was wrong on all 10 (tint-heavy pages whose
+screened tint correctly demodulated into a flat fill).
 
 ## The stamp — every artefact says which grade made it
 
@@ -355,8 +359,10 @@ Detecting a stale master is now a string comparison — see Verification step 5.
 Parity, skew residual, page class, canvas fit and the grade are measured and
 NOTED — in the page's log line and in its stamp — and the page is published. A
 page that matches no size class is published as the whole levelled sheet with
-`NOT CROPPED` in its stamp. The only thing that stops a page is a missing input
-file.
+`NOT CROPPED` in its stamp. What still stops a page: a missing input file, or a
+frame with no edge to fit at all — no bed touching the frame, the frame all bed
+edge to edge, an empty sheet region, or too few edge samples to fit a trace
+line. Every measured quantity is noted, never gated.
 
 ## The parity gate
 
@@ -575,8 +581,9 @@ longer applies.
 
 ## Known outliers — two pages of 152 do not trace
 
-Since 7b9aa90b neither page fails: 117 publishes the whole levelled sheet with
-`NOT CROPPED`, 007 publishes its trace with a note.
+Since 7b9aa90b neither page fails: both 117 and 007 publish the whole levelled
+sheet with `NOT CROPPED` in its stamp — 007's 304.0 mm trace is outside the A4
+window (297 ± 6), so `page_class()` finds no match for it either.
 
 Seven pages used to fail. Six of them were not outliers at all, only pages
 printed on the **other stock** in this issue, and they now trace from ink vs bed
@@ -610,12 +617,14 @@ bottom lines are fitted from that narrow base. The sheet is also **flush with
 the frame at the top** (nothing above the red banner), so the head trace lands
 at 0 and every millimetre of error at the foot goes straight into the height.
 `debug600/007.png` shows it: three lines on the trim, and the foot line down in
-the prop.
+the prop. 304.0 mm is past the A4 window's 303 mm ceiling, so `page_class()`
+matches nothing and 007 publishes the same way 117 does: the whole levelled
+sheet, `NOT CROPPED`.
 
 This one is worth re-measuring rather than deciding — the fix is a better rule
-for which columns carry a top/bottom sample, not a looser gate — but it is one
-page and the constants that would change are the ones 006, 041, 056 and 092 were
-verified against.
+for which columns carry a top/bottom sample, not a looser size window — but it
+is one page and the constants that would change are the ones 006, 041, 056 and
+092 were verified against.
 
 ### 117 and 007 are published, not deleted
 
