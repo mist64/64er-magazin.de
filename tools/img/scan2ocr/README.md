@@ -50,8 +50,8 @@ re-measure the baseline before claiming an improvement against an older figure.
   once for the issue — because its A4 window is one fit per parity over the
   wordmark anchors of every page. `r005_masters_spread.sh` runs both.
 
-Paths are constants at the top of each file — `SRC_DIR`, `OUT_DIR` — pointing at
-the working issue. Change them there, per issue; there is no flag.
+The one per-issue knob is `ISSUE` at the top of `rules/r000_issue.py`; every
+step derives its paths from `issues/<ISSUE>/issue.json`. There is no flag.
 
 ---
 

@@ -240,7 +240,12 @@ def outer_edges(rgb, par):
 # the fold that survives on every sheet, and they are on the SAME line as the
 # crease (seen on p100 at thumb scale).  MEASURED on 8610's sheets600 (the
 # graded 600 dpi sheet, paper ~230, the holes 16-31 at their darkest), p100
-# and p101 -- the two halves of one sheet, so the same six holes twice:
+# and p101 -- the two halves of one sheet, so the same six holes twice.  The
+# finder itself runs earlier, on the levelled UNGRADED sheet (see measure()
+# and measure_geometry()'s "read the sheet before the grade" note below); the
+# full 200-page sweep found the fold there on 196/200 pages, so the
+# thresholds below hold on the ungraded grey, not just on the graded PNG they
+# were read off:
 #
 #     where      8.3-10.5 mm in from the frame edge on p100, 10.1-12.2 on
 #                p101 -- NOT the ~20 mm the thumbs suggested.  The nearest
@@ -556,7 +561,10 @@ LOGO_BAND_BOT_MM = 5.0       # baseline at h-420..h-300 px (13-18 mm); 8610's
                              # the band is not clipped to the prop line
 LOGO_CORNER_FRAC = 0.48      # ...and this fraction of the width, from the outer edge
 LOGO_SCORE_MIN = 0.5         # 8609 accepted 0.42 with an angle sweep; here the
-                             # page is level.  MEASURED on 8610's sheets600:
+                             # page is level.  MEASURED on 8610's sheets600
+                             # (the graded PNG on disk, read for these figures;
+                             # find_logo() itself runs earlier, on the levelled
+                             # UNGRADED sheet -- see measure_geometry()):
                              # p010 0.941, p011 0.933 (the wordmark, 26.5 /
                              # 20.9 mm in from the outer edge); p100 and p101
                              # are ad pages without one and their best window
@@ -564,6 +572,10 @@ LOGO_SCORE_MIN = 0.5         # 8609 accepted 0.42 with an angle sweep; here the
                              # logo'd pages is 0.247 / 0.234.  0.5 sits in
                              # the gap between the ceiling of a page without
                              # the wordmark (~0.29) and the floor of one with.
+                             # The full 200-page sweep found the wordmark on
+                             # 145/200 pages with no false positive found
+                             # among the 62 pages looked at, so this threshold
+                             # holds on the ungraded grey the finder reads.
 NCC_SIGMA_MIN = 1.0          # grey levels: a window with less texture than this
                              # per pixel has no score (see ncc)
 
@@ -718,8 +730,9 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
                          f"colour boundary -- the inner side is not cut")
     logo = find_logo(gray, par, tmpl)
     if logo is None:
-        notes.append("LOGO not found -- the window is anchored on fold x and "
-                     "bottom-trim y instead")
+        notes.append("LOGO not found -- the window is anchored on the fold "
+                     "(or the inner frame edge when there is no fold) and "
+                     "the bottom trim instead")
     return {
         "page": page, "parity": par, "sheet_px": [w, h],
         "skew": {"angle": angle, "residual": residual},
@@ -993,7 +1006,8 @@ def cut():
             "anchor": (f"logo ({ax:.0f}, {ay:.0f}) score {g['anchor']['score']:.2f}"
                        if source == "logo" else
                        f"edges: window top-left ({ax:.0f}, {ay:.0f}) from fold + bottom trim"),
-            "window": f"S {fit[g['parity']][0]} B {fit[g['parity']][1]} ({g['parity']})",
+            "window": f"S {fit[g['parity']][0]} B {fit[g['parity']][1]} ({g['parity']})"
+                      + ("" if source == "logo" else " -- not used: edges anchor"),
             "unknown": f"{frac:.2%} of the window is fabricated white",
             "notes": "; ".join(notes) or "(none)",
         })

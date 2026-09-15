@@ -49,6 +49,14 @@ So every frame holds, measured on the 150 dpi thumbs of pages 10/11, 50/51,
 | on the fold | **6 clip holes** — 3 vertical pairs, dark teardrops on a faint crease | 8.3–10.5 mm in from the inner frame edge on p100, 10.1–12.2 on p101 (NOT the ~20 mm the thumbs suggested); 0.42–1.06 mm **across** the crease and 0.51–2.84 mm **along** it (the punch tore the paper along the fold; two of the six are over 2 mm long), aspect up to 3.72, filled 0.51–0.71 of their box; 155–184 grey levels below their surround on the graded sheet, where paper is ~230 and the holes 16–31 at their darkest |
 | the nearest type to the holes | an ad column on p100 | 19.2 mm in on p100, ~22 on p101 — a 7 mm gap between the farthest hole and the nearest type |
 
+The grey levels above were read off `sheets600`, the **graded** PNG, because
+that is what is visible on disk; the fold and logo finders themselves run
+earlier, in `measure()`, on the levelled **UNGRADED** 600 dpi sheet (*The two
+variants*, and `measure_geometry`'s own comment). The full 200-page sweep
+proved the thresholds hold there, on the ungraded grey the finders actually
+read: fold found on 196/200 pages, wordmark on 145/200, with no false
+positive found among the 62 pages looked at (*What it read, on the full sweep*).
+
 Sheet pairing is `k ↔ 201−k`. Parity: **even page → neighbour on the RIGHT,
 odd → LEFT** (the same as 8609).
 
@@ -460,7 +468,7 @@ the page line), the stamp's `notes` field, the overlay's text and the JSON's
 | `EDGES top|bot|outer from the frame|prop: the paper trace ran n.n mm in at ±n.nn deg -- ink to the trim` | a traced edge was beyond `EDGE_*_MAX_MM` or tilted over `EDGE_TILT_MAX`; that edge is the frame's (the prop's, for the bottom) |
 | `FOLD from the neighbour's colour boundary (n bands, residual n.nn mm) -- n hole candidates did not fit a line` | no hole line; the fallback found the neighbour's boundary |
 | `FOLD not found: n hole candidates, no colour boundary -- the inner side is not cut` | neither |
-| `LOGO not found -- the window is anchored on fold x and bottom-trim y instead` | the best NCC window scored under `LOGO_SCORE_MIN` |
+| `LOGO not found -- the window is anchored on the fold (or the inner frame edge when there is no fold) and the bottom trim instead` | the best NCC window scored under `LOGO_SCORE_MIN` |
 | `ANCHOR from the page edges (fold + bottom trim): the wordmark was not found` | `cut`'s own, on every page without a wordmark (so it accompanies `LOGO not found`) |
 
 ### `geometry/NNN.json`
@@ -551,6 +559,15 @@ neighbours, whose placement on the scanner is unrelated to this page's. The
 stamp says `anchor edges: window top-left (x, y) from fold + bottom trim`, the
 page gets a NOTE, and `fit.json` lists it under `anchor: edges`.
 
+The design spec (`docs/superpowers/specs/2026-09-15-8610-r005-masters-spread-design.md`
+§3.3 item 2) said fold x and **top**-trim y; this rule anchors the foot on the
+**bottom** trim instead. That is a deliberate change, not a drift from the
+spec: the top trace is exactly the edge a full-bleed page does not have (it is
+traced from ink running to the trim, which a full-bleed picture has none of),
+while the prop at the foot exists under every sheet regardless of what is
+printed on it, so the bottom trim is the one edge every page — full-bleed or
+not — actually has to anchor on.
+
 ### The fills
 
 Everything the master should not show is painted **255 white** on the page's
@@ -593,7 +610,9 @@ over the grade block the sheet rule describes: `page`, `phase cut`,
 count, template matches on a hole fold, tilt), `holes` (`n filled of m
 candidates`), `anchor` (`logo (x, y) score
 0.95`, or `edges: window top-left (x, y) from fold + bottom trim`), `window`
-(`S B (parity)`), `unknown` (`n.nn% of the window is fabricated white`) and
+(`S B (parity)`, followed by `-- not used: edges anchor` on a page placed on
+its physical edges rather than the fit — the fit ran, but this page's window
+did not come from it), `unknown` (`n.nn% of the window is fabricated white`) and
 `notes` — every NOTE `measure` made plus `cut`'s own. Detecting a stale master
 is a string comparison on `grade-sha`, Verification check 4.
 
