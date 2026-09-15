@@ -1248,7 +1248,7 @@ git commit -m "r005_masters_spread: measure writes geometry/NNN.json and the deb
 - Modify: `tools/img/scan2ocr/rules/r005_masters_spread.py`, `tools/img/scan2ocr/tests/test_r005_spread.py`
 
 **Interfaces:**
-- Produces: `unknown_mask(geom, scale=1) -> bool[h/scale, w/scale]` (True = not this page: beyond the traced edges, beyond the fold, hole discs); `anchor_of(geom) -> (x, y, source)`; `fit_window(geoms) -> dict(even=(S, B), odd=(S, B), stats)`; `cut_page(geom, fit) -> (master uint8[7016, 4961, 3], unknown_frac, notes)`; `cut()`; constants `FIT_SCALE = 4`, `FIT_S_RANGE`, `FIT_B_RANGE_MM`, `FOLD_INSET_MM = 0.0`, `HOLE_FILL_R_MM`.
+- Produces: `unknown_mask(geom, scale=1) -> bool[h/scale, w/scale]` (True = not this page: beyond the traced edges, beyond the fold, hole discs); `anchor_of(geom) -> ("logo", ax, ay) | ("edges", x0, y0)`; `fit_window(geoms) -> dict(even=(S, B), odd=(S, B), stats)`; `cut_page(geom, fit) -> (master uint8[7016, 4961, 3], unknown_frac, notes)`; `cut()`; constants `FIT_SCALE = 4`, `FIT_S_RANGE`, `FIT_B_RANGE_MM`, `FOLD_INSET_MM = 0.0`, `HOLE_FILL_R_MM`.
 
 - [ ] **Step 1: Failing tests**
 
@@ -1301,6 +1301,17 @@ def test_fit_window_recovers_the_layout():
         S_, B_ = fit[par]
         assert abs(S_ - (ax - x0)) < tol, (par, S_, ax - x0)
         assert abs(B_ - (ay - y0)) < tol, (par, B_, ay - y0)
+
+
+def test_anchor_of_without_logo_places_window_on_fold_and_foot():
+    g = synthetic_geom(100, logo=False)
+    source, x0, y0 = S.anchor_of(g)
+    assert source == "edges"
+    assert abs(x0 - (g["fold"]["poly"][1] - S.MASTER_W_PX)) < 1
+    assert abs(y0 - (g["edges"]["bot"][1] - S.MASTER_H_PX)) < 1
+    g = synthetic_geom(101, logo=False)
+    source, x0, y0 = S.anchor_of(g)
+    assert abs(x0 - g["fold"]["poly"][1]) < 1
 
 
 def test_cut_page_is_a4_and_white_where_unknown():
@@ -1367,16 +1378,22 @@ def unknown_mask(geom, scale=1):
 
 
 def anchor_of(geom):
-    """(x, y, source) in sheet px: the wordmark, else fold x and top-trim y."""
+    """("logo", ax, ay) -- the wordmark, placed through the parity's (S, B) --
+    or ("edges", x0, y0) -- the window's own top-left, placed directly on the
+    page's PHYSICAL edges: its inner edge on the fold and its foot on the
+    bottom trim (the prop's top).  The second is for pages without a wordmark
+    -- covers, full-page ads -- and uses no fit at all: the two edges it needs
+    are the two every page has, whatever its ink."""
     if geom["anchor"]:
-        return geom["anchor"]["x"], geom["anchor"]["y"], "logo"
+        return "logo", geom["anchor"]["x"], geom["anchor"]["y"]
     w, h = geom["sheet_px"]
-    top_y = float(np.polyval(geom["edges"]["top"], w / 2))
+    bot_y = float(np.polyval(geom["edges"]["bot"], w / 2))
     if geom["fold"]["poly"]:
         fold_x = float(np.polyval(geom["fold"]["poly"], h / 2))
     else:
         fold_x = float(w - 1 if geom["parity"] == "even" else 0)
-    return fold_x, top_y, "fold+top"
+    x0 = fold_x - MASTER_W_PX if geom["parity"] == "even" else fold_x
+    return "edges", x0, bot_y - MASTER_H_PX
 
 
 def _window_sums(u, W, H):
@@ -1433,9 +1450,12 @@ def cut_page(geom, fit, sheet600):
     """The master: sheet600 with the unknown painted white, cut to the window."""
     notes = list(geom["notes"])
     w, h = geom["sheet_px"]
-    ax, ay, source = anchor_of(geom)
-    S_, B_ = fit[geom["parity"]]
-    x0, y0 = int(round(ax - S_)), int(round(ay - B_))
+    source, ax, ay = anchor_of(geom)
+    if source == "logo":
+        S_, B_ = fit[geom["parity"]]
+        x0, y0 = int(round(ax - S_)), int(round(ay - B_))
+    else:
+        x0, y0 = int(round(ax)), int(round(ay))
     u = unknown_mask(geom)
     painted = sheet600[:h, :w].copy()
     painted[u] = 255
@@ -1448,7 +1468,8 @@ def cut_page(geom, fit, sheet600):
         unk[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = u[sy0:sy1, sx0:sx1]
     frac = float(unk.mean())
     if source != "logo":
-        notes.append(f"ANCHOR from {source}: the wordmark was not found")
+        notes.append("ANCHOR from the page edges (fold + bottom trim): the "
+                     "wordmark was not found")
     return master, frac, notes
 
 
@@ -1464,7 +1485,7 @@ def cut():
         stem = f"{g['page']:03d}"
         sheet = np.array(Image.open(OUT_SHEET600 / f"{stem}.png").convert("RGB"))
         master, frac, notes = cut_page(g, fit, sheet)
-        ax, ay, source = anchor_of(g)
+        source, ax, ay = anchor_of(g)
         stamp = stamp_text(VARIANT, **{
             "page": f"{stem} of {ISSUE}", "phase": "cut",
             "master-px": f"{MASTER_W_PX} {MASTER_H_PX}",
@@ -1472,8 +1493,9 @@ def cut():
             "fold": f"{g['fold']['source']} n={g['fold']['n']}"
                     + (f" tilt {g['fold']['tilt_deg']:+.2f} deg" if g["fold"]["poly"] else ""),
             "holes": str(len(g["holes"])),
-            "anchor": f"{source} ({ax:.0f}, {ay:.0f})"
-                      + (f" score {g['anchor']['score']:.2f}" if g["anchor"] else ""),
+            "anchor": (f"logo ({ax:.0f}, {ay:.0f}) score {g['anchor']['score']:.2f}"
+                       if source == "logo" else
+                       f"edges: window top-left ({ax:.0f}, {ay:.0f}) from fold + bottom trim"),
             "window": f"S {fit[g['parity']][0]} B {fit[g['parity']][1]} ({g['parity']})",
             "unknown": f"{frac:.2%} of the window is fabricated white",
             "notes": "; ".join(notes) or "(none)",
@@ -1490,7 +1512,7 @@ def cut():
 ```
 Replace the `raise SystemExit("cut: not built yet")` in `__main__` with `cut()`.
 
-- [ ] **Step 4: Run — expect 16 passed**
+- [ ] **Step 4: Run — expect 17 passed**
 
 - [ ] **Step 5: Cut the six measured pages**
 
