@@ -58,14 +58,40 @@ def test_outer_edges_fullbleed_uses_frame_and_prop():
     assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 1e-9
     assert abs(np.polyval(e["bot"], w / 2) - (h - 7.0 * MM)) < 3
     assert abs(S.tilt(e["bot"])) < 0.05
+
+
+def test_outer_edges_ink_to_the_trim_takes_the_frame_for_that_edge_only():
+    """p092 on the sweep: a 0.80-paper page with a red band across its top
+    15 mm; the trace put the top 15 mm down and the master lost the band.
+    The band is ink, not bed: the top comes from the frame, the other two
+    edges stay traced, and the page is not full-bleed."""
+    a = synthetic_frame("even")
+    h, w = a.shape[:2]
+    a[int(1.0 * MM):int(16.0 * MM)] = (200, 30, 40)
+    e = S.outer_edges(a, "even")
+    assert e["source"] == "paper" and e["body"] > S.FULLBLEED_BODY_FRAC
+    assert [r[0] for r in e["replaced"]] == ["top"]
+    assert 14 < e["replaced"][0][1] < 17                        # the trace's depth, mm
+    assert list(e["top"]) == [0.0, 0.0]
+    assert abs(np.polyval(e["bot"], w / 2) - (h - 7.0 * MM)) < 3
+    assert abs(np.polyval(e["outer"], h / 2) - 0) < 3
+    # p149: a black column on the outer side -- the outer edge is the frame
+    a = synthetic_frame("odd")
+    a[:, w - int(14.0 * MM):] = (20, 20, 20)
+    e = S.outer_edges(a, "odd")
+    assert [r[0] for r in e["replaced"]] == ["outer"]
+    assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 1e-9
     assert list(S.outer_edges(a, "even")["outer"]) == [0.0, 0.0]
 
 
-def with_holes(a, par, fold_from_edge_mm=10.0, ys_mm=(30, 43, 130, 143, 230, 243),
+CLIP_YS_MM = tuple(59.0 + t for t in S.HOLE_TEMPLATE_MM)   # the clip, where 8610's pages have it
+
+
+def with_holes(a, par, fold_from_edge_mm=10.0, ys_mm=CLIP_YS_MM,
                d_mm=0.7, x_jitter_mm=0.1):
     """Six 0.7 mm holes on a line fold_from_edge_mm in from the inner frame
     edge -- 10 mm, where 8610's sheets600 have them (MEASURED 8.3-12.2 on
-    p100/p101), inside S.HOLE_BAND_MM."""
+    p100/p101), inside S.HOLE_BAND_MM, at the clip template's spacing."""
     h, w = a.shape[:2]
     x = (w - fold_from_edge_mm * MM) if par == "even" else fold_from_edge_mm * MM
     r = d_mm * MM / 2
@@ -98,7 +124,7 @@ def test_find_holes_ignores_type_and_rules():
 def test_fit_fold_line():
     a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even")
     h = a.shape[0]
-    fold = S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even"), h)
+    fold = S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even"))
     assert fold is not None and fold["n"] == 6
     assert abs(np.polyval(fold["poly"], h / 2) - x) < 0.2 * MM
     assert abs(S.tilt(fold["poly"])) < 0.1
@@ -106,9 +132,43 @@ def test_fit_fold_line():
 
 def test_fit_fold_refuses_three_holes():
     a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even",
-                      ys_mm=(30, 43, 130))
-    assert S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even"),
-                      a.shape[0]) is None
+                      ys_mm=CLIP_YS_MM[:3])
+    assert S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even")) is None
+
+
+def test_fit_fold_accepts_two_pairs_of_the_clip():
+    """Pairs 1+2 span 103 mm, under half the height: the template, not a
+    span rule, is what admits them (p092, p109, p124 on the sweep)."""
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even",
+                      ys_mm=CLIP_YS_MM[:4])
+    h = a.shape[0]
+    fold = S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even"))
+    assert fold is not None and fold["n"] == 4 and fold["template"] == 4
+    assert abs(np.polyval(fold["poly"], h / 2) - x) < 0.2 * MM
+
+
+def test_fit_fold_refuses_six_holes_off_the_template():
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even",
+                      ys_mm=(30, 43, 130, 143, 230, 243))
+    assert S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even")) is None
+
+
+def test_fit_fold_prefers_the_clip_to_a_neighbour_column():
+    """The sweep's false lock: the neighbour's justified column edge, clipped
+    by the frame, leaves 20+ line-end fragments collinear to 0.1 mm at 1-2 mm
+    from the frame edge -- more 'holes' than the clip has.  The template
+    must win, not the count."""
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even")
+    h, w = a.shape[:2]
+    for k in range(24):                                   # a 1 mm 'comma' every 11.7 mm
+        y = int((25 + 11.7 * k) * MM)
+        cx = w - int(1.5 * MM)
+        a[y:y + int(1.0 * MM), cx - int(0.4 * MM):cx + int(0.4 * MM)] = (20, 18, 18)
+    holes = S.find_holes(a.mean(2).astype(np.uint8), "even")
+    assert len(holes) == 30
+    fold = S.fit_fold(holes)
+    assert fold is not None and fold["template"] == 6 and fold["n"] == 6
+    assert abs(np.polyval(fold["poly"], h / 2) - x) < 0.2 * MM
 
 
 def test_neighbour_boundary_finds_colour_step():
@@ -195,9 +255,10 @@ def synthetic_geom(page, w=5500, h=7300, fold_from_edge_mm=20.0, logo=True,
             "skew": {"angle": 0.0, "residual": 0.0},
             "edges": {"top": [0.0, 1.0 * MM], "bot": [0.0, h - 7.0 * MM],
                       "outer": [0.0, 0.0 if par == "even" else w - 1.0],
-                      "source": "paper", "body": 0.9},
+                      "source": "paper", "body": 0.9, "replaced": []},
             "fold": {"source": "holes", "poly": [0.0, fold_x], "n": 6,
-                     "residual_mm": 0.1, "tilt_deg": 0.0},
+                     "residual_mm": 0.1, "template": 6, "template_rms_mm": 0.1,
+                     "tilt_deg": 0.0},
             "holes": [[fold_x, 40 * MM, 0.7]],
             "anchor": ({"source": "logo", "x": int(ax), "y": int(h - anchor_dy_mm * MM),
                         "score": 0.9, "bbox": [0, 0, 0, 0]} if logo else None),

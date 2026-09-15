@@ -11,7 +11,7 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-python3}"
 cd "$DIR"
-# The page count follows the ISSUE constant in r010_ocr_blocks.py, asked of the
+# The page count follows the ISSUE constant in r000_issue.py, asked of the
 # program itself rather than repeated here -- a second place to say how long the
 # issue is is a second place to forget.  The literal 176 this replaces was
 # 8609's, and would have run 24 pages past the end of a 152-page Sonderheft.

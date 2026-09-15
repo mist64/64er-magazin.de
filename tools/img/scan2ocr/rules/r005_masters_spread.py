@@ -137,6 +137,26 @@ def parity(page):
 # holes) and neighbour_boundary() (the fallback).
 EDGE_INSET_MM = 0.3          # inside its own line, as the sheet variant
 FULLBLEED_BODY_FRAC = 0.15   # in the gap between 0.023 (p001) and 0.414 (p100)
+# A page that is NOT full-bleed can still carry ink to the trim on one side,
+# and there the paper trace follows the ink's inner boundary, not the trim.
+# MEASURED on the full 8610 sweep: p027 (a purple ad ground) traced its top
+# 27.2 mm down and its bottom 15.7 mm up at -4.05 deg; p092 (a red band at
+# the top of a 0.80-paper page) its top 15.2 mm down at +2.49 deg; p149 (a
+# black column) its outer edge 13.5 mm in at +0.96 deg; p177 its bottom 16.4
+# mm up at -5.97 deg; p057 its outer edge at -1.49 deg into a photo -- and
+# the masters were painted white there.  The body fraction cannot see this
+# (p092 is 0.80 paper).  The FRAME can: it is 304.3 mm high for 297 of page
+# and 7 of prop, so on the 195 sound pages the top trim sits 0-1.1 mm below
+# the frame's top, the bottom 6.4-9.4 mm above its foot, the outer trim
+# 0-5.7 mm in (the frame's slack over A4 beyond the fold is at most 8 mm),
+# and no sound edge tilts more than 0.82 deg on a levelled page.  A traced
+# edge beyond those is ink, and that edge alone -- not the page -- takes the
+# full-bleed line (the frame row / column, the prop's top), NOTEd, with the
+# other two traces kept.
+EDGE_TOP_MAX_MM = 3.0        # traced top further below the frame's top than this: ink
+EDGE_BOT_MAX_MM = 12.0       # traced bottom further above the frame's foot than this: ink
+EDGE_OUTER_MAX_MM = 8.0      # traced outer edge further into the frame than this: ink
+EDGE_TILT_MAX = 1.0          # deg; a levelled page's trim is level
 PROP_FOOT_MM = 15.0          # the prop's top is looked for this far up from the foot
 PROP_AT_FOOT_MM = 2.0        # ...in columns whose prop starts within this of it
 
@@ -179,20 +199,39 @@ def outer_edges(rgb, par):
     h, w = mask.shape
     body = float(min((mask.mean(1) > BODY_PAPER_FRAC).mean(),
                      (mask.mean(0) > BODY_PAPER_FRAC).mean()))
+    frame = {"top": np.array([0.0, 0.0]),
+             "outer": np.array([0.0, 0.0 if par == "even" else w - 1.0])}
     if body >= FULLBLEED_BODY_FRAC:
         try:
             rows, starts, ends, cols, tops, bots = boundaries(mask)
-            return {"top": trace(tops, cols, CLEAN_PCT, MM),
-                    "bot": trace(bots, cols, CLEAN_PCT, MM),
-                    "outer": trace(starts if par == "even" else ends, rows, CLEAN_PCT, MM),
-                    "source": "paper", "body": body}
+            e = {"top": trace(tops, cols, CLEAN_PCT, MM),
+                 "bot": trace(bots, cols, CLEAN_PCT, MM),
+                 "outer": trace(starts if par == "even" else ends, rows, CLEAN_PCT, MM),
+                 "source": "paper", "body": body, "replaced": []}
+            # each edge against the frame: how far in, and how tilted
+            top_in = np.polyval(e["top"], w / 2) / MM
+            bot_in = (h - 1 - np.polyval(e["bot"], w / 2)) / MM
+            ox = np.polyval(e["outer"], h / 2)
+            outer_in = (ox if par == "even" else w - 1 - ox) / MM
+            for key, depth, limit in (("top", top_in, EDGE_TOP_MAX_MM),
+                                      ("bot", bot_in, EDGE_BOT_MAX_MM),
+                                      ("outer", outer_in, EDGE_OUTER_MAX_MM)):
+                t = tilt(e[key])
+                if depth > limit or abs(t) > EDGE_TILT_MAX:
+                    e["replaced"].append([key, float(depth), float(t)])
+                    if key == "bot":
+                        pt = prop_top(rgb)
+                        e["bot"] = np.array([0.0, h - 1.0]) if pt is None else pt
+                    else:
+                        e[key] = frame[key]
+            return e
         except PageFailed:
             pass
     bot = prop_top(rgb)
-    return {"top": np.array([0.0, 0.0]),
+    return {"top": frame["top"],
             "bot": np.array([0.0, h - 1.0]) if bot is None else bot,
-            "outer": np.array([0.0, 0.0 if par == "even" else w - 1.0]),
-            "source": "fullbleed", "body": body}
+            "outer": frame["outer"],
+            "source": "fullbleed", "body": body, "replaced": []}
 
 
 # --- the fold: the clip holes --------------------------------------------
@@ -229,13 +268,40 @@ HOLE_LONG_MAX_MM = 4.0       # ALONG it (measured 0.51-2.84; next up is 16 mm)
 HOLE_FILL_MIN = 0.40         # area / bbox: a teardrop, not a line fragment
 HOLE_ASPECT_MAX = 4.5        # long/short: measured <= 3.72; a clipped printed rule reads 5.2+
 # The line through them: at least this many holes, within this of the line,
-# spanning this fraction of the page height, and near-vertical.  Six holes on a
-# rigid clip give a line to a fraction of a millimetre; three do not tell a
-# column of bullets from a clip.
-FOLD_TOL_MM = 0.5
+# and near-vertical (the clip is rigid and the sheet is levelled).  The
+# tolerance is ACROSS the crease, where a torn hole's centre of mass moves:
+# MEASURED on the sweep, the four holes of p064, p083, p117 and p137 sit
+# 0.8-0.9 mm apart across the line and no line held them at 0.5 mm (fold
+# none on all four, two of them without a wordmark to place the window by);
+# at 0.8 all four fit, no page moves more than 0.4 mm, and the template
+# below -- not this tolerance -- is what keeps a text column out.
+FOLD_TOL_MM = 0.8
 FOLD_MIN_HOLES = 4
-FOLD_MIN_SPAN = 0.5
 FOLD_TILT_MAX = 1.0          # deg
+# WHICH line: the one that matches the clip's rigid 3-pair TEMPLATE, not the
+# one with most holes.  MEASURED on the full 8610 sweep: with "most inliers
+# wins" 25 of 200 pages locked on the NEIGHBOUR's justified column edge --
+# the line-end hyphens, commas and letter fragments that the inner frame
+# edge clips off, 0.4-3.7 mm in, hole-shaped and collinear to 0.1 mm, 15-152
+# of them against six holes (p061 22 at 0.6 mm, p086 64 at 1.9, p189 50 at
+# 2.3; the true holes on every one of those pages at 8.5-14.8 mm).  The six
+# holes' y positions, over 75 pages where the six were the line's only
+# inliers: gaps 13.35 / 76.27 / 13.30 / 66.44 / 13.59 mm, sd 0.14-0.19 mm,
+# and no page's six deviate more than 0.41 mm (p95 0.30) from the template
+# below once it is shifted onto them.  A line SCORES the template: for every
+# "inlier k is hole j" hypothesis, how many of the six positions have an
+# inlier within HOLE_TEMPLATE_TOL_MM, and the RMS of those offsets; the
+# best hypothesis is the line's score.  Matches, then RMS, then inliers,
+# then residual decide; under HOLE_TEMPLATE_MIN matches a line is not a
+# fold.  A neighbour column fakes at most 5 matches at RMS 0.31-0.45 (the
+# six pages where it reaches 5: p084, 086, 091, 187, 189, 193), the holes
+# score 6 there, and 5 true holes fit at RMS <= 0.30.  Four matches replace
+# the old half-height span rule: pairs 1+2 span 103 mm and are the clip
+# (p092, p109, p124 -- their other holes are off the line or under type);
+# four random specks in 0.75 mm of four template positions are not.
+HOLE_TEMPLATE_MM = (0.0, 13.35, 89.62, 102.92, 169.36, 182.95)
+HOLE_TEMPLATE_TOL_MM = 0.75  # measured max 0.41, p95 0.30
+HOLE_TEMPLATE_MIN = 4        # matches; 6 on an ordinary page, 4-5 with a torn or inked-over hole
 
 
 def find_holes(gray, par):
@@ -274,19 +340,38 @@ def find_holes(gray, par):
     return holes
 
 
-def fit_fold(holes, h):
-    """The line most holes agree on, or None.
+def template_score(ys):
+    """(matches, rms_mm) of the clip template on the inlier y's (px): the best
+    over every 'inlier k is template hole j' shift."""
+    ys = np.sort(np.asarray(ys, float) / MM)
+    t = np.asarray(HOLE_TEMPLATE_MM)
+    pos = (ys[:, None] - t[None, :]).ravel()[:, None] + t[None, :]   # (n*6, 6)
+    idx = np.searchsorted(ys, pos)
+    lo = ys[np.clip(idx - 1, 0, len(ys) - 1)]
+    hi = ys[np.clip(idx, 0, len(ys) - 1)]
+    dev = np.minimum(np.abs(pos - lo), np.abs(pos - hi))
+    hit = dev <= HOLE_TEMPLATE_TOL_MM
+    m = hit.sum(1)
+    best = np.flatnonzero(m == m.max())
+    rms = np.array([math.sqrt((dev[b][hit[b]] ** 2).mean()) for b in best])
+    return int(m.max()), float(rms.min())
 
-    Every pair of holes proposes a line x = a*y + b; the proposal with the most
-    holes within FOLD_TOL_MM wins, ties broken by residual; the winner is
-    refitted by least squares over its inliers.  A proposal steeper than
-    FOLD_TILT_MAX or whose inliers span less than FOLD_MIN_SPAN of the height
-    is not a fold: a clip is rigid and the sheet is levelled.
+
+def fit_fold(holes):
+    """The line that matches the clip template, or None.
+
+    Every pair of holes proposes a line x = a*y + b (dropped if steeper than
+    FOLD_TILT_MAX); the holes within FOLD_TOL_MM are its inliers, and a
+    proposal with fewer than FOLD_MIN_HOLES is not scored.  Each distinct
+    inlier set is scored against HOLE_TEMPLATE_MM; the most template matches
+    win, then the smallest template RMS, then the most inliers, then the
+    smallest residual; fewer than HOLE_TEMPLATE_MIN matches is no fold.  The
+    winner is refitted by least squares over its inliers.
     """
     if len(holes) < FOLD_MIN_HOLES:
         return None
     pts = np.array([(cx, cy) for cx, cy, _ in holes])
-    best = None
+    seen, best = set(), None
     for i in range(len(pts)):
         for j in range(i + 1, len(pts)):
             (x1, y1), (x2, y2) = pts[i], pts[j]
@@ -301,20 +386,23 @@ def fit_fold(holes, h):
             n = int(inl.sum())
             if n < FOLD_MIN_HOLES:
                 continue
-            span = (pts[inl, 1].max() - pts[inl, 1].min()) / h
-            if span < FOLD_MIN_SPAN:
+            key = np.packbits(inl).tobytes()
+            if key in seen:
                 continue
-            key = (n, -float(res[inl].mean()))
-            if best is None or key > best[0]:
-                best = (key, inl)
+            seen.add(key)
+            m, rms = template_score(pts[inl, 1])
+            if m < HOLE_TEMPLATE_MIN:
+                continue
+            score = (m, -rms, n, -float(res[inl].mean()))
+            if best is None or score > best[0]:
+                best = (score, inl)
     if best is None:
         return None
-    inl = best[1]
+    (m, neg_rms, _, _), inl = best
     poly = np.polyfit(pts[inl, 1], pts[inl, 0], 1)          # x = f(y)
     res = np.abs(pts[inl, 0] - np.polyval(poly, pts[inl, 1]))
-    return {"poly": poly, "n": int(inl.sum()),
-            "residual_mm": float(res.mean() / MM),
-            "span": float((pts[inl, 1].max() - pts[inl, 1].min()) / h)}
+    return {"poly": poly, "n": int(inl.sum()), "template": m, "template_rms_mm": -neg_rms,
+            "residual_mm": float(res.mean() / MM)}
 
 
 # --- the fold fallback: the neighbour's content boundary ------------------
@@ -556,8 +644,11 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
     if edges["source"] == "fullbleed":
         notes.append(f"EDGES fullbleed: paper body {edges['body']:.2f} -- top/outer "
                      f"at the frame, bottom from the prop")
+    for key, depth, t in edges["replaced"]:
+        notes.append(f"EDGES {key} from the {'prop' if key == 'bot' else 'frame'}: "
+                     f"the paper trace ran {depth:.1f} mm in at {t:+.2f} deg -- ink to the trim")
     holes = find_holes(gray, par)
-    fold = fit_fold(holes, h)
+    fold = fit_fold(holes)
     source = "holes"
     if fold is None:
         nb = neighbour_boundary(rgb, par)
@@ -578,11 +669,14 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
         "page": page, "parity": par, "sheet_px": [w, h],
         "skew": {"angle": angle, "residual": residual},
         "edges": {**{k: [float(v) for v in edges[k]] for k in ("top", "bot", "outer")},
-                  "source": edges["source"], "body": edges["body"]},
+                  "source": edges["source"], "body": edges["body"],
+                  "replaced": edges["replaced"]},
         "fold": {"source": source,
                  "poly": None if fold is None else [float(v) for v in fold["poly"]],
                  "n": 0 if fold is None else fold["n"],
                  "residual_mm": None if fold is None else fold["residual_mm"],
+                 "template": fold.get("template", 0) if fold else 0,
+                 "template_rms_mm": fold.get("template_rms_mm") if fold else None,
                  "tilt_deg": None if fold is None else tilt(fold["poly"])},
         "holes": [[float(a), float(b), float(c)] for a, b, c in holes],
         "anchor": None if logo is None else {"source": "logo", **logo},
@@ -609,14 +703,16 @@ def draw_debug(img, geom, dest):
     w, h = img.size
     overlay = img.copy()
     d = ImageDraw.Draw(overlay)
-    edge_colour = DEBUG_COLOR if geom["edges"]["source"] == "paper" else DEBUG_FULLBLEED
+    replaced = {r[0] for r in geom["edges"]["replaced"]}
+    def edge_colour(key):
+        return DEBUG_FULLBLEED if geom["edges"]["source"] != "paper" or key in replaced else DEBUG_COLOR
     for key in ("top", "bot"):
         p = geom["edges"][key]
         d.line([(x, np.polyval(p, x)) for x in range(0, w, DEBUG_STEP)],
-               fill=edge_colour, width=DEBUG_WIDTH)
+               fill=edge_colour(key), width=DEBUG_WIDTH)
     p = geom["edges"]["outer"]
     d.line([(np.polyval(p, y), y) for y in range(0, h, DEBUG_STEP)],
-           fill=edge_colour, width=DEBUG_WIDTH)
+           fill=edge_colour("outer"), width=DEBUG_WIDTH)
     if geom["fold"]["poly"]:
         p = geom["fold"]["poly"]
         d.line([(np.polyval(p, y), y) for y in range(0, h, DEBUG_STEP)],
@@ -654,6 +750,7 @@ def measure(page):
     print(f"p{stem}: skew {angle:+.2f} -> {residual:+.2f} deg | edges T {tilt(geom['edges']['top']):+.2f} "
           f"B {tilt(geom['edges']['bot']):+.2f} O {tilt(geom['edges']['outer']):+.2f} | "
           f"fold {f['source']} n={f['n']}"
+          + (f" t={f['template']}/{f['template_rms_mm']:.2f}" if f["source"] == "holes" else "")
           + (f" x={np.polyval(f['poly'], rgb.shape[0] / 2):.0f} tilt {f['tilt_deg']:+.2f}" if f["poly"] else "")
           + f" | logo {'%.2f' % anchor['score'] if anchor else 'none'}"
           + f" | grade {GRADE_SHA}"
@@ -822,6 +919,7 @@ def cut():
             "master-px": f"{MASTER_W_PX} {MASTER_H_PX}",
             "skew": f"{g['skew']['angle']:+.2f} -> {g['skew']['residual']:+.2f} deg",
             "fold": f"{g['fold']['source']} n={g['fold']['n']}"
+                    + (f" template {g['fold']['template']}" if g["fold"]["source"] == "holes" else "")
                     + (f" tilt {g['fold']['tilt_deg']:+.2f} deg" if g["fold"]["poly"] else ""),
             "holes": str(len(g["holes"])),
             "anchor": (f"logo ({ax:.0f}, {ay:.0f}) score {g['anchor']['score']:.2f}"

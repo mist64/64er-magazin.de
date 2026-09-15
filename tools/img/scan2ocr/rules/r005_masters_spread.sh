@@ -12,7 +12,7 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-$DIR/../../../../.venv/bin/python}"
 cd "$DIR"
-# The page count follows the ISSUE constant in r005_masters.py, asked of the
+# The page count follows the ISSUE constant in r000_issue.py, asked of the
 # program itself rather than repeated here -- as r010_ocr_blocks.sh does.
 FIRST="${1:-1}"
 LAST="${2:-$("$PY" -c 'import r005_masters_spread as m; print(m.ISS.pages)')}"

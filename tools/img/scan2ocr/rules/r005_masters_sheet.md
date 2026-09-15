@@ -21,7 +21,7 @@ descriptor's `binding`:
 
 | variant | the frame holds | inner boundary |
 |---|---|---|
-| `r005_masters_spread` | a clipped **SPREAD** (8609, the monthlies) | facing-page colour boundary, clip holes as fallback, holes inpainted |
+| `r005_masters_spread` | half of a clipped **SPREAD** (8610, the monthlies) | the fold: a line through the binder-clip holes matched to the clip's 3-pair template; the neighbour's colour boundary as the fallback; the holes filled white |
 | `r005_masters_sheet` | one loose **SHEET** (SH8601) | the torn fringe: traced on a verso, a flush vertical cut on a recto |
 
 **The suffix names the variant. It is not a step inserted after another one.**
@@ -71,7 +71,8 @@ python3 r005_masters_sheet.py            # every page in the descriptor
 python3 r005_masters_sheet.py 6 41 56 92 # named pages
 ```
 
-The only per-issue knob is `ISSUE = "SH8601"` at the top of the program. No CLI
+The only per-issue knob is `ISSUE` at the top of `r000_issue.py`, which the
+program imports (`from r000_issue import ISSUE`). No CLI
 flags, no environment knobs — every path is derived from the descriptor. Page
 numbers are positional purely so the work can be split across processes, exactly
 as in `r010`.
