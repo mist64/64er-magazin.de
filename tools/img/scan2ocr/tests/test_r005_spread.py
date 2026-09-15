@@ -182,3 +182,88 @@ def test_find_logo_odd_page_bottom_right():
 def test_find_logo_none_on_blank():
     a = synthetic_frame("even", neighbour_rgb=PAPER)
     assert S.find_logo(a.mean(2).astype(np.uint8), "even", S.load_template()) is None
+
+
+# --- cut: the window ---------------------------------------------------------
+
+def synthetic_geom(page, w=5500, h=7300, fold_from_edge_mm=20.0, logo=True,
+                   anchor_dx_mm=24.0, anchor_dy_mm=16.0):
+    par = "even" if page % 2 == 0 else "odd"
+    fold_x = w - fold_from_edge_mm * MM if par == "even" else fold_from_edge_mm * MM
+    ax = anchor_dx_mm * MM if par == "even" else w - anchor_dx_mm * MM
+    return {"page": page, "parity": par, "sheet_px": [w, h],
+            "skew": {"angle": 0.0, "residual": 0.0},
+            "edges": {"top": [0.0, 1.0 * MM], "bot": [0.0, h - 7.0 * MM],
+                      "outer": [0.0, 0.0 if par == "even" else w - 1.0],
+                      "source": "paper", "body": 0.9},
+            "fold": {"source": "holes", "poly": [0.0, fold_x], "n": 6,
+                     "residual_mm": 0.1, "tilt_deg": 0.0},
+            "holes": [[fold_x, 40 * MM, 0.7]],
+            "anchor": ({"source": "logo", "x": int(ax), "y": int(h - anchor_dy_mm * MM),
+                        "score": 0.9, "bbox": [0, 0, 0, 0]} if logo else None),
+            "notes": []}
+
+
+def test_unknown_mask_marks_bed_prop_neighbour_and_hole():
+    g = synthetic_geom(100)
+    u = S.unknown_mask(g)
+    w, h = g["sheet_px"]
+    assert u[2, w // 2] and not u[int(2 * MM), w // 2]          # bed strip / paper
+    assert u[h - 3, w // 2]                                        # prop
+    assert u[h // 2, w - 5] and not u[h // 2, w - int(25 * MM)]  # beyond fold / inside
+    assert u[int(40 * MM), int(w - 20 * MM)]                      # the hole disc
+
+
+def test_fit_window_recovers_the_layout():
+    # The synthetic frame is 233 x 309 mm with 1 mm bed, 7 mm prop and the fold
+    # 20 mm in from the inner edge, so the KNOWN region (212.7 x 300.7 mm) holds
+    # a 210 x 297 window with a little slack: the objective is flat over that
+    # slack and argmin takes the first minimum, i.e. the smallest S and B --
+    # the window at its LARGEST x0 and y0: against the foot, and against
+    # whichever side edge is on the RIGHT -- the fold on an even page, the
+    # outer edge on an odd one.  The expected offsets follow from that, to
+    # within the 0.3 mm inset, the 0.75 mm the filled hole on the fold pushes
+    # the even window off it, and one grid step.
+    geoms = [synthetic_geom(p) for p in range(10, 30)]
+    fit = S.fit_window(geoms)
+    assert fit["stats"]["even"]["pages"] == fit["stats"]["odd"]["pages"] == 10
+    tol = 1.0 * MM
+    for par, page in (("even", 10), ("odd", 11)):
+        g = synthetic_geom(page)
+        w, h = g["sheet_px"]
+        fold_x = g["fold"]["poly"][1]
+        outer_x = g["edges"]["outer"][1]
+        bot_y = g["edges"]["bot"][1]
+        ax, ay = g["anchor"]["x"], g["anchor"]["y"]
+        x0 = (fold_x if par == "even" else outer_x) - S.MASTER_W_PX
+        y0 = bot_y - S.MASTER_H_PX
+        S_, B_ = fit[par]
+        assert abs(S_ - (ax - x0)) < tol, (par, S_, ax - x0)
+        assert abs(B_ - (ay - y0)) < tol, (par, B_, ay - y0)
+
+
+def test_anchor_of_without_logo_places_window_on_fold_and_foot():
+    g = synthetic_geom(100, logo=False)
+    source, x0, y0 = S.anchor_of(g)
+    assert source == "edges"
+    assert abs(x0 - (g["fold"]["poly"][1] - S.MASTER_W_PX)) < 1
+    assert abs(y0 - (g["edges"]["bot"][1] - S.MASTER_H_PX)) < 1
+    g = synthetic_geom(101, logo=False)
+    source, x0, y0 = S.anchor_of(g)
+    assert abs(x0 - g["fold"]["poly"][1]) < 1
+
+
+def test_cut_page_is_a4_and_white_where_unknown():
+    # The fit puts the window's foot on the bottom inset; this page's wordmark
+    # sits 6 mm LOWER than the fitted pages', so its window runs 6 mm into the
+    # prop, and that band must come out white.
+    g = synthetic_geom(100, anchor_dy_mm=10.0)
+    fit = S.fit_window([synthetic_geom(p) for p in range(10, 30)])
+    sheet = synthetic_frame("even")
+    master, unknown_frac, notes = S.cut_page(g, fit, sheet)
+    assert master.shape == (S.MASTER_H_PX, S.MASTER_W_PX, 3)
+    assert (master[-5:] == 255).all()             # the prop band is white
+    assert (master[-int(6 * MM):] == 255).all()
+    assert tuple(master[S.MASTER_H_PX // 2, S.MASTER_W_PX // 2]) == PAPER
+    assert 0.015 < unknown_frac < 0.05
+    assert notes == []

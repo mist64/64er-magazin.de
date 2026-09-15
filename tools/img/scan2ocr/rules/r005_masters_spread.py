@@ -573,7 +573,7 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
     logo = find_logo(gray, par, tmpl)
     if logo is None:
         notes.append("LOGO not found -- the window is anchored on fold x and "
-                     "top-trim y instead")
+                     "bottom-trim y instead")
     return {
         "page": page, "parity": par, "sheet_px": [w, h],
         "skew": {"angle": angle, "residual": residual},
@@ -660,6 +660,188 @@ def measure(page):
           + "".join(f"\n      NOTE p{stem}: {n}" for n in notes), flush=True)
 
 
+# ---------------------------------------------------------------------------
+# cut: the window
+# ---------------------------------------------------------------------------
+# ONE rigid (S, B) per parity: the anchor's distance from the window's left
+# and top edge, chosen to minimise the UNKNOWN fraction inside the window --
+# bed, prop, beyond the fold, off the frame -- over the pages that carry their
+# own wordmark.  8609's fit: even S=568 B=6892, odd S=4416 B=6900 (600 dpi
+# px), unknown p50 1.38 % / 1.92 %.  The search spans the whole page width;
+# capping it once pinned the odd optimum to the cap and reported a window
+# mostly off the page.  Fitted at 1/FIT_SCALE resolution: one step is 0.17
+# mm, below the 0.3 mm the edge inset already gives away.
+FIT_SCALE = 4
+FIT_B_RANGE_MM = (250.0, 297.0)   # the anchor is 4-30 mm above the foot
+FOLD_INSET_MM = 0.0               # cut ON the fold; the holes are filled separately
+HOLE_FILL_R_MM = 0.4              # radius added to a hole's own before filling
+CUT_INSET_MM = EDGE_INSET_MM
+
+
+def unknown_mask(geom, scale=1):
+    w, h = geom["sheet_px"]
+    ws, hs = w // scale, h // scale
+    ys = np.arange(hs) * scale
+    xs = np.arange(ws) * scale
+    mm = MM
+    top = np.polyval(geom["edges"]["top"], xs) + CUT_INSET_MM * mm
+    bot = np.polyval(geom["edges"]["bot"], xs) - CUT_INSET_MM * mm
+    outer = np.polyval(geom["edges"]["outer"], ys)
+    u = (ys[:, None] < top[None, :]) | (ys[:, None] > bot[None, :])
+    if geom["parity"] == "even":
+        u |= xs[None, :] < (outer + CUT_INSET_MM * mm)[:, None]
+    else:
+        u |= xs[None, :] > (outer - CUT_INSET_MM * mm)[:, None]
+    if geom["fold"]["poly"]:
+        fold = np.polyval(geom["fold"]["poly"], ys)
+        if geom["parity"] == "even":
+            u |= xs[None, :] > (fold - FOLD_INSET_MM * mm)[:, None]
+        else:
+            u |= xs[None, :] < (fold + FOLD_INSET_MM * mm)[:, None]
+    for cx, cy, dm in geom["holes"]:
+        r = (dm / 2 + HOLE_FILL_R_MM) * mm / scale
+        cy_, cx_ = cy / scale, cx / scale
+        y0, y1 = max(int(cy_ - r) - 1, 0), min(int(cy_ + r) + 2, hs)
+        x0, x1 = max(int(cx_ - r) - 1, 0), min(int(cx_ + r) + 2, ws)
+        yy, xx = np.mgrid[y0:y1, x0:x1]
+        u[y0:y1, x0:x1] |= (yy - cy_) ** 2 + (xx - cx_) ** 2 <= r * r
+    return u
+
+
+def anchor_of(geom):
+    """("logo", ax, ay) -- the wordmark, placed through the parity's (S, B) --
+    or ("edges", x0, y0) -- the window's own top-left, placed directly on the
+    page's PHYSICAL edges: its inner edge on the fold and its foot on the
+    bottom trim (the prop's top).  The second is for pages without a wordmark
+    -- covers, full-page ads -- and uses no fit at all: the two edges it needs
+    are the two every page has, whatever its ink."""
+    if geom["anchor"]:
+        return "logo", geom["anchor"]["x"], geom["anchor"]["y"]
+    w, h = geom["sheet_px"]
+    bot_y = float(np.polyval(geom["edges"]["bot"], w / 2))
+    if geom["fold"]["poly"]:
+        fold_x = float(np.polyval(geom["fold"]["poly"], h / 2))
+    else:
+        fold_x = float(w - 1 if geom["parity"] == "even" else 0)
+    x0 = fold_x - MASTER_W_PX if geom["parity"] == "even" else fold_x
+    return "edges", x0, bot_y - MASTER_H_PX
+
+
+def _window_sums(u, W, H):
+    """Sum of `u` over every W x H window whose top-left is (x0, y0), for all
+    x0 in [-W, w) and y0 in [-H, h): an integral image over `u` padded with
+    UNKNOWN (off the frame is not this page)."""
+    h, w = u.shape
+    pad = np.ones((h + 2 * H, w + 2 * W), np.int64)
+    pad[H:H + h, W:W + w] = u
+    I = np.zeros((pad.shape[0] + 1, pad.shape[1] + 1), np.int64)
+    I[1:, 1:] = pad.cumsum(0).cumsum(1)
+    # window top-left at padded (py, px) -> sum = I[py+H, px+W] - I[py, px+W] - I[py+H, px] + I[py, px]
+    py = np.arange(0, h + H)          # = y0 + H, y0 in [-H, h)
+    px = np.arange(0, w + W)
+    return (I[py[:, None] + H, px[None, :] + W] - I[py[:, None], px[None, :] + W]
+            - I[py[:, None] + H, px[None, :]] + I[py[:, None], px[None, :]])
+
+
+def fit_window(geoms):
+    W, H = MASTER_W_PX // FIT_SCALE, MASTER_H_PX // FIT_SCALE
+    out = {"stats": {}}
+    for par in ("even", "odd"):
+        acc, n = None, 0
+        for g in geoms:
+            if g["parity"] != par or not g["anchor"]:
+                continue
+            u = unknown_mask(g, FIT_SCALE)
+            sums = _window_sums(u, W, H)                 # indexed by (y0+H, x0+W)
+            ax, ay = g["anchor"]["x"] // FIT_SCALE, g["anchor"]["y"] // FIT_SCALE
+            # window top-left (x0, y0) = (ax - S, ay - B); accumulate over (S, B)
+            # on a common grid: S in [0, W), B in [Bmin, Bmax]
+            Bs = np.arange(int(FIT_B_RANGE_MM[0] * MM) // FIT_SCALE,
+                           int(FIT_B_RANGE_MM[1] * MM) // FIT_SCALE + 1)
+            Ss = np.arange(0, W)
+            y_idx = ay - Bs + H
+            x_idx = ax - Ss + W
+            ok_y = (y_idx >= 0) & (y_idx < sums.shape[0])
+            ok_x = (x_idx >= 0) & (x_idx < sums.shape[1])
+            grid = np.full((len(Bs), len(Ss)), W * H, np.int64)   # off-grid = all unknown
+            grid[np.ix_(ok_y, ok_x)] = sums[np.ix_(y_idx[ok_y], x_idx[ok_x])]
+            acc = grid if acc is None else acc + grid
+            n += 1
+        if n == 0:
+            raise SystemExit(f"{VARIANT} cut: no {par} page has a logo anchor -- "
+                             f"nothing to fit the window on")
+        bi, si = np.unravel_index(int(acc.argmin()), acc.shape)
+        S_, B_ = int(Ss[si] * FIT_SCALE), int(Bs[bi] * FIT_SCALE)
+        out[par] = (S_, B_)
+        out["stats"][par] = {"pages": n, "mean_unknown": float(acc[bi, si] / (n * W * H))}
+    return out
+
+
+def cut_page(geom, fit, sheet600):
+    """The master: sheet600 with the unknown painted white, cut to the window."""
+    notes = list(geom["notes"])
+    w, h = geom["sheet_px"]
+    source, ax, ay = anchor_of(geom)
+    if source == "logo":
+        S_, B_ = fit[geom["parity"]]
+        x0, y0 = int(round(ax - S_)), int(round(ay - B_))
+    else:
+        x0, y0 = int(round(ax)), int(round(ay))
+    u = unknown_mask(geom)
+    painted = sheet600[:h, :w].copy()
+    painted[u] = 255
+    master = np.full((MASTER_H_PX, MASTER_W_PX, 3), 255, np.uint8)
+    unk = np.ones((MASTER_H_PX, MASTER_W_PX), bool)
+    sy0, sy1 = max(y0, 0), min(y0 + MASTER_H_PX, h)
+    sx0, sx1 = max(x0, 0), min(x0 + MASTER_W_PX, w)
+    if sy1 > sy0 and sx1 > sx0:
+        master[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = painted[sy0:sy1, sx0:sx1]
+        unk[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = u[sy0:sy1, sx0:sx1]
+    frac = float(unk.mean())
+    if source != "logo":
+        notes.append("ANCHOR from the page edges (fold + bottom trim): the "
+                     "wordmark was not found")
+    return master, frac, notes
+
+
+def cut():
+    geoms = [json.loads(p.read_text()) for p in sorted(OUT_GEOM.glob("[0-9][0-9][0-9].json"))]
+    if not geoms:
+        raise SystemExit(f"{VARIANT} cut: no geometry in {OUT_GEOM} -- run measure first")
+    fit = fit_window(geoms)
+    OUT_MASTER.mkdir(parents=True, exist_ok=True)
+    report = {"fit": {k: list(v) for k, v in fit.items() if k != "stats"},
+              "stats": fit["stats"], "pages": {}}
+    for g in geoms:
+        stem = f"{g['page']:03d}"
+        sheet = np.array(Image.open(OUT_SHEET600 / f"{stem}.png").convert("RGB"))
+        master, frac, notes = cut_page(g, fit, sheet)
+        source, ax, ay = anchor_of(g)
+        stamp = stamp_text(VARIANT, **{
+            "page": f"{stem} of {ISSUE}", "phase": "cut",
+            "master-px": f"{MASTER_W_PX} {MASTER_H_PX}",
+            "skew": f"{g['skew']['angle']:+.2f} -> {g['skew']['residual']:+.2f} deg",
+            "fold": f"{g['fold']['source']} n={g['fold']['n']}"
+                    + (f" tilt {g['fold']['tilt_deg']:+.2f} deg" if g["fold"]["poly"] else ""),
+            "holes": str(len(g["holes"])),
+            "anchor": (f"logo ({ax:.0f}, {ay:.0f}) score {g['anchor']['score']:.2f}"
+                       if source == "logo" else
+                       f"edges: window top-left ({ax:.0f}, {ay:.0f}) from fold + bottom trim"),
+            "window": f"S {fit[g['parity']][0]} B {fit[g['parity']][1]} ({g['parity']})",
+            "unknown": f"{frac:.2%} of the window is fabricated white",
+            "notes": "; ".join(notes) or "(none)",
+        })
+        save_master(master, OUT_MASTER / f"{stem}.png", stamp)
+        (OUT_MASTER / f"{stem}.stamp.txt").write_text(stamp, encoding="utf-8")
+        report["pages"][stem] = {"anchor": source, "fold": g["fold"]["source"],
+                                 "unknown": frac}
+        print(f"p{stem}: anchor {source} | fold {g['fold']['source']} | "
+              f"unknown {frac:.2%}" + "".join(f"\n      NOTE p{stem}: {n}" for n in notes),
+              flush=True)
+    (OUT_GEOM / "fit.json").write_text(json.dumps(report, indent=1))
+    print("fit:", json.dumps(report["fit"]), json.dumps(report["stats"]), flush=True)
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1] not in ("measure", "cut"):
         raise SystemExit(f"usage: {VARIANT}.py measure [pages..] | cut")
@@ -680,4 +862,4 @@ if __name__ == "__main__":
             raise SystemExit(f"r005: {len(failed)} page(s) had no input: "
                              f"{', '.join('%03d' % p for p in failed)}")
     else:
-        raise SystemExit("cut: not built yet")   # the cut phase is a later task
+        cut()
