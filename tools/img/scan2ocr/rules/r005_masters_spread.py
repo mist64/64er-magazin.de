@@ -52,10 +52,11 @@ from PIL import Image
 
 from r005_masters import (
     ISSUE, ISS, MM, SCAN_REDUCE, MASTER_DPI, THUMB_DPI,
-    SKEW_RESIDUAL_MAX,
+    SKEW_RESIDUAL_MAX, CLEAN_PCT,
     ANCHORS, LEVELS, HAVE_PROFILE, GRADE_SHA,
     PageFailed, measure_skew,
     separate_and_render, archive_cmyk, save_master, write_profile, stamp_text,
+    paper_mask, boundaries, trace, tilt,
 )
 
 Image.MAX_IMAGE_PIXELS = None
@@ -96,6 +97,41 @@ OUT_DIRS = (OUT_MASTER, OUT_SHEET, OUT_SHEET600, OUT_CMYK, OUT_GEOM, OUT_DEBUG)
 def parity(page):
     """'even' or 'odd'.  Even -> neighbour on the RIGHT, odd -> LEFT."""
     return "even" if page % 2 == 0 else "odd"
+
+
+# --- the three outer edges -------------------------------------------------
+# Top, bottom and the OUTER side are paper-vs-backing boundaries and are traced
+# exactly as the sheet variant traces a clean edge: band medians of the
+# per-row / per-column first and last paper pixel, a straight line through the
+# bands.  Backing is whatever the paper mask does not see -- the grey bed strip
+# at the top (lum ~130-185, MEASURED on 8610's thumbs; the paper-distance mask
+# sees it at city-block ~200 from W, BED_LUM would not) and the yellow prop at
+# the foot (prop_mask).  Where the paper runs off the frame the samples are a
+# constant 0 (or w-1) and the line is the frame edge: the scan does not
+# contain the trim, and the window -- not this trace -- decides the page.
+#
+# The INNER side is NOT traced here.  The neighbour half of the sheet is paper
+# too, and the paper mask cannot see the fold.  See fold_line().
+EDGE_INSET_MM = 0.3          # inside its own line, as the sheet variant
+
+# `tilt` is not called in this file -- nothing here needs the angle, only the
+# poly.  It is re-exported so a caller (the geometry printer that lands in a
+# later task, and tests/test_r005_spread.py meanwhile) can score any poly this
+# module traces via `r005_masters_spread.tilt`, the same as the sheet variant
+# calls it on its own traced edges, without a second import of r005_masters.
+__all__ = ("parity", "outer_edges", "EDGE_INSET_MM", "tilt")
+
+
+def outer_edges(rgb, par):
+    """dict(top, bot, outer): straight lines in 600 dpi sheet pixels.
+
+    top/bot are y(x); outer is x(y).  Parity says which side is outer: an even
+    page's neighbour is on the right, so its outer edge is the LEFT one.
+    """
+    rows, starts, ends, cols, tops, bots = boundaries(paper_mask(rgb))
+    return {"top": trace(tops, cols, CLEAN_PCT, MM),
+            "bot": trace(bots, cols, CLEAN_PCT, MM),
+            "outer": trace(starts if par == "even" else ends, rows, CLEAN_PCT, MM)}
 
 
 # ---------------------------------------------------------------------------
