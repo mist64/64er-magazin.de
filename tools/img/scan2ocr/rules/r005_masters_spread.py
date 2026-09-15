@@ -227,7 +227,7 @@ HOLE_MIN_MM = 0.4            # longest extent; the satellite specks are 0.17-0.3
 HOLE_MAX_MM = 1.5            # ACROSS the crease (measured 0.42-1.06)
 HOLE_LONG_MAX_MM = 4.0       # ALONG it (measured 0.51-2.84; next up is 16 mm)
 HOLE_FILL_MIN = 0.40         # area / bbox: a teardrop, not a line fragment
-HOLE_ASPECT_MAX = 4.5        # long/short: measured <= 3.72; a clipped rule 5.2+
+HOLE_ASPECT_MAX = 4.5        # long/short: measured <= 3.72; a clipped printed rule reads 5.2+
 # The line through them: at least this many holes, within this of the line,
 # spanning this fraction of the page height, and near-vertical.  Six holes on a
 # rigid clip give a line to a fraction of a millimetre; three do not tell a
