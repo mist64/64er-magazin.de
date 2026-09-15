@@ -579,7 +579,7 @@ BED = (135, 128, 124)                          # 8610's grey bed strip
 PROP = (250, 218, 113)                         # the yellow prop
 
 
-def synthetic_frame(par="even", w=5100, h=7188, top_bed_mm=1.0, prop_mm=7.0,
+def synthetic_frame(par="even", w=5500, h=7300, top_bed_mm=1.0, prop_mm=7.0,
                     fold_from_edge_mm=20.0, neighbour_rgb=(90, 120, 200)):
     """A levelled 600 dpi spread frame: bed on top, prop below, paper to the
     outer frame edge, a neighbour strip beyond the fold on the inner side."""
@@ -1253,7 +1253,7 @@ git commit -m "r005_masters_spread: measure writes geometry/NNN.json and the deb
 - [ ] **Step 1: Failing tests**
 
 ```python
-def synthetic_geom(page, w=5100, h=7188, fold_from_edge_mm=20.0, logo=True,
+def synthetic_geom(page, w=5500, h=7300, fold_from_edge_mm=20.0, logo=True,
                    anchor_dx_mm=24.0, anchor_dy_mm=16.0):
     par = "even" if page % 2 == 0 else "odd"
     fold_x = w - fold_from_edge_mm * MM if par == "even" else fold_from_edge_mm * MM
@@ -1281,15 +1281,26 @@ def test_unknown_mask_marks_bed_prop_neighbour_and_hole():
 
 
 def test_fit_window_recovers_the_layout():
+    # The synthetic frame is 233 x 309 mm with 1 mm bed, 7 mm prop and the fold
+    # 20 mm in from the inner edge, so the KNOWN region (212.7 x 300.7 mm) holds
+    # a 210 x 297 window with a little slack: the objective is flat over that
+    # slack and argmin takes the first minimum, i.e. the smallest S and B --
+    # the window pushed against the fold and against the foot.  The expected
+    # offsets follow from that, to within the 0.3 mm inset plus one grid step.
     geoms = [synthetic_geom(p) for p in range(10, 30)]
     fit = S.fit_window(geoms)
-    # the page is 210 mm wide from the fold outward; the anchor sits 24 mm in
-    # from the outer trim -- an even page's trim is at fold_x - 210 mm
-    S_even, B_even = fit["even"]
-    assert abs(S_even - 24.0 * MM) < 2 * S.FIT_SCALE
-    assert abs(B_even - (297.0 - 16.0) * MM) < 2 * S.FIT_SCALE
-    S_odd, B_odd = fit["odd"]
-    assert abs(S_odd - (210.0 - 24.0) * MM) < 2 * S.FIT_SCALE
+    tol = 1.0 * MM
+    for par, page in (("even", 10), ("odd", 11)):
+        g = synthetic_geom(page)
+        w, h = g["sheet_px"]
+        fold_x = g["fold"]["poly"][1]
+        bot_y = g["edges"]["bot"][1]
+        ax, ay = g["anchor"]["x"], g["anchor"]["y"]
+        x0 = fold_x - S.MASTER_W_PX if par == "even" else fold_x
+        y0 = bot_y - S.MASTER_H_PX
+        S_, B_ = fit[par]
+        assert abs(S_ - (ax - x0)) < tol, (par, S_, ax - x0)
+        assert abs(B_ - (ay - y0)) < tol, (par, B_, ay - y0)
 
 
 def test_cut_page_is_a4_and_white_where_unknown():
