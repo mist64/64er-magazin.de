@@ -196,6 +196,24 @@ def test_fit_fold_prefers_the_clip_to_a_neighbour_column():
     assert abs(np.polyval(fold["poly"], h / 2) - x) < 0.2 * MM
 
 
+def test_fit_fold_holes_are_the_punches_not_the_crease():
+    """p005: the picture's first dot column lies ON the fold line (its edge
+    is the crease) -- 205 inliers, 19 at the template's positions.  Only
+    the latter are `holes`, the ones `cut` fills; the line uses them all."""
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even")
+    h, w = a.shape[:2]
+    for k in range(40):                                   # a dot every 6.3 mm on the line, between the pairs
+        y = int((30.0 + 6.3 * k) * MM)
+        if min(abs(y / MM - c) for c in CLIP_YS_MM) < 3.0:
+            continue
+        a[y:y + int(0.7 * MM), int(x - 0.35 * MM):int(x + 0.35 * MM)] = (20, 18, 18)
+    holes = S.find_holes(a.mean(2).astype(np.uint8), "even")
+    fold = S.fit_fold(holes)
+    assert fold["n"] > 30 and fold["template"] == 6
+    assert len(fold["holes"]) == 6
+    assert all(min(abs(cy / MM - c) for c in CLIP_YS_MM) < 1.0 for cx, cy, _ in fold["holes"])
+
+
 def test_fit_fold_accepts_a_regular_column_alone_KNOWN_LIMITATION():
     """What the template does NOT tell apart: a perfectly REGULAR column of
     fragments at a body-text pitch that divides the template's gaps.  At
@@ -313,11 +331,35 @@ def synthetic_geom(page, w=5500, h=7300, fold_from_edge_mm=20.0, logo=True,
                       "source": "paper", "body": 0.9, "replaced": []},
             "fold": {"source": "holes", "poly": [0.0, fold_x], "n": 6,
                      "residual_mm": 0.1, "template": 6, "template_rms_mm": 0.1,
-                     "tilt_deg": 0.0},
+                     "tilt_deg": 0.0, "holes": [[fold_x, 40 * MM, 0.7]]},
             "holes": [[fold_x, 40 * MM, 0.7]],
             "anchor": ({"source": "logo", "x": int(ax), "y": int(h - anchor_dy_mm * MM),
                         "score": 0.9, "bbox": [0, 0, 0, 0]} if logo else None),
             "notes": []}
+
+
+def test_unknown_mask_fills_the_clip_holes_and_not_the_other_candidates():
+    """p005 on the sweep: a coarse-screened picture at the crease gave 643
+    hole-shaped candidates and the fill painted 518 of them -- the picture
+    -- white.  Only the fold's inliers, the clip's punches, are filled."""
+    g = synthetic_geom(100)
+    w, h = g["sheet_px"]
+    fold_x = g["fold"]["poly"][1]
+    clip = [[fold_x, (59.0 + t) * MM, 0.7] for t in S.HOLE_TEMPLATE_MM]
+    rng = np.random.default_rng(5)
+    scatter = [[fold_x - (2.0 + 6.0 * rng.random()) * MM, (20.0 + 8.5 * k) * MM, 0.9]
+               for k in range(30)]                             # on the page, off the line
+    g["fold"]["holes"] = clip
+    g["fold"]["n"] = 6
+    g["holes"] = clip + scatter
+    u = S.unknown_mask(g)
+    for cx, cy, _ in clip:
+        assert u[int(cy), int(cx - 0.5 * MM)]                  # inside the disc (r = 0.35 + 0.4 mm), on the page
+    for cx, cy, _ in scatter:
+        assert not u[int(cy), int(cx)]                          # the picture stays
+    g["fold"]["holes"] = []                                     # a colour / none fold fills no disc
+    u = S.unknown_mask(g)
+    assert not u[int(clip[0][1]), int(fold_x - 0.5 * MM)]
 
 
 def test_unknown_mask_marks_bed_prop_neighbour_and_hole():

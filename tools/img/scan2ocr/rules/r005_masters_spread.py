@@ -334,6 +334,15 @@ HOLE_TEMPLATE_TOL_MM = 0.75  # measured max 0.41, p95 0.30
 HOLE_TEMPLATE_MIN = 4        # matches; 6 on an ordinary page, 4-5 with a torn or inked-over hole
 HOLE_TEMPLATE_Y0_MM = 59.0   # hole 1's y in the frame: measured 58.05-59.97 (p5-p95), mean 58.91
 HOLE_TEMPLATE_Y0_TOL_MM = 3.0
+# WHICH inliers are the clip's punches, for the fill: those within this of a
+# template position along the line.  An inlier elsewhere on the line is the
+# crease -- a crack in the ink (p001: 25 inliers, 4 punches), a speck, or,
+# on p005, the first dot column of a picture whose edge is the crease (205
+# inliers, 19 punches; filling all 205 scalloped 530 mm2 off the picture's
+# edge).  2 mm: a punch tore the paper up to 2.84 mm along the fold, so a
+# fragment's centre sits within ~1.5 mm of it; the template itself is good
+# to 0.41.
+HOLE_FILL_NEAR_MM = 2.0
 
 
 def find_holes(gray, par):
@@ -373,15 +382,16 @@ def find_holes(gray, par):
 
 
 def template_score(ys):
-    """(matches, rms_mm) of the clip template on the inlier y's (px): the best
-    over every 'inlier k is template hole j' shift whose hole 1 lands within
-    HOLE_TEMPLATE_Y0_TOL_MM of HOLE_TEMPLATE_Y0_MM; (0, 0.0) if no shift does."""
+    """(matches, rms_mm, shift_mm) of the clip template on the inlier y's (px):
+    the best over every 'inlier k is template hole j' shift whose hole 1
+    lands within HOLE_TEMPLATE_Y0_TOL_MM of HOLE_TEMPLATE_Y0_MM -- shift_mm
+    is that hole 1's y; (0, 0.0, None) if no shift qualifies."""
     ys = np.sort(np.asarray(ys, float) / MM)
     t = np.asarray(HOLE_TEMPLATE_MM)
     shifts = (ys[:, None] - t[None, :]).ravel()
     shifts = shifts[np.abs(shifts - HOLE_TEMPLATE_Y0_MM) <= HOLE_TEMPLATE_Y0_TOL_MM]
     if not len(shifts):
-        return 0, 0.0
+        return 0, 0.0, None
     pos = shifts[:, None] + t[None, :]                                # (k, 6)
     idx = np.searchsorted(ys, pos)
     lo = ys[np.clip(idx - 1, 0, len(ys) - 1)]
@@ -391,7 +401,9 @@ def template_score(ys):
     m = hit.sum(1)
     best = np.flatnonzero(m == m.max())
     rms = np.array([math.sqrt((dev[b][hit[b]] ** 2).mean()) for b in best])
-    return int(m.max()), float(rms.min())
+    j = int(rms.argmin())                  # among the equal-best shifts, the tightest
+    k = best[j]
+    return int(m[k]), float(rms[j]), float(shifts[k])
 
 
 def fit_fold(holes):
@@ -403,7 +415,10 @@ def fit_fold(holes):
     inlier set is scored against HOLE_TEMPLATE_MM; the most template matches
     win, then the smallest template RMS, then the most inliers, then the
     smallest residual; fewer than HOLE_TEMPLATE_MIN matches is no fold.  The
-    winner is refitted by least squares over its inliers.
+    winner is refitted by least squares over its inliers; `holes` returns
+    the inliers within HOLE_FILL_NEAR_MM along the line of a template
+    position -- the clip's punches and their torn fragments, the only
+    candidates `cut` fills.
     """
     if len(holes) < FOLD_MIN_HOLES:
         return None
@@ -427,19 +442,22 @@ def fit_fold(holes):
             if key in seen:
                 continue
             seen.add(key)
-            m, rms = template_score(pts[inl, 1])
+            m, rms, shift = template_score(pts[inl, 1])
             if m < HOLE_TEMPLATE_MIN:
                 continue
             score = (m, -rms, n, -float(res[inl].mean()))
             if best is None or score > best[0]:
-                best = (score, inl)
+                best = (score, inl, shift)
     if best is None:
         return None
-    (m, neg_rms, _, _), inl = best
+    (m, neg_rms, _, _), inl, shift = best
     poly = np.polyfit(pts[inl, 1], pts[inl, 0], 1)          # x = f(y)
     res = np.abs(pts[inl, 0] - np.polyval(poly, pts[inl, 1]))
+    punches = np.abs(pts[:, 1][:, None] / MM - (shift + np.asarray(HOLE_TEMPLATE_MM))[None, :]
+                     ).min(1) <= HOLE_FILL_NEAR_MM
     return {"poly": poly, "n": int(inl.sum()), "template": m, "template_rms_mm": -neg_rms,
-            "residual_mm": float(res.mean() / MM)}
+            "residual_mm": float(res.mean() / MM),
+            "holes": [holes[i] for i in np.flatnonzero(inl & punches)]}
 
 
 # --- the fold fallback: the neighbour's content boundary ------------------
@@ -714,7 +732,8 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
                  "residual_mm": None if fold is None else fold["residual_mm"],
                  "template": fold.get("template", 0) if fold else 0,
                  "template_rms_mm": fold.get("template_rms_mm") if fold else None,
-                 "tilt_deg": None if fold is None else tilt(fold["poly"])},
+                 "tilt_deg": None if fold is None else tilt(fold["poly"]),
+                 "holes": [[float(a), float(b), float(c)] for a, b, c in fold.get("holes", [])] if fold else []},
         "holes": [[float(a), float(b), float(c)] for a, b, c in holes],
         "anchor": None if logo is None else {"source": "logo", **logo},
         "notes": notes,
@@ -754,9 +773,11 @@ def draw_debug(img, geom, dest):
         p = geom["fold"]["poly"]
         d.line([(np.polyval(p, y), y) for y in range(0, h, DEBUG_STEP)],
                fill=DEBUG_FOLD, width=DEBUG_WIDTH)
+    filled = {(cx, cy) for cx, cy, _ in geom["fold"]["holes"]}
     for cx, cy, dm in geom["holes"]:
         r = max(dm * MM, DEBUG_HOLE_RING_PX)
-        d.ellipse((cx - r, cy - r, cx + r, cy + r), outline=DEBUG_FOLD, width=DEBUG_WIDTH)
+        d.ellipse((cx - r, cy - r, cx + r, cy + r), outline=DEBUG_FOLD,
+                  width=DEBUG_WIDTH * (3 if (cx, cy) in filled else 1))   # the filled ones ring thick
     if geom["anchor"]:
         d.rectangle(geom["anchor"]["bbox"], outline=DEBUG_LOGO, width=DEBUG_WIDTH)
     small = overlay.resize((w // DEBUG_REDUCE, h // DEBUG_REDUCE), Image.LANCZOS)
@@ -809,6 +830,16 @@ FIT_SCALE = 4
 FIT_B_RANGE_MM = (250.0, 297.0)   # the anchor is 4-30 mm above the foot
 FOLD_INSET_MM = 0.0               # cut ON the fold; the holes are filled separately
 HOLE_FILL_R_MM = 0.4              # radius added to a hole's own before filling
+# WHICH holes are filled: fold.holes -- the fold line's inliers at the
+# template's positions, the clip's punches and their fragments -- and never
+# the other candidates.  The first sweep filled every candidate, on the
+# argument that a candidate is a hole-shaped dark mark in the fold band
+# whether or not it sat on the line; MEASURED, that painted 518 dots of
+# p005's coarse-screened picture white (1137 mm2, its first ~5 mm along the
+# inner edge) and crease specks and cracks off 41 other pages; filling every
+# inlier still took the picture's first dot column, which IS the crease
+# (530 mm2).  A candidate off the line or off the template is ink, a speck,
+# a crack or the picture, and stays.
 CUT_INSET_MM = EDGE_INSET_MM
 
 
@@ -832,7 +863,7 @@ def unknown_mask(geom, scale=1):
             u |= xs[None, :] > (fold - FOLD_INSET_MM * mm)[:, None]
         else:
             u |= xs[None, :] < (fold + FOLD_INSET_MM * mm)[:, None]
-    for cx, cy, dm in geom["holes"]:
+    for cx, cy, dm in geom["fold"]["holes"]:      # the clip's punches -- never the other candidates
         r = (dm / 2 + HOLE_FILL_R_MM) * mm / scale
         cy_, cx_ = cy / scale, cx / scale
         y0, y1 = max(int(cy_ - r) - 1, 0), min(int(cy_ + r) + 2, hs)
@@ -958,7 +989,7 @@ def cut():
             "fold": f"{g['fold']['source']} n={g['fold']['n']}"
                     + (f" template {g['fold']['template']}" if g["fold"]["source"] == "holes" else "")
                     + (f" tilt {g['fold']['tilt_deg']:+.2f} deg" if g["fold"]["poly"] else ""),
-            "holes": str(len(g["holes"])),
+            "holes": f"{len(g['fold']['holes'])} filled of {len(g['holes'])} candidates",
             "anchor": (f"logo ({ax:.0f}, {ay:.0f}) score {g['anchor']['score']:.2f}"
                        if source == "logo" else
                        f"edges: window top-left ({ax:.0f}, {ay:.0f}) from fold + bottom trim"),

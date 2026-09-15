@@ -313,8 +313,10 @@ replace the old half-height span rule: pairs 1+2 span 103 mm and are the clip
 specks within 0.75 mm of four template positions are not. The winner is
 refitted by least squares over its inliers; the JSON records the line, the
 inlier count, the template matches and RMS, the mean residual and the tilt;
-the hole list records every candidate, inlier or not, because `cut` fills all
-of them.
+`fold.holes` records the inliers within `HOLE_FILL_NEAR_MM` = 2 mm along the
+line of a template position — the clip's punches and their torn fragments,
+the only discs `cut` fills — and the page's `holes` list every candidate,
+inlier or not, for the record and the overlay's rings.
 
 **What the template does and does not tell apart.** Measured on 8610, a
 neighbour column reaches at most **5** matches, at RMS 0.31–0.45 (the six
@@ -425,7 +427,8 @@ decisions drawn on top: the three edges **green** when traced from paper,
 traced page with one edge given up to the frame shows that one orange); the fold
 **magenta**; every hole candidate ringed in the same magenta (the ring is drawn
 wide enough to survive the reduction — a 0.7 mm hole would otherwise be an
-invisible 3 px ring); the wordmark's box **blue**; and, top-left, one line of
+invisible 3 px ring), the punches `cut` fills ringed three times as thick
+(on overlays drawn after the fill change; the sweep's were not redrawn); the wordmark's box **blue**; and, top-left, one line of
 text — page, parity, edge source, fold source, anchor score or `NONE` —
 followed by the page's notes. Lines and rings are drawn at 600 dpi and reduced
 with the page; the text is drawn after the reduction, because PIL's default
@@ -484,8 +487,11 @@ fold          {source: "holes"|"colour"|"none"
                residual_mm: float or null   mean |x| residual of the inliers
                template:        int         template matches (0 unless "holes")
                template_rms_mm: float|null  RMS of the matched y offsets (null unless "holes")
-               tilt_deg: float or null}
-holes         [[cx, cy, size_mm], ...]   floats; EVERY candidate, inlier or not; size = longest extent
+               tilt_deg: float or null
+               holes:  [[cx, cy, size_mm], ...]  the inliers at the template's positions -- the
+                       clip's punches and their fragments, the ONLY discs cut fills; [] unless "holes"}
+holes         [[cx, cy, size_mm], ...]   floats; EVERY candidate, inlier or not, for the record and
+              the overlay's rings (cut does not read it); size = longest extent
 anchor        null, or {source: "logo", x: int, y: int, score: float, bbox: [x0, y0, x1, y1]}
               x, y = the wordmark's OUTER-BOTTOM corner; bbox = the template's box, ints
 notes         [str, ...]    the NOTEs above, in the order they were made
@@ -503,7 +509,7 @@ geometry/*.json
   -> per page:
        the anchor: the wordmark through (S, B), or the page's own edges
        the UNKNOWN mask on sheets600: outside the three edges, beyond the
-         fold, the hole discs -- painted paper white
+         fold, the punches' discs (fold.holes) -- painted paper white
        the window cut from that; where it overhangs the frame, white
   -> masters600/NNN.png (4961 x 7016, every page) + NNN.stamp.txt
   -> geometry/fit.json
@@ -556,18 +562,23 @@ Everything the master should not show is painted **255 white** on the page's
 - outside the outer line, moved 0.3 mm in;
 - beyond the fold line, cut **on** the fold (`FOLD_INSET_MM` = 0: the holes
   are filled separately, so the line needs no margin);
-- every hole candidate's disc — its own radius (half its longest extent) plus
-  `HOLE_FILL_R_MM` = 0.4 mm — every candidate, not only the line's inliers,
-  because a candidate is by construction a hole-shaped dark mark in the fold
-  band whether or not it sat on the line. **Measured on the sweep, that
-  argument fails on a screen:** 42 pages carry candidates on the page side
-  of the fold beyond the six holes — crease specks and cracks, ≤ 38 discs
-  and ≤ 73 mm² a page on 41 of them — and on **p005**, whose coarse-screened
-  picture starts at the crease, 518 dots of the picture are painted white,
-  1137 mm², the first ~5 mm of the picture along the inner edge (*What it
-  read*). The fill that would not do this paints the line's inliers within
-  2 mm of a template position (the holes and their torn fragments) and
-  nothing else; not changed on this sweep, recorded as p005's gap;
+- the disc of every hole in `fold.holes` — the clip's punches: the fold
+  line's inliers at the template's positions (± `HOLE_FILL_NEAR_MM` = 2 mm
+  along the line, for the fragments of a torn punch) — its own radius (half
+  its longest extent) plus `HOLE_FILL_R_MM` = 0.4 mm. **Not** every
+  candidate, and **not** every inlier. The first sweep filled every
+  candidate, on the argument that a candidate is a hole-shaped dark mark in
+  the fold band whether or not it sat on the line; measured, that argument
+  fails on a screen: on **p005**, whose coarse-screened picture starts at
+  the crease, 518 dots of the picture were painted white — 1137 mm², the
+  picture's first ~5 mm along the whole inner edge — and 41 other pages lost
+  crease specks and cracks (≤ 38 discs, ≤ 73 mm² a page). Filling every
+  *inlier* still took p005's first dot column, which lies on the crease
+  (205 inliers, 530 mm²). The punches are what the clip destroyed; a crack,
+  a speck or a dot is the page, and stays. On p005 19 discs are filled of
+  643 candidates, on an ordinary page 6 of 6–9, on the covers 4–5 of 25–35
+  (*What it read*). A fold from the colour boundary, or none, fills no
+  disc;
 - and, in the master, wherever the window overhangs the frame.
 
 A page with `fold: none` has no inner fill: its master shows whatever of the
@@ -579,7 +590,8 @@ is the mask's share of the master's 4961 × 7016 px, overhang included.
 Every master carries, in its `r005` chunk and beside it in `NNN.stamp.txt`,
 over the grade block the sheet rule describes: `page`, `phase cut`,
 `master-px 4961 7016`, `skew` (angle → residual), `fold` (source, inlier
-count, template matches on a hole fold, tilt), `holes` (the candidate count), `anchor` (`logo (x, y) score
+count, template matches on a hole fold, tilt), `holes` (`n filled of m
+candidates`), `anchor` (`logo (x, y) score
 0.95`, or `edges: window top-left (x, y) from fold + bottom trim`), `window`
 (`S B (parity)`), `unknown` (`n.nn% of the window is fabricated white`) and
 `notes` — every NOTE `measure` made plus `cut`'s own. Detecting a stale master
@@ -592,16 +604,17 @@ check 5 reads the whole report from it.
 
 ## The fill is fabrication, and it is stated
 
-The white outside the traced edges, beyond the fold, in the hole discs and in
-the frame overhang is **paper that the scan did not contain or that the clip
-destroyed**. It is fabricated and it is deliberate, and it is stated here — and
+The white outside the traced edges, beyond the fold, in the punches' discs
+and in the frame overhang is **paper that the scan did not contain or that
+the clip destroyed**. It is fabricated and it is deliberate, and it is stated here — and
 in every stamp, as the unknown fraction — so that nobody later reads a clean
 margin, a white corner or a hole-free fold as evidence about the copy. The
 bed, the prop, the neighbour's half and the clip holes were all in the frame;
 the master shows none of them, by decision, not by measurement.
 
 What is **not** fabricated: the page's own ink up to the fold line (the cut
-is on the line, with no inset); on a page whose fold came from the colour
+is on the line, with no inset), including a crack, a speck or a screen dot on
+the crease that is not one of the clip's punches; on a page whose fold came from the colour
 boundary, the neighbour's blank margin between its content and the crease,
 which is real scanned paper and stays for the window to take out — that
 page's NOTE says which finder placed the line; and the neighbour's content on
@@ -795,13 +808,14 @@ levelling is ≤ 0.02° on all 200).
 2  every master 4961 x 7016
 3  worst residuals: 200.png 0.60 -- then 0.02 (163, 147, 091, 002, 133, 004, 003)
 4  stale 0, chunk != sidecar 0
-5  fit even S=556 B=6904 (83 pages, mean unknown 1.52 %), odd S=4416 B=6904 (62 pages, 1.79 %)
+5  fit even S=556 B=6904 (83 pages, mean unknown 1.51 %), odd S=4416 B=6904 (62 pages, 1.79 %)
    anchor logo 145 / edges 55; fold holes 196 / colour 3 / none 1
-   unknown (logo pages) even p50 1.77 % p95 2.46 %, odd p50 1.86 % p95 2.71 %
+   unknown (logo pages) even p50 1.74 % p95 2.46 %, odd p50 1.86 % p95 2.71 %
    LOOK AT: no logo -- the 55 below; no fold -- 111; unknown > 4 % -- none
-6  bands with bed/prop: 001 002 003 004 005 023 027 057 067 092 104 119 147 149 151 159 163 177 187 198 199 200
+6  bands with bed/prop: 001 002 003 004 005 023 027 057 067 092 104 119 147 149 151 163 177 187 196 198 199 200
    (every one an ad or cover whose own ink reads as "bed"; the prop column is <= 0.015 everywhere but p001 0.099,
-   p005 0.090, p002 0.049 -- prop-coloured ink: the cover's orange banner, a yellow ad ground)
+   p005 0.095, p002 0.047 -- prop-coloured ink: the cover's orange banner, a yellow ad ground; p196 joined the
+   list when its yellow screen dots on the crease stopped being painted)
 7  debug_contact.png
 8  hole folds: x mm p5 7.4 p50 9.8 p95 13.4 | n == 6: 112 | template 6/5/4: 131/50/15
    LOOK AT x < 5 mm: (82, 0.9, colour), (119, 1.7, colour)
@@ -813,7 +827,8 @@ The fit: 8609's was even S=568 B=6892, odd S=4416 B=6900; 8610's odd S is
 same layout, as the anchor argument predicted. The unknown percentiles are
 8609's (1.38 / 2.30, 1.92 / 2.99) within half a point; they rose from the
 first pass's 1.58 / 1.57 because 25 pages now have their real fold and the
-neighbour's strip inside the window is marked, not shown. Check 3's p200 is
+neighbour's strip inside the window is marked, not shown, and eased by 0.03
+when the fill stopped taking crease specks (review round 2). Check 3's p200 is
 the back cover, art to the trim: the projection measure has no type there;
 its one line of type (the health warning) reads 0.18–0.20°, and the same
 measure on the levelled sheet said −0.02°, so the cover is ~0.2° off, the
@@ -853,16 +868,16 @@ was wiped and `cut` run over all 200.
 
 ### The pages looked at (overlay and master, 12 %; the inner 40 mm at 1/5; strips at 600 dpi where it mattered)
 
-Right / wrong is about the master. **Wrong at the end: p111 (placement) and
-p005 (the fill)**. 62 pages:
+Right / wrong is about the master. **Wrong at the end: p111** (placement;
+p005's fill was fixed in review round 2). 62 pages:
 
 | page | what it is, what happened | verdict |
 |---|---|---|
 | p001 | front cover, odd, full-bleed (body 0.03): frame + prop edges; the crease cracks through the art, 25 candidates on it, template 4 at 14.3 mm; edges anchor | right |
 | p002 | Computerspiel-Riesen ad, even, no wordmark; first pass locked 18 crease specks at 10.5 mm, now the six holes (template 6) at 10.0 | right |
 | p003 / p004 | the inside-cover sheet, a black card of order forms, full-bleed (0.00): frame + prop; 6 holes at 12.7 / 10.3 | right |
-| p005 | ad, odd, **no wordmark**, a coarse-screened picture whose left edge **is** the crease: 643 dot candidates (all at 8–16 mm — the picture; the neighbour's side is blank), 205 inliers on the line; looked at in 600 dpi strips at the three pair rows, the six holes sit on the picture's edge at 10.0–10.6 mm and the line runs through them (template 6, and with the prior its shift is on them): the fold is a measurement, 10.3 mm. The window is placed on it: the master's left edge is the picture's edge, its right edge 2.67 mm white (the outer trim is off the 217.8 mm frame). **What is wrong is the fill**: every candidate is painted white, and 518 of them are dots of the picture on the page side — 1137 mm², the picture's first ~5 mm along the whole inner edge scalloped away (55 % of the master's inner 8 mm is white); unknown 3.69 %, the sweep's highest | **wrong** — the fill, not the placement |
-| p196 | its sheet-mate, even, logo 0.95; the same picture in its frame at 0–11 mm from the inner edge, 1156 candidates, 204 inliers, the six holes among them at 9.8–10.6; 102 candidate discs on its own side — the picture's ~1 mm of bleed past the fold, gutter | right |
+| p005 | ad, odd, **no wordmark**, a coarse-screened picture whose left edge **is** the crease: 643 dot candidates (all at 8–16 mm — the picture; the neighbour's side is blank), 205 inliers on the line; looked at in 600 dpi strips at the three pair rows, the six holes sit on the picture's edge at 10.0–10.6 mm and the line runs through them (template 6, and with the prior its shift is on them): the fold is a measurement, 10.3 mm. The window is placed on it: the master's left edge is the picture's edge, its right edge 2.67 mm white (the outer trim is off the 217.8 mm frame). **The fill was wrong**: with every candidate painted white, 518 dots of the picture on the page side went white — 1137 mm², the picture's first ~5 mm along the whole inner edge scalloped away (55 % of the master's inner 8 mm white; unknown 3.69 %). With every *inlier* filled, still its first dot column (on the crease: 205 inliers, 530 mm², the inner 2 mm 43 % white). With the punches only — 19 discs of 643 — the picture is intact to the crease: the inner 2 mm strip is 15 % white (the six punch clusters and the dots' own gaps), 2–4 mm 1.2 %, 4–8 mm 0.5 %; unknown 2.16 % | wrong, then right (review round 2) |
+| p196 | its sheet-mate, even, logo 0.95; the same picture in its frame at 0–11 mm from the inner edge, 1156 candidates, 204 inliers, the six holes among them at 9.8–10.6; 20 discs filled | right |
 | p009 | article, odd, logo 0.95; a satellite speck had joined the six (n=7, x 9.1); now the six, 10.5 | right |
 | p010, p093, p110, p150 | controls, ordinary logo pages: 6 / 5 / 6 / 6 holes at 8.1 / 9.8 / 8.8 / 13.0 | right |
 | p013 | maxell ad, odd, no wordmark; edges anchor, 6 holes at 10.2; the ad's address line sits on its trim | right |
@@ -911,10 +926,13 @@ the issue's median fold would reject those, and `measure` has no median; the
 hole fold's p5–p95 on this issue is 7.4–13.4 mm. Not changed: both pages
 have the wordmark and the fallback never decided a master here.
 
-**The 8609 reference** for the unknown percentiles stands. Two masters are
-wrong at the end and the report names both: p111, the one page this variant
-cannot place (no fold, no wordmark, a blank neighbour), and p005, placed
-right and bitten by the fill along its inner 5 mm.
+**The 8609 reference** for the unknown percentiles stands. One master is
+wrong at the end and the report names it: p111, the one page this variant
+cannot place (no fold, no wordmark, a blank neighbour). p005 — placed right,
+bitten by the first fill along its inner 5 mm — is whole since the fill
+takes the punches only (review round 2): the fit did not move (even
+556/6904, odd 4416/6904 before and after), 1871 of 4920 candidate discs
+were filled under the inlier rule and 1173 under the punch rule.
 
 ## Notes
 
