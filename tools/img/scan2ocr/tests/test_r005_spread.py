@@ -39,3 +39,53 @@ def test_outer_edges_odd_is_mirrored():
     e = S.outer_edges(a, "odd")
     h, w = a.shape[:2]
     assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 3
+
+
+def with_holes(a, par, fold_from_edge_mm=10.0, ys_mm=(30, 43, 130, 143, 230, 243),
+               d_mm=0.7, x_jitter_mm=0.1):
+    """Six 0.7 mm holes on a line fold_from_edge_mm in from the inner frame
+    edge -- 10 mm, where 8610's sheets600 have them (MEASURED 8.3-12.2 on
+    p100/p101), inside S.HOLE_BAND_MM."""
+    h, w = a.shape[:2]
+    x = (w - fold_from_edge_mm * MM) if par == "even" else fold_from_edge_mm * MM
+    r = d_mm * MM / 2
+    yy, xx = np.mgrid[:h, :w]
+    for i, y_mm in enumerate(ys_mm):
+        cx = x + (x_jitter_mm * MM if i % 2 else -x_jitter_mm * MM)
+        disc = (yy - y_mm * MM) ** 2 + (xx - cx) ** 2 <= r * r
+        a[disc] = (20, 18, 18)
+    return a, x
+
+
+def test_find_holes_finds_six():
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even")
+    gray = a.mean(2).astype(np.uint8)
+    holes = S.find_holes(gray, "even")
+    assert len(holes) == 6
+    assert all(abs(cx - x) < 0.3 * MM for cx, cy, d in holes)
+    assert all(0.5 < d < 1.0 for _, _, d in holes)
+
+
+def test_find_holes_ignores_type_and_rules():
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even")
+    h, w = a.shape[:2]
+    a[int(100 * MM):int(100 * MM) + 4, w - int(14 * MM):w - int(6 * MM)] = 0    # a rule
+    a[int(150 * MM):int(153 * MM), w - int(11 * MM):w - int(9 * MM)] = 0      # a 3 mm blob
+    gray = a.mean(2).astype(np.uint8)
+    assert len(S.find_holes(gray, "even")) == 6
+
+
+def test_fit_fold_line():
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even")
+    h = a.shape[0]
+    fold = S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even"), h)
+    assert fold is not None and fold["n"] == 6
+    assert abs(np.polyval(fold["poly"], h / 2) - x) < 0.2 * MM
+    assert abs(S.tilt(fold["poly"])) < 0.1
+
+
+def test_fit_fold_refuses_three_holes():
+    a, x = with_holes(synthetic_frame("even", neighbour_rgb=PAPER), "even",
+                      ys_mm=(30, 43, 130))
+    assert S.fit_fold(S.find_holes(a.mean(2).astype(np.uint8), "even"),
+                      a.shape[0]) is None
