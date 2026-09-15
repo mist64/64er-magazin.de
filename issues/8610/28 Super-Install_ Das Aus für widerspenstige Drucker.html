@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Super-Install: Das Aus für widerspenstige Drucker</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Mario Schacht, rf">
+    <meta name="64er.issue" content="10/86">
+    <meta name="64er.pages" content="28-29">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX9">
+</head>
+
+<body>
+    <article>
+        <h1>Super-Install: Das Aus für widerspenstige Drucker</h1>
+        <p class="intro">Vergessen Sie die ewigen Probleme mit der Druckeranpassung. Super-Install versetzt Sie in die Lage, beliebige ASCII-Werte zu ändern und sorgt dafür, daß die entsprechenden Zeichen auch wie gewünscht auf dem Drucker erscheinen.</p>
+
+        <p>ahezu jeder C 64-Besitzer kenntdas Problem: Die euphorische Begeisterung über den neuen Drucker mit passendem Interface legt sich oft beim ersten Probeausdruck. Der C 64 und der angeschlossene Drucker verstehen sich nicht.</p>
+
+        <p>Manche Textverarbeitungsprogramme besitzen zum Glück eine eigene Druckeranpassung. Doch was tun, wenn dies nicht der Fall ist? Entweder man versucht es »zu Fuß«, indem man selbst eine entsprechende Routine schreibt, oder aber — man kann auf Super-Install zurückgreifen. Dieses komplett in Basic geschriebene Programm wird im folgenden am Beispiel einer Textverarbeitung vorgestellt und beschrieben.</p>
+
+        <h2>Spaziergang durch den Werte-Dschungel</h2>
+
+        <p>Nur in seltenen Fällen weiß der Anwender, welche Werte das Textprogramm dem Drucker schickt, um das gerade anstehende Zeichen auszugeben. Die meisten Programme haben mit dem amerikanischen Standardzeichensatz. keinerlei Probleme, doch wenn es darum geht, Umlaute auszudrucken, spielen die Drucker des öfteren verrückt. Um eine solide Grundlage für das Arbeiten mit Super-Install zu schaffen, sollte man sich als erstes eine Liste der ASCII-Werte seines Druckers erstellen. Dies geschieht mit folgendem kleinen Programm:</p>
+
+        <pre><code>10 OPEN 1,4,7  
+20 FOR I=0 TO 255 : PRINT I 30 POKE 198,0 : WAIT 198,1  
+: GETX$ : IF  
+X$=CHR$(13) THEN NEXT +0 PRINT#1,CHR$(I); I &gt;50 NEXT  
+50 CLOSE  
+</code></pre>
+
+
+        <p>Wenn Sie &lt;RETURN&gt; drücken, wird das Zeicher übersprungen, ansonster erfolgt die Ausgabe auf derr Drucker mit Wert und Bedeutung (Bild ])). Nachdem diese Wertetabelle erstellt worden ist, laden Sie als nächstes Ihr Textverarbeitungsprogramm. Dort erfassen Sie nun alle sinnvollen Zeichen (Bild 2) und drucken diese aus. Sollten Sie nach einem Vergleich von Eingabe und Ausdruck (Bild 3) keine Unterschiede feststellen, brauchen Sie keine Anpassung durchführen. Ansonsten tritt jetzt Super-Install in Aktion. Alle nicht übereinstimmenden Zeichen werden der Übersicht halber in eine Liste (Bild 4) eingetragen. Die verschiedenen Werte der Zeichen werden ebenfalls in die Liste geschrieben. Man stellt fest, daß viele Zeichen mehrfach belegt sind. Nun könnte das große Rätselraten beginnen, wenn man nicht etwas logisch vorgehen würde. Es empfiehlt sich, zuerst die Zeichen zu ersetzen, die in der Wertetabelle nur einmal vorkommen. In diesem Fall sind das die Zeichen »A« mit dem Wert 219, »O« mit 220, »U« mit 221 und »A« mit 193. Man sollte grundsätzlich nicht versuchen, die gesamte Anpassung auf einmal durchzuführen, da man schnell den Überblick verlieren kann.</p>
+
+        <p>Zunächst werden in »Super-Install« die Werte ä = 91 durch 219 ö 92 durch 220</p>
+
+        <p>93 durch 221</p>
+
+        <p>2 = 65 durch 193 ersetzt. Führt dies nicht zum Erfolg, so hat man, wie aus der Wertetabelle ersichtlich, noch eine andere Möglichkeit: ä = 219 wird durch 251 ö = 220 durch 252 ü = 221 durch 253 a = 193 durch 225 ersetzt.</p>
+
+        <p>Wenden wir uns nun den anderen Zeichen zu. Beiden verbleibenden Zeichen ist folgendes zu beachten: die Zeichen »; ( = ) I« müssen ja selbst auch gedruckt werden. Wie wir gesehen haben, werden diese Zeichen richtig zu Papier gebracht. Der Wert darf also nicht überschrieben werden. Man erhält zum Beispiel an Stelle des »;« ein »ä«.</p>
+
+        <h2>Drucker überlistet</h2>
+
+        <p>In den meisten Fällen kann man davon ausgehen, daß der niedrigste Wert für das Zeichen selbst reserviert ist und demzufolge nicht umdefiniert werden sollte.</p>
+
+        <p>Sehen wir uns zunächst die Werte für »ä öü ß« näher an. Die ersten Werte, so bleibt zu vermuten, scheiden von vorneherein aus. Wenn man unterstellt, daß die Werte vom Textprogramm nicht kreuz und quer verteilt sind, sondern nacheinander stehen, so können einige Werte schon mal unter den Tisch fallen.</p>
+
+        <p>Mit Super-Install werden zunächst die Werte ‚= 123 durch 91 C = 124 durch 92 = = 125 durch 93</p>
+
+        <p>= 126 durch 94 ersetzt. Führt dies wiederum nicht zum Erfolg, ist es sinnvoll, die Anpassung mit folgenden Werten zu wiederholen:</p>
+
+        <p>; = 91 wird durch 187 ( = 92 durch 188 = = 93 durch 189 ) = 94 durch 190 ersetzt. Weitere Kombinationsmöglichkeiten sind möglich, aber nicht erforderlich. Wenden wir uns dem letzten Zeichen zu. Aus den eben genannten Gründen setzt mannicht den Wert 33 für das »I«, sondern den Wert 97. Nunistesunlogisch, wie bisher den ersten Wert (65) einzusetzen, also für »I« = 97 die 65. Es wurde bereits für den Wert 65 die 193 eingesetzt, was zur Folge haben würde, daß nun beim Drucken des»a«ein»A«entstünde (den Vorgang muß man erst einmal langsam durchdenken). Geht man nicht logisch vor, so erkennt man spätestens beim Ausdruck, daß die nächste Kombination zum Erfolg führt. Man ersetzt »I« = 228.</p>
+
+        <p>Soviel vorerst zur Anpassung, wobei noch anzumerken ist, daß Super-Install die Umlaute und Sonderzeichen natürlich nicht anzeigt, sondernnurdie dem Commodore-Code entsprechenden Zeichen.</p>
+
+        <h2>Hoher Bedienungskomfort</h2>
+
+        <p>Im folgenden werden nun der Programmaufbau und die Bedienung von Super-Install näher erläutert. Wie bereits erwähnt, ist Super-Install ein Basic-Programm. Es wird also ganz gewöhnlich mit</p>
+
+        <p>LOAD "Super-Install",8 von Diskette geladen. Nach dem Starten erscheint eine übersichtliche Bildschirmmaske, in der die ersten Werte mit Zeichenbedeutung zu finden sind. Mit den Cursortasten kann man in der Tabelle blättern. Um nun einen Wert zuändern, bewegt man den Cursor neben das zu ändernde Zeichen und gibt den neuen Wert ein. Sofort erscheint die neue Belegung. Nachdem alle erforderlichen Definitionen durchgeführt sind, wird die neue Wertetabelle abgespeichert. Dazu muß der Anwender mit der Taste &lt;S&gt; den Menüpunkt Sichern anwählen. Das Programm meldet sich mit »CODE SICHERN:«. An dieser Stelle geben Sie den frei wählbaren Namen Ihrer Wertetabelle ein, der sich sinnvollerweise auf das angewendete Programm beziehen sollte. Danach verlangt Super-Install die Eingabe der Adresse. Und damit wären wir dann bei der eigentlichen Besonderheit von Super-Install. Hier wird mit Hilfe des Basic-Programms ein Maschinensprache-Programm erstellt, wofür Super-Install allerdings die Startadresse benötigt. Nachdem die Adresse erfaßt ist, verlangt Super-Install noch den Namen des Textprogramms, das unterstützt werden soll. Natürlich können Sie hier auch eigene Programme angeben, da die Maschinenroutine auch mit Basic-Programmen zusammenarbeitet.</p>
+
+        <p>Wenn alle Angaben ordnungsgemäß gemacht wurden, kann nun mit &lt;CTRL+ X&gt; der Lader für das Programm erstellt werden. Dieser erhält den Namen »LADER.Textprogramm«.</p>
+
+        <p>Wenn das Anwenderprogramm mit Druckeranpassung gestartet werden soll, lädt man zuerst den Lader in den Speicher. Alles andere übernimmt dann der C 64.</p>
+
+        <p>Längst ist jetzt eine nähere Beschreibung der erstellten Maschinenroutine fällig. Die Routine muß unbedingt in einen Speicherbereich geladen werden, der vom eigentlichen Anwenderprogramm nicht belegt wird. Allerdings kann der Kassettenpuffer dafür nicht verwendet werden, da die Routine zu lang ist. Am besten verwendet man den Speicherbereich oberhalb von Adresse 49152. Noch etwas muß unbedingt beachtet werden: Die Geräteadresse des Druckers muß 4 sein, dain der Maschinenroutine sonst, ohne das Zeichen zu konvertieren, in die BSOUT-Routine des C 64 gesprungen wird. Doch nun zu der Maschinenroutine (Bild 5) im einzelnen. Als erstes wird dort der OUTPUTVektor verbogen, so daß er auf die eigentliche Anderungsroutine zeigt. Steht ein Zeichen zur Ausgabe an, wird als erstes abgeprüft, ob die Geräteadresse auf 4 steht. Ist dies nicht der Fall, wird das Zeichen auf den Bildschirm ausgegeben und nicht konvertiert. Andernfalls wird aus der direkt hinter dem Maschinenprogramm gespeicherten Wertetabelle, mit dem übergebenen Wert im Y-Register indiziert, der entsprechende Wert geholt und im Akkumulator an die Ausgaberoutine BSOUT übergeben. Das war dann auch schon alles. Im Prinzip kein großer Aufwand, aber eserfülltinjedemFallseinen Zweck. Der, wie bereits erwähnt, größte Vorteil, liegt in der Anwendbarkeit auf fast alle Programme. Dies soll an einem kleinen Beispiel demonstriert werden. Dazu nehmen Sie wieder das kleine Programm zum Ausdrucken der ASCII-Werte. Die alte Liste können Sie ohne weiteres verwenden. Mit Super-Install wird nun der Wert für va« durch den Wert von »Z« ersetzt und üumgekehrt. Das Ganze speichern Sie unter dem Namen »Test« ab. Als Adresse gibt man 49152 an.</p>
+
+        <p>Für den Namen des Textverarbeitungsprogramms wird einfach der Name des Programms zum Drucken der Wertetabelle erfaßt. Mit &lt;CTRL+X&gt; erstellen Sie sodann noch den Lader für den kleinen Test. Wenn mit dem Lader ein Basic-Programm aufgerufen werden soll, muß in Zeile 5 des Laders die 1 nach der Geräteadresse entfernt und das Programm nochmals abgespeichert werden. Nachdem dann »NEW« eingegeben wurde, kann es losgehen. Mit »LADER.Programmname« wird das Ladeprogramm eingeladen. Dieses wird dann nur noch mit »RUN« gestartet, und nach kurzer Zeit beginnt der Drucker mit seinem Werk. Beim Vergleichen der neuen Wertetabelle mit der alten, kann man feststellen, daß sich hier einiges geändert hat. So wurde, um auf obiges Beispiel zurückzukommen, das »a« mit dem »Z« vertauscht.</p>
+
+        <h2>Zu guter Letzt...</h2>
+
+        <p>Mit Super-Install hat auch . der mit der Maschinenprogrammierung weniger vertraute Anwender die Möglichkeit, mit den Problemen der Druckeranpassung fertig zu werden. Noch dazu kann Super-Install sowohl bei der Textverarbeitung als auch bei eigenen Programmen verwendet werden, die Garantie für ein breites Anwendungsspektrum.</p>
+
+        <address class="author">(Mario Schacht/rf)</address>
+    </article>
+</body>
+
+</html>

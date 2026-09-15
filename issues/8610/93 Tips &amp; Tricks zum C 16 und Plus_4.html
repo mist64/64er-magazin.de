@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 16 und Plus/4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Georg Polivka, tr, H. Haberfellner, tr, tr">
+    <meta name="64er.issue" content="10/86">
+    <meta name="64er.pages" content="93">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX28">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 16 und Plus/4</h1>
+        <p class="intro">Das gute Basic des C 16 erlaubt mit nur sechs Programmzeilen eine verblüffende 3D-Grafik. Darüber hinaus bringen wir ein paar neue PEEKs &amp; POKEs und einen Artikel über den User-Port des Plus/4.</p>
+
+        <p>Zu Beginn ein paar allgemeine Informationen: — Die meisten C 128-Grafik-Listings (Rubrik »Tips &amp; Tricks zum C 128«), die in reinem Basic geschrieben sind, lassen sich auch auf dem C 16 und Plus/4 verwenden. Lediglich die Befehle zum Einstellen der Bildschirmfarben und die »SCNCLR«-Funktion müssen angepaßt werden. Die herrlichen Grafik-Demos aus der Ausgabe 1/86 der 64'er lassen sich zum Beispiel durch genannte Änderungen für den C 16 und Plus/4 verwenden.</p>
+
+        <p>— Für diejenigen, die esnoch nicht wissen sollten: Beim Zeitschriftenhändler liegt unser Sonderheft 8/86 mit dem Thema »C 16, Plus/4« für Sie bereit! Für die Datasetten-Besitzer gibt es alle Programme dieses Sonderheftes auch auf Kassette zu kaufen. 5</p>
+
+        <p>— Unsere © 16-Kiste schreit immer noch nach Tips &amp; Tricks-Futter! Da wir eine Zeitschrift zum Mitmachen sind, sind wir auch auf Ihre Beiträge angewiesen, um diese Rubrik weiter auszubauen. Vergessen Sie nicht: Es geht weniger darum, daß Sie einen brandheißen, bahnbrechenden Trick entdeckt haben. Vielmehr legen wir Wert auf eine leicht verständliche Beschreibung Ihres Beitrages. Sie helfen vielen C 16-Einsteigern sehr mit Tips, kurzen Unterprogrammen'oder Grafik-Listings, die vielleicht für Sie als selbstverständlich gelten. Und: Jeder veröffentlichte Beitrag wird natürlich angemessen honoriert.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>Tolle 3D-Grafik</h2>
+
+        <p>Mit wenigen Programmzeilen (siehe Listing 1) läßt sich eine erstaunliche Grafik erzeugen. Etwas experimentieren mit den einzelnen Zahlenwerten lohnt sich. In Zeile 1 wird die Funktion eingesetzt. Durchschnittliche Zeichengeschwindigkeit zirka vier Minuten. Maximaldauer bei sehr komplizierten Funktionen bis zirka 12 Minuten. Einige Beispielfunktionen: DEFFNA(Z)=30%C0S(7*%Z/15)</p>
+
+        <p>DEFFNA(2Z)=-COS(#*2Z/90) *TAN(m*Z/320+1)+1</p>
+
+        <p>DEFFNA(Z)=X (guter Effekt!)</p>
+
+        <p>DEFFNA(Z)=INT(Z)-110.</p>
+
+        <address class="author">(Georg Polivka/tr)</address>
+
+        <h2>Peeks &amp; Pokes</h2>
+
+        <p>Ich habe für den C 16 einige PEEKS und POKES ausgetüftelt: POKE 1343,0 Schaltet die Tastatur aus</p>
+
+        <p>POKE 1343,10 Schaltet die Tastatur wieder ein (natürlich nur vom Programm aus)</p>
+
+        <p>POKE 1345,X Verlangsamt die Repeat-Funktion</p>
+
+        <p>PEEK (15]) Anzahl der offenen Dateien</p>
+
+        <p>POKE 788,11 Absturz-POKE</p>
+
+        <p>PEEK (1339) Zeichenfarbe</p>
+
+        <p>schwarz = 80 rot =82</p>
+
+        <p>purpur = 84 blau = 86</p>
+
+        <p>orange = 88 gelb/grün = 90</p>
+
+        <p>blau/grün =92 dunkelblau = 94</p>
+
+        <p>weiß = 8 zyan = 83</p>
+
+        <p>grün = 85 gelb = 87</p>
+
+        <p>braun = 89 rosa = 9</p>
+
+        <p>hellblau = 93</p>
+
+        <p>Beispiel: j</p>
+
+        <p>10 Color 1,3,5</p>
+
+        <p>20 PRINTPEEK (1339)</p>
+
+        <p>ergibt 82 (Ingo Krüger/tr)</p>
+
+        <p>Der User-Port des Plus/4</p>
+
+        <p>Im Plus/4 wird ein 6529 Single Port Chip verwendet, der sich in Aufbau und Anwendung doch etwas vom 6522 des C 64 unterscheidet. Beim 6529 fehlt das Datenrichtungsregister und die Handshake-Leitungen CBl und CB2. Jede Leitung kann als Aus- und Eingang gleichzeitig verwendet werden.</p>
+
+        <h3>Programmierung:</h3>
+
+        <p>POKE 64784, byte: Jede binäre 0 in diesem Byte schaltet den entsprechenden Ausgang auf 0 V (- 6 mA), eine 1 legt ihn (durch einen passiven Pull-Up-Widerstand) auf 5 V (600 uA), wobei die jeweils angegebenen Ströme fließen dürfen. PEEK (64784:) liefert ein Bitmuster, das den tatsächlichen Pegeln an den Ports entspricht. Bei Verwendung einer Portleitung als Ausgang könnte ein zusätzlicher Pull-Up-Widerstand von 1 bis 4,7 kQ nützlich sein, um auch im High-Pegel ausreichende Ströme zu erhalten. Bei Verwendung als Eingang sollte mindestens 1 mA geliefert werden, damit die Leitung sicher auf 0V gezogen werden kann.</p>
+
+        <p>Die technischen Angaben stammen von Commodore Österreich. Da sich die Pinbelegung vom C 64 unterscheidet, habe ich nachfolgend eine Vergleichstabelle zusammengestellt. Hier nun die unterschiedliche Pinbelegung.</p>
+
+        <address class="author">(H. Haberfellner/tr)</address>
+    </article>
+</body>
+
+</html>

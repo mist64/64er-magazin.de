@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mini-Hardcopy für MPS 801</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="S. Nahmer, og">
+    <meta name="64er.issue" content="10/86">
+    <meta name="64er.pages" content="95">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX31">
+</head>
+
+<body>
+    <article>
+        <h1>Mini-Hardcopy für MPS 801</h1>
+        <p class="intro">Nur ein Viertel der normalen Größe benötigt eine Hardcopy mit dem Programm »Mini-Hardcopy« für den MPS 801. Dementsprechend spart der verkürzte Ausdruck Zeit und Nerven.</p>
+
+        <p>eben Sie das Programm »Mini-Hardcopy« (siehe Listing) bitte mitdemMSE ein und speichern Sie es. Geladen wird Mini-Hardcopy mit</p>
+
+        <p>LOAD "minihardceopy",8,1 und nachfolgendem NEW.</p>
+
+        <p>Das Programm arbeitet nach folgendem Prinzip: Jeweils vier Bytes werden zu einem zusammengefaßt. Das geschieht folgendermaßen:</p>
+
+        <p>10001000 00110001 01001100 00111101</p>
+
+        <p>Im ersten Schritt werden die untereinanderliegenden Byte durch eine ODER-Verknüpfung verbunden:</p>
+
+        <p>11001100 00111101</p>
+
+        <p>Im zweiten Schritt werden jeweils zwei nebeneinanderliegende Bits zu einem zusammengefaßt.</p>
+
+        <p>10100111</p>
+
+        <p>Bilder mit sehr hoher Punktdichte werden zuerst invertiert, dann verkleinertund wieder invertiert. Dadurch wird verhindert, daß die Mini-Hardcopy völlig schwarz und dadurch natürlich unansehnlich wird.</p>
+
+        <p>Bilder, die invers im Speicher liegen, dazu gehören die diverser Dia-Shows und Paint-Magic-Grafiken, werden einmal invertiert. Dies kann vor oder nach der ODER-Verknüpfung gemacht werden. Dadurch kommt es bei den Hardcopies zu einer unterschiedlichen Punktdichte.</p>
+
+        <p>Das Programm liegt im Speicher von $C000 (49152) bis $C34D (49997). Die Anfangsadresse für die Daten des verkleinerten Bildes berechnet sich aus der Anfangsadresse desBildes, vermindert um $1200. Die Druckerdaten (maximal 280 Bytes) werden direkt hinter das Programm gelegt.</p>
+
+        <p>Die Hardcopy wird gestartet mit:</p>
+
+        <p>SYS 49152, Anfangsadresse,Spalte,Parameter P</p>
+
+        <p>Anfangsadresse: Anfangsadresse des Bildes, wird dezimal übergeben</p>
+
+        <p>— Doodle: 24576 = $6000</p>
+
+        <p>— Paint Magic: 16384 = $4000</p>
+
+        <p>— »Standardbereich«: 8192 = $2000</p>
+
+        <p>Die Bilder müssen absolut, das heißt mit »,8,1« geladen werden.</p>
+
+        <p>Spalte: Anfangsspalte der Hardcopy auf dem Papier (0 bis 255) . P: nicht inverse Bilder:</p>
+
+        <p>0: starker Ausdruck; 1: schwacher Ausdruck inverse Bilder:</p>
+
+        <p>2: starker Ausdruck; 3: schwacher Ausdruck</p>
+
+        <p>Alle P größer als 3 werden als O interpretiert. Ein Ausdruck (siehe Bild) erreicht meistens nur bei einer der beiden möglichen Einstellungen von P ein akzeptables Aussehen.</p>
+
+        <address class="author">(S. Nahmer/og)</address>
+    </article>
+</body>
+
+</html>

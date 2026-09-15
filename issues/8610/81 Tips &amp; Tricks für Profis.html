@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Alfred Jäger, tr, Andreas Kaiser, tr, Arne Wohlfart, tr, Dieter Lauesf, tr, Dirk Trossen, tr, Florian Müller, tr, Frank Hund, tr, Günter Burgstaller, tr, Jens Vöcker, tr, K. Pichlmair, tr, nachher, tr, vorher">
+    <meta name="64er.issue" content="10/86">
+    <meta name="64er.pages" content="81-84">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX25">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Neben Beiträgen über Listschutz bringen wir zwei erstaunliche Programme, die den Rasterzeilen-Interrupt ausnutzen. Weiterhin eine Joystick-Bastelei und ein Programm zur Zahleneingabe mit dem Jovstick.</p>
+
+        <p>die zur Zeitwohl beste Lösung dar. Aber gibtesnoch bessere Möglichkeiten? Wo liegen die Grenzen eines Listschutzes (ohne Autostart)? Hat der Basic-Interpreter außer der &lt;SHIFT+L&gt;-Macke noch andere Programmierfehler? Kennen Sie als ausgefuchster C 64-Profinoch eine andere Methode? Wenn ja, schicken Sie uns diese! Der beste Profi-Listschutz wird unter Tips &amp; Tricks veröffentlicht.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>im LIST-Befeh</h2>
+
+        <p>Wie Sie sicher wissen, ist folgende Programmzeile gegen den LIST-Befehl insofern geschützt, als beim Listen dieser Zeile anstelle des geSHIFTeten L ein »SYNTAX ERROR« auftritt.</p>
+
+        <p>10 REM &lt;SHIFT+L&gt;</p>
+
+        <p>Dieser Listschutz ist einer der einfachsten und hat entsprechend oft — vor allem bei Einsteigern — Verwendung gefunden. Um ein auf diese Weise geschütztes Programm problemlos listen zu können, ist folgender Einzeiler (Befehlsabkürzungen verwenden, Leerzeichen nicht eintippen) vor dem Listen einzugeben:</p>
+
+        <p>POKE 95,0:POKE 96, 160:POKE 90,0:POKE 91,192:POKE 88,0:POKE 89,192:SYS 41919: POKE 1,54:POKE 42816, 144</p>
+
+        <p>Dann erscheint statt der »SYNTAX ERROR«-Meldung der Basic-Befehl END. Als Profis wollen wir uns aber nicht damit zufriedengeben, den Listschutz zu umgehen (wofür das Programm »LIST-KNACKER — Und er LISTet dochl« aus dem 64'er-Sonderheft 2/86 »Tips &amp; Tricks« viel besser geeignet ist), sondern vor allem klären, warum dieser Listschutz funktioniert und wie er behoben wird.</p>
+
+        <p>Verantwortlich ist ein kleiner Fehler in der LIST-Routine, den wir mit Hilfe desSMON genau aufzeigen wollen. Mit »M AO9E Al9E« können Sie die Tabelle der Befehlswörter, welche der Computer zur Decodierung der Tokens in Klartext einsetzt, ausgeben lassen, mit »D A717 A741l« die Umwandlungsroutine, der das Token im Akkumulator übergeben wird. Zunächst wird aus dem Token ermittelt, ab welcher Position in der Tabelle ab $A09E das benötigte Befehlswort steht. Betrachten wir nun das Bild 1, eine Hardcopy von einem Bildschirm, aufdem.die verantwortlichen Teile desROMs stehen.</p>
+
+        <p>Bei $A738 wird dann Zeichen für Zeichen das Befehlswort ausgegeben, da dort die Position in der Tabelle bereits im Y-Register steht. Wie man am Hex-Dump der Befehlswörter-Tabelle sieht, ist im letzten Zeichen eines Kommandos Bit 7 gesetzt. Diese Endmarkierung wird von $A73B erkannt, andernfalls wird das Zeichen bei $A73D ausgegeben. Nun kommt die kritische Stelle. Normalerweise ist das auszugebende Zeichen nicht CHR$(0) und somit das Z-Flag nach Ausgabe des Zeichens gelöscht, wodurch der BNE-Befehl bei $A740 einem JMP gleichkommt (mehr über diesen und andere Programmiertricks in »Effektives Programmieren in Assembler«, 64'er-Assembler-Sonderheft 8/85, Seite 74).</p>
+
+        <p>Bei $CC, dem Code, der durch das geSHIFTete L erzeugt wird, gibt es allerdings eine Ausnahme: nach der Umwandlung des Tokens in den Offset steht in der Tabelle bei $A738 im YRegister der Wert $FF (dies können Sie mit dem Trace-BefehldesSMON nachvollziehen, indemSieinden Akku den Wert $CC schreiben, von $A717 bis $A738 TRACEn lassen und dabei den Wert des Y-Registers beobachten), wodurch der Inhalt von $A19D ausgelesen wird. Wie das Hex-Dump zeigt (siehe Bild), steht dort ein Null-Byte!</p>
+
+        <p>Die Folgen ergeben sich ganz logisch: bei $A740 ist das Z-Flag gesetzt, dader Akku den Wert Ohatte, und es erfolgt keine Verzweigung, was aber zur fehlerfreien Funktion unbedingt notwendig wäre. Statt dessen wird die im Speicher direkt hinter der »LIST«-Routine liegende »FOR«-Routine abgearbeitet (ab $A742), die ihrerseits die Parameter des »FOR«-Befehls einzuholen versucht (bei $A746 wird der»LET«-Befehl zur Definition der Schleifenvariablen aufgerufen). Da wir aber nach »LIST« keine »FOR«-Parameter eingeben können, vermißt der Interpreter solche: SYNTAX ERROR!</p>
+
+        <p>Nun wissen wir, wie es zu dieser Fehlermeldung kommt, die einen Abbruch des Listens bewirkt. Mit Hilfe desSMON fanden wir heraus, wie man diese Genauigkeit der LIST Routine behebt. Wenn das Interpreter-ROM in das an gleicher Adresse liegende RAM kopiert wird, kann man den BNE-Befehl bei $A740 in einen »BCC« umwandeln. Dieser Verzweigungsbefehl funktioniert einwandfrei, da bei der Bildschirmausgabe ($A73D JSR $AB47) kein YO-Fehler vorkommt und von daher das C-Flag immer gelöscht ist.</p>
+
+        <p>Genau diese Änderungen nimmt der oben vorgestellte Einzeiler vor, der im übrigen durch &lt;RUN/STOP RESTORE&gt; wieder aufgehoben werden kann. Dadurch wird nämlich wieder das alte (und fehlerhafte) Basic-ROM eingeschaltet.</p>
+
+        <p>Anmerkung der Redaktion: Unser Floppyspeeder »64'er-DOS« bringt bei einem List-Versuch des genannten Schutzes weder »Syntax Error noch »REMEND« sondern ein &lt;SHIFT+L&gt;, wie es ja auch richtig sein sollte.</p>
+
+        <address class="author">(Florian Müller/tr)</address>
+
+        <h2>&lt;RESTORE&gt; — Die Prügeltaste</h2>
+
+        <p>Bei allen (zumindest uns bekannten) C 64-Computern braucht man bei der &lt;RESTORE&gt;-Taste einen sehr harten Anschlag, um überhaupt eine Reaktion zu erhalten. Da dieser durchaus störende Umstand nicht etwa auf einem Fehler in der Tastaturmechanik beruht, haben wir uns einmal den zuständigen Teil des Schaltplanes angesehen. Demnach befindetsichin der Restore-Leitungein Kondensator © 38 (zu findenander vorderen, linken Ecke der Computerplatine), der von Commodore mit 5l pF eindeutig zu klein dimensioniert ist, um das nachfolgende Timer-IC zu triggern. Nach Austausch dieses Kondensators gegen einen einfachen l0-nF Keramiktyp ist die &lt;RESTORE &gt;-Taste ebenso leichtgängig wie jede andere Taste auch.</p>
+
+        <address class="author">(Arne Wohlfart/tr)</address>
+
+        <h2>Musik am User-Port</h2>
+
+        <p>Dieses Programm gibt einen Ton in der gewünschten Frequenz am User-Port aus. Als Vorbereitung nimmt man einen Lautsprecher und verbindet ihn mit den Anschlüssen GND und Pb6. Dann gibt man folgendes Programm ein: 10 POKE 56590,7</p>
+
+        <p>20 INPUT"Hertz :";he</p>
+
+        <p>30 h=985248.4/he:hi=INT(h/256) : lo=h-hi*256</p>
+
+        <p>40 POKE 56580, 10:POKE 56581, hi</p>
+
+        <h3>Erklärung:</h3>
+
+        <p>In Zeile 10 wird der Timer A desCIA2 gestartet und ein Unterlauf an Pb6 des User-Ports ausgegeben. In Zeile 20 wird die Frequenz des Tons eingegeben. Zeile 30 rechnet die Frequenz mit Hilfe der Taktfrequenz (985248,4 kHz) in Timerwerte um. In Zeile 40 werden diese Timerwerte in die Zählregister von Timer A gePOKEt.</p>
+
+        <h3>Zur Umrechnung der Frequenz:</h3>
+
+        <p>Nehmen wir an, wir wollen alle 60stel Sekunde einen Interrupt (also einen Timerunterlauf) verursachen, wie dies zum Beispiel beim Systeminterrupt der Fall ist. Dann berechnen wir die Timerwerte nach folgender Rechnung:</p>
+
+        <p>Timerwerte = Taktfrequenz * 1/t, dabei istt die Anzahl der Unterläufe. Für unser Beispiel würde das bedeuten:</p>
+
+        <p>Timerwerte = Taktfrequenz * %o bei einer Taktfrequenz von 985248.4 gibt das als Timerwert 16420.8. Diese Zahl wird inLSB und MSB erteilt und in die Zählregister gePOKEt. Nun wird alle 60stel Sekunde ein Unterlauferzeugt. Dieser Unterlauf wird am User-Port ausgegeben (an Pb6) und erzeugt im Lautsprecher ein Knacken. Aufgrund der hohen Frequenz erscheint dieses Knacken als gleichmäßiger Ton.</p>
+
+        <p>Zum Bereich der Frequenz sei gesagt, daß er von 16 Hz bis zirka 20000 Hz reicht. Nach oben hin wird die Tonausgabe immer ungenauer, da die Stufung der Zählregister in 255er-Schritten zu ungenau ist.</p>
+
+        <p>Zur Ergänzung sei gesagt, daß diese Tonausgabe an einem weiteren Pin des User-Ports möglich ist: Es ist dies der Pin Pb7. Dabei müssen nur die entsprechenden Register von Timer B des CIA2 angesteuert und ein zweiter Lautsprecher angeschlossen werden.</p>
+
+        <address class="author">(Dirk Trossen/tr)</address>
+
+        <h2>Tempo für die RS232-Schnittstelle</h2>
+
+        <p>Wie inzwischen bekannt, lassen sich alle Parameter der ıinternen RS232-Schnittstelle durch ein entsprechendes Bit-Muster im Steuerregister (665) und Kontrollregister (666) einstellen. Die Übergabe der Parameter erfolgt beim Öffnen der Schnittstelle mit einem OPEN-Befehl unter der Gerätenummer 2.</p>
+
+        <p>Möchte man nun in einem laufenden Programm die Bedingungen Parität, Anzahl der Stopp-Bits und Datenwortlänge ändern, so kann dies durch Verändern der entsprechenden Bitwerte im Steuer- und Kontroliregister jederzeit geschehen. Willman jedoch die Übertragungsgeschwindigkeit in Bit pro Sekunde wechseln und setzt die korrespondierenden Bits neu, so stelltman fest, daß dies ohne Wirkungbleibt. Eine andere Geschwindigkeit läßtsichnur beieinemerneuten Initialisieren mit OPEN... einstellen. Dieser Befehl löscht aber gleichzeitig alle Variablen, so daß dann sowieso das Programm abgebrochen wird.</p>
+
+        <p>Eine Untersuchung der ROM-Routinen brachte die Ursache zutage. Beim Eröffnen der Schnittstelle werden die Speicherzellen $299 und $29A mit Konstanten versehen, die je nach eingestellten Bitpro Sekunde auseiner Tabelle entnommen werden. Diese Konstanten steuern den Timer im 6522 und damit die Taktrate. Beider Bearbeitung der Schnittstelle werden jetzt nur noch die Speicherzellen $299 und $29A ausgewertet, daher bleibt eine nachträgliche Änderung im Steuerregister wirkungslos.</p>
+
+        <p>Das Problem läßt sich dadurch lösen, indem man nachträglich noch einmal den Teil der OPEN-Routine anspringt, wo die Konstanten der Übertragungsgeschwindigkeit zugeordnet werden, Eine geeignete Einsprungstelle ist die Adresse 62499 ($F423). Man ändert also die entsprechenden Bits im Steuerregister und fügt anschließend an: SYS 62499.</p>
+
+        <address class="author">(Dieter Lauesf/tr)</address>
+
+        <h2>EOR in Basic</h2>
+
+        <p>Wir haben eine Möglichkeit gefunden, in Basic ein »exclusiv-oder« zu simulieren. Dazu muß im Programm einfach die Zeile »DEF FNa(e)=((NOTXJANDY)JOR(NOTYJANDx% erscheinen. Dann setztman die Variablenx und y aufdie zu verknüpfenden Werte und ruft die Funktion mit einem beliebigen Parameter für e auf. Die Idee kam aus einem Digitalelektronikbuch, in dem eine EXOR-Schaltung durch Oder-, Nicht- und Und-Gatter aufgebaut wurde.</p>
+
+        <address class="author">(Jens Vöcker/tr)</address>
+
+        <h2>»Enson-Sunpori« ohne Line-Feed</h2>
+
+        <p>Im Sonderheft 6/86 ist ein Grafik-Programm abgedruckt, 6Epson-Support«), indessen Beschreibung angegeben wird, daß Auto-Line-Feed abgeschaltet werden muß. Ich habe das Programm abgetippt, und sann sofort auf Abhilfe. Das Ergebnis lautet: POKE50326,32 und ALF kann weiter eingeschaltet bleiben.</p>
+
+        <address class="author">(Alfred Jäger/tr)</address>
+
+        <h2>Die Musik von »Elite«</h2>
+
+        <p>Ich habe einen Tip für alle diejenigen, die bei dem Spiel »Elites die Musik vermissen. Es gibt bei der englischen Version von Elite nur ein Lied (von Johann Strauß), dagegen bei der deutschen Version noch ein Lied zusätzlich (die Anfangsmusik). Wenn man das Spiel mit &lt;INST/DEL&gt; angehalten hat, kann manmit der Taste &lt;M &gt; lediglich dasStart-und ÄAndockrauschen ein/ausschalten. Was nicht in der Beschreibung steht, ist, daß man mit der Taste &lt;X&gt; in einen Modus kommt, indem man die Musik im Hintergrund ein-/ausschalten kann, bestimmen kann, ob neben der Musik andere Geräusche zugelassen sind oder nicht, und (bei der deutschen Version) sogar zwischen zwei Liedern wählen kann.</p>
+
+        <p>Folgende Tasten haben obige Wirkung, wenn Elite angehalten wurde:</p>
+
+        <p>&lt;X&gt; = Modus ein-/ausschalten |</p>
+
+        <p>&lt;C&gt; = Musik möglich/nicht möglich (beim nächsten Docken/Neustart wird die Musik automatisch ein/ausgeschaltet)</p>
+
+        <p>&lt;M&gt; = Musik sofort ein/ausschalten</p>
+
+        <p>&lt;B&gt; = Geräusche während Musik ein-/ausschalten &lt;E&gt; = (nur deutsche Version) Wahl zwischen zwei Liedern</p>
+
+        <p>Vielleicht weiß jemand, welche Bedeutungdie &lt;D&gt;-Taste hat, denn auch bei ihr hört man das typische Klickgeräusch. (Torsten Tiedemannftr)</p>
+
+        <h2>Der Bildschirm als liniertes Blatt</h2>
+
+        <p>Es ist oft rechtärgerlich, wenn man am Bildschirm des C 64 arbeitet und, wenn Rahmen und Hintergrund gleichfarbig sind, nicht weiß, wo die letzte Zeile ist und einem auf einmal die ganze Sache nach oben wegscrollt. Für solche und ähnliche Fälle ist das Programm »Liniertes Blatt« (Listing ]) wie geschaffen. Durch eine geniale Raster-Interrupt-Routine erreichen Sie nämlich dasselbe wie wenn Sie mit Filzstift auf der Mattscheibe am Ende jeder Zeile eine Linie ziehen würden. Eingegeben wird das äußerst kurze Programm mit dem MSE und gestartet mit SYS49206. Es liegt von $C000 bis $C05a im Speicher. Die Hintergrundfarbe muß von jetzt an nach 49175 gePOKEt werden; die Farbe der Linien ist in 49163 festgelegt.</p>
+
+        <address class="author">(Günter Burgstaller/tr)</address>
+
+        <h2>Kursivschrift am Bildschirm</h2>
+
+        <p>Kursivschrift oder »Italics« gehört heutzutage schon zur Standardausrüstung eines durchschnittlichen Druckers. Mit dem gleichnamigen Programm (Listing 2) kann der C 64-Besitzer diese Schriftart auch auf dem Bildschirm genieBen. Eine VIC-Interrupt-Routine setzt ohne Veränderung des Zeichensatzes diesen Effekt für Sie in Szene. Eingegeben wird wie gewohnt mit dem MSE, die Inbetriebnahme erfolgt durch SYS49197. Das Progrämmchen belegt die Speicherstellen $C000 bis $C031.</p>
+
+        <address class="author">(Günter Burgstaller/tr)</address>
+
+        <h2>Der Super-Listschutz</h2>
+
+        <p>Es handelt sich hier um eine ganz besondere Art von Listschutz, welche das Auflisten zwar nicht verhindert, aber den unbefugten Eindringling mit den blanken Zeilennummern konfrontiert. Nehmen wir an, Sie hätten ein Basic-Programm geschrieben und wollen es ganz oder nur bestimmte Teile (zum Beispiel Algorithmen) vor neugierigen Blicken schützen. Sie laden dazu Ihr Programm und H.l.DE. (Listing 3) und starten dieses mit SYS49152. Achtung: Ihr Programm muß lOOprozentigin den Basic-Zeilen untergebracht sein. Maschinenprogramme, die nur eine Basic-Kopfzeile haben, können nicht bearbeitet werden. Es ist übrigens egal, ob Sie H.I.DE. vor oder nach Ihrem Programm laden, da bei seinem Start die Basic-Endezeiger wieder gerichtet werden und so ein »OUT OF MEMORY ERROR« verhindert wird. Nach kurzer Zeit hat das Maschinenprogramm seine geheimnisvolle Arbeit getan, und Sie dürfen jetzt versuchen, Ihr Basic-Programm zu LISTen. j</p>
+
+        <p>Beispiel:</p>
+
+        <address class="author">(vorher)</address>
+
+        <p>10 A$="NIZAGAM RE'46"</p>
+
+        <p>20 FOR T=LEN(A$) TO 1 STEP -I</p>
+
+        <p>30 PRINT MIDKA$T,),:;REM GEHEIMER ALGORITHMUS 40 NEXTT</p>
+
+        <p>SYS 49152</p>
+
+        <address class="author">(nachher)</address>
+
+        <p>Es ist verblüffend, nicht? Sie können natürlich auch Zeilen stehenlassen. Sie teilen das dem Programm mit, indem Sie jeder Zeile, die affen b@ vo 50 @REM COPYRIGHT BY 64er 1986 wird nicht verändert. Nur der Klammeraffe wird gelöscht. So lassen sich Bemerkungen, die den Neugierigen empfangen sollen (zum Beispiel GET OUT OF HERE!) leicht anbringen. Noch besser sieht'saus, wenn die Zeile nicht angesprungen wird, und so das REM entfallen kann!</p>
+
+        <p>Eine Einschränkung: Die erste Zeile darf nicht stehenbleiben! Lassen Sie notfalls eine REM-Zeile verschwinden.</p>
+
+        <p>Ihr Programm können Sie jetzt ganz normal speichern. Nach dem Laden muß nichts mehr eingegeben werden, wie bei anderen Listschutz-Versuchen üblich, die meist ziemlich sinnlos sind, wenn der Unbefugte erst einen POKE eingeben muß, um abgewiesen zu werden.</p>
+
+        <p>Wenn Sie nun aufeine Erklärung des Phänomens gewartet haben, muß ich Sie enttäuschen, denn was ist schon ein Listschutz, wenn er überall bekannt ist? Versuchen Sie, es selber herauszufinden. Wie Sie sicher merken werden, kann es je nach Programmlänge etwas länger dauern, bisH.l.DE. fertig ist. HI.DE. informiert Sie regelmäßig, welche Zeile er gerade bearbeitet. So sehen Sie auch, daß er bei längeren Programmen relativ lange für eine Zeile braucht.</p>
+
+        <p>Nur so viel: esliegt daran, daß extrem vielim Speicher verschoben werden muß. Deshalb sollte man bei seinen Programmen wenn möglich folgendes beachten:</p>
+
+        <p>— Zur Einsparung von Speicherplatz lassen Sie alle REMs weg.</p>
+
+        <p>— Versuchen Sie so viel Programmtext wie möglich in eine Zeile zu packen. Man sieht es später ja nicht mehr.</p>
+
+        <p>Sollte Ihr Programm zu lang sein, meldet sich H.I.DE. und ..sagt es Ihnen. Normalerweise sind Programme bis 32 KByte möglich. Beachten Sie auch, daß Sie das Programm jetzt nicht mehr editieren können und die Zeilen gelöscht werden, wenn Sie mit dem Cursor auf die Zeilennummer gehen und &lt;RETURN&gt; drücken!</p>
+
+        <address class="author">(Frank Hund/tr)</address>
+
+        <h2>Kegeilbares Dauerieuer</h2>
+
+        <p>Ich habe einen Quickshot II-Joystick, der mit einfachem Dauerfeuer ausgestattet ist. Durch das Auswechseln eines Widerstandes gegen ein Poti (Bild 2) kann das Dauerfeuer geregelt werden. Hardwareschäden sind während der vier Wochen Dauertest nicht aufgetreten</p>
+
+        <address class="author">(K. Pichlmair/tr)</address>
+
+        <h2>Zahlen eingeben mit dem Joystick</h2>
+
+        <p>In Ausgabe 6/86 auf Seite 77 wurde bereits ein solches Programm veröffentlicht. Esläßt sich aber wesentlich kürzer und übersichtlicher schreiben (siehe Listing 4). Der Joystick wird in Port 1 gesteckt. Der Feuerknopf beendet die Eingabe. Danach wird die eingegebene Zahl berechnet und in der Variablen W gespeichert.</p>
+
+        <p>Die Eingabe kann mit Hilfe von PRINT-Befehlen beliebig positioniert werden. Der POKE 198,0 in der letzten Zeile löscht den Tastaturpuffer, der wegen des Joysticks in Port 1 wirre Zeichen enthält.</p>
+
+        <address class="author">(Andreas Kaiser/tr)</address>
+
+        <h2>Tip zu PrologicDOS</h2>
+
+        <p>Über »POKE 781,133: SYS 58551« läßt sich aus einem Basic-Programm heraus das Disketteninhaltsverzeichnis auf den Bildschirm bringen (entspricht der &lt;Fl&gt;-Taste). Das Ganze läßt sich natürlich auch in Maschinensprache schreiben: »LDX #$85: J]SR $E4B7«</p>
+
+        <address class="author">(tr)</address>
+    </article>
+</body>
+
+</html>
