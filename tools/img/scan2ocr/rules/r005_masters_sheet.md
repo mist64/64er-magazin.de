@@ -86,34 +86,37 @@ directory mixing two runs is not something any downstream check can see.
 ## Outputs
 
 ```
-<tmp>/masters600/NNN.png         the OCR master — r010 reads this   (the contract)
-<tmp>/masters600/NNN.stamp.txt   which profile and which curve made that master
-<tmp>/figures600/NNN.png         the figure master — r145 reads this
-<tmp>/cmyk2400/NNN.tif            the CMYK archival form, deflate-compressed
-<tmp>/cmyk2400/NNN.colors.txt     the profile the separator was actually run with
+<tmp>/masters600/NNN.png         the master — r010 OCRs it, r145 cuts from it   (the contract)
+<tmp>/masters600/NNN.stamp.txt   which profile made that master
+<tmp>/sheets600/NNN.png          the levelled, graded, UNCUT sheet at 600 dpi
+<tmp>/masters2400/NNN.png        the same at 2400 — a figure that bleeds off the trim still exists here
+<tmp>/cmyk2400/NNN.tif           the CMYK archival form, deflate-compressed
+<tmp>/cmyk2400/NNN.colors.txt    the profile the separator was actually run with
 <tmp>/debug600/NNN.png           the overlay: the four traced lines, in green
 ```
 
 `<tmp>/masters600` is derived by `r000_issue.py`, because it is the contract the
-rest of the chain depends on. The other three directories are this step's own
+rest of the chain depends on. The other four directories are this step's own
 workings and are named in this step. `r010` and `r145` build their paths from
-the page number, so the two sidecars sit beside the images they describe without
-disturbing anything that counts files.
+the page number, so the sidecars and the other renders sit beside the images
+they describe without disturbing anything that counts files.
 
-Every master is the **same size** — 231 × 304 mm at 600 dpi, 5457 × 7181 px —
+Every master defaults to the **same size** — 231 × 304 mm at 600 dpi, 5457 ×
+7181 px, grown only for the rare page whose trace overflows it (see below) —
 because `r010`'s block geometry and `r145`'s figure crops share one coordinate
 system. If each page had its own width, a block's page-fraction would mean
 something different on every page. The traced page is anchored at its own
 top-left **trim corner** and the shortfall is paper white.
 
 The canvas is **derived** from the widest and tallest entry in `PAGE_CLASSES`,
-not measured separately, so a page that passes the size gate cannot overflow it
-— for **any** class, not only for A4. Two independent numbers there would
-eventually disagree and truncate a page quietly; as it is, an overflow is
-impossible and the step refuses one anyway rather than cropping. The price is
-15 mm of extra fabricated white on the right of the 145 pages that are A4: the
-cover leaf's fold flap has to fit, and a canvas per class would break the one
-thing `r010` and `r145` rely on.
+not measured separately — for **any** class, not only for A4 — so it fits every
+class without two independent numbers that could quietly disagree and truncate
+a page. A page that still does not fit it — the whole levelled sheet published
+`NOT CROPPED`, for instance — grows the canvas to fit itself and says so in its
+stamp, rather than being truncated. The price of the shared canvas is 15 mm of
+extra fabricated white on the right of the 145 pages that are A4: the cover
+leaf's fold flap has to fit, and a canvas per class would break the one thing
+`r010` and `r145` rely on.
 
 ## The procedure
 
@@ -136,10 +139,11 @@ scan_dir/NNN.png
   -> fill everything outside the traced page with paper white
   -> drop bed components that touch the frame AND lie mostly outside the page
   -> the traced page must match one of PAGE_CLASSES          [the size gate]
-  -> separate to CMYK with tools/img/cmyk_reconstruction     [not reimplemented]
-  -> two renders off that ONE separation: masters600 carries the black-point
-     curve, figures600 does not
-  -> masters600/NNN.png + NNN.stamp.txt, figures600/NNN.png,
+  -> separate to CMYK with tools/img/cmyk_reconstruction at 2400, UNDO its GCR
+     (printed black is all four inks, not K alone — that is why type is black)
+  -> ONE render, uncurved: masters2400, reduced 4:1 to sheets600, cut to the
+     traced page -> masters600
+  -> masters600/NNN.png + NNN.stamp.txt, sheets600/NNN.png, masters2400/NNN.png,
      cmyk2400/NNN.tif + NNN.colors.txt, debug600/NNN.png
 ```
 
@@ -261,11 +265,12 @@ Where the sheet runs off the side of the frame the samples are a constant 0 (or
 scan does not contain the trim, so the traced width is a **lower bound** on the
 leaf, not a measurement of it.
 
-## The size gate — three classes, measured
+## The size classes — three of them, measured
 
 A traced page must come out one of the sizes **this issue actually has**. A page
-that matches none of them means a traced line ran away, and the fill would then
-be eating type rather than bed.
+that matches none of them means a traced line ran away, and it is published
+uncropped — the whole levelled sheet, `NOT CROPPED` in its stamp — rather than a
+crop that might be wrong.
 
 | class | window | what lands there |
 |---|---|---|
@@ -292,117 +297,30 @@ A4, four for the card, one for the cover leaf. Two interior pages fall outside
 every window — 007 and 117 — and both are trace failures rather than sizes this
 issue has; see *Known outliers*.
 
-## The grade — call the converter, render twice
+## The grade — call the converter, undo its GCR, render once
 
-The separation is **not reimplemented here**.
-`tools/img/cmyk_reconstruction` already does the hard part and `colors.txt` was
-written for it: 8 RGB anchors (W C M Y R G B K) plus 4 per-ink level lines. It
-works in the DENSITY domain — `d = -log10(rgb/W)`, six polynomial features, a
-least-squares solve against the seven ink targets, then full GCR
-(`K = min(C,M,Y)`, subtracted from each). Because the paper white is the density
-reference, the scan's global R/B 1.163 cast falls out for free.
+The separation is **not reimplemented here**. `tools/img/cmyk_reconstruction`
+does it, in the density domain, against the 8 anchors and 4 level lines of
+`colors.txt` — or the built-in anchor set with identity levels when the
+descriptor has no profile. It is run on the levelled **2400 dpi** sheet, and
+the 600 dpi master is a 4:1 reduce of the graded result: grading first and
+averaging afterwards is what antialiases thin type instead of deleting it.
 
-```
-cmyk_reconstruction --colors <profile> <in.png> <out.tiff>
-magick <out.tiff> -profile USWebCoatedSWOP.icc -profile AdobeRGB1998.icc <rgb.png>
-```
+**The separator's GCR is undone.** It moves `min(C,M,Y)` into K, which leaves
+printed black as K alone, and 100 % single K renders about 50 through SWOP —
+grey type. `c = c_final + k` recovers exactly what was subtracted. MEASURED on
+p056: glyph p50 37 → 20, 0 % → 39.6 % of glyph pixels solid black, which is
+where 8609's masters sit (p010: 31, 42.1 %). p006's photo keeps its gradation.
 
-`colors` is **optional** in the descriptor. With no profile the grade falls back
-to the **built-in anchor set** — the eight anchors the old separation compiled
-in, copied into `BUILTIN_ANCHORS` rather than imported, because `scan2mrc` is
-retired and `scan2ocr` must not reference it — and to identity levels, because a
-level line is a per-ink contrast decision that must be measured, not guessed.
+**There is ONE master and no contrast curve.** `r145_extract_figures.py` reads
+the same file `r010` OCRs, so a curve on the master is a curve on every
+published figure, and a curve crushes photographs. The uncurved render is the
+master; the `-level 30%,100%` curve and the second render are gone.
 
-### One separation, two renders
-
-The two consumers want different images, so both come off **one** separation:
-
-| render | for | wants |
-|---|---|---|
-| `masters600/NNN.png` | `r010` OCR | contrast: type to solid black. The ICC render **with the black-point curve on it**. Clipping is a feature |
-| `figures600/NNN.png` | `r145` figure cuts | fidelity: the straight ICC render. No clipped highlight, no crushed shadow, **no curve** |
-
-Ink at ~66 is not a bug, it is honesty: 100% SWOP black is not RGB 0. The OCR
-master boosts it anyway — tesseract binarises, so the boost costs nothing there
-— which is exactly why there are two renders and not one.
-
-**The curve is one issue-wide constant, never per page.** ImageMagick's
-`-level 30%,100%`, and exactly that arithmetic:
-
-```
-out = clamp((in - 0.30 * 255) / (0.70 * 255) * 255)
-```
-
-The prototype measured a black point per page — the 2nd percentile of that
-page's own ink — and stretched to it. That makes the same grey mean a different
-thing on every page: a page whose darkest pixel is a photograph gets a different
-transfer from the text page beside it, and nothing downstream can see that it
-happened.
-
-**30 % was chosen on the worst page, measured on all four.** "glyph p50" is the
-median level of the pixels a glyph is made of in a body-text window — 0 is solid
-black — and "paper p50" is the median of the paper beside it:
-
-| level | none | 20 % | 25 % | 30 % | 35 % |
-|---|---|---|---|---|---|
-| glyph p50, 006 | 69 | 28 | 14 | **1** | 0 |
-| glyph p50, 041 | 54 | 8 | 1 | **0** | 0 |
-| glyph p50, 056 | 53 | 5 | 0 | **0** | 0 |
-| glyph p50, 092 | 72 | 32 | 18 | **4** | 0 |
-| paper p50 | 255/255/254/254 | — | — | unchanged | 041's paper starts to drop |
-
-30 % is where the worst page's type goes solid black while the paper floor is
-still untouched. 35 % buys nothing — the type is already there — and starts
-eating paper, which is the one thing a black-point curve must never do.
-
-**And the figure render must not have it.** A black-point curve crushes a
-photograph: measured on p006's cover photo, this level drives the pure-black
-area of the picture from **25 % to 42 %**. Type wants the crush; pictures do
-not. `r145` cuts its pictures from `figures600`, which is why that render stays
-straight.
-
-(The implementation is four lines of numpy rather than a `magick` call, so the
-curve costs no extra pass over a 110 megapixel image. It agrees with
-`magick -level 30%,100%` to within one level — verified against it.)
-
-### THE LEVELS ARE NOT TRUSTED, THEY ARE PROVEN
-
-SH8601's `colors.txt` as written has `LK 90 95`, which maps K's 229–242 window
-onto the full range: ordinary black text falls **below** the low point and is
-clipped toward zero ink, and 93 % of the page snaps to pure white. The result
-still looks like a page, which is what makes it dangerous — nothing downstream
-can tell a washed-out master from a clean one.
-
-So the grade is measured against the ungraded page it came from, and the step
-**fails the page** rather than publishing it. Two independent checks:
-
-| check | measured on p056 |
-|---|---|
-| the graded page must keep `GRADE_INK_KEEP` (0.70) of the scan's ink | ungraded 17.1 % inked; levels neutralised keeps 15.3 % (0.90), `colors.txt` as written keeps 5.7 % (**0.34**) |
-| the darkest ink's p50 must sit `MIN_INK_CONTRAST` (120) below paper white | 201 with the levels neutralised, 162 with them as written |
-
-The level lines have since been re-measured (`LC 5 100 / LM 4 100 / LY 5 100 /
-LK 3 100`, against a re-measured white point `W 209 175 157`), and both checks
-now pass on every page that is printed on this issue's paper. The profile as
-first found is kept beside the current one as `colors_asfound.txt`; do not
-neutralise the levels to get past a failure — re-measure them and re-run.
-
-**Both checks are statements about the level lines, and the level lines were
-measured on this issue's paper.** They cannot judge a page that is not printed
-on it, because the two sides of the ratio then use two different papers: the raw
-side measures ink as a distance from the *sheet's own* white (`STOCK_PCT`) and
-the graded side from what the profile's `W` grades to. Measured on p149: the
-card's pale cyan field sits 52 city-block from its own stock — ink, by the raw
-test — and grades to 254, because relative to a `W` that is yellower and darker
-than this card it has almost no density. The ratio reads **0.31** and the master
-is, by eye, excellent: crisp blue type, the pale field gone to paper.
-
-So on the eight `ink/bed` pages the two checks **report instead of refusing**,
-the page's log line carries `GRADE UNPROVEN, not this issue's paper: …`, and one
-weaker gate stays hard — the graded page must not have come out **blank**
-(`GRADE_MIN_INK_FRAC`, 0.5 % of the canvas against a measured 2.9–85.9 %). If
-the pale tint on the coated stock has to survive, the fix is a second measured
-profile for that stock. That is a decision, not a looser constant here.
+**The grade is measured and REPORTED, never gated.** Two numbers go in every
+page's log line — ink kept vs the raw scan, and the darkest ink's contrast to
+paper. A gate on ink-keep once failed 10 of 152 pages and was wrong on all 10
+(tint-heavy pages whose screened tint correctly demodulated into a flat fill).
 
 ## The stamp — every artefact says which grade made it
 
@@ -412,17 +330,18 @@ standing in `masters600/` were now stale, and it took a **human eye noticing
 yellow corners** to find out. Nothing mechanical could have.
 
 So everything this step writes carries the grade's fingerprint — the 8 anchors,
-the 4 level lines, the OCR level constant, and a 12-hex `grade-sha` over exactly
-those — plus what was decided about the page's geometry:
+the 4 level lines, and a 12-hex `grade-sha` over exactly those — plus what was
+decided about the page's geometry:
 
 | where | how |
 |---|---|
 | `masters600/NNN.png` | a PNG `tEXt` chunk keyed `r005` |
 | `masters600/NNN.stamp.txt` | the same text, readable without opening a 110 megapixel PNG |
-| `figures600/NNN.png` | PNG `Comment` |
+| `sheets600/NNN.png` | a PNG `tEXt` chunk keyed `r005`, same as the master |
+| `masters2400/NNN.png` | PNG `Comment` |
 | `cmyk2400/NNN.tif` | TIFF `ImageDescription` |
 | `cmyk2400/NNN.colors.txt` | the profile file the separator was **actually run with**, kept rather than deleted with the scratch directory |
-| the run's log | the whole block once at the top, and `grade <sha> level 30%` on every page line |
+| the run's log | the whole block once at the top, and `grade <sha>` on every page line |
 
 Three copies because each survives a different accident: the chunk survives the
 file being copied out of `masters600/`, the sidecar survives not wanting to
@@ -430,20 +349,13 @@ decode the image, and the log survives the files being deleted.
 
 Detecting a stale master is now a string comparison — see Verification step 5.
 
-### A failed page leaves nothing publishable behind
+### A page is never refused
 
-A page that fails a gate is skipped, its four **publishable** artefacts are
-deleted, its number is printed on stderr, and the process exits non-zero with
-the list. The sweep does not abort at the first failure — 152 pages is two
-hours, and losing it to page 002 means nobody ever sees what pages 003–152 do.
-What the step never does is publish the page anyway.
-
-`debug600/NNN.png` is the exception and is **kept**: nothing counts it, nothing
-publishes it, and it is the one artefact that says why the page failed. It is
-also written *before* the size gate rather than at the end of the page, because
-a page that fails that gate never reaches the end — the message has always said
-"look at `debug600/NNN.png`", and until now that file had just been deleted, if
-it was ever written at all.
+Parity, skew residual, page class, canvas fit and the grade are measured and
+NOTED — in the page's log line and in its stamp — and the page is published. A
+page that matches no size class is published as the whole levelled sheet with
+`NOT CROPPED` in its stamp. The only thing that stops a page is a missing input
+file.
 
 ## The parity gate
 
@@ -485,12 +397,13 @@ the decision drawn on top.
 ```bash
 cd tools/img/scan2ocr/rules
 
-# 1. every page produced all six artefacts, and nothing else did
+# 1. every page produced all seven artefacts, and nothing else did
 python3 - <<'PY'
 import os, r000_issue, r005_masters_sheet as R
 iss = r000_issue.load(R.ISSUE)
 for d, ext in ((R.OUT_MASTER, ".png"), (R.OUT_MASTER, ".stamp.txt"),
-               (R.OUT_FIGURE, ".png"), (R.OUT_CMYK, ".tif"),
+               (R.OUT_SHEET, ".png"), (R.OUT_SHEET600, ".png"),
+               (R.OUT_CMYK, ".tif"),
                (R.OUT_CMYK, ".colors.txt"), (R.OUT_DEBUG, ".png")):
     have = sorted(f[:3] for f in os.listdir(d) if f.endswith(ext))
     want = ["%03d" % p for p in iss.page_range]
@@ -531,11 +444,10 @@ PY
 #    trim.  Two things this check has to get right:
 #      - the page's box inside the canvas is READ FROM THE STAMP, not guessed
 #        from the pixels.  The fabricated margin and the page's own paper are
-#        both white, and a bbox of "not quite white" guesses wrong on a master
-#        whose paper the curve has pushed to 255.
-#      - it reads figures600, the UNCURVED render.  BED_LUM was measured on
-#        unclipped pixels; on the curved master a printed RED banner (lum 101)
-#        lands at 35 and reads as bed.
+#        both white, and a bbox of "not quite white" guesses wrong on the
+#        canvas margin, which is also white.
+#      - it reads masters600 itself: there is no curve on it any more (see THE
+#        GRADE), so BED_LUM -- measured on unclipped pixels -- applies directly.
 python3 - <<'PY'
 import numpy as np, os, re
 from PIL import Image
@@ -547,7 +459,7 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
         continue
     s = (R.OUT_MASTER / f.replace(".png", ".stamp.txt")).read_text()
     pw, ph = (int(v) for v in re.search(r"^page-px\s+(\d+) (\d+)$", s, re.M).groups())
-    rgb = np.array(Image.open(R.OUT_FIGURE / f).convert("RGB"))[:ph, :pw]
+    rgb = np.array(Image.open(R.OUT_MASTER / f).convert("RGB"))[:ph, :pw]
     lum, prop = rgb.mean(2), R.prop_mask(rgb)
     cells = []
     for k, sl in (("top", (slice(None, b), slice(None))),
@@ -581,10 +493,9 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
           "|", re.search(r"^edge-finder\s+(.*)$", side, re.M).group(1))
 PY
 
-# 6. THE CURVE: the OCR master's type is black and its paper is untouched, and
-#    the FIGURE render did not get the curve.  A body-text window per page, in
-#    mm from the traced page's top-left corner; "glyph" is the INTERIOR of the
-#    strokes, chosen on the uncurved render and then measured in both.
+# 6. the master's type is black because the GCR is undone; there is no curve
+#    to compare.  A body-text window per page, in mm from the traced page's
+#    top-left corner; "glyph" is the INTERIOR of the strokes.
 python3 - <<'PY'
 import numpy as np
 from PIL import Image
@@ -595,13 +506,12 @@ WINDOWS = {"006": (14, 100, 58, 180), "041": (16, 60, 60, 140),
            "056": (20, 60, 90, 140), "092": (12, 150, 45, 260)}
 for stem, mm in sorted(WINDOWS.items()):
     box = tuple(int(v * R.MM) for v in mm)
-    fig = np.array(Image.open(R.OUT_FIGURE / f"{stem}.png").crop(box).convert("L"), float)
     ocr = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").crop(box).convert("L"), float)
-    glyph = ND.binary_erosion(fig < 128, np.ones((3, 3)))
-    paper = fig > 200
+    glyph = ND.binary_erosion(ocr < 128, np.ones((3, 3)))
+    paper = ocr > 200
     print(f"p{stem} window {mm} mm | ink {glyph.mean():5.1%} | "
-          f"glyph p50 {np.median(fig[glyph]):5.1f} -> {np.median(ocr[glyph]):5.1f} | "
-          f"paper p50 {np.median(fig[paper]):5.1f} -> {np.median(ocr[paper]):5.1f}")
+          f"glyph p50 {np.median(ocr[glyph]):5.1f} | "
+          f"paper p50 {np.median(ocr[paper]):5.1f}")
 PY
 ```
 
@@ -634,11 +544,15 @@ bright", which is true of the physical prop under the sheet and equally true of
 a printed orange banner. On the ink/bed pages the real prop cannot be there at
 all: it is part of the bed mask that found the sheet in the first place.
 
-**5.** Twelve of twelve masters carry `grade-sha 2b29e17a6be4`, the sha of the
-current `colors.txt` plus `OCRLEVEL 30 100`; the PNG chunk equals the sidecar on
-all twelve.
+**5.** Twelve of twelve masters carried `grade-sha 2b29e17a6be4` at the time of
+this run, matching the `colors.txt` then current; the PNG chunk equalled the
+sidecar on all twelve. (Recorded before 7b9aa90b; `grade-sha` is now the sha of
+just the 8 anchors and 4 level lines, so a fresh run reads a different hash.)
 
-**6.** The curve, measured on the published pair:
+**6.** The curve, as it stood before 7b9aa90b removed it — kept here for the
+record, since the check itself no longer exists as written; today's
+Verification step 6 measures `glyph p50` and `paper p50` on `masters600` alone,
+with no curve and no second render to compare it to:
 
 | page | ink in window | glyph p50 figure → master | paper p50 figure → master |
 |---|---|---|---|
@@ -647,22 +561,22 @@ all twelve.
 | 056 | 10.3 % | 79 → **3** | 255 → 255 |
 | 092 | 4.0 % | 87 → **15** | 255 → 255 |
 
-Type goes from a mid-grey to near-black and the paper floor does not move at
-all — which is the whole claim of `-level 30%,100%`. (These are higher than the
-figures in the constant's own table because the glyph *set* is defined
-differently: this check takes stroke interiors on the uncurved render and
-measures the same pixels in both, which keeps the two columns comparable at the
-cost of including more of the stroke's shoulder. The conclusion — worst page
-solid, paper untouched — is the same either way, and both are recorded.)
+Type went from a mid-grey to near-black and the paper floor did not move at all
+— which was the whole claim of `-level 30%,100%`, the constant this step no
+longer applies.
 
-**p117 fails, and nothing was published for it** — see below.
+**p117's trace matches no size class** — it publishes the whole levelled sheet,
+`NOT CROPPED` — see below.
 
 ## Known outliers — two pages of 152 do not trace
+
+Since 7b9aa90b neither page fails: 117 publishes the whole levelled sheet with
+`NOT CROPPED`, 007 publishes its trace with a note.
 
 Seven pages used to fail. Six of them were not outliers at all, only pages
 printed on the **other stock** in this issue, and they now trace from ink vs bed
 and pass as their own classes: 001, 002, 147 and 148 (the folded A3 cover leaf)
-and 149–152 (the Zahlkarte). Two pages still fail, and **both are trace
+and 149–152 (the Zahlkarte). Two pages still mistrace, and **both are trace
 failures, not size classes** — there is nothing about the paper that is
 different, only about what the tracer can see.
 
@@ -698,21 +612,21 @@ for which columns carry a top/bottom sample, not a looser gate — but it is one
 page and the constants that would change are the ones 006, 041, 056 and 092 were
 verified against.
 
-### What happens to a failed page
+### 117 and 007 are published, not deleted
 
-Its four publishable artefacts are deleted, `debug600/NNN.png` is **kept** (it
-is the artefact that explains the failure, and the size gate's message points at
-it), the page is named on stderr, and the process exits non-zero with the list.
-The disposition of 007 and 117 — crop by hand, re-trace, or accept the issue
-without them — belongs in the issue's `LOG.md`. "The step refused it" is not a
-decision.
+Neither page's artefacts are removed any more; both are published with the
+disposition NOTED — see the line above. Whether to accept them as is, crop by
+hand, or re-trace still belongs in the issue's `LOG.md`. Publishing a page is
+not that decision.
 
 ### The tally
 
-Fourteen pages have been run through the current code: **12 published, 2
-failed**. The remaining 138 were traced at thumb resolution only, where all of
-them land inside the A4 window (208.9–212.0 × 294.0–298.5 mm). A full sweep is
-still the thing that settles the count, and it has not been run.
+Fourteen pages were run through the code as it stood for this record: **12
+published, 2 failed**. Since 7b9aa90b neither of those two fails any more — see
+above — so a re-run today publishes all fourteen. The remaining 138 were traced
+at thumb resolution only, where all of them land inside the A4 window
+(208.9–212.0 × 294.0–298.5 mm). A full sweep is still the thing that settles the
+count, and it has not been run.
 
 ## Notes
 
