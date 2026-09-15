@@ -164,8 +164,9 @@ that nobody later reads a clean margin as evidence about the copy.
   `PIL.Image.rotate` (which applies) turn in opposite directions. Getting the
   sign wrong **doubled** the skew on p056, to −1.28 deg, and every downstream
   geometry check still passed because nothing re-measured. The step therefore
-  re-measures the residual on the levelled page and fails if it exceeds
-  `SKEW_RESIDUAL_MAX`.
+  re-measures the residual on the levelled page and, if it exceeds
+  `SKEW_RESIDUAL_MAX`, re-levels once from the corrected angle; if the residual
+  is still over the limit after that it is NOTED and the page publishes anyway.
 - **Per-column extremes are not an edge.** "The last paper row in this column"
   is dragged outward by a few paper-coloured pixels in the bed transition and
   left **3.8 mm of bed** at the foot of p056. Clean edges come from the band
@@ -289,8 +290,8 @@ scans, and on both the sheet runs off the side of it.
 **The Zahlkarte is a payment card** (Zahlkarte/Postüberweisung) printed blue on
 a white card, bound into the back of the issue. It is an A5 leaf (148 × 210 mm)
 with the frame cutting a few mm off two of its edges. It is genuinely not an A4
-page and **not a defect**, so it passes as its own class rather than failing a
-gate written for a different piece of paper.
+page and **not a defect**, so it passes as its own class rather than being
+measured against a window written for a different piece of paper.
 
 The tolerance is per class because the evidence behind each is: ~145 pages for
 A4, four for the card, one for the cover leaf. Two interior pages fall outside
@@ -365,7 +366,10 @@ expensive, so it is checked on the **thumb**, before the 800 MB scan is opened.
 
 A guillotined edge is straight to within a pixel row; a torn edge jitters from
 row to row. So parity decides, and only a **confident** disagreement
-(`ratio >= TORN_CONFIDENT_RATIO`) fails the page. Ambiguity passes.
+(`ratio >= TORN_CONFIDENT_RATIO`) is NOTED — `TORN SIDE reads {side} (ratio
+{ratio:.2f}) but parity says {expected} -- misfiled or mis-rotated?`, in the
+page's log line and its stamp — and the page publishes anyway. Ambiguity says
+nothing.
 
 **Re-measured over all 152 thumbs after `colors.txt` was re-measured**, because
 this gate reads the paper mask and a new paper white is a new mask. Of the 144
@@ -380,10 +384,11 @@ ratio among them is **2.73**, the median 11.98. Exactly one disagrees, p117 at
 | disagreements | 002 at 1.33, 116 at 1.45 | 117 at 1.64 |
 | floor | 1.6 | **2.5**, in the gap |
 
-Leaving the floor at 1.6 would fail p117 for being misfiled, which it is not:
+Leaving the floor at 1.6 would NOTE p117 as possibly misfiled, which it is not:
 p117's paper mask sees only the cream panel inside a full-bleed dark ground, so
-its jitter measurement means nothing. It fails the **size** gate two steps
-later, which is the check that can say what is actually wrong with it.
+its jitter measurement means nothing. It matches none of the **size classes**
+two steps later — published `NOT CROPPED` instead — which is the check that can
+say what is actually wrong with it.
 
 ## The debug overlay
 
