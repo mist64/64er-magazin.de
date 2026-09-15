@@ -32,6 +32,7 @@ def test_outer_edges_even():
     assert abs(np.polyval(e["bot"], w / 2) - (h - 7.0 * MM)) < 3
     assert abs(np.polyval(e["outer"], h / 2) - 0) < 3          # paper to the frame
     assert abs(S.tilt(e["top"])) < 0.05
+    assert e["source"] == "paper" and e["body"] > S.FULLBLEED_BODY_FRAC
 
 
 def test_outer_edges_odd_is_mirrored():
@@ -39,6 +40,25 @@ def test_outer_edges_odd_is_mirrored():
     e = S.outer_edges(a, "odd")
     h, w = a.shape[:2]
     assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 3
+    assert e["source"] == "paper"
+
+
+def test_outer_edges_fullbleed_uses_frame_and_prop():
+    # a cover: dark art to the trim, so the paper mask sees nothing but the bed
+    # strip's neighbours -- top and outer are the frame, the bottom is the prop
+    a = synthetic_frame("odd")
+    h, w = a.shape[:2]
+    a[int(1.0 * MM):h - int(7.0 * MM)] = (50, 50, 36)      # p200's median colour
+    # p001's orange banner: prop-coloured art inside the foot, above the prop,
+    # on the left third -- the bottom line is the prop's, not the banner's
+    a[h - int(12.0 * MM):h - int(9.0 * MM), :w // 3] = PROP
+    e = S.outer_edges(a, "odd")
+    assert e["source"] == "fullbleed" and e["body"] < S.FULLBLEED_BODY_FRAC
+    assert list(e["top"]) == [0.0, 0.0]
+    assert abs(np.polyval(e["outer"], h / 2) - (w - 1)) < 1e-9
+    assert abs(np.polyval(e["bot"], w / 2) - (h - 7.0 * MM)) < 3
+    assert abs(S.tilt(e["bot"])) < 0.05
+    assert list(S.outer_edges(a, "even")["outer"]) == [0.0, 0.0]
 
 
 def with_holes(a, par, fold_from_edge_mm=10.0, ys_mm=(30, 43, 130, 143, 230, 243),

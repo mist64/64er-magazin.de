@@ -58,12 +58,12 @@ from scipy.signal import fftconvolve
 
 from r005_masters import (
     HERE, ISSUE, ISS, MM, SCAN_REDUCE, MASTER_DPI, THUMB_DPI,
-    SKEW_RESIDUAL_MAX, CLEAN_PCT,
+    SKEW_RESIDUAL_MAX, CLEAN_PCT, TRACE_BANDS, BODY_PAPER_FRAC,
     DEBUG_REDUCE, DEBUG_COLOR, DEBUG_WIDTH, DEBUG_STEP,
     ANCHORS, LEVELS, HAVE_PROFILE, GRADE_SHA,
     PageFailed, measure_skew,
     separate_and_render, archive_cmyk, save_master, write_profile, stamp_text,
-    paper_mask, boundaries, trace, tilt,
+    paper_mask, prop_mask, boundaries, trace, tilt,
 )
 
 Image.MAX_IMAGE_PIXELS = None
@@ -117,22 +117,82 @@ def parity(page):
 # constant 0 (or w-1) and the line is the frame edge: the scan does not
 # contain the trim, and the window -- not this trace -- decides the page.
 #
+# A FULL-BLEED page has no paper for the mask to see, and a page is never
+# refused: the covers are art to the trim.  MEASURED, the fraction of rows /
+# columns whose paper fraction passes BODY_PAPER_FRAC, the smaller of the two
+# (8610's thumbs; the mask is colour-only, so the scale is immaterial):
+#
+#     p001 0.023   p200 0.005      the two covers -- p200's trace raised
+#     p010 0.879   p011 0.872      "12 usable edge samples for 24 bands", p001
+#     p100 0.414   p101 0.724      traced its title band as the "top" at 67 mm
+#
+# Below FULLBLEED_BODY_FRAC (or if a trace still raises above it) the frame
+# is the edge on top and outside, and the bottom is the PROP's top boundary,
+# which prop_mask sees on any page: per column, its first prop row in the
+# foot of the frame.  The source is returned so the JSON and the overlay say
+# which case this was.
+#
 # The INNER side is NOT traced here.  The neighbour half of the sheet is paper
 # too, and the paper mask cannot see the fold.  See fit_fold() (the clip
 # holes) and neighbour_boundary() (the fallback).
 EDGE_INSET_MM = 0.3          # inside its own line, as the sheet variant
+FULLBLEED_BODY_FRAC = 0.15   # in the gap between 0.023 (p001) and 0.414 (p100)
+PROP_FOOT_MM = 15.0          # the prop's top is looked for this far up from the foot
+PROP_AT_FOOT_MM = 2.0        # ...in columns whose prop starts within this of it
+
+
+def prop_top(rgb):
+    """The prop's top boundary as a line y(x), or None if too few columns see it.
+
+    Per column, the top of the prop RUN THAT TOUCHES THE FOOT -- not the first
+    prop-coloured row in the foot: MEASURED on p001, the cover's orange banner
+    sits inside the foot and pulled the first-row line 4.7 mm up on the left.
+    The run may start a few rows above the frame's last row, which is black
+    where the levelling rotation left a wedge.
+    """
+    h, w = rgb.shape[:2]
+    foot = prop_mask(rgb[h - int(PROP_FOOT_MM * MM):])[::-1]     # row 0 = the foot
+    first = np.argmax(foot, axis=0)                              # first prop row up
+    cols = np.where(foot.any(0) & (first <= PROP_AT_FOOT_MM * MM))[0]
+    if len(cols) < TRACE_BANDS:
+        return None
+    tops = np.empty(len(cols))
+    for k, c in enumerate(cols):
+        run = foot[first[c]:, c]
+        end = first[c] + (int(np.argmin(run)) if not run.all() else len(run))
+        tops[k] = h - end                                        # first non-prop row
+    try:
+        return trace(tops, cols.astype(float), CLEAN_PCT, MM)
+    except PageFailed:
+        return None
 
 
 def outer_edges(rgb, par):
-    """dict(top, bot, outer): straight lines in 600 dpi sheet pixels.
+    """dict(top, bot, outer, source, body): straight lines in 600 dpi sheet pixels.
 
     top/bot are y(x); outer is x(y).  Parity says which side is outer: an even
     page's neighbour is on the right, so its outer edge is the LEFT one.
+    source is "paper" (traced) or "fullbleed" (frame + prop, see above); body
+    is the measured paper body fraction either way.
     """
-    rows, starts, ends, cols, tops, bots = boundaries(paper_mask(rgb))
-    return {"top": trace(tops, cols, CLEAN_PCT, MM),
-            "bot": trace(bots, cols, CLEAN_PCT, MM),
-            "outer": trace(starts if par == "even" else ends, rows, CLEAN_PCT, MM)}
+    mask = paper_mask(rgb)
+    h, w = mask.shape
+    body = float(min((mask.mean(1) > BODY_PAPER_FRAC).mean(),
+                     (mask.mean(0) > BODY_PAPER_FRAC).mean()))
+    if body >= FULLBLEED_BODY_FRAC:
+        try:
+            rows, starts, ends, cols, tops, bots = boundaries(mask)
+            return {"top": trace(tops, cols, CLEAN_PCT, MM),
+                    "bot": trace(bots, cols, CLEAN_PCT, MM),
+                    "outer": trace(starts if par == "even" else ends, rows, CLEAN_PCT, MM),
+                    "source": "paper", "body": body}
+        except PageFailed:
+            pass
+    bot = prop_top(rgb)
+    return {"top": np.array([0.0, 0.0]),
+            "bot": np.array([0.0, h - 1.0]) if bot is None else bot,
+            "outer": np.array([0.0, 0.0 if par == "even" else w - 1.0]),
+            "source": "fullbleed", "body": body}
 
 
 # --- the fold: the clip holes --------------------------------------------
@@ -493,6 +553,9 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
     h, w = rgb.shape[:2]
     gray = rgb.mean(2).astype(np.uint8)
     edges = outer_edges(rgb, par)
+    if edges["source"] == "fullbleed":
+        notes.append(f"EDGES fullbleed: paper body {edges['body']:.2f} -- top/outer "
+                     f"at the frame, bottom from the prop")
     holes = find_holes(gray, par)
     fold = fit_fold(holes, h)
     source = "holes"
@@ -514,7 +577,8 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
     return {
         "page": page, "parity": par, "sheet_px": [w, h],
         "skew": {"angle": angle, "residual": residual},
-        "edges": {k: [float(v) for v in p] for k, p in edges.items()},
+        "edges": {**{k: [float(v) for v in edges[k]] for k in ("top", "bot", "outer")},
+                  "source": edges["source"], "body": edges["body"]},
         "fold": {"source": source,
                  "poly": None if fold is None else [float(v) for v in fold["poly"]],
                  "n": 0 if fold is None else fold["n"],
@@ -527,7 +591,8 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
 
 
 # --- the debug overlay -----------------------------------------------------
-# Edges green (the sheet variant's colour), fold magenta, holes circled in
+# Edges green (the sheet variant's colour) when traced from paper, ORANGE when
+# they are the full-bleed frame + prop lines, fold magenta, holes circled in
 # the same magenta, the wordmark's box blue.  The lines and circles are drawn
 # at 600 dpi and reduced with the page; the text is drawn AFTER the reduction,
 # because PIL's default font is ~11 px and would be 2 px tall otherwise.  A
@@ -535,6 +600,7 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
 # an invisible 3 px ring, so the ring is drawn wide enough to survive it.
 DEBUG_FOLD = (230, 0, 200)
 DEBUG_LOGO = (0, 120, 255)
+DEBUG_FULLBLEED = (255, 140, 0)
 DEBUG_HOLE_RING_PX = 12 * DEBUG_REDUCE       # radius at 600 dpi; 12 px after
 
 
@@ -543,13 +609,14 @@ def draw_debug(img, geom, dest):
     w, h = img.size
     overlay = img.copy()
     d = ImageDraw.Draw(overlay)
+    edge_colour = DEBUG_COLOR if geom["edges"]["source"] == "paper" else DEBUG_FULLBLEED
     for key in ("top", "bot"):
         p = geom["edges"][key]
         d.line([(x, np.polyval(p, x)) for x in range(0, w, DEBUG_STEP)],
-               fill=DEBUG_COLOR, width=DEBUG_WIDTH)
+               fill=edge_colour, width=DEBUG_WIDTH)
     p = geom["edges"]["outer"]
     d.line([(np.polyval(p, y), y) for y in range(0, h, DEBUG_STEP)],
-           fill=DEBUG_COLOR, width=DEBUG_WIDTH)
+           fill=edge_colour, width=DEBUG_WIDTH)
     if geom["fold"]["poly"]:
         p = geom["fold"]["poly"]
         d.line([(np.polyval(p, y), y) for y in range(0, h, DEBUG_STEP)],
@@ -560,7 +627,8 @@ def draw_debug(img, geom, dest):
     if geom["anchor"]:
         d.rectangle(geom["anchor"]["bbox"], outline=DEBUG_LOGO, width=DEBUG_WIDTH)
     small = overlay.resize((w // DEBUG_REDUCE, h // DEBUG_REDUCE), Image.LANCZOS)
-    text = [f"p{geom['page']:03d} {geom['parity']}  fold:{geom['fold']['source']} "
+    text = [f"p{geom['page']:03d} {geom['parity']}  edges:{geom['edges']['source']} "
+            f"fold:{geom['fold']['source']} "
             f"anchor:{'logo %.2f' % geom['anchor']['score'] if geom['anchor'] else 'NONE'}"]
     ImageDraw.Draw(small).text((12, 12), "\n".join(text + geom["notes"]), fill=DEBUG_FOLD)
     small.save(dest)
