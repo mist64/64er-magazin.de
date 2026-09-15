@@ -51,9 +51,10 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 from scipy import ndimage as ND
+from scipy.signal import fftconvolve
 
 from r005_masters import (
-    ISSUE, ISS, MM, SCAN_REDUCE, MASTER_DPI, THUMB_DPI,
+    HERE, ISSUE, ISS, MM, SCAN_REDUCE, MASTER_DPI, THUMB_DPI,
     SKEW_RESIDUAL_MAX, CLEAN_PCT,
     ANCHORS, LEVELS, HAVE_PROFILE, GRADE_SHA,
     PageFailed, measure_skew,
@@ -121,7 +122,8 @@ EDGE_INSET_MM = 0.3          # inside its own line, as the sheet variant
 # later task, and tests/test_r005_spread.py meanwhile) can score any poly this
 # module traces via `r005_masters_spread.tilt`, the same as the sheet variant
 # calls it on its own traced edges, without a second import of r005_masters.
-__all__ = ("parity", "outer_edges", "EDGE_INSET_MM", "find_holes", "fit_fold", "tilt")
+__all__ = ("parity", "outer_edges", "EDGE_INSET_MM", "find_holes", "fit_fold", "tilt",
+           "load_template", "ncc", "find_logo")
 
 
 def outer_edges(rgb, par):
@@ -332,6 +334,86 @@ def neighbour_boundary(rgb, par, prior_x=None):
         return None
     return {"poly": poly, "n": int(keep.sum()),
             "residual_mm": float(res[keep].mean() / MM)}
+
+
+# --- the anchor: the 64'er wordmark ---------------------------------------
+# The wordmark is the same glyph on every page, not mirrored between parities,
+# print-registered to the content, in the OUTER-bottom corner: even pages
+# bottom-left ("<num>  64'er"), odd bottom-right ("64'er  <num>").  8609 found
+# it on 129/176 pages at a median score of 0.95 by normalised cross-
+# correlation against this template; the pages without it are ads and
+# full-bleed pictures.  The template is a 600 dpi grey crop of the wordmark,
+# 394 x 131 px, kept in scan2ocr/ (rules/ admits only rNNN_ files).
+#
+# The page is levelled before this runs, so there is no angle sweep.
+TEMPLATE_PATH = HERE.parent / "template_64er_600.png"
+LOGO_BAND_TOP_MM = 30.0      # search rows h-30mm .. h-5mm: 8609 saw the
+LOGO_BAND_BOT_MM = 5.0       # baseline at h-420..h-300 px (13-18 mm); 8610's
+                             # sheets600 have it at h-11.2..11.4 mm (p010, p011)
+                             # -- the band's last 1.7 mm is the yellow prop
+                             # (starts h-6.6..6.8 mm), and the windows that
+                             # overlap it score <= 0.29: no spurious peak, so
+                             # the band is not clipped to the prop line
+LOGO_CORNER_FRAC = 0.48      # ...and this fraction of the width, from the outer edge
+LOGO_SCORE_MIN = 0.5         # 8609 accepted 0.42 with an angle sweep; here the
+                             # page is level.  MEASURED on 8610's sheets600:
+                             # p010 0.941, p011 0.933 (the wordmark, 26.5 /
+                             # 20.9 mm in from the outer edge); p100 and p101
+                             # are ad pages without one and their best window
+                             # is 0.290 / 0.292 -- the runner-up on the two
+                             # logo'd pages is 0.247 / 0.234.  0.5 sits in
+                             # the gap between the ceiling of a page without
+                             # the wordmark (~0.29) and the floor of one with.
+NCC_SIGMA_MIN = 1.0          # grey levels: a window with less texture than this
+                             # per pixel has no score (see ncc)
+
+
+def load_template():
+    return np.array(Image.open(TEMPLATE_PATH).convert("L"), np.float32)
+
+
+def ncc(region, tmpl):
+    """Zero-mean normalised cross-correlation, valid mode, by FFT.
+
+    The window sums run in float64 and the variance is floored at
+    NCC_SIGMA_MIN.  The variance is the difference of two ~3e9 sums (51614
+    px of paper at ~230), which single precision holds to ~256: MEASURED on
+    a synthetic blank page, a flat window's variance came out 128 or -2180
+    where the truth is 0, and the numerator's rounding noise over that
+    scored 522 at a blank spot.  In float64 the same window is 1e-7 -- and
+    that is still a zero divisor waiting for a flatter page, so the floor
+    is one grey level of texture per pixel, not an epsilon.
+    """
+    t = (tmpl - tmpl.mean()).astype(np.float64)
+    tn = math.sqrt(float((t * t).sum()))
+    ones = np.ones_like(t)
+    region = region.astype(np.float64)
+    num = fftconvolve(region, t[::-1, ::-1], mode="valid")
+    s1 = fftconvolve(region, ones, mode="valid")
+    s2 = fftconvolve(region * region, ones, mode="valid")
+    var = np.maximum(s2 - s1 * s1 / t.size, t.size * NCC_SIGMA_MIN ** 2)
+    return (num / (np.sqrt(var) * tn)).astype(np.float32)
+
+
+def find_logo(gray, par, tmpl):
+    """The wordmark's outer-bottom corner, or None."""
+    h, w = gray.shape
+    th, tw = tmpl.shape
+    y0, y1 = h - int(LOGO_BAND_TOP_MM * MM), h - int(LOGO_BAND_BOT_MM * MM)
+    cw = int(w * LOGO_CORNER_FRAC)
+    x0 = 0 if par == "even" else w - cw
+    region = gray[y0:y1, x0:x0 + cw].astype(np.float32)
+    if region.shape[0] < th or region.shape[1] < tw:
+        return None
+    m = ncc(region, tmpl)
+    iy, ix = np.unravel_index(int(m.argmax()), m.shape)
+    score = float(m[iy, ix])
+    if score < LOGO_SCORE_MIN:
+        return None
+    bx0, by0 = x0 + int(ix), y0 + int(iy)
+    bbox = (bx0, by0, bx0 + tw, by0 + th)
+    x = bx0 if par == "even" else bx0 + tw
+    return {"x": int(x), "y": int(by0 + th), "score": score, "bbox": bbox}
 
 
 # ---------------------------------------------------------------------------

@@ -121,3 +121,44 @@ def test_neighbour_boundary_rejects_far_from_prior():
     a = synthetic_frame("even", fold_from_edge_mm=18.0, neighbour_rgb=(90, 120, 200))
     h, w = a.shape[:2]
     assert S.neighbour_boundary(a, "even", prior_x=w - 40.0 * MM) is None
+
+
+def test_ncc_peaks_at_the_paste():
+    rng = np.random.default_rng(0)
+    tmpl = S.load_template()
+    th, tw = tmpl.shape
+    region = 200 + 10 * rng.standard_normal((th + 400, tw + 600)).astype(np.float32)
+    region[150:150 + th, 300:300 + tw] = tmpl
+    m = S.ncc(region, tmpl)
+    y, x = np.unravel_index(m.argmax(), m.shape)
+    assert (y, x) == (150, 300) and m.max() > 0.95
+
+
+def test_find_logo_even_page_bottom_left():
+    tmpl = S.load_template()
+    th, tw = tmpl.shape
+    a = synthetic_frame("even", neighbour_rgb=PAPER)
+    g = a.mean(2).astype(np.uint8)
+    h, w = g.shape
+    y0, x0 = h - int(16 * MM) - th, int(24 * MM)
+    g[y0:y0 + th, x0:x0 + tw] = tmpl.astype(np.uint8)
+    r = S.find_logo(g, "even", tmpl)
+    assert r is not None and r["score"] > 0.9
+    assert (r["x"], r["y"]) == (x0, y0 + th)          # outer-bottom corner: bottom-LEFT
+
+
+def test_find_logo_odd_page_bottom_right():
+    tmpl = S.load_template()
+    th, tw = tmpl.shape
+    a = synthetic_frame("odd", neighbour_rgb=PAPER)
+    g = a.mean(2).astype(np.uint8)
+    h, w = g.shape
+    y0, x0 = h - int(16 * MM) - th, w - int(24 * MM) - tw
+    g[y0:y0 + th, x0:x0 + tw] = tmpl.astype(np.uint8)
+    r = S.find_logo(g, "odd", tmpl)
+    assert r is not None and (r["x"], r["y"]) == (x0 + tw, y0 + th)
+
+
+def test_find_logo_none_on_blank():
+    a = synthetic_frame("even", neighbour_rgb=PAPER)
+    assert S.find_logo(a.mean(2).astype(np.uint8), "even", S.load_template()) is None
