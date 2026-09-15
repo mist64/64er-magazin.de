@@ -241,6 +241,20 @@ def load(issue_id):
     if d["kind"] not in KINDS:
         raise SystemExit(f"r000_issue: {path} kind={d['kind']!r}, "
                          f"expected one of {KINDS}")
+    # NEVER `/tmp/...` -- spell it `/private/tmp/...` (the same directory on
+    # macOS, where /tmp is a symlink to it).  Leptonica's genPathname() rewrites
+    # every path that begins with `/tmp/` to `$TMPDIR/...`, so tesseract cannot
+    # open a work file that r010 wrote under /tmp: it reports "image file not
+    # found", falls back to the bare filename in its cwd, and then reads the
+    # file's own bytes as a list of image names.  MEASURED on 8610 with
+    # tesseract 5.5.1 / leptonica 1.85.0: `/tmp/64er_8610/ocr/out/017_tess_work.png`
+    # fails, `/private/tmp/64er_8610/ocr/out/017_tess_work.png` -- the same
+    # inode -- reads 6943 characters.
+    if d["tmp"].startswith("/tmp/"):
+        raise SystemExit(f"r000_issue: {path} tmp={d['tmp']!r} begins with /tmp/ "
+                         f"-- leptonica rewrites that prefix to $TMPDIR and "
+                         f"tesseract then cannot open r010's work files. Spell "
+                         f"it /private/tmp/... (the same directory).")
     if d["binding"] not in BINDINGS:
         raise SystemExit(f"r000_issue: {path} binding={d['binding']!r}, "
                          f"expected one of {BINDINGS} -- binding selects which "

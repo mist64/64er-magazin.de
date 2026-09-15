@@ -405,3 +405,18 @@ Load-bearing, not cosmetic.
 (This issue's own screen, measured by `r145` at 600 dpi: **133 lpi at 45°**,
 spread 44.3–48.5°. Unscreened crops peak at 0°, on the printer's or the
 scanner's own grid.)
+
+---
+
+## 12. `/tmp/...` is not a path tesseract can open
+
+Leptonica's `genPathname()` rewrites every path beginning with `/tmp/` to
+`$TMPDIR/...` (on macOS `/var/folders/.../T/`), then falls back to the bare
+filename in the process's cwd. So `tesseract /tmp/64er_8610/ocr/out/017_tess_work.png`
+reports *image file not found*, tries `017_tess_work.png` locally, fails, and
+reads the PNG's own bytes as a list of image names (`�PNG cannot be read`).
+The same inode as `/private/tmp/64er_8610/...` reads 6943 characters. Every
+other tool (PIL, magick, cmyk_reconstruction) opens `/tmp/...` normally, which
+is why step 005 ran and step 010 died on its first page. MEASURED with
+tesseract 5.5.1 / leptonica 1.85.0. `r000_issue.load()` now refuses a
+descriptor whose `tmp` begins with `/tmp/`.
