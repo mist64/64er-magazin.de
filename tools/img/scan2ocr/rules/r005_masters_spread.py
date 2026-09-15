@@ -18,7 +18,9 @@ frame with some overlap.  MEASURED on 8610's 150 dpi thumbs:
     outer side   usually OFF-FRAME: the paper runs to the frame edge
     inner side   the FOLD, then the neighbour half of the same sheet -- blank
                  margin on some pages, its content on others
-    on the fold  6 clip holes, 3 vertical pairs, ~0.6 mm dark teardrops
+    on the fold  6 clip holes, 3 vertical pairs: dark teardrops 0.42-1.06 mm
+                 across the crease and up to 2.84 mm along it (MEASURED on
+                 p100/p101's sheets600)
 
 Even page -> neighbour on the RIGHT, odd -> LEFT.  Sheet pairing is k <-> 201-k.
 
@@ -43,19 +45,21 @@ Page numbers are positional so the work can be split across processes.  No
 flags, no env knobs.
 """
 
+import json
 import math
 import sys
 import tempfile
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from scipy import ndimage as ND
 from scipy.signal import fftconvolve
 
 from r005_masters import (
     HERE, ISSUE, ISS, MM, SCAN_REDUCE, MASTER_DPI, THUMB_DPI,
     SKEW_RESIDUAL_MAX, CLEAN_PCT,
+    DEBUG_REDUCE, DEBUG_COLOR, DEBUG_WIDTH, DEBUG_STEP,
     ANCHORS, LEVELS, HAVE_PROFILE, GRADE_SHA,
     PageFailed, measure_skew,
     separate_and_render, archive_cmyk, save_master, write_profile, stamp_text,
@@ -114,16 +118,9 @@ def parity(page):
 # contain the trim, and the window -- not this trace -- decides the page.
 #
 # The INNER side is NOT traced here.  The neighbour half of the sheet is paper
-# too, and the paper mask cannot see the fold.  See fold_line().
+# too, and the paper mask cannot see the fold.  See fit_fold() (the clip
+# holes) and neighbour_boundary() (the fallback).
 EDGE_INSET_MM = 0.3          # inside its own line, as the sheet variant
-
-# `tilt` is not called in this file -- nothing here needs the angle, only the
-# poly.  It is re-exported so a caller (the geometry printer that lands in a
-# later task, and tests/test_r005_spread.py meanwhile) can score any poly this
-# module traces via `r005_masters_spread.tilt`, the same as the sheet variant
-# calls it on its own traced edges, without a second import of r005_masters.
-__all__ = ("parity", "outer_edges", "EDGE_INSET_MM", "find_holes", "fit_fold", "tilt",
-           "load_template", "ncc", "find_logo")
 
 
 def outer_edges(rgb, par):
@@ -315,7 +312,7 @@ def neighbour_boundary(rgb, par, prior_x=None):
         if j - i < NB_BLOCK_MIN_MM * MM or j >= len(c):    # too thin, or full-bleed
             continue
         edge = j                                    # page-facing edge, border-first index
-        x = to_x(strip_w - 1 - edge) if par == "even" else to_x(edge)
+        x = to_x(strip_w - edge) if par == "even" else to_x(edge)
         pts.append((band.mean(), x))
     if len(pts) < NB_MIN_BANDS:
         return None
@@ -370,6 +367,9 @@ NCC_SIGMA_MIN = 1.0          # grey levels: a window with less texture than this
 
 def load_template():
     return np.array(Image.open(TEMPLATE_PATH).convert("L"), np.float32)
+
+
+TEMPLATE = load_template()
 
 
 def ncc(region, tmpl):
@@ -480,17 +480,115 @@ def grade_page(stem, full, stamp):
     return sheet
 
 
+# ---------------------------------------------------------------------------
+# measure, part 2: the geometry, on the levelled UNGRADED 600 dpi sheet
+# ---------------------------------------------------------------------------
+# The finders read the sheet as `level_page` hands it over, BEFORE the grade:
+# that is where paper_mask / prop_mask were calibrated (the built-in W is the
+# raw scan's paper), and the hole and logo finders read its grey.  The graded
+# sheet is only for the master.
+
+def measure_geometry(rgb, page, angle, residual, notes, tmpl):
+    par = parity(page)
+    h, w = rgb.shape[:2]
+    gray = rgb.mean(2).astype(np.uint8)
+    edges = outer_edges(rgb, par)
+    holes = find_holes(gray, par)
+    fold = fit_fold(holes, h)
+    source = "holes"
+    if fold is None:
+        nb = neighbour_boundary(rgb, par)
+        if nb is not None:
+            fold, source = nb, "colour"
+            notes.append(f"FOLD from the neighbour's colour boundary "
+                         f"({nb['n']} bands, residual {nb['residual_mm']:.2f} mm) "
+                         f"-- {len(holes)} hole candidates did not fit a line")
+        else:
+            source = "none"
+            notes.append(f"FOLD not found: {len(holes)} hole candidates, no "
+                         f"colour boundary -- the inner side is not cut")
+    logo = find_logo(gray, par, tmpl)
+    if logo is None:
+        notes.append("LOGO not found -- the window is anchored on fold x and "
+                     "top-trim y instead")
+    return {
+        "page": page, "parity": par, "sheet_px": [w, h],
+        "skew": {"angle": angle, "residual": residual},
+        "edges": {k: [float(v) for v in p] for k, p in edges.items()},
+        "fold": {"source": source,
+                 "poly": None if fold is None else [float(v) for v in fold["poly"]],
+                 "n": 0 if fold is None else fold["n"],
+                 "residual_mm": None if fold is None else fold["residual_mm"],
+                 "tilt_deg": None if fold is None else tilt(fold["poly"])},
+        "holes": [[float(a), float(b), float(c)] for a, b, c in holes],
+        "anchor": None if logo is None else {"source": "logo", **logo},
+        "notes": notes,
+    }
+
+
+# --- the debug overlay -----------------------------------------------------
+# Edges green (the sheet variant's colour), fold magenta, holes circled in
+# the same magenta, the wordmark's box blue.  The lines and circles are drawn
+# at 600 dpi and reduced with the page; the text is drawn AFTER the reduction,
+# because PIL's default font is ~11 px and would be 2 px tall otherwise.  A
+# hole is ~0.7 mm = 16 px, and after the 5:1 reduction a 16 px circle would be
+# an invisible 3 px ring, so the ring is drawn wide enough to survive it.
+DEBUG_FOLD = (230, 0, 200)
+DEBUG_LOGO = (0, 120, 255)
+DEBUG_HOLE_RING_PX = 12 * DEBUG_REDUCE       # radius at 600 dpi; 12 px after
+
+
+def draw_debug(img, geom, dest):
+    """Edges green, fold magenta, holes circled, logo box blue, notes as text."""
+    w, h = img.size
+    overlay = img.copy()
+    d = ImageDraw.Draw(overlay)
+    for key in ("top", "bot"):
+        p = geom["edges"][key]
+        d.line([(x, np.polyval(p, x)) for x in range(0, w, DEBUG_STEP)],
+               fill=DEBUG_COLOR, width=DEBUG_WIDTH)
+    p = geom["edges"]["outer"]
+    d.line([(np.polyval(p, y), y) for y in range(0, h, DEBUG_STEP)],
+           fill=DEBUG_COLOR, width=DEBUG_WIDTH)
+    if geom["fold"]["poly"]:
+        p = geom["fold"]["poly"]
+        d.line([(np.polyval(p, y), y) for y in range(0, h, DEBUG_STEP)],
+               fill=DEBUG_FOLD, width=DEBUG_WIDTH)
+    for cx, cy, dm in geom["holes"]:
+        r = max(dm * MM, DEBUG_HOLE_RING_PX)
+        d.ellipse((cx - r, cy - r, cx + r, cy + r), outline=DEBUG_FOLD, width=DEBUG_WIDTH)
+    if geom["anchor"]:
+        d.rectangle(geom["anchor"]["bbox"], outline=DEBUG_LOGO, width=DEBUG_WIDTH)
+    small = overlay.resize((w // DEBUG_REDUCE, h // DEBUG_REDUCE), Image.LANCZOS)
+    text = [f"p{geom['page']:03d} {geom['parity']}  fold:{geom['fold']['source']} "
+            f"anchor:{'logo %.2f' % geom['anchor']['score'] if geom['anchor'] else 'NONE'}"]
+    ImageDraw.Draw(small).text((12, 12), "\n".join(text + geom["notes"]), fill=DEBUG_FOLD)
+    small.save(dest)
+
+
 def measure(page):
     stem = f"{page:03d}"
     for d in OUT_DIRS:
         d.mkdir(parents=True, exist_ok=True)
     angle, residual, full, img, notes = level_page(page)
+    rgb = np.array(img)                      # the levelled, UNGRADED 600 dpi sheet
+    geom = measure_geometry(rgb, page, angle, residual, notes, TEMPLATE)
+    f, anchor = geom["fold"], geom["anchor"]
     stamp = stamp_text(VARIANT, **{"page": f"{stem} of {ISSUE}",
                                    "phase": "measure",
                                    "skew": f"{angle:+.2f} -> {residual:+.2f} deg",
+                                   "fold": f["source"],
+                                   "anchor": f"logo {anchor['score']:.2f}" if anchor else "none",
                                    "notes": "; ".join(notes) or "(none)"})
     grade_page(stem, full, stamp)
-    print(f"p{stem}: skew {angle:+.2f} -> {residual:+.2f} deg | grade {GRADE_SHA}"
+    (OUT_GEOM / f"{stem}.json").write_text(json.dumps(geom, indent=1))
+    draw_debug(img, geom, OUT_DEBUG / f"{stem}.png")
+    print(f"p{stem}: skew {angle:+.2f} -> {residual:+.2f} deg | edges T {tilt(geom['edges']['top']):+.2f} "
+          f"B {tilt(geom['edges']['bot']):+.2f} O {tilt(geom['edges']['outer']):+.2f} | "
+          f"fold {f['source']} n={f['n']}"
+          + (f" x={np.polyval(f['poly'], rgb.shape[0] / 2):.0f} tilt {f['tilt_deg']:+.2f}" if f["poly"] else "")
+          + f" | logo {'%.2f' % anchor['score'] if anchor else 'none'}"
+          + f" | grade {GRADE_SHA}"
           + "".join(f"\n      NOTE p{stem}: {n}" for n in notes), flush=True)
 
 
@@ -514,4 +612,4 @@ if __name__ == "__main__":
             raise SystemExit(f"r005: {len(failed)} page(s) had no input: "
                              f"{', '.join('%03d' % p for p in failed)}")
     else:
-        raise SystemExit("cut: not built yet")   # replaced in Task 9
+        raise SystemExit("cut: not built yet")   # the cut phase is a later task

@@ -96,20 +96,20 @@ def test_neighbour_boundary_finds_colour_step():
     h, w = a.shape[:2]
     nb = S.neighbour_boundary(a, "even")
     assert nb is not None
-    assert abs(np.polyval(nb["poly"], h / 2) - (w - 18.0 * MM)) < 1.0 * MM
+    assert abs(np.polyval(nb["poly"], h / 2) - (w - 18.0 * MM)) < 2
 
 
 def test_neighbour_boundary_finds_colour_step_odd():
     # mirrors the even-parity test above: same fold depth, opposite side.  The
     # even path indexes its strip border-first (`inward = cols[::-1]`) and
-    # maps back with `to_x(strip_w - 1 - edge)`; the odd path uses the strip
+    # maps back with `to_x(strip_w - edge)`; the odd path uses the strip
     # order directly and `to_x(edge)`.  A mirror bug in either mapping would
     # only show up on the parity it belongs to, so both are exercised here.
     a = synthetic_frame("odd", fold_from_edge_mm=18.0, neighbour_rgb=(90, 120, 200))
     h, w = a.shape[:2]
     nb = S.neighbour_boundary(a, "odd")
     assert nb is not None
-    assert abs(np.polyval(nb["poly"], h / 2) - 18.0 * MM) < 1.0 * MM
+    assert abs(np.polyval(nb["poly"], h / 2) - 18.0 * MM) < 2
 
 
 def test_neighbour_boundary_none_on_blank_margin():
