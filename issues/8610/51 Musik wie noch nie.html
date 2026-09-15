@@ -86,6 +86,99 @@
 
         <p>Bewegen Sie den Cursor auf die erste Ziffer der Kolonne ‚unter TRK], neben den Step (»SP«) 00. Geben Sie »BO00« ein, dasselbe bei Step DI, Step 02 und 03. Jetzt steht untereinander viermal BO00. Das bedeutet, daß in der ersten Stimme viermal der Takt gespielt wird, der bei $B000 beginnt. Das Basic-ROM ist in dieser Zeit ausgeblendet, man legt die Takte am besten zwischen $B000 und $BE00 ab. Die Routine hat keinerleiSpeicherverwaltung, dafür kann man aber Takte beliebig im Speicher ablegen. Tabelle 1 zeigt Ihnen die Speicheraufteilung des Soundmonitors. Nach einem Initialize sind alle Steps mit dem Takt $BE00 belegt, dieser enthält keine Noten und dient als Leertakt (zum Beispiel für Pausen, die länger als ein Takt sind). Gehen Sie mit dem Cursor auf den Step 00 und drücken Sie die &lt;F3&gt; Taste. Damit wird der Anfang des Musikstückes festgelegt (wird bei der hellblauen Anzeige von »FIRST STEP« angezeigt). Setzen Sie jetzt das Ende des Stückes mit &lt;F5&gt; bei STEP 03 (Anzeige bei »LAST STEP«).</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <td>02C0 — 02E0</td>
+                    <td>Variablen der Musikroutine</td>
+                </tr>
+                <tr>
+                    <td>1000 — 2FFF</td>
+                    <td>Editorprogramm</td>
+                </tr>
+                <tr>
+                    <td>3000 — 9FFF</td>
+                    <td>Frei für Takte</td>
+                </tr>
+                <tr>
+                    <td>A000 — A0FF</td>
+                    <td>Low-Bytes der Takte für Stimme 1</td>
+                </tr>
+                <tr>
+                    <td>A100 — A1FF</td>
+                    <td>High-Bytes der Takte für Stimme 1</td>
+                </tr>
+                <tr>
+                    <td>A200 — A2FF</td>
+                    <td>Transpose-Speicher für Stimme 1</td>
+                </tr>
+                <tr>
+                    <td>A300 — A3FF</td>
+                    <td>Sound-Basisnummer für Stimme 1</td>
+                </tr>
+                <tr>
+                    <td>A400 —</td>
+                    <td>Abspielfolge für Stimme 2</td>
+                </tr>
+                <tr>
+                    <td>— A7FF</td>
+                    <td>wie für Stimme 1</td>
+                </tr>
+                <tr>
+                    <td>A8000 —</td>
+                    <td>Abspielfolge für Stimme 3</td>
+                </tr>
+                <tr>
+                    <td>— ABFF</td>
+                    <td>wie für Stimme 1</td>
+                </tr>
+                <tr>
+                    <td>AC00 — ACFF</td>
+                    <td>Low-Bytes des Arpeggiospeichers</td>
+                </tr>
+                <tr>
+                    <td>AD00 — ADFF</td>
+                    <td>High-Bytes des Arpeggiospeichers</td>
+                </tr>
+                <tr>
+                    <td>AE00 — B1FF</td>
+                    <td>Soundspeicher (20 Soundeinstellungen, jeweils 24 Bytes) (32 Sounds ergeben 768 Bytes)</td>
+                </tr>
+                <tr>
+                    <td>B000 — BDFF</td>
+                    <td>Taktspeicher</td>
+                </tr>
+                <tr>
+                    <td>BE00 — BEFF</td>
+                    <td>Leertakte</td>
+                </tr>
+                <tr>
+                    <td>BF00 — BFFF</td>
+                    <td>Arpeggiospeicher</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Insgesamt von A000-BFFF (32 Blöcke)</td>
+                </tr>
+                <tr>
+                    <td>C000 — C00E</td>
+                    <td>Musikroutine Einsprung</td>
+                </tr>
+                <tr>
+                    <td>C00F — C01E</td>
+                    <td>Variablen</td>
+                </tr>
+                <tr>
+                    <td>C01F — CC00</td>
+                    <td>»Musikmaster«-Programm</td>
+                </tr>
+                <tr>
+                    <td>CC01 — CFFF</td>
+                    <td>Variablen der Musikroutine und des Editors</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Speicheraufteilung des Soundmonitors</figcaption>
+        </figure>
+
         <h3>Eingabe von Noten</h3>
 
         <p>Stellen Sie den Cursor auf die Adresse des Taktes, den Sie editieren wollen. (Beiunserem Beispiel $B000 bei»TRKld). Um in die Notendarstellung des Taktes zu gelangen, drücken Sie &lt;RETURN&gt;. Auf dem Bildschirm erscheint jetzt der Takt in spezieller Notendarstellung. Der Takt wird von links oben nach rechts unten aufgebaut (links oben ist die erste, rechts unten die letzte Note des Taktes). Es wird jeweils die Note (C bis H), die Halbnotenverschiebung (# #« oder »—«) sowie die Oktave (0 bis T)angegeben. Drei Striche bedeuten Pause (dabei wird beim Spielen »die Taste losgelassen«). Eingeben kann man dieses als &lt;—> auf der Note (erste Stelle). Drei Pluszeichen bedeuten, daß der Ton gehalten wird, sofern der Sound ein »Halten« zuläßt.</p>
@@ -168,19 +261,34 @@ Start der Musik
 
         <p>Tempo, Taktlänge sowie Lautstärke werden in der ARP/S-Page eingestellt. Zu dieser (sehr monitorähnlichen) Darstellung gelangt man durch ein &lt;RETURN&gt;, wenn man unter der ARP/S-Spurin der Track/Step-Table steht. Die Adresse in der Track/Step-Table kann auch hier beliebig verändert weden. Allerdings müssen dann einige Parameter gesetzt werden. Am AnfangderZeile steht die Adresse, dann folgen acht Hexadezimalzahlen. Die erste Zeile (also diejenige, deren Adresse im Track/Step-Table angezeigt wird) ist für die Grundparameter zuständig. Die acht Stellen haben folgende Bedeutung:</p>
 
-        <p class="source">erste Stelle<br>
-            zweite Stelle<br>
-            dritte Stelle vierte Stelle<br>
-            fünfte Stelle<br>
-            : Geschwindigkeit des C1A-Timers low (Feineinstellung des Tempos, zum Beispiel zum Synchronisieren mit einem Plattenspieler), (Kapitel »SYCHRONISATION«) : Geschwindigkeit des CIATimers high (möglichst 33 bis 50)<br>
-            : Grobeinstellung des Tempos (zwischen O und 4) (Für alle Gschwindigkeitseinstellungen gilt: je kleiner die Zahl, desto höher das Tempo)<br>
-            : Taktlänge (lesen Sie bitte unter »TAKTLÄNGEX« nach) : Zuständig für ein langsames Ausklingen am Ende des Musikstücks (FF = kein ÄAusklingen)<br>
-            Um diese Funktion nutzen zu können, müssen Sie am Ende des Liedes eine andere Adresse angeben (unter »ARP/S«), die die gleichen Grundeinstellungen und Arpeggios hat (Ärpeggio wird noch erklärt). Lediglich die vierte Stelle darf sich vom alten ARP/S unterscheiden (Werte von 10 bis 30 sind empfehlenswert, 10 = schnelles Ausklingen, 30 = langsames Ausklingen)<br>
-            : Lautstärke 00 bis OF (fast identisch mit SID-Register 24, allerdings ohne Filter, der das obere Nibble dieses Bytes besetzen würde. Dieses Highnibble finden Sie ir der Sounddarstellung wieder, dort wird dann das untere Nibble nicht benutzt.)<br>
-            te Stelle sind unbenutzt.</p>
+        <table class="plain">
+            <tr>
+                <td>nullte Stelle :</td>
+                <td>Geschwindigkeit des CIA-Timers low (Feineinstellung des Tempos, zum Beispiel zum Synchronisieren mit einem Plattenspieler), (Kapitel »SYCHRONISATION«)</td>
+            </tr>
+            <tr>
+                <td>erste Stelle :</td>
+                <td>Geschwindigkeit des CIA-Timers high (möglichst 35 bis 50)</td>
+            </tr>
+            <tr>
+                <td>zweite Stelle :</td>
+                <td>Grobeinstellung des Tempos (zwischen 0 und 4) (Für alle Gschwindigkeitseinstellungen gilt: je kleiner die Zahl, desto höher das Tempo)</td>
+            </tr>
+            <tr>
+                <td>dritte Stelle :</td>
+                <td>Taktlänge (lesen Sie bitte unter »TAKTLÄNGE« nach)</td>
+            </tr>
+            <tr>
+                <td>vierte Stelle :</td>
+                <td>Zuständig für ein langsames Ausklingen am Ende des Musikstücks (FF = kein Ausklingen)<br>Um diese Funktion nutzen zu können, müssen Sie am Ende des Liedes eine andere Adresse angeben (unter »ARP/S«), die die gleichen Grundeinstellungen und Arpeggios hat (Arpeggio wird noch erklärt). Lediglich die vierte Stelle darf sich vom alten ARP/S unterscheiden (Werte von 10 bis 30 sind empfehlenswert, 10 = schnelles Ausklingen, 30 = langsames Ausklingen)</td>
+            </tr>
+            <tr>
+                <td>fünfte Stelle :</td>
+                <td>Lautstärke 00 bis 0F (fast identisch mit SID-Register 24, allerdings ohne Filter, der das obere Nibble dieses Bytes besetzen würde. Dieses Highnibble finden Sie in der Sounddarstellung wieder, dort wird dann das untere Nibble nicht benutzt.)</td>
+            </tr>
+        </table>
 
-
-        <p></p>
+        <p>sechste und siebte Stelle sind unbenutzt.</p>
 
         <h3>Taktlänge</h3>
 

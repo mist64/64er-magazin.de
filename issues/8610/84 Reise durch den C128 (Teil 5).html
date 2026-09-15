@@ -44,13 +44,52 @@
 
         <p>Im © 64-Modus haben die beiden Speicherstellen $00 und $01 eine besondere Rolle als sogenannter Prozessor-Port. Man kann durch unterschiedliche Bit-Konstellationen ROM oder RAM an verschiedenen Plätzen ein- und ausblenden. Auch im C 128-Modus ist dies der Prozessor-Port. Wenn wir uns den Speicheraufbau ansehen, dann sollten wir auch versuchen, die Bedeutung der einzelnen Bits in diesem Modus herauszufinden. Das Ergebnis unserer Untersuchungen finden Sie zusammengefaßt in Bild 3:</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit:</th>
+                    <th>7</th>
+                    <th>6</th>
+                    <th>5</th>
+                    <th>4</th>
+                    <th>3</th>
+                    <th>2</th>
+                    <th>1</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th>Bedeutung:</th>
+                    <td>?</td>
+                    <td>DIN/ASCII Umschaltung<br>1 = ASCII<br>0 = DIN</td>
+                    <td colspan="2">Zusammenhang<br>11 = keine Taste<br>00 = Taste</td>
+                    <td>mit ?</td>
+                    <td colspan="2">Text-/Grafik-Modus<br>01 = Text<br>10 = Grafik</td>
+                    <td>Steuert D800—DC00<br>1 = Farb-RAM für Text<br>0 = Farb-RAM für Grafik (Multicolorfarbe 2)</td>
+                </tr>
+            </table>
+            <figcaption>Bild 3. Der Prozessorport (Speicherstelle 01) im C 128-Modus</figcaption>
+        </figure>
+
         <p>Bit ist, wiewirschon gesehenhaben, verantwortlich dafür, welches Farb-RAM ab $D800 aktiv ist. Dernormale Bitwert ist lund das Text-Farb-RAM eingeschaltet. Beim Wert O aber findet sich an: der gleichen Stelle das Farb-RAM für die Multicolor-Farbe 2.</p>
 
         <p>Die Bits 1 und 2 enthalten im Grafik-Modus (also nach GRAPHIC 1...4), die Belegung 10, ansonsten aber Ol in den beiden Textmodi.</p>
 
-        <p>Die Bedeutung der Bits 3 bis 5 konnte noch nicht ganz geklärt werden. Anscheinend dienen sie ähnlichen Zwecken wie im C 64-Modus, denn wenn eine Datasettentaste gedrückt wird, wandelt sich der Inhalt der beiden Bit 4 und 5 von »l1« um in.»00«. Im C 64-Modus dienen diese Bits folgendem Zweck: : Bit 3 serielle Daten werden zum Kassetten-Port gesandt. Normaler Inhalt = 0 Bit 4 1 = keine Recorder-Taste gedrückt 0 = Taste gedrückt</p>
+        <p>Die Bedeutung der Bits 3 bis 5 konnte noch nicht ganz geklärt werden. Anscheinend dienen sie ähnlichen Zwecken wie im C 64-Modus, denn wenn eine Datasettentaste gedrückt wird, wandelt sich der Inhalt der beiden Bit 4 und 5 von »l1« um in.»00«. Im C 64-Modus dienen diese Bits folgendem Zweck:</p>
 
-        <p>Bit 5 Datasettenmotor aus = 1 Motor ein = 0</p>
+        <table class="plain">
+            <tr>
+                <td>Bit 3</td>
+                <td>serielle Daten werden zum Kassetten-Port gesandt. Normaler Inhalt = 0</td>
+            </tr>
+            <tr>
+                <td>Bit 4</td>
+                <td>1 = keine Recorder-Taste gedrückt<br>0 = Taste gedrückt</td>
+            </tr>
+            <tr>
+                <td>Bit 5</td>
+                <td>Datasettenmotor aus = 1<br>Motor ein = 0</td>
+            </tr>
+        </table>
 
         <p>Weil aber die Datasetten-Tasten immer auch den Motor einschalten, sind beide Bits (also 4 und 5) auf »1l«. oder »00«. Der beobachtete Normalzustand des Bit 3im C 128-Modus war ebenfalls 0.</p>
 
@@ -62,25 +101,48 @@
 
         <p>Da wir immer noch bei Fragen der Speicherkonfiguration sind, sollnoch ein ROM-Baustein von 4 KByte Länge erwähnt werden, der ebenfalls bei $D000 liegt. Wir werden ihn gleich erklären. Zuvor aber noch etwas Stoff zum Nachdenken: Die Erbauer desC 128 waren wirklich Meister im Verstecken von Speicherraum! Wie wir später beim Untersuchen des VDC-Chip feststellen werden, gibt'sdaebenfallsnochmal 16 KByte .Speicherraum. Insgesamt hat also unser C 128 in der Grundstufe folgenden Speicherplatz:</p>
 
-        <p>128 KByte inBANK Ound 1</p>
-
-        <p>60 KByte inBANK 15</p>
-
-        <p>4KByte Zeichen-ROM für ASCII-Zeichen</p>
-
-        <p>4 KByte Zeichen-ROM für DIN-Zeichen</p>
-
-        <p>1 KByte Farb-RAM für Multicolor</p>
-
-        <p>4 KByte Z80-ROM (das besprechen wir gerade)</p>
-
-        <p>16 KByte VDC-RAM</p>
-
-        <p>8KByte Interpreter-ROM für C 64-Modus</p>
-
-        <p>8KByte Kernel-ROM für C 64-Modus</p>
-
-        <p>233 KByte insgesamt!</p>
+        <table class="plain">
+            <tr>
+                <td>128 KByte</td>
+                <td>in BANK 0 und 1</td>
+            </tr>
+            <tr>
+                <td>60 KByte</td>
+                <td>in BANK 15</td>
+            </tr>
+            <tr>
+                <td>4 KByte</td>
+                <td>Zeichen-ROM für ASCII-Zeichen</td>
+            </tr>
+            <tr>
+                <td>4 KByte</td>
+                <td>Zeichen-ROM für DIN-Zeichen</td>
+            </tr>
+            <tr>
+                <td>1 KByte</td>
+                <td>Farb-RAM für Multicolor</td>
+            </tr>
+            <tr>
+                <td>4 KByte</td>
+                <td>Z80-ROM (das besprechen wir gerade)</td>
+            </tr>
+            <tr>
+                <td>16 KByte</td>
+                <td>VDC-RAM</td>
+            </tr>
+            <tr>
+                <td>8 KByte</td>
+                <td>Interpreter-ROM für C 64-Modus</td>
+            </tr>
+            <tr>
+                <td>8 KByte</td>
+                <td>Kernel-ROM für C 64-Modus</td>
+            </tr>
+            <tr>
+                <td>233 KByte</td>
+                <td>insgesamt!</td>
+            </tr>
+        </table>
 
         <p>Erstaunlich, nicht wahr: Unser C 128 ist ein C 233!</p>
 
@@ -90,41 +152,159 @@
 
         <p>Das, was die Speicherstelle $01 verwaltet, ist nur ein sehr kleiner Teil des Gedächtnisses unseres Computers. Den Gesamtüberblick hat die schon erwähnte MMU. Mittels 17 Registern hat sie — und damit auch wir, wenn wir die Bedeutung der Register kennen — alle Speichervarianten voll im Griff. Und das ist allerhand, wie Sie gleich noch sehen werden. In Bild 4 sind alle Register mit ihren Namen und Adressen vorgestellt:</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <td>D50B</td>
+                    <td>VR</td>
+                    <td>Version-Register</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D50A</td>
+                    <td>P1H</td>
+                    <td>Page1-Pointer MSB</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D509</td>
+                    <td>P1L</td>
+                    <td>Page1-Pointer LSB</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D508</td>
+                    <td>P04</td>
+                    <td>Zeropage-Pointer MSB</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D507</td>
+                    <td>P0L</td>
+                    <td>Zeropage-Pointer LSB</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D506</td>
+                    <td>RCR</td>
+                    <td>RAM-Konfigurations-Reg.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D505</td>
+                    <td>MCR</td>
+                    <td>Modus-Konfigurations-Reg.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D504</td>
+                    <td>PCRD</td>
+                    <td rowspan="4">programmierbare Konfigurations-Register (A-D)</td>
+                    <td>FF04</td>
+                    <td>LCRD</td>
+                    <td rowspan="4">Register zum Laden der programmierten Konfigurations-Register (A—D)</td>
+                </tr>
+                <tr>
+                    <td>D503</td>
+                    <td>PCRC</td>
+                    <td>FF03</td>
+                    <td>LCRC</td>
+                </tr>
+                <tr>
+                    <td>D502</td>
+                    <td>PCRB</td>
+                    <td>FF02</td>
+                    <td>LCRB</td>
+                </tr>
+                <tr>
+                    <td>D501</td>
+                    <td>PCRA</td>
+                    <td>FF01</td>
+                    <td>LCRA</td>
+                </tr>
+                <tr>
+                    <td>D500</td>
+                    <td>CR</td>
+                    <td>Konfigurations-Register</td>
+                    <td>FF00</td>
+                    <td>CR</td>
+                    <td>Konfigurations-Register</td>
+                </tr>
+                <tr>
+                    <th colspan="3">MMU in I/O-Bereich</th>
+                    <th colspan="3">MMU-Register im oberen ROM-Bereich</th>
+                </tr>
+            </table>
+            <figcaption>Bild 4. Übersicht über die MMU-Register</figcaption>
+        </figure>
+
         <p>Sehen wir sie uns nun im einzelnen an. Da wäre ersteinmal das wohl wichtigste, das CR. CR kommt von »Configuration Register« und dieses Register steuert die aktuelle RAM-/ ROM- und V/O-Zusammenstellung.</p>
 
-        <p>Es befindet sich sowohl an der Speicherstelle $D500 als auch — als Doppel — bei $FF'00. Falls der /O-Bereich einmal ausgeblendet ist, haben wir noch den Schalter bei $FF00. Bild 5 zeigt Ihnen den Aufbau und die Bedeutung der einzelnen Bits: Bit O0 steuert, was sich im Bereich $D000 bis $DFFF anfindet.</p>
+        <p>Es befindet sich sowohl an der Speicherstelle $D500 als auch — als Doppel — bei $FF'00. Falls der /O-Bereich einmal ausgeblendet ist, haben wir noch den Schalter bei $FF00. Bild 5 zeigt Ihnen den Aufbau und die Bedeutung der einzelnen Bits:</p>
 
-        <p>l: RAM/ROM-Konfiguration gemäß den Inhalten von Bit 4 und 5</p>
+        <table class="plain">
+            <tr>
+                <td>Bit 0</td>
+                <td>steuert, was sich im Bereich $D000 bis $DFFF anfindet.<br>1: RAM/ROM-Konfiguration gemäß den Inhalten von Bit 4 und 5<br>0: I/O-Bereich ist eingeschaltet.</td>
+            </tr>
+            <tr>
+                <td>Bit 1</td>
+                <td>richtet uns den Speicherbereich von $4000 bis $7FFF ein:<br>1: Hier befindet sich RAM<br>0: Das Basic-Low-ROM ist eingeblendet.</td>
+            </tr>
+            <tr>
+                <td>Bit 2 u. 3</td>
+                <td>kümmern sich um den Inhalt des Speicherraums $8000 bis $BFFF.<br>00: Das Basic-high-ROM liegt an der Benutzeroberfläche<br>01: internes ROM<br>10: externes ROM<br>beide sind für uns momentan noch ohne Interesse.<br>11: RAM ist eingeschaltet.</td>
+            </tr>
+            <tr>
+                <td>Bit 4 u. 5</td>
+                <td>Diese beiden Bit steuern den Inhalt der Speicher $C000 bis $FFFF.<br>00: ROM ist eingeschaltet<br>01: es liegt wieder internes<br>10: oder externes ROM vor. Beides sind ebenso wie bei den Bit 2 und 3 Erweiterungen, die noch nicht aktuell sind.<br>11: RAM ist eingeschaltet.<br>Solange mit diesen beiden Bit ROM eingeschaltet ist, liegt immer eine Lücke im Bereich $D000 bis $DFFF. In dieser Lücke befindet sich — je nach Inhalt von Bit 1 — entweder das ganze I/O-Sortiment oder aber Zeichensatz-ROM.</td>
+            </tr>
+            <tr>
+                <td>Bit 6 u. 7</td>
+                <td>Jedesmal, wenn bei den anderen Bit eine Kombination zur Einblendung von RAM geführt hat, entscheidet nun diese letzte Paarung, welcher RAM-Bereich gemeint ist.<br>00: RAM aus BANK 0<br>01: RAM aus BANK 1<br>10: (RAM aus BANK 2 und<br>11: RAM aus BANK 3). Die beiden letzteren sind ohne Speicherergänzung noch nicht bedeutsam. Statt dessen erfolgt die Einblendung derart, daß nur Bit 6 berücksichtigt wird.</td>
+            </tr>
+        </table>
 
-        <p>0: VO-Bereich ist eingeschaltet. Bit ], richtet uns den Speicherbereich von $4000 bis $7FFF ein:</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit:</th>
+                    <th>7</th>
+                    <th>6</th>
+                    <th>5</th>
+                    <th>4</th>
+                    <th>3</th>
+                    <th>2</th>
+                    <th>1</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th>Bedeutung:</th>
+                    <td colspan="2">RAM-Bank-Auswahl:<br>00 = Bank 0<br>01 = Bank 1<br>10 = Bank 2<br>11 = Bank 3</td>
+                    <td colspan="2">Bereich C000—FFFF:<br>00 = ROM<br>01 = intern. ROM<br>10 = extern. ROM<br>11 = RAM</td>
+                    <td colspan="2">Bereich 8000—BFFF:<br>00 = Basic-ROM (high)<br>01 = intern. ROM<br>10 = extern. ROM<br>11 = RAM</td>
+                    <td>Bereich 4000—7FFFF<br>0 = Basic-ROM (low)<br>1 = RAM</td>
+                    <td>Bereich D000—DFFF<br>0 = I/O<br>1 = RAM/ROM (H. Bit. 4 u. 5)</td>
+                </tr>
+            </table>
+            <figcaption>Bild 5. Der Aufbau des CR (Konfigurations-Register) $D500</figcaption>
+        </figure>
 
-        <p>l: Hier befindet sich RAM . 0: Das Basic-Low-ROM ist eingeblendet. Bit2u.3 kümmern sich um den Inhalt des Speicherraums $8000 bis $BFFF.</p>
-
-        <p>00: Das Basic-high-ROM liegt an der Benutzeroberfläche</p>
-
-        <p>0l: internes ROM</p>
-
-        <p>10: externes ROM beide sind für uns momentan noch ohne Interesse.</p>
-
-        <p>ll: RAM ist eingeschaltet.</p>
-
-        <p>Bit4u.5 Diese beiden Bit steuern den Inhalt der Speicher $C000 bis $FFFF.</p>
-
-        <p>00: ROM ist eingeschaltet</p>
-
-        <p>01: es liegt wieder internes</p>
-
-        <p>10: oder externes ROM vor. Beides sind ebenso wie bei den Bit 2 und 3 Erweiterungen, die noch nicht aktuell sind.</p>
-
-        <p>ll: RAM ist eingeschaltet.</p>
-
-        <p>Solange mit diesen beiden Bit ROM eingeschaltet ist, liegt immer eine Lücke im Bereich $D000 bis $DFFF. In dieser Lücke befindet sich — je nach Inhalt von Bit 1 — entweder das ganze /O-Sortiment oder aber Zeichensatz-ROM. Bit6u. 7 Jedesmal, wenn bei den anderen Bit eine Kombination zur Einblendung von RAM geführt hat, entscheidet nun diese letzte Paarung, welcher RAM-Bereich gemeint ist.</p>
-
-        <p>00: RAM aus BANK O</p>
-
-        <p>01: RAM aus BANK 1</p>
-
-        <p>10: (RAM aus BANK 2 und ll: RAM aus BANK 3). Die beiden letzteren sind ohne Speicherergänzung noch nicht bedeutsam. Statt dessen erfolgt die Einblendung derart, daß nur Bit 6 berücksichtigt wird. Der Einschaltwert dieses CR-Registers ist 0. Das heißt, daß alle System-ROMs aktiv sind, ebenso der I/O-Bereich. Der verbleibende Speicher gehört zu BANK 0. Damit endet wieder einmal die Erkundungsreise unseres eifrigen Forschers. In der nächsten Ausgabe folgt dann Teil 6, der diesen Bericht abschließt.</p>
+        <p>Der Einschaltwert dieses CR-Registers ist 0. Das heißt, daß alle System-ROMs aktiv sind, ebenso der I/O-Bereich. Der verbleibende Speicher gehört zu BANK 0. Damit endet wieder einmal die Erkundungsreise unseres eifrigen Forschers. In der nächsten Ausgabe folgt dann Teil 6, der diesen Bericht abschließt.</p>
 
         <address class="author">(Heimo Ponnath/dm)</address>
     </article>
