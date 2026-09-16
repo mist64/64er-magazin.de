@@ -1,0 +1,150 @@
+
+
+;vg-cp80x.src.prg ==0801==
+   50 sys9*4096
+  100 ;
+  110 ;
+  120 .opt oo
+  130 ;anpassung von cp 80x an vizawrite
+  140 ;umlaute und steuercodes werden
+  150 ;vom cp 80x richtig ausgegeben, wenn
+  160 ;er als epson-drucker (e) angesteuert
+  170 ;wird
+  180 ;zusaetzlich ist es moeglich grafiken zu drucken!
+  190 ;
+  200 ;version 2.2
+  210 ;
+  220 ;(c) 1986 markt&technik
+  230 ;
+  240 ;       written by
+  250 ;       ralf lenz
+  260 ;     am landgraben 12
+  270 ;    4290 bocholt-barlo
+  280 ;
+  290 ;
+  300 print  = $f1ca;ausgabe eines zeichens
+  310 graphcode = $a8;code fuer grafik
+  320 cr = $0d;carriage return 
+  330 ;
+  340 ;
+  350 *= $02a7
+  360 ;
+  370 grafik      sty yzw;y-register zwischenspeichern
+  380             ldy #0
+  390             sty flag;flag fuer nibble
+  400 bin320      lda tabelle3,y;drucker auf 320 binaer-
+  410             jsr print;daten einstellen
+  420             iny
+  430             cpy #4
+  440             bne bin320
+  450             ldy yzw;y-register zurueckholen
+  460             lda #<graphout;outputvektor erneut
+  470             sta $0326;verstellen fuer ausgabe von
+  480             lda #>graphout;grafik
+  490             sta $0327;outputvektor erneut verstellen
+  500 exit2       clc
+  510             rts
+  540 ;
+  550 graphout    cmp #graphcode;pruefen, ob zeilenende
+  560             bne g1
+  570             clc;ende der grafikzeile erreicht.
+  580             jmp init;output-vektor zurueckstellen
+  590 g1          cmp #63;pruefen, ob illegaler code (0-63)
+  600             bcc exit2
+  610             and #%00001111;nur unteres nibble verwenden
+  620             pha; und auf stapel
+  630             lda flag;oberes oder unteres nibble
+  640             bne nibble2
+  650 ;
+  660 nibble1     inc flag;flag=1
+  670             pla;nibble zurueckholen
+  680             sta store;und zwischenspeichern
+  690             clc
+  700             rts
+  710 ;
+  720 nibble2     dec flag;flag=0
+  730             pla;nibble zurueckholen
+  740             asl;und um 4 bit nach links schieben
+  750             asl:asl:asl
+  760             ora store;verknuepfen mit unterem nibble
+  770             jsr print;und ausgeben
+  780             rts
+  790 ;
+  800 ;
+  810 ;
+  820 *= $0365
+  830 init        lda #<start ;output-vektor aendern
+  840             sta $0326
+  850             lda #>start
+  860             sta $0327
+  870             rts
+  880 ;
+  890 start       pha;druckbyte auf stapel retten
+  900             lda $9a  ;pruefen ob
+  910             cmp #$04;ausgabe auf drucker
+  920             bne ende   ;nein
+  930             pla ;wenn ja, druckbyte zurueckholen
+  940             cmp #graphcode
+  950             bne s1
+  960             jmp grafik
+  970 s1          pha ;und sofort wieder auf stapel
+  980             sty yzw   ;yregister zwischenspeichern
+  990             ldy #$07
+ 1000 such        cmp tabelle1,y;druckbyte mit zu aendernden
+ 1010 ;                       zeichen vergleichen
+ 1020             beq tausch1;zeichen gefunden
+ 1030             dey
+ 1040             bpl such ;weitersuchen
+ 1050             bne smalltest;kein umlaut gefunden
+ 1060 tausch1     pla;druckbyte vom stapel holen
+ 1070             lda tabelle2,y ;ersatzbyte aus tabelle holen
+ 1080             pha;und als neues druckbyte zum stapel
+ 1090             clc
+ 1100             bcc ende1;esctest kann entfallen, da umlaut
+ 1110 smalltest   pla;druckbyte vom stapel holen
+ 1120             cmp #15; mit code fuer schmalschrift vergleichen
+ 1130             bne nosmall
+ 1140             ldy smallflg;flag pruefen
+ 1150             beq smallon 
+ 1160             ora #128; bit 7 setzen fuer schmalschrift aus
+ 1170 smalloff    ldy #0
+ 1180             .byte $2c; die folgenden 2 bytes ueberspringen
+ 1190 smallon     ldy #1
+ 1200             sty smallflg
+ 1210 nosmall     pha;druckbyte wieder auf stapel
+ 1220 esctest     lda test
+ 1230             cmp #27;escapecode
+ 1240             beq ende1;vorhergegangener code war escape
+ 1250 ;                    ===> byte nicht aendern
+ 1260 tausch2     pla
+ 1270             cmp #65
+ 1280             bcc exit ;kleiner als 65 (a)
+ 1290             cmp #91
+ 1300             bcs weiter;groesser als 90 (z)
+ 1310             ora #%10000000 ;bit 7 setzen
+ 1320             bcc exit ;springt hier immer
+ 1330 weiter      cmp #97
+ 1340             bcc exit;kleiner als 97 ({$61})
+ 1350             cmp #123
+ 1360             bcs exit;groesser als 122 ({$7a})
+ 1370             and #%11011111;bit 5 loeschen
+ 1380 exit        pha
+ 1390 ende1       ldy yzw;yregister zurueckholen
+ 1400 ende        pla;druckbyte zurueckholen
+ 1410             sta test;und fuer esctest beim naechsten
+ 1420 ;                     einsprung speichern
+ 1430             jmp print;sprung zum normalen output-vektor
+ 1440 ;
+ 1450 tabelle1    .byte  91,92,93,126,123,124,125,64
+ 1460 ;                     sollen getauscht werden
+ 1470 tabelle2    .byte  219,220,221,94,91,92,93,192
+ 1480 ;                     sollen dafuer gedruckt werden
+ 1490 yzw         .byte 00 ;zwischenspeicher fuer yregister
+ 1500 test        .byte 00;zwischenspeicher fuer esctest
+ 1510 smallflg    .byte 00;flag fuer smalltest
+ 1520 tabelle3    .byte $1b,$4b,$40,$01;escape k 320
+ 1530 store       .byte 00;speicher fuer grafikbyte
+ 1540 flag        .byte 00;flag fuer oberes/unteres nibble
+ 1550 ;
+ 1560 ;
+

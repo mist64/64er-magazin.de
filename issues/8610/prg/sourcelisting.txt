@@ -1,0 +1,211 @@
+
+
+;sourcelisting.prg ==0801==
+  100 rem *****************************
+  110 rem * quelltext fuer            *
+  120 rem * profi-ass oder formel-64  *
+  130 rem * programm : h.i.d.e. v3.2  *
+  140 rem *                           *
+  150 rem * written by...frank hund   *
+  160 rem *              hoehenweg 8  *
+  170 rem *         5200 siegburg 1   *
+  180 rem *                           *
+  190 rem * (c) 1986 f.h.             *
+  200 rem *                           *
+  210 rem * start $c000=49152         *
+  220 rem *****************************
+  230 :
+  240 sys9*4096
+  250 .opt oo
+  260 * = $c000
+  270 ;
+  280 jsr 42291        ;nichts geht
+  290 lda 34           ;ueber ein gutes
+  300 clc              ;'old' zu anfang.
+  310 adc #$02         ;h.i.d.e. wird
+  320 sta 45           ;dadurch
+  330 lda 35           ;anwender-
+  340 adc #$00         ;freundlicher!
+  350 sta 46           ;
+  360 lda 43            ;initialisieren
+  370 sta $fb           ;
+  380 lda 44            ;
+  390 sta $fc           ;
+  400 lda #$00          ;
+  410 sta zaehlerlow    ;
+  420 sta zaehlerhigh   ;
+  430 jsr hello         ;moment bitte !
+  440 ;
+  450 mainloop ldy #$00 ;
+  460 lda ($fb),y       ;adresse fuer
+  470 sta adresselow    ;naechste zeile
+  480 iny               ;lesen
+  490 lda ($fb),y       ;
+  500 sta adressehigh
+  510 bne nostop        ;pruefen auf
+  520 lda adresselow    ;ende
+  530 bne nostop        ;
+  540 jmp fertig
+  550 ;
+  560 nostop jsr zout ;zeilennummer
+  570 ;               ;ausgeben...
+  580 ldy #$04          ;wird diese
+  590 lda ($fb),y       ;zeile
+  600 cmp #"@"          ;verschont "?"
+  610 beq nohide        ;
+  620 ldy #$00          ;nein ! (hehe...)
+  630 clc               ;hilfszaehler
+  640 lda zaehlerlow    ;um 6 erhoehen
+  650 adc #$06          ;
+  660 sta zaehlerlow    ;
+  670 lda zaehlerhigh   ;
+  680 adc #$00          ;
+  690 sta zaehlerhigh   ;
+  700 ;
+  710 jsr verknuepfe    ;addieren und
+  720 ;                 ;zurueckschreiben
+  730 clc
+  740 lda $fb           ;4 bytes
+  750 adc #$04          ;(adresse,
+  760 sta $fb           ;zeilennummer)
+  770 lda $fc           ;ueberspringen
+  780 adc #$00          ;
+  790 sta $fc
+  800 jmp copit         ;k o p i e r e n
+  810 ;
+  820 back ldy #$00     ;entstandenen
+  830 tya               ;zwischenraum
+  840 sta ($fb),y       ;mit
+  850 iny               ;1* 00
+  860 lda #$3a          ;5* 3a
+  870 fuell sta ($fb),y ;auffuellen
+  880 iny               ;
+  890 cpy #$06          ;
+  900 bne fuell
+  910 set lda adresselow;vektor auf
+  920 sta $fb           ;naechste, neu-
+  930 lda adressehigh   ;errechnente
+  940 sta $fc           ;zeile
+  950 jmp mainloop      ;und von anfang
+  960 ;
+  970 nohide lda #$20   ;zeile wird
+  980 sta ($fb),y       ;verschont.
+  990 ldy #$00          ;marke (@) wird
+ 1000 jsr verknuepfe   ;beseitigt...
+ 1010 jmp set          ;
+ 1020 ;
+ 1030 verknuepfe clc   ;unteroutine :
+ 1040 lda adresselow   ;
+ 1050 adc zaehlerlow   ;berechnung der
+ 1060 sta adresselow   ;naechsten
+ 1070 sta ($fb),y      ;adresse.
+ 1080 lda adressehigh  ;
+ 1090 adc zaehlerhigh  ;
+ 1100 sta adressehigh  ;
+ 1110 iny              ;
+ 1120 sta ($fb),y      ;
+ 1130 rts
+ 1140 ;
+ 1150 zout ldx #$00    ;routine
+ 1160 llp3 lda pos,x   ;aktuelle
+ 1170 jsr $ffd2        ;zeilennummer
+ 1180 inx              ;ausgeben.
+ 1190 cmp #$00         ;
+ 1200 bne llp3         ;
+ 1210 ldy #$02         ;
+ 1220 lda ($fb),y      ;
+ 1230 tax              ;
+ 1240 iny              ;
+ 1250 lda ($fb),y      ;
+ 1260 jsr $bdcd        ;
+ 1270 rts
+ 1280 ;
+ 1290 fertig clc       ;fertig...fast!
+ 1300 lda 43           ;wichtig:
+ 1310 adc #$05         ;ein 'a' in der
+ 1320 sta $fb          ;1. zeile.
+ 1330 lda 44           ;ausfuehrlich
+ 1340 adc #$00         ;gemacht damit
+ 1350 sta $fc          ;flexibel fuer
+ 1360 ldy #$00         ;alle speicher-
+ 1370 lda #$41         ;bereiche
+ 1380 sta ($fb),y
+ 1390 rts              ;back to basic
+ 1400 ;
+ 1410 copit lda 45     ;kopierroutine
+ 1420 sta $fd          ;=============
+ 1430 lda 46           ;
+ 1440 sta $fe          ;initialisieren:
+ 1450 clc              ;-vektoren
+ 1460 lda 45           ; setzen
+ 1470 adc #$06         ;-speicherende
+ 1480 sta 45           ; hochsetzen
+ 1490 lda 46           ;
+ 1500 adc #$00         ;
+ 1510 sta 46           ;
+ 1520 cmp #$a0         ;prg zu gross
+ 1530 beq error        ;geworden"?"
+ 1540 jsr deb
+ 1550 ;
+ 1560 begin ldy #$00   ;
+ 1570 lda ($fd),y      ;hier wird der
+ 1580 ldy #$06         ;speicher
+ 1590 sta ($fd),y      ;zwischen der
+ 1600 dec $fd          ;aktuellen
+ 1610 lda $fd          ;'arbeitsstelle'
+ 1620 cmp #$ff         ;und dem
+ 1630 bne no           ;programmende
+ 1640 dec $fe          ;um 6 bytes
+ 1650 no lda $fd       ;nach hinten
+ 1660 cmp $fb          ;verschoben
+ 1670 bne begin        ;
+ 1680 lda $fe          ;
+ 1690 cmp $fc          ;
+ 1700 bne begin        ;
+ 1710 jsr inb
+ 1720 jmp back         ;zurueck
+ 1730 ;
+ 1740 inb inc $fb      ;kleine
+ 1750 lda $fb          ;subroutinen
+ 1760 bne noi          ;
+ 1770 inc $fc          ;
+ 1780 noi rts          ;
+ 1790 ;                ;
+ 1800 deb dec $fb      ;
+ 1810 lda $fb          ;
+ 1820 cmp #$ff         ;
+ 1830 bne not          ;
+ 1840 dec $fc          ;
+ 1850 not rts          ;
+ 1860 ;
+ 1870 hello ldx #$00
+ 1880 llp lda words,x
+ 1890 jsr $ffd2
+ 1900 inx
+ 1910 cmp #$00
+ 1920 bne llp
+ 1930 rts
+ 1940 words .asc "{down}{rvon}h.i.d.e. v3.2{rvof}"
+ 1950 .byt $0d
+ 1960 .asc "moment bitte !"
+ 1970 .byt $0d
+ 1980 .asc "{down}zeile : "
+ 1990 .byt $00
+ 2000 error ldx #$00
+ 2010 llp2 lda words2,x
+ 2020 jsr $ffd2
+ 2030 inx
+ 2040 cmp #$00
+ 2050 bne llp2
+ 2060 jmp fertig
+ 2070 words2 .byt $0d
+ 2080 .asc "{rvon}sorry, prg zu lang.{rvof}{down}"
+ 2090 .byt $00
+ 2100 pos .byt $0d
+ 2110 .asc "{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}" : .byt $00
+ 2120 ;
+ 2130 zaehlerlow  .byt 0 ;hilfszeiger
+ 2140 zaehlerhigh .byt 0 ;
+ 2150 adresselow  .byt 0 ;
+ 2160 adressehigh .byt 0 ;
+

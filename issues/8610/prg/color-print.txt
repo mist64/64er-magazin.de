@@ -1,0 +1,243 @@
+
+
+;color-print.prg ==0801==
+    5 rem ********************************
+    6 rem ***   (c) by matthias may    ***
+    9 rem ********************************
+   10 ifs=0thens=1:load"print.1",8,1
+   12 ifs=1thens=2:load"print.2",8,1
+   14 ifs=2thens=3:load"print.3",8,1
+   16 ifs=3thens=4:load"print.4",8,1
+   17 ifs=4thens=5:load"print.5",8,1
+   18 poke45,1:poke46,64:poke55,0:poke56,128
+   20 clr
+   22 sys49664
+   24 print"{clr}"
+   26 f$(1)="schwarz":f$(2)="blau":f$(3)="rot"
+   28 sl$=chr$(13)+"{home}{down}             color-print"+chr$(13)
+   30 sl$=sl$+"             {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"+chr$(13)
+   32 sl$=sl$+"{down}        (c) by matthias may"
+   40 print sl$
+   41 poke53280,11:poke53281,0
+   42 n$(1)="  diskwork   ":n$(2)=" farbwechsel ":n$(3)=" bild zeigen "
+   43 n$(4)="    druck    ":n$(5)="    ende     "
+   45 f=1:s1=9:fm=5:z=6
+   50 print:print:print:print
+   55 print"   {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}        "
+   60 print"   B    diskwork     B        "
+   70 print"   B   farbwechsel   B        "
+   80 print"   B   bild zeigen   B        "
+   90 print"   B      druck      B        "
+  100 print"   B      ende       B        "
+  105 print"   {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}        "
+  106 print"                              "
+  107 print"                              "
+  109 gosub 550
+  110 getx$:if x$="" then 110
+  120 if x$="{down}" then gosub500
+  130 if x$="{up}" then gosub600
+  135 if x$=chr$(13) then 150
+  140 goto 110
+  150 on f goto 1000,2000,3000,4000,10000
+  500 if f=fm then return
+  510 f=f+1
+  550 poke 214,s1+f-1:poke211,z:sys58640:printn$(f-1)
+  560 poke 214,s1+f  :poke211,z:sys58640:print"{rvon}"n$(f)"{rvof}"
+  570 return
+  600 if f=1 then return
+  610 f=f-1
+  650 poke 214,s1+f+1:poke211,z:sys58640:printn$(f+1)
+  660 poke 214,s1+f  :poke211,z:sys58640:print"{rvon}"n$(f)"{rvof}"
+  670 return
+ 1000 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 1001 n$(1)="  directory  "
+ 1002 n$(2)="  load-pic   "
+ 1003 n$(3)="    menu     "
+ 1004 f=1:s1=13:fm=3:z=12
+ 1010 print:print:print:print
+ 1015 printtab(11)"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 1020 printtab(11)"B  directory  B"
+ 1030 printtab(11)"B  load-pic   B"
+ 1035 print"           B    menu     B         "
+ 1040 print" {$a0}{$a0}{$a0}       {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}         "
+ 1041 print"                                   "
+ 1042 print"                               "
+ 1045 print"                               "
+ 1046 print"                               "
+ 1047 print"                              "
+ 1048 print"                               "
+ 1049 gosub 550
+ 1050 getx$:if x$="" then 1050
+ 1055 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 1060 if x$="{down}" then gosub 500
+ 1070 if x$="{up}" then gosub 600
+ 1075 if x$<>chr$(13) then 1050
+ 1080 on f goto 1100,1200,40
+ 1090 goto 1050
+ 1100 poke59639,18:poke1,53
+ 1105 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 1106 print"                           B"
+ 1110 sys49921
+ 1120 getx$:if x$="" then 1120
+ 1130 poke1,55:goto 1000
+ 1200 print"      {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 1210 print"      Bload    .................B{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}":t=0
+ 1211 print"      {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+ 1215 poke214,17:poke211,15:sys58640
+ 1220 poke198,0:wait 198,1:geta$
+ 1230 if a$=chr$(20) then t=t-1:print"{left}.{left}";:goto 1220
+ 1240 poke 36864+t,asc(a$):printa$;
+ 1245 if a$<>chr$(13) then t=t+1:goto 1220
+ 1250 if t>18 then t=18:print"{left}";:goto 1220
+ 1260 poke36889,t
+ 1270 sys36896
+ 1280 open1,8,15
+ 1290 get#1,a,b$,c,d:printa;b$;c;d
+ 1295 close1
+ 1300 goto 1000
+ 2000 c0=0:c1=0:c2=0:c3=3:for u=1 to 3:print"{clr}"
+ 2010 gosub 15000
+ 2040 poke51238,c3:poke51237,c2:poke51236,c1:poke53281,c0
+ 2045 sys32928
+ 2050 getx$:if x$="" then 2050
+ 2055 gosub 17000
+ 2060 print"{clr}"
+ 2070 print"{down}{down}{down}{down}{down}{down}{down}{down}"
+ 2080 printtab(14)"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 2090 printtab(14)"B       B{left}{left}{left}{left}{left}{left}{left}{left}"f$(1)
+ 2100 printtab(14)"B       B{left}{left}{left}{left}{left}{left}{left}{left}"f$(2)
+ 2110 printtab(14)"B       B{left}{left}{left}{left}{left}{left}{left}{left}"f$(3)
+ 2120 printtab(14)"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+ 2130 n$(1)=f$(1)
+ 2140 n$(2)=f$(2)
+ 2150 n$(3)=f$(3)
+ 2160 f=1:fm=3:s1=10:z=15
+ 2170 gosub 550
+ 2180 getx$:if x$="" then 2180
+ 2190 if x$="{down}" then gosub 500
+ 2200 if x$="{up}" then gosub 600
+ 2210 if x$<>chr$(13) then 2180
+ 2220 a$(u)=f$(f)
+ 2230 if c0=0 and c1=0 and c2=0 then c1=3:c3=0:goto 2250
+ 2240 if c0=0 and c2=0 and c3=0 then c2=3:c1=0
+ 2250 nextu
+ 2260 f$(1)=a$(1)
+ 2270 f$(2)=a$(2)
+ 2280 f$(3)=a$(3)
+ 2290 print"{clr}":goto 40
+ 3000 print"{clr}"
+ 3010 gosub 15000
+ 3035 sys32928
+ 3040 getx$:if x$="" then 3040
+ 3041 if x$="{f1}" then poke 53281,(peek(53281)+1)and15:goto 3035
+ 3042 if x$="{f3}" then poke 51236,(peek(51236)+1)and15:goto 3035
+ 3043 if x$="{f5}" then poke 51237,(peek(51237)+1)and15:goto 3035
+ 3044 if x$="{f7}" then poke 51238,(peek(51238)+1)and15:goto 3035
+ 3046 if x$="i" then sys32768:forg=1 to 1000:next:sys32768:goto 3035
+ 3050 gosub 17000
+ 3080 print"{clr}":goto 40
+ 4000 printtab(8)"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 4005 printtab(8)"B invertiert   j/n  B"
+ 4010 printtab(8)"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+ 4015 get x$:if x$="" then 4015
+ 4020 if x$="j" then sys32768
+ 4050 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 4051 poke 59639,18:poke1,53
+ 4052 open4,4:print#4,chr$(8);
+ 4053 print"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+ 4054 print"Bbitte blatt plazieren B"
+ 4055 print"Bund markieren !       B"
+ 4056 print"Bfarbe :               B{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}"f$(1)
+ 4057 print"B                      B"
+ 4058 print"B                      B"
+ 4059 print"B                      B{up}{up}{up}"
+ 4060 getx$:ifx$="" then 4060
+ 4061 print"Bstart ..."
+ 4065 x=312
+ 4070 p=8192
+ 4090 for h=0 to 7
+ 4100 a=peek(p+h+x):if a=0 then a=128:goto 4700
+ 4101 if a=255 then 4700
+ 4110 if (aand1)=1 and (aand2)=2 then 4115
+ 4112 a=aand255-1-2
+ 4115 if (aand4)=4 and (aand8)=8 then 4125
+ 4120 a=aand255-4-8
+ 4125 if (aand16)=16 and (aand32)=32 then4135
+ 4130 a=aand255-16-32
+ 4135 if (aand64)=64 and (aand128)=128 then 4150
+ 4140 a=aand255-64-128
+ 4150 a=int(a/2):a=aor128
+ 4700 a$=a$+chr$(a)
+ 4710 next h:print#4,a$;:a$=""
+ 4720 p=p+320:if p<16384-192 then 4090
+ 4730 print#4
+ 4740 x=x-8
+ 4750 if x>-8 then 4070
+ 4800 print"Bbitte blatt plazieren B"
+ 4810 print"Bfarbe :               B{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";f$(2)
+ 4811 print"B                      B"
+ 4812 print"B                      B"
+ 4813 print"B                      B"
+ 4814 print"B                      B{up}{up}{up}{up}"
+ 4820 getx$:if x$="" then 4820
+ 4830 print"Bstart ..."
+ 4840 x=312
+ 4850 p=8192
+ 4990 for h=0 to 7
+ 5000 a=peek(p+h+x):if a=0 then a=128:goto 5060
+ 5001 if a=255 then a=128:goto5060
+ 5010 if (aand1)=1 and (aand2)<>2 then a=a+2:goto 5012
+ 5011 a=aand255-1-2
+ 5012 if (aand4)=4 and (aand8)<>8 then a=a+8:goto 5014
+ 5013 a=aand255-4-8
+ 5014 if (aand16)=16 and (aand32)<>32 then a=a+32:goto 5016
+ 5015 a=aand255-16-32
+ 5016 if (aand64)=64 and (aand128)<>128 then a=a+128:goto 5050
+ 5017 a=aand255-64-128
+ 5050 a=int(a/2):a=aor128
+ 5060 a$=a$+chr$(a)
+ 5070 next h:print#4,a$;:a$=""
+ 5080 p=p+320:if p<16384-192 then 4990
+ 5090 print#4
+ 5100 x=x-8
+ 5110 if x>-8 then 4850
+ 5120 print"Bbitte blatt plazieren B"
+ 5130 print"Bfarbe :               B{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}"f$(3)
+ 5131 print"B                      B"
+ 5132 print"B                      B"
+ 5133 print"B                      B"
+ 5134 print"B                      B{up}{up}{up}{up}"
+ 5140 getx$:if x$="" then 5140
+ 5150 print"Bstart ..."
+ 5160 x=312
+ 5170 p=8192
+ 5190 for h=0 to 7
+ 5200 a=peek(p+h+x):if a=0 then a=128:goto 5260
+ 5201 if a=255 then a=128:goto 5260
+ 5210 if (aand2)=2 and (aand1)<>1 then a=a+1:goto 5212
+ 5211 a=aand255-1-2
+ 5212 if (aand8)=8 and (aand4)<>4 then a=a+4:goto 5214
+ 5213 a=aand255-4-8
+ 5214 if (aand32)=32 and (aand16)<>16 then a=a+16:goto 5216
+ 5215 a=aand255-16-32
+ 5216 if (aand128)=128 and (aand64)<>64 then a=a+64:goto 5250
+ 5217 a=aand255-64-128
+ 5250 a=int(a/2):a=aor128
+ 5260 a$=a$+chr$(a)
+ 5270 next h:print#4,a$;:a$=""
+ 5280 p=p+320:if p<16384-192 then5190
+ 5290 print#4
+ 5300 x=x-8
+ 5310 if x>-8 then 5170
+ 5320 close4
+ 5330 goto 24
+10000 end
+15000 poke 53265,peek(53265)or176
+15010 poke 53270,peek(53270)or16
+15020 poke 53272,peek(53272)or8
+15030 return
+17000 poke 53265,peek(53265)and159
+17010 poke 53270,peek(53270)and255-16
+17020 poke 53272,peek(53272)and255-8
+17030 return
+

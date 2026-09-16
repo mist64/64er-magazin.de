@@ -1,0 +1,92 @@
+
+
+;vg-print.src.prg ==0801==
+   50 sys9*4096
+  100 ;
+  110 ;
+  120 ;
+  130 ;vizawrite grafikprint
+  140 ;    version 3.0
+  150 ;
+  160 ;(c) 1986 markt&technik
+  170 ;
+  180 ;     written by
+  190 ;     ralf lenz
+  200 ;   am landgraben 12
+  210 ;  4290 bocholt-barlo
+  220 ;
+  230 .opt oo
+  240 ;
+  250 *= $0365;startadresse des programms
+  260 ;
+  270 print  = $f1ca;ausgabe eines zeichens
+  280 graphcode = $a8;code fuer grafik
+  290 cr = $0d;carriage return 
+  300 ;
+  310 init       lda #<newout;outputvektor auf
+  320            sta $0326;eigene routine verstellen
+  330            lda #>newout
+  340            sta $0327
+  350            rts
+  360 ;
+  370 newout     pha;zu druckendes byte auf stapel
+  380            lda $9a;pruefen, ob ausgabe auf drucker
+  390            cmp #4
+  400            bne noprinter;ausgabe nicht auf drucker
+  410            pla;druckbyte zurueckholen
+  420            cmp #graphcode;pruefen, ob grafikzeile
+  430            bne nographik;normaler textausdruck
+  440            sty yzw;y-register zwischenspeichern
+  450            ldy #0
+  460            sty flag;flag fuer nibble
+  470 bin320     lda tabelle1,y;drucker auf 320 binaer-
+  480            jsr print;daten einstellen
+  490            iny
+  500            cpy #5
+  510            bne bin320
+  520            ldy yzw;y-register zurueckholen
+  530            lda #<graphout;outputvektor erneut
+  540            sta $0326;verstellen fuer ausgabe von
+  550            lda #>graphout;grafik
+  560            sta $0327;outputvektor erneut verstellen
+  570 exit       clc
+  580            rts
+  590 noprinter  pla;druckbyte zurueckholen
+  600 nographic  jmp print;normale output-routine
+  610 ;
+  620 graphout   cmp #graphcode;pruefen, ob zeilenende
+  630            bne g1
+  640            clc;ende der grafikzeile erreicht.
+  650            jmp init;output-vektor zurueckstellen
+  660 g1         cmp #63;pruefen, ob illegaler code (0-63)
+  670            bcc exit
+  680            and #%00001111;nur unteres nibble verwenden
+  690            pha; und auf stapel
+  700            lda flag;oberes oder unteres nibble
+  710            bne nibble2
+  720 ;
+  730 nibble1    inc flag;flag=1
+  740            pla;nibble zurueckholen
+  750            sta store;und zwischenspeichern
+  760            clc
+  770            rts
+  780 ;
+  790 nibble2    dec flag;flag=0
+  800            pla;nibble zurueckholen
+  810            asl;und um 4 bit nach links schieben
+  820            asl:asl:asl
+  830            ora store;verknuepfen mit unterem nibble
+  840            jsr print;und ausgeben
+  850            rts
+  860 ;
+  870 yzw        .byte 00;zwischenspeicher fuer y-register
+  880 tabelle1   .byte $1b;escape senden
+  881 .byte $2a;'*' fuer 8-nadel-bitmuster-modus
+  882 .byte $06;modus 0-6 anwaehlen,hier 6 voreingestellt
+  883 .byte $40,$01;320-punkte-dichte
+  890 store      .byte 00;speicher fuer grafikbyte
+  900 flag       .byte 00;flag fuer oberes/unteres nibble
+  910 ;
+  920 ;
+  930 ;
+

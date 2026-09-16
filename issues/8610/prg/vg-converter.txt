@@ -1,0 +1,197 @@
+
+
+;vg-converter.prg ==0801==
+   10 ifpeek(49152)=32 and peek(49153)=84then210
+   20 load"grconv.code.obj",8,1
+   30 rem ********************************
+   40 rem *                              *
+   50 rem * vizawrite-grafik-converter   *
+   60 rem *                              *
+   70 rem * (c) 1986 markt&technik verlag*
+   80 rem *                              *
+   90 rem *       written by             *
+  100 rem*                              *
+  110 rem*        ralf lenz             *
+  120 rem*                              *
+  130 rem*     am landgraben 12         *
+  140 rem*                              *
+  150 rem*    4290 bocholt-barlo        *
+  160 rem*                              *
+  170 rem*                              *
+  180 rem*                              *
+  190 rem********************************
+  200 :
+  210 vic=53248:rem startadresse vic-chip
+  220 laden = 12*4096:rem bild laden
+  230 hires= laden+20:rem umschalten auf hires
+  240 lres= laden+53:rem umschalten auf lores
+  250 lcol= laden+65:rem farbe textbildschirm
+  260 colr= laden+76 :rem farbe hires
+  270 invert= laden+103:rem bild invertieren
+  280 speichern= laden+127:rem bild speichern
+  290 cnvert= laden+276:rem bild convertieren
+  300 setsprite= laden+349:rem sprites initialisieren
+  310 down= laden+436:rem sprites nach untenbewegen
+  320 up=laden+453:rem sprites nach oben bewegen
+  330 :
+  340 sys lcol:printchr$(14):rem farbe setzen und umschalten auf kleinschrift
+  350 printchr$(30):rem schriftfarbe blau
+  360 print"{clr}****************************************"
+  370 print" {$a0}{$a0}     Vizawrite-Grafik-Converter"
+  380 print"{down}      (c) 1986 Markt&Technik Verlag"
+  390 print"                  by
+  400 print"               Ralf Lenz
+  410 print"            Am Landgraben 12
+  420 print"           4290 Bocholt-Barlo
+  430 print
+  440 print"{down}****************************************"
+  450 name$=""
+  460 print"{down}{down}Name des Bildes ('$' fuer Directory): ";
+  470 inputname$:ifname$=""then340
+  480 ifname$="$"thengosub1650:goto340
+  490 print"{down}Legen Sie die Diskette mit dem Bild ins Laufwerk und druecken Sie ";
+  500 print"{rvon}RETURN{rvof}"
+  510 gosub980
+  520 sys laden,name$:rem bild nach $2000 laden
+  530 gosub1080
+  540 ifa=0then590
+  550 print"{down}{rvon}Disk Fehler!{rvof} ";
+  560 print"Druecken Sie {rvon}RETURN{rvof}";
+  570 gosub 980
+  580 goto340
+  590 gosub1010
+  600 print"{down}{rvon}1{rvof} Bild ansehen"
+  610 print"{rvon}2{rvof} Ganzes Bild convertieren"
+  620 print"{rvon}3{rvof} Ausschnitt convertieren"
+  630 print"{rvon}4{rvof} Neues Bild laden"
+  640 print"{rvon}5{rvof} Disc-Befehl senden"
+  650 print"{rvon}6{rvof} Directory"
+  660 print"{rvon}7{rvof} Programmende"
+  670 print"{down}{down}Ihre Wahl (1-7) ? ";
+  680 geta$:ifa$<"1" or a$>"7"then 680
+  690 printa$:on val(a$) gosub 1160,1230,1290
+  700 if a$="4"then340
+  710 if a$="5"thengosub1910:goto590
+  720 if a$="6"thengosub1680:goto590
+  730 if a$="7"thenprint"{clr}";:end
+  740 iff3then 760:rem flag fuer ende des convertierens
+  750 goto590
+  760 syslres:pokevic+21,0:rem sprites aus
+  770 gosub1010
+  780 name$=""
+  790 print"{down}{down}Unter welchem Namen soll das Bild"
+  800 print"{down}gespeichert werden?"
+  810 input"{down}";name$:ifname$=""then900
+  820 name$="vg."+na$+",s,w"
+  830 print"{down}{down}Legen Sie die Diskette, auf die das Bildgespeichert werden soll ";
+  840 print"ins Laufwerk und";
+  850 print"druecken Sie {rvon}RETURN{rvof}"
+  860 gosub980
+  870 sys speichern,name$,oben,unten
+  880 gosub1080:ifa<>0then770
+  890 gosub1010
+  900 print"{down}{down}Wollen Sie noch ein Bild convertieren?"
+  910 print"{down}Falls ja, druecken Sie {rvon}RETURN{rvof}"
+  920 geta$:ifa$=""then920
+  930 ifa$=chr$(13)thenrun210
+  940 print"{clr}":end
+  950 :
+  960 rem wartet auf returntaste
+  970 :
+  980 geta$:ifa$<>chr$(13)then 980
+  990 return
+ 1000 :
+ 1010 print"{clr}****************************************"
+ 1020 print" {$a0}{$a0}     Vizawrite-Grafik-Converter      "
+ 1030 print"****************************************"
+ 1040 return
+ 1050 :
+ 1060 rem fehlerkanal abfragen
+ 1070 :
+ 1080 open15,8,15:input#15,a,b$,c,d:print:printb$:close15:return
+ 1090 :
+ 1100 print"{down}Zum Ausfuehren druecken Sie {rvon}RETURN{rvof}"
+ 1110 print"{down}Rueckkehr zum Menue mit {rvon}RETURN{rvof}"
+ 1120 gosub 980:return
+ 1130 :
+ 1140 rem bild ansehen
+ 1150 :
+ 1160 gosub1100:syscolr,1:syshires
+ 1170 geta$:ifa$="i"then sys invert
+ 1180 ifa$=chr$(13)then syslres :return
+ 1190 goto1170
+ 1200 :
+ 1210 rem ganzes bild convertieren
+ 1220 :
+ 1230 f3=-1:syscolr,1:sys hires:sys cnvert:sys lres
+ 1240 oben=8192:unten=8192+8000
+ 1250 return
+ 1260 :
+ 1270 rem ausschnitt convertieren
+ 1280 :
+ 1290 print"{clr}{down}{down}{down}Bewegen Sie den Zeiger mit den Cursor-  Tasten auf und ab"
+ 1300 print"Zuerst legen Sie die obere Grenze fest. Wenn Sie die gewuenschte Zeile"
+ 1310 print"erreicht haben, druecken Sie die Return-Taste. Analog verfahren Sie mit"
+ 1320 print"der unteren Grenze."
+ 1330 print"{rvon}HOME{rvof} bringt den Zeiger nach oben und"
+ 1340 print"{rvon}I{rvof} invertiert die Grafik"
+ 1350 print"Zum Start druecken Sie {rvon}RETURN{rvof}":gosub 980
+ 1360 syshires:syscolr,1:sys setsprite
+ 1370 geta$:ifa$=""then 1370
+ 1380 ifa$=chr$(13)thengosub1470 :iff3thenreturn
+ 1390 ifa$="{down}"then sys down
+ 1400 ifa$="{up}"then sys up
+ 1410 ifa$="i"then sys invert:fori=1to200:next
+ 1420 ifa$="{home}"thenfori=vic+1 to vic+14step2:pokei,50:next
+ 1430 goto 1370
+ 1440 :
+ 1450 rem obere grenze berechnen
+ 1460 :
+ 1470 iff2then1580 :rem untere grenze
+ 1480 f2=-1
+ 1490 oz=int((peek(vic+1)-50)/8):rem bildschirmzeilennummer des sprites
+ 1500 ifoz=0then1520 :rem sprite ist ganz oben
+ 1510 fori=1024to1023+oz*40:pokei,0:next:rem im farbram loeschen
+ 1520 oben=8192+oz*320
+ 1530 fori=vic+1 to vic+14step2:pokei,242:next:rem alle sprites nach unten
+ 1540 return
+ 1550 :
+ 1560 rem untere grenze berechnen
+ 1570 :
+ 1580 uz=int((peek(vic+1)-50)/8):rem bildschrimzeilennummer des sprites
+ 1590 ifuz=250then 1610 :rem sprite ist ganz unten
+ 1600 fori=1024+uz*40to 2023:pokei,0:next:rem im farbram loeschen
+ 1610 unten=8192+uz*320
+ 1620 f3=-1:fori=1to800:next
+ 1630 syscnvert
+ 1640 return
+ 1650 :
+ 1660 rem inhaltsverzeichnis anzeigen
+ 1670 :
+ 1680 print"{clr}";
+ 1690 open1,8,0,"$0"
+ 1700 get#1,u$,v$
+ 1710 get#1,u$,v$
+ 1720 get#1,u$,v$
+ 1730 bl=0
+ 1740 ifu$<>""thenbl=asc(u$)
+ 1750 ifv$<>""thenbl=bl+asc(v$)*256
+ 1760 printmid$(str$(bl),2);tab(4);
+ 1770 get#1,v$:ifst<>0then1890
+ 1780 ifv$<>chr$(34)then1770
+ 1790 get#1,v$:ifv$<>chr$(34)thenprintv$;:goto1790
+ 1800 get#1,v$:ifv$=chr$(32)then1800
+ 1810 ifv$=chr$(42)thenv$="{left}*"
+ 1820 printtab(22);:w$=""
+ 1830 w$=w$+v$:get#1,v$:ifv$<>""then1830
+ 1840 printleft$(w$,5)
+ 1850 getx$
+ 1860 ifx$="_"thenclose1:return
+ 1870 ifx$=" "thenpoke198,0:wait198,1:poke198,0
+ 1880 ifst=0then1710
+ 1890 print"blocks free"
+ 1900 close1:poke198,0:wait198,1:poke198,0:return
+ 1910 open15,8,15:print"Befehl: ";:poke631,34:poke198,1:inputdb$
+ 1920 print#15,db$:close15:gosub1080
+ 1930 poke198,0:wait198,1:poke198,0:return
+

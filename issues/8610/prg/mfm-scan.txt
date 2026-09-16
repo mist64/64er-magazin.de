@@ -1,0 +1,29 @@
+
+
+;mfm-scan.prg ==1c01==
+   10 rem
+   20 rem  mfm-scanner: angabe der physikalischen diskparameter einer
+   30 rem  mfm oder gcr-diskette mit 1570/1571 & c-128 bzw. c-128d
+   40 rem   (c) markt & technik verlag ag
+   50 rem  written by steffen stempel altrip,   1/6/86
+   60 rem
+  100 data120,32,195,229,44,13,220,32,3,245,32,186,244,141,70,11,41,128,240,27,32,3,245,32,186,244,141,69,11,41,128,240,14
+  110 data162,5,32,3,245,32,186,244,157,63,11,202,208,244,88,76,69,229
+  120 bank15:fori=2816to2866:readx:pokei,x:next
+  130 open15,8,15,"u:":input#15,f,f$,s,t
+  135 ifright$(f$,4)<>"1571"andright$(f$,4)<>"1570"thenprint"{down}{CTRL-O}Laufwerk ist keine 1570/1571":close15:end
+  137 f%=right$(f$,1)="1"
+  140 iff%theninput"{clr}{swlc}Seite, Spur   1,0{left}{left}{left}{left}{left}";si,tr:elseinput"{clr}{down}Spur   0{left}{left}{left}";tr
+  150 print#15,"u0"+chr$(138+16*((si-1)and1))+chr$(tr):sys2816
+  160 if(peek(2886)and14)<>0thenprint"{down}{CTRL-O}Lese-Fehler oder Disk unformatiert.":close15:end
+  170 ifpeek(2886)<128thenprint"{down}Diskette ist GCR-Formatiert.":close15:end
+  180 print"{down}{down}{down}MFM-Format-Report :":print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{down}"
+  190 print"logische Spurnummer           : "peek(2883)
+  200 print"{down}1. logische Sektornummer      : "peek(2882)
+  210 print"letzte log. Sektornummer      : "peek(2881)
+  220 print"Sektoranzahl                  : "peek(2884)
+  230 print"Sektorgroesse (Bytes)         : "2^(7+((peek(2886)/16)and3))
+  240 print"{down}Sektorfolge :":print#15,"m-r"chr$(11)chr$(2)chr$(peek(2884))
+  250 fori=1topeek(2884):get#15,x$:printright$(hex$(asc(x$)),2)" ";:next:print
+  260 close15:end
+

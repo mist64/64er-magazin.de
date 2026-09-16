@@ -1,0 +1,183 @@
+
+
+;super-install.prg ==0801==
+   10 rem ********************************
+   20 rem **    -- super-install --     **
+   30 rem **    m. schacht / m.klemm    **
+   40 rem **    berlin 51   (c) 1985    **
+   50 rem ********************************
+   60 poke53280,0:poke53281,0:poke53272,23:printchr$(147)chr$(159)chr$(9)
+   61 poke788,52:rem stop blockieren
+   62 dimla$(11),dt(36),in(255),bi(255),in$(16)
+   65 fori=0to38:bl$=bl$+chr$(32):next
+   67 po=23:pt=10:pr$="... bitte warten ...":gosub100
+   70 rem ------------tabellenwertevorgabe
+   73 fori=0to31:bi(i)=i+128:bi(i+32)=i+32:bi(i+64)=i:bi(i+96)=i+64
+   74 bi(i+128)=i+192:bi(i+160)=i+96:bi(i+192)=i+64:bi(i+223)=i+95:next:bi(255)=94
+   75 fori=0to255:in(i)=i:next:poke631,17:poke198,1
+   76 restore:fori=0to36:readdt(i):next
+   77 fori=0to11:readla$(i):next
+   78 ze=10:n$="codetabellen name":ad=49152:tx$="textprogramm"
+   80 goto919
+   98 :
+   99 rem ----------ausdruck positionieren
+  100 poke214,po-1:print:poke211,pt:printchr$(145)pr$:return
+  198 :
+  199 rem -------------------vorblaettern
+  200 ifii=240thenreturn
+  205 ii=ii+16:fori=0to15:poke214,i+4:print:poke211,23:printleft$(bl$,3)
+  210 poke214,i+4:print:poke211,22:printin(i+ii)
+  220 poke(1236+i*40),bi(i+ii):poke(1242+i*40),bi(in(i+ii)):next:return
+  298 :
+  299 rem ---------------zurueckblaettern
+  300 ifii<=0thenreturn
+  305 ii=ii-16:fori=15to0step-1:poke214,i+4:print:poke211,23:printleft$(bl$,3)
+  310 poke214,i+4:print:poke211,22:printin(i+ii)
+  320 poke(1236+i*40),bi(i+ii):poke(1242+i*40),bi(in(i+ii)):next:return
+  598 :
+  599 rem -------editor(idee:data becker)
+  600 in=0:poke214,po-1:print:poke211,pt:printfr$;" ";
+  605 poke204,0
+  609 poke212,1:getin$:ifin$=""then609
+  610 ifnu=0then616
+  611 ifin=0then615
+  612 ifin$=chr$(20)then620
+  613 ifin$=chr$(17)orin$=chr$(145)thenpoke631,asc(in$):poke198,1:in$=chr$(13):goto625
+  614 ifin$="s"orin$="l"orin$="_"thenpoke631,asc(in$):poke198,1:in$=chr$(13):nu=0:goto625
+  615 :ifasc(in$)<48orasc(in$)>57then605
+  616 ifin$=chr$(29)orin$=chr$(157)thenin$="":goto605
+  617 ifin$="_"orin$=chr$(145)orin$=chr$(17)thenpoke204,1:poke212,0:return
+  618 ifin$=chr$(13)andin=0thenin$="":goto605
+  620 poke207,0
+  625 ifin$=chr$(13)thenpoke204,1:printchr$(32):in$="":goto650
+  630 ifin$=chr$(20)thengosub660:goto605
+  635 ifin>ll-1then605
+  640 printin$;
+  645 in$(in)=in$:in=in+1:goto605
+  650 forsl=0toin-1
+  655 in$=in$+in$(sl):next:return
+  660 ifin=0thenreturn
+  665 poke212,0:poke207,0:printchr$(157)chr$(32)chr$(32)chr$(157)chr$(157);
+  670 in=in-1:in$(in)="":return
+  698 :
+  699 rem ------------------------anzeige
+  700 ifze>18thenze=3:poke198,0:po=21:pt=26:pr$=chr$(32):gosub100
+  705 ze=ze+1:pt=26:poke214,ze-1:print:poke211,pt:printchr$(32)chr$(158);
+  715 printchr$(157)chr$(17)chr$(18)chr$(32)chr$(146)chr$(159):ifze=4thengosub200
+  720 return
+  740 :
+  750 ifze<5thenze=20:poke198,0:po=6:pt=26:pr$=chr$(32):gosub100
+  755 ze=ze-1:pt=26:poke214,ze+1:print:poke211,pt:printchr$(32)chr$(158);
+  765 printchr$(157)chr$(145)chr$(18)chr$(32)chr$(146)chr$(159):ifze=19thengosub300
+  770 return
+  798 :
+  799 rem ----------------------editieren
+  800 fr$="":po=ze+1:pt=22:ll=3:nu=1:poke214,po-1:print:poke211,23:printleft$(bl$,4)
+  810 poke631,asc(x$):poke198,1:gosub600:ifval(in$)>255thenx$=chr$(32):goto800
+  820 in(ii+ze-4)=val(in$):poke1242+(ze-4)*40,bi(val(in$))
+  830 return
+  898 :
+  899 rem --------------hauptmenue layout
+  900 poke214,0:print:poke211,7:forq=1to25:printchr$(175);:next
+  905 pr$="zeichen    code":po=3:pt=12:gosub100
+  909 poke214,1:print:forq=1to21:poke211,7:printchr$(165):poke211,31:printchr$(145)chr$(167):next
+  910 pr$="{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}    {CBM-T}{CBM-T}{CBM-T}{CBM-T}":po=4:pt=12:gosub100
+  915 pr$=chr$(18)+" sichern {SHIFT--} laden {SHIFT--}_ ende ":po=23:pt=7:gosub100:printbl$
+  916 return
+  917 :
+  918 rem ------------hauptmenue abfragen
+  919 gosub900:ii=-16:gosub200:gosub2350:rem vorgaben listen
+  920 getx$:ifx$=""then920
+  925 ifasc(x$)>47andasc(x$)<58thengosub800:goto920
+  930 ifx$<>"s"andx$<>"l"andx$<>chr$(17)andx$<>chr$(145)andx$<>"_"andx$<>chr$(24)then920
+  940 ifx$=chr$(17)andii+ze<259thengosub700:goto920
+  945 ifx$=chr$(17)andii+ze>258thenii=-16:gosub700:goto920
+  950 ifx$=chr$(145)andii+ze>4thengosub750:goto920
+  955 ifx$=chr$(145)andii+ze<5thenii=256:gosub750:goto920
+  960 ifx$="s"thengosub1100:po=24:pt=0:pr$=bl$:gosub100:goto920
+  970 ifx$="l"thengosub1000:po=24:pt=0:pr$=bl$:gosub100:goto920
+  980 ifx$=chr$(24)thengosub3000
+  985 ifx$="_"thenpoke788,49:printchr$(147):end
+  990 goto920
+  998 :
+  999 rem ----------------indexfeld laden
+ 1000 fr$="code laden:":ll=16:po=23:pt=7:nu=0:gosub600:n$=in$
+ 1002 ifin$="_"orin$=chr$(145)orin$=chr$(17)thenpoke631,asc(in$):poke198,1:return
+ 1005 open15,8,15:open1,8,2,in$+",p,r":gosub2200:rem fehler
+ 1010 iffe<>0then1090
+ 1020 get#1,z$,v$:ad=asc(z$+chr$(0))+256*asc(v$+chr$(0)):rem adresse
+ 1030 fori=0to36:get#1,x$:next:rem ueberlesen
+ 1040 fori=0to255:get#1,x$:in(i)=asc(x$+chr$(0)):next
+ 1045 get#1,l$:le=asc(l$+chr$(0))-1
+ 1050 tx$="":fori=0tole:get#1,x$:tx$=tx$+x$:next:gosub2350:rem textprg.name
+ 1060 ii=-16:gosub200:rem neu listen
+ 1090 close1:close15:in$="":return
+ 1098 :
+ 1099 rem -------------indexfeld sichern
+ 1100 fr$="code sichern:":ll=16:po=23:pt=7:nu=0:gosub600:n$=in$
+ 1101 gosub1190:ifpeek(198)=1thenreturn
+ 1102 fr$="adresse <dez>:":ll=5:gosub600:ad=val(in$):gosub1190:ifpeek(198)=1thenreturn
+ 1103 gosub2400:aa=ad:gosub2450:ifad=0then1102
+ 1104 fr$="textprogramm:":ll=16:gosub600:tx$=in$:gosub1190:ifpeek(198)=1thenreturn
+ 1110 open15,8,15:open1,8,1,"@:"+n$:gosub2200:rem fehler
+ 1112 iffe<>0thenclose1:close15:in$="":return
+ 1115 gosub2350:rem statuszeile
+ 1120 print#1,chr$(lb);chr$(hb);:rem adresse
+ 1125 k=0:fori=adto(ad+36):print#1,chr$(dt(k));:k=k+1:next:rem maschinenprg drucker
+ 1130 k=0:fori=(ad+36)to(ad+36+255):print#1,chr$(in(k));:k=k+1:next:rem indexfeld
+ 1135 print#1,chr$(len(tx$));
+ 1140 k=1:fori=(ad+36+255)to(ad+36+255+len(tx$)-1)
+ 1145 print#1,chr$(asc(mid$(tx$,k,1)));:k=k+1:next:rem name
+ 1150 close1:close15:gosub3000:in$="":return
+ 1188 :
+ 1189 rem --------------abfrage ausstieg
+ 1190 po=24:pt=0:pr$=bl$:gosub100
+ 1191 ifin$="_"orin$=chr$(145)orin$=chr$(17)thenpoke631,asc(in$):poke198,1:return
+ 1192 po=23:pt=7:return
+ 2198 :
+ 2199 rem ------------------------fehler
+ 2200 input#15,fe,fe$:iffe=0then2220
+ 2210 pr$=bl$:po=24:pt=0:gosub100:pr$=fe$:pt=(40-len(fe$))/2:gosub100:gosub2300
+ 2220 return
+ 2298 :
+ 2299 rem -----------------warteschleife
+ 2300 forq=1to2500:next:return
+ 2348 :
+ 2349 rem -------------------statuszeile
+ 2350 po=1:pt=0:pr$=bl$:gosub100:ad$=right$(str$(ad),len(str$(ad))-1)
+ 2352 pr$=chr$(30)+chr$(34)+n$+chr$(47)+ad$+chr$(47)+tx$+chr$(34)+chr$(159)
+ 2353 iflen(pr$)>40thenpr$=left$(pr$,39)+chr$(34)
+ 2355 pt=int((41-len(pr$))/2):gosub100:return
+ 2398 :
+ 2399 rem --------------adresse anpassen
+ 2400 aa=ad+11:gosub2450:dt(1)=lb:dt(6)=hb
+ 2405 aa=ad+35:gosub2450:dt(20)=lb:dt(21)=hb:dt(28)=lb:dt(29)=hb
+ 2410 aa=ad+37:gosub2450:dt(24)=lb:dt(25)=hb
+ 2420 return
+ 2448 :
+ 2449 rem -----------------high/low byte
+ 2450 hb=int(aa/256):lb=aa-hb*256:return
+ 2998 :
+ 2999 rem -------ladeprogramm generieren
+ 3000 po=23:pt=7:pr$=chr$(18)+"mit ctrl-x lader erzeugen":gosub100
+ 3002 po=24:pr$="programm wird geloescht !":gosub100
+ 3003 getx$:ifx$=""then3003
+ 3005 ifx$<>chr$(24)thengosub915:return
+ 3010 printchr$(147);la$(0)
+ 3020 print:print:printla$(1);chr$(34);n$;chr$(34);la$(2):printla$(3)
+ 3030 printla$(4);chr$(34);la$(5);str$(ad);la$(6);chr$(34);la$(7);chr$(34);tx$;
+ 3040 printchr$(34);la$(7);chr$(34);la$(2):printla$(8)
+ 3050 printla$(9);chr$(34);la$(10)+tx$;chr$(34);la$(11)
+ 3060 poke631,19:fori=632to637:pokei,13:next:poke198,7:end
+ 4998 :
+ 4999 rem ---------------druckerprogramm
+ 5000 data169,11,141,38,3,169,192,141,39,3,96,72,165,154,201,4,208,12,104,140
+ 5010 data35,192,168,185,37,192,72,172,35,192,104,76,202,241,255,255,255
+ 5998 :
+ 5999 rem ------------datas-ladeprogramm
+ 6000 data "new" , "1 printchr$(147):ifa=0thena=1:load"
+ 6010 data ",8,1"
+ 6020 data "3 printchr$(19);" , "5 print" , "sys" , ":load" , "chr$(34)"
+ 6030 data "7 poke631,19:poke632,13:poke198,2:end"
+ 6040 data "save" , "@:lader." , ",8"
+

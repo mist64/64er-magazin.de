@@ -1,0 +1,93 @@
+
+
+;cp_m formatter.prg ==1c01==
+   10 rem
+   20 rem formatter fuer erzeugen von cp/m-tauglichen mfm-formaten
+   30 rem laeuft auf dem c-128 mit 1571 im c-128-modus
+   40 rem  (c) markt & technik verlag ag
+   50 rem written by steffen stempel altrip, mai 1986
+   60 rem
+   70 gn=8:open15,gn,15:ifpeek(215)thensp=20:fast
+   80 fz=8
+   90 dimn$(fz),si(fz),ft(1,fz),tr(fz),fs(1,fz),sa(fz),ss(fz),sf(fz),tb(48)
+  100 fori=1tofz:readn$(i),si(i),ft(0,i),ft(1,i),tr(i),fs(0,i),fs(1,i),sa(i),ss(i),sf(i):next:mp=1
+  110 print"{clr}{swlc}"spc(26)"C P / M   F o r m a t t e r"
+  120 printspc(26)"==========================="
+  130 print"{down}Formatieren von Disketten im  MFM- oder GCR-Format fuer den":print"Einsatz unter C-128 CP/M 3.0{down}"
+  140 print"   Formatauswahl :{down}"
+  150 fori=1tofz:char 1,5,7+i,n$(i),-(i=mp):next
+  160 do:do:getkeyw$:loop untilw$="{down}"orw$="{up}"orw$="{home}"orw$=chr$(13)
+  170 ifw$="{down}"thennp=mp+1:ifnp>fzthennp=1
+  180 ifw$="{up}"thennp=mp-1:ifnp=0thennp=fz
+  190 ifw$="{home}"thennp=1
+  200 ifw$<>chr$(13)thenchar1,5,7+mp,n$(mp),0:char1,5,7+np,n$(np),1:mp=np
+  205 loopuntilw$=chr$(13):ifmp=1thenprint#15,"u:":char 1,0,23:close15:end
+  210 print#15,"u:"
+  220 rem
+  230 rem formatieren von gcr-formaten
+  240 rem
+  250 ifmp>4then360
+  260 char 1,0,22,"Disk ins Laufwerk, RETURN zum Formatieren, ESC zum Abbruch":print
+  270 do:getkeyw$:loop untilasc(w$)=13orasc(w$)=27:ifasc(w$)=27then110
+  280 ifmp<>4thenprint#15,"u0"chr$(190)"m0":elseprint#15,"u0"chr$(190)"m1"
+  290 print#15,"n0:cp/m plus,65":input#15,f,f$,s,t:iff<>0thenprint"{down}DISK-Error beim formatieren :"f;f$;s;t:sleep5:goto110
+  300 restore2000:k$="":fori=0to35:readx$:k$=k$+chr$(dec(x$)):next:fori=36to254:k$=k$+chr$(0):next
+  301 open2,gn,2,"#":print#15,"b-p 2 0":print#2,k$;chr$(0);
+  305 ifmp=2thenprint#15,"b-p 2 0":print#2,"xxx";:elseifmp=4thenprint#15,"b-p 2 255":print#2,chr$(255);
+  307 print#15,"u2 2 0 1 0":input#15,f,f$,s,t
+  310 iff<>0thenprint"DISK-Error beim Schreiben des Boot-Sektors : "f;f$;s;t:close2:sleep5:goto110
+  320 ifmp=2thentr=3:se=0:elsetr=1:se=1
+  330 k$=chr$(229):fori=1to7:k$=k$+k$:next:print#2,k$;k$;:print"{up}"chr$(27)"qLoeschen der CP/M-Direktory-Spur"
+  340 fori=seto20:print#15,"u2 2 0"tr;i:input#15,f,f$,s,t:iff<>0thenprint"Disk-Error :"f;f$;s;t:close2:sleep5:goto110
+  350 nexti:close2::goto110
+  351 rem
+  352 rem formatierung im mfm-format
+  353 rem
+  360 print"{clr}Formatname ............................ "n$(mp)
+  361 print"{down}Anzahl der Seiten ....................."si(mp)
+  363 print"{down}Anzahl der Spuren pro Seite ..........."tr(mp)
+  365 print"{down}log. Nummer der ersten Spur, vorne ...."ft(0,mp)
+  366 ifsi(mp)=2thenprint"{down}log. Nummer der ersten Spur, hinten ..."ft(1,mp)
+  367 print"{down}log. Nr. des ersten Sektors, vorne ...."fs(0,mp)
+  368 ifsi(mp)=2thenprint"{down}log. Nr. des ersten Sektors, hinten ..."fs(1,mp)
+  370 print"{down}Anzahl der Sektoren pro Spur .........."sa(mp)
+  372 print"{down}Bytes je Sektor ......................."2^(ss(mp)+7)
+  373 print"{down}Gesammtkapazitaet in KByte ............";si(mp)*tr(mp)*sa(mp)*2^(ss(mp)+7)/1024
+  374 print"{down}Format Skew-Factor ...................."sf(mp)
+  376 print"{down}{down}RETURN zum Formatieren, ESC zum Abbruch."
+  380 do:getkeyw$:loopuntilasc(w$)=27orasc(w$)=13:ifasc(w$)=27then110
+  381 fori=0tosa(mp)-1:tb(i)=255:next:i=0
+  382 forse=0tosa(mp)-1:do while tb(i)<>255:i=-(i+1)*(i+1<sa(mp)):loop:tb(i)=se:i=-(i+sf(mp))*((i+sf(mp))<sa(mp)):next
+  390 print"{up}"chr$(27)"q     Formatieren der Vorderseite ..."
+  395 k$="u0"+chr$(6)+chr$(192+fs(0,mp))+chr$(0)+chr$(ss(mp))+chr$(ft(0,mp)+tr(mp)-1)+chr$(sa(mp))+chr$(ft(0,mp))+chr$(0)+chr$(229)
+  400 fori=0tosa(mp)-1:k$=k$+chr$(tb(i)+fs(0,mp)):next
+  405 print#15,k$:input#15,f,f$,s,t:iff<>0thenprint"{down}Disk-Error :";f;f$;s;t:sleep5:goto110
+  410 if si(mp)=1then440
+  415 print"{up}"chr$(27)"q     ... und der Rueckseite
+  420 k$="u0"+chr$(22)+chr$(192+fs(1,mp))+chr$(0)+chr$(ss(mp))+chr$(ft(1,mp)+tr(mp)-1)+chr$(sa(mp))+chr$(ft(1,mp))+chr$(0)+chr$(229)
+  425 fori=0tosa(mp)-1:k$=k$+chr$(tb(i)+fs(1,mp)):next
+  430 print#15,k$:input#15,f,f$,s,t:iff<>0thenprint"{down}Disk-Error :";f;f$;s;t:sleep5:goto110
+  440 print"{up}"chr$(27)"q       Diskette ist formatiert.":sleep3:goto110
+ 1000 rem
+ 1010 rem datenblock fuer exit und gcr-formate
+ 1020 rem
+ 1030 data "Exit",0,0,0,0,0,0,0,0,0
+ 1040 data "C-64 single sided",0,0,0,0,0,0,0,0,0
+ 1050 data "C-128 single sided",0,0,0,0,0,0,0,0,0
+ 1060 data "C-128 double sided",0,0,0,0,0,0,0,0,0
+ 1070 rem
+ 1080 rem datenblock fuer mfm-formate: bedeutung der eintrage :
+ 1090 rem   1. sektornr vorne, 1. sektornummer hinten, sektoranzahl,
+ 1100 rem   sektorgroesse,skew-factor
+ 1110 rem
+ 1130 data "KayPro IV",2,0,0,40,0,10,10,2,2
+ 1140 data "Osborne DD",1,0,0,40,1,0,5,3,1
+ 1150 data "IBM-8 SS",1,0,0,40,1,0,8,2,1
+ 1170 data "Epson QX-10 DS",2,0,0,40,1,1,16,1,2
+ 2000 rem
+ 2010 rem daten fuer cp/m 3.0 bootsektor
+ 2020 rem
+ 2030 data 43,42,4d,00,00,00,00,00,00,78,20,84,ff,a9,3e,8d
+ 2040 data 00,ff,a9,c3,8d,ee,ff,a9,08,8d,ef,ff,a9,00,8d,f0
+ 2050 data ff,4c,d0,ff
+
