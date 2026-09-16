@@ -1085,10 +1085,13 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
 
     issue = db.issues[issue_key]
-    pdf_filename = optional_issue_prefix(issue.pdf_filename, issue, prepend_issue_dir)
     title_image = html_generate_title_image(db, issue, 300, prepend_issue_dir)
 
-    title_image = f"""
+    # An issue without a PDF yet (warned at load) shows its cover without the
+    # download button rather than a link to nothing.
+    if issue.pdf_filename:
+        pdf_filename = optional_issue_prefix(issue.pdf_filename, issue, prepend_issue_dir)
+        title_image = f"""
 <div class="download_full_pdf">
     <a href="{pdf_filename}">
         {title_image}
@@ -1098,6 +1101,12 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
           <div class="download_label">{LABEL_DOWNLOAD_ISSUE_PDF}</div>
         </div>
     </a>
+</div>\n
+"""
+    else:
+        title_image = f"""
+<div class="download_full_pdf">
+        {title_image}
 </div>\n
 """
     html_parts.append('<div class="toc_container">')
@@ -2063,7 +2072,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 <img src="/{BASE_DIR}pdf.svg" alt="PDF">
 {LABEL_DOWNLOAD_ARTICLE_PDF}
 </a>
-</div>'''
+</div>''' if pdf_path else ''
 
     url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # XXX hack :(
 
@@ -2282,7 +2291,9 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
             pages = article.pages
 
-            # create PDF with just the article
+            # create PDF with just the article -- an issue without a PDF yet
+            # (warned above) gets its articles without the download action
+            pdf_path = None
             if pdf_filename:
                 source_pdf_path = os.path.join(issue_source_path, pdf_filename)
                 pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
