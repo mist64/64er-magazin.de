@@ -29,7 +29,7 @@
 
         <p>Das Programm ist für die älteren Versionen des C 64 geschrieben — daher die Belegung des Bildschirmfarbspeichers —, läuft aber auch auf den anderen Versionen, bei denen man die Zeilen, die sich auf die Farben beziehen, weglassen kann. Erinnern Sie sich bitte an die Art, wie der 6502 und seine kompatiblen Nachkommen Adressen im Speicher ablegen: Wenn wir ein Assemblerprogramm schreiben:</p>
 
-        <pre><code>STX $D800  
+        <pre><code>STX $D800
 </code></pre>
 
 
@@ -62,9 +62,9 @@
 
         <p>Ebenso wie im Basic-Beispiel zeigt sich auch im Listing 2 ein Nachteil dieser Art der Programmierung: Das Programm kann kein zweites Mal gestartet werden — eben weil wir es verändert haben. Jedenfalls leistet es beim Neustart nicht mehr genau dasselbe. Sehen Sie sich nach dem Programmdurchlauf einmal das Disassemblerlisting an, dann finden Sie in den veränderten Zeilen:</p>
 
-        <pre><code>CODE IDA #300  
-BILD STA $O4AFF  
-FARB STX $D8FF  
+        <pre><code>CODE  LDA  #$00
+BILD  STA  $04FF
+FARB  STX  $D8FF
 </code></pre>
 
 
@@ -72,17 +72,12 @@ FARB STX $D8FF
 
         <p>Es ist also erforderlich, in solche selbstmodifizierenden Programme einen Reparaturmechanismus einzubauen, der die veränderten Speicherinhalte wieder auf einen definierten Startwert bringt. Das geschieht durch eine Initialisierung vor dem eigentlichen Programm oder durch Rückstellen aller beeinflußten Speicherplätze nach dem Arbeitsteil — waseine weitere Selbstmodifikation wäre. Anstelle des BRK im Listing 2 stünde dann beispielsweise:</p>
 
-        <pre><code>BILD +1 FARB + 1  
+        <pre><code>STX  CODE + 1
+DEX
+STX  BILD + 1
+STX  FARB + 1
+BRK
 </code></pre>
-
-
-        <p>STX CODE +1 DEX</p>
-
-        <p>STX</p>
-
-        <p>STX</p>
-
-        <p>BRK</p>
 
         <p>Zur Übung können Sie ja mal die andere Möglichkeit — also die Initialisierung vor dem eigentlichen Programm — einbauen.</p>
 
@@ -92,11 +87,10 @@ FARB STX $D8FF
 
         <p>So ist es beispielsweise möglich, eine ganze Reihe von Befehlen zu simulieren, die es im Sprachschatz des 6502-Assemblers nicht gibt: indirekte JSR-Sprünge (es gibt nur den indirekten JMP-Befehl), indirekte Schiebe-, Dekrementier- und Inkrementierbefehle. Befehle mit unmittelbarer Adressierung (beispielsweise CMP #$20)können veränderliche Argumente erhalten, man kann auf diese Weise beispielsweise den Inhalt des Akku und des X-Registers addieren:</p>
 
-        <pre><code>STX ADD+1 CLC ADD ADC #$FF  
-</code></pre>
-
-
-        <pre><code>;X-Register hinter ADC-Befehl ablegen ;eventuell weiteres Programm ;Carry-Bit freimachen vor Addition ;$FF ist nur ein Füllwert (Dummy)  
+        <pre><code>      STX  ADD+1   ;X-Register hinter ADC-Befehl ablegen
+      ...          ;eventuell weiteres Programm
+      CLC          ;Carry-Bit freimachen vor Addition
+ADD   ADC  #$FF    ;$FF ist nur ein Füllwert (Dummy)
 </code></pre>
 
 
@@ -104,15 +98,18 @@ FARB STX $D8FF
 
         <h3>Ein kurzer Blick CHRGET-Routine</h3>
 
-        <p>Eine andere Anwendung selbstmodifizierender Programmtechniken befindet sich schon fix und fertig in unserem Computer (hier ist speziell der C 64 gemeint): die sogenannte CHRGET-Routine Laden Sie doch einmal den SMON und blicken Sie mittels D.0073 008B in den unteren RAM-Bereich hinein. Was Sie dann auf dem Bildschirm sehen, ist dieses kleine Programm, das die Aufgabe hat den Inhalt des Basic-Speichers Byte für Byte zu lesen und mit bestimmten Markierungen an den Basic-Interpreter zu übergeben. Es handelt sich um eines der wichtigsten Werkzeuge des Interpreters. Wie es genau funktioniert, sollten Sie einmal nachlesen im Kapitel 25 des Assembler-Kurses (Sonderheft M/RA Qaıta DE\Y hizar unirno nıno die Besprechung zu v Thema wegführen. Zur aber passen die ersten len:</p>
+        <p>Eine andere Anwendung selbstmodifizierender Programmtechniken befindet sich schon fix und fertig in unserem Computer (hier ist speziell der C 64 gemeint): die sogenannte CHRGET-Routine Laden Sie doch einmal den SMON und blicken Sie mittels</p>
 
-        <p>NN? Int $yA</p>
+        <pre><code>D 0073 008B
+</code></pre>
 
-        <pre><code>0073 INC $7A  
-0075 BNE $0079  
-0077 INC $7B  
-0079 LDA 80225 ;$0225 steht hier nur als Dummy  
-007C  
+        <p>in den unteren RAM-Bereich hinein. Was Sie dann auf dem Bildschirm sehen, ist dieses kleine Programm, das die Aufgabe hat den Inhalt des Basic-Speichers Byte für Byte zu lesen und mit bestimmten Markierungen an den Basic-Interpreter zu übergeben. Es handelt sich um eines der wichtigsten Werkzeuge des Interpreters. Wie es genau funktioniert, sollten Sie einmal nachlesen im Kapitel 25 des Assembler-Kurses (Sonderheft M/RA Qaıta DE\Y hizar unirno nıno die Besprechung zu v Thema wegführen. Zur aber passen die ersten len:</p>
+
+        <pre><code>0073      INC $7A
+0075      BNE $0079
+0077      INC $7B
+0079      LDA $0225   ;$0225 steht hier nur als Dummy
+007C      ...
 </code></pre>
 
 
@@ -130,35 +127,56 @@ FARB STX $D8FF
 
         <p>Es folgen zwei Funktionen zur Umrechnung von Gradmaß in Bogenmaß und umgekehrt. BOG ermittelt das Bogenmaß eines Winkels:</p>
 
-        <p>Aufruf: BOG Winkel</p>
+        <p>Aufruf: BOG,Winkel</p>
 
-        <p>GRD geht den umgekehrten Weg der Berechnung des Gradmaßes eines im Bogenmaß angegebenen Winkels: Aufruf: GRD Winkel</p>
+        <p>GRD geht den umgekehrten Weg der Berechnung des Gradmaßes eines im Bogenmaß angegebenen Winkels:</p>
+
+        <p>Aufruf: GRD,Winkel</p>
 
         <p>Sind Sie das Rechnen mit dem durch LOG erzeugten natürlichen Logarithmus leid, dann verwenden Sie DLGR für den normalen dekadischen Logarithmus:</p>
 
-        <p>Aufruf: DLGR, Argument</p>
+        <p>Aufruf: DLGR,Argument</p>
 
-        <p>Bei den trigonometrischen Funktionen steht Ihnen nun nebenSIN, COSund TAN auch der Kotangens COT zur Verfügung: Aufruf: COT;Winkel im Bogenmaß</p>
+        <p>Bei den trigonometrischen Funktionen steht Ihnen nun nebenSIN, COSund TAN auch der Kotangens COT zur Verfügung:</p>
+
+        <p>Aufruf: COT,Winkel im Bogenmaß</p>
 
         <p>Die bislang nur durch recht komplizierte Formeln zu ermittelnden Umkehrfunktionen (die im Handbuch sogar teilweise falsch angegeben sind) des Sinus, Cosinus und Kotangens erreichen Sie durch die nächsten drei Funktionen ARCS, ARCC und ACOT:</p>
 
-        <p>Aufruf: ARCS,Argument ARCC, Argument</p>
-
-        <p>ACOT, Argument</p>
+        <p>Aufruf: ARCS,Argument<br>
+            ARCC,Argument<br>
+            ACOT,Argument</p>
 
         <p>Ein kleines Bonbon noch am Schluß: Ein Polynom ist ein Ausdruck der Form:</p>
 
         <p>=ytax+traX®+taxXt+.. af"</p>
 
-        <p>Dabei ist n der Grad des Polynoms. Die einzelnen »a« nennt man Koeffizienten. Durch den neuen Befehl POLY kann solch ein Polynom schnell berechnet werden, indem man angibt, für welchen Wert »x« man die Berechnung ausführt, welchen Grad das Polynom hat und wie die Koeffizienten heißen: Aufruf: POLY,x,n,a,A,.1,..-,&amp;1,&amp;0</p>
+        <p>Dabei ist n der Grad des Polynoms. Die einzelnen »a« nennt man Koeffizienten. Durch den neuen Befehl POLY kann solch ein Polynom schnell berechnet werden, indem man angibt, für welchen Wert »x« man die Berechnung ausführt, welchen Grad das Polynom hat und wie die Koeffizienten heißen:</p>
+
+        <p>Aufruf: POLY,x,n,a<sub>n</sub>,a<sub>n-1</sub>,...,a<sub>1</sub>,a<sub>0</sub></p>
 
         <p>Solche Polynome spielen in vielen Bereichen der Mathematik und der Statistik eine wichtige Rolle.</p>
 
-        <p>Noch zueiner Besonderheit all dieser Funktionen, die ihren Aufruf betrifft. Bei der Beschreibung desersten Moduls werden Sie sehen, daß die hier gewählte Methode der Befehlserweiterung relativ einfach ist. Das bietet zwar den Vorzug (der im Rahmen dieses Kurses erst einmal Vorrang genießt), daß man leicht verstehen kann, wie das Ganze funktioniert, hat aber in der Handhabung der neuen Befehle einige Nachteile Ein Nachteil betrifft die Ausgabe der durch die neuen Funktionen ermittelten Ergebnisse. Während man beim Sinus beispielsweise gewohnt ist, A=SIN(x) oder B=SQR(SIN(x)) zu schreiben, die Funktion selbst also wie einen Variablenwert verwenden Kann, geht das bei unseren Funktionen nicht. Das hätte einen tieferen Eingriff in die Interpreterschleife erfordert. Andererseits war es uns zu primitiv, lediglich das Ergebnis nach der Berechnung auf dem Bildschirm ausgeben zu lassen: Man sollte schon damit weiterrechnen können. Der Kompromiß sieht etwas merkwürdig aus, funktioniert aber (und später, wenn wir weitere Formen der Befehlserweiterung kennengelernt haben, können wir das Programm auch umbauen). Das Ergebnis steht immer in der Variablen, die als letzte vor dem Funktionsaufruf genannt worden ist. Um also in der Variablen A das Bogenmaß eines Winkels zu speichern, ruft man auf: oderumden dekadischen Logarithmus eines Ausdruckes in A abzulegen beispielsweise:</p>
+        <p>Noch zueiner Besonderheit all dieser Funktionen, die ihren Aufruf betrifft. Bei der Beschreibung desersten Moduls werden Sie sehen, daß die hier gewählte Methode der Befehlserweiterung relativ einfach ist. Das bietet zwar den Vorzug (der im Rahmen dieses Kurses erst einmal Vorrang genießt), daß man leicht verstehen kann, wie das Ganze funktioniert, hat aber in der Handhabung der neuen Befehle einige Nachteile Ein Nachteil betrifft die Ausgabe der durch die neuen Funktionen ermittelten Ergebnisse. Während man beim Sinus beispielsweise gewohnt ist, A=SIN(x) oder B=SQR(SIN(x)) zu schreiben, die Funktion selbst also wie einen Variablenwert verwenden Kann, geht das bei unseren Funktionen nicht. Das hätte einen tieferen Eingriff in die Interpreterschleife erfordert. Andererseits war es uns zu primitiv, lediglich das Ergebnis nach der Berechnung auf dem Bildschirm ausgeben zu lassen: Man sollte schon damit weiterrechnen können. Der Kompromiß sieht etwas merkwürdig aus, funktioniert aber (und später, wenn wir weitere Formen der Befehlserweiterung kennengelernt haben, können wir das Programm auch umbauen). Das Ergebnis steht immer in der Variablen, die als letzte vor dem Funktionsaufruf genannt worden ist. Um also in der Variablen A das Bogenmaß eines Winkels zu speichern, ruft man auf:</p>
+
+        <pre><code>A=A:BOG,Winkel
+</code></pre>
+
+        <p>oderumden dekadischen Logarithmus eines Ausdruckes in A abzulegen beispielsweise:</p>
+
+        <pre><code>A=0:DLGR,SQR(x)
+</code></pre>
+
 
         <p>Wenn man zwei von unseren neuen Funktionen nacheinander verwendet, beispielsweise hier den Kotangens eines Winkels, der zuvor ins Bogenmaß umgerechnet wurde, dann kann man schreiben:</p>
 
+        <pre><code>B=0:BOG,Winkel:A=A:COT,B
+</code></pre>
+
         <p>Es ist aber auch ein abgekürzter Weg möglich, denn ein interner Zeiger weist weiterhin auf die bezeichnete Variable:</p>
+
+        <pre><code>A=A:BOG,Winkel:COT,A
+</code></pre>
 
         <p>In beiden Fällen steht hinterher der Ergebniswert in der Variablen A, die nun ganz normal weiterverwendet werden kann.</p>
 
@@ -176,9 +194,14 @@ FARB STX $D8FF
 
         <p>Die folgenden Adressen sind Interpreter-Routinen, die wir uns nutzbar machen, meist solche einige Anmerkungen: Wir wergenau auf die sogenannten Fließkommazahlen, ihre verschiedenen _Speicherformate und die beiden Fließkomma-Akkumulatoren FAC und ARG eingehen. Sie können all das aber auch noch nachlesen im Assembler-Kurs (vollständig erschienen im Sonderheft 8/85). Die übliche Art der Zahlenverarbeitung im C 64 (und auch im C 128) ist die Verarbeitung im Fließkommaformat. Dabei spielt der sogenannte Fließkomma-Akkumulator 1, der allgemein FAC genannt wird und der in den Speicherstellen $61 bis $66 steht, eine ähnlich zentrale Rolle wie der Akkumulator bei den einfachen Assembler-Programmen. Die meisten mathematischen Routinen erwarten das Argument im FAC und geben das Ergebnisim FAC aus. Manchmal ist die Verwendung eines Hilfsakkumulators sinnvoll, der sogenannte ARG ($69 und $6E). Es gibt im Prinzip zwei Formate für Fließkommazahlen in unserem Computer: Als FLPT-Format bezeichneich dieSpeicherung der als MFLPT-Format die im normalenSpeicherraum, dienur5Byte beansprucht.</p>
 
-        <p>Damit ergibt sich die Notwendigkeit folgender Routinen: )) Routinen, die Werte als Zahlen, Variable oder mathematische Ausdrücke aus dem Basic-Textlesen, ins FLPT-Format bringen und im FAC ablegen. 2) Routinen, die Zahlen aus dem FAC in den normalen Speicher transportieren und dabei die Übersetzung ins MFLPT-Format leisten und Routinen, die den umgekehrten Weg gehen. 3) Routinen, die die nötigen mathematischen Operationen an der Zahl ausführen, die im FAC steht und das Ergebnis im FAC ablegen.</p>
+        <p>Damit ergibt sich die Notwendigkeit folgender Routinen:</p>
 
-        <p>4) Routinen, die dasselbe wie in 3) ausgedrückt leisten, dazu aber noch weitere Zahlen verwenden, die im normalen Speicherraum im MFLPT-Format vor‚handen sind.</p>
+        <ol>
+            <li>Routinen, die Werte als Zahlen, Variable oder mathematische Ausdrücke aus dem Basic-Textlesen, ins FLPT-Format bringen und im FAC ablegen.</li>
+            <li>Routinen, die Zahlen aus dem FAC in den normalen Speicher transportieren und dabei die Übersetzung ins MFLPT-Format leisten und Routinen, die den umgekehrten Weg gehen.</li>
+            <li>Routinen, die die nötigen mathematischen Operationen an der Zahl ausführen, die im FAC steht und das Ergebnis im FAC ablegen.</li>
+            <li>Routinen, die dasselbe wie in 3) ausgedrückt leisten, dazu aber noch weitere Zahlen verwenden, die im normalen Speicherraum im MFLPT-Format vor‚handen sind.</li>
+        </ol>
 
         <p>Damitbeendenwir diesen Teil des Kurses. In der nächsten Ausgabe werden wir das Modul 1 fertig besprechen und uns die Label näher ansehen.</p>
 
