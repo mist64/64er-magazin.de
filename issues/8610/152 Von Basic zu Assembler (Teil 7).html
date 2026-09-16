@@ -26,9 +26,20 @@
 
         <p>Wie unterscheidet unser Computer Programme und Daten? Sehen wir uns zuerst einmal an, wie das in Basic aussieht: Beide (Daten und Programme) werden im RAM streng voneinander getrennt (beim C 128 liegen sie sogar in unterschiedlichen Speicherbänken) und völlig unterschiedlich verwaltet. Deshalb ist die Selbstveränderung von Basic-Programmen auch mit allerlei Tricks verbunden, die entweder über POKEs den Programmspeicher beeinflussen oder im programmierten Direktmodus arbeiten. Ein simples Basic-Beispiel zeigt Listing 1:</p>
 
+        <figure>
+            <pre data-filename="programm 1" data-name="Programm 1"></pre>
+            <figcaption>Listing 1. Selbstmodifikation mit Hilfe des POKE-Befehls im Basic-Programm</figcaption>
+        </figure>
+
         <p>Dieses Programm für den C 64 (bei anderen Computern muß die Adresse in Zeile 50 entsprechend geändert werden) verändert während des Programmablaufes die Speicherstelle 2112. Dort befindet sich der Buchstabe A im PRINT-Befehl der Zeile 30. Durch den POKE-Befehl gelangt nach dem A ein B, dann ein C und so weiter in das PRINT-Argument. Das sehen Sie dann, wenn Sie sich nach dem Ablauf des Programms mit LIST noch einmal die PRINT-Anweisung ansehen: Das A ist verschwunden, statt dessen ist dort ein Grafikzeichen (bei eingeschalteter Groß- und Kleinschreibung) oder der griechische Buchstabe Pi (bei Großschreibung) zu finden. Die andere Technik, also die, die im programmierten Direktmodus arbeitet, bedient sich des Tastaturpuffers. Falls Sie darüber mehr wissen möchten, dann lesen Sie bitte den Artikel »Lernen Sie Ihren Commodore 64 kennen«, Teil 4, in der Ausgabe 8/85 der Zeitschrift Happy-Computer, Seite 45ff. C 128-Benutzer sollten die Ausgabe 7/86 des 64'er-Magazins auf Seite 85 aufschlagen: Dort sind allerlei Verwendungsmöglichkeiten dieser Technik für den großen Bruder des C 64 vorgeführt. Soweit also das Ganze in Basic, wie verhält es sich in Assembler?</p>
 
         <p>Hier existiert für den Computer nur eine lange Straße aufeinanderfolgender Speicherzellen. Der Zentralprozesser orientiert sich am Programmzähler, in dem sich die gerade aktuelle Anschrift befindet. In jeder Hausnummer findet die CPU irgendeinen Code, der sie veranlaßt, darauf zu reagieren. Alle derartigen Codes führen zu Veränderungen von Speicherinhalten — und sei es auch nur das Hochzählen des Programmzählers beim NOP-Befehl, das Chaos beim Programmabsturz oder auch das Eintragen von ASCII-Werten in den Bildschirmspeicher. Malliegen diese Veränderungen weit weg vom Programm-Code, mal näher dran: Nichts hindert uns, auch in dem Speicherteil Änderungen vorzunehmen, in dem das Programm abgelegt ist, was uns mit Assemblern wie dem Hypra-Ass leicht fällt. Listing 2 zeigt, wie man Vergleichbares in Maschinensprache erreichen kann:</p>
+
+        <figure>
+            <pre data-filename="programm 2 quell" data-name="Programm 2 (Quelltext)" data-assembler="hypra-ass"></pre>
+            <figcaption>Listing 2. Zum Prinzip der Selbstmodifikation in Assemblerprogrammen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="programm 2 quell.prg" data-name="Programm 2 (Quelltext)"></div>
 
         <p>Das Programm ist für die älteren Versionen des C 64 geschrieben — daher die Belegung des Bildschirmfarbspeichers —, läuft aber auch auf den anderen Versionen, bei denen man die Zeilen, die sich auf die Farben beziehen, weglassen kann. Erinnern Sie sich bitte an die Art, wie der 6502 und seine kompatiblen Nachkommen Adressen im Speicher ablegen: Wenn wir ein Assemblerprogramm schreiben:</p>
 
@@ -209,6 +220,17 @@ ADD   ADC  #$FF    ;$FF ist nur ein Füllwert (Dummy)
         <p>Damit beenden wir diesen Teil des Kurses. In der nächsten Ausgabe werden wir das Modul 1 fertig besprechen und uns die Label näher ansehen.</p>
 
         <address class="author">(Heimo Ponath/dm)</address>
+
+        <figure>
+            <pre data-filename="programm 3 quell" data-name="Programm 3 (Quelltext)" data-assembler="hypra-ass"></pre>
+            <figcaption>Listing 3. Eine Basic-Befehlserweiterung in 10 Modulen, die den Wortschatz um einige mathematische Befehle ergänzt</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="programm 3 quell.prg" data-name="Programm 3 (Quelltext)"></div>
+        <figure>
+            <pre data-filename="modul 1-10.prg" data-name="Programm 3 (Modul 1-10)" data-mse=mse1></pre>
+            <figcaption>Listing 4. Das fertig assemblierte Listing 3. Bitte mit dem MSE eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="modul 1-10.prg" data-name="Programm 3 (Modul 1-10)"></div>
     </article>
 </body>
 
