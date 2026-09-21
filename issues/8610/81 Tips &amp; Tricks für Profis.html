@@ -39,6 +39,11 @@
 
         <p>Verantwortlich ist ein kleiner Fehler in der LIST-Routine, den wir mit Hilfe des SMON genau aufzeigen wollen. Mit »M A09E A19E« können Sie die Tabelle der Befehlswörter, welche der Computer zur Decodierung der Tokens in Klartext einsetzt, ausgeben lassen, mit »D A717 A741« die Umwandlungsroutine, der das Token im Akkumulator übergeben wird. Zunächst wird aus dem Token ermittelt, ab welcher Position in der Tabelle ab $A09E das benötigte Befehlswort steht. Betrachten wir nun das Bild 1, eine Hardcopy von einem Bildschirm, auf dem die verantwortlichen Teile des ROMs stehen.</p>
 
+        <figure>
+            <img src="81-1.png" alt="Bildschirmausdruck eines Maschinensprachemonitors mit einer Hexdump-Tabelle und einem Disassembler-Listing">
+            <figcaption>Diese Teile des Basic-Interpreters sind für den Fehler verantwortlich</figcaption>
+        </figure>
+
         <p>Bei $A738 wird dann Zeichen für Zeichen das Befehlswort ausgegeben, da dort die Position in der Tabelle bereits im Y-Register steht. Wie man am Hex-Dump der Befehlswörter-Tabelle sieht, ist im letzten Zeichen eines Kommandos Bit 7 gesetzt. Diese Endmarkierung wird von $A73B erkannt, andernfalls wird das Zeichen bei $A73D ausgegeben. Nun kommt die kritische Stelle. Normalerweise ist das auszugebende Zeichen nicht CHR$(0) und somit das Z-Flag nach Ausgabe des Zeichens gelöscht, wodurch der BNE-Befehl bei $A740 einem JMP gleichkommt (mehr über diesen und andere Programmiertricks in »Effektives Programmieren in Assembler«, 64'er-Assembler-Sonderheft 8/85, Seite 74).</p>
 
         <p>Bei $CC, dem Code, der durch das geSHIFTete L erzeugt wird, gibt es allerdings eine Ausnahme: nach der Umwandlung des Tokens in den Offset steht in der Tabelle bei $A738 im YRegister der Wert $FF (dies können Sie mit dem Trace-Befehl des SMON nachvollziehen, indem Sie in den Akku den Wert $CC schreiben, von $A717 bis $A738 TRACEn lassen und dabei den Wert des Y-Registers beobachten), wodurch der Inhalt von $A19D ausgelesen wird. Wie das Hex-Dump zeigt (siehe Bild), steht dort ein Null-Byte!</p>
@@ -205,6 +210,11 @@ SYS 49152
         <h2>Regelbares Dauerfeuer</h2>
 
         <p>Ich habe einen Quickshot II-Joystick, der mit einfachem Dauerfeuer ausgestattet ist. Durch das Auswechseln eines Widerstandes gegen ein Poti (Bild 2) kann das Dauerfeuer geregelt werden. Hardwareschäden sind während der vier Wochen Dauertest nicht aufgetreten</p>
+
+        <figure>
+            <img src="81-2.png" alt="Zwei Zeichnungen des geöffneten Joystick-Innenraums, links mit Widerstand R1, rechts mit einem Potentiometer">
+            <figcaption>Bild 2. Regelbares Dauerfeuer für den Quickshot II</figcaption>
+        </figure>
 
         <address class="author">(K. Pichlmair/tr)</address>
 
