@@ -300,3 +300,13 @@ instruction source.
 | `new/index_workflow_apply.py` | `rules/r220_index_meta_apply.py` |
 | `new/toc_title_apply.py` | `rules/r100_toc_title_apply.py` |
 | `new/index_meta_apply.py` | removed — an older duplicate of `index_workflow_apply.py`, same job, referenced by nothing |
+
+## Dependencies are installed, not escalated
+
+The chain needs `tesseract` + `deu`, `magick`, `markdown` (Discount), `petcat`
+and `c1541` (VICE), `guetzli`, `gs`, `qpdf`, `exiftool`, the Rust
+`cmyk_reconstruction`, and a Python 3.12 `.venv` with numpy, scipy, pillow,
+beautifulsoup4, lunr, pytz, pytest. When one is missing, install it and go on —
+`brew install <formula>`, `.venv/bin/pip install -r requirements.txt`,
+`cargo build --release`. Standing permission, given 2026-09-21. Only an
+UNINSTALLABLE dependency is the user's decision.

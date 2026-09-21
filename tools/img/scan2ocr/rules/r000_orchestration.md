@@ -258,8 +258,15 @@ small.
   worth it.
 - Status checks / lookups that don't write anything (`grep`, `git
   log`, `ls`, reading a file). Just do them in-line.
-- Tool / dependency setup (`brew install`, `npm install`) — run
-  inline so the user sees the output and can intervene.
+- Tool / dependency setup — run it inline, **without asking**. A missing
+  tool is not a decision to escalate: `brew install <formula>`, `pip install`
+  into the repo `.venv`, `cargo build --release` in `tools/img/*`. The user
+  has standing permission for this (stated 2026-09-21, after `guetzli` —
+  which `tools/img/issue_pdf` needs — had stopped a step for want of one
+  command). Do it inline rather than in a sub-agent so the output is visible,
+  say which version landed, and carry on. What still goes to the user is a
+  tool that is not installable (a licence, a login, a missing input file),
+  never the install itself.
 
 The trigger for sub-agent dispatch is an **editorial** rule (040 onward) under
 `tools/img/scan2ocr/rules/`. Program steps (010-030) the orchestrator runs
