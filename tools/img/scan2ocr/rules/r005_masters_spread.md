@@ -77,6 +77,114 @@ Consequences, and the reason this variant exists:
 - Everything else the sheet variant does — skew, grade, stamps, the debug
   overlay, "publish and NOTE, never refuse" — transfers unchanged.
 
+## The profile is MEASURED for this issue's paper, never defaulted
+
+8610 ran its first sweep on `"colors": null`, and that is not "no profile": it
+is `BUILTIN_ANCHORS` with identity level lines, whose `W 201 195 188` describes
+somebody else's paper. `W` is the **density reference** — the separation works
+in `d = -log10(rgb/W)`, paper lighter than `W` clamps to zero ink and **paper
+darker than `W` in any channel IS ink**. Set above the real paper it does not
+cast the page, it greys it, and the stock's grain prints through as a tint.
+Measured on this issue's own 150 dpi thumbs:
+
+| | darker than the built-in `W` in some channel |
+|---|---|
+| p036 paper pixels | **62 %** |
+| p150 paper pixels | **80 %** |
+
+**Measure `W` before the sweep, not after it.** Pool paper pixels over every
+interior thumb — `lum > 170` and `max − min < 40`, inside the body box so the
+grey bed strip at the top and the yellow prop at the foot are out of it — and
+read a low per-channel percentile off the pool:
+
+```bash
+cd tools/img/scan2ocr/rules
+PY=../../../../.venv/bin/python
+$PY - <<'PY'
+import numpy as np
+from PIL import Image
+import r005_masters_spread as R
+pool = []
+for p in R.ISS.page_range:         # INTERIOR pages only -- the cover and any
+    a = np.asarray(Image.open(     # bound-in leaf are a different stock
+        R.THUMB_DIR / f"{p:03d}.png").convert("RGB"), float)
+    h, w, _ = a.shape
+    b = a[int(.12 * h):int(.88 * h), int(.10 * w):int(.90 * w)].reshape(-1, 3)
+    pool.append(b[(b.mean(1) > 170) & (b.max(1) - b.min(1) < 40)])
+pool = np.concatenate(pool)
+for q in (0.5, 1, 2, 5, 10, 50):
+    print("p%-4s" % q, np.percentile(pool, q, axis=0).round().astype(int))
+PY
+```
+
+8610's pooled paper, all 196 interior thumbs:
+
+| | p0.5 | p1 | p2 | p5 | p10 | p50 |
+|---|---|---|---|---|---|---|
+| R G B | 173 170 165 | 176 172 167 | **180 174 170** | 187 180 174 | 193 184 178 | 204 194 190 |
+
+**The percentile is a measurement too, not a constant carried over.** SH8601
+settled at **p5** (`209 175 157` on its own stock) — and only after a mid-build
+re-measurement that stranded four already-graded masters and moved the parity
+gate's floor with it (`r005_masters_sheet.md`, *The stamp* and *The parity
+gate*). Read as a constant, p5 is wrong here: on 8610 it still left the darkest
+tenth of the paper standing as ink — over bare paper the separation's residual
+read **C 27 % M 14 % Y 6 % K 5 % at p99**, a cyan-biased speckle. **p2**
+(`180 174 170`) took the same band to white, and did not touch the type:
+
+| | p5 | p2 |
+|---|---|---|
+| p006 blank band, pure-white share | 90 % | **99.9 %** |
+| p006 blank band, paper p1 | 239 239 244 | **255 255 254** |
+| glyph p50, pages 1–10 | 26–33 | **26–33** |
+| solid-black share, pages 1–10 | 7–17 % | **7–17 %** |
+
+**The gate — three test pages, before the four hours.** A sweep is ~4.3 h wall
+clock over 200 pages on 6 lanes; the profile is settled on three graded pages
+first:
+
+> **blank-paper p1 ≥ 250 AND glyph p50 ≤ 40.**
+
+"Blank paper" is a band the page has no ink on at all; "glyph" is the pixels
+under lum 100 in a body-text window. Both read off the 600 dpi master:
+
+```bash
+$PY - <<'PY'
+import numpy as np
+from PIL import Image
+import r005_masters_spread as R
+Image.MAX_IMAGE_PIXELS = None
+BLANK = {"006": (600, 900, 3600, 1500)}    # px -- PICK a band this page has
+TYPE  = {"006": (600, 2400, 3600, 3600)}   # no ink on, and a body-text window
+for stem in sorted(BLANK):
+    m = Image.open(R.OUT_MASTER / f"{stem}.png")
+    a = np.asarray(m.crop(BLANK[stem]).convert("RGB"), float).reshape(-1, 3)
+    print(f"p{stem} blank paper p1", np.percentile(a, 1, axis=0).round().astype(int),
+          "| pure white %.1f%%" % (100 * (a.min(1) == 255).mean()))
+    g = np.asarray(m.crop(TYPE[stem]).convert("L"), float)
+    g = g[g < 100]
+    print(f"p{stem} glyph p50 %5.1f | solid black %.1f%%"
+          % (np.median(g), 100 * (g == 0).mean()))
+PY
+```
+
+Failing the first half means `W` sits above the paper (grain graded as ink);
+failing the second means it sits below the ink (type dissolving into paper).
+Both halves have to pass on all three pages before the sweep starts.
+
+**The ink anchors stay the built-in set** — same scanner, same stock family —
+unless a colour is visibly wrong on the page; an anchor moved without a
+measurement is the same mistake pointing the other way. **The level lines stay
+identity** until they are measured as the **p99 of each ink over bare interior
+paper**. That measurement is still OPEN on 8610: its `colors.txt` ships
+`LC/LM/LY/LK 0 100` and says in a comment that it is waiting for the
+separation to exist.
+
+Worked example: **`issues/8610/colors.txt`**, which carries its own
+measurement — the date, the 196 thumbs, the percentile table and why `W` is the
+2nd and not the 5th. Write the next issue's the same way; a profile that does
+not state how it was measured is a constant again.
+
 ## Two phases
 
 The window offsets are an **issue-wide fit** over per-page anchors, so this
@@ -114,11 +222,13 @@ cd tools/img/scan2ocr/rules
   missing input is settled.
 
 Inputs: the issue descriptor `issues/<ISSUE>/issue.json` via `r000_issue.py`
-(`scan_dir`, `thumb_150`, `tmp`, `colors`, `binding`, `pages`; 8610 has
-`"colors": null`, so the grade uses the built-in anchor set with identity
-levels, and the program says so at the top of its log — once per process, so
-once per `xargs` lane invocation of 5 pages, ~40 times in a sweep log, each
-time followed by the run stamp);
+(`scan_dir`, `thumb_150`, `tmp`, `colors`, `binding`, `pages`; 8610's `colors`
+is `issues/8610/colors.txt`, measured off its own thumbs — see *The profile is
+MEASURED for this issue's paper*. A descriptor with `"colors": null` grades
+with the built-in anchor set and identity levels instead, and the program says
+so at the top of its log — once per process, so once per `xargs` lane
+invocation of 5 pages, ~40 times in a sweep log, each time followed by the run
+stamp);
 `tools/img/cmyk_reconstruction/target/release/cmyk_reconstruction`, built; the
 ICC pair in `tools/img/`; `magick`; the wordmark template
 `tools/img/scan2ocr/template_64er_600.png` (a 394 × 131 px grey crop of the

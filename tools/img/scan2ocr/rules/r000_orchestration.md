@@ -418,6 +418,28 @@ falls between rules:
   brief the sub-agent on this constraint so it doesn't re-introduce a
   second `<h1>` based on the printed banner alone.
 
+## Cross-cutting rule: the working directory must be DURABLE
+
+`<tmp>` is the issue descriptor's `tmp`, and everything under it is derived --
+masters, separations, OCR, geometry, overlays. Derived is not the same as
+disposable:
+
+- **Never under `/tmp` or `/private/tmp`.** Two independent reasons. (a)
+  Leptonica rewrites a path beginning `/tmp/` to `$TMPDIR` and tesseract then
+  cannot open step 010's work files at all (`FINDINGS.md` section 12);
+  `r000_issue.py` refuses such a descriptor. (b) macOS deletes files under
+  `/private/tmp` that have not been accessed for three days -- on 8610 that ran
+  mid-chain and took `sheets600` 200 -> 11, `masters2400` 200 -> 10,
+  `cmyk2400`, `geometry` and the assembled `<ID>.md` with it.
+- **What losing it costs**, measured on 8610 (200 pages): step 005 ~4.3 h,
+  step 010 ~30 min, step 020 ~15 min and 200 model calls. Nothing shippable is
+  lost -- the repo holds every deliverable -- but a sweep you did not plan is a
+  day.
+- Put it beside the scans on a volume nobody cleans, e.g.
+  `/Volumes/<disk>/tmp/<ID>` or `~/DNB/<ID>/tmp`, and say so in the descriptor.
+  8610 stays at `/private/tmp/64er_8610` by the user's decision, knowing the
+  cleaner: that is a choice to re-run, not a default to copy.
+
 ## Cross-cutting recipe: page block index (blocks/pNNN.txt)
 
 Several steps (130 place_figures, 160 fill_tables,
@@ -472,6 +494,33 @@ the code or table region usually sits **above** it in the same column -- walk
 preceding blocks whose x-range overlaps to find its top edge.
 
 Everything under `out/` is scratch -- never commit it.
+
+## Cross-cutting rule: THE PAGE IMAGE IS `masters600`, and there is no PDF
+
+Every rule that needs to look at a page says so in its own words, and several
+still say `pdftoppm -r 300 issues/<YYMM>/64er_19XX-XX.pdf ...`. **On an issue
+built by this chain that file does not exist.** The PDF is made at the END (by
+`tools/img/issue_pdf/`, optional), so a rule that renders from it cannot run at
+all -- 8610 hit this in nine rules, and every sub-agent had to be corrected in
+its dispatch.
+
+The render already exists, and it is better than a `pdftoppm` of the PDF would
+be: **`<tmp>/masters600/NNN.png`**, 600 dpi, A4, deskewed, cut and graded by
+step 005 -- the same file `r010` OCR'd and `r145` cuts figures from.
+
+```bash
+SRC=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
+magick "$SRC/145.png" -crop 2136x574+390+3736 +repage <scratch>/crop.png
+```
+
+- The bboxes in `<OUT_DIR>/blocks/pNNN.txt` are **in this file's pixels**
+  (600 dpi), so a crop is the bbox verbatim -- no scaling, no offset. `frac=`
+  is the same box for a render at any other resolution.
+- A lower-resolution look is `-resize 12%` of the same file, never a second
+  render of something else.
+- Where a rule below says `pdftoppm`, read it as "crop `masters600/NNN.png`".
+  That instruction survives only for issues imported before this chain existed.
 
 ## Cross-cutting rule: the PDF has no usable text layer
 
@@ -611,6 +660,26 @@ Two cheaper companions worth running at the same time:
 - **dangling cross-references**: text that says `Bild 3` / `Tabelle 2` /
   `Listing 4` while the article has no such caption. A reference with no target
   usually means the figure and its caption were dropped together.
+
+## End-of-issue gate: the issue must BUILD
+
+```bash
+.venv/bin/python generate.py --issues <ID> --future local
+```
+
+Exit 0 and no traceback. This is the only check that sees the issue the way
+the site does, and it catches what no per-rule verification can:
+
+- a missing `issues/<ID>/title.png` -- the generator stops dead on it. Make it
+  from the cover master, as SH8601 did: crop `masters600/001.png` to the traced
+  page box in its stamp, resize to **1240 x 1754** (A4 at 150 dpi, what every
+  other issue uses).
+- a `toc_category` outside the issue's own `toc.txt`, a duplicate `64er.id`, a
+  malformed `64er.pages`.
+- An issue with no PDF yet builds (8610 fixed the two sites that assumed one);
+  the load-time `Warning: Missing PDF` is expected and not a failure.
+
+The generator serves `out/` on :8000 when a `local` build finishes -- kill it.
 
 ## Deliberate deviations from print must be marked in place
 

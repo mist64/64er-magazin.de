@@ -302,6 +302,106 @@ A4, four for the card, one for the cover leaf. Two interior pages fall outside
 every window — 007 and 117 — and both are trace failures rather than sizes this
 issue has; see *Known outliers*.
 
+## The profile is MEASURED for this issue's paper, never defaulted
+
+`"colors": null` is not "no profile". It is `BUILTIN_ANCHORS` with identity
+level lines, and that set's `W 201 195 188` is a statement about somebody
+else's paper. `W` is the **density reference**: the separation works in
+`d = -log10(rgb/W)`, so paper lighter than `W` clamps to zero ink and paper
+darker than `W` in any channel **IS ink**. A `W` above the issue's real paper
+does not cast the page — it greys it, and the stock's grain comes through as
+a tint. MEASURED on 8610's 150 dpi thumbs against that built-in `W`: **62 % of
+p036's paper pixels and 80 % of p150's are darker than it in some channel.**
+That is what defaulting costs, and nothing downstream reports it.
+
+**So measure `W` first.** Pool paper pixels over every interior thumb — `lum >
+170` and `max − min < 40`, inside the body box so the bed and the prop are out
+of it — and read a low per-channel percentile off the pool:
+
+```bash
+cd tools/img/scan2ocr/rules
+python3 - <<'PY'
+import numpy as np
+from PIL import Image
+import r000_issue, r005_masters_sheet as R
+iss = r000_issue.load(R.ISSUE)
+pool = []
+for p in iss.page_range:          # INTERIOR pages only: a cover leaf or a
+    a = np.asarray(Image.open(    # bound-in card is another stock entirely
+        f"{iss.thumb_150}/{p:03d}.png").convert("RGB"), float)
+    h, w, _ = a.shape
+    b = a[int(.12 * h):int(.88 * h), int(.10 * w):int(.90 * w)].reshape(-1, 3)
+    pool.append(b[(b.mean(1) > 170) & (b.max(1) - b.min(1) < 40)])
+pool = np.concatenate(pool)
+for q in (0.5, 1, 2, 5, 10, 50):
+    print("p%-4s" % q, np.percentile(pool, q, axis=0).round().astype(int))
+PY
+```
+
+8610's pooled paper, all 196 interior thumbs:
+
+| | p0.5 | p1 | p2 | p5 | p10 | p50 |
+|---|---|---|---|---|---|---|
+| R G B | 173 170 165 | 176 172 167 | **180 174 170** | 187 180 174 | 193 184 178 | 204 194 190 |
+
+**Which percentile is itself a measurement, not a constant.** SH8601 settled at
+**p5**, `209 175 157` on its own yellowed stock — and not on the first try: the
+profile was re-measured mid-build from `214 195 186`, which left four already
+graded masters silently stale (*The stamp*) and forced every mask that reads
+the paper to be re-measured with it (*The parity gate*, where the same
+re-measurement moved the agreeing pages' floor from 1.6 to 2.5). On 8610 p5 was
+still too high — over bare paper the separation's residual read **C 27 % M 14 %
+Y 6 % K 5 % at p99**, the darkest tenth of the paper standing as a cyan-biased
+speckle. **p2** (`180 174 170`) took the same band to white: on p006's blank
+band the pure-white share went **90 % → 99.9 %** and paper p1 **239 239 244 →
+255 255 254** — and the type did not move with it, glyph p50 **26–33** and
+solid-black share **7–17 %** across pages 1–10.
+
+**The gate — run it on three test pages before committing the sweep.** A full
+issue is ~4 hours (8610, 200 pages, 6 lanes), so the profile is settled on
+three graded pages first, not discovered in the contact sheet afterwards:
+
+> **blank-paper p1 ≥ 250 AND glyph p50 ≤ 40.**
+
+"Blank paper" is a band the page has no ink on at all; "glyph" is the pixels
+under lum 100 inside a body-text window. Both off the 600 dpi master:
+
+```bash
+python3 - <<'PY'
+import numpy as np
+from PIL import Image
+import r005_masters_sheet as R
+Image.MAX_IMAGE_PIXELS = None
+BLANK = {"006": (600, 900, 3600, 1500)}   # px -- PICK a band this page has
+TYPE  = {"006": (14, 100, 58, 180)}       # no ink on; TYPE is check 6's
+                                          # window, mm from the trim corner
+for stem in sorted(BLANK):
+    m = Image.open(R.OUT_MASTER / f"{stem}.png")
+    a = np.asarray(m.crop(BLANK[stem]).convert("RGB"), float).reshape(-1, 3)
+    print(f"p{stem} blank paper p1", np.percentile(a, 1, axis=0).round().astype(int),
+          "| pure white %.1f%%" % (100 * (a.min(1) == 255).mean()))
+    g = np.asarray(m.crop(tuple(int(v * R.MM) for v in TYPE[stem])).convert("L"), float)
+    g = g[g < 100]
+    print(f"p{stem} glyph p50 %5.1f | solid black %.1f%%"
+          % (np.median(g), 100 * (g == 0).mean()))
+PY
+```
+
+A `W` that fails the first half is above the paper (grain graded as ink); one
+that fails the second is below the ink (type dissolving into the paper).
+
+**The ink anchors stay the built-in set** unless a colour is visibly wrong on
+the page — same scanner, same stock family, and an anchor moved without a
+measurement is the defaulting mistake in the other direction. **The level lines
+stay identity** until they are measured as the **p99 of each ink over bare
+paper**; that measurement is still OPEN on 8610, which is why its `colors.txt`
+ships `LC/LM/LY/LK 0 100` with a comment saying so.
+
+Worked example: **`issues/8610/colors.txt`** — the file carries its own
+measurement, the date, the pages it was read on and why the percentile is where
+it is. Write the next issue's the same way; a profile without its measurement
+in it is a constant again.
+
 ## The grade — call the converter, undo its GCR, render once
 
 The separation is **not reimplemented here**. `tools/img/cmyk_reconstruction`

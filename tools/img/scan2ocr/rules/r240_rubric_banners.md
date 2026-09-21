@@ -85,6 +85,16 @@ For each of the three rubrics:
    blocks file to find a starting bbox; the banner illustration
    typically sits adjacent in the same column. Save the crop as
    `issues/<YYMM>/<START>-0.png`.
+   **Deliver it in the right bucket.** `tools/convert-scans.sh` states the
+   project's convention: colour / greyscale art ships at **150 dpi** — a
+   `-resize 25%` of the 600 dpi crop — and bilevel line art stays at
+   **600 dpi**, unresized. The Editorial portrait is a colour photo and is
+   resized: 8610's came off the master at 1370×1145 / 3.9 MB and ships at
+   343×286 / 209 KB, matching 8609's `8-0.png` at 339×279 / 208 KB. The
+   Fehlerteufelchen devil is line art and stays at 600 dpi — 8610's `80-0.png`
+   is 1070×1062, as 8609's `61-0.png` is 1017×1072. A banner `cp`'d from the
+   prior issue (Bücher) is already in its bucket; don't re-crop it.
+
 4. **Read the crop** to verify it's the banner and not page noise.
 5. **Insert into the article HTML** with the rubric-appropriate
    shape:

@@ -87,6 +87,46 @@ truth re-bases every number.
 in this pipeline's history looked perfect on their test pages and were reverted
 after a full sweep; the numbers are in `FINDINGS.md`.
 
+## The dropped Impressum — a masthead sharing its page with an ad
+
+Both issues built by this chain lost the Impressum, and by the same route. The
+masthead is never alone on its page: it is one column, and the rest of the page
+is apparatus or advertising. The page-level judgement then goes to the majority
+of the page, the label comes back `ad` / `other`, **0 blocks are kept**, and the
+masthead goes with it.
+
+| | the page | what shares it | what the classifier said |
+|---|---|---|---|
+| SH8601 | p146 | a book ad and a dealer list, the left two thirds | `ad`/`toc`, 0 kept — 20 masthead blocks, correctly OCR'd, thrown away |
+| 8610 | p195 | the Inserentenverzeichnis, the left column | `other`, 0 kept — 30 right-column blocks (x ≥ 3312) thrown away |
+
+**The loss is invisible.** Nothing errors, nothing is malformed, no check in the
+chain fires: the article count is simply one short — 28 articles for SH8601's 29
+printed. Step 020's own scores do not see it either, because a page with no
+kept blocks is not a page with a wrong block.
+
+**The signature**, and it is cheap to grep for: a page whose **kept-block count
+is 0** while its `blocks/pNNN.txt` holds a column of masthead labels —
+`Herausgeber`, `Chefredakteur`, `Anzeigenleitung`, `Druck`. One column of those
+on an `ad`-labelled page is an Impressum, every time; an ad has no reason to
+carry them.
+
+**The recovery is a rebuild, not a re-classification.** The block index is
+authoritative and it survived: reconstruct the article from that page's blocks
+plus a 600 dpi crop of the master, in the shape of the **previous issue's**
+Impressum (same head metas, same `<article class="impressum">`, same
+`<p><em>Label: </em>value</p>` run in the printed order), with the line-break
+hyphens resolved. The prior issue decides OCR doubts one word at a time and
+supplies the HTML shape — it does not supply content: 8610's masthead carries a
+paragraph 8609's does not (the Aktionäre / Aufsichtsrat block), and that came
+off the crop.
+
+**What catches it is r000's end-of-issue article-set completeness gate** — the
+printed TOC and the previous issue's recurring rubrics, Impressum among them,
+compared against the split article set. Per-step verification cannot: this is an
+omission, and omission reads as correct. The classifier's page-level call is
+what to fix upstream; the reconstructed file is the repair, not the fix.
+
 ## A paragraph's orphan line labelled as a heading — fixed in step 010
 
 When the print leaves a short final (or initial) line of a paragraph alone in

@@ -62,6 +62,28 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
     `<img class="inline" src="…" alt="…">` without `<figure>`
     wrapper.
 
+## Two resolution buckets, and which one a figure is in
+
+`tools/convert-scans.sh` states the project's convention for every image file
+this chain writes:
+
+| bucket | delivered at | how |
+|---|---|---|
+| colour / greyscale art (`c/`, `gray/`) | **150 dpi** | `-resize 25%` of the 600 dpi crop |
+| bilevel line art (`bw/`, `dots/`) | **600 dpi** | no resize |
+
+A crop cut off `masters600` is at 600 dpi by construction, so the colour bucket
+always needs the 25 % step and the line-art bucket never does. 8610's editor
+portrait came off the master at 1370×1145 / 3.9 MB and was resized to 343×286 /
+209 KB, which is 8609's `8-0.png` (339×279 / 208 KB) — the prior issue's file is
+the check that the bucket is right. Its Fehlerteufelchen devil is line art and
+stays at 600 dpi: `80-0.png` 1070×1062, as 8609's `61-0.png` 1017×1072.
+
+Shipping a colour figure at 600 dpi is not a visible defect on the page — it is
+a 3.9 MB download where 209 KB was intended, and nothing in the chain measures
+it. Compare against the analogous figure in the previous issue before
+committing the file.
+
 ## Alt text — describe only what is visible
 
 - **No identity claims** unless caption explicitly names the

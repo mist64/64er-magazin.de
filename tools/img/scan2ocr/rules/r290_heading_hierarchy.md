@@ -25,10 +25,13 @@ forces a specific level).
 
 Structural overrides that DO apply:
 
-- **h2 inside an aside → h3.** Always demote a top-level heading
-  inside `<aside>` to `<h3>`. An aside is a callout, so its internal
-  hierarchy starts at h3. This is structural, not a
-  typographic-weight judgement.
+- **An `<h2>` inside an `<aside>` STAYS an `<h2>`.** A set-off box's own
+  heading carries the print's banner weight, and it is not demoted for
+  sitting in a callout. This section used to say the exact opposite
+  ("always demote to `<h3>`") while the bottom of the same file retracted
+  it — the evidence that settled it is in *`<h2>` inside `<aside>` is
+  CORRECT*, below. There is one aside shape that does use `<h3>`: rule
+  300's Fehlerteufelchen erratum box.
 
 ### Anti-pattern — the heading-audit trap
 
@@ -104,10 +107,9 @@ To decide if an `<h3>` should be `<h2>` (or vice versa), ask:
    Aktuelles items, CP/M-Ecke entries). Those rarely need h2
    banners — print uses inline-flow h3.
 
-3. **Inside an `<aside>`?** The first heading inside
-   `<aside>` is always `<h3>`, regardless of what it would be at
-   article scope. The aside is a callout, so its internal
-   hierarchy starts at h3.
+3. **Inside an `<aside>`?** Then the question does not arise: the
+   box's own heading is an `<h2>` and stays one. Do not demote it,
+   and do not promote an `<h3>` that rule 300 put in an erratum box.
 
 Never promote on (1) alone. Never demote on (1) alone. (1) without
 (2) is a structure-only heuristic and is exactly the trap above.
@@ -117,9 +119,10 @@ Never promote on (1) alone. Never demote on (1) alone. (1) without
 For every article in `issues/<YYMM>/*.html`:
 
 1. List heading hierarchy (h1/h2/h3 with line numbers).
-2. For each suspicious heading (h3 at top level, h2 inside an
-   aside, h2 → h3 mid-article, two adjacent h2 with no body
-   between), check the **print scan at 600 dpi**:
+2. For each suspicious heading (h3 at top level, h2 → h3
+   mid-article, two adjacent h2 with no body between — an `<h2>`
+   in an `<aside>` is NOT suspicious), check the **print scan at
+   600 dpi**:
    - Crop the heading region.
    - Compare typographic weight against a known-h2 in the same
      issue.
@@ -151,16 +154,22 @@ for f in sorted(os.listdir(d)):
 PY
 )" "$dir"
 
-# 2. no h2 inside <aside>
+# 2. aside headings -- an INVENTORY, not a failure.  <h2> in an <aside>
+#    is the correct shape; this lists the hits so the report can account
+#    for them, and flags the one level that is NOT expected.
 python3 -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
+n = 0
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
     for m in re.finditer(r'<aside\b[^>]*>(.*?)</aside>', s, re.DOTALL):
-        if re.search(r'<h2\b', m.group(1)):
-            print(f"  {f}: <h2> inside <aside>")
+        for lvl in re.findall(r'<(h[1-6])\b', m.group(1)):
+            n += 1
+            mark = '' if lvl == 'h2' else '   <- rule 300 erratum box, or check it'
+            print(f"  {f}: <{lvl}> inside <aside>{mark}")
+print(f"  {n} aside headings; expected <h2> except rule 300's erratum boxes")
 PY
 )" "$dir"
 ```
@@ -187,9 +196,10 @@ evidence pasted verbatim into the report**:
 - For each candidate considered but LEFT UNCHANGED, paste the same
   scan-band evidence so the orchestrator can confirm the default-
   to-leave was a real comparison, not a skip-by-omission.
-- For each structural override (`<h2>` inside `<aside>`
-  demoted to `<h3>`), paste the `<aside>…<h2>` line that triggered
-  the override.
+- For each `<h2>` inside an `<aside>` that was LEFT ALONE, nothing has
+  to be pasted: it is the expected shape, and check 2's inventory line
+  is the whole record. A demotion of one, on the other hand, is a
+  heading-level change like any other and needs its scan band.
 
 **No verifier output, no claimed heading change.** A heading-level
 change reported without the scan-band evidence is treated as a guess;
@@ -208,7 +218,8 @@ don't change" after the third repetition of the same mistake.
 
 - **`b94e5876b`** ("8607: heading hierarchy audit — 20 articles
   fixed"). Walked every 8607 article's hierarchy. 9 of the changes
-  were structural (h2-in-aside demotions, kept). The other
+  were structural (h2-in-aside demotions, kept at the time — the
+  convention was later reversed, see below). The other
   ~14 were judgement-call promotions / demotions across 12 articles
   (22, 49, 67, 73, 84, 85, 92, 136, 139, 150, 166, 174). All wrong.
 - **`70e6a5905`** ("8607: heading hierarchy + Grafik-Modi review
@@ -290,5 +301,26 @@ of non-letters, or start lowercase.
 
 ## `<h2>` inside `<aside>` is CORRECT
 
-Earlier versions of this rule flagged `<h2>` inside an `<aside>` as a defect.
-It is not: a set-off box's heading is an `<h2>`. Do not "fix" it to `<h3>`.
+A set-off box's heading is an `<h2>`. Do not "fix" it to `<h3>`.
+
+Earlier versions of this rule said the opposite, and for a while said BOTH: the
+header section ordered the demotion, this section retracted it, and the
+Verification block still tested for the demoted form. That is resolved here, in
+this direction, on three pieces of evidence:
+
+- **The published corpus.** 8609 ships **10 `<h2>` inside an `<aside>` across
+  7 files** — `9 Aktuelles` ×3, `46 Vollgas für die Floppy 1570/71` ×2,
+  `48 Bar-Codes selbst gemacht`, `68 Die CP_M-Ecke (Teil 3)`,
+  `148 Wettstreit der Assembler`, `151 GV-Forth V1.0`,
+  `160 Der ewige Wettlauf` — and not one demoted `<h3>` among them.
+- **Rule 190's practice.** Rule 190 owns every aside in the issue and builds
+  them with an `<h2>`; a demote pass here would undo its work on every issue.
+- **8610.** 7 instances across 6 files (`32`, `34`, `36`, `46`, `51`, `52`)
+  were checked against that precedent and kept, with no demote-then-restore
+  round trip.
+
+The one exception is not an exception to the weight rule but a different
+shape: rule 300's **Fehlerteufelchen erratum box** carries an `<h3>`, three of
+them in 8609 (`48 Bar-Codes selbst gemacht`, `71 Cross-Referenz-Liste C128`,
+`156 Tips und Tricks zu Vizawrite (Teil 9)`). Leave those alone too — they are
+rule 300's, not this rule's.

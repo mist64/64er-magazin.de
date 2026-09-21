@@ -87,12 +87,118 @@ for c in chunks:
         orphan += c.count('<figure')
 print(f"orphan figures (no section separator yet): {orphan}")
 PY
+
+# 4. ROUND-TRIP every listing: the .txt must re-tokenise to the .prg it
+#    came from.  This is the only check that sees a WRONG DIALECT -- the
+#    decoded text reads fine and the reader's download is the wrong bytes.
+#    It re-implements nothing: the address/version/petcat call is
+#    generate.py's petcat2prg (generate.py:59-94), so a pass here is a
+#    pass on the site.
+dir=issues/<YYMM>
+python3 - "$dir" <<'PY'
+import os, re, subprocess, sys
+d = os.path.join(sys.argv[1], "prg")
+bad = 0
+for f in sorted(os.listdir(d)):
+    if not f.endswith(".txt"):
+        continue
+    listing = open(os.path.join(d, f), encoding="utf-8", errors="replace").read()
+    m = re.findall(r"^;.*==([0-9A-Fa-f]{4})==", listing, re.M)   # the opener
+    addr = m[0] if m else "0801"
+    v = re.search(r"^;version=(.*)$", listing, re.M)             # optional tag
+    v = v.group(1) if v else "2"
+    got = subprocess.run(["petcat", f"-w{v}", "-l", addr, f"-{v}"],
+                         input=listing.encode(), capture_output=True).stdout
+    stem = f[:-4]
+    for cand in (os.path.join(d, stem + ".prg"),
+                 os.path.join(d, "del", stem + ".prg")):
+        if os.path.exists(cand):
+            want = open(cand, "rb").read()
+            break
+    else:
+        print(f"  NO .prg   {f}"); bad += 1; continue
+    if got == want:
+        print(f"  ok  v{v:<6} {f}")
+    else:
+        print(f"  MISMATCH v{v:<6} {f}: {len(got)} vs {len(want)} bytes")
+        bad += 1
+print("round-trip failures:", bad)
+PY
 ```
 
 If you see orphans, the very first listings on the disk preceded any
 section separator — they're typically the boot screen / disk
 intro. Treat them per the placement rule (next step): if they don't
 match an article, they get reported, not placed.
+
+## Check 4: every mismatch is one of three things
+
+None of them is "close enough". A `.txt` that does not re-tokenise to its disk
+bytes is a defect until it is dispositioned in `LOG.md`.
+
+1. **The wrong dialect.** The `.txt` was petcat-detokenised as V2 and the
+   program is not V2. Fix the `;version=` tag and re-decode from the `.prg`
+   (*Non-V2 BASIC dialects need a re-decode*, below), then re-run: the right
+   dialect round-trips **byte-identical**, never merely closer. 8610 shipped
+   four of these past this step, and none was caught here — all four were found
+   by eye at step 130, off the decoded text reading wrong:
+
+   | file | decoded as | actually | evidence |
+   |---|---|---|---|
+   | `cp_m formatter` | V2 | **C 128 BASIC 7.0**, `;version=70` | V2 round-trip differed by 7 bytes; `-w70` identical |
+   | `mfm-scan` | V2 | **C 128 BASIC 7.0**, `;version=70` | V2 differed by 4 bytes; `-w70` identical |
+   | `3d-grafik.c16` | V2 | **BASIC 3.5** at `$4001`, `;version=3` | `-w3` identical |
+   | `p.pop im kopp` | V2 — `RGR`, `RDOT`, `ERR$`, `TRON`, `CHAR` inside a Speech-Basic demo | **Speech-Basic** at `$1801`, `;version=speech` | V2 gave 1152 bytes against 1111 on disk; `-speech` identical |
+
+   The caption is a hint, not the check: `cp_m formatter`'s printed caption says
+   *"für das Basic 7.0 des C 128 geschrieben"* in so many words, and the step
+   still ran V2 over it, because nothing compared the output to the disk.
+
+2. **The file is not BASIC at all** — a Hypra-Ass / Top-Ass source, an
+   assembler object, a directory sector. Then the `.txt` is the defect, not the
+   tag: see *Remediation* and *Sanity-check every extracted file*. 8610's
+   `vg-print.src` (2235 against 2766) and `vg-cp80x.src` (4059 against 5033)
+   are Profi-Ass sources kept as text on 8609's `viza.patch.quell` precedent —
+   a **dispositioned** mismatch, written into `LOG.md`.
+
+3. **Trailing bytes on the disk past the BASIC program's end** — `checksummer`
+   1024 against 1027, `programm 1` (saved from a C 128) 121 against 122.
+   Harmless, and still written down: an undispositioned mismatch is
+   indistinguishable from case 1.
+
+8610 finishes at **4 mismatches, all of them cases 2 and 3**, and that is the
+state a finished issue is allowed to be in.
+
+## An ML program with a BASIC stub ships as the RAW BINARY
+
+A `.prg` whose BASIC part is a **loader stub** — one line, a `SYS` — followed
+by a machine-code body is not a BASIC listing, and check 4 is where it
+announces itself: the stub re-tokenises to a hundred-odd bytes against a disk
+file of kilobytes.
+
+8610's `sound-monitor` is the case. The disk file is `1986 SYS2167` plus
+**12.6 KByte** of machine code (12797 bytes — the article's "51 Blocks"); the
+extractor saw `$0801`, called it BASIC, wrote a 5-line `prg/sound-monitor.txt`
+and moved the real program to `prg/del/`. `petcat2prg` over that `.txt` yields
+**114 bytes**, so the reader's download would have been the stub alone: a
+program that loads, runs, and does nothing.
+
+The rule, which is the *hard rule* above applied to this class:
+
+- the `.prg` sits in **`prg/`**, not `prg/del/` — the generator's
+  binary-download resolver does not reach into `del/`;
+- the bogus `.txt` is **dropped**: there is nothing for `petcat2prg` to
+  materialise from, and nothing the print typeset as BASIC;
+- the article gets the MSE / binary-download shape, not a `<pre>` of five
+  lines. 8610's `51 Musik wie noch nie` carries
+  `<pre data-filename="sound-monitor.prg" data-name="Soundmonitor" data-mse=mse1>`
+  and its `binary_download`, on 8609's `82 HiRes Colossal` precedent.
+
+The signature to grep for before the article is written: a `prg/*.txt` of a
+handful of lines whose last statement is a bare `SYS`, with a `prg/del/*.prg`
+companion an order of magnitude larger. **The reader's download must be the
+program.** A 5-line stub passes every markup check in this directory — it is
+the omission class that reads as correct.
 
 ## Notes / things to watch
 
