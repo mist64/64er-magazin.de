@@ -280,10 +280,27 @@ writing into one then silently rewrites the other. Unlink before regenerating â€
 tools/img/issue_pdf/make_issue_pdf.sh <masters600 dir> <out.pdf> "<issue tag>"
 ```
 
-Use `make_issue_pdf_mixed.sh` where the issue has a substantial number of
-pages carrying only black ink: it ships those as 600 dpi lossless JBIG2 and
-the rest as 150 dpi guetzli. The plain script ships every page at 150 dpi
-guetzli, quality binary-searched to land under 100 MB.
+**`make_issue_pdf_mixed.sh` with `MODE=allbw` IS THE DEFAULT BUILD**, decided
+on 8609 (2026-08-15) and re-confirmed on 8610. It ships every colour-free page
+as 600 dpi lossless JBIG2 -- halftone or not -- and the rest as 150 dpi
+guetzli. `MODE=nohalftone` converts only the colour-free pages with no
+halftone; reach for it when an issue's photographs matter more than its type.
+
+The plain `make_issue_pdf.sh` is **not** the way an issue ships. It has one job
+here: it builds the OCR cache and the 150 dpi rasters the mixed build consumes
+(procedure step 2 below). Shipping from it does not fit a full issue and the
+arithmetic says so twice:
+
+| | pure guetzli at its q84 floor | mixed, `allbw` |
+|---|---|---|
+| 8609, 176 pages | **103.31 MB -- did not fit** | 96.15 MB at q95 |
+| 8610, 200 pages | **103.64 MB -- did not fit** | see this issue's LOG |
+
+The 100 MB ceiling is a hard limit and is not negotiable, and guetzli below
+q84 smears the halftone, so on a long issue there is nothing left to give: the
+bytes have to come from the bilevel pages instead. 8610 measured **118 of its
+200 pages colour-free**, 57.3 MB of the 99.1 MB JPEG payload -- which is the
+prize the mixed build collects.
 
 ### The whole procedure, in order
 

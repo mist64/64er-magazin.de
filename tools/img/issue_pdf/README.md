@@ -1,7 +1,10 @@
 # issue_pdf — scans to a searchable, archive-grade issue PDF
 
 Takes a folder of 600 dpi page scans and produces one searchable PDF/A-3B per issue, sized to land
-just under 100 MB. Built and measured on issue 8608 (168 pages, landed q85 = 98.99 MB); moved into
+just under 100 MB. **`make_issue_pdf_mixed.sh` with `MODE=allbw` is the build an issue ships**
+(see *The mixed build*, below); `make_issue_pdf.sh` builds the OCR cache it consumes and is not,
+by itself, enough for a full issue -- measured twice, 8609 at 103.31 MB and 8610 at 103.64 MB,
+both at guetzli's q84 floor. Built and measured on issue 8608 (168 pages, landed q85 = 98.99 MB); moved into
 the repo 2026-08-14 so it stops living in a working directory.
 
 ```sh

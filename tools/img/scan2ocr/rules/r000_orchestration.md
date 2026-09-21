@@ -285,8 +285,11 @@ from the descriptor and has to recognise it on sight.
 Step 006 owns it, and **the recipe is not in this directory**: it lives in
 `tools/img/issue_pdf/README.md` beside the scripts that implement it —
 searchable PDF/A, OCR rendered at 402 dpi, the delivered image 150 dpi
-guetzli, quality binary-searched to land under 100 MB, with a JBIG2 variant
-for pages carrying only black ink. `r006_issue_pdf.md` says when it runs and
+the colour-free pages as 600 dpi lossless JBIG2 and the rest 150 dpi guetzli,
+quality binary-searched to land under the 100 MB ceiling -- that mixed build
+(`make_issue_pdf_mixed.sh`, `MODE=allbw`) IS the default: on a full issue pure
+guetzli does not fit at all, 103.3 MB on 8609 and 103.6 MB on 8610, both at
+q84, which is guetzli's floor before the halftone smears. `r006_issue_pdf.md` says when it runs and
 what is checked; it deliberately does not restate the recipe, because two
 copies of a measured procedure drift.
 
