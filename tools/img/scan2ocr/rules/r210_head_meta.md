@@ -75,7 +75,11 @@ n=$(grep -lE '64er\.head1' "$dir"/*.html | wc -l | tr -d ' ')
 total=$(ls "$dir"/*.html | wc -l | tr -d ' ')
 echo "  head1 in $n of $total article(s)"
 echo "  excluded (should NOT have head1):"
-grep -lE '64er\.id" content="(editorial|impressum|inhalt|vorschau)"' "$dir"/*.html
+# `vorwort` belongs here too: a Sonderheft's opening piece is a Vorwort, not
+# an editorial, and its page carries the band WITHOUT a section word -- so it
+# is a real exclusion, not a missed article.  Without it the count was off by
+# one on SH8601 and the check reported a failure that did not exist.
+grep -lE '64er\.id" content="(editorial|vorwort|impressum|inhalt|vorschau)"' "$dir"/*.html
 # Leserforum is excluded too (rule 200 already set its head1 by hand);
 # it may still show a head1, so don't count it as a rule 210 target.
 echo "  → expect n ≈ total − (count of the excluded files above, plus Leserforum)"

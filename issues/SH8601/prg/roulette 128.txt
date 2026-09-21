@@ -1,0 +1,484 @@
+
+
+;roulette 128.prg ==4001==
+    5 rem    roulette 128
+    6 rem by juergen koehler
+    7 rem    martin-may-str.17
+    9 rem    6000 frankfurt/m 70
+   11 fast
+   12 trap 7000
+   15 scnclr:color0,6:graphic1,1
+   16 poke0,peek(0) and63 :rem amerik.tast.
+   20 dimz(10),s$(10,60),s(10),n$(10),k(6),a$(6,20),a(6),ns$(6),x$(23,6)
+   30 sp=1:zu=rnd(-ti)
+  100 data37,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
+  102 data25,26,27,28,29,30,31,32,33,34,35,36,36,plein
+  105 data60,0001,0002,0003,0102,0104,0203,0205,0306,0405,0407,0506,0508
+  106 data0609,0708,0710,0809,0811,0912,1011,1013,1112,1114,1215,1314,1316
+  107 data1415,1417,1518,1617,1619,1718,1720,1821,1920,1922,2021,2023,2124
+  108 data2223,2225,2324,2326,2427,2526,2528,2627,2629,2730,2829,2831,2930
+  109 data2932,3033,3132,3134,3233,3235,3336,3435,3536,18,cheval
+  110 data14,010203,040506,070809,101112,131415,161718,192021,222324
+  111 data252627,282930,313233,343536,000102,000203,12,transversale plein
+  115 data23,00010203,01020405,02030506,04050708,05060809,07081011
+  116 data08091112,10111314,11121415,13141617,14151718,16171920,17182021
+  117 data19202223,20212324,22232526,23242627,25262829,26272930
+  118 data28293132,29303233,31323435,32333536,9,carre
+  120 data11,010203040506,040506070809,070809101112,101112131415,131415161718
+  121 data161718192021,192021222324,222324252627,252627282930,282930313233
+  122 data313233343536,6,transversale simple
+  125 data3,010203040506070809101112,131415161718192021222324
+  126 data252627282930313233343536,3,douze
+  130 data3,010407101316192225283134,020508111417202326293235
+  131 data030609121518212427303336,3,kolonne
+  135 data2,010203040506070809101112131415161718
+  136 data192021222324252627282930313233343536,2,manque/passe
+  140 data2,010305070911131517192123252729313335
+  141 data020406081012141618202224262830323436,2,impair/pair
+  145 data2,020406081011131517202224262829313335
+  146 data010305070912141618192123252730323436,2,schwarz/rot
+  150 data401,201,313,202,314,203,401,301,102,204,103,206,104,301
+  152 data501,205,402,207,403,208,501,302,105,209,106,211,107,302
+  154 data502,210,404,212,405,213,502,303,108,214,109,216,110,303
+  156 data503,215,406,217,407,218,503,304,111,219,112,221,113,304
+  158 data504,220,408,222,409,223,504,305,114,224,115,226,116,305
+  160 data505,225,410,227,411,228,505,306,117,229,118,231,119,306
+  162 data506,230,412,232,413,233,506,307,120,234,121,236,122,307
+  164 data507,235,414,237,415,238,507,308,123,239,124,241,125,308
+  166 data508,240,416,242,417,243,508,309,126,244,127,246,128,309
+  168 data509,245,418,247,419,248,509,310,129,249,130,251,131,310
+  170 data510,250,420,252,421,253,510,311,132,254,133,256,134,311
+  172 data511,255,422,257,423,258,511,312,135,259,136,260,137,312
+  199 :
+  200 rem einlesen
+  201 :
+  205 fori=1to10
+  210 read z(i)
+  215 forj=1toz(i)
+  220 read s$(i,j)
+  225 nextj
+  230 read s(i),n$(i)
+  235 nexti
+  240 :
+  245 fori=0to23
+  250 forj=0to6
+  255 read x$(i,j)
+  256 iflen(x$(i,j))<>3thenslow:print"fehler in datas ab zeile 150!!":end
+  260 nextj,i
+  299 :
+  300 rem grafik
+  301 :
+  310 color0,6:color1,1:color4,14
+  315 graphic1
+  330 data3,1,3,1,3,1,3,1,3,1,1,3,1,3,1,3,1,3,3,1,3,1,3,1,3,1,3,1,1,3,1,3,1,3,1,3
+  331 h=1
+  335 fori=11to22
+  340 forj=17to21step2
+  345 reada
+  350 a$=str$(h):ifh>9thena$=right$(a$,2)
+  355 color1,a
+  360 char,j,i,a$,1
+  365 h=h+1
+  370 nextj
+  375 nexti
+  380 color1,1:char,20,10,"0"
+  382 char,12,13,"passe"
+  384 char,23,13,"manque"
+  386 char,12,16,"pair"
+  388 char,23,16,"impair"
+  395 box,137,80,184,87
+  400 draw,137,79to88,88to88,188to137,192to184,192to232,189to232,88to184,79
+  405 draw,136,119to89,120
+  410 draw,136,151to89,150
+  415 draw,89,180to137,184to184,184to231,180
+  420 draw,184,119to231,120
+  425 draw,184,151to231,150
+  430 data 104,182,189,120,184,191,136,185,191,152,185,191,168,185,191,184,185,191
+  431 data 200,184,191,216,182,189
+  435 fori=1to8
+  440 read x,y1,y2
+  445 draw,x,y1tox,y2
+  450 nexti
+  455 draw,104,163to109,153to110,153to115,163to115,164to110,174to109,174
+  460 draw,109,174to104,164
+  465 paint,110,165
+  466 color1,3
+  470 draw,204,163to209,153to210,153to215,163to215,164to210,174to209,174
+  475 draw,209,174to204,164
+  480 paint,210,165
+  485 color1,1
+  490 data0,0,4,1,0,4,2,0,4,0,1,4,0,2,4,2,1,4,2,2,4,1,2,4,0,3,4,0,4,4
+  492 data16,3,0,16,4,0,16,5,0,16,6,0,17,3,0,18,4,0,19,3,0,20,3,0,20,4,0,20,5,0
+  494 data20,6,0
+  496 data32,4,-3,33,4,-3,34,5,-3,34,6,-3,33,7,-3,32,5,-3,32,6,-3,32,7,-3
+  500 fori=1to29
+  505 readx,y,y1
+  510 draw,94+x,182+y
+  515 draw,193+x,182+y+y1
+  520 nexti
+  530 forw=0to360 step(360/15)
+  531 circle,160,40,30,,w,w+1
+  532 nextw
+  533 circle,160,40,36:circle,160,40,39
+  534 paint,197,40
+  535 color1,8
+  540 circle,160,40,27
+  545 circle,160,40,15
+  550 color1,16
+  555 char,19,4,"MN"
+  556 char,19,5,"NM"
+  560 color1,8
+  565 forw=0 to 360 step(360/37)
+  570 circle,160,40,15,,w,w+1
+  572 x=rdot(0):y=rdot(1)
+  574 v=(w*~)/180
+  576 x1=160+27*sin(v):y1=40-27*cos(v)
+  578 draw,x,ytox1,y1
+  580 nextw
+  585 color1,10
+  590 draw,75,0to75,199
+  592 draw,78,0to78,199
+  594 paint,77,1
+  595 draw,242,0to242,199
+  597 draw,245,0to245,199
+  599 paint,244,1
+  600 draw,78,196 to 242,196
+  602 paint,80,198
+  605 color1,1
+  610 circle,6,6,3:paint,6,6
+  612 sshape a$,0,0,23,20
+  615 sprsav a$,1
+  620 circle0,6,6,3:paint0,6,6
+  625 sprite1,0,15,0,0,0,0
+  630 color1,1
+  635 draw,0,0to1,0to1,1to0,1
+  640 sshape a$,0,0,23,20
+  645 sprsav a$,2
+  650 draw0,0,0to1,0to1,1to0,1
+  655 sprite2,0,1,0,0,0,0
+  700 poke0,peek(0)or 64:poke1,peek(1)and63:rem dt.tastatur
+  998 slow
+  999 :
+ 1000 rem eingabe
+ 1001 :
+ 1002 color1,2
+ 1003 gosub6000
+ 1005 char,31,2,"name des":char,31,3,str$(sp)+".":char,31,4,"spielers?"
+ 1010 p2=6:h1$="a":h2$="{CBM-X}":gosub6200
+ 1015 ns$(sp)=b$
+ 1020 char,31,10,"kapital":char,31,11,"des":char,31,12,str$(sp)+"."
+ 1024 char,31,13,"spielers":char,31,14,"in dm :"
+ 1025 p2=16:h1$="0":h2$="9":gosub6200
+ 1045 k(sp)= val(b$)
+ 1050 char,31,20,"eingaben":char,31,21," ok ?"
+ 1055 getkeya$
+ 1060 ifa$="n"then1000
+ 1065 ifa$="j"then1075
+ 1070 goto1055
+ 1075 char,0,sp*4,ns$(sp)+":":char,0,sp*4+1,str$(k(sp))
+ 1100 gosub6000
+ 1103 ifsp=5 then1130
+ 1105 char,31,5,"steigt":char,31,6,"noch":char,31,7,"ein"
+ 1110 char,31,8,"spieler":char,31,9,"ein ?"
+ 1115 getkeya$
+ 1120 ifa$="j"thensp=sp+1:goto1000
+ 1125 ifa$<>"n"then1115
+ 1999 :
+ 2000 rem spieleingabe
+ 2001 :
+ 2002 gosub6000
+ 2005 fors=1tosp
+ 2006 se=1:graphic1:gosub6000
+ 2008 fori=1tosp
+ 2009 char,0,i*4+1,"         ":char,0,i*4+1,str$(k(i)):next
+ 2010 char,32,2,ns$(s)
+ 2011 char,32,5,"m",1:char,33,5,"en{CBM-X}"
+ 2012 char,33,7,"oder"
+ 2014 char,32,9,"t",1:char,33,9,"ableau"
+ 2015 char,35,11,"?"
+ 2020 getkeya$
+ 2022 ifa$="m"thengraphic0:goto2500
+ 2024 ifa$<>"t"then2020
+ 2030 sprite1,1
+ 2035 gosub6000
+ 2087 an=0:gosub6000
+ 2100 movspr 1,115,229
+ 2110 j=joy(2)
+ 2111 x=rsppos(1,0):y=rsppos(1,1)
+ 2113 ifj=128then2300
+ 2114 ifj=0andan=1then2110
+ 2115 ifj=0thengosub6000:gosub7500:gosub8000:an=1:goto2110
+ 2118 an=0
+ 2120 if j=1 then begin
+ 2121 :ifx>154andx<204andy>131andy<224thenmovspr1,+0,-4:goto2110
+ 2122 :ifx=120andy=185thenmovspr1,+14,-46:goto2110
+ 2123 :ifx=115andy=215thenmovspr1,+5,-30:goto2110
+ 2124 :if(x=115orx=130orx=145)and(y=229ory=230ory=231)thenmovspr1,115,215:goto2110
+ 2126 :ify=232thenmovspr1,+1,-9:goto2110
+ 2128 :ifx=214andy=218thenmovspr1,+18,-31:goto2110
+ 2130 :ifx=232andy=187thenmovspr1,-14,-50:goto2110
+ 2132 :ify=131thenmovspr1,175,127:goto2110
+ 2134 bend
+ 2140 ifj=3then begin
+ 2142 :ifx>154andx<203andy>130andy<224thenmovspr1,+8,+0:goto2110
+ 2144 :ifx=134andy=139thenmovspr1,+21,+12:goto2110
+ 2146 :ifx=120andy=185thenmovspr1,+35,-10:goto2110
+ 2148 :ifx=115andy=215thenmovspr1,+40,+0:goto2110
+ 2150 :if(x=115orx=130)and(y=229ory=230)then movspr1,+15,+1:goto2110
+ 2152 :ifx=145andy=231thenmovspr1,+17,+1:goto2110
+ 2154 :if(x=162orx=178)andy=232thenmovspr1,+16,+0:goto2110
+ 2156 :ifx=203andy>130andy<160thenmovspr1,218,137:goto2110
+ 2158 :ifx=203andy>161andy<192thenmovspr1,232,187:goto2110
+ 2160 :ifx=203andy>195andy<223thenmovspr1,214,218:goto2110
+ 2165 bend
+ 2170 ifj=5then begin
+ 2172 :ifx>154andx<204andy>130andy<223thenmovspr1,+0,+4:goto2110
+ 2174 :ifx=175andy=127thenmovspr1,179,131:goto2110
+ 2176 :ifx=134andy=139thenmovspr1,120,185:goto2110
+ 2178 :ifx=120andy=185thenmovspr1,115,215:goto2110
+ 2180 :ifx=115andy=215thenmovspr1,130,230:goto2110
+ 2182 :ifx=232andy=187thenmovspr1,214,218:goto2110
+ 2184 :ifx=218andy=137thenmovspr1,232,187:goto2110
+ 2186 :ify=223and(x=163orx=179orx=195)thenmovspr1,-1,+9:goto2110
+ 2190 bend
+ 2200 if j=7then begin
+ 2202 :ifx>155andx<204andy>130andy<224thenmovspr1,-8,+0:goto2110
+ 2204 :ifx=218andy=137thenmovspr1,203,151:goto2110
+ 2206 :ifx=232andy=187thenmovspr1,203,175:goto2110
+ 2208 :ifx=214andy=218thenmovspr1,203,207:goto2110
+ 2210 :if(x=130orx=145)and(y=230ory=231)then movspr1,-15,-1:goto2110
+ 2212 :if(x=178orx=194)andy=232thenmovspr1,-16,+0:goto2110
+ 2214 :ifx=155andy>130andy<160thenmovspr1,134,139:goto2110
+ 2216 :ifx=155andy>161andy<192thenmovspr1,120,185:goto2110
+ 2218 :ifx=155andy>195andy<223thenmovspr1,115,215:goto2110
+ 2220 :ifx=162andy=232thenmovspr1,145,231:goto2110
+ 2222 bend
+ 2230 goto2110
+ 2300 rem bilden des strings
+ 2305 a$(s,se)=e$+f$+"d"
+ 2315 gosub6000
+ 2320 char,31,5,"wieviel":char,31,6,"dm wollen"
+ 2322 char,31,7,"sie":char,31,8,"setzen ?"
+ 2325 p2=10:h1$="0":h2$="9":gosub6200
+ 2330 ifval(b$)>k(s)orval(b$)<=0then2315
+ 2335 k(s)=k(s)-val(b$)
+ 2340 char,0,s*4+1,"         ":char,0,s*4+1,str$(k(s))
+ 2345 a$(s,se)=a$(s,se)+" "+b$
+ 2346 a(s)=se
+ 2347 ifse=20ork(s)=0then2380
+ 2350 gosub6000
+ 2355 char,31,1,"wollen":char,31,2,"sie ,"
+ 2360 char,31,3,ns$(s):char,31,4,", auf":char,31,5,"noch mehr"
+ 2365 char,31,6,"setzen ?"
+ 2370 getkeya$
+ 2375 ifa$="j"then se=se+1:goto2087
+ 2376 ifa$<>"n"then2370
+ 2380 nexts
+ 2385 goto3000
+ 2500 scnclr
+ 2505 sprite 1,0
+ 2515 printns$(s)":":print
+ 2520 fori=1to10
+ 2525 printi,n$(i)
+ 2530 nexti
+ 2535 input"ihre wahl (1,2,3...)";a$
+ 2540 ifval(a$)<1orval(a$)>10then2535
+ 2545 ifval(a$)<10thena$="0"+a$
+ 2550 scnclr
+ 2555 fori=1toz(val(a$))
+ 2560 print"{rvon}"i"{rvof} ";
+ 2565 forj=1to(len(s$(val(a$),i))-1)step2
+ 2570 printmid$(s$(val(a$),i),j,2)"/";
+ 2575 nextj
+ 2580 print"{left} "
+ 2585 nexti
+ 2590 input"ihre wahl";b$
+ 2595 if val(b$)<1orval(b$)>z(val(a$))then2590
+ 2600 input"wieviel dm";dm
+ 2605 if dm>k(s)ordm<=0then2600
+ 2610 k(s)=k(s)-dm
+ 2615 a$(s,se)=a$+s$(val(a$),val(b$))+"d"+str$(dm)
+ 2617 ifse=20ork(s)=0then2640
+ 2620 print"will spieler "s" auf noch mehr setzen?"
+ 2625 getkeyc$
+ 2630 ifc$="j"thense=se+1:goto2500
+ 2635 a(s)=se
+ 2640 nexts
+ 2999 :
+ 3000 rem zahl zwischen 0 und 36 erzeugen
+ 3001 :
+ 3002 fori=1tosp:char,0,i*4+1,"         ":char,0,i*4+1,str$(k(i)):next
+ 3009 sprite 1,0
+ 3010 graphic1
+ 3015 gosub6000
+ 3020 collision 2,3300
+ 3050 sprite 2,1
+ 3060 movspr2,149,88
+ 3065 r=33:n=r
+ 3100 forw=(3*~)/2to(7*~)/2 step .3
+ 3105 x=184+r*sin(w)
+ 3110 y=88-r*cos(w)
+ 3115 movspr2,x,y
+ 3120 r=n-.05:n=r
+ 3125 if r<22andrnd(1)<.7then3500
+ 3130 ifr<19then3500
+ 3140 next
+ 3170 goto3100
+ 3300 if bump(2)<>2 then return
+ 3305 r=r-(rnd(1)-.2)
+ 3310 ifn>34 thenn=34
+ 3315 n=r-(rnd(1)-.2)
+ 3320 return
+ 3500 sleep 2
+ 3505 sprite 2,0
+ 3510 sleep 1
+ 3515 collision 2
+ 3900 zu= rnd(-ti)
+ 3915 zu=int(rnd(1)*37)
+ 3919 forj=0to5
+ 3920 fori=1to16
+ 3925 color1,i
+ 3930 char,10,5,str$(zu):char,26,5,str$(zu)
+ 3935 nexti,j
+ 3940 color1,2
+ 3945 char,10,5,str$(zu):char,26,5,str$(zu)
+ 3950 sleep3
+ 3955 char,10,5,"   ":char,26,5,"   "
+ 3960 sprite2,0
+ 3999 :
+ 4000 rem auswertung
+ 4005 :
+ 4010 fori=1tosp
+ 4015 forj=1toa(i)
+ 4020 :sl=instr(a$(i,j),"d")
+ 4025 z$=mid$(a$(i,j),3,sl-3)
+ 4030 forh=1 to(len(z$)-1)step2
+ 4035 ifzu=val(mid$(z$,h,2))then4060
+ 4040 nexth
+ 4045 nextj
+ 4050 nexti
+ 4055 goto5000
+ 4060 g=val(mid$(a$(i,j),1,2))
+ 4065 dm=val(mid$(a$(i,j),sl+2,(len(a$(i,j))-sl)+1))
+ 4070 k(i)=k(i)+s(g)*dm
+ 4075 goto4045
+ 4999 :
+ 5000 rem anzeige kapital
+ 5005 :
+ 5010 gosub6100
+ 5015 fori=1tosp
+ 5020 char,0,i*4,ns$(i)+":"
+ 5025 char,0,i*4+1,str$(k(i))
+ 5030 nexti
+ 5035 gosub6000
+ 5036 gosub10000 :rem eigene erweiterung
+ 5040 char,31,5,"steigt":char,31,6,"ein"
+ 5045 char,31,7,"spieler":char,31,8,"aus ?"
+ 5046 pv=0
+ 5047 fork=1tosp
+ 5048 ifk(k)=0thena$="j":pv=1:goto5055
+ 5049 nextk
+ 5050 getkeya$
+ 5055 ifa$="j"then5070
+ 5060 ifa$<>"n"then5050
+ 5065 goto1100
+ 5070 gosub6000
+ 5075 char,31,3,"sein":char,31,4,"name ?"
+ 5076 ifpv=1thenchar,31,6,ns$(k):b$=ns$(k):goto5115
+ 5080 p2=6:h1$="a":h2$="{CBM-X}":gosub6200
+ 5115 s=1
+ 5120 ifb$=ns$(s)then5145
+ 5125 ifs<spthens=s+1:goto5120
+ 5130 char,31,15,"diesen":char,31,16,"spieler":char,31,17,"kenne ich"
+ 5135 char,31,18,"nicht!"
+ 5140 sleep5:goto5035
+ 5145 fori=stosp
+ 5150 ns$(i)=ns$(i+1)
+ 5155 k(i)  =k(i+1)
+ 5160 nexti
+ 5165 sp=sp-1:ifsp=0thengoto9000
+ 5170 goto5000
+ 5999 :
+ 6000 rem rechten bereich der graphic             loeschen
+ 6005 :
+ 6010 fori=0to24
+ 6015 char,31,i,"         "
+ 6020 nexti
+ 6025 return
+ 6030 :
+ 6100 rem linken bereich der graphic              loeschen
+ 6105 :
+ 6110 fori=0to24
+ 6115 char,0,i,"         "
+ 6120 next
+ 6125 return
+ 6199 :
+ 6200 rem eingabe string
+ 6201 :
+ 6205 p1=31:b$=""
+ 6210 getkeya$
+ 6215 if((a$>=h1$anda$<=h2$)ora$=" ")andp1<=38then begin
+ 6220 char,p1,p2,a$:p1=p1+1:b$=b$+a$:bend
+ 6225 ifa$=chr$(13) thenreturn
+ 6230 ifa$=chr$(20) and p1>31then begin
+ 6235 p1=p1-1:char,p1,p2," ":b$=left$(b$,len(b$)-1 ):bend
+ 6240 goto 6210
+ 6999 :
+ 7000 rem fehlerbehandlung
+ 7001 :
+ 7010 slow:graphic0
+ 7015 color0,12:color5,14
+ 7020 print:printerr$(er)" error  in "el
+ 7025 fori=1to8:spritei,0:nexti
+ 7030 help
+ 7040 end
+ 7499 :
+ 7500 rem feststellung von satz aus graphic
+ 7501 :
+ 7505 x=rsppos(1,0):y=rsppos(1,1)
+ 7510 ifx>154andx<204andy>130andy<224then begin
+ 7515 :e$="0"+left$(x$((y-131)/4,(x-155)/8),1)
+ 7520 :f$=right$(x$((y-131)/4,(x-155)/8),2)
+ 7525 :f$=s$(val(e$),val(f$)):return
+ 7530 bend
+ 7540 ifx=175andy=127thene$="01":f$="0":return
+ 7545 ifx=134andy=139thene$="08":f$=s$(8,2):return
+ 7550 ifx=120andy=185thene$="09":f$=s$(9,2):return
+ 7555 ifx=115andy=215thene$="10":f$=s$(10,1):return
+ 7560 ifx=115andy=229thene$="06":f$=s$(6,1):return
+ 7565 ifx=130andy=230thene$="06":f$=s$(6,2):return
+ 7570 ifx=145andy=231thene$="06":f$=s$(6,3):return
+ 7575 ifx=162andy=232thene$="07":f$=s$(7,1):return
+ 7580 ifx=178andy=232thene$="07":f$=s$(7,2):return
+ 7585 ifx=194andy=232thene$="07":f$=s$(7,3):return
+ 7590 ifx=214andy=218thene$="10":f$=s$(10,2):return
+ 7595 ifx=232andy=187thene$="09":f$=s$(9,1):return
+ 7600 ifx=218andy=137thene$="08":f$=s$(8,1):return
+ 7610 return
+ 8000 rem anzeige aus graphic
+ 8001 :
+ 8005 ze=5
+ 8010 ifval(e$)>7then8030
+ 8015 iflen(n$(val(e$)))>8thenbegin: char,31,2,"transver."
+ 8020 char,32,3,right$(n$(val(e$)),6):goto8030
+ 8025 bend
+ 8026 char,32,2,n$(val(e$))
+ 8030 fori=1tolen(f$) step 6
+ 8035 char,32,ze,mid$(f$,i,2)+" "+mid$(f$,i+2,2)+" "+mid$(f$,i+4,2)
+ 8037 ze=ze+1
+ 8040 nexti
+ 8045 return
+ 8999 :
+ 9000 rem spielende
+ 9001 :
+ 9010 gosub6000:gosub6100
+ 9020 char,0,2,"wir":char,0,3,"danken":char,0,4,"ihnen"
+ 9025 char,0,5,"fuer":char,0,6,"ihren":char,0,7,"besuch."
+ 9030 char,0,9,"auf":char,0,10,"wiedersehen"
+ 9040 sleep10:graphic0
+ 9050 end
+ 9999 :
+10000 rem eigene erweiterung
+10001 :
+10010 return
+

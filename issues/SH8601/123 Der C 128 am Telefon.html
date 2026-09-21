@@ -5,9 +5,29 @@
     <title>Der C 128 am Telefon</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
+    <!--
+          The kürzel `zu` is printed on the page and signs four articles in this
+          issue (22, 110, 118, 123).  It is deliberately NOT expanded to a name.
+
+          What is known: it appears as an author code in NO other issue of this
+          archive, it is not in known_authors.csv (which maps 19 codes, all staff),
+          and SH8601's Impressum -- unlike a monthly's -- prints no code list at
+          all.  The only masthead surname that could yield `zu` is the Fremdautor
+          Zumbach, but that is an inference and not a mapping: a two-letter
+          lowercase code is the form used for in-house editors who take a piece in,
+          not for external contributors, and the print sets "Th. Rumbach" on p62
+          where the Impressum lists "Zumbach", so the print may itself confuse the
+          two names.  The issue owner does not know who `zu` was either.
+
+          Bare codes are normal in this archive (bs, ev, ah, tr all ship
+          unexpanded), so this reads as intended rather than as a gap.  If the
+          person is ever identified, add the row to known_authors.csv and every
+          instance expands at once.
+    -->
     <meta name="author" content="zu">
     <meta name="64er.issue" content="SH8601">
     <meta name="64er.pages" content="123-124">
+    <meta name="64er.head1" content="Software">
     <meta name="64er.toc_category" content="Software">
     <meta name="64er.id" content="dfü">
 </head>
@@ -17,80 +37,509 @@
         <h1>Der C 128 am Telefon</h1>
         <p class="intro">Über Akustikkoppler oder Modem mit Mailboxen in Verbindung treten. Das kann der Commodore 128 auch!</p>
 
-        <p>Im C64-Modus behandelt der Commodore 128 den User-Port und damit die RS232-Schnittstelle wie gewohnt. Gute Bekannte wie das Datenfernübertragungs-Programm »Proterm 64« (64'er Sonderheft 7/1985) versehen einwandfrei ihren Dienst. Wie aber verhält sich der User-Port im 128-Modus?</p>
+        <p>Im C 64-Modus behandelt der Commodore 128 den User-Port und damit die RS232-Schnittstelle wie gewohnt. Gute Bekannte wie das Datenfernübertragungs-Programm »Proterm 64« (64'er Sonderheft 7/1985) versehen einwandfrei ihren Dienst. Wie aber verhält sich der User-Port im 128-Modus?</p>
 
         <p>Der User-Port des C 128 wird vorwiegend für den Druckeranschluß oder für den Anschluß eines Akustikkopplers genutzt. Dazu wird entweder eine parallele oder serielle Schnittstelle am User-Port simuliert. Um Daten mit dem Telefon zu übertragen, ist meist die serielle RS 232-Schnittstelle erforderlich. Mit dieser Schnittstelle werden acht Byte nicht gleichzeitig nebeneinander, sondern Bit für Bit hintereinander gesendet. Dadurch wird zwar die Geschwindigkeit wesentlich geringer als bei der parallelen Datenübertragung, aber man kommt mit viel weniger Leitungen aus. Und gerade im Telefon-Verkehr ist die serielle Übertragung die einzig mögliche.</p>
 
-        <p>Der Commodore 128 ist von Haus aus im Betriebssystem mit der erforderlichen Software zum Betrieb einer seriellen RS232-Schnittstelle ausgerüstet. Die RS232-Schnittstelle selbst muß noch mit einem Modul hardwaremäßig am User-Port simuliert werden. Dazu gibt es in der 64'er, Ausgabe 3/85 einen kleinen Bausatz für 25 Mark, der den Normpegel am User-Port (TTL-Pegel von +5V) auf den RS232-Pegel (+3V bis +15V) umwandelt.</p>
+        <p>Der Commodore 128 ist von Haus aus im Betriebssystem mit der erforderlichen Software zum Betrieb einer seriellen RS232-Schnittstelle ausgerüstet. Die RS232-Schnittstelle selbst muß noch mit einem Modul hardwaremäßig am User-Port simuliert werden. Dazu gibt es in der 64'er, Ausgabe 3/85 einen kleinen Bausatz für 25 Mark, der den Normpegel am User-Port (TTL-Pegel von +5V) auf den RS232-Pegel (±3V bis ±15V) umwandelt.</p>
 
-        <p>Die RS232-Schnittstelle hat im C128 die Geräteadresse 2 bekommen. Dadurch wird diese Schnittstelle wie ein Floppy-Laufwerk oder ein Drucker angesprochen.</p>
+        <p>Die RS232-Schnittstelle hat im C 128 die Geräteadresse 2 bekommen. Dadurch wird diese Schnittstelle wie ein Floppy-Laufwerk oder ein Drucker angesprochen.</p>
 
         <p>Eröffnet man beim Commodore 128 ein User-Port-File mit der OPEN-Anweisung, so legt der C 128 zwei Daten-Buffer von je 256 Byte an. In den Eingabebuffer, der ab der Adresse $0C00 Hex liegt, werden alle über die RS232-Schnittstelle hereinkommenden Daten gesammelt. Der Ausgabebuffer ab der Adresse $0D00 nimmt die an die RS232-Schnittstelle auszugebenden Daten auf.</p>
 
-        <p>Um die Datenübertragung zu organisieren gibt es zwei spezielle Register: das Kontrollregister und das Befehlsregister. Diese werden automatisch mit der Eröffnung des logischen Files (Geräteadresse 2) definiert. .. Das Befehlsregister bestimmt die Übertragungsart, die Parität und die Art der Verbindung (Handshake). Im Kontrollregister wird die Baud-Rate definiert und die Anzahl der Daten- und Stop-Bits.</p>
+        <p>Um die Datenübertragung zu organisieren gibt es zwei spezielle Register: das Kontrollregister und das Befehlsregister. Diese werden automatisch mit der Eröffnung des logischen Files (Geräteadresse 2) definiert.</p>
 
-        <p>Die Datenübertragungsrate beträgt bei den meisten C64-Mailboxen 300 Baud bei sieben Daten-Bits und einem Stop-Bit. Das Stop-Bit kennzeichnet das UÜbertragungsende von Daten-Bits. Die Baud-Rate darf beim C 128 den Wert von 2400 nicht übersteigen, da die interne Software des C 128-Betriebssytems nicht schneller arbeitet.</p>
+        <p>Das Befehlsregister bestimmt die Übertragungsart, die Parität und die Art der Verbindung (Handshake). Im Kontrollregister wird die Baud-Rate definiert und die Anzahl der Daten- und Stop-Bits.</p>
+
+        <p>Die Datenübertragungsrate beträgt bei den meisten C 64-Mailboxen 300 Baud bei sieben Daten-Bits und einem Stop-Bit. Das Stop-Bit kennzeichnet das Übertragungsende von Daten-Bits. Die Baud-Rate darf beim C 128 den Wert von 2400 nicht übersteigen, da die interne Software des C 128-Betriebssytems nicht schneller arbeitet.</p>
 
         <p>Alle Parameter werden in der OPEN-Anweisung übergeben. Die Syntax für den OPEN-Befehl lautet: »OPEN Filenummer, Geräteadresse, Sekundäradresse, Kontrollregister, Befehlsregister«. Eine Eröffnung des Datenkanals mit allen Parametern sieht beispielsweise folgendermaßen aus:</p>
 
-        <pre><code>»OPEN 2,2,0CHR$ (6+32+0)+ CHR$(0+0+0)«  
+        <pre><code>»OPEN 2,2,0,CHR$ (6+32+0)+ CHR$(0+0+0)«
 </code></pre>
 
         <p>Damit haben wir folgende Parameter programmiert:</p>
 
         <ul>
-            <li>
-                <p>logisches File 2 öffnen</p>
-            </li>
-            <li>
-                <p>Geräteadresse 2 ansprechen - Sekundäradresse 0 setzen</p>
-            </li>
-            <li>
-                <p>300 Baud Übertragung</p>
-            </li>
-            <li>
-                <p>7 Daten-Bits</p>
-            </li>
-            <li>
-                <p>1 Stop-Bit</p>
-            </li>
-            <li>
-                <p>3-Draht-Leitung</p>
-            </li>
-            <li>
-                <p>Vollduplex</p>
-            </li>
-            <li>
-                <p>keine Parität (kein 8. Daten-Bit) Bits 5,6 und 7 die Parität bestimmt (siehe Tabelle 2).</p>
-            </li>
+            <li>logisches File 2 öffnen</li>
+            <li>Geräteadresse 2 ansprechen</li>
+            <li>Sekundäradresse 0 setzen</li>
+            <li>300 Baud Übertragung</li>
+            <li>7 Daten-Bits</li>
+            <li>1 Stop-Bit</li>
+            <li>3-Draht-Leitung</li>
+            <li>Vollduplex</li>
+            <li>keine Parität (kein 8. Daten-Bit)</li>
         </ul>
-
-
-        <p>Selbstverständlich können bei der Datenübertragung mit der RS 232-Schnittstelle Fehler vorkommen. Dafür gibt es das sogenannte Status-Register, dasallerdingsnach dem Auslesen sofort gelöscht wird. Man sollte diese Statusvariable ST immer in einer Variablen ablegen. Die Bedeutung der einzelnen Bits der Statusvariablen ST sind der Tabelle 3 zu entnehmen.</p>
-
-        <p>Das Kontrollregister, das Befehlsregister und die Statusvariable kann man auch direkt aus der Zeropage auslesen. Für die RS232-Routine nach einem Moment wieder »vernünftigen« Text liefern.</p>
-
-        <p>Wesentlich mehr Komfort und Geschwindigkeit bringen in Maschinensprache geschriebene Terminalprogramme. Da nur kleine Änderungen der Speicheradtessierung vorzunehmen sind, wird sicherlich demnächst mitmehreren</p>
-
-        <p>Datenfernübertragungsprogrammen zu rechnen sein, die auch im C128-Modus des Commodore 128 laufen. Nur steht diesen dann wesentlich mehr Speicherplatz für die Protokollführung zur Verfügung. Dann kann man sich mit dem C128 Programme übertragen las-</p>
 
         <p>Wie man sieht, wird das Befehls- und Kontrollregister mit dem OPEN-Befehl definiert. Dazu haben wir nach der Adreß-Definition zwei Byte mit Hilfe der CHR$-Anweisung übergeben.</p>
 
-        <p>Einige Bits dieser beiden Register haben wichtige Funktionen. Die ersten vier Bit des Kontrollregisters bestimmen die Baud-Rate, Bit 5 und 6 die Anzahl der Datenbits und Bit 7 die Anzahl der Stop-Bits (siehe Tabelle )).</p>
+        <p>Einige Bits dieser beiden Register haben wichtige Funktionen. Die ersten vier Bit des Kontrollregisters bestimmen die Baud-Rate, Bit 5 und 6 die Anzahl der Datenbits und Bit 7 die Anzahl der Stop-Bits (siehe Tabelle 1).</p>
 
-        <p>Das zweite Byte wird in das Befehlsregister geschrieben und bestimmt mit Bit 0 die Art des Handshake-Betriebs. Die darauffolgenden dLrei Bit sind von untergeordneter Bedeutung. Mit Bit 4 wird die Übertragungsart und über die Schnittstelle sind die Adressen $0A0OF Hex bis $0AIlB Hex wichtig (siehe Tabelle 4).</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit</th>
+                    <th>3</th>
+                    <th>2</th>
+                    <th>1</th>
+                    <th>0</th>
+                    <th>dezimal</th>
+                    <th>Baud-Rate</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>Anwender-Baud-Rate,</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>50</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>75</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>110</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>4</td>
+                    <td>134.5</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>5</td>
+                    <td>150</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>6</td>
+                    <td>300</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>7</td>
+                    <td>600</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>1200</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>9</td>
+                    <td>1800</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>2400</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>11</td>
+                    <td>3600</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>12</td>
+                    <td>4800</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>13</td>
+                    <td>7200</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>14</td>
+                    <td>9600</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>15</td>
+                    <td>19200</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <th>6</th>
+                    <th>5</th>
+                    <th></th>
+                    <th></th>
+                    <th>dezimal</th>
+                    <th>Anzahl der Datenbits</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td></td>
+                    <td></td>
+                    <td>0</td>
+                    <td>8 Bit</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td>32</td>
+                    <td>7 Bit</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td></td>
+                    <td></td>
+                    <td>64</td>
+                    <td>6 Bit</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td>96</td>
+                    <td>5 Bit</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <th>7</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>dezimal</th>
+                    <th>Anzahl der Stoppbits</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>0</td>
+                    <td>1 Stoppbit</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>128</td>
+                    <td>2 Stoppbit</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die Bit-Funktionen des Kontrollregisters</figcaption>
+        </figure>
+
+        <p>Das zweite Byte wird in das Befehlsregister geschrieben und bestimmt mit Bit 0 die Art des Handshake-Betriebs. Die darauffolgenden drei Bit sind von untergeordneter Bedeutung. Mit Bit 4 wird die Übertragungsart und über die Bits 5,6 und 7 die Parität bestimmt (siehe Tabelle 2).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit</th>
+                    <th>0</th>
+                    <th></th>
+                    <th></th>
+                    <th>dezimal</th>
+                    <th>Handshake</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td></td>
+                    <td></td>
+                    <td>0</td>
+                    <td>3-Draht-Handshake</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td>1</td>
+                    <td>X-Draht-Handshake</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <th>4</th>
+                    <th></th>
+                    <th></th>
+                    <th>dezimal</th>
+                    <th>Übertragungsart</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td></td>
+                    <td></td>
+                    <td>0</td>
+                    <td>Vollduplex</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                    <td>16</td>
+                    <td>Halbduplex</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <th>7</th>
+                    <th>6</th>
+                    <th>5</th>
+                    <th>0</th>
+                    <th>Paritätsprüfung</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>keine Paritätsprüfung<br>kein 8. Datenbit</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>32</td>
+                    <td>ungerade Parität</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>96</td>
+                    <td>gerade Parität</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>160</td>
+                    <td>8. Datenbit immer 1<br>keine Paritätsprüfung</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>224</td>
+                    <td>8. Datenbit immer 0</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Bit-Belegung des Befehlsregisters</figcaption>
+        </figure>
+
+        <p>Selbstverständlich können bei der Datenübertragung mit der RS 232-Schnittstelle Fehler vorkommen. Dafür gibt es das sogenannte Status-Register, das allerdings nach dem Auslesen sofort gelöscht wird. Man sollte diese Statusvariable ST immer in einer Variablen ablegen. Die Bedeutung der einzelnen Bits der Statusvariablen ST sind der Tabelle 3 zu entnehmen.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit</th>
+                    <th>Beschreibung</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Paritätsfehler</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Rahmenfehler</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Empfängerbuffer voll</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Empfängerbuffer leer</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>CTS (Clear To Send) Signal fehlt</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>unbenutzt</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>DSR (Data Set Ready) Signal fehlt</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Break-Signal empfangen</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Die Statusvariablen ST</figcaption>
+        </figure>
+
+        <p>Das Kontrollregister, das Befehlsregister und die Statusvariable kann man auch direkt aus der Zeropage auslesen. Für die RS232-Schnittstelle sind die Adressen $0A0F Hex bis $0A1B Hex wichtig (siehe Tabelle 4).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Hex</th>
+                    <th>Dezimal</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>0A0F:</td>
+                    <td>2575</td>
+                    <td>RS-232<br>NMI Status Register</td>
+                </tr>
+                <tr>
+                    <td>0A10:</td>
+                    <td>2576</td>
+                    <td>RS-232<br>Kontrollregister</td>
+                </tr>
+                <tr>
+                    <td>0A11:</td>
+                    <td>2577</td>
+                    <td>RS-232<br>Kommandoregister</td>
+                </tr>
+                <tr>
+                    <td>0A12:</td>
+                    <td>2578 &ndash; 2579</td>
+                    <td>RS-232<br>Benutzer Baud-Rate</td>
+                </tr>
+                <tr>
+                    <td>0A14:</td>
+                    <td>2580</td>
+                    <td>RS-232<br>Statusregister</td>
+                </tr>
+                <tr>
+                    <td>0A15:</td>
+                    <td>2581</td>
+                    <td>RS-232<br>Anzahl der zu sendenden Bits</td>
+                </tr>
+                <tr>
+                    <td>0A16:</td>
+                    <td>2582 &ndash; 2583</td>
+                    <td>RS-232<br>Baud-Rate: Full Bit Time (in &micro;s)</td>
+                </tr>
+                <tr>
+                    <td>0A18:</td>
+                    <td>2584</td>
+                    <td>RS-232<br>Index auf den Anfang des Eingabepuffers</td>
+                </tr>
+                <tr>
+                    <td>0A19:</td>
+                    <td>2585</td>
+                    <td>RS-232<br>Index auf das Ende des Eingabepuffers</td>
+                </tr>
+                <tr>
+                    <td>0A1A:</td>
+                    <td>2586</td>
+                    <td>RS-232<br>Index auf den Anfang des Ausgabepuffers</td>
+                </tr>
+                <tr>
+                    <td>0A1B:</td>
+                    <td>2587</td>
+                    <td>RS-232<br>Index auf das Ende des Ausgabepuffers</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. RS232-Adressen in der Zeropage</figcaption>
+        </figure>
 
         <p>Daß ein Programm für die RS232-Schnittstelle nicht umfangreich sein muß, beweist unser kleines C 128-Terminalprogramm (siehe Listing). Mit ihm kann mit jeder Mailbox kommuniziert werden.</p>
 
-        <p>Leider ist der Basic 7.0 Interpreter etwas langsamer als der Dateneingang über die RS232-Schnittstelle. Wenn kontinuierlich Daten hereinkommen, läuft der Datenpuffer nach einiger Zeit über, weil der Computer mit dem Auslesen nicht mehr nachkommt. Die Folge ist, daß der Text plötzlich unleserlich wird. Erst wenn der Partnercomputer eine Pause macht, kann die Basicsen, für die der Speicher des C64 zu klein war.</p>
+        <p>Leider ist der Basic 7.0 Interpreter etwas langsamer als der Dateneingang über die RS232-Schnittstelle. Wenn kontinuierlich Daten hereinkommen, läuft der Datenpuffer nach einiger Zeit über, weil der Computer mit dem Auslesen nicht mehr nachkommt. Die Folge ist, daß der Text plötzlich unleserlich wird. Erst wenn der Partnercomputer eine Pause macht, kann die Basic-Routine nach einem Moment wieder »vernünftigen« Text liefern.</p>
+
+        <p>Wesentlich mehr Komfort und Geschwindigkeit bringen in Maschinensprache geschriebene Terminalprogramme. Da nur kleine Änderungen der Speicheradressierung vorzunehmen sind, wird sicherlich demnächst mit mehreren Datenfernübertragungsprogrammen zu rechnen sein, die auch im C 128-Modus des Commodore 128 laufen. Nur steht diesen dann wesentlich mehr Speicherplatz für die Protokollführung zur Verfügung. Dann kann man sich mit dem C 128 Programme übertragen lassen, für die der Speicher des C 64 zu klein war.</p>
 
         <address class="author">(zu)</address>
 
         <p class="source">Quelle: Commodore 128 Intern von Data Becker, ISBN 3-89011-098-3<br>
-            Das Commodore 128 Handbuch von Markt&Technik. Verlag, ISBN 3-89090-171-9</p>
+            Das Commodore 128 Handbuch von Markt&Technik Verlag, ISBN 3-89090-171-9</p>
 
 
-        <p></p>
+        <figure>
+            <pre data-filename="terminalprg 128" data-name="C 128-Terminalprogramm"></pre>
+            <figcaption>Listing. Ein Terminalprogramm für den C 128</figcaption>
+        </figure>
+
     </article>
 </body>
 

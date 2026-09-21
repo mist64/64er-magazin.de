@@ -646,6 +646,51 @@ def page_range(pages):
     return "[" + ", ".join(f"{a}-{b}" if a != b else str(a) for a, b in runs) + "]"
 
 
+
+# --- a numbered list arrives from OCR as ONE PROSE BLOB ---------------------
+#
+# A column of body text is what the OCR sees, so `1. ... 2. ... 3. ...` comes
+# back as a single paragraph.  Emitted verbatim, Discount then promotes
+# whichever item happens to fall at a LINE START into an <ol> and leaves the
+# rest inline -- and which item that is depends on arbitrary soft-wrapping, so
+# the damage is random.  The survivor renders as "1." however far down the list
+# it really was, and the reader sees "1. 2. 1.".
+# MEASURED on SH8601: 4 lists in `139 Tips und Tricks`, and 16 across 7 issues
+# of the published corpus.
+#
+# Breaking each marker onto its own line is all Discount needs to see the whole
+# list.  The guard is deliberately tight, because a false positive INVENTS a
+# list where the magazine printed prose:
+#   * at least two markers, and
+#   * they ascend by exactly one, starting at 1, and
+#   * each is followed by a capital (an item, not "1. Januar" mid-sentence).
+NUM_ITEM = re.compile(r'(?:(?<=\s)|^)(\d{1,2})\.\s+(?=[A-ZÄÖÜ])')
+
+def split_numbered_list(text):
+    """`1. A 2. B 3. C` -> one line per item, so Discount makes ONE <ol>.
+
+    An INTRO sentence before item 1 is separated by a BLANK line, not a single
+    newline: under `-G` a single newline is only a <br/>, so without the blank
+    line the items stay inside the paragraph and no <ol> is produced at all.
+    MEASURED: SH8601's `... gibt es 3 Möglichkeiten: 1. EXIT: ... 2. UNTIL: ...`
+    produced 0 <ol> until the blank line was added, while the list that begins
+    at item 1 converted fine -- so testing only the second shape would have
+    shipped a fix that works half the time.
+    """
+    hits = list(NUM_ITEM.finditer(text))
+    if len(hits) < 2:
+        return text
+    nums = [int(h.group(1)) for h in hits]
+    if nums[0] != 1 or nums != list(range(1, len(nums) + 1)):
+        return text
+    intro = text[:hits[0].start()].strip()
+    items = []
+    for i, h in enumerate(hits):
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(text)
+        items.append(text[h.start():end].strip())
+    body = "\n".join(items)
+    return (intro + "\n\n" + body) if intro else body
+
 def render_article(article):
     chunks = [f'# {article["title"]} {page_range(article["pages"])}']
     source = []
@@ -672,7 +717,7 @@ def render_article(article):
             # heading inside this one
             chunks.append("## " + text)
         else:
-            chunks.append(ROLE_PREFIX.get(role, "") + text)
+            chunks.append(ROLE_PREFIX.get(role, "") + split_numbered_list(text))
     flush()
     return "\n\n".join(chunks)
 

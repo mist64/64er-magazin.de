@@ -1,0 +1,46 @@
+
+
+;shape_spr-koll.prg ==4001==
+   10 rem ***** kollision von sprites und shapes *****
+   20 rem ***** shapes zu sprites umwandeln *****
+   30 rem********** multicolor-sprites **********
+   40 color0,1:color1,6:color2,2:color3,3:color4,1:color5,2
+   50 graphic3,1:circle1,5,10,5,10:box2,0,0,10,20:draw3,0,10to10,10
+   60 draw3,5,0to5,20
+   70 sshapea$,0,0,11,20
+   80 sprsava$,1:sprcolor6,3:movspr1,100,100:sprite1,1,2,0,0,0,1
+   90 sleep2
+  100 rem********** normaler hiressprite **********
+  110 graphic1,1:circle1,50,10,10,10:circle1,50,10,7,7:circle1,50,10,4,4
+  120 sshapeb$,40,0,63,20:gshapea$,0,0
+  130 sprsavb$,2:movspr2,200,200:sprite2,1,6
+  140 movspr1,0#4:movspr2,90#8
+  150 sleep2
+  160 rem********** loeschen der strings **********
+  170 clr
+  180 rem********** uebertragen von sprites in shapes **********
+  190 sprsav1,a$:sprsav2,b$
+  200 gshapea$,150,100:gshapeb$,200,100
+  210 rem********** steuern von sprite 1 **********
+  220 char1,20,0,"joystick port 2"
+  230 rem********** kollision m. shapes **********
+  240 movspr1,0#0
+  250 x=rsppos(1,0):y=rsppos(1,1):i=6:j=3
+  260 collision2,370
+  270 onjoy(2)gosub290,300,310,320,330,340,350,360
+  280 goto270
+  290 y=y-2:movspr1,x,y:return
+  300 x=x+1:y=y-1:movspr1,x,y:return
+  310 x=x+2:movspr1,x,y:return
+  320 x=x+1:y=y+1:movspr1,x,y:return
+  330 y=y+2:movspr1,x,y:return
+  340 x=x-1:y=y+1:movspr1,x,y:return
+  350 x=x-2:movspr1,x,y:return
+  360 x=x-1:y=y-1:movspr1,x,y:return
+  370 collision2
+  380 i=i+1:ifi>16theni=1
+  390 j=j+3:ifj>16thenj=1
+  400 sprcolori,j
+  410 collision2,370
+  420 return
+

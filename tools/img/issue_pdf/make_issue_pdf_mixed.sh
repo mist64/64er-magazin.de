@@ -55,7 +55,11 @@ ICC="$(ls -1 /opt/homebrew/Cellar/ghostscript/*/share/ghostscript/iccprofiles/sr
 CACHE="$IN/.ocrcache"
 LOG="${OUT%.pdf}.build.log"
 LIMIT=$((100*1000*1000))
-QMIN=84; QMAX=97                 # guetzli's own floor is 84; it refuses to go below
+# guetzli's own floor is 84; it refuses to go below.  BOTH ARE OVERRIDABLE so a
+# comparison build can be PINNED to the q an earlier build already landed on --
+# QMIN=95 QMAX=95 does one encode instead of a four-step binary search, which is
+# hours of guetzli.  The search is still the default and still what a keeper gets.
+QMIN="${QMIN:-84}"; QMAX="${QMAX:-97}"
 NCPU="$(sysctl -n hw.ncpu)"
 AUTHOR="Markt & Technik"
 CREATOR="tesseract 5 + guetzli + jbig2enc + pikepdf"
@@ -79,6 +83,41 @@ for f in "$IN"/[0-9][0-9][0-9].png "$IN"/[0-9][0-9][0-9].tiff; do
   b="$(basename "$f")"; pages="$pages ${b%.*}"
 done
 pages=$(printf '%s\n' $pages | sort -u)
+
+# ---- THE COVER IS THE HAND-MADE FILE, AND THIS BUILD MUST PROVE IT ------------------------------
+# This script does not build the 150 dpi pages -- it consumes the cache make_issue_pdf.sh left
+# behind.  So a cache built without the cover silently ships a machine reduction of the cover
+# master as page 1.  MEASURED on SH8601: exactly that shipped, and every verification passed,
+# because the derived page has the same size (1240x1754) and the same codec as the real cover.
+# Compare the PIXELS.  Shape proves nothing here.
+TITLE_PNG="${TITLE_PNG:-$IN/title.png}"
+first="$(echo $pages | awk '{print $1}')"
+if [[ -f "$TITLE_PNG" ]]; then
+  # `magick compare` EXITS NON-ZERO WHENEVER THE IMAGES DIFFER, which is the
+  # normal case here -- and under `set -euo pipefail` that killed this script
+  # silently, printing nothing after the header.  The guard must report the
+  # mismatch, never become the mismatch.  MEASURED: two builds died this way,
+  # exit 1, empty log, no PDF.
+  # Threshold in GREY LEVELS, from the normalised figure compare prints in
+  # parentheses -- the raw number is on an unrelated scale and `> 1` of it is
+  # ~0.005 of a level, which no real cover survives.  title.png may carry an
+  # alpha channel (SH8601's does: 0.54% of pixels non-opaque) that has to be
+  # flattened onto white before encoding, and flattening plus quantisation
+  # leaves ~0.01 of a level.  A MACHINE-DERIVED cover differs by ~24 levels --
+  # three orders of magnitude clear of this line.
+  mae=$( { magick compare -metric MAE "$TITLE_PNG" "$CACHE/${first}_150.png" null: 2>&1 || true; } \
+         | sed -n 's/.*(\([-+0-9.eE]*\)).*/\1/p' | awk '{print $1*255}')
+  mae="${mae:-999}"
+  if awk "BEGIN{exit !($mae > 2)}"; then
+    echo "cached page $first does not carry $TITLE_PNG ($mae grey levels)" >&2
+    echo "  rebuild the cache with the cover:  TITLE_PNG=$TITLE_PNG make_issue_pdf.sh $IN ..." >&2
+    exit 1
+  fi
+  echo "[cover] page $first carries $TITLE_PNG ($mae grey levels)"
+elif [[ "${COVER_OPTIONAL:-0}" != "1" ]]; then
+  echo "no cover at $TITLE_PNG -- see make_issue_pdf.sh; COVER_OPTIONAL=1 to build without one" >&2
+  exit 1
+fi
 echo "pages: $(echo $pages | wc -w)"
 
 src_of() { if [[ -f "$IN/$1.png" ]]; then echo "$IN/$1.png"; else echo "$IN/$1.tiff"; fi; }

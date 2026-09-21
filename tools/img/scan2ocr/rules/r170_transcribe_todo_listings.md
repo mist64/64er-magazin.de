@@ -49,7 +49,8 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')
 magick "$SRC/<NNN>.png" -crop <W>x<H>+<X>+<Y> +repage /tmp/64er_<YYMM>_listing.png
 ```
 
-The bbox is in the master's pixels. The master is deskewed and A4-cropped and
+The bbox is in the master's pixels. The master is deskewed and cut to the sheet's own traced edges (exact A4 is
+the delivered PDF, not the master) and
 the delivered PDF page is neither, so the two spaces differ by a rotation and an
 offset — cropping these coordinates out of a `pdftoppm` render lands in the
 wrong place. See r000, "page block index".

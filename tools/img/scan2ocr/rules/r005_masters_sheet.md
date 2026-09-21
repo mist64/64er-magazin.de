@@ -14,14 +14,89 @@ This is a **program step**: the orchestrator runs it, checks the exit status and
 runs the Verification block below. There is no editorial judgement in it and
 nothing to dispatch.
 
+## The first action — TWO QUESTIONS, asked before anything is graded
+
+Step 005 is the chain's first step, and **its first action is to ask**. Two
+properties of the physical copy decide everything below; neither can be
+recovered from the pixels; and guessing either produces a **plausible-looking
+wrong result that nothing downstream can see**:
+
+| question, in the owner's terms | descriptor key | what it decides |
+|---|---|---|
+| **How is this issue bound?** A3 sheets held with **clips**, or A4 sheets torn off a **glued** spine? | `binding` | the **edge maths** — which variant of step 005 runs |
+| **Which pages are printed on which paper?** the good white stock, or the cheap interior stock? | `paper` | the **grade**, per page |
+
+If the descriptor carries no answer, the step prints the question — both options
+in one line each, the evidence for answering it, and the JSON to paste back —
+and **exits non-zero having written nothing**. No scan is opened, no output
+directory is made. `first_action()` runs before the page list is even parsed.
+
+**This is the ONE thing step 005 refuses over.** Everything else — parity, skew
+residual, page class, canvas fit, every number the grade reports — it publishes
+and *notes*, because everything else is a defect of a page that a human can see
+in the artefact it published (see *A failed page leaves nothing publishable
+behind*). An unanswered question is not a page defect and not a measurement: it
+is a decision only the owner can make, with the copy in hand.
+
+The two questions are asked **together**, and they are asked **before the
+variant is chosen** — they are questions about the *issue*, they are the same
+two whichever variant ends up running, and a descriptor with no `binding` cannot
+be routed to a variant at all. The `binding != "sheet"` check ("this issue
+belongs to `r005_masters_spread`") is the second half of the same function, and
+runs after them.
+
+### What the step offers as evidence
+
+For the paper question it measures both of these on the 150 dpi thumbs, about
+0.1 s a page — cheap enough to print for the whole issue, so the question comes
+with the means to answer it rather than as a bare demand:
+
+- **which pages took the ink-vs-bed edge finder** — the fraction of the frame's
+  rows/columns that this issue's paper white can see, below
+  `FULLBLEED_PAPER_FRAC`. This is the strongest signal the step has, and it is
+  **one-sided**: it finds pages whose stock the paper mask is *blind* to, which
+  is the same fact that makes the grade wrong on them. A good stock the mask
+  happens to see will not show up, which is why the answer is the owner's and
+  not this measurement's.
+- **each page's own white** — the `STOCK_PCT` percentile of its non-bed pixels,
+  printed against the low profile's `W`. On SH8601 the eight non-interior pages
+  read 240–250 across the board; the interior reads 217 192 179.
+
+The step pre-fills `high_pages` with what the edge-finder evidence points at and
+says, in the output, that it is a guess to be checked against the copy.
+
+### The answer, recorded
+
+```json
+"binding": "sheet",
+"paper": {
+  "high": null,
+  "low":  "/Users/mist/DNB/SH8601/master_2400/SH8601/colors.txt",
+  "high_pages": [1, 2, 147, 148, 149, 150, 151, 152] }
+```
+
+`null` means **the built-in anchor set** (`BUILTIN_ANCHORS`, `W 201 195 188`,
+identity levels) — not "missing". A path that does not exist is a **loud
+error**, not a fallback: the whole point of the map is that nothing is graded
+against numbers nobody chose. Validation lives in `r000_issue.py` and every
+failure is a `SystemExit` — unknown key, wrong type, a page number outside
+`1..pages`, a duplicate, or a descriptor carrying both `paper` and the legacy
+`colors`.
+
+SH8601's answer is above: **1, 2, 147, 148** (the folded A3 cover wrapper) and
+**149–152** (the bound-in Zahlkarte) are high quality; the other 144 pages are
+the interior stock.
+
 ## The two variants, and why the suffix is not an insertion
 
 Step 005 exists in two **mutually exclusive** variants, chosen by the issue
-descriptor's `binding`:
+descriptor's `binding` — which is **asked for** as the first action above, never
+assumed. The field existed before the question did, and an absent or wrong value
+selected the wrong edge maths in silence:
 
 | variant | the frame holds | inner boundary |
 |---|---|---|
-| `r005_masters_spread` | half of a clipped **SPREAD** (8610, the monthlies) | the fold: a line through the binder-clip holes matched to the clip's 3-pair template; the neighbour's colour boundary as the fallback; the holes filled white |
+| `r005_masters_spread` | a clipped **SPREAD** (8609, the monthlies) | facing-page colour boundary, clip holes as fallback, holes inpainted |
 | `r005_masters_sheet` | one loose **SHEET** (SH8601) | the torn fringe: traced on a verso, a flush vertical cut on a recto |
 
 **The suffix names the variant. It is not a step inserted after another one.**
@@ -55,7 +130,9 @@ nothing to fill, which is why the two variants exist at all.
 ## Inputs
 
 - the issue descriptor, `issues/<ISSUE>/issue.json`, read through
-  `r000_issue.py` — `scan_dir`, `thumb_150`, `tmp`, `colors`, `binding`, `pages`
+  `r000_issue.py` — `scan_dir`, `thumb_150`, `tmp`, `pages`, and the two
+  **answers**, `binding` and `paper` (`paper.low` replaces the old whole-issue
+  `colors`, which still loads for an issue that has not been migrated)
 - `tools/img/cmyk_reconstruction/target/release/cmyk_reconstruction`, built
   (`cargo build --release` in `tools/img/cmyk_reconstruction`)
 - the ICC pair in `tools/img/`: `USWebCoatedSWOP.icc`, `AdobeRGB1998.icc`
@@ -71,8 +148,7 @@ python3 r005_masters_sheet.py            # every page in the descriptor
 python3 r005_masters_sheet.py 6 41 56 92 # named pages
 ```
 
-The only per-issue knob is `ISSUE` at the top of `r000_issue.py`, which the
-program imports (`from r000_issue import ISSUE`). No CLI
+The only per-issue knob is `ISSUE = "SH8601"` at the top of the program. No CLI
 flags, no environment knobs — every path is derived from the descriptor. Page
 numbers are positional purely so the work can be split across processes, exactly
 as in `r010`.
@@ -87,37 +163,34 @@ directory mixing two runs is not something any downstream check can see.
 ## Outputs
 
 ```
-<tmp>/masters600/NNN.png         the master — r010 OCRs it, r145 cuts from it   (the contract)
-<tmp>/masters600/NNN.stamp.txt   which profile made that master
-<tmp>/sheets600/NNN.png          the levelled, graded, UNCUT sheet at 600 dpi
-<tmp>/masters2400/NNN.png        the same at 2400 — a figure that bleeds off the trim still exists here
-<tmp>/cmyk2400/NNN.tif           the CMYK archival form, deflate-compressed
-<tmp>/cmyk2400/NNN.colors.txt    the profile the separator was actually run with
+<tmp>/masters600/NNN.png         the OCR master — r010 reads this   (the contract)
+<tmp>/masters600/NNN.stamp.txt   which profile and which curve made that master
+<tmp>/figures600/NNN.png         the figure master — r145 reads this
+<tmp>/cmyk2400/NNN.tif            the CMYK archival form, deflate-compressed
+<tmp>/cmyk2400/NNN.colors.txt     the profile the separator was actually run with
 <tmp>/debug600/NNN.png           the overlay: the four traced lines, in green
 ```
 
 `<tmp>/masters600` is derived by `r000_issue.py`, because it is the contract the
-rest of the chain depends on. The other four directories are this step's own
+rest of the chain depends on. The other three directories are this step's own
 workings and are named in this step. `r010` and `r145` build their paths from
-the page number, so the sidecars and the other renders sit beside the images
-they describe without disturbing anything that counts files.
+the page number, so the two sidecars sit beside the images they describe without
+disturbing anything that counts files.
 
-Every master defaults to the **same size** — 231 × 304 mm at 600 dpi, 5457 ×
-7181 px, grown only for the rare page whose trace overflows it (see below) —
+Every master is the **same size** — 231 × 304 mm at 600 dpi, 5457 × 7181 px —
 because `r010`'s block geometry and `r145`'s figure crops share one coordinate
 system. If each page had its own width, a block's page-fraction would mean
 something different on every page. The traced page is anchored at its own
 top-left **trim corner** and the shortfall is paper white.
 
 The canvas is **derived** from the widest and tallest entry in `PAGE_CLASSES`,
-not measured separately — for **any** class, not only for A4 — so it fits every
-class without two independent numbers that could quietly disagree and truncate
-a page. A page that still does not fit it — the whole levelled sheet published
-`NOT CROPPED`, for instance — grows the canvas to fit itself and says so in its
-stamp, rather than being truncated. The price of the shared canvas is 15 mm of
-extra fabricated white on the right of the 145 pages that are A4: the cover
-leaf's fold flap has to fit, and a canvas per class would break the one thing
-`r010` and `r145` rely on.
+not measured separately, so a page that passes the size gate cannot overflow it
+— for **any** class, not only for A4. Two independent numbers there would
+eventually disagree and truncate a page quietly; as it is, an overflow is
+impossible and the step refuses one anyway rather than cropping. The price is
+15 mm of extra fabricated white on the right of the 145 pages that are A4: the
+cover leaf's fold flap has to fit, and a canvas per class would break the one
+thing `r010` and `r145` rely on.
 
 ## The procedure
 
@@ -127,8 +200,7 @@ scan_dir/NNN.png
   -> paper mask: distance from the profile's paper white
   -> is there enough paper here to trace from?          [picks the edge finder]
   -> check the torn side against parity                     [the parity gate]
-  -> rotate to level, then RE-MEASURE the residual; still too high after one
-     retry, NOTE it and publish anyway
+  -> rotate to level, then RE-MEASURE the residual and assert it is ~0
   -> TRACE each page edge as a line, robustly:
        PAPER vs BED, 144 pages:
          clean edges  -> band MEDIANS of the per-row/col paper boundary
@@ -138,18 +210,74 @@ scan_dir/NNN.png
        INK vs BED, the 8 pages not printed on this issue's paper:
          all four edges -> band MEDIANS of the sheet's own boundary against
                            the bed, the sheet found as one connected region
-  -> fill everything outside the traced page with paper white -- AFTER the
-     2400 dpi separation, on the 600 dpi reduce, not before it
+  -> fill everything outside the traced page with paper white
   -> drop bed components that touch the frame AND lie mostly outside the page
-  -> the traced page is checked against PAGE_CLASSES -- no match publishes
-     NOT CROPPED instead of a crop
-  -> separate to CMYK with tools/img/cmyk_reconstruction at 2400, UNDO its GCR
-     (printed black is all four inks, not K alone — that is why type is black)
-  -> ONE render, uncurved: masters2400, reduced 4:1 to sheets600, cut to the
-     traced page -> masters600
-  -> masters600/NNN.png + NNN.stamp.txt, sheets600/NNN.png, masters2400/NNN.png,
+  -> the traced page must match one of PAGE_CLASSES          [the size gate]
+  -> separate to CMYK with tools/img/cmyk_reconstruction     [not reimplemented]
+  -> two renders off that ONE separation: masters600 carries the black-point
+     curve, figures600 does not
+  -> masters600/NNN.png + NNN.stamp.txt, figures600/NNN.png,
      cmyk2400/NNN.tif + NNN.colors.txt, debug600/NNN.png
 ```
+
+### The fill: MIRROR the page into the band, do not paint a constant
+
+**This is the older process's rule, ported here because it never was.** The
+scan2mrc crop step fills a band that reaches the page border by **reflecting the
+page's own pixels into it**, and only paints where reflection is not defensible.
+Its two constants are the whole rule:
+
+```
+MIRROR_MAX_PX = 1200        # @2400 dpi = 12.7 mm
+```
+
+> *Beyond this distance from any known pixel, DO NOT MIRROR — fill with the
+> page's own paper. Mirroring assumes the page plausibly continues just past the
+> crop, which is true for a matte band. It is false for a large void: p003/p004
+> are bound-in reply cards narrower than A4, so ~44% of the page has no sheet
+> behind it at all, and reflecting there fabricates a mirrored copy of the card
+> — which reads as real content and is worse than the black it replaced.*
+
+And the fallback colour is **measured, not assumed**: the median of the KNOWN
+pixels in the lightest quartile, per page, so a cream stock or a colour cast
+fills with its own white rather than with 255.
+
+**Both halves matter, and the second one is the one this chain gets wrong
+today:** step 005 fills outside the traced page with the profile's `W` and the
+A4 window pads with a literal `255`.
+
+**Why SH8601 was NOT re-run to change this, measured rather than argued.** On
+the delivered 150 dpi pages the fabricated strip is **0.0–1.4 mm**, and the real
+graded paper immediately inside it sits at **p50 255, sd 2.3–4.8** — this
+issue's grading already maps its paper to pure white, so a mirrored strip and a
+painted strip differ by under three grey levels on a band a millimetre wide, and
+the issue's 48 bilevel pages threshold both to the same white. Re-grading,
+re-cutting and rebuilding a 152-page PDF for that is not worth it.
+
+**It is worth it where the paper still has tone.** A matte or cream stock, a
+band left by a deep cut into the fringe (this issue's deepest real cut is ~8 mm,
+well inside the 12.7 mm cap), or any issue delivered without this issue's
+aggressive white point will show a flat band against textured paper. Implement
+the mirror there, with the cap and the measured-paper fallback, and record which
+of the two filled each band.
+
+### THE MASTER KEEPS THE PAPER'S OWN SIZE — A4 IS A DELIVERY CONVENTION
+
+**DECIDED 2026-08 by the issue owner: keep.** `masters600/NNN.png` stays at
+whatever the sheet physically measures; exact A4 is imposed later, by step 005b's
+window, and only on what ships.
+
+The question was whether to make the master itself exact A4 so every later step
+inherits one geometry. It is tempting — it would remove a class of downstream
+arithmetic — and it is wrong, for the same reason print typos stay: **the master
+is the record of the paper.** SH8601's interior sheets run 209.2-212.1 x
+296.0-298.6 mm, the cover leaf is 223 mm wide with its fold flap, and the
+Zahlkarte is 144 x 205 mm. "This sheet measures 211.4 mm" is a fact about the
+object; A4 is a decision about the delivery. Overwriting the first with the
+second discards evidence to save arithmetic.
+
+It would also have cost a re-run of r010, r020 and r030 on an issue already
+verified — a real price for a change that improves nothing the reader sees.
 
 ### Why the edges are TRACED and not cropped to
 
@@ -168,9 +296,8 @@ that nobody later reads a clean margin as evidence about the copy.
   `PIL.Image.rotate` (which applies) turn in opposite directions. Getting the
   sign wrong **doubled** the skew on p056, to −1.28 deg, and every downstream
   geometry check still passed because nothing re-measured. The step therefore
-  re-measures the residual on the levelled page and, if it exceeds
-  `SKEW_RESIDUAL_MAX`, re-levels once from the corrected angle; if the residual
-  is still over the limit after that it is NOTED and the page publishes anyway.
+  re-measures the residual on the levelled page and fails if it exceeds
+  `SKEW_RESIDUAL_MAX`.
 - **Per-column extremes are not an edge.** "The last paper row in this column"
   is dragged outward by a few paper-coloured pixels in the bed transition and
   left **3.8 mm of bed** at the foot of p056. Clean edges come from the band
@@ -253,6 +380,15 @@ lie about *why* the page is different and would not survive a re-scan;
 `FULLBLEED_PAPER_FRAC` sits at 0.10, in the middle of a gap five times its own
 width.
 
+The **grade** on those eight pages is a page number, and deliberately so: it
+comes from the descriptor's `paper.high_pages`, which is the owner's answer and
+not a measurement. There is nothing to defer to — the paper mask cannot see that
+stock at all, which is the same fact that makes the grade wrong there. The two
+are cross-checked every page: a page that takes the ink-vs-bed finder while the
+map calls it `low` (or the reverse) gets a `PAPER MAP:` note in its log line and
+in its stamp. A **note**, never a refusal — the map is the answer and this step
+does not overrule it.
+
 Two things had to be got right:
 
 - **Fill the holes.** A photograph's own blacks are as dark as the bed. They are
@@ -270,12 +406,11 @@ Where the sheet runs off the side of the frame the samples are a constant 0 (or
 scan does not contain the trim, so the traced width is a **lower bound** on the
 leaf, not a measurement of it.
 
-## The size classes — three of them, measured
+## The size gate — three classes, measured
 
 A traced page must come out one of the sizes **this issue actually has**. A page
-that matches none of them means a traced line ran away, and it is published
-uncropped — the whole levelled sheet, `NOT CROPPED` in its stamp — rather than a
-crop that might be wrong.
+that matches none of them means a traced line ran away, and the fill would then
+be eating type rather than bed.
 
 | class | window | what lands there |
 |---|---|---|
@@ -294,139 +429,168 @@ scans, and on both the sheet runs off the side of it.
 **The Zahlkarte is a payment card** (Zahlkarte/Postüberweisung) printed blue on
 a white card, bound into the back of the issue. It is an A5 leaf (148 × 210 mm)
 with the frame cutting a few mm off two of its edges. It is genuinely not an A4
-page and **not a defect**, so it passes as its own class rather than being
-measured against a window written for a different piece of paper.
+page and **not a defect**, so it passes as its own class rather than failing a
+gate written for a different piece of paper.
 
 The tolerance is per class because the evidence behind each is: ~145 pages for
 A4, four for the card, one for the cover leaf. Two interior pages fall outside
 every window — 007 and 117 — and both are trace failures rather than sizes this
 issue has; see *Known outliers*.
 
-## The profile is MEASURED for this issue's paper, never defaulted
+## The grade — call the converter, render twice
 
-`"colors": null` is not "no profile". It is `BUILTIN_ANCHORS` with identity
-level lines, and that set's `W 201 195 188` is a statement about somebody
-else's paper. `W` is the **density reference**: the separation works in
-`d = -log10(rgb/W)`, so paper lighter than `W` clamps to zero ink and paper
-darker than `W` in any channel **IS ink**. A `W` above the issue's real paper
-does not cast the page — it greys it, and the stock's grain comes through as
-a tint. MEASURED on 8610's 150 dpi thumbs against that built-in `W`: **62 % of
-p036's paper pixels and 80 % of p150's are darker than it in some channel.**
-That is what defaulting costs, and nothing downstream reports it.
+The separation is **not reimplemented here**.
+`tools/img/cmyk_reconstruction` already does the hard part and `colors.txt` was
+written for it: 8 RGB anchors (W C M Y R G B K) plus 4 per-ink level lines. It
+works in the DENSITY domain — `d = -log10(rgb/W)`, six polynomial features, a
+least-squares solve against the seven ink targets, then full GCR
+(`K = min(C,M,Y)`, subtracted from each). Because the paper white is the density
+reference, the scan's global R/B 1.163 cast falls out for free.
 
-**So measure `W` first.** Pool paper pixels over every interior thumb — `lum >
-170` and `max − min < 40`, inside the body box so the bed and the prop are out
-of it — and read a low per-channel percentile off the pool:
-
-```bash
-cd tools/img/scan2ocr/rules
-python3 - <<'PY'
-import numpy as np
-from PIL import Image
-import r000_issue, r005_masters_sheet as R
-iss = r000_issue.load(R.ISSUE)
-pool = []
-for p in iss.page_range:          # INTERIOR pages only: a cover leaf or a
-    a = np.asarray(Image.open(    # bound-in card is another stock entirely
-        f"{iss.thumb_150}/{p:03d}.png").convert("RGB"), float)
-    h, w, _ = a.shape
-    b = a[int(.12 * h):int(.88 * h), int(.10 * w):int(.90 * w)].reshape(-1, 3)
-    pool.append(b[(b.mean(1) > 170) & (b.max(1) - b.min(1) < 40)])
-pool = np.concatenate(pool)
-for q in (0.5, 1, 2, 5, 10, 50):
-    print("p%-4s" % q, np.percentile(pool, q, axis=0).round().astype(int))
-PY
+```
+cmyk_reconstruction --colors <profile> <in.png> <out.tiff>
+magick <out.tiff> -profile USWebCoatedSWOP.icc -profile AdobeRGB1998.icc <rgb.png>
 ```
 
-8610's pooled paper, all 196 interior thumbs:
+### Two papers, two profiles
 
-| | p0.5 | p1 | p2 | p5 | p10 | p50 |
-|---|---|---|---|---|---|---|
-| R G B | 173 170 165 | 176 172 167 | **180 174 170** | 187 180 174 | 193 184 178 | 204 194 190 |
+**One white point cannot serve two stocks.** `W` is the *density reference*:
+`d = -log10(rgb/W)`. Grade a good white sheet against a profile measured off
+yellowed paper and every light tone is reported as carrying **less ink than it
+does** — highlights clamp to zero — and mid-tone hue skews, because each channel
+is normalised by a differently wrong number.
 
-**Which percentile is itself a measurement, not a constant.** SH8601 settled at
-**p5**, `209 175 157` on its own yellowed stock — and not on the first try: the
-profile was re-measured mid-build from `214 195 186`, which left four already
-graded masters silently stale (*The stamp*) and forced every mask that reads
-the paper to be re-measured with it (*The parity gate*, where the same
-re-measurement moved the agreeing pages' floor from 1.6 to 2.5). On 8610 p5 was
-still too high — over bare paper the separation's residual read **C 27 % M 14 %
-Y 6 % K 5 % at p99**, the darkest tenth of the paper standing as a cyan-biased
-speckle. **p2** (`180 174 170`) took the same band to white: on p006's blank
-band the pure-white share went **90 % → 99.9 %** and paper p1 **239 239 244 →
-255 255 254** — and the type did not move with it, glyph p50 **26–33** and
-solid-black share **7–17 %** across pages 1–10.
+SH8601 was graded end to end with one profile, measured off the **interior**
+stock: `W 209 175 157` with `LC 5 100 / LM 4 100 / LY 5 100 / LK 3 100`. That
+white point is the *yellowed 5th percentile* of the interior paper and was
+chosen to stop yellow corners — the right answer for 144 pages and the wrong one
+for the other eight. Measured on p151, the white Zahlkarte, under that profile:
+**ink kept 0.36, dark contrast 91**, on a master that is excellent by eye. The
+step already said so in every log line; what it could not do was fix it, and the
+note in the code said the fix was *a second measured profile for that stock — a
+decision, not a looser constant here*.
 
-**The gate — run it on three test pages before committing the sweep.** A full
-issue is ~4 hours (8610, 200 pages, 6 lanes), so the profile is settled on
-three graded pages first, not discovered in the contact sheet afterwards:
+**That decision was taken.** The descriptor names a profile per paper class and
+`grade_for(page)` picks it per page:
 
-> **blank-paper p1 ≥ 250 AND glyph p50 ≤ 40.**
+| class | what it is | profile |
+|---|---|---|
+| `high` | white stock that was white when new — the folded cover wrapper, a bound-in card or insert | the **built-in anchor set**: `W 201 195 188, C 38 140 165, M 192 37 66, Y 201 159 61, K 16 17 17` and its overprints, with **identity levels** |
+| `low` | the cheap interior stock, yellowish-grey from the start and browner now | this issue's **measured** `colors.txt` |
 
-"Blank paper" is a band the page has no ink on at all; "glyph" is the pixels
-under lum 100 inside a body-text window. Both off the 600 dpi master:
+The built-in anchors are the eight the old separation compiled in, copied into
+`BUILTIN_ANCHORS` rather than imported (`scan2mrc` is retired and `scan2ocr` must
+not reference it). They are not a fallback here — they *are* the high-quality
+paper's profile, by the owner's decision: `W 201 195 188` is a white sheet, which
+is what a cover wrapper and a card are. The levels stay the identity because
+nobody has measured that stock; a level line is a per-ink contrast decision that
+must be measured, not guessed. Either class may name a `colors.txt` of its own
+once one is measured — `"high": null` is an answer, not a gap.
 
-```bash
-python3 - <<'PY'
-import numpy as np
-from PIL import Image
-import r005_masters_sheet as R
-Image.MAX_IMAGE_PIXELS = None
-BLANK = {"006": (600, 900, 3600, 1500)}   # px -- PICK a band this page has
-TYPE  = {"006": (14, 100, 58, 180)}       # no ink on; TYPE is check 6's
-                                          # window, mm from the trim corner
-for stem in sorted(BLANK):
-    m = Image.open(R.OUT_MASTER / f"{stem}.png")
-    a = np.asarray(m.crop(BLANK[stem]).convert("RGB"), float).reshape(-1, 3)
-    print(f"p{stem} blank paper p1", np.percentile(a, 1, axis=0).round().astype(int),
-          "| pure white %.1f%%" % (100 * (a.min(1) == 255).mean()))
-    g = np.asarray(m.crop(tuple(int(v * R.MM) for v in TYPE[stem])).convert("L"), float)
-    g = g[g < 100]
-    print(f"p{stem} glyph p50 %5.1f | solid black %.1f%%"
-          % (np.median(g), 100 * (g == 0).mean()))
-PY
+**The paper mask is a different question with a different answer.** It uses the
+**low** class's `W` on every page, including the high-quality ones, because its
+job is to find *this issue's own paper* against the bed and to notice the pages
+that are not on it — which is exactly what the ink-vs-bed switch reads. A mask
+that could see both stocks would see no difference between them and the switch
+would have nothing to switch on.
+
+An issue whose descriptor has no `paper` map is not graded at all: see *The
+first action*. The legacy whole-issue `colors` key still loads, for an issue not
+yet migrated, and means what it always meant.
+
+### One separation, two renders
+
+The two consumers want different images, so both come off **one** separation:
+
+| render | for | wants |
+|---|---|---|
+| `masters600/NNN.png` | `r010` OCR | contrast: type to solid black. The ICC render **with the black-point curve on it**. Clipping is a feature |
+| `figures600/NNN.png` | `r145` figure cuts | fidelity: the straight ICC render. No clipped highlight, no crushed shadow, **no curve** |
+
+Ink at ~66 is not a bug, it is honesty: 100% SWOP black is not RGB 0. The OCR
+master boosts it anyway — tesseract binarises, so the boost costs nothing there
+— which is exactly why there are two renders and not one.
+
+**The curve is one issue-wide constant, never per page.** ImageMagick's
+`-level 30%,100%`, and exactly that arithmetic:
+
+```
+out = clamp((in - 0.30 * 255) / (0.70 * 255) * 255)
 ```
 
-A `W` that fails the first half is above the paper (grain graded as ink); one
-that fails the second is below the ink (type dissolving into the paper).
+The prototype measured a black point per page — the 2nd percentile of that
+page's own ink — and stretched to it. That makes the same grey mean a different
+thing on every page: a page whose darkest pixel is a photograph gets a different
+transfer from the text page beside it, and nothing downstream can see that it
+happened.
 
-**The ink anchors stay the built-in set** unless a colour is visibly wrong on
-the page — same scanner, same stock family, and an anchor moved without a
-measurement is the defaulting mistake in the other direction. **The level lines
-stay identity** until they are measured as the **p99 of each ink over bare
-paper**; that measurement is still OPEN on 8610, which is why its `colors.txt`
-ships `LC/LM/LY/LK 0 100` with a comment saying so.
+**30 % was chosen on the worst page, measured on all four.** "glyph p50" is the
+median level of the pixels a glyph is made of in a body-text window — 0 is solid
+black — and "paper p50" is the median of the paper beside it:
 
-Worked example: **`issues/8610/colors.txt`** — the file carries its own
-measurement, the date, the pages it was read on and why the percentile is where
-it is. Write the next issue's the same way; a profile without its measurement
-in it is a constant again.
+| level | none | 20 % | 25 % | 30 % | 35 % |
+|---|---|---|---|---|---|
+| glyph p50, 006 | 69 | 28 | 14 | **1** | 0 |
+| glyph p50, 041 | 54 | 8 | 1 | **0** | 0 |
+| glyph p50, 056 | 53 | 5 | 0 | **0** | 0 |
+| glyph p50, 092 | 72 | 32 | 18 | **4** | 0 |
+| paper p50 | 255/255/254/254 | — | — | unchanged | 041's paper starts to drop |
 
-## The grade — call the converter, undo its GCR, render once
+30 % is where the worst page's type goes solid black while the paper floor is
+still untouched. 35 % buys nothing — the type is already there — and starts
+eating paper, which is the one thing a black-point curve must never do.
 
-The separation is **not reimplemented here**. `tools/img/cmyk_reconstruction`
-does it, in the density domain, against the 8 anchors and 4 level lines of
-`colors.txt` — or the built-in anchor set with identity levels when the
-descriptor has no profile. It is run on the levelled **2400 dpi** sheet, and
-the 600 dpi master is a 4:1 reduce of the graded result: grading first and
-averaging afterwards is what antialiases thin type instead of deleting it.
+**And the figure render must not have it.** A black-point curve crushes a
+photograph: measured on p006's cover photo, this level drives the pure-black
+area of the picture from **25 % to 42 %**. Type wants the crush; pictures do
+not. `r145` cuts its pictures from `figures600`, which is why that render stays
+straight.
 
-**The separator's GCR is undone.** It moves `min(C,M,Y)` into K, which leaves
-printed black as K alone, and 100 % single K renders about 50 through SWOP —
-grey type. `c = c_final + k` recovers exactly what was subtracted. MEASURED on
-p056: glyph p50 37 → 20, 0 % → 39.6 % of glyph pixels solid black, which is
-where 8609's masters sit (p010: 31, 42.1 %). p006's photo keeps its gradation.
+(The implementation is four lines of numpy rather than a `magick` call, so the
+curve costs no extra pass over a 110 megapixel image. It agrees with
+`magick -level 30%,100%` to within one level — verified against it.)
 
-**There is ONE master and no contrast curve.** `r145_extract_figures.py` reads
-the same file `r010` OCRs, so a curve on the master is a curve on every
-published figure, and a curve crushes photographs. The uncurved render is the
-master; the `-level 30%,100%` curve and the second render are gone.
+### THE LEVELS ARE NOT TRUSTED, THEY ARE PROVEN
 
-**The grade is measured and REPORTED, never gated.** Up to two numbers go in
-every page's log line — ink kept vs the raw scan (only when the raw scan had
-ink to measure), and the darkest ink's contrast to paper. A gate on ink-keep
-once failed 10 of 152 pages and was wrong on all 10 (tint-heavy pages whose
-screened tint correctly demodulated into a flat fill).
+SH8601's `colors.txt` as written has `LK 90 95`, which maps K's 229–242 window
+onto the full range: ordinary black text falls **below** the low point and is
+clipped toward zero ink, and 93 % of the page snaps to pure white. The result
+still looks like a page, which is what makes it dangerous — nothing downstream
+can tell a washed-out master from a clean one.
+
+So the grade is measured against the ungraded page it came from, and the step
+**fails the page** rather than publishing it. Two independent checks:
+
+| check | measured on p056 |
+|---|---|
+| the graded page must keep `GRADE_INK_KEEP` (0.70) of the scan's ink | ungraded 17.1 % inked; levels neutralised keeps 15.3 % (0.90), `colors.txt` as written keeps 5.7 % (**0.34**) |
+| the darkest ink's p50 must sit `MIN_INK_CONTRAST` (120) below paper white | 201 with the levels neutralised, 162 with them as written |
+
+The level lines have since been re-measured (`LC 5 100 / LM 4 100 / LY 5 100 /
+LK 3 100`, against a re-measured white point `W 209 175 157`), and both checks
+now pass on every page that is printed on this issue's paper. The profile as
+first found is kept beside the current one as `colors_asfound.txt`; do not
+neutralise the levels to get past a failure — re-measure them and re-run.
+
+**Both checks are statements about the level lines, and the level lines were
+measured on this issue's paper.** They cannot judge a page that is not printed
+on it, because the two sides of the ratio then use two different papers: the raw
+side measures ink as a distance from the *sheet's own* white (`STOCK_PCT`) and
+the graded side from what the profile's `W` grades to. Measured on p149: the
+card's pale cyan field sits 52 city-block from its own stock — ink, by the raw
+test — and grades to 254, because relative to a `W` that is yellower and darker
+than this card it has almost no density. The ratio reads **0.31** and the master
+is, by eye, excellent: crisp blue type, the pale field gone to paper.
+
+That was the state of it while **one** profile graded the whole issue. With the
+paper map both sides of the ratio use the same paper on every page, because
+every page is graded with its own stock's profile — see *Two papers, two
+profiles*. The numbers still **report and never gate**: a gate on ink-keep
+failed 10 of 152 pages on the first full sweep and was wrong on all 10 (they
+were the issue's most tint-heavy pages, and a screened tint demodulating into a
+flat fill is the pipeline working, not ink loss). Both numbers go in every log
+line, because the failure they were built for — the old `LK 90 95` turning black
+type into blank paper — is loud enough for a human to see in a thumbnail.
 
 ## The stamp — every artefact says which grade made it
 
@@ -436,18 +600,32 @@ standing in `masters600/` were now stale, and it took a **human eye noticing
 yellow corners** to find out. Nothing mechanical could have.
 
 So everything this step writes carries the grade's fingerprint — the 8 anchors,
-the 4 level lines, and a 12-hex `grade-sha` over exactly those — plus what was
-decided about the page's geometry:
+the 4 level lines, and a 12-hex `grade-sha` over exactly those — plus
+**`paper-class`**, the name of the class whose profile made this page, plus what
+was decided about the page's geometry.
+
+The class is deliberately **not** in the digest. `grade-sha` answers *"were
+these pixels made with these numbers?"*, which is a string comparison;
+`paper-class` answers *"why those numbers?"*. A mixed-stock issue has **two
+current grades**, and "is this master stale?" is only answerable once you know
+which of them was supposed to make it — so both lines sit in the head of every
+stamp:
+
+```
+grade-sha    cec3ff863b36
+paper-class  high
+profile      (none -- the built-in anchors, identity levels)
+```
+
 
 | where | how |
 |---|---|
 | `masters600/NNN.png` | a PNG `tEXt` chunk keyed `r005` |
 | `masters600/NNN.stamp.txt` | the same text, readable without opening a 110 megapixel PNG |
-| `sheets600/NNN.png` | a PNG `tEXt` chunk keyed `r005`, same as the master |
-| `masters2400/NNN.png` | PNG `Comment` |
+| `figures600/NNN.png` | PNG `Comment` |
 | `cmyk2400/NNN.tif` | TIFF `ImageDescription` |
 | `cmyk2400/NNN.colors.txt` | the profile file the separator was **actually run with**, kept rather than deleted with the scratch directory |
-| the run's log | the whole block once at the top, and `grade <sha>` on every page line |
+| the run's log | the whole block once at the top, and `grade <sha> level 30%` on every page line |
 
 Three copies because each survives a different accident: the chunk survives the
 file being copied out of `masters600/`, the sidecar survives not wanting to
@@ -455,15 +633,20 @@ decode the image, and the log survives the files being deleted.
 
 Detecting a stale master is now a string comparison — see Verification step 5.
 
-### A page is never refused
+### A failed page leaves nothing publishable behind
 
-Parity, skew residual, page class, canvas fit and the grade are measured and
-NOTED — in the page's log line and in its stamp — and the page is published. A
-page that matches no size class is published as the whole levelled sheet with
-`NOT CROPPED` in its stamp. What still stops a page: a missing input file, or a
-frame with no edge to fit at all — no bed touching the frame, the frame all bed
-edge to edge, an empty sheet region, or too few edge samples to fit a trace
-line. Every measured quantity is noted, never gated.
+A page that fails a gate is skipped, its four **publishable** artefacts are
+deleted, its number is printed on stderr, and the process exits non-zero with
+the list. The sweep does not abort at the first failure — 152 pages is two
+hours, and losing it to page 002 means nobody ever sees what pages 003–152 do.
+What the step never does is publish the page anyway.
+
+`debug600/NNN.png` is the exception and is **kept**: nothing counts it, nothing
+publishes it, and it is the one artefact that says why the page failed. It is
+also written *before* the size gate rather than at the end of the page, because
+a page that fails that gate never reaches the end — the message has always said
+"look at `debug600/NNN.png`", and until now that file had just been deleted, if
+it was ever written at all.
 
 ## The parity gate
 
@@ -473,10 +656,7 @@ expensive, so it is checked on the **thumb**, before the 800 MB scan is opened.
 
 A guillotined edge is straight to within a pixel row; a torn edge jitters from
 row to row. So parity decides, and only a **confident** disagreement
-(`ratio >= TORN_CONFIDENT_RATIO`) is NOTED — `TORN SIDE reads {side} (ratio
-{ratio:.2f}) but parity says {expected} -- misfiled or mis-rotated?`, in the
-page's log line and its stamp — and the page publishes anyway. Ambiguity says
-nothing.
+(`ratio >= TORN_CONFIDENT_RATIO`) fails the page. Ambiguity passes.
 
 **Re-measured over all 152 thumbs after `colors.txt` was re-measured**, because
 this gate reads the paper mask and a new paper white is a new mask. Of the 144
@@ -491,11 +671,10 @@ ratio among them is **2.73**, the median 11.98. Exactly one disagrees, p117 at
 | disagreements | 002 at 1.33, 116 at 1.45 | 117 at 1.64 |
 | floor | 1.6 | **2.5**, in the gap |
 
-Leaving the floor at 1.6 would NOTE p117 as possibly misfiled, which it is not:
+Leaving the floor at 1.6 would fail p117 for being misfiled, which it is not:
 p117's paper mask sees only the cream panel inside a full-bleed dark ground, so
-its jitter measurement means nothing. It matches none of the **size classes**
-two steps later — published `NOT CROPPED` instead — which is the check that can
-say what is actually wrong with it.
+its jitter measurement means nothing. It fails the **size** gate two steps
+later, which is the check that can say what is actually wrong with it.
 
 ## The debug overlay
 
@@ -509,13 +688,12 @@ the decision drawn on top.
 ```bash
 cd tools/img/scan2ocr/rules
 
-# 1. every page produced all seven artefacts, and nothing else did
+# 1. every page produced all six artefacts, and nothing else did
 python3 - <<'PY'
 import os, r000_issue, r005_masters_sheet as R
 iss = r000_issue.load(R.ISSUE)
 for d, ext in ((R.OUT_MASTER, ".png"), (R.OUT_MASTER, ".stamp.txt"),
-               (R.OUT_SHEET, ".png"), (R.OUT_SHEET600, ".png"),
-               (R.OUT_CMYK, ".tif"),
+               (R.OUT_FIGURE, ".png"), (R.OUT_CMYK, ".tif"),
                (R.OUT_CMYK, ".colors.txt"), (R.OUT_DEBUG, ".png")):
     have = sorted(f[:3] for f in os.listdir(d) if f.endswith(ext))
     want = ["%03d" % p for p in iss.page_range]
@@ -556,10 +734,11 @@ PY
 #    trim.  Two things this check has to get right:
 #      - the page's box inside the canvas is READ FROM THE STAMP, not guessed
 #        from the pixels.  The fabricated margin and the page's own paper are
-#        both white, and a bbox of "not quite white" guesses wrong on the
-#        canvas margin, which is also white.
-#      - it reads masters600 itself: there is no curve on it any more (see THE
-#        GRADE), so BED_LUM -- measured on unclipped pixels -- applies directly.
+#        both white, and a bbox of "not quite white" guesses wrong on a master
+#        whose paper the curve has pushed to 255.
+#      - it reads figures600, the UNCURVED render.  BED_LUM was measured on
+#        unclipped pixels; on the curved master a printed RED banner (lum 101)
+#        lands at 35 and reads as bed.
 python3 - <<'PY'
 import numpy as np, os, re
 from PIL import Image
@@ -571,7 +750,7 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
         continue
     s = (R.OUT_MASTER / f.replace(".png", ".stamp.txt")).read_text()
     pw, ph = (int(v) for v in re.search(r"^page-px\s+(\d+) (\d+)$", s, re.M).groups())
-    rgb = np.array(Image.open(R.OUT_MASTER / f).convert("RGB"))[:ph, :pw]
+    rgb = np.array(Image.open(R.OUT_FIGURE / f).convert("RGB"))[:ph, :pw]
     lum, prop = rgb.mean(2), R.prop_mask(rgb)
     cells = []
     for k, sl in (("top", (slice(None, b), slice(None))),
@@ -599,15 +778,19 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
     side = (R.OUT_MASTER / f.replace(".png", ".stamp.txt")).read_text()
     chunk = Image.open(R.OUT_MASTER / f).info.get("r005", "")
     sha = re.search(r"^grade-sha\s+(\S+)$", side, re.M).group(1)
-    print(f, sha,
-          "CURRENT" if sha == R.GRADE_SHA else "*** STALE -- re-run this page ***",
+    # PER PAGE, not per issue: a mixed-stock issue has one current grade per
+    # paper class, and the page's class decides which one this master owes.
+    want = R.grade_for(int(f[:3]))
+    print(f, sha, want.klass,
+          "CURRENT" if sha == want.sha else "*** STALE -- re-run this page ***",
           "| chunk == sidecar" if chunk == side else "| *** CHUNK DISAGREES ***",
           "|", re.search(r"^edge-finder\s+(.*)$", side, re.M).group(1))
 PY
 
-# 6. the master's type is black because the GCR is undone; there is no curve
-#    to compare.  A body-text window per page, in mm from the traced page's
-#    top-left corner; "glyph" is the INTERIOR of the strokes.
+# 6. THE CURVE: the OCR master's type is black and its paper is untouched, and
+#    the FIGURE render did not get the curve.  A body-text window per page, in
+#    mm from the traced page's top-left corner; "glyph" is the INTERIOR of the
+#    strokes, chosen on the uncurved render and then measured in both.
 python3 - <<'PY'
 import numpy as np
 from PIL import Image
@@ -618,12 +801,13 @@ WINDOWS = {"006": (14, 100, 58, 180), "041": (16, 60, 60, 140),
            "056": (20, 60, 90, 140), "092": (12, 150, 45, 260)}
 for stem, mm in sorted(WINDOWS.items()):
     box = tuple(int(v * R.MM) for v in mm)
+    fig = np.array(Image.open(R.OUT_FIGURE / f"{stem}.png").crop(box).convert("L"), float)
     ocr = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").crop(box).convert("L"), float)
-    glyph = ND.binary_erosion(ocr < 128, np.ones((3, 3)))
-    paper = ocr > 200
+    glyph = ND.binary_erosion(fig < 128, np.ones((3, 3)))
+    paper = fig > 200
     print(f"p{stem} window {mm} mm | ink {glyph.mean():5.1%} | "
-          f"glyph p50 {np.median(ocr[glyph]):5.1f} | "
-          f"paper p50 {np.median(ocr[paper]):5.1f}")
+          f"glyph p50 {np.median(fig[glyph]):5.1f} -> {np.median(ocr[glyph]):5.1f} | "
+          f"paper p50 {np.median(fig[paper]):5.1f} -> {np.median(ocr[paper]):5.1f}")
 PY
 ```
 
@@ -656,15 +840,11 @@ bright", which is true of the physical prop under the sheet and equally true of
 a printed orange banner. On the ink/bed pages the real prop cannot be there at
 all: it is part of the bed mask that found the sheet in the first place.
 
-**5.** Twelve of twelve masters carried `grade-sha 2b29e17a6be4` at the time of
-this run, matching the `colors.txt` then current; the PNG chunk equalled the
-sidecar on all twelve. (Recorded before 7b9aa90b; `grade-sha` is now the sha of
-just the 8 anchors and 4 level lines, so a fresh run reads a different hash.)
+**5.** Twelve of twelve masters carry `grade-sha 2b29e17a6be4`, the sha of the
+current `colors.txt` plus `OCRLEVEL 30 100`; the PNG chunk equals the sidecar on
+all twelve.
 
-**6.** The curve, as it stood before 7b9aa90b removed it — kept here for the
-record, since the check itself no longer exists as written; today's
-Verification step 6 measures `glyph p50` and `paper p50` on `masters600` alone,
-with no curve and no second render to compare it to:
+**6.** The curve, measured on the published pair:
 
 | page | ink in window | glyph p50 figure → master | paper p50 figure → master |
 |---|---|---|---|
@@ -673,23 +853,22 @@ with no curve and no second render to compare it to:
 | 056 | 10.3 % | 79 → **3** | 255 → 255 |
 | 092 | 4.0 % | 87 → **15** | 255 → 255 |
 
-Type went from a mid-grey to near-black and the paper floor did not move at all
-— which was the whole claim of `-level 30%,100%`, the constant this step no
-longer applies.
+Type goes from a mid-grey to near-black and the paper floor does not move at
+all — which is the whole claim of `-level 30%,100%`. (These are higher than the
+figures in the constant's own table because the glyph *set* is defined
+differently: this check takes stroke interiors on the uncurved render and
+measures the same pixels in both, which keeps the two columns comparable at the
+cost of including more of the stroke's shoulder. The conclusion — worst page
+solid, paper untouched — is the same either way, and both are recorded.)
 
-**p117's trace matches no size class** — it publishes the whole levelled sheet,
-`NOT CROPPED` — see below.
+**p117 fails, and nothing was published for it** — see below.
 
 ## Known outliers — two pages of 152 do not trace
-
-Since 7b9aa90b neither page fails: both 117 and 007 publish the whole levelled
-sheet with `NOT CROPPED` in its stamp — 007's 304.0 mm trace is outside the A4
-window (297 ± 6), so `page_class()` finds no match for it either.
 
 Seven pages used to fail. Six of them were not outliers at all, only pages
 printed on the **other stock** in this issue, and they now trace from ink vs bed
 and pass as their own classes: 001, 002, 147 and 148 (the folded A3 cover leaf)
-and 149–152 (the Zahlkarte). Two pages still mistrace, and **both are trace
+and 149–152 (the Zahlkarte). Two pages still fail, and **both are trace
 failures, not size classes** — there is nothing about the paper that is
 different, only about what the tracer can see.
 
@@ -718,30 +897,28 @@ bottom lines are fitted from that narrow base. The sheet is also **flush with
 the frame at the top** (nothing above the red banner), so the head trace lands
 at 0 and every millimetre of error at the foot goes straight into the height.
 `debug600/007.png` shows it: three lines on the trim, and the foot line down in
-the prop. 304.0 mm is past the A4 window's 303 mm ceiling, so `page_class()`
-matches nothing and 007 publishes the same way 117 does: the whole levelled
-sheet, `NOT CROPPED`.
+the prop.
 
 This one is worth re-measuring rather than deciding — the fix is a better rule
-for which columns carry a top/bottom sample, not a looser size window — but it
-is one page and the constants that would change are the ones 006, 041, 056 and
-092 were verified against.
+for which columns carry a top/bottom sample, not a looser gate — but it is one
+page and the constants that would change are the ones 006, 041, 056 and 092 were
+verified against.
 
-### 117 and 007 are published, not deleted
+### What happens to a failed page
 
-Neither page's artefacts are removed any more; both are published with the
-disposition NOTED — see the line above. Whether to accept them as is, crop by
-hand, or re-trace still belongs in the issue's `LOG.md`. Publishing a page is
-not that decision.
+Its four publishable artefacts are deleted, `debug600/NNN.png` is **kept** (it
+is the artefact that explains the failure, and the size gate's message points at
+it), the page is named on stderr, and the process exits non-zero with the list.
+The disposition of 007 and 117 — crop by hand, re-trace, or accept the issue
+without them — belongs in the issue's `LOG.md`. "The step refused it" is not a
+decision.
 
 ### The tally
 
-Fourteen pages were run through the code as it stood for this record: **12
-published, 2 failed**. Since 7b9aa90b neither of those two fails any more — see
-above — so a re-run today publishes all fourteen. The remaining 138 were traced
-at thumb resolution only, where all of them land inside the A4 window
-(208.9–212.0 × 294.0–298.5 mm). A full sweep is still the thing that settles the
-count, and it has not been run.
+Fourteen pages have been run through the current code: **12 published, 2
+failed**. The remaining 138 were traced at thumb resolution only, where all of
+them land inside the A4 window (208.9–212.0 × 294.0–298.5 mm). A full sweep is
+still the thing that settles the count, and it has not been run.
 
 ## Notes
 

@@ -72,8 +72,10 @@ Critical guardrails:
 dir=issues/<YYMM>
 
 # 1. no in-scope TODO marker survives
+# `sort` exits 0 on empty input, so piping into it and testing THAT printed
+# the FAIL line unconditionally -- including on a clean issue.  Test the grep.
 grep -hoE 'TODO (PRE|INDENTATION|INDENTED|ASIDE|BOX)' "$dir"/*.html \
-  | sort -u && echo "  FAIL: in-scope TODO survived"
+  | sort -u | grep . && echo "  FAIL: in-scope TODO survived"
 
 # 2. expected-skip TODO markers may still exist
 grep -lE 'TODO FORMULA|TODO ALL BOXES|TODO two boxes' "$dir"/*.html \
@@ -185,12 +187,20 @@ its source/`Info:` footer — they belong together. Put the `<figure>` or
 Check: for every `<p class="source">`, the block immediately before it must not
 be a `<figure>` or `<table>`.
 
-## An image or table must never break text from its byline or source
+## NEVER SPLIT THE AUTHOR AWAY FROM THE TEXT THEY WROTE
 
 Extending the rule above: the closing run of an article — **last paragraph →
-`<address class="author">` → `<p class="source">`** — is a unit. A `<figure>`
-or `<table>` may not be emitted anywhere inside it. Move the figure/table
-**after** the closing run.
+`<address class="author">` → `<p class="source">`** — is a unit. **Nothing may
+be emitted inside it: not a `<figure>`, not a `<table>`, not a `<pre>`, not an
+`<aside>`.** Move whatever the layout floated in there **after** the closing
+run.
+
+**This rule used to say "image or table", and that is exactly why it kept being
+missed.** SH8601 had five bylines split off — by `<pre>`, by `<figure>`, by
+`<table>`, and by combinations — and only the figure/table ones were even
+describable as defects under the old wording. A listing between a paragraph and
+its byline separates the author from their text just as completely as a picture
+does. Corpus-wide the broadened rule finds 129.
 
 Seen in 8609 on `124 Wie funktioniert ein Computer?`, where Bild 3 landed
 between the final paragraph and the byline.

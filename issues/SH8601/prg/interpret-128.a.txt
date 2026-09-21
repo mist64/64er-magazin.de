@@ -1,0 +1,111 @@
+
+
+;interpret-128.a.prg ==1c01==
+    1 rem "               Interpret-128.a
+    2 :
+    3 rem "        ver{CBM-F}ndert Interpreter-Schleife
+    4 :
+    5 rem "                 (c) by KRW
+    6 :
+    7 rem "                     1985
+    8 :
+    9 rem "                 version 1.00
+   10 :
+   11 :
+   20 n$="interpret-128.m"
+   30 open 15,8,15,"s0:"+n$: gosub 60100
+   40 open 2,8,2,n$+",p,w": gosub 60100
+   70 :
+   80 sys 9*4096
+   90 ;
+  100 .opt o2
+  110 ;
+  220 ; "*** Unterprogramme ***"
+  230 ;
+  240 chrget   =  $0380      ; "holt n{CBM-F}chstes Byte aus BASIC-Text
+  250 execute  =  $4af3      ; "f{CBM-X}hrt Befehl aus, token in A
+  260 inter    =  $4af6      ; "holt n{CBM-F}chsten Befehl und f{CBM-X}hrt ihn aus
+  270 ;
+  300 ; "*** Variable ***
+  310 ;
+  320 min     = $de    ; "kleinstes token
+  330 max     = $e9    ; "gr{CBM-C}{CBM-V}tes token
+  360 ;
+  900 *= $1300
+  910 ;
+ 1000 ^       jmp anfang
+ 1010 ^       jmp init
+ 1020 ;
+ 2000 init    sei                  ; "pointer f{CBM-X}r die
+ 2010 ^       lda #<anfang         ; "Interpreterschleife Prg-Modus
+ 2020 ^       sta $0308            ; "auf 'anfang' setzen
+ 2030 ^       lda #>anfang
+ 2040 ^       sta $0309
+ 2050 ^       cli
+ 2060 ^       lda #$00
+ 2070 ^       sta $ff00            ; "bank 15 einschalten
+ 2080 ^       lda #$06
+ 2090 ^       sta $d506            ; "$0-$1fff gemeinsamer RAM-Bereich
+ 2100 ^       lda #$20
+ 2110 ^       sta $30
+ 2120 ^       sta $32
+ 2130 ^       sta $34
+ 2140 ^       lda #$00             ; "Variablen-Zeiger entsprechend
+ 2150 ^       sta $2f              ; "anpassen
+ 2160 ^       sta $31
+ 2170 ^       sta $33
+ 2180 ^       rts
+ 2190 ;
+ 3000 anfang  jsr chrget           ; "Befehl holen
+ 3010 ^       cmp #min             ; "eines der 'token', die auf
+ 3020 ^       bcc alt              ; "neue Befehlsadresse f{CBM-X}hren sollen ?
+ 3030 ^       cmp #max
+ 3040 ^       bcs alt
+ 3050 ^       tax                  ; "ja, dann
+ 3052 ^       bit $d7              ; "auf 40-Zeichen-Modus testen
+ 3054 ^       bpl vic              ; "40 Z., dann Sprung auf 'normale' Adresse
+ 3060 ^       lda tablow-min,x     ; "80 Z.: low-Byte
+ 3070 ^       sta prg+1            ; "                der neuen Befehlsadresse
+ 3080 ^       lda tabhigh-min,x    ; "       high-Byte
+ 3090 ^       sta prg+2            ; "                        nach prg+1,+2
+ 3100 route   txa
+ 3110 ^       jsr chrget           ; "zur{CBM-X}ck zur Interpreterschleife
+ 3120 prg     jsr $0000            ; "Befehl ausf{CBM-X}hren
+ 3130 ^       jmp inter            ; "zur{CBM-X}ck zur Interpreterschleife
+ 3140 alt     jsr chrget+6         ; "kein Sonderbefehl, 'normale' Schleife
+ 3150 ^       jmp execute
+ 3900 ;
+ 4000 tablow  .byt $3e, $72, $d7, $81, $93, $8d
+ 4010 ^       .byt $2b, $56, $58, $e2, $79, $60
+ 4020 ;
+ 5000 tabhigh .byt $1a, $16, $67, $17, $18, $65
+ 5010 ^       .byt $64, $18, $69, $69, $6a, $69
+ 5020 ;
+ 6000 vic     lda lowtab-min,x     ; "low-Byte
+ 6010 ^       sta prg+1            ; "          der '40-Z.-Adresse' nach prg
+ 6020 ^       lda hightab-min,x    ; "high-Byte
+ 6030 ^       sta prg+2
+ 6040 ^       jmp route            ; "weiter s.o.
+ 6050 ;
+ 7000 lowtab  .byt $5a, $a8, $d7, $b7, $8e, $8d
+ 7010 ^       .byt $2b, $97, $55, $e2, $79, $60
+ 7020 ;
+ 7030 hightab .byt $6b, $61, $67, $62, $66, $65
+ 7040 ^       .byt $64, $67, $69, $69, $6a, $69
+ 7050 ;
+ 8000 .end
+ 9000 end
+60000 zz$="interpret-128.a": un=8
+60010 open 15,un,15,"s0:"+zz$
+60020 gosub 60100
+60030 save zz$,un
+60040 gosub 60100
+60050 verify zz$,un
+60060 close 15
+60070 end
+60100 input#15, s1, s$, s2, s3
+60110 if s1=1 then print s2; s$
+60120 if s1<20 then return
+60130 print s1 ", " s$ "," s2; "," s3
+60140 close 15
+

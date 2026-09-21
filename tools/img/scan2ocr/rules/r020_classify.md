@@ -87,6 +87,49 @@ truth re-bases every number.
 in this pipeline's history looked perfect on their test pages and were reverted
 after a full sweep; the numbers are in `FINDINGS.md`.
 
+## A TINTED BOX ACROSS THE COLUMNS SCRAMBLES THE READING ORDER
+
+**This issue's most damaging defect class, and the hardest to see.** Where a
+band of tinted boxes or tables cuts across the text columns, each column is
+split into an upper and a lower half. The extractor then emits the six (or
+four) half-columns as independent blocks — and orders them wrongly, welding the
+head of one column to the tail of another.
+
+The result is **grammatical and meaningless**, which is why nothing catches it.
+MEASURED on SH8601 p124, where three columns are cut by a band of four tinted
+tables (Tabellen 1–4), the article read:
+
+```
+Für die RS232-Routine nach einem Moment wieder »vernünftigen« Text liefern.
+…kann die Basicsen, für die der Speicher des C 64 zu klein war.
+```
+
+Two sentences, each a graft. Valid German at a glance, past r310, r320, r330
+and a green build, and only found by a human reading the article.
+
+**It has now happened twice on one issue.** r000 records the same failure on
+p090, where `--psm 3` interleaved a tinted box with the surrounding body
+columns. Two instances is a pattern, not an accident: **wherever a page has a
+tinted box or table band interrupting its columns, verify the reading order
+explicitly against the page.**
+
+How the p124 order was recovered, as the worked method:
+
+1. Render the FULL page and look at it — column x-centres and band y-extents
+   (p124: columns at x≈330 / 1815 / 3305; bands at y≈520–2020 and 4880–6650).
+2. Derive the printed order from that geometry — column by column, upper half
+   then lower half:
+   `col1-upper → col1-lower → col2-upper → col2-lower → col3-upper → col3-lower`
+3. **Confirm every join by reading the two fragments as one sentence** at 600
+   dpi. `…Mit Bit 4 wird die Übertragungsart und über die` + `Bits 5,6 und 7
+   die Parität bestimmt (siehe Tabelle 2).` A join that does not read as one
+   sentence is the wrong join.
+4. Place each table after the paragraph that first cites it.
+
+Record the reconstruction in LOG.md with the crop that establishes the geometry.
+This is step 030's class — block order — not a word-level fix, and must be
+reported as such rather than smuggled in as a typo repair.
+
 ## The dropped Impressum — a masthead sharing its page with an ad
 
 Both issues built by this chain lost the Impressum, and by the same route. The

@@ -52,13 +52,36 @@ BLOCK_TAGS = {
 # are byte-identical or deliberately different for reasons rule 300 owns.
 SKIP_TAGS = {"head", "script", "style", "pre", "code", "noscript", "template"}
 
+# Never compared, for the same reason <pre> is not: the reprint credit is site
+# apparatus, not transcribed prose.  This rule requires one on every confirmed
+# reprint (`<p><strong>Nachdruck aus <a ...>64'er 10/85, S. 87</a>.</strong></p>`),
+# it is printed on NEITHER page, and so it can never be dispositioned -- `PRINT`
+# would claim both pages print it, which is false.  Worse, the D-numbering is
+# positional: MEASURED on `70 Test_ WordStar.html`, adding the credit moved the
+# real `WordStar`/`Wordstar` difference from D-006 to D-007 while `verify` still
+# reported D-006 as dispositioned, because verify matches differences by number,
+# not by text.  Every disposition after the credit silently described its
+# neighbour.  Excluding the credit here is what keeps that from happening.
+REPRINT_CREDIT = re.compile(r"^(Teilweiser\s+)?Nachdruck\s+aus\b", re.I)
+
 PAGES_META = re.compile(r'<meta\s+name="64er\.pages"\s+content="([^"]*)"', re.I)
 ISSUE_META = re.compile(r'<meta\s+name="64er\.issue"\s+content="([^"]*)"', re.I)
 TITLE_TAG = re.compile(r"<title>(.*?)</title>", re.I | re.S)
 
 # A hyphen followed by whitespace between two word characters, the lowercase
 # continuation marking it as a broken word rather than a compound.
-SOFT_HYPHEN = re.compile(r"(\w)[-‐­]\s+([a-zäöüßéèàçñ])")
+#
+# EXCEPT the German SUSPENDED hyphen, which is lowercase too and is NOT a break:
+# `RGB- und Composite-Signal`, `Ein- und Ausgabe`, `Kaypro- etc.`.  Joining those
+# produced `RGBund` / `Einund` / `Kayproetc.` -- harmless where both sides do it,
+# but it FABRICATES a difference wherever the block exists on one side only, and
+# it makes the diff read as our error where the HTML is right.  MEASURED on
+# SH8601 r330.  The list is the closed set of words that can follow one.
+SOFT_HYPHEN = re.compile(
+    r"(\w)[-‐­]\s+"
+    r"(?!(?:und|oder|bzw|beziehungsweise|sowie|wie|etc|usw)\b)"
+    r"([a-zäöüßéèàçñ])"
+)
 
 TOKEN = re.compile(r"\w+|[^\w\s]", re.UNICODE)
 
@@ -92,7 +115,7 @@ class _Extractor(html.parser.HTMLParser):
         if self._role is not None:
             raw = "".join(self._buf)
             text, joins = normalise(raw)
-            if text:
+            if text and not REPRINT_CREDIT.match(text):
                 self.blocks.append(Block(self._role, text, len(self.blocks), joins))
         self._buf = []
         self._role = None

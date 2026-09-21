@@ -105,6 +105,120 @@ rule's header to make a particular build go through. A rule that turns out to
 apply to both kinds is re-classified `all` **with the evidence in the commit
 message**, permanently, for every issue after it too.
 
+## THE CHAIN'S FIRST ACTION — ask which binding, and which pages are which paper
+
+**Before step 005 grades anything — before a scan is opened, before an output
+directory is made — the operator is asked two questions about the physical
+copy.** They are the first thing that happens in an issue build. Step 005 asks
+them itself (`first_action()` in `r005_masters_sheet.py`) and **exits non-zero
+having written nothing** if the descriptor does not carry the answers.
+
+| question, in the owner's terms | descriptor key | what it decides |
+|---|---|---|
+| **How is this issue bound?** A3 sheets held with **clips**, or A4 sheets torn off a **glued** spine? | `binding` | the **edge maths** — which variant of step 005 runs |
+| **Which pages are printed on which paper?** the good white stock, or the cheap interior stock? | `paper` | the **grade** — which colour profile makes each page |
+
+This is the **only** thing step 005 refuses over. Everything else it publishes
+and notes: parity, skew residual, page class, canvas fit, every number the grade
+reports. Those are defects of a page, visible to a human in the artefact it
+published. These two are neither defects nor measurements — they are decisions
+only the owner can make, with the copy in hand, and **guessing either produces a
+plausible-looking wrong result that no downstream check can see.**
+
+### 1. `binding` — clip-bound or glue-bound
+
+```
+"spread"   CLIP-BOUND -- A3 sheets held with clips. The frame holds a facing
+           pair; the inner edge is the facing page's colour boundary, with the
+           clip holes as the fallback, and the holes get inpainted.
+           -> r005_masters_spread          (8609 and the monthlies)
+"sheet"    GLUE-BOUND -- A4 sheets torn off a glued spine. The frame holds one
+           loose sheet; there is no facing page and no clip hole, and the inner
+           edge is a torn fringe (verso) or a flush cut (recto).
+           -> r005_masters_sheet           (SH8601)
+```
+
+The field is not new — `r000_issue.py` has validated it against that closed set
+all along, and the VARIANTS section below is built on it. What was missing is
+that **nothing asked for it**: an absent or wrong value picked the other
+variant's edge maths in silence, and the other variant traces the facing page's
+outer edge as this page's inner one, or hunts a torn fringe on a sheet that has
+none. So `binding` is now optional in the *loader* — precisely so that step 005
+gets to ask the question rather than the loader dying with "missing binding" —
+and present-but-wrong is still fatal on the spot.
+
+### 2. `paper` — which pages are on the good stock
+
+**A magazine issue is not printed on one stock, and one white point cannot serve
+two.** The separation works in the density domain, `d = -log10(rgb/W)`, so `W`
+is the reference every tone is measured against. Grade a good white sheet
+against a profile measured off yellowed paper and every light tone is reported
+as carrying **less ink than it does** (highlights clamp to zero), and mid-tone
+hue skews, because each channel is normalised by a differently wrong number.
+
+The measurements this rule came out of, from SH8601:
+
+- The whole issue was graded with **one** profile, measured off the **interior**
+  stock: `W 209 175 157` with `LC 5 100 / LM 4 100 / LY 5 100 / LK 3 100`. That
+  white point is the *yellowed 5th percentile* of the interior paper, chosen to
+  stop yellow corners. Right for 144 pages.
+- The interior is cheap paper that was **yellowish-grey when new** and has
+  browned further. The **cover** is a folded A3 wrapper on high-quality stock —
+  pages **001, 002, 147, 148** — and pages **149–152** are a bound-in Zahlkarte
+  on high-quality white card.
+- On those eight pages the profile is wrong, and step 005 **already said so**
+  every run: they are the eight that take the ink-vs-bed edge finder, because a
+  coated white sits 100+ city-block from that `W` and the paper mask cannot see
+  them as paper at all. p151 (Zahlkarte) reported **ink kept 0.36, dark contrast
+  91** on a master that is excellent by eye. The code's own note said the fix
+  was *a second measured profile for that stock — a decision, not a looser
+  constant here.*
+
+**The decision:** two classes, one profile each, chosen per page.
+
+| class | what it is | profile |
+|---|---|---|
+| `high` | white stock that was white when new — a cover wrapper, a bound-in card or insert | the **built-in anchor set**: `W 201 195 188, C 38 140 165, M 192 37 66, Y 201 159 61, K 16 17 17` and its overprints, with identity levels |
+| `low` | the cheap interior stock, yellowish-grey from the start | the issue's **measured** `colors.txt` |
+
+In the descriptor, `issues/<ID>/issue.json`:
+
+```json
+"binding": "sheet",
+"paper": {
+  "high": null,
+  "low":  "/Users/mist/DNB/SH8601/master_2400/SH8601/colors.txt",
+  "high_pages": [1, 2, 147, 148, 149, 150, 151, 152] }
+```
+
+- `high` / `low` — a path to a `colors.txt`, or `null` meaning **the built-in
+  anchors with identity levels**. `null` is an answer, not a gap; a path that
+  does not exist is a loud error rather than a silent fallback.
+- `high_pages` — the printed page numbers on the good stock, 1-based, cover
+  counted as 1. Everything not in the list is `low`. It is a **list and not a
+  measurement** on purpose: the paper mask is blind to the other stock, which is
+  the same fact that makes the grade wrong there, so there is nothing to defer
+  to. `r000_issue.py` validates all of it loudly — unknown key, wrong type, a
+  page outside `1..pages`, a duplicate, or a descriptor carrying both `paper`
+  and the legacy whole-issue `colors`.
+
+Every artefact step 005 writes stamps `grade-sha` **and** `paper-class`, so a
+mixed-stock issue stays auditable: a master is stale when its `grade-sha` does
+not match the current grade **of its own class**.
+
+### What the operator gets asked with
+
+The question is not a bare demand. Step 005 measures, on the 150 dpi thumbs and
+in about 0.1 s a page, the evidence for answering it: **which pages took the
+ink-vs-bed edge finder** (the strongest signal there is — and one-sided, since
+it finds only the pages the paper mask is blind to) and **each page's own
+white** against the low profile's `W`. It pre-fills `high_pages` from that and
+says in the output that it is a guess to be checked against the copy.
+
+Record both answers in `LOG.md` with the rest of step 005's disposition. A
+descriptor that already carries them is not asked again — the questions are per
+issue, not per run.
+
 ## VARIANTS — two programs at one step number
 
 A step can exist in **two mutually exclusive variants** that do the same job for
@@ -117,7 +231,8 @@ descriptive suffix on the name:
 | `r005_masters_sheet` | the scan frame holds one loose SHEET, torn off a glued spine (SH8601) | `"binding": "sheet"` |
 
 The closed set of legal values lives in `r000_issue.py` (`BINDINGS`), which
-rejects anything else at load time — a typo'd `binding` would otherwise match
+rejects a wrong one at load time and leaves an ABSENT one to step 005's opening
+question — a typo'd `binding` would otherwise match
 neither variant, or worse, be read as the other one.
 
 Both write the identical contract — `<tmp>/masters600/NNN.png`, 600 dpi,
@@ -125,8 +240,9 @@ levelled, cut, graded, one per page — so every downstream step reads one
 directory and neither knows nor cares which variant filled it.
 
 **The selector is the issue descriptor's `binding` field**, from
-`issues/<ID>/issue.json`, read via `r000_issue.py`. Exactly one variant runs for
-a given issue. The other is recorded in `LOG.md` exactly like a kind mismatch,
+`issues/<ID>/issue.json`, read via `r000_issue.py` — and it is **asked for as
+the chain's first action** (see above), never assumed and never inferred from
+the scans. Exactly one variant runs for a given issue. The other is recorded in `LOG.md` exactly like a kind mismatch,
 with `binding` in place of `kind`:
 
 ```markdown
@@ -164,6 +280,36 @@ from the descriptor and has to recognise it on sight.
 
 
 
+## Where the issue PDF comes from
+
+Step 006 owns it, and **the recipe is not in this directory**: it lives in
+`tools/img/issue_pdf/README.md` beside the scripts that implement it —
+searchable PDF/A, OCR rendered at 402 dpi, the delivered image 150 dpi
+guetzli, quality binary-searched to land under 100 MB, with a JBIG2 variant
+for pages carrying only black ink. `r006_issue_pdf.md` says when it runs and
+what is checked; it deliberately does not restate the recipe, because two
+copies of a measured procedure drift.
+
+Two things about its position. It comes **after 005**, because its only input
+is the graded masters and re-grading a page makes every PDF page built from it
+stale. It comes **before the editorial chain**, because the PDF's text layer
+is an INDEPENDENT OCR of the same pages at 402 dpi where step 010 reads 300 —
+and `issue_pdf`'s README records the measurement that at 300 dpi tesseract
+truncates words at the image edges. Where the corpus shows a column-edge
+truncation, that text layer often has the word.
+
+### The one page a human always makes
+
+The cover is cut and graded by step 005 like every other page, and then the
+issue owner makes a cleaned-up `title.png` **at 150 dpi** from it by hand.
+That single file serves twice: it is the cover the site shows, and it is
+**page 1's image in the issue PDF** — not re-derived from the master, but used
+as the 150 dpi master for that page. Every other page of the PDF comes
+straight from step 005.
+
+Step 006 therefore waits for it. A PDF built without it disagrees with the
+published cover about what the cover looks like.
+
 ## The chain, and what the numbers used to be
 
 The scan-to-corpus steps and the issue-build rules were two chains that met at
@@ -174,6 +320,9 @@ them through this table.
 
 | now | was | step |
 |---|---|---|
+| 005 | — | masters — the raw scan to the 600 dpi masters (variant by `binding`) |
+| 005b | — | a4_window — the A4 crop, anchored on the 64'er logo (see r005_a4_window.md) |
+| 006 | — | issue_pdf — the searchable issue PDF, built from those masters. **Blocks on a hand-made `title.png`** — see below |
 | 010 | — | ocr_blocks — OCR the scans into measured blocks |
 | 020 | — | classify — labels, reading order, roles, per-page markdown |
 | 030 | — | assemble — pages back into articles, one `<YYMM>.md` |
@@ -204,6 +353,7 @@ them through this table.
 | 280 | 27 | ocr_word_cleanup |
 | 290 | 28 | heading_hierarchy |
 | 300 | 29 | fehlerteufelchen_errata |
+| 325 | — | read_for_sense (added 2026-08, SH8601) |
 
 Two rules were removed rather than renumbered:
 
@@ -490,7 +640,9 @@ magick <SRC_DIR>/145.png -crop 2136x574+390+3736 +repage /tmp/64er_<YYMM>_crop.p
 ```
 
 **COORDINATE SPACE -- read before cropping.** The bboxes are in pixels of the
-graded **600 dpi master** (`SRC_DIR`), which is deskewed and A4-cropped. They are
+graded **600 dpi master** (`SRC_DIR`), which is deskewed and cut to the
+sheet's own traced edges on the issue canvas -- NOT exact A4; that is the
+delivered PDF's geometry. They are
 **not** in the delivered PDF's page space: the PDF page is neither deskewed nor
 cropped, so the two differ by a rotation and an offset. Crop from the master,
 never from a `pdftoppm` render. `frac=` is the same box as a fraction of the
@@ -502,14 +654,15 @@ preceding blocks whose x-range overlaps to find its top edge.
 
 Everything under `out/` is scratch -- never commit it.
 
-## Cross-cutting rule: THE PAGE IMAGE IS `masters600`, and there is no PDF
+## Cross-cutting rule: THE PAGE IMAGE IS `masters600` -- the PDF comes last
 
 Every rule that needs to look at a page says so in its own words, and several
-still say `pdftoppm -r 300 issues/<YYMM>/64er_19XX-XX.pdf ...`. **On an issue
-built by this chain that file does not exist.** The PDF is made at the END (by
-`tools/img/issue_pdf/`, optional), so a rule that renders from it cannot run at
+still say `pdftoppm -r 300 issues/<YYMM>/64er_19XX-XX.pdf ...`. **While the
+issue is being built that file does not exist yet**: the PDF is assembled at
+the END, by `tools/img/issue_pdf/`. A rule that renders from it cannot run at
 all -- 8610 hit this in nine rules, and every sub-agent had to be corrected in
-its dispatch.
+its dispatch. (Once the PDF exists its text layer is a candidate source, per
+the section below; the page IMAGE is still this file.)
 
 The render already exists, and it is better than a `pdftoppm` of the PDF would
 be: **`<tmp>/masters600/NNN.png`**, 600 dpi, A4, deskewed, cut and graded by
@@ -529,11 +682,23 @@ magick "$SRC/145.png" -crop 2136x574+390+3736 +repage <scratch>/crop.png
 - Where a rule below says `pdftoppm`, read it as "crop `masters600/NNN.png`".
   That instruction survives only for issues imported before this chain existed.
 
-## Cross-cutting rule: the PDF has no usable text layer
+## Cross-cutting rule: the PDF's text layer is a CANDIDATE SOURCE, not authority
 
-The delivered PDF's text layer is a re-OCR of the same scan. It is **not**
-independent evidence, and on a scanned issue it is **void** -- agreeing with it
-proves nothing, and disagreeing with it proves nothing either.
+**Since step 006 the delivered PDF does carry a text layer**, and it is not
+the same OCR this chain runs: `issue_pdf` renders at **402 dpi** where step
+010 reads **300**, and its README records why -- at 300 dpi tesseract
+truncates words at the image edges.
+
+So it is worth consulting and worth distrusting in equal measure. MEASURED on
+SH8601 over 38 column-edge truncation candidates, anchored on the preceding
+word so a longer form elsewhere on the page could not count: **10 recovered,
+7 unchanged, 21 undecidable**. And on p090 it is actively worse -- `--psm 3`
+interleaved a tinted box with the surrounding body columns and scrambled the
+reading order, so a truncation there would be traded for an unknown
+reordering.
+
+Use it to GENERATE a candidate for a damaged word, then confirm that
+candidate against the master crop. Never quote it as what the print says.
 
 There are exactly two authoritative sources for what the print says:
 
@@ -548,6 +713,146 @@ checked wearing a different hat. This is stated once, here, because it was
 previously restated per rule and the restatements disagreed -- two rules called
 `pdftotext` void while two others demanded it as the mandatory evidence form,
 each citing rule 280 as the authority.
+
+## Cross-cutting rule: CONSISTENCY WITH THE PAGE BEATS CONSISTENCY WITH ITSELF
+
+Where the magazine is inconsistent, **the transcription is inconsistent in the
+same places.** Match the page, site by site; do not normalise.
+
+The standing example is the machine names. The magazine sets `C 64` and `C64`,
+`C 128` and `C128`, and switches between them within one issue and sometimes
+within one article — SH8601 has 344 sites of the closed-up form. Normalising
+them all to the spaced form would make the archive tidier than the paper, which
+is the one thing it must not be. **DECIDED 2026-08 by the issue owner:
+consistency with the page.**
+
+It follows from the rule this chain already lives by — *typos in print remain
+typos in the HTML* — and it costs something real: the published text stays
+uneven, and a reader may think we were careless. That is the correct trade. The
+archive's claim is that it reproduces what was printed; a house style applied
+over the top quietly breaks that claim everywhere it touches, and leaves no
+record that it did.
+
+The same reasoning governs `gibt's`/`gibt’s`, `Graphic`/`Grafik`, and any other
+pair the paper does not settle: read the page, set what it sets.
+
+**This is not a licence to preserve OUR errors.** A glyph we mis-read is ours
+and gets fixed; a form the magazine chose is the magazine's and stays. The test
+is always the crop, never the corpus frequency.
+
+## Cross-cutting rule: THE ISSUE YOU ARE WORKING ON IS THE SCOPE
+
+Work on the issue in hand. **Do not take on work in another issue unless THIS
+issue touches it.**
+
+"Touches it" is a real relationship, not a pretext:
+
+- this issue REPRINTS an article from another one, so the two transcriptions of
+  one printed text disagree and the comparison names the error (r330 — SH8601
+  fixed 14 such errors in 8510, 8511, 8512 and 8601);
+- an erratum in another issue corrects a page THIS issue reprints;
+- a shared tool, rule or template that this issue's work has proven wrong.
+
+What does NOT qualify, however tempting: a defect merely *noticed* while working
+here, and a corpus-wide gate result. MEASURED: running r310 over the whole
+archive reports **327 HARD findings across 33 published issues** — 143 of them
+one missing `</html>`, 61 `<li>` wrapping `<p>`, 62 a Discount `<ol type=>` bug.
+Most are markup that predates the gate: r310 was written 2026-08-21, and 8409
+was published in the repo 2024-08-20. **That is a corpus cleanup project with
+its own decision to make, not this issue's tail.**
+
+Report what you noticed, with evidence, and move on. Fixing another issue's
+published HTML on your own judgement is the same mistake as fixing the
+magazine's typos — you are changing something whose owner did not ask you to.
+
+## Cross-cutting rule: CHANGING A TOOL MEANS MEASURING BEFORE AND AFTER, AND RECONCILING THE DIFFERENCE
+
+**Never change a checker, a detector or a converter without running it both ways
+over the same real data and accounting for every finding that appeared or
+disappeared.** The delta is the evidence that the change did what you claim; a
+new version whose output you have not diffed against the old is an assertion.
+
+Three things the reconciliation must produce, and all three are load-bearing:
+
+1. **The counts, before and after**, on the whole corpus the tool covers — not
+   on the example that motivated the change.
+2. **An explanation for every difference.** A finding that VANISHED is either a
+   false positive correctly removed, or a real defect you have just gone blind
+   to. A finding that APPEARED is either a real defect newly visible, or a false
+   positive you have just introduced. There is no third case, and "the number
+   got better" is not an explanation.
+3. **The delta applied.** Newly visible defects get fixed, or recorded with
+   their evidence. A tool change that surfaces work and leaves it unrecorded is
+   worse than no change.
+
+MEASURED on SH8601, each of these actually happened:
+
+| change | before | after | what the delta was |
+|---|---|---|---|
+| dump cross-check: hand table -> `da65` | 13 | 13 | *the same 13* — two independent disassemblers agreeing, which is why the swap was trustworthy |
+| `da65` symbol lines not skipped | 13 | 63 | 50 phantom mismatches: `L795C := $795C` is a definition, not an instruction |
+| indirect addressing added | 25 | 13 | 12 phantom address gaps — `fmt()` raised, the caller swallowed it, `prev` never advanced |
+| absolute operands padded | 15 | 13 | 2 syntax-rendering differences, `sta $fb,y` against the monitor's `sta $00fb,y` |
+| layout pass on article 125 | 13 | 16 | 2 magazine errors that had been INVISIBLE inside `<p>`, plus 1 real tool fault — holding the count at 13 would have meant re-hiding them |
+| bold detector: threshold 1.35 -> 1.50 | 4 found | 3 found | **a false negative**: a genuine `Composite.` at exactly 1.50 was lost, so the change was reverted |
+| bold detector: paragraph-initial filter | 10 | 4 | 6 mid-sentence short words; all 4 survivors are the real terms |
+
+Note the sixth row. A change can make the number look better and be wrong:
+raising a threshold removed noise AND a real find. **Prefer a false positive to
+a false negative wherever a human confirms each hit** — the confirming crop is
+cheap, and a defect the tool stops reporting is invisible forever.
+
+## Cross-cutting rule: A CHECK YOU HAVE NOT SEEN FAIL IS NOT A CHECK
+
+**Before trusting any check, prove it can fail.** Run it against data that
+should trip it — the pre-edit tree (`git archive HEAD`), a copy with the defect
+reintroduced, a deliberately wrong input — and confirm it reports. A check that
+has only ever printed "clean" has not been shown to test anything.
+
+This is not caution. It is the single most repeated failure in this chain:
+**fourteen separate verification checks have been wrong on first contact with
+real data**, each written by someone confident it was right.
+
+| check | what it actually did |
+|---|---|
+| r180 | name regex excluded a hyphen — 43 false failures |
+| r190 | piped through `sort`, which exits 0, so the gate was an unconditional FAIL |
+| r150 | filename regex excluded an underscore |
+| r160 | counted `<table` inside HTML comments |
+| r210 | id list was monthly-only, so `vorwort` never matched |
+| r250 | counted comments as tags, and missed `<aside>` entirely |
+| r260 | tested the first *letter* against German model numbers (`C 128`) |
+| r270 | matched its own explanatory comment |
+| r280 | canary string hardcoded from a different issue — 0 hits by construction |
+| r300 | `for f in $(grep -rl …)` word-split on filenames containing spaces |
+| r310 | flagged an adjudicated printed period it could never clear, so HARD could not reach 0 |
+| drop-cap | examined only the first non-intro paragraph, and tested `islower()` alone — found 15 of 17 |
+| r330 `verify` | matched dispositions by NUMBER, not text, so a renumbering silently re-pointed 2047 of them |
+| cover guard | `magick compare` exits non-zero when images differ, so under `set -euo pipefail` it killed the build with an empty log — plus a threshold on the raw metric (~0.005 of a grey level) and a parse that rejected scientific notation |
+
+The pattern is always the same: the check encodes what its author expected the
+data to look like. The data is a 40-year-old magazine.
+
+**Corollary — a gate that always reports the same number stops being read.**
+Where a finding is adjudicated and correct as printed, record the adjudication
+where the CHECK can see it (r290's `PRINTED` comment beside the heading), not
+only in LOG.md. Otherwise the count never reaches zero and nobody looks again.
+
+## Cross-cutting rule: SAY WHAT TO READ SEPARATELY FROM WHAT TO EDIT
+
+When briefing a sub-agent, scope of ATTENTION and scope of MODIFICATION are two
+different things, and collapsing them silently shrinks the work.
+
+MEASURED on SH8601: a glyph sweep was briefed "do NOT touch … headings",
+meaning *do not restructure them*. It read that as *do not look there*, so 247
+headings went unswept — and `<h2>Die Befehle zur $priteprogrammierung</h2>`
+survived a pass that fixed 100 instances of exactly that defect elsewhere in the
+same issue.
+
+So write both, explicitly: **"read everything including headings and table
+cells; edit only the words, never the structure."** The same applies to the
+other axis — which FILES may be touched — when several agents work one issue at
+once.
 
 ## Cross-cutting rule: OCR cleanup granularity
 
@@ -722,10 +1027,24 @@ that nothing *detectable* is outstanding — they do not establish that the issu
 is right. Every substantive defect class in 8609 was found by a human looking
 at a page after the automated checks were already green.
 
+**r325 exists to narrow that gap, and cannot close it.** Every automated pass
+is pattern-driven or diff-driven: it confirms suspicions and cannot have
+suspicions of its own. r325 reads the whole issue for sense precisely because
+of that, but it is still a reading — SH8601's `$priteprogrammierung` sat in an
+`<h2>` through r280, r310, r320, r330 and a green build, and was found by the
+owner opening the article.
+
 So: report status, list what is still open, and wait. Do not write "the issue is
 complete" or upload on your own judgement.
 
-## Changing a listing ALWAYS goes to the user first
+## Changing a PROGRAM FILE always goes to the user first
+
+**This is about `prg/*.txt` — the runnable programs — and nothing else.** A
+`<pre>` block inside an article is transcription of the printed page like any
+other text: when it disagrees with the master, read the 600 dpi crop and
+correct it, exactly as for prose. Do not escalate that. (SH8601's chain
+escalated four such lines and should not have; they were fixed from the page
+in the end.)
 
 `prg/*.txt` are the programs readers typed in. Editing one — applying an
 erratum, correcting a line, renumbering — is not a markup fix and is never
@@ -736,8 +1055,10 @@ routine:
   the change is legible to the next reader.
 - Keep the superseded line as a `;` comment rather than deleting it, so the
   disk's original state is recoverable from the file itself.
-- **Test the result** — the listing must still load and run. See r320 for the
-  x128 harness.
+- **Test the result** — the listing must still load and run, in the emulator
+  for the machine the program is FOR: `x128` for a C128 program, `x64` for a
+  C64 one, `xplus4` for a Plus/4, and so on. The harness is in r320; the
+  machine is a property of the listing, not of the harness.
 
 The default remains: record the errata state, do not patch. Patch only when the
 user asks for it.

@@ -2,7 +2,9 @@
 
 **Applies to:** all — every issue is OCR'd the same way; nothing in it knows the kind.
 
-**Goal:** turn the deskewed, matted, A4-cropped, graded **600 dpi masters** into
+**Goal:** turn the deskewed, cut and graded **600 dpi masters** (step 005 traces each
+sheet's own edges and places it on the issue canvas; exact A4 is the
+*delivered PDF's* geometry, not the master's) into
 one JSON per page describing every block on it: bbox, printed type size, indent,
 ink density, a geometric label, and the block's text with the printed line
 breaks undone. Plus the per-page block index every later bbox step reads.
@@ -56,7 +58,9 @@ and already knows every bbox, so the index is a projection of data we have. It
 costs no OCR and cannot disagree with the corpus.
 
 **Coordinate space — read before cropping.** The bboxes are in pixels of the
-graded 600 dpi master, which is deskewed and A4-cropped. They are **not** in the
+graded 600 dpi master, which is deskewed and cut to the sheet's own traced
+edges (exact A4 is the delivered PDF's geometry, not the master's). They are
+**not** in the
 delivered PDF's page space; the PDF page is neither deskewed nor cropped, so the
 two differ by a rotation and an offset. Crop from the master:
 
@@ -181,3 +185,35 @@ unvalidated. Do that as its own before/after experiment.
 Note this does NOT fix drop caps the OCR never detects at all (`asin Ausgabe
 4/86` for `Das in Ausgabe 4/86`), nor mid-word doublings (`Programmiierung`,
 `Rüickumschlages`, `MO®S`), which are genuine tesseract misreads.
+
+### The undetected drop cap is the COMMON case, and r310 now gates it
+
+MEASURED on SH8601: **17 of 29 articles** opened with a truncated first word
+(`enn beim`, `ur Programmierung`, `abellenkalkulationen`). The splice above can
+only repair an initial tesseract DETECTED; where it detected none, the letter is
+simply absent — and what is left is valid HTML and grammatical German, so it
+passed r310, r320 and the site build untouched, and reached the review as a
+finished issue.
+
+It is caught by reading the article's **opening**, not its prose: r310 tests the
+first two prose paragraphs of every article. Two, because the truncated one is
+usually the first body paragraph after a standfirst, and a standfirst is
+sometimes `class="intro"` and sometimes a bare `<p>` — on SH8601 the two-paragraph
+window found all 17 where "the first paragraph" found 1 and "the first non-intro
+paragraph" found 15.
+
+Two forms, and they are gated differently because their populations differ:
+
+- **a stub where the initial belongs** — `$ ie glauben` for `Sie glauben`,
+  `D: große` for `Die große`. **HARD**: zero legitimate instances in 1724
+  published articles.
+- **a lowercase opening** — **soft**, because the magazine runs a headline into
+  its first sentence: `Warum…` / *sieht die 64'er diesmal…*, `3D-Joystick-Grafik`
+  / *ist ein Programm für den VC 20*. 10 in 1724 articles, 7 of them that idiom.
+  Read every one anyway: the same sweep found `esonders dem
+  Maschinensprache-Anfänger` for `Besonders dem` in an already-published issue.
+
+**The letter is READ, never inferred.** Six SH8601 articles open `Der C 128` and
+the seventh opens `Ist der C 128` — and that glyph is a plain slanted bar that
+had to be zoomed to tell an `I` from a `1`. Where the initial is present,
+check it against the page too: a WRONG initial is the same defect.

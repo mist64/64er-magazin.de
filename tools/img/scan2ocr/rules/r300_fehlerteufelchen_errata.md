@@ -9,6 +9,97 @@ it to the affected article here: an `<aside class="fehlerteufelchen">` at
 the end of the article, an in-text link to it, and — for code errata — a
 matching fix in the `prg/*.txt` listing.
 
+## TWO KINDS OF DEVIL: Fehlerteufelchen is THEIRS, Futureteufelchen is OURS
+
+Both already exist in this site — CSS, an SVG each, and generator handling in
+`generate.py` (`aside.fehlerteufelchen` / `aside.futureteufelchen`). 17 published
+articles carry a Futureteufelchen.
+
+| | who found it | when | what it is |
+|---|---|---|---|
+| `<aside class="fehlerteufelchen">` | the magazine | 1984-86 | a correction 64'er itself printed in a later issue's errata column |
+| `<aside class="futureteufelchen">` | **us** | **2026** | an error in the printed magazine that **was never corrected back then**, found while making this archive |
+
+A Futureteufelchen is signed by the modern finder where there is one
+(`<address class="author">(Endurion, goloMAK)</address>`); most carry no byline.
+It may also record a repair we made to a `prg/*.txt` listing — 8406/117's says
+`Die folgenden Fehler wurden im Basic-Lader behoben:` and lists them.
+
+**It does NOT change the article text.** *Typos in print remain typos in the
+HTML* still holds: the page's error stays where the reader can see it, and the
+Futureteufelchen stands beside it saying what is actually true.
+
+### A FUTURETEUFELCHEN IS NEVER YOURS TO ADD — IT COMES FROM THE ISSUE OWNER
+
+**This section is knowledge, not a worklist.** A Fehlerteufelchen is mechanical:
+the magazine printed a correction, you route it and apply it. A Futureteufelchen
+is an editorial statement in the archive's own voice, saying *the magazine was
+wrong and here is what is true* — and that is a judgement about the subject
+matter, not about the scan.
+
+So: **find them, record them, and stop.** Never add one on your own judgement,
+never add one in bulk, never treat a list of candidates as work to be worked
+through. Each one is decided case by case, by the issue owner.
+
+What to hand over: the passage, what appears to be wrong, and the crop that
+shows the page really prints it — the same evidence any other finding carries.
+
+**What qualifies, from SH8601's reading pass** (all verified as printed, all
+recorded, NONE acted on):
+
+| page | what the magazine printed | why it is a candidate |
+|---|---|---|
+| p054 | `80x200 = 1600 Byte` | the arithmetic is wrong; it is 16000 |
+| p032 | `»SHAPE DATA 2« (Listing 13)` | no such listing exists — p046's Listing 13 is `»SHAPE UND SPRITE«`, and no such file is on the disk |
+| p018/020 | `maximal 200 KByte` | contradicts `170 KByte` two pages earlier in the same article |
+| p145 | crossword clue `(92)` | the grid HAS a cell 92; the printed clue list jumps 90 -> 93 |
+| p109 | `(acht Zeilen Länge)` | *Zeichen* is meant, not *Zeilen* |
+| p026 | Bild 14/15 caption vs text | the magazine's own figure numbering disagrees with its prose |
+
+And what does NOT qualify, however wrong it looks: a plain typo. `Beipielprogramm`,
+`nebenanderliegene`, `»MANDELBROT1»`, `zwischen $0 uns $1fff` — the reader can
+see what was meant, and an aside would say nothing they do not already know.
+A Futureteufelchen earns its place by telling the reader something the page
+misleads them about.
+
+### A REPRINT of a corrected page needs a Futureteufelchen, not a copy of the Fehlerteufelchen
+
+When an erratum corrected the ORIGINAL printing but this issue reprints the
+uncorrected page, the finding — *this reprint is still wrong* — is **ours, made
+now**. The magazine never said it. So it is a Futureteufelchen.
+
+**ADAPT the wording; do not paste the original erratum.** It was written about
+the other issue and cites ITS page numbers, which are meaningless here. Drop
+them and describe the figure as it appears in THIS article, then say where the
+original correction ran:
+
+```html
+<aside class="futureteufelchen" id="futureteufelchen">
+    <h2>Futureteufelchen</h2>
+    <p>Die in Bild 2 mit der Nummer 3 bezeichnete RESET-Taste ist in
+       Wirklichkeit die RESET-Taste für das Diskettenlaufwerk. …</p>
+    <p>Die 64'er hat diesen Fehler im Fehlerteufelchen der Ausgabe 5/86 für den
+       Erstdruck in Ausgabe 1/86 richtiggestellt. Dieser Nachdruck übernimmt
+       Bild 2 jedoch unverändert, so daß die Korrektur hier nie erschienen
+       ist.</p>
+</aside>
+```
+
+MEASURED on SH8601: `16 Der C 128 D im ersten Test` reprints 8601 pp 43-44;
+8605's Fehlerteufelchen corrects Bild 2 of exactly those pages — the button
+labelled 3 is the DRIVE's reset, item 4 the hardware reset, not the mains
+switch. `issues/8601/43` carries the Fehlerteufelchen. The reprint carried
+`3-Resettaste; 4-Netzschalter` and nothing else, so its reader saw a
+known-wrong figure with the correction three issues away.
+
+**Routing is why it was missed:** the erratum's heading names `Ausgabe 1/86,
+Seite 43 und 44`, so step 1 sends it to the monthly and stops. After routing an
+erratum, check `REPRINTS.md` and the r330 verdicts for an article in THIS issue
+that reprints the cited pages.
+
+Do not edit the other issue — r000, *the issue you are working on is the scope*.
+The monthly already has its own aside; what is missing is the reprint's.
+
 This is why prior issues carry 2–7 of these asides each (8601–8607) while a
 freshly-built issue has **zero**: the errata live in issues that are
 imported later, so this step is a **cross-issue enrichment**, not a
@@ -146,8 +237,13 @@ the article aside AND the `prg/*.txt` fix exist.
 dir=issues/<YYMM>
 # every aside is well-formed and anchored
 grep -rl 'aside class="fehlerteufelchen" id="fehlerteufelchen"' "$dir"/*.html
-# every aside names its source issue
-for f in $(grep -rl 'class="fehlerteufelchen"' "$dir"/*.html); do
+# every aside names its source issue.
+# NUL-separated, and read without word-splitting: EVERY article filename in
+# this repo contains spaces ("62 Roulette C 128.html"), so `for f in $(grep
+# -rl ...)` splits each one into fragments and reports a dozen missing files
+# per issue.  It fails identically on issues that have been correct for
+# months -- run it over SH8501's eight known-good asides and watch.
+grep -rlZ 'class="fehlerteufelchen"' "$dir"/*.html | while IFS= read -r -d '' f; do
   grep -q "<!-- 64'er " "$f" || echo "  $f: aside missing <!-- 64'er M/YYYY --> trailer"
 done
 # no orphan links (link present but no aside in same file)

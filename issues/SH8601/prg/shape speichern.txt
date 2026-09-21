@@ -1,0 +1,27 @@
+
+
+;shape speichern.prg ==4001==
+   10 rem***** shape erstellen *****
+   20 color0,1:color4,1:color1,6:graphic1,1:b$=chr$(13)
+   30 circle1,10,10,10,10:sshapea$,0,0,20,20:gosub230
+   40 scratch"shape1"
+   50 rem***** shapes auf diskette speichern *****
+   60 dopen#1,"shape1",w:print#1
+   70 fori=1tolen(a$):print#1,asc(mid$(a$,i,1))b$:nexti:print#1,"ende"b$
+   80 dclose#1
+   90 rem***** variable loeschen und neustart *****
+  100 clr:graphic1,1:sleep2:run120
+  110 rem***** shapes wieder von diskette holen *****
+  120 dopen#1,"shape1"
+  130 do
+  140 :input#1,b$
+  150 ::if b$="ende" then exit
+  160 :b=val(b$):b$=chr$(b):a$=a$+b$
+  170 loop
+  180 dclose#1:gosub230
+  190 rem***** shape zeichnen *****
+  200 gshapea$,100,100
+  210 end
+  220 rem***** kontrollunterprogramm *****
+  230 fori=1tolen(a$):printasc(mid$(a$,i,1));:nexti:print:printlen(a$):return
+
