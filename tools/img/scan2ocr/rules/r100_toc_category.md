@@ -222,8 +222,9 @@ PY
   from article to category is a lookup rather than a third reading of p6/p7.
   Fall back to the page only if the file is absent (a pre-chain issue).
 
-- **Check the Rubriken box against the article set** — every entry under
-  `Rubriken` should have an article whose `64er.pages` contains its page:
+- **Check EVERY printed TOC entry against the article set** — not only the
+  `Rubriken` box. An entry whose page no article claims is a piece the chain
+  dropped, and the printed index is the only witness that it existed:
 
   ```bash
   $PY - issues/<YYMM> <<'PYEOF'
@@ -246,13 +247,32 @@ PY
               claimed.update(range(int(a), int(b or a) + 1))
   for line in io.open(ent, encoding='utf-8'):
       page, section, entry = (line.rstrip('\n').split('\t') + ['', ''])[:3]
-      if section == 'Rubriken' and entry not in ADS and page.isdigit():
+      if entry not in ADS and page.isdigit():
           if int(page) not in claimed:
               print('NO ARTICLE for Rubriken entry %-22s p%s' % (entry, page))
   PYEOF
   ```
 
-  **What this catches, and what it provably does not.** It catches a rubric
+  MEASURED on 8611: silent as the issue stands, and against the state before
+  the p96 rebuild it reports exactly `NO ARTICLE p96 Schaltplan des
+  1541-Laufwerks [64'er Extra]` — the article a human found by reading the
+  index, two steps after the loss.
+
+  **This is the check for prose lost inside artwork, and text statistics are
+  not.** p097's explanatory paragraph was OCR'd into the 1541 schematic as one
+  328-token block, `Zum Reparaturkurs in die¬N ser Ausgabe der Schaltplan li
+  der Diskettenstation 1541` interleaved with `+5Y um sh 5 j` and `6234152
+  1623415 P3`, and r020 labelled the whole block `noise` — right for 95 % of
+  its characters. Three ways of scoring the text were tried against every
+  dropped block in the issue and **none separates it**: longest run of
+  consecutive German words puts it 3 (rank ~116), German-word density 24 %
+  (rank 48 of 73), best density in a 25-token window 60 % (rank 25 of 56).
+  Above it every time sit table headers, classified-ad small print and figure
+  keys that are *correctly* dropped. The paragraph does not read differently
+  from them — what distinguishes it is that **the magazine's own index says an
+  article is there**.
+
+  **What this catches, and what it provably does not.** It catches an entry
   that was DROPPED — no article claims its page at all. It does **not** catch
   one that was ABSORBED, and that is not a limitation to work around, it is
   arithmetic: 8611's Editorial was glued to the front of the Messebericht on
