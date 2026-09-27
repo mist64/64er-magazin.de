@@ -21,9 +21,32 @@ HTML_TAGS = {
     'title','tr','u','ul','var','wbr',
 }
 s = open(fp, encoding='utf-8').read()
+
+# BOTH ESCAPES ARE FOR DISCOUNT'S INLINE PARSER, WHICH DOES NOT RUN INSIDE A
+# FENCE.  Applied there anyway, the escape is shipped LITERALLY: `10 A=B\*2`
+# renders with the backslash visible, and `&lt;F1&gt;` inside a fence comes out
+# as the text "&lt;F1&gt;" because 070 re-escapes the ampersand.  Nothing later
+# in the chain strips either.  MEASURED on Discount 3.0.2 with r060's own flags,
+# and on 8611: 4 fenced lines would have shipped a stray backslash and 2 would
+# have shipped entity text -- inside LISTINGS, which are the one thing in this
+# corpus that has to be byte-exact, because a reader types them in.
+# Fenced regions are therefore passed through untouched.  ``` only: 030 emits
+# no indented code blocks (MEASURED: 0 in 8611), and treating a 4-space indent
+# as code would swallow ordinary continuation lines.
+def map_outside_fences(s, fn):
+    out, infence = [], False
+    for line in s.splitlines(keepends=True):
+        if line.lstrip().startswith('```'):
+            infence = not infence
+            out.append(line)
+            continue
+        out.append(line if infence else fn(line))
+    return ''.join(out)
+
 # Pass 1: convert any pre-existing backslash-escaped pair `\<X\>` to entities,
 #         since Discount preserves `\<` literal when it looks like a tag.
-s = re.sub(r'\\<([^<>\n]*?)\\>', lambda m: '&lt;' + m.group(1) + '&gt;', s)
+s = map_outside_fences(s, lambda l: re.sub(r'\\<([^<>\n]*?)\\>',
+                                           lambda m: '&lt;' + m.group(1) + '&gt;', l))
 # Pass 2: escape bare <X> where X is not a recognised HTML tag.
 def fix(m):
     inner = m.group(1)
@@ -32,7 +55,7 @@ def fix(m):
         return m.group(0)
     return '&lt;' + inner + '&gt;'
 # Match <…>: starts with letter (so '<10', '< CBM >', '<\*>' don't match).
-s = re.sub(r'<(/?[a-zA-Z][^<>\n]*?)>', fix, s)
+s = map_outside_fences(s, lambda l: re.sub(r'<(/?[a-zA-Z][^<>\n]*?)>', fix, l))
 open(fp, 'w', encoding='utf-8').write(s)
 # report
 left_bad = 0

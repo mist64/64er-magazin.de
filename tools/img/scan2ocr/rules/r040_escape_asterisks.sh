@@ -12,10 +12,33 @@ python3 - "$1" <<'PY'
 import re, sys
 fp = sys.argv[1]
 s = open(fp, encoding='utf-8').read()
+
+# BOTH ESCAPES ARE FOR DISCOUNT'S INLINE PARSER, WHICH DOES NOT RUN INSIDE A
+# FENCE.  Applied there anyway, the escape is shipped LITERALLY: `10 A=B\*2`
+# renders with the backslash visible, and `&lt;F1&gt;` inside a fence comes out
+# as the text "&lt;F1&gt;" because 070 re-escapes the ampersand.  Nothing later
+# in the chain strips either.  MEASURED on Discount 3.0.2 with r060's own flags,
+# and on 8611: 4 fenced lines would have shipped a stray backslash and 2 would
+# have shipped entity text -- inside LISTINGS, which are the one thing in this
+# corpus that has to be byte-exact, because a reader types them in.
+# Fenced regions are therefore passed through untouched.  ``` only: 030 emits
+# no indented code blocks (MEASURED: 0 in 8611), and treating a 4-space indent
+# as code would swallow ordinary continuation lines.
+def map_outside_fences(s, fn):
+    out, infence = [], False
+    for line in s.splitlines(keepends=True):
+        if line.lstrip().startswith('```'):
+            infence = not infence
+            out.append(line)
+            continue
+        out.append(line if infence else fn(line))
+    return ''.join(out)
+
 def esc(m):
     n = len(m.group(0))
     return m.group(0) if n == 2 else '\\*' * n
-s = re.sub(r'(?<!\\)\*+', esc, s)   # (?<!\\) keeps idempotent: skip runs already preceded by '\'
+# (?<!\\) keeps idempotent: skip runs already preceded by '\'
+s = map_outside_fences(s, lambda line: re.sub(r'(?<!\\)\*+', esc, line))
 open(fp, 'w', encoding='utf-8').write(s)
 # report
 solo = len(re.findall(r'(?<!\\)(?<!\*)\*(?!\*)', s))

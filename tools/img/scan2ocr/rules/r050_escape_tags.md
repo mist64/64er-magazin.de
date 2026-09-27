@@ -12,7 +12,16 @@ them so they render as literal text. Keep real HTML tags (`<br>`, `<sub>`,
 For every `<…>` pattern in the `.md`:
 - Extract the first identifier (the would-be tag name; for `</X>` strip the leading `/`, for `<X/>` ignore the trailing `/`).
 - If the **lowercased** identifier is in the HTML whitelist (`br, p, h1-h6, a, strong, em, sub, sup, table, tr, td, th, thead, tbody, ul, ol, li, dl, dt, dd, hr, img, code, pre, blockquote, aside, figure, figcaption, address, div, span, section, article, small, big, b, i, u, kbd, mark, samp, …`) → **keep**.
-- Else → **escape** the surrounding `<` and `>` as `\<` … `\>`, so markdown renders them as `&lt;…&gt;` (browser-safe literal text).
+- Else → **replace** the surrounding `<` and `>` with the entities `&lt;` and
+  `&gt;` directly. Not with `\<` … `\>`: this file used to say that, and the
+  script's own comment says why it stopped — Discount **preserves `\<`
+  literally** when what follows looks like a tag, so `text \<F1\>` ships
+  backslashes and all. MEASURED on Discount 3.0.2 with r060's flags.
+- **Fenced code is left alone.** The escape is for Discount's inline parser,
+  which does not run inside a fence, so an entity written there is re-escaped
+  by 070 and ships as the visible text `&lt;F1&gt;`. Discount escapes `<…>`
+  inside a fence by itself, correctly. Same for r040's `\*`, which would ship
+  as a stray backslash in a listing.
 
 Patterns that already start with a non-letter (e.g. `< CBM >` with leading space, `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because HTML requires a letter immediately after `<` for a tag.
 
