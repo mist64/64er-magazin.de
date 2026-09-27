@@ -27,6 +27,43 @@ tools/img/scan2ocr/rules/r020_classify.sh
 
 Four lanes, one model call per uncached page.
 
+## The evaluation's truth can be a REFUSAL, and it is not truth
+
+`r020_evaluate.py` asks a model to transcribe each page and scores the
+pipeline against that reading. On a 1986 magazine the model may decline:
+
+> *"I can't provide a full verbatim transcription of this page. It's
+> copyrighted article text from the magazine … I can offer a summary and
+> short quotes instead."*
+
+`build_truth` already refused to write a SERVICE message (a session limit
+once landed in 165 truth files). It did not refuse to write a **content**
+refusal, and because it skips files that already exist, every summary became
+this issue's permanent ground truth.
+
+MEASURED on 8611: **43 of 192**, almost all of them article pages — only 53
+of the pages that carry article text had usable truth at all. And the harm
+was not the files, it was the number:
+
+| | recall | precision | order | headings |
+|---|---|---|---|---|
+| as printed, all 192 | **0.733** | 0.767 | 0.999 | 0.744 |
+| the 149 with real truth | **0.930** | 0.973 | 0.999 | 0.908 |
+
+A reader budgeting from 0.733 goes looking for a regression that was never
+there. `is_refusal()` now catches it in three places: `build_truth` will not
+write one, `score()` will not score one already on disk, and the summary
+prints how many pages it could not score before it prints any figure.
+
+> **A score without its denominator is not a score.** Both of this file's
+> earlier disasters were the same shape — 165 truth files of "session
+> limit", and a stage B that died leaving 174 unclassified pages while the
+> evaluation printed recall 0.505 as if it meant something.
+
+A refusal is not deterministic: delete those truth files and most of them
+transcribe on a second pass. Deleting them is the correct response, not a
+workaround.
+
 ## Outputs
 
 ```
@@ -67,9 +104,17 @@ something new.
 ## Verification
 
 ```bash
+# The venv, not bare python3 (numpy), and the ISSUE's page count, not
+# another issue's: the literal 176 that stood here was 8609's and would
+# have scored 16 pages short of a 192-page issue and 24 past a 152-page
+# Sonderheft. r010_ocr_blocks.sh fixed this in its own file years ago;
+# the same literal survived here.
+PY=${PYTHON:-tools/img/scan2ocr/rules/../../../../.venv/bin/python}
+PAGES=$("$PY" -c 'import r000_issue; from r000_issue import ISSUE
+print(r000_issue.load(ISSUE).pages)')
 cd tools/img/scan2ocr/rules
-python3 r020_evaluate.py $(seq 1 176)      # scores against a vision reading
-python3 r020_collect.py                    # review bundle: pNNN.png + pNNN.txt
+$PY r020_evaluate.py $(seq 1 $PAGES)       # scores against a vision reading
+"$PY" r020_collect.py                      # review bundle: pNNN.png + pNNN.txt
 ```
 
 `r020_evaluate.py` reports four numbers, deliberately **not** combined because they

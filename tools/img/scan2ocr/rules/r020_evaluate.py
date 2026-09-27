@@ -80,6 +80,30 @@ SERVICE_ERRORS = ("session limit", "usage limit", "rate limit",
 # again by 23:45 with nothing done to fix it.  A usage limit is the opposite case
 # and must NOT be retried, since it resets on a clock, not on a wait.
 TRANSIENT_ERRORS = ("Failed to authenticate", "OAuth session expired", "Overloaded")
+# A CONTENT REFUSAL is not a transcription either, and it is the one that got
+# through.  SERVICE_ERRORS catches the service saying no; this catches the model
+# saying no -- "I can't provide a full verbatim transcription of this page. It's
+# copyrighted article text ... I can offer a summary instead."  MEASURED on
+# 8611: 43 of 192 truth files, nearly all of them ARTICLE pages, so only 53 of
+# the pages that have article text had usable truth at all.  Because build_truth
+# skips files that already exist, every one of those summaries would have been
+# ground truth for every future run of this issue.
+#
+# The damage is not the files, it is the number: the run printed recall 0.733,
+# and on the pages that actually had truth it was 0.930.  A reader budgeting
+# from the printed figure would have gone looking for a regression that was
+# never there.
+#
+# Checked against the OPENING of the reply, because a transcription of a 1986
+# magazine page does not begin in the first person.
+REFUSAL_OPENERS = ("i can't", "i cannot", "i'm not able", "i am not able",
+                   "i won't", "i will not", "i'm unable", "i am unable")
+
+
+def is_refusal(text):
+    """True when the model declined instead of transcribing."""
+    head = (text or "")[:200].lower().lstrip("# *\n")
+    return any(head.startswith(m) or ("\n" + m) in head for m in REFUSAL_OPENERS)
 RETRIES = 3
 RETRY_WAIT = 45   # seconds
 CLAUDE_TIMEOUT = 600
@@ -204,6 +228,8 @@ def build_truth(page):
     # that is not plausibly a page of text.
     if not out or any(m in out for m in SERVICE_ERRORS):
         raise RuntimeError(f"p{page}: not a transcription: {out[:120]}")
+    if is_refusal(out):
+        raise RuntimeError(f"p{page}: REFUSAL, not a transcription: {out[:120]}")
     open(dest, "w", encoding="utf-8").write(out + "\n")
 
 
@@ -214,6 +240,12 @@ def score(page):
     if not os.path.exists(tp) or not os.path.exists(pp):
         return None
     raw = open(tp, encoding="utf-8").read()
+    # A refusal already on disk from an earlier run is not truth either.  Caught
+    # here as well as in build_truth so an issue that was evaluated before this
+    # check existed reports an honest denominator without anyone deleting files
+    # by hand.
+    if is_refusal(raw):
+        return None
     if "NO_ARTICLE_TEXT" in raw:
         raw = ""
     truth = paragraphs(raw)
@@ -295,6 +327,21 @@ def main(pages):
         list(ex.map(lambda p: _safe(build_truth, p), pages))
 
     rows = [r for r in (score(p) for p in pages) if r]
+
+    # THE DENOMINATOR IS PART OF THE SCORE.  Pages whose truth is a refusal are
+    # not scored, and saying so is the difference between "recall 0.733, this
+    # chain has got worse" and "recall 0.930 over the 149 pages that had truth".
+    refused = [p for p in pages
+               if os.path.exists(os.path.join(TRUTH_DIR, f"{p:03d}.txt"))
+               and is_refusal(open(os.path.join(TRUTH_DIR, f"{p:03d}.txt"),
+                                   encoding="utf-8").read())]
+    if refused:
+        print(f"NO TRUTH on {len(refused)} of {len(pages)} pages: the model "
+              f"declined to transcribe them (copyright), so they are excluded "
+              f"from every figure below.")
+        print(f"  {refused[:12]}{'...' if len(refused) > 12 else ''}")
+        print(f"  Delete those truth files to re-ask; a refusal is not "
+              f"deterministic and a second pass usually gets most of them.")
 
     # A page whose article.txt exists but whose labels.json does not was never
     # classified -- its text is stage A's provisional guess, not the pipeline's
