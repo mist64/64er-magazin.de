@@ -1,5 +1,11 @@
 # scan2ocr — scans → article-text corpus
 
+**The entry point for a build is
+[`rules/r000_orchestration.md`](rules/r000_orchestration.md)**, not this
+file. This one describes what the chain IS; that one says how to run it.
+A fresh agent reaches both from [`CLAUDE.md`](../../../CLAUDE.md) in the
+repo root.
+
 Extracts **article text and only article text** from a scanned 64'er issue, as
 markdown: no running heads, no folios, no ads, no Kleinanzeigen, no standalone
 type-in listings, no facing-page slivers. One `.md`-shaped `.txt` per page; a
