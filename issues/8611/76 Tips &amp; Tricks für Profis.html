@@ -32,12 +32,20 @@ ldy #3 ;Sekundäradresse (ohne Funktion)
 jsr setpar ;Werte setzen
 lda #2 ;Länge des Filenamens
 ldx #&lt;fadr ;Adresse des Filenamens (low)
+ldy #>fadr ;(high)
+jsr setnam ;Name für OPEN setzen
+jsr open ;Datei öffnen
+ldx #&lt;ebuf ;Zeiger für Empfangspuffer
+ldy #&gt;ebuf ;und
+stx $£7
+sty $f8
+ldx #&lt;abuf
+ldy #&gt;abuf
+stx $£9
+sty $fa
+fadr .byte %00000110 ;Wert für Steuerregister
+... "byte %00000000 ;Wert für Befehlsregister
 </code></pre>
-
-
-        <p>ldy #>fadr ;(high) jsr setnam ;Name für OPEN setzen jsr open ;Datei öffnen ldx #&lt;ebuf ;Zeiger für Empfangspuffer ldy #&gt;ebuf ;und stx $£7 sty $f8 ldx #&lt;abuf ldy #&gt;abuf stx $£9 sty $fa fadr .byte %00000110 ;Wert für Steuerregister</p>
-
-        <p>... "byte %00000000 ;Wert für Befehlsregister</p>
 
         <p>Übrigens werden die Zeiger auf die Puffer auch vom Betriebssystem gesetzt, das die Puffer an das obere (Basic-) RAM-Ende legt. Dies ist auch der Grund, weswegen beim Öffnen der Schnittstelle ein CLR ausgeführt wird, denn im gleichen Speicherbereich liegen ja auch die Stringvariablen. Wenn wir jetzt zum Beispiel sequentielle Dateien senden oder empfangen wollten, könnte es bei langen Dateien passieren, daß die Puffer und die Datei sich überlappen, so daß Datenverluste entstehen. Darum legen wir die Puffer in uns angenehme Speicherbereiche, was man entweder vor oder nach dem OPEN-Befehl machen kann. Vorher deswegen, da das Betriebssystem die Pufferadressen erst festlegt, nachdem esin den Speicherstellen nachgesehen hat, ob das vom Programm schon gemacht wurde. Ist das High-Byte der Pufferzeiger ungleich Null, wird davon ausgegangen, daß die Zeiger bereits auf die Puffer deuten. Deshalb wird nichts mehr verändert. Und nun geht's los!</p>
 
@@ -94,15 +102,9 @@ ldy #3 ;Sekundaeradresse
 jsr setlfs ;Werte setzen
 lda #4 ;der Filename ist 2 Zeichen lang
 ldx #(fadr ;Adresse des Filenamens (low)
-</code></pre>
-
-
-        <pre><code>ldy #)fadr ;(high)
+ldy #)fadr ;(high)
 jsr setnam ;Name für OPEN setzen
-</code></pre>
-
-
-        <pre><code>jsr open ;Datei oeffnen
+jsr open ;Datei oeffnen
 ldx #2 ;Datei mit der logischen Filenummer
 jsr chkout ;#2 als Standardausgabegerät
 </code></pre>
@@ -111,39 +113,30 @@ jsr chkout ;#2 als Standardausgabegerät
         <p>Nun müssen Sie einen Zeiger auf den Anfang des in den Speicher geladenen sequentiellen Files setzen und die Pufferzeiger entsprechend ändern.</p>
 
         <pre><code>(Zeiger »pt« auf Dateianfang setzen)
-sende ldy #0 ;aktuelles Zeichen aus dem lda (pt),y ;File in den Akku holen
+sende ldy #0 ;aktuelles Zeichen aus dem
+lda (pt),y ;File in den Akku holen
 (Zeichen nun bearbeiten, zum Beispiel in ASCII-Code
-</code></pre>
-
-
-        <pre><code>wandeln)
+wandeln)
 tax ;Zeichen merken
 wloop lda $02al ;ist das vorherige Zeichen
 and #1 ;bereits gesendet worden?
 bne wloop ;nein: =&gt;warten
 txa ;gemerktes Zeichen zurueckholen
-</code></pre>
-
-
-        <pre><code>jsr chrout ;auf. RS232 ausgeben
+jsr chrout ;auf. RS232 ausgeben
 </code></pre>
 
 
         <p>Der Zeiger »PT« muß nun erhöht und auf Fileende getestet werden. Ist die Dateinoch nicht zu Ende, muß wieder zum Label SENDE gesprungen werden.</p>
 
-        <pre><code>jsr elrchn ;Standardwerte Ein-/Ausgabe lda #2 ;setzen und Datei schließen
+        <pre><code>jsr elrchn ;Standardwerte Ein-/Ausgabe
+lda #2 ;setzen und Datei schließen
+jsr close
+rts ‚das war's!
+.byte %00100000
+.byte %00000000
+.byte %00000010
+.byte %00000000
 </code></pre>
-
-
-        <p>jsr close rts ‚das war's!</p>
-
-        <p>.byte %00100000</p>
-
-        <p>.byte %00000000</p>
-
-        <p>.byte %00000010</p>
-
-        <p>.byte %00000000</p>
 
         <p>Das folgende Programm (Listing 1, bitte mit dem MSE eingeben) sendet sequentielle Files mit 4800 Bit/s, 8 Datenbits, 1 Stoppbit, keine Parität, Vollduplex und 3-Line-Handshake. Die Syntax lautet: SYS 52480,konv-flag," Name" Wenn konrv-flag = 0, werden die Zeichen erst in ASCII-Code gewandelt und dann gesendet. Bei konv-flag = 128 erfolgt die Übertragung unverändert.</p>
 
@@ -172,17 +165,9 @@ txa ;gemerktes Zeichen zurueckholen
 
         <p>Die Zahl 1 ist der Bildschirm-Code des Zeichens A, dem der Wert 66(CHRS$-Code von B) zugeordnet wird. Esist dabei unwichtig, ob das B vorher geändert war oder nicht. Der CHRS$-Code wird aus dem ROM gelesen.</p>
 
-        <p>Um eine QWERTZ-Tastatur zu erhalten, sind folgende Befehle einzugeben: 125,90 (wandelt Yin Z um)</p>
+        <p>Um eine QWERTZ-Tastatur zu erhalten, sind folgende Befehle einzugeben:<br>125,90 (wandelt Yin Z um)<br>126,89 (wandelt Zin Y um)</p>
 
-        <p>126,89 (wandelt Zin Y um)</p>
-
-        <p>Soll die Cursor-Steuerung auf die Funktionstasten gelegt werden, so benötigt man folgende Befehle:</p>
-
-        <p>139,145 (&lt;Fl&gt; = &lt;CRSR&gt;-hoch) 140,17 (&lt;F3&gt; = &lt;CRSR&gt;-unten)</p>
-
-        <p>141,157 (&lt;F5&gt; = &lt;CRSR&gt;-links)</p>
-
-        <p>163,29 (&lt;F7&gt; = &lt;CRSR&gt;-rechts)</p>
+        <p>Soll die Cursor-Steuerung auf die Funktionstasten gelegt werden, so benötigt man folgende Befehle:<br>139,145 (&lt;Fl&gt; = &lt;CRSR&gt;-hoch)<br>140,17 (&lt;F3&gt; = &lt;CRSR&gt;-unten)<br>141,157 (&lt;F5&gt; = &lt;CRSR&gt;-links)<br>163,29 (&lt;F7&gt; = &lt;CRSR&gt;-rechts)</p>
 
         <p>Beim Abtippen von »DATA-Wüsten« lohnt es sich, die Komma-Taste zu verschieben. Der Befehl !31,44 verlegt diese auf die &lt;->-Taste.</p>
 
@@ -258,13 +243,7 @@ txa ;gemerktes Zeichen zurueckholen
 
         <p>Bei einigermaßen geschicktem Einsatz der acht zur Verfügung stehenden Spritesläßt sich eine brauchbare Laufschrift aufdem Rahmen erzeugen. Es sind aber durchaus auch zwei Laufschriften möglich. Genau dies tut nun das vorliegende Programm (Listing 3, bitte mit dem MSE eingeben). Es scrollt acht Sprites, deren Inhalt in $3E00 bis $3FFF abgelegt ist, von rechts nach links über den Bildschirm. Das dazugehörige kleine Basic-Programm (Listing 4) berechnet aus den eingegebenen Texten die Daten für diese Sprites und schreibt sie gleich in den richtigen Bereich.</p>
 
-        <p>Nachdem das Basic-Programm etwa zehn Sekunden lang gerechnet hat, erscheinen die eingegebenen Texte als Laufschriften ober- und unterhalb des Bildschirms. Ein erneutes Einschalten ist nach &lt;RUN/STOP+RESTORE&gt; durch SYS 49152 möglich, da die Daten im Speicher erhalten bleiben. Achtung: Vor dem erneuten Starten des Basic-Teils muß die Interrupt-Routine durch &lt;RUN/STOP+RESTORE&gt; oder</p>
-
-        <p class="source">Fortsetzung:von Seite 79</p>
-
-
-
-        <p>durch Eingabe von »SYS 58648:SYS 64789:SYS 64931« (klappt nicht immer) abgeschaltet werden.</p>
+        <p>Nachdem das Basic-Programm etwa zehn Sekunden lang gerechnet hat, erscheinen die eingegebenen Texte als Laufschriften ober- und unterhalb des Bildschirms. Ein erneutes Einschalten ist nach &lt;RUN/STOP+RESTORE&gt; durch SYS 49152 möglich, da die Daten im Speicher erhalten bleiben. Achtung: Vor dem erneuten Starten des Basic-Teils muß die Interrupt-Routine durch &lt;RUN/STOP+RESTORE&gt; oder durch Eingabe von »SYS 58648:SYS 64789:SYS 64931« (klappt nicht immer) abgeschaltet werden.</p>
 
         <p>Mögliche Änderungen des Programms: Am einfachsten läßt sich die Farbe der Schrift ändern. Hierzu ruft man die Routine nur mit einer anderen Cursorfarbe auf. Zum Verschieben der Laufschriften in YRichtung muß der Inhalt der Speicherstelle 49174 verändert werden (normal 8. In Adresse 49206 steht die Blocknummer des letzten Sprites (normal = 255). Wird diese verändert, müssen natürlich auch im Basic-Teil die Zahlen 15911 und 15872 in Zeile 270/280 verändert werden. Auch mit einem geänderten Zeichensatz läßt sich die Laufschrift einsetzen. Dazu muß die Variable ZA in Zeile 180 auf den Beginn des neuen Zeichensatzes zeigen. Setzt man hier 55296 ein, erscheint die Laufschrift in Kleinschrift.</p>
 
