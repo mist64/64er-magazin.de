@@ -11,6 +11,29 @@
 German guillemets `«» / »«` are kept — they're the magazine's authentic
 quotation marks and stay verbatim.
 
+## Inside `<pre>` these substitutions are CORRECT — do not make this step fence-aware
+
+Steps 040, 050 and 060 all had to be taught to leave fenced code alone, and it
+would be easy to conclude that any whole-file pass is wrong inside `<pre>`.
+This one is not, and the difference is the whole point:
+
+| the pass | inside `<pre>` | why |
+|---|---|---|
+| 040 `\*`, 050 `&lt;` | **wrong** | the escape is for Discount's inline parser, which does not run in a fence, so it ships literally |
+| 060 `-G` padding | **wrong** | the renderer added it; it was never in the source |
+| **070 curly → straight** | **RIGHT** | it restores what the source actually was |
+
+**Ask what the source characters were, not whether it is a code block.** The
+C64 character set has exactly ONE quote, `"` at 0x22 — there is no curly quote
+in PETSCII — so a `"` or `"` inside a listing is an OCR misreading of a plain
+quote and straightening it is a repair, not a corruption. `CHR$(27);"*"` is
+what the magazine printed and what a reader must type; `CHR$(27);"*"` would not
+run.
+
+MEASURED over the published corpus, inside `<pre>`: **8610 has 0 curly quotes
+and 102 straight; 8608 has 0 and 26.** 8609 has 8 curly that survived, and
+those are a defect, not a precedent.
+
 ## Substitutions
 
 | from | to |
