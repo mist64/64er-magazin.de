@@ -50,19 +50,33 @@ write a number it has no source for.
 
 Where it comes from, in order:
 
-1. **The magazine's own announcement**, where it prints one. The
-   Sonderheft bullets cite theirs as page references —
-   `Sonderheft 6/85 (Top-Themen): ca. 18. Oktober 2025 <!-- 8511/S.139 -->`
-   — because the monthly that preceded them printed an on-sale date. Check
-   the previous issue's *Vorschau* first. The monthly bullets carry no such
-   comment: 8610's Vorschau announces 11/86's contents and no date.
-2. **Otherwise the established cadence**, which the operator confirms. It
-   is a **Saturday, 28 or 35 days after the previous issue**, keeping to
-   mid-month — MEASURED over the last eight planned dates, six of which are
-   the 2nd or 3rd Saturday and the gaps alternate 28/35 to stay there.
-   The rhythm is the point: one issue a month, 40 years on.
+**THE PREVIOUS ISSUE PRINTS IT.** Every *Vorschau* page carries, in its
+masthead banner beside the wordmark:
 
-Whichever it is, the operator says it, and the bullet records it.
+> `VORSCHAU 64'er   DIE NÄCHSTE AUSGABE ERSCHEINT AM 17.10.86`
+
+That is the next issue's on-sale date, and it is the authority. Add 40 years
+to it — the same day of the same month — and that is the bullet. 11/86's
+came off 8610 p196, 12/86's off 8611 p188.
+
+**Read it from the PAGE IMAGE, not the article text.** The date is set in
+the banner, which is artwork; it is not in the Vorschau article's prose and
+never reaches the HTML. This rule previously said "8610's Vorschau announces
+the contents and no date" — written after reading the article body and
+finding nothing, which is exactly the wrong place to look. Crop the top strip
+of `masters600/<Vorschau page>.png`.
+
+The Vorschau is the **5th-from-last page** of a monthly (188 of 192 on 8611,
+196 of 200 on 8610), and `toc_entries.txt` gives it exactly: the `Rubriken`
+entry named `Vorschau`.
+
+So the plan date is **derived, not chosen** — and because it is, the operator
+confirms it rather than invents it. Two issues ahead can be filled at once:
+reading 8611 p188 supplies 12/86 before 8612 is imported at all.
+
+*Sanity, not authority:* the original dates are Fridays and the same calendar
+dates 40 years on are Saturdays, 28 days apart. If a derived date is neither
+a Saturday nor ~28 days after the previous, re-read the banner.
 
 **If the issue ships on a different day, only `pubdate.txt` changes.**
 The user sets it (`pubdate.txt` is a publishing decision, not an import
