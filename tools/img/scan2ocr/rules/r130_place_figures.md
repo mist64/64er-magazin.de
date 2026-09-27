@@ -83,7 +83,7 @@ For each `<figure>` block in `prg.txt`, in order:
 |---|---|---|
 | BASIC source (`prg/<name>.txt` present, `.prg` in `prg/del/`) | `<pre data-filename="<name>"></pre>` (no `.prg` suffix) | Generator renders petcat text; binary download materialised via `petcat2prg`. |
 | MSE binary (`prg/<name>.prg`) | `<pre data-filename="<name>.prg" data-name="…" data-mse=mse1></pre>` + sibling `<div class="binary_download" data-filename="<name>.prg" data-name="…">` | MSE hex dump + download. |
-| Hypra-Ass source | `<pre data-filename="<name>.src" data-assembler="hypra-ass"></pre>` | Auto-decoded by generator. Master file is `prg/<name>.prg` or `prg/<name>.txt`. |
+| Hypra-Ass source | `<pre data-filename="<name>.src" data-assembler="hypra-ass"></pre>` | Auto-decoded by generator. Master file is `prg/<name>.prg` or `prg/<name>.txt`. Add `data-charset="lower"` when the PRINTED listing is mixed case — see r120. |
 | Top-Ass source | `<pre data-filename="<name>.prg" data-assembler="top-ass"></pre>` | Auto-decoded. |
 | Compiled / binary-only download | `<div class="binary_download" data-filename="<name>.prg" data-name="…">` alone | No printed listing to display. |
 | Hidden BASIC companion (no printed listing, but section separator assigns it to this article) | wrap a `<pre data-filename="<name>">` (no `.prg`) inside `<div style="display: none;">` | Materialises a download link without rendering content. |

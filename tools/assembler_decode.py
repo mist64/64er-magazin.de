@@ -38,6 +38,7 @@ Usage:
   assembler_decode.py --topass <file.prg>    # Top-Ass raw .prg
 """
 
+import re
 import sys
 
 # BASIC V2 token table ($80-$CB)
@@ -80,7 +81,15 @@ DIRECTIVES = [
 
 
 def petscii_char(b):
-    """Decode a single PETSCII byte to a unicode character."""
+    """Decode a single PETSCII byte to a unicode character.
+
+    This is the LOWER/UPPERCASE (text) display charset: $41-$5A are the
+    small letters and $C1-$DA their capitals.  A listing typed in the
+    UPPER/GRAPHICS charset means the opposite -- $41-$5A are capitals and
+    $C1-$DA are graphics glyphs -- and must not be passed through here.
+    Which charset a listing was typed in is not recoverable from the bytes;
+    it is declared per listing with ``data-charset`` (see r120).
+    """
     if 0x41 <= b <= 0x5a:
         return chr(b + 0x20)  # $41-$5A -> a-z
     if 0x61 <= b <= 0x7a:
@@ -456,13 +465,18 @@ _RAW_PRG_DIRECTIVES = {
 }
 
 
-def _expand_raw_prg_tokens(text_bytes):
+def _expand_raw_prg_tokens(text_bytes, lower=False):
     """Expand BASIC tokens in a raw Hypra-Ass line to mnemonic/directive text.
 
     The byte preceding a token is inspected: '.' + directive byte expands to
     '.<NAME> ' (trailing space), '.' + mnemonic byte (or a bare mnemonic
     token) expands to '<MNEMONIC> ' (trailing space, so the operand is
     separated from the opcode).
+
+    ``lower`` declares that the listing was typed in the lower/uppercase
+    display charset, so the text bytes go through ``petscii_char``: $41-$5A
+    are small letters and $C1-$DA their capitals.  Default False keeps the
+    upper/graphics reading, where the byte IS the character.
     """
     out = []
     i = 0
@@ -476,7 +490,7 @@ def _expand_raw_prg_tokens(text_bytes):
             out.append(MNEMONICS[b - 0x81] + ' ')
             i += 1
         else:
-            out.append(chr(b))
+            out.append(petscii_char(b) if lower else chr(b))
             i += 1
     return ''.join(out)
 
@@ -547,7 +561,7 @@ def _format_raw_prg_line(line_text):
     if len(code) >= 4 and code[3] == ' ':
         opcode = code[:3]
         operand = code[4:]
-    elif len(code) > 3 and code[:3] in _MNEMONIC_SET:
+    elif len(code) > 3 and code[:3].upper() in _MNEMONIC_SET:
         opcode = code[:3]
         operand = code[3:]
     else:
@@ -562,12 +576,21 @@ def _format_raw_prg_line(line_text):
     return out.rstrip()
 
 
-def decode_prg_bytes(data):
+# Hypra-Ass short-form directives typed as plain PETSCII ('.ba$5000') arrive
+# jammed against their operand, the same way bare mnemonics do; Hypra-Ass's
+# own LIST prints the separating space, and so do the magazine's listings.
+_SHORT_DIRECTIVE_JAM = re.compile(
+    r'(?mi)^(\s*)\.(ba|by|wo|eq|ob|oe|ma)(?=[^\s;])')
+
+
+def decode_prg_bytes(data, lower=False):
     """Decode raw Hypra-Ass .prg bytes, returning a list of formatted lines.
 
     Lines are prefixed with the BASIC line number formatted as 'NNN -' to
     mirror the listing layout produced by Hypra-Ass's own LIST routine, and
     the column layout used by the magazine's printed listings.
+
+    ``lower``: see ``_expand_raw_prg_tokens``.
     """
     pos = 2  # skip load address
 
@@ -603,7 +626,8 @@ def decode_prg_bytes(data):
         raw = data[text_start:pos]
         pos += 1  # skip NUL terminator
 
-        expanded = _expand_raw_prg_tokens(raw)
+        expanded = _expand_raw_prg_tokens(raw, lower=lower)
+        expanded = _SHORT_DIRECTIVE_JAM.sub(r'\1.\2 ', expanded)
         formatted = _format_raw_prg_line(expanded)
         lines.append(f"{str(line_num).ljust(num_col)}-{formatted}")
     return lines

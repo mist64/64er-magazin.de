@@ -681,6 +681,10 @@ class Issue:
           data_checksummer = tag.get("data-checksummer")
           data_mse = tag.get("data-mse")
           data_hypraass = tag.get("data-assembler")
+          # Which C64 display charset the listing was typed in. The bytes do
+          # not say; the printed listing does. "lower" = the lower/uppercase
+          # text set ($41-$5A small, $C1-$DA capitals). Default: upper/graphics.
+          lower_charset = tag.get("data-charset") == "lower"
           if data_hypraass and data_filename:
               topass = data_hypraass == "top-ass"
               if topass:
@@ -690,7 +694,7 @@ class Issue:
               elif (data_filename + '.prg') in listings_bin:
                   # Hypra-Ass raw .prg: decode tokens directly.
                   asm_bin = listings_bin[data_filename + '.prg'][0]
-                  lines = assembler_decode.decode_prg_bytes(asm_bin)
+                  lines = assembler_decode.decode_prg_bytes(asm_bin, lower=lower_charset)
               else:
                   # Hypra-Ass via petcat: .txt is the master, petcat2prg
                   # gives us a synthetic tokenized stream to decode.

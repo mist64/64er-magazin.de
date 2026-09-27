@@ -270,6 +270,48 @@ the omission class that reads as correct.
   - `issues/8606/134 Von Basic zu Assembler (Teil 4).html`
     (BLOCK / SWAP)
 
+## `data-charset="lower"` — which display charset the listing was typed in
+
+The C 64 has two character sets, and a listing does not say which one it
+was written in: the bytes are the same either way, only the glyphs differ.
+
+| byte range | UPPER/graphics (default) | LOWER/uppercase (text) |
+|---|---|---|
+| `$41-$5A` | `A-Z`                     | `a-z` |
+| `$C1-$DA` | graphics glyphs           | `A-Z` |
+
+An author who typed in the text charset therefore produces a listing that
+the default reading renders **inverted**: the small letters come out as
+capitals, and the capitals come out as Latin-1 garbage. 8610's Listing 3
+decoded as
+
+    ;*    ÐÒÏÇÒÁÍÍ 3 / ÍÏÄÕÌ 1    *
+    ;*      ÅRWEITERUNG DER       *
+
+where the print (p156) has
+
+    ;*    PROGRAMM 3 / MODUL 1    *
+    ;*      Erweiterung der       *
+
+**The printed listing is the evidence.** Mixed case in the print, or those
+accented capitals in the decode, means the text charset; declare it:
+
+```html
+<pre data-filename="<name>" data-name="…" data-assembler="hypra-ass"
+     data-charset="lower"></pre>
+```
+
+Nothing in the bytes can be measured to decide this and nothing should try
+to guess it — a listing with no lower-case letters at all reads identically
+either way. Default is the graphics charset, which is what most listings
+are. Known occurrences: 8610 `programm 3 quell` (p156-157), 8606
+`hypra-ass_cass` (p95). `quicksort.ass` (8607) and `block`/`swap` (8606)
+are graphics-charset and must stay so.
+
+Hypra-Ass's own LIST prints a space between a short directive and its
+operand (`.ba $5000`, `.eq forpnt=$49`) even when the source has none;
+`decode_prg_bytes` reinserts it, the same way it splits a jammed mnemonic.
+
 ## Remediation: Hypra-Ass / Top-Ass misclassified as BASIC
 
 **Hard rule:** a shipping `.prg` may **NEVER** live in `prg/del/`
