@@ -629,7 +629,21 @@ falls between rules:
    then has no Impressum to expand editor initials from.
 3. **LOG.md is the audit trail — every rule contributes.** Any rule
    that finds a body-text gap, an un-transcribable region, a print
-   oddity, or a deferred decision writes it to `LOG.md`. At issue end,
+   oddity, or a deferred decision writes it to `LOG.md`.
+
+   **A finding belongs to the step that FOUND it, not the step that will
+   use it, and it is written down the moment it is found.** The steps that
+   read a page — 080 with the scans and the annual index, 130, 170 — see
+   things that only matter at 210, 220 or 280, when the page is no longer
+   in front of anyone. On 8611: step 080 found that the p65 banner prints
+   two lines and that the second, "Tips und Tricks zu Vizawrite (11)",
+   makes this article part 11 of a series running since 8601 — a fact 220
+   needs and cannot rediscover, because by then the evidence is a crop
+   nobody is looking at. It also found the printed index gives "ProDisc im
+   neuen Kleid" as p69 where the article is on p89, which only 220 can act
+   on. Both went into `LOG.md` with the page and the evidence, at 080.
+
+   A finding carried in someone's head, or in a message, is a finding lost. At issue end,
    **every `LOG.md` "known gap" must be explicitly dispositioned**
    (fixed, or user-acknowledged as permanent) — a scope note like
    "out of table scope, not repaired" must not be the final word on a
