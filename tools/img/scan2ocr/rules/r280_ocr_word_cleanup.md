@@ -217,6 +217,42 @@ substitutions:
 | Final-position `l` for `t` | t vs l | Lowercase typewriter `t` with hooked descender OCRs as `l`, especially at word end: `Mini-Autostarl` → `Mini-Autostart` (8607/76). The common shape is `…stt` mis-read as `…sl`. Apply only when the t-form is a known German / 64'er-jargon word AND the l-form isn't (eyeball check, not memory): `Autostarl` is not a word, `Autostart` is. Same context-confirms test as the other Pass-2 substitutions. |
 | `]` for `1` | serif 1 vs ] | The serif digit `1` in this typeface is regularly read as `]`. Sweep `grep -n ']' ` over the whole issue, not just figure references — 8609 had 27, 8608 zero, so it is scan-specific and easy to miss entirely. Hits look like `Bild ]`, `Listing ]`, `Tabelle ]`, `(0 oder ])`, `VR]`, `CHR$(n])`, `($D60])`, `1541/70/7]`, `Monitor 190]`, `33] Seiten`, `&lt;]>`. Confirm the digit rather than assuming `1`: check the article's own figure list (a `Bild ]` in an article whose captions run Bild 1–3 is only `Bild 1` if the sentence fits Bild 1), or read the line on the scan. |
 
+### The lone token is Pass 2's worst case — sweep it on its own
+
+Every substitution above is written "only-when-context-confirms", and that
+works because a wrong glyph inside a word makes a non-word. A token that is
+NOT a word has no context to confirm anything against, and the magazine is
+full of them:
+
+| token | what it is | how it came out |
+|---|---|---|
+| `U1`, `U13` | chip designator | `Ul`, `Ul3` (8610 p50, five times) |
+| `1` after a city | Zustellpostamt | `|`, `SO` (8610 p49, p164) |
+| `1` as a register/bit | operand | `Register |`, `ansonsten aber Ol` (8610 p51, p84) |
+| `11.` in a date | day of month | `Il. bis 15. November` (8610 p9) |
+
+None of these is a misspelling, none breaks the grammar, and every one
+survived r280, r310 and the build. Sweep them mechanically over the prose
+(listings and tables excluded — a `<pre>` legitimately contains anything):
+
+```bash
+python3 - <<'EOF'
+import glob, io, re
+for f in sorted(glob.glob('issues/<YYMM>/*.html')):
+    s = io.open(f, encoding='utf-8').read()
+    i = s.find('<article'); b = s[i:s.rfind('</article>')] if i >= 0 else s
+    b = re.sub(r'<(pre|table)\b.*?</\1>', '', b, flags=re.S | re.I)
+    t = re.sub(r'<[^>]+>', ' ', b)
+    for m in re.finditer(r'(?<![\w])(?:U|I|O|S)l\d*(?![\w])|\|', t):
+        print(f.split('/')[-1][:38], '|', repr(t[max(0, m.start()-45):m.end()+35]))
+EOF
+```
+
+MEASURED on 8610: 4 hits, 4 real defects, 0 false positives. Extend the
+character class when a scan shows a different confusion; the shape of the
+check -- *a token whose only content is the ambiguous glyph* -- is the part
+that transfers. The district-code case has its own gated check in r310.
+
 ### Pass 2 must sweep PUNCTUATION, not only letters
 
 MEASURED on SH8601, AFTER a full 280 run and after r310/r320 and the site build

@@ -212,6 +212,19 @@ def main(d):
             if mm.group(0).count('<br') < 2: S('<br> in a running Info: footer — column wrap?', f)
         for mm in re.finditer(r'[^<>]{15,}\((?:[a-z]{2,3}|[A-ZÄÖÜ][^()<>]{2,28}/[a-z]{2,3})\)</p>', body):
             S('byline glued to a paragraph (FP: Impressum masthead)', f, mm.group(0)[-34:])
+        # r250 tags a source footer from the MEASURED type size, which is
+        # blind to a footer set in ordinary body type -- and to one a later
+        # step moved. 8610 p173 ends on a bare <p> naming the distributor and
+        # its Postfach, printed in the small type, untagged. The shape is
+        # narrow enough to check: the LAST block of the article, short, and
+        # it names a company form or a Postfach. FP population: an article
+        # that genuinely ends on a sentence about a company.
+        tail_p = re.findall(r'<p(?![^>]*class=)[^>]*>((?:(?!</p>).){0,220})</p>\s*'
+                            r'(?:<address[^>]*>[^<]*</address>\s*)?$', body, re.S)
+        for t in tail_p:
+            if re.search(r'\b(GmbH|AG|KG|OHG|Verlag|Postfach|Ltd|Inc)\b', t):
+                S('article ends on an untagged contact footer (r250)', f, t[:34])
+
         # --- German addresses, pre-1993 ------------------------------------
         # A West German address of the period is "<4-digit PLZ> <Stadt>" and,
         # for a city with several Zustellpostaemter, a district NUMBER after

@@ -11,6 +11,16 @@ survives reads perfectly well.
 Listing blocks are excluded: the disk .txt is the correct petcat rendering while
 the OCR reading of the printed listing is garbled ('mps 891' for 'mps 801'), so
 they never match and would drown the signal.
+
+That exclusion leaves a hole, and it has been fallen into: a page that carries
+NOTHING BUT one article's listing is claimed by no 64er.pages, so it never
+enters the reconciliation at all and its absence reads as silence.  8610's
+Listing 3 filled p156-157 and the article's meta said "152-153, 155"; coverage
+reported 0.0% unaccounted while two whole pages were unclaimed.  So the second
+half of this check walks the page NUMBERS, 1..pages, and reports every one no
+article claims.  Ads are the legitimate population and they are most of it --
+the check prints the list, a human reads it, and a page with a listing on it
+cannot hide in the middle of it.
 """
 import glob, io, json, re, sys
 
@@ -71,3 +81,21 @@ print(f'pages {len(page2art)}   kept prose blocks {kept_total}   UNACCOUNTED {le
 for p, lab, frac, n, txt, arts in missing:
     print(f'p{p:<4} {lab:<9} match={frac:<5} words={n:<4} {arts}')
     print(f'      "{txt}…"')
+
+# --- pages no article claims ------------------------------------------------
+# Needs only the HTML and the descriptor, so it still runs when <tmp> has been
+# swept away and the OCR output is gone -- which is when it is most useful.
+unclaimed = [p for p in range(1, ISS.pages + 1) if p not in page2art]
+print(f'\nUNCLAIMED PAGES {len(unclaimed)} of {ISS.pages} — ads are the legitimate '
+      f'population; a listing or a figure here means some 64er.pages is short')
+for p in unclaimed:
+    what = ''
+    try:
+        lab = json.load(open(f'{OCR}/{p:03d}.labels.json'))
+        keep = {str(i) for i in lab.get('order', [])}
+        labels = sorted({str(b.get('label', '?')) for b in lab.get('blocks', [])
+                         if str(b.get('id')) in keep})
+        what = '  kept: ' + ', '.join(labels) if labels else '  kept: nothing'
+    except FileNotFoundError:
+        pass
+    print(f'  p{p:<4}{what}')

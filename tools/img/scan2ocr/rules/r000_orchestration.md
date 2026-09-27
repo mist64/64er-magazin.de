@@ -968,10 +968,22 @@ page-by-page read found them, and reading every page by hand does not scale.
 
 Two cheaper companions worth running at the same time:
 
-- **page coverage**: every page in the issue is claimed by an article, or is
-  knowingly an ad / classifieds page. Gaps are missing articles; the annual
-  `Jahresinhaltsverzeichnis` gives the authoritative page range per article and
-  caught two understated ranges in 8609 (71-74, 82-84).
+- **page coverage** — now the second half of the same script, and it needs
+  only `issues/<YYMM>/` and the descriptor, so it still runs after `<tmp>` has
+  been swept away. It lists every page 1..`pages` that no `64er.pages` claims.
+  Ads and classifieds are the legitimate population and they are most of the
+  list; read it anyway. The reason it cannot be skipped: the UNACCOUNTED half
+  excludes listing blocks by design, so a page carrying NOTHING BUT one
+  article's listing is claimed by nobody, enters the reconciliation nowhere,
+  and its absence reads as silence. MEASURED on 8610: UNACCOUNTED 0.0% while
+  **12 pages were unclaimed and editorial** — Super-Install's `(Schluß)` on
+  p31, the Soundmonitor on 59/61/62/64, Speech-Basic's on p70, the MSE's on
+  p78, the CP/M-Formatter on p91, Colorprint on 107-108, the Vizawrite
+  converter on 183-184. The quickest way to read the list is a montage of the
+  unclaimed pages' top 150 thumb rows: an ad has no rubric banner, a listing
+  page has one.
+  The annual `Jahresinhaltsverzeichnis` gives the authoritative page range per
+  article and caught two understated ranges in 8609 (71-74, 82-84).
 - **dangling cross-references**: text that says `Bild 3` / `Tabelle 2` /
   `Listing 4` while the article has no such caption. A reference with no target
   usually means the figure and its caption were dropped together.
