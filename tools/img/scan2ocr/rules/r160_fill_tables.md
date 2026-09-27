@@ -112,7 +112,13 @@ Every `TODO TABLE` MUST be replaced. **Garbage adjacent to `TODO TABLE`** — th
 
 **Pass 3 — UNCAPTIONED tables.** Many tables have NO `Tabelle N.` caption and won't appear in Pass 1. Patterns observed in 8607 alone that Pass 1 missed: `Verwendete Variable` callout (variable-reference list), `Monitor-/Fernseher-Eingangsnormen` + per-Stecker Pin/Signal tables, `Leistungen des Breitband-ISDN`, `Datenblatt des Seikosha MP-1300AI`, `Kurz belichtet — Melchers CPA-80X` test datasheet, `Funktionen der Sekundäradressen`. Other common shapes: bottom-half marketplace/comparison tables, yellow / tinted callout boxes, multi-page reference tables, fontspec/ASCII-code lookups, aside-style boxes.
 
-**This pass is MANDATORY. "Visually scan every page" is not enough — make it mechanical** using step 010's block index:
+**This pass is MANDATORY — and the VISUAL WALK is the mechanism, not the
+sweeps.** This rule used to say the opposite ("visually scan every page is not
+enough — make it mechanical"). MEASURED on 8611: **13 of the issue's 39 tables
+were found ONLY by the visual walk, with no sweep hit at all**, and the
+narrow-column sweep below found none of them. Walk every page. The sweeps
+below are a supplement that catches a few shapes an eye skims past; they are
+not a substitute and never were.
 
 ```bash
 # 1. Walk each page's blocks index for known callout heading words
@@ -123,9 +129,23 @@ grep -hiE "Verwendete |Leistungen |Steckernormen|Belegung |Datenblatt|Kurz belic
 #    blocks whose width < 350 px AND text contains 4+ short newline-
 #    separated lines = strong candidate for tabular reference data.
 for f in <OUT_DIR>/blocks/p*.txt; do
-  awk -F'[ =x+]' '/^block=/ { w=$5; if (w<350) print FILENAME": "$0 }' "$f"
+  awk -F'bbox=' '/^block=/ { split($2, b, "x"); if (b[1]+0 < 350)
+    print FILENAME": "$0 }' "$f"
 done | head -50
 ```
+
+> **This sweep returned 0 on every page of every issue it has ever run on,**
+> and nobody noticed for three issues. The old field separator `-F'[ =x+]'`
+> also splits `bbox` at its own `x`, so `$5` was the string `"bbo"`, and
+> `"bbo" < 350` is a STRING comparison that is never true. A silent no-op
+> reporting success is worse than no sweep: "Pass 3 done, 0 candidates" was
+> a truthful report of nothing happening, in a pass whose own rule exists
+> because 8607's was rubber-stamped.
+>
+> Fixed, it returns **1249 candidates** on a 192-page issue — mostly noise
+> fragments — and still none of the 13 tables the walk found. So it is
+> corrected here to stop it lying, not because it earns its place. Treat its
+> output as a hint list to skim, and do the walk.
 
 For each candidate block:
 1. Crop and view the page region (use step 010's bbox).
