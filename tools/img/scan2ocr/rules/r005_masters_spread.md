@@ -129,12 +129,40 @@ the one this file used to apply:
 problem of step 005.** The paper is not uniform: it browns towards the trim
 and varies fibre to fibre, so a single reference low enough to clamp the worst
 paper is also low enough to dissolve the lightest ink. What the plate reading
-asks for instead is a **per-page paper field** — the local paper white
-estimated as a smooth, low-frequency surface and used as the density reference
-in place of one constant. Halftone dots are high-frequency and darker than
-their local paper, so they survive it; browning and fibre are exactly what it
-removes. Not implemented. Until it is, the gate below measures how close one
-constant can get, which is not the same question.
+asks for is a **per-page paper field** — the local paper white estimated as a
+smooth, low-frequency surface and used as the density reference in place of
+one constant — **and a floor under it**. Two mechanisms, not one. MEASURED on
+8611, raw, no grading, nothing in the chain touched:
+
+| clamp-to-white fraction | interior blank band | trim band (0.8-15 mm) |
+|---|---|---|
+| one global `W` | 99.7 % | 57.7 % |
+| local field, q=p2, radius 2 / 5 / 10 mm | 96.6 / 96.7 / 96.7 % | 81.3 / 80.5 / 80.4 % |
+
+**The field fixes browning and does NOT fix fibre.** +23 points at the trim,
+and *worse than one constant* on clean interior paper, because a local low
+percentile there sits above the global `W`. Radius makes no difference from 2
+to 10 mm. The reason is definitional: fibre is high-frequency and sits just
+below its local paper, which is the same signature as a light halftone dot, so
+no smooth surface can separate them. An earlier version of this section
+claimed the field removes both. It does not.
+
+**The second mechanism is a floor, and it is safe only at 2400 dpi.** Ink
+below `k × field` is zero. Measured on the interior blank band **at 2400 dpi**,
+min-channel: paper p50 **187**, p5 175, p1 167, p0.1 150 — and only **0.078 %**
+of the band falls below `0.78 × paper`. At 600 dpi the same band looks
+hopeless, because a 133 lpi screen is 4.5 px per cell there and every dot is
+blurred into a partial grey indistinguishable from fibre. At 2400 dpi the cell
+is ~18 px, the dot is resolved and near-solid, and the gap between "fibre, 9-22 %
+below paper" and "dot, 80-100 % below paper" is wide open. **The separator
+already runs at 2400, which is the only reason this works** — measure the floor
+there, never on the 600 dpi reduction.
+
+What a floor costs is anything genuinely lighter than `1-k` in density. In a
+1986 magazine at 2400 dpi that is not a light tint — a light tint is dots plus
+paper, and the dots survive — it is dot EDGES, which are antialiasing rather
+than plate. Not implemented; the choice of `k`, and of floor-versus-despeckle,
+is the user's.
 
 ## The profile is MEASURED for this issue's paper, never defaulted
 

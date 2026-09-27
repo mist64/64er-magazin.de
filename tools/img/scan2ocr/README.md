@@ -41,6 +41,13 @@ So a blank area is not "clean enough at 99.7 %". Either the plate put ink
 there or it did not, and where it did not the answer is white. A number in
 this chain is only good when the thing it measures is plate.
 
+**Measure at 2400 dpi, not on the 600 dpi reduction.** At 2400 a 133 lpi
+screen is ~18 px per cell: the dot is resolved and near-solid, and fibre
+(9-22 % below its local paper) is nowhere near it. At 600 the cell is 4.5 px,
+every dot blurs into a partial grey, and fibre and ink become the same
+measurement. 8611 spent a cycle concluding a problem was unsolvable from
+600 dpi numbers. Plate questions are asked at plate resolution.
+
 ## The one standing rule
 
 **The files in here are the deliverable, not the issue.** An issue is published
