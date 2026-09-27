@@ -24,14 +24,14 @@
 # Whichever is smaller wins.  On a box with a 350 GB model server resident
 # that is memory; with it stopped it is cores.  Both happened on one afternoon,
 # which is why this is measured at run time and not written down as a number.
-LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')
-echo "r005: $LANES lanes (~19 GB each, half the free RAM, capped by cores)" >&2
 # cut is seconds a page and runs alone: it needs EVERY page's geometry before
 # it can fit the window, so it cannot start until the last lane is done.
 set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-$DIR/../../../../.venv/bin/python}"
 cd "$DIR"
+LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')
+echo "r005: $LANES lanes (~19 GB each, half the free RAM, capped by cores)" >&2
 # The page count follows the ISSUE constant in r000_issue.py, asked of the
 # program itself rather than repeated here -- as r010_ocr_blocks.sh does.
 FIRST="${1:-1}"

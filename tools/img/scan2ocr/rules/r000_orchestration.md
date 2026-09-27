@@ -485,6 +485,31 @@ The verification block should:
 - be cheap enough that running it after every sub-agent dispatch is
   acceptable.
 
+### And the WRAPPERS are code, so run them
+
+A `.sh` in this directory gets edited like prose and committed like prose,
+and it is neither. Three ways it bit on one afternoon, all in one commit that
+was read carefully and never executed:
+
+- a `LANES=$("$PY" …)` line inserted **above** the `PY=` that defines it —
+  `bash -n` passes, because the syntax is fine; the run dies in one second
+  with `: command not found` and `xargs: -P : invalid`
+- `$(basename "$0")` in a message, which is the caller's name, not the
+  script's, whenever the header is sourced or piped
+- `PY="${PYTHON:-python3}"` in two of the three wrappers, where bare
+  `python3` has no numpy — a pre-existing trap that only surfaced when
+  something finally ran the header
+
+> **`bash -n` is not a test. Run the thing.** For a wrapper whose body is a
+> long job, run its HEADER — everything above the first `seq`/`xargs` — and
+> look at what it prints:
+>
+> ```sh
+> sed -n '1,/^seq /p' rNNN_step.sh | sed '$d' | bash
+> ```
+>
+> It exits 0 and prints the lane line, or the edit is not finished.
+
 ## Briefing template for a sub-agent dispatch
 
 Use this skeleton when invoking the `Agent` tool for a rule:
