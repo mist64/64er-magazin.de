@@ -31,6 +31,19 @@ keep their `¬` and the WARNING line names every one.
    page that resumes it, and that page's head must name the page it came from.
    A one-sided marker is not a jump; it is an OCR miss or a print error, and it
    is reported, not acted on.
+
+   **And the NUMBER must be read, on both ends.** "Confirmed in both
+   directions" is not satisfied by finding the word *Fortsetzung* at each end;
+   a marker whose page number the OCR dropped confirms nothing. 8611 printed
+   `Fortsetzung auf Seite 88` at the foot of p79 and `Fortsetzung auf Seite 99`
+   at the foot of p94; OCR truncated both to `…auf Seite`, and this step paired
+   the two headless markers with the two headless heads **the wrong way round**
+   — p79→99 and p94→88. Both jumps were wrong, nothing failed, and the damage
+   surfaced two steps later: the Laufschrift tail and its byline sat in the
+   wrong article, and p94 claimed the p97 schematic.
+   A marker with no number is a marker with no number. Report it and let a
+   human read the page; two unnumbered markers do not make one jump, and they
+   certainly do not make two.
 4. **The line-break hyphens**, resolved over the distinct broken words.
 
 Only (1) needs judgement, and it gets the one model call: the running heads, the
