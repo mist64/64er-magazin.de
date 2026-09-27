@@ -132,6 +132,52 @@ Critical guardrails:
 - House-ads / Sonderheft promos with no body byline are
   Eigenanzeigen — treat as unsigned (remove meta).
 
+## THE IMPRESSUM IS THE CLOSED VOCABULARY — check the bylines against it
+
+An editor's initials are a two- or three-letter token that OCR mangles freely
+and no spell-check can see. On 8611 **`(rf)` — Roland Fieger — appeared as
+`(dd`, `(d`, `(Ad`, `(ed`, `(M`, `(M)`, `()`, `(f)`, `(643)`, `[643)`, `AM)`,
+and twice not at all**: 21 bylines across 12 articles, all invisible to any
+check keyed on the shape `(xx)`.
+
+What makes them findable is that the issue carries its own answer key. The
+Impressum lists the staff:
+
+> `an = Achim Hübner (verantwortl.), dm = Dieter Mayer, do = Gerd Donaubauer …
+> aw = Arnd Wängler, bj = Herbert Buckel, rf = Roland Fieger, nj = Norbert
+> Jungmann …`
+
+So check **both directions**:
+
+```bash
+$PY tools/img/scan2ocr/rules/../../../../ -  # see the snippet in the repo history
+```
+
+- **SILENT** — an editor in the Impressum with **zero** bylines in the issue.
+  Possible, but rare: an editor who wrote nothing all month.
+- **NOT IN THE IMPRESSUM** — a byline whose initials no Impressum line
+  defines. A guest, or a misread.
+
+The two lists read together are the diagnosis. MEASURED across the corpus:
+
+| issue | silent | not in Impressum |
+|---|---|---|
+| 8607 | `gk`, `nj` | `cg`, `ev` |
+| 8608 | `gk` | `aa`, `ev`, `hg`, `wg` |
+| **8609** | **`rf`** | `aa` |
+| **8610** | **`hm`, `kn`** | `aa` |
+| 8611 | `an`, `do` | `ah`, `ni` |
+
+8611's pair is the shape to recognise: `an` silent and `ah` unexplained, for
+one person — the Impressum's own line was misread, `ah = Achim Hübner` as
+`an =`. And **8609 shipped with `rf` silent**, which is this issue's defect in
+a published issue; 8610's `hm` and `kn` are the same suspicion. Recorded, not
+yet investigated.
+
+A guest author is a real second answer — 8611's `(ni)` is printed clearly and
+is in no Impressum in the corpus — so this is a triage list, not a gate. Two
+to four lines an issue, and it points at the person rather than the page.
+
 ## Verification
 
 ```bash
