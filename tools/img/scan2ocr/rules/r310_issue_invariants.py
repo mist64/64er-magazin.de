@@ -263,6 +263,18 @@ def main(d):
         if 'name="author"' not in s and '<address class="author">' not in body:
             S('no author at all — read the last page, a dropped final line takes the byline (r180)', f)
 
+    # --- the magazine's own name ----------------------------------------
+    # 64'er and 128'er take an APOSTROPHE. OCR reads it as a double quote and
+    # r070 then straightens that to ", giving 64"er -- grammatical-looking,
+    # invisible in a proof-read, and the highest-frequency proper noun in the
+    # corpus. MEASURED over every published issue: exactly TWO occurrences,
+    # 8610 p9 (shipped) and 8611 mid-build. 0 false positives, so HARD.
+    # Both spellings of the apostrophe are accepted: the corpus uses ASCII '
+    # and U+2019 about equally and neither is wrong.
+    for mm in re.finditer(r'\b(?:64|128)["\u201c\u201d\u201e\u00ab\u00bb]er', prose):
+        H("the magazine's name takes an apostrophe, not a quote (r070/r280)",
+          f, mm.group(0))
+
     # --- the issue has an Impressum -------------------------------------
     # A masthead reads like a list, so step 020's prompt grouped it with the
     # table of contents and the corpus dropped it -- silently, because ~90

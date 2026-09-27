@@ -32,7 +32,24 @@ run.
 
 MEASURED over the published corpus, inside `<pre>`: **8610 has 0 curly quotes
 and 102 straight; 8608 has 0 and 26.** 8609 has 8 curly that survived, and
-those are a defect, not a precedent.
+those are a defect, not a precedent. On 8611 the pass changed 17 quotes on 9
+lines inside `<pre>`, every one a BASIC string delimiter.
+
+**"But what if a listing PRINTS a typographic quote?"** It cannot. Every
+`<pre>` in this corpus holds PETSCII — a listing, a monitor dump, a screen
+transcript — and PETSCII has no curly quote to print. `PRINT "…"` can only
+contain characters the machine has. The question is worth asking and the
+answer is closed, so this pass needs no exception.
+
+### Where the straightening then goes wrong: the magazine's own name
+
+`64'er` and `128'er` take an **apostrophe**. OCR reads it as a double quote
+and this step dutifully straightens that to `"`, giving `64"er` — which looks
+like ordinary text, survives a proof-read, and is the highest-frequency proper
+noun in the corpus. MEASURED over every published issue: exactly **two**
+occurrences, 8610 p9 (shipped that way) and 8611 mid-build. `r310` now fails
+HARD on it. Both spellings of the apostrophe pass — the corpus uses ASCII `'`
+and U+2019 about equally and neither is wrong.
 
 ## Substitutions
 
