@@ -60,6 +60,29 @@ there, so the output (`prg/`, `prg.txt`) lands next to the issue's
 article files. The first comment line of `prg.txt` records the
 absolute path of each `.D64` consumed — keep that for provenance.
 
+**A PATH IS NOT PROVENANCE. Record the sha256 beside it.** 8610's `prg.txt`
+opens `<!-- /private/tmp/64er_8610/disks/8610A.D64 -->`, and that file no
+longer exists: it sat in `/private/tmp`, which the macOS cleaner sweeps after
+three days. The line now points at nothing and nobody can tell which of the
+several copies on this machine it was. A digest survives that, and it is the
+only thing that actually identifies a disk:
+
+```
+<!-- 8611 side A: ~/DNB/8611/disks/8611A.D64
+     sha256 622d2a7c032bd7c9…  174848 bytes -->
+```
+
+**And the images go somewhere durable before the extractor runs**, for the
+same reason `<tmp>` does (r000, *the working directory must be DURABLE*).
+`~/DNB/<ID>/disks/` beside the issue's other durable artefacts. They are
+170 KB each; there is no reason to leave the only reference pointing into a
+directory that gets deleted.
+
+The canonical root this rule used to name, `~/tmp/64er-Disketten/`, does not
+exist on this machine at all. Confirm the source with the operator — the
+instruction above still holds, and multiple byte-identical copies is the
+normal case, not the exception.
+
 ## Verification
 
 ```bash
