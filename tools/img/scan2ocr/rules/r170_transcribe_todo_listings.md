@@ -97,7 +97,39 @@ principle):
   `einstelljahr` inconsistencies, missing commas in floats, mixed
   case opcode bytes, `>91 AND <64` impossible logical conditions).
 - Preserve BASIC checksummer brackets (`<238>`, `<004>`) on Checksummer
-  listings.
+  listings — **and then USE them: a checksummed listing can be PROVEN, and
+  proving it is mandatory.** The magazine printed those numbers so a reader
+  could find a typo; they do the same for a transcription, and they are the
+  only check in this rule that does not depend on someone's eyes.
+
+  ```bash
+  # BASIC: tokenise the transcription, recompute, compare to the print.
+  # -w2 for V2, -w3 for BASIC 3.5 (C16/Plus4), -w70 for the C128 -- the
+  # WRONG dialect gives wrong sums, so a mismatch may be the dialect, not
+  # the transcription (see r120's round-trip check).
+  petcat -w2 -l 0801 -o /<scratch>/l.prg -- /<scratch>/l.pet
+  .venv/bin/python -c "from tools import checksummer; ..."   # v3 per line
+  # MSE hex: every line carries its own checksum byte
+  .venv/bin/python -c "from tools import mse; ..."
+  ```
+
+  MEASURED on 8610, where all three printed listings proved out:
+
+  | listing | proof |
+  |---|---|
+  | `76` Listing 2, the MSE-Lader (107 lines) | all 107 printed `<nnn>` reproduced, all 86 of the loader's own line sums, and its DATA bytes equal `prg/mse.prg[$0801..$0EAB]` |
+  | `80` Listing 1, the Viza.Key erratum (MSE1 hex) | all five line checksums recomputed, and the assembled bytes are identical to 8609's disk `viza.key.prg` |
+  | `80` Listing 2, the Matrix-Editor erratum | all seven printed values reproduced under `-w3` (BASIC 3.5) |
+
+  **The checksum does not only verify — it DECIDES.** A C64 graphic character
+  is a glyph a human cannot reliably name from a scan: on 8610's Matrix-Editor
+  the sums settled `CBM-@` in line 1410, `CBM-T` in 1420, ten `SHIFT-*` runs
+  and a `SHIFT--`, none of which the eye could have called. Where a listing
+  carries checksums, transcribe, compute, and let the arithmetic pick the
+  character — then say in the report which lines the checker confirmed.
+
+  A listing with NO printed checksums (a screen dump, a Pascal fragment) has no
+  such proof: say so, and fall back to a second independent read.
 - **NEVER fabricate the `<figcaption>`.** The caption belongs to the
   print, not to you. Transcribe it verbatim from step 010's block index
   or a 600 dpi scan crop (the PDF text layer is void, see r000); if you cannot read it, leave a bare `Listing N.` (no
