@@ -24,6 +24,32 @@ with the verbatim caption and `<pre>TODO</pre>` as the body so the
 gap is visible in the rendered HTML. Rule 170's job is to OCR the
 printed listing into the `<pre>` body.
 
+## The transcription stays INLINE — it never becomes a `prg/` file
+
+A `<pre data-filename="…">` is empty markup: the generator fills it from
+`issues/<ID>/prg/<name>.txt`, which mirrors what was on the Programm-Service
+disk (r120). A listing this rule transcribes was, by definition, NOT on that
+disk — so writing one into `prg/` would misrepresent the disk's contents, and
+would do it in the one directory the project treats as the disk's record.
+**Transcribe into the `<pre>` body and leave it there**, even when the
+transcription is provably exact.
+
+The corpus already works this way: 339 `<figure><pre data-filename=…>` against
+**78 inline** ones, and the inline ones are this rule's population — Pascal
+source, assembler disassembly of in-ROM code, loaders, errata.
+
+Two 8610 cases worth recognising, because both invite the mistake:
+
+- `76` Listing 2, the MSE-Lader. The disk ships `mse.prg`, the FINISHED
+  program; the print carries the BASIC loader that types it in, which the disk
+  does not. The transcription round-trips (its DATA bytes are `mse.prg`
+  itself), so it *could* be tokenised — and must not be. The reader already
+  gets `mse.prg` as a `binary_download` beside the listing.
+- `80` Listing 2, the Matrix-Editor erratum. An erratum's lines belong to the
+  program of the article it CORRECTS — here `Sonderheft 3/86` p57, which is not
+  imported. There is no `prg/` for it to point at in this issue or any other,
+  and inventing one in 8610 would file another issue's code under this one.
+
 ## Cropping listing regions from the page scan
 
 Don't guess crop coordinates by trial-and-error. Step 010 already wrote the
