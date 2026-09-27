@@ -35,7 +35,9 @@ numbered `.sh` is the entry point, and it carries the parallelism, which is not
 a detail: numpy stages want `OMP_NUM_THREADS=1` and many lanes, and this box is
 shared with a job that swap-thrashes if crowded.
 
-~15 minutes for 176 pages. Deterministic and local — no model is called.
+**78 s for 192 pages on 28 lanes** (8611, 2026-09-27); the ~15 minutes
+this replaces was the same work on the 6 lanes the wrapper used to
+hardcode. Deterministic and local — no model is called.
 
 **After any change to this step, wipe `OUT_DIR` and start again from page 1.**
 Step 020 caches its verdict per page keyed on the block ids this step produces;
@@ -116,7 +118,11 @@ each with its measurement in the comment above it.
 
 ```bash
 cd tools/img/scan2ocr/rules
-dir=$(python3 -c "import r010_ocr_blocks as OB; print(OB.OUT_DIR)")
+# The repo venv, not bare python3: the step modules import numpy and
+# scipy, which the system python here does not have, so as `python3`
+# this check failed at the import rather than checking anything.
+PY=${PYTHON:-../../../../.venv/bin/python}
+dir=$("$PY" -c "import r010_ocr_blocks as OB; print(OB.OUT_DIR)")
 
 # 1. every page produced a JSON, a digest and an overlay
 ls $dir/*.json | grep -vc 'labels' ; ls $dir/*.digest.txt | wc -l ; ls $dir/*_boxes.png | wc -l

@@ -662,10 +662,17 @@ disposable:
   `/private/tmp` that have not been accessed for three days -- on 8610 that ran
   mid-chain and took `sheets600` 200 -> 11, `masters2400` 200 -> 10,
   `cmyk2400`, `geometry` and the assembled `<ID>.md` with it.
-- **What losing it costs**, measured on 8610 (200 pages): step 005 ~4.3 h,
-  step 010 ~30 min, step 020 ~15 min and 200 model calls. Nothing shippable is
-  lost -- the repo holds every deliverable -- but a sweep you did not plan is a
-  day.
+- **What losing it costs.** On 8611 (192 pages, lanes sized by the rule
+  below): step 005 **1 h 46 on 11 lanes**, step 010 **78 s on 28**. On 8610
+  (200 pages, a hardcoded 6 lanes everywhere): step 005 ~4.3 h, step 010
+  ~30 min. Step 020 is ~15 min and one model call a page either way, since it
+  is not sized by this machine. Nothing shippable is lost -- the repo holds
+  every deliverable -- but a sweep you did not plan is still hours.
+
+  **A timing figure in these files states its page count, its lane count and
+  its date, or it is worse than nothing.** r010 carried "~15 minutes for 176
+  pages" from the 6-lane era into a run that took 78 seconds, and a reader
+  budgeting from it would have been out by a factor of ten.
 - Put it beside the scans on a volume nobody cleans, e.g.
   `/Volumes/<disk>/tmp/<ID>` or `~/DNB/<ID>/tmp`, and say so in the descriptor.
   8610 stays at `/private/tmp/64er_8610` by the user's decision, knowing the

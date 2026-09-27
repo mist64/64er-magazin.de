@@ -18,11 +18,14 @@ cd "$DIR"
 FIRST="${1:-1}"
 LAST="${2:-$("$PY" -c 'import r010_ocr_blocks as m; print(m.ISS.pages)')}"
 # Lanes: half the free RAM, capped by the cores -- r000_orchestration.md,
-# *PARALLELISE TO HALF THE FREE RAM*. 3 GB a lane is a CONSERVATIVE GUESS
-# (tesseract plus a 600 dpi master), not a measurement: take the real peak off the next
-# run with `ps -axo rss,comm` and put it here. The hardcoded -P 6 this
-# replaces left 26 of 32 cores idle.
-LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(3))')
-echo "r010: $LANES lanes (~3 GB each, half the free RAM)" >&2
+# *PARALLELISE TO HALF THE FREE RAM*.  1.5 GB a lane is MEASURED on 8611:
+# RSS sampled every 5 s across a 28-lane run peaked at 1.03 GB for the python
+# and 0.21 GB for its tesseract, so ~1.25 GB, and 1.5 is that plus margin.
+# (The 3 GB that stood here first was a guess, and it was 2.4x too high.)
+# At this size the cores cap always binds first, which is the point: the
+# hardcoded -P 6 this replaces left 26 of 32 idle and made an 78-second job
+# take a quarter of an hour.
+LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(1.5))')
+echo "r010: $LANES lanes (~1.5 GB each, measured; half the free RAM)" >&2
 seq "$FIRST" "$LAST" | OMP_NUM_THREADS=1 xargs -P "$LANES" -n 8 "$PY" r010_ocr_blocks.py
 "$PY" r010_blocks_index.py
