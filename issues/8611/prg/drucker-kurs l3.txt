@@ -1,0 +1,47 @@
+
+
+;drucker-kurs l3.prg ==0801==
+   10 rem programm epson-grafik
+   12 rem druckerkurs 64'er (aw)
+   14 print chr$(147)
+   16 rem*********************************
+   18 rem kanal zum drucker oeffnen
+   20 rem*********************************
+   22 open 1,4
+   24 a=8192:gosub 78
+   26 print#1,chr$(27);chr$(51);chr$(24)
+   28 rem*********************************
+   30 rem zeilenabstand auf 24/216
+   32 rem*********************************
+   34 for m=1 to 3:rem drei zeilen
+   36 rem*********************************
+   38 rem grafimodus esc "*" m=1 (960)
+   40 rem*********************************
+   42 print#1,chr$(27);chr$(42);chr$(1);chr$(195);chr$(3);
+   44 rem*********************************
+   46 rem eine zeile drucken (960) punkte
+   48 rem*********************************
+   50 for z=0 to 960
+   52 b=peek(a+z)
+   54 print#1,chr$(b);
+   56 next z
+   58 a=a+960
+   60 rem*********************************
+   62 rem einen zeilenvorschub
+   64 rem*********************************
+   66 print#1,chr$(13)
+   68 next m
+   70 end
+   72 rem*********************************
+   74 rem zufallsmuster ab 8192
+   76 rem*********************************
+   78 poke 8192,255
+   80 for x=8193 to 9150:poke x,128:next x
+   82 poke 9151,255
+   84 poke 9152,255
+   86 for x=9153 to 10110:poke x,0:next x
+   88 poke 10111,255
+   90 poke 10112,255
+   92 for x=10113 to 11070:poke x,1:next x
+   96 return
+

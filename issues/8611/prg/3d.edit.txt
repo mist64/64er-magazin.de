@@ -1,0 +1,530 @@
+
+
+;3d.edit.prg ==0801==
+    0 rem"-{CBM-M}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-G}
+    1 rem"-{CBM-M}       3d - master         {CBM-G}
+    2 rem"-{CBM-M}     von j.schwarzer       {CBM-G}
+    3 rem"-{CBM-M}       heideweg 11         {CBM-G}
+    4 rem"-{CBM-M}5020 frechen 4 (bei koeln) {CBM-G}
+    5 rem"- {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}
+    6 rem"- noch fragen ?
+    7 rem"-
+    8 rem"- tel.: 02234/62542
+    9 rem"-       {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}
+   10 :
+  100 sys2^14+9:sys2^14:poke3,0:poke4,0
+  110 poke650,128:poke53281,0
+  120 poke56,64:clr:lo=1:dw=45
+  130 v=53248:p=~/180
+  140 s=5:m=40:xm=160:ym=100:w=30
+  150 ba=2^14:l=ba+3:in=ba+6:se=ba+12:vp=ba+15:pl=ba+18:nr=ba+21
+  160 sq=ba+24:lq=ba+27:ip=ba+30:dp=ba+33
+  170 il=ba+36:dl=ba+39:dr=ba+42
+  180 gosub10850
+  190 p1=20736:p2=20992
+  200 xs=19456:ys=19712:zs=19968
+  210 poke191,dw/4
+  220 dimx(128),y(128)
+  230 d=256:r=127:ri$=chr$(13):w$="{down}{rght}{wht} ":h$="{home}":c$="{clr}
+  240 cu$="{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}
+  250 ss$="---------------------------------------
+  260 sp$="                                       ":d$="{down}":u$="{up}":l$="{left}":r$="{rght}
+  270 printc$:rem -----
+  280 poke24568,111:pokev+39,2
+ 1000 rem menue
+ 1010 gosub1240:z=1:qs=81:qr=87:poke53280,0:pokev+21,0
+ 1020 print"{home}{down}{rght}{wht}{swuc}{dish}eingabe-menue:
+ 1030 print"{down}{down}{down}{rght} 1 {red}........ eingeben als 3d-zeichnung
+ 1040 printw$"2 {orng}... eingeben als koordinatentripel
+ 1050 printw$"3 {yel}... eingeben von rotationskoerpern
+ 1060 printw$"4 {grn}................ koordinaten laden
+ 1070 printw$"5 {gry1}............ koordinaten speichern
+ 1080 printw$"6 {blu}........................ directory
+ 1085 printw$"7 {lblu}........................... drehen
+ 1090 print"{rght}{rght}{wht}                                {CBM-@}{CBM-@}{CBM-@}{CBM-@}
+ 1100 print"{rght} 8 ............................. {rvon}exit
+ 1110 sysba+1646
+ 1230 poke198,0:onpeek(2)goto10000,20000,30000,50010,40010,50100,60020,60000
+ 1240 pokev+24,21:pokev+17,27:poke56576,3:return
+ 1250 pokev+24,120:pokev+17,59:poke56576,2:return
+ 1260 poke1146+z*80,q
+ 1270 qc=peek(55420+z*80)
+ 1280 ifq=qrthenqc=1
+ 1290 poke55418+z*80,qc:return
+ 1300 -----    
+10000 pokev+21,0:sysba:poke56576,2:x=0:y=0:z=0
+10010 gosub10820
+10020 iflothenlo=0:ap=0:al=0:poke3,0:poke4,0:goto10140
+10030 if(aporal)=0goto10140
+10040 sysnr:fori=0toal-1
+10050 x=peek(xs+peek(p1+i)):x=x+d*(x>r)
+10060 y=peek(ys+peek(p1+i)):y=y+d*(y>r)
+10070 z=peek(zs+peek(p1+i)):z=z+d*(z>r)
+10080 gosub10350:xa=xx:ya=yy
+10090 x=peek(xs+peek(p2+i)):x=x+d*(x>r)
+10100 y=peek(ys+peek(p2+i)):y=y+d*(y>r)
+10110 z=peek(zs+peek(p2+i)):z=z+d*(z>r)
+10120 gosub10350:sysl,xa,ya,xx,yy:next
+10130 sysin
+10140 xa=160:ya=100:xb=xa:yb=ya:x=0:y=0:z=0
+10150 gosub10850:pokev+21,1
+10160 gosub60050
+10170 ifa$<>""goto10220
+10180 gosub10320
+10190 gosub60050
+10200 gosub10320
+10210 ifa$=""goto10160
+10220 gosub10490
+10230 xr=xa:yr=ya:xp=xb:yp=yb
+10240 gosub10320:gosub10250:sysl,xr,yr,xp,yp:onmm+1goto10160,10000
+10250 ifq=1thenx1=x:y1=y:z1=z:gosub10340:xa=xx:ya=yy:gosub10850
+10260 ifa$="*"thengosub10410:gosub10340:gosub10850
+10270 ifa$=ri$thengosub10320:gosub10680:gosub10410:goto10290
+10280 return
+10290 xl=x1:yl=y1:zl=z1:x1=x2:y1=y2:z1=z2:x=x1:y=y1:z=z1:xa=xb:ya=yb:return
+10300 -----
+10310 rem linie ziehen
+10320 sysl,xa,ya,xb,yb:return
+10330 -----
+10340 rem 3d nach 2d koordinaten
+10350 yt=y/1.6
+10360 yy=ym-z-yt*si
+10370 xx=xm+x+yt*co
+10380 return
+10390 -----
+10400 rem 2.punkt suchen
+10410 xx=x1:yy=y1:zz=z1
+10420 x1=x2:y1=y2:z1=z2
+10430 x2=xx:y2=yy:z2=zz
+10440 xx=xa:yy=ya:xa=xb
+10450 ya=yb:xb=xx:yb=yy
+10460 x=x1:y=y1:z=z1
+10470 return
+10480 -----
+10490 q=0:mm=0
+10500 ifa$="x"ora$=r$thenx=x+s:q=1:ifx>mthenx=m
+10510 ifa$="X"ora$=l$thenx=x-s:q=1:ifx<-mthenx=-m
+10520 ifa$="y"theny=y+s:q=1:ify>mtheny=m
+10530 ifa$="Y"theny=y-s:q=1:ify<-mtheny=-m
+10540 ifa$="z"ora$=u$thenz=z+s:q=1:ifz>mthenz=m
+10550 ifa$="Z"ora$=d$thenz=z-s:q=1:ifz<-mthenz=-m
+10560 ifa$=c$thenlo=1:goto10000
+10570 ifa$=h$thenx=0:y=0:z=0:q=1
+10580 ifa$="+"thenifdw<90-sthendw=dw+s:poke191,dw/4:mm=1:goto10820
+10590 ifa$="-"thenifdw>sthendw=dw-s:poke191,dw/4:mm=1:goto10820
+10600 ifa$="k"goto10870
+10610 ifa$="p"thenx1=x:y1=y:z1=z:xb=xa:yb=ya:x2=x:y2=y:z2=z
+10620 ifa$="l"thenx=xl:y=yl:z=zl:q=1
+10630 ifa$="a"thengosub10950
+10640 ifa$>"/"anda$<":"thens=asc(a$)-48:ifs=0thens=10
+10650 ifa$="_"ora$="m"goto60030
+10660 return
+10670 -----
+10680 rem koordinaten speichern
+10690 ifap=255oral=255thenreturn
+10700 x=x1:y=y1:z=z1:gosub10760
+10710 pp=p
+10720 x=x2:y=y2:z=z2:gosub10760
+10730 sysvp,pp,p
+10740 al=peek(4):return
+10750 -----
+10760 sysse,x-256*(x<0),y-256*(y<0),z-256*(z<0)
+10770 ap=peek(3):p=peek(782):return
+10780 -----
+10790 pokev+21,0
+10800 poke191,dw/4:sysba:sysd3:poke56576,2
+10810 pokev+21,1
+10820 co=cos(p*dw):si=sin(p*dw)
+10830 return
+10840 -----
+10850 pokev,xa+1and255:pokev+1,ya+30:return
+10860 -----
+10870 xd=x:yd=y:zd=z
+10880 x=-m:y=0:z=0:gosub10340:xq=xx:yq=yy
+10890 x=m:gosub10340:sysl,xx,yy,xq,yq
+10900 x=0:y=-m:gosub10340:xq=xx:yq=yy
+10910 y=m:gosub10340:sysl,xx,yy,xq,yq
+10920 y=0:z=-m:gosub10340:xq=xx:yq=yy
+10930 z=m:gosub10340:sysl,xx,yy,xq,yq
+10940 x=xd:y=yd:z=zd:return
+10950 print"{clr}{down}{rght}koordinaten anzeigen:
+10960 print"{down}{rght}{rght}x="x
+10970 print"{down}{rght}{rght}y="y
+10980 print"{down}{rght}{rght}z="z
+10990 pokev+21,0:gosub1240
+11000 poke198,0:wait198,1:poke198,0
+11010 pokev+21,1:goto1250
+11020 -----
+20000 ze=0:gosub1240:zz=1280
+20010 gosub1240:zz=1280:printc$
+20020 zu=0:ifap=0goto20050
+20030 ifap>ze+15thenzu=15:goto20050
+20040 zu=(ap-1)and15:ifap=0thenzu=-1
+20050 y1=0
+20060 gosub21120
+20070 fori=zetoze+zu
+20080 gosub21190
+20090 next:x1=0:xa=0:y1=zu:ifq=5theny1=t:ify1>zutheny1=zu
+20100 printss$
+20110 :
+20120 gosub60050
+20130 ifa$<>""goto20190
+20140 gosub21080
+20150 gosub60050
+20160 gosub21080
+20170 ifa$=""goto20120
+20180 :
+20190 gosub21080
+20200 q=0
+20210 gosub20260
+20220 onqgoto20000,20120,20050,21280,20010
+20230 pokea,c
+20240 goto20120
+20250 :
+20260 ifa$=d$goto20870
+20270 ifa$=u$goto20940
+20280 ifa$=r$goto20980
+20290 ifa$=l$goto21030
+20300 ifa$=c$thenap=0:poke3,0:a$=h$:q=1
+20310 ifa$=h$thenx1=0:y1=0
+20320 ifa$=chr$(148)andap<>255thensysip,ze+y1:ap=peek(3):q=5:t=y1:return
+20330 ifa$=chr$(20)thenifap<>0thensysdp,ze+y1:ap=peek(3):q=5:t=y1:ifapand15=15goto20543
+20340 ifa$>="0"anda$<":"goto20680
+20350 ifa$="+"ora$=" "ora$="-"goto20790
+20360 ifa$="_"ora$="m"thenpoke3,ap:goto60030
+20370 ifa$="{f7}"thenq=4:poke3,ap:return
+20380 ifa$<>ri$thenreturn
+20390 :
+20400 rem return taste
+20410 x1=0:xa=0:pokea,c
+20420 ify1<zutheny1=y1+1:return
+20430 ifzu<>15goto20500
+20440 ifze<240thenze=ze+16
+20450 print"{clr}":y1=0
+20460 ifze=apthenzu=0:q=3:ap=ap+1:poke3,ap:return
+20470 ifap<ze+17thenzu=ap-1and15
+20480 q=3:return
+20490 ;
+20500 zu=zu+1:ap=ap+1:poke3,ap:ifap=1thenzu=0:q=3:return
+20505 gosub21120
+20510 i=ap-1:printd$sp$u$
+20520 gosub21190
+20530 y1=y1+1
+20540 printss$:q=2:return
+20541 -----
+20542 rem delete point
+20543 ifzu=0thenifze>15andap=zethenze=ze-16:t=15
+20544 return
+20550 -----
+20560 rem zeile uebernehmen
+20570 q=zz+y1*40:x$="":y$=x$:z$=x$
+20580 fori=0to2
+20590 x$=x$+chr$(peek(q-1+i))
+20600 y$=y$+chr$(peek(q+7+i))
+20610 z$=z$+chr$(peek(q+15+i)):next
+20620 q=ze+y1
+20630 x=val(x$):pokexs+q,x-d*(x<0)
+20640 y=val(y$):pokeys+q,y-d*(y<0)
+20650 z=val(z$):pokezs+q,z-d*(z<0)
+20660 q=0:return
+20670 -----
+20680 rem zahl eingeben
+20690 x2=zz+x1+y1*40
+20700 i=zz+(x1and24)+y1*40-1
+20710 x$="":forn=itoi+2
+20720 t=peek(n)and127:ifn=x2thent=asc(a$)
+20730 x$=x$+chr$(t):next
+20740 t=val(x$):ifabs(t)>mthenreturn
+20750 c=asc(a$):t=t-d*(t<0)
+20760 pokexs+((x1and24)/8)*d+ze+y1,t
+20770 goto20990
+20780 -----
+20790 ifa$="+"thena$=" "
+20800 x2=zz+(x1and24)-1+y1*40
+20810 pokex2,asc(a$)
+20820 x2=xs+((x1and24)/8)*d+ze+y1
+20830 t=peek(x2):t=-t-d*(t>r)
+20840 t=t-d*(t<0):pokex2,t:return
+20850 -----
+20860 rem down
+20870 ify1<zutheny1=y1+1:q=0:return
+20880 ifzu<>15orap<ze+17thenreturn
+20890 ifze<240thenze=ze+16
+20900 zu=15:ifap<ze+16thenzu=ap-1and15
+20910 q=3:y1=0:printc$:return
+20920 -----
+20930 rem up
+20940 ify1>0theny1=y1-1:return
+20950 ifze>0thenze=ze-16:q=3:zu=15:printc$
+20960 return
+20970 -----
+20980 rem right
+20990 ifx1=1orx1=9thenxa=xa+1:x1=xa*8:return
+21000 ifx1<17thenx1=x1+1
+21010 return
+21020 -----
+21030 rem left
+21040 ifx1=8orx1=16thenxa=xa-1:x1=xa*8:return
+21050 ifx1>0thenx1=x1-1
+21060 return
+21070 -----
+21080 a=zz+x1+y1*40:c=peek(a)
+21090 pokea,(cor128)-(cand128)
+21100 return
+21110 -----
+21120 print"{gry1}
+21130 print"{home}{swlc}{rght}Koordinatentripel eingeben:{down}
+21140 print"{rght} Anzahl der Punkte:"ap
+21150 print"{rght} Anzahl der Linien:"al
+21160 printd$ss$
+21170 printu$left$(cu$,y1):return
+21180 -----
+21190 rem inhalt des punktespeichers
+21200 rem anzeigen
+21210 print"Nr."i+1"{left} "tab(8)
+21220 x=peek(xs+i):x=x+d*(x>r)
+21230 y=peek(ys+i):y=y+d*(y>r)
+21240 z=peek(zs+i):z=z+d*(z>r)
+21250 print"==>{rvof}  x="x"{left} "tab(21)"y="y"{left} "tab(29)"z="z"{left}  "
+21260 return
+21270 -----
+21280 poke3,ap:ze=0
+21290 zu=15:ifal<ze+16thenzu=al-1and15
+21300 ifal=0thenzu=0
+21310 zz=1285
+21320 y1=0:x=0:print"{clr}{yel}":gosub21130
+21330 fori=zetoze+zu
+21340 gosub22140
+21350 next:y=zu:ifq=2theny=t:ify>zutheny=zu
+21360 printss$
+21370 gosub60050
+21380 gosub21520
+21390 ifa$<>""goto21450
+21400 gosub60050
+21410 ifa$<>""goto21450
+21420 gosub21520
+21430 goto21370
+21440 :
+21450 q=0
+21460 gosub21570
+21470 onqgoto21320,21290,20000
+21480 pokek,j
+21490 goto21370
+21500 :
+21510 rem invertieren
+21520 k=zz+x+y*40
+21530 j=peek(k)
+21540 pokek,(jor128)-(jand128)
+21550 return
+21560 :
+21570 ifa$=d$goto21800
+21580 ifa$=u$goto21860
+21590 ifa$=r$goto21910
+21600 ifa$=l$goto21960
+21610 ifa$=h$goto21990
+21611 ifa$=c$thenal=0:poke4,0:q=2:return
+21620 ifa$=chr$(148)andal<>255thensysil,ze+y:al=peek(4):q=2:t=y:return
+21630 ifa$=chr$(20)andal<>0thensysdl,ze+y:al=peek(4):q=2:t=y:ifaland15=15then21791
+21640 ifa$="{f7}"thenq=3:poke4,al:return
+21650 ifa$>"/"anda$<":"goto22010
+21660 ifa$="m"ora$="_"thenpoke4,al:goto60030
+21670 ifa$<>ri$thenreturn
+21680 :
+21690 pokek,j:x=0
+21700 ify<zutheny=y+1:return
+21710 al=al+1:poke4,al
+21720 ifzu=15goto21780
+21730 zu=zu+1:y1=zu:ifal=1thenzu=0:y1=0:goto21750
+21740 printu$sp$
+21750 gosub21130
+21760 i=al-1:gosub22140:y=zu
+21770 printss$:return
+21780 ifze<240thenze=ze+16
+21790 zu=0:q=1:return
+21791 rem delete line
+21792 ifzu=0thenifze>15andal=zethenze=ze-16:t=15
+21793 return
+21800 rem down
+21810 ify<zutheny=y+1:return
+21820 ifzu<>15oral<ze+17thenreturn
+21830 ifze<240thenze=ze+16
+21840 zu=15:ifal<ze+16thenzu=al-1and15
+21850 q=1:return
+21860 rem up
+21870 ify>0theny=y-1:return
+21880 ifze=0thenreturn
+21890 zu=15:ifze>0thenze=ze-16
+21900 q=1:return
+21910 rem right
+21920 ifx<14thenx=x+1:ifx=3thenx=12
+21930 ifpeek(zz+x+y*40)<>32thenreturn
+21940 ifx>12thenx=x-1:return
+21950 goto21920
+21960 rem left
+21970 ifx>0thenx=x-1:ifx=11thenx=0
+21980 return
+21990 rem home
+22000 y=0:x=0:return
+22010 rem zahl eingeben
+22020 z=zz+y*40:ifx>11thenz=z+12
+22030 x$="":fori=ztoz+2
+22040 x$=x$+chr$(peek(i)and127):next
+22050 z=x+1:ifx>11thenz=z-12
+22060 x$=left$(x$,z-1)+a$+mid$(x$,z+1)
+22070 z=val(x$):ifz>aporz=0thenreturn
+22080 qq=p1+ze+y:ifx>11thenqq=qq+d
+22090 pokeqq,z-1
+22100 j=asc(a$):ifx=14thenreturn
+22110 ifx=2thenx=12:return
+22120 x=x+1:return
+22130 -----
+22140 print"Nr.:"i+1tab(9)"==>";
+22150 pa=peek(p1+i)+1:ifpa>apthenpa=1:pokep1+i,1
+22160 pb=peek(p2+i)+1:ifpb>apthenpb=1:pokep2+i,1
+22170 print" von Nr."pa"{left}  "tab(25)"bis Nr."pb"{left}   "
+22180 return
+22190 -----
+30000 g$="{home}{down}{rght}{swlc}{wht}Rotationskoerper:"
+30010 print"{clr}"g$
+30020 a$="n":input"{down}{rght}Alte Koordinaten loeschen ? n{left}{left}{left}";a$:ifa$="n"goto30040
+30030 poke3,0:poke4,0:ap=0:al=0
+30040 pokev+21,0:sysba:poke56576,2:za=0:lo=0
+30050 x=0:y=0:x1=x:y1=y
+30060 xa=xm-m*2:ya=ym+m/2:yb=ya
+30070 fori=0to4*mstep4
+30080 h=6:ifi/5=int(i/5)thenh=12
+30090 sysl,xa+i,ya+1,xa+i,ya+h:next
+30100 xa=xm:xb=xa:gosub10850:pokev+21,1
+30110 fori=xm-m*2toxm+m*2step10
+30120 forj=ya-m*2toyastep10
+30130 syspl,i,j:nextj,i
+30140 gosub60050
+30150 ifa$<>""goto30210
+30160 gosub10320
+30170 gosub60050
+30180 gosub10320
+30190 ifa$=""goto30140
+30200 :
+30210 xr=xa:yr=ya:xp=xb:yp=yb:q=4
+30220 gosub10320
+30230 gosub30280
+30240 sysl,xr,yr,xp,yp
+30250 ifq=1thengosub30470:xa=xx:ya=yy:gosub10850:q=4
+30260 onq-1goto30040,30490,30140
+30270 poke53280,1:stop
+30280 ifa$="x"ora$=r$thenx=x+s:q=1:ifx>mthenx=m
+30290 ifa$="X"ora$=l$thenx=x-s:q=1:ifx<-mthenx=-m
+30300 ifa$="y"ora$=u$theny=y+s:q=1:ify>mtheny=m
+30310 ifa$="Y"ora$=d$theny=y-s:q=1:ify<0theny=0
+30320 ifa$="l"thenx=x2:y=y2:q=1
+30330 ifa$="p"thenx1=x:y1=y:xb=xa:yb=ya
+30340 ifa$=c$thenq=2
+30350 ifa$=h$thenx=0:y=0:q=1
+30360 ifa$="*"goto30450
+30370 ifa$=" "thenq=3:s=5:return
+30380 ifa$="m"ora$="_"goto60030
+30390 ifa$>"/"anda$<":"thens=asc(a$)-48:ifs=0thens=10
+30400 ifa$<>ri$thenreturn
+30410 :
+30420 x(za)=x1:y(za)=y1:za=za+1:x(za)=x:y(za)=y:za=za+1:x2=x1:y2=y1
+30430 x1=x:y1=y:gosub30470:gosub10320:xb=xx:yb=yy:return
+30440 :
+30450 q=1:xx=x:yy=y:x=x1:y=y1:x1=xx:y1=yy:xb=xa:yb=ya:return
+30460 :
+30470 xx=xm+x*2:yy=ym+m/2-y*2:return
+30480 :
+30490 gosub1240
+30500 print"{clr}":pokev+21,0
+30510 printg$:poke19,64
+30520 input"{down}{rght}von 0 Grad - 360 Grad  {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";gr$:gr=int(abs(val(gr$)))
+30530 print:ifgr>360goto30500
+30540 poke19,0
+30550 input"{down}{rght}Anzahl der Facetten:";an
+30560 ifan<3thenprint"{up}{up}";:goto30550
+30570 input"{down}{rght}Alles ok.";a$
+30580 ifa$<>"n"goto30630
+30590 input"{down}{rght}Neu zeichnen";a$
+30600 ifa$="j"goto30000
+30610 goto30500
+30620 :
+30630 ap=peek(3):al=peek(4):n=al
+30640 a$="{down}{rght}Anzahl der Facetten zu gross !!"
+30650 print"{down}{rght}1. Facetten{down}
+30660 fori=0to(gr-1)*pstep(gr/an)*p
+30670 forj=0toza-1step2:printn-al+1"{up}"
+30680 fork=0to1:t=k+j
+30690 x=x(t)-d*(x(t)<0)
+30700 y=int(y(t)*cos(i)):y=y-d*(y<0)
+30710 z=int(y(t)*sin(i)):z=z-d*(z<0)
+30720 sysse,x,y,z
+30730 pokep1+n+k*d,peek(782)
+30740 nextk:n=n+1:nextj:ifi=0thenf=n-al
+30750 nexti
+30760 :
+30770 ifn>255thenprinta$:poke3,ap:poke4,al:goto30510
+30780 :
+30790 poke4,n:ap=peek(3):print"{up}{up}"
+30800 :
+30810 t=n-f-1-al
+30820 print"{down}{rght}2. Verbindungen 1
+30830 fori=altot+alstepf
+30840 forj=0tof-1
+30850 pa=peek(p1+i+j):pb=peek(p1+i+j+f)
+30860 ifpa=pbgoto30880
+30870 sysvp,pa,pb:ifpeek(4)=255thenn=256:goto30770
+30880 nextj,i
+30890 ifgr<>360goto30950
+30900 fork=0tof-1
+30910 pa=peek(p1+i+k):pb=peek(p1+k+al)
+30920 ifpa=pbgoto30940
+30930 sysvp,pa,pb:ifpeek(4)=255thenn=256:goto30770
+30940 nextk
+30950 print"{down}{rght}3. Verbindungen 2
+30960 fori=altot+alstepf
+30970 forj=0tof-1
+30980 pa=peek(p2+i+j):pb=peek(p2+i+j+f)
+30990 ifpa=pbgoto31010
+31000 sysvp,pa,pb:ifpeek(4)=255thenn=256:goto30770
+31010 nextj,i
+31020 ifgr<>360goto60030
+31030 fork=0tof-1
+31040 pa=peek(p2+i+k):pb=peek(p2+k+al)
+31050 ifpa=pbgoto31070
+31060 sysvp,pa,pb:ifpeek(4)=255thenn=256:goto30770
+31070 nextk
+31080 :
+31090 goto60030
+40000 -speichern-
+40010 gosub50040
+40020 open1,8,1,b$
+40030 print#1,chr$(peek(3));
+40040 print#1,chr$(peek(4));
+40050 fori=0topeek(3)-1
+40060 print#1,chr$(peek(xs+i));
+40070 print#1,chr$(peek(ys+i));
+40080 print#1,chr$(peek(zs+i));
+40090 next
+40100 fori=0topeek(4)-1
+40110 print#1,chr$(peek(p1+i));
+40120 print#1,chr$(peek(p2+i));
+40130 next
+40140 close1:goto60030
+50000 -laden-
+50010 ifpeek(1023)=0thensysba:gosub1240
+50015 gosub50040:lo=0
+50020 syslq,1,8,0,b$:close1:goto60030
+50030 -filename-
+50040 b$="":input"{down}{rght}filename";b$:ifb$="_"orb$="m"orb$=""goto60030
+50050 b$=left$(b$,13)+".3d,s":return
+50060 -directory-
+50100 print:sysba+1649
+50110 wait198,1:poke198,0:goto60030
+59999 -exit-
+60000 end
+60010 -----
+60020 if(aporal)<>0thenprintc$:sysba:sysdr
+60030 pokev+21,0:poke198,0:clr:ap=peek(3):al=peek(4):dw=peek(191)*4:goto130
+60040 -----
+60050 fori=0tow:geta$:ifa$=""thennext
+60060 return
+

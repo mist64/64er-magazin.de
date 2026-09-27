@@ -1,0 +1,534 @@
+
+
+;cad.main.prg ==0801==
+   10 ifvc=1then2433
+   20 ifvc=2then2440
+   30 :
+   35 :
+   40 a=peek(836)+1:poke836,a:ifa=1thenpoke55,0:poke56,80:clr:a=1
+   45 ifa=1thenload"hires4.cad.obj",8,1
+   50 ifa=2thenload"hires6.cad.obj",8,1
+   55 sys50707,1:poke53280,14:dimb$(63):ifd=0thengosub3060:poke808,237
+   60 close1:open1,8,15,"u9":close1:sys37021
+   65 :
+   70 :
+   90 :
+   95 n=50181:co=50292:e=50707:g=50859:li=51049:jo=51627:h2=1
+  100 re=51800:t2=52490:mu=52517:cp=36878:j2=39247:d1=40052:c2=40206
+  105 l4=21764:um=22873:ml=21839
+  110 fr=51480:uf=51507:f(1)=11:f(2)=12:f(3)=0:f(4)=15
+  115 ifpeek(53263)=1andl=1thenb=1:ri=0:gosub2475:sysco,2,0:poke53263,0:goto125
+  120 syse,1:sysn,11,15,2:ri=0:l=1:ifd<>1thenb=2:gosub2875
+  125 sysg,160,190,319,199,0,2:syst2,2:ifd=1thensys25919:v=0:k=0
+  130 syscp,2:sysre,0,0,319,199,1,2
+  131 ifvc=2thenvc=0:goto135
+  132 sysco,1,0
+  135 poke192,0:close1:open1,8,15,"xr+":print#1,"u9":close1:goto525
+  140 :
+  145 :
+  165 :
+  170 ifa=1anddr<>0thendr=0:goto420
+  175 ifa=3anddl<>0thendl=0:goto420
+  180 ifa=2anddu<>0thendu=0:goto420
+  185 input"{clr}{down}{down}{rght}{rght}{rght}Drehung um X,Y, oder Z-Achse";a$:c=asc(a$)-87
+  190 ifa=1thendr=c:du=0:goto410
+  195 ifa=3thendl=c:goto410
+  200 ifa=2thendu=c:dr=0:goto410
+  205 print"{clr}{down}{down}{rght}{rght}{rght}Summanden des Fluchtpunktes  5,15,5";
+  210 input"{home}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";kx,ky,kz:goto410
+  215 print"{clr}{down}{down}{rght}{rght}{rght}Verschiebungsfaktor     5.5"
+  220 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";kf::kf=-kf:goto410
+  225 print"{clr}{down}{down}{rght}{rght}{rght}Neigung der Z-Achse    -30"
+  230 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";zv::goto410
+  235 print"{clr}{down}{down}{rght}{rght}{rght}Vergroesserungsfaktor   3"
+  240 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";vf:vf=vf*100:goto410
+  245 gosub1015:ifa$<>"j"goto410
+  250 a=49153:pokea+940,dr:pokea+941,dl:w=kx:i=942:gosub2815
+  255 w=ky:gosub2815:w=kz:gosub2815
+  260 w=vf:gosub2815
+  265 w=kf:gosub2815:l=.5:pokea+952,du:goto2400
+  270 dr=0:dl=0:kx=0:ky=0:kz=0:vf=0:kf=0:goto420
+  275 :
+  280 :
+  300 :
+  305 gosub615:print" {rvon}              Zusaetze                {CTRL-O}"
+  310 gosub620
+  315 print"{home}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}A. 4-fache Aufloesung"
+  320 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}B. 10-fache Aufloesung"
+  325 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}C. Film erstellen"
+  330 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}D. Film ergaenzen"
+  335 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}E. Rahmen zeichen an ";:ifrn=0thenprint"{left}{left}{left}aus"
+  340 gosub1020
+  345 gosub635:ifa$="_"thensyse,1:goto525
+  350 ifa<1ora>5goto345
+  355 onagoto360,370,410,480,490
+  360 gosub1015:ifa$<>"j"goto305
+  365 l=2:ri=0:wm=0:bs=0:mc=0:goto2395
+  370 gosub1015:ifa$<>"j"goto305
+  375 l=2:ri=1:wm=0:bs=0:mc=0:goto2395
+  380 :
+  385 :
+  405 :
+  410 gosub615:print" {rvon}           Film erstellen             {CTRL-O}"
+  415 gosub620
+  420 print"{home}{down}{down}{down}{down}{rght}{rght}{rght}{rght}A. Drehung des Koerpers an ";:ifdr=0thenprint"{left}{left}{left}aus";
+  425 print:print"{down}{rght}{rght}{rght}{rght}B. Drehung um den Koerper an ";:ifdu=0thenprint"{left}{left}{left}aus";
+  430 print:print"{down}{rght}{rght}{rght}{rght}C. Drehung der Lichtquelle an ";:ifdl=0thenprint"{left}{left}{left}aus";
+  435 print:print"{down}{rght}{rght}{rght}{rght}D. Verschieben des Fluchtpunktes"
+  440 print"{down}{rght}{rght}{rght}{rght}E. Verschieben der Schnittebene"
+  445 print"{down}{rght}{rght}{rght}{rght}F. Kippen der Z-Achse"
+  450 print"{down}{rght}{rght}{rght}{rght}G. Aendern der Groesse"
+  455 print"{down}{rght}{rght}{rght}{rght}H. Berechnung"
+  460 print"{down}{rght}{rght}{rght}{rght}I. Neue Parameter"
+  465 gosub635:ifa$="_"goto305
+  470 ifa<1ora>9goto345
+  475 onagoto170,170,170,205,215,225,235,245,270
+  480 gosub1015:ifa$<>"j"goto305
+  485 l=3:ri=0:wm=0:goto2395
+  490 rn=1-rn:goto315
+  495 :
+  500 :
+  520 :
+  525 o=160:p=10:poke53280,14:ds=0:fi=0
+  530 gosub1030:ifpeek(631)<>0goto530
+  535 ifp>9goto530
+  540 ifo<57goto2970
+  545 ifo>97ando<126goto1760
+  550 ifo>288goto1105
+  555 ifo>126ando<165goto1360
+  560 ifd=1goto530
+  565 ifo>57ando<97goto2230
+  570 ifo>165ando<233goto2395
+  575 ifo>234ando<287goto305
+  580 :
+  585 :
+  605 :
+  610 goto530
+  615 print"{clr}{gry1} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}":return
+  620 fori=1to22:print" {CBM-G}                                    {CBM-M}":next
+  625 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{$a0}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{home}":return
+  630 syse,0:printchr$(14)chr$(8)"{home}{gry1}";:return
+  635 geta$:ifa$=""goto635
+  640 a=asc(a$)-64:return
+  645 sysl4,0,0,0,199,1,1:sysl4,319,0,319,199,1,2:iffi=1thensysl4,0,0,319,0,1,3
+  650 return
+  655 :
+  660 :
+  680 :
+  685 close1
+  690 open1,8,15:input#1,f,f$,t,s:iff=0thenreturn
+  695 gosub1020:print:print"{down}{down}{rght}{rght}{rght}{rvon}Diskettenfehler :"
+  700 print"{down}{down}{rght}{rght}"f","f$","t","s:ifds=0andfithenreturn
+  705 close2:print#1,"u9":close1:ifds=0thengosub635:return
+  710 print"{down}{down}{rght}{rght}{rght}Noch ein Versuch  (j/n) ?"
+  715 gosub635:ifa$="n"thenf=99:print"{clr}":return
+  720 ifa$="j"thenf=1:print"{clr}":return
+  725 goto715
+  730 :
+  735 :
+  755 :
+  760 sysl4,r,q,o-1,q,2,1:sysl4,o,q,o,p-1,2,1
+  765 sysl4,o,p,r+1,p,2,1:sysl4,r,p,r,q+1,2,1:pm=1-pm:return
+  770 w=w+1:ifj1<>jthenw=1
+  775 ifw>20thenw=20
+  780 j1=j:p=p+w*(j=1)-w/m*(j=3)-w*(j=5)+w/m*(j=7)
+  785 o=o+w*m*(j=1)-w*(j=3)-w*m*(j=5)+w*(j=7):return
+  790 :
+  795 :
+  815 :
+  820 ifo<50thenr=3:rx=49:q1=1:goto835
+  825 ifo<100thenr=50:rx=99:q1=3:goto835
+  830 r=100:rx=156:q1=2
+  835 ifp<135thenq=102:ry=134:q2=2:goto850
+  840 ifp<165thenq=135:ry=164:q2=1:goto850
+  845 q=165:ry=196:q2=0
+  850 c=q2*3+q1:return
+  855 sysg,r,q,rx,ry,2,b:return
+  860 :
+  865 :
+  885 :
+  890 ifbq=1andei=0thenbq=0:b=2:gosub855
+  895 sysjo:j=peek(859)
+  900 ifj=0goto895
+  905 ifj=128goto920
+  910 ifint(j/2)=j/2goto895
+  915 j=int(j/2)+1:return
+  920 b=2:gosub855:c=0:bq=1:return
+  925 :
+  930 :
+  950 :
+  955 ifa<49ora>57thenc=0:return
+  960 a=a-48:xa=int((9-a)/3)*3:xb=a-int((a-1)/3)*3
+  965 xb=3+(xb<2)*2+(xb>2)*1:c=xa+xb:ei=1:gosub630:geta$
+  970 ifc>6theninput"{clr}{down}{down}{rght}{rght}{rght}Drehwinkel   90{left}{left}{left}{left}";w:return
+  975 ifc>3theninput"{clr}{down}{down}{rght}{rght}{rght}Verschiebungssummand   50{left}{left}{left}{left}";w:return
+  980 input"{clr}{down}{down}{rght}{rght}{rght}Verzerrrungsfaktor   1.5{left}{left}{left}{left}{left}";w:return
+  985 :
+  990 :
+ 1010 :
+ 1015 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rvon} Sind Sie sicher ? {rvof}":gosub635:return
+ 1020 ifpeek(53272)<>23thengosub630
+ 1025 return
+ 1030 sysj2,o,p,0:o=peek(2024)+256*peek(2025):p=peek(2026):return
+ 1035 close1
+ 1040 open2,8,2,n1$+left$(n$,10)+str$(fi*2+(b-2))+",p,w":gosub690:iff=0goto1055
+ 1045 iff=99thenclose2:gosub3115:return
+ 1050 close1:close2:open1,8,15,"s:"+n1$+left$(n$,10)+str$(fi*2+(b-2)):goto1035
+ 1055 sys26068,b:close2:gosub3115:return
+ 1060 ei=1:gosub630:geta$:input"{clr}{down}{down}{rght}{rght}{rght}Verzerrungsfaktor   1.5{left}{left}{left}{left}{left}";w
+ 1065 sysre,2,101,157,197,0,1:sysum,1,0,1,d,1,0,w:sysum,2,0,1,d,1,0,w:return
+ 1070 syse,0:goto2970
+ 1075 :
+ 1080 :
+ 1100 :
+ 1105 yu=0:gosub615:print" {rvon}         Darstellungs - Modi          {CTRL-O}"
+ 1110 gosub620
+ 1115 print"{home}{down}{down}{down}{down}{rght}{rght}{rght}A. Fluchtpunktdarstellung an ";:iffl=0thenprint"{left}{left}{left}aus";
+ 1120 print:print"{down}{rght}{rght}{rght}B. Zeichnen der Schnittlinien an ";
+ 1125 ifsl=0thenprint"{left}{left}{left}aus";
+ 1130 print:print"{down}{rght}{rght}{rght}C. Hidden-Line Modus an ";:ifhd=0thenprint"{left}{left}{left}aus";
+ 1135 print:print"{down}{rght}{rght}{rght}D. Schattierungs-Modus an ";:ifwq=0thenprint"{left}{left}{left}aus";
+ 1140 print:print"{down}{rght}{rght}{rght}E. Lichtquellen-Koordinaten"
+ 1145 print"{down}{rght}{rght}{rght}F. Multicolour-Modus an ";:ifmc=0thenprint"{left}{left}{left}aus";
+ 1150 print:print"{down}{rght}{rght}{rght}G. Doppelmodus Hires & Multi an ";
+ 1155 ifwm=0thenprint"{left}{left}{left}aus";
+ 1160 print:print"{down}{rght}{rght}{rght}H. Hidden-L. & Schattierung an ";:ifbs=0thenprint"{left}{left}{left}aus";
+ 1165 print:print"{down}{rght}{rght}{rght}I. Schnittebene an ";:ifse=0thenprint"{left}{left}{left}aus";
+ 1170 gosub1020
+ 1175 gosub635:ifa$="_"thensyse,1:goto525
+ 1180 ifa<1ora>9goto1175
+ 1185 onagoto1195,1190,1215,1220,1225,1245,1250,1265,1255
+ 1190 sl=1-sl:goto1115
+ 1195 fl=1-fl:iffl=0goto1280
+ 1200 print"{clr}{down}{down}{rght}{rght}{rght}Fluchtpunkt-Koordinaten:"
+ 1205 print"{down}{rght}{rght}{rght}X,Y,Z   "str$(a1)","str$(a2)","str$(a3):yu=1
+ 1210 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a1,a2,a3:goto1280
+ 1215 hd=1-hd:goto1305
+ 1220 wq=1-wq:goto1310
+ 1225 print"{clr}{down}{down}{rght}{rght}{rght}Koordinaten der Lichtquelle:"
+ 1230 print"{down}{rght}{rght}{rght}X,Y,Z   "wx"{left},"wy"{left},"wz
+ 1235 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";wx,wy,wz:ifwx=0andwy=0andwz=0goto1235
+ 1240 goto1105
+ 1245 mc=1-mc:goto1280
+ 1250 wm=1-wm:goto1290
+ 1255 se=1-se:ifsegoto1270
+ 1260 goto1280
+ 1265 bs=1-bs:goto1295
+ 1270 yu=1:print"{clr}{down}{down}{rght}{rght}{rght}Tiefe der Schnittebene:"
+ 1275 print"{down}{rght}{rght}{rght}Y   "str$(-ke):input"{up}{rght}{rght}{rght}{rght}{rght}";ke:ke=-ke:goto1280
+ 1280 :
+ 1285 ifmcthenwm=0:bs=0
+ 1290 ifwmthenmc=0:bs=0
+ 1295 ifbsthenmc=0:wm=0
+ 1300 ifseormcorwmorbsthenwq=1:hd=1
+ 1305 ifhd=0thenwq=0
+ 1310 ifwq=0thenmc=0:wm=0:se=0:bs=0
+ 1315 ifwqthenhd=1
+ 1320 ifyugoto1105
+ 1325 goto1115
+ 1330 :
+ 1335 :
+ 1355 :
+ 1360 sysg,127,0,165,9,2,1
+ 1365 gosub615:print" {rvon}            Zoom - Menue              {CTRL-O}"
+ 1370 gosub620
+ 1375 print"{home}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}A. Zoomen des Objekts"
+ 1380 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}B. Orginalgroesse"
+ 1385 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}C. Optimaler Ausschnitt"
+ 1390 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}D. Betrachten der Grafik"
+ 1395 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}E. Zentrieren":gosub1020
+ 1400 gosub635:ifa$="_"thensyse,1:sysg,127,0,165,9,2,1:goto525
+ 1405 if(a<1ora>5)or(a<>4andd=1)goto1400
+ 1410 onagoto1445,1550,1585,1640,1675
+ 1415 :
+ 1420 :
+ 1440 :
+ 1445 syse,1:o=160:p=100:m=8/5:pm=0
+ 1450 gosub1030
+ 1455 if(peek(631))=95goto1545
+ 1460 sysjo:ifpeek(859)=128goto1460
+ 1465 r=o:q=p
+ 1470 gosub760:sysjo:j=peek(859):geta$:ifa$<>""goto1525
+ 1475 ifj=0orj>128thenw=0:goto1470
+ 1480 ifpmthengosub760
+ 1485 ifj=128goto1505
+ 1490 ifint(j/2)=j/2goto1470
+ 1495 ifo<rtheno=r:p=q:w=0
+ 1500 gosub770:goto1470
+ 1505 ifr=ogoto1545
+ 1510 h=320/(abs(r-o))*h:f1=r/h2+f1:f2=q/h2+f2:h2=h:ifpm=0thengosub760
+ 1515 sysn,11,15,2:b=2:gosub2875:sysre,0,0,319,199,1,2
+ 1520 sysg,160,190,318,198,0,2:syscp,2:syst2,2:sysco,1,0:goto525
+ 1525 ifpmthengosub760
+ 1530 ifa$="_"goto1545
+ 1535 ifa$="l"goto1445
+ 1540 goto1470
+ 1545 sysg,127,0,165,9,2,1:goto525
+ 1550 syse,1:f1=0:f2=0:h=1:h2=1:goto1515
+ 1555 :
+ 1560 :
+ 1580 :
+ 1585 pm=0:ifh<>1thenpm=1
+ 1590 syse,1:o=-8000:p=o:r=-o:q=-o:f1=0:f2=0:h=1:h2=1
+ 1595 i=0:fora=1tov:sysd1,a:y1=usr(1):u=usr(2):z1=usr(3):gosub2910
+ 1600 ifu>otheno=u
+ 1605 ifz1>pthenp=z1
+ 1610 ifu<rthenr=u
+ 1615 ifz1<qthenq=z1
+ 1620 nexta:r=r-1:q=q-1:o=o+1:p=p+1:m=8/5
+ 1625 b1=abs(o-r):b2=abs(p-q)
+ 1630 ifb1<b2*mthenfa=b2*m:o=o+abs(fa-b1)/2:r=r-abs(fa-b1)/2:goto1510
+ 1635 ifb1>b2/mthenfa=b1/m:p=p+abs(fa-b2)/2:q=q-abs(fa-b2)/2:goto1510
+ 1640 sysg,127,0,165,9,2,1:syse,2:b=2:goto2130
+ 1645 :
+ 1650 :
+ 1670 :
+ 1675 syse,1:o=-8000:p=o:r=-o:q=r:qz=r:pz=p:f1=0:f2=0:h=1:h2=1
+ 1680 i=0:fora=1tov:sysd1,a:u=usr(1):y1=usr(2):z1=usr(3)
+ 1685 ifu>otheno=u
+ 1690 ify1>pthenp=y1
+ 1695 ifz1>pzthenpz=z1
+ 1700 ifu<rthenr=u
+ 1705 ify1<qthenq=y1
+ 1710 ifz1<qzthenqz=z1
+ 1715 nexta:fx=(r+o)/2:fy=(q+p)/2:fz=(qz+pz)/2
+ 1720 sysum,4,0,0,d,1,0,fx:sysum,5,0,0,d,1,0,-fy:sysum,6,0,0,d,1,0,fz
+ 1725 sysn,11,15,2:syse,1:goto115
+ 1730 :
+ 1735 :
+ 1755 :
+ 1760 gosub615:print" {rvon}             Disk - Menue             {CTRL-O}"
+ 1765 gosub620
+ 1770 print"{home}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}A. Objekt laden"
+ 1775 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}B. Objekt speichern"
+ 1780 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}C. Diskettenkommando senden"
+ 1785 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}D. Directory anzeigen"
+ 1790 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}E. Grafik laden"
+ 1795 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}F. Grafik speichern"
+ 1800 gosub1020
+ 1805 gosub635:ifa$="_"thensyse,1:goto525
+ 1810 ifa<1ora>6goto1805
+ 1815 onagoto1850,1925,2060,2000,2110,2165
+ 1820 :
+ 1825 :
+ 1845 :
+ 1850 gosub615:gosub625:print" {rvon}             Objekt laden             {rvof}"
+ 1855 input"{down}{down}{down}{rght}{rght}{rght}Objekt - Name    ";n$:ifn$="_"orn$=""goto1760
+ 1860 open2,8,2,"ob."+n$+",s,r":gosub685:iff<>0goto1760
+ 1865 h=1:l=1:f1=0:f2=0:fk=0:h2=1:v=0:d=1:k=0:sys25919
+ 1870 input#2,d:input#2,v:input#2,k
+ 1875 sys22541,d,v
+ 1880 fori=1tok:input#2,b$(i):next
+ 1885 sysc2,v+1,d,0,0
+ 1890 close2:gosub685:gosub3115:syse,1:sysn,11,15,2:goto115
+ 1895 :
+ 1900 :
+ 1920 :
+ 1925 ifd=1goto1805
+ 1930 gosub615:gosub625::print" {rvon}           Objekt speichern           {rvof}"
+ 1935 input"{down}{down}{down}{rght}{rght}{rght}Objekt - Name    ";n$:ifn$="_"orn$=""goto1760
+ 1940 open2,8,2,"ob."+n$+",s,w":gosub685:iff<>0goto1760
+ 1945 print#2,d:print#2,v:print#2,k
+ 1950 sys22520,d,v
+ 1955 fori=1tok:print#2,b$(i):next
+ 1960 close2:gosub685:gosub3115
+ 1965 goto1760
+ 1970 :
+ 1975 :
+ 1995 :
+ 2000 print"{clr}";:gosub615:print" {rvon}          Directory anzeigen          {rvof}"
+ 2005 print:open2,8,0,"$0":sys26134:close2
+ 2010 :close2
+ 2015 close1:open1,8,15:input#1,f,f$,t,s:iff=0goto2025
+ 2020 print"{home}{down}":gosub695:goto1760
+ 2025 print#1,"u9":close1:gosub635:goto1760
+ 2030 :
+ 2035 :
+ 2055 :
+ 2060 gosub615:gosub625:print" {rvon}      Diskettenkommando senden        {rvof}"
+ 2065 poke631,34:poke198,1:n$="":input"{down}{down}{rght}{rght}{rght}Kommando ";n$:ifn$="_"goto1760
+ 2070 close1:open1,8,15,n$:input#1,f,f$,t,s:print"{down}{down}{rght}{rght}{rght}{rvon} Diskettenstatus: "
+ 2075 gosub700:goto1760
+ 2080 :
+ 2085 :
+ 2105 :
+ 2110 gosub615:gosub625:print" {rvon}             Grafik laden             {rvof}"
+ 2115 input"{down}{down}{down}{rght}{rght}{rght}Grafik - Name    ";n$:ifn$="_"orn$=""goto1760
+ 2120 print"{clr}":open2,8,2,"pi."+n$+",p,r":gosub685:iff<>0goto1760
+ 2125 sysn,11,15,2:syse,2:sys26101,2:close2:print#1,"u9":close1:b=2
+ 2130 gosub2475:syse,1:goto525
+ 2135 :
+ 2140 :
+ 2160 :
+ 2165 gosub615:gosub625:print" {rvon}           Grafik speichern           {rvof}"
+ 2170 cr=a:input"{down}{down}{down}{rght}{rght}{rght}Grafik - Name    ";n$:ifn$="_"orn$=""goto2190
+ 2175 ifcr=6theninput"{down}{down}{rght}{rght}{rght}Grafik - Bildschirm # ";b
+ 2180 open2,8,2,"pi."+n$+",p,w"
+ 2185 sys26068,b:close2:gosub685:close1:open1,8,15:print#1,"u9":close1
+ 2190 ifcr=6thensyse,1:goto525
+ 2195 return
+ 2200 :
+ 2205 :
+ 2225 :
+ 2230 sysco,2,0:sysg,58,0,96,9,2,2:sysg,0,100,158,104,0,2:bq=1
+ 2235 sysmu,2:sysre,0,99,159,199,1,2:sysre,2,101,157,197,1,2:syse,2:b=2
+ 2240 o=160:p=100:jl=0
+ 2245 gosub1030
+ 2250 ifpeek(631)<>0thena=peek(631):goto2325
+ 2255 ifo>57ando<97andp<9thena=95:goto2325
+ 2260 ifo>159orp<100goto2245
+ 2265 gosub820:ifc=0goto2245
+ 2270 gosub890:ifc=0goto2245
+ 2275 sysre,2,101,157,197,0,2:sysum,c,0,0,d,ei,j,w
+ 2280 ifjl>0thenjl=jl+1:sysre,2,101,157,197,1,2:ifei=0goto2270
+ 2285 ifjl>0thenei=0:bq=1:c=0:goto2245
+ 2290 b=1:dh=hd:hd=0:sysn,11,15,1:gosub2875:hd=dh
+ 2295 sysre,0,0,319,199,1,1:syst2,1:sysg,160,190,318,198,0,1:syscp,1
+ 2300 syse,1:sysco,2,0:sysg,0,100,158,104,0,2:sysg,58,0,96,9,2,2
+ 2305 sysmu,2:sysre,0,99,159,199,1,2:sysre,2,101,157,197,1,2
+ 2310 ifjlthenjl=1:syse,2:poke53280,14:goto2325
+ 2315 ifeithenei=0:bq=1:c=0:syse,2:goto2245
+ 2320 b=2:gosub855:bq=0:syse,2:goto2270
+ 2325 ifa=95andjl>1thenpoke53280,14:goto2290
+ 2330 ifa=95thensyse,1:goto525
+ 2335 ifa=133andjl=0thenjl=1:poke53280,6:goto2245
+ 2340 ifa=133andjl=1thenjl=0:poke53280,14:goto2245
+ 2345 ifa=133andjl>1thenpoke53280,14:goto2290
+ 2350 ifa=48thengosub1060:c=3:syse,2:goto2275
+ 2355 gosub955:ifc=0orw=0thensyse,2:ei=0:w=0:c=0:bq=1:goto2245
+ 2360 syse,2:goto2275
+ 2365 :
+ 2370 :
+ 2395 sysn,11,15,2:syse,2:poke53280,15
+ 2400 ifhdthenprint"{clr}";:syse,0:goto2975
+ 2405 ifl<>1thengosub630:input"{clr}{down}{down}{down}{down}{rght}{rght}{rght}File - Name ";n$
+ 2410 ifl<>1thends=1:syse,1:print"{clr}":open1,8,15,"xr-":print#1,"u9":poke192,192
+ 2415 ifl=.5goto2565
+ 2420 ifl=2andri=1goto2700
+ 2425 ifl=2goto2725
+ 2430 ifl=3goto2750
+ 2431 gosub630:input"{clr}{down}{down}{down}{down}{rght}{rght}{rght}Plotten ";n$:ifn$<>"j"then2436
+ 2432 vc=1:load"giga-line.obj",8,1
+ 2433 zz=0:input"{down}{down}{down}{rght}{rght}{rght}Gross (j/n)";n$:ifn$="j"thenzz=1
+ 2434 input"{down}{rght}{rght}{rght}Farbe      ";ff$:sys51375,asc(ff$),zz:gosub2875
+ 2435 sys51408:vc=2:load"hires1.cad.obj",8,1
+ 2436 b=2:syse,2:gosub2875:gosub2475
+ 2440 syse,1:goto125
+ 2445 :
+ 2450 :
+ 2470 :
+ 2475 xa=1:poke53280,15
+ 2480 gosub635:a=a+64:ifa>48anda<51thenb=a-48:syse,b
+ 2485 ifa<133ora>140goto2500
+ 2490 a=a-132:i=a-int(a/5)*4:w=-(a<5)+(a>4):f(i)=f(i)+w:iff(i)<0thenf(i)=15
+ 2495 iff(i)>15thenf(i)=0
+ 2500 ifa=83thena=0:gosub630:gosub2165
+ 2505 ifa=82thensysre,0,0,319,199,1,3
+ 2510 ifa=95thensysml,11,15,0,1:sysml,11,15,0,2:poke53281,15:syse,b:return
+ 2515 ifa=77thenxa=1-xa
+ 2520 sysml,f(1),f(2),f(3),b:poke53280,f(4):poke53281,f(4)
+ 2525 ifxathensysml,f(1),f(4),0,b:syse,b
+ 2530 goto2480
+ 2535 :
+ 2540 :
+ 2560 :
+ 2565 sysn,11,15,2:syse,2:poke53280,15
+ 2570 close1:open1,8,15,"s:cad.main.datas":print#1,"xr-":print#1,"u9":poke192,192
+ 2575 close1:open2,8,2,"cad.main.datas,s,w":gosub685:iff=0goto2590
+ 2580 iff=99thenclose2:gosub3115:syse,1:goto135
+ 2585 close2:close1:goto2570
+ 2590 sys22520,d,v:close2:gosub3115:f3=f1:f4=f2:dv=du:vx=a1:vy=a2:vz=a3
+ 2595 h2=h:forfi=1to24:b=2:syse,2:h3=(vf-100)/100/24*fi+1:ifdu=0thendu=dr
+ 2600 sysre,310,0,319,194,1,2:sys50859,311,1,318,fi*8+1,1,2
+ 2605 ifdu=1thensysum,8,0,1,d,1,0,15*fi
+ 2610 ifdu=2thensysum,7,0,1,d,1,0,15*fi
+ 2615 ifdu=3thensysum,9,0,1,d,1,0,15*fi
+ 2620 a1=a1+kx:a2=a2+ky:a3=a3+kz:du=dv:ifzvthensysum,8,0,1,d,1,0,zv
+ 2625 ifvf<>0thenh=h2*h3:f2=f4-(100/h3-100)/h2:f1=f3-(160/h3-160)/h2
+ 2630 gosub2875:syse,0:ifrnthensysre,0,0,159,95,1,2
+ 2635 open2,8,2,"fi."+n$+str$(fi)+",p,w":gosub685:iff=0goto2650
+ 2640 iff=99thenclose2:gosub3115:goto2655
+ 2645 close2:close1:open1,8,15,"s:fi."+n$+str$(fi):goto2635
+ 2650 sys22299:close2
+ 2655 ds=0:close1:open2,8,2,"cad.main.datas,s,r":gosub690:iff=0goto2685
+ 2660 print"{down}{down}{down} Diskette mit Systemdaten einlegen !"
+ 2665 print"{down}{down} Noch einen Versuch (j/n) ?"
+ 2670 gosub635:ifa$="j"thenclose2:print"{clr}":goto2655
+ 2675 ifa$="n"thenclose2:sys25919:df=1:vi=0:mn=0:sysn,11,15,2:syse,1:goto125
+ 2680 goto2670
+ 2685 sys22541,d,v:close2:gosub3115:ds=1
+ 2690 sysn,11,15,2:next:f1=f3:f2=f4
+ 2695 h=h2:a1=vx:a2=vy:a3=vz:syse,1:l=1:poke192,0:poke53280,14:goto135
+ 2700 print"{clr}":forfi=1to5:sysn,11,15,1:sysn,11,15,2:syse,1:sysfr,0:b=1
+ 2705 fk=fi*200-200:gosub2875:sysuf,1:syse,0:ifrnthengosub645
+ 2710 ifrnandfi=5thensysl4,0,199,319,199,1,3
+ 2715 n1$="hz.":b=1:gosub1035:b=2:gosub1035
+ 2720 gosub3115:nextfi:fk=0:l=1:ri=0:goto120
+ 2725 forfi=1to2:b=1:sysn,11,15,1:sysn,11,15,2:syse,1:sysfr,0
+ 2730 fk=(fi-1)*200:gosub2875:sysuf,1:syse,0:ifrnthengosub645
+ 2735 ifrnandfi=2thensysl4,0,199,319,199,1,3
+ 2740 n1$="hv.":b=1:gosub1035:b=2:gosub1035
+ 2745 gosub3115:nextfi:fk=0:l=1:ri=0:goto120
+ 2750 sysn,11,15,2:syse,2:l=.5:gosub2875:l=1:ifrnthensysre,0,0,159,95,1,2
+ 2755 open2,8,2,"fi."+n$+",p,w":gosub685:iff=0goto2770
+ 2760 iff=99goto2775
+ 2765 close2:close1:open1,8,15,"s:fi."+n$:close1:goto2755
+ 2770 sys22299
+ 2775 close2:gosub3115:syse,1:l=1:goto135
+ 2780 :
+ 2785 :
+ 2805 :
+ 2810 w2=int(w/256):w1=w-256*w2:pokea+i,w1:pokea+i+1,w2:i=i+2:return
+ 2815 ifabs(w)>3276.7thenw=3276.7*sgn(w)
+ 2820 w=w*10+32768:gosub2810:return
+ 2825 poke53280,15:gosub630:print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}        Systemdiskette einlegen !"
+ 2830 gosub635:ifa$="_"thenreturn
+ 2835 open2,8,2,n$+",p,r":close2:gosub685:iffthena$="_":return
+ 2840 print#1,"u9":close1:return
+ 2845 forx=1tok:fory=1to13:w=peek(a+y):ifw=254theny=13:goto2855
+ 2850 b$(x)=b$(x)+chr$(w)
+ 2855 nexty:a=a+14:nextx:a=49153:return
+ 2860 forx=1tok:fory=1tolen(b$(x)):pokea+y,asc(mid$(b$(x),y,1)):nexty
+ 2865 pokea+y,254:a=a+14:nextx:a=49153:return
+ 2870 w1=a+i:w=((peek(w1)+256*peek(w1+1))-32768)/10:i=i+2:return
+ 2875 sys20480,d,fl,ri,a1,a2,a3,h,l,f1,f2,fk,b:return
+ 2880 :
+ 2885 :
+ 2905 :
+ 2910 iffl=0then2930
+ 2915 ify1-a2=0thent=0:goto2925
+ 2920 t=y1/(y1-a2)
+ 2925 u=u-t*(u-a1):z1=z1-t*(z1-a3)
+ 2930 ifri=1thenx4=u:u=-z1*1.5:z1=x4*1.5
+ 2935 u=((u+160)-f1)*h*l:z1=((z1+100)-f2)*h*l-fk*h:return
+ 2940 :
+ 2945 :
+ 2965 :
+ 2970 n$="cad.create":goto2980
+ 2975 n$="cad.paint"
+ 2980 gosub2825:ifa$="_"thensyse,1:poke53280,14:goto525
+ 2985 a=49153:w=fl+2*wq+4*mc+8*ri+16*se+32*wm+64*bs+128*hd:pokea+912,w
+ 2990 i=900:w=k:gosub2810:w=d:gosub2810:w=v:gosub2810
+ 2995 w=a1:gosub2815:w=a2:gosub2815:w=a3:gosub2815:i=i+1:w=wx:gosub2815
+ 3000 w=wy:gosub2815:w=wz:gosub2815:i=i+2:w=f1:gosub2815:w=f2:gosub2815
+ 3005 w=ke:gosub2815:pokea+919,l*2:pokea+954,sl:i=898:w=zv:gosub2815
+ 3010 pokea+920,rn:w$=str$(h):pokea+927,len(w$)
+ 3015 forw=1tolen(w$):pokea+927+w,asc(mid$(w$,w,1)):nextw:ifkthengosub2860
+ 3020 poke836,0:print"{gry3}{clr}load"chr$(34)n$chr$(34)",8"
+ 3025 print"{down}{down}{down}{down}run:":poke631,19:poke632,13:poke633,13:poke198,3:new
+ 3030 :
+ 3035 :
+ 3055 :
+ 3060 a=49153:k=peek(a+900):d=peek(a+902)+256*peek(a+903)
+ 3065 v=peek(a+904)+256*peek(a+905)
+ 3070 ifpeek(a+919)=255thenwy=500:wz=-200:a1=50:a2=300:a3=30:l=1:h=1:goto3110
+ 3075 i=906:gosub2870:a1=w:gosub2870:a2=w
+ 3080 gosub2870:a3=w:i=i+1:gosub2870:wx=w:gosub2870:wy=w:gosub2870:wz=w
+ 3085 i=i+2:gosub2870:f1=w:gosub2870:f2=w:gosub2870:ke=w:l=peek(a+919)/2
+ 3090 w=peek(a+912):rn=peek(a+920)
+ 3095 fl=wand1:wq=(wand2)/2:mc=(wand4)/4:ri=(wand8)/8:se=(wand16)/16
+ 3100 wm=(wand32)/32:bs=(wand64)/64:hd=(wand128)/128:sl=peek(a+954)
+ 3105 n$="":forx=1topeek(a+927):n$=n$+chr$(peek(a+927+x)):nextx:h=val(n$)
+ 3110 gosub2845:return
+ 3115 close1:open1,8,15,"u9":close1:return
+

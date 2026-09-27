@@ -1,0 +1,186 @@
+
+
+;seq-transfer.prg ==0801==
+    0 goto 100
+    1 list 1000-2100
+    2 list 1920-2100
+    3 list 2300-2999
+  100 poke 53280,0:poke 53281,0:poke 56325,35:poke 646,4:poke 650,128
+  110 open 1,8,1,"seq-transver .obj"
+  120 sys 9*4096
+  130 ;
+  140 .opt o1
+  150 ;
+  160 *= $cd00
+  170 ;
+  180 ;
+  190 ;
+  199 ;
+  200 ;----------------------------------
+  201 ;
+  210 setlfs = $ffba   ;"log{CBM-@}Filenr.,Geraetnr.,Skundadr. setzen
+  220 setnam = $ffbd   ;"Filename setzen
+  230 open   = $ffc0   ;"File oeffnen
+  240 readst = $ffb7   ;"Statusvariable lesen
+  290 close  = $ffc3   ;"File schliessen
+  295 chkin  = $ffc6   ;"File auf Eingabe setzen
+  300 chkout = $ffc9   ;"File auf Ausgabe setzen
+  310 chrout = $ffd2   ;"Zeichen ausgeben
+  315 chrin  = $ffcf   ;"Zeichen holen
+  320 clrchn = $ffcc   ;"Standardwerte fuer I/O setzen
+  330 ;
+  370 chckom = $aefd   ;"Auf Komma testen
+  380 frmevl = $ad9e   ;"Ausdruck auswerten
+  390 frestr = $b6a6   ;"weitere Auswertungen fuer Strings
+  400 getbyt = $b79e   ;"Byte holen
+  410 ;
+  500 pt     = $22     ;"Zeiger auf  Textende
+  510 hpt    = $14     ;"zu sendendes Byte
+  520 mconv  = $02     ;"Flag fuer ASCII-Konvertierung
+  530 synerr = $af08   ;"?SYNTAX ERROR ausgeben
+  600 buf    = $ce00   ;"Buffer fuer RS 232
+  610 ribuf  = $f7     ;"Zeiger auf Eingabebuffer
+  620 robuf  = $f9     ;"Zeiger auf Ausgabebuffer
+  700 start  = $0801   ;"Ladeadresse fuer SEQ-File
+  710 enable = $02a1   ;"RS 232 Flag: Alle Zeichen gesendet?
+ 1000 ;
+ 1001 ;"--------------------------------
+ 1002 ;"- SEQ-Transfer -- version 1.0 --
+ 1003 ;"- SEQ-Files mit 4800 Baud ------
+ 1004 ;"- ueber RS 232 senden ----------
+ 1005 ;"- geschrieben von --------------
+ 1006 ;"-- Martin Mueller --------------
+ 1007 ;"- (c) by Arnd Waengler, 64'er --
+ 1008 ;"--------------------------------
+ 1009 ;
+ 1010 baudin jsr chckom     ;"Auf Komma testen
+ 1012 ^      jsr getbyt     ;"Konvertierungsflag nach
+ 1014 ^      stx mconv      ;"mconv holen
+ 1016 ^      jsr chckom     ;"Auf Komma testen
+ 1020 ^      jsr frmevl     ;"Ausdruck auswerten
+ 1030 ^      jsr frestr     ;"Stringauswertungen
+ 1040 ^      cmp #5         ;"Laenge des Strings < 5{$a0}?
+ 1050 ^      bcs baudw1     ;"Nein: => weiter
+ 1060 ^      jmp synerr     ;"Sonst: SYNTAX ERROR{$a0}melden
+ 1070 baudw1 ldx pt         ;"Stringadresse als
+ 1080 ^      ldy pt + 1     ;"Adresse des Filenamen
+ 1090 ^      jsr setnam     ;"dem OS uebergeben
+ 1100 ^      lda #1         ;"logische Filenummer: 1
+ 1110 ^      ldx #8         ;"Geraetenummer: 8
+ 1120 ^      ldy #2         ;"Sekundaeradresse: 2
+ 1130 ^      jsr setlfs     ;"setzen
+ 1140 ^      jsr open       ;"Datei eroeffnen
+ 1150 ^      jsr readst     ;"Fehlermeldung holen
+ 1155 ^      beq baud21     ;"Kein Fehler: => weiter
+ 1160 baudw2 jsr clrchn     ;"Standartwere fuer I/O setzen
+ 1165 ^      lda #1         ;"File schliessen
+ 1170 ^      jmp close      ;"Zurueck
+ 1180 ;
+ 1190 baud21 ldx #1         ;"File als Eingabefile
+ 1200 ^      jsr chkin      ;"definieren
+ 1210 ^      jsr readst     ;"Fehler aufgetreten?
+ 1220 ^      bne baudw2     ;"JA: => Zurueck nach BASIC
+ 1230 ^      ldx #<start    ;"Adresse, ab der die
+ 1240 ^      ldy #>start    ;"Daten des SEQ-File abgelegt
+ 1250 ^      stx pt         ;"werden, als Zeiger merken
+ 1260 ^      sty pt + 1     ;"(= Basicanfang)
+ 1270 ;
+ 1280 baudl1 jsr chrin      ;"Zeichen vom File holen
+ 1290 ^      ldy #0         ;"und in den Speicher
+ 1300 ^      sta (pt),y     ;"schreiben
+ 1310 ^      inc pt         ;"Zeiger um
+ 1320 ^      bne baudw3     ;"eins erhoehen
+ 1330 ^      inc pt + 1
+ 1340 ;
+ 1350 baudw3 jsr readst     ;"Fehler aufgetreten?
+ 1360 ^      beq baudl1     ;"NEIN: => weiter
+ 1370 ^      and #%01000000 ;"File zu ende?
+ 1390 ^      beq baudw2     ;"NEIN: => Zurueck nach BASIC
+ 1420 ;
+ 1430 baudw4 jsr baudw2     ;"Datei schliessen
+ 1460 ;"RS 232 Schnittstelle oeffnen
+ 1470 ;"4800 Baud, 8 Datenbits, 1 Stopbit
+ 1480 ;"Parity disabled, 3-Line Handshake,
+ 1485 ;"Full Duplex
+ 1490 ^      lda #1         ;"Logische Filenummer: 1
+ 1500 ^      ldx #2         ;"Geraetenummer: 2
+ 1510 ^      ldy #3         ;"Sekundaeradresse: 3
+ 1520 ^      jsr setlfs     ;"setzen
+ 1530 ^      lda #4         ;"Werte fuer
+ 1540 ^      ldx #<rsnam    ;"RS 232
+ 1550 ^      ldy #>rsnam    ;"setzen
+ 1560 ^      jsr setnam
+ 1570 ^      jsr open       ;"File oeffnen
+ 1580 ^      ldx #3         ;"Zeiger fuer RS 232 Buffer
+ 1590 baudl9 lda rstab,x    ;"setzen
+ 1600 ^      sta ribuf,x
+ 1610 ^      dex
+ 1620 ^      bpl baudl9
+ 1650 ;
+ 1660 ^      ldx #1         ;"File als Ausgabefile
+ 1670 ^      jsr chkout     ;"deklarieren
+ 1680 ^      ldx #<start    ;"Startadresse fuer
+ 1690 ^      ldy #>start    ;"das SEQ-File als Zeiger
+ 1700 ^      stx hpt        ;"merken
+ 1710 ^      sty hpt + 1
+ 1712 ^      lda 56334      ;"Timerirq sperren
+ 1714 ^      and #254
+ 1716 ^      sta 56334
+ 1720 ;
+ 1730 baudl2 ldy #0         ;"Aktuelles Zeichen
+ 1740 ^      lda (hpt),y    ;"holen
+ 1750 ^      bit mconv      ;"Zeichen konvertieren?
+ 1760 ^      bmi baud51     ;"NEIN: => weiter
+ 1770 ^      cmp #65        ;"Sonst: Commodore'ASCII'
+ 1780 ^      bcc baudw5     ;"nach ASCII
+ 1790 ^      cmp #128
+ 1800 ^      bcs baud41
+ 1810 ^      ora #%00100000
+ 1820 ^      bne baudw5
+ 1830 baud41 cmp #192
+ 1840 ^      bcc baudw5
+ 1850 ^      sec
+ 1860 ^      sbc #128
+ 1870 baudw5 and #%01111111
+ 1880 baud51 tax            ;"Zeichen merken
+ 1890 baudl3 lda enable     ;"Ist das vorherige Zeichen
+ 1900 ^      and #%00000001 ;"schon gesendet worden
+ 1910 ^      bne baudl3     ;"NEIN: => Weiter
+ 1915 ^      txa            ;"Zeichen zurueckholen
+ 1917 ^      jsr chrout     ;"und ueber RS 232 ausgeben
+ 1920 ;
+ 1930 ^      inc hpt        ;"Zeiger auf aktuelles
+ 1940 ^      bne baudw6     ;"Zeichen um eins
+ 1950 ^      inc hpt + 1    ;"incrementieren
+ 1960 baudw6 lda pt         ;"Ist bereits das
+ 1970 ^      cmp hpt        ;"letzte Zeichen
+ 1980 ^      bne baudl2     ;"uebertragen worden
+ 1990 ^      lda pt + 1     ;"NEIN: => Weiter uebertragen
+ 2000 ^      cmp hpt + 1
+ 2010 ^      bne baudl2
+ 2020 ;
+ 2022 baudl4 lda enable     ;"Sonst warten, bis das Zeichen
+ 2024 ^      and #%00000001 ;"schon geschickt worden ist!
+ 2026 ^      bne baudl4
+ 2040 ^      jsr baudw2     ;"File schliessen
+ 2060 ;
+ 2070 ^      lda 56334      ;"Timerirqs wieder
+ 2080 ^      ora #1         ;"erlauben
+ 2090 ^      sta 56334
+ 2100 ^      rts            ;"Programmende
+ 2300 rsnam .byte %00000000 ;"1 Stopbit,8 Datenbits,4800 Baud
+ 2310 ^     .byte %00000000 ;"Parity disabled,Full Duplex,
+ 2315 ;"3-Line Handshake
+ 2320 ^     .byte 2         ;"Werte fuer 4800 Baud
+ 2330 ^     .byte 0
+ 2340 ;
+ 2350 rstab .byte <buf         ;"Tabellen fuer Adressen
+ 2360 ^     .byte >buf         ;"der RS 232 Buffer
+ 2370 ^     .byte <(buf + 256)
+ 2380 ^     .byte >(buf + 256)
+60000 .end
+60010 end
+60100 open 15,8,15,"s:seq-transver"
+60110 close 15
+60120 save "seq-transver",8
+

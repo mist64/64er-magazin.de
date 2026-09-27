@@ -1,0 +1,37 @@
+;screentest.prg ==1c01==
+;version=70
+  100 rem ******* programm screentest *******
+  110 scnclr5:window0,12,79,24
+  120 rem +++ bildschirm-ram veraendern +++
+  130 :input"adresse bildschirm-ram(0 bis 1999)";v
+  140 :input"gewuenschter wert(poke-code)";w
+  150 :input"wie oft";n
+  160 :gosub380:scnclr5
+  170 rem +++ attribut-ram veraendern +++
+  180 :print"moechten sie ein attribut veraendern? (j/n)"
+  190 :getkeya$:ifa$="n"then250
+  200 :input"adresse attribut-ram(2048-4047)";v
+  210 :input"gewuenschter wert(siehe beschreibung)";w
+  220 :input"wie oft";n
+  230 :gosub380:scnclr5
+  240 rem +++ zeichenmuster-ram veraendern +++
+  250 :print"sollen zeichenmuster veraendert werden? (j/n)
+  260 :getkeya$:ifa$="n"then320
+  270 :input"poke-code des zu aendernden zeichens";p:b=8192+16*p
+  280 :input"das wievielte byte (0 bis 7)";by:v=b+by
+  290 :input"neuer wert";w:n=1
+  300 :gosub380:scnclr5
+  310 rem +++ weitere veraenderungen +++
+  320 print"weitere versuche?"
+  330 print"(1=bildschirm / 2=attribut / 3=zeichen / 4=ende)"
+  340 getkeya$:if val(a$)<1 or val(a$)>4 then320
+  350 scnclr5:on val(a$) goto 130,200,270,360
+  360 window0,0,79,24,1:end
+  370 rem ----- unterprogramm vdc-ram beschreiben -----
+  380 hi=int(v/256):lo=v-256*hi
+  390 poke dec("d600"),18:poke dec("d601"),hi
+  400 poke dec("d600"),19:poke dec("d601"),lo
+  410 poke dec("d600"),31:poke dec("d601"),w
+  420 wait dec("d600"),32
+  430 poke dec("d600"),30:poke dec("d601"),n
+  440 return
