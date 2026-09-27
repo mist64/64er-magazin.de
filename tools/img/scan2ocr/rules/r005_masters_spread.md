@@ -1215,7 +1215,9 @@ print("bands with bed/prop:", bad or "none")
 PY
 
 # 7. contact sheet of the overlays, for the eye
-magick montage $(ls /tmp/64er_8610/debug600/*.png | head -200) -tile 10x -geometry 200x282+2+2 /tmp/64er_8610/debug_contact.png
+T=$($PY -c 'import r000_issue; from r000_issue import ISSUE
+print(r000_issue.load(ISSUE).tmp)')
+magick montage $(ls $T/debug600/*.png | head -200) -tile 10x -geometry 200x282+2+2 $T/debug_contact.png
 
 # 8. where the fold is: x from the inner frame edge, inliers, template matches -- the outliers
 $PY - <<'PY'

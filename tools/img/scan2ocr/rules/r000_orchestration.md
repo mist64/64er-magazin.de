@@ -370,7 +370,7 @@ them through this table.
 | now | was | step |
 |---|---|---|
 | 005 | — | masters — the raw scan to the 600 dpi masters (variant by `binding`) |
-| 005b | — | a4_window — the A4 crop, anchored on the 64'er logo (see r005_a4_window.md) |
+| 005b | — | a4_window — the A4 crop, anchored on the 64'er logo (see r005_a4_window.md). **`sheet` only**: a `spread` issue's step 005 already writes the exact A4 window |
 | 006 | — | issue_pdf — the searchable issue PDF, built from those masters. **Blocks on a hand-made `title.png`** — see below |
 | 010 | — | ocr_blocks — OCR the scans into measured blocks |
 | 020 | — | classify — labels, reading order, roles, per-page markdown |

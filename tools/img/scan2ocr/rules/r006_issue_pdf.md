@@ -305,12 +305,19 @@ prize the mixed build collects.
 ### The whole procedure, in order
 
 Written out because SH8601 was rebuilt SIX times before it was right, and every
-wrong build looked like a success. `<tmp>` is the issue's tmp dir, `<A4>` the
-delivered A4 pages (`<tmp>/a4600`), `<repo>` this repository.
+wrong build looked like a success. `<tmp>` is the issue's tmp dir, `<repo>` this
+repository, and `<A4>` the delivered A4 pages — **which directory that is
+depends on the binding**:
+
+| `binding` | `<A4>` | why |
+|---|---|---|
+| `sheet` | `<tmp>/a4600` | step 005 wrote a traced-trim canvas; **005b** cut the A4 |
+| `spread` | `<tmp>/masters600` | step 005 wrote the exact A4 window itself, 4961 x 7016; **005b does not run** |
 
 **1. The pages must be the ones the owner reviewed** — see the review rule
-above. The A4 cut comes from step 005b, and re-cutting anything means going
-through step 3 below for those pages.
+above. The A4 cut comes from step 005b on a sheet issue and from step 005
+itself on a spread one, and re-cutting anything means going through step 3
+below for those pages.
 
 **2. Build the OCR cache and the 150 dpi rasters — WITH THE COVER.** The
 default `TITLE_PNG` points into the scans dir, where the cover does not live;

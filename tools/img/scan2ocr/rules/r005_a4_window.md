@@ -1,6 +1,17 @@
 # 005b — The A4 window, anchored on the 64'er logo
 
-**Applies to:** all — every issue of this magazine is cut this way.
+**Applies to:** **`binding: "sheet"` only.** Every issue of this magazine is
+cut this way, but a SPREAD issue is already cut this way by step 005: the
+spread variant anchors on the logo and writes an exact A4 window,
+`MASTER_W_PX x MASTER_H_PX` = **4961 x 7016**, so `masters600` IS the A4
+delivery. The sheet variant writes a traced-trim canvas of varying size
+instead, and that is what this step turns into A4.
+
+Running it on a spread issue produces `a4600`, a second crop computed a
+different way from the same `sheets600`, which nothing downstream reads —
+step 010 OCRs `masters600`, and for a spread issue so does the PDF. 8611
+asked before running it rather than after, which is the only reason this
+line is right.
 
 **This rule is copied from the process that already solved it**, `03-crop`, and
 is reproduced here so scan2ocr is self-contained. The wording of the principle
