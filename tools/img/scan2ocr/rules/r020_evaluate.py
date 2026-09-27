@@ -31,6 +31,8 @@ character for character -- one says "Zeichensatz" where the other says
 error rate, which is not what this harness is for.
 """
 
+import hashlib
+import io
 import json
 import os
 import re
@@ -216,10 +218,31 @@ def similarity(a, b):
     return SequenceMatcher(None, a, b, autojunk=False).ratio()
 
 
+# THE TRUTH IS KEYED ON THE PROMPT THAT PRODUCED IT, for the same reason
+# labels.json carries PROMPT_KEY: a cached answer to a question nobody is
+# asking any more is not an answer.  MEASURED on 8611 -- the truth prompt used
+# to exclude the masthead, so p187's truth read "NO_ARTICLE_TEXT"; when the
+# prompt was fixed the classifier re-asked (its cache IS keyed) and the truth
+# did not, so the page scored against a stale exclusion until the file was
+# moved aside BY HAND.  Here it was one page. A wider change to this prompt
+# would have left every truth file stale and nothing would have said so.
+TRUTH_KEY = hashlib.sha256(TRUTH_PROMPT.encode("utf-8")).hexdigest()[:16]
+TRUTH_KEY_MARK = "<!-- truth-key: %s -->"
+
+
+def truth_is_current(path):
+    """False when this truth answers an older truth prompt."""
+    try:
+        head = io.open(path, encoding="utf-8").read(200)
+    except OSError:
+        return False
+    return (TRUTH_KEY_MARK % TRUTH_KEY) in head
+
+
 def build_truth(page):
     stem = f"{page:03d}"
     dest = os.path.join(TRUTH_DIR, stem + ".txt")
-    if os.path.exists(dest):
+    if os.path.exists(dest) and truth_is_current(dest):
         return
     # Run FROM the image directory and name the file bare: a nested `claude -p`
     # refuses to read paths outside its working directory, and silently wrote the
@@ -235,7 +258,8 @@ def build_truth(page):
         raise RuntimeError(f"p{page}: not a transcription: {out[:120]}")
     if is_refusal(out):
         raise RuntimeError(f"p{page}: REFUSAL, not a transcription: {out[:120]}")
-    open(dest, "w", encoding="utf-8").write(out + "\n")
+    open(dest, "w", encoding="utf-8").write(
+        (TRUTH_KEY_MARK % TRUTH_KEY) + "\n" + out + "\n")
 
 
 def score(page):

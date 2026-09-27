@@ -64,6 +64,32 @@ A refusal is not deterministic: delete those truth files and most of them
 transcribe on a second pass. Deleting them is the correct response, not a
 workaround.
 
+**Budget two extra passes.** MEASURED on 8611, deleting and re-asking each
+time: **43 refused → 18 recovered → 6 more → 19 left**. So **24 of 43, 56 %,
+come back over two further passes**, and what remains is a hard core that
+keeps declining. 19 of 192 unscorable is the floor to plan for, not a failure
+to chase; say the denominator and move on.
+
+### The truth is keyed on the prompt that produced it
+
+`labels.json` carries `PROMPT_KEY` and re-asks when the classify prompt
+changes. `truth/` had no equivalent, so when the truth prompt was fixed to
+stop excluding the masthead, the classifier re-asked and **the truth did
+not** — p187 kept scoring against a stale `NO_ARTICLE_TEXT` until the file
+was moved aside by hand. One page here; a wider change to that prompt would
+have left every truth file stale with nothing to say so.
+
+Each truth file now opens with `<!-- truth-key: … -->` and `build_truth`
+re-asks any file that does not carry the current one. When you change
+`TRUTH_PROMPT`, either let it re-ask or migrate deliberately and **write
+which in `LOG.md`** — on 8611 the 173 existing files were stamped rather than
+re-asked, because the masthead clause was the only semantic change and the
+one page it affected had already been rebuilt.
+
+> A cached answer to a question nobody is asking any more is not an answer.
+> That now applies to both caches at this step, which is the only reason the
+> second one was noticed.
+
 ## Outputs
 
 ```
