@@ -9,6 +9,20 @@ collected from `(byline)` paragraphs.
 
 ## What the script does
 
+**The `<h1>` is the printed headline, COMPLETE.** Not a shortened, tidied or
+more-convenient form of it. The headline arrives from step 030, which took it
+from the page, and the temptation to trim is strongest exactly where the
+headline is a long standing one: 8611 split `Wir suchen die Anwendung des
+Monats` as `Anwendung des Monats` and `Einmal im Monat gibt es 2000 Mark für
+das Listing des Monats` as `2000 Mark für Listing des Monats`. The page prints
+the long forms, and 8608, 8609 and 8610 all carry them in full — a shortened
+h1 here makes the same recurring page look like a different article each year.
+
+Fix it AT THIS STEP. The filename derives from the `<h1>`, so by rule 260 a
+correction means a content edit and a `git mv` staged together, which r000
+calls the danger zone; and by then 090, 100 and 140 have all built on the
+wrong name.
+
 For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
 
 - **filename** = `<first-page> <h1-without-page-numbers>.html`. The
