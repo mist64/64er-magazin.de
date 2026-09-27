@@ -10,10 +10,19 @@ article is offset a few hours from the issue's pubdate based on its
 sort index).
 
 The site re-publishes each historical issue **exactly 40 years after
-its original print release**. The authoritative table of
-release dates per issue lives in the project's top-level `README.md`
-("Exakt 40 Jahre nach der ursprünglichen Veröffentlichung erscheint
-hier jeden Monat eine neue Ausgabe" / "Ausgabe N/YY: TT. Monat 20JJ").
+its original print release**, and the plan for that lives in the
+project's top-level `README.md` ("Exakt 40 Jahre nach der
+ursprünglichen Veröffentlichung erscheint hier jeden Monat eine neue
+Ausgabe" / "Ausgabe N/YY: TT. Monat 20JJ").
+
+**The README is the PLAN. `pubdate.txt` is the RELEASE.** They agree
+when an issue ships on its planned day and they diverge when it does
+not -- 8610 was planned for 19 September 2026 and released on the 27th.
+When they disagree, `pubdate.txt` is right and the README bullet stays
+as it was: it is the record of what was originally scheduled, not a
+value to be reconciled. **Never edit a README bullet to match a
+pubdate.** The only time this rule writes to the README is when the
+issue has no bullet at all.
 
 ## File format
 
@@ -33,9 +42,12 @@ That's the whole file. No comments, no metadata.
 2. Convert the German `TT. Monat 20JJ` to `YYYY-MM-DD`.
 3. Write `issues/<YYMM>/pubdate.txt` with that one line.
 
-If `README.md` doesn't yet have a bullet for the issue — update
-`README.md` first (the README is the single source of truth for the
-publication schedule), then copy the date into `pubdate.txt`.
+If `README.md` doesn't yet have a bullet for the issue — add one
+first, then copy the date into `pubdate.txt`.
+
+**If the issue ships on a different day, only `pubdate.txt` changes.**
+The user sets it (`pubdate.txt` is a publishing decision, not an import
+step); the README bullet keeps the planned date.
 
 ## Usage
 
@@ -60,11 +72,13 @@ datetime.date.fromisoformat(lines[0])   # raises if malformed
 print(f'{fp}: {lines[0]} OK')
 PY
 
-# Cross-check that the date matches the README schedule. README bullets
-# are "MM/YY: TT. Monat 20JJ" (e.g. "08/86: 19. Juli 2026"). Pass the
-# issue id EXPLICITLY — the old `dirname pubdate.txt` form was a no-op
-# (`dirname pubdate.txt` is always ".", so the sed produced nothing and
-# grep matched every line). For issue YYMM, grep "MM/YY":
+# Print the README's planned date beside it. This is a LOOK, not a gate:
+# a mismatch means the issue slipped, which is normal and is exactly what
+# pubdate.txt exists to record. Do not "fix" either side to agree.
+# README bullets are "MM/YY: TT. Monat 20JJ" (e.g. "08/86: 19. Juli 2026").
+# Pass the issue id EXPLICITLY — the old `dirname pubdate.txt` form was a
+# no-op (`dirname pubdate.txt` is always ".", so the sed produced nothing
+# and grep matched every line). For issue YYMM, grep "MM/YY":
 YYMM=8608                                  # this issue's id
 grep "${YYMM:2:2}/${YYMM:0:2}" README.md   # 8608 → grep "08/86" README.md
 ```
