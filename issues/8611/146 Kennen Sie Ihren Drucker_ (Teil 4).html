@@ -59,6 +59,11 @@ CHR$(3);CHR$({n1) ;CHR$(n2) N NTrHncT 4
 
         <p>Man könnte auch sagen, die Anzahl der Grafikdaten entspricht n2*255+nl, aber dasnur am Rande. Wer will, kann die Berechnung der Parameter nl und n2 aber auch mit dem kleinen Programm (Listing ]) durchführen</p>
 
+        <figure>
+            <pre data-filename="drucker-kurs l1" data-name="Parameter-Berechnung"></pre>
+            <figcaption>Listing 1. Dieses Programm berechnet die Parameter N1 und N2 für die Einstellung der Grafikauflösung</figcaption>
+        </figure>
+
         <p>Natürlich muß man bei der Angabe der Grafikdaten darauf achten, daß man die höchstzulässıge Punktezahl pro Zeile bei der gewählten Grafikdichte nicht überschreitet. Bei der gewählten vierfachen Grafikdichte sind das 1920 Punkte (nl=135; n2=7), wobei niemals zwei nebeneinanderliegende Punkte gedruckt werden dürfen. Damit ist auch schon das Wesen der Grafik bei Epson-kompatiblen Druckern beschrieben. Zusammengefaßt muß dem Drucker in jeder Zeile mitgeteilt werden, welche Grafikdichte gewählt wird und wie viele Grafikpunkte gleich. Vergleichen wir unser Beispielprogramm des ESC "*"_Befehls mit dem ESC "K"-Befehl. Das Programm sieht dann wie folgt aus:</p>
 
         <p>10 OPEN 1,4</p>
@@ -71,11 +76,21 @@ CHR$(3);CHR$({n1) ;CHR$(n2) N NTrHncT 4
 
         <p>Ein interessantes Beispiel für die Grafik ist das Drucken von Grafik aus dem Speicher des C 64. Ein winziges Programm ist dabei in der Lage, Grafikdaten aus dem Speicher auszulesen und zudrucken. Damit sind faszinierende Möglichkeiten, zum Beispiel Bilder mit der drei- bis sechsfachen Auflösung des C 64 (natürlich nur auf dem Drucker) denkbar (Listing 2). Gehen wir dazu zunächst den einfachsten Weg und füllen den zu druckenden Bereich mit einem zufälligen Muster (Zeile 78 bis 86). Die Werte, die in den Speicher ab der Speicherstelle 8192 geschrieben werden, kann man während des Programmlaufes auch auf dem Bildschirm sehen (warum, erfahren Sie später). Wenn man sich nun den Speicher des C 64, wie in Bild 3und Bild 4 gezeigt, vorstellt, hat man nichts anderes, als einen vorläufignur drei Zeilen langen, imaginären Bildschirm mit einer horizontalen Auflösung von 960 Punkten. In der Vertikalen kann dieses Arbeitsblatt natürlich bis an die Speichergrenze verlängert werden. Jeden der Punkte auf diesem »Bildschirm« kann man "nun separat ansprechen und zum Beispiel auslesen und ausdrucken. Dazu wird im Beispielprogramm zunächst der Zeilenabstand auf 24/216 eingestellt, damit die Zeilen direkt übereinanderliegen (Listingzeile 26). Danach wird eine Zeile mit 960 Punkten nach der anderen ausgelesen und mit dem ESC"*"-Befehl an den Drucker gesendet. Wir haben uns in unserem Beispielprogramm vorläufig auf drei Zeilen beschränkt, damit das Programm nicht zu lange läuft, 25 Zeilen sind aber durchaus möglich (960 Bytex25Zeilen = 24000 Byte). In dieses Arbeitsfeld können Sie nun hineinschreiben, was Sie möchten, Bilder, 3D-Grafiken, mathematische Formeln und vieles mehr. Die Programmierung dieses überdimensionalen »Bildschirms« ist zwar nicht eifach, das Ergebnis kann sich dafür aber sehen lassen. ProbierenSie ruhig verschiedenes aus.</p>
 
+        <figure>
+            <pre data-filename="drucker-kurs l2" data-name="Epson-Grafik"></pre>
+            <figcaption>Listing 2. Epson-Grafik. Der Drucker wird zum hochauflösenden Monitor. Beachten Sie bitte die Eingabehinweise auf Seite 99</figcaption>
+        </figure>
+
         <h2>Die Sache mit den Bits</h2>
 
         <p>Bei unserem Beispiel hat der Computer eigentlich nur die Aufgabe, die Daten für den Drucker zwischenzuspeichern. Man muß sich dabei von der »Bildschirm-Denkweise« trennen, denn aufdem Bildschirm ist man an die maximale Auflösung von 320 x 200 Punkten gebunden, auf dem Drucker ist man dies nicht. Hier kann der C 64 Auflösungen wie ein Proficomputer erreichen und auch realisieren. Deshalb haben wir hier auch nicht noch eine Hardcopy-Routine besprochen, davon gibt es wohl mehr als genug. Wer will, kann mit obigem Programm natürlich auch ein Grafikbild ausdrucken (einfach laden, der Speicherbereich wurde ab 8192 gewählt, also einem üblichen Platz für Bilder). Dabei wird man allerdings eine kleine Überraschung erleben, denn der Ausdruck ist gegenüber der Bildschirmdarstellung verdreht. Das hat auch seinen guten Grund, denn der C 64 speichert seine Bilder auf eine andere Weise als es für einen Epson-kompatiblen Drucker notwendig ist. Doch das nur am Rande. Für uns ist natürlich wichtig, wie ein Byte aufgebaut sein muß, damit es das gewünschte Resultat auf dem Drucker erzielt. Schauen wir uns dazu acht der neun Nadeln eines Druckers an (Bild 5). Die oberste Nadel hat den Wert 128, die nächste den Wert 64 und so weiter, bis zur untersten Nadel, die den Wert 1 hat. Will man, daß alle Nadeln anschlagen, so muß man alle Nadel-Werte addieren, also: 128+64+32+16+8+4+2+1= 255</p>
 
         <p>Soll keine Nadel anschlagen, so haben alle Nadeln den Wert 0 — so einfach ist das. Insgesamt gibt es also 256 verschiedene Möglichkeiten, die Nadeln zu aktivieren. Als letztes Beispiel wollen wir um unseren imaginären Bildschirm einen Rahmen ziehen. Ersetzen Sie dazu die Zeilen 78 bis 86 durch die Zeilen aus Listing 3. Starten Sie nun das Programm erneut, der Rahmen wird ausgedruckt. Zum Schluß habeichnocheine kleine Aufgabe für Sie. Füllen Sie den Rahmen mit einer hübschen Grafik aus. Sie werden sehen, wie viel Freude die Programmierung Ihres Druckers macht.</p>
+
+        <figure>
+            <pre data-filename="drucker-kurs l3" data-name="Epson-Grafik (Rahmen)" data-range="78-96"></pre>
+            <figcaption>Listing 3. Diese Zeilen müssen anstelle der gleichen Zeilen in Listing 2 eingesetzt werden. Lesen Sie dazu bitte den Text.</figcaption>
+        </figure>
 
         <address class="author">(aw)</address>
 

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="Andreas Schindler, dm, Martin Müller, aw">
     <meta name="64er.issue" content="11/86">
-    <meta name="64er.pages" content="76, 78-79">
+    <meta name="64er.pages" content="76, 78-79, 88">
     <meta name="64er.toc_category" content="Listings zum Abtippen|Tips & Tricks">
     <meta name="64er.toc_title" content="Tips &amp; Tricks für Profis: RS232 mit 4800 bit/s / Änderung der Tastaturbelegung / Laufschrift im Bildschirmrahmen">
     <meta name="64er.id" content="XXX20">
@@ -128,6 +128,20 @@ txa ;gemerktes Zeichen zurueckholen
 
         <address class="author">(Martin Müller/aw)</address>
 
+        <!-- deviates from print, deliberately (PENDING SIGN-OFF, step 130): p78 prints under
+             this caption the MSE dump "Name : screencopy $cf11  cf11 cfff" -- the Screencopy
+             program of 172 StarTexter, not the RS232 sender. The article's program (SYS 52480
+             = $CD00) is seq-trans.ob on the disk, under this article's separator; it is shown
+             here instead. Do not "restore" the printed dump without a decision. -->
+        <figure>
+            <pre data-filename="seq-trans.ob.prg" data-name="SEQ-Transfer" data-mse=mse1></pre>
+            <figcaption>Listing 1. RS232 mit 4800 Bit/s. Bitte mit dem MSE eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="seq-trans.ob.prg" data-name="SEQ-Transfer"></div>
+        <div style="display: none;">
+            <pre data-filename="seq-transfer" data-name="SEQ-Transfer (Quelltext für Profi-Ass)"></pre>
+        </div>
+
         <h2>Änderung der Tastuturbelegung</h2>
 
         <p>Es kommt desöfteren vor, daß man anstelle der alten Tastaturbelegung eine andere benutzen möchte, um beispielsweise Programme leichter eingeben zu können. Oder man möchte anstelle der amerikanischen QWERTY- eine QWERTZ-Tastatur haben. Eine Lösungsmöglichkeit wäre, die Zeichen Y und Z im Zeichensatz umzudefinieren. Die gebräuchlichste Lösung dieses Problems ist, dasROM ins RAM zu kopieren und die Zeichen in der Tastaturtabelle auszutauschen. Will man dies jedoch in Basic ausführen, ist das sehr zeitaufwendig und schwierig.</p>
@@ -182,6 +196,11 @@ txa ;gemerktes Zeichen zurueckholen
 
         <address class="author">(Andreas Schindler/dm)</address>
 
+        <figure>
+            <pre data-filename="tastaturbelegung" data-name="Tastaturbelegung" data-range="0-12"></pre>
+            <figcaption>Listing 2. Leichtes Umdefinieren der Tastaturbelegung</figcaption>
+        </figure>
+
         <h2>Laufschrift im Bildschirmrahmen</h2>
 
         <p>Seit einiger ZeitistesinMode gekommen, im Titelbild mancher Programme mindestens eine Laufschrift darzustellen. Nachdem sich die Programmiertechnik hier immer weiter fortentwickelt hat, so daß sich die Laufschriften jetzt schon hochauflösend und flimmerfrei bewegen, bleibt immer noch ein großes Problem: Jede Laufschrift benötigt Platz auf dem Bildschirm. Will man zum Beispiel eine Laufschrift in ein HiRes-Bild einblenden, mußte bisher immer das Bild so weit angepaßt werden, daß eine oder zwei Zeilen für die Laufschrift freiblieben. Hier stelltsich die Frage: Muß das so sein?</p>
@@ -191,6 +210,26 @@ txa ;gemerktes Zeichen zurueckholen
         <p>Bei einigermaßen geschicktem Einsatz der acht zur Verfügung stehenden Spritesläßt sich eine brauchbare Laufschrift aufdem Rahmen erzeugen. Es sind aber durchaus auch zwei Laufschriften möglich. Genau dies tut nun das vorliegende Programm (Listing 3, bitte mit dem MSE eingeben). Es scrollt acht Sprites, deren Inhalt in $3E00 bis $3FFF abgelegt ist, von rechts nach links über den Bildschirm. Das dazugehörige kleine Basic-Programm (Listing 4) berechnet aus den eingegebenen Texten die Daten für diese Sprites und schreibt sie gleich in den richtigen Bereich.</p>
 
         <p>Nachdem das Basic-Programm etwa zehn Sekunden lang gerechnet hat, erscheinen die eingegebenen Texte als Laufschriften ober- und unterhalb des Bildschirms. Ein erneutes Einschalten ist nach &lt;RUN/STOP+RESTORE&gt; durch SYS 49152 möglich, da die Daten im Speicher erhalten bleiben. Achtung: Vor dem erneuten Starten des Basic-Teils muß die Interrupt-Routine durch &lt;RUN/STOP+RESTORE&gt; oder</p>
+
+        <p class="source">Fortsetzung:von Seite 79</p>
+
+
+
+        <p>durch Eingabe von »SYS 58648:SYS 64789:SYS 64931« (klappt nicht immer) abgeschaltet werden.</p>
+
+        <p>Mögliche Änderungen des Programms: Am einfachsten läßt sich die Farbe der Schrift ändern. Hierzu ruft man die Routine nur mit einer anderen Cursorfarbe auf. Zum Verschieben der Laufschriften in YRichtung muß der Inhalt der Speicherstelle 49174 verändert werden (normal 8. In Adresse 49206 steht die Blocknummer des letzten Sprites (normal = 255). Wird diese verändert, müssen natürlich auch im Basic-Teil die Zahlen 15911 und 15872 in Zeile 270/280 verändert werden. Auch mit einem geänderten Zeichensatz läßt sich die Laufschrift einsetzen. Dazu muß die Variable ZA in Zeile 180 auf den Beginn des neuen Zeichensatzes zeigen. Setzt man hier 55296 ein, erscheint die Laufschrift in Kleinschrift.</p>
+
+        <address class="author">(Niklas Nebel/dm)</address>
+
+        <figure>
+            <pre data-filename="laufschrift.prg" data-name="Laufschrift" data-mse=mse1></pre>
+            <figcaption>Listing 3. Laufschriften im Bildschirmrahmen. Bitte mit dem MSE eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="laufschrift.prg" data-name="Laufschrift"></div>
+        <figure>
+            <pre data-filename="basic-demo" data-name="Demo-Laufschrift"></pre>
+            <figcaption>Listing 4. Editor-Programm zur Rahmen-Laufschrift. Beachten Sie die Eingabehinweise auf Seite 99.</figcaption>
+        </figure>
     </article>
 </body>
 
