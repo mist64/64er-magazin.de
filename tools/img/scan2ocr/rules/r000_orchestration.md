@@ -600,6 +600,59 @@ disposable:
   8610 stays at `/private/tmp/64er_8610` by the user's decision, knowing the
   cleaner: that is a choice to re-run, not a default to copy.
 
+## Cross-cutting rule: PREFLIGHT the free space, before step 005
+
+Step 005 is the only step that writes at 2400 dpi and it writes ~**2.25 GB
+per page** — `masters2400/NNN.png` plus `cmyk2400/NNN.tif`. On a 200-page
+monthly that is **~450 GB**, and it arrives over four hours with no check of
+its own. Running out at hour three loses the sweep, not just the page.
+
+So before dispatching 005:
+
+```bash
+ISS=$($PY -c 'import r000_issue; from r000_issue import ISSUE
+i = r000_issue.load(ISSUE); print(i.tmp, i.pages)')
+set -- $ISS
+df -g "$(dirname "$1")" | tail -1         # free GB on the volume holding <tmp>
+echo "budget: $(( $2 * 9 / 4 )) GB for the 2400 dpi archive"
+```
+
+**Then make it a measurement, not a constant.** The profile gate already
+renders three real pages before the four hours (`r005_masters_spread.md`,
+*The gate*). Read the footprint off those three instead of trusting the
+number above — different page count, different ink coverage, different
+compression:
+
+```bash
+du -sm <tmp>/masters2400 <tmp>/cmyk2400   # after the 3 gate pages
+```
+
+### When it does not fit
+
+**The 2400 dpi artefacts are ARCHIVE. Nothing after step 005 reads them.**
+Verified by grep over every rule: 010 OCRs `masters600`, 145 cuts figures
+from `masters600`, `sheets600` is the uncut 600 dpi sheet `cut` re-reads,
+and `masters2400` / `cmyk2400` appear nowhere outside `r005_masters_*.py`.
+Everything the rest of the chain needs is the 600 dpi tier, which is
+roughly **1/40th** of the total.
+
+So a volume that cannot hold the archive is not a blocker on the issue:
+
+1. **Stream it off** — after each page, move `masters2400/NNN.png` and
+   `cmyk2400/NNN.tif` to wherever the archive lives, or
+2. **Do not write it** — the sweep still produces every deliverable.
+
+Either way **say which in `LOG.md`**, because the archive is the only copy
+of the separation and "we skipped it" must not be discovered years later by
+its absence. What is NOT an option is starting the sweep and finding out.
+
+### The other volume is not the answer
+
+Check the free space on the volume holding the SCANS too before proposing
+to move `<tmp>` there. 8610's 200 pages of 2400 dpi source are **159 GB**;
+a disk that holds several issues' scans has no room for a working set on
+top of them.
+
 ## Cross-cutting recipe: page block index (blocks/pNNN.txt)
 
 Several steps (130 place_figures, 160 fill_tables,

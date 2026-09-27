@@ -139,6 +139,11 @@ read **C 27 % M 14 % Y 6 % K 5 % at p99**, a cyan-biased speckle. **p2**
 | glyph p50, pages 1–10 | 26–33 | **26–33** |
 | solid-black share, pages 1–10 | 7–17 % | **7–17 %** |
 
+**Before any of it, preflight the free space** — 005 writes ~2.25 GB a page
+at 2400 dpi and nothing else in the chain reads it back
+(`r000_orchestration.md`, *PREFLIGHT the free space*). The three gate pages
+below are also where that footprint gets measured rather than assumed.
+
 **The gate — three test pages, before the four hours.** A sweep is ~4.3 h wall
 clock over 200 pages on 6 lanes; the profile is settled on three graded pages
 first:
