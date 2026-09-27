@@ -571,6 +571,19 @@ commit by `git add -A`. Both are preventable:
    git commit -m "…" -- path/one path/two     # ignores the rest of the index
    ```
 
+   **And a dispatched agent NEVER runs `git stash`.** It is the one git verb
+   that reaches outside its own file scope by design: `git stash` takes the
+   WHOLE working tree, including the other session's uncommitted work and
+   your own edits to files the agent was never told about, and a
+   `git stash pop` that hits a conflict leaves them half-restored. On 8611 a
+   helper sub-agent ran `stash … pop` around its work while two sessions were
+   writing; it happened to be clean, and it was luck rather than design.
+
+   Nor `git checkout -- .`, `git restore .`, `git reset --hard`, or
+   `git clean`. An agent that wants a pristine file reads it from `HEAD`
+   (`git show HEAD:path > /tmp/…`) and leaves the tree alone. Put this in the
+   dispatch briefing; the agent cannot infer it from the rule it was given.
+
    A pathspec commit takes those paths' working-tree content and leaves
    everything else staged for whoever staged it. `git add -A && git commit`
    is the exact opposite and must not be used by either side.
