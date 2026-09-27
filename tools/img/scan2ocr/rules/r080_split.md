@@ -225,16 +225,40 @@ should be a known paired article; if anything else turns up, the
 splitter (or a previous edit) mis-handled the section.
 
 ```bash
-for f in issues/8607/*.html; do
-  intros=$(grep -c '<p class="intro">' "$f")
-  bylines=$(grep -c '<address class="author">' "$f")
-  if [ "$intros" -gt 1 ] || [ "$bylines" -gt 1 ]; then
-    pages=$(grep -oE '64er.pages" content="[^"]+"' "$f" | sed -E 's/.*content="([^"]+)"/\1/')
-    printf 'intros=%s bylines=%s pages=%-12s %s\n' \
-      "$intros" "$bylines" "$pages" "$(basename "$f")"
-  fi
-done
+$PY - issues/<YYMM> <<'PYEOF'
+import glob, io, os, re, sys
+d = sys.argv[1]
+# A byline is not only <address class="author">. It also occurs INSIDE a
+# paragraph -- "(Jesko Schwarzer/dm) Listing auf Seite 54" on 8611 p50 -- and
+# counting only the tag undercounts, which is how a paired article can pass a
+# check whose whole job is to find paired articles.
+INLINE = re.compile(r'\((?:[A-ZÄÖÜ][\w.\- ]{2,28}/)?[a-z]{2,3}\)')
+for f in sorted(glob.glob(os.path.join(d, '*.html'))):
+    s = io.open(f, encoding='utf-8').read()
+    i = s.find('<article'); body = s[i:s.rfind('</article>')] if i >= 0 else s
+    intros = body.count('<p class="intro">')
+    tagged = body.count('<address class="author">')
+    inline = sum(1 for m in re.finditer(r'<p[^>]*>(.*?)</p>', body, re.S)
+                 if INLINE.search(m.group(1)))
+    if intros > 1 or tagged + inline > 1:
+        pages = re.search(r'64er\.pages" content="([^"]+)"', s)
+        print('intros=%d bylines=%d (tagged %d + inline %d) pages=%-14s %s'
+              % (intros, tagged + inline, tagged, inline,
+                 pages.group(1) if pages else '?', os.path.basename(f)))
+PYEOF
 ```
+
+Two things this used to get wrong, both found on 8611:
+
+- **It hardcoded `issues/8607/*.html`**, so on any other issue it listed that
+  issue's paired articles and said nothing about the one being built. The same
+  stale-literal class as r020's `seq 1 176`; take the directory as an argument.
+- **It counted only `<address class="author">`.** A byline also occurs INSIDE
+  a paragraph — 8611 p50 carries `(Jesko Schwarzer/dm) Listing auf Seite 54`
+  as running text — so a genuine paired article reported `bylines=1` and never
+  reached the list. A check whose whole job is to find paired articles must
+  not be blind to the commonest way one is signed. The count now breaks out
+  `tagged` and `inline` so the operator can see which it found.
 
 Operator eyeballs the list and confirms every entry is a legitimate
 paired article. Anything unexpected is the actionable signal — fix
