@@ -42,8 +42,27 @@ That's the whole file. No comments, no metadata.
 2. Convert the German `TT. Monat 20JJ` to `YYYY-MM-DD`.
 3. Write `issues/<YYMM>/pubdate.txt` with that one line.
 
-If `README.md` doesn't yet have a bullet for the issue — add one
-first, then copy the date into `pubdate.txt`.
+If `README.md` doesn't yet have a bullet for the issue — and for every
+issue after the last one planned, it does not — **the plan date is the
+OPERATOR's to give.** Do not invent one. The rule used to say "add one
+first" without saying where the date comes from, which asks an agent to
+write a number it has no source for.
+
+Where it comes from, in order:
+
+1. **The magazine's own announcement**, where it prints one. The
+   Sonderheft bullets cite theirs as page references —
+   `Sonderheft 6/85 (Top-Themen): ca. 18. Oktober 2025 <!-- 8511/S.139 -->`
+   — because the monthly that preceded them printed an on-sale date. Check
+   the previous issue's *Vorschau* first. The monthly bullets carry no such
+   comment: 8610's Vorschau announces 11/86's contents and no date.
+2. **Otherwise the established cadence**, which the operator confirms. It
+   is a **Saturday, 28 or 35 days after the previous issue**, keeping to
+   mid-month — MEASURED over the last eight planned dates, six of which are
+   the 2nd or 3rd Saturday and the gaps alternate 28/35 to stay there.
+   The rhythm is the point: one issue a month, 40 years on.
+
+Whichever it is, the operator says it, and the bullet records it.
 
 **If the issue ships on a different day, only `pubdate.txt` changes.**
 The user sets it (`pubdate.txt` is a publishing decision, not an import
