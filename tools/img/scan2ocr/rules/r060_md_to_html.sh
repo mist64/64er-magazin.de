@@ -54,8 +54,24 @@ def fix(m):
     return pre + ("\n\n<p>" + tail + "</p>" if tail else "")
 
 s, n = re.subn(r"<p>(<pre><code>.*?</code></pre>)(.*?)</p>", fix, s, flags=re.S)
+
+# -G PADS EVERY LINE INSIDE A FENCE WITH TWO SPACES.  It is Discount's
+# GitHub hard-break marker, and inside <pre><code> it is not a line break,
+# it is trailing whitespace in a LISTING -- the one thing in this corpus
+# that has to come out byte-identical to the fence it came from, because a
+# reader types it in.  Reproduced on a two-line scratch file: with -G the
+# lines end "A  ", without it "A".  -G stays: it is what preserves the
+# OCR'd line breaks in prose.  js-beautify at 080 does NOT strip these
+# (tested), and nothing else in the chain does either.
+# MEASURED on 8611: 85 lines across all 35 blocks.
+def strip_pre(m):
+    body = "\n".join(l.rstrip() for l in m.group(1).split("\n"))
+    return "<pre><code>" + body + "</code></pre>"
+
+s, t = re.subn(r"<pre><code>(.*?)</code></pre>", strip_pre, s, flags=re.S)
 io.open(p, "w", encoding="utf-8").write(s)
 print(f"  unwrapped {n} <p><pre> nestings (Discount fenced-code bug)")
+print(f"  de-padded {t} <pre> blocks (Discount -G trailing spaces)")
 UNWRAP
 echo "wrote $out  ($(wc -l < "$out") lines)"
 # Replace the .md with the .html in git: drop the source, stage the result.

@@ -558,6 +558,22 @@ commit by `git add -A`. Both are preventable:
    `r100_toc_category.sh` run `git add`/`git rm`), so the index may already
    be partly populated when you arrive — reconcile it deliberately, per
    file, before committing.
+
+   **When TWO agents share one working tree, an explicit pathspec is not
+   enough — commit by pathspec too.** The index is shared, so a rule script
+   that `git add`s its output and a supervisor that commits a rule change
+   land in the same commit, whichever of them runs `git commit` first. It
+   happened three times on the 8611 build; on the third,
+   `issues/8611/8611.html` — step 060's output, staged by its own script —
+   went into a commit about r040 and r050's verification blocks.
+
+   ```bash
+   git commit -m "…" -- path/one path/two     # ignores the rest of the index
+   ```
+
+   A pathspec commit takes those paths' working-tree content and leaves
+   everything else staged for whoever staged it. `git add -A && git commit`
+   is the exact opposite and must not be used by either side.
 2. **Rules that BOTH edit content AND rename** (rule 260 is the prime
    case: it rewrites the h1/`<title>` *and* `git mv`s the file) are the
    danger zone. `git mv` records with 100% similarity ("0 insertions")
