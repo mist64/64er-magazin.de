@@ -103,6 +103,57 @@ something new.
 
 ## Verification
 
+### The Impressum must survive stage B
+
+The masthead reads like a list, so this step's prompt used to group it with the
+table of contents and the corpus dropped it. Silently: ~90 kept-nothing pages
+is normal in an issue half full of ads, so a missing Impressum hides inside a
+legitimate population, and no check anywhere looked for it. It was rebuilt BY
+HAND on 8610 (commit `10a8745a`) and on SH8601, and lost outright on 8611
+before the pattern was noticed. The prompt is fixed; this is what says so next
+time, and it runs at step 020 rather than at the end, where a fix is cheap.
+
+```bash
+$PY - <<'PYEOF'
+import glob, io, json, os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_issue
+from r000_issue import ISSUE
+import r010_ocr_blocks as OB
+OUT = OB.OUT_DIR
+# The masthead's entries. A page that carries three or more DISTINCT ones is
+# the Impressum; MEASURED on 8611, p187 has 10 and no other page has 2.
+MAST = (r'Herausgeber|Chefredakteur|Stellv\. *Chefredakteur|Chef vom Dienst|'
+        r'Anzeigenleit|Anzeigenpreise|Verlagsleit|Vertriebsleit|Druck:|'
+        r'Verantwortlich|Urheberrecht|Erscheinungsweise|Bezugspreis|Redaktion:')
+bad = []
+for f in sorted(glob.glob(os.path.join(OUT, 'blocks', 'p*.txt'))):
+    page = int(re.search(r'p(\d+)', os.path.basename(f)).group(1))
+    hits = {m.group(0) for m in re.finditer(MAST, io.open(f, encoding='utf-8',
+                                                          errors='replace').read())}
+    if len(hits) < 3:
+        continue
+    lab = os.path.join(OUT, f'{page:03d}.labels.json')
+    kept = 0
+    if os.path.exists(lab):
+        d = json.load(open(lab))
+        kept = sum(1 for b in d.get('blocks', [])
+                   if b.get('label') in OB.ARTICLE_LABELS)
+    print(f'  p{page:03d}: {len(hits)} masthead labels, kept {kept}')
+    if kept == 0:
+        bad.append(page)
+print(('HARD FAIL: the Impressum was dropped on %s' % bad) if bad
+      else 'ok: every masthead page keeps blocks')
+sys.exit(1 if bad else 0)
+PYEOF
+```
+
+MEASURED on 8611: fires on p187, which carries **10** distinct masthead
+entries, and on no other page of 192 — no other page has even 2. The
+published-side companion is in `r310_issue_invariants.py`: exactly one article
+with `64er.id="impressum"`, which 41 of 41 published issues satisfy.
+
+
 ```bash
 # The venv, not bare python3 (numpy), and the ISSUE's page count, not
 # another issue's: the literal 176 that stood here was 8609's and would

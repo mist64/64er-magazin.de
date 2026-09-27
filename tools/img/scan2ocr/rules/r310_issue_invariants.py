@@ -263,6 +263,21 @@ def main(d):
         if 'name="author"' not in s and '<address class="author">' not in body:
             S('no author at all — read the last page, a dropped final line takes the byline (r180)', f)
 
+    # --- the issue has an Impressum -------------------------------------
+    # A masthead reads like a list, so step 020's prompt grouped it with the
+    # table of contents and the corpus dropped it -- silently, because ~90
+    # kept-nothing pages is normal in an issue half full of ads, so a missing
+    # Impressum hides inside a legitimate population. It was rebuilt BY HAND on
+    # 8610 and SH8601 and lost outright on 8611 before anyone noticed a pattern.
+    # The prompt is fixed; this is the check that says so next time.
+    # MEASURED over the corpus: 41 of 41 published issues carry exactly one,
+    # and no issue carries two. 0 false positives.
+    imp = [f for f, s_, b in arts
+           if re.search(r'name="64er\.id"\s+content="impressum"', s_)]
+    if len(imp) != 1:
+        H('issue has %d Impressum pages, expected exactly 1 (r020)' % len(imp),
+          os.path.basename(d), ', '.join(os.path.basename(x) for x in imp[:3]))
+
     for k, f, x in hard: print(f'HARD  {k:<52} {f[:40]} {x}')
     if '--soft' in sys.argv:
         for k, f, x in soft: print(f'soft  {k:<52} {f[:40]} {x}')

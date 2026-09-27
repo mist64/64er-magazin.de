@@ -168,7 +168,21 @@ Assign a final label to every block id. Valid labels:
                       publisher's own subscription/order/club promotions, coupons
   kleinanzeige        small classified ad -- one placed BY A READER, in the
                       classifieds section, offering or seeking goods
-  toc                 table of contents, cover, masthead/Impressum
+  toc                 table of contents and cover -- a page whose whole job is to
+                      point at other pages. NOT the masthead: see below.
+
+                      THE MASTHEAD/IMPRESSUM IS AN ARTICLE. Label its title
+                      `heading` and its entries `body`, exactly like any other
+                      page. It reads as a list -- Herausgeber, Chefredakteur,
+                      Chef vom Dienst, Anzeigenleitung, Druck, Verantwortlich,
+                      Urheberrecht, Erscheinungsweise, Bezugspreis -- and that
+                      look is why it was grouped with the contents page here.
+                      It is not the same thing: a contents page points at the
+                      articles, a masthead is the magazine stating who made it,
+                      and every published issue of this corpus carries it as its
+                      own page (41 of 41). Calling it `toc` drops it from the
+                      corpus, which is how 8610 and SH8601 came to have their
+                      Impressum rebuilt BY HAND and 8611 lost p187.
   header              running head at the top (section name, machine tag)
   footer              folio line at the foot (page number, "Ausgabe 9/September 1986")
   sliver              text belonging to the FACING page, caught at the extreme

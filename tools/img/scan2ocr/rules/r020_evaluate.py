@@ -135,9 +135,14 @@ EXCLUDE completely:
 - figure and table captions ("Bild 3. ...", "Tabelle 1. ...")
 - standalone type-in listings: BASIC listings and hex dumps printed for the
   reader to key in, usually boxed and captioned "Listing 1. ..."
-- the table of contents ("Inhalt"), the cover, and the masthead/Impressum. These
-  list or credit the articles rather than being one, however much prose they
-  carry. A page whose whole job is to point at other pages is not an article.
+- the table of contents ("Inhalt") and the cover. A page whose whole job is to
+  point at other pages is not an article.
+
+The MASTHEAD/IMPRESSUM is NOT in that list: transcribe it like any other page.
+It is the magazine stating who made it, not a page pointing at other pages, and
+this corpus publishes it as an article in every issue. Excluding it here made
+the evaluation blind to the classifier dropping it, so the same defect passed
+unnoticed for three issues.
 
 Write the result as MARKDOWN, using exactly these conventions:
 - "# "   the headline of an article starting on this page. A page may carry two
