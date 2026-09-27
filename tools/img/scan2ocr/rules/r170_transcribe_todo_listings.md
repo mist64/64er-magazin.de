@@ -165,6 +165,39 @@ principle):
 
   A listing with NO printed checksums (a screen dump, a Pascal fragment) has no
   such proof: say so, and fall back to a second independent read.
+
+  ### WHICH DIRECTION: read the print, or generate from the disk?
+
+  **The checksums decide that too.** Both directions end in the same
+  comparison — a computed sum against the printed sum — but they test
+  different claims, and only one of them is the claim you need:
+
+  | | tests | |
+  |---|---|---|
+  | read the print, then compute | *did I read the printed bytes correctly?* | no proof the disk matches |
+  | generate from the disk, then check every printed sum | ***are the disk's bytes the printed bytes?*** | the stronger claim |
+
+  So where the page carries checksums, **generating the lines from `prg/` and
+  then verifying every printed checksum against them is sound, and better than
+  reading hex by eye** — a human cannot match an arithmetic gate over a
+  hundred lines of hex. 8611's 89 was done this way: 132 MSE lines, every
+  printed checksum recomputed from the disk bytes, every one equal.
+
+  Two conditions, and they are what make it not circular:
+
+  1. **The printed checksums must be read from the PAGE, independently.**
+     Generate the bytes if you like; never generate the sums you are checking
+     them against. That is the whole proof.
+  2. **A visual pass over the crops is then a sanity check, not the
+     evidence** — and say so in the report. A reader primed by a generated
+     line sees what it says, which is exactly why the arithmetic has to be
+     the thing that decides. 8611 raised this against its own method, which
+     is the right instinct; the answer is that the checksum does not care
+     what you looked at.
+
+  With NO checksums on the page, generate-first is unsafe for precisely the
+  reason 8611 feared: there is nothing independent to catch a disk-print
+  divergence, and the eye confirms what it was shown. Read first, twice.
 - **NEVER fabricate the `<figcaption>`.** The caption belongs to the
   print, not to you. Transcribe it verbatim from step 010's block index
   or a 600 dpi scan crop (the PDF text layer is void, see r000); if you cannot read it, leave a bare `Listing N.` (no
@@ -202,9 +235,16 @@ for f in sorted(os.listdir(d)):
     for m in re.finditer(r'<figure[^>]*>(.*?)</figure>', s, re.DOTALL):
         body = m.group(1)
         if not re.search(r'<figcaption>Listing\s+\d+', body): continue
-        pre_m = re.search(r'<pre[^>]*>(.*?)</pre>', body, re.DOTALL)
+        pre_m = re.search(r'(<pre[^>]*>)(.*?)</pre>', body, re.DOTALL)
         if pre_m:
-            inner = pre_m.group(1).strip()
+            # A <pre data-filename=…> is EMPTY BY DESIGN: generate.py fills it
+            # from prg/ at build time. Without this the check fails on every
+            # issue that has disk listings at all -- 35 times on 8611 -- which
+            # is the r040 all-zero case again: a check that reports the normal
+            # state as a fault gets ignored, and then it is not a check.
+            if 'data-filename' in pre_m.group(1):
+                continue
+            inner = pre_m.group(2).strip()
             if inner in ('', 'TODO'):
                 print(f"  empty Listing pre in {f}"); bad += 1
 sys.exit(1 if bad else 0)
