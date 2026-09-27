@@ -98,18 +98,28 @@ grep -oE '"--+[^"]*"' issues/8607/prg.txt | sort -u
 # 3. Cross-check: no <figure> block in prg.txt was emitted without a
 #    section separator above it (orphan listing — would have no
 #    article to place into):
-python3 - issues/8607/prg.txt <<'PY'
+$PY - issues/<YYMM>/prg.txt <<'PYEOF'
 import re, sys
-s = open(sys.argv[1]).read()
-chunks = re.split(r'(<!--[^>]*"----+[^"]*"[^>]*-->)', s)
-section = None; orphan = 0
+s = open(sys.argv[1], encoding='utf-8').read()
+# A SECOND DISK SIDE RESETS THE SECTION. Without this, side B's files fall
+# under side A's LAST separator and are counted as placed. MEASURED on 8611:
+# side B has nine files and no separators of its own -- its whole directory
+# sits under side A's "Achtung! Rueckseite bespielt" banner -- so the orphan
+# count read 1 where the truth was 10, and the check that exists to find
+# unplaceable listings reported the issue clean.
+chunks = re.split(r'(<!--[^>]*"----+[^"]*"[^>]*-->|<!-- [^>]*\.[Dd]64[^>]*-->)', s)
+section = None; orphan = 0; orphans = []
 for c in chunks:
-    if c.startswith('<!--') and '----' in c:
-        section = c.strip(); continue
+    if c.startswith('<!--'):
+        section = None if '.D64' in c or '.d64' in c else c.strip()
+        continue
     if '<figure' in c and section is None:
         orphan += c.count('<figure')
+        orphans += re.findall(r'data-filename="([^"]+)"', c)
 print(f"orphan figures (no section separator yet): {orphan}")
-PY
+for o in orphans[:12]:
+    print("   ", o)
+PYEOF
 
 # 4. ROUND-TRIP every listing: the .txt must re-tokenise to the .prg it
 #    came from.  This is the only check that sees a WRONG DIALECT -- the

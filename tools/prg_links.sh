@@ -199,6 +199,18 @@ echo "Generating HTML..." >&2
                     echo "<div class=\"binary_download\" data-filename=\"${filename_alt}.prg\" data-name=\"XXXXXXXXXXXXXXX\"></div>"
                     echo ""
                     found=true
+                # A SEQ file is DATA, not a program: it has no load address,
+                # so its first two bytes are payload and an MSE dump of it
+                # invents a $F079 or $8041 out of them.  $filetype was captured
+                # here and never used; 8611 got 17 bogus MSE proposals out of
+                # that -- the .3d demo figures and the 4x-modul data -- each of
+                # which step 130 then had to un-propose by hand.  Offer the
+                # download and say what it is.
+                elif [ "$filetype" = "seq" ] && [ -f "${OUTPUT_DIR}/${filename_alt}.prg" ]; then
+                    echo "<!-- ${filename}: SEQ (sequential data, no load address) -->"
+                    echo "<div class=\"binary_download\" data-filename=\"${filename_alt}.prg\" data-name=\"XXXXXXXXXXXXXXX\"></div>"
+                    echo ""
+                    found=true
                 # Check for .prg file (MSE listing & binary download)
                 elif [ -f "${OUTPUT_DIR}/${filename_alt}.prg" ]; then
                     echo "<figure><pre data-filename=\"${filename_alt}.prg\" data-name=\"XXXXXXXXXXXX\" data-mse=mse1></pre><figcaption>YYYYYYYYYYYYY</figcaption></figure>"
