@@ -79,13 +79,31 @@ def main(d):
         # survived here -- <pre> and <aside> were not covered.
         # MEASURED on SH8601: 5, separated by <pre>, <figure>, <table> and
         # combinations of them.
+        # ...EXCEPT where the print itself sets it that way, which happens in
+        # the tip rubrics: a tip ends with the two monitor lines or the four
+        # program lines it is about, and THEN the byline.  Moving that block
+        # below the byline to satisfy this check inverts the page.  MEASURED on
+        # 8610 p94, `Tip zu INPUT`: the print reads "...ist die verbesserte
+        # INPUT-Anweisung aktiviert." / ">0419 34 39 2b 28" / ">0545 00 04" /
+        # "(Daniel Neukomm/tr)".  So the same PRINTED marker that adjudicates a
+        # heading's trailing period adjudicates this: an HTML comment carrying
+        # the word PRINTED, within the 400 characters before the block, saying
+        # what was read off the page.  It downgrades to soft -- still listed,
+        # never silent.
         for mm in re.finditer(r'<address class="author">', body):
             pre_ = body[:mm.start()]
             lastp = pre_.rfind('</p>')
             if lastp < 0: continue
-            broke = re.findall(r'<(figure|table|pre|aside)\b', pre_[lastp + 4:], re.I)
+            tail = pre_[lastp + 4:]
+            broke = re.findall(r'<(figure|table|pre|aside)\b', tail, re.I)
             if broke:
-                H('<%s> splits the byline from its text (r190)' % broke[0], f)
+                start = lastp + 4 + tail.lower().index('<' + broke[0].lower())
+                if re.search(r'<!--(?:(?!-->).)*\bPRINTED\b(?:(?!-->).)*-->\s*$',
+                             body[max(0, start - 400):start], re.S):
+                    S('<%s> before the byline — annotated as PRINTED (r190)'
+                      % broke[0], f)
+                else:
+                    H('<%s> splits the byline from its text (r190)' % broke[0], f)
         # A NUMBERED LIST TORN IN HALF.  The OCR hands r030 a numbered list as
         # one prose blob; Discount then promotes whichever item happens to fall
         # at a line start into an <ol> and leaves the rest inline in the <p>.
@@ -194,6 +212,41 @@ def main(d):
             if mm.group(0).count('<br') < 2: S('<br> in a running Info: footer — column wrap?', f)
         for mm in re.finditer(r'[^<>]{15,}\((?:[a-z]{2,3}|[A-ZÄÖÜ][^()<>]{2,28}/[a-z]{2,3})\)</p>', body):
             S('byline glued to a paragraph (FP: Impressum masthead)', f, mm.group(0)[-34:])
+        # --- German addresses, pre-1993 ------------------------------------
+        # A West German address of the period is "<4-digit PLZ> <Stadt>" and,
+        # for a city with several Zustellpostaemter, a district NUMBER after
+        # the city: "8013 Haar bei Muenchen", but "4000 Duesseldorf 30",
+        # "2000 Hamburg 76", "4300 Essen 1".  That number is bare digits and
+        # nothing else, which makes it a perfect OCR trap: it stands alone at
+        # the end of a line, so no word context can correct it, and the
+        # confusions are the classic ones -- 3/S, 5/S, 0/O, 1/l/|, 8/B.
+        # MEASURED on 8610: 2 of 7 were wrong ("Duesseldorf SO", "Essen |"),
+        # both invisible to every spelling check.
+        #
+        # Both checks look ONLY at text that already names a street, a
+        # Postfach or a Verlag/GmbH, within the 120 characters before the
+        # PLZ.  Without that gate a bare "\d{4} <Word> <token>" matches BASIC
+        # line numbers, prices and print specs -- MEASURED over 8604-8609:
+        # 60 findings, 12 of them addresses; with the gate, 9 findings, 9
+        # addresses.
+        ADDR_CTX = (r'(?:[\wäöüß.\-]*(?:stra(?:ss|ß)e|str\.|weg|platz|gasse|allee|ring)'
+                    r'|Postfach|Verlag|GmbH|KG|AG)')
+        for mm in re.finditer(ADDR_CTX + r'[^<]{0,120}?'
+                              r'\b\d{4}\s+[A-ZÄÖÜ][\wäöüß.\-]+'
+                              r'(?:\s+(?:a\.|b\.|am|an|bei|im)\s+[A-ZÄÖÜ][\wäöüß.\-]+)*'
+                              r'\s+([^\s<.,;:)]{1,2})(?=[\s.,;:)<]|$)', prose):
+            if not mm.group(1).isdigit():
+                S('district code after the city is not a number (r280)', f, mm.group(0)[-30:])
+        # A postal address is SET AS A BLOCK, one element per line.  OCR joins
+        # the lines into one paragraph and nothing downstream can tell the
+        # result from prose -- it is grammatical-looking German.  The tell is
+        # a street with a house number running straight into a PLZ, no comma
+        # between them.  MEASURED on 8610: 1 hit, p150, a real defect; the
+        # comma-separated run-in form the magazine also uses does not match.
+        for mm in re.finditer(r'(?i)\b[\wäöüß.\-]*(?:stra(?:ss|ß)e|str\.|weg|platz|gasse|allee|ring)'
+                              r'\s*\d+[a-z]?\s+\d{4}\s+[A-ZÄÖÜ]', prose):
+            S('street runs into the PLZ — address block flattened into prose?', f, mm.group(0)[:36])
+
         if 'name="author"' not in s and '<address class="author">' not in body:
             S('no author at all — read the last page, a dropped final line takes the byline (r180)', f)
 

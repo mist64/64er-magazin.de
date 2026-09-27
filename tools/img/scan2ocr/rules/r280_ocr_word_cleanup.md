@@ -394,6 +394,42 @@ intervening space is almost always a missing-space artifact).
 The `C 64II` / `»C 641«` pattern: `C 64II` → `C 64 II`, `»C 641«`
 → `»C 64 I«` (digit `1` misread of Roman `I`, plus lost space).
 
+## Pass 3 mechanised: `r280_word_jams.py` (a German dictionary decides)
+
+Greps find the seam with a CAPITAL in it (`derComputer`). They cannot find
+the seam without one, and that seam is just as common:
+
+    warenalle  darfnicht  ganzrechts  einessolchen  verfügenüber
+    Tagzum     Malliegen  Modusdurch  Taktfrequenzliegen
+
+All grammatical-looking German, all valid HTML, all invisible to every
+pattern in this file. So ask a dictionary instead:
+
+```bash
+brew install aspell            # standing permission, see r000
+tools/img/scan2ocr/rules/r280_word_jams.py issues/<YYMM>
+```
+
+A word aspell does not know that **splits into two words it does know** is
+a candidate. It prints them; a human reads the list. The dictionary cannot
+tell `darfnicht` from `Diskettenbefehle` -- both split cleanly -- so the
+reader applies the one test that separates them:
+
+> **A noun or a verb stem may compound. A function word never does.**
+> `nicht`, `doch`, `ganz`, `waren`, `eines`, `und`, `direkt`, `ebenfalls`,
+> `anders`, `gestanden`, `würde` on the left means the space was eaten.
+
+Use `de-alt`, the pre-1996 orthography -- the magazine writes `daß` and
+`muß`, and plain `de` calls every one of them a misspelling.
+
+MEASURED on 8610: 245 unknown lower-case words -> 94 candidates -> **17
+real jams**; 1328 unknown capitalised words -> 135 candidates -> **8 real
+jams**. 25 defects that survived the whole chain including r310, found by
+reading two lists for two minutes. Run it on every issue.
+
+The check never fails a build. Every finding needs a human, and the party
+most likely to be wrong is the dictionary.
+
 ## Pass 2 hard exception: hex addresses and binary code
 
 The `0`/`O` and `1`/`l`/`I` substitution rules from Pass 2 **must
