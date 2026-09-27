@@ -759,6 +759,23 @@ if it is not caught before the sweep.
 
 To re-measure, on a sample of **at least 20 pages spread over the issue**:
 
+0. **First find out WHICH of the two is wrong — the offset or the spacing.**
+   Print each page's inlier y's *relative to hole 1* beside
+   `HOLE_TEMPLATE_MM`. Without this the rest of the procedure widens the
+   offset tolerance, reports "count still 4", and names no cause; 8611 had to
+   invent this step to get anywhere. MEASURED there, gaps in mm:
+
+   | | 1-2 | 2-3 | 3-4 | 4-5 | 5-6 |
+   |---|---|---|---|---|---|
+   | 8610 | 13.35 | **76.27** | 13.30 | **66.44** | 13.59 |
+   | 8611 | 13.14 | **73.15** | 13.66 | **68.70** | 13.56 |
+
+   Holes 3 and 4 sit 3.3 mm higher, the same to ~0.1 mm on every page — a
+   different clip, or the same one re-drilled or re-set, not noise. The offset
+   was never what bound: 8611's shifts ran 57.41-58.73 against `Y0` 59.0 ± 3,
+   and widening the tolerance to 20 mm changed nothing at all.
+   **If the SPACING is what moved, only a new `holes_mm` fixes it.**
+
 1. Run `measure` with `HOLE_TEMPLATE_Y0_TOL_MM` widened enough not to bind
    (20 mm), so the fit reports where the clip actually is rather than where
    the previous issue's clip was.
@@ -767,9 +784,25 @@ To re-measure, on a sample of **at least 20 pages spread over the issue**:
    shift — 8610 had four of 196).
 3. Read the **p5–p95 spread and the mean**. That is how 8610 got 58.05–59.97
    and 58.91, hence `HOLE_TEMPLATE_Y0_MM` 59.0.
-4. Set `HOLE_TEMPLATE_Y0_MM` to the mean and `HOLE_TEMPLATE_Y0_TOL_MM` to
-   **three times the spread**, and say both numbers in `LOG.md` with the
-   sample.
+4. Put all of it in **the descriptor**, never in the module. `clip` is
+   validated by `r000_issue.py` and absent means the built-in 8610 template,
+   exactly as an absent `colors` means the built-in anchors:
+
+   ```json
+   "clip": { "holes_mm": [0, 13.14, 86.30, 99.95, 168.66, 182.21],
+             "y0_mm": 58.15, "tol_mm": 2.0 }
+   ```
+
+   `holes_mm` is six ascending numbers in mm with `[0]` exactly 0 — they are
+   *relative to hole 1* — `y0_mm` is the mean shift and `tol_mm` three times
+   the p5-p95 spread. A partial block is refused: the half you leave out
+   would silently keep another issue's. Say the numbers and the sample in
+   `LOG.md` too (which is a work log and is **not** committed — `.gitignore`
+   line 30).
+
+   Every master's stamp then records `clip: descriptor|built-in y0 … holes …`,
+   so a page says which copy's clip it was fitted against, the same way
+   `grade-sha` says which profile graded it.
 
 Then re-run the sample and confirm the hole count reaches 6 on clean pages
 before spending the four hours.

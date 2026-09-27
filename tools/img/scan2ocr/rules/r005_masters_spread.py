@@ -334,11 +334,29 @@ FOLD_TILT_MAX = 1.0          # deg
 # is a fact about the operator's placement, re-measured per issue like the
 # template; an issue whose clip sat elsewhere reports `fold none` on every
 # page, and checks 5 and 8 say so.
-HOLE_TEMPLATE_MM = (0.0, 13.35, 89.62, 102.92, 169.36, 182.95)
+# THE CLIP IS A FACT ABOUT ONE PHYSICAL COPY, so the descriptor's `clip` block
+# overrides these.  They are the fallback, measured on 8610, and they are NOT a
+# default to rely on: applied to 8611 they fit 4 of 6 holes on every page and
+# nothing failed, because 8611's clip has holes 3 and 4 sitting 3.3 mm higher --
+# the same to 0.1 mm on every page, so a different clip or the same one re-set.
+# The tell is a hole count that never reaches 6 on a clean page.  See
+# r005_masters_spread.md, *The absolute prior*, for how to measure a new one.
+_BUILTIN_HOLE_TEMPLATE_MM = (0.0, 13.35, 89.62, 102.92, 169.36, 182.95)
+_BUILTIN_Y0_MM, _BUILTIN_Y0_TOL_MM = 59.0, 3.0
+
+if ISS.clip is not None:
+    HOLE_TEMPLATE_MM = ISS.clip.holes_mm
+    HOLE_TEMPLATE_Y0_MM = ISS.clip.y0_mm
+    HOLE_TEMPLATE_Y0_TOL_MM = ISS.clip.tol_mm
+    CLIP_SOURCE = "descriptor"
+else:
+    HOLE_TEMPLATE_MM = _BUILTIN_HOLE_TEMPLATE_MM
+    HOLE_TEMPLATE_Y0_MM = _BUILTIN_Y0_MM
+    HOLE_TEMPLATE_Y0_TOL_MM = _BUILTIN_Y0_TOL_MM
+    CLIP_SOURCE = "built-in (8610's clip)"
+
 HOLE_TEMPLATE_TOL_MM = 0.75  # measured max 0.41, p95 0.30
 HOLE_TEMPLATE_MIN = 4        # matches; 6 on an ordinary page, 4-5 with a torn or inked-over hole
-HOLE_TEMPLATE_Y0_MM = 59.0   # hole 1's y in the frame: measured 58.05-59.97 (p5-p95), mean 58.91
-HOLE_TEMPLATE_Y0_TOL_MM = 3.0
 # WHICH inliers are the clip's punches, for the fill: those within this of a
 # template position along the line.  An inlier elsewhere on the line is the
 # crease -- a crack in the ink (p001: 25 inliers, 4 punches), a speck, or,
@@ -1003,6 +1021,12 @@ def cut():
                     + (f" template {g['fold']['template']}" if g["fold"]["source"] == "holes" else "")
                     + (f" tilt {g['fold']['tilt_deg']:+.2f} deg" if g["fold"]["poly"] else ""),
             "holes": f"{len(g['fold']['holes'])} filled of {len(g['holes'])} candidates",
+            # WHICH CLIP this page was fitted against, for the same reason the
+            # grade-sha is here: a master carries no other record of it, and
+            # applying the previous issue's clip fails silently at 4 of 6.
+            "clip": f"{CLIP_SOURCE} y0 {HOLE_TEMPLATE_Y0_MM:.2f}"
+                    f"+-{HOLE_TEMPLATE_Y0_TOL_MM:.2f}mm "
+                    + " ".join(f"{v:.2f}" for v in HOLE_TEMPLATE_MM),
             "anchor": (f"logo ({ax:.0f}, {ay:.0f}) score {g['anchor']['score']:.2f}"
                        if source == "logo" else
                        f"edges: window top-left ({ax:.0f}, {ay:.0f}) from fold + bottom trim"),

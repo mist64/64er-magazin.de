@@ -109,13 +109,59 @@ REQUIRED_KEYS = ("id", "kind", "pages", "scan_dir", "thumb_150", "tmp", "pdf")
 # it with an error, and neither is ever guessed at.
 ASK_KEYS = ("binding", "paper")
 
+
+class Clip:
+    """The binder clip's six punches, measured on this issue's scans."""
+
+    def __init__(self, holes_mm, y0_mm, tol_mm):
+        self.holes_mm = tuple(holes_mm)
+        self.y0_mm = y0_mm
+        self.tol_mm = tol_mm
+
+    def __repr__(self):
+        return (f"<Clip {len(self.holes_mm)} holes "
+                f"y0={self.y0_mm}+-{self.tol_mm}mm>")
+
+
+def _clip(d, path):
+    """Validate a `clip` block, or None for the built-in template."""
+    if d is None:
+        return None
+    if not isinstance(d, dict):
+        raise SystemExit(f"r000_issue: {path} clip must be an object with "
+                         f"holes_mm, y0_mm and tol_mm")
+    unknown = set(d) - {"holes_mm", "y0_mm", "tol_mm"}
+    if unknown:
+        raise SystemExit(f"r000_issue: {path} clip has unknown key(s) "
+                         f"{sorted(unknown)}")
+    missing = {"holes_mm", "y0_mm", "tol_mm"} - set(d)
+    if missing:
+        raise SystemExit(f"r000_issue: {path} clip is missing {sorted(missing)}"
+                         f" -- a partial clip is worse than none, because the "
+                         f"half that is absent silently keeps another issue's")
+    h = d["holes_mm"]
+    if (not isinstance(h, list) or len(h) != 6
+            or not all(isinstance(v, (int, float)) for v in h)):
+        raise SystemExit(f"r000_issue: {path} clip.holes_mm must be 6 numbers, "
+                         f"mm relative to hole 1, got {h!r}")
+    if h[0] != 0:
+        raise SystemExit(f"r000_issue: {path} clip.holes_mm[0] is {h[0]}, must "
+                         f"be 0 -- the positions are RELATIVE to hole 1")
+    if list(h) != sorted(h):
+        raise SystemExit(f"r000_issue: {path} clip.holes_mm must ascend")
+    for k in ("y0_mm", "tol_mm"):
+        if not isinstance(d[k], (int, float)) or d[k] <= 0:
+            raise SystemExit(f"r000_issue: {path} clip.{k} must be a positive "
+                             f"number, got {d[k]!r}")
+    return Clip(h, float(d["y0_mm"]), float(d["tol_mm"]))
+
 # ...and the ones that may simply be absent or null.  `colors` is the LEGACY
 # spelling of the paper map: one measured profile for the whole issue, from
 # before an issue was known to be printed on more than one stock.  It still
 # loads, and it still means what it meant; an issue that carries `paper` must
 # not carry it as well (load() refuses both) because the two would eventually
 # disagree about which numbers graded a page.
-OPTIONAL_KEYS = ("colors", "masters600")
+OPTIONAL_KEYS = ("colors", "masters600", "clip")
 
 # `kind` is editorial (it decides how the issue is titled and dated downstream),
 # `binding` is mechanical: it selects which variant of step 005 runs, and the
@@ -360,6 +406,21 @@ class Issue:
                 root = os.path.abspath(os.path.join(REPO_ROOT, colors))
                 colors = here if os.path.exists(here) else root
             self.colors = colors if colors and os.path.exists(colors) else None
+
+        # `clip` -- THE BINDER CLIP THIS COPY WAS HELD IN, measured off this
+        # issue's own scans.  Six hole positions in mm relative to hole 1, the
+        # template's y in the frame, and the tolerance on that y.  Absent means
+        # the built-in template, exactly as an absent `colors` means the
+        # built-in anchors -- and for the same reason: it is measured by a
+        # later hand, and the descriptor names where the answer will go.
+        #
+        # It is here rather than in r005_masters_spread.py because it is a fact
+        # about ONE PHYSICAL COPY.  As a module constant it silently applied
+        # 8610's clip to 8611, whose clip has holes 3 and 4 sitting 3.3 mm
+        # higher -- same to 0.1 mm on every page, so a different clip or the
+        # same one re-set.  Nothing failed; every page just fitted 4 of 6 holes
+        # and got a worse fold.
+        self.clip = _clip(d.get("clip"), os.path.join(issue_dir, DESCRIPTOR_NAME))
 
         # --- where the issue lives in the repo -------------------------------
         self.issue_dir = issue_dir
