@@ -189,6 +189,16 @@ python3 -c "import r030_assemble as A; print(A.ISSUE, A.ISS.kind, A.PAGES, A.OUT
   page found` line means the boundary call ran on running heads and headlines
   alone; that is a legitimate but degraded run and belongs in `LOG.md`.
 
+## The splice this step makes is checked at r320
+
+Joining two halves of an article across a page jump is this step's work, and
+when the OCR lost the column at the seam the join is silent: the sentence reads
+as German and every later check passes. 8610 lost twelve words and a paragraph
+break at the `41 -> 48` splice that way. The check — crop both ends of every
+`Fortsetzung` and compare — lives with the other omission companions in
+[`r320_omission.md`](r320_omission.md), because it is an end-of-issue gate: a
+later rule can break a join this step made correctly.
+
 ## The coverage gate moved to r320
 
 The omission check that used to be documented here is now **r320**, because

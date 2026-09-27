@@ -54,8 +54,36 @@ Known false-positive sources, excluded or expected:
 - **our own OCR corrections** move the HTML away from the OCR, hence a probe
   fraction rather than an exact match
 
-## Two companions to run at the same time
+## Companions to run at the same time
 
+- **THE PAGE-JUMP SPLICE — check both ends of every `Fortsetzung`.** Where an
+  article jumps pages, the text at the END of the last column before the jump
+  can be missing outright, and the two halves are then welded into one sentence
+  that still reads as German. Nothing else in the chain sees it: the paragraph
+  is well-formed, the byline is in place, r310 is clean, and r320's own block
+  accounting passes because the classifier's block for that column was never
+  kept in the first place.
+
+  MEASURED on 8610, `41 Nach uns die Sintflut` (pages `41, 48`): the corpus read
+  *"…des Gesamtsystems **beitragen. Druckern ist nun einmal sehr komplex**…"*
+  while p41's last column ends with a NEW paragraph, *"Das Thema Computer mit
+  verschiedenen Programmen, Interfaces und"*, and p48's continuation block reads
+  *"Druckern ist nun einmal sehr…"*. Twelve words and a paragraph break, gone,
+  and a human reading for sense found it — no check did.
+
+  So: for every article whose `64er.pages` carries a comma, crop the end of the
+  last column before each jump and the start of the continuation block, and
+  compare them against the text at that join. Restore what is missing from the
+  crop, word for word, keeping the paragraph break where the print starts one.
+  Check the reverse too — a continuation's first words duplicated, or the
+  `Fortsetzung auf Seite N` marker itself leaking into the prose.
+
+  ```bash
+  grep -l '64er.pages" content="[^"]*,' issues/<ID>/*.html
+  ```
+
+  Every hit is a whole column of type. This is the cheapest check in the file
+  per byte recovered, and the only one that finds this class at all.
 - **page coverage** — every page is claimed by an article or is knowingly an
   ad/classifieds page. The annual `Jahresinhaltsverzeichnis` gives the
   authoritative range per article; it caught two understated ones in 8609
