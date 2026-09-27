@@ -61,6 +61,15 @@ def main(d):
     H = lambda k, f, x='': hard.append((k, os.path.basename(f), x))
     S = lambda k, f, x='': soft.append((k, os.path.basename(f), x))
     ids, arts = {}, list(articles(d))
+    # The issue's kind, for the checks that only apply to one. A directory with
+    # no descriptor (an issue imported before this chain) is treated as unknown
+    # and those checks are skipped rather than guessed at.
+    ISS_KIND = 'unknown'
+    try:
+        import json
+        ISS_KIND = json.load(open(os.path.join(d, 'issue.json')))['kind']
+    except Exception:
+        pass
     if not arts: print('FAIL: no articles found — wrong directory?'); return 2
 
     for f, s, body in arts:
@@ -262,6 +271,24 @@ def main(d):
 
         if 'name="author"' not in s and '<address class="author">' not in body:
             S('no author at all — read the last page, a dropped final line takes the byline (r180)', f)
+
+    # --- a monthly has an Editorial ---------------------------------------
+    # Same shape as the Impressum and harder to see: on 8611 the Editorial was
+    # not dropped, it was ABSORBED. Step 020 read p8 as one text under "# Start"
+    # (OCR took only the first word of "Start frei ..."), 030 and 080 then glued
+    # it to the front of the Messebericht, and the Chefredakteur's sign-off ran
+    # into the next article mid-paragraph. No coverage check can see that: the
+    # page is claimed, every word is present, nothing is missing -- there is
+    # simply one article where there were two.
+    # MEASURED over the corpus: 33 monthlies carry exactly one id="editorial",
+    # none carries two, and every Sonderheft carries none. It is always p8.
+    if ISS_KIND == 'monthly':
+        ed = [f for f, s_, b in arts
+              if re.search(r'name="64er\.id"\s+content="editorial"', s_)]
+        if len(ed) != 1:
+            H('monthly has %d Editorial articles, expected exactly 1 (r080)'
+              % len(ed), os.path.basename(d),
+              ', '.join(os.path.basename(x) for x in ed[:3]))
 
     # --- the magazine's own name ----------------------------------------
     # 64'er and 128'er take an APOSTROPHE. OCR reads it as a double quote and
