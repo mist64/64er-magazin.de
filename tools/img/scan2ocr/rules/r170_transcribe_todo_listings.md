@@ -75,7 +75,11 @@ padding.
 
 One-shot crop — **from the master, not from a PDF render**:
 ```bash
-SRC=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `python3` makes SRC silently EMPTY
+# and every crop below then fails on "/NNN.png". MEASURED on 8611.
+PY=${PYTHON:-.venv/bin/python}
+SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.SRC_DIR)')
 magick "$SRC/<NNN>.png" -crop <W>x<H>+<X>+<Y> +repage /tmp/64er_<YYMM>_listing.png
 ```

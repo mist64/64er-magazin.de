@@ -28,8 +28,20 @@ article's category — the print is the source.
 
 The sub-agent must:
 
-1. Render scans at 300 dpi if not already done: `pdftoppm -r 300
-   issues/<YYMM>/64er_19XX-XX.pdf /tmp/64er_<YYMM>_pages_300/p -png`.
+
+```bash
+# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `python3` makes SRC silently EMPTY
+# and every crop below then fails on "/NNN.png". MEASURED on 8611.
+PY=${PYTHON:-.venv/bin/python}
+SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
+```
+
+1. The page image is `"$SRC/NNN.png"` from `masters600` — 600 dpi, A4,
+   deskewed. For a 300 dpi look, `-resize 50%` of that; never a render of
+   the issue PDF, which does not exist until step 006. See r000, *THE PAGE
+   IMAGE IS `masters600`*.
 2. Build article → start-page map from each file's
    `<meta name="64er.pages" content="N-M">`.
 3. Skip the rubrics: `editorial`, `impressum`, `inhalt`, `vorschau`

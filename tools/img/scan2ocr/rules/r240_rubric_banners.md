@@ -77,9 +77,20 @@ For each of the three rubrics:
 
 1. **Check the article exists** (per the absence rule above). If it
    doesn't, skip the rubric and report N/A.
-2. **Render the start page** at 600 dpi for the banner crop:
-   `pdftoppm -r 600 issues/<YYMM>/64er_19XX-XX.pdf
-   /tmp/64er_<YYMM>_pages_600/p -png -f <START> -l <START>`.
+
+```bash
+# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `python3` makes SRC silently EMPTY
+# and every crop below then fails on "/NNN.png". MEASURED on 8611.
+PY=${PYTHON:-.venv/bin/python}
+SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
+```
+
+2. **The start page is already rendered** at 600 dpi: `"$SRC/<START>.png"`
+   from `masters600`, zero-padded to three digits. Do not `pdftoppm` the
+   issue PDF — it is assembled at step 006 and does not exist yet. See r000,
+   *THE PAGE IMAGE IS `masters600`*.
 3. **Find and crop the banner** on the page (top of column for
    Bücher / top of page for Editorial / Fehlerteufelchen). Grep step 010's block index (`<OUT_DIR>/blocks/pNNN.txt`) for the rubric name in the
    blocks file to find a starting bbox; the banner illustration

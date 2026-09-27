@@ -118,9 +118,10 @@ as a normal `<aside>` between two `<section>` elements.
 
 The sub-agent must:
 
-1. Render the Leserforum start page at 600 dpi: `pdftoppm -r 600
-   issues/<YYMM>/64er_19XX-XX.pdf /tmp/64er_<YYMM>_pages_600/p -png -f
-   <START> -l <START>`.
+1. Take the Leserforum start page from `masters600` — it is already 600
+   dpi, A4, deskewed and graded, and no render is needed:
+   `"$SRC/<START>.png"` (zero-padded to three digits). The issue PDF does
+   not exist yet; see r000, *THE PAGE IMAGE IS `masters600`*.
 2. Crop the banner image (`<START>-0.png`) from the page — envelope /
    letter motif at the top of page <START>. Verify by reading the
    crop.

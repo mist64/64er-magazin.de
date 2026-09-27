@@ -891,7 +891,11 @@ be: **`<tmp>/masters600/NNN.png`**, 600 dpi, A4, deskewed, cut and graded by
 step 005 -- the same file `r010` OCR'd and `r145` cuts figures from.
 
 ```bash
-SRC=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `python3` makes SRC silently EMPTY
+# and every crop below then fails on "/NNN.png". MEASURED on 8611.
+PY=${PYTHON:-.venv/bin/python}
+SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
 magick "$SRC/145.png" -crop 2136x574+390+3736 +repage <scratch>/crop.png
 ```
@@ -901,8 +905,15 @@ magick "$SRC/145.png" -crop 2136x574+390+3736 +repage <scratch>/crop.png
   is the same box for a render at any other resolution.
 - A lower-resolution look is `-resize 12%` of the same file, never a second
   render of something else.
-- Where a rule below says `pdftoppm`, read it as "crop `masters600/NNN.png`".
-  That instruction survives only for issues imported before this chain existed.
+- **No rule says `pdftoppm` any more.** This paragraph used to end "where a
+  rule below says `pdftoppm`, read it as crop `masters600/NNN.png`" — a
+  standing override that every sub-agent dispatch had to repeat, which is a
+  note about a debt rather than a fix. 8611 hit it again at 090, so the six
+  rules that still carried the instruction were changed instead: 090, 190,
+  200, 210, 240 now name `masters600` at the resolution each asked for
+  (`-resize 25%` for 150 dpi, `-resize 50%` for 300, the file itself for
+  600). 170's mention survives because it WARNS against `pdftoppm`, which is
+  the point.
 
 ## Cross-cutting rule: the PDF's text layer is a CANDIDATE SOURCE, not authority
 
