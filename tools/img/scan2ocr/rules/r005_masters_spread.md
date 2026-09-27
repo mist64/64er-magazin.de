@@ -77,6 +77,31 @@ Consequences, and the reason this variant exists:
 - Everything else the sheet variant does — skew, grade, stamps, the debug
   overlay, "publish and NOTE, never refuse" — transfers unchanged.
 
+## This variant takes ONE profile, and `paper` high/low is not available here
+
+`r005_masters.py` holds `ANCHORS`, `LEVELS`, `HAVE_PROFILE` and `GRADE_SHA` as
+**module-level constants**: one profile per run, chosen when the module loads.
+The sheet variant's per-page paper class is built on top of that in
+`r005_masters_sheet.py` and **does not exist here**. A spread descriptor that
+carries `paper` with `high_pages` is not honoured — every page is graded with
+the single profile, silently.
+
+So a spread issue uses the **legacy whole-issue `colors` key**, and the answer
+to "which pages are on which paper" is *all of them are low*:
+
+```json
+"binding": "spread",
+"colors": "issues/<ID>/colors.txt"
+```
+
+A monthly's wrapper (the cover leaf and its inside pages, typically 1-4 and
+the last two) IS a different, whiter stock, and on 8611's thumbs it reads
+`244 237 235` against the interior. Grading it with the interior profile
+leaves those four to six pages very slightly grey. **8610 shipped that way and
+was signed off**; 8611 follows it (decided 2026-09-27) so the two issues read
+alike. Changing it means giving this variant a per-page class first, which is
+a code change, not a descriptor edit.
+
 ## The profile is MEASURED for this issue's paper, never defaulted
 
 8610 ran its first sweep on `"colors": null`, and that is not "no profile": it

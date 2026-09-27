@@ -77,7 +77,7 @@ import os
 #     "SH8601"   Sonderheft 1/86, 152 pages, loose sheets
 #     "8609"     the September 1986 monthly, 176 pages, clipped spreads
 #     "8610"     the October 1986 monthly, 200 pages, clipped spreads
-ISSUE = "8610"
+ISSUE = "8611"
 
 # The descriptors live with the issues they describe: <repo>/issues/<ID>/.  That
 # directory already IS the issue as far as the site generator is concerned (its

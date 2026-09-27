@@ -109,9 +109,18 @@ message**, permanently, for every issue after it too.
 
 **Before step 005 grades anything — before a scan is opened, before an output
 directory is made — the operator is asked two questions about the physical
-copy.** They are the first thing that happens in an issue build. Step 005 asks
-them itself (`first_action()` in `r005_masters_sheet.py`) and **exits non-zero
-having written nothing** if the descriptor does not carry the answers.
+copy.** They are the first thing that happens in an issue build.
+
+**`first_action()` lives ONLY in `r005_masters_sheet.py`.** The spread variant
+has none, and this is a trap, not a detail: with `binding` absent — which is
+the prescribed starting state, since `r000_issue.py` leaves it absent so 005
+can ask — the only variant that can ask is the sheet one, and for a clip-bound
+issue it answers *"this belongs to r005_masters_sheet"*, which is wrong.
+`r005_masters_spread.py` refuses to load at all on an absent `binding`. Found
+on 8611.
+
+So for a SPREAD issue the two questions are answered before 005 is run at all,
+as follows.
 
 | question, in the owner's terms | descriptor key | what it decides |
 |---|---|---|
@@ -241,8 +250,20 @@ directory and neither knows nor cares which variant filled it.
 
 **The selector is the issue descriptor's `binding` field**, from
 `issues/<ID>/issue.json`, read via `r000_issue.py` — and it is **asked for as
-the chain's first action** (see above), never assumed and never inferred from
-the scans. Exactly one variant runs for a given issue. The other is recorded in `LOG.md` exactly like a kind mismatch,
+the chain's first action** (see above), never assumed. "Never assumed" is not
+"never measured": the binding is a fact of the paper and the thumbs show it in
+one look, so bring the operator the evidence rather than the bare question.
+
+| on a 150 dpi thumb | `spread` | `sheet` |
+|---|---|---|
+| inner side | the FOLD, then the neighbour half of the same A3 sheet, in frame | a torn or cut paper edge, backing beyond it |
+| on the fold | **6 clip holes**, 3 vertical pairs, ~0.6 mm | nothing |
+| foot | the yellow prop, ~7 mm | the bed |
+| parity | even page -> neighbour RIGHT, odd -> LEFT | none |
+
+One montage of `thumb/100.png` and `thumb/101.png` settles it. 8611 was
+answered this way in about a minute; the operator confirms, they do not
+divine it. Exactly one variant runs for a given issue. The other is recorded in `LOG.md` exactly like a kind mismatch,
 with `binding` in place of `kind`:
 
 ```markdown
