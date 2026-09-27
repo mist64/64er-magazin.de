@@ -107,6 +107,45 @@ REQUIRED_KEYS = ("id", "kind", "pages", "scan_dir", "thumb_150", "tmp", "pdf")
 # docstring).  Present-but-wrong is still fatal, right here, as loudly as ever:
 # an unanswered question stops the chain with a question, a typo'd answer stops
 # it with an error, and neither is ever guessed at.
+def lanes(lane_gb, reserve_cores=4):
+    """How many lanes a LOCAL-COMPUTE step should run. See r000_orchestration.
+
+    THE RULE: parallelise to use HALF the free RAM, capped by the cores.
+    Half and not all, because the other half is the margin that keeps a long
+    run off the swap when something else on the machine wants memory
+    part-way through, and a run that starts swapping is slower than one that
+    never grew.
+
+    `lane_gb` is that step's MEASURED peak for one lane, which is the only
+    number a caller has to supply and the only one worth arguing about.
+
+    Measured rather than written down because this box ran both ways inside
+    one afternoon: with a 350 GB model server resident (116 GB free, 6 lanes
+    was right) and without it (386 GB free, 10). Any constant would have been
+    wrong in half the day.
+
+    NOT for a step whose lanes are model calls -- those are bound by rate
+    limits and by the credential race in r000_llm, not by this machine.
+    """
+    import multiprocessing, subprocess
+    cores = multiprocessing.cpu_count()
+    free_gb = 0
+    try:
+        out = subprocess.run(["vm_stat"], capture_output=True, text=True).stdout
+        page = int(out.split("page size of ")[1].split()[0])
+        pages = sum(int(l.split()[-1].rstrip("."))
+                    for l in out.splitlines()
+                    if l.startswith(("Pages free", "Pages inactive",
+                                     "Pages speculative")))
+        free_gb = pages * page / 1073741824
+    except Exception:
+        pass                       # not macOS, or vm_stat moved: fall back to cores
+    n = max(1, cores - reserve_cores)
+    if free_gb:
+        n = min(n, max(1, int(free_gb / 2 / lane_gb)))
+    return n
+
+
 ASK_KEYS = ("binding", "paper")
 
 

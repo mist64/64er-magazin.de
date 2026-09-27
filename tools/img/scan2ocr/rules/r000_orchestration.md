@@ -646,6 +646,64 @@ disposable:
   8610 stays at `/private/tmp/64er_8610` by the user's decision, knowing the
   cleaner: that is a choice to re-run, not a default to copy.
 
+## Cross-cutting rule: PARALLELISE TO HALF THE FREE RAM
+
+Every step that fans out over pages locally — 005 masters, 010 OCR, 145 figure
+extraction — sizes its lanes the same way, and none of them may hardcode a
+number:
+
+> **As many lanes as fit in HALF the free RAM, capped at cores − 4.**
+
+Ask for it, never write it down:
+
+```sh
+LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')
+```
+
+The one argument is **that step's measured peak for one lane**, in GB. It is
+the only number worth arguing about and the only one a caller supplies.
+
+**Half, and not all.** The other half is the margin that keeps a long run off
+the swap when something else on the machine wants memory part-way through, and
+a run that starts swapping is slower than one that never grew. The owner's
+rule, stated 2026-09-27.
+
+**Why it is asked and not written.** This box ran both ways inside one
+afternoon: with a 350 GB model server resident — 116 GB free, memory-bound,
+6 lanes was right — and then without it, 386 GB free, core-bound, 10. Any
+constant in a `.sh` would have been wrong in half the day. The hardcoded
+`-P 6` that all three steps carried was written when it was true and left
+**26 of 32 cores idle** for two hours once it was not.
+
+**`OMP_NUM_THREADS=1` stays.** It is what makes a lane exactly one core:
+numpy and ImageMagick both thread by default, and two layers of parallelism on
+one box contend instead of adding. Lanes are the only parallelism.
+
+### Measuring a lane's peak
+
+Run the step, and while it runs:
+
+```sh
+ps -axo rss,pcpu,comm | sort -rn | head
+```
+
+Take the largest steady RSS **per lane**, counting every process a lane owns at
+once. MEASURED for 005 on 8611: **~19 GB** — python holding the 2400 dpi sheet
+(~14 GB), or, while it waits on the separator, python idle (~9 GB) *plus*
+`magick`'s own copy (~9 GB). ImageMagick at Q16 HDRI holds a 590 Mpx
+4-channel page at 8 bytes a channel, which is where its share comes from.
+
+**010 and 145 are still guessing at 3 GB.** That is a placeholder, not a
+measurement; take the real number off the next run and put it in.
+
+### NOT for model-call steps
+
+020 classify, 020 evaluate and 145 judge fan out over **model calls**, and they
+are bound by rate limits and by the credential race in `r000_llm.py` — four
+concurrent processes sharing one OAuth file once took out pages 84-176 of an
+overnight run. Their `LANES = 4` is a different constant answering a different
+question. Leave it alone.
+
 ## Cross-cutting rule: PREFLIGHT the free space, before step 005
 
 Step 005 is the only step that writes at 2400 dpi and it writes ~**2.25 GB

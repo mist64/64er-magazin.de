@@ -24,15 +24,8 @@
 # Whichever is smaller wins.  On a box with a 350 GB model server resident
 # that is memory; with it stopped it is cores.  Both happened on one afternoon,
 # which is why this is measured at run time and not written down as a number.
-LANE_GB=19
-CORES=$(sysctl -n hw.physicalcpu)
-FREE_GB=$(vm_stat | awk '/page size/{ps=$8} /Pages free/{f=$3} /Pages inactive/{i=$3} /Pages speculative/{s=$3} END{printf "%d", (f+i+s)*ps/1073741824}')
-LANES=$(( CORES - 4 ))
-MEM_LANES=$(( FREE_GB / 2 / LANE_GB ))          # HALF the free RAM, never all
-[ $MEM_LANES -lt $LANES ] && LANES=$MEM_LANES
-[ $LANES -lt 2 ] && LANES=2
-echo "r005: $LANES lanes ($CORES cores, ${FREE_GB} GB free," \
-     "half of it at ~${LANE_GB} GB a lane)" >&2
+LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')
+echo "r005: $LANES lanes (~19 GB each, half the free RAM, capped by cores)" >&2
 # cut is seconds a page and runs alone: it needs EVERY page's geometry before
 # it can fit the window, so it cannot start until the last lane is done.
 set -e
