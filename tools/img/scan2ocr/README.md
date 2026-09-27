@@ -1,10 +1,38 @@
 # scan2ocr — scans → article-text corpus
 
-**The entry point for a build is
-[`rules/r000_orchestration.md`](rules/r000_orchestration.md)**, not this
-file. This one describes what the chain IS; that one says how to run it.
-A fresh agent reaches both from [`CLAUDE.md`](../../../CLAUDE.md) in the
-repo root.
+**This directory is where the machine-assisted work lives.** The repo root is
+the project itself — the website, its issues, its stylesheet. Everything about
+how an issue gets BUILT is in here, and this file is the door.
+
+## Start here
+
+**[`rules/r000_orchestration.md`](rules/r000_orchestration.md)**
+
+That is the entry point for a build: scans → OCR → article HTML → figures →
+metadata → checks → PDF. It defines the numbered rules
+(`rNNN_name.{md,sh,py}` in [`rules/`](rules/)), what runs in what order, which
+steps apply to which kind of issue, and what a step must prove before it is
+done. Its own first sections answer what a new build asks first — which
+physical binding this issue has, which paper profile grades it, where the
+working directory goes, how much free disk the sweep needs.
+
+Read it before touching anything under `issues/<YYMM>/`.
+
+## The one standing rule
+
+**The files in here are the deliverable, not the issue.** An issue is published
+once; these rules are read by every agent that builds every issue after it.
+When a run teaches you something, it goes into the `.md` *before* it goes into
+a message to anyone — a correction delivered as prose teaches one agent and
+evaporates. Record what was **disproved** as carefully as what was true: a
+plausible wrong hypothesis costs the next reader the same cycle it cost you.
+
+The test of a rule is not whether it is true. It is whether someone who has
+never seen this issue can act on it without asking.
+
+Commit as the rules say. **Do not push unless asked.**
+
+## What the chain is
 
 Extracts **article text and only article text** from a scanned 64'er issue, as
 markdown: no running heads, no folios, no ads, no Kleinanzeigen, no standalone
