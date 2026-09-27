@@ -50,6 +50,16 @@ from r000_issue import ISSUE
 # no resampling filter touches the ink on the way down.
 SCAN_DPI = 2400
 MASTER_DPI = 600
+
+# The flat field and the floor -- see THE FLAT FIELD AND THE FLOOR below,
+# beside the code. Up here because GRADE_TEXT has to cover them.
+FLATFIELD = True
+FLOOR_K = 0.78        # ink only below this fraction of the LOCAL paper white
+FIELD_BLOCK_MM = 5.0  # field estimated per block of this size
+FIELD_PCT = 2.0       # ...as this percentile of the block's paper pixels
+FIELD_DPI = 300       # ...on a reduction: the field is smooth, so this is free
+
+
 SCAN_REDUCE = SCAN_DPI // MASTER_DPI          # 4
 THUMB_DPI = 150                               # the thumb/ renders beside the scans
 MM = MASTER_DPI / 25.4                        # px per mm in master space
@@ -299,7 +309,9 @@ PAPER_RGB = np.array(ANCHORS["W"], float)
 # in -- the 8 anchors, the 4 level lines, and the OCR level -- and the digest is
 # written into every artefact this step produces.  Comparing a master with the
 # current profile is then a string comparison, not a judgement about colour.
-GRADE_TEXT = profile_text(ANCHORS, LEVELS)
+GRADE_TEXT = profile_text(ANCHORS, LEVELS) + (
+    "FF %s %g %g %g %g\n" % (FLATFIELD, FLOOR_K, FIELD_BLOCK_MM,
+                              FIELD_PCT, FIELD_DPI))
 GRADE_SHA = hashlib.sha1(GRADE_TEXT.encode("utf-8")).hexdigest()[:12]
 
 
@@ -453,6 +465,110 @@ def trace(vals, idx, pct, mm_px):
 # The grade
 # ---------------------------------------------------------------------------
 
+# --- THE FLAT FIELD AND THE FLOOR ------------------------------------------
+# We are reconstructing the printing plate, not the paper (README, THE CORE
+# IDEA).  Where the plate laid no ink the answer is 255 255 255, and one global
+# W cannot deliver that: the stock browns towards the trim and varies fibre to
+# fibre, so a reference low enough to clamp the worst paper also dissolves the
+# lightest ink.  Two mechanisms, applied to the SCAN before the separator sees
+# it, so the separator, the GCR undo and the ICC pair stay exactly as they were.
+#
+#   FIELD  the local paper white as a smooth low-frequency surface, divided out
+#          so every paper pixel lands on the profile's W.  Fixes the browning.
+#          MEASURED on 8611: trim clamp 57.7% -> 81.3%.
+#   FLOOR  anything within (1 - FLOOR_K) of its LOCAL paper is pushed onto W as
+#          well, so the separator reads exactly zero ink there.  Fixes the
+#          fibre, which the field cannot: fibre is high-frequency and sits just
+#          below its local paper, the same signature as a light halftone dot.
+#
+# The floor is safe ONLY because the separator runs at 2400 dpi, where a 133 lpi
+# screen is ~18 px per cell: the dot is resolved and near-solid (80-100% below
+# paper) and fibre is 9-22% below, so the gap is wide open.  At 600 dpi the cell
+# is 4.5 px, every dot blurs to a grey, and the two are one measurement.  Never
+# calibrate this on the reduction.
+#
+# MEASURED on 8611 p010, the real separator, before vs after: pure white among
+# paper pixels 29.5% -> 94.1% (the remaining 6% is antialiasing on the edges of
+# type and rules, which is real).  Halftone untouched: p5 9->10, p25 72->75,
+# p50 116->119, p95 218->239, the top end cleaner because paper now shows
+# through the screen correctly.  Adopted from 8611 onward by the owner's
+# decision (2026-09-27); 8610 and earlier shipped without it and are not being
+# re-run, so there is a deliberate seam in the corpus at 11/86.
+def paper_field(rgb):
+    """The local paper white, per channel, as a smooth surface at FIELD_DPI.
+
+    A LOW percentile of each block, never a max or a median: the field has to
+    sit UNDER the paper it describes or nothing clamps.  Blocks that are all
+    ink yield no estimate and are filled from the nearest block that did, then
+    smoothed -- an all-ink block has no paper to get wrong.
+
+    Estimated on a reduction because the field is low-frequency by construction.
+    MEASURED: the paper percentile moves 2-6 levels between 150 dpi and 600 dpi,
+    and the floor carries a 22% margin, so the error is irrelevant and it turns
+    a minute a page into a second.
+    """
+    step = max(1, int(round(SCAN_DPI / FIELD_DPI)))
+    small = np.asarray(Image.fromarray(rgb[::step, ::step]).convert("RGB"), float)
+    lum = small @ [.299, .587, .114]
+    ispaper = (lum > 170) & ((small.max(2) - small.min(2)) < 40)
+    b = max(4, int(FIELD_BLOCK_MM / 25.4 * FIELD_DPI))
+    h, w, _ = small.shape
+    gh, gw = max(1, h // b), max(1, w // b)
+    grid = np.full((gh, gw, 3), np.nan, np.float32)
+    for i in range(gh):
+        for j in range(gw):
+            m = ispaper[i*b:(i+1)*b, j*b:(j+1)*b]
+            if m.sum() > m.size * 0.02:
+                blk = small[i*b:(i+1)*b, j*b:(j+1)*b][m]
+                grid[i, j] = np.percentile(blk, FIELD_PCT, axis=0)
+    bad = np.isnan(grid[:, :, 0])
+    if bad.all():
+        return None                      # a page with no paper at all: no field
+    if bad.any():
+        idx = ND.distance_transform_edt(bad, return_distances=False,
+                                        return_indices=True)
+        grid = grid[tuple(idx)]
+    for c in range(3):
+        grid[:, :, c] = ND.uniform_filter(grid[:, :, c], size=3, mode="nearest")
+    return grid
+
+
+def flatfield(rgb):
+    """Divide the paper field out and floor what is within the margin of it.
+
+    Worked in horizontal stripes: a 2400 dpi sheet is 1.7 GB as uint8 and three
+    float32 copies of it do not fit anywhere sensible.
+    """
+    grid = paper_field(rgb)
+    if grid is None:
+        return rgb
+    h, w, _ = rgb.shape
+    out = np.empty_like(rgb)
+    band = max(1, 2 ** 26 // (w * 3))         # ~64 MB of float32 per stripe
+    gh = grid.shape[0]
+    for y0 in range(0, h, band):
+        y1 = min(h, y0 + band)
+        # Upsample only the grid rows this stripe needs, never the whole field.
+        # Resizing the full-page field once per stripe per channel is 81 full
+        # resizes on an A3 sheet and cost 129 s a page before it was noticed.
+        g0 = max(0, int(y0 * gh / h) - 1)
+        g1 = min(gh, int(np.ceil(y1 * gh / h)) + 1)
+        sub = grid[g0:g1]
+        top, bot = g0 * h / gh, g1 * h / gh
+        rows = int(round(bot - top))
+        f = np.stack([np.asarray(Image.fromarray(sub[:, :, c])
+                                 .resize((w, rows), Image.BILINEAR))
+                      [y0 - int(round(top)): y0 - int(round(top)) + (y1 - y0)]
+                      for c in range(3)], axis=2)
+        chunk = rgb[y0:y1].astype(np.float32)
+        ratio = chunk / np.maximum(f, 1.0)
+        scaled = np.clip(ratio * PAPER_RGB, 0, 255)
+        paperish = ratio.min(2) >= FLOOR_K
+        scaled[paperish] = PAPER_RGB
+        out[y0:y1] = scaled.astype(np.uint8)
+    return out
+
+
 def separate_and_render(src_png, cmyk_tiff, rgb_png, profile_txt, stamp):
     """RGB -> CMYK (the existing tool) -> RGB (the ICC pair).  One separation.
 
@@ -466,8 +582,17 @@ def separate_and_render(src_png, cmyk_tiff, rgb_png, profile_txt, stamp):
     if not tool.exists():
         raise SystemExit(f"r005: {tool} is not built -- "
                          f"cargo build --release in tools/img/cmyk_reconstruction")
+    src = str(src_png)
+    if FLATFIELD:
+        # The flat field and the floor are a pre-pass on the SCAN. The separator
+        # is called on the treated image and is itself untouched.
+        a = np.asarray(Image.open(src_png).convert("RGB"))
+        src = str(Path(cmyk_tiff).with_suffix(".ff.png"))
+        Image.fromarray(flatfield(a)).save(src)
     subprocess.run([str(tool), "--colors", str(profile_txt),
-                    str(src_png), str(cmyk_tiff)], check=True)
+                    src, str(cmyk_tiff)], check=True)
+    if FLATFIELD:
+        os.unlink(src)
     undo_gcr(cmyk_tiff)
     subprocess.run(["magick", str(cmyk_tiff),
                     "-profile", str(IMG_DIR / ICC_CMYK),

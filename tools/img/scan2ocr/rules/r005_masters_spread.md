@@ -161,8 +161,32 @@ there, never on the 600 dpi reduction.
 What a floor costs is anything genuinely lighter than `1-k` in density. In a
 1986 magazine at 2400 dpi that is not a light tint — a light tint is dots plus
 paper, and the dots survive — it is dot EDGES, which are antialiasing rather
-than plate. Not implemented; the choice of `k`, and of floor-versus-despeckle,
-is the user's.
+than plate.
+
+**IMPLEMENTED**, in `r005_masters.py`: `FLATFIELD`, `FLOOR_K = 0.78`,
+`FIELD_BLOCK_MM = 5`, `FIELD_PCT = 2`, `FIELD_DPI = 300`. It is a pre-pass on
+the SCAN inside `separate_and_render`, so `cmyk_reconstruction`, the GCR undo
+and the ICC pair are untouched and both variants get it without changing a
+call site. The five constants are in `GRADE_TEXT`, so a master graded the old
+way does not read as current.
+
+MEASURED on 8611 p010 through the real separator, pure white among paper
+pixels: **29.5 % → 94.4 %**. Halftone untouched — p5 9→10, p25 72→75,
+p50 116→119, p95 218→239, the top end cleaner because paper now shows through
+the screen correctly. The remaining ~6 % is antialiasing on the edges of type
+and rules, which is real ink meeting real paper.
+
+**Cost: ~33 s a page**, on six lanes about 18 minutes on a 200-page sweep.
+Estimate the field on a REDUCTION (`FIELD_DPI`) — it is low-frequency by
+construction — and upsample only the grid rows each stripe needs. Resizing the
+full-page field once per stripe per channel is 81 full-page resizes on an A3
+sheet and cost 129 s a page before it was caught.
+
+**The corpus has a seam at 11/86.** Adopted from 8611 onward by the owner's
+decision (2026-09-27). 8610 and everything before shipped with one global `W`
+and the same fibre, and are not being re-run. A back-catalogue page and an
+8611 page are graded to different standards; the `grade-sha` in every stamp
+says which.
 
 ## The profile is MEASURED for this issue's paper, never defaulted
 
