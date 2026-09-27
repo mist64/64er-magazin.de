@@ -171,7 +171,29 @@ call site. The five constants are in `GRADE_TEXT`, so a master graded the old
 way does not read as current.
 
 MEASURED on 8611 p010 through the real separator, pure white among paper
-pixels: **29.5 % → 94.4 %**. Halftone untouched — p5 9→10, p25 72→75,
+pixels: **29.5 % → 94.4 %**.
+
+**The passing reference for the gate, accepted by the owner on 8611
+(2026-09-27) and the number a new issue is held to:**
+
+| band | pure white |
+|---|---|
+| interior blank, p067 | **99.94 %** (was 95.5 with one global `W`) |
+| interior blank, p158 | **99.96 %** |
+| trim band, p010 — the one that was rejected as "too yellow" | **99.92 %** (was 16.5) |
+
+`p1` is `255 255 255` on all three, and `glyph p50` moved 37→36, 30→28,
+51→50 — *darker*, because the paper around the type stopped contributing
+density. **That is what a passing grade looks like: three nines on blank
+paper and the ink where it was.** Read pure white, not "p1 ≥ 250" — under the
+plate standard the old threshold is not the question.
+
+What survives the floor, since there is no despeckle: on the p067 band ~190
+blobs over 63 × 40 mm, median 2 px, the largest **0.27 mm** across (33 px at
+600 dpi, min L 132). Real marks on the paper — press dirt, foxing, a deep
+fibre — and at that size nothing but geometry could separate them from a
+genuine ink speck. Visible if you look for them, invisible at reading size.
+They are accepted. Halftone untouched — p5 9→10, p25 72→75,
 p50 116→119, p95 218→239, the top end cleaner because paper now shows through
 the screen correctly. The remaining ~6 % is antialiasing on the edges of type
 and rules, which is real ink meeting real paper.
@@ -722,8 +744,35 @@ which fit at 0.8 mm, became the fold at 12.9 mm; p005's shift pinned on its
 real holes (10.33 → 10.28 mm). It does **not** kill a regular column — its
 fitting shifts recur every pitch, so one always lands inside ±3 mm. It is a
 fact about the operator's placement, re-measured per issue like the
-template; an issue whose clip sat elsewhere reports `fold none` on every
-page, and checks 5 and 8 say so.
+template.
+
+**The failure is not always loud.** An issue whose clip sat somewhere else
+entirely reports `fold none` on every page and checks 5 and 8 say so. The
+common case is quieter and this rule used to miss it: the clip sat *close*,
+folds are still found, and the only symptom is the **hole count stuck below
+6**. 8611 reported `t=4/6` on every page of its gate sample against 8610's
+mostly-6 — not a failure by any check, and a worse fold fit on all 192 pages
+if it is not caught before the sweep.
+
+> **The tell is a hole count that never reaches 6 on a clean page. Re-measure
+> before the sweep, not after.**
+
+To re-measure, on a sample of **at least 20 pages spread over the issue**:
+
+1. Run `measure` with `HOLE_TEMPLATE_Y0_TOL_MM` widened enough not to bind
+   (20 mm), so the fit reports where the clip actually is rather than where
+   the previous issue's clip was.
+2. Take the best template shift per page from the candidate lists, drop the
+   pages whose shift is arbitrary (a screen or a dense crease matches any
+   shift — 8610 had four of 196).
+3. Read the **p5–p95 spread and the mean**. That is how 8610 got 58.05–59.97
+   and 58.91, hence `HOLE_TEMPLATE_Y0_MM` 59.0.
+4. Set `HOLE_TEMPLATE_Y0_MM` to the mean and `HOLE_TEMPLATE_Y0_TOL_MM` to
+   **three times the spread**, and say both numbers in `LOG.md` with the
+   sample.
+
+Then re-run the sample and confirm the hole count reaches 6 on clean pages
+before spending the four hours.
 
 ### The fold fallback — the neighbour's colour boundary
 
