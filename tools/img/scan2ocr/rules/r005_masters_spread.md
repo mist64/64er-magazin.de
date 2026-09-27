@@ -313,14 +313,27 @@ snippet are that page's. On another issue they point at nothing in particular:
 - **The blank band must also be verified blank.** A band that clips a printed
   rule, a page number or a halftone reports the ink, not the paper. Look at
   the crop, do not trust the coordinates.
-- **The type window must be body text.** Classified ads, tabular matter at 6 pt
-  and halftone captions all give a lighter `glyph p50` and no solid black,
-  because there is no solid black in them to find. 8611's first reading took
-  `47.0` off a page whose window was not body text.
+- **The type window must be body text in the ISSUE'S BODY FACE**, and weight
+  matters as much as size. Classified ads, tabular matter at 6 pt and halftone
+  captions have no solid black in them to find — but so does body text set in
+  a light face. MEASURED on 8611, all three windows genuinely body-shaped:
+  `glyph p50` read **30.0** on p158's body text, **37.0** on p010's, **51.0**
+  on p067's small sans ad copy, and **47.0** on a p151 window that *was* body
+  text, in a light serif. A 20-level spread across windows that all look right.
+  So the number says as much about the face as about the grade, and it is only
+  evidence when the window is the same kind of type on every page you compare.
 - **Pick the three pages for what is ON them**, not by spacing them through the
   issue: one page with a real blank band, one ordinary body-text page, one
   ink-heavy page. A classifieds page is the worst possible choice for both
   halves at once.
+- **Not every page owes you both numbers.** The two halves test different
+  things and neither needs all three pages. A body-text page often has NO
+  blank band inside the body box at all — 8611's p010 has none, and its p158
+  band was a 1.4 mm gap between a heading and its standfirst, the only one on
+  the page. So: **at least one page with a genuinely clean blank band**, and
+  **at least one window of the issue's body face**. Report which page gave
+  which; do not hunt for a passing window on a page that does not have one,
+  and do not fail a page for lacking a band it never had.
 
 A useful sanity number while placing them: pure white over the blank band ran
 **99.9 %** on 8610. Anything in the 20-80 % range is a band with ink in it, not
