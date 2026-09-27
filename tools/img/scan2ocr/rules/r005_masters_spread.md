@@ -102,6 +102,40 @@ was signed off**; 8611 follows it (decided 2026-09-27) so the two issues read
 alike. Changing it means giving this variant a per-page class first, which is
 a code change, not a descriptor edit.
 
+## What the grade is FOR: the plate, not the paper
+
+See `README.md`, *THE CORE IDEA*. Step 005 is not making a faithful photograph
+of a 1986 copy; it is recovering what the plates laid down. The paper is the
+substrate, and the substrate is not the deliverable.
+
+That is the standard every number below is held to, and it is stricter than
+the one this file used to apply:
+
+- **Where the plate laid no ink the answer is `255 255 255`.** Not "close",
+  not "99.7 %". MEASURED on 8611's gate crops at 600 dpi 1:1: a clean interior
+  blank band is **95.5 %** pure white — the other 4.5 % is fibre, mostly 1-6
+  levels down but reaching L 115. At 1:1 that reads as texture, and it is
+  texture no plate printed.
+- **Browning at the trim is substrate, so it goes.** It is tempting to call it
+  the artefact's patina and ship it. On 8611 the top 10 mm of every page
+  renders `253 249 239` (B 14 under R), 11 levels at 2 mm, 6.5 at 6 mm, ~3
+  from 12 mm in. The plate laid nothing there. It should be white.
+- **`W` is not the paper's colour.** It is the threshold above which we
+  declare that no ink was laid. A joint clamp of 95 % is not a good `W`; it is
+  5 % of blank paper reported as ink the plate never laid. 8610's 94.8 % was
+  the same error, unnoticed because nothing asked the question this way.
+
+**One global `W` cannot meet that standard, and this is the open design
+problem of step 005.** The paper is not uniform: it browns towards the trim
+and varies fibre to fibre, so a single reference low enough to clamp the worst
+paper is also low enough to dissolve the lightest ink. What the plate reading
+asks for instead is a **per-page paper field** — the local paper white
+estimated as a smooth, low-frequency surface and used as the density reference
+in place of one constant. Halftone dots are high-frequency and darker than
+their local paper, so they survive it; browning and fibre are exactly what it
+removes. Not implemented. Until it is, the gate below measures how close one
+constant can get, which is not the same question.
+
 ## The profile is MEASURED for this issue's paper, never defaulted
 
 8610 ran its first sweep on `"colors": null`, and that is not "no profile": it

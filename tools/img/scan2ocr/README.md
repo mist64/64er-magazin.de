@@ -18,6 +18,29 @@ working directory goes, how much free disk the sweep needs.
 
 Read it before touching anything under `issues/<YYMM>/`.
 
+## THE CORE IDEA — we are reconstructing the printing plate
+
+Not photographing a 40-year-old copy. **Recovering what the plates laid down
+in 1986.** The paper is a substrate the plate was printed on, and everything
+that is the substrate rather than the plate — the browning at the trim, the
+fibre speckle, the scanner's noise, the stock's own colour — is not
+information we are trying to keep. It is contamination to be removed.
+
+Every colour decision in the chain descends from this, and it decides them
+differently from "make the scan look faithful":
+
+| | faithful-scan reading | PLATE reading |
+|---|---|---|
+| paper the plate left blank | whatever the paper is today | **255 255 255, everywhere** |
+| browning at the trim | the artefact's patina, ship it | substrate, remove it |
+| fibre speckle in a blank area | texture, ship it | substrate, remove it |
+| `W` | the paper's colour | **the threshold that declares "no ink here"** |
+| 95 % of blank paper clamping to white | a good grade | **5 % wrong** — ink reported that no plate laid |
+
+So a blank area is not "clean enough at 99.7 %". Either the plate put ink
+there or it did not, and where it did not the answer is white. A number in
+this chain is only good when the thing it measures is plate.
+
 ## The one standing rule
 
 **The files in here are the deliverable, not the issue.** An issue is published
