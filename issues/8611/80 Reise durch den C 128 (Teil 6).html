@@ -35,6 +35,37 @@
 
         <p>Bisher hatten alle Register einen Verwandten im oberen Speicher-Bereich. Das ändert sich nun: Die folgenden existierennurnochimunteren MMU-Teil. Dakommt alsnächstes das MCR, also das Modus-Konfigurations-Register ins Spiel. In Bild 1 sehen Sie, wie es aufgebaut ist:</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Bits:</th>
+                    <th>7</th>
+                    <th>6</th>
+                    <th>5</th>
+                    <th>4</th>
+                    <th>3</th>
+                    <th>2</th>
+                    <th>1</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th rowspan="2">Bedeutung:</th>
+                    <td rowspan="2">40/80-Zeichen-TASTE<br>0 = gedrückt<br>1 = nicht gedrückt</td>
+                    <td rowspan="2">Betriebsart:<br>0 = C 128<br>1= C 64</td>
+                    <td rowspan="2">EXROM<br>1</td>
+                    <td rowspan="2">GAME<br>1</td>
+                    <td rowspan="2">FSDIR Ausgabe f. schnellen seriellen Daten-Puffer</td>
+                    <td colspan="2">ungenutzt</td>
+                    <td rowspan="2">Aktive CPU.<br>0 = Z80<br>1 = 8502</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+            </table>
+            <figcaption>Bild 1. Der Aufbau des MCR (Modus-Konfigurations-Register) $D505</figcaption>
+        </figure>
+
         <p>Bit 0 bietet eine Möglichkeit, den Computer auf den Z80-Betrieb umzustellen. Man muß dazu nur dieses Bit 1löschen. Allerdings wird der Computer dann abstürzen, weil er keinen gültigen Z80-Code vorfindet. Wennmanabereinen Weg dazu findet, diesen griffbereit zu halten, dann könnte man den C 128 als Z80-Computer arbeiten lassen.</p>
 
         <p>Bit 1 und 2 werden noch nicht genutzt.</p>
@@ -46,6 +77,30 @@
         <p>0 = Taste gedrückt 1 = Taste frei</p>
 
         <p>Im Abschnitt über den VIC war es schon angedeutet worden: Es gibt eine Möglichkeit inden MMU-Registern, den Zugriff des VIC auf BANK 1 zu richten. Dazu dient das RCR (RAM-Konfigurations-Register). Einen Überblick über die Möglichkeiten zeigt Bild 2:</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bits:</th>
+                    <th>7</th>
+                    <th>6</th>
+                    <th>5</th>
+                    <th>4</th>
+                    <th>3</th>
+                    <th>2</th>
+                    <th>1</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th>Bedeutung</th>
+                    <td colspan="2">VIC-BANKZEIGER<br>X0 = BANK 0<br>X1 = BANK 1<br>X: Bit 7 noch ohne Bedeutung</td>
+                    <td colspan="2">unbenutzt<br>(geplant als Blockzeiger)</td>
+                    <td colspan="2">Ort der Common Area:<br>00= keine Common A.<br>01 = unterer RAM-Bereich<br>10 = oberer RAM-Bereich<br>11 = ein Teil im unteren, einer im oberen RAM-Bereich</td>
+                    <td colspan="2">Größe der Common Area:<br>00 = 1 KByte<br>01 = 4 KByte<br>10 = 8 KByte<br>11 = 16 KByte</td>
+                </tr>
+            </table>
+            <figcaption>Bild 2. Der Aufbau des RCR (RAM-Konfigurations-Register) $D506</figcaption>
+        </figure>
 
         <p>Sie sehen, daß außer dem VIC-Zugriff auch die Organisation der Common Areas hier geschieht.</p>
 

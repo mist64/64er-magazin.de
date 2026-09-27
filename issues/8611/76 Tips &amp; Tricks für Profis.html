@@ -41,6 +41,31 @@ ldx #&lt;fadr ;Adresse des Filenamens (low)
 
         <p>Übrigens werden die Zeiger auf die Puffer auch vom Betriebssystem gesetzt, das die Puffer an das obere (Basic-) RAM-Ende legt. Dies ist auch der Grund, weswegen beim Öffnen der Schnittstelle ein CLR ausgeführt wird, denn im gleichen Speicherbereich liegen ja auch die Stringvariablen. Wenn wir jetzt zum Beispiel sequentielle Dateien senden oder empfangen wollten, könnte es bei langen Dateien passieren, daß die Puffer und die Datei sich überlappen, so daß Datenverluste entstehen. Darum legen wir die Puffer in uns angenehme Speicherbereiche, was man entweder vor oder nach dem OPEN-Befehl machen kann. Vorher deswegen, da das Betriebssystem die Pufferadressen erst festlegt, nachdem esin den Speicherstellen nachgesehen hat, ob das vom Programm schon gemacht wurde. Ist das High-Byte der Pufferzeiger ungleich Null, wird davon ausgegangen, daß die Zeiger bereits auf die Puffer deuten. Deshalb wird nichts mehr verändert. Und nun geht's los!</p>
 
+        <h3>Übersicht der Werte für:</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Steuerregister</th>
+                    <th>Befehlsregister</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bit 7:<br>0 1 Stoppbit<br>1 2 Stoppbits</td>
+                    <td>Bit 7,6,5:<br>000 keine Parität<br>001 gerade Parität<br>011 ungerade Parität<br>101 8. Datenbit = 1<br>111 8. Datenbit = 0</td>
+                </tr>
+                <tr>
+                    <td>Bit 5,6:<br>00 8 Datenbits<br>01 7 Datenbits<br>10 6 Datenbits<br>11 5 Datenbits</td>
+                    <td>Bit 4:<br>0 Vollduplex<br>1 Halbduplex</td>
+                </tr>
+                <tr>
+                    <td>Bit 0,1,2,3:<br>0000 selbstdef. Übertr.<br>0001 50 bit/s<br>0010 75 bit/s<br>0011 110 bit/s<br>0100 134,5 bit/s<br>0101 150 bit/s<br>0110 300 bit/s<br>0111 600 bit/s<br>1000 1200 bit/s<br>1001 1800 bit/s<br>1010 2400 bit/s</td>
+                    <td>Bit 0 (Handshake):<br>0 3-Line (Software-)<br>1 X-Line (Hardware-)</td>
+                </tr>
+            </tbody>
+        </table>
+
         <p>Der Filename kann auch vier Zeichen lang sein. Die ersten beiden Zeichen behalten ihre Bedeutungbei, aber die nächsten beiden beinhalten den Wert für die Übertragungsrate.</p>
 
         <p>Der Filename sieht also wie folgt aus:</p>
@@ -163,27 +188,56 @@ txa ;gemerktes Zeichen zurueckholen
 
         <p>Einige der Zeichen können jedoch nicht geändert werden. Es sind die Bildschirmcodes von 33 bis 41 sowie der Code 63. Diese Zeichencodes sind anderweitig belegt.</p>
 
-        <p>Zeichencode Neue Belegung</p>
-
-        <p>33 &lt;CRSR&gt;-links</p>
-
-        <p>34 &lt;CRSR&gt;-hoch</p>
-
-        <p>35 &lt;DEL&gt;</p>
-
-        <p>36 &lt;HOME&gt;</p>
-
-        <p>37 &lt;STOP&gt;</p>
-
-        <p>38 &lt;RETURN&gt;</p>
-
-        <p>39 &lt;Fl&gt;</p>
-
-        <p>40 &lt;F3&gt;</p>
-
-        <p>41 &lt;F5&gt;</p>
-
-        <p>63 &lt;F7&gt;</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Zeichencode</th>
+                    <th>Neue Belegung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>33</td>
+                    <td>&lt;CRSR&gt;-links</td>
+                </tr>
+                <tr>
+                    <td>34</td>
+                    <td>&lt;CRSR&gt;-hoch</td>
+                </tr>
+                <tr>
+                    <td>35</td>
+                    <td>&lt;DEL&gt;</td>
+                </tr>
+                <tr>
+                    <td>36</td>
+                    <td>&lt;HOME&gt;</td>
+                </tr>
+                <tr>
+                    <td>37</td>
+                    <td>&lt;STOP&gt;</td>
+                </tr>
+                <tr>
+                    <td>38</td>
+                    <td>&lt;RETURN&gt;</td>
+                </tr>
+                <tr>
+                    <td>39</td>
+                    <td>&lt;F1&gt;</td>
+                </tr>
+                <tr>
+                    <td>40</td>
+                    <td>&lt;F3&gt;</td>
+                </tr>
+                <tr>
+                    <td>41</td>
+                    <td>&lt;F5&gt;</td>
+                </tr>
+                <tr>
+                    <td>63</td>
+                    <td>&lt;F7&gt;</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Im Klartext heißt das, daß Sie, wenn Sie den Bildschirm-Code 33 mit dem Befehl !33,65 ändern wollen, nicht das Ausrufungszeichen, sondern die &lt;CRSR&gt;-links-Taste in ein A umwandeln.</p>
 
