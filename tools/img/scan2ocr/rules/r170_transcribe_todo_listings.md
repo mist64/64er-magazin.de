@@ -24,31 +24,36 @@ with the verbatim caption and `<pre>TODO</pre>` as the body so the
 gap is visible in the rendered HTML. Rule 170's job is to OCR the
 printed listing into the `<pre>` body.
 
-## The transcription stays INLINE — it never becomes a `prg/` file
+## A COMPLETE MSE OR CHECKSUMMER LISTING IS RECREATED AS A DISK FILE
 
-A `<pre data-filename="…">` is empty markup: the generator fills it from
-`issues/<ID>/prg/<name>.txt`, which mirrors what was on the Programm-Service
-disk (r120). A listing this rule transcribes was, by definition, NOT on that
-disk — so writing one into `prg/` would misrepresent the disk's contents, and
-would do it in the one directory the project treats as the disk's record.
-**Transcribe into the `<pre>` body and leave it there**, even when the
-transcription is provably exact.
+**The disk not carrying it was a mistake, not a fact to preserve.** The
+magazine printed these two formats precisely so a reader could reconstruct the
+program byte for byte: a Checksummer listing carries a per-line sum, an MSE
+listing a per-line checksum over its hex. A transcription that satisfies those
+numbers IS the program. So it does not stay as page text — it goes into
+`issues/<ID>/prg/` like any disk file, and the article references it:
 
-The corpus already works this way: 339 `<figure><pre data-filename=…>` against
-**78 inline** ones, and the inline ones are this rule's population — Pascal
-source, assembler disassembly of in-ROM code, loaders, errata.
+| printed as | recreate | markup |
+|---|---|---|
+| Checksummer BASIC | `petcat -w<ver> -l <addr>` the transcription, keep the petcat text as `prg/<name>.txt` (house opener `;<name>.prg ==0801==`, plus `;version=` where the dialect is not V2) | `<pre data-filename="<name>" data-name="<Name>" data-checksummer="<1\|2\|3>"></pre>` — EMPTY; the generator tokenises the file and recomputes the sums for display |
+| MSE hex | decode the hex to the binary with `tools/mse.py`, write `prg/<name>.prg` | `<pre data-filename="<name>.prg" data-name="<Name>" data-mse=mse1></pre>` |
 
-Two 8610 cases worth recognising, because both invite the mistake:
+`data-checksummer` is the Checksummer VERSION the article printed — 1, 2 or 3;
+the corpus carries 81, 114 and 32 of each, so all three are live. Getting it
+wrong changes every displayed sum.
 
-- `76` Listing 2, the MSE-Lader. The disk ships `mse.prg`, the FINISHED
-  program; the print carries the BASIC loader that types it in, which the disk
-  does not. The transcription round-trips (its DATA bytes are `mse.prg`
-  itself), so it *could* be tokenised — and must not be. The reader already
-  gets `mse.prg` as a `binary_download` beside the listing.
-- `80` Listing 2, the Matrix-Editor erratum. An erratum's lines belong to the
-  program of the article it CORRECTS — here `Sonderheft 3/86` p57, which is not
-  imported. There is no `prg/` for it to point at in this issue or any other,
-  and inventing one in 8610 would file another issue's code under this one.
+**Prove it before you write it**, and say so in the report: the recomputed sums
+equal every printed one, and where the listing's DATA is a known binary, the
+bytes equal it. 8610's MSE-Lader satisfied all 107 printed `<nnn>`, all 86 of
+its own loader sums, and its DATA bytes equal `prg/mse.prg[$0801..$0EAB]`.
+
+**What stays inline** is what cannot be a disk file:
+
+- a PARTIAL listing — an erratum's corrected lines (8610's `80` Listing 2 is
+  lines 1390-1450 of a program printed in `Sonderheft 3/86`), a fragment quoted
+  inside prose;
+- a listing in no reconstructable format — a screen dump, Pascal source, an
+  assembler disassembly of in-ROM code, anything with no checksums to prove.
 
 ## Cropping listing regions from the page scan
 
