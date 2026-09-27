@@ -867,8 +867,40 @@ Grep for the caption / heading / header text you need, then crop:
 
 ```bash
 grep -iE "listing|tabelle|bild" <OUT_DIR>/blocks/p145.txt
-magick <SRC_DIR>/145.png -crop 2136x574+390+3736 +repage /tmp/64er_<YYMM>_crop.png
+magick <SRC_DIR>/145.png -crop 2136x574+390+3736 +repage <scratch>/crop.png
 ```
+
+> ### `text=` IS A 200-CHARACTER PREVIEW. A GREP MISS HERE IS NOT AN ABSENCE.
+>
+> `r010_blocks_index.py` writes `PREVIEW_CHARS = 200` of each block; `nw=` is
+> the block's REAL word count. MEASURED on 8611: **1923 of 6834 blocks are
+> truncated, and 104,726 words are in the OCR but not in this file** — a
+> quarter of the blocks and most of the text on any page with a long one.
+>
+> This bit on 8611 p097. The 1541 schematic's explanatory paragraph was OCR'd
+> into the diagram as one 331-word block; the index shows its first 200
+> characters, which are all component labels, so `grep Reparaturkurs` came
+> back empty and the paragraph was reported as never having been read. It had
+> been. It was 250 characters in.
+>
+> **The full text is `<OUT_DIR>/NNN.labels.json`.** Grep that when the answer
+> "it is not in the OCR" would change what you do:
+>
+> ```bash
+> $PY - <<'PYEOF'
+> import glob, json, sys
+> NEEDLE = "Reparaturkurs"
+> for f in sorted(glob.glob("<OUT_DIR>/*.labels.json")):
+>     for b in json.load(open(f, encoding="utf-8")).get("blocks", []):
+>         if NEEDLE.lower() in (b.get("text") or "").lower():
+>             print(f.split("/")[-1], b.get("id"), b.get("label"))
+> PYEOF
+> ```
+>
+> Rules that grep the index for CONTENT rather than for a bbox — r130's
+> caption search, r160's Pass 1 and Pass 3, r170's listing search, and this
+> recipe — are all subject to this. Use the index to find *where* something
+> is; use the JSON to decide whether it *exists*.
 
 **COORDINATE SPACE -- read before cropping.** The bboxes are in pixels of the
 graded **600 dpi master** (`SRC_DIR`), which is deskewed and cut to the
