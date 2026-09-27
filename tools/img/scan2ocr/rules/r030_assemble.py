@@ -606,7 +606,24 @@ def dehyphenate(articles):
         if not m:
             print(f"hyphens {i}: no JSON in reply, batch skipped", flush=True)
             continue
-        got = json.loads(m.group(0))
+        # MALFORMED json is the same case as no json, and used to be a
+        # different one: json.loads raised and killed the step, after the
+        # expensive boundary call had already been made and 20 other batches
+        # had already been answered.  MEASURED on 8611 -- the first batch of
+        # the run came back unparseable and cost a full re-run, and the input
+        # was not at fault (no broken word in the issue contains a quote or a
+        # backslash).  A skipped batch is not a loss: those words keep their
+        # U+00AC and the WARNING line below names every one of them.
+        try:
+            got = json.loads(m.group(0))
+        except json.JSONDecodeError as e:
+            print(f"hyphens {i}: malformed JSON ({e}), batch skipped",
+                  flush=True)
+            continue
+        if not isinstance(got, dict):
+            print(f"hyphens {i}: JSON is not an object, batch skipped",
+                  flush=True)
+            continue
         # Only answers to words that were asked about; a hallucinated key would
         # otherwise poison the cache for every later run.
         cache.update({k: v for k, v in got.items() if k in set(batch)})

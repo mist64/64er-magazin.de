@@ -6,7 +6,14 @@
 order, with its page range in the title — from the per-page corpus of step 020.
 This is the file step 040 onward operate on.
 
-This is a **program step** that makes exactly one model call for the whole issue.
+This is a **program step** that makes **two kinds** of model call: one for the
+article boundaries over the whole issue, and then one per batch of 200 distinct
+broken words for the dehyphenation — 21 batches on 8611's 4196 marks. The "one
+call" this used to claim was the boundary call only, and the difference matters
+when a reply comes back wrong: the boundary verdict is cached in
+`articles.json.boundaries` and survives a crash, a hyphen batch is not the whole
+step, and **a batch that cannot be parsed is skipped, not fatal**. Those words
+keep their `¬` and the WARNING line names every one.
 
 ## What only exists once the pages are back together
 
