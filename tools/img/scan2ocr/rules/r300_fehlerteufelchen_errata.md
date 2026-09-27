@@ -29,6 +29,18 @@ It may also record a repair we made to a `prg/*.txt` listing — 8406/117's says
 HTML* still holds: the page's error stays where the reader can see it, and the
 Futureteufelchen stands beside it saying what is actually true.
 
+**"The article text" includes its LISTINGS.** This is where the rule gets
+argued with, because replacing a wrong listing with the right one feels like
+repair rather than rewriting. It is rewriting. 8611 p78 prints a hex dump
+headed `Name : screencopy $cf11` under the caption *"Listing 1. RS232 mit
+4800 Bit/s. Bitte mit dem MSE eingeben."* — the wrong film went into that box
+in 1986 and the magazine never corrected it. A sub-agent placed the disk's
+correct RS232 program instead, marked `deviates from print, deliberately`,
+which is the natural engineering instinct and the wrong answer: the page
+printed Screencopy, so the article shows Screencopy, and the Futureteufelchen
+beside it carries the correction and the program that should have been there.
+A whole wrong listing is the same case as a wrong line, only larger.
+
 ### A FUTURETEUFELCHEN IS NEVER YOURS TO ADD — IT COMES FROM THE ISSUE OWNER
 
 **This section is knowledge, not a worklist.** A Fehlerteufelchen is mechanical:
