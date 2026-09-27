@@ -643,7 +643,16 @@ falls between rules:
    neuen Kleid" as p69 where the article is on p89, which only 220 can act
    on. Both went into `LOG.md` with the page and the evidence, at 080.
 
-   A finding carried in someone's head, or in a message, is a finding lost. At issue end,
+   A finding carried in someone's head, or in a message, is a finding lost.
+
+   **And `LOG.md` is git-ignored, so it does not reach the next issue.** It
+   is the audit trail for THIS build: what was found, what was decided, what
+   is still owed. A decision that will recur — the same judgement call the
+   next issue and the one after will face — belongs in the RULE, with the
+   issues that made it. 8609, 8610 and 8611 each resolved the
+   Wettbewerbe-versus-Listings category of a merged "Listing des Monats"
+   independently, from evidence, identically, because the answer lived only
+   in three ignored files. It is in `r100` now. At issue end,
    **every `LOG.md` "known gap" must be explicitly dispositioned**
    (fixed, or user-acknowledged as permanent) — a scope note like
    "out of table scope, not repaired" must not be the final word on a

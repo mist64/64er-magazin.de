@@ -203,6 +203,16 @@ PY
   one whose pages match the article's `<meta name="64er.pages">` content. (The
   commonest monthly instance: an "Anwendung des Monats" announcement filed under
   Wettbewerbe and the actual listing filed under Listings zum Abtippen.)
+
+  **After a step 080 merge, "pages match" no longer discriminates** — the
+  merged article covers both TOC entries. 8611: `50, 54-65` spans the
+  Wettbewerbe row at 50 and the Listings row at 54. **Take the Listings
+  one.** The announcement is a teaser for the piece; the piece is the
+  article, and the category follows the substance. Decided the same way on
+  8609 (`46 Vollgas`, `48 Bar-Codes`), 8610 (`51 Musik wie noch nie`,
+  `52 Sprache und Musik digitalisieren`) and 8611 — three issues resolving
+  it identically out of a per-issue `LOG.md`, which is **git-ignored**, so
+  each one re-derived it from scratch. A decision that recurs belongs here.
 - Articles **not in the printed TOC** (small fillers, walkthroughs)
   get the closest topical category that's already in `toc.txt`. Don't
   invent new categories — extend `toc.txt` first if you really need one.
