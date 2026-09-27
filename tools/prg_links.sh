@@ -168,7 +168,13 @@ echo "Generating HTML..." >&2
     for D64_FILE in "${D64_FILES[@]}"; do
         # Add comment with D64 filename
         echo ""
-        echo "<!-- $D64_FILE -->"
+        # PROVENANCE IS THE DIGEST, NOT THE PATH (r120).  Written here rather
+        # than added by hand afterwards: a re-run of this script regenerates
+        # prg.txt from scratch, so anything a human added is silently lost.
+        # 8610's provenance was a /private/tmp path that the cleaner deleted;
+        # 8611 re-applied its digests by hand after a tool fix, and said so.
+        echo "<!-- $(basename "$D64_FILE"): $D64_FILE"
+        echo "     sha256 $(shasum -a 256 "$D64_FILE" | cut -d' ' -f1)  $(stat -f%z "$D64_FILE" 2>/dev/null || stat -c%s "$D64_FILE") bytes -->"
         echo ""
 
         # Get the directory listing from c1541

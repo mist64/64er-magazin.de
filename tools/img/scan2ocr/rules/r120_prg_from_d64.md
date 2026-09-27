@@ -60,6 +60,16 @@ there, so the output (`prg/`, `prg.txt`) lands next to the issue's
 article files. The first comment line of `prg.txt` records the
 absolute path of each `.D64` consumed — keep that for provenance.
 
+**A RE-RUN REGENERATES `prg.txt` FROM SCRATCH.** Anything added to it by
+hand is lost — and this step's own remediations are exactly that. 8611 had
+to re-apply three of them after a fix to the extractor: the provenance
+digests, a dialect re-decode (`screentest` as 7.0), and a stub promotion
+(`sound-monitor` to raw binary). The digests are mechanical and the script
+writes them itself now. The other two are per-file judgements and cannot be,
+so **list every remediation in `LOG.md` as a re-apply checklist**, not as
+prose: a re-run after any tool change starts from the wrapper's output and
+walks that list.
+
 **A PATH IS NOT PROVENANCE. Record the sha256 beside it.** 8610's `prg.txt`
 opens `<!-- /private/tmp/64er_8610/disks/8610A.D64 -->`, and that file no
 longer exists: it sat in `/private/tmp`, which the macOS cleaner sweeps after
