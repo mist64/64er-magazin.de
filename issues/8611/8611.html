@@ -471,7 +471,7 @@ Frankfurter Allee 1—3, 6236 Eschborn</p>
 
 <p>Durch POKEn in das Kontrollregister 53272 ($D018 HEX) kann die Adresse des Bildschirmspeichers geändert werden. Dieses Register wird jedoch auch zur Steuerung des jeweils benutzten Zeichensatzes verwendet. Achten Sie daher besonders darauf, diesen Teil des Steuerregisters nicht zu stören. Die oberen 4 Bit steuern den Bildschirmspeicher. Um den Bildschirm in einen anderen Bereich zu legen, ist folgende Anweisung erforderlich:</p>
 
-<pre><code>POKE53272, (PEEK(53272) AND15)ORA  
+<pre><code>POKE53272, (PEEK(53272) AND15)ORA
 </code></pre>
 
 
@@ -497,13 +497,13 @@ Frankfurter Allee 1—3, 6236 Eschborn</p>
 
 <p>Es kann jedoch passieren, daß Sie das Zeichen-ROM benötigen, und zwar dann, wenn Sie programmierbare Zeichen benutzen wollen und eine Kopie eines Teils vom Zeichen-ROM für die Zeichendefinition brauchen. In diesem Fall müssen Sie das Ein/Ausgaberecister aus- und das Zeichen-ROM einschalten. Dann können Sie kopieren. Danach muß das Ein/Ausgaberegister erneut eingeschaltet werden. Während des Kopierens (bei ausgeschalteter Ein-/Ausgabe) sind keine Unterbrechungen erlaubt. Für werden nämlich die Ein/Ausgaberegister benötigt. Wenn Sie dies vergessen und eine Unvornehmen, passiert Unvorhersehbares. Die Tasteneingabe darf während des Kopierens nicht gelesen werden. Um die Tastatur und weitere normale Unterbrechungen abzuschalten, die mit dem C 64 möglich sind, benutzen Sie folUnterbrechungen terbrechung gende POKE-Anweisung:</p>
 
-<pre><code>POKE 56334, PEEK(56334) AND254 (Interrupt AUS)  
+<pre><code>POKE 56334, PEEK(56334) AND254 (Interrupt AUS)
 </code></pre>
 
 
 <p>Wenn Sie den Zugriff auf das Zeichen-ROM beendet haben, wird die Tastatur POKE- durch folgende Anweisung eingeschaltet: POKE 56334, PEEK(56334)OR1 (Interrupt EIN) Durch folgende POKE-Anweisung wird die Ein/Ausgabe ausgeschaltet und das Zeichen-ROM eingeschaltet:</p>
 
-<pre><code>POKE 1,PEEK(1)AND251  
+<pre><code>POKE 1,PEEK(1)AND251
 </code></pre>
 
 
@@ -541,30 +541,30 @@ Frankfurter Allee 1—3, 6236 Eschborn</p>
 
 <p>Nun wollen wir Grafikzeichen erstellen. Um Ihren Zeichensatz zu schützen, sollten Sie die Speicherkapazität für das Basic reduzieren. Der Speicher in Ihrem Computer bleibt unverändert. Sie haben lediglich dem Basic die Anweisung gegeben, einen bestimmten Teil nicht zu benutzen. Tippen Sie folgendes ein:</p>
 
-<pre><code>PRINT FRE(O)-(SGN(FRE(0)) &lt;0)*65535  
+<pre><code>PRINT FRE(O)-(SGN(FRE(0)) &lt;0)*65535
 </code></pre>
 
 
 <p>Die angezeigte Zahl gibt die unbenutzte Speicherkapazitätan. Geben Sie nun folgendes ein:</p>
 
-<pre><code>POKE 52,48:POKE56,48:CLR  
-Und nun:  
+<pre><code>POKE 52,48:POKE56,48:CLR
+Und nun:
 </code></pre>
 
 
-<pre><code>PRINT FRE(0)-(SGN(FRE(0)) &lt;0)*65535  
+<pre><code>PRINT FRE(0)-(SGN(FRE(0)) &lt;0)*65535
 </code></pre>
 
 
 <p>Sehen Sie die Änderung? Das Basic nimmt nun an, daß weniger Speicherkapazität zur Verfügung steht. In diesem gewonnenen Speicherplatz können Sie nun Ihren Zeichensatz unterbringen. Als nächstes sind die Zeichen im RAM zu definieren. Zu Beginn stehen ab 12288 (83000) zufällige Daten. Durch folgendes Programm werden 64 Zeichen vom ROM- in den RAM-Zeichensatz übertragen:</p>
 
-<pre><code>&gt; FRINIUHRSI LAE)  
-10 POKE52,48:POKE56,48:CLR 20 POKE56334,PEEK(56334)  
-AND254  
-30 POKE1,PEEK{1)AND251 40 FORI=0TO511:POKEI+12288,  
-PEEK (1453248) :NEXT  
-50 POKE1,PEEK(1)OR4  
-60 POKE56334,PEEK(56334)OR1 70 END  
+<pre><code>&gt; FRINIUHRSI LAE)
+10 POKE52,48:POKE56,48:CLR 20 POKE56334,PEEK(56334)
+AND254
+30 POKE1,PEEK{1)AND251 40 FORI=0TO511:POKEI+12288,
+PEEK (1453248) :NEXT
+50 POKE1,PEEK(1)OR4
+60 POKE56334,PEEK(56334)OR1 70 END
 </code></pre>
 
 
@@ -576,7 +576,7 @@ PEEK (1453248) :NEXT
 
 <p>Wird ein anderes Zeichen gewünscht, so ist vorher noch etwas zu berücksichtigen. Was ist zu tun, wenn Sie nun Zeichennummer 154, ein umgekehrtes Z, wünschen? Sie können daserreichen, indem Sie ein Z umkehren, oder Sie können den Satz der umgekehrten Zeichen aus dem ROM kopieren oder einfach daseine Zeichen aus dem ROM holen und ein nicht benötigtes Zeichen im RAM dadurch ersetzen. Nehmen wir an, Sie benötigen das Zeichen > nicht mehr. Dieses Zeichen soll also gegen das negativ dargestellte Zeichen Z ausgetauscht werden. Geben Sie folgendes ein:</p>
 
-<pre><code>FOR I=0 TO 7:POKE 12784 + 1,255-PEEK(I+12496) :NEXT  
+<pre><code>FOR I=0 TO 7:POKE 12784 + 1,255-PEEK(I+12496) :NEXT
 </code></pre>
 
 
@@ -594,13 +594,13 @@ PEEK (1453248) :NEXT
 
 <p>Zum Einschalten des Modus für mehrfarbige Zeichen wird Bit 4 des Steuerregisters durch folgende POKE-Anweisung bei 53270 ($D016) gesetzt:</p>
 
-<pre><code>POKE 53270, PEEK(53270)OR 16  
+<pre><code>POKE 53270, PEEK(53270)OR 16
 </code></pre>
 
 
 <p>Zum Abschalten dieser Betriebsart wird Bit 4 der gleichen Speicherzelle (53270) durch nachstehende POKE-Anweisung auf 0 gesetzt:</p>
 
-<pre><code>POKE 53270, PEEK (53270) AND 239  
+<pre><code>POKE 53270, PEEK (53270) AND 239
 </code></pre>
 
 
@@ -628,13 +628,13 @@ PEEK (1453248) :NEXT
 
 <p>Zum Einschalten des erweiterten Farbmodus wird Bit 6 des VIC-II-Registers mit der Adresse 53265 ($DO1l) auf l gesetzt. Dies geschieht durch folgende POKE-Anweisung:</p>
 
-<pre><code>POKE 53265, PEEK(53265)OR 64  
+<pre><code>POKE 53265, PEEK(53265)OR 64
 </code></pre>
 
 
 <p>weiterten Farbmodus wird Bit 6 des VIC-II-Registers mit der Adresse 53265 ($DO1) aufO gesetzt. Hierzu dient fol“enne Änweisunct</p>
 
-<pre><code>POKE 53265, PEEK(53265) AND 191  
+<pre><code>POKE 53265, PEEK(53265) AND 191
 </code></pre>
 
 
@@ -667,11 +667,11 @@ PEEK (1453248) :NEXT
 
 <p>Für diese komplexeren Aufgaben werden Variablen benötigt. Diese bezeichnen ein Datenfeld (Speicherbereich für bestimmte Daten), dem Werte oder Texte zugewiesen werden können, die sich ständig durch Ihre Eingabe oder den Programmablauf ändern. Um dieses Phänomen näher zu betrachten, sollte die Funktion der beiden Basic-Befehle INPUT und LET aus dem Handbuch entnommen werden. Man kann also einer Variablen einen beliebigen Wert zuweisen und mit dieser Variablen rechnen, Bildschirmausgaben gestalten oder die Variable, was immer als erstes erfolgen sollte, mit einem Wert belegen. Wie dasnun genau funktioniert? Anhand eines kleinen Beispielprogramms können Sie das selbst erforschen:</p>
 
-<pre><code>10 PRINT ”ERSTE ZAHL: ”; 20 INPUT E2%  
-30 PRINT ”ZWEITE ZAHL: ”; 40 INPUT ZZ  
-50 ERG = EZ% + ZZ  
-60 TEXT$ = ”ERGEBNIS” 70 PRINT: PRINT  
-80 PRINT TEXT$,ERG  
+<pre><code>10 PRINT ”ERSTE ZAHL: ”; 20 INPUT E2%
+30 PRINT ”ZWEITE ZAHL: ”; 40 INPUT ZZ
+50 ERG = EZ% + ZZ
+60 TEXT$ = ”ERGEBNIS” 70 PRINT: PRINT
+80 PRINT TEXT$,ERG
 </code></pre>
 
 
@@ -737,7 +737,7 @@ PEEK (1453248) :NEXT
 
 <p>Solleine softwaremäßig geschützte Diskette ventschärft« werden, taucht ein Problem auf. Es läßt sich ja absolut nichts mehr speichern beziehungsweise ändern. Man muß also das Betriebssystem der Floppy-Station davon überzeugen, daß das richtige Formatkennzeichen an der richtigen Stelle steht. Dazu existiert im Speicher der Floppy-Station eine Speicherzelle, in der nach jeder Initialisierung das aktuelle Formatkennzeichen gespeichert wird. Es handelt sich um die Speicherzelle $101. Wird in diese Speicherzelle mit dem Befehl</p>
 
-<pre><code>PRINT #15, ”M-W” CHRE(1)CHRE(L)CHR$(L)CHR$(65)  
+<pre><code>PRINT #15, ”M-W” CHRE(1)CHRE(L)CHR$(L)CHR$(65)
 </code></pre>
 
 
@@ -793,8 +793,8 @@ PEEK (1453248) :NEXT
 
 <p>95 END</p>
 
-<pre><code>100 FOR I=N+4 TO 140 STEP 4: PRINT#1,”"B-P”;2;1:  
-PRINT#2,CHR$(0): NEXT: RETURN  
+<pre><code>100 FOR I=N+4 TO 140 STEP 4: PRINT#1,”"B-P”;2;1:
+PRINT#2,CHR$(0): NEXT: RETURN
 </code></pre>
 
 
@@ -814,19 +814,19 @@ PRINT#2,CHR$(0): NEXT: RETURN
 
 <p>Eine Programmunterbrechung erreicht man durch Drücken einer beliebigen Taste. Weiter geht esbeieinem erneuten Druck auf eine Taste. Einen Programmabbruch erzielt man mit &lt;Q&gt;.</p>
 
-<pre><code>10 X=2048  
-20 Y=PEEK(X): IF Y&gt;64 AND Y&lt;91 THEN PRINT CHR$(Y):  
-GOTO 40  
-30 PRINT”.”;  
-40 X=X+1: GET R$: IF R$&lt;&gt;"" THEN 60  
-50 GOTO 20  
+<pre><code>10 X=2048
+20 Y=PEEK(X): IF Y&gt;64 AND Y&lt;91 THEN PRINT CHR$(Y):
+GOTO 40
+30 PRINT”.”;
+40 X=X+1: GET R$: IF R$&lt;&gt;"" THEN 60
+50 GOTO 20
 </code></pre>
 
 
-<pre><code>60 IF R$="Q” THEN END  
-70 GET Y$: IF Y$="" THEN 60  
-80 GOTO 20  
-(Peter Riedliberger/ah)  
+<pre><code>60 IF R$="Q” THEN END
+70 GET Y$: IF Y$="" THEN 60
+80 GOTO 20
+(Peter Riedliberger/ah)
 </code></pre>
 
 
@@ -886,7 +886,7 @@ GOTO 40
 
 <p>Wichtig ist, daß diese SYS-Zeile nach dem Schema Zeilennummer, Space, SYS-Befehl mit nachfolgender, in Klammern eingeschlossener, vierstelliger Zahl aufgebaut ist. anschließend führen Sie im Direktmodus folgende Befehlssequenz aus:</p>
 
-<pre><code>8=2297:A$+4STR$ (S) : FOR L=2 TO 5:POKE 2053+L,ASC(MID$(A$,L,1)):NEXT &lt;RETURN&gt;  
+<pre><code>8=2297:A$+4STR$ (S) : FOR L=2 TO 5:POKE 2053+L,ASC(MID$(A$,L,1)):NEXT &lt;RETURN&gt;
 </code></pre>
 
 
@@ -1717,12 +1717,12 @@ Schneider Elektronik, Siegenstr. 124, 4600 Dortmund 15</p>
 
 <p>Beim C 64 ist die Übertragung rein softwaremäßig geregelt. Er setzt dazu den CIA #2 ein. Dieser Baustein besitzt zwei 16-Bit-Intervall-Timer, die von einem bestimmten Wert auf Null zählen und dann einen NMI auslösen können. Dies nutzt die RS232-Schnittstelle aus. Die Software holt den Wert für den Timer B, der als Interruptgenerator dient, aus einer im ROM verankerten Tabelle. Es existieren hierzu zwei verschiedene Tabellen, aber dazu später mehr. Diese Werte werden in den Timer und in zwei Speicherstellen gebracht. Danach startet der Timer. Da beim C 64 das Senden und Empfangen über RS232 interruptgesteuert geschieht, werden zwei Puffer (Zwischenspeicher) benötigt. Einer der beiden Puffer steht für die zusendenden Daten bereit. Die Daten werden nur in den Puffer geschrieben. Das Senden geschieht mit Hilfe des NMI-Interrupts, weil man ihn (im Gegensatz zum IRQ) nicht sperren kann. So werden die Daten in jedem Fall gesendet, es sei denn, man stoppt den Timer oder verbiegt den NMI-Vektor. Da die Daten in den Puffer geschrieben werden und das Beschreiben des Puffers normalerweise schneller geht als das Senden der Zeichen, sollte man, nachdem ein Zeichen gesendet wurde, das nächste Zeichen vorbereiten und warten, bis der Puffer freiist. Nunkann das Zeichen problemlos in den Puffer geschrieben werden. Beachtet man dies nicht, könnte versehentlich ein noch nicht gesendetes Zeichen überschrieben werden. Die Folge wäre eine fehlerhafte Übertragung. Das Empfangen geschieht auf ähnliche Weise, denn die RDX-Leitung (hier gelangen die Daten vom anderen Computer zum C 64) ist nicht nur mit dem Port Bdes CIA #2 verbunden, sondern auch mit dem EingangFLAG derCIA, dereinen NMI auslösen kann. Das Empfangen geschieht also unabhängig vom Programm, daher werden die Daten in den Empfangspuffer geschrieben, der genauso groß ist wie der Sendepuffer: 256 Byte. Man sollte sich also darum kümmern, daß die Zeichen rechtzeitig aus dem Puffer gelesen werden. Durch die Kernelroutine READST, oder beim C 64 auch durch Auslesen der Speicherstelle $90, läßt sich der Status abfragen. Bei gesetztem Bit 2 liefder Empfangspuffer über. Umnunandere Übertragungsraten zu benutzen, könnten natürlich die Werte in den Timer und die entsprechenden Werte in die beiden Speicherstellen geschrieben werden. Dieshättenurden großen Nachteil, daß- die so erstellten Programme schwer an andere (Commodore-)Computer anzupassen wären, da diese nicht die gleichen Speicherstellen benutzen. Aber dies ist gar nicht nötig, denn es geht auch sehr viel eleganter! Die RS232-Schnittstelle öffneten wir bisher folgendermaßen:</p>
 
-<pre><code>lda #2 ;Logische Filenummer = 2  
-ldx #2 ;Gerätenummer der RS232  
-ldy #3 ;Sekundäradresse (ohne Funktion)  
-jsr setpar ;Werte setzen  
-lda #2 ;Länge des Filenamens  
-ldx #&lt;fadr ;Adresse des Filenamens (low)  
+<pre><code>lda #2 ;Logische Filenummer = 2
+ldx #2 ;Gerätenummer der RS232
+ldy #3 ;Sekundäradresse (ohne Funktion)
+jsr setpar ;Werte setzen
+lda #2 ;Länge des Filenamens
+ldx #&lt;fadr ;Adresse des Filenamens (low)
 </code></pre>
 
 
@@ -1740,9 +1740,9 @@ ldx #&lt;fadr ;Adresse des Filenamens (low)
 
 <p>Wie gesagt, das untere Nibble vom »Steuerregister« muß %0000 sein! Die Werte für »Übertragungsrate-low« und »Übertragungsrate-high« berechnet man wie folgt:</p>
 
-<pre><code>Übertragungsrate-high = INT(Prozessortakt/ Übertragungsrate/2-100)/256)  
-Übertragungsrate-low= INT(Prozessortakt/  
-Übertragungsrate/2-100-Übertragungsrate-highx256)  
+<pre><code>Übertragungsrate-high = INT(Prozessortakt/ Übertragungsrate/2-100)/256)
+Übertragungsrate-low= INT(Prozessortakt/
+Übertragungsrate/2-100-Übertragungsrate-highx256)
 </code></pre>
 
 
@@ -1754,50 +1754,50 @@ ldx #&lt;fadr ;Adresse des Filenamens (low)
 
 <p>Wir möchten ein sequentielles File mit 4800 bit/s, 7 Datenbits, 1 Stoppbit, 3-Line-Handshake und keiner Paritätsenden. Also: Zuerst dassequentielle File in den Speicher laden. Jetzt müssen wir noch die RS232-Schnittstelle öffnen, wobei wir auf die Abfrage auf PAL- oder NTSC-Version verzichten. Das Programm zum Öffnen ist bis auf den Filenamen und dessen Länge von dem altbekannten nicht zu unterscheiden.</p>
 
-<pre><code>lda #2 ;logische Filenummer = 2  
-ldx #2 ;Geraetenummer der RS232  
-ldy #3 ;Sekundaeradresse  
-jsr setlfs ;Werte setzen  
-lda #4 ;der Filename ist 2 Zeichen lang  
-ldx #(fadr ;Adresse des Filenamens (low)  
+<pre><code>lda #2 ;logische Filenummer = 2
+ldx #2 ;Geraetenummer der RS232
+ldy #3 ;Sekundaeradresse
+jsr setlfs ;Werte setzen
+lda #4 ;der Filename ist 2 Zeichen lang
+ldx #(fadr ;Adresse des Filenamens (low)
 </code></pre>
 
 
-<pre><code>ldy #)fadr ;(high)  
-jsr setnam ;Name für OPEN setzen  
+<pre><code>ldy #)fadr ;(high)
+jsr setnam ;Name für OPEN setzen
 </code></pre>
 
 
-<pre><code>jsr open ;Datei oeffnen  
-ldx #2 ;Datei mit der logischen Filenummer  
-jsr chkout ;#2 als Standardausgabegerät  
+<pre><code>jsr open ;Datei oeffnen
+ldx #2 ;Datei mit der logischen Filenummer
+jsr chkout ;#2 als Standardausgabegerät
 </code></pre>
 
 
 <p>Nun müssen Sie einen Zeiger auf den Anfang des in den Speicher geladenen sequentiellen Files setzen und die Pufferzeiger entsprechend ändern.</p>
 
-<pre><code>(Zeiger »pt« auf Dateianfang setzen)  
-sende ldy #0 ;aktuelles Zeichen aus dem lda (pt),y ;File in den Akku holen  
-(Zeichen nun bearbeiten, zum Beispiel in ASCII-Code  
+<pre><code>(Zeiger »pt« auf Dateianfang setzen)
+sende ldy #0 ;aktuelles Zeichen aus dem lda (pt),y ;File in den Akku holen
+(Zeichen nun bearbeiten, zum Beispiel in ASCII-Code
 </code></pre>
 
 
-<pre><code>wandeln)  
-tax ;Zeichen merken  
-wloop lda $02al ;ist das vorherige Zeichen  
-and #1 ;bereits gesendet worden?  
-bne wloop ;nein: =&gt;warten  
-txa ;gemerktes Zeichen zurueckholen  
+<pre><code>wandeln)
+tax ;Zeichen merken
+wloop lda $02al ;ist das vorherige Zeichen
+and #1 ;bereits gesendet worden?
+bne wloop ;nein: =&gt;warten
+txa ;gemerktes Zeichen zurueckholen
 </code></pre>
 
 
-<pre><code>jsr chrout ;auf. RS232 ausgeben  
+<pre><code>jsr chrout ;auf. RS232 ausgeben
 </code></pre>
 
 
 <p>Der Zeiger »PT« muß nun erhöht und auf Fileende getestet werden. Ist die Dateinoch nicht zu Ende, muß wieder zum Label SENDE gesprungen werden.</p>
 
-<pre><code>jsr elrchn ;Standardwerte Ein-/Ausgabe lda #2 ;setzen und Datei schließen  
+<pre><code>jsr elrchn ;Standardwerte Ein-/Ausgabe lda #2 ;setzen und Datei schließen
 </code></pre>
 
 
@@ -1891,10 +1891,10 @@ txa ;gemerktes Zeichen zurueckholen
 
 <p>Die Speicherstellen $D501 bis $D504 nennen sich PCRA bis PCRD. PCR heißt soviel wie programmierte Konfigurationsregister. Sie hängen sehr engmit den Speicherstellen $FF0Il bis $FFO4 zusammen, die LCRA bis LCRD heißen. LCR kommt von »Lade das Konfigurations-Register«. Der Bit-Aufbau dieser acht Register ist identisch mit demdesCR, daswirin der letzten Folge besprochen haben. Was haben sie für eine Wirkung und wie benutzt man sie? Nehmen wir einmal an, daß Sie im Rahmen eines Programmes vier verschiedene Speicherkonfigurationen brauchen:</p>
 
-<pre><code>Konfiguration CR-Inhalt dazu  
-1) Alles RAM (BANK 0)$3F (=00111111)  
-2) Alles RAM (BANK 1)$7F (=01111111)  
-3) Alles ROM + BANK O + Zeichen-ROM $01 (=00000001) 4) Alles ROM + BANK 1 + Zeichen-ROM $41 (=01000001)  
+<pre><code>Konfiguration CR-Inhalt dazu
+1) Alles RAM (BANK 0)$3F (=00111111)
+2) Alles RAM (BANK 1)$7F (=01111111)
+3) Alles ROM + BANK O + Zeichen-ROM $01 (=00000001) 4) Alles ROM + BANK 1 + Zeichen-ROM $41 (=01000001)
 </code></pre>
 
 
@@ -2342,17 +2342,17 @@ Diese Routine arbeitet mit dem Ka wird der Tastaturabfrage-Vektor ı</p>
 
 <p>Wußten Sie eigentlich, daß die Programmierung des Druckers fast noch mehr Spaß macht, als die Programmierung der Bildschirmausgabe? Alle Begrenzungen, an die man auf dem Bildschirm gebunden ist, sind auf einmal unwichtig. Horizontale Auflösungen bis zu 1920 Punkten und eine nahezu unbegrenzte vertikale Auflösung, wer will sogar in Farbe, mit beliebigen Farbpunkten nebeneinander und vieles mehr, sind doch Leistungen, die anspornen. Eslohnt sich also den Drucker zu anderem, als zum schnöden Anfertigen einer Hardcopy heranzuziehen. Denn wenn man schon für einen Drucker mehr als für den Computer bezahlt hat, dann sollte er sich auch auszahlen. Dazu braucht man in erster Linie die Grafikfähigkeit des Druckers. Doch Grafik ist nicht gleich Grafik. Der Epson FX-85 und der Seikosha MP 1300 AI besitzen zum Beispiel insgesamt sieben Grafikmodiund fünfverschiedene Grafikbefehle. Einer der interessantesten Grafikbefehle ist der ESC »*«-Befehl, den wir nun etwas genauer betrachten wollen. Mit diesem Befehl lassen sich nur durch Veränderung eines einzigen Parameters bis zu sieben verschiedene Grafikmodi einstellen. Der Befehl, so wie er im Handbuch steht, lautet dafür (im Commodore-Basic):</p>
 
-<pre><code>10 OPEN 1,4  
-20 PRINT#1,CHR$(27);”*”;  
-CHR$(m) ;CHR$(n1) ;CHR$(n2} an Mrrncom 4  
+<pre><code>10 OPEN 1,4
+20 PRINT#1,CHR$(27);”*”;
+CHR$(m) ;CHR$(n1) ;CHR$(n2} an Mrrncom 4
 </code></pre>
 
 
 <p>In Zeile 10 wird ein Kanal zum Drucker geöffnet. In Zeile 20 wird zunächst der Befehlsmodus (ESC=CHR$(@27) des Druckers aktiviert. Danach folgt der eigentliche Befehl, in diesem Fall »*«. Dieser Befehl erwartet zunächst eine Angabe, welchen der sieben Grafikmodi er verwenden soll. Dazu dient der Parameter »m«, derzwischen O0 und 6 liegen kann und dem Drucker mit dem CHR$-Befehl übermittelt wird. Die verschiedenen Grafikmodi finden Sie in der Tabelle. Soll zum Beispiel in vierfacher Dichte gedruckt werden, so hatm den Wert 3, der Befehl sieht dann wie folgt aus:</p>
 
-<pre><code>10 OPEN 1,4  
-20 PRINT#1,CHR$(27);”*”;  
-CHR$(3);CHR$({n1) ;CHR$(n2) N NTrHncT 4  
+<pre><code>10 OPEN 1,4
+20 PRINT#1,CHR$(27);”*”;
+CHR$(3);CHR$({n1) ;CHR$(n2) N NTrHncT 4
 </code></pre>
 
 
@@ -2627,8 +2627,8 @@ CHR$(3);CHR$({n1) ;CHR$(n2) N NTrHncT 4
 
 <p>Das Ergebnis steht dann in A, was durch »PRINT A« leicht zu kontrollieren ist. Auf die Startadresse eines Variablenwertes weist der Zeiger »FORPNT«. Um sicher zu gehen, daß er beiden manchmal reichlich unübersichtlichen Interpreter-Routinen nicht doch mal überschrieben wird, schieben wir seinen Inhalt auf den Stapel:</p>
 
-<pre><code>lda forpnt pha  
-lda forpnt+1 pha  
+<pre><code>lda forpnt pha
+lda forpnt+1 pha
 </code></pre>
 
 
@@ -2652,13 +2652,13 @@ lda forpnt+1 pha
 
 <p>Wir werden nun immer nur noch die Modulkerne besprechen. Da hatten wir es zuerst also mitdem Kern von BOG zu tun. BOG soll aus einem Winkel im Gradmaß das Bogenmaß berechnen. Nach dem Aktivieren der Erweiterung kann das Bogenmaß von 60 Grad im Direktmodus beispielsweise durch:</p>
 
-<pre><code>A=A:BOG,60:PRINT A  
+<pre><code>A=A:BOG,60:PRINT A
 </code></pre>
 
 
 <p>ermittelt werden. Unser Modul folgt der Umrechnungsformel:</p>
 
-<pre><code>Bogenmaß = Gradmaßx(/180)  
+<pre><code>Bogenmaß = Gradmaßx(/180)
 </code></pre>
 
 
@@ -2668,7 +2668,7 @@ lda forpnt+1 pha
 
 <p>Für die Umrechnung vom Bogen- in das Gradmaß gelten die gleichen Erläuterungen wie eben bei BOG: GRD leistet uns diesen Dienst nach der Gleichung:</p>
 
-<pre><code>Gradmaß = Bogenmaßx(180/T)  
+<pre><code>Gradmaß = Bogenmaßx(180/T)
 </code></pre>
 
 
@@ -2682,7 +2682,7 @@ lda forpnt+1 pha
 
 <p>Wieder haben wir einen Faktor vorliegen (nämlich 1/1n10, LOGFAK mit dem Wert 0,434294482), der als Fließkommazahl in der Konstantentabelle ab LOGFAK abgelegt ist. Diesmal wird aber nicht direkt der Wert im FAC mit der Konstanten multipliziert, sondern zuvor muß vom FAC-Inhalt noch der natürliche Logarithmus gebildet werden. Dazu verwenden wir — einfach durch den Routineaufruf mittels JSR — die Interpreterroutine LOG. Automatisch legt diese Routine den In des eingegebenen Wertes im FAC ab, wo wir damit dann genauso weiterverfahren wie bisher: Akku und Y-Register auf LOGFAK richten und FMULT aufrufen. Wie bentzt man DLGR? Hier ein Beispiel:</p>
 
-<pre><code>A=A:DLGR, Ausdruck: PRINT A  
+<pre><code>A=A:DLGR, Ausdruck: PRINT A
 </code></pre>
 
 
