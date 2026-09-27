@@ -28,13 +28,152 @@
 
         <figure>
             <pre data-filename="screencopy $cf11.prg" data-name="Screencopy $CF11" data-mse=mse1></pre>
-            <figcaption>Listing 1. »Screencopy« legt den Bildschirminhalt im StarTexter-Format auf Diskette ab. Bitte verwenden Sie zur Eingabe den MSE (Hinweise auf Seite 99).</figcaption>
+            <figcaption>Listing 1. »Screencopy« legt den Bildschirminhalt im StarTexter-Format auf Diskette ab. Bitte verwenden Sie zur Eingabe den MSE.</figcaption>
         </figure>
         <div class="binary_download" data-filename="screencopy $cf11.prg" data-name="Screencopy $CF11"></div>
         <div class="binary_download" data-filename="screencopy $c000.prg" data-name="Screencopy $C000"></div>
-        <!-- printed p172, not on the disk -- OCR pending (step 170) -->
+        <!-- printed p172, not on the disk; transcribed at 170 from masters600/172.png (part 1 crop 1350x950+330+5580, then columns 1450x4320+1740+3130 and 1500x4320+3170+3130); slashed zeros as 0. Proof: assembled with xa it equals prg/screencopy $c000.prg in 237 of 238 bytes; the one difference is line 1432 LDA #"_" ($C070: the disk has $DF, a plain "_" assembles to $5F); presumably the list printer's rendering of that character. Kept as printed. -->
         <figure>
-            <pre>TODO</pre>
+            <pre>10 SYS9*4096
+20 .OPT OO,P
+30 *= $C000
+201 ;
+210 FILPAR = $FFBA
+220 FILNAM = $FFBD
+230 OPEN   = $FFC0
+240 CLOSE  = $FFC3
+250 CHKOUT = $FFC9
+260 CHROUT = $FFD2
+350 CLRALL = $FFE7
+360 CLRCHN = $FFCC
+370 ;
+400 ;
+402 ;
+410 IRQVEC  = $0314
+420 SWITCH  = 56334
+430 IRQALT  = $EA31
+440 FLAGS   = 653
+450 HIBASE  = 648
+460 ZEIGER  = $F7
+470 CPUPORT = $01
+1001 ;
+1003 ; - BILDSCHIRM AUF FLOPPY ---------
+1004 ; -- KOPIEREN -- VERSION 1.2 ------
+1005 ; - (C) 1986 MARKT&amp;TECHNIK VERLAG -
+1006 ; -- WRITTEN BY MARTIN MUELLER ----
+1007 ;
+1010 SETIRQ    SEI
+1020           LDX #&lt;IRQ
+1030           LDY #&gt;IRQ
+1040           STX IRQVEC
+1050           STY IRQVEC + 1
+1060           CLI
+1062           LDA #"A"
+1064           STA NNAME
+1070           RTS
+1080 ;
+1200 IRQ       LDA FLAGS
+1210           EOR #%00000111
+1215           AND #%00000111
+1220           BEQ IRQWE1
+1230           JMP IRQALT
+1235 ;
+1240 IRQWE1    LDA SWITCH
+1242           AND #%11111110
+1244           STA SWITCH
+1246           LDA #1
+1250           LDX #8
+1260           LDY #1
+1270           JSR FILPAR
+1280           LDA #6
+1290           LDX #&lt;NAME
+1300           LDY #&gt;NAME
+1310           JSR FILNAM
+1320           JSR OPEN
+1322           LDX #1
+1324           JSR CHKOUT
+1332           LDA #&gt;16384
+1334           JSR CHROUT
+1336           LDA #&lt;16384
+1338           JSR CHROUT
+1342           LDA HIBASE
+1350           STA ZEIGER + 1
+1360           LDA #0
+1370           STA ZEIGER
+1372           LDA #25
+1374           STA ZEILEN
+1390 IRQL3     LDA #40
+1400           STA ZAEHLER
+1410 IRQL1     LDY #0
+1415           JSR ARAM
+1420           LDA (ZEIGER),Y
+1422           EOR #%10000000
+1424           STA (ZEIGER),Y
+1426           JSR AROM
+1428           CMP #32
+1430           BNE IRQW1
+1432           LDA #"_"
+1434           BNE IRQWE2
+1440 IRQW1     CMP #160
+1442           BEQ IRQWE2
+1454           EOR #%10000000
+1456           AND #%01111111
+1458           CMP #32
+1460           BCS ASCWE1
+1470           ORA #%01000000
+1480           JMP IRQWE2
+1490 ASCWE1    CMP #64
+1500           BCC IRQWE2
+1510           CMP #96
+1520           BCS ASCWE2
+1530           ORA #%10000000
+1540           JMP IRQWE2
+1550 ASCWE2    CLC
+1555           ADC #64
+1570 IRQWE2    JSR CHROUT
+1572           LDY #0
+1574           JSR ARAM
+1576           LDA (ZEIGER),Y
+1578           EOR #%10000000
+1580           STA (ZEIGER),Y
+1582           JSR AROM
+1584           INC ZEIGER
+1590           BNE IRQWE3
+1600           INC ZEIGER + 1
+1620 IRQWE3    DEC ZAEHLER
+1630           BNE IRQL1
+1650           LDA #40
+1660           STA ZAEHLER
+1670 IRQL2     LDA #32
+1680           JSR CHROUT
+1690           DEC ZAEHLER
+1700           BNE IRQL2
+1760           DEC ZEILEN
+1770           BNE IRQL3
+1790           JSR CLRCHN
+1800           LDA #1
+1810           JSR CLOSE
+1830           INC NNAME
+1840           LDA SWITCH
+1850           ORA #%00000001
+1860           STA SWITCH
+1870           JMP IRQALT
+1895 ;
+1900 ZAEHLER  .BYTE 0
+1910 ZEILEN   .BYTE 0
+1920 NAME     .ASC "BILD "
+1930 NNAME    .ASC "A"
+2000 ;
+2010 ARAM      SEI
+2020           LDX #52
+2030           STX CPUPORT
+2040           RTS
+2050 ;
+2060 AROM      LDX #55
+2070           STX CPUPORT
+2080           CLI
+2090           RTS
+READY.</pre>
             <figcaption>Listing 2. Assembler-Quellprogramm von »Screencopy« im Profi-Ass-Format</figcaption>
         </figure>
     </article>

@@ -199,9 +199,187 @@
             <figcaption>Listing 1. Eine interruptgesteuerte Mausabfrage</figcaption>
         </figure>
         <div class="binary_download" data-filename="maus-irq.prg" data-name="Maus-IRQ"></div>
-        <!-- printed p47 (commented disassembly), not on the disk -- OCR pending (step 170) -->
+        <!-- printed p47 (commented disassembly), not on the disk; transcribed at 170 from masters600/047.png, left column crop 2150x4680+320+2020, right column 2100x5470+2530+660 (block 126 "Source-Code (Schluß)"); no printed checksums, but all 116 code lines hex bytes equal maus-irq.prg ($c000-$c0f9, the Variablen $c042-$c046 are printed without bytes). Line 0c029 is printed twice, kept. -->
         <figure>
-            <pre>TODO</pre>
+            <pre>Beschreibung:
+-------------
+Diese Routine testet bei jedem k-ten Interrupt ob die Maus (Port 2)
+bewegt wird und aktualisiert die Koordinaten.
+
+Die Koordinaten werden mit Hilfe der usr-Funktion ausgelesen:
+usr(0)     0 &lt;= x-Koordinate &lt;= wählbare rechte Grenze      ($fa/$fb)
+usr(1)     0 &lt;= y-Koordinate &lt;= wählbare obere  Grenze      ($fc)
+usr(2)     1 = linke  Taste gedrückt, 0 sonst               ($fd)
+usr(3)     1 = rechte Taste gedrückt, 0 sonst               ($fe)
+Man kann die Koordinate vorbesetzen, indem man die gewünschten Werte nach
+der Initialisierung in die Register $fa-$fc poke't.
+
+Initialisiert wird die Routine mit
+
+      sys 49152 , &lt;rechte Grenze&gt; , &lt;obere Grenze&gt; , &lt;k&gt;
+
+wobei &lt;rechte Grenze&gt;   =  [1,...,319]
+      &lt;obere  Grenze&gt;   =  [1,...,199]
+      &lt;k&gt;               =  Decrement für Maus-Interupt   [1,...,15]
+                           Mit diesem Parameter läßt sich die Genauigkeit
+                           der Maus beeinflussen.
+
+
+Belegter Speicherplatz:
+-----------------------
+$00fa-$00fe    : Koordinaten und Flags
+$c000-$c041    : Initialisierung
+$c042-$c046    : Variablen
+$c047-$c0b8    : IRQ-Routine
+$c0b9-$c0f9    : usr-Funktion
+
+Programm:
+---------
+
+Initialisierung
+
+0c000  20 fd ae jsr $aefd    Test auf Komma
+0c003  20 8a ad jsr $ad8a    rechte Grenze lesen
+0c006  20 9b bc jsr $bc9b
+0c009  a5 65    lda $65      und merken
+0c00b  a6 64    ldx $64
+0c00d  8d 42 c0 sta $c042
+0c010  8e 43 c0 stx $c043
+0c013  20 f1 b7 jsr $b7f1    Test auf Komma und obere Grenze lesen
+0c016  8e 44 c0 stx $c044    und merken
+0c019  20 f1 b7 jsr $b7f1    Test auf Komma und IRQ-Decrement lesen
+0c01c  8e 45 c0 stx $c045    und merken
+0c01f  8e 46 c0 stx $c046
+0c022  a2 04    ldx #$04     Koordinaten löschen
+0c024  a9 00    lda #$00
+0c026  95 fa    sta $fa,x
+0c028  ca       dex
+0c029  10 fb    bpl $c026
+0c029  10 fb    bpl $c026
+0c02b  a9 47    lda #$47     IRQ-Zeiger setzen
+0c02d  a0 c0    ldy #$c0
+0c02f  78       sei
+0c030  8d 14 03 sta $0314
+0c033  8c 15 03 sty $0315
+0c036  58       cli
+0c037  a9 b9    lda #$b9     usr-Funktion-Zeiger setzen
+0c039  a0 c0    ldy #$c0
+0c03b  8d 11 03 sta $0311
+0c03e  8c 12 03 sty $0312
+0c041  60       rts
+
+Varaiblen
+
+0c042                        rechte Grenze low -Byte
+0c043                        rechte Grenze high-Byte
+0c044                        obere  Grenze
+0c045                        IRQ-Decrement
+0c046                        IRQ-Zähler
+
+IRQ
+
+0c047  ce 46 c0 dec $c046    IRQ-Zähler erniedrigen
+0c04a  d0 6a    bne $c0b6    wenn größer als null dann normalen IRQ
+0c04c  ad 45 c0 lda $c045    IRQ-Zähler setzen
+0c04f  8d 46 c0 sta $c046
+0c052  ad 00 dc lda $dc00    CIA Port A lesen
+0c055  4a       lsr          Maus nach oben ?
+0c056  b0 0b    bcs $c063    wenn nein dann Sprung
+0c058  e6 fc    inc $fc      y-Koordinate erhöhen
+0c05a  ae 44 c0 ldx $c044    mit oberer Grenze vergleichen
+0c05d  e4 fc    cpx $fc
+0c05f  b0 02    bcs $c063
+0c061  86 fc    stx $fc      wenn größer dann y-Koordinate = obere Grenze
+0c063  4a       lsr          Maus nach unten
+0c064  b0 06    bcs $c06c    wenn nein dann Sprung
+0c066  a6 fc    ldx $fc      y-Koordinate bereits null ?
+0c068  f0 02    beq $c06c
+0c06a  c6 fc    dec $fc      wenn nein dann erniedrigen
+0c06c  4a       lsr          Maus nach links ?
+0c06d  b0 0c    bcs $c07b    wenn nein dann Sprung
+0c06f  a6 fa    ldx $fa      wenn x-Koordinate größer als null
+0c071  d0 06    bne $c079    dann decrementieren
+0c073  a6 fb    ldx $fb
+0c075  f0 04    beq $c07b
+0c077  c6 fb    dec $fb
+0c079  c6 fa    dec $fa
+0c07b  4a       lsr          Maus nach rechts ?
+0c07c  b0 1a    bcs $c098    wenn nein dann Sprung
+0c07e  e6 fa    inc $fa      incrementieren
+0c080  d0 02    bne $c084
+0c082  e6 fb    inc $fb
+0c084  ac 43 c0 ldy $c043    wenn x-Koordinate größer als rechte Grenze
+0c087  ae 42 c0 ldx $c042    dann auf rechte Grenze setzen
+0c08a  c4 fb    cpy $fb
+0c08c  90 06    bcc $c094
+0c08e  d0 08    bne $c098
+0c090  e4 fa    cpx $fa
+0c092  b0 04    bcs $c098
+0c094  86 fa    stx $fa
+0c096  84 fb    sty $fb
+0c098  4a       lsr          linke Maus-Taste gedrückt ?
+0c099  b0 04    bcs $c09f    wenn nein dann Sprung
+0c09b  a9 01    lda #$01     Flag setzen
+0c09d  85 fd    sta $fd
+0c09f  a9 80    lda #$80     rechte Maus-Taste gedrückt ?
+0c0a1  8d 00 dc sta $dc00
+0c0a4  a2 00    ldx #$00
+0c0a6  e8       inx
+0c0a7  d0 fd    bne $c0a6
+0c0a9  ad 19 d4 lda $d419
+0c0ac  10 03    bpl $c0b1
+0c0ae  e8       inx          wenn ja dann Flag setzen
+0c0af  86 fe    stx $fe
+0c0b1  a9 7f    lda #$7f
+0c0b3  8d 00 dc sta $dc00
+0c0b6  4c 31 ea jmp $ea31    reguläre IRQ-Routine fortsetzen
+
+usr-Funktion
+
+0c0b9  20 9b bc jsr $bc9b    Index holen
+0c0bc  a5 64    lda $64      wenn Index &gt; 255 dann Fehler
+0c0be  d0 0d    bne $c0cd
+0c0c0  a6 65    ldx $65
+0c0c2  f0 0c    beq $c0d0    Index = 0 ?
+0c0c4  ca       dex
+0c0c5  f0 17    beq $c0de    Index = 1 ?
+0c0c7  ca       dex
+0c0c8  f0 22    beq $c0ec    Index = 2 ?
+0c0ca  ca       dex
+0c0cb  f0 26    beq $c0f3    Index = 3 ?
+0c0cd  4c 48 b2 jmp $b248    sonst 'illegal quality error' ausgeben
+
+usr(0)
+
+0c0d0  a5 fa    lda $fa      x-Koordinate lesen
+0c0d2  85 63    sta $63
+0c0d4  a5 fb    lda $fb
+0c0d6  85 62    sta $62
+0c0d8  a2 90    ldx #$90
+0c0da  38       sec
+0c0db  4c 49 bc jmp $bc49    ins FAC bringen und usr beenden
+
+usr(1)
+
+0c0de  a9 00    lda #$00     y-Koordinate lesen
+0c0e0  85 62    sta $62
+0c0e2  a5 fc    lda $fc
+0c0e4  85 63    sta $63
+0c0e6  a2 90    ldx #$90
+0c0e8  38       sec
+0c0e9  4c 44 bc jmp $bc44    ins FAC bringen und usr beenden
+
+usr(2)
+
+0c0ec  a5 fd    lda $fd      Flag für linke Taste lesen
+0c0ee  46 fd    lsr $fd      Flag löschen
+0c0f0  4c 3c bc jmp $bc3c    ins FAC bringen und usr beenden
+
+usr (3)
+
+0c0f3  a5 fe    lda $fe      Flag lesen
+0c0f5  46 fe    lsr $fe      Flag löschen
+0c0f7  4c 3c bc jmp $bc3c    ins FAC bringen und usr beenden</pre>
             <figcaption>Listing 2. Der Source-Code zu Listing 1</figcaption>
         </figure>
         <figure>
