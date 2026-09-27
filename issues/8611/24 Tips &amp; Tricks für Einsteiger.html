@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Einsteiger</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bruno Henze, ah, Daniel Wicker, ah, Frank Besler, ah, Harald Wengner, ah, K. Deisenhofer, ah, Tobias Wörmann, ah">
+    <meta name="64er.issue" content="11/86">
+    <meta name="64er.pages" content="24-25">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX6">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Einsteiger</h1>
+        <p class="intro">Diesmal beschäftigen wir uns mit dem Eingabehilfe für DATA-Zeilen und einem Programm, das beliebige Texte in Abenteuerspielen aufspürt.</p>
+
+        <p>h st es Ihnen nicht auch schon einmal passiert: Sie haben in mühevoller Kleinarbeit eine Diskette mit allen wichtigen</p>
+
+        <p>Programmen zusammengestellt, und wie es der Zufall will, plötzlich befinden sich durch falsche Eingabe Files auf der Diskette, die nicht dort hingehören oder die Diskette ist neu formatiert. Gut, Files lassen sich löschen. Mit einer neu formatierten Diskette sieht das schon anders aus. Die aufihr gespeicherten Programme sind verloren.</p>
+
+        <p>Der mechanische Schreibschutz (Aufkleber) ist auch nicht der Weisheit letzter Schluß, um solchen Zufällen zu begegnen. Wenn häufiger Daten auf der Diskette geändert werden sollen, muß der Schreibschutz jedesmal entfernt und nach erfolgreicher Änderung wieder angebracht werden. Um diesen mechanischen Schreibschutz zu umgehen, kann eine Diskette auch softwaremäßig geschützt werden (Listing ]). Wie das funktioniert, soll kurz erklärt werden.</p>
+
+        <p>Auf der Diskette ist im 2. Byte auf Spur 18 Sektor O0 das Formatkennzeichen der 1541 gespeichert und zwar die Zahl $41. Wird in dieses Byte eine andere Zahl geschrieben (miteinem Disketten-Monitor), so funktioniert das Beschreiben einer Diskette nur so lange, bis die Floppy-Station neu initialisiert wird (zum Beispiel aus- und wieder einschalten). Wird jetzt versucht, ein Programm oder Daten zu speichern, meldet die Floppy-Station einen Formatfehler und nichts geht mehr. Dieser Software-Schutz funktioniert auch dann, wenn versucht wird, die Diskette mit</p>
+
+        <p>OPEN 15,8,15, "N: TEST" zu formatieren. Dasheißt, formatiert wird die Diskette mit dieser Befehlssequenz eigentlich nicht. Es wird nur das Inhaltsverzeichnis und ein Diskettenbereich (BAM) gelöscht, der Informationen darüber enthält, welche Diskettenblöcke belegt sind und welche nicht. Dieser Vorgang nennt sich auch »weich formatieren«.</p>
+
+        <p>Solleine softwaremäßig geschützte Diskette ventschärft« werden, taucht ein Problem auf. Es läßt sich ja absolut nichts mehr speichern beziehungsweise ändern. Man muß also das Betriebssystem der Floppy-Station davon überzeugen, daß das richtige Formatkennzeichen an der richtigen Stelle steht. Dazu existiert im Speicher der Floppy-Station eine Speicherzelle, in der nach jeder Initialisierung das aktuelle Formatkennzeichen gespeichert wird. Es handelt sich um die Speicherzelle $101. Wird in diese Speicherzelle mit dem Befehl</p>
+
+        <pre><code>PRINT #15, "M-W" CHRE(1)CHRE(L)CHR$(L)CHR$(65)
+</code></pre>
+
+
+        <p>(Zeile 100) wieder das 1541 Formatkennzeichen ($41 beziehungsweise 65 oder A) geschrieben, läßt sich die Diskette wieder ganz normal beschreiben. Unter anderem kann nun auch wieder das Formatkennzeichen auf der Diskette geändert werden.</p>
+
+        <address class="author">(Bruno Henze/ah)</address>
+
+        <h2>DATA Eingabehilfe</h2>
+
+        <p>Das kleine Programm ist eine Hilfe zum Eintippen von DATAs. In Zeile 1 wird nach der Startzeilennummer gefragt, ab der die DATAs beginnen und in welcher Schrittweite die Zeilennummer erhöht werden soll.</p>
+
+        <p>Nachdem das Programm mit RUN gestartet und die beiden Parameter eingegeben wurden, erscheinen 20 Zeilen mitder gewünschten Startzeilennummer und dahinter das Wort »DATA«.</p>
+
+        <p>Diese Zeilen können nun editiert werden.</p>
+
+        <p>Das Programm läßt sich beliebig verändern. Statt DATA kann man auch PRINT oder ähnliches einsetzen. 1 INPUT "STARTZEILENNUMMER" ;X: INPUT "SCHRITTWEITE" ;Y: FOR Z=1 TO 20</p>
+
+        <p>2 PRINT X "DATA": X=X4Y: NEXT:PRINT " [HOME}[CRSR DOWN} " : END</p>
+
+        <address class="author">(Frank Besler/ah)</address>
+
+        <h2>8925 Blocks free</h2>
+
+        <p>Das nun folgende kleine Programm wird Sie verblüffen. Mit ihm läßt sich beim LISTen des Directory (Inhaltsverzeichnis) die Meldung »8925 BLOCKS FREE« erzeugen. Frei sind natürlich nur 664 Blocks. Das Programm schreibt einfach so oft 255 in die BAM (Block Availability Map oder Blockbelegungsplan), bis die gewünschte Zahl erreicht ist. Alle auf der Diskette gespeicherten Programme können problemlos geladen werden. Speichern sollte man auf dieser Diskette jedoch nichts mehr, es Sei denn, Sie haben vorher den Befehl</p>
+
+        <p>OPEN 15,8,15,"V" &lt;RETURN&gt; eingegeben.</p>
+
+        <p>10 INPUT "WIEVIELE BLOCKS FREE" ;B</p>
+
+        <p>13 IF B>8925 THEN 10</p>
+
+        <p>15 HI=INT(B/255): LO=B-HI*255</p>
+
+        <p>20 OPEN 1,8,15, "IO": OPEN 2,8,2,"#" 25 PRINT#1, "U1";2;0;18;0</p>
+
+        <p>27 IF HI&lt;1 THEN N=4: GOTO 60</p>
+
+        <p>30 FOR N=4 TO (HI+1)*4 STEP 4</p>
+
+        <p>40 PRINT#1,"B-P";2;N</p>
+
+        <p>45 PRINT#2,CHR$(255)</p>
+
+        <p>50 NEXT</p>
+
+        <p>60 IF N&lt;144 THEN PRINT#1,"B-P";2;N 70 IF N&lt;144 THEN PRINT#2,CHR$(LO)</p>
+
+        <p>75 IF N&lt;136 THEN GOSUB 100</p>
+
+        <p>80 PRINT#1, "U2";2;0;18;0</p>
+
+        <p>90 CLOSE 2: PRINT#1,"IO": INPUT#1,A,A$,B,C: PRINT A,A$,B,C: CLOSE 1</p>
+
+        <p>95 END</p>
+
+        <pre><code>100 FOR I=N+4 TO 140 STEP 4: PRINT#1,""B-P";2;1:
+PRINT#2,CHR$(0): NEXT: RETURN
+</code></pre>
+
+
+        <address class="author">(Tobias Wörmann/ah)</address>
+
+        <h2>Adventurelister</h2>
+
+        <p>Kommt manbei Abenteuerspielen (Adventures) nicht mehr weiter, bietet es sich an, die Texte zu untersuchen. Als Werkzeug könnte zum Beispiel ein Maschinensprachemonitor (SMON) dienen. Aber Basic-Programmierer können mit solchen Werkzeugen für Assemblerfreaks recht wenig anfangen. Daher wurde ein Basic-Programm entwickelt, das die Texte in Adventures suchtund aufdem Bildschirm ausgibt. So wird das Programm gehandhabt:</p>
+
+        <ol>
+            <li>
+                <p>Adventure laden</p>
+            </li>
+            <li>
+                <p>Reset-Knopf drücken (siehe Ausgabe 6/85)</p>
+            </li>
+            <li>
+                <p>Programm »Adventurelister« abtippen oder von Diskette beziehungsweise Kassette laden</p>
+            </li>
+            <li>
+                <p>RUN &lt;RETURN&gt; eingeben</p>
+            </li>
+        </ol>
+
+
+        <p>Eine Programmunterbrechung erreicht man durch Drücken einer beliebigen Taste. Weiter geht esbeieinem erneuten Druck auf eine Taste. Einen Programmabbruch erzielt man mit &lt;Q&gt;.</p>
+
+        <pre><code>10 X=2048
+20 Y=PEEK(X): IF Y&gt;64 AND Y&lt;91 THEN PRINT CHR$(Y):
+GOTO 40
+30 PRINT".";
+40 X=X+1: GET R$: IF R$&lt;&gt;"" THEN 60
+50 GOTO 20
+</code></pre>
+
+
+        <pre><code>60 IF R$="Q" THEN END
+70 GET Y$: IF Y$="" THEN 60
+80 GOTO 20
+(Peter Riedliberger/ah)
+</code></pre>
+
+
+        <h2>Der kleinste Sprite-Editor</h2>
+
+        <p>Mit diesem Zweizeiler läßt sich ein Sprite entwerfen. Die Sprite-Daten werden dabei automatisch auf dem Bildschirm ausgegeben.</p>
+
+        <p>Wenn das Programm geladen beziehungsweise abgetippt worden ist, darf es zunächst nicht mit RUN &lt;RETURN&gt; gestartet werden. Zuerst ist im Direktmodus mit der &lt;SHIFT+CLEAR/HOME&gt; Taste der Bildschirm zu 1öschen. Jetzt kann, angefangen in der linken oberen Bildschirmecke, das Sprite entworfen werden:</p>
+
+        <p>&lt;*> setzt einen Punkt</p>
+
+        <p>&lt;SPACE&gt; löscht beziehungsweise überspringt einen Punkt</p>
+
+        <p>Das Eingabefeld hat eine Größe von 21 Spalten und 24 Zeilen.</p>
+
+        <p>Sind Sie mit Ihrem Kunstwerk zufrieden und wollen die Sprite-Daten ausgeben, ist der Cursor am Änfang der vorletzten Bildschirmzeile zu positionieren.</p>
+
+        <p>RUN &lt;RETURN&gt; an dieser Stelle startet schließlich den Sprite-Editor, der die Daten errechnet und auf dem Bildschirm ausgibt.</p>
+
+        <p>1 FOR I=0 TO 2: A=0: FOR N=0 TO 7: AsA-21(7-N)*</p>
+
+        <p>(PEEK (10244+1%8) = 42): NEXT</p>
+
+        <p>2 PRINT A;: NEXT: PRINT: X=X+1: IF X&lt;21 THEN 1</p>
+
+        <address class="author">(Daniel Wicker/ah)</address>
+
+        <h2>Druckersequenzen</h2>
+
+        <p>Möchte man seinen Epson-kompatiblen Drucker dazu bewegen von nun an alles zu unterstreichen, ist nach dem entsprechenden OPEN- und PRINT-Befehl folgende Befehlssequenz erforderlich:</p>
+
+        <p>CHR$(27)" - "CHR$(49)</p>
+
+        <p>Man muß also für diese Sequenz insgesamt 19 Tasten drücken.</p>
+
+        <p>Es geht aber auch einfacher und platzsparender. Der Basic-Interpreter erlaubt es uns nämlich, die Anzahl der zu drückenden Tasten im Gänsefußmodus auf drei zu reduzieren. &lt;SHIFT+CTRL+:&gt;+&lt;1></p>
+
+        <p>Dabei steht &lt;SHIFT+CTRL+:&gt;für CHR$(27) und &lt;1>für CHR$(49).</p>
+
+        <p>Diese Methode läßt sich natürlich auch auf andere Steuerzeichen anwenden.</p>
+
+        <p>Aus einer einfachen Beziehung heraus kann man sich die Tastenkombinationen errechnen, um die Codes 1 bis 26 zu senden.</p>
+
+        <p>Zuvor muß jedoch gesagt werden, daß sich diese Methode nicht auf die Codes 0, 13 und 20 anwenden läßt.</p>
+
+        <p>Die Stelle, die ein Buchstabe im Alphabet einnimmt (zum Beispiel B=2)ergibt den gewünschten Code, wenn der Buchstabe zusammen mit der &lt;SHIFT&gt;-und &lt;CTRL&gt;-Taste gedrückt wird.</p>
+
+        <p>Das kleine Beispielprogramm (Listing 2) veranlaßt einen FX-80, Text in der kleinstmöglichen Schrift mit angepaßtem Zeilenabstand auszugeben.</p>
+
+        <address class="author">(Harald Wengner/ah)</address>
+
+        <h2>SYS-Zeile für Basic-Programme</h2>
+
+        <p>Geben Sie zunächst NEW &lt;RETURN&gt; ein, um ein eventuell gespeichertes Basic-Programm zu löschen. Im nächsten Schritt läßt sich die SYS-Zeile eingeben, die ungefähr so aussehen könnte:</p>
+
+        <p>1986 SYSU11)"64'er" &lt;RETURN&gt;</p>
+
+        <p>Wichtig ist, daß diese SYS-Zeile nach dem Schema Zeilennummer, Space, SYS-Befehl mit nachfolgender, in Klammern eingeschlossener, vierstelliger Zahl aufgebaut ist. anschließend führen Sie im Direktmodus folgende Befehlssequenz aus:</p>
+
+        <pre><code>8=2297:A$+4STR$ (S) : FOR L=2 TO 5:POKE 2053+L,ASC(MID$(A$,L,1)):NEXT &lt;RETURN&gt;
+</code></pre>
+
+
+        <p>Mit dernächsten Zeile, die ebenfalls im Direktmodus einzugebenist, legen Sie ein winziges Maschinenprogramm an die Startadresse:</p>
+
+        <p>POKE S,169:POKE S + 1,9:POKE S + 2,133:POKE S + 3,44:POKE S+4,76:POKE S+5,142:POKE S+6,166 &lt;RETURN&gt;</p>
+
+        <p>Nun läßt sich nach dem Hochsetzen der Basic-Startadresse mit den drei Befehlen</p>
+
+        <p>POKE 44,9:POKE 2304,0:NEW &lt;RETURN&gt; ein Basic-Programm laden oder eingeben. Ist das geschehen, müssen Sie das Programm mit der Zeile POKE 44,8:SAVE"name" geräteadresse &lt;RETURN&gt; speichern. In Zukunft ist Ihr Basic-Programm vor Neugierigen sicher (bei LIST erscheint nur die SYS-Zeile).</p>
+
+        <address class="author">(K. Deisenhofer/ah)</address>
+    </article>
+</body>
+
+</html>

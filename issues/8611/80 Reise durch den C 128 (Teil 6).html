@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Reise durch den C 128 (Teil 6)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, dm">
+    <meta name="64er.issue" content="11/86">
+    <meta name="64er.pages" content="80, 82, 84">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX21">
+</head>
+
+<body>
+    <article>
+        <h1>Reise durch den C 128 (Teil 6)</h1>
+        <p class="intro">VDC und MMU — zwei interessante und wichtige Bausteine im C 128. Wie kann der Bildaufbau mit den VDC-Registern beeinflußt werden?</p>
+
+        <p>nser Korrespondent wurde leider im letzten Teil ziemlich abrupt unterbrochen. Deshalb folgt hier zunächst die nahtlose Fortsetzung des 5. Teils aus Ausgabe 10/86.</p>
+
+        <p>Die Speicherstellen $D501 bis $D504 nennen sich PCRA bis PCRD. PCR heißt soviel wie programmierte Konfigurationsregister. Sie hängen sehr engmit den Speicherstellen $FF0Il bis $FFO4 zusammen, die LCRA bis LCRD heißen. LCR kommt von »Lade das Konfigurations-Register«. Der Bit-Aufbau dieser acht Register ist identisch mit demdesCR, daswirin der letzten Folge besprochen haben. Was haben sie für eine Wirkung und wie benutzt man sie? Nehmen wir einmal an, daß Sie im Rahmen eines Programmes vier verschiedene Speicherkonfigurationen brauchen:</p>
+
+        <pre><code>Konfiguration CR-Inhalt dazu
+1) Alles RAM (BANK 0)$3F (=00111111)
+2) Alles RAM (BANK 1)$7F (=01111111)
+3) Alles ROM + BANK O + Zeichen-ROM $01 (=00000001) 4) Alles ROM + BANK 1 + Zeichen-ROM $41 (=01000001)
+</code></pre>
+
+
+        <p>Nun könnten Sie natürlich jedesmal, wenn es soweit ist, den jeweiligen Code nach $FF00 schreiben. Das wäre aber überflüssige Arbeit, denn es gibt die andere Möglichkeit: Schreiben Sie zu Beginn Ihres Programms all diese verschiedenen Speichercodesin die PCR-Register, also beispielsweise den, der zur ersten Konfiguration gehört in PCRA, den der zur zweiten gehört in PCRB und so weiter. Wenn nun eine bestimmte Speichergruppierung erforderlich ist, schreiben Sie irgendeinen Wert in das dazugehörige LCR. Das ist nämlich der Trick: Sobald man beispielsweise ins LCRA irgend etwas schreibt, dann wird automatisch der Inhalt des PCRA ins CR geschrieben. Das bedeutet, daß die neue Speicherkonfiguration aktiviert ist. Versucht man dagegen die LCRs zu lesen, dann erhält man statt des LCR-Inhaltes den Inhalt des dazu korrespondierenden PCR. Die oben verwendeten Beispiele stammen übrigens aus unserem Computer: Sehen Sie sich mal nach dem Einschalten mit dem Monitor die LCRs an.</p>
+
+        <p>Die LCRs sind bei jeder Speicherkonfiguration ebenso erreichbar wie das CR bei $FF00.</p>
+
+        <p>Bisher hatten alle Register einen Verwandten im oberen Speicher-Bereich. Das ändert sich nun: Die folgenden existierennurnochimunteren MMU-Teil. Dakommt alsnächstes das MCR, also das Modus-Konfigurations-Register ins Spiel. In Bild 1 sehen Sie, wie es aufgebaut ist:</p>
+
+        <p>Bit 0 bietet eine Möglichkeit, den Computer auf den Z80-Betrieb umzustellen. Man muß dazu nur dieses Bit 1löschen. Allerdings wird der Computer dann abstürzen, weil er keinen gültigen Z80-Code vorfindet. Wennmanabereinen Weg dazu findet, diesen griffbereit zu halten, dann könnte man den C 128 als Z80-Computer arbeiten lassen.</p>
+
+        <p>Bit 1 und 2 werden noch nicht genutzt.</p>
+
+        <p>Bit3hatmitdemschnellen seriellen Daten-Transportzutun.</p>
+
+        <p>Bit 4 und 5 zeigen an, ob die beiden Leitungen GAME und EXROM belegt sind, sich also ein Steckmodul im Expansion-Port befindet. Ist das der Fall, dann wird der C 64-Modus aktiviert. C 128-Module benutzen diese Leitungen nicht. Beide Leitungen können aber auch als Ausgang (statt wie eben auf Eingang) betrieben werden. In diesem Fall haben sie mit der Verwaltung der Farb-RAM-BANK zu tun. Bit 6 zeigt an, welche Betriebsart aktiv ist: 0 = C 128-Modus 1 = C 64-Modus Bit 7schließlich gibt den Zustand der &lt;40/80-Display >-Taste an:</p>
+
+        <p>0 = Taste gedrückt 1 = Taste frei</p>
+
+        <p>Im Abschnitt über den VIC war es schon angedeutet worden: Es gibt eine Möglichkeit inden MMU-Registern, den Zugriff des VIC auf BANK 1 zu richten. Dazu dient das RCR (RAM-Konfigurations-Register). Einen Überblick über die Möglichkeiten zeigt Bild 2:</p>
+
+        <p>Sie sehen, daß außer dem VIC-Zugriff auch die Organisation der Common Areas hier geschieht.</p>
+
+        <p>BitOundl</p>
+
+        <p>Hier wird die Größe der Common Area definiert. Sie muß also keineswegs — wie im Einschaltzustand — immer 1 KByte betragen. 00 = 1 KByte 10 = 8 KByte 01 = 4 KByte ll = 16 KByte Bit 2 und 3 Auch die Lage dieser Bereiche kann verändert werden: 00 = Keine Common Areal</p>
+
+        <p>01 = Der gemeinsame Speicher liegt im unteren RAM-Bereich, also am Speicheranfang. Dasist der Normalzustand. 10 = In dieser Konfiguration liegt die definierte Common Area am Speicherende.</p>
+
+        <p>ll = Der gemeinsame Speicherbereich wird aufgeteilt: ein Teil befindet sich am Anfang, der andere am Ende des Speichers.</p>
+
+        <p>Bit 4und 5</p>
+
+        <p>Diese beiden Bits sind noch ungenutzt. Es wird daran gedacht, sie für Blockzugriffe zu verwenden. Jeder Block hätte in dem Fall 256 KByte an Speicherinhalt. Dann würden durch die vier verschiedenen Bitkombinationen insgesamt 1 MByte RAM adressierbar werden.</p>
+
+        <p>Bit6und 7</p>
+
+        <p>Da haben wir die VIC-Bankzeiger. In der vorliegenden Version des C 128 spielt lediglich das Bit 6 eine Rolle: X0 = Der VIC greift auf die BANK 0 zu</p>
+
+        <p>X1 = BANK 1 steht dem VIC offen! Alles, was Sie im Abschnitt über den VIC erfahren, läßtsich nun aufdiese BANK übertragen. Die Anzahl der möglichen Bildschirmspeicher, Bit-Maps und Zeichen-RAMs kann verdoppelt werden.</p>
+
+        <p>Die Variationsbreite unseres Computers ist durch die bisher kennengelernten MMU-Register schon sehr breit. Jetzt kommt es aber noch besser. Die Register $D507 bis $D50A können nämlich die Zeropage und den Prozessorstapel verlegen! Zwar ist das vor allem für System-Programmierer interessant, aber häufig werden gerade Grafikprogramme in Assembler geschrieben. Außerdem kommt es meist besonders bei der Grafikprogrammierung auf Geschwindigkeit an.</p>
+
+        <p>Wie funktioniert das? Natürlich kann an dieser Stelle nur das Prinzip erklärt werden, mehr darüber sollte in der Assembler-Literatur erscheinen. Übrigens haben allem Anschein nach die Hersteller der Firmware des C 128 diese Möglichkeit nicht genutzt! Nun zum Prinzip. POL ($D507) und POH ($D508) sind die Page-Zeiger für eine neue Zeropage. In POL dienen die Bits 0 bis 7 zum Einschreiben der Page in einer BANK, die nun Zeropage werden soll. Die Nummer der BANK gelangt in POH. Dafür sind dort die Bits 0 bis 3 vorgesehen. Die Bits 4 bis 7 werden nicht benutzt und sind immer 1. Im Einschaltzustand befindet sich im POL der Wert 0 (Page 0 ist dann die Zeropage), im POH findet man $FO, wobei dasF von den vier gesetzten oberen Bits stammt. Ansonsten ist also die BANK 0 dafür definiert. Sie merken schon, daß man auch bei dieser Umstellung zu neuen Zeropages die Common Area im Auge behalten sollte.</p>
+
+        <p>Ebenso, wie wir das für die Zeropage nun betrachtet haben, gilt es für den Stapel. Hier heißen die beiden Register PIL ($D509) und PIH ($D50A). Der Einschaltzustand bewirkt die Inhalte: PIL = 01 (dort befindet sich janormalerweise der Prozessorstapel) und PIH = FO, ebenso wie beim POH.</p>
+
+        <p>Eine Änderung dieser Zeiger muß zuerst die Register POH (beziehungsweise PIH) betreffen. Der eingeschriebene Wert wird so lange zwischengespeichert, bis auch POL (beziehungsweise PIL) belegt wird.</p>
+
+        <p>Ein letztes MMU-Register, welches aber nur gelesen werden kann, ist das VR. VR steht für Versions-Register. Die unteren vier Byte machen eine Aussage über die vorliegende MMU-Version. In meinem C 128 steht dort 0000. Die Bits 4 bis 7 geben die Anzahl der verfügbaren 64-KByte-Banks an. Mein Computer hat dort 0010 stehen, also zwei Banks.</p>
+
+        <h2>Einführung in den VDC-Chip</h2>
+
+        <p>Der VDC ist ein Chip, der die Verwaltung des 80-Zeichen-Bildschirmes kontrolliert. Es wäre unfair, an dieser Stelle nun alle Register abzudrucken. Sie finden diese nämlich recht ausführlich kommentiert in Ihrem Handbuch (Anhang, Seite 6 und folgende). Deshalb sollen nur die bedeutsamen herausgenommen und näher erläutert werden.</p>
+
+        <p>Weder die Register noch ein 16-KByte-Speicherbereich, der beim GRAPHIC-Befehl schon vorgestellt wurde und den VDC mit den notwendigen Bildschirminformationen versorgt, sind in irgendeiner BANK unter den normalen Adressen (beispielsweise durch PEEK oder POKE oder mittels Monitor) zu finden. Sie führen ein vornehmes Einzeldasein fernab davon. Nur zwei Speicherstellen im VDC-Bereich zwischen $D600 und $D700 sind die Vermittler:</p>
+
+        <p>$D600 dient zur Angabe des gewünschten Registers $D601 übergibt den in das Register zu schreibenden oder den aus diesem Register gelesenen Wert.</p>
+
+        <p>Ein POKE-Befehl sähe also so aus:</p>
+
+        <p>BANK15:POKE DEC( "D600"),Reg.Nummer:POKE DEC( "D601") ‚Wert Und ein PEEK wäre zu realisieren durch:</p>
+
+        <p>BANK15:POKE DEC( "D600"),Reg.Nummer: PRINT PEEK(DEC ("D601"))</p>
+
+        <p>Und in Maschinensprache wird es noch etwas komplexer, denn die VDC-Register sollten nur dann beschrieben werden, wenn dieser Chipnicht gerade etwasandereszutunhat. Zwar ist er mit seiner Ärbeit so schnell, daß man in Basic kaum Störungen zu erwarten hat, in Assembler aber müssen wir daher aufein Status-Bit achten, welches als Bit 7 der Speicherstelle $D600 existiert. Erst wenn hier eine 1 steht, sollte $D601 angesprochen werden.</p>
+
+        <p>In den 16 KByte des VDC-Speichers liegen drei für uns interessante Bereiche, auf die wir Einfluß nehmen können: 1) 80000 bis $07CF Bildschirm-Speicher</p>
+
+        <p>2) $0800 bis $OFCF Attribut-RAM.</p>
+
+        <p>3) $2000 bis $3FFF Zeichenmuster</p>
+
+        <p>Zum ersten Bereich fragen wir uns, wie wir dort hinein schreiben können. Außerdem ist auch hier ein Verschieben des Bildschirms eine nette Sache. Das gleiche gilt für das Attribut-RAM. Der Zeichenmusterbereich ist interessant, weil wir durch Eingriffe eigene Zeichen definieren können.</p>
+
+        <p>Schließlich ist es noch unser Änliegen, Grafik auf dem 80-Zeichen-Bildschirm zu realisieren. Auch dazu gibt es Wege. Aber gehen wir der Reihe nach vor.</p>
+
+        <p>Die Register 18 und 19 des VDC bestimmen die Adresse aus dem 16-KByte-Speicher, in die ein Wert geschrieben wird. Dabei soll dann 19 das LSB und 18 das MSB der gewünschten Anschrift erhalten. Nehmen wir mal als Beispiel das Bildschirm-RAM von $0000 bis $07CF (das ist dezimal 0 bis 1999) und daraus die Adresse $0400 (also dezimal 1024). In einem Programm können wir uns die beiden Bestandteile berechnen lassen. V sei die Adresse, LO das LSB und HI das MSB davon:</p>
+
+        <p>380 HI = INT(V/256):LO = V - HIX256</p>
+
+        <p>Wir erhalten auf diese Weise für HI den Wert 4 und für LO den Wert O (in Hexadezimalzahlen ist das schon auf den ersten Blick klar: 04 00). Unser Programm muß weiter lauten: 390 POKE DEC( "D600"),18:POKE DEC("D601"),HI 400 POKE DEC( "D600"),19:POKE DEC( "D601"),LO</p>
+
+        <p>Nun muß natürlich noch der Wert, derin den so ausgewählten Speicherplatz hinein soll, übergeben werden. Zu diesem Zweck dient das VDC-Register 31. Sei der Wert allgemein ausgedrückt durch die Variable W, dann lautet das weitere Programm:</p>
+
+        <p>410 POKE DEC( "D600"),31:POKE DEC( "D601"),W</p>
+
+        <p>Es gilt nun noch zweierlei zu beachten. Es muß angegeben werden, wieviele Speicherstellen diesen Wert von der besagten Adresse an erhalten sollen. Das schreibt man als Variable Nin das Register 30. Erst durch diesen Schreibvorgang wird ein Zeichenmuster oder der angegebene Wert tatsächlich in den Speicher eingetragen. Zuvor aber gibt esnoch eine Kleinigkeit zu beachten: In $D600 gibtesnämlich noch ein Bit, das anzeigt, ob ein Rasterstrahl-Rücklauf stattfindet. Darauf muß gewartet werden:</p>
+
+        <p>420 WAIT DEC("D600"),32</p>
+
+        <p>430 POKE DEC("D600"),30:POKE DEC( "D601"),N</p>
+
+        <p>Das war's eigentlich auch schon! Damit haben wir die gesamten 16 KByte im Griff. Fassen Sie diese Programmzeilen als Unterprogramm aufund fügen Sie einen entsprechenden Rahmen dazu, dann erhalten Sie etwas ähnliches wie unser kleines Testprogramm SCREENTEST (Listing ]):</p>
+
+        <p>Hier eine kurze Beschreibung: Der erste Abschnitt dient dem Einschreiben von Zeichen in den Bildschirmspeicher. Zuerst wird nach der gewünschten Adresse gefragt, dann nach dem POKE-Code des Zeichens und schließlich nach deren gewünschter Anzahl. Damit die ganzen Dialoge nicht mit der Bildschirmveränderung in Konflikt kommen, ist der Textbetrieb auf ein Fenster beschränkt worden, das die untere Bildschirmhälfte einnimmt. Es ist daher sinnvoll, Adressen zu wählen, die außerhalb des Fensters liegen.</p>
+
+        <p>Der nächste Programmblock bedient das Attribut-RAM. Auch hier werden Sie zunächst nach der Adresse gefragt. Der Zusammenhang der Bildschirmspeicher- mit der Attribut-RAM-Adiresse ist ähnlich wie bei der 40-Zeichen-Darstellung: Zu jeder Bildschirmzelle gibt es eine korrespondierende Attribut-RAM-Zelle. Bild 3 stellt die Verhältnisse dar:</p>
+
+        <p>' Des weiteren wird der einzuschreibende Wert und die Anzahl der insgesamt davon betröffenen Speicherzellen erfragt — ebenso, wie es vorhin im ersten Teil geschah.</p>
+
+        <p>Der dritte Teil unseres Programms erlaubt ein Einschreiben in den Speicherbereich, aus dem der VDC seine Zeichen abruft. Man gibt dazu den POKE-Code des zu ändernden Zeichens ein und welches der acht Byte des Zeichenmusters man meint. Dann fragt das Programm, was statt dessen dort hineingeschrieben werden soll. Falls Sie nun das betreffende Zeichen auf dem Bildschirm haben, erkennen Sie sofort das neue Gewand. Danach haben Sie die freie Wahl bis Sie &lt;4> eingeben: Dies beendet das Programm. Sollten Sie wieder normale Zeichen benutzen wollen, brauchen Sie nur die &lt;ASCIVYDIN&gt;-Taste betätigen. Dadurch wird der jeweils andere Zeichensatz ins Muster-RAM eingeladen und unsere Mühe ist umsonst gewesen.</p>
+
+        <p>Den ersten Teil unserer Fragen haben wir nun beantwortet. Außerdem wissen wir nun genau, wie wir auf den 16-KByte-Speicher des VDC zugreifen können.</p>
+
+        <p>Sehen wir nun malnach, inwieweit der Bildschirmspeicher verschiebbar ist. Es existieren da nämlich zwei Register im VDC-Chip, die damit zu tun haben: Register 13 enthält das LSB,</p>
+
+        <p>Register 12 das MSB der neuen Bildschirmstartadresse.</p>
+
+        <p>Das MSB muß außerdem noch in eine Speicherstelle des normalen Speichers geschrieben werden, nämlich in 2606. Die Bestandteile (MSB und LSB) können wieder mittels der oben genannten Formel berechnet werden. Sie wissenjanun auch, wie man diese Werte an die beiden Register übergibt. Also steht Ihnen nun nichts mehr im Weg, den Bildschirmspeicher innerhalb der 16 KByte zu verschieben. Wohin kann geschoben werden? Gehen wir die 16 KByte einmal durch, wobei wirnoch daran denken sollten, daßzumeinenderBildschirm zwar nur 2000 Speicherplätze benötigt, aber unser Computer meistens 2048 Plätze behandelt.</p>
+
+        <p>Oberhalb desnormalen Bildschirm-RAM liegt der Platz für das Attribut-RAM. Es gibt eine Möglichkeit (die wir gleich noch kennenlernen), die Farbe nicht aus diesem RAM zu holen, sondern durch ein VDC-Register bestimmen zu lassen. Zwar haben dann der Vorder- und der Hintergrund auf dem gesamten Bildschirm jeweils den gleichen Farbcode, aber das Attribut-RAM steht uns für einen weiteren Bildschirm zur Verfügung. /</p>
+
+        <p>Ab $1000 ist bisher freier Platz, in den zwei komplette Bildschirme passen. Außerdem kann mit dem Zeichenmuster-RAM manipuliert werden. Es befinden sich beide Zeichensätze (Groß- und Kleinbuchstaben) komplett ab $2000 im RAM. Kann man aufeinen der beiden verzichten — man darf dann auchnicht die &lt;ASCIVYDIN &gt; Taste drücken —, können statt dessen noch zwei weitere Bildschirme eingerichtet werden. Insgesamt stehen uns also maximal sechs verschiedene Bildschirme zur Verfügung.</p>
+
+        <p>Ebenso, wie wir es eben mit dem Bildschirm gemacht haben, können wir auch das Attribut-RAM verschieben. Dazu dienen die folgenden Register:</p>
+
+        <p>Register 21 LSB der Startadresse und Register 20 MSB.</p>
+
+        <p>Wieder existiert im normalen RAM eine Speicherstelle, an die das MSB ebenfalls zu schreiben ist: 2607. Dazu braucht nun eigentlich nichts mehr gesagt werden, weil Sie alles schon vom Bildschirm-RAM her kennen.</p>
+
+        <p>Viel interessanter für uns ist das Register 25. Zwei Bit daraus, nämlich Bit 6 und Bit 7, werden wir uns etwas genauer ansehen. Das Bit 6 legt fest, woher die Attribute eines Zeichens auf dem Bildschirm stammen. Im Normalfall ist dieses Bit gleich 1. Das bedeutet, daß das Attribut-RAM Quelle der Attribute ist (also Farbe, Blinken, Unterstreichen, Revers, Groß- oder Kleinschreibung). Schalten wir aber statt dessen dieses Bit auf 0, dann kommt die Farbgebung durch das Register 26 zustande. Dort dienen die Bits 0 bis 3 zum Definieren der Hintergrund, die Bits 4 bis 7aber der Vordergrundfarbe. Der normale Inhalt von Register 25 ist 64 (es ist also lediglich Bit 6 gesetzt), so daß wir es uns einfach machen können: POKE DEC( "D600"),25:POKE DEC( "D601"),0 schaltet alle Bits auf O0 und die Farben legen wir so fest: Fl=Vordergrund, F2=Hintergrundfarbe. F = 16xFl+F2 ergibt die Farbkennzahl in Register 26. Wir setzen dann die Farben so:</p>
+
+        <p>POKE DEC( "D600"),26:POKE DEC( "D601"),F</p>
+
+        <p>Auf diese Weise kann auch die Farbgebung im Hochauflösungs-Modus geschehen. Das ist nämlich der Zweck des Bit 7 vom Register 25. Der Inhalt 0 an dieser Stelle sorgt für die normale Textdarstellung. Schreiben wir aber eine 1 dort hinein, dann schaltet der VDC um auf die Abbildung einer Bit-Map. Im Gegensatz zur VIC-Bit-Map benötigt die VDC-Bit-Map allerdings volle 16000 Byte Speicherplatz, dasheißt, daß das VDC-RAM praktisch vollständig als Bit-Map verwendet wird. Dafür ist aber die Auflösung in X-Richtung doppelt so groß, denn 80 Zeichen mal jeweils 8 Bit ergeben 640 verschiedene horizontale Bildpunkte. In der Vertikalen bleibt alles beim alten: 25 Zeilen zu je 8Bit ergeben nach wie vor 200 Bildpunkte. Insgesamt stehen uns nun 128000 verschiedene Bildschirmpositionen zur Verfügung!</p>
+
+        <address class="author">(Heimo Ponnath/dm)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Von Basic zu Assembler (Teil 8)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, dm">
+    <meta name="64er.issue" content="11/86">
+    <meta name="64er.pages" content="151-153">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX30">
+</head>
+
+<body>
+    <article>
+        <h1>Von Basic zu Assembler (Teil 8)</h1>
+        <p class="intro">Wie kann man als Assembler-Programmierer mathematische Routinen des Interpreters nutzen, um beispielsweise den Sinus, die Quadratwurzel oder einfach den Absolutwert einer Zahl zu berechnen? Wir zeigen Ihnen, wie es gemacht wird.</p>
+
+        <p>as Basic 2.0 des C 64 stellt nicht allzu viele mathematische Funktionen bereit. Mit der in der letzten Ausgabe vorgestellten Basic-Erweiterung, die wir nun weiter besprechen werden, erweitern wir den Basic-Interpreter um neun weitere Befehle.</p>
+
+        <p>In Teil 7 dieses Kurses erhielten wir ein Programm, mit dem das Basic 2.0 des C 64 durch zusätziiche mathematische Routinen erweitert wurde. Wir begannen, das ebenfalls abgedruckte Quell-Listing zu besprechen und wollen nun mit dieser Erklärung fortfahren. Beginnen wir gleich mit den im Listing 3 aus Ausgabe 10/86 definierten Label, die _Interpreter-Einsprungadressen definieren. (All diese Interpreter-Routinen existieren einsatzbereit in unserem Computer. Eine Übersicht finden Sie beispielsweise im Assembler-Sonderheft 8/85 ab Seite 178). Sehen wir sie uns der Reihe nach an:</p>
+
+        <h3>ERROR</h3>
+
+        <p>Ausgabe von Fehlermeldungen und READY-Status</p>
+
+        <p>$A437 dezimal 42039</p>
+
+        <p>Fehlernummer in X-Register</p>
+
+        <p>Alle weiteren Angaben, die Sie bei den meisten anderen Routinen finden (welche Speicherstellen benutzt werden, welche Register und wieviele Plätze des Stapelregisters) sind hier ohne Bedeutung, weil ohnehin das Programm abgebrochen und der READY-Status aktiv wird. Die Fehlernummern und ihre Zuordnungen zeigt Ihnen die folgende Übersicht:</p>
+
+        <p>Fehler Meldung too many files file open file not open file not found device not present not input file not output file missing filename illegal device number next without for syntax return without gosub 13 out of data</p>
+
+        <p>14 illegal quantity</p>
+
+        <p>15 overflow</p>
+
+        <p>16 out of memory</p>
+
+        <p>17 undef'd statement</p>
+
+        <p>18 bad subscript</p>
+
+        <p>19 redim'd array</p>
+
+        <p>20 division by zero</p>
+
+        <p>21 illegal direct</p>
+
+        <p>22 type mismatch</p>
+
+        <p>23 string too long</p>
+
+        <p>24 file data</p>
+
+        <p>25 formula too complex</p>
+
+        <p>26 can't continue</p>
+
+        <p>27 undef'd function</p>
+
+        <p>Es gibt noch zwei weitere Meldungen: »28 VERIFY« und »29 LOAD«, die auf diese Weise aufgerufen werden können.</p>
+
+        <h2>Kernel-Routinen. . .</h2>
+
+        <p>Die drei nächsten Adressen NEWSTT ($ATAE, 42926), GONEI ($AT7E4, 42980) und INTEND ($AT7ET, 42983) sollen uns in diesem Zusammenhang noch nicht interessieren. Es handelt sich um verschiedene Stellen der Interpreterschleife, in die nach Bearbeitungeiner eigenen Routine gesprungen wird oder die den normalen Inhalt eines Vektors bilden. Wir werden auf diese Interpreterschleife in einer späteren Folge noch aus"führlich zurückkommen.</p>
+
+        <p>FRMNUM ist eine der wichtigsten Interpreter-Routinen, die zum Einlesen eines numerischen Wertes in den FAC dient:</p>
+
+        <h3>FRMNUM</h3>
+
+        <p>Holt beliebigen numerischen Ausdruck aus dem Basic-Text in den FAC und überprüft den Ausdruck.</p>
+
+        <p>$AD8A dezimal 44426 viele verschiedene Speicherstellen, darunter auch FAC benötigt alle Register Stapelbedarf verschieden, je nach Ausdruck</p>
+
+        <p>FRMNUM erledigt eine Vielzahl von nützlichen Aufgaben quasi nebenher: Die Speicherstelle $0D erhält den Inhalt 0, wenn ein numerischer Ausdruck, aber $FF, wenn ein Stringausdruck angesprochen wird. Im letzteren Fall erfolgt auch eine Fehlermeldung. In der Speicherstelle $0E wird angezeigt, ob man eine Fließkomma-odereine Integerzahl geholt hat: Bei Fließkommazahlen findet man hier den Inhalt 0, bei Integer-Zahlen den Inhalt $80. Liegt eine einfache Variable vor, dann ist anschließend ein Zeiger in $45/$46 auf daseerste Byte des Variablennamens gerichtet etc. Ich empfehle Ihnen, sich einmal ein ROM-Listing zu dieser Routine anzusehen. Sie werden noch einiges Brauchbare mehr entdecken.</p>
+
+        <h3>CHKCOM</h3>
+
+        <p>Prüft, ob das gerade gelesene Byte ein Komma ist und überliest dieses, oder Ausgabe einer Fehlermeldung, wenn kein Komma vorliegt.</p>
+
+        <p>$AEFD dezimal 44797 Speicherstellen TXTPTR (also $7A und $7B)</p>
+
+        <p>Register A und Y kein Stapelbedarf</p>
+
+        <p>Man verwendet diese Routine CHKCOM, um eine gewisse Struktur in die selbstgeschaffenenBasic-Befehle zu bringen. Es kann sonst unter Umständen leicht geschehen, daß der Interpreter den Basic-Iext falsch liest.</p>
+
+        <h3>FACINX</h3>
+
+        <p>Wandelt eine Fließkommazahl im FAC in eine 2-Byte-Integer-Zahl um, die dann im Akku und Y-Register steht. $BIAA dezimal 45482 Vorbereitungen: Zahl in FAC benötigt alle Register</p>
+
+        <p>Das entspricht der INT-Funktion des Basic, das LSB befindet sich im Akku, das MSB im Y-Register.</p>
+
+        <h3>GETBYTC</h3>
+
+        <p>Liest aus dem Basic-Text eine Zahl zwischen O und 255 ins X-Register ein.</p>
+
+        <p>$B79B dezimal 47003 Speicherstellen mehrere, unter anderem auch FAC benötigt alle Register</p>
+
+        <p>Diese Routine GETBYTC bringt gegenüber FRMNUMnur den Vorteil einer gewissen Bequemlichkeit. Im Grunde genommen ruft sie nämlich zuerst einfach FRMNUM auf, dann FACINX und stellt noch eine Reihe von Überprüfungen an.</p>
+
+        <h3>FSUB</h3>
+
+        <p>Subtrahiert den FAC von einer durch Akku und Y-Register angezeigten Zahl im Speicher und legt das Ergebnis im FAC ab. $B850 dezimal 47184 Vorbereitungen: A/Y als Vektor auf Zahl im Speicher richten, FAC laden Speicherstellen: mehrere, unter anderem auch FAC und ARG benötigt alle Register</p>
+
+        <p>FSUB lädt erst die durch A/Y angezeigte MFLPT-Zahl in den ARG, dreht dann das Vorzeichen des FAC-Inhaltes um und addiert beide.</p>
+
+        <p>Die nächste Adresse EINS ($B9BC, 47548) und auch die später auftretende PHIALB ($E2E0, 58080) ist jeweils die Startadresse einer Zahl, die schon fest im ROM im MFLPT-Format verankert vorliegt. Wie schon die Namen sagen, liegt bei EINS der MFLPT Wert von 1 und bei PIHALB der von Pi/2. Solche Zahlenwerte gibt es einige im ROM. Eine Übersicht finden Sie im Assemblerkurs (Kapitel 46, Sonderheft 8/85 des 64'er-Magazins).</p>
+
+        <h2>..und Interpreter-BRautinan</h2>
+
+        <h3>LOG</h3>
+
+        <p>Bildet den natürlichen Logarithmus des FAC-Inhaltes und legt diesen dann im FAC ab. $B9EA dezimal 47594 Vorbereitungen: Zahl in FAC Speicherstellen mehrere, unter anderem auch FAC und ARG benötigt alle Register</p>
+
+        <p>Diese Routine LOG prüft auch die Korrektheit des Argumentes im FAC. Die nächste Routine dient der Multiplikation zweier Fließkommazahlen:</p>
+
+        <h3>FMULT</h3>
+
+        <p>Der FAC-Inhalt wird mit einer MFLPT-Zahl multipliziert, auf die der Zeiger A/Y weist und das Ergebnis im FAC abgelegt. $BA28 dezimal 47656 Vorbereitungen: Faktor lin FAC laden, Zeiger A/Y auf Faktor 2 richten</p>
+
+        <p>Speicherstellen mehrere, unter anderen auch FAC und ARG benötigt alle Register</p>
+
+        <h3>FDIV</h3>
+
+        <p>Eine MFLPT-Zahl, auf die der Zeiger A/Y weist, wird durch den Inhalt des FAC geteilt und das Ergebnis im FAC abgelegt. $BBOF dezimal 47887</p>
+
+        <p>Vorbereitungen: Divisor in FAC, Zeiger A/Y aufDividendenrichten</p>
+
+        <p>Speicherstellen mehrere, unter anderem auch FAC und ARG benötigt alle Register</p>
+
+        <p>Die Routine FDIV meldet auch einen Fehler, wenn der Dividend gleich Null ist. Zur Gruppe der Transportroutinen gehören die beiden folgenden:</p>
+
+        <h3>MOVFM</h3>
+
+        <p>Transportiert eine MFLPT-Zahl, auf die A/Y weist, aus dem Speicher in den FAC und wandelt sie dabei um in das FLPT: Format.</p>
+
+        <p>$BBA2 dezimal 48034</p>
+
+        <p>Vorbereitungen: Zeiger A/Y auf erstes Byte der Zahl im Speicher richten</p>
+
+        <p>Speicherstellen $22, $23, FAC Register: A und Y</p>
+
+        <p>Den umgekehrten Weg öffnet diese Routine:</p>
+
+        <h3>MOVMF</h3>
+
+        <p>Transportiert den Inhalt des FAC in den Speicher an die Stelle, aufdie X/Y weistund wandelt das FLPT- ins MFLPT-Format um. $BBD4 dezimal 48084</p>
+
+        <p>Vorbereitungen: Zeiger X/Y auf erstes Byte im Speicher richten Speicherstellen $22, $23, FAC benötigt alle Register</p>
+
+        <p>Beide Routinen transportieren eigentlich nicht, sondern sie kopieren die entsprechenden Inhalte nur. Daraus folgt, daß die jeweilige Quelle unverändert erhalten bleibt.</p>
+
+        <h2>Mathematische Routinen</h2>
+
+        <h3>ABS</h3>
+
+        <p>Ermittelt den Absolutwert einer Zahl im FAC</p>
+
+        <p>$BC58 dezimal 48216</p>
+
+        <p>Vorbereitungen: Zahl in FAC Speicherstellen FAC keine Register</p>
+
+        <p>Ein sehr kurzes Programm, sehen Sie mal in ein ROM-Listing. Entspricht etwa der ABS-Funktion in Basic.</p>
+
+        <h3>FCOMP</h3>
+
+        <p>Vergleicht den FAC-Inhalt mit einer Zahl im Speicher auf die A/Y weist.</p>
+
+        <p>$BC5B dezimal 48219</p>
+
+        <p>Vorbereitungen: Zahl 1 in FAC, Zeiger A/Y auf Zahl 2 richten Speicherstellen $24, $25, FAC benötigt alle Register</p>
+
+        <p>Das Ergebnis des Vergleiches FCOMP wird im Akku angezeigt. Dabei ergeben sich folgende Aussagen: Akku Aussage</p>
+
+        <p>$01 FAC-Inhalt größer als Speicherzahl $00 FAC-Inhalt gleich Speicherzahl $FF FAC-Inhalt kleiner als Speicherzahl</p>
+
+        <p>Nun kommen wieder einige</p>
+
+        <p>Funktionen. Zunächst einmal das Bilden der Quadratwurzel des FAC-Inhaltes:</p>
+
+        <h3>SOR</h3>
+
+        <p>Die Quadratwurzel des FAC-Inhalts wird gebildetundim FAC abgelegt.</p>
+
+        <p>$BF71 dezimal 49009</p>
+
+        <p>Vorbereitungen: Zahl in FAC Speicherstellen mehrere, darunter auch FAC und ARG benötigt alle Register</p>
+
+        <h3>POLYX</h3>
+
+        <p>Berechnen eines Polynoms, Ergebnis im FAC.</p>
+
+        <p>$E059 dezimal 57433 Vorbereitungen: Argument in FAC, Zeiger A/Y auf Anfang einer Konstantentabelle richten mehrere Speicherstellen benötigt alle Register</p>
+
+        <p>POLYX wird von uns später beim POLY-Befehl verwendet. Die Konstantentabelle muß folgende Angaben enthalten: l. Byte: Polynomgrad, weitere Bytes enthalten die Koeffizienten in absteigender Reihenfolge (alSO Ay, Ay.) »..) als MFLPT-Zahlen.</p>
+
+        <h3>cos</h3>
+
+        <p>Bildet den Cosinus des FAC-Inhaltes und legt diesen im FAC ab.</p>
+
+        <p>$E264 dezimal 57956 Vorbereitungen: Zahl in FAC benötigt alle Register</p>
+
+        <p>Diese Funktion COS entspricht der Cosinus-Funktion im Basic ebenso wie die folgende Funktion SIN der Sinus-Funktion des Basic entspricht:</p>
+
+        <h3>SIN</h3>
+
+        <p>Bildet den Sinus des FAC-Inhalts und legt diesen im FAC ab.</p>
+
+        <p>$E26B dezimal 57963 Vorbereitungen: Zahl in FAC benötigt alle Register</p>
+
+        <p>Zu guter Letzt verwenden wir auch noch die Arcustangens-Funktion des Interpreters:</p>
+
+        <h3>ATN</h3>
+
+        <p>Bildet den Arcustangens des FAC-Inhaltes und legt diesen wieder im FAC ab.</p>
+
+        <p>$E30E dezimal 58126 Vorbereitungen: Zahl in FAC benötigt alle Register</p>
+
+        <p>Wir werden später bei den einzelnen Modulen direkt mit all diesen Interpreter-Routinen arbeiten.</p>
+
+        <h2>Das Programm im Modul I</h2>
+
+        <p>Ab Zeile 480 (im Listing 3 aus Ausgabe 10/86, Seite 156) fangen zwei kurze Programmteile an, die dem Ein- und Ausschalten der Befehlserweiterung dienen. Wie Sie sehen, speichern wir einfach in den Vektor IGONE die Startadresse unserer eigenen Interpreterschleife. Von da an wird jeder Befehl ausdem Basic-Text zuerst durch unsere Schleife und erst danach durch die normale Interpreterschleife überprüft. Das verlängert — allerdings unmerklich — die Abarbeitung eines Programms. Deshalb kann mit dem Programmstück ab Zeile 560 wieder der normale Inhalt des IGONE-Vektors restauriert werden. Wie Sie gleich sehen werden, passiert das immer dann, wenn AUS als neuer Basic-Befehl auftritt.</p>
+
+        <p>Ab Zeile 640 tritt nun unsere eigene Interpreterschleife auf den Plan. Unsere neuen Befehle sind als normale ASCII-Buchstaben im Basic-Text abgelegt. Deshalb wird ein durch die CHRGET-Routine in den Akku geholtes Zeichen zunächst überprüft, ob es sich um einen Buchstaben handelt. Falls das nicht der Fall ist, geben wir die Kontrolle wieder an den normalen Basic-Interpreter zurück. In Modul 10 haben wir eine Reihe von Tabellen und Hilfszellen geschaffen. Eine davon — nämlich AKKU — dient zur Zwischenspeicherung des Akku-Inhaltes, in eine andere — BEFNR — schreiben wir über das X-Register eine Befehlsnummer 0. Außerdem packen wir für die spätere Verwendung ins Y-Register den Wert O und erhöhen die Befehlsnummer auf l. Des weiteren enthält dasModul 10 die Tabelle der Befehlstexte, ausder wirnun ein Zeichen in den Akku holen, überprüfen, ob wir ein Trennzeichen vor uns haben (nämlich eine Null). Nun wird verglichen (nämlich ab Zeile 850) und zwar Byte für Byte, ob der Textin der Befehlstabelle und der aus dem Basic-Text übereinstimmt. Sobald eine Ungleichheit festgestellt wird, überlesen wir schnell den Rest des Befehlswortes und überprüfen den nächsten Eintrag in der Tabelle. Mit jedem neuen Befehlswort wird auch der Inhalt in BEFNR erhöht.</p>
+
+        <p>Wenn der Basic-Text und der Text in der Befehlstabelle übereinstimmt, dann sorgen wir zuerst für das Erhöhen des TXTPTR, damit dieser Zeiger hinter unseren eigenen Befehl weist. Die Befehlsnummer in BEFNR wird verdoppelt und als Index in eine weitere Tabelle, die Spungtabelle SPRTAB in Modul 10 verwendet. In dieser Tabelle liegen nacheinander die Startadressen aller Programmteile, die zu den einzelnen Befehlen gehören. Die Verdoppelung von BEFNR wird einfach dadurch nötig, daß jede Adresse aus zwei Byte besteht. In Zeile 1070 unseres Moduls steht nun ein Sprungbefehl, dessen Adresse noch aus einem Dummy-Wert besteht. Das LSB der Adresse ist sprung+1, das MSB sprung+2. Die aus der Sprungtabelle SPRTAB gelesene Adresse schreiben wir nun anstelle des Dummy-Wertes: Das Programm modifiziert sich an dieser entscheidenden Stelle selbst. Sobald das geschehen ist, sind wir schon bei dem Sprung in das Unterprogramm (also in ein anderes Modul) angekommen. Danach — alsonach der Abarbeitung des Befehls — begeben wir uns zurück in den normalen Basic-Interpreter. In Bild 1 aus Teil 7 (Ausgabe 10/86, Seite 153) finden Sie noch ein Flußdiagramm, das Ihnen zum besseren Überblick über das Modul 1 dienen soll.</p>
+
+        <h2>Die neuen Befehle</h2>
+
+        <p>Interessant wird es nun bei den einzelnen neuen Befehlen: Wir lernen dabei die Anwendung der mathematischen Interpreter-Routinen kennen. Sie werden sehen, daß alles einfacher ist, als man gemeinhin denkt. Um welche Befehle geht es? Zur Erinnerung: Zunächst machen wir es uns etwas einfacher, indem wir Bogen- in Gradmaß durchBOGundGRD auszurechnen. Auch störtes viele, daß man immer mit der LOG-Funktion den reichlich ungebräuchlichen, natürlichen Logarithmus erhält: DLGR liefert uns den dekadischen Logarithmus. Der Vollständigkeit halber ist den Winkelfunktionen SIN, COS und TAN nun auch noch der COT (Cotangens) hinzugefügt. Die eingangs erwähnte Umkehrfunktion des Sinus (ARCS) ist ebenso vorhanden wie die des Cosinus (ARCC) und des Cotangens (ACOT). Mit der ohnehin schon vorhandenen ATN-Funktion für den Arcustangens ist somit auch der Satz der Umkehrfunktionen komplett. Zu guter Letzt gibt es da noch die POLY-Funktion, mit deren Hilfe man mit einem einzigen Befehl den Wert eines Polynoms berechnen kann.</p>
+
+        <h2>Modulaufbau</h2>
+
+        <p>Jedes Programm-Modul besteht aus einem Rahmen und einem Kern (siehe dazu Bild |).</p>
+
+        <p>Der Rahmen istüberallnahezu identisch und soll daher nur einmal erklärt werden. Damit jeder neue Befehl sowohl im Programm-, als auch im Direktmodus betrieben werden kann und die Ergebnisausgabe in Variablen erfolgt, hatten wir eine etwas ungewöhnliche, aber einfach zu durchschauende Technik gewählt: Das Ergebnis landetimmer in der zuletzt aufgerufenen Variablen. So erfolgt der BOG-Aufruf beispielsweise durch</p>
+
+        <p>A = A:BOG,45</p>
+
+        <p>Das Ergebnis steht dann in A, was durch »PRINT A« leicht zu kontrollieren ist. Auf die Startadresse eines Variablenwertes weist der Zeiger »FORPNT«. Um sicher zu gehen, daß er beiden manchmal reichlich unübersichtlichen Interpreter-Routinen nicht doch mal überschrieben wird, schieben wir seinen Inhalt auf den Stapel:</p>
+
+        <pre><code>lda forpnt pha
+lda forpnt+1 pha
+</code></pre>
+
+
+        <p>Es folgt der Aufruf einer Syntaxkontrolle:</p>
+
+        <p>jsr chkcom</p>
+
+        <p>CHKCOM. überprüft, ob im Basic-Text ein Komma vorliegt. Ist das der Fall, wird es einfach überlesen. Andernfalls meldet sich der Computer mit SYNTAX ERROR und das Programm endetim READY-Zustand. Weshalb diese unnötige Kontrolle, werden Sie fragen! Zum einen wird ein Programm besser lesbar, wenn klar erkennbare Trennzeichen eingeplant sind. Das können durchaus auch andere als das Komma sein (mit der Komma-Abfrage gehts aber besonders leicht). Zum anderen werden Sie staunen, was ein Basic-Interpreter alles aus so einem selbstgemachten Befehl ohne Trennzeichen herauslesen kann! Probieren Sie es doch einfach mal aus.</p>
+
+        <p>Der letzte Befehl im oberen Teil unseres Rahmens ist jsr frmnum</p>
+
+        <p>Damit lesen wir den Ausdruck hinter dem Komma in den Fließkomma-Akku 1 (den FAC) ein. Diese Routine nimmt nur numerische Ausdrücke an, bei Strings meldet sie einen Fehler und der Computer geht in den READY-Zustand. Die damit eröffnete Variationsbreite der Mödglichkeiten von numerischen Ausdrücken ist ungeheuer vielfältig: Wir können Integer-Zahlen, Fließkommaausdrücke und Festkommazahlen einlesen, einfache Variable oder Array-Elemente, kompliziert zusammengesetzte Formeln oder Funktionen. Das Ergebnis liegt danach immer in leicht verarbeitbarer Form im FAC vor, und unserer Kreativität sind nur wenige Grenzen gesetzt.</p>
+
+        <p>Nach dieser Zeile folgtin allen Modulen der jeweilige Kern. Den Abschluß bildet danach der zweite Teil des Rahmens, der lediglich den zuvor auf dem Stapelgespeicherten Variablenzeiger zurückholt und den FAC-Inhalt in die dadurch bezeichnete Variable schreibt:</p>
+
+        <p>pla tay pla tax jsr movnf rts</p>
+
+        <p>Wie Sie sicher wissen, funktioniert der Stapelspeicher nach dem LIFO-Prinzip: Das heißt »Last In-First Out«und bedeutet, daß der zuletzt daraufgelegte Wert als erster wieder herunter genommen wird (wie bei einem Bücherstapel). Als letzter Wert wurde im ersten Teil unseres Modulrahmens das MSB des Vektors FORPNT+1 abgelegt. Der kommt also nun wieder zurück in den Akku und von dort aus ins Y-Register. Das LSB lag darunter, wird als zweiter Wert vom Stapel geholt und auf dem Umweg über den Akku insX-Register transportiert. Damit haben wir die Vorbereitungen schon erledigt, die die Interpreter-Routine MOVMF braucht: LSB der Zieladresse ins X-Register, MSB ins Y-Register. Mittels des MOVMF-Aufrufes transportieren (genaugenommen kopieren) wir nun den Inhalt des FAC in den dafür bereitgehaltenen Speicherbereich der durch FORPNT markierten Variable. Nun steht uns das Ergebnis vom Basic aus leicht zur Verfügung. Die Module werden durch RTS beendet, was den Rücksprung in das Modul 1, die Hauptschleife unserer Basic-Erweiterung, bewirkt.</p>
+
+        <h2>Modul 2: BOG</h2>
+
+        <p>Wir werden nun immer nur noch die Modulkerne besprechen. Da hatten wir es zuerst also mitdem Kern von BOG zu tun. BOG soll aus einem Winkel im Gradmaß das Bogenmaß berechnen. Nach dem Aktivieren der Erweiterung kann das Bogenmaß von 60 Grad im Direktmodus beispielsweise durch:</p>
+
+        <pre><code>A=A:BOG,60:PRINT A
+</code></pre>
+
+
+        <p>ermittelt werden. Unser Modul folgt der Umrechnungsformel:</p>
+
+        <pre><code>Bogenmaß = Gradmaßx(/180)
+</code></pre>
+
+
+        <p>Der Faktor 7/180 wurde BOGFAK genannt und sein Wert (0,0174532925) als Fließkommazahl in einer Konstantentabelle ab der BOGFAK genannten Speicherstelle abgelegt. Weil sich im FAC schon der Winkel im Gradmaß befindet, brauchen wir nur noch die Interpreter-Routine FMULT aufrufen, nachdem wir zuvor noch die Startadresse von BOGFAK in den Akku (LSB) und das Y-Register (MSB) geschrieben haben. Das Ergebnis der Multiplikation befindet sich im FAC. In Bild 1 finden Sie diesen Kern als Flußdiagramm.</p>
+
+        <h2>Modul 3: GRD</h2>
+
+        <p>Für die Umrechnung vom Bogen- in das Gradmaß gelten die gleichen Erläuterungen wie eben bei BOG: GRD leistet uns diesen Dienst nach der Gleichung:</p>
+
+        <pre><code>Gradmaß = Bogenmaßx(180/T)
+</code></pre>
+
+
+        <p>Auch diesen Faktor (er heißt GRDFAK und hat den Wert 57.2957795) finden Sie im Fließkommaformat in der Konstantentabelle ab GRDFAK. Außer dem anderen Faktor unterscheidet sich das Modul 3 nicht vom ModAul 2.</p>
+
+        <h2>Modul 4: DLGR</h2>
+
+        <p>Spätestens an dieser Stelle werden Sie sich fragen, weshalb nicht der wesentlich einprägsamere Befehlsname DLOG gewählt wurde. Da spieltunsder Interpreter wieder einen Streich: Beim Eintippen von DLOG und &lt;RETURN&gt; amEnde der Zeile würde er nämlich das LOG als normales Basic-Befehlswort deuten und statt der ASCI-Zeichenkette LOG ein sogenanntes Token in den Programmtext einbauen, also eine Kennzahl, die der Computer beim Programmlauf später der Logarithmusfunktion zuordnet. Natürlich kann man als gewiefter Assembler-Programmierer auch diesem unerwünschten Interpreterverhalten einen Riegel vorschieben, aber dann wird es für diesen Kurs ein wenig unübersichtlich. Deshalb heben wir uns solche Feinheiten für eine spätere Folge aufund begnügen uns damit, Befehlsworte zu verwenden, die keine normalen Basic-Worte in sich enthalten.</p>
+
+        <p>Den dekadischen Logarithmus (log, also den Logarithmus zur Basis 10) berechnet man aus dem natürlichen (In, also dem zur Basis e — dabei ist e die Eulersche Zahl 2,718281828489...) durch die Gleichung: log (x) = In (x) * (1/1n10)</p>
+
+        <p>Wieder haben wir einen Faktor vorliegen (nämlich 1/1n10, LOGFAK mit dem Wert 0,434294482), der als Fließkommazahl in der Konstantentabelle ab LOGFAK abgelegt ist. Diesmal wird aber nicht direkt der Wert im FAC mit der Konstanten multipliziert, sondern zuvor muß vom FAC-Inhalt noch der natürliche Logarithmus gebildet werden. Dazu verwenden wir — einfach durch den Routineaufruf mittels JSR — die Interpreterroutine LOG. Automatisch legt diese Routine den In des eingegebenen Wertes im FAC ab, wo wir damit dann genauso weiterverfahren wie bisher: Akku und Y-Register auf LOGFAK richten und FMULT aufrufen. Wie bentzt man DLGR? Hier ein Beispiel:</p>
+
+        <pre><code>A=A:DLGR, Ausdruck: PRINT A
+</code></pre>
+
+
+        <p>In A steht dann der dekadische Logarithmus von »Ausdruck«, der hier auf dem Bildschirm angezeigt wird.</p>
+
+        <p>In der nächsten Folge werden wir die noch fehlenden Module besprechen. Damit haben Sie dann eine leistungsfähige Befehlserweiterung vorliegen, die mathematische Funktionen unterstützt.</p>
+
+        <address class="author">(Heimo Ponnath/dm)</address>
+    </article>
+</body>
+
+</html>
