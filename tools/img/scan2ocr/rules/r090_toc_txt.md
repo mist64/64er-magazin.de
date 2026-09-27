@@ -90,6 +90,37 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
      print itself uses a sub-header.
 5. Write `issues/<YYMM>/toc.txt`. Final newline at end of file.
 
+6. **Write `issues/<YYMM>/toc_entries.txt` as well — the ENTRIES, not just
+   the sections.** You have just read every one of them off the page; this
+   keeps them instead of throwing them away. One line per printed TOC entry,
+   tab-separated:
+
+   ```
+   page<TAB>section<TAB>entry
+   8	Rubriken	Editorial
+   16	Rubriken	Leserforum
+   50	Wettbewerbe	Blitzschnelle 3D-Animation
+   54	Listings zum Abtippen|Listing des Monats	3D-Grafik in Echtzeit
+   187	Rubriken	Impressum
+   ```
+
+   `section` is the `toc.txt` line the entry sits under, verbatim. `page` is
+   the printed page number. `entry` is the printed entry text.
+
+   **Why this file exists.** Step 100 needs exactly this and used to
+   re-read p6/p7 in full to get it — MEASURED on 8611, where three separate
+   readings of the same two pages happened in one afternoon. And it makes
+   the Rubriken box checkable: 8611's Editorial was absorbed into its
+   neighbour and nothing noticed until step 100, because a missing article
+   whose text is still on the page is invisible to every coverage check.
+   The Rubriken box is the most regular part of the TOC — one line each,
+   name and right-aligned page — and reads cleanly at column-crop
+   resolution.
+
+   `toc.txt`'s contract is unchanged. Anything reading `toc_entries.txt`
+   must tolerate its absence: issues imported before this chain do not have
+   one.
+
 ## Verification
 
 ```bash

@@ -216,6 +216,55 @@ PY
 - Articles **not in the printed TOC** (small fillers, walkthroughs)
   get the closest topical category that's already in `toc.txt`. Don't
   invent new categories — extend `toc.txt` first if you really need one.
+- **Read the entries from `issues/<YYMM>/toc_entries.txt`**, which step 090
+  wrote from the same page you would otherwise re-read. It gives
+  `page<TAB>section<TAB>entry` for every printed TOC entry, so the mapping
+  from article to category is a lookup rather than a third reading of p6/p7.
+  Fall back to the page only if the file is absent (a pre-chain issue).
+
+- **Check the Rubriken box against the article set** — every entry under
+  `Rubriken` should have an article whose `64er.pages` contains its page:
+
+  ```bash
+  $PY - issues/<YYMM> <<'PYEOF'
+  import glob, io, os, re, sys
+  d = sys.argv[1]
+  # House advertising appears under Rubriken and is not an article. MEASURED
+  # on 8610 and 8611; 8610's unclaimed-page sweep confirmed both as ads.
+  ADS = {'Programm-Service', 'Einkaufsführer'}
+  ent = os.path.join(d, 'toc_entries.txt')
+  if not os.path.exists(ent):
+      sys.exit('no toc_entries.txt (pre-chain issue) -- skipped')
+  claimed = set()
+  for f in glob.glob(os.path.join(d, '*.html')):
+      m = re.search(r'64er\.pages" content="([^"]+)"',
+                    io.open(f, encoding='utf-8').read())
+      for part in (m.group(1).split(',') if m else []):
+          part = part.strip()
+          a, _, b = part.partition('-')
+          if a.isdigit():
+              claimed.update(range(int(a), int(b or a) + 1))
+  for line in io.open(ent, encoding='utf-8'):
+      page, section, entry = (line.rstrip('\n').split('\t') + ['', ''])[:3]
+      if section == 'Rubriken' and entry not in ADS and page.isdigit():
+          if int(page) not in claimed:
+              print('NO ARTICLE for Rubriken entry %-22s p%s' % (entry, page))
+  PYEOF
+  ```
+
+  **What this catches, and what it provably does not.** It catches a rubric
+  that was DROPPED — no article claims its page at all. It does **not** catch
+  one that was ABSORBED, and that is not a limitation to work around, it is
+  arithmetic: 8611's Editorial was glued to the front of the Messebericht on
+  the same page, so p8 stayed claimed, every word stayed present, and there
+  was simply one article where there were two. Tested against a
+  reconstruction of exactly that state — the check stays silent, as it must.
+
+  Absorption is caught by identity, not by coverage: `r310`'s *a monthly has
+  exactly one `id="editorial"`* is the check for it, and it can only run once
+  step 140 has assigned ids. Two different failures, two different checks;
+  do not expect either to do the other's job.
+
 - **Prune unused `toc.txt` lines at the END OF THE ISSUE, not here.** The
   instruction used to say "once this step is done", which assumes the article
   set is final at 100. It is not: 130, 150 and 170 can still turn a dropped
