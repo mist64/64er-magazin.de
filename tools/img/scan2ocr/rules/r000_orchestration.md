@@ -29,6 +29,31 @@ Running the editorial steps in-line in the main conversation thread is the wrong
 shape: each one chews up context the user is paying for, and it skips the second
 pair of eyes the verification block in each rule was designed to provide.
 
+## THE FILES ARE THE DELIVERABLE, not the issue
+
+An issue is published once. These files are read by every agent that builds
+every issue after it, so **the point of a build is not that the agent working
+it learns something — it is that this directory learns it.** The next agent
+should need less help than the last one, and the run after that less again.
+
+Two habits follow, and they are not optional.
+
+**Write the rule BEFORE you send the correction.** When a run goes wrong and
+someone supervising it works out why, the fix belongs in the `.md` first and
+the message to the runner is then a pointer: *"pull, read r005 §the gate"*.
+A correction delivered as prose in a message teaches one agent and evaporates.
+8611's supervisor caught itself doing exactly that and had to go back.
+
+**Record what was DISPROVED, not only what was true.** A plausible wrong
+hypothesis costs the next agent the same cycle it cost this one, and nothing
+in a rule warns them off it unless someone writes it down. `r005_masters_spread.md`
+now carries "the thumb pool is not too smooth — measured, 2-6 levels" and "if
+joint clamp is ~95 % then `W` is not the defect" for precisely that reason:
+both were reasonable, both were wrong, both cost a cycle.
+
+The test of a rule is not whether it is true. It is whether an agent who has
+never seen this issue can act on it without asking.
+
 ## `Applies to:` — the issue-kind contract
 
 Not every step exists for every issue. A **monthly** (`8609`) carries a

@@ -175,6 +175,71 @@ first:
 
 > **blank-paper p1 ≥ 250 AND glyph p50 ≤ 40.**
 
+**Those two numbers are 8610 p006's, and so is the 99.9 % pure-white figure
+below. They are a REFERENCE, not a threshold another issue must meet.** This
+file spends a page telling you the percentile is a measurement and not a
+constant carried over, and then states the gate that checks it as a constant.
+8611 failed it on paper that is graded as well as 8610's.
+
+**The pool comes off the 150 dpi thumbs, and that is not a compromise.** The
+obvious worry — a 16:1 reduction averages the grain away, so the thumb's
+percentiles describe a smoother paper than the one the grade actually sees at
+2400 dpi — is reasonable and is WRONG. MEASURED, same page, same paper mask,
+thumb against the raw scan reduced 4:1 to 600 dpi:
+
+| | thumb p2 | 600 dpi p2 |
+|---|---|---|
+| 8610 p006 | `177 177 172` | `171 176 173` |
+| 8611 p010 | `182 172 164` | `181 171 162` |
+
+Two to six levels apart. Pool on the thumbs; it costs 0.1 s a page instead of
+a minute and it tells you the same thing. Do not re-derive this hypothesis —
+8611 spent a cycle on it.
+
+**Before grading anything, take the one number that predicts the grade.**
+`W` exists to make paper clamp to zero ink, so measure exactly that, on the
+pool you already have and for nothing but arithmetic:
+
+> **JOINT CLAMP** — the fraction of pooled paper pixels with **all three
+> channels ≥ `W`**. Those are the pixels that grade to zero ink.
+
+```bash
+$PY -c 'import numpy as np
+p = POOL            # the same paper pool W came from, N x 3
+W = np.array([181, 173, 165], float)
+print("joint clamp %.2f%%" % (100 * np.all(p >= W, axis=1).mean()))'
+```
+
+MEASURED, whole-page paper pool off the raw scans at 600 dpi:
+
+| issue | `W` | joint clamp |
+|---|---|---|
+| 8610 p006 | `180 174 170` (p2) | **94.80 %** |
+| 8611 p010 | `181 173 165` (p2) | **95.37 %** |
+
+Two things follow, and both cost four hours to learn the other way. **A joint
+clamp near 95 % is what a good `W` looks like** — that is the number to hold a
+new issue to, not another issue's rendered band. And **the percentile is a
+weak knob**: p0.5 buys about 3.5 points over p2 on both issues and costs ink
+density at the other end. If the clamp is already ~95 % and the rendered page
+still looks wrong, **`W` is not the defect** and moving it is wasted hours.
+Look downstream — the separation, the GCR undo, the ICC render — by reading
+the same band in both domains, `cmyk2400/NNN.tif` (ink %) and
+`masters600/NNN.png` (rendered RGB).
+
+**`pure white %` and `solid black %` are DIAGNOSTICS, never gates.** Both are
+exact-equality tests on a continuous quantity and neither survives a change of
+stock. 8611 read `solid black 0.00 %` on pages whose ink sits at L 1-10 —
+5-6 % of the page under L 10, and not one pixel at exactly 0. Nothing was
+wrong. Use `L <= 10` and `L >= 250` if you want the numbers to mean anything
+across issues.
+
+**The gate ends with a CROP, not a number.** 8610 passed every number it was
+given and was still wrong: the issue had been graded, all 200 pages, before
+anyone looked at a page at 600 dpi and saw the grain. That cost the whole
+sweep. So the last step before the four hours is to put a 600 dpi crop of a
+blank area and a body-text area in front of the operator, and wait.
+
 "Blank paper" is a band the page has no ink on at all; "glyph" is the pixels
 under lum 100 in a body-text window. Both read off the 600 dpi master:
 
