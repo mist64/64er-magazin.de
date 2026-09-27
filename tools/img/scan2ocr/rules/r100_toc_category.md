@@ -216,6 +216,14 @@ PY
 - Articles **not in the printed TOC** (small fillers, walkthroughs)
   get the closest topical category that's already in `toc.txt`. Don't
   invent new categories — extend `toc.txt` first if you really need one.
-- Once this step is done, prune any line in `toc.txt` that no article
-  ended up using — the generator doesn't care about unused lines, but
-  the file is documentation; keep it tight.
+- **Prune unused `toc.txt` lines at the END OF THE ISSUE, not here.** The
+  instruction used to say "once this step is done", which assumes the article
+  set is final at 100. It is not: 130, 150 and 170 can still turn a dropped
+  region into an article. 8611 pruned `64'er Extra` because its only entry,
+  the p96 Schaltplan, had no article — while the p97 text that becomes that
+  article was already logged as owed to 130/150. A line pruned at 100 and
+  needed at 150 is a line someone has to remember to put back.
+
+  So at 100, **list** the unused lines and leave them. Prune in the
+  end-of-issue pass, when the article set really is final, and re-check that
+  every `toc_category` value still resolves.
