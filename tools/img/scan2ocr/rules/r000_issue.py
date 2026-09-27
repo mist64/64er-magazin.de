@@ -347,6 +347,18 @@ class Issue:
             self.colors = self.paper.profiles["low"]
         else:
             colors = d.get("colors")
+            # A RELATIVE path is resolved against the descriptor's own
+            # directory, never against the caller's cwd.  Otherwise
+            # "issues/8611/colors.txt" -- the spelling every rule shows --
+            # resolves only when you happen to stand in the repo root, and
+            # from rules/ it simply does not exist, which is indistinguishable
+            # here from "not measured yet" and grades the whole issue with the
+            # built-in anchors while the descriptor says otherwise.  8611 lost
+            # a three-page gate run to exactly that.
+            if colors and not os.path.isabs(colors):
+                here = os.path.abspath(os.path.join(issue_dir, colors))
+                root = os.path.abspath(os.path.join(REPO_ROOT, colors))
+                colors = here if os.path.exists(here) else root
             self.colors = colors if colors and os.path.exists(colors) else None
 
         # --- where the issue lives in the repo -------------------------------

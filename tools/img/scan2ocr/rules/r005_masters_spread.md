@@ -202,6 +202,47 @@ Failing the first half means `W` sits above the paper (grain graded as ink);
 failing the second means it sits below the ink (type dissolving into paper).
 Both halves have to pass on all three pages before the sweep starts.
 
+**Failing BOTH at once does not mean either.** `W` moves the two numbers in
+opposite directions, so no value of it can fix both, and iterating is wasted
+time. It means the windows are wrong, or the grade never ran with the profile
+you think it did. 8611 hit this and lost a gate run to it. Before touching
+`W`, take the two readings that cannot be confounded by a window:
+
+```bash
+# 1. WHICH PROFILE ACTUALLY RAN.  This file is written by the separator, so
+#    it is the grade's own account of itself, not the descriptor's claim.
+diff <tmp>/cmyk2400/010.colors.txt issues/<ID>/colors.txt
+# 2. THE WHOLE PAGE, not a band: if solid black is 0.0 % over 34.8 M pixels
+#    the grade is wrong; if it is normal there but 0.0 % in your window, the
+#    window is.
+$PY -c 'import numpy as np; from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
+a = np.asarray(Image.open("<tmp>/masters600/010.png").convert("L"))
+print("black %.2f%%  white %.2f%%  p1 %d  p50 %d"
+      % (100*(a==0).mean(), 100*(a==255).mean(),
+         np.percentile(a,1), np.percentile(a,50)))'
+```
+
+**The windows are the hard part and the rule cannot name them for you.** The
+thresholds above were measured on **8610 p006** and the band constants in the
+snippet are that page's. On another issue they point at nothing in particular:
+
+- **The blank band must be verified blank** before its number means anything.
+  A band that clips a printed rule, a page number or a halftone reports the
+  ink, not the paper. Look at the crop, do not trust the coordinates.
+- **The type window must be body text.** Classified ads, tabular matter at 6 pt
+  and halftone captions all give a lighter `glyph p50` and no solid black,
+  because there is no solid black in them to find. 8611's first reading took
+  `47.0` off a page whose window was not body text.
+- **Pick the three pages for what is ON them**, not by spacing them through the
+  issue: one page with a real blank band, one ordinary body-text page, one
+  ink-heavy page. A classifieds page is the worst possible choice for both
+  halves at once.
+
+A useful sanity number while placing them: pure white over the blank band ran
+**99.9 %** on 8610. Anything in the 20-80 % range is a band with ink in it, not
+a `W` that needs moving.
+
 **The ink anchors stay the built-in set** — same scanner, same stock family —
 unless a colour is visibly wrong on the page; an anchor moved without a
 measurement is the same mistake pointing the other way. **The level lines stay
