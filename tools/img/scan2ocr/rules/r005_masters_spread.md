@@ -227,6 +227,15 @@ Look downstream — the separation, the GCR undo, the ICC render — by reading
 the same band in both domains, `cmyk2400/NNN.tif` (ink %) and
 `masters600/NNN.png` (rendered RGB).
 
+**The ICC render is not the suspect; it has been cleared once, by arithmetic.**
+On 8611 p010 the separation's all-four-inks-zero fraction over a band was
+**54.4 %** and the 2400 dpi master's all-channels-255 fraction over the same
+band was **54.4 %** — the same number, so the render adds nothing of its own.
+When a rendered band carries a cast, the cast is already in `cmyk2400`, and
+the question is why the separator put it there: either the paper under that
+band really is that colour, or `W` is wrong. Read the RAW scan over the band
+before blaming either.
+
 **`pure white %` and `solid black %` are DIAGNOSTICS, never gates.** Both are
 exact-equality tests on a continuous quantity and neither survives a change of
 stock. 8611 read `solid black 0.00 %` on pages whose ink sits at L 1-10 —
@@ -292,9 +301,18 @@ print("black %.2f%%  white %.2f%%  p1 %d  p50 %d"
 thresholds above were measured on **8610 p006** and the band constants in the
 snippet are that page's. On another issue they point at nothing in particular:
 
-- **The blank band must be verified blank** before its number means anything.
-  A band that clips a printed rule, a page number or a halftone reports the
-  ink, not the paper. Look at the crop, do not trust the coordinates.
+- **The blank band must lie INSIDE the body box the pool was measured over**
+  — 12-88 % of the height, 10-90 % of the width. This is the one that cost
+  8611 three cycles. Its first band sat 7-16 mm below the top trim, i.e.
+  outside the pool, and the trim edge of this stock is BROWNED: raw p50 there
+  read `206 184 170` against the pool's `203 191 184` (G −7, B −14), and its
+  joint clamp was **73 %** against the pool's **95 %**. `W` was fitted to
+  interior paper and the gate was pointed at edge paper, so the gate reported
+  a yellow cast that the grade had not caused. The second band, at 36-48 mm —
+  just inside the 12 % line — read `247 245 244` and nearly passed.
+- **The blank band must also be verified blank.** A band that clips a printed
+  rule, a page number or a halftone reports the ink, not the paper. Look at
+  the crop, do not trust the coordinates.
 - **The type window must be body text.** Classified ads, tabular matter at 6 pt
   and halftone captions all give a lighter `glyph p50` and no solid black,
   because there is no solid black in them to find. 8611's first reading took
