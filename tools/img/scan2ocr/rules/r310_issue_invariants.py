@@ -317,6 +317,21 @@ def main(d):
         H('issue has %d Impressum pages, expected exactly 1 (r020)' % len(imp),
           os.path.basename(d), ', '.join(os.path.basename(x) for x in imp[:3]))
 
+    # --- every <img> target exists --------------------------------------
+    # generate.py skips a missing image SILENTLY (os.path.exists guard before
+    # the avif/jpg conversion), so a <figure> written against a file that was
+    # never cut passes the build gate and ships a broken image. Nothing else in
+    # the chain looks at this. MEASURED over the whole corpus: exactly ONE,
+    # 8605/87's 87-0.png, shipped. 0 false positives, so HARD.
+    for f, s_, b in arts:
+        for mm in re.finditer(r'<img[^>]+src="([^"]+)"', s_):
+            src = mm.group(1)
+            if src.startswith(('/', 'http', 'data:')):
+                continue
+            if not os.path.exists(os.path.join(d, src)):
+                H('<img> target does not exist (the build skips it silently)',
+                  f, src)
+
     for k, f, x in hard: print(f'HARD  {k:<52} {f[:40]} {x}')
     if '--soft' in sys.argv:
         for k, f, x in soft: print(f'soft  {k:<52} {f[:40]} {x}')
