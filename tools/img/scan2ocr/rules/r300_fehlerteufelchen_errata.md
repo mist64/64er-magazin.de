@@ -255,7 +255,10 @@ grep -rl 'aside class="fehlerteufelchen" id="fehlerteufelchen"' "$dir"/*.html
 # -rl ...)` splits each one into fragments and reports a dozen missing files
 # per issue.  It fails identically on issues that have been correct for
 # months -- run it over SH8501's eight known-good asides and watch.
-grep -rlZ 'class="fehlerteufelchen"' "$dir"/*.html | while IFS= read -r -d '' f; do
+# --null, NOT -Z: `grep` here is ugrep, where -Z means --fuzzy, so -rlZ emits
+# newline-separated names and `read -d ''` consumes none of them. This loop ran
+# ZERO times on every issue until it was fixed.
+grep -rl --null 'class="fehlerteufelchen"' "$dir"/*.html | while IFS= read -r -d '' f; do
   grep -q "<!-- 64'er " "$f" || echo "  $f: aside missing <!-- 64'er M/YYYY --> trailer"
 done
 # no orphan links (link present but no aside in same file)

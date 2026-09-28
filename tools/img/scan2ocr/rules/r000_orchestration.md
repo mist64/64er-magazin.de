@@ -532,6 +532,10 @@ against them:
   the transform started skipping fenced code; the check did not.
 - **a threshold above its own documented calibration**: a finder shipped at
   1.40 against a docstring worked example of 1.35, and found nothing all issue.
+- **a GNU flag that means something else here**: `grep` on this machine is
+  ugrep, where `-Z` is `--fuzzy`, not NUL-output. `grep -rlZ … | while read -d
+  ''` therefore looped zero times on every issue. Use `--null`, and prefer the
+  long flag whenever the short one is doing something structural.
 - **a tag pattern that matches a longer tag**: `<p[^>]*>` matches `<pre>`,
   because `[^>]*` eats the `re`. A sweep for code-in-paragraphs built on it
   reported every correct `<pre>` listing as a defect, and the corpus counts
