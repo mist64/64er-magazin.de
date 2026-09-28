@@ -100,10 +100,12 @@ BAS = re.compile(r'(?:^|<br>|\n)\s*\d{1,5}\s+' + KW, re.I)
 ASM = re.compile(r'(?:^|<br>|\n)\s*(?:lda|sta|jsr|jmp|ldx|ldy|cmp|beq|bne|inx|iny|adc|sbc|asl|lsr)\s+[#$(]', re.I)
 for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
     s = open(f, encoding='utf-8').read()
-    for m in re.finditer(r'<p[^>]*>(.*?)(?=</p>|<p[^>]*>)', s, re.S):
+    # <p[^>]*> ALSO MATCHES <pre>: [^>]* eats the "re". That version reported
+    # every correct <pre> listing as a defect. Match the tag exactly.
+    for m in re.finditer(r'<p(?:\s[^>]*)?>(.*?)(?=</p>|<p(?:\s[^>]*)?>)', s, re.S):
         t = m.group(1)
         if len(BAS.findall(t)) >= 2 or len(ASM.findall(t)) >= 2:
-            kind = 'in <p><code>' if '<code>' in t else 'in BARE <p>'
+            kind = 'in <p><code>' if '<code>' in t else 'in BARE <p>'   # both are defects
             print(f"  listing {kind}: {os.path.basename(f)}: {re.sub(r'\s+', ' ', t)[:64]}")
 PYEOF
 ```
@@ -112,25 +114,21 @@ Two BASIC line numbers each followed by a keyword is the threshold: one is
 ordinary prose quoting a line, two is a listing. Expect a handful per issue —
 around 7 to 14 on recent ones — so a flood means the pattern broke.
 
-**Most of what it prints is CORRECT, so read the `<code>` column first.**
-A multi-line `<p><code>` is this corpus's established form for a snippet quoted
-inside the prose flow — 201 of them are published, 14 in 8609, 29 in 8610, 24 in
-8611 — and converting those to `<pre>` would be the damage, not the repair. The
-three forms, and step 020's own labels decide between them:
+**The code form in this corpus is `<pre>`, in every case.** A snippet quoted
+inside the prose flow is `<pre><code>` — 289 published, 34 in 8609, 52 in 8610,
+44 in 8611 — and TRUE `<p><code>` does not occur in any recent issue at all (0
+in 8607, 8609, 8610 and 8611). So every hit this sweep reports is a defect, in
+one of two forms:
 
 | step 020 label | markup | what it is in print |
 |---|---|---|
-| `listing-standalone` | `<pre>` | a captioned listing set off from the text |
-| `listing-inline` | `<p><code>` | a snippet quoted inside a paragraph |
-| `body` on code | **the defect** | code with no code markup at all |
+| `listing-standalone` / `listing-inline` | `<pre>` (with `<code>` inside) | either kind of printed code |
+| `body` on code | **the defect** — a bare `<p>`, or a `<p><code>` | code the classifier took for prose |
 
-So act only on the **BARE `<p>`** hits — code the sweep found with no `<code>`
-and no `<pre>` around it. Expect **0 to 3** of those on a recent issue (8611
-had one, 8610 three) against a handful of correct `<p><code>` ones. The
-`<code>` form starts at 8609: 8607 and earlier have no `<p><code>` at all and
-many more bare hits, so do not read them as precedent for a new issue. For those, check whether the line breaks survived as
-well: restoring the markup means restoring the lines from the crop, not just
-adding a tag.
+Expect **zero** on a correctly built recent issue; SH8504 has seven. The real
+ones come from step 020 giving a short code block the `body` role — on 8611,
+assembler in 151 and Prolog in 181. When you move one into `<pre>`, check the
+line breaks survived, and restore them from the crop if not.
 
 ## The two finders are calibration instruments, not detectors
 

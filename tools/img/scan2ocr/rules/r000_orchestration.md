@@ -532,6 +532,11 @@ against them:
   the transform started skipping fenced code; the check did not.
 - **a threshold above its own documented calibration**: a finder shipped at
   1.40 against a docstring worked example of 1.35, and found nothing all issue.
+- **a tag pattern that matches a longer tag**: `<p[^>]*>` matches `<pre>`,
+  because `[^>]*` eats the `re`. A sweep for code-in-paragraphs built on it
+  reported every correct `<pre>` listing as a defect, and the corpus counts
+  taken with it measured `<pre><code>` while claiming to measure `<p><code>`.
+  Match the tag exactly: `<p(?:\s[^>]*)?>`.
 
 **A check that fails on a good result is worse than no check**, because it
 gets "fixed" by undoing the transform — that is how a corrected bug returns.
