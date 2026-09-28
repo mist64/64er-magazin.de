@@ -290,9 +290,7 @@
             </tbody>
         </table>
 
-        <p>Nun kommen wieder einige</p>
-
-        <p>Funktionen. Zunächst einmal das Bilden der Quadratwurzel des FAC-Inhaltes:</p>
+        <p>Nun kommen wieder einige Funktionen. Zunächst einmal das Bilden der Quadratwurzel des FAC-Inhaltes:</p>
 
         <h3>SQR</h3>
 
@@ -356,8 +354,10 @@
 
         <p>Das Ergebnis steht dann in A, was durch »PRINT A« leicht zu kontrollieren ist. Auf die Startadresse eines Variablenwertes weist der Zeiger »FORPNT«. Um sicher zu gehen, daß er bei den manchmal reichlich unübersichtlichen Interpreter-Routinen nicht doch mal überschrieben wird, schieben wir seinen Inhalt auf den Stapel:</p>
 
-        <pre><code>lda forpnt pha
-lda forpnt+1 pha
+        <pre><code>lda forpnt
+pha
+lda forpnt+1
+pha
 </code></pre>
 
 
@@ -373,7 +373,13 @@ lda forpnt+1 pha
 
         <p>Nach dieser Zeile folgt in allen Modulen der jeweilige Kern. Den Abschluß bildet danach der zweite Teil des Rahmens, der lediglich den zuvor auf dem Stapel gespeicherten Variablenzeiger zurückholt und den FAC-Inhalt in die dadurch bezeichnete Variable schreibt:</p>
 
-        <p>pla tay pla tax jsr movmf rts</p>
+        <pre><code>pla
+tay
+pla
+tax
+jsr movmf
+rts
+</code></pre>
 
         <p>Wie Sie sicher wissen, funktioniert der Stapelspeicher nach dem LIFO-Prinzip: Das heißt »Last In-First Out« und bedeutet, daß der zuletzt daraufgelegte Wert als erster wieder herunter genommen wird (wie bei einem Bücherstapel). Als letzter Wert wurde im ersten Teil unseres Modulrahmens das MSB des Vektors FORPNT+1 abgelegt. Der kommt also nun wieder zurück in den Akku und von dort aus ins Y-Register. Das LSB lag darunter, wird als zweiter Wert vom Stapel geholt und auf dem Umweg über den Akku ins X-Register transportiert. Damit haben wir die Vorbereitungen schon erledigt, die die Interpreter-Routine MOVMF braucht: LSB der Zieladresse ins X-Register, MSB ins Y-Register. Mittels des MOVMF-Aufrufes transportieren (genaugenommen kopieren) wir nun den Inhalt des FAC in den dafür bereitgehaltenen Speicherbereich der durch FORPNT markierten Variable. Nun steht uns das Ergebnis vom Basic aus leicht zur Verfügung. Die Module werden durch RTS beendet, was den Rücksprung in das Modul 1, die Hauptschleife unserer Basic-Erweiterung, bewirkt.</p>
 
