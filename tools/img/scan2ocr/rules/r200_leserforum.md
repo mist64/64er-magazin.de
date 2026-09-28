@@ -60,6 +60,37 @@ Required metas: `64er.head1=Leserforum`, `64er.toc_category=Rubriken`,
 no overall author; per-question authorship lives inside each
 `<p class="author">`.
 
+## THE Q&A SHAPE IS NOT THE LESERFORUM'S ALONE
+
+This anatomy is the project's shape for **any** reader-question article, and
+four published files outside the Leserforum use it: `8502/12` and `8505/13`
+*Leser fragen – Willi Brechtl antwortet*, `8512/40` *Fragen und Antworten zum
+128er*, and `8610/23` *Profis helfen Einsteigern* (`<article class="qa
+numbered">`, 8 `div.q`, each asker a `<p class="author">(Name)</p>`).
+
+Because this rule is titled for the Leserforum, such an article can pass the
+whole chain unrestructured — 8611/29, *Profis helfen Einsteigern (Teil 2)*,
+reached step 290 with 0 `div.q` and 7 bare `<h3>` while its own Teil 1 in the
+previous issue had the full shape.
+
+**The asker NEVER goes in the heading.** Merging it in (`…Schaden nimmt?
+(Burkhart Laasch)`) loses the `<p class="author">` the generator and the
+author index both read, and check 5 below — every `div.q` has a
+`<p class="author">` — cannot see it, because there are no `div.q` elements to
+check.
+
+**The reliable tell is the SERIES, not the markup.** If part N−1 of a series
+uses `article class="qa"`, part N must:
+
+```bash
+grep -l 'class="qa"' issues/*/*.html | sed 's/.*\///' | sort -u   # the shape's precedents
+```
+
+Counting question-shaped headings does **not** work as a tell — 19 files have
+three or more, and most are ordinary articles with rhetorical subheads (*Was
+ist zu beachten?*). It is also self-defeating: appending the asker to the
+heading stops it ending in `?`, so the error hides the file from the check.
+
 ## Per-section anatomy
 
 Inside each `<section>`:

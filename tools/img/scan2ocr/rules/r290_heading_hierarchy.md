@@ -68,6 +68,19 @@ because it "looks odd": stop. The input is right. Move on.
    an article without ever using h2 — and that's fine; it's the
    article's own design choice, not a structural defect.
 
+## A QUESTION heading may mean the article is in the wrong shape entirely
+
+Before changing levels on an article whose headings are reader questions, check
+whether it should be a Q&A article rather than a flat one with `<h3>`s: if a
+previous part of the same series carries `<article class="qa">`, this part owes
+the same structure, and the fix is **r200's anatomy**, not a heading level.
+8611/29 reached this step with 7 bare `<h3>` and 0 `div.q` while its Teil 1 had
+eight.
+
+In that shape the asker is a `<p class="author">(Name)</p>` inside the
+`div.q` — **never appended to the heading.** Doing so destroys the markup the
+author index reads and makes the file invisible to r200's own check.
+
 ## The promotion trap (don't do this)
 
 ❌ **"This article has no `<h2>`, so the top-level `<h3>` blocks
