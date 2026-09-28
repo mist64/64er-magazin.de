@@ -68,6 +68,20 @@ because it "looks odd": stop. The input is right. Move on.
    an article without ever using h2 — and that's fine; it's the
    article's own design choice, not a structural defect.
 
+## A heading can be MISSING, not just at the wrong level
+
+This step's default is to leave levels alone, which makes it easy to forget
+that a heading may not be in the file at all. 8611/34 had `Scanner` nowhere in
+the HTML — the OCR never emitted it — while its sibling
+`Videodigitalisiergeräte` sat in a `<p>`, both set in the same bold style in
+print as the headings around them.
+
+No check on the HTML can find the missing one: there is nothing to match, and
+the text reads as a run-on paragraph. Since this step already puts the crop in
+front of you for the level question, **count the print's bold subheads for the
+article against the headings in the file** while you are there. A shortfall is
+the only signal there is.
+
 ## A QUESTION heading may mean the article is in the wrong shape entirely
 
 Before changing levels on an article whose headings are reader questions, check

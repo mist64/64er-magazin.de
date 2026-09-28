@@ -131,7 +131,9 @@ Three instruments were tried against those four cases and **all three failed**
 
 So there is no mechanical check, and this section exists to say so rather than
 to leave the next agent looking for one. The instrument is **r325, reading the
-page**, and what this class contributes is where to look hardest: the FIRST
+page** — and **r290**, which catches lost HEADINGS as a side effect of holding
+the crop up for the level question. What this class contributes is where to
+look hardest: the FIRST
 LINE of a column, and any paragraph that runs beside a figure or an ornamental
 initial. Both are places the OCR's line segmentation has least context.
 
