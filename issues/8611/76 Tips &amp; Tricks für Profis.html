@@ -21,13 +21,13 @@
         <h1>Tips &amp; Tricks für Profis</h1>
         <p class="intro">gentlich nicht nutzbare Bildschirmrahmen nun doch sinnvoll beschreiben.</p>
 
-        <p>m Handbuch desC 64 steht überhaupt nichts, im Programmierhandbuch nichts Genaues — was ıst mit den freidefinierbaren Übertragungsraten los?</p>
+        <p>Im Handbuch des C 64 steht überhaupt nichts, im Programmierhandbuch nichts Genaues — was ist mit den freidefinierbaren Übertragungsraten los?</p>
 
-        <p>Beim C 64 handeltesssich bei der RS232-Schnittstelle um eine bitserielle, asynchrone Übertragung. Das heißt ein Byte wird in Bits zerteilt und diese werden dann über eine Leitung in Form von Spannungswechseln gesendet. Unter asynchroner Übermittlung versteht man die Verwendung von Kennzeichen für Byteanfang und Byteende. Beimanchen Computern können die Daten wunschweise auch synchron übermittelt werden. Der Computer sendet dann kein Start- oder Stoppbit mehr, es werden nur noch die Daten übertragen. Vorteil: Die Übertragungszeit verkürzt sich, da die Steuerbits entfallen.</p>
+        <p>Beim C 64 handelt es sich bei der RS232-Schnittstelle um eine bitserielle, asynchrone Übertragung. Das heißt ein Byte wird in Bits zerteilt und diese werden dann über eine Leitung in Form von Spannungswechseln gesendet. Unter asynchroner Übermittlung versteht man die Verwendung von Kennzeichen für Byteanfang und Byteende. Bei manchen Computern können die Daten wunschweise auch synchron übermittelt werden. Der Computer sendet dann kein Start- oder Stoppbit mehr, es werden nur noch die Daten übertragen. Vorteil: Die Übertragungszeit verkürzt sich, da die Steuerbits entfallen.</p>
 
         <h2>RS232 mit 4800 bit/s</h2>
 
-        <p>Beim C 64 ist die Übertragung rein softwaremäßig geregelt. Er setzt dazu den CIA #2 ein. Dieser Baustein besitzt zwei 16-Bit-Intervall-Timer, die von einem bestimmten Wert auf Null zählen und dann einen NMI auslösen können. Dies nutzt die RS232-Schnittstelle aus. Die Software holt den Wert für den Timer B, der als Interruptgenerator dient, aus einer im ROM verankerten Tabelle. Es existieren hierzu zwei verschiedene Tabellen, aber dazu später mehr. Diese Werte werden in den Timer und in zwei Speicherstellen gebracht. Danach startet der Timer. Da beim C 64 das Senden und Empfangen über RS232 interruptgesteuert geschieht, werden zwei Puffer (Zwischenspeicher) benötigt. Einer der beiden Puffer steht für die zusendenden Daten bereit. Die Daten werden nur in den Puffer geschrieben. Das Senden geschieht mit Hilfe des NMI-Interrupts, weil man ihn (im Gegensatz zum IRQ) nicht sperren kann. So werden die Daten in jedem Fall gesendet, es sei denn, man stoppt den Timer oder verbiegt den NMI-Vektor. Da die Daten in den Puffer geschrieben werden und das Beschreiben des Puffers normalerweise schneller geht als das Senden der Zeichen, sollte man, nachdem ein Zeichen gesendet wurde, das nächste Zeichen vorbereiten und warten, bis der Puffer freiist. Nunkann das Zeichen problemlos in den Puffer geschrieben werden. Beachtet man dies nicht, könnte versehentlich ein noch nicht gesendetes Zeichen überschrieben werden. Die Folge wäre eine fehlerhafte Übertragung. Das Empfangen geschieht auf ähnliche Weise, denn die RDX-Leitung (hier gelangen die Daten vom anderen Computer zum C 64) ist nicht nur mit dem Port Bdes CIA #2 verbunden, sondern auch mit dem EingangFLAG derCIA, dereinen NMI auslösen kann. Das Empfangen geschieht also unabhängig vom Programm, daher werden die Daten in den Empfangspuffer geschrieben, der genauso groß ist wie der Sendepuffer: 256 Byte. Man sollte sich also darum kümmern, daß die Zeichen rechtzeitig aus dem Puffer gelesen werden. Durch die Kernelroutine READST, oder beim C 64 auch durch Auslesen der Speicherstelle $90, läßt sich der Status abfragen. Bei gesetztem Bit 2 liefder Empfangspuffer über. Umnunandere Übertragungsraten zu benutzen, könnten natürlich die Werte in den Timer und die entsprechenden Werte in die beiden Speicherstellen geschrieben werden. Dieshättenurden großen Nachteil, daß- die so erstellten Programme schwer an andere (Commodore-)Computer anzupassen wären, da diese nicht die gleichen Speicherstellen benutzen. Aber dies ist gar nicht nötig, denn es geht auch sehr viel eleganter! Die RS232-Schnittstelle öffneten wir bisher folgendermaßen:</p>
+        <p>Beim C 64 ist die Übertragung rein softwaremäßig geregelt. Er setzt dazu den CIA #2 ein. Dieser Baustein besitzt zwei 16-Bit-Intervall-Timer, die von einem bestimmten Wert auf Null zählen und dann einen NMI auslösen können. Dies nutzt die RS232-Schnittstelle aus. Die Software holt den Wert für den Timer B, der als Interruptgenerator dient, aus einer im ROM verankerten Tabelle. Es existieren hierzu zwei verschiedene Tabellen, aber dazu später mehr. Diese Werte werden in den Timer und in zwei Speicherstellen gebracht. Danach startet der Timer. Da beim C 64 das Senden und Empfangen über RS232 interruptgesteuert geschieht, werden zwei Puffer (Zwischenspeicher) benötigt. Einer der beiden Puffer steht für die zusendenden Daten bereit. Die Daten werden nur in den Puffer geschrieben. Das Senden geschieht mit Hilfe des NMI-Interrupts, weil man ihn (im Gegensatz zum IRQ) nicht sperren kann. So werden die Daten in jedem Fall gesendet, es sei denn, man stoppt den Timer oder verbiegt den NMI-Vektor. Da die Daten in den Puffer geschrieben werden und das Beschreiben des Puffers normalerweise schneller geht als das Senden der Zeichen, sollte man, nachdem ein Zeichen gesendet wurde, das nächste Zeichen vorbereiten und warten, bis der Puffer frei ist. Nun kann das Zeichen problemlos in den Puffer geschrieben werden. Beachtet man dies nicht, könnte versehentlich ein noch nicht gesendetes Zeichen überschrieben werden. Die Folge wäre eine fehlerhafte Übertragung. Das Empfangen geschieht auf ähnliche Weise, denn die RDX-Leitung (hier gelangen die Daten vom anderen Computer zum C 64) ist nicht nur mit dem Port B des CIA #2 verbunden, sondern auch mit dem Eingang FLAG der CIA, der einen NMI auslösen kann. Das Empfangen geschieht also unabhängig vom Programm, daher werden die Daten in den Empfangspuffer geschrieben, der genauso groß ist wie der Sendepuffer: 256 Byte. Man sollte sich also darum kümmern, daß die Zeichen rechtzeitig aus dem Puffer gelesen werden. Durch die Kernelroutine READST, oder beim C 64 auch durch Auslesen der Speicherstelle $90, läßt sich der Status abfragen. Bei gesetztem Bit 2 lief der Empfangspuffer über. Um nun andere Übertragungsraten zu benutzen, könnten natürlich die Werte in den Timer und die entsprechenden Werte in die beiden Speicherstellen geschrieben werden. Dies hätte nur den großen Nachteil, daß die so erstellten Programme schwer an andere (Commodore-)Computer anzupassen wären, da diese nicht die gleichen Speicherstellen benutzen. Aber dies ist gar nicht nötig, denn es geht auch sehr viel eleganter! Die RS232-Schnittstelle öffneten wir bisher folgendermaßen:</p>
 
         <pre><code>lda #2 ;Logische Filenummer = 2
 ldx #2 ;Gerätenummer der RS232
@@ -40,17 +40,17 @@ jsr setnam ;Name für OPEN setzen
 jsr open ;Datei öffnen
 ldx #&lt;ebuf ;Zeiger für Empfangspuffer
 ldy #&gt;ebuf ;und
-stx $£7
+stx $f7
 sty $f8
-ldx #&lt;abuf
+ldx #&lt;abuf ;Ausgabepuffer setzen
 ldy #&gt;abuf
-stx $£9
+stx $f9
 sty $fa
 fadr .byte %00000110 ;Wert für Steuerregister
-... "byte %00000000 ;Wert für Befehlsregister
+     .byte %00000000 ;Wert für Befehlsregister
 </code></pre>
 
-        <p>Übrigens werden die Zeiger auf die Puffer auch vom Betriebssystem gesetzt, das die Puffer an das obere (Basic-) RAM-Ende legt. Dies ist auch der Grund, weswegen beim Öffnen der Schnittstelle ein CLR ausgeführt wird, denn im gleichen Speicherbereich liegen ja auch die Stringvariablen. Wenn wir jetzt zum Beispiel sequentielle Dateien senden oder empfangen wollten, könnte es bei langen Dateien passieren, daß die Puffer und die Datei sich überlappen, so daß Datenverluste entstehen. Darum legen wir die Puffer in uns angenehme Speicherbereiche, was man entweder vor oder nach dem OPEN-Befehl machen kann. Vorher deswegen, da das Betriebssystem die Pufferadressen erst festlegt, nachdem esin den Speicherstellen nachgesehen hat, ob das vom Programm schon gemacht wurde. Ist das High-Byte der Pufferzeiger ungleich Null, wird davon ausgegangen, daß die Zeiger bereits auf die Puffer deuten. Deshalb wird nichts mehr verändert. Und nun geht's los!</p>
+        <p>Übrigens werden die Zeiger auf die Puffer auch vom Betriebssystem gesetzt, das die Puffer an das obere (Basic-) RAM-Ende legt. Dies ist auch der Grund, weswegen beim Öffnen der Schnittstelle ein CLR ausgeführt wird, denn im gleichen Speicherbereich liegen ja auch die Stringvariablen. Wenn wir jetzt zum Beispiel sequentielle Dateien senden oder empfangen wollten, könnte es bei langen Dateien passieren, daß die Puffer und die Datei sich überlappen, so daß Datenverluste entstehen. Darum legen wir die Puffer in uns angenehme Speicherbereiche, was man entweder vor oder nach dem OPEN-Befehl machen kann. Vorher deswegen, da das Betriebssystem die Pufferadressen erst festlegt, nachdem es in den Speicherstellen nachgesehen hat, ob das vom Programm schon gemacht wurde. Ist das High-Byte der Pufferzeiger ungleich Null, wird davon ausgegangen, daß die Zeiger bereits auf die Puffer deuten. Deshalb wird nichts mehr verändert. Und nun geht's los!</p>
 
         <h3>Übersicht der Werte für:</h3>
 
@@ -77,7 +77,7 @@ fadr .byte %00000110 ;Wert für Steuerregister
             </tbody>
         </table>
 
-        <p>Der Filename kann auch vier Zeichen lang sein. Die ersten beiden Zeichen behalten ihre Bedeutungbei, aber die nächsten beiden beinhalten den Wert für die Übertragungsrate.</p>
+        <p>Der Filename kann auch vier Zeichen lang sein. Die ersten beiden Zeichen behalten ihre Bedeutung bei, aber die nächsten beiden beinhalten den Wert für die Übertragungsrate.</p>
 
         <p>Der Filename sieht also wie folgt aus:</p>
 
@@ -86,26 +86,25 @@ fadr .byte %00000110 ;Wert für Steuerregister
         <p>Wie gesagt, das untere Nibble vom »Steuerregister« muß %0000 sein! Die Werte für »Übertragungsrate-low« und »Übertragungsrate-high« berechnet man wie folgt:</p>
 
         <pre><code>Übertragungsrate-high = INT(Prozessortakt/ Übertragungsrate/2-100)/256)
-Übertragungsrate-low= INT(Prozessortakt/
-Übertragungsrate/2-100-Übertragungsrate-highx256)
+Übertragungsrate-low= INT(Prozessortakt/ Übertragungsrate/2-100-Übertragungsrate-highx256)
 </code></pre>
 
 
-        <p>Der Prozessortakt beträgt bei der deutschen PAL-Version 985259 Hertz, bei der amerikanischen NTSC-Version 1022730 Hertz. Das heißt nichts anderes, als daß die Programme auf amerikanischen Geräten schneller laufen als aufdeutschen. Da dies natürlich auch Auswirkungen auf die Übertragungskapazität hat, sind im Betriebssystem zwei Tabellen für den Timer B vorhanden. Wenn Sie nun Programme mit selbstdefinierten Übertragungsraten schreiben, sollten Sie immer daran denken, daß diese Programme entweder nur auf dem deutschen oder dem amerikanischen C 64 richtiglaufen, wenn Sie nur eine Tabelle verwenden. Durch Auslesen der Speicherstelle $02A6 können Sie ganz einfach feststellen, ob Sie eine PAL- oder eine NTSC-Version vor sich haben. Bei einer PAL-Version steht in besagter Speicherstelle der Wert 1, bei NTSC eine Null.</p>
+        <p>Der Prozessortakt beträgt bei der deutschen PAL-Version 985259 Hertz, bei der amerikanischen NTSC-Version 1022730 Hertz. Das heißt nichts anderes, als daß die Programme auf amerikanischen Geräten schneller laufen als auf deutschen. Da dies natürlich auch Auswirkungen auf die Übertragungskapazität hat, sind im Betriebssystem zwei Tabellen für den Timer B vorhanden. Wenn Sie nun Programme mit selbstdefinierten Übertragungsraten schreiben, sollten Sie immer daran denken, daß diese Programme entweder nur auf dem deutschen oder dem amerikanischen C 64 richtig laufen, wenn Sie nur eine Tabelle verwenden. Durch Auslesen der Speicherstelle $02A6 können Sie ganz einfach feststellen, ob Sie eine PAL- oder eine NTSC-Version vor sich haben. Bei einer PAL-Version steht in besagter Speicherstelle der Wert 1, bei NTSC eine Null.</p>
 
-        <p>Nun ein Beispiel: Die Übertragungsrate soll 1800 Bit/s betragen. Also erhalten wir für »Übertragungsrate-high«: INT((985250/4800/2-100)/256)=0 und für »Übertragungsrate-low«: INT(985250/4800/2-100-0x256)=2. Der Filename lautet also: HVXXXX0000, WAXXXXXXX, %00000010, %00000000 Achtung: Für die X-Bits setzen Sie die entsprechenden Werte aus der Tabelle ein.</p>
+        <p>Nun ein Beispiel: Die Übertragungsrate soll 1800 Bit/s betragen. Also erhalten wir für »Übertragungsrate-high«: INT((985250/4800/2-100)/256)=0 und für »Übertragungsrate-low«: INT(985250/4800/2-100-0x256)=2. Der Filename lautet also: %XXXX0000, %XXXXXXXX, %00000010, %00000000 Achtung: Für die X-Bits setzen Sie die entsprechenden Werte aus der Tabelle ein.</p>
 
         <h3>Übungen:</h3>
 
-        <p>Wir möchten ein sequentielles File mit 4800 bit/s, 7 Datenbits, 1 Stoppbit, 3-Line-Handshake und keiner Paritätsenden. Also: Zuerst dassequentielle File in den Speicher laden. Jetzt müssen wir noch die RS232-Schnittstelle öffnen, wobei wir auf die Abfrage auf PAL- oder NTSC-Version verzichten. Das Programm zum Öffnen ist bis auf den Filenamen und dessen Länge von dem altbekannten nicht zu unterscheiden.</p>
+        <p>Wir möchten ein sequentielles File mit 4800 bit/s, 7 Datenbits, 1 Stoppbit, 3-Line-Handshake und keiner Parität senden. Also: Zuerst das sequentielle File in den Speicher laden. Jetzt müssen wir noch die RS232-Schnittstelle öffnen, wobei wir auf die Abfrage auf PAL- oder NTSC-Version verzichten. Das Programm zum Öffnen ist bis auf den Filenamen und dessen Länge von dem altbekannten nicht zu unterscheiden.</p>
 
         <pre><code>lda #2 ;logische Filenummer = 2
 ldx #2 ;Geraetenummer der RS232
 ldy #3 ;Sekundaeradresse
 jsr setlfs ;Werte setzen
 lda #4 ;der Filename ist 2 Zeichen lang
-ldx #(fadr ;Adresse des Filenamens (low)
-ldy #)fadr ;(high)
+ldx #&lt;fadr ;Adresse des Filenamens (low)
+ldy #&gt;fadr ;(high)
 jsr setnam ;Name für OPEN setzen
 jsr open ;Datei oeffnen
 ldx #2 ;Datei mit der logischen Filenummer
@@ -121,29 +120,29 @@ lda (pt),y ;File in den Akku holen
 (Zeichen nun bearbeiten, zum Beispiel in ASCII-Code
 wandeln)
 tax ;Zeichen merken
-wloop lda $02al ;ist das vorherige Zeichen
+wloop lda $02a1 ;ist das vorherige Zeichen
 and #1 ;bereits gesendet worden?
 bne wloop ;nein: =&gt;warten
 txa ;gemerktes Zeichen zurueckholen
-jsr chrout ;auf. RS232 ausgeben
+jsr chrout ;auf RS232 ausgeben
 </code></pre>
 
 
-        <p>Der Zeiger »PT« muß nun erhöht und auf Fileende getestet werden. Ist die Dateinoch nicht zu Ende, muß wieder zum Label SENDE gesprungen werden.</p>
+        <p>Der Zeiger »PT« muß nun erhöht und auf Fileende getestet werden. Ist die Datei noch nicht zu Ende, muß wieder zum Label SENDE gesprungen werden.</p>
 
-        <pre><code>jsr elrchn ;Standardwerte Ein-/Ausgabe
+        <pre><code>jsr clrchn ;Standardwerte Ein-/Ausgabe
 lda #2 ;setzen und Datei schließen
 jsr close
-rts ‚das war's!
-.byte %00100000
+rts ;das war's!
+fadr .byte %00100000
 .byte %00000000
 .byte %00000010
 .byte %00000000
 </code></pre>
 
-        <p>Das folgende Programm (Listing 1, bitte mit dem MSE eingeben) sendet sequentielle Files mit 4800 Bit/s, 8 Datenbits, 1 Stoppbit, keine Parität, Vollduplex und 3-Line-Handshake. Die Syntax lautet: SYS 52480,konv-flag," Name" Wenn konrv-flag = 0, werden die Zeichen erst in ASCII-Code gewandelt und dann gesendet. Bei konv-flag = 128 erfolgt die Übertragung unverändert.</p>
+        <p>Das folgende Programm (Listing 1, bitte mit dem MSE eingeben) sendet sequentielle Files mit 4800 Bit/s, 8 Datenbits, 1 Stoppbit, keine Parität, Vollduplex und 3-Line-Handshake. Die Syntax lautet: SYS 52480,konv-flag," Name" Wenn konv-flag = 0, werden die Zeichen erst in ASCII-Code gewandelt und dann gesendet. Bei konv-flag = 128 erfolgt die Übertragung unverändert.</p>
 
-        <p>Mit dem Namen ist der Titel der sequentiellen Datei gemeint. »,S,R"«wird vom Programm nicht automatisch ergänzt. Sie müssen es also noch an den Namen anhängen. Beispiel: SYS 52480,128," TEST,S,R"</p>
+        <p>Mit dem Namen ist der Titel der sequentiellen Datei gemeint. »,S,R"« wird vom Programm nicht automatisch ergänzt. Sie müssen es also noch an den Namen anhängen. Beispiel: SYS 52480,128," TEST,S,R"</p>
 
         <p>Die Datei TEST wird unkonvertiert gesendet.</p>
 
@@ -158,21 +157,21 @@ rts ‚das war's!
             <pre data-filename="seq-transfer" data-name="SEQ-Transfer (Quelltext für Profi-Ass)"></pre>
         </div>
 
-        <h2>Änderung der Tastuturbelegung</h2>
+        <h2>Änderung der Tastaturbelegung</h2>
 
-        <p>Es kommt desöfteren vor, daß man anstelle der alten Tastaturbelegung eine andere benutzen möchte, um beispielsweise Programme leichter eingeben zu können. Oder man möchte anstelle der amerikanischen QWERTY- eine QWERTZ-Tastatur haben. Eine Lösungsmöglichkeit wäre, die Zeichen Y und Z im Zeichensatz umzudefinieren. Die gebräuchlichste Lösung dieses Problems ist, dasROM ins RAM zu kopieren und die Zeichen in der Tastaturtabelle auszutauschen. Will man dies jedoch in Basic ausführen, ist das sehr zeitaufwendig und schwierig.</p>
+        <p>Es kommt des öfteren vor, daß man anstelle der alten Tastaturbelegung eine andere benutzen möchte, um beispielsweise Programme leichter eingeben zu können. Oder man möchte anstelle der amerikanischen QWERTY- eine QWERTZ-Tastatur haben. Eine Lösungsmöglichkeit wäre, die Zeichen Y und Z im Zeichensatz umzudefinieren. Die gebräuchlichste Lösung dieses Problems ist, das ROM ins RAM zu kopieren und die Zeichen in der Tastaturtabelle auszutauschen. Will man dies jedoch in Basic ausführen, ist das sehr zeitaufwendig und schwierig.</p>
 
-        <p>Das folgende Programm (Listing 2) macht es Ihnen sehr leicht. Bis auf die Tasten &lt;SHIFT&gt;, &lt;CBM&gt;, &lt;CTRL&gt; und &lt;RESTORE&gt; kann jeder Taste des C 64 ein beliebiger CHR$-Code zugeordnet werden. Der Tasten-Code stimmt mit dem jeweiligen Bildschirm-Code überein. Die Syntax des neuen Befehls lautet: !IA,B</p>
+        <p>Das folgende Programm (Listing 2) macht es Ihnen sehr leicht. Bis auf die Tasten &lt;SHIFT&gt;, &lt;CBM&gt;, &lt;CTRL&gt; und &lt;RESTORE&gt; kann jeder Taste des C 64 ein beliebiger CHR$-Code zugeordnet werden. Der Tasten-Code stimmt mit dem jeweiligen Bildschirm-Code überein. Die Syntax des neuen Befehls lautet: !A,B</p>
 
-        <p>A ist der Bildschirm-Code, dem der CHR$-Code B zugeordnet wird. Wollen wir beispielsweise das Zeichen A inein B umwandeln, muß folgender Befehl angewandt werden: 11,66 (und !2,65, falls das B in ein Ä geändert werden soll).</p>
+        <p>A ist der Bildschirm-Code, dem der CHR$-Code B zugeordnet wird. Wollen wir beispielsweise das Zeichen A in ein B umwandeln, muß folgender Befehl angewandt werden: !1,66 (und !2,65, falls das B in ein A geändert werden soll).</p>
 
-        <p>Die Zahl 1 ist der Bildschirm-Code des Zeichens A, dem der Wert 66(CHRS$-Code von B) zugeordnet wird. Esist dabei unwichtig, ob das B vorher geändert war oder nicht. Der CHRS$-Code wird aus dem ROM gelesen.</p>
+        <p>Die Zahl 1 ist der Bildschirm-Code des Zeichens A, dem der Wert 66 (CHR$-Code von B) zugeordnet wird. Es ist dabei unwichtig, ob das B vorher geändert war oder nicht. Der CHR$-Code wird aus dem ROM gelesen.</p>
 
-        <p>Um eine QWERTZ-Tastatur zu erhalten, sind folgende Befehle einzugeben:<br>125,90 (wandelt Yin Z um)<br>126,89 (wandelt Zin Y um)</p>
+        <p>Um eine QWERTZ-Tastatur zu erhalten, sind folgende Befehle einzugeben:<br>!25,90 (wandelt Y in Z um)<br>!26,89 (wandelt Z in Y um)</p>
 
-        <p>Soll die Cursor-Steuerung auf die Funktionstasten gelegt werden, so benötigt man folgende Befehle:<br>139,145 (&lt;Fl&gt; = &lt;CRSR&gt;-hoch)<br>140,17 (&lt;F3&gt; = &lt;CRSR&gt;-unten)<br>141,157 (&lt;F5&gt; = &lt;CRSR&gt;-links)<br>163,29 (&lt;F7&gt; = &lt;CRSR&gt;-rechts)</p>
+        <p>Soll die Cursor-Steuerung auf die Funktionstasten gelegt werden, so benötigt man folgende Befehle:<br>!39,145 (&lt;F1&gt; = &lt;CRSR&gt;-hoch)<br>!40,17 (&lt;F3&gt; = &lt;CRSR&gt;-unten)<br>!41,157 (&lt;F5&gt; = &lt;CRSR&gt;-links)<br>!63,29 (&lt;F7&gt; = &lt;CRSR&gt;-rechts)</p>
 
-        <p>Beim Abtippen von »DATA-Wüsten« lohnt es sich, die Komma-Taste zu verschieben. Der Befehl !31,44 verlegt diese auf die &lt;->-Taste.</p>
+        <p>Beim Abtippen von »DATA-Wüsten« lohnt es sich, die Komma-Taste zu verschieben. Der Befehl !31,44 verlegt diese auf die &lt;←>-Taste.</p>
 
         <p>Einige der Zeichen können jedoch nicht geändert werden. Es sind die Bildschirmcodes von 33 bis 41 sowie der Code 63. Diese Zeichencodes sind anderweitig belegt.</p>
 
@@ -229,7 +228,7 @@ rts ‚das war's!
 
         <p>Im Klartext heißt das, daß Sie, wenn Sie den Bildschirm-Code 33 mit dem Befehl !33,65 ändern wollen, nicht das Ausrufungszeichen, sondern die &lt;CRSR&gt;-links-Taste in ein A umwandeln.</p>
 
-        <p>Die Initialisierung der Routine erfolgt durch SYS 49152. Danach steht Ihnen der Befehl !A,B zur Verfügung. Der Wertebereich von A und B liegt zwischen O0 und 255. Löschen läßt sich die Tastenbelegung, indem man die ursprüngliche Belegung aus dem ROM kopiert. Dies geschieht durch: POKE 1,55:SYS 49152</p>
+        <p>Die Initialisierung der Routine erfolgt durch SYS 49152. Danach steht Ihnen der Befehl !A,B zur Verfügung. Der Wertebereich von A und B liegt zwischen 0 und 255. Löschen läßt sich die Tastenbelegung, indem man die ursprüngliche Belegung aus dem ROM kopiert. Dies geschieht durch: POKE 1,55:SYS 49152</p>
 
         <address class="author">(Andreas Schindler/dm)</address>
 
@@ -240,15 +239,15 @@ rts ‚das war's!
 
         <h2>Laufschrift im Bildschirmrahmen</h2>
 
-        <p>Seit einiger ZeitistesinMode gekommen, im Titelbild mancher Programme mindestens eine Laufschrift darzustellen. Nachdem sich die Programmiertechnik hier immer weiter fortentwickelt hat, so daß sich die Laufschriften jetzt schon hochauflösend und flimmerfrei bewegen, bleibt immer noch ein großes Problem: Jede Laufschrift benötigt Platz auf dem Bildschirm. Will man zum Beispiel eine Laufschrift in ein HiRes-Bild einblenden, mußte bisher immer das Bild so weit angepaßt werden, daß eine oder zwei Zeilen für die Laufschrift freiblieben. Hier stelltsich die Frage: Muß das so sein?</p>
+        <p>Seit einiger Zeit ist es in Mode gekommen, im Titelbild mancher Programme mindestens eine Laufschrift darzustellen. Nachdem sich die Programmiertechnik hier immer weiter fortentwickelt hat, so daß sich die Laufschriften jetzt schon hochauflösend und flimmerfrei bewegen, bleibt immer noch ein großes Problem: Jede Laufschrift benötigt Platz auf dem Bildschirm. Will man zum Beispiel eine Laufschrift in ein HiRes-Bild einblenden, mußte bisher immer das Bild so weit angepaßt werden, daß eine oder zwei Zeilen für die Laufschrift freiblieben. Hier stellt sich die Frage: Muß das so sein?</p>
 
-        <p>Nein, denn wozu gibt es den weitgehend ungenutzten Bildschirmrand, der lange Zeit immer nur die Farbe annehmen konnte, die in $D020 angegeben war. Vor einiger Zeit kam jemand auf die Idee, diesen Platz dem VIC durch geschicktes Umschalten in den 24-Zeilen-Modus (durch Löschen des Bit ROW SELECT im Register $DOll) als nutzbaren Raum zu entlocken. Die Euphorie über diese Entdeckung wurde jedoch rasch wieder gebremst: Außer dem einen Byte am Ende des VIC-Adreßraums, das nur langweilige Streifen erzeugt, kann der VIC in diesem Bereich nur Sprites darstellen. So lag die einzige Nutzung dieses zusätzlichen Raumes darin, ein paar einsame Sprites über den Rand hinauswandern zu lassen. Diese Sprites können aber auch sinnvoller eingesetzt werden!</p>
+        <p>Nein, denn wozu gibt es den weitgehend ungenutzten Bildschirmrand, der lange Zeit immer nur die Farbe annehmen konnte, die in $D020 angegeben war. Vor einiger Zeit kam jemand auf die Idee, diesen Platz dem VIC durch geschicktes Umschalten in den 24-Zeilen-Modus (durch Löschen des Bit ROW SELECT im Register $D011) als nutzbaren Raum zu entlocken. Die Euphorie über diese Entdeckung wurde jedoch rasch wieder gebremst: Außer dem einen Byte am Ende des VIC-Adreßraums, das nur langweilige Streifen erzeugt, kann der VIC in diesem Bereich nur Sprites darstellen. So lag die einzige Nutzung dieses zusätzlichen Raumes darin, ein paar einsame Sprites über den Rand hinauswandern zu lassen. Diese Sprites können aber auch sinnvoller eingesetzt werden!</p>
 
-        <p>Bei einigermaßen geschicktem Einsatz der acht zur Verfügung stehenden Spritesläßt sich eine brauchbare Laufschrift aufdem Rahmen erzeugen. Es sind aber durchaus auch zwei Laufschriften möglich. Genau dies tut nun das vorliegende Programm (Listing 3, bitte mit dem MSE eingeben). Es scrollt acht Sprites, deren Inhalt in $3E00 bis $3FFF abgelegt ist, von rechts nach links über den Bildschirm. Das dazugehörige kleine Basic-Programm (Listing 4) berechnet aus den eingegebenen Texten die Daten für diese Sprites und schreibt sie gleich in den richtigen Bereich.</p>
+        <p>Bei einigermaßen geschicktem Einsatz der acht zur Verfügung stehenden Sprites läßt sich eine brauchbare Laufschrift auf dem Rahmen erzeugen. Es sind aber durchaus auch zwei Laufschriften möglich. Genau dies tut nun das vorliegende Programm (Listing 3, bitte mit dem MSE eingeben). Es scrollt acht Sprites, deren Inhalt in $3E00 bis $3FFF abgelegt ist, von rechts nach links über den Bildschirm. Das dazugehörige kleine Basic-Programm (Listing 4) berechnet aus den eingegebenen Texten die Daten für diese Sprites und schreibt sie gleich in den richtigen Bereich.</p>
 
         <p>Nachdem das Basic-Programm etwa zehn Sekunden lang gerechnet hat, erscheinen die eingegebenen Texte als Laufschriften ober- und unterhalb des Bildschirms. Ein erneutes Einschalten ist nach &lt;RUN/STOP+RESTORE&gt; durch SYS 49152 möglich, da die Daten im Speicher erhalten bleiben. Achtung: Vor dem erneuten Starten des Basic-Teils muß die Interrupt-Routine durch &lt;RUN/STOP+RESTORE&gt; oder durch Eingabe von »SYS 58648:SYS 64789:SYS 64931« (klappt nicht immer) abgeschaltet werden.</p>
 
-        <p>Mögliche Änderungen des Programms: Am einfachsten läßt sich die Farbe der Schrift ändern. Hierzu ruft man die Routine nur mit einer anderen Cursorfarbe auf. Zum Verschieben der Laufschriften in YRichtung muß der Inhalt der Speicherstelle 49174 verändert werden (normal 8. In Adresse 49206 steht die Blocknummer des letzten Sprites (normal = 255). Wird diese verändert, müssen natürlich auch im Basic-Teil die Zahlen 15911 und 15872 in Zeile 270/280 verändert werden. Auch mit einem geänderten Zeichensatz läßt sich die Laufschrift einsetzen. Dazu muß die Variable ZA in Zeile 180 auf den Beginn des neuen Zeichensatzes zeigen. Setzt man hier 55296 ein, erscheint die Laufschrift in Kleinschrift.</p>
+        <p>Mögliche Änderungen des Programms: Am einfachsten läßt sich die Farbe der Schrift ändern. Hierzu ruft man die Routine nur mit einer anderen Cursorfarbe auf. Zum Verschieben der Laufschriften in Y-Richtung muß der Inhalt der Speicherstelle 49174 verändert werden (normal = 8). In Adresse 49206 steht die Blocknummer des letzten Sprites (normal = 255). Wird diese verändert, müssen natürlich auch im Basic-Teil die Zahlen 15911 und 15872 in Zeile 270/280 verändert werden. Auch mit einem geänderten Zeichensatz läßt sich die Laufschrift einsetzen. Dazu muß die Variable ZA in Zeile 180 auf den Beginn des neuen Zeichensatzes zeigen. Setzt man hier 55296 ein, erscheint die Laufschrift in Kleinschrift.</p>
 
         <address class="author">(Niklas Nebel/dm)</address>
 
