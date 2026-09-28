@@ -191,7 +191,12 @@ file="issues/<YYMM>/<START> Leserforum.html"
 grep -q '<article class="qa">' "$file" || echo "  FAIL: missing class=qa"
 
 # 2. banner image present
-grep -q '<header>.*<img src="<START>-0\.png"' "$file" || \
+# -z reads the file as ONE record, so <header> and its <img> may sit on
+# separate lines -- which they always do, because step 080 beautifies every
+# article and js-beautify breaks them. The single-line grep this replaces
+# therefore failed on EVERY correctly built Leserforum, including the
+# committed 8610/14. MEASURED on 8611.
+grep -qz '<header>[[:space:]]*<img src="<START>-0\.png"' "$file" || \
   echo "  FAIL: missing banner"
 ls "issues/<YYMM>/<START>-0.png" >/dev/null || echo "  FAIL: banner file missing"
 
