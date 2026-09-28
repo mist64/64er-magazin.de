@@ -1427,10 +1427,24 @@ routine:
   the change is legible to the next reader.
 - Keep the superseded line as a `;` comment rather than deleting it, so the
   disk's original state is recoverable from the file itself.
-- **Test the result** — the listing must still load and run, in the emulator
-  for the machine the program is FOR: `x128` for a C128 program, `x64` for a
-  C64 one, `xplus4` for a Plus/4, and so on. The harness is in r320; the
-  machine is a property of the listing, not of the harness.
+- **Test the result.** There is no harness — this is the procedure, and the
+  emulator is the one for the machine the program is FOR (`x64sc` for a C64,
+  `x128` for a C128, `xplus4` for a Plus/4). All are installed:
+
+  ```bash
+  petcat -w2 -l 0801 -o /tmp/t.prg -- issues/<ID>/prg/<name>.txt   # tokenise
+  petcat -2 -o /tmp/back.txt -- /tmp/t.prg                          # and back
+  diff issues/<ID>/prg/<name>.txt /tmp/back.txt   # ONLY the patched lines
+  x64sc -warp -autostart /tmp/t.prg -limitcycles 60M \
+        -exitscreenshot /tmp/t.png                                  # it runs
+  ```
+
+  **Say what this does and does not show.** A clean round trip proves the
+  patched lines tokenise; the autostart proves the program loads and reaches
+  its first screen without a `?SYNTAX ERROR`. Neither exercises the patched
+  lines unless they lie on the path the program takes to that screen. When they
+  do not — SH8507's 9550 and 20100 are only reached from deeper menu actions —
+  record that limit with the result rather than reporting "tested".
 
 The default remains: record the errata state, do not patch. Patch only when the
 user asks for it.
