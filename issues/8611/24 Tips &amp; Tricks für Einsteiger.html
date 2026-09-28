@@ -58,42 +58,37 @@
 
         <h2>8925 Blocks free</h2>
 
-        <p>Das nun folgende kleine Programm wird Sie verblüffen. Mit ihm läßt sich beim LISTen des Directory (Inhaltsverzeichnis) die Meldung »8925 BLOCKS FREE« erzeugen. Frei sind natürlich nur 664 Blocks. Das Programm schreibt einfach so oft 255 in die BAM (Block Availability Map oder Blockbelegungsplan), bis die gewünschte Zahl erreicht ist. Alle auf der Diskette gespeicherten Programme können problemlos geladen werden. Speichern sollte man auf dieser Diskette jedoch nichts mehr, es sei denn, Sie haben vorher den Befehl</p>
+        <p>Das nun folgende kleine Programm wird Sie verblüffen. Mit ihm läßt sich beim LISTen des Directory (Inhaltsverzeichnis) die Meldung »8925 BLOCKS FREE« erzeugen. Frei sind natürlich nur 664 Blocks. Das Programm schreibt einfach so oft 255 in die BAM (Block Availability Map oder Blockbelegungsplan), bis die gewünschte Zahl erreicht ist.</p>
 
-        <p>OPEN 15,8,15,"V" &lt;RETURN&gt; eingegeben.</p>
+        <p>Alle auf der Diskette gespeicherten Programme können problemlos geladen werden. Speichern sollte man auf dieser Diskette jedoch nichts mehr, es sei denn, Sie haben vorher den Befehl</p>
 
-        <p>10 INPUT "WIEVIELE BLOCKS FREE" ;B</p>
-
-        <p>13 IF B>8925 THEN 10</p>
-
-        <p>15 HI=INT(B/255): LO=B-HI*255</p>
-
-        <p>20 OPEN 1,8,15, "I0": OPEN 2,8,2,"#" 25 PRINT#1, "U1";2;0;18;0</p>
-
-        <p>27 IF HI&lt;1 THEN N=4: GOTO 60</p>
-
-        <p>30 FOR N=4 TO (HI+1)*4 STEP 4</p>
-
-        <p>40 PRINT#1,"B-P";2;N</p>
-
-        <p>45 PRINT#2,CHR$(255)</p>
-
-        <p>50 NEXT</p>
-
-        <p>60 IF N&lt;144 THEN PRINT#1,"B-P";2;N 70 IF N&lt;144 THEN PRINT#2,CHR$(LO)</p>
-
-        <p>75 IF N&lt;136 THEN GOSUB 100</p>
-
-        <p>80 PRINT#1, "U2";2;0;18;0</p>
-
-        <p>90 CLOSE 2: PRINT#1,"I0": INPUT#1,A,A$,B,C: PRINT A,A$,B,C: CLOSE 1</p>
-
-        <p>95 END</p>
-
-        <pre><code>100 FOR I=N+4 TO 140 STEP 4: PRINT#1,"B-P";2;I:
-PRINT#2,CHR$(0): NEXT: RETURN
+        <pre><code>OPEN 15,8,15,"V" &lt;RETURN&gt;
 </code></pre>
 
+        <p>eingegeben.</p>
+
+        <!-- PRINTED: p24/p25 set the listing between the last paragraph
+             and the byline; that is the printed order. -->
+        <pre><code>10 INPUT "WIEVIELE BLOCKS FREE";B
+13 IF B&gt;8925 THEN 10
+15 HI=INT(B/255): LO=B-HI*255
+20 OPEN 1,8,15,"I0": OPEN 2,8,2,"#"
+25 PRINT#1,"U1";2;0;18;0
+27 IF HI&lt;1 THEN N=4: GOTO 60
+30 FOR N=4 TO (HI+1)*4 STEP 4
+40 PRINT#1,"B-P";2;N
+45 PRINT#2,CHR$(255)
+50 NEXT
+60 IF N&lt;144 THEN PRINT#1,"B-P";2;N
+70 IF N&lt;144 THEN PRINT#2,CHR$(LO)
+75 IF N&lt;136 THEN GOSUB 100
+80 PRINT#1,"U2";2;0;18;0
+90 CLOSE 2: PRINT#1,"I0": INPUT#1,A,A$,B,C:
+PRINT A,A$,B,C: CLOSE 1
+95 END
+100 FOR I=N+4 TO 140 STEP 4: PRINT#1,"B-P";2;I:
+PRINT#2,CHR$(0): NEXT: RETURN
+</code></pre>
 
         <address class="author">(Tobias Wörmann/ah)</address>
 
@@ -102,23 +97,17 @@ PRINT#2,CHR$(0): NEXT: RETURN
         <p>Kommt man bei Abenteuerspielen (Adventures) nicht mehr weiter, bietet es sich an, die Texte zu untersuchen. Als Werkzeug könnte zum Beispiel ein Maschinensprachemonitor (SMON) dienen. Aber Basic-Programmierer können mit solchen Werkzeugen für Assemblerfreaks recht wenig anfangen. Daher wurde ein Basic-Programm entwickelt, das die Texte in Adventures sucht und auf dem Bildschirm ausgibt. So wird das Programm gehandhabt:</p>
 
         <ol>
-            <li>
-                <p>Adventure laden</p>
-            </li>
-            <li>
-                <p>Reset-Knopf drücken (siehe Ausgabe 6/85)</p>
-            </li>
-            <li>
-                <p>Programm »Adventurelister« abtippen oder von Diskette beziehungsweise Kassette laden</p>
-            </li>
-            <li>
-                <p>RUN &lt;RETURN&gt; eingeben</p>
-            </li>
+            <li>Adventure laden</li>
+            <li>Reset-Knopf drücken (siehe Ausgabe 6/85)</li>
+            <li>Programm »Adventurelister« abtippen oder von Diskette beziehungsweise Kassette laden</li>
+            <li>RUN &lt;RETURN&gt; eingeben</li>
         </ol>
 
 
         <p>Eine Programmunterbrechung erreicht man durch Drücken einer beliebigen Taste. Weiter geht es bei einem erneuten Druck auf eine Taste. Einen Programmabbruch erzielt man mit &lt;Q&gt;.</p>
 
+        <!-- PRINTED: p25 sets the listing between the last paragraph
+             and the byline; that is the printed order. -->
         <pre><code>10 X=2048
 20 Y=PEEK(X): IF Y&gt;64 AND Y&lt;91 THEN PRINT CHR$(Y):
 GOTO 40
