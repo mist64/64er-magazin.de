@@ -141,6 +141,97 @@ Critical guardrails:
   start) but the actual CP/M-Ecke article starts at p.95. Manually
   re-route via Edit.
 
+## Check the ROUTING, not only the count
+
+`check 1` compares CSV rows against rows applied. **A misroute passes it** —
+the row landed, just in the wrong article — and on 8611 four of 49 did:
+
+- the p13 *Aktuelles* items went to `11 Epson und der Druckermarkt`, because
+  the fallback returned the first filename in LEXICAL order whose range
+  contains the page and `11-13` sorts before `12 Aktuell`;
+- the p69 *ProDisc* row went to `52 Das Ende aller Tippfehler` (65-73).
+
+The apply script is fixed — it takes the **nearest preceding start page** now
+— and the same rule is the check, which needs the CSV because the page is the
+*row's*, not the article's:
+
+```bash
+$PY - issues/<YYMM> "Jahresinhaltsverzeichnis <YYYY>.csv" <YYMM> <<'PYEOF'
+import csv, glob, io, os, re, sys
+# THE ROUTING RULE IS THE CHECK. A row (page, title) belongs to the article
+# whose start page is the NEAREST PRECEDING one. So for every applied row,
+# verify no OTHER article starts strictly between its article's start and the
+# row's own page. This needs the CSV, because the page is the row's, not the
+# article's -- an article's mere overlap with another is normal (interleaved
+# listing runs) and says nothing.
+d, csv_path, code = sys.argv[1], sys.argv[2], sys.argv[3]
+rows = []
+for line in io.open(csv_path, encoding='utf-8'):
+    p = next(csv.reader([line]))
+    if len(p) > 4 and p[0] == code and p[1].isdigit():
+        rows.append((int(p[1]), p[4]))
+starts, spans, titles = {}, {}, {}
+for f in sorted(glob.glob(os.path.join(d, '*.html'))):
+    s = io.open(f, encoding='utf-8').read()
+    m = re.search(r'64er\.pages" content="([^"]+)"', s)
+    if not m: continue
+    segs = []
+    for seg in m.group(1).split(','):
+        lo, _, hi = seg.strip().partition('-')
+        if lo.isdigit(): segs.append((int(lo), int(hi or lo)))
+    if not segs: continue
+    starts[f] = segs[0][0]
+    spans[f] = segs
+    for t in re.findall(r'64er\.index_title" content="([^"]*)"', s):
+        titles.setdefault(t, []).append(f)
+    tm = re.search(r'<title>(.*?)</title>', s)
+    if tm: titles.setdefault(tm.group(1), []).append(f)
+bad = 0
+for page, title in rows:
+    fs = titles.get(title) or titles.get(title.replace('&', '&amp;'))
+    if not fs: continue
+    f = fs[0]
+    # A row whose title IS the article's own title was routed by title, not by
+    # page, and the title is the stronger evidence. 8610's "Mini-Hardcopy für
+    # MPS 801" (row p96, article starts p95) is exactly this.
+    own = re.search(r'<title>(.*?)</title>',
+                    io.open(f, encoding='utf-8').read())
+    if own and own.group(1).replace('&amp;', '&') == title:
+        continue
+    # and the nearer article must actually COVER the row's page -- a one-page
+    # item that merely starts closer cannot own it. 8607's "9 DFÜ-News" looked
+    # like a misroute for 8 Aktuelles' p11 rows until this was added.
+    closer = [g for g, st in starts.items()
+              if starts[f] < st <= page and g != f
+              and any(lo <= page <= hi for lo, hi in spans[g])]
+    if closer:
+        best = max(closer, key=lambda g: starts[g])
+        print(f"  MISROUTE  p{page} {title[:34]:<36} -> {os.path.basename(f)[:30]}"
+              f"  (p{starts[best]} {os.path.basename(best)[:26]} starts closer)")
+        bad += 1
+print(f"{bad} of {len(rows)} rows routed past a nearer article")
+PYEOF
+```
+
+Two exclusions, both learned by running it across the year and reading what
+it flagged:
+
+- **A row whose title IS the article's own title was routed by title**, which
+  is stronger evidence than the page. 8610's *Mini-Hardcopy für MPS 801*
+  (row p96, article starts p95) is exactly this.
+- **The nearer article must COVER the row's page.** A one-page item that
+  merely starts closer cannot own it — 8607's `9 DFÜ-News` looked like a
+  misroute for `8 Aktuelles`'s p11 rows until this was added.
+
+MEASURED over 8604-8611 with both in place: **0 hits on seven issues, 1 on
+8607** — the CP/M-Ecke, where the row title differs from the article's only by
+`(Teil 2)`. That one is a real routing question, not noise.
+
+A content check is the obvious alternative and it is weaker: matching half the
+index title's words against the article's headings caught 3 of the 4 on 8611
+and missed *24-Nadel-Drucker* in *Epson und der Druckermarkt*, because
+"drucker" matches "Druckermarkt".
+
 ## Verification
 
 ```bash

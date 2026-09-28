@@ -71,22 +71,30 @@ def find_file_for_entry(entry, by_page, all_files):
                 return c
         return candidates[0]  # fallback
 
-    # No direct match — search by page range
+    # No file STARTS on this page, so the row belongs to the article that is
+    # running across it -- the one whose start page is the NEAREST PRECEDING
+    # one. This used to return the first filename in LEXICAL order whose range
+    # contained the page, which is not the same thing and is wrong whenever two
+    # articles overlap: on 8611 the p13 Aktuell rows went to "11 Epson"
+    # (11-13 sorts before "12 Aktuell") and the p69 ProDisc row went to
+    # "52 Das Ende aller Tippfehler" (65-73). 4 of 49 rows misrouted, and no
+    # check saw it -- a count of rows applied cannot.
+    best, best_start = None, -1
     for fn in all_files:
-        text = open(fn).read()
+        text = open(fn, encoding='utf-8').read()
         m = re.search(r'64er\.pages" content="([^"]*)"', text)
-        if m:
-            for segment in m.group(1).split(','):
-                if '-' in segment:
-                    lo, hi = segment.split('-')
-                    try:
-                        if int(lo) <= int(start) <= int(hi):
-                            return fn
-                    except ValueError:
-                        pass
-                elif segment.strip() == start:
-                    return fn
-    return None
+        if not m:
+            continue
+        for segment in m.group(1).split(','):
+            segment = segment.strip()
+            lo, _, hi = segment.partition('-')
+            try:
+                lo_i, hi_i = int(lo), int(hi or lo)
+            except ValueError:
+                continue
+            if lo_i <= int(start) <= hi_i and lo_i > best_start:
+                best, best_start = fn, lo_i
+    return best
 
 
 def get_title(text):
@@ -143,7 +151,10 @@ def main():
             idx_cat = f"{entry['category']}|{entry['subcategory']}"
             idx_title = entry['title']
 
-            if idx_title != article_title:
+            # get_title() returns the ESCAPED <title>; the CSV title is raw.
+            # Comparing them directly meant every title containing &差 differed
+            # from itself, and 4 rows on 8611 got a redundant index_title.
+            if idx_title != H.unescape(article_title or ''):
                 insert += f'    <meta name="64er.index_title" content="{H.escape(idx_title)}">\n'
             insert += f'    <meta name="64er.index_category" content="{H.escape(idx_cat)}">\n'
 
