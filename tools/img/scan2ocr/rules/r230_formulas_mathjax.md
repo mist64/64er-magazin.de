@@ -94,6 +94,29 @@ Anti-memory: the LaTeX source comes from reading the scan, not
 from physics knowledge or context. If the print shows a specific
 notation (e.g. `V₀` vs `V_0`), match the print.
 
+## A check that passes because there is nothing to check
+
+8611 needed no MathJax: no `TODO FORMULA` marker exists, and the issue's
+formulas are inline Unicode. That is the normal case — **8607 is the only
+issue in the corpus that ships LaTeX at all**, and every other issue's clean
+run of these checks says nothing whatever about them.
+
+`check 2` was broken for exactly as long as that was true. It counted `\(`
+and `\[` against `\)` and `\]` in the 100 characters *before* each macro,
+so a preceding formula's closing delimiter cancelled the opening one of the
+formula actually being tested: **9 false positives on published 8607**, and
+silence everywhere else because everywhere else has no LaTeX to misjudge.
+
+The replacement strips the delimited spans and looks at what is left, which
+needs no window and cannot be confused by a neighbour. MEASURED: 0 on 8607,
+0 on 8611, 6 on a copy with faults planted.
+
+> **When a step finds nothing to do, its checks have not been exercised.**
+> Say so in the report — "0 findings, and the checks were not under load" —
+> and test them against the one issue that does have the thing, if there is
+> one. Here that is 8607; a fault-planted copy is the fallback when there is
+> not.
+
 ## Verification
 
 ```bash
@@ -106,24 +129,28 @@ grep -nE 'TODO FORMULA' "$dir"/*.html && echo "  FAIL: TODO FORMULA left"
 #    formulas should not contain LaTeX macros at all.
 #    (heuristic: any \frac / \sqrt / \cdot / \omega outside \( \) or
 #    \[ \] is suspicious)
-python3 -c "$(cat <<'PY'
+$PY - "$dir" <<'PYEOF'
 import os, re, sys
 d = sys.argv[1]
+MACROS = (r'\frac', r'\sqrt', r'\cdot', r'\omega', r'\mathrm')
+# STRIP THE DELIMITED SPANS, THEN LOOK AT WHAT IS LEFT. The version this
+# replaces counted \( \[ against \) \] in the 100 characters BEFORE each
+# macro, so the previous formula's closing \] cancelled this formula's
+# opening \[ -- 9 false positives on published 8607, the ONLY issue in the
+# corpus that ships MathJax. It passed everywhere else because everywhere
+# else has no LaTeX at all: a check that passes when there is nothing to
+# check.
 for f in sorted(os.listdir(d)):
-    if not f.endswith('.html'): continue
-    s = open(os.path.join(d, f)).read()
-    for keyword in (r'\frac', r'\sqrt', r'\cdot', r'\omega', r'\mathrm'):
-        for m in re.finditer(re.escape(keyword), s):
-            # check it's inside \( \) or \[ \]
-            i = m.start()
-            window = s[max(0, i-100):i]
-            opens = window.count(r'\(') + window.count(r'\[')
-            closes = window.count(r'\)') + window.count(r'\]')
-            if opens <= closes:
-                snippet = s[max(0, i-20):i+30]
-                print(f"  bare LaTeX in {f}: {snippet!r}")
-PY
-)" "$dir"
+    if not f.endswith('.html'):
+        continue
+    s = open(os.path.join(d, f), encoding='utf-8').read()
+    s = re.sub(r'<!--.*?-->', '', s, flags=re.S)      # comments first
+    s = re.sub(r'\\\[.*?\\\]', '', s, flags=re.S)
+    s = re.sub(r'\\\(.*?\\\)', '', s, flags=re.S)
+    for kw in MACROS:
+        for m in re.finditer(re.escape(kw), s):
+            print(f"  bare LaTeX in {f}: {s[max(0, m.start()-20):m.start()+30]!r}")
+PYEOF
 
 # 3. balanced \( \) and \[ \] pairs per file
 python3 -c "$(cat <<'PY'
