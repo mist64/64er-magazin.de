@@ -83,8 +83,14 @@ check.
 uses `article class="qa"`, part N must:
 
 ```bash
-grep -l 'class="qa"' issues/*/*.html | sed 's/.*\///' | sort -u   # the shape's precedents
+grep -lE '<article class="qa( [a-z-]+)*"' issues/*/*.html   # the shape's precedents
 ```
+
+The `numbered` modifier turns on the printed question badges. When the series
+continues a previous part's numbering, carry the offset as
+`style="counter-reset: qa-question <N>"` on the `<article>`: that is the
+standard CSS idiom, `style.css` needs no change, and inline `style` is long
+established here (115 files use one).
 
 Counting question-shaped headings does **not** work as a tell — 19 files have
 three or more, and most are ordinary articles with rhetorical subheads (*Was
@@ -219,7 +225,10 @@ Critical preservation rules:
 file="issues/<YYMM>/<START> Leserforum.html"
 
 # 1. article uses qa class
-grep -q '<article class="qa">' "$file" || echo "  FAIL: missing class=qa"
+# The class list may carry MODIFIERS -- "qa numbered" is the numbered variant.
+# Matching the attribute exactly fails on every numbered Q&A article, published
+# 8610/23 included.
+grep -qE '<article class="qa( [a-z-]+)*"' "$file" || echo "  FAIL: missing class=qa"
 
 # 2. banner image present
 # -z: step 080 beautifies the article, so <header> and its <img> are always
