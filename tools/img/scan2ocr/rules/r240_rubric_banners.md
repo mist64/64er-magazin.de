@@ -100,11 +100,22 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
    project's convention: colour / greyscale art ships at **150 dpi** — a
    `-resize 25%` of the 600 dpi crop — and bilevel line art stays at
    **600 dpi**, unresized. The Editorial portrait is a colour photo and is
-   resized: 8610's came off the master at 1370×1145 / 3.9 MB and ships at
-   343×286 / 209 KB, matching 8609's `8-0.png` at 339×279 / 208 KB. The
-   Fehlerteufelchen devil is line art and stays at 600 dpi — 8610's `80-0.png`
-   is 1070×1062, as 8609's `61-0.png` is 1017×1072. A banner `cp`'d from the
-   prior issue (Bücher) is already in its bucket; don't re-crop it.
+   resized. MEASURED across the corpus, every editorial banner lands in one
+   narrow family — **8607 338×279, 8608 337×279, 8609 339×279, 8610 336×279,
+   8611 337×280** — so a new one outside 335–340 × 278–282 is cut wrong. (The
+   numbers this replaces, "1370×1145 → 343×286", were not any file in the
+   corpus.) **Crop inside the photo's keyline**, which every precedent does
+   and nothing said.
+
+   The Fehlerteufelchen devil is line art and stays at 600 dpi, unresized:
+   8610's `80-0.png` is **1032×1051** 1-bit. Its own print is ~880 px wide, so
+   that file is 1.17× its page; cut a new one at its own printed size and let
+   `width="300"` do the rest.
+
+   **The Bücher banner is NOT identical across issues** — this rule said it
+   was and that you could `cp` the previous one. Five issues, five different
+   md5s and five sizes: 8605 245×202, 8608 248×205, 8609 247×206, 8610
+   247×206, 8611 246×206. Cut it from this issue's master like the others.
 
 4. **Read the crop** to verify it's the banner and not page noise.
 5. **Insert into the article HTML** with the rubric-appropriate
@@ -168,17 +179,25 @@ for rub in Bücher Fehlerteufelchen Fachredakteur; do
     echo "  $rub: N/A (no article in this issue)"
     continue
   fi
-  for f in $matches; do
+  # `for f in $matches` word-splits "144 Bücher.html" at the space, and EVERY
+  # article filename in this corpus has spaces. As written this printed 17
+  # FAIL lines on published 8610 and 12 on a finished 8611, plus
+  # "grep: invalid option -- ." when $page came out empty.
+  # The reference test is anchored too: a bare "$page-0.png" substring match
+  # accepts 18-0.png for page 8.
+  printf '%s\n' "$matches" | while IFS= read -r f; do
+    [ -n "$f" ] || continue
     page=$(basename "$f" | grep -oE '^[0-9]+')
     banner="$dir/$page-0.png"
     [ -f "$banner" ] || echo "  FAIL: $f has no banner $banner"
-    grep -q "$page-0.png" "$f" || echo "  FAIL: $f doesn't reference banner"
+    grep -q "src=\"$page-0\.png\"" "$f" || echo "  FAIL: $f doesn't reference banner"
   done
 done
 if [ -z "$editorial" ]; then
   echo "  Editorial: N/A (no article in this issue)"
 else
-  for f in $editorial; do
+  printf '%s\n' "$editorial" | while IFS= read -r f; do
+    [ -n "$f" ] || continue
     page=$(basename "$f" | grep -oE '^[0-9]+')
     banner="$dir/$page-0.png"
     [ -f "$banner" ] || echo "  FAIL: $f has no banner $banner"
