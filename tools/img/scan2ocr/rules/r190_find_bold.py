@@ -57,6 +57,12 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
 
 HEAVY = 1.40          # ink fraction relative to the word's own line median
+# ...and 1.40 is ABOVE this file's own worked example, which says "a threshold
+# of 1.35 isolates it with nothing else near".  MEASURED on 8611: a confirmed
+# bold word (p164 "Herstelleranschriften:") scores 1.35 and roman tops out at
+# 1.20, so the shipped default returns ZERO on that issue.  The docstring is
+# right and the constant drifted.  Do not raise it to make an issue quiet;
+# CALIBRATE IT, as the docstring says, and say in the report what you set.
 MIN_CHARS = 3         # short words are noisy: 'man', 'aus', 'zu' hit 1.36-1.49
                       # on stroke-thickening alone.  Raising HEAVY instead lost
                       # a genuine `Composite.` at 1.50, and a false negative is
