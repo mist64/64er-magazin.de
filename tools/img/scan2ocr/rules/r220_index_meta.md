@@ -144,16 +144,10 @@ Critical guardrails:
 ## Check the ROUTING, not only the count
 
 `check 1` compares CSV rows against rows applied. **A misroute passes it** —
-the row landed, just in the wrong article — and on 8611 four of 49 did:
-
-- the p13 *Aktuelles* items went to `11 Epson und der Druckermarkt`, because
-  the fallback returned the first filename in LEXICAL order whose range
-  contains the page and `11-13` sorts before `12 Aktuell`;
-- the p69 *ProDisc* row went to `52 Das Ende aller Tippfehler` (65-73).
-
-The apply script is fixed — it takes the **nearest preceding start page** now
-— and the same rule is the check, which needs the CSV because the page is the
-*row's*, not the article's:
+the row landed, just in the wrong article. The old apply script picked the
+first filename in LEXICAL order whose page range contained the row's page,
+which put four of 8611's 49 rows in the wrong article. It now takes the
+**nearest preceding start page**, and that same rule is the check:
 
 ```bash
 $PY - issues/<YYMM> "Jahresinhaltsverzeichnis <YYYY>.csv" <YYMM> <<'PYEOF'
@@ -213,24 +207,14 @@ print(f"{bad} of {len(rows)} rows routed past a nearer article")
 PYEOF
 ```
 
-Two exclusions, both learned by running it across the year and reading what
-it flagged:
+A normal run is **silent**. MEASURED over 8604-8611: 0 hits on seven issues,
+1 on 8607 — the CP/M-Ecke, where the row title differs from the article's only
+by `(Teil 2)`, which is a real routing question. A flood means the check broke,
+not the issue.
 
-- **A row whose title IS the article's own title was routed by title**, which
-  is stronger evidence than the page. 8610's *Mini-Hardcopy für MPS 801*
-  (row p96, article starts p95) is exactly this.
-- **The nearer article must COVER the row's page.** A one-page item that
-  merely starts closer cannot own it — 8607's `9 DFÜ-News` looked like a
-  misroute for `8 Aktuelles`'s p11 rows until this was added.
-
-MEASURED over 8604-8611 with both in place: **0 hits on seven issues, 1 on
-8607** — the CP/M-Ecke, where the row title differs from the article's only by
-`(Teil 2)`. That one is a real routing question, not noise.
-
-A content check is the obvious alternative and it is weaker: matching half the
-index title's words against the article's headings caught 3 of the 4 on 8611
-and missed *24-Nadel-Drucker* in *Epson und der Druckermarkt*, because
-"drucker" matches "Druckermarkt".
+Do not replace this with a content check: matching index-title words against
+the article's headings misses *24-Nadel-Drucker* in *Epson und der
+Druckermarkt*, because "drucker" matches "Druckermarkt".
 
 ## Verification
 

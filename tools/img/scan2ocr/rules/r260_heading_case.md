@@ -104,12 +104,10 @@ For every article HTML in `issues/<YYMM>/*.html`:
    $PY - issues/<YYMM> <<'PYEOF'
 import glob, io, os, re, sys
 # THE CHECK IS THE TRIGGER. The rule above defines ALL CAPS as ">=80% of the
-# letters uppercase AND 3 uppercase in a row"; this implements that and
-# nothing else. The grep it replaces -- a character class of
-# [A-ZÄÖÜẞ0-9 .,/&-] -- had no : — » « ? and no leading digit, so it passed
-# "ENDLICH: …", "NG-10 — …", "24-NADELN-DRUCKER" and "WAS IST … HARDWARE?"
-# while they were still in caps: 1 of 5 planted headings, and blind to 11 of
-# 8611's 29 real ones.
+# letters uppercase AND 3 uppercase in a row"; this implements that and nothing
+# else. Do not re-express it as a character class: any punctuation left out of
+# the class (: — » « ?) or a leading digit makes the heading pass while it is
+# still in caps.
 for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
     for m in re.finditer(r'<h([12])>(.*?)</h\1>', io.open(f, encoding='utf-8').read(), re.S):
         t = re.sub(r'<[^>]+>', '', m.group(2))
@@ -167,12 +165,10 @@ dir=issues/<YYMM>
 $PY - "$dir" <<'PYEOF'
 import glob, io, os, re, sys
 # THE CHECK IS THE TRIGGER. The rule above defines ALL CAPS as ">=80% of the
-# letters uppercase AND 3 uppercase in a row"; this implements that and
-# nothing else. The grep it replaces -- a character class of
-# [A-ZÄÖÜẞ0-9 .,/&-] -- had no : — » « ? and no leading digit, so it passed
-# "ENDLICH: …", "NG-10 — …", "24-NADELN-DRUCKER" and "WAS IST … HARDWARE?"
-# while they were still in caps: 1 of 5 planted headings, and blind to 11 of
-# 8611's 29 real ones.
+# letters uppercase AND 3 uppercase in a row"; this implements that and nothing
+# else. Do not re-express it as a character class: any punctuation left out of
+# the class (: — » « ?) or a leading digit makes the heading pass while it is
+# still in caps.
 for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
     for m in re.finditer(r'<h([12])>(.*?)</h\1>', io.open(f, encoding='utf-8').read(), re.S):
         t = re.sub(r'<[^>]+>', '', m.group(2))

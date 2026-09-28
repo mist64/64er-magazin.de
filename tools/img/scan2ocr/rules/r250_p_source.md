@@ -35,13 +35,11 @@ wherever that median does not exist or is not the footer's page:
 - **a footer OCR'd into a neighbouring body block** — its ratio reads 1.000.
   Only the crop shows it.
 
-MEASURED on 8611: all 35 imported tags held up, and all 3 additions were
-these two cases (p12, p49, p164). So the DEFAULT below still stands — an
-existing tag is evidence — but an ABSENT tag on such a page is not.
+So the DEFAULT below still stands — an existing tag is evidence — but an
+ABSENT tag on such a page is not, and the ratio alone will not find it.
 
-Two check gaps to know about: check 1 misses a label wrapped in `<strong>`,
-and check 4 rejects a run-in byline `<address>` after a source (8611/164,
-8508/115).
+Two known check gaps, so you don't chase them: check 1 misses a label wrapped
+in `<strong>`, and check 4 rejects a run-in byline `<address>` after a source.
 
 ## DEFAULT: don't change `<p class="source">`
 

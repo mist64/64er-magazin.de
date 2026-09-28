@@ -517,29 +517,31 @@ one or the other. A check written from a defect and never run on a clean file
 fails on correct output; a check written from a clean file and never run on a
 defect passes everything.
 
-This is not a theoretical risk. Found in a single issue's build, all of them
-in rules that had shipped and been trusted:
+This is not a theoretical risk: seven shipped, trusted checks were found
+broken in one issue's build. They had five recognisable shapes — compare yours
+against them:
 
-| | |
-|---|---|
-| `r160` Pass 3's narrow-column sweep | `-F'[ =x+]'` split `bbox` at its own `x`, so the test was `"bbo" < 350`, a string comparison. **Zero hits on every page of every issue, three issues running** — inside the pass whose own rule exists because a previous one was rubber-stamped |
-| `r170` check #3 | flagged every `<pre data-filename=…>` as an "empty Listing pre". They are empty by design. **35 false positives on 8611**, and on every issue with disk listings |
-| `r200` check #2 | grepped one line for `<header>…<img>`; step 080 beautifies every article and js-beautify puts them on separate lines. **Failed on every correctly built Leserforum, including the published 8610/14** |
-| `r040`/`r050` checks | counted the whole file after the transform learned to skip fenced code, so they reported correct output as 4 failures |
-| `r180` check #5 | flags `Name/xx` bylines as two entries — on published 8609 and 8610 as well |
-| `r190_find_bold` | ships `HEAVY = 1.40` above its own docstring's worked example of 1.35: **0 hits on a whole issue** |
-| `r320` check 3 | split on separators only, so a second disk side's files inherited side A's last one: reported **1 orphan where the truth was 10** |
+- **a comparison that can never be true**: an awk field split landed on the
+  data's own separator, so the test became `"bbo" < 350`, a string comparison.
+  Zero hits on every page of three issues.
+- **flagging by-design output as a defect**: every `<pre data-filename=…>` is
+  empty on purpose; the check called each one an error.
+- **a single-line grep against beautified HTML**: step 080 runs js-beautify,
+  so markup the check expects on one line never is.
+- **counting the whole file after the transform learned to skip part of it**:
+  the transform started skipping fenced code; the check did not.
+- **a threshold above its own documented calibration**: a finder shipped at
+  1.40 against a docstring worked example of 1.35, and found nothing all issue.
 
 **A check that fails on a good result is worse than no check**, because it
 gets "fixed" by undoing the transform — that is how a corrected bug returns.
-A check that never fires is worse still: it reports success, and a sub-agent
+A check that never fires is worse still: it reports success, and an agent
 writing "0 candidates" is telling the truth about nothing happening.
 
 So: keep a known-bad fixture, or reconstruct one (`git stash` is forbidden —
-copy the tree, or read the file out of an earlier commit). **Say in the
-report that the check was seen to fail**, not only that it passed. 8611 did
-this for `r190`'s V1/V3/V4 by planting a fault, and for the Impressum check
-by running it against the state before the fix.
+copy the tree, or read the file out of an earlier commit). Plant a fault if
+you have no natural one. **Say in the report that the check was seen to
+fail**, not only that it passed.
 
 ### A check that matches MARKUP also matches comments ABOUT markup
 

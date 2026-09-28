@@ -134,49 +134,39 @@ Critical guardrails:
 
 ## THE IMPRESSUM IS THE CLOSED VOCABULARY — check the bylines against it
 
-An editor's initials are a two- or three-letter token that OCR mangles freely
-and no spell-check can see. On 8611 **`(rf)` — Roland Fieger — appeared as
-`(dd`, `(d`, `(Ad`, `(ed`, `(M`, `(M)`, `()`, `(f)`, `(643)`, `[643)`, `AM)`,
-and twice not at all**: 21 bylines across 12 articles, all invisible to any
-check keyed on the shape `(xx)`.
-
-What makes them findable is that the issue carries its own answer key. The
-Impressum lists the staff:
-
-> `an = Achim Hübner (verantwortl.), dm = Dieter Mayer, do = Gerd Donaubauer …
-> aw = Arnd Wängler, bj = Herbert Buckel, rf = Roland Fieger, nj = Norbert
-> Jungmann …`
-
-So check **both directions**:
+An editor's initials are a two-letter token that OCR mangles freely and no
+spell-check can see, so a check keyed on the shape `(xx)` finds nothing. What
+makes them findable is that the issue carries its own answer key: the
+Impressum defines every staff initial as `xx = Name`. Compare the two sets
+**both ways**:
 
 ```bash
-$PY tools/img/scan2ocr/rules/../../../../ -  # see the snippet in the repo history
+d=issues/<YYMM>
+imp=$(ls "$d"/*Impressum*.html | head -1)
+grep -oE '\b[a-z]{2} = [A-ZÄÖÜ]' "$imp" | cut -d' ' -f1 | sort -u > /tmp/imp
+grep -ho '<address class="author">([a-z]*)</address>' "$d"/*.html \
+  | sed 's/.*(\(.*\)).*/\1/' | sort -u > /tmp/byl
+echo "SILENT:    $(comm -23 /tmp/imp /tmp/byl)"   # in Impressum, no byline
+echo "UNDEFINED: $(comm -13 /tmp/imp /tmp/byl)"   # byline, not in Impressum
 ```
 
-- **SILENT** — an editor in the Impressum with **zero** bylines in the issue.
-  Possible, but rare: an editor who wrote nothing all month.
-- **NOT IN THE IMPRESSUM** — a byline whose initials no Impressum line
-  defines. A guest, or a misread.
+Anchor on `<address class="author">`, not on `(xx)` anywhere in the text:
+body prose contains parenthesised lowercase words and they flood the set.
 
-The two lists read together are the diagnosis. MEASURED across the corpus:
+This is a triage list, not a gate. Read it like this:
 
-| issue | silent | not in Impressum |
-|---|---|---|
-| 8607 | `gk`, `nj` | `cg`, `ev` |
-| 8608 | `gk` | `aa`, `ev`, `hg`, `wg` |
-| **8609** | **`rf`** | `aa` |
-| **8610** | **`hm`, `kn`** | `aa` |
-| 8611 | `an`, `do` | `ah`, `ni` |
+- **Chronic silents are normal.** `do` has no byline in any issue 8607–8611;
+  `og` and `gk` are silent in the older ones. An editor can write nothing all
+  month. Do not chase these.
+- **UNDEFINED is either a guest or a misread.** A guest is a real answer —
+  8611's `(ni)` is printed clearly and appears in no Impressum in the corpus.
+- **One silent plus one undefined, for the same person, means the Impressum
+  line itself was misread.** 8611 showed `an` silent and `ah` undefined: the
+  Impressum's `ah = Achim Hübner` had been read as `an =`. Fix the Impressum,
+  not the bylines.
 
-8611's pair is the shape to recognise: `an` silent and `ah` unexplained, for
-one person — the Impressum's own line was misread, `ah = Achim Hübner` as
-`an =`. And **8609 shipped with `rf` silent**, which is this issue's defect in
-a published issue; 8610's `hm` and `kn` are the same suspicion. Recorded, not
-yet investigated.
-
-A guest author is a real second answer — 8611's `(ni)` is printed clearly and
-is in no Impressum in the corpus — so this is a triage list, not a gate. Two
-to four lines an issue, and it points at the person rather than the page.
+Open across the published corpus, recorded and not yet investigated: `rf`
+silent in 8609, `hm` and `kn` silent in 8610, `aa` undefined in 8608–8610.
 
 ## Verification
 

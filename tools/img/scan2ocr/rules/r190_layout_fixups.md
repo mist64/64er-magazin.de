@@ -78,48 +78,33 @@ Critical guardrails:
 - Every `<aside>` callout is this rule's territory — methodology,
   contest, feature list, warning, author bio.
 
-## What the two finders actually contributed, measured
+## The two finders are calibration instruments, not detectors
 
-`r190_find_bold.py` and `r190_find_italic.py` are calibration instruments, not
-detectors, and on a real issue they may decide nothing at all. MEASURED on
-8611, where every emphasis that shipped came from a 600 dpi crop plus corpus
-precedent:
+`r190_find_bold.py` and `r190_find_italic.py` may decide nothing on a real
+issue. Two limits to know before spending time on them:
 
-| | result |
-|---|---|
-| `find_bold` at the shipped `HEAVY = 1.40` | **0 hits**, whole issue |
-| calibrated to 1.35 (confirmed bold `Herstelleranschriften:` = 1.35, roman ≤ 1.20) | captions, monospace `POKE`, Impressum labels — nothing that needed deciding |
-| on lexicon headwords (p28) | **cannot score**: tesseract returned one paragraph-opening word, so there is nothing to measure |
-| `find_italic` | **1405 hits, all noise** |
-
-Two lessons, and the second is the one to carry:
-
-- **The shipped `HEAVY` is above this tool's own worked example** (1.40 against
-  a docstring that says 1.35). Calibrate per issue, as the docstring demands,
-  and never raise the threshold to quieten an issue.
-- **A finder cannot see what the OCR did not return.** Where tesseract merges
-  or drops the words, no ink-fraction threshold exists at any value. That is
-  not a tuning problem, and an hour spent on the threshold is an hour not
-  spent on the crop.
+- **Calibrate `HEAVY` per issue, as the docstring demands, and never raise it
+  to quieten an issue.** The shipped default (1.40) sits above the docstring's
+  own worked example (1.35); measure a known-bold word and a known-roman word
+  on the page in hand. `find_italic` is noise at any threshold.
+- **A finder cannot see what the OCR did not return.** Where tesseract merged
+  or dropped the words — lexicon headwords, for instance — no ink-fraction
+  threshold exists at any value. Go to the 600 dpi crop instead.
 
 ## Where PRINT and CORPUS PRECEDENT disagree, precedent wins
 
-The print bolds things this corpus has never marked: Impressum field labels
-(bold in print, unmarked in **0 of 10** issues) and Leserforum questions
-(same, 0 of 10). 8611 left them unmarked, following precedent, and that is the
-policy.
+The print bolds things the monthlies have never marked: Impressum field labels
+(`<strong>` in **0 of 32**) and Leserforum question lead-ins (**0 of 31**) are
+bold on the page and unmarked in every monthly issue. Follow precedent and
+leave them unmarked. Draw precedent from the monthlies only — the Sonderhefte
+are a separate series and eight of them do bold the Impressum labels. Fidelity to the artefact is
+the job of the page image and the PDF, which keep every one of those bolds; the
+HTML owes the reader that two issues of the same magazine look alike.
 
-The HTML is a reading edition, not the page. Fidelity to the artefact is the
-job of the **page image and the PDF**, where every one of those bolds survives
-exactly as printed. What the HTML owes the reader is that two issues of the
-same magazine look like the same magazine — and an Impressum bolded in 8611
-and plain in the nine issues around it fails that for no gain.
-
-This does **not** license dropping emphasis that carries meaning: a bold
+This does **not** license dropping emphasis that carries meaning. A bold
 lead-in that separates one Q&A item from the next is structure, and structure
-is content. The test is whether the emphasis distinguishes *this* text from
-the text beside it, or merely decorates a field name the layout already sets
-apart.
+is content. The test is whether the emphasis distinguishes *this* text from the
+text beside it, or merely decorates a field name the layout already sets apart.
 
 ## Verification
 

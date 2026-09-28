@@ -96,13 +96,12 @@ notation (e.g. `V₀` vs `V_0`), match the print.
 
 ## Most issues need nothing here, and then the checks are untested
 
-**8607 is the only issue in the corpus that ships LaTeX.** Everywhere else
-these checks run over material that cannot trigger them, so a clean run says
-nothing about them — and `check 2` was wrong for exactly as long as that was
-true (9 false positives on 8607; fixed).
+**8607 is the only issue in the corpus that ships LaTeX**, so it is the only
+fixture these checks have. Everywhere else they run over material that cannot
+trigger them, and a clean run says nothing about them.
 
-So when the sweep finds nothing, say in the report that **the checks had
-nothing to find** — and exercise them against 8607 or a fault-planted copy.
+When the sweep finds nothing, say in the report that **the checks had nothing
+to find**, and exercise them against 8607 or a fault-planted copy.
 
 ## Verification
 
@@ -120,13 +119,9 @@ $PY - "$dir" <<'PYEOF'
 import os, re, sys
 d = sys.argv[1]
 MACROS = (r'\frac', r'\sqrt', r'\cdot', r'\omega', r'\mathrm')
-# STRIP THE DELIMITED SPANS, THEN LOOK AT WHAT IS LEFT. The version this
-# replaces counted \( \[ against \) \] in the 100 characters BEFORE each
-# macro, so the previous formula's closing \] cancelled this formula's
-# opening \[ -- 9 false positives on published 8607, the ONLY issue in the
-# corpus that ships MathJax. It passed everywhere else because everywhere
-# else has no LaTeX at all: a check that passes when there is nothing to
-# check.
+# STRIP THE DELIMITED SPANS, THEN LOOK AT WHAT IS LEFT. Do not instead count
+# delimiters near each macro: the previous formula's closing \] cancels this
+# formula's opening \[, and every formula after the first reads as bare.
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'):
         continue
