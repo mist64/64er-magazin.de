@@ -27,6 +27,13 @@ next to the articles, where it survives the sweep, and r150's later re-run has
 the text without touching a master. `status` is `IN_HTML`, `ABSENT` (no figure
 yet — the work list for after the owner cuts them) or `TRUNCATED`.
 
+**The file is RAW OCR, not a transcription.** It preserves what tesseract read,
+soft hyphens and all — 8611's has 12 `¬` inside words (`Buch¬stabens`) and
+glyph errors like `GC 64` for `C 64`. It exists so the caption's TEXT is not
+lost with `<tmp>`; it does not exempt anyone from checking each caption against
+its page at placement. Pasting a line from it into a `<figcaption>` unread ships
+an OCR error into the article.
+
 **`TRUNCATED` is the second thing it finds.** A caption can be present and
 short: 8611 dropped the second sentence of several listing captions ("Beachten
 Sie bitte die Eingabehinweise auf Seite 99"), which three readers found
