@@ -8,6 +8,36 @@ unhandled elsewhere) in the issue directory into a `<figure>` or
 verbatim from the print scan; alt text is a short German visual
 description.
 
+## FIRST: capture the printed captions, while the OCR still exists
+
+A caption belonging to a figure nobody has cut yet is in no HTML file. It lives
+only in the OCR intermediates, and those go when `<tmp>` is swept — MEASURED
+across the corpus, exactly ONE issue still has them, the one being built. 8611
+had **74** printed `Bild`/`Tabelle`/`Listing` captions in that position. Lose
+them and they must be read off the masters again, one page at a time.
+
+So before anything else here, and before any sweep:
+
+```bash
+$PY tools/img/scan2ocr/rules/r150_figure_captions.py issues/<YYMM> --write
+```
+
+It writes `issues/<YYMM>/figure_captions.txt` (`page<TAB>status<TAB>caption`)
+next to the articles, where it survives the sweep, and r150's later re-run has
+the text without touching a master. `status` is `IN_HTML`, `ABSENT` (no figure
+yet — the work list for after the owner cuts them) or `TRUNCATED`.
+
+**`TRUNCATED` is the second thing it finds.** A caption can be present and
+short: 8611 dropped the second sentence of several listing captions ("Beachten
+Sie bitte die Eingabehinweise auf Seite 99"), which three readers found
+independently and by luck. That is a systematic drop at caption transcription,
+not a reading miss, and no coverage check sees it — the caption is there.
+
+Read each `TRUNCATED` hit against the page, in BOTH directions: the OCR is
+sometimes the short one. Of 8611's two residual hits, p19's `Tabelle 3` is
+complete in the HTML and truncated in the OCR, and p148's `Listing 1` is one
+printed caption the OCR split into two blocks. Expect a couple of these.
+
 ## Mapping images to articles
 
 Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
