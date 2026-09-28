@@ -78,6 +78,60 @@ Critical guardrails:
 - Every `<aside>` callout is this rule's territory — methodology,
   contest, feature list, warning, author bio.
 
+## `TODO PRE` HAS NO PRODUCER — so find the listings yourself
+
+The marker table above tells you what to do with `TODO PRE`, and **nothing in
+this repository emits it.** Step 030 does not; no script does. The only
+occurrences outside this rule are two that *shipped* in published SH8504/110,
+with their BASIC listings still sitting in `<p>` underneath them. So the
+handling has been dead for the whole recent run.
+
+The cause upstream is step 020 giving a short `listing-inline` block the `body`
+role instead of a code role. Until that is fixed, sweep for it here:
+
+```bash
+$PY - issues/<YYMM> <<'PYEOF'
+import glob, os, re, sys
+KW = r'(?:REM|PRINT|POKE|DATA|FOR|IF|GOTO|GOSUB|INPUT|READ|NEXT|OPEN|SYS|LET|DIM|END)'
+BAS = re.compile(r'(?:^|<br>|\n)\s*\d{1,5}\s+' + KW, re.I)
+# MNEMONICS MUST BE LINE-ANCHORED AND CARRY AN OPERAND. An unanchored \bdec\b
+# matches BASIC's DEC( function and German prose; that version produced 135
+# blocks corpus-wide, effectively all false.
+ASM = re.compile(r'(?:^|<br>|\n)\s*(?:lda|sta|jsr|jmp|ldx|ldy|cmp|beq|bne|inx|iny|adc|sbc|asl|lsr)\s+[#$(]', re.I)
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    s = open(f, encoding='utf-8').read()
+    for m in re.finditer(r'<p[^>]*>(.*?)(?=</p>|<p[^>]*>)', s, re.S):
+        t = m.group(1)
+        if len(BAS.findall(t)) >= 2 or len(ASM.findall(t)) >= 2:
+            kind = 'in <p><code>' if '<code>' in t else 'in BARE <p>'
+            print(f"  listing {kind}: {os.path.basename(f)}: {re.sub(r'\s+', ' ', t)[:64]}")
+PYEOF
+```
+
+Two BASIC line numbers each followed by a keyword is the threshold: one is
+ordinary prose quoting a line, two is a listing. Expect a handful per issue —
+around 7 to 14 on recent ones — so a flood means the pattern broke.
+
+**Most of what it prints is CORRECT, so read the `<code>` column first.**
+A multi-line `<p><code>` is this corpus's established form for a snippet quoted
+inside the prose flow — 201 of them are published, 14 in 8609, 29 in 8610, 24 in
+8611 — and converting those to `<pre>` would be the damage, not the repair. The
+three forms, and step 020's own labels decide between them:
+
+| step 020 label | markup | what it is in print |
+|---|---|---|
+| `listing-standalone` | `<pre>` | a captioned listing set off from the text |
+| `listing-inline` | `<p><code>` | a snippet quoted inside a paragraph |
+| `body` on code | **the defect** | code with no code markup at all |
+
+So act only on the **BARE `<p>`** hits — code the sweep found with no `<code>`
+and no `<pre>` around it. Expect **0 to 3** of those on a recent issue (8611
+had one, 8610 three) against a handful of correct `<p><code>` ones. The
+`<code>` form starts at 8609: 8607 and earlier have no `<p><code>` at all and
+many more bare hits, so do not read them as precedent for a new issue. For those, check whether the line breaks survived as
+well: restoring the markup means restoring the lines from the crop, not just
+adding a tag.
+
 ## The two finders are calibration instruments, not detectors
 
 `r190_find_bold.py` and `r190_find_italic.py` may decide nothing on a real
