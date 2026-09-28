@@ -94,28 +94,15 @@ Anti-memory: the LaTeX source comes from reading the scan, not
 from physics knowledge or context. If the print shows a specific
 notation (e.g. `V₀` vs `V_0`), match the print.
 
-## A check that passes because there is nothing to check
+## Most issues need nothing here, and then the checks are untested
 
-8611 needed no MathJax: no `TODO FORMULA` marker exists, and the issue's
-formulas are inline Unicode. That is the normal case — **8607 is the only
-issue in the corpus that ships LaTeX at all**, and every other issue's clean
-run of these checks says nothing whatever about them.
+**8607 is the only issue in the corpus that ships LaTeX.** Everywhere else
+these checks run over material that cannot trigger them, so a clean run says
+nothing about them — and `check 2` was wrong for exactly as long as that was
+true (9 false positives on 8607; fixed).
 
-`check 2` was broken for exactly as long as that was true. It counted `\(`
-and `\[` against `\)` and `\]` in the 100 characters *before* each macro,
-so a preceding formula's closing delimiter cancelled the opening one of the
-formula actually being tested: **9 false positives on published 8607**, and
-silence everywhere else because everywhere else has no LaTeX to misjudge.
-
-The replacement strips the delimited spans and looks at what is left, which
-needs no window and cannot be confused by a neighbour. MEASURED: 0 on 8607,
-0 on 8611, 6 on a copy with faults planted.
-
-> **When a step finds nothing to do, its checks have not been exercised.**
-> Say so in the report — "0 findings, and the checks were not under load" —
-> and test them against the one issue that does have the thing, if there is
-> one. Here that is 8607; a fault-planted copy is the fallback when there is
-> not.
+So when the sweep finds nothing: say **"0 findings, checks not under load"**
+in the report, and exercise them against 8607 or a fault-planted copy.
 
 ## Verification
 
