@@ -101,8 +101,8 @@ these checks run over material that cannot trigger them, so a clean run says
 nothing about them — and `check 2` was wrong for exactly as long as that was
 true (9 false positives on 8607; fixed).
 
-So when the sweep finds nothing: say **"0 findings, checks not under load"**
-in the report, and exercise them against 8607 or a fault-planted copy.
+So when the sweep finds nothing, say in the report that **the checks had
+nothing to find** — and exercise them against 8607 or a fault-planted copy.
 
 ## Verification
 

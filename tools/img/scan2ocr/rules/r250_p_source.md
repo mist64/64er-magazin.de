@@ -25,6 +25,24 @@ strong grounds**. The tagging is still worth extending, because a
 source note set in ordinary body type is invisible to that measurement;
 that is what the mechanical trigger below is for.
 
+## Where the type-size measurement cannot see a footer
+
+The 0.85x test is relative to **the page's own body median**, so it is blind
+wherever that median does not exist or is not the footer's page:
+
+- **a page with no body text at all** — a full-page table or listing. The
+  footer under it is never measured. Fall back to the ISSUE median.
+- **a footer OCR'd into a neighbouring body block** — its ratio reads 1.000.
+  Only the crop shows it.
+
+MEASURED on 8611: all 35 imported tags held up, and all 3 additions were
+these two cases (p12, p49, p164). So the DEFAULT below still stands — an
+existing tag is evidence — but an ABSENT tag on such a page is not.
+
+Two check gaps to know about: check 1 misses a label wrapped in `<strong>`,
+and check 4 rejects a run-in byline `<address>` after a source (8611/164,
+8508/115).
+
 ## DEFAULT: don't change `<p class="source">`
 
 Default action: leave `class="source"` exactly as it is. Tag a
