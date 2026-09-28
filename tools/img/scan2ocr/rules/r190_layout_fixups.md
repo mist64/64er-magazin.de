@@ -130,6 +130,56 @@ ones come from step 020 giving a short code block the `body` role — on 8611,
 assembler in 151 and Prolog in 181. When you move one into `<pre>`, check the
 line breaks survived, and restore them from the crop if not.
 
+### The sweep above misses a listing that was BROKEN UP
+
+It looks for code-shaped text inside one `<p>`, keyed on lines that start with a
+number and a BASIC keyword. Two common manglings defeat it:
+
+- the lines are **space-joined into one paragraph**, so nothing starts a line:
+  `10 SUMME1 = 50 + 25 20 SUMME2 = 60 + 40 30 PRINT SUMME1`
+- the statement is an **assignment**, so there is no keyword after the number
+- the listing is **split one line per `<p>`**, so no single paragraph holds two
+
+8611 had seven of these and the sweep reported none. What survives every
+mangling is that a listing's LINE NUMBERS ASCEND:
+
+```bash
+$PY - issues/<YYMM> <<'PYEOF'
+import glob, os, re, sys
+P = re.compile(r'<p(?:\s[^>]*)?>(.*?)</p>', re.S)
+# Uppercase after the number is what separates code from prose: German text is
+# full of "Bit 4 und 5" and "Register 25", and BASIC in this corpus is CAPS.
+# Without the [A-Z]{2} this floods -- 39 hits on a clean issue, 2 with it.
+NUM = re.compile(r'(?:^|[\s>])(\d{1,5})\s+(?=[A-Z]{2})')
+def run_len(ns):
+    best = cur = 1 if ns else 0
+    for a, b in zip(ns, ns[1:]):
+        cur = cur + 1 if b > a else 1
+        best = max(best, cur)
+    return best
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    texts = [re.sub(r'<[^>]+>', ' ', m.group(1))
+             for m in P.finditer(open(f, encoding='utf-8').read())]
+    for t in texts:                                   # joined into one <p>
+        if run_len([int(x) for x in NUM.findall(t)]) >= 3:
+            print(f"  joined listing: {os.path.basename(f)[:38]}: {t.strip()[:50]}")
+    run = []                                          # split one line per <p>
+    for t in texts + ['']:
+        m = NUM.match(' ' + t.strip())
+        if m:
+            run.append((int(m.group(1)), t.strip()))
+            continue
+        if run_len([n for n, _ in run]) >= 3:
+            print(f"  split listing:  {os.path.basename(f)[:38]}: {run[0][1][:50]}")
+        run = []
+PYEOF
+```
+
+Three ascending numbers, not two, because prose quotes one line often and two
+rarely. MEASURED: 8609 and 8610 score **0**, 8607 4, SH8601 5, and 8611 scored
+4 before its listings were fixed and 2 after — the residue is prose, so read
+each hit rather than trusting the count. Both real ones on 8611 were in the 4.
+
 ## The two finders are calibration instruments, not detectors
 
 `r190_find_bold.py` and `r190_find_italic.py` may decide nothing on a real
