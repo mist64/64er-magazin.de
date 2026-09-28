@@ -387,17 +387,17 @@ lda forpnt+1 pha
 
         <p>ermittelt werden. Unser Modul folgt der Umrechnungsformel:</p>
 
-        <pre><code>Bogenmaß = Gradmaßx(/180)
+        <pre><code>Bogenmaß = Gradmaßx(π/180)
 </code></pre>
 
 
-        <p>Der Faktor 7/180 wurde BOGFAK genannt und sein Wert (0,0174532925) als Fließkommazahl in einer Konstantentabelle ab der BOGFAK genannten Speicherstelle abgelegt. Weil sich im FAC schon der Winkel im Gradmaß befindet, brauchen wir nur noch die Interpreter-Routine FMULT aufrufen, nachdem wir zuvor noch die Startadresse von BOGFAK in den Akku (LSB) und das Y-Register (MSB) geschrieben haben. Das Ergebnis der Multiplikation befindet sich im FAC. In Bild 1 finden Sie diesen Kern als Flußdiagramm.</p>
+        <p>Der Faktor π/180 wurde BOGFAK genannt und sein Wert (0,0174532925) als Fließkommazahl in einer Konstantentabelle ab der BOGFAK genannten Speicherstelle abgelegt. Weil sich im FAC schon der Winkel im Gradmaß befindet, brauchen wir nur noch die Interpreter-Routine FMULT aufrufen, nachdem wir zuvor noch die Startadresse von BOGFAK in den Akku (LSB) und das Y-Register (MSB) geschrieben haben. Das Ergebnis der Multiplikation befindet sich im FAC. In Bild 1 finden Sie diesen Kern als Flußdiagramm.</p>
 
         <h2>Modul 3: GRD</h2>
 
         <p>Für die Umrechnung vom Bogen- in das Gradmaß gelten die gleichen Erläuterungen wie eben bei BOG: GRD leistet uns diesen Dienst nach der Gleichung:</p>
 
-        <pre><code>Gradmaß = Bogenmaßx(180/T)
+        <pre><code>Gradmaß = Bogenmaßx(180/π)
 </code></pre>
 
 
@@ -407,9 +407,9 @@ lda forpnt+1 pha
 
         <p>Spätestens an dieser Stelle werden Sie sich fragen, weshalb nicht der wesentlich einprägsamere Befehlsname DLOG gewählt wurde. Da spieltunsder Interpreter wieder einen Streich: Beim Eintippen von DLOG und &lt;RETURN&gt; amEnde der Zeile würde er nämlich das LOG als normales Basic-Befehlswort deuten und statt der ASCI-Zeichenkette LOG ein sogenanntes Token in den Programmtext einbauen, also eine Kennzahl, die der Computer beim Programmlauf später der Logarithmusfunktion zuordnet. Natürlich kann man als gewiefter Assembler-Programmierer auch diesem unerwünschten Interpreterverhalten einen Riegel vorschieben, aber dann wird es für diesen Kurs ein wenig unübersichtlich. Deshalb heben wir uns solche Feinheiten für eine spätere Folge aufund begnügen uns damit, Befehlsworte zu verwenden, die keine normalen Basic-Worte in sich enthalten.</p>
 
-        <p>Den dekadischen Logarithmus (log, also den Logarithmus zur Basis 10) berechnet man aus dem natürlichen (In, also dem zur Basis e — dabei ist e die Eulersche Zahl 2,718281828489...) durch die Gleichung: log (x) = In (x) * (1/1n10)</p>
+        <p>Den dekadischen Logarithmus (log, also den Logarithmus zur Basis 10) berechnet man aus dem natürlichen (In, also dem zur Basis e — dabei ist e die Eulersche Zahl 2,718281828489...) durch die Gleichung: log (x) = ln (x) * (1/ln10)</p>
 
-        <p>Wieder haben wir einen Faktor vorliegen (nämlich 1/1n10, LOGFAK mit dem Wert 0,434294482), der als Fließkommazahl in der Konstantentabelle ab LOGFAK abgelegt ist. Diesmal wird aber nicht direkt der Wert im FAC mit der Konstanten multipliziert, sondern zuvor muß vom FAC-Inhalt noch der natürliche Logarithmus gebildet werden. Dazu verwenden wir — einfach durch den Routineaufruf mittels JSR — die Interpreterroutine LOG. Automatisch legt diese Routine den In des eingegebenen Wertes im FAC ab, wo wir damit dann genauso weiterverfahren wie bisher: Akku und Y-Register auf LOGFAK richten und FMULT aufrufen. Wie bentzt man DLGR? Hier ein Beispiel:</p>
+        <p>Wieder haben wir einen Faktor vorliegen (nämlich 1/ln10, LOGFAK mit dem Wert 0,434294482), der als Fließkommazahl in der Konstantentabelle ab LOGFAK abgelegt ist. Diesmal wird aber nicht direkt der Wert im FAC mit der Konstanten multipliziert, sondern zuvor muß vom FAC-Inhalt noch der natürliche Logarithmus gebildet werden. Dazu verwenden wir — einfach durch den Routineaufruf mittels JSR — die Interpreterroutine LOG. Automatisch legt diese Routine den In des eingegebenen Wertes im FAC ab, wo wir damit dann genauso weiterverfahren wie bisher: Akku und Y-Register auf LOGFAK richten und FMULT aufrufen. Wie bentzt man DLGR? Hier ein Beispiel:</p>
 
         <pre><code>A=A:DLGR, Ausdruck: PRINT A
 </code></pre>
