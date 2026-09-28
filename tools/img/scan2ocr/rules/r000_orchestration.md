@@ -668,6 +668,29 @@ overstepping.) A sub-agent that renders/crops for its own OCR must
 delete or /tmp-scope those files; the issue dir holds only shippable
 content.
 
+## Cross-cutting rule: AN AGENT CAN BE STOPPED MID-STEP — LEAVE NOTHING STRANDED
+
+A sub-agent can be halted by the harness at any moment, with no report and no
+warning ("no safety verdict for 10 responses in a row" is one way). You cannot
+prevent it. Make it harmless instead:
+
+- **The parent commits per ITEM, not per batch.** This is the whole difference.
+  A stop during 8611's step 290 left three files edited, unverified and
+  unattributed; a stop during the r190 pass left a clean tree, because each
+  finished item had already been verified and committed.
+- **A stopped agent's edits are UNVERIFIED — assess them, never assume them.**
+  Read each against the brief and keep, or take a `git show HEAD:<path>` copy
+  and redo. One of 8611's three was wrong against corpus precedent.
+- **Never recover with `restore`, `checkout`, `reset` or `clean`.** The tree is
+  shared: it may hold another agent's uncommitted work. Recover file by file.
+  (`git stash` is already forbidden, for the same reason.)
+- **When the harness starts refusing tool calls, stop calling gated ones.**
+  Reading and searching need no verdict and keep working. Every retry of a
+  blocked call spends one of the attempts before the hard stop, so a retry loop
+  guarantees the stop it is trying to avoid.
+- **Prefer one script over forty small commands.** Each call is an opportunity
+  to be stopped, and a sub-agent that greps forty times has forty of them.
+
 ## End-of-issue gates (run before declaring an issue done)
 
 The per-rule verifications catch per-rule failures; these catch what
