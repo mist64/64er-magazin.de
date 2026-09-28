@@ -21,15 +21,15 @@
         <h1>Grafikprogrammierung auf dem C 64</h1>
         <p class="intro">Einfach zeigen wir Ihnen, was sich mit dem Videocontroller des C 64 alles anstellen läßt. Gestützt durch viele Basic-Beispiele lernen Sie mit Sprites, HiRes-Bildschirmen und allem was mit Grafik zu tun hat, umzugehen.</p>
 
-        <p>unächst einige allgemeine Informationen. Der Bildschirm des C 64 verfügt über 1000 Positionen. Normalerweise beginnt der Bildschirm ab Adresse 1024 ($0400) und endet bei Adresse 2023. Jede dieser Adressen kann 8 Bit speichern. Das entspricht einer beliebigen ganzen Zahl zwischen O und 255. Der Bildschirmspeicher entspricht einer Gruppe von 1000 Adressen, der Farbspeicher oder Farb-RAM genannt wird. Dieses Farb-RAM belegt den Speicher von 55296 ($D800) bis 56295 ($DBE7). Jede Farb-RAM-Adresse speichert 4 Bit und kann daher eine beliebige ganze Zahl zwischen O0 und 15 aufnehmen.</p>
+        <p>Zunächst einige allgemeine Informationen. Der Bildschirm des C 64 verfügt über 1000 Positionen. Normalerweise beginnt der Bildschirm ab Adresse 1024 ($0400) und endet bei Adresse 2023. Jede dieser Adressen kann 8 Bit speichern. Das entspricht einer beliebigen ganzen Zahl zwischen 0 und 255. Der Bildschirmspeicher entspricht einer Gruppe von 1000 Adressen, der Farbspeicher oder Farb-RAM genannt wird. Dieses Farb-RAM belegt den Speicher von 55296 ($D800) bis 56295 ($DBE7). Jede Farb-RAM-Adresse speichert 4 Bit und kann daher eine beliebige ganze Zahl zwischen 0 und 15 aufnehmen.</p>
 
-        <p>Die verschiedenen Grafikmodi werden über 47 Steuerregister im Videocontroller-Baustein ausgewählt. Viele Grafikfunktionen lassen sich steuern, indem der richtige Wert über die POKE-Anweisung in eines der Register geschrieben wird, das im Adreßbereich von 53248 ($D000) bis 53294 ($DO2E) liegt.</p>
+        <p>Die verschiedenen Grafikmodi werden über 47 Steuerregister im Videocontroller-Baustein ausgewählt. Viele Grafikfunktionen lassen sich steuern, indem der richtige Wert über die POKE-Anweisung in eines der Register geschrieben wird, das im Adreßbereich von 53248 ($D000) bis 53294 ($D02E) liegt.</p>
 
         <h3>Wahl der Video-Bank</h3>
 
-        <p>Der Videocontroller-Baustein kann immer nur aufeinen Speicherbereich von 16 KByte zugreifen. Da im C 64 64 KByte RAM untergebracht sind, soll der Videocontroller natürlich auch den ganzen Speicher »sehen« können. Dies ist möglich. Es gibt vier verschiedene Banks (oder Abschnitte), die für jeweils 16 KByte gelten. Nun muß lediglich noch geregelt werden, aufwelche dieser Abschnitte der Videocontroller-Baustein zugreift. Auf diese Weise kann der Baustein die gesamte Speicherkapazität von 64 KByte ausnutzen. Die Bankanwahl-Bits, die Ihnen einen Zugriff auf die verschiedenen Speicherabschnitte ermöglichen, befinden sich im Complex-Interface-Adapter #2 (CIA #2) 6526. Über die Basic-Anweisung POKE und PEEK wird eine Bank durch Steuerung der Bits 0 und 1 von Port Ades CIA#2 (oder hex 56576 $DD00) gewählt. Zur Änderung der Speicherabschnitte müssen diese zwei Bit auf Ausgabe gesetzt sein. Dies wird anhand nachstehender Befehle deutlich: POKE 56578, PEEK(56578)OR 3: REM BITS O UND 1 SETZEN POKE 56576, (PEEK (56576) AND 252)OR A:REM VIDEO-BANK WECHSELN</p>
+        <p>Der Videocontroller-Baustein kann immer nur auf einen Speicherbereich von 16 KByte zugreifen. Da im C 64 64 KByte RAM untergebracht sind, soll der Videocontroller natürlich auch den ganzen Speicher »sehen« können. Dies ist möglich. Es gibt vier verschiedene Banks (oder Abschnitte), die für jeweils 16 KByte gelten. Nun muß lediglich noch geregelt werden, auf welche dieser Abschnitte der Videocontroller-Baustein zugreift. Auf diese Weise kann der Baustein die gesamte Speicherkapazität von 64 KByte ausnutzen. Die Bankanwahl-Bits, die Ihnen einen Zugriff auf die verschiedenen Speicherabschnitte ermöglichen, befinden sich im Complex-Interface-Adapter #2 (CIA #2) 6526. Über die Basic-Anweisung POKE und PEEK wird eine Bank durch Steuerung der Bits 0 und 1 von Port A des CIA #2 (oder hex 56576 $DD00) gewählt. Zur Änderung der Speicherabschnitte müssen diese zwei Bit auf Ausgabe gesetzt sein. Dies wird anhand nachstehender Befehle deutlich: POKE 56578, PEEK(56578)OR 3: REM BITS 0 UND 1 SETZEN POKE 56576, (PEEK (56576) AND 252)OR A:REM VIDEO-BANK WECHSELN</p>
 
-        <p>»A« muß einen der folgenden Werte haben (Tabelle ]). Dieses Konzept der 16-KByte-Abschnitte spielt bei allen AnwendungendesVIC eine Rolle. Sie sollten stets wissen, auf welche Bank der Videocontroller zugreift, denn dadurch wird festgelegt, woher die Zeichendatenmuster kommen, wo sich der Bildschirm und der Speicherbereich für die Sprites befinden. Nach dem Einschalten des C 64 wird automatisch Bank 0 ($0000-$3FFF) aktiviert. Anmerkung: Der Zeichensatz des Commodore 64 ist in den Banks 1 und 3 für den Videocontroller-Baustein nicht verfügbar.</p>
+        <p>»A« muß einen der folgenden Werte haben (Tabelle 1). Dieses Konzept der 16-KByte-Abschnitte spielt bei allen Anwendungen des VIC eine Rolle. Sie sollten stets wissen, auf welche Bank der Videocontroller zugreift, denn dadurch wird festgelegt, woher die Zeichendatenmuster kommen, wo sich der Bildschirm und der Speicherbereich für die Sprites befinden. Nach dem Einschalten des C 64 wird automatisch Bank 0 ($0000-$3FFF) aktiviert. Anmerkung: Der Zeichensatz des Commodore 64 ist in den Banks 1 und 3 für den Videocontroller-Baustein nicht verfügbar.</p>
 
         <figure>
             <table>
@@ -204,19 +204,19 @@
 
         <h3>Farbspeicher</h3>
 
-        <p>Der Farbspeicher kann nicht verschoben werden. Er befindet sich stets im Adreßbereich von 55296 ($D800) bis 56295 ($DBEN7). Bildschirmspeicher und Farbspeicher werden in den verschiedenen Grafikmodi unterschiedlich benutzt. Ein in einem Modus erstelltes Bild sieht in einem anderen Grafikmodus häufig anders aus.</p>
+        <p>Der Farbspeicher kann nicht verschoben werden. Er befindet sich stets im Adreßbereich von 55296 ($D800) bis 56295 ($DBE7). Bildschirmspeicher und Farbspeicher werden in den verschiedenen Grafikmodi unterschiedlich benutzt. Ein in einem Modus erstelltes Bild sieht in einem anderen Grafikmodus häufig anders aus.</p>
 
         <h3>Zeichenspeicher</h3>
 
         <p>Für die Programmierung von Grafiken ist es wesentlich, von wo genau der Videocontroller die Zeicheninformation bekommt. Normalerweise erhält der Baustein die Konturen der anzuzeigenden Zeichen vom Character-Generator-ROM. In diesem Baustein sind die Muster gespeichert, die die verschiedenen Buchstaben, Zeichen, Interpunktionssymbole und alle anderen Zeichen der Tastatur bilden.</p>
 
-        <p>Eines der Merkmale des Commodore 64 ist seine Fähigkeit, in RAM-Speicher befindliche Muster zu benutzen. Diese RAM-Muster werdenvonIhnenerstellt, so daß ein nahezu unbegrenzter Satz an Symbolen für Spiele und so weiter zur Verfügung steht.</p>
+        <p>Eines der Merkmale des Commodore 64 ist seine Fähigkeit, in RAM-Speicher befindliche Muster zu benutzen. Diese RAM-Muster werden von Ihnen erstellt, so daß ein nahezu unbegrenzter Satz an Symbolen für Spiele und so weiter zur Verfügung steht.</p>
 
-        <p>Ein normaler Zeichensatz enthält 256 Zeichen, beidem jedes Zeichen durch 8 Byte bestimmt wird. Da jedes Zeichen also 8 Byte beansprucht, benötigt der komplette Zeichensatz256x8=2 KByte. Da der Videocontroller-Baustein gleichzeitig auf 16 KByte zugreift, gibt es acht verschiedene Speicherplatzmöglichkeiten für einen vollständigen Zeichensatz. Sie brauchen natürlich nicht immer einen ganzen Zeichensatz zu verwenden. Er muß jedoch stets an einem der achtmöglichen Startplätze beginnen. Die Lage des Zeichenspeichers wird durch 3 Bit vom Videocontroller kontrolliert (83272 ($D018 HEX)). Die Bits 3, 2 und 1 steuern die Lage des Zeichensatzes, Bit 0 wird überlesen. Um die Lage des Zeichensatzes zu ändern, benutzen Sie folgende Basic-Anweisung:</p>
+        <p>Ein normaler Zeichensatz enthält 256 Zeichen, bei dem jedes Zeichen durch 8 Byte bestimmt wird. Da jedes Zeichen also 8 Byte beansprucht, benötigt der komplette Zeichensatz 256 x 8 = 2 KByte. Da der Videocontroller-Baustein gleichzeitig auf 16 KByte zugreift, gibt es acht verschiedene Speicherplatzmöglichkeiten für einen vollständigen Zeichensatz. Sie brauchen natürlich nicht immer einen ganzen Zeichensatz zu verwenden. Er muß jedoch stets an einem der acht möglichen Startplätze beginnen. Die Lage des Zeichenspeichers wird durch 3 Bit vom Videocontroller kontrolliert (53272 ($D018 HEX)). Die Bits 3, 2 und 1 steuern die Lage des Zeichensatzes, Bit 0 wird überlesen. Um die Lage des Zeichensatzes zu ändern, benutzen Sie folgende Basic-Anweisung:</p>
 
         <p>POKE 53272, (PEEK (53272) AND240)OR A</p>
 
-        <p>Hierbeihat A einen derfolgenden Werte (Tabelle 3).</p>
+        <p>Hierbei hat A einen der folgenden Werte (Tabelle 3).</p>
 
         <figure>
             <table>
@@ -294,15 +294,15 @@
             <figcaption>Tabelle 3. Die Bits 1, 2 und 3 des Kontrollregisters bestimmen die Lage des Zeichensatzspeichers</figcaption>
         </figure>
 
-        <p>Greift der VIC auf die Zeichendaten zu, so wird das ROM eingeschaltet. Ansonsten wird dieser Bereich von den Ein/Ausgaberegistern beansprucht, und das Zeichen-ROM kann nur vom VIC erreicht werden.</p>
+        <p>Greift der VIC auf die Zeichendaten zu, so wird das ROM eingeschaltet. Ansonsten wird dieser Bereich von den Ein-/Ausgaberegistern beansprucht, und das Zeichen-ROM kann nur vom VIC erreicht werden.</p>
 
-        <p>Es kann jedoch passieren, daß Sie das Zeichen-ROM benötigen, und zwar dann, wenn Sie programmierbare Zeichen benutzen wollen und eine Kopie eines Teils vom Zeichen-ROM für die Zeichendefinition brauchen. In diesem Fall müssen Sie das Ein/Ausgaberecister aus- und das Zeichen-ROM einschalten. Dann können Sie kopieren. Danach muß das Ein/Ausgaberegister erneut eingeschaltet werden. Während des Kopierens (bei ausgeschalteter Ein-/Ausgabe) sind keine Unterbrechungen erlaubt. Für werden nämlich die Ein/Ausgaberegister benötigt. Wenn Sie dies vergessen und eine Unvornehmen, passiert Unvorhersehbares. Die Tasteneingabe darf während des Kopierens nicht gelesen werden. Um die Tastatur und weitere normale Unterbrechungen abzuschalten, die mit dem C 64 möglich sind, benutzen Sie folUnterbrechungen terbrechung gende POKE-Anweisung:</p>
+        <p>Es kann jedoch passieren, daß Sie das Zeichen-ROM benötigen, und zwar dann, wenn Sie programmierbare Zeichen benutzen wollen und eine Kopie eines Teils vom Zeichen-ROM für die Zeichendefinition brauchen. In diesem Fall müssen Sie das Ein-/Ausgaberegister aus- und das Zeichen-ROM einschalten. Dann können Sie kopieren. Danach muß das Ein-/Ausgaberegister erneut eingeschaltet werden. Während des Kopierens (bei ausgeschalteter Ein-/Ausgabe) sind keine Unterbrechungen erlaubt. Für Unterbrechungen werden nämlich die Ein-/Ausgaberegister benötigt. Wenn Sie dies vergessen und eine Unterbrechung vornehmen, passiert Unvorhersehbares. Die Tasteneingabe darf während des Kopierens nicht gelesen werden. Um die Tastatur und weitere normale Unterbrechungen abzuschalten, die mit dem C 64 möglich sind, benutzen Sie folgende POKE-Anweisung:</p>
 
         <pre><code>POKE 56334, PEEK(56334) AND254 (Interrupt AUS)
 </code></pre>
 
 
-        <p>Wenn Sie den Zugriff auf das Zeichen-ROM beendet haben, wird die Tastatur POKE- durch folgende Anweisung eingeschaltet: POKE 56334, PEEK(56334)OR1 (Interrupt EIN) Durch folgende POKE-Anweisung wird die Ein/Ausgabe ausgeschaltet und das Zeichen-ROM eingeschaltet:</p>
+        <p>Wenn Sie den Zugriff auf das Zeichen-ROM beendet haben, wird die Tastatur durch folgende POKE-Anweisung eingeschaltet: POKE 56334, PEEK(56334)OR1 (Interrupt EIN) Durch folgende POKE-Anweisung wird die Ein-/Ausgabe ausgeschaltet und das Zeichen-ROM eingeschaltet:</p>
 
         <pre><code>POKE 1,PEEK(1)AND251
 </code></pre>
@@ -318,13 +318,13 @@
 
         <p>Zeichen können aus dem ROM oder dem RAM gelesen werden. Normalerweise wird jedoch auf die Zeichen im ROM zugegriffen. Benötigen Sie für ein Programm spezielle Grafikzeichen, so sind lediglich die neuen Zeichenmuster im RAM zu definieren und der VIC ist anzuweisen, die Zeicheninformationen aus dem RAM und nicht aus dem Zeichen-ROM zu nehmen.</p>
 
-        <p>Um Zeichen auf dem Bildschirm in Farbe anzuzeigen, greift der Videocontroller-Baustein auf den Bildschirmspeicher zu, um den Zeichen-Code für diesen Bildschirmplatz zu bestimmen. Gleichzeitig greifter aufden Farbspeicher zu, um die Farbe für die Zeichenanzeige festzulegen. Der Zeichen-Code wird vom Videocontroller in die Startadresse des 8-KByte-SatzesmitIhrem Zeichenmuster umgesetzt.</p>
+        <p>Um Zeichen auf dem Bildschirm in Farbe anzuzeigen, greift der Videocontroller-Baustein auf den Bildschirmspeicher zu, um den Zeichen-Code für diesen Bildschirmplatz zu bestimmen. Gleichzeitig greift er auf den Farbspeicher zu, um die Farbe für die Zeichenanzeige festzulegen. Der Zeichen-Code wird vom Videocontroller in die Startadresse des 8-KByte-Satzes mit Ihrem Zeichenmuster umgesetzt.</p>
 
         <p>Die Umsetzung ist nicht zu kompliziert, zur Erstellung der gewünschten Adresse werden jedoch verschiedene Punkte kombiniert. Zunächst ist der von Ihnen bei der POKE-Anweisung für den Bildschirmspeicher benutzte Zeichencode mit 8 zu multiplizieren. Danach wird der Anfang vom Zeichenspeicher addiert. Nun werden die Bankanwahl-Bits berücksichtigt. Hierzu wird die Basisadresse addiert. Anhand der folgenden einfachen Gleichung können Sie sehen, wie dies gemeint ist: Zeichenadresse = Bildschirmcode x 8 + (Zeichensatz x 2048) + (Bank x 16348)</p>
 
         <h3>Zeichendefinitionen</h3>
 
-        <p>Jedes Zeichen wird aus einer Matrix von 8x 8 Punkten gebildet. Hierbeikönnen die einzelnen Punkte entweder ein- oder ausgeschaltet sein. Beim Commodore 64 sind die Zeichenbits im ZeichengeneratorROM abgelegt. Jedes Zeichen ist hierbei als Satz von 8 Byte gespeichert. Jedes Byte steht für das Punktmuster einer Reihe im Zeichen und jedes Bit für einen Punkt. Der Zeichenspeicher im ROM beginnt ab 53248 (bei ausgeschalteter Ein-/Ausgabe). Die ersten 8 Byte ab 53248 ($D000) bis 53255 ($D007) enthalten das Muster für das Zeichen @, dessen Zeichencodewert im Bildschirmspeicher 0 ist. Die nächsten 8 Byte ab 53256 ($D008) bis 53263 ($DOOF) enthalten die Information zur Bildung des Buchstabens A Bild).</p>
+        <p>Jedes Zeichen wird aus einer Matrix von 8 x 8 Punkten gebildet. Hierbei können die einzelnen Punkte entweder ein- oder ausgeschaltet sein. Beim Commodore 64 sind die Zeichenbits im Zeichengenerator ROM abgelegt. Jedes Zeichen ist hierbei als Satz von 8 Byte gespeichert. Jedes Byte steht für das Punktmuster einer Reihe im Zeichen und jedes Bit für einen Punkt. Der Zeichenspeicher im ROM beginnt ab 53248 (bei ausgeschalteter Ein-/Ausgabe). Die ersten 8 Byte ab 53248 ($D000) bis 53255 ($D007) enthalten das Muster für das Zeichen @, dessen Zeichencodewert im Bildschirmspeicher 0 ist. Die nächsten 8 Byte ab 53256 ($D008) bis 53263 ($D00F) enthalten die Information zur Bildung des Buchstabens A (Bild 1).</p>
 
         <figure>
             <table>
@@ -385,11 +385,11 @@
 
         <h3>Programmierbare Zeichen</h3>
 
-        <p>Da die Zeichen im ROM gespeichert sind, sieht es so aus, als ob sie für frei programmierbare Zeichen nicht geändert werden könnten. Der Speicherplatz, der dem VIC mitteilt, wo die Zeichen zu finden sind, ist jedoch ein programmierbares Register. Dieses kann so geändert werden, daß es auf viele Speicherbereiche zeigt, indem der Zeichenspeicherzeiger so geändert wird, daß er auf das RAM zeigt. Alle Buchstaben, Zahlen oder Standardgrafikzeichen vom © 64 müssen zuerst in den RAM-Speicher kopiert werden, damit Sie ihn in Ihrem Programm benutzen können. Achtung: Achten Sie darauf, daß Ihr Zeichensatz nicht vom Basic-Programm, das auch das RAM benutzt, überschrieben wird.</p>
+        <p>Da die Zeichen im ROM gespeichert sind, sieht es so aus, als ob sie für frei programmierbare Zeichen nicht geändert werden könnten. Der Speicherplatz, der dem VIC mitteilt, wo die Zeichen zu finden sind, ist jedoch ein programmierbares Register. Dieses kann so geändert werden, daß es auf viele Speicherbereiche zeigt, indem der Zeichenspeicherzeiger so geändert wird, daß er auf das RAM zeigt. Alle Buchstaben, Zahlen oder Standardgrafikzeichen vom C 64 müssen zuerst in den RAM-Speicher kopiert werden, damit Sie ihn in Ihrem Programm benutzen können. Achtung: Achten Sie darauf, daß Ihr Zeichensatz nicht vom Basic-Programm, das auch das RAM benutzt, überschrieben wird.</p>
 
-        <p>Zwei Adressen im C 64 dürfen nicht als Beginn des Zeichensatzes gewählt werden: Adresse O0 und Adresse 2048. Der erste darfnicht benutzt werden, weil das System auf Seite 0 (0-Page) wichtige Daten speichert. Adresse 2048 ist der Beginn Ihres Basic-Programms!</p>
+        <p>Zwei Adressen im C 64 dürfen nicht als Beginn des Zeichensatzes gewählt werden: Adresse 0 und Adresse 2048. Der erste darf nicht benutzt werden, weil das System auf Seite 0 (0-Page) wichtige Daten speichert. Adresse 2048 ist der Beginn Ihres Basic-Programms!</p>
 
-        <p>Für Ihren Zeichensatz stehen jedoch noch sechs weitere Anfangspositionen zur Verfügung. Am besten wählen Sie hierzu den Bereich ab 12288 ($3000). Dies erfolgt, indem zu den unteren 4 Bit in Speicherzelle 53272 der Wert l2 addiert wird. Probieren Sie nun folgende POKE-Anweisung aus:</p>
+        <p>Für Ihren Zeichensatz stehen jedoch noch sechs weitere Anfangspositionen zur Verfügung. Am besten wählen Sie hierzu den Bereich ab 12288 ($3000). Dies erfolgt, indem zu den unteren 4 Bit in Speicherzelle 53272 der Wert 12 addiert wird. Probieren Sie nun folgende POKE-Anweisung aus:</p>
 
         <p>POKE 53272, (PEEK(53272) AND240)+12</p>
 
@@ -397,11 +397,11 @@
 
         <p>Nun wollen wir Grafikzeichen erstellen. Um Ihren Zeichensatz zu schützen, sollten Sie die Speicherkapazität für das Basic reduzieren. Der Speicher in Ihrem Computer bleibt unverändert. Sie haben lediglich dem Basic die Anweisung gegeben, einen bestimmten Teil nicht zu benutzen. Tippen Sie folgendes ein:</p>
 
-        <pre><code>PRINT FRE(O)-(SGN(FRE(0)) &lt;0)*65535
+        <pre><code>PRINT FRE(0)-(SGN(FRE(0)) &lt;0)*65535
 </code></pre>
 
 
-        <p>Die angezeigte Zahl gibt die unbenutzte Speicherkapazitätan. Geben Sie nun folgendes ein:</p>
+        <p>Die angezeigte Zahl gibt die unbenutzte Speicherkapazität an. Geben Sie nun folgendes ein:</p>
 
         <pre><code>POKE 52,48:POKE56,48:CLR
 </code></pre>
@@ -412,15 +412,13 @@
 </code></pre>
 
 
-        <p>Sehen Sie die Änderung? Das Basic nimmt nun an, daß weniger Speicherkapazität zur Verfügung steht. In diesem gewonnenen Speicherplatz können Sie nun Ihren Zeichensatz unterbringen. Als nächstes sind die Zeichen im RAM zu definieren. Zu Beginn stehen ab 12288 (83000) zufällige Daten. Durch folgendes Programm werden 64 Zeichen vom ROM- in den RAM-Zeichensatz übertragen:</p>
+        <p>Sehen Sie die Änderung? Das Basic nimmt nun an, daß weniger Speicherkapazität zur Verfügung steht. In diesem gewonnenen Speicherplatz können Sie nun Ihren Zeichensatz unterbringen. Als nächstes sind die Zeichen im RAM zu definieren. Zu Beginn stehen ab 12288 ($3000) zufällige Daten. Durch folgendes Programm werden 64 Zeichen vom ROM- in den RAM-Zeichensatz übertragen:</p>
 
-        <pre><code>&gt; FRINIUHRSI LAE)
+        <pre><code>5 PRINTCHR$(142)
 10 POKE52,48:POKE56,48:CLR
-20 POKE56334,PEEK(56334)
-AND254
-30 POKE1,PEEK{1)AND251
-40 FORI=0TO511:POKEI+12288,
-PEEK (1453248) :NEXT
+20 POKE56334,PEEK(56334)AND254
+30 POKE1,PEEK(1)AND251
+40 FORI=0TO511:POKEI+12288,PEEK(I+53248):NEXT
 50 POKE1,PEEK(1)OR4
 60 POKE56334,PEEK(56334)OR1
 70 END
@@ -429,25 +427,25 @@ PEEK (1453248) :NEXT
 
         <p>Geben Sie nun ein: POKE 53272, (PEEK(53272)AND240) + 12. Nichts passiert, stimmt's? Fast nichts! Der C 64 bekommt die Zeicheninformationen nun vom RAM und nicht vom ROM. Da wir jedoch die Zeichen genau aus dem ROM kopiert haben, ist kein Unterschied zu sehen ...noch nicht. Die Zeichen können nun leicht geändert werden. Löschen Sie den Bildschirm und drücken Sie die Taste &lt;@>. Bewegen Sie den Cursor um einige Zeilen nach unten, und geben Sie dann folgendes ein:</p>
 
-        <p>FOR I = 12288 TO 12288+7: POKE 1,255 - PEEK(I):NEXT Sie haben soeben ein »@«in Reversdarstellung erstellt.</p>
+        <p>FOR I = 12288 TO 12288+7: POKE I,255 - PEEK(I):NEXT Sie haben soeben ein »@« in Reversdarstellung erstellt.</p>
 
-        <p>Bewegen Sie nun den Oursor wieder zum Programmanfang und drücken Sie die Taste &lt;RETURN&gt; erneut, um das Zeichen noch einmal umzukehren. Die Tabelle der Bildschirm-Codes zeigt Ihnen, wo die einzelnen Zeichen im RAM stehen. Denken Sie daran, daß zur Speicherung jedes Zeichens acht Speicherplätze benötigt werden.</p>
+        <p>Bewegen Sie nun den Cursor wieder zum Programmanfang und drücken Sie die Taste &lt;RETURN&gt; erneut, um das Zeichen noch einmal umzukehren. Die Tabelle der Bildschirm-Codes zeigt Ihnen, wo die einzelnen Zeichen im RAM stehen. Denken Sie daran, daß zur Speicherung jedes Zeichens acht Speicherplätze benötigt werden.</p>
 
-        <p>Wird ein anderes Zeichen gewünscht, so ist vorher noch etwas zu berücksichtigen. Was ist zu tun, wenn Sie nun Zeichennummer 154, ein umgekehrtes Z, wünschen? Sie können daserreichen, indem Sie ein Z umkehren, oder Sie können den Satz der umgekehrten Zeichen aus dem ROM kopieren oder einfach daseine Zeichen aus dem ROM holen und ein nicht benötigtes Zeichen im RAM dadurch ersetzen. Nehmen wir an, Sie benötigen das Zeichen > nicht mehr. Dieses Zeichen soll also gegen das negativ dargestellte Zeichen Z ausgetauscht werden. Geben Sie folgendes ein:</p>
+        <p>Wird ein anderes Zeichen gewünscht, so ist vorher noch etwas zu berücksichtigen. Was ist zu tun, wenn Sie nun Zeichennummer 154, ein umgekehrtes Z, wünschen? Sie können das erreichen, indem Sie ein Z umkehren, oder Sie können den Satz der umgekehrten Zeichen aus dem ROM kopieren oder einfach das eine Zeichen aus dem ROM holen und ein nicht benötigtes Zeichen im RAM dadurch ersetzen. Nehmen wir an, Sie benötigen das Zeichen > nicht mehr. Dieses Zeichen soll also gegen das negativ dargestellte Zeichen Z ausgetauscht werden. Geben Sie folgendes ein:</p>
 
-        <pre><code>FOR I=0 TO 7:POKE 12784 + 1,255-PEEK(I+12496) :NEXT
+        <pre><code>FOR I=0 TO 7:POKE 12784 + I,255-PEEK(I+12496) :NEXT
 </code></pre>
 
 
-        <p>(Diese Änderung betrifft jedoch nur die Darstellung auf dem Bildschirm. Auch wenn das Zeichen wie ein umgekehrtes Z aussieht, wirkt es in einem Programm dochimmernochals >). Probieren Sie das an einem Beispiel aus, bei dem dieses Zeichen benötigt wird.</p>
+        <p>(Diese Änderung betrifft jedoch nur die Darstellung auf dem Bildschirm. Auch wenn das Zeichen wie ein umgekehrtes Z aussieht, wirkt es in einem Programm doch immer noch als >). Probieren Sie das an einem Beispiel aus, bei dem dieses Zeichen benötigt wird.</p>
 
-        <p>Fassen wir zusammen: Sie können nun Zeichen aus demROMindasRAM kopieren. Hinsichtlich der programmierbaren Zeichen fehlt Ihnen also nur noch ein Punkt (und zwar der Beste!) .. das Erstellen Ihrer eigenen Zeichen.</p>
+        <p>Fassen wir zusammen: Sie können nun Zeichen aus dem ROM in das RAM kopieren. Hinsichtlich der programmierbaren Zeichen fehlt Ihnen also nur noch ein Punkt (und zwar der Beste!) .. das Erstellen Ihrer eigenen Zeichen.</p>
 
-        <p>Wissen Sie noch, wie Zeichen im ROM gespeichert sind? Die Bit-Muster der Zeichen-Bytes geben direkt das Zeichen wieder. Werden 8Byte übereinander angeordnet und jedes Byte als achtstellige Binärzahl geschrieben, so entsteht eine 8x8-Matrix, die das Zeichen darstellt. Enthält ein Bit eine l, so ist an diesem Platz ein Punkt; enthälteseine 0, istan diesem Platz eine Leerstelle.</p>
+        <p>Wissen Sie noch, wie Zeichen im ROM gespeichert sind? Die Bit-Muster der Zeichen-Bytes geben direkt das Zeichen wieder. Werden 8 Byte übereinander angeordnet und jedes Byte als achtstellige Binärzahl geschrieben, so entsteht eine 8x8-Matrix, die das Zeichen darstellt. Enthält ein Bit eine 1, so ist an diesem Platz ein Punkt; enthält es eine 0, ist an diesem Platz eine Leerstelle.</p>
 
         <h3>Mehrfarbige Grafiken</h3>
 
-        <p>Durch die standardmäßige hochauflösende Grafik können Sie selbst Einzelprodukte auf dem Bildschirm ansteuern. Für jeden Punkt im Zeichensatz stehen zwei Werte zur Verfügung: 1 für EIN und 0 für AUS. Hat ein Punkt den Wert ], so wird er in der von Ihnen für die jeweilige Bildschirmposition gewählten Farbe angezeigt. Bei der hochauflösenden Grafik können alle Punkte innerhalb der 8x8-Matrix entweder in der Hinter- oder Vordergrundfarbe angezeigt werden. Hierdurch wird die Farbauflösung innerhalb dieses Bereichs eingeschränkt. So können zum Beispiel Schwierigkeiten entstehen, wenn sich zwei Linien mit verschiedenen Farben kreuzen.</p>
+        <p>Durch die standardmäßige hochauflösende Grafik können Sie selbst Einzelprodukte auf dem Bildschirm ansteuern. Für jeden Punkt im Zeichensatz stehen zwei Werte zur Verfügung: 1 für EIN und 0 für AUS. Hat ein Punkt den Wert 1, so wird er in der von Ihnen für die jeweilige Bildschirmposition gewählten Farbe angezeigt. Bei der hochauflösenden Grafik können alle Punkte innerhalb der 8x8-Matrix entweder in der Hinter- oder Vordergrundfarbe angezeigt werden. Hierdurch wird die Farbauflösung innerhalb dieses Bereichs eingeschränkt. So können zum Beispiel Schwierigkeiten entstehen, wenn sich zwei Linien mit verschiedenen Farben kreuzen.</p>
 
         <p>Dieses Problem wird durch den Mehrfarbenmodus gelöst. Hierbei kann jeder Punkt eine von vier Farben annehmen: Bildschirmfarbe (Hintergrundfarbregister #0), die Farbe im Hintergrund #1, die Farbe im Hintergrundfenster #2 oder die Zeichenfarbe. Die einzige Einschränkung liegt in der horizontalen Auflösung, da im Mehrfarbenmodus jeder Punkt doppelt so breit ist wie bei Hochauflösung. Es überwiegen jedoch bei weitem die vielen Vorteile des Mehrfarbenmodus.</p>
 
@@ -463,7 +461,7 @@ PEEK (1453248) :NEXT
 </code></pre>
 
 
-        <p>Dieser Mehrfarbenmodus wird für jede Bildschirmstelle ein-oder ausgeschaltet, so daß Mehrfarbengrafiken und Grafiken mit hoher Auflösung (HiRes) kombiniert werden können. Dies wird über Bit 3 im Farbspeicher gesteuert. Der Farbspeicher beginnt ab 55296 ($D800). Ist die Zahl im Farbspeicher kleiner als 8 (0 bis 7), so gilt für die entsprechende Stelle auf dem Bildschirm Hochauflösung in der gewählten Farbe (0 bis 7). Ist die Zahlim Farbspeicher größer oder gleich 8 (von 8 bis 15), dann wird die entsprechende Stelle im Mehrfarbenmodus angezeigt.</p>
+        <p>Dieser Mehrfarbenmodus wird für jede Bildschirmstelle ein- oder ausgeschaltet, so daß Mehrfarbengrafiken und Grafiken mit hoher Auflösung (HiRes) kombiniert werden können. Dies wird über Bit 3 im Farbspeicher gesteuert. Der Farbspeicher beginnt ab 55296 ($D800). Ist die Zahl im Farbspeicher kleiner als 8 (0 bis 7), so gilt für die entsprechende Stelle auf dem Bildschirm Hochauflösung in der gewählten Farbe (0 bis 7). Ist die Zahl im Farbspeicher größer oder gleich 8 (von 8 bis 15), dann wird die entsprechende Stelle im Mehrfarbenmodus angezeigt.</p>
 
         <p>Die Zeichenfarbe einer Bildschirm-Position kann durch eine POKE-Anweisung im Farbspeicher geändert werden. Durch das POKEn einer Zahl von 0 bis 7 werden die Zeichen in normaler Farbdarstellung angezeigt. Durch das POKEn einer Zahl zwischen 8 und 15 gilt für die entsprechende Bildschirmstelle der Mehrfarbenmodus. Das heißt durch das Einschalten von Bit 3 im Farbspeicher wird der Mehrfarbenmodus und durch Ausschalten der normale Hochauflösungsmodus gewählt.</p>
 
@@ -515,7 +513,7 @@ PEEK (1453248) :NEXT
             <figcaption>Bild 2. Die Bit-Muster des Buchstabens »A« im Normalmodus</figcaption>
         </figure>
 
-        <p>Im normalen oder HiRes-Modus wird die Bildschirmfarbe beijedem 0-Bit und die Zeichenfarbe stets da angezeigt, wo das Bit 1 ist. Beim Mehrfarbenmodus werden die Bits paarweise benutzt (Bild 3).</p>
+        <p>Im normalen oder HiRes-Modus wird die Bildschirmfarbe bei jedem 0-Bit und die Zeichenfarbe stets da angezeigt, wo das Bit 1 ist. Beim Mehrfarbenmodus werden die Bits paarweise benutzt (Bild 3).</p>
 
         <figure>
             <table>
@@ -610,7 +608,7 @@ PEEK (1453248) :NEXT
 
         <p>Bei erweitertem Modus ist die Anzahl der verschiedenen anzeigbaren Zeichen jedoch eingeschränkt. Ist der erweiterte Farbmodus eingeschaltet, können nur die ersten 64 Zeichen des Zeichen-ROM (oder die ersten 64 in Ihrem programmierbaren Zeichensatz) benutzt werden. Zwei Bit des Zeichen-Codes werden nämlich für die Wahl der Hintergrundfarbe benutzt.</p>
 
-        <p>Der Zeichen-Code (die auf dem Bildschirm gePOKEte Zahl) vom Buchstaben A ist eine 1. Im erweiterten Farbmodus erscheint nach dem POKEneiner lein A. Normalerweise muß nach dem POKEn von 65 das Zeichen mit dem Zeichen-Code (CHR$) 129, also ein invertiertes A, erscheinen. Dies passiert nichtim erweiterten Farbmodus. Es erscheint genau das gleiche A wie vorher, jedoch eine andere Hintergrundfarbe. Entnehmen Sie die Codes der Tabelle 5.</p>
+        <p>Der Zeichen-Code (die auf dem Bildschirm gePOKEte Zahl) vom Buchstaben A ist eine 1. Im erweiterten Farbmodus erscheint nach dem POKEn einer 1 ein A. Normalerweise muß nach dem POKEn von 65 das Zeichen mit dem Zeichen-Code (CHR$) 129, also ein invertiertes A, erscheinen. Dies passiert nicht im erweiterten Farbmodus. Es erscheint genau das gleiche A wie vorher, jedoch eine andere Hintergrundfarbe. Entnehmen Sie die Codes der Tabelle 5.</p>
 
         <figure>
             <table>
@@ -661,13 +659,13 @@ PEEK (1453248) :NEXT
             <figcaption>Tabelle 5. Im Hintergrundfarbmodus können die ersten 64 Zeichen mit unterschiedlichen Hintergrundfarben dargestellt werden</figcaption>
         </figure>
 
-        <p>Zum Einschalten des erweiterten Farbmodus wird Bit 6 des VIC-II-Registers mit der Adresse 53265 ($DO1l) auf l gesetzt. Dies geschieht durch folgende POKE-Anweisung:</p>
+        <p>Zum Einschalten des erweiterten Farbmodus wird Bit 6 des VIC-II-Registers mit der Adresse 53265 ($D011) auf 1 gesetzt. Dies geschieht durch folgende POKE-Anweisung:</p>
 
         <pre><code>POKE 53265, PEEK(53265)OR 64
 </code></pre>
 
 
-        <p>weiterten Farbmodus wird Bit 6 des VIC-II-Registers mit der Adresse 53265 ($DO1) aufO gesetzt. Hierzu dient fol"enne Änweisunct</p>
+        <p>Zum Ausschalten des erweiterten Farbmodus wird Bit 6 des VIC-II-Registers mit der Adresse 53265 ($D011) auf 0 gesetzt. Hierzu dient folgende Anweisung:</p>
 
         <pre><code>POKE 53265, PEEK(53265) AND 191
 </code></pre>
