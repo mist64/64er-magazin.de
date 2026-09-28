@@ -32,20 +32,30 @@ import re
 import sys
 from collections import Counter
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+# rules/ -> scan2ocr -> img -> tools -> REPO. That is FIVE parents; this said
+# four and landed in tools/, so every run died on "issue dir not found:
+# .../tools/issues/<ID>". The script had therefore never run.
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                         "..", "..", "..", ".."))
 
 WORK_DIRS = ["_work", "_work_v2", "_work_v3", "_work_v4", "_work_v5"]
 
-# Vertical band where the running headers live (300-DPI page is ~3500px tall).
-HEADER_Y_MAX = 260
+# THESE ARE 600 DPI PIXELS, because that is what step 010's block index
+# carries (r000, "the bboxes are in this file's pixels"). They were written
+# for a 300 dpi page -- the old comment said so, "300-DPI page is ~3500px
+# tall" -- and every one of them was half the value it needed. MEASURED on
+# 8611 p042, a real running head: bbox=944x120+2080+258. Against the old
+# bounds its width alone (944 > 800) disqualified it.
+# Vertical band where the running headers live (a 600 dpi A4 page is 7016px).
+HEADER_Y_MAX = 520
 
 # Sane height range for header text.
-HEADER_H_MIN = 25
-HEADER_H_MAX = 100
+HEADER_H_MIN = 50
+HEADER_H_MAX = 200
 
 # Sane width range for header text (excludes full-width rule lines etc).
-HEADER_W_MIN = 100
-HEADER_W_MAX = 800
+HEADER_W_MIN = 200
+HEADER_W_MAX = 1600
 
 # Articles that should never get head1/head2 (by 64er.id).
 SKIP_IDS = {
@@ -57,9 +67,16 @@ SKIP_IDS = {
 
 # Page numbers that should never get head1/head2 (front-matter / classifieds / ads).
 # Front matter / TOC area / classifieds area in 8606.
-SKIP_PAGES = set(range(1, 8))  # 1-7
-SKIP_PAGES.update(range(105, 134))  # classifieds + ads block (verified by OCR scan)
-SKIP_PAGES.update(range(180, 188))  # back matter / ads
+# HARD-CODED FOR 8606 and silently wrong everywhere else: it skipped pages
+# 1-7, 105-133 and 180-187 of whatever issue it was pointed at. On 8611 that
+# is the classifieds run at 112-148 and the back matter at 179-188 -- different
+# pages, so it would have skipped live articles and processed ads. An issue
+# that needs skips declares them; the default skips nothing, and the
+# classifier already knows which pages carry articles.
+SKIP_PAGES = set()
+_LEGACY_8606_SKIPS = set(range(1, 8))  # 1-7
+_LEGACY_8606_SKIPS.update(range(105, 134))  # 8606 classifieds + ads
+_LEGACY_8606_SKIPS.update(range(180, 188))  # 8606 back matter
 
 
 # ---------- block parsing ----------
