@@ -35,6 +35,10 @@ A heading qualifies for re-casing iff **all** of the following hold:
 2. At least **3 of those uppercase characters appear in a row** (i.e.
    the regex `[A-ZÄÖÜẞ]{3,}` matches somewhere in the heading).
 
+A heading that IS code stays in caps — 8609's `POKE 1,0 ???` is the only hit
+in the corpus and is correct. So is `14mal schneller laden`, which check 2
+flags and published precedent shares (`30mal schneller mit SpeedDos`).
+
 The 3-in-a-row clause excludes mixed-case headings where one
 Umlaut OCR'd as upper, or where a 2-letter acronym (`DR`, `IM`) sits
 adjacent to a real word — those are NOT predominantly ALL CAPS and
@@ -97,7 +101,25 @@ For every article HTML in `issues/<YYMM>/*.html`:
 1. Find all `<h1>` and `<h2>` headings whose content is predominantly
    ALL CAPS:
    ```bash
-   grep -nE '<h[12]>[A-ZÄÖÜẞ][A-ZÄÖÜẞ0-9 .,/&\-]+</h[12]>' issues/<YYMM>/*.html
+   $PY - issues/<YYMM> <<'PYEOF'
+import glob, io, os, re, sys
+# THE CHECK IS THE TRIGGER. The rule above defines ALL CAPS as ">=80% of the
+# letters uppercase AND 3 uppercase in a row"; this implements that and
+# nothing else. The grep it replaces -- a character class of
+# [A-ZÄÖÜẞ0-9 .,/&-] -- had no : — » « ? and no leading digit, so it passed
+# "ENDLICH: …", "NG-10 — …", "24-NADELN-DRUCKER" and "WAS IST … HARDWARE?"
+# while they were still in caps: 1 of 5 planted headings, and blind to 11 of
+# 8611's 29 real ones.
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    for m in re.finditer(r'<h([12])>(.*?)</h\1>', io.open(f, encoding='utf-8').read(), re.S):
+        t = re.sub(r'<[^>]+>', '', m.group(2))
+        letters = re.findall(r'[A-Za-zÄÖÜäöüßẞ]', t)
+        if not letters:
+            continue
+        upper = [c for c in letters if c.isupper()]
+        if len(upper) / len(letters) >= 0.8 and re.search(r'[A-ZÄÖÜẞ]{3,}', t):
+            print(f"  ALL CAPS heading: {os.path.basename(f)}: {t.strip()[:60]}")
+PYEOF
    ```
 2. For each match, decide the natural-case version per the rules
    above. Anti-memory: the proper nouns / product names come from
@@ -142,7 +164,25 @@ Critical guardrails:
 dir=issues/<YYMM>
 
 # 1. no h1/h2 left entirely in ALL CAPS
-grep -nE '<h[12]>[A-ZÄÖÜẞ][A-ZÄÖÜẞ0-9 .,/&\-]+</h[12]>' "$dir"/*.html && \
+$PY - "$dir" <<'PYEOF'
+import glob, io, os, re, sys
+# THE CHECK IS THE TRIGGER. The rule above defines ALL CAPS as ">=80% of the
+# letters uppercase AND 3 uppercase in a row"; this implements that and
+# nothing else. The grep it replaces -- a character class of
+# [A-ZÄÖÜẞ0-9 .,/&-] -- had no : — » « ? and no leading digit, so it passed
+# "ENDLICH: …", "NG-10 — …", "24-NADELN-DRUCKER" and "WAS IST … HARDWARE?"
+# while they were still in caps: 1 of 5 planted headings, and blind to 11 of
+# 8611's 29 real ones.
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    for m in re.finditer(r'<h([12])>(.*?)</h\1>', io.open(f, encoding='utf-8').read(), re.S):
+        t = re.sub(r'<[^>]+>', '', m.group(2))
+        letters = re.findall(r'[A-Za-zÄÖÜäöüßẞ]', t)
+        if not letters:
+            continue
+        upper = [c for c in letters if c.isupper()]
+        if len(upper) / len(letters) >= 0.8 and re.search(r'[A-ZÄÖÜẞ]{3,}', t):
+            print(f"  ALL CAPS heading: {os.path.basename(f)}: {t.strip()[:60]}")
+PYEOF && \
   echo "  FAIL: ALL CAPS heading survived"
 
 # 2. spot-check: every h1/h2 starts with a capital letter
