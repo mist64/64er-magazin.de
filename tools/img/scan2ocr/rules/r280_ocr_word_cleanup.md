@@ -477,6 +477,18 @@ reading two lists for two minutes. Run it on every issue.
 The check never fails a build. Every finding needs a human, and the party
 most likely to be wrong is the dictionary.
 
+## A number in a `SYS`/`POKE` argument can be a lost operator
+
+`↑` is BASIC's exponent operator and it is everywhere in this corpus (75
+published files). OCR reads it as `1`, which leaves a plausible-looking decimal
+number: `SYS 2↑14` arrives as `SYS 2114`.
+
+The tell is that the number does not resolve to anything. `2↑14` is 16384,
+`$4000` — a routine base a reader would recognise. 2114 is nothing. So when a
+`SYS`, `POKE` or `PEEK` argument points nowhere sensible, suspect a swallowed
+operator before you accept the digits, and check the crop. The same applies to
+`π` and to `←`.
+
 ## Pass 2 hard exception: hex addresses and binary code
 
 The `0`/`O` and `1`/`l`/`I` substitution rules from Pass 2 **must
