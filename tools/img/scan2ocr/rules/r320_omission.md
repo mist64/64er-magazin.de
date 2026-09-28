@@ -107,6 +107,34 @@ Known false-positive sources, excluded or expected:
   redundant**: a dropped caption is a `caption` block, which this coverage gate
   already reconciles. Use the gate; do not rebuild the reference check.
 
+## The loss this gate CANNOT see: a line or two dropped inside a claimed page
+
+Every check here asks whether a page, an article or a file is accounted for.
+A page can be fully claimed, its blocks all present and its word count
+unremarkable, and still be missing a line or two of text the OCR never
+emitted. 8611 had four: an intro's opening sentence, four lines mid-column,
+two phrases beside a figure, and a fragment before a subhead. Nothing in this
+gate fired on any of them, and nothing could have.
+
+Three instruments were tried against those four cases and **all three failed**
+— do not rebuild them:
+
+- **Unclaimed vertical whitespace in a text column.** A dropped line leaves no
+  hole: the following block simply starts where it starts. The gaps this finds
+  are the running header's, on every page, and it missed the clearest case.
+- **A block starting mid-word or lowercase.** Real, but it is the dropped
+  drop-cap signal r280 already sweeps, and column flow makes a lowercase start
+  legitimate.
+- **Blocks abutting an illustration as a crop worklist.** Too broad to be a
+  worklist (658 blocks over 127 pages in one issue) and it still misses cases
+  that are nowhere near a figure.
+
+So there is no mechanical check, and this section exists to say so rather than
+to leave the next agent looking for one. The instrument is **r325, reading the
+page**, and what this class contributes is where to look hardest: the FIRST
+LINE of a column, and any paragraph that runs beside a figure or an ornamental
+initial. Both are places the OCR's line segmentation has least context.
+
 ## Why omission needs its own gate at all
 
 It is the one defect class that reads as correct. An article missing a
