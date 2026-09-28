@@ -22,7 +22,7 @@ article claims.  Ads are the legitimate population and they are most of it --
 the check prints the list, a human reads it, and a page with a listing on it
 cannot hide in the middle of it.
 """
-import glob, io, json, re, sys
+import glob, html, io, json, re, sys
 
 import r000_issue
 from r000_issue import ISSUE
@@ -45,7 +45,12 @@ for f in sorted(glob.glob(ISSUE_DIR + '/*.html')):
     m = re.search(r'64er\.pages" content="([^"]*)"', s)
     if not m: continue
     i = s.find('<article')
-    arttext[f] = ' '.join(norm(re.sub(r'<[^>]+>', ' ', s[i:s.rfind('</article>')] if i >= 0 else s)))
+    # UNESCAPE AFTER STRIPPING TAGS, never before: &lt;F3&gt; unescaped first
+    # becomes <F3> and is then removed as a tag. Without this the entity text
+    # normalises to 'lt f3 gt' and never matches the OCR's 'f3', which both
+    # invents false positives and hides a real one whose text turns on < > &.
+    arttext[f] = ' '.join(norm(html.unescape(
+        re.sub(r'<[^>]+>', ' ', s[i:s.rfind('</article>')] if i >= 0 else s))))
     for part in m.group(1).split(','):
         part = part.strip()
         rng = range(int(part.split('-')[0]), int(part.split('-')[1]) + 1) if '-' in part \
@@ -55,12 +60,13 @@ for f in sorted(glob.glob(ISSUE_DIR + '/*.html')):
 listings = ' '.join(' '.join(norm(io.open(f, encoding='utf-8', errors='replace').read()))
                     for f in glob.glob(ISSUE_DIR + '/prg/*.txt'))
 
-missing, kept_total = [], 0
+missing, kept_total, pages_read = [], 0, 0
 for p, arts in sorted(page2art.items()):
     try:
         lab = json.load(open(f'{OCR}/{p:03d}.labels.json'))
     except FileNotFoundError:
         continue
+    pages_read += 1
     keep = {str(i) for i in lab.get('order', [])}
     if not keep: continue
     hay = ' '.join(arttext[a] for a in arts) + ' ' + listings
@@ -76,8 +82,18 @@ for p, arts in sorted(page2art.items()):
             missing.append((p, b.get('label'), round(hit/len(probes), 2), len(w),
                             ' '.join(w[:16]), [a.split('/')[-1][:30] for a in arts]))
 
-print(f'pages {len(page2art)}   kept prose blocks {kept_total}   UNACCOUNTED {len(missing)}'
-      f'   ({100*len(missing)/max(1,kept_total):.1f}%)\n')
+# A SWEPT <tmp> LOOKS EXACTLY LIKE A CLEAN ISSUE: every page raises
+# FileNotFoundError, kept_total stays 0, and the old summary printed
+# "UNACCOUNTED 0 (0.0%)" -- a pass, from a check that never ran. Say so and exit
+# non-zero instead; the unclaimed-pages half below needs no OCR and still runs.
+if pages_read == 0:
+    print(f'CANNOT RUN: no <page>.labels.json under {OCR}')
+    print('  The OCR intermediates are gone (swept <tmp>?). This half of the')
+    print('  check reconciles kept blocks against the HTML and needs them.')
+    print('  Rebuild them, or run this on an issue whose <tmp> still exists.\n')
+else:
+    print(f'pages {len(page2art)}   kept prose blocks {kept_total}   UNACCOUNTED {len(missing)}'
+          f'   ({100*len(missing)/max(1,kept_total):.1f}%)\n')
 for p, lab, frac, n, txt, arts in missing:
     print(f'p{p:<4} {lab:<9} match={frac:<5} words={n:<4} {arts}')
     print(f'      "{txt}…"')

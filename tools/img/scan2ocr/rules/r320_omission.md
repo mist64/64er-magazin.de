@@ -107,6 +107,20 @@ Known false-positive sources, excluded or expected:
   redundant**: a dropped caption is a `caption` block, which this coverage gate
   already reconciles. Use the gate; do not rebuild the reference check.
 
+## RUN THE RECONCILIATION BEFORE `<tmp>` IS SWEPT — you cannot go back
+
+The kept-block reconciliation needs `<page>.labels.json`, which lives in the
+issue's `<tmp>`. Once that is swept the check can never be run on that issue
+again: MEASURED today, of every issue in the corpus exactly ONE still has its
+OCR intermediates — the one being built. So this half is a one-shot gate, and
+running it late means not running it.
+
+It used to fail silently in exactly that situation: with the directory gone,
+every page raised `FileNotFoundError`, the loop skipped them all, and the
+summary printed `kept prose blocks 0   UNACCOUNTED 0   (0.0%)` — a pass, from a
+check that had not looked at anything. It now prints `CANNOT RUN` and says
+what is missing. The unclaimed-pages half needs no OCR and still runs.
+
 ## The loss this gate CANNOT see: a line or two dropped inside a claimed page
 
 Every check here asks whether a page, an article or a file is accounted for.
