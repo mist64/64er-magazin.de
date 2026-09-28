@@ -122,9 +122,13 @@ CHR$(3);CHR$(n1);CHR$(n2)
 </code></pre>
 
 
-        <p>So wie der Befehl jetzt dasteht, wird er allerdings noch nicht vom Drucker verstanden, denn die Werte n1 und n2 sind ja noch nicht definiert. Diese beiden Parameter sind aber nichts anderes, als zwei Bytes, die dem Drucker sagen, wieviele Grafikzeichen nun folgen werden. Die Berechnung der beiden Parameter ist in manchen Handbüchern leider etwas kompliziert dargestellt, beziehungsweise funktioniert nur bei einer Anzahl von Grafikwerten größer als 255. Trotzdem ist die Berechnung gar nicht so schwer. Dazu müssen wir zwei Fälle unterscheiden. Im Fall 1 sollen weniger als 255 Grafikdaten übertragen werden (zum Beispiel 200). Der Wert von n1 ist in diesem Fall immer die Anzahl der zu übertragenden Grafikdaten, das heißt in unserem Beispiel n1=200. Der Parameter n2 ist im Fall 1 immer Null, darf aber nicht ignoriert werden, sondern muß als CHR$(0) mit übertragen werden. Bei 200 Grafikdaten sieht unser Beispielprogramm so aus: 10 OPEN 1,4 20 PRINT#1,CHR$(27);"*";</p>
+        <p>So wie der Befehl jetzt dasteht, wird er allerdings noch nicht vom Drucker verstanden, denn die Werte n1 und n2 sind ja noch nicht definiert. Diese beiden Parameter sind aber nichts anderes, als zwei Bytes, die dem Drucker sagen, wieviele Grafikzeichen nun folgen werden. Die Berechnung der beiden Parameter ist in manchen Handbüchern leider etwas kompliziert dargestellt, beziehungsweise funktioniert nur bei einer Anzahl von Grafikwerten größer als 255. Trotzdem ist die Berechnung gar nicht so schwer. Dazu müssen wir zwei Fälle unterscheiden. Im Fall 1 sollen weniger als 255 Grafikdaten übertragen werden (zum Beispiel 200). Der Wert von n1 ist in diesem Fall immer die Anzahl der zu übertragenden Grafikdaten, das heißt in unserem Beispiel n1=200. Der Parameter n2 ist im Fall 1 immer Null, darf aber nicht ignoriert werden, sondern muß als CHR$(0) mit übertragen werden. Bei 200 Grafikdaten sieht unser Beispielprogramm so aus:</p>
 
-        <p>CHR$(3);CHR$(200);CHR$(0) 30 CLOSE 1</p>
+        <pre><code>10 OPEN 1,4
+20 PRINT#1,CHR$(27);"*";
+CHR$(3);CHR$(200);CHR$(0)
+30 CLOSE 1
+</code></pre>
 
         <p>Im Fall 2 sollen mehr als 255 Grafikdaten übertragen werden, zum Beispiel 320 (entspricht der horizontalen Grafikauflösung des C 64). In diesem Fall ist n1 der ganzzahlige Rest, wenn Sie die Anzahl der Grafikdaten durch 255 teilen. In unserem Beispiel errechnet sich das wie folgt:</p>
 
@@ -145,7 +149,7 @@ CHR$(3);CHR$(65);CHR$(1)
             <figcaption>Listing 1. Dieses Programm berechnet die Parameter N1 und N2 für die Einstellung der Grafikauflösung</figcaption>
         </figure>
 
-        <p>Natürlich muß man bei der Angabe der Grafikdaten darauf achten, daß man die höchstzulässige Punktezahl pro Zeile bei der gewählten Grafikdichte nicht überschreitet. Bei der gewählten vierfachen Grafikdichte sind das 1920 Punkte (n1=135; n2=7), wobei niemals zwei nebeneinanderliegende Punkte gedruckt werden dürfen. Damit ist auch schon das Wesen der Grafik bei Epson-kompatiblen Druckern beschrieben. Zusammengefaßt muß dem Drucker in jeder Zeile mitgeteilt werden, welche Grafikdichte gewählt wird und wie viele Grafikpunkte gleich. Vergleichen wir unser Beispielprogramm des ESC "*"-Befehls mit dem ESC "K"-Befehl. Das Programm sieht dann wie folgt aus:</p>
+        <p>Natürlich muß man bei der Angabe der Grafikdaten darauf achten, daß man die höchstzulässige Punktezahl pro Zeile bei der gewählten Grafikdichte nicht überschreitet. Bei der gewählten vierfachen Grafikdichte sind das 1920 Punkte (n1=135; n2=7), wobei niemals zwei nebeneinanderliegende Punkte gedruckt werden dürfen. Damit ist auch schon das Wesen der Grafik bei Epson-kompatiblen Druckern beschrieben. Zusammengefaßt muß dem Drucker in jeder Zeile mitgeteilt werden, welche Grafikdichte gewählt wird und wie viele Grafikpunkte übermittelt werden sollen. Auch bei den Standardbefehlen wie ESC K, ESC L, ESC Y und ESC Z für die Grafik funktioniert dies gleich. Vergleichen wir unser Beispielprogramm des ESC "*"-Befehls mit dem ESC "K"-Befehl. Das Programm sieht dann wie folgt aus:</p>
 
         <pre><code>10 OPEN 1,4
 20 PRINT#1,CHR$(27);"K";
@@ -159,7 +163,7 @@ CHR$(n1);CHR$(n2)
 
         <figure>
             <pre data-filename="drucker-kurs l2" data-name="Epson-Grafik"></pre>
-            <figcaption>Listing 2. Epson-Grafik. Der Drucker wird zum hochauflösenden Monitor.</figcaption>
+            <figcaption>Listing 2. Epson-Grafik. Der Drucker wird zum hochauflösenden Monitor. Beachten Sie bitte die Eingabehinweise auf Seite 99</figcaption>
         </figure>
 
         <h2>Die Sache mit den Bits</h2>

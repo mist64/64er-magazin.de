@@ -332,7 +332,7 @@
 
         <p>Wir werden später bei den einzelnen Modulen direkt mit all diesen Interpreter-Routinen arbeiten.</p>
 
-        <h2>Das Programm im Modul I</h2>
+        <h2>Das Programm im Modul 1</h2>
 
         <p>Ab Zeile 480 (im Listing 3 aus Ausgabe 10/86, Seite 156) fangen zwei kurze Programmteile an, die dem Ein- und Ausschalten der Befehlserweiterung dienen. Wie Sie sehen, speichern wir einfach in den Vektor IGONE die Startadresse unserer eigenen Interpreterschleife. Von da an wird jeder Befehl aus dem Basic-Text zuerst durch unsere Schleife und erst danach durch die normale Interpreterschleife überprüft. Das verlängert — allerdings unmerklich — die Abarbeitung eines Programms. Deshalb kann mit dem Programmstück ab Zeile 560 wieder der normale Inhalt des IGONE-Vektors restauriert werden. Wie Sie gleich sehen werden, passiert das immer dann, wenn AUS als neuer Basic-Befehl auftritt.</p>
 
@@ -386,7 +386,7 @@ jsr movmf
 rts
 </code></pre>
 
-        <p>Wie Sie sicher wissen, funktioniert der Stapelspeicher nach dem LIFO-Prinzip: Das heißt »Last In-First Out« und bedeutet, daß der zuletzt daraufgelegte Wert als erster wieder herunter genommen wird (wie bei einem Bücherstapel). Als letzter Wert wurde im ersten Teil unseres Modulrahmens das MSB des Vektors FORPNT+1 abgelegt. Der kommt also nun wieder zurück in den Akku und von dort aus ins Y-Register. Das LSB lag darunter, wird als zweiter Wert vom Stapel geholt und auf dem Umweg über den Akku ins X-Register transportiert. Damit haben wir die Vorbereitungen schon erledigt, die die Interpreter-Routine MOVMF braucht: LSB der Zieladresse ins X-Register, MSB ins Y-Register. Mittels des MOVMF-Aufrufes transportieren (genaugenommen kopieren) wir nun den Inhalt des FAC in den dafür bereitgehaltenen Speicherbereich der durch FORPNT markierten Variable. Nun steht uns das Ergebnis vom Basic aus leicht zur Verfügung. Die Module werden durch RTS beendet, was den Rücksprung in das Modul 1, die Hauptschleife unserer Basic-Erweiterung, bewirkt.</p>
+        <p>Wie Sie sicher wissen, funktioniert der Stapelspeicher nach dem LIFO-Prinzip: Das heißt »Last In - First Out« und bedeutet, daß der zuletzt daraufgelegte Wert als erster wieder herunter genommen wird (wie bei einem Bücherstapel). Als letzter Wert wurde im ersten Teil unseres Modulrahmens das MSB des Vektors FORPNT+1 abgelegt. Der kommt also nun wieder zurück in den Akku und von dort aus ins Y-Register. Das LSB lag darunter, wird als zweiter Wert vom Stapel geholt und auf dem Umweg über den Akku ins X-Register transportiert. Damit haben wir die Vorbereitungen schon erledigt, die die Interpreter-Routine MOVMF braucht: LSB der Zieladresse ins X-Register, MSB ins Y-Register. Mittels des MOVMF-Aufrufes transportieren (genaugenommen kopieren) wir nun den Inhalt des FAC in den dafür bereitgehaltenen Speicherbereich der durch FORPNT markierten Variable. Nun steht uns das Ergebnis vom Basic aus leicht zur Verfügung. Die Module werden durch RTS beendet, was den Rücksprung in das Modul 1, die Hauptschleife unserer Basic-Erweiterung, bewirkt.</p>
 
         <h2>Modul 2: BOG</h2>
 
@@ -422,7 +422,7 @@ rts
 
         <p>Wieder haben wir einen Faktor vorliegen (nämlich 1/ln10, LOGFAK mit dem Wert 0,434294482), der als Fließkommazahl in der Konstantentabelle ab LOGFAK abgelegt ist. Diesmal wird aber nicht direkt der Wert im FAC mit der Konstanten multipliziert, sondern zuvor muß vom FAC-Inhalt noch der natürliche Logarithmus gebildet werden. Dazu verwenden wir — einfach durch den Routineaufruf mittels JSR — die Interpreterroutine LOG. Automatisch legt diese Routine den ln des eingegebenen Wertes im FAC ab, wo wir damit dann genauso weiterverfahren wie bisher: Akku und Y-Register auf LOGFAK richten und FMULT aufrufen. Wie bentzt man DLGR? Hier ein Beispiel:</p>
 
-        <pre><code>A=A:DLGR, Ausdruck: PRINT A
+        <pre><code>A=A:DLGR,Ausdruck:PRINT A
 </code></pre>
 
 
