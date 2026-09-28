@@ -8,6 +8,27 @@ against the printed page.
 
 ---
 
+## The dump cross-checker: what it reads, and what it does not
+
+`r325_dump_crosscheck.py <issue-dir>` disassembles each printed byte run with
+da65 and compares it to the printed mnemonic. It reads the **monitor-dump**
+form (`0c047  ce 46 c0  dec $c046`), with or without a comment column.
+
+Two forms it does NOT read, so do not take its silence as coverage:
+
+- **assembler source with no byte column** (`a 0b30 jsr $795c ;CHKKOM`). There
+  are no bytes, so there is nothing to cross-check. It skips these rather than
+  reporting them, which it used to do six times per issue to no purpose.
+- **the hex-row form** (`a599 : 00 06 … de`, nine columns). 132 rows of it in
+  8611 alone, all unread. If you are tempted to treat the last column as a line
+  checksum: eight algorithms were tried against those 132 rows — plain sum,
+  sum with the address bytes, sum with carry, XOR, XOR with the address,
+  one's complement — and **none scored above chance**. Either it is data, or
+  the algorithm is something else. Do not guess; read the page.
+
+Expect a **small** number of findings: 8611 2, SH8601 9, 8609 and 8610 0. A
+flood means a form it cannot parse, not an issue full of errors.
+
 ## Why this exists: every other pass is blind in the same way
 
 By the time this step runs, the issue has been through r280 (word cleanup),

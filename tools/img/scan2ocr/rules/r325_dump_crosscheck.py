@@ -51,6 +51,16 @@ def check(path):
                 # `4098 $1002 8D 80 00 00 00` is a decimal/hex row, and its
                 # second column starting with `$` is the tell.  Without this the
                 # table rows are reported as unreadable dump lines.
+                # An ASSEMBLER SOURCE listing numbers its lines like BASIC and
+                # comments them with ';' (`1003 ; -- KOPIEREN --`). That is a
+                # comment line, not an unreadable dump line.
+                if re.match(r'^[a.]?\s*[0-9a-fA-FlO]{4,5}\s*;', t): continue
+                # An address followed by NO hex bytes is an annotation line in
+                # the dump's comment column (`0c042   rechte Grenze low-Byte`),
+                # not an unreadable instruction. Require at least one byte-shaped
+                # token before calling a line unparseable.
+                tail = re.sub(r'^[a.]?\s*[0-9a-fA-FlO]{4,5}\s*', '', t)
+                if not re.match(r'(?:[0-9a-fA-FlOSB]{2}[.,]?\s+){1,}', tail + ' '): continue
                 if re.match(r'^[a.]?\s*[0-9a-fA-FlO]{4,5}\s', t) and not re.match(r'^\d{3,5}\s+[A-Z"$]', t):
                     skipped.append((path,t,"UNPARSEABLE — read this line on the page"))
                 continue
@@ -64,7 +74,19 @@ def check(path):
             exp = disasm(a, bb)
             if exp is None:
                 out.append((path,raw.strip(),"da65 could not disassemble these bytes")); continue
-            printed = re.sub(r'\s+','', (mn+rest).strip().lower())
+            # CUT THE COMMENT COLUMN. Many printed dumps annotate each line
+            # (`20 fd ae jsr $aefd  Test auf Komma`), and the comment is not part
+            # of the instruction. An operand never contains two spaces in a row,
+            # so the column gap is the boundary; `;` also starts one. Without
+            # this, every annotated line is a phantom finding: 203 of 8611's 205.
+            # A 6502 OPERAND NEVER CONTAINS A SPACE, and always opens with $, #
+            # or '(' in these dumps ('a' for accumulator mode). Anything else in
+            # that position is the comment column, which matters most for the
+            # instructions that take NO operand: in `lsr     Maus nach oben ?`
+            # a naive split makes "Maus nach oben ?" the operand.
+            first = (rest.strip().split() or [''])[0]
+            operand = first if re.match(r'^[#$(]|^[aA]$', first) else ''
+            printed = re.sub(r'\s+','', (mn+operand).strip().lower())
             # da65 writes ABSOLUTE operands in assembler shorthand and drops a
             # zero high byte: `99 fb 00` (STA abs,y -- there IS no zp,y form for
             # $99) renders as `sta $fb,y`, where the C128 monitor prints all
@@ -73,15 +95,28 @@ def check(path):
             # comparing, or every such line is a phantom finding.
             if len(bb) == 3:
                 exp = re.sub(r'\$([0-9a-f]{2})\b', lambda m: '$00'+m.group(1), exp)
+            # ACCUMULATOR ADDRESSING: da65 writes `lsr a`, the printed dumps
+            # write a bare `lsr`. Same instruction, different syntax, like the
+            # $00fb case above.
+            if exp == printed + 'a' and mn.lower() in ('asl','lsr','rol','ror'):
+                exp = printed
             if printed != exp:
                 out.append((path,raw.strip(),f"bytes say  {exp}"))
             if prev is not None and a!=prev:
                 out.append((path,raw.strip(),f"address gap: expected {prev:05x}"))
             prev = a + len(bb)
     return out+skipped
+# THE ISSUE DIRECTORY COMES FROM argv, like every other tool in the chain.
+# This was hardcoded to SH8601 and ignored its argument, so running it on any
+# other issue silently cross-checked SH8601 and printed ITS findings as though
+# they were yours. Same class as r280's hardcoded canary.
+import r000_issue
+from r000_issue import ISSUE
+ISSUE_DIR = sys.argv[1] if len(sys.argv) > 1 else r000_issue.load(ISSUE).issue_dir
 tot=[]
-for f in sorted(glob.glob('/Users/mist/Documents/git/64er-magazin.de/issues/SH8601/*.html')):
+for f in sorted(glob.glob(os.path.join(ISSUE_DIR, '*.html'))):
     tot+=check(f)
+print(f"issue dir: {ISSUE_DIR}")
 print(f"cross-check findings: {len(tot)}\n")
 cur=None
 for p,line,why in tot:
