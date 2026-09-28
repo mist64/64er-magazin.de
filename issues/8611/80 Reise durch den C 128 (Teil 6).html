@@ -163,19 +163,25 @@
 
         <p>Die Register 18 und 19 des VDC bestimmen die Adresse aus dem 16-KByte-Speicher, in die ein Wert geschrieben wird. Dabei soll dann 19 das LSB und 18 das MSB der gewünschten Anschrift erhalten. Nehmen wir mal als Beispiel das Bildschirm-RAM von $0000 bis $07CF (das ist dezimal 0 bis 1999) und daraus die Adresse $0400 (also dezimal 1024). In einem Programm können wir uns die beiden Bestandteile berechnen lassen. V sei die Adresse, LO das LSB und HI das MSB davon:</p>
 
-        <p>380 HI = INT(V/256):LO = V - HI*256</p>
+        <pre><code>380 HI = INT(V/256):LO = V - HI*256
+</code></pre>
 
-        <p>Wir erhalten auf diese Weise für HI den Wert 4 und für LO den Wert 0 (in Hexadezimalzahlen ist das schon auf den ersten Blick klar: 04 00). Unser Programm muß weiter lauten: 390 POKE DEC( "D600"),18:POKE DEC("D601"),HI 400 POKE DEC( "D600"),19:POKE DEC( "D601"),LO</p>
+        <p>Wir erhalten auf diese Weise für HI den Wert 4 und für LO den Wert 0 (in Hexadezimalzahlen ist das schon auf den ersten Blick klar: 04 00). Unser Programm muß weiter lauten:</p>
+
+        <pre><code>390 POKE DEC("D600"),18:POKE DEC("D601"),HI
+400 POKE DEC("D600"),19:POKE DEC("D601"),LO
+</code></pre>
 
         <p>Nun muß natürlich noch der Wert, der in den so ausgewählten Speicherplatz hinein soll, übergeben werden. Zu diesem Zweck dient das VDC-Register 31. Sei der Wert allgemein ausgedrückt durch die Variable W, dann lautet das weitere Programm:</p>
 
-        <p>410 POKE DEC( "D600"),31:POKE DEC( "D601"),W</p>
+        <pre><code>410 POKE DEC("D600"),31:POKE DEC("D601"),W
+</code></pre>
 
         <p>Es gilt nun noch zweierlei zu beachten. Es muß angegeben werden, wieviele Speicherstellen diesen Wert von der besagten Adresse an erhalten sollen. Das schreibt man als Variable N in das Register 30. Erst durch diesen Schreibvorgang wird ein Zeichenmuster oder der angegebene Wert tatsächlich in den Speicher eingetragen. Zuvor aber gibt es noch eine Kleinigkeit zu beachten: In $D600 gibt es nämlich noch ein Bit, das anzeigt, ob ein Rasterstrahl-Rücklauf stattfindet. Darauf muß gewartet werden:</p>
 
-        <p>420 WAIT DEC("D600"),32</p>
-
-        <p>430 POKE DEC("D600"),30:POKE DEC( "D601"),N</p>
+        <pre><code>420 WAIT DEC("D600"),32
+430 POKE DEC("D600"),30:POKE DEC("D601"),N
+</code></pre>
 
         <p>Das war's eigentlich auch schon! Damit haben wir die gesamten 16 KByte im Griff. Fassen Sie diese Programmzeilen als Unterprogramm auf und fügen Sie einen entsprechenden Rahmen dazu, dann erhalten Sie etwas ähnliches wie unser kleines Testprogramm SCREENTEST (Listing 1):</p>
 
