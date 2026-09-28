@@ -176,6 +176,19 @@ see r300.
 issue owner's call, case by case. Record the passage, what appears wrong, and
 the crop — then move on. A list of candidates is a report, never a worklist.
 
+Two things make that report decidable, and both are the reporter's job:
+
+- **Say what a reader who typed it in would EXPERIENCE**, and order the list by
+  that. "The print is wrong" cannot be ruled on; "this `+` should be `=`, so the
+  SYS-line trick silently produces nothing" can. A wrong digit that is harmless
+  in the common case and fatal in another belongs low on the list, with both
+  halves stated.
+- **Say whether that impact was REASONED or RUN.** An impact worked out from
+  the arithmetic is worth having and is not the same claim as one seen in an
+  emulator — r000's patching section has the petcat/x64sc procedure and the
+  same distinction. Mark each row, and never let "would crash" stand unmarked
+  when nothing was executed.
+
 ## Granularity
 
 Word-level substitutions only — r000's *OCR cleanup granularity* applies in
