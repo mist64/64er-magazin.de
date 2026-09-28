@@ -145,9 +145,9 @@
 
         <p>Ein POKE-Befehl sähe also so aus:</p>
 
-        <p>BANK15:POKE DEC( "D600"),Reg.Nummer:POKE DEC( "D601"),Wert Und ein PEEK wäre zu realisieren durch:</p>
+        <p>BANK15:POKE DEC("D600"),Reg.Nummer:POKE DEC("D601"),Wert Und ein PEEK wäre zu realisieren durch:</p>
 
-        <p>BANK15:POKE DEC( "D600"),Reg.Nummer: PRINT PEEK(DEC ("D601"))</p>
+        <p>BANK15:POKE DEC("D600"),Reg.Nummer:PRINT PEEK(DEC("D601"))</p>
 
         <p>Und in Maschinensprache wird es noch etwas komplexer, denn die VDC-Register sollten nur dann beschrieben werden, wenn dieser Chip nicht gerade etwas anderes zu tun hat. Zwar ist er mit seiner Arbeit so schnell, daß man in Basic kaum Störungen zu erwarten hat, in Assembler aber müssen wir daher auf ein Status-Bit achten, welches als Bit 7 der Speicherstelle $D600 existiert. Erst wenn hier eine 1 steht, sollte $D601 angesprochen werden.</p>
 
@@ -216,9 +216,9 @@
 
         <p>Wieder existiert im normalen RAM eine Speicherstelle, an die das MSB ebenfalls zu schreiben ist: 2607. Dazu braucht nun eigentlich nichts mehr gesagt werden, weil Sie alles schon vom Bildschirm-RAM her kennen.</p>
 
-        <p>Viel interessanter für uns ist das Register 25. Zwei Bit daraus, nämlich Bit 6 und Bit 7, werden wir uns etwas genauer ansehen. Das Bit 6 legt fest, woher die Attribute eines Zeichens auf dem Bildschirm stammen. Im Normalfall ist dieses Bit gleich 1. Das bedeutet, daß das Attribut-RAM Quelle der Attribute ist (also Farbe, Blinken, Unterstreichen, Revers, Groß- oder Kleinschreibung). Schalten wir aber statt dessen dieses Bit auf 0, dann kommt die Farbgebung durch das Register 26 zustande. Dort dienen die Bits 0 bis 3 zum Definieren der Hintergrund-, die Bits 4 bis 7 aber der Vordergrundfarbe. Der normale Inhalt von Register 25 ist 64 (es ist also lediglich Bit 6 gesetzt), so daß wir es uns einfach machen können: POKE DEC( "D600"),25:POKE DEC( "D601"),0 schaltet alle Bits auf 0 und die Farben legen wir so fest: F1=Vordergrund, F2=Hintergrundfarbe. F = 16xF1+F2 ergibt die Farbkennzahl in Register 26. Wir setzen dann die Farben so:</p>
+        <p>Viel interessanter für uns ist das Register 25. Zwei Bit daraus, nämlich Bit 6 und Bit 7, werden wir uns etwas genauer ansehen. Das Bit 6 legt fest, woher die Attribute eines Zeichens auf dem Bildschirm stammen. Im Normalfall ist dieses Bit gleich 1. Das bedeutet, daß das Attribut-RAM Quelle der Attribute ist (also Farbe, Blinken, Unterstreichen, Revers, Groß- oder Kleinschreibung). Schalten wir aber statt dessen dieses Bit auf 0, dann kommt die Farbgebung durch das Register 26 zustande. Dort dienen die Bits 0 bis 3 zum Definieren der Hintergrund-, die Bits 4 bis 7 aber der Vordergrundfarbe. Der normale Inhalt von Register 25 ist 64 (es ist also lediglich Bit 6 gesetzt), so daß wir es uns einfach machen können: POKE DEC("D600"),25:POKE DEC("D601"),0 schaltet alle Bits auf 0 und die Farben legen wir so fest: F1=Vordergrund, F2=Hintergrundfarbe. F = 16xF1+F2 ergibt die Farbkennzahl in Register 26. Wir setzen dann die Farben so:</p>
 
-        <p>POKE DEC( "D600"),26:POKE DEC( "D601"),F</p>
+        <p>POKE DEC("D600"),26:POKE DEC("D601"),F</p>
 
         <p>Auf diese Weise kann auch die Farbgebung im Hochauflösungs-Modus geschehen. Das ist nämlich der Zweck des Bit 7 vom Register 25. Der Inhalt 0 an dieser Stelle sorgt für die normale Textdarstellung. Schreiben wir aber eine 1 dort hinein, dann schaltet der VDC um auf die Abbildung einer Bit-Map. Im Gegensatz zur VIC-Bit-Map benötigt die VDC-Bit-Map allerdings volle 16000 Byte Speicherplatz, das heißt, daß das VDC-RAM praktisch vollständig als Bit-Map verwendet wird. Dafür ist aber die Auflösung in X-Richtung doppelt so groß, denn 80 Zeichen mal jeweils 8 Bit ergeben 640 verschiedene horizontale Bildpunkte. In der Vertikalen bleibt alles beim alten: 25 Zeilen zu je 8 Bit ergeben nach wie vor 200 Bildpunkte. Insgesamt stehen uns nun 128000 verschiedene Bildschirmpositionen zur Verfügung!</p>
 
