@@ -10,10 +10,20 @@ adjacent words.
 
 This runs **once per issue** as a baseline cleanup. It does NOT do
 heavy editorial OCR repair (dictionary lookup, hyphenation
-correction by morphology rules, missing-punctuation insertion) —
-those are issue #329 item 4 territory and the user explicitly
-skipped them. Rule 280 only does the obvious, mechanical, word-level
-substitutions the workflow's three passes cover.
+correction by morphology rules, supplying punctuation the PAGE DOES
+NOT HAVE) — those are issue #329 item 4 territory and the user
+explicitly skipped them. Rule 280 only does the obvious, mechanical,
+word-level substitutions the workflow's three passes cover.
+
+**A mark the print has and the OCR dropped is restored, like a dropped
+letter.** That is transcription, and it is in scope — see "Pass 2 must
+sweep PUNCTUATION, not only letters" below. A mark the print does not
+have is an editorial improvement to the magazine, and it is not.
+Read literally, two agents split this sentence two ways on one issue,
+so the test is the crop: if the mark is on the page, it goes in.
+Correcting the 1986 page is never this step's job; where the print is
+genuinely wrong, the machinery for saying so is the Futureteufelchen
+(r330), and it needs the owner's authorisation.
 
 ## What word-level cleanup means
 
