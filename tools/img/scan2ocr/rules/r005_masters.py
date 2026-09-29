@@ -481,6 +481,10 @@ def trace(vals, idx, pct, mm_px):
 #          fibre, which the field cannot: fibre is high-frequency and sits just
 #          below its local paper, the same signature as a light halftone dot.
 #
+# Two screens in this corpus, measured by FFT on the masters: 133-134 lpi at 45
+# degrees for monochrome work, 160-162 lpi (cyan ~72, magenta ~19) for colour.
+# The floor is safe at either -- 15 px per cell at the finer one -- but size the
+# margin from 160, not 133.
 # The floor is safe ONLY because the separator runs at 2400 dpi, where a 133 lpi
 # screen is ~18 px per cell: the dot is resolved and near-solid (80-100% below
 # paper) and fibre is 9-22% below, so the gap is wide open.  At 600 dpi the cell

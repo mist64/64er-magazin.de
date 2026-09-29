@@ -323,7 +323,16 @@ Each of these was a boundary already present on the paper:
 
 Two measurements are settled and independently confirmed:
 
-- **The press screen of this issue is 133 lpi at 45°** — 4.4–4.5 px pitch, peak
+- **There are TWO press screens, and which one you meet depends on the
+  figure.** MEASURED by FFT on the 2400 dpi masters, 8606 through 8611:
+  **monochrome work is 133–134 lpi at 45°**, and **colour work is 160–162 lpi**
+  with cyan near 72° and magenta near 19° (the classic 75°/15° pair). Covers
+  are colour, so 160–162. Do not assume 133 on a colour figure — at 600 dpi
+  that is 3.7 px per cell, not 4.5.
+  A peak near **144 lpi at 45°** in a colour area is NOT a third screen: it is
+  the cyan−magenta beat (their vector difference is 142.5 lpi at 135°). Reading
+  it as a screen is a mistake this rule made.
+- **The monochrome press screen is 133 lpi at 45°** — 4.4–4.5 px pitch, peak
   78–411× the local median, unscreened crops peaking at 0° every time. A
   reviewer wrote its own FFT and agreed on the bucket of all 35 line-art crops.
 - **The right-edge clamp is gone** — 13 boxes once shared the edge 4700; now
