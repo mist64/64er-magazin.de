@@ -152,6 +152,14 @@ while IFS=$'\t' read -r n c h; do
     if [[ "$MODE" == "allbw" ]]; then keep=1
     elif awk "BEGIN{exit !($h < $HALFTONE_MAX)}"; then keep=1; fi
   fi
+  # FORCE_CONTONE="030 024": pages the classifier gets wrong, kept at 150 dpi.
+  # Its colour test blurs and ERODES before thresholding, and the erode is what
+  # removes scanner fringing -- but it also removes THIN COLOURED LINES. A page
+  # whose only colour is a wireframe screenshot on a dark ground therefore reads
+  # as colour-free, and JBIG2 renders it as a near-empty black box. MEASURED on
+  # 8611 p030, where Bild 2-7 vanish entirely; an un-eroded chroma rank puts that
+  # page 25x above the next bilevel page.
+  [[ " ${FORCE_CONTONE:-} " == *" $n "* ]] && keep=0
   # page 1 carries the cleaned cover when there is one, so it is never bilevel
   [[ "$n" == "$(echo $pages | awk '{print $1}')" && -f "$CACHE/${n}_150.png" && -n "${TITLE_PNG:-}" ]] && keep=0
   if (( keep )); then bilevel="$bilevel $n"; else contone="$contone $n"; fi

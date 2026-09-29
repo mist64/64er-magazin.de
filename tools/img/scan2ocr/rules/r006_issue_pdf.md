@@ -77,6 +77,39 @@ Two further traps found with it, both now closed in the scripts:
   plain script's cache. It now compares page 1's cached pixels against
   `title.png` (MAE ≤ 1) and refuses to assemble otherwise.
 
+## THE COLOUR TEST MISSES THIN COLOURED LINES ON A DARK GROUND
+
+The classifier blurs and **erodes** before thresholding chroma. The erode is
+what removes scanner fringing from the edge of black type, and it also removes
+thin coloured lines. So a page whose only colour is a wireframe screenshot —
+fine green lines on near-black — is classified colour-free and shipped as
+JBIG2, where it becomes **a near-empty black box**.
+
+MEASURED on 8611 p030: the build's own test scores it 0.00004, while an
+UN-ERODED chroma fraction puts it at 0.0134, twenty-five times the next bilevel
+page. Its three screenshots, which the caption exists to describe, survive the
+bilevel conversion as frame borders and nothing else.
+
+So before compiling, rank the bilevel pages by un-eroded chroma and look at the
+top few:
+
+```python
+im = Image.open(master).convert('RGB').resize((w//4, h//4), Image.LANCZOS)
+a = np.asarray(im).astype(np.int16)
+sat = np.where(a.mean(2) > 12, a.max(2) - a.min(2), 0)   # ignore pure black
+score = (sat > 20).mean()                                 # no erode, no blur
+```
+
+8611's bilevel set separates cleanly: p024 0.033, p030 0.013, p161 0.0012, then
+a floor around 0.0005 that is scanner fringing at the page edge. **A high score
+is not by itself a defect** — 024 and 161 are background tint panels whose loss
+costs nothing but the tint, while 030 loses its content. Look at each, and
+decide on what the page LOSES, not on the number.
+
+Keep a page at 150 dpi with `FORCE_CONTONE="030"` (space-separated page
+numbers) on `make_issue_pdf_mixed.sh`. Do not retune the classifier's threshold
+to catch one page: the erode earns its place on every other page.
+
 ## THE PAGE INPUTS ARE REVIEWED BEFORE THE PDF IS COMPILED — ALWAYS
 
 **Do not compile until the issue owner has looked at the exact files that will
