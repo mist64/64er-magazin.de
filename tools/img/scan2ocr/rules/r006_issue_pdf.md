@@ -90,21 +90,27 @@ UN-ERODED chroma fraction puts it at 0.0134, twenty-five times the next bilevel
 page. Its three screenshots, which the caption exists to describe, survive the
 bilevel conversion as frame borders and nothing else.
 
-So before compiling, rank the bilevel pages by un-eroded chroma and look at the
-top few:
+So before compiling, measure the bilevel pages. The statistic that works is
+**chroma AREA after a gentle opening**, in mm² of the printed page:
 
 ```python
-im = Image.open(master).convert('RGB').resize((w//4, h//4), Image.LANCZOS)
-a = np.asarray(im).astype(np.int16)
-sat = np.where(a.mean(2) > 12, a.max(2) - a.min(2), 0)   # ignore pure black
-score = (sat > 20).mean()                                 # no erode, no blur
+im = Image.open(master).convert('RGB').resize((w//4, h//4), Image.LANCZOS)  # 150 dpi
+a   = np.asarray(im).astype(np.int16)
+m   = (a.max(2) - a.min(2) >= 18) & (a.mean(2) > 25)   # real chroma, not near-black
+m   = ndimage.binary_opening(m, np.ones((3,3)))        # 3x3 ONLY
+area_mm2 = m.sum() / (150/25.4)**2
 ```
 
-8611's bilevel set separates cleanly: p024 0.033, p030 0.013, p161 0.0012, then
-a floor around 0.0005 that is scanner fringing at the page edge. **A high score
-is not by itself a defect** — 024 and 161 are background tint panels whose loss
-costs nothing but the tint, while 030 loses its content. Look at each, and
-decide on what the page LOSES, not on the number.
+The opening is the whole measurement: scanner CCD fringing on the edge of black
+type is one or two pixels wide and vanishes, while printed ink survives. **3×3
+and no more** — a 5×5 destroys colour that is criss-crossed by line art, which
+is the exact case the shipped classifier already gets wrong.
+
+MEASURED on 8611's 107 bilevel pages: 024 **2600 mm²** (a pale blue tint panel),
+030 **164 mm²** (green wireframes on a dark ground), and then 161, 098, 004, 053
+at **0.0–2.9 mm²**, which is fringing. **Anything above ~50 mm² carries real
+ink; below it is the scanner.** There is no judgement here — 161 looks tinted on
+screen and measures zero, because a grey panel has no chroma.
 
 Keep a page at 150 dpi with `FORCE_CONTONE="030"` (space-separated page
 numbers) on `make_issue_pdf_mixed.sh`. Do not retune the classifier's threshold
