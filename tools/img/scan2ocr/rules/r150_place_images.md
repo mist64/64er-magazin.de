@@ -46,6 +46,14 @@ So do not renumber a figure into the neighbouring article's sequence, and do
 not read a `9-0.png` as belonging to a page-9 article when no article starts on
 page 9 — it is the second page-8 article's lead image and belongs at `8-00`.
 
+**And when you add an article on a page another article already claims, do NOT
+reduce that article's `64er.pages`.** Sharing a page is normal; the other
+article probably prints there too. Look at the page first. 8611 gained a new
+article on p185 and the obvious tidy-up — take 185 off article 184, which
+claimed 184-185 — would have orphaned 184's Bild 4, its Bild 5 and its closing
+paragraph, all of which are printed on p185 above the new article's box. It
+would also have cut that page out of 184's per-article PDF slice.
+
 **A `Bild` caption does NOT always want an image.** The print labels tables and
 diagrams "Bild" as freely as photographs, and this corpus typesets them:
 **154 figures** in it carry a `Bild` caption on an HTML `<table>` — register
