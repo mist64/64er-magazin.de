@@ -9,6 +9,30 @@ it to the affected article here: an `<aside class="fehlerteufelchen">` at
 the end of the article, an in-text link to it, and — for code errata — a
 matching fix in the `prg/*.txt` listing.
 
+## HOW OFTEN: essentially never. Count before you argue
+
+**19 asides in 1,825 articles.** 31 of the 44 issues have NONE; 8 have one; 4
+have two; the most any issue has ever had is 3. For scale, the magazine's own
+errata appear 153 times — the archive adds its own voice eight times less often
+than the magazine corrected itself.
+
+So the question is **not** "does this candidate qualify". A qualification test
+applied to a reading of a whole issue will pass a dozen things, and 8611's read
+produced 18 candidates — which would have taken the corpus from 19 to 37, from
+one issue out of 44.
+
+The question is: **is there one thing in this issue a reader must be told, that
+beats the best one already here?** Usually there is nothing, and that is the
+normal outcome. 8611's is the calibre to measure against: Listing 1 on p78 is
+not the routine the article promises but a different article's, and the
+magazine never put it right. An entire listing absent, for the issue's life.
+
+Against that, a wrong digit, a crash from one bad address, a note that plays
+flat, a chart disagreeing with its own text — these are ordinary 1986, and the
+corpus has passed over them 1,800 times. Record them in LOG.md and move on.
+**The criterion below says what MAY be said; this says how rarely it is worth
+saying.** Having only the first is what makes a list of 18 look reasonable.
+
 ## WHEN a Futureteufelchen is added — the corpus's own criterion
 
 Derived from all 19 in the corpus, not from principle. Every one of them says
