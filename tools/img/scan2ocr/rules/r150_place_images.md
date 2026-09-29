@@ -27,6 +27,25 @@ next to the articles, where it survives the sweep, and r150's later re-run has
 the text without touching a master. `status` is `IN_HTML`, `ABSENT` (no figure
 yet — the work list for after the owner cuts them) or `TRUNCATED`.
 
+## TWO ARTICLES CAN SHARE A START PAGE — the second one's lead image is `-00`
+
+Figure files are `<article-start-page>-<n>.png`, so two articles beginning on
+the same page collide on the prefix. The corpus already answers this: the
+SECOND article's lead image takes **`-00`**, and `-0` stays with the first.
+
+MEASURED: 15 `-00.png` files across the corpus. Page 8 carries a trade-show
+report beside the editorial in 8503, 8508 and 8603, and in every one the report
+owns `8-00.png` while the editorial keeps `8-0.png`. The same pairing gives
+`52-00` in 8512, 8601, 8602, 8603, 8605, 8608 and 8611.
+
+Precedent renders it as a lead image, not a captioned figure:
+`<img src="8-00.png" alt="">`, no `<figcaption>`. r150's alt-text check already
+tolerates the name (`-0[0-9a]*`).
+
+So do not renumber a figure into the neighbouring article's sequence, and do
+not read a `9-0.png` as belonging to a page-9 article when no article starts on
+page 9 — it is the second page-8 article's lead image and belongs at `8-00`.
+
 **A `Bild` caption does NOT always want an image.** The print labels tables and
 diagrams "Bild" as freely as photographs, and this corpus typesets them:
 **154 figures** in it carry a `Bild` caption on an HTML `<table>` — register
