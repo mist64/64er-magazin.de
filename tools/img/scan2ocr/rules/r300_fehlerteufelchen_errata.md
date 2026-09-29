@@ -9,6 +9,40 @@ it to the affected article here: an `<aside class="fehlerteufelchen">` at
 the end of the article, an in-text link to it, and — for code errata — a
 matching fix in the `prg/*.txt` listing.
 
+## WHEN a Futureteufelchen is added — the corpus's own criterion
+
+Derived from all 19 in the corpus, not from principle. Every one of them says
+something **the archive knows and the page does not**, and falls into four
+kinds:
+
+| kind | n | what the aside actually says |
+|---|---|---|
+| we corrected it | 8 | "Der folgende Fehler wurde in Listing 6 behoben", "Im MSE-File ist es korrekt" |
+| our files differ | 4 | "Listings 1 und 2 liegen hier bereits in der dekomprimierten Form vor" |
+| the magazine never did | 2 | "Die 64'er hat diese Verwechslung nie richtiggestellt" |
+| a fact checkable off the page | 5 | the C64's graphics base is `$E000`; `$97` stores to `MM,Y`; the C128D's numbered button is the drive's reset; here is the formula that generates the printed table |
+
+**So "the print is wrong" is not the criterion, and an internal inconsistency
+on its own is not one either** — that is a typo, and *typos in print remain
+typos*. The aside exists to carry what we can assert, with its grounds.
+
+Ask, in this order:
+
+1. **Is the version in `prg/` or on the Programmservice disk correct?** This
+   settles most cases with evidence instead of assertion, and it is what the
+   dominant 8 do. Check before anything else.
+2. **Do our files differ from the print** because of how the archive was built?
+   Then say how.
+3. **Did the magazine correct it later, or never?** `Fehlerteufelchen.md` is the
+   record; "never" is itself worth stating, and both instances say so plainly.
+4. **Is the correct fact verifiable off the page** — machine behaviour, CPU
+   semantics, hardware, arithmetic that can be shown? Then state it and say how
+   it was checked. r000's petcat/x64sc procedure can now settle a BASIC or
+   assembler claim by running it.
+
+If none of the four applies, record the candidate and leave it. A page that
+merely contradicts itself gets no aside.
+
 ## TWO KINDS OF DEVIL: Fehlerteufelchen is THEIRS, Futureteufelchen is OURS
 
 Both already exist in this site — CSS, an SVG each, and generator handling in
