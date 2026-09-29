@@ -27,6 +27,14 @@ next to the articles, where it survives the sweep, and r150's later re-run has
 the text without touching a master. `status` is `IN_HTML`, `ABSENT` (no figure
 yet — the work list for after the owner cuts them) or `TRUNCATED`.
 
+**A `Bild` caption does NOT always want an image.** The print labels tables and
+diagrams "Bild" as freely as photographs, and this corpus typesets them:
+**154 figures** in it carry a `Bild` caption on an HTML `<table>` — register
+bit-layouts (`Bild 1. Der Aufbau des MCR … $D505`), type overviews, market
+comparisons. So a figure with a `Bild` caption and no `<img>` is not evidence of
+a missing cut; it may be a table that belongs to r160. Decide from the page, and
+keep the printed "Bild N" wording either way.
+
 **The file is RAW OCR, not a transcription.** It preserves what tesseract read,
 soft hyphens and all — 8611's has 12 `¬` inside words (`Buch¬stabens`) and
 glyph errors like `GC 64` for `C 64`. It exists so the caption's TEXT is not
