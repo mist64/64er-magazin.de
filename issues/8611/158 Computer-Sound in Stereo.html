@@ -22,7 +22,16 @@
         <h1>Computer-Sound in Stereo</h1>
         <p class="intro">Haben Sie davon auch schon geträumt? Stereo-Sound aus Ihrem C 64 oder sechs Stimmen frei programmierbar. Mit dem Stereo-SID können Sie es verwirklichen!</p>
 
+        <figure>
+            <img src="158-0.png" alt="Frau mit geschlossenen Augen und Kopfhörern zwischen Lautsprecherboxen, darüber Notenlinien mit farbigen Noten, rechts ein Monitor">
+        </figure>
+
         <p>Alles hat seine Grenzen — dachte man. Aber schon bei unserem Musikwettbewerb waren wir erstaunt, was aus dem SID (Sound Interface Device) herauszuholen ist. Was wird aber erst, wenn zwei SIDs zur Verfügung stehen? Nun, zunächst können Sie sechs anstelle der drei Stimmen aktivieren. Das ist aber nicht alles. Bei unserem Stereo-SID (Bild 1) ist ein zweiter SID so geschaltet, daß die beiden NF-Signale der Sound-Bausteine getrennt ausgekoppelt werden. Also richtig stereo.</p>
+
+        <figure>
+            <img src="158-1.png" alt="Kleine Platine mit zwei 6581-SID-Chips, einem weiteren IC, Transistor, Elko und Widerständen">
+            <figcaption>Bild 1. Mit dem Stereo-SID können Sie Ihrem C 64 zu einem echten Stereo-Sound verhelfen.</figcaption>
+        </figure>
 
         <p>Jetzt können Sie natürlich die verschiedensten Effekte erzielen. Schicken Sie beispielsweise den gleichen Ton zum linken und zum rechten Kanal Ihrer Stereoanlage, so hören Sie den Ton aus der Mitte zwischen den Lautsprechern. Durch einen Unterschied in der Lautstärke wird der Ton aus der Mitte verschoben. Wenn Sie eine sehr geringe zeitliche Verzögerung (Phasenverschiebung) zwischen beiden Kanälen hervorrufen, so läßt sich der Ton nicht mehr räumlich orten, er kommt sozusagen »aus dem freien Raum«. Aber das ist längst nicht alles. Mit einer größeren zeitlichen Verzögerung lassen sich Hall- und Echo-Effekte erzeugen. Oder Sie schalten Ihren Verstärker auf Mono und programmieren sechsstimmige Akkorde.</p>
 
@@ -40,19 +49,90 @@
 
         <p>Jetzt wollen wir uns wieder der Hardware zuwenden und Ihnen die Schaltung erklären. Im Schaltbild (Bild 2), das übrigens mit Hi-Eddi plus auf dem C 64 erstellt wurde, sehen Sie, daß die meisten Anschlüsse von SID I (IC1) nach SID II (IC2) durchverbunden sind. Allerdings gibt es einige entscheidende Ausnahmen. Fangen wir mit den vier Anschlüssen CAP 1A, CAP 1B, CAP 2A und CAP 2B an. Am IC2 sind hier die Kondensatoren C1 und C2 angeschlossen. Bei IC1 ist dies nicht notwendig, weil die entsprechenden Kondensatoren auf der Computerplatine sind und über die Kontakte 1 bis 4 mit dem IC1 verbunden werden.</p>
 
+        <figure>
+            <img src="158-2.png" alt="Schaltplan: zwei 6581 SID (IC1, IC2), Decoder 74LS138 (IC3), Transistorverstärkerstufe mit T1 BC338 und die Steckverbindung zum Computer">
+            <figcaption>Bild 2. Die Schaltung für den Stereo-SID</figcaption>
+        </figure>
+
         <p>Mit den Eingängen PotX und PotY stehen Ihnen zwei weitere A-D-Wandler zur Verfügung. Da die 28polige Steckverbindung zum Computer voll belegt ist, sind diese beiden Anschlüsse auf der Stereo-SID-Platine als Lötstützpunkte herausgeführt. Im Bestückungsplan (Bild 3) haben wir sie markiert.</p>
+
+        <figure>
+            <img src="158-3.png" alt="Bestückungsplan der Platine mit IC1, IC2, IC3, C1 bis C4, R1 bis R3, T1 und den Lötpunkten PotX, PotY, Ext in und Adreßleitung A5">
+            <figcaption>Bild 3. Der Bestückungsplan vom Stereo-SID<br>*1 = Drahtbrücke unter dem IC-Sockel<br>*2 = Stiftleisten auf der Lötseite der Platine</figcaption>
+        </figure>
 
         <p>Nun kommen wir zur Selektierung der beiden SIDs. Mit dem Chip-Select-Signal (CS) an Pin 8 der Steckverbindung wurde vor dem Umbau der SID angesprochen (0 = angesprochen, 1 = nicht angesprochen). Jetzt müssen zwei SIDs innerhalb des üblichen Adreßbereiches selektiert werden, und zwar in einem Abstand von 32 Byte. Da 32 gleich 2<sup>5</sup> ist, kann die Adreßleitung A5 für die Selektion der beiden SIDs benutzt werden. Die Verknüpfung des ankommenden CS-Signals mit der Adreßleitung A5 erfolgt im IC3. Der SN74LS138N ist ein 3-zu-8-Decoder/Multiplexer mit 3 Freigabe-Eingängen. Das hört sich komplizierter an als es ist. Zum besseren Verständnis haben wir diesen Baustein im Bild 4 mit Innenleben abgebildet. Wenn den drei Adreßeingängen ein 3-Bit-Code zugeführt wird, geht der diesem Code entsprechende Ausgang Q auf »0«. Da A1 und A2 am IC3 fest auf »0« gelegt sind, können von A0 nur noch die Ausgänge Q0 und Q1 beeinflußt werden. Dies ist jedoch nur möglich, wenn die Freigabe-Eingänge E1, E2 »0« sind und E3 nicht »0« ist. In unserer Schaltung bedeutet das folgendes: Nur wenn das ankommende Chip-Selekt an E1 auf »0« gesetzt ist, kann über die Adreßleitung A5 einer der beiden SIDs angesprochen werden. Ist A5 dann »0«, so wird IC1 selektiert, während bei »1« IC2 angesprochen wird.</p>
 
+        <figure>
+            <img src="158-4.png" alt="Anschlußschema des 16poligen ICs mit 1-aus-8-Adreß-Decoder, Adreßeingängen A0 bis A2, Freigabeeingängen E1 bis E3 und Ausgängen Q0 bis Q7">
+            <figcaption>Bild 4. Die Innenschaltung des SN74LS138N (IC3)</figcaption>
+        </figure>
+
         <p>Sie wissen jetzt, wie die einzelnen SIDs selektiert werden, aber noch nicht, wie der Computer-Sound zu Ihrer Stereoanlage gelangt. Wenn Sie noch den C 64-Schaltplan aus unserer Ausgabe 9/86 zu Rate ziehen, dann können Sie sehen, daß der Ausgang (Audio out I) von IC1 über eine Verstärkerstufe mit dem Pin 3 der Audio/Video-Buchse verbunden ist. Eine gleichartige Verstärkerstufe ist beim Stereo-SID hinter dem Ausgang von SID II (Audio out II). Diese Verstärkerstufe ist über den Auskoppel-Elko am ehemaligen Audio-Eingang (Pin 26 der Steckverbindung) angeschlossen. Wenn Sie jetzt noch den ehemaligen Einkoppel-Kondensator C12 auf der Computerplatine mit einem kleinen Stück Draht überbrücken, dann ist der Ausgang von SID II über die Verstärkerstufe direkt mit dem Pin 5 der Audio/Video-Buchse verbunden. Wo Sie den Kondensator C12 auf der Computerplatine finden, das haben wir im Bild 5 aufgezeigt. Die neue Beschaltung der Audio/Video-Buchse ist aus dem Bild 6 zu ersehen. Die Buchse ist dabei abgebildet, wie sie von außen am Computer zu sehen ist.</p>
 
+        <figure>
+            <img src="158-5.png" alt="Ausschnitt einer grünen Computerplatine mit leerem IC-Sockel, daran ein angelöteter weißer Draht; zwei Stellen rot eingekreist">
+            <figcaption>Bild 5. Platinenausschnitt vom C 64 mit freiem Steckplatz anstelle des SIDs. Der Kondensator C 12 und der Lötstützpunkt für die Adreßleitung A5 sind gekennzeichnet.</figcaption>
+        </figure>
+
+        <figure>
+            <img src="158-6.png" alt="Achtpolige Buchse mit numerierten Kontakten 1 bis 8">
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>= Luminanz</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>= GND</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>= Audio out I</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>= Video out</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>= Audio out II</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>= Chrominanz</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>= nicht angeschlossen</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>= nicht angeschlossen</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 6. Die neue Beschaltung der Audio/Video-Buchse</figcaption>
+        </figure>
+
         <p>Als Verbindungskabel zur Stereoanlage sollten Sie kein 5poliges Diodenkabel verwenden, denn damit würden Sie auch das Video- und Luminanz-Signal zu Ihrer Stereoanlage leiten und es können sich Probleme ergeben. Benutzen Sie bitte nur ein 3poliges Kabel (2 Leitungen, einzeln abgeschirmt). Im Bild 7 sehen Sie, wie das Kabel nach DIN zu verdrahten ist. Es kommt allerdings auch vereinzelt vor, daß die beiden Leitungen für den linken und rechten Kanal bei der Stereoanlage an Pin 1 und 4 angeschlossen werden. Anders ist es, wenn Sie eine japanische oder amerikanische Stereoanlage besitzen. In diesem Fall kann es sein, daß Sie den 5poligen Diodenstecker durch zwei Cinch-Stecker ersetzen müssen.</p>
+
+        <figure>
+            <img src="158-7.png" alt="Zwei fünfpolige DIN-Stecker, verbunden über ein abgeschirmtes Kabel mit den Leitungen linker Kanal und rechter Kanal">
+            <figcaption>Bild 7. Anschlußkabel zur Stereoanlage. Abgebildet sind die Stecker, von der Lötseite gesehen.</figcaption>
+        </figure>
 
         <p>Nun aber zurück zu unserem Stereo-SID.</p>
 
         <h2>Tips für den Nachbau</h2>
 
         <p>Durch das einseitige Layout für die Platine (Bild 3a) ist der Nachbau recht einfach. Alle notwendigen Bauteile finden Sie in der Stückliste (Tabelle). Einiges sollten Sie aber beim Nachbau beachten.</p>
+
+        <figure>
+            <img src="158-3a.png" alt="Spiegelverkehrtes Platinenlayout mit Leiterbahnen und den Schriftzügen »64’er« und »STEREO-SID«">
+            <figcaption>Bild 3a. Layout für die Stereo-SID-Platine (spiegelverkehrt)</figcaption>
+        </figure>
 
         <figure>
             <table>
