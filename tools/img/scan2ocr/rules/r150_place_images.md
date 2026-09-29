@@ -105,6 +105,12 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
    that first mentions it. **Never split a paragraph.** If the
    first reference sits mid-paragraph, the figure still goes after
    the *full* enclosing `</p>`.
+   **Except when that paragraph is the item's LAST: then the figure goes after
+   the byline**, not between the text and the byline. r190's rule that an
+   author is never split from what they wrote outranks this one, and in a
+   rubric of short items the first mentioning paragraph is routinely also the
+   last — 8611's Aktuelles hit it 9 times in one article, and r310 flagged all
+   nine as HARD.
 5. **Read the caption from the scan.** Open the corresponding page
    PNG, find the caption printed under the image, type it verbatim
    into `<figcaption>`. If no caption is visible, omit
