@@ -84,11 +84,17 @@ A `Bild N` referenced in the body that is NONE of the above *and* has no crop is
 
 ## `<code>` ALONE DOES NOT RENDER MONOSPACE — it needs `class="mono"`
 
-`issues/style.css` gives a monospace face only to `code.mono`, `span.mono`,
-`table.mono > tbody > tr > td` and `ul.mono > li`. A bare `<code>` inherits the
-body font, so a column whose whole purpose is alignment — a bit pattern, a
-star matrix, a listing line — comes out proportional and does not line up, with
-nothing in the markup to show it is wrong.
+`issues/style.css` does not merely leave `<code>` alone — it **sets
+`li code, p code, td code { font-family: "RL", serif }`**. Monospace comes only
+from `code.mono`, `span.mono`, `table.mono > tbody > tr > td` and `ul.mono > li`,
+and `code.mono` (0,1,1) wins over `td code` (0,0,2) on specificity, taking the
+font while leaving the `display: block; white-space: pre-line` layout intact.
+
+So a bare `<code>` in a cell is actively rendered in a SERIF face. A column
+whose whole purpose is alignment — a bit pattern, a star matrix, a listing line
+— comes out proportional, and the markup looks right while the page is wrong.
+That is why it survives review: `<code>` reads as "monospace" to anyone
+checking the source.
 
 This matters most where the cell carries `&nbsp;` for position: 8611/18's three
 `Bild` figures set `   **` against `00011000` and the leading spaces are the
