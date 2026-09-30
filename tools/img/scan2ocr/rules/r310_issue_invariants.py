@@ -317,6 +317,27 @@ def main(d):
         H('issue has %d Impressum pages, expected exactly 1 (r020)' % len(imp),
           os.path.basename(d), ', '.join(os.path.basename(x) for x in imp[:3]))
 
+    # --- the Impressum is BUILT, not just transcribed --------------------
+    # The masthead prints as a list of labelled entries with rules between
+    # groups, and the whole text can be present while none of that structure is:
+    # 8611 shipped the complete text as NINE run-together paragraphs, 105 words
+    # in the first, no <em> labels and no <hr>. Every other check passed -- the
+    # words are all there, so coverage, spelling and markup see nothing.
+    # MEASURED over 41 Impressum pages: paragraphs median 36, and the lowest
+    # besides 8611's 9 is 16. Label marking is <em> in the monthlies and
+    # <strong> in the Sonderhefte, median 32; only 8611 and SH8504 have none.
+    for f, s_, b in arts:
+        if not re.search(r'name="64er\.id"\s+content="impressum"', s_):
+            continue
+        body = s_[s_.find('<article'):]
+        paras = len(re.findall(r'<p[ >]', body))
+        labels = len(re.findall(r'<em[ >]', body)) + len(re.findall(r'<strong[ >]', body))
+        if paras < 12:
+            H('Impressum has %d paragraphs; the masthead is one per printed entry'
+              % paras, f, 'structure never built')
+        elif labels < 10:
+            S('Impressum marks %d labels; the print sets them bold' % labels, f, '')
+
     # --- every <img> target exists --------------------------------------
     # generate.py skips a missing image SILENTLY (os.path.exists guard before
     # the avif/jpg conversion), so a <figure> written against a file that was
