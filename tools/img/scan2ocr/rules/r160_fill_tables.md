@@ -82,6 +82,26 @@ these from OCR text. Instead:
 
 A `Bild N` referenced in the body that is NONE of the above *and* has no crop is a gap, not a no-op: log it to `LOG.md` (as with a referenced-but-missing table) rather than silently skipping.
 
+## `<code>` ALONE DOES NOT RENDER MONOSPACE — it needs `class="mono"`
+
+`issues/style.css` gives a monospace face only to `code.mono`, `span.mono`,
+`table.mono > tbody > tr > td` and `ul.mono > li`. A bare `<code>` inherits the
+body font, so a column whose whole purpose is alignment — a bit pattern, a
+star matrix, a listing line — comes out proportional and does not line up, with
+nothing in the markup to show it is wrong.
+
+This matters most where the cell carries `&nbsp;` for position: 8611/18's three
+`Bild` figures set `   **` against `00011000` and the leading spaces are the
+data. In a proportional face they mean nothing.
+
+MEASURED: `<code class="mono">` is the convention, 56 uses across the corpus.
+A bare `<code>` inside a `<td>` occurs 27 times in 4 files, and all four are
+this defect — 8611/18 (21), plus `8412/86`, `8502/34` and `8506/52`, which are
+published with BASIC and assembler lines that do not render monospace.
+
+So: when the print sets a column in typewriter face, write
+`<code class="mono">`, and check the rendered page rather than the markup.
+
 ## Multi-level headers
 
 If the print has a spanning header (e.g. "Adresse" above sub-headers "Dez"/"Hex"), reproduce with `colspan`/`rowspan`. Don't flatten.
