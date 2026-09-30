@@ -108,6 +108,35 @@ grep -h '64er.pages" content=' issues/8607/*.html | grep -vE 'content="[0-9,\- ]
 [ ! -f issues/8607/8607.html ] && echo "consolidated removed ✓"
 ```
 
+## THE HEADLINE CAN BE SET INSIDE THE LEAD PHOTO — the OCR cannot see it
+
+A feature sometimes has its title typeset ONTO its opening picture, not above
+it. There is then no headline in the text layer at all, and the transcriber
+reaches for the nearest words that exist — usually the TOC entry — producing an
+`<h1>` the page never prints.
+
+8611/8 shipped as *"Messebericht aus London"*, which is the TOC's wording. The
+page prints **"PCW—Show 1986"** in large red display type across the lead photo.
+
+**There is no mechanical detector, and two plausible ones fail.** An `<h1>` that
+shares no word with `index_title` gives 55 hits corpus-wide, nearly all
+legitimate, because the annual index title is descriptive rather than the
+headline. An `<h1>` that is a substring of `toc_title` gives 278, because the
+TOC routinely prefixes a rubric (*"Listing des Monats: X"*) to a headline of
+*"X"*. Do not build either.
+
+What to do instead, at the moment the `<h1>` is decided:
+
+- **If the headline did not come from the page's own text, look at the opening
+  picture before accepting a substitute.** Display type inside a photograph is
+  invisible to every check downstream, including the filename rule below.
+- The genre that does this is the feature opener with a full-width lead image
+  (`-0` / `-00`). It is not universal: 8408/10, 8503/8 and 8508/8 are the same
+  kind of trade-show report and their lead photos carry no headline at all.
+- `index_title` is worth reading when it disagrees — 8611/8 already carried
+  `PCW-Show 1986 in London`, from the annual index, while the `<h1>` said
+  something else. It is evidence, not proof.
+
 ## Paired articles — never split
 
 64'er occasionally runs **two pieces on the same topic in one issue** on
