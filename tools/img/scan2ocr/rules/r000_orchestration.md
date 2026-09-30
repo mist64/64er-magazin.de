@@ -811,6 +811,12 @@ number:
 
 > **As many lanes as fit in HALF the free RAM, capped at cores − 4.**
 
+**ALWAYS.** There is no step, no machine state and no deadline that exempts a
+fan-out from this. FREE means free *at the moment the step starts*, read then,
+never carried over from an earlier step in the same build — this box regularly
+carries a **170–290 GiB model server** for another user, which appears and
+disappears between steps.
+
 Ask for it, never write it down:
 
 ```sh
@@ -831,6 +837,14 @@ afternoon: with a 350 GB model server resident — 116 GB free, memory-bound,
 constant in a `.sh` would have been wrong in half the day. The hardcoded
 `-P 6` that all three steps carried was written when it was true and left
 **26 of 32 cores idle** for two hours once it was not.
+
+**The neighbour on this box is not just memory.** `~/DNB/llm/CLAUDE.md`
+records that 32 concurrent `magick` processes drove the load to ~975 and the
+inference watchdog killed the server; on 2026-08-05 a comparable load panicked
+the machine outright, because the compositor missed its kernel check-ins while
+the GPU was held. The lane count from this rule is what keeps that from
+happening — a step that sizes itself by RAM also sizes itself by cores, and the
+`cores − 4` cap is not decoration.
 
 **`OMP_NUM_THREADS=1` stays.** It is what makes a lane exactly one core:
 numpy and ImageMagick both thread by default, and two layers of parallelism on

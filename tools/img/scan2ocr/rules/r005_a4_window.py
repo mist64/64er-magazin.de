@@ -257,7 +257,15 @@ OUT_A4 = Path(os.environ.get("A4_OUT") or (Path(ISS.tmp) / "a4600"))
 CACHE = Path(ISS.tmp) / "a4win"
 OUT_OVERLAY = CACHE / "preview"
 
-JOBS = 6
+# LANES, NOT A CONSTANT. r000's rule is HALF THE FREE RAM, always, measured at
+# the moment the step runs -- this box regularly carries a 170-290 GiB model
+# server for another user, and a 6 that was right with it resident leaves most
+# of the machine idle without it. This is the same hardcoded 6 that r010 had,
+# which left 26 of 32 cores idle for two hours. _measure_one holds one 2400 dpi
+# page: measured peak ~4 GB.
+def JOBS():
+    import r000_issue
+    return r000_issue.lanes(4)
 
 # ---------------------------------------------------------------------------
 # DETECTION
@@ -859,7 +867,7 @@ def main():
             or not (CACHE / f"{p:03d}.npz").exists()]
     if todo:
         print(f"r005b: measuring {len(todo)} page(s) ...", flush=True)
-        with Pool(JOBS) as pool:
+        with Pool(JOBS()) as pool:
             for r in pool.imap_unordered(_measure_one, todo):
                 if r:
                     recs[r["page"]] = r
