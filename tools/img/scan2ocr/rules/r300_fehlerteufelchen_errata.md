@@ -33,6 +33,19 @@ corpus has passed over them 1,800 times. Record them in LOG.md and move on.
 **The criterion below says what MAY be said; this says how rarely it is worth
 saying.** Having only the first is what makes a list of 18 look reasonable.
 
+## KEEP THE TEXT COMPACT
+
+MEASURED over all 19 in the corpus, counting prose and excluding any generated
+listing: **median 34 words**, quartiles 20 / 34 / 64. The shortest are nine
+("Das Spiel liegt hier bereits als zusammengefaßte Datei vor"), and the three
+above 84 are outliers, not the pattern.
+
+So: **one or two sentences.** Say what the page gets wrong, say what is right,
+and stop. Where the disk or `prg/` already has it right, that sentence is the
+whole aside. Do not narrate how it was found, do not reason in the aside, and do
+not restate the article. The evidence belongs in LOG.md and the commit message;
+the reader wants the correction.
+
 ## WHEN a Futureteufelchen is added — the corpus's own criterion
 
 Derived from all 19 in the corpus, not from principle. Every one of them says
