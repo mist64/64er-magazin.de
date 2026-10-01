@@ -18,7 +18,7 @@
         <h1>Tips &amp; Tricks zum C 128</h1>
         <p class="intro">Diesmal präsentieren wir Ihnen eine Hardcopy-Routine für die 80-Zeichen-Grafik, eine verbesserte INPUT-Routine und weitere kleine Tips &amp; Tricks.</p>
 
-        <p>inen für Commodore ungewöhnlichen Effekt haben die Entwickler des C 128 in das Betriebssystem eingebaut. Es handelt sich zwar nicht um einen Virus im Computer, aber doch um eine darin verborgene Nachricht für den Benutzer. Wer gerne wissen will, welche Leute an seinem C 128 für Design, Soft- und Hardware verantwortlich sind, dergebe folgendes im Direktmodus ein:</p>
+        <p>Einen für Commodore ungewöhnlichen Effekt haben die Entwickler des C 128 in das Betriebssystem eingebaut. Es handelt sich zwar nicht um einen Virus im Computer, aber doch um eine darin verborgene Nachricht für den Benutzer. Wer gerne wissen will, welche Leute an seinem C 128 für Design, Soft- und Hardware verantwortlich sind, dergebe folgendes im Direktmodus ein:</p>
 
         <pre><code>SYS 32800,123,45,6
 </code></pre>
@@ -62,9 +62,11 @@
 
         <p>Beim Einschalten des Laufwerks ist der 1541-Modus eingeschaltet. Durch Umstellung auf 1571-Modus erfolgt die doppelseitige Benutzung der Diskette.</p>
 
-        <p>Befehle im Direktmodus (C 64-Modus beim C 128): OPEN 1,8,15, "UO>M1" (1571-Modus)</p>
+        <p>Befehle im Direktmodus (C 64-Modus beim C 128):</p>
 
-        <p>OPEN 1,8,15, "UO>MO" (1541-Modus)</p>
+        <pre><code>OPEN 1,8,15, "UO>M1" (1571-Modus)
+OPEN 1,8,15, "UO>MO" (1541-Modus)
+</code></pre>
 
         <p>Zu beachten ist, daß beim Neuformatieren einer doppelseitig zu formatierenden Diskette der Modus stimmen muß. Der Einsatz von Backup-Kopierprogrammen ist im 1571-Modus nicht möglich, da diese das beidseitige Format nicht unterstützen. Das Kopieren mit File-orientierten Kopierprogrammen wie etwa Supercopy ist einwandfrei möglich, wenn es auch in mehreren Durchgängen erfolgt.</p>
 
@@ -86,11 +88,10 @@
 
         <p>Dieser Umstand ermöglicht ein interessantes Spiel mitden Farben, nämlich das »Schillern« der Zeichen. Dazu dient dieses Programm (Listing 3). Um ein einwandfreies Funktionieren zu gewährleisten, sollte man vor dem Programmaufruf auf BANK 15 schalten.</p>
 
-        <p>Der Basic-Lader schreibt das Programm an die richtige Stelle und speichert es danach unter dem Namen »Farbspiel« auf Diskette. Zum weiteren Gebrauch muß nur noch das Programm mit</p>
-
-        <p>BLOAD 'FARBSPIEL" geladen werden. Der Start erfolgt durch</p>
-
-        <p>SYS DEC("1300")</p>
+        <p>Der Basic-Lader schreibt das Programm an die richtige Stelle und speichert es danach unter dem Namen »Farbspiel« auf Diskette. Zum weiteren Gebrauch muß nur noch das Programm mit<br>
+            BLOAD 'FARBSPIEL"<br>
+            geladen werden. Der Start erfolgt durch<br>
+            SYS DEC("1300")</p>
 
         <p>Die Routine kann jederzeit durch Druck aufeine beliebige Taste unterbrochen werden.</p>
 
@@ -120,13 +121,22 @@
             <figcaption>Listing 4. Unterprogramm zur sicheren Eingabe</figcaption>
         </figure>
 
-        <h2>Hardconv-Routine</h2>
+        <h2>Hardcopy-Routine</h2>
 
         <p>Der C 128 verfügt über die Möglichkeit der 80-Zeichen-Grafik, die aber leider durch das Basic nicht unterstützt wird. Die Voraussetzung für das Programm (Listing 5, bitte mit dem MSE im C 64-Modus eingeben) sind also vorhandene Routinen, die das Ein- und Ausschalten sowie das Setzen und Löschen von Punkten in der 80-Zeichen-Grafik ermöglichen. Der Speicherbereich dieser Grafik ist im VDC-Chip untergebracht und belegt dort 16 KByte. Da dieser Speicherbereich im 80-Zeichen-Textmodus vom Video-RAM, Attribut-RAM und CHARROM überschrieben wird, darf vor dem Aufruf der Hardcopy-Routine nicht in den 80-Zeichen-Textmodus umgeschaltet werden!</p>
 
         <p>Das Programm ist für Epson-Drucker und kompatible ausgelegt. Wichtig ist, daß bei eventuellen Druckerinterfaces keine Codewandlung vorgenommen wird, da sonst die Steuerbefehle sowie die Grafik-Informationen verfälscht werden.</p>
 
-        <p>Die Routine belegt den Bereich von $1300 bis $1480. Zur Handhabung: l. Grafik erstellen 2. Druckerkanal ohne Codewandlung öffnen 3. Programmaufruf 4. Druckerkanal schließen Programmaufruf:</p>
+        <p>Die Routine belegt den Bereich von $1300 bis $1480. Zur Handhabung:</p>
+
+        <ol>
+            <li>Grafik erstellen</li>
+            <li>Druckerkanal ohne Codewandlung öffnen</li>
+            <li>Programmaufruf</li>
+            <li>Druckerkanal schließen</li>
+        </ol>
+
+        <p>Programmaufruf:</p>
 
         <pre><code>SYS DEC("1312"),Kanalnummer,Modus
 </code></pre>

@@ -371,3 +371,16 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   - r006's "all caches keyed on existence" omits `.ocrcache/pageclass.tsv` and `.ocrcache/jbig2/*.jb2`; both go stale after a re-grade.
   - The README says page 1 is "resized to page-1 dimensions"; the script refuses to resize.
   - The chroma snippet uses undefined `w, h`.
+
+## 190 — the rule's step list is built around TODO markers that no step produces; the real work is in no step
+
+- Both 190 sub-agents (8-39, 100-195) found zero TODO markers. The work was: 31+ lost drop caps, paragraphs split
+  mid-sentence, headings that swallowed body text, lost headings, p.source debris, a dropped paragraph, and the
+  Impressum rebuild. None of it is a step in r190; all of it came from my brief.
+- Conflicts found: interview labels are "bold italic" per the rule but roman in 8612's print (page won). Dash lists: the
+  rule says <ul> on a real glyph, while 8609-8611 keep `<p>— …</p>`. The aside test (tint/rule) misses a typeface-only box
+  (Werner Paul bio). The never-split heading lists <pre>/<aside>, but its check covers only figure/table, and the
+  Verification has no never-split or empty-<p> check at all. `/tmp/skipped_files.txt` is hardcoded. Word-level fixes
+  inside <pre> are not addressed. The Impressum has no owning rule.
+- **What would have prevented it.** A step "restore lost drop caps (one letter, from the crop)" and a step "split
+  headings that swallowed body text". A never-split + empty-<p> check in Verification. An owner for the Impressum.

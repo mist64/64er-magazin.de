@@ -18,7 +18,7 @@
         <h1>Tips &amp; Tricks für Profis</h1>
         <p class="intro">Haben Sie schon einmal daran gedacht, einen Stack in Basic zu simulieren? Oder die NMI-Routine umzuprogrammieren? Wir zeigen Ihnen neben diesen beiden Tricks und vielen weiteren auch eine Tabelle mit einigen interessanten Systemadressen.</p>
 
-        <p>K:: Ursache, große Wirkung: Im Leserforum der Ausgabe 8/86 der 64'er fragte ein Leser nach der »größten Primzahl der Welt«. Seitdem treffen ständig mehr oder weniger kurze Listings ein, die sich mit Primzahlen auseinandersetzen. Ohne Zweifel, ein heißes Thema für Computerfreunde. Bleibt abzuwarten, wie weit diese Entwicklung geht. Vielleicht haben Sie ja auch einmal ein kniffliges Programm zum Thema Primzahlen geschrieben. Schicken Sie es an die 64'er! Interessante Lösungsmöglichkeiten werden wir veröffentlichen.</p>
+        <p>Kleine Ursache, große Wirkung: Im Leserforum der Ausgabe 8/86 der 64'er fragte ein Leser nach der »größten Primzahl der Welt«. Seitdem treffen ständig mehr oder weniger kurze Listings ein, die sich mit Primzahlen auseinandersetzen. Ohne Zweifel, ein heißes Thema für Computerfreunde. Bleibt abzuwarten, wie weit diese Entwicklung geht. Vielleicht haben Sie ja auch einmal ein kniffliges Programm zum Thema Primzahlen geschrieben. Schicken Sie es an die 64'er! Interessante Lösungsmöglichkeiten werden wir veröffentlichen.</p>
 
         <address class="author">(tr)</address>
 
@@ -29,6 +29,8 @@
         <p>Übrigens läßt sich die Höhe der ausgedruckten Balken durch Ändern der Variablen RC in Zeile 52 reduzieren (zum Beispiel RC=5), was für die meisten Anwendungen ausreichen dürfte und beim Ausdruck eine bedeutende Zeitersparnis bedeutet.</p>
 
         <p>Bild 1 zeigt die Programm-Änderungen für den Drucker Star SG-10 sowie der berichtigten Zeile 85 und einem Probeausdruck. Da das von mir verwendete Star-Secus-Interface die Steuerzeichen im Klartext ausdruckt, ist statt desangegebenen »ESC« jeweils &lt;CTRL+:&gt; und statt »($D)« ist &lt;CTRL+A&gt; einzugeben, wie auch bereits. im Artikel erwähnt.</p>
+
+        <address class="author">(Markus Raute/tr)</address>
 
         <figure>
             <pre>50  :
@@ -63,9 +65,6 @@
 85  DATA"0111011","0010001","1000100"</pre>
             <figcaption>Bild 1. Diese Zeilen müssen Sie im »Bar-Codes«-Listing ändern, um mit dem Star SG-10 arbeiten zu können</figcaption>
         </figure>
-
-
-        <address class="author">(Markus Raute/tr)</address>
 
         <h2>Ku-Ba-Graf und Epson-Drucker</h2>
 
@@ -145,7 +144,7 @@
             <figcaption>Listing 2. Eine Fakultätsberechnung mit simuliertem Stack</figcaption>
         </figure>
 
-        <h2>Die (neue) NMi-Routine</h2>
+        <h2>Die (neue) NMI-Routine</h2>
 
         <p>Jeder kennt sie! Sie wird durch das Drücken der Tasten &lt;RUN/STOP+RESTORE&gt; aktiviert. Die NMI-Routine ist nichts Neues, auch nicht, daß sie bestimmte Vektoren wieder zurücksetzt, was nicht immer erwünscht ist.</p>
 
@@ -180,13 +179,12 @@
 </code></pre>
 
 
-        <p>Hier endet der kopierte Teil. 102d 1da#%00 ;hier steht der eigene Teil</p>
+        <p>Hier endet der kopierte Teil.</p>
 
-        <pre><code>102f sta $d020 ;der NMI-Routine 1032 sta $d021
-</code></pre>
-
-
-        <pre><code>‚1035 rts
+        <pre><code>102d 1da#%00 ;hier steht der eigene Teil
+102f sta $d020 ;der NMI-Routine
+1032 sta $d021
+‚1035 rts
 </code></pre>
 
 
@@ -326,51 +324,65 @@
 
         <h2>Exzesse über den Filenamen</h2>
 
-        <p>Es ist wie mit den meisten Schutztricks. Einmal veröffentlicht, schon sind sie nicht mehr effizient, weil sie nun jeder kennt. So auch mitdem»LOAD-Schutz einmalanders«aus der 64'er 6/86. Stefan Bültenas Frage kann ich daher nur mit »ja« beantworten! Diesen Trick findet man heute in fast jeder Computerzeitschrift. Niemand aber erwähnt, daß es auch noch eine ganze Palette von anderen Möglichkeiten gibt, einemFile den Namen »" "«zu geben. Bis heute habe ich 74 ohne, und weit über 100 Arten mit optischer Veränderung des Directorys ausprobiert. Die Wahrscheinlichkeit, jetzt den richtigen Namen herauszufinden, ist nun um ein Vielfaches geringer. Mit etwas Ausdauer lassen sich bestimmt noch mehr Wege finden, zwei Anführungszeichen als Namen zu benutzen. Nun aber zu den angekündigten Varianten: 1. Die ersten 15:</p>
-
-        <p>SAVE CHR$(34)+ "{1 bis 15 Space} ",8</p>
+        <p>Es ist wie mit den meisten Schutztricks. Einmal veröffentlicht, schon sind sie nicht mehr effizient, weil sie nun jeder kennt. So auch mitdem»LOAD-Schutz einmalanders«aus der 64'er 6/86. Stefan Bültenas Frage kann ich daher nur mit »ja« beantworten! Diesen Trick findet man heute in fast jeder Computerzeitschrift. Niemand aber erwähnt, daß es auch noch eine ganze Palette von anderen Möglichkeiten gibt, einemFile den Namen »" "«zu geben. Bis heute habe ich 74 ohne, und weit über 100 Arten mit optischer Veränderung des Directorys ausprobiert. Die Wahrscheinlichkeit, jetzt den richtigen Namen herauszufinden, ist nun um ein Vielfaches geringer. Mit etwas Ausdauer lassen sich bestimmt noch mehr Wege finden, zwei Anführungszeichen als Namen zu benutzen. Nun aber zu den angekündigten Varianten:</p>
 
         <ol>
-            <li>Die zweiten 15:</li>
+            <li>Die ersten 15:<br>
+                SAVE CHR$(34)+"{1 bis 15 Space}",8</li>
+            <li>Die zweiten 15:<br>
+                SAVE"&lt;SHIFT+SPACE&gt;{1 bis 15 Space}",8</li>
+            <li>Weitere 10 Stück:<br>
+                a) SAVE CHR$(34)+"&lt;SPACE&gt;",8<br>
+                b) +"&lt;SHIFT+SPACE&gt;",8<br>
+                c) +"&lt;CRSR&gt;-links",8<br>
+                d) +"&lt;CRSR&gt;-rechts",8<br>
+                e) +&lt;SHIFT+SPACE&gt;"&lt;CRSR&gt;-links",8<br>
+                f) +&lt;SHIFT+SPACE&gt;"&lt;CRSR&gt;-rechts",8<br>
+                g) +"&lt;SPACE&gt;&lt;SHIFT+SPACE&gt;&lt;SPACE&gt;",8<br>
+                h) "&lt;SHIFT+SPACE&gt;&lt;CRSR&gt;-links",8<br>
+                i) "&lt;SHIFT+SPACE&gt;&lt;CRSR&gt;-rechts",8<br>
+                j) "&lt;SPACE&gt;&lt;SHIFT+SPACE&gt;&lt;SPACE&gt;",8</li>
+            <li>Die bekanntesten:<br>
+                a) SAVE CHR$(34),8<br>
+                b) SAVE"&lt;SHIFT+SPACE&gt;",8</li>
+            <li>Die Supernamen (unlöschbar!):<br>
+                a) SAVE CHR$(34)+CHR$(58)+CHR$(34),8<br>
+                b) SAVE"&lt;SHIFT+SPACE&gt;"+CHR$(58)+"&lt;SHIFT+SPACE&gt;",8</li>
+            <li>Die drei gleichen:<br>
+                a) SAVE CHR$(34)+CHR$(44)+CHR$(34),8<br>
+                b) SAVE CHR$(34)+CHR$(44)+"&lt;SHIFT+SPACE&gt;",8<br>
+                c) siehe 5a!</li>
+            <li>Nochmal 13 Arten:<br>
+                SAVE"&lt;SHIFT+SPACE&gt;"+CHR$(58)+"&lt;SHIFT+SPACE&gt;{1 bis 15 Space}",8</li>
+            <li>Diese drei gibt's auch:<br>
+                a) SAVE"&lt;SHIFT+SPACE&gt;"+CHR$(44)+"&lt;SHIFT+SPACE&gt;",8<br>
+                b) SAVE CHR$(34)+CHR$(58)+CHR$(34)+CHR$(44)+CHR$(34)",8<br>
+                c) bei b) das mittlere CHR$(34) durch &lt;SHIFT+SPACE&gt; ersetzen</li>
+            <li>Die letzten 14:<br>
+                SAVE CHR$(34)+"&lt;SHIFT+SPACE&gt;{1 bis 14 Space}",8</li>
         </ol>
 
+        <p>Bemerkungen zu den Speicherarten:</p>
 
-        <p>SAVE' &lt;SHIFT+SPACE&gt;[l bis 15 Space} ",8 3. Weitere 10 Stück:</p>
+        <p>Zu Punkt 6: Hat man einen dieser Namen benutzt, so lassen sich die anderen nicht mehr anwenden! Zum Laden läßt sich statt CHR$(44) auch CHR$(58) verwenden, und umgekehrt! Beim Speichern ist es genau das gleiche Spielchen.</p>
 
-        <p>a) SAVE CHR$(34) +" &lt;SPACE&gt; ",8 c) d) e) ) g) +" &lt;CRSR&gt;-lnks",8 +" &lt;CRSR&gt;-rechts" 8 + &lt;SHIFT+SPACE&gt; " &lt;CRSR&gt;-links + &lt;SHIFT+SPACE&gt; * &lt;CRSR&gt;-rechts +" &lt;SPACE&gt; &lt;SHIFT+SPACE&gt; &lt;SPACE&gt;",8</p>
+        <p>Zu den optischen Veränderungen benutzt man die &lt;DEL&gt;-Taste. Aber auch &lt;SHIFT+SPACE&gt; in Verbindung mit den Funktionstasten tut das seine dazu.</p>
 
-        <p>&lt;SHIFT+SPACE&gt; &lt;CRSR&gt;-lnks",8 &lt;SHIFT+SPACE&gt; &lt;CRSR&gt;-rechts" 8 &lt;SPACE&gt; &lt;SHIFT+SPACE&gt; &lt;SPACE&gt; " 8 4. Die bekanntesten: a) SAVE CHR$(84) ‚8 b) SAVE" &lt;SHIFT+SPACE&gt;" ‚8</p>
-
-        <p class="source">5. Die Supernamen (unlöschbar!):<br>
-            a) SAVE CHR$(34) + CHR$(58) + CHR$(34) ‚8<br>
-            b) SAVE" &lt;SHIFT+SPACE&gt; " +CHR$(58) + " &lt;SHIFT+ SPACE&gt;",8<br>
-            6. Die drei gleichen:<br>
-            a) SAVE CHR$(34) + CHR$(44) + CHR$(34) ‚8<br>
-            b) SAVE CHR$(34) + CHR$(44)+ " &lt;SHIFT+SPACE&gt;" ‚8 c) siehe 5al<br>
-            7. Nochmal 13 Arten:<br>
-            SAVE" &lt;SHIFT+SPACE&gt; " +CHR$(658)+ " &lt;SHIFT+ SPACE &gt;{1l bis 15 Space} ",8<br>
-            8. Diese drei gibt's auch:<br>
-            a) SAVE" &lt;SHIFT+SPACE &gt; " +CHR$(44)+ " &lt;SHIFT+ SPACE&gt;" ‚8<br>
-            b) SAVE CHR$(34) + CHR$(58) + CHR$(34) + CHR$(44) + CHR$(34)" ‚8<br>
-            c) bei b) das mittlere CHR$(34) durch &lt;SHIFT+SPACE&gt; ersetzen<br>
-            9. Die letzten 14:<br>
-            SAVE CHR$(84) +" &lt;SHIFT+SPACE&gt;[{l bis 14 Space)" ‚8 Bemerkungen zu den Speicherarten:<br>
-            Zu Punkt 6: Hat man einen dieser Namen benutzt, so lassen sich die anderen nicht mehr anwenden! Zum Laden läßt sich statt CHR$(44) auch CHR$(58) verwenden, und umgekehrt! Beim Speichern ist es genau das gleiche Spielchen.<br>
-            Zu den optischen Veränderungen benutzt man die &lt;DEL&gt;-Taste. Aber auch &lt;SHIFT+SPACE &gt; in Verbindung mit den Funktionstasten tut das seine dazu.<br>
-            Ich wünsche noch viel Spaß beim Ausprobieren und Weiterknobeln!</p>
+        <p>Ich wünsche noch viel Spaß beim Ausprobieren und Weiterknobeln!</p>
 
         <address class="author">(Marco Richter/tr)</address>
 
-
-        <p></p>
-
         <h2>Betrifft: »Die schnellste Grafikerweiterung für den C 64«</h2>
 
-        <p class="source">Im 64'er Sonderheft 6/86 wurde auf Seite 96 die schnellste Grafikerweiterung für den C 64 vorgestellt. Dieses Programm erlaubt die Programmierung von wirklich schneller HiRes-Grafik in Basic.<br>
-            Ein Leser teilte uns jedoch mit, daß in der abgedruckten Basic-Erweiterung »gefährliche« Zeropage-Ädressen verwendet werden, die bei komplexen Funktionen als Parameter für die Grafik-Routinen zu einem »Absturz« des Computers führen können.<br>
-            Im folgenden ist deshalb ein Programm abgedruckt, dasin mühevoller (/minütiger) Kleinarbeit alle diese Zeropage-Adressen durch ungefährliche Werte ersetzt. Laut Autor läuft »High-Speed-Grafik« danach einwandfrei.<br>
-            Zur Bedienung<br>
-            Laden Sie die Grafik-Erweiterung aus dem Sonderheft und tippen Sie »NEW«ein. Danach ladenSie das Listing 3und starten es mit »RUN«. Legen Sie außerdem eine Diskette in das Diskettenlaufwerk, damit die korrigierte Version gespeichert werden kann. Nach zirka sieben Minuten sind 237 Adressen geändert worden (wird vom Programm angezeigt). Die korrigierte Version von »High-Speed-Grafik« wird danach automatisch mit dem Namen »HSCG%« auf die eingelegte Diskette geschrieben.</p>
+        <p>Im 64'er Sonderheft 6/86 wurde auf Seite 96 die schnellste Grafikerweiterung für den C 64 vorgestellt. Dieses Programm erlaubt die Programmierung von wirklich schneller HiRes-Grafik in Basic.</p>
+
+        <p>Ein Leser teilte uns jedoch mit, daß in der abgedruckten Basic-Erweiterung »gefährliche« Zeropage-Ädressen verwendet werden, die bei komplexen Funktionen als Parameter für die Grafik-Routinen zu einem »Absturz« des Computers führen können.</p>
+
+        <p>Im folgenden ist deshalb ein Programm abgedruckt, dasin mühevoller (7minütiger) Kleinarbeit alle diese Zeropage-Adressen durch ungefährliche Werte ersetzt. Laut Autor läuft »High-Speed-Grafik« danach einwandfrei.</p>
+
+        <p>Zur Bedienung:</p>
+
+        <p>Laden Sie die Grafik-Erweiterung aus dem Sonderheft und tippen Sie »NEW«ein. Danach ladenSie das Listing 3und starten es mit »RUN«. Legen Sie außerdem eine Diskette in das Diskettenlaufwerk, damit die korrigierte Version gespeichert werden kann. Nach zirka sieben Minuten sind 237 Adressen geändert worden (wird vom Programm angezeigt). Die korrigierte Version von »High-Speed-Grafik« wird danach automatisch mit dem Namen »HSG2« auf die eingelegte Diskette geschrieben.</p>
 
         <address class="author">(W. Lohwasser/ks/tr)</address>
 
@@ -381,16 +393,19 @@
         <!-- hsg-neu: the corrected High-Speed-Graphic the Listing 3 program writes; not printed, download only -->
         <div class="binary_download" data-filename="hsg-neu.prg" data-name="High-Speed-Graphic (korrigiert)"></div>
 
+        <aside>
+            <h2>Checksummer und MSE</h2>
 
-        <p></p>
+            <p>Der Checksummer und der MSE sind Eingabehilfen für unsere Listings.</p>
 
-        <h2>Checdksummer und MSE Der Checksummer und der MSE sind Eingabehilfen für</h2>
+            <p>Der Checksummer zeigt für jede eingegebene Basic-Zeile eine Prüfsumme auf dem Bildschirm, die mit der in der 64'er abgedruckten Zahl (am Zeilenende) übereinstimmen muß. Diese Zahlen dürfen Sie beim Eintippen nicht mit eingeben. Unterstrichene Zeichen sind zusammen mit der&lt;SHIFT&gt;-Taste, überstrichene zusammen mit der &lt;C=&gt;-Taste einzugeben. Wenn im Listing geschweifte Klammern ({CLR}) auftauchen, dürfen Sie das, was innerhalb der Klammern steht, nicht eintippen, sondern müssen die entsprechenden Tasten drücken (zum Beispiel &lt;CLR&gt;).</p>
 
-        <p>unsere Listings.</p>
+            <p>Der MSE dient zur Eingabe von Maschinenspracheprogrammen. Auch er erzeugt zu jeder eingegebenen Zeile eine Prüfsumme. Diese »MSE-Listings« können Sie auch mit einem normalen Maschinensprache-Monitor eingeben. Dabei müssen Sie jedoch die letzte Spalte (Prüfsumme) weglassen.</p>
 
-        <p>Der Checksummer zeigt für jede eingegebene Basic-Zeile eine Prüfsumme auf dem Bildschirm, die mit der in de Ma abgedruckten Zahl (am Zeilenende) übereinstimmen muß. Diese Zahlen dürfen Sie beim Eintippen nicht mit eingeben. Unterstrichene Zeichen sind zusammen mit der&lt;SHIFT&gt;-Taste, 'überstrichene zusammen mit der &lt;C=&gt;-Taste einzugeben. Wenn im Listing ge<em> schweifte Klammern ([CLR)) auftauchen, dürfen Sie das, was innerhalb der Klammern steht, nicht eintippen, sondern müssen die entsprechenden Tasten drücken (zum Beispiel &lt;COoR&gt;). Der MSE dient zur Eingabe von Maschinensprachepro</em> grammen. Auch er erzeugt zu jeder eingegebenen Zeile _ eine Prüfsumme. Diese »MSE-Listings« können Sie auch mit einem normalen Maschinensprache-Monitor eingeben. Dabei müssen Sie jedoch die letzte Spalte (Prüfsum_ me) weglassen. Der Checksummer und der MSE wurden in. inder _ Ausgabe 10/86 auf Seite 76 veröffentlicht. Beide sind auch auf jeder Programmservice-Diskette enthalten. Gegen Einsendung eines mit 1,80 Mark frankierten Rückumschlages (Format DIN A4) senden wir Ihnen die Listings mit Beschreibung auch gerne zu.</p>
+            <p>Der Checksummer und der MSE wurden zuletzt in der Ausgabe 10/86 auf Seite 76 veröffentlicht. Beide sind auch auf jeder Programmservice-Diskette enthalten. Gegen Einsendung eines mit 1,80 Mark frankierten Rückumschlages (Format DIN A4) senden wir Ihnen die Listings mit Beschreibung auch gerne zu.</p>
 
-        <address class="author">(tr)</address>
+            <address class="author">(tr)</address>
+        </aside>
 
         <div style="display: none;">
             <pre data-filename="checksummer" data-name="Checksummer"></pre>
