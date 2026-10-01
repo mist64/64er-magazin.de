@@ -113,6 +113,53 @@ is free. It is discarded and re-asked when either changes:
   improvement is silently discarded: the answers keep coming from the cache and
   the sweep looks like the rule did nothing.
 
+## WHICH MODEL — measured, not assumed
+
+`r000_llm.py` sends this step's prompt and overlay to `claude-opus-5`. A local
+model is cheaper and needs no credentials, so the substitution was measured
+rather than argued: **GLM-5.3-Flash (oQ4e, 320B/18B active, multimodal, served
+by oMLX)** was given this file's `PROMPT` *unmodified*, with the same overlay
+and digest, on 15 pages of 8611 spanning every `page_kind`, and its verdict
+diffed against the Opus verdict that shipped.
+
+| | `reasoning_effort: low` | `high` |
+|---|---|---|
+| block labels agreeing | 90.4% (639/707) | 90.7% on the 9 hardest (559/616; low scored 89.6% on the same 9) |
+| reading order identical | 12/15 pages | 7/9 pages |
+| `page_kind` identical | 11/15 pages | 6/9 pages |
+| cost | 50 s/page — **2.8 h** per 200-page issue | 183 s/page — **10.2 h** |
+
+`high` buys **+1.1 points for 3.7x the time**, and it is not an improvement so
+much as a reshuffle: it fixed p006 (9/17 -> 16/17) and p059 (30/39 -> 39/39) and
+broke p136 (113/113 -> 106/113) and p102 (63/63 -> 59/63). Neither setting is a
+substitute for Opus here.
+
+**Read the agreement number with the label taxonomy in hand.** Two thirds of the
+disagreements (49 of 68) were GLM saying `noise` where Opus said `ad`, on
+ad-heavy pages like p092 and p139. `ARTICLE_LABELS` is `{heading, body,
+listing-inline}`, so `ad` and `noise` are excluded alike: that class costs
+overlay colours and nothing else. **An agreement percentage over all labels
+measures the wrong thing.** What to measure instead, and what the harness now
+reports:
+
+- **article blocks in the truth's `order` that are missing from the
+  candidate's** — text LOST. p094 agreed on all 39 labels and dropped id35,
+  80 words of body, out of the reading order. Label agreement cannot see this.
+- **non-article blocks added to `order`** — garbage INJECTED. p075 relabelled
+  two `noise` blocks (`'e! N e! 8/2 5/64/1'`, read off a screened tint) as
+  `body`; p006 turned 8 `toc` blocks, `INHALT` and a 243-word entry list among
+  them, into `heading`/`body`.
+- **`page_kind`**, which is wrong on a third of pages at either effort and
+  drives how later steps treat the page.
+
+**So this step stays on Opus** — it is ~350 calls an issue, the CLI transport
+needs no API key, and a wrong label here is invisible until the article reads
+wrong. What the local model is worth is a **second opinion**: 2.8 h for a whole
+issue, and after filtering the `ad`/`noise` class the disagreement set was 19
+blocks over 15 pages, about **1.3 per page** — a review surface a person can
+actually look at, and one that finds the decider's slips as readily as the
+challenger's. Use it to disagree, not to decide.
+
 ## Label decides inclusion, role decides rendering
 
 Keeping those orthogonal is what lets the markdown layer sit on top without
