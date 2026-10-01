@@ -1,0 +1,32 @@
+
+
+;interface.prg ==0801==
+   10 print"{clr}{down}       ****  printer-basic  ****"
+   20 print"         interface -anpassung"
+   30 print"{down}{down}  diskette mit {rvon}printer-basic{rvof} einlegen,"
+   40 print"      schreibschutz entfernen und"
+   50 print"{down}            {rvon}return{rvof} druecken"
+   60 geta$:ifa$<>chr$(13)then60
+   65 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}              bitte warten"
+   70 open2,8,2,"printer-basic,p,r"
+   80 dimw$(1900):i=0
+   90 get#2,a$:w$(i)=a$:ifst=0theni=i+1:goto90
+  100 close2
+  110 print"{clr}{down} devicenummer  ";asc(w$(799)+chr$(0))
+  115 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a
+  120 w$(799)=chr$(a)
+  130 print"{down} filenummer    ";asc(w$(797)+chr$(0))
+  135 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a
+  140 w$(797)=chr$(a):w$(822)=w$(797)
+  150 print"{down} sekundaeradr. ";asc(w$(801)+chr$(0))
+  155 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a
+  160 w$(801)=chr$(a)
+  170 print"{down}{down} sind sie sicher (j/n) ?"
+  180 geta$:ifa$="n"then110
+  190 ifa$<>"j"then180
+  195 print"{down}{down}{down}              bitte warten"
+  200 open1,8,15,"s:printer-basic"
+  210 open2,8,2,"printer-basic,p,w"
+  220 fori=0to1900:print#2,chr$(asc(w$(i)+chr$(0)));:next
+  230 close2
+

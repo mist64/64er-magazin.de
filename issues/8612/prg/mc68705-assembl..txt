@@ -1,0 +1,819 @@
+
+
+;mc68705-assembl..prg ==0801==
+   10 data *port-a equ 0000
+   20 data *port-b equ 0001
+   30 data *port-c equ 0002
+   40 data *ddr-a equ 0004
+   50 data *ddr-b equ 0005
+   60 data *ddr-c equ 0006
+   70 data *eoi-flag equ 0011
+   80 data *dev-# equ 0012
+   90 data *sec.flag equ 0013
+  100 data *label14 equ 0014
+  110 data *cbm-flag equ 0015
+  120 data *lf-flag equ 0016
+  130 data *$22-flag equ 0017
+  140 data *crsr-flag equ 0018
+  150 data *restore equ 0019
+  160 data *dot-flag equ 001a
+  170 data *asc.flag equ 001b
+  175 data *frz-flag equ 001c
+  180 data *opcode equ 0020
+  190 data *hi-byte equ 0021
+  200 data *lo-byte equ 0022
+  210 data *label23 equ 0023
+  220 data org 07fe
+  230 data dat 04
+  240 data dat 00
+  250 data org 0784
+  260 data dat 80
+  270 data org 0080
+  280 data *get-byte lda@ 18
+  290 data *clockl bil clockl
+  300 data *lclock bil lclock
+  310 data bcl0 port-c
+  320 data *bil bil clock1h
+  330 data *deca deca
+  340 data bne bil
+  350 data lda@ 10
+  360 data bst0 port-c
+  370 data *dec deca
+  380 data bne dec
+  390 data bst7 eoi-flag
+  400 data bcl0 port-c
+  410 data *clock1h bih clock1h
+  420 data *clock1l bil clock1l
+  430 data bbc1 port-c bit-1
+  440 data *bit-1 rorx
+  450 data *clock2h bih clock2h
+  460 data *clock2l bil clock2l
+  470 data bbc1 port-c bit-2
+  480 data *bit-2 rorx
+  490 data *clock3h bih clock3h
+  500 data *clock3l bil clock3l
+  510 data bbc1 port-c bit-3
+  520 data *bit-3 rorx
+  530 data *clock4h bih clock4h
+  540 data *clock4l bil clock4l
+  550 data bbc1 port-c bit-4
+  560 data *bit-4 rorx
+  570 data *clock5h bih clock5h
+  580 data *clock5l bil clock5l
+  590 data bbc1 port-c bit-5
+  600 data *bit-5 rorx
+  610 data *clock6h bih clock6h
+  620 data *clock6l bil clock6l
+  630 data bbc1 port-c bit-6
+  640 data *bit-6 rorx
+  650 data *clock7h bih clock7h
+  660 data *clock7l bil clock7l
+  670 data bbc1 port-c bit-7
+  680 data *bit-7 rorx
+  690 data *clock8h bih clock8h
+  700 data *clock8l bil clock8l
+  710 data bbc1 port-c bit-8
+  720 data *bit-8 rorx
+  730 data *byte bih byte
+  740 data bst0 port-c
+  750 data rts
+  760 data *data jsr check
+  770 data *busy bbs0 port-a busy
+  780 data sta port-b
+  790 data bcl3 port-c
+  800 data bst3 port-c
+  810 data *jsr80 jsr get-byte
+  820 data bbs2 port-c data
+  830 data jmp test-dev
+  840 data org 0400
+  850 data lda@ 00
+  860 data sta ddr-a
+  870 data lda@ ff
+  880 data sta ddr-b
+  890 data inca
+  900 data sta port-b
+  910 data lda@ 09
+  920 data sta ddr-c
+  930 data deca
+  940 data sta port-c
+  950 data clr eoi-flag
+  960 data clr cbm-flag
+  970 data clr dot-flag
+  980 data clr lf-flag
+  990 data clr asc.flag
+  995 data clr frz-flag
+ 1000 data lda port-a
+ 1010 data eor@ ff
+ 1020 data tax
+ 1030 data asra
+ 1040 data and@ 03
+ 1050 data add@ 24
+ 1060 data sta dev-#
+ 1070 data lda@ d6
+ 1080 data sta opcode
+ 1090 data lda@ 01
+ 1100 data sta hi-byte
+ 1110 data clr lo-byte
+ 1120 data lda@ 81
+ 1130 data sta label23
+ 1140 data clc
+ 1150 data txa
+ 1160 data asla
+ 1170 data bcc test-lf
+ 1180 data bst7 dot-flag
+ 1190 data *test-lf clc
+ 1200 data asla
+ 1210 data bcc atn
+ 1220 data bst7 lf-flag
+ 1230 data *atn bbs2 port-c atn
+ 1240 data *clock bih clock
+ 1250 data clr sec.flag
+ 1260 data clr $22-flag
+ 1270 data clr crsr-flag
+ 1280 data clr restore
+ 1290 data clr asc.flag
+ 1300 data bst0 port-c
+ 1310 data jsr get-byte
+ 1320 data *test-dev cpx dev-#
+ 1330 data beq plus13
+ 1340 data *unlist cpx@ 3f
+ 1350 data bne atn2
+ 1360 data *datal bra release
+ 1370 data *atn2 bbc7 eoi-flag slr
+ 1380 data *release lda@ 0e
+ 1390 data bst0 port-c
+ 1400 data *tfr deca
+ 1410 data bne tfr
+ 1420 data bcl7 eoi-flag
+ 1430 data *slr bcl0 port-c
+ 1440 data *wait bbc2 port-c wait
+ 1450 data bra atn
+ 1460 data *plus13 jsr get-byte
+ 1470 data bbc2 port-c sec.adr.
+ 1480 data jmp data
+ 1490 data *sec.adr. cpx@ 3f
+ 1500 data beq release
+ 1502 data bbs7 frz-flag store
+ 1510 data txa
+ 1520 data and@ 0f
+ 1530 data cmp@ 0e
+ 1540 data bhs autofeed
+ 1550 data cmp@ 01
+ 1560 data beq truth
+ 1570 data cmp@ 02
+ 1580 data beq ascii
+ 1582 data cmp@ 03
+ 1584 data beq freeze
+ 1590 data cmp@ 05
+ 1600 data beq truth
+ 1610 data cmp@ 06
+ 1620 data beq truth
+ 1630 data cmp@ 07
+ 1640 data beq busin
+ 1650 data *clr.sec. bcl7 sec.flag
+ 1660 data *store jmp jsr80
+ 1670 data *autofeed cmp@ 0f
+ 1680 data bne off
+ 1690 data bst7 lf-flag
+ 1700 data bra store
+ 1703 data *freeze bst7 frz-flag
+ 1706 data bra store
+ 1710 data *off bcl7 lf-flag
+ 1720 data bra store
+ 1730 data *truth bst7 cbm-flag
+ 1740 data bcl7 sec.flag
+ 1750 data bra store
+ 1760 data *busin bst7 sec.flag
+ 1770 data bst7 restore
+ 1780 data bra store
+ 1790 data *ascii bcl7 sec.flag
+ 1800 data bcl7 restore
+ 1810 data bst7 asc.flag
+ 1820 data bra store
+ 1830 data *check txa
+ 1840 data bbc7 cbm-flag check-2
+ 1850 data cmp@ 0d
+ 1860 data bne print
+ 1870 data bbc7 lf-flag print
+ 1880 data jsr out
+ 1890 data lda@ 0a
+ 1900 data *print rts
+ 1910 data *check-2 bbs7 asc.flag ascii-1
+ 1920 data cmp@ 22
+ 1930 data bne verder
+ 1940 data inc $22-flag
+ 1950 data *verder and@ 7f
+ 1960 data cmp@ 1f
+ 1970 data bls codes
+ 1980 data txa
+ 1990 data bbs7 sec.flag transl.
+ 2000 data cmp@ 5b
+ 2010 data bhs graphic
+ 2020 data rts
+ 2030 data *ascii-1 jmp ascii-2
+ 2040 data *graphic cmp@ 60
+ 2050 data bhs bit-8h
+ 2060 data lda@ 03
+ 2070 data sta hi-byte
+ 2080 data lda@ 40
+ 2090 data sta lo-byte
+ 2100 data txa
+ 2110 data sub@ 5b
+ 2120 data sta label14
+ 2130 data asla
+ 2140 data asla
+ 2150 data add label14
+ 2160 data add label14
+ 2170 data add lo-byte
+ 2180 data sta lo-byte
+ 2190 data jmp bit-imm.
+ 2200 data *bit-8h cmp@ 9f
+ 2210 data bhi m.adr.
+ 2220 data add@ 60
+ 2230 data tax
+ 2240 data *m.adr. clr lo-byte
+ 2250 data lda@ 01
+ 2260 data sta hi-byte
+ 2270 data jsr multiply
+ 2280 data jmp bit-imm.
+ 2290 data *codes jmp codes-1
+ 2300 data *transl. jmp business
+ 2310 data *multiply txa
+ 2320 data sub@ a0
+ 2330 data sta label14
+ 2340 data *multi clc
+ 2350 data asla
+ 2360 data bcc multi-4
+ 2370 data inc hi-byte
+ 2380 data clc
+ 2390 data *multi-4 asla
+ 2400 data bcc multi-5
+ 2410 data inc hi-byte
+ 2420 data clc
+ 2430 data *multi-5 adc label14
+ 2440 data bcc sum
+ 2450 data inc hi-byte
+ 2460 data clc
+ 2470 data *sum adc label14
+ 2480 data bcc result
+ 2490 data inc hi-byte
+ 2500 data clc
+ 2510 data *result sta lo-byte
+ 2520 data rts
+ 2530 data *bit-imm. jsr dottest
+ 2540 data *nxt jsr opcode
+ 2550 data jsr out
+ 2560 data incx
+ 2570 data cpx@ 06
+ 2580 data bne nxt
+ 2590 data clra
+ 2600 data *return rsp
+ 2610 data jmp jsr80
+ 2620 data *out bbs0 port-a out
+ 2630 data sta port-b
+ 2640 data bcl3 port-c
+ 2650 data bst3 port-c
+ 2660 data rts
+ 2670 data *business cmp@ 5b
+ 2680 data bhs upper-1
+ 2690 data cmp@ 41
+ 2700 data bhs lower
+ 2710 data rts
+ 2720 data *lower ora@ 20
+ 2730 data rts
+ 2740 data *upper-1 cmp@ 61
+ 2750 data bhs upper-2
+ 2760 data sub@ 5b
+ 2770 data sta label14
+ 2780 data lda@ 03
+ 2790 data sta hi-byte
+ 2800 data lda label14
+ 2810 data jsr multi
+ 2820 data add@ 40
+ 2830 data sta lo-byte
+ 2840 data jmp bit-imm.
+ 2850 data *upper-2 cmp@ 7b
+ 2860 data bhs graph-2
+ 2870 data and@ 5f
+ 2880 data rts
+ 2890 data *graph-2 cmp@ 80
+ 2900 data bhs kar-a9
+ 2910 data sub@ 7b
+ 2920 data *graph-3 sta label14
+ 2930 data lda@ 03
+ 2940 data sta hi-byte
+ 2950 data lda label14
+ 2960 data jsr multi
+ 2970 data add@ 64
+ 2980 data sta lo-byte
+ 2990 data jmp bit-imm.
+ 3000 data *kar-a9 cmp@ a9
+ 3010 data bne kar-ba
+ 3020 data lda@ 03
+ 3030 data sta hi-byte
+ 3040 data lda@ 82
+ 3050 data sta lo-byte
+ 3060 data jmp bit-imm.
+ 3070 data *kar-ba cmp@ ba
+ 3080 data bne kar-ff
+ 3090 data lda@ 03
+ 3100 data sta hi-byte
+ 3110 data lda@ 88
+ 3120 data sta lo-byte
+ 3130 data jmp bit-imm.
+ 3140 data *kar-ff cmp@ ff
+ 3150 data bne kar-c0
+ 3160 data lda@ 03
+ 3170 data sta hi-byte
+ 3180 data lda@ 76
+ 3190 data sta lo-byte
+ 3200 data jmp bit-imm.
+ 3210 data *kar-c0 cmp@ c0
+ 3220 data bne graph-4
+ 3230 data lda@ 03
+ 3240 data sta hi-byte
+ 3250 data lda@ 5e
+ 3260 data sta lo-byte
+ 3270 data jmp bit-imm.
+ 3280 data *graph-4 cmp@ e0
+ 3290 data bhs graph-5
+ 3300 data cmp@ c1
+ 3310 data bhs upper-3
+ 3320 data jmp m.adr.
+ 3330 data *graph-5 and@ bf
+ 3340 data jmp kar-a9
+ 3350 data *upper-3 cmp@ db
+ 3360 data bhs graph-6
+ 3370 data and@ 7f
+ 3380 data rts
+ 3390 data *graph-6 sub@ db
+ 3400 data jmp graph-3
+ 3410 data *codes-1 txa
+ 3420 data cmp@ 0d
+ 3430 data bne codes-2
+ 3440 data bbc7 crsr-flag cr-1
+ 3450 data lda restore
+ 3460 data sta sec.flag
+ 3470 data clr crsr-flag
+ 3480 data *cr-1 bbs7 lf-flag lf
+ 3490 data clr $22-flag
+ 3500 data rts
+ 3510 data *lf jsr out
+ 3520 data clr $22-flag
+ 3530 data lda@ 0a
+ 3540 data rts
+ 3550 data *codes-2 cmp@ 11
+ 3560 data beq codes-3
+ 3570 data cmp@ 91
+ 3580 data beq codes-4
+ 3590 data cmp@ 12
+ 3600 data beq codes-5
+ 3610 data cmp@ 13
+ 3620 data beq codes-6
+ 3630 data cmp@ 0e
+ 3640 data beq codes-7
+ 3650 data cmp@ 0f
+ 3660 data beq codes-8
+ 3670 data bne codes-9
+ 3680 data *codes-3 bbs0 $22-flag print-d
+ 3690 data bst7 sec.flag
+ 3700 data bst7 crsr-flag
+ 3710 data jmp return
+ 3720 data *codes-4 bbs0 $22-flag codes-9
+ 3730 data bcl7 sec.flag
+ 3740 data bst7 crsr-flag
+ 3750 data jmp return
+ 3760 data *codes-5 bbs0 $22-flag print-r
+ 3770 data jmp return
+ 3780 data *codes-6 bbs0 $22-flag print-s
+ 3790 data jmp return
+ 3800 data *print-d lda@ 8e
+ 3810 data sta lo-byte
+ 3820 data *pr-code lda@ 03
+ 3830 data sta hi-byte
+ 3840 data jmp bit-imm.
+ 3850 data *print-r lda@ 94
+ 3860 data sta lo-byte
+ 3870 data bra pr-code
+ 3880 data *print-s lda@ 9a
+ 3890 data sta lo-byte
+ 3900 data bra pr-code
+ 3910 data *codes-7 bbs0 $22-flag codes-9
+ 3920 data lda@ 1b
+ 3930 data jsr out
+ 3940 data lda@ 57
+ 3950 data jsr out
+ 3960 data lda@ 01
+ 3970 data jsr out
+ 3980 data jmp return
+ 3990 data *codes-8 bbs0 $22-flag codes-9
+ 4000 data lda@ 1b
+ 4010 data jsr out
+ 4020 data lda@ 57
+ 4030 data jsr out
+ 4040 data lda@ 00
+ 4050 data jsr out
+ 4060 data jmp return
+ 4070 data *codes-9 bbs0 $22-flag end
+ 4080 data cmp@ 10
+ 4090 data beq chr$16
+ 4100 data cmp@ 08
+ 4110 data beq chr$26
+ 4120 data rts
+ 4130 data *chr$26 jsr get-byte
+ 4140 data txa
+ 4150 data cmp@ 1a
+ 4160 data beq repead
+ 4170 data rts
+ 4180 data *repead jmp rep-char.
+ 4190 data *chr$16 jmp set-tap
+ 4200 data *end add@ 40
+ 4210 data tax
+ 4220 data cmp@ 45
+ 4230 data bne hoger-1
+ 4240 data lda@ a0
+ 4250 data sta lo-byte
+ 4260 data lda@ 03
+ 4270 data sta hi-byte
+ 4280 data jmp bit-imm.
+ 4290 data *hoger-1 cmp@ 80
+ 4300 data bhs hoger-2
+ 4310 data lda@ 03
+ 4320 data sta hi-byte
+ 4330 data txa
+ 4340 data sub@ 5b
+ 4350 data sta label14
+ 4360 data jsr multi
+ 4370 data add@ 40
+ 4380 data sta lo-byte
+ 4390 data jmp bit-rev.
+ 4400 data *hoger-2 clr lo-byte
+ 4410 data lda@ 01
+ 4420 data sta hi-byte
+ 4430 data jsr multiply
+ 4440 data *bit-rev. jsr dottest
+ 4450 data *go-on jsr opcode
+ 4460 data eor@ fe
+ 4470 data jsr out
+ 4480 data incx
+ 4490 data cpx@ 06
+ 4500 data bne go-on
+ 4510 data clra
+ 4520 data rsp
+ 4530 data jmp jsr80
+ 4540 data *dottest bbs7 dot-flag ibm
+ 4550 data lda@ 1b
+ 4560 data jsr out
+ 4570 data lda@ 4b
+ 4580 data jsr out
+ 4590 data lda@ 06
+ 4600 data jsr out
+ 4610 data clrx
+ 4620 data clra
+ 4630 data jsr out
+ 4640 data rts
+ 4650 data *ibm lda@ 1b
+ 4660 data jsr out
+ 4670 data lda@ 2a
+ 4680 data jsr out
+ 4690 data lda@ 00
+ 4700 data jsr out
+ 4710 data lda@ 06
+ 4720 data jsr out
+ 4730 data clrx
+ 4740 data clra
+ 4750 data jsr out
+ 4760 data rts
+ 4770 data org 03a8
+ 4780 data *set-tap lda@ 1b
+ 4790 data jsr out
+ 4800 data lda@ 44
+ 4810 data jsr out
+ 4820 data jsr get-byte
+ 4830 data txa
+ 4840 data and@ 0f
+ 4850 data asla
+ 4860 data sta label14
+ 4870 data asla
+ 4880 data asla
+ 4890 data add label14
+ 4900 data sta label14
+ 4910 data jsr get-byte
+ 4920 data txa
+ 4930 data and@ 0f
+ 4940 data add label14
+ 4950 data jsr out
+ 4960 data lda@ 00
+ 4970 data jsr out
+ 4980 data lda@ 09
+ 4990 data jsr out
+ 5000 data jmp return
+ 5010 data org 03d8
+ 5020 data *ascii-2 cmp@ 9f
+ 5023 data bls cmp-0d
+ 5026 data and@ 7f
+ 5030 data *cmp-0d cmp@ 0d
+ 5040 data beq asc-lf
+ 5050 data cmp@ 60
+ 5060 data bhs asc.low
+ 5070 data cmp@ 40
+ 5080 data bhs asc.up
+ 5090 data *printen rts
+ 5100 data *asc.low and@ 5f
+ 5110 data bra printen
+ 5120 data *asc.up ora@ 20
+ 5130 data bra printen
+ 5140 data *asc-lf bbc7 lf-flag printen
+ 5150 data jsr out
+ 5160 data lda@ 0a
+ 5170 data rts
+ 5180 data org 0738
+ 5190 data *rep-char. lda@ 1b
+ 5200 data jsr out
+ 5210 data bbs7 dot-flag ibm-2
+ 5220 data lda@ 4b
+ 5230 data jsr out
+ 5240 data bra rep-2
+ 5250 data *ibm-2 lda@ 2a
+ 5260 data jsr out
+ 5270 data lda@ 00
+ 5280 data jsr out
+ 5290 data *rep-2 jsr get-byte
+ 5300 data txa
+ 5310 data sta label14
+ 5320 data jsr out
+ 5330 data lda@ 00
+ 5340 data jsr out
+ 5350 data jsr get-byte
+ 5360 data txa
+ 5370 data ldx label14
+ 5380 data *rep-3 jsr out
+ 5390 data decx
+ 5400 data bne rep-3
+ 5410 data jmp return
+ 5420 rem 550 statements - 148 labels
+10000 print"{clr}":print"assembler for motorola mc68705":print
+10010 open4,4:poke56,144:clr
+10020 print"even geduld a.u.b.":print
+10030 for cl=36864 to 38912:pokecl,0:next
+10040 poke38910,4:poke38788,128
+10050 print"base adress of ass. code buffer $9000":p=36864:print
+10060 input"how many lines to be assembled";d:print
+10070 input"how many labels are used";c:print:print
+10080 diml$(c),a(c):z=1
+10090 print"first pass running":print:print
+10100 k=0:q=0
+10110 for x=1 to d:printx;
+10120 if z=3 then print#4,x;
+10130 gosub 12250
+10140 goto 10240
+10150 gosub 12450
+10160 next x
+10170 z=z+1
+10180 if z=4 then 10210
+10190 if z=3 then print"print-out":print:print:restore:goto10100
+10200 print"secund pass running":print:print:restore:goto 10100
+10210 print:print:print"assembly complete":print#4:print#4:print#4,"assembly complete"
+10220 print#4:print#4
+10230 close 4:end
+10240 read s$:p$=s$
+10250 if left$(s$,1)="*" then gosub 10930
+10260 m$=left$(s$,3):s$=right$(s$,(len(s$)-3))
+10270 if m$="adc" then b=169:goto 11050
+10280 if m$="add" then b=171:goto 11050
+10290 if m$="and" then b=164:goto 11050
+10300 if m$="asl" then b=56:goto 10990
+10310 if m$="asr" then b=55:goto 10990
+10320 if m$="bcc" then o=36:goto 11450
+10330 if m$="bcl" then b=17:goto 11610
+10340 if m$="bcs" then o=37:goto 11450
+10350 if m$="beq" then o=39:goto 11450
+10360 if m$="bhc" then o=40:goto 11450
+10370 if m$="bhf" then o=41:goto 11450
+10380 if m$="bhi" then o=34:goto 11450
+10390 if m$="bhs" then o=36:goto 11450
+10400 if m$="bih" then o=47:goto 11450
+10410 if m$="bil" then o=46:goto 11450
+10420 if m$="bit" then b=165:goto 11050
+10430 if m$="blo" then o=37:goto 11450
+10440 if m$="bls" then o=35:goto 11450
+10450 if m$="bmc" then o=44:goto 11450
+10460 if m$="bmi" then o=43:goto 11450
+10470 if m$="bms" then o=45:goto 11450
+10480 if m$="bne" then o=38:goto 11450
+10490 if m$="bpl" then o=42:goto 11450
+10500 if m$="bra" then o=32:goto 11450
+10510 if m$="brn" then o=33:goto 11450
+10520 if m$="bbc" then b=1:goto 11720
+10530 if m$="bbs" then b=0:goto 11720
+10540 if m$="bst" then b=16:goto 11610
+10550 if m$="bsr" then o=173:goto 11450
+10560 if m$="clc" then o=152:goto 11780
+10570 if m$="cli" then o=154:goto 11780
+10580 if m$="clr" then b=63:goto 10990
+10590 if m$="cmp" then b=161:goto 11050
+10600 if m$="com" then b=51:goto 10990
+10610 if m$="cpx" then b=163:goto 11050
+10620 if m$="dat" then 12060
+10630 if m$="dec" then b=58:goto10990
+10640 if m$="eor" then b=168:goto11050
+10650 if m$="equ" then 12160
+10660 if m$="inc" then b=60:goto10990
+10670 if m$="jmp" then b=172:goto11050
+10680 if m$="jsr" then b=173:goto11050
+10690 if m$="lda" then b=166:goto11050
+10700 if m$="ldx" then b=174:goto11050
+10710 if m$="lsl" then b=56:goto10990
+10720 if m$="lsr" then b=52:goto10990
+10730 if m$="neg" then b=48:goto10990
+10740 if m$="nop" then o=157:goto11780
+10750 if m$="ora" then b=170:goto11050
+10760 if m$="org" then 12090
+10770 if m$="rol" then b=57:goto10990
+10780 if m$="ror" then b=54:goto10990
+10790 if m$="rsp" then o=156:goto11780
+10800 if m$="rti" then o=128:goto11780
+10810 if m$="rts" then o=129:goto11780
+10820 if m$="sbc" then b=162:goto11050
+10830 if m$="sec" then o=153:goto11780
+10840 if m$="sei" then o=155:goto11780
+10850 if m$="sta" then b=167:goto11050
+10860 if m$="stx" then b=175:goto11050
+10870 if m$="sub" then b=160:goto11050
+10880 if m$="swi" then o=130:goto11780
+10890 if m$="tax" then o=151:goto11780
+10900 if m$="tst" then b=61:goto10990
+10910 if m$="txa" then o=159:goto11780
+10920 print"mnemonic error in line ";x:close4:end
+10930 l$=mid$(s$,2,1):s$=right$(s$,(len(s$)-2))
+10940 if left$(s$,1)=" " then 10970
+10950 l$=l$+left$(s$,1):gosub 12230
+10960 goto 10940
+10970 gosub 12230:k=k+1:l$(k)=l$
+10980 a(k)=q:return
+10990 t=1:m$=left$(s$,1):gosub 12230
+11000 if m$=" " then m=0:goto11140
+11010 if m$="a" then m=1:goto 11100
+11020 if m$="x" then m=2:goto 11100
+11030 if m$="(" then m=3:goto 11120
+11040 print"adress mode error in line ";x:close4:end
+11050 t=2:m$=left$(s$,1):gosub 12230
+11060 if m$="@" then m=0:goto 11350
+11070 if m$=" " then m=2:goto 11140
+11080 if m$="(" then m=3:goto 11120
+11090 goto 11040
+11100 gosub 11800
+11110 goto 10150
+11120 m$=left$(s$,1)
+11130 if m$=")" then 11210
+11140 gosub 11910
+11150 if f=0 then 11250
+11160 if t=2 then 11300
+11170 ifh>0thenprint"read/modefy/write to page zero only - error in line ";x:close4:end
+11180 gosub 11800
+11190 gosub 11880
+11200 goto 10150
+11210 if t=2 then m=5:goto 11230
+11220 m=4
+11230 gosub 11800
+11240 goto 10150
+11250 if z=2 then print"undefined label in line ";x:close4:end
+11260 if t=1 then 11180
+11270 gosub 11800
+11280 gosub 11840
+11290 goto 10150
+11300 if a(y)>q then 11270
+11310 if h>0 then 11270
+11320 if m=2 then m=1:goto 11340
+11330 m=4
+11340 goto 11180
+11350 gosub 12230
+11360 gosub 11380
+11370 goto 11180
+11380 m$=left$(s$,1)
+11390 if asc(m$)<71 and asc(m$)> 64 then l=(asc(m$)-55)*16:goto 11410
+11400 l=(asc(m$)-48)*16
+11410 m$=mid$(s$,2,1)
+11420 if asc(m$)<71 and asc(m$)>64 then l=l+asc(m$)-55:goto 11440
+11430 l=l+asc(m$)-48
+11440 return
+11450 gosub 11810
+11460 gosub 12230
+11470 gosub 11910
+11480 if f=0 then 11560
+11490 if a(y)>q+1 then 11530
+11500 if (q+1)-a(y)>128 then print"branch out of range in line ";x:close4:end
+11510 l=256-((q+1)-a(y))
+11520 goto 11580
+11530 if a(y)-(q+1)>127 then print"branch out of range in line ";x:close4:end
+11540 l=a(y)-(q+1)
+11550 goto 11580
+11560 if z=2 then print"undefined label in line ";x-1:close4:end
+11570 l=0
+11580 if o<16 then return
+11590 gosub 11880
+11600 goto 10150
+11610 m$=left$(s$,1):gosub 12230
+11620 if val(m$)<0 or val(m$)>7 then print"bit number error in line ";x:close4:end
+11630 m=val(m$)
+11640 gosub 12230:gosub 11910
+11650 if f=0 then print"undefined label in line ";x:close4:end
+11660 if a(y)>127thenprint"target byte not in ram - error in line ";x:close4:end
+11670 o=b+(2*m)
+11680 gosub 11810
+11690 if b<16 then return
+11700 gosub 11880
+11710 goto 10150
+11720 gosub 11610
+11730 j=l
+11740 gosub 11470
+11750 h=j
+11760 gosub 11840
+11770 goto 10150
+11780 gosub 11810
+11790 goto 10150
+11800 o=b+(16*m)
+11810 poke(p+q),o:q=q+1
+11820 gosub 12300
+11830 return
+11840 poke(p+q),h:q=q+1
+11850 gosub 12350
+11860 if b=0 or b=1 then l=l-1
+11870 if l<0 then l=0
+11880 poke(p+q),l:q=q+1
+11890 gosub 12400
+11900 return
+11910 l$=""
+11920 if len(s$)=0 then 11960
+11930 l$=l$+left$(s$,1):gosub 12230
+11940 ifright$(l$,1)=")"orright$(l$,1)=" "thenl$=left$(l$,(len(l$)-1)):goto11960
+11950 goto 11920
+11960 y=0
+11970 y=y+1
+11980 if y>k then 12030
+11990 if l$=l$(y) then 12020
+12000 goto 11970
+12010 f=0:h=255:l=255:return
+12020 f=1:h=int(a(y)/256):l=a(y)-(h*256):return
+12030 if z=1 then 12010
+12040 if y>c then 12010
+12050 goto 11990
+12060 gosub 12230
+12070 gosub 11380
+12080 gosub 11880:goto 10150
+12090 gosub 12230
+12100 gosub 11380
+12110 h=l
+12120 s$=right$(s$,(len(s$)-2))
+12130 gosub 11380
+12140 q=l+(256*h)
+12150 goto 10150
+12160 gosub 12230
+12170 gosub 11380
+12180 a(k)=256*l
+12190 s$=right$(s$,(len(s$)-2))
+12200 gosub 11380
+12210 a(k)=a(k)+l
+12220 goto 10150
+12230 s$=right$(s$,(len(s$)-1))
+12240 return
+12250 if z<3 then return
+12260 r=q:e=3
+12270 gosub 12560
+12280 print#4,tab(6) r$;
+12290 return
+12300 if z<3 then return
+12310 r=o:e=2
+12320 gosub 12560
+12330 print#4,tab(11)r$;
+12340 return
+12350 if z<3 then return
+12360 r=h:e=2
+12370 gosub 12560
+12380 print#4,tab(14)r$;
+12390 return
+12400 if z<3 then return
+12410 r=l:e=2
+12420 gosub 12560
+12430 print#4,tab(17)r$;
+12440 return
+12450 if z<3 then return
+12460 hp$=""
+12470 if left$(p$,1)="*" then 12490
+12480 goto 12530
+12490 hp$=hp$+(left$(p$,1))
+12500 p$=right$(p$,(len(p$)-1))
+12510 if left$(p$,1)<>" " then 12490
+12520 print#4,tab(21)hp$;tab(32)p$:goto 12540
+12530 print#4,tab(33)p$
+12540 :
+12550 return
+12560 r$=""
+12570 for y=e to 1 step-1
+12580 i=int(r/16^(y-1))):r=r-(i*(16^(y-1)))
+12590 if i>9 then i$=chr$(i+55):goto 12610
+12600 i$=chr$(i+48)
+12610 r$=r$+i$
+12620 next y
+12630 return
+

@@ -1,0 +1,45 @@
+
+
+;g.h.1520.prg ==0801==
+  100 a=a+1
+  110 if a=1 then load "copy 1520",8,1
+  200 if a=3 then 400
+  250 open3,6,3:print#3,1:close3
+  300 print"{clr}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}giga-cad hardcopy"
+  310 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}==================="
+  320 print"{down}{rght}{rght}druckertyp: 1520 plotter"
+  330 print"{down}{rght}{rght}hardcopy routine : 'copy 1520'"
+  340 print"{rght}{rght}                    aus 64'er sh. 4/85"
+  350 input"{down}{down}{rght}{rght}name der graphik  : ";n$
+  360 input"{down}{rght}{rght}farbe der graphik (0-3): ";c
+  370 print"{down}{down}{rght}{rght}aufloesung :           1 = normal"
+  380 print"{down}{rght}{rght}                       4 = vierfach"
+  390 print"{down}{rght}{rght}                      10 = zehnfach"
+  391 input"{down}{rght}{rght}welche aufloesung :   1{left}{left}{left}";d: b=-1
+  392 ifd<>1andd<>4andd<>10thengoto391
+  393 ifd=4thenn$="hv."+n$
+  394 ifd=10thenn$="hz."+n$
+  395 print"{clr}"
+  400 if d=4 or d=10 then 500
+  420 if a=2 then gosub 780
+  430 gosub 700
+  440 gosub 750
+  450 goto  800
+  500 if a=2 then b=b+2 : gosub 790
+  510 gosub 700
+  520 a=2
+  530 if b=d or b=d-1 then gosub 750
+  540 if b=d then goto 800
+  550 if b=d-1 then b=0
+  560 goto 500
+  700 poke 3399,32: poke 3392,0: poke 1000,0:poke 1001,3andc
+  710 print"{down}{rght}{rght}printing : ";n$:poke780,1:sys 3328
+  720 open1,6,1:print#1,"m",0,-180:close1
+  730 open1,6:print#1,"":close1:return
+  750 open1,6:print#1,"":print#1,"":print#1,"":close1:return
+  780 print"{down}{rght}{rght}loading  : ";n$:load n$,8,1
+  790 print"{down}{rght}{rght}loading  : ";n$+str$(b):load n$+str$(b),8,1
+  800 input"{down}{rght}{rght}nochmal (j/n)? :   n{left}{left}{left}";ea$
+  810 ifea$="j"thena=1:goto100
+  820 end
+

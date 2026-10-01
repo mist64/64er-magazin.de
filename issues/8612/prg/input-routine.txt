@@ -1,0 +1,73 @@
+;input-routine.prg ==1c01==
+;version=70
+    1 rem  -------------------------------------------
+    2 rem  -       c u r s o r  -  g e t             -
+    3 rem  -------------------------------------------
+    4 rem  -                 v o n                   -
+    5 rem  -       j u e r g e n   r i e h n         -
+    6 rem  -       g a r l e s s t r .   2 2         -
+    7 rem  -        8 6 7 7   s e l b i t z          -
+    8 rem  -         0 9 2 8 0  /  1 0 6 3           -
+    9 rem  -------------------------------------------
+10000 rem beispielanwendung
+10001 fast:scnclr:rem bildschirm loeschen
+10002 in$="":rem uebergabeinhalt
+10003 cs=45:cz=15:rem spalte,zeile
+10004 :        mn=1:rem nur nummerische      eingabe
+10005 rem      mn=2     nur alphanummerische eingabe
+10006 rem      mn=3     nur erlaubte zeichen
+10022 il=5:rem laenge=5
+10024 ez$="1290":rem erlaubte zeicheh bei mn=3
+10025 :
+10030 gosub35000:rem  cursorget-routine aufrufen
+10040 print:printin$
+10050 end
+10060 ...
+10070 ...
+10080 ...
+35000 :
+35005 rem eingabe
+35010 :
+35011 fori=1toil
+35012 : if mid$(in$,i,1)=" "thenmid$(in$,i,1)="{CBM-@}"
+35013 next
+35014 in$=left$(in$+"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}",il)
+35020 la=1:il=il+1
+35060 gosub37800:getkeyg$
+35080 g=asc(g$):ifg=13then35400:rem return
+35100 ifg=20andla>1then:goto36700:rem delete
+35140 ifg=148thengoto37100:rem insert
+35160 ifg=29andla<il-1thenla=la+1:goto35060:rem cursor right
+35180 ifg=157andla>1thenla=la-1:goto35060:rem cursor left
+35200 onmngoto35220,35300,35350:rem nummerisch/alphanumerisch/erlaubte zeichen
+35220 ifg>47andg<58andla<ilorg=45andla<ilorg=46andla<ilthengosub36000:goto35060:elseprintchr$(7);:goto35060
+35300 ifg>47andg<58andla<ilthengosub36000:goto35060
+35305 ifg<43or(g>57andg<65)or(g>90andg<193)org>218thenprintchr$(7);:goto35060
+35320 if la<ilthengosub36000:goto35060:elseprintchr$(7);:goto35060
+35350 ifinstr(ez$,g$)=0thenprintchr$(7);:goto35060:elsegosub36000:goto35060
+35400 rem ende des unterprogrammes
+35660 gosub37900:rem blinken einstellen
+35670 if instr(in$,"{CBM-@}")=0thenreturn
+35680 fori=1toil-1
+35690 : if mid$(in$,i,1)="{CBM-@}"thenmid$(in$,i,1)=" "
+35700 next
+35710 return
+36000 rem 1 erlaubtes zeichen eingegeben
+36050 mid$(in$,la,1)=g$
+36055 ifla<il-1thenla=la+1
+36060 return
+36700 rem delete
+36730 in$=left$(in$,la-2)+right$(in$,il-la)+"{CBM-@}"
+36740 la=la-1
+36770 goto35060
+37100 rem insert
+37130 in$=left$(in$,la-1)+"{CBM-@}"+right$(in$,il-la):in$=left$(in$,il-1)
+37170 goto35060
+37800 rem cursor position
+37850 printchr$(143);:sys dec("cc6c"),,cz-1,cs-1:printin$
+37860 printchr$(15);:sys dec("cc6c"),,cz-1,cs-2+la:printmid$(in$,la,1);
+37870 return
+37900 rem cursor ende
+37950 printchr$(143);:sys dec("cc6c"),,cz-1,cs-1:printin$
+37970 return
+

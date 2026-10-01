@@ -1,0 +1,79 @@
+
+
+;skaltrans (allg).prg ==0801==
+   10 rem ********* transformationen test ************
+   15 a=0:b=0:c=0:d=0:i=0:j=0:k=0:l=0:xu=0:xo=64:yu=0:yo=40:a$=""
+   20 dim p(2,6,3),m(1,3,3)
+   25 rem -------- belegen der punktematrix ---------
+   30 data 0,0,15,0,15,9,7.5,13,0,9
+   35 for i=1 to 5
+   40 :forj=1to2
+   45 ::read p(0,i,j)
+   50 :nextj
+   55 :p(0,i,3)=1
+   60 nexti
+   65 p(0,6,1)=p(0,1,1):p(0,6,2)=p(0,1,2):p(0,6,3)=p(0,1,3)
+   70 rem -------- belegen der matrix m(1,..) -------
+   75 m(1,1,1)=319/(xo-xu):m(1,2,2)=-199/(yo-yu):m(1,3,3)=1
+   80 fori=1to3
+   85 :forj=1to3
+   90 ::ifi=jthen100
+   95 ::m(1,i,j)=0
+  100 :nextj
+  105 nexti
+  110 m(1,3,2)=199
+  200 rem ------- hauptprogramm - skaltrans ------
+  205 rem --- belegen von m(0,...) --------
+  210 for i = 1 to 3
+  215 :for j = 1 to 3
+  220 ::m(0,i,j)=0
+  225 :next j
+  230 next i
+  235 m(0,1,1)=0.1:m(0,2,2)=0.1:m(0,3,3)=1
+  240 gosub655
+  245 rem --- zentrale schleife -----------
+  250 for l = 1 to 10
+  255 :m(0,1,1)=m(0,1,1)+.1:m(0,2,2)=m(0,2,2)+.1
+  260 :b=0:a=1:d=0:gosub550
+  265 :b=1:a=2:d=1:gosub550
+  270 :gosub630
+  275 next l
+  280 gosub670
+  285 end
+  500 rem +++++++++++ up matrimult +++++++++++++
+  505 rem eine 3,3-matrix m und eine 6,3-matrix
+  510 rem p werden miteinander multipliziert.
+  515 rem i,j,k = schleifenvariable
+  520 rem c     = zwischenwert
+  525 rem a und b nummer der 6,3-matrix p:
+  530 rem  b     = ausgangsmatrix
+  535 rem  a     = ergebnismatrix
+  540 rem d ist die nummer der 3,3-matrix m
+  545 rem ++++++++++++++++++++++++++++++++++++++
+  550 fori=1to6
+  555 :forj=1to3
+  560 ::c=0
+  565 ::fork=1to3
+  570 :::c=c+p(b,i,k)*m(d,k,j)
+  575 ::nextk:p(a,i,j)=c
+  580 :nextj
+  585 nexti
+  590 return
+  600 rem ++++++++ up zeichnen (allg) +++
+  605 rem i  = schleifenvariable
+  610 rem a$ = variable fuer tastendruck
+  615 rem p ist die 6,3-punktematrix
+  620 rem  a ist die nummer dieser matrix
+  625 rem +++++++++++++++++++++++++++++++
+  630 fori=1to5
+  635 :linie(p(a,i,1),p(a,i,2),p(a,i+1,1),p(a,i+1,2))
+  640 nexti
+  645 return
+  650 rem --- grafik einschalten --------
+  655 init:start
+  660 return
+  665 rem --- grafik ausschalten --------
+  670 show
+  675 normal
+  680 return
+

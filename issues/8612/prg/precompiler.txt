@@ -1,0 +1,324 @@
+
+
+;precompiler.prg ==0801==
+    1 poke2053,143:load"precompiler.h",8,1
+   10 rem ********************************
+   20 rem *                              *
+   30 rem * programm: basic-precompiler  *
+   40 rem * autor   : hoang-thai nguyen  *
+   50 rem * adresse : hans-a-kampmann 12 *
+   60 rem *           3418 uslar 1       *
+   80 rem *                              *
+   90 rem ********************************
+  100 :
+  110 rem *****************************
+  120 rem variablen & arrays definieren
+  130 rem *****************************
+  140 :
+  150 clr:wo=49183:li=49286:de=49444
+  160 pm%=500:cm%=100:lm%=100:mm%=100
+  170 dimp$(pm%),cs%(cm%),lt$(lm%),lt%(lm%),m$(1,mm%)
+  180 :
+  190 rem *************
+  200 rem hauptprogramm
+  210 rem *************
+  220 :
+  230 poke53280,6:poke53281,14:poke646,0:rem farben setzen
+  240 print"{clr}{down}basic-precompiler":rem titel ausgeben
+  250 print"written by hoang-thai nguyen{down}"
+  260 :
+  270 input"file-name: ";w$:print:rem file-name abfragen
+  280 ifw$="*"thenend:rem programmende
+  290 :
+  300 input"number of first line: ";f%:rem 1.zeilennr abfragen
+  310 iff%<0orlen(w$)>16then240:rem abfragen wiederholen
+  320 :
+  330 rem ********************
+  340 rem parameter einstellen
+  350 rem ********************
+  360 :
+  370 rem wenn ascii, dann 76, sonst (bsc) 32 in 49520 schreiben
+  380 poke49520,76:rem ( bei textomat )
+  390 rem ascii-kode der leerzeichen
+  400 poke49544,32:rem blank-kode
+  410 poke49545,160:rem shift-blank-kode
+  420 poke49546,164:rem "{CBM-@}"-kode ( bei textomat )
+  430 rem ascii-kode des endzeichen einer zeile
+  440 poke49340,95:rem "_"-kode ( bei textomat )
+  450 :
+  460 rem ***********************
+  470 rem file open & compilieren
+  480 rem ***********************
+  490 :
+  500 open2,8,2,w$+",p,r":rem file open
+  510 get#2,w$:get#2,w$:rem prg-adresse ueberlesen
+  520 ifst<>0thenclose2:end:rem file not found
+  530 :
+  540 print"{down}pass 1 in progress":gosub910:rem pass 1
+  550 close2:rem file schliessen
+  560 :
+  570 ifp$(z%)<>"endprogram"then500:rem naechtes file lesen
+  580 :
+  590 c%=c%-1:ifc%<0then660:rem stackzeiger=0
+  600 :
+  610 print"stack pointer =";c%+1:rem stackzeiger ausgeben
+  620 if(cs%(c%)and24576)=8192thenprint"repeat..?":end
+  630 if(cs%(c%)and24576)=16384thenprint"while..do..?":end
+  640 print"if..then..else..?":end
+  650 :
+  660 print"pass 2 in progress{down}":gosub2650:rem pass 2
+  670 poke1024,32:rem linke obere ecke loeschen
+  680 :
+  690 rem ************************
+  700 rem obj-programm abspeichern
+  710 rem ************************
+  720 :
+  730 input"program-name: ";w$:rem programmname abfragen
+  740 ifw$="*"thenend:rem programmende
+  750 iflen(w$)>16then730:rem programmname zu lang
+  760 print"{down}writing ";w$:rem programm abspeichern
+  770 open1,8,1,w$+",p,w":rem file open
+  780 print#1,chr$(1);chr$(8);:rem programmanfangsadresse schreiben
+  790 z%=0:rem auf 1.zeile zeigen
+  800 rem programmzeile schreiben
+  810 ifp$(z%)<>"endprogram"thenprint#1,p$(z%);:z%=z%+1:goto810
+  820 :
+  830 rem programmende
+  840 print#1,chr$(0);chr$(0);:close1:end
+  850 :
+  860 rem ************************
+  870 rem >>>> unterprogramme <<<<
+  880 rem ************************
+  890 :
+  900 rem ***********
+  910 rem durchlauf 1
+  920 rem ***********
+  930 :
+  940 poke1024,z%and255:sysli,z$:t$=z$:rem zeile lesen
+  950 :
+  960 ifz$<>"endprogram"then1010
+  970 :
+  980 rem ende des 1.durchlaufen
+  990 p$(z%)=z$:return:rem ende 1.durchlaufen
+ 1000 :
+ 1010 ifleft$(z$,1)<>"#"then1120
+ 1020 :
+ 1030 rem label definieren
+ 1040 ifl%>lm%thenc%=1:goto3120:rem tabelle ist voll
+ 1050 z$=right$(z$,len(z$)-1):rem 1.zeichen eliminieren
+ 1060 syswo,w$,z$:rem label in w$
+ 1070 ifw$=""thenc%=3:goto3120
+ 1080 gosub2940:rem pruefen ob label schon definiert wurde
+ 1090 ifi>=0thenc%=130:goto3120:rem label schon definiert
+ 1100 lt$(l%)=w$:lt%(l%)=f%+z%:l%=l%+1:rem label eintragen
+ 1110 :
+ 1120 ifleft$(z$,1)<>"@"then1250
+ 1130 :
+ 1140 rem macro-definition
+ 1150 ifm%>mm%thenc%=4:goto3120:rem tabelle ist voll
+ 1160 z$=right$(z$,len(z$)-1):rem 1.zeichen eliminieren
+ 1170 syswo,w$,z$:rem macro-name in w$
+ 1180 ifw$=""thenc%=5:goto3120
+ 1190 gosub3030:rem ist macro definiert
+ 1200 ifi>=0thenc%=134:goto3120:rem macro schon definiert
+ 1210 ifz$=""thenc%=135:goto3120:rem zeile leer
+ 1220 m$(0,m%)=w$:m$(1,m%)=z$:rem macro eintragen
+ 1230 m%=m%+1:rem zeile weiterpruefen
+ 1240 :
+ 1250 ifleft$(z$,1)<>"!"then1350
+ 1260 :
+ 1270 rem macro-aufruf
+ 1280 z$=right$(z$,len(z$)-1):rem 1.zeichen eliminieren
+ 1290 syswo,w$,z$:rem macro-name in w$
+ 1300 ifw$=""thenc%=8:goto3120
+ 1310 gosub3030:rem in tabelle suchen
+ 1320 ifi<0thenc%=137:goto3120:rem macro nicht definiert
+ 1330 z$=m$(1,i)+z$:t$=z$:rem macro-zeile in z$
+ 1340 :
+ 1350 ifleft$(z$,1)<>"\"then1430
+ 1360 :
+ 1370 rem textfiles verketten
+ 1380 w$=right$(z$,len(z$)-1):rem file-name in w$
+ 1390 ifw$=""thenc%=23:goto3120
+ 1400 iflen(w$)>16thenc%=24:goto3120
+ 1410 return:rem ende
+ 1420 :
+ 1430 ifz$=""then940:rem naechste zeile
+ 1440 syswo,w$,z$:rem wort in w$
+ 1450 ifw$=":"andlen(p$(z%))=0then1430:rem doppelpunkt ueberlesen
+ 1460 ifw$=":"andright$(p$(z%),1)=":"then1430:rem 2.doppelpunkt ueberlesen
+ 1470 :
+ 1480 ifw$<>"repeat"then1560
+ 1490 :
+ 1500 rem repeat
+ 1510 ifc%>cm%thenc%=10:goto3120:rem stack ist voll
+ 1520 ifp$(z%)<>""thenz%=z%+1:rem zeile inkrementieren
+ 1530 cs%(c%)=z%or8192:c%=c%+1:rem zeilennr eintragen
+ 1540 goto1430:rem naechstes wort
+ 1550 :
+ 1560 ifw$<>"endwhile"then1660
+ 1570 :
+ 1580 rem endwhile
+ 1590 c%=c%-1:ifc%<0thenc%=11:goto3120
+ 1600 if(cs%(c%)and24576)<>16384thenc%=11:goto3120
+ 1610 i=cs%(c%)and8191:p$(i)=p$(i)+str$(f%+z%+1):rem sprungzeile setzen
+ 1620 ifz%>pm%thenc%=12:goto3120:rem text zu lang
+ 1630 p$(z%)="gO"+str$(f%+i):rem schleife fortsetzen
+ 1640 z%=z%+1:goto1430:rem naechstes wort
+ 1650 :
+ 1660 ifw$<>"endif"then1740
+ 1670 :
+ 1680 rem endif
+ 1690 c%=c%-1:ifc%<0thenc%=13:goto3120
+ 1700 ifcs%(c%)>8191thenc%=13:goto3120
+ 1710 i=cs%(c%):p$(i)=p$(i)+str$(f%+z%):rem sprungzeile setzen
+ 1720 goto1430:rem naechstes wort
+ 1730 :
+ 1740 ifw$<>"case"then1910
+ 1750 :
+ 1760 rem case..endcase
+ 1770 i=z%:rem case-zeile merken
+ 1780 sysli,z$:rem zeile lesen
+ 1790 syswo,w$,z$:rem konditionsausdruck in w$
+ 1800 ifz%>pm%thenc%=12:goto3120
+ 1810 p$(z%)="if"+w$+"then ":rem konditionsabfrage
+ 1820 syswo,w$,z$:ifw$<>"rem"orw$<>""thenp$(z%)=p$(z%)+w$:goto1820
+ 1830 z%=z%+1:sysli,z$:rem zeile lesen
+ 1840 ifz$="endcase"then1880
+ 1850 p$(z%-1)=p$(z%-1)+":gO":goto1790:rem naechste zeile
+ 1860 :
+ 1870 rem endcase
+ 1880 w$=str$(f%+z%):ifz%>i+1thenfori=itoz%-2:p$(i)=p$(i)+w$:next
+ 1890 syswo,w$,z$:goto1430:rem naechstes wort
+ 1900 :
+ 1910 ifw$<>"until"then2020
+ 1920 :
+ 1930 rem until
+ 1940 c%=c%-1:ifc%<0thenc%=14:goto3120
+ 1950 if(cs%(c%)and24576)<>8192thenc%=14:goto3120
+ 1960 ifz%>pm%thenc%=12:goto3120
+ 1970 syswo,w$,z$:rem konditionsausdruck in w$
+ 1980 ifw$=""thenc%=15:goto3120
+ 1990 i=cs%(c%)and8191:p$(z%)="if("+w$+")=0then"+str$(f%+i):remkonditionsabfrage
+ 2000 z%=z%+1:goto1430:rem naechstes wort
+ 2010 :
+ 2020 ifw$<>"while"then2160
+ 2030 :
+ 2040 rem while
+ 2050 ifc%>cm%thenc%=10:goto3120
+ 2060 ifp$(z%)<>""thenz%=z%+1
+ 2070 syswo,w$,z$:rem konditionsausdruck in w$
+ 2080 ifw$=""thenc%=16:goto3120
+ 2090 ifz%>pm%thenc%=12:goto3120
+ 2100 p$(z%)="if("+w$+")=0then"
+ 2110 syswo,w$,z$:rem naechstes wort in w$
+ 2120 ifw$<>"do"thenc%=17:goto3120
+ 2130 cs%(c%)=z%or16384:c%=c%+1:rem while-zeile eintragen
+ 2140 z%=z%+1:goto1430:rem naechstes wort pruefen
+ 2150 :
+ 2160 ifw$<>"rem"then2220
+ 2170 :
+ 2180 rem kommentar
+ 2190 iflen(p$(z%))=0then940:rem ganze zeile ignorieren
+ 2200 z%=z%+1:goto940:rem naechste zeile
+ 2210 :
+ 2220 ifw$<>"if"then2350
+ 2230 :
+ 2240 rem if
+ 2250 ifc%>cm%thenc%=10:goto3120
+ 2260 syswo,w$,z$:rem konditionsausdruck in w$
+ 2270 ifw$=""thenc%=18:goto3120
+ 2280 ifz%>pm%thenc%=12:goto3120
+ 2290 p$(z%)="if("+w$+")=0then"
+ 2300 cs%(c%)=z%:c%=c%+1:rem if-zeile eintragen
+ 2310 z%=z%+1:syswo,w$,z$:rem naechstes wort in w$
+ 2320 ifw$<>"then"thenc%=19:goto3120
+ 2330 goto1430:rem naechstes wort
+ 2340 :
+ 2350 ifw$<>"else"then2460
+ 2360 :
+ 2370 rem else
+ 2380 c%=c%-1:ifc%<0thenc%=20:goto3120
+ 2390 ifcs%(c%)>8191thenc%=20:goto3120
+ 2400 i=cs%(c%):p$(i)=p$(i)+str$(f%+z%+1)
+ 2410 ifz%>pm%thenc%=12:goto3120
+ 2420 p$(z%)=p$(z%)+"gO":rem unbedingter sprung anhaengen
+ 2430 cs%(c%)=z%:c%=c%+1:rem zeile merken
+ 2440 z%=z%+1:goto1430:rem naechstes wort
+ 2450 :
+ 2460 ifw$<>"goto"andw$<>"gosub"then2560
+ 2470 :
+ 2480 rem goto
+ 2490 iflen(p$(z%))<>0thenw$=" "+w$
+ 2500 ifz%>pm%thenc%=12:goto3120
+ 2510 p$(z%)=p$(z%)+w$+" "
+ 2520 ifz$=""thenc%=21:goto3120
+ 2530 ifleft$(z$,1)=":"thenc%=21:goto3120
+ 2540 syswo,w$,z$:w$=w$+" ":rem sprungmarke+blank
+ 2550 :
+ 2560 ifz%>pm%thenc%=12:goto3120
+ 2570 p$(z%)=p$(z%)+w$:rem wort in zeile einfuegen
+ 2580 ifz$<>""then1430:rem naechstes wort
+ 2590 z%=z%+1:goto940:rem naechste zeile
+ 2600 :
+ 2610 rem ***********
+ 2620 rem durchlauf 2
+ 2630 rem ***********
+ 2640 :
+ 2650 z%=0:c%=2049:rem auf 1.zeile zeigen & linkadresse=2049
+ 2660 poke1024,z%and255:ifp$(z%)="endprogram"thenreturn:rem ende
+ 2670 :
+ 2680 z$=p$(z%):t$=z$:p$(z%)=""
+ 2690 ifright$(z$,1)=":"thenz$=left$(z$,len(z$)-1):goto2690
+ 2700 syswo,w$,z$:rem wort in w$
+ 2710 ifw$="goto"orw$="gosub"then2830:rem goto/gosub-befehl gefunden
+ 2720 p$(z%)=p$(z%)+w$:ifz$<>""then2700:rem weiterpruefen
+ 2730 :
+ 2740 rem zeile tokenisieren
+ 2750 sysde,p$(z%):rem zeile in tokens umwandeln
+ 2760 c%=c%+5+len(p$(z%)):rem linkadresse berechnen
+ 2770 l%=int(c%/256):rem linkadresse high-byte
+ 2780 m%=int(f%/256):rem zeilennr high-byte
+ 2790 rem programmzeile bilden
+ 2800 p$(z%)=chr$(c%and255)+chr$(l%)+chr$(f%and255)+chr$(m%)+p$(z%)+chr$(0)
+ 2810 z%=z%+1:f%=f%+1:goto2660:rem naechste zeile
+ 2820 :
+ 2830 p$(z%)=p$(z%)+w$:rem befehl anhaengen
+ 2840 syswo,w$,z$:rem sprungmarke in w$
+ 2850 gosub2940:rem sprungmarke in tablle suchen
+ 2860 ifi<0thenc%=150:goto3120
+ 2870 w$=str$(lt%(i)):w$=right$(w$,len(w$)-1):rem sprungzeile in w$ umwandeln
+ 2880 goto2720:rem sprungzeile anhaengen
+ 2890 :
+ 2900 rem ***************
+ 2910 rem suchroutine lt$
+ 2920 rem ***************
+ 2930 :
+ 2940 i=0:rem auf 1.element zeigen
+ 2950 ifw$=lt$(i)thenreturn:rem wort gefunden
+ 2960 i=i+1:ifi<l%then2950:rem weitersuchen
+ 2970 i=-1:return:rem wort nicht gefunden
+ 2980 :
+ 2990 rem **************
+ 3000 rem suchroutine m$
+ 3010 rem **************
+ 3020 :
+ 3030 i=0:rem auf 1.element zeigen
+ 3040 ifw$=m$(0,i)thenreturn:rem wort gefunden
+ 3050 i=i+1:ifi<m%then3040:rem weitersuchen
+ 3060 i=-1:return:rem wort nicht gefunden
+ 3070 :
+ 3080 rem **********************
+ 3090 rem fehlermeldung ausgeben
+ 3100 rem **********************
+ 3110 :
+ 3120 printt$:ifc%>127thenprintw$;:rem textzeile ausgeben
+ 3130 restore:fori=1toc%and127:readw$:next:rem text lesen
+ 3140 printw$:close2:end:rem programmende
+ 3150 :
+ 3160 data"table overflow"," redefinition of label","#?","macro table overflow"
+ 3170 data"@?"," redefinition of macro"," macro ?","!?"," undef'd macro"
+ 3180 data"stack overflow","?while..do","text too long","?if..then","?repeat"
+ 3190 data"until ?","while ?","while..?","if?","if..?","?if..then"
+ 3200 data"goto/gosub ?"," undef'd label","?file-name","file-name too long"
+

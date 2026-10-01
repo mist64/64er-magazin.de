@@ -1,0 +1,86 @@
+
+
+;minos.prg ==0801==
+    0 ifpeek(36864)<>169thenload"labyri",8,1
+    2 poke53280,0:poke53281,0:poke52,64:poke51,0:poke56,64:poke55,0:clr
+    5 dimf(16):xl=1:yl=1:xp=38:yp=23:poke650,128
+   10 la=10:br=18:gw=255:gz=255:fw=10:fl=5
+   15 fori=0to68:reada:poke832+i,a:next
+   20 fori=0to15:readf(i):next:readma
+   25 fori=0to10:readfl(i):next:fori=0to5:readfw(i):next
+   30 fori=0toma:poke40705+i,f(i):poke40705+2*ma-i,f(i):next:poke40704,2*ma
+   50 print"{clr}{yel}{swlc}{dish}Laenge    "la"{left}{left}{left}{left}{left}";:inputla
+   55 print"{down}Breite    "br"{left}{left}{left}{left}{left}";:inputbr
+   60 ifla>54orbr>70orla<1orbr<1then50
+   70 print"{down}Wurmgeschwindigkeit hin        "gw"{left}{left}{left}{left}{left}{left}";:inputgw
+   75 print"{down}Wurmgeschwindigkeit zurueck    "gz"{left}{left}{left}{left}{left}{left}";:inputgz
+   80 poke39538,256-gw:poke39543,256-gw:poke39553,256-gz:poke39558,256-gz
+   85 print"{down}Farbe Wurm ";:poke646,fw:inputz$:fw=peek(646):poke55629,fw
+   90 poke1357,160:print"{down}{yel}Farbe Labyrinth ";:poke646,fl:inputz$:fl=peek(646)
+   95 poke1442,160:poke55714,fl
+   97 print"{yel}{down}Bildschirmverfolgung (y/j/n) ?"
+  100 getz$:ifz$<>"j"andz$<>"n"andz$<>"y"then100
+  102 poke39562,32:poke39568,32:ifz$="n"thenpoke39562,76:poke39568,76
+  105 gosub400:fori=0to10:poke40192+fl(i),fl:next
+  110 a=16530+2*int(rnd(ti)*br):e=16818+2*int(rnd(1)*br)+288*la
+  111 poke39980,2*br+1:poke39988,2*la+3:poke40000,2*br+2:sys39936
+  115 fori=0to5:poke40192+fw(i),fw:next
+  120 r(0)=1:r(1)=-144:r(2)=-1:r(3)=144
+  125 rem --------------------
+  130 rem -- der reihe nach --
+  135 rem --------------------
+  140 sys37056:poke38660,br:poke38405,la:sys38400:t=0
+  145 ifpeek(34816+t)<>0thent=t+1:print"{rvon}{home}{yel}"t:goto145
+  150 rem -------------------
+  155 rem -- weg verfolgen --
+  160 rem -------------------
+  170 z=e:pokee,42
+  175 hi=e/256:lo=e-int(hi)*256:hi=int(hi):poke36869,lo:poke36865,hi
+  180 sys36864:i=0
+  185 rem -------------------------------
+  190 rem -- weg aus abgeschl. irrgang --
+  195 rem -------------------------------
+  200 lo=peek(32768+i):hi=peek(34816+i):z=256*hi+lo
+  205 ifpeek(z)<>32then240
+  210 ifz=0then245
+  215 poke37633,hi:poke37637,lo:sys37632:c=peek(183)
+  220 ifc=0thenpoke886,32:sys869:poke886,42:poke32769+i,lo:poke34817+i,hi:t=t+1
+  225 r=int(rnd(1)*c):z=peek(38144+r)*256+peek(37888+r):r=int(rnd(1)*4)
+  230 ifpeek(z+2*r(r))<>42thenr=r+1+4*(r=3):goto230
+  235 pokez+r(r),42:sys869
+  240 print"{rvon}{home}{yel}"t-i"{left} ":i=i+1:ifi<tthen200
+  245 data169,64,133,255,169,0,133,254,160,0,162,160,177,254,41,96,201,96,240
+  250 data2,162,32,138,145,254,200,208,238,230,255,165,255,201,128,208,228,96,169
+  255 data64,133,255,169,0,133,254,160,0,177,254,201,81,208,4,169,42,145,254,200
+  260 data208,243,230,255,165,255,201,128,208,233,96
+  265 rem ----------------
+  270 rem -- weg finden --
+  275 rem ----------------
+  277 fori=0to7:poke1024+i,p(i):next
+  280 sys832:print"{home}";:z=e:sys40832:pokee,32:pokea,32
+  285 pokez,93
+  290 data0,11,2,10,7,4,10,8,12,5,7,13,3,14,15,1,4
+  295 data112,110,109,125,93,64,107,115,113,114,91,85,73,74,75,66,67
+  330 pokee+144,96
+  335 pokea-144,102:r=int(rnd(1)*4):hi=int(a/256):lo=a-int(a/256)*256
+  337 poke40542,lo:poke40546,hi
+  340 hi=z/256:lo=z-int(hi)*256:hi=int(hi):poke39185,lo:poke39189,hi:sys40760
+  345 pokea,66
+  350 poke40614,2:poke40703,0:poke40702,0:sys40541:goto50
+  400 print"{down}X-position linke obere Ecke    "xl"{left}{left}{left}{left}{left}";:inputxl
+  405 print"{down}Y-position linke obere Ecke    "yl"{left}{left}{left}{left}{left}";:inputyl
+  410 print"{down}Ausdehnung X-Richtung          "xp"{left}{left}{left}{left}{left}";:inputxp:xr=xp+xl
+  415 print"{down}Ausdehnung Y-Richtung          "yp"{left}{left}{left}{left}{left}";:inputyp:yr=yp+yl
+  417 ifyr>24oryl<1orxl<1orxr>39thenprint"{up}{up}{up}{up}{up}{up}{up}{up}";:goto400
+  420 z=int(xp/2)+40*int(yp/2):po=z-int(z/40)*40+144*int(z/40)
+  425 hi=int(po/256):lo=po-hi*256:poke40452,hi:poke40459,lo
+  430 z=1024+xl+yl*40:hi=int(z/256):lo=z-hi*256:poke40467,lo:poke40471,hi
+  435 poke40503,xr-xl:z=z+yp*40:hi=int(z/256):lo=z-hi*256:poke40531,hi
+  440 poke40537,lo:print"{clr}{swuc}";
+  445 fori=983+yl*40+xlto984+xr+yl*40:pokei,160:pokei+54272,7:pokei+yp*40+40,160
+  450 pokei+54312+yp*40,7:next
+  455 fori=983+yl*40+xlto983+yr*40+xlstep40:pokei,160:pokei+54272,7
+  460 pokei+xp+1,160:pokei+54272+xp+1,7:next:vo=xp*yp:x=30000-vo*30000/874
+  465 poke40665,int(x/255)+1:poke40670,x-int(x/255)*255+1
+  470 fori=0to7:p(i)=peek(1024+i):next:return
+

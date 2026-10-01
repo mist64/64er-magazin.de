@@ -1,0 +1,19 @@
+
+
+;messprogramm.prg ==0801==
+    0 rem dieses programm misst, wie lange am userport pin l auf masse liegt
+    1 rem anwendung von blitzlicht bis zu messungen ueber 1 stunde moeglich
+    2 rem w.bruechle 6108 weiterstadt, f.v.stein-str.7b
+   10 data 120, 169, 0, 141, 3, 221, 169, 144, 141, 14, 221, 169, 209, 141, 15, 221
+   20 data 169, 255, 141, 5, 221, 141, 4, 221, 141, 6, 221, 141, 7, 221, 169, 145
+   30 data 44, 1, 221, 48, 251, 141, 14, 221, 169, 128, 44, 1, 221, 16, 251, 45, 14
+   40 data 221, 45, 15, 221, 173, 4, 221, 141, 143, 3, 173, 5, 221, 141, 144, 3,173
+   45 data 6, 221, 141, 145, 3, 173, 7, 221, 141, 146, 3, 88, 96
+   50 for i=0 to 78 :read a:poke832+i,a:next
+   60 z=2^32-6:a=911:print"{clr}{down}{rght}messbereit"
+   70 sys832
+   80 fori=0to3:z=z-(peek(a+i)*256^i):next
+   90 z=z/985248.4:print"{clr}{down}{down}{down}";z;"sek";:ifz<1thenprint" = 1/".1*int(10/z);"sek."
+  100 geta$:ifa$<>" "then100
+  110 goto 60
+
