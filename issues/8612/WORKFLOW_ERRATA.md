@@ -546,3 +546,13 @@ Ranked by cost (my reading of where the build lost the most time or came closest
    Their output had to be discarded or hand-corrected.
 Rules that SAVED time: r000's `python3` warning (r030), r005 step 0, r000 "THE SCAN IS THE ONLY INPUT" (derived thumbs),
 r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest issue: no-op stated, not hunted).
+
+## 006 — r006's only check on title.png is its pixel size, which a plain downsample of the master also passes
+
+- (Found by 64er_control.) The title.png handed to this build is pixel-identical to an early export and differs from the master
+  by ~2.93 levels in ~100 pixels at the bottom edge. The owner's retouching never reached a file. r006 checks only that
+  title.png is exactly 1240x1754, and a 150 dpi reduction of the master is also exactly 1240x1754, so the rule cannot tell a
+  retouched cover from an untouched one. The PDF was built with it, and is reopened to rebuild when the new cover arrives
+  (only the mixed pass re-runs; the OCR cache stands).
+- **What would have prevented it.** Before building, measure title.png against a 25% reduction of masters600/001.png. Below
+  a few levels' MAE it is NOT a retouched cover: stop and ask. (The 8611 cover read MAE ~930/0.014; 8612's would have read ~0.)
