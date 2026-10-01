@@ -231,3 +231,31 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   Fortsetzung lines are dropped, and the host's page spec gains M."
 - Also (sub-agent): Verification 2's `tr '?/:' '_'` does not mirror the script's sanitiser
   (`<>:"/\|?*+`), and the rule's prose says only `? / :` are sanitised.
+
+## 110 — "The Vorschau is the 5th-from-last page" is false on 8612
+
+- **What the rule says.** "The Vorschau is the **5th-from-last page** of a monthly (188 of 192
+  on 8611, 196 of 200 on 8610)".
+- **What is true.** 8612 has 200 pages and its Vorschau is p194, 7th from last. Found by the
+  sub-agent; I confirmed on the banner crop. The fallback the rule names (`toc_entries.txt`)
+  does not exist at 110, because 090 runs at the same time or produces it later.
+- **Also.** Whether an agent may write the DERIVED next-issue bullet before the operator confirms
+  it is stated both ways ("the OPERATOR's to give. Do not invent one" vs "derived, not
+  chosen").
+- **What would have prevented it.** "The Vorschau is the page whose banner reads VORSCHAU 64'er
+  — near the end, 5th-7th from last; find it in the 080 file list (`NNN Vorschau.html`). Write
+  the derived next-issue bullet and list it for the owner's confirmation at PAUSE 2."
+
+## 100 — the toc_title helper reads a file 090 no longer writes; the editorial sentence contradicts the corpus
+
+- **Sub-agent's findings, confirmed by me from its output.**
+  - `r100_toc_title_apply.py` expects `issues/<ID>/_tmp/toc_entries.json`. 090 writes
+    `toc_entries.txt` (TSV), and the helper's SECTION_TO_TOC_CATEGORY lacks Einsteiger-Teil, Hardware
+    and Software-Hilfen.
+  - The rule says "If this issue's TOC files its opening piece under a heading, that heading is its
+    category", but 8608-8611 all ship the editorial with `""` although their TOCs list it under
+    Rubriken.
+  - The script stages with `git add -u issues/<ID>`, which stages EVERY tracked modification in the
+    directory (here WORKFLOW_ERRATA.md), not just "each rewritten file".
+- **What would have prevented it.** Point the helper at toc_entries.txt (or retire it and say so).
+  Restrict the opening-piece sentence to Sonderhefte. Stage by explicit file list.
