@@ -927,11 +927,16 @@ the step is wrong.
 
 ### Everything else, the chain made
 
-The chain takes the **2400 dpi scan masters** and nothing else. Every other file
-it reads, it made: `masters600`, `sheets600`, `cmyk2400`, `geometry`, the OCR
-blocks, the article HTML, the issue PDF. (The one other external input is the
-magazine's cover disk, `~/tmp/64er-Disketten/YYXX/<YYMM>.D64`, which step 120
-reads and which no scan can substitute for.)
+**The chain has ONE input: the 2400 dpi scan masters.** Every other file it
+reads, it made -- `masters600`, `sheets600`, `cmyk2400`, `geometry`, the OCR
+blocks, the article HTML, the issue PDF -- or it is already in the repo, put
+there by an earlier issue's run of this same chain.
+
+There is no second input and no exception. A step that appears to need one is
+either reading something derived (it is under `<tmp>`), something a previous
+build published (it is under `issues/`), or a reference whose location that
+step's own rule gives you -- r120's disk archive, the README's release table.
+None of those is an input to the chain; they are places the rules already name.
 
 **So a path in these rules that points outside the scan directory, the issue's
 `<tmp>`, and the repo is a FOSSIL.** Earlier versions of this chain put derived
