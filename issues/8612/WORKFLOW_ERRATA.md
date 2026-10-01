@@ -499,3 +499,14 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   digits). The sub-agent held them; I applied them after checking the crop.
 - **What would have prevented it.** "A token that is not valid hex (contains O, l, I, …) is OCR damage: fix it from the crop."
   And one sentence on whether <pre> is in 280's scope (every agent had <pre> worklist items).
+
+## 320 — the gate exits 0 on findings AND on CANNOT RUN; 8612's losses were all in blocks the classifier never kept
+
+- Found by the sub-agent. Exit status 0 with UNACCOUNTED hits, with a planted deletion, and with "CANNOT RUN". Any exit-code
+  consumer reads every case as a pass. The three real 8612 losses were a `noise`-labelled block (p19), a line absent from
+  labels.json (p23), and merged column tops (p163). The gate cannot see any of them; earlier steps had found them by eye. A
+  sweep of noise/other blocks gave 71 screenable candidates (all figure text). The probe threshold flips on large table
+  blocks. r000's coverage section still recommends "dangling cross-references", which r320 calls TRIED AND REJECTED. The
+  Jahresinhaltsverzeichnis ranges were wrong in both directions here (ads included; Centronics 52—57 vs 52-67).
+- **What would have prevented it.** Exit non-zero on hits and on CANNOT RUN. Add the noise/other-block sweep as a companion.
+  Delete the cross-reference line from r000. Call the index ranges "a hint to check on the masters".
