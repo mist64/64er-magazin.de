@@ -436,3 +436,20 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   in "64'er Extra" where the corpus has a literal `'`.
 - **What would have prevented it.** Use page-relative fractions (`frac=`) in the helper; add "no running head on the
   start page → use the article's first headed page"; fix the count formula.
+
+## 220 — the routing check skips every range row; the apply script routes by start page before 64er.pages
+
+- Found by the sub-agent. The check's filter `p[1].isdigit()` drops rows like `172—173`, so it checked 26 of 55 rows,
+  and a planted range-row misroute passed silently. The script sent the 320-KByte Aktuell item (inside 11 Aktuell, 11-14)
+  to 14 Scorpio by exact start page, and the check then flags the CORRECT route. "Run from the issue directory" contradicts
+  the Verification paths (repo root). Correcting a CSV typo can make the value equal <title> and delete it (step 3 after step 4).
+- **What would have prevented it.** Parse the first integer before `—`. Route by `64er.pages` coverage plus an h2 match
+  inside a multi-page rubric. One stated cwd.
+
+## 006 — the mixed build writes no CreationDate/ModDate and no dc:title; r006's house standard needs them
+
+- `make_issue_pdf_mixed.sh` output on 8612 had Title and Author but no CreationDate/ModDate and no XMP dc:title. 8611's LOG
+  shows the same ("after the exiftool stamp"). r006 states the four fields and the exiftool repair recipe, but not that
+  every mixed build needs the stamp.
+- **What would have prevented it.** End make_issue_pdf_mixed.sh with the exiftool stamp (Title, dc:title, dates =
+  file mtime), or say in r006 "the mixed build always needs this; run it after every build".

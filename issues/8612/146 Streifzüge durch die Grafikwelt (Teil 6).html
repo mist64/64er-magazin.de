@@ -196,7 +196,12 @@
 
         <h3>Skalieren</h3>
 
-        <p>Als erste Aufgabe stellen wir uns das Problem des Verkleinerns oder Vergrößerns von Bildern. Aus der letzten Folge wissen Sie, daß man das durch Skalieren lösen kann. Eine Skalierungs-Matrix hatten wir kennengelernt. Ihre allgemeine Form ist die 3,3-Matrix in Bild 2: Wir belegen also eine Matrix M(0,...) mit den gewünschten Anfangswerten SX und SY (im Programm habe ich dazu O.l verwendet) und müssen nun in einer Schleife sukzessive die Elemente M(0,1,1) und M(0,2,2) für eine Vergrößerung erhöhen oder für eine Verkleinerung der Abbildung erniedrigen. Im Programm wurde die Vergrößerung gewählt. In Bild 3 sehen Sie das Ergebnis unserer Bemühungen. Die Aufgabe der Skalierung wurde dabei durch das Programm-Modul SKALTRANS erfüllt (Zeilen 200 bis 285). Die Zeile 255 übernimmt die Vergrößerung der beiden Matrixelemente.</p>
+        <p>Als erste Aufgabe stellen wir uns das Problem des Verkleinerns oder Vergrößerns von Bildern. Aus der letzten Folge wissen Sie, daß man das durch Skalieren lösen kann. Eine Skalierungs-Matrix hatten wir kennengelernt. Ihre allgemeine Form ist die 3,3-Matrix in Bild 2: Wir belegen also eine Matrix M(0,...) mit den gewünschten Anfangswerten SX und SY (im Programm habe ich dazu 0.1 verwendet) und müssen nun in einer Schleife sukzessive die Elemente M(0,1,1) und M(0,2,2) für eine Vergrößerung erhöhen oder für eine Verkleinerung der Abbildung erniedrigen. Im Programm wurde die Vergrößerung gewählt. In Bild 3 sehen Sie das Ergebnis unserer Bemühungen. Die Aufgabe der Skalierung wurde dabei durch das Programm-Modul SKALTRANS erfüllt (Zeilen 200 bis 285). Die Zeile 255 übernimmt die Vergrößerung der beiden Matrixelemente.</p>
+
+        <figure>
+            <p>\[S = \begin{pmatrix} \mathrm{SX} & 0 & 0 \\ 0 & \mathrm{SY} & 0 \\ 0 & 0 & 1 \end{pmatrix}\]</p>
+            <figcaption>Bild 2. Die Skalierungsmatrix S</figcaption>
+        </figure>
 
         <figure>
             <img src="146-3.png" alt="Grafik: ineinandergeschachtelte, unterschiedlich große Hausumrisse, die eine gemeinsame obere linke Ecke haben">
@@ -211,13 +216,20 @@
 
         <p>Das neue Modul heißt ROTTRANS. Die Aufgabe besteht hier in der sukzessiven Verdrehung des Hauses in der XY-Ebene. Man löst solch eine Aufgabe mittels der Rotationsmatrix R, die wir in der letzten Folge kennengelernt haben. Bild 4 ruft uns diese Matrix wieder ins Gedächtnis zurück. Wie wir die Aufgabe lösen sehen Sie aus dem Modul ROTTRANS.</p>
 
-        <p>Wie Sie sich entsinnen werden, bezeichnet w den Winkel der Drehung. Wir müssen die Elemente M(0,1D, M(0,12), M(0,2,1) und M(0,2,2) verändern, die jeweils den Sinus oder Cosinus des variierten Winkels enthalten. Wir fangen beim Winkel w=0anund weil der Sinus von 0 ebenfalls 0 ist, der Cosinus aber 1, braucht man in Zeile 235 lediglich drei Elemente mit dem Ausgangswert | zu belegen. Die Schleife ab Zeile 250 zählt den Winkel (hier heißt er L) von O bis za in Schritten von /10. In der Zeile 255 werden die vier Elemente der Rotationsmatrix jeweils neu berechnet und in M(0....) eingetragen.</p>
+        <figure>
+            <p>\[R = \begin{pmatrix} \mathrm{COS}(W) & \mathrm{SIN}(W) & 0 \\ -\mathrm{SIN}(W) & \mathrm{COS}(W) & 0 \\ 0 & 0 & 1 \end{pmatrix}\]</p>
+            <figcaption>Bild 4. Die Rotationsmatrix R</figcaption>
+        </figure>
 
-        <p>Bis auf zwei Änderungen bleibt der Rest des Programmes erhalten. Diese beiden Neuerungen betreffen eine Verschiebung des Koordinatenursprunges in die Bildmitte, damit Platz genug zum Drehen des Hauses vorhanden ist. In Zeile 15 steht für die Größen XU,XO etc. nun: XU = -64:XO = 64 YU = -40:YO = 40</p>
+        <p>Wie Sie sich entsinnen werden, bezeichnet w den Winkel der Drehung. Wir müssen die Elemente M(0,1,1), M(0,1,2), M(0,2,1) und M(0,2,2) verändern, die jeweils den Sinus oder Cosinus des variierten Winkels enthalten. Wir fangen beim Winkel w=0 an und weil der Sinus von 0 ebenfalls 0 ist, der Cosinus aber 1, braucht man in Zeile 235 lediglich drei Elemente mit dem Ausgangswert 1 zu belegen. Die Schleife ab Zeile 250 zählt den Winkel (hier heißt er L) von 0 bis π in Schritten von π/10. In der Zeile 255 werden die vier Elemente der Rotationsmatrix jeweils neu berechnet und in M(0,...) eingetragen.</p>
 
-        <p>Außerdem muß die Matrix M(l....) in drei Elementen verändert werden. Deshalb lautet die Zeile 110 nun:</p>
+        <p>Bis auf zwei Änderungen bleibt der Rest des Programmes erhalten. Diese beiden Neuerungen betreffen eine Verschiebung des Koordinatenursprunges in die Bildmitte, damit Platz genug zum Drehen des Hauses vorhanden ist. In Zeile 15 steht für die Größen XU,XO etc. nun:</p>
 
-        <p>110 M(1,3,2) = 100:M(1,3,1) = 160</p>
+        <p><code>XU = -64:XO = 64:YU = -40:YO = 40</code></p>
+
+        <p>Außerdem muß die Matrix M(1,...) in drei Elementen verändert werden. Deshalb lautet die Zeile 110 nun:</p>
+
+        <p><code>110 M(1,3,2) = 100:M(1,3,1) = 160</code></p>
 
         <p>Wenn Sie sich das Zustandekommen unserer Matrix M aus der letzten Folge ansehen, dann erkennen Sie, daß die erste Änderung eine Verkleinerung, die zweite eine Verschiebung bewirkt hat. Sie können aber auch einfach weiter arbeiten, ohne zunächst diese beiden Eingriffe zu verstehen. Wenn wir über kombinierte Transformationen sprechen, wird Ihnen die Vorgehensweise klar werden. Das Ergebnis des Programmes ROTTRANS sehen Sie in Bild 5.</p>
 
@@ -228,7 +240,12 @@
 
         <h3>Translationen</h3>
 
-        <p>Die dritte Aufgabe betrifft Verschiebungen (Translationen) in der Ebene. Wie Sie sicher noch aus der letzten Folge erinnern, hatten wir dazu eine Matrix T entwickelt, in der das Element T@,) TX genannt wurde und den Betrag bezeichnete, um den ein Punkt in der X-Richtung verschoben wurde. Der Y-Betrag tauchte als TY im Element T(3,2) auf. Bild 6 zeigt Ihnen die Translationsmatrix.</p>
+        <p>Die dritte Aufgabe betrifft Verschiebungen (Translationen) in der Ebene. Wie Sie sicher noch aus der letzten Folge erinnern, hatten wir dazu eine Matrix T entwickelt, in der das Element T(3,1) TX genannt wurde und den Betrag bezeichnete, um den ein Punkt in der X-Richtung verschoben wurde. Der Y-Betrag tauchte als TY im Element T(3,2) auf. Bild 6 zeigt Ihnen die Translationsmatrix.</p>
+
+        <figure>
+            <p>\[T = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ \mathrm{TX} & \mathrm{TY} & 1 \end{pmatrix}\]</p>
+            <figcaption>Bild 6. Die Translationsmatrix T</figcaption>
+        </figure>
 
         <p>Wieder können wir unser Programm verwenden, lediglich das Modul in den Zeilen 200 bis 285 heißt nun TRANSLAT.</p>
 
@@ -247,41 +264,50 @@
 
         <h3>Mehrere Translationen</h3>
 
-        <p>Nehmen wir einmal an, ein Punkt Pwerde durch eine Translation (mit Hilfe der Matrix T, die wir durch ihre beiden wichtigen Elemente x] und yl kennzeichnen: T(xl,yl)) zum Punkt P'. Dieser Punkt P' seinerseits aber erfahre wiederum eine Translation durch eine weitere Transformation miteiner Translationsmatrix T(x2,y2). Der dadurch endgültig erreichte Punkt hieße nun P'. Bild 8 soll die Verhältnisse illustrieren. Wir haben gelernt, daß man schreiben kann: P'=PxT«ly)) und</p>
+        <p>Nehmen wir einmal an, ein Punkt P werde durch eine Translation (mit Hilfe der Matrix T, die wir durch ihre beiden wichtigen Elemente x1 und y1 kennzeichnen: T(x1,y1)) zum Punkt P'. Dieser Punkt P' seinerseits aber erfahre wiederum eine Translation durch eine weitere Transformation mit einer Translationsmatrix T(x2,y2). Der dadurch endgültig erreichte Punkt hieße nun P''. Bild 8 soll die Verhältnisse illustrieren. Wir haben gelernt, daß man schreiben kann:</p>
+
+        <p>P' = P x T(x1,y1)<br>und<br>P'' = P'x T(x2,y2)</p>
 
         <figure>
             <img src="146-8.png" alt="Diagramm: im X-Y-Koordinatensystem führt ein Pfeil 1. Translation von P nach P&#x27; und ein Pfeil 2. Translation von P&#x27; nach P&#x27;&#x27;; Bemaßungen X1, X2, X1 + X2 sowie Y1, Y2, Y1 + Y2">
             <figcaption>Bild 8. Zwei aufeinanderfolgende Translationen grafisch dargestellt</figcaption>
         </figure>
 
-        <p>P'"= P'x T(x2y2)</p>
+        <p>Setzt man in der zweiten Gleichung anstelle von P' die rechte Seite der ersten Gleichung ein, dann ergibt sich:</p>
 
-        <p>Setzt man in der zweiten Gleichung anstelle von P" die rechte Seite der ersten Gleichung ein, dann ergibt sich:</p>
+        <p>P'' = P x T(x1,y1) x T(x2,y2)<br>= P x (T(x1,y1)xT(x2,y2))</p>
 
-        <p>P' = Px T(xlyl) x T(x2,y2) = Px (TxlyD)xT(x2,y2))</p>
+        <p>Statt also zuerst P mit der Matrix T(x1,y1) malzunehmen und das Ergebnis davon (P') dann weiter mit der Matrix T(x2,y2) zu multiplizieren um so P'' zu erhalten, kann man auch P multiplizieren mit dem Produkt beider Translationsmatrizen. Nennen wir dieses Produkt einfach T:</p>
 
-        <p>Statt also zuerst P mit der Matrix T(xlyl) malzunehmen und das Ergebnis davon (P') dann weiter mit der Matrix T(x2,y2) zu multiplizieren um so P' zu erhalten, kann man auch P multiplizieren mit dem Produkt beider Translationsmatrizen. Nennen wir dieses Produkt einfach T: T = T&amp;lyl) x T(x2,y2) dann kann man einfach schreiben:</p>
+        <p>T = T(x1,y1) x T(x2,y2)</p>
 
-        <p>P'=PxT</p>
+        <p>dann kann man einfach schreiben:</p>
 
-        <p>Berechnen wir nun einmalT. In Bild 9 sehen Sie diese Berechnung, die wir in der vorletzten Folge erlernt haben. Es ergibt sich für T (siehe Bild 10).</p>
+        <p>P'' = P x T</p>
+
+        <p>Berechnen wir nun einmal T. In Bild 9 sehen Sie diese Berechnung, die wir in der vorletzten Folge erlernt haben. Es ergibt sich für T (siehe Bild 10).</p>
 
         <figure>
             <img src="146-9.png" alt="Rechenschema: Matrix T(X2,Y2) mit den Zeilen 1 0 0, 0 1 0, X2 Y2 1; Matrix T(X1,Y1) mit den Zeilen 1 0 0, 0 1 0, X1 Y1 1; Ergebnis T mit den Zeilen 1 0 0, 0 1 0, X1+X2 Y1+Y2 1">
             <figcaption>Bild 9. Zur Berechnung der kombinierten Translationsmatrix</figcaption>
         </figure>
 
+        <figure>
+            <p>\[T = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ \mathrm{X1}+\mathrm{X2} & \mathrm{Y1}+\mathrm{Y2} & 1 \end{pmatrix}\]</p>
+            <figcaption>Bild 10. Die kombinierte Matrix</figcaption>
+        </figure>
+
         <p>Dieses Ergebnis beweist es uns: Mehrere aufeinanderfolgende Translationen verhalten sich additiv. Es genügt, die verschiedenen Verschiebungen in X- und in Y-Richtung zusammenzuzählen. In Bild 8 sind zwei aufeinanderfolgende Translationen grafisch dargestellt.</p>
 
         <h3>Mehrere Skalierungen</h3>
 
-        <p>Nach dem gleichen Schema wie eben bei den Translationen können wir auch mehrere Skalierungen zusammenfassen. Nennen wir wieder nach den beiden wichtigen Elementen der Skalierungsmatrix die beiden nacheinander angewendeten Matrizen S(sxlsyl) und S(sx2,sy2), dann kann man als gemeinsame Matrix S schreiben:</p>
+        <p>Nach dem gleichen Schema wie eben bei den Translationen können wir auch mehrere Skalierungen zusammenfassen. Nennen wir wieder nach den beiden wichtigen Elementen der Skalierungsmatrix die beiden nacheinander angewendeten Matrizen S(sx1,sy1) und S(sx2,sy2), dann kann man als gemeinsame Matrix S schreiben:</p>
 
-        <p>S = S(sxl,syl) x S(sx2,sy2)</p>
+        <p>S = S(sx1,sy1) x S(sx2,sy2)</p>
 
         <p>Für einen Punkt P gilt dann ebenso nach 2 Transformationen:</p>
 
-        <p>P'=PxS</p>
+        <p>P'' = P x S</p>
 
         <p>In Bild 11 wird diese gemeinsame Matrix S berechnet:</p>
 
@@ -292,11 +318,16 @@
 
         <p>Die kombinierte Matrix S zeigt Ihnen Bild 12.</p>
 
+        <figure>
+            <p>\[S = \begin{pmatrix} \mathrm{SX1} \cdot \mathrm{SX2} & 0 & 0 \\ 0 & \mathrm{SY1} \cdot \mathrm{SY2} & 0 \\ 0 & 0 & 1 \end{pmatrix}\]</p>
+            <figcaption>Bild 12. Die kombinierte Matrix</figcaption>
+        </figure>
+
         <p>Wir erkennen aus dieser Kombination, daß mehrere Skalierungen multiplikativ sind. Die einzelnen Skalierungsfaktoren sx und sy müssen also miteinander malgenommen werden.</p>
 
         <h3>Mehrere Rotationen</h3>
 
-        <p>Bild 13 zeigt uns die Verhältnis-se beimehreren aufeinanderfolgenden Rotationen eines Punktes P über P' nach P'. Wieder können die beiden Rotationsmatrizen zur gemeinsamen Rotationsmatrix R verknüpft werden. Bild 14 führt Ihnen die Berechnung vor Augen.</p>
+        <p>Bild 13 zeigt uns die Verhältnisse bei mehreren aufeinanderfolgenden Rotationen eines Punktes P über P' nach P''. Wieder können die beiden Rotationsmatrizen zur gemeinsamen Rotationsmatrix R verknüpft werden. Bild 14 führt Ihnen die Berechnung vor Augen.</p>
 
         <figure>
             <img src="146-13.png" alt="Diagramm: im X-Y-Koordinatensystem dreht ein Bogenpfeil 1. Rotation den Punkt P um den Ursprung nach P&#x27;, ein zweiter Bogenpfeil 2. Rotation von P&#x27; nach P&#x27;&#x27;; Winkel W 1, W 2 und W 1 + W 2 eingezeichnet">
@@ -309,6 +340,11 @@
         </figure>
 
         <p>Schon in der letzten Folge hatten wir Gesetze für den Sinus und den Cosinus von Winkelsummen vorgestellt. Damit kommen wir auf eine kombinierte Rotationsmatrix R, die in Bild 15 gezeigt wird.</p>
+
+        <figure>
+            <p>\[R = \begin{pmatrix} \mathrm{COS}(\mathrm{W1}+\mathrm{W2}) & \mathrm{SIN}(\mathrm{W1}+\mathrm{W2}) & 0 \\ -\mathrm{SIN}(\mathrm{W1}+\mathrm{W2}) & \mathrm{COS}(\mathrm{W1}+\mathrm{W2}) & 0 \\ 0 & 0 & 1 \end{pmatrix}\]</p>
+            <figcaption>Bild 15. Die kombinierte Matrix</figcaption>
+        </figure>
 
         <p>Daraus folgert, was auch in Bild 13 zu erkennen ist: Mehrere aufeinanderfolgende Rotationen verhalten sich additiv. Man muß also nur die Winkel zusammenzählen, die die Argumente in den jeweiligen einzelnen Rotationsmatrizen bilden, um die Gesamtrotation durchzuführen.</p>
 
