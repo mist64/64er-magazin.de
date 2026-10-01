@@ -172,3 +172,33 @@ I did with it, what is true, what it cost, the sentence that would have prevente
 - **What would have prevented it.** r030 *Outputs*: "Then `cp <tmp>/ocr/<ID>.md
   issues/<ID>/<ID>.md`. That copy is what 040 onward edit. It is not committed
   (`.md` is ignored); 060 commits the HTML."
+
+## 040 — "length 2 is always bold" is false, and no check sees an unpaired `**`
+
+- **What the rule says.** "**length == 2** → keep (it's a `**bold**` delimiter)." The
+  Verification's `**bold** pairs` is "a sanity readout".
+- **What is true.** 8612's Protext article shows space padding as `*`:
+  "Der**Mann*schläft." / "Der*Mann**schläft." Each line has one literal `**`, kept as
+  "bold" (sub-agent found it; I confirmed). The fence-aware checks all read 0.
+- **Also found by the sub-agent.** The script's own printout is not fence-aware
+  (`solitary=2` on correct output). The Rule section has no fence exception; it lives only
+  in the .sh comment.
+- **Cost.** ~3 min orchestrator time, plus the sub-agent's.
+- **What would have prevented it.** Add a check that lists lines with an odd number
+  of `**` outside fences (an unpaired delimiter is a literal), and change the rule
+  to "length 2 → keep IF it pairs within the paragraph; else escape".
+
+## 050 — "`<`+non-letter is browser-safe" is false for `</`
+
+- **What the rule says.** "Patterns that already start with a non-letter (e.g. `< CBM >`,
+  `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because
+  HTML requires a letter immediately after `<` for a tag."
+- **What is true** (sub-agent found it; I confirmed). For `</` the HTML5 tokenizer drops
+  `</>` entirely and treats `</`+non-letter as a bogus comment that eats text to the next
+  `>`. 8612 l.2903 "durch </> dargestellt" would have lost the `</>`.
+- **Also.** The "Idempotent: lookbehinds for `\`" sentence describes a script that no
+  longer exists. Idempotency comes from writing entities. The script's own count is not
+  fence-aware. The prose whitelist lists `big`, the code does not.
+- **What would have prevented it.** "…browser-safe — EXCEPT `</` followed by a
+  non-letter (`</>`, `</1>`), which the HTML tokenizer swallows; escape those too."
+  Plus a check: `re.findall(r'</[^A-Za-z]', outside_fences)` must be empty.
