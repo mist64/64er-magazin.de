@@ -320,3 +320,12 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   transcribe printed source. Found when I read r170, so no owner time was spent.
 - **The rules were fine; I read ahead too little.** A pointer in r130's TODO section, "a `<pre>TODO</pre>`
   is r170's, which recreates MSE/Checksummer listings as disk files; do not escalate it", would have caught it.
+
+## 180 — expand initials (rule) vs keep initials (every published meta); checks 4 and 5 broken
+
+- Found by the sub-agent. The rule: "Initial → full name comes from the previous issue's Impressum, period". Its
+  own examples and 8609-8611 keep initials. Check 4's bracket `[…\- ]` is "invalid character range" under BSD grep,
+  so it silently passes. Check 5 counts one entry per <address>, but `(Name/xx)` yields two, so it flags correct metas
+  (6 files in published 8611 too).
+- **What would have prevented it.** Say "keep the initials as printed" (or fix the corpus). Use `[…., -]` in check 4.
+  Split each address on `/` in check 5.
