@@ -424,3 +424,15 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   of chroma outside the traced paper — the bed problem (004). Fix (2) would have removed 004 automatically; fix (1) alone would not.
 - **The review was what caught it.** On 8611 the owner waived the page-input review; on 8612 they reviewed, and that is the
   only reason 186 was caught before shipping. r006's "a build started without that review is to be stopped" earned its place.
+
+## 210 — the helper is half-converted from 300 dpi; a headerless start page has no rule
+
+- `r210_head_meta_apply.py` uses `2480` and `x < 1240` (300 dpi page geometry) on 600 dpi block coordinates, so on 8612 it
+  picked fragment blocks as head2 on 6 pages, missed one, and kept junk ("Aktuell |", "Hardwa", "C 123"). Its output was
+  unusable; the sub-agent read every value off crops instead.
+- "The start page's header is authoritative" has no fallback for a start page printed without a running head (52, a
+  full-bleed photo opener). I used the first headed page. Check 1's expected-count formula is off by one (Leserforum
+  carries head1), and the check cannot detect a head1 on an excluded rubric. `html.escape` writes `&#x27;` for the apostrophe
+  in "64'er Extra" where the corpus has a literal `'`.
+- **What would have prevented it.** Use page-relative fractions (`frac=`) in the helper; add "no running head on the
+  start page → use the article's first headed page"; fix the count formula.
