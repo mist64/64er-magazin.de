@@ -471,3 +471,11 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   "This rule only toggles the class attribute" is contradicted in practice by every OCR-damaged source line.
 - **What would have prevented it.** Skip figure/download/display:none blocks before reading the next tag; accept </aside>;
   one line on in-issue pointers (plain <p>, per 8611/50).
+
+## 260 — the Verification block does not run (heredoc terminator), and its FAIL fires on clean output
+
+- Found by the sub-agent. `PYEOF && \` is not a valid heredoc terminator, so bash swallows check 2 and Python dies
+  ("unterminated string literal"). Once fixed, `&& echo FAIL` keys on exit status (always 0), so it prints FAIL on every run.
+  Check 2 has no exemption for a heading opening with a symbol (`§202a StGB`). Step 5's js-beautify options are unstated.
+- **What would have prevented it.** Terminator alone on its line; test output non-empty, not exit status; exempt
+  leading non-letters; name r080's beautify options. This is r000's "the WRAPPERS are code, so run them" in a .md.
