@@ -318,7 +318,7 @@ I did with it, what is true, what it cost, the sentence that would have prevente
 - I read r130 and r000 *Changing a PROGRAM FILE* and queued "copy 8611's seq-trans.ob?" and "render
   hyperscreen ii.s?" for the owner. r170 prescribes both: recreate a printed MSE listing as a new prg/ file, and
   transcribe printed source. Found when I read r170, so no owner time was spent.
-- **The rules were fine; I read ahead too little.** A pointer in r130's TODO section, "a `<pre>TODO</pre>`
+- **The rules were fine; I read ahead too little.** What would have prevented it: a pointer in r130's TODO section, "a `<pre>TODO</pre>`
   is r170's, which recreates MSE/Checksummer listings as disk files; do not escalate it", would have caught it.
 
 ## 180 — expand initials (rule) vs keep initials (every published meta); checks 4 and 5 broken
@@ -417,7 +417,7 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   as 8611's 004 did.
 - Final FORCE_CONTONE="022 024 114 125 152 172 180". The first build (with 004, 042, 186) was stopped in its OCR phase;
   nothing shipped.
-- **Fix for r006.** Threshold the largest connected component (not the sum); state that display-type fringing survives a
+- **What would have prevented it (fix for r006).** Threshold the largest connected component (not the sum); state that display-type fringing survives a
   3x3 opening; exclude chroma lying outside the traced paper (the bed). "There is no judgement here" is only true once
   the measure is right.
 - **Two defects, not one** (control): (1) total area vs largest component — the fringe problem (186, 042); (2) no exclusion
@@ -510,3 +510,39 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   Jahresinhaltsverzeichnis ranges were wrong in both directions here (ads included; Centronics 52—57 vs 52-67).
 - **What would have prevented it.** Exit non-zero on hits and on CANNOT RUN. Add the noise/other-block sweep as a companion.
   Delete the cross-reference line from r000. Call the index ranges "a hint to check on the masters".
+
+## 320/325 — r320 skips listing blocks, so a PRINT-ONLY listing can lose 21 lines with the gate green
+
+- r320 skips listing blocks because "the disk .txt is the correct petcat rendering". That only holds for listings ON the disk.
+  74's NMI routine is hand-typed (no disk file); 21 printed lines on p76 were missing and the gate reported nothing. The
+  40-99 read-for-sense agent found it by diffing the HTML against the PDF text layer (pdftotext -raw) and cropping suspects.
+- Also from 325: most damage in hand-typed <pre> is LINE structure (lines joined, lines run together), which "word-level
+  substitutions only" does not obviously allow. Monospace spacing errors (`TAB(15) "B"`) are only visible by glyph-column
+  alignment. A run of repeated characters (`::::`) has to be counted mechanically (20 vs 21 disagreed between two agents).
+- **What would have prevented it.** In r320: "skip a listing block only when its article references a disk file for it;
+  hand-typed listings are checked like prose". In r325: re-breaking printed lines in hand-typed <pre> is in scope; check
+  monospace spacing by column; count repeated glyphs mechanically. Suggest the PDF-text-layer word diff as the candidate
+  generator for the read.
+
+## Sign-off (step 340, 2026-10-01)
+
+Kept from the first confusion (setup, before 005) to the end; first committed early in the build (1280f862).
+~40 entries. Records rather than errata, by design: *Resolutions*, the 005 KNOWN LIMITATION, the C3 decision.
+
+Ranked by cost (my reading of where the build lost the most time or came closest to shipping a defect):
+1. **006 FORCE_CONTONE**: r006 measures total chroma area, which mis-measured display-type fringe (186) and the scanner bed (004).
+   It was caught only because the owner reviewed the page inputs. A full PDF build was restarted.
+2. **C3 mse.py**: an approved change would have rewritten 311 of 377 shipped MSE listings. Caught by measuring before landing (r000).
+3. **320/325**: a print-only listing lost 21 lines with the gate green. r320 skips all listing blocks.
+4. **005 clip template**: the 8610 hole spacing failed on 8612 (11/25 fold none). Step 0 found it in one table. r005's
+   re-measure procedure asks for two extra sample sweeps it does not need.
+5. **Broken or blind checks** (r000's "a check you have not seen fail"):
+   - r260's Verification does not run at all;
+   - r220's routing check skips every range row;
+   - r280's checks hide hits behind `head`;
+   - r240's editorial grep is unanchored;
+   - r320 exits 0 on findings.
+6. **Helpers that no longer match the chain**: r210 (300 dpi geometry), r100 (toc_entries.json), r220 (start-page routing).
+   Their output had to be discarded or hand-corrected.
+Rules that SAVED time: r000's `python3` warning (r030), r005 step 0, r000 "THE SCAN IS THE ONLY INPUT" (derived thumbs),
+r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest issue: no-op stated, not hunted).
