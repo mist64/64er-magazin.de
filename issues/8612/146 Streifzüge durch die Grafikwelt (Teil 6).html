@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="H. Ponnath, og">
     <meta name="64er.issue" content="12/86">
-    <meta name="64er.pages" content="146, 148-149">
+    <meta name="64er.pages" content="146, 148-149, 152-153">
     <meta name="64er.toc_category" content="Kurse">
     <meta name="64er.toc_title" content="Streifzüge durch die Grafikwelt (6)">
     <meta name="64er.id" content="grafik_welt">
@@ -24,7 +24,155 @@
 
         <h2>Der Grafikstandard</h2>
 
-        <p>Zur Erinnerung: Weil es wirklich schlimm bestellt ist um die vielen unterschiedlichen Basic-Versionen und ihre Grafik-Befehle, wird in dieser Serie eine Anzahl künstlicher grundlegender Grafik-Befehle verwendet, die keinem Standard-Basic entsprechen. Das hat einen Nachteil und allerlei Vorteile: Als nachteilig empfindet der eilige Anwender, daß die abgedruckten Programme nicht direkt lauffähig sind, sondern daß einige Befehle erst noch in den gerade benutzten Basic-Dialekt übersetzt werden müssen. Von Vorteil ist aber, daß nahezu jedes System diese Programme verwenden kann. Gleichgültig, ob Sie einen C 128 oder einen Atari vor sich stehen haben: Wenn Sie die zehn Grafikbefehle unseres Standards in Ihr Basic übersetzt haben, dann läuft das Programm auch bei Ihnen. Eine Hilfe ist die Übersetzungstabelle (Tabelle ]), die folgende Übersetzungen liefert: C 64 mit HIRES-3, Commodore-Computer mit Plotter 1520, Basic 7.0 desC 128 und Basic 3.5 des C 16. \</p>
+        <p>Zur Erinnerung: Weil es wirklich schlimm bestellt ist um die vielen unterschiedlichen Basic-Versionen und ihre Grafik-Befehle, wird in dieser Serie eine Anzahl künstlicher grundlegender Grafik-Befehle verwendet, die keinem Standard-Basic entsprechen. Das hat einen Nachteil und allerlei Vorteile: Als nachteilig empfindet der eilige Anwender, daß die abgedruckten Programme nicht direkt lauffähig sind, sondern daß einige Befehle erst noch in den gerade benutzten Basic-Dialekt übersetzt werden müssen. Von Vorteil ist aber, daß nahezu jedes System diese Programme verwenden kann. Gleichgültig, ob Sie einen C 128 oder einen Atari vor sich stehen haben: Wenn Sie die zehn Grafikbefehle unseres Standards in Ihr Basic übersetzt haben, dann läuft das Programm auch bei Ihnen. Eine Hilfe ist die Übersetzungstabelle (Tabelle 1), die folgende Übersetzungen liefert: C 64 mit HIRES-3, Commodore-Computer mit Plotter 1520, Basic 7.0 desC 128 und Basic 3.5 des C 16. \</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th colspan="2">C 64 mit HIRES-3</th>
+                </tr>
+                <tr>
+                    <th>Befehl</th>
+                    <th>Übersetzung</th>
+                </tr>
+                <tr>
+                    <td>INIT</td>
+                    <td>POKE 53280,0:SYS 37498:HFL,6,12</td>
+                </tr>
+                <tr>
+                    <td>START</td>
+                    <td>TRS,0,320,0,200</td>
+                </tr>
+                <tr>
+                    <td>MITTE</td>
+                    <td>TRS,-160,160,-100,100</td>
+                </tr>
+                <tr>
+                    <td>PUNKT(X,Y)</td>
+                    <td>TPK,X,Y</td>
+                </tr>
+                <tr>
+                    <td>LINE(XA,YA,XB,YB)</td>
+                    <td>TLN,XA,YA,XB,YB</td>
+                </tr>
+                <tr>
+                    <td>KREIS(XM,YM,RX,RY)</td>
+                    <td>TKR,XM,YM,RX,RY,2*Pi</td>
+                </tr>
+                <tr>
+                    <td>TEXT(A$,XT,YT)</td>
+                    <td>TEX,A$,YT,XT</td>
+                </tr>
+                <tr>
+                    <td>SHOW</td>
+                    <td>HAN</td>
+                </tr>
+                <tr>
+                    <td>NORMAL</td>
+                    <td>HOF</td>
+                </tr>
+                <tr>
+                    <td>GRESET</td>
+                    <td>LOE:AUS</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Commodore-Computer mit Plotter 1520</th>
+                </tr>
+                <tr>
+                    <th>Befehl</th>
+                    <th>Übersetzung</th>
+                </tr>
+                <tr>
+                    <td>INIT</td>
+                    <td>OPEN1,6,1:OPEN2,6,2:PRINT #2,0:<br>CLOSE2</td>
+                </tr>
+                <tr>
+                    <td>START PRINT</td>
+                    <td>#1,"M",0,-200:PRINT #1,"I"</td>
+                </tr>
+                <tr>
+                    <td>MITTE PRINT</td>
+                    <td>#1,"R",240,0:PRINT #1,"I"</td>
+                </tr>
+                <tr>
+                    <td>PUNKT(X,,Y)</td>
+                    <td>PRINT #1,"R",X,Y:PRINT #1,"J",X-<br>+2,Y+2:PRINT #1,"R",X,Y</td>
+                </tr>
+                <tr>
+                    <td>LINE(XA,YA,XB,YB)</td>
+                    <td>PRINT #1,"R",XA,YA:PRINT #1,<br>"J",XB,YB</td>
+                </tr>
+                <tr>
+                    <td>KREIS(XM,YM,RX,RY)</td>
+                    <td>Hier ist ein kleines Programm<br>nötig: M=50:D=360*π/(M*180):<br>DIMT(M):T(0)=2*π FOR I=1 TO M<br>T(I)=T(I-1)+D PRINT #1,"R",RX*<br>COS(T(I-1))+XM,RY*SIN(T(I-1))+YM<br>PRINT #1,"J",RX*COS(T(I))+XM,<br>RY*SIN(T(I))+YM NEXT I</td>
+                </tr>
+                <tr>
+                    <td>TEXT(A$,XT,YT)</td>
+                    <td>OPEN4,6:PRINT #1,"R",XT,YT:<br>PRINT #4,A$:CLOSE4: PRINT #1,<br>"M",240,-YT:PRINT #1,"I"</td>
+                </tr>
+                <tr>
+                    <td>SHOW</td>
+                    <td>PRINT #1,"R",0,-200</td>
+                </tr>
+                <tr>
+                    <td>NORMAL</td>
+                    <td>CLOSE1</td>
+                </tr>
+                <tr>
+                    <td>GRESET</td>
+                    <td>OPEN7,6,7:PRINT #7:CLOSE7</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Basic 7.0 des C 128 und<br>Basic 3.5 des C 16</th>
+                </tr>
+                <tr>
+                    <th>Befehl</th>
+                    <th>Übersetzung</th>
+                </tr>
+                <tr>
+                    <td>INIT</td>
+                    <td>COLOR0,16:COLOR1,7:COLOR4,1:<br>GRAPHIC1,1</td>
+                </tr>
+                <tr>
+                    <td>START</td>
+                    <td>XU=0:XO=319:YU=0:YO=199<br>(bezogen auf UP Transformation)</td>
+                </tr>
+                <tr>
+                    <td>MITTE</td>
+                    <td>XU=-160:XO=160:YU=-100:YO=100<br>(bezogen auf UP Transformation)</td>
+                </tr>
+                <tr>
+                    <td>PUNKT(X,Y)</td>
+                    <td>GOSUB 1020:DRAW1,XX,YY<br>(UP Transformation beginnt bei<br>1020)</td>
+                </tr>
+                <tr>
+                    <td>LINE(XA,YA,XB,YB)</td>
+                    <td>X=XA:Y=YA:GOSUB 1020:X1=XX:<br>Y1=YY X=XB:Y=YB:GOSUB 1020:<br>X2=XX:Y2=YY DRAW1,X1,Y1<br>TO X2,Y2<br>(UP Transformation beginnt bei<br>1020)</td>
+                </tr>
+                <tr>
+                    <td>KREIS(XM,YM,RX,RY)</td>
+                    <td>X=XM:Y=YM:GOSUB 1020:X5=XX:<br>Y5=YY RX=RX*319/(XO-XU):RY=<br>RY*199/(YO-YU)<br>CIRCLE1,X5,Y5,RX,RY<br>(UP Transformation beginnt bei<br>1020)</td>
+                </tr>
+                <tr>
+                    <td>TEXT(A$,XT,YT)</td>
+                    <td>CHAR1,XT,YT,A$</td>
+                </tr>
+                <tr>
+                    <td>SHOW</td>
+                    <td>GRAPHIC1</td>
+                </tr>
+                <tr>
+                    <td>NORMAL</td>
+                    <td>GRAPHIC0</td>
+                </tr>
+                <tr>
+                    <td>GRESET</td>
+                    <td>SCNCLR1</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Umsetzung der allgemeinen Grafikbefehle in Hires, Basic 7.0 und für den Plotter 1520</figcaption>
+        </figure>
+
 
         <h3>Einfache 2D-Transformationen</h3>
 
