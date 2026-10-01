@@ -453,3 +453,12 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   every mixed build needs the stamp.
 - **What would have prevented it.** End make_issue_pdf_mixed.sh with the exiftool stamp (Title, dc:title, dates =
   file mtime), or say in r006 "the mixed build always needs this; run it after every build".
+
+## 240 — the editorial reference check is unanchored; the Bücher banner is "never cp" and "you can cp" in one file
+
+- Found by the sub-agent. The editorial loop greps `"$page-0.png"` (unanchored, `.` unescaped) and accepts `src="18-0.png"`
+  (planted, passed). The other loops were already anchored. There is no shape check for the editorial. The rule is
+  written as if the banners do not exist yet (find/crop/insert), while in practice 150 has placed the owner's cuts and
+  240 is an audit. Step 3 "never `cp` the previous one" contradicts the Notes "You can `cp` the prior issue's".
+- **What would have prevented it.** Anchor the editorial grep like the others; add an editorial shape check; reframe
+  r240 as "audit the banners 150 placed"; delete one of the two cp sentences.
