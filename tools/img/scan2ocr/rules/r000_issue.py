@@ -34,7 +34,7 @@ stay as commented constants in the step that uses them, where the comment
 explaining the measured value can sit beside it.
 
     { "id": "SH8601", "kind": "sonderheft", "binding": "sheet", "pages": 152,
-      "scan_dir": "/Users/mist/DNB/SH8601/master_2400/SH8601",
+      "scan_dir": "/Volumes/S/png/SH8601",
       "thumb_150": "/Users/mist/DNB/SH8601/master_2400/SH8601/thumb",
       "tmp":       "/Users/mist/DNB/SH8601/tmp",
       "paper": {

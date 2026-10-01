@@ -189,8 +189,25 @@ finished *except* for figures, so:
 - Any check that renders or inspects the issue PDF cannot run -- 006 has not
   happened yet.
 
+The per-rule verifications that touch a **cut figure file** are likewise partly
+deferred. SURVEYED 2026-10-01 -- the blocks containing such a check are in
+**r150** (6, it is the placing step), **r160** (1), **r200** (2), **r240** (2) and
+**r300** (2). Defer only the checks that name a figure, not the whole block: the
+rest of each verification is about text and must pass at pause 2 like any other.
+
 Run every other gate. An agent that treats its own correct output as a failure
 will keep working past the hand-off and start inventing figures.
+
+### Keep `WORKFLOW_ERRATA.md` from the first confusion onward
+
+The build is also a test of these files, and step 340 is where it reports.
+**Its entries are written the moment the confusion happens, not at the end** --
+once you have worked out what a rule meant you can no longer reconstruct what you
+thought it meant, and that misreading is the finding. Signed off last; started
+the first time a rule does not say what you need. See `r340_workflow_errata.md`.
+
+Record the cost too -- wall-clock, and how many commands it took to recover.
+Nobody can recover that number afterwards, and it is what ranks the fixes.
 
 ### If you are blocked, escalate to the ORCHESTRATOR, never to the owner
 
@@ -473,6 +490,7 @@ them through this table.
 | 290 | 28 | heading_hierarchy |
 | 300 | 29 | fehlerteufelchen_errata |
 | 325 | — | read_for_sense (added 2026-08, SH8601) |
+| 340 | — | workflow_errata — what these rules got wrong, written while it hurt. **Kept from the first confusion onward, signed off last** |
 
 Two rules were removed rather than renumbered:
 
@@ -889,6 +907,25 @@ every `command -v` says MISSING. Export `PATH=/opt/homebrew/bin:$PATH` in the
 command, or run it through a login shell, before concluding anything is missing.
 
 ## Cross-cutting rule: THE SCAN IS THE ONLY INPUT — everything else is DERIVED
+
+### Where the scans are
+
+```
+/Volumes/S/png/<ID>/NNN.png      the 2400 dpi masters   -> the descriptor's scan_dir
+/Volumes/S/png/<ID>/thumb/       150 dpi thumbnails     -> the descriptor's thumb_150
+```
+
+VERIFIED 2026-10-01: 47 issue directories, 8405 through 8612 plus the Sonderhefte.
+A master is an A3 sheet at 2400 dpi and runs to about 900 MB, so an issue is
+~180 GB and nothing about it is cheap to re-make.
+
+**NEVER WRITE INTO `/Volumes/S/png/`. Nothing stops you** -- the volume is
+writable and the files are not mode-locked; the only thing protecting the only
+irreplaceable input this project has is that you do not do it. Derived data goes
+under the descriptor's `tmp`. If a step seems to want an output beside its input,
+the step is wrong.
+
+### Everything else, the chain made
 
 The chain takes the **2400 dpi scan masters** and nothing else. Every other file
 it reads, it made: `masters600`, `sheets600`, `cmyk2400`, `geometry`, the OCR
