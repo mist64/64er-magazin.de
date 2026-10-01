@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Precompiler für Textdateien</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="12/86">
+    <meta name="64er.pages" content="68-69">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX24">
+</head>
+
+<body>
+    <article>
+        <h1>Precompiler für Textdateien</h1>
+        <p class="intro">Wenn Sie für die Erstellung eigener Programme einen leistungsfähigen Editor vermissen, verwenden Sie doch einfach Ihr Textverarbeitungsprogramm.</p>
+
+        <p>er abgedruckte »Basic-Precompiler« (Listing 1 und 2) verwandelt mit einem Textverarbeitungsprogramm erstellte Textdateien in lauffähige Basic-Programme. Der Vorteil liegt auf der Hand: Mit einem guten Textverarbeitungsprogramm können Sie — im Gegensatz zum Basic-Editor des C 64 — sehr leicht Zeilen(-blöcke) verschieben, 1öschen oder einfügen. Das Suchen nach bestimmten Befehls- oder Zeichenketten wird durch eine »FIND«-Option erheblich erleichtert. Mit »REPLACE« können Sie beispielsweise Textstrings, Variablennamen und ähnliches leicht ersetzen. Vor allem aber sind Sie unabhängig von Zeilennummern, so daß der sonst häufig benötigte RENUMBER-Befehl überflüssig wird. Doch wie kann man die in Basic unverzichtbaren Befehle GSOTO und GOSUB ohne Zeilennummern verwenden? Die Antwort lautet: Mit Hilfe freiwählbarer Marken (Labels). Anstelle eines »GSOTO 1000« können Sie beispielsweise einfach »GOTO EINSPRUNG« schreiben. Auf diese Weise sind nachträgliche Änderungen im Programm (zum Beispiel das Einfügen neuer Zeilen) ohne weitere Anpassungen möglich. Außerdem ist das Programm mit der Verwendung aussagekräftiger Labelnamen übersichtlicher und auch nach Monaten noch verständlich.</p>
+
+        <p>Der Basic-Precompiler erlaubt auch, häufig benutzte Befehle als Makros zu definieren, die man an anderen Stellen des Programms bei Bedarfeinfach mit ihrem Namen aufzurufen braucht ( hierzu später mehr).</p>
+
+        <p>Besonders interessant ist auch, daß die Pascal-ähnlichen Kontrollstrukturen:</p>
+
+        <p>IF... THEN...ELSE... ENDIF REPEAT..UNTIL</p>
+
+        <p>WHILE...DO..ENDWHILE und CASE...ENDCASE« unterstützt werden. Befindet sich im Textfile eine dieser Kontrollstrukturen, wird sie automatisch in Standard-Basic-Befehle übersetzt.</p>
+
+        <p>Wer in Assembler oder einer anderen Compiler-Sprache programmiert und hierzu einen Quellcode mit Basic-Zeilennummern benötigt, kann auch für diesen Zweck mit einem Textverarbeitungsprogramm arbeiten und den Basic-Precompiler verwenden, da dieser bei der Übersetzung keine Syntax-Prüfung vornimmt (außer bei den neuen Kontrollstrukturen).</p>
+
+        <p>Die Programm-Quelldateien müssen für eine erfolgreiche Precompilierung folgende Voraussetzungen erfüllen: — Jede Zeile darf höchstens 256 Zeichen enthalten — Zeilen müssen mit einem Endezeichen (&lt;RETURN&gt;) abgeschlossen sein</p>
+
+        <p>— Die Befehle müssen von ihren Operanden mit einem Leerzeichen getrennt sein</p>
+
+        <p>— Konditionsausdrücke dürfen keine Leerzeichen enthalten (richtig: »A=XAND25%« falsch: »A=X AND 2550</p>
+
+        <p>— das Programm muß mit dem Schlüsselwort »ENDPROGRAM« enden</p>
+
+        <p>— Die Quelltext-Datei muß sich auf einer Diskette befinden.</p>
+
+        <p>Zum Compilieren laden Sie bitte das Programm mit »LOAD "PRECOMPILER'" ,8&amp; und starten es mit »RUN«. Der Basic-Precompiler lädt daraufhin automatisch das Maschinenprogramm »PRECOMPILER.H« nach (Listing 2) und fragt Sie nach dem Namen der zu compilierenden Dateiund nach der ersten Zeilennummer des Compilats. Während des Compilierens erscheint — je nach Länge des Quellprogramms — der ganze Zeichensatz buchstabenweise in der linken oberen Ecke des Bildschirms, damit Sie sehen können, daß die Übersetzung richtig läuft.</p>
+
+        <p>Der Basic-Precompiler verarbeitet auch die neuen Befehle von Basic-Erweiterungen. Voraussetzungist, daß die Erweiterung während des Compiliervorgangs (und natürlich beim Lauf des Programms) aktiviert und die Einsprungsadresse für die Umwandlungsroutine der neuen Tokens in Adresse $0304/80305 abgelegt ist. Dasistbei»echten«Befehlserweiterungen, wie zum Beispiel Simons Basic, immer der Fall.</p>
+
+        <p>Falls während des Compiliervorgangs ein Fehler auftritt, wird das Programm mit Ausgabe einer Fehlermeldung (siehe Tabelle 1) abgebrochen. Nach der erfolgreichen Compilierung aber, werden Sie aufgefordert, den Namen einzugeben, unter dem das Programm gespeichert werden soll.</p>
+
+        <h3>TABLE OVERFLOW</h3>
+
+        <p>Die Tabelle, in die die Labels eingetragen werden, ist voll. #?</p>
+
+        <p>Ein Label sollte definiert werden. Der Compiler fand jedoch keinen Namen</p>
+
+        <h3>REDEFINATION OF LABEL</h3>
+
+        <p>Ein Label wurde erneut definiert</p>
+
+        <h3>UNDEF'D LABEL</h3>
+
+        <p>Ein nicht definiertes Label wurde aufgerufen @ :</p>
+
+        <p>Ein Makro sollte definiert werden. Der Compiler fand jedoch keinen Namen</p>
+
+        <h3>MAKRO TABLE OVERFLOW</h3>
+
+        <p>Die Tabelle, in die Makros eingetragen werden, ist voll</p>
+
+        <h3>REDEFINATION OF MAKRO</h3>
+
+        <p>Ein Makro wurde zweimal definiert</p>
+
+        <h3>MACRO?</h3>
+
+        <p>Der Compiler fand keine Anweisung hinter einem Makronamen</p>
+
+        <p>»</p>
+
+        <p>Ein Makro sollte aufgerufen werden. Der Compiler fand aber keinen Namen</p>
+
+        <h3>UNDEF'D MACRO</h3>
+
+        <p>Ein nicht definiertes Makro wurde aufgerufen</p>
+
+        <h3>STACK OVERFLOW</h3>
+
+        <p>Der Compiler hat einen eigenen Stack, um Verzweigungen von Kontrollstrukturen zu speichern. Eine zu tiefe Verschachtelung kann der Compiler nicht verarbeiten</p>
+
+        <h3>WHILE ?</h3>
+
+        <p>Der Konditionsausdruck hinter WHILE fehlt</p>
+
+        <h3>WHILE...?</h3>
+
+        <p>Nach der Bedingung mit WHILE fehlt die DO-Anweisung</p>
+
+        <h3>?WHILE...DO</h3>
+
+        <p>Die Schleife wurde nicht mit WHILE...DO definiert, Der Compiler fand aber ENDWHILE ir Der Konditionsausdruck hinter IF fehlt</p>
+
+        <p>Nach der Bedingung mit IF fehlt das Schlüsselwort THEN</p>
+
+        <h3>?IF...THEN</h3>
+
+        <p>Die Verzweigung wurde mit IF. THEN vereinbart, aber nicht mit ELSE beziehungsweise ENDIF abgeschlossen.</p>
+
+        <h3>?REPEAT</h3>
+
+        <p>Die Schleife wurde mit REPEAT definiert, aber UNTIL fehlt</p>
+
+        <h3>UNTIL?</h3>
+
+        <p>Der Konditionsausdruck hinter UNTIL fehlt</p>
+
+        <h3>STACK POINTER =...</h3>
+
+        <p>Nach dem ersten Durchlauf prüft der Compiler, ob Stackzeiger null ist. Wenn ja, dann setzt er seine Arbeit mit dem zweiten Pass fort, andernfalls bricht er sie mit der Anzeige, welche Kontrollstruktur nicht ae abgeschlossen wurde, ab</p>
+
+        <h3>TEXT TO LONG</h3>
+
+        <p>Der Speicher reicht nicht aus, den Text weiter aufzunehmen.</p>
+
+        <h3>GOTO/GOSUB?</h3>
+
+        <p>Die Sprungmarke hinter GOTO beziehungsweise GOSUB fehlt</p>
+
+        <h3>?FILE-NAME- | Der Dateiname des nachzuladenden Quelltextes fehlt.</h3>
+
+        <h3>FILE-NAME TOO LONG</h3>
+
+        <p>Der Dateiname des nachzuladenden Quelltextes ist länger als 16 Zeichen</p>
+
+        <p>Es ist durchaus möglich, mehrere Quelltextdateien zu einem einzigen Objektcode-Programm zusammenzufassen. Sie brauchen hierzu lediglich den Dateinamen des nächsten Quelltextes mit einem führenden Pfundzeichen in die letzte Programmzeile zu schreiben (zum Beispiel »£SOURCE 24.</p>
+
+        <p>Wie bereits oben erwähnt, verwenden Sie bei der Programmerstellung Labels als Sprungziele für GOTO und GOSUB. Das Label muß bei der Definition mit einem führenden Doppelkreuz am Anfang einer Zeile stehen und mit einem Leerzeichen von dem nachstehenden Befehl getrennt sein. Der Aufruf erfolgt mit dem Labelnamen, der aus einer beliebig langen Zeichenkette bestehen darf. Zum Beispiel: GOSUB KEY</p>
+
+        <pre><code>#KEY POKE 198,0: WAIT 198,1: RETURN
+</code></pre>
+
+
+        <p>Nicht erlaubt sind jedoch bedingte Sprünge (IF... THEN) ohne GOTO, verwenden Sie deshalb bitte auch hier den GOTO-Befehl (zum Beispiel IF A=0 THEN GOTO labe)!).</p>
+
+        <p>Der »Basic-Precompiler« erlaubt auch Makro-Instruktionen, die aber nicht mit denen der Assembler-Programmierung vergleichbar sind. Makros bedeuten hier, daß wiederholt auftretende Zeilen anfangs mit einem Kennamen definiert werden können und danach bei Bedarf lediglich mit diesem Namen aufgerufen werden brauchen. Bei der ComPilierung werden sie durch die entsprechenden Befehlszeilen ersetzt. Dem Makronamen muß bei der Definition ein Klammeraffe und beim Aufruf ein Ausrufezeichen vorangestellt werden.</p>
+
+        <p>Die erstellten Texte werden von den verschiedenen Textverarbeitungsprogrammen in unterschiedlicher Weise gespeichert. Deshalb ist es notwendig, den Basic-Precompiler an das gewünschte Format anzupassen. Die abgedruckte Version ist ohne Änderung für Textomat-Dateien verwendbar. Zur Anpassung an andere gängige Formate brauchen nur wenige Zeilen geändert beziehungsweise eingefügt wer-</p>
+
+        <p>den (Tabelle 2). (Hoang-Thai Nguyen/nj)</p>
+
+        <p>_ Vizawrite 6% Mantertere nn</p>
+
+        <p>380 POKE 49520,32 380 POKE 4920,32</p>
+
+        <p>420 POKE 49546,32 420 POKE 49546,32</p>
+
+        <p>440 POKE 49340,220 440 POKE 49340, 220</p>
+
+        <p>515 FORI=0 TO 258. WORDPRO 3 PLUS:</p>
+
+        <p>GET#2WS:NEXT 380 POKE 49520,32.</p>
+
+        <ul>
+            <li>516 GET#2W$:IF WS &lt;> 420 POKE 49546,32.</li>
+        </ul>
+
+
+        <p>CHR$(220) THEN 316 StarTexter 64:</p>
+
+        <p>510 REM 2</p>
+    </article>
+</body>
+
+</html>

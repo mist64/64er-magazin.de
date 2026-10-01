@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Die Axt im Haus... (5)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="dm">
+    <meta name="64er.issue" content="12/86">
+    <meta name="64er.pages" content="48-50">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX21">
+</head>
+
+<body>
+    <article>
+        <h1>Die Axt im Haus... (5)</h1>
+        <p class="intro">Tips &amp; Tricks zur Fehlersuche beim Floppy-Laufwerk 1541: Diesmal erklären wir, wie elektronisch bedingte Lese- und Schreibfehler behoben werden können und wie das Laufwerk selbst justiert werden kann.</p>
+
+        <p>EFehler, der bei der Floppy-Station 1541 häufiger vorkommt, ist ein nicht ordnungsgemäßes Schreiben auf oder Lesen von Diskette. Klammert man vorerst einen möglicherweise verstellten Schreib-/Lesekopf als Fehlerursache aus, ist der Defekt vorrangig in der Elektronik des Diskettenlaufwerks zu suchen. Zum besseren Verständnis der Floppy-Elektronik finden Sie in Teil 4, der in Ausgabe 11/86 abgedruckt war, einen Schaltplan dieser Commodore-Floppy. Außerdem ist in besagter Folge noch ein Foto enthalten, das Ihnen die Lage der Bauteile auf der Platine verdeutlicht. Wenn hinter den Bezeichnungen der Bausteine noch Positionsnummern angegeben sind, beziehen sich diese auf das Bild lin Teil 4, das auf Seite 157in Ausgabe 11 zu finden ist.</p>
+
+        <p>Nachdem Sie wie in Folge 4 beschrieben die Floppy-Station geöffnethaben (ACHTUNG: Garantieverlust), liegt nun die Hauptplatine des Laufwerks vor Ihnen. Beginnen wir nun mit der Fehlersuche.</p>
+
+        <h3>Schreib-Probleme</h3>
+
+        <p>Kontrollieren Sie zuerst den Stecker P8 auf Unterbrechung oder Wackelkontakt. Anschließend ist zu messen,ob an Kontakt 12 des Steckers P6&amp; Low-Pegel anliegt, wenn sich keine Diskette im Laufwerk befindet. Legen Sie eine schreibgeschützte Diskette ein. Der Pegel sollte auf High wechseln. Ist dies nicht der Fall, ist der Schreibschutzsensor M4, der sich im Gußgehäuse des Laufwerks befindet (Lichtschranke), zu kontrollieren.</p>
+
+        <p>Beikorrektem Pegeltesten Sie Pin 6 des Inverters UAl. Ohne Schreibschutz muß High- mit Schreibschutz Low-Pegel anliegen. Wenn das nicht der Fall ist, ist das IC UAl auszutauschen.</p>
+
+        <p>Messen Sie nun den Widerstand des Schreib/Lesekopfs. Zwischen Kontakt 1 und 4desSteckers P8 sollten 16,4 Ohm feststellbar sein. Die Kontakte 4 und 5 desselben Steckers weisen einen Widerstand von 17,4 Ohm auf.</p>
+
+        <p>Versuchen Sie, eine Diskette zu formatieren. Anden Pins 10, 11, 12, 13, 14 und 40 vom VIA UC3 muß Low-Pegel feststellbar sein. Stellen Sie abweichende Pegel fest, sind versuchsweise folgende ICs auszutauschen: UAI, UBl und UD3.</p>
+
+        <p>Liegt an der Interruptleitung (Pin 2]) von UC3 während des Formatierens Low-Pegel an? Wenn nicht, ist dieser Baustein versuchsweise auszuwechseln. Stimmt der Pegel, wird die Suche etwas aufwendiger. Prüfen Sie das RAM (UB2), die CPU (UC4) und den Interface-Baustein (UC2) durch Austauschen. Wechseln Sie nur jeweils ein Bauteil aus, bis der fehlerhafte Baustein gefunden ist.</p>
+
+        <p>Mögliche Fehlerquellen können auch die Transistoren Q3, Q4, Q5, Q6 und Q7 sowie die damit verbundenen Leitungen sein. Auch das Puffer-IC (UD2) und der Controller (UC]) müssen bei weiteren Fehlern durch Austauschen geprüft werden.</p>
+
+        <h3>Lese-Schwierigkeiten</h3>
+
+        <p>Wurde bei einer Überprüfung festgestellt, daß die beiden Port-Bausteine im Computer (6526) in Ordnung sind, muß der Fehler in der Floppy-Station gesucht werden.</p>
+
+        <p>Dazu wird Pin 3 des Steckkontaktes P5 (Position 4) auf Masse gelegt. Damit sollte sich der Antriebsmotor einschalten. Messen Sie nun, ob an Pin 2 des Controllers (UC1, Position 6) High-Pegel anliegt. Andernfalls ist UC1 versuchsweise auszutauschen.</p>
+
+        <p>Wenn der Motor läuft, legen Sie eine Diskette mit Programmen ein. Der Schreib-/ Lesekopf ist auf eine Spur zu positionieren, die Daten enthält (zum Beispiel mit dem LOAD-Befehl). Testen Sie nun aufImpulse an Pin l und Pin 14 des Video-Verstärkers (UF4). Ist kein Signal festzustellen, sollten die Spulen desSchreib-/Lesekopfes auf eventuelle Unterbrechungen untersucht werden. Achten Sie darauf, daß der Stecker P8 (Position 1) keinen Wackelkontakt hat und prüfen Sie die Bauteile und Signale (Spannungen), die mit den Pins |, 3, 5, 7, 8, 10, 12 und 14 des Video-Verstärkers (UF3) in Verbindung stehen. Liegen an Pin 1 und 14 von UF3 die richtigen Signale an, istzuüberprüfen, oban den Pins 2 und 5 von UE4 Impulse vorhanden sind.</p>
+
+        <p>Testen Sie die Spannungen, die an den Pins 1 bis 8 des Bausteins UE4 anliegen. Kontrollieren Sie, ob Impulse an Pin 7 und 10 des Multivibrators UD4 anliegen. Diese Impulse sollten auch feststellbar sein, wenn das Laufwerk nicht läuft.</p>
+
+        <p>Sind an Pin 7 von UD4 keine Impulse feststellbar, während sie an Pin 4 desselben ICs vorhanden sind, tauschen Sie UD4 versuchsweise gegen einen neuen Baustein aus. Fehlen die Pulse an Pin 4, kann der Baustein UD3 defekt sein. SindanPin 7 von UD7 Impulse feststellbar, ist zu prüfen, ob ebenfalls an Pin 12 von UD3, Pin lOund Pin 12 von UD4 Pulse vorhanden sind. Diese Pulse sollten auch feststellbar sein, wenn das Laufwerk nicht läuft. Fehlen die Signale an Pin 12 von UD3, tauschen Sie versuchsweise UC] aus.</p>
+
+        <h3>Der Antriebsmotor läuft nicht</h3>
+
+        <p>Überprüfen Sie zuerst die Spannung an Kontakt 2 des Steckers P5 (11,8 Volt). Fehlt diese Spannung, ist die Stromversorgung (siehe Teil 4) zu kontrollieren. VersuchenSie, ein Programm zu laden und messen Sie den Pegel an Kontakt 3 von Stecker P5. Esmuß ein Low-Pegel anliegen. Stimmt der Pegel, müssen die Spannungen und Bauteile auf der Motor-Control-Platine und der Motor M2 (Bild unten) kontrolliert werden.</p>
+
+        <p>Sollte der Pegel an Kontakt 3 von Pin 5 auf High-Pegellliegen, überprüfen Sie das Signal an Pin 5 von UC1. Liegt Low-Pegel an, ist versuchsweise UD2 gegen einen neuen Baustein auszutauschen. Sollte dagegen ein High-Pegel feststellbar sein, messen Sie nach, obanPin8von UC1 ebenfalls High-Pegel anliegt. Ist dies der Fall, tauschen Sie UC1l gegen einen neuen Baustein aus. Andernfalls kontrollieren Sie das Interface-IC (UC2) durch austauschen.</p>
+
+        <p>Wenn der Motor nun immernochnicht läuft, sind der Reihe nach folgende ICs gegen neue auszuwechseln, bis der Motor läuft: UB2, UB3, UB4, UC3 und UC4.</p>
+
+        <h3>Möglicher Prozessor-Defekt?</h3>
+
+        <p>Vergewissern Sie sich durch Überprüfen des Pegels an Pin 40 des Prozessors (UC4), daß die Reset-Schaltung korrekt arbeitet. Nach dem Einschalten sollte für etwa eine viertel Sekunde Low-Pegel anliegen, der danach bis zum Ausschalten auf High-Pegel wechselt. Funktioniert der Reset nicht ordnungsgemäß, sind der Kondensator C46, die Diode CR7 und die Widerstände R25, R60 und R6l zu kontrollieren.</p>
+
+        <p>Möglicherweise fehlen auch die Taktsignale an den CPU-Eingängen. Prüfen Sie deshalb die Pins 37 und 37 des Prozessors (UC4). Ist das Signal an Pin 39nicht vorhanden, tauschen Sie den Prozessor versuchsweise gegen einen neuen aus.</p>
+
+        <p>Sollte das Signal an Pin 37 der CPU fehlen, kontrollieren Sie die Spannung am Timer-IC (UD5). Beträgt Sie nicht 5 Volt, könnte die Spule L] eine Unterbrechung aufweisen. Falls Sie über ein Oszilloskop verfügen, prüfen Sie die Oszillatorfrequenz an Pin 8 von Baustein UD3. Sie muß 16 MHz betragen. Bei falscher Frequenz prüfen Sie das 16-MHz-Quarzoszillator-Modul Yl. Testen Sie auch, ob an Pin 12 von UD5 das 1-MHz-Taktsignal vorhanden ist. Fehlt dieses Signal, tauschen Sie versuchsweise UD5 aus. Möglicherweise ist auch das Zähler IC UE6 defekt. Dieser Baustein ist dann ebenfalls gegen einen neuen Baustein auszuwechseln.</p>
+
+        <p>Stellen Sie fest, ob aufdem Datenbus (Pins 26 bis 33) und aufdem Adreßbus (Pins 9 bis 20 und 22 bis 33) der VIAs (6522) Impulse feststellbar sind. Fehlen diese Signale und legt am Pin 2 des Bausteins UC4 ein High-Pegel an, ist dieser Baustein gegen einen neuen auszutauschen. Sind die Impulse aber feststellbar, kann ein Austauschen der Bausteine UB2 und UB4 gegen neue ICs zum Erfolg führen. Es kann aberauchdasIC UC6 defekt sein. Verfahren Sie versuchsweise mit diesem Baustein ebenso wie mitdenanderen.</p>
+
+        <p>Weitere Fehlerquellen können auch die Bausteine UC5 und UC7 sein. Doch um diese Fehlerquellen zu lokalisieren, benötigen Sie ein Oszilloskop. Dazu finden Sie in der Reparaturanleitung zur Floppy 1541 (siehe Info), aus der dieser Artikel ein Auszug ist, Oszillogramme und genauere Meßwerte, die bei der Fehlersuche weiterhelfen.</p>
+
+        <h3>Justierung des Laufwerks</h3>
+
+        <p>In den meisten Fällen ist die Ursache bei Leseproblemen ein verstellter Schreib-/ Lesekopf. Wird das Laufwerk zu einem Reparaturservice eingeschickt, können manchmal Wartezeiten bis zu drei Monaten auftreten. Außerdem ist die Reparatur nicht ganz billig und von Fall zu Falltrittder gleiche Fehler innerhalb kürzester Zeit wieder auf.</p>
+
+        <p>Wir bieten Ihnen deshalb zwei Verfahren an, mitdenen Sie das 154l-Laufwerk selbst einstellen beziehungsweise von jedem Radio- und Fernsehfachhandel einstellen lassen können. Bei dem ersten Verfahren handelt es sich um eine reine Software-Lösung, mit der das Laufwerk leider nicht exakt eingestellt werden kann. Inden meisten Fällen ist es aber vollkommen ausreichend. Mit dem zweiten Verfahren kann das Laufwerk dagegen absolut genau eingestellt werden. Dafür benötigt man allerdings ein Oszilloskop.</p>
+
+        <h3>Fixierung der Mechanik</h3>
+
+        <p>Unabhängig vom Verfahren muß zuerst der Schreib-/ Lesekopf neu fixiert werden. Schalten Sie dazu alle Geräte aus und ziehen dann alle Kabel von der Floppy-Station ab.</p>
+
+        <p>Wenn Sie nach der Anleitung aus Teil 4 vorgegangen sind, liegt jetzt das Chassis (Bild) vor Ihnen. Auf der rechten Seite der Chassis-Oberseite sehen Sie nun ein Stahlband, das den Schreib/Lesekopf mit dem Schrittmotor über ein Zugrad verbindet (im Bild oben links). Da sich das Zugrad bei Erwärmung mehr ausdehnt als die Achse des Schrittmotors und nur über eine Preßpassung mit dieser verbunden ist, tritt zwischen Schrittmotor-Achse und Zylinder ein Schlupf auf. Das heißt, daß sich der Zylinder auf der Achse beim Formatieren einer Diskette verdreht und dadurch den Schreib-/Lesekopf verstellt. Um das zu verhindern, muß die Achse und der Zylinder in betriebswarmen Zustand verklebt werden. Dazu eignen sich Superkleber, wie sie von vielen Firmen angeboten werden oder Epoxidharz, das mit einem Härter versehen, ausreichend Festigkeit gewährleistet. Lassen Sie diesen Kleber vorsichtig zwischen Achse und Zylinder laufen. Passen Sie aber auf, daß der Kleber nicht versehentlich mit dem Stahlband in Berührung kommt. Nach etwa drei Stunden Trockenzeit können Platine und Chassis zusammengeschraubt werden. Vergessen Sie nicht, die Steckverbindungen wieder herzustellen. Der Schreib-/Lesekopfistjetztfixiertund dereigentliche Einstellvorgang kann beginnen. Stellen Sie dazu das Laufwerk so vor sich hin, daß der Diskettenschacht senkrecht steht und der Steppermotor (siehe Bild 2 in Teil 4) nach oben weist. Stellen Sie die Verbindung mit dem Computer und dem Netz wieder her und schalten alle Geräte ein.</p>
+
+        <h3>Verfahren 1 (Softwarelösung)</h3>
+
+        <p>Laden Sie das vorher abgetippte Programm (Listing )) und legen eine »sauber« bespielte Diskette in das Laufwerk (am besten die Test/Demo-Disk). Nach dem Lockern der zwei Schrittmotor-Befestigungsschrauben (sieheBild2 ausTeil4)ander Unterseite des Laufwerks kann das Programm mit RUN gestartet werden. Der Menüpunkt »FEINEINSTELLUNG« eignet sich nicht zur Justierung des Laufwerks, denn hier werden alle Spuren getestet und die Lesezeiten der einzelnen Spuren weichen minimal voneinander ab. Es läßt sich also keine minimale Lesezeit einstellen. Wählen Sie deshalb den Menüpunkt »GROBEINSTELLUNG«. Sie werden nach der maximal zulässigen Lesezeit gefragt. Die Voreinstellung beträgt 0,2 Sekunden. Das ist die Zeit, die dem Laufwerk zur Verfügung steht, um einen Sektor zu lesen. Wird diese Zeit überschritten, erscheint auf dem Bildschirm in roter Farbe eine Fehlermeldung. Ist die Lesezeit kürzer als 0,2 Sekunden, wird einmal die tatsächliche Zeit, die das Laufwerk braucht, um einen Sektor zu lesen, angezeigt. Zum anderen wird diese Lesezeit optisch durch einen querliegenden Balken verdeutlicht.</p>
+
+        <p>Versuchen Sie durch Verstellung des Schrittmotors diese Lesezeit auf ein Minimum zu reduzieren. Ist das geschehen, sind die Einstellschrauben leicht anzuziehen, so daß sich der Schrittmotor nicht mehr von selbst verstellen kann. Sie werden sehen, daß sich die Lesezeit alleine durch das Festschrauben verändert hat. Versuchen Sie jetzt, indem Sie den Vorgang wiederholen, die Lesezeitnochmals zu optimieren. Anschließend sind die Einstellschrauben fest anzuziehen und das Laufwerk kann wieder zusammengebaut werden.</p>
+
+        <h3>Verfahren 2 (Hardwarelösung)</h3>
+
+        <p>Da der C 64 wie jeder andere Computer auch ein Gerät ist, das Daten digital verarbeitet, lassen sich analoge Einstellvorgänge zwar hinreichend genau, aber nicht exakt durchführen. Aus diesem Grund haben wir eine Hardware-Lösung entwickelt, mit der jeder, der den Umgang mit einem Oszilloskop beherrscht, das 1541-Diskettenlaufwerk absolut exakt einstellen kann. Voraussetzung ist eine Diskette, die mit einem völlig intakten Laufwerk beschrieben wurde (zum Beispiel die Test/Demo-Diskette).</p>
+
+        <p>Die Vorgehensweise ist die gleiche wie bei Verfahren 1, nur mit dem Unterschied, daß nach dem Einschalten aller Geräte und dem Lösen der Einstellschrauben folgende Zeilen anstelle des Programms eingegeben werden müssen:</p>
+
+        <pre><code>10 OPEN 2,8,2,"#":
+OPEN 15,8,15 20 PRINT#15,"UL 2018 0":
+GOTO 20
+</code></pre>
+
+
+        <p>Die Aufgabe des kleinen Programms, das mit RUN gestartet wird, ist das permanente Lesen des Sektors 0 auf Spur 18. Diese Spur und dieser Sektor sind mit Absicht gewählt worden, dader Abstand zu Spur 1 und Spur 35 der gleiche ist. Stellen Sie nundie YAblenkung des Oszilloskops auf 10 mV/cm und die X-Ablenkung auf 1 ms. Verbinden Sie den Tastkopf, der bei den angegebenen Einstellwerten ein Tastverhältnis von 1:10 haben muß, mit Pin 8 von Baustein UF3. Das Oszillogramm zeigt ein »hochfrequentes« Signal, das bei exakter Justierung einen Spannungspegel von etwa 350 mV haben sollte. Dieser Spannungspegelistaber nur ein Anhaltspunkt und hängt in erster Linie vom Alter der Diskettenaufzeichnung ab. Verdrehen Sie den Schrittmotor so lange, bis der Spannungspegel ein Maximum erreicht. Auch ist bei einem dejustierten Schreib-/Lesekopf dem hochfrequenten SignaleinniederfrequentesSignal überlagert, das an der zyklischen Amplitude zu erkennen ist. Dieses Signal verschwindet bei exakt eingestelltem Schreib-/Lesekopf.</p>
+
+        <p>Damit beschließen wir diesen Teil des Reparaturkurses. Die nächste Folge des Kurses beschäftigt sich mit Reparaturtips und -Hinweisen, die uns als Reaktion auf diese Serie von Lesern erreichten.</p>
+
+        <address class="author">(dm)</address>
+
+        <p>Alle in dieser Serie gemachten Anleitungen werden in der Redaktion sorgfältig geprüft. Für Fehler, die durch unsachgemäße Handhabung entstehen, übernehmen wir keine Haftung</p>
+
+        <p class="source">Info: Reparaturanleitung Commodore-Foppy VC1541/1541, 1985, te-wi Verlag, Markt&Technik Verlag AG, Hans-Pinsel-Str. 2, 8013 Haar. Rat und Tat, Technischer Kundendienst GmbH, Theodor-Althoff-Str. 2, 4300 Essen,</p>
+
+
+        <p></p>
+    </article>
+</body>
+
+</html>

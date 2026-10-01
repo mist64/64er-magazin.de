@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Sprites im Abseits</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Chr. Zänker, R. Frahm, tr">
+    <meta name="64er.issue" content="12/86">
+    <meta name="64er.pages" content="91, 94">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX31">
+</head>
+
+<body>
+    <article>
+        <h1>Sprites im Abseits</h1>
+        <p class="intro">Mit Hyperscreen Il ist es erstmals möglich, Sprites im linken und rechten Bildschirmrahmen darzustellen. Dadurch lassen sich Laufschriften vom rechten zum linken Bildschirmrand realisieren.</p>
+
+        <p>as Verschwinden des seitlichen Randes beruht auf einem ähnlichen Prinzip wie Hyperscreen, bei dem der obere und untere Rand durch das Umschalten von 25- auf 24-Zeilen-Darstellung bei einer bestimmten Rasterzeile erfolgt (siehe dazu den Artikel von H. Gehrmann in der 64er, Ausgabe 12/85). BeiHyperscreen II wird jedoch zwischen 38- und 40-Spalten-Darstellung hin- und hergeschaltet. Das muß jedoch, da der seitliche Rahmen in jeder Rasterzeile neu gesetzt wird, in jeder Zeile geschehen, in der der Rahmen verschwinden soll. Zudem ist es notwendig, daß dieses Umschalten auf den Taktzyklus genau erfolgen muß. Dazu ist es erforderlich, daß der Rasterzeilen-Interrupt, mit dem die »Side-Border-Routine« aufgerufen wird, immer zur gleichen Zeit ausgelöst wird, was bereits einige Probleme aufwirft, da einIRQ immer erst nach Beendigung eines Befehls ausgelöst werden kann. Deshalb verzögert sich der IRQ-Aufruf oft um ein paar Taktzyklen, was die Funktion der »SB-Routine« verhindert.</p>
+
+        <p>Da es nicht möglich ist, die X-Position des Rasterstrahls abzufragen, um die oben erwähnte Verzögerung desIRQ auszugleichen, muß man sich eines Tricks bedienen. Man stellt in der Zeile, über der der IRQ ausgelöst wird, Sprites dar. Dadurch wird gewährleistet, daß der Raster-IRQ wirklich immer zur gleichen Zeit ausgelöst wird.</p>
+
+        <p>Im IRQ-Programm wird mit Hilfe einer Verzögerungsschleife genau an der richtigen Stelle (etwa 5 mm vom rechten Rahmenrand entfernt) zwischen 40- und 38-Spalten-Darstellung hin- und hergeschaltet. Es werden also soviele Zeilen ohne seitlichen Rand dargestellt, wie die Schleife durchlaufen wird. Dabei ist zu beachten, daß die Schleife nur in dem von den Spritesin Y-Richtung überdeckten Bereich richtig arbeitet.</p>
+
+        <p>Die oben genannte Schleife ist auch der Grund dafür, daß der seitliche Rahmen nur ober- und unterhalb des Textfensters sentfernt«werden kann. Im Textfenster wird nämlich bei jeder achten Zeile die Arbeit der CPU vom VIC unterbrochen, um die Bitmuster für die darzustellenden Zeichen aus dem Zeichengenerator auszulesen. Die Schleife würde also immer nach acht Zeilen »gestört« werden.</p>
+
+        <p>Um Sprites am äußersten linken Bildschirmrand darstellen zu können, muß die X-Koordinate desbetreffenden Sprites etwa 498 betragen, was jedoch im wesentlichen vom verwendeten Monitor oder Fernseher abhängig ist.</p>
+
+        <h3>Hinweise zum Abtippen</h3>
+
+        <p>Nach dem Start des MSE-Listings von Hyperscreen II (Listing 1) mit »SYS 49152« werden acht Sprites, die vom äußersten linken zum rechten Bildschirmrand reichen, in verschiedenen Farben auf dem Monitor sichtbar. Dieses Demo ist zwar wenig eindrucksvoll, jedoch wurde versucht, das Programm möglichst kurzzuhalten, daesja im wesentlichen zum Einbau ein eigene Interrupt-Programme bestimmt ist. Dabei ist folgendes zu beachten: Wichtig sind von Listing 4 nur die Zeilen 1810 bis 2130, welche den seitlichen Rahmen entfernen. Diese kurze Routine muß durch einen Raster-Interruptin Zeile $ F9 aufgerufen werden. das zweite MSE-Listing »SCROLL.OBJ« (Listing 2) abgetippt wurde. Diese beiden Programme werdennach dem Startdes Basic-Programmes von Diskette nachgeladen. Danach wird ein beliebiger Text, der in den DATA-Statements ab Zeile 380 stehen muß, hinter das Maschinenprogramm zum Scrollen eines Textes geschrieben. Die POKEs in den Zeilen 290 bis 310 bewirken nun, daß anstatt des kurzen Demoprogramms, das normalerweise beim Start von Hyperscreen Il aktiviert wird, ein Sprung auf »SCROLL.OBJ« erfolgt. Außerdem wird jetzt bei jedem IRQ der Text um einen Punkt weitergescrollt.</p>
+
+        <address class="author">(Chr. Zänker/R. Frahm/tr)</address>
+
+        <h2>Verwendete Speicherstellen außerhalb der vom Programm belegten Bereiche:</h2>
+
+        <p>Hyperscreen Il Scroll.obj: keine (Bit $02 dient nur zur Verzögerung) $b0,$b1,$b2 als Hilfszeiger $9e/$9f als Zeiger auf den zı scrollenden Text $3e00 bis $4040 für Sprites</p>
+    </article>
+</body>
+
+</html>

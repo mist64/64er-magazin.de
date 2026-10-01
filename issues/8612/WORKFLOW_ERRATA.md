@@ -202,3 +202,32 @@ I did with it, what is true, what it cost, the sentence that would have prevente
 - **What would have prevented it.** "…browser-safe — EXCEPT `</` followed by a
   non-letter (`</>`, `</1>`), which the HTML tokenizer swallows; escape those too."
   Plus a check: `re.findall(r'</[^A-Za-z]', outside_fences)` must be empty.
+
+## 070 — the script `git add`s silently, and it is not idempotent on `'’`
+
+- **What the rule says.** "In-place rewrite, idempotent (re-running on a cleaned file is a
+  no-op)." Nothing about staging.
+- **What is true** (sub-agent found both; I confirmed the first by reading the script).
+  - `r070_html_cleanup.sh` ends `git add "$1" 2>/dev/null || true`. r000 warns that
+    self-staging scripts plus a shared index have swept files into the wrong commit three
+    times, but r000's list of self-staging scripts (060, 080, 100) omits 070.
+  - `''` → `"` runs before the curly folding, so `TEDMON'’s` became `TEDMON''s`, and a
+    second run would make it `TEDMON"s`. Also, `''` → `"` is wrong for a math double prime
+    (`P''`, 8612 L2577), which survived only by that ordering accident.
+- **Cost.** ~3 min orchestrator time.
+- **What would have prevented it.** Add 070 to r000's list of self-staging scripts (or
+  drop the line). Fold curly quotes FIRST, then `''`. Say whether `''` can be legitimate
+  (a prime/double prime in a formula is).
+
+## 080 — no rule for joining a continuation: where its text goes, and the "Fortsetzung" lines
+
+- **What the rule says.** Nothing. r030 strands a continuation when the marker is OCR'd or
+  one-sided, and r080 never mentions continuations.
+- **What happened.** The sub-agent (briefed by me) decided both from precedent: drop the printed
+  "Fortsetzung von/auf Seite N" lines (git grep finds none kept in 85xx/86xx), and splice the jump's
+  text where the jump line was (reading order), not at the end of the file.
+- **What would have prevented it.** r080: "A `[Fortsetzung von Seite N]` section from 030 is
+  joined to its host at the host's `Fortsetzung auf Seite M` line (reading order), the printed
+  Fortsetzung lines are dropped, and the host's page spec gains M."
+- Also (sub-agent): Verification 2's `tr '?/:' '_'` does not mirror the script's sanitiser
+  (`<>:"/\|?*+`), and the rule's prose says only `? / :` are sanitised.

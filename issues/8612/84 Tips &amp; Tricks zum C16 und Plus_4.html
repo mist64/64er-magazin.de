@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C16 und Plus/4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Erwin Huber, tr, Oliver Eickhoff, tr, Sven Burgdorf, tr, tr">
+    <meta name="64er.issue" content="12/86">
+    <meta name="64er.pages" content="84-85">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX29">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C16 und Plus/4</h1>
+        <p class="intro">Wir zeigen Ihnen, wie Sie im Grafikmodus des C 16 bis zu 4 KByte Basic-Speicher zur Verfügung haben. Außerdem bringen wir einige interessante PEEKs und POKEs und ein Grafikprogramm zum Experimentieren.</p>
+
+        <p>chtung: An alle versierten C 16- und Plus/4-Programmierer! Wir suchen dringend einen »MSE« und einen »Checksummer« für obengenannte Computer. Die Programme sollten mit denselben Prüfsummern arbeiten, wie die C 64-Versionen. Es wird also am günstigsten sein, wenn die bereits vorhandenen Programme nur noch auf diese Computer mit den geänderten Adressen angepaßt werden. Der»ChecksummerC l6&amp;«muß natürlichauch den erweiterten Befehlssatz des Basic V3.5 verarbeiten können.</p>
+
+        <p>Passend zu diesem Checksummer benötigen wir ein Druckprogramm, das die Steuerzeichen des Computers (zum Beispiel Cursor-Bewegungen innerhalb von PRINT-Anweisungen) in Klartext übersetzt (siehe Checksummer C 64). Wenn Sie einen entsprechenden Lösungsvorschlag entwickelt haben, schicken Sie ihn an die Redaktion, zu Händen Herrn Röder oder setzen Sie sich telefonisch mit uns in Verbindung.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>PEEKs und POKEs</h2>
+
+        <p>Und hier wieder einmal eine Liste mit interessanten Speicheradressen für den © 16 und Plus/4: POKE 0,0 Datasettenmotor aus</p>
+
+        <p>POKE 0,15 Datasettenmotor ein</p>
+
+        <p>PRINT PEEK() Abfrage der Datasette:</p>
+
+        <p>200= Aus, 216=Störung, 192=eine der Tasten PLAY/REW/FWD gedrückt, 208=PLAY und REC gedrückt</p>
+
+        <p>SYS 32768 Reset POKE 240,255 POKE 1351,128 Wartet, bis eine Taste gedrückt wird Groß/Klein-Umschaltung wird blockiert</p>
+
+        <p>PRINT PEEK(1347) Sondertastenabfrage &lt;SHIFT&gt;/ &lt;CTRL&gt; und &lt;CBM&gt; POKE 652886,</p>
+
+        <p>PEEK(65286)</p>
+
+        <p>AND239 Bildschirm abschalten</p>
+
+        <p>POKE 652886,</p>
+
+        <p>PEEK(65286)OR16 Bildschirm einschalten</p>
+
+        <p>POKE 814,23 LOAD wird nicht mehr ausgeführt</p>
+
+        <address class="author">(Oliver Eickhoff/tr)</address>
+
+        <h2>Die kleine Schlange</h2>
+
+        <p>Das Zeichenprogramm, das folgt, zeichnet eine Schlangenlinie. Es ist kein großartiges Programm, aber für C 16-Fans und Anfänger das richtige.</p>
+
+        <pre><code>10 COLOR 4, 5
+20 GRAPHIC 1,1
+30 FORX=T0319
+40 Y = INT (100 +99 * SIN (X/20)) 50 DRAW 1 TO X,Y
+60 NEXT X
+70 GRAPHIC O0
+80 END
+</code></pre>
+
+
+        <p>Man kann das Programm auch mit Punkten zeichnen, dann muß man Zeile 50 umändern. Sie lautetdann 50 DRAW 1, X, Y.</p>
+
+        <address class="author">(Sven Burgdorf/tr)</address>
+
+        <h2>Bis zu 4 KByte Basic-Speicher im Grafikmodus des C 16</h2>
+
+        <p>Das größte Problem, mit dem sich die Benutzer des C 16 herumschlagen müssen, ist der kleine Arbeitsspeicher der Grundversion. Er beträgt im Normalmodus bekanntlich nur 12277 Byte; im Grafikmodus gar nur noch 2045 Byte.</p>
+
+        <p>Wer käufliche oder veröffentlichte Programme, die mit der hochauflösenden Grafik arbeiten, um eigene Routinen, Melodien oder Texte erweitern will, wird enttäuscht, weil diese Programme den Speicher meist bis aufs letzte Byte ausnutzen. Auch der Selbstentwickler wird nicht sehr erfreut sein, wenn der Speicher das Programm gerade nicht mehr aufnehmen kann. Diesen Problemen kann jedochin den meisten Fällen, ohne einen Pfennig für Speichererweiterungen auszugeben, abgeholfen werden: denn so unglaublich es klingt, mit ein paar Tricks stehen Ihnen im Grafikmodus 4053 Byte zur Verfügung.</p>
+
+        <p>Um die Tricks auch einigermaßen zu verstehen, sollte man sich zunächst über den Aufbau des RAM klar werden. Der Speicher des C 16 gliedert sich in sieben Bereiche</p>
+
+        <p>‚Adressen 0 bis 2047 umfassen die Zeropage _ und dient gewissermaßen als Member für _ das Betriebssystem.</p>
+
+        <p>_ Adressen 2048 bis 3071 beithalten die Farbin_ formationen für Hintergrund und Vordergrund jeder einzelnen der 25 x 2 Bildschirmpositio_HKenimTextmodus</p>
+
+        <p>Bereich: ‚Adressen 3072 bis 4095 uifassen den Speicherbereich für die auf dem Bildschirm im Textmodus dargestellten Zeichen. Bereich 4 Adressen 4096 bis 6143 umfassen den Bereich de Basic-Speichers, der auch im Grafikmodus verfügbar ist.</p>
+
+        <p>_ Adressen 6144 bis 16383 dienen | im Textmodus als Basic-Speicher, im Grafikmodus ist dort der</p>
+
+        <p>Bildschirminhalt abgelegt.</p>
+
+        <p>Adressen 16384 bis 64767 sind als RAM beim € 16 nicht bestückt.</p>
+
+        <p>Adressen 64768 bis 65535 werden vom Computer ähnlich gehandhabt wie der Bereich 1.</p>
+
+        <p>Nun muß man sich folgendes verdeutlichen: — Im Textmodus wird das Basic-Programm in den Bereichen 4 und 5 abgelegt, die Bereiche 2 und 3 dienen zur Speicherung des Bildschirminhalts.</p>
+
+        <p>— Im Grafikmodus ist das Basic-Programm im Bereich 4 enthalten, der Bereich 5 speichert den Bildschirminhalt.</p>
+
+        <p>Eine naheliegende Frage lautet nun, was bei eingeschaltetem Grafikmodusin den Bereichen 2 und 3, also aufdem Textbildschirm, vor sich geht. Die Antwortlautet: Nichts! Und man kann diese Bereiche für Basic-Programme nutzen. Vorzugsweise natürlich bei Grafikprogrammen, mit Einschränkungen aber auch im Textmodus.</p>
+
+        <p>Bei allen drei im folgenden dargestellten Möglichkeiten wird der Zeiger für den Basic-Anfang verschoben, und zwar entweder unmittelbar hinter den Bildschirmspeicher oder aber in die Bereiche 2 beziehungsweise 3. Die Verschiebung der Zeiger muß jeweils nach einem Reset, also vor dem Eingeben oder Laden von Programmen erfolgen. Natürlich können dann die Programme, die keine Speichererweiterung benötigen, ganz normal geladen werden. Programme, die den erweiterten Speicher benötigen, sind ohne die Verschiebung der Zeiger nicht lauffähig, da sie bei Erreichen des »GRAPHIC«-Befehls einen »out of memory error« erzeugen. Sie können jedoch (ohne die Zeiger zu verschieben) geladen, gelistet und bearbeitet werden.</p>
+
+        <p>Wie bereitserwähnt, gibtesdrei Möglichkeiten, den Basic-Anfang zu verschieben.</p>
+
+        <ol>
+            <li>Man verschiebt den Basic-Anfang unmittelbar hinter das letzte Zeichen des Bildschirmspeichers. Ausgenutzt wird dabei die Tatsache, daß der Bildschirm aus 25 x 40 = 1000 Zeichen besteht, der C 16 dem Bereich 3 aber 1 KByte, also 1024 Byte zur Verfügung stellt. Die überschüssigen Bytes können Sie mit folgendem Befehl an den Arbeitsspeicher anhängen:</li>
+        </ol>
+
+
+        <pre><code>POKE 44,15:POKE 43,233: POKE4072,0:NEW
+</code></pre>
+
+
+        <p>Die beiden ersten POKEs setzen den Zeiger für den Basic-Anfang auf das erste freie Byte. Der dritte POKE-Befehl setzt an den neuen Basic-Anfang eine notwendige Null. Durch »NEW« wird der Computer veranlaßt, weitere interne Adressen an den neuen Basic-Anfang auszurichten. Sie haben nun 22 Byte gewonnen, der Textbildschirm steht voll zur Verfügung und Sie werden im weiteren Verlauf der Arbeit nichts von der Veränderung bemerken.</p>
+
+        <ol>
+            <li>Wesentlich mehr, nämlich bis zu 822 Byte, stehen Ihnen mit der zweiten Möglichkeit zur Verfügung. Dabei wird der Basic-Anfang in den Textbildschirm gesetzt. Das Basic-Programm, dassich dann im Bildschirmbereich befindet, äußRert sich durch einen Zeichensalat in der unteren Hälfte des Bildschirms. Als besonders vorteilhaft erweist sich hier einmal mehr die Möglichkeit des C 16, Windows zu definieren. Damit kann nämlich der Bildschirmbereich, in dem sich das Basic-Programm befindet, vordem Überschreiben geschützt werden. Es steht Ihnen also bei dieser Möglichkeit ein Fenster in der oberen Bildschirmhälfte zur Verfügung, dessen Größe Sie je nach Bedarf selbst festlegen können. In diesem Fenster können Sie Ein- und Ausgaben durchführen, Programme schreiben, listen und testen wie gewohnt. Ein Nachteil ist wohl, daß Programme, die den Textbildschirm nutzen, eventuell so geändert werden müssen, daß sie mit dem definierten Fenster auskommen.</li>
+        </ol>
+
+
+        <p>Wollen Sie diese Möglichkeit nutzen, so gehen Sie folgendermaßen vor:</p>
+
+        <p>— Überlegen Sie, wieviel Speicherplatz Sie brauchen, das heißt wie groß Ihr Fenster sein darf.</p>
+
+        <p>— Bringen Sie den Cursor auf das letzte Zeichen der letzten nutzbaren Zeile.</p>
+
+        <p>— Drücken Sie nacheinander die Tasten &lt;ESC&gt; und &lt;B&gt;. — Entnehmen Sie die entsprechenden Werte aus der untenstehenden Tabelle.</p>
+
+        <p>— Setzen Sie die Werte für H,Lund N aus der Tabelle in den folgenden Befehl ein: POKE 44,H : POKE 43, L : POKEN,O : NEW</p>
+
+        <ol>
+            <li>Die dritte Möglichkeit hatzwarleider mehr Nachteile, die aber durch den Gewinn von 2 KByte Speicher leicht wettgemacht werden. Da bei Ausnutzung dieser Speichergröße nur eine einzige Textzeile im Textmoduszur Verfügung steht, muß man folgendermaßen vorgehen: Die Programme werden im Normalmodus geschrieben, dabei darf der Grafikmodus auch vorher nicht eingeschaltet worden sein, da auch »GRAPHIC 0« den Grafikspeicher nicht für Basic freimacht, sondern nur in den Textmodus umschaltet. Ein Testen von Programmen ist also nur sehr eingeschränkt, eventuell nur durch Weglassen der »SRAPHIC«-Befehle möglich.</li>
+        </ol>
+
+
+        <p>Nun muß in das fertige Programm eine REM-Zeile so eingebaut werden, daß die Codes der Eingaben (LOAD, RUN etc.) die in der ersten Bildschirmzeile durchgeführt werden müssen, im Programm hinter eben diese REM-Anweisung zu stehen kommen. Auf diese Weise kann trotz Betrieb der ersten Bildschirmzeile bei erweitertem Basic-Speicher dieser am Stück« gehandhabt werden. Um die richtige Zeilennummer für diese REM-Zeile zu finden, gehen Sie folgendermaßen vor:</p>
+
+        <p>— Beginnen Sie mit dem Wert 5</p>
+
+        <p>— Zu Beginn jeder Zeile zählen Sie 5 dazu. — In den Zeilen zählt jedes Zeichen |, dabei gelten Basic-Befehlswörter als ein Zeichen.</p>
+
+        <p>— Am Ende von Zeilen dürfen keine unnötigen Leerstellen stehen.</p>
+
+        <p>— Die Zeilennummer und die darauffolgende Leerstelle werden nicht gezählt.</p>
+
+        <p>— Vor der Zeile, mitder Sie den Wert 984 erreichen, fügen Sie folgende Zeile ein: &lt;Zeilennummer&gt; REM [80 beliebige Zeichen] Beispiel: 980 REM EEEEEEEEEEEEE... und so weiter.</p>
+
+        <p>— Nun speichern Sie das Programm.</p>
+
+        <p>— Cursor auf das letzte Zeichen der ersten Zeile setzen. — &lt;ESC&gt; und dann &lt;B&gt; drücken.</p>
+
+        <p>— POKE 44,8: POKE 43,41 : POKE 2088,0 : NEW eingeben. — Programm laden und starten.</p>
+
+        <p>Anmerkung: Die Möglichkeit 1 funktioniert in allen Grafikmodi, beiden Möglichkeiten 2 und 3 dürfen nur die Grafikmodi mit ungeteiltem Bildschirm, also GRAPHIC 1 und GRAPHIC 3 benutzt werden. Ich meine, daß sich mit den dargestellten Tricks trotz der erwähnten Nachteile sehr viel anfangen läßt.</p>
+
+        <address class="author">(Erwin Huber/tr)</address>
+    </article>
+</body>
+
+</html>

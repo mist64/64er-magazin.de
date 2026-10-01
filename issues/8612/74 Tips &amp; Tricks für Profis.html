@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Seiler, tr, Gerhard Muth, tr, Ingo Godauftr, Markus Raute, tr, Stefan Blomen, tr, W.D. Busch, tr, tr">
+    <meta name="64er.issue" content="12/86">
+    <meta name="64er.pages" content="74-76, 78">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX27">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">Haben Sie schon einmal daran gedacht, einen Stack in Basic zu simulieren? Oder die NMI-Routine umzuprogrammieren? Wir zeigen Ihnen neben diesen beiden Tricks und vielen weiteren auch eine Tabelle mit einigen interessanten Systemadressen.</p>
+
+        <p>K:: Ursache, große Wirkung: Im Leserforum der Ausgabe 8/86 der 64'er fragte ein Leser nach der »größten Primzahl der Welt«. Seitdem treffen ständig mehr oder weniger kurze Listings ein, die sich mit Primzahlen auseinandersetzen. Ohne Zweifel, ein heißes Thema für Computerfreunde. Bleibt abzuwarten, wie weit diese Entwicklung geht. Vielleicht haben Sie ja auch einmal ein kniffliges Programm zum Thema Primzahlen geschrieben. Schicken Sie es an die 64'er! Interessante Lösungsmöglichkeiten werden wir veröffentlichen.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>Star SG-10 und Bar-Codes</h2>
+
+        <p>Nach dem Umschreiben auf Star SG-10 und anschließendem Probelauf sowie einen Vergleich mit tatsächlich vergebenen EAN-Codes, bin ich zu der Überzeugung gelangt, daß in Zeile 85 ein Fehler vorhanden ist. Meines Erachtens müßte der dritte DATA-Wert »1000100« lauten, statt wie angegeben, »1001000«. Dieses wäre schon allein durch die Tatsache erklärt, daß der Zeichensatz C das Spiegelbild des Zeichensatzes B, beziehungsweise die Invers-Darstellung von Zeichensatz A darstellt.</p>
+
+        <p>Übrigens läßt sich die Höhe der ausgedruckten Balken durch Ändern der Variablen RC in Zeile 52 reduzieren (zum Beispiel RC=5), was für die meisten Anwendungen ausreichen dürfte und beim Ausdruck eine bedeutende Zeitersparnis bedeutet.</p>
+
+        <p>Bild 1 zeigt die Programm-Änderungen für den Drucker Star SG-10 sowie der berichtigten Zeile 85 und einem Probeausdruck. Da das von mir verwendete Star-Secus-Interface die Steuerzeichen im Klartext ausdruckt, ist statt desangegebenen »ESC« jeweils &lt;CTRL+:&gt; und statt »($D)« ist &lt;CTRL+A&gt; einzugeben, wie auch bereits. im Artikel erwähnt.</p>
+
+        <address class="author">(Markus Raute/tr)</address>
+
+        <h2>Ku-Ba-Graf und Epson-Drucker</h2>
+
+        <p>Um das Programm Ku-Ba-Graf aus dem Grafik-Sonderheft 6/86 an einen (Epson-kompatiblen) Drucker anzupassen, der am seriellen Bus betrieben wird, sind nur ein paar Änderungen nötig.</p>
+
+        <p>Zuerst »Epson Support« laden;</p>
+
+        <pre><code>LOAD" EPSON-SUPPORT",8,1 NEW
+</code></pre>
+
+
+        <p>Durch die folgenden drei POKEs wird die Ausgaberoutine auf eine Betriebssystemroutine (CHROUT $FFD2) umgeleitet:</p>
+
+        <pre><code>POKE 49650,210 BPNKEB LOAS1I_DE5
+</code></pre>
+
+
+        <p>Wer ein »Auto-Line-Feed«an seinem Drucker eingeschaltet lassen will, gibt noch folgenden POKE ein:</p>
+
+        <pre><code>POKE 50326,0
+</code></pre>
+
+
+        <p>Jetzt kann das geänderte »Epson-Support« (mit einem Monitor) gespeichert werden. Wem daszu kompliziert ist, kann die vier POKEs auch an den Anfang des Basic-Hauptprogramms stellen.</p>
+
+        <p>Um die Änderungen am Maschinenprogramm möglichst gering zu halten, muß nun noch das Hauptprogramm verändert werden:</p>
+
+        <pre><code>547 .OPEN1,4:CMD1:&amp;PRINT:PRINT#1:CLOSEL 880 OPEN1,4:CMD1:&amp;PRINT:PRINT#1:CLOSE1:RETURN
+</code></pre>
+
+
+        <p>In Zeile 550 muß &amp;PRINT, in Zeile 870 &amp;PRINT und RETURN gelöscht werden.</p>
+
+        <p>Jetzt kann das geänderte Programm gespeichert werden. Nach diesen Änderungen funktioniert Ku-Bu-Graf zumindest auf meinen NL-10 einwandfrei.</p>
+
+        <address class="author">(Stefan Blomen/tr)</address>
+
+        <h2>Hohe Primzahlen</h2>
+
+        <p>Zu dem Leserbrief in der 64'er 8/86 auf Seite 18über Primzahlen habe ich mir Gedanken gemacht und ein kurzes Primzahlprogramm entwickelt, welches in relativ kurzer Rechenzeit viele Primzahlen auf dem Bildschirm ausdruckt. Wenn dieses Programm (Listing ]) compiliert wird, läuft esetwa um 50 % schneller. Es werden zwar keine solch hohen Primzahlen erreicht wie in dem genannten Beispiel, dazu wäre auch der Speicherplatz zu gering, dafür nutze ich aber die gesamte Rechengenauigkeit des C 64 aus.</p>
+
+        <p>Der Befehl »INT (A% in Zeile 20 wird deswegen gebraucht, daderC 64 sonst mitseiner Rechenungenauigkeit immer das falsche Ergebnis herausbekommt.</p>
+
+        <p>Das Programm wurde kurz gehalten, damit es möglichst schnell ablaufen kann.</p>
+
+        <address class="author">(Ingo Godauftr)</address>
+
+        <h2>Stack in Basic</h2>
+
+        <p>Im folgenden will ich eine Programmier-Strategie vorstellen, die die Einrichtung vieler Variablen überflüssig macht und die sogar die rekursive Programmierung bequem unterstützt.</p>
+
+        <p>Die Hauptschwierigkeit beim Programmieren in Basic besteht darin, daß für jede Kleinigkeit eine neue Variable eingerichtet werden muß. In vielen Fällen würde es reichen, einen Wert einfach aufeinem Stack abzulegen und später wieder zurückzuholen: Basic hat aber keinen Datenstapel.</p>
+
+        <p>Wirklich nicht? Eigentlich besteht ein solcher Stapel doch nur auseinemeindimensionalen Datenfeld und einer Zeigervariablen: beides Elemente, die von Basic unterstützt werden. Warum machen wir uns nicht einfach selber einen?</p>
+
+        <p>Mit DIM STACK(255) wird das Array eingerichtet; die Tiefe 255 ist willkürlich gewählt. Der zugehörige Zeiger seiP=0.</p>
+
+        <p>Der Befehl push X $lege den Wert von X aufdem Stack ab«) wird folgendermaßen nachgebildet: P=P+1:STACK(P)=X; der Befehl pop X hole den Wert für X vom Stack«) so: X=STACK(P) :P=P-1.</p>
+
+        <p>Der Datenstack bildet eine sehr einfache Möglichkeit, Parameter an Subroutinen zu übergeben, oder aber auch Funktionen mit echter Fallunterscheidung zu simulieren (die Parameter-Eingabe wie auch die -Ausgabe steht stets auf dem Stack!).</p>
+
+        <p>Listing 2 demonstriert anhand der allseits beliebten Fakultätsberechnung, daß mit Hilfe des Datenstacks in Basic sogar rekursiv programmiert werden kann. Nochmal ganz kurz zur Fakultätsdefinition:</p>
+
+        <p>Def fak(n): wenn n&lt;2, dann übergib (l), andernfalls übergib (n*fak(n-))).</p>
+
+        <p>Diese Strategie des selbstprogrammierten Stacks löst nun längst nicht alle Schwierigkeiten in Rauch auf: Beispielsweise bleibt es beider begrenzten Anzahl von GOSUB-Ebenen (2]). Aber es wirkt dem »Spaghetti-Charakter« vieler Programme entgegen.</p>
+
+        <address class="author">(W.D. Busch/tr)</address>
+
+        <h2>Die (neue) NMi-Routine</h2>
+
+        <p>Jeder kennt sie! Sie wird durch das Drücken der Tasten &lt;RUN/STOP+RESTORE&gt; aktiviert. Die NMI-Routine ist nichts Neues, auch nicht, daß sie bestimmte Vektoren wieder zurücksetzt, was nicht immer erwünscht ist.</p>
+
+        <p>Da man in jeder zweiten 64'er (Tips und Tricks) lesen kann »... und nach dem Drücken von &lt;RUN/STOP +RESTORE&gt; muß das Programm wieder mit SYS xxxxx aktiviert werden...«, gebe ich hier eine kleine Hilfestellung.</p>
+
+        <p>Den oben beschriebenen Effekt vermeide ich, indem ich den wichtigsten Teil der Original-NMI-Routine kopiere und an deren Schluß ein kleines Initialisierungsprogramm für meine »eigenen Vektoren« und sonstige Einstellungen setze. Ich erkläre es besser an einem Beispielprogramm, das bei $1000 beginnt (am besten gleich den SMON laden). Mit der folgenden Mini-Routine »verbiege« ich den sogenannten NMI-Vektor.</p>
+
+        <pre><code>1000 1da#$0b ; 1002 1d4x#$10 ; 1004 sta $0318 ; 1007 stx $0319 ; 100a rts
+</code></pre>
+
+
+        <pre><code>lo-byte hi-byte NMI-Vektor, 10 NMI-Vektor, hi
+</code></pre>
+
+
+        <p>Die Hauptroutine sieht so aus:</p>
+
+        <pre><code>100b pha
+100c txa
+1004 pha
+100e tya
+100f pha
+1010 1da #$7f
+1012 sta $ddOd
+1015 jsr $f6be
+1018 jsr $ffel
+101b jsr $fd15
+10le jsr $fda3
+1021 jsr $e518 1024 jsr $1000 ; den schon wieder verstellten NMI-Vektor reininitialisieren
+1027 jsr $102d ; neue Einstellungen
+102a jmp ($a002)
+</code></pre>
+
+
+        <p>Hier endet der kopierte Teil. 102d 1da#%00 ;hier steht der eigene Teil</p>
+
+        <pre><code>102f sta $d020 ;der NMI-Routine 1032 sta $d021
+</code></pre>
+
+
+        <pre><code>‚1035 rts
+</code></pre>
+
+
+        <p>Unser Beispiel färbt den Hintergrund und den Rahmen schwarz. Probieren Sie es aus: SYS 4096 und dann &lt;RUN/STOP+RESTORE&gt; drücken!</p>
+
+        <p>Eine neue NMI-Routine ist auch dann notwendig, wenn Funktionstasten, dieüber den IRQ-Vektor programmiert sind, nach &lt;RUN/STOP+RESTORE&gt; ohne »aktivieren durch SYS XXxxx« noch funktionieren sollen.</p>
+
+        <p>Die »Einstellroutine« kann dann so aussehen:</p>
+
+        <pre><code>1024 1da#$38 102f 1dx#$10 1031 sta $0314 1034 stx $0315 1037 rts
+</code></pre>
+
+
+        <p>Auf die Programmierung der Funktionstasten will ich hier nicht weiter eingehen, da ich damit ja nur ein sinnvolles Beispiel für eine neue NMI-Routine geben wollte.</p>
+
+        <p>Das Herz jeder neuen NMI-Routine ist das Programm von $100b bis $102c.</p>
+
+        <address class="author">(Gerhard Muth/tr)</address>
+
+        <h2>Tips &amp; Tricks Mischmasch</h2>
+
+        <p class="intro">Zuerst einige Tips für Basic-Programmierer, die auch für Assemblerfans interessant sind</p>
+
+        <p>—- SYS 58778, Initialisiert den Videochip neu - SYS 64931 Initialisiert den gesamten Interrupt - SYS 59626 Scerollt den Bildschirminhalt um eine Zeile nach oben</p>
+
+        <p>-SYS 58592 wartet 8,5 Sekunden, bei Druck auf die Commodoretaste wird abgebrochen (wird benutzt beim Laden von Datasette (FOUND...)</p>
+
+        <ul>
+            <li>
+                <p>SYS 63544 Gibt »PRESS RECORD &amp; PLAY ON TAPE« aus und wartet, bis die &lt;Play&gt;-Taste der Datasette gedrückt ist</p>
+            </li>
+            <li>
+                <p>SYS 63511 Wie SYS 63544, jedoch wird nur auf die Play>-Taste gewartet (gibt »PRESS PLAY ON TAPE« aus)</p>
+            </li>
+            <li>
+                <p>SYS 64767 Bewirkt einen Basic Kaltstart — POKE 214,x:</p>
+            </li>
+        </ul>
+
+
+        <p>POKE211,y: SYS</p>
+
+        <p>58732 Setzt den Cursor auf Zeile x und Spaltey</p>
+
+        <ul>
+            <li>?PEEK (174)</li>
+        </ul>
+
+
+        <p>+PEEK (175) Gibt nach dem Laden eines Pro*256 grammes die Endadresse des Programmes aus</p>
+
+        <ul>
+            <li>?PEEK(187)</li>
+        </ul>
+
+
+        <p>+PEEK (188)</p>
+
+        <p>*256 Gibt die Anfangsadresse des zuletzt benutzten Filenamens aus</p>
+
+        <ul>
+            <li>?PEEK(648)</li>
+        </ul>
+
+
+        <p>*256 Gibt die Anfangsadresse des Bildschirmspeichers aus</p>
+
+        <ul>
+            <li>POKE 649,0 Schaltet die Tastatur »aus« (Setzen der Tastaturpuffergröße auf Null) — POKE 198,0 Löscht den Tastaturpuffer - POKE 157,128 (0) Blockiert (erlaubt) die Ausgabe der Meldungen »SEARCHING FOR« etc. Falls A=0, dann war der zuletzt benutzte Befehl, der die Floppy oder Datasette anspricht, der LOAD-Befehl, andernfalls der VERIFY-Befehl (SAVE wird nicht berücksichtigt)</li>
+        </ul>
+
+
+        <p class="source">- A=PEEK(10)</p>
+
+
+        <p></p>
+
+        <p>— POKE 781,x:</p>
+
+        <p>SYS 59903 — POKE 808,230 Löscht Bildschirmzeile x Schaltet die &lt;RUN/STOP&gt;-Taste aus, wobei die Funktion von TI$ und TI erhalten bleibt</p>
+
+        <h3>Nun folgen ein paar Tips für die Assemblerfreaks:</h3>
+
+        <p>-1da #01 &lt;REVERS ON&gt; sta $c7</p>
+
+        <ul>
+            <li>jsr $e544 Löscht den Bildschirm - jsr $e566 Setzt den Cursor in die linke obere Ecke (&lt;HOME&gt;)</li>
+        </ul>
+
+
+        <p>-1lda #1 Gibt den Text aus, der im ASCIIldy #h Code Adresse steht, die in Low- und Highbyte angegeben ist. jsr $able Der Computer bricht ab, wenn er auf ein Nullbyte oder ein Gänsefüßchen stößt. -1dx #1 lda #h Gibt eine 16-Bit-Zahl dezimal auf jsr $oded dem Bildschirm aus, die in Low- und Highbyte angegeben werden muß -1dx #a ldy #b Setzt den Cursor an Zeile a und Spalte b jsr $e50c</p>
+
+        <ul>
+            <li>jmp $febe Alle Register werden vom Stapel geholt, mit anschließendem RTI. Gut zu gebrauchen für eigene Interrupt-Programme (Rasterinterrupt etc.) -1dx #a Holt die Anfangsadresse der jsr $e9fo Bildschirmzeile a im Bildschirmspeicher und legt diese in $D1/$D2 ab. Bei Einsprung in Adresse $EA24 erfolgt das gleiche wie oben, aber diesmal für den Farbspeicher, die Werte werden in $F3/$F4 abgelegt.</li>
+        </ul>
+
+
+        <address class="author">(Christian Seiler/tr)</address>
+
+        <h2>Exzesse über den Filenamen</h2>
+
+        <p>Es ist wie mit den meisten Schutztricks. Einmal veröffentlicht, schon sind sie nicht mehr effizient, weil sie nun jeder kennt. So auch mitdem»LOAD-Schutz einmalanders«aus der 64'er 6/86. Stefan Bültenas Frage kann ich daher nur mit »ja« beantworten! Diesen Trick findet man heute in fast jeder Computerzeitschrift. Niemand aber erwähnt, daß es auch noch eine ganze Palette von anderen Möglichkeiten gibt, einemFile den Namen »" "«zu geben. Bis heute habe ich 74 ohne, und weit über 100 Arten mit optischer Veränderung des Directorys ausprobiert. Die Wahrscheinlichkeit, jetzt den richtigen Namen herauszufinden, ist nun um ein Vielfaches geringer. Mit etwas Ausdauer lassen sich bestimmt noch mehr Wege finden, zwei Anführungszeichen als Namen zu benutzen. Nun aber zu den angekündigten Varianten: 1. Die ersten 15:</p>
+
+        <p>SAVE CHR$(34)+ "{1 bis 15 Space} ",8</p>
+
+        <ol>
+            <li>Die zweiten 15:</li>
+        </ol>
+
+
+        <p>SAVE' &lt;SHIFT+SPACE&gt;[l bis 15 Space} ",8 3. Weitere 10 Stück:</p>
+
+        <p>a) SAVE CHR$(34) +" &lt;SPACE&gt; ",8 c) d) e) ) g) +" &lt;CRSR&gt;-lnks",8 +" &lt;CRSR&gt;-rechts" 8 + &lt;SHIFT+SPACE&gt; " &lt;CRSR&gt;-links + &lt;SHIFT+SPACE&gt; * &lt;CRSR&gt;-rechts +" &lt;SPACE&gt; &lt;SHIFT+SPACE&gt; &lt;SPACE&gt;",8</p>
+
+        <p>&lt;SHIFT+SPACE&gt; &lt;CRSR&gt;-lnks",8 &lt;SHIFT+SPACE&gt; &lt;CRSR&gt;-rechts" 8 &lt;SPACE&gt; &lt;SHIFT+SPACE&gt; &lt;SPACE&gt; " 8 4. Die bekanntesten: a) SAVE CHR$(84) ‚8 b) SAVE" &lt;SHIFT+SPACE&gt;" ‚8</p>
+
+        <p class="source">5. Die Supernamen (unlöschbar!):<br>
+            a) SAVE CHR$(34) + CHR$(58) + CHR$(34) ‚8<br>
+            b) SAVE" &lt;SHIFT+SPACE&gt; " +CHR$(58) + " &lt;SHIFT+ SPACE&gt;",8<br>
+            6. Die drei gleichen:<br>
+            a) SAVE CHR$(34) + CHR$(44) + CHR$(34) ‚8<br>
+            b) SAVE CHR$(34) + CHR$(44)+ " &lt;SHIFT+SPACE&gt;" ‚8 c) siehe 5al<br>
+            7. Nochmal 13 Arten:<br>
+            SAVE" &lt;SHIFT+SPACE&gt; " +CHR$(658)+ " &lt;SHIFT+ SPACE &gt;{1l bis 15 Space} ",8<br>
+            8. Diese drei gibt's auch:<br>
+            a) SAVE" &lt;SHIFT+SPACE &gt; " +CHR$(44)+ " &lt;SHIFT+ SPACE&gt;" ‚8<br>
+            b) SAVE CHR$(34) + CHR$(58) + CHR$(34) + CHR$(44) + CHR$(34)" ‚8<br>
+            c) bei b) das mittlere CHR$(34) durch &lt;SHIFT+SPACE&gt; ersetzen<br>
+            9. Die letzten 14:<br>
+            SAVE CHR$(84) +" &lt;SHIFT+SPACE&gt;[{l bis 14 Space)" ‚8 Bemerkungen zu den Speicherarten:<br>
+            Zu Punkt 6: Hat man einen dieser Namen benutzt, so lassen sich die anderen nicht mehr anwenden! Zum Laden läßt sich statt CHR$(44) auch CHR$(58) verwenden, und umgekehrt! Beim Speichern ist es genau das gleiche Spielchen.<br>
+            Zu den optischen Veränderungen benutzt man die &lt;DEL&gt;-Taste. Aber auch &lt;SHIFT+SPACE &gt; in Verbindung mit den Funktionstasten tut das seine dazu.<br>
+            Ich wünsche noch viel Spaß beim Ausprobieren und Weiterknobeln! (Marco Richter/tr)</p>
+
+
+        <p></p>
+
+        <h2>Betrifft: »Die schnellste Grafikerweiterung für den C 64«</h2>
+
+        <p class="source">Im 64'er Sonderheft 6/86 wurde auf Seite 96 die schnellste Grafikerweiterung für den C 64 vorgestellt. Dieses Programm erlaubt die Programmierung von wirklich schneller HiRes-Grafik in Basic.<br>
+            Ein Leser teilte uns jedoch mit, daß in der abgedruckten Basic-Erweiterung »gefährliche« Zeropage-Ädressen verwendet werden, die bei komplexen Funktionen als Parameter für die Grafik-Routinen zu einem »Absturz« des Computers führen können.<br>
+            Im folgenden ist deshalb ein Programm abgedruckt, dasin mühevoller (/minütiger) Kleinarbeit alle diese Zeropage-Adressen durch ungefährliche Werte ersetzt. Laut Autor läuft »High-Speed-Grafik« danach einwandfrei.<br>
+            Zur Bedienung<br>
+            Laden Sie die Grafik-Erweiterung aus dem Sonderheft und tippen Sie »NEW«ein. Danach ladenSie das Listing 3und starten es mit »RUN«. Legen Sie außerdem eine Diskette in das Diskettenlaufwerk, damit die korrigierte Version gespeichert werden kann. Nach zirka sieben Minuten sind 237 Adressen geändert worden (wird vom Programm angezeigt). Die korrigierte Version von »High-Speed-Grafik« wird danach automatisch mit dem Namen »HSCG%« auf die eingelegte Diskette geschrieben.<br>
+            (W. Lohwasser/ks/tr)</p>
+
+
+        <p></p>
+
+        <h2>Checdksummer und MSE Der Checksummer und der MSE sind Eingabehilfen für</h2>
+
+        <p>unsere Listings.</p>
+
+        <p>Der Checksummer zeigt für jede eingegebene Basic-Zeile eine Prüfsumme auf dem Bildschirm, die mit der in de Ma abgedruckten Zahl (am Zeilenende) übereinstimmen muß. Diese Zahlen dürfen Sie beim Eintippen nicht mit eingeben. Unterstrichene Zeichen sind zusammen mit der&lt;SHIFT&gt;-Taste, 'überstrichene zusammen mit der &lt;C=&gt;-Taste einzugeben. Wenn im Listing ge<em> schweifte Klammern ([CLR)) auftauchen, dürfen Sie das, was innerhalb der Klammern steht, nicht eintippen, sondern müssen die entsprechenden Tasten drücken (zum Beispiel &lt;COoR&gt;). Der MSE dient zur Eingabe von Maschinensprachepro</em> grammen. Auch er erzeugt zu jeder eingegebenen Zeile _ eine Prüfsumme. Diese »MSE-Listings« können Sie auch mit einem normalen Maschinensprache-Monitor eingeben. Dabei müssen Sie jedoch die letzte Spalte (Prüfsum_ me) weglassen. Der Checksummer und der MSE wurden in. inder _ Ausgabe 10/86 auf Seite 76 veröffentlicht. Beide sind auch auf jeder Programmservice-Diskette enthalten. Gegen Einsendung eines mit 1,80 Mark frankierten Rückumschlages (Format DIN A4) senden wir Ihnen die Listings mit Beschreibung auch gerne zu.</p>
+
+        <address class="author">(tr)</address>
+    </article>
+</body>
+
+</html>
