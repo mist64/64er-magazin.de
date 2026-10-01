@@ -774,6 +774,42 @@ falls between rules:
   brief the sub-agent on this constraint so it doesn't re-introduce a
   second `<h1>` based on the printed banner alone.
 
+## Cross-cutting rule: CHECK THE TOOLCHAIN BEFORE THE FIRST LONG SWEEP
+
+`requirements.txt` at the repo root is the **site generator's** list, not the
+chain's. A fresh clone whose venv was built from it runs no step of this chain.
+The chain needs, in the repo venv:
+
+```
+numpy scipy pillow beautifulsoup4 soupsieve      # 005, 010, 020 and the HTML steps
+opencv-python-headless                            # r005_a4_window only (binding "sheet")
+pikepdf lxml PyPDF2 lunr python-dateutil pytz     # 006 issue_pdf, and generate.py
+```
+
+and on `PATH`: **tesseract 5.x with `deu`** (010), **imagemagick**, **poppler**
+(`pdftoppm`), **ghostscript**, **qpdf**, **vice** (`petcat`, step 120), and a
+**rust toolchain** to build `tools/img/cmyk_reconstruction` (005).
+
+One command answers the whole question, and it belongs in the hour before a
+sweep starts, not in the step that needs the import:
+
+```bash
+.venv/bin/python -c "import numpy,scipy,PIL,bs4,cv2,pikepdf,lxml,PyPDF2,lunr,dateutil,pytz; print('venv OK')"
+for t in tesseract magick pdftoppm gs qpdf petcat cargo; do printf '%-9s %s\n' $t "$(command -v $t || echo MISSING)"; done
+tesseract --list-langs | grep -qx deu && echo 'deu OK' || echo 'deu MISSING'
+```
+
+**Why before, and not when it fails.** The missing import is usually not at the
+step that stops. MEASURED 2026-10-01, importing 8612 on a second machine: that
+venv had five of the twelve packages, and because `cv2` is needed only by
+`r005_a4_window` — which a `spread` issue skips — nothing would have noticed
+until step 006, about **15 h** into the 005 sweep. The check above took seconds.
+
+**A toolchain can also look absent when it is present.** A non-interactive
+`ssh host 'cmd'` does not source `.zprofile`, so Homebrew is not on `PATH` and
+every `command -v` says MISSING. Export `PATH=/opt/homebrew/bin:$PATH` in the
+command, or run it through a login shell, before concluding anything is missing.
+
 ## Cross-cutting rule: the working directory must be DURABLE
 
 `<tmp>` is the issue descriptor's `tmp`, and everything under it is derived --
