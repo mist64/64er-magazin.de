@@ -90,6 +90,54 @@ the delivered PDF page is neither, so the two spaces differ by a rotation and an
 offset — cropping these coordinates out of a `pdftoppm` render lands in the
 wrong place. See r000, "page block index".
 
+## A LOCAL OCR MODEL READS HEX DUMPS BYTE-PERFECTLY — measured
+
+MEASURED 2026-10-01 on 8611 p59, a page of MSE hex (45 lines of
+`addr : b0..b7 cs`, the last 360 bytes of `3D-CODE`). The truth is not a
+judgement here: `issues/8611/prg/3d.code.prg` is the hand-transcribed,
+checksum-satisfying binary, load `$4000`, so every printed line must equal the
+eight bytes at that address.
+
+| reading | lines | addresses not in the prg | byte-perfect lines | wrong bytes |
+|---|---|---|---|---|
+| tesseract (`ocr/out/059.txt`) | 41 | 5 | 25/36 | **28/288 = 9.72%** |
+| `mlx-community/GLM-OCR-8bit`, column crops | 45 | 0 | **45/45** | **0/360 = 0.00%** |
+
+GLM-OCR's 45 addresses are contiguous `$4a60`–`$4bc0` with no gaps and the last
+line ends exactly at the binary's final byte `$4bc7`. Where tesseract read
+`42360`, `cA4`, `Aad8`, `4650` and `£fO £8`, it read `4a60`, `c4`, `4ad8`,
+`4b50` and `f0 f8`.
+
+**Two conditions, both necessary.** Fed a whole dense page it degenerates into a
+token loop (a run of `20 20 20…`) and it reads *across* a three-column dump,
+emitting one output line per printed row rather than per listing line. Both go
+away on a **single-column crop with a modest `max_tokens`**, which is what the
+0.00% was measured on — and cropping the region is what this rule already does.
+
+**What this does and does not say.** It is a comparison against *tesseract*, the
+chain's general OCR. It is **not** a comparison against the vision sub-agent this
+rule dispatches today, which has not been scored this way. What it establishes is
+that a 1.6 GB local model is a credible transcriber for this step: free, offline,
+repeatable, and — because an MSE line carries its own checksum and a complete
+listing must equal the `.prg` byte for byte — **self-verifying**, so a wrong byte
+is caught by the rule's existing gates rather than trusted.
+
+Run it standalone, not through the oMLX server:
+
+```python
+import mlx_vlm                                     # in ~/.omlx-07
+model, processor = mlx_vlm.load("/Users/mist/omlx-models-doc/GLM-OCR-8bit")
+```
+
+**Use the API, not `python -m mlx_vlm.generate`.** MEASURED on one 2825x3995
+page: through the API it bills 14,415 prompt tokens and returns correct output;
+through the CLI, with no `--resize-shape` passed, the same file yields boxes in a
+~1000 px space and then a token loop. That is the observation. The *cause* is not
+established — the CLI's `--resize-shape` defaults to `None` and it only resizes
+when set, so the likelier culprit is how it builds the prompt rather than a
+downscale. Either way the API path is the one that works; do not infer from this
+that the model or the quant is at fault, which is what the loop first looked like.
+
 ## Briefing for the sub-agent
 
 The sub-agent must:
