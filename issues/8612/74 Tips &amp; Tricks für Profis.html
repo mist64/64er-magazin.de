@@ -31,7 +31,7 @@
 
         <p>Übrigens läßt sich die Höhe der ausgedruckten Balken durch Ändern der Variablen RC in Zeile 52 reduzieren (zum Beispiel RC=5), was für die meisten Anwendungen ausreichen dürfte und beim Ausdruck eine bedeutende Zeitersparnis bedeutet.</p>
 
-        <p>Bild 1 zeigt die Programm-Änderungen für den Drucker Star SG-10 sowie der berichtigten Zeile 85 und einem Probeausdruck. Da das von mir verwendete Star-Secus-Interface die Steuerzeichen im Klartext ausdruckt, ist statt desangegebenen »ESC« jeweils &lt;CTRL+:&gt; und statt »($D)« ist &lt;CTRL+A&gt; einzugeben, wie auch bereits. im Artikel erwähnt.</p>
+        <p>Bild 1 zeigt die Programm-Änderungen für den Drucker Star SG-10 sowie der berichtigten Zeile 85 und einem Probeausdruck. Da das von mir verwendete Star-Secus-Interface die Steuerzeichen im Klartext ausdruckt, ist statt des angegebenen »ESC« jeweils &lt;CTRL+:&gt; und statt »($1)« ist &lt;CTRL+A&gt; einzugeben, wie auch bereits im Artikel erwähnt.</p>
 
         <address class="author">(Markus Raute/tr)</address>
 
@@ -85,13 +85,13 @@
 </code></pre>
 
 
-        <p>Wer ein »Auto-Line-Feed«an seinem Drucker eingeschaltet lassen will, gibt noch folgenden POKE ein:</p>
+        <p>Wer ein »Auto-Line-Feed« an seinem Drucker eingeschaltet lassen will, gibt noch folgenden POKE ein:</p>
 
         <pre><code>POKE 50326,0
 </code></pre>
 
 
-        <p>Jetzt kann das geänderte »Epson-Support« (mit einem Monitor) gespeichert werden. Wem daszu kompliziert ist, kann die vier POKEs auch an den Anfang des Basic-Hauptprogramms stellen.</p>
+        <p>Jetzt kann das geänderte »Epson-Support« (mit einem Monitor) gespeichert werden. Wem das zu kompliziert ist, kann die vier POKEs auch an den Anfang des Basic-Hauptprogramms stellen.</p>
 
         <p>Um die Änderungen am Maschinenprogramm möglichst gering zu halten, muß nun noch das Hauptprogramm verändert werden:</p>
 
@@ -107,9 +107,9 @@
 
         <h2>Hohe Primzahlen</h2>
 
-        <p>Zu dem Leserbrief in der 64'er 8/86 auf Seite 18über Primzahlen habe ich mir Gedanken gemacht und ein kurzes Primzahlprogramm entwickelt, welches in relativ kurzer Rechenzeit viele Primzahlen auf dem Bildschirm ausdruckt. Wenn dieses Programm (Listing ]) compiliert wird, läuft esetwa um 50 % schneller. Es werden zwar keine solch hohen Primzahlen erreicht wie in dem genannten Beispiel, dazu wäre auch der Speicherplatz zu gering, dafür nutze ich aber die gesamte Rechengenauigkeit des C 64 aus.</p>
+        <p>Zu dem Leserbrief in der 64'er 8/86 auf Seite 18 über Primzahlen habe ich mir Gedanken gemacht und ein kurzes Primzahlprogramm entwickelt, welches in relativ kurzer Rechenzeit viele Primzahlen auf dem Bildschirm ausdruckt. Wenn dieses Programm (Listing 1) compiliert wird, läuft es etwa um 50 % schneller. Es werden zwar keine solch hohen Primzahlen erreicht wie in dem genannten Beispiel, dazu wäre auch der Speicherplatz zu gering, dafür nutze ich aber die gesamte Rechengenauigkeit des C 64 aus.</p>
 
-        <p>Der Befehl »INT (A% in Zeile 20 wird deswegen gebraucht, daderC 64 sonst mitseiner Rechenungenauigkeit immer das falsche Ergebnis herausbekommt.</p>
+        <p>Der Befehl »INT (A)« in Zeile 20 wird deswegen gebraucht, da der C 64 sonst mit seiner Rechenungenauigkeit immer das falsche Ergebnis herausbekommt.</p>
 
         <p>Das Programm wurde kurz gehalten, damit es möglichst schnell ablaufen kann.</p>
 
@@ -124,21 +124,21 @@
 
         <p>Im folgenden will ich eine Programmier-Strategie vorstellen, die die Einrichtung vieler Variablen überflüssig macht und die sogar die rekursive Programmierung bequem unterstützt.</p>
 
-        <p>Die Hauptschwierigkeit beim Programmieren in Basic besteht darin, daß für jede Kleinigkeit eine neue Variable eingerichtet werden muß. In vielen Fällen würde es reichen, einen Wert einfach aufeinem Stack abzulegen und später wieder zurückzuholen: Basic hat aber keinen Datenstapel.</p>
+        <p>Die Hauptschwierigkeit beim Programmieren in Basic besteht darin, daß für jede Kleinigkeit eine neue Variable eingerichtet werden muß. In vielen Fällen würde es reichen, einen Wert einfach auf einem Stack abzulegen und später wieder zurückzuholen: Basic hat aber keinen Datenstapel.</p>
 
-        <p>Wirklich nicht? Eigentlich besteht ein solcher Stapel doch nur auseinemeindimensionalen Datenfeld und einer Zeigervariablen: beides Elemente, die von Basic unterstützt werden. Warum machen wir uns nicht einfach selber einen?</p>
+        <p>Wirklich nicht? Eigentlich besteht ein solcher Stapel doch nur aus einem eindimensionalen Datenfeld und einer Zeigervariablen: beides Elemente, die von Basic unterstützt werden. Warum machen wir uns nicht einfach selber einen?</p>
 
-        <p>Mit DIM STACK(255) wird das Array eingerichtet; die Tiefe 255 ist willkürlich gewählt. Der zugehörige Zeiger seiP=0.</p>
+        <p>Mit DIM STACK(255) wird das Array eingerichtet; die Tiefe 255 ist willkürlich gewählt. Der zugehörige Zeiger sei P=0.</p>
 
-        <p>Der Befehl push X $lege den Wert von X aufdem Stack ab«) wird folgendermaßen nachgebildet: P=P+1:STACK(P)=X; der Befehl pop X hole den Wert für X vom Stack«) so: X=STACK(P) :P=P-1.</p>
+        <p>Der Befehl push X (»lege den Wert von X auf dem Stack ab«) wird folgendermaßen nachgebildet: P=P+1:STACK(P)=X; der Befehl pop X (»hole den Wert für X vom Stack«) so: X=STACK(P) :P=P-1.</p>
 
         <p>Der Datenstack bildet eine sehr einfache Möglichkeit, Parameter an Subroutinen zu übergeben, oder aber auch Funktionen mit echter Fallunterscheidung zu simulieren (die Parameter-Eingabe wie auch die -Ausgabe steht stets auf dem Stack!).</p>
 
         <p>Listing 2 demonstriert anhand der allseits beliebten Fakultätsberechnung, daß mit Hilfe des Datenstacks in Basic sogar rekursiv programmiert werden kann. Nochmal ganz kurz zur Fakultätsdefinition:</p>
 
-        <p>Def fak(n): wenn n&lt;2, dann übergib (l), andernfalls übergib (n*fak(n-))).</p>
+        <p>Def fak(n): wenn n&lt;2, dann übergib (1), andernfalls übergib (n*fak(n-1)).</p>
 
-        <p>Diese Strategie des selbstprogrammierten Stacks löst nun längst nicht alle Schwierigkeiten in Rauch auf: Beispielsweise bleibt es beider begrenzten Anzahl von GOSUB-Ebenen (2]). Aber es wirkt dem »Spaghetti-Charakter« vieler Programme entgegen.</p>
+        <p>Diese Strategie des selbstprogrammierten Stacks löst nun längst nicht alle Schwierigkeiten in Rauch auf: Beispielsweise bleibt es bei der begrenzten Anzahl von GOSUB-Ebenen (21). Aber es wirkt dem »Spaghetti-Charakter« vieler Programme entgegen.</p>
 
         <address class="author">(W.D. Busch/tr)</address>
 
@@ -155,7 +155,7 @@
 
         <p>Den oben beschriebenen Effekt vermeide ich, indem ich den wichtigsten Teil der Original-NMI-Routine kopiere und an deren Schluß ein kleines Initialisierungsprogramm für meine »eigenen Vektoren« und sonstige Einstellungen setze. Ich erkläre es besser an einem Beispielprogramm, das bei $1000 beginnt (am besten gleich den SMON laden). Mit der folgenden Mini-Routine »verbiege« ich den sogenannten NMI-Vektor.</p>
 
-        <pre><code>1000 1da#$0b ; 1002 1d4x#$10 ; 1004 sta $0318 ; 1007 stx $0319 ; 100a rts
+        <pre><code>1000 lda#$0b ; 1002 ldx#$10 ; 1004 sta $0318 ; 1007 stx $0319 ; 100a rts
 </code></pre>
 
 
@@ -167,16 +167,17 @@
 
         <pre><code>100b pha
 100c txa
-1004 pha
+100d pha
 100e tya
 100f pha
-1010 1da #$7f
-1012 sta $ddOd
-1015 jsr $f6be
-1018 jsr $ffel
+1010 lda #$7f
+1012 sta $dd0d
+1015 jsr $f6bc
+1018 jsr $ffe1
 101b jsr $fd15
-10le jsr $fda3
-1021 jsr $e518 1024 jsr $1000 ; den schon wieder verstellten NMI-Vektor reininitialisieren
+101e jsr $fda3
+1021 jsr $e518
+1024 jsr $1000 ; den schon wieder verstellten NMI-Vektor reininitialisieren
 1027 jsr $102d ; neue Einstellungen
 102a jmp ($a002)
 </code></pre>
@@ -184,20 +185,20 @@
 
         <p>Hier endet der kopierte Teil.</p>
 
-        <pre><code>102d 1da#%00 ;hier steht der eigene Teil
+        <pre><code>102d lda#$00 ;hier steht der eigene Teil
 102f sta $d020 ;der NMI-Routine
 1032 sta $d021
-‚1035 rts
+1035 rts
 </code></pre>
 
 
         <p>Unser Beispiel färbt den Hintergrund und den Rahmen schwarz. Probieren Sie es aus: SYS 4096 und dann &lt;RUN/STOP+RESTORE&gt; drücken!</p>
 
-        <p>Eine neue NMI-Routine ist auch dann notwendig, wenn Funktionstasten, dieüber den IRQ-Vektor programmiert sind, nach &lt;RUN/STOP+RESTORE&gt; ohne »aktivieren durch SYS XXxxx« noch funktionieren sollen.</p>
+        <p>Eine neue NMI-Routine ist auch dann notwendig, wenn Funktionstasten, die über den IRQ-Vektor programmiert sind, nach &lt;RUN/STOP+RESTORE&gt; ohne »aktivieren durch SYS xxxxx« noch funktionieren sollen.</p>
 
         <p>Die »Einstellroutine« kann dann so aussehen:</p>
 
-        <pre><code>1024 1da#$38 102f 1dx#$10 1031 sta $0314 1034 stx $0315 1037 rts
+        <pre><code>102d lda#$38 102f ldx#$10 1031 sta $0314 1034 stx $0315 1037 rts
 </code></pre>
 
 
@@ -327,7 +328,7 @@
 
         <h2>Exzesse über den Filenamen</h2>
 
-        <p>Es ist wie mit den meisten Schutztricks. Einmal veröffentlicht, schon sind sie nicht mehr effizient, weil sie nun jeder kennt. So auch mitdem»LOAD-Schutz einmalanders«aus der 64'er 6/86. Stefan Bültenas Frage kann ich daher nur mit »ja« beantworten! Diesen Trick findet man heute in fast jeder Computerzeitschrift. Niemand aber erwähnt, daß es auch noch eine ganze Palette von anderen Möglichkeiten gibt, einemFile den Namen »" "«zu geben. Bis heute habe ich 74 ohne, und weit über 100 Arten mit optischer Veränderung des Directorys ausprobiert. Die Wahrscheinlichkeit, jetzt den richtigen Namen herauszufinden, ist nun um ein Vielfaches geringer. Mit etwas Ausdauer lassen sich bestimmt noch mehr Wege finden, zwei Anführungszeichen als Namen zu benutzen. Nun aber zu den angekündigten Varianten:</p>
+        <p>Es ist wie mit den meisten Schutztricks. Einmal veröffentlicht, schon sind sie nicht mehr effizient, weil sie nun jeder kennt. So auch mit dem »LOAD-Schutz einmal anders« aus der 64'er 6/86. Stefan Bültenas Frage kann ich daher nur mit »ja« beantworten! Diesen Trick findet man heute in fast jeder Computerzeitschrift. Niemand aber erwähnt, daß es auch noch eine ganze Palette von anderen Möglichkeiten gibt, einem File den Namen »" "«zu geben. Bis heute habe ich 74 ohne, und weit über 100 Arten mit optischer Veränderung des Directorys ausprobiert. Die Wahrscheinlichkeit, jetzt den richtigen Namen herauszufinden, ist nun um ein Vielfaches geringer. Mit etwas Ausdauer lassen sich bestimmt noch mehr Wege finden, zwei Anführungszeichen als Namen zu benutzen. Nun aber zu den angekündigten Varianten:</p>
 
         <ol>
             <li>Die ersten 15:<br>
@@ -379,13 +380,13 @@
 
         <p>Im 64'er Sonderheft 6/86 wurde auf Seite 96 die schnellste Grafikerweiterung für den C 64 vorgestellt. Dieses Programm erlaubt die Programmierung von wirklich schneller HiRes-Grafik in Basic.</p>
 
-        <p>Ein Leser teilte uns jedoch mit, daß in der abgedruckten Basic-Erweiterung »gefährliche« Zeropage-Ädressen verwendet werden, die bei komplexen Funktionen als Parameter für die Grafik-Routinen zu einem »Absturz« des Computers führen können.</p>
+        <p>Ein Leser teilte uns jedoch mit, daß in der abgedruckten Basic-Erweiterung »gefährliche« Zeropage-Adressen verwendet werden, die bei komplexen Funktionen als Parameter für die Grafik-Routinen zu einem »Absturz« des Computers führen können.</p>
 
-        <p>Im folgenden ist deshalb ein Programm abgedruckt, dasin mühevoller (7minütiger) Kleinarbeit alle diese Zeropage-Adressen durch ungefährliche Werte ersetzt. Laut Autor läuft »High-Speed-Grafik« danach einwandfrei.</p>
+        <p>Im folgenden ist deshalb ein Programm abgedruckt, das in mühevoller (7minütiger) Kleinarbeit alle diese Zeropage-Adressen durch ungefährliche Werte ersetzt. Laut Autor läuft »High-Speed-Grafik« danach einwandfrei.</p>
 
         <p>Zur Bedienung:</p>
 
-        <p>Laden Sie die Grafik-Erweiterung aus dem Sonderheft und tippen Sie »NEW«ein. Danach ladenSie das Listing 3und starten es mit »RUN«. Legen Sie außerdem eine Diskette in das Diskettenlaufwerk, damit die korrigierte Version gespeichert werden kann. Nach zirka sieben Minuten sind 237 Adressen geändert worden (wird vom Programm angezeigt). Die korrigierte Version von »High-Speed-Grafik« wird danach automatisch mit dem Namen »HSG2« auf die eingelegte Diskette geschrieben.</p>
+        <p>Laden Sie die Grafik-Erweiterung aus dem Sonderheft und tippen Sie »NEW« ein. Danach laden Sie das Listing 3 und starten es mit »RUN«. Legen Sie außerdem eine Diskette in das Diskettenlaufwerk, damit die korrigierte Version gespeichert werden kann. Nach zirka sieben Minuten sind 237 Adressen geändert worden (wird vom Programm angezeigt). Die korrigierte Version von »High-Speed-Grafik« wird danach automatisch mit dem Namen »HSG2« auf die eingelegte Diskette geschrieben.</p>
 
         <address class="author">(W. Lohwasser/ks/tr)</address>
 

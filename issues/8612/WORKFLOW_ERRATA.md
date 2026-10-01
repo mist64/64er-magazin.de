@@ -479,3 +479,15 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   Check 2 has no exemption for a heading opening with a symbol (`§202a StGB`). Step 5's js-beautify options are unstated.
 - **What would have prevented it.** Terminator alone on its line; test output non-empty, not exit status; exempt
   leading non-letters; name r080's beautify options. This is r000's "the WRAPPERS are code, so run them" in a .md.
+
+## 280 — the two-engine check can never decide; the character-count heuristic would keep real OCR errors
+
+- Found by the 100-195 sub-agent over ~260 fixes. The "second engine" (the block index) is the HTML's own ancestor, so it always
+  shows the same oddity: the "engines disagree → apply" branch never fired once. Every fix rested on the crop. The block-index
+  .txt truncates at ~300 chars (labels.json has the full text), so the rule's grep misses most body text.
+- "Wrong number of letters → print typo, leave it; apply this heuristic FIRST" would have KEPT verlier→verliert,
+  Textbildschirm→Textbildschirms, emem→einem, Pawrn, zusätzliicher, COME!I, all OCR adds/drops proven on the crop.
+  It contradicts the rule's own "Doubled letters" section and "the test is the crop".
+- Verification checks 1-2 pipe into `head` (a planted fault was hidden as entry 20 of 23) and never fail.
+- **What would have prevented it.** Make the crop the decision and the block index a locator (via labels.json). Demote the
+  letter-count heuristic to "a hint that it MAY be a print typo — decide on the crop". Drop `head` and make 1-2 fail on hits.
