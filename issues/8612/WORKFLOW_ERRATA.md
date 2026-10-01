@@ -303,3 +303,20 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   Bild-captioned `<figure><table>` shape the rule itself requires.
 - **What would have prevented it.** Delete the Briefing sentence; add the tint pre-filter to step 4; make
   check #5 `(Tabelle|Bild) [\d\]lI]+` and exempt Bild captions in #7.
+
+## 160 — "Auf einen Blick" boxes: the rule says no figcaption from a title above a table; precedent uses one
+
+- Found by the 8-99 sub-agent. r160: "**Do NOT promote section headings or bold titles above a table to
+  `<figcaption>`**". 8609/22 and 8610/176 put "Auf einen Blick: …" into a `<figcaption>`. 8612 follows the rule
+  (h2 + bare table), so the corpus is now split. Also silent: a label printed INSIDE the box (Stückliste),
+  a Bild holding tables AND drawings (p61 Bild 7), and market overviews whose tables are only referenced generically.
+- **What would have prevented it.** One sentence naming the "Auf einen Blick" box and its shape, and
+  a scoped Verification variant for split runs.
+
+## 130 — I queued two owner decisions that r170 already answers (my miss, not the rules')
+
+- I read r130 and r000 *Changing a PROGRAM FILE* and queued "copy 8611's seq-trans.ob?" and "render
+  hyperscreen ii.s?" for the owner. r170 prescribes both: recreate a printed MSE listing as a new prg/ file, and
+  transcribe printed source. Found when I read r170, so no owner time was spent.
+- **The rules were fine; I read ahead too little.** A pointer in r130's TODO section, "a `<pre>TODO</pre>`
+  is r170's, which recreates MSE/Checksummer listings as disk files; do not escalate it", would have caught it.

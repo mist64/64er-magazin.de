@@ -63,9 +63,153 @@
             <pre data-filename="hyper2.demo" data-name="Hyperscreen II Demo"></pre>
             <figcaption>Listing 3. »Demo« zeigt die Fähigkeiten von Hyperscreen II. Bitte mit dem Checksummer V3 eingeben.</figcaption>
         </figure>
-        <!-- TODO (r130): Listing 4 is printed on p94 as assembler SOURCE (lines 1000-2230). The disk file hyperscreen ii.s.prg is that source as line-linked plain ASCII loaded at $1FD8, not Hypra-Ass/Top-Ass tokens and not BASIC: no generator path renders it and r130 offers none. Not hex-dumped (the print shows source). Transcribe at step 170, or decide a converter; the raw file stays the download below -->
+        <!-- r170: Listing 4 transcribed from the print, p94 (crops masters600/094.png 1800x5100+540+1600 and 1850x5100+2790+1600): 124 source lines 1000-2230 as 144 printed 40-column rows plus READY. The print is a formatted Hypra-Ass-style listing of the disk file hyperscreen ii.s.prg (line-linked plain ASCII at $1FD8, no generator path renders it); the raw file stays the download below. Print and disk agree in every line except 1040, where the disk has "(C) 15.08.1986" and the print "15.08.1986". -->
         <figure>
-            <pre>TODO</pre>
+            <pre>1000 -; ------------------------------
+1010 -;
+1020 -;         HYPERSCREEN II
+1030 -;
+1040 -;          15.08.1986
+1050 -;
+1060 -;    BY C.ZAENKER AND R.FRAHM
+1070 -;
+1080 -; ------------------------------
+1090 -;
+1100 -;
+1110 -          .BA $C000
+1120 -;-LABELS-------------------------
+1130 -          .EQ CLS=$E544
+1140 -          .EQ CRA=$DC0E
+1150 -          .EQ IRQL=$0314
+1160 -          .EQ IRQH=$0315
+1170 -          .EQ VIC=$D000
+1180 -          .EQ SR2=$D016
+1190 -          .EQ RZI=$D012
+1200 -          .EQ IMR=$D01A
+1210 -          .EQ IRR=$D019
+1220 -          .EQ SR1=$D011
+1230 -;-PRG----------------------------
+1240 -START     LDA #00
+1250 -          STA $D021
+1260 -          LDA #00
+1270 -          STA $D020
+1280 -          JSR CLS
+1290 -          LDA #08
+1300 -          STA SR2
+1310 -          JSR SETSPRS    ;SPRITES
+SETZEN
+1320 -          JSR IRQON      ;IRQ INIT
+IALISIEREN
+1330 -STANDBY   JMP STANDBY
+1340 -;-IRQON--------------------------
+1350 -IRQON     SEI
+1360 -          LDA #00        ;SYSTEM-I
+RQ
+1370 -          STA $DC0E      ;AUSSCHAL
+TEN
+1380 -          STA 16383      ;BILDSCHI
+RMRAHMENZEICHEN LOESCHEN
+1390 -          LDA #&lt;(IRQ)
+1400 -          STA IRQL
+1410 -          LDA #&gt;(IRQ)
+1420 -          STA IRQH
+1430 -          LDA #249
+1440 -          STA RZI
+1450 -          LDA #01
+1460 -          STA IMR
+1470 -          LDA SR1
+1480 -          AND #127
+1490 -          STA SR1
+1500 -          CLI
+1510 -          RTS
+1520 -;-SETSPRS------------------------
+1530 -SETSPRS   LDX #00        ;SPRITEKO
+ORDINATEN SETZEN
+1540 -SETLOOP1  LDA TAB1,X
+1550 -          STA VIC,X
+1560 -          INX
+1570 -          CPX #17
+1580 -          BNE SETLOOP1
+1590 -          LDA #255
+1600 -          STA VIC+21     ;8 SPRITE
+S
+1610 -          STA VIC+29     ;NACH X V
+ERBREITERT
+1620 -          LDX #00        ;SPRITE-B
+LOECKE SETZEN
+1630 -SETLOOP2  LDA TAB2,X
+1640 -          STA 2040,X
+1650 -          INX
+1660 -          CPX #08
+1670 -          BNE SETLOOP2
+1680 -          LDX #00
+1690 -          LDA #255
+1700 -SETLOOP3  STA $3FC0,X
+1710 -          INX
+1720 -          CPX #63
+1730 -          BNE SETLOOP3
+1740 -          LDA #00
+1750 -          STA $3FC0
+1760 -          STA $3FC1
+1770 -          STA $3FC2
+1780 -          RTS
+1790 -;-IRQ----------------------------
+1800 -IRQ       LDA #19        ;AUF 24 Z
+EILEN
+1810 -          STA SR1        ;UMSCHALT
+EN
+1820 -          LDY #21        ;WARTESCH
+LEIFE
+1830 -LOOP1     DEY
+1840 -          BNE LOOP1
+1850 -          BIT 02
+1860 -          LDX #21        ;21 BORDE
+RZEILEN/BORDERSCHLEIFE
+1870 -LOOP2     DEC SR2        ;40 SPALT
+EN
+1880 -          INC SR2        ;38 SPALT
+EN
+1890 -          NOP
+1900 -          NOP
+1910 -          NOP
+1920 -          NOP
+1930 -          NOP
+1940 -          NOP
+1950 -          NOP
+1960 -          NOP
+1970 -          NOP
+1980 -          NOP
+1990 -          NOP
+2000 -          NOP
+2010 -          NOP
+2020 -          BIT 02
+2030 -          DEX
+2040 -          BNE LOOP2
+2050 -          LDA #27        ;AUF 25 Z
+EILEN
+2060 -          STA SR1        ;UMSCHALT
+EN
+2070 -          LDA #01        ;IRR
+2080 -          STA IRR        ;LOESCHEN
+2090 -          NOP            ;EVENTUEL
+LER SPRUNG
+2100 -          NOP            ;ZU  SCRO
+LL-ROUTINE
+2110 -          NOP
+2120 -          JMP $FEBC      ;REGISTER
+WIEDER HERSTELLEN
+2130 -TAB1      .BY 241,250
+2140 -          .BY 41,250
+2150 -          .BY 41+48,250
+2160 -          .BY 41+2*48,250
+2170 -          .BY 41+3*48,250
+2180 -          .BY 41+4*48,250
+2190 -          .BY 25,250
+2200 -          .BY 25+48,250
+2210 -          .BY 193
+2220 -TAB2      .BY 255,255,255,255
+2230 -          .BY 255,255,255,255
+READY.</pre>
             <figcaption>Listing 4. Der dokumentierte Quelltext zu Hyperscreen II</figcaption>
         </figure>
         <div class="binary_download" data-filename="hyperscreen ii.s.prg" data-name="Hyperscreen II (Quelltext)"></div>
