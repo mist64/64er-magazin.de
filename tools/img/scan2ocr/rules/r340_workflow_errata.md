@@ -109,8 +109,22 @@ awk '/^## /{h=$0; n=0} /would have prevented|should (have )?(said|carried|state)
   file usually means the entries were never kept, not that nothing happened.
 - **Do not fix the rule yourself mid-build.** Record it and carry on. Editing a
   rule while running it means the next step reads something different from what
-  the previous one did, and the record of what actually went wrong is gone. The
-  orchestrator harvests this file into the rules afterwards.
+  the previous one did, and the record of what actually went wrong is gone.
+
+- **And neither does the orchestrator.** The harvest happens when this file is
+  COMPLETE -- the issue finished, signed off, step 340 closed -- and not a step
+  earlier. The reason is the one above, and it does not care who is holding the
+  pen: a rule edited at step 160 means steps 040-150 ran against text that no
+  longer exists, and the build stops being a single test of a single set of
+  rules. Half a harvest also re-reads worse than none, because the entries that
+  were applied are gone from the file and the ones that were not look like the
+  whole story.
+
+  **The single exception is a BLOCKING defect** -- the build genuinely cannot go
+  on. That is not a harvest, it is an unblocking, and it is reported to the
+  runner as a change to pull. It is still written in this file, with the fact
+  that it was fixed mid-build and why, because a later reader needs to know the
+  rules moved under the build. Everything else waits.
 - **One exception:** a rule that is actively dangerous — it would destroy work, or
   write outside the issue — is stopped at once and escalated, not recorded and
   obeyed.

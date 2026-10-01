@@ -1050,7 +1050,11 @@ Then **record it in `WORKFLOW_ERRATA.md` and carry on** -- do not edit the rule
 yourself mid-build. Editing a rule while running it means a later step reads
 something different from what an earlier step did, and the record of what
 actually went wrong is gone. The orchestrator harvests the errata into these
-files afterwards. (If you are running without an orchestrator, fix it in the same
+files **when the build is finished and `WORKFLOW_ERRATA.md` is complete**, never
+during -- the same reason, and it does not care who holds the pen. The one
+exception is a defect that BLOCKS the build: that is fixed at once, pushed, and
+pointed out to the runner, and it is recorded in the errata as having moved
+under the build. See r340. (If you are running without an orchestrator, fix it in the same
 change as the work; a fossil path costs every future agent the same half hour.)
 
 ## Cross-cutting rule: the working directory must be DURABLE
