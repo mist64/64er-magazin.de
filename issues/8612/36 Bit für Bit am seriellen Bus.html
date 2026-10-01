@@ -42,6 +42,55 @@
 
         <p>In der Tabelle 1 finden Sie alle Signale vom seriellen Bus. Wo die einzelnen Pins an der Buchse des Computers liegen, zeigt Bild 1. Im Ruhezustand sind alle Leitungen vom Bus auf High. Wird die Leitung ATN (Achtung) auf Low gesetzt, so unterbricht jedes Gerät seine Tätigkeit und wartet auf einen weiteren Befehl. Der Computer sendet jetzt die Primäradresse. Bestätigt das angesprochene Gerät nach einer bestimmten Zeit nicht den Empfang, dann geht der Computer davon aus, daß das angesprochene Gerät nicht angeschlossen ist und gibt eine Fehlermeldung aus. Wurde der Empfang bestätigt, übermittelt der Computer dem Gerät eventuell noch weitere Befehle (Sekundäradresse). Jetzt setzt der Computer die ATN-Leitung wieder auf High. Alle nicht angesprochenen Geräte setzten ihre unterbrochene Tätigkeit fort und kümmern sich nicht mehr um das weitere Geschehen auf dem Bus. Der Computer teilt dem angesprochenen Gerät mit, ob es als Sender oder Empfänger arbeiten soll. Nun werden über den Bus die Daten übertragen.</p>
 
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Signal</th>
+                        <th>Pin</th>
+                        <th colspan="2">Bedeutung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SRQ</td>
+                        <td>1</td>
+                        <td colspan="2">SERVICE REQUEST IN — Jedes am seriellen Bus angeschlossene Gerät kann diese Leitung auf Low ziehen, um auf sich aufmerksam zu machen.</td>
+                    </tr>
+                    <tr>
+                        <td>GND</td>
+                        <td>2</td>
+                        <td colspan="2">GROUND — Masse</td>
+                    </tr>
+                    <tr>
+                        <td>ATN</td>
+                        <td>3</td>
+                        <td>ATTENTION IN/OUT</td>
+                        <td>siehe Text</td>
+                    </tr>
+                    <tr>
+                        <td>CLK</td>
+                        <td>4</td>
+                        <td>CLOCK IN/OUT</td>
+                        <td>siehe Text</td>
+                    </tr>
+                    <tr>
+                        <td>DATA</td>
+                        <td>5</td>
+                        <td>DATA IN/OUT</td>
+                        <td>siehe Text</td>
+                    </tr>
+                    <tr>
+                        <td>RES</td>
+                        <td>6</td>
+                        <td colspan="2">RESET — Leitung, um die angeschlossenen Geräte in den Anfangszustand zu versetzen.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Die Signale am seriellen Bus</figcaption>
+        </figure>
+
+
         <p>Nachdem das letzte Datum übermittelt wurde, zieht der Computer die ATN-Leitung wieder auf Low. Alle angeschlossenen Geräte reagieren wieder wie oben beschrieben. Der Computer sendet die Primäradresse und teilt dem angeschlossenen Gerät mit, daß die Datenübertragung beendet ist. Dabei wird die Initialisierung als Empfänger oder Sender wieder aufgehoben.</p>
 
         <p>Soweit zum prinzipiellen Verlauf der Datenübertragung. Sie sollen aber auch erfahren, wie die Datenübertragung genau vor sich gehen.</p>
@@ -57,6 +106,59 @@
         <p>Am seriellen Bus Ihres C 64 erfolgt die Übertragung eines Bytes im Handshake-Betrieb. Das bedeutet, der Empfänger gibt eine Rückmeldung, ob das gerade übertragene Byte angekommen ist und das nächste gesendet werden kann. Schauen Sie sich den Ablauf der Übertragung eines Bytes einmalim Bild 2 an. Die ATN-Leitung ist während der normalen Datenübertragung auf High. Die entscheidenden Leitungen für die Übermittlung eines Bytes sind die DATA- und die CLOCK-Leitung. Zunächst macht der Sender kenntlich, daß er Daten übermitteln will, indem er die CLOCK-Leitung auf High setzt. Der Empfänger bestätigt seine Empfangsbereitschaft, indem er die DATA-Leitung auf High setzt. Nun beginnt die eigentliche Datenübertragung. Der Sender taktet mit der CLOCK-Leitung den Datentransfer. Mit jeder steigenden Flanke (Sprung von Low auf High) des CLOCK-Signals liest der Empfänger ein Bit ein. Nach der Übermittlung des achten Bits zieht der Empfänger die DATA-Leitung auf Low und kennzeichnet damit, daß er das Byte empfangen hat. Nun beginnt der ganze Vorgang für das nächste Byte von vorn.</p>
 
         <p>Alle, die es noch genauer wissen wollen, finden in der Tabelle 2 die Zeitenangaben, also das Timing, für die im Bild 2 gekennzeichneten Schaltzeiten.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>minimal</th>
+                        <th>normal</th>
+                        <th>maximal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>T<sub>H</sub></td>
+                        <td>0</td>
+                        <td>—</td>
+                        <td>∞</td>
+                    </tr>
+                    <tr>
+                        <td>T<sub>NE</sub></td>
+                        <td>—</td>
+                        <td>40 µs</td>
+                        <td>200 µs</td>
+                    </tr>
+                    <tr>
+                        <td>T<sub>S</sub></td>
+                        <td>20 µs</td>
+                        <td>70 µs</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>T<sub>V</sub></td>
+                        <td>20 µs</td>
+                        <td>20 µs</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>T<sub>F</sub></td>
+                        <td>0</td>
+                        <td>20 µs</td>
+                        <td>1000 µs</td>
+                    </tr>
+                    <tr>
+                        <td>T<sub>BB</sub></td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Das Timing am seriellen Bus</figcaption>
+        </figure>
+
 
         <p>Dieser Beitrag sollte Ihnen ein grundlegendes Verständnis für den seriellen Bus vermitteln. Wenn Sie beispielsweise ein Drucker-Interface konstruieren wollen, sind solche Kenntnisse unbedingt notwendig.</p>
 

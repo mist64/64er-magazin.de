@@ -30,6 +30,41 @@
 
         <p>Bild 1 zeigt die Programm-Änderungen für den Drucker Star SG-10 sowie der berichtigten Zeile 85 und einem Probeausdruck. Da das von mir verwendete Star-Secus-Interface die Steuerzeichen im Klartext ausdruckt, ist statt desangegebenen »ESC« jeweils &lt;CTRL+:&gt; und statt »($D)« ist &lt;CTRL+A&gt; einzugeben, wie auch bereits. im Artikel erwähnt.</p>
 
+        <figure>
+            <pre>50  :
+51  OPEN1,4,4
+52  RC=5 :IFEAN=8THENRC=5
+53  FORC=1TOE:PRINT#1,"(ESC)@(ESC)M"CHR$(15);
+54  FORCO=1TORC:FORC1=1TO2
+55  PRINT#1,D$(0)D$(1)D$(2);
+56  IFC1=1THENPRINT#1,"(ESC)3($1)"CHR$(13)CHR$(10);:
+    GOTO58
+57  IFCO&lt;RCTHENPRINT#1,"(ESC)1"CHR$(13)CHR$(10);
+58  NEXT:NEXT
+59  :
+60  PRINT#1,"(ESC)2"CHR$(13)CHR$(10)"(ESC)B"CHR$(2)
+    "(ESC)G";
+61  IFEAN=8THENPRINT#1," (ESC)W"CHR$(1)LEFT$(N$,4)
+    " (ESC)W"CHR$(0)" (ESC)W"CHR$ (1)RIGHT$(N$,4);:
+    GOTO64
+62  PRINT#1,"(ESC)W"CHR$(1)LEFT$(N$,2)"(ESC)W"CHR$
+    (0)" (ESC)W"CHR$(1)MID$(N$,3,5)"(ESC)W"CHR$
+    (0)" (ESC)W"CHR(1);
+63  PRINT#1,MID$(N$,8,5)"(ESC)W"
+    CHR$(0)" (ESC)W"
+    CHR$(1)RIGHT$(N$,1);
+64  PRINT#1,CHR$(13)CHR$(10)CHR$(10);:NEXT:PRINT#1,
+    "(ESC)@":CLOSE1:RUN
+65  :
+
+95  D$(0)=CHR$(27)+CHR$(103)+CHR$(3)+CHR$(58)+CHR$(2):
+    D$(1)="":D$(2)=""
+
+85  DATA"0111011","0010001","1000100"</pre>
+            <figcaption>Bild 1. Diese Zeilen müssen Sie im »Bar-Codes«-Listing ändern, um mit dem Star SG-10 arbeiten zu können</figcaption>
+        </figure>
+
+
         <address class="author">(Markus Raute/tr)</address>
 
         <h2>Ku-Ba-Graf und Epson-Drucker</h2>
@@ -175,79 +210,117 @@
 
         <p class="intro">Zuerst einige Tips für Basic-Programmierer, die auch für Assemblerfans interessant sind</p>
 
-        <p>—- SYS 58778, Initialisiert den Videochip neu - SYS 64931 Initialisiert den gesamten Interrupt - SYS 59626 Scerollt den Bildschirminhalt um eine Zeile nach oben</p>
-
-        <p>-SYS 58592 wartet 8,5 Sekunden, bei Druck auf die Commodoretaste wird abgebrochen (wird benutzt beim Laden von Datasette (FOUND...)</p>
-
-        <ul>
-            <li>
-                <p>SYS 63544 Gibt »PRESS RECORD &amp; PLAY ON TAPE« aus und wartet, bis die &lt;Play&gt;-Taste der Datasette gedrückt ist</p>
-            </li>
-            <li>
-                <p>SYS 63511 Wie SYS 63544, jedoch wird nur auf die Play>-Taste gewartet (gibt »PRESS PLAY ON TAPE« aus)</p>
-            </li>
-            <li>
-                <p>SYS 64767 Bewirkt einen Basic Kaltstart — POKE 214,x:</p>
-            </li>
-        </ul>
-
-
-        <p>POKE211,y: SYS</p>
-
-        <p>58732 Setzt den Cursor auf Zeile x und Spaltey</p>
-
-        <ul>
-            <li>?PEEK (174)</li>
-        </ul>
-
-
-        <p>+PEEK (175) Gibt nach dem Laden eines Pro*256 grammes die Endadresse des Programmes aus</p>
-
-        <ul>
-            <li>?PEEK(187)</li>
-        </ul>
-
-
-        <p>+PEEK (188)</p>
-
-        <p>*256 Gibt die Anfangsadresse des zuletzt benutzten Filenamens aus</p>
-
-        <ul>
-            <li>?PEEK(648)</li>
-        </ul>
-
-
-        <p>*256 Gibt die Anfangsadresse des Bildschirmspeichers aus</p>
-
-        <ul>
-            <li>POKE 649,0 Schaltet die Tastatur »aus« (Setzen der Tastaturpuffergröße auf Null) — POKE 198,0 Löscht den Tastaturpuffer - POKE 157,128 (0) Blockiert (erlaubt) die Ausgabe der Meldungen »SEARCHING FOR« etc. Falls A=0, dann war der zuletzt benutzte Befehl, der die Floppy oder Datasette anspricht, der LOAD-Befehl, andernfalls der VERIFY-Befehl (SAVE wird nicht berücksichtigt)</li>
-        </ul>
-
-
-        <p class="source">- A=PEEK(10)</p>
-
-
-        <p></p>
-
-        <p>— POKE 781,x:</p>
-
-        <p>SYS 59903 — POKE 808,230 Löscht Bildschirmzeile x Schaltet die &lt;RUN/STOP&gt;-Taste aus, wobei die Funktion von TI$ und TI erhalten bleibt</p>
+        <table class="plain mono">
+            <tbody>
+                <tr>
+                    <td>– SYS 58778</td>
+                    <td>Initialisiert den Videochip neu</td>
+                </tr>
+                <tr>
+                    <td>– SYS 64931</td>
+                    <td>Initialisiert den gesamten Interrupt</td>
+                </tr>
+                <tr>
+                    <td>– SYS 59626</td>
+                    <td>Scrollt den Bildschirminhalt um eine Zeile nach oben</td>
+                </tr>
+                <tr>
+                    <td>–SYS 58592</td>
+                    <td>wartet 8,5 Sekunden, bei Druck auf die Commodoretaste wird abgebrochen (wird benutzt beim Laden von Datasette (FOUND...)</td>
+                </tr>
+                <tr>
+                    <td>– SYS 63544</td>
+                    <td>Gibt »PRESS RECORD &amp; PLAY ON TAPE« aus und wartet, bis die &lt;Play&gt;-Taste der Datasette gedrückt ist</td>
+                </tr>
+                <tr>
+                    <td>– SYS 63511</td>
+                    <td>Wie SYS 63544, jedoch wird nur auf die Play&gt;-Taste gewartet (gibt »PRESS PLAY ON TAPE« aus)</td>
+                </tr>
+                <tr>
+                    <td>– SYS 64767</td>
+                    <td>Bewirkt einen Basic Kaltstart</td>
+                </tr>
+                <tr>
+                    <td>– POKE 214,x:<br>POKE211,y: SYS<br>58732</td>
+                    <td>Setzt den Cursor auf Zeile x und Spalte y</td>
+                </tr>
+                <tr>
+                    <td>– ?PEEK(174)<br>+PEEK(175)<br>*256</td>
+                    <td>Gibt nach dem Laden eines Programmes die Endadresse des Programmes aus</td>
+                </tr>
+                <tr>
+                    <td>– ?PEEK(187)<br>+PEEK(188)<br>*256</td>
+                    <td>Gibt die Anfangsadresse des zuletzt benutzten Filenamens aus</td>
+                </tr>
+                <tr>
+                    <td>– ?PEEK(648)<br>*256</td>
+                    <td>Gibt die Anfangsadresse des Bildschirmspeichers aus</td>
+                </tr>
+                <tr>
+                    <td>– POKE 649,0</td>
+                    <td>Schaltet die Tastatur »aus« (Setzen der Tastaturpuffergröße auf Null)</td>
+                </tr>
+                <tr>
+                    <td>– POKE 198,0</td>
+                    <td>Löscht den Tastaturpuffer</td>
+                </tr>
+                <tr>
+                    <td>– POKE 157,128 (0)</td>
+                    <td>Blockiert (erlaubt) die Ausgabe der Meldungen »SEARCHING FOR« etc.</td>
+                </tr>
+                <tr>
+                    <td>– A=PEEK(10)</td>
+                    <td>Falls A=0, dann war der zuletzt benutzte Befehl, der die Floppy oder Datasette anspricht, der LOAD-Befehl, andernfalls der VERIFY-Befehl (SAVE wird nicht berücksichtigt)</td>
+                </tr>
+                <tr>
+                    <td>– POKE 781,x:<br>SYS 59903</td>
+                    <td>Löscht Bildschirmzeile x</td>
+                </tr>
+                <tr>
+                    <td>– POKE 808,230</td>
+                    <td>Schaltet die &lt;RUN/STOP&gt;-Taste aus, wobei die Funktion von TI$ und TI erhalten bleibt</td>
+                </tr>
+            </tbody>
+        </table>
 
         <h3>Nun folgen ein paar Tips für die Assemblerfreaks:</h3>
 
-        <p>-1da #01 &lt;REVERS ON&gt; sta $c7</p>
-
-        <ul>
-            <li>jsr $e544 Löscht den Bildschirm - jsr $e566 Setzt den Cursor in die linke obere Ecke (&lt;HOME&gt;)</li>
-        </ul>
-
-
-        <p>-1lda #1 Gibt den Text aus, der im ASCIIldy #h Code Adresse steht, die in Low- und Highbyte angegeben ist. jsr $able Der Computer bricht ab, wenn er auf ein Nullbyte oder ein Gänsefüßchen stößt. -1dx #1 lda #h Gibt eine 16-Bit-Zahl dezimal auf jsr $oded dem Bildschirm aus, die in Low- und Highbyte angegeben werden muß -1dx #a ldy #b Setzt den Cursor an Zeile a und Spalte b jsr $e50c</p>
-
-        <ul>
-            <li>jmp $febe Alle Register werden vom Stapel geholt, mit anschließendem RTI. Gut zu gebrauchen für eigene Interrupt-Programme (Rasterinterrupt etc.) -1dx #a Holt die Anfangsadresse der jsr $e9fo Bildschirmzeile a im Bildschirmspeicher und legt diese in $D1/$D2 ab. Bei Einsprung in Adresse $EA24 erfolgt das gleiche wie oben, aber diesmal für den Farbspeicher, die Werte werden in $F3/$F4 abgelegt.</li>
-        </ul>
-
+        <table class="plain mono">
+            <tbody>
+                <tr>
+                    <td>– lda #01<br>sta $c7</td>
+                    <td>&lt;REVERS ON&gt;</td>
+                </tr>
+                <tr>
+                    <td>– jsr $e544</td>
+                    <td>Löscht den Bildschirm</td>
+                </tr>
+                <tr>
+                    <td>– jsr $e566</td>
+                    <td>Setzt den Cursor in die linke obere Ecke (&lt;HOME&gt;)</td>
+                </tr>
+                <tr>
+                    <td>– lda #l<br>ldy #h<br>jsr $ab1e</td>
+                    <td>Gibt den Text aus, der im ASCII-Code Adresse steht, die in Low- und Highbyte angegeben ist. Der Computer bricht ab, wenn er auf ein Nullbyte oder ein Gänsefüßchen stößt.</td>
+                </tr>
+                <tr>
+                    <td>– ldx #l<br>lda #h<br>jsr $bdcd</td>
+                    <td>Gibt eine 16-Bit-Zahl dezimal auf dem Bildschirm aus, die in Low- und Highbyte angegeben werden muß</td>
+                </tr>
+                <tr>
+                    <td>– ldx #a<br>ldy #b<br>jsr $e50c</td>
+                    <td>Setzt den Cursor an Zeile a und Spalte b</td>
+                </tr>
+                <tr>
+                    <td>– jmp $febc</td>
+                    <td>Alle Register werden vom Stapel geholt, mit anschließendem RTI. Gut zu gebrauchen für eigene Interrupt-Programme (Rasterinterrupt etc.)</td>
+                </tr>
+                <tr>
+                    <td>– ldx #a<br>jsr $e9f0</td>
+                    <td>Holt die Anfangsadresse der Bildschirmzeile a im Bildschirmspeicher und legt diese in $D1/$D2 ab. Bei Einsprung in Adresse $EA24 erfolgt das gleiche wie oben, aber diesmal für den Farbspeicher, die Werte werden in $F3/$F4 abgelegt.</td>
+                </tr>
+            </tbody>
+        </table>
 
         <address class="author">(Christian Seiler/tr)</address>
 

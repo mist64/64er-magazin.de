@@ -294,3 +294,12 @@ I did with it, what is true, what it cost, the sentence that would have prevente
 - **What I did.** Logged "not run: DISABLED (rule header)", which is a third disposition r000 does not admit.
 - **What would have prevented it.** Add 145 to r000's chain table marked DISABLED, and admit
   "not run — disabled" as a disposition (or drop 145 from the lanes text).
+
+## 160 — Pass 3 "mechanical, NOT a visual scan" in the Briefing contradicts the normative "the VISUAL WALK is the mechanism"
+
+- Found by the 100-195 sub-agent. On 8612 the walk found all six uncaptioned tables and the sweeps found none
+  (the same as 8611). Tesseract returns nothing on halftone-tinted boxes without `-blur 0x1.5 -threshold 55-60%`.
+  Check #5's `Tabelle (\d+)` misses OCR-damaged `Tabelle ]` and every Bild-captioned table. Check #7 flags the
+  Bild-captioned `<figure><table>` shape the rule itself requires.
+- **What would have prevented it.** Delete the Briefing sentence; add the tint pre-filter to step 4; make
+  check #5 `(Tabelle|Bild) [\d\]lI]+` and exempt Bild captions in #7.
