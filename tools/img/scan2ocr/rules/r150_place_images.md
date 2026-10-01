@@ -90,7 +90,7 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
 2. Find the article whose `<meta name="64er.pages" content="…">`
    starts with that page, e.g. `content="145-153"`.
 3. Disambiguate collisions: when two articles share a start page,
-   Read the relevant pages from `/tmp/64er_<YYMM>_pages/` to see which
+   Read the relevant pages from `<tmp>/masters600/NNN.png` to see which
    article the figure actually sits on. The image may be on a later
    page of the article, not the start page.
 4. Fix wrong filenames with `git mv` when visual verification shows
@@ -175,8 +175,11 @@ committing the file.
 
 The sub-agent must:
 
-1. Render the issue PDF to `/tmp/64er_<YYMM>_pages/` at `-r 150` (once, up
-   front).
+1. **Do not render the issue PDF.** It does not exist yet -- it is built at
+   the END, by step 006 (`r000`, *THE PAGE IMAGE IS `masters600`*). The page
+   image is `<tmp>/masters600/NNN.png`, already 600 dpi, deskewed, cut and
+   graded by step 005, and it is the same file r010 OCR'd and r145 cut these
+   figures from. Read it directly; there is nothing to render up front.
 2. Generate `issues/<YYMM>/images.txt` worklist from the loose PNGs:
    ```bash
    find . -maxdepth 1 -name "*.png" -not -name "title.png" \
@@ -296,7 +299,7 @@ pasted verbatim into the report**:
   read from the scan (the exact words the vision agent returned), so
   the orchestrator can confirm no caption was paraphrased or invented.
 - For each `git mv`, paste a one-line statement of which page the
-  image was visually located on (`Read /tmp/64er_<YYMM>_pages/p-NN.png`)
+  image was visually located on (`Read <tmp>/masters600/NNN.png`)
   and which article's column it sat in.
 - For each unplaced image, paste the one-line reason logged to
   `LOG.md`.

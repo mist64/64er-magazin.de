@@ -39,11 +39,13 @@ these from OCR text. Instead:
    never the mark cells. 300 dpi is tesseract's optimal input; never
    feed it 600 dpi.
 2. **Read the mark cells from a 600 dpi vision crop**, column-gridded:
-   - Higher-res CMYK page scans live at
-     `~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff` (one per magazine
-     page; `031.tiff` = page 31). These are NOT pixel-aligned with the
-     `/tmp/…_pages_300` renders (different crop/offset) — locate the
-     table visually, don't reuse 300 dpi coordinates.
+   - The page image is **`<tmp>/masters600/NNN.png`** (`031.png` = page 31),
+     written by step 005: 600 dpi, A4, deskewed, cut and graded, and the same
+     file r010 OCR'd. It is NOT pixel-aligned with tesseract's 300 dpi input --
+     locate the table visually, don't reuse 300 dpi coordinates.
+     (This rule used to name `~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff`,
+     where an earlier version of the chain put its derived 600 dpi pages. That
+     directory does not exist; see `r000`, *THE SCAN IS THE ONLY INPUT*.)
    - Derive the column centres from the printed digit/name header, then
      crop **per section** and, if needed, composite the digit header
      directly above each sparse section so every mark's column is
@@ -124,8 +126,8 @@ A pure `Tabelle …` grep is **not enough**. Use a layered sweep:
 ```bash
 OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
-cat "$OUT_DIR"/blocks/p*.txt > /tmp/64er_<YYMM>_full.txt
-grep -iE "Tabelle[ :.][^.]" /tmp/64er_<YYMM>_full.txt | \
+cat "$OUT_DIR"/blocks/p*.txt > "$OUT_DIR"/blocks_full.txt
+grep -iE "Tabelle[ :.][^.]" "$OUT_DIR"/blocks_full.txt | \
   grep -vE "Farbtabelle|Steuersequenztabelle|[Ww]ertetabelle|Preistabelle|Linktabelle"
 ```
 Also sweep for `Bild N\.`, `STECKBRIEF`, and `^\s*Listing [0-9]+\.`.
@@ -197,9 +199,10 @@ doesn't mention `Tabelle`, treat Pass 3 as incomplete and re-run.
 
 The sub-agent must:
 
-1. Render the issue PDF to `/tmp/64er_<YYMM>_pages/p-NNN.png` at `-r 150`
-   (once, up front).
-2. Concatenate step 010's block index to `/tmp/64er_<YYMM>_full.txt` for
+1. **Do not render the issue PDF.** It does not exist yet -- step 006 builds
+   it at the END (`r000`, *THE PAGE IMAGE IS `masters600`*). Read
+   `<tmp>/masters600/NNN.png` directly.
+2. Concatenate step 010's block index to `<OUT_DIR>/blocks_full.txt` for
    caption-sweep grep.
 3. Find work to do via the documented three passes:
    - Pass 1: `Tabelle [N]?[.:]`, `STECKBRIEF`, `Bild N` (the last for

@@ -56,8 +56,11 @@ Later than everything, including rule 300:
 - **This issue's scan** — `<OUT_DIR>/blocks/pNNN.txt` and 600 dpi crops of
   `<SRC_DIR>/NNN.png`, per the *page block index* recipe in
   `r000_orchestration.md`. This is the authority for our side.
-- **The monthly's scan** — `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf`,
-  rendered to PNG and **read with your own eyes**. This is the authority for
+- **The monthly's page** — `issues/<YYMM>/64er_19XX-XX.pdf` when that issue is
+  already imported (the repo has 32 of them), else its 2400 dpi scan in
+  `/Volumes/S/png/<YYMM>/`. Rendered to PNG and **read with your own eyes**.
+  (This rule used to name `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf`; those
+  files are gone -- see `r000`, *THE SCAN IS THE ONLY INPUT*.) This is the authority for
   their side. Render the *page image*; the PDF's **text layer is void** (r000,
   *the PDF has no usable text layer*) — it is a third OCR of the same paper and
   proves nothing either way.
@@ -281,7 +284,7 @@ is always a printed page:
 - for **our** side: the `<OUT_DIR>/blocks/pNNN.txt` line, or a 600 dpi crop of
   `<SRC_DIR>/NNN.png` at that bbox, read multimodally;
 - for **their** side: the monthly's page rendered from
-  `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf` and read multimodally.
+  `issues/<YYMM>/64er_19XX-XX.pdf`, or its scan, and read multimodally.
   Magazine page ≠ PDF page — the offset is per-issue (commonly −2, but it
   varies); confirm you are on the right page by its folio, not by arithmetic.
 

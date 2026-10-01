@@ -77,7 +77,40 @@ import os
 #     "SH8601"   Sonderheft 1/86, 152 pages, loose sheets
 #     "8609"     the September 1986 monthly, 176 pages, clipped spreads
 #     "8610"     the October 1986 monthly, 200 pages, clipped spreads
-ISSUE = "8611"
+#
+# IT IS A VARIABLE, NOT A LITERAL, AND IT HAS NO DEFAULT.  It used to be a
+# hardcoded string that each new issue had to remember to edit.  Forgetting did
+# not crash: every step then read the PREVIOUS issue's descriptor and wrote the
+# new issue's pages into the finished issue's directories, on top of shipped
+# work, silently.  A build that cannot say which issue it is must stop, not
+# guess -- so an unset value is an error with instructions, never a fallback.
+#
+# Two ways to set it, both one-time:
+#     rules/ISSUE.txt      one line, e.g. "8612" -- survives across shells, and
+#                          is what an issue build sets once at the start
+#     ISSUE=8612 in the environment   overrides the file, for a one-off run
+# ISSUE.txt is git-ignored: which issue a working tree is building is a local
+# fact, not something to commit and then conflict over.
+
+def _read_issue():
+    env = os.environ.get("ISSUE", "").strip()
+    if env:
+        return env
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ISSUE.txt")
+    try:
+        val = open(path, encoding="utf-8").read().strip()
+    except OSError:
+        val = ""
+    if val:
+        return val
+    raise SystemExit(
+        "r000_issue: no issue selected.\n"
+        "  The chain does not guess which issue it is building.\n"
+        f"  Set it once:  echo 8612 > {path}\n"
+        "  Or for a single run:  ISSUE=8612 <command>")
+
+
+ISSUE = _read_issue()
 
 # The descriptors live with the issues they describe: <repo>/issues/<ID>/.  That
 # directory already IS the issue as far as the site generator is concerned (its

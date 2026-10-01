@@ -38,12 +38,15 @@ The project's canonical disk-image archive lives at:
 # e.g. ~/tmp/64er-Disketten/86XX/8607.D64
 ```
 
-For Sonderhefte the file lives under the same root with the SH naming.
-**Always confirm the exact source path with the user before running
-the extractor** — multiple copies of the same disk may exist on the
-machine (TOSEC archive, mirror folders, local downloads). Pick the
-canonical one so `prg.txt`'s recorded source comment is meaningful
-later.
+For Sonderhefte the file lives under the same root with the SH naming. An
+issue published as two disks is `<YYMM>A.D64` / `<YYMM>B.D64` -- 8611 is two,
+8612 is one; look, do not assume. Each `.D64` has a `.TXT` beside it.
+
+**Check the canonical path first and use it if it is there** -- VERIFIED
+2026-10-01, the archive is mounted and holds `84XX` through `91XX`. Only when
+it is absent is the source a question for the operator, because copies of the
+same disk exist in other places (TOSEC archive, mirror folders, local
+downloads) and `prg.txt` records which one was used.
 
 ## Usage
 
@@ -88,10 +91,12 @@ same reason `<tmp>` does (r000, *the working directory must be DURABLE*).
 170 KB each; there is no reason to leave the only reference pointing into a
 directory that gets deleted.
 
-The canonical root this rule used to name, `~/tmp/64er-Disketten/`, does not
-exist on this machine at all. Confirm the source with the operator — the
-instruction above still holds, and multiple byte-identical copies is the
-normal case, not the exception.
+A note that said this root "does not exist on this machine at all" stood here
+until 2026-10-01, when it did exist and had for some time -- written during a
+build where it happened to be unmounted, and then believed. **A rule that
+reports a path as missing must say WHEN it was checked**, or the next agent
+inherits a wrong fact with no way to date it. Check, then trust what you see
+over what this file says about your filesystem.
 
 ## Verification
 

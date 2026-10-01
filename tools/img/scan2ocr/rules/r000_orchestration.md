@@ -130,6 +130,76 @@ rule's header to make a particular build go through. A rule that turns out to
 apply to both kinds is re-classified `all` **with the evidence in the commit
 message**, permanently, for every issue after it too.
 
+## THE SHAPE OF A BUILD: TWO PAUSES, AND NOTHING ELSE INTERRUPTS THE OWNER
+
+An issue build stops for its owner **exactly twice**. Between those two points
+the chain runs unattended -- it does not ask, it does not wait, and it does not
+experiment. Everything it needs in between is either in these files or derivable
+from the scan; where it is not, that is a **defect in these files** and fixing it
+is part of the work (see *THE SCAN IS THE ONLY INPUT*).
+
+**PAUSE 1 — before step 005.** The two questions about the physical copy:
+binding, and which pages are which paper. They cannot be answered from a scan,
+and 005 grades nothing until they are. See the section below.
+
+**PAUSE 2 — the image boundary.** The chain runs from 005 to the end of the HTML
+with **no cut figures**, then stops and hands over. What it delivers:
+
+1. `issues/<ID>/*.html` complete in every respect that does not need a figure --
+   text, tables, listings, metadata, headings, errata, the lot;
+2. the **crop worklist**: every figure the pages call for, with page and caption,
+   so the owner can cut them;
+3. the **cover source** for `title.png` -- step 006 blocks on a hand-made 150 dpi
+   `title.png` and the owner makes it from the scan, so put the crop in front of
+   them in the same sitting rather than a week later;
+4. **every owner decision accumulated since pause 1** (below).
+
+Then the owner cuts the figures and makes `title.png`. Then the chain resumes:
+place the images (150), build the PDF (006), re-run the end-of-issue gates.
+
+**Step 006 is numbered early and RUNS LATE.** It is the issue PDF, it blocks on a
+hand-made input, and the PDF comes last anyway (*THE PAGE IMAGE IS `masters600`*).
+Numbering is not a schedule.
+
+### Owner decisions ACCUMULATE; they are not raised when found
+
+Several steps turn up something only the owner can settle:
+
+| step | what it finds |
+|---|---|
+| 300 | a Futureteufelchen -- our own correction to the printed page. **Each one needs the owner's authorisation**, every time |
+| 325 | a passage that reads wrong and may be the scan or may be the print |
+| any | a reader-visible defect the rule cannot resolve from the page |
+
+None of these is a reason to stop and ask. **Write it to `LOG.md` the moment it
+is found** -- with the page, the evidence, and the question in one sentence --
+and carry on. They are delivered as one list at pause 2, where the owner is
+already looking at the issue. A question asked the moment it occurs costs the
+owner a context switch and the chain its momentum; the same question asked with
+nineteen others costs one sitting.
+
+### What legitimately CANNOT pass at pause 2
+
+The end-of-issue gates are written for a finished issue. At pause 2 the issue is
+finished *except* for figures, so:
+
+- **Gate 1, "No stray TODO", cannot pass** -- every unplaced figure is a `TODO`
+  by design. That is the deliverable, not a failure. Report the count; do not
+  hunt for a way to make the grep empty.
+- Any check that renders or inspects the issue PDF cannot run -- 006 has not
+  happened yet.
+
+Run every other gate. An agent that treats its own correct output as a failure
+will keep working past the hand-off and start inventing figures.
+
+### If you are blocked, escalate to the ORCHESTRATOR, never to the owner
+
+Giving up is allowed and is useful information. Say what you tried, which rule
+sent you there, and what was missing. The orchestrator either tells you to carry
+on -- the instructions were sufficient and you stopped early -- or fixes these
+files and points you at the change. **The owner is interrupted at the two pauses
+and for nothing else.**
+
 ## THE CHAIN'S FIRST ACTION — ask which binding, and which pages are which paper
 
 **Before step 005 grades anything — before a scan is opened, before an output
@@ -479,6 +549,14 @@ has nothing to validate the sub-agent against. If you're writing a new
 rule, write the verification block before the procedure section — that
 forces clarity about what "done" means.
 
+**A check that names a specific issue is a WORKED EXAMPLE from that issue, not a
+command to run.** Thirteen of them across r060, r070, r080, r120 and r140 say
+`issues/8607/…`, with expected values -- "expect 0", "~90+" -- measured on 8607
+and true of no other issue. Substitute the issue you are building before running
+one, and read its expected value as "this is what it looked like there", never
+as a target for your own. Pasted verbatim, such a check reports on a finished
+issue and passes while saying nothing about yours.
+
 The verification block should:
 - be runnable as shell (with `python3 -` heredocs where useful);
 - exit non-zero or print a clearly flaggable result on failure;
@@ -809,6 +887,36 @@ until step 006, about **15 h** into the 005 sweep. The check above took seconds.
 `ssh host 'cmd'` does not source `.zprofile`, so Homebrew is not on `PATH` and
 every `command -v` says MISSING. Export `PATH=/opt/homebrew/bin:$PATH` in the
 command, or run it through a login shell, before concluding anything is missing.
+
+## Cross-cutting rule: THE SCAN IS THE ONLY INPUT — everything else is DERIVED
+
+The chain takes the **2400 dpi scan masters** and nothing else. Every other file
+it reads, it made: `masters600`, `sheets600`, `cmyk2400`, `geometry`, the OCR
+blocks, the article HTML, the issue PDF. (The one other external input is the
+magazine's cover disk, `~/tmp/64er-Disketten/YYXX/<YYMM>.D64`, which step 120
+reads and which no scan can substitute for.)
+
+**So a path in these rules that points outside the scan directory, the issue's
+`<tmp>`, and the repo is a FOSSIL.** Earlier versions of this chain put derived
+data in other places, and when the chain changed the data moved and the sentence
+did not. Found 2026-10-01, all dead:
+
+| rule | pointed at | what it is now |
+|---|---|---|
+| r150, r160 | `/tmp/64er_<YYMM>_pages/`, `/tmp/64er_<YYMM>_full.txt` | `<tmp>/masters600/NNN.png` and this issue's own OCR |
+| r160 | `~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff` | `<tmp>/masters600/NNN.png` — same page, already deskewed and cut |
+| r300, r330 | `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf` | **gone.** For another issue use the repo's own `issues/<YYMM>/64er_19XX-XX.pdf`, or its scans |
+
+**What to do when a path in a rule does not exist.** Do not hunt for it and do
+not invent a replacement. Ask which of these it is:
+
+- derived by this chain -> it is under the issue's `<tmp>`, and the rule naming
+  anywhere else is stale. `masters600` is the page image (see the rule below);
+- a *previous* issue's work -> it is in the repo, under `issues/<YYMM>/`;
+- the scan -> the descriptor's `scan_dir`.
+
+Then fix the rule, in the same change as the work. A fossil path costs every
+future agent the same half hour.
 
 ## Cross-cutting rule: the working directory must be DURABLE
 

@@ -371,9 +371,28 @@ The "Fehlerteufelchen" rubric was 64'er-Magazin's errata column. Each monthly is
 
 ## Pipeline
 
+### 0. If this issue is the NEWEST in the corpus, this step is a no-op
+
+This rule applies errata printed in **later** monthlies to **this** issue's
+articles. A later monthly that has not been scanned cannot correct anything, so
+for the newest issue in `/Volumes/S/png/` there is nothing to find and nothing to
+apply: record that in `LOG.md` and go on. Say it, do not leave it implied -- an
+agent that finds no source for step 1 will otherwise assume the source is
+missing and go looking for it. MEASURED 2026-10-01: 8612 is the newest scan, so
+8612's step 300 has no input by construction.
+
 ### 1. Find the Fehlerteufelchen page in each candidate issue
 
-Source PDFs live in `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf` (Year > 1985 has them; later years drop the rubric).
+**Where the later issue comes from.** It is one of two things and never a third:
+
+- **already imported** -> the repo has it, `issues/<YYMM>/` (32 issues as of
+  2026-10-01, each with its HTML and its own `64er_19XX-XX.pdf`). Grep the HTML;
+  it is this project's own transcription and better than any OCR of a PDF.
+- **scanned but not imported** -> `/Volumes/S/png/<YYMM>/`, the 2400 dpi masters.
+
+This rule used to name `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf`. **Those
+files are gone and are not coming back** -- they were a separately-OCR'd set from
+before this chain existed. See `r000`, *THE SCAN IS THE ONLY INPUT*.
 
 Heuristics, in priority order:
 
