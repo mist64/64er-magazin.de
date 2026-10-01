@@ -384,3 +384,43 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   inside <pre> are not addressed. The Impressum has no owning rule.
 - **What would have prevented it.** A step "restore lost drop caps (one letter, from the crop)" and a step "split
   headings that swallowed body text". A never-split + empty-<p> check in Verification. An owner for the Impressum.
+
+## 006 — I presented a MEASURED quantity (FORCE_CONTONE) as an owner decision; and "~50 mm²" is not a threshold
+
+- **What happened.** I listed the chroma-area candidates with my own "force? yes/no/owner's call" column and argued 004, 114,
+  125 and 042 out ("scanner backdrop", "neighbour leaf", "only a cast", "hairline"), offering 186 (68.5 mm²) as optional.
+  r006: "**Anything above ~50 mm² carries real ink; below it is the scanner.** There is no judgement here." The owner's
+  correction: FORCE_CONTONE is whatever the measurement yields, here 10 pages.
+- **What in r006 failed to stop me.** The method (the code snippet) and the deciding sentence are ~20 lines apart, and the
+  sentence is mid-paragraph after a table of 8611 numbers. Nothing near the FORCE_CONTONE usage line says "the list is the
+  measurement's output".
+- **The tilde.** "~50 mm²" gives no answer for a page at 48 or 52 while claiming "no judgement". Either state an exact
+  number or admit a band that goes to the owner. (Not changed by me; recorded.)
+- **What would have prevented it.** Put beside `FORCE_CONTONE=`: "= every bilevel page whose 3x3-opened chroma area exceeds
+  50 mm² (exact). Not a choice; report the table."
+- Also: three masters (001, 037, 073) carry the Affinity Photo xattr — the pages the owner cut crops from. Only 001's
+  content was overwritten (shasums). Integrity check that works: re-run `cut` and compare all 200 shasums; 199/199 were
+  byte-identical to the original sweep's output.
+
+## 006 — RULE DEFECT: r006 thresholds TOTAL chroma area; it must be the LARGEST CONNECTED REGION (found by 64er_control)
+
+- r006's method sums every 3x3-opened chroma pixel on the page. Fringing on body text vanishes under a 3x3 opening, but
+  fringing on DISPLAY type is thicker than the kernel: 8612 p186's headline left 28 fragments (greys with a blue cast,
+  R≈G, B +15-18) summing to 68.5 mm², the largest 27.9. The owner: "186 clearly b/w. if you measure something different,
+  you're not measuring right."
+- Measured (total / largest / blobs / 5x5-opened total): 180 2174.0/2153.6/7/2146.1; 152 2869.2/248.0/1788/969.5;
+  022 136.2/136.2/1; 024 127.7/124.1/13; 125 94.8/89.6/13/63.5; 172 78.2/78.2/1; 114 75.8/58.7/5/74.2;
+  004 3853.9/1504.5/1472/1977.7; **186 68.5/27.9/28/46.5 (fringe)**; **042 56.6/15.4/39/0.0 (fringe)**.
+  Largest-blob separates cleanly: real ≥ 58.7, fringe ≤ 27.9.
+- **And no area measure can tell printed ink from the scanner bed.** 004's chroma is the navy backdrop beside the narrower
+  reply card (`mean > 25` lets a dark bed with a colour cast through). I excluded it as not ink; it ships bilevel = black,
+  as 8611's 004 did.
+- Final FORCE_CONTONE="022 024 114 125 152 172 180". The first build (with 004, 042, 186) was stopped in its OCR phase;
+  nothing shipped.
+- **Fix for r006.** Threshold the largest connected component (not the sum); state that display-type fringing survives a
+  3x3 opening; exclude chroma lying outside the traced paper (the bed). "There is no judgement here" is only true once
+  the measure is right.
+- **Two defects, not one** (control): (1) total area vs largest component — the fringe problem (186, 042); (2) no exclusion
+  of chroma outside the traced paper — the bed problem (004). Fix (2) would have removed 004 automatically; fix (1) alone would not.
+- **The review was what caught it.** On 8611 the owner waived the page-input review; on 8612 they reviewed, and that is the
+  only reason 186 was caught before shipping. r006's "a build started without that review is to be stopped" earned its place.
