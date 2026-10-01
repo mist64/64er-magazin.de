@@ -1046,8 +1046,12 @@ not invent a replacement. Ask which of these it is:
 - a *previous* issue's work -> it is in the repo, under `issues/<YYMM>/`;
 - the scan -> the descriptor's `scan_dir`.
 
-Then fix the rule, in the same change as the work. A fossil path costs every
-future agent the same half hour.
+Then **record it in `WORKFLOW_ERRATA.md` and carry on** -- do not edit the rule
+yourself mid-build. Editing a rule while running it means a later step reads
+something different from what an earlier step did, and the record of what
+actually went wrong is gone. The orchestrator harvests the errata into these
+files afterwards. (If you are running without an orchestrator, fix it in the same
+change as the work; a fossil path costs every future agent the same half hour.)
 
 ## Cross-cutting rule: the working directory must be DURABLE
 
