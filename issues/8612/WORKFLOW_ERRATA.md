@@ -329,3 +329,45 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   (6 files in published 8611 too).
 - **What would have prevented it.** Say "keep the initials as printed" (or fix the corpus). Use `[…., -]` in check 4.
   Split each address on `/` in check 5.
+
+## 005 — KNOWN LIMITATION (owner, 2026-10-01): art-tilted ads are levelled to the art; accepted for 8612
+
+- p183: art printed ~6.6° tilted. `measure_skew`'s coarse sweep SKEW_COARSE (-3.0, 3.0, 0.2) clamps at -3.3 (fine
+  span ±0.3 around -3.0); the re-level pass then adds the re-measured residual -3.30, for -6.60 applied, residual
+  -0.26 (the only NOTE). p140 +2.02° and p117 -1.72° are the same class inside the sweep range and carry NO note.
+  Paper is square in all three thumbs; the masters show the sheet rotated, with prop/bed wedges. All three are ads,
+  so no article text is affected. **Owner: accept, no code change for 8612.**
+- Diagnosable next time by: |skew.angle| > 1° together with fold none and logo none on the same page.
+- The fix, if it ever matters: a per-page skew override in r005, or refusing a total angle outside SKEW_COARSE.
+
+## C3 / tools/mse.py — the MSE last line is shorter than the print, BY DECISION (owner, 2026-10-01)
+
+- **What the print does.** The 1986 MSE printed a full 8-byte last line; bytes past the end address are whatever was in
+  memory, checksum over all 8. MEASURED: 8612 p72 seq-trans `ff 00 ff`; 8611 p88 47erw `00 00 00 00 00`; 8611 p88 49erw
+  `e6 7b a9 fc`; 8510 p144 timer-test `ff 00 ff 00 …`; 8502 p86 cursorsteuerung `00 a0`.
+- **Why it cannot be rebuilt.** The bytes are in NO file. The prg stops at the end address, and the 8611A.D64 sector tail
+  after SEQ-TRANS.OB is `00 00 00`. The checksum cannot tell `00 00 00` from `ff 00 ff`.
+- **What the renderer does.** `dumpMSE1` sums only bytes with `c+i < e`, so our shorter line still checksums like the
+  magazine's, and a reader typing it gets a working program. The gap is faithfulness, not correctness.
+- **What was rejected.** A zero-pad changes 311/377 corpus listings in 31 issues, most then disagreeing with print. A
+  per-listing `tail` variant (0/377 change; reproduces 8612 p72 exactly) exists at
+  /Users/mist/DNB/8612/tmp/scratch_mse/mse.diff. It would need a generator hook plus 377 unverifiable hand
+  transcriptions. **Owner: leave mse.py unchanged.**
+- **Separate defect, out of 8612's scope, not investigated.** 8510 timer-test and SH8505 dump c000 ship prgs ONE byte
+  longer than the printed range.
+- Lesson kept: the change was approved and still measured first (r000). Measuring found it would have rewritten 311 shipped listings.
+
+## 006 — a master can be silently overwritten by the cover export, and nothing checks master size against its stamp
+
+- `masters600/001.png` was found as a 1240x1754 Affinity Photo export (19:58, quarantine xattr "Affinity Photo 2"), almost
+  certainly saved over the master while title.png was being made from it. The stamp still said 4961x7016. r006's
+  freshness check ("title.png older than the cover master") PASSES in this case. Fixed by re-running r005 `cut`
+  (deterministic): 001 restored to 4961x7016, and the other 199 masters byte-identical before/after (shasum).
+- **What would have prevented it.** r006 pre-build check: every masters600/NNN.png has the stamp's master-px. And tell
+  the owner to export title.png to a new path (or work from a copy).
+- **Also found by the sub-agent.**
+  - make_issue_pdf_mixed.sh runs NCPU magick jobs, each with full OpenMP threads (load ~900, 25+ min stall). With
+    `MAGICK_THREAD_LIMIT=1` it took minutes. This is the same oversubscription r000's lanes rule warns about.
+  - r006's "all caches keyed on existence" omits `.ocrcache/pageclass.tsv` and `.ocrcache/jbig2/*.jb2`; both go stale after a re-grade.
+  - The README says page 1 is "resized to page-1 dimensions"; the script refuses to resize.
+  - The chroma snippet uses undefined `w, h`.
