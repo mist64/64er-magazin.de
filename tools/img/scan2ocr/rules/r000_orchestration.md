@@ -6,6 +6,24 @@
 directory is run under. Read this once at the start of an issue build;
 re-read whenever a new agent or session takes over.
 
+## BEFORE ANYTHING ELSE: name the issue
+
+Every step imports one name for the issue being built, from `r000_issue.py`. It
+has **no default**, so nothing runs until you set it:
+
+```bash
+echo 8612 > tools/img/scan2ocr/rules/ISSUE.txt     # one line, the issue id
+```
+
+`ISSUE.txt` is git-ignored: which issue a working tree is building is a local
+fact. `ISSUE=8612` in the environment overrides it for a single run.
+
+It used to be a hardcoded string in `r000_issue.py` that each issue had to
+remember to edit, and **forgetting did not crash** -- every step read the
+previous issue's descriptor and wrote the new issue's pages into the finished
+issue's directories, on top of published work, silently. A build that cannot say
+which issue it is now stops and tells you how to say so.
+
 The build pipeline is a chain of substantive, sometimes editorial
 transformations. It has **two kinds of step**, and they are run differently:
 
