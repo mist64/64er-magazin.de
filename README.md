@@ -35,6 +35,7 @@ Zum 40jährigen Jubiläum des *64'er Magazins* präsentieren wir das Kunstprojek
 * 10/86: 19. September 2026
 * 11/86: 17. Oktober 2026 <!-- 8610/S.196 -->
 * 12/86: 14. November 2026 <!-- 8611/S.188 -->
+* 01/87: 12. Dezember 2026 <!-- 8612/S.194 -->
 
 usw.
 
