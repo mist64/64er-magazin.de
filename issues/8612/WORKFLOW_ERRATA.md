@@ -259,3 +259,38 @@ I did with it, what is true, what it cost, the sentence that would have prevente
     directory (here WORKFLOW_ERRATA.md), not just "each rewritten file".
 - **What would have prevented it.** Point the helper at toc_entries.txt (or retire it and say so).
   Restrict the opening-piece sentence to Sonderhefte. Stage by explicit file list.
+
+## 120 — the sub-agent found four gaps; recorded as found
+
+- "`NN` is the article's start page" is false for 54/57/78 on 8612. Those are listing pages
+  inside 51, 52 and 74, and they resolve only through `64er.pages`.
+- No path for BASIC at a load address not ending in 01 (find c128 at $242B). The extractor
+  routes it to PRG and petcat produces garbage. The relink-to-$1C01 workaround is the sub-agent's.
+- The stub test (`< 3 content lines`, "last statement is a bare SYS") misses a stub whose
+  SYS is the FIRST statement with CR-bearing tail text (4gewinnt meister). Only check 4 caught it.
+- No path for a line-linked plain-ASCII assembler source (hyperscreen ii.s). Neither
+  data-assembler branch decodes it.
+- The re-decode recipe leaves `;del/<n>.prg` and leading blank lines, which 8611's files do not have.
+- **What would have prevented these.** One sentence each in r120 (above). Plus: "a separator
+  NN is the PAGE the listings sit on; map it through 64er.pages, not filenames".
+
+## 130 — fossil paths in Inputs (r000's fossil table misses r130)
+
+- **What the rule says.** r130 *Inputs*: "`issues/<YYMM>/64er_*.pdf` — for verbatim captions" and
+  "The page-scan PNGs under `issues/<YYMM>/png/`".
+- **What is true.** Neither exists during a build (the PDF is made at 006, after PAUSE 2; there is no
+  png/). r000's *THE PAGE IMAGE IS masters600* names the right source, and r000's fossil table lists
+  r150/r160/r300/r330 but not r130. Also `/tmp/64er_<YYMM>_full.txt` is a /tmp path (r000: never /tmp).
+- **Cost.** 1 min; I briefed the sub-agent with <tmp>/masters600 and the block index instead.
+- **What would have prevented it.** Add r130 to the fossil table, and replace both lines with
+  `<tmp>/masters600/NNN.png` and `<OUT_DIR>/blocks/pNNN.txt` / `NNN.labels.json`.
+
+## 000/145 — a DISABLED step has no disposition in r000's vocabulary, and is missing from the chain table
+
+- **What the rules say.** r000: "every number in the chain has exactly one `LOG.md` disposition:
+  ran-and-verified, or `not applicable — kind`". r000's chain table has no 145, yet r000's lanes
+  section and THE PAGE IMAGE section speak of "145 figure extraction" / "r145 cuts figures from".
+  r145 itself opens "DISABLED — 2026-08-22. Do not run this step."
+- **What I did.** Logged "not run: DISABLED (rule header)", which is a third disposition r000 does not admit.
+- **What would have prevented it.** Add 145 to r000's chain table marked DISABLED, and admit
+  "not run — disabled" as a disposition (or drop 145 from the lanes text).
