@@ -462,3 +462,12 @@ I did with it, what is true, what it cost, the sentence that would have prevente
   240 is an audit. Step 3 "never `cp` the previous one" contradicts the Notes "You can `cp` the prior issue's".
 - **What would have prevented it.** Anchor the editorial grep like the others; add an editorial shape check; reframe
   r240 as "audit the banners 150 placed"; delete one of the two cp sentences.
+
+## 250 — check 4 flags figures/downloads/hidden blocks after a source, and rejects `</aside>`
+
+- Found by the sub-agent. It accepts only h2/h3/aside/</section>/</article>/source as the next block, so every source followed
+  by an r150/r170-placed figure or download is flagged (6 on 8612, 6 on 8611, 5 on 8610). A source that is the last child of
+  an aside is also rejected. The trigger list omits <aside>. In-issue page pointers ("Anleitung auf Seite N") are unmentioned.
+  "This rule only toggles the class attribute" is contradicted in practice by every OCR-damaged source line.
+- **What would have prevented it.** Skip figure/download/display:none blocks before reading the next tag; accept </aside>;
+  one line on in-issue pointers (plain <p>, per 8611/50).
