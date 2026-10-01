@@ -52,8 +52,46 @@ API_TIMEOUT = 600.0
 # Opus 5 takes up to 2576 px on the long edge, so that is what is sent: the
 # task is reading small print off a magazine page, and this is the most detail
 # the model will accept.
+#
+# The same number happens to be right for the local GLM-5.3-Flash on oMLX, for a
+# different reason.  MEASURED on 8611 p99, prompt tokens billed for one image:
+#
+#     452x640     0.3 Mpx    408
+#     910x1288    1.2 Mpx   1535
+#    1821x2576    4.7 Mpx   3865     <- the cap
+#    3642x5152   18.8 Mpx   3865     4x the pixels, same cost and same detail
+#    2480x7016   17.4 Mpx   1941     a TALL strip gets LESS budget, not more
+#
+# So the image is capped at ~3865 tokens and 2576 px on the long edge already sits
+# at the cap: sending more pixels buys nothing, and cropping to a long thin strip
+# buys less than nothing.  To give a model more detail on a small region, crop so
+# the REGION fills a roughly page-shaped frame.  Do not raise this constant
+# expecting to read finer print.
 IMAGE_LONG_EDGE = 2576
 IMAGE_FORMAT = "PNG"
+
+# WHAT A LOCAL MODEL IS AND IS NOT GOOD FOR.  GLM-5.3-Flash (oQ4e, multimodal,
+# served by oMLX, no credentials) was measured against Opus on real pages, and the
+# answer differs per TASK, not per model:
+#
+#   Transcribing what is printed -- TRUSTWORTHY.  8611 p99's frequency table
+#   misprints the G# row: 485 is 0x1E5, so Lo-Hex should be E5 / 229, and the
+#   magazine prints E3 / 227.  GLM returned E3 / 227 in 4 runs of 4, at both
+#   efforts and both framings -- it read the paper instead of doing the
+#   arithmetic, which is the whole requirement.  tesseract's text for that page
+#   contains NEITHER value, so the answer came from the image alone.
+#
+#   Classifying page layout (step 020) -- NOT a substitute.  90.4% of block
+#   labels, with the misses concentrated in toc, standalone listings and
+#   page_kind.  See r020_classify.md.
+#
+#   reasoning_effort is an HONESTY dial, not a quality dial.  Asked for that same
+#   G# row against p94, where the table stops at F# above a printed "Fortsetzung
+#   auf Seite 99", `low` answered "Lo-Hex=F2 Lo-Dez=242" -- fabricated, plausible,
+#   unhedged -- while `high` quoted the continuation note and declined.  Given a
+#   crop of an unrelated article, `high` described what was actually in frame and
+#   refused.  So: `low` for work whose answer is certainly in the image and is
+#   checked by a script; `high` whenever "it is not here" is a possible answer.
 
 CLAUDE = "claude"
 CLAUDE_TIMEOUT = 600
