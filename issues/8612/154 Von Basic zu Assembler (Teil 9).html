@@ -18,7 +18,7 @@
         <h1>Von Basic zu Assembler (Teil 9)</h1>
         <p class="intro">Selbstmodifikation von Programmen und Programmierung einer Befehlserweiterung: Anhand einer Basic-Erweiterung erklären wir diese Techniken näher.</p>
 
-        <p>in immer noch zu wenig behandeltes Thema ist die Programmierung von selbstmodifizierenden Programmen. Dazu hatten wir in Teil 7Zeine Basic-Erweiterung vorgestellt, die das Basic V2 des C 64 um neun mathematische Funktionen erweitert. In Teil 8 begannen wir damit, die einzelnen Module (Unterroutinen) dieser Erweiterung zu besprechen, wobei das letzte behandelte Unterprogramm das Modul 4 (DLGR) war. Wir wollen nun dort weitermachen, wo wir aufgehört haben, also die fehlenden Module 5 bis 9 erklären.</p>
+        <p>Ein immer noch zu wenig behandeltes Thema ist die Programmierung von selbstmodifizierenden Programmen. Dazu hatten wir in Teil 7Zeine Basic-Erweiterung vorgestellt, die das Basic V2 des C 64 um neun mathematische Funktionen erweitert. In Teil 8 begannen wir damit, die einzelnen Module (Unterroutinen) dieser Erweiterung zu besprechen, wobei das letzte behandelte Unterprogramm das Modul 4 (DLGR) war. Wir wollen nun dort weitermachen, wo wir aufgehört haben, also die fehlenden Module 5 bis 9 erklären.</p>
 
         <h3>Modul 5: COT</h3>
 
@@ -104,19 +104,11 @@
 
         <p>Im POLY-Modul kommt es uns nicht darauf an, Rechnungen durchzuführen. Vielmehr erschöpft sich die Arbeit in der richtigen Übernahme aller Parameter. Sehen wir uns zunächst einmal an, welche Werte die von uns benutzte Routine POLYX erwartet. Ein Polynom ist ein mathematischer Ausdruck der Form y a, tra xl. 4 a, xXe+a.'X+a,</p>
 
-        <p>Einige Beispiele sollen das erläutern: y=5-x°-2.x + 7mitn=3, a, =5, 3, =0,a, =-2und Eh =7 y = 3.7x!? - 5x? mit n=12, a,, =37,a, =-5, alle anderen a-Werte (man nennt diese Werte Koeffizienten) sind gleich 0.</p>
+        <p>Einige Beispiele sollen das erläutern:<br>y=5-x°-2.x + 7mitn=3, a, =5, 3, =0,a, =-2und Eh =7<br>y = 3.7x!? - 5x? mit n=12, a,, =37,a, =-5,<br>alle anderen a-Werte (man nennt diese Werte Koeffizienten) sind gleich 0.</p>
 
-        <p>Sie sehen, es gibt unzählige Varianten. Außerdem können die Koeffizienten auch noch alle möglichen mathematischen Ausdrücke darstellen. POLYX erwartet nun vor dem Aufruf die Startadresse einer Tabelle im schon bekannten Zeiger A/Y. Der Aufbau dieser Tabelle sieht so aus: 1.Byte: Polynomgrad n (l-Byte-Integer)</p>
+        <p>Sie sehen, es gibt unzählige Varianten. Außerdem können die Koeffizienten auch noch alle möglichen mathematischen Ausdrücke darstellen. POLYX erwartet nun vor dem Aufruf die Startadresse einer Tabelle im schon bekannten Zeiger A/Y. Der Aufbau dieser Tabelle sieht so aus:<br>1.Byte: Polynomgrad n (l-Byte-Integer)<br>Bytes 2 bis 6: Koeffizient a, (Fließkommazahl im MFLPT-Format)<br>Bytes 7 bis 11: Koeffizient a,.ı (Fließkommazahl im MFLPT-Format)<br>Bytes 12 bis 16: Koeffizient a... (Fiießkommazahl im MFLPT Format)<br>und so weiter bis zum Koeffizienten ao.<br>Der Aufrufsoll in dieser Form erfolgen:</p>
 
-        <p>Bytes 2 bis 6: Koeffizient a, (Fließkommazahl im MFLPT-Format)</p>
-
-        <p>Bytes 7 bis 11: Koeffizient a,.ı (Fließkommazahl im MFLPT-Format)</p>
-
-        <p>Bytes 12 bis 16: Koeffizient a... (Fiießkommazahl im MFLPT Format) und so weiter bis zum Koeffizienten ao.</p>
-
-        <p>Der Aufrufsoll in dieser Form erfolgen:</p>
-
-        <p>Im ersten oben genannten Be spiel stünde dann: A=A:POLY.x,3,5.0-3,7: PRINT A</p>
+        <p>Im ersten oben genannten Be spiel stünde dann:<br>A=A:POLY.x,3,5.0-3,7: PRINT A</p>
 
         <p>Unser Modulkern speichert also zunächst die Zahl x (das Argument) mit der schon bekannten Routine MOVMF aus dem FAC in den Zwischenspeicher 1. Nun holt sich das Programm nach erneutem Prüfen auf ein Komma wieder durch FRMNUM den Polynomgradnin den FAC. Mit der Routine FACINX wandeln wir den Fließkommawert von n um in eine 2-Byte-Integer-Zahl, deren LSB im Y-Register und deren MSB im Akku landet. Uns reicht das LSB, denn Polynome mit einem Grad größer 255 sind wohl kaum sinnvoll und lassen sich auch nicht mehr eingeben.</p>
 
