@@ -10,6 +10,14 @@ matted, graded **600 dpi masters** that `r010` OCRs and `r145` cuts figures
 from. This is the first step of the chain; it owns everything between the
 scanner and `r010`'s input.
 
+**The thumbs are DERIVED, not found.** `thumb_150` points into `<tmp>`; a
+`thumb/` directory sitting beside the scans is not an input and is not trusted
+(r000, *A `thumb/` you FIND beside the scans is NOT an input*). Every threshold
+below was measured on thumbs made with `magick -scale 6.25%` from a 2400 dpi
+master -- byte-identical to the set beside the scans, verified on 8610 p050 and
+8612 p002/p050/p150 -- and does not transfer to a set made any other way.
+
+
 This is a **program step**: the orchestrator runs it, checks the exit status and
 runs the Verification block below. There is no editorial judgement in it and
 nothing to dispatch.

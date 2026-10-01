@@ -35,7 +35,7 @@ explaining the measured value can sit beside it.
 
     { "id": "SH8601", "kind": "sonderheft", "binding": "sheet", "pages": 152,
       "scan_dir": "/Volumes/S/png/SH8601",
-      "thumb_150": "/Users/mist/DNB/SH8601/master_2400/SH8601/thumb",
+      "thumb_150": "/Users/mist/DNB/SH8601/tmp/thumb150",
       "tmp":       "/Users/mist/DNB/SH8601/tmp",
       "paper": {
         "high": null,
@@ -441,7 +441,13 @@ class Issue:
         self.binding = d.get("binding")
         self.pages = int(d["pages"])       # printed pages, cover counted as 1
         self.pdf = d["pdf"]                # file name inside issue_dir
-        self.scan_dir = d["scan_dir"]      # raw 2400 dpi scans, NNN.png
+        self.scan_dir = d["scan_dir"]      # raw 2400 dpi scans, NNN.png -- THE input
+        # 150 dpi thumbs the CHAIN derived from scan_dir, under tmp -- never a
+        # thumb/ directory found beside the scans. See r000_orchestration.md,
+        # "A thumb/ you FIND beside the scans is NOT an input": two different
+        # generator scripts exist on the scan volume, they disagree on scale and
+        # on filter, one skips files that already exist so a directory can be a
+        # mixture, and r005's thresholds were measured on one of the two.
         self.thumb_150 = d["thumb_150"]    # 150 dpi thumbs of the same
         self.tmp = d["tmp"]                # the working directory, everything below
 

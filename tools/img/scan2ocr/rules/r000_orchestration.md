@@ -930,12 +930,83 @@ command, or run it through a login shell, before concluding anything is missing.
 
 ```
 /Volumes/S/png/<ID>/NNN.png      the 2400 dpi masters   -> the descriptor's scan_dir
-/Volumes/S/png/<ID>/thumb/       150 dpi thumbnails     -> the descriptor's thumb_150
+/Volumes/S/png/<ID>/thumb/       150 dpi thumbnails     -> NOT an input. See below.
 ```
+
+The masters are the input. A `thumb/` directory may or may not be sitting next to
+them; it is derived data and the chain re-makes its own -- the descriptor's
+`thumb_150` points into `<tmp>`, never here.
 
 VERIFIED 2026-10-01: 47 issue directories, 8405 through 8612 plus the Sonderhefte.
 A master is an A3 sheet at 2400 dpi and runs to about 900 MB, so an issue is
 ~180 GB and nothing about it is cheap to re-make.
+
+### A `thumb/` you FIND beside the scans is NOT an input — re-derive it
+
+`/Volumes/S/png/<ID>/thumb/` is **derived data sitting in the input directory**,
+and it is not trusted. It may not exist, and when it does you cannot tell what
+made it. The evidence, on the scan volume itself:
+
+- **Two generator scripts, and they disagree.** `create_thumbnails.sh` uses
+  `convert -resize 6.25%` (Lanczos) and branches by page range because that
+  issue's scans were *mixed resolution* -- 25% for its 600 dpi pages, 6.25% for
+  its 2400 dpi ones. `create-thumbs.sh` uses `magick -scale 25%`: a different
+  scale AND a different filter (`-scale` averages, `-resize` does not).
+- **One of them skips files that already exist** ("Thumbnail exists, skipping"),
+  so a `thumb/` directory can be a *mixture* of two methods.
+- **Neither records which ran.** Nothing in the directory says.
+- **They are not always there.** VERIFIED 2026-10-01: 8608, 8610, 8611 and 8612
+  have a full set at 16:1; **8505 has 188 masters and no thumbs at all.**
+
+**Why this is not pedantry.** Step 005 measures *skew* on the thumb and applies
+that angle to the 2400 dpi master, and the `sheet` variant measures the paper
+mask, the parity gate and the **colour pool** on it too. A thumb at the wrong
+scale, or made with the wrong filter, does not fail -- it silently levels every
+page by a wrong angle and grades it against the wrong paper, and nothing
+downstream can see it. Worse, r005's thresholds (`lum > 170`, `max - min < 40`,
+the "2-6 levels" validation) were measured on **8610's** thumbs, i.e. on one
+particular filter at one particular scale. They do not transfer to a set made
+the other way.
+
+**So: if a step needs thumbs, the chain makes its own**, into `<tmp>/thumb150/`,
+and the descriptor's `thumb_150` points THERE and never at the scan directory.
+
+```bash
+# Derive the thumbs this build will use. -scale, NOT -resize: see below.
+mkdir -p "<tmp>/thumb150"
+for m in <scan_dir>/[0-9][0-9][0-9].png; do
+  magick "$m" -scale 6.25% "<tmp>/thumb150/$(basename "$m")"
+done
+```
+
+**`-scale`, and the choice is measured, not stylistic.** 6.25% of 2400 dpi is
+150 dpi, but the *filter* decides the pixel values, and r005's thresholds
+(`lum > 170`, `max - min < 40`) are pixel values. Compared against the thumbs
+actually sitting beside the scans, on 8612 p050:
+
+| derivation | mean abs diff | max |
+|---|---|---|
+| **`-scale 6.25%`** (16x16 box average) | **0.00** | **0** |
+| `-filter Box -resize 6.25%` | 0.49 | 9 |
+| `-filter Triangle -resize 6.25%` | 2.58 | 41 |
+| `-resize 6.25%` (default Lanczos) | 2.77 | 39 |
+| `-sample` / `-filter Point` | 7.54 | 101 |
+
+`-scale` is byte-identical -- VERIFIED on 8612 p002, p050, p150 and on **8610
+p050, the issue r005's numbers were measured on**. So this derivation reproduces
+exactly the set every constant in r005 came from, and the constants transfer
+unchanged. Plain `-resize` would have moved a third of the pixels by more than
+two levels and up to 39, against a threshold whose window is 40 wide.
+
+A thumb a build DERIVED is reproducible; a thumb it FOUND is an artefact of
+whichever script ran last. The point is not that the found ones are wrong today
+-- for 8612 they are identical to what this command makes. The point is that
+you cannot know that without checking, and the check is the derivation.
+
+**Then verify:** one thumb per master, no orphans either way, and every thumb
+exactly 1/16 of its own master's width -- per page, because page widths vary
+within an issue (8612 runs 20485 to 20862 px) and a set made from different
+scans will not track them.
 
 **NEVER WRITE INTO `/Volumes/S/png/`. Nothing stops you** -- the volume is
 writable and the files are not mode-locked; the only thing protecting the only
