@@ -75,13 +75,16 @@
 
         <p>Zuerst »Epson Support« laden;</p>
 
-        <pre><code>LOAD" EPSON-SUPPORT",8,1 NEW
+        <pre><code>LOAD"EPSON-SUPPORT",8,1
+NEW
 </code></pre>
 
 
         <p>Durch die folgenden drei POKEs wird die Ausgaberoutine auf eine Betriebssystemroutine (CHROUT $FFD2) umgeleitet:</p>
 
-        <pre><code>POKE 49650,210 BPNKEB LOAS1I_DE5
+        <pre><code>POKE 49649,76
+POKE 49650,210
+POKE 49651,255
 </code></pre>
 
 
@@ -95,7 +98,8 @@
 
         <p>Um die Änderungen am Maschinenprogramm möglichst gering zu halten, muß nun noch das Hauptprogramm verändert werden:</p>
 
-        <pre><code>547 .OPEN1,4:CMD1:&amp;PRINT:PRINT#1:CLOSEL 880 OPEN1,4:CMD1:&amp;PRINT:PRINT#1:CLOSE1:RETURN
+        <pre><code>547 OPEN1,4:CMD1:&amp;PRINT:PRINT#1:CLOSE1
+880 OPEN1,4:CMD1:&amp;PRINT:PRINT#1:CLOSE1:RETURN
 </code></pre>
 
 
@@ -155,11 +159,11 @@
 
         <p>Den oben beschriebenen Effekt vermeide ich, indem ich den wichtigsten Teil der Original-NMI-Routine kopiere und an deren Schluß ein kleines Initialisierungsprogramm für meine »eigenen Vektoren« und sonstige Einstellungen setze. Ich erkläre es besser an einem Beispielprogramm, das bei $1000 beginnt (am besten gleich den SMON laden). Mit der folgenden Mini-Routine »verbiege« ich den sogenannten NMI-Vektor.</p>
 
-        <pre><code>1000 lda#$0b ; 1002 ldx#$10 ; 1004 sta $0318 ; 1007 stx $0319 ; 100a rts
-</code></pre>
-
-
-        <pre><code>lo-byte hi-byte NMI-Vektor, 10 NMI-Vektor, hi
+        <pre><code>1000 lda#$0b   ;  lo-byte
+1002 ldx#$10   ;  hi-byte
+1004 sta $0318 ; NMI-Vektor, 10
+1007 stx $0319 ; NMI-Vektor, hi
+100a rts
 </code></pre>
 
 
@@ -198,7 +202,32 @@
 
         <p>Die »Einstellroutine« kann dann so aussehen:</p>
 
-        <pre><code>102d lda#$38 102f ldx#$10 1031 sta $0314 1034 stx $0315 1037 rts
+        <pre><code>102d lda#$38
+102f ldx#$10
+1031 sta $0314
+1034 stx $0315
+1037 rts
+1038 lda $cb   ; Code der gerade gedrückten Taste
+103a cmp #$40  ; $40 = keine Taste gedrückt
+103c bne $1043 ; irgendeine Taste gedrückt, dann weiter
+103e sta $02   ; merken, um Repeat-Funktion zu verhindern
+1040 jmp $ea31 ; zur normalen IRQ-Routine
+1043 cmp #$04  ; &lt;F1&gt; gedrückt ?
+1045 bne $103e ; nein, normaler IRQ
+1047 cmp $02   ; dieselbe Taste wie vorher ?
+1049 beq $103e ; ja, dann normaler IRQ
+104b sta $02   ; merken, um Repeat-Funktion zu verhindern
+104d lda #$52  ; "R"
+104f ldx #$55  ; "U"
+1051 ldy #$4e  ; "N"
+1053 sta $0277
+1056 stx $0278 ; in Tastaturpuffer schreiben
+1059 sty $0279
+105c lda #$0d   ; "Return"
+105e ldx #$04   ; vier Zeichen im Tastaturpuffer
+1060 sta $027a
+1063 stx $c6
+1065 jmp $ea31 ; normal weitermachen
 </code></pre>
 
 
