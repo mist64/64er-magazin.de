@@ -491,3 +491,11 @@ I did with it, what is true, what it cost, the sentence that would have prevente
 - Verification checks 1-2 pipe into `head` (a planted fault was hidden as entry 20 of 23) and never fail.
 - **What would have prevented it.** Make the crop the decision and the block index a locator (via labels.json). Demote the
   letter-count heuristic to "a hint that it MAY be a print typo — decide on the crop". Drop `head` and make 1-2 fail on hits.
+
+## 280 — the hex hard exception keeps known-wrong hex; the briefing forbids <pre> while the worklists put <pre> items on 280
+
+- The exception ("Skip Pass 2 substitution when the token starts with `$`") exists to stop valid hex being "corrected".
+  It has no case for OCR damage that makes the token INVALID hex (`$ddOd`, `$ffel`, `10le`, `$FDO0`: O and l are not hex
+  digits). The sub-agent held them; I applied them after checking the crop.
+- **What would have prevented it.** "A token that is not valid hex (contains O, l, I, …) is OCR damage: fix it from the crop."
+  And one sentence on whether <pre> is in 280's scope (every agent had <pre> worklist items).
