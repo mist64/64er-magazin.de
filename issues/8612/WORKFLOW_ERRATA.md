@@ -556,3 +556,24 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
   (only the mixed pass re-runs; the OCR cache stands).
 - **What would have prevented it.** Before building, measure title.png against a 25% reduction of masters600/001.png. Below
   a few levels' MAE it is NOT a retouched cover: stop and ask. (The 8611 cover read MAE ~930/0.014; 8612's would have read ~0.)
+
+## (all steps) — no rule states the HTML-comment convention: German, reader-facing, what the PRINT has or lacks; never process
+
+- **What happened.** All 26 comments this build wrote into issues/8612/*.html were English and most carried process detail:
+  crop geometry and masters600 paths (18 of 26), step numbers ("read by step 290", "r170:"), and in two cases owner/decision
+  provenance with a date. An HTML comment ships to readers. The owner: never write log or discussion material into source
+  we publish, and every HTML comment is German.
+- **Evidence that this is a LOST convention, not a new one** (measured by 64er_control): 383 comments in 42 issues, 99 English,
+  concentrated in the chain-built issues — 8612 26/26, 8611 22/22, SH8601 14/16 — while the hand-built issues are almost
+  all German with no process detail (8404, 8602, SH8501: 0 English; 8407: 8 of 26). House style, e.g. "Die beschriebenen
+  Programme sind weder abgedruckt noch befinden sie sich in 84XX/8404.D64 auf der 64'er CD-ROM." It states what the printed
+  magazine has or lacks, addressed to a reader.
+- **Rules that taught the drift.** r000 *Deliberate deviations* gives an English example comment. r290/r310 make the English
+  word `PRINTED` the machine marker (regex `\bPRINTED\b`), so a German comment cannot clear an adjudicated finding. 8612's
+  rewrite uses "So im Heft gedruckt:" and r310 is back to HARD 14 until the marker accepts it. Several sub-agent briefs
+  (mine included) asked for "evidence in the comment".
+- **Fixed here.** All 26 rewritten in German, reader-facing only; provenance stays in LOG.md and commit messages.
+- **What would have prevented it.** One rule in r000: "Every HTML comment is German and tells the READER what the printed
+  magazine has, lacks or differs in. Never crops, paths, step numbers, dates, or who decided." Plus a German marker in
+  r290/r310 (e.g. `So im Heft gedruckt`) and a German example in r000's deviation section.
+- **For the owner (out of 8612's scope, not touched):** 8611 (22/22 English) and SH8601 (14 of 16) have the same defect.
