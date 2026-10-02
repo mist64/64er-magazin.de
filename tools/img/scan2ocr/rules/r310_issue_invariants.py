@@ -35,6 +35,66 @@ ADJUDICATED = (r'<!--(?:(?!-->).)*'
                r'(?:\bPRINTED\b|So im Heft gedruckt|Abweichung vom Druck)'
                r'(?:(?!-->).)*-->\s*$')
 
+# A MECHANICAL ADJUDICATION IS NOT AN EDITORIAL NOTE, AND DOES NOT BELONG IN THE
+# PAGE.  Two different things were using one mechanism.  An editorial note --
+# "the printed table gives Busy on pin 16, the schematic has it right on 11" --
+# is written for whoever reads the source and belongs in the file.  A mechanical
+# adjudication -- "yes, this heading really does end with a full stop" -- says
+# only that the gate already asked and the answer was yes, and it ended up in
+# the file because a comment was the only channel this gate had.
+#
+# MEASURED on 8612: 26 comments, of which 14 were mechanical and TEN of those
+# were the identical sentence in one article, one per heading the gate flagged.
+# They ship: the live page for 8610 serves its comment as written.
+#
+# So the mechanical ones move to <issue>/adjudicated.txt, one line per CLASS
+# rather than per instance, and the file carries the reason a person would want:
+#
+#     # finding-key        n   reason
+#     heading-ends-period  10  alle zehn Zwischenüberschriften so gedruckt
+#     byline-split          1  Einzeiler vor der Autorenzeile, so gedruckt
+#
+# A `#` comment line and blank lines are ignored.  `n` is the count the build
+# adjudicated; it is recorded so a later run that finds MORE of them says so
+# instead of silently inheriting an old blessing.
+ADJ_FILE = 'adjudicated.txt'
+
+
+def adjudications(issue_dir):
+    """{finding-key: (count, reason)} from <issue>/adjudicated.txt, or {}."""
+    path = os.path.join(issue_dir, ADJ_FILE)
+    out = {}
+    try:
+        lines = open(path, encoding='utf-8').read().splitlines()
+    except OSError:
+        return out
+    for ln in lines:
+        ln = ln.strip()
+        if not ln or ln.startswith('#'):
+            continue
+        parts = ln.split(None, 2)
+        if len(parts) < 2:
+            continue
+        key, n = parts[0], parts[1]
+        out[key] = (int(n) if n.isdigit() else 0, parts[2] if len(parts) > 2 else '')
+    return out
+
+
+def ADJUDICATED_HERE(body, pos, adj, key, seen):
+    """An adjudication, from adjudicated.txt OR from a comment in the page.
+
+    The file is the normal channel; a comment still counts so the editorial
+    notes that legitimately live in a page (a print error with the right value
+    beside it) keep working, and so 8610/8611/SH8601 keep passing unchanged.
+    Returns the reason, or '' when there is none.
+    """
+    if key in adj:
+        seen[key] = seen.get(key, 0) + 1
+        return adj[key][1] or 'so gedruckt'
+    if re.search(ADJUDICATED, body[max(0, pos - 400):pos], re.S):
+        return 'im Text vermerkt'
+    return ''
+
 VOID = {'img', 'br', 'meta', 'link', 'hr', 'input'}
 # SOFT allow-lists — verified legitimate, do NOT "fix" these
 OK_JAM = {'HiRes', 'TurboAss', 'StarTexter', 'StarDatei', 'SpeedDos', 'KoalaPrinter',
@@ -77,6 +137,9 @@ def unbalanced(html):
     p = P(); p.feed(html); return p.st
 
 def main(d):
+    # Mechanical adjudications live beside the issue, not in its pages.
+    ADJ = adjudications(d)
+    adj_seen = {}
     hard, soft = [], []
     H = lambda k, f, x='': hard.append((k, os.path.basename(f), x))
     S = lambda k, f, x='': soft.append((k, os.path.basename(f), x))
@@ -127,10 +190,10 @@ def main(d):
             broke = re.findall(r'<(figure|table|pre|aside)\b', tail, re.I)
             if broke:
                 start = lastp + 4 + tail.lower().index('<' + broke[0].lower())
-                if re.search(ADJUDICATED,
-                             body[max(0, start - 400):start], re.S):
-                    S('<%s> before the byline — annotated as PRINTED (r190)'
-                      % broke[0], f)
+                adj = ADJUDICATED_HERE(body, start, ADJ, 'byline-split', adj_seen)
+                if adj:
+                    S('<%s> before the byline — adjudicated: %s (r190)'
+                      % (broke[0], adj), f)
                 else:
                     H('<%s> splits the byline from its text (r190)' % broke[0], f)
         # A NUMBERED LIST TORN IN HALF.  The OCR hands r030 a numbered list as
@@ -189,8 +252,7 @@ def main(d):
         # read.  The word PRINTED (upper case, in a comment) is the marker, and
         # it must state what was verified and how -- see r290.
         printed_ok = lambda pos: bool(
-            re.search(ADJUDICATED,
-                      body[max(0, pos - 400):pos], re.S))
+            ADJUDICATED_HERE(body, pos, ADJ, 'heading-ends-period', adj_seen))
         for mm in re.finditer(r'<h([2-6])>([^<]*)</h\1>', body):
             t = mm.group(2).rstrip()
             # an ellipsis is legitimate and the magazine sets it both ways:
@@ -376,6 +438,18 @@ def main(d):
     for k, f, x in hard: print(f'HARD  {k:<52} {f[:40]} {x}')
     if '--soft' in sys.argv:
         for k, f, x in soft: print(f'soft  {k:<52} {f[:40]} {x}')
+    # A blessing that no longer matches what is on the page is not a blessing.
+    # If adjudicated.txt says ten and the pages now hold twelve, two were never
+    # looked at -- say so rather than let the file silently cover them.
+    for key, (n, why) in sorted(ADJ.items()):
+        got = adj_seen.get(key, 0)
+        if n and got != n:
+            print(f'ADJ   {key:<24} declared {n}, found {got}'
+                  f'{"  -- MORE than adjudicated" if got > n else ""}')
+    if ADJ:
+        print(f'adjudicated.txt: {len(ADJ)} class(es), '
+              f'{sum(adj_seen.values())} instance(s) matched')
+
     print(f'\narticles {len(arts)}   HARD {len(hard)}   soft {len(soft)}'
           f'{"" if "--soft" in sys.argv else "  (--soft to list)"}')
     return 1 if hard else 0
