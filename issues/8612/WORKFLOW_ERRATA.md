@@ -577,3 +577,14 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
   magazine has, lacks or differs in. Never crops, paths, step numbers, dates, or who decided." Plus a German marker in
   r290/r310 (e.g. `So im Heft gedruckt`) and a German example in r000's deviation section.
 - **For the owner (out of 8612's scope, not touched):** 8611 (22/22 English) and SH8601 (14 of 16) have the same defect.
+
+## (all steps) — the test for an HTML comment is HARM, not truth (owner, 2026-10-02)
+
+- The 26 comments this build wrote shrank to 2. The test, from the owner's ruling on 186 ("hard kill"): a comment earns its place
+  only if a source reader would otherwise be MISLED or come to harm. "The reader questions are printed without names" is true
+  and about the print, and fails it. "Druckfehler: Busy liegt an Pin 11" stops someone miswiring a board, and passes.
+- Applied consistently: removed every note on an ordinary absence the page already shows (an unprinted download, a listing not
+  on disk, unsigned questions) and a disk-vs-print copyright difference. Kept the two "Druckfehler:" notes (8610's
+  `Reiner Druckfehler` shape). Mechanical gate adjudications live in adjudicated.txt.
+- **What would have prevented it.** r000: "An HTML comment is German, names a print error a reader would otherwise act on, and
+  says what is correct. Nothing else — not absences, not provenance, not adjudications (adjudicated.txt)."
