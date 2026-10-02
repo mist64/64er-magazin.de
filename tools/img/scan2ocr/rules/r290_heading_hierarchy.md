@@ -334,16 +334,30 @@ could not honestly reach zero. A gate that always reports two failures stops
 being read.
 
 **Write the adjudication into the file, immediately above the heading**, as an
-HTML comment containing the word `PRINTED` in upper case, saying what was read
+HTML comment opening **`So im Heft gedruckt:`** (or `Abweichung vom Druck:`
+where this edition knowingly differs), saying what was read
 and from where. r310 honours it within the 400 characters before the heading and
 demotes the finding to soft:
 
 ```html
-<!-- The trailing period is PRINTED: verified against the 600 dpi master
+<!-- So im Heft gedruckt: Die Zwischenüberschrift endet mit einem Punkt.
      by step 290.  r310 flags a heading ending in "." as a possible
      paragraph tail; here it is the page's own typography. -->
 <h3>2. Sprites auf Diskette und Kassette.</h3>
 ```
+
+**The marker is German because the comment is.** Every HTML comment in this
+corpus is written in German and addressed to a reader of this edition. The
+marker used to be the English word `PRINTED`, and a rule that says "put this
+English token in a comment" is a rule that says "write the comment in English":
+8611 commented 22 of 22 in English, SH8601 14 of 16, 8612 26 of 26 before they
+were rewritten, several carrying crop coordinates and step numbers that have no
+business shipping to a reader. r310 still recognises `PRINTED` so the six
+comments already carrying it keep passing; do not write new ones.
+
+**And say it to the reader, not to the checker.** The comment states what the
+printed magazine has or lacks. Not how it was verified, not which step read it,
+not who decided -- that belongs in `LOG.md` and the commit message.
 
 The comment is the evidence, not a silencer: it must name the page and how the
 glyph was read, exactly as a LOG line would. No marker, no exemption — proved by

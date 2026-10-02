@@ -15,6 +15,26 @@ usage:  r310_issue_invariants.py issues/8609 [--soft]
 import glob, io, os, re, sys
 from html.parser import HTMLParser
 
+
+# THE ADJUDICATION MARKER IS GERMAN, because the comment it lives in is.
+# Every HTML comment in this corpus is written in German and addressed to a
+# reader of this edition -- the owner's rule, and the hand-built issues' practice
+# long before anyone wrote it down.  The marker used to be the English word
+# PRINTED, which forced an English comment around it: a rule that says "put this
+# English token in a comment" is a rule that says "write the comment in English",
+# and three chain-built issues learned exactly that (8611 22 of 22 English,
+# SH8601 14 of 16, 8612 26 of 26 before the rewrite), several with crop
+# coordinates and step numbers in them.
+#
+# "So im Heft gedruckt" is what the corpus already says for this -- it reads as a
+# note to a reader rather than a token for a checker -- and "Abweichung vom
+# Druck" for the case where this edition knowingly differs.  PRINTED stays
+# recognised so the six comments already carrying it (8610, 8611, SH8601) keep
+# passing.  It is legacy, not a second option to pick from.
+ADJUDICATED = (r'<!--(?:(?!-->).)*'
+               r'(?:\bPRINTED\b|So im Heft gedruckt|Abweichung vom Druck)'
+               r'(?:(?!-->).)*-->\s*$')
+
 VOID = {'img', 'br', 'meta', 'link', 'hr', 'input'}
 # SOFT allow-lists — verified legitimate, do NOT "fix" these
 OK_JAM = {'HiRes', 'TurboAss', 'StarTexter', 'StarDatei', 'SpeedDos', 'KoalaPrinter',
@@ -107,7 +127,7 @@ def main(d):
             broke = re.findall(r'<(figure|table|pre|aside)\b', tail, re.I)
             if broke:
                 start = lastp + 4 + tail.lower().index('<' + broke[0].lower())
-                if re.search(r'<!--(?:(?!-->).)*\bPRINTED\b(?:(?!-->).)*-->\s*$',
+                if re.search(ADJUDICATED,
                              body[max(0, start - 400):start], re.S):
                     S('<%s> before the byline — annotated as PRINTED (r190)'
                       % broke[0], f)
@@ -169,7 +189,7 @@ def main(d):
         # read.  The word PRINTED (upper case, in a comment) is the marker, and
         # it must state what was verified and how -- see r290.
         printed_ok = lambda pos: bool(
-            re.search(r'<!--(?:(?!-->).)*\bPRINTED\b(?:(?!-->).)*-->\s*$',
+            re.search(ADJUDICATED,
                       body[max(0, pos - 400):pos], re.S))
         for mm in re.finditer(r'<h([2-6])>([^<]*)</h\1>', body):
             t = mm.group(2).rstrip()
