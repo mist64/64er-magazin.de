@@ -25,13 +25,23 @@ forces a specific level).
 
 Structural overrides that DO apply:
 
-- **An `<h2>` inside an `<aside>` STAYS an `<h2>`.** A set-off box's own
-  heading carries the print's banner weight, and it is not demoted for
-  sitting in a callout. This section used to say the exact opposite
-  ("always demote to `<h3>`") while the bottom of the same file retracted
-  it — the evidence that settled it is in *`<h2>` inside `<aside>` is
-  CORRECT*, below. There is one aside shape that does use `<h3>`: rule
-  300's Fehlerteufelchen erratum box.
+- **An aside's heading sits ONE LEVEL BELOW the article's highest section
+  heading.** So `<h2>` when the body has `<h2>` sections of its own — a set-off
+  box's heading carries the print's banner weight and is not demoted merely for
+  sitting in a callout — but `<h3>` when the aside would otherwise hold the
+  file's ONLY `<h2>`, or would outrank a body built from `<h3>`.
+
+  The corpus runs **360 `h2` to 70 `h3`** inside asides, so `h2` is the norm
+  and this is the exception, not a reversal. This section used to say "always
+  demote to `<h3>`" while the bottom of the same file retracted it; the
+  evidence is in *`<h2>` inside `<aside>` is CORRECT*, below. Rule 300's
+  Fehlerteufelchen erratum box always uses `<h3>`.
+
+  MEASURED on 8612, both found by the owner reading rather than by any check:
+  article 8's §202a box held the file's only `<h2>`, and article 91 had an
+  aside `<h2>` while its own body sections were `<h3>`. Both are now `h3`.
+  This rule said only "aside with h2"; r290's check looked only for `<h3>`
+  inside `<aside>`, so neither could see it.
 
 ### Anti-pattern — the heading-audit trap
 

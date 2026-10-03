@@ -42,7 +42,25 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
    deskewed. For a 300 dpi look, `-resize 50%` of that; never a render of
    the issue PDF, which does not exist until step 006. See r000, *THE PAGE
    IMAGE IS `masters600`*.
-2. Walk every `<p>TODO …</p>` marker in `issues/<YYMM>/*.html`:
+2. **Walk every page against its crop and repair what the import lost.** This
+   is the bulk of the step and it is NOT marker-driven: both 190 sub-agents on
+   8612 found **zero** TODO markers, and everything below came out of the
+   orchestrator's brief instead of this rule.
+
+   | What to find | How |
+   |---|---|
+   | **lost drop caps** — one letter dropped from the start of a paragraph | the first word reads wrong ("er Computer"); read the letter off the crop. 31+ on 8612 |
+   | **paragraphs split mid-sentence** | a `</p><p>` where the sentence continues; rejoin |
+   | **headings that swallowed body text** | an `<h2>`/`<h3>` running on into prose; split at the printed heading's end |
+   | **lost headings** | a printed heading that arrived as an ordinary paragraph |
+   | **`p.source` debris** | leftover source markup inside the paragraph |
+   | **a dropped paragraph** | compare paragraph counts against the crop, column by column |
+
+   The **Impressum** is rebuilt here too — it had no owning rule at all before
+   this, and 8612's was rebuilt from the crop under this step.
+
+3. Walk every `<p>TODO …</p>` marker in `issues/<YYMM>/*.html` (there may be
+   none; that is normal, not a reason to stop):
 
    | Marker | Action |
    |---|---|
@@ -54,7 +72,7 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
    | `TODO ALL BOXES LIKE BELOW` | **SKIP** content reconstruction — fresh OCR of multiple boxes is out of scope. |
    | `TODO two boxes with text` (or similar content stubs) | **SKIP** content reconstruction. |
 
-3. Light general formatting sweep:
+4. Light general formatting sweep:
    - Delete `<p>` paragraphs containing only `&nbsp;` or only
      whitespace.
    - Drop a trailing `<br>` immediately before `</p>`.
@@ -62,11 +80,11 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
      when the print shows a real bullet glyph or number prefix on
      each item; if the print is just numbered prose ("1. ein,
      2. zwei, 3. drei" running text), leave it as `<p>`/`<br>`.
-4. Beautify touched files (`npx --yes js-beautify --type html
+5. Beautify touched files (`npx --yes js-beautify --type html
    --indent-size 4 --wrap-line-length 0 --replace`). **Verify
    `<pre>` blocks survived** (js-beautify preserves them by default
    but sanity-check after each run).
-5. **Do not commit.** Return per-marker action table + general-sweep
+6. **Do not commit.** Return per-marker action table + general-sweep
    summary + list of explicitly-skipped FORMULA / content markers.
 
 Critical guardrails:
@@ -208,10 +226,30 @@ lead-in that separates one Q&A item from the next is structure, and structure
 is content. The test is whether the emphasis distinguishes *this* text from the
 text beside it, or merely decorates a field name the layout already sets apart.
 
+## Three conflicts settled on 8612
+
+- **Interview labels are ROMAN, not bold italic.** This rule called them "bold
+  italic"; 8612's print sets them roman. The page won.
+- **Dash lists stay `<p>— …</p>`.** The rule says to build a `<ul>` when the
+  print shows a real dash glyph, but 8609-8611 all keep the paragraph form.
+  Precedent wins, as the section above says.
+- **The never-split rule yields to the PRINT when the box is physically above.**
+  r190 moved 48's liability box below the Info source because never-split said
+  so, while p50 prints it **above**. Where the printed order is unambiguous, it
+  decides. (And the aside test keys on tint or a rule, so it misses a box set
+  off by TYPEFACE alone — the Werner Paul bio on 8612.)
+
+**An aside's heading is one level below the article's highest section heading.**
+See r290: `h2` when the body has `h2` sections of its own, `h3` when the aside
+would otherwise be the only `h2` or would outrank the body.
+
+Write the skipped-file list under `<tmp>`, never `/tmp` (r000).
+
 ## Verification
 
 ```bash
 dir=issues/<YYMM>
+PY=${PYTHON:-.venv/bin/python}
 
 # 1. no in-scope TODO marker survives
 # `sort` exits 0 on empty input, so piping into it and testing THAT printed
@@ -221,9 +259,10 @@ grep -hoE 'TODO (PRE|INDENTATION|INDENTED|ASIDE|BOX)' "$dir"/*.html \
 
 # 2. expected-skip TODO markers may still exist
 grep -lE 'TODO FORMULA|TODO ALL BOXES|TODO two boxes' "$dir"/*.html \
-  > /tmp/skipped_files.txt
-echo "  expected skipped markers in $(wc -l < /tmp/skipped_files.txt | tr -d ' ') file(s):"
-cat /tmp/skipped_files.txt
+  > "$TMPDIR_ISSUE/skipped_files.txt"
+echo "  expected skipped markers in $(wc -l < "$TMPDIR_ISSUE/skipped_files.txt" | tr -d ' ') file(s):"
+cat "$TMPDIR_ISSUE/skipped_files.txt"
+# TMPDIR_ISSUE is this issue's <tmp>. r000 forbids /tmp, which this was.
 
 # 3. <pre> well-formed
 python3 -c "$(cat <<'PY'
@@ -236,6 +275,24 @@ for f in sorted(os.listdir(d)):
     if o != c: print(f"  pre mismatch in {f}: open={o} close={c}")
 PY
 )" "$dir"
+
+# 3b. nothing in the never-split list was split, and no empty <p> survives.
+#     The never-split rule names <pre> and <aside>, but the check covered only
+#     figure and table -- and there was no empty-<p> check at all.
+$PY - <<'NEVERSPLIT'
+import os, re, sys
+d = sys.argv[1] if len(sys.argv) > 1 else "."
+for f in sorted(os.listdir(d)):
+    if not f.endswith(".html"):
+        continue
+    s = open(os.path.join(d, f), encoding="utf-8").read()
+    for tag in ("pre", "aside", "figure", "table"):
+        if len(re.findall(r"<%s\b" % tag, s)) != len(re.findall(r"</%s>" % tag, s)):
+            print("  %s: <%s> unbalanced -- a never-split block was split" % (f, tag))
+    n = len(re.findall(r"<p>\s*(?:&nbsp;|\s)*</p>", s))
+    if n:
+        print("  %s: %d empty <p>" % (f, n))
+NEVERSPLIT
 
 # 4. <aside> well-formed
 python3 -c "$(cat <<'PY'
