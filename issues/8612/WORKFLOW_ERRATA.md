@@ -604,3 +604,33 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
 - **What would have prevented it.** In the mixed script: invalidate `guetzli-q*/$n.jpg` when `${n}_150.png` is newer (the plain
   script already does this for its own cache). In r006's verification: "after a cover change, page 1's embedded image must
   DIFFER from the previous build's and match title.png". The size alone is a tell too.
+
+## 250/080 — A PRINT NAVIGATION POINTER IS NEVER ARTICLE TEXT (owner, review of 8612)
+
+- **What happened.** 52 kept `<p>Anleitung auf Seite 58</p>`, a standalone paragraph between a byline and the next heading. I kept
+  it at step 250 on the precedent of 8611/50, which keeps `<p>Listing auf Seite 54</p>`. That precedent is the same defect. The
+  owner: "dont add this to the HTML! ever! this is like 'Fortsetzung auf Seite …' — it's a hint for you where to continue only!"
+  Removed by 64er_control (cf8e973d).
+- **The test is not the words.** A sweep of 8612 found 16 "auf Seite N" and only ONE pointer. The other 15 are prose a reader
+  needs ("beachten Sie bitte die Eingabehinweise auf Seite 78", "in Ausgabe 10/86 auf Seite 18", Fehlerteufelchen headings).
+  The test: is the sentence the AUTHOR writing to a reader, or the LAYOUT telling a reader where to turn? A paragraph whose whole
+  content is a page reference is the layout's. In a single-page HTML it says nothing and misleads.
+- **What would have prevented it.** r080 already drops "Fortsetzung" lines by precedent; state the rule for the whole class there
+  ("Fortsetzung / Anleitung / Listing auf Seite N" as a standalone paragraph is never transcribed), and add an r310 check: a <p>
+  whose entire text matches `^(\w+ )?(auf|von) Seite \d+\.?$`.
+- **Out of scope, for the owner:** 8611/50 carries `<p>Listing auf Seite 54</p>`, the same defect.
+
+## 190/290 — an aside heading must not outrank its article (owner review; fixed by 64er_control 494b82ef)
+
+- 8 Jagd auf Mailboxen's §202a box had the file's only <h2>; 91 Sprites im Abseits had an aside <h2> while its body sections are
+  <h3>. Both are now h3. The corpus is 360 h2 to 70 h3 inside asides, so h2 is the norm: correct when the article has h2 sections
+  of its own, wrong when the aside would be the only h2 or would outrank the body. r190 says "aside with h2"; r290 checks only
+  "<h3> inside <aside>".
+- **What would have prevented it.** r190/r290: "an aside heading is one level below the article's highest section heading
+  (h2 if the body has h2 sections, else h3)", plus the matching r310 check.
+
+## (review) — nothing in the chain catches either of the two above
+
+- r310 has no check for a paragraph that is only a page reference, and none for an aside heading that outranks its article. Both
+  were found by the owner reading. Also from the review: 48's liability box sat below the Info source while p50 prints it above
+  (r190's never-split rule had moved it AFTER the source; the print wins over that rule when the box is physically above).
