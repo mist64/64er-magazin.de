@@ -18,7 +18,7 @@
         <h1>So macht man Programme schneller</h1>
         <p class="intro">Basic-Programme können nach drei Gesichtspunkten optimiert werden: strukturiert und lesbar, schnell sowie speicherplatzsparend. In diesem Beitrag wird der Aspekt der Laufgeschwindigkeit und ihrer Verbesserung behandelt.</p>
 
-        <p>e: gibt einige Dinge auf der Welt, die man sehr wohl einzeln, aber nicht alle gleichzeitig haben kann. Wirtschaftswachstum, keine Inflation und niedrige Arbeitslosigkeit lassen sich eben nicht unter einen Hut bringen.</p>
+        <p>Es gibt einige Dinge auf der Welt, die man sehr wohl einzeln, aber nicht alle gleichzeitig haben kann. Wirtschaftswachstum, keine Inflation und niedrige Arbeitslosigkeit lassen sich eben nicht unter einen Hut bringen.</p>
 
         <p>Bei der Computerei, oder genauer gesagt beim Programmieren, gibt es in einer höheren Sprache wie Basic ebenfalls so ein magisches Dreieck: strukturierte Programme, minimaler Speicherbedarf, kürzere Laufzeiten.</p>
 
@@ -40,11 +40,15 @@
 
         <p>Die »Stoppuhr« wird gestartet mit: 10 TI$="000000"</p>
 
-        <p>Sie wird am Ende des Testprogramms gestoppt mit: 1000 PRINT TI/60 " SEKUNDEN" :END</p>
+        <p>Sie wird am Ende des Testprogramms gestoppt mit:</p>
+
+        <pre><code>1000 PRINT TI/60 " SEKUNDEN" :END
+</code></pre>
 
         <p>Zwischen diese beiden Zeilen stecken wir dann die Prüflinge, das heißt die Programme, deren Laufzeit wir messen wollen. Zur Prüfung geben wir zuerst die Zeile 15 mit einer simplen Verzögerungsschleife ein.</p>
 
-        <p>15 FOR T=1 TO 100:NEXT T</p>
+        <pre><code>15 FOR T=1 TO 100:NEXT T
+</code></pre>
 
         <p>Dieses Programm hat eine Laufzeit von 0,13 Sekunden.</p>
 
@@ -54,21 +58,23 @@
 
         <p>Die Zahl 374 hat nichts Magisches an sich. Es sind ganz einfach 17 Zeilen voller As auf dem Schirm. 17 Zeilen lassen uns genug Platz, um die gestoppte Zeit darunter gut lesbar anzuzeigen.</p>
 
-        <p>In der Version 1 des Programms verwenden wir POKE-Befehle, mit denen wir das A und die dazugehörige Farbe auf den Bildschirm, das heißt in den Bildschirmspeicher (Video-RAM) und den Farbspeicher (Color-RAM) bringen. Beim C64 sind es die Speicherzellen 1024 und 55296. Schauen Sie bitte in den Commodore-Handbüchern nach und vergewissern Sie sich, daß Sie dieses System des Zeichen-POKEns verstehen. Es ist dort gut beschrieben. Der Buchstabe A hat den Bildschirm-Codewert 1. Als Farbe wähle ich die »Normalfarben« der beiden Computer. Der Farbcode für das Blau ist 14. Das Programm beginnt mit dem Löschen des Bildschirms (Zeile 20) und POKEt dann in Zeile 40 das erste A in den ersten Platz des Bildschirms.</p>
+        <p>In der <strong>Version 1</strong> des Programms verwenden wir POKE-Befehle, mit denen wir das A und die dazugehörige Farbe auf den Bildschirm, das heißt in den Bildschirmspeicher (Video-RAM) und den Farbspeicher (Color-RAM) bringen. Beim C64 sind es die Speicherzellen 1024 und 55296. Schauen Sie bitte in den Commodore-Handbüchern nach und vergewissern Sie sich, daß Sie dieses System des Zeichen-POKEns verstehen. Es ist dort gut beschrieben. Der Buchstabe A hat den Bildschirm-Codewert 1. Als Farbe wähle ich die »Normalfarben« der beiden Computer. Der Farbcode für das Blau ist 14. Das Programm beginnt mit dem Löschen des Bildschirms (Zeile 20) und POKEt dann in Zeile 40 das erste A in den ersten Platz des Bildschirms.</p>
 
-        <p>20 PRINT CHR$ (147)</p>
-
-        <p>40 POKE 1024+2:POKE 55296+2,14</p>
+        <pre><code>20 PRINT CHR$ (147)
+40 POKE 1024+Z:POKE 55296+Z,14
+</code></pre>
 
         <p>In Zeile 40 finden Sie zusätzlich eine Variable »Z«. Wie geplant, soll das A 374 mal gePOKEt werden. Also müssen wir die Zahl der Speicherzelle laufend um 1 erhöhen. Dazu erfinden wir diese Variable Z, die zur Speicherzelle addiert wird. Wir setzen Zam Anfang des Programms (in Zeile 30) auf Null und zählen es in Zeile 50 um 1 weiter. 30 Z=0</p>
 
-        <p>50 Z=2+1</p>
+        <pre><code>30 Z=0
+50 Z=Z+1
+</code></pre>
 
         <p>Als nächstes müssen wir prüfen, ob Z den Schlußwert 374 erreicht hat. Wenn nicht, dann soll der nächste POKE-Befehl ausgeführt werden, das heißt wir springen auf Zeile 40 zurück. Dann kommt die Zeile 1000 zum Zug mit dem Stoppen und Ausdrucken der Laufzeit. Also:</p>
 
-        <p>60 IF Z=374 THEN 1000</p>
-
-        <p>70 GOTO 40</p>
+        <pre><code>60 IF Z=374 THEN 1000
+70 GOTO 40
+</code></pre>
 
         <p>Ich schlage vor, daß Sie das kleine Programm noch mal LISTen, damit wir es komplett sehen können.</p>
 
@@ -78,88 +84,103 @@
 
         <h2>Ersatz für den Befehl »PRINT AT«</h2>
 
-        <p>Wir brauchen ein Kochrezept, um mit einem PRINT-Befehl an einen ganz bestimmten Platz auf dem Bildschirm drucken zu können. Einige Basic-Dialekte kennen den Befehl »PRINT-Al&lt;. Welche Möglichkeiten bietet uns das Basic von Commodore?</p>
+        <p>Wir brauchen ein Kochrezept, um mit einem PRINT-Befehl an einen ganz bestimmten Platz auf dem Bildschirm drucken zu können. Einige Basic-Dialekte kennen den Befehl »PRINT-AT«. Welche Möglichkeiten bietet uns das Basic von Commodore?</p>
 
-        <p>1) PRINT"[Cursor Down}{Cursor Right)"</p>
+        <p>1) PRINT"{Cursor Down}{Cursor Right}"<br>2) PRINT TAB(X)<br>3) PRINT SPC(X)</p>
 
-        <p>2) PRINT TAB(X)</p>
-
-        <p>3) PRINT SPC(X)</p>
-
-        <p>Um zum Beispiel an den 3. Platz in der 20. Zeile die Zeit zu drucken, müßten wir 18mal das inverse Q für Cursor Down und imal Cursor Right eingeben.</p>
+        <p>Um zum Beispiel an den 3. Platz in der 20. Zeile die Zeit zu drucken, müßten wir 18mal das inverse Q für Cursor Down und 1mal Cursor Right eingeben.</p>
 
         <p>Mit TAB (X) geht es besser. Wir haben nur ein Problem, daß nämlich der höchste zulässige Wert für X nur 255 ist (X nennt man das »Argument«). Wir müssen deshalb zwei TAB-Befehle hintereinander setzen, um einen Abstand von 400 Leerstellen zu erzeugen.</p>
 
-        <p>1000 PRINT TAB (255) TAB (155) TI/60"SEKUNDEN":END</p>
+        <pre><code>1000 PRINT TAB (255) TAB (155) TI/60"SEKUNDEN":END
+</code></pre>
 
         <p>Für das Argument von SPC gilt dieselbe Begrenzung von 255. Eine doppelte Verwendung von SPC geht natürlich auch, allerdings zählt SPC nicht vom Anfang der Zeile, sondern ab der letzten Cursor-Stelle. Durch Rechnen oder einfach durch Probieren finden wir die Gesamtzahl von 397, das gibt:</p>
 
-        <p>1000 PRINT SPC (255) SPC (142) TI/60"SEKUNDEN":END</p>
-
+        <pre><code>1000 PRINT SPC (255) SPC (142) TI/60"SEKUNDEN":END
+</code></pre>
 
         <p>Es gibt noch eine dritte Methode, um PRINT-AT zu simulieren.</p>
 
         <p>In die Speicherzelle 214 kann die Zahl einer Zeile hineingePOKEt werden, auf die mit einem nachfolgenden PRINT der Cursor gesetzt wird. Das gleiche gilt für einen Platz in einer Zeile mit der Speicherzelle 211. Versuchen Sie es mit der direkten Eingabe:</p>
 
-        <p>POKE 214,8:PRINT:POKE 211,4:PRINT"A"</p>
+        <pre><code>POKE 214,8:PRINT:POKE 211,4:PRINT"A"
+</code></pre>
 
         <h2>Drei Formen für »PRINT AT«</h2>
 
-        <p>Das druckt den Buchstaben A in die 4. Spalte auf der 9. Zeile. Für unseren Anwendungsfall in Zeile 1000 müssen wir die Zahl 18 nach 214 POKEn, 211 können wir vernachlässigen. 1000 POKE 214,18:PRINT:PRINT TV/60"SEKUNDEN":END</p>
+        <p>Das druckt den Buchstaben A in die 4. Spalte auf der 9. Zeile. Für unseren Anwendungsfall in Zeile 1000 müssen wir die Zahl 18 nach 214 POKEn, 211 können wir vernachlässigen.<br>1000 POKE 214,18:PRINT:PRINT TI/60"SEKUNDEN":END</p>
 
         <p>Alle drei Methoden sind gleichwertig, sowohl in Auswirkung als auch beim Speicherbedarf. Ich bleibe im folgenden bei der 214-Methode.</p>
 
         <p>Zurück zur Version 1 des Testprogramms. Das Programm unterscheidet sich für die beiden Computer nur in der Zeile 40, allerdings auch durch die Laufzeit. Nach RUN erhalten wir 10,48 Sekunden.</p>
 
-        <p>Dieses Auffüllen des Bildschirms mit A geht haltrecht langsam. Schon beim Zuschauen wird man ungeduldig. Der Teil in diesem Programm, welcher die Laufzeit am nachhaltigsten beeinflußt, ist die 374fache Wiederholung des POKE-Befehls. Bei einem POKE-Befehl ist die Umwandlung der Zahlen aus dem ASCII-Code sehr zeitaufwendig. Hoppla, was heißt denn das schon wieder, sagen Sie jetzt vielleicht.</p>
+        <p>Dieses Auffüllen des Bildschirms mit A geht halt recht langsam. Schon beim Zuschauen wird man ungeduldig. Der Teil in diesem Programm, welcher die Laufzeit am nachhaltigsten beeinflußt, ist die 374fache Wiederholung des POKE-Befehls. Bei einem POKE-Befehl ist die Umwandlung der Zahlen aus dem ASCII-Code sehr zeitaufwendig. Hoppla, was heißt denn das schon wieder, sagen Sie jetzt vielleicht.</p>
 
         <p>Jede Zahl, wie zum Beispiel 7680 oder 1024, wird zuerst als vier einzelne ASCII-Codezahlen gespeichert. Wenn das Programm abläuft, werden diese ASCIl-Zahlen zuerst in ganze Zahlen, dann in Fließkomma-Zahlen umgewandelt das für den Fall, daß mit den Zahlen arithmetische Funktionen ausgeführt werden. Schließlich werden sie wieder in eine ganzzahlige POKE-Adresse umgewandelt, und das in unserem Fall 37 4mal!</p>
 
-        <p>Hier können wir einen ersten innerbetrieblichen Verbesserungsvorschlag einreichen. Wenn wir eine so häufig vorkommende Zahl wie die POKE-Adresse in Zeile 40 am Anfang des Programms einer Variablen zuweisen, dann erfolgt die oben genannte Umwandlungssequenz nur einmal, nämlich am Anfang des Programms. Das Programm muß dann 374mal nur den Wert der Variablen im Speicher suchen, und das geht vielschneller. Wollen Sie es sehen? Ändern Sie bitte für diese Version 2 die Zeilen 30 und 40.</p>
+        <p>Hier können wir einen ersten innerbetrieblichen Verbesserungsvorschlag einreichen. Wenn wir eine so häufig vorkommende Zahl wie die POKE-Adresse in Zeile 40 am Anfang des Programms einer Variablen zuweisen, dann erfolgt die oben genannte Umwandlungssequenz nur einmal, nämlich am Anfang des Programms. Das Programm muß dann 374mal nur den Wert der Variablen im Speicher suchen, und das geht vielschneller. Wollen Sie es sehen? Ändern Sie bitte für diese <strong>Version 2</strong> die Zeilen 30 und 40.</p>
 
         <p>Die Anfangsadresse im Bildschirmspeicher definieren wir als Variable mit dem schönen und zutreffenden Namen »VIDEO«, die des Farbspeichers mit »FARBE«. In Zeile 30 erhalten sie dann die Werte</p>
 
-        <p>30 Z=0:VIDEO=1024 : FARBE=55296</p>
+        <pre><code>30 Z=0:VIDEO=1024:FARBE=55296
+</code></pre>
 
-        <p>Zeile 40 ergibt sich dann eigentlich zwangsläufig: 40 POKE VIDEO+Z,1:POKE FARBE+Z,14</p>
+        <p>Zeile 40 ergibt sich dann eigentlich zwangsläufig:</p>
+
+        <pre><code>40 POKE VIDEO+Z,1:POKE FARBE+Z,14
+</code></pre>
 
         <p>Alles andere bleibt gleich. Tippen Sie RUN ein. Ergebnis: 7,3 Sekunden. Wir haben also eine Verkürzung von zirka drei Sekunden erzielt, das sind 30 Prozent!</p>
 
         <p>Eine Beschleunigung von 30 Prozent ist gut, aber noch nicht alles, was wir erreichen können. Da die Methode der vordefinierten Variablen so effektiv ist, wollen wir sie auf alle oft verwendeten Zahlen des Programms anwenden. Neben Z, VIDEO und FARBE gibt es noch die 1 für den Buchstaben A und die 14 für die Farbe sowie den Schlußwert 374 der Schleife. Sie wissen schon, wie das geht. Wir ändern folgende Zeilen:</p>
 
-        <p>30 Z=0: SCHLUSSWERT=374 :VIDEO=1024 : FARBE=55296: BUCHSTA=1:DRUCK=14</p>
+        <pre><code>30 Z=0: SCHLUSSWERT=374:VIDEO=1024:FARBE=55296:BUCHSTA=1:DRUCK=14
+40 POKE VIDEO+Z, BUCHSTA:POKE FARBE+Z,DRUCK
+60 IF Z=SCHLUSSWERT THEN 1000
+</code></pre>
 
-        <p>40 POKE VIDEO+Z, BUCHSTA:POKE FARBE+Z , DRUCK 60 IF Z=SCHLUSSWERT THEN 1000</p>
+        <p>Das ist <strong>Version 3</strong> des Programms, mit einer Laufzeit von 6,15 Sekunden. Das ist wieder eine Verbesserung gegenüber der ersten Version.</p>
 
-        <p>Das ist Version 3 des Programms, mit einer Laufzeit von 6,15 Sekunden. Das ist wieder eine Verbesserung gegenüber der ersten Version.</p>
+        <p>Bisher haben wir die Variablen im Sinn einer guten Lesbarkeit mit langen und verständlichen Namen versehen. Aber das kostet natürlich Speicherplatz und auch Geschwindigkeit. Der Grund ist immer derselbe: Bei der Variablen VIDEO sind fünf Zeichen 374mal zu bearbeiten. Wenn wir sie nur VI nennen, ist das erheblich weniger. In <strong>Version 4</strong> des Programms reduzieren wir also alle langen Variablennamen auf zwei Zeichen. Wir wollen mal schauen, was das bringt:</p>
 
-        <p>Bisher haben wir die Variablen im Sinn einer guten Lesbarkeit mit langen und verständlichen Namen versehen. Aber das kostet natürlich Speicherplatz und auch Geschwindigkeit. Der Grund ist immer derselbe: Bei der Variablen VIDEO sind fünf Zeichen 37 4mal zu bearbeiten. Wenn wir sie nur VI nennen, ist das erheblich weniger. In Version 4 des Programms reduzieren wir also alle langen Variablennamen auf zwei Zeichen. Wir wollen mal schauen, was das bringt: 30 2=0: SC=374: VI=1024:FA=55296:BU=1:DR=14 40 POKE VI+Z,BU:POKE FA+Z,DR60 IF Z=SC THEN 1000 Ergebnis: 5,63 Sekunden</p>
+        <pre><code>30 Z=0: SC=374: VI=1024:FA=55296:BU=1:DR=14
+40 POKE VI+Z,BU:POKE FA+Z,DR60 IF Z=SC THEN 1000
+</code></pre>
+
+        <p>Ergebnis: 5,63 Sekunden</p>
 
         <p>Gegenüber der Version 1 des Programms haben wir schon eine Verbesserung von 46% erreicht.</p>
 
-        <p>Sie wissen sicher, daß der Computer alle Variablennamen immer auf zwei Stellen reduziert, daß aber einstellige Variablen durchaus zugelassen sind. Damit müßte unser Programm eigentlich noch schneller werden. Die folgenden Änderungen für Version 5 zielen genau darauf: 30 S=374: V=1024: F=55296:B=1:D=16</p>
+        <p>Sie wissen sicher, daß der Computer alle Variablennamen immer auf zwei Stellen reduziert, daß aber einstellige Variablen durchaus zugelassen sind. Damit müßte unser Programm eigentlich noch schneller werden. Die folgenden Änderungen für <strong>Version 5</strong> zielen genau darauf:</p>
 
-        <p>40 POKE V+Z,B:POKE F+Z,D60 IF Z=S THEN 1000</p>
+        <pre><code>30 S=374: V=1024: F=55296:B=1:D=16
+40 POKE V+Z,B:POKE F+Z,D60 IF Z=S THEN 1000
+</code></pre>
 
-        <p>Die erzielte Verbesserung ist meßbar, aber nicht gerade überwältigend. Der C 64 braucht nun 5,51 Sekunden. Mit dem bisher Gesagten läßt sich bereits eine erste generelle Regel für schnellere Basic-Programme aufstellen. Regel 1</p>
+        <p>Die erzielte Verbesserung ist meßbar, aber nicht gerade überwältigend. Der C 64 braucht nun 5,51 Sekunden. Mit dem bisher Gesagten läßt sich bereits eine erste generelle Regel für schnellere Basic-Programme aufstellen.</p>
 
-        <p>* Häufig vorkommende Zahlen, Adressen und Variable, besonders innerhalb von</p>
+        <aside>
+            <h2>Regel 1</h2>
+            <ul>
+                <li>Häufig vorkommende Zahlen, Adressen und Variable, besonders innerhalb von Schleifen, werden am Anfang des Programms vordefiniert.</li>
+                <li>Variable, die sich im Lauf des Programms verändern, werden trotzdem vordefiniert, allerdings mit einem unschädlichen Anfangswert (dummy).</li>
+                <li>Die Zahl, die am häufigsten vorkommt, wird als erste vordefiniert (damit sie schneller »gefunden« wird).</li>
+                <li>Variablennamen sollen möglichst einstellig, aber höchstens zweistellig sein.</li>
+            </ul>
+        </aside>
 
-        <p>Schleifen, werden am Anfang des Programms vordefiniert. * Variable, die sich im Lauf des Programms verändern, werden trotzdem vordefiniert, allerdings mit einem unschädlichen Anfangswert (dummy). . * Die Zahl, die am häufigsten vorkommt, wird als erste vordefiniert (damit sie schneller</p>
+        <p>Halt! Löschen Sie das Programm noch nicht. Wir liegen noch unter 50 Prozent mit unseren Verbesserungen, und das reicht noch lange nicht. Was können wir am bisherigen Programm noch ändern? Denken Sie mal nach. Wie kann man Buchstaben auf den Bildschirm bringen? Natürlich, mit PRINT statt der POKEs.</p>
 
-        <p class="source">»gefunden« wird).<br>
-            \* Variablennamen sollen möglichst einstellig, aber höchstens zweistellig sein.</p>
+        <p>In <strong>Version 6</strong> des Programms ersetzen wir die Buchstaben-POKE-Befehle durch eine PRINT-Anweisung, die prinzipiell noch den Vorteil hat, daß keine Farbanweisung nötig ist. Den Buchstaben A wollen wir in dieser Version zunächst einmal mit seiner ASCII-Codezahl 65 angeben, ein Semikolon setzt alle A hintereinander.</p>
 
+        <pre><code>40 PRINT CHR$(65);
+</code></pre>
 
-        <p></p>
+        <p>Für die Schleife brauchen wir nur die Variablen Z und S:</p>
 
-        <p>Halt! Löschen Sie das Programm noch nicht. Wir liegen noch unter 50 Prozentmit unseren Verbesserungen, und das reicht noch lange nicht. Was können wir am bisherigen Programm noch ändern? Denken Sie mal nach. Wie kann man Buchstaben auf den Bildschirm bringen? Natürlich, mit PRINT statt der POKEs.</p>
-
-        <p>In Version 6 des Programms ersetzen wir die Buchstaben-POKE-Befehle durch eine PRINT-Anweisung, die prinzipiell noch den Vorteil hat, daß keine Farbanweisung nötig ist. Den Buchstaben A wollen wir in dieser Version zunächst einmal mit seiner ASCII-Codezahl 65 angeben, ein Semikolon setzt alle A hintereinander.</p>
-
-        <p>40 PRINT CHR$(65);</p>
-
-        <p>Für die Schleife brauchen wir nur die Variablen Z und S: 30 2=0:8=374</p>
+        <pre><code>30 Z=0:S=374
+</code></pre>
 
         <p>Alle anderen Zeilen bleiben unverändert.</p>
 
@@ -167,143 +188,152 @@
 
         <p>Das ergibt eine weitere Verbesserung von 1,5 Sekunden. Unser Programmbeispiel wird also durch die Verwendung von PRINT statt POKE stark beschleunigt. Das geht natürlich deswegen besonders gut, weil alle Buchstaben automatisch hintereinander gesetzt werden. Wenn wir jedesmal den Platz mit angeben müßten, wohin gePRINTet werden soll, wäre der Vorteil rasch verspielt.</p>
 
-        <p>Die Anweisung PRINT CHR$(65) ist zwar gut lesbar, aber wir haben ja vorher gelernt, daß Vordefinieren von Variablen schneller ist. In Version 7 machen wir das auch mit der PRINT-Variablen.</p>
+        <p>Die Anweisung PRINT CHR$(65) ist zwar gut lesbar, aber wir haben ja vorher gelernt, daß Vordefinieren von Variablen schneller ist. In <strong>Version 7</strong> machen wir das auch mit der PRINT-Variablen.</p>
 
-        <p>30 Z=0: S=374: A$=CHR$(65)</p>
-
-        <p>40 PRINT A$</p>
+        <pre><code>30 Z=0: S=374: A$=CHR$(65)
+40 PRINT A$
+</code></pre>
 
         <p>Das Resultat ist wieder beeindruckend: 3,10 Sekunden. Das sind schon 69 Prozent Verbesserung gegenüber der 1. Version.</p>
 
         <p>Aber selbst - oder gerade - jedem Anfänger ist die direkte PRINT-Anweisung mit Gänsefüßen am geläufigsten. Sie braucht auch weniger Speicherplatz und macht sogar ein Vordefinieren unnötig. Wir wollen schauen, ob sie auch schneller ist.</p>
 
-        <p>Ändern Sie für Version 8 die Zeilen 30 und 40: 30 2=0:8=374</p>
+        <p>Ändern Sie für <strong>Version 8</strong> die Zeilen 30 und 40:</p>
 
-        <p>40 PRINT "A";</p>
+        <pre><code>30 Z=0:S=374
+40 PRINT "A";
+</code></pre>
 
-        <p>Erstaunlicherweise bringt das fast gar nichts, nur 0,07 Sekunden. Die Erklärung liegt darin, daß beide Darstellun- gen, CHR$(65) und "A' ASCII-Code-Verwender sind. Damit ist der einzige Unterschied zwischen Version 7 und 8 die Anzahl der Zeichen im Programm. Fassen wir zusammen: Regel 2</p>
+        <p>Erstaunlicherweise bringt das fast gar nichts, nur 0,07 Sekunden. Die Erklärung liegt darin, daß beide Darstellungen, CHR$(65) und "A" ASCII-Code-Verwender sind. Damit ist der einzige Unterschied zwischen Version 7 und 8 die Anzahl der Zeichen im Programm. Fassen wir zusammen:</p>
 
-        <p>* n Schleifen mit aneinandergereihten Druckanweisungen ist PRINT vielschneller als</p>
+        <aside>
+            <h2>Regel 2</h2>
+            <ul>
+                <li>In Schleifen mit aneinandergereihten Druckanweisungen ist PRINT viel schneller als POKE.</li>
+                <li>Die PRINT-Variablen sollen entweder vordefiniert oder im Gänsefuß-Modus eingesetzt werden.</li>
+            </ul>
+        </aside>
 
-        <p>POKE.</p>
+        <p>In der PRINT-Schleife (Zeile 40) und nachfolgender IF-Abfrage (Zeile 60) gibt es noch zwei Feinheiten. Basic erlaubt uns bei bedingten Sprüngen statt IF... THEN GOTO .. nur IF .. THEN .. zu schreiben, und das haben wir bisher auch brav gemacht.</p>
 
-        <p class="source">\* Die PRINT-Variablen sollen entweder vordefiniert oder im Gänsefuß-Modus eingesetzt werden.</p>
+        <p>Man kann aber auch IF .. GOTO verwenden. Eigentlich ist nicht zu erwarten, daß zwischen den beiden Schreibarten ein Zeitunterschied besteht. Der Fall ist tatsächlich fast akademisch, wie <strong>Version 9</strong> beweist:</p>
 
-
-        <p></p>
-
-        <p>In der PRINT-Schleife (Zeile 40) und nachfolgender IF-Abfrage (Zeile 60) gibtesnoch zwei Feinheiten. Basic erlaubt uns bei bedingten Sprüngen statt IF... THEN GOTO .. nur IF .. THEN .. zu schreiben, und das haben wir bisher auch brav gemacht.</p>
-
-        <p>Man kann aber auch IF .. GOTO verwenden. Eigentlich ist nicht zu erwarten, daß zwischen den beiden Schreibarten ein Zeitunterschied besteht. Der Fall ist tatsächlich fast akademisch, wie Version 9 beweist:</p>
-
-        <p>60 IF Z=S GOTO 1000 .</p>
+        <pre><code>60 IF Z=S GOTO 1000
+</code></pre>
 
         <p>Laufzeit des C64: 3,0 Sekunden.</p>
 
         <p>Eine andere Änderung bringt auch nur ganz wenig in der Geschwindigkeit, aber sie spart uns eine ganze Zeile und damit Speicherplatz:</p>
 
-        <p>60 IF Z&lt;>S GOTO 40</p>
+        <pre><code>60 IF Z&lt;&gt;S GOTO 40
+</code></pre>
 
         <p>70 entfällt</p>
 
-        <p>Diese Version 10 gewinnt nur 0,02 Sekunden.</p>
+        <p>Diese <strong>Version 10</strong> gewinnt nur 0,02 Sekunden.</p>
 
-        <p>Regel 3</p>
-
-        <p>2 er Schleifen mit Sprunganweisungen ist IF '.. GOTO schneller als IF.THEN * Prüfung auf Ungleichheit (&lt;>) bietet Vorteile, wenn: sie eine Zeile erspart.</p>
+        <aside>
+            <h2>Regel 3</h2>
+            <ul>
+                <li>Bei Schleifen mit Sprunganweisungen ist IF .. GOTO schneller als IF..THEN</li>
+                <li>Prüfung auf Ungleichheit (&lt;&gt;) bietet Vorteile, wenn sie eine Zeile erspart.</li>
+            </ul>
+        </aside>
 
         <p>Für die etwas weiter Fortgeschrittenen unter Ihnen gebe ich hier noch eine weitere Anregung, die wir mit unserem Prüfprogramm nicht testen können.</p>
 
         <p>Die Prüfung mit IF..THEN hängt oft von mehr als einer Bedingung ab. Zum Beispiel kann sie so lauten:</p>
 
-        <p>100 IF (A=1 AND B=2 AND C=3) THEN 999</p>
+        <pre><code>100 IF (A=1 AND B=2 AND C=3) THEN 999
+110 GOTO 50
+</code></pre>
 
-        <p>110 GOTO 50</p>
+        <p>Zeile 100 prüft jedesmal, ob alle drei Bedingungen erfüllt sind, erst nach dem THEN wird entschieden, ob das Programm auf Zeile 999 springt oder auf 110 weiterläuft. Nehmen wir an, A ist im 20. Durchlauf erfüllt, B im 50. Durchlauf, C aber erst im 300. Durchlauf. Das Programm muß also 300mal alle drei Bedingungen nachprüfen. Wenn wir die Zeile 100 so schreiben:</p>
 
-        <p>Zeile 100 prüft jedesmal, ob alle drei Bedingungen erfüllt sind, erst nach dem THEN wird entschieden, ob das Programm auf Zeile 999 springt oder auf 110 weiterläuft. Nehmen wir an, A istim 20. Durchlauf erfüllt, Bim 50. Durchlauf, C aber erst im 300. Durchlauf. Das Programm muß also 300mal alle drei Bedingungen nachprüfen. Wenn wir die Zeile 100 so schreiben:</p>
+        <pre><code>100 IF C=3 THEN IF B=2 THEN IF A=1 THEN 999
+</code></pre>
 
-        <p>100 IF C=3 THEN IF B=2 THEN IF A=1 THEN 999 dann bricht das Programm 300mal die Prüfung nach dem C sofort ab und geht in 110 weiter. B und A werden erst dann zur Prüfung herangezogen, wenn C=3 ist. Es ist wohl klar und einzusehen, daß die zweite Schreibweise schneller ist. Regel 4</p>
+        <p>dann bricht das Programm 300mal die Prüfung nach dem C sofort ab und geht in 110 weiter. B und A werden erst dann zur Prüfung herangezogen, wenn C=3 ist. Es ist wohl klar und einzusehen, daß die zweite Schreibweise schneller ist.</p>
 
-        <p>BER.THEN-Prüifüngen mit mehreren Bedingungen sollen diese Bedingungen in ein-</p>
+        <aside>
+            <h2>Regel 4</h2>
+            <p>Bei IF..THEN-Prüfungen mit mehreren Bedingungen sollen diese Bedingungen in einzelnen IF..THEN-Prüfungen hintereinander gesetzt werden. Dabei wird die Bedingung an die erste Stelle gesetzt, welche als erste nicht erfüllt ist.</p>
+        </aside>
 
-        <p class="source">zelnen IF..THEN-Prüfungen hintereinander gesetzt werden. Dabei wird die Bedingung an die erste Stelle gesetzt, welche als erste nicht erfüllt ist.</p>
+        <p>Ich habe mit Absicht bis hierher die 374malige Wiederholung der Schleife mit der Zählvariablen Z hochgezählt und mit IF..THEN beziehungsweise IF..GOTO den Schlußwert abgefragt. Das gab mir die Gelegenheit, die Schnelligkeit dieser Methode ganz auszureizen. Und wir haben auch die ursprüngliche Laufzeit von 10,48 Sekunden auf 2,88 Sekunden reduziert! Jetzt wollen wir noch eine andere Basic-Möglichkeit austesten, die Sie ja alle kennen, nämlich die Schleife mit FOR..TO..NEXT zu programmmieren.</p>
 
+        <p>Wir wollen in <strong>Version 11</strong> des immer noch gleichen Programms dazu die Zeilen 30, 50 und 60 ändern:</p>
 
-        <p></p>
-
-        <p>Ich habe mit Absicht bis hierher die 37 4malige Wiederholung der Schleife mit der Zählvariablen Z hochgezählt und mit IF..-THEN beziehungsweise IF..GOTO den Schlußwert abgefragt. Das gab mir die Gelegenheit, die Schnelligkeit dieser Methode ganz auszureizen. Und wir haben auch die ursprüngliche Laufzeit von 10,48 Sekunden auf 2,88 Sekunden reduziert! Jetzt wollen wir noch eine andere Basic-Möglichkeit austesten, die Sie ja alle kennen, nämlich die Schleife mit FOR.TO..NEXT zu programmmieren.</p>
-
-        <p>Wir wollen in Version 11 des immer noch gleichen Programms dazu die Zeilen 30, 50 und 60 ändern: 30 FOR Z=1 TO 374</p>
-
-        <p>50 NEXT Z</p>
+        <pre><code>30 FOR Z=1 TO 374
+50 NEXT Z
+</code></pre>
 
         <p>60 entfällt</p>
 
-        <p>Lassen Sie's laufen. Huiiih! Das pfeift runter! Der C64 braucht nur noch 1,08 Sekunden. Das bringt gegenüber der IF.THEN-Schleife der Version 10 eine ganze Menge, nämlich ungefähr 2 Sekunden oder, auf die Zeit der Version 1 bezogen 89 Prozent.</p>
+        <p>Lassen Sie's laufen. Huiiih! Das pfeift runter! Der C64 braucht nur noch 1,08 Sekunden. Das bringt gegenüber der IF..THEN-Schleife der Version 10 eine ganze Menge, nämlich ungefähr 2 Sekunden oder, auf die Zeit der Version 1 bezogen 89 Prozent.</p>
 
-        <p>Das einzige, was wir in der FOR..NEXT-Schleife noch verbessern können, ist die vielgeübte Praxis des Weglassens der Schleifenvariable Z nach dem NEXT-Befehl. 50 NEXT</p>
+        <p>Das einzige, was wir in der FOR..NEXT-Schleife noch verbessern können, ist die vielgeübte Praxis des Weglassens der Schleifenvariable Z nach dem NEXT-Befehl.</p>
 
-        <p>Der Geschwindigkeitsgewinn dieser Version 12 ist nicht sehr groß, nämlich nur etwa 0,1 Sekunden, aber wir wollen die Methode doch in die nächste Regel mit aufnehmen.</p>
-
-        <p class="source">Regel 5<br>
-            Schleifen sollen nicht mit IF..THEN, sondern mit FOR..TO..NEXT gebildet werden. Die Schleifenvariable nach NEXT soll dann weggelassen werden, wenn es nicht zu Verwechslungen mit anderen Schleifen führen kann.</p>
-
-
-        <p></p>
-
-        <p>Ich bin fast am Ende meines Beschleunigungslateins. Nur eines bleibt noch, nämlich die bisher hochgehaltene Lesbarkeit des Programms zu opfern. Ich hoffe nämlich, Sie haben bisher meiner Eingangsforderung Folge geleistet und alles schön mit Leerzeichen geschrieben. Das behalten wir zunächstnochbei, im Gegenteil, wir wollen zunächst die Lesbarkeit noch erhöhen und REM-Erläuterungen einfügen. Ich schlage vor, die Version 13 so auszuschmücken:</p>
-
-        <pre><code>10 TI$="000000" :REM UHR AUF NULL 12 REMERERERRRRRRERRRERRHRRRHCKR
+        <pre><code>50 NEXT
 </code></pre>
 
+        <p>Der Geschwindigkeitsgewinn dieser <strong>Version 12</strong> ist nicht sehr groß, nämlich nur etwa 0,1 Sekunden, aber wir wollen die Methode doch in die nächste Regel mit aufnehmen.</p>
 
-        <pre><code>13 REM* *
-14 REMXTEST-PROGRAMM* *
-15 REM* *
-</code></pre>
+        <aside>
+            <h2>Regel 5</h2>
+            <p>Schleifen sollen nicht mit IF..THEN, sondern mit FOR..TO..NEXT gebildet werden. Die Schleifenvariable nach NEXT soll dann weggelassen werden, wenn es nicht zu Verwechslungen mit anderen Schleifen führen kann.</p>
+        </aside>
 
+        <p>Ich bin fast am Ende meines Beschleunigungslateins. Nur eines bleibt noch, nämlich die bisher hochgehaltene Lesbarkeit des Programms zu opfern. Ich hoffe nämlich, Sie haben bisher meiner Eingangsforderung Folge geleistet und alles schön mit Leerzeichen geschrieben. Das behalten wir zunächst noch bei, im Gegenteil, wir wollen zunächst die Lesbarkeit noch erhöhen und REM-Erläuterungen einfügen. Ich schlage vor, die <strong>Version 13</strong> so auszuschmücken:</p>
 
-        <pre><code>16 REMKRRRRRRRRRRRRRRRR RR RR 20 PRINT CHR$(147);:REM ALLES LOESCHEN 30 FOR Z=1 TO 374:REM 374 ZEICHEN 40 PRINT"A":
+        <pre><code>10 TI$="000000":REM UHR AUF NULL
+12 REM****************************
+13 REM*                          *
+14 REM*TEST-PROGRAMM*            *
+15 REM*                          *
+16 REM****************************
+20 PRINT CHR$(147);:REM ALLES LOESCHEN
+30 FOR Z=1 TO 374:REM 374 ZEICHEN
+40 PRINT"A":
 50 NEXT
 999 REM ZEIT AUSDRUCKEN
-1000 POKE 214,18:PRINT TI/60 "SEKUNDEN" :END
+1000 POKE 214,18:PRINT TI/60 "SEKUNDEN":END
 </code></pre>
 
-
-        <p>"Sieht gut aus, nicht wahr?</p>
+        <p>Sieht gut aus, nicht wahr?</p>
 
         <p>Aber leider, REM-Erläuterungen kosten Zeit. Wir sind um 0,2 Sekunden langsamer geworden.</p>
 
-        <p>Wir schmeißen deshalb alle REMs wieder raus und haben damit wieder Version 12. Jetzt aber gehen wir einen Schritt in der anderen Richtung weiter und entfernen alle Leerstellen und Abstände. Mit dieser Version 14 will ich Ihnen zeigen, daß das auch einen Einfluß auf die Laufgeschwindigkeit hat.</p>
+        <p>Wir schmeißen deshalb alle REMs wieder raus und haben damit wieder Version 12. Jetzt aber gehen wir einen Schritt in der anderen Richtung weiter und entfernen alle Leerstellen und Abstände. Mit dieser <strong>Version 14</strong> will ich Ihnen zeigen, daß das auch einen Einfluß auf die Laufgeschwindigkeit hat.</p>
 
         <pre><code>10 TI$="000000"
 20 PRINTCHR$(147);
-30 FORZ=1T0374
+30 FORZ=1TO374
 40 PRINT"A";
 50 NEXT
-1000 POKE214,18:PRINT:PRINTTI/60 " SEKUNDEN" :END
+1000 POKE214,18:PRINT:PRINTTI/60"SEKUNDEN":END
 </code></pre>
-
 
         <p>Das Ergebnis ist 0,98 Sekunden.</p>
 
-        <p>In Version 15 treiben wir die Schrumpfung ins Extrem, indem wir das Programm im Prinzip unverändert, aber mit einem Minimum an Zeilen schreiben, also möglichst viele Befehle in eine Zeile packen.</p>
+        <p>In <strong>Version 15</strong> treiben wir die Schrumpfung ins Extrem, indem wir das Programm im Prinzip unverändert, aber mit einem Minimum an Zeilen schreiben, also möglichst viele Befehle in eine Zeile packen.</p>
 
         <p>Sie wissen, die maximale Zeilenlänge beträgt 80 Zeichen beim C 64. Unser Programm können wir sogar in einer einzigen Zeile unterbringen - fast unglaublich, aber es geht. Sie müssen allerdings alle Abkürzungsmöglichkeiten ausschöpfen, die das Commodore-System bietet. Im Anhang der Commodore-Handbücher finden Sie die Liste aller Abkürzungen beim Eintippen: C und geSHIFTetes H für CHR$, ? für PRINT und so weiter. Im nachfolgenden Ausdruck ist das natürlich nicht zu sehen, weil der Befehl LIST die Abkürzungen nicht berücksichtigt. So kommen auch mehr als 80 Zeichen in eine Zeile des Listings.</p>
 
-        <p>10 TI$="000000" :PRINTCHR$ (147) ; :FORZ=1T0374: PRINT"A" ;:NEXT:POKE214,18:PRINT:PRINT TI/60 " SEKUNDEN" :END</p>
+        <pre><code>10 TI$="000000":PRINTCHR$(147);:FORZ=1TO374:PRINT"A";:NEXT:POKE214,18:PRINT:PRINT TI/60 "SEKUNDEN":END
+</code></pre>
 
         <p>Und siehe da, diese »Kurzform« des Programms ist auch die allerschnellste Version. Der C64 braucht 0,93 Sekunden. Diese letzte Beschleunigung wird dadurch erreicht, daß das Betriebssystem des Computers nur einmal einen Zeilenanfang und Zeilenende suchen und erkennen muß, statt sechsmal in der Version 14.</p>
 
-        <p>Das Ausnützen der vollen Kapazität einer Zeile bringt also "nicht nur den Vorteil eines kleineren Speicherbedarfs, sondern auch Zeitgewinn.</p>
+        <p>Das Ausnützen der vollen Kapazität einer Zeile bringt also nicht nur den Vorteil eines kleineren Speicherbedarfs, sondern auch Zeitgewinn.</p>
 
-        <p class="source">Regel 6<br>
-            \* Programme ohne REM-Erläuterungen und ohne Leerstellen zwischen den Zeichen<br>
-            laufen schneller.<br>
-            \* Zur Reduzierung der Zeilenzahl sollen möglichst viele Befehle in eine Zeile geschrieben werden.</p>
-
-
-        <p></p>
+        <aside>
+            <h2>Regel 6</h2>
+            <ul>
+                <li>Programme ohne REM-Erläuterungen und ohne Leerstellen zwischen den Zeichen laufen schneller.</li>
+                <li>Zur Reduzierung der Zeilenzahl sollen möglichst viele Befehle in eine Zeile geschrieben werden.</li>
+            </ul>
+        </aside>
 
         <p>»Einzeiler« können auch Spaß und Herausforderung zugleich sein. Man sollte eigentlich annehmen, daß mit einer Zeile nicht viel anzufangen sei. Weit gefehlt!</p>
 
@@ -401,24 +431,21 @@
             <figcaption>Laufzeiten der Programmversionen für »Buchstaben auf dem Bildschirm«</figcaption>
         </figure>
 
-
         <p>Von A. Boyd (Manchester) stammt ein Primzahlen-Erzeuger, der für die obere Grenze von 65000 viele Stunden braucht.</p>
 
-        <pre><code>1 FOR N=1 TO 65000:F=0FOR J=2 TO N-1:F=F+((N-J*INT (N/J))=0) :NEXT:X=-(F=0) : PRINT RIGHT$(STRE(X*N) ‚6*X): NEXT
+        <pre><code>1 FOR N=1 TO 65000:F=0FOR J=2 TO N-1:F=F+((N-J*INT(N/J))=0):NEXT:X=-(F=0):PRINT RIGHT$(STR$(X*N),6*X):NEXT
 </code></pre>
-
 
         <p>Ein anderer Einzeiler wurde von A.M. Simmelt (Sheffield) geschrieben zur Konvertierung von Dezimal- in Dualzahlen.</p>
 
-        <pre><code>1 INPUT A:FOR I=14 TO O0 STEP-1:Z=A AND 2II:A =Z/2t1:2$=RIGHT$(STR$(Z) ,1):PRINT Z$; :NEXT: GOTO1
+        <pre><code>1 INPUT A:FOR I=14 TO 0 STEP-1:Z=A AND 2↑I:A=A-Z:Z=Z/2↑I:Z$=RIGHT$(STR$(Z),1):PRINT Z$;:NEXT:GOTO1
 </code></pre>
-
 
         <p>Lassen wir's gut sein mit diesem Programmsport und kehren wir zurück zu einer abschließenden Betrachtung der Zeitgewinne.</p>
 
         <p>Wir haben in Version 1 mit 10,48 Sekunden begonnen. Diese Laufzeit wurde ohne Änderung des Programmresultats stetig verkürzt, bis wir schließlich in Version 15 bei 0,93 Sekunden gelandet sind. Ich nenne diese Beschleunigung um 90 Prozent schlicht und einfach spektakulär.</p>
 
-        <p>Mehr allerdings kann ich nicht herausholen, es sei denn naja, eigentlich habe ich am Anfang ganz laut »Basic« gesagt.</p>
+        <p>Mehr allerdings kann ich nicht herausholen, es sei denn - naja, eigentlich habe ich am Anfang ganz laut »Basic« gesagt.</p>
 
         <p>Aber ich kann doch nicht widerstehen und Sie scharf machen auf ultima velocitas - zu deutsch Maschinensprache.</p>
 
@@ -432,147 +459,173 @@
 1000 POKE 214,18:PRINT:PRINT TI/60 " SEKUNDEN" :END
 </code></pre>
 
-
         <p>Ab Zeile 2000 setzen wir jetzt das Programm, welches uns das Maschinenprogramm einliest. Um mit dem Einlesen zu beginnen, setzen wir noch eine Umleitung vor das Meßprogramm: 5 GOTO 2000</p>
 
         <p>In Zeile 2000 löschen wir den Bildschirm. Zeile 2010 und 2020 und 2030 liest die Codezahlen, die von Zeile 2050 bis 2090 stehen, und POKEt sie in die Speicherplätze 7168 bis 7200. Sobald die Zahlen eingelesen sind, können Sie das Meßprogramm mit dem Befehl GOTO 10 (direkt eingetippt) starten.</p>
 
         <p>Im Abdruck unten wird das etwas eleganter gemacht. Zuerst meldet das Programm das Ende des Einlesens (Zeile 2100 und 2101). Dann kommt die Anweisung, wie das Meßprogramm zu starten ist, nämlich durch Drücken irgendeiner Taste, die durch eine GET-Schleife abgefragt wird. Wenn eine Taste gedrückt wird, springt das Programm auf Zeile 10 (das geschieht in Zeile 2160).</p>
 
-        <p>So, inzwischen haben Sie sicher Ihre Überraschung gehabt! 0,066 Sekunden Laufzeit. Ich hoffe, daß ich Sie mit dem Virus der Maschinensprache infiziert habe.</p>
-
-        <p>Wir wollen im folgenden ein paar arithmetische Funktionen untersuchen und beschleunigen. Als erste nehmen wir uns in Version 17 die Multiplikation vor. Die Messung der Laufzeit erfolgt auf dieselbe Weise wie bei allen Programmen vorher auch. Deshalb bleiben die Zeilen 10, 20 und 1000 gleich. Die Multiplikation selbst soll 300mal ausgeführt werden (Zeile 30). Dann wird das Ergebnis gedruckt (Zeile 60).</p>
-
-        <pre><code>30 FOR Z=1 TO 300
+        <pre><code>5 GOTO 2000
+10 TI$="000000"
+20 PRINT CHR$(147)
+30 SYS 7168
+1000 POKE 214,18:PRINT:PRINT TI/60 "SEKUNDEN":END
+2000 PRINT CHR$(147)
+2010 FOR A=7168 TO 7200
+2020 READ B
+2030 POKE A,B
+2040 NEXT
+2050 DATA 162,0,169,1,157
+2060 DATA 0,4,169,14,157,0,216
+2070 DATA 232,224,0,208,241,169,1,157
+2080 DATA 254,4,169,14,157,254,216
+2090 DATA 232,224,120,208,241,96
+2100 PRINT"DAS MASCHINENPROGRAMM"
+2110 PRINT"IST JETZT EINGELESEN.":PRINT
+2120 PRINT"ZUM STARTENDES PRO-"
+2130 PRINT"GRAMMS" CHR$(18)"TASTE"CHR$(146)"DRUECKEN"
+2140 GET A$
+2150 IF A$=" "THEN 2140
+2160 GOTO 10
 </code></pre>
 
+        <p>So, inzwischen haben Sie sicher Ihre Überraschung gehabt! 0,066 Sekunden Laufzeit. Ich hoffe, daß ich Sie mit dem Virus der Maschinensprache infiziert habe.</p>
 
-        <pre><code>50 NEXT
+        <p>Wir wollen im folgenden ein paar arithmetische Funktionen untersuchen und beschleunigen. Als erste nehmen wir uns in <strong>Version 17</strong> die Multiplikation vor. Die Messung der Laufzeit erfolgt auf dieselbe Weise wie bei allen Programmen vorher auch. Deshalb bleiben die Zeilen 10, 20 und 1000 gleich. Die Multiplikation selbst soll 300mal ausgeführt werden (Zeile 30). Dann wird das Ergebnis gedruckt (Zeile 60).</p>
+
+        <pre><code>30 FOR Z=1 TO 300
+50 NEXT
 60 PRINT A
 </code></pre>
 
-
         <p>Als Multiplikation nehmen wir den Extremfall einer kurzen Zahl multipliziert mit einer langen.</p>
 
-        <pre><code>40 A=3%0,123456789
+        <pre><code>40 A=3*0,123456789
 </code></pre>
-
 
         <p>Nach RUN bleibt der Bildschirm zuerst leer, bis dann nach 11,85 (14, 15) Sekunden das Ergebnis der Multiplikation und die Laufzeit ausgedruckt wird.</p>
 
-        <p>In Version 18 vertauschen wir die beiden Zahlen, die in Zeile 40 multipliziert werden.</p>
+        <p>In <strong>Version 18</strong> vertauschen wir die beiden Zahlen, die in Zeile 40 multipliziert werden.</p>
 
-        <pre><code>40 A=0.123456789%*3
+        <pre><code>40 A=0.123456789*3
 </code></pre>
-
 
         <p>Diese einfache Manipulation bringt natürlich nach Adam Riese dasselbe Resultat wie vorher, aber die Laufzeit ist kürzer. Wir gewinnen 0,44 Sekunden. Dieser Gewinn ist nicht überwältigend, aber überraschend. Aber denken Sie nach!</p>
 
         <p>Wie ist das, wenn Sie so eine Multiplikation auf dem Papier durchführen? Da ist die Rechnung im zweiten Fall auch einfacher. Der Computer hat genau dasselbe Problem.</p>
 
-        <p>In Version 19 nützen wir noch eine kleine Eigenheit der Commodore-Computer aus, die auf ihre amerikanische Herkunft zurückzuführen ist. Bei den Angelsachsen ist es nämlich erlaubt, eine Null vor dem Dezimalpunkt wegzulassen. Beim Computer dürfen wir das auch. Obwohl das mit der Multiplikation direkt nichts zu tun hat, bietet sie uns doch eine gute Gelegenheit, die Einsparung durch das Weglassen der Null auch zeitlich zu messen. Also, Zeile 40 sieht jetzt so aus:</p>
+        <p>In <strong>Version 19</strong> nützen wir noch eine kleine Eigenheit der Commodore-Computer aus, die auf ihre amerikanische Herkunft zurückzuführen ist. Bei den Angelsachsen ist es nämlich erlaubt, eine Null vor dem Dezimalpunkt wegzulassen. Beim Computer dürfen wir das auch. Obwohl das mit der Multiplikation direkt nichts zu tun hat, bietet sie uns doch eine gute Gelegenheit, die Einsparung durch das Weglassen der Null auch zeitlich zu messen. Also, Zeile 40 sieht jetzt so aus:</p>
 
         <pre><code>40 A=.123456789*3
 </code></pre>
 
-
         <p>Das bringt nicht sehr viel, 0,20 Sekunden. Aber Kleinvieh macht auch Mist.</p>
 
-        <p>Eine ähnliche Verbesserung, die wir hier nicht ausprobieren, wird erzielt durch den Ersatz einer alleinstehenden Null durch einen Punkt, zum Beispiel: statt IF X=0 THEN jetzt IF x=. THEN Eine gewaltige Beschleunigung erfährt das Multiplikationsbeispiel, wenn wir die Regel 1 anwenden und die Variablen vordefinieren.</p>
+        <p>Eine ähnliche Verbesserung, die wir hier nicht ausprobieren, wird erzielt durch den Ersatz einer alleinstehenden Null durch einen Punkt, zum Beispiel:<br>statt IF X=0 THEN -<br>jetzt IF x=. THEN -</p>
 
-        <p class="source">Regel 7<br>
-            \* Bei einer Multiplikation soll die längere Zahl vor der kürzeren stehen (langer Multiplikant, kurzer Multiplikator).<br>
-            \* Eine einzelne Null wird durch einen Punkt ersetzt, eine Null vor dem Dezimalpunkt<br>
-            wird weggelassen.</p>
+        <p>Eine gewaltige Beschleunigung erfährt das Multiplikationsbeispiel, wenn wir die Regel 1 anwenden und die Variablen vordefinieren.</p>
 
+        <aside>
+            <h2>Regel 7</h2>
+            <ul>
+                <li>Bei einer Multiplikation soll die längere Zahl vor der kürzeren stehen (langer Multiplikant, kurzer Multiplikator).</li>
+                <li>Eine einzelne Null wird durch einen Punkt ersetzt, eine Null vor dem Dezimalpunkt wird weggelassen.</li>
+            </ul>
+        </aside>
 
-        <p></p>
+        <p>In <strong>Version 20</strong> ersetzen wir in Zeile 40 beide Zahlen durch Buchstaben, die wir in einer neuen Zeile 25 diese Werte zuweisen.</p>
 
-        <p>In Version 20 ersetzen wir in Zeile 40 beide Zahlen durch Buchstaben, die wir in einer neuen Zeile 25 diese Werte zuweisen.</p>
-
-        <p>25 B=.123456789:0=3</p>
-
-        <p>40 A=B*C</p>
+        <pre><code>25 B=.123456789:C=3
+40 A=B*C
+</code></pre>
 
         <p>Dieser Lauf bleibt nach 1,48 Sekunden stehen, das heißt wir gewinnen 12,23 Sekunden. Also bitte Regel 1 unbedingt beachten!</p>
 
-        <p>Eine andere betrachtenswerte arithmetische Funktion ist das »Potenzieren« (Quadrat-/Kubikzahlen), ausgelöst durch das Zeichen t. Version 21 erzielen wir durch Löschen der Zeile 25 und Abänderung der Zeile 40:</p>
+        <p>Eine andere betrachtenswerte arithmetische Funktion ist das »Potenzieren« (Quadrat-/Kubikzahlen), ausgelöst durch das Zeichen ↑. <strong>Version 21</strong> erzielen wir durch Löschen der Zeile 25 und Abänderung der Zeile 40:</p>
 
-        <p>40 A=41 3 »Vier hoch drei« ergibt 64 und braucht 10,53 Sekunden.</p>
+        <pre><code>40 A= 4 ↑ 3
+</code></pre>
 
-        <p>In Version 22 wollen wir sehen, ob vordefinierte Variable auch so einschlagen wie bei der Multiplikation. 25 B=4:0=3</p>
+        <p>»Vier hoch drei« ergibt 64 und braucht 10,53 Sekunden.</p>
 
-        <p>40 A=BIC</p>
+        <p>In <strong>Version 22</strong> wollen wir sehen, ob vordefinierte Variable auch so einschlagen wie bei der Multiplikation.</p>
 
-        <p>Man kann sich doch auf nichts verlassen! Diesmal sind wir nur um 0,22 Sekunden schneller. Wir dürfen aber nicht aufgeben. Version 23 macht alles wieder wett, und zwar durch den simplen Trick, daß wir das Potenzieren in seine Grundelemente zerlegen.</p>
+        <pre><code>25 B=4:C=3
+40 A=B↑C
+</code></pre>
 
-        <p>Sie wissen doch: 4 hoch 3 (413) ist dasselbe wie »4 zweimal mit sich selbst multipliziert« (4*4* 4). 25 B=4 (C entfällt)</p>
+        <p>Man kann sich doch auf nichts verlassen! Diesmal sind wir nur um 0,22 Sekunden schneller. Wir dürfen aber nicht aufgeben. <strong>Version 23</strong> macht alles wieder wett, und zwar durch den simplen Trick, daß wir das Potenzieren in seine Grundelemente zerlegen.</p>
 
-        <p>40 A=B*B*B</p>
+        <p>Sie wissen doch: 4 hoch 3 (4↑3) ist dasselbe wie »4 zweimal mit sich selbst multipliziert« (4*4*4).</p>
 
-        <p>Ja, daschauen Sie, gell? Das Programm braucht nur 1,68, also 8,31 Sekunden weniger.</p>
+        <pre><code>25 B=4 (C entfällt)
+40 A=B*B*B
+</code></pre>
 
-        <p class="source">Regel 8<br>
-            Die Funktion Potenzieren (1) soll durch Mehrfach-Multiplikation ersetzt werden.</p>
+        <p>Ja, da schauen Sie, gell? Das Programm braucht nur 1,68, also 8,31 Sekunden weniger.</p>
 
+        <aside>
+            <h2>Regel 8</h2>
+            <p>Die Funktion Potenzieren (↑) soll durch Mehrfach-Multiplikation ersetzt werden.</p>
+        </aside>
 
-        <p></p>
+        <p>Als letztes Objekt möchte ich oft aufgerufene Unterprogramme messen. Wir erreichen das ganz einfach dadurch, daß wir das letzte Programm (Version 23) abändern. So erhalten wir <strong>Version 24</strong>: Die Definition der Variablen (Zeile 25) und die Multiplikation (Zeile 40) verbannen wir als Unterprogramm an das Ende des Programms und springen innerhalb der 300fachen Schleife mit GOTO darauf.</p>
 
-        <p>Als letztes Objekt möchte ich oft aufgerufene Unterprogramme messen. Wir erreichen das ganz einfach dadurch, daß wir das letzte Programm (Version 23) abändern. So erhalten wir Version 24: Die Definition der Variablen (Zeile 25) und die Multiplikation (Zeile 40) verbannen wir als Unterprogramm an das Ende des Programms und springen innerhalb der 300fachen Schleife mit GOTO darauf. 25 löschen;</p>
+        <pre><code>25 löschen;
+30 FOR Z=1 TO 300;
+40 GOTO 40000
+</code></pre>
 
-        <p>30 FOR Z=1 TO 300;</p>
+        <p>Alles andere bleibt, aber neu kommt dazu: 40000 B=4;</p>
 
-        <p>40 GOTO 40000</p>
+        <pre><code>50000 A=B*B*B;
+60000 GOTO 50
+</code></pre>
 
-        <p>Alles andere bleibt, aber neu kommt dazu: 40000 B=4; 50000 A=B*B#B;</p>
+        <p>Es ist nicht weiter erstaunlich, daß dieser Umbau diese Version 24 gegenüber Version 23 verlangsamt. Aber merken Sie sich die Laufzeit, 3,28 Sekunden. Als nächstes ersetzen wir die beiden GOTO-Zeilen durch GOSUB-RETURN.</p>
 
-        <p>60000 GOTO 50</p>
+        <pre><code>40 GOSUB 40000
+60000 RETURN
+</code></pre>
 
-        <p>Esistnicht weiter erstaunlich, daß dieser Umbau diese Version 24 gegenüber Version 23 verlangsamt. Aber merken Sie sich die Laufzeit, 3,28 Sekunden. Als nächstes ersetzen wir die beiden GOTO-Zeilen durch GOSUB-RETURN. 40 GOSUB 40000</p>
+        <p>Diese <strong>Version 25</strong> spart uns 0,15 Sekunden. GOSUB ist schneller als GOTO! Sie haben vielleicht schon gelesen, daß oft gebrauchte Unterprogramme am Anfang eines Programms stehen sollen. Den Grund dafür will ich Ihnen mit den nächsten zwei Versionen vorführen. <strong>Version 26</strong> macht das zunächst für die GOTO-Version. Wir bauen sie auf der Version 24 auf, mit folgenden Änderungen: Die Zeitmessung lassen wir wie gehabt in den Zeilen 10, 20 und 1000, die Schleife und den Ausdruck des Resultats in den Zeilen 30, 50 und 60.</p>
 
-        <p>60000 RETURN</p>
+        <p>Nur beim Unterprogramm streichen wir alle Nullen der Zeilennummern, so daß es jetzt in den Zeilen 4, 5 und 6 steht. Um zu vermeiden, daß das Programm gleich mit dem Unterprogramm beginnt, fügen wir davor (Zeile 3) noch eine Umleitung ein, die sofort auf der Zeile 10 weitermacht. Schließlich brauchen wir noch den Sprung in das Unterprogramm, den wir in die Zeile 33 setzten. Das Ganze sieht jetzt so aus:</p>
 
-        <p>Diese Version 25 spart uns 0,15 Sekunden. GOSUB ist schneller als GOTO! Sie haben vielleicht schon gelesen, daß oft gebrauchte Unterprogramme am Anfang eines Programms stehen sollen. Den Grund dafür will ich Ihnen mit den nächsten zwei Versionen vorführen. Version 26 macht das zunächst für die GOTO-Version. Wir bauen sie auf der Version 24 auf, mit folgenden Änderungen: Die Zeitmessung lassen wir wie gehabtin den Zeilen 10, 20 und 1000, die Schleife und den Ausdruck des Resultats in den Zeilen 30, 50 und 60.</p>
+        <pre><code>3 GOTO 10
+4 B=4
+5 A=B*B*B
+6 GOTO 50
+10 TI$="000000"
+20 PRINT CHR$(147)
+30 FOR Z=1 TO 300
+33 GOTO 4
+50 NEXT
+60 PRINT A
+1000 POKE 214,18:PRINT:PRINT TI/60 "SEKUNDEN":END
+</code></pre>
 
-        <p>Nur beim Unterprogramm streichen wir alle Nullen der Zeilennummern, so daß es jetzt in den Zeilen 4, 5 und 6 steht. Um zu vermeiden, daß das Programm gleich mit dem Unterprogramm beginnt, fügen wir davor (Zeile 3) noch eine Umlei‚tung ein, die sofort auf der Zeile 10 weitermacht. Schließlich brauchen wir noch den Sprung in das Unterprogramm, den wir in die Zeile 33 setzten. Das Ganze sieht jetzt so aus:</p>
+        <p>Nach RUN erhalten wir 3,1 Sekunden. Gegenüber Version 24, unserem Vergleichsobjekt, sparen wir 0,18 Sekunden. Dasselbe passiert, wenn wir in der <strong>Version 27</strong> die GOTOs mit GOSUB-RETURN ersetzen.</p>
 
-        <p>3 GOTO 10</p>
-
-        <p>4 B=4</p>
-
-        <p>5 A=B*B*B</p>
-
-        <p>6 GOTO 50</p>
-
-        <p>10 TI$="000000"</p>
-
-        <p>.20 PRINT CHR$(147)</p>
-
-        <p>30 FOR Z=1 TO 300</p>
-
-        <p>33 GOTO 4</p>
-
-        <p>50 NEXT</p>
-
-        <p>60 PRINT A</p>
-
-        <p>1000 POKE 214,18:PRINT:PRINT TI/60 " SEKUNDEN" :END Nach RUN erhalten wir 3,1 Sekunden. Gegenüber Version 24, unserem Vergleichsobjekt, sparen wir 0,18 Sekunden. Dasselbe passiert, wenn wir in der Version 27 die GOTOs mit GOSUB-RETURN ersetzen.</p>
-
-        <p>6 RETURN</p>
-
-        <p>33 GOSUB 4</p>
+        <pre><code>6 RETURN
+33 GOSUB 4
+</code></pre>
 
         <p>Gegenüber der anderen GOSUB-Version (Version 25) sparen wir 0,17 Sekunden.</p>
 
-        <p class="source">Regel 9<br>
-            \* Der Aufruf von Unterprogrammen mit GOSUB ist schneller als mit GOTO. \* Häufig gebrauchte Unterprogramme gehören ganz an den Anfang eines Programms. Sie müssen dann allerdings zuerst mit einem GOTO umgangen werden.</p>
-
-
-        <p></p>
+        <aside>
+            <h2>Regel 9</h2>
+            <ul>
+                <li>Der Aufruf von Unterprogrammen mit GOSUB ist schneller als mit GOTO.</li>
+                <li>Häufig gebrauchte Unterprogramme gehören ganz an den Anfang eines Programms. Sie müssen dann allerdings zuerst mit einem GOTO umgangen werden.</li>
+            </ul>
+        </aside>
 
         <p>Ich bin überzeugt, daß in Basic noch mehr spektakuläre Zeitgewinne stecken. Falls Sie eine Regel 10 oder noch mehr entdecken, ermuntere ich Sie um Mitteilung.</p>
 
         <p>Wenn Sie Fragen haben, können Sie mich mit einer Leserzuschrift ansprechen.</p>
+
+        <address class="author">(Dr. Helmuth Hauck/aa/hm)</address>
         <figure>
             <table>
                 <tr>
@@ -645,8 +698,6 @@
             <figcaption>Laufzeiten der Versionen für Unterprogramme</figcaption>
         </figure>
 
-
-        <address class="author">(Dr. Helmuth Hauck/aa/hm)</address>
     </article>
 </body>
 

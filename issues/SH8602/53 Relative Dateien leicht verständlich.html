@@ -25,7 +25,7 @@
 
         <p>Um nun Daten mit dem Computer zu verwalten, gibt es beim Commodore 64 in Verbindung mit der Floppy VC 1541 grundsätzlich zwei Dateiarten: Die sequentielle und eben die relative.</p>
 
-        <p>Bei der sequentiellen Dateiorganisation werden alle Datensätze hintereinander, das heißt sequentiell gespeichert. Wenn nun Datensätze (in unserem Beispiel Adressen) gelesen, hinzugefügt, gelöscht oder geändert werden sollen diese Vorgänge bezeichnet man übrigens als Dateiarbeit oder »Datenpflege« -, dann muß dazu die komplette Datei in den Rechner geladen und nach Beendigung der Datenpflege wieder auf die Diskette zurückgespeichert werden. Ein direkter Zugriff auf jeden einzelnen Datensatz der Datei ist nicht möglich.</p>
+        <p>Bei der sequentiellen Dateiorganisation werden alle Datensätze hintereinander, das heißt sequentiell gespeichert. Wenn nun Datensätze (in unserem Beispiel Adressen) gelesen, hinzugefügt, gelöscht oder geändert werden sollen - diese Vorgänge bezeichnet man übrigens als Dateiarbeit oder »Datenpflege« -, dann muß dazu die komplette Datei in den Rechner geladen und nach Beendigung der Datenpflege wieder auf die Diskette zurückgespeichert werden. Ein direkter Zugriff auf jeden einzelnen Datensatz der Datei ist nicht möglich.</p>
 
         <p>Dieser Umstand ist einerseits sehr zeitraubend (die Floppy 1541 ist ja nicht gerade die Schnellste), andererseits macht er die maximale Dateigröße vom verfügbaren Speicherplatz im Rechner abhängig. Die sequentielle Datenspeicherung ist daher mehr etwas für kleinere Dateien (mit wenigen Datensätzen) oder für Dateien mit sehr kurzen Datensätzen (was wir uns später noch zunutze machen werden).</p>
 
@@ -62,17 +62,11 @@
         <p>Die Verwaltung einer relativen Datei gliedert sich grob in vier Abschnitte:</p>
 
         <ul>
-            <li>
-                <p>»Öffnen« der Datei - Positionieren auf den gewünschten Record</p>
-            </li>
-            <li>
-                <p>Lesen/Schreiben des Records</p>
-            </li>
-            <li>
-                <p>»Schließen« der Datei.</p>
-            </li>
+            <li>»Öffnen« der Datei</li>
+            <li>Positionieren auf den gewünschten Record</li>
+            <li>Lesen/Schreiben des Records</li>
+            <li>»Schließen« der Datei.</li>
         </ul>
-
 
         <p>Da das Basic 2.0 des Commodore 64 leider keine speziellen Befehle zur Unterstützung von relativen Dateien zur Verfügung stellt, bleibt nur der Weg über »OPEN«- und »CHR$(...)«-Sequenzen. Daher sieht das Ganze auf den ersten (und wohl auch zweiten) Blick etwas kompliziert aus. Wenn man sich die erforderlichen Programmteile aber - wie inLListing 1 geschehen - als Unterprogramme schreibt, ist es halb so schlimm.</p>
 
@@ -82,15 +76,16 @@
 
         <p>Bei einer relativen Datei ist es - im Gegensatz zum Beispiel zur sequentiellen Datei - praktisch egal, ob die Datei auf der Diskette schon eingerichtet ist oder nicht oder ob Sie Daten lesen oder schreiben wollen. Der Öffnungsbefehl ist immer derselbe:</p>
 
-        <p>OPEN LF,GA,SA,DN$+",L," +CHR$(RL)</p>
+        <pre><code>OPEN LF,GA,SA,DN$+",L," +CHR$(RL)
+</code></pre>
 
-        <p>Die einzelnen Variablen - auch »Parameter« genannt haben folgende Bedeutung:</p>
+        <p>Die einzelnen Variablen - auch »Parameter« genannt - haben folgende Bedeutung:</p>
 
-        <p>LF: Das ist die logische Filenummer der Datei. Sie ist erforderlich, damit der Computer bei späteren Lese- oder Schreibbefehlen (bei denen diese Nummer angegeben werden muß) weiß, aus welcher Datei gelesen oder in welche Datei geschrieben werden soll. LF kann Werte zwischen 1 und 127 annehmen.</p>
+        <p><strong>LF:</strong> Das ist die logische Filenummer der Datei. Sie ist erforderlich, damit der Computer bei späteren Lese- oder Schreibbefehlen (bei denen diese Nummer angegeben werden muß) weiß, aus welcher Datei gelesen oder in welche Datei geschrieben werden soll. LF kann Werte zwischen 1 und 127 annehmen.</p>
 
-        <p>GA: Das ist die Geräteadresse der Floppy. Im Normalfall also 8.</p>
+        <p><strong>GA:</strong> Das ist die Geräteadresse der Floppy. Im Normalfall also 8.</p>
 
-        <p>SA: Die »Sekundäradresse« oder »Kanalnummer« SA hat auf Floppy-Ebene eine ähnliche Bedeutung wie die logische Filenummer LF auf Computer-Ebene.</p>
+        <p><strong>SA:</strong> Die »Sekundäradresse« oder »Kanalnummer« SA hat auf Floppy-Ebene eine ähnliche Bedeutung wie die logische Filenummer LF auf Computer-Ebene.</p>
 
         <p>Für uns ist aber nur wichtig, daß SA Werte zwischen 2 und 14 annehmen kann.</p>
 
@@ -98,15 +93,15 @@
 
         <p>In diesem Zusammenhang noch ein wichtiger Hinweis:</p>
 
-        <p>Auf Floppy-Ebene können maximal drei Dateien gleichzeitig geöffnet sein. (Auf Computer-Ebene sind es übrigens maximal 10). Da zur Verwaltung einer relativen Datei neben der eigentlichen Datei - wie wir gleich noch sehen werden auch der Floppy-Kommandokanal geöffnet werden muß, , bedeutet das, daß maximal eine relative und eine sequentielle Datei gleichzeitig geöffnet sein können (was gerade für eine indexsequentielle Dateiorganisation reicht).</p>
+        <p>Auf Floppy-Ebene können maximal drei Dateien gleichzeitig geöffnet sein. (Auf Computer-Ebene sind es übrigens maximal 10). Da zur Verwaltung einer relativen Datei neben der eigentlichen Datei - wie wir gleich noch sehen werden - auch der Floppy-Kommandokanal geöffnet werden muß, bedeutet das, daß maximal eine relative und eine sequentielle Datei gleichzeitig geöffnet sein können (was gerade für eine indexsequentielle Dateiorganisation reicht).</p>
 
-        <p>DN$: DN$ enthält den Namen der Datei. Dieser darf maximal 16 Zeichen lang sein. Außerdem ist darauf zu achten, daß kein File (=Datei oder Programm) desselben Namens bereits auf der Diskette existiert - außer natürlich eine früher definierte relative Datei dieses Namens, mit der Sie jetzt arbeiten wollen, denn sonst gibt es einen »FILE EXISTS ERROR«.</p>
+        <p><strong>DN$:</strong> DN$ enthält den Namen der Datei. Dieser darf maximal 16 Zeichen lang sein. Außerdem ist darauf zu achten, daß kein File (=Datei oder Programm) desselben Namens bereits auf der Diskette existiert - außer natürlich eine früher definierte relative Datei dieses Namens, mit der Sie jetzt arbeiten wollen, denn sonst gibt es einen »FILE EXISTS ERROR«.</p>
 
-        <p>",L,": Dieser Parameter teilt dem Floppy-DOS mit, daß eine relative Datei geöffnet werden soll. (Die Kommas dienen zur Abtennung von den übrigen Parametern.)</p>
+        <p><strong>",L,":</strong> Dieser Parameter teilt dem Floppy-DOS mit, daß eine relative Datei geöffnet werden soll. (Die Kommas dienen zur Abtennung von den übrigen Parametern.)</p>
 
-        <p>RL: RL enthält die gewünschte Recordlänge der Datei und kann Werte zwischen 1 und 254 annehmen.</p>
+        <p><strong>RL:</strong> RL enthält die gewünschte Recordlänge der Datei und kann Werte zwischen 1 und 254 annehmen.</p>
 
-        <p>Wichtig: Die beim ersten Offnen der Datei angegebene Recordlänge kann später nicht mehr geändert werden! (Wenn Sie versuchen, eine bereits existierende relative Datei mit einer anderen Recordlänge als bei der ersten Öffnung . angegeben zu öffnen, so wird ein »RECORD NOT PRESENT ERROR« angezeigt.)</p>
+        <p>Wichtig: Die beim ersten Öffnen der Datei angegebene Recordlänge kann später nicht mehr geändert werden! (Wenn Sie versuchen, eine bereits existierende relative Datei mit einer anderen Recordlänge als bei der ersten Öffnung angegeben zu öffnen, so wird ein »RECORD NOT PRESENT ERROR« angezeigt.)</p>
 
         <p>Zur Ermittlung der Recordlänge zählen Sie einfach alle Datenfeldlängen eines Datensatzes zusammen. Im Eingangsbeispiel ergibt das eine Länge von 15 (Nachname) + 10 (Vorname) + 15 (Straße) + 15 (Wohnort) + 11 (Telefon) = 66 Byte.</p>
 
@@ -116,21 +111,22 @@
 
         <h2>Positionieren auf einen Record</h2>
 
-        <p>Da die Positionieranweisung über den Floppy-Kommandokanal gesendet werden muß, muß dieser zuerst mit "OPEN 15,8,15,« geöffnet werden. Die erste 15 ist wieder die logische Filenummer (Um Kollisionen mit Dateien zu vermeiden, istes zweckmäßig, hier immer dieselbe logische Filenummer zu verwenden); bei der 8 handelt es sich um die Geräteadresse der Floppy. Die zweite 15 ist die Kanalnummer des Floppy-Kommandokanals.</p>
+        <p>Da die Positionieranweisung über den Floppy-Kommandokanal gesendet werden muß, muß dieser zuerst mit »OPEN 15,8,15,« geöffnet werden. Die erste 15 ist wieder die logische Filenummer (Um Kollisionen mit Dateien zu vermeiden, ist es zweckmäßig, hier immer dieselbe logische Filenummer zu verwenden); bei der 8 handelt es sich um die Geräteadresse der Floppy. Die zweite 15 ist die Kanalnummer des Floppy-Kommandokanals.</p>
 
         <p>Der Positionierbefehl ist ähnlich kompliziert aufgebaut wie der OPEN-Befehl:</p>
 
-        <p>PRINT#15, "P"+CHR$(SA)+CHR$(LB)+CHR$(HB)+CHR$(RP)</p>
+        <pre><code>PRINT#15,"P"+CHR$(SA)+CHR$(LB)+CHR$(HB)+CHR$(RP)
+</code></pre>
 
         <p>Die Parameter im einzelnen:</p>
 
-        <p>SA: Das ist die beim Öffnen der Datei festgelegte Sekun- ı däradresse.</p>
+        <p><strong>SA:</strong> Das ist die beim Öffnen der Datei festgelegte Sekundäradresse.</p>
 
-        <p>LB/HB: Das ist die Recordnummer in einer für Sie vielleicht etwas ungewohnten Form, der sogenannten Lowbyte-/ Highbyte-Form.</p>
+        <p><strong>LB/HB:</strong> Das ist die Recordnummer in einer für Sie vielleicht etwas ungewohnten Form, der sogenannten Lowbyte-/ Highbyte-Form.</p>
 
-        <p>Da mit CHR$(...) nur Werte bis zu 255 übermittelt werden können, muß die Recordnummer in zwei solcher Werte aufgeteilt werden, die sich aus folgenden Formeln ergeben: HB=INT(RN/256):LB=RN-256*HB</p>
+        <p>Da mit CHR$(...) nur Werte bis zu 255 übermittelt werden können, muß die Recordnummer in zwei solcher Werte aufgeteilt werden, die sich aus folgenden Formeln ergeben:<br>HB=INT(RN/256):LB=RN-256*HB</p>
 
-        <p>RP: Mit RP können Sie auf eine bestimmte Stelle innerhalb des Records positionieren. Wollen Sie zum Beispiel einen Record ab dem 10. Zeichen einlesen, so muß RP den Wert 10 erhalten.</p>
+        <p><strong>RP:</strong> Mit RP können Sie auf eine bestimmte Stelle innerhalb des Records positionieren. Wollen Sie zum Beispiel einen Record ab dem 10. Zeichen einlesen, so muß RP den Wert 10 erhalten.</p>
 
         <p>Wichtig: Eine Positionierung auf eine Stelle innerhalb eines Records ist nur beim Lesen dieses Records sinnvoll. Zum Schreiben eines Records muß RP auf 1 gesetzt werden!</p>
 
@@ -140,16 +136,18 @@
 
         <h2>Schreiben eines Records</h2>
 
-        <p>Vor dem Schreiben eines Records sind drei Dinge zu beachten: , - Esmuß unbedingt auf das erste Byte des Records positioniert werden (RP=1).</p>
+        <p>Vor dem Schreiben eines Records sind drei Dinge zu beachten:</p>
 
         <ul>
-            <li>Essollte sichergestellt werden, daß alle Datenfelder - und damit auch der Record - ihre vorgeschriebene Länge aufweisen. Wie eine solche Kontrolle und Korrektur aussehen könnte, sehen Sie in Listing 2 in den Zeilen 860-920. - Dader Record in einem Stück geschrieben werden muß, müssen die einzelnen Datenfelder vor dem Schreiben zusammengefaßt werden (siehe auch Listing 2 Zeile 940 bis 960). .</li>
+            <li>Es muß unbedingt auf das erste Byte des Records positioniert werden (RP=1).</li>
+            <li>Es sollte sichergestellt werden, daß alle Datenfelder - und damit auch der Record - ihre vorgeschriebene Länge aufweisen. Wie eine solche Kontrolle und Korrektur aussehen könnte, sehen Sie in Listing 2 in den Zeilen 860-920.</li>
+            <li>Da der Record in einem Stück geschrieben werden muß, müssen die einzelnen Datenfelder vor dem Schreiben zusammengefaßt werden (siehe auch Listing 2 Zeile 940 bis 960).</li>
         </ul>
-
 
         <p>Sind diese Voraussetzungen erfüllt, so kann der Record mit folgendem Befehl geschrieben werden:</p>
 
-        <p>PRINT#LF,RC$</p>
+        <pre><code>PRINT#LF,RC$
+</code></pre>
 
         <p>LF ist dabei die beim OPEN-Befehl festgelegte logische Filenummer; RC$ enthält den zu schreibenden Record.</p>
 
@@ -165,7 +163,7 @@
 
         <p>Zum Lesen eines Records gibt es zwei Möglichkeiten:</p>
 
-        <p>Die erste Möglichkeit stellt der INPUT #-Befehl dar. Mitihm kann ein Record komplett in den Computer geladen werden - unter zwei Bedingungen: Der Record darf nicht länger als 88 Zeichen sein, und er muß ein »RETURN« oder ein Komma als letztes Zeichen aufweisen.</p>
+        <p>Die erste Möglichkeit stellt der INPUT #-Befehl dar. Mit ihm kann ein Record komplett in den Computer geladen werden - unter zwei Bedingungen: Der Record darf nicht länger als 88 Zeichen sein, und er muß ein »RETURN« oder ein Komma als letztes Zeichen aufweisen.</p>
 
         <p>Das Befehlsformat: INPUT#LF,RC$</p>
 
@@ -173,7 +171,8 @@
 
         <p>Eine zweite Möglichkeit - bei einer Recordlänge von mehr als 88 Byte zudem die einzige - bietet der GET #-Befehl. Um zum Beispiel einen 100 Byte langen Record einzulesen, wäre folgende Befehlssequenz denkbar:</p>
 
-        <p>FOR I=1 TO 100:GET#LF,EG$:RC$=RC$+EG$: NEXT I</p>
+        <pre><code>FOR I=1 TO 100:GET#LF,EG$:RC$=RC$+EG$: NEXT I
+</code></pre>
 
         <p>LF ist dabei wieder die beim OPEN-Befehl festgelegte logische Filenummer.</p>
 
@@ -181,19 +180,20 @@
 
         <p>Nach Beendigung der Dateiarbeit muß die Datei geschlossen werden. Der dazu erforderliche Befehl ist - ausnahmsweise - sehr einfach.</p>
 
-        <p>CLOSE LF</p>
+        <pre><code>CLOSE LF
+</code></pre>
 
         <p>LF ist dabei wiederum die beim OPEN-Befehl festgelegte logische Filenummer.</p>
 
         <p>Zum Abschluß eine kleine Adreßverwaltung zum Experimentieren. Bitte geben Sie dazu Listing 2 ein.</p>
 
-        <p>Wichtig: Das Programm ist nur mit den in Listing 1 enthaltenen Unter-Programmen lauffähig. Tippen Sie also am besten zuerstListing 1 ein und speichern es (für spätere eigene Entwicklungen, für die Sie die Unterprogramme gut gebrauchen können). Danach geben Sie zusätzlich Listing 2 ein und speichern das Gesamtprogramm dann ebenfalls auf Diskette.</p>
+        <p>Wichtig: Das Programm ist nur mit den in Listing 1 enthaltenen Unter-Programmen lauffähig. Tippen Sie also am besten zuerst Listing 1 ein und speichern es (für spätere eigene Entwicklungen, für die Sie die Unterprogramme gut gebrauchen können). Danach geben Sie zusätzlich Listing 2 ein und speichern das Gesamtprogramm dann ebenfalls auf Diskette.</p>
 
         <p>Da das Programm selbst ausführlich dokumentiert ist, möchte ich an dieser Stelle nur noch kurz ein paar Bedienungshinweise geben:</p>
 
         <p>Nachdem das Hauptmenü ausgegeben wurde, geben Sie als erstes »1« (+ "RETURN") ein. Dadurch werden alle notwendigen Vorbereitungen für die Dateiarbeit getroffen. Sobald das Hauptmenü wieder erschienen ist, können Sie wahlweise (und auch abwechselnd) Adressen ein- oder ausgeben. Bei der Ausgabe wird dabei der Nachname als Index verwendet. Nach Beendigung der Dateiarbeit geben Sie »4« ein, wodurch die Datei ordnungsgemäß geschlossen und das Programm beendet wird.</p>
 
-        <p>Das Programm ist zwar recht spartanisch, dafür aber sehr flexibel. Beides soll Sie dazu animieren, selbst tätig zu werden und das Programm nach Ihren speziellen Wünschen abzuändern und zu ergänzen. Denn auch bei der Datenverwaltung gilt, wie überall: Übung macht den Meister! "</p>
+        <p>Das Programm ist zwar recht spartanisch, dafür aber sehr flexibel. Beides soll Sie dazu animieren, selbst tätig zu werden und das Programm nach Ihren speziellen Wünschen abzuändern und zu ergänzen. Denn auch bei der Datenverwaltung gilt, wie überall: Übung macht den Meister!</p>
 
         <address class="author">(Martin Hecht/gk)</address>
 
