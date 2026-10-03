@@ -80,6 +80,21 @@ MEASURED on SH8601: 31 blocks are disk-backed and **68 are hand transcriptions**
 code examples the magazine sets INSIDE the body text, and no listing is missing
 on their account: every `Listing N` the articles cite has its own figure.
 
+**In a hand-typed `<pre>`, LINE STRUCTURE is in scope.** Most of the damage
+there is not word-level at all: lines joined together, two lines run into one,
+a line break inserted where the print has none. "Word-level substitutions only"
+does not obviously permit re-breaking them, and it must — on 8612 a hand-typed
+listing had **21 printed lines missing** and every other gate was green.
+
+Two things that can only be checked mechanically:
+
+- **Monospace spacing, by glyph column.** `TAB(15) "B"` against `TAB(15)  "B"`
+  is invisible in prose reading and obvious when the columns are lined up
+  against the crop. Compare column positions, not words.
+- **A run of repeated characters must be COUNTED.** Two agents disagreed 20
+  against 21 on a run of colons in one BASIC line. Count them in the crop
+  programmatically; do not eyeball a run of more than about four.
+
 **A brief that says "skip `<pre>`" therefore leaves the least-checked text in the
 issue unchecked.** Mine did, and the blocks it excused read `1da` for `lda`,
 `#804` for `#$04`, `bp1` for `bpl`, `a 00645` for `a 00b45`. Say

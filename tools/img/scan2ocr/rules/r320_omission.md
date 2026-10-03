@@ -44,11 +44,27 @@ starting where a drop cap was restored (`as tun` vs `Was tun`), a listing
 fragment deliberately deleted as a duplicate, and a table whose cells now split
 the 4-word probes.
 
+**The gate cannot see text the classifier never kept.** All three of 8612's
+real losses were outside its reach: a `noise`-labelled block (p19), a line
+absent from `labels.json` altogether (p23), and merged column tops (p163).
+Earlier steps had found them by eye. So run the companion sweep over the
+`noise` and `other` blocks and screen what comes back — on 8612 that gave 71
+candidates, all of them figure text, which is the expected population. A
+page whose `noise` block holds prose is the finding.
+
 Known false-positive sources, excluded or expected:
 
-- **listing blocks** are skipped — the disk `.txt` is the correct petcat
+- **listing blocks** are skipped **only when the article references a disk
+  file for that listing** — there the disk `.txt` is the correct petcat
   rendering while the OCR reading of the printed listing is garbled (`mps 891`
-  for `mps 801`)
+  for `mps 801`). A **hand-typed** listing has no disk file to be right, and is
+  checked like prose.
+
+  MEASURED on 8612: article 74's NMI routine is hand-typed, **21 printed lines
+  from p76 were missing**, and this gate reported nothing. It was found by
+  diffing the HTML against the PDF text layer and cropping the suspects. Of
+  8612's 38 listings, 36 are disk-backed and 2 are not; skipping all of them
+  is what hid this.
 - **ads and non-article matter** are excluded by using `order` rather than every
   block on the page; before that filter p140's job ad produced six spurious hits
 - **our own OCR corrections** move the HTML away from the OCR, hence a probe

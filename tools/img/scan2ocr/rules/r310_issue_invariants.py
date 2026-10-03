@@ -10,7 +10,8 @@ HARD failures must be zero and exit non-zero.  SOFT findings are a triage list:
 each has a known false-positive population documented beside it, because the
 recurring mistake is "fixing" a product name, a German compound or a print typo.
 
-usage:  r310_issue_invariants.py issues/8609 [--soft]
+usage:  r310_issue_invariants.py [issues/<ID>] [--soft]
+        With no path it uses r000_issue's selected issue (rules/ISSUE.txt).
 """
 import glob, io, os, re, sys
 from html.parser import HTMLParser
@@ -435,6 +436,70 @@ def main(d):
                 H('<img> target does not exist (the build skips it silently)',
                   f, src)
 
+    # ------------------------------------------------------------------
+    # Four checks added from 8612's review. Every one of these defects was
+    # found by the OWNER READING, and nothing in the chain could see them.
+    # ------------------------------------------------------------------
+
+    # 1. An ASIDE HEADING MUST NOT OUTRANK ITS ARTICLE (r190/r290).
+    #    h2 is correct when the body has h2 sections of its own; it is wrong
+    #    when the aside would hold the file's only h2, or would outrank a body
+    #    built from h3. 8612: article 8's §202a box, article 91's bio box.
+    for f, s_, b in arts:
+        asides = re.findall(r'<aside\b.*?</aside>', b, re.S)
+        if not asides:
+            continue
+        outside = b
+        for a in asides:
+            outside = outside.replace(a, ' ')
+        body_levels = {int(x) for x in re.findall(r'<h([23])\b', outside)}
+        for a in asides:
+            for lv in {int(x) for x in re.findall(r'<h([23])\b', a)}:
+                if lv == 2 and 2 not in body_levels:
+                    H('aside heading outranks its article (h2, body has no h2)',
+                      f, re.sub(r'<[^>]+>', '', (re.search(r'<h2[^>]*>(.*?)</h2>', a, re.S)
+                                                 or re.match('', '')).group(1)
+                                if re.search(r'<h2[^>]*>(.*?)</h2>', a, re.S) else '')[:40])
+
+    # 2. A <p> THAT IS ONLY A PAGE POINTER is the layout speaking, not the
+    #    author, and is never transcribed (r080). 8612 kept "Anleitung auf
+    #    Seite 58"; 8611/50 kept "Listing auf Seite 54". A sweep of 8612 found
+    #    16 "auf Seite N" and exactly ONE was a pointer, so this must match the
+    #    WHOLE paragraph, never a substring.
+    PTR = re.compile(r'^\s*(?:\w+\s+)?(?:auf|von)\s+Seite\s+\d+\s*\.?\s*$', re.I)
+    for f, s_, b in arts:
+        for mm in re.finditer(r'<p[^>]*>(.*?)</p>', b, re.S):
+            txt = re.sub(r'<[^>]+>', '', mm.group(1)).replace('&nbsp;', ' ')
+            if PTR.match(txt):
+                H('<p> is only a page pointer (layout, not text)', f, txt.strip()[:40])
+
+    # 3. TWO ARTICLES MUST NOT SHARE A BARE START PAGE (r080). They get
+    #    lettered pages NNNa / NNNb in printed order. 8611 was lettered on
+    #    instruction and it never became a rule, so 8612 repeated it twice
+    #    (169 and 193) and the owner caught both.
+    starts = {}
+    for f, s_, b in arts:
+        mm = re.search(r'64er\.pages" content="([^"]+)"', s_)
+        if not mm:
+            continue
+        first = mm.group(1).split(',')[0].strip().split('-')[0].strip()
+        if re.match(r'^\d+$', first):
+            starts.setdefault(first, []).append(f)
+    for pg, fs in sorted(starts.items()):
+        if len(fs) > 1:
+            for f in fs:
+                H('two articles share bare start page (needs NNNa/NNNb)', f, 'p' + pg)
+
+    # 4. A <br> INSIDE A <td> is usually the printed COLUMN's wrap, not the
+    #    author's line break, and is not reproduced (r160/r190). SOFT: an
+    #    author's break in a cell is legitimate, so this is a list to read,
+    #    not a failure. 8612 shipped 283 of these before the owner's review.
+    for f, s_, b in arts:
+        n = sum(len(re.findall(r'<br\s*/?>', c))
+                for c in re.findall(r'<td\b[^>]*>(.*?)</td>', b, re.S))
+        if n:
+            S('<br> inside a <td> (column wrap, or the author\'s?)', f, '%d' % n)
+
     for k, f, x in hard: print(f'HARD  {k:<52} {f[:40]} {x}')
     if '--soft' in sys.argv:
         for k, f, x in soft: print(f'soft  {k:<52} {f[:40]} {x}')
@@ -455,4 +520,17 @@ def main(d):
     return 1 if hard else 0
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1] if len(sys.argv) > 1 else 'issues/8609'))
+    # DEFAULT TO THE SELECTED ISSUE. This used to fall back to a hard-coded
+    # 'issues/8609', so a bare `r310_issue_invariants.py` audited 8609 and
+    # reported ITS findings -- on 8612 that was "articles 55 HARD 4", four
+    # r190 byline splits in articles that do not exist in 8612. Every other
+    # rule in the chain takes the issue from r000_issue; now so does this.
+    if len(sys.argv) > 1 and not sys.argv[1].startswith('--'):
+        target = sys.argv[1]
+    else:
+        import r000_issue
+        # rules/ -> scan2ocr/ -> img/ -> tools/ -> repo root
+        _repo = os.path.abspath(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..'))
+        target = os.path.join(_repo, 'issues', r000_issue.ISSUE)
+    sys.exit(main(target))

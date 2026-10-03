@@ -41,12 +41,21 @@ count, different glyph at one position → OCR; fix. Different count
 
 ## OCR vs print typo: character-count heuristic
 
-**The rule.** OCR is a character-level substitution / spacing
-operation: glyph confusion, line-break hyphen artifacts, lost
-spaces. It does NOT add or drop letters. If a candidate has the
-wrong number of letters compared to the German-correct form,
-that's a print typo, not OCR. **Leave it.** Apply this heuristic
-FIRST; if the candidate fails it, skip — don't even open the block index.
+**The rule. THE CROP DECIDES.** Open the 600 dpi crop and read the word. That
+is the test, and nothing overrides it.
+
+OCR is mostly a character-level substitution / spacing operation: glyph
+confusion, line-break hyphen artifacts, lost spaces. So a candidate whose
+letter count differs from the German-correct form **may** be a print typo —
+treat that as **a hint, nothing more**, and settle it on the crop.
+
+This rule used to say the opposite: that a wrong letter count proves a print
+typo, that you should "leave it", and that the heuristic is applied FIRST
+without even opening the block index. MEASURED over ~260 fixes on 8612, that
+instruction would have KEPT `verlier`→`verliert`, `Textbildschirm`→
+`Textbildschirms`, `emem`→`einem`, `Pawrn`, `zusätzliicher` and `COME!I` —
+every one an OCR add or drop proven on the crop. It also contradicted this
+file's own *Doubled letters* section.
 
 **Valid OCR fixes** (same character count, or pure spacing / hyphen):
 
@@ -173,12 +182,22 @@ them as confirmed until a crop settles them.
 ```bash
 OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
-grep -i '<word>' "$OUT_DIR"/blocks/p<NNN>.txt
+# labels.json carries the FULL block text; blocks/pNNN.txt truncates at ~300
+# chars, so a grep there misses most body text.
+$PY -c "import json,sys; d=json.load(open(sys.argv[1])); \
+  [print(b.get('id'), (b.get('text') or '')[:200]) for b in d.get('blocks', []) \
+   if sys.argv[2].lower() in (b.get('text') or '').lower()]" \
+  "$OUT_DIR"/<NNN>.labels.json '<word>'
 ```
 
-If the block index returns the **corrected** form, the two engines disagree and
-the fix is authorised. If it returns the same oddity, the candidate is
-undecided -- settle it on a 600 dpi crop or leave it.
+**The block index is a LOCATOR, not a second engine.** It tells you which page
+and which block to crop. It cannot confirm or refute anything, because it is
+the HTML's own ancestor: it always shows the same oddity, and on 8612 the
+"engines disagree → apply" branch **never fired once** in the whole build.
+Every fix rested on the crop.
+
+Read it through `labels.json`, not the `.txt`: the `.txt` truncates at about
+300 characters, so a grep against it misses most body text.
 
 ## Pass 1 — line-break hyphen artifacts
 
@@ -186,7 +205,9 @@ Find every `X-y` token where the second half starts lowercase:
 
 ```bash
 grep -hoE '[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+' issues/<YYMM>/*.html \
-  | sort -u | head -200
+  | sort -u
+# NO `head`. The checks here used to pipe into `head`, which hid a planted
+# fault as entry 20 of 23, and they never failed on hits. Print every hit.
 ```
 
 Most are line-break artifacts: `Drucker` was printed at column edge
@@ -264,6 +285,22 @@ character class when a scan shows a different confusion; the shape of the
 check -- *a token whose only content is the ambiguous glyph* -- is the part
 that transfers. The district-code case has its own gated check in r310.
 
+### A token that is not valid hex is OCR damage
+
+The hard exception — skip Pass 2 substitution when the token starts with `$` —
+exists so that valid hex is never "corrected". It has **no case for OCR damage
+that makes the token invalid hex**: `$ddOd`, `$ffel`, `10le`, `$FDO0` all
+contain `O`, `l` or `I`, which are not hex digits. A token that cannot be hex
+is damage; fix it from the crop. (8612 held these back until the crops were
+checked, then applied them.)
+
+### `<pre>` IS in this rule's scope
+
+Every sub-agent's worklist on 8612 contained `<pre>` items while the briefing
+forbade touching `<pre>`, and nothing said which won. It is in scope: word-level
+OCR damage inside a listing is damage like any other. Line STRUCTURE inside a
+hand-typed listing belongs to r325.
+
 ### Pass 2 must sweep PUNCTUATION, not only letters
 
 MEASURED on SH8601, AFTER a full 280 run and after r310/r320 and the site build
@@ -299,7 +336,9 @@ Find words with internal lowercase→uppercase boundaries:
 
 ```bash
 grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' issues/<YYMM>/*.html \
-  | sort -u | head -200
+  | sort -u
+# NO `head`. The checks here used to pipe into `head`, which hid a planted
+# fault as entry 20 of 23, and they never failed on hits. Print every hit.
 ```
 
 **CRITICAL: the capital-boundary regex above misses the most common

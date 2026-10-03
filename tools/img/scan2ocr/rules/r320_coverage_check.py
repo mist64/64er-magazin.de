@@ -51,10 +51,22 @@ for f in sorted(glob.glob(ISSUE_DIR + '/*.html')):
     # invents false positives and hides a real one whose text turns on < > &.
     arttext[f] = ' '.join(norm(html.unescape(
         re.sub(r'<[^>]+>', ' ', s[i:s.rfind('</article>')] if i >= 0 else s))))
+    # A LETTERED page ('169a', '193b') is r080's convention for two articles
+    # sharing a start page. `part.isdigit()` is False for it, so both articles
+    # claimed NO pages and p169's blocks fell to whichever article's range
+    # covered 169 -- four spurious UNACCOUNTED findings on 8612. Strip the
+    # suffix: the letter orders the two articles, it is not part of the page.
+    def _pg(tok):
+        mm = re.match(r'^(\d+)[a-z]?$', tok.strip())
+        return int(mm.group(1)) if mm else None
     for part in m.group(1).split(','):
         part = part.strip()
-        rng = range(int(part.split('-')[0]), int(part.split('-')[1]) + 1) if '-' in part \
-              else ([int(part)] if part.isdigit() else [])
+        if '-' in part:
+            lo, hi = (_pg(x) for x in part.split('-', 1))
+            rng = range(lo, hi + 1) if lo is not None and hi is not None else []
+        else:
+            one = _pg(part)
+            rng = [one] if one is not None else []
         for p in rng: page2art.setdefault(p, []).append(f)
 
 listings = ' '.join(' '.join(norm(io.open(f, encoding='utf-8', errors='replace').read()))
@@ -115,3 +127,15 @@ for p in unclaimed:
     except FileNotFoundError:
         pass
     print(f'  p{p:<4}{what}')
+
+# EXIT STATUS -- the comment above has said "exit non-zero" since it was
+# written, and nothing ever did. This script exited 0 with UNACCOUNTED hits,
+# exited 0 with a planted deletion, and exited 0 on CANNOT RUN, so every
+# exit-code consumer read all three as a pass.
+#
+# UNCLAIMED PAGES is informational: ads are the legitimate population there,
+# so it does not affect the status.
+if pages_read == 0:
+    sys.exit(2)      # could not run -- not a pass
+if missing:
+    sys.exit(1)      # real findings
