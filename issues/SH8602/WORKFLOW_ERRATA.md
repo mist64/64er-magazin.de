@@ -198,3 +198,13 @@ code (it strips tags, keeps entities). The script calls bare `python3`.
 Also: which `64er.issue` form a Sonderheft takes is shown only by the Usage
 example (`'Sonderheft 7/86'`), and SH8601 shipped `SH8601` — I briefed from
 the outlier first. Found by the 080 sub-agent; correction ~3 min.
+
+## 110 — the Sonderheft case is "all" in the header and monthly in the body
+
+"Applies to: all — the README's release table carries the Sonderheft dates
+too". It carries bounds ("**vor** 14. Februar 2026", "ca.", "unbekannt"),
+which "Convert `TT. Monat 20JJ`" cannot read; the Vorschau derivation is
+monthly-only; the Verification grep `"${YYMM:2:2}/${YYMM:0:2}"` with 8602
+digits matches the MONTHLY 02/86 bullet (and breaks on `SH8602`). Nothing
+says what to do with a bullet that holds a bound. Wrote a provisional date and
+carried it to PAUSE 2. Found by the 110 sub-agent.
