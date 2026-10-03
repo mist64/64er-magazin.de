@@ -1,6 +1,6 @@
 # 220 — Fill `64er.index_category` / `64er.index_title` from the annual CSV
 
-**Applies to:** monthly — the annual Jahresinhaltsverzeichnis CSVs are keyed by monthly `YYMM` only — none of the three at the repo root contains a Sonderheft row, so a Sonderheft has no input at all. Seven of the eight published Sonderhefte carry zero `index_category` (`SH8501` is the lone outlier and looks like a mis-route off the monthly `8501` rows).
+**Applies to:** all — RE-CLASSIFIED 2026-10-03. A monthly takes the annual `Jahresinhaltsverzeichnis <YYYY>.csv`; a **Sonderheft takes `Gesamtinhaltsverzeichnis Sonderhefte.csv`**, a separate file at the repo root with a different layout. The old classification was `monthly`, on the true but incomplete evidence that no Sonderheft appears in the ANNUAL CSVs — which ruled out one file, not the input.
 
 **Goal:** every article that appears in the year's
 Jahresinhaltsverzeichnis (annual index) CSV gets its `index_category`
@@ -22,12 +22,44 @@ the three:
 cut -d, -f1 Jahresinhaltsverzeichnis*.csv | sort -u | grep -c SH   # → 0
 ```
 
-That is why this rule is `Applies to: monthly`. On a Sonderheft it is recorded
-`not applicable — kind` and no meta is written. **Do not fall back to the
-same-numbered monthly's rows** — `SH8501` in the repo carries 27
-`index_category` values that appear to have come from the monthly `8501` rows,
-which is the mis-route this note exists to prevent; the other seven published
-Sonderhefte correctly carry none.
+That shows only that the ANNUAL CSVs hold no Sonderheft. **A Sonderheft's
+index lives in its own file**, and this rule runs for both kinds.
+
+### A Sonderheft's source: `Gesamtinhaltsverzeichnis Sonderhefte.csv`
+
+Different file, different layout, different issue key. There is no header row.
+
+| col | holds | example |
+|---|---|---|
+| 0 | category | `Software-Grundlagen` |
+| 1 | subcategory | `Basic-Optimierung` |
+| 2 | title | `So macht man Programme schneller` |
+| 3 | **the issue, as `N/YY`** | `2/86` for `SH8602` |
+| 4 | page (a single page, not a range) | `44` |
+| 5-6 | empty | |
+
+So the key is **`N/YY` in column 3**, not `SH86NN` and not column 0. Map it
+from the directory name: `SH8602` → `2/86`. MEASURED: the file covers every
+Sonderheft, `1/85`-`8/85` and `1/86`-`8/86` (SH8602 → 36 rows, pages 9-161;
+SH8601 → 27 rows).
+
+The category/subcategory pair is written as `category|subcategory`, which is
+the form `SH8501` already carries.
+
+**`SH8501` is NOT a mis-route — it is the one Sonderheft done correctly.** Its
+27 `index_category` values read `Listings zum Abtippen|Assembler`,
+`…|Basic-Erweiterung`, `…|Floppy` and so on, which match this file's `1/85`
+rows. The monthly `8501` rows carry entirely different categories
+(Abenteuerlösungen, Aktuell, Hardware-Tests), so they cannot be the source.
+An earlier note here had it backwards and told the builder to write nothing.
+
+**Consequence, recorded:** `SH8601` shipped with **0** `index_category` across
+its 29 articles because this rule was skipped as `not applicable — kind`.
+Published; not fixed retroactively (owner, 2026-10-03). Do not repeat it.
+
+**The apply script reads only the monthly layout** (`line.startswith(f"{code},")`
+and `parts[1]` pages / `parts[2]` category / `parts[4]` title). A Sonderheft
+needs its own reader for the columns above; write one as part of this step.
 
 Each row: `YYMM,pages,category,subcategory,title`. Pages use em-dash
 `—` as range separator. Category + subcategory become

@@ -86,8 +86,12 @@ header**, on its own line immediately under the H1 and before `**Goal:**`:
 ```
 # 220 — Fill `64er.index_category` / `64er.index_title` from the annual CSV
 
-**Applies to:** monthly — the Jahresinhaltsverzeichnis CSVs are keyed by
-monthly `YYMM`; no Sonderheft has a row in any of them.
+**Applies to:** all — a monthly takes the annual Jahresinhaltsverzeichnis
+CSV; a Sonderheft takes `Gesamtinhaltsverzeichnis Sonderhefte.csv`, keyed
+`N/YY` in column 3 (`SH8602` → `2/86`). RE-CLASSIFIED 2026-10-03: the old
+`monthly` rested on "no Sonderheft has a row in any of them", which is true
+of the ANNUAL CSVs and ruled out one file rather than the input. SH8601
+shipped with no index metadata as a result.
 
 **Goal:** …
 ```
@@ -113,12 +117,22 @@ the outcome into `issues/<ID>/LOG.md`, in the same place and shape every other
 step's result goes, before advancing to the next number:
 
 ```markdown
-## Step 220 (index_meta) — not applicable — kind
+## Step 240 (rubric_banners) — not applicable — kind
 
 Rule header: `Applies to: monthly`. `issues/SH8601/issue.json` → `"kind": "sonderheft"`.
-Evidence: `grep -c '^SH8601,' Jahresinhaltsverzeichnis\ 1986.csv` → 0.
+Evidence: SH8601's `92 Bücher zum C 128.html` carries no `92-0.png`, and the
+issue has no Editorial/Vorwort or Fehlerteufelchen article at all.
 No files touched.
 ```
+
+**The evidence must rule out the INPUT, not one file.** This example used to be
+step 220, with `grep -c '^SH8601,' Jahresinhaltsverzeichnis 1986.csv` → 0 as
+its evidence. That grep is true and the conclusion was wrong: a Sonderheft's
+index lives in `Gesamtinhaltsverzeichnis Sonderhefte.csv`, keyed `N/YY`, so
+220 applies to both kinds and has been re-classified. SH8601 shipped with no
+index metadata because this example taught the skip. Before writing
+`not applicable — kind`, ask what the input for THIS kind would be, and show
+that it does not exist.
 
 Three things are mandatory in that entry and all three are checkable:
 
