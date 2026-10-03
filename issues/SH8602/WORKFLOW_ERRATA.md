@@ -368,3 +368,13 @@ the current issue. The evidence example path (`/tmp/64er_<YYMM>_pages_600/`)
 and "render at 300 dpi" contradict r000's masters600 rule. Nothing says what
 to do with a formula an earlier step faked with a CSS overline. Found by the
 230 sub-agent.
+
+## 250 — check 4 accepts a source paragraph before a byline; $PY unset
+
+The rule puts a single-topic source AFTER the `<address>`; check 4 accepts one
+followed by `<address>`, so any pre-byline prose wrongly tagged `source`
+passes (seen on a plant). Check 4 uses `$PY` which the block never sets (runs
+as `-c …`, a silent no-op). Pass 1's label grep (Preis, Vertrieb, Anbieter)
+would tag Impressum lines if followed literally. The import's small-type tag
+was 13/14 OCR junk on SH8602, not "every one a source note" as measured on
+8609. Found by the 250 sub-agent.
