@@ -426,3 +426,22 @@ even the `;` header the rule demands is a prg edit r000 sends to the user.
 "check the r330 verdicts" — r330 runs after r300. Stale inputs (fehlerteufelchen
 PDFs, "PDF pages 4-7") when the later issues are imported and greppable.
 Found by the 300 sub-agent.
+
+## 320 — the dropped-listings companion crashes on lettered pages and is vacuous on MSE/BASIC issues
+
+`r320_dropped_listings.py` `pages_of()` does `int(b)` on `131b` and dies.
+Run on a letter-stripped copy it reports 0 — but it only examines SMON
+monitor-dump blocks (`a 1234 xx`), of which SH8602 has none, so a planted
+removal of every `<pre>` in the issue still reports 0. The rule should say
+which listing formats it covers and that "0" on an issue without dumps is not
+evidence.
+
+## 310 — the intro-badge check has no adjudication path
+
+`badge bled into the intro (r280)` matches any intro opening `\d{1,2}\s`
+and calls `H()` directly, not via `ADJUDICATED_HERE`, so neither
+adjudicated.txt nor a page note can clear a correct intro such as SH8602/159
+"20 KByte adressierbarer Speicher …" — the same defect class as the old
+printed-period check. Fix: route it through `ADJUDICATED_HERE(..., 'badge-intro')`
+and/or skip a number followed by a unit. Not edited mid-build (r000); HARD
+stays at 1, adjudicated.
