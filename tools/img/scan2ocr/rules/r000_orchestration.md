@@ -139,7 +139,8 @@ Three things are mandatory in that entry and all three are checkable:
    header; do not run the step behind the contract's back.
 
 At the end of the issue, every number in the chain has exactly one `LOG.md`
-disposition: ran-and-verified, or `not applicable — kind`. A number with
+disposition: ran-and-verified, `not applicable — kind`, or `not run — disabled`
+(a step whose own rule header says DISABLED, as r145 does). A number with
 neither is an unfinished issue, and that is precisely the state the old silent
 skip made invisible.
 
@@ -159,6 +160,13 @@ is part of the work (see *THE SCAN IS THE ONLY INPUT*).
 **PAUSE 1 — before step 005.** The two questions about the physical copy:
 binding, and which pages are which paper. They cannot be answered from a scan,
 and 005 grades nothing until they are. See the section below.
+
+For `binding: spread` the paper answer is **fixed** until the spread variant
+learns per-page classes: one measured profile under the legacy `colors` key,
+wrapper graded with the interior (decided 2026-09-27, 8610 and 8611). A spread
+descriptor carrying `paper` with `high_pages` is not honoured — every page is
+graded with the single profile, silently. So ask the owner only to CONFIRM that,
+not to choose.
 
 **PAUSE 2 — the image boundary.** The chain runs from 005 to the end of the HTML
 with **no cut figures**, then stops and hands over. What it delivers:
@@ -491,6 +499,7 @@ them through this table.
 | 120 | 9 | prg_from_d64 |
 | 130 | 10 | place_figures |
 | 140 | 11 | 64er_id |
+| 145 | — | extract_figures — **DISABLED** 2026-08-22. Do not run it; its `LOG.md` disposition is `not run — disabled` |
 | 150 | 12 | place_images |
 | 160 | 13 | fill_tables |
 | 170 | 14 | transcribe_todo_listings |
@@ -718,8 +727,8 @@ commit by `git add -A`. Both are preventable:
 
 1. **Never `git add -A` / `git add .` during an issue build.** Stage by
    **explicit pathspec** of the rule's expected file set. Several rule
-   scripts self-stage (`r060_md_to_html.sh`, `r080_split.sh`,
-   `r100_toc_category.sh` run `git add`/`git rm`), so the index may already
+   scripts self-stage (`r060_md_to_html.sh`, `r070_html_cleanup.sh`,
+   `r080_split.sh`, `r100_toc_category.sh` run `git add`/`git rm`), so the index may already
    be partly populated when you arrive — reconcile it deliberately, per
    file, before committing.
 
@@ -1003,10 +1012,13 @@ whichever script ran last. The point is not that the found ones are wrong today
 -- for 8612 they are identical to what this command makes. The point is that
 you cannot know that without checking, and the check is the derivation.
 
-**Then verify:** one thumb per master, no orphans either way, and every thumb
-exactly 1/16 of its own master's width -- per page, because page widths vary
-within an issue (8612 runs 20485 to 20862 px) and a set made from different
-scans will not track them.
+**Then verify:** one thumb per master, no orphans either way, and every thumb's
+width and height within **1 px** of its master's / 16 -- per page, because page
+widths vary within an issue (8612 runs 20485 to 20862 px) and a set made from
+different scans will not track them. Do NOT test for equality: masters are not
+multiples of 16 and `-scale 6.25%` rounds to nearest, so a 20485 px master gives
+a 1280 px thumb, not 1281. `ceil(w/16)` reports 9 false mismatches in 8612's
+first ten pages; the 1 px test reports 0 of 200.
 
 **NEVER WRITE INTO `/Volumes/S/png/`. Nothing stops you** -- the volume is
 writable and the files are not mode-locked; the only thing protecting the only
@@ -1036,6 +1048,7 @@ did not. Found 2026-10-01, all dead:
 |---|---|---|
 | r150, r160 | `/tmp/64er_<YYMM>_pages/`, `/tmp/64er_<YYMM>_full.txt` | `<tmp>/masters600/NNN.png` and this issue's own OCR |
 | r160 | `~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff` | `<tmp>/masters600/NNN.png` — same page, already deskewed and cut |
+| r130 | `issues/<YYMM>/64er_*.pdf`, `issues/<YYMM>/png/` | `<tmp>/masters600/NNN.png` and `<OUT_DIR>/blocks/pNNN.txt` / `NNN.labels.json`. Neither input exists during a build: the PDF is made at 006, after PAUSE 2, and there is no `png/` at all |
 | r300, r330 | `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf` | **gone.** For another issue use the repo's own `issues/<YYMM>/64er_19XX-XX.pdf`, or its scans |
 
 **What to do when a path in a rule does not exist.** Do not hunt for it and do
@@ -1636,11 +1649,30 @@ Two cheaper companions worth running at the same time:
   converter on 183-184. The quickest way to read the list is a montage of the
   unclaimed pages' top 150 thumb rows: an ad has no rubric banner, a listing
   page has one.
-  The annual `Jahresinhaltsverzeichnis` gives the authoritative page range per
-  article and caught two understated ranges in 8609 (71-74, 82-84).
-- **dangling cross-references**: text that says `Bild 3` / `Tabelle 2` /
-  `Listing 4` while the article has no such caption. A reference with no target
-  usually means the figure and its caption were dropped together.
+  The annual `Jahresinhaltsverzeichnis` is **a hint to check on the masters**,
+  not an authority: it caught two understated ranges in 8609 (71-74, 82-84),
+  but on 8612 it was wrong in both directions — ads counted into a range, and
+  the Centronics article given as 52—57 where it actually runs 52-67.
+
+## A CHECK SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL
+
+Write the check, then **plant the fault it is meant to catch** and watch it
+fire. A check that has never failed is not a check; it is a sentence that looks
+like one, and it is worse than nothing because it buys false confidence.
+
+MEASURED on 8612 — five shipped checks could not fail at all:
+
+| rule | why it could never fail |
+|---|---|
+| r260 | `PYEOF && \` is not a valid heredoc terminator, so bash swallowed check 2 and Python died. Repaired, `&& echo FAIL` keyed on exit status (always 0) and printed FAIL on clean output |
+| r220 | the routing check filtered on `p[1].isdigit()`, dropping every range row (`172—173`): 26 of 55 rows checked, and a planted misroute passed |
+| r280 | checks 1-2 piped into `head`, which hid a planted fault as entry 20 of 23 |
+| r240 | the editorial grep was unanchored with an unescaped `.`, so a planted `src="18-0.png"` passed |
+| r320 | exited 0 on findings AND on `CANNOT RUN`, so every exit-code consumer read a pass |
+
+Four of the five were found by planting a fault. None had ever been seen to
+fail. Test **output non-empty**, not exit status, unless the script sets the
+status deliberately — and never pipe a check's findings into `head`.
 
 ## End-of-issue gate: the issue must BUILD
 
@@ -1662,6 +1694,33 @@ the site does, and it catches what no per-rule verification can:
 
 The generator serves `out/` on :8000 when a `local` build finishes -- kill it.
 
+## EVERY HTML COMMENT IS GERMAN, AND IS FOR THE READER
+
+An HTML comment ships. It is part of the published page, so it is written for
+whoever reads the source, in the language of the magazine.
+
+**The test is HARM, not truth.** A comment earns its place only if a reader
+would otherwise be misled or come to harm. "Die Leserfragen sind ohne Namen
+gedruckt" is true, is about the print, and fails the test — the page already
+shows it. "Druckfehler: Busy liegt an Pin 11, nicht an Pin 16" stops someone
+miswiring a board, and passes.
+
+So: **German, naming a print error a reader would otherwise act on, and saying
+what is correct. Nothing else.** Never crop geometry, never a `masters600`
+path, never a step number, never a date, never who decided, never an ordinary
+absence the page already shows, and never a gate adjudication — those live in
+`adjudicated.txt`.
+
+House style, from the hand-built issues: *"Die beschriebenen Programme sind
+weder abgedruckt noch befinden sie sich in 84XX/8404.D64 auf der 64'er
+CD-ROM."* It states what the printed magazine has or lacks, addressed to a
+reader.
+
+MEASURED 2026-10-02: 383 comments across 42 issues, 99 of them English — and
+the English ones sit almost entirely in the chain-built issues (8612 26/26,
+8611 22/22, SH8601 14/16) while 8404, 8602 and SH8501 have none. These rules
+taught the drift; this section ends it. 8612 went from 26 comments to 2.
+
 ## Deliberate deviations from print must be marked in place
 
 The standing rule is that the printed page wins, and every review pass is told
@@ -1674,10 +1733,10 @@ the change**, as an HTML comment saying what the print has and that the
 difference is intentional:
 
 ```html
-<!-- deviates from print, deliberately: p150 sets one heading
-     "Kleines Assembler-Lexikon: TurboAss- und ASSI/M-Besonderheiten"
-     over the Lexikon box, but the second half belongs to these two
-     tables. Split here; do not "restore" it to the printed form. -->
+<!-- Bewusste Abweichung vom Druck: Im Heft steht eine einzige Überschrift
+     "Kleines Assembler-Lexikon: TurboAss- und ASSI/M-Besonderheiten" über dem
+     Lexikon-Kasten; die zweite Hälfte gehört aber zu diesen beiden Tabellen.
+     Hier getrennt. -->
 ```
 
 Mark both ends when the change moves text between two places, so whichever end a
