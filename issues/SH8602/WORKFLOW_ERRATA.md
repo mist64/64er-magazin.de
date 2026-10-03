@@ -378,3 +378,13 @@ as `-c …`, a silent no-op). Pass 1's label grep (Preis, Vertrieb, Anbieter)
 would tag Impressum lines if followed literally. The import's small-type tag
 was 13/14 OCR junk on SH8602, not "every one a source note" as measured on
 8609. Found by the 250 sub-agent.
+
+## 260 — check 1 FAILs on a correct program-name heading and has no way to be told
+
+"A heading that IS code stays in caps — 8609's `POKE 1,0 ???` is the only hit
+in the corpus" — SH8602's `UNNEW` (a program name) is another; the check only
+exempts ROM keywords, so the correct tree reports FAIL, and r260 does not read
+`adjudicated.txt` the way r310 does. "Applies to: all — the print sets
+headings in caps in both kinds" is false for SH8602. "`14mal schneller
+laden`, which check 2 flags" — check 2 now skips digit-initial headings. Found
+by the 260 sub-agent.
