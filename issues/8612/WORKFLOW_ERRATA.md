@@ -685,3 +685,10 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
   the checksummer path) and 16 issues use it, but r130 never mentions comparing the file's first/last line with the print.
 - **What would have prevented it.** r130: "For every disk-backed listing, compare the file's first and last line number with the
   printed listing; where they differ, add `data-range="<first>-<last>"` (comma-separated runs allowed). The download stays the full file."
+
+## r310 without an argument checks issues/8609, not the selected issue
+- **What happened.** At a review fix, `r310_issue_invariants.py` run without a path printed "articles 55 HARD 4" (r190 byline
+  splits in "64 Tips & Tricks …", "66 …", "68 Die CP_M-Ecke"), none of which exist in 8612. The script's fallback is the hard-coded
+  `issues/8609` (r310:458), while every other rule takes the issue from r000_issue (rules/ISSUE.txt = 8612).
+- **What would have prevented it.** r310 should default to `r000_issue`'s selected issue (or refuse to run without one), like the
+  rest of the chain; until then the rule text should say "always pass `issues/<ID>`".
