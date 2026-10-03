@@ -157,6 +157,14 @@ experiment. Everything it needs in between is either in these files or derivable
 from the scan; where it is not, that is a **defect in these files** and fixing it
 is part of the work (see *THE SCAN IS THE ONLY INPUT*).
 
+**NEVER COPY THE PREVIOUS ISSUE'S DESCRIPTOR.** `binding` and `paper` are
+properties of the PHYSICAL COPY in the owner's hands, and the next issue in a
+series is not bound or printed the same way just because it is next. 8612's
+descriptor was copied from 8611's and silently inherited its `colors` path;
+SH8601 is `binding: "sheet"` and the Sonderheft after it may be anything.
+Write the descriptor fresh: copy only the SHAPE (which keys exist), never the
+values. Both values come from PAUSE 1.
+
 **PAUSE 1 — before step 005.** The two questions about the physical copy:
 binding, and which pages are which paper. They cannot be answered from a scan,
 and 005 grades nothing until they are. See the section below.
@@ -1006,6 +1014,14 @@ p050, the issue r005's numbers were measured on**. So this derivation reproduces
 exactly the set every constant in r005 came from, and the constants transfer
 unchanged. Plain `-resize` would have moved a third of the pixels by more than
 two levels and up to 39, against a threshold whose window is 40 wide.
+
+**THE NAME VARIES, THE RULE DOES NOT.** This is written about `thumb/`, but
+what is actually beside the scans differs per issue: `thumb/` on 8612 and
+SH8601, **`thumbs/` on SH8602**, plus `widths.txt`, `widths_debug.txt`,
+`widths_preview/`, `rotate.log`, `thumbs.log`, `colors.txt`. **Every derived
+artefact you find in the scan directory is untrusted, whatever it is called.**
+Do not match on the name `thumb`; treat anything that is not a `NNN.png`
+master as something a previous tool left behind. Re-derive what you need.
 
 A thumb a build DERIVED is reproducible; a thumb it FOUND is an artefact of
 whichever script ran last. The point is not that the found ones are wrong today

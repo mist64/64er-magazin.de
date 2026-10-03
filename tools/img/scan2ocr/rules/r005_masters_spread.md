@@ -102,6 +102,13 @@ to "which pages are on which paper" is *all of them are low*:
 "colors": "/Users/mist/Documents/git/64er-magazin.de/issues/<ID>/colors.txt"
 ```
 
+**The profile lives in the REPO, not beside the scans.** 8610, 8611 and 8612
+all point at `issues/<ID>/colors.txt`. **SH8601 points at
+`/Volumes/S/png/SH8601/colors.txt`** — inside the scan directory, which r000
+says is never written to. That is the odd one out and must not be copied by
+the next Sonderheft: the scan volume holds the only copy of the masters, and a
+build that writes there has written into its own input.
+
 **The path is ABSOLUTE.** Every real descriptor carries one — 8610, 8611 and
 8612 all do — because the steps run from `rules/` and a relative path's
 resolution is specified nowhere. Earlier versions of this example were
