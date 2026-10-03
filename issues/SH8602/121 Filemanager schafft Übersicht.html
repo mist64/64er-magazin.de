@@ -17,13 +17,12 @@
         <h1>Filemanager schafft Übersicht</h1>
         <p class="intro">Irgendwann steht wohl jeder C 64-Besitzer verzweifelt vor seiner Diskettensammlung und sucht ein bestimmtes Programm. Ohne eine entsprechende Liste kann das jedoch zu einer aufwendigen Suche führen. »Filemanager« schafft hier wirkungsvoll Abhilfe.</p>
 
-        <p>ilemanager sortiert die Einträge nach drei Kriterien. _ Dadurch entfällt ständiges Umsortieren. »Filemanager« (Listing) läuft nicht mit Hypra-Load zusammen.</p>
+        <p>Filemanager sortiert die Einträge nach drei Kriterien. Dadurch entfällt ständiges Umsortieren. »Filemanager« (Listing) läuft nicht mit Hypra-Load zusammen.</p>
 
-        <p>Zum Programm</p>
+        <h3>Zum Programm</h3>
 
-        <p>Fangen wir mit der Speicheraufteilung an. »Filemanager« belegt den Speicherplatz von $C000 - $CFD9. Die Filenamen werden zwischen einer Variablen (Ugrenze) und $CO0O abgelegt. Außerdem existieren noch drei Zeigerstapel mit den Adressen $CFD2, $DFEC, $EFF6. Diese Zeigerstapel bestehen auf 16-Bit Zeigern, die auf den Anfang der einzelnen Filenamen zeigen. Beim Sortieren werden nur diese Zeigerstapel sortiert. Die Filenamen selber bleiben an ihrer Stelle im Speicher. Ein Filename ist folgendermaßen aufgebaut.</p>
+        <p>Fangen wir mit der Speicheraufteilung an. »Filemanager« belegt den Speicherplatz von $C000 - $CFD9. Die Filenamen werden zwischen einer Variablen (Ugrenze) und $C000 abgelegt. Außerdem existieren noch drei Zeigerstapel mit den Adressen $CFD2, $DFEC, $EFF6. Diese Zeigerstapel bestehen auf 16-Bit Zeigern, die auf den Anfang der einzelnen Filenamen zeigen. Beim Sortieren werden nur diese Zeigerstapel sortiert. Die Filenamen selber bleiben an ihrer Stelle im Speicher. Ein Filename ist folgendermaßen aufgebaut.<br>1. Byte:</p>
 
-        <p>1. Byte:</p>
 
         <table class="plain">
             <tr>
@@ -40,8 +39,7 @@
             </tr>
         </table>
 
-        <p>2. Byte:<br>
-            Blocklänge des Files.</p>
+        <p>2. Byte:<br>Blocklänge des Files.</p>
 
         <table class="plain">
             <tr>
@@ -112,71 +110,51 @@
             </tr>
         </table>
 
-        <p>Beim Laden wird eine noch im Speicher befindliche Liste nicht gelöscht, das heißt: es wird immer dazugeladen (Merge). Da auch die Zeiger mit gespeichert werden, ist eine Programmliste, die vor dem Speichern geordnet war, auch sofortnach dem Laden nach Blocklänge, alphabetischer Reihenfolge sowie nach der ID sortiert. Befehle von »Filemanager«:</p>
+        <p>Beim Laden wird eine noch im Speicher befindliche Liste nicht gelöscht, das heißt: es wird immer dazugeladen (Merge). Da auch die Zeiger mit gespeichert werden, ist eine Programmliste, die vor dem Speichern geordnet war, auch sofort nach dem Laden nach Blocklänge, alphabetischer Reihenfolge sowie nach der ID sortiert.</p>
+
+        <h3>Befehle von »Filemanager«:</h3>
 
         <p>Alle Befehle bis auf »@« werden zu Token umgewandelt und können somit abgekürzt werden.</p>
 
-        <p>»@«</p>
+        <p><strong>»@«</strong><br>»@« alleine liest den Fehlerkanal aus. Falls ein String folgt, wird dieser, falls er nicht mit »$« beginnt, über den Befehlkanal zur Floppy gesendet.<br>Beispiel: @"$t*=seq" listet alle sequentiellen Files, die mit »t« beginnen.</p>
 
-        <p>'»@« alleine liest den Fehlerkanal aus. Falls ein String folgt, wird dieser, falls er nicht mit »$« beginnt, über den Befehlkanal zur Floppy gesendet.</p>
+        <p><strong>DMERGE</strong><br>Dmerge benötigt keine weiteren Parameter. Das Inhaltsverzeichnis der Diskette wird in der Liste aufgenommen.</p>
 
-        <p>Beispiel: @" $t* =seq" listet alle sequentiellen Files, die mit »t« beginnen.</p>
+        <p><strong>HELP</strong><br>Keine Parameter. »Help« listet alle neuen Schlüsselwörter bis auf »@«.</p>
 
-        <h3>DMERGE</h3>
+        <p><strong>SMERGE</strong><br>Wie »Dmerge«, außer daß nur die Filenamen in der Liste aufgenommen werden, die sich noch nicht in ihr befinden. Dabei sind alle Vergleichkriterien relevant. Da die Liste bei jeden Filenamen neu durchsucht werden muß, ist »Smerge« besonders bei längerer Liste erheblich langsamer als »Dmerge«. »Smerge« eignet sich dazu, neue Programmnamen in der Liste aufzunehmen, wenn sich schon einige Programmnamen der eingelegten Diskette in der Liste befinden.</p>
 
-        <p>Dmerge benötigt keine weiteren Parameter. Das Inhaltsverzeichnis der Diskette wird in der Liste aufgenommen.</p>
+        <p><strong>SLOOK</strong><br>Listet das gesamte Inhaltsverzeichnis der Diskette. Filenamen, die sich schon in der Liste befinden, werden revers gelistet. Beim Suchen in der Liste wird die ID nicht berücksichtigt, da das gleiche Programm schon auf einer anderen Diskette mit anderer ID sein kann.</p>
 
-        <h3>HELP</h3>
+        <p><strong>KILL</strong><br>»Kill« löscht die gesamte Liste.</p>
 
-        <p>Keine Parameter. »Help« listet alle neuen Schlüsselwörter bis auf »@«.</p>
+        <p><strong>QUIT</strong><br>Quit schaltet »Filemanager« aus. »Filemanager« kann mit »SYS 50000« reaktiviert werden, ohne eine eventuell im Speicher befindliche Liste zu löschen.</p>
 
-        <h3>SMERGE</h3>
+        <p><strong>MEM</strong><br>Mem gibt die Anzahl der noch freien Filenamen-Plätze, begrenzt durch die Anzahl Zeiger im Zeigerstapel, die Anzahl der in der Liste befindlichen Namen, den noch freien Speicherplatz für die Filenamen selber und den schon verbrauchten Speicherplatz an. Dann wird »Membot« und der Zeiger auf Anfang Filenamenspeicher ausgegeben.</p>
 
-        <p>Wie »Dmerge«, außer daß nur die Filenamen in der Liste aufgenommen werden, die sich noch nicht in ihr befinden. Dabei sind alle Vergleichkriterien relevant. Da die Liste bei jeden Filenamen neu durchsucht werden muß, ist »Smerge« besonders bei längerer Liste erheblich langsamer als »Dmerge«. »Smerge« eignet sich dazu, neue Programmnamen in der Liste aufzunehmen, wenn sich schon einige Programmnamen der eingelegten Diskette in der Liste befinden. SLOOK</p>
+        <p><strong>MEMBOT</strong> Numerischer Ausdruck<br>Setzen des Zeigers auf Anfang Filenamenspeicher auf einen neuen Wert, ohne die Liste zu zerstören. Membot wird dazu genutzt, den Speicherplatz entsprechend den Anforderungen zu bemessen. »Out of Memory Error« wird ausgegeben, wenn:</p>
 
-        <p>Listet das gesamte Inhaltsverzeichnis der Diskette. Filenamen, die sich schon in der Liste befinden, werden revers gelistet. Beim Suchen in der Liste wird die ID nicht berücksichtigt, da das gleiche Programm schon auf einer anderen Diskette mit anderer ID sein kann. KILL</p>
+        <p>— der Zeiger auf einen niedrigeren Wert gesetzt werden soll, als in 55/56 steht (Obergrenze Speicherplatz für Basic Interpreter).</p>
 
-        <p>»Kill« löscht die gesamte Liste. QUIT</p>
+        <p>— dadurch der Zeiger auf das erste nicht genutzte Byte der Liste (Spointer) $C000 =Ogrenze überschreitet.</p>
 
-        <p>Quit schaltet »Filemanager« aus. »Filemanager« kann mit »SYS 50000« reaktiviert werden, ohne eine eventuell im Speicher befindliche Liste zu löschen. MEM</p>
+        <p><strong>Disk</strong> Numerischer Ausdruck<br>»Disk« setzt die Nummer des aktuellen IEC-Peripherie-Gerätes. Nach dem Laden mit Basic-Lader wird automatisch Disk PEEK (186) - durchgeführt. Da es bei falscher Eingabe nicht zum Programmabsturz kommen kann, wird auf eine Überprüfung des Wertes verzichtet.</p>
 
-        <p>Mem gibt die Anzahl der noch freien Filenamen-Plätze, begrenzt durch die Anzahl Zeiger im Zeigerstapel, die Anzahl der in der Liste befindlichen Namen, den noch freien Speicherplatz für die Filenamen selber und den schon verbrauchten Speicherplatz an. Dann wird »Membot« und der Zeiger auf Anfang Filenamenspeicher ausgegeben. MEMBOT Numerischer Ausdruck</p>
+        <p><strong>MERGE</strong> String<br>Laden einer auf Diskette gespeicherten Liste in den Speicher.</p>
 
-        <p>Setzen des Zeigers auf Anfang Filenamenspeicher auf einen neuen Wert, ohne die Liste zu zerstören. Membot wird dazu genutzt, den Speicherplatz entsprechend den Anforderungen zu bemessen. »Out of Memory Error« wird ausgegeben, wenn:</p>
+        <p><strong>PUT</strong> String<br>Speichert die Liste auf Diskette.</p>
 
-        <ul>
-            <li>
-                <p>der Zeiger auf einen niedrigeren Wert gesetzt werden soll, als in 55/56 steht (Obergrenze Speicherplatz für Basic Interpreter).</p>
-            </li>
-            <li>
-                <p>dadurch der Zeiger auf das erste nicht genutzte Byte der Liste (Spointer) $C0O00 =Ogrenze überschreitet. Disk Numerischer Ausdruck</p>
-            </li>
-        </ul>
+        <p><strong>SORT</strong><br>Sortiert die Liste alphabetisch, nach ID und nach Blocklänge.</p>
 
+        <p><strong>WRITE</strong> Numerischer Ausdruck String Filetyp String<br>Liest die Blocklänge, den Namen, den Typ und die ID eines Programms in den Speicher ein.<br>Dabei ist zu beachten, daß keine Verknüpfungen erlaubt sind wie zum Beispiel für String: "abc"+"cde". In diesem Fall muß man einer Stringvariablen diesen Wert zuweisen: A$="abc"+"cde": Write12A$P "ID".<br>Beim Filetyp genügt es,den ersten Buchstaben anzugeben. In diesem Fall müssen aber zwei beliebige Zeichen folgen. »Illegal Name Error« wird bei nicht eindeutigen Angaben sowie bei Verwendung des Jokers ausgegeben.</p>
 
-        <p>»Disk« setzt die Nummer des aktuellen IEC-Peripherie-Gerätes. Nach dem Laden mit Basic-Lader wird automatisch Disk PEEK (186) - durchgeführt. Da es bei falscher Eingabe nicht zum Programmabsturz kommen kann, wird auf eine Überprüfung des Wertes verzichtet. MERGE String</p>
+        <p><strong>SCRATCH</strong> Parameter, wie Write<br>Löscht alle Files, die der Eingabemaske entsprechen, aus der Liste. Verwendung des Jokers »*« ist erlaubt für alle Parameter. Statt eines Jokers kann für die ID ein Leerstring eingegeben werden, oder man kann die ID auch ganz weglassen. Beispiel: Es sollen alle Filenamen aus der Liste entfernt werden, die sich auf der Diskette mit der ID "AD" befinden und mit "File" beginnen:<br>Scratch*"File*"*"AD"<br>Bei Verwendung des Jokers beim Filetypmüssen nicht, siehe letztes Beispiel, dem Joker zwei Zeichen folgen. Die Anzahl der gelöschten Namen wird ausgegeben. Da für gelöschten Namen die Blockverschiebe-Routine und die Zeigerkorrektur-Routine, die wiederum dreimal die Verschiebe-Routine aufruft, benötigt wird, braucht »Scratch« meist sehr viel Zeit.</p>
 
-        <p>Laden einer auf Diskette gespeicherten Liste in den Speicher. PUT String</p>
+        <p><strong>BLOOK</strong> Numerischer Ausdruck - Numerischer Ausdruck<br>Listet alle Namen, die der Eingabemaske entsprechen. Verkettung numerischer Ausdrücke ist nicht gestattet. Verwendung des Jokers ist erlaubt. Sonst Syntax, wie beim List-Befehl.<br>Beispiel: alle Namen listen<br>Blook oder Blook*</p>
 
-        <p>Speichert die Liste auf Diskette.</p>
+        <p><strong>ALOOK</strong> String - String<br>Funktion und Syntax wie Blook</p>
 
-        <h3>SORT</h3>
-
-        <p>Sortiert die Liste alphabetisch, nach ID und nach Blocklänge. WRITE Numerischer Ausdruck String Filetyp String Liest die Blocklänge, den Namen, den Typ und die ID eines Programms in den Speicher ein. Dabei ist zu beachten, daß keine Verknüpfungen erlaubt sind wie zum Beispiel für String: "abc"+""cde".Indiesem Fallmuß man einer Stringvariablen diesen Wert zuweisen: A$="abc"+"cde": Writel2A$P "1D".</p>
-
-        <p>Beim Filetyp genügt es, den ersten Buchstaben anzugeben. In diesem Fall müssen aber zwei beliebige Zeichen folgen. »Illegal Name Error« wird bei nicht eindeutigen Angaben sowie bei Verwendung des Jokers ausgegeben. SCRATCH Parameter, wie Write</p>
-
-        <p>Löscht alle Files, die der Eingabemaske entsprechen, aus der Liste. Verwendung des Jokers »*« ist erlaubt für alle Parameter. Statt eines Jokers kann für die ID ein Leerstring eingegeben werden, oder man kann die ID auch ganz weglassen. Beispiel: Es sollen alle Filenamen aus der Liste entfernt werden, die sich auf der Diskette mit der ID "AD" befinden und mit "File" beginnen:</p>
-
-        <p>Scratch* "File* " *"AD"</p>
-
-        <p>Bei Verwendung des Jokers beim Filetyp müssen nicht, siehe letztes Beispiel, dem Joker zwei Zeichen folgen. Die Anzahl der gelöschten Namen wird ausgegeben. Dafür gelöschten Namen die Blockverschiebe-Routine und die Zeigerkorrektur-Routine, die wiederum dreimal die Verschiebe-Routine aufruft, benötigt wird, braucht »Scratch« meist sehr viel Zeit. BLOOK Numerischer Ausdruck - Numerischer Ausdruck Listet alle Namen, die der Eingabemaske entsprechen. Verkettung numerischer Ausdrücke ist nicht gestattet. Verwendung des Jokers ist erlaubt. Sonst Syntax, wie beim List-Befehl.</p>
-
-        <p>Beispiel: alle Namen listen</p>
-
-        <p>Blook oder Blook* ALOOK String - String</p>
-
-        <p>Funktion und Syntax wie Blook ILOOK siehe Alook</p>
+        <p><strong>ILOOK</strong><br>siehe Alook</p>
 
         <p>Bei sortierter Liste werden bei »Blook« nach Blocklänge, bei »Alook« nach alphabetischer Reihenfolge, bei »Ilook« nach ID die Filenamen geordnet ausgegeben.</p>
 
@@ -186,171 +164,125 @@
 
         <h2>Die wichtigsten Unterprogramme</h2>
 
-        <p>ACOMPARE $C053 - $CO9F</p>
+        <p><strong>ACOMPARE $C053 - $C09F</strong><br>Zeiger1 und Zeiger3 zeigen auf den Anfang je eines Elementes. Diese Elemente werden auf die alphabetische Reihenfolge hin verglichen. Das Ergebnis steht in C- und Z-Flag.</p>
 
-        <p>Zeigeri und Zeiger3 zeigen auf den Anfang je eines Elementes. Diese Elemente werden auf die alphabetische Reihenfolge hin verglichen. Das Ergebnis steht in C- und Z-Flag. ACTIVATE $C350 - $C366</p>
+        <p><strong>ACTIVATE $C350 - $C366</strong><br>Aktivieren des File-Managers.</p>
 
-        <p>Aktivieren des File-Managers. BASOUT $C2DA - $C2ED</p>
+        <p><strong>BASOUT $C2DA - $C2ED</strong><br>Ausgabe eines Zeichens mit Verwaltung des Spaltenzählers Cursor.</p>
 
-        <p>Ausgabe eines Zeichens mit Verwaltung des Spaltenzählers Cursor. BCOMPARE $C09f - $COB7</p>
+        <p><strong>BCOMPARE $C09f - $C0B7</strong><br>Wie »Acompare«, nur Blocklänge als Kriterium</p>
 
-        <p>Wie »Acompare«, nur Blocklänge als Kriterium BEFEHLCH $C3F2 - $CA0C</p>
+        <p><strong>BEFEHLCH $C3F2 - $C40C</strong><br>Öffnen des Befehls-Kanals der Floppy</p>
 
-        <p>Öffnen des Befehls-Kanals der Floppy CHKFILMEN $C4AA - $C4D3</p>
+        <p><strong>CHKFILMEN $C4AA - $C4D3</strong><br>Wie »Chknammem«, prüft auf Platz für Zeiger3 Elemente und (Zeiger1) Bytes.</p>
 
-        <p>Wie »Chknammem«, prüft auf Platz für Zeiger3 Elemente und (Zeiger1) Bytes. CHKNAMMEM $C499 - $CAD3</p>
+        <p><strong>CHKNAMMEM $C499 - $C4D3</strong><br>Prüft auf Platz für Element in Akku1. Falls kein Platz vorhanden, dann »Out of memory error«, sonst Rückkehr in Hauptprogramm.</p>
 
-        <p>Prüft auf Platz für Element in Akku1. Falls kein Platz vorhanden, dann »Out of memory error«, sonst Rückkehr in Hauptprogramm. COMPARE $C0D6 - $C115</p>
+        <p><strong>COMPARE $C0D6 - $C115</strong><br>Wie »Acompare«, das Vergleichskriterium wird in die Bitmaske übergeben. Bit 3-0 sind Direktbits, Bit 7-4 sind Vorrangsbits. Die Bits werden von links nach rechts geprüft. Wird ein gesetztes Vorrangsbit gefunden, dann wird geprüft, ob das entsprechende Direktbit gesetzt ist. Falls das entsprechende Direktbit nicht gesetzt ist, wird das Vorrangsbit gelöscht, ansonsten wird die entsprechende Vergleichsroutine aufgerufen. Ist das Ergebnis Z=0, dann ist die Routine beendet. Sonst werden die entsprechenden Bits in Bitmaske gelöscht und der Vergleich beginnt von vorne, bis alle Bits gelöscht sind oder als Ergebnis bei einem Vergleich Z=0 herausgekommen ist.</p>
 
-        <p>Wie »Acompare«, das Vergleichskriterium wird in die Bitmaske übergeben. Bit 3-0 sind Direktbits, Bit 7-4 sind Vorrangsbits. Die Bits werden von links nach rechts geprüft. Wird ein gesetztes Vorrangsbit gefunden, dann wird geprüft, ob das entsprechende Direktbit gesetzt ist. Falls das entsprechende Direktbit nicht gesetzt ist, wird das Vorrangsbit gelöscht, ansonsten wird die entsprechende Vergleichsroutine aufgerufen. Ist das Ergebnis Z=0, dann ist die Routine beendet. Sonst werden die entsprechenden Bits in Bitmaske gelöscht und der Vergleich beginnt von vorne, bis alle Bits gelöscht sind oder als Ergebnis bei einem Vergleich Z=O herausgekommen ist: CRETURN $C2D2 - $C2ED</p>
+        <p><strong>CRETURN $C2D2 - $C2ED</strong><br>Ausgabe von Carriage Return.</p>
 
-        <p>N Ausgabe von Carriage Return. DIROPEN $C3C8 - $C3F2</p>
+        <p><strong>DIROPEN $C3C8 - $C3F2</strong><br>Öffnen des Directories. Löschen des Status.</p>
 
-        <p>Öffnen des Directories. Löschen des Status. DOPEN $C3CE - $C3F2</p>
+        <p><strong>DOPEN $C3CE - $C3F2</strong><br>Öffnen eines Lesefiles. Parameter für Filenamen in den Registern.</p>
 
-        <p>Öffnen eines Lesefiles. Parameter für Filenamen in den Registern. ERRORD $C420 - $C430</p>
+        <p><strong>ERRORD $C420 - $C430</strong><br>Auslesen des Fehlerkanals</p>
 
-        <p>Auslesen des Fehlerkanals ERROROP $C6B0 - $C6C0</p>
+        <p><strong>ERROROP $C6B0 - $C6C0</strong><br>Öffnen des Fehlerkanals der Floppy</p>
 
-        <p>Öffnen des Fehlerkanals der Floppy FIRSTNAM $C566 - $C5E1</p>
+        <p><strong>FIRSTNAM $C566 - $C5E1</strong><br>Öffnet Directory und holt erstes Element nach Akku1.</p>
 
-        <p>Öffnet Directory und holt erstes Element nach Akku1. FLOPPY $C68F - $C6A8</p>
+        <p><strong>FLOPPY $C68F - $C6A8</strong><br>Gibt String, dessen Adressen in $22 und dessen Länge in Speicher steht, auf den Befehlskanal der Floppy aus.</p>
 
-        <p>Gibt String, dessen Adressen in $22 und dessen Länge in Speicher steht, auf den Befehlskanal der Floppy aus. FLOPPYD $C692 - $C6A8</p>
+        <p><strong>FLOPPYD $C692 - $C6A8</strong><br>Wie Floppy, nur ohne Öffnen des Befehlskanals.</p>
 
-        <p>Wie Floppy, nur ohne Öffnen des Befehlskanals. FNADRESS $C018 - $C041</p>
+        <p><strong>FNADRESS $C018 - $C041</strong><br>Stackbot zeigt auf den Anfang eines Zeigerstapels. Index ist relativer Zeiger in diesem Stapel. Zuerst wird der Inhalt der Adresse »Stackbot +2index« nach Zeiger2 kopiert. Dann wird der Inhalt von Zeiger2 nach Zeiger1 gebracht.</p>
 
-        <p>Stackbot zeigt auf den Anfang eines Zeigerstapels. Index ist relativer Zeiger in diesem Stapel. Zuerst wird der Inhalt der Adresse »Stackbot +2index« nach Zeiger2 kopiert. Dann wird der Inhalt von Zeiger2 nach Zeigeri gebracht. GETAKKU $C623 - $C63C</p>
+        <p><strong>GETAKKU $C623 - $C63C</strong><br>Holt das Element, auf das Zeiger1 zeigt, nach Akku1.</p>
 
-        <p>Holt das Element, auf das Zeiger zeigt, nach Akku!. GETLONGI $C041 - $CO4A</p>
+        <p><strong>GETLONGI $C041 - $C04A</strong><br>Aus den ersten Byte von Akku1 werden die Bits, in denen die Namenslänge-1 steht, herausgefiltert (and #%00001111) und in Namlog1 gespeichert.<br>Chklong1 $C044 - $C04A<br>Wie Getlong1, nur daß der Inhalt des A-Registers übergeben wird.</p>
 
-        <p>Aus den ersten Byte von Akku1 werden die Bits, in denen die Namenslänge-1 steht, herausgefiltert (and #%00001111) und in Namlog1 gespeichert. Chklong! $C044 - $COAA</p>
+        <p><strong>GETLONG2 $C04A - $C053</strong><br>Wie Getlong1, nur mit Akku2 und Namlog2.<br>Chklong2 $C04D - $C053<br>Wie Getlong2, aber der Akkumulator wird übergeben.</p>
 
-        <p>Wie Getlong1, nur daß der Inhalt des A-Registers übergeben wird. GETLONG2 $C04A - $C053</p>
+        <p><strong>HOCHKOM $C2D8 - $C2ED</strong><br>Ausgabe eines Hochkommas.</p>
 
-        <p>Wie Getlong1, nur mit Akku2 und Namlog2. Chklong2 $CO4D - $C053</p>
+        <p><strong>ICOMPARE $C0B7 - $C0C5</strong><br>Wie Acompare, ID als Kriterium.</p>
 
-        <p>Wie Getlong2, aber der Akkumulator wird übergeben. HOCHKOM $C2D8 - $C2ED</p>
+        <p><strong>IECINI $C40C - $C416</strong><br>Wenn Status =0, dann Fehlerkanal auslesen und nächsten Befehl interpretieren, sonst Byte vom IEC-bus holen.</p>
 
-        <p>Ausgabe eines Hochkommas. ICOMPARE $C0B7 - $C0C5</p>
+        <p><strong>INTERRUPT $C345 - $C34C</strong><br>Einschalten des ROMs und Sprung zum Basic-Kaltstart. (Wird benutzt, um bei abgeschalteten ROM ein Abstürzen bei Drücken der Restore-Taste zu vermeiden).</p>
 
-        <p>Wie Acompare, ID als Kriterium. IECINI $C40C - $C416</p>
+        <p><strong>KEYSTR $C0D8 - $C1F4</strong><br>Das X-te Wort aus Newtab wird ausgegeben.</p>
 
-        <p>Wenn Status =0, dann Fehlerkanal auslesen und nächsten Befehl interpretieren, sonst Byte vom IEC-bus holen. INTERRUPT $C345 - $C34C</p>
+        <p><strong>LEERCHAR $C2D5 - $C2ED</strong><br>Ausgabe eines Spaces.</p>
 
-        <p>Einschalten des ROMs und Sprung zum Basic-Kaltstart. (Wird benutzt, um bei abgeschalteten ROM ein Abstürzen bei Drücken der Restore-Taste zu vermeiden). KEYSTR $C0D8 - $C1F4</p>
+        <p><strong>MEMFREE $C479 - $C489</strong><br>Freier Speicherplatz nach Zeiger2.</p>
 
-        <p>Das X-te Wort aus Newtab wird ausgegeben. LEERCHAR $C2D5 - $C2ED</p>
+        <p><strong>MEMFULL $C465 - $C479</strong><br>Voller Speicherplatz nach Hzeiger.</p>
 
-        <p>Ausgabe eines Spaces. MEMFREE $C479 - $C489</p>
+        <p><strong>NAMFREE $C489 - $C499</strong><br>Anzahl freier Elemente nach Zeiger4.</p>
 
-        <p>Freier Speicherplatz nach Zeiger2. MEMFULL $C465 - $C479</p>
+        <p><strong>NEWLIST $C1F4 - $C212</strong><br>List-Routine für die neuen Token.</p>
 
-        <p>Voller Speicherplatz nach Hzeiger. NAMFREE $C489 - $C499</p>
+        <p><strong>NEXTIND $C60B - $C623</strong><br>Index - Index+1. Wenn Index = Counter, dann Z = 1.</p>
 
-        <p>Anzahl freier Elemente nach Zeiger4. NEWLIST $C1F4 - $C212</p>
+        <p><strong>NEXTNAM $C57F - $C5E1</strong><br>Holt nächstes Element des Directories nach Akku1.</p>
 
-        <p>List-Routine für die neuen Token. NEXTIND $C60B - $C623</p>
+        <p><strong>PRINTHEX $C212 - $C246</strong><br>Die 16-Bitzahl A/X wird ausgegeben und bis zur 6. Ziffer mit Spaces aufgefüllt.</p>
 
-        <p>Index - Index+ 1. Wenn Index = Counter, dannZ = 1. NEXTNAM $C57F - $C5E1</p>
+        <p><strong>PRINTNAM $C246 - $C2AB</strong><br>Das Element in Akku1 wird ausgegeben. Prüfung auf Stop-Taste. Warteschleife auf Tastendruck.</p>
 
-        <p>Holt nächstes Element des Directories nach Akku1. PRINTHEX $C212 - $C246</p>
+        <p><strong>ROMAUS $C000 - $C00C</strong><br>Umschalten auf RAM</p>
 
-        <p>Die 16-Bitzahl A/X wird ausgegeben und bis zur 6. Ziffer mit Spaces aufgefüllt. PRINTNAM $C246 - $C2AB</p>
+        <p><strong>ROMEIN $C00C - $C018</strong><br>Umschalten auf ROM</p>
 
-        <p>Das Element in Akkul wird ausgegeben. Prüfung auf Stop-Taste. Warteschleife auf Tastendruck. ROMAUS $C000 - $C00C</p>
+        <p><strong>SETGRENZ $C5ED - $C602</strong><br>Füllt Akku2 mit $00 und Akku3 mit $ff.</p>
 
-        <p>Umschalten auf RAM ROMEIN $C00C - $C018</p>
+        <p><strong>SETINDEX $C5EF - $C5F8</strong><br>Index =-1.</p>
 
-        <p>Umschalten auf ROM SETGRENZ $C5ED - $C602</p>
+        <p><strong>STORREAKKU $C4D3 - $C566</strong><br>Legt Element in Akku1 in Liste ab.</p>
 
-        <p>Füllt Akku2 mit $00 und Akku3 mit $ff. SETINDEX $C5EF - $C5F8</p>
+        <p><strong>TAB $C2AB - $C2CB</strong><br>Ausgabe von Spaces bis zur nächsten Zehnertabulatur.</p>
 
-        <p>Index =-1. STORREAKKU $C4D3 - $C566</p>
+        <p><strong>TCOMPARE $C0C5 - $C0D6</strong><br>Filetyp als Kriterium, sonst wie »Acompare«.</p>
 
-        <p>Legt Element in Akku1 in Liste ab.</p>
+        <p><strong>TOKENNEU $C115 - $C1D8</strong><br>Einbindung der neuen Token.</p>
 
-        <p>TAB $C2AB - $C2CB</p>
+        <p><strong>TRANSFER $C2ED - $C345 und $C366 - $C3AE</strong><br>Der Bereich Zeiger2 bis Zeiger4 wird um Index Byte verschoben. Dabei wird Index als vorzeichenbehaftete Zahl benutzt.</p>
 
-        <p>Ausgabe von Spaces bis zur nächsten Zehnertabulatur.</p>
+        <p><strong>DECTXTPT $C6A8 - $C6B0</strong><br>Decrementiert den Programmzähler ($7a).</p>
 
-        <p>TCOMPARE $C0C5 - $COD6</p>
+        <p><strong>INNAM $C6C0 - $C702</strong><br>Holt Filename vom Bildschirm nach Akku1.</p>
 
-        <p>Filetyp als Kriterium, sonst wie »Acompare«. TOKENNEU $C115 - $C1D8</p>
+        <p><strong>INGRENZ $C702 - $C73F</strong><br>Holt Grenzwerte vom Bildschirm nach Akku2 und Akku3.</p>
 
-        <p>Einbindung der neuen Token.</p>
+        <p><strong>A1NACHA3 $C730 - $C73C</strong><br>Kopiert Akku1 nach Akku3.</p>
 
-        <p>TRANSFER $C2ED - $C345 und $C366 - $C3AE</p>
+        <p><strong>INGRENZ6 $C73C - $C73F</strong><br>Sprungbefehl für Ingrenz.</p>
 
-        <p>Der Bereich Zeiger2 bis Zeiger4 wird um Index Byte verschoben. Dabei wird Index als vorzeichenbehaftete Zahl benutzt.</p>
+        <p><strong>A1NACHA2 $C73F - $C74B</strong><br>Kopiert Akku1 nach Akku2.</p>
 
-        <p>DECTXTPT $C6A8 - $C6B0</p>
+        <p><strong>INBL $C7A7 - $C7E0</strong><br>Holt Blocklänge vom Bildschirm nach Akku1.</p>
 
-        <p>Decrementiert den Programmzähler ($7a).</p>
+        <p><strong>INID $C7EF - $C814</strong><br>Holt ID vom Bildschirm nach Akku1.</p>
 
-        <p>INNAM $C6C0 - $C702</p>
+        <p><strong>ORDER $C844 - $C90C</strong><br>Sortiert aufsteigend den Zeigerstapel, auf den X/Y zeigt, nach den Kriterien, die in A stehen (Bitmaske).</p>
 
-        <p>Holt Filename vom Bildschirm nach Akku1.</p>
+        <p><strong>Z1Z3Z2Z4 $C90C - $C91D</strong><br>Kopiert Zeiger1 nach Zeiger3 und Zeiger2 nach Zeiger4.</p>
 
-        <p>INGRENZ $C702 - $C73F</p>
+        <p><strong>CHKSTRDA $CB52 - $CB75</strong><br>Prüft nach den Kriterien in Bitmaske, ob sich das Element in Akku1 in der Liste befindet und holt gegebenenfalls Adresse nach Zeiger 4.<br>Gefunden: C=1.</p>
 
-        <p>Holt Grenzwerte vom Bildschirm nach Akku2 und Akku3.</p>
+        <p><strong>CORPTRSUB $CB9B - $CC5B</strong><br>Korrigiert alle Zeiger des Zeigerstapels, auf den X/Y zeigt, um den Wert Index, falls der betreffende Zeiger größer als Zeiger3 ist. Falls der betreffende Zeiger = Zeiger3 ist, dann wird dieser aus dem Stapel entfernt.</p>
 
-        <p>A1INACHA3 $C730 - $C73C</p>
+        <p><strong>CORPTRDE $CC5B - $CC64</strong><br>Decrementiert Zeiger für »Corptrsub«.</p>
 
-        <p>Kopiert Akkul nach AkkuS3.</p>
+        <p><strong>CORPTRIM $CC64 - $CC70</strong><br>Incrementiert Zeiger für »Corptrsub«. Falls Ende erreicht, dann C=0.</p>
 
-        <p>INGRENZ6 $C73C - $C73F . Sprungbefehl für Ingrenz.</p>
+        <p><strong>CORPTRUE $CC67 - $CC70</strong><br>Vermindert den Wert für den zu korrigierenden Zeigerstapel um eine Page.</p>
 
-        <p>AINACHA2 $C73F - $C74B</p>
+        <p><strong>CORPTR $CCFB - $CD10</strong><br>Korrigiert alle Zeigerstapel. »Corptrsub«.</p>
 
-        <p>Kopiert Akkul nach Akku2.</p>
-
-        <p>INBL $C7A7 - $C7EO</p>
-
-        <p>Holt Blocklänge vom Bildschirm nach Akku1.</p>
-
-        <p>INID $C7EF - $C814</p>
-
-        <p>Holt ID vom Bildschirm nach Akku1.</p>
-
-        <p>ORDER $C844 - $C90C</p>
-
-        <p>Sortiert aufsteigend den Zeigerstapel, auf den X/Y zeigt, nach den Kriterien, die in A stehen (Bitmaske).</p>
-
-        <p>Z1Z3Z2Z4 $C90C - $C91D</p>
-
-        <p>Kopiert Zeiger! nach Zeiger3 und Zeiger2 nach Zeiger4.</p>
-
-        <p>CHKSTRDA $CB52 - $CB75</p>
-
-        <p>Prüft nach den Kriterien in Bitmaske, ob sich das Element in Akku1 in der Liste befindet und holt gegebenenfalls Adresse nach Zeiger 4.</p>
-
-        <p>Gefunden: C=1.</p>
-
-        <p>CORPTRSUB $CB9B - $CC5B</p>
-
-        <p>Korrigiert alle Zeiger des Zeigerstapels, auf den X/Y zeigt, um den Wert Index, falls der betreffende Zeiger größer als Zeiger3 ist. Falls der betreffende Zeiger = Zeiger3 ist, dann wird dieser aus dem Stapel entfernt.</p>
-
-        <p>CORPTRDE $CCSB - $CC64</p>
-
-        <p>Decrementiert Zeiger für »Corptrsub«.</p>
-
-        <p>CORPTRIM $CC64 - $CC7O</p>
-
-        <p>Incrementiert Zeiger für »Corptrsub«. Falls Ende erreicht, dann C=0.</p>
-
-        <p>CORPTRUE $CC67 - $CC70</p>
-
-        <p>Vermindert den Wert für den zu korrigierenden Zeigerstapel um eine Page.</p>
-
-        <p>CORPTR $CCFB - $CD10</p>
-
-        <p>Korrigiert alle Zeigerstapel. »Corptrsub«.</p>
-
-        <p>PARA $CD10 - $CD6D</p>
-
-        <p>Holt gesamtes Element vom Bildschirm und setzt entsprechend der verwendeten Joker Bitmaske.</p>
+        <p><strong>PARA $CD10 - $CD6D</strong><br>Holt gesamtes Element vom Bildschirm und setzt entsprechend der verwendeten Joker Bitmaske.</p>
 
         <h2>Variable</h2>
         <table class="plain">
@@ -420,7 +352,7 @@
         <p>Stackpnt $CE8F -Zwischenspeicher für Stackpointer<br>
             Speicher $CE90, Speicher2 $CE91, Speicherplatz, um Zwischenwerte abzulegen, die nicht problemlos auf dem Stack zwischengespeichert werden können.</p>
 
-        <p>Hzeiger $CE9 2 Hilfszeiger für Zwischenwerte</p>
+        <p>Hzeiger $CE92 Hilfszeiger für Zwischenwerte</p>
 
         <p>Index $CE94 wird meist als Zähler verwendet.</p>
 
@@ -524,7 +456,8 @@
                 <td>$C3BB</td>
             </tr>
             <tr>
-                <td>Omerge</td>
+                <td>Dmerge</td>
+
                 <td>$C5E1</td>
                 <td>Alook</td>
                 <td>$C74B</td>

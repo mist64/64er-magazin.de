@@ -15,13 +15,13 @@
 <body>
     <article>
         <h1>20000 Byte mehr</h1>
-        <p class="intro">20 KByte adressierbarer Speicher werden 'uns beim normalen Basic vom Computer vorenthalten. Dieser Speicherplatz ist jedoch nicht tot, er kann mit ein paar Tricks für alle möglichen Zwecke nutzbar gemacht werden.</p>
+        <p class="intro">20 KByte adressierbarer Speicher werden uns beim normalen Basic vom Computer vorenthalten. Dieser Speicherplatz ist jedoch nicht tot, er kann mit ein paar Tricks für alle möglichen Zwecke nutzbar gemacht werden.</p>
 
-        <p>Der C 64 besitzt zwei Arten von Speicher-Chips. Zum einen den RAM-Speicher (Random Access Memory), zum anderen den ROM-Speicher (Read Only Memory). Auf das RAM kann beliebig zugegriffen werden. Das heißt, man kann diesen Speicher beliebig beschreiben und lesen. Dieser Speicher dient zur Aufnahme der eigenen Programme. ROM heißt soviel wie Nur-Lese-Speicher. Erenthält ein festes Programm oder Daten (Zeichensatz etc.) und kann nur gelesen werden. Der ROM-Speicher behält seine Informationen auch nach dem Ausschalten des Computers. Beim Einschalten des Computers oder nach einem Reset verzweigt der Prozessor ins ROM (Betriebssystem) und initialisiert das gesamte System.</p>
+        <p>Der C 64 besitzt zwei Arten von Speicher-Chips. Zum einen den RAM-Speicher (Random Access Memory), zum anderen den ROM-Speicher (Read Only Memory). Auf das RAM kann beliebig zugegriffen werden. Das heißt, man kann diesen Speicher beliebig beschreiben und lesen. Dieser Speicher dient zur Aufnahme der eigenen Programme. ROM heißt soviel wie Nur-Lese-Speicher. Er enthält ein festes Programm oder Daten (Zeichensatz etc.) und kann nur gelesen werden. Der ROM-Speicher behält seine Informationen auch nach dem Ausschalten des Computers. Beim Einschalten des Computers oder nach einem Reset verzweigt der Prozessor ins ROM (Betriebssystem) und initialisiert das gesamte System.</p>
 
-        <p>Der C 64 besitzt 64 KByte RAM und 20 KByte ROM. Im ROM sind Basic, Betriebssystem und Standardzeichensatz gespeichert (Bild 1). Für die Ein-/Ausgabevorrichtungen benötigt der C 64 nochmal 4 KByte Speicherkapazität. Ein 8-Bit-Computer mit 16-Bit-Adreß-Bus kann aber normalerweise nur 64 KByte (2 hoch 16 Bit) adressieren. Wo liegt aber der Unterschied zwischen © 64 und den anderen 8-Bit-Computern der 65xx-Reihe?</p>
+        <p>Der C 64 besitzt 64 KByte RAM und 20 KByte ROM. Im ROM sind Basic, Betriebssystem und Standardzeichensatz gespeichert (Bild 1). Für die Ein-/Ausgabevorrichtungen benötigt der C 64 nochmal 4 KByte Speicherkapazität. Ein 8-Bit-Computer mit 16-Bit-Adreß-Bus kann aber normalerweise nur 64 KByte (2 hoch 16 Bit) adressieren. Wo liegt aber der Unterschied zwischen C 64 und den anderen 8-Bit-Computern der 65xx-Reihe?</p>
 
-        <p>Das Geheimnis liegt im 6510-Prozessor. Der Chip verfügt im Gegensatz zum 6502 über ein Prozessorregister. Über diesen Port wird gesteuert, ob RAM, ROM oder Ein-/Ausgabe in bestimmten Speicherbereichen aktiv sind. Hierfür benötigt das Register (Speicherstelle 1) allerdings nur 3 Bit. Weitere 3 Bit steuern den Kassettenport. Die restlichen 2 Bit sind unbesetzt und werden einfach überlesen. Das Datenrichtungsregister für diesen Port liegt im Speicherplatz O.</p>
+        <p>Das Geheimnis liegt im 6510-Prozessor. Der Chip verfügt im Gegensatz zum 6502 über ein Prozessorregister. Über diesen Port wird gesteuert, ob RAM, ROM oder Ein-/Ausgabe in bestimmten Speicherbereichen aktiv sind. Hierfür benötigt das Register (Speicherstelle 1) allerdings nur 3 Bit. Weitere 3 Bit steuern den Kassettenport. Die restlichen 2 Bit sind unbesetzt und werden einfach überlesen. Das Datenrichtungsregister für diesen Port liegt im Speicherplatz 0.</p>
 
         <p>Die einzelnen Bits im Kontrollregister des 6510 sind wie folgt definiert:</p>
 
@@ -73,15 +73,21 @@
             </tr>
         </table>
 
-        <p>Zu jedem Daten-Port gehört auch ein Datenrichtungsregister. Dieses liegt für den Prozessor-Port in Speicherstelle 1. Der Normalwert für das Datenrichtungsregister lautet 47 oder Binär 00101111, wobei O für Eingabe und 1 für Ausgabe steht. In Standardmodus stehen LORAM, HIRAM, CHAREN, Schreibleitung und Motorsteuerung auf »Ausgabe«. Nur der Kassettenschalter steht auf »Eingabe«.</p>
+        <p>Zu jedem Daten-Port gehört auch ein Datenrichtungsregister. Dieses liegt für den Prozessor-Port in Speicherstelle 1. Der Normalwert für das Datenrichtungsregister lautet 47 oder Binär 00101111, wobei 0 für Eingabe und 1 für Ausgabe steht. In Standardmodus stehen LORAM, HIRAM, CHAREN, Schreibleitung und Motorsteuerung auf »Ausgabe«. Nur der Kassettenschalter steht auf »Eingabe«.</p>
 
-        <p>Die Steuerbits des Prozessorregisters erfüllen im allgemeinen folgende Funktion: BIT O (LORAM):</p>
+        <p>Die Steuerbits des Prozessorregisters erfüllen im allgemeinen folgende Funktion:</p>
 
-        <p>Dieses Bit steuert die Belegung des Speicherbereichs von $A000 Bis $BFFF. Ist Bit O gesetzt, so belegt der 8-KByte-Basic-ROM den Adreßbereich. Bringt man diese Bit auf Low, so verschwindet das Basic-ROM und wird durch 8 KByte RAM-Speicher ersetzt. BIT 1 (HIRAM):</p>
+        <p>BIT 0 (LORAM):</p>
 
-        <p>Ist dieses Bit gesetzt, hat der Prozessor im Adreßbereich $EO00 bis $FFFF Zugriff auf das Betriebssystem (Kernel-ROM) des Computers. Bei Low-Pegel wird das Kernel durch ebenfalls 8 KByte ersetzt. Bit 2 (CHAREN):</p>
+        <p>Dieses Bit steuert die Belegung des Speicherbereichs von $A000 Bis $BFFF. Ist Bit 0 gesetzt, so belegt der 8-KByte-Basic-ROM den Adreßbereich. Bringt man diese Bit auf Low, so verschwindet das Basic-ROM und wird durch 8 KByte RAM-Speicher ersetzt.</p>
 
-        <p>Dieses Bit ist dafür verantwortlich, ob sich das 4K-Byte-Zeichengenerator-ROM oder das I/O-RAM im Prozessor-Adreßbereich von $DO00 bis $DFFF befindet. Wenn Bit 2 gesetzt ist, dann hat der Prozessor Zugriff auf folgende Ein-/ Ausgabe-Register:</p>
+        <p>BIT 1 (HIRAM):</p>
+
+        <p>Ist dieses Bit gesetzt, hat der Prozessor im Adreßbereich $E000 bis $FFFF Zugriff auf das Betriebssystem (Kernel-ROM) des Computers. Bei Low-Pegel wird das Kernel durch ebenfalls 8 KByte ersetzt.</p>
+
+        <p>Bit 2 (CHAREN):</p>
+
+        <p>Dieses Bit ist dafür verantwortlich, ob sich das 4K-Byte-Zeichengenerator-ROM oder das I/O-RAM im Prozessor-Adreßbereich von $D000 bis $DFFF befindet. Wenn Bit 2 gesetzt ist, dann hat der Prozessor Zugriff auf folgende Ein-/Ausgabe-Register:</p>
 
         <table class="plain">
             <tr>
@@ -138,7 +144,7 @@
 30 POKE 5634,PEEK(56334) OR 1: REM INTERRUPT EIN
 </code></pre>
 
-        <p>Sie werden sich nun aber fragen, wie der Computer trotz Tastaturabfrage Zeichen am Bildschirm ausgeben kann. Dies geschieht mit Hilfe des sogenannten ROM-IMAGE. Weil der VIC-II-Chip gleichzeitig nur auf 16 KByte zugreifen kann, muß der Zeichensatz immer in der jeweiligen Bank des VIC-II-Chips liegen. Im Standardmodus greift der VIC auf Bank O zu ($0000 bis $3FFF). Das System ist so entwickelt, daß VIC-II davon ausgeht, daß sich der Zeichensatz im »zugriffsberechtigten« Speicherbereich befindet. Arbeitet der VIC-II in Bank 0, nimmt er an, der Zeichensatz befindet sich ab $1000, obwohl dieser in Wirklichkeitin $DOO00 liegt. Der Speicherbereich $1000 bis $1FFF ist aber trotzdem für den Anwender als RAM-Bereich vorhanden. Gleiches gilt für die drei anderen möglichen Banks des VIC-Il:</p>
+        <p>Sie werden sich nun aber fragen, wie der Computer trotz Tastaturabfrage Zeichen am Bildschirm ausgeben kann. Dies geschieht mit Hilfe des sogenannten ROM-IMAGE. Weil der VIC-II-Chip gleichzeitig nur auf 16 KByte zugreifen kann, muß der Zeichensatz immer in der jeweiligen Bank des VIC-II-Chips liegen. Im Standardmodus greift der VIC auf Bank 0 zu ($0000 bis $3FFF). Das System ist so entwickelt, daß VIC-II davon ausgeht, daß sich der Zeichensatz im »zugriffsberechtigten« Speicherbereich befindet. Arbeitet der VIC-II in Bank 0, nimmt er an, der Zeichensatz befindet sich ab $1000, obwohl dieser in Wirklichkeit in $D000 liegt. Der Speicherbereich $1000 bis $1FFF ist aber trotzdem für den Anwender als RAM-Bereich vorhanden. Gleiches gilt für die drei anderen möglichen Banks des VIC-II:</p>
 
         <table class="plain">
             <tr>
@@ -174,11 +180,11 @@
 </code></pre>
 
 
-        <p>Jetzt stehen die 64 KByte RAM voll zur Verfügung, nur ist der Computer jetzt »scheintot«. Er reagiert weder auf Tastendruck noch auf gut zureden. Hier hilftnurnoch ein Resetoder ' Ausschalten.</p>
+        <p>Jetzt stehen die 64 KByte RAM voll zur Verfügung, nur ist der Computer jetzt »scheintot«. Er reagiert weder auf Tastendruck noch auf gut zureden. Hier hilft nur noch ein Reset oder Ausschalten.</p>
 
         <h2>Was passiert bei PEEK und POKE?</h2>
 
-        <p>Befindet sich der C 64 im Standardmodus (wie nach demEinschalten), dann sind Basic-ROM und Kernel-ROM aktiv. Wie wir wissen, kann man den ROM-Speicher nicht beschreiben (Read Only Memory). Was passiert nun, wenn man versucht, in diesen Speicherbereich einen Wert zu POKEn? Der Befehl wird nicht einfach ignoriert, wie man das so vom VC 20 oder den anderen CBM-Computern kennt. Der Prozessor schiebt den Wert einfach in das darunterliegende, »versteckte«RAM. Versucht man mit PEEK (X) das Byte wieder zu lesen, stellt man fest, daß der Prozessor auf das ROM zugreift.</p>
+        <p>Befindet sich der C 64 im Standardmodus (wie nach dem Einschalten), dann sind Basic-ROM und Kernel-ROM aktiv. Wie wir wissen, kann man den ROM-Speicher nicht beschreiben (Read Only Memory). Was passiert nun, wenn man versucht, in diesen Speicherbereich einen Wert zu POKEn? Der Befehl wird nicht einfach ignoriert, wie man das so vom VC 20 oder den anderen CBM-Computern kennt. Der Prozessor schiebt den Wert einfach in das darunterliegende, »versteckte« RAM. Versucht man mit PEEK (X) das Byte wieder zu lesen, stellt man fest, daß der Prozessor auf das ROM zugreift.</p>
 
         <p>Auf diese Weise läßt sich einfach das Basic- und Kernel-ROM ins RAM kopieren. Setzt man anschließend Bit 1 des Prozessorports auf Low, verändert sich scheinbar nichts. Der Prozessor greift jetzt auf das RAM zu und kann beliebig verändert werden.</p>
 
@@ -225,11 +231,11 @@
 
         <p>Hier stellen sich dem Anwender ungeahnte Möglichkeiten, auf die hier nicht im einzelnen eingegangen werden soll.</p>
 
-        <h2>20 KByte frei was tun damit?</h2>
+        <h2>20 KByte frei - was tun damit?</h2>
 
         <p>Es gibt auch noch andere Möglichkeiten, den RAM-Bereich unter dem ROM zu nutzen.</p>
 
-        <p>Es ist durchaus möglich, zum Beispiel ein HiRes-Grafikbild in desem RAM-Bereich zu erstellen. Durch Umschalten des VIC-II-Chips steht dem Anwender so sofort ein neues Grafikbild zur Verfügung, während das frühere Bild wieder editiert werden kann. Eine praktische Anwendung hierfür wäre zum Beispiel eine Dia-Show.</p>
+        <p>Es ist durchaus möglich, zum Beispiel ein HiRes-Grafikbild in diesem RAM-Bereich zu erstellen. Durch Umschalten des VIC-II-Chips steht dem Anwender so sofort ein neues Grafikbild zur Verfügung, während das frühere Bild wieder editiert werden kann. Eine praktische Anwendung hierfür wäre zum Beispiel eine Dia-Show.</p>
 
         <p>Die RAM-Bank unter dem ROM kann auch als sogenanntes RAM-Floppy verwendet werden. Es könnte also durchaus ein 20 KByte langes Maschinen-Programm ohne Schwierigkeiten im »versteckten« RAM untergebracht werden.</p>
 

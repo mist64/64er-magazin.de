@@ -17,27 +17,31 @@
         <h1>3D-Grafik für Schachspiele</h1>
         <p class="intro">Wollen Sie Ihrem Schachprogramm zu einer räumlichen Darstellung verhelfen oder wichtige Schachpartien speichern? Hier finden Sie wertvolle Routinen dafür.</p>
 
-        <p>aben Sie sich schon häufig über die zweidimensionale Darstellung bei Schachspielen geärgert? Das Programm »Schachgrafik« (Listing) beendet diese Misere. Sie können damit ein perspektivisches Schachbrett erzeugen, wie es im Bild zu sehen ist.</p>
+        <p>Haben Sie sich schon häufig über die zweidimensionale Darstellung bei Schachspielen geärgert? Das Programm »Schachgrafik« (Listing) beendet diese Misere. Sie können damit ein perspektivisches Schachbrett erzeugen, wie es im Bild zu sehen ist.</p>
 
-        <p>Das Programm ist vollständig in Maschinensprache geschrieben und belegt den Speicherbereich $CO00 bis $C9BE. Der Basic-Speicher bleibt auch bei eingeschalteter Grafik frei. Nachdem Sie das Programm mit dem MSE eingegeben haben, stehen Ihnen zwölf Routinen zur Verfügung, die mit dem SYS-Befehl aufgerufen werden können. Schachprogrammen wie »Schachmeister« (Ausgabe 11/84) oder »Schach dem C 64« (Ausgabe 8/85) verhelfen Sie mit diesem Programm zu einer hervorragenden Grafik.</p>
+        <p>Das Programm ist vollständig in Maschinensprache geschrieben und belegt den Speicherbereich $C000 bis $C9BE. Der Basic-Speicher bleibt auch bei eingeschalteter Grafik frei. Nachdem Sie das Programm mit dem MSE eingegeben haben, stehen Ihnen zwölf Routinen zur Verfügung, die mit dem SYS-Befehl aufgerufen werden können. Schachprogrammen wie »Schachmeister« (Ausgabe 11/84) oder »Schach dem C 64« (Ausgabe 8/85) verhelfen Sie mit diesem Programm zu einer hervorragenden Grafik.</p>
 
         <p>So, nun zu den einzelnen Routinen, die Ihnen nach der Eingabe von »Schachgrafik« zur Verfügung stehen.</p>
 
         <h3>SYS 50000</h3>
 
-        <p>Hiermit schalten Sie die Grafik ein. Weder die Bitmap wird gelöscht, noch werden die Farben der Grafik gesetzt. Die Bitmap liegt bei $EOOO, der Farbspeicher bei $CCOO.</p>
+        <p>Hiermit schalten Sie die Grafik ein. Weder die Bitmap wird gelöscht, noch werden die Farben der Grafik gesetzt. Die Bitmap liegt bei $E000, der Farbspeicher bei $CC00.</p>
 
         <h3>SYS 50003,FLAG</h3>
 
-        <p>Schaltet die Grafik aus. Bei FLAG=O geht der Computer in den Großschrift-Grafikmodus, bei FLAG=1 in den Kleinschrift-Großschrift-Modus. SYS 50006</p>
+        <p>Schaltet die Grafik aus. Bei FLAG=0 geht der Computer in den Großschrift-Grafikmodus, bei FLAG=1 in den Kleinschrift-Großschrift-Modus.</p>
 
-        <p>Löschen der Bitmap SYS 50009,Byte</p>
+        <h3>SYS 50006</h3>
 
-        <p>Setzen der Grafikfarben. Werte zwischen O und 255 können eingegeben werden. Das obere Nibble des Bytes bestimmt die Zeichen-, das untere die Hintergrundfarbe.</p>
+        <p>Löschen der Bitmap</p>
+
+        <h3>SYS 50009,Byte</h3>
+
+        <p>Setzen der Grafikfarben. Werte zwischen 0 und 255 können eingegeben werden. Das obere Nibble des Bytes bestimmt die Zeichen-, das untere die Hintergrundfarbe.</p>
 
         <h3>SYS 50012,FLAG</h3>
 
-        <p>Zeichnen eines leeren Brettes. Bei FLAG=O ist die untere linke Ecke in der Zeichen-, bei FLAG=1 in der Hintergrundfarbe gezeichnet.</p>
+        <p>Zeichnen eines leeren Brettes. Bei FLAG=0 ist die untere linke Ecke in der Zeichen-, bei FLAG=1 in der Hintergrundfarbe gezeichnet.</p>
 
         <h3>SYS 50015,FIG,FELD</h3>
 
@@ -94,9 +98,13 @@
             </tr>
         </table>
 
-        <p>Alle weiteren Codes sind nicht erlaubt. Die Felder sind von 0 bis 63 durchnumeriert. Dabei liegt Feld O links oben. SYS 50018,FELD</p>
+        <p>Alle weiteren Codes sind nicht erlaubt. Die Felder sind von 0 bis 63 durchnumeriert. Dabei liegt Feld 0 links oben.</p>
 
-        <p>Zeichnet nur das Feld mit der Nummer FELD neu. SYS 50021,FELDA,FELDB</p>
+        <h3>SYS 50018,FELD</h3>
+
+        <p>Zeichnet nur das Feld mit der Nummer FELD neu.</p>
+
+        <h3>SYS 50021,FELDA,FELDB</h3>
 
         <p>Setzt die Figur auf FELDA nach FELDB und zeichnet beide Felder neu.</p>
 
@@ -106,17 +114,18 @@
 
         <h3>SYS 50027</h3>
 
-        <p>Rotiert das Brett einmal gegen den Uhrzeigersinn. Hierbei werden auch synchron die Nummern der Felder geändert. Nach einmaligem Drehen befindet sich das Feld O links unten, nach zweimaligem Drehen rechts unten etc.</p>
+        <p>Rotiert das Brett einmal gegen den Uhrzeigersinn. Hierbei werden auch synchron die Nummern der Felder geändert. Nach einmaligem Drehen befindet sich das Feld 0 links unten, nach zweimaligem Drehen rechts unten etc.</p>
 
         <h3>SYS 50030</h3>
 
-        <p>Nach Ausführung dieses Befehls sind die Feldnummern wieder so, als sei das Brett bisher nicht gedreht worden. Feld Nr. O ist wieder links oben.</p>
+        <p>Nach Ausführung dieses Befehls sind die Feldnummern wieder so, als sei das Brett bisher nicht gedreht worden. Feld Nr. 0 ist wieder links oben.</p>
 
-        <h3>SYS 50033,TEXT,ZEILE,SPALTE.</h3>
+        <h3>SYS 50033,TEXT,ZEILE,SPALTE</h3>
 
         <p>Gibt den TEXT an der durch ZEILE und SPALTE bestimmten Position in der Bitmap aus. Alle Zeichen erscheinen im Großschrift-Grafikmodus. Steuerzeichen werden als Leerzeichen interpretiert.</p>
 
-        <p>Es muß gelten: O &lt;=ZEILE &lt;=24 und O0 &lt;=SPALTE &lt;=39.</p>
+        <p>Es muß gelten: 0 &lt;=ZEILE &lt;=24 und 0 &lt;=SPALTE &lt;=39.
+        </p>
 
         <p>Bei allen Befehlen können alle zu übergebenden Werte in beliebigen Formen, zum Beispiel als Variablen, Formeln oder ähnliches auftauchen.</p>
 

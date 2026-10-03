@@ -19,7 +19,7 @@
 
         <p>Der Modulgenerator zeichnet sich gegenüber vielen zum Teil mit der Hardware (EPROM-Programmiergerät) mitgelieferten und anderen käuflichen Programmen dieser Art durch seine einfache, menügesteuerte Bedienung aus. Er ermöglicht das komfortable Generieren eines aus bis zu fünf Programmen (Basic oder Maschinensprache) bestehenden Auto-Start-Moduls mit Menüsteuerung. Dieses Modul kann anschließend mit der Treibersoftware des EPROM-Brenners auf ein EPROM übertragen werden.</p>
 
-        <p>Vor der Beschreibung des Modulgenerators selbst sollen zuvor der Aufbau und die Funktionsweise der von ihm generierten Programme erläutert werden. Sie belegen den Bereich von $8000 bis $AO00 und eignen sich somit zum Brennen auf ein O0, beziehungsweise $AFFF, 8 KByte oder 16 KByte EPROM. Hinter der Modulkennung »CBM 80« für den Autostart befindet sich ein kurzes Steuerprogramm zur Tastaturabfrage, zum Verschieben und Starten der gespeicherten Programme; dahinter sind eine Liste der Programmnamen sowie eine Tabelle mit wichtigen Adressen:</p>
+        <p>Vor der Beschreibung des Modulgenerators selbst sollen zuvor der Aufbau und die Funktionsweise der von ihm generierten Programme erläutert werden. Sie belegen den Bereich von $8000 bis $A000 und eignen sich somit zum Brennen auf ein 0, beziehungsweise $AFFF, 8 KByte oder 16 KByte EPROM. Hinter der Modulkennung »CBM 80« für den Autostart befindet sich ein kurzes Steuerprogramm zur Tastaturabfrage, zum Verschieben und Starten der gespeicherten Programme; dahinter sind eine Liste der Programmnamen sowie eine Tabelle mit wichtigen Adressen:</p>
 
         <table class="plain">
             <tr>
@@ -114,15 +114,7 @@
 
         <p>Nachdem Aufbau und Funktionsweise der generierten Programme kurz erläutert wurden, folgt nun die Beschreibung des Modulgenerators. Er belegt das von Basic nicht benutzte RAM von $C000-$CFFF. Nach dem Kopieren des eben beschriebenen Modul-Steuerprogramms nach $8000 befindet man sich in einem Menü, das folgende Programmpunkte enthält:</p>
 
-        <p>F1 Directory</p>
-
-        <p>F3 Disc Commands</p>
-
-        <p>F5 File Load</p>
-
-        <p>F7 Save Modul</p>
-
-        <p>F8 Quit</p>
+        <p>F1 Directory<br>F3 Disc Commands<br>F5 File Load<br>F7 Save Modul<br>F8 Quit</p>
 
         <p>Nach der Betätigung einer der Funktionstasten prüft der Modulgenerator, ob die Diskette (Gerätenummer 8) eingeschaltet ist. Wenn nicht, ertönt ein akustisches Signal, und es wird eine Fehlermeldung ausgegeben (»Device not present«). Bei erfolgreichem Test wird das gewünschte Menü-Unterprogramm gestartet. Jedes Unterprogramm ist durch Eingabe eines »RETURN« zu verlassen, so daß man sich die einzelnen Programmpunkte ruhig ansehen kann.</p>
 
@@ -130,17 +122,17 @@
 
         <p>Das zweite, mit der Funktionstaste F3 gestartete Unterprogramm, dient dem Senden von Floppy-Systembefehlen (Scratch, Rename, Copy, Format, Validate, Initial., etc.), mit dem auch das Listen von Teilen der Directory möglich ist, zum Beispiel:</p>
 
-        <p>»$:T?A* « listet alle Programme des Directory, deren erster Buchstabe ein »T« und deren dritter Buchstabe ein »A« ist.</p>
+        <p>»$:T?A*« listet alle Programme des Directory, deren erster Buchstabe ein »T« und deren dritter Buchstabe ein »A« ist.</p>
 
         <p>Die Eingabe des Floppy-Kommandos muß im Modulgenerator ohne Anführungsstriche erfolgen.</p>
 
-        <p>Das dritte Unterprogramm des Modulgenerators (F5) dient dem Laden beziehungsweise Anhängen (Merge) eines Programms an das Modul-Programm (ab Adresse $81EB), beziehungsweise an das zuletzt geladene. Wird dieses Unterprogramm gewählt, werden auf dem Bildschirm die Anzahl freier Bytes, die Anzahl freier Blöcke und die Anzahl der bereits geladenen Programme angezeigt. Ist diese Zahl bereits fünf, erscheint kurz die Meldung »Out of Memory«, und man befindet sich wieder im Hauptmenü. Andernfalls erscheint »Filename:«, und man kann den Namen des gewünschten Programms eingeben. Drückt man dagegen nur die »RETURN«-Taste, gelangt man, wie bereits erwähnt, ins Hauptmenü zurück. Nach der Eingabe des Filenamens "und »RETURN« wird versucht, das Programm zu laden. Tritt dabei ein Fehler auf (zum Beispiel File not found), wird dies unverzüglich angezeigt und zum Hauptmenü zurückgesprungen. Benötigt das geladene Programm mehr Speicherkapazität als im Modul vorhanden, wird dies hinterher mit »Out of Memory« angezeigt und das Programm als nicht geladen betrachtet.</p>
+        <p>Das dritte Unterprogramm des Modulgenerators (F5) dient dem Laden beziehungsweise Anhängen (Merge) eines Programms an das Modul-Programm (ab Adresse $81EB), beziehungsweise an das zuletzt geladene. Wird dieses Unterprogramm gewählt, werden auf dem Bildschirm die Anzahl freier Bytes, die Anzahl freier Blöcke und die Anzahl der bereits geladenen Programme angezeigt. Ist diese Zahl bereits fünf, erscheint kurz die Meldung »Out of Memory«, und man befindet sich wieder im Hauptmenü. Andernfalls erscheint »Filename:«, und man kann den Namen des gewünschten Programms eingeben. Drückt man dagegen nur die »RETURN«-Taste, gelangt man, wie bereits erwähnt, ins Hauptmenü zurück. Nach der Eingabe des Filenamens und »RETURN« wird versucht, das Programm zu laden. Tritt dabei ein Fehler auf (zum Beispiel File not found), wird dies unverzüglich angezeigt und zum Hauptmenü zurückgesprungen. Benötigt das geladene Programm mehr Speicherkapazität als im Modul vorhanden, wird dies hinterher mit »Out of Memory« angezeigt und das Programm als nicht geladen betrachtet.</p>
 
-        <p>Nach erfolgreichem Ladevorgang (Meldung »00,0K,00, 00«) fragt das Programm, ob die Ladeanfangsadresse auch die Startadresse ist. Bei Ladeanfangsadresse $0801 fragt er, ob das Programm mit »RUN«, andernfalls ob es mit »SYS Anfangsadresse« gestartet werden soll. Diese Frage ist mit »J« oder »N« zu beantworten. Wird die Frage bestätigt, erscheint »O.K.«, und man befindet sich wieder im Hauptmenü. Bei »N« wird man nach der dezimalen (Integer-Zahl) Startadresse des Files gefragt (»Start mit SYS:?«). Wird an dieser Stelle lediglich die »RETURN«-Taste gedrückt, wird das Programm später im Modul lediglich verschoben (nicht gestartet!). Die Filenamen und die Adressen (Anfang, Ende und Start) werden in die Tabellen des Modul-Programms eingetragen, bevor in das Hauptmenü des Modulgenerators zurückgesprungen wird. Ist das Modul-Programm erstellt, kann es mit dem vierten Menüpunkt (F7) abgespeichert werden. Zunächst wird wiederum nach dem Filenamen gefragt, unter dem das Programm auf der Diskette abgelegt werden soll. Der eingegebene Filename des Moduls erscheint später auch mit dem Zusatz »Modul-Version« in der obersten Bildschirmzeile des Modul-Menüs und sollte deshalb sinnvoll gewählt werden.</p>
+        <p>Nach erfolgreichem Ladevorgang (Meldung »00,OK,00,00«) fragt das Programm, ob die Ladeanfangsadresse auch die Startadresse ist. Bei Ladeanfangsadresse $0801 fragt er, ob das Programm mit »RUN«, andernfalls ob es mit »SYS Anfangsadresse« gestartet werden soll. Diese Frage ist mit »J« oder »N« zu beantworten. Wird die Frage bestätigt, erscheint »O.K.«, und man befindet sich wieder im Hauptmenü. Bei »N« wird man nach der dezimalen (Integer-Zahl) Startadresse des Files gefragt (»Start mit SYS:?«). Wird an dieser Stelle lediglich die »RETURN«-Taste gedrückt, wird das Programm später im Modul lediglich verschoben (nicht gestartet!). Die Filenamen und die Adressen (Anfang, Ende und Start) werden in die Tabellen des Modul-Programms eingetragen, bevor in das Hauptmenü des Modulgenerators zurückgesprungen wird. Ist das Modul-Programm erstellt, kann es mit dem vierten Menüpunkt (F7) abgespeichert werden. Zunächst wird wiederum nach dem Filenamen gefragt, unter dem das Programm auf der Diskette abgelegt werden soll. Der eingegebene Filename des Moduls erscheint später auch mit dem Zusatz »Modul-Version« in der obersten Bildschirmzeile des Modul-Menüs und sollte deshalb sinnvoll gewählt werden.</p>
 
-        <p>Gespeichert wird immer der gesamte Bereich von $8000 bis $A000 (beziehungsweise bis $AFFF), so daß 33 Blöcke (66 Blöcke) auf der Diskette belegt werden. ;</p>
+        <p>Gespeichert wird immer der gesamte Bereich von $8000 bis $A000 (beziehungsweise bis $AFFF), so daß 33 Blöcke (66 Blöcke) auf der Diskette belegt werden.</p>
 
-        <p>Nach dem Speichern kann man mit dem letzten Punkt des Menüs (F8) den Modulgenerator verlassen. Wurde ein Programm geladen, das Modul jedoch nicht gespeichert, erscheint der Hinweis »Warning - Changes Not Saved. Quit (J/N)«. Bei Eingabe von »J« wird man gefragt, ob man das Modul testen oder zurück zu Basic will. Beim Modultest wird lediglich ein Software-Reset ausgelöst, mit dem man direktin das erstellte Modul-Programm gelangt und die integrierten Files mit den Tasten 1-n (n=maximal 5) starten kann.</p>
+        <p>Nach dem Speichern kann man mit dem letzten Punkt des Menüs (F8) den Modulgenerator verlassen. Wurde ein Programm geladen, das Modul jedoch nicht gespeichert, erscheint der Hinweis »Warning - Changes Not Saved. Quit (J/N)«. Bei Eingabe von »J« wird man gefragt, ob man das Modul testen oder zurück zu Basic will. Beim Modultest wird lediglich ein Software-Reset ausgelöst, mit dem man direkt in das erstellte Modul-Programm gelangt und die integrierten Files mit den Tasten 1-n (n=maximal 5) starten kann.</p>
 
         <p>Bei »Quit TO Basic« wird das Programm mit einem »rts« (entspricht dem Basic-Befehl »end« verlassen. Der Modulgenerator befindet sich weiterhin im RAM (Basic-RAM und ab Adresse $C000) und kann deshalb sowohl mit »RUN« als auch mit »SYS 49152« neu gestartet werden.</p>
 

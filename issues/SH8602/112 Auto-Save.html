@@ -17,17 +17,17 @@
         <h1>Auto-Save</h1>
         <p class="intro">Wenn Ihnen beim Abtippen eines Programms schon mal der Strom ausgefallen ist, dann ist das folgende Programm genau das richtige für Sie.</p>
 
-        <p>D: abgedruckten Listings in den Fachzeitschriften sind ja eine willkommene Programmaquelle. Allerdings ist das Abtippen der oft sehr langen Programme eine sehr mühselige Angelegenheit. Besonders groß wird der Ärger, wenn ein Stromausfall beziehungsweise ein Hardware-Defekt stundenlange Tipparbeit zunichte machen. Abhilfe schafft hier nur das umständliche Zwischenspeichern in gewissen Abständen, doch das wird oft vergessen oder aus Bequemlichkeit unterlassen.</p>
+        <p>Die abgedruckten Listings in den Fachzeitschriften sind ja eine willkommene Programmquelle. Allerdings ist das Abtippen der oft sehr langen Programme eine sehr mühselige Angelegenheit. Besonders groß wird der Ärger, wenn ein Stromausfall beziehungsweise ein Hardware-Defekt stundenlange Tipparbeit zunichte machen. Abhilfe schafft hier nur das umständliche Zwischenspeichern in gewissen Abständen, doch das wird oft vergessen oder aus Bequemlichkeit unterlassen.</p>
 
-        <p>Das hier vorgestellte Programm nimmt nun dem geplagten Computer-Benutzer diese Arbeit ab. Es speichert automatisch das bisher Getippte in Intervallen oder auch auf Knopfdruck ab. Bitte tippen Sie vor der Benutzung Listing 1 mitdem MSE und Listing 2 mit dem Checksummer ab. Vergessen Sie das Speichern nicht!</p>
+        <p>Das hier vorgestellte Programm nimmt nun dem geplagten Computer-Benutzer diese Arbeit ab. Es speichert automatisch das bisher Getippte in Intervallen oder auch auf Knopfdruck ab. Bitte tippen Sie vor der Benutzung Listing 1 mit dem MSE und Listing 2 mit dem Checksummer ab. Vergessen Sie das Speichern nicht!</p>
 
         <p>Hinweise zur Benutzung:</p>
 
-        <p>Geladen wird das Programm mit LOAD" AUTO-SAVE" ‚8 und anschließendem RUN. Der Maschinensprachteil wird nachgeladen und dann der Name des einzutippenden Programms erfragt. Keine beziehungsweise Eingabe von Leerzeichen wird abgefangen.</p>
+        <p>Geladen wird das Programm mit LOAD"AUTO-SAVE",8 und anschließendem RUN. Der Maschinensprachteil wird nachgeladen und dann der Name des einzutippenden Programms erfragt. Keine beziehungsweise Eingabe von Leerzeichen wird abgefangen.</p>
 
         <p>Bei der Eingabe des Speicher-Intervalls ist folgendes zu beachten: Die Intervalle werden nicht durch die Zeit, sondern durch die Speicherbelegung gesteuert. Dies geschieht durch eine Abfrage der Speicherstelle 46. Diese enthält das High-Byte des Zeigers auf den Variablen-Anfang (=Programmende). Gibt man also als Intervall zum Beispiel 4 ein, so wird immer dann, wenn 1 KByte Programmtext neu im Speicher stehen, zwischengespeichert. Um außerdem besonders schwierige Programmteile, zum Beispiel Bildschirmmasken oder mathematische Formeln, sofort zu speichern, gibt es die Möglichkeit, per Knopfdruck ein Speichern auszulösen.</p>
 
-        <p>Dies geschieht durch Drücken der @-Taste (Klammeraffe) und anschließendem RETURN. Diese Funktion kann mit POKE 49177,ASC(" taste") leicht auf jede andere Taste verlegt werden.</p>
+        <p>Dies geschieht durch Drücken der @-Taste (Klammeraffe) und anschließendem RETURN. Diese Funktion kann mit POKE 49177,ASC("taste") leicht auf jede andere Taste verlegt werden.</p>
 
         <p>Beendet werden kann das Programm durch RUN STOP/RESTORE oder einen Reset, neu wird es gestartet mit SYS 49152.</p>
 
@@ -88,31 +88,20 @@
 
         <p>INIT: Zwei Vektoren werden umgeändert und damit das Maschinenprogramm aktiviert.</p>
 
-        <p>BEFEHL: Dieser Teil wird über den Vektor " Neuen Basic-Befehl ausführen" (dez. 776-777) angesprungen. Er prüft, ob der Klammeraffe beziehungsweise die festgelegte Taste gedrückt wurde. Falls ja, wird zu SAVE verzweigt, ansonsten wieder in die Interpreterschleife.</p>
+        <p>BEFEHL: Dieser Teil wird über den Vektor "Neuen Basic-Befehl ausführen" (dez. 776-777) angesprungen. Er prüft, ob der Klammeraffe beziehungsweise die festgelegte Taste gedrückt wurde. Falls ja, wird zu SAVE verzweigt, ansonsten wieder in die Interpreterschleife.</p>
 
-        <p>AUTO: Diese Routine wurde über den " Zeiger auf Tastatur-Dekodiertabelle" (dez. 655-656) eingebunden. Bei jedem Tastendruck wird der Inhalt der Speicherstelle 46 mit dem Sollwert (siehe oben) verglichen und bei Gleichheit wiederum SAVE angesprungen.</p>
+        <p>AUTO: Diese Routine wurde über den "Zeiger auf Tastatur-Dekodiertabelle" (dez. 655-656) eingebunden. Bei jedem Tastendruck wird der Inhalt der Speicherstelle 46 mit dem Sollwert (siehe oben) verglichen und bei Gleichheit wiederum SAVE angesprungen.</p>
 
         <p>SAVE: Der eigentliche Hauptteil des Programms. Er wird von den oben genannten Routinen angesprungen und hat mehrere Aufgaben:</p>
 
-        <ul>
-            <li>
-                <p>»Sollwert« um »Intervall« erhöhen</p>
-            </li>
-            <li>
-                <p>bisherigen Programmteil löschen</p>
-            </li>
-            <li>
-                <p>neuen Programmteil speichern</p>
-            </li>
-            <li>
-                <p>Textmeldung ausgeben.</p>
-            </li>
-        </ul>
-
+        <p>— »Sollwert« um »Intervall« erhöhen</p>
+        <p>— bisherigen Programmteil löschen</p>
+        <p>— neuen Programmteil speichern</p>
+        <p>— Textmeldung ausgeben.</p>
 
         <p>Um den »Replace«-Befehl mittels Klammeraffen, der bekanntlich seine Tücken hat, zu umgehen, wurde der etwas umständlichere Weg gewählt, vor dem Speichern einen »Scratch«-Befehl an das Laufwerk zu senden und somit das alte Programm zu löschen.</p>
 
-        <p>Die Meldung »Saving« des Interpreters wird unterdrückt und statt dessen der Text »Programm wird abgespeichert« ausgegeben. Wem diese Meldung nicht gefällt, der kann sie leicht ändern, indem er sie im ASCIl-Format in den oben genannten Speicherbereich schreibt.</p>
+        <p>Die Meldung »Saving« des Interpreters wird unterdrückt und statt dessen der Text »Programm wird abgespeichert« ausgegeben. Wem diese Meldung nicht gefällt, der kann sie leicht ändern, indem er sie im ASCII-Format in den oben genannten Speicherbereich schreibt.</p>
 
         <address class="author">(Manfred Lins/bs)</address>
 

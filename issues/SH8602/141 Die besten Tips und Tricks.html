@@ -18,49 +18,45 @@
         <h1>Die besten Tips und Tricks</h1>
         <p class="intro">Es ist einfach lästig, immer wieder -zig Hefte nach einem bestimmten Trick durchsuchen zu müssen. Deshalb haben wir die wichtigsten und interessantesten Tips und Tricks aus früheren 64'er-Ausgaben für Sie zusammengestellt.</p>
 
-        <p>KK: Sie folgende Situation? Man sitzt vor einem Programmierproblem und erinnert sich - da stand doch mal was bei den Tips und Tricks. Ein Stapel 64'er wird geholt, und die Sucherei geht los. Wir wollen da Abhilfe schaffen. Auf den folgenden Seiten finden Sie unter anderem kurze Programme zu den Themen: Basic-Programme retten und verbinden, Bildschirm speichern, Cursor steuern, Listschutz, Maschinenprogramme speichern, PET-Simulation, Reset-Hilfen.</p>
+        <p>Kennen Sie folgende Situation? Man sitzt vor einem Programmierproblem und erinnert sich - da stand doch mal was bei den Tips und Tricks. Ein Stapel 64'er wird geholt, und die Sucherei geht los. Wir wollen da Abhilfe schaffen. Auf den folgenden Seiten finden Sie unter anderem kurze Programme zu den Themen: Basic-Programme retten und verbinden, Bildschirm speichern, Cursor steuern, Listschutz, Maschinenprogramme speichern, PET-Simulation, Reset-Hilfen.</p>
 
         <h2>Basic-Programme verbinden</h2>
 
-        <p>So manch einen C 64-Besitzer wird es schon geärgert haben, daß sein Computer keinen MERGE-Befehlbesitzt. Mit wenig Aufwand ist es aber dennoch möglich, Basic-‚ Programme aneinanderzuhängen:</p>
+        <p>So manch einen C 64-Besitzer wird es schon geärgert haben, daß sein Computer keinen MERGE-Befehl besitzt. Mit wenig Aufwand ist es aber dennoch möglich, Basic-Programme aneinanderzuhängen:</p>
 
         <ol>
-            <li>
-                <p>Im Direktmodus »PRINT PEEK(43); PEEK(44)«eingeben und sich die Ergebnisse merken.</p>
-            </li>
-            <li>
-                <p>Das erste Programm normal laden.</p>
-            </li>
-            <li>
-                <p>Erscheint jetzt nach »PRINT PEEK(45)« eine Null oder eine Eins, dann geben Sie »POKE 43, 256 + PEEK(45) - 2 :: POKE 44, PEEK(46) - 1 : NEW« ein. Im anderen Fall wird »POKE 43, PEEK(45) - 2 : POKE 44, , PEEK(46) : NEW« eingegeben.</p>
-            </li>
-            <li>
-                <p>Nun wird das anzuhängende Programm geladen (Achtung! Das anzuhängende Programm muß die höheren Zeilennummern haben).</p>
-            </li>
-            <li>
-                <p>Jetzt POKEn Sie in die Speicherstellen 43 und 44 die zu Anfang gemerkten Werte.</p>
-            </li>
+            <li>Im Direktmodus »PRINT PEEK(43); PEEK(44)« eingeben und sich die Ergebnisse merken.</li>
+            <li>Das erste Programm normal laden.</li>
+            <li>Erscheint jetzt nach »PRINT PEEK(45)« eine Null oder eine Eins, dann geben Sie »POKE 43, 256 + PEEK(45) - 2 : POKE 44, PEEK(46) - 1 : NEW« ein. Im anderen Fall wird »POKE 43, PEEK(45) - 2 : POKE 44, PEEK(46) : NEW« eingegeben.</li>
+            <li>Nun wird das anzuhängende Programm geladen (Achtung! Das anzuhängende Programm muß die höheren Zeilennummern haben).</li>
+            <li>Jetzt POKEn Sie in die Speicherstellen 43 und 44 die zu Anfang gemerkten Werte.</li>
         </ol>
 
 
-        <p>Beide Programme sind nun verbunden. Wichtig bei der ganzen Prozedur ist, daß keine Variablen definiertwerden, da das MERGEn sonst nicht richtig funktioniert.</p>
+        <p>Beide Programme sind nun verbunden. Wichtig bei der ganzen Prozedur ist, daß keine Variablen definiert werden, da das MERGEn sonst nicht richtig funktioniert.</p>
 
         <address class="author">(Thomas Lopatic)</address>
 
         <h2>Basic-Programme retten</h2>
 
-        <p>Die Betriebssystemroutine »Angleich von Koppeladressen« ab Adresse 42291 ermöglicht ein schnelles und einfaches »UNNEW« nach einem versehentlichen »NEW« oder Reset: POKE 2049,1 : POKE 2050,1 : SYS 42291 Danach kann zumindest wieder geilSTet werden. Ein vollständiges »UNNEW« verlangt allerdings die Korrektur der Zeiger auf den Beginn der Variablen und Felder. Dazu wäre die Kenntnis der Programmlänge notwendig. Man kann sich aber behelfen, indem man das Programm notfalls in Teilen auf dem Bildschirm auf LISTet und die einzelnen Zeilen mit der RETURN-Taste neu übernimmt.</p>
+        <p>Die Betriebssystemroutine »Angleich von Koppeladressen« ab Adresse 42291 ermöglicht ein schnelles und einfaches »UNNEW« nach einem versehentlichen »NEW« oder Reset:</p>
+
+        <pre><code>POKE 2049,1 : POKE 2050,1 : SYS 42291
+</code></pre>
+
+        <p>Danach kann zumindest wieder geLISTet werden. Ein vollständiges »UNNEW« verlangt allerdings die Korrektur der Zeiger auf den Beginn der Variablen und Felder. Dazu wäre die Kenntnis der Programmlänge notwendig. Man kann sich aber behelfen, indem man das Programm notfalls in Teilen auf dem Bildschirm auf LISTet und die einzelnen Zeilen mit der RETURN-Taste neu übernimmt.</p>
 
         <address class="author">(Gerhard Wagner)</address>
 
         <h2>UNNEW</h2>
 
-        <pre><code>Haben Sie ein Programm versehentlich mit NEW gelöscht, hilft UNNEW:
-100 FOR 1=525 TO 578
-120 READ A : POKE I,A :
+        <p>Haben Sie ein Programm versehentlich mit NEW gelöscht, hilft UNNEW:</p>
+
+        <pre><code>100 FOR I=525 TO 578
+120 READ A : POKE I,A : NEXT I
 200 POKE 43,525 AND 255 : POKE 44,2
 210 POKE 45,578 AND 255 : POKE 46,2
-220 CLR : SAVE " UNNEW",8 : REMbzw. ‚1,1
+220 CLR : SAVE " UNNEW",8 : REM bzw. ,1,1
 300 DATA 160,003,200,177,043,208,251,200
 310 DATA 200,152,160,000,145,043,165,044
 320 DATA 200,145,043,133,060,160,000,132
@@ -68,10 +64,16 @@
 340 DATA 177,059,208,245,232,224,003,208
 350 DATA 242,200,208,002,230,060,132,045
 360 DATA 164,060,132,046,096,256
-Wenn Sie dieses Programm eingeben und starten, wird ein Programm namens »UNNE\W« auf Diskette geschrieben. Falls Sie aus Versehen NEW eingetippt haben, dann laden Sie das Programm durch
-LOAD "UNNEW" ‚8,1
-und starten es durch
-SYS 525
+</code></pre>
+
+        <p>Wenn Sie dieses Programm eingeben und starten, wird ein Programm namens »UNNEW« auf Diskette geschrieben. Falls Sie aus Versehen NEW eingetippt haben, dann laden Sie das Programm durch</p>
+
+        <pre><code>LOAD "UNNEW" ,8,1
+</code></pre>
+
+        <p>und starten es durch</p>
+
+        <pre><code>SYS 525
 </code></pre>
 
 
@@ -79,17 +81,19 @@ SYS 525
 
         <p>Das kurze Maschinenprogramm (Listing 1) dient dazu, den Bildschirminhalt beim Commodore 64 zu speichern und auch wieder einzuladen. Dies kann mit einem Recorder oder Diskettenlaufwerk geschehen. Dabei werden außer dem eigentlichen Bildschirmspeicher (der an eine beliebige Stelle verschoben sein kann und nicht ab Adresse 1024 liegen muß) auch das Color-RAM und die Tabelle der Doppelzeilenkennzeichnungen mitberücksichtigt. Das Speichern und Laden erfolgt über einen Pufferbereich im »versteckten« RAM ab 40960, da die drei verschiedenen Speicherbereiche in einem Stück gespeichert und außerdem die 1000 Farbnibbles zu 500 Bytes zusammengeschoben werden. Das erspart beim Arbeiten mit dem Recorder wertvolle Zeit.</p>
 
-        <p>Nach dem Eintippen des Basic-Loaders kann durch »RUN 16« geprüft werden, ob es richtig eingegeben wurde. Trotzdem sollte es vor dem Start gespeichert werden, da auch durch Prüfsummen nicht alle Fehler erkannt werden können. Ausgegeben werden zwei Adressen für das Laden und Speichern. Das Programm kann an jede Stelle des Arbeitsspeichers geladen werden, in der vorliegenden Version lädt es sich an das Ende des Basic-Arbeitsspeichers. Es: ist davon auszugehen, daß das Programm direktnach demEinschalten ohne andere Erweiterungen geladen und gestartet wird.</p>
+        <p>Nach dem Eintippen des Basic-Loaders kann durch »RUN 16« geprüft werden, ob es richtig eingegeben wurde. Trotzdem sollte es vor dem Start gespeichert werden, da auch durch Prüfsummen nicht alle Fehler erkannt werden können. Ausgegeben werden zwei Adressen für das Laden und Speichern. Das Programm kann an jede Stelle des Arbeitsspeichers geladen werden, in der vorliegenden Version lädt es sich an das Ende des Basic-Arbeitsspeichers. Es ist davon auszugehen, daß das Programm direkt nach dem Einschalten ohne andere Erweiterungen geladen und gestartet wird.</p>
 
         <p>Soll ein Bildschirminhalt auf Diskette gespeichert werden, so erfolgt dies durch</p>
 
-        <p>SYS 40738 "FILENAME", 8</p>
+        <pre><code>SYS 40738 "FILENAME", 8
+</code></pre>
 
         <p>Beim Arbeiten mit Recorder kann (auch beim Laden) die Gerätenummer entfallen; die Angabe einer Sekundäradresse ist nicht erlaubt. Durch das Speichern bedingte Betriebssystemmeldungen wie »PRESS RECORD &amp; PLAY« sowie das Scrolling des Bildschirms sind unbedeutend und werden nicht berücksichtigt. Alle Bildschirmdaten werden zuvor in einen Zwischenspeicher übertragen.</p>
 
         <p>Das Laden solcherart gespeicherter Bildschirminhalte geschieht mit</p>
 
-        <p>SYS 40833 "FILENAME", 8</p>
+        <pre><code>SYS 40833 "FILENAME", 8
+</code></pre>
 
         <p>Zunächst werden die Daten in den Puffer von Adresse 40960 bis 42483 geladen und dann in MSB-Tabelle, Farbspeicher und die momentan gewählte Videomatrix übertragen.</p>
 
@@ -104,7 +108,7 @@ SYS 525
 
         <p>Bei professionellen Programmen der PC-Klasse kann der Cursor meist über Eingabegeräte wie die Maus positioniert werden. Daß es auch recht gut mit dem Joystick und dem C 64 funktioniert, beweist dieses Programm.</p>
 
-        <p>Haben Sie den kurzen MSE-Lader (Listing 2) eingetippt und gestartet, können Sie den Cursor mit einem Joystick in Port 2 steuern. Das Steuerprogramm befindet sich von Adresse $C000 bis $C066 im Speicher. Die ersten 15 Bytes nimmt eine Initialisierungsroutine in Anspruch, die den Interruptvektor auf $COOF legt und das Steuerprogramm in den Kernelinterrupt einbindet. Die Routine wird mit SYS 49152 aufgerufen. Das Programm benutzt Speicherzelle $02 als Zählregister, da der Joystick nur bei jedem sechsten Interrupt abgefragt wird. In Zeile 300 des Assemblerlistings (Listing 3) wird die Zählvariable um 1 erniedrigt. Ist die Variable O, wird sie auf 6 gesetzt und in die Steuerungsroutine verzweigt. Ab Zeile 360 wird der Tastaturpuffer auf freien Platz überprüft. Sollte der Puffer voll sein, wird sofort in die Interruptroutine des Betriebssystems ($EA31) gesprungen. In Zeile 400 wird der Joystick abgefragt und das entsprechende Cursorsteuerzeichen in den Akku geladen. Ab 800 wird das Zeichen in den Tastaturpuffer geschrieben und der Pufferzeiger erhöht.</p>
+        <p>Haben Sie den kurzen MSE-Lader (Listing 2) eingetippt und gestartet, können Sie den Cursor mit einem Joystick in Port 2 steuern. Das Steuerprogramm befindet sich von Adresse $C000 bis $C066 im Speicher. Die ersten 15 Bytes nimmt eine Initialisierungsroutine in Anspruch, die den Interruptvektor auf $C00F legt und das Steuerprogramm in den Kernelinterrupt einbindet. Die Routine wird mit SYS 49152 aufgerufen. Das Programm benutzt Speicherzelle $02 als Zählregister, da der Joystick nur bei jedem sechsten Interrupt abgefragt wird. In Zeile 300 des Assemblerlistings (Listing 3) wird die Zählvariable um 1 erniedrigt. Ist die Variable 0, wird sie auf 6 gesetzt und in die Steuerungsroutine verzweigt. Ab Zeile 360 wird der Tastaturpuffer auf freien Platz überprüft. Sollte der Puffer voll sein, wird sofort in die Interruptroutine des Betriebssystems ($EA31) gesprungen. In Zeile 400 wird der Joystick abgefragt und das entsprechende Cursorsteuerzeichen in den Akku geladen. Ab 800 wird das Zeichen in den Tastaturpuffer geschrieben und der Pufferzeiger erhöht.</p>
 
         <address class="author">(P. Siepen)</address>
 
@@ -207,7 +211,10 @@ SYS 525
 
         <h2>Cursor steuern</h2>
 
-        <p>Das Betriebssystem des C 64 enthält eine Routine, die man benutzen kann, um den Cursor an eine beliebige Stelle zu setzen. Geben Sie doch mal folgendes ein: POKE 214, (Zeile) : POKE 211, (Spalte) : SYS 58640 : PRINT " TEXT"</p>
+        <p>Das Betriebssystem des C 64 enthält eine Routine, die man benutzen kann, um den Cursor an eine beliebige Stelle zu setzen. Geben Sie doch mal folgendes ein:</p>
+
+        <pre><code>POKE 214, (Zeile) : POKE 211, (Spalte) : SYS 58640 : PRINT " TEXT"
+</code></pre>
 
         <address class="author">(Michael Keukert)</address>
 
@@ -215,7 +222,7 @@ SYS 525
 
         <p>Für alle diejenigen C 64-Besitzer, denen die Bewegung des Cursors bisher zu langsam war, gibt es einen speziellen POKE.</p>
 
-        <p>Mit POKE 56325, 5 wird der Cursor rasend schnell und flitzt bei Betätigung der Cursortasten nur noch so über den Bildschirm. Wer's lieber gemütlicher mag, der sollte es statt dessen einmal mit POKE 56325,255 probieren.</p>
+        <p>Mit POKE 56325,5 wird der Cursor rasend schnell und flitzt bei Betätigung der Cursortasten nur noch so über den Bildschirm. Wer's lieber gemütlicher mag, der sollte es statt dessen einmal mit POKE 56325,255 probieren.</p>
 
         <address class="author">(Oliver Bausch)</address>
 
@@ -223,7 +230,8 @@ SYS 525
 
         <p>Häufig möchte man sich das Directory einer Diskette ansehen, ohne das gerade im Speicher befindliche Programm zu zerstören. Wenn man das DOS 5.1 nicht geladen hat, behilft man sich meist mit der zeitaufwendigen Zwischenspeicherung des Programms auf der Diskette. Es geht jedoch auch einfacher und schneller. Geben Sie einfach den folgenden Befehl ein:</p>
 
-        <p>POKE 44, PEEK(46) + 1</p>
+        <pre><code>POKE 44, PEEK(46) + 1
+</code></pre>
 
         <p>Damit wird der Basic-Anfang auf einen freien Speicherbereich gestellt. Sie können jetzt wie gewohnt mit »LOAD "$",8« das Directory laden und anschließend auflisten.</p>
 
@@ -235,9 +243,9 @@ SYS 525
 
         <p>Mit einem einfachen SYS-Aufruf können Sie Programme und sequentielle Dateien direkt von Diskette listen. Programme im Speicher bleiben dabei erhalten.</p>
 
-        <p>»Floppy-Lister« bietet zwei Möglichkeiten, ein Programm von Diskette zu listen. Basic-Programme und sequenitielle Dateien können entweder als Klartext oder als Speicherauszug (Dumps) gelistet werden. Im Dumpmodus werden sämtliche Daten als Hexcodes ausgegeben und, soweit möglich, in ASCII-Zeichen übersetzt. Deshalb eignet er sich besonders zum Analysieren von unbekannten. Programmdateien. Maschinenprogramme dürfen grundsätzlich nur auf diese Art gelistet werden, will man einen Absturz vermeiden.</p>
+        <p>»Floppy-Lister« bietet zwei Möglichkeiten, ein Programm von Diskette zu listen. Basic-Programme und sequentielle Dateien können entweder als Klartext oder als Speicherauszug (Dumps) gelistet werden. Im Dumpmodus werden sämtliche Daten als Hexcodes ausgegeben und, soweit möglich, in ASCII-Zeichen übersetzt. Deshalb eignet er sich besonders zum Analysieren von unbekannten Programmdateien. Maschinenprogramme dürfen grundsätzlich nur auf diese Art gelistet werden, will man einen Absturz vermeiden.</p>
 
-        <p>Ist das Ladeprogramm (Listing 4) mit dem MSE eingetippt, kann das Maschinenprogramm auf Diskette oder Kassette gespeichert werden. Der »Floppy-Lister« kann dann direkt geladen (LOAD "name/ 8, 1, oder LOAD "name", 1, 1) und mit SYS 49152, "XY: filename" aufgerufen werden. Vergessen Sie nach dem absoluten Laden nicht, den erforderlichen NEU-Befehl im Direktmodus einzugeben, um die Basic-Zeiger in einen vernünftigen Zustand zu bringen. »X« steht für die Fileart: entweder »P« für Programm oder »S« für sequentielle Datei. »Y« steht für den Modus, in dem gelistet werden soll: »L« für einfaches Listen und »D« für Ausgabe in Form eines Speicherauszugs. Zum Beispiel listet der Befehl SYS 49152," SL:TESTSEQUENZ" eine sequentielle Datei mit dem Namen »sTESTSEQUENZ«. Abkürzungen des Filenamens mit »*« sind erlaubt. Falsche Eingaben werden mit einer Fehlermeldung quittiert.</p>
+        <p>Ist das Ladeprogramm (Listing 4) mit dem MSE eingetippt, kann das Maschinenprogramm auf Diskette oder Kassette gespeichert werden. Der »Floppy-Lister« kann dann direkt geladen (LOAD "name", 8, 1, oder LOAD "name", 1, 1) und mit SYS 49152,"XY:filename" aufgerufen werden. Vergessen Sie nach dem absoluten Laden nicht, den erforderlichen NEU-Befehl im Direktmodus einzugeben, um die Basic-Zeiger in einen vernünftigen Zustand zu bringen. »X« steht für die Fileart: entweder »P« für Programm oder »S« für sequentielle Datei. »Y« steht für den Modus, in dem gelistet werden soll: »L« für einfaches Listen und »D« für Ausgabe in Form eines Speicherauszugs. Zum Beispiel listet der Befehl SYS 49152,"SL:TESTSEQUENZ" eine sequentielle Datei mit dem Namen »TESTSEQUENZ«. Abkürzungen des Filenamens mit »*« sind erlaubt. Falsche Eingaben werden mit einer Fehlermeldung quittiert.</p>
 
         <p>Mit der CTRL-Taste kann die Ausgabe verlangsamt und mit der RUN/STOP-Taste unterbrochen werden. Eine Fortsetzung erfolgt mit der A-, und vorzeitiger Abbruch des Listens mit der DEL-Taste. Am Ende eines Listings muß immer die SPACE-Taste gedrückt werden.</p>
 
@@ -253,16 +261,19 @@ SYS 525
 
         <h2>Joystickabfrage:</h2>
 
-        <pre><code>Auch die Joystickabfrage ist beim C64 nicht ganz einfach. Dabei hilft folgendes Hilfsprogramm:
-10 POKE 56322,224
-20 JO=PEEK (56320) ,
-30 IF (JO AND 1)=0 THENPRINT" OBEN"
-40 IF (JO AND 2)=0 THENPRINT" UNTEN"
+        <p>Auch die Joystickabfrage ist beim C 64 nicht ganz einfach. Dabei hilft folgendes Hilfsprogramm:</p>
+
+        <pre><code>10 POKE 56322,224
+20 JO=PEEK(56320)
+30 IF (JO AND 1)=0 THENPRINT"OBEN"
+40 IF (JO AND 2)=0 THENPRINT"UNTEN"
 50 IF (JO AND 4)=0 THENPRINT"LINKS"
 60 IF (JO AND 8)=0 THENPRINT"RECHTS"
-70 IF (JO AND 16)=0 THENPRINT" FEUER"
-Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
+70 IF (JO AND 16)=0 THENPRINT"FEUER"
 </code></pre>
+
+        <p>Dieses Programm gilt für eine Joystickabfrage am Controlport 2.</p>
+
 
 
         <h2>Commodore-Joystick verbessert</h2>
@@ -275,11 +286,13 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <h2>List-Schutz für Basic-Programme</h2>
 
-        <p>Dieser List-Schutz (Listing 5) ist für Nichteingeweihte sehr verblüffend. Die Grundidee dazu stammt aus dem Bericht »Disketten-Manipulationen« aus der 64'er, Ausgabe 6/85. Er wurde jedoch etwas ausgebaut, so daß hier beim Listen alle Steuercodes aktiv werden. Dies wird dadurch erreicht, daß man in eine Speicherstelle vor den Codes die Zahl 141 schreibt. Um nun ein Programm zu schützen, lädtman es und gibt zwei Zeilen ein (Listing 5).</p>
+        <p>Dieser List-Schutz (Listing 5) ist für Nichteingeweihte sehr verblüffend. Die Grundidee dazu stammt aus dem Bericht »Disketten-Manipulationen« aus der 64'er, Ausgabe 6/85. Er wurde jedoch etwas ausgebaut, so daß hier beim Listen alle Steuercodes aktiv werden. Dies wird dadurch erreicht, daß man in eine Speicherstelle vor den Codes die Zahl 141 schreibt. Um nun ein Programm zu schützen, lädt man es und gibt zwei Zeilen ein (Listing 5).</p>
 
         <p>Danach gibt man im Direktmodus ein:</p>
 
-        <p>POKE 2067,71 : POKE 2073,141 : POKE 2118,0 : POKE 2119,0</p>
+        <pre><code>POKE 2067,71 : POKE 2073,141 : POKE 2118,0 :
+POKE 2119,0
+</code></pre>
 
         <p>Listet man nun das Programm, so wird der Bildschirm gelöscht und der Text in der REM-Zeile ausgegeben. Durch das künstlich erzeugte Basic-Programm-Endezeichen (drei Nullen) wird das Listen abgebrochen. Wird im Programm dann auch noch durch POKE 788,52 die RUN-STOP-, und durch POKE 792,193 die RESTORE-Taste ausgeschaltet, kann keiner mehr an das Programm. Aufheben läßt sich dieser List-Schutz nur mit einem Monitor und mit der Kenntnis der Funktionsweise des Schutzes.</p>
 
@@ -296,45 +309,40 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Ich habe mich daher entschlossen, ein Programm zu schreiben, das diese Mängel umgeht und sogar noch andere positive Merkmale aufweist.</p>
 
-        <p>Zunächst eine Zusammenfassung von drei mir bekannten Listschutzmöglichkeiten mit ihren Vor- und Nachteilen: 1. Möglichkeit</p>
+        <p>Zunächst eine Zusammenfassung von drei mir bekannten Listschutzmöglichkeiten mit ihren Vor- und Nachteilen:</p>
+
+        <h3>1. Möglichkeit</h3>
 
         <p>In die erste Zeile des Basic-Programms (zum Beispiel Zeilennummer 1) wird REM, gefolgt von zwei Anführungszeichen und SHIFT L, geschrieben.</p>
 
-        <p>1 REM" "L (RETURN)</p>
+        <pre><code>1 REM" "L (RETURN)
+</code></pre>
 
-        <p>Der Cursor wird nun auf das zweite Anführungszeichen gesetzt und sechsmal SHIFT INST gedrückt (das Anführungszeichen wird um sechs Positionen nach rechts geschoben). Dann wird sechsmal DEL eingegeben (es erscheinen als Steuerzeichen sechs reverse T) und die Zeile mit (RETURN) abgespeichert. Wird nun der LIST-Befehl aufgerufen, meldet sich der Rechner mit: ?SYNTAX ERROR</p>
-
-        <p>READY.</p>
+        <p>Der Cursor wird nun auf das zweite Anführungszeichen gesetzt und sechsmal SHIFT INST gedrückt (das Anführungszeichen wird um sechs Positionen nach rechts geschoben). Dann wird sechsmal DEL eingegeben (es erscheinen als Steuerzeichen sechs reverse T) und die Zeile mit (RETURN) abgespeichert. Wird nun der LIST-Befehl aufgerufen, meldet sich der Rechner mit:<br>"<br>?SYNTAX ERROR<br>READY.</p>
 
         <p>Auf den ersten Blick sehr beeindruckend, aber durch Entfernen dieser Zeile ist der Listschutz wieder aufgehoben. Außerdem ist ein »LIST 2« noch möglich.</p>
 
-        <ol>
-            <li>Möglichkeit</li>
-        </ol>
-
+        <h3>2. Möglichkeit</h3>
 
         <p>In jede Basic-Zeile werden synthetische Steuerzeichen eingefügt (genaue Beschreibung im 64'er-Magazin, Ausgabe 6/84). Diese Methode ist zwar recht sicher, will man aber alle Zeilen eines längeren Basic-Programms schützen, ist der Aufwand viel zu groß, vom Speicherplatzbedarf der Steuerzeichen ganz abgesehen.</p>
 
-        <ol>
-            <li>Möglichkeit</li>
-        </ol>
-
+        <h3>3. Möglichkeit</h3>
 
         <p>Durch POKE 775,200 wird der Listbefehl außer Kraft gesetzt, durch POKE 775,167 wird diese Wirkung wieder aufgehoben. Dieser Listschutz ist zwar wirkungsvoll, aber er muß erst durch diesen POKE-Befehl aktiviert werden. Nach dem Laden eines Programms ist er daher noch nicht aktiv.</p>
 
-        <p>Das hier vorgestellte Programm erzeugt nicht nur einen sicheren Listschutz, sondern schützt auch vor dem Löschen einzelner Basic-Zeilen. So können zum Beispiel Hinweise auf ein Kopierrecht und auf den Autor eines Programms nicht geändert oder entfernt werden. Auch kann ein so gesichertes Programm nur mit RUN gestartet werden, ein RUN, gefolgt von einer Zeilennummer, führt zu einer Fehlermeldung. Jede Zeile des Programms ist geschützt, es können also auch einzelne Zeilen nicht gelistet werden. Einzige Bedingung für die Verwendung dieses Schutzes: Das zu schützende Programm darf keine Zeilennummern O und 1 enthalten. Ansonsten wird eine Fehlermeldung ausgegeben und das Programm bleibt unverändert.</p>
+        <p>Das hier vorgestellte Programm erzeugt nicht nur einen sicheren Listschutz, sondern schützt auch vor dem Löschen einzelner Basic-Zeilen. So können zum Beispiel Hinweise auf ein Kopierrecht und auf den Autor eines Programms nicht geändert oder entfernt werden. Auch kann ein so gesichertes Programm nur mit RUN gestartet werden, ein RUN, gefolgt von einer Zeilennummer, führt zu einer Fehlermeldung. Jede Zeile des Programms ist geschützt, es können also auch einzelne Zeilen nicht gelistet werden. Einzige Bedingung für die Verwendung dieses Schutzes: Das zu schützende Programm darf keine Zeilennummern 0 und 1 enthalten. Ansonsten wird eine Fehlermeldung ausgegeben und das Programm bleibt unverändert.</p>
 
-        <p>Das Listschutzprogramm (Listing 6) liegt als Basic-Lader vor. Nachdem esrichtig abgetippt wurde, kann es durch RUN gestartet werden. Das Maschinenprogramm steht dann im Speicher ab der Adresse 50000 zur Verfügung. Das zu schützende Basic-Programm kann nun geladen werden, durch SYS 50000 wird das Schutzprogramm aktiviert und das Basic-Programm geschützt. Es kann nun wieder auf Kassette/Diskette gespeichert werden. Das mit dem Listschutz versehene Programm ist nur um wenige Bytes größer als vorher.</p>
+        <p>Das Listschutzprogramm (Listing 6) liegt als Basic-Lader vor. Nachdem es richtig abgetippt wurde, kann es durch RUN gestartet werden. Das Maschinenprogramm steht dann im Speicher ab der Adresse 50000 zur Verfügung. Das zu schützende Basic-Programm kann nun geladen werden, durch SYS 50000 wird das Schutzprogramm aktiviert und das Basic-Programm geschützt. Es kann nun wieder auf Kassette/Diskette gespeichert werden. Das mit dem Listschutz versehene Programm ist nur um wenige Bytes größer als vorher.</p>
 
-        <p>Funktionsweise</p>
+        <h3>Funktionsweise</h3>
 
-        <p>Das Maschinenprogramm (Listing 6) generiert zwei Basic-Zeilen mit den Zeilennummern O und 1. Die Zeile O ist eine REM-Zeile, in der ein unlistbares Zeichen (SHIFT L) steht. Hinter diesem Zeichen stehen dann noch zwei kurze Maschinenprogramme, deren Funktionen im folgenden noch erklärt werden. In der zweiten Zeile steht ein SYS-Befehl, der eine der beiden Maschinenroutinen in Zeile O startet. Sind diese beiden Zeilen nun erzeugt, wird die Zeilennummer O durch eine höhere, eigentlich unerlaubte Zeilennummer (größer 64000) ersetzt. Diese Zeile kann daher auch nicht gelöscht werden.</p>
+        <p>Das Maschinenprogramm (Listing 6) generiert zwei Basic-Zeilen mit den Zeilennummern 0 und 1. Die Zeile 0 ist eine REM-Zeile, in der ein unlistbares Zeichen (SHIFT L) steht. Hinter diesem Zeichen stehen dann noch zwei kurze Maschinenprogramme, deren Funktionen im folgenden noch erklärt werden. In der zweiten Zeile steht ein SYS-Befehl, der eine der beiden Maschinenroutinen in Zeile 0 startet. Sind diese beiden Zeilen nun erzeugt, wird die Zeilennummer 0 durch eine höhere, eigentlich unerlaubte Zeilennummer (größer 64000) ersetzt. Diese Zeile kann daher auch nicht gelöscht werden.</p>
 
-        <p>Da alle nun folgenden Zeilen des Programms kleiner sind als die erste,können diese vom Computer nicht mehr erkannt werden. Ein-Sprung in eine solche Zeile führt zu der Fehlermeldung: ?UNDEF'D STATEMENT ERROR. Es kann daher auchkeine Zeile gelöscht werden, da diese für den Computer ja nicht mehr vorhanden sind.</p>
+        <p>Da alle nun folgenden Zeilen des Programms kleiner sind als die erste, können diese vom Computer nicht mehr erkannt werden. Ein Sprung in eine solche Zeile führt zu der Fehlermeldung: ?UNDEF'D STATEMENT ERROR. Es kann daher auch keine Zeile gelöscht werden, da diese für den Computer ja nicht mehr vorhanden sind.</p>
 
         <p>Der einzige Nachteil ist, daß es nicht nur ein perfekter List- und Löschschutz, sondern auch ein RUN-Schutz ist (auch Sprungziele innerhalb des Programms können nicht gefunden werden).</p>
 
-        <p>Wird das geschützte Programm gestartet, trifft der Interpreter als erstes auf den SYS-Befehl in Zeile 1. Es folgt ein Sprung in das Maschinenprogramm in der REM-Zeile. Dort wird die Zeilennummer wieder auf O gesetzt, und der Vektor auf den Basic-Warmstart wird auf die zweite Maschinenroutine gesetzt.</p>
+        <p>Wird das geschützte Programm gestartet, trifft der Interpreter als erstes auf den SYS-Befehl in Zeile 1. Es folgt ein Sprung in das Maschinenprogramm in der REM-Zeile. Dort wird die Zeilennummer wieder auf 0 gesetzt, und der Vektor auf den Basic-Warmstart wird auf die zweite Maschinenroutine gesetzt.</p>
 
         <p>Nun kann das Basic-Programm ohne Fehler ausgeführt werden. Wird der Programmlauf unterbrochen (durch STOP-Taste, Fehlermeldungen, Programmende und so weiter), wird das zweite Maschinenprogramm über den Basic-Warmstartvektor angesprungen. Dort wird die Zeilennummer wieder hochgesetzt, der Warmstartvektor wieder auf den normalen Wert gebracht und die Warmstartroutine angesprungen. Das Programm liegt nun wieder in der geschützten Form vor.</p>
 
@@ -351,61 +359,56 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Im Interpreter existiert eine Schleife, die einen Basic-Befehl holt und ausführt.</p>
 
-        <p>ATEL JMP (0308) ; zeigt normalerweise auf A7E4</p>
-
-        <p>ATE4 ISR 0073 ; nächstes Zeichen aus Basic-Text holen AT7E7 JSR AT7ED ; Statement ausführen</p>
-
-        <p>ATEA JMP ATAE ; zurück zur Interpreterschleife</p>
+        <pre><code>A7E1 JMP (0308) ; zeigt normalerweise auf A7E4
+A7E4 JSR 0073   ; nächstes Zeichen aus Basic-Text holen
+A7E7 JSR A7ED   ; Statement ausführen
+A7EA JMP A7AE   ; zurück zur Interpreterschleife
+</code></pre>
 
         <p>In den Speicherzellen $0308 und $0309 (776 und 777 dez) liegt ein Zeiger, der normalerweise auf den Beginn dieser Schleife zeigt. Verbiegt man nun den Zeiger auf eine eigene Routine, kann man den Basic-Befehl auf das eigene Zeichen überprüfen.</p>
 
-        <p>Wird es erkannt, springt? man auf den Anfang des gewünschten Unterprogramms. Wurde das Zeichen nicht vorgefunden, macht man in der Schleife normal weiter.</p>
+        <p>Wird es erkannt, springt man auf den Anfang des gewünschten Unterprogramms. Wurde das Zeichen nicht vorgefunden, macht man in der Schleife normal weiter.</p>
 
         <p>Dieses Verfahren verwende ich bei der Programmierhilfe »Merge« aus Ausgabe 4/84, die normalerweise mit SYS 50000 gestartet werden muß. Es kann aber auch für andere Maschinenprogramme umgeschrieben werden.</p>
 
-        <p>»Merge« belegt den Speicherbereich 50000 bis 50264. Die eigene Routine beginnt auf Adresse 49152 (COOO hex). Der Wert in den Adressen $0308 und $0309 muß deshalb auf COOO abgeändert werden. Der Computer durchläuft dann vor jedem Befehl, den er ausführen soll, folgende Schleife:</p>
+        <p>»Merge« belegt den Speicherbereich 50000 bis 50264. Die eigene Routine beginnt auf Adresse 49152 (C000 hex). Der Wert in den Adressen $0308 und $0309 muß deshalb auf C000 abgeändert werden. Der Computer durchläuft dann vor jedem Befehl, den er ausführen soll, folgende Schleife:</p>
 
-        <p>C000 JSR 0073</p>
-
-        <p>C003 CM 40</p>
-
-        <pre><code>; nächstes Zeichen holen ; Vergleich mit @-Zeichen C005 BEQ ; verzweigen wenn erkannt C007 JSR 0079 ; Flags setzen COOA JMP A7E7 ; Rücksprung COOD JSR 0073 ; nächstes Zeichen holen C010 JSR C350 ; zur eigenen Routine C013 JMP A7AE ; Rücksprung
+        <pre><code>C000 JSR 0073 ; nächstes Zeichen holen
+C003 CMP   40 ; Vergleich mit @-Zeichen
+C005 BEQ      ; verzweigen wenn erkannt
+C007 JSR 0079 ; Flags setzen
+C00A JMP A7E7 ; Rücksprung
+C00D JSR 0073 ; nächstes Zeichen holen
+C010 JSR C350 ; zur eigenen Routine
+C013 JMP A7AE ; Rücksprung
 </code></pre>
 
 
-        <p>Nach dem Drücken von @ und RETURN wird nun das Programm ab Adresse 50000 (C350 Hex) ausgeführt. Auf die anderen Befehle hat diese Routine keinen Einfluß. Eine Hürde gibt es noch zu meistern. Die Änderung der Adressen 0308 und 0309 ist auf der Basic-Ebene mit POKE nicht möglich. Dies istauch verständlich, daPOKE auch ein Basic-Befehl ist und durch die Anderung der ersten Adresse der Einsprung verändert wird.</p>
+        <p>Nach dem Drücken von @ und RETURN wird nun das Programm ab Adresse 50000 (C350 Hex) ausgeführt. Auf die anderen Befehle hat diese Routine keinen Einfluß. Eine Hürde gibt es noch zu meistern. Die Änderung der Adressen 0308 und 0309 ist auf der Basic-Ebene mit POKE nicht möglich. Dies ist auch verständlich, da POKE auch ein Basic-Befehl ist und durch die Änderung der ersten Adresse der Einsprung verändert wird.</p>
 
         <p>Deshalb muß diese Adreßänderung in Maschinensprache durchgeführt werden.</p>
 
-        <p>C100 LDA 00 ; Lade Akku mit 00 c102 STA 0308 ; Speichere Akku nach 0308</p>
-
-        <p>C105 LDA CO ; Lade Akku mit CO</p>
-
-        <p>C107 STA 0309 ; Speichere Akku nach 0309</p>
-
-        <p>C10A RTS ; Rückkehr nach Basic</p>
+        <pre><code>C100 LDA   00 ; Lade Akku mit 00
+C102 STA 0308 ; Speichere Akku nach 0308
+C105 LDA   C0 ; Lade Akku mit C0
+C107 STA 0309 ; Speichere Akku nach 0309
+C10A RTS      ; Rückkehr nach Basic
+</code></pre>
 
         <p>Basic-Lader für Befehlserweiterung</p>
 
-        <p>240 FOR I= 49152 TO 49152 + 21</p>
+        <pre><code>240   FOR I= 49152 TO 49152 + 21
+250   READ Q : POKE I, Q
+260   NEXT
+300   FOR I = 49408 TO 49408 + 10
+310   READ Q : POKE I, Q
+320   NEXT : SYS 49408
+11000 DATA 32,115,0,201,64,240,6,32,121
+12000 DATA 0,76,231,167,32,115,0,32,80
+13000 DATA 195,76,174,167
+14000 DATA 169,0,141,8,3,169,192,141,9,3,96
+</code></pre>
 
-        <p>250 READQ : POKE I, Q</p>
-
-        <p>260 NEXT</p>
-
-        <p>300 FOR I = 49408 TO 49408 + 10</p>
-
-        <p>310 READQ : POKE I, Q</p>
-
-        <p>320 NEXT : SYS 49408</p>
-
-        <p>11000 DATA 32,115,0,201,64,240,6,32,121</p>
-
-        <p>12000 DATA 0,76,231,167,32,115,0,32,80</p>
-
-        <p>13000 DATA 195,76,174,167</p>
-
-        <p>14000 DATA 169,0,141,8,3,169,192,141,9,3,96</p>
 
         <p>Diesen Basic-Lader tippt man hinter das Programm »Merge« und speichert es gemeinsam ab.</p>
 
@@ -423,23 +426,40 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Ein Maschinenprogrammfile auf Diskette enthält, vor den Maschinenbefehlen, in den ersten beiden Bytes, die Startadresse des Programms. Der Computer erkennt daran, ab welcher Speicherstelle er das Programm laden soll.</p>
 
-        <p>Der. Basic-Lader (Listing 7) muß also ein Programmfile eröffnen, die Startadresse des Maschinenprogrammsins File schreiben und anschließend alle Werte aus den DATA-Zeilen. Wie das im einzelnen programmiert wird, können Sie am Listing des Beispielprogramms sehen, das Sie ohne weiteres an jedes Ladeprogramm anpassen können.</p>
+        <p>Der Basic-Lader (Listing 7) muß also ein Programmfile eröffnen, die Startadresse des Maschinenprogramms ins File schreiben und anschließend alle Werte aus den DATA-Zeilen. Wie das im einzelnen programmiert wird, können Sie am Listing des Beispielprogramms sehen, das Sie ohne weiteres an jedes Ladeprogramm anpassen können.</p>
 
-        <p>Der. wichtigste Befehl in diesem Beipiel steht in Zeile 50130:</p>
+        <p>Der wichtigste Befehl in diesem Beipiel steht in Zeile 50130:</p>
 
-        <p>OPEN 1,8,1, "Programmname"</p>
+        <pre><code>OPEN 1,8,1, "Programmname"
+</code></pre>
 
-        <p>Er öffnet eine Datei. Allerdings keine sequentielle, sondern eine Programmdatei. Die Sekundäradresse 1 sagt der Floppy 1541, daß nun ein Programm (NAME.PRG) geschrieben wird. Häufig findet man für diesen Befehl die Syntax OPEN 2,8,2, "Programmname,P, W" bei der man die Sekundäradresse frei wählen darf. Hier muß jedoch nach dem Namen angegeben werden, daß eine Programmdatei (P) geöffnet werden soll, in die geschrieben wird (Write). Entsprechend kann bei sequentiellen Dateien optional »S,W« bei Schreib- oder »S,R« bei Lesezugriffen angegeben werden.</p>
+        <p>Er öffnet eine Datei. Allerdings keine sequentielle, sondern eine Programmdatei. Die Sekundäradresse 1 sagt der Floppy 1541, daß nun ein Programm (NAME.PRG) geschrieben wird. Häufig findet man für diesen Befehl die Syntax</p>
 
-        <p>Nachdem in Zeile 50130 die Programmdatei angelegt wurde, muß die Startadresse des Maschinenprogrammes gespeichert werden. Die Startadresse wird dazu in den Zeilen 50170 und 50180 in Low- und High-Byte zerlegt und die zwei Byte in Zeile 50190 in das Programmfile geschrieben. Jetzt wird das eigentliche Programm gespeichert. Die numerischen Werte müssen dazu mit der CHR$-Funktion in die entsprechenden Strings übersetzt werden. Um die erforderliche Datendichte beim Schreiben des Files zu erreichen, muß jedem String ein Semicolon »;« folgen. Ohne Semicolon ist das Programm später nicht lauffähig. Sind alle Werte, die der Basic-Lader in den Speicher gePOKEt hätte, gespeichert, wird die Datei mit CLOSE geschlossen. Damit ist das Maschinenprogramm auf Diskette gespeichert und kann mit LOAD "NAME",8,1 geladen und, wenn dies notwendig ist, mit dem entsprechenden SYS-Befehl gestartet werden.</p>
+        <pre><code>OPEN 2,8,2, "Programmname,P, W"
+</code></pre>
 
-        <p>Laden von Maschinenprogrammen in Basic</p>
+        <p>bei der man die Sekundäradresse frei wählen darf. Hier muß jedoch nach dem Namen angegeben werden, daß eine Programmdatei (P) geöffnet werden soll, in die geschrieben wird (Write). Entsprechend kann bei sequentiellen Dateien optional »S,W« bei Schreib- oder »S,R« bei Lesezugriffen angegeben werden.</p>
+
+        <p>Nachdem in Zeile 50130 die Programmdatei angelegt wurde, muß die Startadresse des Maschinenprogrammes gespeichert werden. Die Startadresse wird dazu in den Zeilen 50170 und 50180 in Low- und High-Byte zerlegt und die zwei Byte in Zeile 50190 in das Programmfile geschrieben. Jetzt wird das eigentliche Programm gespeichert. Die numerischen Werte müssen dazu mit der CHR$-Funktion in die entsprechenden Strings übersetzt werden. Um die erforderliche Datendichte beim Schreiben des Files zu erreichen, muß jedem String ein Semicolon »;« folgen. Ohne Semicolon ist das Programm später nicht lauffähig. Sind alle Werte, die der Basic-Lader in den Speicher gePOKEt hätte, gespeichert, wird die Datei mit CLOSE geschlossen. Damit ist das Maschinenprogramm auf Diskette gespeichert und kann mit</p>
+
+        <pre><code>LOAD "NAME",8,1
+</code></pre>
+
+        <p>geladen und, wenn dies notwendig ist, mit dem entsprechenden SYS-Befehl gestartet werden.</p>
+
+        <h3>Laden von Maschinenprogrammen in Basic</h3>
 
         <p>Sie können Maschinenroutinen mit Hilfe von Basic-Programmen laden, ohne sie zu zerstören. Dabei ist zu beachten, daß nach dem Laden das Basic-Programm von neuem startet. Die Basic-Zeile</p>
 
-        <p>10 LOAD "KEIN ENDEJ8,1 bewirkt deshalb eine Endlosschleife, die immer wieder das Maschinenprogramm »KEIN ENDE lädt. Da angelegte Variablen dabei erhalten bleiben, kann mit</p>
+        <pre><code>10 LOAD "KEIN ENDE",8,1
+</code></pre>
 
-        <p>10 IF A=0 THEN A=1:LOAD "KEIN ENDE" ,8,1 ein mehrmaliges Laden verhindert werden, da beim Neustart A=1 ist.</p>
+        <p>bewirkt deshalb eine Endlosschleife, die immer wieder das Maschinenprogramm »KEIN ENDE« lädt. Da angelegte Variablen dabei erhalten bleiben, kann mit</p>
+
+        <pre><code>10 IF A=0 THEN A=1:LOAD "KEIN ENDE",8,1
+</code></pre>
+
+        <p>ein mehrmaliges Laden verhindert werden, da beim Neustart A=1 ist.</p>
 
         <address class="author">(S. Wengler)</address>
 
@@ -450,11 +470,10 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <h2>Der C 64 als PET</h2>
 
-        <p>Wenn Sie CBM 2000, 3000 oder 4000 geschriebene Programme auf Ihrem C 64 laufen lassen wollen, müssen Sie umständlich PEEKs und POKESs ändern. Der »Pet-Simulator« nimmt Ihnen diese Arbeit ab.</p>
+        <p>Wenn Sie CBM 2000, 3000 oder 4000 geschriebene Programme auf Ihrem C 64 laufen lassen wollen, müssen Sie umständlich PEEKs und POKEs ändern. Der »Pet-Simulator« nimmt Ihnen diese Arbeit ab.</p>
 
-        <p>Ist das Programm (Listing 8) eingegeben und gestartet, werden als erstes die DATAs für das Maschinenprogramm in den Bereich ab Adresse 49152 gePOKEt (SU = Prüfsumme für die Daten). Danach fragt das Programm nach der Zeichenfarbe. Sie werden aufgefordert, eine Zahl zwischen O und 15 einzugeben.</p>
+        <p>Ist das Programm (Listing 8) eingegeben und gestartet, werden als erstes die DATAs für das Maschinenprogramm in den Bereich ab Adresse 49152 gePOKEt (SU = Prüfsumme für die Daten). Danach fragt das Programm nach der Zeichenfarbe. Sie werden aufgefordert, eine Zahl zwischen 0 und 15 einzugeben.<br>(0 = schwarz 1 = weiß,..., 15 = grau 3).</p>
 
-        <p>(0 = schwarz 1 = weiß,..., 15 = grau 3).</p>
 
         <p>Bei anschließendem Starten des Maschinenprogrammes wird das Basic-ROM in das darunterliegende RAM gePOKEt (Basic-Interpreter kopieren). Anschließend wird das Bildschirm-RAM von Adresse 1024 nach Adresse 32768 verlegt. Basic-Speicheranfang und -ende werden dem des PET angepaßt. Weiterhin wird in der POKE-Routine des Basic-Interpreters ein Eingriff vorgenommen, nach der der Computer aus dem Interpreter in eine Routine des Maschinenprogramms springt. Hier wird überprüft, ob das Bildschirm-RAM angesprochen wurde. Trifft dies zu, wird die dazugehörige Farb-RAM-Adresse berechnet und der vorher festgelegte Farbwert (Zeichenfarbe) hineingePOKEt. Um das Zurücksetzen des Bildschirmes auf das C 64-Format zu vermeiden (durch Drücken der RUN/STOP- und RESTORE-Tasten), wird die RESTORE-Taste durch Verändern des NMI-Vektors ausgeschaltet. Programme können aber noch mit der RUN/STOP-Taste unterbrochen werden.</p>
 
@@ -471,15 +490,15 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Diese Befehlserweiterung erlaubt es, ein Basic-Programm zu jedem beliebigen Zeitpunkt per Tastendruck durch die F1-Taste unterbrechen zu lassen. Es kann dann in eine vorher definierte Basic-Routine gesprungen werden. Diese könnte zum Beispiel den noch freien Speicherplatz oder die Uhrzeit anzeigen.</p>
 
-        <p>Das Programm (Listing 9) bitte mit dem MSE eingeben. Es liegt dann im Speicherbereich von 40499 bis 40768. Geladen wird es absolut mit LOAD "PSEUDO-IRQ" ‚8,1. Da das Programm im Bereich für die Basic-Variablen steht, muß es durch POKE 56,158:CLR vor Überschreiben geschützt werden. Nach dem Start durch »SYS 40541« stehen die neuen Befehle zur Verfügung:</p>
+        <p>Das Programm (Listing 9) bitte mit dem MSE eingeben. Es liegt dann im Speicherbereich von 40499 bis 40768. Geladen wird es absolut mit LOAD "PSEUDO-IRQ",8,1. Da das Programm im Bereich für die Basic-Variablen steht, muß es durch POKE 56,158:CLR vor Überschreiben geschützt werden. Nach dem Start durch »SYS 40541« stehen die neuen Befehle zur Verfügung:</p>
 
-        <p>!IFIUJUMP &lt;Zeilennummer&gt; legt fest, in welche Zeile im Falle einer Unterbrechung durch die F1-Taste gesprungen werden soll. Tritt der Befehl mehrmals auf, so gilt die zuletzt angegebene Zeilennummer.</p>
+        <p>!F1JUMP &lt;Zeilennummer&gt; legt fest, in welche Zeile im Falle einer Unterbrechung durch die F1-Taste gesprungen werden soll. Tritt der Befehl mehrmals auf, so gilt die zuletzt angegebene Zeilennummer.</p>
 
-        <p>IUBACK bewirkt die Fortsetzung des Basic-Programms ab der Stelle, an der unterbrochen wurde.</p>
+        <p>!JBACK bewirkt die Fortsetzung des Basic-Programms ab der Stelle, an der unterbrochen wurde.</p>
 
-        <p>ISF1 verhindert Unterbrechungen. Dies kann zum Beispiel beim Aufbau einer Grafik oder bei Arbeiten mit der Diskettenstation wichtig sein.</p>
+        <p>!SF1 verhindert Unterbrechungen. Dies kann zum Beispiel beim Aufbau einer Grafik oder bei Arbeiten mit der Diskettenstation wichtig sein.</p>
 
-        <p>ICF1 läßt gesperrte Unterbrechungen wieder zu.</p>
+        <p>!CF1 läßt gesperrte Unterbrechungen wieder zu.</p>
 
         <address class="author">(Guido Schuhmacher)</address>
 
@@ -493,15 +512,14 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Wenn Sie sich darüber ärgern, daß der C64 nach jedem ausgeführten Befehl sein stupides »READY.« auf den Bildschirm schreibt, dann geben Sie doch die beiden folgenden Zeilen im Direktmodus ein:</p>
 
-        <p>FOR I=40960 TO 49151 : POKE I,PEEK(I) : NEXT : POKE 1,54 : REM Basic-Interpreter ins RAM laden FOR I= 41848 TO 41853 : POKE 1,32 : NEXT :</p>
-
-        <p>REM READY-Meldung überschreiben</p>
+        <pre><code>FOR I=40960 TO 49151 : POKE I,PEEK(I) : NEXT : POKE 1,54 : REM Basic-Interpreter ins RAM laden
+FOR I= 41848 TO 41853 : POKE I,32 : NEXT : REM READY-Meldung überschreiben
+</code></pre>
 
         <p>Wenn Sie jetzt irgendeinen Befehl eingeben, erscheint kein »READY.« mehr. Natürlich können Sie aber auch einfach den Text ändern:</p>
 
-        <p>A$="HALLO." : FOR I=1 TO 6:</p>
-
-        <p>(MID$(A$,I,1)) : NEXT</p>
+        <pre><code>A$="HALLO." : FOR I=1 TO 6 : POKE 41847+I,ASC(MID$(A$,I,1)) : NEXT
+</code></pre>
 
         <p>Nach Eingabe dieser Zeile meldet sich der Interpreter nach jeder Eingabe mit »Hallo.«. Sie können jeden beliebigen Text wählen, vorausgesetzt, er ist maximal sechs Zeichen lang.</p>
 
@@ -511,25 +529,23 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Falls Sie in einem Programm einen Reset wünschen, dann benutzen Sie folgenden Befehl:</p>
 
-        <p>SYS 64738</p>
+        <pre><code>SYS 64738
+</code></pre>
 
         <p>Mit folgendem kleinen Programm sorgt man von Basic aus dafür, daß ein Reset keinen Effekt hat:</p>
 
-        <p>100 FOR I=32770 TO 32778</p>
-
-        <p>110 READ A : POKE I,A</p>
-
-        <p>120 NEXT I</p>
-
-        <p>130 DATA 10, 128, 195, 194, 205</p>
-
-        <p>140 DATA 56, 48, 88, 0</p>
+        <pre><code>100 FOR I=32770 TO 32778
+110 READ A : POKE I,A
+120 NEXT I
+130 DATA 10, 128, 195, 194, 205
+140 DATA 56, 48, 88, 0
+</code></pre>
 
         <address class="author">(Daniel Kossmann)</address>
 
         <h2>Einfacher Reset-Schalter selbstgebaut</h2>
 
-        <p>Sehr preiswert und einfach kommt man im Selbstbau zu einem Reset-Schalter, wenn man sich im Elektronikfachgeschäft einen sechspoligen Diodenstecker und einen Miniatur-Tastschalter besorgt. Der Tastschalter wird zwischen die Pins 2 und 6 des Diodensteckers gelötet. Zur Pinbelegung vergleiche auch Seite 142 im © 64-Handbuch. Der so präparierte Diodenstecker wird nun in den seriellen Port des C64 beziehungsweise VC 20 gesteckt. Falls der Port bereits von Floppy oder Drucker belegt ist, kann der Stecker natürlich auch in die freie Buchse des entsprechenden Zusatzgerätes eingesteckt werden. Auf Knopfdruck wird nun in jedem Fall wieder der Einschaltzustand des Computers hergestellt.</p>
+        <p>Sehr preiswert und einfach kommt man im Selbstbau zu einem Reset-Schalter, wenn man sich im Elektronikfachgeschäft einen sechspoligen Diodenstecker und einen Miniatur-Tastschalter besorgt. Der Tastschalter wird zwischen die Pins 2 und 6 des Diodensteckers gelötet. Zur Pinbelegung vergleiche auch Seite 142 im C 64-Handbuch. Der so präparierte Diodenstecker wird nun in den seriellen Port des C64 beziehungsweise VC 20 gesteckt. Falls der Port bereits von Floppy oder Drucker belegt ist, kann der Stecker natürlich auch in die freie Buchse des entsprechenden Zusatzgerätes eingesteckt werden. Auf Knopfdruck wird nun in jedem Fall wieder der Einschaltzustand des Computers hergestellt.</p>
 
         <p>Die Kosten für Stecker und Taste betragen etwa 4 Mark.</p>
 
@@ -554,15 +570,17 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Will man in ein Programm ein schon vorhandenes Unterprogramm einfügen, kann es beim Lesen von DATAs Schwierigkeiten geben. Oft genügt die RESTORE-Anweisung nicht.</p>
 
-        <p>Wenn beide Programmteile, Hauptprogramm und Unterprogramme, DATAs enthalten, muß sichergestellt werden, daß auch wirklich die richtigen Werte gelesen werden. Wenn man nicht aufpaßt, kann es passieren, daß das Unterprogramm DATAs aus dem Hauptprogramm liest. Wie kann man das verhindern? Es gibt eine umständliche Methode: Man kann eine kleine Basic-Erweiterung einbauen, den RESTORE X-Befehl. Es geht aber auch einfacher. Die Zeropage, das sind die ersten 256 Bytes des Speichers, hilft uns bei der Lösung des Problems. Genauer gesagt, die Adressen 65/66 und 122/123. Schlagen wir im C 64-Handbuch auf Seite 162 nach, dann steht dort:</p>
-
-        <p>65- 66 Adresse des aktuellen DATA-Elements 122-123 Basic-Zeiger innerhalb der Subroutine</p>
+        <p>Wenn beide Programmteile, Hauptprogramm und Unterprogramme, DATAs enthalten, muß sichergestellt werden, daß auch wirklich die richtigen Werte gelesen werden. Wenn man nicht aufpaßt, kann es passieren, daß das Unterprogramm DATAs aus dem Hauptprogramm liest. Wie kann man das verhindern? Es gibt eine umständliche Methode: Man kann eine kleine Basic-Erweiterung einbauen, den RESTORE X-Befehl. Es geht aber auch einfacher. Die Zeropage, das sind die ersten 256 Bytes des Speichers, hilft uns bei der Lösung des Problems. Genauer gesagt, die Adressen 65/66 und 122/123. Schlagen wir im C 64-Handbuch auf Seite 162 nach, dann steht dort:<br>65- 66 Adresse des aktuellen DATA-Elements<br>122-123 Basic-Zeiger innerhalb der Subroutine</p>
 
         <p>Mit diesen Informationen läßt sich schon etwas anfangen. Wenn das Unterprogramm angesprungen wird, dann sollte der Zeiger in Speicherstelle 122/123 auf die Adresse des Unterprogramms im Speicher stehen. POKEt man diese Werte in die Zeilen 65/55 mit</p>
 
-        <p>POKE 65, PEEK(122)</p>
+        <pre><code>POKE 65,PEEK(122)
+POKE 66,PEEK(123),
+</code></pre>
 
-        <p>POKE 66,PEEK(123), so wird beim nächsten READ der Wert gelesen, der hinter dieser Basic-Zeile mit den POKESs steht, also das erste DATA-Element innerhalb des Unterprogramms. Nach dem Rücksprung aus dem Unterprogramm muß der Zeiger eventuell auch im Hauptprogramm wieder gestellt werden. . Indem kurzen Demo-Listing (Listing 11) werden drei Untergrogramme in zufälliger Reihenfolge aufgerufen.</p>
+        <p>so wird beim nächsten READ der Wert gelesen, der hinter dieser Basic-Zeile mit den POKEs steht, also das erste DATA-Element innerhalb des Unterprogramms. Nach dem Rücksprung aus dem Unterprogramm muß der Zeiger eventuell auch im Hauptprogramm wieder gestellt werden.</p>
+
+        <p>In dem kurzen Demo-Listing (Listing 11) werden drei Unterprogramme in zufälliger Reihenfolge aufgerufen.</p>
 
         <address class="author">(Stephan Pätzold)</address>
 
@@ -575,9 +593,9 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Wer kennt das nicht: ein paar Veränderungen an einem Programm - eine Zeile rein, eine andere raus - und nichts geht mehr. Das lästige Neuladen des Originalprogramms von Diskette können Sie ab jetzt vergessen.</p>
 
-        <p>Ist ein Programm mal wieder zu Tode editiert, werden Sie nun nicht mehr von den langen Ladezeiten der 1541 in Ihrem Programmierdrang gebremst. Mit »RAM-Floppy« (Listing 12) kann ein Programm bearbeitet werden, während man eine Kopie davon im RAM hat. In Sekundenschnelle kann die Kopie in den Basic-Speicher gebracht oder mit der Orginalversion vertauscht werden. Ganz einfach durch Eingabe von »@\V« oder »@T«. Numerische Variablen bleiben dabei erhalten. Die »RAM-Floppy« besitzt eine Speicherkapazität von maximal 25 KByte. Der Speicher beginntab Adresse 40960.</p>
+        <p>Ist ein Programm mal wieder zu Tode editiert, werden Sie nun nicht mehr von den langen Ladezeiten der 1541 in Ihrem Programmierdrang gebremst. Mit »RAM-Floppy« (Listing 12) kann ein Programm bearbeitet werden, während man eine Kopie davon im RAM hat. In Sekundenschnelle kann die Kopie in den Basic-Speicher gebracht oder mit der Orginalversion vertauscht werden. Ganz einfach durch Eingabe von »@V« oder »@T«. Numerische Variablen bleiben dabei erhalten. Die »RAM-Floppy« besitzt eine Speicherkapazität von maximal 25 KByte. Der Speicher beginnt ab Adresse 40960.</p>
 
-        <p>Ein Problem ergibt sich im Speicherbereich des Kernal- und Basic-ROMs. Ein POKE-Befehl schreibt ins RAM, während die PEEK-Funktion auf das ROM zugreift. Noch komplizierter sieht es beim Zeichen-ROM und den I/O-Bausteinen aus. Wie Sie vielleicht aus unserem Grafikkurs wissen, gibtes in diesen Bereichen drei Speicheretagen. Der Inhalt der Zelle 1 regelt den Zugriff des Computers auf die verschiedenen Speicherebenen. Werden die Bits O und 1 in Adresse 1 gelöscht, sieht der Computer nur noch das RAM. Basic- und Kernel-ROM sind verschwunden. Löschen Sie diese Bits deshalb nur durch ein Maschinenspracheprogramm, wenn vorher Ein- und Ausgaben gesperrt wurden. Dies wird durch Setzen des Interruptregisters erreicht.</p>
+        <p>Ein Problem ergibt sich im Speicherbereich des Kernal- und Basic-ROMs. Ein POKE-Befehl schreibt ins RAM, während die PEEK-Funktion auf das ROM zugreift. Noch komplizierter sieht es beim Zeichen-ROM und den I/O-Bausteinen aus. Wie Sie vielleicht aus unserem Grafikkurs wissen, gibt es in diesen Bereichen drei Speicheretagen. Der Inhalt der Zelle 1 regelt den Zugriff des Computers auf die verschiedenen Speicherebenen. Werden die Bits 0 und 1 in Adresse 1 gelöscht, sieht der Computer nur noch das RAM. Basic- und Kernel-ROM sind verschwunden. Löschen Sie diese Bits deshalb nur durch ein Maschinenspracheprogramm, wenn vorher Ein- und Ausgaben gesperrt wurden. Dies wird durch Setzen des Interruptregisters erreicht.</p>
 
         <p>Das Maschinenprogramm besteht aus drei Teilen. Im Bereich von 40704 bis 40768 erfolgt die Auswertung der Befehle von »RAM-Floppy« und der Aufruf der beiden Unterprogramme, die das Tauschen oder Verschieben der Basic-Programme erledigen.</p>
 
@@ -594,7 +612,11 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <h2>Sequentielle Datei als Basic-Programm laden</h2>
 
-        <p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht's für den VC 20 möglich: OPEN 1, (Gerät), (Sekundäradresse), "(Name)" : POKE 812, 238 : POKE 781, 1 : SYS 65478</p>
+        <p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht's für den VC 20 möglich:</p>
+
+        <pre><code>OPEN 1, (Gerät), (Sekundäradresse), "(Name)" :
+POKE 812, 238 : POKE 781, 1 : SYS 65478
+</code></pre>
 
         <p>Dieses Miniprogramm öffnet das File Nummer 1 als Eingabefile (anstelle der Tastatur). Außerdem wird der CLALL-Vektor des Betriebssystems auf ein »RTS« gesetzt, so daß beim Einlesen von Programmzeilen keine Files geschlossen werden.</p>
 
@@ -602,46 +624,39 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Um in den normalen Eingabemodus zurückzukehren, muß nur »POKE 812, 239 : CLR« eingegeben werden.</p>
 
-        <p>Zum Ausprobieren: Laden Sie ein beliebiges Basic-Programm und geben Sie danach im Direktmodus ein: OPEN 1,8,3, ""LISTING,S,W": CMD1 : LIST : PRINT#1 : CLOSE 1</p>
+        <p>Zum Ausprobieren: Laden Sie ein beliebiges Basic-Programm und geben Sie danach im Direktmodus ein:</p>
+
+        <pre><code>OPEN 1,8,3,"LISTING,S,W": CMD 1 : LIST : PRINT#1 :
+CLOSE 1
+</code></pre>
 
         <h2>Spezialeffekt</h2>
 
-        <p>Wenn man beim C 64 in die Speicherstelle 53270 Werte zwischen O und 15 schreibt (POKE 53270,x), kann man den Bildschirm um bis zu sieben Bildpunkte nach links oder rechts scrollen lassen. Istx kleiner als 8, dann scrollt der Bildschirmausschnitt um x Bildpunkte nach links, sonst um x-8 Bildpunkte nach rechts.</p>
+        <p>Wenn man beim C 64 in die Speicherstelle 53270 Werte zwischen 0 und 15 schreibt (POKE 53270,x), kann man den Bildschirm um bis zu sieben Bildpunkte nach links oder rechts scrollen lassen. Ist x kleiner als 8, dann scrollt der Bildschirmausschnitt um x Bildpunkte nach links, sonst um x-8 Bildpunkte nach rechts.</p>
 
-        <p>bier, POKE 53270,8 stellt den Normalzustand wieder her. Dieser Trick läßt sich gut bei Action-Spielen als optische Untermalung beispielsweise einer Explosion einsetzen.</p>
+        <p>POKE 53270,8 stellt den Normalzustand wieder her. Dieser Trick läßt sich gut bei Action-Spielen als optische Untermalung beispielsweise einer Explosion einsetzen.</p>
 
         <address class="author">(Michael Keukert)</address>
 
         <h2>Text und Grafik mischen</h2>
 
-        <p>im Leserforum des 64'er-Magazins, Ausgabe 8/84, fragte Frank Schager nach einer Möglichkeit, mit Simons Basic ein Textfenster in der hochauflösenden Grafik zu erzeugen.</p>
+        <p>Im Leserforum des 64'er-Magazins, Ausgabe 8/84, fragte Frank Schager nach einer Möglichkeit, mit Simons Basic ein Textfenster in der hochauflösenden Grafik zu erzeugen.</p>
 
-        <p>Mit dem folgenden kleinen Programm wird die normale Tastaturabfrage mit dem Simons Basic-Befehl »sTEXT« verbunden:</p>
+        <p>Mit dem folgenden kleinen Programm wird die normale Tastaturabfrage mit dem Simons Basic-Befehl »TEXT« verbunden:</p>
 
-        <p>101X=2:Y=2</p>
-
-        <p>20 HIRES 15, 11:</p>
-
-        <pre><code>: REM Text-Anfang REM Grafik ein
-</code></pre>
-
-
-        <pre><code>30 GET A$
-40 IFA$ &lt; &gt; " " THEN GOSUB, 100 50 GOTO 30
+        <pre><code>10 X = 2 : Y = 2 : REM Text-Anfang
+20 HIRES 15, 11 : REM Grafik ein
+30 GET A$
+40 IF A$ &lt; &gt; " " THEN GOSUB 100
+50 GOTO 30
 60 REM
 100 X = X + 8 : REM X-Koordinate erhöhen
+110 IF X &gt;38 * 8 THEN X = 2 : Y = Y + 8 : REM Zeilenende? Dann neue Zeile
+120 TEXT X,Y,A$,1,1,8 : REM Zeichen drucken
+130 AA$ = AA$ + A$ : REM Wort erzeugen
+140 IF AA$ = "GEHE" THEN 1000 : REM Zum Beispiel
+150 RETURN
 </code></pre>
-
-
-        <p>110 IFX >33 %8 THENX=2:Y=Y+3:</p>
-
-        <p>REM Zeilenende? Dann neue Zeile</p>
-
-        <p>120 TEXT X,Y,A$,1,1,8 : REM Zeichen drucken</p>
-
-        <p>130 AA$ = AA$ + A$ : REM Wort erzeugen</p>
-
-        <p>140 IF AA$ = "GEHE" THEN 1000 : REM Zum Beispiel 150 RETURN</p>
 
         <p>Veränderbar ist auch der Faktor 38 in Zeile 110, je nachdem, welche Zeilenlänge gewünscht wird. Ebenso besteht die Möglichkeit, zwischen den Zeilen 130 und 150 weitere IF-Abfragen einzubauen. Empfehlenswert ist die besondere Abfrage der Tasten SPACE und RETURN.</p>
 
@@ -651,9 +666,9 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Mit der folgenden kurzen Routine lassen sich die meisten Grundversions- oder +3 KByte-Programme auch mit einer 8 KByte-Erweiterung laden und ausführen:</p>
 
-        <p>POKE 648, 30 : SYS 64821</p>
-
-        <p>POKE 4096,.0 : POKE 44, 16 : NEW</p>
+        <pre><code>POKE 648, 30 : SYS 64821
+POKE 4096, 0 : POKE 44, 16 : NEW
+</code></pre>
 
         <p>Da der Bildschirmspeicher durch die kleine Routine an der gleichen Stelle wie in der Grundversion liegt, sind die meisten Grundversions-Programme direkt lauffähig.</p>
 
@@ -663,19 +678,15 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Die Syntax des AUTO-Befehls ist:</p>
 
-        <p>-A anfangszeilennummer, schrittweite</p>
+        <p>←A anfangszeilennummer, schrittweite</p>
 
         <p>Nach Eingabe dieses Befehls wird die Zeilennummer vorgegeben und nach RETURN um »schrittweite« erhöht.</p>
 
-        <p>Um aus dem AUTO-Modus wieder herauszukommen, muß man nach Vorgabe einer Zeilennummer</p>
-
-        <p>»-« RETURN eingeben.</p>
+        <p>Um aus dem AUTO-Modus wieder herauszukommen, muß man nach Vorgabe einer Zeilennummer<br>»←« RETURN eingeben.</p>
 
         <p>Falls man nach Vorgabe einer Zeilennummer die RETURN-Taste betätigt, wird die entsprechende Zeile, falls sie vorhanden ist, gelöscht. Hiermit lassen sich auch sehr schnell Programmblöcke löschen, falls man die RETURN-Taste gedrückt hält, die Zeilenvorgabe weiterläuft und die entsprechenden Zeilennummern gelöscht werden.</p>
 
-        <p>»-«=CHR$(95)</p>
-
-        <p>»A«=CHR$(65)</p>
+        <p>»←«=CHR$(95)<br>»A«=CHR$(65)</p>
 
         <p>Das Programm (Listing 13) als Basic-Lader eintippen, anschließend mit RUN starten. Falls »FEHLER IN DEN DATA-ZEILEN« erscheint, DATAs auf Tippfehler überprüfen. Falls »OK«, kann die Basic-Erweiterung mit SYS 49152 initialisiert werden. Nun hat man das Basic um den Befehl »A« erweitert.</p>
 
@@ -690,25 +701,24 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
 
         <p>Die Speicherstellen 57 und 58 enthalten die Zeilennummer der aktuellen Basic-Zeile. Die Abfrage geschieht mit »PRINT PEEK(57) + 256 * PEEK(58)«.</p>
 
-        <p>Mit»PRINT PEEK(1)«kann abgefragt werden, ob eine Taste an der Datasette gedrückt ist. Es gibt drei mögliche Werte: 7: Taste gedrückt,</p>
+        <p>Mit »PRINT PEEK(1)« kann abgefragt werden, ob eine Taste an der Datasette gedrückt ist. Es gibt drei mögliche Werte:<br>7: Taste gedrückt,<br>55: keine Taste gedrückt,<br>39: Taste gedrückt, aber Programmlauf unterbrochen.</p>
 
-        <p>55: keine Taste gedrückt,</p>
-
-        <p>39: Taste gedrückt, aber Programmlauf unterbrochen.</p>
-
-        <p>Diese Abfragen sind für die benutzerfreundliche Program-: mierung von Kassettenoperationen recht nützlich.</p>
+        <p>Diese Abfragen sind für die benutzerfreundliche Programmierung von Kassettenoperationen recht nützlich.</p>
 
         <address class="author">(Wolfgang Meyer/kn)</address>
 
-        <p>Und noch ein Tip</p>
+        <h2>Und noch ein Tip</h2>
 
-        <p>EEEEIHNITSERNESIHBERNEIERTITDNTIDEIDIFEETETERTTFTRREN Der FORMULAR TOO COMPLEX-Error ist sehr unangenehm, da sich das Programm danach oft nicht mehr listen läßt. Nach Eingabe von POKE 24,0 verhält sich der Computer ' aber wieder normal.</p>
+        <p>Der FORMULAR TOO COMPLEX-Error ist sehr unangenehm, da sich das Programm danach oft nicht mehr listen läßt. Nach Eingabe von POKE 24,0 verhält sich der Computer aber wieder normal.</p>
 
         <address class="author">(Roger Limberg)</address>
 
-        <p>Tips und Tricks, die nur ein PEEK oder POKE beinhalten, finden Sie in der POKE-Liste.</p>
+        <aside>
+            <p>Tips und Tricks, die nur ein PEEK oder POKE beinhalten, finden Sie in der POKE-Liste.</p>
 
-        <address class="author">(kn)</address>
+            <address class="author">(kn)</address>
+        </aside>
+
     </article>
 </body>
 
