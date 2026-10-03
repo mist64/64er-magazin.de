@@ -454,6 +454,11 @@ def main(d):
             outside = outside.replace(a, ' ')
         body_levels = {int(x) for x in re.findall(r'<h([23])\b', outside)}
         for a in asides:
+            # Rule 300's erratum box is a STANDARD element, not the article's
+            # own aside, and the corpus sets it h2 in 20 of 20 cases. Not this
+            # check's business. (r290 claims it uses h3; the corpus disagrees.)
+            if re.search(r'class="[^"]*(?:future|fehler)teufelchen', a):
+                continue
             for lv in {int(x) for x in re.findall(r'<h([23])\b', a)}:
                 if lv == 2 and 2 not in body_levels:
                     H('aside heading outranks its article (h2, body has no h2)',
