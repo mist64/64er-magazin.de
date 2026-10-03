@@ -58,7 +58,7 @@ from scipy.signal import fftconvolve
 
 from r005_masters import (
     HERE, ISSUE, ISS, MM, SCAN_REDUCE, MASTER_DPI, THUMB_DPI,
-    SKEW_RESIDUAL_MAX, CLEAN_PCT, TRACE_BANDS, BODY_PAPER_FRAC,
+    SKEW_RESIDUAL_MAX, SKEW_COARSE, CLEAN_PCT, TRACE_BANDS, BODY_PAPER_FRAC,
     DEBUG_REDUCE, DEBUG_COLOR, DEBUG_WIDTH, DEBUG_STEP,
     ANCHORS, LEVELS, HAVE_PROFILE, GRADE_SHA,
     PageFailed, measure_skew,
@@ -686,6 +686,13 @@ def level_page(page):
         residual = residual_of(img)
         notes.append(f"SKEW re-levelled: residual was {first:+.2f}, "
                      f"corrected to {angle:+.2f} deg, now {residual:+.2f}")
+        _lo, _hi, _ = SKEW_COARSE
+        if not (_lo <= angle <= _hi):
+            notes.append(f"SKEW total {angle:+.2f} deg is OUTSIDE the coarse "
+                         f"sweep [{_lo:+.1f}, {_hi:+.1f}] -- the sweep clamped "
+                         f"and the re-level pass added the rest. This is almost "
+                         f"always ARTWORK printed tilted, not a tilted sheet "
+                         f"(8612 p183: -6.60 applied). LOOK AT the page")
     if abs(residual) > SKEW_RESIDUAL_MAX:
         notes.append(f"SKEW still {residual:+.2f} deg after a second pass "
                      f"(allowed {SKEW_RESIDUAL_MAX}) -- published anyway")

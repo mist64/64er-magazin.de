@@ -99,8 +99,13 @@ to "which pages are on which paper" is *all of them are low*:
 
 ```json
 "binding": "spread",
-"colors": "issues/<ID>/colors.txt"
+"colors": "/Users/mist/Documents/git/64er-magazin.de/issues/<ID>/colors.txt"
 ```
+
+**The path is ABSOLUTE.** Every real descriptor carries one — 8610, 8611 and
+8612 all do — because the steps run from `rules/` and a relative path's
+resolution is specified nowhere. Earlier versions of this example were
+relative, which is the one form no descriptor actually uses.
 
 A monthly's wrapper (the cover leaf and its inside pages, typically 1-4 and
 the last two) IS a different, whiter stock, and on 8611's thumbs it reads
@@ -284,6 +289,12 @@ read **C 27 % M 14 % Y 6 % K 5 % at p99**, a cyan-biased speckle. **p2**
 at 2400 dpi and nothing else in the chain reads it back
 (`r000_orchestration.md`, *PREFLIGHT the free space*). The three gate pages
 below are also where that footprint gets measured rather than assumed.
+
+**Run `cut` after the sample `measure`, before the gate.** The gate's snippet
+opens `R.OUT_MASTER / f"{stem}.png"`, and a `measure` alone leaves `masters600`
+empty — the sample fit is throwaway (an indicative 9-10 page fit per parity),
+and the sweep's own wipe-and-cut supersedes it. Without this the gate reports a
+missing file and reads like a grading failure.
 
 **The gate — three test pages, before the four hours.** A sweep is ~4.3 h wall
 clock over 200 pages on 6 lanes; the profile is settled on three graded pages
@@ -784,14 +795,18 @@ To re-measure, on a sample of **at least 20 pages spread over the issue**:
    and widening the tolerance to 20 mm changed nothing at all.
    **If the SPACING is what moved, only a new `holes_mm` fixes it.**
 
-1. Run `measure` with `HOLE_TEMPLATE_Y0_TOL_MM` widened enough not to bind
-   (20 mm), so the fit reports where the clip actually is rather than where
-   the previous issue's clip was.
-2. Take the best template shift per page from the candidate lists, drop the
+1. **Do not re-measure.** Every page's `holes` list in `geometry/NNN.json` is
+   already the FULL candidate set — the fit stores what it found, not only what
+   it used. Read the candidates from the sample's stored geometry and associate
+   the six per page nearest a rough template. On 8612 this replaced two
+   `measure` sweeps of ~17 minutes each.
+2. Take the best template shift per page from those candidate lists, drop the
    pages whose shift is arbitrary (a screen or a dense crease matches any
    shift — 8610 had four of 196).
 3. Read the **p5–p95 spread and the mean**. That is how 8610 got 58.05–59.97
-   and 58.91, hence `HOLE_TEMPLATE_Y0_MM` 59.0.
+   and 58.91, hence `HOLE_TEMPLATE_Y0_MM` 59.0. Confirm the new `clip` by
+   replaying `fit_fold` over the stored candidates: the *Notes* below state it
+   is a pure function of them, so nothing has to be re-cut to check.
 4. Put all of it in **the descriptor**, never in the module. `clip` is
    validated by `r000_issue.py` and absent means the built-in 8610 template,
    exactly as an absent `colors` means the built-in anchors:
@@ -1164,6 +1179,28 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
 worst.sort(reverse=True)
 print("worst residuals:", [(f, "%.2f" % r) for r, f in worst[:8]])
 PY
+
+# 3b. pages levelled to TILTED ART rather than to the sheet
+#     A clipped sheet is rarely more than ~1 deg off, so every hit here is art.
+#     On 8612: 183 (-6.60), 140 (+2.02), 117 (-1.72) -- all three ads, all three
+#     levelled to the artwork. Only 183 carried a NOTE, and it reported the
+#     residual (-0.26), not the applied angle. fold/logo "none" on the same page
+#     makes it near certain.
+$PY - <<'SKEWCHK'
+import json, os
+import r005_masters_spread as R
+flagged = []
+for f in sorted(os.listdir(R.OUT_GEOM)):
+    if not f.endswith(".json"):
+        continue
+    g = json.load(open(R.OUT_GEOM / f))
+    a = (g.get("skew") or {}).get("angle")
+    if a is not None and abs(a) > 1.0:
+        flagged.append((f[:3], round(a, 2),
+                        (g.get("fold") or {}).get("source") or "none",
+                        (g.get("logo") or {}).get("source") or "none"))
+print("LOOK AT |skew.angle| > 1.0 deg:", flagged or "none")
+SKEWCHK
 
 # 4. every stamp names the current grade; chunk == sidecar
 $PY - <<'PY'
