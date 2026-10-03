@@ -610,7 +610,7 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
 - **What happened.** 52 kept `<p>Anleitung auf Seite 58</p>`, a standalone paragraph between a byline and the next heading. I kept
   it at step 250 on the precedent of 8611/50, which keeps `<p>Listing auf Seite 54</p>`. That precedent is the same defect. The
   owner: "dont add this to the HTML! ever! this is like 'Fortsetzung auf Seite …' — it's a hint for you where to continue only!"
-  Removed by 64er_control (cf8e973d).
+  Removed by 64er_control (494b82ef).
 - **The test is not the words.** A sweep of 8612 found 16 "auf Seite N" and only ONE pointer. The other 15 are prose a reader
   needs ("beachten Sie bitte die Eingabehinweise auf Seite 78", "in Ausgabe 10/86 auf Seite 18", Fehlerteufelchen headings).
   The test: is the sentence the AUTHOR writing to a reader, or the LAYOUT telling a reader where to turn? A paragraph whose whole
@@ -620,7 +620,7 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
   whose entire text matches `^(\w+ )?(auf|von) Seite \d+\.?$`.
 - **Out of scope, for the owner:** 8611/50 carries `<p>Listing auf Seite 54</p>`, the same defect.
 
-## 190/290 — an aside heading must not outrank its article (owner review; fixed by 64er_control 494b82ef)
+## 190/290 — an aside heading must not outrank its article (owner review; fixed by 64er_control cf8e973d)
 
 - 8 Jagd auf Mailboxen's §202a box had the file's only <h2>; 91 Sprites im Abseits had an aside <h2> while its body sections are
   <h3>. Both are now h3. The corpus is 360 h2 to 70 h3 inside asides, so h2 is the norm: correct when the article has h2 sections
