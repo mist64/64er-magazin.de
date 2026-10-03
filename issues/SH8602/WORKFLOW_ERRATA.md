@@ -413,3 +413,16 @@ contradicts itself (the 290 agent's literal check flagged all 12 correct
 asides); "Inside an `<aside>`? … stays [h2]" contradicts the h3 exception. The
 Verification block still has no aside-outranks or paragraph-tail check (only
 r310 has them). Found by the 290 sub-agent.
+
+## 300 — the "disk has the bug, user not yet asked" state has no word
+
+"Every aside carries a disposition comment" vs "stays unmarked until the
+listing is either patched … or the decision is taken to leave it"; none of the
+three vocabulary words fits "disk has the bug, decision pending". The same
+illegible-digit case gets `Reiner Druckfehler` in the aside but `Disk-Version
+bereits korrigiert` in the prg header (step 2 vs appendix step 8). Goal/step 4
+"Patch the source listing" vs "Default to recording" and r000's "user first";
+even the `;` header the rule demands is a prg edit r000 sends to the user.
+"check the r330 verdicts" — r330 runs after r300. Stale inputs (fehlerteufelchen
+PDFs, "PDF pages 4-7") when the later issues are imported and greppable.
+Found by the 300 sub-agent.
