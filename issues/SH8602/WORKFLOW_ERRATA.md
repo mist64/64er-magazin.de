@@ -360,3 +360,11 @@ inside another article and is clearly not it (SH8602's C16 row — nearest-
 preceding routing would silently mis-file it onto article 20). "Category values
 must match a TOPICS list in generate.py" — no TOPICS entry for the Sonderheft
 CSV's top-level categories. Found by the 220 sub-agent.
+
+## 230 — "8607 is the only issue that ships LaTeX" is false
+
+8508/52 and 8602/71 ship MathJax too. Two sentences name 8606 as if it were
+the current issue. The evidence example path (`/tmp/64er_<YYMM>_pages_600/`)
+and "render at 300 dpi" contradict r000's masters600 rule. Nothing says what
+to do with a formula an earlier step faked with a CSS overline. Found by the
+230 sub-agent.
