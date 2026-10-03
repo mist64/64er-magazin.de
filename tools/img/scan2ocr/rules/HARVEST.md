@@ -219,7 +219,7 @@ SH8601), and the check still fires on a planted ALL CAPS heading.
 hand-built pre-chain issues (8408 4, 8501 5, 8408/8412/8504/8505/8507/8601/
 8602/8603/SH8506 the rest). They predate the chain.
 
-## OPEN — the shared-start-page check fails every chain-built issue
+## DECIDED — the shared-start-page check stays HARD; old issues are not fixed
 
 The new r310 HARD check ("two articles must not share a bare start page")
 works, but the corpus shows the lettering convention has only ever been
@@ -242,8 +242,19 @@ everywhere. Three ways out, for the owner:
   which shares p99 with the Checksummer in 8611), keeping it HARD for the
   rest.
 
-Until this is decided the check is left HARD exactly as ruled, and 8612
-reports 6 HARD findings from it. 8612's content was NOT changed.
+**Owner's ruling (2026-10-03): HARD. Do not fix old issues.**
+
+So the check stays HARD, none of the eleven pairs is lettered retroactively,
+and the findings stand as a known state of the published corpus: 8609 2 pairs,
+8610 3, 8611 2, 8612 3 (p8, p170, p195). Option (a) is rejected, (b) and (c)
+are not taken.
+
+What this means for a NEW build: the check will fire on the editorial/feature
+pair on page 8 of every issue. Letter the pairs that matter on the page, as
+r080 now says, and expect the p8 pair to show up in r310's HARD list without
+being a defect. It is a list to read, not a gate to reach zero -- r000's
+warning about a check that stops being read applies, and this is the one
+place in the chain where a HARD finding is expected to persist.
 
 ## Also found while applying
 
