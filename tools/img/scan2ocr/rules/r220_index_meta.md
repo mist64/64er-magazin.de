@@ -78,7 +78,12 @@ Run it from the issue directory, which is what the script's own paths assume —
 its CSV argument is relative to that cwd, and so is the Verification block below:
 
 ```bash
-cd issues/<YYMM>
+# ONE cwd for this rule: the REPO ROOT. The apply script globs *.html, so it
+# is invoked with the issue directory as cwd via a subshell -- but every path
+# in this file, and every Verification snippet, is relative to the repo root.
+# The rule used to say "run from the issue directory" while its Verification
+# used repo-root paths.
+cd /Users/mist/Documents/git/64er-magazin.de
 python3 ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py <YYMM> \
   "../../Jahresinhaltsverzeichnis <YYYY>.csv"
 ```
@@ -162,8 +167,13 @@ d, csv_path, code = sys.argv[1], sys.argv[2], sys.argv[3]
 rows = []
 for line in io.open(csv_path, encoding='utf-8'):
     p = next(csv.reader([line]))
-    if len(p) > 4 and p[0] == code and p[1].isdigit():
-        rows.append((int(p[1]), p[4]))
+    # PARSE THE FIRST INTEGER BEFORE THE DASH. `p[1].isdigit()` is False for
+    # every range row ("172—173"), so this check silently examined 26 of
+    # 8612's 55 rows and a planted range-row misroute passed.
+    if len(p) > 4 and p[0] == code:
+        mm = re.match(r'\s*(\d+)', p[1])
+        if mm:
+            rows.append((int(mm.group(1)), p[4]))
 starts, spans, titles = {}, {}, {}
 for f in sorted(glob.glob(os.path.join(d, '*.html'))):
     s = io.open(f, encoding='utf-8').read()

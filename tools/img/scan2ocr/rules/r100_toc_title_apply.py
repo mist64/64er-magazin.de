@@ -39,7 +39,10 @@ import re
 import sys
 from collections import defaultdict
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+# rules/ -> scan2ocr/ -> img/ -> tools/ -> repo root: FIVE levels. With four
+# this resolved to <repo>/tools and the helper could never find an issue dir.
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                         "..", "..", "..", ".."))
 
 
 def expand_pages(pages_attr):
@@ -137,6 +140,10 @@ SECTION_TO_TOC_CATEGORY = {
     "SOFTWARE-TEST":            {"Software-Test"},
     "SPIELE-TEST":              {"Spiele-Test"},
     "RUBRIKEN":                 {"Rubriken"},
+    # Missing until 2026-10 -- an article under any of these matched nothing.
+    "EINSTEIGER-TEIL":          {"Einsteiger-Teil"},
+    "HARDWARE":                 {"Hardware"},
+    "SOFTWARE-HILFEN":          {"Software-Hilfen", "Software-Hilfe"},
 }
 
 
@@ -349,13 +356,31 @@ def main():
         print(f"ERROR: issue dir not found: {issue_dir}", file=sys.stderr)
         sys.exit(1)
 
-    toc_json = args.toc_json or os.path.join(issue_dir, "_tmp", "toc_entries.json")
-    if not os.path.isfile(toc_json):
-        print(f"ERROR: toc entries not found: {toc_json}", file=sys.stderr)
+    # Step 090 writes issues/<ID>/toc_entries.txt as TSV: page, section,
+    # title. It has never written _tmp/toc_entries.json, which this helper
+    # used to demand -- so on 8612 it could not run at all. The JSON path
+    # stays available as an explicit override for anything that still has one.
+    toc_txt = os.path.join(issue_dir, "toc_entries.txt")
+    if args.toc_json:
+        with open(args.toc_json) as f:
+            toc_entries = json.load(f)
+    elif os.path.isfile(toc_txt):
+        toc_entries = []
+        with open(toc_txt, encoding="utf-8") as f:
+            for line in f:
+                parts = line.rstrip("\n").split("\t")
+                if len(parts) < 3 or not parts[0].strip().isdigit():
+                    continue
+                toc_entries.append({
+                    "page": int(parts[0].strip()),
+                    "section": parts[1].strip().upper(),
+                    "title": parts[2].strip(),
+                    "prefix": "",
+                    "hint_id": None,
+                })
+    else:
+        print(f"ERROR: toc entries not found: {toc_txt}", file=sys.stderr)
         sys.exit(1)
-
-    with open(toc_json) as f:
-        toc_entries = json.load(f)
 
     html_paths = sorted(glob.glob(os.path.join(issue_dir, "*.html")))
     articles = [read_article_meta(p) for p in html_paths]

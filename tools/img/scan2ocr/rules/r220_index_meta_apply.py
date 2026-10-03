@@ -55,10 +55,53 @@ def find_html_by_page(html_files):
     return by_page
 
 
-def find_file_for_entry(entry, by_page, all_files):
+def page_coverage(html_files):
+    """{filename: set of pages it covers}, from 64er.pages -- not the filename.
+
+    The filename only carries the START page, so routing by it alone sends a
+    row to whichever article happens to start on that page even when the row
+    belongs to a rubric running across it. On 8612 the "320 KByte" item, which
+    sits inside "11 Aktuell" (pages 11-14), went to "14 Scorpio" because
+    Scorpio starts on 14 -- and the check then flagged the correct route as
+    the wrong one.
+    """
+    cov = {}
+    for fn in html_files:
+        m = re.search(r'64er\.pages" content="([^"]+)"',
+                      open(fn, encoding="utf-8").read())
+        if not m:
+            continue
+        pages = set()
+        for seg in m.group(1).split(","):
+            seg = seg.strip()
+            mm = re.match(r'^(\d+)[a-z]?(?:\s*[-\u2013\u2014]\s*(\d+)[a-z]?)?$', seg)
+            if not mm:
+                continue
+            lo = int(mm.group(1))
+            hi = int(mm.group(2)) if mm.group(2) else lo
+            pages.update(range(lo, hi + 1))
+        cov[fn] = pages
+    return cov
+
+
+def find_file_for_entry(entry, by_page, all_files, cov=None):
     """Find the HTML file that an index entry belongs to."""
     start = entry['start']
     candidates = by_page.get(start, [])
+
+    # A MULTI-PAGE RUBRIC that covers this page and carries a matching <h2>
+    # outranks an article that merely starts here.
+    if cov and start.isdigit():
+        pg = int(start)
+        t = re.sub(r'<[^>]+>', '', entry['title']).strip().lower()[:24]
+        for fn, pages in cov.items():
+            if fn in candidates or pg not in pages or len(pages) < 2:
+                continue
+            body = open(fn, encoding="utf-8").read()
+            for h in re.findall(r'<h[23][^>]*>(.*?)</h[23]>', body, re.DOTALL):
+                h = re.sub(r'<[^>]+>', '', h).strip().lower()
+                if t and (t in h or h[:24] in t):
+                    return fn
 
     if len(candidates) == 1:
         return candidates[0]
@@ -118,6 +161,7 @@ def main():
     # Build mappings
     html_files = sorted(glob.glob("*.html"))
     by_page = find_html_by_page(html_files)
+    cov = page_coverage(html_files)
 
     # Remove existing index entries
     for fn in html_files:
@@ -130,7 +174,7 @@ def main():
     # Group entries by target file
     file_entries = defaultdict(list)
     for entry in entries:
-        fn = find_file_for_entry(entry, by_page, html_files)
+        fn = find_file_for_entry(entry, by_page, html_files, cov)
         if fn:
             file_entries[fn].append(entry)
         else:

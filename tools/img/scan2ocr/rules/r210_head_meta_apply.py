@@ -49,6 +49,16 @@ WORK_DIRS = ["_work", "_work_v2", "_work_v3", "_work_v4", "_work_v5"]
 # Vertical band where the running headers live (a 600 dpi A4 page is 7016px).
 HEADER_Y_MAX = 520
 
+# Page WIDTH in the same 600 dpi pixels (r005's MASTER_W_PX). The conversion
+# above missed two 300 dpi literals further down -- 2480 for the page width
+# and 1240 for its midline -- so "nearest a page edge" and "which half of the
+# page" were both computed against a page half the real width. On 8612 that
+# picked fragment blocks as head2 on six pages, missed one, and kept junk
+# ("Aktuell |", "Hardwa", "C 123"); the output had to be discarded and every
+# value read off the crops instead.
+PAGE_W = 4961
+PAGE_MID = PAGE_W // 2
+
 # Sane height range for header text.
 HEADER_H_MIN = 50
 HEADER_H_MAX = 200
@@ -297,15 +307,15 @@ def extract_head1_head2(blocks):
         # If multiple machine candidates, prefer the one nearest a page edge.
         machine_sorted = sorted(
             machine,
-            key=lambda b: min(b["x"], 2480 - (b["x"] + b["w"])),
+            key=lambda b: min(b["x"], PAGE_W - (b["x"] + b["w"])),
         )
         head2_block = machine_sorted[0]
     # head1: the non-machine block furthest from head2 (or just the largest non-machine).
     if section:
         if head2_block is not None:
             # Prefer the section block on the opposite side of the page.
-            head2_centre_left = (head2_block["x"] < 1240)
-            opposite = [b for b in section if (b["x"] >= 1240) != head2_centre_left]
+            head2_centre_left = (head2_block["x"] < PAGE_MID)
+            opposite = [b for b in section if (b["x"] >= PAGE_MID) != head2_centre_left]
             if not opposite:
                 opposite = section
             # Pick the widest opposite block.

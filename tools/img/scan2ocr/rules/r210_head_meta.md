@@ -165,4 +165,13 @@ and must come from the print, not from the article's
 - Spread headers for multi-page articles can drift: e.g. an article
   starting on a "section cover" page might have a different
   running header than its body pages. The start page's header is
-  authoritative.
+  authoritative — **unless the start page has no running head at all**, which
+  a full-bleed photo opener does not (8612's article 52). Then use the
+  article's FIRST HEADED page instead. Without this the helper has nothing to
+  read and invents a head from a fragment block.
+- `html.escape` writes `&#x27;` for the apostrophe, but the corpus carries a
+  literal `'` — in "64'er Extra" above all. Write the literal.
+- Check 1's expected-count formula is **off by one**: the Leserforum does
+  carry a head1, and the check assumed it does not. It also cannot detect a
+  head1 on a rubric that is supposed to be excluded, so a wrong head there
+  passes silently.

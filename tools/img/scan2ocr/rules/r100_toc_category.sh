@@ -70,9 +70,19 @@ for fn, cat in mapping.items():
     if s2 != s:
         open(fp, 'w', encoding='utf-8').write(s2)
         changed += 1
+        # Name what we touched, so step 4 can stage exactly that. `git add -u
+        # <dir>` stages EVERY tracked modification in the issue directory --
+        # on 8612 it swept WORKFLOW_ERRATA.md into this step's commit.
+        open(os.path.join(issue_dir, '.r100_staged'), 'a', encoding='utf-8').write(fp + "\n")
 print(f"updated {changed} of {len(mapping)} file(s) in {issue_dir}")
 PY
 )" "$issue_dir"
 
-# 4. stage rewritten files
-git add -u "$issue_dir"
+# 4. stage ONLY the files this step rewrote (never `git add -u <dir>`: r000's
+#    rule on self-staging scripts and a shared index)
+if [ -s "$issue_dir/.r100_staged" ]; then
+  tr '\n' '\0' < "$issue_dir/.r100_staged" | xargs -0 git add --
+  rm -f "$issue_dir/.r100_staged"
+else
+  echo "  nothing rewritten -- nothing staged"
+fi
