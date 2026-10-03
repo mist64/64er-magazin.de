@@ -125,8 +125,12 @@ The sub-agent must:
 
 Critical guardrails:
 - No `XXX` may survive. No empty `content=""` either.
-- Don't invent author names. Initial → full name comes from the
-  previous issue's Impressum, period.
+- Don't invent author names.
+- **Keep the initials exactly as printed.** This rule used to say an initial is
+  expanded to the full name from the previous issue's Impressum, "period" — but
+  its own examples keep initials, and so do 8609, 8610 and 8611. The print is
+  the authority here as everywhere else. Use the Impressum only to CHECK an
+  initial you cannot read, never to replace one you can.
 - Don't add a `<meta name="author">` to an unsigned rubric just
   because the file template suggested one.
 - House-ads / Sonderheft promos with no body byline are
@@ -214,7 +218,10 @@ PY
 # 4. every meta name=author content has at least one comma-separated
 #    name made of letters / spaces / dots
 grep -hE 'name="author" content=' "$dir"/*.html | \
-  grep -vE 'content="[A-Za-zÄÖÜäöüß.,\- ]+"' && echo "  FAIL: malformed content"
+  grep -vE 'content="[-A-Za-zÄÖÜäöüß., ]+"' && echo "  FAIL: malformed content"
+#    (the hyphen goes FIRST. As `…ß.,\- ` it was a range from '\' to ' ',
+#     which BSD grep rejects as an invalid character range -- the command
+#     errored, the && never fired, and the check silently passed every time.)
 
 # 5. shape consistency: an article whose meta `content` has duplicate
 #    entries must have a matching count of body bylines (per-byline
@@ -235,7 +242,13 @@ for f in sorted(os.listdir(d)):
     if len(parts) == len(set(parts)): continue  # no duplicates
     # has duplicates → expansion shape expected; body byline count
     # should be >= len(parts)
-    body_bylines = re.findall(r'<address class="author">', s)
+    # One <address> can carry SEVERAL names: "(Name/xx)" yields two meta
+    # entries. Counting addresses flagged correct metas -- 6 files in
+    # published 8611 among them -- so count the names inside them.
+    body_bylines = []
+    for a in re.findall(r'<address class="author">(.*?)</address>', s, re.DOTALL):
+        inner = re.sub(r'<[^>]+>', '', a).strip().strip('()')
+        body_bylines += [x for x in re.split(r'[/,]', inner) if x.strip()]
     if len(body_bylines) < len(parts):
         print(f"  {f}: meta has {len(parts)} entries ({len(parts)-len(set(parts))} dup) "
               f"but only {len(body_bylines)} body <address class=\"author\"> — "

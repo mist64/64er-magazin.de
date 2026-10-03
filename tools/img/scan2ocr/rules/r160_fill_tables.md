@@ -67,7 +67,14 @@ these from OCR text. Instead:
 
 - **Bordered data table with headers** → plain `<table>` with `<th>` header row.
 - **Borderless glossary / key list** → `<table class="plain">` with no header row.
-- **Table with a real caption** → wrap the whole `<table>` in `<figure>` with `<figcaption>`. A "real caption" is text printed on the scan in one of: `Tabelle: …`, `Tabelle N: …`/`Tabelle N. …`, `Bild N: …`/`Bild N. …` (for numbered figure-tables), or `STECKBRIEF: …` (yellow callout). **Do NOT promote section headings or bold titles above a table to `<figcaption>`** — a bold "Erklärung der einzelnen Bearbeitungsroutinen" above a table is a heading, not a caption.
+- **Table with a real caption** → wrap the whole `<table>` in `<figure>` with `<figcaption>`. A "real caption" is text printed on the scan in one of: `Tabelle: …`, `Tabelle N: …`/`Tabelle N. …`, `Bild N: …`/`Bild N. …` (for numbered figure-tables), or `STECKBRIEF: …` (yellow callout). **Do NOT promote section headings or bold titles above a table to `<figcaption>`** — a bold "Erklärung der einzelnen Bearbeitungsroutinen" above a table is a heading, not a caption. **EXCEPT a NAMED BOX whose title belongs to the box rather than to the surrounding section**: "Auf einen Blick: …" and "Stückliste" are captions and DO become `<figcaption>`, as 8609/22 and 8610/176 already have them. The test is whether the title would still make sense with the box removed; a section heading would, a box's own label would not.
+
+Three further shapes this rule never named, all met on 8612:
+- a label printed **inside** the box rather than above it (Stückliste) — still the box's caption;
+- a `Bild` holding **both** tables and drawings (p61 Bild 7) — one figure, the tables typeset inside it;
+- market-overview tables referenced only **generically** ("die Tabelle zeigt"), which no `Tabelle N` sweep will ever find.
+
+**When a printed table interleaves drawings with per-item legends, keep the pairing.** Do not regroup the legends below the images: the legends differ per item (on 8612's EPROM tables the 2516 has CS, the 2532 has none, the 2564 has CS(X)), so a pile of legends under a row of drawings is not untidy, it is **misleading**. One column per item, each drawing above its own legend.
 - **The `<figcaption>` ALWAYS goes BELOW the table** inside the `<figure>`, even if the print places it above. Project convention.
 - **Table with a heading or no caption marker** → bare `<table>`, no `<figure>`.
 - **NEVER fabricate a caption.** A `<figcaption>` is only allowed when its exact text is printed on the page (read it off step 010's block index or a 600 dpi scan crop; the PDF text layer is void, see r000); transcribe it verbatim. Do not compose a plausible-sounding descriptive title of your own — that is a fabrication. When in doubt, emit a bare `<table>` with no caption rather than an invented one. (Conversely, don't delete a real caption as "invented" without checking the scan: 8608/142 `Listing 1. Laufzeit-Testschleife in »C«` IS printed in bold on p145.)
@@ -160,6 +167,17 @@ for f in <OUT_DIR>/blocks/p*.txt; do
   awk -F'bbox=' '/^block=/ { split($2, b, "x"); if (b[1]+0 < 350)
     print FILENAME": "$0 }' "$f"
 done | head -50
+
+# 3. A TINTED box yields NOTHING from the block index: tesseract returns
+#    nothing at all on a halftone-screened panel, so such a table is
+#    invisible to steps 1 and 2 and to every Tabelle sweep. Re-OCR the
+#    suspect region through a tint pre-filter before concluding it is empty.
+magick <tmp>/masters600/NNN.png -crop <WxH+X+Y> +repage \
+  -colorspace Gray -blur 0x1.5 -threshold 57% png:- \
+  | tesseract - - -l deu --psm 6
+#    The blur fills the screen dots, the threshold then separates type from
+#    tint; 55-60% is the usable band. On 8612 all six uncaptioned tables came
+#    from the visual walk and NONE from a sweep -- the same as 8611.
 ```
 
 > **This sweep returned 0 on every page of every issue it has ever run on,**
@@ -209,7 +227,8 @@ The sub-agent must:
      pseudo-code / Bild-labelled tables).
    - Pass 2: `grep -l 'TODO TABLE' issues/<YYMM>/*.html` — every hit
      MUST be replaced.
-   - Pass 3 (MANDATORY, mechanical — NOT a visual thumbnail scan):
+   - Pass 3 (MANDATORY — the VISUAL WALK is the mechanism; the sweeps only
+     add to it. See the normative section above):
      sweep step 010's block index for uncaptioned tables, exactly as
      the normative "Sweeping captions across a whole issue → Pass 3"
      section above specifies. Run both blocks-index greps (known
@@ -310,9 +329,11 @@ for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
     refs = set()
-    for m in re.finditer(r'\bTabelle (\d+)\b', s):
+    # OCR damage puts ']', 'l' or 'I' where the digit was ("Tabelle ]"),
+    # and a table may be captioned "Bild N" -- both were missed on 8612.
+    for m in re.finditer(r'\b(?:Tabelle|Bild) ([\d\]lI]+)\b', s):
         refs.add(m.group(1))
-    placed = set(re.findall(r'<figcaption>Tabelle (\d+)', s)) | \
+    placed = set(re.findall(r'<figcaption>(?:Tabelle|Bild) ([\d\]lI]+)', s)) | \
              set(re.findall(r'-t(\d+)\.png', s))
     miss = refs - placed
     if miss:
@@ -359,7 +380,9 @@ for f in sorted(os.listdir(d)):
         if not cap:
             print(f"  {f}: <figure><table> with no <figcaption>")
             continue
-        if 'Tabelle' not in cap.group(1):
+        # A Bild-captioned <figure><table> is the shape this rule REQUIRES
+        # for a numbered figure-table, so it is not a finding.
+        if 'Tabelle' not in cap.group(1) and 'Bild' not in cap.group(1):
             txt = re.sub(r'<[^>]+>', '', cap.group(1)).strip()[:60]
             print(f"  {f}: <figure><table> caption not 'Tabelle …': {txt!r}")
 PY
@@ -453,3 +476,29 @@ Signature: a run of short paragraphs that share a common shape (`X: Y`,
 `CMD  description`, `N. item`). Check the page — if it is set as a table, build
 a table; if it is set as display lines inside a flowing paragraph, use one `<p>`
 with `<br>`.
+
+## A `<br>` IS THE AUTHOR'S LINE BREAK, NEVER THE COLUMN'S
+
+**A break where the printed column simply ended is not reproduced.** Join it
+with a space, rejoining a word split at a hyphen. A `<br>` marks only a break
+the author made: a new list item, an address line, a code line, a deliberately
+set display line.
+
+MEASURED on 8612 before the owner's review: **283 `<br>` inside table cells**
+(article 40 alone had 181, then 146 with 27, 160 with 23, 74 with 16) and 133
+more in ordinary paragraphs. This rule caused them by saying to keep "printed
+line breaks" in cells without distinguishing the two kinds. The owner: *"if it
+looks like the line breaks are just because of the width of the table, dont
+reproduce them in tables."*
+
+**Joining CODE is not the same as joining prose.** A wrap after `: , * = + - ( /`
+or before `+ - * / = ) " ;` hides no space — rejoin with none. Use one space
+only between two alphanumeric tokens (`DRAW1,X1,Y1 TO`, `SYS 58732`). Joining
+with a space everywhere gives `RX* COS(`, `RY= RY*199`, `?PEEK(174) +PEEK(175)
+*256`. Two traps: **an HTML entity ends in `;`** (`&lt;&gt;`), so it is not an
+operator boundary; and tokenise before joining.
+
+**A discriminator for BASIC cells, advisory only:** if the text after the `<br>`
+does not begin a new line number, the break is a wrap artefact. It is **wrong
+for unnumbered code** — 146's Tabelle 1 runs statements together with spaces in
+the print itself — so decide on the crop, never on this test alone.
