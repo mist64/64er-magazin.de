@@ -339,3 +339,11 @@ by the 190A sub-agent (50 min).
   CANDIDATE source for a page whose OCR is hopeless (58: used, then verified
   against every page — r000's PDF-text-layer rule is the right analogue and
   should be cited here).
+
+## 210 — "vorwort … carries the band WITHOUT a section word" is SH8601-only
+
+Verification check 1 lists `vorwort` as excluded because "its page carries
+the band WITHOUT a section word" — SH8602 p3 prints EINLEITUNG, as do
+SH8503–07; and step 3 does not skip it. "Crop the top ~250 px" names no
+resolution (at 600 dpi the band needs ~500 px). Check 1 only lists files and
+compares nothing; check 3 is eyeball-only. Found by the 210 sub-agent.
