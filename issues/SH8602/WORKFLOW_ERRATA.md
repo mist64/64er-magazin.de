@@ -445,3 +445,24 @@ adjudicated.txt nor a page note can clear a correct intro such as SH8602/159
 printed-period check. Fix: route it through `ADJUDICATED_HERE(..., 'badge-intro')`
 and/or skip a number followed by a unit. Not edited mid-build (r000); HARD
 stays at 1, adjudicated.
+
+## 330 — nothing says how a new issue gets its reprint leads
+
+r330's trigger is `REPRINTS.md` leads, which SH8601 inherited from a deleted
+PDF-OCR file. For a fresh issue no step produces them, and the rule's fallback
+("no REPRINTS.md … ran, zero leads") would have recorded zero for an issue
+that measurably reprints 8+ articles (Checksummer 0.92, MSE 0.96, Debugging
+0.83, Ordnung 0.74 …). I built the leads by 8-word-shingle overlap of every
+built article against all of `issues/` (~2 min) and wrote `REPRINTS.md`.
+**What would have prevented it:** a "Step 0 — find the leads" in r330 with
+that measurement, run after 280, before 325/330.
+
+## 325 — the dump cross-checker is silent on three more dump forms
+
+"Do not take its silence as coverage" names two unread forms; SH8602 has three
+more it also skips without a word: SMON `>, C000 A9 C0 LDA #$C0`, the monitor
+`.,  081A  A9 CC  LDA #$CC`, and assembler listings with line#/loc/code
+columns (95 instruction rows in one half of this issue). It should print how
+many rows it parsed so "0 parsed" differs from "0 wrong". The pdftotext
+locator it recommends does not exist before 006. "Readers must … report as they
+go" — a sub-agent has only its final hand-back. Found by both 325 readers.
