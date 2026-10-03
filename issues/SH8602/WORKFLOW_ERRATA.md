@@ -319,3 +319,23 @@ writer (SH8602: Georg Klinge). The Impressum vocabulary check assumes `xx =
 Name` lines Sonderheft Impressums never print, and misses initials inside
 `(Name/xx)` bylines — 10 of the 11 here. Orchestrator note: my brief said
 "use it to expand"; the agent followed the rule, correctly.
+
+## 190 — aside heading level stated two ways; dash-list precedent misstated; "never retype" vs "restore from the crop"
+
+"An aside's heading is one level below the article's highest section
+heading" vs the next clause "`h2` when the body has `h2` sections" vs the
+unconditional "The aside's heading is an `<h2>`". "Dash lists stay `<p>— …</p>`
+… 8609-8611 all keep the paragraph form" — those issues carry 128 `<li>`.
+"code inside `<pre>` must come from the existing HTML … never retype from
+print" vs "restore them from the crop if not" — on SH8602 the OCR had lost
+whole code values (20's organ program, 44's 2000–2160 loader) that only the
+crop has. The broken-listing sweep's `(?=[A-Z]{2})` misses assignment lines
+(`30 A=1`); the Verification uses `$TMPDIR_ISSUE` without defining it. Found
+by the 190A sub-agent (50 min).
+- 190B adds: "Convert … to `<ul>`/`<ol>` only when the print shows a real
+  bullet glyph" contradicts "Dash lists stay `<p>— …</p>`"; the Verification
+  has no check for the never-split-author rule it describes; nothing says
+  whether the step-020 vision `truth/NNN.txt` transcripts may serve as a
+  CANDIDATE source for a page whose OCR is hopeless (58: used, then verified
+  against every page — r000's PDF-text-layer rule is the right analogue and
+  should be cited here).
