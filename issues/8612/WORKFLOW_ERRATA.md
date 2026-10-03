@@ -554,7 +554,11 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
   title.png is exactly 1240x1754, and a 150 dpi reduction of the master is also exactly 1240x1754, so the rule cannot tell a
   retouched cover from an untouched one. The PDF was built with it, and is reopened to rebuild when the new cover arrives
   (only the mixed pass re-runs; the OCR cache stands).
-- **What would have prevented it.** Before building, measure title.png against a 25% reduction of masters600/001.png. Below
+- **What would have prevented it.** Before building, compare title.png with a 25% (Lanczos) reduction of masters600/001.png
+  and count the pixels that moved by more than 30 levels (max over channels). MAE alone does not discriminate: on 8612
+  the unretouched export read MAE 2.93 and the owner's retouched cover 5.54, a coin toss for any threshold. The counts were
+  27,049 vs **81,409** (3x), the retouch being one page-wide tonal adjustment plus localised work down the left edge. A count
+  near the unretouched level means stop and ask. (Correction by 64er_control to the MAE-only check first written here.)
   a few levels' MAE it is NOT a retouched cover: stop and ask. (The 8611 cover read MAE ~930/0.014; 8612's would have read ~0.)
 
 ## (all steps) — no rule states the HTML-comment convention: German, reader-facing, what the PRINT has or lacks; never process
@@ -588,3 +592,15 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
   `Reiner Druckfehler` shape). Mechanical gate adjudications live in adjudicated.txt.
 - **What would have prevented it.** r000: "An HTML comment is German, names a print error a reader would otherwise act on, and
   says what is correct. Nothing else — not absences, not provenance, not adjudications (adjudicated.txt)."
+
+## 006 — a new title.png does NOT reach the mixed build: its per-quality JPEG cache is keyed on existence
+
+- **What happened.** On the cover rebuild, make_issue_pdf.sh correctly refreshed `.ocrcache/001_150.png` (newer title.png →
+  invalidated), and make_issue_pdf_mixed.sh's MAE guard passed against that refreshed raster. But Phase 4 re-encodes a page only
+  `[[ -s "$qd/$n.jpg" ]] || guetzli …`, so every `guetzli-qNN/001.jpg` from the first build was reused. The "rebuilt" PDF had
+  page 1 byte-identical to the old one, and the same total size to the byte (96,313,586). Every metadata/page check passed.
+- **How it was caught.** The identical file size looked wrong; `pdfimages -j` + `cmp` of page 1 from both builds proved it.
+  Repaired by deleting `guetzli-q*/001.jpg` and re-running the mixed pass.
+- **What would have prevented it.** In the mixed script: invalidate `guetzli-q*/$n.jpg` when `${n}_150.png` is newer (the plain
+  script already does this for its own cache). In r006's verification: "after a cover change, page 1's embedded image must
+  DIFFER from the previous build's and match title.png". The size alone is a tell too.
