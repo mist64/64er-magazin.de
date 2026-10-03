@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Kurz und nützlich - Einzeiler</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="cg">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="152-154, 156-158">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX35">
+</head>
+
+<body>
+    <article>
+        <h1>Kurz und nützlich - Einzeiler</h1>
+        <p class="intro">Einzeiler sind häufig sehr nützliche Utilities oder »Basic-Erweiterungen«. Wir stellen Ihnen deshalb hier einige dieser Kurzprogramme vor. ir wollen uns nicht nur auf's Listing beschränken, WW Ihnen auch eine Beschreibung der Variablen und eine kurze Erklärung des Programmlaufs geben. So wird es sicher einfacher, die Kniffe, die in solchen</p>
+
+        <p>Einzeilern stecken, zu verstehen und auch selbst zu verwenden.</p>
+
+        <h2>Zahlenkonvertierungen von Dezimal nach Hexadezimal.</h2>
+
+        <p>Diese Zahlenkonvertierungen braucht man recht häufig. - Hex X$ nach dezimal (Listing 1) und - Dezimal X nach hex X$: (Listing 2)</p>
+
+        <h2>Umwandlung beliebiger Zahlensysteme</h2>
+
+        <p>Die folgenden beiden Einzeiler von Martin und Hartmut Sprave dienen zum Umwandeln von Dezimalzahlen in Zahlen beliebiger Basis und umgekehrt. Man kann die beiden Programme auch kombinieren und erhält so eine Umwandlungsroutine zwischen verschiedenen Zahlensystemen. Beide sind auch als Unterroutine in einem Programm denkbar.</p>
+
+        <p>Zur Umwandlung dezimal/beliebig:</p>
+
+        <p>Die Variable D enthält eine Dezimalzahl beliebiger Größe. In der Variablen B muß die Basis angegeben werden, die der umgewandelten Zahl zugrunde liegt. Das Ergebnis steht in $Z.</p>
+
+        <p>Zum Programm: Die Dummy-Schleife (von O bis O) wird benutzt, um später wieder mitten in die Zeile springen zu können. An jeder Stelle wird die Zahl in der Variablen D durch die Basis B geteilt. Dadurch wird die unterste Ziffer abgeschnitten. Die jeweils niederwertigste Stelle ist der ganzzahlige Rest dieser Division und steht in S. Dieser wird in ASCII-Code umgerechnet. Durch den CHR$-Befehl wird der Code zu einer Zeichenkette. Diese wird vorne an $Z angehängt. Die letzte höchstwertige Ziffer ist erreicht, wenn D&lt;1, da die nächste Stelle dann O ist. Solange D> = 1 ist, ist die Endbedingung nochnicht erreicht und die FOR-Schleife wird weiter durchlaufen (bis P+1&lt;=0).</p>
+
+        <h2>Zur Umwandlung beliebig/dezimal:</h2>
+
+        <p>Diese Routine wandelt eine beliebig große Zahl, deren Basis in der Variablen B steht, in eine Dezimalzahl um. Die Zahl selbst muß in $Z stehen. D wird mit O initialisiert. Die Schleifenvariable S dient als Zeiger auf die einzelnen Stellen von $Z. Diese werden nacheinander in ASCII-Code umgewandelt. Der Code für Null (48) wird subtrahiert und das Ergebnis in H zwischengespeichert. Man multipliziert die umgewandelten Stellen (in D) mit B und erhöht sie dadurch um eine Potenz dieser Basis. Dann addiert man die aktuelle Stelle (H) dazu. Bei Darstellung durch einen Buchstaben (H > 9) ist aufgrund des ASCII-Codes noch die Subtraktion einer 7 notwendig. Die Schleife wird solange durchlaufen, bis die niederwertigste Stelle erreicht ist.</p>
+
+        <h2>Die Fakultätsfunktion</h2>
+
+        <p>Dieser Einzeiler von Detlev Marks berechnet Fakultäten besser als ein Taschenrechner (größer als »69%«). Der C 64 besitzt standardmäßig keinen Befehl zur Berechnung der: Fakultät.</p>
+
+        <p>Die Eingabevariable ist A. B dient als Zählvariable und C als Rechen- und Ausgabe-Variable.</p>
+
+        <h2>Dividieren mit beliebig vielen Nachkommastellen</h2>
+
+        <p>Die Variable Z enthält die Zahl, die geteilt wird, die Variable D den Dividenden, durch den geteilt wird. In N kann die Anzahl der gewünschten Nachkommastellen angegeben werden. Die Variable E% enthält das Ergebnis ohne Rest. Es wird ausgegeben. R enthält den Rest und in Q% steht der Quotient (beschränkt auf Vorkommastellen).</p>
+
+        <p>Die Vorkommazahl erhält man durch Q=INT(Z/D), hier vereinfacht durch Q%=Z/D. Q% wird ausgegeben. Dann wird der Rest (Z-Q% *D) berechnet. Die Schleife wird n mal durchlaufen (N=Anzahl der Nachkommastellen).</p>
+
+        <p>Analog zu Q% wird E%=R* 10/D berechnet. E% wird ausgegeben als 1. Stelle. Der neue Rest wird gebildet durch: R (neu) = 10*R (alt) - D*E%.</p>
+
+        <p>Nun kann die Schleife durchlaufen werden, bis alle Nachkommastellen ausgegeben wurden.</p>
+
+        <p>Beispiel: Wie lautet die 85. Nachkommastelle von 116/13? Z=116, D=13, N=85 sind die Variablenwerte. Das Programm liefert das Ergebnis 9.</p>
+
+        <p>Der Autor dieses Programms ist Heinz Bauschke.</p>
+
+        <h2>INPUT mit Komma</h2>
+
+        <p>Diese INPUT-Routine von Jürgen Reinert ersetzt den INPUT-Befehl. Sie erlaubt Komma, Doppelpunkt und Strichpunkt als zusätzliche Satzzeichen bei der Eingabe. Sonst funktioniert sie genauso wie der INPUT-Befehl. Die Routine übernimmt alle Zeichen der Tastatur, auch führende Leerzeichen (Leerzeichen vor Beginn des Textes).</p>
+
+        <p>Die Variable AA enthält die aktuelle Eingabe in ASCII-Code. Il bildet die Laufvariable für Schleifen und XX$ enthält den eingegebenen Text.</p>
+
+        <p>Das »Herz« dieses Einzeilers ist die Eingaberoutine ab Adresse 42336. Diese schreibt alle 80 Zeichen einer Bildschirmzeile in den Basic-Eingabepuffer, der bei Adresse 512 beginnt. Dann liest das Programm Zeichen für Zeichen den Eingabepuffer bis zur genannten O und stellt daraus den String XX$ zusammen.</p>
+
+        <p>Erfolgt keine Eingabe, das heißt, nur die RETURN-Taste wurde gedrückt, so wird die Routine mit XX$=CHR$(32) verlassen. In allen anderen Fällen enthält XX$ alle sichtbaren, eingegebenen Zeichen (außer Steuerzeichen).</p>
+
+        <h2>Formatierte Ausgabe</h2>
+
+        <p>Dieser Einzeiler gibt Zahlen beliebiger Länge und unabhängig vom Vorzeichen rechtsbündig aus. Die Tabulatorfunktion von Volker Walter ist sicher beim Aufbau von Tabellen nützlich.</p>
+
+        <p>Die Variable A enthält die Zahl, die ausgegeben wird. Die Zahl »22«legtfest, daß die Kommata der ausgegebenen Zahlen in Spalte 24 stehen (2 Stellen werden vom Komma gebraucht). Die Spaltennummer kann im Listing beliebig gesetzt werden (Zahl im Listing = tatsächliche Spaltennummer - 2).</p>
+
+        <p>IstA> =1, so wird der Zehnerlogarithmus von A berechnet und von der Spaltennummer abgezogen, bei der der Dezimalpunkt stehen soll. Da der C 64 nur den Logarithmus zur Basis e berechnen kann, muß das Ergebnis mit der Konstanten ‚43429448188 multipliziert werden. Dadurch erhält man den Zehnerlogarithmus.</p>
+
+        <p>Diese Berechnung erfolgt durch</p>
+
+        <p>INT(LOG(B-(B=0)) *.43429448188)*(B&lt;=1).</p>
+
+        <p>Ist A&lt;1, so wird zur Spaltennummer eine Eins addiert. Null bildet einen Sonderfall, da die Nullnoch vor dem Komma stehen muß.</p>
+
+        <p>INT(-B)*(B&lt;1).</p>
+
+        <h2>Mehr Struktur mit Spaces</h2>
+
+        <p>Der Basic-Interpreter auf dem C 64 überliest führende Leerzeichen zwischen Zeilennummer und dem Basic-Befehl einfach. So ist ein Einrücken mehrerer Programmzeilen oder das Einfügen von Leerzeilen, wodurch das Programm wesentlich übersichtlicher würde, standardmäßig nicht möglich. .</p>
+
+        <p>In der Regel behilft man sich in solchen Fällen, indem man an den Zeilenanfang einen Doppelpunkt setzt, auf den dann die gewünschte Anzahl Leerzeilen folgt.</p>
+
+        <p>Von Herbert Heise stammt eine wesentlich elegantere Methode:</p>
+
+        <p>Der Basic-Interpreter überliest bei der Zeileneingabe Grafikzeichen. Diese Tatsache kann man sich zunutze machen. Nach der Zeilennummer wird irgendein Grafikzeichen (besonders einfach: SHIFT und gleichzeitig die Leertaste) getippt, danach die gewünschte Anzahl führender Leerzeichen und dahinter die vorgesehenen Basic-Befehle. Auf dem Bildschirm ist das Grafikzeichen noch zu sehen. Aber beim Auflisten stellt man fest, daß das Grafikzeichen nicht in den Programmtext übernommen wurde. Dennoch erscheint die Zeile um die gewünschte Anzahl von Stellen eingerückt.</p>
+
+        <p>Um ganze Leerzeilen mit dieser Methode zu erzeugen, schreibt man hinter die Zeilennummer ein Grafikzeichen, ein Space und noch ein Grafikzeichen. Nach einem RETURN wird nur das Leerzeichen in die Zeile übernommen. Mit LIST erhält man nun eine Zeile, die nur aus einem Leerzeichen besteht.</p>
+
+        <p>In diesem Zusammenhang istnoch folgender POKE-Befehl interessant:</p>
+
+        <p>Mit »POKE 129,58« werden Basic-Zeilen nicht mehr ausgeführt, die keine Spaces in Anführungszeichen enthalten. Der Interpreter meldet »?SYNTAX ERROR«. Ausschalten läßt sich dieser Modus wieder mit »POKE 129,322«.</p>
+
+        <h2>Zeilen löschen am Bildschirm</h2>
+
+        <p>ERTEEERRETRETIEEEERTESEERTEENFERENIEFSEEFT TREE Diese kleine Routine von Stefan Keimeier löscht bestimmte Zeilen auf dem Bildschirm. Dabei wird eine Maschinenroutine des C 64 verwendet, die diejenige Zeile vom Bildschirm löscht, deren Zeilennummer im X-Register steht. Die Zeilennummer wird zunächst in die Speicherzelle gePOKEt, deren Inhalt der SYS-Befehl in das X-Register übernimmt. Dabei wird von O bis 24 gezählt. Die Position des Cursors bleibt davon unbeeinflußt.</p>
+
+        <p>Die Variable LN enthält die Zeilennummer (O bis 24), V gibt die Von-Zeile und B die Bis-Zeile an (gelöscht wird »von« »bise«).</p>
+
+        <p>18 FOR LN=V TO B:POKE 781,1LN:5YS 59903: NEXT</p>
+
+        <p>20 :</p>
+
+        <p>3@ REM FUER NUR EINE ZU LOESCHENDE ZEILEGILT:</p>
+
+        <p>48 :</p>
+
+        <p>5@ FOKE 788,LN:5YS 59993</p>
+
+        <p>&amp;8 :</p>
+
+        <p>7@ REM</p>
+
+        <h2>Grafikbildschirm löschen mit DIM-Befehl</h2>
+
+        <p>Die Variablen A und B müssen vor der DIM-Anweisung angelegt werden:</p>
+
+        <p>(A=0:B=0), daim Programmverlauf das Variablenfeld beeinflußt wird.</p>
+
+        <p>Dann werden durch</p>
+
+        <p>A=PEEK(49):B=PEEK(50) die Werte für das Variablenende gesichert. Durch das Dimensionieren einer Variablen wird ein entsprechend großer Platz hinter dem Variablenende auf Null gesetzt.</p>
+
+        <p>Der Bildschirmspeicher fängt bei Adresse 8192 und geht bis Adresse 16191. Hinter dem bisherigen Variablenende (Adresse: A+B*256) wird die Variable F (auf der Adresse 16191-a-b* 256) angelegt. Pro indizierter Variablen werden 5 Byte freigemacht. Dabei wird die mit O indizierte Variable nicht berücksichtigt, ebenso die ersten sieben Byte für Variablenname und Dimension.</p>
+
+        <p>Durch POKE 49,A:POKE 50,B werden die alten Werte wieder hergestellt. F ist nun nicht mehr dimensioniert.</p>
+
+        <p>Wenn das Variablenende größer oder gleich 8186 ist, wenn also das Programm einschließlich Variablenfeld größer ist als 6 Bytes, dann wird der Bildschirm nicht ganz gelöscht.</p>
+
+        <p>Soll das Grafikprogramm zum Speichern von Bildern benutzt werden, darf man nicht vergessen, den Zeiger für Speichergrenzen (PEEK(55)+PEEK(56)*256) auf eine Adresse kurz hinter den Bildschirmspeicher zu setzen.</p>
+
+        <p>Der Autor des Programms, Manfred Hedtke, schlägt vor, im Grafikprogramm die Zeile 10 immer dann aufzurufen, wenn über die Tastatur »SHIFT + CTRL HOME« (entsprechend »freier Bildschirm im Textmodus«) eingegeben wird.</p>
+
+        <h2>Soft-Scrolling</h2>
+
+        <p>Mit diesem Einzeiler von Georg Brandt kann ein beliebiger Text von rechts nach links punktweise über den Bildschirm geschoben werden. Die Variable A mit dem Wert 53270 bildet das Register für horizontales Smooth-Scrolling. Die Variable L enthält die Anzahl der Zeichen (L=40 für die gesamte Bildschirmbreite, weniger für kleinere Textausschnitte), die gleichzeitig auf dem Bildschirm erscheinen sollen. In der Variablen A$ erwartet die Routine den zu zeigenden Text. Das letzte Zeichen sollte ein Leerzeichen sein. Das rechtsbündige Zeichen des Strings steht zweimal auf dem Bildschirm, da es nicht gelöscht wird.</p>
+
+        <p>Das Programm arbeitet nach folgendem Prinzip: Der Text wird auf den Bildschirm ausgegeben. Dann wird der Bildschirminhalt mit Hilfe des Smooth-Scrolling-Registers punktweise nach links gezogen, bis er um sieben Punkte verschoben ist. Nun wird der gesamte Text nach links geschoben und das Scroll-Register zurückgesetzt. Dadurch scheint der Text um den achten Punkt verschoben zu sein.</p>
+
+        <p>Wichtig:</p>
+
+        <ul>
+            <li>
+                <p>Vor Programmaufruf sollte der Bildschirm gelöscht werden, da sonst auch der restliche Bildschirminhalt verschoben wird.</p>
+            </li>
+            <li>
+                <p>Auch andere Steuerzeichen außer dem hier verwendeten HOME können eingesetzt werden, um den Text zu positionieren.</p>
+            </li>
+        </ul>
+
+
+        <h2>Scrollen in x-Richtung</h2>
+
+        <p>Bei diesem Einzeiler von Hans-Peter Harmann kann die Geschwindigkeit des Scrollers je nach Anwendung neu eingestellt werden. Die Verzögerungsschleife</p>
+
+        <p>FOR G=0 TO 3:NEXT muß nur entsprechend abgeändert werden. Durch den Wert 3 wird nur eine minimale Verzögerung erreicht. Experimentieren Sie ruhig mal damit, mit welchen Verzögerungswerten der Bildschirm wie schnell gescrollt wird.</p>
+
+        <h2>Scrollen bei bleibendem Text</h2>
+
+        <p>Dieses kleine Programm stammt von Peter Eckart. Es bewirkt, daß nur Teile des Bildschirmes gescrollt werden. Die Zahl, die Sie in Speicherzelle 59639 POKEn, legt fest, wieviele Zeilen am oberen Rand stehen bleiben. So kann man die Kopfzeile einer Tabelle auf dem Bildschirm festhalten oder eine Information, die für ein Programm wichtig ist (Tastenbelegung, Erklärung der wichtigsten Befehle oder anderes). Beendet wird dieses Programm durch den Befehl POKE 1,55.</p>
+
+        <p>Wenn Sie eine »O« gePOKEthaben, wird eine Zeile auf dem Bildschirm festgehalten. Beim POKEn einer »1« zwei Zeilen, beim POKEn einer »%« ...</p>
+
+        <p>Obwohl diese Routine sehr kurz ist, braucht sie sehr lange zur Ausführung.</p>
+
+        <h2>Grafik: Rahmen zweifarbig</h2>
+
+        <p>Der Bildrahmen des C 64 ist standardmäßig einfarbig. Von Markus Hillebrand stammt dieser Einzeiler, der einen zweifarbigen Außenrahmen simuliert.</p>
+
+        <p>So einfach diese Routine ist: sie verblüfft einen doch!</p>
+
+        <p>Der Rahmen erscheint in schwarz (0) und weiß (1). Beim Abtippen der Programmzeile ist es ganz wichtig, die Anzahl der Doppelpunkte und der Leerstellen genau zu treffen. Zwischen den beiden POKEs und den Doppelpunkten stehen je fünf Leerzeichen. Danach folgen 17 beziehungsweise 15 Doppelpunkte. Wichtig ist dies deshalb: Der Autor des Programms wollte die Grenze zwischen den beiden Farben möglichst ruhig auf dem Bildschirm haben. Dazu mußte er die genaue Farbwechselperiode finden. Da der Interpreter Doppelpunkte und Leerzeichen unterschiedlich schnell abarbeitet, hater die Feineinstellung mit Leerzeichen vorgenommen.</p>
+
+        <p>Aber Vorsicht: Sobald während des Programmablaufs eine Taste gedrückt wird, fängt das Bild an zu »laufen«, weil die Raster-Interrupt-Tastaturabfrage in Kraft getreten ist, die den Zeitplan durcheinander bringt.</p>
+
+        <h2>Spiralen mit dem Plotter 1520</h2>
+
+        <p>Dieser Einzeiler malt mit dem Plotter 1520 eine Spirale, die aus lauter Dreiecken besteht. Zugrunde liegt diesem Programm von Christoph von Rhein die Berechnung eines Kreises. Die X- und Y-Koordinaten werden mit den Funktionen SIN und COS errechnet. Da X und Y mit der Laufvariablen I multipliziert werden, kommt bei dieser Berechnung eine Spirale heraus. Wenn Sie das Aussehen der Grafik ändern wollen, dann können Sie den Faktor 2 innerhalb der Sinus- und Cosinus-Klammern durch einen anderen Wert ersetzen.</p>
+
+        <h2>Ein grafischer Disassembler: DI-AS</h2>
+
+        <p>Der Speicherbereich des C 64 läßt sich in 256 Seiten 4256 Byte aufteilen. DI-AS interpretiert die Speicherinhalte als Bildschirmcode und stellt die 64 KByte des C 64 Seite für Seite auf den Zeilen 7-13 des Bildschirms dar. Die Seitennummer wird am oberen Bildschirmrand angezeigt. Andreas Carl, der Autor dieses Programms, sagt zur Bedienung des Dissassemblers:</p>
+
+        <p>Bevor das Progamm geladen und gestartet wird, muß mit »SYS64738« unbedingt ein Reset durchgeführt werden. Dann sollte der Bildschirm mit »CLR« gelöscht werden. Mit »RUN« wird das Programm gestartet. Dann stehen dem Benutzer die folgenden Optionen offen:</p>
+
+        <ul>
+            <li>im Speicher vorwärts blättern</li>
+        </ul>
+
+
+        <p>(CURSOR-RIGHT)</p>
+
+        <ul>
+            <li>im Speicher rückwärts blättern (CURSOR-DOWN) - die Seite NR betrachten (R/S POKE3,NR:CLR:RUN) Es stehen umfangreiche Fehlerbehandlungen zur Verfü-</li>
+        </ul>
+
+
+        <h2>Speicherblockverschiebung</h2>
+
+        <p>Dieser Einzeiler von Jens Baas dient zur Übertragung von Speicherblöcken. Er ist zum Beispiel nützlich, wenn Sie das Basic oder das Betriebssystem vom ROM ins RAM verlegen wollen. Die Variablen mit »L« bezeichnen jeweils das Low-Byte der Adresse, die Variablen mit »H« das High-Byte. Für eine Adresse X lassen sich diese so berechnen: AL=X-256 * INT(X/256):AH=INT(X/256).</p>
+
+        <p>Die Routine benutzt die Blockverschiebe-Routine des ROMs.</p>
+
+        <h2>Merge</h2>
+
+        <p>Bisher gab es oft nur die eine Möglichkeit, wenn ein Programm aus zweien zusammengesetzt werden sollte: das kürzere mußte ans Ende des längeren getippt werden. Hier ist eine ganz kurze Routine von Andreas Gast, die Programme verkettet.</p>
+
+        <h2>Directory laden, ohne das Basic-Programm zu zerstören</h2>
+
+        <p>Jedem Programmierer ist das Problem, das diesem Einzeiler zugrunde liegt, sehr bekannt: Man hat - mit Ach und Krach '- ein Basic-Programm geschrieben. Nun will man seine Arbeit speichern und erkennt seine freien Disketten nicht wieder. Wenn man die Disketten aber mit</p>
+
+        <p>LOAD "$",8 : LIST listet, löscht man das neue Programm und die ganze Arbeit war umsonst. Reinhard Abdel-Hamid schlägt vor, die folgende Programmzeile vor dem eigenen Programm einzugeben. Mit ihr läßt sich das Directory listen. Das im Speicher liegende eigene Programm bleibt erhalten. Gestartet wird mit</p>
+
+        <p>OPEN 1,8,2,"$":GOTO 0.</p>
+
+        <p>Der OPEN-Befehl eröffnet eine sequentielle Datei (hier das Directory) zum Lesen. Mit</p>
+
+        <p>GET #1,A$ wird ein Byte vom Disketten-Puffer geholt und das Kommando</p>
+
+        <p>A=ASC(A$+ " SHIFT/HOME") wandelt ASCII-Zeichen in Zahlen (von O bis 255) um. Hat A$ die Länge 0, so behält der Ausdruck trotzdem die Länge 1. Durch</p>
+
+        <p>PRINT CHR$((A=130 AND 13 OR ((31 &lt;A AND A&lt;95) AND A))); wird das zugehörige Zeichen zu A gedruckt, wenn A einen Wert zwischen 32 und 95 hat. Ist A=130, so wird RETURN ausgegeben. Die Steuerzeichen und Grafiksymbole werden durch die Formel innerhalb der Charakterstring-Klammer »herausgefiltert«. Nur Zahlen, Buchstaben und Satzzeichen werden ausgedruckt.</p>
+
+        <p>Die Routine kann auch für andere Zwecke angewendet werden.</p>
+
+        <p>Es istohne weiteres möglich, alle Kommentare, Inhalte von Print-Anweisungen und Texte des auf der Diskette befindlichen Programms auf den Bildschirm zu bringen, da man alle Programme auf der Diskette als sequentielle Datei lesen kann.</p>
+
+        <p>Eröffnen Sie die Datei dafür nach dem folgenden Schema: OPEN 1,8,2, "filename"</p>
+
+        <p>Dann wird das Programm mit</p>
+
+        <p>GOTO O gestartet. Wenn die Ausgabe beendet ist, wird mit der RUN/STOP-Taste die Endlosschleife wieder verlassen.</p>
+
+        <h2>Maschinenprogramme speichern</h2>
+
+        <p>Mit dem folgenden Einzeiler von Markus Eicher können Maschinenprogramme sehr einfach gespeichert werden, ohne den Basic-Pointer zu verstellen. Die Werte für LE und HE werden berechnet, indem man auf die Endadresse eine 1 addiert.</p>
+
+        <p>Le = Low-Byte der Endadresse</p>
+
+        <p>He = High-Byte der Endadresse</p>
+
+        <p>La = Low-Byte der Anfangsadressse</p>
+
+        <p>Ha = High-Byte der Anfangsadresse</p>
+
+        <p>Low- und High-Byte einer Adresse werden so berechnet: Adresse = dez. 2000 Highbyte = INT(2000/256)=78</p>
+
+        <p>Lowbyte = 20000-Lowbyte*256=32</p>
+
+        <p>Die Variable A$ enthält den Namen der Datei, in die auf der Diskette das Maschinen-Programm abgelegt werden soll. X legt fest, ob das Programm auf Diskette (X=8) oder Kassette (X=1) gespeichert wird.</p>
+
+        <p>Falls ein langer Programmname gewählt wird, müssen die Befehle abgekürzt werden.</p>
+
+        <p>Beispiel 1:</p>
+
+        <p>Das Programm auf den Adressen 20000 bis 22000 soll auf der Diskette unter dem Namen »Beispieli« gespeichert werden. Der Dateiname wird der Variablen $A zugewiesen. Die POKE-Befehle lauten</p>
+
+        <p>Bier, POKE193,32:POKE194,78;POKE174,241:POKE175,85</p>
+
+        <p>Beispiel 2:</p>
+
+        <p>Ein Programm von $C000-$C37E soll auf Kassette gespeichert werden. Die Variable X hat also den Wert 1.</p>
+
+        <p>Die Low- und High-Bytes sind:</p>
+
+        <ol>
+            <li>von $COOO</li>
+        </ol>
+
+
+        <p>Low =$00 =dez.O</p>
+
+        <p>High = $CO = dez. 192</p>
+
+        <p>2.von $C37E</p>
+
+        <p>Low = $7E = dez. 126</p>
+
+        <p>High = $C3 = dez. 195</p>
+
+        <p>Die POKE-Befehle heißen:</p>
+
+        <p>POKE193,0:POKE194,192:POKE174,127:POKE175,195</p>
+
+        <h2>Floppy-Zeit verkürzen</h2>
+
+        <p>Die kleine Routine von Robert Loos dient dazu, die Zugriffszeit der Floppy-Disk 1541 ganz entscheidend zu verkürzen. Eine sichere Funktion der Floppy wird nicht gefährdet, wenn der Schrittmotor, der den Schreib-Lesekopf bewegt, wesentlich schneller arbeitet. Der Schrittmotor wird im Interrupt bedient. Daher genügt es, die Größe des Interruptintervalls zu verändern, um die Drehzahl des Motors zu beeinflussen. Standardmäßig wird etwaalle 15 Millisekunden (hier etwa alle 4 Millisekunden) ein Interrupt ausgelöst, der den Stepper um eine Viertelspur bewegt. Alle Bewegungen des Kopfes werden dadurch fast viermal schneller. Vorteile sind neben der Zeitersparnis:</p>
+
+        <p>Das Laufgeräusch wird angenehm leise und kurz, und im Falle einer Kopfjustage fährt der Kopf mit erheblich verminderter Kraft gegen den Anschlag, sodaß die Gefahr einer Dejustage deutlich gemindert ist.</p>
+
+        <h2>Ein RENEW, das funktioniert!</h2>
+
+        <p>Noch ein Programm von Hartmut und Martin Sprave: Dieser Einzeiler ist im Direktmodus, also ohne Zeilennummern, einzugeben. Vorher dürfen keine Variablen definiert oder Basic-Zeilen eingetippt werden, da sonst das gelöschte, aber noch im Speicher befindliche Programm zerstört wird. Im Wesentlichen besteht das RENEW-Programm auf dem Aufruf einer System-Routine, die die Basic-Zeilen neu bindet und das Ende des gelöschten Programms herausfindet. Das erste POKE tut so, als ob sich ein (ungelöschtes) Basic-Programm im Speicher befindet, weil sonst die Routine nicht arbeitet. Die Endadresse des Basic-Programms wird um zwei erhöht undinn den Zeiger auf den Start der Variablen (45/46) übertragen. Der CTR-Befehl gleicht alle weiteren Basic-Zeiger diesem Befehl an.</p>
+
+        <h2>Ein einfaches Renumber</h2>
+
+        <p>Diese Routine von Georg Wichert numeriert ein Basic-Programm, das bis zu 255 Zeilen hat, in wenigen Sekunden neu. Die erste Zeilennummer ist dann 0, die Schrittweite ist 1, Sprungadressen der Befehle GOTO und GOSUB bleiben beim Neunumerieren unverändert. Jedes Basic-Programm belegt die Speicherplätze 2048 bis PEEK(45)+PEEK(46) *256-3. PEEK(2049)+PEEK(2050)*256 gibt an, bei welcher Adresse die erste Zeile aufhört. Die erste Zeilennummer A wird aufgrund der Adressen 2051 und 2052 folgendermaßen berechnet:</p>
+
+        <p>A=PEEK(2051)+PEEK(2052)*256.</p>
+
+        <p>Die zweite Zeilennummer findet man im Speicher an den Adressen</p>
+
+        <p>PEEK(2049-+PEEK(2050)*256+2 und PEEK(2049)+PEEK(2050)*256+3.</p>
+
+        <p>Die Zeilennummern befinden sich jeweils an den Adressen A+2 (Low Byte) und A+3 (High Byte).</p>
+
+        <p>Ist das Basic-Programm, das neu numeriert wird, länger als 255 Zeilen, dann muß der Einzeiler zum Zweizeiler abgeändert werden. Dann wird folgendes wichtig: Aus Platzgründen wird in dieser Programmversion an die Stelle A+2 der Wert z gePOKEt (z=0,1,2...,n-1; n-1 steht für die Anzahl der Zeilen des Basic-Programms, das umnumeriert werden soll, inklusive dem Einzeiler) und an die Stelle A+3 den Wert O. Track-Zerstörer: Kopierschutz</p>
+
+        <p>Diese Programmzeile von Jörg Wegmeyer produziert auf dem gewünschten Track der Diskette (Variable T) einen READ ERROR 21. Damit erreicht man einen relativ sicheren Kopierschutz.</p>
+
+        <h2>Eine Zeile = kompletter Datenschutz</h2>
+
+        <p>Diese Routine von Volker Ritzhaupt erreicht, daß auf einer Diskette weder das Inhaltsverzeichnis gelistet, Programme gelöscht noch irgendetwas auf die Diskette geschrieben werden kann. Das Laden der Programme funktioniert hingegen ganz normal. Der Inhalt der Diskette kann nur durch Formatieren mit einer neuen ID-Nummer noch manipuliert werden.</p>
+
+        <p>Das Directory wird nicht mehr gelistet, weil es als Basic-Programm geladen wird und in dem veränderten Directory drei Nullen am Anfang (für den Interpreter das Zeichen für Programmende) erscheinen. Das »Directory-Programm« endet also schon nach zehn Bytes. Die ersten fünf Byte stellen den Zeilenanfang und die Zeilennummer dar. Darauf folgen, wie immer am Anfang eines Inhaltsverzeichnisses, ein Leerzeichen und ein Anführungszeichen. Um diese drei Zeichen beim Listen verschwinden zu lassen, folgen nun drei chr$(20), also drei DELETEs. Dies bewirkt, daß das Directory beim Listen völlig verschwindet. Da nun unmittelbar die drei Nullen folgen, wird das Listen hier abgebrochen. Auf den LIST-Befehl erscheint nur die Meldung »READY«.</p>
+
+        <h2>Der Befehl GOTO X eine Basic-Erweiterung</h2>
+
+        <p>Dieses Programm von Reinhard Jurk simuliert den im Commodore-Basic nicht vorhandenen Befehl GOTO X.</p>
+
+        <p>Zu dem etwas seltsamen Aussehen der Programmzeile: In den Ausführungszeichen steht ein Maschinenprogramm, dessen Opcodes im Listing des Basic-Interpreters diese merkwürdigen Zeichen erzeugen.</p>
+
+        <p>Zur Eingabe:</p>
+
+        <p>In diesem Listing ist ein Generierungsprogramm angegeben. Dieses wird eingegeben und gestartet. Wenn der Checksummer-Test positiv ausgefallen ist und man sich vergewissert hat, daß das Programm richtig eingegeben wurde, gibt man »LIST« ein, gefolgt von »NEW«. Dann fährt man mit dem Cursor auf Zeile 10 und drückt RETURN. Die Routine steht nun im Speicher.</p>
+
+        <p>Zum Einbinden der Routine in eigene Programme ändert man die Zeilennummern entsprechend ab, weist der Variablen LL% den Wert der anzuspringenden Zeile zu und springt mit »GOTO« zu der Zeile, in der GOTO X steht.</p>
+
+        <h2>File-Einträge mit Sonderzeichen</h2>
+
+        <p>Mit dem Einzeiler von Ralf Peiler lassen sich Zusätze an Filenamen im Directory anhängen. So wird zum Beispiel aus dem Directory-Eintrag "name" der Directory-Eintrag "name ",8: oder "name",8,1. Doch nun der Einzeiler: INPUT"name";A$:OPEN 1,8,15, "R:"+A$+" {SHIFT-SPACE) [COMMODODRE-D}8 [SHIPT-KLAMMERAFFE)= ""+A$:CLOSE 1 »SHIFT-SPACE teilt dem DOS mit, ein Anführungszeichen zu setzen.</p>
+
+        <p>»COMMODORE-B,« ist der Code für »,«. »8« entspricht der normalen »8« und »SHIFT-KLAMMERAFFE« ist der Code für »i«, Soll »,8,1« an den Filenamen angehängt werden, so ist »[COMMODORE-D}E[SHIFT-KLAMMERAFFEX« zu ersetzen durch »[COMMODORE-D}8[COMMODORE-DIX. Wie Sie sehen, geht das Anhängen kinderleicht. Verblüffung kann man auch erzeugen durch ein buntes Directory. Allerdings lassen sich nicht sämtliche Farben erzeugen. Bisher sind folgende Kombinationen gefunden worden: name [ SHIFT-SPACE) [ CTRL-2]= name — weiß name [ SHIFT-SPACE} [ CTRL-3}= name — rot name [ SHIFT-SPACE]} [ CTRL-4) — blau } "Walls wett an 2 Mile) - 4AQG TT YLOU name | SHIFT-SPACE} [CTRL-6}= name — grün name [SHIFT-SPACE] [CTRLE = name — cIr name [SHIFT-SPACE [DELE =name — del (auch mehrmals) name [| SHIFT-SPACE} [| RVSON) = name — bis »PRG« revers</p>
+
+        <h2>Trick 17 mit ON ".. GOTO</h2>
+
+        <p>Eine sehr interessante Version einer ON... GOTO-Anweisung stammt von Peter Zankl.</p>
+
+        <p>Der Ausdruck (A$="A") hat den Wert -1, wenn ein A eingegeben wurde. Sonst hat er den Wert 0. Rechnen Sie nach oder probieren Sie es aus!</p>
+
+        <address class="author">(cg)</address>
+    </article>
+</body>
+
+</html>

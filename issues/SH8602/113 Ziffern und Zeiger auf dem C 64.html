@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Ziffern und Zeiger auf dem C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Michaelis, og">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="113-114">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX22">
+</head>
+
+<body>
+    <article>
+        <h1>Ziffern und Zeiger auf dem C 64</h1>
+        <p>Digitaluhren sind out. Um dem Trend der Zeit zu folgen, haben wir für Sie eine »Analog-Uhr« auf dem C 64 installiert.</p>
+
+        <p>= C64 veröffentlicht worden. Zur Abwechslung haben wir diesmal eine Interrupt-gesteuerte Analoguhr für Sie. Das Programm blendet ein klassisches Zifferblatt mit Zeigern in die rechte obere Ecke des Bildschirms ein.</p>
+
+        <p>Hinweise zum Eintippen. Geben Sie zuerst das Maschinenprogramm »UHR PRG.« (Listing 1) mit dem MSE ein, und s sind schon etliche Versionen von Digitaluhren auf speichern Sie es. Dann tippen Sie »UHR SPRITEGEN« (Listing 2) mit dem Checksummer ab und speichern es ebenfalls. Starten Sie »UHR SPRITEGEN«. Dieses lädt zuerst das Maschinenprogramm und berechnet danach die Sprite-Daten für die Uhr und die Zeiger. Nach etwa vier Minuten werden die Spritedaten inklusive der Interruptroutine auf Diskette gespeichert. Das Programm wird dann mit LOAD "ANALOGUHR'" ‚8,1 geladen.</p>
+
+        <p>Zum Programm. Die Uhr wird durch »SYS 40000,hh, mm,ss« eingeschaltet. Dabei bedeuten hh, mm, ss jeweils Stunden, Minuten und Sekunden mit je zwei Ziffern (Zum Beispiel »SYS 40000,15,05,00« stellt die Uhr auf 15:05,00). Der Bildschirmspeicher liegt jetzt von 35840 bis 36839 und der Basic-Speicher wird auf etwa 33000 Bytes begrenzt. Durch RUN/STOP-RESTORE wird die Uhr abgeschaltet und der Bildschirm liegt wieder bei 1024. Das Ziffernblatt und die drei Zeiger bestehen aus Sprites, die von der neuen Interrupt-Routine gesteuert werden. Diese Routine liest bei jedem Interrupt die »time-of-day«-Register der CIA 1, berechnet für jeden Zeiger die Bildschirmposition und setzt die Spritpointer. Dann wird zum normalen Interrupt des Betriebssystems gesprungen.</p>
+
+        <p>Programmbeschreibung: Das Basic-Programm »UHR SPRITEGEN« besteht hauptsächlich aus drei Schleifen. In den Zeilen 160-260 werden die Zeigersprites erzeugt. Die IF-Zeilen bestimmen die Startkoordinaten der Linien. Durch READ in Zeile 220 werden die Endkoordinaten aus dem ersten Datenblock gelesen. Die aufgerufenen Uhnterprogramme löschen das zu bearbeitenden Sprite (460), ziehen eine Linie im Sprite (370) und übertragen das Sprite in den endgültigen Speicher unter dem Basic-ROM (480). In den Zeilen 270-290 werden die Daten für die vier Sprites, die das Zifferblatt darstellen, gelesen und gePOKE!t. Zeile 300 liest die Daten für das Maschinenprogramm, das das Programm »ANALOGUHR« speichert. Dieses wird in Zeile 310 aufgerufen. Das Unterprogramm Zeile 340-360 setzt einen Punkt im bearbeiteten Sprite, in Zeile 380-440 werden die Punkte für eine Linie (X1, Y1, X2, Y2) berechnet und gesetzt. Zeile 460 löscht das Arbeitssprite. In Zeile 480 werden die Spritedaten in den Speicherbereich, entsprechend der Variablen »W«, die in Zeile 240 berechnet wird, übertragen. Die Datazeilen enthalten die X2,Y2-Koordinaten der Zeiger, die Daten für das Zifferblatt und für die Speicherroutine.</p>
+
+        <p>Das Maschinenprogramm »UHR PRG.« arbeitet folgendermaßen: nach SYS 40000 wird zuerst die Uhr in CIAl gestellt, der Bildschirm verschoben und die Spriteregister des VIC initialisiert. Dann wird der Basic-Speicher begrenzt und der NMI- und IRQ-Vektor verbogen. Anschließend wird zum Basic-Warmstart gesprungen. Die neue NMI-Routine setzt nur den Bildschirm wieder zurück, dann wird zum »Restore« des Betriebssystems gesprungen.</p>
+
+        <p>Das eigentliche Steuerprogramm ist eine neue Interruptroutine. Zuerst wird die Stunde gelesen, von BCD in binär umgewandelt, und daraus die vorläufige Spritenummer für den Stundenzeiger berechnet. Außerdem wird die Spriteposition des Stundenzeigers berechnet (Stunde &lt;3 £ rechtes oberes Viertel, Stunde &lt;6 &amp; rechtes unteres Viertel etc.). Dann werden die Minuten gelesen, umgerechnet und die Position des Minutenzeigers berechnet. Wenn die Minuten größer oder gleich 30 sind, wird der Stundenzeiger um eine halbe Stunde vorgerückt. Schließlich wird noch der Sekundenzeiger nach der gleichen Methode gesetzt. Bevor zur IRQ-Routine des Betriebssystems gesprungen wird, muß noch das Zehntelsekunden-Register gelesen werden, um die Uhr wieder freizugeben.</p>
+
+        <address class="author">(M. Michaelis/og)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Poster-Maker für den C64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Wolf, ah">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="108, 110">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX19">
+</head>
+
+<body>
+    <article>
+        <h1>Poster-Maker für den C64</h1>
+        <p class="intro">Ein- und mehrfarbige HiRes-Grafiken können in einer Größe von sage und schreibe 50 x 80 cm auf fast jedem Drucker ausgegeben werden.</p>
+
+        <p>Dazu wird der Grafikbildschirm in vier gleich große, senkrechte Streifen zu je 80 x 200 Punkten unterteilt. Diese werden hintereinander auf Endlospapier ausgedruckt, wobei ein Grafikpunkt einem Druckzeichen entspricht. Bei Mehrfarbgrafiken besteht die Möglichkeit, für jedes der vier Bitmuster 00, 01, 10, 11, denen im Multicolor-Modus verschiedene Farben zugeordnet sind, verschiedene Druckzeichen zu definieren. Durch die Wahl dieser Zeichen lassen sich auch Graustufen erzeugen. Beim Ausdruck sind dann jeweils zwei nebeneinanderliegende Zeichen gleich.</p>
+
+        <p>Der Aufruf des Programms erfolgt durch einen SYS-Befehl:</p>
+
+        <pre><code>SYS 49152,adr,m,c1,c2,03,c4
+</code></pre>
+
+
+        <p>Dabei ist 49152 die Startadresse des Programms ($C000), adr ist die Anfangsadresse der Grafik.</p>
+
+        <p>m ist der Grafikmodus. Soll eine Grafik im normalen Einzelpunktmodus (Auflösung 320 x 200 Punkte) ausgedruckt werden, istm = 1 zu setzen. Bei einer Grafik im Multicolor-Modus (Auflösung 160 x 200 Punkte) istm = 2. c1 bis c4 entsprechen den ASCIl-Codes der verschiedenen Druckzeichen: c1 entspricht Bitmuster 00 c2 entspricht Bitmuster 01 c3 entspricht Bitmuster 10 c4 entspricht Bitmuster 11</p>
+
+        <p>Dies gilt jedoch nur für den Multicolor-Modus. Im Einzelpunktmodus müssen c3 und c4 entfallen, da dort nur die beiden Bitmuster O und 1 exisitieren (c1 steht dann für O, c2 für 1). Beispiel für einen Aufruf:</p>
+
+        <pre><code>SYS 49152,8192,2,32,46,119,113
+</code></pre>
+
+
+        <p>Damit erfolgt ein Ausdruck einer Mehrfarbgrafik (Bild 1 erstellt mit einem Commodore-Drucker beziehungsweise eines Ausschnitts Bild 2 erstellt mit einem FX-80), die bei 8192 beginnt, wobei 00 zweiLeerstellen, 01 zwei Punkte, 10 zwei nicht ausgefüllte Kreise und 11 zwei ausgefüllte Kreise zugeordnet sind.</p>
+
+        <p>Der Ausdruck einer Einzelpunktgrafik kann zum Beispiel so aussehen:</p>
+
+        <pre><code>SYS 49152,8192,1,32,113
+</code></pre>
+
+
+        <p>Es. ist zu. beachten, daß höchstens vier verschiedene Druckzeichen definiert werden können, auch wenn die Grafik mehr als vier Farben hat. Diese sind dann durch das Farbregister festgelegt. Das Programm unterscheidet jedoch nur zwischen den Bitmustern undnicht zwischen den Werten im Farbregister, die dem jeweiligen Bildpunkt entsprechen.</p>
+
+        <p>Das Programm ist so ausgelegt, daß es auf den meisten Druckern läuft. Das einzige, was an den Drucker angepaßt werden muß, sind die Kommandos zur Verkleinerung des Zeilenabstandes, um einen lückenlosen Ausdruck zu erreichen. Das Programm ist für folgende Drucker vorbereitet: MPS 801/VC 1525 MPS 802/VC 1526 Epson und Kompatible</p>
+
+        <p>Bei allen anderen Druckern muß vor dem Aufruf des Programms der Zeilenabstand laut Druckerhandbuch selbst eingestellt werden.</p>
+
+        <h2>Zur Handhabung des Basic-Laders</h2>
+
+        <p>Das im Lader (siehe Listing) enthaltene Menü erlaubt es, verschiedene Parameter des Programms festzulegen und es dadurch an einen Drucker anzupassen.</p>
+
+        <p>Zunächst wird nach einer Filenummer (fn) und einer Sekundäradresse (sa) gefragt. Das Maschinenprogramm führt später folgenden Befehl aus: OPEN fn,4,sa</p>
+
+        <p>Hierbei kann man die Standardwerte einsetzen, das heißt die Werte, die man zum Beispiel beim Ausdruck eines Listings benutzt. Als drittes muß der Druckertyp eingegeben werden. Die jeweiligen Nummern werden im Menü aufgeführt.</p>
+
+        <p>Wie schon erwähnt, muß bei nicht aufgeführten Druckern Typ O) der Zeilenvorschub vor dem Start des Programms auf "ha inch anhand der Bedienungsanleitung verkleinert und nach dessen Ausführung wieder auf den normalen Wertrückgesetzt werden.</p>
+
+        <p>Unter Typ S fallen alle Drucker, bei denen die Umschaltung mit dem Befehl »ESC 1« (PRINT #fn,CHR$(27);chr$(49);) erfolgt.</p>
+
+        <p>Nachdem Sie die Eingaben beendet haben, wird der Poster-Maker als Maschinenprogramm auf Diskette gespeichert. Er muß mit Load »POSTER-MAKER«,8,1 geladen werden. Haben Sie den Poster-Maker mit dem Basic-Befehl</p>
+
+        <pre><code>SYS 49152, adr, m, c1, c2, c3, c4 für Multicolour-Bilder beziehungsweise SYS 49152, adr, m, c1, c2
+</code></pre>
+
+
+        <p>für normalen Einzelpunktmodus gestartet, wird die gewünschte Grafik ausgedruckt. Zu beachten ist, daß bei der Eingabe der CHR$-Codes für die Druckzeichen die ASCIl-Tabelle des Druckers, nicht die im Handbuch des C 64, gültig ist. Diese stimmt nur für Commodore-Drucker.</p>
+
+        <p>Ein CLOSE nach Beendigung des Ausdrucks ist nicht nötig. Jetzt muß nur noch die Druckerfahne an den gesttrichelten Linien auseinandergeschnitten und die vier Streifen nebeneinandergeklebt werden.</p>
+
+        <address class="author">(Thomas Wolf/ah)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Relative Dateien leicht verständlich</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Martin Hecht, gk">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="53-56">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX10">
+</head>
+
+<body>
+    <article>
+        <h1>Relative Dateien leicht verständlich</h1>
+        <p class="intro">Die Datenverwaltung zählt - neben dem Spielen - wohl zu den häufigsten Anwendungsgebieten für Heimcomputer. Um Daten aber effektiv verwalten zu können, bedarf es des sinnvollen Einsatzes bestimmter Verfahren und Techniken.</p>
+
+        <p>Die relative Dateiorganisation, die sich vor allem bei der Verwaltung größerer Datenbestände als sehr nützlich erweist, ist eine davon und wird im folgenden Artikel näher erläutert.</p>
+
+        <p>Zunächst ein paar Worte zum Begriff der »Datei«. Eine Datei läßt sich am besten vergleichen mit einem Karteikasten mit vielen gleichartigen Karteikarten. Einer Karteikarte entspricht dabei ein sogenannter »Datensatz« der Datei. Jeder Datensatz unterteilt sich wiederum in verschiedene »Datenfelder«, in die die einzelnen Eintragungen auf der Karteikarte erfolgen.</p>
+
+        <p>Ein kleines Beispiel: In Bild 1 links sehen Sie, wie ein Eintragungs- bzw. Eingabeschema zur Verwaltung von Adressen aussehen könnte. Die Punkte zwischen den Ausrufezeichen markieren die Stellen, an die die einzelnen Daten jeweils geschrieben werden, wie Sie in Bild 1 rechts sehen können. Die Bereiche zwischen den Ausrufezeichen stellen also die einzelnen Datenfelder dar! Alle Inhalte der Datenfelder zusammen (das heißt eine komplette Adresse bestehend aus Nachname, Vorname, Straße, Wohnort und Telefon) ergeben dann einen Datensatz; mehrere gleichartige Datensätze eine Datei. (Eine schematische Darstellung dieses Sachverhalts finden Sie in Bild 2.)</p>
+
+        <p>Um nun Daten mit dem Computer zu verwalten, gibt es beim Commodore 64 in Verbindung mit der Floppy VC 1541 grundsätzlich zwei Dateiarten: Die sequentielle und eben die relative.</p>
+
+        <p>Bei der sequentiellen Dateiorganisation werden alle Datensätze hintereinander, das heißt sequentiell gespeichert. Wenn nun Datensätze (in unserem Beispiel Adressen) gelesen, hinzugefügt, gelöscht oder geändert werden sollen diese Vorgänge bezeichnet man übrigens als Dateiarbeit oder »Datenpflege« -, dann muß dazu die komplette Datei in den Rechner geladen und nach Beendigung der Datenpflege wieder auf die Diskette zurückgespeichert werden. Ein direkter Zugriff auf jeden einzelnen Datensatz der Datei ist nicht möglich.</p>
+
+        <p>Dieser Umstand ist einerseits sehr zeitraubend (die Floppy 1541 ist ja nicht gerade die Schnellste), andererseits macht er die maximale Dateigröße vom verfügbaren Speicherplatz im Rechner abhängig. Die sequentielle Datenspeicherung ist daher mehr etwas für kleinere Dateien (mit wenigen Datensätzen) oder für Dateien mit sehr kurzen Datensätzen (was wir uns später noch zunutze machen werden).</p>
+
+        <p>Wesentlich flexibler in bezug auf die Datenpflege ist die relative Dateiorganisation, die ja der eigentliche Gegenstand dieses Artikels ist. Bei ihr ist es nämlich möglich, direkt auf jeden einzelnen Datensatz - auch »Record« genannt - der Datei zuzugreifen! (Zusätzlich kann sogar auf eine beliebige Stelle innerhalb eines Records positioniert werden.)</p>
+
+        <h2>Zum Prinzip der relativen Datei</h2>
+
+        <p>Bei der relativen Dateiorganisation werden alle Datensätze (Records) in laufender Reihenfolge durchnumeriert. Der erste Datensatz bekommt dabei die Nummer 1, der zweite die Nummer 2, etc. Wenn Sie jetzt auf einen Datensatz zugreifen wollen, müssen Sie nur noch dessen Nummer angeben.</p>
+
+        <p>Dieser Vorteil ist allerdings mit einer wichtigen Bedingung verbunden:</p>
+
+        <p>Alle Records einer Datei müssen eine konstante, beim Einrichten der Datei festzulegende Länge zwischen 1 und 254 Byte (Zeichen) aufweisen!</p>
+
+        <p>Diese Bedingung wird verständlich, wenn man sich überlegt, wie das Floppy-Betriebssystem (kurz: Floppy-DOS) aus der Recordnummer die Position des Datensatzes auf der Diskette bestimmt.</p>
+
+        <p>Angenommen, Sie wollen auf den 27. Record einer Datei mit einer Recordlänge von 50 Byte zugreifen. Um nun die Position dieses Datensatzes zu ermitteln, multipliziert das Floppy-DOS die Recordlänge (in unserem Fall also 50) mit der Recordnummer -1 (also 26), was die Anzahl der Byte ergibt, die von den ersten 26 Records der Datei belegt werden (=1300 Byte). Dieser Wert wird jetzt noch zur Anfangsposition der Datei hinzuaddiert, was schließlich die Position des gewünschten Datensatzes ergibt. (Die ersten 26 Records werden durch das Aufaddieren ihrer Gesamtlänge auf den Anfang der Datei praktisch »übersprungen«.)</p>
+
+        <p>Jetzt wird auch der Name dieser Dateiart, nämlich »relativ«, verständlich, denn die Record-Position wird ja relativ zum Anfang der Datei ermittelt! (Im Beispiel beginnt der gewünschte Datensatz 1300 Byte vom Anfang der Datei entfernt.)</p>
+
+        <p>Wie gesagt kann also jeder Datensatz einer relativen Datei durch Angabe seiner Nummer direkt angesprochen werden. Wenn Sie aber zum Beispiel eine bestimmte Adresse suchen, werden Sie in der Regel kaum die Nummer des betreffenden Datensatzes kennen. Das gleiche gilt auch für die meisten anderen Anwendungsgebiete. (Höchstens bei einer Kontenverwaltung - zum Beispiel für ein Haushaltsbuch - wäre eine direkte Verwendung der Recordnummer sinnvoll.) Daher verwendet man in der Praxis häufig eine Mischform aus sequentieller und relativer Dateiorganisation, die »indexsequentielle Datei«.</p>
+
+        <p>Das Prinzip ist ganz einfach:</p>
+
+        <p>Alle Daten werden - wie bisher - in einer relativen Hauptdatei abgelegt. Zusätzlich wird dann eine sequentielle Index- oder Schlüsseldatei angelegt. Diese Schlüsseldatei enthält von jedem Datensatz der relativen Datei nur einen Teil - bei einer Adreßdatei zum Beispiel den Nachnamen - sowie die Recordnummer des zugehörigen Datensatzes der relativen Hauptdatei, in dem - im Beispiel - die komplette Adresse untergebracht ist.</p>
+
+        <p>Wenn Sie jetzt beispielsweise nach der Adresse eines Herrn Müller suchen, wird einfach die Schlüsseldatei komplett in den Computer geladen (da sie sehr kurz ist, geht dies ja relativ schnell, und auch die Maximalanzahl der Adressen ist verhältnismäßig hoch), dort durchsucht und - sofern der Datensatz »Müller« vorhanden ist - auf den bei »Müller« (in Form der Recordnummer) vermerkten Datensatz positioniert. Dieser wird dann schließlich in den Speicher geladen und ausgegeben.</p>
+
+        <p>Natürlich ist es auch möglich, zu einer relativen Hauptdatei mehrere Indexdateien anzulegen (zum Beispiel eine mit den Nachnamen als Index, eine mit den Vornamen, etc.). Allerdings muß man dann das eventuell wieder auftretende Speicherplatzproblem - die Indexdateien müssen ja komplett in den Speicher geladen werden - im Auge behalten beziehungsweise muß sich vor der Dateiarbeit entscheiden, mit welcher Indexdatei man jeweils arbeiten will.</p>
+
+        <p>Nach all der Theorie kommen wir nun zur Praxis:</p>
+
+        <p>Wie werden relative Dateien mit dem Commodore 64 und der Floppy VC 1541 - die Anlage relativer Dateien auf Kassette ist nicht möglich! - angelegt und verwaltet? Mit dieser Frage wollen wir uns im Folgenden ausführlich befassen. Zum Abschluß wird dann noch eine kleine, ausführlich kommentierte indexsequentielle Adreßverwaltung (Listing 2) vorgestellt, die Sie selbst nach Belieben abändern können, um so Ihre neuen Kenntnisse in der Praxis zu erproben.</p>
+
+        <p>Die Verwaltung einer relativen Datei gliedert sich grob in vier Abschnitte:</p>
+
+        <ul>
+            <li>
+                <p>»Öffnen« der Datei - Positionieren auf den gewünschten Record</p>
+            </li>
+            <li>
+                <p>Lesen/Schreiben des Records</p>
+            </li>
+            <li>
+                <p>»Schließen« der Datei.</p>
+            </li>
+        </ul>
+
+
+        <p>Da das Basic 2.0 des Commodore 64 leider keine speziellen Befehle zur Unterstützung von relativen Dateien zur Verfügung stellt, bleibt nur der Weg über »OPEN«- und »CHR$(...)«-Sequenzen. Daher sieht das Ganze auf den ersten (und wohl auch zweiten) Blick etwas kompliziert aus. Wenn man sich die erforderlichen Programmteile aber - wie inLListing 1 geschehen - als Unterprogramme schreibt, ist es halb so schlimm.</p>
+
+        <p>Kommen wir zum ersten Schritt, dem »Öffnen« der Datei.</p>
+
+        <h2>Öffnen einer relativen Datei</h2>
+
+        <p>Bei einer relativen Datei ist es - im Gegensatz zum Beispiel zur sequentiellen Datei - praktisch egal, ob die Datei auf der Diskette schon eingerichtet ist oder nicht oder ob Sie Daten lesen oder schreiben wollen. Der Öffnungsbefehl ist immer derselbe:</p>
+
+        <p>OPEN LF,GA,SA,DN$+",L," +CHR$(RL)</p>
+
+        <p>Die einzelnen Variablen - auch »Parameter« genannt haben folgende Bedeutung:</p>
+
+        <p>LF: Das ist die logische Filenummer der Datei. Sie ist erforderlich, damit der Computer bei späteren Lese- oder Schreibbefehlen (bei denen diese Nummer angegeben werden muß) weiß, aus welcher Datei gelesen oder in welche Datei geschrieben werden soll. LF kann Werte zwischen 1 und 127 annehmen.</p>
+
+        <p>GA: Das ist die Geräteadresse der Floppy. Im Normalfall also 8.</p>
+
+        <p>SA: Die »Sekundäradresse« oder »Kanalnummer« SA hat auf Floppy-Ebene eine ähnliche Bedeutung wie die logische Filenummer LF auf Computer-Ebene.</p>
+
+        <p>Für uns ist aber nur wichtig, daß SA Werte zwischen 2 und 14 annehmen kann.</p>
+
+        <p>Wenn Sie mehrere Dateien gleichzeitig geöffnet haben, müssen Sie außerdem darauf achten, daß Sie jeder Datei eine andere Sekundäradresse zuweisen. Wird nämlich eine zweite Datei mit derselben Sekundäradresse wie die erste geöffnet, so wird die zuerst geöffnete Datei auf Floppy-Ebene geschlossen!</p>
+
+        <p>In diesem Zusammenhang noch ein wichtiger Hinweis:</p>
+
+        <p>Auf Floppy-Ebene können maximal drei Dateien gleichzeitig geöffnet sein. (Auf Computer-Ebene sind es übrigens maximal 10). Da zur Verwaltung einer relativen Datei neben der eigentlichen Datei - wie wir gleich noch sehen werden auch der Floppy-Kommandokanal geöffnet werden muß, , bedeutet das, daß maximal eine relative und eine sequentielle Datei gleichzeitig geöffnet sein können (was gerade für eine indexsequentielle Dateiorganisation reicht).</p>
+
+        <p>DN$: DN$ enthält den Namen der Datei. Dieser darf maximal 16 Zeichen lang sein. Außerdem ist darauf zu achten, daß kein File (=Datei oder Programm) desselben Namens bereits auf der Diskette existiert - außer natürlich eine früher definierte relative Datei dieses Namens, mit der Sie jetzt arbeiten wollen, denn sonst gibt es einen »FILE EXISTS ERROR«.</p>
+
+        <p>",L,": Dieser Parameter teilt dem Floppy-DOS mit, daß eine relative Datei geöffnet werden soll. (Die Kommas dienen zur Abtennung von den übrigen Parametern.)</p>
+
+        <p>RL: RL enthält die gewünschte Recordlänge der Datei und kann Werte zwischen 1 und 254 annehmen.</p>
+
+        <p>Wichtig: Die beim ersten Offnen der Datei angegebene Recordlänge kann später nicht mehr geändert werden! (Wenn Sie versuchen, eine bereits existierende relative Datei mit einer anderen Recordlänge als bei der ersten Öffnung . angegeben zu öffnen, so wird ein »RECORD NOT PRESENT ERROR« angezeigt.)</p>
+
+        <p>Zur Ermittlung der Recordlänge zählen Sie einfach alle Datenfeldlängen eines Datensatzes zusammen. Im Eingangsbeispiel ergibt das eine Länge von 15 (Nachname) + 10 (Vorname) + 15 (Straße) + 15 (Wohnort) + 11 (Telefon) = 66 Byte.</p>
+
+        <p>Sofern Sie zum Einlesen der Records in den Computer den INPUT #-Befehl benutzen, müssen Sie dazu noch ein Byte addieren, denn, um das Ende eines Records erkennen zu können, benötigt der INPUT #-Befehl ein »RETURN« (entspricht CHR$(13)) oder ein Komma (entspricht CHR$(44)) am Ende des Records. Das »RETURN« wird normalerweise am Ende eines jeden PRINT- beziehungsweise PRINT #-Befehls gesendet - sofern Sie es nicht durch ein Semikolon am Ende des PRINT-Kommandos (zum Beispiel bei »PRINT #1, " text";«) unterdrücken.</p>
+
+        <p>Im Beispiel ergibt sich also eine Gesamtlänge von 67 Byte. Nachdem die Datei geöffnet wurde, kann mit der eigentlichen Dateiarbeit begonnen werden. Um jetzt einen bestimmten Record zu schreiben beziehungsweise zu lesen, muß zunächst auf ihn positioniert werden.</p>
+
+        <h2>Positionieren auf einen Record</h2>
+
+        <p>Da die Positionieranweisung über den Floppy-Kommandokanal gesendet werden muß, muß dieser zuerst mit "OPEN 15,8,15,« geöffnet werden. Die erste 15 ist wieder die logische Filenummer (Um Kollisionen mit Dateien zu vermeiden, istes zweckmäßig, hier immer dieselbe logische Filenummer zu verwenden); bei der 8 handelt es sich um die Geräteadresse der Floppy. Die zweite 15 ist die Kanalnummer des Floppy-Kommandokanals.</p>
+
+        <p>Der Positionierbefehl ist ähnlich kompliziert aufgebaut wie der OPEN-Befehl:</p>
+
+        <p>PRINT#15, "P"+CHR$(SA)+CHR$(LB)+CHR$(HB)+CHR$(RP)</p>
+
+        <p>Die Parameter im einzelnen:</p>
+
+        <p>SA: Das ist die beim Öffnen der Datei festgelegte Sekun- ı däradresse.</p>
+
+        <p>LB/HB: Das ist die Recordnummer in einer für Sie vielleicht etwas ungewohnten Form, der sogenannten Lowbyte-/ Highbyte-Form.</p>
+
+        <p>Da mit CHR$(...) nur Werte bis zu 255 übermittelt werden können, muß die Recordnummer in zwei solcher Werte aufgeteilt werden, die sich aus folgenden Formeln ergeben: HB=INT(RN/256):LB=RN-256*HB</p>
+
+        <p>RP: Mit RP können Sie auf eine bestimmte Stelle innerhalb des Records positionieren. Wollen Sie zum Beispiel einen Record ab dem 10. Zeichen einlesen, so muß RP den Wert 10 erhalten.</p>
+
+        <p>Wichtig: Eine Positionierung auf eine Stelle innerhalb eines Records ist nur beim Lesen dieses Records sinnvoll. Zum Schreiben eines Records muß RP auf 1 gesetzt werden!</p>
+
+        <p>Und natürlich ist auch nur eine solche Positionsangabe sinnvoll, die kleiner gleich der Recordlänge ist. Daher ergibt sich für RP - eine entsprechende Recordlänge vorausgesetzt - ein Maximalwert von 254.</p>
+
+        <p>Nach der Positionierung ist der betreffende Record nun für einen Lese- oder Schreibzugriff bereit.</p>
+
+        <h2>Schreiben eines Records</h2>
+
+        <p>Vor dem Schreiben eines Records sind drei Dinge zu beachten: , - Esmuß unbedingt auf das erste Byte des Records positioniert werden (RP=1).</p>
+
+        <ul>
+            <li>Essollte sichergestellt werden, daß alle Datenfelder - und damit auch der Record - ihre vorgeschriebene Länge aufweisen. Wie eine solche Kontrolle und Korrektur aussehen könnte, sehen Sie in Listing 2 in den Zeilen 860-920. - Dader Record in einem Stück geschrieben werden muß, müssen die einzelnen Datenfelder vor dem Schreiben zusammengefaßt werden (siehe auch Listing 2 Zeile 940 bis 960). .</li>
+        </ul>
+
+
+        <p>Sind diese Voraussetzungen erfüllt, so kann der Record mit folgendem Befehl geschrieben werden:</p>
+
+        <p>PRINT#LF,RC$</p>
+
+        <p>LF ist dabei die beim OPEN-Befehl festgelegte logische Filenummer; RC$ enthält den zu schreibenden Record.</p>
+
+        <p>In diesem Zusammenhang erwähnenswert ist die Fehlermeldung »RECORD NOT PRESENT ERROR«, was soviel bedeutet wie »Datensatz nicht vorhanden«. Falls nämlich auf einen Record zugegriffen (geschrieben/gelesen) wird, der zuvor noch nicht beschrieben wurde, so wird diese Meldung erzeugt. Beim (erstmaligen) Schreiben eines Records kann diese Meldung natürlich ignoriert werden. (Der Schreibbefehl wird trotz der Meldung ausgeführt.)</p>
+
+        <p>Weiterhin ist zu beachten: Ein Schreibbefehl auf einen zuvor noch nicht beschriebenen Record hat zur Folge, daß alle davor liegenden (zuvor noch nicht beschriebenen) Records ebenfalls beschrieben werden!</p>
+
+        <p>Ein Beispiel: Sie haben eine relative Datei bereits bis zum 20. Record beschrieben. Nun schreiben Sie den 100. Record. Dadurch werden gleichzeitig die Records 21 bis 99 (mit demselben Inhalt wie der 100. Record) beschrieben!</p>
+
+        <p>Wenn Sie also eine relative Datei nicht der Reihe nach beschreiben wollen, dann sollten Sie beim Einrichten der Datei als erstes den Record mit der höchsten Nummer (mit einem beliebigen Inhalt) beschreiben. Dadurch bleiben Ihnen unnötige Wartezeiten bei der Dateiarbeit - das Beschreiben von zum Beispiel 50 Records nimmt einige Zeit in Anspruch - erspart.</p>
+
+        <h2>Lesen eines Records</h2>
+
+        <p>Zum Lesen eines Records gibt es zwei Möglichkeiten:</p>
+
+        <p>Die erste Möglichkeit stellt der INPUT #-Befehl dar. Mitihm kann ein Record komplett in den Computer geladen werden - unter zwei Bedingungen: Der Record darf nicht länger als 88 Zeichen sein, und er muß ein »RETURN« oder ein Komma als letztes Zeichen aufweisen.</p>
+
+        <p>Das Befehlsformat: INPUT#LF,RC$</p>
+
+        <p>LF ist dabei die beim OPEN-Befehl festgelegte logische Filenummer; RC$ wird der Record zugewiesen.</p>
+
+        <p>Eine zweite Möglichkeit - bei einer Recordlänge von mehr als 88 Byte zudem die einzige - bietet der GET #-Befehl. Um zum Beispiel einen 100 Byte langen Record einzulesen, wäre folgende Befehlssequenz denkbar:</p>
+
+        <p>FOR I=1 TO 100:GET#LF,EG$:RC$=RC$+EG$: NEXT I</p>
+
+        <p>LF ist dabei wieder die beim OPEN-Befehl festgelegte logische Filenummer.</p>
+
+        <h2>Schließen einer relativen Datei</h2>
+
+        <p>Nach Beendigung der Dateiarbeit muß die Datei geschlossen werden. Der dazu erforderliche Befehl ist - ausnahmsweise - sehr einfach.</p>
+
+        <p>CLOSE LF</p>
+
+        <p>LF ist dabei wiederum die beim OPEN-Befehl festgelegte logische Filenummer.</p>
+
+        <p>Zum Abschluß eine kleine Adreßverwaltung zum Experimentieren. Bitte geben Sie dazu Listing 2 ein.</p>
+
+        <p>Wichtig: Das Programm ist nur mit den in Listing 1 enthaltenen Unter-Programmen lauffähig. Tippen Sie also am besten zuerstListing 1 ein und speichern es (für spätere eigene Entwicklungen, für die Sie die Unterprogramme gut gebrauchen können). Danach geben Sie zusätzlich Listing 2 ein und speichern das Gesamtprogramm dann ebenfalls auf Diskette.</p>
+
+        <p>Da das Programm selbst ausführlich dokumentiert ist, möchte ich an dieser Stelle nur noch kurz ein paar Bedienungshinweise geben:</p>
+
+        <p>Nachdem das Hauptmenü ausgegeben wurde, geben Sie als erstes »1« (+ "RETURN") ein. Dadurch werden alle notwendigen Vorbereitungen für die Dateiarbeit getroffen. Sobald das Hauptmenü wieder erschienen ist, können Sie wahlweise (und auch abwechselnd) Adressen ein- oder ausgeben. Bei der Ausgabe wird dabei der Nachname als Index verwendet. Nach Beendigung der Dateiarbeit geben Sie »4« ein, wodurch die Datei ordnungsgemäß geschlossen und das Programm beendet wird.</p>
+
+        <p>Das Programm ist zwar recht spartanisch, dafür aber sehr flexibel. Beides soll Sie dazu animieren, selbst tätig zu werden und das Programm nach Ihren speziellen Wünschen abzuändern und zu ergänzen. Denn auch bei der Datenverwaltung gilt, wie überall: Übung macht den Meister! "</p>
+
+        <address class="author">(Martin Hecht/gk)</address>
+    </article>
+</body>
+
+</html>

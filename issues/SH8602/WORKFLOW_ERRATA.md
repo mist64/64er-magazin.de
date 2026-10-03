@@ -184,3 +184,17 @@ while its table and script convert every `''`. And the rule file's own curly
 characters have been flattened to ASCII in places, so table rows read
 `"` → `"`. No effect on SH8602 (one `''`, OCR garbage). Found by the 070
 sub-agent.
+
+## 080 — Verification 4 rejects the lettered pages the same rule demands
+
+`grep -vE 'content="[0-9,\- ]+"'` flags every `NNNa`/`NNNb`, which "Three
+conventions" requires; and nothing says the FILENAME keeps the plain number
+(the corpus does: 8507, 8508). The splitter turns ANY `<p>(…)</p>` into a
+byline, and its DOTALL regex can span paragraphs — SH8602 got 7 false
+bylines and one `<address>` that swallowed two paragraphs and broke the
+`<head>`; a post-split check ("every `<address>` matches `(Name/)xx`") would
+have caught them. The "escaped HTML text" sentence does not describe the
+code (it strips tags, keeps entities). The script calls bare `python3`.
+Also: which `64er.issue` form a Sonderheft takes is shown only by the Usage
+example (`'Sonderheft 7/86'`), and SH8601 shipped `SH8601` — I briefed from
+the outlier first. Found by the 080 sub-agent; correction ~3 min.

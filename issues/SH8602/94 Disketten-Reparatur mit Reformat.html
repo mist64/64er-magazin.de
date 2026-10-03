@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Disketten-Reparatur mit Reformat</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="G. Burger, ah">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="94">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX16">
+</head>
+
+<body>
+    <article>
+        <h1>Disketten-Reparatur mit Reformat</h1>
+        <p class="intro">Haben Sie auch schon einmal versehentlich eine Diskette neu formatiert? Wenn ja, dann brauchen Sie »Reformat«. Denn mit diesem Programm läßt sich die Berne sehr einfach »reparieren«.</p>
+
+        <p>enn eine bespielte Diskette ohne Angabe einer ID</p>
+
+        <p>WW wurde, präsentiert sich das Directory in jungfräulichem Zustand mit friedlichen 646 freien Blöcken. Doch dieser Zustand trügt, denn in Wirklichkeit sind noch alle Daten auf der Diskette vorhanden, nur der Zugang dazu ist verbaut. Es werden bei der Formatierung ohne ID nur die BAM (18,0) und der erste Sektor der Directory (18,1) formatiert. Deshalb dauert dieser Vorgang auch nur einige Sekunden, während die Formatierung mit ID, bei der alle Blöcke formatiert werden, eine halbe Ewigkeit braucht. Dain jedem Sektor der Directory 8 Files verwaltet werden, sind außer den ersten 8 Filenamen alle weiteren Filenamen noch vorhanden.</p>
+
+        <p>Um die Programme auf der Diskette zu retten, muß man »nur« die gelöschten Sektoren 18,0 und 18,1 in der Directory wieder rekonstruieren. Man benötigt dazu vor allem die Start-Blöcke der Programme.</p>
+
+        <p>Um die Start-Blöcke zu finden, müssen die ersten beiden Byte aller Blöcke von der Diskette eingelesen werden. Da diese Byte die Zeiger auf die folgenden Blöcke enthalten, kann man durch Zuordnen die Programmanfänge herausfinden. Diesen Vorgang erledigt »Reformat«. Die Bedienung</p>
+
+        <p>Zum Ausprobieren legen wir uns eine »absichtlich« formatierte Diskette zu. Machen Sie sich eine Kopie von einer Diskette mit mehr als 8 Programmen. Diese Kopie formatieren Sie mit OPEN 1,8,15,"N TEST".</p>
+
+        <p>Wenn Sie nun das Directory dieser Diskette betrachten, haben Sie ein leeres Inhaltsverzeichnis auf dem Bildschirm.</p>
+
+        <p>Nun laden Sie »Reformat« (siehe Listing) und legen nach dem Start mit RUN die Test-Diskette in das Laufwerk.</p>
+
+        <p>Sie befinden sich nun im Auswahlmenü. Mit F7 können Sie die Sektoren 1 bis 18 der Spur 18 untersuchen. Es werden in diesem Programmpunkt die untersuchten Blöcke mit den Zeigern auf die nächsten Blöcke aufgelistet. Zeigt ein Sektor auf 0,255, so ist dieser Sektor der letzte Sektor mit Einträgen. 'Die Reihenfolge der Sektoren ist dabei nicht linear (1,2,3,4,..), sondern geht in Dreierschritten von 1 bis 18 (1,4,7,10,13,16;2,5,8,11,14,17;3,6,9...): Zeigt ein Sektor auf 75,1, dann ist dieser Sektor nicht benutzt, also noch im frisch formatierten Zustand und hat deshalb keine Daten gespeichert.</p>
+
+        <p>»NO MORE FILES IN SEKTOR x« weist darauf hin, daß in diesem Sektor nicht alle 8 Einträge vorhanden sind.</p>
+
+        <p>Hatte das Directory nicht mehr als 8 Einträge, so wird man keine Programmnamen mehr finden; hatte sie jedoch mehr als 8 Einträge, so sind ab Sektor 4 (dem Folge-Sektor vom gelöschten Sektor 1) die restlichen Einträge mit Namen, Anzahl der Blöcke, Programmtyp und Startspur und -sektor angegeben.</p>
+
+        <p>Diesen Programmpunkt kann man durch Drücken der »-—-«-Taste vorzeitig verlassen. Am Schluß dieses Programmteils kommt man durch einen Tastendruck wieder ins Auswahlmenü.</p>
+
+        <p>Mit F1 wird die eigentliche Rekonstruktion des Directory gestartet. Es werden zuerst die Block-Zeiger eingelesen.</p>
+
+        <p>Als nächstes werden die kritischen Blöcke, das heißt die Blöcke, auf die mehrere Blöcke zeigen, aufgelistet. Diese Blöcke sollte man sich notieren. Nun muß man entscheiden, ob man die noch vorhandenen Programmnamen im Directory für die Rekonstruktion hernehmen will. Wenn ja, dann wird zusätzlich das Directory auf noch vorhandene Namen hin untersucht. Im Anschluß daran werden die gefundenen Programme aufgelistet. Man hat nun zu entscheiden, welche Programme man wieder übernehmen möchte. Beantwortet man die Frage »WRITE BACK IN DIRECTORY« mit ja, dann wird das Programm in die BAM eingetragen.</p>
+
+        <p>Hierbei können einige Probleme auftreten. Kritische Blöcke sollten nicht in das Directory zurückgeschrieben werden, daBlöcke, die als belegt gekennzeichnet werden sollten und schon belegt sind, die Fehlermeldung »no block« auslösen. In diesem Fall kann man durch das im Programm vorgeschlagene Drücken der F7-Taste sich durch die kritischen Blöcke hangeln, bis ein normales Programm gefunden wird. Wichtig ist, daß auf der zu reformatierenden Diskette 664 Blöcke frei sind, da sonst die gefundenen Programme nicht richtig in die BAM eingetragen werden können, was ebenfalls die Fehlermeldung »no block« zur Folge hat.</p>
+
+        <p>Wenn im Directory noch der alte Name zu finden war, wird dieser vom Programm vorgeschlagen, wenn der alte Name schon gelöscht war, muß ein neuer Name eingegeben werden.</p>
+
+        <p>Ist das gesuchte Programm eingetragen, läßt sich die Reformatierung ohne weiteres beenden.</p>
+
+        <p>Programme mit nur einem Block werden ignoriert.</p>
+
+        <p>Bei auftretenden Fehlern (zum Beispiel: read error oder no block) kann man das Programm durch F7 fortsetzen oder durch die —-Taste neu starten. Bei der Fortsetzung mit F7 . muß man sich unter Umständen durch mehrmaliges Drücken von F7 durch eine ganze Spur wurschteln.</p>
+
+        <p>Aus Geschwindigkeitsgründen ist es empfehlenswert, das Programm zu compilieren.</p>
+
+        <address class="author">(G. Burger/ah)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Spline - das computergesteuerte Kurvenlineal</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Buhtz, ah">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="96-97, 100">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX17">
+</head>
+
+<body>
+    <article>
+        <h1>Spline - das computergesteuerte Kurvenlineal</h1>
+        <p class="intro">Durch wenige Stützstellen lassen sich beliebige Kurven sehr exakt ermitteln und darstellen. Daher ist das Programm für all diejenigen interessant, die in irgendeiner Form etwas mit der grafischen Auswertung von Meßwerten zu tun haben.</p>
+
+        <p>Die Motivation zum Erstellen einer ersten Version des Programms »SPLINE« erhielt ich während meiner Diplomarbeit. Große Mengen an Meßwerten waren innerhalb kurzer Zeit grafisch zu verarbeiten, um weiterführende Versuche planen zu können.</p>
+
+        <p>Die konventionelle Methode einer grafischen Versuchsauswertung besteht darin, die Meßwerte (Stützstellen) von Hand in ein entsprechend dimensioniertes Koordinatensystem einzutragen und in einem weiteren Arbeitsschritt mittels eines Kurvenlineals (Spline) zu einem stetigen Kurvenzug zu verbinden.</p>
+
+        <p>Durch den Einsatz des Programms »SPLINE« (Listing) in Verbindung mit Simons Basic, einem C 64, einer Floppy 1541 und einem Drucker MPS 801 verringert sich der Arbeitsaufwand auf das Eintippen der Wertepaare. Sind die Stützstellen erst einmal in einer Datei abgelegt, bestehen die verschiedensten Möglichkeiten, die Ergebniskurven zu kombinieren und darzustellen.</p>
+
+        <h2>Ein Nachteil mit Vorteilen</h2>
+
+        <p>Gemeint ist die bei zahlreichen Stützstellen erhebliche Rechenzeit, bedingt durch die reine Basic-Programmierung. Für alle jene, die einen Blick hinter die Kulissen werfen möchten, also den Berechnungsalgorithmus der Splines ergründen wollen, ist die Bearbeitung in Basic sicherlich leichter nachvollziehbar.</p>
+
+        <p>Was ist ein Spline?</p>
+
+        <p>Nur die im vorliegenden Programm verwendeten »kubischen Splines« sollen hier etwas näher erläutert werden. Der Graph einer kubischen Splinefunktion verhält sich wie eine Kurve, die mit einem elastischen Kurvenlineal (Spline) gezeichnet wird, so daß sie die vorgegebenen Punkte (Stützstellen) ohne Knick durchläuft.</p>
+
+        <p>Eine Splinefunktion besteht aus einer Anzahl von Teilfunktionen, die jeweils durch ein Polynom 3. Grades beschrieben werden.</p>
+
+        <p>y=atb*x+ce*xX+d*x</p>
+
+        <p>Die Anzahl dieser Polynome richtet sich nach der Anzahl der Stützstellen; je zwei Stützstellen werden durch ein Polynom verbunden (Bild 1).</p>
+
+        <p>Der glatte Übergang der Polynomgraphen an den Stützstellen hängt allein von der Bestimmung geeigneter Koeffizienten (a, b, c, d) ab. Zu diesem Zweck stellt man an den Berührpunkt zweier benachbarter Polynome vier Bedingungen: 1. Der Funktionswert des Polynoms entspricht an den Stützstellen dem y-Wert dieser Punkte.</p>
+
+        <ol>
+            <li>
+                <p>Die y-Werte zweier Polynome im Berührpunkt sind gleich klar, sonst würden sie sich nicht berühren.</p>
+            </li>
+            <li>
+                <p>Die Steigung und...</p>
+            </li>
+            <li>
+                <p>die Krümmung der Polynomgraphen im Berührpunkt sollen gleich sein.</p>
+            </li>
+        </ol>
+
+
+        <p>Aus diesen vier Bedingungen lassen sich für jedes Polynom vier Gleichungen ableiten - man erhält also pro Polynom ein Gleichungssystem. Ein Gleichungssystem, in dem die Anzahl der Gleichungen gleich der Zahl der Unbekannten ist, kann eindeutig gelöst werden. Die Unbekannten sind in unserem Fall die vier Koeffizienten a, b, c, d der Polynome. Das Programm »SPLINE« arbeitet menügesteuert - die Eingabe erfolgt im Dialogbetrieb. Nach dem Start des Programms erscheint das Eingabemenü (Bild 2).</p>
+
+        <p>KEY</p>
+
+        <p>Eingabe eines neuen Datenfiles über die Tastatur.</p>
+
+        <h3>TAPE-GRAPHIC</h3>
+
+        <p>Abrufen einer vollständigen Grafik vom Band.</p>
+
+        <h3>TAPE-D-FILE .</h3>
+
+        <p>Abrufen eines einzelnen (oder mehrerer) Datenfiles vom Band</p>
+
+        <p>DISK-GRAPHIC</p>
+
+        <p>DISK-D-FILE siehe TAPE.</p>
+
+        <h3>FKT-SPL.</h3>
+
+        <p>Diese Option ermöglicht den Vergleich zwischen dem Graphen einer mathematischen Funktion und dem Kurvenverlauf eines durch Splines dargestellten Zusammenhangs.</p>
+
+        <h3>KEY (1)</h3>
+
+        <p>Nach Wahl der Option 1 erwartet das Programm Angaben über die einzugebenden Stützstellen beziehungsweise die nach der entsprechenden Splinefunktion zu berechnenden Zwischenwerte.</p>
+
+        <p>ANZAHL DER KURVEN, deren Stützstellen eingegeben werden sollen.</p>
+
+        <p>ANZAHL DER INT.POL.SCHRITTE?</p>
+
+        <p>Anzahl der Interpolationsschritte, also Anzahl der Wertepaare, die vom Computer nach der ermittelten Splinefunktion zwischen zwei Stützstellen berechnet werden sollen. Bei einer zu geringen Zahl von Interpolationsschritten wird der Kurvenverlauf in der Grafik eckig - bei einer großen Anzahl erhöht sich die Rechenzeit.</p>
+
+        <h3>EINGABE STÜTZSTELLEN</h3>
+
+        <p>Die Eingabe der Stützstellen erfolgt entsprechend dem folgenden Beispiel:</p>
+
+        <pre><code>Stützstellen Anzeige Eingabe x y
+1 2 X1),Y() 1,2 1.5 2.4 X(2),Y(2) 1.5,2.4 3.75 512 X(3),Y(3) 3.75,5.12
+FKT-SPL (6)
+</code></pre>
+
+
+        <p>Nach Wahl der Option 6 erwartet das Programm die Eingabe einer mathematischen Funktion in Basic-Syntax. Beispiele:</p>
+
+        <pre><code>math. Fkt. | Eingabe
+fx)=x2 | x12
+fx)=V 82x+3 SAR(82*X+3)
+</code></pre>
+
+
+        <p>Des weiteren müssen als Funktionsdaten der Anfangs-x-Wert, der End-x-Wert und die Anzahl der Zwischenwerte innerhalb der Definitionsmenge (Anf.-x-Wert bis End-x-Wert) spezifiziert werden.</p>
+
+        <p>Nach Eingabe der entsprechenden Daten erscheint wieder das Eingabemenü. Die Daten der zu vergleichenden Splines können nun entweder über die Tastatur, das Bandgerät oder die Diskettenstation eingegeben werden.</p>
+
+        <p>Nach Eingabe der in der jeweils gewählten Option gefragten Angaben gelangt man ins Ausgabemenü (Bild 3). NEW (1) zurück ins Eingabemenü.</p>
+
+        <h3>TAB (2)</h3>
+
+        <p>Ausgabe der ermittelten Splinefunktionen auf dem Bildschirm; Ausgabe der x,y-Werte der Stützstellen sowie der errechneten Interpolationswerte in Tabellenform.</p>
+
+        <p>COPY (3)</p>
+
+        <p>Ausgabe der entsprechenden Tabelle (TAB (2)) auf einem Drucker MPS 801.</p>
+
+        <p>GRAPH (4)</p>
+
+        <p>Grafische Darstellung im HiRes-Mode (Simons Basic). Wurde zuvor eine vollständige Grafik von Diskette oder Band geladen, so erfolgt nach Wahl dieser Option direkt die grafische Ausgabe auf dem Bildschirm.</p>
+
+        <p>Für die Darstellung eines Datensatzes, der über die Optionen KEY oder D-FILE eingegeben wurde, sind einige Angaben zur Beschriftung der Koordinatenachsen (Einheiten) und der Achseneinteilung erforderlich. Die Einteilung kann sowohl manuell (MANU) als auch automatisch (AUTO) erfolgen. Bei manueller Eingabe der Achseneinteilung können lineare oder logaritnmische Maßstäbe für Ordinate (y-Achse) und Abszisse (x-Achse) gewählt werden. Des weiteren erwartet das Programm Angaben über die Begrenzung (MAXIMALWERT, MINIMALWERT) und Einteilung (STUFUNG) des Diagramms, jeweils für X-ACHSE und Y-ACHSE. OLD (5)</p>
+
+        <p>Nach Wahl dieses Menüpunktes erscheint die zuletzt erstellte Grafik wieder auf dem Bilschirm.</p>
+
+        <p>COPY (6)</p>
+
+        <p>Erzeugt Hardcopy der Grafik auf einem Drucker MPS 801.</p>
+
+        <p>TAPE (7), DISK (8)</p>
+
+        <p>Nach Wahl einer dieser Optionen wird die vollständige Grafik auf Band oder Diskette als Datensatz abgelegt.</p>
+
+        <p>Abschließend noch zwei Hinweise zur allgemeinen Bedienung des Programms. Unterbricht der Programmablauf zur Darstellung einer Grafik oder Tabelle, so wird es nach Drücken der SPACE-Taste fortgesetzt. Bei nahezu allen Eingaben ist es möglich, durch Drücken der »-«-Taste einen Rückschritt zu erzeugen, um Korrekturen durchzuführen. Entsprechend dem speziellen Format bei der Eingabe der Stützstellen bedeutet hier »-,0« einen Rückschritt. Beispiele</p>
+
+        <p>Bild 4 zeigt den Wertverlust zweier Mittelklasse-Pkw im Vergleich. Die Wertepaare (Jahre, DM) wurden einer ADAC-Zeitschrift entnommen. Die obere Kurve repräsentiert den Kadett L 1.3, während die untere Kurve den Preisverfall des Peugeot 305 GL zeigt.</p>
+
+        <p>Als Beispiel eines durchgeführten Programmlaufs in der Option FKT-SPL zeigen die Bilder 5 bis 7 den Vergleich einer durch Splines erzeugten Parabel mit dem Graphen der Funktion f(x)=x?. Für die Spline-Berechnung wurden 10 Interpolationsschritte und die folgenden Stützstellen gewählt:</p>
+
+        <p>Das Ergebnis zeigt Bild 5. Die Funktionsdaten für die Darstellung des Funktionsgraphen f(x)=x? (Bild 6) waren: ANFANGS X-WERT ! 2</p>
+
+        <p>END X-WERT 3</p>
+
+        <p>ANZAHL ZWISCHENWERTE : : 20</p>
+
+        <p>Die Überlagerung der beiden Kurven in Bild 7 zeigt kaum erkennbare Abweichungen und beweist damit die Leistungsfähigkeit des Spline-Verfahrens.</p>
+
+        <address class="author">(M. Buhtz/ah)</address>
+    </article>
+</body>
+
+</html>

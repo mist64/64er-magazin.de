@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>3D-Grafik für Schachspiele</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frithof Dau, kn">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="87-88">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX14">
+</head>
+
+<body>
+    <article>
+        <h1>3D-Grafik für Schachspiele</h1>
+        <p class="intro">Wollen Sie Ihrem Schachprogramm zu einer räumlichen Darstellung verhelfen oder wichtige Schachpartien speichern? Hier finden Sie wertvolle Routinen dafür.</p>
+
+        <p>aben Sie sich schon häufig über die zweidimensionale Darstellung bei Schachspielen geärgert? Das Programm »Schachgrafik« (Listing) beendet diese Misere. Sie können damit ein perspektivisches Schachbrett erzeugen, wie es im Bild zu sehen ist.</p>
+
+        <p>Das Programm ist vollständig in Maschinensprache geschrieben und belegt den Speicherbereich $CO00 bis $C9BE. Der Basic-Speicher bleibt auch bei eingeschalteter Grafik frei. Nachdem Sie das Programm mit dem MSE eingegeben haben, stehen Ihnen zwölf Routinen zur Verfügung, die mit dem SYS-Befehl aufgerufen werden können. Schachprogrammen wie »Schachmeister« (Ausgabe 11/84) oder »Schach dem C 64« (Ausgabe 8/85) verhelfen Sie mit diesem Programm zu einer hervorragenden Grafik.</p>
+
+        <p>So, nun zu den einzelnen Routinen, die Ihnen nach der Eingabe von »Schachgrafik« zur Verfügung stehen.</p>
+
+        <h3>SYS 50000</h3>
+
+        <p>Hiermit schalten Sie die Grafik ein. Weder die Bitmap wird gelöscht, noch werden die Farben der Grafik gesetzt. Die Bitmap liegt bei $EOOO, der Farbspeicher bei $CCOO.</p>
+
+        <h3>SYS 50003,FLAG</h3>
+
+        <p>Schaltet die Grafik aus. Bei FLAG=O geht der Computer in den Großschrift-Grafikmodus, bei FLAG=1 in den Kleinschrift-Großschrift-Modus. SYS 50006</p>
+
+        <p>Löschen der Bitmap SYS 50009,Byte</p>
+
+        <p>Setzen der Grafikfarben. Werte zwischen O und 255 können eingegeben werden. Das obere Nibble des Bytes bestimmt die Zeichen-, das untere die Hintergrundfarbe.</p>
+
+        <h3>SYS 50012,FLAG</h3>
+
+        <p>Zeichnen eines leeren Brettes. Bei FLAG=O ist die untere linke Ecke in der Zeichen-, bei FLAG=1 in der Hintergrundfarbe gezeichnet.</p>
+
+        <h3>SYS 50015,FIG,FELD</h3>
+
+        <p>Dieser Befehl setzt die Figur mit dem Code FIG auf das Feld mit der Nummer FELD. Die Figurencodes:</p>
+
+        <p>Farbe 1 Farbe 2 Bedeutung</p>
+
+        <p>[6) oder 128 ;Leeres Feld</p>
+
+        <p>1 oder 129 :Bauer</p>
+
+        <p>2 oder 130 :Pferd</p>
+
+        <p>3 oder 131 Läufer</p>
+
+        <p>4 oder 132 Turm</p>
+
+        <p>5 oder 133 :Dame</p>
+
+        <p>6 oder 134 König</p>
+
+        <p>Alle weiteren Codes sind nicht erlaubt. Die Felder sind von 0 bis 63 durchnumeriert. Dabei liegt Feld O links oben. SYS 50018,FELD</p>
+
+        <p>Zeichnet nur das Feld mit der Nummer FELD neu. SYS 50021,FELDA,FELDB</p>
+
+        <p>Setzt die Figur auf FELDA nach FELDB und zeichnet beide Felder neu.</p>
+
+        <h3>SYS 50024</h3>
+
+        <p>Zeichnet alle Felder neu. Nach dem Laden der Schachgrafik ist das Schachbrett in der Anfangsstellung besetzt.</p>
+
+        <h3>SYS 50027</h3>
+
+        <p>Rotiert das Brett einmal gegen den Uhrzeigersinn. Hierbei werden auch synchron die Nummern der Felder geändert. Nach einmaligem Drehen befindet sich das Feld O links unten, nach zweimaligem Drehen rechts unten etc.</p>
+
+        <h3>SYS 50030</h3>
+
+        <p>Nach Ausführung dieses Befehls sind die Feldnummern wieder so, als sei das Brett bisher nicht gedreht worden. Feld Nr. O ist wieder links oben.</p>
+
+        <h3>SYS 50033,TEXT,ZEILE,SPALTE.</h3>
+
+        <p>Gibt den TEXT an der durch ZEILE und SPALTE bestimmten Position in der Bitmap aus. Alle Zeichen erscheinen im Großschrift-Grafikmodus. Steuerzeichen werden als Leerzeichen interpretiert.</p>
+
+        <p>Es muß gelten: O &lt;=ZEILE &lt;=24 und O0 &lt;=SPALTE &lt;=39.</p>
+
+        <p>Bei allen Befehlen können alle zu übergebenden Werte in beliebigen Formen, zum Beispiel als Variablen, Formeln oder ähnliches auftauchen.</p>
+
+        <p>Leider schreibt bei einem RUN/STOP-RESTORE eine ROM-Routine (bei $FD15) 32 Bytes in die Bitmap, die man aber mit SYS 50033," ",23,14 löschen kann. Trotzdem sollte man RUN/STOP-RESTORE vermeiden oder sogar softwaremäßig unterbinden. Liste aller Datensätze und Routinen</p>
+
+        <p>$C000-$C29F AND- und OR-Masken (je 48 Bytes) von Unterteil, Bauer, Pferd, Läufer, Turm, Dame und König. 3*4-Grafikausschnitt Brett (als Hintergrund).</p>
+
+        <p>2 quadratische Grafikausschnitte, die in einer Routine benötigt werden. 'Speicher des Feldes Sprungtabelle zu den Hauptroutinen. Die Hauptroutinen aller Befehle, Beginn der einzelnen Routinen siehe Sprungtabelle.</p>
+
+        <p>Zeichnet Text in Bitmap. Leicht korrigiert übernommen von Heimo Ponnath, 64er, 8/85.</p>
+
+        <p>4 Routinen, die prüfen, ob ein Feld am Rand des Brettes liegt. Hier werden alle Teile des Brettes, die in keinem 3*4-Feldausschnitt enthalten sind, gezeichnet.</p>
+
+        <p>überträgt 3* 4-Brettausschnitt (der Feldnummer entsprechend modifiziert) in den Puffer. s Rotiert einmal das gesamte Feld. Errechnet Adresse eines Grafikausschnittes in der Bitmap abhängig von der Feldnummer. Überträgt Pufferinhalt in die Bitmap. Überträgt Figur eines Feldes in den Puffer.</p>
+
+        <p>Überträgt unteren rechten Ausschnitt der Figur, die im Grafikausschnitt oben links auftaucht, in den Puffer.</p>
+
+        <p>Überträgt unteren linken Ausschnitt der Figur, die im Grafikausschnitt oben rechts auftaucht, in den Puffer. Überträgt oberen rechten Ausschnitt der Figur, die im Grafikausschnitt unten links auftaucht, in den Puffer.</p>
+
+        <p>Überträgt oberen linken Ausschnitt der Figur, die im Grafikausschnitt unten rechts auftaucht, in den Puffer. Rotiert eine im X-Register stehende Feldnummer ein- oder mehrmals gegen den Uhrzeigersinn.</p>
+
+        <p>Verknüpft zwei Bytes aus zwei AND- bzw. OR-Masken mit dem Pufferinhalt. Adressen der Unterteilmasken. Ermittelt Adressen der Masken beliebi- ger Figuren und schreibt sie in zwei Zeiger. $C9Y4A-$C95C Rotiert eine im X-Register stehende Feldnummer einmal gegen den Uhrzeigersinn.</p>
+
+        <p>$C95D-$C9Y5E Zwei Flags.</p>
+
+        <p>$CIY5F-$CYBE Puffer.</p>
+
+        <p>Auf der Leserservice-Diskette finden Sie zusätzlich ein Demonstrationsprogramm, das Ihnen alle Möglichkeiten von »Schachgrafik« aufzeigt.</p>
+
+        <address class="author">(Frithof Dau/kn)</address>
+    </article>
+</body>
+
+</html>

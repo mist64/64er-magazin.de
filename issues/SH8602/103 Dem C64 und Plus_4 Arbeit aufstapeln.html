@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Dem C64 und Plus/4 Arbeit aufstapeln</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. P. Kittels, bs">
+    <meta name="64er.issue" content="Sonderheft 2/86">
+    <meta name="64er.pages" content="103-104, 106-107">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX18">
+</head>
+
+<body>
+    <article>
+        <h1>Dem C64 und Plus/4 Arbeit aufstapeln</h1>
+        <p class="intro">Wollen Sie viele verschiedene Tätigkeiten direkt hintereinander ausführen und haben keine Lust, die ganze Zeit neben dem Computer sitzen zu müssen? Die Lösung heißt Batch- oder Stapel-Verarbeitung. Zusätzlich stellen wir Ihnen noch einen komfortablen Editor zur Verfügung.</p>
+
+        <p>Eier werden gleich zwei Programme auf einmal vorgestellt, die beide sehr nützlich sind: EDI.BAS - ein total in Basic geschriebener und trotzdem vollwertiger, schneller Screen-Editor</p>
+
+        <p>BATCH - ein Programm, das einen Hauch von Großrechner-Komfort zugänglich macht, indem ganze Folgen von Programmen und Eingaben automatisch ablaufen, ohne daß der Benutzer Hand anlegen muß.</p>
+
+        <p>Die Batch-Verarbeitung arbeitet rein theoretisch wie ein sehr großer Tastaturpuffer. Man kann dem Computer im voraus die Eingaben für die nächsten Minuten oder gar Stunden geben. In diesen Eingaben können selbstverständlich LOAD- und RUN-Befehle enthalten sein, so daß sich ganze Programmketten auf einen Befehl hin abarbeiten lassen. Da man sich das wie einen Stapel von Eingaben vorstellen kann, von dem der Computer sich immer eine neue Arbeit abholt, bis der Stapel abgetragen ist, nennt man diese Prozedur Stapel- oder englisch Batch-Verarbeitung.</p>
+
+        <h2>Der Editor - EDI.BAS</h2>
+
+        <p>Wie oft muß in Programmen eine größere Menge Text eingegeben werden oder es werden Datenfiles gebraucht, in denen bestimmte Werte drinstehen oder korrigiert werden sollen. Man findet dann oft mehr oder weniger aufwendig gestaltete Editor-Routinen, die aber lange nicht an den Komfort heranreichen, den ein echter Screen-Editor bietet.</p>
+
+        <p>Die Routine EDI.BAS, die im Listing 1 die Zeilen 1 bis 299 umfaßt, ist ein kleiner Auszug aus einem kompletten Textsystem. Sie ist völlig eigenständig und kann auch ohne den Rest dieses Listings verwendet werden.</p>
+
+        <p>Eine besondere Eigenschaft von EDI.BAS ist, daß es sich automatisch an 40- und 80-Zeichen-Schirme anpassen kann! Wen die Verfahrensweise interessiert, der sollte sich die Zeile 350 ansehen. Dort wird ein Zeichen an die 41. Bildschirmposition gesetzt und dann überprüft, ob es sich schon in der zweiten Zeile befindet.</p>
+
+        <p>Vor der ersten Benutzung als eigenständiges Programm ist EDI.BAS durch Aufruf der Zeile 200 zu initialisieren. Dies entfällt, wenn man das komplette Listing abgetippt hat.</p>
+
+        <p>EDI.BAS bearbeitet einen zeilenweise in A$() abgespeicherten Text. Aufgerufen wird der Editor nach der Initialisierung einfach mit GOSUB 100.</p>
+
+        <p>EDI.BAS erklärt sich durch seine Help-Funktion fast von selbst. Diese Funktion kann man durch Eintippen von »H« und Return in der Kommandozeile erreichen.</p>
+
+        <p>Einschränkungen bestehen nur darin, daß nur die allernotwendigsten Funktionen vorhanden sind und daß die Zeilenlänge auf 77 Zeichen beschränkt werden mußte.</p>
+
+        <p>Erst dadurch, das EDI.BAS vollkommen in Basic programmiert wurde, ohne POKE- und PEEK-Befehle zu benutzen, konnte erreicht werden, daß die Routine auf fast allen Commodore-Rechnern, so dem C 64, C 128 oder dem 8032 anstandslos läuft.</p>
+
+        <h2>Batch-Verarbeitung</h2>
+
+        <p>Viele Aktionen sind nicht direkt programmierbar, so zum Beispiel die Aufrufe mehrerer Programme hintereinander und die Versorgung dieser Programme mit diversen Eingaben. Solche Befehlsfolgen können mit BATCH in einem Zug eingetippt und dann automatisch durchgeführt werden. Bedient wird BATCH folgendermaßen:</p>
+
+        <p>a) Start einfach mit RUN (ohne Parameter): Es wird ein Filename erfragt, unter dem die Kommandofolge auf der Floppy abgelegt werden soll beziehungsweise schon vorhanden ist. Wenn das File noch nicht existiert, kann es mit dem in BATCH 64 eingebauten Editor erstellt werden. Ist die Kommandofolge fertig, wird sie abgespeichert. Sie wird anschließend nochmals eingelesen und in einem geschützten RAM-Bereich abgelegt. Zum Schluß kann der Batch-Job mit einem unter dem Cursor bereitgestellten SYS-Befehl gestartet werden. .</p>
+
+        <p>b) Start mit Angabe von Parametern: In einem Kommando-Mutterfile können manche Eingaben (zum Beispiel Filenamen) mit formalen Parametern %a, %b, ..., %z gekennzeichnet werden. Beim Aufruf von BATCH 64 werden diese dann mit aktuellen Inhalten versorgt und gelangen so zur Ausführung. Dazu muß hinter dem RUN-Befehl ein Doppelpunkt geschrieben werden, gefolgt von der Liste der aktuellen Parameter-Inhalte (Strings), jeweils durch Kommata getrennt. Der erste Parameter ist immer der Name des Kommando-Mutterfiles; wird hier ein Minus (-) eingegeben, wird der Parameter erfragt. Die folgenden entsprechen der alphabetischen Reihenfolge %a, ... Soll ein Parameterstring selbst ein Komma enthalten, muß er in Gänsefüßchen eingeschlossen werden. Gänsefüßchen können nicht übergeben werden! Beispiel: RUN: Mutterfile, erster Par, zweiter,, vierter, "ein komma: ,'</p>
+
+        <p>Bleibt ein Parameter leer (hier %c), erzeugt er im Kommandofile eine leere Stelle. Auf diese Weise wird aus dem Kommando-Mutterfile ein aktuelles Kommandofile (Batchfile) erzeugt, das auf Wunsch auch noch verändert werden kann. Vor Ausführung muß es auf jeden Fallnoch einmal auf Floppy gespeichert werden. Der endgültige Aufruf erfolgt mit SYS wie oben bei a).</p>
+
+        <p>c) Aufruf mit Angabe des Kommandofilenamens: Ist schon ein fertig verwendbares Kommandofile vorhanden, kann es ohne weitere Nachfragen direkt gestartet werden. Dazu schreibt man dessen Filenamen (und nur diesen) durch Doppelpunkt getrennt hinter das RUN des Startkommados für das Programm BATCH 64. Beispiel: RUN:kommando.bat (also ähnlich wie oben das Mutterfile).</p>
+
+        <p>Wirkungsweise:</p>
+
+        <p>Der Kommandotext wird zusammen mit einer zugehörigen Maschinen-Routine unterhalb des aktuell zugänglichen RAM-Endes abgelegt (relokiert). Dieser Speicherbereich wird durch Umsetzen des Top-of-RAM-Pointers vor Überschreiben durch Basic geschützt. Die Maschinenroutine wird in die Interrupt-Routine des Computers eingeschleift. Stellt diese nach Aktivierung fest, daß der Tastaturpuffer leer ist, holt sie aus dem Kommandbotext das nächste Byte und legt es in den Tastaturpuffer. Die eigene Interrupt-Routine schaltet sich automatisch selbst ab, wenn:</p>
+
+        <ul>
+            <li>
+                <p>der ganze Kommandotext abgearbeitet ist, - die Stopptaste gedrückt wird oder</p>
+            </li>
+            <li>
+                <p>im Tastaturpuffer mehr als ein Tastendruck, also Eingaben des Benutzers, angetroffen werden.</p>
+            </li>
+        </ul>
+
+
+        <p>Der Top-of-RAM-Pointer wird nicht zurückgesetzt! Einschränkungen:</p>
+
+        <p>Es sind einerseits die RAM-Belegung und andererseits das Interrupt-Verhalten aufgerufener Software zu beachten. Durch geeignetes Setzen des Top-of-RAM-Pointers vor Aufruf von BATCH 64 kann meist eine Kollision mit anderen Programmen in diesem Speicherbereich vermieden werden.</p>
+
+        <p>Da eine eigene Interrupt-Routine eingeschleift wird, kann es bei Programmen, die das auch tun, zu Kollisionen kommen. Bei wiederholten Aufruf von BATCH64 wird der Top-of-RAM-Pointer immer nur noch tiefer gesetzt, so daß er in vernünftigen Abständen wieder initialisiert werden sollte, zum Beispiel durch POKE56,160:clIr</p>
+
+        <p>Als Detail sei noch auf die Parameterübergabe im RUN-Befehl hingewiesen, die durch die GET-Funktion aus dem Bildschirm bewerkstelligt wird. Dadurch sind Schreibweisen möglich, wie man sie sonst nur aus Betriebssystemkommandos anderer, größerer Computer kennt.</p>
+
+        <p>Zur Anpassung an andere Computer sind die DATA-Zeilen mit der Maschinenroutine (siehe unten) und die Zeilen 700 und 805 mit der Adresse des Top-of-Memory-Pointers zu verändern. Letztere ist auch zu beachten, wenn man diesen Pointer ab und zu wieder restauriert:</p>
+
+        <p>POKE56,160:CLR:REM C 64</p>
+
+        <p>POKE56,128:CLR:REM PLUS/4</p>
+
+        <p>POKE53,128:CLR:REM 8xxx/40xx</p>
+
+        <p>Daß man beim PLUS/4 nur die ersten 32 KByte des Speichers ausnutzen kann (siehe auch Zeile 701, Listing 1!), liegt daran, daß man bei höherer Plazierung der eigenen Interrupt-Routine noch Bank-Switching zwischen parallelliegendem RAM und ROM ausführen müßte. Diesen Ausbau der Routine will ich gern interessierten Lesern überlassen.</p>
+
+        <p>Noch etwas zum Verfahren: Der Kommandotext muß ins RAM gelegt werden, weil zum Zeitpunkt der Abarbeitung durchaus schon alle Floppy-Kanäle (beziehungsweise Puffer) belegt sein können, so daß kein direkter Zugriff auf das Kommandofilemehr möglich ist. Der Top-of-RAM-Pointer darf auch nicht automatisch beim Ausklinken der Interrrupt-Routine zurückgestellt werden, denn anschließend müßte ja ein CLR-Befehl gegeben werden, der Variablen eines womöglich nicht in vollem Lauf befindlichen Basic-Programms einfach zerstören würde!</p>
+
+        <p>Theoretischerweise kann man in BATSCH 64 auch die Routine EDI-BAS weglassen und durch eine andere ersetzen, oder man benutzt einen externen Texteditor zur Erstellung der Kommandofiles. Auf jeden Fallmuß das File anschlieBend reinen ASCII-Text enthalten, also nicht Bildschirmcode oder Vorspänne mit Tab- und Formatier-Informationen.</p>
+
+        <p>Listing 2 ist das Assembler-Listing der von BATCH verwendeten Maschinen-Routine, und zwar in der 8xxx/40Oxx-Version. Die Version für den C 64 können Sie den Hinweisen und den DATAs aus Listing 1 entnehmen. Hinweise gibt es auch zur Anpassung an den Plus/4.</p>
+
+        <p>Der Quelltext ist mit Gewalt (Adresse $fe90 statt $90 für 8xxx, das Byte $fe=254 muß nachträglich zu Fuß in den DATASs auf 000 korrigiert werden!) so gestaltet, daß er für alle Computer die gleiche Länge hat. Die Anpassung an andere kann also direkt in den DATA-Zeilen von Listing 2 erfolgen, wenn man im Assembler-Listing die Änderungen und Vorkommen der fraglichen Werte heraussucht.</p>
+
+        <p>Nur für 8xxx/40xx ist der Programmteil aktiv, der sich um die /O-Ende-Routine kümmert. Dahinter verbirgt sich eine ganz böse Falle für jeden Interrupt-Routinen-Programmierer. Auf besagtem Rechner wird nämlich nach jeder Ein-/Ausgabe eine Routine aufgerufen, die einfach so lange wartet, bis der Interrupt-Pointer wieder seinen Normalwert hat! Das kommt von den Kassettenroutinen, deren Timing ‚über eigene Interrupt-Routinen gemanagt wird. Wenn man den Pointer nun aber selbst verbogen hat und zum Beispiel einen LOAD-Befehl gibt, bleibt der Computer erst mal hängen, läßt sich aber immerhin mit der Stopptaste zurückholen. Zur Abhilfe schaut nun in unserer Routine ein Programmteil auf dem Stack nach, ob die Rücksprungadresse womöglich irgendwo in diese Warteschleife zeigt. Wenn ja, wird die Rücksprungadresse brutal auf den nächsten RTS-Befehl umgesetzt. Testlauf</p>
+
+        <p>Erstellen Sie am besten ein Kommandofile namens TEST.BAT mit folgenden zwei Zeilen Inhalt (Kleinschreibung wegen Groß/Klein-Modus des Editors):</p>
+
+        <p>list-5 run:test-bat</p>
+
+        <p>Wenn Sie BATCH 64 mit RUNTTEST.BAT aufrufen, müßte sich ein immer wieder selbst anstartender Ablauf ergeben, der erst durch OUT OF MEMORY ERROR gebremst wird, wenn Top-of-Memory nach wenigen Stunden zu klein geworden ist.</p>
+
+        <address class="author">(Dr. P. Kittels/bs)</address>
+    </article>
+</body>
+
+</html>
