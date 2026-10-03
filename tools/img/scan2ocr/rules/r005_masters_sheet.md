@@ -148,6 +148,19 @@ nothing to fill, which is why the two variants exist at all.
 - Python 3.11+ with `numpy`, `scipy`, `pillow` — on this box `/usr/bin/python3`
   has all three
 
+### Not every scan is 2400 dpi
+
+The scan's resolution is READ per page from its PNG pHYs (`scan_dpi()`), and
+the reduction to 600 follows from it: 4 at 2400, 1 at 600. SH8602's interior
+(003–162) was scanned at 600 dpi and only its wrapper and card at 2400; the raw
+TIFFs agree, so there is nothing higher to go back to. A 600 dpi page is
+levelled, separated and graded at 600 and has **no `masters2400/NNN.png`**;
+its `cmyk2400/NNN.tif` is the separation at 600, and its stamp says
+`scan-dpi 600`. Measured on SH8602: the 2400 dpi path is pixel-identical to
+the code before the change (p163); the 600 dpi path went from a 53 × 76 mm
+trace to 209.2 × 296.9 mm (p050). Derive that issue's thumbs at
+`150 / dpi`, i.e. `-scale 25%` for a 600 dpi master, not 6.25 %.
+
 ## Run
 
 ```bash

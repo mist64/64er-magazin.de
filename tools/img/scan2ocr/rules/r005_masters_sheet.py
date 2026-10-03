@@ -147,7 +147,15 @@ BINDING = "sheet"
 # 300 dpi for tesseract and takes a clean 2:1 box filter down to it, and r145
 # wants the extra stop for figure crops.  4 is an exact integer reduction, so
 # no resampling filter touches the ink on the way down.
-SCAN_DPI = 2400
+#
+# NOT EVERY ISSUE IS 2400 dpi THROUGHOUT.  SH8602's interior (003-162) was
+# scanned at 600 dpi and only its wrapper and card at 2400, and the raw TIFFs
+# say the same, so there is no 2400 dpi copy to go back to.  The scan's own
+# resolution is therefore READ per page (scan_dpi), and the reduction follows
+# from it: 4 for a 2400 dpi page, exactly as before, and 1 for a 600 dpi page,
+# which is levelled, separated and graded at 600 and has no 2400 dpi sheet.
+SCAN_DPI = 2400                               # the usual case; see scan_dpi()
+SCAN_DPIS = (600, 2400)                       # the resolutions this step accepts
 MASTER_DPI = 600
 SCAN_REDUCE = SCAN_DPI // MASTER_DPI          # 4
 THUMB_DPI = 150                               # the thumb/ renders beside the scans
@@ -985,6 +993,27 @@ def save_master(arr, dest, stamp):
 # One page
 # ---------------------------------------------------------------------------
 
+def scan_dpi(scan):
+    """The scan's own resolution, from its PNG pHYs chunk, cross-checked.
+
+    The header is the claim; the sheet's HEIGHT in mm is the check, because a
+    wrong pHYs would otherwise rescale every millimetre constant in this file
+    in silence.  Every scan frame this chain has seen is ~304 mm tall (SH8601,
+    8612: 28751 px at 2400; SH8602's interior: 7188 px at 600).  A resolution
+    outside SCAN_DPIS, or a frame that is not 250-350 mm tall at the claimed
+    resolution, stops the page -- there is nothing defensible to publish.
+    """
+    with Image.open(scan) as im:
+        dpi = im.info.get("dpi", (0, 0))[0]
+        h = im.size[1]
+    got = min(SCAN_DPIS, key=lambda d: abs(d - dpi))
+    if abs(got - dpi) > 1 or not 250 <= h / got * 25.4 <= 350:
+        raise PageFailed(f"r005 {scan.name}: pHYs says {dpi:.2f} dpi and the "
+                         f"frame is {h} px tall -- not one of {SCAN_DPIS} dpi "
+                         f"with a ~304 mm frame")
+    return got
+
+
 def tilt(poly):
     return math.degrees(math.atan(poly[0]))
 
@@ -1060,9 +1089,11 @@ def process(page):
     # other order (reduce, then rotate, then grade at 600) averages the ink away
     # before the grade can see whether it was on the paper, and thin black type
     # is exactly what that loses.
+    dpi = scan_dpi(scan)
+    reduce = dpi // MASTER_DPI                # 4 at 2400, 1 at 600
     full = Image.open(scan).convert("RGB")
     full = full.rotate(angle, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
-    img = full.reduce(SCAN_REDUCE)
+    img = full.reduce(reduce)
     def residual_of(im):
         return measure_skew(np.array(im.reduce(MASTER_DPI // THUMB_DPI)
                                      .convert("L"), float))
@@ -1076,7 +1107,7 @@ def process(page):
         first, angle = residual, angle + residual
         full = Image.open(scan).convert("RGB")
         full = full.rotate(angle, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
-        img = full.reduce(SCAN_REDUCE)
+        img = full.reduce(reduce)
         residual = residual_of(img)
         notes.append(f"SKEW re-levelled: residual was {first:+.2f}, "
                      f"corrected to {angle:+.2f} deg, now {residual:+.2f}")
@@ -1252,6 +1283,7 @@ def process(page):
         "notes": "; ".join(notes) if notes else "(none)",
         "edge-finder": f"{finder} (paper frac {paper_frac:.3f})",
         "skew": f"{angle:+.2f} -> {residual:+.2f} deg",
+        "scan-dpi": f"{dpi}",
     })
 
     with tempfile.TemporaryDirectory(prefix=f"r005_{ISSUE}_{stem}_") as work:
@@ -1262,15 +1294,21 @@ def process(page):
         write_profile(grade, profile_txt)
         src_png, cmyk_tiff = work / "in.png", work / "sep.tiff"
         full.save(src_png)
-        separate_and_render(src_png, cmyk_tiff,
-                            OUT_SHEET / f"{stem}.png", profile_txt, stamp)
+        # A 600 dpi scan has no 2400 dpi sheet: its full-resolution render IS
+        # sheets600, so it is rendered into the scratch directory and not
+        # published under masters2400, where it would claim a resolution it
+        # does not have.  The CMYK archive is kept either way -- it is the
+        # separation, at whatever resolution the scan had; its stamp says which.
+        full_png = (OUT_SHEET if reduce > 1 else work) / f"{stem}.png"
+        separate_and_render(src_png, cmyk_tiff, full_png, profile_txt, stamp)
         archive_cmyk(cmyk_tiff, OUT_CMYK / f"{stem}.tif", stamp)
+        sheet_img = Image.open(full_png).convert("RGB").reduce(reduce)
+        sheet_img.load()
     (OUT_MASTER / f"{stem}.stamp.txt").write_text(stamp, encoding="utf-8")
 
-    # The 600 dpi master comes OFF the graded 2400 sheet -- one grade, one
-    # reduce, in that order -- and only then is it cut to the traced page.
-    sheet_img = Image.open(OUT_SHEET / f"{stem}.png").convert("RGB") \
-                     .reduce(SCAN_REDUCE)
+    # The 600 dpi master comes OFF the graded full-resolution sheet -- one
+    # grade, one reduce, in that order -- and only then is it cut to the traced
+    # page.
     save_master(np.array(sheet_img), OUT_SHEET600 / f"{stem}.png", stamp)
     sheet600 = np.array(sheet_img)
     sheet600 = sheet600[:h, :w]
