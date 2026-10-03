@@ -34,7 +34,8 @@ image into a unit square scaled by the CTM — a different pixel count lands on 
 1. **OCR** — `magick -resize 67%` → `tesseract -l deu --psm 3 --oem 3 --dpi 402 … pdf`, one
    searchable single-page PDF per page, cached.
 2. **Rasters** — `magick -resize 25%` → 150 dpi PNG per page, cached. Page 1 takes `title.png`
-   instead, resized to page-1 dimensions.
+   as it is: the script does **not** resize it, and refuses to assemble unless it is already
+   exactly 1240×1754.
 3. **Size search** — binary search over guetzli quality 84…97 for the largest that keeps the final
    PDF/A under 100 MB. Each probe encodes, swaps, merges and PDF/A-converts; all of it is cached
    per quality, so a probe that was already run is free.

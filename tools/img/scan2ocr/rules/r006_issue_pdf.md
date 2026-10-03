@@ -77,6 +77,52 @@ Two further traps found with it, both now closed in the scripts:
   plain script's cache. It now compares page 1's cached pixels against
   `title.png` (MAE ≤ 1) and refuses to assemble otherwise.
 
+- the **per-quality guetzli cache is also keyed on existence**
+  (`[[ -s "$qd/$n.jpg" ]] || guetzli …`), so a cover change reached the 150 dpi
+  raster and stopped there. On 8612's cover rebuild the "new" PDF had page 1
+  **byte-identical** to the old one and the same total size to the byte
+  (96,313,586), and every metadata and page check passed. Invalidate
+  `guetzli-q*/$n.jpg` whenever `${n}_150.png` is newer, as the plain script
+  already does for its own cache. Verification: after a cover change, page 1's
+  embedded image must DIFFER from the previous build's and match `title.png`.
+
+## PIXEL SIZE DOES NOT PROVE A COVER WAS RETOUCHED
+
+`title.png` must be exactly 1240×1754 — but **a plain 150 dpi reduction of the
+master is also exactly 1240×1754**, so the size check cannot tell a retouched
+cover from an untouched one. On 8612 the file handed to the build was
+pixel-identical to an early export; the retouching had never reached a file,
+and the PDF was built and then rebuilt.
+
+MAE does not discriminate either: the unretouched export read **2.93** and the
+owner's retouched cover **5.54** — a coin toss for any threshold. What does
+discriminate is **counting pixels that moved**:
+
+```python
+ref = master001.resize((1240, 1754), Image.LANCZOS)      # 25% Lanczos
+d   = np.abs(np.asarray(title, int) - np.asarray(ref, int)).max(2)
+moved = int((d > 30).sum())
+```
+
+MEASURED on 8612: **27,049** for the unretouched export against **81,409** for
+the owner's cover — 3×, because a real retouch is a page-wide tonal adjustment
+plus localised work. A count near the unretouched level means **stop and ask**.
+
+## A MASTER CAN BE SILENTLY OVERWRITTEN BY THE COVER EXPORT
+
+`masters600/001.png` was found on 8612 as a **1240×1754 Affinity Photo export**
+(quarantine xattr "Affinity Photo 2") saved over the 4961×7016 master while
+`title.png` was being made from it. The `.stamp.txt` still claimed 4961×7016,
+and r006's freshness check ("title.png older than the cover master") **passes**
+in exactly this case. Three masters carried the xattr — 001, 037, 073, the
+pages the owner cut crops from — but only 001's content was lost.
+
+**So before building: every `masters600/NNN.png` must match its stamp's
+master-px.** Repair by re-running r005 `cut`, which is deterministic: 001 came
+back 4961×7016 and the other 199 masters were byte-identical by shasum.
+
+**And tell the owner: export `title.png` to a NEW path, never over the master.**
+
 ## THE COLOUR TEST MISSES THIN COLOURED LINES ON A DARK GROUND
 
 The classifier blurs and **erodes** before thresholding chroma. The erode is
@@ -94,23 +140,67 @@ So before compiling, measure the bilevel pages. The statistic that works is
 **chroma AREA after a gentle opening**, in mm² of the printed page:
 
 ```python
-im = Image.open(master).convert('RGB').resize((w//4, h//4), Image.LANCZOS)  # 150 dpi
+im = Image.open(master).convert('RGB')
+w, h = im.size                                          # the master's own size
+im = im.resize((w // 4, h // 4), Image.LANCZOS)         # 600 -> 150 dpi
 a   = np.asarray(im).astype(np.int16)
 m   = (a.max(2) - a.min(2) >= 18) & (a.mean(2) > 25)   # real chroma, not near-black
-m   = ndimage.binary_opening(m, np.ones((3,3)))        # 3x3 ONLY
-area_mm2 = m.sum() / (150/25.4)**2
+m   = ndimage.binary_opening(m, np.ones((3, 3)))       # 3x3 ONLY
+m  &= paper                                             # EXCLUDE the scanner bed
+lbl, n = ndimage.label(m)
+areas  = ndimage.sum(m, lbl, range(1, n + 1)) if n else []
+largest_mm2 = (max(areas) if n else 0) / (150 / 25.4) ** 2
 ```
+
+`paper` is the traced paper mask for the page (r005 already has one). Without
+it a dark scanner bed with a colour cast passes `mean > 25` and is measured as
+ink.
 
 The opening is the whole measurement: scanner CCD fringing on the edge of black
 type is one or two pixels wide and vanishes, while printed ink survives. **3×3
 and no more** — a 5×5 destroys colour that is criss-crossed by line art, which
 is the exact case the shipped classifier already gets wrong.
 
+**Threshold the LARGEST CONNECTED COMPONENT, at exactly 50.0 mm². Not the
+sum.** Summing every opened pixel measures the wrong thing twice over, and both
+defects shipped on 8612 before the owner's review caught them:
+
+- Fringing on BODY type vanishes under a 3×3 opening, but fringing on DISPLAY
+  type is thicker than the kernel. p186's headline left **28 fragments**
+  (greys with a blue cast, R≈G, B +15-18) summing to 68.5 mm² — over the
+  threshold — while the largest was 27.9. The owner: *"186 clearly b/w. if you
+  measure something different, you're not measuring right."*
+- No area measure can tell printed ink from the scanner bed. p004's chroma is
+  the navy backdrop beside the narrower reply card, 1504 mm² in one blob. Only
+  the paper mask removes it.
+
+MEASURED on 8612 — total / largest / blob count:
+
+| page | total | largest | blobs | |
+|---|---|---|---|---|
+| 180 | 2174.0 | 2153.6 | 7 | ink |
+| 152 | 2869.2 | 248.0 | 1788 | ink |
+| 022 | 136.2 | 136.2 | 1 | ink |
+| 024 | 127.7 | 124.1 | 13 | ink |
+| 125 | 94.8 | 89.6 | 13 | ink |
+| 172 | 78.2 | 78.2 | 1 | ink |
+| 114 | 75.8 | 58.7 | 5 | ink |
+| 004 | 3853.9 | 1504.5 | 1472 | **scanner bed** |
+| 186 | 68.5 | **27.9** | 28 | **fringe** |
+| 042 | 56.6 | **15.4** | 39 | **fringe** |
+
+Largest-blob separates the two classes with room to spare: real ink ≥ 58.7,
+fringe ≤ 27.9. On the sum, 186 and 042 both pass.
+
 MEASURED on 8611's 107 bilevel pages: 024 **2600 mm²** (a pale blue tint panel),
 030 **164 mm²** (green wireframes on a dark ground), and then 161, 098, 004, 053
-at **0.0–2.9 mm²**, which is fringing. **Anything above ~50 mm² carries real
-ink; below it is the scanner.** There is no judgement here — 161 looks tinted on
-screen and measures zero, because a grey panel has no chroma.
+at **0.0–2.9 mm²**, which is fringing. 161 looks tinted on screen and measures
+zero, because a grey panel has no chroma.
+
+**`FORCE_CONTONE` is the output of this measurement, not a choice.** Report the
+table; do not argue pages out of it one at a time. "There is no judgement here"
+is true only once the measure is right — and an exact 50.0 is part of that: a
+tilde gives no answer at 48 or 52 while claiming there is nothing to decide.
 
 Keep a page at 150 dpi with `FORCE_CONTONE="030"` (space-separated page
 numbers) on `make_issue_pdf_mixed.sh`. Do not retune the classifier's threshold
@@ -297,6 +387,8 @@ a re-cut invalidates none of them by itself:
 | `.ocrcache/NNN.pdf` | the OCR text layer **and the page box** | the page was re-cut, at all |
 | `.ocrcache/NNN_150.png` | the 150 dpi raster | the page's pixels changed |
 | `.ocrcache/<enc>-q<N>/NNN.jpg`, `NNN_g.pdf`, `merged.pdf`, `out.pdf` | the encoded page and the assembly | either of the above changed |
+| `.ocrcache/pageclass.tsv` | each page's colour/halftone verdict | **the page was re-graded** — the verdicts are from the old pixels |
+| `.ocrcache/jbig2/NNN.jb2` | the bilevel encoding | the page was re-cut or re-graded |
 
 Re-OCR exactly the affected pages with the recipe's own parameters — they are
 one line in `make_issue_pdf.sh`: `-resize 67%`, `-l deu --psm 3 --oem 3 --dpi

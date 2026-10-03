@@ -61,6 +61,10 @@ LIMIT=$((100*1000*1000))
 # hours of guetzli.  The search is still the default and still what a keeper gets.
 QMIN="${QMIN:-84}"; QMAX="${QMAX:-97}"
 NCPU="$(sysctl -n hw.ncpu)"
+# We already run NCPU jobs in parallel; letting each magick use all cores too
+# drove the load to ~900 and stalled for 25+ min on 8612.  With this it is
+# minutes.  (r000's lanes rule, in script form.)
+export MAGICK_THREAD_LIMIT=1
 AUTHOR="Markt & Technik"
 CREATOR="tesseract 5 + guetzli + jbig2enc + pikepdf"
 TITLE="64'er $TAG"
@@ -183,7 +187,10 @@ build_at() {  # $1=quality -> byte size of the assembled PDF
   local q="$1" qd="$CACHE/guetzli-q$1" man="$CACHE/manifest-$MODE-q$1.tsv"
   mkdir -p "$qd"
   for n in $contone; do
-    [[ -s "$qd/$n.jpg" ]] && continue
+    # Keyed on existence alone, a cover change reached ${n}_150.png and stopped
+    # there: on 8612 the "rebuilt" PDF had page 1 byte-identical and the same
+    # total size to the byte.  The plain script already does this for its cache.
+    [[ -s "$qd/$n.jpg" && ! "$CACHE/${n}_150.png" -nt "$qd/$n.jpg" ]] && continue
     ( guetzli --quality "$q" "$CACHE/${n}_150.png" "$qd/$n.jpg" 2>/dev/null ) &
     while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
   done; wait
@@ -210,5 +217,19 @@ while (( lo <= hi )); do
 done
 [[ -n "$best" ]] || { echo "even q$QMIN exceeds $LIMIT"; exit 1; }
 cp "$bestf" "$OUT"
+
+# assemble_pdf.py sets Title and Author but neither the dates nor XMP dc:title,
+# so every mixed build needs this stamp -- it is not a repair step.  r006 names
+# all four fields as the house standard.  exiftool writes an incremental update.
+if command -v exiftool >/dev/null; then
+  NOW="$(date -r "$OUT" '+%Y:%m:%d %H:%M:%S')"
+  exiftool -overwrite_original -q \
+    -Title="$TITLE" -XMP-dc:Title="$TITLE" \
+    -CreateDate="$NOW" -ModifyDate="$NOW" "$OUT" \
+    || echo "WARNING: exiftool stamp failed -- metadata incomplete"
+else
+  echo "WARNING: exiftool not found -- /CreationDate, /ModDate and dc:title unset"
+fi
+
 echo "=== $(date '+%H:%M:%S') DONE -> $OUT  mode=$MODE q=$best  $(stat -f%z "$OUT") bytes ==="
 echo "    bilevel $(echo $bilevel | wc -w) pages @600dpi JBIG2, contone $(echo $contone | wc -w) pages @150dpi guetzli q$best"
