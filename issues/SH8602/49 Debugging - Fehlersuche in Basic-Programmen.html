@@ -79,14 +79,59 @@
         <p>Dieser Befehl listet die Zeilennummer der zuletzt gelesenen DATA-Zeile. Ein typisches, wenn auch stark vereinfachtes Beispiel für das Auftreten von Fehlern im Zusammenhang mit DATA-Anweisungen, ist in Listing 1 gegeben. In den Zeilen 100 bis 170 wird eine Prüfsumme über den ersten DATA-Block gebildet und nur dann, wenn diese Prüfsumme in Ordnung ist, wird in den nächsten Programmteil verzweigt, wo aus dem zweiten DATA-Block Zahlen gelesen und an den Anfang des Bildschirms gePOKEt werden und dort das Wort » COMMODORE bilden sollen.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>1 REM DATA-TEST
+2 REM ---------
+3 REM
+4 REM
+5 B=1024:REM BILDSCHIRM
+6 REM
+7 PRINT"{CLR}":REM CLEAR
+8 PRINT:PRINT:PRINT:PRINT
+9 REM
+100 REM DATA-BLOCK 1 LESEN
+105 REM
+110 FOR I=1 TO 17
+120 READ X
+130 S=S+X
+140 NEXT I
+150 PRINT"S =";S
+160 YF S&lt;&gt;282 THEN PRINT"PRUEFSUMMENFEHLER":END
+170 PRINT"OK"
+190 REM
+195 REM
+200 REM DATA-BLOCK 2 LESEN
+205 REM
+210 FOR I=0 TO 8
+220 READ X
+230 POKE B+I,X
+240 NEXT I
+250 END
+290 REM
+295 REM
+300 REM DATA-BLOCK 1
+305 REM
+310 DATA 12,33,11,4,17,38,22,19,7,18,
+320 DATA 11,41,15,19,3,12,0
+345 REM
+350 REM DATA-BLOCK 2
+355 REM
+360 DATA 3,1513,13,15.4,15,18,5</pre>
             <figcaption>Listing 1. In diesem Testprogramm sind einige Fehler in den DATA-Zeilen enthalten</figcaption>
         </figure>
 
         <p>Das Programm enthält nun einige Fehler in den DATA-Zeilen, die wir gemeinsam herausfinden wollen. Stellen wir uns einfach vor, wir hätten das Programm in Listing 1 aus einer Zeitschrift abgetippt und dabei einige Fehler in den DATA-Zeilen fabriziert. In Listing 2 sind zum Vergleich noch einmal die entsprechenden DATA-Zeilen des »Original«-Listings abgedruckt. Die Fehlersuche scheint somit recht einfach: Man vergleicht die paar DATAs in beiden Listings und wird dann schon den Fehler finden. Bei diesem kurzen Testprogramm stimmt das natürlich auch. Aber stellen wir uns doch einmal vor, daß die beiden DATA-Blöcke insgesamt vielleicht über drei volle Listing-Seiten gehen und nicht nur über drei Zeilen wie in unserem Beispiel. Dann lohnt es sich nämlich mit Sicherheit schon, wenn man etwas systematischer an die Fehlersuche herangeht.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>290 REM
+295 REM
+300 REM DATA-BLOCK 1
+305 REM
+310 DATA 12,33,11,4,17,38,22,19,7,18
+320 DATA 11,41,15,19,3,12,0
+345 REM
+350 REM DATA-BLOCK 2
+355 REM
+360 DATA 3,15,13,13,15,4,15,18,5</pre>
             <figcaption>Listing 2. Dies ist nochmals der DATA-Block aus Listing 1, aber diesmal das fehlerfreie »Original«</figcaption>
         </figure>
 
@@ -113,7 +158,11 @@
         <p>Auf den ersten Blick würde man vielleicht vermuten, daß der Fehler nur im zweiten DATA-Block stehen kann, weil das Lesen des ersten Blocks keine Fehlermeldung°'erzeugt und sogar die Prüfsummenbildung stimmt. Diese Ußerlegung ist aber nicht ganz schlüssig. Denn durch Bildung einer einfachen Prüfsumme werden Vertauschungsfehlerund überflüssige oder fehlende Nullen nicht erkannt. Die fünf DATA-Zeilen in Listing 3 ergeben zum Beispiel alle die gleiche Prüfsumme.</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>100 DATA 12,13,14,15,16,17,0
+200 DATA 13,12,14,15,16,17,0
+300 DATA 13,12,14,15,16,17,0,0,0
+400 DATA 23,2,14,15,16,17,0
+500 DATA 23,2,14,15,16,,17</pre>
             <figcaption>Listing 3. Die Bildung einer Prüfsumme ist kein zuverlässiges Mittel, um Fehler in DATA-Zeilen zu entdecken. Wie man leicht nachrechnen kann, ergibt jede der fünf DATA-Zeilen die gleiche Prüfsumme.</figcaption>
         </figure>
 

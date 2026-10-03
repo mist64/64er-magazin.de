@@ -125,19 +125,18 @@
 
         <p>Das Zeichen-ROM kann wie folgt eingeschaltet werden:</p>
 
-        <pre><code>10 POKE 56334,PEEK(56334) AND 254: REM INTERRUPT
-AUS
-20 POKE 1,PEEK(1) AND 251: REM ZEICHEN-ROM EIN 30 Programn..... (Kopie des Zeichensatzes etc.) 1000 POKE 5634,PEEK(56334) OR 1:. REM INTERRUPT EIN
+        <pre><code>10 POKE 56334,PEEK(56334) AND 254: REM INTERRUPT AUS
+20 POKE 1,PEEK(1) AND 251: REM ZEICHEN-ROM EIN
+30 Programm.....(Kopie des Zeichensatzes etc.)
+1000 POKE 5634,PEEK(56334) OR 1: REM INTERRUPT EIN
 </code></pre>
 
+        <p>Ausgeschaltet wird die Sache mit folgendem Programm:</p>
 
-        <p>Ausgeschaltet wird die Sache mit folgendem Programm: 10 POKE 56334,PEEK(56334) AND 254: REM INTERRUPT</p>
-
-        <p>AUS</p>
-
-        <pre><code>20 POKE 1,PEEK(1) OR 4 : REM I/O-RAM EIN 30 POKE 5634, PEEK(56334) OR 1: REM INTERRUPT EIN
+        <pre><code>10 POKE 56334,PEEK(56334) AND 254: REM INTERRUPT AUS
+20 POKE 1,PEEK(1) OR 4 : REM I/O-RAM EIN
+30 POKE 5634,PEEK(56334) OR 1: REM INTERRUPT EIN
 </code></pre>
-
 
         <p>Sie werden sich nun aber fragen, wie der Computer trotz Tastaturabfrage Zeichen am Bildschirm ausgeben kann. Dies geschieht mit Hilfe des sogenannten ROM-IMAGE. Weil der VIC-II-Chip gleichzeitig nur auf 16 KByte zugreifen kann, muß der Zeichensatz immer in der jeweiligen Bank des VIC-II-Chips liegen. Im Standardmodus greift der VIC auf Bank O zu ($0000 bis $3FFF). Das System ist so entwickelt, daß VIC-II davon ausgeht, daß sich der Zeichensatz im »zugriffsberechtigten« Speicherbereich befindet. Arbeitet der VIC-II in Bank 0, nimmt er an, der Zeichensatz befindet sich ab $1000, obwohl dieser in Wirklichkeitin $DOO00 liegt. Der Speicherbereich $1000 bis $1FFF ist aber trotzdem für den Anwender als RAM-Bereich vorhanden. Gleiches gilt für die drei anderen möglichen Banks des VIC-Il:</p>
 
@@ -185,7 +184,9 @@ AUS
 
         <p>Im folgenden werden zwei Programme gezeigt, um das Betriebssystem ins RAM zu kopieren und umzuschalten:</p>
 
-        <pre><code>10 FOR I=40960 TO 49151: POKE I,PEEK(I) : NEXT 20 FOR I=57344 TO 65535: POKE I,PEEK(I) : NEXT 30 POKE 1,53 : REM FÜR C 64
+        <pre><code>10 FOR I=40960 TO 49151: POKE I,PEEK(I) : NEXT
+20 FOR I=57344 TO 65535: POKE I,PEEK(I) : NEXT
+30 POKE 1,53 : REM FÜR C 64
 30 POKE 1,5 : REM FÜR SX 64
 </code></pre>
 
@@ -193,7 +194,32 @@ AUS
         <p>oder wie in Listing 1:</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>&gt;, C000 A9 C0    LDA #$C0
+&gt;, C002 85 FB    STA $FB
+&gt;, C004 A9 A0    LDA #$A0
+&gt;, C006 85 FD    STA $FD
+&gt;, C008 20 1E C0 JSR $C01E
+&gt;, C00B A9 00    LDA #$00
+&gt;, C00D 85 FB    STA $FB
+&gt;, C00F A9 E0    LDA #$E0
+&gt;, C011 85 FD    STA $FD
+&gt;, C013 20 1E C0 JSR $C01E
+&gt;, C016 A9 35    LDA #$35
+&gt;, C018 85 01    STA $01
+&gt;, C01A 8D D6 FD STA $FDD6
+&gt;, C01D 60       RTS
+&gt;, C01E A0 00    LDY #$00
+&gt;, C020 84 FC    STY $FC
+&gt;, C022 B1 FC    LDA ($FC),Y
+&gt;, C024 91 FC    STA ($FC),Y
+&gt;, C026 C8       INY
+&gt;, C027 C0 00    CPY #$00
+&gt;, C029 D0 F7    BNE $C022
+&gt;, C02B E6 FD    INC $FD
+&gt;, C02D A5 FD    LDA $FD
+&gt;, C02F C5 FB    CMP $FB
+&gt;, C031 D0 EB    BNE $C01E
+&gt;, C033 60       RTS</pre>
             <figcaption>Listing 1. So kopiert man das ROM ins RAM</figcaption>
         </figure>
 

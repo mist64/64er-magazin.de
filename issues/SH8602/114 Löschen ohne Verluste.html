@@ -29,7 +29,122 @@
         </figure>
         <div class="binary_download" data-filename="clear-dim.prg" data-name="CLEAR-DIM"></div>
         <figure>
-            <pre>TODO</pre>
+            <pre>10 "; =====================================================
+20 ";
+30 ";                  PROGRAMM:  CLEAR
+40 ";
+50 ";                  LOESCHEN EINES EINZELNEN
+60 ";                  VARIABLENFELDES MIT :
+70 ";                  CLR X
+80 ";
+90 "; =====================================================
+100 " .BA 49152
+105 "        LDA #$0B  ; VEKTOREN AUF
+110 "        STA $0308 ;
+115 "        LDA #$C0  ; NEUE ROUTINE
+120 "        STA $0309 ;
+125 "        RTS       ;
+130 ";===============================================
+135 "        JSR $0073 ; NAECHSTES ZEICHEN
+140 "        CMP #$9C  ; IST ES CLR
+145 "        BEQ JA    ;
+150 "        JSR $0079 ; LETZTES ZEICHEN HOLEN
+155 "        JMP $A7E7 ; BEFEHL AUSFUEHREN
+160 "ERROR   JMP $AF08 ; SYNTAX ERROR AUSGEBEN
+165 "NCLR    JSR $A660 ; NORMALEN CLR BEFEHL AUSFUEHREN
+170 "        JMP $A7AE ; ZUR INTERPRETERSCHLEIFE
+175 "JA      LDA #$00  ;
+180 "        STA $F7   ; VARIABLENNAME AUF
+185 "        STA $F8   ; NULL SETZEN
+190 "        JSR $0073 ; NAECHSTES ZEICHEN HOLEN
+195 "        BEQ NCLR  ; NICHTS, DANN NORMALEN CLR AUSFUEHREN
+200 "        JSR $B113 ; PRUEFT AUF BUCHSTABE
+205 "        BCC ERROR ; KEIN BUCHSTABE, DANN FEHLER
+210 "        JSR $0079 ; LETZTES ZEICHEN NACH ACCU
+215 "        STA $F7   ; UND NACH $F7
+220 "        JSR $0073 ; NAECHSTES ZEICHEN
+225 "        BEQ X2    ; NICHTS, DANN NUMERISCHE VARIABLE
+230 "        CMP #'$   ; STRINGVARIABLE ?
+235 "        BEQ STRING
+240 "        CMP #'%   ; INTEGERVARIABLE
+245 "        BEQ INTEGER
+250 "        STA $F8   ; ZEICHEN NACH $F8
+255 "LLX     JSR $0073 ; NAECHSTES ZEICHEN
+260 "        BEQ X2    ; NICHTS, DANN NUMERISCHE VARIABLE
+265 "        CMP #'$   ; STRINGVARIABLE ?
+270 "        BEQ STRING
+275 "        CMP #'%   ; INTEGERVARIABLE ?
+280 "        BNE LLX   ;
+285 "INTEGER JSR $0073 ; NAECHSTES ZEICHEN
+290 "        LDA #$80  ; BIT 7 IM 1. BYTE
+295 "        ORA $F7   ; DES VARIABLENNAMEN
+300 "        STA $F7   ; SETZEN
+305 "        BNE SPRUNG
+310 "STRING  JSR $0073 ; NAECHSTES ZEICHEN
+315 "SPRUNG  LDA #$80  ; BIT 7 IM 2. BYTE
+320 "        ORA $F8   ; DES VARIABLENNAMEN
+325 "        STA $F8   ; SETZEN
+330 "X2      LDA $2F   ; ============================
+335 "        LDX $30   ; ARRAYANFANG NACH           I
+340 "        STA $F9   ; $F9/$FA SPEICHERN          I
+345 "        STX $FA   ; ============================
+350 "LOOP    LDA $FA   ; ============================
+355 "        CMP $32   ; $F9/$FA MIT ARRAY ENDE     I
+360 "        BNE NO1   ;                            I
+365 "        LDA $F9   ; VERGLEICHEN                I
+370 "        CMP $31   ; ============================
+375 "        BEQ NOFOUND
+380 "NO1     LDY #$00    ; ERSTES BYTE DES
+385 "        LDA ($F9),Y ; VARIABLENNAMENS
+390 "        CMP $F7     ; MIT GESUCHTER VARIABLE
+395 "        BNE NO      ; VERGLEICHEN
+400 "        INY         ;
+405 "        LDA ($F9),Y ; ZWEITES BYTE
+410 "        CMP $F8     ; VERGLEICHEN
+415 "        BEQ FOUND   ;
+420 "NO      JSR PLUS    ; NAECHSTE VARIABLE
+425 "        JMP LOOP    ;
+430 "FOUND   LDA $F9     ; VARIABLE GEFUNDEN
+435 "        LDX $FA     ; ANFANG DER GESUCHTEN VARIABLE
+440 "        STA $F7     ; NACH $F7/$F8 SPEICHERN
+445 "        STX $F8
+450 "        JSR PLUS    ; ANFANG DER NAECHSTEN VARIABLEN
+455 "N2      LDA $FA     ; ==============================
+460 "        CMP $32     ;                              I
+465 "        BNE VERSCH  ; ENDE DES ARRAYBEREICHS ?     I
+470 "        LDA $F9     ;                              I
+475 "        CMP $31     ; ==============================
+480 "        BNE VERSCH  ;
+485 "        LDA $F7     ; ZEIGER ARRAY ENDE
+490 "        STA $31     ;
+495 "        LDA $F8     ; SETZEN
+500 "        STA $32     ;
+505 "NOFOUND JMP $A7AE   ; ZUR INTERPRETERSCHLEIFE
+510 "VERSCH  LDY #$00    ; ======================================
+515 "        LDA ($F9),Y ;                                      I
+520 "        STA ($F7),Y ; ANFANG DER NAECHSTEN VARIABLEN       I
+525 "        INC $F7     ; NACH ANFANG DER GESUCHTEN VARIABLEN  I
+530 "        BNE N1      ; VERSCHIEBEN, BIS ARRAY ENDE          I
+535 "        INC $F8     ; ERREICHT IST.                        I
+540 "N1      INC $F9     ;                                      I
+545 "        BNE N2      ;                                      I
+550 "        INC $FA     ;                                      I
+555 "        JMP N2      ; ======================================
+560 "PLUS    LDY #$03    ; ================================
+565 "        LDA ($F9),Y ;                                I
+570 "        TAX         ;                                I
+575 "        DEY         ;                                I
+580 "        LDA ($F9),Y ;                                I
+585 "        CLC         ; ANFANG DER NAECHSTEN           I
+590 "        ADC $F9     ;                                I
+595 "        BCC N3      ; VARIABLEN ERRECHNEN            I
+600 "        INC $FA     ;                                I
+605 "N3      STA $F9     ; UND NACH $F9/$FA SPEICHERN     I
+610 "        TXA         ;                                I
+615 "        CLC         ;                                I
+620 "        ADC $FA     ;                                I
+625 "        STA $FA     ;                                I
+630 "        RTS         ; ================================</pre>
             <figcaption>Listing 2. Assembler-Listing zu »CLEAR-DIM«</figcaption>
         </figure>
     </article>

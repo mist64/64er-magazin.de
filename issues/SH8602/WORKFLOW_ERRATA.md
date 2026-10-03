@@ -293,3 +293,19 @@ text when the table is left for crop. #5's regex also matches `Bild N`, which
 floods it before crops exist. The visual walk found 13 tables the sweeps and
 the 150 worklist had missed — the walk is the part that works. Found by the
 160 sub-agent (23 min).
+
+## 170 — mutually contradicting method sentences; no glyph convention; no version test
+
+"tesseract-locate the caption's bbox in the rendered page" vs the block-index
+recipe; "300 dpi is the right target resolution" vs "Crop from the graded 600
+dpi master"; "Dispatch a sub-sub-agent to OCR the crop" beside the measured
+GLM-OCR section, with no word on which is authoritative. Check 3 sees only
+`<figcaption>Listing N`, so captionless boxes (all 29 Einzeiler) and named
+captions are never checked. `r170_score_hex_ocr.py` is hard-wired to 8611's
+`3d.code.prg`. No convention for an unnameable reverse/graphic glyph in a
+listing without checksums (the agent used `[ILLEGIBLE]`, 39 times), nor for
+side-by-side machine variants (VC 20 / C 64). Nothing says to TEST the
+Checksummer version — 141 L11 verifies only under V1/V2 in a V3 issue.
+Orchestrator error recorded too: my brief said "write only *.html", which
+blocked the rule's "recreate as a disk file" — fixed by a second dispatch.
+(78 min, 421 tool calls.)

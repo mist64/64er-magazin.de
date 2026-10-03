@@ -108,7 +108,101 @@
             <figcaption>Listing 1. Programm EDI.BAS/BATCH. Bitte mit dem Checksummer Seite 6 eingeben.</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>                        line
+
+00002  0000              ;put"80:irqbat.src"
+00003  0000              ;*
+00004  0000              ;*********************************************************
+00005  0000              ;*
+00006  0000              ;* irq - bat
+00007  0000              ;*
+00008  0000              ;* batch-job-abwicklung ueber irq-routine
+00009  0000              ;* version fuer 8xxx/40xx mit hinweisen fuer c 64, plus/4
+00010  0000              ;*
+00011  0000              ;* p. kittel, frankfurt 1985
+00012  0000              ;*
+00013  0000              ;*********************************************************
+00014  0000              ;
+00015  0000              irqptr = $fe90         ;pointer irq-routine (8xxx: $0090)
+00016  0000                              ;                high-byte $fe=254 in datas korrigieren!
+00017  0000                              ;                c-64: $0314,  plus/4: $0212
+00018  0000                                   ;
+00019  0000              tasanz = $9e           ;anzahl im tastaturpuffer (8xxx)
+00020  0000                              ;                c-64: $c6,    plus/4: $ef
+00021  0000                              ;
+00022  0000              taspuf = $026f         ;tastaturpuffer (8xxx)
+00023  0000                              ;                c-64: $0277,  plus/4: $0527
+00024  0000                              ;
+00025  0000              ;
+00026  0000                     * = $7000
+00027  7000              ;
+00028  7000  78          aktiv  sei             ; batch-routine aktivieren
+00029  7001  ad 90 fe           lda irqptr     ;alten pointer retten
+00030  7004  8d 74 70           sta irqend+1
+00031  7007  ad 91 fe           lda irqptr+1
+00032  700a  8d 75 70           sta irqend+2
+00033  700d                                    ;statt 'start' bei c-64 und plus/4    start1 :
+00034  700d  a9 19              lda #&lt;start    ;neuen setzen, bzw. start1
+00035  700f  8d 90 fe           sta irqptr
+00036  7012  a9 70              lda #&gt;start    ;bzw. start1 (s.o.)
+00037  7014  8d 91 fe           sta irqptr+1
+00038  7017  58                 cli
+00039  7018  60                 rts            ;fertig, gleich gehts los
+00040  7019              ;
+00041  7019              ;programmteil nur fuer cbm 8/4xxx benoetigt:
+00042  7019  bd 05 01    start  lda $0105,x     ;i/o-ende-schleife?
+00043  701c  29 fc              and #$fc       ;ruecksprungadr pruefen
+00044  701e  c9 2c              cmp #$2c
+00045  7020  d0 11              bne start1     ;ne: nein
+00046  7022  bd 06 01           lda $0106,x
+00047  7025  c9 f9              cmp #$f9
+00048  7027  d0 0a              bne start1     ;ne: nein
+00049  7029  a9 34              lda #$34       ;ruecksprungadr
+00050  702b  9d 05 01           sta $0105,x    ;manipulieren
+00051  702e  a9 f9              lda #$f9
+00052  7030  9d 06 01           sta $0106,x
+00053  7033              ;
+00054  7033  a5 9e       start1 lda tasanz      ;tastenpuffer leer?
+00055  7035  f0 0d              beq holtas     ;eq: ja, was dagegen tun
+00056  7037  c9 02              cmp #2         ;mehr als eine taste?
+00057  7039  b0 2c              bcs reset      ;cs: ja, abbruch wegen operator-eingriff
+00058  703b              ;
+00059  703b  ad 6f 02           lda taspuf     ;zuletzt gedrueckte taste
+00060  703e  c9 03              cmp #3         ;stop-taste?
+00061  7040  f0 25              beq reset      ;eq: ja, abbrechen
+00062  7042  d0 2f              bne irqend     ;ne: einfach weiter
+
+irqbat......page 0003
+
+line# loc   code        line
+
+00063  7044              ;
+00064  7044  e6 9e       holtas inc tasanz      ;eine taste 'druecken'
+00065  7046  ad ff ff    holptr lda $ffff       ;dummy-adresse wird modifiz.
+00066  7049  8d 6f 02           sta taspuf     ;in tastaturpuffer
+00067  704c  ad 47 70           lda holptr+1   ;low byte
+00068  704f  d0 03              bne nocar      ;ne: kein uebertrag
+00069  7051  ce 48 70           dec holptr+2   ;high byte
+00070  7054  ce 47 70    nocar  dec holptr+1    ;naechstes byte
+00071  7057              ;
+00072  7057  ad 47 70           lda holptr+1   ;abfrage auf ende
+00073  705a  cd 76 70           cmp endptr
+00074  705d  d0 14              bne irqend     ;ne: nein
+00075  705f  ad 48 70           lda holptr+2
+00076  7062  cd 77 70           cmp endptr+1
+00077  7065  d0 0c              bne irqend     ;ne: nein, weiter
+00078  7067              ;
+00079  7067  ad 74 70    reset  lda irqend+1    ;fertig, irq restaurieren
+00080  706a  8d 90 fe           sta irqptr
+00081  706d  ad 75 70           lda irqend+2
+00082  7070  8d 91 fe           sta irqptr+1
+00083  7073                                    ;
+00084  7073  4c ff ff    irqend jmp $ffff       ;dummy-adresse wird modifiziert
+00085  7076              ;
+00086  7076  00          endptr .byte 0,0       ;hier pointer auf (letztes byte -1)
+00086  7077  00
+00087  7078              ;
+00088  7078                     .end</pre>
             <figcaption>Listing 2. Der Sourcecode für BATCH 64</figcaption>
         </figure>
     </article>

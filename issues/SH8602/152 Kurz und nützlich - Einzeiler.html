@@ -24,10 +24,12 @@
         <p>Diese Zahlenkonvertierungen braucht man recht häufig. - Hex X$ nach dezimal (Listing 1) und - Dezimal X nach hex X$: (Listing 2)</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>— Hex X$ nach dezimal X:10
+x=0:fori=1tolen(x$):x0=asc (mid$(x$,i,1)):x=16*x+x0-48+(x0&gt;64)*7: next</pre>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>— Dezimal X nach hex X$:10
+x$="":fori=1to4:x0=x/16:x=x-int(x0)*16:x$=chr$(48+x-(x&gt;9)*7+x$:x=x0:next</pre>
         </figure>
 
         <h2>Umwandlung beliebiger Zahlensysteme</h2>
@@ -40,15 +42,32 @@
 
         <p>Zum Programm: Die Dummy-Schleife (von O bis O) wird benutzt, um später wieder mitten in die Zeile springen zu können. An jeder Stelle wird die Zahl in der Variablen D durch die Basis B geteilt. Dadurch wird die unterste Ziffer abgeschnitten. Die jeweils niederwertigste Stelle ist der ganzzahlige Rest dieser Division und steht in S. Dieser wird in ASCII-Code umgerechnet. Durch den CHR$-Befehl wird der Code zu einer Zeichenkette. Diese wird vorne an $Z angehängt. Die letzte höchstwertige Ziffer ist erreicht, wenn D&lt;1, da die nächste Stelle dann O ist. Solange D> = 1 ist, ist die Endbedingung nochnicht erreicht und die FOR-Schleife wird weiter durchlaufen (bis P+1&lt;=0).</p>
 
+        <figure>
+            <pre>10 z$="":forp=0to0:d=d/b:s=(d-int(d))*b:z$=chr$(55+s+7*(s&lt;10))+z$:p=-d:next
+40 rem in 10 dez in beliebig</pre>
+        </figure>
+
         <h2>Zur Umwandlung beliebig/dezimal:</h2>
 
         <p>Diese Routine wandelt eine beliebig große Zahl, deren Basis in der Variablen B steht, in eine Dezimalzahl um. Die Zahl selbst muß in $Z stehen. D wird mit O initialisiert. Die Schleifenvariable S dient als Zeiger auf die einzelnen Stellen von $Z. Diese werden nacheinander in ASCII-Code umgewandelt. Der Code für Null (48) wird subtrahiert und das Ergebnis in H zwischengespeichert. Man multipliziert die umgewandelten Stellen (in D) mit B und erhöht sie dadurch um eine Potenz dieser Basis. Dann addiert man die aktuelle Stelle (H) dazu. Bei Darstellung durch einen Buchstaben (H > 9) ist aufgrund des ASCII-Codes noch die Subtraktion einer 7 notwendig. Die Schleife wird solange durchlaufen, bis die niederwertigste Stelle erreicht ist.</p>
+
+        <figure>
+            <pre>20 d=0:fors=1tolen(z$):h=asc(mid$(z$,s))-48:d=d*b+h+7*(h&gt;9):next
+50 rem in 20 beliebig in dez</pre>
+        </figure>
 
         <h2>Die Fakultätsfunktion</h2>
 
         <p>Dieser Einzeiler von Detlev Marks berechnet Fakultäten besser als ein Taschenrechner (größer als »69%«). Der C 64 besitzt standardmäßig keinen Befehl zur Berechnung der: Fakultät.</p>
 
         <p>Die Eingabevariable ist A. B dient als Zählvariable und C als Rechen- und Ausgabe-Variable.</p>
+
+        <figure>
+            <pre>10 rem fakultaeten
+20 :
+30 inputa:frb=1toa:c=c+log(b):next:c=c/log(10):print10↑(c-int(c));"e";int(c):run
+40 :</pre>
+        </figure>
 
         <h2>Dividieren mit beliebig vielen Nachkommastellen</h2>
 
@@ -64,6 +83,11 @@
 
         <p>Der Autor dieses Programms ist Heinz Bauschke.</p>
 
+        <figure>
+            <pre>0 inputz,d,n:q%=z/d:printq%:r=z-d*q%:fori=1ton:e%=r*10/d:print"[ILLEGIBLE 2]";e%;:r=10*r-d*e%:next
+10 rem</pre>
+        </figure>
+
         <h2>INPUT mit Komma</h2>
 
         <p>Diese INPUT-Routine von Jürgen Reinert ersetzt den INPUT-Befehl. Sie erlaubt Komma, Doppelpunkt und Strichpunkt als zusätzliche Satzzeichen bei der Eingabe. Sonst funktioniert sie genauso wie der INPUT-Befehl. Die Routine übernimmt alle Zeichen der Tastatur, auch führende Leerzeichen (Leerzeichen vor Beginn des Textes).</p>
@@ -73,6 +97,12 @@
         <p>Das »Herz« dieses Einzeilers ist die Eingaberoutine ab Adresse 42336. Diese schreibt alle 80 Zeichen einer Bildschirmzeile in den Basic-Eingabepuffer, der bei Adresse 512 beginnt. Dann liest das Programm Zeichen für Zeichen den Eingabepuffer bis zur genannten O und stellt daraus den String XX$ zusammen.</p>
 
         <p>Erfolgt keine Eingabe, das heißt, nur die RETURN-Taste wurde gedrückt, so wird die Routine mit XX$=CHR$(32) verlassen. In allen anderen Fällen enthält XX$ alle sichtbaren, eingegebenen Zeichen (außer Steuerzeichen).</p>
+
+        <figure>
+            <pre>1 SYS 42336:XX$="":FOR II=512 TO 600:AA=PEEK(II):IF AA THEN XX$=XX$+CHR$(AA):NEXT
+10 :
+20 REM INPUT</pre>
+        </figure>
 
         <h2>Formatierte Ausgabe</h2>
 
@@ -89,6 +119,10 @@
         <p>Ist A&lt;1, so wird zur Spaltennummer eine Eins addiert. Null bildet einen Sonderfall, da die Nullnoch vor dem Komma stehen muß.</p>
 
         <p>INT(-B)*(B&lt;1).</p>
+
+        <figure>
+            <pre>20 b=abs(a):printtab(int(log(b-(b=0))*.43429448188)*(b&gt;=1)+int(-b)*(b&lt;1)+22);a</pre>
+        </figure>
 
         <h2>Mehr Struktur mit Spaces</h2>
 
@@ -112,19 +146,15 @@
 
         <p>Die Variable LN enthält die Zeilennummer (O bis 24), V gibt die Von-Zeile und B die Bis-Zeile an (gelöscht wird »von« »bise«).</p>
 
-        <p>18 FOR LN=V TO B:POKE 781,1LN:5YS 59903: NEXT</p>
-
-        <p>20 :</p>
-
-        <p>3@ REM FUER NUR EINE ZU LOESCHENDE ZEILEGILT:</p>
-
-        <p>48 :</p>
-
-        <p>5@ FOKE 788,LN:5YS 59993</p>
-
-        <p>&amp;8 :</p>
-
-        <p>7@ REM</p>
+        <figure>
+            <pre>10 FOR LN=V TO B:POKE 781,LN:SYS 59903:NEXT
+20 :
+30 REM FUER NUR EINE ZU LOESCHENDE ZEILEGILT:
+40 :
+50 POKE 780,LN:SYS 59903
+60 :
+70 REM                 STEFAN KEIMEIER</pre>
+        </figure>
 
         <h2>Grafikbildschirm löschen mit DIM-Befehl</h2>
 
@@ -146,6 +176,11 @@
 
         <p>Der Autor des Programms, Manfred Hedtke, schlägt vor, im Grafikprogramm die Zeile 10 immer dann aufzurufen, wenn über die Tastatur »SHIFT + CTRL HOME« (entsprechend »freier Bildschirm im Textmodus«) eingegeben wird.</p>
 
+        <figure>
+            <pre>10 a=0:b=0:a=peek(49):b=peek(50):dimf((16191-a-b*256)/5):poke49,a:poke50,b
+20 rem</pre>
+        </figure>
+
         <h2>Soft-Scrolling</h2>
 
         <p>Mit diesem Einzeiler von Georg Brandt kann ein beliebiger Text von rechts nach links punktweise über den Bildschirm geschoben werden. Die Variable A mit dem Wert 53270 bildet das Register für horizontales Smooth-Scrolling. Die Variable L enthält die Anzahl der Zeichen (L=40 für die gesamte Bildschirmbreite, weniger für kleinere Textausschnitte), die gleichzeitig auf dem Bildschirm erscheinen sollen. In der Variablen A$ erwartet die Routine den zu zeigenden Text. Das letzte Zeichen sollte ein Leerzeichen sein. Das rechtsbündige Zeichen des Strings steht zweimal auf dem Bildschirm, da es nicht gelöscht wird.</p>
@@ -164,11 +199,22 @@
         </ul>
 
 
+        <figure>
+            <pre>1 FOR R=1 TO LEN(A$):FOR I=207 TO 200 STEP -1:PRINT"{HOME}"MID$(A$,R,L):POKE A,I:NEXT I,R
+10 :
+20 REM SCROLL</pre>
+        </figure>
+
         <h2>Scrollen in x-Richtung</h2>
 
         <p>Bei diesem Einzeiler von Hans-Peter Harmann kann die Geschwindigkeit des Scrollers je nach Anwendung neu eingestellt werden. Die Verzögerungsschleife</p>
 
         <p>FOR G=0 TO 3:NEXT muß nur entsprechend abgeändert werden. Durch den Wert 3 wird nur eine minimale Verzögerung erreicht. Experimentieren Sie ruhig mal damit, mit welchen Verzögerungswerten der Bildschirm wie schnell gescrollt wird.</p>
+
+        <figure>
+            <pre>10 fort=1to7:poke53270,t:forg=0to3:next:next:onagoto10:fory=1024to2023:pokey,194:next:a=1:goto10
+20 rem</pre>
+        </figure>
 
         <h2>Scrollen bei bleibendem Text</h2>
 
@@ -177,6 +223,10 @@
         <p>Wenn Sie eine »O« gePOKEthaben, wird eine Zeile auf dem Bildschirm festgehalten. Beim POKEn einer »1« zwei Zeilen, beim POKEn einer »%« ...</p>
 
         <p>Obwohl diese Routine sehr kurz ist, braucht sie sehr lange zur Ausführung.</p>
+
+        <figure>
+            <pre>1 fori=40960to49151:pokei,peek(i):next:fori=57344to65535:pokei,peek(i):next:poke59639,10:poke1,53</pre>
+        </figure>
 
         <h2>Grafik: Rahmen zweifarbig</h2>
 
@@ -188,9 +238,18 @@
 
         <p>Aber Vorsicht: Sobald während des Programmablaufs eine Taste gedrückt wird, fängt das Bild an zu »laufen«, weil die Raster-Interrupt-Tastaturabfrage in Kraft getreten ist, die den Zeitplan durcheinander bringt.</p>
 
+        <figure>
+            <pre>10 poke53280,1     :::::::::::::::::poke53280,0     :::::::::::::::goto10
+20 rem</pre>
+        </figure>
+
         <h2>Spiralen mit dem Plotter 1520</h2>
 
         <p>Dieser Einzeiler malt mit dem Plotter 1520 eine Spirale, die aus lauter Dreiecken besteht. Zugrunde liegt diesem Programm von Christoph von Rhein die Berechnung eines Kreises. Die X- und Y-Koordinaten werden mit den Funktionen SIN und COS errechnet. Da X und Y mit der Laufvariablen I multipliziert werden, kommt bei dieser Berechnung eine Spirale heraus. Wenn Sie das Aussehen der Grafik ändern wollen, dann können Sie den Faktor 2 innerhalb der Sinus- und Cosinus-Klammern durch einen anderen Wert ersetzen.</p>
+
+        <figure>
+            <pre>1 OPEN 1,6,1:PRINT#1,"M",240,0:FOR I=1 TO 250:PRINT#1,"S",240+SIN(I*2)*I,COS(I*2)*I:NEXT</pre>
+        </figure>
 
         <h2>Ein grafischer Disassembler: DI-AS</h2>
 
@@ -210,15 +269,30 @@
         </ul>
 
 
+        <figure>
+            <pre>5 print"[ILLEGIBLE]":"peek(3)"[ILLEGIBLE]":poke41,5:geta$:poke3,peek(3)-(a$="[ILLEGIBLE]")+(a$="[ILLEGIBLE]"):sys1024:goto5</pre>
+        </figure>
+
         <h2>Speicherblockverschiebung</h2>
 
         <p>Dieser Einzeiler von Jens Baas dient zur Übertragung von Speicherblöcken. Er ist zum Beispiel nützlich, wenn Sie das Basic oder das Betriebssystem vom ROM ins RAM verlegen wollen. Die Variablen mit »L« bezeichnen jeweils das Low-Byte der Adresse, die Variablen mit »H« das High-Byte. Für eine Adresse X lassen sich diese so berechnen: AL=X-256 * INT(X/256):AH=INT(X/256).</p>
 
         <p>Die Routine benutzt die Blockverschiebe-Routine des ROMs.</p>
 
+        <figure>
+            <pre>1 poke95,al:poke96,ah:poke90,el:poke91,eh:poke88,nl:poke89,nh:sys41919
+11 rem beispiel:
+12 poke95,0:poke96,160:poke90,0:poke91,192:poke88,0:poke89,192:sys41919
+13 rem ↑↑ basic ins ram ↑↑</pre>
+        </figure>
+
         <h2>Merge</h2>
 
         <p>Bisher gab es oft nur die eine Möglichkeit, wenn ein Programm aus zweien zusammengesetzt werden sollte: das kürzere mußte ans Ende des längeren getippt werden. Hier ist eine ganz kurze Routine von Andreas Gast, die Programme verkettet.</p>
+
+        <figure>
+            <pre>10 a=peek(45)+256*peek(46)-2:poke44,a/256:poke43,a-peek(44)*256:print"prg laden&amp; pO43,1:pO44,8</pre>
+        </figure>
 
         <h2>Directory laden, ohne das Basic-Programm zu zerstören</h2>
 
@@ -235,6 +309,10 @@
         <p>A=ASC(A$+ " SHIFT/HOME") wandelt ASCII-Zeichen in Zahlen (von O bis 255) um. Hat A$ die Länge 0, so behält der Ausdruck trotzdem die Länge 1. Durch</p>
 
         <p>PRINT CHR$((A=130 AND 13 OR ((31 &lt;A AND A&lt;95) AND A))); wird das zugehörige Zeichen zu A gedruckt, wenn A einen Wert zwischen 32 und 95 hat. Ist A=130, so wird RETURN ausgegeben. Die Steuerzeichen und Grafiksymbole werden durch die Formel innerhalb der Charakterstring-Klammer »herausgefiltert«. Nur Zahlen, Buchstaben und Satzzeichen werden ausgedruckt.</p>
+
+        <figure>
+            <pre>0 get#1,a$:a=asc(a$+"{CLR}"):printchr$((a=130and13or((31&lt;aanda&lt;95)anda)));:goto0</pre>
+        </figure>
 
         <p>Die Routine kann auch für andere Zwecke angewendet werden.</p>
 
@@ -265,6 +343,10 @@
         <p>Die Variable A$ enthält den Namen der Datei, in die auf der Diskette das Maschinen-Programm abgelegt werden soll. X legt fest, ob das Programm auf Diskette (X=8) oder Kassette (X=1) gespeichert wird.</p>
 
         <p>Falls ein langer Programmname gewählt wird, müssen die Befehle abgekürzt werden.</p>
+
+        <figure>
+            <pre>1 sys(57812)a$,x:poke193,ls:poke194,hs:poke174,le:poke175,he:sys62957</pre>
+        </figure>
 
         <p>Beispiel 1:</p>
 
@@ -303,9 +385,20 @@
 
         <p>Das Laufgeräusch wird angenehm leise und kurz, und im Falle einer Kopfjustage fährt der Kopf mit erheblich verminderter Kraft gegen den Anschlag, sodaß die Gefahr einer Dejustage deutlich gemindert ist.</p>
 
+        <figure>
+            <pre>10 OPEN 1,8,15,"M-W"+CHR$(7)+CHR$(28)+CHR$(1)+CHR$(15)
+20 :
+30 REM ZUGRIFFSZEIT DER FLOPPY KUERZER</pre>
+        </figure>
+
         <h2>Ein RENEW, das funktioniert!</h2>
 
         <p>Noch ein Programm von Hartmut und Martin Sprave: Dieser Einzeiler ist im Direktmodus, also ohne Zeilennummern, einzugeben. Vorher dürfen keine Variablen definiert oder Basic-Zeilen eingetippt werden, da sonst das gelöschte, aber noch im Speicher befindliche Programm zerstört wird. Im Wesentlichen besteht das RENEW-Programm auf dem Aufruf einer System-Routine, die die Basic-Zeilen neu bindet und das Ende des gelöschten Programms herausfindet. Das erste POKE tut so, als ob sich ein (ungelöschtes) Basic-Programm im Speicher befindet, weil sonst die Routine nicht arbeitet. Die Endadresse des Basic-Programms wird um zwei erhöht undinn den Zeiger auf den Start der Variablen (45/46) übertragen. Der CTR-Befehl gleicht alle weiteren Basic-Zeiger diesem Befehl an.</p>
+
+        <figure>
+            <pre>6 rem c-64
+7 poke2050,8:sys42291:poke46,peek(35)-(peek(781)&gt;253):poke45,peek(781)+2and255:clr</pre>
+        </figure>
 
         <h2>Ein einfaches Renumber</h2>
 
@@ -321,7 +414,17 @@
 
         <p>Ist das Basic-Programm, das neu numeriert wird, länger als 255 Zeilen, dann muß der Einzeiler zum Zweizeiler abgeändert werden. Dann wird folgendes wichtig: Aus Platzgründen wird in dieser Programmversion an die Stelle A+2 der Wert z gePOKEt (z=0,1,2...,n-1; n-1 steht für die Anzahl der Zeilen des Basic-Programms, das umnumeriert werden soll, inklusive dem Einzeiler) und an die Stelle A+3 den Wert O. Track-Zerstörer: Kopierschutz</p>
 
+        <figure>
+            <pre>1 FOR A=2049 TO PEEK(45)+PEEK(46)*256-3:POKE A+2,Z:POKE A+3,0:A=PEEK(A)+PEEK(A+1)*256-1:Z=Z+1:NEXT
+10 :
+20 REM RENUMBER (GEORG WICHERT)</pre>
+        </figure>
+
         <p>Diese Programmzeile von Jörg Wegmeyer produziert auf dem gewünschten Track der Diskette (Variable T) einen READ ERROR 21. Damit erreicht man einen relativ sicheren Kopierschutz.</p>
+
+        <figure>
+            <pre>1 open1,8,15:open2,8,2,"#":print#1,"u1 2 0";t;0:print#1,"m-e"chr$(163)chr$(253)</pre>
+        </figure>
 
         <h2>Eine Zeile = kompletter Datenschutz</h2>
 
@@ -329,11 +432,69 @@
 
         <p>Das Directory wird nicht mehr gelistet, weil es als Basic-Programm geladen wird und in dem veränderten Directory drei Nullen am Anfang (für den Interpreter das Zeichen für Programmende) erscheinen. Das »Directory-Programm« endet also schon nach zehn Bytes. Die ersten fünf Byte stellen den Zeilenanfang und die Zeilennummer dar. Darauf folgen, wie immer am Anfang eines Inhaltsverzeichnisses, ein Leerzeichen und ein Anführungszeichen. Um diese drei Zeichen beim Listen verschwinden zu lassen, folgen nun drei chr$(20), also drei DELETEs. Dies bewirkt, daß das Directory beim Listen völlig verschwindet. Da nun unmittelbar die drei Nullen folgen, wird das Listen hier abgebrochen. Auf den LIST-Befehl erscheint nur die Meldung »READY«.</p>
 
+        <figure>
+            <pre>1 open1,8,3,"#":open2,8,15,"b-p3,144":print#1,"[ILLEGIBLE 4]"chr$(0)chr$(0)chr$(0):print#2,"u2:3,0,18":print#2,"i
+2 rem
+3 rem verhindert auflisten des directory      und macht schreibschutz auf disk
+4 rem</pre>
+        </figure>
+
         <h2>Der Befehl GOTO X eine Basic-Erweiterung</h2>
 
         <p>Dieses Programm von Reinhard Jurk simuliert den im Commodore-Basic nicht vorhandenen Befehl GOTO X.</p>
 
         <p>Zu dem etwas seltsamen Aussehen der Programmzeile: In den Ausführungszeichen steht ein Maschinenprogramm, dessen Opcodes im Listing des Basic-Interpreters diese merkwürdigen Zeichen erzeugen.</p>
+
+        <figure>
+            <pre>10 syspeek(61)+256*peek(62)+26:"[ILLEGIBLE]"
+20 rem
+30 rem goto x: ll%=zeilennummer:goto10
+40 rem</pre>
+        </figure>
+
+        <figure>
+            <pre>  BITTE UNBEDINGT GENAUSO EINGEBEN !!!
+  43 KLAMMERAFFEN (@)
+
+5 GOTO20
+10 SYSPEEK(61)+256*PEEK(62)+26:"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+20 FORA=2082TO2124:READX:S=S+X:POKEA,X:NEXT:IFS&lt;&gt;5185THENPRINT"DATA ERROR !":END
+30 PRINT"OK."
+40 DATA169,204,133,69,133,70,165,157,133,85,133,86,160,12,200,145,85,162,129
+50 DATA202,200,138,145,85,172,128,163,166,46,165,45,32,17,177,32,43,175,32,1
+60 DATA184,76,163,168
+READY.</pre>
+            <figcaption>Der Einzeiler als DATA-Lader</figcaption>
+        </figure>
+
+        <figure>
+            <pre>C*
+     PC  IRQ  NV-BDIZC AC XR YR SP
+.;  E147 EA31 00110001 08 08 02 F6
+
+.,  081A  A9 CC      LDA #$CC
+.,  081C  85 45      STA $45
+.,  081E  85 46      STA $46
+.,  0820  A5 9D      LDA $9D
+.,  0822  85 55      STA $55
+.,  0824  85 56      STA $56
+.,  0826  A0 0C      LDY #$0C
+.,  0828  C8         INY
+.,  0829  91 55      STA ($55),Y
+.,  082B  A2 81      LDX #$81
+.,  082D  CA         DEX
+.,  082E  C8         INY
+.,  082F  8A         TXA
+.,  0830  91 55      STA ($55),Y
+.,  0832  AC 80 A3   LDY $A380
+.,  0835  A6 2E      LDX $2E
+.,  0837  A5 2D      LDA $2D
+.,  0839  20 11 B1   JSR $B111
+.,  083C  20 2B AF   JSR $AF2B
+.,  083F  20 01 B8   JSR $B801
+.,  0842  4C A3 A8   JMP $A8A3</pre>
+            <figcaption>Die Bedeutung des DATAs im Assembler-Code</figcaption>
+        </figure>
 
         <p>Zur Eingabe:</p>
 
@@ -352,6 +513,23 @@
         <p>Eine sehr interessante Version einer ON... GOTO-Anweisung stammt von Peter Zankl.</p>
 
         <p>Der Ausdruck (A$="A") hat den Wert -1, wenn ein A eingegeben wurde. Sonst hat er den Wert 0. Rechnen Sie nach oder probieren Sie es aus!</p>
+
+        <figure>
+            <pre>100 rem tastaturabfrage mit sprung
+200 rem :
+300 rem vorher:
+400 :
+410 geta$:ifa$=""then410
+420 ifa$="a"then2000:rem programmteil a
+430 ifa$="b"then3000:rem programmteil b
+440 ifa$="x"then end:rem ende
+450 goto 410
+499 :
+500 rem nachher:
+600 :
+610 geta$:on1-(a$="a")-2*(a$="b")-3*(a$="x")goto610,2000,3000:end
+620 :</pre>
+        </figure>
 
         <address class="author">(cg)</address>
     </article>

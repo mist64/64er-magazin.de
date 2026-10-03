@@ -108,7 +108,94 @@ SYS 525
         </figure>
         <div class="binary_download" data-filename="cursor.prg" data-name="Cursorsteuerung"></div>
         <figure>
-            <pre>TODO</pre>
+            <pre>10 REM*********************************
+20 REM*    CURSOR STEUEREUNG          *
+30 REM*                               *
+65 REM*       PETER SIEPEN            *
+70 REM*                               *
+75 REM*     VON-STEPHAN-STR.6         *
+80 REM*                               *
+82 REM*    4200 OBERHAUSEN 1          *
+84 REM*                               *
+85 REM*  TELEFON :(0208)/26555        *
+90 REM*********************************
+95 :
+100 SYS9*4096
+110 .OPT P,00
+111 :
+112 :
+113 :
+114 :
+120 *= $C000
+125 :
+130 :
+140 :
+150 TEST  = $02         ;ZAEHLVARIABLE
+160 JOY   = 56320       ;PORT #2
+170 AZITP = $C6         ;ANZAHL ZEICHEN IM PUFFER
+174 :
+175 :
+180 LDA #&lt;BEGINN;INTERUPTVEKTOR
+185 STA $314
+190 LDA #&gt;BEGINN;AUF NEUE
+195 STA $315    ;ADDRESSE SETZEN
+200 LDA #$06    ;ZAEHLVARIABLE
+205 STA TEST    ;HOCHSETZEN
+210 RTS         ;ZURUECK ZU BASIC
+215 :
+220 :
+225 :
+300 BEGINN   DEC TEST
+320 :        BEQ START   ;GENUG LEER IRR
+330 :        JMP $EA31   ;NEIN WEITER MIT IRR
+340 START    LDA #$06    ;ZAEHLVARIABLE HOCHSETZEN
+350 :        STA TEST
+360 :        LDX AZITP   ;TASTATURPUFFER
+370 :        CPX #$08    ;VOLL
+380 :        BCC WEITER
+390 :        JMP $EA31   ;JA WEITER MIT INTERUPT
+400 WEITER   LDA JOY     ;WENN JOY NICHT
+410 :        AND #1      ;NACH OBEN
+420 :        CMP #0      ;WEITER
+430 :        BNE NOBEN
+440 :        LDA #"{UP}" ;WENN JA STEUERZEICHEN
+450 :        JSR AUSG    ;AUSGEBEN
+460 NOBEN    LDA JOY
+470 :        AND #2
+480 :        CMP #0
+490 :        BNE NUNTEN
+500 :        LDA #"{DOWN}"
+510 :        JSR AUSG
+520 NUNTEN   LDA JOY
+530 :        AND #4
+540 :        CMP #0
+550 :        BNE NLINKS
+560 :        LDA #"{LEFT}"
+570 :        JSR AUSG
+580 NLINKS   LDA JOY
+590 :        AND #8
+600 :        CMP #0
+700 :        BNE NRECHTS
+710 :        LDA #"{RIGHT}"
+720 :        JSR AUSG
+730 NRECHTS  JMP $EA31
+740 :
+750 :
+760 :
+770 :
+780 :
+790 :
+800 AUSG     LDX $C6     ;X-REG FUER
+810 :        STA $277,X  ;INDIZIERTE
+820 :        INC AZITP   ;ADDRESSIERUNG
+830 :        RTS         ;LADEN
+840 :                    ;IN TASTPUFFER
+850 :                    ;SCHREIBEN
+860 :                    ;ANZAHL ZEICHEN
+870 :                    ;IM TASTPUFFER
+880 :                    ;ERHOEHEN
+890 :
+900 :</pre>
             <figcaption>Listing 3. Assemblerprogramm der Cursorsteuerung</figcaption>
         </figure>
 
@@ -189,7 +276,8 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
         <address class="author">(Thomas Uttendorfer)</address>
 
         <figure>
-            <pre>TODO</pre>
+            <pre> 1 POKE 2067,73:GOTO 10                                                   &lt;134&gt;
+ 2 REM"A{CLR,3DOWN,YELLOW}IT IS NOT ALLOWED TO LIST THIS PROGRAM{BLUE}AA  &lt;123&gt;</pre>
             <figcaption>Listing 5. Listing zu »List-Schutz für Basic-Programme«</figcaption>
         </figure>
 
@@ -347,7 +435,33 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
         <address class="author">(S. Wengler)</address>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>50000 REM    BASIC-LADER                &lt;034&gt;
+50010 DATA   ..................         &lt;058&gt;
+50020 DATA   ..................         &lt;068&gt;
+50030 DATA   ..................         &lt;078&gt;
+50040 :                                 &lt;231&gt;
+50050 REM    MASCHINENPROGRAMME AUS     &lt;065&gt;
+50060 REM    DATALADERN                 &lt;219&gt;
+50070 :                                 &lt;005&gt;
+50080 REM S KOENNEN WEGGELASSEN WERDEN  &lt;056&gt;
+50090 :                                 &lt;025&gt;
+50100 REM    DA = STARTADRESSE          &lt;249&gt;
+50110 REM    EA = ENDADRESSE            &lt;125&gt;
+50120 :                                 &lt;055&gt;
+50130 OPEN 1,8,1, "NAME"                &lt;131&gt;
+50140 :                                 &lt;075&gt;
+50150 REM SA U.EA ZUORDNEN              &lt;036&gt;
+50160 :                                 &lt;095&gt;
+50170 SH = INT(SA/256) :REM HIGH-BYTE   &lt;166&gt;
+50180 SL = SA-SH*256   :REM LOW-BYTE    &lt;064&gt;
+50190 PRINT#1,CHRS$(SL);CHR$(SH);       &lt;065&gt;
+50200 :                                 &lt;137&gt;
+50210 FOR I=SA TO EA                    &lt;249&gt;
+50220 READ WERT                         &lt;064&gt;
+50230 PRINT#1,CHR$(WERT);               &lt;079&gt;
+50240 NEXT I                            &lt;029&gt;
+50250 :                                 &lt;187&gt;
+50260 CLOSE 1                           &lt;232&gt;</pre>
             <figcaption>Listing 7. Listing zu »Maschinenprogramme auf Diskette speichern«</figcaption>
         </figure>
 
@@ -460,7 +574,45 @@ Dieses Programm gilt für eine Joystickabfrage am Controlport 2.
         <p>POKE 66,PEEK(123), so wird beim nächsten READ der Wert gelesen, der hinter dieser Basic-Zeile mit den POKESs steht, also das erste DATA-Element innerhalb des Unterprogramms. Nach dem Rücksprung aus dem Unterprogramm muß der Zeiger eventuell auch im Hauptprogramm wieder gestellt werden. . Indem kurzen Demo-Listing (Listing 11) werden drei Untergrogramme in zufälliger Reihenfolge aufgerufen. - - (Stephan Pätzold)</p>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>1 REM    ************************         &lt;128&gt;
+2 REM    *         DEMO         *         &lt;010&gt;
+3 REM    *  SUBROUTINE-RESTORE  *         &lt;071&gt;
+4 REM    ************************         &lt;131&gt;
+5 PRINT"{CLR,6SPACE}TASTE DRUECKEN !"     &lt;104&gt;
+6 PRINT:PRINT                             &lt;114&gt;
+10 X=INT(RND(TI)*3)+1                     &lt;125&gt;
+20 ON X GOSUB 1000,2000,3000              &lt;040&gt;
+25 POKE 65,PEEK(122):POKE 66,PEEK(123)    &lt;001&gt;
+30 READ A$:PRINT A$                       &lt;066&gt;
+50 DATA " HAUPTPRG."                      &lt;146&gt;
+100 GOTO 10                               &lt;078&gt;
+1000 REM   *** SUBROUTINE 1 ***           &lt;183&gt;
+1005 :                                    &lt;042&gt;
+1010 POKE 65,PEEK(122):POKE 66,PEEK(123)  &lt;221&gt;
+1020 FOR I=1 TO 4:READ A:PRINT A;:NEXT    &lt;145&gt;
+1030 READ A$:PRINT A$;                    &lt;105&gt;
+1040 POKE 198,0:WAIT 198,1                &lt;116&gt;
+1050 DATA 1,11,111,1111,"UP1{2SPACE}"     &lt;085&gt;
+1060 RETURN                               &lt;182&gt;
+1070 :                                    &lt;108&gt;
+2000 REM   *** SUBROUTINE 2 ***           &lt;164&gt;
+2005 :                                    &lt;022&gt;
+2010 POKE 65,PEEK(122):POKE 66,PEEK(123)  &lt;201&gt;
+2020 FOR I=1 TO 4:READ A:PRINT A;:NEXT    &lt;125&gt;
+2030 READ A$:PRINT A$;                    &lt;084&gt;
+2040 POKE 198,0:WAIT 198,1                &lt;095&gt;
+2050 DATA 2,22,222,2222,"UP 2 "           &lt;076&gt;
+2060 RETURN                               &lt;162&gt;
+2070 :                                    &lt;088&gt;
+3000 REM   *** SUBROUTINE 3 ***           &lt;145&gt;
+3005 :                                    &lt;002&gt;
+3010 POKE 65,PEEK(122):POKE 66,PEEK(123)  &lt;181&gt;
+3020 FOR I=1 TO 4:READ A:PRINT A;:NEXT    &lt;105&gt;
+3030 READ A$:PRINT A$;                    &lt;064&gt;
+3040 POKE 198,0:WAIT 198,1                &lt;075&gt;
+3050 DATA 3,33,333,3333,"UP{2SPACE}3"     &lt;066&gt;
+3060 RETURN                               &lt;141&gt;
+3070 :                                    &lt;067&gt;</pre>
             <figcaption>Listing 11. Demoprogramm zu »RESTORE für Unterprogramme« mit zwei POKEs</figcaption>
         </figure>
 
