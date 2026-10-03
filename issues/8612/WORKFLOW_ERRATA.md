@@ -634,3 +634,45 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
 - r310 has no check for a paragraph that is only a page reference, and none for an aside heading that outranks its article. Both
   were found by the owner reading. Also from the review: 48's liability box sat below the Info source while p50 prints it above
   (r190's never-split rule had moved it AFTER the source; the print wins over that rule when the box is physically above).
+
+## 160/190 — hard line breaks reproduced from the printed column width (owner review)
+
+- Owner: "there are plenty of hard line breaks in our HTML that should be soft. in text as well as in basic. … if it looks like
+  the line breaks are just because of the width of the table, dont reproduce them in tables." Measured on 8612: 283 `<br>` in
+  table cells (40: 181, 146: 27, 160: 23, 74: 16, …) and 133 in ordinary paragraphs.
+- **Rules that taught it.** r160 step 5 keeps "printed line breaks as `<br>`" in cells; r190 says to rebuild display lines with
+  `<br>` "per the print", and neither separates the AUTHOR's line (address, list item, code line) from the COLUMN's wrap. The
+  sub-agents did exactly what the rules said.
+- **A mechanical discriminator for BASIC cells** (64er_control): if the text after the `<br>` does not begin a new line number,
+  the break is a wrap artefact (e.g. 146 Tabelle 1 `…"J",X- <br> +2,Y+2` splits an expression).
+- **Nothing in the chain checks for `<br>` in a table cell.**
+- **What would have prevented it.** r160/r190: "A `<br>` marks the AUTHOR's line break only — a new list item, address line,
+  code line or deliberately set display line. A break where the printed column simply ended is not reproduced; join with a space
+  (rejoin a word split at a hyphen)." Plus an r310 soft check listing every `<br>` in a `<td>`, and the BASIC discriminator as a hard one.
+
+## 100 — the "both" table shape was misleading, not untidy (owner review; rebuilt by 64er_control 5845e1d0)
+
+- After png-wins, Tabelle 2-4 held the DIL drawings above a pile of legends. But the legends differ per chip (2516 has CS, 2532 has
+  none, 2564 has CS(X)), so the print pairs each drawing with ITS legend. Now rebuilt as three-column tables, each drawing over its
+  own legend, and the file renamed "100 64'er Extra_ EPROMs und EEPROMs.html" with the printed title prefix.
+- **What would have prevented it.** r160/r150: "when a printed table interleaves drawings and per-item legends, keep the pairing;
+  do not regroup legends below the images."
+- Also (5845e1d0's companion 1118e2bd): 8611/50's `<p>Listing auf Seite 54</p>` removed at the owner's word. 8609-8612 had only those two.
+
+## 080 — two articles sharing a start page get lettered pages (169a/169b, 193a/193b); the convention is in NO rule
+
+- 8611 lettered its pair 182a/182b on owner instruction; it never became a rule, so 8612 repeated the defect twice (169 Preiswerter
+  Schnellader / 1000 Mark zu gewinnen!, 193 Wir suchen die Anwendung / Einmal im Monat). The order is decided ON THE PAGE: whichever
+  piece starts higher is "a" (p169: the Schnellader headline sits at the top of the page, the 1000 Mark box below it; p193: the
+  Anwendung box above the Listing box). That equals 8611's 182 order, but it was verified here rather than copied.
+- **What would have prevented it.** r080: "Two articles starting on the same page get `64er.pages` NNNa / NNNb in printed order
+  (the one starting higher on the page is a)", with an r310 check that two articles never share a bare start page.
+
+## 160/190 — joining a column wrap inside CODE: no space at an operator boundary (found applying the line-break rule)
+
+- The sub-agent joined wrapped BASIC with a single space everywhere, giving `RX* COS(`, `RY= RY*199`, `?PEEK(174) +PEEK(175) *256`.
+  A wrap after `: , * = + - ( /` or before `+ - * / = ) " ;` hides no space in the source. Rejoined without a space there, with one
+  space only between two alphanumeric tokens (`DRAW1,X1,Y1 TO`, `SYS 58732`). Two traps found while fixing it: an HTML entity ends in
+  `;` (`&lt;&gt;`), so it is not an operator; and the BASIC discriminator "no line number after the break → wrap" fails for UNNUMBERED
+  code, which 146 Tabelle 1 is (statements there run together with spaces in the print itself). Each case was decided on the crop.
+- **What would have prevented it.** State the code-join rule next to the line-break rule; tokenise before joining (entities are not operators).
