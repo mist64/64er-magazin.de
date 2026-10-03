@@ -401,3 +401,15 @@ evidence section still asks for "grep output showing the other engine read the
 corrected form", which cannot happen. Verification 1–2 still pipe into `head`.
 "Normalise" model names vs r000 "CONSISTENCY WITH THE PAGE". Found by the 280A
 sub-agent.
+
+## 290 — still tells the agent to write the adjudication into the page
+
+"Write the adjudication into the file, immediately above the heading, as an
+HTML comment opening `So im Heft gedruckt:`" (with an example naming a step and
+a checker) — contradicts r000 ("never a gate adjudication — those live in
+`adjudicated.txt`") and r310's header. "An aside's heading sits ONE LEVEL BELOW
+the article's highest section heading. So `<h2>` when the body has `<h2>`"
+contradicts itself (the 290 agent's literal check flagged all 12 correct
+asides); "Inside an `<aside>`? … stays [h2]" contradicts the h3 exception. The
+Verification block still has no aside-outranks or paragraph-tail check (only
+r310 has them). Found by the 290 sub-agent.
