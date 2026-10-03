@@ -388,3 +388,16 @@ exempts ROM keywords, so the correct tree reports FAIL, and r260 does not read
 headings in caps in both kinds" is false for SH8602. "`14mal schneller
 laden`, which check 2 flags" — check 2 now skips digit-initial headings. Found
 by the 260 sub-agent.
+
+## 280 — the Briefing still carries the rules the body reversed
+
+Briefing step 1: "If the candidate would add or drop letters vs the
+German-correct form, it's a print typo. Skip — do not even open the block
+index" vs the section "THE CROP DECIDES … This rule used to say the opposite"
+(SH8602 `spezieles` is OCR — the print has `spe-zielles`). "Explicitly NOT
+touch … `<pre>`" vs "`<pre>` IS in this rule's scope". The "two-engine
+cross-check" vs "The block index is a LOCATOR, not a second engine"; the
+evidence section still asks for "grep output showing the other engine read the
+corrected form", which cannot happen. Verification 1–2 still pipe into `head`.
+"Normalise" model names vs r000 "CONSISTENCY WITH THE PAGE". Found by the 280A
+sub-agent.
