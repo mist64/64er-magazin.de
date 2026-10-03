@@ -30,7 +30,8 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
   raw markup, not the rendered text), so an entity like `&amp;`
   appears **literally** in the filename (e.g. a file named
   `… Tips &amp; Tricks.html`, not `… Tips & Tricks.html`).
-  Filesystem-illegal chars `? / :` are sanitised to `_`.
+  Filesystem-illegal chars are sanitised to `_` — the full set the script
+  uses is `< > : " / \ | ? * +`, not just `? / :`.
 - **`<title>`** = the cleaned `<h1>` text
 - **`64er.pages` meta** = the bracketed page numbers
 - **`64er.issue` meta** = the issue id passed in (or auto-derived from the
@@ -58,6 +59,34 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
 - strips any `id=` attribute that snuck in (Discount doesn't emit them, but
   this is defensive).
 
+## Three conventions the splitter does not know about
+
+**A continuation is joined at the jump, not appended.** When 030 hands over a
+`[Fortsetzung von Seite N]` section, splice its text **where the host's
+`Fortsetzung auf Seite M` line was** — reading order, not the end of the file —
+drop both printed `Fortsetzung` lines, and add M to the host's `64er.pages`.
+(Decided from precedent on 8612: `git grep` finds no kept `Fortsetzung` line
+anywhere in 85xx or 86xx.)
+
+**A standalone page pointer is NEVER article text.** A paragraph whose entire
+content is a page reference — `Fortsetzung auf Seite 195`, `Anleitung auf
+Seite 58`, `Listing auf Seite 54` — is the LAYOUT telling a reader where to
+turn, not the author writing to them. In a single-page HTML it says nothing and
+misleads. Drop the whole paragraph.
+
+The test is not the words. A sweep of 8612 found 16 occurrences of "auf Seite
+N" and exactly **one** was a pointer; the other 15 are prose a reader needs
+("beachten Sie bitte die Eingabehinweise auf Seite 78", "in Ausgabe 10/86 auf
+Seite 18"). Ask who is speaking: the author, or the layout.
+
+**Two articles starting on the same page get lettered pages.** They take
+`64er.pages` `NNNa` and `NNNb` **in printed order — the one starting higher on
+the page is `a`**. Read the order off the crop; it cannot be derived from the
+file order. 8611 lettered 182a/182b on instruction and it never became a rule,
+so 8612 repeated the defect twice: 169 (Preiswerter Schnellader above, 1000 Mark
+zu gewinnen! below) and 193 (Wir suchen die Anwendung above, Einmal im Monat
+below).
+
 The splitter is adapted from `tools/split.py` and **embedded inline in
 `r080_split.sh`** -- there is no `split.py` in this directory. The original
 still works standalone; the embedded copy is canonical for this chain.
@@ -83,13 +112,13 @@ After the script:
 ls issues/8607/*.html | wc -l                          # expect dozens
 
 # 2. each file's <h1> matches its filename (modulo sanitisation).
-#    split sanitises the filesystem-illegal chars `? / :` → `_`, so
+#    split sanitises `< > : " / \ | ? * +` → `_` (sanitize_filename), so
 #    apply the SAME substitution to the h1 before comparing — else a
 #    file `146 Billiges Vergnügen_.html` vs h1 `Billiges Vergnügen?`
 #    false-MISMATCHes.
 for f in issues/8607/*.html; do
   base=$(basename "$f" .html | sed -E 's/^[0-9]+ //')
-  h1=$(grep -oE '<h1>[^<]+</h1>' "$f" | head -1 | sed -E 's#</?h1>##g' | tr '?/:' '_')
+  h1=$(grep -oE '<h1>[^<]+</h1>' "$f" | head -1 | sed -E 's#</?h1>##g' | tr '<>:"/\\|?*+' '_')
   [ "$base" = "$h1" ] || echo "MISMATCH: $f  (file:'$base'  h1:'$h1')"
 done
 

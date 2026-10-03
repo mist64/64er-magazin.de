@@ -32,7 +32,7 @@ an italic run, a link or a quotation. `<P>RESS <RETURN>` would open a
 paragraph tag and swallow the line. The whitelist is all lowercase precisely
 so that an uppercase key name can never match it.
 
-Patterns that already start with a non-letter (e.g. `< CBM >` with leading space, `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because HTML requires a letter immediately after `<` for a tag.
+Patterns that already start with a non-letter (e.g. `< CBM >` with leading space, `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because HTML requires a letter immediately after `<` for a tag. **EXCEPT `</` followed by a non-letter** (`</>`, `</1>`): the HTML5 tokenizer drops `</>` entirely and treats `</`+non-letter as a bogus comment that eats text up to the next `>`. 8612 line 2903, "durch `</>` dargestellt", would have lost the `</>` and swallowed what followed. Escape those too.
 
 ## Usage
 

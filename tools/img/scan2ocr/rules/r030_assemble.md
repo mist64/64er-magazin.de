@@ -64,6 +64,18 @@ articles.json     the structure, machine-readable
 hyphens.json      resolved line-break hyphens (cache)
 ```
 
+**Then copy it into the repo:**
+
+```bash
+cp <tmp>/ocr/<ID>.md issues/<ID>/<ID>.md
+```
+
+That copy is what 040 onward edit — r040's verification and every later step
+operate on `issues/<ID>/<ID>.md`, while `ISSUE_MD` points into the working
+directory. Nothing else in the chain states this, and on 8612 it was found only
+in 8611's `LOG.md` ("re-copied from `<tmp>/ocr/8611.md`"). The copy is not
+committed (`.md` is ignored); step 060 commits the HTML.
+
 ## The three shapes an article can take
 
 This taxonomy is general. **Which runs in THIS issue fall into which shape is
@@ -162,7 +174,8 @@ issue looks like a department, the evidence for that is on this issue's pages.
 
 ```bash
 cd tools/img/scan2ocr/rules
-python3 - <<'PY'
+PY=${PYTHON:-../../../../.venv/bin/python}
+$PY - <<'PY'
 import r030_assemble as A
 stream, pi = A.page_stream()
 c = A.candidates(stream); v = A.ask_boundaries(stream, c, pi)
@@ -185,7 +198,7 @@ dropped as a headline fragment, or a cross-reference. Unexplained loss must be
 Also confirm: no `¬` survives, and every `#` line carries a page range.
 
 ```bash
-md=$(python3 -c "import sys; sys.path.insert(0,'tools/img/scan2ocr/rules'); import r030_assemble as A; print(A.ISSUE_MD)")
+md=$($PY -c "import sys; sys.path.insert(0,'tools/img/scan2ocr/rules'); import r030_assemble as A; print(A.ISSUE_MD)")
 grep -c '¬'            "$md"    # expect 0
 grep -c '^# .*\[[0-9]' "$md"    # expect = article count
 ```
@@ -199,7 +212,8 @@ Two more checks that the issue-specific facts really did come from the issue:
 
 ```bash
 cd tools/img/scan2ocr/rules
-python3 -c "import r030_assemble as A; print(A.ISSUE, A.ISS.kind, A.PAGES, A.OUT_DIR)"
+PY=${PYTHON:-../../../../.venv/bin/python}
+$PY -c "import r030_assemble as A; print(A.ISSUE, A.ISS.kind, A.PAGES, A.OUT_DIR)"
 ```
 
 - the id, kind and page range must be **this** issue's, straight out of

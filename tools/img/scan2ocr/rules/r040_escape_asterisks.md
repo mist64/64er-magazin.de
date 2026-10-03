@@ -7,8 +7,15 @@
 ## Rule
 
 For every contiguous run of `*` in the file:
-- **length == 2** → keep (it's a `**bold**` delimiter).
+- **length == 2** → keep **only if it pairs within the paragraph**; an unpaired
+  `**` is a literal and is escaped.
 - **any other length** (1, 3, 4, …) → escape each `*` to `\*`.
+
+"Length 2 is always bold" is false. 8612's Protext article renders space
+padding as asterisks — `Der**Mann*schläft.` / `Der*Mann**schläft.` — so each
+line carries one literal `**`, which this rule kept as a bold delimiter. All of
+the fence-aware checks read 0, because an unpaired delimiter is invisible to a
+pair count.
 
 That covers:
 - `*` (one) → `\*` (BASIC multiply, wildcard, literal star)

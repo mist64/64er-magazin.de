@@ -75,6 +75,16 @@ tools/img/scan2ocr/rules/r070_html_cleanup.sh issues/8607/8607.html
 
 In-place rewrite, idempotent (re-running on a cleaned file is a no-op).
 
+**It also `git add`s the file it rewrote** (`git add "$1" 2>/dev/null || true`).
+r000 warns that self-staging scripts plus a shared index have swept files into
+the wrong commit three times, and r000's list now names this script too.
+
+**Order matters: fold the curly quotes FIRST, then `''`.** As shipped, `''` → `"`
+ran before the curly folding, so `TEDMON'’s` became `TEDMON''s` and a second run
+would make it `TEDMON"s` — not idempotent after all. And `''` → `"` is simply
+wrong for a mathematical double prime (`P''`, 8612 L2577), which survived only
+by that ordering accident. A prime in a formula is legitimate; leave it.
+
 ## Verification
 
 After running:

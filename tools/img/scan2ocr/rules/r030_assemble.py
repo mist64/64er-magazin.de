@@ -61,7 +61,10 @@ HYPHEN_CACHE = ISS.hyphen_cache
 # apparatus: once the article is assembled they are not just redundant but
 # wrong, since the text runs straight through.  The page range in the title
 # carries what they said.
-FORTSETZUNG = re.compile(r"Fortsetzung\s+(auf|von)\s+Seite\s+(\d+)", re.I)
+# "auf" tolerates one OCR slip: 8612 p042 prints "Fortsetzung aug Seite 195",
+# which the exact spelling missed -- the continuation stranded, and the only
+# signal was one "has no article to rejoin" line in a 12-minute log.
+FORTSETZUNG = re.compile(r"Fortsetzung\s+(a\w{1,2}|von)\s+Seite\s+(\d+)", re.I)
 
 # The issue's contents, the one place that names the major articles and the page
 # each starts on.  It is NOT a fixed page pair and must not be compiled in: 8609
