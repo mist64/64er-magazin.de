@@ -196,3 +196,25 @@ Owner: SH8601 now; 8611 and the prgs later.
   the template the next six Sonderheft builds will be compared against.
 - RECORDED, not now: 8611 (22/22 English comments); 8510 timer-test and
   SH8505 dump c000 ship prgs one byte longer than the printed range.
+
+## Found while applying — r260's checks had never run, so their gaps were invisible
+
+Once the heredoc terminator was repaired, both r260 checks ran for the first
+time and produced five false positives on published issues. Three shapes, all
+now exempt:
+
+- a BASIC KEYWORD heading is code and correctly uppercase: 8609/66 "POKE 1,0
+  ???", SH8505/103 "ON ERROR GOTO";
+- a heading opening with the MAGAZINE'S OWN NAME: 20 in the corpus ("64'er
+  Extra: …", "64'er Disk-Ecke");
+- a heading opening with a NUMBER of any length, or an ellipsis: 8609 "19 neue
+  Befehle", 8611 "14mal schneller laden", 8610 "... oder aber Informationen",
+  8611 ". . .und Interpreter-Routinen". The model-number rule wanted three or
+  four digits and so missed the two-digit cases.
+
+VERIFIED: 0 findings on every chain-built issue (8609, 8610, 8611, 8612,
+SH8601), and the check still fires on a planted ALL CAPS heading.
+
+**Recorded for the owner, out of scope:** 25 findings remain across ten
+hand-built pre-chain issues (8408 4, 8501 5, 8408/8412/8504/8505/8507/8601/
+8602/8603/SH8506 the rest). They predate the chain.

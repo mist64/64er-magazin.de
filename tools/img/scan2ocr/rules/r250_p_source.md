@@ -41,6 +41,13 @@ ABSENT tag on such a page is not, and the ratio alone will not find it.
 Two known check gaps, so you don't chase them: check 1 misses a label wrapped
 in `<strong>`, and check 4 rejects a run-in byline `<address>` after a source.
 
+**An in-issue page pointer is not a source note.** A standalone
+`<p>Anleitung auf Seite 58</p>` between a byline and the next heading is the
+LAYOUT, not the author, and r080 drops it outright — do not tag it, and do not
+preserve it. (8611/50 kept `<p>Listing auf Seite 54</p>` and 8612 followed that
+precedent; both were removed on the owner's word. A genuine in-issue reference
+inside prose stays a plain `<p>`.)
+
 ## DEFAULT: don't change `<p class="source">`
 
 Default action: leave `class="source"` exactly as it is. Tag a
@@ -274,10 +281,11 @@ PY
 )" "$dir"
 
 # 4. mechanical section-tail trigger: every <p class="source"> must
-#    have its next sibling block be <h2>, <h3>, </section> or
-#    </article>. Anything else means it's mid-section, not
-#    section-tail — likely false positive.
-python3 -c "$(cat <<'PY'
+#    have its next sibling block be <h2>, <h3>, <aside>, </aside>,
+#    </section> or </article>. Anything else means it's mid-section, not
+#    section-tail — likely false positive. Figures, downloads and hidden
+#    blocks are stepped over: they are inserted after the text is finished.
+$PY -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -303,9 +311,35 @@ for f in sorted(os.listdir(d)):
         # `<aside>` belongs here too: rule 190 boxes the printed grey panels,
         # and a source footer commonly sits immediately before one.  This list
         # predates those panels -- 8 of SH8601's 29 articles end in an aside.
+        # A FIGURE, a DOWNLOAD or a display:none block placed by r150/r170
+        # is not the "next block" either -- it is material inserted after the
+        # text was finished. Skipping them removed 6 findings on 8612, 6 on
+        # 8611 and 5 on 8610, every one of them correct markup.
+        while True:
+            skip = re.match(r'\s*<(figure\b|div[^>]*class="binary_download"|'
+                            r'[a-z]+[^>]*style="[^"]*display:\s*none)', tail)
+            if not skip:
+                break
+            tag = skip.group(1).split()[0]
+            close = tail.find('</%s>' % tag)
+            if close < 0:
+                break
+            tail = tail[close + len(tag) + 3:]
+            nxt = re.match(r'\s*(<[^>]+>)', tail)
+            if not nxt:
+                t = None
+                break
+            t = nxt.group(1)
+        if t is None:
+            continue
         if (re.match(r'<h2\b', t) or
             re.match(r'<h3\b', t) or
             re.match(r'<aside\b', t) or
+            # a source that is the LAST CHILD of an aside is correct too
+            re.match(r'</aside>', t) or
+            # a RUN-IN BYLINE after the source: this rule's own prose already
+            # says check 4 wrongly rejects it (8611/164 Computer zu Computer)
+            re.match(r'<address\b', t) or
             re.match(r'</section>', t) or
             re.match(r'</article>', t) or
             re.match(r'<p class="source"', t)):

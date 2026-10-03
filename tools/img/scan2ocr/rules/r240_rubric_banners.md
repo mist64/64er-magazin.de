@@ -194,7 +194,11 @@ else
     page=$(basename "$f" | grep -oE '^[0-9]+')
     banner="$dir/$page-0.png"
     [ -f "$banner" ] || echo "  FAIL: $f has no banner $banner"
-    grep -q "$page-0.png" "$f" || echo "  FAIL: $f doesn't reference banner"
+    # Anchored like the rubric loop above. Unanchored, with the dot
+    # unescaped, this accepted a planted src="18-0.png" for page 8.
+    grep -q "src=\"$page-0\.png\"" "$f" || echo "  FAIL: $f doesn't reference banner"
+    # and the editorial needs the same SHAPE check the rubrics get
+    grep -q "<figure" "$f" || echo "  NOTE: $f banner not wrapped in <figure>"
   done
 fi
 
@@ -260,6 +264,9 @@ tinted versions).
   agent set this); both work, but pick one and be consistent
   within the issue.
 - The Bücher banner image content is identical across the recent
-  issue run (8601–8606). You can `cp` the prior issue's
+  issue run (8601–8606). (Step 3 above says never `cp` the previous issue's
+  banner, and that is the rule: crop this issue's own master. The sentence
+  below contradicted it and is kept only as the historical note it is — what
+  8601–8606 actually did.) You could `cp` the prior issue's
   `<page>-0.png` after renaming to the current page, then verify
   the result matches the new issue's print. Saves a banner crop.

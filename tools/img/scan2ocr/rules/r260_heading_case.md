@@ -115,6 +115,21 @@ for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
         if not letters:
             continue
         upper = [c for c in letters if c.isupper()]
+        # A BASIC KEYWORD heading is CODE and is correctly uppercase:
+        # 8609/66's "POKE 1,0 ???" and SH8505/103's "ON ERROR GOTO" are both
+        # right as printed. If every uppercase run is a keyword, this is not
+        # display type set in caps. (Found the first time this block actually
+        # ran -- the heredoc terminator defect had prevented that.)
+        BASIC = {'POKE','PEEK','SYS','LOAD','SAVE','PRINT','OPEN','CLOSE',
+                 'DATA','GET','INPUT','RUN','LIST','NEW','CLR','DIM','DEF',
+                 'FOR','NEXT','GOTO','GOSUB','RETURN','IF','THEN','ELSE',
+                 'REM','ON','ERROR','WAIT','USR','FRE','VERIFY','CMD','TAB',
+                 'SPC','CHR','ASC','AND','OR','NOT','TO','STEP','END','STOP',
+                 'CONT','RESTORE','READ','LET','MID','LEFT','RIGHT','VAL',
+                 'STR','LEN','INT','ABS','SGN','SQR','RND','POS','STATUS'}
+        runs = re.findall(r'[A-ZÄÖÜẞ]{2,}', t)
+        if runs and all(r in BASIC for r in runs):
+            continue
         if len(upper) / len(letters) >= 0.8 and re.search(r'[A-ZÄÖÜẞ]{3,}', t):
             print(f"  ALL CAPS heading: {os.path.basename(f)}: {t.strip()[:60]}")
 PYEOF
@@ -130,7 +145,9 @@ PYEOF
    `Farb-`, not `Färb-`; uppercase Ä was an OCR misread of A in
    the print's section banner typeface).
 4. Replace each match.
-5. Beautify (`npx --yes js-beautify …`).
+5. Beautify with the SAME options r080 uses, so a file does not churn between
+   steps: `npx --yes js-beautify --type html --indent-size 4 --wrap-line-length 0
+   --preserve-newlines --max-preserve-newlines 1 -r <file>`.
 6. **Rename the article HTML file to match the new h1.** Filenames
    are emitted by rule 080 from the h1 text, so when rule 260 lower-cases the h1 the filename also needs `git mv`. Match
    the natural-case form (e.g.
@@ -162,7 +179,13 @@ Critical guardrails:
 dir=issues/<YYMM>
 
 # 1. no h1/h2 left entirely in ALL CAPS
-$PY - "$dir" <<'PYEOF'
+#
+# THE TERMINATOR STANDS ALONE ON ITS LINE. As `PYEOF && \` bash never saw the
+# heredoc end: it swallowed check 2 into the script body and Python died with
+# "unterminated string literal", so this check did not run AT ALL. And once
+# that was repaired, `&& echo FAIL` keyed on EXIT STATUS -- always 0 here --
+# and printed FAIL on clean output. Test the OUTPUT, not the status.
+caps=$($PY - "$dir" <<'PYEOF'
 import glob, io, os, re, sys
 # THE CHECK IS THE TRIGGER. The rule above defines ALL CAPS as ">=80% of the
 # letters uppercase AND 3 uppercase in a row"; this implements that and nothing
@@ -176,13 +199,29 @@ for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
         if not letters:
             continue
         upper = [c for c in letters if c.isupper()]
+        # A BASIC KEYWORD heading is CODE and is correctly uppercase:
+        # 8609/66's "POKE 1,0 ???" and SH8505/103's "ON ERROR GOTO" are both
+        # right as printed. If every uppercase run is a keyword, this is not
+        # display type set in caps. (Found the first time this block actually
+        # ran -- the heredoc terminator defect had prevented that.)
+        BASIC = {'POKE','PEEK','SYS','LOAD','SAVE','PRINT','OPEN','CLOSE',
+                 'DATA','GET','INPUT','RUN','LIST','NEW','CLR','DIM','DEF',
+                 'FOR','NEXT','GOTO','GOSUB','RETURN','IF','THEN','ELSE',
+                 'REM','ON','ERROR','WAIT','USR','FRE','VERIFY','CMD','TAB',
+                 'SPC','CHR','ASC','AND','OR','NOT','TO','STEP','END','STOP',
+                 'CONT','RESTORE','READ','LET','MID','LEFT','RIGHT','VAL',
+                 'STR','LEN','INT','ABS','SGN','SQR','RND','POS','STATUS'}
+        runs = re.findall(r'[A-ZÄÖÜẞ]{2,}', t)
+        if runs and all(r in BASIC for r in runs):
+            continue
         if len(upper) / len(letters) >= 0.8 and re.search(r'[A-ZÄÖÜẞ]{3,}', t):
             print(f"  ALL CAPS heading: {os.path.basename(f)}: {t.strip()[:60]}")
-PYEOF && \
-  echo "  FAIL: ALL CAPS heading survived"
+PYEOF
+)
+[ -n "$caps" ] && { printf '%s\n' "$caps"; echo "  FAIL: ALL CAPS heading survived"; }
 
 # 2. spot-check: every h1/h2 starts with a capital letter
-python3 -c "$(cat <<'PY'
+$PY -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -200,6 +239,25 @@ for f in sorted(os.listdir(d)):
         # So: if the heading starts with a digit, the case of the word after
         # it is not this check's business; and a known product name that
         # starts lowercase is exempt (this rule's Notes list them).
+        # THE MAGAZINE'S OWN NAME opens 20 headings in the corpus ("64'er
+        # Extra: …", "64'er Disk-Ecke"). It is a proper noun with a digit at
+        # the front; the model-number rule below wants three or four digits
+        # and so does not cover it. Found the first time this check actually
+        # ran -- the heredoc defect above had prevented that.
+        if h.startswith("64'er") or h.startswith("64\u2019er"):
+            continue
+        # A heading may also open with a SYMBOL that is part of its subject:
+        # 8612's "§202a StGB, Ausspähen von Daten" is correct as printed, and
+        # this check had no exemption for it.
+        if h[0] in '§$&%#*".\u2026\u00bb\u201e(\u2013\u2014-':
+            continue
+        # A heading opening with a NUMBER: German correctly lowercases the
+        # word after it, so its case is not this check's business. 8609's
+        # "19 neue Befehle" and 8611's "14mal schneller laden" are both
+        # right as printed, and both have two digits -- the model-number
+        # rule below wants three or four and so missed them.
+        if h[0].isdigit():
+            continue
         # A MODEL NUMBER specifically -- three or four digits, as in "1541 -
         # der Oldtimer".  Not any digit: SH8601's "60 64 wie kompatibel ist
         # der c128?" also starts with one, and there the digits are OCR damage
