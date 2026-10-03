@@ -22,13 +22,32 @@ are not.
   until the next separator, belongs to the article whose start page
   is 36").
 - `issues/<YYMM>/prg/` — the actual `.txt` / `.prg` files.
-- `issues/<YYMM>/64er_*.pdf` — for verbatim captions; one-time
-  concatenating step 010's block index makes them grep-able:
-  `cat "$OUT_DIR"/blocks/p*.txt > /tmp/64er_<YYMM>_full.txt`.
+- `<OUT_DIR>/blocks/pNNN.txt` and `NNN.labels.json` — for verbatim captions.
+  (This used to name `issues/<YYMM>/64er_*.pdf`, which does not exist during a
+  build: the PDF is made at step 006, after PAUSE 2. The concatenation target
+  used to be a `/tmp` path, which r000 forbids — write it under `<tmp>`.)
 - `issues/<YYMM>/<page> ….html` — the article files to receive
   figures.
-- The page-scan PNGs under `issues/<YYMM>/png/` (when the PDF text
-  layer is wrong, fall back to reading the scan visually).
+- `<tmp>/masters600/NNN.png` — the page image, when the block text is wrong,
+  fall back to reading the scan visually. (There is no `issues/<YYMM>/png/`;
+  r000's *THE PAGE IMAGE IS masters600* names the one real source.)
+
+**A `<pre>TODO</pre>` is r170's work, not an owner question.** r170 prescribes
+both halves: it recreates a printed MSE/Checksummer listing as a new `prg/`
+file, and it transcribes printed source. Do not escalate either to the owner.
+(On 8612 two such questions were queued before r170 was read, and withdrawn.)
+
+**Every disk-backed listing's range is compared with the print.** Where the
+file's first or last line number differs from the printed listing, add
+`data-range="<first>-<last>"` (comma-separated runs allowed) so the page shows
+what the magazine showed. The download stays the **full** file. `data-range` is
+implemented in `generate.py` (:679, :721, honoured by the checksummer path) and
+16 issues already use it.
+
+MEASURED on 8612: 2 of 38 disk listings start before the print — `79 yankee
+doodle` (file from 10, print from 100) and `input-routine` (file from 1, print
+from 10000) — and none end after it. The test is **fidelity to the print**,
+nothing else.
 
 ## Procedure
 

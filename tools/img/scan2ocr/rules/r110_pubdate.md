@@ -44,7 +44,8 @@ That's the whole file. No comments, no metadata.
 
 If `README.md` doesn't yet have a bullet for the issue — and for every
 issue after the last one planned, it does not — **the plan date is the
-OPERATOR's to give.** Do not invent one. The rule used to say "add one
+OPERATOR's to give.** Write the DERIVED bullet and list it for the owner to
+confirm at PAUSE 2 — that is not inventing one. Do not invent one that is not derived. The rule used to say "add one
 first" without saying where the date comes from, which asks an agent to
 write a number it has no source for.
 
@@ -66,9 +67,12 @@ the contents and no date" — written after reading the article body and
 finding nothing, which is exactly the wrong place to look. Crop the top strip
 of `masters600/<Vorschau page>.png`.
 
-The Vorschau is the **5th-from-last page** of a monthly (188 of 192 on 8611,
-196 of 200 on 8610), and `toc_entries.txt` gives it exactly: the `Rubriken`
-entry named `Vorschau`.
+The Vorschau is the page whose banner reads **VORSCHAU 64'er** — near the end,
+**5th to 7th from last** (188 of 192 on 8611, 196 of 200 on 8610, but **194 of
+200 on 8612**, which is 7th). Find it in the 080 file list as `NNN Vorschau.html`
+rather than counting back from the end. `toc_entries.txt` also names it (the
+`Rubriken` entry `Vorschau`), but it does not exist yet at 110: step 090 runs
+alongside, or produces it later.
 
 So the plan date is **derived, not chosen** — and because it is, the operator
 confirms it rather than invents it. Two issues ahead can be filled at once:

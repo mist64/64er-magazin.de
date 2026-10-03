@@ -197,8 +197,12 @@ PY
   from this issue's TOC page. `SH8507` prints its opening piece under a real
   category and the published corpus follows the print:
   `3 Anwendungen für jedermann.html` → `Vorwort`, and `164 Impressum.html` →
-  `Rubriken`. Not one article in that issue carries `""`. If this issue's TOC
-  files its opening piece under a heading, that heading is its category.
+  `Rubriken`. Not one article in that issue carries `""`.
+
+  **That inference holds for a SONDERHEFT only.** 8608-8611 all ship the
+  editorial with `""` although their printed TOCs list it under Rubriken, so in
+  a monthly the TOC heading does NOT decide it — the corpus does, and the
+  corpus says `""`.
 - Articles **listed twice** in the printed TOC get **one** category. Pick the
   one whose pages match the article's `<meta name="64er.pages">` content. (The
   commonest monthly instance: an "Anwendung des Monats" announcement filed under

@@ -23,7 +23,10 @@ directory and:
   generator renders them as MSE hex dumps or as binary downloads;
 - emits the disk's "section separator" filenames (`-----------NN`)
   as HTML comments in `prg.txt`. Those comments tell you which article
-  the listings under them belong to: `NN` is the article's start page.
+  the listings under them belong to: **`NN` is the PAGE the listings sit on.**
+  Map it through `64er.pages`, not through a filename and not as a start page —
+  on 8612, 54, 57 and 78 are listing pages *inside* articles 51, 52 and 74, and
+  resolve only that way.
 - assembles a single `prg.txt` containing one `<figure>` block per
   listing in disk-directory order, with placeholder
   `data-name="XXXXXXXXXXXX"` and `<figcaption>YYYYYYYYYYYYY</figcaption>`
@@ -216,6 +219,25 @@ bytes is a defect until it is dispositioned in `LOG.md`.
 
 8610 finishes at **4 mismatches, all of them cases 2 and 3**, and that is the
 state a finished issue is allowed to be in.
+
+## Four cases the extractor does not route correctly
+
+Each of these was found on 8612 and fixed by hand; none is in the script.
+
+- **BASIC at a load address not ending in `01`.** `find c128` loads at $242B.
+  The extractor routes it to the PRG branch and `petcat` produces garbage.
+  Relink the line pointers to $1C01, decode, and keep the real load address in
+  the download.
+- **A stub whose `SYS` is the FIRST statement.** The stub test ("fewer than 3
+  content lines" plus "the last statement is a bare `SYS`") misses
+  `4gewinnt meister`, where the `SYS` leads and CR-bearing text trails it. Treat
+  a bare `SYS` **anywhere** in a short BASIC part as a stub; only check 4 caught
+  this one.
+- **A line-linked plain-ASCII assembler source.** `hyperscreen ii.s` is neither
+  branch's shape: it has BASIC line links but ASCII assembler text. Decode the
+  links, emit the text.
+- **Re-decode debris.** The recipe leaves `;del/<n>.prg` entries and leading
+  blank lines, which 8611's files do not have. Strip both.
 
 ## An ML program with a BASIC stub ships as the RAW BINARY
 
