@@ -153,6 +153,90 @@ EINBLENDEN
         <p>Dazu müssen wir uns zuerst mit dem Aufbau eines Zeichens und dem Aufbau des Zeichensatz-ROMs beschäftigen.</p>
 
         <p>Jedes einzelne Zeichen besteht aus einer 8*8 Punkt-Matrix. Alle in dieser Matrix enthaltenen Punkte können entweder gesetzt oder nicht gesetzt sein; ein nichtgesetzter Punkt entspricht einer »0« und ein gesetzter entsprechend einer »1«. Jedes Zeichen ist nun zeilenweise gespeichert zu je 8 Bit beziehungsweise einem Byte. Das soll an dem Buchstaben »A« demonstriert werden:</p>
+        <table class="plain mono">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>0001 1000</td>
+                <td></td>
+                <td>18</td>
+                <td></td>
+                <td>024</td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;****</td>
+                <td></td>
+                <td>0011 1100</td>
+                <td></td>
+                <td>3C</td>
+                <td></td>
+                <td>060</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>0110 0110</td>
+                <td></td>
+                <td>66</td>
+                <td></td>
+                <td>102</td>
+            </tr>
+            <tr>
+                <td>&nbsp;******</td>
+                <td>=</td>
+                <td>0111 1110</td>
+                <td>=</td>
+                <td>7E</td>
+                <td>=</td>
+                <td>126</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>0110 0110</td>
+                <td></td>
+                <td>66</td>
+                <td></td>
+                <td>102</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>0110 0110</td>
+                <td></td>
+                <td>66</td>
+                <td></td>
+                <td>102</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>0110 0110</td>
+                <td></td>
+                <td>66</td>
+                <td></td>
+                <td>102</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>0000 0000</td>
+                <td></td>
+                <td>00</td>
+                <td></td>
+                <td>000</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>binär</td>
+                <td></td>
+                <td>hex</td>
+                <td></td>
+                <td>dez</td>
+            </tr>
+        </table>
+
 
         <p>Die Bytes liegen nun von oben angefangen nacheinander im Speicher, also hexadezimal:</p>
 
@@ -174,7 +258,50 @@ EINBLENDEN
 
         <p>Versuchen Sie doch gleich einmal, den Multicolor--Modus mit der ersten der beiden Zeilen einzugeben. Sie werden nur noch unleserliche Zeichen auf dem Bildschirm entdecken. Woran liegt das nun?</p>
 
-        <p>Nun, wie Sie vielleicht wissen, existiert neben dem Video-RAM auch ein Farb-RAM, in dem der Computer die Farbinformationen für die Bildschirmdarstellung speichert. Dieses Farb-RAM liegt im Bereich von $D800 bis $DBFF und kann nicht verschoben werden. Da es vom Umfang her 1 KByte groß ist, kann im normalen Modus jedem Zeichen eine andere Farbe gegeben werden. Jede Bildschirmposition hat ein korrespondierendes Byte im Farb-RAM. Auf die Farbgebung der Zeichen haben aber nur die vier unteren Bits, also Bit 3, 2, 1 und O eine Wirkung. Dabei hat Bit 3 eine spezielle Bedeutung. Ist es gesetzt, so wird das Zeichen im Multicolor-Modus, ist es nicht gesetzt, im Normal-Modus dargestellt. Daher lassen sich Multicolor- und normale Zeichen beliebig auf dem Bildschirm mischen. Jedem Multicolor-Zeichen werden in Abhängigkeit von den im Zeichensatz gesetzten Bits drei Farben zugeordnet. Dazu wird jedes Byte in vier Bit-Paare aufgeteilt. Nehmen wir als Beispiel wieder das Zeichen »A«, dann würde das so aussehen: Die Farbzuordnung der einzelnen Bit-Paare ist wie folgt definiert:</p>
+        <p>Nun, wie Sie vielleicht wissen, existiert neben dem Video-RAM auch ein Farb-RAM, in dem der Computer die Farbinformationen für die Bildschirmdarstellung speichert. Dieses Farb-RAM liegt im Bereich von $D800 bis $DBFF und kann nicht verschoben werden. Da es vom Umfang her 1 KByte groß ist, kann im normalen Modus jedem Zeichen eine andere Farbe gegeben werden. Jede Bildschirmposition hat ein korrespondierendes Byte im Farb-RAM. Auf die Farbgebung der Zeichen haben aber nur die vier unteren Bits, also Bit 3, 2, 1 und O eine Wirkung. Dabei hat Bit 3 eine spezielle Bedeutung. Ist es gesetzt, so wird das Zeichen im Multicolor-Modus, ist es nicht gesetzt, im Normal-Modus dargestellt. Daher lassen sich Multicolor- und normale Zeichen beliebig auf dem Bildschirm mischen. Jedem Multicolor-Zeichen werden in Abhängigkeit von den im Zeichensatz gesetzten Bits drei Farben zugeordnet. Dazu wird jedes Byte in vier Bit-Paare aufgeteilt. Nehmen wir als Beispiel wieder das Zeichen »A«, dann würde das so aussehen:</p>
+        <table class="plain mono">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>00 01 10 00</td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;****</td>
+                <td></td>
+                <td>00 11 11 00</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>01 10 01 10</td>
+            </tr>
+            <tr>
+                <td>&nbsp;******</td>
+                <td>=</td>
+                <td>01 11 11 10</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>01 10 01 10</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>01 10 01 10</td>
+            </tr>
+            <tr>
+                <td>&nbsp;**&nbsp;&nbsp;**</td>
+                <td></td>
+                <td>01 10 01 10</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>00 00 00 00</td>
+            </tr>
+        </table>
+        <p>Die Farbzuordnung der einzelnen Bit-Paare ist wie folgt definiert:</p>
 
         <p>00: Hintergrundfarbe O = Bildschirmfarbe = Adresse = $D021 (53281)</p>
 

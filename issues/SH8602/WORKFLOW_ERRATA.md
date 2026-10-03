@@ -280,3 +280,16 @@ figure of the SECOND article on a shared page. "Always delegate scan reads to
 sub-sub-agents" sits beside the pause-2 need to survey every page.
 `r150_figure_captions.py` only sees caption blocks starting Bild/Tabelle/
 Listing. Found by the 150 sub-agent.
+
+## 160 — evidence demand cannot be met; caption check passes "Bildschirm"
+
+"For each Pass-3 candidate block walked … paste the one line" vs Pass 3
+returning 1746 lines on SH8602 and the rule itself calling it "a hint list to
+skim". Check #7's `'Bild' not in cap` substring test lets "…auf dem
+Bildschirm" pass; anchor `^(Tabelle|Bild) \d`. Not covered: a framed box with
+no inner rules; a title printed as a full-width row inside the table; a column
+header reprinted at the top of each column half; a caption glued into body
+text when the table is left for crop. #5's regex also matches `Bild N`, which
+floods it before crops exist. The visual walk found 13 tables the sweeps and
+the 150 worklist had missed — the walk is the part that works. Found by the
+160 sub-agent (23 min).

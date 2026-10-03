@@ -23,21 +23,55 @@
 
         <p>Das Geheimnis liegt im 6510-Prozessor. Der Chip verfügt im Gegensatz zum 6502 über ein Prozessorregister. Über diesen Port wird gesteuert, ob RAM, ROM oder Ein-/Ausgabe in bestimmten Speicherbereichen aktiv sind. Hierfür benötigt das Register (Speicherstelle 1) allerdings nur 3 Bit. Weitere 3 Bit steuern den Kassettenport. Die restlichen 2 Bit sind unbesetzt und werden einfach überlesen. Das Datenrichtungsregister für diesen Port liegt im Speicherplatz O.</p>
 
-        <p>Die einzelnen Bits im Kontrollregister des 6510 sind wie folgt definiert: Name ‚BIT . Funktion</p>
+        <p>Die einzelnen Bits im Kontrollregister des 6510 sind wie folgt definiert:</p>
 
-        <p>LORAM O _ Basic-ROM/RAM ($A000 bis $BFFF) HIRAM 1 Betriebssystem-RAM ($EO000 bis $FFFF) CHAREN l/O-Zeichen-ROM 2</p>
-
-        <p>($DO00 bis $DFFF)</p>
-
-        <p>3 Schreibleitung</p>
-
-        <p>4 Schalter</p>
-
-        <p>5 _ Motorsteuerung (Bit 3 bis 5 betreffen nur Kassettenport)</p>
-
-        <p>6 _(unbesetzt)</p>
-
-        <p>7 _ (unbesetzt)</p>
+        <table class="plain">
+            <tr>
+                <th>Name</th>
+                <th>BIT</th>
+                <th>Funktion</th>
+            </tr>
+            <tr>
+                <td>LORAM</td>
+                <td>0</td>
+                <td>Basic-ROM/RAM<br>($A000 bis $BFFF)</td>
+            </tr>
+            <tr>
+                <td>HIRAM</td>
+                <td>1</td>
+                <td>Betriebssystem-RAM<br>($E000 bis $FFFF)</td>
+            </tr>
+            <tr>
+                <td>CHAREN</td>
+                <td>2</td>
+                <td>I/O-Zeichen-ROM<br>($D000 bis $DFFF)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>3</td>
+                <td>Schreibleitung</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>4</td>
+                <td>Schalter</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>5</td>
+                <td>Motorsteuerung (Bit 3 bis 5 betreffen nur Kassettenport)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>6</td>
+                <td>(unbesetzt)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>7</td>
+                <td>(unbesetzt)</td>
+            </tr>
+        </table>
 
         <p>Zu jedem Daten-Port gehört auch ein Datenrichtungsregister. Dieses liegt für den Prozessor-Port in Speicherstelle 1. Der Normalwert für das Datenrichtungsregister lautet 47 oder Binär 00101111, wobei O für Eingabe und 1 für Ausgabe steht. In Standardmodus stehen LORAM, HIRAM, CHAREN, Schreibleitung und Motorsteuerung auf »Ausgabe«. Nur der Kassettenschalter steht auf »Eingabe«.</p>
 
@@ -49,17 +83,43 @@
 
         <p>Dieses Bit ist dafür verantwortlich, ob sich das 4K-Byte-Zeichengenerator-ROM oder das I/O-RAM im Prozessor-Adreßbereich von $DO00 bis $DFFF befindet. Wenn Bit 2 gesetzt ist, dann hat der Prozessor Zugriff auf folgende Ein-/ Ausgabe-Register:</p>
 
-        <p>$D000-$D3FF : VIC</p>
-
-        <p>$D400-$D7FF : SID</p>
-
-        <p>$D800-$DBFF : Farb-RAM</p>
-
-        <p>$DC00-$DCFF : CIA1</p>
-
-        <p>$DDO0-$DDFF : CIA2</p>
-
-        <p>$DEOO-$DEFF $DFOO-$DFFF : freier I/O-Port #1 : freier I/O-Port #2</p>
+        <table class="plain">
+            <tr>
+                <td>$D000-$D3FF</td>
+                <td>:</td>
+                <td>VIC</td>
+            </tr>
+            <tr>
+                <td>$D400-$D7FF</td>
+                <td>:</td>
+                <td>SID</td>
+            </tr>
+            <tr>
+                <td>$D800-$DBFF</td>
+                <td>:</td>
+                <td>Farb-RAM</td>
+            </tr>
+            <tr>
+                <td>$DC00-$DCFF</td>
+                <td>:</td>
+                <td>CIA1</td>
+            </tr>
+            <tr>
+                <td>$DD00-$DDFF</td>
+                <td>:</td>
+                <td>CIA2</td>
+            </tr>
+            <tr>
+                <td>$DE00-$DEFF</td>
+                <td>:</td>
+                <td>freier I/O-Port #1</td>
+            </tr>
+            <tr>
+                <td>$DF00-$DFFF</td>
+                <td>:</td>
+                <td>freier I/O-Port #2</td>
+            </tr>
+        </table>
 
         <p>Ist Bit 2 gelöscht, kann der Prozessor aus dem Zeichen-ROM lesen. In diesem Fall sind die Ein-/Ausgabe-Register gesperrt. Im Normalzustand ist dieses Bit gesetzt. Dieses Bit muß nur gelöscht werden, wenn man den Zeichensatz ins RAM kopieren will. Dabei darf aber das Programm nicht unterbrochen werden, da ja die CIA1 (Tastatur) abgeschaltet ist. Um Bit 2 von Basic aus auf Low zu setzen, muß vorher der Interrupt gesperrt werden, da die Interruptroutine statt des Timers im CIA den Charaktergenerator vorfindet und dadurch abstürzt.</p>
 
@@ -81,15 +141,33 @@ AUS
 
         <p>Sie werden sich nun aber fragen, wie der Computer trotz Tastaturabfrage Zeichen am Bildschirm ausgeben kann. Dies geschieht mit Hilfe des sogenannten ROM-IMAGE. Weil der VIC-II-Chip gleichzeitig nur auf 16 KByte zugreifen kann, muß der Zeichensatz immer in der jeweiligen Bank des VIC-II-Chips liegen. Im Standardmodus greift der VIC auf Bank O zu ($0000 bis $3FFF). Das System ist so entwickelt, daß VIC-II davon ausgeht, daß sich der Zeichensatz im »zugriffsberechtigten« Speicherbereich befindet. Arbeitet der VIC-II in Bank 0, nimmt er an, der Zeichensatz befindet sich ab $1000, obwohl dieser in Wirklichkeitin $DOO00 liegt. Der Speicherbereich $1000 bis $1FFF ist aber trotzdem für den Anwender als RAM-Bereich vorhanden. Gleiches gilt für die drei anderen möglichen Banks des VIC-Il:</p>
 
-        <p>Bank VIC-II-Chip ROM-IMAGE</p>
-
-        <p>[6) $0000-$3FFF $1000-$1FFF</p>
-
-        <p>1 $4000-$7FFF $5000-$5FFF</p>
-
-        <p>2 $8000-$BFFF $9000-$9FFF</p>
-
-        <p>3 $C000-$FFFF $DO00-$DFFF</p>
+        <table class="plain">
+            <tr>
+                <th>Bank</th>
+                <th>VIC-II-Chip</th>
+                <th>ROM-IMAGE</th>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>$0000-$3FFF</td>
+                <td>$1000-$1FFF</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>$4000-$7FFF</td>
+                <td>$5000-$5FFF</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>$8000-$BFFF</td>
+                <td>$9000-$9FFF</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>$C000-$FFFF</td>
+                <td>$D000-$DFFF</td>
+            </tr>
+        </table>
 
         <p>Wenn man nun Bit 1 und 2 löscht, müßte man theoretisch auf 64 KByte RAM Zugriff haben. Das probieren wir gleich mal aus (vorher eventuelle Programme sichern!):</p>
 

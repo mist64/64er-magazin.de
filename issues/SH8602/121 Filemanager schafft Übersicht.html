@@ -21,32 +21,96 @@
 
         <p>Zum Programm</p>
 
-        <p>Fangen wir mit der Speicheraufteilung an. »Filemanager« belegt den Speicherplatz von $C000 - $CFD9. Die Filenamen werden zwischen einer Variablen (Ugrenze) und $CO0O abgelegt. Außerdem existieren noch drei Zeigerstapel mit den Adressen $CFD2, $DFEC, $EFF6. Diese Zeigerstapel bestehen auf 16-Bit Zeigern, die auf den Anfang der einzelnen Filenamen zeigen. Beim Sortieren werden nur diese Zeigerstapel sortiert. Die Filenamen selber bleiben an ihrer Stelle im Speicher. Ein Filename ist folgendermaßen aufgebaut. 1. Byte:</p>
+        <p>Fangen wir mit der Speicheraufteilung an. »Filemanager« belegt den Speicherplatz von $C000 - $CFD9. Die Filenamen werden zwischen einer Variablen (Ugrenze) und $CO0O abgelegt. Außerdem existieren noch drei Zeigerstapel mit den Adressen $CFD2, $DFEC, $EFF6. Diese Zeigerstapel bestehen auf 16-Bit Zeigern, die auf den Anfang der einzelnen Filenamen zeigen. Beim Sortieren werden nur diese Zeigerstapel sortiert. Die Filenamen selber bleiben an ihrer Stelle im Speicher. Ein Filename ist folgendermaßen aufgebaut.</p>
 
-        <p>Bits 0-3: Länge-1 des eigentlichen Filenamens. Bits 4-5: Übertrag der Blocklänge der Files. Bits 6-7: Filetyp 00 = Prog, 01 = Seq., 10 = Usr, 11 = Rel.</p>
+        <p>1. Byte:</p>
 
-        <ol>
-            <li>Byte:</li>
-        </ol>
+        <table class="plain">
+            <tr>
+                <td>Bits 0-3:</td>
+                <td>Länge-1 des eigentlichen Filenamens.</td>
+            </tr>
+            <tr>
+                <td>Bits 4-5:</td>
+                <td>Übertrag der Blocklänge der Files.</td>
+            </tr>
+            <tr>
+                <td>Bits 6-7:</td>
+                <td>Filetyp 00 = Prog, 01 = Seq., 10 = Usr, 11 = Rel.</td>
+            </tr>
+        </table>
 
+        <p>2. Byte:<br>
+            Blocklänge des Files.</p>
 
-        <p>Blocklänge des Files.</p>
+        <table class="plain">
+            <tr>
+                <td>Bytes 3-4:</td>
+                <td>ID des Files</td>
+            </tr>
+            <tr>
+                <td>Byte 5:</td>
+                <td>Länge gesamtes File-Element: Name des Files.</td>
+            </tr>
+        </table>
 
-        <p>Bytes 3-4: ID des Files</p>
+        <p>Belegte Speicherbereiche:</p>
 
-        <p>Byte 5: Länge gesamtes File-Element: Name des Files. Belegte Speicherbereiche:</p>
-
-        <p>($CFC7) - $C0O00 = Bereich Speicherplatz für Filenamen</p>
-
-        <p>$C000 - $CESF = Maschinenprogramm $CE8SF - $CFDB = Bereich Datentabellen und Variablen $CFDC -($CFD3) = Bereich Zeigerstapel für Blook $CFE6 -($CFD5) = Bereich Zeigerstapel für Ilook $CFFO -($CFD7) = Bereich Zeigerstapel für Alook</p>
+        <table class="plain">
+            <tr>
+                <td>($CFC7) - $C000</td>
+                <td>=</td>
+                <td>Bereich Speicherplatz für Filenamen</td>
+            </tr>
+            <tr>
+                <td>$C000 - $CE8F</td>
+                <td>=</td>
+                <td>Maschinenprogramm</td>
+            </tr>
+            <tr>
+                <td>$CE8F - $CFDB</td>
+                <td>=</td>
+                <td>Bereich Datentabellen und Variablen</td>
+            </tr>
+            <tr>
+                <td>$CFDC -($CFD3)</td>
+                <td>=</td>
+                <td>Bereich Zeigerstapel für Blook</td>
+            </tr>
+            <tr>
+                <td>$CFE6 -($CFD5)</td>
+                <td>=</td>
+                <td>Bereich Zeigerstapel für Ilook</td>
+            </tr>
+            <tr>
+                <td>$CFF0 -($CFD7)</td>
+                <td>=</td>
+                <td>Bereich Zeigerstapel für Alook</td>
+            </tr>
+        </table>
 
         <p>Die Liste, die auf Diskette abgespeichert wird, hat folgendes Format:</p>
 
-        <p>Am Anfang stehen die Anzahl Byte, die für die gesamten Filenamen ohne Zeiger benötigt werden, danach kommt die Anzahl der Filenamen selber. Nach diesen 4 Byte folgt dieses periodische Format I-mal: 2 Byte: l.ter Zeiger aus obersten Zeigerstapel-Ugrenze.</p>
+        <p>Am Anfang stehen die Anzahl Byte, die für die gesamten Filenamen ohne Zeiger benötigt werden, danach kommt die Anzahl der Filenamen selber. Nach diesen 4 Byte folgt dieses periodische Format I-mal:</p>
 
-        <p>2 Byte: I.ter Zeiger aus mittleren Zeigerstapel-Ugrenze.</p>
-
-        <p>2 Byte: l.ter Zeiger aus unteren Zeigerstapel-Ugrenze. 5-20 Byte: I.ter Filename der ungeordneten Liste.</p>
+        <table class="plain">
+            <tr>
+                <td>2 Byte:</td>
+                <td>I.ter Zeiger aus obersten Zeigerstapel-Ugrenze.</td>
+            </tr>
+            <tr>
+                <td>2 Byte:</td>
+                <td>I.ter Zeiger aus mittleren Zeigerstapel-Ugrenze.</td>
+            </tr>
+            <tr>
+                <td>2 Byte:</td>
+                <td>I.ter Zeiger aus unteren Zeigerstapel-Ugrenze.</td>
+            </tr>
+            <tr>
+                <td>5-20 Byte:</td>
+                <td>I.ter Filename der ungeordneten Liste.</td>
+            </tr>
+        </table>
 
         <p>Beim Laden wird eine noch im Speicher befindliche Liste nicht gelöscht, das heißt: es wird immer dazugeladen (Merge). Da auch die Zeiger mit gespeichert werden, ist eine Programmliste, die vor dem Speichern geordnet war, auch sofortnach dem Laden nach Blocklänge, alphabetischer Reihenfolge sowie nach der ID sortiert. Befehle von »Filemanager«:</p>
 
@@ -214,13 +278,11 @@
 
         <p>Filetyp als Kriterium, sonst wie »Acompare«. TOKENNEU $C115 - $C1D8</p>
 
-        <p>NE!</p>
-
         <p>Einbindung der neuen Token.</p>
 
-        <p>TRANSFER $C2ED - $C345 und $C366 - $C3AE elemente</p>
+        <p>TRANSFER $C2ED - $C345 und $C366 - $C3AE</p>
 
-        <p>Akku3 = $CED8 - $CEEC -Speicher für Obergrenzwert beim Listen Der Bereich Zeiger2 bis Zeiger4 wird um Index Byte verschoben. Dabei wird Index als vorzeichenbehaftete Zahl benutzt.</p>
+        <p>Der Bereich Zeiger2 bis Zeiger4 wird um Index Byte verschoben. Dabei wird Index als vorzeichenbehaftete Zahl benutzt.</p>
 
         <p>DECTXTPT $C6A8 - $C6B0</p>
 
@@ -248,21 +310,17 @@
 
         <p>Holt Blocklänge vom Bildschirm nach Akku1.</p>
 
-        <p>Counter $CFD1 enthält Anzahl Namen in Liste Bpointer $CFD3 zeigt auf Ende Zeigerstapel für Blook Ipointer $CFD5 zeigt auf Ende Zeigerstapel für IIook Apointer $CFD7 zeigt auf Ende Zeigerstapel für Alook Spointer $CFD9 zeigt auf Ende benutzter Bereich für INID $C7EF - $C814</p>
+        <p>INID $C7EF - $C814</p>
 
         <p>Holt ID vom Bildschirm nach Akku1.</p>
 
         <p>ORDER $C844 - $C90C</p>
 
-        <p>Sortiert aufsteigend den Zeigerstapel, auf den X/Y zeigt, nach den Kriterien, die in A stehen (Bitmaske). Ogrenz</p>
+        <p>Sortiert aufsteigend den Zeigerstapel, auf den X/Y zeigt, nach den Kriterien, die in A stehen (Bitmaske).</p>
 
         <p>Z1Z3Z2Z4 $C90C - $C91D</p>
 
-        <p>Kopiert Zeiger! nach Zeiger3 und Zeiger2 nach | Nammax</p>
-
-        <p>= $C000 Obergrenze für Speicherplatz Filenamen.</p>
-
-        <p>= 2053 maximale Anzahl Namen in Liste Zeiger4.</p>
+        <p>Kopiert Zeiger! nach Zeiger3 und Zeiger2 nach Zeiger4.</p>
 
         <p>CHKSTRDA $CB52 - $CB75</p>
 
@@ -272,19 +330,21 @@
 
         <p>CORPTRSUB $CB9B - $CC5B</p>
 
-        <p>Korrigiert alle Zeiger des Zeigerstapels, auf den X/Y zeigt, um den Wert Index, falls der betreffende Zeiger größer als Zeiger3 ist. Falls der betreffende Zeiger = Zeiger3 ist, dann wird dieser aus dem Stapel entfernt. NewizB</p>
+        <p>Korrigiert alle Zeiger des Zeigerstapels, auf den X/Y zeigt, um den Wert Index, falls der betreffende Zeiger größer als Zeiger3 ist. Falls der betreffende Zeiger = Zeiger3 ist, dann wird dieser aus dem Stapel entfernt.</p>
 
-        <p>CORPTRDE $CCSB - $CC64 Newtable Decrementiert Zeiger für »Corptrsub«.</p>
+        <p>CORPTRDE $CCSB - $CC64</p>
 
-        <p>CORPTRIM $CC64 - $CC7O Adrtable Incrementiert Zeiger für »Corptrsub«. Falls Ende | Filetyp erreicht, dann C=0.</p>
+        <p>Decrementiert Zeiger für »Corptrsub«.</p>
 
-        <p>CORPTRUE $CC67 - $CC70 nu Altwerte Vermindert den Wert für den zu korrigierenden Zeigerstapel um eine Page. Vecaltta erg - $CF99 Schlüsselworttabelle für</p>
+        <p>CORPTRIM $CC64 - $CC7O</p>
 
-        <p>$CF47 - $CF99 Schlüsselworttabelle für neue Token</p>
+        <p>Incrementiert Zeiger für »Corptrsub«. Falls Ende erreicht, dann C=0.</p>
 
-        <p>$CF99 - $CFBB Adressen-1 der Befehle $CFBB - $CFBF Anfangsbuchstaben der Filetypen</p>
+        <p>CORPTRUE $CC67 - $CC70</p>
 
-        <p>$CFBF - $CFCY Anfangswerte für Counter, Bpointer, Ipointer, Apointer und Spointer _$EBB4 Normale Adressen für Klartext in Token CORPTR $CCFB - $CD10</p>
+        <p>Vermindert den Wert für den zu korrigierenden Zeigerstapel um eine Page.</p>
+
+        <p>CORPTR $CCFB - $CD10</p>
 
         <p>Korrigiert alle Zeigerstapel. »Corptrsub«.</p>
 
@@ -292,47 +352,218 @@
 
         <p>Holt gesamtes Element vom Bildschirm und setzt entsprechend der verwendeten Joker Bitmaske.</p>
 
-        <p>Bitmaske $C34C - Bedeutung siehe »Compare«</p>
+        <h2>Variable</h2>
+        <table class="plain">
+            <tr>
+                <td>Zeiger 1</td>
+                <td>=</td>
+                <td>$61</td>
+            </tr>
+            <tr>
+                <td>Zeiger 2</td>
+                <td>=</td>
+                <td>$63</td>
+            </tr>
+            <tr>
+                <td>Zeiger 3</td>
+                <td>=</td>
+                <td>$65</td>
+            </tr>
+            <tr>
+                <td>Zeiger 4</td>
+                <td>=</td>
+                <td>$FC</td>
+            </tr>
+        </table>
 
-        <p>Namlong! $C34D - siehe Getlong!</p>
+        <table class="plain">
+            <tr>
+                <td>Bitmaske</td>
+                <td>$C34C</td>
+                <td>- Bedeutung siehe »Compare«</td>
+            </tr>
+            <tr>
+                <td>Namlong1</td>
+                <td>$C34D</td>
+                <td>- siehe Getlong1</td>
+            </tr>
+            <tr>
+                <td>Namlong2</td>
+                <td>$C34E</td>
+                <td>- siehe Getlong2</td>
+            </tr>
+            <tr>
+                <td>Kursor</td>
+                <td>$C34F</td>
+                <td>- siehe Tab.</td>
+            </tr>
+        </table>
 
-        <p>Namlong2 $C34E - siehe Getlong2</p>
+        <table class="plain">
+            <tr>
+                <td>Akku2</td>
+                <td>=</td>
+                <td>$CEB0 - $CEC4 -Speicherplatz für Untergrenzwert beim Listen</td>
+            </tr>
+            <tr>
+                <td>Akku1</td>
+                <td>=</td>
+                <td>$CEC4 - $CED8 -Hauptarbeitsspeicher für Fileelemente</td>
+            </tr>
+            <tr>
+                <td>Akku3</td>
+                <td>=</td>
+                <td>$CED8 - $CEEC -Speicher für Obergrenzwert beim Listen</td>
+            </tr>
+        </table>
 
-        <p>Kursor $C34F - siehe Tab.</p>
+        <p>Stackpnt $CE8F -Zwischenspeicher für Stackpointer<br>
+            Speicher $CE90, Speicher2 $CE91, Speicherplatz, um Zwischenwerte abzulegen, die nicht problemlos auf dem Stack zwischengespeichert werden können.</p>
 
-        <p>Akku2 = $CEBO - $CEC4 -Speicherplatz für Untergrenzwert beim Listen</p>
+        <p>Hzeiger $CE9 2 Hilfszeiger für Zwischenwerte</p>
 
-        <p>Akkul = $CEC4 - $CED8 -Hauptarbeitsspeicher für File-Stackpnt $CE8F -Zwischenspeicher für Stackpointer Speicher $CE90, Speicher2 $CE91, Speicherplatz, um Zwischenwerte abzulegen, die nicht problemlos auf dem Stack zwischengespeichert werden können. Hzeiger $CE9 2 Hilfszeiger für Zwischenwerte Index $CE9Y4 wird meist als Zähler verwendet. Stackbot $CE96 dient zur Übergabe der Anfangsadressen der Zeigerstapel an Unterroutinen. Ugrenze $CFC7 enthält Adresse auf Anfang Speicherbereich für Filenamen.</p>
+        <p>Index $CE94 wird meist als Zähler verwendet.</p>
 
-        <h2>Konstante Datentabellen</h2>
+        <p>Stackbot $CE96 dient zur Übergabe der Anfangsadressen der Zeigerstapel an Unterroutinen.</p>
 
-        <p>ZweiPott $CEY8 - $CEAO enthält 255-Zweierpotenzen</p>
+        <p>Ugrenze $CFC7 enthält Adresse auf Anfang Speicherbereich für Filenamen.</p>
 
-        <p>Kurtable $CEAO - $CEA8 Tabulatorstops für Tab</p>
+        <table class="plain">
+            <tr>
+                <td>Counter</td>
+                <td>$CFD1 enthält Anzahl Namen in Liste</td>
+            </tr>
+            <tr>
+                <td>Bpointer</td>
+                <td>$CFD3 zeigt auf Ende Zeigerstapel für Blook</td>
+            </tr>
+            <tr>
+                <td>Ipointer</td>
+                <td>$CFD5 zeigt auf Ende Zeigerstapel für Ilook</td>
+            </tr>
+            <tr>
+                <td>Apointer</td>
+                <td>$CFD7 zeigt auf Ende Zeigerstapel für Alook</td>
+            </tr>
+            <tr>
+                <td>Spointer</td>
+                <td>$CFD9 zeigt auf Ende benutzter Bereich für</td>
+            </tr>
+        </table>
 
-        <p>Comtablo $CEA8 - $CEACLowbytes der Adressen der</p>
+        <h2>Konstante</h2>
+        <table class="plain">
+            <tr>
+                <td>Ogrenz</td>
+                <td>=</td>
+                <td>$C000 Obergrenze für Speicherplatz Filenamen.</td>
+            </tr>
+            <tr>
+                <td>Nammax</td>
+                <td>=</td>
+                <td>2053 maximale Anzahl Namen in Liste</td>
+            </tr>
+        </table>
 
-        <p>Vergleichsroutinen</p>
-
-        <p>Comtabhi $CEAC - $CEBO Highbytes -</p>
-
-        <p>und umgekehrt, Statement ausführen. Vecneuta $CFC9 - $CFD1 Neue Werte für Klartext in Token.... '</p>
+        <h2>Datentabellen</h2>
+        <table class="plain">
+            <tr>
+                <td>ZweiPot</td>
+                <td>$CE98 - $CEA0 enthält 255-Zweierpotenzen</td>
+            </tr>
+            <tr>
+                <td>Kurtable</td>
+                <td>$CEA0 - $CEA8 Tabulatorstops für Tab</td>
+            </tr>
+            <tr>
+                <td>Comtablo</td>
+                <td>$CEA8 - $CEACLowbytes der Adressen der Vergleichsroutinen</td>
+            </tr>
+            <tr>
+                <td>Comtabhi</td>
+                <td>$CEAC - $CEB0 Highbytes -</td>
+            </tr>
+            <tr>
+                <td>Newtab</td>
+                <td>$CEEC - $CF99 Schlüsselworttabelle für Keystr.</td>
+            </tr>
+            <tr>
+                <td>Newtable</td>
+                <td>$CF47 - $CF99 Schlüsselworttabelle für neue Token</td>
+            </tr>
+            <tr>
+                <td>Adrtable</td>
+                <td>$CF99 - $CFBB Adressen-1 der Befehle</td>
+            </tr>
+            <tr>
+                <td>Filetyp</td>
+                <td>$CFBB - $CFBF Anfangsbuchstaben der Filetypen</td>
+            </tr>
+            <tr>
+                <td>Altwerte</td>
+                <td>$CFBF - $CFC9 Anfangswerte für Counter, Bpointer, Ipointer, Apointer und Spointer</td>
+            </tr>
+            <tr>
+                <td>Vecaltta</td>
+                <td>$EBB4 Normale Adressen für Klartext in Token und umgekehrt, Statement ausführen.</td>
+            </tr>
+            <tr>
+                <td>Vecneuta</td>
+                <td>$CFC9 - $CFD1 Neue Werte für Klartext in Token....</td>
+            </tr>
+        </table>
 
         <h2>Anfangsadressen der Befehle</h2>
-
-        <p>Variable</p>
-
-        <p>@ $C66A Quit Kill $C3BB</p>
-
-        <p>Omerge $C5E1 Alook $C74B Blook $C7EO</p>
-
-        <p>Zeiger 1 = $61 llook $C814 Sort Put $CYAE</p>
-
-        <p>Zeiger 2 = $63 Merge $CA47 Slook $CB75 Membot $CC70</p>
-
-        <p>Zeiger 3 = $65 Write $CD6D Scratch $CD95 Merge $CE4E</p>
-
-        <p>Zeiger 4 = $FC Help $CE6A Mem Disk $CAED</p>
+        <table class="plain">
+            <tr>
+                <td>@</td>
+                <td>$C66A</td>
+                <td>Quit</td>
+                <td>$C3AE</td>
+                <td>Kill</td>
+                <td>$C3BB</td>
+            </tr>
+            <tr>
+                <td>Omerge</td>
+                <td>$C5E1</td>
+                <td>Alook</td>
+                <td>$C74B</td>
+                <td>Blook</td>
+                <td>$C7E0</td>
+            </tr>
+            <tr>
+                <td>Ilook</td>
+                <td>$C814</td>
+                <td>Sort</td>
+                <td>$C823</td>
+                <td>Put</td>
+                <td>$C9AE</td>
+            </tr>
+            <tr>
+                <td>Merge</td>
+                <td>$CA47</td>
+                <td>Slook</td>
+                <td>$CB75</td>
+                <td>Membot</td>
+                <td>$CC70</td>
+            </tr>
+            <tr>
+                <td>Write</td>
+                <td>$CD6D</td>
+                <td>Scratch</td>
+                <td>$CD95</td>
+                <td>Merge</td>
+                <td>$CE4E</td>
+            </tr>
+            <tr>
+                <td>Help</td>
+                <td>$CE6A</td>
+                <td>Mem</td>
+                <td>$CAF6</td>
+                <td>Disk</td>
+                <td>$CAED</td>
+            </tr>
+        </table>
 
         <figure>
             <pre data-filename="file-manager.prg" data-name="Filemanager" data-mse=mse1></pre>

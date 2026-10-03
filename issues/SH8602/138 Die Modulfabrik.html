@@ -19,13 +19,26 @@
 
         <p>Der Modulgenerator zeichnet sich gegenüber vielen zum Teil mit der Hardware (EPROM-Programmiergerät) mitgelieferten und anderen käuflichen Programmen dieser Art durch seine einfache, menügesteuerte Bedienung aus. Er ermöglicht das komfortable Generieren eines aus bis zu fünf Programmen (Basic oder Maschinensprache) bestehenden Auto-Start-Moduls mit Menüsteuerung. Dieses Modul kann anschließend mit der Treibersoftware des EPROM-Brenners auf ein EPROM übertragen werden.</p>
 
-        <p>Vor der Beschreibung des Modulgenerators selbst sollen zuvor der Aufbau und die Funktionsweise der von ihm generierten Programme erläutert werden. Sie belegen den Bereich von $8000 bis $AO00 und eignen sich somit zum Brennen auf ein O0, beziehungsweise $AFFF, 8 KByte oder 16 KByte EPROM. Hinter der Modulkennung »CBM 80« für den Autostart befindet sich ein kurzes Steuerprogramm zur Tastaturabfrage, zum Verschieben und Starten der gespeicherten Programme; dahinter sind eine Liste der Programmnamen sowie eine Tabelle mit wichtigen Adressen: Byte 1 und 2: Anfangsadresse des Programms im Modul</p>
+        <p>Vor der Beschreibung des Modulgenerators selbst sollen zuvor der Aufbau und die Funktionsweise der von ihm generierten Programme erläutert werden. Sie belegen den Bereich von $8000 bis $AO00 und eignen sich somit zum Brennen auf ein O0, beziehungsweise $AFFF, 8 KByte oder 16 KByte EPROM. Hinter der Modulkennung »CBM 80« für den Autostart befindet sich ein kurzes Steuerprogramm zur Tastaturabfrage, zum Verschieben und Starten der gespeicherten Programme; dahinter sind eine Liste der Programmnamen sowie eine Tabelle mit wichtigen Adressen:</p>
 
-        <p>Byte 3und 4 Endadresse+1 des Programms im Modul</p>
-
-        <p>Byte 5 und 6: Endadresse+1 des Programms nach dem Verschieben</p>
-
-        <p>Byte 7 und 8: Startadresse des Programms</p>
+        <table class="plain">
+            <tr>
+                <td>Byte 1 und 2:</td>
+                <td>Anfangsadresse des Programms im Modul</td>
+            </tr>
+            <tr>
+                <td>Byte 3 und 4:</td>
+                <td>Endadresse+1 des Programms im Modul</td>
+            </tr>
+            <tr>
+                <td>Byte 5 und 6:</td>
+                <td>Endadresse+1 des Programms nach dem Verschieben</td>
+            </tr>
+            <tr>
+                <td>Byte 7 und 8:</td>
+                <td>Startadresse des Programms</td>
+            </tr>
+        </table>
 
         <p>Zum Verschieben der Programme aus dem EPROM in den eigentlichen Speicherbereich wird die Blockverschiebe-Routine des Basic-Interpreters ($A3BF) benutzt. Hierbei sind die ersten sechs Byte erforderlich.</p>
 
@@ -34,6 +47,68 @@
         <p>Ist es negativ, wird geprüft, ob diese Bytes gleich Null sind. In diesem Fall wird das Programm nicht gestartet, und man bleibt weiterhin im Modul-Menü. Auf diese Weise können mehrteilige Programme verschoben werden, bevor das eigentliche Hauptprogramm gestartet wird (enthaltene Nachlade-Befehle müssen bei diesem Programmteil selbstverständlich vorher entfernt werden). Enthalten die Bytes 7 und 8 weder die Basic-Kennung noch die Null-Kennung, wird das Programm direkt angesprungen, das heißt mit jmp $xxxx gestartet.</p>
 
         <p>Hinter den beschriebenen Tabellen befinden sich die gespeicherten Programme unmittelbar hintereinander. Tabelle 1 zeigt noch einmal schematisch den beschriebenen Aufbau:</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>$8000</td>
+                    <td>Modulkopf »CBM 80« etc.</td>
+                </tr>
+                <tr>
+                    <td>$8009</td>
+                    <td>Modulname</td>
+                </tr>
+                <tr>
+                    <td>$8033</td>
+                    <td>Initialisierung nach Reset</td>
+                </tr>
+                <tr>
+                    <td>$805C</td>
+                    <td>Steuerprogramm mit Verschiebe- und Startroutine</td>
+                </tr>
+                <tr>
+                    <td>$8149</td>
+                    <td>Text des Modul-Menüs (ASCII-Zeichen)</td>
+                </tr>
+                <tr>
+                    <td>$8173</td>
+                    <td>Programmnamen (maximal fünf je 16 Zeichen)</td>
+                </tr>
+                <tr>
+                    <td>$81C3</td>
+                    <td>Tabelle (Adressen)</td>
+                </tr>
+                <tr>
+                    <td>$81EB</td>
+                    <td>Programm 1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>.</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>.</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>.</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Programm n</td>
+                </tr>
+                <tr>
+                    <td>$9FFF</td>
+                    <td>letztes Byte</td>
+                </tr>
+                <tr>
+                    <td>$A000</td>
+                    <td>----------------------</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Aufbau der generierten Modul-Programme</figcaption>
+        </figure>
 
         <p>Durch das notwendige Steuerprogramm stehen dem Anwender bei 8-KByte-Modulen lediglich 30 oder 32 Blöcke für die Programme zur Verfügung, was für die meisten Anwendungen ausreichend ist.</p>
 

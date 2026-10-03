@@ -197,6 +197,63 @@
 
         <p>Die Lösung ist einfach. Der VIC.Il benutzt zur Festlegung der horizontalen Position eines Sprites nämlich nicht nur ein, sondern zwei Register, wobei das zweite allerdings kein vollwertiges Register ist, daes nur die Werte O und 1 aufnehmen kann. Der Wert 1 bedeutet, daß eine horizontale Position gröBer als 255 angesteuert werden soll. In diesem Fall addiert der C 64 den Wert 256 zum aktuellen Wert des ersten Registers. Enthält also zum Beispiel das erste Register den Wert 33 und das zweite Register den Wert 1, so ergibt sich für die anzusteuernde horizontale Position der Wert 298 (265 + 33). Enthält das zweite Register den Wert O, so gilt nur der Wert des ersten Registers. Tabelle 1 zeigt einige Beispiele für horizontale Positionen zwischen O und 511.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>1. Horizontales Register</th>
+                    <th>2. Horizontales Register</th>
+                    <th>Sprite Position</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>24</td>
+                    <td>0</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <td>125</td>
+                    <td>0</td>
+                    <td>125</td>
+                </tr>
+                <tr>
+                    <td>255</td>
+                    <td>0</td>
+                    <td>255</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>256</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>1</td>
+                    <td>276</td>
+                </tr>
+                <tr>
+                    <td>64</td>
+                    <td>1</td>
+                    <td>320</td>
+                </tr>
+                <tr>
+                    <td>88</td>
+                    <td>1</td>
+                    <td>344</td>
+                </tr>
+                <tr>
+                    <td>255</td>
+                    <td>1</td>
+                    <td>511</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Einige Werte der horizontalen Positionsregister für Sprite-Positionen zwischen 0 und 511</figcaption>
+        </figure>
+
+
         <h2>Horizontale Bewegungen</h2>
 
         <p>Laden Sie bitte das Programm »Ein einfaches Sprite« (Listing 1), und fügen Sie die Zeilen aus Listing 3 hinzu. Speichern und starten Sie dann das neue Programm.</p>
@@ -426,6 +483,35 @@
 
         <p>In Kapitel 1 haben Sie gelernt, daß Adresse 2040 dazu dient, dem Rechner mitzuteilen, an welcher Speicherstelle sich die Pixelcodes für Sprite O befinden. Die entsprechenden Zeiger für die Sprites 1-7 stehen in den Adressen 2041 bis 2047 (Tabelle 2).</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Adresse</th>
+                    <td>2040</td>
+                    <td>2041</td>
+                    <td>2042</td>
+                    <td>2043</td>
+                    <td>2044</td>
+                    <td>2045</td>
+                    <td>2046</td>
+                    <td>2047</td>
+                </tr>
+                <tr>
+                    <th>Zeigt auf Pixel-Daten für Sprite-Nummer</th>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Die Speicherzellen der Sprite-Datenzeiger</figcaption>
+        </figure>
+
+
         <p>Betrachten wir die wichtigen Abschnitte des Programms (Listing 8) einmal genauer. Die Zeilen 1000-1310 kommen Ihnen sicherlich bekannt vor. Die Rückmeldung des Programms wird ausgegeben, die Bildpunktdaten werden in die Speicherzellen 896-958 gelesen, der Bildschirm wird gelöscht, und die Variable VIC erhält die Anfangsadresse des VIC.II-Bausteins.</p>
 
         <p>Der erste Unterschied zum alten Programm liegt in den Zeilen 1330 bis 1360:</p>
@@ -484,6 +570,35 @@
 
         <p>Die beiden binären Zeichen O und 1 heißen »Bits«. Eine Gruppe von acht Bits bezeichnet man als ein »Byte«. Jede der Speicherzellen des C 64, auch die Register, können jeweils ein Byte aufnehmen. Die Bilder 12 und 13 zeigen die Darstellung einiger Bytes. Mit 8 Bitlassen sich die Zahlen von O bis 255 darstellen. N</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Zahl</th>
+                    <td>255</td>
+                    <td>240</td>
+                    <td>128</td>
+                    <td>127</td>
+                    <td>60</td>
+                    <td>15</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <th>Byte-Schreibweise</th>
+                    <td>11111111</td>
+                    <td>11110000</td>
+                    <td>10000000</td>
+                    <td>01111111</td>
+                    <td>00111100</td>
+                    <td>00001111</td>
+                    <td>00000001</td>
+                    <td>00000000</td>
+                </tr>
+            </table>
+            <figcaption>Bild 13. In einem Byte können die Dezimalwerte (Basis 10) von 0 bis 255 in binärer Form (8 Bit) dargestellt werden</figcaption>
+        </figure>
+
+
         <p>10101100</p>
 
         <p>} f Bild 12. Ein Byte Das ist ein Bit besteht aus 8 Bit</p>
@@ -498,7 +613,276 @@
 
         <p>Bild 14 zeigt ein Byte mit den numerierten Bits, ihren Codes sowie den beiden möglichen Bitwerten. Um den richtigen Zahlenwert zur Steuerung der Sprites zu erhalten, tragen Sie zunächst für jedes Sprite, das sichtbar werden soll, eine 1 an der entsprechenden Bitposition ein und für jedes Byte, das unsichtbar bleiben soll, eine O. Die Addition der Codes aller Bits, deren Wert 1 ist, ergibt dann die gesuchte Zahl, deren binäre Darstellung die Reihe der eingetragenen O/1-Werte ist.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit-Code</th>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <th>Ein beliebiges Byte</th>
+                    <td>1 or 0</td>
+                    <td>1 or 0</td>
+                    <td>1 or 0</td>
+                    <td>1 or 0</td>
+                    <td>1 or 0</td>
+                    <td>1 or 0</td>
+                    <td>1 or 0</td>
+                    <td>1 or 0</td>
+                </tr>
+                <tr>
+                    <th>Bit-Nummer</th>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+            </table>
+            <figcaption>Bild 14. Ein Byte mit seinen numerierten 8 Bit, den Bit-Codes und den möglichen Bitwerten</figcaption>
+        </figure>
+
+
         <p>Einige Beispiele dazu finden Sie in Bild 15. Die Tabelle enthält auch den im Programm »Einfache Kopien« benutzten Wert. Es sollen dort die Sprites O-3 sichtbar gemacht werden. Dazu müssen Sie die Bits O bis 3 auf 1 setzen. Die Addition der entsprechenden Bitcodes ergibt (8 +4 +2 +1) = 15. Damit ist das Geheimnis der Zahl 15 in Zeile 1530 gelüftet.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Sichtbare Sprites</th>
+                    <th>Unsichtbare Sprites</th>
+                    <th colspan="9">Registerbyte<br>(Jedes Bit steuert das Sprite mit der gleichen Nummer)</th>
+                    <th>Wert für den POKE-Befehl</th>
+                </tr>
+                <tr>
+                    <td rowspan="3">–</td>
+                    <td rowspan="3">0–7</td>
+                    <td>Bit-Code</td>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td rowspan="3">0</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Bit-Nummer</td>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">0</td>
+                    <td rowspan="3">1–7</td>
+                    <td>Bc</td>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td rowspan="3">1=<br>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Bn</td>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">0,1</td>
+                    <td rowspan="3">2–7</td>
+                    <td>Bc</td>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td rowspan="3">1+2=<br>3</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Bn</td>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">0–3</td>
+                    <td rowspan="3">4–7</td>
+                    <td>Bc</td>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td rowspan="3">1+2+4+8=<br>15</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Bn</td>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">0,2,4,6</td>
+                    <td rowspan="3">1,3,5,7</td>
+                    <td>Bc</td>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td rowspan="3">1+4+16+64=<br>85</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Bn</td>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td rowspan="3">0-7</td>
+                    <td rowspan="3">–</td>
+                    <td>Bc</td>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td rowspan="3">1+2+4+8+16+32+64+128=<br>255</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Bn</td>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+            </table>
+            <figcaption>Bild 15. Beispiel zur Steuerung der Sprites</figcaption>
+        </figure>
+
 
         <p>Die restlichen Zeilen des Programms »Einfache Kopien« sind Ihnen bereits bekannt. In den Zeilen 1580-1590 wartet der Rechner auf einen Tastendruck. Sobald eine Taste betätigt wird, setzt Zeile 1640 die Sprite-Register zurück. Dabei zeigtsich eine kleine Besonderheit: nichtjedes Register muß zurückgesetzt werden.</p>
 
@@ -510,7 +894,108 @@
 
         <p>Wie Sie aus Kapitel 1 wissen, steuert das Register VIC+29 die Verbreiterung der Sprites. Jedem Bit des Registers ist ein Sprite zugeordnet. Um zum Beispiel die Sprites 2 und 3 zu verbreitern, müssen Sie Bit 2 und 3 des Registers auf 1 setzen. Mit Hilfe-von Bild 14 finden Sie für die in das ' Register einzugebende Zahl den Wert (8 + 4) = 12. Dieser Wert ist in Tabelle 3 dargestellt.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit-Code</th>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <th>Bit-Nummer</th>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>8 +</td>
+                    <td>4</td>
+                    <td colspan="2">= 12</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Die Eingabe des Wertes 12 in das horizontale Vergrößerungsregister setzt Bit 2 und 3 auf 1 und bewirkt die horizontale Vergrößerung der Sprites 2 und 3</figcaption>
+        </figure>
+
+
         <p>Das Register VIC+ 23 steuert in gleicher Weise die Verlängerung von Sprites. Um beispielsweise Sprite 1 und 3zu verlängern, müssen Sie Bit 1 und 3 auf 1 setzen. Der entsprechende Zahlenwert für das Register ist (8 + 2) = 10. Er ist in Tabelle 4 dargestellt.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bit-Code</th>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <th>Bit</th>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <th>Bit-Nummer</th>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>8 +</td>
+                    <td></td>
+                    <td>2</td>
+                    <td>= 10</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. Die Eingabe des Wertes 10 in das vertikale Vergrößerungsregister setzt Bit 1 und 3 auf 1 und bewirkt die vertikale Vergrößerung der Sprites 1 und 3</figcaption>
+        </figure>
+
 
         <p>Sie besitzen nun das nötige Rüstzeug, um das Programm »Einfache Kopien« zu modifizieren. Laden Sie es und fügen ‚Sie die Zeilen aus Listing 9 hinzu. Damit erhalten Sie das Programm »Modifizierte Kopien«. Speichern und starten Sie das neue Programm.</p>
 
@@ -532,6 +1017,35 @@
         <p>Wenn Sie nur drei oder weniger Sprites darstellen wollen, stehen folgende Speicherbereiche zur Verfügung: 832-894, 896-958, 960-1022. Dieser gesamte Bereich ist der Puffer für den Kassettenrekorder und wird während des Programmlaufes nicht benutzt. Falls Sie den Kassettenpuffer benutzen, müssen die Datenzeiger der entsprechenden Sprites (2040-2047) die Anfangsadresse des jeweiligen Datenblocks, geteilt durch 64, enthalten.., Für den Kassettenpuffer sind dies die Werte 13, 14 und 15.</p>
 
         <p>Für die Daten von mehr als drei Sprites empfiehlt sich der Speicherbereich ab Adresse 12288. Tabelle 5 zeigt die jeweiligen Anfangsadressen pro Block sowie die zugehörigen Werte für die Datenzeiger. Dem fortgeschrittenen Systemprogrammierer des C 64 stehen zwar noch weitere Speicherbereiche zur Verfügung, deren Manipulation ist jedoch nicht Thema dieses Buches.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>63-Byte Speicherbereich</th>
+                    <td>12288 — 12350</td>
+                    <td>12352 — 12414</td>
+                    <td>12416 — 12478</td>
+                    <td>12480 — 12542</td>
+                    <td>12544 — 12606</td>
+                    <td>12608 — 12670</td>
+                    <td>12672 — 12734</td>
+                    <td>12736 — 12798</td>
+                </tr>
+                <tr>
+                    <th>Datenzeiger auf</th>
+                    <td>192</td>
+                    <td>193</td>
+                    <td>194</td>
+                    <td>195</td>
+                    <td>196</td>
+                    <td>197</td>
+                    <td>198</td>
+                    <td>199</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 5. Die für die Speicherung von SpriteDaten geeigneten Bereiche und die entsprechenden Werte der Datenzeiger</figcaption>
+        </figure>
+
 
         <h2>Zwei unterschiedliche Sprites</h2>
 
@@ -766,6 +1280,38 @@ Wenn ja, endet das Programm mit der Rücksetzung der
         <h2>Der Mehrfarbenmodus</h2>
 
         <p>Welche Farben stehen für mehrfarbige Sprites zur Verfügung? Das Bitpaar O0 definiert die Farbe des Bildschirmes, die ja bekanntlich im Register VIC+33 (53281) codiert ist. Das Bitpaar 01 bedeutet, daß der Farbcode aus dem Mehrfarbenregister O mit der Adresse VIC+37 gelesen wird. Ein Bitpaar 10 veranlaßt den C64, das normale Farbregister des Sprites zu benutzen. Wie Sie sich erinnern, besitzt jedes Sprite sein eigenes Farbregister im Bereich VIC+39 bis VIC + 46. Das Bitpaar 11 schließlich verweist auf den Farbcode im Mehrfarbregister 1 mit der Adresse VIC + 38. Alle Zuordnungen sind in Tabelle 6 noch einmal zusammengefaßt.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bitpaar</th>
+                    <th>Beschreibung</th>
+                    <th>Adresse</th>
+                </tr>
+                <tr>
+                    <td>0 0</td>
+                    <td>Bildschirmfarbe</td>
+                    <td>VC+33 (53281)</td>
+                </tr>
+                <tr>
+                    <td>0 1</td>
+                    <td>Sprite- Mehrfarbenregister 0</td>
+                    <td>VC+37 (53285</td>
+                </tr>
+                <tr>
+                    <td>1 0</td>
+                    <td>Sprite-Farbregister</td>
+                    <td>eines der Register VC+39 - VC+46 (53287 - 53294)</td>
+                </tr>
+                <tr>
+                    <td>1 1</td>
+                    <td>Sprite- Mehrfarbenregister 1</td>
+                    <td>VC+38 (53286)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 6. Das einem Doppelbildpunkt zugeordnete Bitpaar bestimmt das Farbcode-Register</figcaption>
+        </figure>
+
 
         <p>Auf welche Weise wird dem C64 nun mitgeteilt, daß er ein bestimmtes Sprite mehrfarbig darstellen soll? Das Steuerregister dafür ist VIC+28. Wie üblich, ist jedem Bit ein Sprite zugeordnet, Bit O steuert Sprite 1, und so weiter. Ist ein Bit dieses Registers auf 1 gesetzt, so wird das entsprechende Sprite mehrfarbig dargestellt. Ein Rücksetzen des Bits bewirkt wieder die normale Darstellung des Sprites.</p>
 

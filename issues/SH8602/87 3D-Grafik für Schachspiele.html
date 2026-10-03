@@ -43,21 +43,56 @@
 
         <p>Dieser Befehl setzt die Figur mit dem Code FIG auf das Feld mit der Nummer FELD. Die Figurencodes:</p>
 
-        <p>Farbe 1 Farbe 2 Bedeutung</p>
-
-        <p>[6) oder 128 ;Leeres Feld</p>
-
-        <p>1 oder 129 :Bauer</p>
-
-        <p>2 oder 130 :Pferd</p>
-
-        <p>3 oder 131 Läufer</p>
-
-        <p>4 oder 132 Turm</p>
-
-        <p>5 oder 133 :Dame</p>
-
-        <p>6 oder 134 König</p>
+        <table>
+            <tr>
+                <th>Farbe 1</th>
+                <th></th>
+                <th>Farbe 2</th>
+                <th>Bedeutung</th>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>oder</td>
+                <td>128</td>
+                <td>:Leeres Feld</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>oder</td>
+                <td>129</td>
+                <td>:Bauer</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>oder</td>
+                <td>130</td>
+                <td>:Pferd</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>oder</td>
+                <td>131</td>
+                <td>:Läufer</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>oder</td>
+                <td>132</td>
+                <td>:Turm</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>oder</td>
+                <td>133</td>
+                <td>:Dame</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>oder</td>
+                <td>134</td>
+                <td>:König</td>
+            </tr>
+        </table>
 
         <p>Alle weiteren Codes sind nicht erlaubt. Die Felder sind von 0 bis 63 durchnumeriert. Dabei liegt Feld O links oben. SYS 50018,FELD</p>
 
@@ -85,29 +120,112 @@
 
         <p>Bei allen Befehlen können alle zu übergebenden Werte in beliebigen Formen, zum Beispiel als Variablen, Formeln oder ähnliches auftauchen.</p>
 
-        <p>Leider schreibt bei einem RUN/STOP-RESTORE eine ROM-Routine (bei $FD15) 32 Bytes in die Bitmap, die man aber mit SYS 50033," ",23,14 löschen kann. Trotzdem sollte man RUN/STOP-RESTORE vermeiden oder sogar softwaremäßig unterbinden. Liste aller Datensätze und Routinen</p>
+        <p>Leider schreibt bei einem RUN/STOP-RESTORE eine ROM-Routine (bei $FD15) 32 Bytes in die Bitmap, die man aber mit SYS 50033," ",23,14 löschen kann. Trotzdem sollte man RUN/STOP-RESTORE vermeiden oder sogar softwaremäßig unterbinden.</p>
 
-        <p>$C000-$C29F AND- und OR-Masken (je 48 Bytes) von Unterteil, Bauer, Pferd, Läufer, Turm, Dame und König. 3*4-Grafikausschnitt Brett (als Hintergrund).</p>
+        <h3>Liste aller Datensätze und Routinen</h3>
 
-        <p>2 quadratische Grafikausschnitte, die in einer Routine benötigt werden. 'Speicher des Feldes Sprungtabelle zu den Hauptroutinen. Die Hauptroutinen aller Befehle, Beginn der einzelnen Routinen siehe Sprungtabelle.</p>
-
-        <p>Zeichnet Text in Bitmap. Leicht korrigiert übernommen von Heimo Ponnath, 64er, 8/85.</p>
-
-        <p>4 Routinen, die prüfen, ob ein Feld am Rand des Brettes liegt. Hier werden alle Teile des Brettes, die in keinem 3*4-Feldausschnitt enthalten sind, gezeichnet.</p>
-
-        <p>überträgt 3* 4-Brettausschnitt (der Feldnummer entsprechend modifiziert) in den Puffer. s Rotiert einmal das gesamte Feld. Errechnet Adresse eines Grafikausschnittes in der Bitmap abhängig von der Feldnummer. Überträgt Pufferinhalt in die Bitmap. Überträgt Figur eines Feldes in den Puffer.</p>
-
-        <p>Überträgt unteren rechten Ausschnitt der Figur, die im Grafikausschnitt oben links auftaucht, in den Puffer.</p>
-
-        <p>Überträgt unteren linken Ausschnitt der Figur, die im Grafikausschnitt oben rechts auftaucht, in den Puffer. Überträgt oberen rechten Ausschnitt der Figur, die im Grafikausschnitt unten links auftaucht, in den Puffer.</p>
-
-        <p>Überträgt oberen linken Ausschnitt der Figur, die im Grafikausschnitt unten rechts auftaucht, in den Puffer. Rotiert eine im X-Register stehende Feldnummer ein- oder mehrmals gegen den Uhrzeigersinn.</p>
-
-        <p>Verknüpft zwei Bytes aus zwei AND- bzw. OR-Masken mit dem Pufferinhalt. Adressen der Unterteilmasken. Ermittelt Adressen der Masken beliebi- ger Figuren und schreibt sie in zwei Zeiger. $C9Y4A-$C95C Rotiert eine im X-Register stehende Feldnummer einmal gegen den Uhrzeigersinn.</p>
-
-        <p>$C95D-$C9Y5E Zwei Flags.</p>
-
-        <p>$CIY5F-$CYBE Puffer.</p>
+        <table class="plain">
+            <tr>
+                <td>$C000–$C29F</td>
+                <td>AND- und OR-Masken (je 48 Bytes) von Unterteil, Bauer, Pferd, Läufer, Turm, Dame und König.</td>
+            </tr>
+            <tr>
+                <td>$C2A0–$C2FF</td>
+                <td>3*4-Grafikausschnitt Brett (als Hintergrund).</td>
+            </tr>
+            <tr>
+                <td>$C300–$C30F</td>
+                <td>2 quadratische Grafikausschnitte, die in einer Routine benötigt werden.</td>
+            </tr>
+            <tr>
+                <td>$C310–$C34F</td>
+                <td>Speicher des Feldes</td>
+            </tr>
+            <tr>
+                <td>$C350–$C373</td>
+                <td>Sprungtabelle zu den Hauptroutinen.</td>
+            </tr>
+            <tr>
+                <td>$C374–$C4FE</td>
+                <td>Die Hauptroutinen aller Befehle, Beginn der einzelnen Routinen siehe Sprungtabelle.</td>
+            </tr>
+            <tr>
+                <td>$C4FF–$C607</td>
+                <td>Zeichnet Text in Bitmap. Leicht korrigiert übernommen von Heimo Ponnath, 64'er, 8/85.</td>
+            </tr>
+            <tr>
+                <td>$C608–$C62C</td>
+                <td>4 Routinen, die prüfen, ob ein Feld am Rand des Brettes liegt.</td>
+            </tr>
+            <tr>
+                <td>$C62D–$C696</td>
+                <td>Hier werden alle Teile des Brettes, die in keinem 3*4-Feldausschnitt enthalten sind, gezeichnet.</td>
+            </tr>
+            <tr>
+                <td>$C697–$C752</td>
+                <td>überträgt 3*4-Brettausschnitt (der Feldnummer entsprechend modifiziert) in den Puffer.</td>
+            </tr>
+            <tr>
+                <td>$C753–$C76E</td>
+                <td>Rotiert einmal das gesamte Feld.</td>
+            </tr>
+            <tr>
+                <td>$C76F–$C7B1</td>
+                <td>Errechnet Adresse eines Grafikausschnittes in der Bitmap abhängig von der Feldnummer.</td>
+            </tr>
+            <tr>
+                <td>$C7B2–$C7E2</td>
+                <td>Überträgt Pufferinhalt in die Bitmap.</td>
+            </tr>
+            <tr>
+                <td>$C7E3–$C80F</td>
+                <td>Überträgt Figur eines Feldes in den Puffer.</td>
+            </tr>
+            <tr>
+                <td>$C810–$C847</td>
+                <td>Überträgt unteren rechten Ausschnitt der Figur, die im Grafikausschnitt oben links auftaucht, in den Puffer.</td>
+            </tr>
+            <tr>
+                <td>$C848–$C87A</td>
+                <td>Überträgt unteren linken Ausschnitt der Figur, die im Grafikausschnitt oben rechts auftaucht, in den Puffer.</td>
+            </tr>
+            <tr>
+                <td>$C87B–$C8AD</td>
+                <td>Überträgt oberen rechten Ausschnitt der Figur, die im Grafikausschnitt unten links auftaucht, in den Puffer.</td>
+            </tr>
+            <tr>
+                <td>$C8AE–$C8E5</td>
+                <td>Überträgt oberen linken Ausschnitt der Figur, die im Grafikausschnitt unten rechts auftaucht, in den Puffer.</td>
+            </tr>
+            <tr>
+                <td>$C8E6–$C8F9</td>
+                <td>Rotiert eine im X-Register stehende Feldnummer ein- oder mehrmals gegen den Uhrzeigersinn.</td>
+            </tr>
+            <tr>
+                <td>$C8FA–$C914</td>
+                <td>Verknüpft zwei Bytes aus zwei AND- bzw. OR-Masken mit dem Pufferinhalt.</td>
+            </tr>
+            <tr>
+                <td>$C915–$C923</td>
+                <td>Adressen der Unterteilmasken.</td>
+            </tr>
+            <tr>
+                <td>$C924–$C949</td>
+                <td>Ermittelt Adressen der Masken beliebiger Figuren und schreibt sie in zwei Zeiger.</td>
+            </tr>
+            <tr>
+                <td>$C94A–$C95C</td>
+                <td>Rotiert eine im X-Register stehende Feldnummer einmal gegen den Uhrzeigersinn.</td>
+            </tr>
+            <tr>
+                <td>$C95D–$C95E</td>
+                <td>Zwei Flags.</td>
+            </tr>
+            <tr>
+                <td>$C95F–$C9BE</td>
+                <td>Puffer.</td>
+            </tr>
+        </table>
 
         <p>Auf der Leserservice-Diskette finden Sie zusätzlich ein Demonstrationsprogramm, das Ihnen alle Möglichkeiten von »Schachgrafik« aufzeigt.</p>
 
