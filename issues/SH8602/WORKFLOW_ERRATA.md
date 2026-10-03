@@ -268,3 +268,15 @@ editorial slug should always be `editorial`" — Sonderhefte use `vorwort`
 (SH8503–07, SH8601); `checksummer`, `mse`, `impressum` are not listed as
 recurring. Check 3 pipes into `head -5` (r000 forbids). Found by the 140
 sub-agent.
+
+## 150 — r000's "every unplaced figure is a TODO" has no producer
+
+r000 Gate 1: "every unplaced figure is a `TODO` by design". r150 never inserts
+one before images exist, and no other rule does (r130's `<pre>TODO</pre>` is
+listings only). r000 counts "r150 (6)" figure-dependent checks; r150 has 5.
+Naming is unstated for tables (`-tN` is corpus practice), unnumbered tables,
+unnumbered captioned images, uncaptioned non-lead images, and a non-lead
+figure of the SECOND article on a shared page. "Always delegate scan reads to
+sub-sub-agents" sits beside the pause-2 need to survey every page.
+`r150_figure_captions.py` only sees caption blocks starting Bild/Tabelle/
+Listing. Found by the 150 sub-agent.
