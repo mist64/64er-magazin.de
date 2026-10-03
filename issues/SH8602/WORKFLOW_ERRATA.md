@@ -309,3 +309,13 @@ Checksummer version — 141 L11 verifies only under V1/V2 in a V3 issue.
 Orchestrator error recorded too: my brief said "write only *.html", which
 blocked the rule's "recreate as a disk file" — fixed by a second dispatch.
 (78 min, 421 tool calls.)
+
+## 180 — "expand initials" vs "keep initials exactly as printed"
+
+Briefing step 3 and the evidence section say expand initials from the
+Impressum; the guardrail says keep them as printed and only CHECK them. Case C
+maps the Vorwort to the chief editor; a Sonderheft Vorwort is signed by its
+writer (SH8602: Georg Klinge). The Impressum vocabulary check assumes `xx =
+Name` lines Sonderheft Impressums never print, and misses initials inside
+`(Name/xx)` bylines — 10 of the 11 here. Orchestrator note: my brief said
+"use it to expand"; the agent followed the rule, correctly.
