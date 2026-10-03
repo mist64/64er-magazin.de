@@ -1,0 +1,96 @@
+
+
+;listing 12.prg ==0801==
+ 1000 rem *** lustige kollision ***
+ 1010 :
+ 1020 :
+ 1030 rem ** sprite-daten laden
+ 1040 :
+ 1050 print "{clr}"
+ 1060 for n = 832 to 958
+ 1070 :   read spdta
+ 1080 :   poke n, spdta
+ 1090 next n
+ 1100 :
+ 1110 data   0,255,  0,  1,129,128
+ 1120 data   3,  0,192,  3,  0,192
+ 1130 data   3,  0,192,  6,102, 96
+ 1140 data  60,102, 60, 96,  0,  6
+ 1150 data 192,  0,  3,192,102,  3
+ 1160 data 198, 60, 99, 99,  0,198
+ 1170 data 113,129,142, 28,195, 56
+ 1180 data  12,195, 48, 12,102, 48
+ 1190 data   6, 60, 96,  6,  0, 96
+ 1200 data   3,129,192,  0,195,  0
+ 1210 data   0,126,  0,  0
+ 1220 :
+ 1230 data   0,  0,  0,  0, 16,  0
+ 1240 data   0, 56,  0,  0, 84,  0
+ 1250 data   0, 16,  0,  2, 16,128
+ 1260 data   1, 17,  0,  0,146,  0
+ 1270 data  16, 84, 16, 32, 56,  8
+ 1280 data 127,255,252, 32, 56,  8
+ 1290 data  16, 84, 16,  0,146,  0
+ 1300 data   1, 17,  0,  2, 16,128
+ 1310 data   0, 16,  0,  0, 84,  0
+ 1320 data   0, 56,  0,  0, 16,  0
+ 1330 data   0,  0,  0
+ 1340 :
+ 1350 :
+ 1360 rem ** sprites vorbereiten und ein
+ 1370 :
+ 1380 vic = 53248    :rem grafikbaustein
+ 1390 poke vic+33,0  :rem hgrnd schwarz
+ 1400 :
+ 1410 poke 2040,13   :rem datenzeiger 0
+ 1420 poke 2041,14   :rem datenzeiger 1
+ 1430 :
+ 1440 poke vic,120   :rem horzntl.pos. 0
+ 1450 poke vic+2,160 :rem horzntl.pos. 1
+ 1460 poke vic+1,138 :rem vertkal.pos. 0
+ 1470 poke vic+3,126 :rem vertkal.pos. 1
+ 1480 :
+ 1490 poke vic+39,3  :rem 0 ist hellblau
+ 1500 poke vic+40,7  :rem 1 ist gelb
+ 1510 poke vic+29,2  :rem nur 1 ist von
+ 1520 poke vic+23,2  :rem dopp. groesse
+ 1530 :
+ 1540 poke vic+21,3  :rem beide sichtb.
+ 1550 :
+ 1560 :
+ 1570 rem ** bewegung sprite 0
+ 1580 :
+ 1590 jr = peek (56320)  :rem eingang 2
+ 1600 if (jr and 16) = 0 then 1870
+ 1610 hd = sgn(jr and 4) - sgn(jr and 8)
+ 1620 vd = sgn(jr and 1) - sgn(jr and 2)
+ 1630 :
+ 1640 poke vic, peek(vic) + hd
+ 1650 poke vic+1, peek(vic+1) + vd
+ 1660 :
+ 1670 :
+ 1680 rem ** zurueck, wenn keine kollis.
+ 1690 :
+ 1700 if peek(vic+30) = 0 then 1490
+ 1710 :
+ 1720 :
+ 1730 rem ** kollision : 1 wird weiss         und 0 blinkt bunt
+ 1740 :
+ 1750 poke vic+40, 1
+ 1760 :
+ 1770 hue = peek(vic+39) and 15
+ 1780 hue = hue + 1
+ 1790 if hue = 8 then hue = 1
+ 1800 poke vic+39, hue
+ 1810 :
+ 1820 goto 1590
+ 1830 :
+ 1840 :
+ 1850 rem ** ausgangswert und ende
+ 1860 :
+ 1870 poke vic+21,0
+ 1880 poke vic+29,0
+ 1890 poke vic+23,0
+ 1900 :
+ 1910 end
+

@@ -219,3 +219,16 @@ what of entries not printed at all (Eintipphilfen, Impressum)? Check 2 says
 carries `XXX`, so before 100 it fails rather than being vacuous. "Normalised to
 Title Case" is wrong for German ("Listings zum Abtippen"). Found by the 090
 sub-agent.
+
+## 120 — Check 2's comment contradicts the rule; shared and repeated separators
+
+Check 2: "each `----------NN` should map to a `NN ….html`" / "matches the
+start page of some article" — against the rule's own "`NN` is the PAGE … not
+as a start page" (SH8602: 142–151 inside 141; 113, 114). Not said: two
+identical separators (`131` twice) map to 131a/131b in disk order; a separator
+page shared by two articles (53, 114, 138) is decided by file content. Case 1
+claims the right dialect is "byte-identical, never merely closer" — false for
+Simons' BASIC with tokens inside REM (`spline 64`: code identical, 6 REM
+lines differ). The routing list misses the mirror of "BASIC at a load address
+not ending in 01": machine code at an address ending in 01 (`pseudo-irq` at
+$9E01) is decoded as BASIC garbage. Found by the 120 sub-agent.

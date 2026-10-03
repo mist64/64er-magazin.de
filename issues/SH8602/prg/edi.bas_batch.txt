@@ -1,0 +1,250 @@
+
+
+;edi.bas_batch.prg ==0801==
+    0 rem save"@0:batch64",8:rem batch-verarbeitung auf c 64 , verwendet:
+    1 rem  edi.bas  zeilenorientierter ascii-text-editor fuer alle cbm-rechner
+    2 rem  von p. kittel , ffm 1985
+    4 goto200:             rem  cold start mit initialisierung
+   20 bj=8:bi=cs+1:ifbi>len(a$)thenbi=len(a$):ifbi=0thenbi=1
+   22 gosub28:cs=bi-1:ifb1<>13andbi<=mland((b1<>17)ork)then22
+   24 ifb1=13thenreturn
+   25 ifb1=17andk=0thenk=b:return
+   26 iflen(a$)>250thena$=left$(a$,len(a$)-1):ifbi>len(a$)thenbi=bi-1:print"{left}";
+   27 printbl$;:goto22
+   28 b1=0:bj$=mid$(a$,bi,1):bi$=mid$(a$,bi+1,1):ifbj$=""thenbj$=" "
+   29 if(asc(bj$)and127)=18thenbj$=chr$(asc("#")+(asc(bj$)and128))
+   30 getb$:ifb$<>""thenprint"{rvof}"bj$;:goto34
+   31 bj=(1+bj)and15:printchr$(18+16*(bjand8));bj$;
+   32 ifbj$=g$thenprintg$"{left}{rvof}";:ifbi<len(a$)andbi$<>g$thenprintbi$"{left}";
+   33 print"{left}";:return
+   34 ifbj$=g$thenprintg$"{left}";:ifbi<len(a$)andbi$<>g$thenprintbi$"{left}";
+   35 print"{left}";:b=asc(b$):b1=band127:ifb1>31then39
+   36 ifb1>12thenonb1-12goto74,38,38,38,38,87,76,60,38,38,38,38,38,38,38,38,46
+   37 rem 13:return,17:vert,18:rev,19:home,20:del,29:horiz
+   38 return
+   39 ifbi>mlthenprintbl$;:return
+   40 bi=bi+1:ifb=222thenb$=chr$(255)
+   41 printb$;:ifb$=g$thenprintg$"{left}";:ifbi<=len(a$)andbi$<>g$thenprintbi$"{left}";
+   42 ifbi>2thenb$=left$(a$,bi-2)+b$
+   43 b$=b$+mid$(a$,bi)
+   44 a$=b$:return
+   46 ifb=29then54
+   48 ifbi>1thenprintb$;:bi=bi-1
+   50 ifbi<2thenprintbl$;
+   52 return
+   54 ifbi>=mlthenprintbl$;:return
+   56 printb$;:bi=bi+1:iflen(a$)<bithena$=a$+" "
+   58 return
+   60 ifb=148then66
+   62 ifbi<2thenprintbl$;:return
+   63 printb$;:b$=mid$(a$,bi):ifbi>2thenb$=left$(a$,bi-2)+b$
+   64 a$=b$:bi=bi-1:return
+   66 l=len(a$):bj$=right$(a$,1):ifl>=mlthenprintbl$;:return
+   68 printb$" {left}";:b$=" "+mid$(a$,bi):ifbi>1thenb$=left$(a$,bi-1)+b$
+   72 a$=b$:return
+   74 print:ifb=13thenb=17:b1=b:bi=1:goto81
+   75 b=141:return
+   76 ifb=19thenprintleft$(cb$,bi-1);:bi=1:return
+   78 ifbi<len(a$)thenprintspc(len(a$)-bi);:bi=len(a$)
+   79 ifbi<mlandright$(a$,1)<>" "thenbi=bi+1:a$=a$+" ":print"{rght}";
+   80 return
+   81 ifm>=nthenreturn
+   82 b$=a$(m+1):ifb$=""thenreturn
+   83 ifmid$(b$,bi,1)=" "thenifbi<len(b$)thenbi=bi+1:goto83
+   84 ifmid$(b$,bi,1)=" "thenbi=1
+   85 return
+   87 bi=bi+1:ifbi>ml+1thenprintbl$;
+   88 printchr$(asc("#")+(band128));:goto42
+   90 print"lx (x = Zahl) = Loeschen  x Zeilen od.
+   91 print"ex (x = Zahl) = Einfuegen x Zeilen od.
+   92 print"h  fuer Hilfe oder":print"-  fuer Abbruch.
+   93 print"{down}In den Textzeilen:":print"Cursortasten und INST/DEL normal
+   94 print"Shift-Return  = zurueck zu Befehlszeile
+   95 print"Return        = naechster Zeilenanfang
+   96 print"Home          = aktueller Zeilenanfang
+   97 print"Shift-Home    = Zeilenende.
+   99 print"{down}Taste druecken.":fori=-1to0:geta$:i=a$="":next
+  100 k=0:print"{clr}":n=-n*(n>=0):g$=chr$(34):bl$=chr$(7)
+  101 print"{home}";tab(69);m-(m<0)+(m-n)*(m>n)
+  102 print"{home}aend/{rvon}l{rvof}oesch/{rvon}e{rvof}infueg/{rvon}h{rvof}ilfe, Ende mit - , ";
+  103 input"Zeilennr./Befehl(l./e./h) = ";a$:b$=left$(a$,1):ifb$="-"thenreturn
+  104 v=m:ifm<0thenv=0
+  105 b=val(mid$(a$,2)):ifb$="l"thenb=b+v-1:gosub185:m=v:goto100
+  106 m=val(a$):ifb$="e"then190
+  110 ifm<0orm>nthen100
+  111 print"{home}Cursor aktiv,  Return: naechste Zeile,  Kommandoz.:";
+  112 print" Shift-Return, Z.:"
+  113 es$="."+chr$(20)+left$(cb$,50):fori=1to39-40*c8:print"-";:next:print
+  114 ifb$="h"thenprint"{down}Befehlszeile:":print"zu aendernde Zeilennr. oder":goto90
+  118 i=4-6*c8:zv=m-i:zb=m+i+1:ifzv<0thenzv=0:zb=2*i+1
+  119 forj=zvtozb:ifj>nthena$="":goto122
+  120 a$=a$(j)
+  122 l=len(a$):ifl=0thenprintleft$(cp$,78)es$:goto128
+  124 forbi=1tol:b$=mid$(a$,bi,1):ifb$=g$thenprintg$;chr$(20);
+  125 if(asc(b$)and127)=18thenb$=chr$(asc("#")+(asc(b$)and128))
+  126 printb$;:next
+  127 printleft$(cp$,78-l);es$
+  128 next
+  130 print"{home}":fori=zvtom:print:next
+  155 a$=a$(m):l=len(a$):ifcs>l-1thencs=l-1:ifcs<0thencs=0
+  156 printspc(cs);
+  160 gosub20
+  161 iflen(a$)<2then169
+  162 ifright$(a$,1)=" "thena$=left$(a$,len(a$)-1):goto161
+  169 a$(m)=a$:ifk<=0then180
+  170 m=m+1+2*(k>20):ifm<zvorm>zbthen100
+  171 print"{home}"tab(69);m;"{left}   ":k=0:ifm>nthenn=m
+  172 goto130
+  180 ifa$(n)=""thenn=n-1:ifn>-1then180
+  182 goto100
+  185 ifv<0orv>borb>nthenprint"{down}Unmoeglich!":fori=1to200:next:return
+  186 m=b-v+1:ifb=nthen188
+  187 fori=b+1ton:a$(i-m)=a$(i):next
+  188 n=n-m:ifn<mzthenfori=n+1ton+m:a$(i)="":next:return
+  190 ifb+n>mzorb<1thenv=-1:gosub185:goto100
+  191 fori=ntovstep-1:a$(i+b)=a$(i):next
+  192 fori=vtov+b-1:a$(i)="":next:ifcs=0orcs>=len(a$(v+b))then199
+  193 a$(v)=left$(a$(v+b),cs):a$(v+b)=mid$(a$(v+b),cs+1)
+  199 n=n+b:m=v:goto100
+  200 rem initialisierung edi.bas: ---------------------------------------------
+  210 rem einfuehrung der benutzten variablen:
+  220 dim a$,b,b$,b1,bi,bj,bj$,g$,bi$,bl$,cb$,cp$,cs,es$,i,j,k,l,m,ml,mz,n,v,c8
+  221 dim zb,zv
+  230 mz=600: rem  maximale zeilenzahl
+  240 ml= 77: rem  max. zeichenzahl/zeile  ggf. per input (nur kleiner moeglich)
+  250 n = -1: rem  aktueller fuellstand in a$()
+  251 m = -1: rem  zuletzt edierte zeilennr.
+  262 cb$="{left}{left}{left}{left}":fori=1to5:cb$=cb$+cb$:next:cb$=cb$+left$(cb$,127):rem curs back
+  263 cp$="    ":fori=1to5:cp$=cp$+cp$:next:cp$=cp$+left$(cp$,127):rem space
+  270 dima$(mz) :rem  text zeilenweise
+  280 :          rem  editor mit gosub100 aufrufen
+  284 :          rem  test auf 40- bzw. 80-zeichen-schirm:
+  285 rem print"{home}{home}{clr}{swlc}"spc(40)"t{home}{down}";:open1,3:get#1,a$:close1:c8=a$=" ":rem s.u.
+  290 rem
+  299 rem edi.bas fertig -------------------------------------------------------
+  300 print"{up}{rght}{rght}";:dimp$(27),n%(27):np=0:open1,3:rem parameter holen
+  301 c=0:fori=2to79:get#1,a$:ifa$=":"thenc=i:i=80
+  302 next:ifc=0thenclose1:mp=-1:goto350
+  310 mp=0:forp=1to27:g$="":fg=1:fc=0
+  311 fori=-1to0:i=-1:get#1,a$:ifa$=chr$(34)thenfg=1-fg:goto320
+  312 c=c+1:ifc>79ora$=chr$(13)theni=0:p$(fc*p)=g$:mp=mp+fc*(p-mp):p=99:goto320
+  313 iffgthenifa$=","theni=0:p$(fc*p)=g$:mp=mp+fc*(p-mp):goto320
+  315 iffcor(a$<>" ")thenfc=1:g$=g$+a$
+  320 next:next:close1:ifmp=0then350
+  330 forp=1tomp:ifp$(p)=""then335
+  331 p$=p$(p):l=len(p$)
+  332 ifright$(p$,1)=" "thenl=l-1:p$=left$(p$,l):goto332
+  333 p$(p)=p$
+  335 p$(p-1)=p$(p):next:p$(mp)="":mp=mp-1
+  340 np=-1:forp=0tomp:ifp$(p)<>""thennp=p
+  341 next:mp=np:f$=p$(0):iff$=""thenf$="-"
+  349 rem zeile 285 hierher verlegt:
+  350 print"{home}{home}{clr}{swlc}"spc(40)"t{home}{down}";:open1,3:get#1,a$:close1:c8=a$=" ":rem 40/80 ?
+  351 print"{clr}{down} {rvon}{swlc} B{$a0}A{$a0}T{$a0}C{$a0}H{$a0}{rvof}{down}
+  352 fp=0:ifmp=0andf$<>"-"andf$<>""thenfp=1:goto511
+  353 ifmp<0then500
+  360 print"{down}{down}Parameter:":print"{down}File: "f$"{down}"
+  361 forp=1tomp:ifp$(p)<>""thenprint"   "chr$(p+64)": "p$(p)
+  362 next:goto510
+  500 print"{down}Namen fuer seq-Kommando-File eingeben,
+  502 print "wenn noch keines existiert: einfach  -
+  505 input"{down}Filename = ";f$
+  510 iff$="-"then520
+  511 print"{down}File wird eingelesen, bitte Geduld.{down}{down}{down}
+  512 n$=chr$(0):cr$=chr$(13):n=-1:open1,8,3,f$
+  513 forz=-1to0:g$="":fori=-1to0:get#1,a$:s=st:a$=left$(a$+n$,1)
+  514 i=(s=0)and(a$<>cr$):ifa$<>cr$theng$=g$+a$:ifa$="%"thenifmp>0thengosub1000
+  515 next:n=n+1:a$(n)=g$:printg$:z=s=0:next:close1:ifmp>0then520
+  516 iffpthen650
+  517 print"{down}{down}{down}Aenderungen noetig (j/n) ? ";
+  518 geta$:ifa$<>"j"anda$<>"n"then518
+  519 printa$:ifa$="n"then650
+  520 print"{down}File muss mit eingebautem Editor
+  521 print "be/er-arbeitet werden.
+  522 print "Geben Sie in der spaeteren Kommando-
+  523 print "zeile {rvon}h{rvof} fuer Hilfe ein.
+  524 print"{down}Hinweis: Mit diesem Editor koennen nur
+  525 print "         Standardzeichen, CR und RVS
+  526 print "         eingegeben werden, {rvon}keine{rvof}
+  527 print "         anderen Steuerzeichen!
+  528 print"{down}Alternative: File mit anderem reinen
+  529 print "         ASCII-Editor erzeugen.
+  530 print"{down}{down}Drive fuer File-Speicherung (0/1) ? ";
+  531 getd$:ifd$<>"0"andd$<>"1"then531
+  532 printd$:ifmp>0thenmp=0:goto550
+  540 gosub100
+  550 fa$=f$:print"{home}{home}{clr}{down}File-Inhalt ok (j/n) ? ";
+  551 geta$:ifa$<>"j"anda$<>"n"then551
+  552 printa$:ifa$="n"then540
+  560 input"{down}File-Name fuer Speicherung = ";f$:iff$="-"then560
+  570 ifnp>0theniff$=fa$thenprint"{down}Nicht Parameter-File ueberschreiben!":goto560
+  600 print"{down}File wird gespeichert, bitte Geduld.
+  610 open1,8,15,"s"+d$+":"+f$:close1:open1,8,3,(d$+":"+f$+",s,w")
+  620 fori=0ton:print#1,a$(i):next:close1
+  630 iflen(f$)<5orright$(f$,4)<>".mot"then650
+  640 print"{down}Bitte mit Parameterangabe neu starten.":end
+  650 m=0:fori=0ton:m=m+len(a$(i))+1:next
+  700 tr=55:rem plus/4: 55, 8xxx/40xx: 52
+  701 t=peek(tr)+256*peek(tr+1)-1:rem plus/4:  ift>32767thent=32767
+  702 th=int(t/256):tl=t-256*th
+  703 lh=int(m/256):ll=m-256*lh
+  704 b=t-m:bh=int(b/256):bl=b-256*bh
+  710 pa=bh:ifbl<122thenpa=pa-1
+  720 p=256*pa:pokep,tl:pokep+1,th:pokep+2,bl:pokep+3,bh:pokep+4,fp
+  721 l=len(f$):ifl>16thenl=16
+  722 fori=1tol:n%(i)=asc(mid$(f$,i,1)):next
+  730 pokep+5,l:fori=1tol:pokep+5+i,n%(i):next
+  740 poke55,0:poke56,pa
+  750 clr
+  800 a$="":i=0:n$=chr$(0)
+  805 tr=55:rem plus/4: 55, 8xxx/40xx: 52
+  810 m=peek(tr+1):p=256*m
+  815 tl=peek(p):th=peek(p+1):bl=peek(p+2):bh=peek(p+3):fp=peek(p+4)
+  820 l=peek(p+5):f$="":fori=1tol:f$=f$+chr$(peek(p+5+i)):next
+  830 t=tl+256*th
+  835 print"{down}File "f$" wird noch einmal
+  836 print"eingelesen, bitte Geduld.{down}
+  840 open1,8,3,f$:fori=-1to0:get#1,a$:i=st=0:poket,asc(a$+n$):t=t-1:next:close1
+  850 restore:readn
+  860 fori=0ton:reada:ifa<0thena=m
+  861 pokep+i,a:next
+  870 pokep+ 71,tl:pokep+ 72,th
+  871 pokep+118,bl:pokep+119,bh
+  900 print"{down}{down}Batch-Job mit    sys"p"    starten:
+  910 iffpthenprint:sysp:end
+  920 print"{down}{down}{down}sys"p"{up}{up}{up}"
+  999 end
+ 1000 get#1,a$:s=st:a$=left$(a$+n$,1):a=asc(a$)
+ 1010 forp=1tomp:ifa=p+64theng$=left$(g$,len(g$)-1)+p$(p):p=mp:a=-1
+ 1011 next:ifa>-1theng$=g$+a$
+ 1020 i=(s=0)and(a$<>cr$):return
+ 6000 a=7*4096:forz=0to13:printa;"data";
+ 6010 fori=0to7:pe=peek(a):a=a+1:ifi>0thenprint",";
+ 6020 print" ";right$("00"+mid$(str$(pe),2),3);:next:print:next
+ 6030 end
+ 7000 restore:readn:a=28672
+ 7010 fori=0ton:readp:ifabs(p)=112thenprintchr$(18-(p<0)*128);a+(iand248),
+ 7020 next:end
+ 8000 rem"  Benutzte Maschinenadressen:
+ 8010 rem"  55-56    Pointer Top of RAM
+ 8020 rem"  $0314    Pointer IRQ-Routine
+ 8030 rem"  $0277    Erstes Byte Tastaturpuffer
+ 8040 rem"  $c6      Anzahl Bytes im Tastaturpuffer
+28600 rem  source-file:  irqbat.src
+28666 data 119
+28672 data 120, 173, 020, 003, 141, 116,-112, 173
+28680 data 021, 003, 141, 117,-112, 169, 051, 141
+28688 data 020, 003, 169,-112, 141, 021, 003, 088
+28696 data 096, 189, 005, 001, 041, 252, 201, 044
+28704 data 208, 017, 189, 006, 001, 201, 249, 208
+28712 data 010, 169, 052, 157, 005, 001, 169, 249
+28720 data 157, 006, 001, 165, 198, 240, 013, 201
+28728 data 002, 176, 044, 173, 119, 002, 201, 003
+28736 data 240, 037, 208, 047, 230, 198, 173, 255
+28744 data 255, 141, 119, 002, 173, 071,-112, 208
+28752 data 003, 206, 072,-112, 206, 071,-112, 173
+28760 data 071,-112, 205, 118,-112, 208, 020, 173
+28768 data 072,-112, 205, 119,-112, 208, 012, 173
+28776 data 116,-112, 141, 020, 003, 173, 117,-112
+28784 data 141, 021, 003, 076, 255, 255, 000, 000
+

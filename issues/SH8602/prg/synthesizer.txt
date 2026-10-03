@@ -1,0 +1,182 @@
+
+
+;synthesizer.prg ==0801==
+    0 :poke2053,143:load" sy",8,1::
+    1 :poke2081,143:load" tasten",8,1
+    2 :
+    3 rem  ********************************
+    4 rem  ********************************
+    5 rem  **                            **
+    6 rem  **  synthesizer (2.fassung)   **
+    7 rem  **  ===========               **
+    8 rem  **                            **
+    9 rem  ** <c> georg gerber okt. 1985 **
+   10 rem **                            **
+   11 rem **     7500 karlsruhe 51      **
+   12 rem **                            **
+   13 rem **     tulpenstr.10           **
+   14 rem **                            **
+   15 rem **     tel.: 0721/31273       **
+   16 rem **                            **
+   17 rem **                            **
+   20 rem ********************************
+   21 rem ********************************
+   25 :
+   32 rem *** parameter setzten ------------
+   33 ff=1000:p=2048:rz=7:at=0:de=0:su=15:re=11:fa=0:l=15:w3=1:f2=1
+   34 gosub20000:rem bildschirm loeschen
+   35 :
+   36 rem *** adressen setzen -------------
+   37 si=54272:rem * basisadresse 'sid'
+   38 pokesi+24,15:pokesi+23,0:pokesi+4,0:pokesi+11,0:pokesi+18,0
+   39 pokesi+5,0:pokesi+6,251:pokesi+12,0:pokesi+13,251:pokesi+19,0:pokesi+20,251
+   40 a=w1*128+w2*64+w3*32+w4*16+w5*8
+   41 poke8*4096+11*256,a
+   42 pokesi+3,8:pokesi+10,8:pokesi+17,8
+   43 :
+   44 rem *** grundton stimmen ------------
+   45 print"{down}grundton stimmen"
+   46 print"EEEEEEEEEEEEEEEE"
+   47 print"{down}{down}{down}f1++ / f3+ / f5- / f7 --"
+   48 print"{down}{down} <return> : weiter"
+   49 pokesi+4,33
+   50 g=2228:w=2^(1/12)
+   60 a=g:gosub20500:pokesi,lb:pokesi+1,hb
+   70 ifpeek(197)=3theng=g-100:ifg<350theng=350
+   71 ifpeek(197)=6theng=g-1:ifg<350theng=350
+   72 ifpeek(197)=5theng=g+1:ifg>6501theng=6501
+   73 ifpeek(197)=4theng=g+100:ifg>6501theng=6501
+   75 ifpeek(197)=1then80
+   77 goto60
+   80 pokesi+4,0:print"{down}moment bitte"
+   90 rem *** tonleiter berechnen **
+  100 fori=0to40:a=g*w^i:gosub20500:poke8*4096+5*256+9+2*i,lb
+  110 poke8*4096+5*256+10+2*i,hb:next
+  120 poke198,0
+  123 :
+  200 rem *** hauptmenu ------------------
+  210 gosub20000:print"{down}{down}"
+  220 print"w ... wellenform"
+  221 print"p ... pulsbreite"
+  222 print"f ... filter"
+  223 print"l ... lautstaerke"
+  224 print"a ... adsr-huellkurve"
+  225 print"s ... spielen"
+  226 print"e ... ende"
+  230 print"{down} bitte waehlen"
+  240 geta$:ifa$=""then240
+  250 ifa$="w"then300
+  251 ifa$="p"then500
+  252 ifa$="f"then700
+  253 ifa$="l"then900
+  254 ifa$="a"then1100
+  255 ifa$="s"then1300
+  256 ifa$="e"then1500
+  260 goto240
+  266 :
+  300 rem *** wellenform -----------------
+  310 gosub20000:print"{down}       wellenform"
+  320 print"{down}rauschen  ";w1
+  321 print"rechteck  ";w2
+  322 print"saegezahn  ";w3
+  323 print"dreieck  ";w4
+  324 print"test  ";w5
+  330 print"{up}{up}{up}{up}{up}{up}"
+  339 input"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a$:ifval(a$)=0anda$<>"0"thenprint"{up}{up}":goto339
+  340 w1=val(a$):ifw1<>1andw1<>0thenprint"{up}{up}":goto339
+  341 input"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a$:ifval(a$)=0anda$<>"0"thenprint"{up}{up}":goto341
+  342 w2=val(a$):ifw2<>1andw2<>0thenprint"{up}{up}":goto341
+  343 input"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a$:ifval(a$)=0anda$<>"0"thenprint"{up}{up}":goto343
+  344 w3=val(a$):ifw3<>1andw3<>0thenprint"{up}{up}":goto343
+  345 input"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a$:ifval(a$)=0anda$<>"0"thenprint"{up}{up}":goto345
+  346 w4=val(a$):ifw4<>1andw4<>0thenprint"{up}{up}":goto345
+  347 input"{rght}{rght}{rght}{rght}{rght}";a$:ifval(a$)=0anda$<>"0"thenprint"{up}{up}":goto347
+  348 w5=val(a$):ifw5<>1andw5<>0thenprint"{up}{up}":goto347
+  350 a=w1*128+w2*64+w3*32+w4*16+w5*8
+  360 poke8*4096+11*256,a
+  370 goto200
+  377 :
+  500 rem *** pulsbreite -----------------
+  510 gosub20000:print"{down}         pulsbreite"
+  520 g=p:m=4095:gosub21000:p=g
+  530 a=g:gosub20500:pokesi+2,lb:pokesi+3,hb:pokesi+9,lb:pokesi+10,hb
+  531 pokesi+16,lb:pokesi+17,hb
+  540 goto200
+  544 :
+  700 rem *** filter ---------------------
+  710 gosub20000:print"{down}       filter"
+  720 print"frequenz":g=ff:m=2047:gosub21000:ff=g
+  730 print"filter {rvon}a{rvof}n / a{rvon}u{rvof}s"
+  735 geta$:ifa$<>"a"anda$<>"u"then735
+  740 mo=7:ifa$="u"thenmo=0
+  750 print"{down}resonanz{down}":g=rz:m=15:gosub21000:rz=g
+  760 pokesi+23,g*16+mo
+  780 print"{down}{down}art:{down}"
+  800 print"tief ";f1
+  801 print"band ";f2
+  802 print"hoch ";f3
+  803 print"{up}{up}{up}{up}":poke198,0
+  810 input"{rght}{rght}{rght}{rght}";a$:ifa$<>"0"andval(a$)=0thenprint"{up}{up}":goto810
+  811 f1=val(a$):iff1<>1andf1<>0thenprint"{up}{up}":goto810
+  812 input"{rght}{rght}{rght}{rght}";a$:ifa$<>"0"andval(a$)=0thenprint"{up}{up}":goto812
+  813 f2=val(a$):iff2<>1andf2<>0thenprint"{up}{up}":goto812
+  814 input"{rght}{rght}{rght}{rght}";a$:ifa$<>"0"andval(a$)=0thenprint"{up}{up}":goto814
+  815 f3=val(a$):iff3<>1andf3<>0thenprint"{up}{up}":goto814
+  820 fa=f1*16+f2*32+f3*64
+  830 pokesi+24,fa+l:goto200
+  888 :
+  900 rem *** lautstaerke ----------------
+  910 gosub20000:print"{down}         lautstaerke{down}"
+  920 g=l:m=15:gosub21000:l=g:pokesi+24,l+fa:goto200
+  999 :
+ 1100 rem *** adsr ----------------------
+ 1110 gosub20000:print"    adsr-huellkurve{down}"
+ 1120 print"attack":g=at:m=15:gosub21000:at=g:poke198,0
+ 1130 print"{down}{down}decay":g=de:m=15:gosub21000:de=g:poke198,0
+ 1140 print"{down}{down}sustain":g=su:m=15:gosub21000:su=g:poke198,0
+ 1150 print"{down}{down}release":g=re:m=15:gosub21000:re=g:poke198,0
+ 1180 a=at*16+de:pokesi+5,a:pokesi+12,a:pokesi+19,a
+ 1185 a=su*16+re:pokesi+6,a:pokesi+13,a:pokesi+20,a
+ 1190 goto200
+ 1195 :
+ 1300 rem *** spielen -------------------
+ 1310 gosub20000:print"        spielen"
+ 1315 poke53281,4
+ 1320 print"{down}{down}{down}f7:ende{down}{down}{down}"
+ 1327 print"{blu}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}";
+ 1330 print"{rvon}{wht}q{blk}2{wht}w{blk}3{wht}er{blk}5{wht}t{blk}6{wht}y{blk}7{wht}ui{blk}9{wht}o{blk}0{wht}p@{blk}-{wht}*{blk}\{wht}^{blk}c{wht}z";
+ 1331 print"{rvon}{wht}x{blk}d{wht}c{blk}f{wht}vb{blk}h{wht}n{blk}j{wht}m{blk}k{wht}<>{blk}:{wht}/{blk};{wht}";
+ 1340 print"{rvon}{wht} {blk} {wht} {blk} {wht} {CBM-G}{blk} {wht} {blk} {wht} {blk} {wht} {CBM-G}{blk} {wht} {blk} {wht} {CBM-G}{blk} {wht} {blk} {wht} {blk} {wht} ";
+ 1341 print"{rvon}{wht}{CBM-H}{blk} {wht} {blk} {wht} {CBM-G}{blk} {wht} {blk} {wht} {blk} {wht} {CBM-G}{blk} {wht} {blk} {wht}";
+ 1350 print"{rvon}{wht} B B {CBM-G}B B B {CBM-G}B B {CBM-G}B B B ";
+ 1351 print"{rvon}{wht}{CBM-H}B B {CBM-H}B B B {CBM-H}B B";
+ 1355 print"{blu}{rvof}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 1390 sys8*4096:poke198,0:goto200
+ 1440 :
+ 1500 rem *** ende ----------------------
+ 1510 gosub20000:print"{down}{down}{down}auf wiedersehen{down}{down}{down}{lblu}"
+ 1520 sys42115:rem * end ohne ready
+19997 :
+19998 :
+19999 :
+20000 rem *** bildschirm ---------------
+20005 poke53281,6
+20010 print"{clr}{down}{wht}        polyphoner synthesizer"
+20011 print"       ========================{down}"
+20012 print"                    <c> georg gerber '85"
+20020 return
+20025 :
+20500 rem *** lb / hb aus a berechnen --
+20510 hb=int(a/256):lb=a-hb*256:return
+20560 :
+21000 rem *** parameter einstellen -----
+21002 print"f1 ++ / f3 + / f5 - / f7 -- "
+21003 print"<return> : ende{down}{down}"
+21010 print"{up}     {left}{left}{left}{left}{left}";g
+21020 ifpeek(197)=3theng=g-100:ifg<0theng=0
+21030 ifpeek(197)=6theng=g-1:ifg<0theng=0
+21040 ifpeek(197)=5theng=g+1:ifg>mtheng=m
+21050 ifpeek(197)=4theng=g+100:ifg>mtheng=m
+21060 ifpeek(197)=1thenreturn
+21070 goto21010
+

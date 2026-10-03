@@ -1,0 +1,51 @@
+
+
+;auto-save.prg ==0801==
+    1 rem  ********************************
+    2 rem  *                              *
+    3 rem  *          auto - save         *
+    4 rem  *                              *
+    5 rem  *      1985 by manfred lins    *
+    6 rem  *              reitacker 1     *
+    7 rem  *         6492 zuentersbach    *
+    8 rem  *                              *
+    9 rem  ********************************
+   10 :
+   11 :
+   12 rem  maschinen-programm nachladen
+   13 if r=0 then r=1:load"save-obj",8,1
+   14 :
+   16 print chr$(147)chr$(18)"             auto - save                "
+   19 print:print:print
+   21 :
+   22 rem  name eingeben
+   23 print"  programmnamen (max. 16 zeichen) ein-"
+   24 print"  geben :"
+   25 :
+   26 s=10:z=6:gosub 62
+   27 if a$="" or left$(a$,1)=" " then 26
+   28 :
+   29 rem  namen und laenge abspeichern
+   30 n$="s:"+left$(a$,16):l=len(n$)
+   31 poke 49365,l-2:poke 49366,l
+   32 :
+   33 for i=1 to l:poke 49366+i,asc(mid$(n$,i,1)):next i
+   36 print:print
+   39 rem  intervall eingeben
+   40 print"  abspeicher-intervall (256 byte = 1)"
+   41 print"  eingeben :"
+   43 s=13:z=10:gosub 62
+   46 rem  intervall abspeichern
+   47 i=val(a$):if i<1 then i=1
+   48 poke 49363,8+i:poke 49364,i
+   51 rem maschinenprogramm initialisieren
+   52 sys 49152
+   53 :
+   54 rem  ladeprogramm loeschen
+   55 new:end
+   60 rem  unterprogramm stringeingabe
+   62 print chr$(144):open 1,0
+   63 poke 214,z:poke 211,s:sys 58640
+   64 input#1,a$
+   65 close 1:print chr$(154):return
+

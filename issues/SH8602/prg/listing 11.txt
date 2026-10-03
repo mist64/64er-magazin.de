@@ -1,0 +1,89 @@
+
+
+;listing 11.prg ==0801==
+ 1000 rem *** jongleur ***
+ 1010 :
+ 1020 :
+ 1030 rem ** ausgabe programmeldung
+ 1040 :
+ 1050 print "{clr}{down}{down}{down}{down}{down}{down}{down}{down}bitte warten";
+ 1060 :
+ 1070 :
+ 1080 rem ** sprite-daten laden
+ 1090 :
+ 1100 for n = 832 to 1023
+ 1110 :   read spdta
+ 1120 :   if spdta = -1 then print " ."; : goto 1140
+ 1130 :   poke n, spdta
+ 1140 next n
+ 1150 :
+ 1160 data   0, 16,  0,  0,  0,  0
+ 1170 data   1,  0,128,  0,  0,  0
+ 1180 data   0,  0,  0,  0,120,  0
+ 1190 data   4,120, 16,  0,120,  0
+ 1200 data   0,120,  0, 12, 24,  0
+ 1210 data  15,255, 16,  0, 61,128
+ 1220 data   0, 60,176,  4, 24,240
+ 1230 data   0, 61,  0,  0, 60,  0
+ 1240 data   0, 36,  0,  0, 36,  0
+ 1250 data   0, 36,  0,  0, 36,  0
+ 1260 data   0,102,  0, -1
+ 1270 :
+ 1280 data   0,  8,  0,  0, 64,  0
+ 1290 data   0,  0,  0,  0,  0, 64
+ 1300 data   0,  0,  0,  4, 60,  0
+ 1310 data   0, 60,  0,  0, 60,  0
+ 1320 data   0, 60, 16,  8, 24,  0
+ 1330 data  13,255,  0, 15, 61, 48
+ 1340 data   0, 61,240,  0, 24,  0
+ 1350 data   0,190,  0,  0, 60,  0
+ 1360 data   0, 36,  0,  0, 36,  0
+ 1370 data   0, 36,  0,  0, 36,  0
+ 1380 data   0,102,  0, -1
+ 1390 :
+ 1400 data   0, 32,  0,  0,  2,  0
+ 1410 data   0,  0,  0,  2,  0,  0
+ 1420 data   0,  0, 32,  0, 60,  0
+ 1430 data   0, 60,  0,  0, 60,  0
+ 1440 data   8, 60,  0,  0, 24, 16
+ 1450 data   0,255,152,  1,188,248
+ 1460 data  13, 60,  0, 15, 24, 64
+ 1470 data   0, 60,  0,  0, 60,  0
+ 1480 data   0, 36,  0,  0, 36,  0
+ 1490 data   0, 36,  0,  0, 38,  0
+ 1500 data   0, 96,  0, -1
+ 1510 :
+ 1520 :
+ 1530 rem ** sprite register vorbereiten
+ 1540 :
+ 1550 print "{clr}"      :rem schirm loesch.
+ 1560 vic = 53248    :rem grafikbaustein
+ 1570 :
+ 1580 poke 2040,13   :rem datenzeiger 0
+ 1590 poke vic,160   :rem horzntl.pos. 0
+ 1600 poke vic+1,129 :rem vertkal.pos. 0
+ 1610 poke vic+39,1  :rem 0 ist weiss
+ 1620 poke vic+29,1  :rem sprite 0 hat
+ 1630 poke vic+23,1  :rem dopp. groesse
+ 1640 poke vic+21,1  :rem sprite 0 ein
+ 1650 :
+ 1660 :
+ 1670 rem ** jonglieren beginnt
+ 1680 :
+ 1690 image = peek (2040) +1
+ 1700 if image = 16 then image = 13
+ 1710 poke 2040, image
+ 1720 :
+ 1730 for delay = 1 to 30 : next delay
+ 1740 :
+ 1750 :
+ 1760 rem ** prog.ende nach tastendruck
+ 1770 :
+ 1780 get kp$
+ 1790 if kp$ = "" then 1690
+ 1810 poke vic+21,0  :rem sprites aus
+ 1820 poke vic+29,0  :rem und wieder
+ 1830 poke vic+23,0  :rem normalgroesse
+ 1840 :
+ 1850 end
+

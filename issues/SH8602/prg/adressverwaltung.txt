@@ -1,0 +1,162 @@
+
+
+;adressverwaltung.prg ==0801==
+  100 rem--- adressverwaltung mit indexsequentieller dateiorganisation -----------
+  110 rem--- (w) 1985 by martin hecht,stgt ---------------------------------------
+  120 :
+  130 :
+  140 :
+  150 rem--- dimensionierungen ---------------------------------------------------
+  160 :
+  170 dm=100:rem maximale datensatzanzahl
+  180 :
+  190 dim id$(dm):rem indexfeld (enthaelt nachnamen)
+  200 dim in(dm):rem enthaelt zugehoerige recordnummern
+  210 dim ds$(5):rem datenfelder
+  220 :
+  230 :
+  240 :
+  250 rem--- hauptmenue ----------------------------------------------------------
+  260 :
+  270 wl=0:print:print
+  280 print tab(11) "adressenverwaltung"
+  290 print
+  300 print tab(8)"-1-: dateiarbeit beginnen"
+  310 print tab(8)"-2-: adressen eingeben"
+  320 print tab(8)"-3-: adressen ausgeben"
+  330 print tab(8)"-4-: dateiarbeit beenden"
+  340 print
+  350 :
+  360 print tab(11) "ihre wahl (1-4)";:input wl
+  370 :
+  380 if wl=1 then gosub 490:rem dateiarbeit beginnen
+  390 if wl=2 then gosub 710:rem adressen eingeben
+  400 if wl=3 then gosub 1110:rem adressen ausgeben
+  410 if wl=4 then goto 1480:rem dateiarbeit beenden
+  420 :
+  430 goto 270:rem zurueck zum hauptmenue
+  440 :
+  450 :
+  460 :
+  470 rem--- dateiarbeit beginnen ------------------------------------------------
+  480 :
+  490 lf=1:sa=2:dn$="reladr":rl=67:gosub 1800:rem relative datei 'reladr' oeffnen
+  500 :
+  510 open 2,8,3,"seqadr,s,r":rem sequentielle datei 'seqadr' zum lesen oeffnen
+  520 :
+  530 gosub 1620:rem floppy-fehlerkanal auslesen
+  540 if er<>0 then ad=0:goto 590:rem datei ist noch nicht angelegt
+  550 :
+  560 input#2,ad:rem anzahl der datensaetze
+  570 for i=1 to ad:input#2,id$(i),in(i):next i:rem indexdatei einlesen
+  580 :
+  590 fl=1:rem kennzeichnung fuer 'datei im rechner'
+  600 :
+  610 close 2:rem sequentielle datei schliessen
+  620 :
+  630 print:print:print tab(7) "dateiarbeit kann beginnen !"
+  640 :
+  650 return
+  660 :
+  670 :
+  680 :
+  690 rem--- adressen eingeben ---------------------------------------------------
+  700 :
+  710 if fl=0 then print:print tab(8) "keine datei im rechner !":return
+  720 :
+  730 rem adresse eingeben
+  740 print:print
+  750 input "nachname (15) :";ds$(1)
+  760 input "vorname (10) :";ds$(2)
+  770 input "strasse (15) :";ds$(3)
+  780 input "wohnort (15) :";ds$(4)
+  790 input "telefon (11) :";ds$(5)
+  800 :
+  810 rem adresse in indexdatei vermerken
+  820 ad=ad+1:rem anzahl der adressen um 1 erhoehen
+  830 id$(ad)=ds$(1):rem nachname
+  840 in(ad)=rn:rem recordnummer
+  850 :
+  860 rem adressfelder auf richtige laenge bringen
+  870 le$="               ":rem leerstring zum auffuellen der felder
+  880 ds$(1)=left$(ds$(1)+left$(le$,abs(15-len(ds$(1)))),15)
+  890 ds$(2)=left$(ds$(2)+left$(le$,abs(10-len(ds$(2)))),10)
+  900 ds$(3)=left$(ds$(3)+left$(le$,abs(15-len(ds$(3)))),15)
+  910 ds$(4)=left$(ds$(4)+left$(le$,abs(15-len(ds$(4)))),15)
+  920 ds$(5)=left$(ds$(5)+left$(le$,abs(11-len(ds$(5)))),11)
+  930 :
+  940 rem adresse fuer speicherung zusammenfassen
+  950 rc$=""
+  960 for i=1 to 5:rc$=rc$+ds$(i):next i
+  970 :
+  980 rem adresse speichern
+  990 rn=ad:rp=1:gosub 1930:rem auf record (nr.=ad) positionieren
+ 1000 print#lf,rc$:rem adresse in record schreiben
+ 1010 gosub 1600:rem floppy-fehlerkanal auslesen
+ 1020 :
+ 1030 print:print:printtab(5)"adresse ist gespeichert !"
+ 1040 :
+ 1050 return
+ 1060 :
+ 1070 :
+ 1080 :
+ 1090 rem--- adressen ausgeben ---------------------------------------------------
+ 1100 :
+ 1110 if fl=0 then print:print tab(8) "keine datei im rechner !":return
+ 1120 :
+ 1130 print:print:input "nachname";nn$:rem index erfragen
+ 1140 :
+ 1150 for i=1 to ad:rem indexdatei durchsuchen
+ 1160 if nn$=id$(i) then gn=i:i=ad:next i:goto 1220:rem index gefunden
+ 1170 next i
+ 1180 :
+ 1190 print:print:print tab(5) "adresse ist nicht vorhanden !"
+ 1200 return
+ 1210 :
+ 1220 rn=gn:rp=1:gosub 1930:rem auf record (nr. = in(i)) positionieren
+ 1230 input#lf,rc$:rem record einlesen
+ 1240 :
+ 1250 rem record aufteilen
+ 1260 ds$(1)=mid$(rc$,1,15):rem nachname
+ 1270 ds$(2)=mid$(rc$,16,10):rem vorname
+ 1280 ds$(3)=mid$(rc$,26,15):rem strasse
+ 1290 ds$(4)=mid$(rc$,41,15):rem wohnort
+ 1300 ds$(5)=mid$(rc$,56,11):rem wohnort
+ 1310 :
+ 1320 rem record ausgeben
+ 1330 print:print
+ 1340 print "nachname: ";ds$(1)
+ 1350 print "vorname: ";ds$(2)
+ 1360 print "strasse: ";ds$(3)
+ 1370 print "wohnort: ";ds$(4)
+ 1380 print "telefon: ";ds$(5)
+ 1390 :
+ 1400 print:print:print "weiter mit 'space' !"
+ 1410 get t$:if t$<>chr$(32) then 1410:rem warten auf 'return'
+ 1420 :
+ 1430 return
+ 1440 :
+ 1450 :
+ 1460 :
+ 1470 rem--- dateiarbeit beenden -------------------------------------------------
+ 1480 print#15,"s:seqadr":rem indexdatei auf diskette loeschen
+ 1490 :
+ 1500 open 2,8,3,"seqadr,s,w":rem seq. datei 'seqadr' zum schreiben oeffnen
+ 1510 print#2,ad:rem anzahl der datensaetze
+ 1520 for i=1 to ad:print#2,id$(i)","in(i):next i:rem indexdatei speichern
+ 1530 :
+ 1540 gosub 2040:rem relative datei schliessen
+ 1550 :
+ 1560 end:rem programm beenden
+ 1570 :
+ 1580 :
+ 1590 :
+ 1600 rem--- floppy-fehlerkanal auslesen -----------------------------------------
+ 1610 :
+ 1620 input#15,er,er$,tr,sk
+ 1630 :
+ 1640 return
+ 1650 :
+ 1660 :
+ 1670 :
+

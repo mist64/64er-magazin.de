@@ -1,0 +1,346 @@
+
+
+;bassist.prg ==0801==
+   10 rem *********+*
+   20 rem * bassist *
+   40 rem ***********
+   50 :
+   60 rem  (c) 1985, robert treichler,  fl-9497 triesenberg (f.tum liechtenstein)
+   70 :
+   80 poke53280,0:poke53281,0:printchr$(14)chr$(8)"{clr}"
+   90 ifz=0thenz=1:x$="":z$="":load"bass/irq",8,1:rem ass-prog.einlesen
+  100 :
+  101 rem definitionen & init.
+  102 :
+  200 hm=100:dimh$(hm),hd%(hm),ha%(hm),hs%(hm),hg%(hm),f(11),p(4,2)
+  205 dims$(12,1),sp(6),sm(11),x$(16)
+  210 rem func.f.bit-muster (y=bit-muster,z=grundton,n=nr.1/2-ton ueber grundton):
+  212 deffn bs(n)=yorsm(n+z+(n+z>11)*12):rem funct. set bit
+  214 deffn bc(n)=yand4095-sm(n+z+(n+z>11)*12):rem funct. clear bit
+  216 deffn bt(n)=yandsm(n+z+(n+z>11)*12):rem funct. test bit
+  220 f=110:fori=0to11:f(i)=f:f=f*1.059463094:sm(i)=2^i:next:rem frequ.+bit-mask.
+  230 fori=0to6:readsp(i):next:rem skala-pointers (a...g)
+  240 forj=0to1:fori=0to12:reads$(i,j):nexti,j:rem #- & b-skalen
+  250 fori=0to4:forj=0to2:readp(i,j):nextj,i:rem parameter
+  260 c$=chr$(13):r=54272:rem adr.sid-reg.
+  265 mn$="   < mit 'f1' zurueck ins Menue >"
+  266 m0$="       {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  267 m1$="       {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  268 m2$="      {CBM-M} "
+  269 m3$="      {CBM-M}                         {CBM-G}"
+  270 ps$="  -{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-+}+"
+  275 l$="                                       "
+  280 fa=.943874:fk=6.378901:f6=1.019440644:fo=1.37:f1=150:f2=300:rem frequ.konst
+  290 ap=49152:fs=ap+22:rb=251:rp=252:rem adr.f.ass-prog
+  300 :
+  301 rem menue
+  302 :
+  310 gosub6950:z=32:print"{clr}{cyn}{down}{down}"m0$:printm3$
+  320 printm2$tab(13)"B A S S I S T"tab(z)"{CBM-G}":printm3$:printm1$:printm0$:printm3$
+  321 printm2$"1=Neueingabe/Editieren"tab(z)"{CBM-G}":printm3$
+  322 printm2$"2=Abspeichern auf Disk"tab(z)"{CBM-G}":printm3$
+  323 printm2$"3=Einlesen von Disk"tab(z)"{CBM-G}":printm3$
+  324 printm2$"4=Play Bass Solo"tab(z)"{CBM-G}":printm3$
+  325 printm2$"5=Play Bass+Schlagzeug"tab(z)"{CBM-G}":printm3$
+  326 printm2$"6=Parameter-Einstellung"tab(z)"{CBM-G}":printm3$
+  327 printm2$"7=Ende"tab(z)"{CBM-G}":printm3$:printm1$
+  330 getz$:ifz$<"1"orz$>"7"then330
+  340 z=val(z$):onzgosub8000,2000,3000,500,505,5000,900
+  350 poke198,0:goto300
+  390 end
+  500 :
+  501 rem play
+  502 :
+  504 kp=1:goto510
+  505 kp=0
+  510 print"{clr}     "mt$:print"{down}"mn$"{down}"
+  520 tr%=1:az=1:fl=0:h=0:h$(ht+1)=h$(1):pr$=""
+  525 au=hd%(ht)-a4+1:ifau<1thenau=1
+  530 gosub6900:gosub1800
+  540 forw=1towa:hb=-1:hn=1:h4=0
+  550 hl=h:h=hn:hn=h+1:ifh>htthen850
+  555 ifh<hlthenpr$="Wiederholung"
+  560 ifh>hl+1thenpr$="Ende Wiederholung"
+  570 ifhn=hb+1thenhn=hw:hb=-1
+  580 ifh$(hn)="w"thenhb=hd%(hn):hw=hn+1:hn=hg%(hn)
+  590 forhd=1tohd%(h):h4=h4+1:ifh4>a4thenh4=1
+  600 :
+  601 rem ton bestimmen
+  602 :
+  605 ifh$(h)="Pause"then630
+  610 ifw<waorh<ht orhd<authen640
+  620 ifhd=authenta%=hg%(h):goto680:rem letzter takt bass aushalten
+  630 ta%=12:fw=0:goto720:rem pause
+  640 if(h4and1)orhd=hd%(h)then650
+  645 ifrnd(0)<p(3,0)then630
+  650 ifhd=1andhg%(h)<>hg%(hl)thenta%=hg%(h):goto680:rem neue harmonie beginnt
+  660 ifhd<>hd%(h)orhg%(h)=hg%(hn)then670:rem es folgt keine neue harmonie
+  662 ifh$(hn)="Pause"thenta%=hg%(h):goto680:rem pause folgt
+  665 sysap+12,ha%(h),ha%(hn),hg%(h),hg%(hn),tr%,ta%:goto680:rem ueberg.ton suchen
+  670 ifrnd(0)<p(4,0)thensysap+15,ha%(h),ta%:goto680:rem zufalls-ton
+  675 sysap+9,ha%(h),tr%,ta%:rem nae.akkordeig.ton suchen
+  680 f=f(ta%):iff=florf*fo<flandf+f<>flthenf=f+f:rem frequ.
+  690 tr%=1+2*(f<fl):iff<f1thentr%=1:rem trend bestimmen
+  695 iff>f2thentr%=-1:rem ...dabei eckfrequ. beachten
+  700 :
+  701 rem ton ausgeben
+  702 :
+  710 fl=f:fw=f*fu:rem frequ.in sid-wert umrechnen
+  720 if(hd>1orh$(h)=h$(hl))andh4>1then800
+  730 ifazthengosub1500:az=0
+  740 ifpeek(fs)then740:rem warte bis letzter ton v.irq-rout.behandelt ...
+  750 ifpr$>""thenprint:print:printpr$:pr$=""
+  760 print:printh$(h)tab(9)": ";:rem ..erst dann harmonie-bez. ausgeben
+  800 sysap+6,h4,fw,fw*fa,s$(ta%,hs%(h)):rem ton mit bez. ->ass-prog
+  820 ifpeek(197)=4thenhd=hd%(h):hn=ht+1:w=wa:rem abbruch
+  830 nexthd:goto550
+  850 nextw:sysap+6,0,0,0,"":sysap+3:rem irq-rout. aus
+  890 fori=0to1500:next:return
+  900 :
+  901 rem ende
+  902 :
+  990 end
+ 1300 :
+ 1301 rem werte zu einer harmonie generieren
+ 1302 :
+ 1308 z=sp(asc(x$)-193):z$=mid$(x$,2,1):x=0
+ 1310 ifz$="#"thenz=z+1:goto1335
+ 1320 ifz$="b"thenz=z-1-(z<1)*12:x=1:goto1335
+ 1330 ifz$<>" "thenx$=left$(x$,1)+" "+mid$(x$,2)
+ 1332 ifz=3orz=8thenx=1:rem c- & f-skalen mit b (nicht #)
+ 1335 h$(ht)=x$:hg%(ht)=z:hs%(ht)=x:rem bez./grundton/skala (# oder b)
+ 1340 fori=0toht-1:ifh$(i)=x$theny=ha%(i):goto1400
+ 1345 nexti:y=0
+ 1350 y=fnbs(0)+fnbs(4)+fnbs(7):rem bit-muster f.grund-dreiklang
+ 1355 fori=2tolen(x$):z$=mid$(x$,i,1)
+ 1360 ifz$="m"theny=fnbc(4):y=fnbs(3):goto1399:rem moll
+ 1365 ifz$="j"theny=fnbc(10):y=fnbs(11):goto1399:rem major
+ 1370 ifz$="+"theny=fnbc(7):y=fnbs(8):goto1399:rem quinte +
+ 1375 ifz$="-"theny=fnbc(7):y=fnbs(6):goto1399:rem quinte -
+ 1380 ifz$="0"orz$="o"theny=fnbc(4):y=fnbs(3):y=fnbc(7):y=fnbs(6):rem vermindert
+ 1382 ifz$="6"theny=fnbs(9):goto1399:rem sexte
+ 1385 ifz$="7"then1398
+ 1386 ifz$="9"then1397
+ 1387 ifz$="1"then1396
+ 1388 ifz$="3"then1395
+ 1390 goto1399
+ 1395 y=fnbs(9):rem 13-er
+ 1396 y=fnbs(5):rem 11-er
+ 1397 y=fnbs(2):rem  9-er
+ 1398 iffnbt(11)=0theny=fnbs(10):rem 7-er, wenn nicht schon major-7
+ 1399 nexti
+ 1400 ha%(ht)=y:print:printx$tab(9)": ";
+ 1410 fori=0to11:iffnbt(i)=0then1450
+ 1420 prints$(i+z+(i+z>11)*12,x)" ";
+ 1450 nexti:print:return
+ 1500 :
+ 1501 rem anzaehlen
+ 1502 :
+ 1510 sysap:rem init.irq-prog.
+ 1511 print:print"Stimmton : "s$(ta%,hs%(h))
+ 1512 pokerb,1:z=fw:fori=1toa4
+ 1514 sysap+6,128,z,0,"":z=0:next
+ 1515 ifpeek(fs)then1515
+ 1516 print:print"Anzaehlen:";
+ 1520 pokerp,1:fori=1toa4
+ 1530 sysap+6,128,0,0,str$(i):next
+ 1540 ifkpthenpokerp,0
+ 1550 pr$=" ":return
+ 1800 :
+ 1801 rem frequ.umrechn.konst. & tempo rechnen/->ass.prog.
+ 1802 :
+ 1820 fu=fk*f6^p(0,0):t0%=0
+ 1840 rem vorschlaege bei tempi<130 ->1/16-noten, wenn schneller ->1/8-triolen
+ 1850 ifp(1,0)<130thenz=int(900/p(1,0)+.5):t2%=2*z:t3%=t2%+z:t4%=t3%+z:goto1870
+ 1860 z=int(1200/p(1,0)+.5):t2%=z:t3%=t2%+z:t4%=t3%+z:goto1870
+ 1870 poker+5,10+t4%/50:rem bass-decay aufgrund tempo
+ 1880 sysap+18,t2%,t3%,t4%:return
+ 1897 :
+ 1898 rem ton -> sid
+ 1899 :
+ 2000 :
+ 2001 rem abspeichern auf disk
+ 2002 :
+ 2010 print"{clr}{down}Abspeichern auf Disk"
+ 2020 input"{down}{down}Musik-Titel";mt$
+ 2030 gosub2700:iferthenreturn
+ 2040 open2,8,2,mt$+",s,w":gosub2800:ifer=0then2050
+ 2042 ifer<>63thenreturn
+ 2044 print"{down}Ueberschreiben (j/n)? ";
+ 2046 getz$:ifz$<>"j"andz$<>"n"then2046
+ 2048 printz$:ifz$="n"then2090
+ 2049 close2:print#15,"s0:"+mt$:goto2040
+ 2050 print#2,ht;c$;a4;c$;wa:fori=0to4:print#2,p(i,0):next
+ 2060 gosub2800:iferthenreturn
+ 2070 fori=1toht:print#2,h$(i);c$;ha%(i);c$;hs%(i);c$;hg%(i);c$;hd%(i):nexti
+ 2090 gosub2800:close2:close15:return
+ 2600 :
+ 2700 open15,8,15,"i0"
+ 2800 input#15,er,er$,et,es:ifer=0thenreturn
+ 2820 print:printer;er$;et;es:ifer<20orer=63thenreturn
+ 2850 :
+ 2900 close2:close15
+ 2910 :
+ 2950 print:print"{down}{down}<Taste druecken>":poke198,0
+ 2960 getz$:ifz$=""then2960
+ 2980 return
+ 3000 :
+ 3001 rem einlesen von disk
+ 3002 :
+ 3010 print"{clr}Titel eingeben oder 'Return' fuer":print"{down}Inhaltsverzeichnis{down}"
+ 3020 mt$="":inputmt$:ifmt$>""then3040
+ 3030 gosub3500:iferormt$=""thenreturn
+ 3040 gosub2700:open2,8,2,"0:"+mt$+",s,r":gosub2800:iferthenreturn
+ 3050 input#2,ht,a4,wa:fori=0to4:input#2,p(i,0):ifp(i,0)<p(i,1)thenp(i,0)=p(i,1)
+ 3055 ifp(i,0)>p(i,2)thenp(i,0)=p(i,2)
+ 3060 nexti:gosub2800:iferthenreturn
+ 3065 print"{clr}"mt$"  :"str$(a4)"/4-Takt":print"{down}Harmonie  Dauer in 1/4{down}"
+ 3070 fori=1toht:input#2,h$(i):z=asc(h$(i)+chr$(0)):ifz=87orz=208then3080:rem w+p
+ 3075 ifz<193orz>199thenprint:print"*** File-Fehler ***":goto2900
+ 3080 input#2,ha%(i),hs%(i),hg%(i),hd%(i)
+ 3090 printh$(i)tab(12)hd%(i):nexti:fori=0to500:next:goto3900
+ 3500 :
+ 3510 gosub2700:iferthenreturn
+ 3515 open2,8,2,"#":dt=18:ds=1
+ 3520 print#15,"u1";2;0;dt;ds
+ 3522 print"{clr}Inhalt:":print"{down}Nr Titel":print"{CBM-T}{CBM-T} {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{down}"
+ 3525 print#15,"b-p";2;0:get#2,z$:dt=asc(z$+chr$(0)):get#2,z$:ds=asc(z$+chr$(0))
+ 3530 fori=0to7:print#15,"b-p";2;i*32+2
+ 3540 get#2,z$:ifz$<>chr$(129)then3600
+ 3550 get#2,z$,z$
+ 3560 x$="":forj=1to16:get#2,z$:x$=x$+z$:next:z$(i)=x$:printi;x$
+ 3600 next:print"{down}{down}{down}Taste druecken:{down}":print"Nr.0...7 = diesen Titel einlesen"
+ 3610 print"'Space'  = weiter im Inhaltsverzeichnis"
+ 3620 print"'f1'     = zurueck ins Menue"
+ 3640 getz$:ifz$=""then3640
+ 3650 ifz$=chr$(133)thenmt$="":goto3900
+ 3660 ifz$=>"0"andz$<"8"thenmt$=z$(val(z$)):goto3900
+ 3670 ifz$<>" "then3640
+ 3680 ifdt<1ordt>35thenprint"{down}keine weiteren Titel":goto3640
+ 3690 goto3520
+ 3900 close2:close15:return
+ 5000 :
+ 5001 rem parameter aendern
+ 5002 :
+ 5020 print"{clr}Parameter-Einstellungen:"
+ 5030 print"Nr. waehlen (1-5) und mit +/- aendern"
+ 5100 print"{down}1)          {rvon}Stimmung{rvof} (a=220 Hz)"
+ 5110 print"   e  f  f# g  g# a  a# b  c  c# d":printps$
+ 5120 print"{down}{down}2) 30 45 60 {rvon}Tempo{rvof}   120   150   180":printps$
+ 5130 print"{down}{down}3) dunkel   {rvon}Bass-Filter{rvof}       hell":printps$
+ 5140 print"{down}{down}4) 1/4      {rvon}Bass-Noten{rvof}         1/2":printps$
+ 5150 print"{down}{down}5) Trend    {rvon}Bass-Linie{rvof}      Zufall":printps$
+ 5160 print"{down}{down}"mn$"{home}"
+ 5165 :
+ 5170 forpn=0to4:gosub5500:next
+ 5180 gosub6900:pn=0:f=220
+ 5190 gosub1800:sysap:sysap+6,0,f*fu,0,"":pokerb,1
+ 5200 z=peek(197):ifz=4then5900
+ 5210 ifz=56thenpn=0
+ 5220 ifz=59thenpn=1
+ 5230 ifz=8 thenpn=2
+ 5240 ifz=11thenpn=3
+ 5250 ifz=16thenpn=4
+ 5290 ifz<>40andz<>43then5200
+ 5300 i=(p(pn,2)-p(pn,1))/30:ifz=43theni=-i
+ 5310 p(pn,0)=p(pn,0)+i
+ 5320 ifp(pn,0)<p(pn,1)thenp(pn,0)=p(pn,1)
+ 5330 ifp(pn,0)>p(pn,2)thenp(pn,0)=p(pn,2)
+ 5400 :
+ 5410 gosub5500:ifpn=0orpn=1then5190
+ 5415 ifpn=2thenpoker+22,p(2,0)
+ 5420 goto5200
+ 5490 :
+ 5500 print"{home}{down}":fori=0topn:print"{down}{down}{down}{down}";:next
+ 5510 z=int(30/(p(pn,2)-p(pn,1))*(p(pn,0)-p(pn,1))+3.5)
+ 5520 printleft$(l$,z)"^"left$(l$,35-z)
+ 5530 return
+ 5900 :
+ 5910 sysap+3:return
+ 6900 :
+ 6901 rem init.sid-registers: bass=vco#1+2, perc=vco#3
+ 6902 :
+ 6910 gosub6950:poker+10,1:poker+12,8:rem vco#2
+ 6920 poker+15,80:rem vco#3
+ 6930 poker+22,p(2,0):poker+23,240+8+2+1:poker+24,16+15:rem filter & volume
+ 6940 return
+ 6950 fori=r+24torstep-1:pokei,0:next:return
+ 8000 :
+ 8001 rem neueingabe / editieren
+ 8002 :
+ 8100 ifht<1thenprint"{clr}Neueingabe":goto8150
+ 8102 print"{clr}Neueingabe oder Editieren (n/e)?";
+ 8105 getz$:ifz$=""then8105
+ 8110 printz$:ifz$="n"then8150
+ 8120 ifz$="e"thenhl=ht:goto8200
+ 8130 goto8100
+ 8150 hl=0:a4=4:wa=1
+ 8200 ht=0:h=0
+ 8210 print"{down}Anzahl 1/4 pro Takt  "a4:printtab(20)"{up}";:inputa4
+ 8220 print"{down}Anzahl Gesamt-Wiederholungen  "wa:printtab(29)"{up}";:inputwa
+ 8300 print"{clr}Harmoniefolge eingeben (*=Ende Eingaben){down}"
+ 8305 print" p=Pause            w=Wiederholung{down}"
+ 8310 print" A...H (oder a...h)  =Grund-Dreiklang"
+ 8315 print" #=erhoeht          b=erniedrigt"
+ 8320 print" j=major            m=moll"
+ 8330 print" +=erhoehte Quint   -=erniedrigte Quint"
+ 8340 print" o=vermindert       B=deutsches H"
+ 8350 print" 6,7,9,11,13=Sext,Sept,None,usw."
+ 8360 print"{down}Beispiele:"
+ 8365 print" C    =C-Dur-Akkord"
+ 8370 print" F#m9 =Fis-Moll-None-Akkord"
+ 8380 print" Gb6/7=Ges-Sext/Sept-Akkord"
+ 8390 print" Bb7j =Bes-major-Sept-Akkord{down}"
+ 8400 x$="":hd=4:ifht<hlthenx$=h$(ht+1):hd=hd%(ht+1)
+ 8410 print"{down}{down}Takt"right$("  "+str$(int(h/a4)+1),3)":   "x$:printtab(9)"{up}";
+ 8420 inputx$:x=asc(x$+chr$(0))and127
+ 8430 ifx=42then8900:rem * (ende)
+ 8435 ifx=87then8500:rem w (wiederh.)
+ 8440 ifx=72thenx=66:rem h wird b
+ 8445 ifx=80thenht=ht+1:h$(ht)="Pause":goto8480:rem p (pause)
+ 8450 ifx<65orx>71thenprint"{down}*** Fehler ***":goto8400
+ 8460 x$=chr$(x+128)+mid$(x$,2)
+ 8470 ht=ht+1:gosub1300
+ 8480 print"{down}Dauer in 1/4  "hd:printtab(13)"{up}";:inputhd::h=h+hd
+ 8490 hd%(ht)=hd:goto8400
+ 8500 :
+ 8501 rem wiederholungszeichen bearbeiten
+ 8510 ifht=>hlthenhd=ht:hg%(ht+1)=1
+ 8520 ht=ht+1:h$(ht)="w"
+ 8530 print"{down}ab der wievielten Harmonie"
+ 8535 print"soll wiederholt werden"
+ 8537 print" "hg%(ht):print"{up}";:inputz:ifz>ht-2orz<1then8530
+ 8538 hg%(ht)=z
+ 8540 print"{down}bis (und mit) zur wievielten Harmonie"
+ 8545 print"soll wiederholt werden ( letzte="ht-1")"
+ 8550 print" "hd:print"{up}";:inputz:ifz=>ht orz<=hg%(ht)then8530
+ 8560 hd%(ht)=z:goto8400
+ 8900 :
+ 8910 ifht<hlthenht=hl:rem exit, korr.ht wenn edit.
+ 8920 return
+ 9000 :
+ 9100 :
+ 9101 rem skala-pointers a,b,c,d,e,f,g
+ 9102 :
+ 9110 data0,2,3,5,7,8,10
+ 9200 :
+ 9201 rem # und b-skalen chromat.
+ 9202 :
+ 9210 data"A ","A#","B ","C ","C#","D ","D#","E ","F ","F#","G ","G#","\ "
+ 9220 data"A ","Bb","B ","C ","Db","D ","Eb","E ","F ","Gb","G ","Ab","\ "
+ 9400 :
+ 9401 rem param. std/tiefst/hoechst-werte
+ 9402 :
+ 9410 data 15,0,30:rem stimmung (1/6-toene oberhalb 'e' ->'e'...'d')
+ 9420 data105,30,180:rem tempo
+ 9430 data15,0,30:rem bass-filter
+ 9440 data.2,0,1:rem 1/4 - 1/2 noten
+ 9450 data.2,0,1:rem trend - zufall
+ 9480 :
+50000 :
+50001 rem save prog.
+50002 :
+50010 open15,8,15,"s0:bassist":gosub2800
+50020 save"bassist",8:gosub2800:close15
+50030 end
+

@@ -1,0 +1,184 @@
+
+
+;grafik-art.prg ==0801==
+    5 poke56,61:poke55,192
+   10 poke53280,0:poke53281,0:poke650,128:poke53272,23:print"{clr}"
+   11 ::
+   12 ifa=0thena=1:load"mt-grafik-art",8,1
+   99 ::
+  100 rem+++++++++++++++++++++++++++++
+  101 rem+                           +
+  102 rem+     grafik-art            +
+  103 rem+                           +
+  104 rem+           andreas a. holz +
+  105 rem+           zikadenweg 15   +
+  106 rem+ [3017728] 1   berlin 19   +
+  107 rem+                           +
+  108 rem+++++++++++++++++++++++++++++
+  109 ::
+  120 for x=704to766:reada:pokex,a:next:rem single cusour [11. block]
+  130 for x=896to958:reada:pokex,a:next:rem multi  cusour [14. block]
+  135 forx=1to9:readsp(x):next:rem +++++speed-datas
+  140 v=53248:pokev+21,143:pokev+14,0:pokev+15,29:pokev+46,7:pokev+29,134:pokev+23,140
+  150 v$="{blu}7654321{lblu}0":l$="                                       ":poke198,0
+  155 gosub710:gosub830:sys49702:rem bildschirmaufbau+sprite loeschen [13.block]
+  170 poke2040,13:pokev+16,6:pokev,255:pokev+1,51:pokev+39,14:rem+  sprite 0
+  180 poke2041,13:pokev+2,28:pokev+3,51:pokev+40,14:rem+++++++++++  sprite 1
+  190 poke2042,13:pokev+4,28:pokev+5,80:pokev+41,14:rem+++++++++++  sprite 2
+  200 poke2043,13:pokev+6,255:pokev+7,80:pokev+42,14:rem++++++++++  sprite 3
+  298 ::
+  299 poke198,0
+  300 sys49152
+  305 geta$:ifa$=""goto300
+  310 ifa$="{f3}"thensys49682:goto300
+  320 ifa$="{f4}"thensys49692:goto300
+  322 ifa$="{rght}"thensys50559:goto300
+  324 ifa$="{left}"thensys50542:goto300
+  326 ifa$="{down}"thensys49879:goto300
+  328 ifa$="{up}"thensys49931:goto300
+  350 ifa$="d"thensys49778:gosub800:goto299
+  355 ifa$="D"thensys49794:gosub800:goto299
+  360 ifa$="{clr}"thensys49702:goto299
+  370 ifa$="{home}"thenpokev+14,0:pokev+15,29:goto299
+  380 ifa$=chr$(13)thenifpeek(v+15)<>189thenpokev+14,0:pokev+15,peek(v+15)+8:goto299
+  390 ifa$="s"thensys49821:gosub800:goto299
+  392 ifa$="{f1}"thensys49720:goto300
+  393 ifa$="{f2}"thensys49735:goto300
+  394 ifa$="{f5}"thensys50502:goto300
+  395 ifa$="{f6}"thensys50522:goto300
+  396 ifa$="{f7}"thensys50512:goto300
+  397 ifa$="{f8}"thensys50532:goto300
+  400 ifa$=" "thenifpeek(49405)=176thensys49844:goto300
+  410 ifa$="0"thenforx=832to894:pokex,255-peek(x):next:sys49548:goto299
+  490 ifa$="m"thensys50065:gosub710:gosub830:sys49548:goto299
+  495 ifa$="a"thengosub1010:goto300
+  497 ifa$="@"goto3005
+  500 ifa$="!"thenifpeek(49236)=15thenpoke49997,128:poke49996,peek(v+39):gosub760:goto299
+  510 ifa$=chr$(34)thenifpeek(49236)=15thenpoke49997,64:poke49996,peek(v+37):gosub760:goto299
+  520 ifa$="#"thenifpeek(49236)=15thenpoke49997,192:poke49996,peek(v+38):gosub760:goto299
+  525 ifa$="_"thengosub4000:goto299
+  527 ifasc(a$)>48andasc(a$)<58thenpoke1661,128+asc(a$):poke49294,sp(asc(a$)-48):goto300
+  528 ifa$="+"thenifpeek(v+46)<>255thenpokev+46,peek(v+46)+1:goto299
+  529 ifa$="-"thenifpeek(v+46)<>0thenpokev+46,peek(v+46)-1:goto299
+  535 ifa$="^"goto7010
+  540 ifa$="*"goto7050
+  550 goto300
+  700 rem++++++++++++++++++++++++
+  701 rem+                      +
+  702 rem+  bildschirmaufbau    +
+  703 rem+                      +
+  704 rem++++++++++++++++++++++++
+  705 ::
+  710 pokev+14,0:pokev+15,29
+  715 print"{clr}";:ifpeek(49236)=15goto740
+  720 forx=1to21:print"{red}++++++++++++++++++++++++{blu}"x:next:forx=0to2:printv$;:next
+  730 poke2047,11:pokev+28,0:goto800
+  740 forx=1to21:print"{red}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{CBM-D}{CBM-F}{blu}"x:next:forx=0to2:printv$;:next
+  750 poke2047,14:pokev+28,15
+  760 poke214,17:poke211,28:sys58640:print"{cyn}Zeichen= ";:poke646,peek(49996):print"{rvon}  {down}{left}{left}  {rvof}"
+  765 poke214,18:poke211,31:sys58640:print"{cyn}farbe"
+  770 poke214,20:poke211,28:sys58640:print"{lred}Farbe #1 ";:poke646,peek(53287):print"{rvon}  {rvof}"
+  780 poke214,21:poke211,28:sys58640:print"{red}Farbe #2 ";:poke646,peek(53285):print"{rvon}  {rvof}"
+  790 poke214,22:poke211,28:sys58640:print"{pur}Farbe #3 ";:poke646,peek(53286):print"{rvon}  {rvof}"
+  800 poke214,11:poke211,28:sys58640:print"{blu}DRAW {rvon} a";
+  805 ifpeek(49280)<>234goto808
+  806 print"n  {rvof}":goto810
+  808 print"us {rvof}"
+  810 poke214,13:poke211,28:sys58640:print"{lblu}S/L-Modus-S":ifpeek(49404)=43thenpoke1582,128+peek(1582)
+  820 ifpeek(49404)<>43thenforx=1572to1574:pokex,128+peek(x):next:return
+  825 return
+  830 poke214,15:poke211,28:sys58640:print"{grn}SPEED # {rvon} 5 {rvof}":poke49294,64:return
+  839 ::
+  840 rem++++  single-sprite-data's  ++++
+  845 data,,,,,,,,,,,,,,,,,,,,,,,,,,,,7,,,8,128,,16,64,,16,64,,8,192,,7,224,,,48
+  850 data,,24,,,,,,,,,,,,
+  900 :
+  905 rem++++  multi -sprite-data's  ++++
+  910 data,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,31,252,,32,2,,32,2,,32,2,,32,2,,31,252,,
+  915 data,,,,,,,,,,,,
+  920 :
+  925 rem++++  speed - datas ++++++++++++
+  930 data80,75,68,64,58,48,35,25,17
+  935 ::
+ 1000 rem+++++++++++++++++++++++
+ 1001 rem+                     +
+ 1002 rem+     ausgabe         +
+ 1003 rem+                     +
+ 1004 rem+++++++++++++++++++++++
+ 1005 :
+ 1010 poke198,0:poke214,23:poke211,0:sys58640:print"{lblu}Ausgabe..."
+ 1020 print"1. Disk   2. Drucker   3. Screen";
+ 1030 geta$:ifa$="1"goto2001
+ 1035 ifa$="2"goto1050
+ 1040 ifa$="3"thengosub1055:goto1080
+ 1042 ifa$=chr$(13)thengosub1095:goto300
+ 1045 goto1030
+ 1050 open4,4:cmd4:gosub1060:print#4:close4:gosub1095:return
+ 1055 print"{clr}";:pokev+21,0
+ 1060 forx=0to4:printx+1"data";:forx1=0to10:printpeek(832+x1+x*12)"{left},";
+ 1065 next:printpeek(832+x1+x*12)
+ 1070 next:printx+1"data";:forx=892to893:printpeek(x)",";:next:printpeek(894):return
+ 1080 input"{down}{down}Programm Ende";a$:ifmid$(a$,1,1)="j"goto5000
+ 1090 gosub710:gosub830:pokev+21,143:sys49548:return
+ 1095 forx=0to1:poke214,23+x:poke211,0:sys58640:printl$;:next:return
+ 1097 poke53280,2:poke53265,peek(53265)and239:return
+ 1098 poke53265,peek(53265)or16:poke53280,0:return
+ 1099 open2,8,2,n$+",s,w":return
+ 1100 ::
+ 1101 close2:gosub1099:gosub1095:sys50607:gosub1098:wait198,1:gosub1095:sys65511:return
+ 2000 ::
+ 2001 gosub1095:gosub4101:ifn$=""thengosub1095:goto300
+ 2010 gosub1097:gosub1099:open15,8,15:input#15,a$:ifa$<>"00"goto1101
+ 2015 forx=832to832+62:print#2,peek(x)
+ 2020 next
+ 2025 close2:close15:gosub1095:gosub1098:return
+ 3000 rem+++++++++++++++++++++++++++
+ 3001 rem+                         +
+ 3002 rem+   disk......            +
+ 3003 rem+                         +
+ 3004 rem+++++++++++++++++++++++++++
+ 3005 poke214,23:poke211,0:sys58640:print"{lblu}Disk...":print"1. DOS   2. Disk-Status";
+ 3010 geta$:ifa$="1"goto3050
+ 3015 ifa$="2"goto3070
+ 3016 ifa$=chr$(13)thengosub1095:goto299
+ 3020 goto3010
+ 3050 gosub1095:poke214,23:poke211,0:sys58640:gosub4100:ifn$=""thengosub1095:goto300
+ 3055 open1,8,15,n$:close1:gosub1095:goto300
+ 3070 gosub1095:sys50709:wait198,1:gosub1095:poke198,0:goto299
+ 3100 rem+++++++++++++++++++++++++++
+ 3101 rem+                         +
+ 3102 rem+   eingabe               +
+ 3103 rem+                         +
+ 3104 rem+++++++++++++++++++++++++++
+ 3998 open2,8,2,n$+",s,r":return
+ 3999 close2:gosub3998:gosub1095:sys50607:gosub1098:wait198,1:gosub1095:sys65511:return
+ 4000 gosub4101:ifn$=""thengosub1095:goto300
+ 4001 gosub1097:gosub3998:open15,8,15:input#15,a$:ifa$<>"00"goto3999
+ 4005 forx=832to832+62:input#2,a:pokex,a:next
+ 4010 close2:close15:gosub1095:sys49548:gosub1098:return
+ 4091 ::
+ 4092 rem +++  get  name  +++
+ 4093 ::
+ 4100 n$="":poke214,23:poke211,0:sys58640:print"{lblu}Befehl? ";:n=29:goto4105
+ 4101 n$="":poke214,23:poke211,0:sys58640:print"{lblu}Filename? ";:n=16
+ 4105 a$="":poke198,0:poke204,0
+ 4110 geta$:ifa$=""then4110
+ 4114 ifa$=chr$(13)thenpoke204,1:print" ";:return
+ 4120 ifa$=chr$(20)thenifn$<>""thenpoke204,1:print"{left}  {left}{left}";:n$=left$(n$,len(n$)-1):goto4105
+ 4125 ifn$=""thenifa$=chr$(20)then4110
+ 4130 iflen(n$)=nthen4110
+ 4135 poke204,1:printa$;:n$=n$+a$:goto4105
+ 5000 poke631,19:forx=632to632+6:pokex,13:next:poke198,7:new
+ 7003 ::
+ 7004 rem **** sprite-speicher
+ 7005 ::
+ 7010 poke214,23:poke211,0:sys58640:print"{lblu}Sprite speichern"
+ 7015 n$="":n=1:print"Spritenr. (1-8)? ";:gosub4105:ifn$=""thengoto7065
+ 7016 x=val(n$):ifx<1orx>8goto7065
+ 7020 forx1=0to62:poke15808+(64*(x-1))+x1,peek(832+x1):next:gosub1095:goto299
+ 7030 ::
+ 7050 poke214,23:poke211,0:sys58640:print"{lblu}Sprite einlesen"
+ 7055 n$="":n=1:print"Spritenr. (1-8)? ";:gosub4105:ifn$=""thengosub1095:goto299
+ 7060 x=val(n$):forx1=0to62:poke832+x1,peek(15808+(64*(x-1))+x1):next
+ 7065 gosub1095:sys49548:goto299
+

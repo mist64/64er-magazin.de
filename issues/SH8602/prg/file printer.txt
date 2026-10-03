@@ -1,0 +1,67 @@
+
+
+;file printer.prg ==0801==
+   10 poke 53280,0:poke 53281,1:print chr$(30)chr$(14)chr$(147)
+   20 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}   Der Disketteninhalt wird in Klein-"
+   30 print
+   40 print" schrift auf einem Drucker ausgegeben."
+   50 print"{down}{down}{down}    Bitte "chr$(18)"'Drucker'"chr$(146)" einschalten
+   60 print
+   70 print"       und Taste druecken !
+   80 poke198,0
+   90 geta$:m=m+1:ifm=10thenm=0
+  100 printmid$("{rvon}{rvof}",m/5+1,1);
+  110 print"{home}{down}{down}{down}{down}{down}Klaus Grabietz,Am Weinberg14,3108 Winsen"
+  120 print"{rvon}{home}{down}{down}             File Printer               "
+  130 ifa$=""goto90
+  140 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}       Naechste Diskette - "chr$(18)"'F7'"
+  150 print
+  160 print"                    Ende - "chr$(18)"'F1'"
+  170 poke198,0
+  180 getc$:ifc$=chr$(136)then210
+  190 ifc$=chr$(133)thenprint"{clr}":end
+  200 goto180
+  210 dim f$(152)
+  220 dim g$(152)
+  230 print chr$(147)chr$(31)chr$(142)
+  240 open9,8,0,"$"
+  250 get#9,a$,b$:n0=0
+  260 get#9,a$,b$:z0=0:x$=""
+  270 ifst<>0then350
+  280 get#9,a$,b$
+  290 n$=chr$(0)
+  300 g$=right$("      "+str$(asc(a$+n$)+asc(b$+n$)*256),6)
+  310 get#9,a$:ifa$=chr$(34)thenz0=sgn(z0+1)
+  320 ifa$=""thenn0=n0+1:n1=n0-1:gosub360:goto260
+  330 ifz0=1theng$=g$+a$
+  340 goto310
+  350 close9:goto470
+  360 ifn0=1then440
+  370 iflen(g$)=6then460
+  380 aa$="":fori=8to24:c$=mid$(g$,i,1):ifc$=chr$(34)theni=24:goto400
+  390 aa$=aa$+c$
+  400 nexti:g$(n1)=left$(aa$+"                  ",18)+left$(g$,6)+"  "+id$
+  410 h1$=mid$(g$(n1),22,3):h2$=left$(g$(n1),16)
+  420 h$=h1$+" "+h2$+" "+mid$(g$,26,3):print"       "h$:a=a+1:f$(a)=h$:printchr$(142)
+  430 return
+  440 cc$=right$(g$,24):id$=mid$(cc$,20,2):print"       {rvon}";cc$:return
+  450 print
+  460 print"    ";g$;" bloecke frei.":cc$=cc$+g$+" bloecke frei.  "+da$:return
+  470 open1,4
+  480 print#1:cmd1 :printchr$(27)chr$(15);:printchr$(27)"s"chr$(0);
+  490 print#1,chr$(27)"a"chr$(5);"name : ";mid$(cc$,2,16);
+  500 print#1,"     nr. : ";id$;
+  510 print#1,"      "mid$(cc$,28,16)
+  520 print#1,"==============================================================";
+  530 print#1,"================="
+  540 ifa/3<>int(a/3)anda-3*int(a/3)=2thena=a+3:goto560
+  550 ifa/3<>int(a/3)anda-3*int(a/3)=1thena=a+3:goto560
+  560 forx=1toint(a/3)
+  570 print#1," "f$(x);"   ";
+  580 print#1,f$(x+int(a/3));"   ";
+  590 print#1,f$(x+2*int(a/3))
+  600 next:goto620
+  610 print#1,mid$(cc$,28,16)
+  620 close1
+  630 printchr$(30)chr$(14)chr$(147):run140
+

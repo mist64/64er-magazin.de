@@ -1,0 +1,75 @@
+
+
+;quell.page4.prg ==0801==
+   10 sys 9*4096      ;profi-ass
+   12 .opt oo
+   13 *= $033c        ;startadresse
+   14 ;
+   50 illq  = $b248
+   55 koget = $b7f1
+   90 ;
+  100 jsr koget
+  110 cpx #1 :beq hole1
+  120 cpx #2 :beq hole2
+  130 cpx #3 :beq hole3
+  140 cpx #4 :beq hole4
+  150 jmp illq
+  200 ;
+  201 ;==================================
+  202 ;die gespeich.screens werden ueber   sys-befehl->sys828,n (n=1-4)aufgerufen
+  203 ;==================================
+  500 hole1 lda $01  :pha
+  510 :     lda #$36 :sta $01
+  515 :     jsr up3  :sta $fb
+  520 :     ldy #$a0 :sty $fc
+  525 :     jsr copy
+  530 :     jsr up4  :ldy #$a4
+  540 :     jmp cop2
+  545 ;
+  555 hole2 lda $01  :pha
+  560 :     lda #$36 :sta $01
+  565 :     jsr up3  :sta $fb
+  570 :     ldy #$a8 :sty $fc
+  580 :     jsr copy
+  585 :     jsr up4  :ldy #$ac
+  595 :     jmp cop2
+  600 ;
+  610 hole3 lda $01  :pha
+  615 :     lda #$36 :sta $01
+  620 :     jsr up3  :sta $fb
+  625 :     ldy #$b0 :sty $fc
+  635 :     jsr copy
+  640 :     jsr up4  :ldy #$b4
+  650 :     jmp cop2
+  655 ;
+  665 hole4 lda $01  :pha
+  670 :     lda #$36 :sta $01
+  675 :     jsr up3  :sta $fb
+  680 :     ldy #$b8 :sty $fc
+  690 :     jsr copy
+  695 :     jsr up4  :ldy #$bc
+  705 :     jmp cop2
+  710 ;
+  720 up3 lda #$00 :ldy #$04 ;$0400 nach
+  725 :   sta $fd  :sty $fe  ;$fd/e
+  730 :   rts
+  734 ;
+  735 up4 lda #$00 :ldy #$d8 ;$d800 nach
+  740 :   sta $fd  :sty $fe  ;$fd/e
+  745 :   rts
+  749 ;
+  750 cop2 sta $fb :sty $fc
+  755 :    jsr copy
+  765 :    pla :sta $01
+  770 :    rts               ;fertig
+  775 ;
+  900 copy ldx #4 :ldy #0  ;kopierroutine
+  905 n lda ($fb),y
+  910 : sta ($fd),y
+  915 : iny
+  920 : bne n
+  925 : inc $fc :inc $fe
+  930 : dex
+  935 : bne n
+  940 rts
+

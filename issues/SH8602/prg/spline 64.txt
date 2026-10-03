@@ -1,0 +1,522 @@
+;spline 64.prg ==0801==
+;version=simons
+   10 rem **********************
+   20 rem *       spline       *
+   30 rem *                    *
+   40 rem *         by         *
+   50 rem *                    *
+   60 rem *       m.buhtz      *
+   70 rem *                    *
+   80 rem *  tel.: 0281/22431  *
+   90 rem **********************
+  100 run110
+  110 rem  *** natuerliche splinefunktion ***
+  120 :
+  130 rem eingabemenue
+  140 :
+  150 print"{clr}{rvon}              eingabemenue              {rvof}"
+  160 print:print:print:printspc(15)"key     (1)"
+  170 print:print:printspc(15)"tape     "
+  180 print:printspc(15)"graphic (2)"
+  190 printspc(15)"d-file  (3)"
+  200 print:print:printspc(15)"disk     "
+  210 print:printspc(15)"graphic (4)"
+  220 printspc(15)"d-file  (5)"
+  230 print:print:printspc(15)"fkt-spl (6)"
+  240 geta$:a=val(a$):on a goto 380,3560,4550,3570,4560,4930:goto240
+  250 :
+  260 rem ausgabemenue
+  270 :
+  280 print"{clr}{rvon}            ausgabemenue                {rvof}"
+  290 print:print:printspc(12)"new      (1)"
+  300 print:print:print:printspc(12)"tab      (2)"
+  310 print:printspc(14)"copy   (3)"
+  320 print:print:print:printspc(12)"graph    (4)"
+  330 print:printspc(14)"old    (5)"
+  340 print:printspc(14)"copy   (6)"
+  350 print:printspc(14)"tape   (7)"
+  360 print:printspc(14)"disk   (8)"
+  370 geta$:a=val(a$):on a goto  100,930,3380,1230,2570,2540,3890,3900:goto370
+  380 :
+  390 rem eingabe key
+  400 :
+  410 print"{clr}{rvon}            eingabe key                 {rvof}"
+  420 print:print:input"  anzahl der kurven";ak$
+  430 ifak$="_"then150
+  440 ak=val(ak$)
+  450 ifak=0then420
+  460 print:print:input"  anzahl der int.pol.schritte";sw$
+  470 ifsw$="_"then420
+  480 sw=val(sw$)
+  490 ifsw=0then460
+  500 print:print
+  510 fori=1toak
+  520 print:print"  {rvon}kurve"i"{rvof}"
+  530 print:print:input"  anzahl der stuetzstellen";n1$(i)
+  540 ifn1$(i)="_"then460
+  550 n1(i)=val(n1$(i))
+  560 ifn1(i)>=3then590
+  570 print:print:print"  fehler!"
+  580 print:print"  minimale anzahl stuetzstellen =3!":goto530
+  590 ifn1(i)>n1thenn1=n1(i)
+  600 nexti
+  610 print:print:print"  eingabe o.k. ?  (j/n)"
+  620 geta$
+  630 ifa$="n"then410
+  640 ifa$="j"then660
+  650 goto620
+  660 n1=n1+1
+  670 dimx(ak,n1),y(ak,n1),sw(ak,n1)
+  680 dima(n1),c(n1),b(n1),d(n1),h(n1),m(n1,n1),v(n1),o(n1),p(n1),q(n1)
+  690 fori=1toak
+  700 print"{clr}{rvon}         eingabe stuetzstellen          {rvof}"
+  710 print:print:print"  {rvon}kurve"i"{rvof}"
+  720 forj=1ton1(i)
+  730 ifj<=0then690
+  740 print"{down}{down}  x("j"), y("j")"
+  750 input"{down}  ";x$(i,j),y(i,j)
+  760 ifx$(i,j)="_"thenj=j-2:nextj
+  770 x(i,j)=val(x$(i,j))
+  780 de=sw*(n1(i)-1)+n1(i)
+  790 ifde>dithendi=de
+  800 nextj
+  810 gosub4160
+  820 forj=2ton1(i)
+  830 sw(i,j-1)=(x(i,j)-x(i,j-1))/sw
+  840 nextj
+  850 print:print:print"  abspeichern ?  (j/n)"
+  860 geta$:ifa$="n"then890
+  870 ifa$="j"then4320
+  880 goto860
+  890 nexti
+  900 dimz(di+3),t(di+3)
+  910 goto260
+  920 :
+  930 rem tabelle
+  940 :
+  950 :
+  960 fork=1toak:g=0:n=n1(k):e6=1
+  970 gosub4100:gosub2610:j=0
+  980 print"{clr}{rvon}                kurve"k"{left}                 {rvof}"
+  990 forl=1ton1(k):print
+ 1000 a1=int(a(l)*100+.5)/100:b1=int(b(l)*100+.5)/100:c1=int(c(l)*100+.5)/100
+ 1010 d1=int(d(l)*100+.5)/100
+ 1020 print"spl{left}"l"{left}: y={rvon}"a1"{rvof}{left}+{rvon}"b1"{rvof}{left}*x+{rvon}"c1"{rvof}{left}*x^2+{rvon}"d1"{rvof}{left}*x^3"
+ 1030 nextl
+ 1040 ifpeek(203)<>60then1040
+ 1050 print"{clr}{rvon} kurve"k"{left}      x             y           {rvof}"
+ 1060 fori=1to21
+ 1070 ifi+j>gthen1160
+ 1080 za=abs(z(i+j)):tc=abs(t(i+j))
+ 1090 ifza<1thenza=0.1
+ 1100 iftc<1thentc=0.1
+ 1110 ta=int(log(za)/log(10))+1:tb=int(log(tc)/log(10))+1
+ 1120 printtab(13-ta)z(i+j),tab(28-tb)t(i+j)
+ 1130 nexti
+ 1140 ifpeek(203)<>60then1140
+ 1150 j=j+21:goto1050
+ 1160 ifpeek(203)<>60then1160
+ 1170 ife5= 2then1190
+ 1180 nextk
+ 1190 j=0:i=0:ife5=1then5120
+ 1200 ife5=2thene5=1:e6=0
+ 1210 goto260
+ 1220 :
+ 1230 rem graphic
+ 1240 :
+ 1250 ifd<>0thentx=nx:ty=ny:gosub4100:goto1920
+ 1260 e2=0:e3=0
+ 1270 print"{clr}{rvon}     achseneinteilung und einheiten     {rvof}"
+ 1280 print:print:input"       einheit x-achse";t1$
+ 1290 ift1$="_"then280
+ 1300 print:print:input"       einheit y-achse";t2$
+ 1310 ift2$="_"then1270
+ 1320 print:print:print:printspc(12)"{rvon} einteilung {rvof}"
+ 1330 print:print:print:printspc(14)"manu  (1)"
+ 1340 print:print:print:printspc(14)"auto  (2)"
+ 1350 geta$:ifa$="_"then1270
+ 1360 a=val(a$):ifa=2thene1=1:goto1840
+ 1370 ifa=1thene1=0:goto1390
+ 1380 goto1350
+ 1390 print:print:print"{clr}            {rvon} x-achse {rvof}"
+ 1400 print:print:printspc(12)"linear    (1)"
+ 1410 print:printspc(12)"logarith. (2)"
+ 1420 geta$:ifa$="_"then1320
+ 1430 a=val(a$):onagoto1440,1560:goto1420
+ 1440 input"{down}{down}      maximalwert";mx$
+ 1450 ifmx$="_"then1390
+ 1460 mx=val(mx$)
+ 1470 input"{down}{down}      minimalwert";nx$
+ 1480 ifnx$="_"then1670
+ 1490 nx=val(nx$)
+ 1500 ifnx>mxthenprint:print:print"       fehler !":goto1440
+ 1510 v=296/(mx-nx):tx=nx
+ 1520 input"{down}{down}      stufung";sx$
+ 1530 ifsx$="_"then1470
+ 1540 sx=val(sx$)
+ 1550 goto1610
+ 1560 input"{down}{down}{down}      maximalwert";mx$
+ 1570 ifmx$="_"then1390
+ 1580 mx=val(mx$)
+ 1590 mx=log(mx)/log(10):sx=1:nx=0:tx=0:v=296/mx
+ 1600 e2=1
+ 1610 print:print:print"{clr}            {rvon} y-achse "
+ 1620 print:print:printspc(12)"linear     (1)"
+ 1630 print:printspc(12)"logarith.  (2)"
+ 1640 geta$:a=val(a$):onagoto1670,1790:goto1640
+ 1650 geta$:ifa$="_"then1390
+ 1660 a=val(a$):onagoto1670,1790:goto1640
+ 1670 input"{down}{down}      maximalwert";my$
+ 1680 ifmy$="_"then1610
+ 1690 my=val(my$)
+ 1700 input"{down}{down}      minimalwert";ny$
+ 1710 ifny$="_"then1670
+ 1720 ny=val(ny$)
+ 1730 ifny>=mythenprint:print:print"       fehler !":goto1670
+ 1740 w=176/(my-ny):ty=ny
+ 1750 input"{down}{down}      stufung";sy$
+ 1760 ifsy$="_"then1700
+ 1770 sy=val(sy$)
+ 1780 goto1840
+ 1790 input"{down}{down}{down}       maximalwert";my$
+ 1800 ifmy$="_"then1390
+ 1810 my=val(my$)
+ 1820 my=log(my)/log(10):sy=1:ny=0:ty=0:w=176/my
+ 1830 e3=1
+ 1840 print:print:print"  eingabe o.k. ?  (j/n)"
+ 1850 geta$
+ 1860 ifa$="n"then1270
+ 1870 ifa$="j"then1900
+ 1880 :
+ 1890 goto1850
+ 1900 gosub4100
+ 1910 :
+ 1920 fork=1toak:g=0:n=n1(k)
+ 1930 :
+ 1940 gosub2610
+ 1950 :
+ 1960 ife1=0then2060
+ 1970 my=int((my+my/10)*100+.5)/100
+ 1980 ny=int((ny-ny/10)*100+.5)/100
+ 1990 w=int((176/(my-ny))*100+.5)/100:ty=ny
+ 2000 sy=int((my-ny)*100+.5)/500
+ 2010 mx=x(k,n):nx=x(k,1)
+ 2020 v=int((296/(mx-nx))*100+.5)/100:tx=nx
+ 2030 sx=int((mx-nx)*100+.5)/500
+ 2040 e1=0
+ 2050 :
+ 2060 ifk>1then2340
+ 2070 hires0,14
+ 2080 line0,0,320,0,1
+ 2090 line320,0,320,200,1
+ 2100 line320,200,0,200,1
+ 2110 line0,200,0,0,1
+ 2120 forj= 0to320stepsx*v
+ 2130 forl=184to0step-4
+ 2140 plotj,l,1
+ 2150 nextl
+ 2160 ifj=0then2200
+ 2170 t$=str$(int(tx*100+.5)/100)
+ 2180 ife2=1thent$=str$(int(10^tx*100+.5)/100 )
+ 2190 textj-16,188,t$,1,1,8
+ 2200 tx=tx+sx
+ 2210 nextj
+ 2220 textj-sx*v*1.8,176,t1$,1,1,8
+ 2230 forj=200to0step-sy*w
+ 2240 forl= 0to320step4
+ 2250 plotl,j,1
+ 2260 nextl
+ 2270 ifj=200then2310
+ 2280 t$=str$(int(ty*100+.5)/100)
+ 2290 ife3=1thent$=str$(int(10^ty*100+.5)/100)
+ 2300 text0,j+2,t$,1,1,8
+ 2310 ty=ty+sy
+ 2320 nextj
+ 2330 text8,j+sy*w*1.5,t2$,1,1,8
+ 2340 ife3=0then2390
+ 2350 forj=1tog
+ 2360 ift(j)<1thent(j)=1
+ 2370 t(j)=log(t(j))/log(10)
+ 2380 nextj
+ 2390 ife2=0then2440
+ 2400 forj=1tog
+ 2410 ifz(j)<1thenz(j)=1
+ 2420 z(j)=log(z(j))/log(10)
+ 2430 nextj
+ 2440 fori=1tog-1
+ 2450 z1=(z(i)-nx)*v   :z2=(z(i+1)-nx)*v
+ 2460 t1=200- (t(i)-ny)*w :t2=200-(t(i+1)-ny)*w
+ 2470 ifz1<0orz2<0ort1<0ort2<0orz1>320orz2>320ort1>200ort2>200then2490
+ 2480 linez1,t1,z2,t2,1
+ 2490 nexti
+ 2500 ife5=2thene5=1:goto2570
+ 2510 nextk
+ 2520 ife5= 1then5120
+ 2530 goto2570
+ 2540 print"{clr}":print:print:print:print:printspc(9)"drucker eingeschaltet ?"
+ 2550 ifpeek(203)<>60then2550
+ 2560 cset2:copy
+ 2570 cset2
+ 2580 ifpeek(203)<>60then2580
+ 2590 cset0:goto260
+ 2600 :
+ 2610 rem berechnung der int.pol.stellen
+ 2620 :
+ 2630 gosub2830
+ 2640 :
+ 2650 fori=1ton-1
+ 2660 x=x(k,i):y=y(k,i):gosub3280
+ 2670 ife1=1thenny=y(k,1)
+ 2680 forx=x(k,i)+sw(k,i)tox(k,i+1) stepsw(k,i)
+ 2690 x=int(x*100+.5)/100
+ 2700 ifx=x(k,i+1)then 2750
+ 2710 y=a(i)+b(i)*(x-x(k,i))+c(i)*(x-x(k,i))^2+d(i)*(x-x(k,i))^3
+ 2720 :
+ 2730 gosub3280
+ 2740 :
+ 2750 nextx
+ 2760 nexti
+ 2770 x=x(k,n):y=y(k,n)
+ 2780 :
+ 2790 gosub3280
+ 2800 :
+ 2810 return
+ 2820 :
+ 2830 rem koeffizientenberechnung
+ 2840 :
+ 2850 fori=1ton
+ 2860 a(i)=y(k,i):nexti
+ 2870 c(1)=0:c(n)=0
+ 2880 fori=1ton-1
+ 2890 h(i)=x(k,i+1)-x(k,i)
+ 2900 nexti
+ 2910 :
+ 2920 gosub3000
+ 2930 :
+ 2940 fori=1ton-1
+ 2950 b(i)=(a(i+1)-a(i))/h(i)-h(i)*(c(i+1)+2*c(i))/3
+ 2960 d(i)=(c(i+1)-c(i))/(3*h(i))
+ 2970 nexti
+ 2980 return
+ 2990 :
+ 3000 rem koeffizientenberechnung c
+ 3010 rem matrix m
+ 3020 :
+ 3030 fori=2ton-1
+ 3040 m(i,i)=2*(h(i)+h(i+1))
+ 3050 m(i,i+1)=h(i)
+ 3060 m(i+1,i)=h(i)
+ 3070 nexti
+ 3080 :
+ 3090 rem vektor v
+ 3100 :
+ 3110 forj=2ton-1
+ 3120 v(j)=3*(a(j+1)-a(j))/h(j)-3*(a(j)-a(j-1))/h(j-1)
+ 3130 nextj
+ 3140 :
+ 3150 rem gauss
+ 3160 :
+ 3170 o(2)=m(2,2):p(2)=m(2,3)/o(2):q(2)=v(2)/o(2)
+ 3180 fori=3ton
+ 3190 o(i)=m(i,i)-m(i,i-1)*p(i-1)
+ 3200 p(i)=m(i,i+1)/o(i)
+ 3210 q(i)=(v(i)-m(i,i-1)*q(i-1))/o(i)
+ 3220 nexti
+ 3230 fori=nto2step-1
+ 3240 c(i)=q(i)-p(i)*c(i+1)
+ 3250 nexti
+ 3260 return
+ 3270 :
+ 3280 rem ergebnisse speichern
+ 3290 :
+ 3300 g=g+1
+ 3310 z(g)=int(x*10000+.5)/10000:t(g)=int(y*10000+.5)/10000
+ 3320 ife1=0then3350
+ 3330 ift(g)>mythenmy=t(g)
+ 3340 ift(g)<nythenny=t(g)
+ 3350 return
+ 3360 :
+ 3370 :
+ 3380 rem tab copy
+ 3390 :
+ 3400 print"{clr}":print:print:print:printspc(9)"drucker eingeschaltet ?"
+ 3410 ifpeek(203)<>60then3410
+ 3420 open4,4
+ 3430 fork=1toak:n=n1(k):g=0:e6=2:gosub2610
+ 3440 print#4,chr$(18)"  kurve "k"         x              y       "
+ 3450 fori=1tog
+ 3460 print#4,chr$(146)chr$(16)"18"z(i)  chr$(16)"33"t(i)
+ 3470 nexti
+ 3480 ife5<>0then3500
+ 3490 nextk
+ 3500 ife5=1then5120
+ 3510 ife5=2thene5=1:e6=0
+ 3520 close4:goto280
+ 3530 :
+ 3540 rem eingabe tape disk
+ 3550 :
+ 3560 d=1:goto3580
+ 3570 d=8
+ 3580 print"{clr}"
+ 3590 fori=1to6:print:nexti
+ 3600 ifd=1thenprintspc(6)"recorder o.k. ?"
+ 3610 ifd=8thenprintspc(6)"floppy o.k. ?"
+ 3620 print:print:input"       filename";n$
+ 3630 ifn$="_"then150
+ 3640 print:print
+ 3650 open1,d,0, n$:open2,8,15:input#2,f,b$
+ 3660 iff=0then3700
+ 3670 print"{clr}{down}  fehler: "b$:close2:close1:dir"$
+ 3680 geta$:ifa$<>""thenprint"{clr}":goto3620
+ 3690 goto3680
+ 3700 input#1,ak,sw,di
+ 3710 input#1,t1$,mx,nx,v,tx,sx,e2
+ 3720 input#1,t2$,my,ny,w,ty,sy,e3
+ 3730 fork=1toak
+ 3740 input#1,n1(k)
+ 3750 ifn1(k)>n1thenn1=n1(k)
+ 3760 nextk
+ 3770 n1=n1+1
+ 3780 dimx(ak,n1),y(ak,n1),sw(k,n1)
+ 3790 dima(n1),b(n1),c(n1),d(n1),m(n1,n1),v(n1),o(n1),p(n1),q(n1)
+ 3800 fork=1toak
+ 3810 fori=1ton1(k)
+ 3820 input#1,x(k,i),y(k,i):input#1,sw(k,i)
+ 3830 nexti
+ 3840 nextk
+ 3850 close1:close2:dimz(di+3),t(di+3):goto260
+ 3860 :
+ 3870 rem ausgabe tape disk
+ 3880 :
+ 3890 d=1:goto3910
+ 3900 d=8
+ 3910 print"{clr}"
+ 3920 fori=1to6:print:nexti
+ 3930 ifd=1thenprintspc(6)"recorder o.k. ?"
+ 3940 ifd=8thenprintspc(6)"floppy o.k. ?"
+ 3950 print:print:input"       filename";n$
+ 3960 open1,d,1,n$
+ 3970 print#1,ak:print#1,sw:print#1,di:print#1,t1$
+ 3980 print#1,mx:print#1,nx:print#1,v:print#1,nx:print#1,sx:print#1,e2
+ 3990 print#1,t2$:print#1,my:print#1,ny:print#1,w:print#1,ny
+ 4000 print#1,sy:print#1,e3
+ 4010 fork=1toak:print#1,n1(k):nextk
+ 4020 fork=1toak
+ 4030 fori=1ton1(k)
+ 4040 print#1,x(k,i):print#1,y(k,i):print#1,sw(k,i)
+ 4050 nexti:nextk
+ 4060 close1:goto280
+ 4070 :
+ 4080 rem text
+ 4090 :
+ 4100 print"{clr}{rvon}           spline berechnung            {rvof}"
+ 4110 fori=1to10:print:nexti
+ 4120 printspc(13)"bitte warten"
+ 4130 return
+ 4140 :
+ 4150 :
+ 4160 rem bubblesort
+ 4170 :
+ 4180 foro=2ton1(i)
+ 4190 forp=n1(i)toostep-1
+ 4200 ifx(i,p-1)>x(i,p)then4220
+ 4210 goto4250
+ 4220 h=x(i,p):q=y(i,p)
+ 4230 x(i,p)=x(i,p-1):y(i,p)=y(i,p-1)
+ 4240 x(i,p-1)=h:y(i,p-1)=q
+ 4250 nextp
+ 4260 nexto
+ 4270 return
+ 4280 :
+ 4290 :
+ 4300 rem ausgabe datenfile
+ 4310 :
+ 4320 print:print:printspc(14)"tape (1)"
+ 4330 print:printspc(14)"disk (2)"
+ 4340 geta$:a=val(a$):onagoto 4350,4360:goto4340
+ 4350 d=1:goto4370
+ 4360 d=8
+ 4370 print"{clr}"
+ 4380 forj=1to6:print:nextj
+ 4390 ifd=1thenprintspc(6)"recorder o.k. ?"
+ 4400 ifd=8thenprintspc(6)"floppy o.k. ?"
+ 4410 print:print:input"  {rght}{rght}     filename ";n$
+ 4420 open1,d,1,n$
+ 4430 print#1,sw:print#1,di:print#1,n1(i)
+ 4440 fork=1ton1(i)
+ 4450 print#1,x(i,k):print#1,y(i,k):print#1,sw(i,k)
+ 4460 nextk
+ 4470 open2,8,15:input#2,f,b$
+ 4480 if f=0then4500
+ 4490 print"{clr}{down}  fehler: "b$:close2:close1:goto4410
+ 4500 close2:close1:d=0:goto890
+ 4510 :
+ 4520 :
+ 4530 rem eingabe datenfile
+ 4540 :
+ 4550 d=1:goto4570
+ 4560 d=8
+ 4570 print"{clr}"
+ 4580 forj=1to6:print:nextj
+ 4590 ifd=1thenprintspc(12)"recorder o.k. ?"
+ 4600 ifd=8thenprintspc(12)"floppy o.k. ?"
+ 4610 geta$:ifa$=""then4610
+ 4620 print"{clr}":print:input"       anzahl datenfiles";ak$
+ 4630 ifak$="_"then150
+ 4640 ak=val(ak$)
+ 4650 dimn$(ak):print
+ 4660 forj=1toak
+ 4670 ifj<=0thenrun
+ 4680 print:print"       filename";j:input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";n$(j)
+ 4690 ifn$(j)="_"thenj=j-2:nextj
+ 4700 nextj
+ 4710 forj=1toak
+ 4720 open1,d,0,n$(j):open2,8,15:input#2,f,b$
+ 4730 iff=0then4770
+ 4740 print"{clr}{down}  fehler: "b$:close2:close1:dir"$
+ 4750 geta$:ifa$<>""thenprint"{clr}":goto4660
+ 4760 goto4750
+ 4770 input#1,sw,de,n1(j)
+ 4780 ifn1(j)>n1thenn1=n1(j)
+ 4790 close1:close2:nextj
+ 4800 n1=n1+1
+ 4810 dimx(ak,n1),y(ak,n1),sw(ak,n1)
+ 4820 dima(n1),b(n1),c(n1),d(n1),h(n1),m(n1,n1),v(n1),o(n1),p(n1),q(n1)
+ 4830 forj=1toak
+ 4840 open1,d,0,n$(j)
+ 4850 input#1,sw,de,n1(j)
+ 4860 ifde>dithendi=de
+ 4870 fork=1ton1(j)
+ 4880 input#1,x(j,k),y(j,k),sw(j,k)
+ 4890 nextk:close1
+ 4900 nextj:ifzw>dithendi=zw
+ 4910 dimz(di+3),t(di+3):d=0:goto260
+ 4920 :
+ 4930 rem vergleich fkt - spl
+ 4940 :
+ 4950 print"{clr}":print:print:input"     funktion f(x)=";f$
+ 4960 iff$="_"thenrun
+ 4970 print"{clr}{gry3}5140 deffnf(x)="f$
+ 4980 print"goto5000"
+ 4990 poke631,19:poke632,13:poke633,13:poke198,3:end
+ 5000 print"{clr}{blk}{rvon}             funktionsdaten             {rvof}"
+ 5010 print:print:input"  anfangs x-wert";xa$
+ 5020 ifxa$="_"then4950
+ 5030 xa=val(xa$)
+ 5040 print:print:input"  end x-wert";xe$
+ 5050 ifxe$="_"then5010
+ 5060 xe=val(xe$)
+ 5070 print:print:input"  anzahl zwischenwerte";zw$
+ 5080 ifzw$="_"then5040
+ 5090 zw=val(zw$)
+ 5100 sv=(xe-xa)/zw:e5=1
+ 5110 goto130
+ 5120 g=0:e5=2
+ 5130 forx=xatoxe+.0001stepsv
+ 5140 deffnf(x)=x+2
+ 5150 y=fnf(x):gosub3300
+ 5160 nextx
+ 5170 ife6=1then1050
+ 5180 ife6=2then3440
+ 5190 goto2340
+

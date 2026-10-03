@@ -1,0 +1,198 @@
+
+
+;menue-maker.prg ==0801==
+   10 dimna$(144),nu$(144)
+   20 printchr$(142):printchr$(8)
+   30 goto1020
+   40 rem *** anleitung ***
+   50 print"{clr}";:print
+   60 printspc(14)"{blu}{rvon}anleitung
+   70 print
+   80 print"{wht}- dieses programm stellt ein menu fuer
+   90 print"  ihre disketten her und speichert es
+  100 print"  ab. sie muessen also nachher nur noch
+  110 print"  das menu laden,das programm das sie
+  120 print"  wuenschen auswaehlen und schon wird
+  130 print"  es in den rechner geladen.
+  140 print
+  150 printspc(11)"{blu}{rvon}vorgehensweise
+  160 print
+  170 print"{wht}- waehlen sie zuerst menupunkt 2 und
+  180 print"  bestimmen sie welche programme ins
+  190 print"  menu aufgenommen werden sollen.
+  200 print"  gleichzeitig legen sie auch fest,ob
+  210 print"  es mit ,8 oder mit ,8,1 (maschinen-
+  220 print"  programme) geladen werden soll.
+  230 print"- wenn sie diese arbeit erledigt haben,
+  240 print"  sind sie automatisch wieder im haupt-
+  250 print"  menu und koennen nun menupunkt 4 waeh-";
+  260 print"  len um das menu abzuspeichern oder
+  270 print"  falls ihnen bei punkt 2 ein fehler
+  280 print"  unterlaufen ist,nochmals von vorne
+  290 print"  beginnen.{up}"
+  300 gett$:ift$=""then300
+  310 return
+  320 :
+  330 :
+  340 rem *** uebernehmen ***
+  350 print"{clr}";:a$="":t$="":in=0:x=0:xx=0
+  360 print"{rvon}f1 = ,8{rvof} {rvon}f3 = ,8,1{rvof} {rvon}f5 = nicht uebernehmen{rvon}{down}"
+  370 close2:open2,8,15
+  380 open1,8,0,"$0"
+  390 get#1,a$,b$
+  400 get#1,a$,b$
+  410 get#1,a$,b$
+  420 c=0
+  430 if a$<>"" then c=asc(a$)
+  440 if b$<>"" then c=c+asc(b$)*256
+  450 get#1,b$:if st<>0 then 540
+  460 if b$<>chr$(34)thengoto450
+  470 get#1,b$:ifb$<>chr$(34)andb$<>"<"thena$=a$+b$:goto 550
+  480 ifb$<>chr$(34)then goto470
+  490 ifx=0thenx=1:a$="":goto520
+  500 a$=right$(a$,len(a$)-1)
+  510 a$=left$(a$,len(a$)):printa$;:gosub570
+  520 get#1,b$:if b$=chr$(32) then520
+  530 if st=0 then 400
+  540 close1:print"{clr}";:return
+  550 iflen(a$)>20thengoto540
+  560 goto470
+  570 in=in+1:na$(in)=a$
+  580 gett$:ift$=""then580
+  590 ift$="{f1}"thennu$(in)="8":poke214,peek(214):poke211,20:sys58640:print"{rvon},8{rvof}"
+  600 ift$="{f1}"thenreturn
+  610 ift$="{f3}"thennu$(in)="81":poke214,peek(214):poke211,20:sys58640:print"{rvon},8,1{rvof}"
+  620 ift$="{f3}"thenreturn
+  630 ift$="{f5}"thenna$(in)="":in=in-1:poke214,peek(214):poke211,20:sys58640
+  640 ift$="{f5}"thenprint"{rvon}nicht uebernommen{rvof}":return
+  650 goto580
+  660 return
+  670 :
+  680 rem *** directory ***
+  690 print"{clr}";
+  700 close2:open2,8,15:x=0:a$="":b$="":c=0:le$=""
+  710 open1,8,0,"$0"
+  720 get#1,a$,b$
+  730 get#1,a$,b$
+  740 get#1,a$,b$
+  750 c=0
+  760 if a$<>"" then c=asc(a$)
+  770 if b$<>"" then c=c+asc(b$)*256
+  780 ifx=0thentb=2:goto800
+  790 tb=5
+  800 printmid$(str$(c),2);tab(tb);
+  810 get#1,b$:if st<>0 then 950
+  820 if b$<>chr$(34)thengoto810
+  830 ifx=0thenprint"{rvon}";
+  840 printchr$(34);:printchr$(34);:print"{del}";
+  850 get#1,b$:ifb$<>chr$(34)andx=0thenprint"{rvon}"b$;:goto850:goto870
+  860 ifb$<>chr$(34)thenprintb$;:goto850
+  870 ifx=0thenprint"{rvon}";
+  880 printchr$(34);:printchr$(34);:print"{del}";
+  890 get#1,b$:if b$=chr$(32) then890
+  900 print tab(24);:c$=""
+  910 c$=c$+b$:get#1,b$:if b$<>""  then 910
+  920 le$=left$(c$,6):ifx=0thenx=1:gosub980:print"{left}{left}{left}{left}{rvon}"le$:goto940
+  930 printle$
+  940 if st=0 then 730
+  950 print"{left}blocks free":close1
+  960 gett$:ift$=""then960
+  970 t$="":return
+  980 le=len(c$):le=6-le
+  990 fori=1tole:zus$=zus$+" ":next
+ 1000 le$=zu$+le$:return
+ 1010 rem *** titel ***
+ 1020 poke 53280,6 :poke 53281,14:print chr$(142)chr$(147);
+ 1030 print
+ 1040 print"{blk} QQQ     QQQ QQQQQQQ QQQ    QQ QQ    QQ
+ 1050 print" {$71}{$71}{$71}{$71}   {$71}{$71}{$71}{$71} {$71}{$71}{$71}{$71}{$71}{$71}{$71} {$71}{$71}{$71}{$71}   {$71}{$71} {$71}{$71}    {$71}{$71}
+ 1060 print" {$71}{$71} {$71}{$71} {$71}{$71} {$71}{$71} {$71}{$71}"spc(6)"{$71}{$71} {$71}{$71}  {$71}{$71} {$71}{$71}    {$71}{$71}
+ 1070 print" {$71}{$71}  {$71}{$71}{$71}  {$71}{$71} {$71}{$71}"spc(6)"{$71}{$71}  {$71}{$71} {$71}{$71} {$71}{$71}    {$71}{$71}
+ 1080 print" {$71}{$71}   {$71}   {$71}{$71} {$71}{$71}"spc(6)"{$71}{$71}   {$71}{$71}{$71}{$71} {$71}{$71}    {$71}{$71}
+ 1090 print" {$71}{$71}"spc(7)"{$71}{$71} {$71}{$71}{$71}{$71}    {$71}{$71}    {$71}{$71}{$71} {$71}{$71}    {$71}{$71}
+ 1100 print" {$71}{$71}"spc(7)"{$71}{$71} {$71}{$71}"spc(6)"{$71}{$71}     {$71}{$71} {$71}{$71}    {$71}{$71}
+ 1110 print" {$71}{$71}"spc(7)"{$71}{$71} {$71}{$71}"spc(6)"{$71}{$71}     {$71}{$71} {$71}{$71}    {$71}{$71}
+ 1120 print" {$71}{$71}"spc(7)"{$71}{$71} {$71}{$71}{$71}{$71}{$71}{$71}{$71} {$71}{$71}     {$71}{$71} {$71}{$71}{$71}{$71}{$71}{$71}{$71}{$71}
+ 1130 print" {$71}{$71}"spc(7)"{$71}{$71} {$71}{$71}{$71}{$71}{$71}{$71}{$71} {$71}{$71}     {$71}{$71}  {$71}{$71}{$71}{$71}{$71}{$71}
+ 1140 print:print
+ 1150 print"  {$77}{$77}     {$77}{$77}  {$77}{$77}{$77}{$77}  {$77}{$77}  {$77} {$77}{$77}{$77}{$77}{$77} {$77}{$77}{$77}{$77}
+ 1160 print"  {$77}{$77}{$77}   {$77}{$77}{$77} {$77}{$77}  {$77}{$77} {$77}{$77} {$77}  {$77}{$77}    {$77}{$77}  {$77}
+ 1170 print"  {$77}{$77} {$77} {$77} {$77}{$77} {$77}{$77}  {$77}{$77} {$77}{$77}{$77}   {$77}{$77}    {$77}{$77}  {$77}
+ 1180 print"  {$77}{$77}  {$77}  {$77}{$77} {$77}{$77}{$77}{$77}{$77}{$77} {$77}{$77}{$77}   {$77}{$77}{$77}{$77}  {$77}{$77}{$77}{$77}
+ 1190 print"  {$77}{$77}     {$77}{$77} {$77}{$77}  {$77}{$77} {$77}{$77} {$77}  {$77}{$77}    {$77}{$77} {$77}
+ 1200 print"  {$77}{$77}     {$77}{$77} {$77}{$77}  {$77}{$77} {$77}{$77}  {$77} {$77}{$77}{$77}{$77}{$77} {$77}{$77}  {$77}
+ 1210 print
+ 1220 print"    "spc(12)"simon (tel 071/85 46 22)";
+ 1230 print"     written by"spc(6)"&
+ 1240 print"    "spc(12)"edy   (tel 071/85 50 46)";
+ 1250 geta$:ifa$=""then1250
+ 1260 print"{clr}"
+ 1270 print,"{down}{down}{wht}  ihre wahl :"
+ 1280 print,"{down}{down}  1  directory einlesen"
+ 1290 print,"{down}{down}  2  uebernehmen"
+ 1300 print,"{down}{down}  3  info"
+ 1310 print,"{down}{down}  4  menu speichern"
+ 1320 print,"{down}{down}  5  ende"
+ 1330 get a$ :if a$=""then 1330
+ 1340 if a$="1"then gosub690:goto1260
+ 1350 if a$="2"then gosub350:goto1260
+ 1360 if a$="3"then gosub50:goto1260
+ 1370 if a$="4"then goto1460
+ 1380 if a$="5"then1410
+ 1390 goto1330
+ 1400 rem *** ende ***
+ 1410 poke214,23:poke211,11:sys58640:print"{rvon}{blu}sind sie sicher ?{up}"
+ 1420 gett$:ift$="n"then1260
+ 1430 ift$="j"thensys64738
+ 1440 goto1420
+ 1450 rem *** datei speichern ***
+ 1460 close15:open15,8,15:print#15,"s0:msd":close15:close2:open2,8,2,"msd,s,w"
+ 1470 z=0
+ 1480 z=z+1:ifz=145thenclose2:goto1530
+ 1490 ifna$(z)=""thenclose2:goto1530
+ 1500 print#2,na$(z);nu$(z)
+ 1510 goto1480
+ 1520 rem *** menu speichern ***
+ 1530 close15:open15,8,15:print#15,"s0:menu":close15:print"{clr}{up}";:print"run1600"
+ 1540 print"{down}{down}{down}poke43,peek(61)+1:poke44,peek(62)"
+ 1550 print"{down}{down}save"chr$(34)"menu"chr$(34)",8"
+ 1560 print"{down}{down}{down}{down}poke43,1:poke44,8"
+ 1570 print"{down}{down}goto1260"
+ 1580 poke631,19:poke632,13:poke633,13:poke634,13:poke635,13:poke636,13
+ 1590 poke637,13:poke198,7:end
+ 1600 stop
+ 1610 poke53280,14:poke53281,6
+ 1620 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}{down}{down}           ich lade die datei":z=0:dimna$(144),nu$(144)
+ 1630 close2:open2,8,2,"msd,s,r"
+ 1640 z=z+1
+ 1650 input#2,naa$
+ 1660 ifright$(naa$,1)="8"thenna$(z)=left$(naa$,len(naa$)-1):nu$(z)=",8"
+ 1670 ifright$(naa$,2)="81"thenna$(z)=left$(naa$,len(naa$)-2):nu$(z)=",8,1
+ 1680 ifst=64thenclose2:goto1700
+ 1690 goto1640
+ 1700 print"{clr}";:z=0
+ 1710 print"{down}{down}              {CBM-N}{rvon}menu-maker{rvof}{CBM-H}"
+ 1720 print"{down}               by simon & edy"
+ 1730 printtab(5)"{down}{down}cursor up    naechstes element"
+ 1740 printtab(5)"{down}cursor down  vorheriges element"
+ 1750 printtab(5)"{down}return       waehlen"
+ 1760 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}    U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+ 1770 print"    {SHIFT--}                {SHIFT--}"
+ 1780 print"    J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K"
+ 1790 poke214,15:poke211,5:sys58640:printna$(1):z=1
+ 1800 gett$:ift$=""then1800
+ 1810 ift$="{up}"thenz=z+1:x=1:gosub1890:goto1800
+ 1820 ift$="{down}"thenz=z-1:x=2:gosub1890:goto1800
+ 1830 ift$=chr$(13)thengoto1850
+ 1840 goto1800
+ 1850 print"{clr}{blu}";:print"load"chr$(34)na$(z)chr$(34)nu$(z)
+ 1860 print"{down}{down}{down}{down}poke646,14:run"
+ 1870 poke631,19:poke632,13:poke633,13:poke198,3:new
+ 1880 rem *** unterprog ***
+ 1890 ifz=0thenz=1:return
+ 1900 ifna$(z)=""andx=2thenz=z+1:return
+ 1910 ifz=145thenz=144:return
+ 1920 ifna$(z)=""andx=1thenz=z-1:return
+ 1930 poke214,15:poke211,5:sys58640:print"                "
+ 1940 poke214,15:poke211,5:sys58640:printna$(z):return
+

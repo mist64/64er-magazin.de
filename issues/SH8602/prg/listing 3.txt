@@ -1,0 +1,60 @@
+
+
+;listing 3.prg ==0801==
+ 1000 rem *** horizontale bewegung ***
+ 1010 :
+ 1020 :
+ 1030 rem ** ausgabe programmeldung
+ 1040 :
+ 1050 print "{clr}{down}{down}{down}{down}{down}{down}{down}{down}bitte warten";
+ 1060 :
+ 1070 :
+ 1080 rem ** sprite-daten einlesen
+ 1090 :
+ 1100 for n = 896 to 958
+ 1110 :   poke n,255
+ 1120 next n
+ 1130 :
+ 1140 :
+ 1150 rem ** sprite-steuerung
+ 1160 :
+ 1170 print "{clr}";    :rem bilds.loeschen
+ 1180 poke 2040,14  :rem datenzeiger
+ 1190 :
+ 1200 vic = 53248   :rem vic-baustein
+ 1210 poke vic,64   :rem horizont. pos.
+ 1220 poke vic+1,139:rem vertikale pos.
+ 1230 poke vic+39,13:rem gruenes sprite
+ 1240 poke vic+21,1 :rem sprite 0 ein
+ 1250 :
+ 1251 :
+ 1252 rem rechts, dann links
+ 1253 :
+ 1254 for hp = 64 to 280 step 2
+ 1255 :   sf = (hp > 255)
+ 1256 :   poke vic,hp + (sf * 256)
+ 1257 :   poke vic+16, sf * (-1)
+ 1258 next hp
+ 1259 :
+ 1260 for hp = 278 to 66 step-2
+ 1261 :   sf = (hp > 255)
+ 1262 :   poke vic,hp + (sf * 256)
+ 1263 :   poke vic+16, sf * (-1)
+ 1264 next hp
+ 1265 :
+ 1266 :
+ 1270 rem ** prog.ende nach tastendruck
+ 1280 :
+ 1290 get kp$
+ 1300 if kp$ = "" then 1254
+ 1310 :
+ 1320 :
+ 1330 rem ** register zuruecksetzen
+ 1340 :
+ 1350 poke vic+21,0 :rem ruecksetzung
+ 1360 poke vic+39,0 :rem in umgekehrter
+ 1370 poke vic+1,0  :rem reihenfolge...
+ 1380 poke vic,0
+ 1390 :
+ 1400 end
+

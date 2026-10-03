@@ -1,0 +1,277 @@
+
+
+;schach demo.prg ==0801==
+    0 rem schachgrafik v1.0
+    1 rem fuer c-64
+    2 rem frithjof dau
+    3 rem 3017 pattensen 4
+    4 rem hopfenberg 5
+    5 rem tel.: 05066/63906
+    6 rem
+ 1000 restore:gosub3100
+ 1010 a$="bitte druecken sie eine taste!"
+ 1020 sys50003,1:poke53280,11:poke53281,11:poke646,0:sys50030
+ 1030 printchr$(147)"SCHACHGRAFIK : DEMO{$a0}UND{$a0}ANLEITUNG."
+ 1040 print:print"Die Befehlserweiterung 'SCHACHGRAFIK' "
+ 1050 print"stellt dem Benutzer 12 neue Befehle,die
+ 1060 print"alle mit 'SYS' angesprungen werden,zur
+ 1070 print"Verfuegung.Sie ist vollstaendig in
+ 1080 print"Maschienensprache geschrieben und belegt";
+ 1090 print"auch bei eingeschalteter Grafik keinen
+ 1100 print"Basicspeicherplatz.Sie laesst sich gut "
+ 1110 print"z.b. in Schachprogrammen oder zum
+ 1120 print"zum Abspielen von Partien (von Meister-"
+ 1130 print"schaften oder aehnlichen) verwenden."
+ 1140 gosub3080
+ 1150 print:print"Der erste Befehl lautet : 'SYS 50000'.
+ 1160 print"Hiermit schaltet man die Grafik ein."
+ 1170 print"Sie wird aber weder geloescht noch"
+ 1180 print"werden die Farben der Grafik gesetzt.Die";
+ 1190 print"Bitmap liegt ab $e000 und der Farbspei-
+ 1200 print"cher ab $cc00.
+ 1210 gosub3080
+ 1220 print:print"2.Befehl: SYS 50003,FLAG"
+ 1230 print"Mit diesem Befehl wird die Grafik ausge-";
+ 1240 print"schaltet.Bei FLAG=0 geht der Computer in";
+ 1250 print"den Kleinschrift-Grossschriftmodus,bei"
+ 1260 print"FLAG=1 in den Grossschrift-Grafikmodus."
+ 1270 gosub3080
+ 1280 print:print"3.Befehl : SYS 50006
+ 1290 print"Mit diesem Befehl wird die Grafik
+ 1300 print"geloescht.
+ 1310 gosub3080
+ 1320 print:print"4.Befehl : SYS 50009,BYTE
+ 1330 print"Der Farbspeicher der Grafik wird mit "
+ 1340 print"dem Wert Byte gefuellt.Es muss gelten:
+ 1350 print"0<=BYTE<=255.Das obere Nibble des Bytes
+ 1360 print"bestimmt die Zeichen-,das untere die"
+ 1370 print"Hintergrundfarbe."
+ 1380 print:print"Demonstration:"
+ 1390 print"Zuerst wird die Grafik eingeschaltet,"
+ 1400 print"dann der Farbspeicher mit 11 gefuellt,"
+ 1410 print"und dann die Bitmap geloescht.Diese"
+ 1420 print"Prozedur geht natuerlich sehr schnell."
+ 1430 gosub3080
+ 1440 sys50000
+ 1450 sys50009,11
+ 1460 sys50006
+ 1470 sys50033,"5.befehl : sys 50012,flag",0,0
+ 1480 sys50033,"mit diesem befehl wird ein leeres brett",1,0
+ 1490 sys50033,"gemalt.bei flag=0 ist die untere linke ",2,0
+ 1500 sys50033,"ecke in der vordergrund-,bei flag=1 in ",3,0
+ 1510 sys50033,"der hintergrundfarbe gemalt.",4,0
+ 1520 sys50033,"demonstation: 'sys 50006 : sys50012,0'",5,0
+ 1530 sys50033,a$,6,0:poke198,0:wait198,1
+ 1540 sys50006
+ 1550 sys50012,0
+ 1560 sys50033,"demonstation: 'sys50012,1'",0,0
+ 1570 sys50033,a$,1,0:poke198,0:wait198,1
+ 1580 poke198,0:wait198,1:sys50012,1
+ 1590 sys50033,a$,0,0:sys50033,"                               ",1,0
+ 1600 poke198,0:wait198,1:sys50003,1
+ 1610 print:print"6.Befehl : SYS 50015,FIG,FELD
+ 1620 print"Dieser Befehl setzt die Figur mit der "
+ 1630 print"Nummer FIG auf das Feld mit der Nummer"
+ 1640 print"FELD.Die Figurencodes sind:
+ 1650 print"FARBE 1      FARBE 2   BEDEUTUNG"
+ 1660 print"  0    oder    128  :  Leeres Feld
+ 1670 print"  1    oder    129  :  Bauer
+ 1680 print"  2    oder   {$a0}130  :  Pferd
+ 1690 print"  3    oder    131  :  Lauefer
+ 1700 print"  4    oder    132  :  Turm
+ 1710 print"  5    oder    133  :  Dame
+ 1720 print"  6    oder    134  :  Koenig
+ 1730 print"Alle weiteren Codes sind nicht erlaubt."
+ 1740 print"Die Felder sind von 0-63 nummeriert."
+ 1750 print"Feld 0 liegt dabei links oben,Feld 7"
+ 1760 print"rechts oben,Feld 56 links unten und Feld";
+ 1770 print"63 rechts unten.Das Feld wird bei diesem";
+ 1780 print"Befehl allerdings nicht gemalt,das macht";
+ 1790 print:print"Der 7. Befehl : SYS 50018,FELD
+ 1800 print"Dieser Befehl malt nur das Feld mit der"
+ 1810 print"Nummer FELD neu."
+ 1820 gosub3080
+ 1830 print:print"Befehl Nr 8 : SYS 50021,FELD1,FELD2"
+ 1840 print"Hiermit wird die Figur auf dem Feld
+ 1850 print"FELD1 nach FELD2 gesetzt.Beide Felder"
+ 1860 print"werden neu gemalt."
+ 1870 gosub3080
+ 1880 print:print"Befehl Nr 9 : SYS 50024
+ 1890 print"Hier werden einfach alle Felder neu
+ 1900 print"gemalt.Nach dem Laden der Schachgrafik"
+ 1910 print"ist das Brett mit der Anfangsstellung"
+ 1920 print"besetzt."
+ 1930 print"Nun wieder eine Demonstration:
+ 1940 gosub3080
+ 1950 sys50006:sys50000:sys50012,0
+ 1960 sys50033,"der befehl 'sys 50024'",0,0
+ 1970 sys50033,a$,1,0
+ 1980 poke198,0:wait198,1:sys50024
+ 1990 sys50033,"der befehl 'sys 50021,9,17'",0,0
+ 2000 poke198,0:wait198,1:sys50021,9,17
+ 2010 sys50033,"die befehle 'sys 50015,1,17'",0,0
+ 2020 sys50033,"und 'sys 50018,17'                ",1,0
+ 2030 sys50033,a$,2,0
+ 2040 poke198,0:wait198,1:sys50015,1,17:sys50018,17
+ 2050 sys50033,a$,0,0
+ 2060 sys50033,"                              ",1,0
+ 2070 sys50033,"                              ",2,0
+ 2080 poke198,0:wait198,1:sys50003,1
+ 2090 print:print"Befehl Nr 10 : SYS 50027
+ 2100 print"Hier wird das ganze Brett einmal gegen"
+ 2110 print"den Uhrzeigersinn,also im mathematisch"
+ 2120 print"positiven Sinn gedreht und neu gemalt."
+ 2130 print"Wichtig:Hierbei werden auch synchron die";
+ 2140 print"Nummern der Felder geaendert,um die "
+ 2150 print"Eingabe zu vereinfachen.So befindet sich";
+ 2160 print"also Feld 0 nach einmaligen Drehen nicht";
+ 2170 print"mehr links oben,sondern links unten."
+ 2180 print"Entsprechendes gilt fuer alle anderen"
+ 2190 print"Felder und fuer mehrmaliges Drehen.
+ 2200 gosub3080
+ 2210 print:print"Befehl Nr 11 : SYS 50030
+ 2220 print"Nach Ausfuehrung dieses Befehls sind die";
+ 2230 print"Feldnummern wieder so,als sei das Brett"
+ 2240 print"bisher nicht gedreht,also befindet sich"
+ 2250 print"Feld 0 wieder links oben usw."
+ 2260 print:print"Wieder eine Demonstation."
+ 2270 gosub3080
+ 2280 sys50000:sys50006:sys50012,0:sys50024
+ 2290 sys50033,"der befehl 'sys 50021,12,20'",0,0
+ 2300 sys50033,a$,1,0
+ 2310 poke198,0:wait198,1:sys50021,12,20
+ 2320 sys50033,"nun drehe ich einmal mit 'sys50027'.",0,0
+ 2330 poke198,0:wait198,1:sys50027
+ 2340 sys50033,"nun der befehl 'sys 50021,20,28'       ",0,0
+ 2350 poke198,0:wait198,1:sys50021,20,28
+ 2360 sys50033,"nun 'sys 50030' und 'sys50021,0,1'.",0,0
+ 2370 poke198,0:wait198,1:sys50030:sys50021,0,1
+ 2380 sys50033,a$+"                 ",0,0
+ 2390 sys50033,"                                 ",1,0
+ 2400 poke198,0:wait198,1:sys50003,1
+ 2410 print:print"Und der letzte Befehl,Befehl Nr 12:"
+ 2420 print"SYS 50033,TEXT,ZEILE,SPALTE"
+ 2430 print"Mit diesem Befehl wird der Text bei der"
+ 2440 print"durch Zeile und Spalte bestimmtenn"
+ 2450 print"Position in die Bitmap geschrieben."
+ 2460 print"Der Text wird immer im Grossschriftmodus";
+ 2470 print"ausgegeben,Steuerzeichen werden als"
+ 2480 print"Leerzeichen interpretiert.Es muss "
+ 2490 print"weiterhin gelten: 0<=SPALTE<=24  "
+ 2500 print"und 0<=ZEILE<=39 ."
+ 2510 gosub3080
+ 2520 print:print"Bei allen Befehlen koennen saemtliche"
+ 2530 print"zu uebergebende Werte in beliebigen"
+ 2540 print"Formen auftauchen,z.b. als Formeln,"
+ 2550 print"Variablen oder aehnliches."
+ 2560 gosub3080
+ 2570 print:print"Es folgt nun eine eingespeicherte "
+ 2580 print"Partie.Sie koennen mit F1 den naechsten"
+ 2590 print"Zug ausfuehren,mit F3 das Brett drehen"
+ 2600 print"mit F5 oder F7 die Farben aendern und"
+ 2610 print"mit 'S' das Spiel vorzeitig beenden."
+ 2620 gosub3080
+ 2630 restore:gosub3100
+ 2640 sys50000:sys50006:sys50012,0
+ 2650 fb=11:sys50009,fb:sys50024
+ 2660 sys50033,"anderssen - staunton",0,0
+ 2670 sys50033,"turnier zu london   1851",1,0
+ 2680 zg=1:sys50033,"zug nr",2,10
+ 2690 f1=11:f2=0
+ 2700 read zug$
+ 2710 if zug$<>"oo "then2740
+ 2720 sys50021,63,61:sys50021,60,62
+ 2730 p$="o-o            ":goto2780
+ 2740 z$=left$(zug$,2):gosub3130:p1=p
+ 2750 z$=mid$(zug$,4,2):gosub3130:p2=p
+ 2760 p$=zug$+" "
+ 2770 sys50021,p1,p2
+ 2780 sys50033,str$(int(zg))+":"+p$,2,16
+ 2790 ifright$(zug$,2)="++"then2880
+ 2800 zg=zg+.5
+ 2810 poke198,0:wait198,1:getz$
+ 2820 ifz$="{f1}"thengoto2700
+ 2830 ifz$="{f3}"thensys50027
+ 2840 ifz$="{f5}"thenf1=f1+1and15:sys50009,f1+16*f2:poke53280,f1
+ 2850 ifz$="{f7}"thenf2=f2+1and15:sys50009,f1+16*f2
+ 2860 ifz$="s"thengoto2880
+ 2870 goto2810
+ 2880 sys50033,a$,3,0
+ 2890 poke198,0:wait198,1
+ 2900 sys50033,"nun eine geschwindigkeitsdemonstration.",0,0
+ 2910 sys50033,"der bauer auf g2 wird 100mal vor- und",1,0
+ 2920 sys50033,"zuruckgesetzt.stoppen sie selbst!",2,0
+ 2930 sys50033,a$,3,0
+ 2940 poke198,0:wait198,1
+ 2950 ti$="000000"
+ 2960 fora=1to100:sys50021,54,46:sys50021,46,54:next
+ 2970 p$=ti$
+ 2980 sys50033,"diese prozedur hat also gerade "+right$(p$,2)+"        ",0,0
+ 2990 sys50033,"sekunden gedauert.                    ",1,0
+ 3000 sys50033,a$+"             ",2,0
+ 3010 sys50033,"                              ",3,0
+ 3020 poke198,0:wait198,1
+ 3030 sys50003,1:poke53280,11
+ 3040 print:print"Damit ist nun die Demonstration zu Ende.";
+ 3050 print"Ich hoffe,sie haben noch viel Vergnuegen";
+ 3060 print"mit der Schachgrafik.Tschuess!!"
+ 3070 print:print:end
+ 3080 print"Bitte druecken Sie eine Taste!"
+ 3090 poke198,0:wait198,1:return
+ 3100 fora=0to63
+ 3110 read fig:sys50015,fig,a:next
+ 3120 return
+ 3130 p=asc(left$(z$,1))-65+8*(8-val(right$(z$,1))):return
+ 3140 data 132,130,131,133,134,131,130,132
+ 3150 data 129,129,129,129,129,129,129,129
+ 3160 data 0,0,0,0,0,0,0,0
+ 3170 data 0,0,0,0,0,0,0,0
+ 3180 data 0,0,0,0,0,0,0,0
+ 3190 data 0,0,0,0,0,0,0,0
+ 3200 data 1,1,1,1,1,1,1,1
+ 3210 data 4,2,3,5,6,3,2,4
+ 3220 data e2-e4,e7-e6
+ 3230 data d2-d4,g7-g6
+ 3240 data f1-d3,f8-g7
+ 3250 data c1-e3,c7-c5
+ 3260 data c2-c3,c5xd4
+ 3270 data c3xd4,d8-b6
+ 3280 data g1-e2,b6xb2
+ 3290 data b1-c3,b2-b6
+ 3300 data a1-c1,b8-a6
+ 3310 data c3-b5,g7-f8
+ 3320 data  oo ,d7-d6
+ 3330 data d4-d5,b6-a5
+ 3340 data e3-d4,e6-e5
+ 3350 data d4-c3,a5-d8
+ 3360 data f2-f4,f7-f6
+ 3370 data f4xe5,f6xe5
+ 3380 data d1-a4,c8-d7
+ 3390 data c3-b4,g8-h6
+ 3400 data g1-h1,h6-f7
+ 3410 data a4-a3,a6-c5
+ 3420 data b5xd6+,f8xd6
+ 3430 data b4xc5,d6xc5
+ 3440 data a3xc5,d8-e7
+ 3450 data c5-c7,f7-d6
+ 3460 data c7-a5,h7-h5
+ 3470 data c1-c7,h8-f8
+ 3480 data f1-c1,a7-a6
+ 3490 data e2-d4,a8-c8
+ 3500 data d4-e6,c8xc7
+ 3510 data c1xc7,f8-f7
+ 3520 data a5-b6,f7-f6
+ 3530 data h2-h3,g6-g5
+ 3540 data b6-b2,d6-b5
+ 3550 data d3xb5,a6xb5
+ 3560 data b2xe5,h5-h4
+ 3570 data c7xb7,f6-f1+
+ 3580 data h1-h2,e7-f6
+ 3590 data b7-b8+,e8-e7
+ 3600 data d5-d6+,e7-f7
+ 3610 data b8-f8+,f7-g6
+ 3620 data f8xf6+,f1xf6
+ 3630 data e5xg5+,g6-f7
+ 3640 data g5-g7+,f7xe6
+ 3650 data g7-e7++
+

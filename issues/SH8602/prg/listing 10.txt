@@ -1,0 +1,99 @@
+
+
+;listing 10.prg ==0801==
+ 1000 rem *** sprite-ueberlagerung ***
+ 1010 :
+ 1020 :
+ 1030 rem ** ausgabe programmeldung
+ 1040 :
+ 1050 print "{clr}{down}{down}{down}{down}{down}{down}{down}{down}bitte warten"
+ 1060 :
+ 1070 :
+ 1080 rem ** sprite-daten laden
+ 1090 :
+ 1100 for n = 832 to 894
+ 1110 :   poke n, 60
+ 1120 next n
+ 1130 :
+ 1140 :
+ 1150 rem ** sprite-register vorbereiten
+ 1160 :
+ 1170 print "{clr}"      :rem schirm loesch.
+ 1180 vic = 53248    :rem grafikbaustein
+ 1190 :
+ 1200 poke 2040,13   :rem datenzeiger 1
+ 1210 poke 2041,13   :rem datenzeiger 2
+ 1220 poke 2042,13   :rem datenzeiger 3
+ 1230 poke 2043,13   :rem datenzeiger 4
+ 1240 :
+ 1250 poke vic,226   :rem horzntl.pos. 0
+ 1260 poke vic+2,94  :rem horzntl.pos. 1
+ 1270 poke vic+4,144 :rem horzntl.pos. 2
+ 1280 poke vic+6,176 :rem horzntl.pos. 3
+ 1290 :
+ 1300 poke vic+1,140 :rem vertal.pos. 0
+ 1310 poke vic+3,118 :rem vertal.pos. 1
+ 1320 poke vic+5,190 :rem vertal.pos. 2
+ 1330 poke vic+7,68  :rem vertal.pos. 3
+ 1340 :
+ 1350 poke vic+39,7  :rem 0 ist gelb
+ 1360 poke vic+40,5  :rem 1 ist gruen
+ 1370 poke vic+41,3  :rem 2 ist hellblau
+ 1380 poke vic+42,1  :rem 3 ist weiss
+ 1390 :
+ 1400 poke vic+23,15 :rem alle sprites
+ 1410 poke vic+29,15 :rem dopp. groesse
+ 1420 :
+ 1430 poke vic+21,15 :rem sprite 0-3 an
+ 1440 :
+ 1450 :
+ 1460 rem ** beweg.register vorbereiten
+ 1470 rem    und anf.schritte zuweisen
+ 1480 :
+ 1490 mr(0) = vic   : mr(1) = vic+2
+ 1500 mr(2) = vic+5 : mr(3) = vic+7
+ 1510 :
+ 1520 mv(0) = -1 : mv(1) = 1
+ 1530 mv(2) = -1 : mv(3) = 1
+ 1540 :
+ 1550 df = -1 :rem -1=n.innen 0=n.aussen
+ 1560 :
+ 1570 :
+ 1580 rem ** sprite bewegen
+ 1590 :
+ 1600 for count = 1 to 200
+ 1610 :   sprnum = int((count-1)/50)
+ 1620 :   if df then sprnum = 3 - sprnum
+ 1630 :   reg = mr(sprnum)
+ 1640 :   move = mv(sprnum)
+ 1650 :   poke reg, peek(reg) + move
+ 1660 :   get kp$
+ 1670 :   if kp$= "" then 1690
+ 1680 :      count = 200 : keypress = -1
+ 1690 next count
+ 1700 :
+ 1710 :
+ 1720 rem ** prog.end nach tastendruck
+ 1730 :
+ 1740 if keypress then 1900
+ 1750 :
+ 1760 :
+ 1770 rem ** pause, dann richtung um-
+ 1780 rem    kehren und von vorn
+ 1790 :
+ 1800 for delay = 1 to 400 : next delay
+ 1810 for sprnum = 0 to 3
+ 1820 :   mv(sprnum) = -1 * mv(sprnum)
+ 1830 next sprnum
+ 1840 df = -1 - df
+ 1850 goto 1600
+ 1860 :
+ 1870 :
+ 1880 rem ** register zuruecksetzen
+ 1890 :
+ 1900 poke vic+21,0
+ 1910 poke vic+29,0
+ 1920 poke vic+23,0
+ 1930 :
+ 1940 end
+

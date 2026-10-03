@@ -1,0 +1,123 @@
+
+
+;listing 8.prg ==0801==
+ 1000 rem *** ein sprite-jagd ***
+ 1010 :
+ 1020 :
+ 1030 rem ** ausgabe programmeldung
+ 1040 :
+ 1050 print "{clr}{down}{down}{down}{down}{down}{down}{down}{down}bitte warten";
+ 1060 :
+ 1070 :
+ 1080 rem ** sprite-daten laden
+ 1090 :
+ 1100 for n = 896 to 958   :rem 1.sprite
+ 1105 :   read spdta
+ 1110 :   poke n, spdta
+ 1130 next n
+ 1140 print". ";           :rem pktausgb
+ 1150 :
+ 1160 for n = 960 to 1022  :rem 2.sprite
+ 1165 :   read spdta
+ 1170 :   poke n, spdta
+ 1190 next n
+ 1200 print". ";           :rem pktausgb
+ 1210 :
+ 1220 data   0, 28,  0,  0, 62,  0
+ 1230 data   0, 62,  0,  0, 62,  0
+ 1240 data   0, 28,  0,  0,  8,  0
+ 1250 data   0,255,128,  0,255,128
+ 1260 data   0,190,128,  0,156,128
+ 1270 data   0,136,128,  0,190,128
+ 1280 data   0,190,128,  1,156,192
+ 1290 data   1,148,192,  0, 20,  0
+ 1300 data   0, 20,  0,  0, 20,  0
+ 1310 data   0, 54,  0,  0,119,  0
+ 1320 data   0,119,  0
+ 1330 :
+ 1340 data   0, 28,  0,  0, 62,  0
+ 1350 data   0, 62,  0,  0,127,  0
+ 1360 data   0, 93,  0,  0,  8,  0
+ 1370 data   0,127,  0,  0,127,  0
+ 1380 data   0, 93,  0,  0, 73,  0
+ 1390 data   0, 93,  0,  0,127,  0
+ 1400 data   0,255,128,  0, 62,  0
+ 1410 data   0, 62,  0,  0, 20,  0
+ 1420 data   0, 20,  0,  0, 20,  0
+ 1430 data   0, 20,  0,  0, 54,  0
+ 1440 data   0,119,  0
+ 1450 :
+ 1460 :
+ 1470 rem ** sprite-register vorbereiten
+ 1480 :
+ 1490 print "{clr}"      :rem schirm loesch.
+ 1500 vic = 53248    :rem grafikbaustein
+ 1510 :
+ 1520 poke 2040,14   :rem datenzeiger 0
+ 1530 poke 2041,15   :rem datenzeiger 1
+ 1540 :
+ 1550 poke vic,110   :rem horzntl.pos. 0
+ 1560 poke vic+2,210 :rem horzntl.pos. 1
+ 1570 poke vic+1,79  :rem vertkal.pos. 0
+ 1580 poke vic+3,179 :rem vertkal.pos. 1
+ 1590 :
+ 1600 poke vic+39,3  :rem 0 ist hellblau
+ 1610 poke vic+40,7  :rem 1 ist gelb
+ 1620 :
+ 1630 poke vic+23,3  :rem beide sprites
+ 1640 poke vic+29,3  :rem dopp. groesse
+ 1650 :
+ 1660 poke vic+21,3  :rem beide sichtb.
+ 1662 :
+ 1664 :
+ 1666 rem ** sprite-bewegung vorbereiten
+ 1667 :
+ 1668 d0 = 1 : d1 = -1
+ 1670 :
+ 1672 :
+ 1674 rem ** vertikale bewegung
+ 1676 :
+ 1678 for move = 1 to 100
+ 1680 :   poke vic+1, peek(vic+1) + d0
+ 1682 :   poke vic+3, peek(vic+3) + d1
+ 1684 :   get kp$
+ 1686 :   if kp$ = "" then 1690
+ 1688 :      move=100 : keypress = -1
+ 1690 next move
+ 1692 :
+ 1694 :
+ 1696 rem ** bei tastendruck abbrechen
+ 1698 :
+ 1700 if keypress then 1750
+ 1702 :
+ 1704 :
+ 1706 rem ** horizontale bewegung
+ 1708 :
+ 1710 for move = 1 to 100
+ 1712 :   poke vic, peek(vic) + d0
+ 1714 :   poke vic+2, peek(vic+2) + d1
+ 1716 :   get kp$
+ 1718 :   if kp$ = "" then 1722
+ 1720 :      move=100 : keypress = -1
+ 1722 next move
+ 1724 :
+ 1726 :
+ 1728 rem ** bei tastendruck abbrechen
+ 1730 :
+ 1732 if keypress then 1750
+ 1734 :
+ 1736 :
+ 1738 rem ** richtung umgekehrt und los
+ 1740 :
+ 1742 d0 = -d0 : d1 = -d1
+ 1744 goto 1670
+ 1746 :
+ 1748 :
+ 1750 rem ** ruecksetzen des registers
+ 1760 :
+ 1770 poke vic+21,0  :rem sprites aus
+ 1780 poke vic+29,0  :rem und wieder
+ 1790 poke vic+23,0  :rem normalgroesse
+ 1800 :
+ 1810 end
+

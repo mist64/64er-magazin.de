@@ -1,0 +1,231 @@
+
+
+;reformat.prg ==0801==
+    1 rem *******************************
+    2 rem *       reformat v4.0         *
+    3 rem *                             *
+    4 rem *  (c) 1985 by georg burger   *
+    5 rem *     roiderstrasse 18        *
+    6 rem *       8051 zolling          *
+    7 rem *******************************
+    8 :
+    9 :
+   10 poke53280,0:poke53281,0:poke646,5:printchr$(142)
+   20 open1,8,15,"i":close1:goto1000
+   97 :
+   98 rem  ---------routinen--------------
+   99 :
+  100 close5:open5,8,5,"#2":return
+  200 input#15,y1$,y2$,y3$,y4$
+  210 ifval(y1$)=0thenreturn
+  220 print"{down}"y1$" "y2$" "y3$" "y4$
+  230 print"{down}   use {rvon} _ {rvof} to exit or {rvon} f7 {rvof} to continue{down}"
+  240 poke198,0
+  250 geta$:ifa$=""then250
+  260 ifa$="_"thenrun
+  270 ifasc(a$)=136thenreturn
+  280 goto250
+  300 print"{clr}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+  310 print"{rvon}   reformat  v4.0    by  georg burger   {rvof}";
+  320 fori=1to7:print"{CBM-G}                                      {CBM-M}";:nexti
+  330 print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":return
+  400 print"old directory-register:":print
+  410 print"name",dn$(d1)
+  420 print"blocks",dl(d1)
+  430 print"track",ds(d1)
+  440 print"sector",db(d1)
+  450 ef$="y":return
+  500 print"{down}             {rvon} press any key {rvof}":poke198,0
+  510 geta$:ifa$=""then510
+  520 return
+  600 d1=0
+  610 if(ds(d1)=as)and(db(d1)=ab)then400
+  620 d1=d1+1:ifd1>=dpthenreturn
+  630 goto610
+  700 mb=nb:nb=nb+3
+  710 ifnb=19thennb=2
+  720 ifnb=20thennb=3
+  730 return
+  997 :
+  998 rem --------- menue ---------------
+  999 :
+ 1000 open15,8,15:open5,8,5,"#2"
+ 1010 dims(35,21),b(35,21),bl(35),di$(29),di(29),a$(255)
+ 1020 dimsv(35,21),bv(35,21),us(35,21),ds(144),db(144),dl(144),dn$(144),dt(144)
+ 1030 fori=1to17:bl(i)=20:next:fori=18to24:bl(i)=18:next
+ 1040 fori=25to30:bl(i)=17:next:fori=31to35:bl(i)=16:next
+ 1050 gosub300:poke214,4:poke211,0:sys58640
+ 1060 print"{rght}   {rvon} f1 {rvof}   reconstruct directory
+ 1070 print"{rght}   {rvon} f7 {rvof}   examine directory":poke198,0
+ 1080 geta$:ifa$=""then1080
+ 1090 ifasc(a$)=133thengosub100:goto2000
+ 1100 ifasc(a$)=136thengosub100:gosub4000:goto1050
+ 1110 goto1080
+ 1997 :
+ 1998 rem --- reconstruct directory ----
+ 1999 :
+ 2000 gosub300:poke214,4:poke211,0:sys58640
+ 2010 print"{rght}         reconstruct directory
+ 2020 print"{rght}            use {rvon} _ {rvof} to exit
+ 2030 print"{down}{down}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+ 2040 print"{rvon} track   sector   to   track     sector {rvof}"
+ 2050 fors=1to35:forb=0tobl(s)
+ 2060 print#15,"b-r:"5;0;s;b:gosub200
+ 2070 print#15,"b-p:"5;0:gosub200
+ 2080 get#5,e$
+ 2090 get#5,f$
+ 2100 e=asc(e$+chr$(0))
+ 2110 f=asc(f$+chr$(0))
+ 2120 print"  "s,b,"    "e,"    "f
+ 2130 geta$:ifa$=""then2150
+ 2140 ifa$="_"thenclose15:run
+ 2150 ife=75andf=1thenus(s,b)=-2:goto2200
+ 2160 ife>35thene=0
+ 2170 iff>21thenf=21
+ 2180 s(s,b)=e:b(s,b)=f
+ 2190 sv(e,f)=s:bv(e,f)=b:us(e,f)=us(e,f)+1
+ 2200 next:next
+ 2210 rem ------ critical blocks -------
+ 2220 gosub300:poke214,5:poke211,0:sys58640
+ 2230 print"{rght}            critical blocks
+ 2240 print"{down}{down}{down}{down}{rvon} track   sector   lenght {rvof}":print
+ 2250 fors=1to35
+ 2260 forb=0tobl(s)
+ 2270 ifus(s,b)<2then2290
+ 2280 print"  "s,b,us(s,b)
+ 2290 next:next
+ 2300 print"{down}         {rvon} end of critical blocks {rvof}"
+ 2310 gosub500:gosub300:poke214,4:poke211,0:sys58640
+ 2320 print"{rght}   use old directory to name files ?
+ 2330 print"{rght}                (y/n)
+ 2340 getda$:ifda$=""then2340
+ 2350 ifda$<>"n"thenda$="y":gosub4030
+ 2360 fors=1to35
+ 2370 ifs=18then2550
+ 2380 forb=0tobl(s)
+ 2390 s1=s:b1=b
+ 2400 if(s=1)and(s(s,b)=0)and(b(s,b)=1)then2540
+ 2410 ifus(s1,b1)<0then2540
+ 2420 ifus(s1,b1)>0thens2=sv(s1,b1):b2=bv(s1,b1):s1=s2:b1=b2:goto2420
+ 2430 print"{clr}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon} file-start {rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";:ba=1:as=s1:ab=b1
+ 2440 prints1,b1:us(s1,b1)=-1
+ 2450 s2=s(s1,b1):b2=b(s1,b1):s1=s2:b1=b2
+ 2460 ifs1<>0thenba=ba+1:goto2440
+ 2470 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon} file-end {rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{down}"
+ 2475 print"lenght:";ba;"blocks":print
+ 2480 ifba<2then2540
+ 2490 ifda$="y"thenef$="n":gosub600
+ 2500 print"{down}write back in directory (y/n)":poke198,0:print
+ 2510 gete$:ife$=""then2510
+ 2520 ife$="y"then2570
+ 2530 ife$<>"n"then2510
+ 2540 nextb
+ 2550 nexts
+ 2560 goto1050
+ 2570 rem -------- write bam -----------
+ 2580 s1=as:b1=ab
+ 2590 print#15,"b-a:"0;s1;b1:gosub200
+ 2600 s2=s(s1,b1):b2=b(s1,b1):s1=s2:b1=b2
+ 2610 ifs1<>0then2590
+ 2620 rem ----- write directory --------
+ 2630 mb=1:nb=4
+ 2640 print#15,"u1:"5;0;18;mb:gosub200
+ 2650 print#15,"b-p:"5;0:gosub200
+ 2660 get#5,ns$,nb$
+ 2670 ns=asc(ns$+chr$(0))
+ 2680 ifns<>0thengosub700:goto2640
+ 2690 c=0
+ 2700 get#5,a$,b$,c$
+ 2710 ifa$=""thena$="0"
+ 2720 ifb$=""thenb$="0"
+ 2730 ifc$=""thenc$="0"
+ 2740 ifa$="0"thenifb$="0"thenifc$="0"then2910
+ 2750 fori=1to27:get#5,a$:next
+ 2760 c=c+1:ifc<8thenget#5,a$,a$:goto2700
+ 2770 ifmb<18then2810
+ 2780 print"directory is full !"
+ 2790 geta$:ifa$=""then2790
+ 2800 goto1050
+ 2810 print#15,"b-p:"5;0:gosub200
+ 2820 print#5,chr$(18);
+ 2830 print#5,chr$(nb);
+ 2840 print#15,"u2:"5;0;18;mb:gosub200
+ 2850 gosub700
+ 2860 print#15,"u1:"5;0;18;mb:gosub200
+ 2870 print#15,"b-p:"5;0:gosub200
+ 2880 print#5,chr$(0);chr$(255);:fori=0to253:print#5,chr$(0);:next
+ 2890 print#15,"u2:"5;0;18;mb:gosub200
+ 2900 goto2640
+ 2910 print"track 18 sector"mb"position"c+1:print
+ 2920 p=2+c*32
+ 2930 print#15,"b-p:"5;p:gosub200
+ 2940 di$(0)=chr$(130)
+ 2950 di$(1)=chr$(as)
+ 2960 di$(2)=chr$(ab)
+ 2970 fori=3to18:di$(i)=chr$(160):next
+ 2980 ifda$="y"andef$="y"thenprint"       "dn$(d1)"{up}"
+ 2990 input"name ";n$
+ 3000 n$=left$(n$,16)
+ 3010 fori=0tolen(n$)-1
+ 3020 di$(3+i)=mid$(n$,i+1,1)
+ 3030 next
+ 3040 fori=19to27:di$(i)=chr$(0):next
+ 3050 bh=int(ba/256):bl=ba-256*bh
+ 3060 di$(28)=chr$(bl)
+ 3070 di$(29)=chr$(bh)
+ 3080 fori=0to29
+ 3090 print#5,di$(i);
+ 3100 next
+ 3110 print#15,"u2:"5;0;18;mb:gosub200
+ 3120 goto2540
+ 3997 :
+ 3998 rem ---- examine directory -------
+ 3999 :
+ 4000 gosub300:poke214,4:poke211,0:sys58640
+ 4010 print"{rght}           examine directory
+ 4020 print"{rght}            use {rvon} _ {rvof} to exit
+ 4030 print
+ 4040 mb=1:dp=0
+ 4050 print#15,"u1:"5;0;18;mb:gosub200
+ 4060 print#15,"b-p:"5;0:gosub200
+ 4070 get#5,ns$,nb$
+ 4080 nb=asc(nb$+chr$(0))
+ 4090 ns=asc(ns$+chr$(0))
+ 4100 print"{down}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}";
+ 4110 print"     track 18  sector"mb"-->"ns" "nb
+ 4120 print"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+ 4130 geta$:ifa$=""then4150
+ 4140 ifa$="_"thenclose15:run
+ 4150 ifns=75andnb=1then4440
+ 4160 print
+ 4170 print"{rvon}blocks"tab(7)"name"tab(26)"typ"tab(31)"tra."tab(36)"sec.{rvof}"
+ 4180 forc=0to7
+ 4190 geta$:ifa$=""then4210
+ 4200 ifa$="_"thenclose15:run
+ 4210 fori=0to29
+ 4220 get#5,di$(i)
+ 4230 nexti
+ 4240 ifc<>7thenget#5,a$,a$
+ 4250 fori=0to29:di(i)=asc(di$(i)+chr$(0)):next
+ 4260 kw$=" no more files in sector"
+ 4270 ifdi(0)=0anddi(1)=0anddi(2)=0thenprint"{down}      {rvon}"kw$;mb"{left} {rvof}":print:goto4440
+ 4280 ds(dp)=di(1):db(dp)=di(2)
+ 4290 dl(dp)=di(29)*256+di(28)
+ 4300 dn$(dp)="":fori=3to18:ifdi(i)<>160thendn$(dp)=dn$(dp)+di$(i)
+ 4310 nexti
+ 4320 dt(dp)=di(0)
+ 4330 dp=dp+1
+ 4340 printdi(29)*256+di(28);tab(7);chr$(34);
+ 4350 fori=3to18:ifdi(i)<>160thenprintdi$(i);
+ 4360 next:printchr$(34);
+ 4370 by=di(0)and(not128):ifby=0thenprinttab(26);"del";
+ 4380 ifby=1thenprinttab(26);"seq";
+ 4390 ifby=2thenprinttab(26);"prg";
+ 4400 ifby=3thenprinttab(26);"usr";
+ 4410 ifby=4thenprinttab(26);"rel";
+ 4420 printtab(30);di(1);tab(35);di(2)
+ 4430 nextc
+ 4440 mb=mb+1:ifmb<>19then4050
+ 4450 ifda$="y"thenreturn
+ 4460 gosub500:return
+
