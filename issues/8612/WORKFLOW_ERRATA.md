@@ -676,3 +676,12 @@ r170's MSE-recreation path (withdrew two owner questions), r300 step 0 (newest i
   `;` (`&lt;&gt;`), so it is not an operator; and the BASIC discriminator "no line number after the break → wrap" fails for UNNUMBERED
   code, which 146 Tabelle 1 is (statements there run together with spaces in the print itself). Each case was decided on the crop.
 - **What would have prevented it.** State the code-join rule next to the line-break rule; tokenise before joining (entities are not operators).
+
+## 130 — a disk listing that starts before the print needs `data-range`; no rule says so (owner, 8612 review)
+
+- Owner: "we only care that it matches the print. so use data-from to match the print only where its necessary." The test is
+  fidelity, not the personal data the two 8612 heads happened to carry. 8612: 2 of 38 disk listings start before the print
+  (79 yankee doodle 10→100, input-routine 1→10000), 0 end after it. `data-range` exists in generate.py (:679/:721, honoured by
+  the checksummer path) and 16 issues use it, but r130 never mentions comparing the file's first/last line with the print.
+- **What would have prevented it.** r130: "For every disk-backed listing, compare the file's first and last line number with the
+  printed listing; where they differ, add `data-range="<first>-<last>"` (comma-separated runs allowed). The download stays the full file."
