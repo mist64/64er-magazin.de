@@ -258,3 +258,13 @@ has the full program, the print only the changed lines — needs comma-separated
 data-range runs, mentioned only in passing; a disk file whose line numbers
 differ from the print (renumbered DATA) has no case. Found by the 130 sub-agent
 (25 min, 156 tool calls).
+
+## 140 — recurring-slug check is monthly-shaped
+
+Check 4 compares against one `<PREV>` and flags any of its rubric slugs this
+issue lacks — on a themed Sonderheft (SH8601 C 128 → SH8602 Tips & Tricks) it
+flags `bücher`, `cpm`, so "All four checks should pass" cannot be met. "The
+editorial slug should always be `editorial`" — Sonderhefte use `vorwort`
+(SH8503–07, SH8601); `checksummer`, `mse`, `impressum` are not listed as
+recurring. Check 3 pipes into `head -5` (r000 forbids). Found by the 140
+sub-agent.
