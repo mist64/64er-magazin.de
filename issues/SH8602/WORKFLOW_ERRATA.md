@@ -208,3 +208,14 @@ monthly-only; the Verification grep `"${YYMM:2:2}/${YYMM:0:2}"` with 8602
 digits matches the MONTHLY 02/86 bullet (and breaks on `SH8602`). Nothing
 says what to do with a bullet that holds a bound. Wrote a provisional date and
 carried it to PAUSE 2. Found by the 110 sub-agent.
+
+## 090 — small inaccuracies
+
+"Find the TOC pages in the issue's PDF (usually pages 6–7…)" — names the PDF
+the next block forbids, and assumes two pages (this Sonderheft: one, p5).
+"entry is the printed entry text" — title only, or title + subtitle? and
+what of entries not printed at all (Eintipphilfen, Impressum)? Check 2 says
+"run once all toc_category metas are filled", but from 080 on every file
+carries `XXX`, so before 100 it fails rather than being vacuous. "Normalised to
+Title Case" is wrong for German ("Listings zum Abtippen"). Found by the 090
+sub-agent.
