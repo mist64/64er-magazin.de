@@ -347,3 +347,16 @@ the band WITHOUT a section word" — SH8602 p3 prints EINLEITUNG, as do
 SH8503–07; and step 3 does not skip it. "Crop the top ~250 px" names no
 resolution (at 600 dpi the band needs ~500 px). Check 1 only lists files and
 compares nothing; check 3 is eyeball-only. Found by the 210 sub-agent.
+
+## 220 — re-classified `all`, but every mechanism is still monthly
+
+The apply script cannot read the Sonderheft CSV layout ("write one", no spec);
+the routing check parses the monthly columns, so on a Sonderheft it examines 0
+rows and passes silently, drops lettered pages (`lo.isdigit()`), and
+`continue`s past unmatched titles (hiding both a mis-filed and an unapplied
+row); Verification 1 greps `^<YYMM>,`. "Run it from the issue directory"
+contradicts "ONE cwd: the REPO ROOT". Nothing covers a row whose page lands
+inside another article and is clearly not it (SH8602's C16 row — nearest-
+preceding routing would silently mis-file it onto article 20). "Category values
+must match a TOPICS list in generate.py" — no TOPICS entry for the Sonderheft
+CSV's top-level categories. Found by the 220 sub-agent.
