@@ -244,3 +244,17 @@ whether to use it. The "unclaimed TOC entry" check skips lettered pages
 (`a.isdigit()`) and labels every section "Rubriken". Not said: whether a
 Sonderheft's printed subtitle line joins toc_title (SH8506/07 yes, SH8601 no).
 Found by the 100 sub-agent.
+
+## 130 — placement sentences that contradict each other, and a verifier that flags the rule's own variant
+
+"The figure block must be inserted after the `</p>` of the paragraph
+containing that first mention" vs the Placement-style shapes "all listings in a
+single block at the very end" — no precedence stated. "Within a tip section,
+listing goes AFTER the byline" has no fallback for a byline fused into a `<p>`.
+Verifier #2 flags every Hypra-Ass `<pre>` backed by a `.prg`, which the
+variant table prescribes. Verifier #6 "at least 3 words" fails on printed
+captions such as "Listing 4. »Floppy-Lister«". The Sonderheft norm — disk
+has the full program, the print only the changed lines — needs comma-separated
+data-range runs, mentioned only in passing; a disk file whose line numbers
+differ from the print (renumbered DATA) has no case. Found by the 130 sub-agent
+(25 min, 156 tool calls).
