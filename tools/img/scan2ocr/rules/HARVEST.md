@@ -218,3 +218,40 @@ SH8601), and the check still fires on a planted ALL CAPS heading.
 **Recorded for the owner, out of scope:** 25 findings remain across ten
 hand-built pre-chain issues (8408 4, 8501 5, 8408/8412/8504/8505/8507/8601/
 8602/8603/SH8506 the rest). They predate the chain.
+
+## OPEN — the shared-start-page check fails every chain-built issue
+
+The new r310 HARD check ("two articles must not share a bare start page")
+works, but the corpus shows the lettering convention has only ever been
+applied to the pairs the owner happened to notice. Current state:
+
+| issue | lettered | NOT lettered (fires HARD) |
+|---|---|---|
+| 8609 | — | p8 (editorial + Commodore Deutschland), p167 (Anwendung + Listing) |
+| 8610 | — | p8, p16, p193 |
+| 8611 | 182a/182b | p8, p99 (Checksummer + Fehlerteufelchen) |
+| 8612 | 169a/b, 193a/b | p8, p170, p195 |
+
+**The editorial shares page 8 with the first feature in EVERY issue.** That is
+structural, not an oversight, which is why a HARD check on it fails
+everywhere. Three ways out, for the owner:
+
+- (a) letter all eleven pairs across 8609-8612 (ordering read off each crop);
+- (b) make the check SOFT -- a list to read, not a gate;
+- (c) exempt a named class (the editorial, and r300's Fehlerteufelchen box
+  which shares p99 with the Checksummer in 8611), keeping it HARD for the
+  rest.
+
+Until this is decided the check is left HARD exactly as ruled, and 8612
+reports 6 HARD findings from it. 8612's content was NOT changed.
+
+## Also found while applying
+
+- `generate.py` exits **1 on every run**, on a clean tree, because it calls
+  `./filter_rss.py` and `./filter_index.py` with `#!/usr/bin/env python3`
+  shebangs and no `check=True`; under system Python both die on missing
+  `pytz` / `bs4`. So r000's end-of-issue build gate cannot be read by exit
+  code. Pre-existing, out of this harvest's scope, owner's call.
+- 8609 carries 4 HARD r190 byline-split findings (articles 64, 66, 68) --
+  these are the ones that used to surface when r310 defaulted to issues/8609.
+  Out of scope, recorded.
