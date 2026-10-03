@@ -232,3 +232,15 @@ Simons' BASIC with tokens inside REM (`spline 64`: code identical, 6 REM
 lines differ). The routing list misses the mirror of "BASIC at a load address
 not ending in 01": machine code at an address ending in 01 (`pseudo-irq` at
 $9E01) is decoded as BASIC garbage. Found by the 120 sub-agent.
+
+## 100 — the wrapper does not parse under /bin/bash; the helper contradicts the rule
+
+`r100_toc_category.sh` dies under macOS `/bin/bash` 3.2 ("unexpected EOF while
+looking for matching `"`" at line 87; backticks in a Python comment inside
+`$(cat <<'PY' …)`); it runs under Homebrew bash 5. `r100_toc_title_apply.py`
+writes a toc_title for every article (rule: only where it differs; delete the
+placeholder otherwise) and writes `&` raw (rule: `&amp;`); the rule never says
+whether to use it. The "unclaimed TOC entry" check skips lettered pages
+(`a.isdigit()`) and labels every section "Rubriken". Not said: whether a
+Sonderheft's printed subtitle line joins toc_title (SH8506/07 yes, SH8601 no).
+Found by the 100 sub-agent.
