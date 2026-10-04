@@ -425,3 +425,16 @@ had both forms (325A: 165/99 in Part A alone), and 210 set the bands closed.
 Owner, 2026-10-04: **"space. C 64, C 128, C 16, C 116, VC 20."** The harvest
 should rewrite r000's example and r210's band guidance accordingly, and say
 what the rule does NOT touch (program text, the CSV's verbatim index titles).
+
+## 005b — the run's offset can put bed inside a failed card page's window
+
+r005_a4_window's new fallback 1 anchors a failed insert page "on its own
+traced top-left corner where there is one, else on the run's offset". Here
+182–184 have no traced corner (the card is flush with the frame's top-left),
+so the run's offset (181's 28 6) applies — and with the run's width it puts
+the window's right edge at 3438, past 183's card (right edge 3431) and the
+low band of 184's: 28 % of 183's right 24 px was bed. Anchoring on the page's
+own measured RIGHT edge (bed step at lum < 60, three-band median) fixed it.
+Suggested: when the top-left is not traceable, anchor on whichever edges ARE
+measurable (right/bottom against the bed), and check the window's edge bands
+for bed before accepting it.
