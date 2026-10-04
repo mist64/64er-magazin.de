@@ -108,6 +108,30 @@ MEASURED on 8612: **27,049** for the unretouched export against **81,409** for
 the owner's cover — 3×, because a real retouch is a page-wide tonal adjustment
 plus localised work. A count near the unretouched level means **stop and ask**.
 
+**ALIGN FIRST — the count cannot tell a RETOUCHED cover from a RE-CROPPED one.**
+The owner may cut the cover by hand, to the printed trim rather than to the
+traced A4 window, and then every edge lands in a new place and the count is
+meaningless. MEASURED on SH8603: the delivered cover scored **1,057,256** moved
+pixels, thirteen times the figure for 8612's heavy retouch — and it was not
+retouched much at all, it was shifted `dx=+7, dy=-22` px. After alignment it
+correlates **0.9884** with the plain reduction.
+
+So: phase-correlate the two first, report the shift, and count the moved pixels
+**on the aligned overlap**. A re-cropped cover that was never retouched would
+otherwise sail through with a huge score.
+
+```python
+a = np.asarray(ref.convert("L"), float) - ...   # ref = 25% reduction of a4600/001
+b = np.asarray(new.convert("L"), float) - ...
+F = np.fft.fft2(a) * np.conj(np.fft.fft2(b)); F /= np.abs(F) + 1e-9
+dy, dx = np.unravel_index(np.argmax(np.abs(np.fft.ifft2(F))), a.shape)
+# wrap dy, dx into +/- half the axis, roll b by them, then count on the overlap
+```
+
+A sharp peak (SH8603: 1344x the background) means a clean rigid shift; a flat
+one means the two images are not the same picture, which is a different problem
+and also worth stopping for.
+
 ## A MASTER CAN BE SILENTLY OVERWRITTEN BY THE COVER EXPORT
 
 `masters600/001.png` was found on 8612 as a **1240×1754 Affinity Photo export**
