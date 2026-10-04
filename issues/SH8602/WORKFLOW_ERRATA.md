@@ -514,3 +514,9 @@ UNCONFIRMED."
   »Heimorgel«, so applying it would have put a typo INTO a correct page), 3
   unverifiable. One wrong in 71 checkable is exactly the case the blind pass
   exists for.
+- After applying: `verify` failed on all pairs whose originals changed (the
+  applied differences vanish, D numbers shift, the renamed 8404 file breaks the
+  table row). Re-diff + content remap + a per-pair "THEIRS applied" table
+  restored it (15/15). r330 says nothing about how an APPLIED THEIRS item is
+  recorded once it no longer has a D number, and `verify`'s `_cells()` splits on
+  every `|`, even `\|`.
