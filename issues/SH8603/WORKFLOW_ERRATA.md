@@ -458,3 +458,20 @@ per-block measure found them); monthly PDFs of 8405/8503/8506/8507/8407 are
 150 ppi, too coarse for commas — the 2400 dpi scans were needed; the
 disposition vocabulary has no value for "figure not yet placed" or a dash-
 glyph-only difference.
+
+## 006 — the largest-blob colour measurement reads browned paper as ink; "the paper mask r005 already has" does not exist for a4600
+
+From the 006 preparation, confirmed on the contact sheet: SH8603's interior
+paper is browned at the head and fore-edge (R>G>B, ~221/211/204 against a
+neutral mid-page). r006's recipe (chroma ≥ 18, mean > 25, 3×3 opening, paper
+mask) measures that as one full-width blob > 50 mm² on 183 of 184 pages —
+literally applied it would ship the whole issue as JPEG and blow the 100 MB
+ceiling. The "paper mask (r005 already has one)" is not stored for a4600; the
+only one is `page_mask()` in r005_a4_window.py, which removes dark/saturated
+bed only. Two fixes agreed exactly here: exclude light warm weak-chroma pixels
+(mean > 170, R ≥ G ≥ B, chroma < 45), or drop blobs touching a 4 mm edge band.
+The classifier's own false promotion (178) has the same cause — a second
+cause besides SH8602's K anchor that the rule should name. Also: the tag must
+be zero-padded ("Sonderheft 03/86"); `make_issue_pdf.sh` sets `LANG="deu"`,
+which clobbers the locale (harmless warnings); step 2 needs no guetzli
+(ENCODER=fast, as SH8602) — say so.
