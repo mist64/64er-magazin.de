@@ -250,3 +250,18 @@ on 8611/8612 — the visual walk found all 18 uncaptioned tables. And box PROSE
 that is not a table (p3 Programmservice, p148 Wichtig!, p47's checklist) has
 no rule that owns it; 030 drops such boxes and nothing downstream restores
 them by mandate.
+
+## 150 — the caption script's regex and "short = seen" shortcut; naming has gaps for shared start pages
+
+From the 150 sub-agent: `r150_figure_captions.py` needs `Bild\s*\d`, so it
+skips "Bild." and "Bild. 1."; takes captions only from blocks labelled
+`caption` (missed p23 Bild 2, labelled listing-inline); and marks any caption
+under 4 words IN_HTML (p146/p148 tables reported present while absent). r150's
+naming has `-00` for a second article's LEAD image only — nothing names a
+second article's TABLE, an unnumbered "Tabelle.", a whole screen-output crop,
+or a figure printed on the page BEFORE its article starts (p76's Bild 1/2 for
+77a). And 150's mapping assumes a figure's page is inside its article's
+`64er.pages`, which 080 had left short for 31 (p38), 47 (p48), 58 (p59) and
+most game listing pages — r320's page-coverage half is the check that sees
+it, but it runs at the END; running it right after 080 would have fixed the
+ranges before 130/150/160 depended on them.
