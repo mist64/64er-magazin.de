@@ -307,3 +307,14 @@ the byline in 9 files — a departure from print position nobody marks, and in
 tension with "restore in print position" for boxes. And no rule owns lost
 DROP CAPS before 190: 030/080 leave them, r310 gates them only at the end;
 here 190 read ~38 of them off the crops.
+
+## 210 — the check excludes the Vorwort it says to keep; the apply script escapes `&`; machine-label spacing unstated
+
+From the 210 sub-agent, checked: check 1's exclusion grep lists `vorwort` as
+"should NOT have head1" while its own comment and SH8602 give the Vorwort one;
+its formula subtracts a Leserforum a Sonderheft does not have.
+`r210_head_meta_apply.py` writes `Tips &amp; Tricks` via `html.escape`; the
+corpus has the literal `&`. The rule's examples are all spaced (`C 64/VC 20`);
+SH8603's bands are set closed — the rule should say the spacing follows the
+band. No guidance for a lettered `b` start page whose band belongs to the `a`
+article above it (77b).
