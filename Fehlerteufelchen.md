@@ -125,7 +125,7 @@ Seite 61
 - **Blockverschiebung** (Sonderheft 7/86, Seite 84)
 - **Dateiverwaltung für den C 16** (Sonderheft 3/86, Seite 81ff)
 - **Modem mit Wählautomatik** (Ausgabe 7/86, Seite 36)
-- **File-Printer** (Sonderheft 2/86, Seite 1)
+- **File-Printer** (Sonderheft 2/86, Seite 111)
 
 ## Ausgabe 10/86
 
