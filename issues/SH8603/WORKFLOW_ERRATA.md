@@ -199,3 +199,16 @@ BASIC with its own machine code appended (`fast hardcopy` — looks like case 3
 "trailing bytes", is not harmless). The stub test would also wrongly flag
 `turbo-racer` (73-byte loader, bare `SYS`, no code appended). The archive
 names A/B disks `SH0X/SH03A.D64`, not the Usage's `<YYMM>A.D64`.
+
+## 100 — the script needs bash 5; one check counts the placeholder; an unmentioned helper contradicts the rule
+
+From the 100 sub-agent, confirmed: `r100_toc_category.sh` fails `bash -n` under
+macOS `/bin/bash` 3.2 ("unexpected EOF while looking for matching `"'", line
+87 — backticks in a Python comment inside `$(cat <<'PY' …)`); it runs under
+Homebrew bash 5. The rule's "exactly one toc_category" check greps
+`<meta name="64er\.toc_category"` and so also counts the commented `XXX`
+placeholder — a file with ONLY the placeholder passes (seen on a planted
+copy). `r100_toc_title_apply.py` sits in rules/ unmentioned by r100.md and
+contradicts it: writes toc_title equal to `<title>`, does not escape `&`,
+cannot parse lettered pages (gave p21's entry to 14 Maschinensprache, left
+77a/77b unmatched). Not used.
