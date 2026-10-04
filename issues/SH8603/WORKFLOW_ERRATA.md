@@ -349,3 +349,18 @@ Verification still pipes checks 1 and 2 into `head`, which r000 (A CHECK
 SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL) forbids. The block index could not
 locate most mid-paragraph words or the p148 box; the agent ran its own
 tesseract word-box pass as a locator.
+
+## 190 — "restore missing text" without first checking the text is not already in the file
+
+**What happened.** 190A reported "Missing section 'Kleiner Epson ganz groß'
+restored" in 43 and restored it under its h2. The text was NOT missing: 030
+had glued it onto the end of the article's opening paragraph, in raw OCR
+form. The issue then printed the section twice; 280A noticed it only because
+a `©` survived in the raw copy. The same pass left two paragraphs in 6
+ending with a copy of the heading it had split out. My own check at 190
+compared the restored words against the OCR — which can only confirm the
+text EXISTS, i.e. the opposite of the question.
+**Suggested.** Before restoring any "missing" passage, grep the article for
+its first and last 8 words; after any restoration or heading split, run a
+repeated-12-word-window sweep over the file (it found exactly these here).
+Put that sweep in r190's and r320's Verification.
