@@ -61,3 +61,64 @@ there, 165/184 here). Neither landed in r005_masters_sheet.md or HARVEST.md.
 `sheets600`, the footer band read as print. Cost ~5 min.
 **Suggested.** Check the harvest of SH8602's 005 entries; it looks as if they
 were dropped.
+
+## 040 — "bullets are always `-`" is false again; the script's own count is not fence-aware
+
+**What the rule says.** r040 Notes: "List bullets in this project are always
+`-`, never `*` — so escaping every solitary `*` won't break lists." SH8602
+already found 9 `* ` bullet lines; SH8603 has 13 (p47–49 region), some run
+together mid-paragraph. **What happened.** Escaped as the rule says; the list
+now renders as literal asterisks and has to be rebuilt downstream (190).
+**Also (sub-agent):** the script's closing summary counts the whole file and
+prints `solitary=2` for the two correctly untouched fenced `*` — exactly the
+"a check must be as fence-aware as the transform" failure the Verification
+docstring warns about; and the script still calls bare `python3` (works only
+because it imports `re`). The rule says pairing is "within the paragraph",
+the script tests per line; the `**` regex lacks `(?<!\*)`, so a `***` tail
+counts as a delimiter. No effect here. SH8602's "keeps every `**`
+unconditionally" no longer holds — the script now checks pairing.
+**Suggested.** Either convert `^\* ` / ` \* ` bullet starts to `- ` before
+escaping, or have the rule say outright that bullets are escaped and 190
+rebuilds lists; fix the summary to skip fences.
+
+## 050 — rule and script disagree in five small places (no effect on SH8603)
+
+Found by the 050 sub-agent, checked against the files: (1) the rule says
+escape `</` followed by a non-letter (`</>`, `</1>`); the script's pattern
+`<(/?[a-zA-Z]…)>` never matches them, nor does the Verification regex. (2) The
+rule's "idempotent: lookbehinds for `\`" — the script has none; it is
+idempotent because entities do not match. (3) The script header still says it
+"skips already-escaped \<...\>"; Pass 1 converts them. (4) The script's
+closing count scans fences too, against the rule's own "outside fenced code
+only". (5) The rule's whitelist names `big`; the script's `HTML_TAGS` and the
+Verification `WHITE` set do not. Plus the bare `python3` again (venv put first
+on PATH). Cost: none beyond the report.
+
+## 030 — a "Fortsetzung von Seite N" glued to body text drops the whole paragraph, and the loss check calls it accounted
+
+**What the rule says.** r030 Verification: "Every paragraph must be accounted
+for: in an article, used as a title, dropped as a headline fragment, or a
+cross-reference. Unexplained loss must be 0 — this is the check that catches a
+boundary rule quietly eating text." **What happened.** Loss 0. At 060 the
+sub-agent found p62's article reduced to `# [Fortsetzung von Seite 60] [62]`:
+stream paragraph 887, 369 chars, is "Fortsetzung von Seite 60 gegen das
+»größte« … umgeschrieben." — the marker and the continuation text are ONE OCR
+paragraph. `FORTSETZUNG.search(text)` matches anywhere in it, so the whole
+paragraph is filed as a cross-reference and `mark` counts it accounted. The
+loss check certifies exactly the silent drop it exists to catch.
+**What is true.** A cross-reference is a SHORT paragraph that is (almost) only
+the marker. **Suggested.** Treat a FORTSETZUNG paragraph as a marker only when
+the text minus the match is under ~20 chars; otherwise strip the marker and
+keep the paragraph, and make the loss check count chars dropped as markers
+(> 40 → report). Cost here: found by luck at 060 (a list-number survey);
+nothing at 030 could have shown it.
+
+## 060 — the list check reads a file the script deletes, and the `<br` spot-check passes on raw `<br>`
+
+From the 060 sub-agent, confirmed: the rule's start-number check greps the
+md, but `r060_md_to_html.sh` deletes `issues/<ID>/<ID>.md` and
+`<tmp>/ocr/<ID>.md` is the pre-040 text, so the check needs a copy the rule
+never says to take. `grep -c '<br'` > 0 passed only because of raw `<br>` in
+`<p class="source">`; `-G` produced 0 `<br/>`. And the commonest list break
+here is OCR dropping the space after the number (`2.$025D`, `2.Die`), which
+the `^…\. ` grep cannot see.
