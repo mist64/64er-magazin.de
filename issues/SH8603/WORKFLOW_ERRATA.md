@@ -522,3 +522,22 @@ Implemented as an opt-in switch, `BILEVEL_THRESHOLD="35%"`, in
 dir — the cache was keyed by page only, so changing the threshold without a
 new dir would have silently re-embedded the Otsu images. Whether 35 % becomes
 the corpus default is for the harvest (r006 + the script's default).
+
+## 190 — the Leserforum "leave bold lead-ins unmarked" precedent strips real structure when the bold is the ONLY separator
+
+**What the rule says.** r190: "Leserforum question lead-ins are bold on the
+page and unmarked in every monthly issue (0 of 31) — follow precedent and
+leave them unmarked." **What happened.** SH8603's `11 Fragen und Antworten`
+prints three levels — centred bold headings with a rule, BOLD flush-left
+questions, roman indented answers — and shipped through every step with the
+questions as plain `<p>` (0 `<strong>` in the file): question and answer
+became indistinguishable. Found by the owner's review, not by any gate.
+**What is true.** The precedent is right where the bold merely decorates a
+lead-in whose Q&A structure survives in other markup; it is wrong where the
+bold is the only thing that separates question from answer. r190's own test
+already says so ("whether the emphasis distinguishes THIS text from the text
+beside it, or merely decorates a field name the layout already sets apart").
+**Suggested.** Qualify the Leserforum sentence: it applies only where the
+structure survives without the bold; otherwise mark it as printed. A check:
+an article whose print has bold paragraph starts and whose HTML has zero
+`<strong>`/headings between them deserves a look.
