@@ -94,7 +94,9 @@
 
         <p>Um Speicherplatz für Maschinenprogramme oder Sonderzeichen zu schaffen, hat man prinzipiell zwei Möglichkeiten. Entweder man verschiebt den Basic-Anfang nach oben oder das Basic-Ende nach unten. Letztere Alternative ist in den meisten Fällen günstiger.</p>
 
-        <p>Um zum Beispiel beim VC 20 das Basic-Ende von Adresse 7680 nach 7168 (= 512 Byte) zu verlegen, gibt man ein: POKE 55,0:POKE 56,28:CLR:REM(256 * 28 = 7168)</p>
+        <p>Um zum Beispiel beim VC 20 das Basic-Ende von Adresse 7680 nach 7168 (= 512 Byte) zu verlegen, gibt man ein:</p>
+
+        <pre>POKE 55,0:POKE 56,28:CLR:REM(256 * 28 = 7168)</pre>
 
         <p>Bei anderen Speichergrößen verfährt man analog.</p>
 
@@ -1935,7 +1937,17 @@
 
         <p>Eine interessante Gebrauchsmöglichkeit ergibt sich durch die Memoryroutine. Dies ist ein kurzes Basic-Programm, welches die Aufgabe hat, den von Programmen, Variablen, Strings und Arrays belegten Speicherplatz festzustellen (Listing 1):</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>10 rem *** memory dump ***
+20 rem
+30 a=46:b=44:gosub 100:print"programm:";x
+40 a=48:b=46:gosub 100:print"variablen:";x
+50 a=50:b=48:gosub 100:print"arrays:";x
+60 a=56:b=52:gosub 100:print"strings:";x
+70 a=56:b=44:gosub 100:print"speicher:";x
+80 print fre(0);"bytes free"
+90 end
+100 x=peek(a)*256+peek(a-1)-peek(b)*256-peek(b-1)
+110 return</pre>
             <figcaption>Listing 1. »Memory Dump« für VC 20 und C16</figcaption>
         </figure>
 
@@ -1976,11 +1988,11 @@
 
         <p>Die nächsten vier Byte geben die Anfangs- und Endadresse des geladenen Files an. Mit der Endadresse hat es eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Load Error geschieht dies nicht; »PRINT FRE(O)« zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm – das vielleicht nur einen geringfügigen Fehler hat – dann nicht starten, weil die Variablen dieses überschreiben würden. Abhilfe schafft in diesem Fall</p>
 
-        <p>POKE 45,PEEK(831) :POKE 46, PEEK(832):CLR.</p>
+        <pre>POKE 45,PEEK(831):POKE 46,PEEK(832):CLR.</pre>
 
         <p>Für den C 16 gibt man ein:</p>
 
-        <p>POKE 45,PEEK(821) :POKE 46,PEEK(822): CLR</p>
+        <pre>POKE 45,PEEK(821):POKE 46,PEEK(822): CLR</pre>
 
         <p>Die Werte werden damit »von Hand« übertragen und ein: normaler Programmablauf ist in den meisten Fällen wieder möglich.</p>
 
@@ -2904,7 +2916,39 @@
 
         <p>Um dies verständlich zu machen, habe ich ein Programm (Listing 2) geschrieben, welches DATA-Zeilen aus Maschinenprogrammen oder Sonderzeichen erzeugt. Die Problematik dabei ist folgende: Wenn ich DATA-Zeilen ins Programm schreiben möchte, so ist dies nur im Direktmodus möglich. Um dies automatisch zu tun, benötigen wir ein Programm. Also was tun? – Man bedient sich des Tastaturpuffers!</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>1 REM DATA-ERZEUGER
+2 REM
+5 B=248:REM 'B=208' BEI C 16
+10 INPUT"{CLR,2DOWN}STARTADRESSE:";SA
+20 INPUT"{DOWN}ENDADRESSE:";EA
+30 A=SA:GOSUB 250:POKE B,A1:POKE B+1,A2
+40 A=EA:GOSUB 250:POKE B+2,A1:POKE B+3,A2
+50 POKE B+4,44:POKE B+5,1:REM STARTZEILE 300
+60 DEF FN Z(X)=PEEK(X)+256*PEEK(X+1)
+65 B=248:REM 'B=208' BEI C 16
+70 AD=FN Z(B+4):REM AKTUELLE ZEILENNUMMER
+80 PRINT"{CLR}";AD;"DATA ";
+90 REM ** DATA-ZEILE MIT 8 ELEMENTEN ERZEUGEN **
+100 FOR T=0 TO 7
+105 X=PEEK(FN Z(B)+T)
+110 B$=STR$(X):L=LEN(B$)
+120 B$=RIGHT$(B$,L-1)
+130 IF L=4 THEN 150
+140 FOR Y=L+1 TO 4:B$="0"+B$:NEXT
+150 B$=","+B$
+160 IF T=0 THEN B$=RIGHT$(B$,3)
+170 PRINT B$;:IF FN Z(B)+T=FN Z(B+2) THEN 240
+180 NEXT
+190 A=AD+10:GOSUB 250:POKE B+4,A1:POKE B+5,A2
+200 A=FN Z(248)+8:GOSUB 250:POKE B,A1:POKE B+1,A2
+210 PRINT:PRINT"{DOWN}RUN 60"
+215 REM TASTATURPUFFER MIT &lt;HOME&gt;,&lt;RETURN&gt;,&lt;CRSR DOWN&gt; UND &lt;RETURN&gt; FUELLEN
+220 Z=631:REM 'Z=1319' BEI C 16
+225 POKE Z,19:POKE Z+1,13:POKE Z+2,17:POKE Z+3,13
+230 POKE 198,4:REM 'POKE 239,4' BEI C 16
+240 END
+250 A2=INT(A/256):A1=A-A2*256
+260 RETURN</pre>
             <figcaption>Listing 2. »Data-Erzeuger« für VC 20 (für C16 REM-Zeilen beachten)</figcaption>
         </figure>
 

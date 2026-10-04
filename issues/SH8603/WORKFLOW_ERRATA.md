@@ -265,3 +265,13 @@ or a figure printed on the page BEFORE its article starts (p76's Bild 1/2 for
 most game listing pages — r320's page-coverage half is the check that sees
 it, but it runs at the END; running it right after 080 would have fixed the
 ranges before 130/150/160 depended on them.
+
+## 170 — check 4 assumes one language per `<pre>`; monitor listings have a proof the rule does not name
+
+From 170 part A: check 4 flags this course's boxes that print "Basic:" plus a
+TEDMON monitor listing in ONE box (L9 9/30, L11 1/10 digit-led lines) — false
+positives by construction. The rule's "prove it" assumes checksums; a monitor
+listing proves itself (hex ↔ disassembly ↔ contiguous addresses), which found
+nothing wrong here but would catch a misread byte — worth naming. Briefing 2b
+("tesseract-locate the caption's bbox") fails where the box has no caption
+block (L1, L14, L16–L18); page overviews located them.

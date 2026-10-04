@@ -91,7 +91,25 @@
 
         <p>Das folgende Programmbeispiel (Listing 1) füllt den Bildschirm des © 16 mit dem Zeichen »A«. Geben Sie es bitte mit dem eingebauten Monitor ein, und starten Sie es anschlieBend mit »SYS 1015«:</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>. 03f7  a9 00    lda #$00
+. 03f9  85 d8    sta $d8
+. 03fb  85 da    sta $da
+. 03fd  a9 08    lda #$08
+. 03ff  85 d9    sta $d9
+. 0401  a9 0c    lda #$0c
+. 0403  85 db    sta $db
+. 0405  a9 01    lda #$01
+. 0407  a2 04    ldx #$04
+. 0409  a0 00    ldy #$00
+. 040b  91 d8    sta ($d8),y
+. 040d  91 da    sta ($da),y
+. 040f  88       dey
+. 0410  d0 f9    bne $040b
+. 0412  e6 d9    inc $d9
+. 0414  e6 db    inc $db
+. 0416  ca       dex
+. 0417  d0 f2    bne $040b
+. 0419  60       rts</pre>
             <figcaption>Listing 1. »Fill Screen«</figcaption>
         </figure>
 
@@ -144,7 +162,9 @@
 
         <p>Beispiel: 1 KByte vorm Basic-Anfang für Maschinenroutinen reservieren (Listing 2):</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>10 POKE 44,PEEK(44)+4
+20 POKE(256*PEEK(44)),0
+30 NEW</pre>
             <figcaption>Listing 2. »INT«</figcaption>
         </figure>
 
@@ -154,11 +174,19 @@
 
         <p>Speichern Sie das Programm bitte unter dem Namen »INIT« auf Diskette oder Kassette ab.</p>
 
-        <p>Die beschriebene Vorgehensweise zur Einbindung von großen Assemblerprogrammen in Basic-Programme wollen wir nun an einem Beispiel erproben: Laden Sie bitte »INIT« und starten Sie es (sofern Sie das nicht bereits im vorigen Schritt getan hatten). Gehen Sie in den Monitor und laden Sie »FILL SCREEN«. Verschieben Sie die Routine bitte nun mit: T 03F7 O41A 1000</p>
+        <p>Die beschriebene Vorgehensweise zur Einbindung von großen Assemblerprogrammen in Basic-Programme wollen wir nun an einem Beispiel erproben: Laden Sie bitte »INIT« und starten Sie es (sofern Sie das nicht bereits im vorigen Schritt getan hatten). Gehen Sie in den Monitor und laden Sie »FILL SCREEN«. Verschieben Sie die Routine bitte nun mit:</p>
+
+        <pre>T 03F7 041A 1000</pre>
 
         <p>Die Routine befindet sich nun in unserem für Maschinenprogramme reservierten Ein-Kilobyte-Bereich, der ab $1000 beginnt. Geben Sie folgendes Programm ein (Listing 3):</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>10 FOR i=1 to 10
+20  PRINT CHR$ (147)
+30  PRINT "zum aufruf der routine taste druecken"
+40  GETKEY A$
+50  SYS 4096
+60  FOR II=1 TO 1000:NEXT
+70 NEXT</pre>
             <figcaption>Listing 3. »INT-Demo«</figcaption>
         </figure>
 
@@ -178,7 +206,16 @@
 
         <p>Die Routine GETIN (Listing 4) liest ein Zeichen von der Tastatur, wartet jedoch nicht darauf, daß eine Taste gedrückt wird, analog dem Basic-Befehl GET. Der ASCII-Code des Zeichens wird im Akku übergeben. Wurde kein Zeichen gelesen, enthält der Akku den Wert Null. Durch das Testen auf Null kann eine Schleife realisiert werden, die erst nach der Eingabe eines Zeichens verlassen wird.</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>Basic:
+10 GET A$:IF A$="" THEN 10
+
+oder auch:
+10 GETKEY A$
+
+Assembler:
+ . 03f7  20 e4 ff jsr $ffe4
+ . 03fa  f0 fb    beq $03f7
+ . 03fc  60       rts</pre>
             <figcaption>Listing 4. »GETIN«</figcaption>
         </figure>
 
@@ -190,13 +227,25 @@
 
         <p>Gibt ein Zeichen, das im Akku übergeben wird, auf dem momentanen Ausgabegerät aus, normalerweise dem Bildschirm (Listing 5). Bei der Bildschirmausgabe ist zu beachten, daß das Zeichen an der momentanen Cursorposition ausgegeben und dieser danach automatisch auf das nächste Zeichen gesetzt wird.</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>Basic:
+10 PRINT "A";
+20 PRINT "B";
+
+Assembler:
+ . 03f7  a9 41    lda #$41
+ . 03f9  20 d2 ff jsr $ffd2
+ . 03fc  a9 42    lda #$42
+ . 03fe  20 d2 ff jsr $ffd2
+ . 0401  60       rts</pre>
             <figcaption>Listing 5. »BSOUT«</figcaption>
         </figure>
 
         <p>Ebenso wie das Basic-Programm gibt auch die Assembler-Routine nach dem Aufruf mit»SYS 1015« die Zeichen »A« und »B« (ASCII-Code: $41/$42) auf dem Bildschirm aus. Wenn Sie bereits länger in Assembler programmieren, wird für Sie ein kleiner Trick bereits selbstverständlich sein, den ich hier verraten möchte: Da alle Betriebssystemroutinen als Unterprogramme geschrieben sind und mit einem »RTS« als letzten Befehl enden, können Sie Ihre Programme kürzen, indem Sie einen »RTS« einsparen, der nach dem Aufruf einer Betriebssystemroutine folgt, und diese anstatt mit »JSR...« mit »JMP...« aufrufen (Listing 6). PLOT ($FFFO)</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>. 03f7  a9 41    lda #$41
+. 03f9  20 d2 ff jsr $ffd2
+. 03fc  a9 42    lda #$42
+. 03fe  4c d2 ff jmp $ffd2</pre>
             <figcaption>Listing 6. »BSOUT ohne RTS«</figcaption>
         </figure>
 
@@ -215,7 +264,11 @@
 
         <p>Cursor auf Zeile 10, Spalte 5 setzen (Listing 7):</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>. 03f7  a2 0a    ldx #$0a
+. 03f9  a0 05    ldy #$05
+. 03fb  18       clc
+. 03fc  20 f0 ff jsr $fff0
+. 03ff  60       rts</pre>
             <figcaption>Listing 7. Cursorposition setzen</figcaption>
         </figure>
 
@@ -223,7 +276,9 @@
 
         <p>Cursorposition holen (Listing 8):</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>. 03f7  38       sec
+. 03f8  20 f0 ff jsr $fff0
+. 03fb  00       brk</pre>
             <figcaption>Listing 8. Cursorposition holen</figcaption>
         </figure>
 
@@ -237,7 +292,42 @@
 
         <p>Die Bildschirmausgabe soll in Zeile 10 und Spalte 15 erscheinen, das heißt etwa in der Mitte des Bildschirms. Außer den Tasten »j« und »n« soll keine weitere zur Beantwortung der Frage zulässig sein, der GET-Befehl ist daher hervorragend zur Lösung des Problems geeignet (Listing 9). Erläuterung:</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>Basic:
+
+10 PRINT CHR$(19);:REM CURSOR HOME
+20 FOR I=1 TO 10
+30   PRINT CHR$(17);:REM CURSOR DOWN
+40 NEXT I
+50 PRINT TAB(15)"SIND SIE SICHER (J/N) ?"
+60 GETKEY A$
+70 IF A$="J"THEN GOTO 100:REM LOESCHEN
+80 IF A$="N" THEN GOTO 200:REM NICHT LOESCHEN
+90 GOTO 60:REM FALSCHE EINGABE
+
+Assembler:
+
+ . 03f7  a2 0a    ldx #$0a
+ . 03f9  a0 0e    ldy #$0e
+ . 03fb  18       clc
+ . 03fc  20 f0 ff jsr $fff0
+
+ . 03ff  a2 00    ldx #$00
+ . 0401  bd 1c 04 lda $041c,x
+ . 0404  20 d2 ff jsr $ffd2
+ . 0407  e8       inx
+ . 0408  e0 23    cpx #$23
+ . 040a  d0 f5    bne $0401
+
+ . 040c  20 e4 ff jsr $ffe4
+ . 040f  c9 4a    cmp #$4a
+ . 0411  f0 07    beq $041a
+ . 0413  c9 4e    cmp #$4e
+ . 0415  f0 04    beq $041b
+ . 0417  4c 0c 04 jmp $040c
+ . 041a  60       rts
+ . 041b  60       rts
+
+&gt;041c 53 49 4e 44 20 53 49 45 20 53 49 43 48 45 52 20 28 4a 2f 4e 29 20 3f</pre>
             <figcaption>Listing 9. Anwendungsbeispiel</figcaption>
         </figure>
 
@@ -247,13 +337,38 @@
 
         <p>Ein Tip: in Assemblerprogrammen ist es sehr oft notwendig, Zeichenketten auf dem Bildschirm auszugeben. Anstatt wie im vorgestellten Beispielprogramm die Anzahl der auszugebenden Zeichen zu zählen und das Ausgabeende anhand des Wertes von X zu erkennen, können Sie sich das Programmieren erleichtern, wenn Sie an jede Zeichenkette eine »Endemarke« anfügen, zum Beispiel das Byte $00, und auf diese Endemarke prüfen (Listing 10). Das Abzählen der einzelnen Zeichen einer Zeichenkette wird dadurch überflüssig: BASIN ($FFCF)</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>        ldx #$00
+loop    lda char,x
+        beq weiter
+        jsr $ffd2
+        inx
+        jmp loop
+
+weiter  ...
+        ...
+        ...
+        ...
+        rts
+
+char    Zeichenkette im ASCII-Format+$00</pre>
             <figcaption>Listing 10. Stringausgabe mit Endemarke</figcaption>
         </figure>
 
         <p>Auch diese Routine (Listing 11) kann zur Eingabe von Zeichen verwendet werden. Bei Verwendung von BASIN erscheint der Cursor auf dem Bildschirm, und ein vom Benutzer eingegebenes Zeichen wird automatisch auf dem Bildschirm ausgegeben, analog dem Basic-Befehl INPUT. Ebenso wie beim INPUT-Befehl ist keine Möglichkeit gegeben, unsinnige Eingaben abzufangen, zum Beispiel das Löschen des Bildschirms. Eingegebene Zeichen werden beim Aufruf von BASIN im Akku übergeben.</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>Basic:
+
+10 INPUT A$
+
+Assembler:
+
+ . 03f7  a2 00    ldx #$00
+ . 03f9  20 cf ff jsr $ffcf
+ . 03fc  9d 05 04 sta $0405,x
+ . 03ff  e8       inx
+ . 0400  c9 0d    cmp #$0d
+ . 0402  d0 f5    bne $03f9
+ . 0404  60       rts</pre>
             <figcaption>Listing 11. »BASIN«</figcaption>
         </figure>
 
@@ -271,7 +386,10 @@
 
         <p>Vor Benutzung der SAVE- oder LOAD-Routine müssen mit SETLFS eine logische Filenummer (Akku), die Geräteadresse (X-Register) und eine Sekundäradresse (Y-Register) angegeben werden (Listing 12).</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>lda #$02      ;log. Filenummer
+ldx #$08      ;Geräteadresse
+ldy #$04      ;Sekundäradresse
+jsr $ffba</pre>
             <figcaption>Listing 12. »SETLFS«</figcaption>
         </figure>
 
@@ -279,7 +397,10 @@
 
         <p>Nachdem mit SETLFS die Fileparameter gesetzt wurden, muß mit der Routine SETNAM der Filename angegeben werden, indem im X- und im Y-Register die Adresse übergeben wird, an der dieser im Speicher abgelegt wurde, und im Akku die Länge des Namens (Listing 13):</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>lda #$04     ;Länge des Filenamens
+ldx #$5e     ;Adresse: Low-Byte
+ldy #$02     ;Adresse: High-Byte
+jsr $ffbd</pre>
             <figcaption>Listing 13. »SETNAM«</figcaption>
         </figure>
 
@@ -313,14 +434,38 @@
             <li>
                 <p>Programm »test« von Datasette an die Ursprungsadresse laden (Listing 14):</p>
                 <figure>
-                    <pre>TODO</pre>
+                    <pre>lda #$02    ;logische Filenummer
+ldx #$01    ;Geräteadresse der Datasette
+ldy #$01    ;absolut laden
+jsr $ffba   ;Fileparameter setzen
+
+lda #$04    ;Länge des Filenamens
+ldx #$5e    ;Adresse low
+ldy #$02    ;Adresse high
+jsr $ffbd   ;Filename setzen
+
+lda #$00    ;Flag für LOAD
+jsr $ffd5   ;LOAD-Routine aufrufen</pre>
                     <figcaption>Listing 14. »LOAD« von Kassette</figcaption>
                 </figure>
             </li>
             <li>
                 <p>Programm »test1« von Diskette an die Adresse $1000 laden (Listing 15).</p>
                 <figure>
-                    <pre>TODO</pre>
+                    <pre>lda #$02    ;logische Filenummer
+ldx #$08    ;Geräteadresse der Floppy
+ldy #$00    ;an die angegebene Adresse laden
+jsr $ffba   ;Fileparameter setzen
+
+lda #$05    ;Länge des Filenamens
+ldx #$5e    ;Adresse low
+ldy #$02    ;Adresse high
+jsr $ffbd   ;Filename setzen
+
+lda #$00    ;Flag für LOAD
+ldx #$00    ;Ladeadresse low
+ldy #$10    ;Ladeadresse high
+jsr $ffd5   ;LOAD-Routine aufrufen</pre>
                     <figcaption>Listing 15. »LOAD« von Diskette</figcaption>
                 </figure>
             </li>
@@ -333,7 +478,16 @@
             <li>Programm ohne Angabe eines Filenamens von Datasette absolut laden (Listing 16).</li>
         </ol>
         <figure>
-            <pre>TODO</pre>
+            <pre>lda #$02    ;logische Filenummer
+ldx #$04    ;Geräteadresse der Datasette
+ldy #$01    ;absolut laden
+jsr $ffba   ;Fileparameter setzen
+
+lda #$00    ;Länge des Filenamens
+jsr $ffbd   ;Filename setzen
+
+lda #$00    ;Flag für LOAD
+jsr $ffd5   ;LOAD-Routine aufrufen</pre>
             <figcaption>Listing 16. »LOAD« von Kassette ohne Angabe eines Filenamens</figcaption>
         </figure>
 
@@ -356,14 +510,48 @@
             <li>
                 <p>$1000 bis $2000 unter dem Namen »test« auf Diskette speichern (Listing 17).</p>
                 <figure>
-                    <pre>TODO</pre>
+                    <pre>lda #$02    ;logische Filenummer
+ldx #$08    ;Geräteadresse der Floppy
+ldy #$02    ;beliebige Sekundäradresse
+jsr $ffba   ;Fileparameter setzen
+
+lda #$04    ;Länge des Filenamens
+ldx #$5e    ;Adresse low
+ldy #$02    ;Adresse high
+jsr $ffbd   ;Filename setzen
+
+lda #$00    ;Anfangsadresse low
+sta $d8
+lda #$10    ;Anfangsadresse high
+sta $d9
+lda #$d8    ;Adresse des Zeigers
+ldx #$01    ;Endadresse+1 low
+ldy #$20    ;Endadresse+1 high
+jsr $ffd8   ;SAVE-Routine</pre>
                     <figcaption>Listing 17. »SAVE« auf Diskette</figcaption>
                 </figure>
             </li>
             <li>
                 <p>$1234 bis $3456 unter dem Namen »testi« auf Datasette speichern (Listing 18). . j</p>
                 <figure>
-                    <pre>TODO</pre>
+                    <pre>lda #$02    ;logische Filenummer
+ldx #$01    ;Geräteadresse der Datasette
+ldy #$02    ;beliebige Sekundäradresse
+jsr $ffba   ;Fileparameter setzen
+
+lda #$05    ;Länge des Filenamens
+ldx #$5e    ;Adresse low
+ldy #$02    ;Adresse high
+jsr $ffbd   ;Filename setzen
+
+lda #$34    ;Anfangsadresse low
+sta $d8
+lda #$12    ;Anfangsadresse high
+sta $d9
+lda #$d8    ;Adresse des Zeigers
+ldx #$57    ;Endadresse+1 low
+ldy #$34    ;Endadresse+1 high
+jsr $ffd8   ;SAVE-Routine</pre>
                     <figcaption>Listing 18. »SAVE« auf Kassette</figcaption>
                 </figure>
             </li>
@@ -372,11 +560,68 @@
 
         <p>Anwendung: hochauflösende Grafik speichern und laden. Als praktische Anwendung der LOAD- und der SAVE-Routine will ich Ihnen nun zeigen, wie Sie den Grafikbildschirm speichern und laden können, der den Speicher von $2000 bis $3FFF belegt. Wir benötigen hierzu ein Basic- und ein Maschinenprogramm. Beide sind in einer Disketten- (Listing 19) und einer Kassettenversion (Listing 20) abgebildet.</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>. 03f7  a9 02    lda #$02
+. 03f9  a2 08    ldx #$08
+. 03fb  a0 02    ldy #$02
+. 03fd  20 ba ff jsr $ffba
+. 0400  a9 07    lda #$07
+. 0402  a2 5e    ldx #$5e
+. 0404  a0 02    ldy #$02
+. 0406  20 bd ff jsr $ffbd
+. 0409  a9 00    lda #$00
+. 040b  85 d8    sta $d8
+. 040d  a9 20    lda #$20
+. 040f  85 d9    sta $d9
+. 0411  a9 d8    lda #$d8
+. 0413  a2 00    ldx #$00
+. 0415  a0 40    ldy #$40
+. 0417  20 d8 ff jsr $ffd8
+. 041a  60       rts
+
+. 041b  a9 02    lda #$02
+. 041d  a2 08    ldx #$08
+. 041f  a0 01    ldy #$01
+. 0421  20 ba ff jsr $ffba
+. 0424  a9 07    lda #$07
+. 0426  a2 5e    ldx #$5e
+. 0428  a0 02    ldy #$02
+. 042a  20 bd ff jsr $ffbd
+. 042d  a9 00    lda #$00
+. 042f  20 d5 ff jsr $ffd5
+. 0432  60       rts</pre>
             <figcaption>Listing 19. »SAVE LOAD« auf und von Diskette</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>. 03f7  a9 02    lda #$02
+. 03f9  a2 01    ldx #$01
+. 03fb  a0 02    ldy #$02
+. 03fd  20 ba ff jsr $ffba
+. 0400  a9 07    lda #$07
+. 0402  a2 5e    ldx #$5e
+. 0404  a0 02    ldy #$02
+. 0406  20 bd ff jsr $ffbd
+. 0409  a9 00    lda #$00
+. 040b  85 d8    sta $d8
+. 040d  a9 20    lda #$20
+. 040f  85 d9    sta $d9
+. 0411  a9 d8    lda #$d8
+. 0413  a2 00    ldx #$00
+. 0415  a0 40    ldy #$40
+. 0417  20 d8 ff jsr $ffd8
+. 041a  60       rts
+
+. 041b  a9 02    lda #$02
+. 041d  a2 01    ldx #$01
+. 041f  a0 01    ldy #$01
+. 0421  20 ba ff jsr $ffba
+. 0424  a9 07    lda #$07
+. 0426  a2 5e    ldx #$5e
+. 0428  a0 02    ldy #$02
+. 042a  20 bd ff jsr $ffbd
+. 042d  a9 00    lda #$00
+. 042f  20 d5 ff jsr $ffd5
+. 0432  60       rts
+. 0433  00       brk</pre>
             <figcaption>Listing 20. »SAVE LOAD« auf und von Kassette</figcaption>
         </figure>
 
@@ -386,11 +631,43 @@
 
         <p>Geben Sie nun bitte die Disketten- beziehungsweise Kassettenversion des benötigten Basic-Programms ein (Listing 21, 22). .</p>
         <figure>
-            <pre>TODO</pre>
+            <pre>10 A$=GRAPHIK:REM FILENAME IN ASCII-
+20 FOR I=1 TO LEN(A$):REM FORM NACH 606
+30  POKE 605+I,ASC(MID$(A$,I,1))
+40 NEXT
+50 :
+60 GRAPHIC1,1
+70 BOX 1,10,10,200,100
+80 BOX 1,50,50,300,190
+90 PAINT 1,60,60
+100 :
+110 SYS 1015:REM GRAFIK SPEICHERN
+120 SCNCLR:REM SCREEN LOESCHEN
+130 SYS 1015+36:REM GRAFIK LADEN
+140 GETKEY Aa$
+150 GRAPHIC0</pre>
             <figcaption>Listing 21. Grafik aufrufen und Maschinenroutine aufrufen (Diskette)</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>10 A$=GRAPHIK:REM FILENAME IN ASCII-
+20 FOR I=1 TO LEN(A$):REM FORM NACH 606
+30  POKE 605+I,ASC(MID$(A$,I,1))
+40 NEXT
+50 :
+60 GRAPHIC1,1
+70 BOX 1,10,10,200,100
+80 BOX 1,50,50,300,190
+90 PAINT 1,60,60
+100 :
+110 CHAR 1,0,24,ZURUECKSPULEN/RECORD+PLAY DRUECKEN
+120 SYS 1015:REM GRAFIK SPEICHERN
+130 CHAR 1,0,24,ZURUECKSPULEN/TASTE DRUECKEN
+140 GETKEY A$
+150 SCNCLR:REM SCREEN LOESCHEN
+160 CHAR 1,0,24,PLAY DRUECKEN
+170 SYS 1015+36:REM GRAFIK LADEN
+180 GETKEY A$
+190 GRAPHIC0</pre>
             <figcaption>Listing 22. Grafik erzeugen und Maschinenroutine aufrufen (Kassette)</figcaption>
         </figure>
 
