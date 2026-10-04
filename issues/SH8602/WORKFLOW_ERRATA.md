@@ -536,3 +536,17 @@ UNCONFIRMED."
 - **A prg file with a printed erratum, decision "record only"** (r300): the
   file gets `;vor Fehlerteufelchen M/YYYY (Zeile N)`; the aside's status
   comment has no word for it (see the 300 entry above).
+
+## 150 — a signed filler cartoon is not an article figure; and glyph-heavy listings are cut whole
+
+The 150 survey proposed `58-29`, a signed cartoon at the end of the Sprites
+article, as a DRAWING to crop. Owner rule (2026-10-04): **cartoons are fillers
+and do not belong to the article — never crop, place or propose one.** No rule
+says so; r150's "every figure the pages call for" invites it. Sentence for
+r150: "A cartoon (signed or not) set in leftover space is a filler, not part
+of the article: never on the worklist."
+Also: for a listing full of reverse/graphic PETSCII glyphs, the owner cut the
+WHOLE LISTING (20 L6–L9, 39 L1) rather than one crop per glyph as the worklist
+proposed (39 rows) — five images instead of 32, and owner-crop-wins then
+replaces the transcription. r170/r150 should propose that shape first. And a
+table printed across two pages is one crop (`20-t2`), not `t2a`/`t2b`.
