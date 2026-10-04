@@ -681,3 +681,18 @@ first bold line has the same bullet and weight as the other section heads —
 the article's name is its banner (running head); the h1 is the banner text and
 the first head is an h2. The headerless-start-page case in r210 is the same
 class seen from the other side."
+
+## 130 — a disk SOURCE file placed under a printed assembler LISTING (post-sign-off, owner review)
+
+13 Listing 3 prints the assembler's output (address, hex bytes, label,
+mnemonic, comment; no line numbers). The disk carries the Profi-Ass source with
+BASIC line numbers. r130 placed the disk source under the printed caption (with
+a `data-range`), noting the mismatch but placing it anyway. The test r130 states
+for disk listings is "fidelity to the print"; a different PRESENTATION of the
+same program fails it as surely as a different line range. Owner: type the
+printed LST from the page and prove the hex column against the binary (as 114
+L2 and 141 L3 already were); keep the source as a download.
+**Sentence for r130's variant table:** "Printed assembler OUTPUT (address + hex
++ source) with only the SOURCE on disk: transcribe the print (r170 method),
+prove the hex column against the assembled/disk binary, offer the source as a
+download — never the source file under the printed caption."
