@@ -375,3 +375,15 @@ the rule's examples (aside at the SAME level as the body's top sections) —
 followed the examples (= SH8602). r290's period section and r000's corollary
 still point to the in-page `PRINTED` comment that r290 itself withdrew for
 `adjudicated.txt`; r310's inline comment too.
+
+## 300 — status vocabulary, a correction outside the rubric, per-file trailer check
+
+From the 300 sub-agent, checked: step 2 says to omit the status comment for
+non-code errata while "every aside carries a disposition comment" says it is
+mandatory (136 of 161 corpus asides have none). The vocabulary has no word
+for "a real code bug, but no program file" (DATA-Erzeuger, print-only) —
+used `Reiner Druckfehler` (8607/79). The rule harvests only the rubric: 8605's
+"Das seltsame Listing" (Tips & Tricks) corrects SH 3/86 p22 and has no home.
+The trailer check is per FILE, so a two-source aside (146, 81) passes with
+one trailer missing. The rule's `_tmp/` / `fehlerteufelchen_pages/` paths
+conflict with r000's scratch confinement.
