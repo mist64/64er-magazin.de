@@ -541,3 +541,18 @@ beside it, or merely decorates a field name the layout already sets apart").
 structure survives without the bold; otherwise mark it as printed. A check:
 an article whose print has bold paragraph starts and whose HTML has zero
 `<strong>`/headings between them deserves a look.
+
+## 080/100 — short signed items the printed Inhalt does not list are COLLECTED, not promoted (owner, SH8603)
+
+No rule covers it. 080 split p21's two signed one-liners (Reaktionstest,
+RESET ohne Reset-Schalter) into two articles of their own, which put two
+unlisted fillers into "Alle Ausgaben" as peers of a four-page feature. Owner:
+group them into one article "Einzeiler" with each item an `<h2>` and its own
+signature (SH8602's "Kurz und nützlich – Einzeiler" shape), metadata only
+what the print gives (toc_category by running head; no toc_title or index
+entries, since neither the Inhalt nor the CSV lists them). These are NOT
+"fillers" in the sense of the owner's SH8602 cartoon rule — they are signed,
+authored, typeset content that sits in leftover space, and they are KEPT; the
+cartoon rule must not be read as reaching them. Suggested for r080: a run of
+short signed items absent from the printed Inhalt is one article, lettered
+in printed order like any other shared start page.
