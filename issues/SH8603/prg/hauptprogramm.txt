@@ -1,0 +1,141 @@
+
+
+;hauptprogramm.prg ==1201==
+   10 rem ************************
+   15 rem                        *
+   20 rem asteroids main program *
+   25 rem                        *
+   30 rem                        *
+   31 rem
+   32 rem 1985 by claus neupert  *
+   33 rem humboldtstr. 44        *
+   34 rem 4600 dortmund 1        *
+   35 rem                        *
+   36 rem                        *
+   37 rem ************************
+   40 rem
+   50 rem poke 55,40:poke 56,21
+   60 rem  poke 648,30:sys 58648
+   65 gosub 15000
+   70 gosub 10000
+   80 gosub 11000
+   90 gosub 12000
+  200 poke 6040,1:poke 6027,10:poke 7514,0:poke 7515,0
+  300 s1=36876:s2=36875:s3=36874:sn=36877:sl=36878:c=30720
+  310 ra=5:hs=0:ht=0
+  400 poke 994,38:for i=1 to 38:poke 1008,i:sys 6080:next:poke254,33:poke 994,5
+  500 poke 36878,15:poke 36879,8:poke 36869,255:print"{clr}{wht}":poke 988,253:poke 989,30:hs=1
+  505 poke 7510,0:poke 7512,0:poke 990,0:poke 991,0:poke 996,0
+  506 poke 7489,32:poke 197,64
+  510 poke peek(988)+256*peek(989),peek(996):
+  520 sys5500
+  530 if peek(7510)=3 then 700
+  540 if peek(7510)=2 then 800
+  550 if peek(7510)=32 then poke 7510,0:goto 1200
+  700 poke s1,0:pokes2,0:pokes3,0:m=peek(988)+256*peek(989)
+  703 pokesl,15:pokem,25:poke m+c,7:pokesn,128:::::forq=1to20:
+  704 pokesl,15-int(q/1.333):::::
+  705 for o=1to16:if o/2=int(o/2)then poke m+c,5:goto710
+  706 poke m+c,2
+  710 next:next:pokesn,0:pokesl,15:pokem+c,1:gosub2000:poke988,253:poke989,30
+  715 zs=peek(7514)+256*peek(7515):bs=int(zs/(1000*hs)):if bs>=1 then ra=ra+1:hs=hs*3
+  717 if ra>8 then ra=10
+  720 ra=ra-1:if ra=0 then 1500
+  725 for i=1 to ra:poke7704+i,0:next i:for j=1 to 800:next j
+  730 x=peek(994):poke994,38:fori=1to38:poke1008,i:sys6080:next:poke994,x:goto500
+  800 pokes1,0:pokes2,0:pokes3,0:po=peek(828+peek(991))+256*peek(868+peek(991))
+  805 pokepo,24:pokepo+c,7:pokesl,15:pokesn,200:forl=15to0step-1
+  810 pokesl,l:pokesn,150+3*l:::::
+  820 forlx=1to15:iflx/2=int(lx/2)thenpokepo+c,4:pokepo,24:goto830
+  825 pokepo+c,2:pokepo,26
+  830 nextlx:nextl:pokesn,0:pokesl,15:pokepo,32:pokepo+c,1
+  840 poke1008,peek(991):poke991,0:sys6080:sc=sc+250:goto505
+ 1200 pf=1:hs=hs+1:ht=1:poke7512,0:ifhs/2=int(hs/2)then1250
+ 1202 for n=7703 to 7745:if peek(n)=32 then 1210
+ 1205 next
+ 1210 po=peek(988)+256*peek(989):poke po,32:po=n:if rnd(1)<.30 then hs=0:goto700
+ 1215 poke po,peek(996):ph=int(po/256):pl=po-ph*256
+ 1216 poke 988,pl:poke 989,ph:goto 505
+ 1250 po=peek(988)+256*peek(989):poke po,32:po=253+256*30:poke 988,253:poke 989,30
+ 1260 ifpeek(po)=32 and rnd(1)<.75 then 1215
+ 1270 goto 700
+ 1500 poke36869,240:print"{clr}{down}{rght}{rght}{rght}{red}****************":printtab(3)"*"tab(18)"*"
+ 1502 printtab(3)"*"tab(18)"*":printtab(3)"*"tab(18)"*"
+ 1504 print"{rght}{rght}{rght}****************"
+ 1505 print"{home}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{wht}game over"
+ 1510 gosub4000
+ 1550 print"{down}{down}{down}{down}{down}{yel}>> score: << {wht}"peek(7514)+256*peek(7515)+sc
+ 1580 gosub2000
+ 1590 print"{cyn}{down}{down}{down}{rght}{rght}{rght}{rght} {rght}again (y/n) ?"
+ 1600 geta$:ifa$=""then1600
+ 1610 ifa$="y"then90
+ 1620 ifa$="n"thenend
+ 1630 goto1600
+ 2000 return
+ 3000 rem
+ 3010 ifi=1200thenpoke36874,0:poke36876,0:goto3110
+ 3020 k=k+z:ifk=0ork=250thenz=-z
+ 3030 k1=128ork2:k2=160ork:k3=128ork/2:k4=180ork3:k5=170ork1
+ 3040 ifi<256ori>1200then3110
+ 3050 ifi=1024thengosub3300:poke36878,10
+ 3100 poke36874,k1:poke36876,k3:poke36874,k2:poke36876,k2:poke36874,k3:poke36876,k1
+ 3110 poke36875,k4:poke36875,k5
+ 3120 return
+ 3300 return
+ 4000 poke36878,15:fori=250to130step-2
+ 4010 poke36876,i:poke36875,128ori:poke36874,240andi:next:poke36876,0
+ 4020 poke36875,0:poke36874,0:poke36878,15:return
+ 4999 stop
+10000 print"{clr}":poke36879,8:poke36869,240:poke36878,15:z=1
+10005 c$="{wht}{red}{cyn}{pur}{grn}{blu}{yel}"
+10010 fori=1to20:printmid$(c$,int(rnd(1)*7)+1,1);"*";:next
+10020 print:print:print:print"{wht}{rght}a s t e r o i d s"
+10030 print:print:print
+10040 fori=1to20:printmid$(c$,int(rnd(1)*7)+1,1);"*";:next:print
+10050 print"{down}{down}{down}{down}{down}{wht}{rght}{rght}{rght}by c. neupert"
+10060 print"{down}{down}{down}{down}{rght}{rght}{rght}{cyn}{rght}{rght}{rght}hit any key"
+10070 geta$:ifa$=""thengosub3000:goto10070
+10080 poke36876,0:poke36875,0:poke36874,0:return
+11000 print"{clr}{down}{rght}{rght}{rght}{red}**asteroids**"
+11010 print"{down}{down}{wht}z     - rotate left"
+11020 print"{down}c     - rotate right"
+11030 print"{down}b     - fire":print"{down}{down}{rvon}space{rvof} - hyperspace"
+11040 print"{down}{rvon}f7{rvof}    - thrust"
+11050 print"{down}{down}{down}{down}{rght}{rght}{rght}{rght}{cyn}hit any key"
+11060 geta$:ifa$=""then11060
+11070 return
+12000 print"{clr}{down}{wht}choose:":print:print:print
+12010 print"1 - slow":print:print"2 - medium"
+12020 print:print"3 - fast"
+12030 geta$:ifa$=""orval(a$)=0orval(a$)>3then12030
+12040 k=(4-val(a$))*70:poke 5558,k:return
+15000 restore:for i=0 to 59:read n:poke 680+i,n:next
+15010 for i=0 to 19
+15020 o=7680+int(rnd(1)*18)+2
+15030 u=8164+int(rnd(1)*18)+2
+15040 l=7724+int(rnd(1)*19)*22
+15050 r=7745+int(rnd(1)*19)*22
+15070 lh=int(l/256):ll=(l/256-lh)*256
+15080 oh=int(o/256):ol=(o/256-oh)*256
+15090 uh=int(u/256):ul=(u/256-uh)*256
+15095 rh=int(r/256):rl=(r/256-rh)*256
+15100 poke 7530+i,ll:poke 7550+i,lh:poke 7570+i,ol
+15110 poke 7590+i,rl:poke 7610+i,rh: poke 7630+i,ul
+15120 next i
+15130 for i=0 to 2:read nu,nl,no,nr
+15140 poke 7527+i,nu:poke 7518+i,nl: poke 7521+i,no:poke 7524+i,nr: next i
+15150 for i=0 to 7:poke 1009+i,0:next: poke 1018,0:poke 1019,0
+15160 for i=0 to 8:read n:poke 997+i,n:next i
+15170 for i=0 to 9: read n: poke 7500+i,n:next i
+15200 poke 7489,32:poke 7512,0:poke 1008,1:poke 7490,0:poke 7499,0:poke 7498,0
+15300 for i=7168+32*8 to 7168+32*8+7:poke i,0:next i
+15900 return
+20000 data 24,109,90,29,141,90,29,176,1,96,238,91,29,165,254
+20010 data 201,3,48,4,198,254,198,254,173,226,3,201,35,16,8
+20020 data 201,35,240,4,238,226,3,234,173,152,23,201,5,240,13
+20030 data 201,5,16,9,238,152,23,234,234,234,234,234,234,96,96
+20040 rem
+20050 data 235,235,21,255,234,1,22,233,233,23,23,21
+20060 data 0,234,235,1,23,22,21,255,233
+20070 data 0,1,255,23,22,21,235,234,233,0
+

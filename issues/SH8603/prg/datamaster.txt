@@ -1,0 +1,464 @@
+;datamaster.prg ==0801==
+;version=3
+    5 fora=1to8:keya,"":next
+    6 key8,"Z":key1,"S"
+    7 color1,15,5:color0,7,0:color4,7,0
+   10 cs=202
+   20 cz=205
+   30 cr=55464
+   40 sc=3072
+   50 pa=-1024
+   60 tz=239
+   70 tp=1319
+   80 gosub4530
+   90 dims%(30),z%(30),bz$(30),le%(30),ty$(30),ug$(30),bz%(82)
+  100 close2:close15
+  110 open15,8,15,"i0"
+  120 gosub150
+  130 goto670
+  140 :
+  150 rem *datei einlesen*
+  160 gosub380
+  170 print#15,"u1:"2;0;18;0:print#15,"b-p:"2;162:rem id
+  180 get#2,a$:get#2,b$:id$=a$+b$
+  190 ifid$<>"dd"thengosub390:return
+  200 rn=663:gosub410
+  210 gosub360:gosub350
+  220 input#2,ad,fz
+  230 mf=fz
+  240 fora=1tofz
+  250 s%(a)=0:z%(a)=1+a*2
+  260 input#2,bz$(a),le%(a),ty$(a)
+  270 next
+  280 rn=664:gosub410
+  290 gosub360:gosub350
+  300 fora=0to82:input#2,b$:bz%(a)=val(b$):next
+  310 gosub390
+  320 return
+  330 :
+  340 rem *b-p,u1,u2,open,close*
+  350 print#15,"b-p:";2;1:return
+  360 print#15,"u1:";2;0;rt;rs:return
+  370 print#15,"u2:";2;0;rt;rs:return
+  380 open2,8,2,"#":return
+  390 close2:return
+  400 :
+  410 rem *blockumrechnung*
+  420 ifrn<358thenaa=0:bb=22:dd=1:goto460
+  430 ifrn<471thenaa=357:bb=20:dd=19:goto460
+  440 ifrn<580thenaa=471:bb=19:dd=25:goto460
+  450 aa=579:bb=18:dd=31
+  460 rt=int(((rn-aa)-1)/(bb-1))+dd:rs=rn-aa-(rt-dd)*bb+(rt-dd-1):return
+  470 :
+  480 rem *hash-zahl*
+  490 hz$=ug$(1)+"aaaaaa"
+  500 h1=0:c=0
+  510 fora=1to6
+  520 h1=asc(mid$(hz$,a,1))
+  530 h1=(h1orc)-(h1andc)
+  540 c=((2*h1)and255)or(sgn(cand128))
+  550 next
+  560 hz=int(h1*662/255):ifhz=0thenhz=1
+  570 return
+  580 :
+  590 rem *maskendefinition*
+  600 fora=1tofz
+  610 s%(a)=0:z%(a)=1+a*2
+  620 bz$(a)=fb$(a):le%(a)=fl(a):ty$(a)=ft$(a)
+  630 next
+  640 mf=fz
+  650 return
+  660 :
+  670 rem *menue*
+  680 print"{clr}"
+  690 gosub1830:print"{rvon} {rvof}";
+  700 print"{rvon}     auswahlmenue                       {rvof}":print
+  710 print"   {rvon}d{rvof} datendiskette wechseln"
+  720 print"{down}   {rvon}e{rvof} eintragen von datensaetzen"
+  730 print"{down}   {rvon}s{rvof} suchen von datensaetzen"
+  740 print"{down}   {rvon}a{rvof} aendern von datensaetzen"
+  750 print"{down}   {rvon}l{rvof} loeschen von datensaetzen"
+  760 print"{down}   {rvon}b{rvof} blaettern in der datei"
+  770 print"{down}   {rvon}k{rvof} komplette datei ausdrucken"
+  780 print"{down}   {rvon}n{rvof} neue datei aufbauen"
+  790 print"{down}   {rvon}v{rvof} verlassen des programms"
+  800 print
+  810 gosub1830:print"{rvon} {rvof}";
+  820 print"{rvon}     kommando ?                         {rvof}";
+  830 fr=fre(0)
+  840 k$="desalbkn"
+  850 geta$:fora=1tolen(k$)
+  860 ifa$=mid$(k$,a,1)then910
+  870 ifa$="v"andid$="dd"thengosub4370
+  880 ifa$="v"thenclose15:end
+  890 next
+  900 goto850
+  910 ifid$<>"dd"anda$<>"n"anda$<>"d"then850
+  920 onagosub3310,1860,2190,3030,3110,3170,3230,3390,4370
+  930 goto670
+  940 :
+  950 rem *funktionstasten*
+  960 pokecs,0:pokecz,23:syscr
+  970 print"{rvon}   f1 : durchfuehrung der funktion     {rvof}"
+  980 print"{rvon} help : rueckkehr zum auswahlmenue     {rvof}";
+  990 return
+ 1000 :
+ 1010 rem *maskenaufbau/steuerung*
+ 1020 rf=0:rem returnflag init.
+ 1030 fora=1tomf
+ 1040 pokecs,s%(a):pokecz,z%(a):syscr
+ 1050 ifda=0thenprintbz$(a)"?"
+ 1060 next
+ 1070 zz=1
+ 1080 :
+ 1090 :
+ 1100 :
+ 1110 ifda=1thenpokecs,s%(zz)+len(bz$(zz))+1:goto1130
+ 1120 pokecs,s%(zz)+len(bz$(zz))+2
+ 1130 pokecz,z%(zz):syscr
+ 1140 gosub1410:rem eingaberoutine
+ 1150 pokea,peek(a)and127
+ 1160 ifa$="{up}"andzz>1thenzz=zz-1:goto1080
+ 1170 if(a$="{down}"orasc(a$)=13)andzz<mfthenzz=zz+1:goto1080
+ 1180 ifa$="Z"thenrf=1:return
+ 1190 ifa$<>"S"then1080
+ 1200 :
+ 1210 :
+ 1220 :
+ 1230 ifda<>1then1340
+ 1240 da=0:fora=1tomf
+ 1250 ug$(a)=""
+ 1260 sp=40*z%(a)+s%(a)+len(bz$(a))+sc+1
+ 1270 forb=sptosp+le%(a)-1
+ 1280 pe=peek(b):ifpe<32thenpe=pe+64
+ 1290 ug$(a)=ug$(a)+chr$(pe)
+ 1300 nextb,a
+ 1310 return
+ 1320 :
+ 1330 rem *maskenfelder einlesen*
+ 1340 fora=1tomf
+ 1350 ug$(a)=""
+ 1360 pokecs,10:pokecz,z%(a):syscr
+ 1370 poketz,1:poketp,13:inputug$(a)
+ 1380 next
+ 1390 return
+ 1400 :
+ 1410 rem *eingaberoutine*
+ 1420 ml=0
+ 1430 a=sc+80
+ 1440 pokea,peek(a)and127
+ 1450 a=sc+40*peek(cz)+peek(cs)
+ 1460 pokea,peek(a)or128:pokea+pa,93
+ 1470 geta$:ifa$=""then1470
+ 1480 ifml=le%(zz)then1570
+ 1490 ifty$(zz)="a"then1520
+ 1500 ifty$(zz)="n"then1540
+ 1510 ifty$(zz)="b"then1560
+ 1520 ifasc(a$)=34ora$=":"ora$=","ora$<" "ora$>"z"then1570
+ 1530 ml=ml+1:printa$;:goto1440
+ 1540 ifa$>","anda$<":"ora$=" "thenml=ml+1:printa$;:goto1440
+ 1550 goto1570
+ 1560 ifa$="a"ora$="n"ora$=" "thenml=ml+1:printa$;:goto1440
+ 1570 ifasc(a$)=20andda=0andml>0thenml=ml-1:printa$;:goto1440
+ 1580 ifa$="{left}"andml>0thenml=ml-1:printa$;:goto1440
+ 1590 ifa$="{rght}"andml<le%(zz)thenml=ml+1:printa$;:goto1440
+ 1600 ifa$="{down}"ora$="{up}"ora$="Z"ora$="S"thenreturn
+ 1610 goto1440
+ 1620 :
+ 1630 rem *infos dateiaufbau*
+ 1640 print"{rvon}feldnr    bezeichnung    laenge    typ "
+ 1650 print"{rvon}           (max.10)     (max.67)  (a/n){rvof}"
+ 1660 return
+ 1670 :
+ 1680 rem *infos 3*
+ 1690 ifaf=1thenprint"{rvon}     aendern von datensaetzen           {rvof}";:return
+ 1700 ifbf=1thenprint"{rvon}     blaettern in der datei             {rvof}";:return
+ 1710 ifef=1thenprint"{rvon}     eintragen von datensaetzen         {rvof}";:return
+ 1720 iflf=1thenprint"{rvon}     loeschen von datensaetzen          {rvof}";:return
+ 1730 print"{rvon}     suchen von datensaetzen            {rvof}";:return
+ 1740 :
+ 1750 rem *infos 4*
+ 1760 pokecs,0:pokecz,23:syscr
+ 1770 print"{rvon}   dateiende erreicht                  {rvof}"
+ 1780 print"{rvon}   druecken sie eine taste             {rvof}";
+ 1790 geta$:ifa$=""then1790
+ 1800 return
+ 1810 :
+ 1820 rem *infos 2*
+ 1830 print"{rvon}                                       {rvof}";
+ 1840 return
+ 1850 :
+ 1860 rem *eintragen*
+ 1870 ifid$<>"dd"thenreturn:rem falsche diskette
+ 1880 print"{clr}";
+ 1890 gosub1830:print"{rvon} {rvof}";
+ 1900 ef=1:rem eintr.flag setzen
+ 1910 gosub1680
+ 1920 ef=0:rem eintr.flag loeschen
+ 1930 gosub950:gosub1010
+ 1940 ifad=662orrf=1thenreturn
+ 1950 ad=ad+1
+ 1960 open2,8,2,"#"
+ 1970 gosub480:rem hash-zahl
+ 1980 rn=hz
+ 1990 print"{home}{rvon}"rn" "
+ 2000 by=int((rn-1)/8):bi=rn-1-8*by
+ 2010 if(bz%(by)and2^bi)<>0then2060
+ 2020 gosub410
+ 2030 gosub360:gosub350
+ 2040 get#2,a$
+ 2050 ifa$="~"then2090
+ 2060 rn=rn+1:ifrn=663thenrn=1
+ 2070 ifrn=hzthenclose2:return
+ 2080 goto1990
+ 2090 gosub350
+ 2100 fora=1tofz
+ 2110 ifug$(a)=""thenug$(a)="*"
+ 2120 print#2,ug$(a);chr$(13);
+ 2130 next
+ 2140 bz%(by)=bz%(by)or2^bi
+ 2150 gosub370:close2
+ 2160 ifaf=1orlf=1thenreturn
+ 2170 goto1880
+ 2180 :
+ 2190 rem *suchen*
+ 2200 rf=0:rem returnflag init.
+ 2210 hf=0:rem hilfsflag initialisieren (blockgrenze ueberschritten?)
+ 2220 print"{clr}";
+ 2230 gosub1830:print"{rvon} {rvof}";
+ 2240 gosub1680
+ 2250 ifbf=1then2280
+ 2260 gosub950:gosub1010
+ 2270 ifrf=1thenreturn
+ 2280 open2,8,2,"#"
+ 2290 gosub480:rem hash-zahl
+ 2300 rn=hz:gosub2830:rem suchabbruch
+ 2310 print"{home}{rvon}"rn" "
+ 2320 by=int((rn-1)/8):ifbz%(by)=0thenrn=8*(by+1)+1:goto2380
+ 2330 bi=rn-1-8*by:if(bz%(by)and2^bi)=0then2370
+ 2340 gosub410
+ 2350 gosub360:gosub350
+ 2360 get#2,a$:ifa$<>"~"then2420
+ 2370 rn=rn+1
+ 2380 ifrn>662thenrn=1:hf=1:rem hf=1:blockgrenze ueberschritten
+ 2390 ifhf=1thenifrn>=hzthengosub1750:rf=1:close2:return
+ 2400 geta$:ifa$=""then2310
+ 2410 rf=1:close2:return
+ 2420 gosub350
+ 2430 fora=1tofz:input#2,ag$(a):ifag$(a)="*"thenag$(a)=""
+ 2440 next
+ 2450 ifbf=1then2500
+ 2460 forb=1tofz
+ 2470 ifug$(b)=""then2490
+ 2480 ifleft$(ag$(b),len(ug$(b)))<>ug$(b)then2370
+ 2490 next
+ 2500 print"{clr}";
+ 2510 gosub1830:print"{rvon} {rvof}";
+ 2520 gosub1680
+ 2530 forb=1tofz
+ 2540 pokecs,0:pokecz,1+b*2:syscr
+ 2550 printbz$(b)+": ";:printag$(b)
+ 2560 next
+ 2570 gosub2860:rem drucken?
+ 2580 iflf=1thengosub2710:rem loeschflag gesetzt?
+ 2590 iflf=1anda$="j"thenclose2:return
+ 2600 iful=1andlf=1thenrf=1:close2:return
+ 2610 iful=1thengosub1750:close2:return
+ 2620 ifkf=1then2690
+ 2630 pokecs,0:pokecz,23:syscr
+ 2640 print"{rvon}     weitersuchen (j/n) ?              {rvof}"
+ 2650 gosub1830
+ 2660 geta$:ifa$<>"j"anda$<>"n"then2660
+ 2670 ifa$="n"and(bf=1oraf=1orlf=1orkf=1)thenclose2:return
+ 2680 ifa$="n"thenclose2:goto2200
+ 2690 gosub2830:goto2370
+ 2700 :
+ 2710 rem *sicherheitsabfrage*
+ 2720 pokecs,0:pokecz,23:syscr
+ 2730 print"{rvon}     loeschen (j/n) ?                  {rvof}"
+ 2740 gosub1830
+ 2750 geta$:ifa$<>"j"anda$<>"n"then2750
+ 2760 ifa$="n"thenreturn
+ 2770 bz%(by)=bz%(by)andnot2^bi
+ 2780 gosub350:print#2,"~":gosub370
+ 2790 ad=ad-1:gf=1:rem geloeschtflag setzen
+ 2800 return
+ 2810 :
+ 2820 rem *suchabbruch*
+ 2830 pokecs,0:pokecz,23:syscr:print"{rvon} abbruch der suche mit beliebiger taste{rvof}"
+ 2840 gosub1830:return
+ 2850 :
+ 2860 rem *drucken*
+ 2870 ifkf=1then2920
+ 2880 pokecs,0:pokecz,23:syscr
+ 2890 print"{rvon}     ausdrucken (j/n) ?                {rvof}":gosub1830
+ 2900 geta$:ifa$<>"j"anda$<>"n"then2900
+ 2910 ifa$="n"thenreturn
+ 2920 open4,4
+ 2930 forb=1tofz
+ 2940 ifag$(b)=""then2970
+ 2950 ifkf=1thenprint#4,ag$(b)"  ";:goto2970
+ 2960 print#4,bz$(b)+" :    "ag$(b)
+ 2970 next
+ 2980 ifkf=1thenprint#4
+ 2990 print#4
+ 3000 close4
+ 3010 return
+ 3020 :
+ 3030 rem *aendern*
+ 3040 af=1:rem aendernflag setzen
+ 3050 gosub3110:rem loeschen
+ 3060 ifrf=1orgf=0thenaf=0:return:rem returnflag gesetzt?
+ 3070 print"{home}";:gosub1890:rem eintragen
+ 3080 af=0:rem aendernflag loeschen
+ 3090 return
+ 3100 :
+ 3110 rem *loeschen*
+ 3120 lf=1:rem loeschflag setzen
+ 3130 gosub2190:rem suchen
+ 3140 lf=0:rem loeschflag loeschen
+ 3150 return
+ 3160 :
+ 3170 rem *blaettern*
+ 3180 bf=1:rem blaetternflag setzen
+ 3190 gosub2190:rem suchen
+ 3200 bf=0:rem blaetternflag loeschen
+ 3210 return
+ 3220 :
+ 3230 rem *komplette datei ausdrucken*
+ 3240 open4,4
+ 3250 a$="*************************************":print#4,a$
+ 3260 print#4,"*datamaster vertrieb:baloui software*"
+ 3270 print#4,a$
+ 3280 fora=1to3:print#4:next:close4
+ 3290 kf=1:gosub3170:kf=0:return
+ 3300 :
+ 3310 rem *datendisk wechseln*
+ 3320 ifid$="dd"thengosub4370
+ 3330 pokecs,0:pokecz,22:syscr
+ 3340 print"{rvon} bitte legen sie eine datendiskette ein {rvof}";
+ 3350 print"{rvon} und druecken sie eine beliebige taste  {rvof}";
+ 3360 geta$:ifa$=""then3360
+ 3370 gosub150:return
+ 3380 :
+ 3390 rem *dateiaufbau*
+ 3400 ifid$="dd"thengosub4370
+ 3410 print"{clr}";
+ 3420 gosub1630
+ 3430 gosub950:rem infos funktionstasten
+ 3440 :
+ 3450 rem maskendefinition
+ 3460 mf=30
+ 3470 fora=1to10
+ 3480 pokecs,0:pokecz,1+2*a:syscr
+ 3490 print"{rvon}"a"{left} {rvof}"
+ 3500 next
+ 3510 iffz=0then3550
+ 3520 fora=1tofz
+ 3530 fb$(a)=bz$(a):fl(a)=le%(a):ft$(a)=ty$(a)
+ 3540 next
+ 3550 fora=1to30step3
+ 3560 s%(a)=9:z%(a)=3+2*int(a/3):bz$(a)="":le%(a)=10:ty$(a)="a"
+ 3570 s%(a+1)=24:z%(a+1)=3+2*int(a/3):bz$(a+1)="":le%(a+1)=2:ty$(a+1)="n"
+ 3580 s%(a+2)=34:z%(a+2)=3+2*int(a/3):bz$(a+2)="":le%(a+2)=1:ty$(a+2)="b"
+ 3590 next
+ 3600 da=1:gosub1010:da=0:rem maskenaufbau/steuerung
+ 3610 ifrf=1thengosub590:return
+ 3620 ss=0:fora=1to30step3:ss=ss+val(ug$(a+1)):ifval(ug$(a+1))>67then3640
+ 3630 next:ss=ss+10:ifss<255then3690
+ 3640 pokecs,0:pokecz,23:syscr
+ 3650 print"{rvon} feld- bzw. satzlaenge ueberschritten!{rvof}"
+ 3660 print"{rvon}     druecken sie eine taste          {rvof}";
+ 3670 geta$:ifa$=""then3670
+ 3680 gosub950:da=1:gosub1070:da=0:goto3610:rem einsprg.maskensteuerung
+ 3690 fora=1to30step3
+ 3700 ifug$(a)="          "then3760
+ 3710 ifval(ug$(a+1))>0and(ug$(a+2)="a"orug$(a+2)="n")then3760
+ 3720 pokecs,0:pokecz,23:syscr
+ 3730 print"{rvon}ihre dateibeschreibung ist unvollstaen-{rvof}"
+ 3740 print"{rvon} dig bzw. fehlerhaft. korrigieren sie! {rvof}";:forb=1to3000:nextb
+ 3750 gosub950:da=1:gosub1070:da=0:goto3610
+ 3760 nexta
+ 3770 pokecs,0:pokecz,23:syscr
+ 3780 print"{rvon}     korrektur (j/n) ?                 {rvof}"
+ 3790 gosub1830
+ 3800 geta$:ifa$<>"j"anda$<>"n"then3800
+ 3810 ifa$="n"then3850
+ 3820 gosub950:rem infos dateiaufbau
+ 3830 da=1:gosub1070:da=0:goto3610:rem einsprg.maskensteuerung
+ 3840 ad=0:rem anz.datensaetze init.
+ 3850 pokecs,0:pokecz,23:syscr
+ 3860 print"{rvon}  sind sie sicher, dass sie eine neue  {rvof}"
+ 3870 print"{rvon}     datei aufbauen wollen (j/n) ?     {rvof}";
+ 3880 geta$:ifa$<>"j"anda$<>"n"then3880
+ 3890 ifa$="n"thengosub590:return
+ 3900 fz=10
+ 3910 fora=1to10
+ 3920 fb$(a)=ug$(a*3-2):rem feldbezeichnung
+ 3930 fl(a)=val(ug$(a*3-1)):rem feldlaenge
+ 3940 ft$(a)=ug$(a*3):rem feldtyp
+ 3950 next
+ 3960 fora=1to9
+ 3970 iffb$(a)<>"          "then4030
+ 3980 forb=ato9
+ 3990 fb$(b)=fb$(b+1):fl(b)=fl(b+1)
+ 4000 ft$(b)=ft$(b+1)
+ 4010 nextb
+ 4020 fz=fz-1
+ 4030 nexta
+ 4040 iffb$(10)="          "thenfz=fz-1
+ 4050 fora=1tofz
+ 4060 s%(a)=0:z%(a)=1+a*2:bz$(a)=fb$(a):le%(a)=fl(a):ty$(a)=ft$(a)
+ 4070 next
+ 4080 fora=0to82:bz%(a)=0:next
+ 4090 ad=0:rem anz.datensaetze init.
+ 4100 pokecs,0:pokecz,23:syscr
+ 4110 print"{rvon}bitte legen sie eine leere diskette ein{rvof}"
+ 4120 print"{rvon}     und druecken sie eine taste       {rvof}";
+ 4130 geta$:ifa$=""then4130
+ 4140 gosub380:print#15,"u1:"2;0;18;0:print#15,"b-p:"2;162
+ 4150 a$="":b$="":get#2,a$:get#2,b$:a$=a$+b$
+ 4160 gosub390
+ 4170 ifa$="dd"then4100
+ 4180 pokecs,0:pokecz,23:syscr
+ 4190 print"{rvon}  bitte haben sie geduld. der aufbau   {rvof}"
+ 4200 print"{rvon}  der datei benoetigt mehrere minuten  {rvof}";
+ 4210 print#15,"n:datamaster-datei,dd"
+ 4220 gosub380:print#15,"u1:"2;0;18;0
+ 4230 id$="dd":print#15,"b-p:"2;162:print#2,id$;:print#15,"u2:"2;0;18;0
+ 4240 print"{home}{rvon}blocknr.{rvof}"
+ 4250 forrn=1to662
+ 4260 print"{home}{down}{rvon}"rn"  {rvof}"
+ 4270 gosub410
+ 4280 gosub350
+ 4290 print#2,"~"
+ 4300 gosub370
+ 4310 nextrn
+ 4320 gosub390
+ 4330 gosub4370:rem maske abspeichern
+ 4340 gosub150:rem daten einlesen
+ 4350 return
+ 4360 :
+ 4370 rem *verlassen*
+ 4380 gosub380
+ 4390 rn=663
+ 4400 gosub410
+ 4410 gosub350
+ 4420 print#2,ad;chr$(13);fz
+ 4430 fora=1tofz
+ 4440 print#2,bz$(a);chr$(13);le%(a);chr$(13);ty$(a)
+ 4450 next
+ 4460 gosub370
+ 4470 rn=664:gosub410:gosub350
+ 4480 fora=0to82:print#2,str$(bz%(a)):next
+ 4490 gosub370:gosub390
+ 4500 return
+ 4510 :
+ 4520 rem *titelbild*
+ 4530 :
+ 4540 print"{clr}"
+ 4550 print"{down}{down}{down}{down}{down}{down}{down}              datamaster"
+ 4560 print"              ----------"
+ 4570 print"{down}{down}{down}       (c) baloui software, 1985"
+ 4730 return
+

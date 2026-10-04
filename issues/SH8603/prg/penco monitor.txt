@@ -1,0 +1,46 @@
+
+
+;penco monitor.prg ==0801==
+    2 rem penco:monitor
+    4 rem vc-20 mit mindestens 8 kbyte erweiterung
+    6 rem frank goroncy/wiesenweg 21/3250 hameln 13
+   10 rem .pruefsummen
+   12 dimcs(27):fort=0to27:readcs(t):next:data13017,17618,10874,20856
+   14 data36576,27458,11408,25631,20224,30214,28582,28081,31135,26987,26832,28356
+   16 data28299,19691,24254,23699,20732,24057,17151,29295,28710,24105,15444,24794
+   18 rem .menue
+   20 hx$="0123456789abcdef":print"{clr}{down}{down}  eingabe         1"
+   22 print"{down}  ueberpruefung   2"
+   24 print"{down}  laden           3"
+   26 print"{down}  abspeichern     4"
+   28 print"{down}  'penco' starten 5{down}"
+   30 poke198,0:wait198,1:geta$:ifa$<"1"ora$>"5"then30
+   40 onval(a$)gosub100,400,200,202,300:goto20
+   98 rem .eingabe
+  100 ad$="":input"{down}  startadresse";ad$:gosub502:lo=ad
+  102 print:c=peek(lo):ad=lo:gosub504:print"  "ad$" ";:b=c:gosub506:printb$" ";
+  104 gosub508:ifa$=chr$(13)thenreturn
+  106 ifa$=" "thenlo=lo+1:goto102
+  108 ifa$="^"thenlo=lo-1:goto102
+  110 b$=a$:gosub508:b$=b$+a$:ifa$=chr$(13)ora$=" "ora$="^"thengoto102
+  112 gosub500:pokelo,b:lo=lo+1:goto102
+  198 rem .laden & abspeichern
+  200 gosub204:poke780,0:sys65493:return
+  202 gosub204:poke193,0:poke194,20:poke174,0:poke175,48:sys63106:return
+  204 poke185,1:poke186,1:poke183,0:poke144,0:poke187,0:return
+  298 rem .'penco' starten
+  300 sys9508
+  398 rem .ueberpruefung
+  400 ad$="":input"{down}  blockadresse";ad$:ifad$=""thenreturn
+  402 gosub502:b=ad/256-20:ifb<>int(b)orb<0orb>27then400
+  404 print"  summe";:c=0:fort=adtoad+255:c=c+peek(t):next:ifcs(b)<>cthenprint" {rvon}nicht";
+  406 print" i.o.":goto400
+  498 rem .hex/dez-routinen
+  500 l=asc(left$(b$,1)):r=asc(right$(b$,1)):b=(l-48+(l>57)*7)*16+r-48+(r>57)*7:return
+  502 b$=left$(ad$,2):gosub500:ad=b*256:b$=right$(ad$,2):gosub500:ad=ad+b:return
+  504 b=int(ad/256):gosub506:ad$=b$:b=ad-b*256:gosub506:ad$=ad$+b$:return
+  506 b$=mid$(hx$,b/16+1,1)+mid$(hx$,b-int(b/16)*16+1,1):return
+  508 poke198,0:wait198,1:geta$:ifa$=chr$(13)ora$=" "ora$="^"thenreturn
+  510 ifa$<"0"ora$>"f"ora$<"a"anda$>"9"then508
+  512 printa$;:return
+

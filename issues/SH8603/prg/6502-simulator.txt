@@ -1,0 +1,1237 @@
+
+
+;6502-simulator.prg ==0801==
+   10 print "{clr}   pc   nv-bdizc   ac  xr  yr  sp
+   12 he$="0123456789abcdef"
+   14 dim st%(255):rem stack
+   16 def fn eo(m)=(m and (not a)) or ((not m) and a)
+   18 def fn v(x)=x-48+7*(x>64)
+   20 def fn f0(x)=(asc(mid$(h0$,x,1))-48) and 1
+   22 gosub 2000
+   24 input "{home}{down}";h0$
+   26 hh$=left$(h0$,4):gosub 400:pc=hh
+   28 n=fn  f0(7)
+   30 v=fn  f0(8)
+   32 p5=fn f0(9)
+   34 b=fn f0(10)
+   36 d=fn f0(11)
+   38 i=fn f0(12)
+   40 z=fn f0(13)
+   42 c=fn f0(14)
+   44 h$=mid$(h0$,18,2):gosub 350:a=h
+   46 h$=mid$(h0$,22,2):gosub 350:x=h
+   48 h$=mid$(h0$,26,2):gosub 350:y=h
+   50 h$=mid$(h0$,30,2):gosub 350:s=h
+   52 print "{down}{down}"
+   54 hp=hp+1
+   56 print hp"{left}. abbruchpunkt";
+   58 input "   {left}{left}{left}";hh$
+   60 if hh$="x" then hp=hp-1:goto 68
+   62 gosub 400
+   64 hp(hp)=hh
+   66 goto 54
+   68 print "{up}                       ";
+   70 gosub 49000
+   72 goto 1000
+  140 :
+  150 rem *** wert in high- und low zerlegen ***
+  160 hi=int(hh/256)
+  170 lo=hh-256*hi
+  180 return
+  190 :
+  200 rem *   2-stellige hexzahl (h$) aus h bilden        *
+  210 h$=mid$(he$,h/16+1,1)+mid$(he$,(h and 15)+1,1)
+  220 return
+  240 :
+  250 rem *   4-stellige hexzahl (hh$) aus hh bilden      *
+  260 h=int(hh/256)
+  270 gosub 200
+  280 hh$=h$
+  290 h=hh-256*h
+  300 gosub 200
+  310 hh$=hh$+h$
+  320 return
+  340 :
+  350 rem * wert von 2-stelliger hex-zahl (h$) -> h       *
+  360 h=16*fn v(asc(h$))+fn v(asc(mid$(h$,2)))
+  370 return
+  390 :
+  400 rem * wert von 4-stelliger hex-zahl (hh$) -> hh     *
+  410 h$=left$(hh$,2)
+  420 gosub 350
+  430 hh=256*h
+  440 h$=right$(hh$,2)
+  450 gosub 350
+  460 hh=hh+h
+  470 return
+  990 :
+ 1000 rem *** schleife fuer jeden befehl ***
+ 1010 gosub 2000
+ 1020 if hp=0 then 1000
+ 1030 for j=1 to hp:if pc=hp(j) then 1080
+ 1035 next j
+ 1040 op=peek(pc)
+ 1045 h=op:gosub 200:print "opcode: "h$"  ";
+ 1050 gosub 1100
+ 1055 pc=pc+1
+ 1060 goto 1000
+ 1080 print "abbruch (";j;") ";
+ 1090 stop
+ 1100 if op=0 then 10000
+ 1110 on op    goto 10100, 1400, 1400, 1400,10500,10600, 1400,10800,10900,11000
+ 1120 on op-10 goto  1400, 1400,11300,11400, 1400,11600,11700, 1400, 1400, 1400
+ 1130 on op-20 goto 12100,12200, 1400,12400,12500, 1400, 1400, 1400,12900,13000
+ 1140 on op-30 goto  1400,13200,13300, 1400, 1400,13600,13700,13800, 1400,14000
+ 1150 on op-40 goto 14100,14200, 1400,14400,14500,14600, 1400,14800,14900, 1400
+ 1160 on op-50 goto  1400, 1400,15300,15400, 1400,15600,15700, 1400, 1400, 1400
+ 1170 on op-60 goto 16100,16200, 1400,16400,16500, 1400, 1400, 1400,16900,17000
+ 1180 on op-70 goto  1400,17200,17300,17400, 1400,17600,17700,17800, 1400,18000
+ 1190 on op-80 goto 18100, 1400, 1400, 1400,18500,18600, 1400,18800,18900, 1400
+ 1200 on op-90 goto  1400, 1400,19300,19400, 1400,19600,19700, 1400, 1400, 1400
+ 1210 on op-100goto 20100,20200, 1400,20400,20500,20600, 1400,20800,20900,21000
+ 1220 on op-110goto  1400,21200,21300, 1400, 1400, 1400,21700,21800, 1400,22000
+ 1230 on op-120goto 22100, 1400, 1400, 1400,22500,22600, 1400, 1400,22900, 1400
+ 1240 on op-130goto  1400,23200,23300,23400, 1400,23600, 1400,23800, 1400,24000
+ 1250 on op-140goto 24100,24200, 1400,24400,24500, 1400, 1400,24800,24900,25000
+ 1260 on op-150goto  1400,25200,25300,25400, 1400, 1400,25700, 1400, 1400,26000
+ 1270 on op-160goto 26100,26200, 1400,26400,26500,26600, 1400,26800,26900,27000
+ 1280 on op-170goto  1400,27200,27300,27400, 1400,27600,27700, 1400, 1400,28000
+ 1290 on op-180goto 28100,28200, 1400,28400,28500,28600, 1400,28800,28900,29000
+ 1300 on op-190goto  1400,29200,29300, 1400, 1400,29600,29700,29800, 1400,30000
+ 1310 on op-200goto 30100,30200, 1400,30400,30500,30600, 1400,30800,30900, 1400
+ 1320 on op-210goto  1400, 1400,31300,31400, 1400,31600,31700, 1400, 1400, 1400
+ 1330 on op-220goto 32100,32200, 1400,32400,32500, 1400, 1400,32800,32900,33000
+ 1340 on op-230goto  1400,33200,33300,33400, 1400,33600,33700,33800, 1400,34000
+ 1350 on op-240goto 34100, 1400, 1400, 1400,34500,34600, 1400,34800,34900, 1400
+ 1360 on op-250goto  1400, 1400,35300,35400, 1400
+ 1370 stop
+ 1400 print "ungueltiger code";
+ 1410 stop
+ 1990 :
+ 2000 rem *** anzeige ***
+ 2010 hh=pc:gosub 250:pc$=hh$
+ 2020 st$=chr$(48+n)+chr$(48+v)+chr$(48+p5)+chr$(48+b)
+ 2030 st$=st$+chr$(48+d)+chr$(48+i)+chr$(48+z)+chr$(48+c)
+ 2040 h=a:gosub 200:a$=h$
+ 2050 h=x:gosub 200:x$=h$
+ 2060 h=y:gosub 200:y$=h$
+ 2070 h=s:gosub 200:s$=h$
+ 2090 print "{home}{down}  "pc$"  "st$"   "a$"  "x$"  "y$"  "s$
+ 2100 return
+ 2990 :
+ 3000 rem *** 1-byte-operand holen ***
+ 3010 pc=pc+1
+ 3020 o=peek(pc)
+ 3030 return
+ 3990 :
+ 4000 rem *** 2-byte-operand holen ***
+ 4010 pc=pc+1
+ 4020 o=peek(pc)
+ 4030 pc=pc+1
+ 4040 oo=o+256*peek(pc)
+ 4050 return
+ 4990 :
+ 5000 rem *** status zusammenfassen ***
+ 5010 p=128*n+64*v+32*p5+16*b+8*d+4*i+2*z+c
+ 5020 return
+ 5990 :
+ 6000 rem *** status zerlegen ***
+ 6010 n =(p and 128)/128
+ 6020 v =(p and  64)/ 64
+ 6030 p5=(p and  32)/ 32
+ 6040 b =(p and  16)/ 16
+ 6050 d =(p and   8)/  8
+ 6060 i =(p and   4)/  4
+ 6070 z =(p and   2)/  2
+ 6080 c =p and 1
+ 6090 return
+ 6990 :
+ 7000 rem *** relativen sprung ausfuehren ***
+ 7010 if o>127 then o=o-256
+ 7020 pc=pc+o
+ 7030 return
+ 7990 :
+ 8000 rem *** a=a+m+c (adc-befehl) ***
+ 8010 if d=0 then a=a+m+c:c=-(a>255):goto 8070
+ 8020 h=(a and 15)+(m and 15)+c
+ 8030 c=-(h>9)
+ 8040 h=h and 15
+ 8050 a=(a and 240)+(m and 240)+h+16*c
+ 8060 c=-(a>99)
+ 8070 a=a and 255
+ 8080 n=(a and 128)/128
+ 8090 z=-(a=0)
+ 8100 return
+ 8190 :
+ 8200 rem *** a=a-m-1+c (sbc-befehl) ***
+ 8210 if d=0 then a=a-m-1+c:c=-(a>=0):goto 8270
+ 8220 h=(a and 15)-(m and 15)-1+c
+ 8230 c=-(h>=0)
+ 8240 h=h and 15
+ 8250 a=(a and 240)-(m and 240)+h-16+16*c
+ 8260 c=-(a>=0)
+ 8270 a=a and 255
+ 8280 c=(a and 128)/128
+ 8290 z=-(a=0)
+ 8300 return
+ 8390 :
+ 8400 rem *** a-m (cmp-befehl) ***
+ 8410 c=-((a-m)>=0)
+ 8420 n=((a-m) and 128)/128
+ 8430 z=-((a-m)=0)
+ 8440 return
+ 9990 :
+10000 rem *** brk
+10005 hh=pc+2:gosub 150
+10010 st%(s)=hi:s=(s-1) and 255
+10015 st%(s)=lo:s=(s-1) and 255
+10020 b=1
+10025 gosub 5000
+10030 st%(s)=p:s=(s-1) and 255
+10035 i=1
+10040 pc=peek(65534)+256*peek(65535)
+10045 gosub 2000
+10050 print "brk erreicht";
+10055 end
+10090 :
+10100 rem *** ora (indirect,x)
+10110 gosub 3000
+10120 oo=peek(o+x)+256*peek(o+x+1)
+10130 a=a or peek(oo)
+10140 n=(a and 128)/128
+10150 z=-(a=0)
+10160 return
+10490 :
+10500 rem *** ora zeropage
+10510 gosub 3000
+10520 a=a or peek(o)
+10530 n=(a and 128)/128
+10540 z=-(a=0)
+10550 return
+10590 :
+10600 rem *** asl zeropage
+10610 gosub 3000
+10620 m=peek(o)
+10630 m=m*2
+10640 c=-(m>255)
+10650 m=m and 255
+10660 poke o,m
+10670 z=-(m=0)
+10680 n=(m and 128)/128
+10690 return
+10790 :
+10800 rem *** php
+10810 gosub 5000
+10820 st%(s)=p:s=(s-1) and 255
+10830 return
+10890 :
+10900 rem *** ora #immediate
+10910 gosub 3000
+10920 a=a or o
+10930 n=(a and 128)/128
+10940 z=-(a=0)
+10950 return
+10990 :
+11000 rem *** asl a
+11010 a=a*2
+11020 c=-(a>255)
+11030 a=a and 255
+11040 z=-(a=0)
+11050 n=(a and 128)/128
+11060 return
+11290 :
+11300 rem *** ora absolute
+11310 gosub 4000
+11320 a=a or peek(oo)
+11330 n=(a and 128)/128
+11340 z=-(a=0)
+11350 return
+11390 :
+11400 rem *** asl absolute
+11410 gosub 4000
+11420 m=peek(oo)
+11430 m=m*2
+11440 c=-(m>255)
+11450 m=m and 255
+11460 poke oo,m
+11470 z=-(m=0)
+11480 n=(m and 128)/128
+11490 return
+11590 :
+11600 rem *** bpl
+11610 gosub 3000
+11620 if n=0 then gosub 7000
+11630 return
+11690 :
+11700 rem ** ora (indirect),y
+11710 gosub 3000
+11720 oo=peek(o)+256*peek(o+1)+y
+11730 a=a or peek(oo)
+11740 n=(a and 128)/128
+11750 z=-(a=0)
+11760 return
+12090 :
+12100 rem *** ora zeropage,x
+12110 gosub 3000
+12120 a=a or peek(o+x)
+12130 n=(a and 128)/128
+12140 z=-(a=0)
+12150 return
+12190 :
+12200 rem *** asl zeropage,x
+12210 gosub 3000
+12220 m=peek(o+x)
+12230 m=m*2
+12240 c=-(m>255)
+12250 m=m and 255
+12260 poke o+x,m
+12270 z=-(m=0)
+12280 n=(m and 128)/128
+12290 return
+12390 :
+12400 rem *** clc
+12410 c=0
+12420 return
+12490 :
+12500 rem *** ora absolute,y
+12510 gosub 4000
+12520 a=a or peek(oo+y)
+12530 n=(a and 128)/128
+12540 z=-(a=0)
+12550 return
+12890 :
+12900 rem *** ora absolute,x
+12910 gosub 4000
+12920 a=a or peek(oo+x)
+12930 n=(a and 128)/128
+12940 z=-(a=0)
+12950 return
+12990 :
+13000 rem *** asl absolute,x
+13010 gosub 4000
+13020 m=peek(oo+x)
+13030 m=m*2
+13040 c=-(m>255)
+13050 m=m and 255
+13060 poke oo+x,m and 255
+13070 z=-(m=0)
+13080 n=(m and 128)/128
+13090 return
+13190 :
+13200 rem *** jsr
+13210 hh=pc+2:gosub 150
+13220 st%(s)=hi:s=(s-1) and 255
+13230 st%(s)=lo:s=(s-1) and 255
+13240 gosub 4000
+13250 pc=oo-1
+13260 return
+13290 :
+13300 rem *** and (indirect,x)
+13310 gosub 3000
+13320 oo=peek(o+x)+256*peek(o+x+1)
+13330 a=a and peek(oo)
+13340 n=(a and 128)/128
+13350 z=-(a=0)
+13360 return
+13590 :
+13600 rem *** bit zeropage
+13610 gosub 3000
+13620 m=peek(o)
+13630 n=(m and 128)/128
+13640 v=(m and 64)/64
+13650 z=-((a and m)=0)
+13660 return
+13690 :
+13700 rem *** and zeropage
+13710 gosub 3000
+13720 a=a and peek(o)
+13730 n=(a and 128)/128
+13740 z=-(a=0)
+13750 return
+13790 :
+13800 rem *** rol zeropage
+13810 gosub 3000
+13820 m=peek(o)
+13830 m=m*2+c
+13840 c=-(m>255)
+13850 m=m and 255
+13860 poke o,m and 255
+13870 z=-(m=0)
+13880 n=(m and 128)/128
+13890 return
+13990 :
+14000 rem *** plp
+14010 s=(s+1) and 255
+14020 p=st%(s)
+14030 gosub 6000
+14040 return
+14090 :
+14100 rem *** and #immediate
+14110 gosub 3000
+14120 a=a and o
+14130 n=(a and 128)/128
+14140 z=-(a=0)
+14150 return
+14190 :
+14200 rem *** rol a
+14210 a=a*2+c
+14220 c=-(a>255)
+14230 a=a and 255
+14240 z=-(a=0)
+14250 n=(a and 128)/128
+14260 return
+14390 :
+14400 rem *** bit absolute
+14410 gosub 4000
+14420 m=peek(oo)
+14430 n=(m and 128)/128
+14440 v=(m and 64)/64
+14450 z=-((a and m)=0)
+14460 return
+14490 :
+14500 rem *** and absolute
+14510 gosub 4000
+14520 a=a and peek(oo)
+14530 n=(a and 128)/128
+14540 z=-(a=0)
+14550 return
+14590 :
+14600 rem *** rol absolute
+14610 gosub 4000
+14620 m=peek(oo)
+14630 m=m*2+c
+14640 c=-(m>255)
+14650 m=m and 255
+14660 poke oo,m and 255
+14670 z=-(m=0)
+14680 n=(m and 128)/128
+14690 return
+14790 :
+14800 rem *** bmi
+14810 gosub 3000
+14820 if n=1 then gosub 7000
+14830 return
+14890 :
+14900 rem *** and (indirect),y
+14910 gosub 3000
+14920 oo=peek(o)+256*peek(o+1)+y
+14930 a=a and peek(oo)
+14940 n=(a and 128)/128
+14950 z=-(a=0)
+14960 return
+15290 :
+15300 rem *** and zeropage,x
+15310 gosub 3000
+15320 a=a and peek(o+x)
+15330 n=(a and 128)/128
+15340 z=-(a=0)
+15350 return
+15390 :
+15400 rem ***rol zeropage,x
+15410 gosub 3000
+15420 m=peek(o+x)
+15430 m=m*2+c
+15440 c=-(m>255)
+15450 m=m and 255
+15460 poke o+x,m and 255
+15470 z=-(m=0)
+15480 n=(m and 128)/128
+15490 return
+15590 :
+15600 rem *** sec
+15610 c=1
+15620 return
+15690 :
+15700 rem *** and absolute,y
+15710 gosub 4000
+15720 a=a and peek(oo+y)
+15730 n=(a and 128)/128
+15740 z=-(a=0)
+15750 return
+16090 :
+16100 rem *** and absolute,x
+16110 gosub 4000
+16120 a=a and peek(oo+y)
+16130 n=(a and 128)/128
+16140 z=-(a=0)
+16150 return
+16190 :
+16200 rem *** rol absolute,x
+16210 gosub 4000
+16220 m=peek(oo+x)
+16230 m=m*2+c
+16240 c=-(m>255)
+16250 m=m and 255
+16260 poke oo+x,m and 255
+16270 z=-(m=0)
+16280 n=(m and 128)/128
+16290 return
+16390 :
+16400 rem *** rti
+16410 s=(s+1) and 255
+16420 p=st%(s)
+16430 gosub 6000
+16440 s=(s+1) and 255
+16450 pc=st%(s)
+16460 s=(s+1) and 255
+16470 pc=256*pc+st%(s)
+16480 return
+16490 :
+16500 rem *** eor (indirect,x)
+16510 gosub 3000
+16520 oo=peek(o+x)+256*peek(o+x+1)
+16530 a=fn eo(peek(oo))
+16540 n=(a and 128)/128
+16550 z=-(a=0)
+16560 return
+16890 :
+16900 rem *** eor zeropage
+16910 gosub 3000
+16920 a=fn eo(peek(o))
+16930 n=(a and 128)/128
+16940 z=-(a=0)
+16950 return
+16990 :
+17000 rem *** lsr zeropage
+17010 gosub 3000
+17020 m=peek(o)
+17030 c=m and 1
+17040 m=int(m/2)
+17050 poke o,m
+17060 z=-(m=0)
+17070 n=(m and 128)/128
+17080 return
+17190 :
+17200 rem *** pha
+17210 st%(s)=a:s=(s-1) and 255
+17220 return
+17290 :
+17300 rem *** eor #immediate
+17310 gosub 3000
+17320 a=fn eo(o)
+17330 n=(a and 128)/128
+17340 z=-(a=0)
+17350 return
+17390 :
+17400 rem *** lsr a
+17410 c=a and 1
+17420 a=int(a/2)
+17430 z=-(a=0)
+17440 n=(a and 128)/128
+17450 return
+17590 :
+17600 rem *** jmp absolute
+17610 gosub 4000
+17620 pc=oo-1
+17630 return
+17690 :
+17700 rem *** eor absolute
+17710 gosub 4000
+17720 a=fn eo(peek(oo))
+17730 n=(a and 128)/128
+17740 z=-(a=0)
+17750 return
+17790 :
+17800 rem *** lsr absolute
+17810 gosub 4000
+17820 m=peek(oo)
+17830 c=m and 1
+17840 m=int(m/2)
+17850 poke oo,m
+17860 z=-(m=0)
+17870 n=(m and 128)/128
+17880 return
+17990 :
+18000 rem *** bvc
+18010 gosub 3000
+18020 if v=0 then gosub 7000
+18030 return
+18090 :
+18100 rem *** eor (indirect),y
+18110 gosub 3000
+18120 oo=peek(o)+256*peek(o+1)+y
+18130 a=fn eo(peek(oo))
+18140 n=(a and 128)/128
+18150 z=-(a=0)
+18160 return
+18490 :
+18500 rem *** eor zeropage,x
+18510 gosub 3000
+18520 a=fn eo(peek(o+x))
+18530 n=(a and 128)/128
+18540 z=-(a=0)
+18550 return
+18590 :
+18600 rem *** lsr zeropage,x
+18610 gosub 3000
+18620 m=peek(o+x)
+18630 c=m and 1
+18640 m=int(m/2)
+18650 poke o+x,m
+18660 z=-(m=0)
+18670 n=(m and 128)/128
+18680 return
+18790 :
+18800 rem *** cli
+18810 i=0
+18820 return
+18890 :
+18900 rem *** eor absolute,y
+18910 gosub 4000
+18920 a=fn eo(peek(oo+y))
+18930 n=(a and 128)/128
+18940 z=-(a=0)
+18950 return
+19290 :
+19300 rem *** eor absolute,x
+19310 gosub 4000
+19320 a=fn eo(peek(oo+x))
+19330 n=(a and 128)/128
+19340 z=-(a=0)
+19350 return
+19390 :
+19400 rem *** lsr absolute,x
+19410 gosub 4000
+19420 m=peek(oo+x)
+19430 c=m and 1
+19440 m=int(m/2)
+19450 poke oo+x,m
+19460 z=-(m=0)
+19470 n=(m and 128)/128
+19480 return
+19590 :
+19600 rem *** rts
+19610 s=(s+1) and 255:hi=st%(s)
+19620 s=(s+1) and 255:lo=st%(s)
+19630 pc=256*hi+lo
+19640 rem  pc=pc+1 geschieht bei 1040
+19650 return
+19690 :
+19700 rem *** adc (indirect,x)
+19710 gosub 3000
+19720 oo=peek(o+x)+256*peek(o+x+1)
+19730 m=peek(oo)
+19740 gosub 8000
+19750 return
+20090 :
+20100 rem *** adc zeropage
+20110 gosub 3000
+20120 m=peek(o)
+20130 gosub 8000
+20140 return
+20190 :
+20200 rem *** ror zeropage
+20210 gosub 3000
+20220 m=peek(o)
+20230 m=(128*c)+m/2
+20240 c=-(m<>int(m))
+20250 m=m and 255
+20260 poke o,m
+20270 z=-(m=0)
+20280 n=(m and 128)/128
+20290 return
+20390 :
+20400 rem *** php
+20410 s=(s+1) and 255
+20420 a=st%(s)
+20430 return
+20490 :
+20500 rem *** adc #immediate
+20510 gosub 3000
+20520 m=o
+20530 gosub 8000
+20540 return
+20590 :
+20600 rem *** ror a
+20610 a=(128*c)+a/2
+20620 c=-(a<>int(a))
+20630 a=a and 255
+20640 z=-(a=0)
+20650 n=(a and 128)/128
+20660 return
+20790 :
+20800 rem *** jmp indirect
+20810 gosub 4000
+20820 pc=peek(oo)+256*peek(oo+1)-1
+20830 return
+20890 :
+20900 rem *** adc absolute
+20910 gosub 4000
+20920 m=peek(oo)
+20930 gosub 8000
+20940 return
+20990 :
+21000 rem *** ror absulute
+21010 gosub 4000
+21020 m=peek(oo)
+21030 m=(128*c)+m/2
+21040 c=-(m<>int(m))
+21050 m=m and 255
+21060 poke oo,m
+21070 z=-(m=0)
+21080 n=(m and 128)/128
+21090 return
+21190 :
+21200 rem *** bvs
+21210 gosub 3000
+21220 if v=1 then gosub 7000
+21230 return
+21290 :
+21300 rem *** adc (indirect),y
+21310 gosub 3000
+21320 oo=peek(o)+256*peek(o+1)+y
+21330 m=peek(oo)
+21340 gosub 8000
+21350 return
+21690 :
+21700 rem *** adc zeropage,x
+21710 gosub 3000
+21720 m=peek(o+x)
+21730 gosub 8000
+21740 return
+21790 :
+21800 rem *** ror zeropage,x
+21810 gosub 3000
+21820 m=peek(o+x)
+21830 m=(128*c)+m/2
+21840 c=-(m<>int(m))
+21850 m=m and 255
+21860 poke o+x,m
+21870 z=-(m=0)
+21880 n=(m and 128)/128
+21890 return
+21990 :
+22000 rem *** sei
+22010 i=1
+22020 return
+22090 :
+22100 rem *** adc absolute,y
+22110 gosub 4000
+22120 m=peek(oo+y)
+22130 gosub 8000
+22140 return
+22490 :
+22500 rem *** adc absolute,x
+22510 gosub 4000
+22520 m=peek(oo+x)
+22530 gosub 8000
+22540 return
+22590 :
+22600 rem *** ror absolute,x
+22610 gosub 4000
+22620 m=peek(oo+x)
+22630 m=(128*c)+m/2
+22640 c=-(m<>int(m))
+22650 m=m and 255
+22660 poke oo+x,m and 255
+22670 z=-(m=0)
+22680 n=(m and 128)/128
+22690 return
+22890 :
+22900 rem *** sta (indirect,x)
+22910 gosub 3000
+22920 oo=peek(o+x)+256*peek(o+x+1)
+22930 poke oo,a
+22940 return
+23190 :
+23200 rem *** sty zeropage
+23210 gosub 3000
+23220 poke o,y
+23230 return
+23290 :
+23300 rem *** sta zeropage
+23310 gosub 3000
+23320 poke o,a
+23330 return
+23390 :
+23400 rem *** stx zeropage
+23410 gosub 3000
+23420 poke o,x
+23430 return
+23590 :
+23600 rem *** dey
+23610 y=(y-1) and 255
+23620 z=-(y=0)
+23630 n=(y and 128)/128
+23640 return
+23790 :
+23800 rem *** txa
+23810 a=x
+23820 z=-(a=0)
+23830 n=(a and 128)/128
+23840 return
+23990 :
+24000 rem *** sty absolute
+24010 gosub 4000
+24020 poke oo,y
+24030 return
+24090 :
+24100 rem *** sta absolute
+24110 gosub 4000
+24120 poke oo,a
+24130 return
+24190 :
+24200 rem *** stx absolute
+24210 gosub 4000
+24220 poke oo,x
+24230 return
+24390 :
+24400 rem *** bcc
+24410 gosub 3000
+24420 if c=0 then gosub 7000
+24430 return
+24490 :
+24500 rem *** sta (indirect),y
+24510 gosub 3000
+24520 oo=peek(o)+256*peek(o+1)+y
+24530 poke oo,a
+24540 return
+24790 :
+24800 rem *** sty zeropage,x
+24810 gosub 3000
+24820 poke o+x,y
+24830 return
+24890 :
+24900 rem *** sta zeropage,x
+24910 gosub 3000
+24920 poke o+x,a
+24930 return
+24990 :
+25000 rem *** stx zeropage,y
+25010 gosub 3000
+25020 poke o+y,x
+25030 return
+25190 :
+25200 rem *** tya
+25210 a=y
+25220 z=-(a=0)
+25230 n=(a and 128)/128
+25240 return
+25290 :
+25300 rem *** sta absolute,y
+25310 gosub 4000
+25320 poke oo+y,a
+25330 return
+25390 :
+25400 rem *** txs
+25410 s=x
+25420 return
+25690 :
+25700 rem *** sta absolute,x
+25710 gosub 4000
+25720 poke oo+x,a
+25730 return
+25990 :
+26000 rem *** ldy #immediate
+26010 gosub 3000
+26020 y=o
+26030 n=(y and 128)/128
+26040 z=-(y=0)
+26050 return
+26090 :
+26100 rem *** lda (indirect,x)
+26110 gosub 3000
+26120 oo=peek(o+x)+256*peek(o+x+1)
+26130 a=peek(oo)
+26140 n=(a and 128)/128
+26150 z=-(a=0)
+26160 return
+26190 :
+26200 rem *** ldx #immediate
+26210 gosub 3000
+26220 x=o
+26230 n=(x and 128)/128
+26240 z=-(x=0)
+26250 return
+26390 :
+26400 rem *** ldy zeropage
+26410 gosub 3000
+26420 y=peek(o)
+26430 n=(y and 128)/128
+26440 z=-(y=0)
+26450 return
+26490 :
+26500 rem ** lda zeropage
+26510 gosub 3000
+26520 a=peek(o)
+26530 n=(a and 128)/128
+26540 z=-(a=0)
+26550 return
+26590 :
+26600 rem *** ldx zeropage
+26610 gosub 3000
+26620 x=peek(o)
+26630 n=(x and 128)/128
+26640 z=-(x=0)
+26650 return
+26790 :
+26800 rem *** tay
+26810 y=a
+26820 z=-(y=0)
+26830 n=(y and 128)/128
+26840 return
+26890 :
+26900 rem *** lda #immediate
+26910 gosub 3000
+26920 a=o
+26930 n=(a and 128)/128
+26940 z=-(a=0)
+26950 return
+26990 :
+27000 rem *** tax
+27010 x=a
+27020 z=-(x=0)
+27030 n=(x and 128)/128
+27040 return
+27190 :
+27200 rem *** ldy absolute
+27210 gosub 4000
+27220 y=peek(oo)
+27230 n=(y and 128)/128
+27240 z=-(y=0)
+27250 return
+27290 :
+27300 rem *** lda absolute
+27310 gosub 4000
+27320 a=peek(oo)
+27330 n=(a and 128)/128
+27340 z=-(a=0)
+27350 return
+27390 :
+27400 rem *** ldx absolute
+27410 gosub 4000
+27420 x=peek(oo)
+27430 n=(x and 128)/128
+27440 z=-(x=0)
+27450 return
+27590 :
+27600 rem *** clv
+27610 v=0
+27620 return
+27690 :
+27700 rem *** lda (indirect),y
+27710 gosub 3000
+27720 oo=peek(o)+256*peek(o+1)+y
+27730 a=peek(oo)
+27740 n=(a and 128)/128
+27750 z=-(a=0)
+27760 return
+27990 :
+28000 rem *** ldy zeropage,x
+28010 gosub 3000
+28020 y=peek(o+x)
+28030 n=(y and 128)/128
+28040 z=-(y=0)
+28050 return
+28090 :
+28100 rem *** lda zeropage,x
+28110 gosub 3000
+28120 a=peek(o+x)
+28130 n=(a and 128)/128
+28140 z=-(a=0)
+28150 return
+28190 :
+28200 rem *** ldx zeropage,x
+28210 gosub 3000
+28220 x=peek(o+y)
+28230 n=(x and 128)/128
+28240 z=-(x=0)
+28250 return
+28390 :
+28400 rem *** clv
+28410 v=0
+28420 return
+28490 :
+28500 rem *** lda absolute,y
+28510 gosub 4000
+28520 a=peek(oo+y)
+28530 n=(a and 128)/128
+28540 z=-(a=0)
+28550 return
+28590 :
+28600 rem *** tsx
+28610 x=s
+28620 z=-(x=0)
+28630 n=(x and 128)/128
+28640 return
+28790 :
+28800 rem *** ldy absolute,x
+28810 gosub 4000
+28820 y=peek(oo+x)
+28830 n=(y and 128)/128
+28840 z=-(y=0)
+28850 return
+28890 :
+28900 rem *** lda absolute,x
+28910 gosub 4000
+28920 a=peek(oo+x)
+28930 n=(a and 128)/128
+28940 z=-(a=0)
+28950 return
+28990 :
+29000 rem *** ldx absolute,y
+29010 gosub 4000
+29020 x=peek(oo+y)
+29030 n=(x and 128)/128
+29040 z=-(x=0)
+29050 return
+29190 :
+29200 rem *** cpy #immediate
+29210 gosub 3000
+29220 c=-((y-o)>=0)
+29230 n=((y-o) and 128)/128
+29240 z=-((y-o)=0)
+29250 return
+29290 :
+29300 rem *** cmp (indirect,x)
+29310 gosub 3000
+29320 oo=peek(o+x)+256*peek(o+x+1)
+29330 m=peek(oo)
+29340 gosub 8400
+29350 return
+29590 :
+29600 rem *** cpy zeropage
+29610 gosub 3000
+29620 m=peek(o)
+29630 c=-((y-m)>=0)
+29640 n=((y-m) and 128)/128
+29650 z=-((y-m)=0)
+29690 :
+29700 rem *** cmp zeropage
+29710 gosub 3000
+29720 m=peek(o)
+29730 gosub 8400
+29740 return
+29790 :
+29800 rem *** dec zeropage
+29810 gosub 3000
+29820 m=peek(o)
+29830 m=(m-1) and 255
+29840 poke o,m
+29850 z=-(m=0)
+29860 n=(m and 128)/128
+29870 return
+29990 :
+30000 rem *** iny
+30010 y=(y+1) and 255
+30020 z=-(y=0)
+30030 n=(y and 128)/128
+30040 return
+30090 :
+30100 rem *** cmp #immediate
+30110 gosub 3000
+30120 m=o
+30130 gosub 8400
+30140 return
+30190 :
+30200 rem *** dex
+30210 x=(x-1) and 255
+30220 z=-(x=0)
+30230 n=(x and 128)/128
+30240 return
+30390 :
+30400 rem *** cpy absolute
+30410 gosub 4000
+30420 m=peek(oo)
+30430 c=-((y-m)>=0)
+30440 n=((y-m) and 128)/128
+30450 z=-((y-m)=0)
+30460 return
+30490 :
+30500 rem *** cmp absolute
+30510 gosub 4000
+30520 m=peek(oo)
+30530 gosub 8400
+30540 return
+30590 :
+30600 rem *** dec absolute
+30610 gosub 4000
+30620 m=peek(oo)
+30630 m=(m-1) and 255
+30640 poke oo,m
+30650 z=-(m=0)
+30660 n=(m and 128)/128
+30670 return
+30790 :
+30800 rem *** bne
+30810 gosub 3000
+30820 if z=0 then gosub 7000
+30830 return
+30890 :
+30900 rem *** cmp (indirect),y
+30910 gosub 3000
+30920 oo=peek(o)+256*peek(o+1)+y
+30930 m=peek(oo)
+30940 gosub8400
+30950 return
+31290 :
+31300 rem *** cmp zeropage,x
+31310 gosub 3000
+31320 m=peek(o+x)
+31330 gosub 8400
+31340 return
+31390 :
+31400 rem *** dec zeropage,x
+31410 gosub 3000
+31420 m=peek(o+x)
+31430 m=(m-1) and 255
+31440 poke o+x,m
+31450 z=-(m=0)
+31460 n=(m and 128)/128
+31470 return
+31590 :
+31600 rem *** cld
+31610 d=0
+31620 return
+31690 :
+31700 rem *** cmp absolute,y
+31710 gosub 4000
+31720 m=peek(oo+y)
+31730 gosub 8400
+31740 return
+32090 :
+32100 rem *** cmp absolute,x
+32110 gosub 4000
+32120 m=peek(oo+x)
+32130 gosub 8400
+32140 return
+32190 :
+32200 rem *** dec absolute,x
+32210 gosub 4000
+32220 m=peek(oo+x)
+32230 m=(m-1) and 255
+32240 poke oo+x,m
+32250 z=-(m=0)
+32260 n=(m and 128)/128
+32270 return
+32390 :
+32400 rem *** cpx #immediate
+32410 gosub 3000
+32420 c=-((x-o)>=0)
+32430 n=((x-o) and 128)/128
+32440 z=-((x-o)=0)
+32450 return
+32490 :
+32500 rem *** sbc (indirect,x)
+32510 gosub 3000
+32520 oo=peek(o+x)+256*peek(o+x+1)
+32530 m=peek(oo)
+32540 gosub 8200
+32550 return
+32790 :
+32800 rem *** cpx zeropage
+32810 gosub 3000
+32820 m=peek(o)
+32830 c=-((x-m)>=0)
+32840 n=((c-m) and 128)/128
+32850 z=-((x-m)=0)
+32860 return
+32890 :
+32900 rem *** sbc zeropage
+32910 gosub 3000
+32920 m=peek(o)
+32930 gosub 8200
+32940 return
+32990 :
+33000 rem *** inc zeropage
+33010 gosub 3000
+33020 m=peek(o)
+33030 m=(m+1) and 255
+33040 poke o,m
+33050 z=-(m=0)
+33060 n=(m and 128)/128
+33070 return
+33190 :
+33200 rem *** inx
+33210 x=(x+1) and 255
+33220 z=-(x=0)
+33230 n=(x and 128)/128
+33240 return
+33290 :
+33300 rem *** sbc #immediate
+33310 gosub 3000
+33320 m=o
+33330 gosub 8200
+33340 return
+33390 :
+33400 rem *** nop
+33460 return
+33590 :
+33600 rem *** cpx absolute
+33610 gosub 4000
+33620 m=peek(oo)
+33630 c=-((x-m)>=0)
+33640 m=((x-m) and 128)/128
+33650 z=-((x-m)>=0)
+33660 return
+33690 :
+33700 rem *** sbc absolute
+33710 gosub 4000
+33720 m=peek(oo)
+33730 gosub 8200
+33740 return
+33790 :
+33800 rem *** inc absolute
+33810 gosub 4000
+33820 m=peek(oo)
+33830 m=(m+1) and 255
+33840 poke oo,m
+33850 z=-(m=0)
+33860 n=(m and 128)/128
+33870 return
+33990 :
+34000 rem *** beq
+34010 gosub 3000
+34020 if z=1 then gosub 7000
+34030 return
+34090 :
+34100 rem *** sbc (indirect),y
+34110 gosub 3000
+34120 oo=peek(o)+256*peek(o+1)+y
+34130 m=peek(oo)
+34140 gosub 8200
+34150 return
+34490 :
+34500 rem *** sbc zeropage,x
+34510 gosub 3000
+34520 m=peek(o+x)
+34530 gosub 8200
+34540 return
+34590 :
+34600 rem *** inc zeropage,x
+34610 gosub 3000
+34620 m=peek(o+x)
+34630 m=(m+1) and 255
+34640 poke o+x,m
+34650 z=-(m=0)
+34660 n=(m and 128)/128
+34670 return
+34790 :
+34800 rem *** sed
+34810 d=1
+34820 return
+34890 :
+34900 rem *** sbc absolute,y
+34910 gosub 4000
+34920 m=peek(oo+y)
+34930 gosub 8200
+34940 return
+35290 :
+35300 rem *** sbc absolute,x
+35310 gosub 4000
+35320 m=peek(oo+x)
+35330 gosub 8200
+35340 return
+35390 :
+35400 rem *** inc absolute,x
+35410 gosub 4000
+35420 m=peek(oo+x)
+35430 m=(m+1) and 255
+35440 poke oo+x,m
+35450 z=-(m=0)
+35460 n=(m and 128)/128
+35470 return
+35500 :
+49000 for hh=34768 to 34783:read h:poke hh,h:next:return
+50000 data 9,240,8,8,88,8,8,8,8,8,8,8,8,0,0,0
+

@@ -186,3 +186,16 @@ eaten by Markdown as a blockquote and comes out as `<p class="intro">` after
 =2 on 14). Also 030: the p21 table box and p60's "Fortsetzung Text auf Seite
 62" line were dropped before 080 ever saw them; the 030 loss check does not
 count blocks it never put in the stream.
+
+## 120 — the extractor's "V2" is petcat's BASIC 7.0 default; check 4's cases miss three real shapes
+
+From the 120 sub-agent, confirmed by its evidence: r120 says the extractor
+decodes "with default V2 mode", but bare `petcat` (VICE 3.9) uses the 7.0
+table — C16 files came out readable but untagged (`key5,"dsave"…dec(`) and a
+VC 20 file showed C16 keywords; only check 4 exposed it. Check 4's three cases
+do not cover: petcat's own asymmetry ($9A → `{blu}` → $1F under `-w3`), a
+BASIC extension petcat has no dialect for ("19 Grafik-Befehle"), and real
+BASIC with its own machine code appended (`fast hardcopy` — looks like case 3
+"trailing bytes", is not harmless). The stub test would also wrongly flag
+`turbo-racer` (73-byte loader, bare `SYS`, no code appended). The archive
+names A/B disks `SH0X/SH03A.D64`, not the Usage's `<YYMM>A.D64`.

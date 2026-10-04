@@ -1,0 +1,212 @@
+
+
+;reloctable.prg ==0801==
+  100 rem reloctable
+  110 rem translation
+  120 rem c. by m.zimmermann,wesel
+  130 rem
+  140 rem
+  150 print"{clr}{down}{down}**********************{down}
+  160 print"     reloctable{down}{down}"
+  170 print"**********************"
+  180 dimop%(255)
+  190 fort=0to255
+  200 reada%
+  210 op%(t)=a%
+  220 next
+  240 rem standorte
+  250 rem
+  260 input"{down}anz. d. bytes ";an
+  270 ifan=0then260
+  280 input"{down}startadresse ";sa
+  290 zi=sa
+  300 input"{down}zieladresse ";zi
+  310 ifzi<>sathen430
+  320 tr$="j"
+  330 input"{down}start c-64 ";ts
+  340 dimc%(211),v%(211)
+  350 fort=0to210step2
+  360 readch,cl,vh,vl
+  370 c%(t)=ch:c%(t+1)=cl
+  380 v%(t)=vh:v%(t+1)=vl
+  390 next
+  400 bs=4*(peek(36866)and128)+64*(peek(36869)and120)
+  410 fs=37888+4*(peek(36866)and128)
+  420 print:printchr$(18)"uebersetzungsversuch!!"chr$(146):goto510
+  430 ifzi>827andzi+an<1021then480
+  440 ifzi<peek(49)+256*peek(50)orzi+an+6>49151thenprint"{down}ungueltiges ziel  {down}{down}":goto300
+  450 ifsa<=zithenifsa+an+1>zithenprint"ungueltiges ziel{down}{down}":goto300
+  460 ifzi<=sathenifzi+an+1>sathenprint"ungueltiges ziel{down}{down}":goto300
+  470 print:printchr$(18)"verschiebungsversuch!!"chr$(146)
+  480 fort=0toan-1
+  490 pokezi+t,peek(sa+t)
+  500 next
+  510 rem
+  520 rem analyse
+  530 rem
+  540 print:print"warten auf "chr$(18)"ready"chr$(146)" !!"
+  550 fort=0toan-1
+  560 we=peek(sa+t)
+  570 ifkk$<>"j"then640
+  580 ifwe=201orwe=224orwe=192then600
+  590 goto660
+  600 h=peek(zi+t+1)
+  610 ifh>26andh<42thenh=22+h-40:pokezi+t+1,h:goto660
+  620 ifh>18andh<27thenh=23+h-25:pokezi+t+1,h
+  630 goto660
+  640 ifwe=169orwe=162orwe=160thengosub970
+  650 ifop%(we)=2thengosub880
+  660 t=t+op%(we)
+  670 next
+  680 ifk$<>"j"then800
+  690 ifk$="j"thenk$="":kk$="j"
+  700 print"{clr}{down}{down}das programm ver-{down}"
+  710 print"wendete adressen des{down}"
+  720 print"bildschirm- und farb-{down}"
+  730 print"bereichs. c64 und vc20{down}"
+  740 print"unterscheiden sich da{down}"
+  750 print"wesentlich. ein ueber-{down}"
+  760 print"setzungsversuch ist{down}"
+  770 print"kritisch! soll ich es"
+  780 print"versuchen?{down}{down}":input"(j/n) ";a$
+  790 ifa$="j"then550
+  800 dh=int(zi/256)
+  810 dl=zi-256*dh
+  820 pokezi+an+2,dl
+  830 pokezi+an+3,dh
+  840 pokezi+an+4,197
+  850 pokezi+an+5,206
+  860 pokezi+an+6,196
+  870 end
+  880 rem
+  890 rem 3 byte-befehl
+  900 rem
+  910 h=peek(sa+t+1)+256*peek(sa+t+2)
+  920 g=t
+  930 iftr$="j"thengosub1240
+  940 ifh<saorh>sa+an-1thenreturn
+  950 gosub1510
+  960 return
+  970 rem
+  980 rem lda/ldx/ldy
+  990 rem
+ 1000 ift=gandt<>0thenreturn
+ 1010 g=t:ge=we:kk=0
+ 1020 h1=peek(sa+t+1)
+ 1030 g=g+op%(ge)+1
+ 1040 ifg>anorkk>1theng=t:return
+ 1050 ge=peek(sa+g)
+ 1060 ifge=169orge=162orge=160then1080
+ 1070 kk=kk+1:goto1030
+ 1080 h2=peek(sa+g+1)
+ 1090 h=h1+256*h2
+ 1100 iftr$="j"thengosub1240
+ 1110 ifh<saorh>sa+an-1thenreturn
+ 1120 gosub1510
+ 1140 rem
+ 1150 rem betrieb
+ 1160 rem
+ 1170 l=0:h1=0:h2=0:ifh=58592orh=58602then1610
+ 1180 h2=256*c%(l)+c%(l+1)
+ 1190 ifh2=hthenh=256*v%(l)+v%(l+1):return
+ 1200 ifh2>hthenh=256*v%(l-2)+v%(l-1)+h-h1:return
+ 1210 h1=h2:l=l+2
+ 1220 ifl<211then1180
+ 1230 return
+ 1240 rem
+ 1250 rem uebersetzung
+ 1260 rem
+ 1270 n$=""
+ 1280 rem zero
+ 1290 ifh=784orh=785orh=786thenh=h-784:goto1510
+ 1300 rem bildschirm
+ 1310 ifh>1023andh<2024thenh=bs+h-1024:k$="j":goto1510
+ 1320 rem sprites
+ 1330 ifh>2039andh<2048thenn$="j"
+ 1340 rem interpret 1
+ 1350 ifh>40959andh<49151thenh=h+8192:gosub1590:goto1510
+ 1360 rem masch. ram
+ 1370 ifh>ts-1andh<ts+anthenh=sa+h-ts:goto1510
+ 1380 ifh>49151andh<53248thenn$="j"
+ 1390 rem video/sound
+ 1400 ifh>53247andh<55295thenn$="j"
+ 1410 rem interp. 2
+ 1420 ifh>55295andh<56296thenh=fs+h-55296:k$="j":goto1510
+ 1430 rem betr. unklar
+ 1440 ifh>56295andh<57344thenn$="j"
+ 1450 rem interpr. 2
+ 1460 ifh>57343andh<58463thenh=h-3:gosub1590:goto1510
+ 1470 ifh>58462andh<65418thengosub1170:goto1510
+ 1480 rem notloesung
+ 1490 ifn$="j"thendl=234:dh=dl:pokezi+t,dh:pokezi+g,dh:goto1540
+ 1500 return
+ 1510 dd=h+zi-sa
+ 1520 dh=int(dd/256)
+ 1530 dl=dd-256*dh
+ 1540 ifg=ttheng=t+1
+ 1550 pokezi+t+1,dl
+ 1560 pokezi+g+1,dh
+ 1570 ifg=t+1theng=0
+ 1580 return
+ 1590 ifwe=141orwe=142orwe=140then1660
+ 1600 return
+ 1610 print"{clr}{down}{down}uebersetzung nicht{down}
+ 1620 print"moeglich, da ent-{down}
+ 1630 print"sprechende routine{down}
+ 1640 print"beim vc-20 nicht vor-{down}
+ 1650 print"handen ist!{down}":end
+ 1660 print"{clr}{down}{down}uebersetzung nicht{down}
+ 1670 print"moeglich, da ins ram{down}
+ 1680 print"gepoked wird{down}{down}"
+ 1690 print"stelle(dez): ";h
+ 1700 print"{down}":end
+ 1710 rem
+ 1720 rem befehlslaenge
+ 1730 rem
+ 1740 data0,1,0,0,1,1,1,0,0,1,0,0,2,2,2,0
+ 1750 data1,1,1,0,1,1,1,0,0,2,0,0,2,2,2,0
+ 1760 data2,1,0,0,1,1,1,0,0,1,0,0,2,2,2,0
+ 1770 data1,1,1,0,1,1,1,0,0,2,0,0,2,2,2,0
+ 1780 data0,1,0,0,0,1,1,0,0,1,0,0,2,2,2,0
+ 1790 data1,1,1,0,0,1,1,0,0,2,0,0,0,2,2,0
+ 1800 data0,1,0,0,1,1,1,0,0,1,0,0,2,2,2,0
+ 1810 data1,1,1,0,1,1,1,0,0,2,0,0,2,2,2,0
+ 1820 data1,1,0,0,1,1,1,0,0,1,0,0,2,2,2,0
+ 1830 data1,1,1,0,1,1,1,0,0,2,0,0,2,2,2,0
+ 1840 data1,1,1,0,1,1,1,0,0,1,0,0,2,2,2,0
+ 1850 data1,1,1,0,1,1,1,0,0,2,0,0,2,2,2,0
+ 1860 data1,1,0,0,1,1,1,0,0,1,0,0,2,2,2,0
+ 1870 data1,1,1,0,0,1,1,0,0,2,0,0,0,2,2,0
+ 1880 data1,1,0,0,1,1,1,0,0,1,0,0,2,2,2,0
+ 1890 data1,1,1,0,0,1,1,0,0,2,0,0,0,2,2,0
+ 1900 rem
+ 1910 rem systemadr.
+ 1920 rem
+ 1930 data228,95,228,41,229,0,229,0,229,5,229,5,229,10,229,10
+ 1940 data229,24,229,24,229,68,229,95,229,102,229,129,229,160,229,187
+ 1950 data229,180,229,207,229,202,229,229,230,50,230,79,230,132,230,184
+ 1960 data230,182,230,234,232,218,233,33,232,234,233,117,233,200,234,86
+ 1970 data233,255,234,141,234,28,234,161,234,36,234,178,234,49,234,191
+ 1980 data234,135,235,30,235,72,235,220,235,121,236,70,235,177,236,94
+ 1990 data236,68,237,33,236,120,237,105,236,185,237,228,236,231,237,243
+ 2000 data236,240,237,254,237,9,238,20,237,12,238,23,237,64,238,228
+ 2010 data237,185,238,192,237,199,238,206,237,239,238,246,237,254,239,4
+ 2020 data238,19,239,25,238,179,239,150,238,187,239,163,239,74,240,39
+ 2030 data240,20,240,237,240,134,241,79,240,164,241,96,240,189,241,116
+ 2040 data241,43,241,224,241,87,242,14,241,202,242,122,242,14,242,199
+ 2050 data242,80,243,9,242,145,243,74,243,15,243,207,243,31,243,223
+ 2060 data243,47,243,239,243,74,244,10,244,158,245,66,245,175,246,71
+ 2070 data245,210,246,106,245,221,246,117,246,143,247,40,246,155,247,52
+ 2080 data246,221,247,96,246,228,247,103,246,237,247,112,246,251,247,126
+ 2090 data247,44,247,175,247,106,247,231,247,208,248,77,247,215,248,84
+ 2100 data247,234,248,103,248,13,248,138,248,23,248,148,248,46,248,171
+ 2110 data248,56,248,183,248,65,248,192,248,74,248,201,248,100,248,234
+ 2120 data248,107,248,234,248,190,249,47,248,225,249,75,249,44,249,142
+ 2130 data251,151,248,219,251,166,251,234,251,205,252,11,252,184,252,246
+ 2140 data252,202,253,11,252,209,253,17,252,219,253,27,252,226,253,34
+ 2150 data253,2,253,63,253,16,253,77,253,21,253,82,253,48,253,109
+ 2160 data253,80,253,141,253,155,253,109,253,249,254,73,254,0,254,80
+ 2170 data254,7,254,87,254,24,254,102,254,28,254,106,254,33,254,246
+ 2180 data254,37,254,115,254,52,254,130,254,67,254,169,254,194,255,92
+ 2190 data255,72,255,114,255,129,255,138
+

@@ -1,0 +1,124 @@
+;char-machine.prg ==1001==
+;version=3
+    1 rem ********************************
+    2 rem ***      char-machine        ***
+    3 rem ***written 1985 by jens engel***
+    4 rem ********************************
+    9 ifl=1thenl=0:goto20
+   10 poke51,255:poke52,55:poke55,255:poke56,55:clr
+   12 goto20000
+   20 poke65298,0:poke65299,56:poke65287,152
+   22 ifpeek(864)<>169thengosub21000
+   90 f1=2:f2=0:f3=4:color0,15,2:color1,3,7:color4,1:color2,2,0:color3,2,4
+  100 print"{rvon}{clr}        {SHIFT-POUND}{SHIFT-POUND}        {rvon} CharMachine "
+  102 print"{rvon}        {SHIFT-POUND}{SHIFT-POUND}"
+  104 print"{rvon}        {SHIFT-POUND}{SHIFT-POUND}           Commands:"
+  106 print"{rvon}        {SHIFT-POUND}{SHIFT-POUND}  {SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}"
+  108 print"{rvon}        {SHIFT-POUND}{SHIFT-POUND}{$a0}{$a0}{SHIFT-POUND}{SHIFT-POUND} Space=unplot {SHIFT-POUND} X/Z=dot{SHIFT-POUND}{SHIFT-POUND}"
+  110 print"{rvon}        {SHIFT-POUND}{SHIFT-POUND}  {SHIFT-POUND}{SHIFT-POUND} Crsr=move    {SHIFT-POUND} C=clear{SHIFT-POUND}{SHIFT-POUND}"
+  112 print"{rvon}        {SHIFT-POUND}{SHIFT-POUND}{$a0} {SHIFT-POUND}{SHIFT-POUND} R=reverse    {SHIFT-POUND} L=load {SHIFT-POUND}{SHIFT-POUND}"
+  114 print"{rvon}        {SHIFT-POUND}{SHIFT-POUND}  {SHIFT-POUND}{SHIFT-POUND} M=select mode{SHIFT-POUND} S=save {SHIFT-POUND}{SHIFT-POUND}"
+  116 print"{rvon}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}  {SHIFT-POUND}{SHIFT-POUND} 1,2 =colors  {SHIFT-POUND} P=pick {SHIFT-POUND}{SHIFT-POUND}"
+  118 print"{rvon}            {SHIFT-POUND}{SHIFT-POUND} n=new char   {SHIFT-POUND} O=copy {SHIFT-POUND}{SHIFT-POUND}"
+  120 print"{rvon}   @     @  {SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}{SHIFT-POUND}"
+  122 print" hires multi"
+  124 print"{rvon}{down}             Written 1985 by Jens Engel"
+  130 fort=0to7:forw=0to31:poke3676+w+t*40,t*32+w:nextw,t:poke3676,86
+  140 poke2048+409,92
+  180 x=0:y=0:b=0
+  190 goto300
+  200 x1=7:y1=7:ad=3072
+  250 getkeya$
+  255 gosub500
+  258 ifa$="x"thenb=0:a$="{down}":gosub500
+  260 ifa$="z"thenb=0:a$="{rght}":gosub500
+  262 ifa$=" "thenb=32:a$="{rght}":gosub500
+  264 ifa$="c"thenprint"{home}";:fort=0to7:print"        ":next:a$="":x=0:y=0:gosub510
+  266 ifa$="m"then700
+  268 ifa$="r"thengosub800
+  290 poke52,55:goto250
+  300 x1=31:y1=7:ad=3676
+  350 getkeya$
+  355 gosub500
+  357 poke3475,b:poke3481,b
+  360 ifa$="p"thengoto600
+  362 ifa$="o"thench=y*32+x:c1=14336+ch*8:c2=int(c1/256):c3=c1-c2*256
+  364 ifa$="o"thenpoke3,c3:poke4,c2:sys950
+  370 ifa$="1"thenf1=f1+1:iff1=8thenf1=0:color0,15,f1:elsecolor0,15,f1
+  372 ifa$="2"thenf2=f2+1:iff2=8thenf2=0:color3,2,f2:elsecolor3,2,f2
+  380 ifa$="s"then1000
+  382 ifa$="l"then2000
+  384 ifa$="n"thenrun
+  390 poke52,55:goto350
+  500 pokead+x+y*40,b
+  510 ifa$="{rght}"thenifx<x1thenx=x+1
+  512 ifa$="{left}"thenifx>0thenx=x-1
+  514 ifa$="{up}"thenify>0theny=y-1
+  516 ifa$="{down}"thenify<y1theny=y+1
+  520 b=peek(ad+x+y*40):pokead+x+y*40,86
+  590 return
+  600 rem **change to edit-modus
+  610 ch=y*32+x:c1=14336+ch*8:c2=int(c1/256):c3=c1-c2*256
+  615 print"{home}";:fort=0to7:print"        ":next
+  620 poke3,c3:poke4,c2:sys864:b=peek(3072):x=0:y2=y:y=0
+  640 goto200
+  700 rem **change to select-modus
+  710 poke3072+x+y*40,b:x=ch-y2*32:y=y2:b=ch
+  720 sys950
+  740 goto300
+  800 poke3072+x+y*40,b:ifb=32thenb=0:goto805
+  802 b=32
+  805 fort=0to7:forw=0to7
+  810 ifpeek(3072+t+w*40)=0thenpoke3072+t+w*40,32:nextw,t:return
+  820 poke3072+t+w*40,0:nextw,t:return
+ 1000 rem** char saven
+ 1010 print"{clr}{down}{down}save char-set:"
+ 1020 print"{down}name:";:inputna$
+ 1030 print"{down}ok?":getkeyb$
+ 1050 poke65287,8:poke1339,peek(65301)
+ 1052 print"{clr}s "chr$(34);na$;chr$(34)",8,3800,3fff"
+ 1054 print"{down}{down}x":print"{down}run20":print"{down}{down}{down}{down}mO{up}{up}";
+ 1060 poke1319,13:poke1320,19:fort=0to5:poke1321+t,13:next:poke239,7:end
+ 2000 rem** char laden
+ 2010 print"{clr}{down}{down}load char-set:"
+ 2020 print"{down}name:";:inputna$
+ 2030 print"{down}ok?":getkeyb$
+ 2040 l=1:loadna$,8,1
+ 9999 end
+20000 rem **char-set copieren
+20005 poke1339,peek(65301)
+20010 print"{clr}{down}{down}t d000 d800 3800"
+20020 print"{down}x"
+20030 print"{down}run20"
+20040 print"{down}{down}mO{up}{up}";
+20050 poke1319,13:poke1320,19:fort=0to5:poke1321+t,13:next:poke239,7:end
+21000 rem **mc-data einlesen
+21010 fort=0to207:readq:poke864+t,q:next
+21020 return
+21100 data169,0,133,210,133,250,169,12
+21102 data133,211,160,0,132,5,132,6
+21104 data162,0,234,234,234,56,102,250
+21106 data165,250,164,5,49,3,240,6
+21108 data169,0,160,0,145,210,234,234
+21110 data230,210,208,2,230,211,232,224
+21112 data8,208,227,162,0,234,234,234
+21114 data169,0,133,250,24,165,210,105
+21116 data32,133,210,165,211,105,0,133
+21118 data211,234,230,5,165,5,201,8
+21120 data208,195,96,0,0,0,169,0
+21122 data133,210,133,250,169,12,133,211
+21124 data160,0,132,5,132,6,162,0
+21126 data76,12,4,56,102,250,160,0
+21128 data177,210,208,10,165,250,164,5
+21130 data17,3,145,3,234,234,230,210
+21132 data208,2,230,211,232,224,8,208
+21134 data227,162,0,234,234,234,169,0
+21136 data133,250,24,165,210,105,32,133
+21138 data210,165,211,105,0,133,211,234
+21140 data230,5,165,5,201,8,208,195
+21142 data96,0,0,0,169,0,160,0
+21144 data145,3,200,145,3,200,145,3
+21146 data200,145,3,200,145,3,200,145
+21148 data3,200,145,3,200,145,3,76
+21150 data203,3,0,0,0,0,0,0
+

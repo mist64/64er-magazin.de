@@ -1,0 +1,140 @@
+
+
+;life main.prg ==1201==
+   10 rem
+   11 rem >> life <<
+   12 rem
+   13 rem vic 20 + 3 k
+   14 rem
+   15 rem first run 'machine code loader'
+   16 rem
+   20 poke55,240:poke56,19:clr
+   22 print"{clr}":poke36879,75:poke36878,15:t1=234:t2=230:t3=223
+   26 fori=1to10:gosub31:forj=1to75:next:poke36878,0
+   27 print"{clr}":forj=1to71:next:poke36878,15:next:poke36874,0:poke36875,0:poke36876,0
+   28 gosub31:poke36874,0:poke36875,0:poke36876,0:gosub4000:goto40
+   31 print"{wht}{home}{down}{down}{down}{rght}{rght}{rght}{rght}{rvon} {down}{left} {down}{left} {down}{left} {down}{left}   "
+   32 print"{home}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} {down}{left} {down}{left} {down}{left} {down}{left} "
+   33 print"{home}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   {down}{left}{left}{left} {down}{left}  {down}{left}{left} {down}{left} "
+   34 print"{home}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   {down}{left}{left}{left} {down}{left}   {down}{left}{left}{left} {down}{left}   "
+   35 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{yel}(c) 1983 by c. neupert{wht}"
+   36 poke36874,t1:poke36875,t2:poke36876,t3:return
+   40 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}hit any key"
+   41 geta$:ifa$=""then41
+   50 poke36878,15:print"{clr}{down}{down}{down}{wht}":ge=0:pp=0
+   51 print"{rght}{rvon}1{rvof} entering of":print"{rght}{rght}{rght}coordinates"
+   52 print:print"{rght}{rvon}2{rvof} single step"
+   53 print:print"{rght}{rvon}3{rvof} automatic mode"
+   54 print"{down}{rght}{rvon}4{rvof} mutations"
+   55 print"{down}{rght}{rvon}5{rvof} mutations off"
+   57 geta$:ifa$=""then57
+   58 onval(a$)goto500,600,700,800,860
+   59 goto57
+   99 stop
+  500 poke36878,15:print"{clr}{wht}{down}":pp=0:rd=0
+  517 print"{down}{down}enter now {rvon}s{rvof} for ":print"{down}setting dots, or"
+  519 print"{down}{rght}{rvon}a{rvof} for deleting all."
+  520 rem
+  522 geta$:ifa$=""then522
+  524 ifa$="s"thengosub7000:goto530
+  525 ifa$="a"thenprint"{clr}{down}{down}{wht} deleting...":gosub4000:goto50
+  526 goto522
+  530 print"{clr}{down}":gosub9000:gosub3000:fory=1to32:forx=1to26:poke7168+x+27*y,76
+  531 ifpeek(5120+x+27*y)=1thenpoke7168+x+27*y,42:poke7168+x+27*y+30720,3:pp=pp+1
+  532 next:next:x=13:y=16:ad=7613:pokead,160:pokead+30720,2:poke36878,15
+  540 geta$:ifa$=""then540
+  542 ifa$<>""thenq=asc(a$)
+  544 ifq=17theny=y+1:goto580
+  545 ifq=29thenx=x+1:goto580
+  546 ifq=145theny=y-1:goto580
+  547 ifq=157thenx=x-1:goto580
+  548 ifq=32then590
+  549 ifq=42then595
+  550 ifq=82thenprint"{clr}":poke36879,75:goto5015
+  552 goto540
+  580 ify>32theny=32
+  581 ify<1theny=1
+  582 ifx>26thenx=26
+  583 ifx<1thenx=1
+  584 poke 36876,210:::::::::::::::::::poke36876,0:ifpeek(ad)=42then587
+  585 ifpeek(ad)=170thenpokead,42:pokead+30720,3:goto587
+  586 pokead,76:pokead+30720,1
+  587 ad=7168+x+27*y:ifpeek(ad)=42thenpokead,170:pokead+30720,2:goto589
+  588 pokead,160:pokead+30720,2
+  589 goto540
+  590 poke36876,235:pokead,160:pokead+30720,2
+  592 poke5120+x+27*y,0:poke36876,0:goto540
+  595 poke36876,240:pokead,170:pokead+30720,3
+  597 poke5120+x+27*y,1:poke36876,0:pp=pp+1:goto540
+  599 return
+  600 gosub2000
+  610 print"{clr}{down}{down}{down}{wht}press {rvon}space{rvof} for each"
+  615 print:print"single step"
+  625 print"{down}{down}{down}{yel}   hit any key{wht}"
+  630 geta$:ifa$=""then630
+  635 print"{clr}":gosub3000:gosub9000
+  636 sys 6400:gosub11100:goto641
+  640 sys 6151:gosub11000
+  641 geta$:ifa$=""thengosub5000:goto641
+  642 ifasc(a$)=136then5015
+  643 ifa$<>" "then641
+  650 goto640
+  700 gosub2000
+  702 print"{clr}{down}do you want a hardcopy":print"{down} [y/n] ?"
+  703 geta$:ifa$=""then703
+  704 ifa$="n"then707
+  705 ifa$<>"y"then703
+  706 pf=1:open1,4:cmd1:print#1
+  707 print"{clr}":gosub3000:gosub9000
+  710 sys 6400:gosub11100:forj=1to900:next:if pf then c$="":zx=0:zy=0:gosub17000
+  720 sys 6151:gosub11000:gosub5000
+  721 c$="":zx=0:zy=0:if pf=1 then gosub 17000
+  730 geta$:ifa$=""then720
+  740 ifasc(a$)<>136then720
+  750 ifpf=1thenprint#1:close1:pf=0
+  752 goto5015
+  800 print"{clr}{down}{down}{down}relative frequency":print"{down}{down}for mutations?"
+  820 print:print:print:input fq:iffq<0orfq<>int(fq)then820
+  850 mf=1:goto50
+  860 print"{clr}":mf=0:fq=0:forj=1to500:next:goto50
+ 2000 print"{clr}{wht}{down}{down}":rd=0
+ 2002 print"{down}{rvon}f3{rvof} screen color":print"{down}{rvon}f5{rvof} character color"
+ 2003 print"{down}{rvon}f7{rvof} goto menue"
+ 2005 print"{down}{down}{down}{wht}want random colors ?"
+ 2010 geta$:ifa$=""then2010
+ 2020 ifa$="y"thenrd=1
+ 2021 return
+ 3000 poke648,28:sys 58648
+ 3005 poke36864,8:poke36865,20:poke36866,27:poke36867,194
+ 3010 poke36879,8:return
+ 4000 fori=5120to6018:pokei,0:next:return
+ 5000 geta$:ifa$=""thenreturn
+ 5005 w=asc(a$):ifw=134thensc=sc+1+15*(sc=15):goto5100
+ 5010 ifw=135then5020
+ 5012 ifw<>136thena$="":return
+ 5015 poke36864,12:poke36865,38:poke36866,150:poke36867,151:sys58648:poke36879,75:goto50
+ 5020 cc=cc+1+8*(cc=7)
+ 5025 fori=37888to38900:pokei,cc:next:a$="":return
+ 5100 poke36879,16*sc+8:a$="":return
+ 7000 print"{clr}{down}do you want to delete":print"{down}the old matrix [y/n] ?"
+ 7010 geta$:ifa$="y"thenprint"{clr}":gosub4000:return
+ 7020 ifa$="n"thenreturn
+ 7030 goto7010
+ 9000 fori=7660to8185:pokei,32:next:fori=37888to38800:pokei,1+int(rnd(1)*8)*rd:next:return
+11000 ifmf=0then11100
+11010 fori=0tofq:xm=int(rnd(1)*26)+1:ym=int(rnd(1)*32)+1
+11020 am=5120+xm+27*ym:pokeam,0
+11030 next
+11100 ge=ge+1:pp=peek(7160)+256*peek(7161):print"{home}{wht}{rght}gen.:";ge;
+11105 print"{home}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{red}population{grn}";pp;"{left}  {home}";
+11110 if pf then print#1,"    generation: ";ge;"     population: ";pp:print#1
+11150 poke36878,15:poke36874,234:poke36875,223:poke36876,204:forj=1to200:next
+11200 poke36874,0:poke36875,0:poke36876,0:return
+15000 fori=0to8:readd:poke6151+i,d:next
+16000 data 169,0,141,248,27,141,249,27,234
+17000 fory=1to32:forx=1to26:ifpeek(5120+x+27*y)=1thenc$=c$+"*":zx=1:goto17010
+17005 c$=c$+" "
+17010 next:if zx then print#1,"";tab(25);c$:zy=0:goto 17030
+17020 if zx=0 then zy=zy+1:ifzy<4then print#1
+17030 c$="":zx=0:next y:print#1:print#1:return
+

@@ -1,0 +1,277 @@
+
+
+;musik m.basic.prg ==1201==
+   60 dim t%(7,3),v%(9),ts%(7):for i=0to2:poke886+i,0:next:poke 844,0
+   70 poke 56,76:poke 55,0:poke 650,128:poke36879,8:poke36878,15:gosub32000
+   90 ta(0)=19500:te(0)=21499:ta(1)=21500:te(1)=23499:ta(2)=23500:te(2)=24570
+  110 for j=0 to 3:for i=0 to 7: read t%(i,j):next:next
+  120 data 0,4,6,0,0,0,0,2,0,16,18,7,9,11,12,14
+  130 data 0,28,30,19,21,23,24,26, 0,0,0,31,0,0,0,0
+  150 ts%(0)=67:ts%(1)=68:ts%(2)=69:ts%(3)=70:ts%(4)=71:ts%(5)=65:ts%(6)=66
+  160 cc(1)=176:cc(2)=191:cc(3)=188:cc(4)=172:cc(5)=177:cc(6)=187:cc(7)=165
+  170 lf(1)=0:lf(2)=1:lf(3)=0:lf(4)=1:lf(5)=0:lf(6)=1:lf(7)=1
+  172 lg(1)=1:lg(2)=0:lg(3)=1:lg(4)=0:lg(5)=1:lg(6)=0:lg(7)=1
+  174 vv(1)=44:vv(2)=44:vv(3)=22:vv(4)=22:vv(5)=00:vv(6)=00:vv(7)=66
+  176 vx(1)=66:vx(2)=44:vx(3)=44:vx(4)=22:vx(5)=22:vx(6)=0:vx(7)=0
+  180 qw(0)=2:qw(1)=1:qw(2)=5:qw(3)=3:qw(4)=7:qw(5)=4:qw(6)=6
+  200 poke 36878,15:poke 36879,8:print"{clr}{wht}{rvon}{rght}{rght}{rght}{rght}music maestro":print"{down}{rght}{rght}{rght}{rght}{cyn}by c. neupert"
+  210 :print"{down}{down}{down}{wht}{rvon}1{rvof} {yel}toene eingeben/edit.":print"{wht}{rvon}2{rvof} {yel}toene spielen"
+  220 print"{down}{wht}{rvon}3{rvof} {yel}toene reservieren":print"{down}{wht}{rvon}4{rvof} {yel}transponieren"
+  230 print"{down}{wht}{rvon}5{rvof} {yel}save":print"{down}{wht}{rvon}6{rvof} {yel}load"
+  240 print"{down}{down}{down}{red}{rght}{rght}{rght}waehlen sie...{wht}"
+  250 get a$:if a$="" or val(a$)<1 or val(a$)> 6 then 250
+  260 gosub 900: print"{clr}{wht}":on val(a$)goto 1000,10000,5000,6000,7000,8000
+  270 stop
+  800 print"{down}fuer diese stimme":print"{down}wurden keine toene":print"{down}reserviert !":print:return
+  900 poke 36876,240:for qr=1to120:next:poke 36876,0:return
+ 1000 poke 36878,15:printchr$(147):poke 36879,8
+ 1010 print"{down}{wht}welche stimme":print:print"   {cyn}[1...3] ?"
+ 1012 get a$:if a$="" or val(a$)<1 or val(a$)>3 then 1012
+ 1013 gosub 900:s=val(a$)-1:if abs(ta(s)-te(s))>15 then 1015
+ 1014 gosub800:goto 1010
+ 1015 print"{clr}{down}{cyn}wollen sie vorzeichen":print"{down}eingeben {wht}[j/n] ?"
+ 1016 get a$:if a$="" or a$<>"j" and a$<>"n"then 1016
+ 1017 if a$="n" then 1041
+ 1018 print"{clr}{down}{wht}0{cyn}{rght}- kein vorzeichen":print"{down}{wht}1 {cyn}- #":print"{down}{wht}2{cyn} - b{yel}"
+ 1019 for i=0 to 6:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}"chr$(ts%(i));" ?"
+ 1020 get a$:if a$="" then 1020
+ 1021 gosub 900:q=val(a$):if q>2 or (q=0 and a$<>"0") then 1020
+ 1022 if q=2 then q=-1
+ 1025 v%(ts%(i)-64)=q:next i
+ 1041 print"{clr}{down}{rght}{rght}{rght}{cyn}schluessel:{wht}":print:print:print:print"1 - violinschluessel":print
+ 1042 print"2 - b-schluessel":print
+ 1043 print"3 - bass-schluessel"
+ 1044 geta$:if a$="" or val(a$)>3 or val(a$)<1 then 1044
+ 1045 sf=val(a$)-1:poke 834,sf:poke 835,0:poke 36869,254
+ 1046 print"{clr}":poke 36869,254:gosub 1800
+ 1050 n=ta(s):sg=36876-s:poke te(s),255:gosub 1610:ok=2:gosub 1950
+ 1090 tf=0
+ 1100 vq=0:get a$:pp=peek(653):if a$="" and pp<> 4 then 1100
+ 1101 ifpp=4thenva=1:pp=0:poke36876,243::poke7826,30:poke38546,5:poke 36876,0:goto 1100
+ 1103 if tf=1 then 1500
+ 1104 if a$<>"" then q=asc(a$):k=q-64:if q>136andq<141then1550
+ 1106 if q>132 and q<137 then ok=q-133:poke 36876,245:gosub 1880:gosub 1950:goto 1100
+ 1107 if q<128 then 1111
+ 1108 ifpeek(653)=1thenq=q-128:k=q-64:ifq>64andq<72thenvq=1:goto 1120
+ 1109 ifpeek(653)=2thengosub1900:if q>64 and q<72 then vq=-1:k=q-64:goto 1120
+ 1110 goto 1100
+ 1111 if a$="="then 10000
+ 1112 if a$="^"then df=1:gosub2000:goto 1100
+ 1113 if a$="_"then df=1:gosub 2100:goto 1100
+ 1114 if a$="p" then l=0:tx=0:goto 1130
+ 1115 if a$="+" then gosub 3000:goto 1100
+ 1116 if a$="-" then gosub 4000: goto 1100
+ 1117 if a$="\" then poke 36869,240:goto 200
+ 1120 ifq<65 or q> 71 then 1150
+ 1121 if va=1 then vb=-v%(k):va=0:goto 1125
+ 1122 vb=0
+ 1125 l=t%(k,ok)+vq+v%(k)+vb:tx=t%(k,ok)
+ 1126 if l<0 or l>31 then poke 36876,245:::::::::poke 36876,0:goto 1100
+ 1127 rem
+ 1130 tf=1:poke 36876,243:poke 7823,29:poke 38543,4:poke 36876,0:sys 6067:goto 1100
+ 1150 if a$="*"then poke 36876,246:poke n,255:poke 36876,0:goto 1522
+ 1160 goto 1100
+ 1500 r=val(a$):if r<1 or r>7 then poke 36876,245::::::::::poke 36876,0:goto 1100
+ 1510 tp=(r-1)*32
+ 1520 poke n,l+tp:goto 1530
+ 1522 poke 36876,245:poke 7825,27:poke 38545,7:gosub 1610:for zx=1 to 2:gosub 900:next
+ 1523 for zx=1 to 1000:next
+ 1524 poke 7825,138
+ 1530 if n<(te(s)-1) then n=n+1:goto 1540
+ 1535 for zx=1 to 9:gosub 900:next:for zx=1 to 1000:next
+ 1540 gosub 1600:tf=0:poke 7823,28:poke 38543,3:poke 7826,138:goto 1100
+ 1550 df=q-136:if df=1 then df=10:gosub 2000:goto 1100
+ 1551 if df=2 then df=50:gosub 2000:goto 1100
+ 1552 if df=3 then df=10:gosub 2100:goto 1100
+ 1553 df=50
+ 1555 gosub 2100:goto 1100
+ 1600 gosub 1610:if a$<>"*" then gosub 1620:return
+ 1610 print"{home}{down}{down}{down}{rght}{rght}{rght}{rght}{wht}{rvon}jjjjjjjj{rvof}{left}{left}{left}{left}{left}{left}{left}{left}"(n-ta(s))-vr;tab(16)"{red}{rvon}jjjjjjjj{rvof}{left}{left}{left}{left}{left}{left}{left}{left}"te(s)-(n-vr)
+ 1612 return
+ 1620 poke 7750,138:poke 7762,138
+ 1630 poke 838,r-1:poke 841,tx:sys 6067:if tx>0 then sys 5640:goto 1640
+ 1635 sys 5490:return
+ 1640 poke sg,peek(7390+l): for qt=1 to 10*(2^(7-r)):next
+ 1650 poke sg,0
+ 1699 return
+ 1800 poke 36879,8:print"{clr}{wht}":gosub 2900:gosub 2400
+ 1805 ad=7947:zz=22:on sf+1 gosub 2500,2600,2700
+ 1810 qz=0: for i=7680+12+10*22 to 7680+12+19*22 step 22
+ 1820 poke i,qz:poke i+1,qz+32:poke i+2,qz+64:qz=qz+1:next i
+ 1830 for i=6144+8*48 to 6144+8*58:poke i,peek(32768+i-6144):next
+ 1840 poke 835,0:sys 6067
+ 1845 for i=1 to 21:poke 7702+i,137:poke 7790+i,137:next
+ 1850 poke 7689,25:poke 7690,26:poke 7747,12:poke 7748,13:poke 7759,14:poke 7760,15
+ 1860 poke 7839,16:poke 7840,17:
+ 1870 poke 7692,49+s:poke 38412,3
+ 1880 poke 7842,49+ok:poke 7842+30720,7:poke 36876,0
+ 1890 return
+ 1900 forqr=1to7:ifq=cc(qr)thenq=qr+64:return
+ 1902 next:return
+ 1950 for i=7857 to 8121 step 22:poke i,138:next
+ 1955 ad=7857+(3-ok)*66:for i=ad to ad+66 step 22
+ 1960 poke i,139:poke i+30720,2:next
+ 1970 return
+ 2000 if n+df>=te(s)then for qt=1 to 9:gosub 900:next: gosub 1610:return
+ 2010 n=n+df:vr=0
+ 2015 z=peek(n):if z=255 then for qt=1 to 3:gosub 900:next:gosub 1610:return
+ 2020 q1=int(z/32):q2=z-q1*32:tx=q2:l=tx:r=q1+1:gosub 1600:return
+ 2100 if n-df<ta(s)then for qt=1 to 9:gosub 900:next:gosub 1610:return
+ 2120 n=n-df:vr=0:goto 2015
+ 2400 restore: for i=1 to 32: read x:next
+ 2420 for i=6240 to 6391:read x:poke i,x:next
+ 2490 return
+ 2500 ad=ad-zz:ifad<7680orad>8185 then return
+ 2510 qz=0:for i=ad to ad+6*zz step zz
+ 2520 poke i,106+qz:poke i+1,106+qz+1:qz=qz+2:next
+ 2530 ad=ad+zz:gosub 2800:return
+ 2600 if ad>8185 or ad<7680 then return
+ 2610 qz=0: for i=ad to ad+4*zz step zz:poke i,127+qz:poke i+1,128+qz:qz=qz+2:next
+ 2620 gosub 2800:return
+ 2700 if ad<7680 or ad>8185 then return
+ 2710 poke ad,120:poke ad+1,121:poke ad+zz,122:poke ad+zz+1,123:poke ad+2*zz+1,124
+ 2720 poke ad+3*zz,125:poke ad+3*zz+1,126:poke ad+2*zz,137:poke ad+4*zz,137
+ 2725 poke ad+ 4*zz+1,137
+ 2730 gosub 2800:return
+ 2800 if ad+120>8185 or ad<7681 then return
+ 2810 for j=0 to 4:for i=ad+2 to ad+13-3*(zz=22):poke i+zz*j,137:next:next
+ 2820 for i=ad-1 to ad +4*zz-1 step zz:poke i,139:pokei+14-3*(zz=22),140:next
+ 2825 if zz<>22 then return
+ 2830 px=ad+2:for i=0 to 6
+ 2840 x=v%(qw(i)):if x=0 then 2880
+ 2850 if x=1then c1=18:c2=20:c3=21:goto2856
+ 2855 c1=19:c2=22:c3=23
+ 2856 if sf=2 then 2875
+ 2857 if sf=1 then 2865
+ 2858 p=px+vv(qw(i)):if lf(qw(i))=1 then poke p,c1:px=px+1:if c1=19 then poke p-22,24
+ 2859 if lf(qw(i))=1 then 2880
+ 2861 poke p,c2:poke p+22,c3:px=px+1:goto 2880
+ 2865 p=px+vx(qw(i)):if lg(qw(i))=1 then poke p,c1:px=px+1:if c1=19 then poke p-22,24
+ 2866 if lg(qw(i))=1 then 2880
+ 2867 poke p,c2:poke p+22,c3:px=px+1:goto 2880
+ 2875 p=px+vv(qw(i))+22:if lf(qw(i))=1 then poke p,c1:px=px+1: if c1=19 then poke p-22,24
+ 2876 if lf(qw(i))=1 then 2880
+ 2877 poke p,c2:poke p+22,c3:px=px+1
+ 2880 next i
+ 2890 return
+ 2900 for i=7680 to 8185:poke i,138:next:return
+ 3000 if n>=te(s)-1 or n<ta(s) then for zx=1 to 9:gosub 900:next: return
+ 3005 poke 36874,130
+ 3010 n1=te(s)-2
+ 3020 poke n1+1,peek(n1)
+ 3030 n1=n1-1:if n1>n then 3020
+ 3040 poke n1,0:poke 36874,0:poke 36876,235:for zx=1 to 500:next: poke 36876,0:return
+ 4000 if n<=ta(s) or n>=te(s) then for zx=1 to 9:gosub 900:next:return
+ 4005 poke 36874,140
+ 4010 n1=n
+ 4020 poke n1-1,peek(n1):n1=n1+1
+ 4030 if n1<te(s) then 4020
+ 4040 poke 36874,0:n=n-1:poke 36876,237:for zx=1 to 900:next:poke 36876,0
+ 4050 return
+ 5000 ub=peek(56)*256-peek(55):ob=24570:fr=ob-ub:af=ub+1
+ 5010 print"{clr}{cyn}{down}{rght}freie toene:";fr-35
+ 5020 for zx=0 to 1:print"{down}{down}{wht}wieviel toene wollen":print"{down}sie fuer stimme ";zx+1
+ 5030 print"{down}reservieren ?":print
+ 5035 input rt(zx)
+ 5040 if rt(zx)+12>frthen print"{down}{down}{down}{red}es sind nur{grn}";fr-15:print"{down}{red}toene frei !{wht}":print:goto 5035
+ 5045 fr=fr-rt(zx)-4:next zx
+ 5050 t1=rt(0):t2=rt(1):t3=fr
+ 5060 ta(0)=af:te(0)=af+t1+1
+ 5080 ta(1)=af+t1+2:te(1)=ta(1)+t2
+ 5100 ta(2)=af+t1+t2+2:te(2)=ta(2)+t3
+ 5110 goto 200
+ 6000 input"stimme";s:if s<1 or s> 3 then 6000
+ 6010 s=s-1:ifabs(ta(s)-te(s))<10 thengosub 800:goto 6000
+ 6020 input"{clr}{down}wieviele halbtoene";dt:if dt<1 or dt>29 then 6020
+ 6030 print"{down}{down}hoeher [1] oder":print"tiefer [2]":print:input sf:if sf<1 or sf>2 then 6030
+ 6040 if sf=2 then sf=-1
+ 6050 for i=ta(s) to te(s)-1:t=int(peek(i)/32):x=peek(i)-32*t:if peek(i)=255then 6100
+ 6055 if x+sf*dt>1 and x+sf*dt<32then x=x+sf*dt:goto 6090
+ 6060 x=x-sf*12:goto 6055
+ 6090 poke i,x+32*t:poke 36876,peek(7390+x):next
+ 6100 poke 36876,0:goto 200
+ 7000 input"{clr}{down}{wht}stimme";s:ifs<1ors>3thenprint:goto7000
+ 7010 s=s-1:ifabs(ta(s)-te(s))<15thengosub800:goto7000
+ 7020 input"{down}{down}{down}von ton # ";t1:print:input"bis ton # ";t2
+ 7030 t1=t1+ta(s):t2=t2+ta(s):if t1>=t2 or(t1<ta(s)ort2>te(s))thenprint:goto7020
+ 7050 fori=0to3:poke i,peek(43+i):next:print"{clr}{wht}pO43,pE(0):pO44,pE(1):pO45,pE(2):pO46,pE(3):run"
+ 7060 aa=int(t1/256):bb=t1-256*aa-1:cc=int(t2/256):dd=t2-256*cc+1
+ 7070 poke 198,2:poke 631,19:poke 632,13:poke 673,aa:poke 674,bb:poke 675,cc:poke 676,dd
+ 7080 poke 44,peek(673):poke 43,peek(674):poke 46,peek(675):poke 45,peek(676):save"",1,1:end
+ 8000 poke 0,peek(45):poke 1,peek(46):print"{clr}{wht}pO45,pE(0):pO46,pE(1):run"
+ 8010 poke 198,2:poke 631,19:poke 632,13:load"",1,1
+10000 gosub 12000
+10040 get a$:if a$="" then 10040
+10050 sys 5120
+10060 get a$:ifa$=""or a$="s" then 10060
+10070 if a$=" "then gosub 13000:gosub12300:goto 10040
+10080 gosub 13000:goto 200
+12000 gosub 13000
+12005 zx=0:print"{clr}{wht}":poke 36869,240:for i=0 to 2
+12006 if abs(ta(i)-te(i))<15then12040
+12008 print:print"{cyn}stimme ";i+1;"{wht}j/n ?"
+12010 get a$:if a$="" then 12010
+12015 gosub 900
+12020 if a$="j" then poke 880+i,1:zx=1:goto 12040
+12030 if a$="n" then poke 880+i,0:goto 12040
+12035 goto 12010
+12040 next i:ifzx=0then200
+12045 zx=0:for i=0 to 2:if peek(880+i)=1 then poke 870+i,0:zx=1
+12046 next:if zx=0then200
+12050 for i=0 to 2: if peek(880+i)=0 then 12090
+12060 print"{clr}{down}{rght}{rght}{rght}{rght}stimme ";i+1;" :":print:print
+12070 print"1 - violinschluessel":print
+12072 print"2 - b-schluessel":print
+12074 print"3 - bass-schluessel"
+12075 get a$:if a$="" or val(a$)<1 or val(a$)>3 then 12075
+12080 q=val(a$)-1:gosub 900:poke 883+i,q
+12090 next i
+12100 rem
+12300 for i=0 to 2:if peek(880+i)=0 then 12330
+12310 h=int(ta(i)/256):l=ta(i)-h*256:poke 860+i,l:poke 863+i,h
+12330 next i
+12340 for i=890 to 916:poke i,0:next
+12350 poke 848,1:poke 849,1:poke 850,1
+12360 print"{clr}{cyn}      {rvon} t e m p o ":print"{wht}{down}{down}{down}{rvon}1{rvof} largo":print
+12361 print"{rvon}2{rvof} larghetto":print"{down}{rvon}3{rvof} adagio":print"{down}{rvon}4{rvof} andante"
+12362 print"{down}{rvon}5{rvof} allegro moderato":print"{down}{rvon}6{rvof} allegro":print"{down}{rvon}7{rvof} presto"
+12363 get a$:if a$="" or val(a$)<1 or val(a$)> 7 then 12363
+12364 gosub 900:poke 877,8:poke 876,35*(8-val(a$)):print"{clr}"
+12400 for i=0 to 2:poke 835,i: sys 6067:next
+12405 poke 36869,254:gosub 2900
+12410 poke 36864,20:poke 36865,20:poke 36866,143:poke 36867,192:poke 36869,254
+12420 zz=15:ad=7711:on peek(883)+1 gosub 2500,2600,2700:goto 12430
+12425 gosub 2500
+12430 zz=15:ad=7861:on peek(884)+1 gosub 2500,2600,2700:goto 12440
+12435 gosub 2500
+12440 zz=15:ad=8026:on peek(885)+1 gosub 2500,2600,2700:goto 12450
+12445 gosub 2500
+12450 qz=0: for i=7686 to 8166 step 15:poke i,qz:poke i+1,qz+32:poke i+2,qz+64
+12460 qz=qz+1: next
+12470 for i=7830 to 7979:poke i+30720,3:next
+12480 for i=7980 to 8184:poke i+30720,2:next
+12490 for i=7705 to 7709:poke i+30720,7:next:for i=7855 to 7859:poke i+30720,5:next
+12495 for i=8020 to 8024:poke i+30720,4:next
+12499 return
+12999 return
+13000 poke 36864,12:poke 36865,38:poke 36866,150:poke 36867,174:poke 36869,240:return
+30000 data 000,251,34,34,34,34,35,0, 000,209,217,85,85,83,211,0
+30010 data 000,247,132,231,133,133,132,0, 000,189,161,189,33,33,189,0
+30020 data 0,244,149,150,149,149,244,0, 0,190,8,8,8,8,137,0
+30030 data 36,126,36,36,255,36,126,36, 32,56,38,34,255,36,56,0
+30040 data 0,0,72,72,255,72,252,72, 72,252,72,72,255,72,0,0
+30050 data 64,64,64,64,255,112,72,68, 72,72,112,112,255,0,0,0
+30060 data 0,0,0,0,255,32,32,32
+30070 data 251,128,128,248,8,8,248,0, 226,128,128,128,128,128,146,0
+30075 data 254,128,128,252,128,128,254,0
+30080 data 60,126,254,255,254,188,128,128, 126,126,64,126,126,64,64,64
+30090 data 128,128,252,132,132,252,4,4
+32000 print"{clr}":poke883,0:poke884,1:poke885,2:gosub 12405:poke36878,15
+32005 fori=0to2:poke835,i:sys6067:next
+32010 x=int(rnd(1)*30)+1:y=int(rnd(1)*6):poke838,y:poke841,x:poke835,0:poke834,0:sys 5640
+32020 poke835,1:poke834,1:sys5640:poke835,2:poke834,2:sys5640
+32030 z=peek(7390+x):poke36876,z:poke36875,z:poke36874,z
+32040 forzx=1to22*y:next
+32050 geta$:ifa$=""then32005
+32060 poke36876,0:poke36875,0:poke36874,0:gosub13000:return
+

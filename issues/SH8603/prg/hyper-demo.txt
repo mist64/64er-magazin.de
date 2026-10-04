@@ -1,0 +1,206 @@
+
+
+;hyper-demo.prg ==1201==
+   10 rem******************************
+   20 rem*     hyper-graphik demo     *
+   30 rem* (c) 1985 by joachim brocke *
+   40 rem* dietrich-bonhoefferstr.-5  *
+   50 rem* 4790 paderborn             *
+   60 rem******************************
+   70 remfestlegung der startadressen der einzelnen routinen
+   80 in=9330:rem'graphic on'
+   90 cl=in+3:rem'graphic clear'
+  100 se=in+6:rem'point set'
+  110 rs=in+9:rem'reset point'
+  120 gs=in+12:rem'gsave'
+  130 gl=in+15:rem'gload'
+  140 of=in+18:rem'graphic off'
+  150 remmenue
+  160 print"{clr}hyper-graphics demo "
+  170 print"{down}bitte waehlen:"
+  180 print"{down}3d-effekt-bild (-1-)"
+  190 print"{down}sinuskurve     (-2-)"
+  200 print"{down}rechtecke      (-3-)"
+  210 print"{down}text + graphik (-4-)"
+  220 getx$
+  230 ifval(x$)<1orval(x$)>4then220
+  240 remwahl der farben
+  250 print"{down}nach dem plotten      taste druecken"
+  260 input"rahmenfarbe";rf
+  270 ifrf<0orrf>7thenprint"fehler!":goto260
+  280 input"hintergrundfarbe";hf
+  290 ifhf<0orhf>15thenprint"fehler!":goto280
+  300 input"punktfarbe";pf
+  310 ifpf<0orpf>7orpf=hfthenprint"fehler!":goto300
+  320 poke646,pf:remzeichenfarbe im text-modus festlegen
+  330 poke36879,8+rf+16*hf:remrahmen- und hintergrundfarbe setzen
+  340 remverzweigeningewaehltesunterprogramm:
+  350 onval(x$)gosub1200,400,470,1310:
+  360 poke198,0:wait198,1:remauf taste warten
+  370 sysof:remgraphik ausschalten
+  380 run:remneustart
+  390 rem*** die unterprogramme ***
+  400 remsinuskurve
+  410 sysin:syscl
+  420 x=-1:fori=-~to~step2*~/208
+  430 x=x+1:y=sin(i)
+  440 sysse,x,y*127+127,pf
+  450 nexti
+  460 return
+  470 remrechtecke
+  480 sysin:syscl
+  490 fori=16to208-16
+  500 sysse,i,16,pf
+  510 sysse,i,255-16,pf
+  520 next
+  530 fori=31to208-31
+  540 sysse,i,31,pf
+  550 sysse,i,255-31,pf
+  560 next
+  570 fori=16to255-16
+  580 sysse,16,i,pf
+  590 sysse,208-16,i,pf
+  600 next
+  610 fori=31to255-31
+  620 sysse,31,i,pf
+  630 sysse,208-31,i,pf
+  640 next
+  650 fori=64to208-64
+  660 sysse,i,64,pf
+  670 sysse,i,255-64,pf
+  680 next
+  690 fori=71to208-71
+  700 sysse,i,71,pf
+  710 sysse,i,255-71,pf
+  720 next
+  730 fori=86to255-86
+  740 sysse,86,i,pf
+  750 sysse,208-86,i,pf
+  760 next
+  770 fori=90to255-90
+  780 sysse,90,i,pf
+  790 sysse,208-90,i,pf
+  800 next
+  810 fori=86to208-86
+  820 sysse,i,86,pf
+  830 sysse,i,255-86,pf
+  840 next
+  850 fori=90to208-90
+  860 sysse,i,90,pf
+  870 sysse,i,255-90,pf
+  880 next
+  890 fori=64to255-64
+  900 sysse,64,i,pf
+  910 sysse,208-64,i,pf
+  920 next
+  930 fori=71to255-71
+  940 sysse,71,i,pf
+  950 sysse,208-71,i,pf
+  960 next
+  970 fori=100to208-100
+  980 sysse,i,100,pf
+  990 sysse,i,255-100,pf
+ 1000 next
+ 1010 fori=102to208-102
+ 1020 sysse,i,102,pf
+ 1030 sysse,i,255-102,pf
+ 1040 next
+ 1050 fori=100to255-100
+ 1060 sysse,100,i,pf
+ 1070 sysse,208-100,i,pf
+ 1080 next
+ 1090 fori=102to255-102
+ 1100 sysse,102,i,pf
+ 1110 sysse,208-102,i,pf
+ 1120 next
+ 1130 x=-1:fori=1to102
+ 1140 y=i
+ 1150 sysse,i,y,pf
+ 1160 sysse,208-i,y,pf
+ 1170 sysse,i,255-y,pf
+ 1180 sysse,208-i,255-y,pf
+ 1190 nexti:return
+ 1200 rem3-effekt-bild
+ 1210 sysin:syscl
+ 1220 deffna(z)=90*exp(-z*z/1500)
+ 1230 g=100:k=50:forx=-103to0:l=-50:h=5*int(sqr(10816-x*x)/5)
+ 1240 fory=hto-hstep-5:z=25+fna(sqr(x*x+y*y))-.6*y
+ 1250 x1=g+x:y1=256-z-k:x2=g-x
+ 1260 ifz>lthenl=z:sysse,x1+3,y1,6:sysse,x2+3,y1,6
+ 1270 nexty,x
+ 1280 return
+ 1290 sysof:poke36879,27:print"{blu}
+ 1300 return
+ 1310 remtext+graphik
+ 1320 input"{clr}ascii-text   oktaeder{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";te$
+ 1330 iflen(te$)>16orte$=""then1320
+ 1340 syscl:sysin
+ 1350 remascii-text (a-z und space bis ?)in punkte wandeln
+ 1360 fori=1tolen(te$)
+ 1370 a=asc(mid$(te$,i,1)):ifa>63thena=a-64
+ 1380 x=i*8:remstartkoordinate des textes (x-richtung)
+ 1390 ad=32768+a*8:remadresse des zeichens im charactergenerator
+ 1400 forj=0to7
+ 1410 a=peek(ad+j):remeines der 8 bytes des zeichens holen
+ 1420 fork=0to7
+ 1430 p=aand2^(7-k):remeines der 8 bits pro zeile des zeichens isolieren
+ 1440 ifpthensysse,x+k,2*j+16,pf:rembit gesetzt?dann punkt setzen
+ 1450 ifpthensysse,x+k,2*j+17,pf:rembit gesetzt?dann punkt setzen
+ 1460 nextk,j,i
+ 1470 sysin:gosub1490:remoktaeder zeichnen
+ 1480 return
+ 1490 remoktaeder
+ 1500 forx=66to133
+ 1510 sysse,x+30,127,pf
+ 1520 sysse,x+30,128,pf
+ 1530 sysse,(xand252)+68,127-18,pf
+ 1540 nextx
+ 1550 y=127:forx=67to101
+ 1560 sysse,(x+30)and254,y,pf
+ 1570 sysse,x+97,y,pf
+ 1580 sysse,x+96,y,pf
+ 1590 y=y-.5
+ 1600 nextx
+ 1610 remsysse,118,118,1
+ 1620 y=128:forx=66to118
+ 1630 sysse,x+30,y,pf
+ 1640 sysse,x+30,y+1,pf
+ 1650 sysse,x+30,256-y,pf
+ 1660 sysse,x+30,255-y,pf
+ 1670 y=y+1.5
+ 1680 nextx
+ 1690 y=110:forx=102to118
+ 1700 sysse,x+30,y,pf
+ 1710 y=y+6
+ 1720 nextx
+ 1730 y=207:forx=118to133
+ 1740 sysse,x+30,y-1,pf
+ 1750 sysse,x+30,y-4,pf
+ 1760 sysse,x+30,y-2,pf
+ 1770 sysse,x+30,y-3,pf
+ 1780 sysse,x+30,y-5,pf
+ 1790 y=y-5
+ 1800 nextx
+ 1810 y=206:forx=118to169
+ 1820 sysse,x+30,y,pf
+ 1830 sysse,x+30,y-1,pf
+ 1840 y=y-1.9
+ 1850 nextx
+ 1860 y=110:forx=102to118
+ 1870 sysse,x+30,y,pf
+ 1880 y=y-3.8
+ 1890 nextx
+ 1900 y=49:forx=148to164
+ 1910 sysse,x,y,pf
+ 1920 sysse,x,y+1,pf
+ 1930 sysse,x,y+2,pf
+ 1940 sysse,x,y+3,pf
+ 1950 sysse,x,y+4,pf
+ 1960 y=y+4.8
+ 1970 nextx
+ 1980 y=49:forx=148to200
+ 1990 sysse,x,y,pf
+ 2000 y=y+1.15
+ 2010 nextx
+ 2020 return
+

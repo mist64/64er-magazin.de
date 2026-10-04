@@ -1,0 +1,116 @@
+;p++z.prg ==0801==
+;version=3
+    1 rem"@p++z":rem  6.10.85  psz=2586
+    3 rem  **************
+    4 rem  * h.wissmann *
+    5 rem  * 02822 4922 *
+    6 rem  *  30.11.83  *
+    7 rem  **************
+   19 goto190
+   24 close15:open15,8,15
+   25 input#15,en,em$,et,es:ifen<2thenreturn
+   27 ifen=64thenq$="{down}  ist kein seq.file {flon}!{flof}{down}":return
+   28 ifen=62thenq$="{down}  gibt es nicht {flon}!{flof}{down}":return
+   29 print"{down} "em$" {rvon}{flon}error{flof}{rvof}":close15:end
+  190 gosub24
+  193 s2$="****************************************"
+  194 s1$="{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  195 gf$=chr$(34)
+  200 print"{clr}{dblu}**      seq.files lesen/aendern       **{down}{down}  file name{down}"
+  210 n1$="":inputn1$:ifn1$=""then9720
+  220 n3$="{rvon}"+n1$+"{rvof}"
+  230 print"{down}  bestand ";n3$
+  240 :
+  250 rem ** rec.zaehlen
+  260 open2,8,3,n1$+",s,r"
+  270 q$="":gosub25:ifq$<>""thenclose2:printq$:getkeyq$:goto200
+  280 i=1
+  290 input#2,q$
+  300 ifst=64then330
+  310 ifst<>0then25
+  320 i=i+1:goto290
+  330 close2
+  340 gs=i:dima$(i)
+  350 ifgs>30then print gs;" variable, einen moment bitte{down}"
+  360 :
+  370 rem **   rec.lesen
+  380 open2,8,3,n1$+",s,r"
+  390 q$="":gosub25:ifq$<>""thenclose2:printq$:getkeyq$:goto200
+  400 i=1
+  410 input#2,a$(i)
+  420 ifst=64then450
+  430 ifst<>0then25
+  440 i=i+1:goto410
+  450 close2
+  460 :
+ 1000 print"{clr}      dateiinfo ";n3$;" ";gs;"variable{down}"
+ 1010 prints1$" bitte gewuenschte lfd.nummer eingeben"
+ 1020 print" oder 0=neuer file, c=copy, e=ende"
+ 1030 print"      a=alle variablen listen":prints1$"{down}"
+ 1040 q$="":input"{up} welche nr: ";q$
+ 1050 ifq$="a"then1150
+ 1060 ifq$="0"orq$="e"then9700
+ 1070 ifq$="c"then5030
+ 1080 q%=val(q$):ifq%<1orq%>gsthen1040
+ 1090 print"{down}{down}";s2$;"{down} ";gf$;a$(q%);gf$:print"{down}";s2$;"{down} a=aendern  l=loeschen"
+ 1100 getkeyq$:ifq$="a"then1240
+ 1110 ifq$="l"then1290
+ 1120 goto1000
+ 1130 :
+ 1140 rem ** datei listen
+ 1150 print"{clr}   "n3$"{down}"
+ 1160 forl=1togs
+ 1170 ifpeek(205)<23then1190
+ 1180 printn3$;"weiter nach return";:getkeyq$:print"{clr}";n3$:ifq$="e"then1000
+ 1190 printusing"### ";l;
+ 1200 print"= ";gf$;a$(l);gf$;"{down}"
+ 1210 next
+ 1220 getkeyq$:goto1000
+ 1230 :
+ 1240 rem ** aendern  a$(q%)
+ 1250 print"{up}"chr$(27)"qneuer inhalt:"
+ 1260 inputa$(q%)
+ 1270 kt=99
+ 1280 goto1000
+ 1290 rem ** loeschen
+ 1300 a$(q%)=""
+ 1310 kt=99
+ 1320 goto1000
+ 1330 :
+ 5000 print"{clr}{down} > aenderung abspeichern{down}{down}":input" ja/nein";x$
+ 5010 ifx$="nein"then9710:else ifx$<>"ja"then5000
+ 5030 print"{clr}  datei speichern"
+ 5040 print"{down}{down} bitte gewuenschte zieldiskette einlegen und {rvon}return{rvof}  (z=zurueck)"
+ 5050 getkeyq$:ifq$="z"then1000
+ 5060 print"{down} unter welchem namen soll die datei      gespeichert werden {down}"
+ 5070 print"  "n1$:input"{up}";n2$:ifn2$=""then1000
+ 5080 iflen(n2$)>15thenn2$=left$(n2$,15)
+ 5090 print"{up}  {rvon}";n2$;"{rvof}{down}{down}"
+ 5100 open5,8,2,n2$+",s,r"
+ 5120 input#15,en,em$,et,es
+ 5130 close5:ifen=62then5400
+ 5140 ifen<>0then29
+ 5300 print"{clr}{down} die alte datei "n3$:print"{down} wird nun {rvon}'uthelp'{rvof}.{down}"
+ 5310 print" danach wird '"n2$"' neu angelegt."
+ 5320 print#15,"s:uthelp"
+ 5330 gosub24:print"  {rvon}s-ok{rvof}"
+ 5350 print#15,"r:uthelp=";n1$
+ 5360 gosub24:print"  {rvon}r-ok{rvof}"
+ 5380 :
+ 5400 kt=0
+ 5410 open1,8,2,n2$+",s,w"
+ 5420 gosub25:print"  {rvon}saving{rvof} "n2$
+ 5430 forl=1togs
+ 5440 ifa$(l)=""then5470
+ 5450 print#1,a$(l)
+ 5460 gosub25
+ 5470 next
+ 5480 close1:goto1000
+ 5620 :
+ 9700 ifkt=99thengoto5000
+ 9710 ifq$="0"thenclr:goto190
+ 9720 gosub25:close15
+ 9730 forl=1to30:print:next
+ 9740 print"ende"
+ 9750 end
+

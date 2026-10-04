@@ -1,0 +1,289 @@
+;matrix-editor.prg ==0801==
+;version=3
+   10 print"{clr}";
+   20 char1,6,2,"{rvon}{flof}bitte warten !!!!!!"
+   30 poke56,62:poke55,223:clr
+   40 trap 2570
+   50 printchr$(8)
+   60 za=4096:e$=chr$(27)
+   70 fort=1to8:keyt,chr$(t+34):next
+   80 ifpeek(44)=20then140
+   90 fort=16096to16381
+  100 readd$:d=dec(d$):s=s+d
+  110 poket,d:next
+  120 ifs<>35182thenprint"{clr}{flon}pruefsummenfehler !!{flof}":end
+  130 sys 16278:run
+  140 w=0:x1=0
+  150 poke16174,109:poke16271,64:sys16128
+  160 color 0,2,6:color 4,5,3:print"{clr}{pur}{rvon}";
+  170 fort=1to40:print"     ";:next
+  180 char 1,5,2,"{wht}  m a t r i x    e d i t o r  "
+  190 char 1,10,4,"{blk}(c) 1985 by c. sauer{rvof}"
+  200 sys 16096
+  210 char1,0,14,"darstellung:"
+  220 char1,0,16,"{rvon}f1{rvof}   : standard   zeichensatz"
+  230 print:print"{rvon}{flon}f2{flof}{rvof}   : umdefinierter zeichensatz"
+  240 print"{rvon}f3{rvof}   : zeichen zur bearbeitung laden"
+  250 char1,0,21,"{rvon}clear{rvof}":print:print"{rvon}home {rvof}: zeichensatz initialisieren"
+  260 x=sx:y=sy
+  270 gosub2670
+  280 ifa$="%"thenfa=1:sys16122:goto1590
+  290 ifa$="{clr}"then320
+  300 ifa$=chr$(13)thenc=w:poke2368+x1,113:sx=x:sy=y:goto370
+  310 goto270
+  320 color 0,7,1:color 1,7,1
+  330 char1,0,21,"{wht}clear"
+  340 char1,0,22,"home : {rvon}{flon}     sind sie sicher ?     {rvof}{flof}"
+  350 getkeya$:ifa$="j"thensys16349
+  360 goto160
+  370 gosub2850:poke65298,196
+  380 fort=0to7
+  390 be(t)=peek(za+t+c*8)
+  400 bn=be(t):gosub950
+  410 next
+  420 color 0,2,6:color 4,4,5:print"{clr}";
+  430 print"{wht}{rght}{rght}{rght}{rght}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+  440 print"{rght}{rght}{rght}{rght}{CBM-+}{grn}76543210{wht}{CBM-+}"
+  450 fort=1to8
+  460 print""t"{left}. {CBM-+}{blk}";bo$(t-1);"{wht}{CBM-+} ";be(t-1)
+  470 next
+  480 print"{rght}{rght}{rght}{rght}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+  490 char 1,22,6,"{rvon}{dblu}standard zeichen"
+  500 char 1,21,11,"{rvon}selbstdef. zeichen"
+  510 poke16271,106:poke16174,123:sys 16128:rem rasterinterrupt
+  520 poke2398,60:poke3422,c
+  530 poke2598,60:poke3622,c
+  540 char 1,21,11,"{rvon}selbstdef. zeichen"
+  550 printe$"m"
+  560 char 1,0,17,"{blu}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+  570 print"{SHIFT--}    f u n k t i o n s t a s t e n     {SHIFT--}"
+  580 print"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+  590 print"{SHIFT--}{rvon}f1{rvof}: punkt setzen   {SHIFT--}{rvon}f4{rvof}: darstellung   {SHIFT--}"
+  600 print"{SHIFT--}{rvon}f2{rvof}: punkt loeschen {SHIFT--}{rvon}f5{rvof}: ende          {SHIFT--}"
+  610 print"{SHIFT--}{rvon}f3{rvof}: kopieren       {SHIFT--}{rvon}f6{rvof}: z.satz  laden {SHIFT--}"
+  620 print"{SHIFT--}{rvon}he{rvof}: hilfschirm     {SHIFT--}{rvon}f7{rvof}: zs. speichern {SHIFT--}"
+  630 print"J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K";
+  640 p=2:d=1
+  650 geta$:ifa$=""then650
+  660 ifa$=chr$(27)then150
+  670 ifa$="&"then1990
+  680 ifa$="'"then2110
+  690 ifa$="#"thenp=1:goto820
+  700 ifa$="$"thenp=0:goto820
+  710 ifa$="%"then1110
+  720 ifa$="{clr}"thenfort=0to7:gosub2850:pokeza+c*8+t,0:next:goto380
+  730 ifa$="{inst}"thenfort=0to7:gosub2850:pokeza+c*8+t,255:next:goto380
+  740 ifa$="("then1580
+  750 ifa$=")"then1720
+  760 ifa$="*"then1370
+  770 fa=0
+  780 gosub2800
+  790 iffa=0then820
+  800 if a$="{home}"thenx=0:y=0:goto820
+  810 goto650
+  820 ifd=1thend=0:x=0:y=0:ax=0:ay=0:z=peek(3157)
+  830 ifx>7thenx=0:y=y+40
+  840 ifx<0thenx=7:y=y-40
+  850 ify>280theny=0
+  860 ify<0theny=280
+  870 poke3157+ax+ay,z
+  880 z=peek(3157+x+y)
+  890 ifz=81thenpoke3157+x+y,209:goto910
+  900 poke3157+x+y,190
+  910 ax=x:ay=y
+  920 ifp=0thengosub1020:x=x-1:z=32:goto820
+  930 ifp=1thengosub1020:x=x+1:z=81:goto820
+  940 goto650
+  950 bo$(t)=""
+  960 forb=1to8
+  970 bn=bn/2
+  980 if bn=int(bn)thenbo$(t)=" "+bo$(t):elsebo$(t)="Q"+bo$(t)
+  990 bn=int(bn)
+ 1000 next
+ 1010 return
+ 1020 t=y/40
+ 1030 on p+1goto1040,1050
+ 1040 be(t)=be(t)and255-2^(7-x):goto1060
+ 1050 be(t)=be(t)or2^(7-x)
+ 1060 bn=be(t):gosub950
+ 1070 char 1,0,t+2,"":p=2
+ 1080 print"{wht}"t+1"{left}.{rght}{CBM-+}{blk}"bo$(t)"{wht}{CBM-+}      {left}{left}{left}{left}{left}"be(t)
+ 1090 pokeza+c*8+t,be(t)
+ 1100 return
+ 1110 poke16174,109:poke16271,64:sys16128
+ 1120 color 0,7,5:color 4,13,2:print"{clr}{pur}{rvon}";
+ 1130 print"{wht}{rvon}    z e i c h e n     k o p i e r e n   {rvof}"
+ 1140 sys16096
+ 1150 char1,0,14,"kopieren von:"
+ 1160 char1,0,16,"{rvon}f1{rvof}   : standard   zeichensatz"
+ 1170 print:print"{rvon}{flon}f2{flof}{rvof}   : umdefinierter zeichensatz"
+ 1180 print"{rvon}f3{rvof}   :"
+ 1190 fl=2:zs=0
+ 1200 gosub2670
+ 1210 iffl=1thenchar1,0,18,"{rvon}f3{rvof}   : umschaltung gross/klein"
+ 1220 iffl=2thenchar1,0,18,"{rvon}f3{rvof}":fort=1to35:print" ";:next
+ 1230 ifa$=chr$(13)thenpoke2368+x1,113:gosub2850:goto1280
+ 1240 ifa$=chr$(27)then420
+ 1250 ifa$="%"andfl=1andzs=0thenprintchr$(14):zs=4:goto1200:else1200
+ 1260 ifa$="%"andfl=1andzs=4thenprintchr$(142):zs=0
+ 1270 goto1200
+ 1280 iffl=1thenad=208+zs:goto1300
+ 1290 ad=za/256
+ 1300 w1=w*8:c1=c*8:w2=int(w1/256):c2=int(c1/256)
+ 1310 w1=w1-w2*256:poke16115,ad+w2
+ 1320 c1=c1-c2*256:poke16118,za/256+c2
+ 1330 poke16114,w1:poke16117,c1
+ 1340 sys16111:printchr$(142)
+ 1350 goto380
+ 1360 print"{clr}{dblu} {rght}{rght}{rght}{rght}zeichensatz:":ff=6
+ 1370 sys16122
+ 1380 print"{clr}{rvon}     h  i  l  f  s  s  c  h  i  r  m    "
+ 1390 print"{down}{down}   NM
+ 1400 print"   {CBM-M}{CBM-G}             {rvon}e{rvof}
+ 1410 print" N{CBM-@}UI{CBM-@}M                     U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I
+ 1420 print" M{CBM-T}JK{CBM-T}N  oder   {rvon}s{rvof}  {rvon}d{rvof}  oder  {SHIFT--}  "s$"  {SHIFT--}
+ 1430 print"   {CBM-M}{CBM-G}                       J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K
+ 1440 print"   MN            {rvon}x{rvof}
+ 1450 print"{down}{down}{rvon}esc{rvof}: ruecksprung in eine hoehere ebene"
+ 1460 print"{down}{rvon}clear{rvof} {rvon}shift{rvof}: zeichen(satz) loeschen"
+ 1470 print"{rvon}home {rvof}      : cursor in linke obere ecke"
+ 1480 print"{down}{rvon}ins{rvof}: zeichen fuellen"
+ 1490 print"{down}{rvon}f3{rvof}: ein gewaehltes zeichen wird kopiert"
+ 1500 print"{rvon}f4{rvof}: schreibmodus (ausprobieren des zs.)"
+ 1510 print"{rvon}f5{rvof}: beenden des programms"
+ 1520 print"{rvon}f6{rvof}: zeichensatz von band oder disk laden"
+ 1530 print"{rvon}f7{rvof}: zeichensatz abspeichern"
+ 1540 print"{down}           {rvon}zurueck mit {flon}esc{flof}{rvof}";
+ 1550 getkeya$
+ 1560 ifa$<>chr$(27)then1550
+ 1570 goto420
+ 1580 sys16122
+ 1590 print"{clr}{rvon}   z e i c h e n s a t z    l a d e n   "
+ 1600 print"{down}{down}{down}{rvon}{flon}b{flof}and oder {flon}f{flof}loppy ?{rvof}  ";
+ 1610 getkeya$
+ 1620 if a$="b"thengn=1:print"band":goto1650
+ 1630 if a$="f"thengn=8:print"floppy":goto1650
+ 1640 if a$=chr$(27)then420:else1610
+ 1650 gosub 1830
+ 1660 print"{down}{down}{rvon}{flon}sind sie sicher ?{flof}{rvof}"
+ 1670 getkey a$:ifa$<>"j"then420
+ 1680 load f$,gn,1
+ 1690 gosub1930
+ 1700 iffa=1thenfa=0:goto150
+ 1710 goto420
+ 1720 sys16122
+ 1730 print"{clr}{rvon}z e i c h e n s a t z  s p e i c h e r n"
+ 1740 print"{down}{down}{down}{rvon}{flon}b{flof}and oder {flon}f{flof}loppy ?{rvof}  ";
+ 1750 getkeya$
+ 1760 if a$="b"thengn=1:print"band":goto1790
+ 1770 if a$="f"thengn=8:print"floppy":goto1790
+ 1780 if a$=chr$(27)then420else1750
+ 1790 gosub1830
+ 1800 poke157,0:poke158,20:poke178,0:poke179,16:sys61857
+ 1810 gosub1930
+ 1820 ifff=1thenreturn:elsegoto420
+ 1830 ifgn=1theninput"{down}{down}{rvon}filename{rvof}";f$:goto1860
+ 1840 input"{down}{down}{rvon}filename{rvof} (?=dir) ";f$
+ 1850 iff$="?"thenprint"{clr}":directory:goto1830
+ 1860 iflen(a$)>16thenf$=left$(f$,16)
+ 1870 poke174,gn:poke171,len(f$)
+ 1880 fort=1tolen(f$)
+ 1890 poke1630+t,asc(mid$(f$,t,1))
+ 1900 next
+ 1910 poke175,95:poke176,6
+ 1920 return
+ 1930 if gn<>8thenreturn
+ 1940 if ds=0thenreturn
+ 1950 print"{down}{down}{flon}floppyfehler:{flof} "ds$
+ 1960 print"{down}{rvon}weiter mit taste{rvof}"
+ 1970 getkey a$
+ 1980 return
+ 1990 print"{clr}{rvon}   d a r s t e l l u n g s m o d u s    "
+ 2000 for t=4to35:char1,t,5,"{SHIFT-*}":next
+ 2010 for t=6to19:char1,4,t,"{SHIFT--}                              {SHIFT--}":next
+ 2020 for t=4to35:char1,t,20,"{SHIFT-*}":next
+ 2030 char1,4,5,"U":char1,35,5,"I"
+ 2040 char1,4,20,"J":char1,35,20,"K"
+ 2050 char1,10,23,"ende mit {rvon}return{rvof}"
+ 2060 poke2021,19:poke2022,6:poke2023,5:poke2024,34
+ 2070 sys16122:poke65298,peek(65298)and251
+ 2080 open1,0:print"{home}";
+ 2090 input#1,a$
+ 2100 print"{home}{home}":close1:goto420
+ 2110 print"{clr}{rvon}            e   n   d   e               ":ff=0
+ 2120 print"{down}{down}{down}wollen sie den zeichens. absaven ? ";
+ 2130 getkeya$
+ 2140 if a$=chr$(27)then420
+ 2150 if a$="j"thenprint"ja":ff=1:gosub1720
+ 2160 if a$<>"n"then2130
+ 2170 poke65298,peek(65298)or4:sys16122
+ 2180 color 0,7,5:color 4,13,2
+ 2190 printe$"l{clr}{blk}"
+ 2200 end
+ 2210 data a2,7f,8a,9d,40,0d,a9,0a
+ 2220 data 9d,40,09,ca,10,f4,60,a2
+ 2230 data 07,bd,34,12,9d,00,10,ca
+ 2240 data 10,f7,78,20,ce,f2,58,60
+ 2250 data 78,a9,0d,8d,14,03,a9,3f
+ 2260 data 8d,15,03,58,60,ad,09,ff
+ 2270 data 29,02,f0,3d,ad,1c,ff,29
+ 2280 data 01,d0,2c,ad,1d,ff,c9,91
+ 2290 data b0,19,a9,c0,8d,12,ff,8d
+ 2300 data 19,ff,ad,1d,ff,c9,93,90
+ 2310 data f9,a9,c4,8d,12,ff,8d,19
+ 2320 data ff,d0,0c,c9,b1,90,08,a9
+ 2330 data c0,8d,12,ff,8d,19,ff,ad
+ 2340 data 09,ff,29,02,f0,03,20,60
+ 2350 data ce,2c,d8,07,10,0e,ad,01
+ 2360 data fd,8d,d4,07,10,06,20,95
+ 2370 data ea,20,5b,ea,20,e4,e3,ad
+ 2380 data 09,ff,29,02,f0,25,8d,09
+ 2390 data ff,2c,0b,ff,a9,c3,50,18
+ 2400 data 20,bf,cf,20,cd,ce,a5,fb
+ 2410 data 48,a9,00,85,fb,08,58,20
+ 2420 data 11,db,28,68,85,fa,a9,62
+ 2430 data 8d,0b,ff,4c,be,fc,a6,2d
+ 2440 data 86,5a,a4,2e,84,5b,20,d0
+ 2450 data 3f,86,58,86,2d,84,59,84
+ 2460 data 2e,a6,2b,86,5f,a4,2c,84
+ 2470 data 60,20,d0,3f,86,2b,86,a6
+ 2480 data 84,2c,84,a7,20,c0,88,20
+ 2490 data 18,88,a5,a6,d0,02,c6,a7
+ 2500 data c6,a6,a9,00,a8,91,a6,60
+ 2510 data 84,a8,18,8a,69,00,aa,a5
+ 2520 data a8,69,04,a8,60,a9,00,85
+ 2530 data a6,85,a8,a9,d0,85,a7,a9
+ 2540 data 10,85,a9,a2,04,a0,00,b1
+ 2550 data a6,91,a8,c8,d0,f9,e6,a7
+ 2560 data e6,a9,ca,d0,f0,60
+ 2570 if er=4thenresumenext
+ 2580 if er=35then2110
+ 2590 if er=30then2110
+ 2600 if er=5thenprint"{down}{down}{flon}floppy einschalten !!!":fort=1to1000:next:resume1700
+ 2610 printerr$(er)" in "el
+ 2620 goto 2110
+ 2630 x=sx:y=sy
+ 2640 poke2368+x1,10
+ 2650 poke2368+w,241:x1=w
+ 2660 return
+ 2670 poke2368+x1,10
+ 2680 poke2368+w,241:x1=w
+ 2690 getkeya$
+ 2700 gosub2800
+ 2710 ifx>40thenx=0:y=y+40
+ 2720 ifx<0thenx=40:y=y-40
+ 2730 ify>120theny=120
+ 2740 ify<0theny=0
+ 2750 w=y+x
+ 2760 if w>127thenw=127
+ 2770 ifa$="#"thensys16122:char1,0,16,"{rvon}{flon}f1{flof}{rvof}":print:print"{rvon}f2{rvof}":fl=1
+ 2780 ifa$="$"thensys16128:char1,0,16,"{rvon}f1{rvof}":print:print"{rvon}{flon}f2{flof}{rvof}":fl=2
+ 2790 return
+ 2800 ifa$="{down}"ora$="x"theny=y+40:return
+ 2810 ifa$="{rght}"ora$="d"thenx=x+1:return
+ 2820 ifa$="{up}"ora$="e"theny=y-40:return
+ 2830 ifa$="{left}"ora$="s"thenx=x-1:return
+ 2840 fa=0:return
+ 2850 char1,32,4,"{rvon}{flon}working{rvof}{flof}"
+ 2860 return
+

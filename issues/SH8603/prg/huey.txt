@@ -1,0 +1,366 @@
+;huey.prg ==0801==
+;version=3
+   10 rem *************
+   20 rem * huey c-16 *
+   30 rem *  1986 by  *
+   40 rem *d. kuhlmann*
+   60 rem *************
+   80 poke55,255:poke56,55:clr
+  100 rem ***** variablen *****
+  110 n$(1)="{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}RRRRRRR{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}EEEEEEE{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+  120 n$(2)="FFFFFFFFFFFF{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}DDDDDDDDDDDD"
+  130 n$(3)="{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  140 n$(4)="DDDDDDDDDDDD{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}FFFFFFFFFFFF"
+  150 n$(5)="{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}EEEEEEE{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}FFFFFFF{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}"
+  160 r$(1)="-----":r$(2)="captain"
+  170 r$(3)="lieutnant":r$(4)="commander"
+  180 r$(5)="general":r$(6)="{rvon} rambo "
+  190 v=65280:al=0:ro=0:rf=0:sp=0:rf=0
+  200 a=0:ko=0:p=0:km=0:aa=200:ra=10
+  210 rp=800:fu=7000:n=3:x1=0:y1=0:xa=0
+  220 ya=0:fl=0:g=0:am=aa:rc=ra:ro=0
+  230 r(1)=0:r(2)=0:r(3)=0:r(4)=0:sc=0
+  240 e=0
+  250 rem ***** titel *****
+  260 s$="":pokev+18,196:pokev+19,208
+  270 color0,1:color4,1:color1,2:scnclr
+  280 char1,1,2,"ks-software schweinfurt praesentiert :"
+  290 char1,2,5,"{CBM-I} {CBM-I}  {CBM-I} {CBM-I}  {CBM-I}{CBM-I}{CBM-I}  {CBM-I} {CBM-I}   {CBM-I}{CBM-I}{CBM-I}      {CBM-I} {CBM-I}{CBM-I}{CBM-I}"
+  300 char1,2,6,"{CBM-I} {CBM-I}  {CBM-I} {CBM-I}  {CBM-I}    {CBM-I} {CBM-I}   {CBM-I}        {CBM-I} {CBM-I}"
+  310 char1,2,7,"{CBM-I}{CBM-I}{CBM-I}  {CBM-I} {CBM-I}  {CBM-I}{CBM-I}   {CBM-I}{CBM-I}{CBM-I}   {CBM-I}   {$a0}{CBM-I}{CBM-I}  {CBM-I} {CBM-I}{CBM-I}{CBM-I}"
+  320 char1,2,8,"{CBM-I} {CBM-I}  {CBM-I} {CBM-I}  {CBM-I}     {CBM-I}    {CBM-I}        {CBM-I} {CBM-I} {CBM-I}"
+  330 char1,2,9,"{CBM-I} {CBM-I}  {CBM-I}{CBM-I}{CBM-I}  {CBM-I}{CBM-I}{CBM-I}   {CBM-I}    {CBM-I}{CBM-I}{CBM-I}      {CBM-I} {CBM-I}{CBM-I}{CBM-I}"
+  340 char1,4,13,"written 1986 by d. kuhlmann (c)"
+  350 char1,0,18,"bitte geben sie ihren namen ein:"
+  360 getkeya$:a=asc(a$):ifa=13goto440
+  370 l=len(s$):ifl>7goto440
+  380 ifa=20goto410
+  390 ifa<32ora>90goto360
+  400 printa$;:s$=s$+a$:goto360
+  410 ifl<1then360
+  420 s$=left$(s$,l-1):print"{left} {left}";:goto360
+  430 :
+  440 iflen(s$)<8thens$=s$+" ":goto440
+  450 char1,0,20,"bitte level (1 bis 6) eingeben !"
+  460 getkeya$:a=val(a$)
+  470 ifa<1ora>6then460
+  480 l=a*2:kf=l*200:scnclr
+  490 rem ***** zeichensatz *****
+  500 restore
+  510 pokev+18,peek(v+18)and251
+  520 pokev+19,peek(v+19)or56
+  530 fori=832to849:reada:pokei,a:next:sys832
+  540 poke836,210:poke839,58
+  550 poke842,211:poke845,59:sys832
+  560 data162,  0,189,  0,208,157,  0, 56
+  570 data189,  0,209,157,  0, 57,202,208
+  580 data241, 96
+  590 rem ***** neue zeichen *****
+  600 fori=14600to14703:readq:pokei,q:next
+  610 data  0,  0,126,126,126,  0,  0,  0
+  620 data  0,  0,  0, 16, 16,  0,  0,  0
+  630 data  0,  0, 16, 56, 16,  0,  0,  0
+  640 data  0,  0, 16,124, 16,  0,  0,  0
+  650 data  0,  0, 24,255, 24,  0,  0,  0
+  660 rem rakete
+  670 data  0,  8,  8, 28, 28, 62,127,119
+  680 data  0,  0,  8, 28, 28, 62, 62, 62
+  690 data  0,  0,  0,  0,  0,  8, 28, 28
+  700 rem explosion
+  710 data164,137, 50, 73,168, 84, 44,129
+  720 rem hubschrauber
+  730 data  0,  0,124, 56, 56,124, 68,  0
+  740 data255, 24,126,219,255,255,189,195
+  750 rem feindrakete
+  760 data119,127, 62, 28, 28,  8,  8,  0
+  770 data  0,  0, 28, 62, 62, 28,  0,  0
+  780 rem ***** voreinstellungen *****
+  790 vol8:pudef"0"
+  800 printchr$(142)chr$(8)
+  810 rem ***** bild *****
+  820 pokev+6,0
+  830 color0,2,6:color4,2,4
+  840 print"{clr}{blk}"tab(5)"{CBM-*}{rvon}     0 h f  1234  sfg&rm    {rvof}{SHIFT-POUND}"
+  850 printtab(6)"{CBM-*}{rvon}  {CBM-M}{rvof}{wht}e{grn}!!!{orng}!{red}!{blk}{SHIFT--}{wht}r!!!!{blk}{SHIFT--}{wht}c!!!!!!{blk}{rvon}{CBM-G}  {rvof}{SHIFT-POUND}"
+  860 printtab(7)"{CBM-*}{rvon}  M{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}N  {rvof}{SHIFT-POUND}"
+  870 fori=1to8
+  880 printtab(8-i)"{rvon}{SHIFT-POUND}{rvof}{SHIFT-POUND}"spc(20+i*2)"{CBM-*}{rvon}{CBM-*}{rvof}"
+  890 next
+  900 print"{rvon}     {CBM-*}{rvof}"spc(28)"{rvon}{SHIFT-POUND}     "
+  910 print"{rvon}          {CBM-*}{rvof}"spc(18)"{rvon}{SHIFT-POUND}          "
+  920 print"{rvon} amm. 000  {$a0}{$a0}      ^              00000 "
+  930 print"{rvon} roc.  00 spd   000  alt 00000    score "
+  940 print"{rvon}          rpm  0000  rot   000          "
+  950 print"{rvon}          km   0000                     "
+  960 printtab(6)"{CBM-*}{rvon}                          {rvof}{SHIFT-POUND}"
+  970 printtab(10)"{CBM-*}{rvon}     pos.   0     {rvof}{SHIFT-POUND}"
+  980 printtab(13)"{CBM-*}{rvon}            {rvof}{SHIFT-POUND}"
+  990 printtab(14)"{rvon}    fuel    {rvof}"
+ 1000 printtab(14)"{rvon}   {rvof}{red}!{grn}!!!!!{blk}{rvon}   {rvof}"
+ 1010 printtab(14)"{rvon}            {rvof}"
+ 1020 printtab(14)"{rvon}            {rvof}"
+ 1030 printtab(13)"{rvon}{SHIFT-POUND}            {CBM-*}{rvof}{home}"
+ 1040 pokev+6,16
+ 1050 rem aktuelle werte printen
+ 1060 char1,6,13,"{blk}{rvon}":printusing"###";am
+ 1070 char1,7,14,"{blk}{rvon}":printusing"##";rc
+ 1080 char1,15,15,"{blk}{rvon}":printusing"####";rp
+ 1090 char1,34,13,"{blk}{rvon}":printusing"#####";sc
+ 1100 char1,27,15,"{blk}{rvon}":printusing"###";ro
+ 1110 color1,6,5:char1,11,1,"!":char1,29,1,"!"
+ 1120 char1,24,1,"!"
+ 1130 ifrf=1thenchar1,28,1,"!"
+ 1140 rem ***** hauptprogramm *****
+ 1150 :
+ 1160 sound1,0,0:sound2,0,0:z=rp/30
+ 1170 sound1,z,150:sound2,z+1,150
+ 1180 rem horizont
+ 1190 color1,10,2:char1,2,10,n$(n)
+ 1200 a=int(rp/10):ifro=agoto1250
+ 1210 ifrf=0goto1250
+ 1220 ifro>athenro=ro-1:goto1240
+ 1230 ro=ro+1+int(a/100)
+ 1240 char1,27,15,"{blk}{rvon}":printusing"###";ro
+ 1250 rem joystickabfrage
+ 1260 a=joy(1)
+ 1270 ifa=7goto2010
+ 1280 ifa=3goto2090
+ 1290 ifa=1goto2160
+ 1300 ifa=5goto2230
+ 1310 ifa=133goto2290
+ 1320 ifa=129goto2370
+ 1330 ifa=135goto2520
+ 1340 ifa=131goto2610
+ 1350 ifa=128goto3050
+ 1360 rem tastatur
+ 1370 geta$:ifa$=""goto1420
+ 1380 ifa$=" "goto2740
+ 1390 ifa$=chr$(13)goto2710
+ 1400 ifa$="f"andal<1goto3190
+ 1410 a=val(a$):ifa>0anda<5goto2440
+ 1420 ifn<3goto2010:rem neigung links
+ 1430 ifn>3goto2090:rem neigung rechts
+ 1440 rem feind
+ 1450 ife<>0goto1560:rem feind vorhanden
+ 1460 ifal<1goto1820:rem boden
+ 1470 mv=0:e=int(l*10*rnd(0))
+ 1480 ife<18thene=0:goto1820:rem kein f.
+ 1490 fl=fl+1:e=int(20*rnd(1))
+ 1500 x1=int(26*rnd(1))+7:xa=x1
+ 1510 y1=int( 5*rnd(1))+4:ya=y1
+ 1520 ife<l*2andal<l*1000thene=2:goto1820:rem rakete
+ 1530 ife<l*5thene=3:goto1820:rem flugz.
+ 1540 e=1:goto1820:rem hubschr.
+ 1550 :
+ 1560 rem feind bewegen
+ 1570 mv=mv+1:ifmv>64-l*4goto3460
+ 1580 onegoto1700,1740:rem flugz.,rakete
+ 1590 ifmv<16-lthenz=34:goto1630
+ 1600 ifmv<32-l*2thenz=35:goto1630
+ 1610 ifmv<48-l*3thenz=36:goto1630
+ 1620 z=37
+ 1630 ify1<3goto1980:rem aus
+ 1640 ify1>9theny1=9
+ 1650 ifx1<12-y1goto1980:rem aus
+ 1660 ifx1>27+y1goto1980
+ 1670 color1,1:char1,xa,ya," "
+ 1680 char1,x1,y1,chr$(z)
+ 1690 xa=x1:ya=y1:goto1820
+ 1700 ifmv<16-lthenz=34:goto1630
+ 1710 ifmv<32-l*2thenz=35:goto1630
+ 1720 ifmv<48-l*3thenz=42:goto1630
+ 1730 z=43:goto1630
+ 1740 rem rakete
+ 1750 color1,1
+ 1760 ifmv>52-l*4goto3240
+ 1770 ifmv<13-lthenchar1,19,9,chr$(34):goto1820
+ 1780 ifmv<26-l*2thenchar1,19,9,"#":goto1820
+ 1790 ifmv<39-l*3thenchar1,19,9,"-":goto1820
+ 1800 char1,19,9," ":char1,19,11,","
+ 1810 :
+ 1820 rem fuel verm.
+ 1830 fu=fu-rp/500-al/1000
+ 1840 iffu<1000then3240
+ 1850 color1,6,5:iffu<2000goto1880
+ 1860 char1,16+fu/1000,21,"!"
+ 1870 goto1890
+ 1880 color1,3,5:char1,25,1,"!":goto1860
+ 1890 rem km plus
+ 1900 ifkm>kfgoto3540:rem am ziel
+ 1910 ifko<90thenp=(90-ko)/2*sp:goto1950
+ 1920 ifko<180thenp=-(ko-90)/2*sp:goto1950
+ 1930 ifko<270thenp=-(270-ko)/2*sp:goto1950
+ 1940 p=(ko-270)/2*sp
+ 1950 km=km+p/10000:ifkm<0then3240
+ 1960 print:char1,15,16,"{blk}{rvon}":printusing"####";km
+ 1970 goto1140
+ 1980 rem feind aus
+ 1990 print:e=0:char1,xa,ya," "
+ 2000 goto1140
+ 2010 rem ***** unterprogramme *****
+ 2020 rem links fliegen
+ 2030 ifrf=0then1440:rem rotor noch aus
+ 2040 ifn<5thenn=n+1
+ 2050 ko=ko-1:x1=x1+1:ifko<0thenko=359
+ 2060 char1,21,18,"{blk}{rvon}":printusing"###";ko
+ 2070 goto1440
+ 2080 :
+ 2090 rem rechts fliegen
+ 2100 ifrf=0then1440
+ 2110 ifn>1thenn=n-1
+ 2120 ko=ko+1:x1=x1-1:ifko>359thenko=0
+ 2130 char1,21,18,"{blk}{rvon}":printusing"###";ko
+ 2140 goto1440
+ 2150 :
+ 2160 rem schneller
+ 2170 ifal<1goto1360
+ 2180 ifsp>250goto1360
+ 2190 a=peek(v+6):ifa<23thenpokev+6,a+1
+ 2200 sp=sp+10:char1,16,14,"{blk}{rvon}":printusing"###";sp
+ 2210 goto1360
+ 2220 :
+ 2230 rem langsamer
+ 2240 ifsp<1goto1360
+ 2250 a=peek(v+6):ifa>16thenpokev+6,a-1
+ 2260 sp=sp-10:char1,16,14,"{blk}{rvon}":printusing"###";sp
+ 2270 goto1360
+ 2280 :
+ 2290 rem steigen
+ 2300 ifrf=0orro<200then1360
+ 2310 s=int((20000-al+rp)/2000)
+ 2320 ifrp<al/3thens=s-(al/150)
+ 2330 ifs<.05then1360
+ 2340 al=al+s:char1,25,14,"{blk}{rvon}":printusing"#####";al
+ 2350 y1=y1+1:goto1360
+ 2360 :
+ 2370 rem sinken
+ 2380 al=al-20:ifal<20thenal=0
+ 2390 char1,25,14,"{blk}{rvon}":printusing"#####";al
+ 2400 ifal<>0goto2420
+ 2410 ifsp>10goto3240
+ 2420 y1=y1-1:goto1360
+ 2430 :
+ 2440 rem rakete laden
+ 2450 ifr(a)=1orrc<1goto1360
+ 2460 sound1,0,0:sound1,900,5
+ 2470 r(a)=1:char1,17+a,1,"{rvof}{red}!"
+ 2480 rc=rc-1:char1,7,14,"{blk}{rvon}":printusing"##";rc
+ 2490 ifrc<1thencolor1,3,5:char1,27,1,"!"
+ 2500 goto1360
+ 2510 :
+ 2520 rem motor schneller
+ 2530 ifrp>9000then1360
+ 2540 rp=rp+rp/80
+ 2550 char1,15,15,"{blk}{rvon}":printusing"####";rp
+ 2560 a=int(rp/2200):color1,6,5
+ 2570 ifa=3thencolor1,9,5
+ 2580 ifa=4thencolor1,3,5
+ 2590 char1,11+a,1,"!":goto1360
+ 2600 :
+ 2610 rem motor langsamer
+ 2620 ifrp<801then1360
+ 2630 rp=rp-rp/80
+ 2640 char1,15,15,"{blk}{rvon}":printusing"####";rp
+ 2650 a=int(rp/2200):color1,6,3
+ 2660 ifa>3goto1140
+ 2670 ifa=3thencolor1,3,3
+ 2680 ifa=2thencolor1,9,3
+ 2690 char1,12+a,1,"!":goto1360
+ 2700 :
+ 2710 rem rotor on
+ 2720 color1,6,5:char1,28,1,"!"
+ 2730 rf=1:goto1360
+ 2740 rem rakete
+ 2750 i=0:color1,3,5
+ 2760 i=i+1:ifr(i)=1then2780
+ 2770 ifi<4then2760:else1360
+ 2780 sound1,0,0:sound2,0,0:sound2,900,10
+ 2790 fori=500to0step-10
+ 2800 sound3,i,1
+ 2810 ifi=500thenchar1,19,12,"{red}{rvof}&"
+ 2820 ifi=350thenchar1,19,12," ":char1,19,11,"'"
+ 2830 ifi=200thenchar1,19,11," ":char1,19,10,"("
+ 2840 next
+ 2850 char1,19,10,"{orng}{SHIFT-*}"
+ 2860 sound3,0,10:i=0
+ 2870 i=i+1:ifr(i)=1goto2880:else2870
+ 2880 r(i)=0:char1,17+i,1,"{rvof}{wht}!"
+ 2890 ifpeek(3451)<>32then2920
+ 2900 goto1360
+ 2910 :
+ 2920 rem treffer
+ 2930 g=g+1:b=peek(3451)
+ 2940 sound3,0,0
+ 2950 char1,19,9,"{orng})"
+ 2960 sound3,10,100
+ 2970 fori=8to0step-1:fora=1to100:next
+ 2980 voli:next
+ 2990 char1,19,9," "
+ 3000 sc=sc+50*e:ife=2thensc=sc+100
+ 3010 e=0:vol8
+ 3020 char1,34,13,"{blk}{rvon}":printusing"#####";sc
+ 3030 goto1140
+ 3040 :
+ 3050 rem kanone
+ 3060 ifam<1goto1360
+ 3070 sound1,0,0:sound3,0,0:sound3,500,30
+ 3080 fori=8to1step-1:fora=1to50:next
+ 3090 voli:next:vol8
+ 3100 am=am-1:print:char1,6,13,"{blk}{rvon}"
+ 3110 printusing"###";am
+ 3120 ifam<1thencolor1,3,5:char1,26,1,"!"
+ 3130 ifpeek(3451)=43goto3150
+ 3140 goto1440
+ 3150 a=int(10*rnd(1))
+ 3160 ifa<8goto1440
+ 3170 goto2920
+ 3180 :
+ 3190 rem auffuellen
+ 3200 sound1,0,0:sound1,600,20
+ 3210 fu=7000:rc=ra:am=aa
+ 3220 fori=1to4:r(i)=0:next
+ 3230 goto810
+ 3240 rem ***** game over *****
+ 3250 sound3,0,0:sound3,100,100
+ 3260 fori=1to16:fora=0to7:color0,i,a
+ 3270 next:vol(17-i)/2:next
+ 3280 print"{blk}":char1,15,7,"game over."
+ 3290 char1,14,9,"-press fire-"
+ 3300 ifjoy(1)<>128then3300
+ 3310 rem hiscore-table
+ 3320 scnclr:color0,2,4:color4,1
+ 3330 char1,13,2,"hiscore-table"
+ 3340 char1,8,4,"die 10 besten piloten:"
+ 3350 fori=1to10:ifsc<=sc(i)thennext:goto3400
+ 3360 z=i
+ 3370 fora=ito9:sc(i+1)=sc(i)
+ 3380 s$(i+1)=s$(i):next
+ 3390 s$(z)=s$:sc(z)=sc
+ 3400 :
+ 3410 fori=1to10:char1,10,5+i,""
+ 3420 printusing"##";i;:print" "s$(i)sc(i)
+ 3430 next
+ 3440 getkeya$:ifa$<>" "then3440
+ 3450 goto100
+ 3460 rem ***** abschuss *****
+ 3470 fori=1to60
+ 3480 sound3,0,0:sound3,1000,1
+ 3490 fora=1to5:next
+ 3500 a1=int(39*rnd(1)):a2=int(24*rnd(1))
+ 3510 print:char1,a1,a2,"{blk}Q"
+ 3520 ifi/10=int(i/10)thenchar1,23+i/10,1,"{red}!"
+ 3530 next:goto3240
+ 3540 rem ***** gewonnen *****
+ 3550 print:sound1,0,0:sound2,0,0
+ 3560 pokev+18,196:pokev+19,208
+ 3570 ife=1andfl>2thenfl=fl-1
+ 3580 print"{clr}":a=100/fl*g/10-4:ifa<1thena=1
+ 3590 char1,1,5,"{blk}sie haben es geschafft !"
+ 3600 char1,1,8,"sie haben"+str$(g)+" feinde abgeschossen !"
+ 3610 char1,1,11,"ihr rang:"+r$(a)
+ 3620 char1,15,20,"[space] !"
+ 3630 fora=1to3:sound3,950,5:forz=1to400:next:next
+ 3640 fora=1to3:sound3,950,3:forz=1to150:next:next
+ 3650 geta$:ifa$<>" "then3630
+ 3660 goto3320
+

@@ -1,0 +1,303 @@
+
+
+;zinsen vc20.prg ==0801==
+    1 rem***********************
+    2 rem* gurtner helmut      *
+    3 rem* goethestr. 9        *
+    4 rem* 5120 herzogenrath   *
+    5 rem* tel: 02406/64433    *
+    8 rem***********************
+   10 poke36879,25:print"{clr}"
+   20 a$="kapital"
+   30 a1$="prozent"
+   40 a2$="zinsen"
+   50 a3$="jahre"
+   60 a4$="monate"
+   70 a5$="tage"
+   80 a6$="zinsesz."
+   90 a7$="gesamt"
+  100 a8$="{rvon}zurueck menue (f1)    {rvof}"
+  110 a9$="{up}{rvon}nochmal (f7) h.-c.(f8){rvof}"
+  120 b$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+  130 b1$="{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  140 b2$="j.-einz."
+  150 b3$="m.-einz."
+  200 print"{clr}{blk}      m e n u e  1":print
+  210 print"{red}zinsberechnungen{blu}      "b1$
+  220 print"1  "a$:print
+  230 print"2  "a1$:print
+  240 print"3  "a2$:print
+  250 print"4  "a5$:print
+  260 print"5  zinseszinsen mit"
+  270 print"   monatl. einzahlung":print
+  280 print"6  zinseszinsen mit"
+  290 print"   einmaliger einz.":print
+  300 print"7  weit. menueauswahl"
+  310 getw$:ifw$=""then310
+  320 ifasc(w$)<49orasc(w$)>55then310
+  330 w=val(w$):onwgoto600,1000,1400,1800,2200,2600,340
+  340 print"{clr}{blk}      m e n u e  2":print
+  341 print"{red}zinsberechnungen{blu}      "b1$
+  350 print"1  errechnen zinstage":print
+  360 print"2  was kostet ein"
+  370 print"   kredit":print
+  390 print"3  zurueck menue":print
+  420 getw1$:ifw1$=""then420
+  430 ifasc(w1$)<49orasc(w1$)>55then420
+  450 w1=val(w1$):onw1goto3000,7000,200
+  460 goto200
+  600 l=10:rem **** kapital ****
+  610 print"{clr}    z * 100 * 360"
+  620 print"k = {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  630 print"       p * t":print
+  640 printa2$:printa1$:printa3$:printa4$:printa5$:printb1$:printa$
+  720 z3=9:z2=5:gosub3520:z2=6:gosub3510:gosub3530:gosub5000
+  725 ifz=0orp=0ort=othengosub6200:goto600
+  730 k=(z*100*360)/(p*t)
+  740 x=k:gosub4500:z2=12:print"{blk}":gosub4950:print"{blu}":gosub6100
+  745 printb$:printa8$:printa9$
+  750 getw1$:ifw1$=""then750
+  760 ifw1$=chr$(133)thengoto200
+  770 ifw1$=chr$(136)thengoto600
+  780 ifw1$=chr$(140)thengosub60000
+  790 goto750
+ 1000 l=10:rem **** prozent ****
+ 1010 print"{clr}    z * 100 * 360"
+ 1020 print"p = {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1030 print"       k * t":print
+ 1040 printa$:printa2$:printa3$:printa4$:printa5$:printb1$:printa1$
+ 1060 z3=9:z2=5:gosub3500:z2=6:gosub3520:gosub3530:gosub5000
+ 1065 ifz=0ork=0ort=0thengosub6200:goto1000
+ 1070 p=(z*100*360)/(k*t)
+ 1080 x=p:gosub4500:z2=12:print"{blk}":gosub4950:print"{blu}":gosub6100
+ 1085 printb$:printa8$:printa9$
+ 1090 getw1$:ifw1$=""then1090
+ 1100 ifw1$=chr$(133)thengoto200
+ 1110 ifw1$=chr$(136)thengoto1000
+ 1120 ifw1$=chr$(140)thengosub60000
+ 1130 goto1090
+ 1400 l=10:rem **** zinsen
+ 1410 print"{clr}    k * p * t":z3=9
+ 1420 print"z = {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1430 print"     100 * 360":print
+ 1440 printa$:printa1$:printa3$:printa4$:printa5$:printb1$
+ 1450 printa2$:printa$:print:printa7$
+ 1460 z2=5:gosub3500:z2=6:gosub3510:gosub3530:gosub5000
+ 1465 ifk=0orp=0ort=0thengosub6200:goto1400
+ 1470 z=(k*p*t)/(100*360)
+ 1480 x=z:gosub4500:z2=12:print"{blk}":gosub4950:print"{blu}"
+ 1490 x=k:gosub4500:z2=13:gosub4950
+ 1500 kz=k+z:x=kz:gosub4500:z2=15:gosub4950:gosub6100
+ 1505 printb$:printa8$:printa9$
+ 1510 getw1$:ifw1$=""then1510
+ 1520 ifw1$=chr$(133)thengoto200
+ 1530 ifw1$=chr$(136)thengoto1400
+ 1540 ifw1$=chr$(140)thengosub60000
+ 1550 goto1510
+ 1800 l=10:rem **** tage ****
+ 1810 print"{clr}    z * 100 * 360"
+ 1820 print"t = {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1830 print"       k * p":print:z3=9:gosub6100
+ 1840 printa$:printa1$:printa2$:printb1$
+ 1850 printa5$:printb1$:print"{down}"a3$:print"{down}"a4$:print"{down}"a5$
+ 1870 z2=5:gosub3500:z2=6:gosub3510:z2=7:gosub3520
+ 1875 ifk=0orp=0orz=0thengosub6200:goto1800
+ 1880 t=(z*100*360)/(k*p)
+ 1890 x=t:gosub4500:z2=10:print"{blk}":gosub4950:print"{blu}":t=int(t+.5)
+ 2000 ift<360then2020
+ 2010 t=t-360:j=j+1:ift>=360then2010
+ 2020 ift<30then2040
+ 2030 t=t-30:m=m+1:ift>=30then2030
+ 2040 printleft$(b$,14);:printtab(14)j:print:printtab(14)m:print:printtab(14)t
+ 2050 print"{blu}":printb$:printa8$:printa9$
+ 2060 getw1$:ifw1$=""then2060
+ 2070 ifw1$=chr$(133)thengoto200
+ 2080 ifw1$=chr$(136)thengoto1800
+ 2090 ifw1$=chr$(140)thengosub60000
+ 2100 goto2060
+ 2200 printchr$(147)"{blk}zinseszinsen mit":l=10:z3=9
+ 2210 print"gleichbleibender"
+ 2220 print"monatl. einzahlung{blu}":print"{down}"b3$:printa1$:printa3$
+ 2225 print"dav. keine":print"einz. m.":print"bonus auf"
+ 2226 print"einz. %":printb1$:print"eigenl."
+ 2230 printa6$:print"bonus":print:printa7$
+ 2240 z2=5:z3=11:gosub3500:z2=6:gosub3510:z2=7:gosub3525
+ 2242 z2=9:gosub4000:ke=n:gosub4800:gosub4950:ifke>12then2242
+ 2244 z2=11:gosub4000:bp=n:gosub4500:gosub4950
+ 2250 kg=0:kk=0:kz=0:mz=12:y=12:kb=0:bd=0:zg=0
+ 2260 m=j*12:m1=m-ke:m2=m1:ifm1<12thenmz=m1
+ 2265 ifm=kethenprint"{clr}{down}{down}falsche angaben":fori=1to2000:next:goto2200
+ 2270 gosub2500
+ 2280 m2=m2-12
+ 2290 ifm2=>12thengoto2510
+ 2295 kb=kb+kx
+ 2300 ifke=12thenzz=kb*p/100:kb=kb+zz
+ 2306 ifm2<12andm2>0thenmz=m2:gosub2500:zz=kb*p/100:kb=kb+kx+zz
+ 2310 kk=k*m1:bd=kk*bp/100:zg=kb-kk:kg=kb+bd
+ 2320 x=kk:gosub4500:z2=14:z3=11:gosub4950
+ 2330 x=zg:gosub4500:z2=15:gosub4950
+ 2340 x=bd:gosub4500:z2=16:gosub4950
+ 2350 x=kg:gosub4500:z2=18:gosub4950:gosub6100
+ 2355 printb$:printa8$:printa9$
+ 2360 getw1$:ifw1$=""then2360
+ 2370 ifw1$=chr$(133)thengoto200
+ 2380 ifw1$=chr$(136)thengoto2200
+ 2390 ifw1$=chr$(140)thengosub60000
+ 2400 goto2360
+ 2500 ka=0:za=0:kx=0:y=12
+ 2501 fori=1tomz
+ 2502 zz=(k*p*y)/(100*12)
+ 2503 zz=int(zz*10000+.5)/10000
+ 2504 za=za+zz:ka=ka+k:y=y-1
+ 2505 nexti
+ 2506 kx=ka+za:return
+ 2510 kb=kb+kx
+ 2512 zb=kb*p/100
+ 2514 zb=int(zb*10000+.5)/10000
+ 2516 kb=kb+zb
+ 2518 goto2280
+ 2600 printchr$(147)"{blk}zinseszinsen bei ein-":l=10:z3=9:kz=0:zg=0
+ 2610 print"maliger einzahlung{blu}":print:print
+ 2620 printa$:printa1$:printa3$:printb1$:printa$:printa6$:print:printa7$
+ 2640 z2=5:gosub3500:z2=6:gosub3510:z2=7:gosub3525
+ 2650 zz=0:kz=k
+ 2660 fori=1toj
+ 2670 zz=kz*p/100
+ 2680 zz=int(zz*10000+.5)/10000
+ 2690 kz=kz+zz
+ 2700 nexti
+ 2710 zg=kz-k
+ 2720 x=k:gosub4500:z2=10:gosub4950
+ 2730 x=zg:gosub4500:z2=11:print"{blk}":gosub4950:print"{blu}"
+ 2740 x=kz:gosub4500:z2=13:gosub4950
+ 2745 printb$:printa8$:printa9$
+ 2750 getw1$:ifw1$=""then2750
+ 2760 ifw1$=chr$(133)thengoto200
+ 2770 ifw1$=chr$(136)thengoto2600
+ 2780 ifw1$=chr$(140)thengosub60000
+ 2790 goto2750
+ 3000 print"{clr}{red}errechnen zinstage":print:l=8:z2=5:z3=8:j=0:m=0:t=0
+ 3010 print"        {blk}ttmmjjjj{blu}":print
+ 3020 print"anfang:":print
+ 3030 print"ende:":print:print
+ 3040 print"i s t":print
+ 3050 printb1$
+ 3060 print"oder jahr/e":print
+ 3070 print"     monat/e":print
+ 3080 print"     tag/e"
+ 3100 gosub4000:aa$=nn$:gosub6000:z2=7:gosub4000:e$=nn$:gosub6000
+ 3110 ja=val(mid$(aa$,5,4)):ma=val(mid$(aa$,3,2)):ta=val(mid$(aa$,1,2)):gosub6000
+ 3130 je=val(mid$(e$,5,4)):me=val(mid$(e$,3,2)):te=val(mid$(e$,1,2)):gosub6000
+ 3140 j=je-ja
+ 3150 t=(j*360)+(me*30)+te-(ma*30)-ta:j=0
+ 3160 printleft$(b$,10);:printtab(7)t;:printa5$
+ 3170 ift<360then3190
+ 3180 t=t-360:j=j+1:ift>=360then3180
+ 3190 ift<30then3210
+ 3200 t=t-30:m=m+1:ift>=30then3200
+ 3210 x=j:z2=14:z3=11:print"{blk}":gosub4800:gosub4950:x=m:z2=16:gosub4800:gosub4950
+ 3220 x=t:z2=18:gosub4800:gosub4950:print"{blu}":gosub6100
+ 3225 printb$:printa8$:printa9$
+ 3230 getw1$:ifw1$=""then3230
+ 3240 ifw1$=chr$(133)then340
+ 3250 ifw1$=chr$(136)then3000
+ 3260 ifw1$=chr$(140)thengosub60000
+ 3270 goto3230
+ 3500 gosub4000:k=n:gosub4500:gosub4950:return
+ 3510 gosub4000:p=n:gosub4500:gosub4950:return
+ 3520 gosub4000:z=n:gosub4500:gosub4950:return
+ 3525 gosub4000:j=n:gosub4800:gosub4950:return
+ 3530 z2=7:gosub4000:j=n:gosub4800:gosub4950
+ 3540 z2=8:gosub4000:m=n:gosub4800:gosub4950
+ 3550 z2=9:gosub4000:t=n:gosub4800:gosub4950:return
+ 4000 rem  get-schleife
+ 4030 printleft$(b$,z2);:printtab(z3)
+ 4040 z1=0:nn$="":print"_";chr$(157);
+ 4050 getn$:ifn$=""then4050
+ 4055 ifn$=chr$(140)thengosub60000
+ 4060 ifn$=chr$(20)andz1>0then4130
+ 4070 ifn$=chr$(13)then4140
+ 4080 ifn$<chr$(46)orn$>chr$(57)then4050
+ 4090 printn$;"_";chr$(157);
+ 4100 nn$=nn$+n$
+ 4110 z1=z1+1:ifz1=lthen4140
+ 4120 goto4050
+ 4130 z1=z1-1:nn$=left$(nn$,z1):printchr$(157);"_ ";chr$(157);chr$(157);:goto4050
+ 4140 print" ";:n=val(nn$):x=n:return
+ 4500 rem***************
+ 4510 rem formatierung
+ 4520 rem**************
+ 4600 x=int(x*100+.5)/100
+ 4610 x$=" "+str$(x)
+ 4615 ifmid$(x$,len(x$)-2,1)="."then4640
+ 4620 ifmid$(x$,len(x$)-1,1)<>"."thenx$=x$+".00"
+ 4630 ifmid$(x$,len(x$)-1,1)="."thenx$=x$+"0"
+ 4640 ifmid$(x$,len(x$)-3,1)=" "thenx$="  0"+right$(x$,3)
+ 4650 ifmid$(x$,len(x$)-3,1)="-"thenx$=" -0"+right$(x$,3)
+ 4660 x$=right$("       "+x$,10)
+ 4670 return
+ 4800 x$=str$(x)
+ 4810 x$="       "+x$+"   "
+ 4820 x$=right$(x$,10)
+ 4830 return
+ 4950 printleft$(b$,z2);:printtab(z3)x$:gosub6000:return
+ 5000 rem errechnen tage
+ 5010 t=t+(j*360)+(m*30)
+ 5020 return
+ 6000 nn$="":x=0:n$=""
+ 6010 return
+ 6100 k=0:z=0:p=0:j=0:m=0:t=0:return
+ 6200 print"{clr}{down}{down}fehlende oder falsche":print:print"eingaben":fori=1to2500:next:return
+ 7000 print"{clr}{blk}    kredit - kosten    {blu}":l=10:z1=0:z2=0:kk=0:ev=0:mz=0
+ 7010 rem print"kredit{blu}":print
+ 7020 print"kred.-sum.":print
+ 7030 print"bearbeitg.-"
+ 7040 print"gebuehr in %":print
+ 7050 print"laufz./monat":print
+ 7055 print"% in mon.":print
+ 7060 print"{blk}kreditkosten":print
+ 7070 print"tatsaechl. ":print"zinsen in %":print
+ 7080 print"monatl. zu":print"zahlen{blu}"
+ 7100 z2=3:z3=12:gosub4000:ks=n:gosub4500:gosub4950
+ 7110 z2=6:z3=16:gosub4000:bz=n:gosub4500:z3=12:gosub4950
+ 7120 z2=8:z3=16:gosub4000:lz=n:gosub4800:z3=12:gosub4950
+ 7130 z2=10:z3=16:gosub4000:pm=n:gosub4500:z3=12:gosub4950
+ 7135 ifks=0orlz=0orpm=othengosub6200:goto7000
+ 7220 z1=pm*lz:rem % * laufz.
+ 7230 z1=(ks*z1)/100:rem zinsen-laufzeit
+ 7240 z2=(ks*bz)/100:rem zinsen-bearb.
+ 7250 kk=z1+z2:rem kreditkosten
+ 7260 ev=(kk*100*12)/(ks*lz):rem eff.-zins.
+ 7270 mz=(ks+kk)/lz:rem m. zu zahlen
+ 7280 x=kk:z2=12:z3=12:print"{blk}":gosub4500:print"{blk}":gosub4950
+ 7290 x=ev:z2=15:gosub4500:gosub4950
+ 7300 x=mz:z2=18:gosub4500:gosub4950:print"{blu}"
+ 7305 printb$:printa8$:printa9$
+ 7330 getw1$:ifw1$=""then7330
+ 7340 ifw1$=chr$(133)then340
+ 7350 ifw1$=chr$(136)then7000
+ 7360 ifw1$=chr$(140)thengosub60000
+ 7370 goto7330
+60000 rem * hard-copy *
+60010 si$=chr$(14):bs$=chr$(8):po$=chr$(16)
+60020 qt$=chr$(34)
+60030 mf$=chr$(145):vr=peek(648)*256
+60040 open4,4:print#4
+60050 forcl=0toz2:qf=0:as$=mf$:forro=0to21
+60060 sc=peek(vr+22*cl+ro)
+60070 ifsc=34thenqf=1-qf
+60080 ifsc<>162then60110
+60090 qf=1-qf:ifqf=1thenas$=as$+qt$:goto60170
+60100 as$=as$+qt$:goto60170:goto60130
+60110 ifqf=1and(sc>=128)thensc=sc-128:goto60130
+60120 ifsc>=120thensc=sc-128:rf=1
+60130 ifsc<32orsc>95thenas=sc+64:goto60160
+60140 ifsc>31andsc<64thenas=sc:goto60160
+60150 ifsc>63andsc<96thenas=sc+32:goto60160
+60160 as$=as$+chr$(as)
+60170 ifrf=1thenrf=0
+60180 nextro
+60190 ifqf=0thenprint#4,si$po$"20"as$:goto60210
+60200 print#4,si$;po$;"20";as$;qt$
+60210 nextcl:close4:return
+

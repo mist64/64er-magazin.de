@@ -1,0 +1,152 @@
+
+
+;imperium ii.prg ==0801==
+    1 rem********vc-20+8k*******
+    2 rem*  imperium romanum   *
+    3 rem*   geschrieben von   *
+    4 rem*   ralf trabhardt    *
+    5 rem* philippsbergstr.45  *
+    6 rem*  6200   wiesbaden   *
+    7 rem*  tel. 06121/523970  *
+    8 rem***********************
+    9 print"{clr}{blk}"
+   10 poke650,128:o1=24:gosub5000:poke650,0
+   15 f=33792:u=37151
+   20 ja=395
+   25 poke36878,15
+   30 j=4108:m=4558:n=4579
+   35 dima(26),b(26),k1(26),k2(26),bw(26)
+   40 forl=1to20:reada(l):nextl
+   45 fori=1to15:readb(i):nexti
+   50 fori=1to5:readk(i):nexti
+   98 fori=1to20:k1(i)=70:k2(i)=100:nexti
+  100 rem*erstellen der karte*
+  110 poke36869,205:print"{clr}{blk}{home}          {CBM-C}{CBM-X}{rvon}hijf{rvof}@@@@@@{rvon}mnopqrs{rvof}   {CBM-F}{CBM-V}{rvon}gk{rvof} {rvon}e{rvof}@@@@@@";
+  120 print"{rvon}tuvwxyz{rvof}   {SHIFT-@}{CBM-B} {rvon}bcd{rvof}@@@@@@";
+  125 print"{rvon}[\]^_!{rvof}  {CBM-Y}{CBM-U}{CBM-O}@{rvon}@a{rvof}@@@@@@@@       {CBM-L}@@@@@@@@@@@@@@";
+  130 print"    {CBM-Q} a{CBM-J}@@@@@@@@@@@@@@";
+  131 print"  edcb@@@@@@@@@@@@@@@@";
+  132 print"   f@@@@@@@@@@@@@@@@@@   g@@@@@@@@@@@@@@@@@@   h@@@@@@@@@@@@@@@@@@";
+  135 print"m  i@@@@@@@@@@@@@@@@@Y@lkj@@@@@@@:@@@@@@@@@X";
+  140 print"@@@@@@@@yz@9;@@@@@@@W @@@@@uwx{CBM-Z}[@_<@@@@@@@V ";
+  150 print"@@@stv  {CBM-@}{CBM-E}\^>=@@@@@@U @@@r    {CBM-G}{CBM-+}]@O ?@@@@@T ";
+  160 print"@@q {CBM-I}{CBM-T}  {CBM-POUND}{CBM-M} !@# {SHIFT-*}@@N@SR@op     {SHIFT-POUND}{CBM-N}  {CBM-P}$%A@LMPQ@";
+  170 print"n{CBM-D}          {CBM-*}& B@K Z@@876543120 ,+(' DCIJ{SHIFT-+}@@";
+  180 print"@@@@@@@@/.{CBM-*}*)   EH{CBM-K}{CBM-*}{CBM--}@@@@@@@@@@-      FG  ~{CBM-A}";
+  181 fori=4580to4601:pokei,0:pokei+f,o2:nexti
+  182 poke4168,162
+  200 fori=1to20:ifk1(i)>0thenpokea(i),34
+  201 ifk2(i)>0andb(i)>0thenpokeb(i),115
+  205 nexti
+  210 fori=1to5:ifk(i)>6thenpokek(i),110:nexti
+  220 fa=4326:p1=peek(fa)
+  300 rem
+  310 ifg1=1org1=2then500
+  320 gosub3000
+  322 rem*bewegung des fadenkreuzes*
+  325 p2=peek(fa-22):ifp2<>32thensr=1
+  327 iffa<4118thensr=0
+  330 ifu2=1andsr=1thenpokefa,p1:fa=fa-22:p1=p2:goto400
+  335 p3=peek(fa+22):ifp3<>32thensr=2
+  336 iffa>4557thensr=0
+  340 ifu4=1andsr=2thenpokefa,p1:fa=fa+22:p1=p3:goto400
+  345 p4=peek(fa-1):ifp4<>32thensr=3
+  346 iffa=morfa=m-22orfa=m-44orfa=m-66orfa=m-88orfa=m-198orfa=m-220orfa=m-242thensr=0
+  350 ifu1=1andsr=3thenpokefa,p1:fa=fa-1:p1=p4:goto400
+  355 p5=peek(fa+1):ifp5<>32thensr=4
+  356 iffa=norfa=n-22orfa=n-44orfa=n-66orfa=n-88orfa=n-110orfa=n-220orfa=n-242thensr=0
+  357 iffa=n-264orfa=n-418orfa=n-440orfa=n-462thensr=0
+  360 ifu3=1andsr=4thenpokefa,p1:fa=fa+1:p1=p5:goto400
+  365 fori=1to20:ifa(i)=faandz=0thenf1=1:goto370
+  366 ifz=1andb(i)=fathenf1=2:goto370
+  367 nexti
+  370 ifsc=1andf1=1theng1=1:f1=0:poke36876,250:poke36876,0:goto400
+  375 ifsc=1andf1=2theng1=2:f1=0:poke36876,250:poke36876,0:goto400
+  380 geta$
+  385 ifa$<>""thenpoke198,0:goto800
+  400 pokefa,114:sr=0:f1=0
+  450 goto300
+  480 rem*bewegung der legionen*
+  500 ifz=0thenx=a(i)
+  501 ifz=1thenx=b(i)
+  502 gosub3000
+  505 w2=peek(x-22):ifw2<>32andw2<>34andw2<>115thensw=1
+  507 ifx<4118thensw=0
+  510 ifu2=1andbw(i)<2andsw=1thenpokex,w1:x=x-22:bw(i)=bw(i)+1:w1=w2:goto600
+  515 w3=peek(x+22):ifw3<>32andw3<>34andw3<>115thensw=2
+  517 ifx>4557thensw=0
+  520 ifu4=1andbw(i)<2andsw=2thenpokex,w1:x=x+22:bw(i)=bw(i)+1:w1=w3:goto600
+  521 w4=peek(x-1):ifw4<>32andw4<>34andw4<>115thensw=3
+  525 ifx=morx=m-22orx=m-44orx=m-66orx=m-88orx=m-198orx=m-220orx=m-242thensw=0
+  530 ifu1=1andbw(i)<2andsw=3thenpokex,w1:x=x-1:bw(i)=bw(i)+1:w1=w4:goto600
+  532 w5=peek(x+1):ifw5<>32andw5<>34andw5<>115thensw=4
+  535 ifx=norx=n-22orx=n-44orx=n-66orx=n-88orx=n-110orx=n-220orx=n-242orx=n-264thensw=0
+  540 ifu3=1andbw(i)<2andsw=4thenpokex,w1:x=x+1:bw(i)=bw(i)+1:w1=w5:goto600
+  600 ifz=0thenpokex,34:a(i)=x
+  610 ifz=1thenpokex,115:b(i)=x
+  615 fory=1to5:ifb(i)=k(y)thenk(y)=5:poke36875,150:be=be+1:ifbe>=4thenbe=0:goto2000
+  616 poke36875,0:nexty
+  620 sw=0:p1=0
+  630 ifsc=1theng1=0:w1=0:poke36876,200:poke36876,0:goto300
+  700 goto502
+  800 z=z+1:ifz>1thenz=0:zt=zt+1
+  801 ifzt<>9then805
+  802 forbo=1to25:ifa(bo)>0thenk1(bo)=k1(bo)+100
+  803 ifb(bo)>0thenk2(bo)=k2(bo)+70
+  804 nextbo
+  805 ifzt>=25then2500
+  810 fort=1to20
+  815 poke36874,130+t*2
+  819 fort2=1to15
+  820 ifa(t)+22=b(t2)ora(t)-22=b(t2)ora(t)-1=b(t2)ora(t)+1=b(t2)then840
+  830 goto860
+  840 tr=int(rnd(1)*20)+1:k1(t)=k1(t)-tr:ifk1(t)<=0thenpokea(t),116:a(t)=0
+  850 tl=int(rnd(1)*20)+1:k2(t2)=k2(t2)-tl
+  855 ifk2(t2)<=0thenpokeb(t2),140:b(t2)=0
+  860 nextt2
+  870 nextt
+  880 poke36874,0
+ 1000 fort=1to25:bw(t)=0:nextt
+ 1010 g1=0:w1=0
+ 1015 poke36869,192:print"{clr}{home}{down}{down}{down}{down}{down}{down}wir befinden uns im"
+ 1016 print"{down}jahre "ja+zt" n. chr."
+ 1017 gosub5000
+ 1020 goto110
+ 2000 rem*sieg der germanen*
+ 2010 poke36875,0:poke36869,192:poke36879,25:print"{clr}"
+ 2100 print"{home}{red}{down}das roemische imperium{down}liegt am boden !"
+ 2110 print"{down}{down}die germanen haben    {down}haben sie wegen ihrer {down}fuehrungsfaehigkeiten"
+ 2120 print"{down}zum koenig auf lebens-{down}zeit ernannt."
+ 2130 print"{down}(das ist eine grosse  {down}ehre,wenn man bedenkt,{down}dass bald die hunnen"
+ 2140 print"{down}kommen)!!"
+ 2150 goto2640
+ 2490 rem*sieg der roemer*
+ 2500 poke36869,192:poke36879,25:print"{clr}{home}{blu}":
+ 2600 print"{down}das roemische imperium{down}konnte diesen klaeg-  {down}lichen versuch einer"
+ 2610 print"{down}horde barbaren laessig{down}abwehren."
+ 2620 print"{down}den germanen folgenden{down}tip:"
+ 2630 print"{down}versucht es in hundert{down}jahren nocheinmal!"
+ 2640 print"{down}{down}neues spiel j/n ?"
+ 2650 geta$:ifa$="j"thenzt=0:run
+ 2660 ifa$="n"thenprint"{clr}{home}{down}{red}ihr seid deserteure!!!":end
+ 2670 goto2650
+ 3000 rem*joystickabfrage*
+ 3010 pokeu+3,127:u3=-((peek(u+1)and128)=0):pokeu+3,255
+ 3020 u1=-((peek(u)and16)=0):u4=-((peek(u)and8)=0):u2=-((peek(u)and4)=0)
+ 3030 sc=-((peek(37137)and32)=0)
+ 3040 return
+ 4990 rem*bildschirmfarben*
+ 5000 print"{down}{down}{down}waehlen sie die       {down}bildschirmfarben:"
+ 5001 print"{down}{rvon}f1{rvof} = bildschirmfarbe  {down}{rvon}f3{rvof} = rahmenfarbe "
+ 5002 print"{down}{rvon}s{rvof}  = start"
+ 5005 poke36879,o1+o2:geta$:ifa$="{f1}"theno1=o1+16:ifo1>248theno1=24
+ 5010 ifa$="{f3}"theno2=o2+1:ifo2>7theno2=0
+ 5020 ifa$="s"thenreturn
+ 5030 goto5005
+ 6000 data4192,4237,4282,4305,4306,4308,4310,4312
+ 6010 data4255,4301,4321,4420,4460,4428,4540,4361,4557
+ 6020 data4368,4375,4355
+ 6030 data4173,4194,4195,4196,4217,4218,4239,4240,4241
+ 6040 data4242,4262,4263,4264,4265,4266
+ 6050 data4427,4544,4491,4437,4256
+
