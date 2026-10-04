@@ -364,3 +364,14 @@ text EXISTS, i.e. the opposite of the question.
 its first and last 8 words; after any restoration or heading split, run a
 repeated-12-word-window sweep over the file (it found exactly these here).
 Put that sweep in r190's and r320's Verification.
+
+## 290 — check 2 knows only the erratum-box exception; the aside override contradicts its examples; PRINTED marker still cited
+
+From the 290 sub-agent, checked: check 2 labels every non-h2 aside heading
+"rule 300 erratum box, or check it" although the rule's own header prescribes
+h3 when the aside would be the only h2 (3, 47, 60 here) — permanent false
+flags. "ONE LEVEL BELOW the article's highest section heading" contradicts
+the rule's examples (aside at the SAME level as the body's top sections) —
+followed the examples (= SH8602). r290's period section and r000's corollary
+still point to the in-page `PRINTED` comment that r290 itself withdrew for
+`adjudicated.txt`; r310's inline comment too.
