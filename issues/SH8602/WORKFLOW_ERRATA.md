@@ -721,3 +721,11 @@ print's hanging columns (label · value · description). Owner: use a
 `table class="plain"`. Sentence for r190: "A legend whose print aligns labels,
 values and descriptions in columns (Syntax/Parameter blocks, a) b) c) option
 lists with `1 =`/`2 =` values) is a `table class="plain"`, not `<br>` lines."
+- (13 Listing 3, follow-up) Replacing the disk `<pre data-filename>` with the
+  printed listing silently dropped the source's download link, and
+  `binary_download` refused `bass_irq-source.prg` because only the `.txt` sits in
+  `prg/` — although the build publishes that `.prg` byte-identical to the disk
+  file. Fixed in generate.py (accept a `.prg` rebuilt from a `.txt` listing;
+  full-build diff: only SH8602 and the search indexes change). r130 should say:
+  "when a printed listing replaces a disk embed, keep the disk file as a
+  `binary_download`."
