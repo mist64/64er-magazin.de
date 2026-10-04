@@ -104,7 +104,10 @@
 
         <p>Die andere Alternative der Platzbeschaffung ist etwas komplizierter und gilt sinnvollerweise nur für den VC 20. Sie wird nur.bei erweitertem Speicher angewendet, um dort Sonderzeichen abzulegen. Um den Anfang des Programmspeichers von 4608 nach 7680 zu schieben, gibt man:</p>
 
-        <p>POKE 44,30:POKE 30 * 256,0:NEW ein, denn 30 x 256 ist gerade 7680. Der zweite POKE-Befehl ist nötig, da am Anfang des Basic-Bereichs immer ein Nullbyte stehen muß.</p>
+        <pre><code>POKE 44,30:POKE 30 * 256,0:NEW
+</code></pre>
+
+        <p>ein, denn 30 x 256 ist gerade 7680. Der zweite POKE-Befehl ist nötig, da am Anfang des Basic-Bereichs immer ein Nullbyte stehen muß.</p>
 
         <p>Eine Besonderheit bietet hier der C16 (in der Grundversion). Wenn man mit dem Befehl GRAPHIC die hochauflösende Grafik des C 16 einschaltet, dann verkleinert sich der Gesamtspeicher um 14 KByte. In diesem Teil des Speichers (siehe auch Bild 6b) werden dann die grafischen Informationen festgehalten.</p>
 
@@ -654,24 +657,24 @@
 
         <p>Durch NEW oder durch einen RESET wird nicht das gesamte Programm, sondern nur der Variablenpointer (45/46) und die erste Koppeladresse gelöscht. Durch Rekonstruktion dieser beiden Zeiger kann das scheinbar verlorene Basic-Programm wieder benutzt werden.</p>
 
-        <p>Hier nun das »Rezept« zur Rekonstruktion: © POKE (Basic-Anfang) + 2,1</p>
-
-        <p>Basic-Anfang in GV = 4096 (4096)</p>
+        <p>Hier nun das »Rezept« zur Rekonstruktion:</p>
 
         <ul>
-            <li>3K = 1024 (-)</li>
+            <li>
+                <pre><code>POKE (Basic-Anfang) + 2,1
+</code></pre>
+                <p>Basic-Anfang in GV = 4096 (4096)<br>+ 3K = 1024 (-)<br>+ 8K = 4608 (-)</p>
+            </li>
+            <li>
+                <pre><code>SYS 50483:POKE 46,PEEK(35):POKE 45,PEEK (781)+2:CLR
+</code></pre>
+            </li>
+            <li>
+                <p>Die Besitzer des C 16 geben statt dessen ein:</p>
+                <pre><code>SYS 34840 : SYS 34892
+</code></pre>
+            </li>
         </ul>
-
-
-        <p>+8K = 4608 (-)</p>
-
-        <p>© SYS 50483:POKE 46,PEEK(35):POKE 45,</p>
-
-        <p>PEEK (781)+2:CLR</p>
-
-        <p>© Die Besitzer des C 16 geben statt dessen ein:</p>
-
-        <p>SYS 34840 : SYS 34892</p>
 
         <p>Unbedingt wichtig ist hier die Reihenfolge der Befehle! Ferner darf während der gesamten Prozedur keine Variable definiert werden, da diese das gelöschte Programm überschreiben würde.</p>
 
@@ -1933,7 +1936,7 @@
 
         <p>Wir wollen es jedoch nicht nur mit der Aufstellung alleine bewenden lassen. Die interessantesten Lokationen möchte ich hier herausgreifen und besprechen. Alle angeführten Adressen gelten, soweit nicht anders angegeben, sowohl für den VC 20 als auch für den C 16.</p>
 
-        <p>Adresse 43-56: Diese Adressen spielen, wie wir schon im ersten Teil gesehen haben, bei der Verwaltung von Basic-"Programmen und -Variablen eine zentrale Rolle. Über sie erfolgt die Trennung zwischen Programm und den einzelnen Variablentypen. Auch für das Speichern und Laden von Programmen liefern sie die Basisdaten. Die einzelnen Funktionen können Sie Tabelle 3 entnehmen.</p>
+        <p><strong>Adresse 43-56:</strong> Diese Adressen spielen, wie wir schon im ersten Teil gesehen haben, bei der Verwaltung von Basic-"Programmen und -Variablen eine zentrale Rolle. Über sie erfolgt die Trennung zwischen Programm und den einzelnen Variablentypen. Auch für das Speichern und Laden von Programmen liefern sie die Basisdaten. Die einzelnen Funktionen können Sie Tabelle 3 entnehmen.</p>
 
         <p>Eine interessante Gebrauchsmöglichkeit ergibt sich durch die Memoryroutine. Dies ist ein kurzes Basic-Programm, welches die Aufgabe hat, den von Programmen, Variablen, Strings und Arrays belegten Speicherplatz festzustellen (Listing 1):</p>
         <figure>
@@ -1955,15 +1958,15 @@
 
         <p>Gerade bei stark limitiertem Speicherplatz (wie zum Beispiel in der Grundversion) kann dieses Hilfsprogramm Aufschluß.über die momentane Speicherverteilung geben.</p>
 
-        <p>Adresse 59, 60: Diese Speicherzellen enthalten die laufende Zeilennummer eines Basic-Programms. Sollte es im Programmlauf unterbrochen werden, hat man hier die Möglichkeit, die Zeilennummer nachzulesen.</p>
+        <p><strong>Adresse 59, 60:</strong> Diese Speicherzellen enthalten die laufende Zeilennummer eines Basic-Programms. Sollte es im Programmlauf unterbrochen werden, hat man hier die Möglichkeit, die Zeilennummer nachzulesen.</p>
 
-        <p>Zustandsbeschreibung: das Statusflag</p>
+        <h2>Zustandsbeschreibung: das Statusflag</h2>
 
-        <p>Adresse 144: Dieses Statusflag ist auch von Basic aus über die STATUS- beziehungsweise ST-Anweisung abfragbar. Es liefert das Computerstatus-Byte, dessen Inhalt aufgrund der letzten Input-Output-Operation gesetzt wurde. Bezogen auf den Kassettenport liefert es nach Bild 3 bestimmte Meldungen. Die Informationen über die geladenen Programme werden binär wiedergegeben. Die Null signalisiert ein ordnungsgemäß geladenes Programm. 32 hingegen bedeutet, daß ein Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der Computer mehrere Meldungen in dieses Byte packt, beispielsweise 52 = 32 + 16 + 4: Hier wurde ein kurzer Block geladen, jedoch ist die Prüfsumme falsch, und ein fataler Ladefehler liegt vor.</p>
+        <p><strong>Adresse 144:</strong> Dieses Statusflag ist auch von Basic aus über die STATUS- beziehungsweise ST-Anweisung abfragbar. Es liefert das Computerstatus-Byte, dessen Inhalt aufgrund der letzten Input-Output-Operation gesetzt wurde. Bezogen auf den Kassettenport liefert es nach Bild 3 bestimmte Meldungen. Die Informationen über die geladenen Programme werden binär wiedergegeben. Die Null signalisiert ein ordnungsgemäß geladenes Programm. 32 hingegen bedeutet, daß ein Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der Computer mehrere Meldungen in dieses Byte packt, beispielsweise 52 = 32 + 16 + 4: Hier wurde ein kurzer Block geladen, jedoch ist die Prüfsumme falsch, und ein fataler Ladefehler liegt vor.</p>
 
         <p>An dieser Stelle ist es angebracht, sich näher mit dem Aufzeichnungsverfahren zu beschäftigen (Bild 4).</p>
 
-        <p>So kommen Programme aufs Band</p>
+        <h2>So kommen Programme aufs Band</h2>
 
         <p>Jeder Speichervorgang beginnt mit dem Header. Dieser Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekunden langer Pfeifton) und dem eigentlichen Programmkopf. Dieser enthält vier wichtige Informationen, nämlich über Programmtyp, Startadresse, Endadresse und Programmname. Diese Daten sind ebenfalls im Bandpuffer zu finden und können von dort abgerufen werden.</p>
 
@@ -1975,13 +1978,8 @@
             </li>
             <li>
                 <p>Ein File – also Daten aus Variablen – wurde gespeichert.</p>
+                <p>Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.</p>
             </li>
-        </ol>
-
-
-        <p>Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.</p>
-
-        <ol>
             <li>Ein Programm ist absolut zu laden.</li>
         </ol>
 
@@ -2006,13 +2004,9 @@
 
         <p>Nach diesem Exkurs zum Kassettenaufzeichnungsformat nun wieder zur Zeropage.</p>
 
-        <p>Adresse 145: Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen: Wert =</p>
+        <p><strong>Adresse 145:</strong> Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen: Wert =</p>
 
-        <p>253: Linke SHIFT-Taste gedrückt</p>
-
-        <p>254: STOP-Taste gedrückt</p>
-
-        <p>255: Keine der beiden gedrückt</p>
+        <p>253: Linke SHIFT-Taste gedrückt<br>254: STOP-Taste gedrückt<br>255: Keine der beiden gedrückt</p>
 
         <p>Wenn man das Low-Byte des STOP-Vektors (Adresse 808, beim C 16: 806) mit POKE 808,PEEK (808)-2 ändert (bitte beim C 16 Adresse 806 statt 808 verwenden), so ist man in der Lage, diese Taste von Basic aus abzufragen, ohne das laufende Programm anzuhalten. Ihr kann dann in der Routine eine besondere Funktion zugewiesen werden, beispielsweise Anhalten des Programmablaufs für eine bestimmte Zeit.</p>
 
@@ -2962,11 +2956,7 @@
 
         <p>Zuerst wird der Cursor mit HOME (=CHR$ (19)) an die linke obere Ecke befördert. Dort wird durch einen Druck auf die RETURN-Taste (=CHR$(13)) die Basic-Zeile in den Speicher übernommen. Nun befindet sich der Cursor in der dritten Zeile. Durch ein »Cursor down« (=CHR$(17)) bewegt er sich eine Zeile nach unten und steht nun auf dem Befehlswort RUN 60. Ein weiteres RETURN bewirkt den erneuten Start des Hilfsprogramms.</p>
 
-        <p>Wir benötigen für die Cursorbewegung also vier Werte. Diese werden vor dem Ende des Programms mit »POKE 631,19: POKE 632, 13: POKE 633,17:</p>
-
-        <p>POKE 634, 13: POKE 198,4«</p>
-
-        <p>(beziehungsweise die oben angegebenen Werte für den C 16) in den Tastaturpuffer geschrieben. Hierdurch simulieren wir eine gedrückte Tastenfolge: denn nachdem sich der Computer über den Befehl END wieder im Direktmodus befindet, wird zuerst der Tastaturpuffer geleert, wodurch der Cursor den vorbestimmten Weg nimmt. »POKE 198,4« (»POKE 239,4«) gibt an, wie viele Zeichen sich momentan im Puffer befinden.</p>
+        <p>Wir benötigen für die Cursorbewegung also vier Werte. Diese werden vor dem Ende des Programms mit »POKE 631,19: POKE 632, 13: POKE 633,17: POKE 634, 13: POKE 198,4« (beziehungsweise die oben angegebenen Werte für den C 16) in den Tastaturpuffer geschrieben. Hierdurch simulieren wir eine gedrückte Tastenfolge: denn nachdem sich der Computer über den Befehl END wieder im Direktmodus befindet, wird zuerst der Tastaturpuffer geleert, wodurch der Cursor den vorbestimmten Weg nimmt. »POKE 198,4« (»POKE 239,4«) gibt an, wie viele Zeichen sich momentan im Puffer befinden.</p>
 
         <p>Jetzt möchte ich noch einen kleinen Einblick in die Speicherorganisation geben, was auch im Hinblick auf Grafik von Bedeutung ist.</p>
 
