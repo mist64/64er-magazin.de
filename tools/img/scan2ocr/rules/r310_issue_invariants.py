@@ -243,8 +243,20 @@ def main(d):
         for mm in re.finditer(r'\b(?:Bild|Tabelle|Listing)\s+\]', prose): H('"] " for digit 1 (r280)', f)
         for mm in re.finditer(r'®', prose):                                H('® for ? (r280)', f)
 
-        for mm in re.finditer(r'<p class="intro">(?:Gier|Test|64\'er|\d{1,2}|-F\])\s', body):
-            H('badge bled into the intro (r280)', f)
+        # The bare \d{1,2} matches any intro opening with a number, and a
+        # correct one often does -- SH8602/159 "20 KByte adressierbarer
+        # Speicher ...".  It called H() DIRECTLY, so neither adjudicated.txt
+        # nor a note in the page could clear it: the same defect class as the
+        # old printed-period check.  Now it skips a number followed by a unit,
+        # and anything left goes through the adjudication path.
+        UNIT = re.compile(r'^\d{1,2}\s+(?:[KMG]?Byte|KB|MB|Bit|Zeichen|Spalten|'
+                          r'Zeilen|Sekunden|Minuten|Jahre|Mark|DM|Prozent|%)\b')
+        for mm in re.finditer(r'<p class="intro">((?:Gier|Test|64\'er|\d{1,2}|-F\])\s[^<]{0,60})', body):
+            if UNIT.match(mm.group(1)):
+                continue
+            if ADJUDICATED_HERE(body, mm.start(), ADJ, 'badge-intro', adj_seen):
+                continue
+            H('badge bled into the intro (r280)', f, mm.group(1)[:34])
         # An adjudicated exception is expressed IN THE FILE, next to the thing
         # it excuses.  A heading whose trailing period was READ off the master
         # carries an HTML comment saying so within the 400 characters before it;

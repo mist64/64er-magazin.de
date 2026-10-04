@@ -231,8 +231,17 @@ loose=$(ls "$dir"/*.png | grep -v '/title\.png$' | wc -l | tr -d ' ')
 # one file named for both (SH8601's 26-5_9.png, Bild 9 and Bild 6 of the same
 # plug).  Without it the check reported 105 files against 104 references and
 # looked like a lost image.
-refs=$(grep -hoE 'src="[0-9]+-[0-9a-z_]+\.png"' "$dir"/*.html | sort -u | wc -l | tr -d ' ')
-[ "$loose" = "$refs" ] || echo "  FAIL: $loose loose PNGs vs $refs unique src refs"
+# COMPARE THE SETS, NOT THE COUNTS.  Two counts being equal says nothing: a
+# dangling reference plus an unreferenced file cancel out, and so does one
+# file referenced twice.  Both pass a count test and both were shown on plants.
+comm -3 \
+  <(ls "$dir"/*.png | xargs -n1 basename | grep -v '^title\.png$' | sort -u) \
+  <(grep -hoE 'src="[0-9]+-[0-9a-z_]+\.png"' "$dir"/*.html \
+      | sed 's/^src="//; s/"$//' | sort -u) \
+  | sed 's/^\t/  referenced but no file: /; s/^\([^ ]\)/  file never referenced: \1/'
+# and separately: no file referenced twice
+grep -hoE 'src="[0-9]+-[0-9a-z_]+\.png"' "$dir"/*.html | sort | uniq -d \
+  | sed 's/^/  referenced more than once: /'
 
 # 2. no XXXXXXXXX placeholder left in any figcaption
 grep -nE 'XXXXXXXXX' "$dir"/*.html && echo "  FAIL: placeholder caption survived"

@@ -44,6 +44,31 @@ construct is almost never a list:
   into a chain of one-item lists.
 
 So: `<ol type="a">` in a converted file is a **bug signature**, not a style.
+
+## Discount drops `start=`, so every list not starting at 1 silently renumbers
+
+`<ol type="a">` is not the only list defect, and the others are quieter.
+Discount emits no `start=` attribute at all, so MEASURED on SH8602:
+
+- **9 lists** printed starting at something other than 1 display from 1;
+- a list interrupted by prose becomes a run of one-item `<ol>`s that **each say
+  "1."** (~20 here);
+- two adjacent lists fuse and continue one numbering;
+- a BASIC line beginning `1000. PRINT …` **loses its line number entirely** —
+  the same silent text loss as the `M. Grewe` case above, by another route.
+
+The corpus carries **one** `<ol start=` in 130+ `<ol>` elements, so earlier
+issues very likely shipped this unseen.
+
+**Check at 060**, and hand the hits to 190 with their source lines:
+
+```bash
+# every <ol> whose source list begins at N != 1, or at a number >= 100
+# (a BASIC line number the converter has eaten)
+grep -nE '^[ \t]*([2-9]|[1-9][0-9]+)\. ' <tmp>/ocr/<ID>.md | head -50
+```
+
+The fix is `<ol start="N">`, written at 190 against the source line.
 Grep for it after conversion and check every hit against the print.
 
 ## Discount emits invalid nesting for fenced code — the post-pass is mandatory

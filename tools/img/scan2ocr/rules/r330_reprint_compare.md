@@ -79,6 +79,32 @@ So a lead is a hypothesis. **Step 1 confirms or refutes it against the printed
 page, before anything is diffed.** "Not actually a reprint" is a legitimate,
 expected outcome and is recorded as one.
 
+## Step 0 — FIND the leads; a new issue has none
+
+`REPRINTS.md` is an INPUT to step 1 and **no step produces it.** SH8601's was
+inherited from a deleted PDF-OCR file; a fresh issue has nothing, and this
+rule's fallback — "a monthly with no leads runs this rule and records *ran,
+zero leads*" — then records a checked outcome that is simply false. MEASURED on
+SH8602: it had no `REPRINTS.md` and reprints **nine** articles (Checksummer
+0.92, MSE 0.96, Debugging 0.83, Ordnung 0.74, …). "Zero leads" would have been
+recorded for an issue that reprints a quarter of itself.
+
+So **measure the leads before step 1**, after 280 and before 325:
+
+> For every article of this issue, compute the 8-word-shingle overlap of its
+> normalised text against every article in `issues/`. Anything above ~0.5 is a
+> lead; write the table to `issues/<ID>/REPRINTS.md`. On SH8602 this took about
+> two minutes for 39 articles against the whole corpus.
+
+Shingles rather than a diff because a reprint is re-set, not copied: line
+breaks, hyphenation and typography all move, and an 8-word window survives
+that while a line-based measure does not. The scores above are the measured
+separation — a real reprint sat at 0.74-0.96, and the highest non-reprint well
+below.
+
+The leads this produces are still **hypotheses**, exactly as the warning above
+says. Step 1 confirms or refutes each one against the printed page.
+
 ## Step 1 — confirm the lead against the printed page
 
 For each row of the `## Leads` table in `REPRINTS.md`:
@@ -352,6 +378,33 @@ handling, because each has a plausible innocent explanation: a difference inside
 a **figure caption or table cell** (the two issues may genuinely print different
 captions), and a difference in a **number** (r000: a genuine print typo such as
 a backwards address range stays verbatim). Flag those to the user as such.
+
+### A THEIRS list is confirmed by a BLIND second reading before it is reported
+
+A `THEIRS` item asks the owner to change another issue's **published** file, so
+the evidence has to be stronger than one agent's reading — and by default it is
+not: the agent that forms the hypothesis is the agent that reads the page to
+confirm it. That is one reading, not two, which is exactly what this rule says
+about leads.
+
+**Before a THEIRS list goes to the owner:** one agent rewrites each item as a
+neutral question — the location and what our HTML has, with the claimed printed
+reading REMOVED — a different agent answers from the original's page images,
+and the orchestrator compares the answers against the claims. The orchestrator
+also states which items it checked itself. An item the blind reading does not
+reproduce is dropped or marked UNCONFIRMED.
+
+MEASURED on SH8602's 140 findings: **70 of 74 checkable claims reproduced, one
+was REFUTED, three were unverifiable.** The refuted one was "Heimorgek" — a
+kerning illusion at low zoom; the page reads »Heimorgel«, so applying it would
+have put a typo INTO a correct page. One wrong in 71 is the case this pass
+exists for.
+
+**And an APPLIED THEIRS item loses its D number.** The D numbers are
+positional, so once the originals change, `verify` fails on every pair that
+moved: the differences vanish, the numbering shifts, and a renamed file breaks
+its table row. Re-diff, remap the content, and record applied items in a
+per-pair "THEIRS applied" table.
 
 ## Step 7 — the reprint carries a reference to its original
 

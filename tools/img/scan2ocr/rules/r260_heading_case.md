@@ -35,8 +35,14 @@ A heading qualifies for re-casing iff **all** of the following hold:
 2. At least **3 of those uppercase characters appear in a row** (i.e.
    the regex `[A-ZÄÖÜẞ]{3,}` matches somewhere in the heading).
 
-A heading that IS code stays in caps — 8609's `POKE 1,0 ???` is the only hit
-in the corpus and is correct. So is `14mal schneller laden`, which check 2
+A heading that IS code stays in caps. The exemption below lists ROM keywords,
+but a **program NAME** is code too and is not in any keyword list — SH8602's
+`UNNEW` is one, and the check reported FAIL on a correct tree with no way to be
+told otherwise. So: **r260 reads `adjudicated.txt` the way r310 does**, under
+the key `heading-all-caps`, and a program name is adjudicated there once rather
+than added to a keyword list that can never be complete.
+
+8609's `POKE 1,0 ???` is one hit and is correct. So is `14mal schneller laden`, which check 2
 flags and published precedent shares (`30mal schneller mit SpeedDos`).
 
 The 3-in-a-row clause excludes mixed-case headings where one

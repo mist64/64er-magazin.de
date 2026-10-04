@@ -139,7 +139,10 @@ for f in issues/8607/*.html; do
 done
 
 # 4. every <meta name="64er.pages"> looks like a page spec
-grep -h '64er.pages" content=' issues/8607/*.html | grep -vE 'content="[0-9,\- ]+"'
+# A LETTERED page (169a, 193b) is required by "Three conventions" above, so the
+# class must admit a trailing letter -- as written this check flagged every one
+# of them.  The FILENAME keeps the plain number (the corpus does: 8507, 8508).
+grep -h '64er.pages" content=' issues/8607/*.html | grep -vE 'content="[0-9a-z,\- ]+"'
 
 # 5. consolidated file is gone
 [ ! -f issues/8607/8607.html ] && echo "consolidated removed ✓"

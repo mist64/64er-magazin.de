@@ -25,8 +25,13 @@ def pages_of(f):
     if m:
         for part in m.group(1).split(','):
             part = part.strip()
+            # r080's lettered pages ('169a') are not ints -- int('131b') dies
+            # here and took the whole check with it on SH8602.
+            part = re.sub(r'(?<=\d)[a-z]$', '', part)
             if '-' in part:
-                a, b = part.split('-'); out |= set(range(int(a), int(b) + 1))
+                a, b = (re.sub(r'[^0-9]', '', x) for x in part.split('-', 1))
+                if a and b:
+                    out |= set(range(int(a), int(b) + 1))
             elif part.isdigit():
                 out.add(int(part))
     return out
@@ -40,6 +45,7 @@ def main(issue_dir, ocr):
     for f in glob.glob(issue_dir + '/*.html'):
         for p in pages_of(f): p2a.setdefault(p, []).append(f)
     bad = []
+    dropped = checkable = 0        # so "0 findings" can be told from "0 looked at"
     for lf in sorted(glob.glob(f'{ocr}/*.labels.json')):
         p = int(os.path.basename(lf)[:3])
         lab = json.load(open(lf))
@@ -48,7 +54,13 @@ def main(issue_dir, ocr):
             if str(b.get('id')) in order: continue
             if not str(b.get('label', '')).startswith('listing'): continue
             t = str(b.get('text', ''))
-            if len(DUMP.findall(t)) < 5: continue      # only monitor dumps are checkable this way
+            dropped += 1
+            # ONLY SMON monitor dumps are checkable this way.  An issue whose
+            # dropped listings are BASIC or MSE yields nothing here, and the
+            # result is then "0 findings" from a check that examined nothing --
+            # on SH8602 a planted removal of EVERY <pre> still reported 0.
+            if len(DUMP.findall(t)) < 5: continue
+            checkable += 1
             arts = p2a.get(p, [])
             html = ' '.join(io.open(a, encoding='utf-8').read() for a in arts)
             pres = ' '.join(re.findall(r'<pre(?![^>]*data-filename)[^>]*>(.*?)</pre>', html, re.S))
@@ -58,7 +70,11 @@ def main(issue_dir, ocr):
             if cov < 0.5:
                 bad.append((p, len(t.split()), round(cov, 2),
                             [os.path.basename(a)[:30] for a in arts], ' '.join(t.split()[:12])))
-    print(f'dropped monitor-dump blocks with no home in the article: {len(bad)}')
+    print(f'dropped listing blocks: {dropped}   of those checkable as monitor '
+          f'dumps: {checkable}   with no home in the article: {len(bad)}')
+    if dropped and not checkable:
+        print('  NOTE: none of the dropped listings is a monitor dump, so this '
+              'check examined nothing. "0" here is not evidence of coverage.')
     for p, n, c, a, t in bad:
         print(f'  p{p:<4} words={n:<4} addr-coverage={c}  {a}\n        {t}…')
     return 1 if bad else 0
