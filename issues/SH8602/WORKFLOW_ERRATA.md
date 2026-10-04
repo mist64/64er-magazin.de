@@ -617,3 +617,51 @@ a black darker than K extrapolates to a hue." And a 006 check: "a page of the
 interior stock classified contone is suspect — look at it before building."
 Also: 006 has `FORCE_CONTONE` but no `FORCE_BILEVEL`; the mirror switch is the
 cheap fix for one page.
+
+## Sign-off (step 340) — 2026-10-04
+
+The build is finished: owner approved the issue PDF ("perfect") and asked to
+finish without pushing. This file was kept from the first confusion (005, the
+mixed-resolution scans) to the end; every entry above names its step, quotes
+the rule, and carries the sentence that would have prevented it.
+
+**Ranked by cost** (what to harvest first):
+1. **005 assumed 2400 dpi throughout** — blocked the build; fixed mid-build in
+   `r005_masters_sheet.py` (per-page `scan_dpi`), measured before/after. The
+   thumb recipe and r005's text still need the general statement.
+2. **No step produces reprint leads for a new issue** (330) — without the
+   overlap measurement the issue would have recorded "zero leads" while
+   reprinting 9 articles; the comparison then fixed 5 of ours and found 140 in
+   other issues.
+3. **THEIRS findings need a blind second reading** (330) — 1 of 71 checkable
+   claims was a kerning illusion that would have put a typo INTO a correct page.
+4. **Converter list numbering** (060) — Discount drops `start=`, renumbers and
+   deletes a BASIC line number; nothing checks it; fixed by hand at 190.
+5. **Verification blocks that cannot fail or fail on correct output** — 080
+   (lettered pages), 150 (count not set), 260 (program-name heading), 310
+   (badge check has no adjudication hook), 320 (dropped-listings: crashes on
+   `131b`, vacuous without SMON dumps), 325 (dump checker reads 3 fewer forms
+   than claimed), 330 (`verify` substring match, `|` splitting).
+6. **Monthly-shaped rules re-classified `all`** — 110 (Sonderheft dates are
+   bounds), 140 (recurring slugs), 210 (vorwort band), 220 (no Sonderheft CSV
+   reader, routing check examines 0 rows).
+7. **Owner rulings with rule consequences** — glyph listings are cropped whole,
+   never `[ILLEGIBLE]`; spaced dash = en dash; filler cartoons are never figures;
+   "record only" for prg errata; THEIRS reported vs applied is the owner's call.
+8. **005 K anchor not measured** — a black darker than the built-in K separates
+   as brown (p3); 006 needed the new `FORCE_BILEVEL`.
+
+**Rules that saved the build** (keep them): r000 "THE SCAN IS THE ONLY INPUT"
+(re-derived thumbs exposed the resolution problem at once); r005's stamps and
+parity gate; r130/r170's checksum proofs (107/107, 27/27, 39/39 V1, byte-
+identical assemblies); r160's visual walk (13 tables no sweep had found);
+r300's "HOW OFTEN: essentially never" (kept every Futureteufelchen candidate in
+LOG); r000's crop-wins and harm-test conventions from memory.
+
+**Orchestrator errors, recorded as such:** briefed a sub-agent from the outlier
+(`64er.issue` SH8601 form); "write only *.html" blocked r170's prg recreation;
+"use the Impressum to expand initials" against r180's guardrail; relayed THEIRS
+findings unchecked; let 006 compile before the owner's page review.
+
+Signed off by the builder session (64er_SH8602). The harvest into the rules is
+for the orchestrator, from this file, now that it is complete.
