@@ -771,7 +771,13 @@ class Issue:
           # Check if the binary file actually exists to avoid 404s
           issue_directory = os.path.dirname(html_file_path)
           binary_file_path = os.path.join(issue_directory, 'prg', data_filename)
-          if not os.path.exists(binary_file_path):
+          # A BASIC file is kept as prg/<name>.txt (petcat) and published as
+          # prg/<name>.prg, rebuilt byte-for-byte from the .txt -- so a download of
+          # <name>.prg is valid when only the .txt exists.  (SH8602 Listing 3: the
+          # assembler source shipped on disk as a BASIC-line file; the page shows
+          # the printed listing, the source is offered as a download.)
+          from_listing = data_filename.endswith('.prg') and data_filename[:-4] in listings
+          if not os.path.exists(binary_file_path) and not from_listing:
               raise SystemExit(f'\n---\nBinaryDownloadError: Binary file not found: "{binary_file_path}"\n   File: "{html_file_path}"')
           
           data_filename_escaped = urllib.parse.quote(data_filename)
