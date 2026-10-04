@@ -24,7 +24,8 @@
 
         <p>Anschließend geben Sie den Befehl »M 1400 147f« ein. Auf dem Bildschirm erscheint der Speicherauszug von $1400 bis $14 7fals Hexdump. Jetzttippen Sie Zeile für Zeile die Werte aus Listing 2 ein. Am Schluß jeder Zeile drücken Sie die RETURN-Taste, die Zeile ist dann in den Speicher aufgenommen. Haben Sie dies erledigt, so können Sie sich mit »M 1480 14ff« den nächsten Bereich vornehmen. Nachdem Sie sich auf diese Weise bis zum Schluß (Adresse $1547) desListings 2 durchgearbeitet haben, gelangen Sie über den Befehl »X« wieder in den Basic-Bereich. Schreiben Sie nun folgenden Befehl:</p>
 
-        <p>POKE 45,80:POKE 46,21:SAVE"FAST-HC",8</p>
+        <pre><code>POKE 45,80:POKE 46,21:SAVE"FAST-HC",8
+</code></pre>
 
         <p>Mit diesem kleinen Trick speichern Sie das Basic- und Maschinenprogramm gemeinsam ab, was Sie jetzt auch unbedingt tun sollten.</p>
 
@@ -35,11 +36,63 @@
         <address class="author">(Jeans Engel/kn)</address>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>1 PRINT"{CLR,2DOWN }***{3SPACE,FLASHON}FAST HARDCOPY{4SPACE}C16/C116{FLASHOFF,4SPACE}***"
+2 PRINT"{DOWN,2SPACE}3.48 MIN{4SPACE}UEBER SEIKOSHA GP-100"
+3 PRINT"{DOWN }(C)1985 GERMAN SOFT{3SPACE}(P) JENS ENGEL"
+4 PRINT"{4DOWN }GRAPHIK MUSS SCHON IM SPEICHER SEIN!"
+5 PRINT"{DOWN }DRUCKER FERTIG? &lt;TASTE&gt;"
+9 IFPEEK(198)=64THEN9
+10 A$="ANFANG**********************************************************************ENDE"
+12 X$=A$+A$:Y$=X$:OPEN1,4:GRAPHIC1
+18 POKE216,0:POKE217,0:POKE3,0:POKE4,0:POKE212,0:FORT=0TO27
+30 SYS5242:PRINT#1,CHR$(8);X$;Y$:NEXT
+40 SYS5242:FORT=0TO159
+42 POKE5900+T,PEEK(5900+T)AND143:POKE5738+T,PEEK(5738+T)AND143:NEXT
+44 PRINT#1,CHR$(8);X$;Y$:GRAPHIC0</pre>
             <figcaption>Listing 1. Basic-Programm zu »Fast-Hardcopy«</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>&gt;1400 A5 D4 29 F8 85 0E 85 05
+&gt;1408 A9 00 85 06 06 05 26 06
+&gt;1410 06 05 26 06 18 A5 05 65
+&gt;1418 0E 85 05 A5 06 69 00 85
+&gt;1420 06 06 05 26 06 06 05 26
+&gt;1428 06 06 05 26 06 A5 D4 29
+&gt;1430 07 18 65 05 85 05 A5 06
+&gt;1438 69 00 85 06 18 A5 03 29
+&gt;1440 F8 65 05 85 05 A5 04 65
+&gt;1448 06 85 06 18 A9 00 65 05
+&gt;1450 85 05 A9 20 65 06 85 06
+&gt;1458 A5 03 29 07 49 07 AA A9
+&gt;1460 01 CA 30 03 0A D0 FA A0
+&gt;1468 00 31 05 F0 07 A9 01 60
+&gt;1470 EA 60 EA EA A9 00 60 EA
+&gt;1478 60 EA A9 00 85 D3 EA EA
+&gt;1480 20 00 14 F0 06 A9 01 05
+&gt;1488 D3 85 D3 E6 D4 20 00 14
+&gt;1490 F0 06 A9 02 05 D3 85 D3
+&gt;1498 E6 D4 20 00 14 F0 06 A9
+&gt;14A0 04 05 D3 85 D3 E6 D4 20
+&gt;14A8 00 14 F0 06 A9 08 05 D3
+&gt;14B0 85 D3 E6 D4 20 00 14 F0
+&gt;14B8 06 A9 10 05 D3 85 D3 E6
+&gt;14C0 D4 20 00 14 F0 06 A9 20
+&gt;14C8 05 D3 85 D3 E6 D4 20 00
+&gt;14D0 14 F0 06 A9 40 05 D3 85
+&gt;14D8 D3 A9 80 05 D3 85 D3 E6
+&gt;14E0 03 D0 02 E6 04 C6 D4 C6
+&gt;14E8 D4 C6 D4 C6 D4 C6 D4 C6
+&gt;14F0 D4 EA EA EA EA EA EA A5
+&gt;14F8 D8 C9 A0 F0 13 A4 D8 E6
+&gt;1500 D8 A5 D3 99 0C 17 4C 7A
+&gt;1508 14 EA EA EA EA EA EA EA
+&gt;1510 A5 D9 C9 A0 F0 0F A4 D9
+&gt;1518 E6 D9 A5 D3 99 6A 16 4C
+&gt;1520 7A 14 EA EA EA EA EA EA
+&gt;1528 EA EA EA EA EA EA A9 00
+&gt;1530 85 03 85 04 A5 D4 18 69
+&gt;1538 07 85 D4 A9 00 85 D8 85
+&gt;1540 D9 60 00 00 00 00 00 00</pre>
             <figcaption>Listing 2. Maschinenprogramm zu »Fast-Hardcopy«. Bitte mit dem eingebauten Monitor eingeben.</figcaption>
         </figure>
         <div class="binary_download" data-filename="fast hardcopy.prg" data-name="Fast-Hardcopy"></div>

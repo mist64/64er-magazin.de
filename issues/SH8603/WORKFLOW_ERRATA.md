@@ -275,3 +275,12 @@ listing proves itself (hex ↔ disassembly ↔ contiguous addresses), which foun
 nothing wrong here but would catch a misread byte — worth naming. Briefing 2b
 ("tesseract-locate the caption's bbox") fails where the box has no caption
 block (L1, L14, L16–L18); page overviews located them.
+
+## 170 — GLM-OCR is not byte-perfect on faint dot-matrix dumps; non-MSE row checksums are proof too
+
+From 170 part B: r170 calls the local GLM-OCR "byte-perfect" on single-column
+crops — measured on clean MSE print. On Penco's faint dot-matrix dump it read
+~86 % of bytes right even on half-row crops, and on a two-column TEDMON dump
+it sometimes emits the address and data columns as separate lists. Tacco's
+own format carries a 16-bit row sum that proves a transcription as well as
+MSE's; the rule's recreation table has rows only for MSE and Checksummer.

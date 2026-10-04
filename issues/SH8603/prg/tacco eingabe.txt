@@ -1,0 +1,44 @@
+;tacco eingabe.prg ==0801==
+    1 rem                      *****************
+    2 rem                      *     tacco     *
+    3 rem                      * eingabeprogr. *
+    4 rem                      *****************
+   10 rem wenn sie eine 3k speichererweiterung besitzen, koennen sie tacco mit
+   20 rem diesem programm eintippen. das programm gibt auch die pruefsumme aus. die
+   30 rem jeweils letzte zeile kann wiederholt eingegeben werden.
+   35 rem die remarkzeilen bitte nicht abschreiben!
+   40 rem tacco wird mit sys5872 gestartet. vor dem ersten start muss es jedoch
+   50 rem abgespeichert sein. dies geschieht wiefolgt:
+   60 rem sys 64802                            [ systemreset ]
+   70 rem poke43,1:poke44,16:poke4096,0        [ basicbeginn initialisieren ]
+   75 rem new
+   76 rem 1 sys5872                            [ diese zeile eingeben ]
+   80 rem poke45,0:poke46,30                   [ basic ende ]
+   90 rem poke51,20:poke52,30                  [ filename auf bildschirm ]
+   91 rem bildschirm loeschen und mit cursor in die dritte zeile
+   92 rem save"tacco"
+   93 rem
+   94 rem
+   95 rem
+   99 print"{clr}":poke 51,200:poke 52,15
+  100 ad=4112
+  110 su=0:for j=0 to 19
+  111 d=ad:gosub 400:print h$;:input h$
+  120 if len(h$)<>2 then 111
+  121 d=0:for i=0 to 1
+  122 t$=mid$(h$,2-i,1)
+  123 if t$<"0"or t$>"9"and t$<"a"or t$>"f"then 111
+  124 if t$>"9"then d=d+(asc(t$)-55)*16^i:goto 126
+  125 d=d+(asc(t$(-48)*16^i
+  126 next
+  130 poke ad,d:su=su+d:ad=ad+1:next j
+  140 d=su:gosub 400:print"checksumme:{rvon}"h$"{rvof} ok?"
+  150 get f$:if f$=""then 150
+  160 if f$="j"then 110
+  170 if f$="n"then ad=ad-20:goto 110
+  180 goto 150
+  400 h$="":for i=3 to 0 step-1
+  410 s=int(d/16^i):d=d-s*16^i
+  420 if s>9 then h$=h$+chr$(s+55):goto 440
+  430 h$=h$+chr$(s+48)
+  440 next i:return
