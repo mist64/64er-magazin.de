@@ -36,6 +36,96 @@
 
         <p>Die Bereich- und Farb-Zuordnung können Sie den Tabellen 1 und 2 entnehmen. Die Helligkeit kann zwischen O (sehr dunkel) und 7 (sehr hell) variiert werden. Ebenso, wie man bei den älteren Commodore-Geräten den jeweiligen Farbwert mittels »PEEK« wieder abfragen konnte, gibt es im neuen Basic 3.5 die Funktionen »RCLR(X)«, um die Farbe des Bildschirmpunktes X auszugeben, und »RLUM(X)«, um die Helligkeit der Farbe zu bestimmen.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>WERT</th>
+                    <th>BEREICH</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Bildschirm-Hintergrund</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Vordergrund (Zeichen, Cursor)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Zusatzfarbe 1 (für Multicolor)</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Zusatzfarbe 2 (für Multicolor)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Bildschirmrand</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die Zuordnung der Farbparameter im Multicolor-Modus</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>WERT</th>
+                    <th>Farbe</th>
+                    <th>WERT</th>
+                    <th>Farbe</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Schwarz</td>
+                    <td>9</td>
+                    <td>Orange</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Weiß</td>
+                    <td>10</td>
+                    <td>Braun</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Rot</td>
+                    <td>11</td>
+                    <td>Gelbgrün</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Cyan</td>
+                    <td>12</td>
+                    <td>Rosa</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Purpur</td>
+                    <td>13</td>
+                    <td>Blaugrün</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Grün</td>
+                    <td>14</td>
+                    <td>Hellblau</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Blau</td>
+                    <td>15</td>
+                    <td>Dunkelblau</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Gelb</td>
+                    <td>16</td>
+                    <td>Hellgrün</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. 16 Grundfarben lassen sich mit dem C16 darstellen</figcaption>
+        </figure>
+
         <h2>Die verschiedenen Grafikmodi</h2>
 
         <p>Soviel zu den Farben. Mit den Grafiksymbolen des C 16 lassen sich zwar viele einfache Grafiken (Blockgrafiken) erstellen, aber man stößt sehr schnell an die Grenzen des Machbaren. Um auch komplexere Grafiken zu erstellen, muß in den Grafik-Modus umgeschaltet werden. Man unterscheidet zwei Grafik-Modi: zum einen hochauflösende Grafik, zum anderen Multicolor-Grafik. Im HiRes-Modus können 64000 Punkte einzeln angesprochen werden (siehe Bild 1). Hier können jedoch in jeder Cursorposition (8 x 8 Einzelpunkte) nur zwei Farben dargestellt werden (Zeichen- und Hintergrundfarbe). Bis zu vier Farben lassen sich im Multicolor-Modus darstellen, allerdings auf Kosten der Auflösung: Pro Zeichen können nur noch 4 x 8 Punkte dargestellt werden. Daraus ergibt sich eine Gesamtauflösung von 32000 Grafikpunkten (siehe Bild 2).</p>
@@ -45,6 +135,42 @@
         <p>Im HiRes-Modus genügt ein Bit, um einen Punkt zu setzen, da die Zeichenfarbe hier entweder ein- oder ausgeschaltet wird. Im Multicolor-Modus muß jedem Bildpunkt aber auch noch eine von vier Farben zugeteilt werden. Das heißt, man muß jedem Punkt einen Wert zwischen Null und Drei zuordnen. Hierfür genügt aber nicht mehr ein Bit. Um vier unterschiedliche Zustände darstellen zu können, benötigt man also 2 Bit (2?=4). Da aber im Multicolor-Modus nicht doppelt so viel Speicherplatz aufgewendet werden kann, muß man für Farbe die halbe Auflösung in Kauf nehmen.</p>
 
         <p>Die beiden Grafik-Modi lassen sich mit dem »GRAPHIC«-Befehl ein- und ausschalten. Dem Befehl sollten zwei Parameter folgen, von denen der erste den Modus angibt (Tabelle 3). Ist der zweite Parameter eine Eins, so wird der Grafik-Bildschirm gelöscht. Folgt kein zweiter Parameter oder ist dieser Null, so bleibt die Grafik erhalten. Wollen Sie im Programm erfahren, in welchem Modus Sie sich befinden, so gibt die Funktion »RGR(X)« den gegenwärtigen Modus aus (Tabelle 3). Befindet man sich schon im Grafikmodus und soll der Bildschirm gelöscht werden, so benützt man den »SCNCLR«-Befehl. Verläßt man den Grafikmodus mit »GRAPHIC O«, so stehen dem Benutzer trotzdem nur 2 KByte Speicher zur Verfügung, da das Grafikbild bis zum erneuten Einschalten erhalten bleibt. Erst nach dem Befehl »GRAPHIC CLR« werden die restlichen 14 KByte freigegeben. In diesem Fall bleibt auch die Grafik nicht mehr erhalten.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>WERT</th>
+                    <th>Modus</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Textmodus</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>HiRes-Grafik</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>HiRes-Grafik<br>&amp; Text</td>
+                    <td>(Zeile 1 - 20)<br>(Zeile 21 - 25)</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Multicolor-Grafik</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Multicolor-Grafik<br>&amp; Text</td>
+                    <td>(Zeile 1 - 20)<br>(Zeile 21 - 25)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Fünf verschiedene Grafikmodi stehen dem Programmierer zur Verfügung</figcaption>
+        </figure>
 
         <p>In beiden Grafik-Modi befindet sich der Koordinatensprung (0/0) links oben. Damit zum Beispiel beim Konstruieren eines Graphen nicht jedesmal überlegt werden muß, in welchem Modus man sich gerade befindet, gibt es den »SCALE«-Befehl. Schaltet man die Skalierung mit »SCALE 1« ein, so stehen, unabhängig vom Modus, auf den X- und Y-Achsen jeweils die Werte zwischen O und 1023 zur Verfügung. Das heißt aber nicht, daß sich auch die Auflösung auf 1048576 (1024 x 1024) Punkte erhöht hat. Es wird vielmehr mit mehreren benachbarten Adressen jeweils ein- und derselbe Punkt angesprochen. Abgeschaltet wird die Skalierung mit »SCALE 0«.</p>
 
@@ -56,11 +182,11 @@
 
         <p>Gezeichnet wird mit Hilfe des »DRAW«-Befehls. Mit ihm lassen sich Punkte, Linien und ganze Linienzüge darstellen. Für einen Punkt sind zusätzlich drei Parameter notwendig: Die erste Zahl gibt die Farbe an. Sie kann im HiRes-Modus maximal zwei Werte annehmen:</p>
 
-        <p>O = Hintergrundfarbe (=Punkt löschen) 1 = Zeichenfarbe (=Punkt setzen)</p>
+        <p>0 = Hintergrundfarbe (=Punkt löschen)<br>1 = Zeichenfarbe (=Punkt setzen)</p>
 
         <p>Im Multicolor-Modus stehen zwei zusätzliche Werte zur Auswahl:</p>
 
-        <p>2 = Zusatzfarbe 1 (siehe Color-Befehl) 3 = Zusatzfarbe 2 (siehe Color-Befehl)</p>
+        <p>2 = Zusatzfarbe 1 (siehe Color-Befehl)<br>3 = Zusatzfarbe 2 (siehe Color-Befehl)</p>
 
         <p>Der zweite und dritte Parameter des »DRAW«-Befehls geben die X- und Y-Koordinaten des Punktes an. Der Befehl »DRAW 1,160,100« setzt im HiRes-Modus einen Punkt in der Bildschirmmitte. Soll eine Linie gezeichnet werden, so sind weiter zwei Parameter nötig, die die Koordinaten des Endpunktes angeben. Diese beiden Parameter werden mit »TO« abgetrennt:</p>
 
@@ -109,6 +235,36 @@
         <p>Da der C 16 im Gegensatz zum C 64 über keine Sprites verfügt, versucht man sich beim C 16 mitsogenannten »Shapes« zu behelfen. Shapes sind rechtwinklige Ausschnitte aus dem Grafikbildschirm, die einer Stringvariablen übergeben wurden.</p>
 
         <p>Diese Ausschnitte lassen sich dann beliebig an jede Stelle des Bilschirms setzen. Das Shape kann nach Belieben in fünf verschiedenen Modi wiedergegeben werden. Das Shape kann entweder revers oder wie die Originalfläche dargestellt werden. Es läßt sich ebenso mit dem neuen Hintergrund »logisch« verknüpfen. Die entsprechenden Modi können Sie der Tabelle 4 entnehmen.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>WERT</th>
+                    <th>Wiedergabe-Modus</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Wie Original</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Revers</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Oder-Verknüpfung mit Grafikfläche</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>UND-Verknüpfung mit Grafikfläche</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Exklusiv-Oder-Verknüpfung mit Grafikfläche</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. Shapes lassen sich mit Grafiken logisch verknüpfen</figcaption>
+        </figure>
 
         <p>Zur Shapehandhabung stehen dem Benutzer zwei Befehle zur Verfügung. Der »SSHAPE«-Befehl übernimmt eine Rechteckfläche aus dem Grafikbild in eine Basic-Stringvariable. Der Befehl hat folgende Syntax:</p>
 

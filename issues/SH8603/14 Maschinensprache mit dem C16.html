@@ -85,9 +85,7 @@
 
         <p>Ebenso wie bei vielen meiner Kollegen bestand meine erste Assembler-»Tat« im Beschreiben des Bildschirms mit unsinnigen Zeichen, zum Beispiel Füllen mit lauter Buchstaben. Daich damals noch eine Scheu vor der Verwendung von Betriebssystemroutinen besaß, wurde jedes Zeichen von mir einzeln in den Bildschirmspeicher »gePOKEt« und die Farbe in der entsprechenden Speicherzelle des Farb-RAMs gesetzt. Für den Fall, daß Sie ebenfalls den Bildschirmspeicher direkt ansprechen wollen, stelle ich Ihnen nun die wichtigsten benötigten Adressen vor:</p>
 
-        <p>Farbspeicher: $0800 bis $OBFF</p>
-
-        <p>Bildschirmspeicher: $0COO bis $OFFF</p>
+        <p>Farbspeicher: $0800 bis $0BFF<br>Bildschirmspeicher: $0C00 bis $0FFF</p>
 
         <p>Wichtig sind nur die ersten 1000 Byte des jeweiligen Bereichs (25 Spalten x 40 Zeichen = 1000 Zeichen). Daß beide Bereiche dennoch ein volles Kilobyte umfassen, ist mitunter sehr vorteilhaft, zum Beispiel wenn der gesamte Bildschirm gelöscht oder mit einem bestimmten Zeichen beschrieben werden soll. In diesen Fällen können Sie mit einem recht einfachen Programm volle vier Seiten, das heißt 1024 Byte, beschreiben. Da der relevante Teil des Bildschirm- beziehungsweise Farbspeichers nur 1000 Byte umfaßt, beschreiben Sie zwar mehr Speicherzellen als unbedingt nötig, das Programm wird dadurch jedoch erheblich vereinfacht und kürzer.</p>
 
@@ -422,9 +420,143 @@
 
         <p>Sollten Sie eine Floppy besitzen, können Sie beobachten, wie sich die Grafik während des Ladevorgangs langsam aufbaut. Bei Verwendung einer Datasette wird bekanntlich der Bildschirm während Kassettenoperationen »weggeklappt«, so daß Sie die Grafik erst nach dem vollständigen Ladevorgang auf dem Bildschirm sehen. Kassettenbesitzer sollten sich in Geduld üben, da das Speichern beziehungsweise Laden einen jeweils acht Kilobyte großen Speicherbereich umfaßt und daher etwa fünf Minuten dauern wird.</p>
 
-        <address class="author">(S. Baloui/ah)</address>
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th colspan="5">Freie Speicherbereiche:</th>
+                </tr>
+                <tr>
+                    <td>Zeropage:</td>
+                    <td>$D8</td>
+                    <td>bis</td>
+                    <td>$E8</td>
+                    <td>(Anwendersoftware)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>$61</td>
+                    <td>bis</td>
+                    <td>$70</td>
+                    <td>(Fließkommaakkumulatoren)</td>
+                </tr>
+                <tr>
+                    <td colspan="5">Sonstige Bereiche:</td>
+                </tr>
+                <tr>
+                    <td>$0200</td>
+                    <td>bis</td>
+                    <td>$02AC</td>
+                    <td colspan="2">(Basic-Eingabepuffer/DOS-Arbeitsbereich)</td>
+                </tr>
+                <tr>
+                    <td>$025D</td>
+                    <td>bis</td>
+                    <td>$02AC</td>
+                    <td colspan="2">(aktuelle DOS-Parameter, zum Beispiel Filenamen)</td>
+                </tr>
+                <tr>
+                    <td>$0332</td>
+                    <td>bis</td>
+                    <td>$03F6</td>
+                    <td colspan="2">(Kassettenpuffer)</td>
+                </tr>
+                <tr>
+                    <td>$03F7</td>
+                    <td>bis</td>
+                    <td>$0436</td>
+                    <td colspan="2">(RS232-Puffer)</td>
+                </tr>
+                <tr>
+                    <td>$055F</td>
+                    <td>bis</td>
+                    <td>$05E6</td>
+                    <td colspan="2">(Funktionstastenbelegung)</td>
+                </tr>
+            </table>
+            <table class="plain">
+                <tr>
+                    <th colspan="2">Speicherbereiche/Zeiger:</th>
+                </tr>
+                <tr>
+                    <td>Farbspeicher</td>
+                    <td>:$0800 bis $0BFF</td>
+                </tr>
+                <tr>
+                    <td>Bildschirmspeicher</td>
+                    <td>:$0C00 bis $0FFF</td>
+                </tr>
+                <tr>
+                    <td>Zeiger Basic-Anfang (Standard $1000)</td>
+                    <td>:$2B/$2C</td>
+                </tr>
+                <tr>
+                    <td>Zeiger Basic-Ende (Standard $3FFF)</td>
+                    <td>:$33/$34</td>
+                </tr>
+            </table>
+            <table class="plain">
+                <tr>
+                    <th colspan="4">Betriebssytemroutinen:</th>
+                </tr>
+                <tr>
+                    <th>Adresse</th>
+                    <th>Label</th>
+                    <th>Funktion</th>
+                    <th>Übergabeparameter</th>
+                </tr>
+                <tr>
+                    <td>$FFE4</td>
+                    <td>GETIN</td>
+                    <td>Zeichen holen</td>
+                    <td>keine; Zeichenübergabe im Akku</td>
+                </tr>
+                <tr>
+                    <td>$FFCF</td>
+                    <td>BASIN</td>
+                    <td>Zeichen holen bis RETURN</td>
+                    <td>keine; Zeichenübergabe im Akku</td>
+                </tr>
+                <tr>
+                    <td>$FFD2</td>
+                    <td>BSOUT</td>
+                    <td>Zeichen ausgeben</td>
+                    <td>Zeichen im Akku übergeben</td>
+                </tr>
+                <tr>
+                    <td>$FFF0</td>
+                    <td>PLOT</td>
+                    <td>Cursor setzen/<br>Position holen</td>
+                    <td>Zeile(X)/Spalte(Y)/Carry Clear<br>Carry Set/Positionsübergabe in X/Y</td>
+                </tr>
+                <tr>
+                    <td>$FFBA</td>
+                    <td>SETLFS</td>
+                    <td>Filepar. setzen</td>
+                    <td>Filenr.(A)/Gerät(X)/Sek.Adresse(Y)</td>
+                </tr>
+                <tr>
+                    <td>$FFBD</td>
+                    <td>SETNAM</td>
+                    <td>Filename setzen</td>
+                    <td>Länge Name(A)/Adresse Name(X/Y)</td>
+                </tr>
+                <tr>
+                    <td>$FFD5</td>
+                    <td>LOAD</td>
+                    <td>Programm laden/</td>
+                    <td>Load(0)-Verify(1)- Flag(A)/ Ladeadresse Verify durchführen (X/Y) bei relativem Laden, absolutes Laden bei Sek.-Adresse 1 (SETLFS)</td>
+                </tr>
+                <tr>
+                    <td>$FFD8</td>
+                    <td>SAVE</td>
+                    <td>Programm speichern</td>
+                    <td>Zeropage-Adresse des Zeigers auf die Anfangsadresse(A)/ Endadresse+1(X/Y)</td>
+                </tr>
+            </table>
+            <figcaption>Tabellarische Übersicht</figcaption>
+        </figure>
 
-        <p>TODO TABLE</p>
+        <address class="author">(S. Baloui/ah)</address>
     </article>
 </body>
 

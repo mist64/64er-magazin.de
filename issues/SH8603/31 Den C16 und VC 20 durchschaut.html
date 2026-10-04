@@ -27,6 +27,66 @@
         <p>Beginnen wollen wir mit der Organisation des verfügbaren RAM durch den Basic-Interpreter.</p>
 
         <p>Der Basic-Beginn liegt bei Adresse 4096, das Ende bei Adresse 7680 (16383) (die Werte beziehen sich auf die Grundversion). Unmittelbar ab dem Basic-Beginn wird das eigentliche Programm abgelegt. An dessen Ende beginnen die Variablen und Felder (Bild 1 und Tabelle 1).</p>
+        <figure>
+            <table>
+                <tr>
+                    <th rowspan="2">Speicherstelle</th>
+                    <th rowspan="2">Bezeichnung</th>
+                    <th colspan="2">Werte</th>
+                </tr>
+                <tr>
+                    <th>VC 20</th>
+                    <th>C16</th>
+                </tr>
+                <tr>
+                    <td rowspan="3">43<br>44</td>
+                    <td rowspan="3">Basic-Beginn</td>
+                    <td>GV : 4096</td>
+                    <td>4096</td>
+                </tr>
+                <tr>
+                    <td>+ 3K : 1024</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>+ 8K : 4608</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>45<br>46</td>
+                    <td>Variablen-Beginn</td>
+                    <td colspan="2">Abhängig von der Programmlänge</td>
+                </tr>
+                <tr>
+                    <td rowspan="6">55<br>56</td>
+                    <td rowspan="6">Basic-Ende</td>
+                    <td>GV : 7680</td>
+                    <td>16383</td>
+                </tr>
+                <tr>
+                    <td>+ 3K : 7680</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>+ 8K : 16384</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>+ 16K : 24576</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>+ 24K : 32768</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>+ 48K : —</td>
+                    <td>65535</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Der Inhalt dieser Speicherzellen bestimmt die Aufteilung des Basic-Bereichs</figcaption>
+        </figure>
+
 
         <p>Der Variablenbereich wächst beim Anlegen neuer Variablen von unten nach oben. Nur das Stringende wandert in entgegenlaufender Richtung.</p>
 
@@ -55,6 +115,540 @@
         <p>Schon oft wurden Verfahren beschrieben, um nach einem versehentlichen NEW das Basic-Programm wieder zurückzuholen. Doch wie funktionieren diese Verfahren? Um das zu verstehen, betrachten wir zunächst kurz den Aufbau eines Basic-Programms (Bild 2).</p>
 
         <p>Am Kopf des Programms steht immer eine Null. Dann folgten die Adresse der nächsten Programmzeile (Koppeladresse) und die Zeilennummer. Danach kommt die eigentliche Programmzeile, die sich aus den sogenannten Tokens den Basic-Codenummern (Tabelle 2) – zusammensetzt. Am Ende dieser Zeile steht dann nochmals eine Null. Die nächste Zeile beginnt wieder mit einem Verbindungszeiger und der Zeilennummer. Das Programm wird mit drei Nullen abgeschlossen. Hieran schließen sich die Variablen an (vergleiche Bild 1). '</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Code (Dezimal)</th>
+                    <th>Zeichen/Befehl</th>
+                    <th>Code (Dezimal)</th>
+                    <th>Zeichen/Befehl</th>
+                    <th>Code (Dezimal)</th>
+                    <th>Zeichen/Befehl</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Zeilenende</td>
+                    <td>94</td>
+                    <td>↑</td>
+                    <td>189</td>
+                    <td>EXP</td>
+                </tr>
+                <tr>
+                    <td>1-31</td>
+                    <td>Leer</td>
+                    <td>95</td>
+                    <td>″</td>
+                    <td>190</td>
+                    <td>COS</td>
+                </tr>
+                <tr>
+                    <td>32</td>
+                    <td>Space</td>
+                    <td>96-127</td>
+                    <td>Leer</td>
+                    <td>191</td>
+                    <td>SIN</td>
+                </tr>
+                <tr>
+                    <td>33</td>
+                    <td>!</td>
+                    <td>128</td>
+                    <td>END</td>
+                    <td>192</td>
+                    <td>TAN</td>
+                </tr>
+                <tr>
+                    <td>34</td>
+                    <td>”</td>
+                    <td>129</td>
+                    <td>FOR</td>
+                    <td>193</td>
+                    <td>ATN</td>
+                </tr>
+                <tr>
+                    <td>35</td>
+                    <td>#</td>
+                    <td>130</td>
+                    <td>NEXT</td>
+                    <td>194</td>
+                    <td>PEEK</td>
+                </tr>
+                <tr>
+                    <td>36</td>
+                    <td>$</td>
+                    <td>131</td>
+                    <td>DATA</td>
+                    <td>195</td>
+                    <td>LEN</td>
+                </tr>
+                <tr>
+                    <td>37</td>
+                    <td>%</td>
+                    <td>132</td>
+                    <td>INPUT#</td>
+                    <td>196</td>
+                    <td>STR$</td>
+                </tr>
+                <tr>
+                    <td>38</td>
+                    <td>&amp;</td>
+                    <td>133</td>
+                    <td>INPUT</td>
+                    <td>197</td>
+                    <td>VAL</td>
+                </tr>
+                <tr>
+                    <td>39</td>
+                    <td>’</td>
+                    <td>134</td>
+                    <td>DIM</td>
+                    <td>198</td>
+                    <td>ASC</td>
+                </tr>
+                <tr>
+                    <td>40</td>
+                    <td>(</td>
+                    <td>135</td>
+                    <td>READ</td>
+                    <td>199</td>
+                    <td>CHR$</td>
+                </tr>
+                <tr>
+                    <td>41</td>
+                    <td>)</td>
+                    <td>136</td>
+                    <td>LET</td>
+                    <td>200</td>
+                    <td>LEFT$</td>
+                </tr>
+                <tr>
+                    <td>42</td>
+                    <td>*</td>
+                    <td>137</td>
+                    <td>GOTO</td>
+                    <td>201</td>
+                    <td>RIGHT$</td>
+                </tr>
+                <tr>
+                    <td>43</td>
+                    <td>+</td>
+                    <td>138</td>
+                    <td>RUN</td>
+                    <td>202</td>
+                    <td>MID$</td>
+                </tr>
+                <tr>
+                    <td>44</td>
+                    <td>’</td>
+                    <td>139</td>
+                    <td>IF</td>
+                    <td>203</td>
+                    <td>GO</td>
+                </tr>
+                <tr>
+                    <td>45</td>
+                    <td>—</td>
+                    <td>140</td>
+                    <td>RESTORE</td>
+                    <td>204</td>
+                    <td>RGR</td>
+                </tr>
+                <tr>
+                    <td>46</td>
+                    <td>.</td>
+                    <td>141</td>
+                    <td>GOSUB</td>
+                    <td>205</td>
+                    <td>RCLR</td>
+                </tr>
+                <tr>
+                    <td>47</td>
+                    <td>/</td>
+                    <td>142</td>
+                    <td>RETURN</td>
+                    <td>206</td>
+                    <td>RLUM</td>
+                </tr>
+                <tr>
+                    <td>48</td>
+                    <td>0</td>
+                    <td>143</td>
+                    <td>REM</td>
+                    <td>207</td>
+                    <td>JOK</td>
+                </tr>
+                <tr>
+                    <td>49</td>
+                    <td>1</td>
+                    <td>144</td>
+                    <td>STOP</td>
+                    <td>208</td>
+                    <td>RDOT</td>
+                </tr>
+                <tr>
+                    <td>50</td>
+                    <td>2</td>
+                    <td>145</td>
+                    <td>ON</td>
+                    <td>209</td>
+                    <td>DEC</td>
+                </tr>
+                <tr>
+                    <td>51</td>
+                    <td>3</td>
+                    <td>146</td>
+                    <td>WAIT</td>
+                    <td>210</td>
+                    <td>HEX$</td>
+                </tr>
+                <tr>
+                    <td>52</td>
+                    <td>4</td>
+                    <td>147</td>
+                    <td>LOAD</td>
+                    <td>211</td>
+                    <td>ERR$</td>
+                </tr>
+                <tr>
+                    <td>53</td>
+                    <td>5</td>
+                    <td>148</td>
+                    <td>SAVE</td>
+                    <td>212</td>
+                    <td>INSTR</td>
+                </tr>
+                <tr>
+                    <td>54</td>
+                    <td>6</td>
+                    <td>149</td>
+                    <td>VERIFY</td>
+                    <td>213</td>
+                    <td>ELSE</td>
+                </tr>
+                <tr>
+                    <td>55</td>
+                    <td>7</td>
+                    <td>150</td>
+                    <td>DEF</td>
+                    <td>214</td>
+                    <td>RESUME</td>
+                </tr>
+                <tr>
+                    <td>56</td>
+                    <td>8</td>
+                    <td>151</td>
+                    <td>POKE</td>
+                    <td>215</td>
+                    <td>TRAP</td>
+                </tr>
+                <tr>
+                    <td>57</td>
+                    <td>9</td>
+                    <td>152</td>
+                    <td>PRINT#</td>
+                    <td>216</td>
+                    <td>TRON</td>
+                </tr>
+                <tr>
+                    <td>58</td>
+                    <td>:</td>
+                    <td>153</td>
+                    <td>PRINT</td>
+                    <td>217</td>
+                    <td>TROFF</td>
+                </tr>
+                <tr>
+                    <td>59</td>
+                    <td>;</td>
+                    <td>154</td>
+                    <td>CONT</td>
+                    <td>218</td>
+                    <td>SOUND</td>
+                </tr>
+                <tr>
+                    <td>60</td>
+                    <td>&lt;</td>
+                    <td>155</td>
+                    <td>LIST</td>
+                    <td>219</td>
+                    <td>VOL</td>
+                </tr>
+                <tr>
+                    <td>61</td>
+                    <td>=</td>
+                    <td>156</td>
+                    <td>CLR</td>
+                    <td>220</td>
+                    <td>AUTO</td>
+                </tr>
+                <tr>
+                    <td>62</td>
+                    <td>&gt;</td>
+                    <td>157</td>
+                    <td>CMD</td>
+                    <td>221</td>
+                    <td>PUDEF</td>
+                </tr>
+                <tr>
+                    <td>63</td>
+                    <td>?</td>
+                    <td>158</td>
+                    <td>SYS</td>
+                    <td>222</td>
+                    <td>GRAPHIC</td>
+                </tr>
+                <tr>
+                    <td>64</td>
+                    <td>@</td>
+                    <td>159</td>
+                    <td>OPEN</td>
+                    <td>223</td>
+                    <td>PAINT</td>
+                </tr>
+                <tr>
+                    <td>65</td>
+                    <td>A</td>
+                    <td>160</td>
+                    <td>CLOSE</td>
+                    <td>224</td>
+                    <td>CHAR</td>
+                </tr>
+                <tr>
+                    <td>66</td>
+                    <td>B</td>
+                    <td>161</td>
+                    <td>GET</td>
+                    <td>225</td>
+                    <td>BOX</td>
+                </tr>
+                <tr>
+                    <td>67</td>
+                    <td>C</td>
+                    <td>162</td>
+                    <td>NEW</td>
+                    <td>226</td>
+                    <td>CIRCLE</td>
+                </tr>
+                <tr>
+                    <td>68</td>
+                    <td>D</td>
+                    <td>163</td>
+                    <td>TAB(</td>
+                    <td>227</td>
+                    <td>GSHAPE</td>
+                </tr>
+                <tr>
+                    <td>69</td>
+                    <td>E</td>
+                    <td>164</td>
+                    <td>TO</td>
+                    <td>228</td>
+                    <td>SSHAPE</td>
+                </tr>
+                <tr>
+                    <td>70</td>
+                    <td>F</td>
+                    <td>165</td>
+                    <td>FN</td>
+                    <td>229</td>
+                    <td>DRAW</td>
+                </tr>
+                <tr>
+                    <td>71</td>
+                    <td>G</td>
+                    <td>166</td>
+                    <td>SPC(</td>
+                    <td>230</td>
+                    <td>LOCATE</td>
+                </tr>
+                <tr>
+                    <td>72</td>
+                    <td>H</td>
+                    <td>167</td>
+                    <td>THEN</td>
+                    <td>231</td>
+                    <td>COLOR</td>
+                </tr>
+                <tr>
+                    <td>73</td>
+                    <td>I</td>
+                    <td>168</td>
+                    <td>NOT</td>
+                    <td>232</td>
+                    <td>SCNCLR</td>
+                </tr>
+                <tr>
+                    <td>74</td>
+                    <td>J</td>
+                    <td>169</td>
+                    <td>STEP</td>
+                    <td>233</td>
+                    <td>SCALE</td>
+                </tr>
+                <tr>
+                    <td>75</td>
+                    <td>K</td>
+                    <td>170</td>
+                    <td>+</td>
+                    <td>234</td>
+                    <td>HELP</td>
+                </tr>
+                <tr>
+                    <td>76</td>
+                    <td>L</td>
+                    <td>171</td>
+                    <td>–</td>
+                    <td>235</td>
+                    <td>DO</td>
+                </tr>
+                <tr>
+                    <td>77</td>
+                    <td>M</td>
+                    <td>172</td>
+                    <td>*</td>
+                    <td>236</td>
+                    <td>LOOP</td>
+                </tr>
+                <tr>
+                    <td>78</td>
+                    <td>N</td>
+                    <td>173</td>
+                    <td>/</td>
+                    <td>237</td>
+                    <td>EXIT</td>
+                </tr>
+                <tr>
+                    <td>79</td>
+                    <td>O</td>
+                    <td>174</td>
+                    <td>↑</td>
+                    <td>238</td>
+                    <td>DIRECTORY</td>
+                </tr>
+                <tr>
+                    <td>80</td>
+                    <td>P</td>
+                    <td>175</td>
+                    <td>AND</td>
+                    <td>239</td>
+                    <td>DSAVE</td>
+                </tr>
+                <tr>
+                    <td>81</td>
+                    <td>Q</td>
+                    <td>176</td>
+                    <td>OR</td>
+                    <td>240</td>
+                    <td>DLOAD</td>
+                </tr>
+                <tr>
+                    <td>82</td>
+                    <td>R</td>
+                    <td>177</td>
+                    <td>&gt;</td>
+                    <td>241</td>
+                    <td>HEADER</td>
+                </tr>
+                <tr>
+                    <td>83</td>
+                    <td>S</td>
+                    <td>178</td>
+                    <td>=</td>
+                    <td>242</td>
+                    <td>SCRATCH</td>
+                </tr>
+                <tr>
+                    <td>84</td>
+                    <td>T</td>
+                    <td>179</td>
+                    <td>&lt;</td>
+                    <td>243</td>
+                    <td>COLLECT</td>
+                </tr>
+                <tr>
+                    <td>85</td>
+                    <td>U</td>
+                    <td>180</td>
+                    <td>SGN</td>
+                    <td>244</td>
+                    <td>COPK</td>
+                </tr>
+                <tr>
+                    <td>86</td>
+                    <td>V</td>
+                    <td>181</td>
+                    <td>INT</td>
+                    <td>245</td>
+                    <td>RENAME</td>
+                </tr>
+                <tr>
+                    <td>87</td>
+                    <td>W</td>
+                    <td>182</td>
+                    <td>ABS</td>
+                    <td>246</td>
+                    <td>BACKUP</td>
+                </tr>
+                <tr>
+                    <td>88</td>
+                    <td>X</td>
+                    <td>183</td>
+                    <td>USR</td>
+                    <td>247</td>
+                    <td>DELETE</td>
+                </tr>
+                <tr>
+                    <td>89</td>
+                    <td>Y</td>
+                    <td>184</td>
+                    <td>FRE</td>
+                    <td>248</td>
+                    <td>RENUMBER</td>
+                </tr>
+                <tr>
+                    <td>90</td>
+                    <td>Z</td>
+                    <td>185</td>
+                    <td>POS</td>
+                    <td>249</td>
+                    <td>KEY</td>
+                </tr>
+                <tr>
+                    <td>91</td>
+                    <td>[</td>
+                    <td>186</td>
+                    <td>SQR</td>
+                    <td>250</td>
+                    <td>MONITOR</td>
+                </tr>
+                <tr>
+                    <td>92</td>
+                    <td>£</td>
+                    <td>187</td>
+                    <td>RND</td>
+                    <td>251</td>
+                    <td>USING</td>
+                </tr>
+                <tr>
+                    <td>93</td>
+                    <td>]</td>
+                    <td>188</td>
+                    <td>LOG</td>
+                    <td>252</td>
+                    <td>UNTIL</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>253</td>
+                    <td>WHILE</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Basic-Token des VC 20/C16. Die Codenummern 32 bis 95 entsprechen den normalen ASCII-Zeichen. Nummern größer als 127 sind Token, also Abkürzungen für Basic-Befehle, die der Basic-Interpreter verwendet, um Speicherplatz zu sparen und die Verarbeitungsgeschwindigkeit zu erhöhen. Token ab Code 204 sind nur beim C16 vorhanden.</figcaption>
+        </figure>
+
 
         <p>Durch NEW oder durch einen RESET wird nicht das gesamte Programm, sondern nur der Variablenpointer (45/46) und die erste Koppeladresse gelöscht. Durch Rekonstruktion dieser beiden Zeiger kann das scheinbar verlorene Basic-Programm wieder benutzt werden.</p>
 
@@ -88,6 +682,1252 @@
         <p>Eine Zeropage-Adressierung, zum Beispiel LDA $42, benötigt nur zwei Byte, eine absolute Adressierung, zum Beispiel LDA $1234, hingegen drei Byte im Speicher. Damit verbunden ist auch die Bearbeitungsgeschwindigkeit eines Maschinenprogramms. Denn die Zeropage-Adressierung ist schneller als die entsprechende Drei-Byte-Methode. Bei kleineren Programmen in Assembler fällt dieser Aspekt zwar nicht so sehr ins Gewicht, bei sehr umfangreichen Routinen (wie zum Beispiel beim Basic-Interpreter und bei Schleifen) spielt die Adressierungsart jedoch eine größere Rolle.</p>
 
         <p>In der Seite O legt der Computer also insbesondere die Daten ab, die er oft benötigt, wie zum Beispiel Vektoren, Parameter etc. Die komplette Liste der Adreßbelegung zeigt Tabelle 3a (Tabelle 3b gilt für den C 16).</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Dezimal</th>
+                    <th>Hexadezimal</th>
+                    <th>Bemerkung</th>
+                </tr>
+                <tr>
+                    <td>0 - 2</td>
+                    <td>00 - 02</td>
+                    <td>USR-Sprungvektor (Normal: JMP $D248)</td>
+                </tr>
+                <tr>
+                    <td>3 - 4</td>
+                    <td>03 - 04</td>
+                    <td>Vektor für Unterprogramm ’Fließkomma nach Integer’</td>
+                </tr>
+                <tr>
+                    <td>5 - 6</td>
+                    <td>05 - 06</td>
+                    <td>Vektor für Unterprogramm ’Integer nach Fließkomma’</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>07</td>
+                    <td>Suchzeichen (sucht ’:’ oder Zeilenende)</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>08</td>
+                    <td>Hochkommaflag</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>09</td>
+                    <td>Spaltenspeicher beim TAB-Befehl</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>0A</td>
+                    <td>LOAD/VERIFY Flag (0 = LOAD/1 = VERIFY)</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>0B</td>
+                    <td>Eingabepufferzeiger (Anzahl der Elemente)</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>0C</td>
+                    <td>Flag für Dim (enthält die laufende Variable)</td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>0D</td>
+                    <td>Variablentyp (0 = Numerisch/128 = String)</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>0E</td>
+                    <td>Numerische Variable (0 = Fließkomma/128 Integer)</td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>0F</td>
+                    <td>Flag bei DATA und LIST</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>10</td>
+                    <td>Flag für FN</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>11</td>
+                    <td>Eingabeflag (0 = INPUT/64 = GET/152 = READ)</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>12</td>
+                    <td>Vorzeichen bei ATN</td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>13</td>
+                    <td>Aktuelles Ein-/Ausgabegerät</td>
+                </tr>
+                <tr>
+                    <td>20 - 21</td>
+                    <td>14 - 15</td>
+                    <td>Integerwert (zum Beispiel Zeilennummer</td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>16</td>
+                    <td>Zeiger im Stringstapel</td>
+                </tr>
+                <tr>
+                    <td>23 - 24</td>
+                    <td>17 - 18</td>
+                    <td>Zeiger auf den zuletzt verwendeten String</td>
+                </tr>
+                <tr>
+                    <td>25 - 33</td>
+                    <td>19 - 21</td>
+                    <td>Stringstapel</td>
+                </tr>
+                <tr>
+                    <td>34 - 37</td>
+                    <td>22 - 25</td>
+                    <td>Speicher für div. Hilfszeiger</td>
+                </tr>
+                <tr>
+                    <td>38 - 42</td>
+                    <td>26 - 2A</td>
+                    <td>Speicherbereich bei einer Multiplikation</td>
+                </tr>
+                <tr>
+                    <td>43 - 44</td>
+                    <td>2B - 2C</td>
+                    <td>Zeiger auf Beginn des Basic-Speicherbereichs</td>
+                </tr>
+                <tr>
+                    <td>45 - 46</td>
+                    <td>2D - 2E</td>
+                    <td>Beginn der Variablen (= Ende des Programms)</td>
+                </tr>
+                <tr>
+                    <td>47 - 48</td>
+                    <td>2F - 30</td>
+                    <td>Beginn der Arrays (= Ende der Variablen)</td>
+                </tr>
+                <tr>
+                    <td>49 - 50</td>
+                    <td>31 - 32</td>
+                    <td>Zeiger auf Ende der Arrays</td>
+                </tr>
+                <tr>
+                    <td>51 - 52</td>
+                    <td>33 - 34</td>
+                    <td>Zeiger auf Beginn der Strings</td>
+                </tr>
+                <tr>
+                    <td>53 - 54</td>
+                    <td>35 - 36</td>
+                    <td>Hilfszeiger für Strings</td>
+                </tr>
+                <tr>
+                    <td>55 - 56</td>
+                    <td>37 - 38</td>
+                    <td>Zeiger auf Basic-Ende</td>
+                </tr>
+                <tr>
+                    <td>57 - 58</td>
+                    <td>39 - 3A</td>
+                    <td>Momentane Basic-Zeilennummer</td>
+                </tr>
+                <tr>
+                    <td>59 - 60</td>
+                    <td>3B - 3C</td>
+                    <td>Vorherige Basic-Zeilennummer</td>
+                </tr>
+                <tr>
+                    <td>61 - 62</td>
+                    <td>3D - 3E</td>
+                    <td>Zeiger auf lfd. Basic-Befehl (für CONT)</td>
+                </tr>
+                <tr>
+                    <td>63 - 64</td>
+                    <td>3F - 40</td>
+                    <td>Momentane Zeilennummer für DATA</td>
+                </tr>
+                <tr>
+                    <td>65 - 66</td>
+                    <td>41 - 42</td>
+                    <td>Momentane Adresse einer DATA-Zeile</td>
+                </tr>
+                <tr>
+                    <td>67 - 68</td>
+                    <td>43 - 44</td>
+                    <td>Zeiger auf Element in DATA-Zeile und INPUT-Vektor</td>
+                </tr>
+                <tr>
+                    <td>69 - 70</td>
+                    <td>45 - 46</td>
+                    <td>Momentaner Variablenname</td>
+                </tr>
+                <tr>
+                    <td>71 - 72</td>
+                    <td>47 - 48</td>
+                    <td>Adresse der momentanen Variablen</td>
+                </tr>
+                <tr>
+                    <td>73 - 74</td>
+                    <td>49 - 4A</td>
+                    <td>Zeiger für FOR/NEXT Variable</td>
+                </tr>
+                <tr>
+                    <td>75 - 76</td>
+                    <td>4B - 4C</td>
+                    <td>Zwischenspeicher für Programmzeiger (bei SAVE)</td>
+                </tr>
+                <tr>
+                    <td>77</td>
+                    <td>4D</td>
+                    <td>Speicher für Vergleichssymbole</td>
+                </tr>
+                <tr>
+                    <td>78 - 79</td>
+                    <td>4E - 4F</td>
+                    <td>Zeiger für FN</td>
+                </tr>
+                <tr>
+                    <td>80 - 83</td>
+                    <td>50 - 53</td>
+                    <td>Verschieden genutzter Speicherbereich</td>
+                </tr>
+                <tr>
+                    <td>84 - 86</td>
+                    <td>54 - 56</td>
+                    <td>FN-Sprungvektor (ähnlich USR)</td>
+                </tr>
+                <tr>
+                    <td>87 - 96</td>
+                    <td>57 - 60</td>
+                    <td>Feld für diverse arithmetische Zwecke (Arithmetik Akku #3 und #4)</td>
+                </tr>
+                <tr>
+                    <td>97</td>
+                    <td>61</td>
+                    <td>Fließkommaakku #1 : Exponent</td>
+                </tr>
+                <tr>
+                    <td>98 - 101</td>
+                    <td>62 - 65</td>
+                    <td>Fließkommaakku #1 : Matisse</td>
+                </tr>
+                <tr>
+                    <td>102</td>
+                    <td>66</td>
+                    <td>Fließkommaakku #1 : Vorzeichen</td>
+                </tr>
+                <tr>
+                    <td>103</td>
+                    <td>67</td>
+                    <td>Zeiger für Polynomauswertung</td>
+                </tr>
+                <tr>
+                    <td>104</td>
+                    <td>68</td>
+                    <td>Überlauf von Akku #1</td>
+                </tr>
+                <tr>
+                    <td>105</td>
+                    <td>69</td>
+                    <td>Fließkommaakku #2 : Exponent</td>
+                </tr>
+                <tr>
+                    <td>106 - 109</td>
+                    <td>6A - 6D</td>
+                    <td>Fließkommaakku #2 : Mantisse</td>
+                </tr>
+                <tr>
+                    <td>110</td>
+                    <td>6E</td>
+                    <td>Fließkommaakku #2 : Vorzeichen</td>
+                </tr>
+                <tr>
+                    <td>111</td>
+                    <td>6F</td>
+                    <td>Vergleichsbyte der Vorzeichen von Akku 1 und 2</td>
+                </tr>
+                <tr>
+                    <td>112</td>
+                    <td>70</td>
+                    <td>Rundung für Akku #1 und #2</td>
+                </tr>
+                <tr>
+                    <td>113 - 114</td>
+                    <td>71 - 72</td>
+                    <td>Länge des Kassettenpuffers</td>
+                </tr>
+                <tr>
+                    <td>115 - 138</td>
+                    <td>73 - 8A</td>
+                    <td>CHRGET-Routine</td>
+                </tr>
+                <tr>
+                    <td>139 - 143</td>
+                    <td>8B - 8F</td>
+                    <td>RND-Wert als Fließkommazahl</td>
+                </tr>
+                <tr>
+                    <td>144</td>
+                    <td>90</td>
+                    <td>Statusflag ST</td>
+                </tr>
+                <tr>
+                    <td>145</td>
+                    <td>91</td>
+                    <td>STOP-Flag</td>
+                </tr>
+                <tr>
+                    <td>150</td>
+                    <td>96</td>
+                    <td>Kassetten EOT (End of Tape) erhalten</td>
+                </tr>
+                <tr>
+                    <td>151</td>
+                    <td>97</td>
+                    <td>Zwischenspeicher für Register</td>
+                </tr>
+                <tr>
+                    <td>152</td>
+                    <td>98</td>
+                    <td>Anzahl der offenen Dateien</td>
+                </tr>
+                <tr>
+                    <td>153</td>
+                    <td>99</td>
+                    <td>Eingabegerät (Normal = 0 : Tastatur)</td>
+                </tr>
+                <tr>
+                    <td>154</td>
+                    <td>9A</td>
+                    <td>Ausgabegerät (Normal = 3 : Bildschirm)</td>
+                </tr>
+                <tr>
+                    <td>155</td>
+                    <td>9B</td>
+                    <td>Paritätsbyte)</td>
+                </tr>
+                <tr>
+                    <td>150</td>
+                    <td>96</td>
+                    <td>Kassetten EOT (End of Tape) erhalten</td>
+                </tr>
+                <tr>
+                    <td>151</td>
+                    <td>97</td>
+                    <td>Zwischenspeicher für Register</td>
+                </tr>
+                <tr>
+                    <td>152</td>
+                    <td>98</td>
+                    <td>Anzahl der offenen Dateien</td>
+                </tr>
+                <tr>
+                    <td>153</td>
+                    <td>99</td>
+                    <td>Eingabegerät (Normal = 0 : Tastatur)</td>
+                </tr>
+                <tr>
+                    <td>154</td>
+                    <td>9A</td>
+                    <td>Ausgabegerät (Normal = 3 : Bildschirm)</td>
+                </tr>
+                <tr>
+                    <td>155</td>
+                    <td>9B</td>
+                    <td>Paritätsbyte vom Band (Prüfsumme)</td>
+                </tr>
+                <tr>
+                    <td>156</td>
+                    <td>9C</td>
+                    <td>Flag für Byte erhalten (von Band)</td>
+                </tr>
+                <tr>
+                    <td>157</td>
+                    <td>9D</td>
+                    <td>Flag für Direktmodus (= 128) oder Programm (= 0)</td>
+                </tr>
+                <tr>
+                    <td>158</td>
+                    <td>9E</td>
+                    <td>Band: erster Teil – Prüfsumme</td>
+                </tr>
+                <tr>
+                    <td>159</td>
+                    <td>9F</td>
+                    <td>Band: zweiter Durchlauf – Prüfsumme</td>
+                </tr>
+                <tr>
+                    <td>160 - 162</td>
+                    <td>A0 - A2</td>
+                    <td>Interne Uhr (Stunde, Minute, Sekunde)</td>
+                </tr>
+                <tr>
+                    <td>163</td>
+                    <td>A3</td>
+                    <td>Bitzähler für serielle Ausgabe</td>
+                </tr>
+                <tr>
+                    <td>164</td>
+                    <td>A4</td>
+                    <td>Zähler für Band</td>
+                </tr>
+                <tr>
+                    <td>165</td>
+                    <td>A5</td>
+                    <td>Startsynchronisation bei Kassetten</td>
+                </tr>
+                <tr>
+                    <td>166</td>
+                    <td>A6</td>
+                    <td>Zeiger im Bandpuffer</td>
+                </tr>
+                <tr>
+                    <td>167 - 171</td>
+                    <td>A7 - AB</td>
+                    <td>Flags für Schreiben/Lesen bei Band</td>
+                </tr>
+                <tr>
+                    <td>172 - 173</td>
+                    <td>AC - AD</td>
+                    <td>Zeiger auf Kassettenpuffer und für scrolling</td>
+                </tr>
+                <tr>
+                    <td>174 - 175</td>
+                    <td>Ae - AF</td>
+                    <td>Zeiger auf Programmende bei LOAD</td>
+                </tr>
+                <tr>
+                    <td>176 - 177</td>
+                    <td>B0 - B1</td>
+                    <td>Bandzeitkonstanten</td>
+                </tr>
+                <tr>
+                    <td>178 - 179</td>
+                    <td>B2 - B3</td>
+                    <td>Startadresse des Bandpuffers</td>
+                </tr>
+                <tr>
+                    <td>180</td>
+                    <td>B4</td>
+                    <td>Bitzähler für Band</td>
+                </tr>
+                <tr>
+                    <td>181</td>
+                    <td>B5</td>
+                    <td>Band oder RS232: nächstes zu sendendes Bit</td>
+                </tr>
+                <tr>
+                    <td>182</td>
+                    <td>B6</td>
+                    <td>Übertragungsspeicher für RS232</td>
+                </tr>
+                <tr>
+                    <td>183</td>
+                    <td>B7</td>
+                    <td>Länge des Filenamens</td>
+                </tr>
+                <tr>
+                    <td>184</td>
+                    <td>B8</td>
+                    <td>Logische Filenummer</td>
+                </tr>
+                <tr>
+                    <td>185</td>
+                    <td>B9</td>
+                    <td>Sekundäradresse</td>
+                </tr>
+                <tr>
+                    <td>186</td>
+                    <td>Ba</td>
+                    <td>Gerätenummer</td>
+                </tr>
+                <tr>
+                    <td>187 - 188</td>
+                    <td>BB - BC</td>
+                    <td>Zeiger auf Filenamen</td>
+                </tr>
+                <tr>
+                    <td>189</td>
+                    <td>BD</td>
+                    <td>Ein-/Ausgabespeicher (für seriell)</td>
+                </tr>
+                <tr>
+                    <td>190</td>
+                    <td>BE</td>
+                    <td>Blockzähler für Band</td>
+                </tr>
+                <tr>
+                    <td>191</td>
+                    <td>BF</td>
+                    <td>Puffer für serielle Ausgabe</td>
+                </tr>
+                <tr>
+                    <td>192</td>
+                    <td>C0</td>
+                    <td>Bandmotor Flag</td>
+                </tr>
+                <tr>
+                    <td>193 - 194</td>
+                    <td>C1 - C2</td>
+                    <td>Startadresse für Ein-/Ausgabe</td>
+                </tr>
+                <tr>
+                    <td>195 - 196</td>
+                    <td>C3 - C4</td>
+                    <td>Endadresse für Ein-/Ausgabe</td>
+                </tr>
+                <tr>
+                    <td>197</td>
+                    <td>C5</td>
+                    <td>gedrückte Taste (momentaner Wert im Tastaturmatrixcode)</td>
+                </tr>
+                <tr>
+                    <td>198</td>
+                    <td>C6</td>
+                    <td>Anzahl der gedrückten Tasten (im Tastaturpuffer)</td>
+                </tr>
+                <tr>
+                    <td>199</td>
+                    <td>C7</td>
+                    <td>Bildschirm: negative Anzeige</td>
+                </tr>
+                <tr>
+                    <td>200</td>
+                    <td>C8</td>
+                    <td>Zeiger auf Zeilenende bei Eingabe</td>
+                </tr>
+                <tr>
+                    <td>201</td>
+                    <td>C9</td>
+                    <td>Cursorzeile</td>
+                </tr>
+                <tr>
+                    <td>202</td>
+                    <td>CA</td>
+                    <td>Cursorspalte</td>
+                </tr>
+                <tr>
+                    <td>203</td>
+                    <td>CB</td>
+                    <td>Welche Taste? (64 = keine)</td>
+                </tr>
+                <tr>
+                    <td>204</td>
+                    <td>CC</td>
+                    <td>Cursorblinken</td>
+                </tr>
+                <tr>
+                    <td>205</td>
+                    <td>CD</td>
+                    <td>Cursor Blinkzähler</td>
+                </tr>
+                <tr>
+                    <td>206</td>
+                    <td>CE</td>
+                    <td>Zeichen unter dem Cursor</td>
+                </tr>
+                <tr>
+                    <td>207</td>
+                    <td>CF</td>
+                    <td>Flag für Cursorblinken (0 = An/1 = Aus)</td>
+                </tr>
+                <tr>
+                    <td>208</td>
+                    <td>D0</td>
+                    <td>Eingabe von Bildschirm/oder Tastatur</td>
+                </tr>
+                <tr>
+                    <td>209 - 210</td>
+                    <td>D1 - D2</td>
+                    <td>Start der aktuellen Bildschirmzeile</td>
+                </tr>
+                <tr>
+                    <td>211</td>
+                    <td>D3</td>
+                    <td>Position des Cursors in der aktuellen Bildschirmzeile</td>
+                </tr>
+                <tr>
+                    <td>212</td>
+                    <td>D4</td>
+                    <td>Flag für Cursor (0 = Direkt, sonst programmiert)</td>
+                </tr>
+                <tr>
+                    <td>213</td>
+                    <td>D5</td>
+                    <td>Länge der Bildschirmzeile (21 od. 42 od. 63 od. 84)</td>
+                </tr>
+                <tr>
+                    <td>214</td>
+                    <td>D6</td>
+                    <td>Cursorzeile</td>
+                </tr>
+                <tr>
+                    <td>215</td>
+                    <td>D7</td>
+                    <td>Zeiger für diverse Zwecke</td>
+                </tr>
+                <tr>
+                    <td>216</td>
+                    <td>D8</td>
+                    <td>Anzahl der Inserts</td>
+                </tr>
+                <tr>
+                    <td>217 - 242</td>
+                    <td>D9 - F2</td>
+                    <td>High Bytes der Bildschirmzeilenanfänge</td>
+                </tr>
+                <tr>
+                    <td>243 - 244</td>
+                    <td>F3 - F4</td>
+                    <td>Zeiger im Farbspeicher</td>
+                </tr>
+                <tr>
+                    <td>245 - 246</td>
+                    <td>F5 - F6</td>
+                    <td>Zeiger in der Tastaturdekodiertabelle</td>
+                </tr>
+                <tr>
+                    <td>247 - 248</td>
+                    <td>F7 - F8</td>
+                    <td>Zeiger auf RS232 Eingabepuffer</td>
+                </tr>
+                <tr>
+                    <td>249 - 250</td>
+                    <td>F9 - FA</td>
+                    <td>Zeiger auf RS232 Ausgabepuffer</td>
+                </tr>
+                <tr>
+                    <td>251 - 254</td>
+                    <td>FA - FE</td>
+                    <td>Freie Zeropageadressen</td>
+                </tr>
+                <tr>
+                    <td>255 - (266)</td>
+                    <td>FF - 10A</td>
+                    <td>Zwischenspeicher für Fließkomma nach ASCII</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3a. Die Zeropage beim VC 20</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tr>
+                    <th>Dezimal</th>
+                    <th>Hexadezimal</th>
+                    <th>Bemerkung</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>$0000</td>
+                    <td>Datenrichtungsregister des 7501</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>$0001</td>
+                    <td>Ein-/Ausgabe-Port des 7501</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>$0002</td>
+                    <td>Flag für Schleifen</td>
+                </tr>
+                <tr>
+                    <td>3-4</td>
+                    <td>$0003-0004</td>
+                    <td>Neue Startadresse (Renumber)</td>
+                </tr>
+                <tr>
+                    <td>5-6</td>
+                    <td>$0005-0006</td>
+                    <td>Schrittweite (Renumber)</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>$0007</td>
+                    <td>Gesuchtes Zeichen</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>$0008</td>
+                    <td>Flag für Anführungszeichen-Modus</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>$0009</td>
+                    <td>TAB-Spaltenzähler</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>$000A</td>
+                    <td>Flag: 0 = Load, 1 = Verify</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>$000B</td>
+                    <td>Zeiger für Eingabepuffer, Anzahl der Elemente</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>$000C</td>
+                    <td>Flag für Standard-DIM</td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>$000D</td>
+                    <td>Datentyp: $FF=String, $00=Numerisch</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>$000E</td>
+                    <td>Datentyp: $80=Integer, $00=Fließkomma</td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>$000F</td>
+                    <td>Flag für DATA/LIST</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>$0010</td>
+                    <td>Flag: Element/FNx-Flag</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>$0011</td>
+                    <td>Flag: $00=INPUT, $40=GET, $98=READ</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>$0012</td>
+                    <td>Flag: Vorzeichen des ATN</td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>$0013</td>
+                    <td>Flag: Input-Prompt</td>
+                </tr>
+                <tr>
+                    <td>20-21</td>
+                    <td>$0014-0015</td>
+                    <td>Int. Adresse</td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>$0016</td>
+                    <td>Zeiger auf temporären Stringstapel</td>
+                </tr>
+                <tr>
+                    <td>23-24</td>
+                    <td>$0017-0018</td>
+                    <td>Letzter temporärer Stringvektor</td>
+                </tr>
+                <tr>
+                    <td>25-33</td>
+                    <td>$0019-0021</td>
+                    <td>Stapel für temporäre Strings</td>
+                </tr>
+                <tr>
+                    <td>34-35</td>
+                    <td>$0022-0023</td>
+                    <td>Bereich für Hilfszeiger 1</td>
+                </tr>
+                <tr>
+                    <td>36-37</td>
+                    <td>$0024-0025</td>
+                    <td>Bereich für Hilfszeiger 2</td>
+                </tr>
+                <tr>
+                    <td>38</td>
+                    <td>$0026</td>
+                    <td>Bereich für Produkt bei Multiplikation</td>
+                </tr>
+                <tr>
+                    <td>39</td>
+                    <td>$0027</td>
+                    <td>Bereich für Produkt bei Multiplikation</td>
+                </tr>
+                <tr>
+                    <td>40</td>
+                    <td>$0028</td>
+                    <td>Bereich für Produkt bei Multiplikation</td>
+                </tr>
+                <tr>
+                    <td>41</td>
+                    <td>$0029</td>
+                    <td>Bereich für Produkt bei Multiplikation</td>
+                </tr>
+                <tr>
+                    <td>42</td>
+                    <td>$002A</td>
+                    <td>Bereich für Produkt bei Multiplikation</td>
+                </tr>
+                <tr>
+                    <td>43-44</td>
+                    <td>$002B-002C</td>
+                    <td>Zeiger auf Basic-Anfang</td>
+                </tr>
+                <tr>
+                    <td>45-46</td>
+                    <td>$002D-002E</td>
+                    <td>Zeiger auf Variablen-Anfang</td>
+                </tr>
+                <tr>
+                    <td>47-48</td>
+                    <td>$002F-0030</td>
+                    <td>Zeiger auf Beginn der Arrays</td>
+                </tr>
+                <tr>
+                    <td>49-50</td>
+                    <td>$0031-0032</td>
+                    <td>Zeiger auf Ende der Arrays (+1)</td>
+                </tr>
+                <tr>
+                    <td>51-52</td>
+                    <td>$0033-0034</td>
+                    <td>Zeiger auf Stringspeicher</td>
+                </tr>
+                <tr>
+                    <td>53-54</td>
+                    <td>$0035-0036</td>
+                    <td>Hilfszeiger für Strings</td>
+                </tr>
+                <tr>
+                    <td>55-56</td>
+                    <td>$0037-0038</td>
+                    <td>Zeiger auf Speichergrenze</td>
+                </tr>
+                <tr>
+                    <td>57-58</td>
+                    <td>$0039-003A</td>
+                    <td>Laufende Basiczeilennummer</td>
+                </tr>
+                <tr>
+                    <td>59-60</td>
+                    <td>$003B-003C</td>
+                    <td>Textpointer</td>
+                </tr>
+                <tr>
+                    <td>61-62</td>
+                    <td>$003D-003E</td>
+                    <td>Zeiger auf Basic-Statement für CONT</td>
+                </tr>
+                <tr>
+                    <td>63-64</td>
+                    <td>$003F-0040</td>
+                    <td>Nummer der aktuellen DATA-Zeile</td>
+                </tr>
+                <tr>
+                    <td>65-66</td>
+                    <td>$0041-0042</td>
+                    <td>Adresse des aktuellen DATA-Elementes</td>
+                </tr>
+                <tr>
+                    <td>67-68</td>
+                    <td>$0043-0044</td>
+                    <td>Sprungvektor für INPUT</td>
+                </tr>
+                <tr>
+                    <td>69-70</td>
+                    <td>$0045-0046</td>
+                    <td>Aktueller Variablenname</td>
+                </tr>
+                <tr>
+                    <td>71-72</td>
+                    <td>$0047-0048</td>
+                    <td>Adresse der aktuellen Variablen</td>
+                </tr>
+                <tr>
+                    <td>73-74</td>
+                    <td>$0049-004A</td>
+                    <td>Variablenzeiger für FOR...NEXT</td>
+                </tr>
+                <tr>
+                    <td>75-76</td>
+                    <td>$004B-004C</td>
+                    <td>Zwischenspeicher für Basic-Zeiger</td>
+                </tr>
+                <tr>
+                    <td>77</td>
+                    <td>$004D</td>
+                    <td>Akkumulator für Vergleichssymbole</td>
+                </tr>
+                <tr>
+                    <td>78-79</td>
+                    <td>$004E-004F</td>
+                    <td>Arbeitsbereich (Zeiger etc.)</td>
+                </tr>
+                <tr>
+                    <td>80-81</td>
+                    <td>$0050-0051</td>
+                    <td>Arbeitsbereich (Zeiger etc.)</td>
+                </tr>
+                <tr>
+                    <td>82</td>
+                    <td>$0052</td>
+                    <td>Arbeitsbereich (Zeiger etc.)</td>
+                </tr>
+                <tr>
+                    <td>83</td>
+                    <td>$0053</td>
+                    <td>Grafik-Modus</td>
+                </tr>
+                <tr>
+                    <td>84-86</td>
+                    <td>$0054-0056</td>
+                    <td>Sprungvektor für Funktionen</td>
+                </tr>
+                <tr>
+                    <td>87-96</td>
+                    <td>$0057-0060</td>
+                    <td>Bereich für numerische Operationen</td>
+                </tr>
+                <tr>
+                    <td>97</td>
+                    <td>$0061</td>
+                    <td>Fließkomma-Akkumulator 1 (FAC): Exponent</td>
+                </tr>
+                <tr>
+                    <td>98-101</td>
+                    <td>$0062-0065</td>
+                    <td>Fließkomma-Akkumulator 1 (FAC): Mantisse</td>
+                </tr>
+                <tr>
+                    <td>102</td>
+                    <td>$0066</td>
+                    <td>Fließkomma-Akkumulator 1 (FAC): Vorzeichen</td>
+                </tr>
+                <tr>
+                    <td>103</td>
+                    <td>$0067</td>
+                    <td>Zeiger für Polynom-Auswertung</td>
+                </tr>
+                <tr>
+                    <td>104</td>
+                    <td>$0068</td>
+                    <td>Fließkomma-Akkumulator 1 Überlauf</td>
+                </tr>
+                <tr>
+                    <td>105-110</td>
+                    <td>$0069-006E</td>
+                    <td>Fließkomma-Akkumulator 2 Exponent etc.</td>
+                </tr>
+                <tr>
+                    <td>111</td>
+                    <td>$006F</td>
+                    <td>Vorzeichenvergleich Akku 1 mit Akku 2</td>
+                </tr>
+                <tr>
+                    <td>112</td>
+                    <td>$0070</td>
+                    <td>Fließkomma-Akkumulator 1 niederwertige Stelle</td>
+                </tr>
+                <tr>
+                    <td>113-114</td>
+                    <td>$0071-0072</td>
+                    <td>Kassettenpuffer Länge/Zeiger</td>
+                </tr>
+                <tr>
+                    <td>115-116</td>
+                    <td>$0073-0074</td>
+                    <td>Automatisches Zeileninkrement 0=AUS</td>
+                </tr>
+                <tr>
+                    <td>117</td>
+                    <td>$0075</td>
+                    <td>Grafik-Flag 0=Text 255=Grafik</td>
+                </tr>
+                <tr>
+                    <td>118-120</td>
+                    <td>$0076-0078</td>
+                    <td>Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>121-123</td>
+                    <td>$0079-007B</td>
+                    <td>Darstellung von DS$</td>
+                </tr>
+                <tr>
+                    <td>124-125</td>
+                    <td>$007C-007D</td>
+                    <td>Basic-Pseudo-Stack-Pointer</td>
+                </tr>
+                <tr>
+                    <td>126-143</td>
+                    <td>$007E-008F</td>
+                    <td>Arbeitsbereich (Sound)</td>
+                </tr>
+                <tr>
+                    <td>144</td>
+                    <td>$0090</td>
+                    <td>Statuswort ST</td>
+                </tr>
+                <tr>
+                    <td>145</td>
+                    <td>$0091</td>
+                    <td>Flag: Stoptaste / RVS-Taste</td>
+                </tr>
+                <tr>
+                    <td>148</td>
+                    <td>$0094</td>
+                    <td>Flag: Serieller Bus — Ausgabe Zeichenpuffer</td>
+                </tr>
+                <tr>
+                    <td>149</td>
+                    <td>$0095</td>
+                    <td>Zeichenspeicher — Serieller Bus</td>
+                </tr>
+                <tr>
+                    <td>150</td>
+                    <td>$0096</td>
+                    <td>Zwischenspeicher</td>
+                </tr>
+                <tr>
+                    <td>151</td>
+                    <td>$0097</td>
+                    <td>Anzahl der geöffneten Files</td>
+                </tr>
+                <tr>
+                    <td>152</td>
+                    <td>$0098</td>
+                    <td>Eingabegerät (Normalwert: 0)</td>
+                </tr>
+                <tr>
+                    <td>153</td>
+                    <td>$0099</td>
+                    <td>Ausgabegerät (Normalwert: 3)</td>
+                </tr>
+                <tr>
+                    <td>154</td>
+                    <td>$009A</td>
+                    <td>Flag: $80=Direkt-, $00=Programm-Modus</td>
+                </tr>
+                <tr>
+                    <td>157-158</td>
+                    <td>$009D-009E</td>
+                    <td>Zeiger auf Ende des Programms</td>
+                </tr>
+                <tr>
+                    <td>159-160</td>
+                    <td>$009F-00A0</td>
+                    <td>Temporärer Datenspeicher</td>
+                </tr>
+                <tr>
+                    <td>161-162</td>
+                    <td>$00A1-00A2</td>
+                    <td>Temporärer Datenspeicher</td>
+                </tr>
+                <tr>
+                    <td>163-165</td>
+                    <td>$00A3-00A5</td>
+                    <td>Echtzeit-Uhr</td>
+                </tr>
+                <tr>
+                    <td>166</td>
+                    <td>$00A6</td>
+                    <td>Register für seriellen Bus</td>
+                </tr>
+                <tr>
+                    <td>167</td>
+                    <td>$00A7</td>
+                    <td>Register für Kassettenroutine</td>
+                </tr>
+                <tr>
+                    <td>168</td>
+                    <td>$00A8</td>
+                    <td>Register für seriellen Bus</td>
+                </tr>
+                <tr>
+                    <td>169</td>
+                    <td>$00A9</td>
+                    <td>Temporärer Farb-Vektor</td>
+                </tr>
+                <tr>
+                    <td>170</td>
+                    <td>$00AA</td>
+                    <td>Register für Kassettenroutine</td>
+                </tr>
+                <tr>
+                    <td>171</td>
+                    <td>$00AB</td>
+                    <td>Anzahl der Zeichen im Filenamen</td>
+                </tr>
+                <tr>
+                    <td>172</td>
+                    <td>$00AC</td>
+                    <td>Aktuelle logische File-Nummer</td>
+                </tr>
+                <tr>
+                    <td>173</td>
+                    <td>$00AD</td>
+                    <td>Aktuelle Sekundär-Adresse</td>
+                </tr>
+                <tr>
+                    <td>174</td>
+                    <td>$00AE</td>
+                    <td>Aktuelle Geräte-Nummer</td>
+                </tr>
+                <tr>
+                    <td>175-176</td>
+                    <td>$00AF-00B0</td>
+                    <td>Zeiger auf Filenamen</td>
+                </tr>
+                <tr>
+                    <td>177</td>
+                    <td>$00B1</td>
+                    <td>Von Fehlerroutine benutzt</td>
+                </tr>
+                <tr>
+                    <td>178-179</td>
+                    <td>$00B2-00B3</td>
+                    <td>I/O Startadresse</td>
+                </tr>
+                <tr>
+                    <td>180-181</td>
+                    <td>$00B4-00B5</td>
+                    <td>Basis-Ladeadresse</td>
+                </tr>
+                <tr>
+                    <td>182-183</td>
+                    <td>$00B6-00B7</td>
+                    <td>Zeiger: Anfang Kassettenpuffer</td>
+                </tr>
+                <tr>
+                    <td>186-187</td>
+                    <td>$00BA-00BB</td>
+                    <td>Zeiger auf Zeichen im Kassettenpuffer</td>
+                </tr>
+                <tr>
+                    <td>190-191</td>
+                    <td>$00BE-00BF</td>
+                    <td>Register für Long-Fetch-Routine</td>
+                </tr>
+                <tr>
+                    <td>192-193</td>
+                    <td>$00C0-00C1</td>
+                    <td>Register für Scrolling</td>
+                </tr>
+                <tr>
+                    <td>194</td>
+                    <td>$00C2</td>
+                    <td>RVS-Flag (Bildschirm)</td>
+                </tr>
+                <tr>
+                    <td>195</td>
+                    <td>$00C3</td>
+                    <td>Zeiger: Ende der Zeile (Input)</td>
+                </tr>
+                <tr>
+                    <td>196-197</td>
+                    <td>$00C4-00C5</td>
+                    <td>Cursorposition (Input), Reihe/Spalte</td>
+                </tr>
+                <tr>
+                    <td>198</td>
+                    <td>$00C6</td>
+                    <td>Tastaturabfrage ($40=keine Taste)</td>
+                </tr>
+                <tr>
+                    <td>199</td>
+                    <td>$00C7</td>
+                    <td>Flag: Eingabe Bildschirm/Tastatur</td>
+                </tr>
+                <tr>
+                    <td>200-201</td>
+                    <td>$00C8-00C9</td>
+                    <td>Zeiger auf Bildschirmzeile</td>
+                </tr>
+                <tr>
+                    <td>202</td>
+                    <td>$00CA</td>
+                    <td>Cursorposition in aktueller Bildschirmzeile</td>
+                </tr>
+                <tr>
+                    <td>203</td>
+                    <td>$00CB</td>
+                    <td>Flag: Anführungszeichen-Modus ($00=nein)</td>
+                </tr>
+                <tr>
+                    <td>204</td>
+                    <td>$00CC</td>
+                    <td>Länge der aktuellen Bildschirmzeile</td>
+                </tr>
+                <tr>
+                    <td>205</td>
+                    <td>$00CD</td>
+                    <td>Zeile, in der sich der Cursor befindet</td>
+                </tr>
+                <tr>
+                    <td>206</td>
+                    <td>$00CE</td>
+                    <td>Letztes Zeichen (I/O)</td>
+                </tr>
+                <tr>
+                    <td>207</td>
+                    <td>$00CF</td>
+                    <td>Anzahl der Zeichen (Insert-Modus)</td>
+                </tr>
+                <tr>
+                    <td>208-215</td>
+                    <td>$00D0-00D7</td>
+                    <td>Reserviert für Software</td>
+                </tr>
+                <tr>
+                    <td>216-232</td>
+                    <td>$00D8-00E8</td>
+                    <td>Reserviert für Anwendungssoftware</td>
+                </tr>
+                <tr>
+                    <td>233</td>
+                    <td>$00E9</td>
+                    <td>Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>234-235</td>
+                    <td>$00EA-00EB</td>
+                    <td>Bildschirm-Editor (Farbe)</td>
+                </tr>
+                <tr>
+                    <td>236-238</td>
+                    <td>$00EC-00EE</td>
+                    <td>Arbeitsbereich (Bildschirm)</td>
+                </tr>
+                <tr>
+                    <td>239</td>
+                    <td>$00EF</td>
+                    <td>Anzahl der Zeichen im Tastaturpuffer</td>
+                </tr>
+                <tr>
+                    <td>241-242</td>
+                    <td>$00F1-00F2</td>
+                    <td>Register für Monitor</td>
+                </tr>
+                <tr>
+                    <td>250</td>
+                    <td>$00FA</td>
+                    <td>Register für X bei Stoptastentest</td>
+                </tr>
+                <tr>
+                    <td>251</td>
+                    <td>$00FB</td>
+                    <td>Aktuelle Bank-Konfiguration</td>
+                </tr>
+                <tr>
+                    <td>254</td>
+                    <td>$00FE</td>
+                    <td>Arbeitsregister (Editor)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3b. Die Zeropage beim C16</figcaption>
+        </figure>
+
 
         <p>Wir wollen es jedoch nicht nur mit der Aufstellung alleine bewenden lassen. Die interessantesten Lokationen möchte ich hier herausgreifen und besprechen. Alle angeführten Adressen gelten, soweit nicht anders angegeben, sowohl für den VC 20 als auch für den C 16.</p>
 
@@ -105,210 +1945,36 @@
 
         <p>Adresse 59, 60: Diese Speicherzellen enthalten die laufende Zeilennummer eines Basic-Programms. Sollte es im Programmlauf unterbrochen werden, hat man hier die Möglichkeit, die Zeilennummer nachzulesen.</p>
 
-        <p>Zustandsbeschreibung: das Statusflag Dezimal Hexadezimal</p>
+        <p>Zustandsbeschreibung: das Statusflag</p>
 
-        <p>0- 2 00 - 02</p>
+        <p>Adresse 144: Dieses Statusflag ist auch von Basic aus über die STATUS- beziehungsweise ST-Anweisung abfragbar. Es liefert das Computerstatus-Byte, dessen Inhalt aufgrund der letzten Input-Output-Operation gesetzt wurde. Bezogen auf den Kassettenport liefert es nach Bild 3 bestimmte Meldungen. Die Informationen über die geladenen Programme werden binär wiedergegeben. Die Null signalisiert ein ordnungsgemäß geladenes Programm. 32 hingegen bedeutet, daß ein Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der Computer mehrere Meldungen in dieses Byte packt, beispielsweise 52 = 32 + 16 + 4: Hier wurde ein kurzer Block geladen, jedoch ist die Prüfsumme falsch, und ein fataler Ladefehler liegt vor.</p>
 
-        <p>Adresse 144: Dieses Statusflag ist auch von Basic aus über 9-4 1095-04 die STATUS- beziehungsweise ST-Anweisung abfragbar. Es A A liefert das Computerstatus-Byte, dessen Inhalt aufgrund der 8 08 letzten Input-Output-Operation gesetzt wurde. Bezogen auf 9 09 den Kassettenport liefert es nach Bild 3 bestimmte Meldun- 10 OA gen. Die Informationen über die geladenen Programme wer- 11 0B den binär wiedergegeben. Die Null signalisiert ein ordnungs- 12 0C gemäß geladenes Programm. 32 hingegen bedeutet, daß ein 13 0D Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der 14 0E Computer mehrere Meldungen in dieses Byte packt, bei- r vr spielsweise 52 = 32 + 16 + 4: Hier wurde ein kurzer Block 17 1 geladen, jedoch ist die Prüfsumme falsch, und ein fataler 18 12 Ladefehler liegt vor. 19 13</p>
+        <p>An dieser Stelle ist es angebracht, sich näher mit dem Aufzeichnungsverfahren zu beschäftigen (Bild 4).</p>
 
-        <p>An dieser Stelle ist es angebracht, sich näher mit dem Auf- 20- 21 | 14-15 zeichnungsverfahren zu beschäftigen (Bild 4). 22 16 23- 24 17 - 18 25- 33 19 - 21 34- 37 22 - 25</p>
+        <p>So kommen Programme aufs Band</p>
 
-        <p>So kommen Programme aufs Band 38- 42 | 26-24</p>
+        <p>Jeder Speichervorgang beginnt mit dem Header. Dieser Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekunden langer Pfeifton) und dem eigentlichen Programmkopf. Dieser enthält vier wichtige Informationen, nämlich über Programmtyp, Startadresse, Endadresse und Programmname. Diese Daten sind ebenfalls im Bandpuffer zu finden und können von dort abgerufen werden.</p>
 
-        <p>43- 44 2B - 2C 45- 46 2D - 2E</p>
-
-        <p>Jeder Speichervorgang beginnt mit dem Header. Dieser 47- 48 | 2F - 30 Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekun- -49- 50 | 31-32 den langer Pfeifton) und dem eigentlichen Programmkopf. 51- 52 | 33 - 34 Dieser enthält vier wichtige Informationen, nämlich über Pro- 53- 54 | 35-36 grammtyp, Startadresse, Endadresse und Programmname. P% 5 a ' I Diese Daten sind ebenfalls im Bandpuffer zu finden und kön- 59- 60 | 38- sc nen von dort abgerufen werden. = . 61- 62 | 3D- 3E</p>
-
-        <p>Das erste Byte (Adresse 828 beziehungsweise 818 beim 63- 64 | 3F - 40 C 16) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß 65- 66 | 41-42 es sich um ein Programm handelt, das verschoben geladen 67- 68 | 43.- 44 werden kann, also auch an eine andere Stelle als die, von der 69- 70 | 45 - 46 aus es gespeichert wurde. Das Gegenstück dazu ist die 71-72 | 47-48 absolute Lademethode (Headertyp 3). Gemeint ist 73- 74 | 49 - 4A. »LOAD"."1,1«. Die Sekundäradresse 1 signalisiert dem Com- | 75° 76 | +8- 40 puter, daß er das Programm (unabhängig von den Zeigern IM 79 E F f . . . - 43, 44) wieder in den gleichen Adreßbereich laden soll. Um 80- 83 | 50-53 Verwechslungen vorzubeugen, ist es wichtig, Headertyp und 84- 86 | 54 - 56 Sekundäradresse zu unterscheiden. Für den Headertyp gibt 87- 96 | 57-60 es drei Möglichkeiten:</p>
+        <p>Das erste Byte (Adresse 828 beziehungsweise 818 beim C 16) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß es sich um ein Programm handelt, das verschoben geladen werden kann, also auch an eine andere Stelle als die, von der aus es gespeichert wurde. Das Gegenstück dazu ist die absolute Lademethode (Headertyp 3). Gemeint ist »LOAD"."1,1«. Die Sekundäradresse 1 signalisiert dem Computer, daß er das Programm (unabhängig von den Zeigern 43, 44) wieder in den gleichen Adreßbereich laden soll. Um Verwechslungen vorzubeugen, ist es wichtig, Headertyp und Sekundäradresse zu unterscheiden. Für den Headertyp gibt es drei Möglichkeiten:</p>
 
         <ol>
             <li>
-                <p>Laden mit Verschiebelader (die Anfangsadresse wird 97 61 durch den Zeiger 43 und 44 bestimmt). 98 - 101 62 - 65</p>
+                <p>Laden mit Verschiebelader (die Anfangsadresse wird durch den Zeiger 43 und 44 bestimmt).</p>
             </li>
             <li>
-                <p>Ein File – also Daten aus Variablen – wurde ge- 102 66 103 67 speichert. 104 68</p>
+                <p>Ein File – also Daten aus Variablen – wurde gespeichert.</p>
             </li>
         </ol>
 
 
-        <p>Die Unterscheidung ist wichtig, denn Daten können " 105 69 R } nicht mit LOAD geladen werden. 106-109 | 6A-- ep</p>
+        <p>Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.</p>
 
         <ol>
-            <li>Ein Programm ist absolut zu laden. 110 6E</li>
+            <li>Ein Programm ist absolut zu laden.</li>
         </ol>
 
 
-        <p>Die nächsten vier Byte geben die Anfangs- und Enid- 11 6F adresse des geladenen Files an. Mit der Endadresse hat es 112 70</p>
-
-        <p>Bemerkung</p>
-
-        <p>USR-Sprungvektor (Normal: JMP $D248) Vektor für Unterprogramm Fileßkonma nach Integer a Rame uchzeichen (sucht " oder Zeilenende) Hochkommaflag</p>
-
-        <p>Spaltenspeicher beim TAB-Befehl LOAD/VERIFY Flag (0 = LOAD/1 = VERIFY) Eingabepufferzeiger (Anzahl der Elemente) Flag für Dim (enthält die laufende Variable) Variablentyp (0 = Numerisch/128 = String) Numerische Variable (0 = Fließkomma/128 Integer) a und LIST</p>
-
-        <p>Eingabeflag (0 = INPUTI64 = GET/152 = READ) Vorzeichen beisATN Aktuelles Ein-/Ausgabegerät Integerwert (zum Beispiel Zeilennummer Zeiger im Stringstapel</p>
-
-        <p>Zeiger auf den zuletzt verwendeten String Stringstapel</p>
-
-        <p>Speicher für div. Hilfszeiger Speicherbereich bei einer Mulipikaton Zeiger auf Beginn des Basic-Speicherbereichs Beginn der Variablen (= Ende des Programms) Beginn der Arrays (= Ende der Variablen) Zeiger auf Ende der Arrays Zeiger auf Beginn der Strings Hilfszeiger für Strings ehe EEE</p>
-
-        <p>Vorherige Basic-Zeilennummer Zeiger auf Ifd. Basio-Befehl (für CONT) Momentane Zeilennummer für DATA Momentane Adresse einer DATA-Zeile Zeiger auf Element in DATA-Zeile und INPUT-Vektor Momentaner Variablenname Adresse der momentanen Variablen Zeiger für FORINEXT Variable D—— Zwischenspeicher für Programmzeiger (bei SAVE) Bere Vergleichssymbole eiger für FN</p>
-
-        <p>Verschieden genutzter Speicherbereich FN-Sprungvektor (ähnlich USR) Feld für diverse arithmetische Zwecke (Arithmetik Akku #3 und #4) Fließkommaakku #1 : Exponent Fließkommaakku #1 : Matisse Fließkommaakku #1 : Vorzeichen Zeiger für Polynomauswertung Überlauf von Akku #1 Flioßkommaakku #2 : Exponent : EXponen Fließkommaakku #2 : Mantisse Fließkommaakku #2 : Vorzeichen Vergleichsbyte der Vorzeichen von Akku 1 und 2 Rundung für Akku #1 und. #2 eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Dezimal Hexadezimal Bemerkung</p>
-
-        <p>113-114 71-72 Länge des Kassettenpuffers</p>
-
-        <p>115 - 138 73 - 8A CHRGET-Routine</p>
-
-        <p>139 - 143 8B - 8F RND-Wert als Fließkommazahl</p>
-
-        <p>144 90 Statusflag ST</p>
-
-        <p>145 91 STOP-Flag</p>
-
-        <p>150 96 Kassetten EOT (End of Tape) erhalten</p>
-
-        <p>151 97 Zwischenspeicher für Register</p>
-
-        <p>152 98 Anzahl der offenen Dateien</p>
-
-        <p>153 99 Eingabegerät (Normal = 0 : Tastatur)</p>
-
-        <p>154 9A Ausgabegerät (Normal = 3 : Bildschirm) 155 9B Paritätsbyte)</p>
-
-        <p>150 96 Kassetten EOT (End of Tape) erhalten . 151 97 Zwischenspeicher für Register</p>
-
-        <p>152 98 Anzahl der offenen Dateien</p>
-
-        <p>153 99 Eingabegerät (Normal = 0 : Tastatur)</p>
-
-        <p>154 9A Ausgabegerät (Normal = 3: Bildschirm) 155 9B Paritätsbyte vom Band (Prüfsumme)</p>
-
-        <p>156 9C Flag für Byte erhalten (von Band)</p>
-
-        <p>157 9D Flag für Direktmodus (= 128) oder Programm (= 0) 158 9E Band: erster Teil – Prüfsumme</p>
-
-        <p>159 9F Band: zweiter Durchlauf – Prüfsumme</p>
-
-        <p>160 - 162 AO - A2 Interne Uhr (Stunde, Minute, Sekunde)</p>
-
-        <p>163 A3 Bitzähler für serielle Ausgabe</p>
-
-        <p>164 a4 Zähler für Band</p>
-
-        <p>165 A5 Startsynchronisation bei Kassetten</p>
-
-        <p>166 A6 Zeiger im Bandpuffer</p>
-
-        <p>167 - 171 AT - AB Flags für Schreiben/Lesen bei Band</p>
-
-        <p>172 - 173 AC - AD Zeiger auf Kassettenpuffer und für scrolling 174 - 175 Ae - AF Zeiger auf Programmende bei LOAD</p>
-
-        <p>176 - 177 BO - B1 Bandzeitkonstanten</p>
-
-        <p>178-179 B2 - B3 Startadresse des Bandpuffers</p>
-
-        <p>180 B4 Bitzähler für Band</p>
-
-        <p>181 B5 Band oder RS232: nächstes zu sendendes Bit 182 B6 Übertragungsspeicher für RS232</p>
-
-        <p>183 B7 Länge des Filenamens</p>
-
-        <p>184 B8 Logische Filenummer</p>
-
-        <p>185 B9 Sekundäradresse</p>
-
-        <p>186 Ba Gerätenummer</p>
-
-        <p>187 - 188 BB - BC Zeiger auf Filenamen</p>
-
-        <p>189 BD Ein-/Ausgabespeicher (für seriell)</p>
-
-        <p>190 BE Blockzähler für Band</p>
-
-        <p>191 - BF Puffer für serielle Ausgabe</p>
-
-        <p>192 co Bandmotor Flag j 193 - 194 c1-C2 Startadresse für Ein-/Ausgabe</p>
-
-        <p>195 - 196 03 - C4 Endadresse für Ein-/Ausgabe</p>
-
-        <p>197 05 gedrückte Taste (momentaner Wert im Tastaturmatrixcode)</p>
-
-        <p>198 C6 Anzahl der gedrückten Tasten (im Tastaturpuffer) 199 c7 Bildschirm: negative Anzeige</p>
-
-        <p>200 08 Zeiger auf Zeilenende bei Eingabe</p>
-
-        <p>201 c9 Cursorzeile</p>
-
-        <p>202 CA Cursorspalte</p>
-
-        <p>203 CB Welche Taste? (64 = keine)</p>
-
-        <p>204 cc Cursorblinken</p>
-
-        <p>205 CD Cursor Blinkzähler</p>
-
-        <p>206 CE Zeichen unter dem Cursor</p>
-
-        <p>207 CF Flag für Cursorblinken (0 = An/1 = Aus) 208 DO Eingabe von Bildschirm/oder Tastatur</p>
-
-        <p>209 - 210 Di - D2 Start der-aktuellen Bildschirmzeile</p>
-
-        <p>211 D3 Position des Cursors in der aktuellen Bildschirmzeile 212 D4 Flag für Cursor (0 = Direkt, sonst programmiert) 213 D5 Länge der Bildschirmzeile (21'0d. 42 od. 63 od. 84) 214 D6 Cursorzeile .</p>
-
-        <p>215 D7 Zeiger für diverse Zwecke</p>
-
-        <p>216 D8 Anzahl der Inserts</p>
-
-        <p>217-242 DI - F2 High Bytes der Bildschirmzeilenanfänge 243 - 244 F3 - F4 Zeiger im Farbspeicher</p>
-
-        <p>245 - 246 F5 - F6 Zeiger in der Tastaturdekodiertabelle</p>
-
-        <p>247 - 248 FT -F8 Zeiger auf RS232 Eingabepuffer</p>
-
-        <p>249 - 250 F9 - FA Zeiger auf RS232 Ausgabepuffer</p>
-
-        <p>251 - 254 FA- FE Freie Zeropageadressen</p>
-
-        <p>255 -(266) | FF - 10A Zwischenspeicher für Fließkomma nach ASCII</p>
-
-        <p>Tabelle 3a. Die Zeropage beim VC 20 (Schluß)</p>
-
-        <p>Dezimal Hexadezimal Bemerkung</p>
-
-        <p>0 $0000 Datenrichtungsregister des 7501</p>
-
-        <p>1 $0001 Ein-/Ausgabe-Port des 7501</p>
-
-        <p>2 $0002 Flag für Schleifen . 3- 4 | $0003-0004 | Neue Startadresse (Renumber)</p>
-
-        <p>5- 6 1$0005-0006 | Schrittweite (Renumber)</p>
-
-        <p>7 $0007 Gesuchtes Zeichen</p>
-
-        <p>8 $0008 Flag für Anführungszeichen-Modus</p>
-
-        <p>9 $0009 TAB-Spaltenzähler</p>
-
-        <p>10 $000A Flag: O0 = Load, 1 = Verify 11 $000B Zeiger für Eingabepuffer, Anzahl der Elemente 12 $000C Flag für Standard-DIM 13 $000D Datentyp: $FF=String, $00=Numerisch 14 $000E Datentyp: $80=Integer, $00=Fließkomma 15 $000F Flag für DATA/LIST</p>
-
-        <p>16 $0010 Flag: Element/FNx-Flag 17 $0011 Flag: $00=INPUT, $40=GET, $98=READ 18 $0012 Flag: Vorzeichen des ATN 19 $0013 Flag: Input-Prompt</p>
-
-        <p>20- 21 $0014-0015 | Int. Adresse</p>
-
-        <p>22 $0016 Zeiger auf temporären Stringstapel 23- 24 |$0017-0018 | Letzter temporärer Stringvektor 25- 33 | $0019-0021 | Stapel für temporäre Strings 34- 35 | $0022-0023 | Bereich für Hilfszeiger 1 36- 37 | $0024-0025 | Bereich für Hilfszeiger 2 38 $0026 Bereich für Produkt bei Multiplikation 39 $0027 Bereich für Produkt bei Multiplikation 40 $0028 Bereich für Produkt bei Multiplikation 41 $0029 Bereich für Produkt bei Multiplikation 42 $002A Bereich für Produkt bei Multiplikation 43- 44 $002B-002C | Zeiger auf Basic-Anfang 45- 46 $002D-002E | Zeiger auf Variablen-Anfang 47- 48 | $002F-0030 | Zeiger auf Beginn der Arrays 49- 50 | $0031-0032 | Zeiger auf Ende der Arrays (+1) 51- 52 $0033-0034 | Zeiger auf Stringspeicher 53- 54 | $0035-0036 | Hilfszeiger für Strings 55- 56 | $0037-0038 | Zeiger auf Speichergrenze 57- 58 $0039-003A | Laufende Basiczeilennummer 59- 60 $003B-003C | Textpointer</p>
-
-        <p>61- 62 $003D-003E | Zeiger auf Basic-Statement für CONT 63- 64 | $003F-0040 | Nummer der aktuellen DATA-Zeile 65- 66 1|$0041-0042 | Adresse des aktuellen DATA-Elementes 67- 68 $0043-0044 | Sprungvektor für INPUT 69- 70 $0045-0046 | Aktueller Variablenname 71- 72 $0047-0048 | Adresse der aktuellen Variablen 73- 74 | $0049-004A | Variablenzeiger für FOR...NEXT 75- 76 $004B-004C | Zwischenspeicher für Basic-Zeiger 77 $004D Akkumulator für Vergleichssymbole 78- 79 $004E-004F | Arbeitsbereich (Zeiger etc.) 80- 81 $0050-0051 | Arbeitsbereich (Zeiger etc.) 82 $0052 Arbeitsbereich (Zeiger etc.) 83 $0053 Grafik-Modus</p>
-
-        <p>84- 86 $0054-0056 | Sprungvektor für Funktionen 87- 96 | $0057-0060 | Bereich für numerische Operationen 97 $0061 Fließkomma-Akkumulator 1 (FAC): Exponent</p>
-
-        <p>98-101 $0062-0065 | Fließkomma-Akkumulator 1 (FAC): Mantisse</p>
-
-        <p>102 $0066 Fließkomma-Akkumulator 1 (FAC): Vorzeichen</p>
-
-        <p>103 $0067 Zeiger für Polynom-Auswertung 104 $0068 Fließkomma-Akkumulator 1 Überlauf 105-110 $0069-006E | Fließkomma-Akkumulator 2 Exponent etc. 111 $006F Vorzeichenvergleich Akku 1 mit Akku 2 112 $0070 Fließkomma-Akkumulator 1 niederwertige Stelle 113-114 $0071-0072 | Kassettenpuffer Länge/Zeiger 115-116 $0073-0074 | Automatisches Zeileninkrement O=AUS 117 $0075 Grafik-Flag O=Text 255=Grafik 118-120 $0076-0078 | Arbeitsbereich ' 121-123 | $0079-007B | Darstellung von DS$ | 124-125 | $007C-007D | Basic-Pseudo-Stack-Pointer 126-143 | $007E-008F | Arbeitsbereich (Sound) 144 $0090 Statuswort ST</p>
-
-        <p>Tabelle 3b. Die Zeropage beim C16 Load Error geschieht dies nicht; »PRINT FRE(O)« zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm – das vielleicht nur einen geringfügigen Fehler hat – dann nicht starten, weil die Variablen dieses überschreiben würden. Abhilfe schafft in diesem Fall</p>
+        <p>Die nächsten vier Byte geben die Anfangs- und Endadresse des geladenen Files an. Mit der Endadresse hat es eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Load Error geschieht dies nicht; »PRINT FRE(O)« zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm – das vielleicht nur einen geringfügigen Fehler hat – dann nicht starten, weil die Variablen dieses überschreiben würden. Abhilfe schafft in diesem Fall</p>
 
         <p>POKE 45,PEEK(831) :POKE 46, PEEK(832):CLR.</p>
 
@@ -357,6 +2023,882 @@
         <p>Die Befehle INPUT und GET dürfen im Direktmodus nicht verwendet werden. Der Grund liegt darin, daß diese Eingabebefehle ebenfalls den Basic-Eingabepuffer zur Zwischenspeicherung der Daten verwenden. Das »Direktmodusprogramm«, das sich zu dieser Zeit im Puffer befindet, würde dann überschrieben. Um das zu verhindern, sind diese Kommandos im Direktmodus verboten (Fehlermeldung »ILLEGAL DIRECT«).</p>
 
         <p>Der nächste größere Komplex, den wir hier behandeln wollen, ist die Tastaturverwaltung. Wie Sie bestimmt schon öfter bemerkt oder gelesen haben, wickelt der VC 20 (und der C 16) seine Tastaturoperationen ebenfalls über einen Puffer ab (vergleiche Tabelle 4). Dies wird beim LISTen von Basic-Programmen deutlich, denn während der Computer ein Programm ausgibt, können alle Tasten (mit Ausnahme des STOP-Keys) drücken – diese erscheinen aber nicht auf dem Bildschirm. Erst wenn das Programm zu Ende gelistet ist, sieht man, daß keine Taste »vergessen« wurde, denn alle Eingaben wurden im Tastaturpuffer (Adresse 631-640, beim C 16: 1319-1328) zwischengespeichert.</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Dezimal</th>
+                    <th>Hexadezimal</th>
+                    <th>Bemerkung</th>
+                </tr>
+                <tr>
+                    <td>255-266</td>
+                    <td>00FF-010A</td>
+                    <td>Arbeitsspeicher für Fließkomma nach ASCII</td>
+                </tr>
+                <tr>
+                    <td>256-318</td>
+                    <td>0100-013E</td>
+                    <td>Korrekturpuffer für Bandbetrieb</td>
+                </tr>
+                <tr>
+                    <td>256-511</td>
+                    <td>0100-01FF</td>
+                    <td>Prozessor Stack</td>
+                </tr>
+                <tr>
+                    <td>512-600</td>
+                    <td>0200-0258</td>
+                    <td>Basic-Eingabepuffer</td>
+                </tr>
+                <tr>
+                    <td>601-610</td>
+                    <td>0259-0262</td>
+                    <td>Tabelle der logischen Filenummern…</td>
+                </tr>
+                <tr>
+                    <td>611-620</td>
+                    <td>0263-026C</td>
+                    <td>....sowie der dazugehörigen Gerätenummern…</td>
+                </tr>
+                <tr>
+                    <td>621-630</td>
+                    <td>026D-0276</td>
+                    <td>...und der entsprechenden Sekundäradressen</td>
+                </tr>
+                <tr>
+                    <td>631-640</td>
+                    <td>0277-0280</td>
+                    <td>Tastaturpuffer</td>
+                </tr>
+                <tr>
+                    <td>641-642</td>
+                    <td>0281-0282</td>
+                    <td>Start des verfügbaren RAM-Bereichs</td>
+                </tr>
+                <tr>
+                    <td>643-644</td>
+                    <td>0283-0284</td>
+                    <td>Ende des verfügbaren RAM-Bereichs</td>
+                </tr>
+                <tr>
+                    <td>645</td>
+                    <td>0285</td>
+                    <td>Timeout-Flag für den seriellen Port</td>
+                </tr>
+                <tr>
+                    <td>646</td>
+                    <td>0286</td>
+                    <td>Aktueller Farbcode</td>
+                </tr>
+                <tr>
+                    <td>647</td>
+                    <td>0287</td>
+                    <td>Farbe unter dem Cursor</td>
+                </tr>
+                <tr>
+                    <td>648</td>
+                    <td>0288</td>
+                    <td>High-Byte des Bildschirmspeichers (Information für das Betriebssystem)</td>
+                </tr>
+                <tr>
+                    <td>649</td>
+                    <td>0289</td>
+                    <td>Größe des Tastaturpuffers (Maximum 10)</td>
+                </tr>
+                <tr>
+                    <td>650</td>
+                    <td>028A</td>
+                    <td>Repeat-Flag (0: Cursor + Space/ 64: Keine Taste/ 128: Alle Tasten mit Repeat)</td>
+                </tr>
+                <tr>
+                    <td>651</td>
+                    <td>028B</td>
+                    <td>Repeat-Zähler (bestimmt die Wartezeit bis die Taste wiederholt wird)</td>
+                </tr>
+                <tr>
+                    <td>652</td>
+                    <td>028C</td>
+                    <td>Repeat-Verzögerung (bestimmt die Zeit, bis die Taste das erstemal wiederholt wird)</td>
+                </tr>
+                <tr>
+                    <td>653</td>
+                    <td>028D</td>
+                    <td>Kontrolltasten-Flag (1: SHIFT/ 2: CBM/ 4: CTRL. Es können auch 2 Tasten erkannt werden zum Beispiel 5: SHIFT + CTRL)</td>
+                </tr>
+                <tr>
+                    <td>654</td>
+                    <td>028E</td>
+                    <td>Letzte Kontrolltaste (Identisch mit 653)</td>
+                </tr>
+                <tr>
+                    <td>655-656</td>
+                    <td>028F-0290</td>
+                    <td>Vektor für Tastaturdecodierung</td>
+                </tr>
+                <tr>
+                    <td>657</td>
+                    <td>0291</td>
+                    <td>Flag für SHIFT + CBM gesperrt (keine Groß-Klein-Schrift-Umschaltung. 0: Normal/128: Sperre)</td>
+                </tr>
+                <tr>
+                    <td>658</td>
+                    <td>0292</td>
+                    <td>Flag für Scrolling</td>
+                </tr>
+                <tr>
+                    <td>659-670</td>
+                    <td>0293-029E</td>
+                    <td>RS 232 Register, Zeiger, etc.</td>
+                </tr>
+                <tr>
+                    <td>671-672</td>
+                    <td>029F-02A0</td>
+                    <td>Zwischenspeicher für IRQ bei Bandbetrieb</td>
+                </tr>
+                <tr>
+                    <td>673-676</td>
+                    <td>02A1-02A4</td>
+                    <td>Diverse VIA-Zeiger</td>
+                </tr>
+                <tr>
+                    <td>677-767</td>
+                    <td>02A5-02FF</td>
+                    <td>Zwischenspeicher einer Bildschirmzeile</td>
+                </tr>
+                <tr>
+                    <td>786-769</td>
+                    <td>0300-0301</td>
+                    <td>Vektor für Fehlermeldung (C43A)</td>
+                </tr>
+                <tr>
+                    <td>770-771</td>
+                    <td>0302-0303</td>
+                    <td>Vektor für Basic-Warmstart (C483)</td>
+                </tr>
+                <tr>
+                    <td>772-773</td>
+                    <td>0304-0305</td>
+                    <td>Vektor für Umwandlung von ASCII in Token (C579)</td>
+                </tr>
+                <tr>
+                    <td>774-775</td>
+                    <td>0306-0307</td>
+                    <td>Vektor für Umwandlung von Token in ASCII (C717)</td>
+                </tr>
+                <tr>
+                    <td>776-777</td>
+                    <td>0308-0309</td>
+                    <td>Vektor für Basic-Befehlsadresse (C7E1)</td>
+                </tr>
+                <tr>
+                    <td>778-779</td>
+                    <td>030A-030B</td>
+                    <td>Vektor für arithmetisches Element (CE83)</td>
+                </tr>
+                <tr>
+                    <td>780</td>
+                    <td>030C</td>
+                    <td>Akku für SYS-Befehl (Bei SYS wird 780 in den Akku geladen)</td>
+                </tr>
+                <tr>
+                    <td>781</td>
+                    <td>030D</td>
+                    <td>X-Reg für SYS-Befehl</td>
+                </tr>
+                <tr>
+                    <td>782</td>
+                    <td>030E</td>
+                    <td>Y-Reg für SYS-Befehl</td>
+                </tr>
+                <tr>
+                    <td>783</td>
+                    <td>030F</td>
+                    <td>Speicher für Status Register für SYS-Befehl</td>
+                </tr>
+                <tr>
+                    <td>788-789</td>
+                    <td>0314-0315</td>
+                    <td>IRQ-Vektor (EABF) *** Kernal-Vektoren</td>
+                </tr>
+                <tr>
+                    <td>790-791</td>
+                    <td>0316-0317</td>
+                    <td>BRK-Vektor (FED2)</td>
+                </tr>
+                <tr>
+                    <td>792-793</td>
+                    <td>0318-0319</td>
+                    <td>NMI-Vektor (FEAD)</td>
+                </tr>
+                <tr>
+                    <td>794-795</td>
+                    <td>031A-031B</td>
+                    <td>OPEN-Vektor (F40A)</td>
+                </tr>
+                <tr>
+                    <td>796-797</td>
+                    <td>031C-031D</td>
+                    <td>CLOSE-Vektor (F34A)</td>
+                </tr>
+                <tr>
+                    <td>798-799</td>
+                    <td>031E-031F</td>
+                    <td>Kanal für Eingabe (CHKIN, F2C7)</td>
+                </tr>
+                <tr>
+                    <td>800-801</td>
+                    <td>0320-0321</td>
+                    <td>Kanal für Ausgabe (CHOUT, F309)</td>
+                </tr>
+                <tr>
+                    <td>802-803</td>
+                    <td>0322-0323</td>
+                    <td>Kanäle initialisieren (CLRCH, F3F3)</td>
+                </tr>
+                <tr>
+                    <td>804-805</td>
+                    <td>0324-0325</td>
+                    <td>Eingabe-Vektor (F20E)</td>
+                </tr>
+                <tr>
+                    <td>806-807</td>
+                    <td>0326-0327</td>
+                    <td>Ausgabe-Vektor (F27A)</td>
+                </tr>
+                <tr>
+                    <td>808-809</td>
+                    <td>0328-0329</td>
+                    <td>Vektor für STOP-Taste prüfen (F770)</td>
+                </tr>
+                <tr>
+                    <td>810-811</td>
+                    <td>032A-032B</td>
+                    <td>GET-Vektor (F1F5)</td>
+                </tr>
+                <tr>
+                    <td>812-813</td>
+                    <td>032C-032D</td>
+                    <td>Alle Files schließen (F3EF)</td>
+                </tr>
+                <tr>
+                    <td>814-815</td>
+                    <td>032E-032F</td>
+                    <td>User-Vektor (FED2)</td>
+                </tr>
+                <tr>
+                    <td>816-817</td>
+                    <td>0330-0331</td>
+                    <td>LOAD—Vektor (F549)</td>
+                </tr>
+                <tr>
+                    <td>818-819</td>
+                    <td>0332-0333</td>
+                    <td>SAVE-Vektor (F685)</td>
+                </tr>
+                <tr>
+                    <td>828-1019</td>
+                    <td>033C-03FB</td>
+                    <td>Kassettenpuffer</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4a. Die Belegung der Seiten 2 bis 4 beim VC20</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tr>
+                    <th>Dezimal</th>
+                    <th>Hexadezimal</th>
+                    <th>Bemerkung</th>
+                </tr>
+                <tr>
+                    <td>256-511</td>
+                    <td>$0100-01FF</td>
+                    <td>Prozessorstack</td>
+                </tr>
+                <tr>
+                    <td>512-600</td>
+                    <td>$0200-0258</td>
+                    <td>Eingabepuffer</td>
+                </tr>
+                <tr>
+                    <td>601-604</td>
+                    <td>$0259-025C</td>
+                    <td>Basic-Puffer</td>
+                </tr>
+                <tr>
+                    <td>605-684</td>
+                    <td>$025D-02AC</td>
+                    <td>Basic-/DOS-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>605</td>
+                    <td>$025D</td>
+                    <td>DOS-Schleifenzähler</td>
+                </tr>
+                <tr>
+                    <td>606-621</td>
+                    <td>$025E-026D</td>
+                    <td>Bereich für Filenamen</td>
+                </tr>
+                <tr>
+                    <td>622</td>
+                    <td>$026E</td>
+                    <td>1. Filename (Länge)</td>
+                </tr>
+                <tr>
+                    <td>623</td>
+                    <td>$026F</td>
+                    <td>DOS (Laufwerk 1)</td>
+                </tr>
+                <tr>
+                    <td>624-625</td>
+                    <td>$0270-0271</td>
+                    <td>1. Filename (Adresse)</td>
+                </tr>
+                <tr>
+                    <td>626</td>
+                    <td>$0272</td>
+                    <td>2. Filename (Länge)</td>
+                </tr>
+                <tr>
+                    <td>627</td>
+                    <td>$0273</td>
+                    <td>DOS (Laufwerk 2)</td>
+                </tr>
+                <tr>
+                    <td>628-629</td>
+                    <td>$0274-0275</td>
+                    <td>2. Filename (Adresse)</td>
+                </tr>
+                <tr>
+                    <td>630</td>
+                    <td>$0276</td>
+                    <td>DOS logische Adresse</td>
+                </tr>
+                <tr>
+                    <td>631</td>
+                    <td>$0277</td>
+                    <td>DOS (Geräteadresse)</td>
+                </tr>
+                <tr>
+                    <td>632</td>
+                    <td>$0278</td>
+                    <td>DOS (Sekundäradresse)</td>
+                </tr>
+                <tr>
+                    <td>633-634</td>
+                    <td>$0279-027A</td>
+                    <td>DOS (Disketten-ID)</td>
+                </tr>
+                <tr>
+                    <td>635</td>
+                    <td>$027B</td>
+                    <td>ID-Flag</td>
+                </tr>
+                <tr>
+                    <td>636</td>
+                    <td>$027C</td>
+                    <td>DOS (Ausgabepuffer)</td>
+                </tr>
+                <tr>
+                    <td>637-684</td>
+                    <td>$027D-02AC</td>
+                    <td>DOS (Arbeitsbereich)</td>
+                </tr>
+                <tr>
+                    <td>685-688</td>
+                    <td>$02AD-02B0</td>
+                    <td>Grafik-Cursor</td>
+                </tr>
+                <tr>
+                    <td>689-692</td>
+                    <td>$02B1-02B4</td>
+                    <td>Grafik-Cursor (Register)</td>
+                </tr>
+                <tr>
+                    <td>693-715</td>
+                    <td>$02B5-02CB</td>
+                    <td>Grafik-Register</td>
+                </tr>
+                <tr>
+                    <td>716-739</td>
+                    <td>$02CC-02E3</td>
+                    <td>Print-Using, Grafik-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>740</td>
+                    <td>$02E4</td>
+                    <td>High-Byte-Adresse des Charakter-ROM</td>
+                </tr>
+                <tr>
+                    <td>747</td>
+                    <td>$02EB</td>
+                    <td>Trace-Flag</td>
+                </tr>
+                <tr>
+                    <td>752</td>
+                    <td>$02F0</td>
+                    <td>Anzahl der Grafik-Parameter</td>
+                </tr>
+                <tr>
+                    <td>753</td>
+                    <td>$02F1</td>
+                    <td>Parameter: Relativ (1), Absolut (0)</td>
+                </tr>
+                <tr>
+                    <td>754-755</td>
+                    <td>$02F2-02F3</td>
+                    <td>Fließkomma-Vektor</td>
+                </tr>
+                <tr>
+                    <td>756-757</td>
+                    <td>$02F4-02F5</td>
+                    <td>Integer-Vektor</td>
+                </tr>
+                <tr>
+                    <td>768-769</td>
+                    <td>$0300-0301</td>
+                    <td>Sprungvektor: Fehlermeldung</td>
+                </tr>
+                <tr>
+                    <td>770-771</td>
+                    <td>$0302-0303</td>
+                    <td>Sprungvektor: Basic-Warmstart</td>
+                </tr>
+                <tr>
+                    <td>772-773</td>
+                    <td>$0304-0305</td>
+                    <td>Sprungvektor: Token-Generierung</td>
+                </tr>
+                <tr>
+                    <td>774-775</td>
+                    <td>$0306-0307</td>
+                    <td>Sprungvektor: Keywort erzeugen</td>
+                </tr>
+                <tr>
+                    <td>776-777</td>
+                    <td>$0308-0309</td>
+                    <td>Sprungvektor: Hauptschleife</td>
+                </tr>
+                <tr>
+                    <td>778-779</td>
+                    <td>$030A-030B</td>
+                    <td>Sprungvektor: Eval</td>
+                </tr>
+                <tr>
+                    <td>780-781</td>
+                    <td>$030C-030D</td>
+                    <td>Sprungvektor: Token-Generierung (User)</td>
+                </tr>
+                <tr>
+                    <td>782-783</td>
+                    <td>$030E-030F</td>
+                    <td>Sprungvektor: Keywort erzeugen</td>
+                </tr>
+                <tr>
+                    <td>784-785</td>
+                    <td>$0310-0311</td>
+                    <td>Sprungvektor: User-Token bearbeiten</td>
+                </tr>
+                <tr>
+                    <td>786-787</td>
+                    <td>$0312-0313</td>
+                    <td>Sprungvektor: Interrupt (Uhr)</td>
+                </tr>
+                <tr>
+                    <td>788-789</td>
+                    <td>$0314-0315</td>
+                    <td>Sprungvektor: Interrupt</td>
+                </tr>
+                <tr>
+                    <td>790-791</td>
+                    <td>$0316-0317</td>
+                    <td>Sprungvektor: Break Interrupt</td>
+                </tr>
+                <tr>
+                    <td>792-793</td>
+                    <td>$0318-0319</td>
+                    <td>Sprungvektor: Open</td>
+                </tr>
+                <tr>
+                    <td>794-795</td>
+                    <td>$031A-031B</td>
+                    <td>Sprungvektor: Close</td>
+                </tr>
+                <tr>
+                    <td>796-797</td>
+                    <td>$031C-031D</td>
+                    <td>Sprungvektor: Kanal für Eingabe öffnen</td>
+                </tr>
+                <tr>
+                    <td>798-799</td>
+                    <td>$031E-031F</td>
+                    <td>Sprungvektor: Kanal für Ausgabe öffnen</td>
+                </tr>
+                <tr>
+                    <td>800-801</td>
+                    <td>$0320-0321</td>
+                    <td>Sprungvektor: I/O zurücksetzen</td>
+                </tr>
+                <tr>
+                    <td>802-803</td>
+                    <td>$0322-0323</td>
+                    <td>Sprungvektor: Input</td>
+                </tr>
+                <tr>
+                    <td>804-805</td>
+                    <td>$0324-0325</td>
+                    <td>Sprungvektor: Ausgabe</td>
+                </tr>
+                <tr>
+                    <td>806-807</td>
+                    <td>$0326-0327</td>
+                    <td>Sprungvektor: Abfrage der Stoptaste</td>
+                </tr>
+                <tr>
+                    <td>808-809</td>
+                    <td>$0328-0329</td>
+                    <td>Sprungvektor: Getin-Routine</td>
+                </tr>
+                <tr>
+                    <td>810-811</td>
+                    <td>$032A-032B</td>
+                    <td>Sprungvektor: Schließen aller Files</td>
+                </tr>
+                <tr>
+                    <td>812-813</td>
+                    <td>$032C-032D</td>
+                    <td>Sprungvektor: Monitor Break</td>
+                </tr>
+                <tr>
+                    <td>814-815</td>
+                    <td>$032E-032F</td>
+                    <td>Sprungvektor: Lade-Routine</td>
+                </tr>
+                <tr>
+                    <td>816-817</td>
+                    <td>$0330-0331</td>
+                    <td>Sprungvektor: Save-Routine</td>
+                </tr>
+                <tr>
+                    <td>818-1010</td>
+                    <td>$0332-03F2</td>
+                    <td>Kassettenpuffer</td>
+                </tr>
+                <tr>
+                    <td>1011-1012</td>
+                    <td>$03F3-03F4</td>
+                    <td>Datenzähler (Write)</td>
+                </tr>
+                <tr>
+                    <td>1013-1014</td>
+                    <td>$03F5-03F6</td>
+                    <td>Datenzähler (Read)</td>
+                </tr>
+                <tr>
+                    <td>1015-1078</td>
+                    <td>$03F7-0436</td>
+                    <td>RS-232-Input-Puffer (64 Byte)</td>
+                </tr>
+                <tr>
+                    <td>1079-1108</td>
+                    <td>$0437-0454</td>
+                    <td>System-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>1109-1138</td>
+                    <td>$0455-0472</td>
+                    <td>System-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>1139-1144</td>
+                    <td>$0473-0478</td>
+                    <td>Chrget-Routine</td>
+                </tr>
+                <tr>
+                    <td>1145-1156</td>
+                    <td>$0455-0484</td>
+                    <td>Chrgot-Routine</td>
+                </tr>
+                <tr>
+                    <td>1172-1244</td>
+                    <td>$0494-04DC</td>
+                    <td>Bankswitching-Routinen</td>
+                </tr>
+                <tr>
+                    <td>1255-1258</td>
+                    <td>$04E7-04EA</td>
+                    <td>Print-Using-Parameter</td>
+                </tr>
+                <tr>
+                    <td>1263-1270</td>
+                    <td>$04EF-04F6</td>
+                    <td>Trap- und Error-Flags</td>
+                </tr>
+                <tr>
+                    <td>1280-1282</td>
+                    <td>$0500-0502</td>
+                    <td>USR-Sprungbefehl</td>
+                </tr>
+                <tr>
+                    <td>1283-1287</td>
+                    <td>$0503-0507</td>
+                    <td>Startwert für RND</td>
+                </tr>
+                <tr>
+                    <td>1288</td>
+                    <td>$0508</td>
+                    <td>Flag für Kalt- oder Warmstart</td>
+                </tr>
+                <tr>
+                    <td>1289-1298</td>
+                    <td>$0509-0512</td>
+                    <td>Tabelle der logischen Filenummern</td>
+                </tr>
+                <tr>
+                    <td>1299-1308</td>
+                    <td>$0513-051C</td>
+                    <td>Tabelle der Gerätenummern</td>
+                </tr>
+                <tr>
+                    <td>1309-1318</td>
+                    <td>$051D-0526</td>
+                    <td>Tabelle der Sekundäradressen</td>
+                </tr>
+                <tr>
+                    <td>1319-1328</td>
+                    <td>$0527-0530</td>
+                    <td>Tastaturpuffer</td>
+                </tr>
+                <tr>
+                    <td>1329-1330</td>
+                    <td>$0531-0532</td>
+                    <td>Basic-Anfang</td>
+                </tr>
+                <tr>
+                    <td>1331-1332</td>
+                    <td>$0533-0534</td>
+                    <td>Basic-Ende</td>
+                </tr>
+                <tr>
+                    <td>1337</td>
+                    <td>$0539</td>
+                    <td>Zeiger: Kassettenpuffer</td>
+                </tr>
+                <tr>
+                    <td>1338</td>
+                    <td>$053A</td>
+                    <td>Typ des Kassettenfiles</td>
+                </tr>
+                <tr>
+                    <td>1344</td>
+                    <td>$0540</td>
+                    <td>Tasten-Widerholfunktion $80=alle, $40=keine, $00=nur DEL, CUR, SPC</td>
+                </tr>
+                <tr>
+                    <td>1345-1346</td>
+                    <td>$0541-0542</td>
+                    <td>Zähler für Wiederholfunktion</td>
+                </tr>
+                <tr>
+                    <td>1347</td>
+                    <td>$0543</td>
+                    <td>Shift-Flag</td>
+                </tr>
+                <tr>
+                    <td>1348</td>
+                    <td>$0544</td>
+                    <td>Letztes Shift-Zeichen</td>
+                </tr>
+                <tr>
+                    <td>1349-1350</td>
+                    <td>$0545-0546</td>
+                    <td>Sprungvektor: Keylog</td>
+                </tr>
+                <tr>
+                    <td>1351</td>
+                    <td>$0547</td>
+                    <td>Text-/Grafik-Flag</td>
+                </tr>
+                <tr>
+                    <td>1352</td>
+                    <td>$0548</td>
+                    <td>Scroll-Flag</td>
+                </tr>
+                <tr>
+                    <td>1355-1372</td>
+                    <td>$054B-0551</td>
+                    <td>Cpu-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>1362-1367</td>
+                    <td>$0552-0557</td>
+                    <td>Cpu-Register</td>
+                </tr>
+                <tr>
+                    <td>1368-1372</td>
+                    <td>$0558-055C</td>
+                    <td>Cpu-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>1373</td>
+                    <td>$055D</td>
+                    <td>Zähler für Funktionstasten</td>
+                </tr>
+                <tr>
+                    <td>1374</td>
+                    <td>$055E</td>
+                    <td>Zeiger: Text, Funktionstasten</td>
+                </tr>
+                <tr>
+                    <td>1375-1510</td>
+                    <td>$055F-05E6</td>
+                    <td>Speicher für Funktionstasten</td>
+                </tr>
+                <tr>
+                    <td>1516-1571</td>
+                    <td>$05EC-06EB</td>
+                    <td>1 Page, Bankingroutinen</td>
+                </tr>
+                <tr>
+                    <td>1516-1519</td>
+                    <td>$05EC-05EF</td>
+                    <td>Adreßtabelle</td>
+                </tr>
+                <tr>
+                    <td>1520-1521</td>
+                    <td>$05F0-05F1</td>
+                    <td>Long-Jump (Adresse)</td>
+                </tr>
+                <tr>
+                    <td>1522</td>
+                    <td>$05F2</td>
+                    <td>Long-Jump (Akkumulator)</td>
+                </tr>
+                <tr>
+                    <td>1523</td>
+                    <td>$05F3</td>
+                    <td>Long-Jump (X-Register)</td>
+                </tr>
+                <tr>
+                    <td>1524</td>
+                    <td>$05F4</td>
+                    <td>Long-Jump (Status-Register)</td>
+                </tr>
+                <tr>
+                    <td>1525-1629</td>
+                    <td>$05F5-065D</td>
+                    <td>RAM-Bereich für Bankswitching</td>
+                </tr>
+                <tr>
+                    <td>1630-1771</td>
+                    <td>$065E-06EB</td>
+                    <td>RAM-Bereich für Benutzersoftware</td>
+                </tr>
+                <tr>
+                    <td>1792-1967</td>
+                    <td>$06EC-07AF</td>
+                    <td>Basic-Pseudo-Stack</td>
+                </tr>
+                <tr>
+                    <td>1968-1996</td>
+                    <td>$07B0-07CC</td>
+                    <td>Kassetten-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>1997-2000</td>
+                    <td>$07CD-07D0</td>
+                    <td>RS-232-Arbeitsbereich</td>
+                </tr>
+                <tr>
+                    <td>2001</td>
+                    <td>$07D1</td>
+                    <td>RS-232: Pointer auf Anf. Eingabepuffer</td>
+                </tr>
+                <tr>
+                    <td>2002</td>
+                    <td>$07D2</td>
+                    <td>RS-232: Pointer auf Ende Eingabepuffer</td>
+                </tr>
+                <tr>
+                    <td>2003</td>
+                    <td>$07D3</td>
+                    <td>Anzahl der Zeichen im Eingabepuffer</td>
+                </tr>
+                <tr>
+                    <td>2021</td>
+                    <td>$07E5</td>
+                    <td>Bildschirm: Unterer Rand</td>
+                </tr>
+                <tr>
+                    <td>2022</td>
+                    <td>$07E6</td>
+                    <td>Bildschirm: Oberer Rand</td>
+                </tr>
+                <tr>
+                    <td>2023</td>
+                    <td>$07E7</td>
+                    <td>Bildschirm: Linker Rand</td>
+                </tr>
+                <tr>
+                    <td>2024</td>
+                    <td>$07E8</td>
+                    <td>Bildschirm: Rechter Rand</td>
+                </tr>
+                <tr>
+                    <td>2026</td>
+                    <td>$07EA</td>
+                    <td>$FF=Automatisches Einfügen</td>
+                </tr>
+                <tr>
+                    <td>2030-2033</td>
+                    <td>$07EE-07F1</td>
+                    <td>Bit-Tabelle</td>
+                </tr>
+                <tr>
+                    <td>2034</td>
+                    <td>$07F2</td>
+                    <td>A-Register retten bei Sys-Kommando</td>
+                </tr>
+                <tr>
+                    <td>2035</td>
+                    <td>$07F3</td>
+                    <td>X-Register retten bei Sys-Kommando</td>
+                </tr>
+                <tr>
+                    <td>2036</td>
+                    <td>$07F4</td>
+                    <td>Y-Register retten bei Sys-Kommando</td>
+                </tr>
+                <tr>
+                    <td>2037</td>
+                    <td>$07F5</td>
+                    <td>Status-Register retten bei Sys-Kommando</td>
+                </tr>
+                <tr>
+                    <td>2038</td>
+                    <td>$07F6</td>
+                    <td>Register für Tastaturabfrage</td>
+                </tr>
+                <tr>
+                    <td>2039</td>
+                    <td>$07F7</td>
+                    <td>Flag: CTRL-S: $00=offen, $06=gesperrt</td>
+                </tr>
+                <tr>
+                    <td>2040</td>
+                    <td>$07F8</td>
+                    <td>RAM-ROM-Umschaltung für Monitor 0=ROM, $80=RAM</td>
+                </tr>
+                <tr>
+                    <td>2044</td>
+                    <td>$07FC</td>
+                    <td>Motorsteuerung</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4b. Die Belegung der Seiten 2 bis 4 beim C16</figcaption>
+        </figure>
+
 
         <p>Mit Hilfe des Tastaturpuffers kann aber auch – und das ist das Interessante an diesen zehn Bytes – eine relativ unkon-. ventionelle Art der Programmierung praktiziert werden.</p>
 

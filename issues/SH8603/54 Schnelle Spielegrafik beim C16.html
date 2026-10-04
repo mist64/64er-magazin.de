@@ -31,6 +31,345 @@
 
         <p>Mit Hilfe des Programms »Matrix-Editor« (Listing) kann man nun komfortabel am Zeichensatz »herumpfuschen«. Dazu kurz noch einige Erläuterungen. Das vorliegende Basic-Programm (Listing) wird einfach in den Speicher geladen und gestartet. Eine der integrierten Maschinenroutinen verschiebt das ganze Programm automatisch so im Speicher, daß der zu editierende Zeichensatz ab Adresse $1000 (wo sich eben normalerweise das Programm befindet) geladen werden kann.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="2">Multiregister 1</th>
+                </tr>
+                <tr>
+                    <td>Bit 0-2</td>
+                    <td>: Bitweise vertikale Verschiebung des Bildschirms</td>
+                </tr>
+                <tr>
+                    <td>Bit 3</td>
+                    <td>: 24 oder 25 Zeilen</td>
+                </tr>
+                <tr>
+                    <td>Bit 4</td>
+                    <td>: Bildschirm abschalten</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Multiregister 2</th>
+                </tr>
+                <tr>
+                    <td>Bit 0-2</td>
+                    <td>: Bitweise horizontale Verschiebung des Bildschirms</td>
+                </tr>
+                <tr>
+                    <td>Bit 3</td>
+                    <td>: 38 oder 40 Spalten</td>
+                </tr>
+                <tr>
+                    <td>Bit 4</td>
+                    <td>: Multicolor-Flag</td>
+                </tr>
+                <tr>
+                    <td>Bit 6</td>
+                    <td>: PAL- oder NTSC-Norm</td>
+                </tr>
+                <tr>
+                    <td>Bit 7</td>
+                    <td>: Hardwaremäßige Invertierung ein/aus</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Multiregister 3</th>
+                </tr>
+                <tr>
+                    <td>Bit 1</td>
+                    <td>: Rasterinterrupt</td>
+                </tr>
+                <tr>
+                    <td>Bit 2</td>
+                    <td>: Lichtgriffelinterrupt</td>
+                </tr>
+                <tr>
+                    <td>Bit 3</td>
+                    <td>: Timer 1 interrupt</td>
+                </tr>
+                <tr>
+                    <td>Bit 4</td>
+                    <td>: Timer 2 interrupt</td>
+                </tr>
+                <tr>
+                    <td>Bit 6</td>
+                    <td>: Timer 3 interrupt</td>
+                </tr>
+                <tr>
+                    <td>Bit 7</td>
+                    <td>: Interrupt-Flag</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Multiregister 4</th>
+                </tr>
+                <tr>
+                    <td>Bit 1</td>
+                    <td>: Rasterinterrupt verhindern</td>
+                </tr>
+                <tr>
+                    <td>Bit 2</td>
+                    <td>: Lichtgriffelinterrupt verhindern</td>
+                </tr>
+                <tr>
+                    <td>Bit 3</td>
+                    <td>: Timer 1 abschalten</td>
+                </tr>
+                <tr>
+                    <td>Bit 4</td>
+                    <td>: Timer 2 abschalten</td>
+                </tr>
+                <tr>
+                    <td>Bit 6</td>
+                    <td>: Timer 3 abschalten</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Multiregister 5</th>
+                </tr>
+                <tr>
+                    <td>Bit 0-3</td>
+                    <td>: Lautstärke</td>
+                </tr>
+                <tr>
+                    <td>Bit 4</td>
+                    <td>: Tongenerator 1 einschalten</td>
+                </tr>
+                <tr>
+                    <td>Bit 5</td>
+                    <td>: Tongenerator 2 einschalten</td>
+                </tr>
+                <tr>
+                    <td>Bit 6</td>
+                    <td>: Tongenerator 2 Rauschen</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Multiregister 6</th>
+                </tr>
+                <tr>
+                    <td>Bit 0-1</td>
+                    <td>: Frequenz von Tongenerator 1 (Bit 8 und 9)</td>
+                </tr>
+                <tr>
+                    <td>Bit 2</td>
+                    <td>: Zeichensatzzugriff (ROM oder RAM)</td>
+                </tr>
+                <tr>
+                    <td>Bit 3-7</td>
+                    <td>: Adresse des Bitmapping-Speichers</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Multiregister 7</th>
+                </tr>
+                <tr>
+                    <td>Bit 2-7</td>
+                    <td>: Adresse des Zeichengenerators</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die Multiregister im TED</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Reg. Nr.</th>
+                    <th>Adresse</th>
+                    <th>Funktion</th>
+                    <th>Erläuterung</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>$FF00</td>
+                    <td>Timer 1</td>
+                    <td>(Low-Byte)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>$FF01</td>
+                    <td>Timer 1</td>
+                    <td>(High-Byte)</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>$FF02</td>
+                    <td>Timer 2</td>
+                    <td>(Low-Byte)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>$FF03</td>
+                    <td>Timer 2</td>
+                    <td>(High-Byte)</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>$FF04</td>
+                    <td>Timer 3</td>
+                    <td>(Low-Byte)</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>$FF05</td>
+                    <td>Timer 3</td>
+                    <td>(High-Byte)</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>$FF06</td>
+                    <td>Multiregister 1</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>$FF07</td>
+                    <td>Multiregister 2</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>$FF08</td>
+                    <td>Tastatur</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>$FF09</td>
+                    <td>Multiregister 3</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>$FF0A</td>
+                    <td>Multiregister 4</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>$FF0B</td>
+                    <td>Rasterinterrupt</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>$FF0C</td>
+                    <td>Hardware Cursor Position</td>
+                    <td>(Bit 8 und 9)</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>$FF0D</td>
+                    <td>Hardware Cursor Position</td>
+                    <td>(Bit 0 bis 7)</td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>$FF0E</td>
+                    <td>Tongenerator 1</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>$FF0F</td>
+                    <td>Tongenerator 2</td>
+                    <td>(Bit 0-7)</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>$FF10</td>
+                    <td>Tongenerator 2</td>
+                    <td>(Bit 8 und 9)</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>$FF11</td>
+                    <td>Multiregister 5</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>$FF12</td>
+                    <td>Multiregister 6</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>$FF13</td>
+                    <td>Multiregister 7</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>21</td>
+                    <td>$FF14</td>
+                    <td>Adresse des Farb- und Videospeichers</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>$FF15</td>
+                    <td>Hintergrundfarbe</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>23</td>
+                    <td>$FF16</td>
+                    <td>Vordergrund</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>24</td>
+                    <td>$FF17</td>
+                    <td>Multicolor 1</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>25</td>
+                    <td>$FF18</td>
+                    <td>Multicolor 2</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>26</td>
+                    <td>$FF19</td>
+                    <td>Rahmenfarbe</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>27</td>
+                    <td>$FF1A</td>
+                    <td>Bitmapping-Register</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>28</td>
+                    <td>$FF1B</td>
+                    <td>Bitmapping-Register</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>29</td>
+                    <td>$FF1C</td>
+                    <td>Abgetastete Rasterzeile</td>
+                    <td>(Bit 8)</td>
+                </tr>
+                <tr>
+                    <td>30</td>
+                    <td>$FF1D</td>
+                    <td>Abgetastete Rasterzeile</td>
+                    <td>(Bit 0-7)</td>
+                </tr>
+                <tr>
+                    <td>31</td>
+                    <td>$FF1E</td>
+                    <td>Rasterspalte</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>32</td>
+                    <td>$FF1F</td>
+                    <td>Vertikal-Adresse</td>
+                    <td></td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Die Register des TED</figcaption>
+        </figure>
+
         <p>Mit dem Cursor sucht man sich dann ein zu bearbeitendes Zeichen aus, wobei man sich wahlweise die Originalzeichen oder den geänderten Zeichensatz zeigen lassen kann. Durch einen Druck auf die RETURN-Taste wählt man das entsprechende Zeichen an. Dieses wird nun 8-fach vergrößert, damit man es – ebenfalls mit dem Cursor – editieren kann. Dabei sind die Funktionstasten das wichtigste Hilfsmittel: Mit F1 kann ein Punkt gesetzt werden (der Cursor bewegt sich dabei eine Position nachrechts), F2 löscht einen Matrixpunkt an der Zeigerposition. Mit der dritten Funktionstaste wählt man die Copy-Routine an. Damit läßt sich ein zweites Zeichen (wahlweise aus den beiden Original-Zeichensätzen oder aus dem zu editierenden) selektieren, das in das gerade bearbeitete Zeichen kopiert wird.</p>
 
         <p>Übrigens kann man sich bei eventueller Fehlbedienung (egal in welchem Programmteil) mit der Escape(ESC)-Taste von dieser Funktion wieder befreien. Auch in das eigentliche Auswahlmenü (welches nach dem Programmstart erscheint) gelangt man durch Drücken der ESC-Taste.</p>

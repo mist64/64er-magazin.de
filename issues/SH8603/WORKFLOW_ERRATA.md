@@ -236,3 +236,17 @@ list has `bücher`/`cpm` but not `vorwort`/`checksummer`/`mse`/`impressum`/
 `abtippen`, so against a Sonderheft it passes trivially; the Sonderheft
 paragraph says these are "not in the list below" (the list is above it), and
 `abtippen` is nowhere in the rule. `mse` does not recur on a VC 20/C16 issue.
+
+## 160 — two checks can never reach zero; box prose has no owner
+
+From the 160 sub-agent, confirmed in the verification output: check #5's
+`(?:Tabelle|Bild)` flags every Bild photo reference and an unnumbered printed
+"Tabelle." that the prose calls "Tabelle 1" — 8 permanent lines; check #7
+lists every named-box caption the rule itself requires — 6 permanent lines. A
+gate that always reports stops being read (r000). Pass 1 greps the 200-char
+block preview and missed two captions split across OCR blocks (p96, p132);
+grep `labels.json`. Sweep 2 (narrow columns) gave 1622 hits and 0 tables, as
+on 8611/8612 — the visual walk found all 18 uncaptioned tables. And box PROSE
+that is not a table (p3 Programmservice, p148 Wichtig!, p47's checklist) has
+no rule that owns it; 030 drops such boxes and nothing downstream restores
+them by mandate.

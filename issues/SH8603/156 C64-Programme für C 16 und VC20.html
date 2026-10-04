@@ -21,6 +21,64 @@
         <p>Lwird man nur sehr selten Programme für den C64 finden, die ohne Änderungen auf dem VC 20 oder C16 laufen. Zwar sind Betriebssystem und Basic des VC 20 und des C 64 praktisch identisch, aber selbst hier stimmen die sonstigen Hardware-Eigenschaften überhaupt nicht überein. Noch schlimmer wird es beim C 16, bei dem es verschiedene Speicher-Bänke gibt für den dem Anwender zur Verfügung stehenden Speicher sowie für Betriebssystem und Basic. Diese Speicherbänke werden durch ein recht kompliziertes Bank-Switching-Verfahren, ähnlich wie beim C128, verwaltet.</p>
 
         <p>Immer dann, wenn zum Beispiel die grafischen oder musikalischen Fähigkeiten des C64 angesprochen werden, geschieht dies durch POKE-Befehle, mit denen Video- und Sound-Chip direkt gesteuert werden. Aufgrund der unterschiedlichen Hardware von C 64, VC 20 undC 16, die zudem auch noch völlig unterschiedliche Adreßbereiche belegt, ist ein C64-Programm, das irgendwelche POKE-Befehle enthält, in der Regel weder auf dem VC 20 noch auf dem C 16 lauffähig. Tabelle 1 gibt einen ersten Überblick über wichtige Speicheradressen bei allen drei Computern.</p>
+        <figure>
+            <table>
+                <tr>
+                    <th rowspan="2"></th>
+                    <th rowspan="2">C 64</th>
+                    <th colspan="2">VC 20</th>
+                    <th rowspan="2">C16/C116/Plus 4</th>
+                </tr>
+                <tr>
+                    <th>Grundversion</th>
+                    <th>ab 8 KByte</th>
+                </tr>
+                <tr>
+                    <td>Video-RAM</td>
+                    <td>1024</td>
+                    <td>7680</td>
+                    <td>4096</td>
+                    <td>3072</td>
+                </tr>
+                <tr>
+                    <td>freier RAM-Bereich</td>
+                    <td>2048</td>
+                    <td>4096</td>
+                    <td>4608</td>
+                    <td>4096</td>
+                </tr>
+                <tr>
+                    <td>Video-Chip (VIC/TED)</td>
+                    <td>53248</td>
+                    <td>36864</td>
+                    <td>36864</td>
+                    <td>65280</td>
+                </tr>
+                <tr>
+                    <td>Synthesizer-Chip</td>
+                    <td>54272</td>
+                    <td>–</td>
+                    <td>–</td>
+                    <td>–</td>
+                </tr>
+                <tr>
+                    <td>Farb-RAM</td>
+                    <td>55296</td>
+                    <td>38400</td>
+                    <td>37888</td>
+                    <td>2048</td>
+                </tr>
+                <tr>
+                    <td>Basic-ROM</td>
+                    <td>40960</td>
+                    <td>49152</td>
+                    <td>49152</td>
+                    <td>32768 (in ROM-Bank)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Wichtige Speicheradressen bei C64, C16 und VC 20 zur ersten Orientierung</figcaption>
+        </figure>
+
 
         <p>Wir wollen uns im folgenden damit beschäftigen, inwiefern man dennoch C 64-Programme auf den VC 20 und den C 16 übertragen kann. Dabei beschränken wir uns auf Basic-Programme, denn das Übertragen von Maschinencode-Programmen ist noch um einiges schwieriger und erfordert gute Kenntnisse und Erfahrung in Maschinensprache.</p>
 
@@ -53,6 +111,348 @@
         <h2>POKE-Befehle für Farbe und Bildschirm</h2>
 
         <p>Selbst die einfachsten Programme enthalten in der Regel Befehle, um die Rahmen- und Hintergrundfarbe des Bildschirms einzustellen. Während es beim C16 zu diesem Zweck den COLOR-Befehl gibt, arbeiten C 64 und VC 20 hier mit POKE-Befehlen. Beim VC 20 werden beide Einstellungen (Rahmenfarbe und Hintergrundfarbe) gleichzeitig mit einem einzigen POKE-Befehl in Register 36879 durchgeführt (Tabelle 2). Der C64 verwendet dafür zwei getrennte Register, nämlich 53280 für die Rahmenfarbe und 53281 für die Hintergrundfarbe. Beim C 16 schließlich geht es etwas komfortabler zu. Tabelle 3 zeigt die Anwendung des COLOR-Befehls bei diesem Computer. Bei allen drei Geräten sind jeweils 16 Farben möglich (Tabelle 4). Zum Beispiel erzeugen die Befehle »POKE 53280,7:POKE 53281,5« beim C64 einen gelben Bildschirmrahmen und einen grünen Hintergrund. Mit »POKE 36879,95« erreicht man dasselbe beim VC 20, mit »COLOR 4, 8: COLOR 0,6« beim C 16. Die Farbnummern sind beim C 16 immer um Eins erhöht gegenüber den entsprechenden Nummern beim C 64.</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Rahmen ▶</th>
+                    <th>BLK</th>
+                    <th>WHT</th>
+                    <th>RED</th>
+                    <th>CYAN</th>
+                    <th>PUR</th>
+                    <th>GRN</th>
+                    <th>BLU</th>
+                    <th>YEL</th>
+                </tr>
+                <tr>
+                    <th>Hintergrund ▼</th>
+                    <th>SCHW</th>
+                    <th>WEISS</th>
+                    <th>ROT</th>
+                    <th>TÜRKIS</th>
+                    <th>VIOLETT</th>
+                    <th>GRÜN</th>
+                    <th>BLAU</th>
+                    <th>GELB</th>
+                </tr>
+                <tr>
+                    <th>SCHWARZ</th>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                    <td>13</td>
+                    <td>14</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <th>WEISS</th>
+                    <td>24</td>
+                    <td>25</td>
+                    <td>26</td>
+                    <td>27</td>
+                    <td>28</td>
+                    <td>29</td>
+                    <td>30</td>
+                    <td>31</td>
+                </tr>
+                <tr>
+                    <th>ROT</th>
+                    <td>40</td>
+                    <td>41</td>
+                    <td>42</td>
+                    <td>43</td>
+                    <td>44</td>
+                    <td>45</td>
+                    <td>46</td>
+                    <td>47</td>
+                </tr>
+                <tr>
+                    <th>TÜRKIS</th>
+                    <td>56</td>
+                    <td>57</td>
+                    <td>58</td>
+                    <td>59</td>
+                    <td>60</td>
+                    <td>61</td>
+                    <td>62</td>
+                    <td>63</td>
+                </tr>
+                <tr>
+                    <th>VIOLETT</th>
+                    <td>72</td>
+                    <td>73</td>
+                    <td>74</td>
+                    <td>75</td>
+                    <td>76</td>
+                    <td>77</td>
+                    <td>78</td>
+                    <td>79</td>
+                </tr>
+                <tr>
+                    <th>GRÜN</th>
+                    <td>88</td>
+                    <td>89</td>
+                    <td>90</td>
+                    <td>91</td>
+                    <td>92</td>
+                    <td>93</td>
+                    <td>94</td>
+                    <td>95</td>
+                </tr>
+                <tr>
+                    <th>BLAU</th>
+                    <td>104</td>
+                    <td>105</td>
+                    <td>106</td>
+                    <td>107</td>
+                    <td>108</td>
+                    <td>109</td>
+                    <td>110</td>
+                    <td>111</td>
+                </tr>
+                <tr>
+                    <th>GELB</th>
+                    <td>120</td>
+                    <td>121</td>
+                    <td>122</td>
+                    <td>123</td>
+                    <td>124</td>
+                    <td>125</td>
+                    <td>126</td>
+                    <td>127</td>
+                </tr>
+                <tr>
+                    <th>ORANGE</th>
+                    <td>136</td>
+                    <td>137</td>
+                    <td>138</td>
+                    <td>139</td>
+                    <td>140</td>
+                    <td>141</td>
+                    <td>142</td>
+                    <td>143</td>
+                </tr>
+                <tr>
+                    <th>HELLORANGE</th>
+                    <td>152</td>
+                    <td>153</td>
+                    <td>154</td>
+                    <td>155</td>
+                    <td>156</td>
+                    <td>157</td>
+                    <td>158</td>
+                    <td>159</td>
+                </tr>
+                <tr>
+                    <th>ROSA</th>
+                    <td>168</td>
+                    <td>169</td>
+                    <td>170</td>
+                    <td>171</td>
+                    <td>172</td>
+                    <td>173</td>
+                    <td>174</td>
+                    <td>175</td>
+                </tr>
+                <tr>
+                    <th>HELLTÜRKIS</th>
+                    <td>184</td>
+                    <td>185</td>
+                    <td>186</td>
+                    <td>187</td>
+                    <td>188</td>
+                    <td>189</td>
+                    <td>190</td>
+                    <td>191</td>
+                </tr>
+                <tr>
+                    <th>HELLVIOLETT</th>
+                    <td>200</td>
+                    <td>201</td>
+                    <td>202</td>
+                    <td>203</td>
+                    <td>204</td>
+                    <td>205</td>
+                    <td>206</td>
+                    <td>207</td>
+                </tr>
+                <tr>
+                    <th>HELLGRÜN</th>
+                    <td>216</td>
+                    <td>217</td>
+                    <td>218</td>
+                    <td>219</td>
+                    <td>220</td>
+                    <td>221</td>
+                    <td>222</td>
+                    <td>223</td>
+                </tr>
+                <tr>
+                    <th>HELLBLAU</th>
+                    <td>232</td>
+                    <td>233</td>
+                    <td>234</td>
+                    <td>235</td>
+                    <td>236</td>
+                    <td>237</td>
+                    <td>238</td>
+                    <td>239</td>
+                </tr>
+                <tr>
+                    <th>HELLGELB</th>
+                    <td>248</td>
+                    <td>249</td>
+                    <td>250</td>
+                    <td>251</td>
+                    <td>252</td>
+                    <td>253</td>
+                    <td>254</td>
+                    <td>255</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Farbkombinationen für Bildschirmrahmen und Hintergrund beim VC 20. Die einzelnen Zahlenwerte errechnen sich nach der Formel »POKE-Wert = Hintergrund x 16 + Rahmen + 8« (vergleiche Tabelle 4).</figcaption>
+        </figure>
+        <figure>
+            <p>COLOR-Farbzonen-Nr., Farb-Nr., [, Helligkeitswert]</p>
+            <p>Mit der COLOR-Anweisung wird eine der fünf Farbzonen bestimmt:</p>
+            <table class="plain">
+                <tr>
+                    <th>Farbzonen-Nr.</th>
+                    <th>Bezeichnung</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Bildschirm-Hintergrund</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Vordergrund (Buchstaben, Zeichen)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Mehrfarben 1</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Mehrfarben 2</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Bildschirmrand</td>
+                </tr>
+            </table>
+            <p>Die zweite Zahl in der COLOR-Anweisung selektiert die Hintergrundfarbe des gewählten Bildschirmbereichs. Diese Zahl ist mit den Farbtasten der Tastatur identisch.</p>
+            <table class="plain">
+                <tr>
+                    <th>Farb-Nr.</th>
+                    <th>Farbe</th>
+                    <th>Farb-Nr.</th>
+                    <th>Farbe</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Schwarz</td>
+                    <td>9</td>
+                    <td>Orange</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Weiß</td>
+                    <td>10</td>
+                    <td>Braun</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Rot</td>
+                    <td>11</td>
+                    <td>Gelb/Grün</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Cyan</td>
+                    <td>12</td>
+                    <td>Rosa</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Purpur</td>
+                    <td>13</td>
+                    <td>Blau/Grün</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Grün</td>
+                    <td>14</td>
+                    <td>Hellblau</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Blau</td>
+                    <td>15</td>
+                    <td>Dunkelblau</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Gelb</td>
+                    <td>16</td>
+                    <td>Hellgrün</td>
+                </tr>
+            </table>
+            <p>Jede Farbe ist auch noch in ihrer Helligkeit (Luminanz) veränderbar. Im Anhang an die Farb-Nr. kann diese Luminanz von Null (0= dunkel) bis sieben (7 = hell) variieren. Der Standardwert für die Helligkeit ist 7. Die acht Helligkeitsstufen gelten für alle Farben, mit Ausnahme von Schwarz.</p>
+            <figcaption>Tabelle 3. Der COLOR-Befehl des C 16 kann bis zu drei Parameter enthalten (vergleiche Tabelle 4)</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="4">VC 20 und C 64</th>
+                    <th colspan="4">nur C 64</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>schwarz</td>
+                    <td>4</td>
+                    <td>violett</td>
+                    <td>8</td>
+                    <td>orange</td>
+                    <td>12</td>
+                    <td>grau 2</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>weiß</td>
+                    <td>5</td>
+                    <td>grün</td>
+                    <td>9</td>
+                    <td>braun</td>
+                    <td>13</td>
+                    <td>hellgrün</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>rot</td>
+                    <td>6</td>
+                    <td>blau</td>
+                    <td>10</td>
+                    <td>hellrot</td>
+                    <td>14</td>
+                    <td>hellblau</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>türkis</td>
+                    <td>7</td>
+                    <td>gelb</td>
+                    <td>11</td>
+                    <td>grau 1</td>
+                    <td>15</td>
+                    <td>grau 3</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. Codierung einzelner Farben bei C64 und VC 20</figcaption>
+        </figure>
+
 
         <p>Der Bildschirmspeicher des C64 belegt die Adressen 1024 bis 2023 (1000 Zeichen), der zugehörige Farbspeicher geht von 55296 bis 56295. Mit »POKE 1024, 1: POKE 55296,2« erscheint zum Beispiel beim C 64 ein rotes »A«in der linken oberen Bildschirmecke. Beim C 16 ist der Video-Speicher etwas höher angesiedelt. Er belegt die Adressen 3072 bis 4071, das Farb-RAM liegt von Adresse 2048 bis 3047. Der für den Anwender verfügbare Basic-Speicherbereich beginnt beim C 64 bei Adresse 2048, beim C 16 bei Adresse 4096. Tabelle 5 zeigt die Speicheraufteilung von C64, C16 und VC 20.</p>
 
@@ -61,6 +461,225 @@
         <h2>Die musikalische Seite</h2>
 
         <p>Einige beim C64 ebenfalls häufig vorkommende POKE-Adressen wurden bisher noch gar nicht erwähnt. Gemeint sind die zur Programmierung von Musik und Geräuscheffekten benutzten Register. Leider ist die Art der Tonerzeugung beim C64 auf der einen und VC 20/C 16 auf der anderen Seite völlig unterschiedlich, so daß sich keine äquivalenten Befehle angeben lassen. Wie bereits zu Anfang erwähnt, verfügt der C64 über einen vollwertigen, dreistimmigen Synthesizer-Baustein, während der C 16 und VC 20 sich mit einfachen Tongeneratoren zufrieden geben müssen. Tabelle 6 enthält zur Referenz eine Übersicht über die beim C64 zur Tonerzeugung benutzten Register. Diese Tabelle dient allerdings wirklich nur zur Orientierung, denn eine Simulation des C 64-Synthesizers ist weder mit dem VC 20 noch mit dem C 16 möglich. Es empfiehlt sich daher, bei der Programmanpassung zunächst einmal alle derartigen POKE-Befehle fortzulassen und später eigene Sound-Routinen einzufügen. C64-Besitzer haben es umgekehrt natürlich etwas einfacher. Mit etwas Geschick und einem guten Handbuch zur Musik-Programmierung können Sie dem C 64 natürlich auch die VC20/C16-Töne entlocken. Für alle C64- und C 16-Besitzer, die vielleicht doch einmal in die Verlegenheit kommen, das eine oder andere VC 20-Programm auf ihre Geräte umzuschreiben, sind in Tabelle 7 die Notenwerte und die Tongenerator-Adressen des VC 20 angegeben.</p>
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="3">Adresse</th>
+                    <th rowspan="2">Inhalt</th>
+                </tr>
+                <tr>
+                    <th>Stimme 1</th>
+                    <th>Stimme 2</th>
+                    <th>Stimme 3</th>
+                </tr>
+                <tr>
+                    <td>54272</td>
+                    <td>54279</td>
+                    <td>54286</td>
+                    <td>Tonfrequenz (Low-Byte)</td>
+                </tr>
+                <tr>
+                    <td>54273</td>
+                    <td>54280</td>
+                    <td>54287</td>
+                    <td>Tonfrequenz (High-Byte)</td>
+                </tr>
+                <tr>
+                    <td>54274</td>
+                    <td>54281</td>
+                    <td>54288</td>
+                    <td>Tastaturverhältnis Rechteckgenerator (Low)</td>
+                </tr>
+                <tr>
+                    <td>54275</td>
+                    <td>54282</td>
+                    <td>54289</td>
+                    <td>Tastaturverhältnis Rechteckgenerator (High)</td>
+                </tr>
+                <tr>
+                    <td>54276</td>
+                    <td>54283</td>
+                    <td>54290</td>
+                    <td>Wellenform</td>
+                </tr>
+                <tr>
+                    <td>54277</td>
+                    <td>54284</td>
+                    <td>54291</td>
+                    <td>Anschlag/Abschwellen</td>
+                </tr>
+                <tr>
+                    <td>54278</td>
+                    <td>54285</td>
+                    <td>54292</td>
+                    <td>Halten/Ausklingen</td>
+                </tr>
+                <tr>
+                    <td colspan="3">54296</td>
+                    <td>Lautstärke</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Mögliche Wellenformen: Dreieck (17), Sägezahn (33), Rechteck (65), Rauschen (129).</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 6. Die wichtigsten Register des C 64-Soundchips</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tr>
+                    <th>NOTE</th>
+                    <th>WERT</th>
+                    <th>NOTE</th>
+                    <th>WERT</th>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>135</td>
+                    <td>G</td>
+                    <td>215</td>
+                </tr>
+                <tr>
+                    <td>C#</td>
+                    <td>143</td>
+                    <td>A<sup>b</sup></td>
+                    <td>217</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>147</td>
+                    <td>A</td>
+                    <td>219</td>
+                </tr>
+                <tr>
+                    <td>E<sup>b</sup></td>
+                    <td>151</td>
+                    <td>B</td>
+                    <td>221</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>159</td>
+                    <td>H</td>
+                    <td>223</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>163</td>
+                    <td>C</td>
+                    <td>225</td>
+                </tr>
+                <tr>
+                    <td>F#</td>
+                    <td>167</td>
+                    <td>C#</td>
+                    <td>227</td>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td>175</td>
+                    <td>D</td>
+                    <td>228</td>
+                </tr>
+                <tr>
+                    <td>A<sup>b</sup></td>
+                    <td>179</td>
+                    <td>E<sup>b</sup></td>
+                    <td>229</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>183</td>
+                    <td>E</td>
+                    <td>231</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>187</td>
+                    <td>F</td>
+                    <td>232</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>191</td>
+                    <td>F#</td>
+                    <td>233</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>195</td>
+                    <td>G</td>
+                    <td>235</td>
+                </tr>
+                <tr>
+                    <td>C#</td>
+                    <td>199</td>
+                    <td>A<sup>b</sup></td>
+                    <td>236</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>201</td>
+                    <td>A</td>
+                    <td>237</td>
+                </tr>
+                <tr>
+                    <td>E<sup>b</sup></td>
+                    <td>203</td>
+                    <td>B</td>
+                    <td>238</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>207</td>
+                    <td>H</td>
+                    <td>239</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>209</td>
+                    <td>C</td>
+                    <td>240</td>
+                </tr>
+                <tr>
+                    <td>F#</td>
+                    <td>212</td>
+                    <td>C#</td>
+                    <td>241</td>
+                </tr>
+                <tr>
+                    <th>Stimmlagen-Befehle</th>
+                    <th colspan="2">X=</th>
+                    <th>Funktion</th>
+                </tr>
+                <tr>
+                    <td>POKE 36878,X</td>
+                    <td colspan="2">0 bis 15</td>
+                    <td>setzt die Lautstärke</td>
+                </tr>
+                <tr>
+                    <td>POKE 36874,X</td>
+                    <td colspan="2">128 bis 255</td>
+                    <td>spielt Note</td>
+                </tr>
+                <tr>
+                    <td>POKE 36875,X</td>
+                    <td colspan="2">128 bis 255</td>
+                    <td>spielt Note</td>
+                </tr>
+                <tr>
+                    <td>POKE 36876,X</td>
+                    <td colspan="2">128 bis 255</td>
+                    <td>spielt Note</td>
+                </tr>
+                <tr>
+                    <td>POKE 36877,X</td>
+                    <td colspan="2">128 bis 255</td>
+                    <td>Geräuscheffekte</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 7. Notenwerte und Tongenerator-Adressen beim VC 20. Diese Tabelle dient zur Orientierung für C 16-Besitzer, die das eine oder andere VC 20-Programm für ihren Computer umsetzen möchten.</figcaption>
+        </figure>
+
 
         <h2>Joysticks und Paddles</h2>
 
@@ -71,12 +690,6 @@
         <p>Beim VC 20 sind es die Register 36872 und 36873, beim C 16 ist eine Paddle-Abfrage nicht vorgesehen und muß, falls überhaupt sinnvoll, per Joystick-Abfrage simuliert werden. An dieser Stelle muß noch einmal deutlich darauf hingewiesen werden, daß die Zahl der C64-Programme, die sich mit vertretbarem Aufwand zum VC 20 oder C 16 übertragen lassen, doch verhältnismäßig gering ist. VC20-Besitzer sind hier etwas besser dran. Sie finden in diesem Sonderheft ein Programm, das Maschinenprogramme für den C64 in entsprechende Routinen für den VC20 übersetzt. Es funktioniert in etwa 70-80% aller Fälle. Im allgemeinen ist jetzt speziell bei Spielprogrammen in der Regel äußerste Vorsicht geboten, da hier aus Geschwindigkeitsgründen zumeist mit verschiedenen Routinen in Maschinensprache gearbeitet wird. Von Sprites und hochauflösender Grafik einmal ganz zu schweigen. Dagegen gibt es viele Anwendungsprogramme, die den C64 nicht als hochspezialisierte Spielmaschine (die er ohne Zweifel ist) ausnutzen, sondern ganz einfach Problemlösungen in Basic anbieten. Dabei kann es sich beispielsweise um eine Dateiverwaltung, einen Vokabeltrainer oder ganz einfach ein Programm zum Ausdrucken eines Jahreskalenders handeln. Für fast alle derartigen Programme sollte es möglich sein, eine Anpassung mit Hilfe der hier abgedruckten Tabellen und Hinweise vorzunehmen.</p>
 
         <address class="author">(ev)</address>
-
-        <pre><code>COLOR-Farbzonen-Nr., Farb-Nr., [, Helligkeitswert]
-</code></pre>
-
-
-        <p>Mit der COLOR-Anweisung wird eine der fünf Farbzonen bestimmt: Die zweite Zahl in der COLOR-Anweisung selektiert die Hintergrundfarbe des gewählten Bildschirmbereichs. Diese Zahl ist mit den Farbtasten der Tastatur identisch. Jede Farbe ist auch noch in ihrer Helligkeit (Luminanz) veränderbar. Im Anhang an die Farb-Nr. kann diese Luminanz von Null (0= dunkel) bis sieben (7 = hell) variieren. Der Standardwert für die Helligkeitist 7. Die acht Helligkeitsstufen gelten für alle Farben, mit Ausnahme von Schwarz.</p>
     </article>
 </body>
 
