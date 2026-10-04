@@ -729,3 +729,27 @@ lists with `1 =`/`2 =` values) is a `table class="plain"`, not `<br>` lines."
   full-build diff: only SH8602 and the search indexes change). r130 should say:
   "when a printed listing replaces a disk embed, keep the disk file as a
   `binary_download`."
+
+## Addendum to the sign-off — owner review after step 340 (2026-10-04)
+
+The owner reviewed the finished issue; each finding was fixed and has its own
+entry above. Listed here so the harvest sees the review round as one block:
+
+| finding | step whose rule missed it | fix | entry |
+|---|---|---|---|
+| p3 shipped as a colour page in the PDF | 005 (K anchor not measured) → 006 | `FORCE_BILEVEL=003`, new switch | "005 — a black darker than the built-in K anchor" |
+| article 3's title is the banner "Einleitung", not its first section head | 030/080/210 | h1 + title + file renamed, first head → h2 | "080/210 — an article whose ONLY name is its running-head banner" |
+| 13 Listing 3 showed the disk SOURCE under the printed LST caption | 130 | printed LST typed, hex proven against the binary | "130 — a disk SOURCE file placed under a printed assembler LISTING" |
+| …and the source download vanished with it | 130 / generate.py | generate.py accepts a `.prg` rebuilt from a `.txt` | follow-up line under that entry |
+| 39 Listing 1 not right after its reference | 130 (two placement rules, no precedence) | owner ruling: course/trick listings inline, standalone programs at the end — no change for 39 | "130 — which placement rule wins: OWNER RULING" |
+| 89 Syntax/Parameter legend lost its hanging columns | 190 | `table class="plain"` | "190 — a parameter legend with hanging indentation" |
+
+**What the review round says about the rules:** every finding sat where two
+artefacts of the same thing disagreed (print vs disk listing, banner vs first
+head, graded vs printed black, two placement rules) and every automated check
+was green. The checks verify each artefact against itself; only the owner
+compared it with the page. That is r000's "Never declare an issue complete
+without the user signing off", confirmed once more.
+
+**The errata file is now closed.** 50 entries including this addendum; the
+harvest belongs to the orchestrator.
