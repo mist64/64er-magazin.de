@@ -77,9 +77,21 @@ HALFTONE_MAX=0.002
 [[ -d "$CACHE" ]] || { echo "no OCR cache at $CACHE -- run make_issue_pdf.sh first"; exit 1; }
 command -v jbig2 >/dev/null || { echo "jbig2enc not installed"; exit 1; }
 
-mkdir -p "$CACHE/jbig2"
+# BILEVEL_THRESHOLD="35%": a fixed grey cutoff for the bilevel pages instead of
+# Otsu.  Unset = Otsu per page, unchanged.  Otsu adapts to page CONTENT once
+# step 005 has normalised the paper, so a page with a halftone photograph gets a
+# darker cutoff and the photo's mid-greys merge to solid black (MEASURED on
+# SH8603: 9 pages lose 62-82 % of their photograph).  Owner, SH8603: 35 %.
+# The JBIG2 cache is keyed by page only, so each setting gets its own cache dir --
+# otherwise a changed threshold silently reuses the old images.
+if [[ -n "${BILEVEL_THRESHOLD:-}" ]]; then
+  THRESH=(-threshold "$BILEVEL_THRESHOLD"); JB="$CACHE/jbig2-t${BILEVEL_THRESHOLD%\%}"
+else
+  THRESH=(-auto-threshold OTSU);            JB="$CACHE/jbig2"
+fi
+mkdir -p "$JB"
 exec >> "$LOG" 2>&1
-echo "=== $(date '+%H:%M:%S') mixed build $IN -> $OUT  mode=$MODE ==="
+echo "=== $(date '+%H:%M:%S') mixed build $IN -> $OUT  mode=$MODE  bilevel-threshold=${BILEVEL_THRESHOLD:-OTSU} ==="
 
 pages=""
 for f in "$IN"/[0-9][0-9][0-9].png "$IN"/[0-9][0-9][0-9].tiff; do
@@ -178,13 +190,13 @@ echo "  bilevel: $(echo $bilevel | wc -w)   contone: $(echo $contone | wc -w)"
 
 # ---- Phase 3: JBIG2 the bilevel pages, lossless (cached) ----------------------------------------
 for n in $bilevel; do
-  [[ -s "$CACHE/jbig2/$n.jb2" ]] && continue
+  [[ -s "$JB/$n.jb2" ]] && continue
   ( S="$(src_of "$n")"
-    magick "$S" -colorspace Gray -auto-threshold OTSU -depth 1 "$CACHE/jbig2/$n.pbm"
-    jbig2 -p "$CACHE/jbig2/$n.pbm" > "$CACHE/jbig2/$n.jb2"
-    magick identify -format "%w %h" "$CACHE/jbig2/$n.pbm" > "$CACHE/jbig2/$n.dim"
-    rm -f "$CACHE/jbig2/$n.pbm"
-    echo "[jbig2] $n $(stat -f%z "$CACHE/jbig2/$n.jb2") bytes" ) &
+    magick "$S" -colorspace Gray "${THRESH[@]}" -depth 1 "$JB/$n.pbm"
+    jbig2 -p "$JB/$n.pbm" > "$JB/$n.jb2"
+    magick identify -format "%w %h" "$JB/$n.pbm" > "$JB/$n.dim"
+    rm -f "$JB/$n.pbm"
+    echo "[jbig2] $n $(stat -f%z "$JB/$n.jb2") bytes" ) &
   while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
 done; wait
 
@@ -202,9 +214,9 @@ build_at() {  # $1=quality -> byte size of the assembled PDF
   done; wait
   : > "$man"
   for n in $pages; do
-    if [[ -s "$CACHE/jbig2/$n.jb2" ]] && [[ " $bilevel " == *" $n "* ]]; then
-      read -r w h < "$CACHE/jbig2/$n.dim"
-      printf "%s\tjbig2\t%s\t%s\t%s\n" "$CACHE/$n.pdf" "$CACHE/jbig2/$n.jb2" "$w" "$h" >> "$man"
+    if [[ -s "$JB/$n.jb2" ]] && [[ " $bilevel " == *" $n "* ]]; then
+      read -r w h < "$JB/$n.dim"
+      printf "%s\tjbig2\t%s\t%s\t%s\n" "$CACHE/$n.pdf" "$JB/$n.jb2" "$w" "$h" >> "$man"
     else
       read -r w h <<< "$(magick identify -format "%w %h" "$qd/$n.jpg")"
       printf "%s\tjpeg\t%s\t%s\t%s\n" "$CACHE/$n.pdf" "$qd/$n.jpg" "$w" "$h" >> "$man"
