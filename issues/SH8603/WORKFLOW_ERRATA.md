@@ -415,3 +415,13 @@ when prose separates the parts. Suggested: r060/r190 say "rejoin if
 contiguous in print; if prose intervenes, numbered run-in `<p>N. …</p>`, not
 `<ol start>`" — and r190's Verification runs r310's `<li><p>` and single-li
 checks on its own output.
+
+## r000 — machine-name spacing is now an owner rule, not "consistency with the page"
+
+r000 *CONSISTENCY WITH THE PAGE* uses `C 64`/`C64` as its standing example of
+matching the page site by site (owner decision 2026-08). On SH8603 the body
+type sets a thin gap that measures neither closed nor a word space, the HTML
+had both forms (325A: 165/99 in Part A alone), and 210 set the bands closed.
+Owner, 2026-10-04: **"space. C 64, C 128, C 16, C 116, VC 20."** The harvest
+should rewrite r000's example and r210's band guidance accordingly, and say
+what the rule does NOT touch (program text, the CSV's verbatim index titles).
