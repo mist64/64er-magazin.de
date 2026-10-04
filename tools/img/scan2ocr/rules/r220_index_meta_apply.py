@@ -22,8 +22,48 @@ import sys
 from collections import defaultdict
 
 
+def sonderheft_key(issue_code):
+    """SH8602 -> '2/86'.  The Sonderheft CSV keys on the magazine's running
+    Sonderheft number and the year, not on the directory name."""
+    m = re.match(r'^SH(\d{2})(\d{2})$', issue_code)
+    return f"{int(m.group(2))}/{m.group(1)}" if m else None
+
+
+def parse_sonderheft_csv(csv_path, issue_code):
+    """Gesamtinhaltsverzeichnis Sonderhefte.csv -- a DIFFERENT layout.
+
+    No header row, and the columns are not the monthly ones:
+
+        0 category   1 subcategory   2 title   3 issue as N/YY   4 page
+
+    So the issue key is in column 3, not column 0, and the page is a single
+    page rather than a range.  SH8601 shipped with NO index metadata at all
+    because r220 was classified `monthly` on the evidence that no Sonderheft
+    appears in the ANNUAL csvs -- true, and the wrong file.
+    """
+    key = sonderheft_key(issue_code)
+    if not key:
+        return []
+    entries = []
+    with open(csv_path, encoding="utf-8") as f:
+        for parts in csv.reader(f):
+            if len(parts) >= 5 and parts[3].strip() == key:
+                page = re.sub(r'[^0-9]', '', parts[4])
+                if not page:
+                    continue
+                entries.append({
+                    'start': page,
+                    'category': parts[0].strip(),
+                    'subcategory': parts[1].strip(),
+                    'title': parts[2].strip(),
+                })
+    return entries
+
+
 def parse_csv(csv_path, issue_code):
     """Parse CSV and return entries for the given issue."""
+    if issue_code.startswith("SH"):
+        return parse_sonderheft_csv(csv_path, issue_code)
     entries = []
     with open(csv_path) as f:
         for line in f:

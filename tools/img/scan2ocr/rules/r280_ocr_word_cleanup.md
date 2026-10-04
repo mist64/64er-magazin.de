@@ -285,7 +285,17 @@ character class when a scan shows a different confusion; the shape of the
 check -- *a token whose only content is the ambiguous glyph* -- is the part
 that transfers. The district-code case has its own gated check in r310.
 
-### A token that is not valid hex is OCR damage
+### THE BRIEFING BELOW IS STALE WHERE IT CONTRADICTS THIS SECTION
+
+The Briefing still tells a sub-agent to skip a candidate whose letter count
+differs ("do not even open the block index"), to leave `<pre>` alone, and to
+run a "two-engine cross-check" whose evidence it then asks for — all three
+reversed above, and the evidence it asks for cannot exist. **Where the Briefing
+and the body disagree, the body wins**, and the Briefing is to be rewritten
+from it before the next build. (SH8602: `spezieles` is OCR damage — the print
+has `spe-zielles` — and the letter-count rule would have kept it.)
+
+## A token that is not valid hex is OCR damage
 
 The hard exception — skip Pass 2 substitution when the token starts with `$` —
 exists so that valid hex is never "corrected". It has **no case for OCR damage

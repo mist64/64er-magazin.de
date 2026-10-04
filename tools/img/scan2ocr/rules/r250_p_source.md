@@ -285,6 +285,9 @@ PY
 #    </section> or </article>. Anything else means it's mid-section, not
 #    section-tail — likely false positive. Figures, downloads and hidden
 #    blocks are stepped over: they are inserted after the text is finished.
+# $PY must be set in this block or the check is a silent no-op (it ran as
+# `-c ...` with an empty command and reported nothing).
+PY=${PYTHON:-.venv/bin/python}
 $PY -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]

@@ -96,7 +96,8 @@ notation (e.g. `V₀` vs `V_0`), match the print.
 
 ## Most issues need nothing here, and then the checks are untested
 
-**8607 is the only issue in the corpus that ships LaTeX**, so it is the only
+**8508/52 and 8602/71 ship MathJax too**, so 8607 is not the only precedent —
+measure before citing it. 8607 is the fullest
 fixture these checks have. Everywhere else they run over material that cannot
 trigger them, and a clean run says nothing about them.
 

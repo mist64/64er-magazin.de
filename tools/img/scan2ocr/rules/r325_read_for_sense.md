@@ -80,6 +80,16 @@ MEASURED on SH8601: 31 blocks are disk-backed and **68 are hand transcriptions**
 code examples the magazine sets INSIDE the body text, and no listing is missing
 on their account: every `Listing N` the articles cite has its own figure.
 
+**The dump cross-checker reads FEWER forms than it claims, and silence is not
+coverage.** Besides the two unread forms it names, it also skips SMON
+`>, C000 A9 C0 LDA #$C0`, the monitor `.,  081A  A9 CC  LDA #$CC`, and
+assembler listings with line-number / location / code columns — 95 instruction
+rows in one half of SH8602 alone. **It must print how many rows it PARSED**, so
+that "0 parsed" reads differently from "0 wrong". (The same defect as r320's
+dropped-listings companion, which reported a clean 0 on two issues while
+examining nothing.) Its recommended `pdftotext` locator also does not exist
+before step 006.
+
 **In a hand-typed `<pre>`, LINE STRUCTURE is in scope.** Most of the damage
 there is not word-level at all: lines joined together, two lines run into one,
 a line break inserted where the print has none. "Word-level substitutions only"

@@ -344,6 +344,12 @@ could not honestly reach zero. A gate that always reports two failures stops
 being read.
 
 **Write the adjudication into the file, immediately above the heading**, as an
+**NO. A GATE ADJUDICATION GOES IN `adjudicated.txt`, NEVER IN THE PAGE.**
+r000 says an HTML comment is German, reader-facing and names a print error a
+reader would act on — never a gate adjudication — and r310 reads the file. This
+paragraph predates that and is kept only to say it is withdrawn. What follows
+describes the OLD mechanism:
+
 HTML comment opening **`So im Heft gedruckt:`** (or `Abweichung vom Druck:`
 where this edition knowingly differs), saying what was read
 and from where. r310 honours it within the 400 characters before the heading and

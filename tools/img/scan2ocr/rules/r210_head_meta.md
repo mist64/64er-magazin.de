@@ -87,6 +87,10 @@ n=$(grep -lE '64er\.head1' "$dir"/*.html | wc -l | tr -d ' ')
 total=$(ls "$dir"/*.html | wc -l | tr -d ' ')
 echo "  head1 in $n of $total article(s)"
 echo "  excluded (should NOT have head1):"
+# NOTE the reason below is SH8601-ONLY. SH8602's p3 prints EINLEITUNG in the
+# band, and so do SH8503-07 -- a Sonderheft Vorwort usually DOES carry a
+# section word. Exclude it because it is the opening piece, not because the
+# band is empty, and do not skip it at step 3.
 # `vorwort` belongs here too: a Sonderheft's opening piece is a Vorwort, not
 # an editorial, and its page carries the band WITHOUT a section word -- so it
 # is a real exclusion, not a missed article.  Without it the count was off by

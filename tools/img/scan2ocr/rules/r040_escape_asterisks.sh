@@ -34,11 +34,23 @@ def map_outside_fences(s, fn):
         out.append(line if infence else fn(line))
     return ''.join(out)
 
-def esc(m):
-    n = len(m.group(0))
-    return m.group(0) if n == 2 else '\\*' * n
-# (?<!\\) keeps idempotent: skip runs already preceded by '\'
-s = map_outside_fences(s, lambda line: re.sub(r'(?<!\\)\*+', esc, line))
+def esc_line(line):
+    # LENGTH 2 IS KEPT ONLY IF IT PAIRS ON THIS LINE.  The rule has said so
+    # since the 8612 harvest; the code kept every length-2 run regardless, so
+    # an unpaired ** shipped as a bold delimiter.  SH8602's Protext article
+    # renders space padding as asterisks, giving one literal ** per line, and
+    # every fence-aware check read 0 because a pair count cannot see it.
+    pairs = len(re.findall(r'(?<!\\)\*{2}(?!\*)', line))
+    keep2 = (pairs % 2 == 0)
+
+    def esc(m):
+        n = len(m.group(0))
+        return m.group(0) if (n == 2 and keep2) else '\\*' * n
+
+    # (?<!\\) keeps idempotent: skip runs already preceded by '\'
+    return re.sub(r'(?<!\\)\*+', esc, line)
+
+s = map_outside_fences(s, esc_line)
 open(fp, 'w', encoding='utf-8').write(s)
 # report
 solo = len(re.findall(r'(?<!\\)(?<!\*)\*(?!\*)', s))

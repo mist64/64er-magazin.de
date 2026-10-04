@@ -2,6 +2,17 @@
 
 **Applies to:** all — the README's release table carries the Sonderheft dates too, and the file format is identical.
 
+**But a Sonderheft's README bullet is usually a BOUND, not a date.** The table
+carries "**vor** 14. Februar 2026", "ca. 20. September 2025", "**unbekannt"**,
+and `Convert TT. Monat 20JJ` cannot read any of them. The Vorschau derivation
+is monthly-only, and the Verification grep `"${YYMM:2:2}/${YYMM:0:2}"` matches
+the MONTHLY bullet for the same digits (8602 → the 02/86 monthly) and breaks
+outright on `SH8602`.
+
+So for a Sonderheft: write the bound as a PROVISIONAL `pubdate.txt`, say in
+LOG.md that it is provisional and which bullet it came from, and carry it to
+PAUSE 2 as an owner decision. Never present a bound as a date.
+
 **Goal:** write the single-line publication date for the issue. The
 generator (`generate.py`) reads `issues/<YYMM>/pubdate.txt` and uses it
 to (a) schedule when the issue becomes public on

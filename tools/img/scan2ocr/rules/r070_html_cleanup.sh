@@ -20,10 +20,17 @@ REPL = [
     ('<blockquote><p>',  '<p class="intro">'),
     ('</blockquote>',    ''),
     ('<br/>',            '<br>'),
-    ("''",               '"'),
-    # Unicode curly quotes -> straight
+    # Unicode curly quotes -> straight.  THESE RUN FIRST.  With "''" -> '"'
+    # ahead of them the script was NOT idempotent, though its rule claims it
+    # is: TEDMON'’s folded to TEDMON''s on the first run and would become
+    # TEDMON"s on a second.  Folding first makes one run final.
     ('‘', "'"), ('’', "'"),
     ('“', '"'), ('”', '"'), ('„', '"'),
+    # ...and only then two straight apostrophes -> one double quote.
+    # NOTE a double PRIME in a formula (P'') is legitimate and this eats it;
+    # it survived on 8612 only by the ordering accident above.  If an issue
+    # sets primes, exclude them before this step runs.
+    ("''",               '"'),
     # HTML entities Discount could emit (defensive)
     ('&lsquo;', "'"), ('&rsquo;', "'"),
     ('&ldquo;', '"'), ('&rdquo;', '"'), ('&bdquo;', '"'),
