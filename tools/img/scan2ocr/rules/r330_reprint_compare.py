@@ -407,7 +407,7 @@ def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout):
 VERDICTS = {"CONFIRMED", "PARTIAL", "NOT-A-REPRINT", "UNRESOLVED"}
 CAND_LINE = re.compile(r"^\s*[-*]\s+(CANDIDATE|REJECTED)\s+`([^`]+)`")
 DISPOSITIONS = {"OURS", "THEIRS", "PRINT", "UNRESOLVED"}
-DISP_LINE = re.compile(r"^\s*[-*]\s+D-(\d{3})\s+([A-Z-]+)\b")
+DISP_LINE = re.compile(r"^\s*[-*]\s+D-(\d{3,})\s+([A-Z-]+)\b")
 STEP_HEAD = re.compile(r"^##\s+Step\s+330\b", re.M)
 NEXT_H2 = re.compile(r"^##\s+(?!#)", re.M)
 

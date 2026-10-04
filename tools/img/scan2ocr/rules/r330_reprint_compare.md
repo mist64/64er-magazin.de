@@ -749,12 +749,12 @@ git status --short -uno issues/ | grep -v "^.\{2\} \"\?issues/$ID/" && {
   echo "  a published issue was edited by this rule -- must be reported, not slipped in"; fail=1; }
 
 # 3. Every THEIRS line carries its disposition word.
-grep -n '^- D-[0-9]\{3\} THEIRS' "issues/$ID/LOG.md" \
+grep -n '^- D-[0-9]\{3,\} THEIRS' "issues/$ID/LOG.md" \
   | grep -v -E 'REPORTED|APPLIED|declined' && {
   echo "  THEIRS finding with no REPORTED/APPLIED/declined state"; fail=1; }
 
 # 4. Every UNRESOLVED is a known gap the end-of-issue sweep will see.
-grep -c '^- D-[0-9]\{3\} UNRESOLVED' "issues/$ID/LOG.md"
+grep -c '^- D-[0-9]\{3,\} UNRESOLVED' "issues/$ID/LOG.md"
 
 exit $fail
 ```

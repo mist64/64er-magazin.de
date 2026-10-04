@@ -438,3 +438,23 @@ own measured RIGHT edge (bed step at lum < 60, three-band median) fixed it.
 Suggested: when the top-left is not traceable, anchor on whichever edges ARE
 measurable (right/bottom against the bed), and check the window's edge bands
 for bed before accepting it.
+
+## 330 — `verify` cannot parse D-1000 and up (FIXED UNDER THE BUILD — blocking)
+
+**What the rule's tool did.** `r330_reprint_compare.py:410` `DISP_LINE =
+re.compile(r"^\s*[-*]\s+D-(\d{3})…")`, and the rule's Verification greps
+`D-[0-9]\{3\}` (lines 752, 757). SH8603's 31 is merged from three monthly
+parts (8409/8410/8411) and each pair runs past 999 differences, so `verify`
+reported 2311 undispositioned D-numbers and exited 1 although every one was
+dispositioned in LOG.md. **Fixed at once** (r000: a defect that BLOCKS the
+build is fixed then, and recorded here as having moved under it): `\d{3,}` in
+the parser and both greps. Seen both ways: HEAD's tool → `FAIL: 6
+problem(s)`, exit 1; fixed tool → `OK: 18 pair(s) verified`. Not pushed.
+Other 330 findings for the harvest (from the sub-agent): check (b)'s regex
+`[0-9]\{4\}` skips `../SH8507/…` links; the rule says a plain `<p><strong>`
+credit, SH8601/SH8602 use `class="nachdruck"` (copied the corpus); Step 0's
+~0.5 threshold misses real merged/partial reprints (0.05–0.26 here — a
+per-block measure found them); monthly PDFs of 8405/8503/8506/8507/8407 are
+150 ppi, too coarse for commas — the 2400 dpi scans were needed; the
+disposition vocabulary has no value for "figure not yet placed" or a dash-
+glyph-only difference.
