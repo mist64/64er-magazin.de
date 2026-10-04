@@ -509,3 +509,8 @@ original's page — a different agent given only the location and the HTML text,
 not the claimed reading — and the orchestrator states which items it checked
 itself. An item the blind reading does not reproduce is dropped or marked
 UNCONFIRMED."
+- Outcome of that blind reading: 70 of 74 claims reproduced, **1 refuted**
+  (8404 "Heimorgek" — a kerning illusion at low zoom; the page reads
+  »Heimorgel«, so applying it would have put a typo INTO a correct page), 3
+  unverifiable. One wrong in 71 checkable is exactly the case the blind pass
+  exists for.
