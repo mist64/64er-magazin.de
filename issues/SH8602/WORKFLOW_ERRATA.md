@@ -520,3 +520,19 @@ UNCONFIRMED."
   restored it (15/15). r330 says nothing about how an APPLIED THEIRS item is
   recorded once it no longer has a D number, and `verify`'s `_cells()` splits on
   every `|`, even `\|`.
+
+## PAUSE 2 decisions with rule consequences (for the harvest)
+
+- **Unreadable PETSCII glyphs in a listing without checksums** (r170): owner
+  ruling 2026-10-04 — they are cropped from the page and placed as images at
+  150, never named by hand and never shipped as `[ILLEGIBLE]`. r170 should say
+  so, and r150's worklist should collect them (SH8602: 39).
+- **Dash style** (r060/r070/r190): a spaced dash in body text is a spaced EN
+  dash — corpus monthlies 4,864 en/em vs 755 hyphen; the hyphen form is drift
+  in the chain-built Sonderhefte (SH8507, SH8601, SH8602). A rule should
+  convert ` - ` outside <pre>/<code> early (070), excluding ranges, minus signs
+  in formulas and key notation (`CTRL - ↑`) — and a converted headline renames
+  the file, so it must run before 080 or own the rename.
+- **A prg file with a printed erratum, decision "record only"** (r300): the
+  file gets `;vor Fehlerteufelchen M/YYYY (Zeile N)`; the aside's status
+  comment has no word for it (see the 300 entry above).
