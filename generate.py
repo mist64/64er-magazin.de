@@ -2525,8 +2525,14 @@ if __name__ == '__main__':
 
     print("*** Filtering")
     dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
-    subprocess.run(['./filter_rss.py'], cwd=dir)
-    subprocess.run(['./filter_index.py'], cwd=dir)
+    # sys.executable, NOT './filter_rss.py'. Run as an executable the kernel
+    # reads the script's own "#!/usr/bin/env python3" shebang and uses SYSTEM
+    # python, which has neither pytz nor bs4, so both died instantly -- and
+    # with no check=True nobody noticed. 64er.rss and the paginated index were
+    # therefore never produced at all; out/ held only 64er_all.rss and
+    # index_all.html. check=True makes a filter failure stop the build.
+    subprocess.run([sys.executable, 'filter_rss.py'], cwd=dir, check=True)
+    subprocess.run([sys.executable, 'filter_index.py'], cwd=dir, check=True)
 
     if CONFIG.deploy:
         print("*** Uploading")
