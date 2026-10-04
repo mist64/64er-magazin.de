@@ -436,7 +436,7 @@ removal of every `<pre>` in the issue still reports 0. The rule should say
 which listing formats it covers and that "0" on an issue without dumps is not
 evidence.
 
-## 310 — the intro-badge check has no adjudication path
+## End-of-issue gate (r310_issue_invariants.py) — the intro-badge check has no adjudication path
 
 `badge bled into the intro (r280)` matches any intro opening `\d{1,2}\s`
 and calls `H()` directly, not via `ADJUDICATED_HERE`, so neither
