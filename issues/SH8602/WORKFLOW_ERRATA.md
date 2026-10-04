@@ -466,3 +466,17 @@ columns (95 instruction rows in one half of this issue). It should print how
 many rows it parsed so "0 parsed" differs from "0 wrong". The pdftotext
 locator it recommends does not exist before 006. "Readers must … report as they
 go" — a sub-agent has only its final hand-back. Found by both 325 readers.
+
+## 330 — verify skips pairs on a substring match; vocabulary has no word for storage-only differences
+
+`verify` splits a lead cell only on "+" and the rule never states the cell
+format; `if problems and any(lead in p for p in problems): continue` is a
+substring test — one malformed cell silently skipped three pairs' diff check,
+and `8410/5` would match `8410/54`. The closed vocabulary has no word for
+differences that are storage, not print (`<pre>` vs `<p>`, `'` vs `’`, ` - ` vs
+`—`, `<ol>` numbering vs a literal "1.", a paragraph split, reordering) — every
+fork had to call them PRINT, which the rule defines as "the printed pages
+differ". Step 7 "A plain `<p><strong>`. No class" is stale since 66dd50cc
+(`class="nachdruck"`). D numbers are positional, so a passing `verify` will
+fail after pending crops land — not stated. One LOG line per difference made
+LOG.md 1.2 MB for this issue. Found by the 330 sub-agent (46 min, 8 forks).
