@@ -665,3 +665,19 @@ findings unchecked; let 006 compile before the owner's page review.
 
 Signed off by the builder session (64er_SH8602). The harvest into the rules is
 for the orchestrator, from this file, now that it is complete.
+
+## 080/210 — an article whose ONLY name is its running-head banner (post-sign-off, owner review)
+
+SH8602 p3: the banner reads EINLEITUNG; "Das Salz in der Suppe" is set with the
+same square bullet and weight as the other four section heads — the page has no
+article-level display headline. 030 took the first section head as the
+headline, 080 made it the h1, and every later step (r080's "h1 = the printed
+headline, COMPLETE", r190, r290, r210) assumed a display headline existed:
+r210 read EINLEITUNG only as `head1` running-head metadata. Owner review caught
+it. Fix applied: h1/title "Einleitung", first section head demoted to h2, file
+renamed, `toc_title` = the TOC's "Das Salz in der Suppe".
+**Sentence for r080:** "If the start page carries no display headline — the
+first bold line has the same bullet and weight as the other section heads —
+the article's name is its banner (running head); the h1 is the banner text and
+the first head is an h2. The headerless-start-page case in r210 is the same
+class seen from the other side."
