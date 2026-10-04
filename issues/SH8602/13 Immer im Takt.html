@@ -280,7 +280,394 @@
         </figure>
         <div class="binary_download" data-filename="bass_irq.prg" data-name="BASS/IRQ"></div>
         <figure>
-            <pre data-filename="bass_irq-source" data-name="BASS/IRQ (Quellcode)" data-range="140-5010"></pre>
+            <pre>                      ;
+                      ;************
+                      ;* bass/irq *
+                      ;************
+                      ;
+                      ; 1985 robert treichler
+                      ;         fl-9497 triesenberg, f.tum liechtenstein
+                      ;
+220:   c000                   *=   $c000
+                      ;
+                      ; aufrufe aus basic ---------------
+                      ;
+                      ; init    sys ap
+                      ; exit    sys ap+3
+                      ; para    sys ap+6,h4,fw,fw*fw,ton-bez.
+                      ; trend   sys ap+9,ha%(h),tr%,ta%
+                      ; hnext   sys ap+12,ha%(h),ha%(hn),hg%(h),hg%(hn),tr%,ta%
+                      ; zufall  sys ap+15,ha%(h),ta%
+                      ; tempo   sys ap+18,t2%.t3%,t4%
+                      ;
+       c000 4c 37 c0          jmp  init    ;irq-rout. ein
+       c003 4c 4d c0          jmp  exit    ;irq-rout. aus
+       c006 4c 57 c1          jmp  para    ;ton-parameter aus basic holen
+       c009 4c b1 c1          jmp  trend   ;nae.akkordeig.ton suchen
+       c00c 4c d2 c1          jmp  hnext   ;ueberg.ton zu nae.harm.suchen
+       c00f 4c 88 c2          jmp  zufall  ;zufalls-ton ermitteln
+       c012 4c b0 c2          jmp  tempo   ;tempo aus basic holen
+                      ;
+                      ; definitionen --------------------
+                      ;
+       c015 00       h4       .byt 0       ;nr. 1/4-schlag im takt
+       c016 00 00    fs       .byt 0,0     ;frequenz hauptschlag
+       c018 00 00    fv       .byt 0,0     ;frequenz vorschlag
+       c01a 00 00 00 save     .byt 0,0,0,0,0 ;save h4,fs,fv
+                      ;
+       c01f 00       t2       .byt 0       ;zeit-inkrement (1.vors.)
+       c020 00       t3       .byt 0       ;      do.      (2.vors.)
+       c021 00       t4       .byt 0       ;      do.      (haupts.)
+                      ;
+       c022 00       timer    .byt 0       ;zeit-zaehler
+                      ;
+       c023 00       pc       .byt 0       ;perc. attack/decay
+                      ;
+       c024 00 00    ha       .byt 0,0     ;akkordeig.toene akt.harmonie (lb/hb)
+       c026 00 00    hanx     .byt 0,0     ;akkordeig.toene naechste harmonie
+       c028 00       hg       .byt 0       ;nr.grundton akt.harmonie
+       c029 00       tr       .byt 0       ;trend +/-1 (1,255)
+       c02a 00       ta       .byt 0       ;nr.akt.ton
+                      ;
+                      ;and-masken fuer 2er-potenzen
+       c02b 01 02 04 mask     .byt 1,2,4,8,16,32,64,128  ;lb(bit0-7)
+       c033 01 02 04          .byt 1,2,4,8  ;hb(bit8-11)
+                      ;
+       c037          rb       =    251     ;run bass
+       c037          rp       =    252     ;run percussion
+                      ;
+       c037          sid      =    54272   ;sid-reg.adr
+       c037          random   =    $d012   ;pseudo-random-wert
+       c037          irqex    =    $ea31   ;irq-rout.exit
+       c037          chkcom   =    $aefd   ;check komma
+       c037          chrout   =    $ffd2   ;char-output
+       c037          getbyt   =    $b79e   ;holt 1-byte-wert -&gt;reg.x
+       c037          getvar   =    $b08b   ;variable suchen
+       c037          typerr   =    $ad99   ;type-mismatch-error
+       c037          getpar   =    $b1b2   ;holt 16-bit-parameter -&gt;$64/65
+       c037          frmevl   =    $ad9e   ;bel.ausdruck auswerten
+       c037          frestr   =    $b6a3   ;string-verwaltung
+                      ;
+                      ; programm ------------------------
+                      ;
+                      ; irq-routine einschalten
+                      ;
+       c037 a9 54    init     lda  #&lt;irq
+       c039 a2 c0             ldx  #&gt;irq
+       c03b 78       vektor   sei
+       c03c 8d 14 03          sta  $0314
+       c03f 8e 15 03          stx  $0315
+       c042 a9 00             lda  #0
+       c044 85 fb             sta  rb
+       c046 85 fc             sta  rp
+       c048 8d 16 c0          sta  fs
+       c04b 58                cli
+       c04c 60                rts
+                      ;
+                      ;irq-rout. aus
+                      ;
+       c04d a9 31    exit     lda  #&lt;irqex
+       c04f a2 ea             ldx  #&gt;irqex
+       c051 4c 3b c0          jmp  vektor
+                      ;
+                      ;irq-einsprung
+                      ;
+       c054 a5 fb    irq      lda  rb
+       c056 05 fc             ora  rp
+       c058 f0 15             beq  tim
+       c05a ee 22 c0          inc  timer
+       c05d ad 22 c0          lda  timer
+       c060 cd 1f c0          cmp  t2      ;check intervall-zeiten
+       c063 f0 10             beq  playt2
+       c065 cd 20 c0          cmp  t3
+       c068 f0 2d             beq  playt3
+       c06a cd 21 c0          cmp  t4
+       c06d f0 57             beq  playt4
+       c06f 8d 22 c0 tim      sta  timer
+       c072 4c 31 ea return   jmp  irqex
+                      ;
+       c075 a9 00    playt2   lda  #0      ;1.vorschlag
+       c077 8d 23 c0          sta  pc
+       c07a ad 15 c0          lda  h4      ;kein 1.vorschlag, wenn ...
+       c07d 30 f3             bmi  return  ;...h4=neg.
+       c07f f0 f1             beq  return  ;...oder h4=0
+       c081 29 01             and  #1
+       c083 d0 ed             bne  return  ;...oder schlag=ungerade
+       c085 ad 12 d0          lda  random
+       c088 69 dc             adc  #220
+       c08a b0 e6             bcs  return  ;...oder random-exit
+       c08c a9 05             lda  #5
+       c08e 8d 23 c0          sta  pc      ;hi-hat kurz
+       c091 20 0d c1          jsr  perc
+       c094 4c 72 c0          jmp  return
+                      ;
+       c097 ad 15 c0 playt3   lda  h4      ;2.vorschlag
+       c09a 30 d6             bmi  return  ;kein 2.vors.wenn h4=neg
+       c09c f0 d4             beq  return  ;...oder h4=0
+       c09e 29 01             and  #1
+       c0a0 f0 05             beq  p310
+       c0a2 a9 05             lda  #5      ;hi-hat kurz,wenn...
+       c0a4 8d 23 c0          sta  pc      ;...schlag=ungerade
+       c0a7 20 0d c1 p310     jsr  perc    ;...oder 1.vors.ausgefuehrt
+       c0aa ad 15 c0          lda  h4
+       c0ad c9 02             cmp  #2
+       c0af b0 c1             bcs  return  ;bass-vorschlag nur bei #1
+       c0b1 ad 12 d0          lda  random
+       c0b4 69 c8             adc  #200
+       c0b6 b0 ba             bcs  return  ;random-exit
+       c0b8 ad 19 c0          lda  fv+1    ;bass-vorschlag
+       c0bb ac 18 c0          ldy  fv
+       c0be f0 b2             beq  return  ;ton noch nicht bereit
+       c0c0 20 27 c1          jsr  bass
+       c0c3 4c 72 c0          jmp  return
+                      ;
+       c0c6 a2 05    playt4   ldx  #5      ;1/4-hauptschlag
+       c0c8 ad 15 c0          lda  h4
+       c0cb 29 01             and  #1
+       c0cd f0 02             beq  p410
+       c0cf a2 08             ldx  #8
+       c0d1 8e 23 c0 p410     stx  pc
+       c0d4 20 0d c1          jsr  perc
+       c0d7 ad 17 c0          lda  fs+1    ;bass-hauptschlag
+       c0da ac 16 c0          ldy  fs
+       c0dd 20 27 c1          jsr  bass
+       c0e0 a9 00             lda  #0
+       c0e2 8d 22 c0          sta  timer   ;reset timer
+       c0e5 8d 23 c0          sta  pc      ;reset perc.byte
+       c0e8 ae 15 c0          ldx  h4
+       c0eb f0 1d             beq  p600
+       c0ed 8d 16 c0          sta  fs      ;freigeben freq-loc. wenn h4&gt;0
+       c0f0 8d 18 c0          sta  fv
+       c0f3 ad c3 c2          lda  string
+       c0f6 f0 12             beq  p600
+       c0f8 a2 00             ldx  #0      ;string ausdrucken
+       c0fa bd c3 c2 p500     lda  string,x
+       c0fd f0 06             beq  p550
+       c0ff 20 d2 ff          jsr  chrout
+       c102 e8                inx
+       c103 d0 f5             bne  p500
+       c105 a9 20    p550     lda  #32
+       c107 20 d2 ff          jsr  chrout
+       c10a 4c 72 c0 p600     jmp  return
+                      ;
+       c10d a5 fc    perc     lda  rp      ;evtl.percussion -&gt;sid
+       c10f f0 15             beq  percex  ;-&gt;keine perc.
+       c111 ad 23 c0          lda  pc
+       c114 f0 10             beq  percex  ;-&gt;keine perc.
+       c116 a9 80             lda  #128
+       c118 8d 12 d4          sta  sid+18  ;vco#3 noise+gate
+       c11b ad 23 c0          lda  pc
+       c11e 8d 13 d4          sta  sid+19  ;vco#3 attack/decay
+       c121 a9 81             lda  #129
+       c123 8d 12 d4          sta  sid+18
+       c126 60       percex   rts
+                      ;
+       c127 d0 07    bass     bne  bass10  ;evtl.bass -&gt;sid
+       c129 a9 2a             lda  #42     ;timing-fehler
+       c12b 20 d2 ff          jsr  chrout
+       c12e a9 ff             lda  #$ff
+       c130 30 24    bass10   bmi  bassex  ;pause
+       c132 a6 fb             ldx  rb
+       c134 f0 20             beq  bassex  ;-&gt;kein bass
+       c136 a2 20             ldx  #32
+       c138 8e 04 d4          stx  sid+4   ;vco#1 saegezahn+gate
+       c13b a2 40             ldx  #64
+       c13d 8e 0b d4          stx  sid+11  ;vco#2 rechteck+sync+gate
+       c140 8d 00 d4          sta  sid     ;vco#1 frequenz
+       c143 8c 01 d4          sty  sid+1
+       c146 8d 07 d4          sta  sid+7   ;vco#2 frequenz
+       c149 8c 08 d4          sty  sid+8
+       c14c a9 21             lda  #33
+       c14e 8d 04 d4          sta  sid+4
+       c151 a9 43             lda  #67
+       c153 8d 0b d4          sta  sid+11
+       c156 60       bassex   rts
+                      ;
+                      ;ton-parameter aus basic holen
+                      ;
+       c157 20 fd ae para     jsr  chkcom
+       c15a 20 9e b7          jsr  getbyt  ;h4
+       c15d 8e 1a c0          stx  save
+       c160 20 b2 b1          jsr  getpar  ;haupt-freq-wert
+       c163 a5 64             lda  $64
+       c165 d0 02             bne  par10
+       c167 a9 ff             lda  #$ff    ;aus null wird $ff
+       c169 8d 1b c0 par10    sta  save+1  ;   hb
+       c16c a5 65             lda  $65
+       c16e 8d 1c c0          sta  save+2  ;   lb
+       c171 20 b2 b1
+       c174 a5 64             lda  $64
+       c176 8d 1d c0          sta  save+3  ;   hb
+       c179 a5 65             lda  $65
+       c17b 8d 1e c0          sta  save+4  ;   lb
+       c17e ad 16 c0 par20    lda  fs      ;check freq-loc.frei
+       c181 f0 05             beq  par40   ;ja
+       c183 ad 15 c0          lda  h4
+       c186 d0 f6             bne  par20   ;warten wenn h4&gt;0
+       c188 a2 04    par40    ldx  #4
+       c18a bd 1a c0 par60    lda  save,x  ;param.uebertragen
+       c18d 9d 15 c0          sta  h4,x
+       c190 ca                dex
+       c191 10 f7             bpl  par60
+                      ;
+       c193 20 fd ae          jsr  chkcom  ;string holen
+       c196 20 9e ad          jsr  frmevl
+       c199 20 a3 b6          jsr  frestr
+       c19c aa                tax
+       c19d a0 00             ldy  #0
+       c19f e8                inx
+       c1a0 ca       par80    dex          ;string uebertragen
+       c1a1 f0 08             beq  par90   ;string zu ende
+       c1a3 b1 22             lda  ($22),y
+       c1a5 99 c3 c2          sta  string,y
+       c1a8 c8                iny
+       c1a9 d0 f5             bne  par80
+       c1ab a9 00    par90    lda  #0      ;mit null abschliessen
+       c1ad 99 c3 c2          sta  string,y
+       c1b0 60                rts
+                      ;
+                      ;naechsten ton im trend suchen
+                      ;
+       c1b1 20 3f c2 trend    jsr  getint  ;hole bit-muster ha%()
+                      ;
+       c1b4 8d 24 c0          sta  ha      ;l.b.
+       c1b7 8e 25 c0          stx  ha+1    ;h.b.
+       c1ba 20 3f c2          jsr  getint  ;hole trend tr%
+       c1bd 8d 29 c0          sta  tr
+       c1c0 20 3f c2          jsr  getint  ;hole ton-nr. ta%
+       c1c3 8d 2a c0 tre010   sta  ta
+       c1c6 ad 29 c0 tre020   lda  tr      ;ta+tr-&gt;ta
+       c1c9 20 65 c2          jsr  chkakk  ;check ob akkordeigen
+       c1cc f0 f8             beq  tre020  ;nein -&gt;loop
+       c1ce 20 59 c2          jsr  putta   ;ta% absp.
+       c1d1 60                rts
+                      ;
+                      ;uebergangston zu nae.harmonie suchen
+                      ;
+       c1d2 20 3f c2 hnext    jsr  getint  ;hole ha%(h)
+       c1d5 8d 24 c0          sta  ha
+       c1d8 8e 25 c0          stx  ha+1
+       c1db 20 3f c2          jsr  getint  ;hole ha%(hn)
+       c1de 8d 26 c0          sta  hanx
+       c1e1 8e 27 c0          stx  hanx+1
+       c1e4 20 3f c2          jsr  getint  ;hole hg%(h)
+       c1e7 8d 28 c0          sta  hg
+       c1ea 20 3f c2          jsr  getint  ;hole hg%(hn)
+       c1ed 8d 2a c0          sta  ta      ;-&gt;wird ta
+       c1f0 20 3f c2          jsr  getint  ;hole tr%
+       c1f3 8d 29 c0          sta  tr
+       c1f6 20 3f c2          jsr  getint  ;hole ta%
+       c1f9 8d 1a c0          sta  save    ;ta% saven
+                      ;1.var.  suche nachbar-ton v.nae.grundton, ...
+                      ;..der akkordeigen zu akt.harmonie ist
+       c1fc a9 ff             lda  #255    ;ta-1-&gt;ta (-1/2 ton)
+       c1fe 20 65 c2          jsr  chkakk  ;check ob akkordeigen
+       c201 d0 32             bne  hnexit  ;-&gt;ja, neuer ton gefunden
+       c203 a9 02             lda  #2      ;ta+2-&gt;ta (+1/2 ton)
+       c205 20 65 c2          jsr  chkakk  ;check ob akkordeigen
+       c208 d0 2b             bne  hnexit  ;-&gt;ja, neuer ton gefunden
+       c20a a9 fd             lda  #253    ;ta-3-&gt;ta (-1 ton)
+       c20c 20 65 c2          jsr  chkakk  ;check ob akkordeigen
+       c20f d0 24             bne  hnexit  ;-&gt;ja, neuer ton gefunden
+       c211 a9 04             lda  #4      ;ta+4-&gt;ta (+1 ton)
+       c213 20 65 c2          jsr  chkakk  ;check ob akkordeigen
+       c216 d0 1d             bne  hnexit  ;-&gt;ja, neuer ton gefunden
+                      ;2.var.  suche ton, der fuer beide harm. akkordeigen
+       c218 ad 24 c0          lda  ha
+       c21b 2d 26 c0          and  hanx
+       c21e 8d 24 c0          sta  ha
+       c221 ad 25 c0          lda  ha+1
+       c224 2d 27 c0          and  hanx+1
+       c227 8d 25 c0          sta  ha+1
+       c22a 0d 24 c0          ora  ha      ;check ob gemeins.toene
+       c22d d0 0a             bne  hne020  ;-&gt;ja
+       c22f ad 28 c0          lda  hg      ;nein, grundton nehmen
+       c232 8d 2a c0          sta  ta
+       c235 20 59 c2 hnexit   jsr  putta   ;ta% absp.
+       c238 60                rts
+                      ;
+       c239 ad 1a c0 hne020   lda  save    ;ta% holen und laut trend...
+       c23c 4c c3 c1          jmp  tre010  ;...gemeins.akkord-ton suchen
+                      ;
+                      ;hole integer aus basic
+                      ;
+       c23f 20 fd ae getint   jsr  chkcom  ;komma
+       c242 20 8b b0          jsr  getvar  ;var.suchen
+       c245 85 49             sta  $49     ;var.adr. absp.
+       c247 84 4a             sty  $4a
+       c249 a5 0e             lda  $0e     ;check ob integer
+       c24b f0 09             beq  geterr  ;-&gt;nein, error
+       c24d a0 00             ldy  #0
+       c24f b1 49             lda  ($49),y  ;var.wert holen
+       c251 aa                tax          ;h.b. -&gt;reg.x
+       c252 c8                iny
+       c253 b1 49             lda  ($49),y  ;l.b. -&gt;reg.a
+       c255 60                rts
+                      ;
+       c256 4c 99 ad geterr   jmp  typerr  ;error
+                      ;
+                      ;ta% als basic-integer-var. absp.
+                      ;
+       c259 a9 00    putta    lda  #0
+       c25b a8                tay
+       c25c 91 49             sta  ($49),y  ;h.b.
+       c25e ad 2a c0          lda  ta
+       c261 c8                iny
+       c262 91 49             sta  ($49),y  ;l.b.
+       c264 60                rts
+                      ;
+                      ;check ob ton nr.(ta)+reg.a  = akkordeigen
+                      ;in  reg.a=inkr./dekr. auf ta
+                      ;
+       c265 18       chkakk   clc
+       c266 6d 2a c0          adc  ta      ;ta+inkr/dekr -&gt;ta
+       c269 10 03             bpl  cak010  ;check ob ta im bereich 0...11
+       c26b 18                clc
+       c26c 69 0c             adc  #12     ;...sonst korrektur
+       c26e c9 0c    cak010   cmp  #12
+       c270 90 03             bcc  cakbit
+       c272 38                sec
+       c273 e9 0c             sbc  #12
+                      ;
+       c275 8d 2a c0 cakbit   sta  ta      ;bit f.akt.ton holen
+       c278 aa                tax
+       c279 bd 2b c0          lda  mask,x  ;and-maske holen
+       c27c a0 00             ldy  #0
+       c27e e0 08             cpx  #8      ;check ob l.b. oder h.b
+       c280 90 02             bcc  cak030  ;-&gt;l.b.
+       c282 a0 01             ldy  #1      ;h.b.
+       c284 39 24 c0 cak030   and  ha,y    ;bit aus akt.harm.extrahieren
+       c287 60                rts
+                      ;
+                      ; zufalls-ton ermitteln
+                      ;
+       c288 20 3f c2 zufall   jsr  getint  ;hole ha%(h)
+       c28b 8d 24 c0          sta  ha      ;l.b.
+       c28e 8e 25 c0          stx  ha+1    ;h.b.
+       c291 20 3f c2          jsr  getint  ;hole ta%
+       c294 20 75 c2          jsr  cakbit  ;bit f.akt.ton holen
+       c297 49 ff             eor  #$ff    ;...und loeschen
+       c299 39 24 c0          and  ha,y    ;...damit nicht nochmals
+       c29c 99 24 c0          sta  ha,y    ;...gleicher ton kommt.
+       c29f ad 12 d0          lda  random  ;zufalls-zahl + ta -&gt;ta
+       c2a2 29 07             and  #7
+       c2a4 d0 02             bne  zuf030
+       c2a6 a9 01    zuf020   lda  #1
+       c2a8 20 65 c2 zuf030   jsr  chkakk  ;check ob akk.eigen
+       c2ab f0 f9             beq  zuf020  ;-&gt;nein, weiter suchen
+       c2ad 4c 59 c2          jmp  putta   ;ja, ta% als basic-var.absp.
+                      ;
+                      ; tempo aus basic holen
+                      ;
+       c2b0 20 3f c2 tempo    jsr  getint  ;hole t2% (1.vorschlag)
+       c2b3 8d 1f c0          sta  t2
+       c2b6 20 3f c2          jsr  getint  ;hole t3% (2.vorschlag)
+       c2b9 8d 20 c0          sta  t3
+       c2bc 20 3f c2          jsr  getint  ;hole t4% (1/4-hauptschlag)
+       c2bf 8d 21 c0          sta  t4
+       c2c2 60                rts
+                      ;
+       c2c3          string   =    *</pre>
             <figcaption>Listing 3. Das Quellcode-Listing zu »BASS/IRQ«</figcaption>
         </figure>
     </article>
