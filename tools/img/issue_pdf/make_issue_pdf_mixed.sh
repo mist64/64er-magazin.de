@@ -164,6 +164,12 @@ while IFS=$'\t' read -r n c h; do
   # 8611 p030, where Bild 2-7 vanish entirely; an un-eroded chroma rank puts that
   # page 25x above the next bilevel page.
   [[ " ${FORCE_CONTONE:-} " == *" $n "* ]] && keep=0
+  # FORCE_BILEVEL="003": the mirror case -- a black-and-white page the classifier
+  # calls colour.  SH8602 p003: its banner bars are a black darker than the
+  # grade's K anchor, the separation extrapolates them to a red-brown, and the
+  # colour test (correctly, for its input) reads chroma 0.019.  Thresholded to
+  # bilevel the brown is black again, which is what the page printed.
+  [[ " ${FORCE_BILEVEL:-} " == *" $n "* ]] && keep=1
   # page 1 carries the cleaned cover when there is one, so it is never bilevel
   [[ "$n" == "$(echo $pages | awk '{print $1}')" && -f "$CACHE/${n}_150.png" && -n "${TITLE_PNG:-}" ]] && keep=0
   if (( keep )); then bilevel="$bilevel $n"; else contone="$contone $n"; fi
