@@ -475,3 +475,27 @@ cause besides SH8602's K anchor that the rule should name. Also: the tag must
 be zero-padded ("Sonderheft 03/86"); `make_issue_pdf.sh` sets `LANG="deu"`,
 which clobbers the locale (harmless warnings); step 2 needs no guetzli
 (ENCODER=fast, as SH8602) — say so.
+
+## 006 — monochrome halftones: Otsu per page stays, never re-screen, FORCE_CONTONE is the only remedy (owner, 2026-10-04)
+
+No rule says any of this; decided with the owner at SH8603's PDF review:
+1. **Otsu per page is correct and stays — never a fixed cutoff.** Measured
+   across SH8603: Otsu picks 49 % on p001 (dark cover), 57–60 % across the
+   interior, 65 % on p025, 79 % on p181 (blue card on white). A fixed 45 %
+   sits below every page's own cutoff and discards the lightest ink, worst
+   on browned pages whose paper drifts toward the threshold.
+2. **Never re-screen.** Ordered dither and Floyd–Steinberg reproduce the
+   tone (both matched the source's 60 % black where Otsu gave 54 %) but
+   fabricate a dot pattern the magazine never printed, which beats against
+   the original screen. Excluded on fidelity. Owner: "no re-screen!!"
+3. **A halftone photograph cannot survive any single-cutoff scheme**: once
+   the screen dots touch they merge and everything past that goes black;
+   fixed and local-adaptive thresholds only move the wall. The faithful
+   remedy is FORCE_CONTONE for that page (trading 600 dpi type for honest
+   tone). The owner chose NOT to force any page on SH8603: 026, 027, 042,
+   112 ship with their photos crushed, consistent with SH8602 and the
+   archive. This is the missing monochrome half of r006's FORCE_CONTONE
+   section (which covers colour detection only).
+And r006's largest-blob chroma measure, rewritten this morning to exclude
+display-type fringe and the scanner bed, has a THIRD case it does not
+exclude: paper browning (183/184 pages here; entry above).
