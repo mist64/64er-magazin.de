@@ -21,12 +21,12 @@
         <p class="intro">Die gute und übersichtliche Tastatur der Computer von Commodore bietet gerade dem Anfänger sehr leichte Einstiegsmöglichkeiten. Wer aber tiefer in die Computerei eindringt, stößt beim VC 20 und Commodore 64 schnell auf eine verwirrende Vielfalt von Codes und Steuerzeichen, deren Kenntnis und Beherrschung jedoch auch dem Anfänger ein weites Anwendungsfeld eröffnen kann.</p>
 
         <p class="nachdruck"><strong>Teilweiser Nachdruck aus <a href="../8404/codes.html">64'er 4/84, S. 114</a>
-        (nur Teil 1: von der Tastaturmatrix bis zur »Heimorgel«),
-        <a href="../8405/codes.html">64'er 5/84, S. 104</a>
-        (nur der Mittelteil: Tabelle der Tastencodes in 203 und 653, Umrechnung in den ASCII-Code, Tastaturpuffer und Codetabelle) und
-        <a href="../8407/codes.html">64'er 7/84, S. 148</a>
-        (nur die Abschnitte von »ASCII-Codes, die von Commodore verschwiegen werden« bis »Der Bildschirm-Code«).
-        Die übrigen Abschnitte stammen nicht aus diesen drei Folgen.</strong></p>
+                (nur Teil 1: von der Tastaturmatrix bis zur »Heimorgel«),
+                <a href="../8405/codes.html">64'er 5/84, S. 104</a>
+                (nur der Mittelteil: Tabelle der Tastencodes in 203 und 653, Umrechnung in den ASCII-Code, Tastaturpuffer und Codetabelle) und
+                <a href="../8407/codes.html">64'er 7/84, S. 148</a>
+                (nur die Abschnitte von »ASCII-Codes, die von Commodore verschwiegen werden« bis »Der Bildschirm-Code«).
+                Die übrigen Abschnitte stammen nicht aus diesen drei Folgen.</strong></p>
 
         <p>Haben Sie schon einmal einen Ball länger als ein paar Minuten auf derselben Stelle liegen sehen? Ich noch nicht, denn der nächste Vorbeikommer kickt ihn – irgendwohin. Sie doch auch, oder ? Dasselbe Phänomen können Sie überall dort beobachten, wo ein Heimcomputer steht. Eingeschaltet oder nicht – jeder der vorbeikommt, drückt auf eine Taste. Und wenn das Ding gar reagiert – mit einem Buchstaben auf dem Bildschirm – dann bleibt selbst die Oma stehen und tippt nochmal und nochmal.</p>
 
@@ -48,6 +48,11 @@
 
         <p>Der Computer erhält nicht, wie es eigentlich logisch wäre, von jeder gedrückten Taste ein spezielles Code-Signal. Das wäre für einen Heimcomputer zu aufwendig und zu teuer. Das Betriebssystem des Computers veranstaltet vielmehr eine Befragung seines Tastenvolkes, nach dessen Stimmenabgabe er dann entscheidet, welche Taste nun eigentlich gedrückt worden ist. Schauen Sie sich bitte das Bild 1 genauer an. Es zeigt Ihnen die 64 Tasten in einer 8 x 8-Matrix. Diese Anordnung entspricht der elektrischen Verbindung der Tasten. Die Abfrage selbst ist sehr einfach. Der Computer ruft alle senkrechten Spalten einzeln auf, indem er die Zahl, die an der jeweiligen Spalte in Bild 1 steht, in eine spezielle Speicherzelle hineinschiebt. Beim VC 20 ist das 37152, beim Commodore 64 die 56320.</p>
 
+        <figure>
+            <img src="20-1.png" alt="Schaltbild einer 8×8-Tastenmatrix mit den Tastenbeschriftungen, Zeilenwerten rechts und Spaltenwerten unten">
+            <figcaption>Bild 1. Die »elektrische« Anordnung der Tasten</figcaption>
+        </figure>
+
         <p>Falls die gedrückte Taste in dieser Spalte liegt, meldet sie sich und die Zahl der waagrechten Zeile wird in die Adresse 37153 (56321) geschrieben. Wenn überhaupt keine Taste gedrückt war, erscheint in 37153 (56321) eine 255.</p>
 
         <p>10 IF Sie jetzt fragen, warum die Zahlen so willkürlich und außerdem paarweise gleich sind, THEN lesen Sie weiter: GOTO nächsten Absatz.</p>
@@ -55,6 +60,11 @@
         <p>20 REM ein bißchen Theorie würde nicht schaden: GOTO übernächsten Absatz.</p>
 
         <p>Die Zahlen sind natürlich nicht willkürlich gewählt. Es sind vielmehr die Dezimalwerte von Dualzahlen, die beim Anwählen einer Spalte beziehungsweise durch Drücken einer Taste in den schon genannten Speicherzellen 37152 (56320) und 37153 (56321) entstehen. Bild 2 zeigt den Zusammenhang.</p>
+
+        <figure>
+            <img src="20-2.png" alt="8×8-Tastenmatrix mit den Registern 37152 (56320) unten und 37153 (56321) rechts und ihren Bitwerten; die Taste »/« ist hervorgehoben">
+            <figcaption>Bild 2. Die Tasten-Matrix mit ihren Registern</figcaption>
+        </figure>
 
         <p>Am Rande der Matrix sehen Sie jetzt nicht die Zahlen, sondern die beiden Speicherzellen, im folgenden »Register« genannt, und ihre bitweise Verbindung mit Spalten und Zeilen der Tasten. Prinzipiell gilt, daß diejenige Spalte angewählt ist, an deren Stelle eine »Null« im Register 37152 (56320) steht.</p>
 
@@ -1244,7 +1254,17 @@
 
         <p>Bild 3 zeigt den Ausdruck auf dem Bildschirm, wenn Sie diese Zahlen LISTen und RUNen.</p>
 
+        <figure>
+            <img src="20-3.png" alt="Bildschirmausdruck eines Basic-Programms mit drei PRINT-CHR$-Zeilen, darunter die Ausgabe A, B und C">
+            <figcaption>Bild 3. Auf dem Bildschirm haben »B« und »C« eine andere Farbe wie »A«</figcaption>
+        </figure>
+
         <p>Zur Erklärung: Die Leerzeile zwischen A und B ist bedingt durch die PRINT-Anweisung in Zeile 20, welche nur die Farbe umschaltet. Obwohl die Codes für B und C zusammen in einer Zeile stehen, werden sie doch durch das »RETURN« (13) untereinander gesetzt. Anstelle der 13 können Sie alle möglichen anderen Steuerfunktionen setzen. Bild 4 zeigt das Resultat von 17, nämlich »CURSOR DOWN«.</p>
+
+        <figure>
+            <img src="20-4.png" alt="Bildschirmausdruck eines Basic-Programms mit CHR$(17), darunter die Ausgabe A, B und ein eingerücktes C">
+            <figcaption>Bild 4. Resultat der Steuerfunktion 17, «CURSOR DOWN«</figcaption>
+        </figure>
 
         <p>Wenn Sie die 8 nehmen, können Sie den Zeichensatz nicht mehr ändern. Der Einsatz der gleichzeitig gedrückten SHIFT- und C=-Tasten funktioniert erst nach CHR$(9) wieder. Das Resultat von Bild 4 wollen wir jetzt durch POKEn der ASCII-Werte in den Tastaturpuffer versuchen.</p>
 
@@ -1257,6 +1277,11 @@
 
         <p>Prinzipiell macht dieses Programm das gleiche wie das Programm in Bild 4. Trotzdem erhalten wir nach LIST und RUN ein anderes Ergebnis, nämlich das von Bild 5.</p>
 
+        <figure>
+            <img src="20-5.png" alt="Bildschirmausdruck eines Basic-Programms mit POKE-Befehlen in die Adressen 198 und 631 bis 635, darunter die Ausgabe">
+            <figcaption>Bild 5. Die ASCII-WERTE wurden in den Tastaturpuffer gePOKEt</figcaption>
+        </figure>
+
         <p>Ist das ein Fehler? Natürlich nicht. Schauen Sie her: Nach RUN laufen zuerst mal alle POKE-Befehle ab. Zeile 5 gibt an, wieviele Zeichen im Puffer stehen sollen. In Zeile 99 findet das Programm das ENDe und meldet sich mit READY. Jetzt erst wird im Tastaturpuffer nachgeschaut. Dort findet der Rechner zuerst das A, dann »purpur«, dann das B, welches sofort neben das A gesetzt wird. Das ist auch logisch, denn es fehlt ja jede Angabe, eine Zeile tiefer zu gehen. Um das zu erreichen, müssen wir in der Zeile 10 den Codewert für RETURN einschieben:</p>
 
         <pre><code>10 POKE 631,65: POKE 632,13
@@ -1264,9 +1289,19 @@
 
         <p>Vorsicht!! Sie müssen in den Zeilen 20 und 30 alle POKE-Adressen um 1 erhöhen und auch die Zahl in Zeile 5. Nehmen Sie 10, dann haben Sie Platz für Erweiterungen. So, jetzt LIST und RUN und es erscheint Bild 6 – und wir haben schon wieder ein Problem!</p>
 
+        <figure>
+            <img src="20-6.png" alt="Bildschirmausdruck eines Basic-Programms mit POKE-Befehlen in den Tastaturpuffer, darunter eine Ausgabe mit ?SYNTAX ERROR">
+            <figcaption>Bild 6. Das Beispielprogramm mit dem Codewert für RETURN</figcaption>
+        </figure>
+
         <p>Aber alles im Rechner ist logisch! Nach dem A findet er den Wert für »RETURN«, also führt er den Befehl aus, auf dem der Cursor gerade steht. Der steht auf dem A. Da das kein gültiger Basic-Befehl ist, druckt der Rechner die Fehler-Meldung und zeigt READY an. Danach allerdings macht er weiter wie oben.</p>
 
         <p>Und jetzt kommt die ASCII-Zahl 141 (SHIFT RETURN) voll zur Geltung. Diese Kombination nämlich setzt den Cursor an den Anfang der nächsten Zeile, ohne die Befehlsausführungsfunktion von RETURN. Ersetzen Sie also die 13 in Zeile 10 durch 141, dann läuft's (Bild 7).</p>
+
+        <figure>
+            <img src="20-7.png" alt="Bildschirmausdruck eines Basic-Programms mit POKE 632,141, darunter die Ausgabe A, B und C">
+            <figcaption>Bild 7. Die Wirkung der ASCII-Zahl 141 (SHIFT RETURN) im Beispielprogramm</figcaption>
+        </figure>
 
         <p>Es gibt übrigens noch eine interessante ASCII-Codezahl, die in keiner Tabelle steht, nämlich 131. Sie bedeutet dasselbe wie die geSHIFTete STOP-Taste, also die Funktion »LOAD+RUN«. Wenn Sie diesen Code mit PRINT CHR$(131) ausprobieren, funktioniert er allerdings nicht. Deshalb steht er wohl auch nicht in den Tabellen. In den Tastaturpuffer gePOKEt bringt er aber seine Wirkung. Setzen Sie bitte in Zeile 30 an die Stelle von 67 die Zahl 131 und anstelle des C erscheint</p>
 
@@ -1369,6 +1404,11 @@ PRESS PLAY ON TAPE
 
         <p>So, jetzt können Sie meine ASCII-Tabelle erst richtig interpretieren (Tabelle 2).</p>
 
+        <figure>
+            <img src="20-t2.png" alt="Zeichentabelle des ASCII-Codes: links die CTRL-Kombinationen für VC 20 und C 64, rechts acht Spalten mit Zeichen und Codezahlen">
+            <figcaption>Tabelle 2. ASCII-Code</figcaption>
+        </figure>
+
         <p>Leere Kästchen haben keine Bedeutung für die betreffende Codezahl.</p>
 
         <p>Jeweils zwei Zeichen nebeneinander mit derselben Codezahl stellen die beiden Zeichensätze dar, in die mit C=SHIFT (Commodore-Taste) umgeschaltet werden kann. Wo nur ein Zeichen steht, ist es in beiden Zeichensätzen identisch.</p>
@@ -1455,6 +1495,11 @@ PRESS PLAY ON TAPE
 
         <p>Um beim Eintippen des Programms in Bild 8 sicherzustellen, daß alles klappt, habe ich statt der reversen Zeichen die Tasten angegeben beziehungsweise umrahmt, die nach dem ersten Gänsefüßchen gedrückt werden müssen.</p>
 
+        <figure>
+            <img src="20-8.png" alt="Basic-Programmzeilen 410 bis 480 mit GET-Abfrage der Funktionstasten">
+            <figcaption>Bild 8. Programm zur Abfrage mit Gänsefüßchen</figcaption>
+        </figure>
+
         <p>Das Programm schaltet, wie die beiden anderen Versionen auch, die Bildschirm-Farben mit f-1, f-2, f-3 und @ um.</p>
 
         <p>Ein letztes Problem bleibt uns noch. Wie schaffen wir es, daß wir im Gänsefüßchen-Modus auch Funktionen einsetzen können, die entweder keine eigene Taste haben (zum Beispiel 14 = Text, 8 = Lock) oder die beim Eintippen sofort die Funktion auslösen (zum Beispiel 13 = RETURN, 20 = DELete)?</p>
@@ -1518,26 +1563,7 @@ PRESS PLAY ON TAPE
         <p>Normalerweise müßte ich jetzt ein Flußdiagramm zeichnen und »strukturiert« vorgehen, so wie die ausgezeichnete Serie in diesem Heft lehrt. Man möge mir aber verzeihen, daß ich aus Erklärungsgründen in einzelnen Schritten vorgehe, welche uns erlauben, jederzeit Zwischenresultate mit Probeläufen zu überprüfen (Listing 6).</p>
 
         <figure>
-            <pre>5 REM**********************************
-6 REM***** SPIEL MIT FINKELN **********
-7 REM**********************************
-10 PRINT CHR$(147)
-20 F=0
-30 R=65
-40 FOR T=1 TO 600:NEXT T
-50 A=INT(RND(0)*7)+65
-60 IF R&gt;71 THEN 400
-70 PRINT CHR$(A);
-80 FOR T=1 TO 1000:NEXT T
-100 GET A$
-110 IF A$&lt;&gt;"{DEL}" THEN 300
-120 PRINT"{DEL}";
-200 IF A=R THEN F=F+1
-210 GOTO 50
-300 IF A&lt;&gt;R THEN F=F+1
-310 R=R+1
-320 GOTO 50
-400 PRINT"[ILLEGIBLE]DAS SPIEL IST ZU ENDE";"[ILLEGIBLE]"F"FEHLER"</pre>
+            <img src="20-l6.png" alt="Basic-Listing »Spiel mit Finkeln« mit den Zeilen 5 bis 400">
             <figcaption>Listing 6. Programmtext zum »Spiel mit Finkeln« für C 64</figcaption>
         </figure>
 
@@ -1632,23 +1658,17 @@ PRESS PLAY ON TAPE
 
         <p>Die Reihenfolge der Zeichen und ihr Code sehen Sie in der Tabelle 4. Sie ähnelt in mehreren Bereichen der ASCII-Reihenfolge, einige Spalten sind sogar identisch. Das macht eine Umrechnung – auch für das Betriebssystem – sehr einfach.</p>
 
+        <figure>
+            <img src="20-t4.png" alt="Zeichentabelle des Bildschirm-Codes mit acht Spalten aus Zeichen und Codezahlen, darunter die reversen Zeichen">
+            <figcaption>Tabelle 4. Bildschirm-Code</figcaption>
+        </figure>
+
         <p>Folgende Blöcke der beiden Codearten entsprechen einander:</p>
 
         <p>Ein Programm zur Umrechnung von ASCII-Code in Bildschirm-Code zeigt Listing 7.</p>
 
         <figure>
-            <pre>3 REM****************
-4 REM**CODE-WANDLER**
-5 REM****************
-10 PRINT CHR$(147)
-20 INPUT "[ILLEGIBLE]ASCII-CODE";ACII
-30 IF ACII=0 THEN END
-40 IF ACII AND 128 THEN BILD=ACII AND 127 OR 64:GOTO 80
-50 IF NOT ACII AND 64 THEN BILD=ACII:GOTO 80
-60 IF ACII AND 32 THEN BILD=ACII AND 95:GOTO 80
-70 BILD=ACII AND 63
-80 PRINT TAB(5) "BILDSCH.CODE:"BILD
-90 GOTO 20</pre>
+            <img src="20-l7.png" alt="Basic-Listing des ASCII-Code-Wandlers mit den Zeilen 3 bis 90">
             <figcaption>Listing 7. Ein ASCII-Code Wandler</figcaption>
         </figure>
 
@@ -1749,6 +1769,16 @@ PRESS PLAY ON TAPE
 
         <p>In Bild 10 ist noch einmal die VC 20-Tastenanordnung dargestellt, in Bild 11 diejenige des C 64. Trotz des Unterschiedes der elektrischen Anordnung ist bei beiden Computern die Abfragemethode identisch, nur die dafür benötigten Register haben unterschiedliche Adressen. Zur Erinnerung:</p>
 
+        <figure>
+            <img src="20-10.png" alt="Tastenmatrix des VC 20 mit Spaltenregister 37152, Ausleseregister 37153 und den Bitwerten 0 bis 7">
+            <figcaption>Bild 10. Die Tastenanordnung des VC 20</figcaption>
+        </figure>
+
+        <figure>
+            <img src="20-11.png" alt="Tastenmatrix des C 64 mit Spaltenregister 56320, Ausleseregister 56321 und den Bitwerten 0 bis 7">
+            <figcaption>Bild 11. Die Tastenanordnung des C 64</figcaption>
+        </figure>
+
         <p>Das Betriebssystem wählt der Reihe nach die senkrechten Spalten dadurch an, daß es die Zahl, die am Fuß jeder Spalte steht, in das Spalten-Register 37152 (beziehungsweise 56320) schreibt. Diese Zahl ergibt in dualer Darstellung eine 0 an dieser Stelle.</p>
 
         <p>Für jede Taste, die in der angewählten Spalte gedrückt ist, wird eine 0 in das andere Register 37153 (56321) geschrieben. Diese Dualzahl ergibt einen Dezimalwert, welcher aus dem Register herausPEEKbar ist.</p>
@@ -1788,61 +1818,7 @@ PRESS PLAY ON TAPE
         <p>Die zweite Methode ist einfacher (Listing 8). Wir schreiben das Programm oben (Zeilen 10 und 20) in Maschinensprache. Das läuft dann so schnell ab, daß es innerhalb zweier Unterbrechungen ausgeführt und somit vom Betriebssystem nicht gestört wird.</p>
 
         <figure>
-            <pre>4 REM **********************
-5 REM   VIELFACHTASTEN
-6 REM      ABFRAGE
-7 REM **********************
-10 PRINT CHR$(147)
-20 POKE 51,235
-30 POKE 52,29
-40 POKE 55,235
-50 POKE 56,29
-100 DATA 169,254,141,0
-101 DATA 220,173,1,220
-102 DATA 141,255,29,96
-105 REM --------VC20-----------
-106 REM   100 DATA169,254,141,32
-107 REM   101 DATA145,173,33,145
-108 REM   102 DATA141,255,29,96
-109 REM --------VC20-ENDE------
-110 FOR K=1 TO 12
-120 READ X
-130 POKE 7660+K,X
-140 NEXT K
-200 POKE 7662,127
-210 SYS 7661
-220 PRINT " [ILLEGIBLE]"PEEK(7679);
-300 POKE 7662,191
-310 SYS 7661
-320 PRINT PEEK(7679);
-400 POKE 7662,223
-410 SYS 7661
-420 PRINT PEEK(7679);
-500 POKE 7662,239
-510 SYS 7661
-511 REM  ------VC20-------------
-512 REM  520 PRINT PEEK(7679)
-513 REM  550 GET A$
-514 REM  560 IF A$&lt;&gt;"[ILLEGIBLE]"THEN200
-515 REM  ------VC20-ENDE--------
-520 PRINT PEEK(7679);
-600 POKE 7662,247
-610 SYS 7661
-620 PRINT PEEK(7679);
-700 POKE 7662,251
-710 SYS 7661
-720 PRINT PEEK(7679);
-800 POKE 7662,253
-810 SYS 7661
-820 PRINT PEEK(7679);
-900 POKE 7662,254
-910 SYS 7661
-920 PRINT PEEK(7679)
-940 REM -------VC20--------------
-950 REM  GET A$
-960 REM  IF A$&lt;&gt;"[ILLEGIBLE]" THEN 600
-970 REM ------VC20-ENDE--------
-1000 GOTO 200</pre>
+            <img src="20-l8.png" alt="Basic-Listing zur Abfrage aller Tasten mit den Zeilen 4 bis 1000, mit DATA-Zeilen und VC-20-Varianten in REM-Zeilen">
             <figcaption>Listing 8. Programm zum Abfragen und Anzeigen aller Tasten</figcaption>
         </figure>
 
@@ -1947,120 +1923,7 @@ PRESS PLAY ON TAPE
         <p>Ich will auch am Schluß meiner Darstellung der Gewohnheit treu bleiben und das Kochrezept in einem kleinen Gericht anwenden (Listing 9).</p>
 
         <figure>
-            <pre>0 REM****************
-1 REM** SPIEL FUER **
-2 REM** 4 PERSONEN **
-3 REM****************
-4 REM
-5 REM
-6 REM****************
-7 REM*** EINGABE ****
-8 REM**MASCHINENCODE*
-9 REM****************
-10 PRINT CHR$(147)
-20 POKE 51,235
-30 POKE 52,29
-40 POKE 55,235
-50 POKE 56,29
-VC 20:
-       100 DATA 169,0,141,32,145,173,33,145,141,255,29,96
-C 64:
-       100 DATA 169,0,141,0,220,173,1,220,141,255,29,96
-110 FOR K=1 TO 12
-120 READ X
-130 POKE 7660+K,X
-140 NEXT K
-199 REM**************
-200 REM*ANWEISUNGEN**
-205 REM**************
-210 PRINT CHR$(147)
-215 POKE830,0
-VC 20:
-       220 PRINT"[ILLEGIBLE]SPIELER 1:(W)TASTE
-       230 PRINT"[ILLEGIBLE]SPIELER 2:(Z)TASTE
-       240 PRINT"[ILLEGIBLE]SPIELER 3:(DEL)TASTE
-       250 PRINT"[ILLEGIBLE]SPIELER 4:(CRSR←)TASTE
-C 64:
-       220 PRINT"[ILLEGIBLE]SPIELER 1 DRUECKT '←'
-       230 PRINT"[ILLEGIBLE]SPIELER 2 DRUECKT 'COMMODORE'
-       240 PRINT"[ILLEGIBLE]SPIELER 3 DRUECKT 'INST/DEL'
-       250 PRINT"[ILLEGIBLE]SPIELER 4 DRUECKT 'CRSR←'
-260 PRINT TAB(125)"[ILLEGIBLE]SPACE[ILLEGIBLE]"
-270 GET A$:IF A$=""THEN 270
-280 PRINT CHR$(147)
-300 POKE 36879,8
-310 PRINT"[ILLEGIBLE]WER SIEHT ALS ERSTER
-320 PRINT"[ILLEGIBLE]DEN BUCHSTABEN
-330 BU = INT(RND(0)*10)+1
-VC 20:
-       340 POKE 7808,BU
-       350 POKE 38528,7
-       360 PRINT"[ILLEGIBLE]UND DRUECKT SEINE      [ILLEGIBLE]TASTE ?
-C 64:
-       340 POKE 1224+17,BU
-       350 POKE 55496+17,7
-       360 PRINT"[ILLEGIBLE]UND DRUECKT SEINE TASTE ?
-370 PRINT TAB(165)"[ILLEGIBLE]SPACE[ILLEGIBLE]"
-380 GET A$:IF A$="" THEN 380
-390 PRINT CHR$(147)
-400 FOR T=1 TO 800:NEXT T
-490 REM**************
-495 REM* BUCHSTABEN *
-500 REM** WUERFELN **
-510 REM**************
-520 VB=INT(RND(0)*10)+1
-530 IF VB=BU THEN POKE 830,250
-VC 20:
-       540 C=INT(RND(0)*505)
-       550 POKE 7680+C,VB
-       560 POKE 38400+C,1
-C 64:
-       540 C=INT(RND(1)*501)*2
-       550 POKE 1024+C,VB
-       560 POKE 55296+C,1
-590 REM**************
-595 REM** ABFRAGE ***
-600 REM* DER TASTEN *
-605 REM**************
-610 FOR Z=1 TO 15
-VC 20:
-       620 POKE 7662,253
-       630 SYS 7661
-       640 IF PEEK(7679)=253 AND PEEK(830)=250 THEN 810
-       650 POKE 7662,239
-       660 SYS 7661
-       670 IF PEEK(7679)=253 AND PEEK(830)=250 THEN 820
-       680 POKE 7662,254
-       690 SYS 7661
-       700 IF PEEK(7679)=127 AND PEEK(830)=250 THEN 830
-       710 POKE 7662,251
-       720 SYS 7661
-       730 IF PEEK(7679)=127 AND PEEK(830)=250 THEN 840
-       740 NEXT Z
-C 64:
-       620 POKE 7662,127
-       630 SYS 7661
-       640 IF PEEK(7679)=253 AND PEEK(830)=250 THEN 810
-       650 IF PEEK(7679)=223 AND PEEK(830)=250 THEN 820
-       660 IF PEEK(7679)=221 AND PEEK(830)=250 THEN 850
-       670 POKE 7662,254
-       690 IF PEEK(7679)=254 AND PEEK(830)=250 THEN 830
-       700 IF PEEK(7679)=251 AND PEEK(830)=250 THEN 840
-       710 IF PEEK(7679)=250 AND PEEK(830)=250 THEN 850
-       720 NEXT Z
-750 GOTO 500: REM (NEUER BUCHSTABE)
-799 REM**************
-800 REM** ERGEBNIS **
-805 REM**************
-810 PRINT"[ILLEGIBLE]SPIELER 1 IST SIEGER":GOTO 860
-820 PRINT"[ILLEGIBLE]SPIELER 2 IST SIEGER":GOTO 860
-830 PRINT"[ILLEGIBLE]SPIELER 3 IST SIEGER":GOTO860
-840 PRINT"[ILLEGIBLE]SPIELER 4 IST SIEGER":GOTO 860
-850 PRINT"[ILLEGIBLE]WEI SPIELER WAREN GLEICHZEITIG...
-860 PRINT"[ILLEGIBLE]NOCH EINMAL ?  (J/N)
-870 GET A$:IF A$="J" THEN 200
-880 IF A$="N" THEN END
-890 GOTO 870</pre>
+            <img src="20-l9.png" alt="Basic-Listing eines Tastenspiels für vier Personen mit getrennten Zeilenblöcken für VC 20 und C 64, Zeilen 0 bis 890">
             <figcaption>Listing 9. Ein Tastenspiel für vier Personen</figcaption>
         </figure>
 

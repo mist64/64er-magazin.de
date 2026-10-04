@@ -25,6 +25,11 @@
 
         <p>Wir müssen uns überlegen, wo der neue Zeichensatz liegen soll. Möchte man kein vom Basic aus nutzbares RAM verwenden, bleibt nur der Bereich von $A000 bis $FFFF. Aber genau das ist für viele Programmierer die Schwierigkeit. Der Grund dafür ist der, daß der im C 64 eingebaute Videocontroller immer nur eine 16-KByte-Bank »sieht«. Das heißt, daß der Bildschirm, also das Video-RAM und der Zeichensatz in der gleichen 16-KByte-Bank liegen müssen. Eine Ausnahme bildet dabei die Einschaltkonfiguration. Denn hier liegt der Bildschirm bekanntlich bei $400 und der Zeichensatz bei $D000 unter dem I/O-Bereich, in dem die Register der Peripheriebausteine liegen, zum Beispiel auch die des Videocontrollers (Bild 1). Die Einschaltkonfiguration ist aber eine hardwaremäßige Maßnahme und läßt sich von einem Programm aus nicht nachbilden. Der Videocontroller beziehungsweise das Zeichensatz-ROM ist nämlich so verdrahtet, daß der Zeichensatz vom Videocontroller aus gesehen bei $1000 liegt. Vom Prozessor aus gesehen liegt er aber bei $D000. Das ist übrigens auch der Grund dafür, warum sich ein beliebiger Zeichensatz nicht ins RAM nach $1000 legen läßt. Denn die Register im Controller sind so gesetzt, als läge der Zeichensatz tatsächlich ab $1000.</p>
 
+        <figure>
+            <img src="80-1.png" alt="Perspektivisches Diagramm dreier übereinanderliegender Speicherebenen ab $D000: Ein-/Ausgabe mit Farb-RAM, Zeichensatz-ROM und RAM">
+            <figcaption>Bild 1. So sieht die Speicherbelegung im $D-Bereich aus</figcaption>
+        </figure>
+
         <p>Wir wollen den neuen Zeichensatz in das RAM nach $E000 legen und das Video-RAM nach $CC00. Das hat den Vorteil, daß kein nutzbares RAM verlorengeht. Wir müssen uns aber jetzt um zwei Dinge kümmern:</p>
 
         <ol>
@@ -37,9 +42,24 @@
 
         <p><strong>Bit 0</strong>: Ist dieses Bit auf »0« gesetzt, wird der Bereich von $A000 bis $BFFF auf RAM geschaltet. Daraus folgt, daß das Basic-ROM ausgeblendet wird (Bild 2).</p>
 
+        <figure>
+            <img src="80-2.png" alt="Speicherdiagramm von 0000 bis FFFF: 52 K RAM, darüber 4 K Ein-/Ausgabe ab D000 und 8 K Betriebssystem ab E000">
+            <figcaption>Bild 2. Ist Bit 0 auf »0« gesetzt, dann existiert diese Speicherbelegung</figcaption>
+        </figure>
+
         <p><strong>Bit 1</strong>: Wird dieses Bit auf »0« gesetzt, so wird der Bereich von $A000 bis $BFFF und zusätzlich noch der Bereich von $E000 bis $FFFF auf RAM und der Bereich von $D000 bis $DFFF auf Zeichensatz-ROM geschaltet. Dies ist die Speicherbelegung, in der wir den Zeichensatz auslesen können. Bei dieser Konfiguration existiert aber weder das Basic noch das Betriebssystem (Bild 3).</p>
 
+        <figure>
+            <img src="80-3.png" alt="Speicherdiagramm von 0000 bis FFFF: 52 K RAM, darüber 4 K Zeichensatz ab D000 und 8 K RAM ab E000">
+            <figcaption>Bild 3. Speicherbelegung für den Fall, daß Bit 1 auf »0« gesetzt ist</figcaption>
+        </figure>
+
         <p><strong>Bit 2</strong>: Dieses Bit blendet, wenn es auf »0« gesetzt ist, das gesamte ROM aus. Hier existieren also volle 64 KByte RAM (Bild 4).</p>
+
+        <figure>
+            <img src="80-4.png" alt="Speicherdiagramm von 0000 bis FFFF als ein einziger Block mit 64 K RAM">
+            <figcaption>Bild 4. Ist Bit 2 auf »0« gesetzt, dann liegt diese Speicherbelegung vor</figcaption>
+        </figure>
 
         <p>Die Routine zum Kopieren des Zeichensatzes läßt sich, wie oben erwähnt, nicht in Basic schreiben. Es bleibt also nur ein Maschinenprogramm. Um aber auch dem Anfänger das Programm verständlich zu machen, möchte ich zuerst ein Basic-Programm vorstellen, mit dem das Kopieren des Zeichensatzes denkbar wäre. Anschließend wird dieses Programm in Maschinensprache umgesetzt.</p>
 
