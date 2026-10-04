@@ -39,6 +39,11 @@
         <p>Beginnen wollen wir mit der Organisation des verfügbaren RAM durch den Basic-Interpreter.</p>
 
         <p>Der Basic-Beginn liegt bei Adresse 4096, das Ende bei Adresse 7680 (16383) (die Werte beziehen sich auf die Grundversion). Unmittelbar ab dem Basic-Beginn wird das eigentliche Programm abgelegt. An dessen Ende beginnen die Variablen und Felder (Bild 1 und Tabelle 1).</p>
+
+        <figure>
+            <img src="31-1.png" alt="Diagramm: senkrechter Speicherblock, von unten nach oben Basic-Programm, numerische Variablen, Felder, leer, Strings; Pfeile markieren die Zeigerpaare 43/44 und 55/56, links Beginn und Ende von Basic sowie Variablen-Beginn">
+            <figcaption>Bild 1. Die Speicherbelegung des Basic-Bereichs</figcaption>
+        </figure>
         <figure>
             <table>
                 <tr>
@@ -130,6 +135,11 @@
         <h2>Erste Hilfe — Basicprogramme retten nach NEW oder Reset</h2>
 
         <p>Schon oft wurden Verfahren beschrieben, um nach einem versehentlichen NEW das Basic-Programm wieder zurückzuholen. Doch wie funktionieren diese Verfahren? Um das zu verstehen, betrachten wir zunächst kurz den Aufbau eines Basic-Programms (Bild 2).</p>
+
+        <figure>
+            <img src="31-2.png" alt="Diagramm: drei Zeilen als Kästchenreihen (1. Zeile, 2. Zeile, n. Zeile) mit Koppel-Adresse (LB/HB), Zeilennummer, Programm-Zeile und Null-Bytes; Pfeile verbinden jede Koppeladresse mit der nächsten Zeile, die letzte Zeile endet mit drei Nullen">
+            <figcaption>Bild 2. Aufbau eines Basic-Programms. Über die Koppeladressen sind die einzelnen Zeilen miteinander verbunden.</figcaption>
+        </figure>
 
         <p>Am Kopf des Programms steht immer eine Null. Dann folgten die Adresse der nächsten Programmzeile (Koppeladresse) und die Zeilennummer. Danach kommt die eigentliche Programmzeile, die sich aus den sogenannten Tokens – den Basic-Codenummern (Tabelle 2) – zusammensetzt. Am Ende dieser Zeile steht dann nochmals eine Null. Die nächste Zeile beginnt wieder mit einem Verbindungszeiger und der Zeilennummer. Das Programm wird mit drei Nullen abgeschlossen. Hieran schließen sich die Variablen an (vergleiche Bild 1).</p>
         <figure>
@@ -1975,7 +1985,17 @@
 
         <p><strong>Adresse 144:</strong> Dieses Statusflag ist auch von Basic aus über die STATUS- beziehungsweise ST-Anweisung abfragbar. Es liefert das Computerstatus-Byte, dessen Inhalt aufgrund der letzten Input-Output-Operation gesetzt wurde. Bezogen auf den Kassettenport liefert es nach Bild 3 bestimmte Meldungen. Die Informationen über die geladenen Programme werden binär wiedergegeben. Die Null signalisiert ein ordnungsgemäß geladenes Programm. 32 hingegen bedeutet, daß ein Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der Computer mehrere Meldungen in dieses Byte packt, beispielsweise 52 = 32 + 16 + 4: Hier wurde ein kurzer Block geladen, jedoch ist die Prüfsumme falsch, und ein fataler Ladefehler liegt vor.</p>
 
+        <figure>
+            <img src="31-3.png" alt="Diagramm: Byte mit acht Bitfeldern 7 bis 0 (Werte 128, 0, 32, 16, 8, 4, 0, 0); Pfeile zu den Bedeutungen EOT (= End of Tape), Prüfsummenfehler, Fataler Lesefehler, langer Block geladen, kurzer Block geladen sowie Programm korrekt geladen">
+            <figcaption>Bild 3. Darstellung des Status-Bytes, das verschiedene Fehlermeldungen enthalten kann. Die Bits 0, 1 und 6 werden bei Bandbetrieb nicht genutzt. Sie sind daher auf Null gesetzt. Enthält das Statusbyte den Wert Null, wurde das letzte Programm korrekt geladen.</figcaption>
+        </figure>
+
         <p>An dieser Stelle ist es angebracht, sich näher mit dem Aufzeichnungsverfahren zu beschäftigen (Bild 4).</p>
+
+        <figure>
+            <img src="31-4.png" alt="Diagramm: Bandaufzeichnung als Blockfolge Header (Vorspann, Programmkopf, Trennzeichen, Programmkopf-Wiederholung), Programmteil und Ende (Endmarkierung, Nachspann); darunter vergrößert der Programmkopf mit den Adressen 828 bis 1009 (in Klammern 818 bis 822) und Pfeilen zu Headertyp, Startadresse und Endadresse des Programms">
+            <figcaption>Bild 4. Darstellung eines auf Band gespeicherten Programms. Die Angaben in Klammern beziehen sich wie immer auf den C 16.</figcaption>
+        </figure>
 
         <h2>So kommen Programme aufs Band</h2>
 
@@ -2022,11 +2042,21 @@
 
         <p>Wenn wir einen Basic-Befehl im Direktmodus (LIST, RUN, PRINT) oder eine Programmzeile mit Zeilennummer eingeben, werden die Informationen – wie bekannt – auf den Bildschirm geschrieben und gelangen gleichzeitig in den Basic-Eingabepuffer (Adresse 512-600/ $0200-$0258). Dort werden Programmzeilen oder direkte Befehle zunächst einmal im ASCII-Format gesammelt (Bild 5a). Dies geschieht solange, bis man die RETURN-Taste betätigt.</p>
 
+        <figure>
+            <img src="31-5a.png" alt="Diagramm: Eingabe PRINT PEEK(43):LIST100-120 als Reihe von Bytewerten (80 82 76 78 84 32 …) mit den zugehörigen Zeichen darunter, endend mit drei Null-Bytes">
+            <figcaption>Bild 5a. Die Basic-Befehle im Eingabepuffer vor der Umwandlung in Interpretercode</figcaption>
+        </figure>
+
         <p>Dieser Puffer hat eine Kapazität von 88 Zeichen – also den bekannten vier Bildschirmzeilen beim C20 beziehungsweise 2 Bildschirmzeilen beim C 16.</p>
 
         <p>Drückt man die RETURN-Taste, so beginnt der Interpreter mit der Auswertung der Kommandos. Eingaben ohne Zeilennummer werden auf ihre Syntax hin überprüft und danach ausgeführt.</p>
 
         <p>Verfolgen wir nun einmal genauer den Weg einer Befehlszeile. Die einzelnen ASCII-Zeichen werden von einer Maschinensprachen-Unterroutine namens »CHRGET« aus dem Puffer gelesen und mit den Befehlswörtern aus dem ROM verglichen. War die Überprüfung positiv – ist der Befehl also identifiziert worden –, so verkürzt der Computer die Kommandozeile, indem er die Befehle in Token (Tabelle 2) umwandelt. Diese Prozedur durchlaufen sowohl die Programmzeilen (mit Zeilennummer) als auch die direkten Kommandos (Bild 5b). An dieser Stelle trennen sich nun aber die Wege dieser beiden Zeilentypen.</p>
+
+        <figure>
+            <img src="31-5b.png" alt="Diagramm: dieselbe Zeile nach der Umwandlung als Bytefolge 153 194 40 52 51 41 58 155 …, Pfeile kennzeichnen die Token PRINT, PEEK und LIST">
+            <figcaption>Bild 5b. Die Kommandos im Puffer nach der Übersetzung in Token</figcaption>
+        </figure>
 
         <p>Zunächst zu dem weiteren Weg einer Programmzeile. Die inzwischen komplett übersetzte Zeile im Basic-Puffer wird nun in einem zweiten Durchlauf vom Zwischenspeicher in den Programmspeicher übertragen, wobei sie auch gleich richtig eingeordnet wird (damit die Reihenfolge der Zeilennummern stimmt). Weil sich dadurch der Programmbereich im Basic-Speicher vergrößert, muß der Variablenbereich weiter oben angesiedelt werden. Die bis dahin gespeicherten Variablen werden dadurch natürlich überschrieben. Nach dem Übertragen der Programmzeile springt das Interpreterprogramm wieder in die Warteschleife zurück, damit weitere Befehle entgegengenommen werden können.</p>
 
@@ -2970,6 +3000,11 @@
 
         <p>Bei Erweiterungen von mehr als 8 KByte verändert sich die Lage des Bildschirm- und Farbspeichers (die Einstellung nimmt die Reset-Routine vor). Anhand von Bild 6a soll erläutert werden, warum eine Verschiebung notwendig ist.</p>
 
+        <figure>
+            <img src="31-6a.png" alt="Diagramm: zwei Speicherbelegungspläne mit Hex- und Dezimaladressen von 0000 bis FFFF, links VC 20 (Grundversion), rechts VC 20 (ab 8-KByte-Erweiterung), mit ROM-Bereichen, Farb- und Video-RAM, Erweiterungen und Zeropage">
+            <figcaption>Bild 6a. Der Speicheraufbau beim VC 20</figcaption>
+        </figure>
+
         <p>Der Video-Interface-Chip VIC (daher auch der englische Name des VC 20), der vor allem für die Erzeugung des Fernsehsignals und den Aufbau des Bildschirmes verantwortlich ist, kann hardwaremäßig nur Videospeicherplätze zwischen 4096 und 8192 adressieren. Folglich muß das Bildschirm-RAM in diesem Bereich angesiedelt werden.</p>
 
         <p>In der Grundversion liegt es zwischen Adresse 7680 und 8191 – also am Ende des verfügbaren Speichers, damit der Speicherbereich für Basic auch bei eingesteckter 3 KByte-Erweiterung durchgängig ist (läge der Bildschirmspeicher so wie bei einer 8-KByte-Erweiterung, wäre dies nicht der Fall).</p>
@@ -2979,6 +3014,11 @@
         <p>Der C 16 ist vom Speicheraufbau etwas anders organisiert. Die in beiden Geräten eingebauten Prozessoren (6502 und 7501) können jeweils immer nur einen Adreßbereich von 64 KByte (das entspricht den Adressen 0-65535) ansprechen. Um Zugriff auf noch mehr Speicherplatz für Programme und Daten (sei es nun im ROM oder im RAM) zu haben, bedient man sich beim C 16 eines Tricks:</p>
 
         <p>Der Computer schaltet einfach immer zwischen zwei Speicherblöcken zu je 64 KByte (siehe Bild 6b) hin und her. Der erste Block besteht – wenn der C 16 voll ausgebaut ist – aus Schreib-/Lesespeicher, die andere Bank verwaltet das ROM. Diese Technik des »Bank-Switching« wird auch beim neuen Commodore-Flaggschiff C 128 verwendet.</p>
+
+        <figure>
+            <img src="31-6b.png" alt="Diagramm: Speicherbelegungsplan C 16/C 116/Plus 4 mit Hex- und Dezimaladressen: Systemspeicher, Farb-RAM, Video-RAM, Basic-RAM bis 4000 (bei 16 KByte), darüber Basic-RAM bei Plus 4 oder C 16 mit 64-KByte-Erweiterung, oben I/O und TED">
+            <figcaption>Bild 6b. Der Speicheraufbau beim C 16</figcaption>
+        </figure>
 
         <p>Damit ist unsere Einführung in die internen Geheimnisse des VC 20/C 16 beendet. Es ist jetzt an Ihnen, die hier erworbenen Kenntnisse durch eigenes Experimentieren zu vertiefen und in eigenen Programmen einzubauen. Zusätzliche wichtige Hintergrund-Informationen speziell über die Themengebiete »Grafik« und »Zeichensatz« beim C 16 finden Sie in diesem Sonderheft.</p>
 
