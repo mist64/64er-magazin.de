@@ -126,6 +126,44 @@ Record per page which of the three was used, beside the grade stamp, so a page
 whose type sits differently from its neighbours can be explained rather than
 re-derived.
 
+## A PAGE WHOSE TRACE FAILS IS STILL CUT AUTOMATICALLY — NEVER BY HAND
+
+**Owner, 2026-10-04: "manual cropping is not an option for the PDF."** A hand
+crop does not reproduce, is not recorded anywhere a later build can read, and
+turns one person into the step. A page whose trace fails gets a BEST-EFFORT
+window from the evidence that is there, and the result is published with a note
+saying which fallback produced it.
+
+The rule above assumes every page of an insert traced, so the run can take the
+max per axis. It does not cover a page that failed OUTRIGHT — the trace found
+no card at all and the page was published as an uncropped sheet. MEASURED:
+
+| issue | traced | failed |
+|---|---|---|
+| SH8602 | 165 `143.1 x 208.0`, 166 `145.0 x 208.0`, 167 `143.1 x 208.4` | 168 (`212.7 x 304.2`, uncropped) |
+| SH8603 | 181 `144.4 x 207.7` | 182, 183, 184 (`216.4 x 304.2`, uncropped) |
+
+So, in order:
+
+1. **A failed page of an INSERT takes its run's unified size**, anchored on its
+   own traced top-left corner where there is one, else on the run's offset. The
+   Zahlkarte measures **~144 x 208 mm** across every Sonderheft that has one
+   (four good traces over SH8602 and SH8603; SH8601's reads ~144 x 205). A
+   member that disagrees with that by more than a few mm has failed, whatever
+   its trace says — 216 x 304 mm is the SHEET, not the card.
+2. **A failed page with surplus paper** (a wrapper back cover, 217 mm of paper
+   in an A4 frame) is windowed on its **ink bounding box**, not the paper's.
+3. **A failed page whose ground is full-bleed dark**, where a colour test for
+   the prop cannot work because the sheet is already graded and separated, is
+   cut from **row and column luminance profiles**: the prop shows as a step at
+   the foot, the bed as a plateau darker than the page. MEASURED on SH8602/155:
+   page lum ~6 -> ~105 -> ~200 at row ~7005; dark-brown ground ~10 against bed
+   ~3, a step at x~4948.
+
+Cut from `masters600`, pad outside the frame with paper white, write into
+`<tmp>/a4600/`, and keep the automatic window as a backup. Note in the stamp
+which fallback was used.
+
 ## Verification
 
 1. Every body page is exactly 4961 × 7016 px.
