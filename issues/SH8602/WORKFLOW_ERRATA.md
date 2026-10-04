@@ -550,3 +550,13 @@ WHOLE LISTING (20 L6–L9, 39 L1) rather than one crop per glyph as the worklist
 proposed (39 rows) — five images instead of 32, and owner-crop-wins then
 replaces the transcription. r170/r150 should propose that shape first. And a
 table printed across two pages is one crop (`20-t2`), not `t2a`/`t2b`.
+
+## 150 — check 1 compares counts, not sets
+
+"every loose PNG … is referenced by exactly one `<img src=…>`" — the code
+compares the two counts, so a dangling reference plus an unreferenced file, or
+one file referenced twice, passes (shown on plants). A set comparison fixes it.
+Also unstated: placement of a lead image when the article has no `p.intro`, and
+of a figure first named inside an `<li>`; what to do when an owner crop covers a
+listing whose `[ILLEGIBLE]` markers had no ruling (152-1). Found by the 150
+sub-agent.
