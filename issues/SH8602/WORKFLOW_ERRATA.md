@@ -574,3 +574,46 @@ use `a4600/001.png`); the `paper` mask it cites is not saved for a4600 pages;
 step 2's by-product PDF still runs the full guetzli search unless
 `ENCODER=fast`; both scripts hardcode `NCPU=$(sysctl -n hw.ncpu)` instead of
 `lanes()` (load ~520 during OCR); README still says "PDF/A-3B".
+
+## 005b/006 — hand crops of untraceable pages: what worked (owner: "perfect" on the cards)
+
+Owner: no hand crops — "best effort, I complain if wrong". What worked, on
+155/163/168 (owner confirmed the cutting, the four Zahlkarte pages "perfect"):
+- **A colour test for the prop fails on GRADED sheets.** `sheets600`/`masters600`
+  are already separated and re-rendered; the yellow prop no longer reads as
+  yellow (R>180 G>140 B<120 found nothing). Use **row/column luminance
+  profiles** instead: the prop shows as a step at the foot (155: page lum ~6 →
+  ~105 → ~200 at row ~7005), the bed as a plateau darker than the page
+  (155: dark-brown ground ~10 vs bed ~3 — a step at x≈4948).
+- **An insert's size comes from its siblings, not from its own trace.** 168 traced
+  143.9 × 297.5 mm (foot ran into the bed); the card's real box (x 0–3409, y
+  3–4926) matched the common size r005b had unified for 165–167 (3426 × 4924), so
+  168 took that size, anchored on its traced top-left corner. One insert is one
+  object (r005_a4_window) — use the unified size for the page that failed too.
+- **A page whose paper runs beyond A4** (163, wrapper back cover, 217 mm of
+  paper in frame): place the A4 window on the PRINTED content's box (ink bbox),
+  not the paper's.
+- Cut from `masters600` (the frame 005b applies its windows in), pad outside the
+  frame with paper white, write into `<tmp>/a4600/`, keep the automatic window as
+  a backup. View the three results before the PDF build.
+Sentence for r005_a4_window "What happens to a failed page": "The orchestrator
+re-cuts it from luminance profiles (prop = foot step, bed = darker plateau); an
+insert takes its run's unified size; a page with surplus paper is windowed on
+its ink box."
+
+## 005 — a black darker than the built-in K anchor separates as BROWN (p3)
+
+**What happened.** p3 (Vorwort, interior stock) shipped in the PDF as a colour
+JPEG; the owner: it is b/w. Measured: p3's banner bars are the darkest black in
+the issue (raw 19.8/16.2/15.6, others ~29–35) on lighter paper (raw p50 225 201
+188 vs ~205 186 176). The grade's K anchor is the BUILT-IN `K 16 17 17` (r005
+spread: "ink anchors stay the built-in set … unless a colour is visibly
+wrong"). G and B sit below the anchor, the solver extrapolates and returns extra
+M+Y: graded bars 43.2/18.8/16.6, red-brown. 006's classifier then measured
+chroma 0.019 (> 0.002) → contone. Only p3 crossed the line.
+**What would have prevented it.** r005: "Measure the K anchor on this issue's
+darkest solid black (p1 of the darkest bars across the interior), not only W —
+a black darker than K extrapolates to a hue." And a 006 check: "a page of the
+interior stock classified contone is suspect — look at it before building."
+Also: 006 has `FORCE_CONTONE` but no `FORCE_BILEVEL`; the mirror switch is the
+cheap fix for one page.
