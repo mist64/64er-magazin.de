@@ -499,3 +499,26 @@ No rule says any of this; decided with the owner at SH8603's PDF review:
 And r006's largest-blob chroma measure, rewritten this morning to exclude
 display-type fringe and the scanner bed, has a THIRD case it does not
 exclude: paper browning (183/184 pages here; entry above).
+
+## 006 — REVERSED: bilevel pages use a FIXED 35 % threshold, not Otsu (owner, 2026-10-05)
+
+Supersedes point 1 of the halftone entry above ("Otsu per page is correct and
+stays"). Evidence relayed by 64er_control: Otsu adapts to page CONTENT, not
+paper — step 005 already normalised paper to p95 = 255 on all 184 pages — so it
+picks 49 % on the dark cover, 57–60 % on type, 79 % on the card: backwards.
+On the browned card pages it turns 1.3 / 3.0 / 4.5 % of clean paper black
+(181/183/184); a fixed 35–50 % turns 0.0 %. On p026 (full page thresholded,
+measured by region) text ink is identical from 35 % to 60 % (30.8 %), light ink
+0 % at every value; only the halftone photo moves: Otsu 75 % solid black →
+35 % 48.5 %. Otsu on the photo pixels alone lands at 42–50 % (median 44)
+across ten pages; 35 % deliberately under-inks so the dots stay separate.
+Nine pages lost 62–82 % of their photograph under Otsu (026, 027, 028, 042,
+045, 046, 112, 155, 171; 147 marginal), and no gate saw it because the PAGE
+average barely moves — mid-greys go black while light greys go white. **A
+check for this must measure inside the halftone region.** Points 2 (never
+re-screen) and 3 (FORCE_CONTONE is the only faithful remedy) stand.
+Implemented as an opt-in switch, `BILEVEL_THRESHOLD="35%"`, in
+`make_issue_pdf_mixed.sh` (unset = Otsu, unchanged), with its own JBIG2 cache
+dir — the cache was keyed by page only, so changing the threshold without a
+new dir would have silently re-embedded the Otsu images. Whether 35 % becomes
+the corpus default is for the harvest (r006 + the script's default).
