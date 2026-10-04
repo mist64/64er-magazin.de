@@ -93,7 +93,7 @@
                     </tr>
                     <tr>
                         <td>10</td>
-                        <td>IF Z&lt;&gt;S statt IF Z = S</td>
+                        <td>IF Z&lt; &gt;S statt IF Z = S</td>
                         <td align="right">2,50</td>
                         <td align="right">2,98</td>
                     </tr>
@@ -172,7 +172,7 @@
 
         <p>Löschen Sie bitte wieder die Zeile 15. Als Programm, welches wir in mehreren Versionen programmieren wollen, habe ich mir einen Ablauf ausgesucht, der auch optisch verfolgbar ist. Auf dem Bildschirm soll nämlich der Buchstabe A gleich 374 mal nebeneinander gedruckt werden.</p>
 
-        <p>Die Zahl 374 hat nichts Magisches an sich. Es sind ganz einfach 17 Zeilen voller As auf dem Schirm des VC 20, der mit seiner begrenzten Spaltenzahl hier den Ton angibt. 17 Zeilen lassen uns genug Platz, um die gestoppte Zeit darunter gut lesbar anzuzeigen.</p>
+        <p>Die Zahl 374 hat nichts Magisches an sich. Es sind ganz einfach 17 Zeilen voller A's auf dem Schirm des VC 20, der mit seiner begrenzten Spaltenzahl hier den Ton angibt. 17 Zeilen lassen uns genug Platz, um die gestoppte Zeit darunter gut lesbar anzuzeigen.</p>
 
         <p>Ich bleibe für den C 64 bei derselben Zahl, damit wir beide Computer miteinander vergleichen können und damit die Programme möglichst identisch sind.</p>
 
@@ -212,7 +212,7 @@
 
         <p>Um zum Beispiel an den 3. Platz in der 20. Zeile die Zeit zu drucken, müßten wir 18mal das inverse Q für Cursor Down und 1mal Cursor Right eingeben.</p>
 
-        <p>Mit TAB(X) geht es besser. Wir haben nur ein Problem, daß nämlich der höchste zulässige Wert für X nur 255 ist (X nennt man das »Argument«), Wir müssen deshalb zwei TAB-Befehle hintereinander setzen, um einen Abstand von 400 Leerstellen zu erzeugen.<br>
+        <p>Mit TAB(X) geht es besser. Wir haben nur ein Problem, daß nämlich der höchste zulässige Wert für X nur 255 ist (X nennt man das »Argument«). Wir müssen deshalb zwei TAB-Befehle hintereinander setzen, um einen Abstand von 400 Leerstellen zu erzeugen.<br>
             1000 PRINT TAB (255) TAB (155) TI/60"SEKUNDEN":END</p>
 
         <p>Für das Argument von SPC gilt dieselbe Begrenzung von 255. Eine doppelte Verwendung von SPC geht natürlich auch, allerdings zählt SPC nicht vom Anfang der Zeile, sondern ab der letzten Cursor-Stelle. Durch Rechnen oder einfach durch Probieren finden wir die Gesamtzahl von 397, das gibt:<br>
@@ -241,7 +241,7 @@
             (30 Z = 0:VIDEO = 1024:FARBE = 55296:REM C 64)</p>
 
         <p>Zeile 40 ergibt sich dann eigentlich zwangsläufig:<br>
-            40 POKEVIDEO + Z, 1:POKEFARBE + Z,6<br>
+            40 POKE VIDEO + Z, 1:POKE FARBE + Z,6<br>
             (40 POKE VIDEO + Z,1:POKE FARBE + Z,14)</p>
 
         <p>Alles andere bleibt gleich. Tippen Sie RUN ein. Ergebnis: der VC 20 braucht 5,78 Sekunden, der C 64 7,3 Sekunden. Wir haben also eine Verkürzung von zirka drei Sekunden erzielt, das sind 30 Prozent!</p>
@@ -279,7 +279,7 @@
             30 Z = 0: S = 374: V=7680:F=38400: B = 1:D = 6<br>
             (30 S = 374: V=1024: F=55296:B = 1: D = 16)<br>
             40 POKE V+Z,B:POKE F+Z,D<br>
-            60 IF Z = STHEN 1000</p>
+            60 IF Z = S THEN 1000</p>
 
         <p>Die erzielte Verbesserung ist meßbar, aber nicht gerade überwältigend. Der VC 20 braucht nun 4,63 und der C 64 5,51 Sekunden. Mit dem bisher Gesagten läßt sich bereits eine erste generelle Regel für schnellere Basic-Programme aufstellen.</p>
 
@@ -317,7 +317,7 @@
 
         <p>Ändern Sie für <strong>Version 8</strong> die Zeilen 30 und 40:<br>
             30 Z = 0:S = 374<br>
-            40 PRINT &lsquo;A";</p>
+            40 PRINT "A";</p>
 
         <p>Erstaunlicherweise bringt das fast gar nichts, beim VC 20 nur 0,05 Sekunden Verbesserung, beim C 64 0,07 Sekunden. Die Erklärung liegt darin, daß beide Darstellungen, CHR$(65) und "A" ASCII-Code-Verwender sind. Damit ist der einzige Unterschied zwischen Version 7 und 8 die Anzahl der Zeichen im Programm.</p>
 
@@ -390,7 +390,7 @@
         </aside>
 
         <p>Ich bin fast am Ende meines Beschleunigungslateins. Nur eines bleibt noch, nämlich die bisher hochgehaltene Lesbarkeit des Programms zu opfern. Ich hoffe nämlich, Sie haben bisher meiner Eingangsforderung Folge geleistet und alles schön mit Leerzeichen geschrieben. Das behalten wir zunächst noch bei, im Gegenteil, wir wollen zunächst die Lesbarkeit noch erhöhen und REM-Erläuterungen einfügen. Ich schlage vor, die <strong>Version 13</strong> so auszuschmücken:<br>
-            10 TI$ = ”OOOOOO”:REM UHR AUF NULL<br>
+            10 TI$ = "000000":REM UHR AUF NULL<br>
             12 REM * * * * * * * * * * * * * * * * * * * * * * * *<br>
             13 REM *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>
             14 REM * TEST-PROGRAMM *;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>
@@ -421,7 +421,7 @@
         <p>In Version 15 treiben wir die Schrumpfung ins Extrem, indem wir das Programm im Prinzip unverändert aber mit einem Minimum an Zeilen schreiben, also möglichst viele Befehle in eine Zeile packen.</p>
 
         <p>Sie wissen, die maximale Zeilenlänge beträgt 88 Zeichen beim VC 20, 80 Zeichen beim C 64. Unser Programm können wir sogar in einer einzigen Zeile unterbringen — fast unglaublich, aber es geht. Sie müssen allerdings alle Abkürzungsmöglichkeiten ausschöpfen, die das Commodore-System bietet. Im Anhang der Commodore-Handbücher finden Sie die Liste aller Abkürzungen beim Eintippen: C und geSHIFTEtes H für CHR$, ? für PRINT und so weiter. Im nachfolgenden Ausdruck ist das natürlich nicht zu sehen, weil der Befehl LIST die Abkürzungen nicht berücksichtigt. So kommen auch mehr als 88 (80) Zeichen in eine Zeile des Listings, woran Sie sich nicht stören dürfen.<br>
-            10 TI$ = ”000000”:PRINTCHR$(147); :FORZ = 1TO374:PRINT’A”;:NEXT :POKE214,18:PRINT:PRINT TI/60 ”SEKUNDEN”:END</p>
+            10 TI$ = ”000000”:PRINTCHR$(147); :FORZ = 1TO374:PRINT"A";:NEXT :POKE214,18:PRINT:PRINT TI/60 ”SEKUNDEN”:END</p>
 
         <p>Und siehe da, diese »Kurzform« des Programms ist auch die allerschnellste Version. Der VC 20 braucht 0,78 Sekunden, der C 64 0,93 Sekunden. Diese letzte Beschleunigung wird dadurch erreicht, daß das Betriebssystem des Computers nur einmal einen Zeilenanfang und Zeilenende suchen und erkennen muß, statt sechsmal in der Version 14.</p>
 
@@ -444,7 +444,7 @@
 
         <ul>
             <li>Von A. Boyd (Manchester) stammt ein Primzahlen-Erzeuger, der für die obere Grenze von 65000 viele Stunden braucht.<br>
-                1 FOR N = 1 T0 65000:F = 0FOR J = 2 TO N-1:F = F + ((N-J*INT(N/J)) = 0):NEXT:X = -(F = 0):PRINT RIGHT$(STR$(X*N),6*X):NEXT</li>
+                1 FOR N = 1 TO 65000:F = 0FOR J = 2 TO N-1:F = F + ((N-J*INT(N/J)) = 0):NEXT:X = -(F = 0):PRINT RIGHT$(STR$(X*N),6*X):NEXT</li>
 
             <li>Ein anderer Einzeiler wurde von A.M. Simmelt (Sheffield) geschrieben zur Konvertierung von Dezimalzahlen in Dualzahlen.<br>
                 1 INPUT A:FOR I = 14 TO 0 STEP-1:Z = A AND 2↑I:A = A-Z:Z = Z/2↑I:Z$ = RIGHT$(STR$(Z),1):PRINT Z$;: NEXT:GOTO1</li>
@@ -459,7 +459,7 @@
 
         <p>Ich nenne diese Beschleunigung um 90 Prozent schlicht und einfach spektakulär.</p>
 
-        <p>Mehr allerdings kann ich nicht herausholen, es sei denn — naja, eigentlich habe ich am Anfang ganz laut »Basic« gesagt.</p>
+        <p>Mehr allerdings kann ich nicht herausholen, es sei denn — na ja, eigentlich habe ich am Anfang ganz laut »Basic« gesagt.</p>
 
         <p>Aber ich kann doch nicht widerstehen und Sie scharf machen auf ultima velocitas — zu deutsch Maschinensprache. Dazu aber in der nächsten Ausgabe.</p>
 
