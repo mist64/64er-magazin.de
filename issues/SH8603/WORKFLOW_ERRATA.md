@@ -284,3 +284,15 @@ crops — measured on clean MSE print. On Penco's faint dot-matrix dump it read
 it sometimes emits the address and data columns as separate lists. Tacco's
 own format carries a 16-bit row sum that proves a transcription as well as
 MSE's; the rule's recreation table has rows only for MSE and Checksummer.
+
+## 180 — monthly-shaped cases and a self-contradicting briefing
+
+From the 180 sub-agent, checked: Case C gives the Vorwort to the chief editor;
+a Sonderheft's Vorwort is signed by the Koordination (Georg Klinge, as on
+SH8602). "A full-name signature takes NO parentheses" — this one is printed
+with them, kept as printed as SH8602 did. The Impressum closed-vocabulary
+check finds no `xx = Name` key in a Sonderheft masthead, so every initial is
+"UNDEFINED". Briefing step 3 says "Expand initials → full names from the
+previous issue's Impressum" while the guardrail says keep initials exactly as
+printed. And `blocks/pNNN.txt` truncation hid ~40 of 50 bylines; the agent
+had to use `NNN.json` — the r000 warning names labels.json, not the rule.
