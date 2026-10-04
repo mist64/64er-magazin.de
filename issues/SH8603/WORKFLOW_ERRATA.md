@@ -224,3 +224,15 @@ address mismatch cannot be expressed. Verifier #6 (≥3 words after
 "Listing N.") flags verbatim print captions like "Listing 2. »INT«" — 12
 false hits. r130 says captions are verbatim; r170 says drop page pointers —
 same captions ("Bitte beachten … Seite 76"), no precedence stated.
+
+## 140 — the cross-issue check cannot see reprints, and its slug list is monthly-shaped
+
+From the 140 sub-agent: check 4 compares against ONE previous issue, but a
+Sonderheft built from monthly reprints takes its ids from the monthly
+originals (here 8501, 8410/11, 8505 ×3, 8506, 8507, 8510). Only a text-overlap
+pass over the whole corpus found the 8 reprints — and r330 needs that list
+too, so the step that finds it should be told to record it. Check 4's slug
+list has `bücher`/`cpm` but not `vorwort`/`checksummer`/`mse`/`impressum`/
+`abtippen`, so against a Sonderheft it passes trivially; the Sonderheft
+paragraph says these are "not in the list below" (the list is above it), and
+`abtippen` is nowhere in the rule. `mse` does not recur on a VC 20/C16 issue.
