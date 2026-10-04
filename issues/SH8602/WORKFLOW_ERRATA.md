@@ -560,3 +560,17 @@ Also unstated: placement of a lead image when the article has no `p.intro`, and
 of a figure first named inside an `<li>`; what to do when an owner crop covers a
 listing whose `[ILLEGIBLE]` markers had no ruling (152-1). Found by the 150
 sub-agent.
+
+## 006 — I briefed the build before the owner's page review (rule was right)
+
+r006: "Do not compile until the issue owner has looked at the exact files that
+will be embedded and said they are good … Then WAIT." My dispatch said "build
+… copy into the repo" in one go; the agent built, flagged the conflict, and the
+PDF is held uncommitted for review. The rule was right; the orchestrator
+skipped it. Also from the 006 agent: the Inputs list says `masters600` where a
+sheet issue embeds `a4600`; the stamp has no `master-px` field (`canvas-px`);
+the retouch snippet resizes a 5457×7181 sheet canvas to 1240×1754 (distorts —
+use `a4600/001.png`); the `paper` mask it cites is not saved for a4600 pages;
+step 2's by-product PDF still runs the full guetzli search unless
+`ENCODER=fast`; both scripts hardcode `NCPU=$(sysctl -n hw.ncpu)` instead of
+`lanes()` (load ~520 during OCR); README still says "PDF/A-3B".
