@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Den C16 und VC 20 durchschaut</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christoph Sauer, ev">
+    <meta name="64er.issue" content="Sonderheft 3/86">
+    <meta name="64er.pages" content="31-37,39-40">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX8">
+</head>
+
+<body>
+    <article>
+        <h1>Den C16 und VC 20 durchschaut</h1>
+        <p class="intro">Der VC 20 und der C16 besitzen – so erstaunlich das auch klingen mag – sehr viele Gemeinsamkeiten. Im Rahmen dieses Kurses bekommen Sie einen Einblick in den inneren Aufbau und die Programmierung beider Computer.</p>
+
+        <p>Dieser Kurs wird »zweigleisig« abgehandelt. Die im normalen Textangeführten Adressen beziehen sich immer auf das Betriebssystem des VC 20. Die entsprechenden Werte für den C 16 sind in Klammern dahinter angegeben. Oft wird es auch vorkommen, daß nur eine Adresse genannt wird, da diese bei beiden Geräten gleich ist.</p>
+
+        <p>Die Betriebssysteme des VC 20 und des 16 sind sehr flexibel gestaltet. Es gibt für den Benutzer viele Möglichkeiten, das Bestehende zu ändern oder zu ergänzen.</p>
+
+        <h2>Wie Basic den Speicher verwaltet</h2>
+
+        <p>Beginnen wollen wir mit der Organisation des verfügbaren RAM durch den Basic-Interpreter.</p>
+
+        <p>Der Basic-Beginn liegt bei Adresse 4096, das Ende bei Adresse 7680 (16383) (die Werte beziehen sich auf die Grundversion). Unmittelbar ab dem Basic-Beginn wird das eigentliche Programm abgelegt. An dessen Ende beginnen die Variablen und Felder (Bild 1 und Tabelle 1).</p>
+
+        <p>Der Variablenbereich wächst beim Anlegen neuer Variablen von unten nach oben. Nur das Stringende wandert in entgegenlaufender Richtung.</p>
+
+        <p>Die wichtigsten Zeiger, wie unter anderem Beginn und Ende von Basic und Variablen, sind in der Zeropage (Adresse O bis 256) abgelegt (Tabelle 1). Dabei ist die Reihenfolge. Low-Byte/High-Byte zu beachten (Adresse = High-Byte x 256 + Low-Byte).</p>
+
+        <p>Um Speicherplatz für Maschinenprogramme oder Sonderzeichen zu schaffen, hat man prinzipiell zwei Möglichkeiten. Entweder man verschiebt den Basic-Anfang nach oben oder das Basic-Ende nach unten. Letztere Alternative ist in den meisten Fällen günstiger.</p>
+
+        <p>Um zum Beispiel beim VC 20 das Basic-Ende von Adresse 7680 nach 7168 (= 512 Byte) zu verlegen, gibt man ein: POKE 55,0:POKE 56,28:CLR:REM(256 * 28 = 7168)</p>
+
+        <p>Bei anderen Speichergrößen verfährt man analog.</p>
+
+        <p>Der Befehl CLR ist nötig, damit sich verschiedene Hilfszeiger (Stringbeginn und Felderende) anpassen können.</p>
+
+        <p>Die andere Alternative der Platzbeschaffung ist etwas komplizierter und gilt sinnvollerweise nur für den VC 20. Sie wird nur.bei erweitertem Speicher angewendet, um dort Sonderzeichen abzulegen. Um den Anfang des Programmspeichers von 4608 nach 7680 zu schieben, gibt man:</p>
+
+        <p>POKE 44,30:POKE 30 * 256,0:NEW ein, denn 30 x 256 ist gerade 7680. Der zweite POKE-Befehl ist nötig, da am Anfang des Basic-Bereichs immer ein Nullbyte stehen muß.</p>
+
+        <p>Eine Besonderheit bietet hier der C16 (in der Grundversion). Wenn man mit dem Befehl GRAPHIC die hochauflösende Grafik des C 16 einschaltet, dann verkleinert sich der Gesamtspeicher um 14 KByte. In diesem Teil des Speichers (siehe auch Bild 6b) werden dann die grafischen Informationen festgehalten.</p>
+
+        <p>Die Reservierung dieses Bereiches wird ebenfalls durch die Veränderung des Zeigerpaares (55/56) realisiert.</p>
+
+        <p>Schaltet man in den Textmodus zurück, dann bleiben einem nur noch 2 KByte für Programme. Benötigt man den Platz für die Grafiken nicht mehr, so kann man den dafür freigehaltenen Speicherbereich mit »POKE 55,0: POKE 56,63: CLR« fürs Basic wieder freigeben.</p>
+
+        <h2>Erste Hilfe — Basicprogramme retten nach NEW oder Reset</h2>
+
+        <p>Schon oft wurden Verfahren beschrieben, um nach einem versehentlichen NEW das Basic-Programm wieder zurückzuholen. Doch wie funktionieren diese Verfahren? Um das zu verstehen, betrachten wir zunächst kurz den Aufbau eines Basic-Programms (Bild 2).</p>
+
+        <p>Am Kopf des Programms steht immer eine Null. Dann folgten die Adresse der nächsten Programmzeile (Koppeladresse) und die Zeilennummer. Danach kommt die eigentliche Programmzeile, die sich aus den sogenannten Tokens den Basic-Codenummern (Tabelle 2) – zusammensetzt. Am Ende dieser Zeile steht dann nochmals eine Null. Die nächste Zeile beginnt wieder mit einem Verbindungszeiger und der Zeilennummer. Das Programm wird mit drei Nullen abgeschlossen. Hieran schließen sich die Variablen an (vergleiche Bild 1). '</p>
+
+        <p>Durch NEW oder durch einen RESET wird nicht das gesamte Programm, sondern nur der Variablenpointer (45/46) und die erste Koppeladresse gelöscht. Durch Rekonstruktion dieser beiden Zeiger kann das scheinbar verlorene Basic-Programm wieder benutzt werden.</p>
+
+        <p>Hier nun das »Rezept« zur Rekonstruktion: © POKE (Basic-Anfang) + 2,1</p>
+
+        <p>Basic-Anfang in GV = 4096 (4096)</p>
+
+        <ul>
+            <li>3K = 1024 (-)</li>
+        </ul>
+
+
+        <p>+8K = 4608 (-)</p>
+
+        <p>© SYS 50483:POKE 46,PEEK(35):POKE 45,</p>
+
+        <p>PEEK (781)+2:CLR</p>
+
+        <p>© Die Besitzer des C 16 geben statt dessen ein:</p>
+
+        <p>SYS 34840 : SYS 34892</p>
+
+        <p>Unbedingt wichtig ist hier die Reihenfolge der Befehle! Ferner darf während der gesamten Prozedur keine Variable definiert werden, da diese das gelöschte Programm überschreiben würde.</p>
+
+        <p>Die Funktionsweise ist relativ einfach. Die Unterprogrammroutine in Adresse 50483 bindet die Programmzeilen neu und stellt dabei den ersten Verbindungszeiger wieder her. Sie übergibt dann in den beiden Speicherstellen 35 und 781 die Adresse des Variablenbeginns -2.</p>
+
+        <h2>Blick in die Zeropage</h2>
+
+        <p>Die Zeropage – oder zu deutsch die Seite null – istin Maschinensprache besonders einfach zu handhaben. Als Seite bezeichnet man im übrigen immer ein Paket von jeweils 256 Byte. So entspricht Seite O den Adressen 0-255, Seite 1 den Adressen 256-511 und so weiter.</p>
+
+        <p>Eine Zeropage-Adressierung, zum Beispiel LDA $42, benötigt nur zwei Byte, eine absolute Adressierung, zum Beispiel LDA $1234, hingegen drei Byte im Speicher. Damit verbunden ist auch die Bearbeitungsgeschwindigkeit eines Maschinenprogramms. Denn die Zeropage-Adressierung ist schneller als die entsprechende Drei-Byte-Methode. Bei kleineren Programmen in Assembler fällt dieser Aspekt zwar nicht so sehr ins Gewicht, bei sehr umfangreichen Routinen (wie zum Beispiel beim Basic-Interpreter und bei Schleifen) spielt die Adressierungsart jedoch eine größere Rolle.</p>
+
+        <p>In der Seite O legt der Computer also insbesondere die Daten ab, die er oft benötigt, wie zum Beispiel Vektoren, Parameter etc. Die komplette Liste der Adreßbelegung zeigt Tabelle 3a (Tabelle 3b gilt für den C 16).</p>
+
+        <p>Wir wollen es jedoch nicht nur mit der Aufstellung alleine bewenden lassen. Die interessantesten Lokationen möchte ich hier herausgreifen und besprechen. Alle angeführten Adressen gelten, soweit nicht anders angegeben, sowohl für den VC 20 als auch für den C 16.</p>
+
+        <p>Adresse 43-56: Diese Adressen spielen, wie wir schon im ersten Teil gesehen haben, bei der Verwaltung von Basic-"Programmen und -Variablen eine zentrale Rolle. Über sie erfolgt die Trennung zwischen Programm und den einzelnen Variablentypen. Auch für das Speichern und Laden von Programmen liefern sie die Basisdaten. Die einzelnen Funktionen können Sie Tabelle 3 entnehmen.</p>
+
+        <p>Eine interessante Gebrauchsmöglichkeit ergibt sich durch die Memoryroutine. Dies ist ein kurzes Basic-Programm, welches die Aufgabe hat, den von Programmen, Variablen, Strings und Arrays belegten Speicherplatz festzustellen (Listing 1):</p>
+
+        <p>Wie man nach dem Starten des Programms sehen kann, erhält man die Werte, indem man die Zeiger – nachdem sie in Dezimalzahlen umgewandelt worden sind – voneinander subtrahiert. Den Speicherplatz, der durch Variablen belegt ist, erhält man beispielsweise durch Subtraktion des Hilfszeigers, »Beginn der Variablen« (45/46) von dem Zeigerpaar »Beginn der Arrays« (47/48).</p>
+
+        <p>Gerade bei stark limitiertem Speicherplatz (wie zum Beispiel in der Grundversion) kann dieses Hilfsprogramm Aufschluß.über die momentane Speicherverteilung geben.</p>
+
+        <p>Adresse 59, 60: Diese Speicherzellen enthalten die laufende Zeilennummer eines Basic-Programms. Sollte es im Programmlauf unterbrochen werden, hat man hier die Möglichkeit, die Zeilennummer nachzulesen.</p>
+
+        <p>Zustandsbeschreibung: das Statusflag Dezimal Hexadezimal</p>
+
+        <p>0- 2 00 - 02</p>
+
+        <p>Adresse 144: Dieses Statusflag ist auch von Basic aus über 9-4 1095-04 die STATUS- beziehungsweise ST-Anweisung abfragbar. Es A A liefert das Computerstatus-Byte, dessen Inhalt aufgrund der 8 08 letzten Input-Output-Operation gesetzt wurde. Bezogen auf 9 09 den Kassettenport liefert es nach Bild 3 bestimmte Meldun- 10 OA gen. Die Informationen über die geladenen Programme wer- 11 0B den binär wiedergegeben. Die Null signalisiert ein ordnungs- 12 0C gemäß geladenes Programm. 32 hingegen bedeutet, daß ein 13 0D Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der 14 0E Computer mehrere Meldungen in dieses Byte packt, bei- r vr spielsweise 52 = 32 + 16 + 4: Hier wurde ein kurzer Block 17 1 geladen, jedoch ist die Prüfsumme falsch, und ein fataler 18 12 Ladefehler liegt vor. 19 13</p>
+
+        <p>An dieser Stelle ist es angebracht, sich näher mit dem Auf- 20- 21 | 14-15 zeichnungsverfahren zu beschäftigen (Bild 4). 22 16 23- 24 17 - 18 25- 33 19 - 21 34- 37 22 - 25</p>
+
+        <p>So kommen Programme aufs Band 38- 42 | 26-24</p>
+
+        <p>43- 44 2B - 2C 45- 46 2D - 2E</p>
+
+        <p>Jeder Speichervorgang beginnt mit dem Header. Dieser 47- 48 | 2F - 30 Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekun- -49- 50 | 31-32 den langer Pfeifton) und dem eigentlichen Programmkopf. 51- 52 | 33 - 34 Dieser enthält vier wichtige Informationen, nämlich über Pro- 53- 54 | 35-36 grammtyp, Startadresse, Endadresse und Programmname. P% 5 a ' I Diese Daten sind ebenfalls im Bandpuffer zu finden und kön- 59- 60 | 38- sc nen von dort abgerufen werden. = . 61- 62 | 3D- 3E</p>
+
+        <p>Das erste Byte (Adresse 828 beziehungsweise 818 beim 63- 64 | 3F - 40 C 16) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß 65- 66 | 41-42 es sich um ein Programm handelt, das verschoben geladen 67- 68 | 43.- 44 werden kann, also auch an eine andere Stelle als die, von der 69- 70 | 45 - 46 aus es gespeichert wurde. Das Gegenstück dazu ist die 71-72 | 47-48 absolute Lademethode (Headertyp 3). Gemeint ist 73- 74 | 49 - 4A. »LOAD"."1,1«. Die Sekundäradresse 1 signalisiert dem Com- | 75° 76 | +8- 40 puter, daß er das Programm (unabhängig von den Zeigern IM 79 E F f . . . - 43, 44) wieder in den gleichen Adreßbereich laden soll. Um 80- 83 | 50-53 Verwechslungen vorzubeugen, ist es wichtig, Headertyp und 84- 86 | 54 - 56 Sekundäradresse zu unterscheiden. Für den Headertyp gibt 87- 96 | 57-60 es drei Möglichkeiten:</p>
+
+        <ol>
+            <li>
+                <p>Laden mit Verschiebelader (die Anfangsadresse wird 97 61 durch den Zeiger 43 und 44 bestimmt). 98 - 101 62 - 65</p>
+            </li>
+            <li>
+                <p>Ein File – also Daten aus Variablen – wurde ge- 102 66 103 67 speichert. 104 68</p>
+            </li>
+        </ol>
+
+
+        <p>Die Unterscheidung ist wichtig, denn Daten können " 105 69 R } nicht mit LOAD geladen werden. 106-109 | 6A-- ep</p>
+
+        <ol>
+            <li>Ein Programm ist absolut zu laden. 110 6E</li>
+        </ol>
+
+
+        <p>Die nächsten vier Byte geben die Anfangs- und Enid- 11 6F adresse des geladenen Files an. Mit der Endadresse hat es 112 70</p>
+
+        <p>Bemerkung</p>
+
+        <p>USR-Sprungvektor (Normal: JMP $D248) Vektor für Unterprogramm Fileßkonma nach Integer a Rame uchzeichen (sucht " oder Zeilenende) Hochkommaflag</p>
+
+        <p>Spaltenspeicher beim TAB-Befehl LOAD/VERIFY Flag (0 = LOAD/1 = VERIFY) Eingabepufferzeiger (Anzahl der Elemente) Flag für Dim (enthält die laufende Variable) Variablentyp (0 = Numerisch/128 = String) Numerische Variable (0 = Fließkomma/128 Integer) a und LIST</p>
+
+        <p>Eingabeflag (0 = INPUTI64 = GET/152 = READ) Vorzeichen beisATN Aktuelles Ein-/Ausgabegerät Integerwert (zum Beispiel Zeilennummer Zeiger im Stringstapel</p>
+
+        <p>Zeiger auf den zuletzt verwendeten String Stringstapel</p>
+
+        <p>Speicher für div. Hilfszeiger Speicherbereich bei einer Mulipikaton Zeiger auf Beginn des Basic-Speicherbereichs Beginn der Variablen (= Ende des Programms) Beginn der Arrays (= Ende der Variablen) Zeiger auf Ende der Arrays Zeiger auf Beginn der Strings Hilfszeiger für Strings ehe EEE</p>
+
+        <p>Vorherige Basic-Zeilennummer Zeiger auf Ifd. Basio-Befehl (für CONT) Momentane Zeilennummer für DATA Momentane Adresse einer DATA-Zeile Zeiger auf Element in DATA-Zeile und INPUT-Vektor Momentaner Variablenname Adresse der momentanen Variablen Zeiger für FORINEXT Variable D—— Zwischenspeicher für Programmzeiger (bei SAVE) Bere Vergleichssymbole eiger für FN</p>
+
+        <p>Verschieden genutzter Speicherbereich FN-Sprungvektor (ähnlich USR) Feld für diverse arithmetische Zwecke (Arithmetik Akku #3 und #4) Fließkommaakku #1 : Exponent Fließkommaakku #1 : Matisse Fließkommaakku #1 : Vorzeichen Zeiger für Polynomauswertung Überlauf von Akku #1 Flioßkommaakku #2 : Exponent : EXponen Fließkommaakku #2 : Mantisse Fließkommaakku #2 : Vorzeichen Vergleichsbyte der Vorzeichen von Akku 1 und 2 Rundung für Akku #1 und. #2 eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Dezimal Hexadezimal Bemerkung</p>
+
+        <p>113-114 71-72 Länge des Kassettenpuffers</p>
+
+        <p>115 - 138 73 - 8A CHRGET-Routine</p>
+
+        <p>139 - 143 8B - 8F RND-Wert als Fließkommazahl</p>
+
+        <p>144 90 Statusflag ST</p>
+
+        <p>145 91 STOP-Flag</p>
+
+        <p>150 96 Kassetten EOT (End of Tape) erhalten</p>
+
+        <p>151 97 Zwischenspeicher für Register</p>
+
+        <p>152 98 Anzahl der offenen Dateien</p>
+
+        <p>153 99 Eingabegerät (Normal = 0 : Tastatur)</p>
+
+        <p>154 9A Ausgabegerät (Normal = 3 : Bildschirm) 155 9B Paritätsbyte)</p>
+
+        <p>150 96 Kassetten EOT (End of Tape) erhalten . 151 97 Zwischenspeicher für Register</p>
+
+        <p>152 98 Anzahl der offenen Dateien</p>
+
+        <p>153 99 Eingabegerät (Normal = 0 : Tastatur)</p>
+
+        <p>154 9A Ausgabegerät (Normal = 3: Bildschirm) 155 9B Paritätsbyte vom Band (Prüfsumme)</p>
+
+        <p>156 9C Flag für Byte erhalten (von Band)</p>
+
+        <p>157 9D Flag für Direktmodus (= 128) oder Programm (= 0) 158 9E Band: erster Teil – Prüfsumme</p>
+
+        <p>159 9F Band: zweiter Durchlauf – Prüfsumme</p>
+
+        <p>160 - 162 AO - A2 Interne Uhr (Stunde, Minute, Sekunde)</p>
+
+        <p>163 A3 Bitzähler für serielle Ausgabe</p>
+
+        <p>164 a4 Zähler für Band</p>
+
+        <p>165 A5 Startsynchronisation bei Kassetten</p>
+
+        <p>166 A6 Zeiger im Bandpuffer</p>
+
+        <p>167 - 171 AT - AB Flags für Schreiben/Lesen bei Band</p>
+
+        <p>172 - 173 AC - AD Zeiger auf Kassettenpuffer und für scrolling 174 - 175 Ae - AF Zeiger auf Programmende bei LOAD</p>
+
+        <p>176 - 177 BO - B1 Bandzeitkonstanten</p>
+
+        <p>178-179 B2 - B3 Startadresse des Bandpuffers</p>
+
+        <p>180 B4 Bitzähler für Band</p>
+
+        <p>181 B5 Band oder RS232: nächstes zu sendendes Bit 182 B6 Übertragungsspeicher für RS232</p>
+
+        <p>183 B7 Länge des Filenamens</p>
+
+        <p>184 B8 Logische Filenummer</p>
+
+        <p>185 B9 Sekundäradresse</p>
+
+        <p>186 Ba Gerätenummer</p>
+
+        <p>187 - 188 BB - BC Zeiger auf Filenamen</p>
+
+        <p>189 BD Ein-/Ausgabespeicher (für seriell)</p>
+
+        <p>190 BE Blockzähler für Band</p>
+
+        <p>191 - BF Puffer für serielle Ausgabe</p>
+
+        <p>192 co Bandmotor Flag j 193 - 194 c1-C2 Startadresse für Ein-/Ausgabe</p>
+
+        <p>195 - 196 03 - C4 Endadresse für Ein-/Ausgabe</p>
+
+        <p>197 05 gedrückte Taste (momentaner Wert im Tastaturmatrixcode)</p>
+
+        <p>198 C6 Anzahl der gedrückten Tasten (im Tastaturpuffer) 199 c7 Bildschirm: negative Anzeige</p>
+
+        <p>200 08 Zeiger auf Zeilenende bei Eingabe</p>
+
+        <p>201 c9 Cursorzeile</p>
+
+        <p>202 CA Cursorspalte</p>
+
+        <p>203 CB Welche Taste? (64 = keine)</p>
+
+        <p>204 cc Cursorblinken</p>
+
+        <p>205 CD Cursor Blinkzähler</p>
+
+        <p>206 CE Zeichen unter dem Cursor</p>
+
+        <p>207 CF Flag für Cursorblinken (0 = An/1 = Aus) 208 DO Eingabe von Bildschirm/oder Tastatur</p>
+
+        <p>209 - 210 Di - D2 Start der-aktuellen Bildschirmzeile</p>
+
+        <p>211 D3 Position des Cursors in der aktuellen Bildschirmzeile 212 D4 Flag für Cursor (0 = Direkt, sonst programmiert) 213 D5 Länge der Bildschirmzeile (21'0d. 42 od. 63 od. 84) 214 D6 Cursorzeile .</p>
+
+        <p>215 D7 Zeiger für diverse Zwecke</p>
+
+        <p>216 D8 Anzahl der Inserts</p>
+
+        <p>217-242 DI - F2 High Bytes der Bildschirmzeilenanfänge 243 - 244 F3 - F4 Zeiger im Farbspeicher</p>
+
+        <p>245 - 246 F5 - F6 Zeiger in der Tastaturdekodiertabelle</p>
+
+        <p>247 - 248 FT -F8 Zeiger auf RS232 Eingabepuffer</p>
+
+        <p>249 - 250 F9 - FA Zeiger auf RS232 Ausgabepuffer</p>
+
+        <p>251 - 254 FA- FE Freie Zeropageadressen</p>
+
+        <p>255 -(266) | FF - 10A Zwischenspeicher für Fließkomma nach ASCII</p>
+
+        <p>Tabelle 3a. Die Zeropage beim VC 20 (Schluß)</p>
+
+        <p>Dezimal Hexadezimal Bemerkung</p>
+
+        <p>0 $0000 Datenrichtungsregister des 7501</p>
+
+        <p>1 $0001 Ein-/Ausgabe-Port des 7501</p>
+
+        <p>2 $0002 Flag für Schleifen . 3- 4 | $0003-0004 | Neue Startadresse (Renumber)</p>
+
+        <p>5- 6 1$0005-0006 | Schrittweite (Renumber)</p>
+
+        <p>7 $0007 Gesuchtes Zeichen</p>
+
+        <p>8 $0008 Flag für Anführungszeichen-Modus</p>
+
+        <p>9 $0009 TAB-Spaltenzähler</p>
+
+        <p>10 $000A Flag: O0 = Load, 1 = Verify 11 $000B Zeiger für Eingabepuffer, Anzahl der Elemente 12 $000C Flag für Standard-DIM 13 $000D Datentyp: $FF=String, $00=Numerisch 14 $000E Datentyp: $80=Integer, $00=Fließkomma 15 $000F Flag für DATA/LIST</p>
+
+        <p>16 $0010 Flag: Element/FNx-Flag 17 $0011 Flag: $00=INPUT, $40=GET, $98=READ 18 $0012 Flag: Vorzeichen des ATN 19 $0013 Flag: Input-Prompt</p>
+
+        <p>20- 21 $0014-0015 | Int. Adresse</p>
+
+        <p>22 $0016 Zeiger auf temporären Stringstapel 23- 24 |$0017-0018 | Letzter temporärer Stringvektor 25- 33 | $0019-0021 | Stapel für temporäre Strings 34- 35 | $0022-0023 | Bereich für Hilfszeiger 1 36- 37 | $0024-0025 | Bereich für Hilfszeiger 2 38 $0026 Bereich für Produkt bei Multiplikation 39 $0027 Bereich für Produkt bei Multiplikation 40 $0028 Bereich für Produkt bei Multiplikation 41 $0029 Bereich für Produkt bei Multiplikation 42 $002A Bereich für Produkt bei Multiplikation 43- 44 $002B-002C | Zeiger auf Basic-Anfang 45- 46 $002D-002E | Zeiger auf Variablen-Anfang 47- 48 | $002F-0030 | Zeiger auf Beginn der Arrays 49- 50 | $0031-0032 | Zeiger auf Ende der Arrays (+1) 51- 52 $0033-0034 | Zeiger auf Stringspeicher 53- 54 | $0035-0036 | Hilfszeiger für Strings 55- 56 | $0037-0038 | Zeiger auf Speichergrenze 57- 58 $0039-003A | Laufende Basiczeilennummer 59- 60 $003B-003C | Textpointer</p>
+
+        <p>61- 62 $003D-003E | Zeiger auf Basic-Statement für CONT 63- 64 | $003F-0040 | Nummer der aktuellen DATA-Zeile 65- 66 1|$0041-0042 | Adresse des aktuellen DATA-Elementes 67- 68 $0043-0044 | Sprungvektor für INPUT 69- 70 $0045-0046 | Aktueller Variablenname 71- 72 $0047-0048 | Adresse der aktuellen Variablen 73- 74 | $0049-004A | Variablenzeiger für FOR...NEXT 75- 76 $004B-004C | Zwischenspeicher für Basic-Zeiger 77 $004D Akkumulator für Vergleichssymbole 78- 79 $004E-004F | Arbeitsbereich (Zeiger etc.) 80- 81 $0050-0051 | Arbeitsbereich (Zeiger etc.) 82 $0052 Arbeitsbereich (Zeiger etc.) 83 $0053 Grafik-Modus</p>
+
+        <p>84- 86 $0054-0056 | Sprungvektor für Funktionen 87- 96 | $0057-0060 | Bereich für numerische Operationen 97 $0061 Fließkomma-Akkumulator 1 (FAC): Exponent</p>
+
+        <p>98-101 $0062-0065 | Fließkomma-Akkumulator 1 (FAC): Mantisse</p>
+
+        <p>102 $0066 Fließkomma-Akkumulator 1 (FAC): Vorzeichen</p>
+
+        <p>103 $0067 Zeiger für Polynom-Auswertung 104 $0068 Fließkomma-Akkumulator 1 Überlauf 105-110 $0069-006E | Fließkomma-Akkumulator 2 Exponent etc. 111 $006F Vorzeichenvergleich Akku 1 mit Akku 2 112 $0070 Fließkomma-Akkumulator 1 niederwertige Stelle 113-114 $0071-0072 | Kassettenpuffer Länge/Zeiger 115-116 $0073-0074 | Automatisches Zeileninkrement O=AUS 117 $0075 Grafik-Flag O=Text 255=Grafik 118-120 $0076-0078 | Arbeitsbereich ' 121-123 | $0079-007B | Darstellung von DS$ | 124-125 | $007C-007D | Basic-Pseudo-Stack-Pointer 126-143 | $007E-008F | Arbeitsbereich (Sound) 144 $0090 Statuswort ST</p>
+
+        <p>Tabelle 3b. Die Zeropage beim C16 Load Error geschieht dies nicht; »PRINT FRE(O)« zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm – das vielleicht nur einen geringfügigen Fehler hat – dann nicht starten, weil die Variablen dieses überschreiben würden. Abhilfe schafft in diesem Fall</p>
+
+        <p>POKE 45,PEEK(831) :POKE 46, PEEK(832):CLR.</p>
+
+        <p>Für den C 16 gibt man ein:</p>
+
+        <p>POKE 45,PEEK(821) :POKE 46,PEEK(822): CLR</p>
+
+        <p>Die Werte werden damit »von Hand« übertragen und ein: normaler Programmablauf ist in den meisten Fällen wieder möglich.</p>
+
+        <p>Jetzt aber wieder zurück zu Bild 3: Nachdem der Vorspann und der Programmkopf vor einem Trennzeichen (dies ist ein ganz kurzer Pieps) auf Band geschrieben worden sind, wird der Header gleich noch einmal gespeichert.</p>
+
+        <p>Dies ist eine Eigenheit des Commodore-Systems, das der Datensicherheit dient. Denn nachdem der Programmkopf 1 geladen hat, vergleicht er in einem zweiten Durchgang das bisher Geladene (welches sich ja schon im Speicher befindet) mit Programmkopf 2. Eine Abweichung veranlaßt den Computer, eine Fehlermeldung auszugeben, in ganz schweren Fällen wird der Ladevorgang gleich ganz unterbrochen. Diese Verfahrensweise gilt nicht nur für den Programmkopf, sondern auch für Programme und Daten – sie alle werden doppelt gespeichert.</p>
+
+        <p>Beim C 16 kommt noch eine spezielle Eigenheit hinzu. Da der recht komplexe TED-Chip (siehe separaten Artikel in diesem Heft) den Prozessor bei dessen Ladearbeit – die jasehr schnell vonstatten gehen muß – stark behindert, wird er ganz einfach abgeschaltet. Aus diesem Grund bleibt der Bildschirm während des Ladevorganges dunkel.</p>
+
+        <p>Nachdem also der Programmkopf erkannt worden ist, zeigt der Computer den Filenamen an, und das eigentliche Programm (oder die Daten) wird geladen. Ihnen ist wiederum ein kurzer Vorspann vorangestellt. Der Endblock besteht aus Endmarkierung und einem Nachspann. Er zeigt dem Computer das Ende des geladenen Programms an, womit der Ladevorgang beendet ist.</p>
+
+        <p>Nach diesem Exkurs zum Kassettenaufzeichnungsformat nun wieder zur Zeropage.</p>
+
+        <p>Adresse 145: Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen: Wert =</p>
+
+        <p>253: Linke SHIFT-Taste gedrückt</p>
+
+        <p>254: STOP-Taste gedrückt</p>
+
+        <p>255: Keine der beiden gedrückt</p>
+
+        <p>Wenn man das Low-Byte des STOP-Vektors (Adresse 808, beim C 16: 806) mit POKE 808,PEEK (808)-2 ändert (bitte beim C 16 Adresse 806 statt 808 verwenden), so ist man in der Lage, diese Taste von Basic aus abzufragen, ohne das laufende Programm anzuhalten. Ihr kann dann in der Routine eine besondere Funktion zugewiesen werden, beispielsweise Anhalten des Programmablaufs für eine bestimmte Zeit.</p>
+
+        <h2>Der Weg einer Eingabezeile</h2>
+
+        <p>Wenn wir einen Basic-Befehl im Direktmodus (LIST, RUN, PRINT) oder eine Programmzeile mit Zeilennummer eingeben, werden die Informationen – wie bekannt – auf den Bildschirm geschrieben und gelangen gleichzeitig in den Basic-Eingabepuffer (Adresse 512-600/ $0200-$0258). Dort werden Programmzeilen oder direkte Befehle zunächst einmal im ASCIlI-Format gesammelt (Bild 5a). Dies geschieht solange, bis man die RETURN-Taste betätigt.</p>
+
+        <p>Dieser Puffer hat eine Kapazität von 88 Zeichen – also den bekannten vier Bildschirmzeilen beim C20 beziehungsweise 2 Bildschirmzeilen beim C16..</p>
+
+        <p>Drückt man die RETURN-Taste, so beginnt der Interpreter mit der Auswertung der Kommandos. Eingaben ohne Zeilennummer werden auf ihre Syntax hin überprüft und danach ausgeführt.</p>
+
+        <p>Verfolgen wir nun einmal genauer den Weg einer Befehlszeile. Die einzelnen ASCIlI-Zeichen werden von einer Maschinensprachen-Unterroutine namens »CHRGET aus dem Puffer gelesen und mit den Befehlswörtern aus dem ROM verglichen. War die Überprüfung positiv – ist der Befehl also identifiziert worden -, so verkürzt der Computer die Kommandozeile, indem er die Befehle in Token (Tabelle 2) umwandelt. Diese Prozedur durchlaufen sowohl die Programmzeilen (mit Zeilennummer) als auch die direkten Kommandos (Bild 5b). An dieser Stelle trennen sich nun aber die Wege dieser beiden Zeilentypen. °</p>
+
+        <p>Zunächst zu dem weiteren Weg einer Programmzeile. Die inzwischen komplett übersetzte Zeile im Basic-Puffer wird nun in einem zweiten Durchlauf vom Zwischenspeicher in den Programmspeicher übertragen, wobei sie auch gleich richtig eingeordnet wird (damit die Reihenfolge der Zeilennummern stimmt). Weil sich dadurch der Programmbereich im Basic-Speicher vergrößert, muß der Variablenbereich weiter oben angesiedelt werden. Die bis dahin gespeicherten Variablen werden dadurch natürlich überschrieben. Nach dem Übertragen der Programmzeile springt das Interpreterprogramm wieder in die Warteschleife zurück, damit weitere Befehle entgegengenommen werden können.</p>
+
+        <p>Nun möchte ich den weiteren Weg einer Direktmoduszeile beschreiben, denn der verläuft anders. Nachdem die Zeile mit Hilfe der CHRGET-Routine (Adresse 115-138 beziehungsweise beim C 16: 1139-1156) in Interpretercode (also Token) umgewandelt worden ist, wird der 2-Byte-Zeiger ($7A-$7B) auf den Pufferanfang zurückgestellt und der Inhalt wie eine Programmzeile behandelt und abgearbeitet (wieder mit Hilfe der CHRGET-Routine).</p>
+
+        <h2>Verbotenes</h2>
+
+        <p>Die Befehle INPUT und GET dürfen im Direktmodus nicht verwendet werden. Der Grund liegt darin, daß diese Eingabebefehle ebenfalls den Basic-Eingabepuffer zur Zwischenspeicherung der Daten verwenden. Das »Direktmodusprogramm«, das sich zu dieser Zeit im Puffer befindet, würde dann überschrieben. Um das zu verhindern, sind diese Kommandos im Direktmodus verboten (Fehlermeldung »ILLEGAL DIRECT«).</p>
+
+        <p>Der nächste größere Komplex, den wir hier behandeln wollen, ist die Tastaturverwaltung. Wie Sie bestimmt schon öfter bemerkt oder gelesen haben, wickelt der VC 20 (und der C 16) seine Tastaturoperationen ebenfalls über einen Puffer ab (vergleiche Tabelle 4). Dies wird beim LISTen von Basic-Programmen deutlich, denn während der Computer ein Programm ausgibt, können alle Tasten (mit Ausnahme des STOP-Keys) drücken – diese erscheinen aber nicht auf dem Bildschirm. Erst wenn das Programm zu Ende gelistet ist, sieht man, daß keine Taste »vergessen« wurde, denn alle Eingaben wurden im Tastaturpuffer (Adresse 631-640, beim C 16: 1319-1328) zwischengespeichert.</p>
+
+        <p>Mit Hilfe des Tastaturpuffers kann aber auch – und das ist das Interessante an diesen zehn Bytes – eine relativ unkon-. ventionelle Art der Programmierung praktiziert werden.</p>
+
+        <p>Um dies verständlich zu machen, habe ich ein Programm (Listing 2) geschrieben, welches DATA-Zeilen aus Maschinenprogrammen oder Sonderzeichen erzeugt. Die Problematik dabei ist folgende: Wenn ich DATA-Zeilen ins Programm schreiben möchte, so ist dies nur im Direktmodus möglich. Um dies automatisch zu tun, benötigen wir ein Programm. Also was tun? – Man bedient sich des Tastaturpuffers!</p>
+
+        <h2>Der »DATA-Erzeuger«</h2>
+
+        <p>Dazu nochmals die Durchleuchtung der Funktionsweise. Während des Systeminterrupts, der alle 60stel Sekunde durchlaufen wird, fragt der Computer die Tastatur ab. Ein eingegebenes Zeichen wird dabei im Tastaturpuffer abgelegt, wo es so lange verbleibt, bis ein Zeichen von der Tastatur benötigt wird. Dies ist zum Beispiel im Direktmodus der Fall (wenn der Cursor blinkt) oder im Programm – bei INPUT oder GET. Die Zeichen werden dann wieder aus dem Tastaturpuffer hervorgeholt, und zwar nach dem Prinzip »First in, First out«. Bei unserem Programm werden zunächst einmal sechs Speicherzellen initialisiert. Die ersten zwei Adressen enthalten die Anfangsadresse der abzuspeichernden Daten aus dem Speicher. Dieser Zeiger wird solange inkrementiert, bis er den Wert der Endadresse – der in den zwei folgenden Bytes abgelegt ist – erreicht hat. In den letzten zwei Speicherstellen (Adresse 252, 253 beziehungsweise 212, 213) steht die Zeilennummer in der Reihenfolge Low-/High-Byte. Bequemer wäre es natürlich, wenn man normale Variablen verwenden könnte. Dies ist jedoch nicht möglich, weil diese beim Einfügen einer DATA-Zeile gelöscht werden. Darum bleibt nur der Umweg über Speicherstellen, deren Inhalte durch Basic nicht überschrieben werden können.</p>
+
+        <p>Als nächstes erzeugt das Programm – mit Hilfe der in 252/253 beziehungsweise 212/213 gespeicherten Zwei-Byte-Zahl – eine Zeilennummer, welche auf den Bildschirm gePRINTet wird. Dann schreibt es das Befehlswort »DATA« und drucktacht dreistellige Zahlen (die Daten aus dem zu verarbeitenden Maschinenprogramm) aus. Nun haben wir eine fertige Programmzeile auf dem Bildschirm stehen, die sich allerdings noch nicht im Speicher befindet. Dies erledigt jetzt unser Tastaturpuffer.</p>
+
+        <p>Vorher müssen wir uns jedoch genau überlegen, wie unser Bildschirm aussieht, denn dementsprechend muß der Cursor programmiert werden.</p>
+
+        <p>Zuerst wird der Cursor mit HOME (=CHR$ (19)) an die linke obere Ecke befördert. Dort wird durch einen Druck auf die RETURN-Taste (=CHR$(13)) die Basic-Zeile in den Speicher übernommen. Nun befindet sich der Cursor in der dritten Zeile. Durch ein »Cursor down« (=CHR$(17)) bewegt er sich eine Zeile nach unten und steht nun auf dem Befehlswort RUN 60. Ein weiteres RETURN bewirkt den erneuten Start des Hilfsprogramms.</p>
+
+        <p>Wir benötigen für die Cursorbewegung also vier Werte. Diese werden vor dem Ende des Programms mit »POKE 631,19: POKE 632, 13: POKE 633,17:</p>
+
+        <p>POKE 634, 13: POKE 198,4«</p>
+
+        <p>(beziehungsweise die oben angegebenen Werte für den C 16) in den Tastaturpuffer geschrieben. Hierdurch simulieren wir eine gedrückte Tastenfolge: denn nachdem sich der Computer über den Befehl END wieder im Direktmodus befindet, wird zuerst der Tastaturpuffer geleert, wodurch der Cursor den vorbestimmten Weg nimmt. »POKE 198,4« (»POKE 239,4«) gibt an, wie viele Zeichen sich momentan im Puffer befinden.</p>
+
+        <p>Jetzt möchte ich noch einen kleinen Einblick in die Speicherorganisation geben, was auch im Hinblick auf Grafik von Bedeutung ist.</p>
+
+        <p>Bei Erweiterungen von mehr als 8 KByte verändert sich die Lage des Bildschirm- und Farbspeichers (die Einstellung nimmt die Reset-Routine vor). Anhand von Bild 6a soll erläutert werden, warum eine Verschiebung notwendig ist.</p>
+
+        <p>Der Video-Interface-Chip VIC (daher auch der englische Name des VC 20), der vor allem für die Erzeugung des Fernsehsignals und den Aufbau des Bildschirmes verantwortlich ist, kann hardwaremäßig nur Videospeicherplätze zwischen 4096 und 8192 adressieren. Folglich muß das Bildschirm-RAM in diesem Bereich angesiedelt werden.</p>
+
+        <p>In der Grundversion liegt es zwischen Adresse 7680 und 8191 – also am Ende des verfügbaren Speichers, damit der Speicherbereich für Basic auch bei eingesteckter 3 KByte-Erweiterung durchgängig ist (läge der Bildschirmspeicher so wie bei einer 8-KByte-Erweiterung, wäre dies nicht der Fall).</p>
+
+        <p>Ist ein Speichermodul von mehr als 8 KByte eingesteckt (egal ob der 3-KByte-Bereich zugeschaltet ist oder nicht), so legt das System den Videospeicher an die unterste adressierbare Stelle für den VIC, also Adresse 4096. Aus diesem Grund kann die eingesteckte 3-KByte-Erweiterung nicht mehr für Basic benutzt werden, denn sonst wäre der Speicher nicht mehr durchgängig.</p>
+
+        <p>Der C 16 ist vom Speicheraufbau etwas anders organisiert. Die in beiden Geräten eingebauten Prozessoren (6502 und 7501) können jeweils immer nur einen Adreßbereich von 64 KByte (das entspricht den Adressen 0-65535) ansprechen. Um Zugriff auf noch mehr Speicherplatz für Programme und Daten (sei es nun im ROM oder im RAM) zu haben, bedient man sich beim C 16 eines Tricks:</p>
+
+        <p>Der Computer schaltet einfach immer zwischen zwei Speicherblöcken zu je 64 KByte (siehe Bild 6b) hin und her. Der erste Block besteht – wenn der C 16 voll ausgebaut ist – aus Schreib-/Lesespeicher, die andere Bank verwaltet das ROM. Diese Technik des »Bank-Switching« wird auch beim neuen Commodore-Flaggschiff C 128 verwendet.</p>
+
+        <p>Damit ist unsere Einführung in die internen Geheimnisse des VC 20/C 16 beendet. Esistjetzt an Ihnen, die hier erworbenen Kenntnisse durch eigenes Experimentieren zu vertiefen und in eigenen Programmen einzubauen. Zusätzliche wichtige Hintergrund-Informationen speziell über die Themengebiete »Grafik« und »Zeichensatz« beim C 16 finden Sie in diesem Sonderheft.</p>
+
+        <address class="author">(Christoph Sauer/ev)</address>
+    </article>
+</body>
+
+</html>

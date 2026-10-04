@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Zeichensatz selbstgemacht</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jens Engel, kn">
+    <meta name="64er.issue" content="Sonderheft 3/86">
+    <meta name="64er.pages" content="175-176">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX48">
+</head>
+
+<body>
+    <article>
+        <h1>Zeichensatz selbstgemacht</h1>
+        <p class="intro">Wollen Sie einen eigenen Zeichensatz definieren? »Charmachine« ermöglicht Ihnen dies: in einer komfortablen Weise. Da Sie auch mehrfarbige Zeichen erzeugen können, ist es besonders für Grafiken interessant.</p>
+
+        <p>Die Möglichkeiten des C 16/116 im Bereich der hochauflösenden Bitmap-Grafik sind schier riesig. Doch für viele Programme, die grafischer Unterstützung bedürfen, sind die nach dem Befehl GRAPHIC 1-4 noch vorhandenen 2 KByte nicht ausreichend. In diesem Fall muß der ebenfalls hochauflösende und/oder mehrfarbige Zeichensatz aushelfen. »Charmachine« dient dazu, diesen bequem editieren zu können.</p>
+
+        <p>Nun zum Umgang mit dem Programm. Nachdem Sie das Programm (Listing) eingetippt und gestartet haben, erscheint in der linken oberen Ecke des Bildschirms ein 8x8 Punkte großes Feld. Rechts daneben sind die Befehle von »Charmachine« zu sehen. Im unteren Teil des Bildschirms befindet sich ein Feld, in dem alle 256 möglichen Zeichen abgebildet sind. Es handelt sich dabei um die positiven Zeichen beider Zeichensätze (also des Groß-Klein- und des Groß-Grafik-Satzes). Die negativen Zeichen beim C 16/116 können nicht gesondert verändert werden, sie zeigen immer genau die Negative ihrer entsprechenden positiven Zeichen.</p>
+
+        <p>In diesem Feld können Sie einen Cursor bewegen und sich das zu verändernde Zeichen aussuchen. Das Zeichen unter dem Cursor wird unterhalb des 8x8-Feldes hochauflösend (hiRes) und mehrfarbig (multicolor) dargestellt. Steht nun der Cursor auf dem richtigen Zeichen, so drücken Sie die Taste P (P=pick). Das Zeichen wird augenblicklich im 8x8-Punktefeld dargestellt, und der Cursor befindet sich ebenfalls dort. Sie können nun das Zeichen ändern mit SPACE für Punkt löschen (SPACE = unplot), Z für Punkt setzen (Cursor nach rechts) und X für Punkt setzen (Cursor nach unten) (Z/X = plot). Man kann das ganze Feld löschen mit C (=Clear) und invertieren mit R (=reverse). Ist das Zeichen fertig editiert, so kehren Sie mit M (=select mode) in den Wählmodus zurück. Hier können Sie mit den Tasten 1 und 2 (=colors) die Multicolorfarben des Zeichens über »multi« ändern sowie den Zeichensatz speichern mit S (= SAVE) und neu laden mit L (=LOAD von Diskette). Der Befehl C (=COPY) erlaubt Ihnen, das sichnoch im 8x8-Feld befindliche Zeichen in ein anderes Zeichen zu kopieren, das mit dem Cursor ausgesucht wird.</p>
+
+        <p>Wenn Sie einen fertigen gespeicherten Zeichensatz in ein eigenes Programm einbauen wollen, so müssen Sie diesen mitLOAD" name" 8,1 laden und dann den Befehl NEW eingeben. An den Anfang Ihres Programms müssen Sie die Befehle setzen, die in Zeile 10 von »Charmachine« (Listing) stehen. Sie dienen dazu, den Zeichensatz vor dem Überschreiben durch Strings zu schützen. Der C 16/116 hat dann noch 10 KByte Speicher frei. Um den Zeichensatz schließlich einzuschalten, müssen Sie folgende POKESs eingeben:</p>
+
+        <pre><code>POKE 65298,0 (Flag für Zeichensatz aus ROM oder RAM), POKE 65299,56 (Anfangsadresse des Zeichensatzes im RAM),
+POKE 65287,8+(16)+128
+</code></pre>
+
+
+        <p>Beim letzten Befehl steht 8 für 40 Zeichen, (16) für Multicolor (wahlweise), 128 für Darstellung der Zeichensätze Groß+Klein und Groß+Grafik. Ohne 128 wird nur einer dieser Zeichensätze, aber mit seinen negativen Zeichen, dargestellt.</p>
+
+        <p>Der undefinierte Zeichensatz liegt im Speicherbereich von 14336 bis 16383 ($3800 bis $3FFF).</p>
+
+        <p>Nun zu einigen Besonderheiten des Programms. Beim Kopieren des Zeichensatzes vom ROM ins RAM greift das Programm auf den Monitor des C 16/116 zurück. Vom Programm aus wird in den Monitor gesprungen und dort mit dem Befehl T (=TRANSVERE) der Zeichensatz von ROM ins RAM geschrieben. Um in den Monitor und wieder zurück zu kommen, wird der »programmierte Direktmodus« benutzt, wobei die erforderlichen Befehle auf den Bildschirm gedruckt werden und durch Auffüllen des Tastaturpuffers mit dem ASCII-Code der RETURN-Taste nach dem Programmabbruch mit END ausgeführt werden. Dieses wird in den Zeilen 20010 bis 20050 bei »Charmachine« vollzogen.</p>
+
+        <p>Dasselbe Verfahren wird beim Speichern des Zeichensatzes in den Zeilen 1052 bis 1060 angewandt, nur mit dem Monitorbefehl S (=SAVE).</p>
+
+        <p>Die Maschinenroutinen, die ab der Zeile 21010 eingelesen werden, dienen zum schnellen Umrechnen der Bits eines Zeichens in die Byte-Folge des 8x8-Feldes auf dem Bildschirm, sowie dem umgekehrten Vorgang, Zeichen direkt nach den Punkte-Anordnungen im 8x8-Feld umzudefinieren.</p>
+
+        <p>Die erste Routine startet ab der Adresse 864 und wird im Programm in Zeile 620 aufgerufen, die zweite ab 950 und wird in Zeile 720 aufgerufen.</p>
+
+        <p>In der abgebildeten Tabelle finden Sie eine Variablenliste für »Charmachine«.</p>
+
+        <address class="author">(Jens Engel/kn)</address>
+    </article>
+</body>
+
+</html>

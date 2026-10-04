@@ -170,3 +170,19 @@ digits matches the MONTHLY bullet "03/86" — SH8602's errata reported this and
 it was not harvested. The block also hardcodes `issues/8607` / `YYMM=8608`.
 And "the README's bullet is the only source of truth" (Lessons) contradicts
 the rule's own Vorschau derivation.
+
+## 080 — four places the split rule and its script disagree
+
+From the 080 sub-agent, checked in the output: (1) "The FILENAME keeps the
+plain number" for lettered pages, but the script derives the filename from the
+h1's `[pages]`, so `[21a]` would make `21a X.html` — letters have to be put
+into the metas AFTER the script, which the rule does not say. (2) The script
+turns ANY all-parenthesised paragraph into an `<address>` byline: 72's
+`(Kassette nr = 1; Diskette nr = 8)` became the author meta. (3) The paired
+check's inline-byline regex `\((?:…/)?[a-z]{2,3}\)` matches `(ost)`, `(von)`,
+`(xx)` in prose — 3 of 4 hits false. (4) A leading `>` (C16 monitor prompt) is
+eaten by Markdown as a blockquote and comes out as `<p class="intro">` after
+070 — an escaping gap at 040/050 that only the paired listing exposed (intros
+=2 on 14). Also 030: the p21 table box and p60's "Fortsetzung Text auf Seite
+62" line were dropped before 080 ever saw them; the 030 loss check does not
+count blocks it never put in the stream.

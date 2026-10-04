@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>19 tolle Grafik-Befehle für den VC 20</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Th. Schaper, ah">
+    <meta name="64er.issue" content="Sonderheft 3/86">
+    <meta name="64er.pages" content="72-73">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX17">
+</head>
+
+<body>
+    <article>
+        <h1>19 tolle Grafik-Befehle für den VC 20</h1>
+        <p class="intro">Mit dieser Basic-Erweiterung kommen auch Sie als VC 20-Besitzer mit einer 16-KByte-Erweiterung in den Genuß, hochauflösende Grafiken einfach zu erstellen.</p>
+
+        <p>Fr ür die Befehlserweiterung ist mindestens eine Speichererweiterung von 16 KByte erforderlich. Das normale Commodore-Basic V.2 wird um 19 Befehle und 5 Funktionen erweitert. 13 dieser neuen Befehle dienen zur leichteren Handhabung der Grafikfähigkeiten des VC 20.</p>
+
+        <p>Mit GLOAD und GSAVE können die Grafiken dann geladen und gespeichert werden.</p>
+
+        <p>Es besteht die Möglichkeit, Grafiken anderer Programme zu laden und auf den Bildschirm zu bringen. Dajedoch oft das Bildschirmformat unterschiedlich ist, muß der Bildschirm der jeweiligen Grafik angepaßt werden. Dies wird mit Hilfe des SCREEN-Befehls erreicht. Für das Format von »JOYPAINT« aus 64'er, Ausgabe 2/85 hätte der Befehl folgendes Aussehen:</p>
+
+        <pre><code>SCREEN 21,9,64
+</code></pre>
+
+
+        <p>Das heißt:</p>
+
+        <p>21 Spalten (8*21 = 168 Bildpunkte)</p>
+
+        <p>9 Zeilen (16*9 = 144 Bildpunkte)</p>
+
+        <p>64 = 1. Zeichen in Bildschirmcode links oben in der Bildschirmecke.</p>
+
+        <p>Ist der Grafikmodus eingeschaltet, kann kein Text eingeblendet werden. Einige der Grafikbefehle sind der Turtle-Grafik für den C 64 aus der Ausgabe 11/84 entliehen. Zur einfacheren Handhabung des Textmodus sind die Befehle CURSOR und SCROLL gedacht.</p>
+
+        <p>Die Speicherplatzbelegung sieht wie folgt aus: $1000 - $11FF $1200 - $iFFF $2000 - $2AFF $2B00 - $XXXX Bildschirm</p>
+
+        <p>Grafik</p>
+
+        <p>Basic-Erweiterung Basic-Programmspeicher</p>
+
+        <p>Als Sprungvektoren werden benutzt:</p>
+
+        <p>$0300 / $0301 Vektor für Fehlermeldungen</p>
+
+        <p>$0304 / $0305 Vektor für Interpretercode</p>
+
+        <p>$0306 / $0307° Vektor für LIST</p>
+
+        <p>$0308 / $0309 $030A / $030B Vektor für Basic-Befehl Vektor für Ausdruck auswerten</p>
+
+        <p>Der Speicherbereich $02A6 bis $02FF wird vom Programm als Zwischenspeicher genutzt.</p>
+
+        <p>Die x-Position des Grafik-Cursors ist in $02A6 gespeichert, die y-Position in $02A7.</p>
+
+        <h2>Eingabe des Programms</h2>
+
+        <p>Vor der Programmeingabe muß folgende Zeile eingegeben werden 1 SYS 8192</p>
+
+        <p>Dann wird im Direktmodus eingegeben: POKE 44,43:POKE 43%256,0:NEW</p>
+
+        <p>Hiermit wird der Basic-Anfang auf $2BOO (dez=43*256) hochgesetzt. Jetzt kann der Basic-Lader eingegeben werden. Lief er ohne Fehlermeldung durch, wird POKE 44,16 eingetippt. Läßt man das Programm jetzt listen, so darf nur</p>
+
+        <p>1 SYS 8192 auf dem Bildschirm erscheinen.</p>
+
+        <p>Jetzt kann das Programm wie jedes Basic-Programm gespeichert werden.</p>
+
+        <p>Alle Zusatzbefehle und Funktionen lassen sich wie die Commocdore-Befehle abkürzen.</p>
+
+        <h2>Befehlserläuterungen</h2>
+
+        <p>CURSOR xp, yp, x$:</p>
+
+        <p>xp = x-Koordinate; yp = y-Koordinate; x$ = Ausgabestring, er kann den gleichen Aufbau haben wie der PRINT-Befehl. Kann nur im Textmodus benutzt werden SCROLL:</p>
+
+        <p>Der Bildschirminhalt wird nach oben gescrollt SOUND tg, th, la:</p>
+
+        <p>tg = Tongenerator O bis 3 th = Tonhöhe 128 bis 255 la = Lautstärke O bis 15</p>
+
+        <h3>RENEW:</h3>
+
+        <p>" Nach einem Reset oder NEW kann mit RENEW das Programm wieder in den Speicher geholt werden. Es darf jedoch in der Zwischenzeit keine Variable definiert worden sein. OFF:</p>
+
+        <p>Die Fehlermeldungen werden unterdrückt. NORM:</p>
+
+        <p>Die Fehlermeldungen werden wieder eingeschaltet. HIRES, mo, hi, ra:</p>
+
+        <p>mo =Text- oder Grafikmodus (Text : mo = 0; Grafik: mo = 1) hi =Hintergrundfarbe O bis 15 ra =Rahmenfarbe O bis 7 bei mo = 1 wird die Zeichenfarbe = 1, der Grafik-Cursor an die Position 80,80 gesetzt. COLOR fa, hi, ra:</p>
+
+        <p>fa =Farbe, in der gezeichnet wird hi =Hintergrundfarbe ra =Rahmenfarbe</p>
+
+        <p>Die Hintergrund- und Rahmenfarbe kann auch weggelassen werden. Das gleiche gilt für den Befehl HIRES. Die Befehle sähen dann wie folgt aus:</p>
+
+        <p>»HIRES mo« oder »COLOR fa«. SCREEN sp, zl, ze:</p>
+
+        <p>sp = Bildschirmbreite; zi = Bildschirmhöhe; ze = erstes Zeichen auf dem Grafikschirm</p>
+
+        <p>Im normalen Grafikmodus ist sp = 20, zi = 10, ze = 32. Das heißt, es gibt 8*20=160 Punkte in x-Richtung und 16*10=160 Punkte in y-Richtung.</p>
+
+        <p>Im Textmodus entspricht sp der Spaltenzahl und zl der Zeilenzahl. ze kann weggelassen werden, wenn nur die Bildgröße verändert werden soll. Mit Hilfe dieses Befehls ist es möglich, Grafiken anderer Grafikprogramme auf den Bildschirm zu bringen. GLOAD x$, nr:</p>
+
+        <p>x$ = Name der zu ladenden Grafik; nr = Device-Nummer</p>
+
+        <p>(Kassette nr = 1; Diskette nr = 8)</p>
+
+        <p>Es können auch Grafiken anderer Programme geladen werden. GSAVE x$, nr:</p>
+
+        <p>x$ = Name der zu speichernden Grafik nr = Gerätenummer CLEAR:</p>
+
+        <p>Grafikbildschirm löschen MODE mo:</p>
+
+        <p>mo= Zeichenmodus</p>
+
+        <p>(Zeichen mo = 0; Löschen mo = 1; mo-= 2) Invertieren mo > 2 hebt den Grafik-Cursor, es wird weder gezeichnet noch gelöscht. PLOT xp, yp:</p>
+
+        <p>xp = x-Koordinate; yp = y-Koordinate</p>
+
+        <p>Der Grafik-Cursor wird an die Position xp, yp gesetzt. DRAW xp, yp:</p>
+
+        <p>xp =x-Koordinate; yp =y-Koordinate</p>
+
+        <p>Es wird eine Linie von der alten x, y-Position zu den Koordinaten xP, yP gezogen. DEG ri:</p>
+
+        <p>ri = Richtung RETURN ri:</p>
+
+        <p>Die Richtung wird um »ri«-Einheiten nach rechts gedreht. LTURN ri</p>
+
+        <p>Die Richtung wird um »ri«-Einheiten nach links gedreht. MOVE vo:</p>
+
+        <p>Es wird eine Linie mit »vo«-Punkten in die gesetzte Richtung gezogen.</p>
+
+        <h2>Funktionserläuterungen</h2>
+
+        <p>JOY: ;</p>
+
+        <p>Ist (JOY AND 23)=16, dann wird der Joystick in keine Richtung bewegt.</p>
+
+        <p>Ist(JOY AND 23) &lt; 16, dann wird der Joystick in die angegebene Richtung gedrückt.</p>
+
+        <p>Bei (JOY AND 8)=8 wird der Feuerknopf betätigt. MULT$(x$, xx) x$ = String; xx = Wert, mit dem x$ verlängert wird. Beispiel:</p>
+
+        <p>MULT$(" +." ,3) = " +.+.4." HEXS(Xx):</p>
+
+        <p>xx wird in einen 4-stelligen Hexadezimalstring umgewandelt. BIN$(xx):</p>
+
+        <p>xx wird in einen 8-stelligen Binärstring umgewandelt. DEC(x$):</p>
+
+        <p>x$ wird in eine Dezimalzahl umgerechnet. Ist LEN(x$)= 4 oder. =2, dann wird vom Hexadezimalsystem ausgegangen.</p>
+
+        <p>Ist LEN(x4)=8, wird vom Binärsystem ausgegangen. SXKXXX</p>
+
+        <p>$XXXX ist eine 4-stellige Hexadezimalzahl. Beispiel:</p>
+
+        <p>?$1EOO</p>
+
+        <p>7680 Lassen Sie sich also nicht durch die »endlose« DATA-Wüste abschrecken. j Denn hat man diese Einöde bewältigt, so verfügt man über eine nützliche Befehlserweiterung.</p>
+
+        <address class="author">(Th. Schaper/ah)</address>
+    </article>
+</body>
+
+</html>

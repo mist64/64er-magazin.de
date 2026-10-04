@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Maschinensprache mit dem C16</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="S. Baloui, ah">
+    <meta name="64er.issue" content="Sonderheft 3/86">
+    <meta name="64er.pages" content="14-21">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX3">
+</head>
+
+<body>
+    <article>
+        <h1>Maschinensprache mit dem C16</h1>
+        <p class="intro">Möchten Sie Maschinenprogramme für den C16 schreiben? Wenn ja, ist dieser Artikel genau das richtige. Wo Sie welche Betriebssystem-Einsprungadressen finden und wie Sie sie anwenden, wird hier ausführlich beschrieben.</p>
+
+        <p>1 n diesem Artikel soll besprochen werden, welche Besonderheiten bei der Programmierung des C 16 in Maschinensprache zu beachten sind, welche Zeropage-Adressen unbenutzt sind und zum Beispiel für Pointer (indirekte Adressierung) verwendet werden können, wie die Betriebssystemroutinen benutzt werden und was bei der Einbindung von Maschinenroutinen in Basic-Programme beachtet werden muß.</p>
+
+        <p>Alle Beispielprogramme wurden möglichst einfach gehalten und unter Verzicht auf jegliche »Tricks« erstellt. Dieser Artikel kann jedoch keinesfalls ein Maschinensprache-Lehrgang sein oder einen solchen ersetzen. Ich muß im folgenden davon ausgehen, daß der Leser Grundkenntnisse über den Prozessor des C 16, dessen Befehle und die verschiedenen Adressierungsarten besitzt.</p>
+
+        <p>Nehmen wir an, daß Sie Assemblergrundkenntnisse besitzen oder sich vor dem Weiterlesen zuerst auf den Kurs »Assembler ist keine Alchimie« (64'er Sonderheft 8/85 »Assembler«) stürzen, und fangen an.</p>
+
+        <p>Benutzung des integrierten Monitors:</p>
+
+        <p>Die in diesem Artikel beschriebenen Programmbeispiele sollten der Einfachheit halber mit dem eingebauten Maschinensprache-Monitor des C16 eingegeben werden. Da im Bedienungshandbuch leider jede Beschreibung des Monitors fehlt, erläutere ich kurz die wichtigsten Befehle (alle Zahlen müssen im Hexadezimalsystem eingegeben werden!) :</p>
+
+        <p>MONITOR = Start des Monitors</p>
+
+        <p>X = Verlassen des Monitors</p>
+
+        <p>S" (FILE) " ‚(GERÄT),(START), (ENDE +1) = Speichern eines Speicherbereichs (Programms), zum Beispiel: S'TEST",1,1000,2000 (Speichern von $1000 bis $1FFF unter dem Namen »TEST« auf Datasette) oder: S"TEST/8,2000,2400 (Speichern von $2000 bis $23FF auf Diskette). e</p>
+
+        <p>L" (FILE) " (GERÄT) = Laden eines Programms, zum Beispiel: L'TEST",1 oder: L'TEST",8</p>
+
+        <p>.(ADRESSE) (MNEMONIC) = Assemblieren, zum Beispiel: .1000 LDA #$1F</p>
+
+        <p>&gt; (ADRESSE) (BYTES) = Bytes eingeben, zum Beispiel: &gt;1000 1F 10 2B</p>
+
+        <p>D (ANFANG) (ENDE) = Speicherbereich disassemblieren, zum Beispiel D 1000 2000</p>
+
+        <p>M (ANFANG) (ENDE) = Speicherbereich anschauen, zum Beispiel M 1000 2000</p>
+
+        <p>T (ANFANG) (ENDE) (ADRESSE) = Speicherbereich zu neuer Adresse verschieben, zum Beispiel: T 1000 2000 3000</p>
+
+        <h3>Freie Zeropage-Adressen</h3>
+
+        <p>Das Programmieren in Assembler ist nicht möglich ohne Kenntnis wichtiger Adressen und Speicherbereiche eines Computers. Der Prozessor des C 16 bietet die sehr elegante indirekte Adressierung. Wie Sie wissen, istes jedoch zur Verwendung dieser Adressierungsart notwendig, Pointer in der Zeropage des Computers abzulegen. Da – unabhängig von der indirekten Adressierung – die Zeropage die schnellste Form der Adressierung gestattet, die sogenannte »Zeropage-Adressierung«, wird man sie in zeitkritischen Routinen (Grafik!) ausgiebig verwenden, um möglichst viele Variablen darin abzulegen, auf die häufig zugegriffen werden muß. Der erste Schritt beim Kennenlernen des C16 besteht somit darin, herauszubekommen, welche Speicherplätze in der Zeropage unbenutzt sind und für eigene Zwecke zur Verfügung stehen.</p>
+
+        <p>Zuerst wäre der Bereich $D8 bis $E8 zu nennen. Dieser Bereich ist ungenutzt und steht sogar speziell für Anwendungssoftware zur Verfügung. In diesem Bereich können Sie alle Variablen ablegen, die ständig unverändert zur Verfügung stehen sollen. Alle weiteren Bereiche, die ich vorstelle, werden vom Basic-Interpreter beziehungsweise vom Betriebssystem benutzt und sind daher nicht unbedingt vorm Überschreiben geschützt.</p>
+
+        <p>Ein Beispiel hierfür ist der Bereich $61 bis $70, die Fließkommaakkumulatoren eins und zwei. Dieser recht große zusammenhängende Bereich wird vom Basic-Interpreter für Berechnungen aller Art benutzt, übrigens keineswegs nur für Berechnungen mit reellen Zahlen, wie man aufgrund des Namens annehmen könnte, sondern ebenso für Berechnungen mit Integerzahlen. Wenn Sie keine reinen Assemblerprogramme schreiben, sondern Assemblerroutinen als Ersatz für besonders zeitkritische Basic-Programmteile verwenden, seien Sie bitte vorsichtig: Wenn die betreffende Routine vom Basic-Programm aufgerufen wird und Werte in die Fließkommaakkumulatoren schreibt, dürfen Sie getrost davon ausgehen, daß nach der Rückkehr ins Basic-Programm und vor dem nächsten Aufruf der Routine diese Werte durch den Basic-Interpreter überschrieben werden. Speichern Sie daher in diesem Bereich bitte keine Werte, die permanent auch nach der Rückkehr ins Basic-Programm – erhalten bleiben sollen.</p>
+
+        <p>Die beschriebenen Bereiche stellen ausreichend Platz für Pointer und oft benötigte Variablen zur Verfügung. Sollten Sie in Ihren Programmen jedoch Tabellen verwalten müssen, oder wollen Sie vor Beginn des Basic-RAMs gar eine komplette kleinere Maschinenroutine ablegen, benötigen Sie größere zusammenhängende Speicherbereiche. Schauen wir uns den Speicher von $FF (Ende Zeropage) aufwärts an. Größere freie Speicherbereiche</p>
+
+        <p>Vor Beginn des Basic-Bereichs bietet der C 16 mehrere Speicherbereiche, die für Tabellen und eventuell sogar für kleine Maschinenroutinen genutzt werden können:</p>
+
+        <ol>
+            <li>$0200 bis $02AC: Ein riesiger uns zur Verfügung stehender Bereich, der normalerweise vom Basic-Interpreter und vom DOS als Eingabepuffer verwendet wird (zum Beispiel INPUT #-Befehl).</li>
+        </ol>
+
+
+        <p>2.$025Dbis $02AC: Diesen Bereich verwendet ebenfalls das DOS. Er darf nur benutzt werden, wenn im Moment des Aufrufs der Maschinenroutine keine.(!) Kanäle geöffnet sind. Die vom DOS benötigten Parameter (Filename, Sekundäradresse, Geräteadresse etc.) werden sonst überschrieben.</p>
+
+        <ol>
+            <li>
+                <p>$0332 bis $O3F6: Kassettenpuffer und Zähler für Kassettenoperationen. Wenn Sie in diesem Puffer Daten ablegen, bleiben sie erhalten, bis die nächste Kassettenoperation erfolgt. Damit eignet sich dieser Bereich zum Beispiel für kleinere Maschinenroutinen (wenn das Basic-Programm keine Kassettenoperationen durchführt!).</p>
+            </li>
+            <li>
+                <p>$03F7 bis $0436: RS232-Puffer. Wenn Sie die RS232-Schnittstelle nicht verwenden (zum Beispiel für den Betrieb eines Modems), wird dieser Bereich völlig unbenutzt bleiben und ist daher hervorragend für Daten geeignet, die permanent erhalten bleiben müssen und nicht durch Basic-Interpreter oder Betriebssystem überschrieben werden dürfen.</p>
+            </li>
+            <li>
+                <p>$055F bis $05E6: In diesem Bereich sind die Zeichenketten abgelegt, mit denen die Funktionstasten belegt sind. Sie können ihn für eigene Zwecke benutzen, wenn Ihr Basic-Programm die Funktionstasten nicht benötigt und deren Belegung daher überschrieben werden darf.</p>
+            </li>
+        </ol>
+
+
+        <p>Wie Sie sehen, bietet der C 16 genug freie Speicherbereiche für die Ablage von Tabellen, Pointern und kleinen Assemblerroutinen, sowohl in der Zeropage als auch dahinter, obwohl ich mich auf die größten zusammenhängenden Bereiche beschränkt habe.</p>
+
+        <p>Wenn Sie kleine Maschinenprogramme in diesen Bereichen ablegen wollen, beschränken Sie sich bitte auf den Kassettenpuffer, den RS232-Puffer und den Funktionstastenspeicher. In letzterem sind Daten vollkommen sicher, in den beiden anderen Bereichen besteht keine Überschreibgefahr, solange weder Kassettenoperationen vorgenommen noch die RS232-Schnittstelle benutzt wird.</p>
+
+        <p>Farbspeicher, Bildschirmspeicher, Basic-RAM</p>
+
+        <p>Ebenso wie bei vielen meiner Kollegen bestand meine erste Assembler-»Tat« im Beschreiben des Bildschirms mit unsinnigen Zeichen, zum Beispiel Füllen mit lauter Buchstaben. Daich damals noch eine Scheu vor der Verwendung von Betriebssystemroutinen besaß, wurde jedes Zeichen von mir einzeln in den Bildschirmspeicher »gePOKEt« und die Farbe in der entsprechenden Speicherzelle des Farb-RAMs gesetzt. Für den Fall, daß Sie ebenfalls den Bildschirmspeicher direkt ansprechen wollen, stelle ich Ihnen nun die wichtigsten benötigten Adressen vor:</p>
+
+        <p>Farbspeicher: $0800 bis $OBFF</p>
+
+        <p>Bildschirmspeicher: $0COO bis $OFFF</p>
+
+        <p>Wichtig sind nur die ersten 1000 Byte des jeweiligen Bereichs (25 Spalten x 40 Zeichen = 1000 Zeichen). Daß beide Bereiche dennoch ein volles Kilobyte umfassen, ist mitunter sehr vorteilhaft, zum Beispiel wenn der gesamte Bildschirm gelöscht oder mit einem bestimmten Zeichen beschrieben werden soll. In diesen Fällen können Sie mit einem recht einfachen Programm volle vier Seiten, das heißt 1024 Byte, beschreiben. Da der relevante Teil des Bildschirm- beziehungsweise Farbspeichers nur 1000 Byte umfaßt, beschreiben Sie zwar mehr Speicherzellen als unbedingt nötig, das Programm wird dadurch jedoch erheblich vereinfacht und kürzer.</p>
+
+        <p>Das folgende Programmbeispiel (Listing 1) füllt den Bildschirm des © 16 mit dem Zeichen »A«. Geben Sie es bitte mit dem eingebauten Monitor ein, und starten Sie es anschlieBend mit »SYS 1015«:</p>
+
+        <p>Programmablauf: Das Programm liegt im RS232-Puffer und ist damit vor dem Überschreiben geschützt, solange diese Schnittstelle nicht benutzt wird. Da das Programm mit indirekt indizierter Adressierung arbeitet, werden zuerst zwei Pointer angelegt: ein Pointer auf den Beginn des Farb-RAMs ($0800) und ein zweiter Pointer auf den Beginn des Bildschirm-RAMs ($0C00). Der erste Pointer kommt nach $D8/$D9, der zweite Pointer nach $DA/$DB, dashheißtin den speziell für Anwendungssoftware reservierten freien Zeropage-Bereich.</p>
+
+        <p>Nachdem die Pointer angelegt wurden, werden sowohl Bildschirm- als auch Farbspeicher mit dem Wert eins beschrieben, und zwar jeweils vier Seiten (X-Register wird mit vier geladen). Das Resultat besteht darin, daß der Bildschirm mit dem Zeichen »A« gefüllt wird (1=Bildschirmcode von »A«).</p>
+
+        <p>Speichern Sie dieses Programm aus dem Monitor heraus bitte mit »S"FILL SCREEN" ,8,03F7,041A« auf Diskette beziehungsweise mit »S" FILL SCREEN" 1,03F7,041A« auf Kassette ab, da wir es in Kürze wieder verwenden werden. Einbindung von Maschinenroutinen</p>
+
+        <p>Das vorgestellte Programm paßt gerade noch in den RS232-Puffer. Bei größeren Programmen stellt sich jedoch die Frage, wo wir sie im Speicher ablegen können. Für Maschinenprogramme, die ein oder gar mehrere Kilobyte umfassen, steht nur ein zusammenhängender Speicherbereich zur Verfügung, der groß genug ist: der Basic-Speicher selbst.</p>
+
+        <p>Der Basic-Speicherbereich beginnt ab $1000. Wo er endet, hängt von mehreren Faktoren ab:</p>
+
+        <ol>
+            <li>
+                <p>Normalerweise endet der Basic-Bereich bei $3FFF.</p>
+            </li>
+            <li>
+                <p>Wurde die hochauflösende Grafik eingeschaltet, wofür zusätzlich Speicherplatz benötigt wird, endet Basic bei $17FF.</p>
+            </li>
+            <li>
+                <p>Wird eine Speichererweiterung verwendet, hängt das Ende des Basic-Speichers von der Größe dieser Erweiterung ab.</p>
+            </li>
+        </ol>
+
+
+        <p>Unveränderlich ist somit nur der Beginn des Basic-Speichers. Wenn Sie Wert darauf legen, daß Ihre Maschinenprogramme auch mit Grafik und Speichererweiterungen zusammenarbeiten, benutzen Sie bitte die Zeropage-Adressen $33 und $34, um das Ende des Basic-Bereichs zu ermitteln. Diese Adresse stellt einen Pointer ($33=Low/$34=High) dar, der auf das aktuelle Ende des verfügbaren Speichers zeigt. Wenn keine Erweiterung verwendet wird und die hochauflösende Grafik nicht eingeschaltet wurde, zeigt dieser Pointer auf die Adresse $3FFF (probieren Sie's aus). Verwenden Sie in Ihren Programmen möglichst immer diesen Pointer anstelle einer absoluten Adresse, die sich – abhängig von der Grafik und Speichererweiterungen – ändern kann.</p>
+
+        <p>Wenn Sie reine Assemblerprogramme schreiben, zum Beispiel eine Textverarbeitung oder ein Malprogramm, benutzen Sie einfach den Basic-Speicher ab $1000. Häufiger dürfte jedoch die Verwendung von Assemblerroutinen sein, die mit einem Basic-Programm zusammenarbeiten sollen, zum Beispiel Eingabe- oder Sortierroutinen.</p>
+
+        <p>In einem solchen Fall legt man üblicherweise die Assemblerroutinen ans Ende des Basic-Speichers und setzt den Zeiger auf dieses Ende ($33/$34) herab, um ein Überschreiben durch Strings zu verhindern, die der Basic-Interpreter leider ebenfalls vom Ende des Basic-Speichers nach unten anlegt.</p>
+
+        <p>Im Falle des C 16 ist diese Vorgehensweise etwas problematisch, da das Einschalten der hochauflösenden Grafik genügt, um die Routinen durch den Grafikbildschirm zu überschreiben. Eine flexiblere Methode, die sich mit der Grafik und auch mit eventuellen Speichererweiterungen verträgt, besteht darin, die Routinen vor (!) das Basic-Programm zu legen. Die Adressen $2B/$2C enthalten einen Zeiger auf den Basic-Anfang. Diesen Zeiger können wir verändern und uns vor dem Basic-Programm beliebig Platz schaffen. Die Vorgehensweise:</p>
+
+        <ol>
+            <li>
+                <p>Zeiger auf Basic-Anfang erhöhen.</p>
+            </li>
+            <li>
+                <p>Null in die neue Startadresse »POKEn«, da am Basic-Anfang immer (!) eine Null stehen muß.</p>
+            </li>
+            <li>
+                <p>»NEW« eingeben, damit der Basic-Interpreter alle weiteren Zeiger entsprechend korrigiert.</p>
+            </li>
+            <li>
+                <p>Maschinenroutinen und Basic-Programm laden (sofern erstere nicht bereits in Form von DATA-Zeilen im Basic-Programm enthalten sind).</p>
+            </li>
+        </ol>
+
+
+        <p>Beispiel: 1 KByte vorm Basic-Anfang für Maschinenroutinen reservieren (Listing 2):</p>
+
+        <p>In Zeile 10 wird der Basic-Anfang um 1 KByte heraufgesetzt, das heißt in das High-Byte des Pointers auf den Basic-Start ($33/$34 = dezimal 43/44) wird der bisherige Wert plus vier geschrieben. Die Erhöhung des High-Bytes um den Wert vier entspricht vier Seiten, also einem Kilobyte.</p>
+
+        <p>Anschließend wird in die Speicherstelle, auf die das High-Byte nun zeigt, eine Null »ggePOKEt«, und durch »NEW« werden zuletzt alle übrigen Zeiger korrigiert. Wenn Sie dieses Programm eingeben, starten und anschließend mit »FRE(O)« den freien Speicherplatz ermitteln, werden Sie feststellen, daß ein Kilobyte weniger als gewohnt zur Verfügung steht, jenes Kilobyte, das wir soeben für Maschinenprogramme reserviert haben.</p>
+
+        <p>Speichern Sie das Programm bitte unter dem Namen »INIT« auf Diskette oder Kassette ab.</p>
+
+        <p>Die beschriebene Vorgehensweise zur Einbindung von großen Assemblerprogrammen in Basic-Programme wollen wir nun an einem Beispiel erproben: Laden Sie bitte »INIT« und starten Sie es (sofern Sie das nicht bereits im vorigen Schritt getan hatten). Gehen Sie in den Monitor und laden Sie »FILL SCREEN«. Verschieben Sie die Routine bitte nun mit: T 03F7 O41A 1000</p>
+
+        <p>Die Routine befindet sich nun in unserem für Maschinenprogramme reservierten Ein-Kilobyte-Bereich, der ab $1000 beginnt. Geben Sie folgendes Programm ein (Listing 3):</p>
+
+        <p>Wie Sie sehen, ist die Einbindung wunderbar gelungen: Ab $1000 (=dezimal 4096) befindet sich die Maschinenroutine im Speicher, ab $2000 beginnt das Basic-Programm, das die Routine mit »SYS 4096« auf Tastendruck aufruft, woraufhin diese den Bildschirm mit »A« beschreibt und anschließend in das Basic-Programm zurückkehrt.</p>
+
+        <p>Die Verwendung der Standardbetriebssystemroutinen hat den Nachteil, daß diese sehr allgemein und flexibel, dadurch jedoch für bestimmte Zwecke manchmal etwas zu langsam sind. In extrem zeitkritischen Routinen kommen Sie nicht umhin, sich Ihre eigenen Routinen – zum Beispiel zur Bildschirmausgabe – zu schreiben, die weniger flexibel, dafür jedoch schneller sind. Sollten Sie jemals in die Verlegenheit kommen, C 16-Assemblerprogramme auf den C 64 oder den C 128 umschreiben zu müssen, werden Sie jedoch dankbar für jede von Ihnen verwendete Betriebssystemroutine sein. Die Standardein-/ausgabe-Routinen sind auf allen drei Computern identisch. Identisch bedeutet nicht, daß die Programme selbst gleich sind, sondern die »Benutzeroberfläche«. Das heißt, daß Routinen die gleichen Auswirkungen haben, die gleichen Parameter übergeben werden müssen und sogar, daß die Einsprungadressen identisch sind.</p>
+
+        <p>Letzteres dank der sogenannten »Kernel-Sprungtabelle«, die jeder der genannten drei Computer besitzt. Die Betriebssytemroutinen befinden sich zwar von Computer zu Computer in verschiedenen Speicherbereichen, werden jedoch nie direkt, sondern immer indirekt über diese Sprungtabelle angesprungen. Ein Beispiel:</p>
+
+        <p>Die Routine BSOUT gibt ein Zeichen auf dem Bildschirm aus. Aufgerufen wird sie mit einem: JSR $FFD2, und zwar auf jedem (!) Commodore-Computer. An Adresse $FFD2 befindet sich ein Sprungbefehl, zum Beispiel JMP $1000, JMP $2000 oder JMP $3000. An welcher Adresse sich die Routine selbst befindet, ist dank der Sprungtabelle für den Benutzer uninteressant, jedenfalls solange er sich an die »offizielle« Methode hält, Betriebssystemroutinen keinesfalls direkt, sondern immer über die Sprungtabelle aufzurufen.</p>
+
+        <h2>Die wichtigsten Betriebssystemroutinen</h2>
+
+        <p>Im folgenden werde ich zu jedem Beispielprogramm die entsprechenden Basic-Programmzeilen vorstellen, um vor allem den Umsteigern, die von Basic her kommen, den Umgang mit den Betriebssystemroutinen zu erleichtern.</p>
+
+        <p>GETIN ($FFE4)</p>
+
+        <p>Die Routine GETIN (Listing 4) liest ein Zeichen von der Tastatur, wartet jedoch nicht darauf, daß eine Taste gedrückt wird, analog dem Basic-Befehl GET. Der ASCII-Code des Zeichens wird im Akku übergeben. Wurde kein Zeichen gelesen, enthält der Akku den Wert Null. Durch das Testen auf Null kann eine Schleife realisiert werden, die erst nach der Eingabe eines Zeichens verlassen wird.</p>
+
+        <p>Starten Sie diese Routine mit »SYS 1015«. Sie kehren nach dem Betätigen einer beliebigen Taste ins Basic zurück.</p>
+
+        <p>Mit GETIN lassen sich außer der Eingabe eines einzigen Zeichens auch komplexere Eingaben durchführen. Alle professionellen Eingaberoutinen, die den Basic-Befehl INPUT aufgrund seiner Nachteile (Bildschirm kann gelöscht werden, während der Eingabe sind keinerlei Eingabeprüfungen möglich und so weiter) ersetzen sollen, verwenden diese Betriebssystemroutine.</p>
+
+        <p>BSOUT ($FFD2)</p>
+
+        <p>Gibt ein Zeichen, das im Akku übergeben wird, auf dem momentanen Ausgabegerät aus, normalerweise dem Bildschirm (Listing 5). Bei der Bildschirmausgabe ist zu beachten, daß das Zeichen an der momentanen Cursorposition ausgegeben und dieser danach automatisch auf das nächste Zeichen gesetzt wird.</p>
+
+        <p>Ebenso wie das Basic-Programm gibt auch die Assembler-Routine nach dem Aufruf mit»SYS 1015« die Zeichen »A« und »B« (ASCII-Code: $41/$42) auf dem Bildschirm aus. Wenn Sie bereits länger in Assembler programmieren, wird für Sie ein kleiner Trick bereits selbstverständlich sein, den ich hier verraten möchte: Da alle Betriebssystemroutinen als Unterprogramme geschrieben sind und mit einem »RTS« als letzten Befehl enden, können Sie Ihre Programme kürzen, indem Sie einen »RTS« einsparen, der nach dem Aufruf einer Betriebssystemroutine folgt, und diese anstatt mit »JSR...« mit »JMP...« aufrufen (Listing 6). PLOT ($FFFO)</p>
+
+        <p>Setzt den Cursor an eine übergebene Bildschirmposition oder übergibt die momentane Cursorposition. Ein Basic-Aquivalent zu dieser Routine exisitiert nicht. In beiden Fällen wird das X-Register zur Übergabe der Zeile und das Y-Register zur Übergabe der Spalte verwendet:</p>
+
+        <ol>
+            <li>Cursor setzen:</li>
+        </ol>
+
+
+        <p>-Carryflag löschen</p>
+
+        <p>-X und Y laden</p>
+
+        <p>-Routine aufrufen</p>
+
+        <p>Cursor auf Zeile 10, Spalte 5 setzen (Listing 7):</p>
+
+        <p>Rufen Sie die Routine mit »SYS 1015:PRINT"HALLO"« auf. Die Zeichenfolge »HALLO« wird ab Spalte 5 von Zeile 10 ausgegeben werden.</p>
+
+        <p>Cursorposition holen (Listing 8):</p>
+
+        <p>Zeile und Spalte werden in X und Y übergeben. Die entsprechenden Registerinhalte werden Ihnen nach dem BREAK angezeigt. Beachten Sie jedoch, daß der Basic-Interpreter einen Zeilenvorschub ausführt. Wegen dieses Zeilenvorschubs enthält das X-Register die Zeile+1, in der sich der Cursor beim Aufruf befand, und das Y-Register den Spaltenwert Null.</p>
+
+        <h2>Anwendung – der bisher beschriebenen Routinen</h2>
+
+        <p>Mit den beschriebenen Routinen läßt sich bereits eine Menge anfangen. Ein Beispiel: Sie schreiben ein Malprogramm in Assembler. Der Benutzer will ein Bild, das gerade gemalt wurde, komplett löschen. Da dieser Vorgang unwiderruflich ist, stellen Sie eine sogenannte »Sicherheitsabfrage«. Sie fragen den Benutzer:</p>
+
+        <p>»SIND SIE SICHER (J/N) ?«</p>
+
+        <p>Die Bildschirmausgabe soll in Zeile 10 und Spalte 15 erscheinen, das heißt etwa in der Mitte des Bildschirms. Außer den Tasten »j« und »n« soll keine weitere zur Beantwortung der Frage zulässig sein, der GET-Befehl ist daher hervorragend zur Lösung des Problems geeignet (Listing 9). Erläuterung:</p>
+
+        <p>Im ersten Programmabschnitt wird der Cursor auf Zeile 10 und Spalte 5 gesetzt. Anschließend wird die Zeichenkette »sind sie sicher (j/n) ?«, die 23 Zeichen enthält (X wird mit 23 verglichen), ab dieser Position auf dem Bildschirm ausgegeben. Die Zeichenkette selbst befindet sich im ASCII-Format am Ende des Programms. Geben Sie sie bitte mit Hilfe des Monitor-Befehls (>) ein, mit dem direkt Bytes verändert werden können.</p>
+
+        <p>Der letzte Programmteil besteht aus einer Routine, die ein Zeichen von der Tastatur liest, mit den ASCII-Codes der Zeichen »j« beziehungsweise »n« vergleicht ($4A/$4E) und zum entsprechenden Programmteil verzweigt. Wurde keines der beiden Zeichen eingegeben, wird die Tastaturabfrage wiederholt. .</p>
+
+        <p>Ein Tip: in Assemblerprogrammen ist es sehr oft notwendig, Zeichenketten auf dem Bildschirm auszugeben. Anstatt wie im vorgestellten Beispielprogramm die Anzahl der auszugebenden Zeichen zu zählen und das Ausgabeende anhand des Wertes von X zu erkennen, können Sie sich das Programmieren erleichtern, wenn Sie an jede Zeichenkette eine »Endemarke« anfügen, zum Beispiel das Byte $00, und auf diese Endemarke prüfen (Listing 10). Das Abzählen der einzelnen Zeichen einer Zeichenkette wird dadurch überflüssig: BASIN ($FFCF)</p>
+
+        <p>Auch diese Routine (Listing 11) kann zur Eingabe von Zeichen verwendet werden. Bei Verwendung von BASIN erscheint der Cursor auf dem Bildschirm, und ein vom Benutzer eingegebenes Zeichen wird automatisch auf dem Bildschirm ausgegeben, analog dem Basic-Befehl INPUT. Ebenso wie beim INPUT-Befehl ist keine Möglichkeit gegeben, unsinnige Eingaben abzufangen, zum Beispiel das Löschen des Bildschirms. Eingegebene Zeichen werden beim Aufruf von BASIN im Akku übergeben.</p>
+
+        <p>Diese Routine liest solange Zeichen ein und speichert sie ab $0405, bis der Benutzer »RETURN« drückt (ASCII-Code $0D), arbeitet somit analog dem INPUT-Befenhl.</p>
+
+        <p>Rufen Sie die Routine mit »SYS 1015« auf und geben Sie mehrere Zeichen ein, bevor Sie die Eingabe mit »RETURN« beenden. Sehen Sie sich anschließend mit dem Monitor den Bereich ab $0405 an (m 0405), in dem die Eingabe abgelegt wurde. ,</p>
+
+        <p>Ich würde Ihnen aufgrund der beschriebenen Nachteile von BASIN empfehlen, sich mit Hilfe der GETIN-Routine eine eigene INPUT-Routine in Assembler zu schreiben und auf die Verwendung von BASIN zur Tastaturabfrage in professionellen Programmen möglichst zu verzichten.</p>
+
+        <h2>Programme laden/speichern</h2>
+
+        <p>Das Betriebssystem des C 16 enthält eine sehr komfortable SAVE-Routine, mit der ein beliebiger Speicherbereich auf Kassette oder Diskette gespeichert werden kann. Die ebenfalls vorhandene LOAD-Routine ermöglicht das Laden eines Programms an eine beliebige Adresse. Diese Routinen können vielseitig verwendet werden, um zum Beispiel ein mit der hochauflösenden Grafik gemaltes Bild, eine Bildschirmmaske und andere Speicherbereiche zu speichern beziehungsweise zu laden. Vor der Benutzung dieser Routinen müssen jedoch die beiden Routinen SETNAM und SETLFS zur Vorbereitung aufgerufen werden.</p>
+
+        <p>SETLFS ($FFBA)</p>
+
+        <p>Vor Benutzung der SAVE- oder LOAD-Routine müssen mit SETLFS eine logische Filenummer (Akku), die Geräteadresse (X-Register) und eine Sekundäradresse (Y-Register) angegeben werden (Listing 12).</p>
+
+        <p>Beispiel: logische Filenummer zwei, Gerät: Floppy, Sekundäradresse vier. SETNAM ($FFBD)</p>
+
+        <p>Nachdem mit SETLFS die Fileparameter gesetzt wurden, muß mit der Routine SETNAM der Filename angegeben werden, indem im X- und im Y-Register die Adresse übergeben wird, an der dieser im Speicher abgelegt wurde, und im Akku die Länge des Namens (Listing 13):</p>
+
+        <ol>
+            <li>
+                <p>Akku mit der Länge des Filenamens in Zeichen laden.</p>
+            </li>
+            <li>
+                <p>X-Register mit dem Low-Byte der Adresse laden.</p>
+            </li>
+            <li>
+                <p>Y-Register mit dem High-Byte der Adresse laden.</p>
+            </li>
+            <li>
+                <p>SETNAM aufrufen</p>
+            </li>
+        </ol>
+
+
+        <p>Beispiel: Ein Speicherbereich soll unter dem Namen »test« gespeichert werden. Der Name »test« befindet sich (in ASCII-Form) an Adresse $025E, der speziell für Filenamen reserviert ist.</p>
+
+        <p>Bei der Speicherung auf Datasette ist es nicht notwendig, dem zu speichernden Programm einen Namen zu geben. Auch in diesem Sonderfall muß (!) jedoch vor Benutzung der LOAD- beziehungsweise SAVE-Routine SETNAM aufgerufen werden. Wenn kein Filename verwendet wird, muß im Akku der Wert Null übergeben werden (Länge des Namens: Null Zeichen). Die Inhalte von X- und Y-Register sind beliebig. LOAD ($FFD5)</p>
+
+        <p>Für das Laden eines Programms spielt die in der Vorbereitungsroutine SETLFS übergebene Sekundäradresse eine wichtige Rolle. Die ersten beiden Bytes jedes Programmfiles enthalten die Adresse, an der sich das Programm beim Speichern befand. Wurde vor dem Aufruf von LOAD die Sekundäradresse eins angegeben, wird das Programm an diese Ursprungsadresse geladen. Wurde eine Null als Sekundäradresse übergeben, so wird der Inhalt von X- und Y-Register beim Aufruf von LOAD als Adresse angesehen, an die das Programm geladen werden soll (X=Low-Byte, Y=High-Byte der Adresse).</p>
+
+        <p>Der Inhalt des Akkus entscheidet beim Aufruf von LOAD darüber, ob ein Programm geladen oder ein VERIFY durchgeführt werden soll (O=Laden, 1=Verifizieren).</p>
+
+        <p>Beispiele:</p>
+
+        <ol>
+            <li>
+                <p>Programm »test« von Datasette an die Ursprungsadresse laden (Listing 14):</p>
+            </li>
+            <li>
+                <p>Programm »test1« von Diskette an die Adresse $1000 laden (Listing 15).</p>
+            </li>
+        </ol>
+
+
+        <p>In beiden Beispielen wird davon ausgegangen, daß sich der Programmname »test« beziehungsweise »test1« in ASCII-Form ab Adresse $025E im Speicher befindet. Ein weiteres Beispiel zum Laden eines Programms ohne Angabe eines Namens (nur bei der Datasette möglich):</p>
+
+        <ol>
+            <li>Programm ohne Angabe eines Filenamens von Datasette absolut laden (Listing 16).</li>
+        </ol>
+
+
+        <p>Mit Hilfe der. SAVE-Routine läßt sich ein beliebiger Speicherbereich auf Kassette oder Diskette speichern. Zuvor müssen wiederum SETLFS und SETNAM als Vorbereitungsroutinen aufgerufen werden. Bei SAVE müssen folgende Parameter übergeben werden:</p>
+
+        <ol>
+            <li>
+                <p>Anfangsadresse des zu speichernden Bereichs. Hierzu muß in der Zeropage ein Zwei-Byte-Zeiger (Low/High) auf diese Adresse abgelegt werden. Bei Aufruf der Routine muß der Akku mit der Adresse geladen werden, an der sich der Zeiger befindet.</p>
+            </li>
+            <li>
+                <p>Endadresse +1 (!) des zu speichernden Bereichs. Diese Adresse wird mit dem X- und dem Y-Register übergeben (X=Adresse low, Y=Adresse high).</p>
+            </li>
+        </ol>
+
+
+        <p>Beispiele:</p>
+
+        <ol>
+            <li>
+                <p>$1000 bis $2000 unter dem Namen »test« auf Diskette speichern (Listing 17).</p>
+            </li>
+            <li>
+                <p>$1234 bis $3456 unter dem Namen »testi« auf Datasette speichern (Listing 18). . j</p>
+            </li>
+        </ol>
+
+
+        <p>Anwendung: hochauflösende Grafik speichern und laden. Als praktische Anwendung der LOAD- und der SAVE-Routine will ich Ihnen nun zeigen, wie Sie den Grafikbildschirm speichern und laden können, der den Speicher von $2000 bis $3FFF belegt. Wir benötigen hierzu ein Basic- und ein Maschinenprogramm. Beide sind in einer Disketten- (Listing 19) und einer Kassettenversion (Listing 20) abgebildet.</p>
+
+        <p>Geben Sie bitte zuerst die Maschinenroutine mit Hilfe des Monitors ein. Sie speichert den Grafikbereich unter dem Namen »GRAPHIK« auf Datasette beziehungsweise Diskette und lädt den Grafikbildschirm wieder in diesen Bereich.</p>
+
+        <p>Der einzige Unterschied zwischen der Disketten- und der Kassettenversion besteht in der unterschiedlichen Geräteangabe bei Aufruf der Routine SETFLS.</p>
+
+        <p>Geben Sie nun bitte die Disketten- beziehungsweise Kassettenversion des benötigten Basic-Programms ein (Listing 21, 22). .</p>
+
+        <p>Das Basic-Programm besteht aus folgenden Teilen:</p>
+
+        <ol>
+            <li>Filename in ASCII-Form ab 606 (=$025E) ablegen</li>
+            <li>
+                <p>Grafik einschalten</p>
+            </li>
+            <li>
+                <p>Rechtecke malen und ausfüllen</p>
+            </li>
+            <li>
+                <p>SAVE-Routine aufrufen</p>
+            </li>
+            <li>
+                <p>Grafik löschen</p>
+            </li>
+            <li>
+                <p>Gespeicherte Grafik laden</p>
+            </li>
+        </ol>
+
+
+        <p>Zusätzlich enthält die Kassettenversion noch Hinweise zur Bedienung der Datasette (Zurückspulen vor dem Speichern, Zurückspulen vor dem Laden, Play beziehungsweise Record+Play drücken).</p>
+
+        <p>Sollten Sie eine Floppy besitzen, können Sie beobachten, wie sich die Grafik während des Ladevorgangs langsam aufbaut. Bei Verwendung einer Datasette wird bekanntlich der Bildschirm während Kassettenoperationen »weggeklappt«, so daß Sie die Grafik erst nach dem vollständigen Ladevorgang auf dem Bildschirm sehen. Kassettenbesitzer sollten sich in Geduld üben, da das Speichern beziehungsweise Laden einen jeweils acht Kilobyte großen Speicherbereich umfaßt und daher etwa fünf Minuten dauern wird.</p>
+
+        <address class="author">(S. Baloui/ah)</address>
+
+        <p>TODO TABLE</p>
+    </article>
+</body>
+
+</html>
