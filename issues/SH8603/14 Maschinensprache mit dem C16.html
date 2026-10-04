@@ -92,6 +92,10 @@
         <p>Wichtig sind nur die ersten 1000 Byte des jeweiligen Bereichs (25 Spalten x 40 Zeichen = 1000 Zeichen). Daß beide Bereiche dennoch ein volles Kilobyte umfassen, ist mitunter sehr vorteilhaft, zum Beispiel wenn der gesamte Bildschirm gelöscht oder mit einem bestimmten Zeichen beschrieben werden soll. In diesen Fällen können Sie mit einem recht einfachen Programm volle vier Seiten, das heißt 1024 Byte, beschreiben. Da der relevante Teil des Bildschirm- beziehungsweise Farbspeichers nur 1000 Byte umfaßt, beschreiben Sie zwar mehr Speicherzellen als unbedingt nötig, das Programm wird dadurch jedoch erheblich vereinfacht und kürzer.</p>
 
         <p>Das folgende Programmbeispiel (Listing 1) füllt den Bildschirm des © 16 mit dem Zeichen »A«. Geben Sie es bitte mit dem eingebauten Monitor ein, und starten Sie es anschlieBend mit »SYS 1015«:</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 1. »Fill Screen«</figcaption>
+        </figure>
 
         <p>Programmablauf: Das Programm liegt im RS232-Puffer und ist damit vor dem Überschreiben geschützt, solange diese Schnittstelle nicht benutzt wird. Da das Programm mit indirekt indizierter Adressierung arbeitet, werden zuerst zwei Pointer angelegt: ein Pointer auf den Beginn des Farb-RAMs ($0800) und ein zweiter Pointer auf den Beginn des Bildschirm-RAMs ($0C00). Der erste Pointer kommt nach $D8/$D9, der zweite Pointer nach $DA/$DB, dashheißtin den speziell für Anwendungssoftware reservierten freien Zeropage-Bereich.</p>
 
@@ -141,6 +145,10 @@
 
 
         <p>Beispiel: 1 KByte vorm Basic-Anfang für Maschinenroutinen reservieren (Listing 2):</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 2. »INT«</figcaption>
+        </figure>
 
         <p>In Zeile 10 wird der Basic-Anfang um 1 KByte heraufgesetzt, das heißt in das High-Byte des Pointers auf den Basic-Start ($33/$34 = dezimal 43/44) wird der bisherige Wert plus vier geschrieben. Die Erhöhung des High-Bytes um den Wert vier entspricht vier Seiten, also einem Kilobyte.</p>
 
@@ -151,6 +159,10 @@
         <p>Die beschriebene Vorgehensweise zur Einbindung von großen Assemblerprogrammen in Basic-Programme wollen wir nun an einem Beispiel erproben: Laden Sie bitte »INIT« und starten Sie es (sofern Sie das nicht bereits im vorigen Schritt getan hatten). Gehen Sie in den Monitor und laden Sie »FILL SCREEN«. Verschieben Sie die Routine bitte nun mit: T 03F7 O41A 1000</p>
 
         <p>Die Routine befindet sich nun in unserem für Maschinenprogramme reservierten Ein-Kilobyte-Bereich, der ab $1000 beginnt. Geben Sie folgendes Programm ein (Listing 3):</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 3. »INT-Demo«</figcaption>
+        </figure>
 
         <p>Wie Sie sehen, ist die Einbindung wunderbar gelungen: Ab $1000 (=dezimal 4096) befindet sich die Maschinenroutine im Speicher, ab $2000 beginnt das Basic-Programm, das die Routine mit »SYS 4096« auf Tastendruck aufruft, woraufhin diese den Bildschirm mit »A« beschreibt und anschließend in das Basic-Programm zurückkehrt.</p>
 
@@ -167,6 +179,10 @@
         <p>GETIN ($FFE4)</p>
 
         <p>Die Routine GETIN (Listing 4) liest ein Zeichen von der Tastatur, wartet jedoch nicht darauf, daß eine Taste gedrückt wird, analog dem Basic-Befehl GET. Der ASCII-Code des Zeichens wird im Akku übergeben. Wurde kein Zeichen gelesen, enthält der Akku den Wert Null. Durch das Testen auf Null kann eine Schleife realisiert werden, die erst nach der Eingabe eines Zeichens verlassen wird.</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 4. »GETIN«</figcaption>
+        </figure>
 
         <p>Starten Sie diese Routine mit »SYS 1015«. Sie kehren nach dem Betätigen einer beliebigen Taste ins Basic zurück.</p>
 
@@ -175,8 +191,16 @@
         <p>BSOUT ($FFD2)</p>
 
         <p>Gibt ein Zeichen, das im Akku übergeben wird, auf dem momentanen Ausgabegerät aus, normalerweise dem Bildschirm (Listing 5). Bei der Bildschirmausgabe ist zu beachten, daß das Zeichen an der momentanen Cursorposition ausgegeben und dieser danach automatisch auf das nächste Zeichen gesetzt wird.</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 5. »BSOUT«</figcaption>
+        </figure>
 
         <p>Ebenso wie das Basic-Programm gibt auch die Assembler-Routine nach dem Aufruf mit»SYS 1015« die Zeichen »A« und »B« (ASCII-Code: $41/$42) auf dem Bildschirm aus. Wenn Sie bereits länger in Assembler programmieren, wird für Sie ein kleiner Trick bereits selbstverständlich sein, den ich hier verraten möchte: Da alle Betriebssystemroutinen als Unterprogramme geschrieben sind und mit einem »RTS« als letzten Befehl enden, können Sie Ihre Programme kürzen, indem Sie einen »RTS« einsparen, der nach dem Aufruf einer Betriebssystemroutine folgt, und diese anstatt mit »JSR...« mit »JMP...« aufrufen (Listing 6). PLOT ($FFFO)</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 6. »BSOUT ohne RTS«</figcaption>
+        </figure>
 
         <p>Setzt den Cursor an eine übergebene Bildschirmposition oder übergibt die momentane Cursorposition. Ein Basic-Aquivalent zu dieser Routine exisitiert nicht. In beiden Fällen wird das X-Register zur Übergabe der Zeile und das Y-Register zur Übergabe der Spalte verwendet:</p>
 
@@ -192,10 +216,18 @@
         <p>-Routine aufrufen</p>
 
         <p>Cursor auf Zeile 10, Spalte 5 setzen (Listing 7):</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 7. Cursorposition setzen</figcaption>
+        </figure>
 
         <p>Rufen Sie die Routine mit »SYS 1015:PRINT"HALLO"« auf. Die Zeichenfolge »HALLO« wird ab Spalte 5 von Zeile 10 ausgegeben werden.</p>
 
         <p>Cursorposition holen (Listing 8):</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 8. Cursorposition holen</figcaption>
+        </figure>
 
         <p>Zeile und Spalte werden in X und Y übergeben. Die entsprechenden Registerinhalte werden Ihnen nach dem BREAK angezeigt. Beachten Sie jedoch, daß der Basic-Interpreter einen Zeilenvorschub ausführt. Wegen dieses Zeilenvorschubs enthält das X-Register die Zeile+1, in der sich der Cursor beim Aufruf befand, und das Y-Register den Spaltenwert Null.</p>
 
@@ -206,14 +238,26 @@
         <p>»SIND SIE SICHER (J/N) ?«</p>
 
         <p>Die Bildschirmausgabe soll in Zeile 10 und Spalte 15 erscheinen, das heißt etwa in der Mitte des Bildschirms. Außer den Tasten »j« und »n« soll keine weitere zur Beantwortung der Frage zulässig sein, der GET-Befehl ist daher hervorragend zur Lösung des Problems geeignet (Listing 9). Erläuterung:</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 9. Anwendungsbeispiel</figcaption>
+        </figure>
 
         <p>Im ersten Programmabschnitt wird der Cursor auf Zeile 10 und Spalte 5 gesetzt. Anschließend wird die Zeichenkette »sind sie sicher (j/n) ?«, die 23 Zeichen enthält (X wird mit 23 verglichen), ab dieser Position auf dem Bildschirm ausgegeben. Die Zeichenkette selbst befindet sich im ASCII-Format am Ende des Programms. Geben Sie sie bitte mit Hilfe des Monitor-Befehls (>) ein, mit dem direkt Bytes verändert werden können.</p>
 
         <p>Der letzte Programmteil besteht aus einer Routine, die ein Zeichen von der Tastatur liest, mit den ASCII-Codes der Zeichen »j« beziehungsweise »n« vergleicht ($4A/$4E) und zum entsprechenden Programmteil verzweigt. Wurde keines der beiden Zeichen eingegeben, wird die Tastaturabfrage wiederholt. .</p>
 
         <p>Ein Tip: in Assemblerprogrammen ist es sehr oft notwendig, Zeichenketten auf dem Bildschirm auszugeben. Anstatt wie im vorgestellten Beispielprogramm die Anzahl der auszugebenden Zeichen zu zählen und das Ausgabeende anhand des Wertes von X zu erkennen, können Sie sich das Programmieren erleichtern, wenn Sie an jede Zeichenkette eine »Endemarke« anfügen, zum Beispiel das Byte $00, und auf diese Endemarke prüfen (Listing 10). Das Abzählen der einzelnen Zeichen einer Zeichenkette wird dadurch überflüssig: BASIN ($FFCF)</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 10. Stringausgabe mit Endemarke</figcaption>
+        </figure>
 
         <p>Auch diese Routine (Listing 11) kann zur Eingabe von Zeichen verwendet werden. Bei Verwendung von BASIN erscheint der Cursor auf dem Bildschirm, und ein vom Benutzer eingegebenes Zeichen wird automatisch auf dem Bildschirm ausgegeben, analog dem Basic-Befehl INPUT. Ebenso wie beim INPUT-Befehl ist keine Möglichkeit gegeben, unsinnige Eingaben abzufangen, zum Beispiel das Löschen des Bildschirms. Eingegebene Zeichen werden beim Aufruf von BASIN im Akku übergeben.</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 11. »BASIN«</figcaption>
+        </figure>
 
         <p>Diese Routine liest solange Zeichen ein und speichert sie ab $0405, bis der Benutzer »RETURN« drückt (ASCII-Code $0D), arbeitet somit analog dem INPUT-Befenhl.</p>
 
@@ -228,10 +272,18 @@
         <p>SETLFS ($FFBA)</p>
 
         <p>Vor Benutzung der SAVE- oder LOAD-Routine müssen mit SETLFS eine logische Filenummer (Akku), die Geräteadresse (X-Register) und eine Sekundäradresse (Y-Register) angegeben werden (Listing 12).</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 12. »SETLFS«</figcaption>
+        </figure>
 
         <p>Beispiel: logische Filenummer zwei, Gerät: Floppy, Sekundäradresse vier. SETNAM ($FFBD)</p>
 
         <p>Nachdem mit SETLFS die Fileparameter gesetzt wurden, muß mit der Routine SETNAM der Filename angegeben werden, indem im X- und im Y-Register die Adresse übergeben wird, an der dieser im Speicher abgelegt wurde, und im Akku die Länge des Namens (Listing 13):</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 13. »SETNAM«</figcaption>
+        </figure>
 
         <ol>
             <li>
@@ -262,9 +314,17 @@
         <ol>
             <li>
                 <p>Programm »test« von Datasette an die Ursprungsadresse laden (Listing 14):</p>
+                <figure>
+                    <pre>TODO</pre>
+                    <figcaption>Listing 14. »LOAD« von Kassette</figcaption>
+                </figure>
             </li>
             <li>
                 <p>Programm »test1« von Diskette an die Adresse $1000 laden (Listing 15).</p>
+                <figure>
+                    <pre>TODO</pre>
+                    <figcaption>Listing 15. »LOAD« von Diskette</figcaption>
+                </figure>
             </li>
         </ol>
 
@@ -274,6 +334,10 @@
         <ol>
             <li>Programm ohne Angabe eines Filenamens von Datasette absolut laden (Listing 16).</li>
         </ol>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 16. »LOAD« von Kassette ohne Angabe eines Filenamens</figcaption>
+        </figure>
 
 
         <p>Mit Hilfe der. SAVE-Routine läßt sich ein beliebiger Speicherbereich auf Kassette oder Diskette speichern. Zuvor müssen wiederum SETLFS und SETNAM als Vorbereitungsroutinen aufgerufen werden. Bei SAVE müssen folgende Parameter übergeben werden:</p>
@@ -293,20 +357,44 @@
         <ol>
             <li>
                 <p>$1000 bis $2000 unter dem Namen »test« auf Diskette speichern (Listing 17).</p>
+                <figure>
+                    <pre>TODO</pre>
+                    <figcaption>Listing 17. »SAVE« auf Diskette</figcaption>
+                </figure>
             </li>
             <li>
                 <p>$1234 bis $3456 unter dem Namen »testi« auf Datasette speichern (Listing 18). . j</p>
+                <figure>
+                    <pre>TODO</pre>
+                    <figcaption>Listing 18. »SAVE« auf Kassette</figcaption>
+                </figure>
             </li>
         </ol>
 
 
         <p>Anwendung: hochauflösende Grafik speichern und laden. Als praktische Anwendung der LOAD- und der SAVE-Routine will ich Ihnen nun zeigen, wie Sie den Grafikbildschirm speichern und laden können, der den Speicher von $2000 bis $3FFF belegt. Wir benötigen hierzu ein Basic- und ein Maschinenprogramm. Beide sind in einer Disketten- (Listing 19) und einer Kassettenversion (Listing 20) abgebildet.</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 19. »SAVE LOAD« auf und von Diskette</figcaption>
+        </figure>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 20. »SAVE LOAD« auf und von Kassette</figcaption>
+        </figure>
 
         <p>Geben Sie bitte zuerst die Maschinenroutine mit Hilfe des Monitors ein. Sie speichert den Grafikbereich unter dem Namen »GRAPHIK« auf Datasette beziehungsweise Diskette und lädt den Grafikbildschirm wieder in diesen Bereich.</p>
 
         <p>Der einzige Unterschied zwischen der Disketten- und der Kassettenversion besteht in der unterschiedlichen Geräteangabe bei Aufruf der Routine SETFLS.</p>
 
         <p>Geben Sie nun bitte die Disketten- beziehungsweise Kassettenversion des benötigten Basic-Programms ein (Listing 21, 22). .</p>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 21. Grafik aufrufen und Maschinenroutine aufrufen (Diskette)</figcaption>
+        </figure>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 22. Grafik erzeugen und Maschinenroutine aufrufen (Kassette)</figcaption>
+        </figure>
 
         <p>Das Basic-Programm besteht aus folgenden Teilen:</p>
 

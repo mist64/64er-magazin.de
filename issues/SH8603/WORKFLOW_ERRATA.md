@@ -212,3 +212,15 @@ copy). `r100_toc_title_apply.py` sits in rules/ unmentioned by r100.md and
 contradicts it: writes toc_title equal to `<title>`, does not escape `&`,
 cannot parse lettered pages (gave p21's entry to 14 Maschinensprache, left
 77a/77b unmatched). Not used.
+
+## 130 — MSE rendering assumes a C64 MSE dump; `data-range` is BASIC-only; verifier #6 vs verbatim captions
+
+From the 130 sub-agent, confirmed in the files: the C16/VC 20 binaries here
+are printed as TEDMON, VC-20 monitor or a game's own input-program dumps
+(tacco at file−$200 with its own row format; penco 25-byte rows), but the 120
+worklist and r130 default to `data-mse=mse1`, which renders addresses the
+magazine never printed; `data-range` exists only for BASIC, so a binary's
+address mismatch cannot be expressed. Verifier #6 (≥3 words after
+"Listing N.") flags verbatim print captions like "Listing 2. »INT«" — 12
+false hits. r130 says captions are verbatim; r170 says drop page pointers —
+same captions ("Bitte beachten … Seite 76"), no precedence stated.
