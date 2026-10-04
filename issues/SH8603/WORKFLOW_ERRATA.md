@@ -157,3 +157,16 @@ misread commas) is not in the rule's quote table. Cost: one sub-agent script
 plus a review of 189 sites. **Suggested.** Put the dash pass, with the
 exclusion classes, into the script; add `grep -c ' – '` > 0 to Verification;
 rule on U+201A.
+
+## 110 — no rule for a Sonderheft whose README bullet is `unbekannt`; the Verification grep is still broken for SH ids
+
+From the 110 sub-agent, confirmed: r110's Sonderheft paragraph assumes the
+README bullet is "usually a BOUND" to write as a provisional date; SH 3/86's
+is `unbekannt`, and the derivable bound (8605, ~11 Apr) is six months in the
+past — useless as a pubdate for an issue being built. Precedent (SH8601,
+SH8602) is a release day the owner picks; the rule never says so. The
+Verification grep with `YYMM=SH8603` searches "86/SH" (no hit) and with
+digits matches the MONTHLY bullet "03/86" — SH8602's errata reported this and
+it was not harvested. The block also hardcodes `issues/8607` / `YYMM=8608`.
+And "the README's bullet is the only source of truth" (Lessons) contradicts
+the rule's own Vorschau derivation.
