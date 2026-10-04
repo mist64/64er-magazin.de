@@ -480,3 +480,32 @@ differ". Step 7 "A plain `<p><strong>`. No class" is stale since 66dd50cc
 (`class="nachdruck"`). D numbers are positional, so a passing `verify` will
 fail after pending crops land — not stated. One LOG line per difference made
 LOG.md 1.2 MB for this issue. Found by the 330 sub-agent (46 min, 8 forks).
+
+## 330 — THEIRS findings went to the owner as one agent's reading, unverified
+
+**What happened.** r330's sub-agent reported 140 differences on the originals'
+side as THEIRS, each "read on the original's printed page". I relayed the list
+to the owner (PAUSE 2 decision 5, then `/tmp/transcription_errors.md`) as
+findings. Asked "did you check them against the images of those issues too?",
+the honest answer was no: I had verified OURS fixes and spot-read three THEIRS
+items myself (8404 p114 "Alle Tasten-,", 8404 p115 "37152", 8407 p137
+"Zeilenvorschub" — all three held), the other ~70 entries rested on the one
+agent's word.
+
+**Why it matters.** A THEIRS item asks the owner to change another issue's
+PUBLISHED file. r330 already demands page evidence for every disposition, but
+nothing makes the orchestrator re-check it, and the evidence is the same agent
+that formed the hypothesis — the "two independent transcriptions" logic of
+r330 itself says that is one reading, not two.
+
+**What was done.** A blind second reading: one agent rewrote the list as neutral
+questions (location + what the HTML has, claimed print reading removed), a
+fresh agent answered them from the original page images, and the orchestrator
+compared the answers with the claims before anything is applied.
+
+**What would have prevented it.** r330, under THEIRS: "Before a THEIRS list
+goes to the owner, every item is confirmed by a second, BLIND reading of the
+original's page — a different agent given only the location and the HTML text,
+not the claimed reading — and the orchestrator states which items it checked
+itself. An item the blind reading does not reproduce is dropped or marked
+UNCONFIRMED."
