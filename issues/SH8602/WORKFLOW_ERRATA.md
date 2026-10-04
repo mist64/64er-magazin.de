@@ -751,5 +751,5 @@ was green. The checks verify each artefact against itself; only the owner
 compared it with the page. That is r000's "Never declare an issue complete
 without the user signing off", confirmed once more.
 
-**The errata file is now closed.** 50 entries including this addendum; the
+**The errata file is now closed.** 48 sections including the sign-off and this addendum; the
 harvest belongs to the orchestrator.
