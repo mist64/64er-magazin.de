@@ -753,3 +753,15 @@ without the user signing off", confirmed once more.
 
 **The errata file is now closed.** 48 sections including the sign-off and this addendum; the
 harvest belongs to the orchestrator.
+
+## Correction to the "banner-only article name" entry and the addendum (owner, 2026-10-04)
+
+The owner's final ruling reverses the retitle: **the printed TOC names the
+article.** SH8602 p5 lists the Vorwort as "Das Salz in der Suppe", so that is
+the title, the toc title and the h1; EINLEITUNG is the running head (head1).
+The entry "080/210 — an article whose ONLY name is its running-head banner"
+and its addendum row are withdrawn as written. The rule they point to is the
+other way round: **when the start page has no display headline, the printed
+TOC entry is the article's name** — not the banner, and not a guess. Sentence
+for r080: "If the start page carries no display headline, take the h1 from
+the article's entry in the printed Inhalt; the running-head banner is head1."
