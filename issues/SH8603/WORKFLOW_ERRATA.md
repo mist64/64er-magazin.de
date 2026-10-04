@@ -331,3 +331,12 @@ check also skips lettered pages (`'21c'.isdigit()` False → KeyError if a row
 lands there) and cannot see a misroute between lettered siblings. "Category
 values must match TOPICS in generate.py" is false for the Sonderheft CSV
 (7 categories match nothing; SH8602 the same).
+
+## 260 — the "adjudicated.txt" hook the rule describes is not wired
+
+From the 260 sub-agent, confirmed by reading both: r260's prose says its check
+"reads `adjudicated.txt` the way r310 does" under `heading-all-caps`; the
+Verification code reads no adjudication file, and r310 has no
+`heading-all-caps` check, so an entry would make r310 report "declared N,
+found 0". A heading kept in caps on purpose therefore cannot be cleared by
+either check (SH8602's UNNEW is the standing example).
