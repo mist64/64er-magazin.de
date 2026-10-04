@@ -475,7 +475,22 @@ a `W` that needs moving.
 
 **The ink anchors stay the built-in set** — same scanner, same stock family —
 unless a colour is visibly wrong on the page; an anchor moved without a
-measurement is the same mistake pointing the other way. **The level lines stay
+measurement is the same mistake pointing the other way.
+
+**EXCEPT K: measure it on THIS issue's darkest solid black.** A black darker
+than the built-in `K 16 17 17` has no anchor beneath it, so the solver
+extrapolates and returns extra M and Y — **it comes out as a hue.**
+
+MEASURED on SH8602 p3: the banner bars are the darkest black in the issue (raw
+19.8 / 16.2 / 15.6, against ~29-35 elsewhere) on lighter-than-usual paper (p50
+raw 225 201 188 vs ~205 186 176). G and B sit below the anchor; the graded bars
+came out **43.2 / 18.8 / 16.6 — red-brown**. Step 006's classifier then measured
+chroma 0.019 against a 0.002 threshold and shipped a black-and-white page as a
+colour JPEG. Exactly one page in the issue crossed the line, which is why
+nothing else caught it.
+
+So, when measuring `W`, also take the darkest solid black across the interior
+and move the `K` anchor to it if it sits below the built-in. **The level lines stay
 identity** until they are measured as the **p99 of each ink over bare interior
 paper**. That measurement is still OPEN on 8610: its `colors.txt` ships
 `LC/LM/LY/LK 0 100` and says in a comment that it is waiting for the

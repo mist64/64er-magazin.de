@@ -314,6 +314,24 @@ Past work sometimes patched only one side — the `.txt` was fixed but the
 article aside was missing, or vice versa. For **every** item verify BOTH
 the article aside AND the `prg/*.txt` fix exist.
 
+## A prg whose printed erratum the owner left unapplied
+
+The three disposition words cover "patched" and "left alone on purpose", but
+not the state a build actually reaches most often: **the disk file carries the
+bug, the magazine printed the correction, and the owner has ruled RECORD ONLY**
+(downloads keep what the magazine shipped). That is neither "pending" nor
+"patched", and none of the three words fits it.
+
+Write it into the program file as a header comment, and say so in the aside:
+
+```
+;vor Fehlerteufelchen M/YYYY (Zeile N)
+```
+
+MEASURED on SH8602: `prg/spline 64.txt` line 670 and `prg/reset-helfer.txt`
+line 190, both corrected by the magazine in 4/1986 and 5/1986, both left as
+printed on the owner's ruling (2026-10-04).
+
 ## Verification
 
 ```bash

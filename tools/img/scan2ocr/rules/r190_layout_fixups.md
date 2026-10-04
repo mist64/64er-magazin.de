@@ -93,6 +93,11 @@ Critical guardrails:
 - "Only convert to lists when print shows a marker glyph" — applies
   here exactly as it does in the markdown→HTML conversion rules.
   Enumeration-looking prose without a real bullet stays `<p>`/`<br>`.
+- **A legend whose print aligns COLUMNS is a `table class="plain"`, not a `<br>`
+  chain.** Syntax/Parameter blocks, and `a) b) c)` option lists with `1 =` /
+  `2 =` values, set label, value and description in hanging columns; a `<br>`
+  chain loses that alignment and the reader loses which value goes with which
+  label. (Owner review, SH8602/89.)
 - Every `<aside>` callout is this rule's territory — methodology,
   contest, feature list, warning, author bio.
 

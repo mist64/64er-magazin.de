@@ -64,6 +64,20 @@ For each `<figure>` block in `prg.txt`, in order:
    Listing)`, etc. That's where the figure goes. The figure block
    must be inserted **after** the `</p>` of the paragraph containing
    that first mention, never splitting a paragraph.
+
+   **Which of the two placement rules wins — owner ruling, 2026-10-04.** This
+   rule says both "insert after the `</p>` of the paragraph containing that
+   first mention" and "at article scope, the byline ends the prose and listings
+   follow", and never said which applies when:
+
+   - **A SHORT listing that belongs to the explanation** — a course step, a
+     trick — goes **INLINE**, after the paragraph that first names it. It is
+     meant to be read as part of the text.
+   - **A LONG listing that is a useful program on its own** goes at the **END**,
+     after the byline.
+
+   When in doubt, ask what a reader would do with it: type it to USE it (end),
+   or read it to UNDERSTAND the text (inline).
 3. **Fill `data-name`.** Use the user-visible program name from the
    article body, not the raw on-disk filename
    (e.g. `data-name="Vectors"`, not `data-name="vectors.boot"`).
@@ -107,6 +121,7 @@ For each `<figure>` block in `prg.txt`, in order:
 | Compiled / binary-only download | `<div class="binary_download" data-filename="<name>.prg" data-name="…">` alone | No printed listing to display. |
 | Hidden BASIC companion (no printed listing, but section separator assigns it to this article) | wrap a `<pre data-filename="<name>">` (no `.prg`) inside `<div style="display: none;">` | Materialises a download link without rendering content. |
 | Hidden binary companion | `<div class="binary_download" data-filename="<name>.prg" data-name="…">` | Same intent; CSS hides body and shows only the download link. |
+| Printed assembler OUTPUT (address + hex + source) with only the SOURCE on disk | transcribe the PRINT (r170 method), prove the hex column against the assembled/disk binary, and offer the source as a download | Never the source file under the printed caption: a different PRESENTATION of the same program fails "fidelity to the print" as surely as a different line range. SH8602/13 Listing 3. **When a printed listing replaces a disk embed, keep the disk file as a `binary_download`** — dropping the `<pre data-filename>` silently removed the download. |
 | Printed listing not on the disk (e.g. one-shot pre-step, in-ROM disassembly) | `<figure><pre>TODO</pre><figcaption>Listing N. …</figcaption></figure>` | Records that the print has it; future pass OCRs the printed bytes into the `<pre>`. |
 
 For inline-typed listings (e.g. Z80 asm, Pascal source typed by a

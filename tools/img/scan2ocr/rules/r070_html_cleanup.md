@@ -75,6 +75,22 @@ tools/img/scan2ocr/rules/r070_html_cleanup.sh issues/8607/8607.html
 
 In-place rewrite, idempotent (re-running on a cleaned file is a no-op).
 
+## A SPACED DASH IN BODY TEXT IS AN EN DASH
+
+` - ` becomes ` – `. MEASURED across the corpus: the monthlies run **4,864
+en/em against 755 hyphen**, so the en dash is house style; the hyphen form is
+drift confined to the chain-built Sonderhefte (SH8507 323/15, SH8601 224/16,
+SH8602 259/14 before this ruling). Owner, 2026-10-04.
+
+**Not converted:** anything inside `<pre>` or `<code>`; a numeric or page RANGE
+(`10-20`, `S. 14-16`); a minus sign in a formula; key notation (`CTRL - ↑`);
+and a hyphenated compound, which is not spaced anyway.
+
+**This step, not later.** A converted dash inside an `<h1>` changes the
+headline, and r080 derives the FILENAME from the h1 — so the conversion has to
+happen before the split, or whoever does it owns the rename. On SH8602, 158
+sites changed and five headlines with them, which renamed five files.
+
 **It also `git add`s the file it rewrote** (`git add "$1" 2>/dev/null || true`).
 r000 warns that self-staging scripts plus a shared index have swept files into
 the wrong commit three times, and r000's list now names this script too.

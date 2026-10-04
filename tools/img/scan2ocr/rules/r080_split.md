@@ -87,6 +87,19 @@ N" and exactly **one** was a pointer; the other 15 are prose a reader needs
 ("beachten Sie bitte die Eingabehinweise auf Seite 78", "in Ausgabe 10/86 auf
 Seite 18"). Ask who is speaking: the author, or the layout.
 
+**If the start page carries NO display headline, the h1 comes from the printed
+Inhalt.** Some openers — a Vorwort, an editorial — have no article-level
+headline at all: the first bold line has the same bullet and weight as the
+other section heads, and the only other name on the page is the running-head
+banner. Take the h1 from **the article's entry in the printed table of
+contents**; the banner is `head1`, not the title.
+
+(Owner, 2026-10-04, on SH8602's p3. The import had promoted the first SECTION
+head to h1. The banner reads EINLEITUNG and was proposed as the title, which
+the owner also rejected: p5's Inhalt names the piece "Das Salz in der Suppe",
+and the printed TOC is what names an article. r210's headerless-start-page case
+is the same class seen from the other side.)
+
 **Two articles starting on the same page get lettered pages.** They take
 `64er.pages` `NNNa` and `NNNb` **in printed order — the one starting higher on
 the page is `a`**. Read the order off the crop; it cannot be derived from the

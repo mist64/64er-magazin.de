@@ -258,6 +258,21 @@ principle):
 - Pascal `:=`, `BEGIN`/`END`, `THEN`/`ELSE`, `ARRAY [n..m] OF`
   exactly.
 
+## An unreadable PETSCII glyph is never guessed and never `[ILLEGIBLE]`
+
+A reverse or graphic PETSCII character in a listing that has **no checksum** to
+verify against cannot be named from the scan with any confidence, and a wrong
+guess ships looking exactly as certain as a right one.
+
+**The listing is cropped from the page and placed as an image** (see r150), and
+owner-crop-wins replaces the transcription. Never name the glyph by hand, and
+never ship an `[ILLEGIBLE]` marker: a reader cannot type either.
+
+MEASURED on SH8602: 39 such glyphs across articles 20, 39 and 152. The build
+first marked them `[ILLEGIBLE]`; the owner's ruling (2026-10-04) replaced all
+39 with five whole-listing crops plus four box crops, and the issue shipped
+with zero markers.
+
 ## Verification
 
 ```bash

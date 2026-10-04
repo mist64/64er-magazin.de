@@ -202,6 +202,17 @@ table; do not argue pages out of it one at a time. "There is no judgement here"
 is true only once the measure is right — and an exact 50.0 is part of that: a
 tilde gives no answer at 48 or 52 while claiming there is nothing to decide.
 
+**And the mirror switch, `FORCE_BILEVEL`.** A page can be wrongly promoted to
+colour as well as wrongly kept bilevel: SH8602's p3 is black and white, but its
+banner bars are darker than the grade's K anchor, so they separated red-brown
+and the classifier measured chroma 0.019 (see r005, *EXCEPT K*). `FORCE_BILEVEL="003"`
+keeps such a page at 600 dpi JBIG2.
+
+**A check worth running before every build: a page of the INTERIOR stock
+classified contone is suspect.** The interior is where colour is rare; a
+wrapper or an ad page classified contone is ordinary. Look at any interior page
+the classifier promotes, before the hours of guetzli, not after.
+
 Keep a page at 150 dpi with `FORCE_CONTONE="030"` (space-separated page
 numbers) on `make_issue_pdf_mixed.sh`. Do not retune the classifier's threshold
 to catch one page: the erode earns its place on every other page.

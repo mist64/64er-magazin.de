@@ -140,6 +140,32 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
     `<img class="inline" src="…" alt="…">` without `<figure>`
     wrapper.
 
+## What is NOT a figure
+
+**A cartoon is a filler, not part of the article.** Signed or not, a cartoon set
+in leftover space belongs to the LAYOUT: never crop one, never place one, never
+put one on the worklist. (Owner, 2026-10-04, on SH8602's `58-29`, a signed
+cartoon at the end of the Sprites article that the survey had proposed as a
+DRAWING. Nothing in this rule said so, and "every figure the pages call for"
+invites it.)
+
+## A listing full of unreadable glyphs is cut WHOLE, not glyph by glyph
+
+When a listing carries reverse or graphic PETSCII that cannot be named from the
+scan, do **not** propose one crop per glyph, and never ship `[ILLEGIBLE]`.
+**Crop the whole listing as one image**, and owner-crop-wins then replaces the
+transcription.
+
+MEASURED on SH8602: the worklist proposed 39 individual glyph crops; the owner
+cut five whole listings instead (article 20's Listings 6-9 and article 39's
+Listing 1), covering 32 of them, with the remaining seven in boxed one-liners
+cut as their boxes. Five images rather than 32, and the listing reads as
+printed. Propose that shape FIRST.
+
+**And a table printed across two pages is ONE crop.** The worklist asked for
+`20-t2a` + `20-t2b` because the chart runs from one column onto the next page;
+the owner cut it whole and it places once. The unit is the TABLE, not the page.
+
 ## Two resolution buckets, and which one a figure is in
 
 `tools/convert-scans.sh` states the project's convention for every image file
