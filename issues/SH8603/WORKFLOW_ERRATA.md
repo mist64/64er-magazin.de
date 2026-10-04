@@ -122,3 +122,24 @@ never says to take. `grep -c '<br'` > 0 passed only because of raw `<br>` in
 `<p class="source">`; `-G` produced 0 `<br/>`. And the commonest list break
 here is OCR dropping the space after the number (`2.$025D`, `2.Die`), which
 the `^…\. ` grep cannot see.
+
+## 040/050/060 — a body line that starts with `#` becomes an `<h1>`, and 080 would split an article on it
+
+**What happened.** p164 prints a bullet wrapping onto "#1281/1282=$0501/0502."
+(# = decimal, in contrast to $). The OCR kept the wrap as a separate line;
+Discount read `#1281…` as an ATX heading (no space needed) and 060 shipped
+`<h1>1281/1282=$0501/0502.</h1>` — losing the `#` and creating a 52nd `<h1>`
+that 080 splits articles on. No rule checks `<h1>` count against 030's
+article count; I noticed because `grep -c '<h1'` said 52 against 51 `#`.
+**Suggested.** r040 (it already escapes markdown metacharacters) also escapes
+a leading `#` on any line that is not one of 030's `# Title [pages]` lines;
+r060 Verification compares `<h1>` count to 030's article count.
+
+## r000 — the labels.json bbox is NOT in master pixels
+
+r000 *page block index*: "The bboxes in `<OUT_DIR>/blocks/pNNN.txt` are **in
+this file's pixels** (600 dpi), so a crop is the bbox verbatim". True of
+`blocks/pNNN.txt`; r000 then sends you to `NNN.labels.json` for full text, and
+that file's `bbox` is `[x0, y0, x1, y1]` at **300 dpi**. Cropping it verbatim
+from masters600 gave the wrong region (the p164 intro); ×2 gave the line. Cost
+2 commands. Say so where the recipe points at the JSON.
