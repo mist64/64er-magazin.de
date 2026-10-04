@@ -466,6 +466,16 @@ def main(d):
                                                  or re.match('', '')).group(1)
                                 if re.search(r'<h2[^>]*>(.*?)</h2>', a, re.S) else '')[:40])
 
+    # 1b. 64er.issue must be M/YY (monthly) or "Sonderheft N/YY".
+    #     SH8601 shipped its directory name as the key for all 29 articles,
+    #     because r080 showed the Sonderheft form only in a usage example.
+    #     The key is generate.py's dictionary key and code parses its shape.
+    ISSUE_KEY = re.compile(r'^(\d{1,2}/\d{2}|Sonderheft \d{1,2}/\d{2})$')
+    for f, s_, b in arts:
+        mm = re.search(r'64er\.issue" content="([^"]*)"', s_)
+        if mm and not ISSUE_KEY.match(mm.group(1)):
+            H('64er.issue is not M/YY or "Sonderheft N/YY"', f, mm.group(1)[:30])
+
     # 2. A <p> THAT IS ONLY A PAGE POINTER is the layout speaking, not the
     #    author, and is never transcribed (r080). 8612 kept "Anleitung auf
     #    Seite 58"; 8611/50 kept "Listing auf Seite 54". A sweep of 8612 found

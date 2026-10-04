@@ -35,7 +35,15 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
 - **`<title>`** = the cleaned `<h1>` text
 - **`64er.pages` meta** = the bracketed page numbers
 - **`64er.issue` meta** = the issue id passed in (or auto-derived from the
-  directory name; e.g. `issues/8607/` → `7/86`)
+  directory name; e.g. `issues/8607/` → `7/86`). **A monthly is `M/YY`; a
+  SONDERHEFT is `Sonderheft N/YY` — never the directory name.** The auto-derive
+  only understands `YYMM`, so a Sonderheft MUST be passed explicitly. This was
+  shown only in the Usage example below, never stated, and SH8601 consequently
+  shipped `SH8601` as its key for all 29 articles — the lone outlier against
+  nine Sonderhefte. It is not cosmetic: `64er.issue` is the dictionary key for
+  the whole issue in `generate.py` (`db.issues[issue_key]`) and code parses its
+  shape (`issue_key.endswith("/84")`, and the regular/special split on
+  `k[0].isdigit()`). Corrected across SH8601 on 2026-10-04.
 - **bylines** `<p>(name1/name2)</p>` → `<address class="author">(name1/name2)</address>`
   AND collected into `<meta name="author" content="name1, name2, …">`
 - **`64er.id` meta** = a unique placeholder `XXX<N>` per article, where `<N>`
