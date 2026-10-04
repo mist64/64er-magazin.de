@@ -318,3 +318,16 @@ corpus has the literal `&`. The rule's examples are all spaced (`C 64/VC 20`);
 SH8603's bands are set closed — the rule should say the spacing follows the
 band. No guidance for a lettered `b` start page whose band belongs to the `a`
 article above it (77b).
+
+## 220 — the Verification is monthly-only and the prose says the script lacks what it has
+
+From the 220 sub-agent, confirmed: r220 says "the apply script reads only the
+monthly layout … write one as part of this step" — `r220_index_meta_apply.py`
+already has `parse_sonderheft_csv`. The Usage `cd`s to the repo root then
+runs `../../tools/...` (only works from the issue dir), with bare `python3`.
+Verification check 1 greps `^<YYMM>,` and the routing check filters on the
+monthly columns, so both find 0 rows on a Sonderheft and PASS; the routing
+check also skips lettered pages (`'21c'.isdigit()` False → KeyError if a row
+lands there) and cannot see a misroute between lettered siblings. "Category
+values must match TOPICS in generate.py" is false for the Sonderheft CSV
+(7 categories match nothing; SH8602 the same).
