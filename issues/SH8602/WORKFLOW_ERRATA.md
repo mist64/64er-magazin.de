@@ -696,3 +696,28 @@ L2 and 141 L3 already were); keep the source as a download.
 + source) with only the SOURCE on disk: transcribe the print (r170 method),
 prove the hex column against the assembled/disk binary, offer the source as a
 download — never the source file under the printed caption."
+
+## 130 — which placement rule wins: OWNER RULING (2026-10-04, for the harvest)
+
+r130 says both "insert after the `</p>` of the paragraph containing that first
+mention" and "at article scope, byline ends the prose, listings follow", and
+never says which wins. **Owner ruling:**
+- **Short listings of a course or a trick go INLINE**, at their first mention —
+  they are meant to be read and learnt from as part of the text.
+- **Long listings that are useful programs by themselves go at the END** of the
+  article, after the byline, as listings.
+Applied to SH8602 as built: 58 Sprites, 20 Tasten, 49 Debugging and the 141
+tips are inline (course/trick fragments); 39 "Steuerzeichensuche" and the other
+standalone programs stay at the end — no change needed. Sentence for r130:
+"A short listing that belongs to the explanation (a course step, a trick) is
+placed inline after the paragraph that first names it; a long listing that is a
+useful program on its own goes after the byline. When in doubt: would a reader
+type it to USE it (end) or to UNDERSTAND the text (inline)?"
+
+## 190 — a parameter legend with hanging indentation is a plain table (owner review)
+
+89 item 4 "Syntax / Parameter" was set as a `<br>` chain, which loses the
+print's hanging columns (label · value · description). Owner: use a
+`table class="plain"`. Sentence for r190: "A legend whose print aligns labels,
+values and descriptions in columns (Syntax/Parameter blocks, a) b) c) option
+lists with `1 =`/`2 =` values) is a `table class="plain"`, not `<br>` lines."
