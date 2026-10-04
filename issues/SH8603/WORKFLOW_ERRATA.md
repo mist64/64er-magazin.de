@@ -396,3 +396,22 @@ found 3 -- MORE than adjudicated" and still exit 0 with HARD 0. An
 adjudication should clear exactly its count; "MORE than adjudicated" should
 be HARD. The single-item `<ol>` check has no adjudication hook, so a printed
 one-item numbered list (14 p17) must be re-shaped to pass.
+
+## 060/190/r310 — how the list defects were actually found (answer for the harvest)
+
+The 52 `<li> wraps <p>` were found ONLY by r310 at the end of the chain;
+nothing in r060's or r190's checks looks for `<li><p>` (grep of both rules and
+r060's script: no such check). Discount emits them for every loose list, and
+SH8603's course articles (14, 6, 76) are list-heavy.
+The 2 single-`<li>` `<ol>`s (both in 14): r060's start-number survey DID list
+the p19 LOAD list (html 725, "→3") as torn — and r060 says "the fix is
+`<ol start="N">`, written at 190". 190 did exactly that, wrapping the lone
+item 3 in `<ol start="3">` — which is the one-item-list shape r310 flags; the
+print has 1., 2., a paragraph, then 3., so the right fix was numbered run-in
+paragraphs (r310 sub-agent). The p17 PLOT one-item list ("1. Cursor setzen:",
+no 2.) was never in r060's list at all. So r060's check earns its place for
+FINDING torn lists, but its prescribed fix produces the defect r310 rejects
+when prose separates the parts. Suggested: r060/r190 say "rejoin if
+contiguous in print; if prose intervenes, numbered run-in `<p>N. …</p>`, not
+`<ol start>`" — and r190's Verification runs r310's `<li><p>` and single-li
+checks on its own output.
