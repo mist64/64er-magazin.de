@@ -960,7 +960,7 @@ command, or run it through a login shell, before concluding anything is missing.
 ### Where the scans are
 
 ```
-/Volumes/S/png/<ID>/NNN.png      the 2400 dpi masters   -> the descriptor's scan_dir
+/Volumes/S/png/<ID>/NNN.png      the scan masters       -> the descriptor's scan_dir
 /Volumes/S/png/<ID>/thumb/       150 dpi thumbnails     -> NOT an input. See below.
 ```
 
@@ -969,7 +969,16 @@ them; it is derived data and the chain re-makes its own -- the descriptor's
 `thumb_150` points into `<tmp>`, never here.
 
 VERIFIED 2026-10-01: 47 issue directories, 8405 through 8612 plus the Sonderhefte.
-A master is an A3 sheet at 2400 dpi and runs to about 900 MB, so an issue is
+**A master is an A3 sheet at 2400 dpi OR at 600 dpi, and ONE ISSUE CAN BE
+BOTH.** Read each page's own resolution from its PNG `pHYs` chunk
+(`magick identify -format '%x'`, px/cm x 2.54); never assume. MEASURED on
+SH8602: pages 003-162 at 600 dpi (~5029x7188, ~63 MB), the wrapper and the
+bound-in card -- 001, 002, 163-168 -- at 2400 (~20300x28751, ~850 MB). The raw
+TIFFs are the same, so there is no higher-resolution original to go back to.
+`r005_masters.scan_dpi()` reads it and cross-checks the frame height in mm,
+because a wrong `pHYs` would rescale every millimetre constant in silence.
+
+A 2400 dpi master runs to about 900 MB, so an issue is
 ~180 GB and nothing about it is cheap to re-make.
 
 ### A `thumb/` you FIND beside the scans is NOT an input — re-derive it
@@ -1006,12 +1015,19 @@ and the descriptor's `thumb_150` points THERE and never at the scan directory.
 # Derive the thumbs this build will use. -scale, NOT -resize: see below.
 mkdir -p "<tmp>/thumb150"
 for m in <scan_dir>/[0-9][0-9][0-9].png; do
-  magick "$m" -scale 6.25% "<tmp>/thumb150/$(basename "$m")"
+  # SCALE BY THE PAGE'S OWN dpi, never a fixed 6.25%. A MASTER IS 2400 dpi OR
+  # 600 dpi, and an issue can be both: SH8602's interior (003-162) is 600 and
+  # only its wrapper is 2400. Run verbatim with 6.25%, 160 of its 168 thumbs
+  # came out 317x449 px -- 37.5 dpi, not 150 -- and step 005 could not run.
+  d=$(magick identify -format '%x' "$m" | awk '{printf "%d", $1*2.54+0.5}')
+  magick "$m" -scale $(awk "BEGIN{printf \"%.6f\", 150/$d*100}")% \
+    "<tmp>/thumb150/$(basename "$m")"
 done
 ```
 
-**`-scale`, and the choice is measured, not stylistic.** 6.25% of 2400 dpi is
-150 dpi, but the *filter* decides the pixel values, and r005's thresholds
+**`-scale`, and the choice is measured, not stylistic.** The ratio is
+`150 / the page's own dpi` -- 6.25% at 2400, 25% at 600 -- but the *filter*
+decides the pixel values, and r005's thresholds
 (`lum > 170`, `max - min < 40`) are pixel values. Compared against the thumbs
 actually sitting beside the scans, on 8612 p050:
 
@@ -1058,7 +1074,7 @@ the step is wrong.
 
 ### Everything else, the chain made
 
-**The chain has ONE input: the 2400 dpi scan masters.** Every other file it
+**The chain has ONE input: the scan masters** (2400 dpi or 600 dpi; see above). Every other file it
 reads, it made -- `masters600`, `sheets600`, `cmyk2400`, `geometry`, the OCR
 blocks, the article HTML, the issue PDF -- or it is already in the repo, put
 there by an earlier issue's run of this same chain.
@@ -1203,10 +1219,17 @@ question. Leave it alone.
 
 ## Cross-cutting rule: PREFLIGHT the free space, before step 005
 
-Step 005 is the only step that writes at 2400 dpi and it writes ~**2.25 GB
-per page** — `masters2400/NNN.png` plus `cmyk2400/NNN.tif`. On a 200-page
-monthly that is **~450 GB**, and it arrives over four hours with no check of
-its own. Running out at hour three loses the sweep, not just the page.
+Step 005 is the only step that writes at the scan's full resolution, and the
+footprint depends on that resolution. For a **2400 dpi** page it is ~**2.25 GB**
+— `masters2400/NNN.png` plus `cmyk2400/NNN.tif` — so a 200-page monthly is
+**~450 GB**, arriving over four hours with no check of its own. Running out at
+hour three loses the sweep, not just the page.
+
+For a **600 dpi** page it is roughly **1/16 of that**: there is no
+`masters2400/NNN.png` at all (at 600 dpi the full-resolution render IS
+`sheets600`), and `cmyk2400/NNN.tif` is written at the scan's own resolution.
+So budget per page, not per issue — SH8602's 160 interior pages at 600 dpi and
+8 wrapper pages at 2400 cost a fraction of what the formula below assumes.
 
 So before dispatching 005:
 
@@ -1215,7 +1238,25 @@ ISS=$($PY -c 'import r000_issue; from r000_issue import ISSUE
 i = r000_issue.load(ISSUE); print(i.tmp, i.pages)')
 set -- $ISS
 df -g "$(dirname "$1")" | tail -1         # free GB on the volume holding <tmp>
-echo "budget: $(( $2 * 9 / 4 )) GB for the 2400 dpi archive"
+# Per page, at that page's OWN resolution: a 600 dpi page costs ~1/16 of a
+# 2400 dpi one, so a fixed per-page figure over-books a mixed issue badly.
+$PY - <<'BUDGET'
+import glob, os
+from PIL import Image
+import r000_issue
+Image.MAX_IMAGE_PIXELS = None
+iss = r000_issue.load(r000_issue.ISSUE)
+per = {2400: 2.25, 600: 2.25 / 16}          # GB per page, measured
+tot = {}
+for f in sorted(glob.glob(os.path.join(iss.scan_dir, "[0-9][0-9][0-9].png"))):
+    with Image.open(f) as im:
+        d = round(im.info.get("dpi", (0, 0))[0])
+    d = min(per, key=lambda k: abs(k - d))
+    tot[d] = tot.get(d, 0) + 1
+print("budget: " + " + ".join("%d pages @%d dpi = %.0f GB" % (n, d, n * per[d])
+                              for d, n in sorted(tot.items())) +
+      "  ->  %.0f GB total" % sum(n * per[d] for d, n in tot.items()))
+BUDGET
 ```
 
 **Then make it a measurement, not a constant.** The profile gate already

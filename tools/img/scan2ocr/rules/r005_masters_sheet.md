@@ -499,6 +499,13 @@ decision, not a looser constant here*.
 | `high` | white stock that was white when new — the folded cover wrapper, a bound-in card or insert | the **built-in anchor set**: `W 201 195 188, C 38 140 165, M 192 37 66, Y 201 159 61, K 16 17 17` and its overprints, with **identity levels** |
 | `low` | the cheap interior stock, yellowish-grey from the start and browner now | this issue's **measured** `colors.txt` |
 
+**For a NEW issue, measure it** — the procedure lives in
+`r005_masters_spread.md`, *The profile is MEASURED for this issue's paper*
+(pool the interior thumbs, take the low percentile per channel) and the result
+goes to `issues/<ID>/colors.txt`. This rule used to say only that the file is
+"measured" and then point at SH8601's existing one, so a new issue had nowhere
+to look; SH8602 had to take the method from the spread rule.
+
 The built-in anchors are the eight the old separation compiled in, copied into
 `BUILTIN_ANCHORS` rather than imported (`scan2mrc` is retired and `scan2ocr` must
 not reference it). They are not a fallback here — they *are* the high-quality

@@ -48,6 +48,13 @@ from r000_issue import ISSUE
 # 300 dpi for tesseract and takes a clean 2:1 box filter down to it, and r145
 # wants the extra stop for figure crops.  4 is an exact integer reduction, so
 # no resampling filter touches the ink on the way down.
+# A MASTER IS 2400 dpi OR 600 dpi.  Owner, 2026-10-04: "masters can be 2400 or
+# 600. we need to adapt."  MEASURED on SH8602: pages 003-162 are 600 dpi
+# (5029x7188, 236.22 px/cm) and only the wrapper and the bound-in card -- 001,
+# 002, 163-168 -- are 2400.  The raw TIFFs are the same, so no 2400 dpi copy of
+# that interior exists.  SCAN_DPI below is the USUAL case and the default for
+# code that has not been told otherwise; read the page's own with scan_dpi().
+SCAN_DPIS = (600, 2400)                       # the resolutions this step accepts
 SCAN_DPI = 2400
 MASTER_DPI = 600
 
@@ -498,7 +505,32 @@ def trace(vals, idx, pct, mm_px):
 # through the screen correctly.  Adopted from 8611 onward by the owner's
 # decision (2026-09-27); 8610 and earlier shipped without it and are not being
 # re-run, so there is a deliberate seam in the corpus at 11/86.
-def paper_field(rgb):
+def scan_dpi(scan):
+    """The scan's own resolution, from its PNG pHYs chunk, cross-checked.
+
+    The header is the claim; the sheet's HEIGHT in mm is the check, because a
+    wrong pHYs would otherwise rescale every millimetre constant in this file
+    in silence.  Every scan frame this chain has seen is ~304 mm tall (SH8601,
+    8612: 28751 px at 2400; SH8602's interior: 7188 px at 600).  A resolution
+    outside SCAN_DPIS, or a frame that is not 250-350 mm tall at the claimed
+    resolution, stops the page -- there is nothing defensible to publish.
+
+    Written for the sheet variant on SH8602 and lifted here so BOTH variants
+    have it: a mixed-resolution spread issue is not ruled out, and the spread
+    path still reduces by the fixed SCAN_REDUCE.
+    """
+    with Image.open(scan) as im:
+        dpi = im.info.get("dpi", (0, 0))[0]
+        h = im.size[1]
+    got = min(SCAN_DPIS, key=lambda d: abs(d - dpi))
+    if abs(got - dpi) > 1 or not 250 <= h / got * 25.4 <= 350:
+        raise PageFailed(f"r005 {scan.name}: pHYs says {dpi:.2f} dpi and the "
+                         f"frame is {h} px tall -- not one of {SCAN_DPIS} dpi "
+                         f"with a ~304 mm frame")
+    return got
+
+
+def paper_field(rgb, dpi=None):
     """The local paper white, per channel, as a smooth surface at FIELD_DPI.
 
     A LOW percentile of each block, never a max or a median: the field has to
@@ -511,7 +543,9 @@ def paper_field(rgb):
     and the floor carries a 22% margin, so the error is irrelevant and it turns
     a minute a page into a second.
     """
-    step = max(1, int(round(SCAN_DPI / FIELD_DPI)))
+    # The page's OWN resolution, not the 2400 default: at 600 dpi a fixed
+    # SCAN_DPI gives step 8 and a 75 dpi field where 300 was intended.
+    step = max(1, int(round((dpi or SCAN_DPI) / FIELD_DPI)))
     small = np.asarray(Image.fromarray(rgb[::step, ::step]).convert("RGB"), float)
     lum = small @ [.299, .587, .114]
     ispaper = (lum > 170) & ((small.max(2) - small.min(2)) < 40)
