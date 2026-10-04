@@ -1,5 +1,18 @@
 # 340 — `WORKFLOW_ERRATA.md`: what these rules got wrong, written while it hurt
 
+## THE FILE'S LIFECYCLE: kept, harvested, then DELETED
+
+`WORKFLOW_ERRATA.md` is written throughout the build and committed, harvested
+into these rules once the issue is COMPLETE — never earlier — and then
+**deleted**. It is a hand-over, not an archive: once its content is in the
+rules, a copy beside the issue is a second place for the same statement to
+drift from. The harvest itself is recorded in
+`tools/img/scan2ocr/rules/HARVEST.md`, which says what was decided and where it
+landed, and the commits carry the detail.
+
+Owner, 2026-10-04: "we also collect. we apply the errata at the END" and "when
+applied, delete all errata md files".
+
 **Applies to:** all — every issue is run by an agent reading these files, so
 every issue is also a test of them.
 

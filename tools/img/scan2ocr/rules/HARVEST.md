@@ -266,3 +266,44 @@ place in the chain where a HARD finding is expected to persist.
 - 8609 carries 4 HARD r190 byline-split findings (articles 64, 66, 68) --
   these are the ones that used to surface when r310 defaulted to issues/8609.
   Out of scope, recorded.
+
+# ============================================================
+# SH8602 — harvested 2026-10-04
+# ============================================================
+
+49 entries from `issues/SH8602/WORKFLOW_ERRATA.md`, applied in five commits and
+the errata file then deleted per the owner's instruction. Read as one
+implementer's notes and cross-checked, not transcribed — two claims turned out
+to understate the problem (see below) and none was found wrong.
+
+Decision procedure used, agreed with the owner beforehand:
+the printed page wins on content; the corpus wins where the print does not
+decide; measurement beats assertion; the owner rules what is editorial. For a
+rule-versus-code disagreement the PROSE follows the CODE, because changing
+prose costs nothing and changing code rewrites published output — unless the
+code is demonstrably producing wrong output, and then the blast radius is
+measured first.
+
+| commit | what |
+|---|---|
+| `ba4605c2` | a master is 2400 dpi OR 600 dpi: shared `scan_dpi()`, per-page thumb recipe, per-page disk budget |
+| `3305da8f` | r330 reprint leads + THEIRS blind reading; r060 list numbering; four checks that could not do their job |
+| `f23a2394` | the owner rulings (figures, glyphs, placement, dash, prg errata, TOC naming, K anchor) |
+| `7e799733` | monthly-shaped rules re-shaped; r070/r040/r220 script bugs |
+| `61aa8a79` | SH8601's issue key normalised, with the r080 rule and an r310 check |
+
+**Two entries understated their own finding:**
+
+- r320's dropped-listings companion was described as "vacuous on MSE/BASIC
+  issues". Making it report its denominator showed worse: **SH8602 has 1,933
+  dropped listing blocks of which 0 were checkable, and 8612 has 647 of which
+  0.** The gate has returned a clean "0" on both issues while examining
+  nothing; only SH8601, which had SMON dumps, ever exercised it.
+- r070's ordering bug was recorded as "the script still has the bug its rule
+  says was fixed". It is worse than cosmetic: the script was **not
+  idempotent**, which is the one property its rule guarantees.
+
+**Corrected while harvesting:** the "banner-only article name" entry. The build
+retitled SH8602's article 3 to "Einleitung" after the running-head banner, on
+my relay; the owner's final ruling is that the **printed Inhalt** names an
+article. The rule in r080 is the TOC, not the banner.
