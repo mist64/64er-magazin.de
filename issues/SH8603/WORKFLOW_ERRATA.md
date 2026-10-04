@@ -143,3 +143,17 @@ this file's pixels** (600 dpi), so a crop is the bbox verbatim". True of
 that file's `bbox` is `[x0, y0, x1, y1]` at **300 dpi**. Cropping it verbatim
 from masters600 gave the wrong region (the p164 intro); ×2 gave the line. Cost
 2 commands. Say so where the recipe points at the JSON.
+
+## 070 — the rule requires an en-dash pass the script does not do, and does not check
+
+**What the rule says.** r070 "A SPACED DASH IN BODY TEXT IS AN EN DASH: ` - `
+becomes ` – `" … "**This step, not later.** … r080 derives the FILENAME from
+the h1". **What is true.** `r070_html_cleanup.sh` has no dash substitution and
+the Verification block has no dash check, so a run of the script alone passes
+070 with 0 en dashes. The sub-agent wrote its own pass (119 converted, 70 kept
+by per-site judgement) — which also means the script's self-`git add` staged
+only half of 070 (`MM` in the index). Also: U+201A `‚` (18 sites, mostly
+misread commas) is not in the rule's quote table. Cost: one sub-agent script
+plus a review of 189 sites. **Suggested.** Put the dash pass, with the
+exclusion classes, into the script; add `grep -c ' – '` > 0 to Verification;
+rule on U+201A.
