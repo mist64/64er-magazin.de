@@ -17,28 +17,34 @@
         <h1>Tips &amp; Tricks zum C16</h1>
         <p class="intro">Auch zu Commodores Kleinsten haben unsere Leser ein paar nützliche Tricks entdeckt, die nicht im Handbuch stehen, den Umgang mit diesem Computer aber wesentlich erleichtern.</p>
 
-        <p>er vom VC 20 oder C 64 auf den C 16/116 umsteigt, wird im ersten Augenblick die bewährte »RESTORE«-Taste vermissen. Hatte sich der Computer einmal »aufgehängt« (zum Beispiel durch eine falsche WAIT-Anweisung oder einen falschen Sprung in ein Maschinenprogramm), so konnte man ihn fast immer mit RUN/STOP-RESTORE zurückholen. Was macht man nun beim © 16/116, wenn sich der Computer in eine Endlosschleife verabschiedet? Nicht gleich ausschalten! Hier gibt es einen kleinen Trick:</p>
+        <p>Wer vom VC 20 oder C 64 auf den C 16/116 umsteigt, wird im ersten Augenblick die bewährte »RESTORE«-Taste vermissen. Hatte sich der Computer einmal »aufgehängt« (zum Beispiel durch eine falsche WAIT-Anweisung oder einen falschen Sprung in ein Maschinenprogramm), so konnte man ihn fast immer mit RUN/STOP-RESTORE zurückholen. Was macht man nun beim C 16/116, wenn sich der Computer in eine Endlosschleife verabschiedet? Nicht gleich ausschalten! Hier gibt es einen kleinen Trick:</p>
 
         <p>Zuerst den »RESET«-Taster drücken (aber noch nicht loslassen). Dann gleichzeitiges Drücken der »RUN/STOP«- und »Commodore«-Taste. Anschließend »RESET«-Taster loslassen und schon befindet man sich im Monitor-Programm, das mit »X« wieder verlassen werden kann. Der alte Speicherinhalt bleibt erhalten!</p>
 
         <address class="author">(C. Q. Spitzner/tr)</address>
 
-        <p>Der Bildschirm des C 16 beginnt bei $0COO (= #3072), der zugehörige Farb-RAM bei $0800 (= #2048) und die hochauflösende Grafik (HiRes) bei $2000 (= #8192). Es können also einfarbige Grafiken vom C 64 problemlos übernommen werden. Die Farbintensität für HiRes ist angesiedelt bei $1800(bis $1FFF). Einen Basic-Warmstart erreicht man durch »SYS 32768« ($8000), hier beginnt auch der ROM-Teil. »SYS 62114« (=$F2A4) macht einen kompletten Reset. Wer von anderen Computern gewohnt ist, seinen Monitor durch einen »SYS«-Befehl zu starten, kann dies mit »SYS 62533« (=$F445) tun.</p>
+        <h2>Diverses</h2>
 
-        <p>Die ESC-Funktionen lassen sich auch von Maschinensprache aus nutzen (siehe Tabelle). Für das Definieren von Bildschirmfenstern ist es notwendig, die Eckpunkte anzugeben. Hierbei ist $CD = Zeile und $CA = Spalte, also zum Beispiel: _</p>
+        <p>Der Bildschirm des C 16 beginnt bei $0C00 (= #3072), der zugehörige Farb-RAM bei $0800 (= #2048) und die hochauflösende Grafik (HiRes) bei $2000 (= #8192). Es können also einfarbige Grafiken vom C 64 problemlos übernommen werden. Die Farbintensität für HiRes ist angesiedelt bei $1800(bis $1FFF). Einen Basic-Warmstart erreicht man durch »SYS 32768« ($8000), hier beginnt auch der ROM-Teil. »SYS 62114« (=$F2A4) macht einen kompletten Reset. Wer von anderen Computern gewohnt ist, seinen Monitor durch einen »SYS«-Befehl zu starten, kann dies mit »SYS 62533« (=$F445) tun.</p>
+
+        <p>Die ESC-Funktionen lassen sich auch von Maschinensprache aus nutzen (siehe Tabelle). Für das Definieren von Bildschirmfenstern ist es notwendig, die Eckpunkte anzugeben. Hierbei ist $CD = Zeile und $CA = Spalte, also zum Beispiel:</p>
 
         <pre><code>LDX #$02
-STX $CA ‚dritte Zeile und
-STX $CD ‚dritte Spalte
-- JSR $DE5SE ;T«-Befehl
+STX $CA     ;dritte Zeile und
+STX $CD     ;dritte Spalte
+JSR $DE5E   ;»T«-Befehl
 LDX #$12
-STX $CA ‚18. Zeile und
-STX $CD ‚18. Spalte
-JMP$DE60 ;»B«-Befehl
+STX $CA     ;18. Zeile und
+STX $CD     ;18. Spalte
+JMP$DE60    ;»B«-Befehl
 </code></pre>
 
-
         <p>definiert ein Bildschirmfenster ab dritter Zeile und Spalte mit 15 Zeilen (18 - 3) Länge zu je 15 Zeichen.</p>
+
+        <p>Gerade die Möglichkeit, mit »Windows« zu arbeiten, hebt den C 16/116 weit über seine Konkurrenten hervor. Auch die anderen Escape-Funktionen bieten umfangreiche Möglichkeiten der Bildschirmgestaltung.</p>
+
+        <p>Übrigens, die »JMP«-Anweisung am Schluß des kleinen Beispielprogramms ist gleichbedeutend mit »JSR« und anschließendem »RTS«.</p>
+
         <figure>
             <table>
                 <tr>
@@ -140,22 +146,13 @@ JMP$DE60 ;»B«-Befehl
             <figcaption>Tabelle. Die Escape-Funktionen und ihre Adressen:</figcaption>
         </figure>
 
+        <h3>Weitere Tips</h3>
 
-        <p>Gerade die Möglichkeit, mit »Windows« zu arbeiten, hebt den C 16/116 weit über seine Konkurrenten hervor. Auch die anderen Escape-Funktionen bieten umfangreiche Möglichkeiten der Bildschirmgestaltung.</p>
+        <p>— »WAIT 1,192« wartet darauf, daß eine Taste am Recorder gedrückt wird.</p>
 
-        <p>Übrigens, die »JMP«-Anweisung am Schluß des kleinen Beispielprogramms ist gleichbedeutend mit »JSR« und anschließendem »RTSe«. Weitere Tips</p>
+        <p>— Der Speicher für die Funktionstasten beginnt bei $0567 und endet bei $05E6.</p>
 
-        <ul>
-            <li>
-                <p>»WAIT 1,192« wartet darauf, daß eine Taste am Recorder gedrückt wird. .</p>
-            </li>
-            <li>
-                <p>Der Speicher für die Funktionstasten beginnt bei $0567 und endet bei $05E6.</p>
-            </li>
-            <li>
-                <p>Die Einsprungadresse für die USR-Funktion steht in #1281/1282=$0501/0502.</p>
-            </li>
-        </ul>
+        <p>— Die Einsprungadresse für die USR-Funktion steht in #1281/1282=$0501/0502.</p>
 
         <address class="author">(Frank Plachetta/tr)</address>
     </article>

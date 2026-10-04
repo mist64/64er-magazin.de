@@ -296,3 +296,14 @@ check finds no `xx = Name` key in a Sonderheft masthead, so every initial is
 previous issue's Impressum" while the guardrail says keep initials exactly as
 printed. And `blocks/pNNN.txt` truncation hid ~40 of 50 bylines; the agent
 had to use `NNN.json` — the r000 warning names labels.json, not the rule.
+
+## 190 — `$TMPDIR_ISSUE` is undefined; the never-split rule moves mid-article tables away from their print position
+
+From both 190 sub-agents: Verification check 2 writes `skipped_files.txt` to
+`$TMPDIR_ISSUE`, which no rule defines — and two parallel parts would collide
+on one path; both used their scratch dirs. The "never split the author from
+their text" rule moved tables/figures that print floats MID-article to after
+the byline in 9 files — a departure from print position nobody marks, and in
+tension with "restore in print position" for boxes. And no rule owns lost
+DROP CAPS before 190: 030/080 leave them, r310 gates them only at the end;
+here 190 read ~38 of them off the crops.
