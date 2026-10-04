@@ -340,3 +340,12 @@ Verification code reads no adjudication file, and r310 has no
 `heading-all-caps` check, so an entry would make r310 report "declared N,
 found 0". A heading kept in caps on purpose therefore cannot be cleared by
 either check (SH8602's UNNEW is the standing example).
+
+## 280 — briefing vs body on `<pre>`; checks still piped into `head`
+
+From 280 part B: the rule's Briefing tells sub-agents to leave `<pre>` alone,
+its body puts `<pre>` in scope (followed the body: 164 `JMP $DE60`). The
+Verification still pipes checks 1 and 2 into `head`, which r000 (A CHECK
+SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL) forbids. The block index could not
+locate most mid-paragraph words or the p148 box; the agent ran its own
+tesseract word-box pass as a locator.

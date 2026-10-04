@@ -20,11 +20,11 @@
         <h1>Ein 6502-Simulator in Basic</h1>
         <p class="intro">Der Simulator ist eine Hilfe für den Einstieg in die Maschinensprache-Programmierung auf dem VC 20/C 16. Man kann direkt am Bildschirm verfolgen, was sich bei der Abarbeitung eines Programms in der Zentraleinheit des Computers, im 6502/7501-Prozessor tut.</p>
 
-        <p>Die meisten Leser, die sich für Maschinensprache interessieren, werden mit Basic vertraut sein, aber in der Regel noch ein paar Schwierigkeiten mit der Funktion einzelner Maschinenbefehle haben. Wir wollen deshalb im folgenden ein Basic-Programm vorstellen, welches. die Maschinenbefehle simuliert. Den Prozessorregistern entsprechen dabei einfache Variablen, und der Stapel wird mit Hilfe eines Arrays simuliert. Die momentanen Werte der Prozessorregister werden am Bildschirm in hexadezimaler Form ausgegeben. Durch die Verwendung von Basic dauert die Ausführung eines Befehls etwa 100 000mal länger, als der Prozessor selbst arbeitet. Dies ist aber gerade dazu gut, um in einer Art Einzelschrittverfahren die Funktion eines Programms nachzuvollziehen.</p>
+        <p>Die meisten Leser, die sich für Maschinensprache interessieren, werden mit Basic vertraut sein, aber in der Regel noch ein paar Schwierigkeiten mit der Funktion einzelner Maschinenbefehle haben. Wir wollen deshalb im folgenden ein Basic-Programm vorstellen, welches die Maschinenbefehle simuliert. Den Prozessorregistern entsprechen dabei einfache Variablen, und der Stapel wird mit Hilfe eines Arrays simuliert. Die momentanen Werte der Prozessorregister werden am Bildschirm in hexadezimaler Form ausgegeben. Durch die Verwendung von Basic dauert die Ausführung eines Befehls etwa 100 000mal länger, als der Prozessor selbst arbeitet. Dies ist aber gerade dazu gut, um in einer Art Einzelschrittverfahren die Funktion eines Programms nachzuvollziehen.</p>
 
         <p>Direkt nach dem Starten fragt das Programm nach der Startadresse, ab der ein Programm bearbeitet werden soll. Das zu testende Maschinenprogramm muß also bereits im Speicher stehen. Man kann sowohl eingebaute ROM-Routinen testen, als auch mit einem Assembler erstellte Programme nachvollziehen.</p>
 
-        <p>Auch ist esmöglich, kleine Programme mit POKE-Befehlen einzugeben und dann ab der entsprechenden Speicherzelle den Test zu starten.</p>
+        <p>Auch ist es möglich, kleine Programme mit POKE-Befehlen einzugeben und dann ab der entsprechenden Speicherzelle den Test zu starten.</p>
 
         <p>Im Anschluß werden die Werte der Prozessorregister, die an das Programm übergeben werden sollen, erfragt. Dabei kann man den Wert des Prozessorstatusregisters in binärer Form eingeben. Schließlich werden noch bis zu 10 Adressen erfragt, bei denen das Programm anhalten soll. Wird im Programmablauf eine dieser Adressen erreicht, so hält das Programm an. Alle Eingaben – außer den Daten des Prozessorstatusregisters – müssen in hexadezimaler Form erfolgen.</p>
 
@@ -34,11 +34,11 @@
 
         <p>Das Programm ist wie folgt aufgebaut:</p>
 
-        <p>Die Zeilen 10 bis 90 geben die Kopfzeile des Programms aus und beinhalten die Eingaben. Dort werden auch einige Felder und Funktionen definiert, die zu späteren Berechnungen notwendig sind. In Zeile 70 befindet sich der Aufruf eines Unterprogramms ab Zeile 49000, welches ein Demonstrationsprogramm in die Speicherzellen ab 34768=$8700 »POKEcdk. In den Zeilen 100 bis 900 sind einige Unterprogramme enthalten, die der Umrechnung von Hexadezimalzahlen dienen, die hier nicht weiter erläutert werden. Ab Zeile 1000 bis 1060 befindetsich die Schleife, die für jeden Befehl durchlaufen wird. Dabei wird zunächst der aktuelle Stand der Prozessorregister angezeigt (Unterprogrammaufruf 2000), dann die Variable OP mit dem Wert der momentan über den Programmzähler adressierten Speicherzelle besetzt und anschließend das Unterprogramm ab Zeile 1100 aufgerufen, welches einen Befehl auswertet. Schließlich wird noch der Programmzähler um eins erhöht und wieder zur Zeile 1000 gesprungen, wenn kein Abbruchkriterium erfüllt ist.</p>
+        <p>Die Zeilen 10 bis 90 geben die Kopfzeile des Programms aus und beinhalten die Eingaben. Dort werden auch einige Felder und Funktionen definiert, die zu späteren Berechnungen notwendig sind. In Zeile 70 befindet sich der Aufruf eines Unterprogramms ab Zeile 49000, welches ein Demonstrationsprogramm in die Speicherzellen ab 34768=$8700 »POKEd«. In den Zeilen 100 bis 900 sind einige Unterprogramme enthalten, die der Umrechnung von Hexadezimalzahlen dienen, die hier nicht weiter erläutert werden. Ab Zeile 1000 bis 1060 befindet sich die Schleife, die für jeden Befehl durchlaufen wird. Dabei wird zunächst der aktuelle Stand der Prozessorregister angezeigt (Unterprogrammaufruf 2000), dann die Variable OP mit dem Wert der momentan über den Programmzähler adressierten Speicherzelle besetzt und anschließend das Unterprogramm ab Zeile 1100 aufgerufen, welches einen Befehl auswertet. Schließlich wird noch der Programmzähler um eins erhöht und wieder zur Zeile 1000 gesprungen, wenn kein Abbruchkriterium erfüllt ist.</p>
 
         <p>Das Unterprogramm ab Zeile 1100 ist ein Sprungverteiler auf die einzelnen Programmstücke, jeweils ein Sprung für einen Befehl. Ein unzulässiger Befehl bedeutet immer einen Sprung auf das Unterprogramm ab Zeile 1400, welches mit einer entsprechenden Meldung am Bildschirm endet.</p>
 
-        <p>Das Unterprogramm ab Zeile 2000 dient zur Anzeige aller Prozessorregister. Das Statusregister wird dabei binär dargestellt, wobei ein Zeichen durch die Funktion CHR$ (48+N) gebildet wird, was hier einer »O« oder »1« entspricht, jenachdem, ob N gleich O oder 1 ist. Die anderen Prozessorregister werden mit Hilfe des Unterprogramms ab Zeile 200 in hexadezimale Zahlen umgewandelt. Diese werden gesammelt in Zeile 2090 in der zweiten Bildschirmzeile ausgegeben.</p>
+        <p>Das Unterprogramm ab Zeile 2000 dient zur Anzeige aller Prozessorregister. Das Statusregister wird dabei binär dargestellt, wobei ein Zeichen durch die Funktion CHR$ (48+N) gebildet wird, was hier einer »0« oder »1« entspricht, je nachdem, ob N gleich 0 oder 1 ist. Die anderen Prozessorregister werden mit Hilfe des Unterprogramms ab Zeile 200 in hexadezimale Zahlen umgewandelt. Diese werden gesammelt in Zeile 2090 in der zweiten Bildschirmzeile ausgegeben.</p>
 
         <p>Die Zeilen 3000 bis 9000 enthalten Unterprogramme, die für die Ausführung von Befehlen notwendig sind, beziehungsweise allgemeine Unterprogramme, die die Programmierung der anderen vereinfachen.</p>
 
@@ -50,7 +50,7 @@
 
         <h2>Komplizierte Addition</h2>
 
-        <p>Da die Addition ein komplizierter Prozeß ist, dainsbesondere Binär- oder Dezimalaritnmetik verwendet werden kann, wird diese in dem Unterprogramm ab Zeile 8000 behandelt. Analog wird ab 8200 die Subtraktion behandelt. In diesen Unterprogrammen wird zunächst erfragt, ob das Dezimalflag gesetzt ist. Wenn nicht, ergibt sich der neue Wert des Akkumulators einfach aus:</p>
+        <p>Da die Addition ein komplizierter Prozeß ist, da insbesondere Binär- oder Dezimalarithmetik verwendet werden kann, wird diese in dem Unterprogramm ab Zeile 8000 behandelt. Analog wird ab 8200 die Subtraktion behandelt. In diesen Unterprogrammen wird zunächst erfragt, ob das Dezimalflag gesetzt ist. Wenn nicht, ergibt sich der neue Wert des Akkumulators einfach aus:</p>
 
         <p>Alter Wert + Speicherwert + Carry-Flag</p>
 
@@ -62,7 +62,7 @@
 
         <h2>Illegale Opcodes</h2>
 
-        <p>Dawir an dieser Stelle davon ausgehen, daß Basic hinlänglich bekannt ist, werden für die Unterprogramme zu den einzelnen Befehlen keine Erklärungen mehr gegeben. Vielmehr sollen gerade die Unterprogramme in Basic dazu dienen, Ihnen die Arbeitsweise der Befehle zu verdeutlichen.</p>
+        <p>Da wir an dieser Stelle davon ausgehen, daß Basic hinlänglich bekannt ist, werden für die Unterprogramme zu den einzelnen Befehlen keine Erklärungen mehr gegeben. Vielmehr sollen gerade die Unterprogramme in Basic dazu dienen, Ihnen die Arbeitsweise der Befehle zu verdeutlichen.</p>
 
         <p>Wie Sie aus Tabelle 1 ersehen können, sind nicht alle der 256 theoretisch möglichen Operations-Codes mit tatsächlichen Funktionen belegt. Sie können jedoch dem Prozessor einen solchen Operations-Code anbieten. Die Reaktion des Prozessors auf einen solchen Befehl ist durch seine interne Struktur definiert. Bei einigen illegalen Befehlen hört der Prozessor auf zu arbeiten und kann dann nur noch mit einem Reset-Impuls reaktiviert werden. Einige Befehle führen jedoch nicht zum Absturz des Computers, sondern führen exotische Funktionen aus, die eine Kombination von offiziellen Operationen darstellen. So zum Beispiel die folgenden drei Befehle:</p>
 
