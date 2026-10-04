@@ -387,3 +387,12 @@ used `Reiner Druckfehler` (8607/79). The rule harvests only the rubric: 8605's
 The trailer check is per FILE, so a two-source aside (146, 81) passes with
 one trailer missing. The rule's `_tmp/` / `fehlerteufelchen_pages/` paths
 conflict with r000's scratch confinement.
+
+## r310 — a class-wide adjudication lets a NEW finding of that class through with exit 0
+
+From the r310 sub-agent, planted: with `byline-split 2` adjudicated, a third,
+unreviewed byline split makes r310 print only "ADJ byline-split declared 2,
+found 3 -- MORE than adjudicated" and still exit 0 with HARD 0. An
+adjudication should clear exactly its count; "MORE than adjudicated" should
+be HARD. The single-item `<ol>` check has no adjudication hook, so a printed
+one-item numbered list (14 p17) must be re-shaped to pass.

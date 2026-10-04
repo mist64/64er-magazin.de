@@ -65,15 +65,9 @@
         <ol>
             <li>$0200 bis $02AC: Ein riesiger uns zur Verfügung stehender Bereich, der normalerweise vom Basic-Interpreter und vom DOS als Eingabepuffer verwendet wird (zum Beispiel INPUT #-Befehl).</li>
             <li>$025D bis $02AC: Diesen Bereich verwendet ebenfalls das DOS. Er darf nur benutzt werden, wenn im Moment des Aufrufs der Maschinenroutine keine (!) Kanäle geöffnet sind. Die vom DOS benötigten Parameter (Filename, Sekundäradresse, Geräteadresse etc.) werden sonst überschrieben.</li>
-            <li>
-                <p>$0332 bis $03F6: Kassettenpuffer und Zähler für Kassettenoperationen. Wenn Sie in diesem Puffer Daten ablegen, bleiben sie erhalten, bis die nächste Kassettenoperation erfolgt. Damit eignet sich dieser Bereich zum Beispiel für kleinere Maschinenroutinen (wenn das Basic-Programm keine Kassettenoperationen durchführt!).</p>
-            </li>
-            <li>
-                <p>$03F7 bis $0436: RS232-Puffer. Wenn Sie die RS232-Schnittstelle nicht verwenden (zum Beispiel für den Betrieb eines Modems), wird dieser Bereich völlig unbenutzt bleiben und ist daher hervorragend für Daten geeignet, die permanent erhalten bleiben müssen und nicht durch Basic-Interpreter oder Betriebssystem überschrieben werden dürfen.</p>
-            </li>
-            <li>
-                <p>$055F bis $05E6: In diesem Bereich sind die Zeichenketten abgelegt, mit denen die Funktionstasten belegt sind. Sie können ihn für eigene Zwecke benutzen, wenn Ihr Basic-Programm die Funktionstasten nicht benötigt und deren Belegung daher überschrieben werden darf.</p>
-            </li>
+            <li>$0332 bis $03F6: Kassettenpuffer und Zähler für Kassettenoperationen. Wenn Sie in diesem Puffer Daten ablegen, bleiben sie erhalten, bis die nächste Kassettenoperation erfolgt. Damit eignet sich dieser Bereich zum Beispiel für kleinere Maschinenroutinen (wenn das Basic-Programm keine Kassettenoperationen durchführt!).</li>
+            <li>$03F7 bis $0436: RS232-Puffer. Wenn Sie die RS232-Schnittstelle nicht verwenden (zum Beispiel für den Betrieb eines Modems), wird dieser Bereich völlig unbenutzt bleiben und ist daher hervorragend für Daten geeignet, die permanent erhalten bleiben müssen und nicht durch Basic-Interpreter oder Betriebssystem überschrieben werden dürfen.</li>
+            <li>$055F bis $05E6: In diesem Bereich sind die Zeichenketten abgelegt, mit denen die Funktionstasten belegt sind. Sie können ihn für eigene Zwecke benutzen, wenn Ihr Basic-Programm die Funktionstasten nicht benötigt und deren Belegung daher überschrieben werden darf.</li>
         </ol>
 
 
@@ -126,15 +120,9 @@
         <p>Der Basic-Speicherbereich beginnt ab $1000. Wo er endet, hängt von mehreren Faktoren ab:</p>
 
         <ol>
-            <li>
-                <p>Normalerweise endet der Basic-Bereich bei $3FFF.</p>
-            </li>
-            <li>
-                <p>Wurde die hochauflösende Grafik eingeschaltet, wofür zusätzlich Speicherplatz benötigt wird, endet Basic bei $17FF.</p>
-            </li>
-            <li>
-                <p>Wird eine Speichererweiterung verwendet, hängt das Ende des Basic-Speichers von der Größe dieser Erweiterung ab.</p>
-            </li>
+            <li>Normalerweise endet der Basic-Bereich bei $3FFF.</li>
+            <li>Wurde die hochauflösende Grafik eingeschaltet, wofür zusätzlich Speicherplatz benötigt wird, endet Basic bei $17FF.</li>
+            <li>Wird eine Speichererweiterung verwendet, hängt das Ende des Basic-Speichers von der Größe dieser Erweiterung ab.</li>
         </ol>
 
 
@@ -147,18 +135,10 @@
         <p>Im Falle des C 16 ist diese Vorgehensweise etwas problematisch, da das Einschalten der hochauflösenden Grafik genügt, um die Routinen durch den Grafikbildschirm zu überschreiben. Eine flexiblere Methode, die sich mit der Grafik und auch mit eventuellen Speichererweiterungen verträgt, besteht darin, die Routinen vor (!) das Basic-Programm zu legen. Die Adressen $2B/$2C enthalten einen Zeiger auf den Basic-Anfang. Diesen Zeiger können wir verändern und uns vor dem Basic-Programm beliebig Platz schaffen. Die Vorgehensweise:</p>
 
         <ol>
-            <li>
-                <p>Zeiger auf Basic-Anfang erhöhen.</p>
-            </li>
-            <li>
-                <p>Null in die neue Startadresse »POKEn«, da am Basic-Anfang immer (!) eine Null stehen muß.</p>
-            </li>
-            <li>
-                <p>»NEW« eingeben, damit der Basic-Interpreter alle weiteren Zeiger entsprechend korrigiert.</p>
-            </li>
-            <li>
-                <p>Maschinenroutinen und Basic-Programm laden (sofern erstere nicht bereits in Form von DATA-Zeilen im Basic-Programm enthalten sind).</p>
-            </li>
+            <li>Zeiger auf Basic-Anfang erhöhen.</li>
+            <li>Null in die neue Startadresse »POKEn«, da am Basic-Anfang immer (!) eine Null stehen muß.</li>
+            <li>»NEW« eingeben, damit der Basic-Interpreter alle weiteren Zeiger entsprechend korrigiert.</li>
+            <li>Maschinenroutinen und Basic-Programm laden (sofern erstere nicht bereits in Form von DATA-Zeilen im Basic-Programm enthalten sind).</li>
         </ol>
 
 
@@ -257,14 +237,10 @@ Assembler:
 
         <p>Setzt den Cursor an eine übergebene Bildschirmposition oder übergibt die momentane Cursorposition. Ein Basic-Äquivalent zu dieser Routine existiert nicht. In beiden Fällen wird das X-Register zur Übergabe der Zeile und das Y-Register zur Übergabe der Spalte verwendet:</p>
 
-        <ol>
-            <li>
-                <p>Cursor setzen:</p>
-                <p>— Carryflag löschen</p>
-                <p>— X und Y laden</p>
-                <p>— Routine aufrufen</p>
-            </li>
-        </ol>
+        <p>1. Cursor setzen:</p>
+        <p>— Carryflag löschen</p>
+        <p>— X und Y laden</p>
+        <p>— Routine aufrufen</p>
 
         <p>Cursor auf Zeile 10, Spalte 5 setzen (Listing 7):</p>
         <figure>
@@ -406,18 +382,10 @@ jsr $ffba</pre>
 
         <p>Nachdem mit SETLFS die Fileparameter gesetzt wurden, muß mit der Routine SETNAM der Filename angegeben werden, indem im X- und im Y-Register die Adresse übergeben wird, an der dieser im Speicher abgelegt wurde, und im Akku die Länge des Namens (Listing 13):</p>
         <ol>
-            <li>
-                <p>Akku mit der Länge des Filenamens in Zeichen laden.</p>
-            </li>
-            <li>
-                <p>X-Register mit dem Low-Byte der Adresse laden.</p>
-            </li>
-            <li>
-                <p>Y-Register mit dem High-Byte der Adresse laden.</p>
-            </li>
-            <li>
-                <p>SETNAM aufrufen</p>
-            </li>
+            <li>Akku mit der Länge des Filenamens in Zeichen laden.</li>
+            <li>X-Register mit dem Low-Byte der Adresse laden.</li>
+            <li>Y-Register mit dem High-Byte der Adresse laden.</li>
+            <li>SETNAM aufrufen</li>
         </ol>
 
 
@@ -440,11 +408,9 @@ jsr $ffbd</pre>
 
         <p>Beispiele:</p>
 
-        <ol>
-            <li>
-                <p>Programm »test« von Datasette an die Ursprungsadresse laden (Listing 14):</p>
-                <figure>
-                    <pre>lda #$02    ;logische Filenummer
+        <p>1. Programm »test« von Datasette an die Ursprungsadresse laden (Listing 14):</p>
+        <figure>
+            <pre>lda #$02    ;logische Filenummer
 ldx #$01    ;Geräteadresse der Datasette
 ldy #$01    ;absolut laden
 jsr $ffba   ;Fileparameter setzen
@@ -456,13 +422,11 @@ jsr $ffbd   ;Filename setzen
 
 lda #$00    ;Flag für LOAD
 jsr $ffd5   ;LOAD-Routine aufrufen</pre>
-                    <figcaption>Listing 14. »LOAD« von Kassette</figcaption>
-                </figure>
-            </li>
-            <li>
-                <p>Programm »test1« von Diskette an die Adresse $1000 laden (Listing 15).</p>
-                <figure>
-                    <pre>lda #$02    ;logische Filenummer
+            <figcaption>Listing 14. »LOAD« von Kassette</figcaption>
+        </figure>
+        <p>2. Programm »test1« von Diskette an die Adresse $1000 laden (Listing 15).</p>
+        <figure>
+            <pre>lda #$02    ;logische Filenummer
 ldx #$08    ;Geräteadresse der Floppy
 ldy #$00    ;an die angegebene Adresse laden
 jsr $ffba   ;Fileparameter setzen
@@ -476,17 +440,13 @@ lda #$00    ;Flag für LOAD
 ldx #$00    ;Ladeadresse low
 ldy #$10    ;Ladeadresse high
 jsr $ffd5   ;LOAD-Routine aufrufen</pre>
-                    <figcaption>Listing 15. »LOAD« von Diskette</figcaption>
-                </figure>
-            </li>
-        </ol>
+            <figcaption>Listing 15. »LOAD« von Diskette</figcaption>
+        </figure>
 
 
         <p>In beiden Beispielen wird davon ausgegangen, daß sich der Programmname »test« beziehungsweise »test1« in ASCII-Form ab Adresse $025E im Speicher befindet. Ein weiteres Beispiel zum Laden eines Programms ohne Angabe eines Namens (nur bei der Datasette möglich):</p>
 
-        <ol start="3">
-            <li>Programm ohne Angabe eines Filenamens von Datasette absolut laden (Listing 16).</li>
-        </ol>
+        <p>3. Programm ohne Angabe eines Filenamens von Datasette absolut laden (Listing 16).</p>
         <figure>
             <pre>lda #$02    ;logische Filenummer
 ldx #$04    ;Geräteadresse der Datasette
@@ -507,22 +467,16 @@ jsr $ffd5   ;LOAD-Routine aufrufen</pre>
         <p>Mit Hilfe der SAVE-Routine läßt sich ein beliebiger Speicherbereich auf Kassette oder Diskette speichern. Zuvor müssen wiederum SETLFS und SETNAM als Vorbereitungsroutinen aufgerufen werden. Bei SAVE müssen folgende Parameter übergeben werden:</p>
 
         <ol>
-            <li>
-                <p>Anfangsadresse des zu speichernden Bereichs. Hierzu muß in der Zeropage ein Zwei-Byte-Zeiger (Low/High) auf diese Adresse abgelegt werden. Bei Aufruf der Routine muß der Akku mit der Adresse geladen werden, an der sich der Zeiger befindet.</p>
-            </li>
-            <li>
-                <p>Endadresse +1 (!) des zu speichernden Bereichs. Diese Adresse wird mit dem X- und dem Y-Register übergeben (X=Adresse low, Y=Adresse high).</p>
-            </li>
+            <li>Anfangsadresse des zu speichernden Bereichs. Hierzu muß in der Zeropage ein Zwei-Byte-Zeiger (Low/High) auf diese Adresse abgelegt werden. Bei Aufruf der Routine muß der Akku mit der Adresse geladen werden, an der sich der Zeiger befindet.</li>
+            <li>Endadresse +1 (!) des zu speichernden Bereichs. Diese Adresse wird mit dem X- und dem Y-Register übergeben (X=Adresse low, Y=Adresse high).</li>
         </ol>
 
 
         <p>Beispiele:</p>
 
-        <ol>
-            <li>
-                <p>$1000 bis $2000 unter dem Namen »test« auf Diskette speichern (Listing 17).</p>
-                <figure>
-                    <pre>lda #$02    ;logische Filenummer
+        <p>1. $1000 bis $2000 unter dem Namen »test« auf Diskette speichern (Listing 17).</p>
+        <figure>
+            <pre>lda #$02    ;logische Filenummer
 ldx #$08    ;Geräteadresse der Floppy
 ldy #$02    ;beliebige Sekundäradresse
 jsr $ffba   ;Fileparameter setzen
@@ -540,13 +494,11 @@ lda #$d8    ;Adresse des Zeigers
 ldx #$01    ;Endadresse+1 low
 ldy #$20    ;Endadresse+1 high
 jsr $ffd8   ;SAVE-Routine</pre>
-                    <figcaption>Listing 17. »SAVE« auf Diskette</figcaption>
-                </figure>
-            </li>
-            <li>
-                <p>$1234 bis $3456 unter dem Namen »test1« auf Datasette speichern (Listing 18).</p>
-                <figure>
-                    <pre>lda #$02    ;logische Filenummer
+            <figcaption>Listing 17. »SAVE« auf Diskette</figcaption>
+        </figure>
+        <p>2. $1234 bis $3456 unter dem Namen »test1« auf Datasette speichern (Listing 18).</p>
+        <figure>
+            <pre>lda #$02    ;logische Filenummer
 ldx #$01    ;Geräteadresse der Datasette
 ldy #$02    ;beliebige Sekundäradresse
 jsr $ffba   ;Fileparameter setzen
@@ -564,10 +516,8 @@ lda #$d8    ;Adresse des Zeigers
 ldx #$57    ;Endadresse+1 low
 ldy #$34    ;Endadresse+1 high
 jsr $ffd8   ;SAVE-Routine</pre>
-                    <figcaption>Listing 18. »SAVE« auf Kassette</figcaption>
-                </figure>
-            </li>
-        </ol>
+            <figcaption>Listing 18. »SAVE« auf Kassette</figcaption>
+        </figure>
 
 
         <p>Anwendung: hochauflösende Grafik speichern und laden. Als praktische Anwendung der LOAD- und der SAVE-Routine will ich Ihnen nun zeigen, wie Sie den Grafikbildschirm speichern und laden können, der den Speicher von $2000 bis $3FFF belegt. Wir benötigen hierzu ein Basic- und ein Maschinenprogramm. Beide sind in einer Disketten- (Listing 19) und einer Kassettenversion (Listing 20) abgebildet.</p>
@@ -687,21 +637,11 @@ jsr $ffd8   ;SAVE-Routine</pre>
 
         <ol>
             <li>Filename in ASCII-Form ab 606 (=$025E) ablegen</li>
-            <li>
-                <p>Grafik einschalten</p>
-            </li>
-            <li>
-                <p>Rechtecke malen und ausfüllen</p>
-            </li>
-            <li>
-                <p>SAVE-Routine aufrufen</p>
-            </li>
-            <li>
-                <p>Grafik löschen</p>
-            </li>
-            <li>
-                <p>Gespeicherte Grafik laden</p>
-            </li>
+            <li>Grafik einschalten</li>
+            <li>Rechtecke malen und ausfüllen</li>
+            <li>SAVE-Routine aufrufen</li>
+            <li>Grafik löschen</li>
+            <li>Gespeicherte Grafik laden</li>
         </ol>
 
 
