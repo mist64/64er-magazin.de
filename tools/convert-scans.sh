@@ -14,7 +14,7 @@ for dir in bw gray c dots; do
       bw)   magick "$i" -colorspace CMYK -channel K -separate +channel -threshold 50% -negate "$out" ;;
       gray) magick "$i" -colorspace CMYK -channel K -separate +channel -negate -resize 25% "$out" ;;
       c)    magick "$i" -resize 25% "$out" ;;
-      dots) magick "$i" -colorspace CMYK -channel K -separate +channel -negate -blur 0x1.5 -statistic median 3x3 -unsharp 0x1+0.3+0 -contrast-stretch 2%x2% -auto-threshold OTSU "$out" ;;
+      dots) magick "$i" -colorspace CMYK -channel K -separate +channel -negate -blur 0x1.5 -statistic median 3x3 -unsharp 0x1+0.3+0 -contrast-stretch 2%x2% -threshold 55% "$out" ;;
     esac &
   done
 done
