@@ -2,14 +2,14 @@
 <html lang="de">
 
 <head>
-    <title>Schnelle Spielegrafik beim C16</title>
+    <title>Schnelle Spielegrafik beim C 16</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="Christoph Sauer, ev">
     <meta name="64er.issue" content="Sonderheft 3/86">
     <meta name="64er.pages" content="54-58">
     <meta name="64er.head1" content="Grafik">
-    <meta name="64er.head2" content="C16">
+    <meta name="64er.head2" content="C 16">
     <meta name="64er.toc_category" content="Grafik">
     <meta name="64er.index_title" content="Schnelle Spielegraphik bei C16">
     <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
@@ -18,14 +18,14 @@
 
 <body>
     <article>
-        <h1>Schnelle Spielegrafik beim C16</h1>
-        <p class="intro">Diese Einführung in die »Innereien« des C16 zeigt, wie schnelle, anspruchsvolle (Spiele-) Grafiken mit einem Zehntel des bisher nötigen Speicherbedarfs realisiert werden können.</p>
+        <h1>Schnelle Spielegrafik beim C 16</h1>
+        <p class="intro">Diese Einführung in die »Innereien« des C 16 zeigt, wie schnelle, anspruchsvolle (Spiele-) Grafiken mit einem Zehntel des bisher nötigen Speicherbedarfs realisiert werden können.</p>
 
         <p>Inzwischen hat es sich unter C 16-Besitzern wohl schon herumgesprochen, daß es Schwierigkeiten bei der Kombination von Spielprogrammen mit der hochauflösenden Grafik gibt. Hier soll nun eine alternative Möglichkeit zur Grafikerzeugung aufgezeigt werden, die besonders für die Spieleprogrammierung geeignet ist. Die Rede ist von einem selbstdefinierten Zeichensatz als Ersatz für Hochauflösung und Shapes, der nur 1 KByte Speicher (statt 10 KByte bei Hochauflösung) belegt.</p>
 
         <p>Auch der C 16 hält, wie seine Vorgänger, einen Farb- und einen Videospeicher für die Bildschirminformationen bereit. Dieser liegt im Speicherbereich zwischen $0800 (2048) und $0FFF (4095), wobei das erste KByte dem Farbspeicher zugeordnet ist. In der Struktur der einzelnen Bits innerhalb einer Farbspeicherstelle hat sich jedoch – um wieder die anderen beiden Computer (C 64 und VC 20) zum Vergleich heranzuziehen – etwas geändert. Die untersten 4 Bit jeder Speicherstelle geben nach wie vor die jeweilige Farbe an der dazugehörigen Bildschirmspeicherposition wieder. Zusätzlich ist es jetzt beim C 16 möglich, auch den Helligkeitswert jedes Zeichens individuell zu bestimmen. Dieser sogenannten Luminanz sind die Bits 4-6 (also 7 Helligkeitsstufen) zugeordnet. Bit 7 entscheidet schließlich noch darüber, ob das Zeichen normal oder blinkend dargestellt wird.</p>
 
-        <p>Reverse Zeichen werden im Gegensatz zu VC20 und C64 hardwaremäßig (durch Setzen des Bit 7 in der entsprechenden Videospeicherstelle) vom TED erzeugt. Somit benötigt der C16 nur noch 2 KByte Speicherplatz für die Zeicheninformationen im ROM.</p>
+        <p>Reverse Zeichen werden im Gegensatz zu VC 20 und C 64 hardwaremäßig (durch Setzen des Bit 7 in der entsprechenden Videospeicherstelle) vom TED erzeugt. Somit benötigt der C 16 nur noch 2 KByte Speicherplatz für die Zeicheninformationen im ROM.</p>
 
         <p>Natürlich ist es auch denkbar, die Daten in den RAM-Speicher zu übertragen, um dort Änderungen am Zeichensatz vorzunehmen. Dies geschieht prinzipiell genauso wie beim VC 20 oder C 64. Man muß lediglich die neue Adresse des Zeichensatzes im Register 14 ($FF13, 65299) vermerken und auf RAM-Zugriff schalten (Bit 2 in Register 13). Das ist in der Praxis alles viel einfacher, als es im ersten Moment den Anschein hat. Dazu möchte ich zunächst eine kurze Beschreibung des beim C 16 verwendeten »Bankswitching« vorausschicken: Der C 16 kann hardwaremäßig 128 KByte Speicher verwalten; 64 KByte ROM und nocheinmal soviel RAM-Speicher. Da die Adreßleitungen nach wie vor aber nur für 64 KByte Gesamtkapazität ausgelegt sind, bedient man sich eines Tricks – dem Bankswitching. Das bedeutet, es wird je nach Bedarf zwischen 64 KByte ROM und RAM hin- und hergeschaltet. Dazu ist sowohl die CPU als auch der TED-Chip in der Lage. Ob er auf den Zeichensatz im ROM oder auf einen im RAM zugreifen soll, entscheidet ein Registerbit ($FF13 Bit 2). Somit ist genau dieses bei der Umschaltung auf den RAM-Zeichensatz zu ändern.</p>
 
@@ -394,13 +394,13 @@
 
         <p>Damit kann man nun die mit dem »Matrix-Editor« erzeugten Zeichen in eigene Programme übernehmen.</p>
 
-        <p>Statt in hochauflösender Grafik mit Shapes zu arbeiten, kann man mit dieser Methode im normalen Textmodus bleiben und dennoch beliebige Grafiken auf den Bildschirm bringen, entweder mit PRINT-Anweisungen oder über POKEs in den Bildschirmspeicher. Das bringt nicht nur einen Geschwindigkeitsvorteil, sondern schont vor allem den begrenzten C16-Speicher. Mit über 11000 freien Bytes sollte sich schon einiges anfangen lassen.</p>
+        <p>Statt in hochauflösender Grafik mit Shapes zu arbeiten, kann man mit dieser Methode im normalen Textmodus bleiben und dennoch beliebige Grafiken auf den Bildschirm bringen, entweder mit PRINT-Anweisungen oder über POKEs in den Bildschirmspeicher. Das bringt nicht nur einen Geschwindigkeitsvorteil, sondern schont vor allem den begrenzten C 16-Speicher. Mit über 11000 freien Bytes sollte sich schon einiges anfangen lassen.</p>
 
         <address class="author">(Christoph Sauer/ev)</address>
 
         <figure>
             <pre data-filename="matrix-editor" data-name="Matrix-Editor"></pre>
-            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing »Matrix-Editor« für den C16. Bitte beachten Sie die Eingabehinweise.</a></figcaption>
+            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing »Matrix-Editor« für den C 16. Bitte beachten Sie die Eingabehinweise.</a></figcaption>
         </figure>
 
         <aside class="fehlerteufelchen" id="fehlerteufelchen">
