@@ -26,7 +26,7 @@ heavily re-edited reprint scores low, and a shared masthead scores high.
 | Debugging - Fehlersuche in Basic-Programmen | 8407/46 | 0.83 |
 | Ordnung ist das halbe Leben | 8505/77 | 0.74 |
 | POKEs, die Sie kennen sollten | 8410/91 | 0.41 |
-| Die besten Tips und Tricks | SH8501/94, 8412/85, 8506/80 | 0.14 / 0.13 / 0.08 — individual tips, probably collected from several issues |
+| Die besten Tips und Tricks | SH8501/94 + 8412/85 + 8506/80 | 0.14 / 0.13 / 0.08 — individual tips, probably collected from several issues |
 
 ## Not leads
 
@@ -34,3 +34,16 @@ heavily re-edited reprint scores low, and a shared masthead scores high.
 - Directory dreispaltig gedruckt — 0.13 to 8609/61 Fehlerteufelchen: that
   erratum quotes this article's line 420.
 - Das Salz in der Suppe — 0.05 to SH8601's Vorwort: house phrases.
+
+## New leads found at step 330 (reported, not compared)
+
+- `39 Synthetische Steuerzeichen` — its last section ("Die Suche nach den
+  Synthetischen") ↔ 8409/104 `Die Suche nach den Synthtischen` (p104 is
+  shared with 8409/103).
+- `20 Alle Tasten-, Zeichen- und Steuercodes` — SH pp35–38 ↔ probably 8408/151
+  (`… 4. Teil und Schluß`); the source of its "Dynamische Tastenabfrage" is
+  unknown.
+- `141 Die besten Tips und Tricks` — about 23 tips overlap other monthly tips
+  pages: 8410/89, 8505/90, 8407/135, 8502/86, 8408/105, 8503/82, 8511/88,
+  8412/80, 8502/91, 8501/87, 8507/85, 8501/90, 8502/92, 8412/84 (8411/92,
+  8404/108 weak).
