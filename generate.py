@@ -863,8 +863,17 @@ class ArticleDatabase:
                     print(error)
                     continue
 
-                # Map issue key to issue data
+                # Map issue key to issue data.
+                # An issue directory with NO articles has no issue_key -- it is a
+                # placeholder, e.g. one holding only pubdate.txt for an issue that
+                # has not been built yet. Registering it put None among the keys
+                # and latest_regular_issue_key() then did k[0] on it, which broke
+                # the whole site build.
                 issue_key = issue.issue_key
+                if issue_key is None:
+                    print(f"- [{issue.directory_path if hasattr(issue,'directory_path') else '?'}] "
+                          f"no articles yet -- skipped")
+                    continue
                 self.issues[issue_key] = issue
                 self.articles.extend(issue.articles)
 
