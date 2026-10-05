@@ -573,3 +573,18 @@ Abtippen unserer Listings" is a standalone article (id `abtippen`). A later
 issue meeting this shape goes to the owner; it does not copy SH8603. r080's
 "a headline-less start page takes its h1 from the printed Inhalt" and the
 Inhalt-names-articles principle are untouched.
+
+## 300 — a print/disk difference is not by itself grounds for a reader note, even when the magazine later corrected it
+
+Pattern, not two one-offs (observed by 64er_control): the owner declined BOTH
+available "tell the reader" notes on SH8603 — the Farbdemo, where the
+magazine itself published a correction (8605 Tips & Tricks), and the
+Hyper-Graphics source, 12 instructions apart from the disk binary, where it
+never did. With r000's harm test ("a comment earns its place only if a
+reader would otherwise be MISLED or come to harm") and SH8602's ruling of no
+Futureteufelchen, the bar is higher than r300's text implies; builders keep
+proposing notes that are then declined, three issues running. **Suggested:**
+r300 says plainly that a print-vs-disk difference — corrected later or not —
+is recorded in LOG.md and NOT put on the page, unless a reader acting on the
+page would be misled or harmed (wrong wiring, a destroyed disk), and that the
+default when in doubt is silence.
