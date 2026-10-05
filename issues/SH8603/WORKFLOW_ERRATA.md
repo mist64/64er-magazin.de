@@ -556,3 +556,20 @@ authored, typeset content that sits in leftover space, and they are KEPT; the
 cartoon rule must not be read as reaching them. Suggested for r080: a run of
 short signed items absent from the printed Inhalt is one article, lettered
 in printed order like any other shared start page.
+
+## 080 — Eingabehinweise inside or beside the Checksummer: an OPEN corpus split (SH8603 resolved by owner fiat, NOT a rule)
+
+SH8603 p77 prints "Wie unsere Basic-Programme einzugeben sind" under the
+EINGABEHILFE band at section-head size (smaller than "Sparen mit dem VC 20"'s
+display headline on the same page); its Bild 1/2 are printed on p76, the
+Checksummer's page; and the printed Inhalt nevertheless lists it on its own
+line ("77 Eingabehinweise für Basic-Listings", beside "76 Checksummer 20
+V3"). 080 split it out as article 77a. The owner folded it into the
+Checksummer as an `<h2>` section — "combine on my authority. special case.
+not a rule." The corpus genuinely disagrees and THIS DOES NOT SETTLE IT:
+SH8507 prints the same text inside its Checksummer article (step 140: 0.67
+overlap with SH8507's `checksummer`), while the monthly 8507/77 "Hinweise zum
+Abtippen unserer Listings" is a standalone article (id `abtippen`). A later
+issue meeting this shape goes to the owner; it does not copy SH8603. r080's
+"a headline-less start page takes its h1 from the printed Inhalt" and the
+Inhalt-names-articles principle are untouched.
