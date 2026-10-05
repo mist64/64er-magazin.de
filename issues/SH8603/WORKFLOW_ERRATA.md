@@ -574,20 +574,24 @@ issue meeting this shape goes to the owner; it does not copy SH8603. r080's
 "a headline-less start page takes its h1 from the printed Inhalt" and the
 Inhalt-names-articles principle are untouched.
 
-## 300 — a print/disk difference is not by itself grounds for a reader note, even when the magazine later corrected it
+## 300 / 130 — EVERY difference between a printed listing and its disk file is an OWNER decision, always
 
-Pattern, not two one-offs (observed by 64er_control): the owner declined BOTH
-available "tell the reader" notes on SH8603 — the Farbdemo, where the
-magazine itself published a correction (8605 Tips & Tricks), and the
-Hyper-Graphics source, 12 instructions apart from the disk binary, where it
-never did. With r000's harm test ("a comment earns its place only if a
-reader would otherwise be MISLED or come to harm") and SH8602's ruling of no
-Futureteufelchen, the bar is higher than r300's text implies; builders keep
-proposing notes that are then declined, three issues running. **Suggested:**
-r300 says plainly that a print-vs-disk difference — corrected later or not —
-is recorded in LOG.md and NOT put on the page, unless a reader acting on the
-page would be misled or harmed (wrong wiring, a destroyed disk), and that the
-default when in doubt is silence.
+Owner: "difference between the printed listing and the disk - always ask
+me." **Suggested sentence for r300 and r130:** "Where the printed listing and
+the disk file differ -- in content, in line range, in presentation, or
+because a later issue corrected one of them -- the difference is reported to
+the owner at PAUSE 2 with the evidence, and the owner decides whether
+anything is said on the page. The builder does not decide it, and a previous
+issue's answer is not a precedent for this one."
+It covers the three shapes seen so far: a magazine-published correction the
+disk already carries (Farbdemo, SH8603/21: printed p22 listing "unabtippbar",
+corrected in 8605's Tips & Tricks, disk = corrected); an uncorrected
+divergence nobody noticed (Hyper-Graphics, SH8603/60: 12 instructions); and
+a disk file carrying a bug the magazine corrected later (spline 64,
+reset-helfer, SH8602). On SH8603 the owner declined a note in both cases
+here — that is the outcome of two decisions, NOT a default for the next
+issue (a first reading of the run of refusals as a standing "say nothing"
+rule was wrong and is withdrawn).
 
 ## 340 — two of its own checks misfire on a real errata file
 
