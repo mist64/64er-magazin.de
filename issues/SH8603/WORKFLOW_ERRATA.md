@@ -588,3 +588,13 @@ r300 says plainly that a print-vs-disk difference — corrected later or not —
 is recorded in LOG.md and NOT put on the page, unless a reader acting on the
 page would be misled or harmed (wrong wiring, a destroyed disk), and that the
 default when in doubt is silence.
+
+## 340 — two of its own checks misfire on a real errata file
+
+Check 3 ("every entry names a step, and the steps named exist") looks for
+`r<NNN>_*.md`; r310 exists only as `r310_issue_invariants.py`, so an entry
+about r310 reports "FAIL: no rule r310". Check 4 recognises a proposed fix
+only by "would have prevented" / "should (have) said|carried|state"; this
+file's entries use "**Suggested.**" (13 of them) and are all reported as
+"no proposed fix". Suggested: check 3 accepts `r<NNN>_*.{md,py}`; check 4
+accepts "Suggested" (or the rule names one marker word and says so).
