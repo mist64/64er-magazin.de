@@ -101,7 +101,18 @@ only the edge finder is a candidate to check, not an answer. The owner confirms
 it against the physical copy at PAUSE 1 regardless.
 
 The step pre-fills `high_pages` with what the edge-finder evidence points at and
-says, in the output, that it is a guess to be checked against the copy.
+says, in the output, that it is a guess to be checked against the copy. **That
+pre-fill is the one-sided witness the paragraph above tells you not to trust**,
+so read it as one of the three and not as the procedure — this sentence used to
+sit here reading like the step's answer.
+
+**MEASURE `colors.txt` BEFORE PAUSE 1, not after.** The own-white gap is the
+strongest of the three witnesses, and the figures the step prints come from
+`ask_text()`, which needs `PAPER_RGB` / `LOW_GRADE` — i.e. a measured low
+profile. A fresh issue has none, so without this the gap is computed against
+the built-in `W` and compares the issue's pages to another issue's paper. The
+measuring method is in `r005_masters_spread.md`; run it on this issue's own
+interior first, then put the three witnesses to the owner together.
 
 ### The answer, recorded
 
@@ -614,7 +625,12 @@ that could see both stocks would see no difference between them and the switch
 would have nothing to switch on.
 
 An issue whose descriptor has no `paper` map is not graded at all: see *The
-first action*. The legacy whole-issue `colors` key still loads, for an issue not
+first action*. **That is not the same as a descriptor that is incomplete on
+purpose.** r000's PAUSE 1 describes exactly that state — `binding` answered and
+`paper` still absent, pending the owner — and `first_action()` handles it by
+asking only the unanswered key. So "no `paper` map" here means an issue that
+will never have one, not an issue that has not got there yet; do not read it as
+a reason to invent one before PAUSE 1. The legacy whole-issue `colors` key still loads, for an issue not
 yet migrated, and means what it always meant.
 
 ### One separation, two renders

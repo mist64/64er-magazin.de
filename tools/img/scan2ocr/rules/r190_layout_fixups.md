@@ -223,7 +223,10 @@ The print bolds things the monthlies have never marked: Impressum field labels
 bold on the page and unmarked in every monthly issue. Follow precedent and
 leave them unmarked — **but read the next paragraph before you do, because it
 is the half that was missed twice.** Draw precedent from the monthlies only — the Sonderhefte
-are a separate series and eight of them do bold the Impressum labels. Fidelity to the artefact is
+are a separate series and bold the Impressum labels: MEASURED, **9 of 12
+Sonderhefte use `<strong>`**, 2 use `<em>` (SH8602 and SH8603, the two most
+recent, which is why the latest precedent misleads) and 1 marks neither. Use
+`<strong>`. Fidelity to the artefact is
 the job of the page image and the PDF, which keep every one of those bolds; the
 HTML owes the reader that two issues of the same magazine look alike.
 
@@ -308,7 +311,16 @@ PYEOF
 
 - **Interview labels are ROMAN, not bold italic.** This rule called them "bold
   italic"; 8612's print sets them roman. The page won.
-- **Dash lists stay `<p>— …</p>`.** The rule says to build a `<ul>` when the
+- **Dash lists stay `<p>— …</p>`, with an EM dash, whatever 070 produced.**
+  070 turns a printed spaced hyphen into an EN dash, so a dash list arrives
+  here as `–` and three of SH8604's four 190 sub-agents kept it; a 280 agent
+  then "harmonised" the one that had written `—` to match them, which is the
+  wrong direction. MEASURED over the corpus: **em 165, en 1.** Set the em dash
+  and do not let the en dash 070 produced decide it.
+  A **connective line inside a dash list** — a bare "und" between two items,
+  SH8604's article 58 — is not an item: keep it as a `<br>` line within the
+  preceding `<p>`, so the list does not gain a member the print does not have.
+- The rule says to build a `<ul>` when the
   print shows a real dash glyph, but 8609-8611 all keep the paragraph form.
   Precedent wins, as the section above says.
 - **The never-split rule yields to the PRINT when the box is physically above.**
@@ -357,7 +369,7 @@ PY
 # 3b. nothing in the never-split list was split, and no empty <p> survives.
 #     The never-split rule names <pre> and <aside>, but the check covered only
 #     figure and table -- and there was no empty-<p> check at all.
-$PY - <<'NEVERSPLIT'
+$PY - "$dir" <<'NEVERSPLIT'
 import os, re, sys
 d = sys.argv[1] if len(sys.argv) > 1 else "."
 for f in sorted(os.listdir(d)):
