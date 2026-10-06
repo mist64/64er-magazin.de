@@ -1,0 +1,1 @@
+                      n¥                 n ¥                §  ¥                §  ¥       n££££££££§ n  ¤¤¤¤¤¤o········§n  nooooool¯¯¯¯¯¯¯¯noooooooooooooooonooooooooooooooooonoooooooooooooooooonooooooooooooooooooo_12AUS DEM FENSTER F#LLT IHR BLICK AUFDAS FRISCH GEPFL%GTE FELD EINESBAUERN,%BER DEM SCHWALBEN KREISEN.

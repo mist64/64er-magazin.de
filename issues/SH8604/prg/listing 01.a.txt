@@ -1,0 +1,375 @@
+
+
+;listing 01.a.prg ==0801==
+    0 rem ***************************
+    1 rem gordon saga ii - 1985 by sm
+    2 rem ***************************
+    3 ifi=0theni=1:load"d.z.satz",8,1
+    4 poke648,204:poke53272,56:poke56576,0:print"{clr}":rem d.t.satz aktivieren
+    5 open15,8,15:print"{clr}{yel}";chr$(14);
+    6 side=2:gosub53200:print"{clr}";
+   15 gosub60000: rem tabellen einlesen
+   20 dimwi(100): rem zimmer-merker
+   30 sc=0:mo=0 : rem score/versuch
+   40 sa=1:gosub53600                                   : rem titeltext
+   50 zn=1:gosub54000                                   : rem beschreib. 1.raum
+  100 rem start ------------------------------------------------------------------
+  101 :
+  110 ifsb<>0thensa=sb:sb=0:gosub53600:rem kommentar ausgeben
+  120 gosub50000           :rem befehlseingabe
+  130 :
+  300 rem geh-routine -----------------
+  310 ifri=0then400
+  320 i=map(zn,ri)
+  330 ifi=0thenprint"Diese Richtung ist nicht m{CBM-O}glich!":goto400
+  340 zn=i:gosub54000
+  400 rem schau/untersuche ------------
+  410 ifve<>11then500
+  415 ifo1=0thengosub54000:goto500
+  420 sa=os(o1):gosub53400:gosub53500:ob$="D"+right$(i$,len(i$)-1)
+  425 ifob(o1)=-1then430
+  430 ifob(o1)<>znthenx$=ob$+" ist hier nicht zu sehen!":gosub53900:goto500
+  440 ifou(o1)=0thenx$=ob$+" hat keine besonderen Merkmale.":gosub53900
+  450 ifou(o1)thensa=ou(o1):gosub53800
+  500 rem nimm ------------------------
+  505 ifve<>12then600
+  506 ifsp=1then550:rem nimm alles
+  507 sa=os(o1):gosub53400:gosub53500:ob$="D"+right$(i$,len(i$)-1)
+  510 ifo1=0thenprint"Ihr Satz enth{CBM-A}lt kein Objekt !":goto600
+  514 :ifob(o1)=-1thenprint"Das haben Sie bereits !":goto600
+  515 :ifob(o1)<>znthenx$=ob$+" ist hier nicht zu sehen!":gosub53900:goto600
+  516 ifoa(o1)=0then600
+  520 :ifoa(o1)=1thenprint"Bizarr!":goto600
+  525 :ifoa(o1)=2thenx$=ob$+" ist viel zu schwer zum tragen!":gosub53900:goto600
+  530 :ifoa(o1)=3thenprint"Genommen.":ob(o1)=-1:goto600
+  550 :
+  554 print:fori=1tooz
+  555 :ifob(i)<>znthen580
+  556 sa=os(i):gosub53400:gosub53500:ob$="D"+right$(i$,len(i$)-1)
+  560 :i$=ob$+": "
+  565 ifsq=1andi=o1then580:rem ausser
+  570 :ifoa(i)=1thenprinti$;"Bizarr !"
+  575 :ifoa(i)=2thenprinti$;"Zu schwer zum tragen !"
+  577 :ifoa(i)=3thenprinti$;"Genommen.":ob(i)=-1
+  580 nexti
+  600 rem inventur -----------------
+  601 ifve<>13then700
+  605 print"{down}Sie haben: {up}"
+  610 ic=0:fori=1tooz
+  611 sa=os(i):gosub53400:gosub53500:ob$="D"+right$(i$,len(i$)-1):i$=ob$
+  612 :ifleft$(i$,3)="Der"thenj$=right$(i$,len(i$)-3):i$="Den"+j$
+  615 :ifob(i)=-1thenprint"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";i$:ic=1
+  620 nexti:ific=0thenprint"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}Bock auf Bier !"
+  700 rem verliere -----------------
+  701 ifve<>14then800
+  702 ifsp=1then750: rem verlier alles
+  703 ifo1=0thenprint"Ihr Satz enth{CBM-A}lt kein Objekt!":goto800
+  705 ifob(o1)<>-1thenprint"{down}Sie haben das nicht !":goto800
+  715 ob(o1)=zn:print"Ok.":goto800
+  750 ic=0:fori=1tooz
+  755 :ifsq=1andi=o1then780:rem ausser
+  760 sa=os(i):gosub53400:gosub53500:ob$="D"+right$(i$,len(i$)-1):i$=ob$+": "
+  770 :ifob(i)=-1thenob(i)=zn:printi$;"Ok.":ic=1
+  780 nexti:ific=0andsq=1thenprint"Wie soll das gehen ?"
+  782 ific=0andsq=0thenprint"Sie haben doch garnichts !"
+  800 :
+ 2000 rem raumspezifische action ------------------------------------------------
+50000 rem *****************************
+50001 rem *                           *
+50002 rem *     wort-parser 4.0       *
+50003 rem *                           *
+50004 rem *      <c> 1986 bei         *
+50005 rem *                           *
+50006 rem *     michael nickles       *
+50007 rem *                           *
+50008 rem *****************************
+50010 rem befehlssatzeingabe ---------------------------------------------------
+50011 zw=0:print:gosub53000:mo=mo+1:rem titelline ausgeben
+50012 ifud>0then50500:rem und
+50015 sl=77: rem befehlssatzlaenge
+50020 be$="":poke198,0:print"{yel}>{CBM-@}";
+50030 getx$:ifpeek(203)=1then50120
+50040 ifx$=""then50030
+50050 iflen(be$)=0andasc(x$)=20then50030
+50060 i=asc(x$):ifi<32ori>133andi<159thenifi<>20then50030
+50070 iflen(be$)=slandi<>20then50030
+50080 be$=be$+x$
+50090 printchr$(20);x$;"{CBM-@}";
+50100 ifi=20thenbe$=left$(be$,len(be$)-2):goto50030
+50110 goto50030
+50120 print"{left} "
+50400 rem satzzeichen suchen ---------------------------------------------------
+50401 :
+50415 sn=0
+50420 ifright$(be$,1)=" "thenbe$=left$(be$,len(be$)-1):goto50420
+50430 i$=right$(be$,1)
+50440 ifi$="."ori$="!"thensn=0:be$=left$(be$,len(be$)-1):goto50420
+50450 ifi$="?"thensn=1:be$=left$(be$,len(be$)-1):goto50420
+50500 rem be$-zeiger setzen ----------------------------------------------------
+50501 :
+50502 ifud=0thenve=0:ri=0:o1=0:o2=0:sp=0:sq=0
+50504 ifud>0thenri=0:goto50530
+50505 ifleft$(be$,1)=" "thenbe$=right$(be$,len(be$)-1):goto50505
+50510 be$=be$+" "
+50520 za=1 :rem zeiger a setzen
+50530 zb=za+1
+50540 ifmid$(be$,zb,1)=""thenud=0:close1:open1,8,3,"texte":return
+50550 ifmid$(be$,zb,1)<>" "thenzb=zb+1:goto50550
+50590 su$=mid$(be$,za,zb-za)
+50600 rem su$ vorbehandlung ----------------------------------------------------
+50601 :
+50610 ifsu$="und"thenud=1:goto50630
+50620 ifsu$=","thenud=2:goto50630
+50625 goto50670
+50630 za=zb+1
+50640 ifmid$(be$,za,1)=""thenprint"Und was ?":goto50530
+50650 ifmid$(be$,za,1)=" "thenza=za+1:goto50650
+50660 close1:open1,8,3,"texte":return
+50670 ifsu$="ihn"orsu$="sie"orsu$="es"theno1=om:goto51300
+50680 ifsu$="alles"thensp=1:goto51300
+50690 ifsu$="ausser"thensq=1:goto51300
+51000 rem binaere suchroutine --------------------------------------------------
+51001 :
+51002 close1:open1,8,3,"wortschatz"
+51007 rem anfang und ende des suchbereiches ermitteln
+51008 i=asc(left$(su$,1))
+51009 ifi-65<0ori-65>25thengosub51500:goto50000
+51010 an=in(i-65):rem anfang des suchbereiches
+51012 iz=64
+51013 ifin(i-iz)=0theniz=iz-1:goto51013
+51015 en=in(i-iz)-1:rem ende des suchbereiches
+51016 ifan=0thengosub51500:ud=0:goto50000
+51020 sz=197:n=int(log(en-an+1)/log(2))+1              :rem maximal-formel
+51030 sa=an-1+(2^n)/2:rem mitte der ges.dat
+51040 gosub52100:rem a$ lesen
+51050 n=n-1     :rem 1.abfrage
+51060 :
+51070 rem su$ mit a$ vergleichen ------
+51080 : iflen(su$)<3then51110
+51090 : ifwa=1 and su$=left$(a$,len(su$)) thenve=wc:goto51300
+51100 : ifwa<>3orsu$<>right$(a$,len(su$))then51110
+51102 :  ifud=1orud=2thenud=3:o1=0:o2=0
+51104 :   ifo1=0theno1=wc:om=o1:goto51300
+51105 :   ifo2=0theno2=wc:om=o1:goto51300
+51110 : ifwa=2 and su$=a$                 thenri=wc:goto51300
+51115 : ifwa=5 and su$=a$                 thenad=wc:goto51300
+51120 : ifwa=1 and su$=a$                 thenve=wc:goto51300
+51125 : ifwa=4 and su$=a$                 then51300
+51130 : ifsu$<a$thensa=sa-(2^(n-1)):gosub52100:goto51160
+51140 : ifsa+(2^(n-1))>sa+en-anandn>-1thenn=n-1:goto51140:rem ''ueberlauf''
+51150 : sa=sa+(2^(n-1)):gosub52100:rem ''halbieren''
+51160 :
+51170 :n=n-1    :rem naechst. halbieren
+51180 :ifn<0thengosub51500:ud=0:goto50000
+51190 rem print"sa=";sa;" n=";n                             :rem unnoetig !!
+51200 :goto51060:rem naechst. such-vers.
+51300 rem naechstes wort
+51310 za=zb+1
+51320 ifmid$(be$,za,1)=""then50530
+51330 ifmid$(be$,za,1)=" "thenza=za+1:goto51330
+51350 goto50530
+51500 rem ich kenne su$ nicht --------------------------------------------------
+51501 :
+51510 i=int(3*rnd(1))+1
+51520 onigoto51530,51540,51550
+51530 x$=""+"Ich kenne das Wort '"+su$+"' nicht.":goto52000
+51540 x$=""+"Das Wort '"+su$+"' ist mir nicht bekannt.":goto52000
+51550 x$=""+"Deutsch ist leider nur meine zweite Sprache. Ich kenne das "
+51555 x$=x$+"Wort '"+su$+"' nicht.":goto52000
+52000 rem formatierte textausgabe ----------------------------------------------
+52010 ifx$=""then52090
+52020 iflen(x$)<40thenprintx$:goto52090
+52030 iflen(x$)=40thenprintx$;:goto52090
+52040 i$=left$(x$,41):ic=0:fori=1tolen(i$):ifmid$(i$,i,1)=" "thenic=i
+52050 nexti:ific=0thenprintx$:goto52090
+52060 i$=left$(i$,ic-1):iflen(i$)=40thenprinti$;
+52070 iflen(i$)<40thenprinti$
+52080 x$=right$(x$,len(x$)-ic):goto52010
+52090 return
+52100 rem satz-teilbereich lesen -----------------------------------------------
+52101 :
+52110 hb%=sa/256:lb%=sa-hb%*256
+52112 print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+52114 input#15,a:ifa=50thenprint"satznummer zu hoch"
+52120 ifa=50thenreturn
+52130 input#1,a$
+52140 wa=val(mid$(a$,22,1))
+52150 wc=val(mid$(a$,23,3))
+52160 a$=left$(a$,21)
+52170 ifright$(a$,1)="{rght}"thena$=left$(a$,len(a$)-1):goto52170
+52180 return
+53000 rem up - titelline -------------------------------------------------------
+53001 :
+53010 i1$="                                     ":t$=""
+53020 t$=t$+chr$(18)+r$:i$=str$(sc)+"/"+right$(str$(mo),len(str$(mo))-1)
+53030 t$=t$+right$(i1$,41-len(t$)-len(i$))+i$+chr$(146):print"{home}";t$;
+53040 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";:return
+53200 rem up - disk einlegen ---------------------------------------------------
+53201 :
+53205 ific=21thengosub53700:rem weiter
+53210 print"{rvon}Bitte Disk-Seite";side;"{left} einlegen !{rvof}";:poke198,0:wait198,1
+53220 print"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}                             ";
+53221 print"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+53222 open2,8,2,"#":print#15,"u1 2 0 18 0":print#15,"b-p";2;162:get#2,i$
+53224 close2:ifside<>val(i$)then53200
+53225 ifside=2thenopen1,8,3,"texte"
+53230 return
+53400 rem zeiger postionieren --------------------------------------------------
+53401 :
+53420 hb%=sa/256:lb%=sa-hb%*256:print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+53430 input#15,ia:ifia=50thenprint"satznummer zu hoch"
+53440 return
+53500 rem satz einlesen --------------------------------------------------------
+53501 :
+53510 ifa=50then53520
+53512 input#1,i$
+53515 zw=zw+1:ifzw>23thengosub53700:zw=0
+53520 return
+53600 rem text-einlesen --------------------------------------------------------
+53601 :
+53610 ifside<>2thenside=2:gosub53200
+53620 gosub53400:rem positonieren
+53630 gosub53500:rem i$ einlesen
+53640 ifright$(i$,1)<>"*"then53660
+53650 :ifi$<>"*"thenprintleft$(i$,len(i$)-1)
+53652 :sa=0:return
+53660 iflen(i$)<40thenprinti$
+53670 iflen(i$)>=40thenprinti$;
+53680 sa=sa+1
+53695 goto53630
+53700 rem weiter ---------------------------------------------------------------
+53701 :
+53705 print"[weiter]";:poke198,0:wait198,1:print"{left}{left}{left}{left}{left}{left}{left}{left}        {left}{left}{left}{left}{up}
+53710 return
+53800 rem kommentar lesen ------------------------------------------------------
+53801 :
+53805 zw=1
+53810 print:gosub53600:return
+53900 rem textformer ------------------
+53901 :
+53902 ifx$<>""thenprint
+53905 ifx$=""then53945
+53910 iflen(x$)<40thenprintx$:goto53945
+53915 iflen(x$)=40thenprintx$;:goto53945
+53920 i$=left$(x$,41):ic=0:fori=1tolen(i$):ifmid$(i$,i,1)=" "thenic=i
+53925 nexti:ific=0thenprintx$:goto53945
+53930 i$=left$(i$,ic-1):iflen(i$)=40thenprinti$;
+53935 iflen(i$)<40thenprinti$
+53940 x$=right$(x$,len(x$)-ic):goto53905
+53945 return
+53950 rem artikel-wandler -------------
+53951 :
+53952 ii$=left$(ob$,3)
+53955 ifii$<>"Der"andii$<>"Das"then53965
+53960 x$="":x$="Hier liegt ein"+right$(ob$,len(ob$)-3)+"."
+53965 ifii$<>"Die"then53970
+53966 x$="":x$="Hier liegt eine"+right$(ob$(i),len(ob$)-3)+"."
+53970 goto53905
+54000 rem raumtext-einlesen ----------------------------------------------------
+54001 :
+54020 print:fori=1tooz :rem ob.tab.
+54030 :ifob(i)<>znthen54080
+54035 :ifox(i)<1then54080  :rem namelos
+54040 :sa=ox(i):gosub53400 :rem posit.
+54050 :ifoa(i)=1thengosub53500:r$=i$          :rem read i$, titelline
+54060 :ifwi(zn)=1andve<>11andoa(i)=1thenprintr$:sa=0:goto54080
+54070 :gosub53600          :rem lesen
+54080 nexti
+54081 fori=1tooz
+54083 ifob(i)<>znoroa(i)<>3orox(i)<>0then54088
+54084 sa=os(i):gosub53400:gosub53500:ob$="D"+right$(i$,len(i$)-1)
+54085 x$="Hier liegt "+ob$+".":zw=zw+1:gosub53950
+54088 nexti
+54095 wi(zn)=1:print:return
+60000 rem tabellen einlesen ----------------------------------------------------
+60001 :
+63000 rem *****************************
+63005 rem * mini-texteditor v.iii.4   *
+63010 rem *     <c> 1985              *
+63015 rem * von michael nickles       *
+63020 rem *****************************
+63025 rem anfangsmenue -----------------
+63030 poke198,0:input"{down}{down}dateiname  *{left}{left}{left}";d$:poke198,0
+63035 input"satzlaenge  40{left}{left}{left}{left}";sl:ifsl<1orsl>254thenprint"geht nicht !":goto30
+63040 open 15,8,15
+63045 print#15,"i0":open 1,8,3,d$:print
+63050 rem zwischenmenue ----------------
+63055 print"{rvon}s / l / ende                            {rvof}";
+63060 geti$:ifi$=""then63060
+63065 ifi$="e"thenprint"{clr}";:goto63265
+63070 ifi$<>"s"andi$<>"l"then63060
+63075 input"satznr";sa:if sa<0 or sa>63000 then63070
+63080 ifi$="l"thenprint"{clr}";:goto63095
+63085 ifi$="s"thenprint"{clr}";:mo=1:goto63150
+63090 goto 63050
+63095 rem lesen ------------------------
+63100 :print"{clr}{rvon}";sa;"{left}-";str$(sa+20);" {rvof}"
+63105 ia=sa
+63110 for sa=ia to ia+20
+63115 : gosub63195:gosub63220
+63120 : ifa=50thensa=ia+21:goto63135
+63125 : iflen(a$)<40thenprinta$
+63130 : iflen(a$)>=40thenprinta$;
+63135 next:print
+63140 ifa=50thenprint"satznummer zu hoch!"
+63145 goto 63050
+63150 rem schreiben --------------------
+63155 print"eingabesatz  //=keine eingabe"
+63160 gosub63195:rem positionieren
+63165 ifa=50thenprint"satznummer zu hoch!":goto63050:rem fehlerkanalabfr.
+63170 gosub63330:a$=be$                                   :rem input-rout.
+63175 ifa$="//"thenmo=0:goto63050:rem ende
+63180 gosub63240:rem a$ schreiben
+63185 sa=sa+1     :rem naechster satz
+63190 goto63160:rem next (loop)
+63195 rem positionieren ****************
+63200 hb%=sa/256:lb%=sa-hb%*256
+63205 print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+63210 input#15,a
+63215 return
+63220 rem satz einlesen ****************
+63225 ifa=50thenreturn
+63230 input#1,a$
+63235 return
+63240 rem satz schreiben ***************
+63245 ifa=50thenreturn
+63250 ifa$=""thena$=":":rem zur sicherheit !!!
+63255 print#1,a$
+63260 return
+63265 rem beenden **********************
+63270 close 1
+63275 close 15
+63280 print "++ ende ++"
+63285 end
+63290 rem korrektur-routine ------------
+63295 fori=0tolen(be$):printchr$(20);:nexti:be$=""
+63300 sa=sa+sc       : rem textzeiger
+63305 ifsa<0thensa=0 : rem sperre
+63310 gosub 63195: rem positionieren
+63315 ifa=50thensa=sa-sc:goto63310
+63320 input#1,a$
+63325 return
+63330 rem texteingabe ------------------
+63335 ifar=1thenar=0:a$="{rvon}satznummer zu hoch!{rvof}":goto63345
+63340 gosub63195:gosub63220
+63345 print"{home}                                        ";:print"{home}{rvon}satz";sa;"{rvof}"
+63350 print"                                        {up}";a$
+63355 print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}";
+63360 print"{down}"
+63365 be$="":poke198,0:poke211,0:poke214,22:sys58732:print"{yel}{CBM-@}";
+63370 getx$:ifpeek(203)=1then63430
+63375 if peek(203)=7andpeek(653)=0 then sc=1 : gosub 63290: goto 63330
+63380 if peek(203)=7andpeek(653)=1 then sc=-1 : gosub 63290: goto 63330
+63385 ifx$=""then63370
+63390 iflen(be$)=0andasc(x$)=20then63370
+63395 i=asc(x$):ifi<32ori>133andi<159thenifi<>20then63370
+63400 iflen(be$)=slandi<>20then63370
+63405 ifx$=" "thenx$="{rght}"
+63410 be$=be$+x$
+63415 printchr$(20);x$;"{CBM-@}";
+63420 ifi=20thenbe$=left$(be$,len(be$)-2):goto63370
+63425 goto63370
+63430 print"{left} ":gosub63195
+63435 ifbe$=""thenbe$=":"
+63440 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":return
+

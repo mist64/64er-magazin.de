@@ -1,0 +1,54 @@
+
+
+;listing 06.p.prg ==0801==
+   10 open1,8,3,"wortschatz":open15,8,15:rem wortschatz-datei oeffnen
+   20 inputsu$
+   30 goto9500
+ 9000 rem zeiger positionieren --------------------------------------------------
+ 9001 :
+ 9010 hb%=sa/256:lb%=sa-hb%*256
+ 9020 print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+ 9030 input#15,a:ifa=50thenprint"satznummer zu hoch"
+ 9040 return
+ 9100 rem satz lesen ------------------------------------------------------------
+ 9101 :
+ 9110 ifa=50thenreturn
+ 9120 input#1,a$
+ 9130 return
+ 9200 rem satz schreiben --------------------------------------------------------
+ 9201 :
+ 9210 ifa=50thenreturn
+ 9220 print#1,a$
+ 9230 return
+ 9300 rem satz-teilbereich lesen ------------------------------------------------
+ 9301 :
+ 9310 ifa=50thenreturn
+ 9320 input#1,a$
+ 9330 wa=val(mid$(a$,22,1)):rem wortart
+ 9332 wc=val(mid$(a$,23,3)):rem wortcode
+ 9335 a$=left$(a$,21)      :rem wort
+ 9340 ifright$(a$,1)="{rght}"thena$=left$(a$,len(a$)-1):goto9340
+ 9345 printa$,len(a$)
+ 9350 return
+ 9500 rem binaere suchroutine ---------------------------------------------------
+ 9520 rem su$=suchwort
+ 9540 sz=197:n=int(log(sz)/log(2))+1                    :rem maximal-formel
+ 9560 sa=(2^n)/2:rem mitte der ges.dat
+ 9565 gosub9000:gosub9300                               :rem a$ lesen
+ 9580 n=n-1     :rem 1.abfrage
+ 9600 :
+ 9620 rem su$ mit a$ vergleichen ------
+ 9623 : iflen(su$)<3then9635
+ 9625 : ifwa=1 and su$=left$(a$,len(su$)) thenprint"su$=verb:satz ";sa:end
+ 9630 : ifwa=3 and su$=right$(a$,len(su$))thenprint"su$=objekt:satz ";sa:end
+ 9635 : ifwa=2 and su$=a$                 thenprint"su$=richtung:satz ";sa:end
+ 9637 : ifwa=1 and su$=a$                 thenprint"su$=verb:satz ";sa:end
+ 9640 : ifsu$<a$thensa=sa-(2^(n-1)):gosub9000:gosub9300:goto9700
+ 9660 : ifsa+(2^(n-1))>szandn>-1thenn=n-1:goto9660      :rem ''ueberlauf''
+ 9680 : sa=sa+(2^(n-1)):gosub9000:gosub9300             :rem ''halbieren''
+ 9700 :
+ 9720 :n=n-1    :rem naechst. halbieren
+ 9740 :ifn<0thenprint"su$ gibt's nicht! in 1220":end    :rem su$ nicht in datei
+ 9760 print"sa=";sa;" n=";n                             :rem unnoetig !!
+ 9780 :goto9600:rem naechst. such-vers.
+

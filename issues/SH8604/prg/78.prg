@@ -1,0 +1,1 @@
+õ                      ê      õ              ê      õ              ê      õ              ê      õ              ê      õ              ê      õ            **ê      õ************  ê      õ            ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶_6VOR IHNEN BEGINNT EIN RAUM,IN DEMEIN FUNKGER#T STEHT.

@@ -1,0 +1,1 @@
+›                    ›    HABEN SIE       ›    PROBLEME ?      ›    FRAGEN SIE      ›                    ›    * D R .  Z *    ›                    ›                    ›                    › _’¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦_’¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦_6AN DER WAND STEHT EINE INBLAUEN LETTERN GESCHRIEBENE SCHRIFT.

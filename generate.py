@@ -81,7 +81,15 @@ def petcat2prg(listing, output_file_name = None) -> tuple[None | bytes, str]:
 
     # Execute the command, piping the listing into it
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    prg, _ = process.communicate(input=listing.encode('utf-8'))
+    # LATIN-1, NOT UTF-8: the listing is PETSCII, one byte per character.
+    # Most of it is ASCII, but a byte >= 0x80 is a real PETSCII character that
+    # petcat must receive unchanged -- e.g. 0xA0, the shifted space, used to pad
+    # a REM banner.  petcat's {$a0} escape only works inside a string; after REM
+    # it tokenises to the five literal characters [$A0], so the raw byte is the
+    # only way to express it.  Encoding UTF-8 turns 0xA0 into C2 A0 and the
+    # generated .prg differs from the disk -- measured on SH8604's
+    # "der kl. hobbit", which was 8 bytes wrong before this.
+    prg, _ = process.communicate(input=listing.encode('latin-1'))
 
     # Check if petcat executed successfully
     if process.returncode != 0:
@@ -533,7 +541,10 @@ class Issue:
               if file.endswith('.txt'):
                   file_path = os.path.join(root, file)
                   basename = os.path.splitext(file)[0]
-                  with open(file_path, 'r') as file_obj:
+                  # latin-1 for the same reason petcat2prg encodes latin-1:
+                  # a PETSCII listing is bytes, and reading it as UTF-8 raises
+                  # on any byte >= 0x80.
+                  with open(file_path, 'r', encoding='latin-1') as file_obj:
                       listings[basename] = file_obj.read()
                   listings_bin[basename] = petcat2prg(listings[basename])
               elif file.endswith('.seq') or file.endswith('.prg'):

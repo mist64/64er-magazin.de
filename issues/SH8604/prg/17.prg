@@ -1,0 +1,1 @@
+   •                 ö  •  ê       ******  ö  •  ê       MARNAX  ö  •  ê       ******  ö  •  ê               ö  •  ê               ö  •  ê                 •  ê                _í¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶ _í¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶_í¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶_11SIE STEHEN IM FLUR DES UNTERENGESCHOSSES.VOR IHNEN BEGINNT DIEK%CHE,HINTER IHNEN DIE GARAGE.

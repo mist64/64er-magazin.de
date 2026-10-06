@@ -1,0 +1,133 @@
+
+
+;parser 4.0.prg ==0801==
+   10 open1,8,3,"wortschatz":open15,8,15:rem wortschatz-datei oeffnen
+   20 data1,3,0,28,31,47,51,60,68,0,70,76,0,82,90,93,100,101,116,149,155,158
+   30 data178,0,0,189
+   35 data198 :rem buchstabe nach z !?!
+   40 dimin(26):fori=0to26:readin(i):nexti
+   50 gosub50000
+   60 print"sn="sn:print"ve="ve:print"o1="o1:print"o2="o2:print"ud="ud:print"ri="ri
+   70 print"ad="ad:print:goto50
+50000 rem *****************************
+50001 rem *                           *
+50002 rem *     wort-parser 4.0       *
+50003 rem *                           *
+50004 rem *      <c> 1986 bei         *
+50005 rem *                           *
+50006 rem *     michael nickles       *
+50007 rem *                           *
+50008 rem *****************************
+50010 rem befehlssatzeingabe ---------------------------------------------------
+50011 :
+50012 ifud>0then50500:rem und
+50015 sl=80: rem befehlssatzlaenge
+50020 print"{down}":be$="":poke198,0:poke211,0:poke214,22:sys58732:print"{yel}{CBM-@}";
+50030 getx$:ifpeek(203)=1then50120
+50040 ifx$=""then50030
+50050 iflen(be$)=0andasc(x$)=20then50030
+50060 i=asc(x$):ifi<32ori>133andi<159thenifi<>20then50030
+50070 iflen(be$)=slandi<>20then50030
+50080 be$=be$+x$
+50090 printchr$(20);x$;"{CBM-@}";
+50100 ifi=20thenbe$=left$(be$,len(be$)-2):goto50030
+50110 goto50030
+50120 print"{left} "
+50400 rem satzzeichen suchen ---------------------------------------------------
+50401 :
+50415 sn=0
+50420 ifright$(be$,1)=" "thenbe$=left$(be$,len(be$)-1):goto50420
+50430 i$=right$(be$,1)
+50440 ifi$="."ori$="!"thensn=0:be$=left$(be$,len(be$)-1):goto50420
+50450 ifi$="?"thensn=1:be$=left$(be$,len(be$)-1):goto50420
+50500 rem be$-zeiger setzen ----------------------------------------------------
+50501 :
+50502 ifud=0thenve=0:ri=0:o1=0:o2=0
+50504 ifud>0thenri=0:goto50530
+50505 ifleft$(be$,1)=" "thenbe$=right$(be$,len(be$)-1):goto50505
+50510 be$=be$+" "
+50520 za=1 :rem zeiger a setzen
+50530 zb=za+1
+50540 ifmid$(be$,zb,1)=""thenud=0:return
+50550 ifmid$(be$,zb,1)<>" "thenzb=zb+1:goto50550
+50590 su$=mid$(be$,za,zb-za)
+50600 rem su$ vorbehandlung ----------------------------------------------------
+50601 :
+50610 ifsu$="und"thenud=1:goto50630
+50620 ifsu$=","thenud=2:goto50630
+50625 goto50670
+50630 za=zb+1
+50640 ifmid$(be$,za,1)=""thenprint"Und was ?":goto50530
+50650 ifmid$(be$,za,1)=" "thenza=za+1:goto50650
+50660 return
+50670 ifsu$="ihn"orsu$="sie"orsu$="es"theno1=om:goto51300
+51000 rem binaere suchroutine --------------------------------------------------
+51001 :
+51007 rem anfang und ende des suchbereiches ermitteln
+51008 i=asc(left$(su$,1))
+51009 ifi-65<0ori-65>25thengosub51500:goto50000
+51010 an=in(i-65):rem anfang des suchbereiches
+51012 iz=64
+51013 ifin(i-iz)=0theniz=iz-1:goto51013
+51015 en=in(i-iz)-1:rem ende des suchbereiches
+51016 ifan=0thengosub51500:ud=0:goto50000
+51020 sz=197:n=int(log(en-an+1)/log(2))+1              :rem maximal-formel
+51030 sa=an-1+(2^n)/2:rem mitte der ges.dat
+51040 gosub52100:rem a$ lesen
+51050 n=n-1     :rem 1.abfrage
+51060 :
+51070 rem su$ mit a$ vergleichen ------
+51080 : iflen(su$)<3then51110
+51090 : ifwa=1 and su$=left$(a$,len(su$)) thenve=wc:goto51300
+51100 : ifwa<>3orsu$<>right$(a$,len(su$))then51110
+51102 :  ifud=1orud=2thenud=3:o1=0:o2=0
+51104 :   ifo1=0theno1=wc:om=o1:goto51300
+51105 :   ifo2=0theno2=wc:om=o1:goto51300
+51110 : ifwa=2 and su$=a$                 thenri=wc:goto51300
+51115 : ifwa=5 and su$=a$                 thenad=wc:goto51300
+51120 : ifwa=1 and su$=a$                 thenve=wc:goto51300
+51125 : ifwa=4 and su$=a$                 then51300
+51130 : ifsu$<a$thensa=sa-(2^(n-1)):gosub52100:goto51160
+51140 : ifsa+(2^(n-1))>sa+en-anandn>-1thenn=n-1:goto51140:rem ''ueberlauf''
+51150 : sa=sa+(2^(n-1)):gosub52100:rem ''halbieren''
+51160 :
+51170 :n=n-1    :rem naechst. halbieren
+51180 :ifn<0thengosub51500:ud=0:goto50000
+51190 rem print"sa=";sa;" n=";n                             :rem unnoetig !!
+51200 :goto51060:rem naechst. such-vers.
+51300 rem naechstes wort
+51310 za=zb+1
+51320 ifmid$(be$,za,1)=""then50530
+51330 ifmid$(be$,za,1)=" "thenza=za+1:goto51330
+51350 goto50530
+51500 rem ich kenne su$ nicht --------------------------------------------------
+51501 :
+51510 i=int(3*rnd(1))+1
+51520 onigoto51530,51540,51550
+51530 x$=""+"ich kenne das wort '"+su$+"' nicht.":goto52000
+51540 x$=""+"das wort '"+su$+"' ist mir nicht bekannt.":goto52000
+51550 x$=""+"deutsch ist leider nur meine zweite sprache. ich kenne das "
+51555 x$=x$+"wort '"+su$+"' nicht.":goto52000
+52000 rem formatierte textausgabe ----------------------------------------------
+52010 ifx$=""then52090
+52020 iflen(x$)<40thenprintx$:goto52090
+52030 iflen(x$)=40thenprintx$;:goto52090
+52040 i$=left$(x$,41):ic=0:fori=1tolen(i$):ifmid$(i$,i,1)=" "thenic=i
+52050 nexti:ific=0thenprintx$:goto52090
+52060 i$=left$(i$,ic-1):iflen(i$)=40thenprinti$;
+52070 iflen(i$)<40thenprinti$
+52080 x$=right$(x$,len(x$)-ic):goto52010
+52090 return
+52100 rem satz-teilbereich lesen -----------------------------------------------
+52101 :
+52110 hb%=sa/256:lb%=sa-hb%*256
+52112 print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+52114 input#15,a:ifa=50thenprint"satznummer zu hoch"
+52120 ifa=50thenreturn
+52130 input#1,a$
+52140 wa=val(mid$(a$,22,1))
+52150 wc=val(mid$(a$,23,3))
+52160 a$=left$(a$,21)
+52170 ifright$(a$,1)="{rght}"thena$=left$(a$,len(a$)-1):goto52170
+52180 return
+

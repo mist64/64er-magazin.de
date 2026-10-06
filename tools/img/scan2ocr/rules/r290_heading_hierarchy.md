@@ -25,11 +25,20 @@ forces a specific level).
 
 Structural overrides that DO apply:
 
-- **An aside's heading sits ONE LEVEL BELOW the article's highest section
-  heading.** So `<h2>` when the body has `<h2>` sections of its own — a set-off
-  box's heading carries the print's banner weight and is not demoted merely for
-  sitting in a callout — but `<h3>` when the aside would otherwise hold the
-  file's ONLY `<h2>`, or would outrank a body built from `<h3>`.
+- **An aside's heading sits AT the level of the article's top section
+  headings — and one below only when sitting at that level would make it
+  outrank the body.** So `<h2>` when the body has `<h2>` sections of its own —
+  a set-off box's heading carries the print's banner weight and is not demoted
+  merely for sitting in a callout — but `<h3>` when the aside would otherwise
+  hold the file's ONLY `<h2>`, or would outrank a body built from `<h3>`.
+
+  This bullet used to open "**ONE LEVEL BELOW** the article's highest section
+  heading", which its own next clause then contradicts: `h2` beside body `h2`
+  is the SAME level, not one below. SH8603 read the heading literally, found
+  it disagreeing with every example under it, and followed the examples —
+  which is what SH8602 had done too. Two builds resolving the same
+  contradiction the same way by ignoring the headline sentence is the headline
+  sentence being wrong.
 
   The corpus runs **360 `h2` to 70 `h3`** inside asides, so `h2` is the norm
   and this is the exception, not a reversal. This section used to say "always
@@ -197,16 +206,39 @@ PY
 python3 -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
-n = 0
+n = bad = 0
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
+    # THE BODY'S TOP SECTION LEVEL IS WHAT MAKES AN ASIDE LEVEL RIGHT OR WRONG,
+    # so compute it: the shallowest h2-h6 OUTSIDE any aside.  This check used to
+    # mark EVERY non-h2 aside heading "rule 300 erratum box, or check it",
+    # although this rule's own header prescribes h3 wherever the aside would
+    # otherwise hold the file's only h2 -- SH8603's articles 3, 47 and 60, three
+    # permanent false flags on an issue that was correct.
+    outside = re.sub(r'<aside\b[^>]*>.*?</aside>', '', s, flags=re.DOTALL)
+    lv = [int(x) for x in re.findall(r'<h([2-6])\b', outside)]
+    top = min(lv) if lv else None
     for m in re.finditer(r'<aside\b[^>]*>(.*?)</aside>', s, re.DOTALL):
-        for lvl in re.findall(r'<(h[1-6])\b', m.group(1)):
+        for lvl in re.findall(r'<h([1-6])\b', m.group(1)):
             n += 1
-            mark = '' if lvl == 'h2' else '   <- rule 300 erratum box, or check it'
-            print(f"  {f}: <{lvl}> inside <aside>{mark}")
-print(f"  {n} aside headings; expected <h2> except rule 300's erratum boxes")
+            lvl = int(lvl)
+            # h1 is the article headline and never belongs in an aside.
+            # Otherwise the only defect is an aside OUTRANKING the body: at or
+            # below the body's top level is correct, and so is any level at all
+            # when the body has no sections of its own but the aside is not h2.
+            if lvl == 1:
+                why = 'h1 inside an aside'
+            elif top is None and lvl == 2:
+                why = 'the file\'s ONLY h2 is in an aside -- demote to h3'
+            elif top is not None and lvl < top:
+                why = f'outranks the body, whose top section is h{top}'
+            else:
+                continue
+            bad += 1
+            print(f"  {f}: <h{lvl}> inside <aside> -- {why}")
+print(f"  {n} aside headings, {bad} wrongly levelled"
+      f"   (h2 is the norm: the corpus runs 360 h2 to 70 h3)")
 PY
 )" "$dir"
 ```
@@ -373,7 +405,9 @@ comments already carrying it keep passing; do not write new ones.
 
 **And say it to the reader, not to the checker.** The comment states what the
 printed magazine has or lacks. Not how it was verified, not which step read it,
-not who decided -- that belongs in `LOG.md` and the commit message.
+not who decided -- that belongs in `LOG.md` and the commit message. This holds
+for **every** shipping artefact, not only for article HTML: see r000,
+*NO PROCESS NOTES IN ANYTHING THAT SHIPS*.
 
 The comment is the evidence, not a silencer: it must name the page and how the
 glyph was read, exactly as a LOG line would. No marker, no exemption — proved by

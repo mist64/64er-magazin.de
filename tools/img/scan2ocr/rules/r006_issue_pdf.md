@@ -34,6 +34,14 @@ makes every PDF page built from it stale. That is why this step sits after
 
 ## The title page is made BY HAND, always
 
+**Its source is handed over at 005, not here.** `<tmp>/title_source_150.png`
+is written and `open`ed at the end of step 005, because the owner retouches it
+by hand and every hour it sits unmentioned is an hour of theirs the build is
+holding. 006 runs late (see r000) and by then the file should be done. If you
+reach 006 and `issues/<ID>/title.png` does not exist, the question is not
+"make the crop now" but "was the crop ever handed over" — see r000, *An OWNER
+DELIVERABLE is handed over the MOMENT it exists*.
+
 **Step 005 does not produce the published cover.** After the cover page has
 been cut and graded like any other page, the issue owner takes it and makes a
 cleaned-up `title.png` **at 150 dpi** — retouching whatever the scan of a
@@ -88,9 +96,36 @@ Two further traps found with it, both now closed in the scripts:
 
 ## PIXEL SIZE DOES NOT PROVE A COVER WAS RETOUCHED
 
-`title.png` must be exactly 1240×1754 — but **a plain 150 dpi reduction of the
-master is also exactly 1240×1754**, so the size check cannot tell a retouched
-cover from an untouched one. On 8612 the file handed to the build was
+`title.png` must be exactly **25 % of `<A4>/001.png`** — but a plain 150 dpi
+reduction of that page is exactly that size too, so the size check cannot tell
+a retouched cover from an untouched one.
+
+**`<A4>` is the PDF's input directory, and WHICH ONE depends on the binding**
+— `a4600` for a `sheet` issue, `masters600` for a `spread` one; see the table
+under *the pages must be the ones the owner reviewed*. Both are 4961×7016,
+exact A4 at 600 dpi, so **1240×1754 does hold for every issue so far** — but
+it holds as a *consequence*, not as a constant, and the gate in
+`make_issue_pdf.sh` computes it rather than quoting it:
+`round(w×25/100) × round(h×25/100)` of `src_of(first)`, **exit 1** on any
+mismatch (*"title.png is WxH, page NNN at 25% is W1xH1 — refusing to rescale
+it"*).
+
+**Compute it, and feed the owner the same file the PDF will use:**
+
+```bash
+# <A4> is a4600 for binding=sheet, masters600 for binding=spread
+A4="$TMPDIR_ISSUE/a4600"            # or masters600, per the binding
+magick "$A4/001.png" -format '%[fx:round(w*0.25)]x%[fx:round(h*0.25)]\n' info:
+```
+
+**Do NOT take the cover off `masters600` on a sheet issue.** On a sheet
+binding `masters600` is the traced-trim canvas, not the A4 cut — SH8604's is
+5457×7181 against `a4600`'s 4961×7016 — so a cover reduced from it is both
+the wrong size (1364×1795) and framed differently from the other 167 pages,
+which the PDF takes from `a4600`. I made exactly that mistake on SH8604 and
+had the builder regenerate a correct crop into a wrong one before catching it.
+The rule is: **whatever directory the PDF reads, the cover comes from the same
+one.** On 8612 the file handed to the build was
 pixel-identical to an early export; the retouching had never reached a file,
 and the PDF was built and then rebuilt.
 
@@ -99,7 +134,7 @@ owner's retouched cover **5.54** — a coin toss for any threshold. What does
 discriminate is **counting pixels that moved**:
 
 ```python
-ref = master001.resize((1240, 1754), Image.LANCZOS)      # 25% Lanczos
+ref = a4_001.resize((W1, H1), Image.LANCZOS)             # 25% Lanczos, computed
 d   = np.abs(np.asarray(title, int) - np.asarray(ref, int)).max(2)
 moved = int((d > 30).sum())
 ```
@@ -152,16 +187,39 @@ w, h = im.size                                          # the master's own size
 im = im.resize((w // 4, h // 4), Image.LANCZOS)         # 600 -> 150 dpi
 a   = np.asarray(im).astype(np.int16)
 m   = (a.max(2) - a.min(2) >= 18) & (a.mean(2) > 25)   # real chroma, not near-black
+# EXCLUDE BROWNED PAPER, which is warm, light and weakly chromatic.  SH8603's
+# interior is browned at the head and fore-edge (~221/211/204, R>G>B, against a
+# neutral mid-page), and without this the measurement found one full-width blob
+# over 50 mm2 on 183 of 184 PAGES -- literally applied it would have shipped
+# the whole issue as JPEG and blown the 100 MB ceiling.
+m  &= ~((a.mean(2) > 170) & (a[:,:,0] >= a[:,:,1]) & (a[:,:,1] >= a[:,:,2])
+        & ((a.max(2) - a.min(2)) < 45))
 m   = ndimage.binary_opening(m, np.ones((3, 3)))       # 3x3 ONLY
 m  &= paper                                             # EXCLUDE the scanner bed
+# ...and drop any blob touching a 4 mm edge band, which is where browning and
+# bed bleed live.  Either guard alone was enough on SH8603; both were agreed.
+edge = int(round(4 * 150 / 25.4))
+lbl0, n0 = ndimage.label(m)
+if n0:
+    border = set(np.unique(np.concatenate([
+        lbl0[:edge, :].ravel(), lbl0[-edge:, :].ravel(),
+        lbl0[:, :edge].ravel(), lbl0[:, -edge:].ravel()]))) - {0}
+    for i in border:
+        m[lbl0 == i] = False
 lbl, n = ndimage.label(m)
 areas  = ndimage.sum(m, lbl, range(1, n + 1)) if n else []
 largest_mm2 = (max(areas) if n else 0) / (150 / 25.4) ** 2
 ```
 
-`paper` is the traced paper mask for the page (r005 already has one). Without
-it a dark scanner bed with a colour cast passes `mean > 25` and is measured as
-ink.
+`paper` is the traced paper mask for the page. Without it a dark scanner bed
+with a colour cast passes `mean > 25` and is measured as ink.
+
+**This file used to say "(r005 already has one)". It does not, for `a4600`.**
+The only paper mask in the chain is `page_mask()` in `r005_a4_window.py`, which
+removes dark and saturated BED and is not stored per page. So either derive the
+mask here from the same function, or rely on the 4 mm edge-band guard above,
+which is what SH8603 did. Do not write a recipe around a file that does not
+exist.
 
 The opening is the whole measurement: scanner CCD fringing on the edge of black
 type is one or two pixels wide and vanishes, while printed ink survives. **3×3
@@ -180,6 +238,13 @@ defects shipped on 8612 before the owner's review caught them:
 - No area measure can tell printed ink from the scanner bed. p004's chroma is
   the navy backdrop beside the narrower reply card, 1504 mm² in one blob. Only
   the paper mask removes it.
+- **A THIRD cause, and the one that nearly shipped an issue as JPEG: BROWNED
+  PAPER.** SH8603's interior browning measured as one full-width blob over the
+  threshold on **183 of 184 pages**. It is not fringing and not bed, so neither
+  of the two guards above touches it; the warm-light-weak-chroma exclusion and
+  the 4 mm edge band are both in the recipe now. The classifier's own false
+  promotion of p178 has the same cause, which makes it a second cause besides
+  SH8602's K anchor — see r005, *EXCEPT K*.
 
 MEASURED on 8612 — total / largest / blob count:
 
@@ -220,9 +285,94 @@ classified contone is suspect.** The interior is where colour is rare; a
 wrapper or an ad page classified contone is ordinary. Look at any interior page
 the classifier promotes, before the hours of guetzli, not after.
 
+**BOTH LISTS ARE SPACE-SEPARATED PAGE NUMBERS, AND A RANGE SILENTLY DOES
+NOTHING.** The test is a substring match on a padded string —
+`[[ " ${FORCE_BILEVEL:-} " == *" $n "* ]]` — so `FORCE_BILEVEL="003-162"`
+matches no page at all, forces nothing, and the build proceeds looking
+entirely successful. On SH8604 that would have shipped all 160 interior pages
+as 150 dpi JPEG, which is the exact failure the setting exists to prevent. I
+recommended the range form and the builder caught it. Write every page number
+out: `FORCE_BILEVEL="003 004 005 … 162"`.
+
+Verify it took, rather than trusting the log line: the summary prints
+`bilevel N pages @600dpi JBIG2, contone M pages @150dpi`, and N must be the
+number you forced plus whatever the classifier found on its own.
+
 Keep a page at 150 dpi with `FORCE_CONTONE="030"` (space-separated page
 numbers) on `make_issue_pdf_mixed.sh`. Do not retune the classifier's threshold
 to catch one page: the erode earns its place on every other page.
+
+## THE MONOCHROME HALF: halftones, the threshold, and what cannot be fixed
+
+Everything above is about detecting COLOUR. A bilevel page has its own
+decision, and r006 never carried it. Settled with the owner at SH8603's PDF
+review, 2026-10-04 and 2026-10-05.
+
+### A halftone photograph cannot survive any single-cutoff scheme
+
+Once the screen dots touch, they merge, and everything past that point goes
+solid black. A fixed threshold, Otsu and a local adaptive threshold all only
+move the wall; none of them removes it. **`FORCE_CONTONE` for that page is the
+only faithful remedy** — it trades 600 dpi type for honest tone.
+
+**Never re-screen.** Ordered dither and Floyd–Steinberg do reproduce the tone
+(both matched the source's 60 % black where Otsu gave 54 %), but they fabricate
+a dot pattern the magazine never printed, which then beats against the
+original screen. Owner: *"no re-screen!!"* Excluded on fidelity, not on
+quality.
+
+The owner chose **not** to force any page on SH8603: 026, 027, 042 and 112
+ship with their photographs crushed, consistent with SH8602 and with the rest
+of the archive. So a crushed halftone is a known, accepted cost — report it,
+do not silently fix it.
+
+### A FIXED 35 % threshold, where the owner asks for one — and Otsu otherwise
+
+**Otsu adapts to CONTENT, not to paper**, which is the opposite of what it
+looks like it is doing. Step 005 has already normalised paper to p95 = 255 on
+every page, so there is no paper variation left for a threshold to adapt to;
+what varies is how much dark ink the page carries. MEASURED on SH8603: Otsu
+picks 49 % on the dark cover, 57–60 % across ordinary type, 65 % on p025 and
+79 % on the blue card — highest exactly where the page is lightest.
+
+What that costs, measured:
+
+| | Otsu | fixed 35–50 % |
+|---|---|---|
+| clean paper turned black on the browned card pages 181/183/184 | 1.3 / 3.0 / 4.5 % | **0.0 %** |
+| p026 text ink (measured by region) | 30.8 % | **30.8 %, identical from 35 % to 60 %** |
+| p026 light ink | 0 % | 0 % |
+| p026's halftone photo, solid black | 75 % | **48.5 %** |
+
+**Nine pages lost 62–82 % of their photograph under Otsu** (026, 027, 028,
+042, 045, 046, 112, 155, 171; 147 marginal), and **no gate saw it, because the
+PAGE average barely moves** — mid-greys go black while light greys go white.
+Otsu run on the photo pixels alone lands at 42–50 % (median 44) across ten
+pages; 35 % deliberately under-inks so the dots stay separate.
+
+**A check for this must measure INSIDE the halftone region.** A whole-page
+black fraction cannot see it.
+
+The switch is `BILEVEL_THRESHOLD="35%"` in
+`tools/img/issue_pdf/make_issue_pdf_mixed.sh`. Unset
+means Otsu, unchanged. **It has its own JBIG2 cache directory**, because the
+cache was keyed by page alone — changing the threshold without a new dir
+silently re-embeds the Otsu images.
+
+**35 % IS NOT THE DEFAULT, and no issue is rebuilt for it.** Owner,
+2026-10-05, asked both questions directly: *"Does the fixed 35 % threshold
+become the default — no. case by case decision. Do SH8602's and the
+monthlies' PDFs get rebuilt with it — nope."* So: Otsu remains the default,
+the switch is offered to the owner at the PDF review on an issue whose
+halftones are being crushed, and the archive is not reprocessed.
+
+### Three smaller things from the same review
+
+- **The PDF tag is zero-padded**: `Sonderheft 03/86`, not `3/86`.
+- `make_issue_pdf.sh` sets `LANG="deu"`, which clobbers the locale and
+  produces harmless warnings. It wants `tesseract -l deu`, not `LANG`.
+- **Step 2 needs no guetzli** on a Sonderheft of this shape: `ENCODER=fast`,
+  as SH8602 used.
 
 ## THE PAGE INPUTS ARE REVIEWED BEFORE THE PDF IS COMPILED — ALWAYS
 

@@ -1,0 +1,40 @@
+
+
+;listing 14.d.prg ==0801==
+   10 gosub10000:rem datei deffinieren
+   20 print"datei ungeordnet:"
+   30 fori=1tosz:printd$(i):nexti
+   40 gosub30000:rem 1.schluessel sortieren
+   50 print"datei nach 1.schluessel sortiert:"
+   60 fori=1tosz:printd$(i):nexti
+   70 end
+10000 rem fruechte-datei deffinieren -------------------------------------------
+10010 sz=8      :rem anzahl der saetze
+10020 dim d$(sz):rem string-feld
+10030 for i=1 to sz
+10040 : read d$(i)
+10050 nexti
+10100 data"vizawrite      01200.0024"
+10105 data"wordpro        01155.5013"
+10110 data"space invaders 02 39.0067"
+10115 data"jumpman        02 49.0034"
+10120 data"simons basic   03 99.0065"
+10125 data"g-basic        03140.0045"
+10130 data"gordon saga    04 39.0089"
+10135 data"deadline       04 99.0034"
+10140 return
+30000 rem  quicksort -----------------------------------------------------------
+30001 dimlg(100),rg(100):z=0:lg(1)=1:rg(1)=sz
+30010 z=z+1:iflg(z)>=rg(z)then30120
+30020 x=lg(z):y=rg(z)
+30030 vg$=left$(d$(int((x+y)/2)),15)
+30040 if x>y then30100
+30050 if left$(d$(x),15)<vg$thenx=x+1:goto30050
+30060 if left$(d$(y),15)>vg$theny=y-1:goto30060
+30070 if x>ythen30100
+30080 s$=d$(x):d$(x)=d$(y):d$(y)=s$
+30090 x=x+1:y=y-1:goto30040
+30100 rg(z+1)=y:lg(z+1)=lg(z):gosub30010
+30110 lg(z+1)=x:rg(z+1)=rg(z):gosub30010
+30120 z=z-1:return
+

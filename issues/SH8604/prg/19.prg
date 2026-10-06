@@ -1,0 +1,1 @@
+      q       q           q ê      q           q ê      q           q ê      q           q ê      q           q ê      q     qqqqqqq ê      qqqqqq§§§§§§§§ê§§§§§§§§§§§§¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶_11VOR IHNEN BEGINNT DAS WOHNZIMMER.SIE STEHEN IM FLUR DES UNTERENGESCHOSSES.

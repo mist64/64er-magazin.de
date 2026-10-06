@@ -45,6 +45,12 @@ body ends with a chief-editor signature line. The meta lists that
 name. Chief-editor mapping: Michael M. Pauly through 8603,
 Michael Scharfenberger from 8604 onward.
 
+**A SONDERHEFT'S VORWORT IS NOT CASE C.** It is signed by the issue's
+*Koordination*, not by the chief editor, and the name is printed at the end of
+the Vorwort itself: SH8602 and SH8603 are both **Georg Klinge**, and SH8601 is
+`(ev)`. Read the signature off the page; do not take the chief-editor mapping,
+which belongs to the monthly editorial column.
+
 **Case D — placeholder `XXX` is invalid.** Template ships with
 `content="XXX"`. Must be replaced with a real name or the line
 removed. Don't leave `XXX` in any article.
@@ -109,9 +115,17 @@ The sub-agent must:
      Michael M. Pauly through 8603).
    - **Case A** (normal article) → read the body's bylines
      (`<address class="author">(…)</address>`) and concatenate them
-     in the order they appear. Expand initials → full names from
-     the previous issue's Impressum (typically
-     `issues/<PREV>/<NNN> Impressum.html`).
+     in the order they appear. **KEEP THE INITIALS EXACTLY AS PRINTED
+     in the `<address>`;** the Impressum lookup is for the `author`
+     META only, and this step used to read as if it rewrote the
+     byline, against the guardrail further down.
+     Resolve from the previous issue's Impressum (typically
+     `issues/<PREV>/<NNN> Impressum.html`) — **which a SONDERHEFT
+     masthead does not carry.** MEASURED: 8612's Impressum has 14
+     `xx = Name` keys; SH8602's and SH8603's have **0**, so every
+     initial comes back UNDEFINED and the check reports the whole
+     set. For a Sonderheft, resolve against the nearest MONTHLY
+     Impressum instead, and say in LOG.md which issue was used.
 4. Sweep `grep -E '<p>\(([a-z]+|[A-Z][a-zA-Z]+)' issues/<YYMM>/*.html`
    for surviving `(byline)` paragraphs. If real bylines (not
    formula connectives like `(und)`, `(oder)`), convert to
@@ -349,7 +363,18 @@ abbreviation, it is a truncated `/bj`; `(Andreas Tschescheftr)` is `/tr` with
 the slash eaten. An abbreviation that appears exactly once in an issue and
 nowhere in the corpus is almost always an OCR artefact, not a new editor.
 
-## A full-name signature takes NO parentheses
+## The block index hides most bylines — use `NNN.json`
+
+A byline is the LAST thing on an article's text, and `blocks/pNNN.txt`
+truncates each block's text at ~200 characters, so the byline is usually past
+the cut. MEASURED on SH8603: **~40 of 50 bylines were invisible** in the block
+index and the pass had to read `NNN.json` instead.
+
+r000 warns about this truncation and names `NNN.labels.json`; this step never
+said it applied here. It does, more than anywhere else, because what this step
+looks for is by definition at the end of a block.
+
+## A full-name signature takes NO parentheses — WRONG, see below
 
 The rule that the editorial's `Michael Scharfenberger, Chefredakteur` is set
 without parentheses is not special to the editorial — it is how the magazine
@@ -360,7 +385,24 @@ sets **any** signature given as a full name on its own right-aligned line:
 <address class="author">Michael Scharfenberger, Chefredakteur</address>
 ```
 
-Parentheses belong to the compact byline form only — `(bs)`, `(Dirk
-Henckels/tr)` — which is set inline at the end of the closing sentence. So
-before wrapping a signature, check which form the print uses. Across the corpus
-every full-name signature is paren-less (2164 bylines checked).
+So before wrapping a signature, check which form the print uses.
+
+**But the heading above has the DEFAULT BACKWARDS, and this is the correction.**
+The old text ended "across the corpus every full-name signature is paren-less
+(2164 bylines checked)". MEASURED over every `<address class="author">` in the
+archive: **341 full-name signatures carry parentheses and 13 do not.**
+
+The distinction is not the NAME FORM — it is what the line IS:
+
+- **a byline**, closing the article's text, takes parentheses whatever the
+  name form: `(bs)`, `(Dirk Henckels/tr)`, `(Georg Klinge)`, `(Dirk Meier)`,
+  `(Doris Eichmeier)`. This is the overwhelming norm (341).
+- **a signature line**, standing on its own with a ROLE or as a bio box's own
+  name, takes none: `Michael Scharfenberger, Chefredakteur`,
+  `Michael Pauly, Redaktionsdirektor`, `Dieter Temme` (a Lebenslauf box).
+  All 13 of the paren-less cases are one of these two shapes.
+
+So a full name in parentheses is **correct**, and SH8602's and SH8603's
+`(Georg Klinge)` — kept as printed, against this rule's old wording — were
+right. The 2164-byline figure cannot be reproduced and should not be carried
+forward; re-measure before citing a number.

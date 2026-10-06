@@ -1,0 +1,157 @@
+
+
+;super-sorter.prg ==0801==
+    0 rem ********************************
+    1 rem *    sortierprogramm fuer      *
+    2 rem *      relative dateien        *
+    3 rem *       <c> 1985 bei           *
+    4 rem *      michael nickles         *
+    5 rem ********************************
+  100 m%=300    :rem groesse des puffers
+  105 n%=m%     :rem wert von m% speichern
+  110 dimm$(m%) :rem puffer fuer saetze
+  120 dimms(m%) :rem puffer fuer zahlen
+  130 dimlg(100),rg(100):z=0:lg(1)=1:rg(1)=m%           :rem fuer quicksort
+  200 rem anfangsmenue -----------------------------------------------------------
+  201 :
+  205 poke53280,0:poke53281,0:print"{clr}{wht}";
+  210 print"{rvon}      rel.datei sortierprogramm         {rvof}";
+  215 print"{rvon}         von michael nickles            {rvof}"
+  220 input"{down}{down}dateiname ";n$
+  230 open15,8,15:rem floppykanal auf
+  235 print#15,"i0":rem initialisieren
+  240 open1,8,3,n$ :rem rel.datei oeffnen
+  250 input#15,a,b$:rem fehlerabfrage
+  254 ifa<>0thenprint"{rvon}error{rvof}  ";b$:end
+  270 print"{down}{down}        {rvon}g{rvof}anze datei sortieren
+  275 print"{down}        {rvon}t{rvof}eilbereich sortieren
+  277 print"{down}        {rvon}l{rvof}esen
+  280 geti$:ifi$<>"g"andi$<>"t"andi$<>"l"then280
+  281 ifi$="l"then10000
+  285 ifi$="g"thenan=1:goto290
+  286 print"{down}bitte geben sie anfang und ende des     bereiches an, der sortiert";
+  287 print" werden soll!"
+  288 input"anfang ";an
+  289 input"ende   ";en:ifan>enthenprint"unsinn!":goto295
+  290 print"{down}bitte geben sie an, nach welchem string-bereich die sortierung
+  291 print"erfolgem soll!"
+  292 input"{down}von zeichen ";zl
+  293 input"bis zeichen ";zr
+  295 zr=zr-zl+1
+  300 rem sortiervorgang anfang --------------------------------------------------
+  301 :
+  305 ti$="000000"     :rem zeit auf 0
+  310 zd=an            :rem zeiger setzen
+  320 zp=1             :rem pufferzeiger
+  325 sa=zd:gosub9000:gosub9100                                :rem 1.satz lesen
+  330 vg$=a$           :rem vergl.satz
+  400 rem die m% kleinesten elemente von satz zd bis letzten satz suchen----------
+  401 :
+  402 print"{down}{rvon}";zp;"{left}. durchlauf    {rvof}{down}"
+  410 sa=zd+1:rem ----- begin loop -----
+  411 printsa,a$       :rem supermike
+  430 :gosub9000       :rem positionieren
+  431 ifa=50thenm%=sa-zd:en=sa:goto500                               :rem end loop
+  432 ifsa=en+1then500                                         :rem end loop
+  435 :gosub9100       :rem a$ lesen
+  440 :ifmid$(a$,zl,zr)>mid$(vg$,zl,zr)ora$="@"then460
+  445 : vg$=a$         :rem neuer vg$
+  450 : mm=sa          :rem satznr. merken
+  460 sa=sa+1          :rem next satz
+  465 goto411:rem ----- cont loop  -----
+  470 :
+  500 rem kleinstes element im bereich zd bis zd+m$ = vg$ wurde gefunden ---------
+  501 :
+  510 sa=mm:gosub9000:a$="@":gosub9200                       :rem satz mm loeschen
+  520 m$(zp)=vg$:ms(zp)=mm                                   :rem puffer fuellen
+  530 zp=zp+1        :rem puffer-zeiger+1
+  540 ifzp>m%then600 :rem puffer voll
+  550 rem neuen vg$ suchen
+  555 sa=zd
+  560 gosub9000:gosub9100:ifa$="@"thensa=sa+1:goto560
+  565 vg$=a$:mm=sa
+  570 goto400
+  600 rem puffer ist jetzt voll --------------------------------------------------
+  601 :
+  610 print"{down}{rvon}pufferinhalt{rvof}{down}":fori=1tom%:printm$(i),ms(i):nexti:rem supermike
+  620 rem ms(1)-ms(m%) wird jetzt mit quicksort sortiert -------------------------
+  621 :
+  625 gosub30000:rem aufruf quicks.up
+  630 print"{down}{rvon}sortierter nummerpuffer{rvof}{down}":fori=1tom%:printms(i):next:rem supermike
+  650 rem neuen pufferzeiger setzen ----------------------------------------------
+  651 :
+  655 zp=1
+  660 ifms(zp)<zd+m%thenzp=zp+1:goto660
+  670 print"zp=";zp       :rem supermike
+  700 rem platz fuer puffer schaffen ---------------------------------------------
+  701 :
+  710 fori=zdtozd+m%-1
+  720 :sa=i:gosub9000:gosub9100                              :rem a$ lesen
+  729 printa$        :rem supermike
+  730 :ifa$="@"then760
+  740 :  sa=ms(zp):gosub9000:gosub9200                       :rem luecke fuellen
+  745 :  zp=zp+1     :rem p.zeiger +1
+  760 nexti
+  800 rem puffer zurueckschreiben ------------------------------------------------
+  801 :
+  810 sa=zd
+  820 : fori=1tom%
+  830 :   a$=m$(i)
+  831 :   printa$          :rem supermike
+  840 :   gosub9000:gosub9200
+  850 :   sa=sa+1
+  860 : nexti
+  900 rem naechsten sortiervorgang vorbereiten------------------------------------
+  901 :
+  910 ifm%<>n%oro%thenprint"sortierzeit: ";ti$:print"{down}{down}*** fertig ***":close15:end
+  920 zd=zd+m%:rem dateizeiger erhoehen
+  924 zp=1    :rem pufferzeiger auf 1
+  925 sa=zd
+  926 gosub9000:gosub9100:ifa$="@"thensa=sa+1:goto560
+  927 vg$=a$:mm=sa
+  930 ifm%>en-zdthenm%=en-zd
+  935 ifm%=en-zdtheno%=1
+  950 goto400 :rem naechste sortierrunde
+ 9000 rem positionieren ***************
+ 9001 :
+ 9010 : hb%=sa/256:lb%=sa-hb%*256
+ 9020 : print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+ 9030 : input#15,a:rem fehlerabfrage
+ 9040 return
+ 9100 rem satz lesen    ***************
+ 9101 :
+ 9110 : ifa=50thenreturn: rem fehler
+ 9120 : input#1,a$
+ 9130 return
+ 9200 rem satz schreiben **************
+ 9201 :
+ 9210 : print#1,a$
+ 9230 return
+10000 rem datei lesen ----------------------------------------------------------
+10001 :
+10010 print"{rvon}lesen / ende{rvof}"
+10015 geti$:ifi$<>"l"andi$<>"e"then10015
+10020 ifi$="e"thenprint"{clr}":goto270
+10030 input"satznummer ";ia
+10034 print"{rvon}satz";ia;"{left}-";ia+20;"{rvof}"
+10035 forsa=iatoia+20
+10040 : gosub9000:gosub9100
+10050 : iflen(a$)<40thenprinta$
+10060 : iflen(a$)>=40thenprinta$;
+10070 nextsa
+10080 goto10010
+30000 rem  quicksort -----------------------------------------------------------
+30001 rg(1)=m%
+30010 z=z+1:iflg(z)>=rg(z)then30120
+30020 x=lg(z):y=rg(z)
+30030 vg=ms(int((x+y)/2))
+30040 if x>y then30100
+30050 if ms(x)<vgthenx=x+1:goto30050
+30060 if ms(y)>vgtheny=y-1:goto30060
+30070 if x>ythen30100
+30080 s=ms(x):ms(x)=ms(y):ms(y)=s
+30090 x=x+1:y=y-1:goto30040
+30100 rg(z+1)=y:lg(z+1)=lg(z):gosub30010
+30110 lg(z+1)=x:rg(z+1)=rg(z):gosub30010
+30120 z=z-1:return
+

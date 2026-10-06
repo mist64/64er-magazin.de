@@ -192,9 +192,16 @@ SKEW_RESIDUAL_MAX = 0.10                      # deg
 # row to row.  Mean |difference| between consecutive rows' paper boundary, in
 # thumb pixels, separates them.
 #
-# The gate is: parity decides, and a CONFIDENT disagreement is a failure -- a
-# page that is misfiled or mis-rotated, which is expensive to discover after a
-# full-resolution sweep.  Ambiguity passes.
+# The gate is: parity decides, and a CONFIDENT disagreement is NOTED on the
+# page -- it may be misfiled or mis-rotated, which is expensive to discover
+# after a full-resolution sweep.  Ambiguity passes silently.
+#
+# NOTED, not failed, and this comment used to say "is a failure" while the code
+# below has always appended to `notes` and published.  Failing would have
+# stopped SH8604 on 93 of its 160 interior pages, none misfiled: at 600 dpi the
+# frame can cut THROUGH the torn fringe, so the measurement reads the clean
+# edge's jitter instead.  The overlay and the size gate are the checks that can
+# say what is wrong with a page; this one only says it is worth a look.
 #
 # RE-MEASURED over all 152 thumbs after colors.txt was re-measured, because this
 # gate reads the PAPER mask and a new paper white is a new mask.  Of the 144

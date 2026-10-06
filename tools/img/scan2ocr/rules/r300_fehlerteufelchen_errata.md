@@ -48,6 +48,21 @@ the reader wants the correction.
 
 ## WHEN a Futureteufelchen is added — the corpus's own criterion
 
+**Owner, 2026-10-05: *"correcting typos that don't help anyone… doesn't help
+anyone."*** That is the test, and it is the reason the four kinds below are the
+four: each of them tells the reader something that changes what they can **do**
+— a listing that will now run, a file that differs from the page in their
+hands, a correction the magazine never printed, a fact they can act on. A
+typo that costs the reader nothing gets nothing, however plainly wrong it is.
+
+Ask it the owner's way first — *who is helped?* — and only then work through
+the four. If the honest answer is "nobody, but it is wrong", that is a typo,
+and typos in print remain typos.
+
+MEASURED on SH8604: its Vorwort (p3) calls the same first course *Sonderheft
+2/85* in one sentence and *Sonderheft 2/86* in the next. Obviously one of them
+is wrong; **nobody is helped by being told which**, and no aside is written.
+
 Derived from all 19 in the corpus, not from principle. Every one of them says
 something **the archive knows and the page does not**, and falls into four
 kinds:
@@ -78,7 +93,9 @@ Ask, in this order:
    assembler claim by running it.
 
 If none of the four applies, record the candidate and leave it. A page that
-merely contradicts itself gets no aside.
+merely contradicts itself gets no aside — and "record and leave it" means a
+line in LOG.md, not a question for the owner. A candidate that fails the
+who-is-helped test is **settled by this rule**, not escalated.
 
 ## TWO KINDS OF DEVIL: Fehlerteufelchen is THEIRS, Futureteufelchen is OURS
 
@@ -266,7 +283,13 @@ Read it before running this rule. The essentials are distilled below.
      - `<!-- Reiner Druckfehler -->` — print-only artifact (unreadable
        digit, hardware-schematic typo); disk was never wrong.
    - **Omit** the status comment entirely for non-code errata (figure
-     caption, prices, addresses, reprints).
+     caption, prices, addresses, reprints) — which is to say: the comment is
+     mandatory wherever a PROGRAM could be affected, and absent where none
+     could. *Every aside carries a disposition comment*, below, reads as
+     unconditional and these two sentences were taken as contradicting each
+     other on SH8603. They do not: **136 of the corpus's 161 asides carry no
+     status comment**, because most errata correct prose, prices or a caption.
+     The test is whether a reader with the disk would need to check anything.
    - If an old `<!-- Fehlerteufelchen … -->` placeholder comment exists,
      **delete it** — never ship both placeholder and aside.
    - **Multiple corrections to the SAME article → ONE aside.** An
@@ -348,7 +371,31 @@ grep -rl 'aside class="fehlerteufelchen" id="fehlerteufelchen"' "$dir"/*.html
 # newline-separated names and `read -d ''` consumes none of them. This loop ran
 # ZERO times on every issue until it was fixed.
 grep -rl --null 'class="fehlerteufelchen"' "$dir"/*.html | while IFS= read -r -d '' f; do
-  grep -q "<!-- 64'er " "$f" || echo "  $f: aside missing <!-- 64'er M/YYYY --> trailer"
+  # PER ASIDE AND PER CORRECTION, not per file.  A two-source aside -- one
+  # <aside> with one <p> per correction, from DIFFERENT issues -- needs one
+  # trailer each, in issue order, and a per-file `grep -q` passes as soon as
+  # ONE of them is there.  SH8603's articles 146 and 81 are both this shape.
+  $PY - "$f" <<'PYEOF'
+import io, re, sys
+s = io.open(sys.argv[1], encoding='utf-8').read()
+for m in re.finditer(r'<aside[^>]*id="fehlerteufelchen"[^>]*>(.*?)</aside>',
+                     s, re.S):
+    body = m.group(1)
+    ps = len(re.findall(r'<p', body))
+    tr = len(re.findall(r"<!-- 64'er ", body))
+    # ONE TRAILER PER SOURCE ISSUE, not per correction: several corrections
+    # can come from the SAME later issue, and then one trailer is right.  The
+    # HTML cannot tell them apart, so a multi-correction aside with a single
+    # trailer is a LOOK and only a missing trailer is a failure.  Measured
+    # over the corpus: 159 erratum asides, 4 with NO trailer, 40 multi-
+    # correction asides carrying one.
+    if tr == 0:
+        print('  FAIL %s: aside with no <!-- 64\'er M/YYYY --> trailer'
+              % sys.argv[1])
+    elif ps > 1 and tr == 1:
+        print('  look %s: %d corrections, 1 trailer -- same issue for all?'
+              % (sys.argv[1], ps))
+PYEOF
 done
 # no orphan links (link present but no aside in same file)
 for f in "$dir"/*.html; do
@@ -581,6 +628,30 @@ Don't compose erratum text from memory or training knowledge — every word must
 - Standard PRG workflow: rule `r120_prg_from_d64.md`
 - Anti-memory enforcement: `r000_orchestration.md`, "OCR cleanup granularity"
 
+## EVERY PRINT/DISK DIFFERENCE IS AN OWNER DECISION, ALWAYS
+
+Owner, 2026-10-04: *"difference between the printed listing and the disk —
+always ask me."*
+
+**Where the printed listing and the disk file differ — in content, in line
+range, in presentation, or because a later issue corrected one of them — the
+difference is reported to the owner at PAUSE 2 with the evidence, and the owner
+decides whether anything is said on the page. The builder does not decide it,
+and a previous issue's answer is not a precedent for this one.**
+
+Three shapes seen so far, all of them this one question:
+
+| shape | example |
+|---|---|
+| a published correction the disk already carries | *Farbdemo*, SH8603/21: the printed p22 listing is unusable, 8605's *Tips & Tricks* corrected it, the disk is the corrected version |
+| an uncorrected divergence nobody noticed | *Hyper-Graphics*, SH8603/60: 12 instructions differ, no erratum anywhere |
+| a disk file carrying a bug the magazine corrected later | *spline 64* and *reset-helfer*, SH8602 |
+
+**On SH8603 the owner declined a note in both of its cases. That is the
+outcome of two decisions, not a default for the next issue.** A first reading
+of that run of refusals as a standing "say nothing" rule was wrong and is
+withdrawn: the rule is *ask*, and the answer may differ next time.
+
 ## When an erratum corrects a listing, check the disk file FIRST
 
 The Programm-Service disk usually carries the **already-corrected** program, so
@@ -653,6 +724,16 @@ source marker. The corpus vocabulary — use it verbatim, do not invent wording:
 | `<!-- Reiner Druckfehler -->` | the error exists only in the print; no program is affected (a wrong figure number, a garbled sentence) |
 | `<!-- Disk-Version bereits korrigiert -->` | a program IS affected, but the Programm-Service disk already shipped the corrected version — nothing was patched |
 | `<!-- Korrektur im Programm angewendet -->` | the correction was applied to the listing in `prg/` |
+| `<!-- Reiner Druckfehler -->` (again) | **also** the value for a real code bug in an article with NO program file at all — see below |
+
+**A real code bug with no program file** has no word of its own, and the
+vocabulary is closed. SH8603 met it on the print-only DATA-Erzeuger and used
+`Reiner Druckfehler` (8607/79 does the same), which is defensible — there is
+no `.txt` and no `.prg`, so nothing a reader has can be wrong, and the error
+does exist only in the print. But note what it costs: the comment then tells a
+future reader "no listing needs checking", which is true here only because
+there IS no listing. **Say so in LOG.md whenever this value is used for that
+reason**, so the distinction survives the aside.
 
 ```html
         <!-- Disk-Version bereits korrigiert -->

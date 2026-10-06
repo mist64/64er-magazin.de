@@ -12,7 +12,7 @@ them so they render as literal text. Keep real HTML tags (`<br>`, `<sub>`,
 For every `<…>` pattern in the `.md`:
 - Extract the first identifier (the would-be tag name; for `</X>` strip the leading `/`, for `<X/>` ignore the trailing `/`).
 - If the identifier is in the HTML whitelist — **compared exactly, NOT
-  lowercased** (`br, p, h1-h6, a, strong, em, sub, sup, table, tr, td, th, thead, tbody, ul, ol, li, dl, dt, dd, hr, img, code, pre, blockquote, aside, figure, figcaption, address, div, span, section, article, small, big, b, i, u, kbd, mark, samp, …`) → **keep**.
+  lowercased** (`br, p, h1-h6, a, strong, em, sub, sup, table, tr, td, th, thead, tbody, ul, ol, li, dl, dt, dd, hr, img, code, pre, blockquote, aside, figure, figcaption, address, div, span, section, article, small, b, i, u, kbd, mark, samp, …`) → **keep**.
 - Else → **replace** the surrounding `<` and `>` with the entities `&lt;` and
   `&gt;` directly. Not with `\<` … `\>`: this file used to say that, and the
   script's own comment says why it stopped — Discount **preserves `\<`
@@ -32,7 +32,14 @@ an italic run, a link or a quotation. `<P>RESS <RETURN>` would open a
 paragraph tag and swallow the line. The whitelist is all lowercase precisely
 so that an uppercase key name can never match it.
 
-Patterns that already start with a non-letter (e.g. `< CBM >` with leading space, `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because HTML requires a letter immediately after `<` for a tag. **EXCEPT `</` followed by a non-letter** (`</>`, `</1>`): the HTML5 tokenizer drops `</>` entirely and treats `</`+non-letter as a bogus comment that eats text up to the next `>`. 8612 line 2903, "durch `</>` dargestellt", would have lost the `</>` and swallowed what followed. Escape those too.
+Patterns that already start with a non-letter (e.g. `< CBM >` with leading space, `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because HTML requires a letter immediately after `<` for a tag. **EXCEPT `</` followed by a non-letter** (`</>`, `</1>`): the HTML5 tokenizer drops `</>` entirely and treats `</`+non-letter as a bogus comment that eats text up to the next `>`. 8612 line 2903, "durch `</>` dargestellt", would have lost the `</>` and swallowed what followed. Escape those too — **Pass 3 in the script.**
+
+This rule has said that since the 8612 harvest and the script did not do it:
+Pass 2's pattern requires a letter after the optional `/`, so `</>` never
+matched, and the Verification regex had the same requirement, so neither end
+could see the gap. Both now cover it. The shape is rare — 0 occurrences in
+SH8603's and SH8604's 030 handovers — so the planted case in the Verification
+is what exercises it.
 
 ## Usage
 
@@ -40,7 +47,10 @@ Patterns that already start with a non-letter (e.g. `< CBM >` with leading space
 tools/img/scan2ocr/rules/r050_escape_tags.sh issues/8607/8607.md
 ```
 
-Idempotent: lookbehinds for `\` (i.e., `(?<!\\)<` and `(?<!\\)>`) mean re-runs are no-ops.
+Idempotent — but **not** by the lookbehinds this line used to claim
+(`(?<!\\)<`, `(?<!\\)>`). The script has no such lookbehind. It is idempotent
+because its output is entities: `&lt;…&gt;` matches none of the three passes.
+Verified by running it twice over its own output.
 
 ## Verification
 
@@ -83,10 +93,26 @@ for m in re.finditer(r'(?<!\\)<(/?[a-zA-Z][^<>\n]*?)(?<!\\)>', s):
     if name not in WHITE: bad.append(m.group(0))
 print(f"unescaped non-HTML <...>: {len(bad)}")
 for b in bad[:5]: print(f"  e.g. {b}")
+# Pass 3's shape, which this block could not see either: both regexes required
+# a letter after the optional '/', so `</>` was unreachable from both ends.
+bogus = re.findall(r'</(?![a-zA-Z])[^<>\n]*>', s)
+print(f"bogus </ + non-letter: {len(bogus)}")
+for b in bogus[:5]: print(f"  e.g. {b}")
 PYEOF
 ```
 
-Expected: zero unescaped non-HTML tags.
+Expected: zero unescaped non-HTML tags, zero bogus `</`.
+
+**And plant Pass 3's case, because live text almost never carries it** (0 in
+both SH8603 and SH8604). A check that no issue can exercise is not a check:
+
+```bash
+printf 'Das Zeichen `</>` und `</1>` und ein echtes <br> dahinter.\n' > /tmp/t50.md
+tools/img/scan2ocr/rules/r050_escape_tags.sh /tmp/t50.md
+cat /tmp/t50.md
+```
+
+Expected: `&lt;/&gt;` and `&lt;/1&gt;`, with `<br>` untouched.
 
 ## Notes / lessons
 

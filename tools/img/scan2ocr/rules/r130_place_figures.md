@@ -44,6 +44,20 @@ what the magazine showed. The download stays the **full** file. `data-range` is
 implemented in `generate.py` (:679, :721, honoured by the checksummer path) and
 16 issues already use it.
 
+**A padded printed last row needs no `data-range` and no note.** An MSE dump's
+final row is short whenever the program's length is not a multiple of eight,
+and the print sometimes pads it with the bytes that followed in memory, giving
+that row a different checksum. We render from the `.prg` and so emit the real
+short row. Owner, 2026-10-05: *"we don't reproduce this."* Not a print/disk
+divergence, no aside — see r170, *THE PRINTED LAST ROW MAY BE PADDED*.
+
+**`data-range` is BASIC-only.** It selects by LINE NUMBER, so a binary has no
+way to express the same thing — and a binary's range mismatch is just as real:
+SH8603 had printed dumps whose address span differs from the disk file's. Until
+there is an address form, report the mismatch at PAUSE 2 (it is a print/disk
+difference, so r300's standing ruling applies) and record the printed span in
+the caption or in LOG.md. Do not silently ship the full dump as if it matched.
+
 MEASURED on 8612: 2 of 38 disk listings start before the print — `79 yankee
 doodle` (file from 10, print from 100) and `input-routine` (file from 1, print
 from 10000) — and none end after it. The test is **fidelity to the print**,
@@ -131,6 +145,21 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
 
 ## Rules / things to watch
 
+- **An MSE hex dump is a C64 MSE dump, and not every binary is one.** The
+  table below defaults a binary to `data-mse=mse1`, which renders MSE's own
+  row format and addresses. SH8603's C16 and VC 20 binaries are printed as
+  **TEDMON dumps, VC-20 monitor dumps, or the game's own input-program
+  format** — `tacco` dumps at file−$200 with its own row layout and a 16-bit
+  row sum, `penco` in 25-byte rows — so `mse1` would print addresses the
+  magazine never set. Read the printed dump's shape before choosing, and where
+  it is not MSE, the `<pre>` carries the dump as printed and the download
+  carries the file.
+- **Where this rule and r170 both touch a caption, r170 wins on page
+  pointers.** This rule says captions are verbatim; r170 says drop a standalone
+  "… auf Seite N" pointer. The same printed caption can be both ("Bitte
+  beachten Sie die Eingabehinweise auf Seite 76"), and no precedence was
+  stated. The pointer goes: it is a print navigation aid that means nothing on
+  a web page, and what remains of the caption is still verbatim.
 - **Captions are verbatim.** Trailing dot after `Listing N`, German
   typography (`»…«`), exact punctuation. Read from the PDF text layer
   first; fall back to scan-visual only when the layer is broken.
@@ -221,6 +250,19 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
   with the verbatim caption, so the gap is visible in the build.
   Never silently drop a printed Listing N.
 
+## A print/disk difference is the OWNER's call — see r300
+
+Where a figure, a caption, a line range or a listing on the page disagrees with the disk file this step is placing, **stop and report it with the evidence**; it is a PAUSE 2 decision and not this step's. The full ruling, with the three shapes it covers, is in r300 under *EVERY PRINT/DISK DIFFERENCE IS AN OWNER DECISION, ALWAYS*. Do not take a previous issue's answer as a precedent.
+
+## An element you cannot place does NOT go at the end
+
+Owner, 2026-10-06. A table, figure or listing whose print position cannot be
+determined is placed **where it fits best** — for a numbered series, between
+its neighbours — never appended to the bottom of the article, which reads as
+the conclusion and lands after the byline's closing run. The rule, the
+reasoning and the check are in **r150, *NEVER LEAVE AN ORPHAN AT THE END***,
+and they cover all three kinds.
+
 ## Verification
 
 ```bash
@@ -294,6 +336,13 @@ PY
 #    the failure mode (8607/`96 Neues vom Hypra-Basic.html` shipped
 #    10 of these). The caption text after the listing label should be
 #    at least 3 words.
+#
+#    BUT CAPTIONS ARE VERBATIM, AND SOME PRINTED ONES ARE SHORT.  "Listing 2.
+#    »INT«" is the whole caption on the page, and the >=3-words test called
+#    12 of SH8603's captions bare.  A printed caption of one or two words is
+#    correct by this rule's own "captions are verbatim"; what the test is
+#    actually looking for is a caption that is ONLY the label.  So: fail on
+#    nothing after "Listing N.", and report a 1-2 word description as a look.
 python3 - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]
@@ -304,8 +353,17 @@ for f in sorted(os.listdir(d)):
             r'<figcaption[^>]*>(?:<[^>]+>)*\s*(Listing\s+\d+[a-z]?\.?)([^<]*)',
             s, re.IGNORECASE):
         rest = m.group(2).strip().lstrip('.').strip()
-        if not rest or len(rest.split()) < 3:
-            print(f"  {f}: short/empty caption after {m.group(1)!r}")
+        # ONLY AN EMPTY DESCRIPTION IS A FAILURE.  A printed caption of one or
+        # two words is correct under "captions are verbatim": SH8603 has 18 of
+        # them -- "Listing »Hamurabi«", "Listing zu »YAATZEE«", "Listing 2.
+        # Maschinencode-Programm »Tacco«" -- and the >=3-word test called every
+        # one bare.  What this check is for is a caption that is ONLY the label,
+        # which is 8607/96's shape.
+        if not rest:
+            print(f"  FAIL {f}: nothing after {m.group(1)!r}")
+        elif len(rest.split()) < 3:
+            print(f"  look {f}: {m.group(1)!r} + {rest[:40]!r}"
+                  " -- short; verbatim on the page?")
 PY
 
 # 7. Listing-N sequence must be gap-free per article. Per-article

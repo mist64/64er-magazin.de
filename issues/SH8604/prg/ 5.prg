@@ -1,0 +1,1 @@
+   ¥     ©             ¥     £££££}£££££   ¥         w}w       ¥          }        ¥     ¤¤¤¤¤¤¤¤¤¤¤   ¥    n              ¥    o···········   l¯¯¯¯¥             ’©oooool¯¯¯¯¯¯¯¯¯¯¯ ’©oooooooooooooooooo©ooooooooooooooooooo_11HIER IST DAS REICH DES KOCHES.AUFDEM SCHRANK VOR IHNEN LIEGEN NOCHZWEI ROHE EIER UND 150 G MEHL.

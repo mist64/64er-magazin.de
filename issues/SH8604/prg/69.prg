@@ -1,0 +1,1 @@
+ê      •                   •                   •                   •                   lØØØØØØØØ©    ê     _í¶¶¶¶¶¶¶¶©     ê    _í¶¶¶¶¶¶¶¶©      ê   _í¶¶¶¶¶¶¶¶©    í¶  ê  _í¶¶¶¶¶¶¶¶©     }  ê _í¶¶¶¶¶¶¶¶©         ê_í¶¶¶¶¶¶¶¶¶¶¶£êí¶¶¶¶¶¶¶_4IM KONFERENZTISCH STECKT EIN EINDEUTIGASIATISCHES MESSER.IN DEN GRIFFIST EIN DRACHE GESCHNITZT.

@@ -14,10 +14,23 @@ if [ -z "$1" ]; then
   echo "usage: $0 <issue-dir> < mapping.tsv" >&2
   exit 1
 fi
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY_BIN="${PYTHON:-$DIR/../../../../.venv/bin/python}"
 issue_dir="$1"
-# Use python3 -c so the inline source code doesn't consume our stdin
-# (which carries the mapping TSV).
-python3 -c "$(cat <<'PY'
+
+# THE BODY GOES TO A FILE, NOT THROUGH $( ... ).  It used to be
+# python3 -c "$(cat <<'PY' ... PY)" -- the command substitution so that the
+# inline source would not eat our stdin, which carries the mapping TSV.
+# macOS /bin/bash is 3.2 and it SCANS INSIDE $( ... ) even when the heredoc
+# there is quoted, so a backtick or an apostrophe in a PYTHON COMMENT broke
+# the whole script: bash -n failed with "unexpected EOF while looking for
+# matching quote" and it ran only under Homebrew bash 5.  Both SH8603 and
+# SH8604 hit it, and patching out the offending characters one by one leaves
+# the next comment to re-break it.  A heredoc written to a file is not
+# scanned, keeps stdin free, and ends the class.
+body=$(mktemp -t r100_body)
+trap 'rm -f "$body"' EXIT
+cat > "$body" <<'PY'
 
 import os, re, sys
 issue_dir = sys.argv[1]
@@ -70,15 +83,15 @@ for fn, cat in mapping.items():
     if s2 != s:
         open(fp, 'w', encoding='utf-8').write(s2)
         changed += 1
-        # Name what we touched, so step 4 can stage exactly that. `git add -u
-        # <dir>` stages EVERY tracked modification in the issue directory --
+        # Name what we touched, so step 4 can stage exactly that.
+        # "git add -u <dir>" stages EVERY tracked modification in the dir --
         # on 8612 it swept WORKFLOW_ERRATA.md into this step's commit.
         open(os.path.join(issue_dir, '.r100_staged'), 'a', encoding='utf-8').write(fp + "\n")
 print(f"updated {changed} of {len(mapping)} file(s) in {issue_dir}")
 PY
-)" "$issue_dir"
+"$PY_BIN" "$body" "$issue_dir"
 
-# 4. stage ONLY the files this step rewrote (never `git add -u <dir>`: r000's
+# 4. stage ONLY the files this step rewrote (never "git add -u <dir>": r000's
 #    rule on self-staging scripts and a shared index)
 if [ -s "$issue_dir/.r100_staged" ]; then
   tr '\n' '\0' < "$issue_dir/.r100_staged" | xargs -0 git add --

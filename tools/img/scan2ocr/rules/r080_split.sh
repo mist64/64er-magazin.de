@@ -88,13 +88,48 @@ def split_html(input_file, issue):
         pages = page_match.group(1)
         h1_clean = re.sub(r'\s*\[.*?\]$', '', h1_text)
         first_page = pages.split(',')[0].split('-')[0].strip()
+        # THE FILENAME KEEPS THE PLAIN NUMBER, the meta keeps the letter.
+        # r080's "Three conventions" requires lettered pages (NNNa/NNNb) when
+        # two articles start on one page, and says the filename stays plain --
+        # the corpus does it (8507, 8508).  Deriving the name from `pages`
+        # verbatim produced "21a Title.html" instead, so the letters had to be
+        # put back into the metas BY HAND after the script, which the rule never
+        # said.  The two siblings' names still differ: their titles do.
+        file_page = re.sub(r'[a-z]$', '', first_page)
         # plain-text version of the heading for the filename and <title>
         h1_plain = re.sub(r'<[^>]+>', '', h1_clean).strip()
-        out_name = sanitize_filename(f"{first_page} {h1_plain}.html")
+        out_name = sanitize_filename(f"{file_page} {h1_plain}.html")
         body = apply_text_replacements(body)
         # Collect (author) bylines into <address class="author"> + <meta name=author>
+        #
+        # NOT EVERY ALL-PARENTHESISED PARAGRAPH IS A BYLINE.  As written this
+        # promoted any <p>(...)</p>: SH8603's 72 got the author
+        # "(Kassette nr = 1; Diskette nr = 8)" and SH8604's a <p>(RETURN)</p>.
+        # MEASURED over the 1,355 distinct bylines in the published corpus, the
+        # test below accepts 1,353 -- the two it rejects are hand-added <a href>
+        # links whose URLs carry digits, which this script never produces -- and
+        # rejects (RETURN), (ADRESSE), (BYTES), (Listing 2), (Bild 3),
+        # (Fortsetzung auf Seite 62) and the Kassette line.  The three parts:
+        #   - no '=' and no ';', which is what a parameter list has;
+        #   - no digit, except the magazine's own name ("Die 64'er Redaktion")
+        #     and a link's URL;
+        #   - not a single ALL-CAPS token: 0 of the 1,355 is one, and a key name
+        #     or a monitor keyword always is.
+        def is_byline(a):
+            if '\n' in a or not (1 <= len(a) <= 80):          return False
+            t = re.sub(r'&[a-z]+;', '', a)
+            if '=' in t or ';' in t:                           return False
+            d = re.sub(r'<a href="[^"]*">', '', t)
+            d = re.sub(r"(?:64|128)['\u2019]er", '', d)
+            if re.search(r'\d', d):                            return False
+            if t.isupper() and not re.search(r'[\s/.]', t):    return False
+            return True
+
         authors = set()
         for a in re.findall(r'<p>\(([^)]*?)\)</p>', body, re.DOTALL):
+            if not is_byline(a.strip()):
+                print(f"  not a byline, left as a paragraph: ({a.strip()[:60]})")
+                continue
             authors.add(a.strip().replace('/', ', '))
             body = body.replace(f'<p>({a})</p>', f'<address class="author">({a})</address>', 1)
         out = tpl_start.format(issue=issue)

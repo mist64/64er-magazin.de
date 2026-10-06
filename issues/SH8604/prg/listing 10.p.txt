@@ -1,0 +1,70 @@
+
+
+;listing 10.p.prg ==0801==
+   10 ifi=0theni=1:load"wortschatz",8,1
+   20 dim be$(25)
+   30 dimin(26):fori=1to26:readin(i):nexti
+   40 data40960,41006,0,41581,41650
+   50 data42018,42110,42317,42501,0
+   60 data42547,42685,0,42823,43007
+   70 data43076,43237,43260,43605,44364
+   80 data44502,44571,45031,0,0,45284
+  100 rem modifizierte peek-funktion ---------------------------------------------
+  101 :
+  110 data32,247,183,120,169,52,133,1
+  120 data160,0,177,20,168,169,55,133
+  130 data1,88,76,162,179
+  140 fori=704to724:readx:pokei,x:s=s+x:nexti
+  150 poke785,192:poke786,2:rem usr-zeiger
+  160 ifs<>2325thenprint"fehler in datas{$a0}!":end
+  200 gosub50000
+  210 print"ve="ve:print"o1="o1:print"o2="o2:print"ad="ad:print"ri="ri
+  230 goto200
+50000 rem *************************
+50001 rem *                       *
+50002 rem *    wort-parser 5.0    *
+50003 rem *                       *
+50004 rem *     <c> 1986 bei      *
+50005 rem *                       *
+50006 rem *    michael nickles    *
+50007 rem *                       *
+50008 rem *************************
+50010 rem befehlseingabe -------------------------------------------------------
+50011 :
+50015 j1=1:j2=10:j3=198:j4=54276:j5=54277:j6=203:j7=3000:j8=2:j9=20:j0=54273
+50016 k1=54272:k2=89:k3=129:k4=47:k5=57:k6=65:k7=90:k8=32:k9=34:k0=44
+50017 print
+50019 poke54296,15:rem und abfragen
+50020 tt=.: rem input-interrupt-zaehler
+50030 fori=j1toj2:be$(i)="":next:pokej3,.:be$="": rem satz loeschen
+50040 print"{yel}>";:print"{CBM-@}";
+50050 pokej4,.:pokej5,.:getx$:ii=peek(j6):iftt<j7then50060:rem tt=tt+1 !!!!
+50055 fori=1tolen(be$)+j8:printchr$(j9);:next:ve=0:return
+50060 ifx$=""then50050
+50061 pokej5,j1:pokej0,j2:pokek1,k2:pokej4,k3
+50070 tt=0
+50080 ifii=1thenifbe$<>""thenprint"{left}.":goto50200
+50085 i=asc(x$):ifi>k4andi<k5then50100
+50090 i=asc(x$):ifi<k6ori>k7thenifi<>k8andi<>j9andi<>k9andi<>k0then50050
+50100 ifi=j9andlen(be$)=.then50050
+50110 ifi=j9thenprint"{left}{left}  {left}{left}{CBM-@}";:be$=left$(be$,len(be$)-j1):goto50050
+50120 be$=be$+chr$(i):iflen(be$)>78thenbe$=left$(be$,78):goto50050
+50125 ifi=k9theni=64
+50130 print"{left}";chr$(i);"{CBM-@}";:goto50050
+50200 rem codierung ------------------------------------------------------------
+50201 :
+50250 rem wort im ram suchen *******
+50254 i$=be$
+50255 im=asc(left$(i$,1)):i=in(im-64)
+50262 rem begin loop           <<<
+50264 :if im<>usr(i)then 50280
+50265 :fori1=1tolen(i$):printmid$(i$,i1,1),chr$(usr(i+i1-1))
+50270 : ifasc(mid$(i$,i1,1))<>usr(i+i1-1)theni1=len(i$):goto50276
+50273 : ifi1=len(i$)andusr(i+21)=3thenob=usr(i+22):om=ob:print"objekt="ob:end
+50274 : ifi1=len(i$)andusr(i+21)=2thenri=usr(i+22):print"richtung="ri:end
+50275 : ifi1=len(i$)andusr(i+21)=1thenve=usr(i+22):print"verb="ve:end
+50276 :nexti1
+50278 i=i+23:goto50264
+50280 rem end loop             <<<
+50290 print"ich kenne das wort "be$" nicht !":end
+

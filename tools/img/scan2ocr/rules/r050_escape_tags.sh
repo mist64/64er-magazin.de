@@ -1,13 +1,17 @@
 #!/bin/bash
 # Escape <...> patterns in a 64'er OCR .md when they're NOT real HTML tags
 # (e.g. <RETURN>, <SHIFT-RUN/STOP>, <F3>). Real tags (<br>, <sub>, <img …>,
-# etc.) are kept. In-place rewrite, idempotent (skips already-escaped \<...\>).
+# etc.) are kept. In-place rewrite, idempotent -- not because it skips an
+# already-escaped \<...\> (the header said so; Pass 1 CONVERTS those), but
+# because the output is entities, and &lt;...&gt; matches no pattern here.
 set -e
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY="${PYTHON:-$DIR/../../../../.venv/bin/python}"
 if [ -z "$1" ]; then
   echo "usage: $0 <md-file>" >&2
   exit 1
 fi
-python3 - "$1" <<'PY'
+"$PY" - "$1" <<'PY'
 import re, sys
 fp = sys.argv[1]
 HTML_TAGS = {
@@ -33,15 +37,18 @@ s = open(fp, encoding='utf-8').read()
 # Fenced regions are therefore passed through untouched.  ``` only: 030 emits
 # no indented code blocks (MEASURED: 0 in 8611), and treating a 4-space indent
 # as code would swallow ordinary continuation lines.
-def map_outside_fences(s, fn):
-    out, infence = [], False
+def fence_flags(s):
+    """(line, inside_a_fence) per line; the ``` lines count as inside."""
+    infence = False
     for line in s.splitlines(keepends=True):
         if line.lstrip().startswith('```'):
             infence = not infence
-            out.append(line)
+            yield line, True
             continue
-        out.append(line if infence else fn(line))
-    return ''.join(out)
+        yield line, infence
+
+def map_outside_fences(s, fn):
+    return ''.join(line if inf else fn(line) for line, inf in fence_flags(s))
 
 # Pass 1: convert any pre-existing backslash-escaped pair `\<X\>` to entities,
 #         since Discount preserves `\<` literal when it looks like a tag.
@@ -56,12 +63,30 @@ def fix(m):
     return '&lt;' + inner + '&gt;'
 # Match <…>: starts with letter (so '<10', '< CBM >', '<\*>' don't match).
 s = map_outside_fences(s, lambda l: re.sub(r'<(/?[a-zA-Z][^<>\n]*?)>', fix, l))
+
+# Pass 3: "</" FOLLOWED BY A NON-LETTER, which Pass 2's pattern cannot reach.
+# The rule has required this since the 8612 harvest; the script never did it,
+# and neither did the Verification regex, so the gap was invisible from both
+# ends.  HTML5 drops </> outright and treats </ + non-letter as a bogus comment
+# that eats text up to the next '>': 8612 line 2903, "durch `</>` dargestellt",
+# would have lost the </> and swallowed what followed.  Neither 030 handover on
+# hand (SH8603, SH8604) has the shape, so it ships unexercised on live text --
+# the planted case in the Verification is what stands in for one.
+s = map_outside_fences(s, lambda l: re.sub(
+    r'</(?![a-zA-Z])([^<>\n]*)>', lambda m: '&lt;/' + m.group(1) + '&gt;', l))
+
 open(fp, 'w', encoding='utf-8').write(s)
-# report
+# Report.  THE SUMMARY MUST BE AS FENCE-AWARE AS THE TRANSFORM.  Counting the
+# whole file, this read every correctly-untouched <...> inside a listing back as
+# "remaining" -- the step's own correct output reported as a defect, which is how
+# a fixed bug gets re-broken.  Same repair as r040's summary.
+t = ''.join(line for line, inf in fence_flags(s) if not inf)
 left_bad = 0
-for m in re.finditer(r'<(/?[a-zA-Z][^<>\n]*?)>', s):
+for m in re.finditer(r'<(/?[a-zA-Z][^<>\n]*?)>', t):
     name = re.match(r'/?([a-zA-Z][a-zA-Z0-9]*)', m.group(1)).group(1)
     if name not in HTML_TAGS: left_bad += 1
-escaped = s.count('&lt;')
-print(f"{fp}: unescaped non-HTML <…> remaining = {left_bad};  &lt; sequences = {escaped}")
+bogus = len(re.findall(r'</(?![a-zA-Z])[^<>\n]*>', t))
+escaped = t.count('&lt;')
+print(f"{fp}: unescaped non-HTML <…> remaining = {left_bad};  bogus </ = {bogus};"
+      f"  &lt; sequences = {escaped}   (outside fences)")
 PY

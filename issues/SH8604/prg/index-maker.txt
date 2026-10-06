@@ -1,0 +1,69 @@
+
+
+;index-maker.prg ==0801==
+    0 rem *********************************
+    1 rem *   index-maker - erstellt den  *
+    2 rem *   index zu einem beliebigen,  *
+    3 rem *    alphabetisch geordneten    *
+    4 rem * bereich einer relativen datei *
+    5 rem * <c> 1986 bei michael nickles  *
+    6 rem *********************************
+   10 print"{clr}{yel}{rvon}index-maker{rvof}"
+   20 dim m%(26) : rem index-tabelle
+   30 print"{down}bitte geben sie den namen der relativen
+   40 print"datei an, von der ein index erstellt
+   50 print"werden soll!"
+   60 poke198,0:input"{down}";d$
+   70 open1,8,3,d$:open15,8,15:rem datei oeffnen
+   80 print"{down}bitte geben sie den bereich der datei an";
+   90 print"von dem der index erstellt werden soll!"
+  100 poke198,0:input"{down}anfang";an
+  110 poke198,0:input"{down}ende  ";en
+  120 sa=an:gosub9000:ifa=50thenprint"anfangsatz existiert nicht!":goto100
+  130 sa=en:gosub9000:ifa=50thenprint"endsatz existiert nicht!":goto100
+  140 ifan>enthenprint"unsinn!":goto100
+ 1000 rem index-erstellen -------------------------------------------------------
+ 1001 :
+ 1005 print"{down}bitte warten !"
+ 1010 sa=an:gosub9000
+ 1020 iz=0
+ 1030 forsa=antoen
+ 1035 :
+ 1040 : gosub9100:printsa,a$
+ 1050 : ifm%(asc(left$(a$,1))-64)=0thenm%(asc(left$(a$,1))-64)=sa
+ 1080 :
+ 1100 nextsa
+ 2000 rem index ausgeben --------------------------------------------------------
+ 2001 :
+ 2010 print"{clr}index-ausgabe:"
+ 2020 print"{down}{down}ausgabe auf bildschirm <1>
+ 2030 print"{down}als seq-file auf disk  <2>
+ 2040 poke198,0
+ 2050 geti$:ifi$<>"1"andi$<>"2"then2050
+ 2060 ifi$="1"then2100
+ 2070 ifi$="2"then2200
+ 2100 rem ausgabe auf bildschirm
+ 2101 :
+ 2110 print"{clr}"
+ 2120 fori=1to13:printchr$(i+64)"="m%(i),chr$(i+13+64)"="m%(i+13):nexti
+ 2130 end
+ 2200 rem m%(1)-m%(26) als seqfile speichern
+ 2201 :
+ 2210 poke198,0:input"{down}filename ";i$:i$=i$+",s,w"
+ 2220 open2,8,2,i$
+ 2230 fori=1to26
+ 2240 :print#2,m%(i)
+ 2250 nexti:close2
+ 2260 end
+ 9000 rem zeiger positionieren --------------------------------------------------
+ 9001 :
+ 9010 hb%=sa/256:lb%=sa-hb%*256
+ 9020 print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+ 9030 input#15,a:ifa=50thenprint"satznummer zu hoch"
+ 9040 return
+ 9100 rem satz lesen ------------------------------------------------------------
+ 9101 :
+ 9110 ifa=50thenreturn
+ 9120 input#1,a$
+ 9130 return
+

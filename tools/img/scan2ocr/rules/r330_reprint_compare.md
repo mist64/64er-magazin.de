@@ -422,7 +422,7 @@ across 7 articles, and it is the only form in the corpus that states "this
 article previously appeared in issue X, page Y":
 
 ```html
-<p><strong>Nachdruck aus <a href="../8404/drawline.html">64'er 4/84, S. 65</a>.</strong></p>
+<p class="nachdruck"><strong>Nachdruck aus <a href="../8404/drawline.html">64'er 4/84, S. 65</a>.</strong></p>
 ```
 
 (`issues/SH8508/167 Ein schneller Drawline-Algorithmus.html:23`.) Every part of
@@ -555,11 +555,23 @@ ID=SH8601
 grep -E '^\| (CONFIRMED|PARTIAL) \|' "issues/$ID/LOG.md" \
   | sed 's/^[^`]*`issues\/[^/]*\/\([^`]*\)`.*/\1/' | sort -u > /tmp/rows.txt
 grep -l 'Nachdruck aus' "issues/$ID"/*.html | sed 's|.*/||' | sort -u > /tmp/creds.txt
-diff /tmp/rows.txt /tmp/creds.txt || echo "  credit set != CONFIRMED/PARTIAL set"
+# THE STANDING REPRINTS CARRY NO CREDIT, so drop them from the expected set or
+# this fails on every issue that has one -- see "A REGULARLY REPRINTED ARTICLE
+# GETS NO CREDIT BOX" below.  `grep -v` into a temp file and move it back is
+# NOT safe here: when the removal empties the file grep exits 1, the `&&` short
+# -circuits, and the stale file survives.  Build the exclusion list, then filter.
+grep -lE '64er\.id" content="(mse|checksummer|abtippen)"' "issues/$ID"/*.html 2>/dev/null \
+  | sed 's|.*/||' | sort -u > /tmp/standing.txt
+comm -23 /tmp/rows.txt /tmp/standing.txt > /tmp/rows_x.txt
+diff /tmp/rows_x.txt /tmp/creds.txt || echo "  credit set != CONFIRMED/PARTIAL set"
 
 # b. every link target resolves to exactly one article in the target issue
 #    (the published name is <64er.id>.html, so match on the meta, not the file)
-grep -ho 'href="\.\./[0-9]\{4\}/[^"]*\.html"' "issues/$ID"/*.html | sort -u \
+# [A-Za-z0-9]\{4,6\}, NOT [0-9]\{4\}: a Sonderheft directory is SH8507, so the
+# digits-only class skipped every ../SH*/ link -- and a Sonderheft reprinting
+# another Sonderheft is exactly what this check exists for.  Measured on
+# SH8603: 16 cross-issue links against the old regex's 15.
+grep -ho 'href="\.\./[A-Za-z0-9]\{4,6\}/[^"]*\.html"' "issues/$ID"/*.html | sort -u \
   | sed 's/href="\.\.\///;s/\.html"//' | while IFS=/ read -r d i; do
       n=$(grep -l "content=\"$i\"" "issues/$d"/*.html 2>/dev/null | wc -l)
       [ "$n" = 1 ] || echo "  BAD ../$d/$i.html -> $n candidate(s)"
@@ -729,6 +741,104 @@ rule the evidence form is, inline in the report, per disposition:
 
 Bare counts are not evidence. A report that says "37 differences, all editorial"
 is un-evidenced and gets re-dispatched.
+
+## A REGULARLY REPRINTED ARTICLE GETS NO CREDIT BOX
+
+**Owner, 2026-10-06:** *"mse and checksummer articles are reprinted regularly.
+do compare them for cross checking ocr errors, but dont have the text box that
+says reprint."*
+
+The Checksummer, the MSE and the Abtippen/Eingabehinweise pages are standing
+furniture: the magazine reprints them issue after issue so a reader can type in
+that issue's listings. Telling that reader the page is a reprint of another
+issue is noise — they are not reading it as an archival curiosity, they are
+reading it because they are about to type a program.
+
+So, for `64er.id` in **`mse`, `checksummer`, `abtippen`**:
+
+- **run the comparison** — it is the point of r330 here. Two transcriptions of
+  one printed text disagreeing names an OCR error in one of them, and these
+  articles recur often enough to be the best cross-check the corpus has;
+- **record the result in `LOG.md`** as CONFIRMED or PARTIAL as usual, and
+  dispose of every difference;
+- **write no `<p class="nachdruck">`** and no link to the earlier issue.
+
+Applied across the corpus 2026-10-06 on the owner's instruction: **5 credits
+removed** — SH8602's Checksummer and MSE, SH8603's Checksummer 20 V3 (a
+*Teilweiser Nachdruck*, restriction and all), SH8604's Checksummer and MSE.
+MEASURED: 39 such articles exist in the corpus and the other 34 never carried
+one, so this was drift in three issues rather than a convention being undone.
+
+Check (a) above subtracts them from the expected credit set.
+
+## `class="nachdruck"` on the credit paragraph
+
+The example above carries it. This rule used to show a bare `<p><strong>`,
+while **SH8601, SH8602 and SH8603 all set `class="nachdruck"`** — 27
+paragraphs — so each build copied the corpus and the rule went on disagreeing
+with it. Use the class: it is what the published Sonderhefte have, and the
+monthlies carry no reprint credits at all for it to conflict with.
+
+The reasoning in *What the credit must say* is unchanged — the credit is
+neither a `source` trailer nor a standfirst, and tagging it `source` fires the
+`<p class="source">` handling on every reprint.
+
+## Step 0's ~0.5 overlap threshold misses a MERGED reprint
+
+The rule says anything above ~0.5 is a reprint. MEASURED on SH8603: its 8
+reprints scored **0.05 to 0.26**, every one below the threshold, and were
+found only by a per-block pass over the whole corpus. The reason is
+arithmetic rather than editorial — article 31 is merged from THREE monthly
+parts (8409, 8410, 8411), so each pairwise overlap is at most a third by
+construction, and a partial reprint that drops half its original sits in the
+same place.
+
+So **0.5 is a floor for a whole-article reprint and says nothing about a
+merged or partial one.** Run a per-block measure as well — the longest common
+run of normalised blocks, scored against the SHORTER of the two articles —
+and read anything above ~0.4 on that. r140's check 4 needs the same list, so
+**record the reprint set where both steps can read it** instead of deriving
+it twice.
+
+## `verify` must parse D-1000 and up
+
+`DISP_LINE` and both Verification greps are `\d{3,}` / `[0-9]\{3,\}`. They
+were `\d{3}` / `[0-9]\{3\}` — exactly three digits.
+
+SH8603's article 31 is merged from three monthly parts and each pair runs past
+999 differences, so `verify` reported **2311 undispositioned D-numbers and
+exited 1** although every one was dispositioned in LOG.md. Seen both ways
+during that build: the old tool `FAIL: 6 problem(s)`, exit 1; the fixed tool
+`OK: 18 pair(s) verified`. **Fixed under the build** as a blocking defect per
+r000, and recorded in the errata as having moved mid-run.
+
+A three-digit assumption anywhere in this file is the same bug. The D-numbers
+are positional, so they also renumber whenever the diff is re-run — see
+*re-run r330's diff remap* in the PAUSE 2 hand-over.
+
+## The disposition vocabulary has two gaps
+
+Both found on SH8603, both needing a value this rule does not define:
+
+- **a figure not yet placed** when the comparison runs — the difference is
+  real but scheduled, not a defect;
+- **a dash-glyph-only difference**, one side `-` and the other `–`, which
+  after the 2026-10-04 en-dash ruling is expected on every pair that straddles
+  it.
+
+Until they are named, dispose of them explicitly in LOG.md with a sentence.
+Do not fold them into `THEIRS` or `UNRESOLVED`, which mean something else.
+
+## A 150 ppi PDF cannot settle a comma
+
+The monthly PDFs of **8405, 8503, 8506, 8507 and 8407 are 150 ppi**, too
+coarse to tell a comma from a full stop or an en dash from a hyphen — and
+those are most of what a reprint comparison turns up. SH8603 had to go to the
+2400 dpi scans for all five.
+
+Check the PDF's resolution before trusting it as the authority, and where it
+is 150 ppi, read the scan. A difference "confirmed" against a 150 ppi render
+is not confirmed.
 
 ## Verification
 

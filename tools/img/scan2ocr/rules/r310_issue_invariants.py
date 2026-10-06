@@ -222,8 +222,16 @@ def main(d):
         # preceding <p> ending in a colon, or is a numbered step.  8606/86 is
         # the extreme case, SIX consecutive one-item <ol> rendering as "1." six
         # times.
+        #
+        # AND IT TAKES AN ADJUDICATION, like every other mechanical class here.
+        # It called H() directly, so a printed one-item numbered list could not
+        # be cleared and had to be RE-SHAPED to pass -- the gate editing the
+        # page instead of the page answering the gate.  SH8603's article 14 p17
+        # prints "1. Cursor setzen:" with no 2. at all.
         for mm in re.finditer(r'<ol[^>]*>((?:(?!</ol>).)*)</ol>', body, re.S):
             if len(re.findall(r'<li\b', mm.group(1))) == 1:
+                if ADJUDICATED_HERE(body, mm.start(), ADJ, 'single-li-ol', adj_seen):
+                    continue
                 H('<ol> with a single <li> — numbered list torn in half? (r060)', f)
         n1 = len(re.findall(r'<h1>', body))
         if n1 != 1 and 'Leserforum' not in f:          H(f'h1 count = {n1}', f)
@@ -527,17 +535,32 @@ def main(d):
         if n:
             S('<br> inside a <td> (column wrap, or the author\'s?)', f, '%d' % n)
 
+    # AN ADJUDICATION CLEARS EXACTLY ITS COUNT.  "MORE than adjudicated" used
+    # to print and nothing else, so with `byline-split 2` blessed a THIRD,
+    # unreviewed byline split made this exit 0 with HARD 0 -- planted and
+    # confirmed on SH8603.  A class-wide blessing that silently grows is worse
+    # than no blessing: it covers findings nobody has seen.  Over-count is HARD.
+    # Under-count is not: the findings went away, which is the normal result of
+    # fixing them, and the stale line can be tidied at 340.
+    for key, (n, why) in sorted(ADJ.items()):
+        got = adj_seen.get(key, 0)
+        if n and got != n:
+            if got > n:
+                hard.append((f'ADJ {key}: declared {n}, found {got} '
+                             f'-- {got - n} never reviewed', ADJ_FILE, ''))
+            else:
+                print(f'ADJ   {key:<24} declared {n}, found {got}'
+                      '  -- fewer than adjudicated; tidy the line at 340')
+
+    # ... and only now print, so an over-count appears in the HARD list it
+    # joined.  Appending to `hard` after this loop would have exited 1 with
+    # nothing on screen to say why.
     for k, f, x in hard: print(f'HARD  {k:<52} {f[:40]} {x}')
     if '--soft' in sys.argv:
         for k, f, x in soft: print(f'soft  {k:<52} {f[:40]} {x}')
     # A blessing that no longer matches what is on the page is not a blessing.
     # If adjudicated.txt says ten and the pages now hold twelve, two were never
     # looked at -- say so rather than let the file silently cover them.
-    for key, (n, why) in sorted(ADJ.items()):
-        got = adj_seen.get(key, 0)
-        if n and got != n:
-            print(f'ADJ   {key:<24} declared {n}, found {got}'
-                  f'{"  -- MORE than adjudicated" if got > n else ""}')
     if ADJ:
         print(f'adjudicated.txt: {len(ADJ)} class(es), '
               f'{sum(adj_seen.values())} instance(s) matched')

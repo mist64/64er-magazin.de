@@ -359,6 +359,16 @@ def candidates(stream):
         if p["role"] == "title":
             kind = "title"
         m = FORTSETZUNG.search(p["text"])
+        # A CROSS-REFERENCE IS A SHORT PARAGRAPH THAT IS (ALMOST) ONLY THE
+        # MARKER.  Matching anywhere filed a 369-char paragraph on SH8603 p62
+        # -- marker plus the continuation text in ONE OCR paragraph -- as a
+        # cross-reference, so the whole paragraph vanished and the "unexplained
+        # loss must be 0" check certified exactly the silent drop it exists to
+        # catch.  Keep the paragraph when there is substantial text around the
+        # marker; strip the marker from it instead.
+        if m and len(p["text"]) - len(m.group(0)) > 20:
+            p["text"] = (p["text"][:m.start()] + p["text"][m.end():]).strip()
+            m = None
         if m:
             kind = "cont-marker"
             if m.group(1).lower() == "von":

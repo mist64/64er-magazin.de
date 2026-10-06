@@ -60,7 +60,9 @@ One entry per confusion, under a `## <step> — <one-line summary>` heading:
 - **What is actually true**, and how you established it.
 - **What it cost** — wall-clock, and how many commands it took to recover. This
   is the number that ranks the fixes, and nobody can recover it later.
-- **What would have prevented it**: the sentence the rule should have carried.
+- **Suggested.**: the sentence the rule should have carried. Use that word —
+  check 4 below looks for it, along with the older "what would have prevented
+  it" phrasing. An entry with no proposal is an observation, not an erratum.
   Write the sentence. "Should be clearer" is not a finding.
 
 Also record the inverse, because it is just as useful and nobody ever writes it
@@ -103,15 +105,39 @@ last=$(git log -1 --format=%H -- "issues/$ID/")
   || echo "WARN: written in a single commit -- was it kept as you worked?"
 
 # 3. Every entry names a step, and the steps named exist.
+#    .md OR .py: not every step is a markdown rule.  r310 exists only as
+#    r310_issue_invariants.py and r150 only as r150_figure_captions.py plus
+#    r150_place_images.md, so SH8603's entries about r310 were all reported
+#    "FAIL: no rule r310" -- a correct entry failing a check about itself.
 grep -oE '^## r?[0-9]{3}' "issues/$ID/WORKFLOW_ERRATA.md" | grep -oE '[0-9]{3}' | sort -u |
 while read s; do
-  ls tools/img/scan2ocr/rules/r${s}_*.md >/dev/null 2>&1 || echo "FAIL: no rule r$s"
+  # ONE glob, then filter -- `ls a.md b.py c.sh` fails as soon as any ONE of
+  # the three is unmatched (and under zsh the unmatched glob is itself an
+  # error), so the three-pattern form reported FAIL for all 24 of SH8603's
+  # steps, including the ones whose .md is right there.
+  ls tools/img/scan2ocr/rules/r${s}_* 2>/dev/null | grep -qE '\.(md|py|sh)$' \
+    || echo "FAIL: no rule r$s"
 done
 
 # 4. An entry that proposes nothing is an observation, not an erratum.
 #    Every entry should carry a concrete replacement sentence.
-awk '/^## /{h=$0; n=0} /would have prevented|should (have )?(said|carried|state)/{n++}
-     /^## /&&p&&!pn{print "  no proposed fix: " p} {p=h; pn=n}' \
+#
+#    "Suggested" IS THE MARKER THIS CHAIN ACTUALLY USES.  The pattern knew only
+#    "would have prevented" and "should (have) said|carried|state", so SH8603's
+#    13 "**Suggested.**" entries -- each carrying a concrete replacement -- were
+#    every one of them reported as "no proposed fix".  A check that rejects the
+#    house style is a check about its own vocabulary.  Write the marker as
+#    **Suggested.** and this passes; the older phrasings still count.
+#    REPORT THE COUNT, then the first few.  On SH8603 the old pattern flagged
+#    41 of 42 entries and the repaired one still flags 28: the vocabulary was
+#    half the problem and the other half is real -- most entries describe the
+#    defect without ever writing the replacement sentence.  41 lines of output
+#    is a gate nobody reads; a count with a sample is one you can act on.
+awk '/^## /{h=$0; n=0}
+     /[Ss]uggested|would have prevented|should (have )?(said|carried|state)/{n++}
+     /^## /&&p&&!pn{c++; if (c<=5) print "  no proposed fix: " p}
+     {p=h; pn=n}
+     END{printf "  %d entr%s with no proposed fix (target 0)\n", c+0, (c==1?"y":"ies")}' \
   "issues/$ID/WORKFLOW_ERRATA.md"
 ```
 

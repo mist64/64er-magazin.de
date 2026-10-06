@@ -490,7 +490,37 @@ colour JPEG. Exactly one page in the issue crossed the line, which is why
 nothing else caught it.
 
 So, when measuring `W`, also take the darkest solid black across the interior
-and move the `K` anchor to it if it sits below the built-in. **The level lines stay
+and move the `K` anchor to it if it sits below the built-in.
+
+**AND CROP TO THE SHEET, NOT TO A FRACTION OF THE FRAME.** The `W` snippet's
+body box (10-90% x 3-97%) is safe for paper but NOT for black: on a SHEET
+variant the frame holds the near-black scanner bed around the sheet, and the
+bed (raw ~21-40) reads in the same range as printed black. MEASURED on SH8603:
+that box reported ~40 000 "solid black" px at 31 27 27 on every one of 176
+pages -- the bed, not the ink. Restricting to the sheet's own paper bbox (rows
+and columns more than 30% paper, 2.5 mm inset) put it on the printed banner
+bars at 30 27 27, above the built-in K 16 17 17. The two answers agreed by
+luck on that issue; on one with a darker black the first would have moved the
+anchor to the bed.
+
+```python
+# K candidate: darkest solid ink INSIDE the sheet, not inside the frame
+pap  = paper_mask(rgb)                      # the traced sheet
+rows = np.where(pap.mean(1) > 0.30)[0]; cols = np.where(pap.mean(0) > 0.30)[0]
+ins  = int(2.5 / 25.4 * dpi)                # 2.5 mm inset off the trimmed edge
+box  = rgb[rows[0]+ins:rows[-1]-ins, cols[0]+ins:cols[-1]-ins]
+lum  = box @ [.299, .587, .114]
+m    = (lum < 70) & ((box.max(2) - box.min(2)) < 40)
+m    = ndimage.binary_erosion(m, np.ones((3, 3)))
+k    = np.percentile(box[m], 50, axis=0) if m.sum() > 5000 else None
+```
+
+**And LOOK at the mask on the darkest page before trusting the number.** This
+is the step where a wrong answer is invisible: a bed-derived K anchor grades
+every page of the issue.
+
+This requirement applies to `r005_masters_sheet.md` too, which does not mention
+the K anchor at all. **The level lines stay
 identity** until they are measured as the **p99 of each ink over bare interior
 paper**. That measurement is still OPEN on 8610: its `colors.txt` ships
 `LC/LM/LY/LK 0 100` and says in a comment that it is waiting for the
@@ -1146,6 +1176,15 @@ fabrication too.
 `<tmp>/masters600` is derived by `r000_issue.py`, because it is the contract
 the rest of the chain depends on; the other directories are this step's own
 workings and are named in this step.
+
+**And `<tmp>/title_source_150.png`**, the cover crop the owner retouches into
+`issues/<ID>/title.png`.
+
+**Hand the owner `sheets600` and the title crop the moment this step finishes,
+and do not stop** — the runnable block is in `r005_masters_sheet.md` under
+*HAND THE OWNER THEIR TWO FILES NOW*, and the reasoning is in r000 under *An
+OWNER DELIVERABLE is handed over the MOMENT it exists*. It applies to both
+variants: a spread-bound issue writes the same two things.
 
 Every master is **4961 × 7016 px, exactly A4 at 600 dpi, every page**, so
 `r010`'s block geometry and `r145`'s figure crops share one coordinate system.

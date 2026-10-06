@@ -154,7 +154,11 @@ done
 # 4. every <meta name="64er.pages"> looks like a page spec
 # A LETTERED page (169a, 193b) is required by "Three conventions" above, so the
 # class must admit a trailing letter -- as written this check flagged every one
-# of them.  The FILENAME keeps the plain number (the corpus does: 8507, 8508).
+# of them.  The FILENAME keeps the plain number (the corpus does: 8507, 8508),
+# AND THE SCRIPT NOW DOES THAT ITSELF: it derived the name from `pages`
+# verbatim, so [21a] produced "21a Title.html" and the letters had to be put
+# back into the metas by hand afterwards, which the rule never said to do.
+# The two siblings' filenames still differ -- their titles do.
 grep -h '64er.pages" content=' issues/8607/*.html | grep -vE 'content="[0-9a-z,\- ]+"'
 
 # 5. consolidated file is gone
@@ -328,7 +332,17 @@ d = sys.argv[1]
 # paragraph -- "(Jesko Schwarzer/dm) Listing auf Seite 54" on 8611 p50 -- and
 # counting only the tag undercounts, which is how a paired article can pass a
 # check whose whole job is to find paired articles.
-INLINE = re.compile(r'\((?:[A-ZÄÖÜ][\w.\- ]{2,28}/)?[a-z]{2,3}\)')
+# AN INLINE BYLINE OPENS OR CLOSES ITS PARAGRAPH.  Unanchored, this matched
+# any two-or-three-letter word in brackets anywhere in running prose: 281 hits
+# over the corpus, 135 distinct, led by (von) 11, (low) 8, (en) 8, (ind), (ein),
+# (rot), (nur) -- and on SH8603 3 of its 4 hits were false.  Anchored to the
+# start or the end of the paragraph: 93 hits, 16 distinct, every one an editor
+# code or a full-name byline, and it still catches the shape it was written for
+# ("(Jesko Schwarzer/dm) Listing auf Seite 54", 8611 p50) as well as a
+# paragraph-final "... ist gut. (sc)".
+_BY = r'\((?:[A-ZÄÖÜ][\w.\- ]{2,28}/)?[a-z]{2,3}\)'
+INLINE = re.compile(r'(?:^\s*(?:<(?:strong|em|b|i)>\s*)*' + _BY +
+                    r'|' + _BY + r'\s*(?:</(?:strong|em|b|i)>\s*)*$)')
 for f in sorted(glob.glob(os.path.join(d, '*.html'))):
     s = io.open(f, encoding='utf-8').read()
     i = s.find('<article'); body = s[i:s.rfind('</article>')] if i >= 0 else s
@@ -344,7 +358,7 @@ for f in sorted(glob.glob(os.path.join(d, '*.html'))):
 PYEOF
 ```
 
-Two things this used to get wrong, both found on 8611:
+Three things this used to get wrong, two found on 8611 and one on SH8603:
 
 - **It hardcoded `issues/8607/*.html`**, so on any other issue it listed that
   issue's paired articles and said nothing about the one being built. The same
@@ -355,13 +369,95 @@ Two things this used to get wrong, both found on 8611:
   reached the list. A check whose whole job is to find paired articles must
   not be blind to the commonest way one is signed. The count now breaks out
   `tagged` and `inline` so the operator can see which it found.
+- **The inline regex was not anchored**, so it matched any bracketed two- or
+  three-letter word in running prose. MEASURED over the corpus: 281 hits, 135
+  distinct, led by `(von)` 11, `(low)` 8, `(en)` 8, then `(ind)`, `(ein)`,
+  `(rot)`, `(nur)` — and on SH8603 three of its four hits were false, which
+  is noise in a check an operator is asked to eyeball. An inline byline opens
+  or closes its paragraph; anchored that way the corpus gives **93 hits, 16
+  distinct**, every one an editor code or a full-name byline, with the 8611
+  p50 shape still caught.
 
 Operator eyeballs the list and confirms every entry is a legitimate
 paired article. Anything unexpected is the actionable signal — fix
 that file, not the rule.
 
+## A RUN OF SHORT SIGNED ITEMS THE PRINTED INHALT DOES NOT LIST IS ONE ARTICLE
+
+Owner, SH8603. The splitter gave p21's two signed one-liners — *Reaktionstest*
+and *RESET ohne Reset-Schalter* — an article each, which put two unlisted
+fillers into "Alle Ausgaben" as peers of a four-page feature. The ruling:
+**collect them into one article**, each item an `<h2>` with its own signature,
+on SH8602's *Kurz und nützlich – Einzeiler* model. The collection is lettered
+in printed order like any other shared start page.
+
+Metadata is only what the print gives: a `toc_category` from the running head,
+and **no `toc_title` and no index entry**, because neither the printed Inhalt
+nor the index CSV lists them.
+
+**These are not "fillers" in the sense of SH8602's cartoon ruling, and that
+ruling must not be read as reaching them.** A filler cartoon is dropped
+because it belongs to the layout and not to any article. These are signed,
+authored, typeset text that happens to sit in leftover space, and they are
+**kept**. The test is the signature: authored content stays.
+
+## Eingabehinweise beside the Checksummer — AN OPEN QUESTION, NOT A PRECEDENT
+
+SH8603 p77 prints *Wie unsere Basic-Programme einzugeben sind* under the
+EINGABEHILFE band at section-head size (smaller than the display headline of
+*Sparen mit dem VC 20* on the same page); its Bild 1 and Bild 2 are printed on
+p76, the Checksummer's page; and **the printed Inhalt lists it on its own
+line** (`77 Eingabehinweise für Basic-Listings`, beside `76 Checksummer 20
+V3`). 080 split it out as article `77a`. The owner folded it into the
+Checksummer as an `<h2>` section — *"combine on my authority. special case.
+not a rule."*
+
+**The corpus genuinely disagrees and this does not settle it.** SH8507 prints
+the same text INSIDE its Checksummer article (step 140 measures 0.67 text
+overlap with SH8507's `checksummer`), while the monthly 8507/77 *Hinweise zum
+Abtippen unserer Listings* is a standalone article with its own id
+(`abtippen`).
+
+So a later issue meeting this shape **goes to the owner** and does not copy
+SH8603. Nothing here touches this rule's "a headline-less start page takes its
+`h1` from the printed Inhalt", nor the principle that the printed Inhalt is
+what names an article.
+
+## A LEADING `>` IS AN INTRO, AND A MONITOR PROMPT LOOKS THE SAME
+
+030 marks an article's intro paragraph as a Markdown blockquote, which 060
+converts to `<blockquote><p>` and 070 to `<p class="intro">`. So a line that
+starts with `>` for any **other** reason silently becomes an intro. SH8603 14
+reported `intros=2` because a C16 monitor prompt did exactly that.
+
+MEASURED on the 030 handovers, line-start `>` outside fences: SH8603 45,
+SH8604 17. SH8603's set contains both kinds — real intros
+(`> Mit der Datasette kann man nicht nur Programme laden …`) and two monitor
+lines (`> (ADRESSE) (BYTES) =`, `>1000 1F 10 2B Bytes eingeben, zum Beispiel:
+D (ANFANG) (ENDE) = …`).
+
+**The no-space form is mechanical and r040 escapes it** — same test as the
+`#` escape, since a Markdown blockquote needs no space but prose never omits
+one. The spaced form is not mechanical: `> (ADRESSE) (BYTES) =` is shaped
+exactly like an intro. So r040 also **reports** every line-start `>`, and this
+step's `intros > 1` check is the backstop. Confirm each one is an intended
+intro before 190.
+
 ## Notes / lessons
 
+- **An all-parenthesised paragraph is not automatically a byline**, and the
+  script used to promote every one of them — SH8603's 72 took the author
+  `(Kassette nr = 1; Diskette nr = 8)`, SH8604's a `<p>(RETURN)</p>`. The
+  test now applied, MEASURED against the 1,355 distinct bylines in the
+  published corpus, accepts **1,353** (the two it rejects are hand-added
+  `<a href>` links whose URLs carry digits, which this script never writes)
+  and rejects `(RETURN)`, `(ADRESSE)`, `(BYTES)`, `(Listing 2)`, `(Bild 3)`,
+  `(Fortsetzung auf Seite 62)` and the Kassette line:
+  no `=` and no `;` (a parameter list has them); no digit, except the
+  magazine's own name (`Die 64'er Redaktion`) and a link's URL; and **not a
+  single ALL-CAPS token** — 0 of the 1,355 is one, and a key name or a
+  monitor keyword always is. Rejected paragraphs are printed and left as
+  paragraphs, never dropped.
 - the embedded splitter's text replacements overlap with `r070_html_cleanup.sh`. That's
   intentional — running 070 first means the .html is already clean when split
   starts, and split's own replacements become no-ops. Either order is safe.

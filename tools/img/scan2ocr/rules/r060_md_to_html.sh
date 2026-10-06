@@ -74,6 +74,22 @@ print(f"  unwrapped {n} <p><pre> nestings (Discount fenced-code bug)")
 print(f"  de-padded {t} <pre> blocks (Discount -G trailing spaces)")
 UNWRAP
 echo "wrote $out  ($(wc -l < "$out") lines)"
+# KEEP A COPY OF THE EXACT INPUT BEFORE DROPPING IT.  This step deletes the
+# .md, and several checks downstream need the text that was actually converted:
+# r060's own start-number survey, r040's heading count, r320's dropped-listing
+# gate.  The rule used to point them at <tmp>/ocr/<ID>.md, which is the 030
+# handover -- pre-040, pre-050, and so not the file Discount saw.  The copy goes
+# beside the handover, named so the difference is visible.
+if [ -z "$TMPDIR_ISSUE" ]; then
+  echo "r060: \$TMPDIR_ISSUE is not set -- see r000 'the working directory must" >&2
+  echo "      be DURABLE'.  Without it this step would delete the only copy of" >&2
+  echo "      the text that was converted." >&2
+  exit 1
+fi
+mkdir -p "$TMPDIR_ISSUE/ocr"
+keep="$TMPDIR_ISSUE/ocr/$(basename "${md%.md}").pre060.md"
+cp "$md" "$keep" && echo "kept the converted source at $keep"
+
 # Replace the .md with the .html in git: drop the source, stage the result.
 # Tolerant on first run (md may not be tracked yet).
 if git ls-files --error-unmatch "$md" >/dev/null 2>&1; then

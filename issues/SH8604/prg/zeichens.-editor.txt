@@ -1,0 +1,147 @@
+
+
+;zeichens.-editor.prg ==0801==
+    0 rem *****************************
+    1 rem  zeichensatz-editor (c) 1985
+    2 rem *****************************
+    3 ifi=1then100
+    4 video=52223:rem start bildschirm
+    5 poke53280,0:poke53281,0:print"{yel}"
+   10 rem modifizierte peek-funktion ------
+   11 fori=704to751:readx:pokei,x:next:poke785,192:poke786,2:rem usr-vektor
+   12 data165,20,72,165,21,72,32,247,183,165,1,72,165,21,201,208,144,7,201,224
+   13 data176,3,169,49,44,169,52,120,133,1,160,0,177,20,168,104,133,1,88,104,133
+   14 data21,104,133,20,76,162,179
+   30 rem menue ---------------------------
+   31 print"{clr}{wht}{rvon}zeichensatz-editor i{rvof}"
+   32 print"{down}von michael nickles.
+   34 print"{down}{down}{down}     {rvon}n{rvof}euen zeichensatz erstellen"
+   35 print"{down}     {rvon}a{rvof}lten zeichensatz aendern  "
+   36 print"{down}     {rvon}d{rvof}eutschen zeichensatz generieren  "
+   37 geti$:ifi$<>"n"andi$<>"a"andi$<>"d"then37
+   38 ifi$="n"then50
+   39 ifi$="d"then50
+   40 rem deutschen zeichensatz laden -----
+   41 input"{down}{down}{down}filename ";i$
+   42 ifi<>1theni=1:loadi$,8,1
+   44 poke648,204:poke53272,56:poke56576,0:print"{clr}"
+   50 rem z.s. vom rom ins ram ab 57344 ---
+   51 print"{down}bitte warten!"
+   53 poke56334,peek(56334)and254:poke1,peek(1)and251: rem interrupt aus
+   55 iz=57344
+   60 fori=53248to57344
+   62 :pokeiz,peek(i)
+   64 :iz=iz+1
+   66 nexti
+   70 poke1,peek(1)or4:poke56334,peek(56334)or1
+   80 ifi$="d"then3000
+  100 rem start --------------------------
+  105 poke648,204:poke53272,56:poke56576,0:print"{clr}{wht}";
+  106 print"bitte waehlen sie:
+  110 print"{down}{down}     gross-grafik z.satz  {rvon}1{rvof}"
+  115 print"{down}     gross-klein  z.satz  {rvon}2{rvof}"
+  116 print"{down}     z.satz abspeichern   {rvon}3{rvof}
+  118 print"{down}     crazy characters     {rvon}4{rvof}
+  120 geti$:ifi$<>"1"andi$<>"2"andi$<>"3"andi$<>"4"then120
+  122 ifi$="1"then an=57344      :printchr$(142)
+  124 ifi$="2"then an=57344+256*8:printchr$(14)
+  125 ifi$="3"then 1000
+  127 ifi$="4"then 2000
+  130 print"{down}{down}welches zeichen wollen sie aendern?"
+  131 print"angabe bitte im bildschirmcode!
+  132 input"{down}zeichen ";nr:z=nr
+  200 rem maske ausgeben -----------------
+  201 video=52223
+  205 print"{clr}zeichen: ":pokevi+10,z
+  210 z=an+z*8
+  229 print"{down}{down}    ";
+  230 fori1=ztoz+7
+  235 printi1;"   ";
+  240 :b=usr(i1)
+  245 : fori2=7to0step-1
+  250 :   if band2^i2 thenprint"*";:goto260
+  255 :   print".";
+  260 : nexti2
+  270 :print"   "b:print"    ";
+  275 nexti1
+  300 rem editor-programm ----------------
+  310 xx=vi+135:xp=peek(xx):pokexx,32
+  330 joy=56320:rem port 2
+  331 ta=203:t1=653
+  335 ifpeek(joy)=127andpeek(ta)=64thenw=0
+  340 ifpeek(joy)=126orpeek(ta)=7andpeek(t1)=1thenw=-40
+  342 ifpeek(joy)=125orpeek(ta)=7andpeek(t1)=0thenw=+40
+  344 ifpeek(joy)=123orpeek(ta)=2andpeek(t1)=1thenw=-1
+  346 ifpeek(joy)=119orpeek(ta)=2andpeek(t1)=0thenw=+1
+  350 ifpeek(joy)>111andpeek(ta)<>60then360
+  352 ifxp=46thenxp=42:goto355
+  354 ifxp=42thenxp=46:goto355
+  355 pokexx,xp:ifpeek(joy)<=111orpeek(ta)=60then355
+  360 :ifpeek(ta)=1thenpokexx,xp:goto400
+  370 pokexx,xp
+  375 xx=xx+w:ifpeek(xx)=32thenxx=xx-w
+  380 xp=peek(xx):pokexx,32
+  390 goto330
+  400 rem neues zeichen berechnen
+  405 print"{down}bitte warten!"
+  410 xx=vi+135
+  430 for i1=xx to xx+7*40step40
+  435 :im=0:iz=7
+  445 : for i2=i1 to i1+7
+  450 :   ifrv=0thenifpeek(i2)=42thenim=im+2^iz
+  451 :   ifrv=1thenifpeek(i2)=46thenim=im+2^iz
+  455 :   iz=iz-1
+  460 : nexti2
+  470 :pokez,im:z=z+1
+  475 nexti1
+  476 ifrv=1thenrv=0:goto100
+  479 ifnr>127then100
+  480 print"revers-aenderung erwuenscht? (j/n)
+  482 geti$:ifi$<>"j"andi$<>"n"then482
+  484 ifi$="n"then100
+  485 z=an+(nr+128)*8:rv=1:goto400
+  490 goto100
+ 1000 rem z.satz abspeichern ------------
+ 1000 rem speichern auf disk -----------
+ 1005 print"{clr}{rvon}zeichensatz auf disk speichern{rvof}":poke198,0
+ 1006 input"{down}{down}filename";i$
+ 1010 print"{down}bitte diskette einlegen!
+ 1020 print"[return]":poke198,0:wait198,1
+ 1030 aa=57344
+ 1040 ea=61439
+ 1050 open1,8,1,i$
+ 1060 hb=int(aa/256):lb=aa-hb*256
+ 1070 print#1,chr$(lb);chr$(hb);
+ 1080 fori=aatoea
+ 1090 :print#1,chr$(usr(i));
+ 1100 nexti
+ 1110 close1
+ 1120 print"{down}{down}{down}*** fertig ***":run
+ 2000 rem crazy characters --------------
+ 2010 fori=57344to61439
+ 2020 :x=usr(i):m=0
+ 2030 : for i1=0 to 7
+ 2040 :  if xand2^i1 then m=m+2^(7-i1)
+ 2050 : nexti1
+ 2060 :pokei,m
+ 2070 :nexti
+ 2080 goto100
+ 3000 rem deutschen zeichensatz automatisch generieren --------------------------
+ 3010 data60264,102,24,60,102,126,102,102,0  :rem grosses ae
+ 3015 data60336,102,60,102,102,102,102,60,0  :rem grosses oe
+ 3020 data60328,102,0,102,102,102,102,60,0   :rem grosses ue
+ 3025 data60288,102,0,60,6,62,102,62,0       :rem kleines ae
+ 3030 data60360,0,102,0,60,102,102,60,0      :rem kleines oe
+ 3035 data60352,0,102,0,102,102,102,62,0     :rem kleines ue
+ 3040 data60272,60,102,102,108,110,102,108,96:rem scharfes s
+ 3045 data59392,102,102,102,0,0,0,0,0        :rem anfuehrungszeichen
+ 3050 data59640,0,0,0,0,0,24,24,48           :rem komma
+ 3055 data59632,0,0,24,0,0,24,0,0            :rem doppelpunkt
+ 3060 data-1
+ 3100 readx:ifx=-1then100
+ 3110 fori=xtox+7
+ 3120 : reada:pokei,a     :rem normal
+ 3130 :       pokei+2048,a:rem revers
+ 3140 nexti
+ 3150 goto3100
+

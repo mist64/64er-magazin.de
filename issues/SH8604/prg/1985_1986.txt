@@ -1,0 +1,433 @@
+
+
+;1985_1986.prg ==0801==
+   10 poke648,192:poke56576,peek(56576)and252:poke53272,8:print"{clr}"
+   20 dimpe(26,10),p(10),ob$(39),oo(39),ge(43),ge$(43),ve$(80),au$(41),pe$(10)
+   30 poke53280,14:poke53281,14:gosub3390:zn=44:dimnz(4):poke785,60:poke786,3
+   40 print"{clr}";:poke53265,peek(53265)or16:mo=1:goto140
+   50 rem * haupt- und steuerprogramm *
+   60 gosub2970
+   69 rem** "n" "s" "o" "w"
+   70 ifve<1orve>4then420
+   80 nz=1:fori=40960+(4*(zn-1))to40960+(4*(zn-1))+3:ri(nz)=usr(i):nz=nz+1:next
+   90 ifzn>54andzn<58thengosub2180
+  100 ifri(ve)=0then120
+  110 zn=ri(ve):print"{clr}";:poke53265,peek(53265)and239:sys50271:goto140
+  120 ve=0:print"sie kollidierten soeben mit einer,was   sie an ";
+  130 print"scheinend nicht wahrhaben wollen,massiven wand.":goto420
+  140 nz=1:fori=40960+(4*(zn-1))to40960+(4*(zn-1))+3:ri(nz)=usr(i):nz=nz+1:next
+  145 ifzn>54andzn<58thengosub2180
+  150 sys50271:ve=0:sys65511:open2,8,2,right$(str$(zn),2)+",p,r"
+  160 poke53265,peek(53265)and239
+  170 input#2,a$:ifa$="_"thenprint"{wht}":goto190
+  180 print"          "a$:goto170
+  190 input#2,a$:poke2,val(a$)
+  200 get#2,a$:ifst=64then220
+  210 printa$;:goto200
+  220 close2:sys50176
+  230 poke53265,peek(53265)or16:sys50176:print"":print"m$gliche richtung";
+  240 ic=0:fori=1to4:ifri(i)<>0thenic=ic+1
+  250 nexti:ific>1thenprint"en : ";:goto270
+  260 print" : ";
+  270 ific=0thenprint"keine.":goto310
+  280 fori=1to4:ifri(i)<>0thenprintve$(i);",";
+  290 next
+  300 printchr$(20)
+  310 print"sie sehen ausserdem noch :";
+  320 ic=0:fori=1tooz:ifoo(i)=znthenprintob$(i);",";:ic=1
+  330 next
+  340 fori=1togz:ifge(i)=znthenprintge$(i)",";:ic=1
+  350 nexti
+  360 ific=0thenprint"":print"nichts nennenswertes."
+  370 ific=1thenprintchr$(20)
+  380 fori=1to9:ifpe(p(i),i)=znthenprintpe$(i)
+  390 next
+  400 print"dr%cken sie eine taste.":poke198,0:wait198,1:poke198,0
+  410 poke2,14:fori=0to10:poke781,i:sys59903:next
+  419 rem** "nimm"
+  420 ifve<>5then480
+  430 ifob<>0thenprint"tut mir leid,dies ist nicht m$glich.":goto480
+  440 ifge(g1)<>znthenprint"ich sehe dies nicht hier.":goto480
+  450 ifge(g1)=-1thenprint"sie tragen dies schon bei sich.":goto480
+  460 ifge(g1)=znandtr<7thenprint"geht in ordnung.":ge(g1)=-1:tr=tr+1:goto1370
+  470 print"mehr kann ich beim besten willen nicht  tragen."
+  479 rem** "iss"
+  480 ifve<>13then510
+  490 ifge(g1)<>znandge(g1)<>-1then510
+  500 print"ihr mund ist mit mehl gef%llt.":print"es schmeckt nach nichts."
+  510 ifve<>17oroo(ob)<>znthen530
+  520 print"dieser wein ist nicht zum trinken":print"gedacht."
+  529 rem** "untersuche"
+  530 ifve<>19then1370
+  540 ifge(g1)<>znandge(g1)<>-1andob=0thenprint"ich sehe das hier nicht.":goto1370
+  550 ifoo(ob)<>znandob<>0thenprint"ich sehe dies hier nicht.":goto1370
+  560 ifob<>0then710
+  570 ifg1<>43then610
+  580 close1,4:sys65511:open4,8,4,"text.k,p,r"
+  590 get#4,a$:ifst=64thenclose4:goto1370
+  600 printa$;:goto590
+  610 ong1goto630,640,660,670,680,690,700
+  620 print"es ist nicht von bedeutung.":goto1370
+  630 print"er hat borsten.":goto1370
+  640 print"es ist ein gegenstand mit einem"
+  650 print"stumpfen ende.":goto1370
+  660 print"es wirkt wie staub.":goto1370
+  670 print"der h$rer liegt auf.":goto1370
+  680 print"es ist der schwarze k$nig.":goto1370
+  690 print"es ist der weisse turm.":goto1370
+  700 print"es ist die schwarze dame.":goto1370
+  710 onobgoto750,780,800,820,840,850,870,890,910,920,930,950,970
+  720 onob-13goto990,1000,1010,1030,1040,1050,1060,1070,1080,1090,1100,1130
+  730 onob-25goto1140,1160,1170,1180,1190,1200,1210,1220,1230,1250,1290,1310
+  740 onob-37goto1330,1350
+  750 print"es ist nichts besonderes an den m$beln,"
+  760 print"sie sind weiss,aus holz und schlecht":print"gestapelt.sie drohen jeden"
+  770 print"moment umzukippen.":goto1370
+  780 print"ein blecherner m%lleimer,wei& lackiert, steht vor ihnen.er ist"
+  790 print"seltsamerweise sehr sauber.":goto1370
+  800 print"die zeit hat die namen der flaschen     unleserlich gemacht,"
+  810 print"allein das abf%lljahr,1876,ist zu lesen.";:goto1370
+  820 print"dies ist der stolz des hauses: ein      radioempf#nger mit mahagon";
+  830 print"igeh#use.":goto1370
+  840 print"dieser mantel ist nicht wichtig.er      geh$rt dem koch.":goto1370
+  850 print"das fauteuil,im volksmund auch sessel   genannt,ist mit gr%nem"
+  860 print"stoff bezogen und offensichtlich sehr   bequem.":goto1370
+  870 print"die schallplatte":printchr$(34)"beethoven, symphonie nr.5"chr$(34);
+  880 print" liegt auf.":goto1370
+  890 print"das bild zeigt queen victoria in ihren  besten jahren als regentin"
+  900 print"des britischen imperiums.":goto1370
+  910 print"der spiegel zeigt sie in mehrere teile  gespalten.":goto1370
+  920 print"beim untersuchen schnappte sie zu (au !)";:goto1370
+  930 print"es besteht aus einer feder,einem tinten-fass und einigen b$gen";
+  940 print" papier.":goto1370
+  950 print"es ist eine englische ausgabe von":printchr$(34)"faust i"chr$(34)" von";
+  960 print" j.w. von goethe.":print"die seiten 37-41 fehlen.":goto1370
+  970 print"die seiten sind die fehlenden 37-41 aus dem "chr$(34)"faust";
+  980 printchr$(34)".":goto1370
+  990 print"der hut ist ein leichter sommerhut aus  stroh.":goto1370
+ 1000 print"die taschen des grauen %bermantels sind leer.":goto1370
+ 1010 print"am stock ist eine silberne plakette mit der gravur "chr$(34)"keith";
+ 1020 print" + co."chr$(34)" befestigt.":goto1370
+ 1030 print"er ist alt,schmutzig und kaputt.":goto1370
+ 1040 print"sie ist gesplittert.":goto1370
+ 1050 print"es ist mit einer kette verschlossen.":goto1370
+ 1060 print"es ist mit einem schlo& gesichert.":goto1370
+ 1070 print"es ist abgeschlossen.":goto1370
+ 1080 print"es ist nichts nennenswertes zu sehen.":goto1370
+ 1090 print"es v$llig uninteressant.":goto1370
+ 1100 print"er ist mit rotem samt ausgeschlagen und ...er ist leer ! auf einer"
+ 1110 print"plakette steht:":printchr$(34)"lawrence templeton-douglas  r i p"chr$(34)"."
+ 1120 goto1370
+ 1130 print"die truhe ist zu 100 prozent leer.":goto1370
+ 1140 print"im safe steht ein schild mit der auf-   schrift:":printchr$(34)"mehr ";
+ 1150 print"gl%ck beim n#chsten mal !!!"chr$(34)".":goto1370
+ 1160 print"die schubladen enthalten handt%cher und eine bibel.":goto1370
+ 1170 print"es ist nichts zu sehen,was momentan von interesse w#re.":goto1370
+ 1180 print"es ist nichts interessantes zu sehen.":goto1370
+ 1190 print"es ist v$llig uninteressant.":goto1370
+ 1200 print"ein asiatischer dolch steckt in der     tischplatte.":goto1370
+ 1210 print"es ist unwichtig.":goto1370
+ 1220 print"das ger#t wurde mutwillig zerst$rt.":goto1370
+ 1230 print"das mikrophon ist an die wand des":print"konferenzzimmers ";
+ 1240 print"angeschlossen.":goto1370
+ 1250 print"es ist ein linker,grauer tuchhandschuh, bzw. was davon %brig ist."
+ 1260 print"ein vielleicht unbedeutendes detail ist,da& der get$tete hausherr"
+ 1270 print"zuerst am rechten arm verletzt wurde,   bevor er t$dlich verletzt"
+ 1280 print"wurde.":goto1370
+ 1290 print"ihr bilck f#llt durch das fenster in denvorgarten des hauses."
+ 1300 goto1370
+ 1310 print"es steht geschrieben:":printchr$(34)"haben sie fragen ? fragen sie dr.";
+ 1320 print" z !"chr$(34)".";:goto1370
+ 1330 print"der dolch ist in den tisch gesto&en     worden.sein griff ist mit"
+ 1340 print"asiatischen schnitzereien verziert.":goto1370
+ 1350 print"es sind rohe h%hnereier.oh! sehen sie,  es ist schon wieder ";
+ 1360 print"eines zerbrochen."
+ 1369 rem** "vergleiche"
+ 1370 ifve<>28then1410
+ 1380 ifg1<>2orpe<>10orge(1)<>-1then1400
+ 1390 print"sie haben recht,es stimmt %berein !":ff=1:goto1410
+ 1400 print"tut mir leid,es stimmt nicht %berein."
+ 1409 rem** "frage"
+ 1410 ifve<>32then1460
+ 1420 ifpe(p(pe),pe)<>znthenprintpe$(pe)" ist aber nicht anwesend.":goto1460
+ 1430 sys65511:close1,4:open4,8,4,"text."+chr$(65+pe)+",p,r"
+ 1440 get#4,a$:ifst=64thenclose4:goto1460
+ 1450 printa$;:goto1440
+ 1459 rem** "warte"
+ 1460 ifve<>38then1480
+ 1470 print"die zeit vergeht..."
+ 1479 rem** "verliere"
+ 1480 ifve<>40then1510
+ 1490 ifge(g1)<>-1thenprint"was man nicht hat,kann man nicht ab-    legen.":goto1510
+ 1500 print"geht in ordnung !":ge(g1)=zn:tr=tr-1
+ 1509 rem** "fuelle"
+ 1510 ifve<>50then1540
+ 1520 print"der befehl {rvon}fuelle{rvof} l#&t sich in diesem spiel auf keinen gegenstand"
+ 1530 print"anwenden.er dient dazu den spieler zu   #rgern."
+ 1539 rem** "hilfe"
+ 1540 ifve<>52then1660
+ 1550 hi=hi+1:ifhi>4thenprint"schade,dr. z ist schon gegangen.":goto3660
+ 1560 print"dr. z betritt den raum.er,als meister   des spiels,sagt:"
+ 1570 onhigoto1580,1600,1630,1650
+ 1580 printchr$(34)"suchen sie sich einen gegenstand,den    der t#ter benutzt";
+ 1590 print" haben k$nnte."chr$(34):goto1660
+ 1600 printchr$(34)"benutzen sie das handbuch und stellen   sie fest,ob der";
+ 1610 print" von ihnen":print"gefundene gegenstand in frage kommt."chr$(34)
+ 1620 goto1660
+ 1630 printchr$(34)"denken sie an die psychologische wirkungentdeckt zu werden.";
+ 1640 printchr$(34):goto1660
+ 1650 printchr$(34)"teilen sie sich ihrem vorgesetzten     mit."chr$(34)
+ 1659 rem** "schlage"
+ 1660 ifve<>54then1690
+ 1670 ifpe(p(pe),pe)<>znthenprintpe$(pe)" ist aber nicht anwesend.":goto1690
+ 1680 printpe$(pe)" nimmt es ihnen %bel,da&":print"sie zugeschlagen haben."
+ 1690 ifve<>56then1720
+ 1699 rem** "binde"
+ 1700 print"der befehl {rvon}binde{rvof} hat keine wirkung in   diesem programm.er soll"
+ 1710 print"den spieler lediglich irritieren."
+ 1719 rem** "bestreiche"
+ 1720 ifve<>62then1790
+ 1730 ifge(2)<>-1orge(5)<>-1thenprint"um dies zu k$nnen brauchen sie noch etwas."
+ 1740 ifge(2)<>-1orge(5)<>-1then1790
+ 1750 ifg1<>2then1770
+ 1760 print"es erscheinen klare abdr%cke auf der    flasche !":goto1790
+ 1770 print"es sind keine klaren abdr%cke zu":print"erkennen.der gegenstand wurde"
+ 1780 print"anscheinend h#ufig benutzt."
+ 1789 rem** "benutze"
+ 1790 ifve<>68then1820
+ 1800 print"wenn ihnen ein sinnvoller verwendungs-  zweck daf%r einf#llt,mir"
+ 1810 print"jedenfalls nicht."
+ 1819 rem** "telephoniere"
+ 1820 ifve<>74then2250
+ 1830 ifge(4)<>-1andge(4)<>81thenprint"das telephon ist nicht in ihrer n#he."
+ 1840 ifge(4)=81thenprint"sie h$ren ein merkw%rdiges ger#usch...":goto2800
+ 1850 print"sie w#hlen die nummer des":print"innenministeriums...{down}"
+ 1860 r$="17384":fori=1to5:printmid$(r$,i,1);" ";:forj=1to200:nextj,i
+ 1870 print"":fork=1to800:next
+ 1880 print"{down}"chr$(34)"innenministerium,worum handelt es sich bitte ?"chr$(34)
+ 1890 gosub3760:printchr$(34)"moment,ich verbinde...":fork=1to800:next
+ 1900 printchr$(34)"ah,guten tag edwards,haben sie einen"
+ 1910 print"verdacht ?"chr$(34):gosub3760:ifleft$(in$,1)="j"then1950
+ 1920 printchr$(34)"edwards,rufen sie bitte erst wieder an,";
+ 1930 print"wenn sie einen konkreten verdacht haben.aufwiederh$ren!"chr$(34)
+ 1940 goto60
+ 1950 printchr$(34)"welchen beweis haben sie daf%r ?"chr$(34)
+ 1960 gosub3760:ifff=1andge(2)=-1then1990
+ 1970 printchr$(34)"%berlegen sie sich das nocheinmal.":print"aufwiederh$ren.";
+ 1980 printchr$(34):goto60
+ 1990 print"der telephonh$rer wird ihnen aus der    hand gerissen.sie drehen ";
+ 2000 print"sich um und...":fori=1to1000:next:print"{down}lawrence templeton-douglas"
+ 2010 print"{down}dessen m$rder sie suchten,steht vor":print"ihnen.er sagt:{down}"
+ 2020 printchr$(34)"h$ren sie auf,mit meinen nerven zu"
+ 2030 print"spielen.ja,ich war es,ich habe zuerst"
+ 2040 print"mich 'umgebracht' und dann den funker.  er hatte mich gesehen."
+ 2050 print"die %brigen anschl#ge gehen auch auf    mein konto.und wollen sie"
+ 2060 print"wissen,weshalb ich ich das getan habe ? nicht weil ich daf%r gut"
+ 2070 print"bezahlt werde,nein,ich brauchte wieder  einmal nervenkitzel,wie"
+ 2080 print"ich ihn seit 1917 nicht mehr hatte.":print"jetzt,da sie alles wissen,"
+ 2090 print"hat der mohr seine schuldigkeit getan."chr$(34)
+ 2100 print"{down}==>weiter":poke198,0:wait198,1:poke198,0:gosub2940
+ 2110 print"er erschie&t sich...":print"{down}seltsam,da& solche f#lle immer so"
+ 2120 print"enden m%ssen.":print"{down}der fuchs ist schlie&lich doch ins eisen";
+ 2130 print"gegangen.":print"auch sie haben als mohr ihre"
+ 2140 print"schuldigkeit getan,ihr"
+ 2150 print"auftrag ist hiermit beendet.m$ge honkongeine gl%ckliche zukunft"
+ 2160 print"bevorstehen...":print"===>weiter":poke198,0:wait198,1:poke198,0
+ 2170 sys50271:poke53265,peek(53265)and239:poke2,1:goto3830
+ 2180 onzn-54goto2190,2210,2230
+ 2190 ifge(7)<>-1thennz(4)=0:ri(4)=0
+ 2200 return
+ 2210 ifge(6)<>-1thennz(3)=0:nz(4)=0:ri(4)=0:ri(3)=0
+ 2220 return
+ 2230 ifge(5)<>-1thennz(3)=0:ri(3)=0
+ 2240 return
+ 2249 rem** "ende"
+ 2250 ifve<>78then2330
+ 2260 print"wollen sie wirklich aufh$ren";:gosub3720
+ 2270  
+ 2280 ifr$="n"thenprint:print"ich wu&te es.":goto2330
+ 2290 print"{down}in der hoffnung,sie bald wiederzusehen, verabschiedet sich von ";
+ 2300 print"ihnen":print"der moderator des adventure nr.3:{down}"
+ 2310 print"      "chr$(34)"wie im eisen der fuchs..."chr$(34)
+ 2320 fori=1to3000:next:poke53265,0:sys64738
+ 2330 ifax<4ormo=1thenax=ax+1:mo=0:goto60
+ 2340 ax=0
+ 2350 fori=1to9
+ 2360 ifp(i)+1>pe(0,i)thenp(i)=0
+ 2370 p(i)=p(i)+1:nexti:ic=0
+ 2380 fori=1togz:ifge(i)=pe(p(7),7)thenic=i
+ 2390 next:ific=0then60
+ 2400 fori=1togz:ifge(i)=0thenge(i)=pe(p(7),7)
+ 2410 next:ge(ic)=0:goto60
+ 2419 rem** spielstand speichern
+ 2420 print"abspeichern";:gosub3720:ifr$="n"then60
+ 2430 print"der name des spielstandes":print"(max. 10 zeichen)";:gosub3750
+ 2440 print"ist der name":print"{rvon}"in$:print"korrekt";:gosub3720
+ 2450 ifr$="n"then2430
+ 2460 sys65511:close1,4:open1,8,15,"s:fuchs."+in$:open4,8,4,"fuchs."+in$+",p,w"
+ 2470 fori=1togz:print#4,ge(i):next:print#4,zn:print#4,ff:print#4,hi:print#4,tr
+ 2480 fori=1to9:print#4,p(i):next
+ 2490 input#1,a$,b$,c$,d$
+ 2500 ifa$="00"thenclose1,4:print"{clr}";:goto140
+ 2510 print"fehlerkanal:"a$","b$","c$","d$:print"{down}erneuter versuch";:gosub3720
+ 2520 ifr$="j"thenclose4,1:goto2460
+ 2530 goto60
+ 2539 rem** spielstand speichern
+ 2540 print"laden";:gosub3720:ifr$="n"then60
+ 2550 print"der name des spielstandes":print"(max. 10 zeichen)";:gosub3750
+ 2560 print"ist der name":print"{rvon}"in$:print"korrekt";:gosub3720
+ 2570 ifr$="n"then2550
+ 2580 sys65511:close1,4:open1,8,15:open4,8,4,"fuchs."+in$+",p,r":input#1,a$,b$,c$,d$
+ 2590 ifa$="00"then2640
+ 2600 print"fehlerkanal: "a$","b$","c$","d$
+ 2610 print"erneuter versuch";:gosub3720
+ 2620 close4,1:ifr$="n"then60
+ 2630 ifr$="j"then2580
+ 2640 fori=1togz:input#4,ge(i):next:input#4,zn:input#4,ff:input#4,hi:input#4,tr
+ 2650 fori=1to9:input#4,p(i):next
+ 2660 input#1,a$,b$,c$,d$
+ 2670 close1,4:ifa$="00"thenprint"{clr}";:goto140
+ 2680 print"fehlerkanal:":printa$","b$","c$","d$:print"erneuter versuch";:gosub3720
+ 2690 ifr$="j"then2640
+ 2700 close4,1:goto140
+ 2709 rem** befehlsliste
+ 2710 print"liste der g%ltigen befehle:"
+ 2720 fori=1tovz:ifval(right$(ve$(i),1))<>0thenprintleft$(ve$(i),len(ve$(i))-1);:goto2740
+ 2730 printve$(i);
+ 2740 print" ";:next:print:goto60
+ 2749 rem** inventur
+ 2750 ic=0:print"sie tragen ";:fori=1togz:ifge(i)=-1thenprintge$(i)",";:ic=ic+1
+ 2760 next:ific=0thenprint"nichts ";
+ 2770 print"{left} bei sich.":goto60
+ 2779 rem** neustart
+ 2780 print"neustart";:gosub3720:ifr$="n"thenprint:print"ich wu&te es.":goto60
+ 2790 print"{clr}":run
+ 2799 rem** toedliche falle
+ 2800 rem** goodbye,yellow brickroad...
+ 2810 si=54272:pokesi,180:pokesi+1,8:pokesi+21,128:pokesi+22,129:pokesi+23,241
+ 2820 pokesi+24,15+16:pokesi+5,15:pokesi+6,253:pokesi+4,129:fori=1to700:next
+ 2830 pokesi+4,128
+ 2840 sys50176:fori=1to20:forj=0to15
+ 2850 poke2,j:nextj,i:poke2,14:print"wie hei&t es doch in amerikanischen"
+ 2860 print"krimis,"chr$(34)"you are deceased"chr$(34)",mit anderen"
+ 2870 print"worten,man hat sie mitsamt telefon ,dem gr$&ten teil des hauses"
+ 2880 print"und der konferenz verdampft.diese falle lag in der n#he des"
+ 2890 print"telefons.untersuchen sie bei der":print"n#chsten gelegenheit die"
+ 2900 print"umgebung des telefons und bewegen sie   das telefon."
+ 2910 print"aber das #ndert alles nichts,man hat siehereingelegt."
+ 2920 print"===>weiter":poke198,0:wait198,1:poke198,0:sys50271
+ 2930 poke53265,peek(53265)and239:poke2,0:goto3830
+ 2939 rem** schussgeraeusch
+ 2940 si=54272:pokesi,219:pokesi+1,43:pokesi+5,15:pokesi+6,252
+ 2950 pokesi+22,128:pokesi+23,241:fori=0to31:pokesi+24,i:next:pokesi+4,129:fork=1to20
+ 2960 pokesi+4,128:return
+ 2969 rem** befehlseingabe & codierung
+ 2970 ifud=1then3200
+ 2980 poke631,5:poke198,1:be$="":print:print"ihre entscheidung ? ";
+ 2990 poke204,0
+ 3000 getx$:ifx$=""then3000
+ 3010 ifx$="{f1}"thenpoke204,1:print" ":goto2420
+ 3020 ifx$="{f3}"thenpoke204,1:print" ":goto2540
+ 3030 ifx$="{f5}"thenpoke204,1:print" ":goto2710
+ 3040 ifx$="{f7}"thenpoke204,1:print" ":goto2750
+ 3050 ifx$="{stop}"thenpoke204,1:print" ":goto2780
+ 3060 ifx$=chr$(13)andlen(be$)<1thenpoke204,1:print"{clr}";:goto140
+ 3070 ifpeek(203)=1thenpoke204,1:print".":goto3120
+ 3075 iflen(be$)+1>68then3000
+ 3080 i=asc(x$):ifi<65ori>90thenifi<>32andi<>20andi<>34then3000
+ 3090 if(i=20ori=157ori=29)andbe$=""then3000
+ 3100 ifi=20thenpoke204,1:print"{left}  {left}{left}";:be$=left$(be$,len(be$)-1):goto2990
+ 3110 printx$;:be$=be$+x$:goto3000
+ 3120 fori=1to10:be$(i)="":next:wz=1:fori=1tolen(be$)
+ 3130 mi$=mid$(be$,i,1):ifmi$=" "ormi$=","ormi$="-"thengosub3170:goto3160
+ 3140 ifwz>10thenprint"die eingabe ist zu lang.":i=len(be$)+1:goto3160
+ 3150 be$(wz)=be$(wz)+mid$(be$,i,1)
+ 3160 nexti:goto3200
+ 3170 ic=0:fori1=1toaz:ifbe$(wz)=au$(i1)thenic=1
+ 3180 nexti1:ific=0thenwz=wz+1:return
+ 3190 be$(wz)="":return
+ 3200 ifud=1thenud=0:goto3220
+ 3210 wz=1:ve=0:ob=0:pe=0
+ 3220 ic=0:g1=0:g2=0
+ 3230 fori=1tovz:ifbe$(wz)=ve$(i)thenve=i:ic=1
+ 3240 iflen(be$(wz))<3then3260
+ 3250 ifbe$(wz)=left$(ve$(i),len(ve$(i))-1)thenve=i-val(right$(ve$(i),1)):ic=1
+ 3260 nexti:ific=1then3350
+ 3270 fori=1togz:ifbe$(wz)<>ge$(i)then3300
+ 3280 ic=1:ifg1=0theng1=i
+ 3290 g2=i:ifg2=g1theng2=0
+ 3300 nexti:ific=1then3350
+ 3310 fori=1tooz:ifbe$(wz)=ob$(i)thenob=i:ic=1
+ 3320 nexti:ific=1then3350
+ 3330 fori=1topz:ifbe$(wz)=pe$(i)thenpe=i:ic=1
+ 3340 nexti
+ 3350 q$=be$(wz):ifq$="und"orq$="dann"orq$="danach"orq$="spaeter"thenud=1:ic=1
+ 3360 ific=0thenprint"ich kenne "chr$(34)be$(wz)chr$(34)" nicht.":return
+ 3370 wz=wz+1:ifwz>10orbe$(wz)=""orud=1thenreturn
+ 3380 ic=0:goto3230
+ 3389 rem** laden der spieldaten
+ 3390 open1,8,4,"text.a,p,r"
+ 3400 gz=43
+ 3410 fori=1to7:input#1,ge$(i),ge(i):next
+ 3420 ge$(43)="handbuch":ge(43)=-1
+ 3430 ge(1)=int(rnd(ti)*27)+1:ge(5)=int(rnd(-ti)*27)+1:tr=1
+ 3440 ge(6)=int(rnd(ti)*27)+1:ge(7)=int(rnd(-ti)*27)+1
+ 3450 fori=8to42:input#1,ge$(i):ge(i)=int(rnd(ti)*80)+1:next
+ 3460 oz=39
+ 3470 fori=1to39:input#1,ob$(i):input#1,oo(i):next
+ 3480 vz=80
+ 3490 fori=1to80:input#1,ve$(i):next
+ 3500 az=41
+ 3510 fori=1to41:input#1,au$(i):next
+ 3520 pz=10
+ 3530 fori=1to10:input#1,pe$(i):next
+ 3540 pe(0,1)=14:pe(0,2)=12:pe(0,3)=16:pe(0,4)=22:pe(0,5)=24
+ 3550 pe(0,6)=26:pe(0,7)=16:pe(0,8)=4:pe(0,9)=22
+ 3560 fori=1to9:forj=1tope(0,i):input#1,pe(j,i):nextj,i
+ 3570 fori=1to9:p(i)=1:next
+ 3580 open4,8,15:input#4,a$,b$,c$,d$:ifa$<>"00"then3600
+ 3590 close4,1:return
+ 3600 print"{clr}disk-fehler: ";a$","b$","c$","d$:poke53265,peek(53265)or16
+ 3610 poke53281,1:poke53280,1:print"{blk}{clr}{down}{down}{rvon}a{rvof} erneuter versuch":print"{down}{rvon}b{rvof} aufgeben"
+ 3620 print"{down}{down}ihre wahl ? ";:poke204,0
+ 3630 getr$:ifr$=""or(r$<>"a"andr$<>"b")then3630
+ 3640 ifr$="a"thenclose4,1:print" {clr}":goto3390
+ 3650 print"{clr}aufwiedersehen !":sys64738
+ 3659 rem** funktionstastenbelegung
+ 3660 print"funktionstastenbelegung:{down}{down}":print"{rvon}run/stop{rvof}  neustart"
+ 3670 print"{down}{rvon}f1{rvof}        spielstand speichern"
+ 3680 print"{down}{rvon}f3{rvof}        spielstand laden"
+ 3690 print"{down}{rvon}f5{rvof}        befehlsliste":print"{down}{rvon}f7{rvof}        inventur"
+ 3700 print"{down}{rvon}return{rvof}    bild ansehen"
+ 3710 goto1660
+ 3719 rem** eingabe von "ja" oder "nein"
+ 3720 poke198,0:print" (j/n) ? ";:poke204,0
+ 3730 getr$:ifr$=""or(r$<>"j"andr$<>"n")then3730
+ 3740 poke204,1:printr$:return
+ 3749 rem** eingaberoutine fuer filenamen
+ 3750 print" ? ";
+ 3760 in$="":poke198,0:poke204,0
+ 3770 getr$:ifr$=""then3770
+ 3780 ifr$=chr$(20)andlen(in$)>0thenin$=left$(in$,len(in$)-1):printr$;:goto3770
+ 3790 if(r$=chr$(13)andlen(in$)>0)thenpoke204,1:print" ":return
+ 3795 iflen(in$)+1>10then3770
+ 3800 if(r$<"a"orr$>"z")andr$<>" "andr$<>"*"andr$<>"?"andr$<>"."then3770
+ 3810 printr$;:in$=in$+r$:iflen(in$)>15then3790
+ 3820 goto3770
+ 3829 rem** laden des nachspanns
+ 3830 onpeek(2)+1goto3840,3860
+ 3840 print"{clr}{blk}lO"chr$(34)"82"chr$(34)",8":print"{home}{down}{down}{down}{down}{down}run":poke631,19:poke632,13
+ 3850 poke633,13:poke198,3:new
+ 3860 print"{clr}{blk}lO"chr$(34)"85"chr$(34)",8":print"{home}{down}{down}{down}{down}{down}run":poke631,19:poke632,13
+ 3870 poke633,13:poke198,3:new
+ 3880  
+ 3890 rem *-*-* adventure nr.3 *-*-*
+ 3900 rem !                        !
+ 3910 rem * haupt & steuerprogramm *
+ 3920 rem !      system v9.5       !
+ 3930 rem *          (p)           *
+ 3940 rem !      olaf barthel      !
+ 3950 rem *       1985/1986        *
+ 3960 rem !                        !
+ 3970 rem *-*-* adventure nr.3 *-*-*
+

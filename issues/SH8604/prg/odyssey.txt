@@ -1,0 +1,1129 @@
+
+
+;odyssey.prg ==0801==
+    0 print"{clr}":poke53280,0:poke53281,0:f=2:gosub20000:poke198,0:gosub750
+   10 dimt$(80):dimra$(20,10):wl=3:ti$="000000"
+   20 rem *** gegenstaende ********************************************************
+   22 g$(0)=" ":g$(1)="messer":g$(2)="metallbehaelter":g$(3)="buch":g$(4)="beil"
+   24 g$(5)="fruechte":g$(6)="verbandszeug":g$(7)="schlangenserum"
+   26 g$(8)="edelsteine":g$(9)="faltboot"
+   36 print"{clr}"chr$(14):gosub25000
+   80 rem *** sprung in raum ******************************************************
+   90 goto1000
+  100 ifun=1thengoto200
+  101 print"{wht}"
+  102 zv=rnd(1):ifzv<0.5thenprint"was nun ?":goto110
+  103 ifzv>0.5andzv<0.80thenprint"was jetzt ?":goto110
+  105 print"und jetzt ?"
+  110 print"{down}{up}":x$="":printchr$(114)
+  120 getb$
+  125 ifza=1thenifti-d>lithent=1:r=0:p$="":goto300
+  127 ifb$=""then120
+  130 ifasc(b$)=13then198
+  140 ifasc(b$)=20andx$<>""then160
+  142 ifasc(b$)=32then150
+  145 ifasc(b$)<65orasc(b$)>90then120
+  150 x$=x$+b$:goto180
+  160 x$=left$(x$,len(x$)-1)
+  170 iflen(x$)<41andlen(x$)>37thenprint"{up}{up}"x$+chr$(114)+chr$(32):ua=1:goto120
+  175 goto190
+  180 iflen(x$)<40and ua=0 thenprint"{up}"x$+chr$(114):ua=0:goto120
+  185 print"{up}{up}"x$+chr$(114):goto194
+  190 iflen(x$)<41and ua=0 thenprint"{up}"x$+chr$(114)+chr$(20):goto194
+  192 print"{up}{up}"x$+chr$(114)+chr$(20):goto194
+  194 iflen(x$)<79then120
+  195 getb$:ifb$<>chr$(20)andb$<>chr$(13)then195
+  196 print"{up}{up}":goto130
+  198 iflen(x$)<39thenprint"{up}"x$+chr$(46):goto200
+  199 print"{up}{up}"x$+chr$(46)
+  200 rem *** stringzerlegung ****************************************************
+  210 un=0:wo=0:sz=0:t$(0)=""
+  217 ifx$=""andun=0thengoto713
+  220 forx=1tolen(x$)
+  230 :   ifmid$(x$,x,1)<>" "andwo=0thenwo=x
+  235 : ifmid$(x$,x,1)=" "andwo<>0thent$(sz)=mid$(x$,wo,x-wo):wo=0:sz=sz+1:goto280
+  240 :ifx=len(x$)andwo<>0thent$(sz)=mid$(x$,wo,x-wo+1):sz=sz+1
+  270 next:goto300
+  280 :   ift$(sz-1)="und"thenx$=right$(x$,len(x$)-x):un=1:goto300
+  290 goto270
+  300 rem *** wortanalyse ********************************************************
+  305 s=0:v=0:r=0:g=0:q=0
+  310 fori=0tosz-1
+  315 ift$(0)=""thengosub704:return
+  320 :   p$=t$(i):f=asc(p$)-64
+  330 :   onfgoto350,360,370,380,390,400,410,420,430,440,450,460,470
+  340 :   onf-13goto480,490,500,510,520,526,545,550,560,570,580,590,600
+  345 next
+  346 ifv=0ands=0andg=0andr=0thengosub702
+  347 gosub800
+  349 return
+  350 rem *** a-ber
+  351 ifp$="ast"thens=3:goto345
+  352 ifp$="alles"thens=1
+  353 ifp$="asche"thens=7
+  359 goto345
+  360 ifp$="betrete"orp$="betritt"thenv=27
+  361 ifleft$(p$,4)="baum"thens=2:goto345
+  362 ifp$="buch"theng=3:s=10
+  363 ifp$="beil"theng=4
+  364 ifp$="behaelter"theng=2
+  365 ifp$="bring"thenv=3
+  366 ifp$="beruehre"thenv=23
+  367 ifp$="bild"thens=25:goto345
+  368 ifp$="behandle"orp$="behandele"thenv=26
+  369 ifp$="boot"theng=9
+  370 rem *** c-ber
+  379 goto345
+  380 rem *** d-ber
+  381 ifp$="drehe"thenv=15
+  382 ifp$="druecke"thenv=23
+  389 goto345
+  390 rem *** e-ber
+  391 ifp$="edelsteine"theng=8
+  395 ifp$="essen"thenv=5
+  396 ifp$="entzuende"thenv=25
+  399 goto345
+  400 ifp$="fahre"thenv=31
+  401 ifp$="fruechte"theng=5:s=11
+  402 ifp$="fass"thens=8
+  403 ifp$="felswand"thens=14
+  404 ifp$="fuelle"thenv=11
+  405 ifp$="faelle"thenv=14
+  406 ifp$="fuenf"thenv=29
+  407 ifp$="faltboot"theng=9
+  408 ifp$="felseninsel"thens=32
+  409 goto345
+  410 rem *** g-ber
+  411 ifp$="goldschale"thens=13
+  412 ifp$="gorilla"thens=19
+  413 ifp$="goetzenbild"thens=25
+  414 ifp$="grabe"thenv=30
+  415 ifp$="gehe"thenv=27
+  419 goto345
+  420 rem *** h-ber
+  421 ifp$="h"orp$="hinauf"thenr=5
+  422 if p$="hinunter"thenr=6
+  423 if p$="hand"thens=20
+  424 if p$="haenge"thenv=17
+  425 if p$="hinueber"theng=10
+  426 if p$="hangle"orp$="hangele"thenv=22
+  427 if p$="huette"thens=30
+  429 goto345
+  430 rem *** i-ber
+  431 ifp$="insel"thens=32
+  435 ifp$="i"orp$="inventur"thens=4
+  436 ifp$="iss"thenv=5
+  439 goto345
+  440 rem *** j-ber
+  441 ifp$="jaguar"thens=29
+  449 goto345
+  450 rem *** k-ber
+  451 ifp$="kiste"thens=15
+  459 goto345
+  460 rem *** l-ber
+  461 ifp$="liane"thens=18
+  465 ifp$="lege"thenv=2
+  466 ifp$="leere"thenv=15
+  467 ifp$="lies"thenv=8
+  469 goto345
+  470 rem *** m-ber
+  471 ifp$="messer"theng=1
+  472 ifp$="metallbehaelter"theng=2
+  473 ifp$="metallkiste"thens=11
+  474 ifp$="maennchen"thens=22
+  475 ifp$="mache"thenv=12
+  479 goto345
+  480 rem *** n-ber
+  481 ifp$="n"orleft$(p$,3)="nor"thenr=1
+  485 ifp$="nimm"thenv=1
+  489 goto345
+  490 rem *** o-ber
+  491 ifp$="o"orleft$(p$,3)="ost"thenr=4
+  492 ifp$="oeffne"thenv=7
+  499 goto345
+  500 rem *** p-ber
+  501 ifp$="pulver"thens=21
+  502 ifp$="paddele"thenv=31
+  509 goto345
+  510 rem *** q-ber
+  519 goto345
+  520 rem *** r-ber
+  521 ifp$="r"orp$="runter"thenr=6
+  522 ifp$="rutsche"thenv=24
+  523 ifp$="rampe"thens=26
+  524 ifp$="rudere"thenv=31
+  525 goto345
+  526 ifp$="spritze"thenv=32
+  527 ifleft$(p$,6)="spalte"thens=33
+  530 ifp$="s"orleft$(p$,4)="sued"thenr=2
+  531 ifleft$(p$,4)="sing"thenv=19
+  532 ifp$="schlangenserum"orright$(p$,5)="serum"theng=7
+  533 ifp$="schau"thens=5
+  534 ifp$="schale"thens=13
+  535 ifp$="strand"thens=6
+  536 ifp$="strauch"thens=12
+  537 ifleft$(p$,6)="schuet"thenv=9
+  538 ifp$="schliesse"thenv=10
+  539 ifp$="schuette"thenv=11
+  540 ifp$="schiesspulver"thens=21
+  541 ifleft$(p$,6)="spring"thenv=13
+  542 ifp$="sand"thenkg=1
+  543 ifp$="spinne"thens=23
+  544 goto345
+  545 rem *** t-ber
+  546 ifp$="tisch"thens=9
+  547 ifp$="toete"thenv=20
+  549 goto345
+  550 rem *** u-ber
+  555 if p$="untersuche"thenv=6
+  559 goto345
+  560 rem *** v-ber
+  561 ifp$="verbandszeug"theng=6
+  562 ifp$="vogelspinne"thens=23
+  563 ifp$="vorsprung"orp$="vorspruenge"thens=24
+  564 ifp$="verbinde"thenv=26
+  565 ifleft$(p$,7)="verlier"thenv=2
+  566 ifp$="verlasse"thenv=28
+  567 ifp$="vernichte"thenv=20
+  569 goto345
+  570 rem *** w-ber
+  571 ifp$="w"orleft$(p$,4)="west"thenr=3
+  572 ifleft$(p$,5)="warte"thenv=4
+  573 ifp$="wand"thens=14
+  574 ifp$="wildstrauch"thens=12
+  575 ifp$="wirf"thenv=11
+  576 ifp$="wende"thenv=15
+  577 ifp$="weg"thens=27
+  578 ifp$="wasser"thens=31
+  579 goto345
+  580 rem *** x-ber
+  589 goto345
+  590 rem *** y-ber
+  599 goto345
+  600 rem *** z-ber
+  601 ifp$="zeug"theng=6
+  602 ifp$="zurueck"thenv=18
+  603 ifp$="zeichnung"thens=25
+  604 ifp$="zuendschnur"thens=28
+  605 ifp$="zuende"thenv=25
+  609 goto345
+  700 rem *** standard-antworten *************************************************
+  701 print"{down}kein weg in dieser richtung !":q=1:return
+  702 zv=rnd(1):ifzv<0.8thenprint"{down}das verstehe ich nicht!":q=1:return
+  703 print"{down}was soll den  d a s  bedeuten ? !":q=1:return
+  704 print"{up}bitte eine korrekte eingabe!":r=0:q=1:goto347
+  705 print"{wht}{down}ok":q=1:return
+  706 print"{down}hier gibt es nichts mehr zu nehmen!":q=1:goto989
+  707 print"{down}sie haben doch nichts mehr!":q=1:goto989
+  708 print"{down}sie entdecken nichts besonderes.":q=1:return
+  709 print"{down}ist schon offen!":q=1:return
+  710 print"{down}ist schon zu!":q=1:return
+  711 print"{down}sie warten.die zeit vergeht...":q=1:return
+  712 print"{down}soviele sachen koennen sie nicht tragen!{up}{up}":q=1:return
+  713 print"{up}wieso druecken sie 'return' ohne etwas e{down}inzugeben ?":ua=0:goto100
+  730 r=0:s=0:v=0:g=0:q=1:return
+  749 rem *** standard-reaktionen ************************************************
+  750 getb$:ifb$<>chr$(32)then750
+  751 x$="":return
+  760 fori=0to10:ifra$(ra,i)<>""thenprint"{down}{yel}"ra$(ra,i)
+  761 next:return
+  777 zv=rnd(1):ifq=0andzv<.7thenprint"{down}das geht nicht!"
+  778 ifq=0andzv>.7thenprint"{down}was wollen sie denn damit bezwecken?"
+  779 return
+  790 print"{down}die kannibalen drohen sie einzuholen!!
+  791 li=1200:d=ti:de=1:return
+  792 print"{down}sie hoeren den knall einer explosion!":za=0:t=0:zu=2:ra$(14,2)=""
+  793 ifka=1thenprint"{down}sie haben die kannibalen in die flucht  gesclagen."
+  794 ra$(13,2)="":ra$(15,2)="":ra$(20,2)="":ra$(12,2)="":return
+  800 ift=1then870
+  801 ifra$(12,9)<>""thenwl=1
+  802 ifra$(12,9)=""thenwl=3
+  805 ifv=1andwi>wlthengosub712:goto838
+  810 ifv=1andra$(ra,g)<>""thengosub705:sp$(g)=g$(g):ra$(ra,g)="":wi=wi+1:goto849
+  815 ifv=1andg>0andsp$(g)=g$(g)thenprint"{down}das haben sie schon!":q=1:goto899
+  820 ifv=1andg>0andra$(ra,g)=""thenprint"{down}hier gibt es das nicht!":q=1:goto899
+  825 ifv=2andg>0andsp$(g)=""thenprint"{down}das haben sie doch gar nicht!":q=1:goto899
+  830 ifv=2andsp$(g)=g$(g)thengosub705:ra$(ra,g)=g$(g):sp$(g)="":wi=wi-1:goto849
+  832 ifv=1ands=1thengosub980:q=1:ifa=1thengosub705
+  835 ifv=2ands=1thengosub986:q=1:ifa=1thengosub705
+  838 ifs=4thengosub990:q=1
+  840 ifv=4thengosub711:goto899
+  842 ifv=5andsp$(5)<>""thengoto999
+  843 ifv=5andsp$(5)=""thenprint"{down}sie haben nichts zu essen!":q=1:goto899
+  844 ifv=6ands>og orv=6ands<ugthengosub708
+  845 ifv=8ands=15andsp$(3)=g$(3)andra<>3thengosub3600:q=1
+  846 ifv=7andsp$(2)=g$(2)andg=2andra<>3thengosub3800:q=1
+  847 ifv=19thenprint"{down}sie singen ein lied...":q=1
+  848 ifv=6ands=11andsp$(5)<>""thenprint"{down}sie stellen fest,dass sie giftig sind!":q=1
+  849 ifsp$(9)<>""thenwl=1
+  850 ifsp$(9)=""thenwl=3
+  869 return
+  870 gosub730:ifde=1thenra=15:goto900
+  871 ifka=1thengosub790
+  872 ifzu=1andsp$(2)<>""thenra=12:goto900
+  873 ifzu=1andsp$(2)=""thengosub792
+  899 return
+  900 rem *** todesanzeigen ******************************************************
+  901 gosub30000
+  902 onragoto905,907,909,911,913,915,917,919,922,923,925,927,929,931,933,935,937
+  903 onra-17goto939,941,943,945,947,949
+  905 print"sie sind von der palme gestuerzt und
+  906 print"haben sich dabei das genick gebrochen!":goto30100
+  907 print"die fleischfressende planze hat sie
+  908 print"verspeist!":goto30100
+  909 print"der skorpion hat sie gestochen!das gift
+  910 print"hat sie getoetet!!":goto30100
+  911 print"der gorilla hat ihnen das genick ge-
+  912 print"brochen!":goto30100
+  913 print"sie sind in den sumpf gestuerzt und
+  914 print"erstickt!":goto30100
+  915 print"die fruechte waren giftig!":goto30100
+  917 print"die grosse,schwarze spinne hat sie
+  918 print"gebissen!":goto30100
+  919 print"der steinhagel hat sie in die tiefe
+  920 print"gerissen!":goto30100
+  922 print"sie sind in die tiefe gestuerzt!!":goto30100
+  923 print"die waende haben sie zerquetscht!!":goto30100
+  925 print"die einstuerzende treppe hat sie unter
+  926 print"sich begraben!":goto30100
+  927 print"der explodierende behaelter hat sie in
+  928 print"stuecke gerissen!":goto30100
+  929 print"das gift der schlange hat ihre atmung{down}
+  930 print"gelaehmt.sie sind erstickt!":goto30100
+  931 print"der jaguar hat sie getoetet!":goto30100
+  933 print"die kannibalen haben sie mit einer keule
+  934 print"erschlagen!":goto30100
+  935 print"{rght}{rght}{rght}{rght}{rght}{rght}sie sind verblutet!":goto30100ready.
+  980 a=0:fori=0to10
+  981 :   ifra$(12,9)<>""thenwl=1
+  982 :   ifwi>wlthengosub712:return
+  983 :   ifra$(ra,i)<>""thensp$(i)=ra$(ra,i):ra$(ra,i)="":a=1:wi=wi+1
+  984 next:ifa=0thengoto706
+  985 return
+  986 a=0:fori=0to10
+  987 :   ifsp$(i)<>""thenra$(ra,i)=sp$(i):sp$(i)="":a=1:wi=wi-1
+  988 next:ifa=0thengoto707
+  989 return
+  990 a=0:print"{down}sie haben:":fori=0to10:ifsp$(i)<>""thenprint"{yel}{down}"sp$(i):a=1
+  991 next:ifa=0thenprint"{yel}{down}nichts"
+  992 return
+  999 print"{wht}{down}sie essen von den fruechten!":fori=0to3000:next:ra=6:goto900
+ 1000 printspc(9)"{grn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+ 1001 printspc(9)"{CBM-M}{grn}     I              {gry1}{CBM-G}"
+ 1002 printspc(9)"{CBM-M}{grn}  {CBM-O}{rvon}I{CBM-*}{rvof}{CBM-*}U{rvon}{SHIFT-POUND}{rvof}{CBM-I}{CBM-POUND}U         {gry1}{CBM-G}"
+ 1003 printspc(9)"{CBM-M}{grn} {rvon}{SHIFT-POUND}U I{CBM-*}{SHIFT-POUND}U{CBM-O} U{CBM-*}{rvof}        {gry1}{CBM-G}"
+ 1004 printspc(9)"{CBM-M}{grn}{CBM-D}{rvon}KI{rvof}{CBM-C}U{brn}{rvon}{CBM-POUND}{CBM-POUND}{grn}{rvof}{CBM-*}I{CBM-C}{rvon}IJ{rvof}        {gry1}{CBM-G}"
+ 1005 printspc(9)"{CBM-M}{grn}U{rvon}J{rvof}J  {brn}{rvon}{CBM-POUND}{CBM-POUND}{rvof} {grn} U{rvon}U{rvof}{CBM-V}        {gry1}{CBM-G}"
+ 1006 printspc(9)"{CBM-N}{grn}     {brn}{rvon}{CBM-POUND}{CBM-POUND}{grn}{rvof}         I   {gry1}{CBM-G}"
+ 1007 printspc(9)"{CBM-M}{grn}     {brn}{rvon}{CBM-POUND}{CBM-POUND}{grn}{rvof} {brn}     {grn}{rvon}{SHIFT-POUND}U{CBM-*}{rvof}{SHIFT-POUND}{rvon}{SHIFT-POUND}I{CBM-*}{gry1}{rvof}{CBM-G}"
+ 1008 printspc(9)"{CBM-M}{brn}     {rvon}{CBM-POUND}{CBM-POUND}{rvof}     {grn} {rvon}UU{rvof}U{brn}{rvon}{CBM-POUND}{grn}{rvof}JP{rvon}K{gry1}{rvof}{CBM-G}"
+ 1009 printspc(9)"{CBM-M}{grn}     {brn}{rvon}{CBM-POUND}{CBM-POUND}{grn}{rvof}      {CBM-C}{CBM-Y} {brn}{rvon}{CBM-POUND}{grn}{rvof}  K{gry1}{CBM-G}"
+ 1010 printspc(9)"{CBM-M}{grn}     {brn}{rvon}{CBM-POUND}{CBM-POUND}{grn}{rvof}         {brn}{rvon}{CBM-POUND}{grn}{rvof}   {gry1}{CBM-G}"
+ 1011 printspc(9)"{CBM-M} {grn}    {brn}{rvon}{CBM-POUND}{CBM-POUND}{grn}{rvof}    {orng} {grn}    {brn}{rvon}{CBM-POUND}{grn}{rvof}   {gry1}{CBM-G}"
+ 1012 printspc(9)"{CBM-M}{grn}    {brn} {rvon}{CBM-POUND}{CBM-POUND}{grn}{rvof}         {brn}{rvon}{CBM-POUND}{grn}{rvof}   {gry1}{CBM-G}"
+ 1013 printspc(9)"{CBM-M}{orng}{CBM-I}{rvon}{CBM-U}{CBM-Y}{CBM-T}    {CBM-T}{CBM-Y}{CBM-U}{rvof}{CBM-I}{CBM-O}{CBM-P}{CBM-@} {brn}{rvon}{CBM-POUND}{orng}{rvof}   {gry1}{CBM-G}"
+ 1014 printspc(9)"{CBM-M}{orng}{rvon} U  U  K   K      {CBM-T}{CBM-Y}{gry1}{rvof}{CBM-G}"
+ 1015 printspc(9)"{CBM-M}{orng}{rvon}   U J   U     J  I {gry1}{rvof}{CBM-G}"
+ 1016 printspc(9)"{orng} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T} "
+ 1019 ra=1:og=6:ug=6
+ 1020 print"{grn}sie befinden sich am suedstrand einer   unbekannten insel.
+ 1050 gosub760
+ 1120 print"{wht}{down}moegliche richtungen : n"
+ 1125 gosub750
+ 1130 gosub100
+ 1135 ifs=5thengoto1000
+ 1140 onrgoto2000,1160,1160,1160,1600,1160
+ 1150 goto1300
+ 1160 gosub701
+ 1300 ifv=6ands=6thenprint"{down}sie untersuchen den strand.":q=1:ifr1=0thengosub1500
+ 1399 gosub777
+ 1400 goto1130
+ 1500 ifr1=0thenra$(1,1)=g$(1):r1=1
+ 1510 gosub760:return
+ 1600 print"{down}sie sitzen auf der palme."
+ 1610 gosub100
+ 1620 onrgoto900,900,900,900,900,1650
+ 1630 ifv=4thengoto1610
+ 1640 goto900
+ 1650 gosub705:goto1130
+ 2000 printspc(9)"{gry1} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+ 2001 printspc(9)"{CBM-M}{rvon} {CBM-G} {grn}{CBM-H}{gry1} {rvof} {rvon}{CBM-J}  {grn}{CBM-H}{gry1} {CBM-L}{CBM-G} B {grn}{CBM-H}{gry1}   {rvof}{CBM-G}"
+ 2002 printspc(9)"{CBM-M}{rvon} {CBM-G} {grn}{CBM-N}{gry1} {rvof}{CBM-G}{rvon}{CBM-G} {CBM-M}{grn}{CBM-N}{gry1} H  G {grn}{CBM-L}{gry1}   {rvof}{CBM-G}"
+ 2003 printspc(9)"{CBM-M}{rvon} G {grn}{CBM-L}{gry1} {rvof}{CBM-H}{rvon}  {CBM-N}{grn}{CBM-L}{gry1} G  {CBM-H} {grn}{rvof}{CBM-K}{gry1}{rvon}{CBM-G}  {rvof}{CBM-G}"
+ 2004 printspc(9)"{CBM-M}{rvon} H {grn}{rvof}{CBM-K}{gry1}{rvon}{CBM-G}{rvof}{CBM-J}{rvon}{CBM-G}  {grn}{rvof}{CBM-K}{gry1}{rvon}{CBM-M}  B  {grn}{rvof}{CBM-K}{gry1}{rvon}   {rvof}{CBM-G}"
+ 2005 printspc(9)"{CBM-M}{rvon} {CBM-M} {grn}{rvof}{CBM-J}{gry1}{rvon} {rvof}{CBM-K}{rvon}   {grn}{rvof}{CBM-K}{gry1}{rvon}HH    {grn}{rvof}{CBM-J}{gry1}{rvon}{CBM-G}  {rvof}{CBM-G}"
+ 2006 printspc(9)"{CBM-M}{rvon} {CBM-M} {grn}{rvof}{CBM-J}{gry1}{rvon} {CBM-L}   {grn}{rvof}{CBM-K}{gry1}{rvon}B {CBM-G}   {grn}{rvof}{CBM-G}{gry1}{rvon}  {CBM-N}{rvof}{CBM-G}"
+ 2007 printspc(9)"{CBM-M}{rvon} {CBM-M} {grn}{rvof}{CBM-H}{gry1}{rvon} {CBM-N}{CBM-G}  {grn}{rvof}{CBM-K}{gry1}{rvon}{CBM-G} {CBM-M}   B  B{rvof}{CBM-G}"
+ 2008 printspc(9)"{CBM-M}{rvon}  {CBM-G}G {CBM-M}  G{grn}{rvof}{CBM-J}{gry1}{rvon}   G     {CBM-H}{rvof}{CBM-G}"
+ 2009 printspc(9)"{CBM-M}{rvon}  G{CBM-G}   H{CBM-L}{grn}{rvof}{CBM-J}{gry1}{rvon}   H    {CBM-N}{CBM-G}{rvof}{CBM-G}"
+ 2010 printspc(9)"{CBM-M}{rvon}  B    {CBM-G}{CBM-M}{grn}{rvof}{CBM-J}{gry1}{rvon}{CBM-H}  {CBM-M}{CBM-G}   {rvof}{CBM-K}{rvon}{CBM-G}{rvof}{CBM-G}"
+ 2011 printspc(9)"{CBM-M}{rvon}  H   {CBM-M}  {grn}{rvof}{CBM-H}{gry1}{rvon}    {CBM-G}   {CBM-L} {rvof}{CBM-G}"
+ 2012 printspc(9)"{CBM-M}{rvon}  {CBM-M}   Y  G    T   {rvof}{CBM-K}{rvon} {rvof}{CBM-G}"
+ 2013 printspc(9)"{CBM-M}{rvon}  {CBM-M}{CBM-H}  H  {CBM-G}    G   Y {rvof}{CBM-G}"
+ 2014 printspc(9)"{CBM-M}{rvon}  {CBM-M}{CBM-J}  B  {CBM-G}    H   B {rvof}{CBM-G}"
+ 2015 printspc(9)"{CBM-M}{rvon}  {CBM-L}{CBM-K}  G  B    Y   {CBM-G} {rvof}{CBM-G}"
+ 2016 printspc(9)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T} "
+ 2019 ra=2:og=1:ug=1
+ 2020 print"{grn}sie stehen an einer hoheh,mit lianen be-wachsenen felswand
+ 2030 print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}an deren fuss eine
+ 2040 print"grosse,fleischfressende planze waechst.
+ 2120 print"{wht}{down}moegliche richtungen : s,w,o"
+ 2125 gosub750
+ 2130 gosub100
+ 2135 ifs=5thengoto2000
+ 2140 onrgoto2160,1000,5000,2500,2200,2160
+ 2150 goto2165
+ 2160 gosub701
+ 2165 gosub777
+ 2170 goto2130
+ 2200 print"{down}{grn}sie sind an einer liane hinaufgeklettert.
+ 2222 print"{up}{rght}da diese in halber hoehe riss,sind sie"
+ 2224 print"auf die erde zurueckgefallen!
+ 2226 print"ausgerechnet in den schlund der fleisch-fressenden planze!!
+ 2228 print"jetzt werden sie verdaut!!!
+ 2300 gosub750:goto900
+ 2500 rem *** raum 2500 *********************************************************
+ 2510 print"{grn}{down}sie stehen auf dem westlichen vorplatz  einer verlassenen huette.
+ 2520 print"am boden sind abdruecke nackter fuesse  und schleifspuren zu erkennen
+ 2530 print"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}."
+ 2540 print"hier scheint ein kampf stattgefunden zu haben!
+ 2545 ra=20:og=1:ug=1
+ 2550 gosub760
+ 2600 print"{wht}{down}moegliche richtungen : s,w,o{down}"
+ 2610 gosub100
+ 2620 onrgoto2640,4000,2000,3000,2640,2640
+ 2625 ifs=5thengoto2500
+ 2630 goto2645
+ 2640 gosub701
+ 2645 gosub777
+ 2650 goto2610
+ 3000 printspc(9)"{brn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{brn} "
+ 3001 printspc(9)"{gry1}{CBM-M}{brn}{rvon}{CBM-M} {grn}{CBM-H}{brn}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3002 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M}{CBM-M}{grn}{CBM-N}{brn}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{grn}{CBM-A}{CBM-R}{CBM-R}{SHIFT-*}{CBM-S}{brn}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3003 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M}{CBM-L}{grn}{CBM-L}{brn}{CBM-M}{CBM-M}{CBM-N}{CBM-M}{grn}BG{CBM-Q}FB{brn}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3004 printspc(9)"{CBM-M}{brn}{rvon}{CBM-N}{CBM-M}{grn}{rvof}{CBM-J}{brn}{rvon}{CBM-M}{CBM-M}{CBM-N}{CBM-M}{grn}{CBM-Q}{CBM-G}{SHIFT-+}{SHIFT-*}{CBM-W}{brn}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3005 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M}{CBM-N}{grn}{rvof}{CBM-J}{brn}{rvon}{CBM-M}{CBM-M}{CBM-N}{CBM-N}{grn}B.BQB{brn}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3006 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M} {grn}{rvof}{CBM-H}{brn}{rvon}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{grn}{CBM-Z}{SHIFT-*}{CBM-E}{SHIFT-*}{CBM-X}{brn}{CBM-M}{CBM-N}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3007 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M} {CBM-G}{CBM-M}{CBM-N}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}{CBM-M}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3008 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M} {rvof}{SHIFT-POUND}{gry1}{CBM-A}{CBM-S} {brn} {wht}{rvon}{SHIFT-POUND}V{rvof}{SHIFT-POUND}{brn}{rvon}{SHIFT-POUND}{CBM-M}{CBM-M}{SHIFT-@}{SHIFT-@}{SHIFT-@}{CBM-M}{CBM-N}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3009 printspc(9)"{CBM-M}{brn}{rvon}{SHIFT-@}{rvof}{SHIFT-POUND} {gry1}JK {wht}   {brn}{rvon}{SHIFT-POUND}{SHIFT-@}{SHIFT-@}{SHIFT-@}{CBM-Y}{CBM-U}{CBM-Y}L{SHIFT-@}{CBM-M}B{gry1}{rvof}{CBM-G}"
+ 3010 printspc(9)"{CBM-M}{brn}{rvon}   {CBM-J}{CBM-H}   {CBM-J}{CBM-H} UY{CBM-@} {CBM-@}TUMB{gry1}{rvof}{CBM-G}"
+ 3011 printspc(9)"{CBM-M}{brn}{rvon} U {CBM-J}{CBM-H} U {CBM-J}{CBM-H}  H {wht}X{brn} G  M{gry1}{rvof}{CBM-G}"
+ 3012 printspc(9)"{CBM-M}{brn}{rvon}   {CBM-J} I  {CBM-J} U Y{CBM-@} {CBM-@}TI  {gry1}{rvof}{CBM-G}"
+ 3013 printspc(9)"{CBM-M}{brn}{rvon}I  {CBM-J}    {CBM-J}   {CBM-M}{CBM-@}{CBM-T}{CBM-@}{CBM-H}   {gry1}{rvof}{CBM-G}"
+ 3014 printspc(9)"{CBM-M}{brn}{rvon}    U      I  {CBM-T}  U  {gry1}{rvof}{CBM-H}"
+ 3015 printspc(9)"{brn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{brn} "
+ 3019 ra=3:og=10:ug=8
+ 3020 print"{grn}die huette scheint vor kurzem noch bewohnt gewesen zu sein.
+ 3022 print"auf dem boden steht ein fass.
+ 3024 gosub760
+ 3120 print"{wht}{down}moegliche richtungen : w"
+ 3125 gosub750
+ 3130 gosub100
+ 3135 ifs=5thengoto3000
+ 3140 onrgoto3160,3160,2500,3160,3160,3160
+ 3150 goto3300
+ 3160 gosub701
+ 3300 ifv=6ands=8thenprint"{down}es enthaelt schiesspulver.":q=1
+ 3310 ifv=6ands=9andsp$(2)=""andsp$(3)=""thengosub3500
+ 3320 ifv=6ands=10andr3=1thenprint"{down}es ist ein tagebuch.":q=1
+ 3350 ifv=8ands=10andr3=1thengosub3600
+ 3360 ifv=7ands=8thengosub3700
+ 3375 ifv=7andg=2andr3=1thengosub3800
+ 3380 ifv=11ands=21andra=3andof=1andob=1andg=2thengosub705:gosub3900:pa=1
+ 3385 ifv=10ands=8andof=0thengosub710
+ 3387 ifv=10andg=2andob=0thengosub710
+ 3390 ifv=10ands=8andof=1thengosub705:of=0
+ 3391 ifv=10andg=2andob=1thengosub705:ob=0
+ 3392 ifv=6ands=9andq=0thengosub708:goto3130
+ 3399 gosub777
+ 3400 goto3130
+ 3500 ifr3=0thenra$(3,3)=g$(3):ra$(3,2)=g$(2):r3=1
+ 3505 print"{down}auf dem tisch liegen verschiedene sachen{up}"
+ 3510 gosub760:q=1:return
+ 3600 print"{down}als letzte eintragung finden sie:{down}
+ 3602 print"...ich muss mich vor den wilden in acht
+ 3604 print"nehmen.es sind wahrscheinlich kannibalen
+ 3606 print"falls sie mich erwischen,ist nicht nur
+ 3608 print"meine ganze forschungsarbeit umsonst
+ 3610 print"gewesen,sondern ich kann auch nicht
+ 3612 print"rechtzeitig am treffpunkt sein...
+ 3620 q=1:return
+ 3700 ifof=0andsa=1thengosub705:of=1:return
+ 3703 ifof=0andsa=0thenprint"{down}im fass ist ein skorpion!er springt":of=1:goto3710
+ 3705 ifsa=1andof=1thengosub709:return
+ 3710 sa=1:print"ihnen auf die hand!!":gosub750:d=ti:li=2700:za=1:gosub100
+ 3730 ifv=9ands=20then3740
+ 3735 goto900
+ 3740 print"{down}der skorpion faellt zu boden und laeuft
+ 3750 print"weg.":za=0:q=1:return
+ 3800 ifob=1thengosub709:return
+ 3802 ifob=0thenprint"{down}der behaelter enthaelt eine zuendschnur":ob=1
+ 3810 ifpa=1andob=1thenprint"und schiesspulver.
+ 3830 q=1:return
+ 3900 print"{down}pulver ist im behaelter.":q=1:return
+ 4000 printspc(9)"{gry1} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+ 4001 printspc(9)"{CBM-M}{grn}             {CBM-*}{rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{gry1}{rvof}{CBM-G}"
+ 4002 printspc(9)"{CBM-M}{grn}               {CBM-*}{rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{gry1}{rvof}{CBM-G}"
+ 4003 printspc(9)"{CBM-M}{grn}                {rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{gry1}{rvof}{CBM-G}"
+ 4004 printspc(9)"{CBM-M}{grn}                {CBM-*}{rvon}{CBM-+}{brn}{CBM-K}B{gry1}{rvof}{CBM-G}"
+ 4005 printspc(9)"{CBM-M}{grn}                  {brn}{rvon}{CBM-K}B{gry1}{rvof}{CBM-G}"
+ 4006 printspc(9)"{CBM-M}{grn}                  {brn}{rvon}{CBM-J}G{gry1}{rvof}{CBM-G}"
+ 4007 printspc(9)"{CBM-N}{grn}                  {brn}{rvon}{CBM-J}G{gry1}{rvof}{CBM-G}"
+ 4008 printspc(9)"{CBM-M}{grn}                  {brn}{rvon}{CBM-H}T{gry1}{rvof}{CBM-G}"
+ 4009 printspc(9)"{CBM-N}{grn}                 {gry3} {brn}{rvon}{CBM-G}T{gry1}{rvof}{CBM-G}"
+ 4010 printspc(9)"{CBM-N}{grn}  {orng} {gry3} {gry1}{CBM-POUND}{CBM-POUND}{CBM-POUND}{grn}          {gry3} {brn}{rvon}{CBM-G}T{gry1}{rvof}{CBM-G}"
+ 4011 printspc(9)"{CBM-N}{grn} {gry2}{rvon}{CBM-B}{rvof}{CBM-B}{gry1}{CBM-+}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-+}{rvon}{CBM-B}{gry2}{rvof}{CBM-B}{grn}   {gry3}    {wht} {brn}{rvon} {CBM-G}{gry1}{rvof}{CBM-G}"
+ 4012 printspc(9)"{CBM-M}{grn}{rvon}  U  I     I    I   {gry1}{rvof}{CBM-G}"
+ 4013 printspc(9)"{CBM-M}{grn}{rvon} I    U  U  K I   U {gry1}{rvof}{CBM-G}"
+ 4014 printspc(9)"{CBM-M}{grn}{rvon}  U U  J  I   U I   {gry1}{rvof}{CBM-G}"
+ 4015 printspc(9)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T} "
+ 4019 ra=4:og=7:ug=7
+ 4020 print"{grn}vor ihnen liegt ein verlassener lager-
+ 4030 print"platz.in der feuerstelle befindet sich
+ 4040 print"asche.
+ 4080 gosub760
+ 4120 print"{wht}{down}moegliche richtungen : n{down}"
+ 4122 gosub750
+ 4125 ifaa=0thengosub4600
+ 4130 gosub100
+ 4135 ifs=5thengoto4000
+ 4140 onrgoto2500,4160,4160,4160,4160,4160
+ 4150 goto4300
+ 4160 gosub701
+ 4300 ifv=6ands=7andr4=0thenra$(4,4)=g$(4):r4=1:q=1:gosub760
+ 4499 gosub777
+ 4500 goto4130
+ 4600 print"{down}ein gorilla erscheint auf der lichtung.
+ 4610 print"er rollt auf dem boden herum und macht
+ 4620 print"maennchen!":aa=1
+ 4630 gosub100:ifv=12ands=22thengoto4700
+ 4635 ifv=20ands=19thengoto900
+ 4637 ifr=1thenprint"{down}der gorilla versperrt ihnen den weg."
+ 4640 print"{down}der gorilla hat aufgehoert und schaut
+ 4650 print"sie grimmig an!
+ 4670 gosub100:ifv=12ands=22thengoto4700
+ 4680 goto900
+ 4700 print"{down}der gorilla tippt sich an den kopf und
+ 4710 print"verschwindet wieder im dschungel.":return
+ 5000 printspc(9)"{grn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{grn} "
+ 5001 printspc(9)"{gry1}{CBM-M}{brn}{rvon} {rvof}{CBM-Y}{CBM-U}{rvon}{CBM-O}{CBM-P}{CBM-O}{CBM-I}{rvof}{CBM-U}{CBM-Y}M{CBM-P} {grn}        {gry1}{CBM-G}"
+ 5002 printspc(9)"{CBM-M}{brn}{rvon} {grn}{rvof}{CBM-T}{CBM-Y}{CBM-U}M EFRN M{brn}        {gry1}{CBM-G}"
+ 5003 printspc(9)"{CBM-M}{brn}{rvon} {CBM-U}{rvof}{CBM-I}{CBM-O}{CBM-I}{CBM-I}{rvon}{CBM-U}{CBM-Y}{CBM-Y}{CBM-U}{rvof}{CBM-P}{CBM-@}{grn}{CBM-T}EDF{CBM-F}   {gry1}{CBM-G}"
+ 5004 printspc(9)"{CBM-M}{brn}{rvon}  {CBM-@}{CBM-P}{CBM-O}{CBM-I}{CBM-I}{rvof}{CBM-Y}{CBM-U}{rvon}{CBM-P} {CBM-@}{CBM-P}{CBM-O}{CBM-I}{rvof}{CBM-Y}{grn}{CBM-J}{orng}   {gry1}{CBM-G}"
+ 5005 printspc(9)"{CBM-M}{brn}{rvon} {grn}{rvof}   {yel} {grn}     {CBM-K}       {yel} {grn} {gry1}{CBM-G}"
+ 5006 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M}{yel}{rvof}HTGG{grn}    {lgrn} {grn}{CBM-K}     {yel}Y TY{gry1}{CBM-G}"
+ 5007 printspc(9)"{CBM-M}{brn}{rvon} {yel}{rvof}BBBH {grn}   {lgrn} {grn}{CBM-J}    {yel}HYBBB{gry1}{CBM-G}"
+ 5008 printspc(9)"{CBM-M}{brn}{rvon} {yel}{rvof}BHGB {grn}    {CBM-G}    {yel}HBBBB{gry1}{CBM-G}"
+ 5009 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M}{yel}{rvof}BBBBB{orng}    {grn}{CBM-G}{orng}    {yel}BBBBB{gry1}{CBM-G}"
+ 5010 printspc(9)"{CBM-M}{brn}{rvon} {gry1}{rvof}{CBM-I}{rvon}{CBM-U}{CBM-U}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-T}{CBM-T}{CBM-T} {CBM-T}{CBM-T}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-U}{CBM-U}{rvof}{CBM-I}{CBM-O}{CBM-G}"
+ 5011 printspc(9)"{CBM-M}{brn}{rvon} {gry1}                   {rvof}{CBM-G}"
+ 5012 printspc(9)"{CBM-M}{brn}{rvon} {gry1}{rvof}{CBM-U}{rvon}{CBM-I}{CBM-I}{CBM-O}{CBM-O}{CBM-O}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-O}{CBM-O}{CBM-O}{CBM-I}{CBM-I}{rvof}{CBM-U}{CBM-Y}{CBM-G}"
+ 5013 printspc(9)"{CBM-M}{brn}{rvon}{CBM-M}{grn}{rvof}                   {gry1}{CBM-G}"
+ 5014 printspc(9)"{CBM-M}{brn}{rvon} {grn}{rvof}                   {gry1}{CBM-H}"
+ 5015 printspc(9)"{CBM-M}{brn}{rvon} {grn}{rvof}                   {gry1}{CBM-G}"
+ 5016 printspc(9)"{grn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{grn} "
+ 5019 ra=5:og=1:ug=1
+ 5020 print"{grn}sie befinden sich am fuss eines baumes. noerdlich von ihnen liegt ein 6
+ 5030 print"{left}{left}{left}{left}{left}{left}{left}{left}meter   breiter,mit schilf bewachsener sumpf.
+ 5040 print"an der mitte eines astes haengt eine    liane mitten ueber dem sumpf.
+ 5050 gosub760
+ 5120 ifsc=0thenprint"{wht}{down}moegliche richtungen : o"
+ 5122 ifsc=1thenprint"{wht}{down}moegliche richtungen : n,o"
+ 5125 gosub750
+ 5130 gosub100
+ 5135 ifs=5thengoto5000
+ 5140 onrgoto5600,5160,5160,2000,5160,5160
+ 5150 goto5300
+ 5160 gosub701
+ 5300 ifv=13then900
+ 5310 ifbu=0ands=2andsp$(4)<>""andv=14thengosub5700
+ 5320 ifbu=1ands=18andv=11thengosub5710
+ 5499 gosub777
+ 5500 goto5130
+ 5600 ifsc=1then5720
+ 5610 goto5160
+ 5700 print"{down}sie haben pech!der baum faellt entlang
+ 5702 print"{down}des ufers.der ast mit der liane steht
+ 5704 print"{down}senkrecht in die luft.":bu=1:q=1
+ 5705 print"{down}das beil ist zerbrochen .":sp$(4)="":wi=wi-1
+ 5706 return
+ 5710 print"{down}die liane verfaengt sich im schilf!":sc=1:q=1:goto5122
+ 5720 print"{down}geschafft!sie sind auf der anderen seite
+ 5730 print"{down}{up}die liane ist aber abgerissen.":gosub750:goto6000
+ 6000 printspc(9)"{grn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{grn}{gry1}"
+ 6002 printspc(9)"{gry1}{CBM-M}{grn}                    {gry1}{CBM-G}"
+ 6003 printspc(9)"{CBM-N} {gry1}{grn}                   {gry1}{CBM-G}"
+ 6004 printspc(9)"{CBM-M}{grn}     {rvon}{CBM-+}{rvof}{CBM--}             {gry1}{CBM-G}"
+ 6005 printspc(9)"{CBM-M}{grn}   {CBM-POUND}{CBM-+}{rvon} {rvof}{CBM-+} {rvon}{CBM-POUND}{rvof}{CBM-POUND}          {gry1}{CBM-G}"
+ 6006 printspc(9)"{CBM-M}{grn}  {yel}Q{grn}  {rvon}{CBM-+}{CBM-POUND}{CBM--}{rvof} {CBM--}{yel}Q{grn}         {gry1}{CBM-G}"
+ 6007 printspc(9)"{CBM-M}{grn}  {CBM-POUND}{rvon}{CBM-POUND}{CBM--}{CBM-POUND}{yel}{rvof}Q{grn}{rvon}{CBM--}{rvof}{CBM-POUND}{CBM-POUND}          {gry1}{CBM-G}"
+ 6008 printspc(9)"{CBM-M}{grn}  {CBM--} {rvon}{CBM-+}{CBM-POUND}{CBM--}{CBM-POUND}{rvof}  {CBM--}         {gry1}{CBM-G}"
+ 6009 printspc(9)"{CBM-M}{grn} {yel}Q {grn}{rvon}{CBM-POUND}{CBM-POUND}{yel}{rvof}Q{grn}{rvon}{CBM-+}{CBM--}{CBM-POUND}{rvof} {yel}Q{grn}         {gry1}{CBM-G}"
+ 6010 printspc(9)"{CBM-M}{grn}  {rvon}{CBM-+}{rvof} {rvon}{CBM--}{CBM-+}{CBM-POUND}{rvof} {rvon}{CBM--}{rvof}{CBM-POUND}          {gry1}{CBM-G}"
+ 6011 printspc(9)"{CBM-M}{grn}  {rvon}{CBM--}{rvof} {yel}Q{grn}{rvon}{CBM--}{CBM--}{CBM--}{rvof}{CBM-POUND} {CBM--}         {gry1}{CBM-G}"
+ 6012 printspc(9)"{CBM-M}{grn}  {yel}Q{grn}  {rvon}{CBM-+}{CBM--}{rvof}  {CBM--}{yel}Q{grn}         {gry1}{CBM-G}"
+ 6013 printspc(9)"{CBM-M}{grn}    {CBM-+}{rvon}{CBM-POUND}{CBM-+}{rvof}  {yel}Q{grn}          {gry1}{CBM-G}"
+ 6014 printspc(9)"{CBM-M}{brn}{rvon}{CBM-Y}{CBM-T}U   I{CBM-T}{CBM-Y}{CBM-U}{CBM-Y}{CBM-T}U I{CBM-T}{CBM-Y}{CBM-U}{CBM-U}{CBM-Y}{gry1}{rvof}{CBM-G}"
+ 6015 printspc(9)"{CBM-M}{brn}{rvon} J  U     I    K    {gry1}{rvof}{CBM-G}"
+ 6016 printspc(9)"{CBM-M}{brn}{rvon}   K   U     I   J  {gry1}{rvof}{CBM-G}"
+ 6017 printspc(9)"{brn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{brn} "
+ 6019 ra=6:og=12:ug=11
+ 6020 print"{grn}sie stehen vor einem wildstrauch.
+ 6030 gosub760
+ 6120 print"{wht}{down}moegliche richtungen : w,o"
+ 6130 gosub100
+ 6135 ifs=5thengoto6000
+ 6140 onrgoto6160,6160,7000,8000,6160,6160
+ 6150 goto6300
+ 6160 gosub701
+ 6300 ifv=6ands=12thenra$(6,5)=g$(5):gosub760:q=1
+ 6499 gosub777
+ 6500 goto6130
+ 7000 printspc(9)"{gry1} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+ 7001 printspc(9)"{CBM-M}{blu}              {grn}      {gry1}{CBM-G}"
+ 7002 printspc(9)"{CBM-M}{blu}  {grn}  {blu}            {orng}{CBM-@}{CBM-P}RF{gry1}{CBM-G}"
+ 7003 printspc(9)"{CBM-M}{blu} {grn} {blu}      {orng}{CBM-@}RF{SHIFT-*}CDE{CBM-T}{grn}  {gry1}.{grn} {gry1}{CBM-G}"
+ 7004 printspc(9)"{CBM-M}{orng}{CBM-@}RF{SHIFT-*}CDE{CBM-T}{gry1}.{orng} {blu} {gry1}.{blu} {gry1}.{blu} {gry1}.{blu} {gry1}.{blu} {grn} {gry1}{CBM-G}"
+ 7005 printspc(9)"{CBM-M}.{grn}  {gry1}.{gry3} {gry1}.{orng} {gry3} {orng} {gry3} {gry1}.{gry3} {gry1}.{gry3}     {gry1}.{gry3} {gry1}{CBM-G}"
+ 7006 printspc(9)"{CBM-M}{grn} {gry1}.{grn}  {gry3} {grn} {gry1}.{gry3} {gry1}.{gry3}    {grn} {gry1}.{grn}  {gry1}.{grn}  {gry1}{CBM-G}"
+ 7007 printspc(9)"{CBM-M}{grn}   {gry3} {gry1}.{gry3}{rvon}{SHIFT-POUND}    {rvof}{SHIFT-POUND}{grn} {gry1}. {grn} {gry1}.{grn}    {gry1}{CBM-G}"
+ 7008 printspc(9)"{CBM-M}{grn} {gry1} {gry3} {gry1}.{grn} {gry3}O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{rvon} {rvof} {grn} {gry1}.{grn}    {gry1} .{CBM-G}"
+ 7009 printspc(9)"{CBM-M}{grn} {gry1}.{grn}  {orng} {gry3}{CBM-H} {red}{SHIFT-+}{gry3}  {rvon} {grn}{rvof}     {gry1}.{grn} {gry1}.{grn} {gry1}{CBM-G}"
+ 7010 printspc(9)"{CBM-M}{gry3} {gry1} {grn}   {gry3}L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-POUND}{grn} {gry1}.{grn} {gry1}.{grn}  {orng}{CBM-@}{CBM-P}{CBM-O}{gry1}{CBM-G}"
+ 7011 printspc(9)"{CBM-M}{orng} {gry1}.{orng} {gry1}.{orng}    {gry1}.{orng}{CBM-@}{CBM-P}{CBM-O}{CBM-I}{rvon}{CBM-U}{CBM-T}{CBM-T} .  {gry1}{rvof}{CBM-G}"
+ 7012 printspc(9)"{CBM-M}{orng} {CBM-@}{CBM-P}{CBM-O}{CBM-I}{rvon}{CBM-U}{CBM-Y}{CBM-Y}   .  .   . {gry1}{rvof}{CBM-G}"
+ 7013 printspc(9)"{CBM-M}{orng}{rvon}  .   .  .  .   .   {gry1}{rvof}{CBM-G}"
+ 7014 printspc(9)"{CBM-M}{orng}{rvon}    .    .    .   . {gry1}{rvof}{CBM-G}"
+ 7015 printspc(9)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{orng} "
+ 7019 ra=7:og=1:ug=1
+ 7020 print"{grn}sie sind an der westkueste der insel.
+ 7030 print"am strand steht eine an land geschwemmte
+ 7040 print"{up}metallkiste.
+ 7050 gosub760
+ 7120 print"{wht}{down}moegliche richtungen : o"
+ 7125 gosub750
+ 7130 gosub100
+ 7135 ifs=5thengoto7000
+ 7140 onrgoto7160,7160,7160,6000,7160,7160
+ 7150 goto7300
+ 7160 gosub701
+ 7300 ifv=7ands=15andok=1thengosub709
+ 7310 ifv=7ands=15andok=0thengosub7600:ok=1:q=1
+ 7320 ifv=10ands=15andok=0thengosub710
+ 7330 ifv=10ands=15andok=1thengosub705:ok=0
+ 7340 ifv=15ands=15andvs=0thengoto7700
+ 7350 ifs=23andv=20andok=1andvs=0thengoto900
+ 7360 ifs=23andvs=0andv=11andok=1andkg=1thengosub7800:q=1
+ 7499 gosub777
+ 7500 goto7130
+ 7600 ifvs=0thenprint"{wht}{down}auf dem inhalt der kiste sitzt eine "
+ 7610 ifvs=0thenprint"grosse,schwarze vogelspinne!":return
+ 7620 gosub705:ok=1:return
+ 7700 print"{down}der inhalt und die spinne fallen heraus.
+ 7702 print"{up}die vogelspinne krabbelt an ihrem bein
+ 7710 print"hoch!!":d=ti:li=500:za=1:gosub100:goto900
+ 7800 print"{down}die spinne laeuft davon!":vs=1
+ 7810 ra$(7,6)=g$(6):ra$(7,7)=g$(7):gosub760:return
+ 8000 printspc(9)"{orng} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{orng} "
+ 8001 printspc(9)"{gry1}{CBM-M}{rvon}  {rvof}{CBM-N}{rvon}  {CBM-M}     {CBM-G}   {CBM-M}  {CBM-G} {rvof}{CBM-G}"
+ 8002 printspc(9)"{CBM-M}{rvon}  {rvof}{CBM-L}{rvon}  Y {gry2}JK{gry1}  G  {CBM-G} {CBM-H} G {rvof}{CBM-G}"
+ 8003 printspc(9)"{CBM-M}{rvon}  G  HB    {CBM-L}  T{CBM-L}{CBM-G} B {rvof}{CBM-G}"
+ 8004 printspc(9)"{CBM-M}{rvon}  B  {SHIFT--} {CBM-G} {gry2}JK{gry1} {CBM-B} G{CBM-M}{CBM-K} {CBM-M} {rvof}{CBM-G}"
+ 8005 printspc(9)"{CBM-M}{rvon}  T{CBM-G} B B      B {CBM-H} Y {rvof}{CBM-G}"
+ 8006 printspc(9)"{CBM-M}{rvon} {CBM-M}{CBM-G}{CBM-B} {CBM-J} H  {gry2}JK{gry1}  {rvof}{CBM-K}{rvon} G H {rvof}{CBM-G}"
+ 8007 printspc(9)"{CBM-M}{rvon} {CBM-N}{CBM-J} B{CBM-H}        {CBM-M}{CBM-H}  H {rvof}{CBM-G}"
+ 8008 printspc(9)"{CBM-M}{rvon} {CBM-L}{CBM-H} Y{CBM-J} {gry2}JK{gry1}      {CBM-K}  G {rvof}{CBM-G}"
+ 8009 printspc(9)"{CBM-M}{rvon} {rvof}{CBM-K}{rvon}{CBM-G} {CBM-L}{CBM-G}         {CBM-M}  T {rvof}{CBM-G}"
+ 8010 printspc(9)"{CBM-M}{rvon} {rvof}{CBM-J}{rvon}  G     {gry2}JK{gry1}    {CBM-G} T {rvof}{CBM-G}"
+ 8011 printspc(9)"{CBM-M}{rvon} B  {CBM-G}          HG {CBM-H} {rvof}{CBM-G}"
+ 8012 printspc(9)"{CBM-M}{rvon} G {CBM-N}{CBM-G}   {gry2}JK{gry1}     {SHIFT--}B {CBM-H}{CBM-G}{rvof}{CBM-G}"
+ 8013 printspc(9)"{CBM-M}{rvon} G {CBM-N}{CBM-B}   {CBM-M}  {gry2}JK{gry1}  G{rvof}{CBM-K}{rvon}{CBM-M} {CBM-G}{rvof}{CBM-G}"
+ 8014 printspc(9)"{CBM-M}{rvon} T Y G  {rvof}{CBM-K}{rvon}      {CBM-G}{CBM-M}{CBM-M} G{rvof}{CBM-G}"
+ 8015 printspc(9)"{CBM-M}{rvon} {CBM-G} H {rvof}{CBM-J}{rvon}  {rvof}{CBM-J}{rvon}     {CBM-M}{CBM-G} {rvof}{CBM-N}{rvon} B{rvof}{CBM-G}"
+ 8016 printspc(9)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T} "
+ 8019 ra=8:og=1:ug=1
+ 8020 print"{grn}sie stehen vor einer felswand mit
+ 8030 print"spalten ,an der fusstritte sind.
+ 8050 gosub760
+ 8120 print"{wht}{down}moegliche richtungen : w,hinauf"
+ 8130 gosub100
+ 8135 ifs=5thengoto8000
+ 8140 onrgoto8160,8160,6000,8160,8600,8160
+ 8150 goto8299
+ 8160 gosub701
+ 8299 gosub777
+ 8300 goto8130
+ 8600 iffh=1thengoto9000
+ 8602 iffh=0thenprint"{down}{wht}sie steigen die wand hinauf.
+ 8610 iffh=0thenprint"{down}ploetzlich kommt von oben ein hagel von
+ 8620 iffh=0thenprint"felsbrocken auf sie zu!!":fh=1:d=ti:li=3600:za=1
+ 8625 gosub100
+ 8630 ifs=33thenprint"{down}der steinhagel faellt an ihnen vorbei!":goto8650
+ 8640 goto900
+ 8650 za=0:gosub100
+ 8660 ifv=18thengosub705:goto8700
+ 8665 ifv=13thengoto8680
+ 8670 goto8650
+ 8680 ra=9:goto900
+ 8700 print"{down}sie stehen wieder in der wand."
+ 8710 gosub100
+ 8720 onrgoto8730,8730,8730,8730,9000,8000
+ 8725 goto8735
+ 8730 gosub701
+ 8735 gosub777
+ 8740 goto8710
+ 9000 printspc(9)"{grn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{grn} "
+ 9001 printspc(9)"{gry1}{CBM-M}{gry3}     {gry2}{rvon}{SHIFT-POUND}N//NN / /N  N {gry1}{rvof}{CBM-G}"
+ 9002 printspc(9)"{CBM-M}{gry3}    {gry2}{rvon}{SHIFT-POUND}NFDD{CBM-Y}DDC{CBM-P}N  N  {gry1}{rvof}{CBM-G}"
+ 9003 printspc(9)"{CBM-M}{gry3}    {gry2}{rvon}F{CBM-Y}  {CBM-P}{CBM-I}{CBM-O}{CBM-P}  {CBM-B} N   {gry1}{rvof}{CBM-G}"
+ 9004 printspc(9)"{CBM-M}{gry3}   {gry2}{rvon}{SHIFT-POUND}  {rvof}O {blu} Y {wht}{CBM--}{gry2}{CBM-C}{rvon}  G   N{gry1}{rvof}{CBM-G}"
+ 9005 printspc(9)"{CBM-M}{gry3}  {gry2}{CBM-D}{rvon}  {rvof}{CBM-V}  {blu} T{gry2} {wht}{CBM-Z}L{gry2}{CBM-L}{rvon} H  N {gry1}{rvof}{CBM-G}"
+ 9006 printspc(9)"{CBM-M}{gry3}  {gry2}{rvon}{CBM-H} {CBM-L}{rvof}   {blu}{CBM-M}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{gry2}{rvon}  {CBM-G}N  {gry1}{rvof}{CBM-G}"
+ 9007 printspc(9)"{CBM-M}{gry3}  {gry2}{rvon}  {rvof}    {blu}/ {yel}{rvon}{SHIFT-POUND}X{rvof}{SHIFT-POUND}M{gry2}{rvon}{CBM-J} B  /{gry1}{rvof}{CBM-G}"
+ 9008 printspc(9)"{CBM-M}{gry3} {gry2}{CBM-M}{rvon} {CBM-L}{yel}{rvof}   {blu}/ {yel}{rvon}{SHIFT-POUND}{CBM-T}{CBM-T}{CBM-*}{rvof}N{gry2}{CBM-N}{rvon} H / {gry1}{rvof}{CBM-G}"
+ 9009 printspc(9)"{CBM-M}{lred} {gry2}{CBM-L}{rvon} {rvof}{CBM-K}{yel}  {blu}/        {gry2}{rvon} {CBM-M}/  {gry1}{rvof}{CBM-G}"
+ 9010 printspc(9)"{CBM-M}{lred} {gry2}{CBM-L}{rvon} {rvof}{CBM-J}{yel} {blu}/{gry1}         {gry2}{rvon}{CBM-H} {CBM-G}  {gry1}{rvof}{CBM-G}"
+ 9011 printspc(9)"{CBM-M}{lred} {gry2}{rvon}{CBM-K} {rvof}{CBM-G}{blu}/{gry1} {blu}      {gry2}   {rvon}{CBM-J} {CBM-H} /{gry1}{rvof}{CBM-G}"
+ 9012 printspc(9)"{CBM-M}{lred} {gry2}{rvon}{CBM-K} {blu}{rvof}/{gry1}        {blu}  {gry2} {rvon}{CBM-K} G/ {gry1}{rvof}{CBM-G}"
+ 9013 printspc(9)"{CBM-M}{rvon}{SHIFT-POUND},  . ,   ,  . , . ,{rvof}{CBM-G}"
+ 9014 printspc(9)"{CBM-M}{rvon}.  , .  , . ,   .  {rvof}{SHIFT-POUND}{CBM-G}"
+ 9015 printspc(9)"{CBM-M}{rvon}   .  , .  .    , {rvof}{SHIFT-POUND} {CBM-G}"
+ 9016 printspc(9)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T} "
+ 9019 ra=9:og=1:ug=1
+ 9020 print"{grn}sie stehen vor dem eingang einer hoehle
+ 9050 gosub760
+ 9120 print"{wht}{down}moegliche richtungen : n,o,runter"
+ 9130 gosub100
+ 9135 ifs=5thengoto9000
+ 9140 onrgoto10000,9160,9160,11000,9160,8000
+ 9150 goto9299
+ 9160 gosub701
+ 9299 gosub777
+ 9300 goto9130
+10000 printspc(9)"{gry1} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+10001 printspc(9)"{CBM-M}{blu}       {wht} {CBM-G}{blu}        {CBM-N}  {gry1}{CBM-G}"
+10002 printspc(9)"{CBM-M}{wht}{rvon}{CBM-POUND}{CBM-POUND}{rvof}   {rvon}{CBM-POUND}{CBM-POUND}{rvof} B        {blu}{CBM-M}{wht}  {gry1}{CBM-G}"
+10003 printspc(9)"{CBM-M}{blu}  {wht}{rvon}{SHIFT-POUND} {CBM-*}{blu}{rvof}   {wht}{CBM-G}{blu}    {wht} {blu}   {CBM-N}  {gry1}{CBM-G}"
+10004 printspc(9)"{CBM-M}{wht} M   N B         {blu}{CBM-M}{wht}  {gry1}{CBM-G}"
+10005 printspc(9)"{CBM-M}{wht}{CBM-G} {rvon}{CBM-R}{CBM-R}{CBM-R}{blu}{rvof}  {wht}{CBM-G}{blu}   {wht} {blu}     {CBM-N}  {gry1}{CBM-G}"
+10006 printspc(9)"{CBM-M}{wht}{SHIFT--}{gry1}{CBM-M}{wht}{rvon}{CBM-E}{CBM-E}{CBM-E}{rvof} B{blu}  {wht}  {blu}      {CBM-N} {wht} {gry1}{CBM-G}"
+10007 printspc(9)"{CBM-M}{wht}{CBM-M}N   M{CBM-G}          {blu}{CBM-M}{wht}  {gry1}{CBM-G}"
+10008 printspc(9)"{CBM-M}{blu} {wht}EF{blu} {wht}FE{yel} {CBM-I}DE{CBM-T}{CBM-T}ED{CBM-I}{blu} {yel} {blu}{CBM-N}{yel}  {gry1}{CBM-G}"
+10009 printspc(9)"{CBM-M}{blu}   {wht}{CBM-T}{blu}  {yel} MEDCCDEN{blu} {yel} {blu}{CBM-N}  {gry1}{CBM-G}"
+10010 printspc(9)"{CBM-M}{blu}      {yel}  M{CBM-P}{CBM-@}{CBM-@}{CBM-P}N {blu} {yel} {blu}{CBM-N}  {gry1}{CBM-G}"
+10011 printspc(9)"{CBM-M}{blu}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{yel}{rvon}{SHIFT-POUND} {rvof}L  {SHIFT-@}{rvon} {rvof}{SHIFT-POUND}M{blu}{CBM-P}{SHIFT-@}  {gry1}{CBM-G}"
+10012 printspc(9)"{CBM-M}{blu}     {yel} {rvon}{SHIFT-POUND}      {rvof}{SHIFT-POUND}  M{blu} M {gry1}{CBM-G}"
+10013 printspc(9)"{CBM-M}   {blu} {yel} {rvon}{SHIFT-POUND}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-*}{rvof}   M{blu} M{gry1}{CBM-G}"
+10014 printspc(9)"{CBM-M}{blu}   {yel} {rvon}{SHIFT-POUND} ZZW WZZ {CBM-*}{blu}{rvof} {yel} N{blu}  {gry1}{CBM-G}"
+10015 printspc(9)"{CBM-M}{blu}  {yel} {rvon}{SHIFT-POUND}     W     {CBM-*}{rvof}N{blu}   {gry1}{CBM-G}"
+10016 printspc(9)"{CBM-M}                    {CBM-G}"
+10017 printspc(9)"{blu} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{blu} "
+10019 ra=10:og=13:ug=13
+10020 print"{grn}sie stehen in einem goetzentempel.
+10030 print"auf dem altar befindet sich eine schale
+10040 print"aus gold.
+10100 gosub760
+10120 print"{wht}{down}moegliche richtungen : s{down}"
+10125 gosub750
+10130 gosub100
+10135 ifs=5thengoto10000
+10140 onrgoto10160,9000,10160,10160,10160,1160
+10150 goto10300
+10160 gosub701
+10300 ifv=6ands=13thengosub10600
+10310 ifv=1andsp$(8)<>""andwa=0thengosub10700
+10499 gosub777
+10500 goto10130
+10600 ifr8=0thenprint"{down}die schale enthaelt edelsteine.
+10610 ifr8=0thenra$(10,8)=g$(8):gosub760:r8=1
+10620 q=1:return
+10700 ifwa=0thengosub10705
+10702 q=1:return
+10705 print"{down}der alter beginnt im boden zu verschwin-
+10710 print"{up}den.vor den ausgang schiebt sich eine
+10720 print"mauer!die waende beginnen sich auf ein-
+10730 print"ander zu zubewegen!!":wa=1:d=ti:li=2400:za=1
+10740 print"{down}moegliche richtungen: keine
+10750 print"{down}sie sind gefangen!
+10760 gosub100
+10770 onrgoto10790,10790,10790,10790,10790,10790
+10780 goto10800
+10790 gosub701
+10800 ifv=23ands=25thengoto10900
+10805 ift=1thengoto900
+10810 gosub777
+10820 goto10760
+10900 za=0:t=0
+10910 print"{down}die waende gehen zurueck.der ausgang istfrei!":goto10120
+11000 printspc(9)"{grn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+11001 printspc(9)"{CBM-M}{grn}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}        {gry1}{CBM-G}"
+11002 printspc(9)"{CBM-M}{grn}           NM       {gry1}{CBM-G}"
+11003 printspc(9)"{CBM-M}{orng}I{grn} {orng}U  U{grn}  {orng}J{grn} N {gry2} {grn}M      {gry1}{CBM-G}"
+11004 printspc(9)"{CBM-M}{grn} {orng}U  {grn}  {orng}U{grn}  N  {gry2} {grn} M     {gry1}{CBM-G}"
+11005 printspc(9)"{CBM-M}{orng}XXXXXXXX{gry1}{CBM-P}{CBM-P}{grn}     M    {gry1}{CBM-G}"
+11006 printspc(9)"{CBM-M}{grn}        {gry1} N{CBM-H}{grn}     M   {gry1}{CBM-G}"
+11007 printspc(9)"{CBM-M}{grn}        {gry1}N{grn} {gry1}L{CBM-P}{grn}     M  {gry1}{CBM-G}"
+11008 printspc(9)"{CBM-M}{grn}     {gry1}  N{grn} {gry1}/{grn} {gry1}N{CBM-H}{grn}     M {gry1}{CBM-G}"
+11009 printspc(9)"{CBM-N}{orng}XXXX{grn} {gry1} N{grn} {gry1}/{grn} {gry1}N{grn} {gry1}L{CBM-P}{grn}     M{gry1}{CBM-G}"
+11010 printspc(9)"{CBM-N}{orng}I{grn}  N{gry1}{CBM-Y}P /{grn} {gry1}N{grn} {gry1}/ N{CBM-H}{grn}     {gry1}{CBM-G}"
+11011 printspc(9)"{CBM-N}{grn} {orng}U{grn}N{wht} {gry2} {gry1}{CBM-N}/ N /{grn} {gry1}N L{CBM-P}{grn}    {gry1}{CBM-G}"
+11012 printspc(9)"{CBM-N}{grn} N{lblu} {grn} {gry2} {grn} {gry1}{CBM-Y}P /{grn} {gry1}N / N{CBM-H}{grn}   {gry1}{CBM-G}"
+11013 printspc(9)"{CBM-N}{grn}N{gry1} {lblu} {grn} {gry2} {grn}  {gry1}{CBM-M}/ N / N{grn} {gry1}L{CBM-P}{grn}  {gry1}{CBM-G}"
+11014 printspc(9)"{CBM-N}{grn}    {gry2} {grn}   {gry1}{CBM-Y}P / N / N{CBM-H}{grn} {gry1}{CBM-G}"
+11015 printspc(9)"{CBM-M}{grn}    {gry2} {grn}    {gry1}{CBM-N}/ N{grn} {gry1}/{grn} {gry1}N{grn} {gry1}L{grn} {gry1}{CBM-G}"
+11016 printspc(9)"{grn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{grn} "
+11019 ra=11:og=1:ug=1
+11020 print"{grn}vor ihnen fuehrt eine treppe auf einer
+11021 print"schraegen rampe nach unten.
+11050 gosub760
+11120 print"{wht}{down}moegliche richtungen : w,runter"
+11125 gosub750
+11130 gosub100
+11135 ifs=5thengoto11000
+11136 ifv=24ands=26andr=6thengoto11500
+11137 ifv=11andg=8andsp$(8)<>""andr=6thengosub705:gosub11450
+11138 ifv=11andr=6org<>0andr=6thenr=0
+11140 onrgoto11160,11160,9000,11160,11160,11400
+11150 goto11299
+11160 gosub701
+11299 gosub777
+11300 goto11130
+11400 print"{down}sie gehen die treppe hinunter.
+11410 print"{down}ploetzlich beginnt die treppe unter
+11420 print"{down}ihnen einzustuerzen!!
+11430 d=ti:li=600:za=1:gosub100
+11435 ifv=13thenza=0:t=0:goto11500
+11440 goto900
+11450 sp$(8)="":ra$(18,8)=g$(8):wi=wi-1:r=0:return
+11500 rem *** raum 11500 *******************************************************
+11519 ra=18:og=1:ug=1
+11520 print"{grn}{down}{down}sie befinden sich am fuss der treppe.
+11530 print"ein pfad verlaeuft nach norden.
+11550 gosub760
+11600 print"{wht}{down}moegliche richtungen : n{down}"
+11610 gosub100
+11620 onrgoto12000,11640,11640,11640,11640,11640
+11625 ifs=5thengoto11500
+11630 goto11645
+11640 gosub701
+11645 gosub777
+11650 goto11610
+12000 printspc(9)"{orng} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{orng} "
+12001 printspc(9)"{gry1}{CBM-M}{orng} {grn}{CBM-B}{rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-B}{rvof}{CBM-B}{orng}          {gry1}{CBM-G}"
+12002 printspc(9)"{CBM-M}{grn}{rvon}{CBM-B}{CBM-B}{rvof}{CBM-POUND}{rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{rvof}{CBM-POUND}{rvon}{CBM-B}{rvof}{CBM-B}{CBM-B}{orng}         {gry1}{CBM-G}"
+12003 printspc(9)"{CBM-M}{grn} {CBM-B}{rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-B}{CBM-B}{rvof}          {gry1}{CBM-G}"
+12004 printspc(9)"{CBM-M}{grn}{rvon}{CBM-B}{CBM-+}{rvof}{CBM--}{rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{rvof}{CBM--}{rvon}{CBM-+}{rvof}{CBM-B}{CBM-B}         {gry1}{CBM-G}"
+12005 printspc(9)"{CBM-M}{grn}{CBM-B}{rvon}{CBM-B}{CBM-B}{CBM-B}{brn}{CBM-K}{grn}{rvof}{CBM-B}{brn}{CBM-K}{grn}{CBM-B}{CBM-B}{CBM-B}          {gry1}{CBM-G}"
+12006 printspc(9)"{CBM-M}{grn} {CBM-B}{rvon}{CBM-B}{rvof} {CBM-B}{brn}{rvon}B{grn}{CBM-B}{rvof} {CBM-B}{rvon}{CBM-B}{rvof}{CBM-B}         {gry1}{CBM-G}"
+12007 printspc(9)"{CBM-M}{grn}    {brn}{rvon}{CBM-J}B{CBM-L}{grn}{rvof}             {gry1}{CBM-G}"
+12008 printspc(9)"{CBM-M}{grn}    {brn}{rvon}{CBM-J}B{CBM-L}{grn}{rvof}         {orng}    {gry1}{CBM-G}"
+12009 printspc(9)"{CBM-M}{grn}    {brn}{rvon}{CBM-J}B{CBM-L}{grn}{rvof}             {gry1}{CBM-G}"
+12010 printspc(9)"{CBM-M}{orng}{CBM-@}{grn}   {brn}{rvon}{CBM-J}G{CBM-L}{grn}{rvof}             {gry1}{CBM-G}"
+12011 printspc(9)"{CBM-M}{orng}{CBM-T}{CBM-Y}ED{brn}{rvon}{CBM-H}G{CBM-M}{orng}{rvof}CDE{CBM-Y}EDC{SHIFT-*}FRFCD{gry1}{CBM-G}"
+12012 printspc(9)"{CBM-M}{grn}    {brn}{rvon}{CBM-H}T{CBM-N}{grn}{rvof}             {gry1}{CBM-G}"
+12013 printspc(9)"{CBM-M}{orng}{rvon} {CBM-T}{CBM-Y}{CBM-T}.  .{CBM-T}{CBM-Y}{CBM-U}{rvof}{CBM-I}{CBM-O}{CBM-I}{rvon}{CBM-U}{rvof}{CBM-I}{CBM-O}{CBM-I}{rvon}{CBM-U}{CBM-Y}{gry1}{rvof}{CBM-H}"
+12014 printspc(9)"{CBM-M}{orng}{rvon} .   .    .   .    .{gry1}{rvof}{CBM-G}"
+12015 printspc(9)"{CBM-M}{orng}{rvon}    .   .    .  .   {gry1}{rvof}{CBM-G}"
+12016 printspc(9)"{grn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{orng} "
+12019 ra=12:og=1:ug=1:we=0
+12020 print"{grn}hier steht ein baum der seltenen gattung
+12030 print"{up}'zypressus jacaranda'.
+12050 gosub760
+12120 print"{wht}{down}moegliche richtungen : n,s,o"
+12125 gosub750
+12130 gosub100
+12135 ifs=5thengoto12000
+12137 ifv=29ands=2andr=3thengosub12400:r=0
+12140 onrgoto17000,11500,12160,13000,12160,12160
+12150 goto12200
+12160 gosub701
+12200 ifv=30andwe=1andma=1thengosub12500
+12299 gosub777
+12300 goto12130
+12400 print"{down}sie stehen fuenf schritte westlich des
+12410 print"baumes.":q=1:we=1:return
+12500 print"{down}sie legen ein faltboot frei.":ra$(12,9)=g$(9):wl=1:gosub760
+12510 q=1:return
+13000 printspc(9)"{orng} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{orng} "
+13001 printspc(9)"{gry1}{CBM-M}    {CBM-G}               {CBM-G}"
+13002 printspc(9)"{CBM-M} {CBM-P}{CBM-P}{SHIFT-@}               {brn} {gry1}{CBM-G}"
+13003 printspc(9)"{CBM-M}{CBM-M}M  {CBM-T}DF{CBM-P}{CBM-@}  {brn}  {gry1}      {brn} {gry1}{CBM-G}"
+13004 printspc(9)"{CBM-M}{CBM-M} {CBM-T}DF{CBM-@}  {brn}UDI{gry1}{CBM-@}       {brn} {gry1}{CBM-G}"
+13005 printspc(9)"{CBM-M}{orng} {gry1}{CBM-G}{orng} {gry1}{CBM-G}{orng}  {gry1}E{brn}/{yel} {brn} /{gry1} {CBM-T}EDCFR{CBM-@}{CBM-@}{CBM-G}"
+13006 printspc(9)"{CBM-M} G{orng} {gry1}T{orng}  {brn}/{yel}  {brn}/{gry1}{CBM-Y}DCFR{CBM-P}{CBM-@}  {CBM-T}{CBM-G}"
+13007 printspc(9)"{CBM-M}{orng} {gry1}B{orng} {gry1}G{orng} {brn}/{grn}  {brn}/ {gry1}{CBM-G}{orng}      {gry1}{CBM-Y}ED{CBM-G}"
+13008 printspc(9)"{CBM-M}{orng} {gry1}Y{orng} {gry1}B{brn}/{grn}  {brn}/ {pur} {gry1}T{brn} {orng}   {gry1}T{orng}    {gry1}{CBM-G}"
+13009 printspc(9)"{CBM-M}{orng} {gry1}{CBM-M}{orng} {brn}/{grn}  {brn}/   {gry1}T{orng}    {gry1}T{orng}    {gry1}{CBM-G}"
+13010 printspc(9)"{CBM-M}{gry2}ED{brn}UDI/{orng}  {brn}  {gry1}G{brn} {orng}   {gry1}G{orng}    {gry1}{CBM-H}"
+13011 printspc(9)"{CBM-M}{orng}  {brn}JRK{gry2}EF{CBM-P}RFC{SHIFT-*}DEDCFRFC{gry1}{CBM-G}"
+13012 printspc(9)"{CBM-M}{brn} {gry2}.{brn}  {gry2}.{brn}      {gry2}.{brn}   {gry2}.   .{gry1}{CBM-G}"
+13013 printspc(9)"{CBM-M}{brn}   {gry2}.{brn}   {gry2}.{brn}         {gry2}.{brn}  {gry1}{CBM-G}"
+13014 printspc(9)"{CBM-M}{brn} {gry2}. {brn}  {gry2}.{brn}    {gry2}.{brn}  {gry2}.{brn} {gry2}    .{gry1}{CBM-H}"
+13015 printspc(9)"{CBM-M}{brn}       {gry2}.{brn}       {gry2}.{brn}  {gry2}.{brn} {gry1}{CBM-G}"
+13016 printspc(9)"{orng} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{orng} "
+13017 ifsh=0thenprint"{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}"
+13018 ifsh=0thenprintspc(17)"{yel}X{down}{left}{left}{grn}UK{down}{left}{left}{left}UK{down}{left}{left}{left}UK{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+13019 ra=13:og=1:ug=1
+13020 print"{grn}sie stehen vor einem baumstamm,der quer
+13030 print"ueber einer schlucht liegt.
+13050 gosub760
+13120 print"{wht}{down}moegliche richtungen : w,o"
+13125 gosub750
+13130 gosub100
+13135 ifs=5thengoto13000
+13140 onrgoto13160,13160,12000,13500,13160,13160
+13150 goto13200
+13160 gosub701
+13200 ifsh=0andv=2ands=11andra$(13,5)=g$(5)thengosub13400:q=1
+13210 ifsh=0andv=20thengoto13600
+13299 gosub777
+13300 goto13130
+13400 print"{down}die schlange frisst von den fruechten.{down}
+13410 print"sie kruemmt sich,verliert den halt und
+13420 print"faellt in die schlucht!":sh=1:ra$(13,5)="":return
+13500 ifsh=1thengoto14000
+13510 goto13600
+13600 print"{down}die auf dem baumstamm liegende schlange
+13601 print"hat sie gebissen!!
+13605 za=1:li=2000:d=ti:gosub100
+13610 ifv=32thengosub777:print"{down}sie haben keine spritze!":goto13605
+13620 goto900
+14000 printspc(9)"{gry1} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+14001 printspc(9)"{CBM-M}{grn}        {wht}{rvon}{SHIFT-POUND}  {CBM-*}{grn}{rvof}        {gry1}{CBM-G}"
+14002 printspc(9)"{CBM-M}{grn}   {gry1}/M{grn}  {gry2}N{wht} {CBM-T}{CBM-T}{grn} {gry2}M{grn}  {gry2} {grn}   {gry1}/{CBM-G}"
+14003 printspc(9)"{CBM-N}{grn}  {gry1}/{grn}  {gry1}M{gry2}N{grn}      {gry2}MNM{grn}  {gry1}/{grn} {gry1}{CBM-G}"
+14004 printspc(9)"{CBM-N}{grn} {gry1}/{grn}   {gry2}N{grn}       {gry2}N {grn} {gry2}M{gry1}/{grn}  {gry1}{CBM-G}"
+14005 printspc(9)"{CBM-N}/{grn}   {gry2}N{grn}       {gry2}N{grn}    {gry2}M{grn}  {gry1}{CBM-H}"
+14006 printspc(9)"{CBM-N}{grn}CFR{CBM-O}RFCFR{CBM-P}{CBM-@}{gry2}N{grn} {CBM-@}{CBM-P}RCDCR{gry1}{CBM-H}"
+14007 printspc(9)"{CBM-N}{grn}     {CBM-@}FD{CBM-T}  {CBM-T}{CBM-Y}{CBM-T}ECR{CBM-@}  {gry1}{CBM-H}"
+14008 printspc(9)"{CBM-N}{grn}{CBM-@}{CBM-P}{CBM-I}{CBM-O}{CBM-I}{CBM-O}{CBM-P}{CBM-@}{CBM-@}{CBM-P}{CBM-@}{CBM-P}{CBM-O}{CBM-I}{rvon}{CBM-U}{CBM-U}{CBM-Y}{CBM-U}{rvof}{CBM-I}{CBM-O}{gry1}{CBM-H}"
+14009 printspc(9)"{CBM-N}{grn}       {CBM-T} {orng} NM  {grn}      {gry1}{CBM-H}"
+14010 printspc(9)"{CBM-N}{grn}      {orng}  {grn} {orng}N  M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{gry1}{CBM-G}"
+14011 printspc(9)"{CBM-N}{grn}        {orng}N{grn}     {orng}Q{grn}  {orng}Q{grn} {orng}Q{gry1}{CBM-G}"
+14012 printspc(9)"{CBM-N}{grn}       {orng}N{grn}  {orng}Q Q{grn}   {orng}Q{grn} {orng}Q{grn} {gry1}{CBM-G}"
+14013 printspc(9)"{CBM-N}{grn}     {orng} N{grn} {orng}{rvon}{CBM-B}{grn}{rvof}   {wht} {orng}{rvon}{CBM-B}{wht}{rvof} {orng}Q{grn}  {orng} Q{gry1}{CBM-G}"
+14014 printspc(9)"{CBM-N}{grn}    {orng} N{grn}   {orng}{rvon}{CBM-B}{rvof} {rvon}{CBM-B}{rvof}    {CBM-P}{CBM-P}{CBM-P}{CBM-P}{gry1}{CBM-G}"
+14015 printspc(9)"{CBM-M}{grn}    {orng}N{grn}   {orng}   {grn}  {orng}Q{grn}  {orng}M{grn}   {gry1}{CBM-G}"
+14016 printspc(9)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{grn} "
+14019 ra=14:og=27:ug=27
+14020 print"{grn}hier teilt sich der weg.ein breiter weg
+14030 print"mit vielen fussabdruecken fuehrt nach
+14040 print"sueden,ein schmaler pfad nach osten.
+14050 gosub760
+14120 print"{wht}{down}moegliche richtungen : s,w,o"
+14125 gosub750
+14130 gosub100
+14135 ifs=5thengoto14000
+14140 onrgoto14160,15000,13000,14500,14160,14160
+14150 goto14200
+14160 gosub701
+14200 ifv=6ands=27thengosub14400
+14210 ifv=25andg=2orv=25ands=28thengosub14450
+14299 gosub777
+14300 goto14130
+14400 print"{down}auf dem boden liegt ein glimmendes stue-ck holz!":q=1:return
+14450 ifsp$(2)=""thenprint"{down}sie haben das nicht!":q=1:return
+14460 gosub705:print"die zuendschnur brennt!"
+14465 ifpa=0thenprint"{down}es ist aber kein pulver darin."
+14470 ifpa=1thenq=1:za=1:d=ti:li=3600:zu=1
+14480 return
+14500 ra=19:og=1:ug=1
+14520 print"{grn}{down}{down}sie stehen auf einer waldlichtung.
+14550 gosub760
+14600 print"{wht}{down}moegliche richtungen : s,w{down}"
+14606 gosub750
+14607 ifle=0thengoto14950
+14608 ifle=1thenprint"{down}auf dem boden liegt ein toter jaguar."
+14610 gosub100
+14620 onrgoto14640,16000,14000,14640,14640,14640
+14625 ifs=5thengoto14520
+14630 goto14849
+14640 gosub701
+14849 gosub777
+14850 goto14610
+14950 print"{down}ein jaguar taucht auf die lichtung auf.
+14951 print"{down}{down}er greift sie an!!":za=1:d=ti:li=3600:le=1
+14952 gosub100
+14953 ifv=20ands=29andsp$(1)<>""andg=1then14960
+14954 ra=14:goto900
+14960 print"{down}geschafft!aber der jaguar hat ihnen die
+14961 print"{down}pulsadern der linken hand aufgerissen!"
+14962 print"{down}sie drohen zu verbluten!!":d=ti
+14963 gosub100
+14964 ifv=26andg=6andsp$(6)<>""thengosub705:goto14970
+14965 gosub777:fori=0to3000:next
+14966 ra=16:goto900
+14970 print"{down}die blutung kommt zum stillstand.sie    sind gerettet!":za=0:goto14610
+15000 printspc(9)"{yel} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@} "
+15001 printspc(9)"{CBM-M}{grn}                    {gry1}{CBM-G}"
+15002 printspc(9)"{CBM-M}{grn}                    {gry1}{CBM-G}"
+15003 printspc(9)"{CBM-M}{grn}                    {gry1}{CBM-G}"
+15004 printspc(9)"{CBM-M}{grn}                    {gry1}{CBM-G}"
+15005 printspc(9)"{CBM-M}{grn}                    {gry1}{CBM-G}"
+15006 printspc(9)"{CBM-M}{grn}   {gry2}AAA{yel}NM{gry2}AAAAAA{yel}NM{gry2}AAA{grn} {gry1}{CBM-G}"
+15007 printspc(9)"{CBM-M}{grn}  {gry2}ABB{yel}N {grn} {yel}M{gry2}BBBB{yel}N{grn}  {yel}M{gry2}BBA{gry1}{CBM-G}"
+15008 printspc(9)"{CBM-M}{grn} {gry2}AB{grn} {yel}N   {grn} {yel}M{grn}  {yel} PEEO{grn}  {gry2}B{gry1}{CBM-G}"
+15009 printspc(9)"{CBM-N}{gry2}ABB{grn} {yel}PEDDEO{grn}   {yel}{CBM-N}UI{CBM-H}{grn}   {gry1}{CBM-G}"
+15010 printspc(9)"{CBM-M}{gry2}BB{grn}  {yel}{CBM-N}{grn} {yel}UI{grn} {yel}{CBM-H}{grn}  {brn}  {yel}{CBM-T}{CBM-T}{grn}    {gry1}{CBM-G}"
+15011 printspc(9)"{CBM-M}{gry2}B{grn}  I{yel}{CBM-M}{grn} {yel}BB{grn} {yel}{CBM-H}{grn}K {brn}Q{gry3} {grn}   I K{gry1}{CBM-G}"
+15012 printspc(9)"{CBM-M}{gry2}B{grn} U  {yel}{CBM-T}EE{CBM-T}{grn}  {brn}U{SHIFT-+}K{grn} J I  {gry1}{CBM-G}"
+15013 printspc(9)"{CBM-M}{grn}    K  I J {brn}{CBM-D}{CBM-E}{CBM-F}{grn}I   J {gry1}{CBM-G}"
+15014 printspc(9)"{CBM-M}{grn} K   U   I  U   K   {gry1}{CBM-G}"
+15015 printspc(9)"{CBM-M}                    {CBM-G}"
+15016 printspc(9)"{grn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{grn} "
+15019 ra=15
+15020 print"{grn}sie stehen vor dem eingang des kanniba-
+15030 print"lendorfes.
+15050 gosub760
+15120 print"{wht}{down}moegliche richtungen : n{down}"
+15125 gosub750
+15127 ifka=0thenprint"{down}die kannibalen haben sie entdeckt und   greifen sie an!"
+15129 q=1:ka=1:za=1:d=ti:li=3600
+15130 gosub100
+15135 ifs=5thengoto15000
+15140 onrgoto14000,15160,15160,15160,15160,15160
+15150 goto15300
+15160 gosub701
+15300 goto15130
+16000 printspc(9)"{grn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{grn} "
+16001 printspc(9)"{gry1}{CBM-M}{grn}                    {gry1}{CBM-G}"
+16002 printspc(9)"{CBM-M}{grn}                    {gry1}{CBM-G}"
+16003 printspc(9)"{CBM-M}{grn}        {yel}          {grn}  {gry1}{CBM-H}"
+16004 printspc(9)"{CBM-M}{grn}        {yel} {rvon}{SHIFT-POUND}    {rvof}{SHIFT-POUND}M{grn}    {gry1}{CBM-G}"
+16005 printspc(9)"{CBM-M}{grn}       {yel} {rvon}{SHIFT-POUND}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-*}{grn}{rvof} {yel}M{grn}   {gry1}{CBM-G}"
+16006 printspc(9)"{CBM-M}{grn}      {yel} {rvon}{SHIFT-POUND}ZZW WZZ{CBM-*}{grn}{rvof} {yel}M{grn}  {gry1}{CBM-G}"
+16007 printspc(9)"{CBM-M}{grn}     {orng} {yel}{rvon}{SHIFT-POUND}    W    {CBM-*}{rvof}N{grn}  {gry1}{CBM-G}"
+16008 printspc(9)"{CBM-N}{gry2}AAAAAA{orng}PPPPPPPPPP {CBM-G}{gry2}AA{gry1}{CBM-G}"
+16009 printspc(9)"{CBM-N}{gry2}BBBBBB{orng}{CBM-N}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{grn} {orng}{CBM-G}{gry2}HH{gry1}{CBM-H}"
+16010 printspc(9)"{CBM-N}{gry2}BBBBBB{orng}{CBM-N}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{grn} {orng}{CBM-G}{gry2}HH{gry1}{CBM-G}"
+16011 printspc(9)"{CBM-N}{orng}U{grn} {orng}J  I{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}{CBM-M}N{grn} {orng}J{grn} {gry1}{CBM-H}"
+16012 printspc(9)"{CBM-N}{grn}   {orng}I{grn}   {orng}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{grn}   {orng}J{gry1}{CBM-G}"
+16013 printspc(9)"{CBM-N}{grn}     {orng}I{grn} {orng}K{grn}  {orng}I{grn} {orng}J{grn}  {orng}U J{grn}  {gry1}{CBM-G}"
+16014 printspc(9)"{CBM-N}{grn} {orng}U{grn} {orng}K{grn}    {orng}U{grn}   {orng} K{grn}    {orng}I{grn} {gry1}{CBM-G}"
+16015 printspc(9)"{CBM-M}{grn}   {orng}I{grn}  {orng}U{grn}    {orng}J{grn}   {orng}J{grn}    {gry1}{CBM-H}"
+16016 printspc(9)"{grn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{grn} "
+16019 ra=16
+16020 print"{grn}sie befinden sich an der rueckseite des
+16030 print"dorfes.hier steht die opferhuette der
+16040 print"kannibalen.sie ist anscheinend unbewacht
+16050 gosub760
+16120 print"{wht}{down}moegliche richtungen : n{down}"
+16125 gosub750
+16130 gosub100
+16135 ifs=5thengoto16000
+16140 onrgoto14500,16160,16160,16160,16160,16160
+16150 goto16300
+16160 gosub701
+16300 ifv=28ands=30thengosub705:gosub16800
+16310 ifv=27ands=30thengosub705:gosub16700
+16499 gosub777
+16500 goto16130
+16700 print"{down}in der huette ist ein gefesselter weis-
+16701 print"ser mann.er sagt zu ihnen:
+16702 print"{down}"chr$(34)"wer sie auch immer sind,fliehen sie!
+16703 print"die huette ist bewacht.gehen sie zum
+16704 print"baum noerdlich vom fuss der treppe!fuenf
+16705 print"{up}fuss westlich von ihm liegt mein falt-
+16706 print"boot vergraben.fahren sie zur felsen-
+16707 print"insel und holen sie hilfe!"chr$(34)
+16710 q=1:ma=1:return
+16800 print"{down}die kannibalen haben sie entdeckt und   greifen sie an!"
+16810 q=1:ka=1:za=1:d=ti:li=3600:return
+17000 printspc(9)"{grn} {gry1}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{grn} "
+17001 printspc(9)"{gry1}{CBM-M}{grn}                    {gry1}{CBM-G}"
+17002 printspc(9)"{CBM-N} {grn}                   {gry1}{CBM-G}"
+17003 printspc(9)"{CBM-M}{grn}                    {gry1}{CBM-G}"
+17004 printspc(9)"{CBM-M}{grn}       {gry1}{CBM-POUND}  {grn}          {gry1}{CBM-G}"
+17005 printspc(9)"{CBM-N}{grn}   {gry1} {CBM-POUND}{CBM-POUND}{rvon}{SHIFT-POUND} {CBM-*}{SHIFT-POUND}{CBM-*}{grn}{rvof}         {gry1}{CBM-G}"
+17006 printspc(9)"{CBM-N}{wht}   {gry1}{rvon}{SHIFT-POUND} N   M {CBM-*}{wht}{rvof}        {gry1}{CBM-G}"
+17007 printspc(9)"{CBM-N}{lblu}{rvon}                    {gry1}{rvof}{CBM-G}"
+17008 printspc(9)"{CBM-M}{lblu}{rvon}                    {gry1}{rvof}{CBM-G}"
+17009 printspc(9)"{CBM-N}{lblu}{rvon}                    {gry1}{rvof}{CBM-G}"
+17010 printspc(9)"{CBM-N}{lblu}{rvon}{CBM-@}{CBM-O}{rvof}{CBM-U}{CBM-T} {CBM-Y}{rvon}{CBM-I}{CBM-P}{CBM-@} {CBM-P}{CBM-O}{CBM-I}{rvof}{CBM-Y}{CBM-T} {CBM-T}{grn} {lblu}{CBM-T}{CBM-Y}{gry1}{CBM-G}"
+17011 printspc(9)"{CBM-N}{grn}  {gry2}.{grn}  {gry2}.{grn}    {gry3}  {gry2}.{gry3} {grn}  {gry2}.{grn}   {gry1}{CBM-G}"
+17012 printspc(9)"{CBM-N}{gry2}.{grn}  {gry2}.{grn}   {gry2}.{grn}      {gry2}.{grn}  {gry2}.{grn} {gry2}.{gry1}{CBM-H}"
+17013 printspc(9)"{CBM-N}{grn}          {gry2}.{grn}         {gry1}{CBM-G}"
+17014 printspc(9)"{CBM-M}{grn} {gry2}.{grn} {gry2} .{grn} {gry2} {grn} {gry2}.{grn}   {gry2}.{grn}  {gry2}.{grn}  {gry2}.{grn} {gry1}{CBM-H}"
+17015 printspc(9)"{CBM-N}{grn}                    {gry1}{CBM-H}"
+17016 printspc(9)"{grn} {gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{grn} "
+17019 ra=17
+17020 print"{grn}sie stehen an der nordkueste der insel.
+17030 print"in der ferne ist eine felseninsel zu
+17040 print"erkennen.
+17050 gosub760
+17120 print"{wht}{down}moegliche richtungen : s{down}"
+17125 gosub750
+17130 gosub100
+17135 ifs=5thengoto17000
+17140 onrgoto17160,12000,17160,17160,17160,17160
+17150 goto17200
+17160 gosub701
+17200 ifs=31andsp$(9)<>""thengosub705:wa=1
+17210 ifwa=1andv=31ands=32then17310
+17300 goto17130
+17310 dd=1:print"{clr}"spc(16)"{wht}das war"
+17320 printspc(13)"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{yel}o d y s s e e
+17330 printspc(14)"{down}{down}{down}{yel}t e i l   1
+17340 fori=0to6000:next:print"{clr}"spc(10)"{wht}erleben sie demnaechst
+17420 forx=0to2:gosub20060:goto20004
+17430 printspc(14)"{yel}{down}{down}{down}{down}t e i l  2":gosub750:print"{wht}{clr}":end
+20000 reads,b:ifs<>-1thenpoke55272+s,f:poke1000+s,b:fori=0to200:next:goto20000
+20001 iff=2thenf=1:goto20000
+20002 forx=0to2:restore:fori=0to24:reads,b:ifs=-1thennexti
+20003 poke1000+s,128+b:poke1000+s,b:nexti:next::gosub20050:forx=0to2:gosub20060
+20004 printspc(4-x)"{up}{yel}  {CBM-@} {grn}  {yel}{CBM-@}{CBM-@}{grn}  {yel} {CBM-@} {CBM-@}  {CBM-@}{CBM-@}{CBM-@}{grn}  {yel}{CBM-@}{CBM-@}{CBM-@}{grn}  {yel}{CBM-@}{CBM-@}{CBM-@}{grn}  {yel}{CBM-@}{grn} {yel}{CBM-@}{grn} "
+20005 gosub20050
+20006 printspc(x)"{yel} //M /{grn} {yel}/M{grn} {yel}////{CBM-H}/{grn}  {yel}/{CBM-G}/{grn}  {yel}/{CBM-G}/{grn}  {yel}/{CBM-G}////{CBM-H}"
+20007 gosub20050
+20008 printspc(4-x)"{rvon}{SHIFT-POUND} {CBM-*}{rvof}/{CBM-G}{rvon}  {CBM-*}{rvof}/{CBM-G}{rvon} {rvof} {rvon} {rvof} {CBM-G}{rvon}   {rvof}/ {rvon}   {rvof}/ {rvon}   {rvof}/ {rvon} {rvof} {rvon} {rvof} {CBM-G}"
+20009 gosub20050
+20010 printspc(x)"{rvon} {rvof} {yel}{rvon} {grn}{rvof} {yel}{CBM-H}{rvon} {rvof} {yel}{rvon} {grn}{rvof} {yel}{CBM-G}{rvon} {rvof} {rvon} {rvof} {CBM-G}{rvon} {rvof} L{CBM-P} {rvon} {rvof} L{CBM-P} {rvon} {grn}{rvof} {yel}L{CBM-P} {rvon} {rvof} {rvon} {rvof} {CBM-G}
+20011 gosub20050
+20012 printspc(4-x)"{rvon} {rvof} {rvon} {rvof} {CBM-H}{rvon} {rvof} {rvon} {rvof} {CBM-G}{rvon} {rvof}/{rvon} {rvof}/ {rvon} {rvof}/ /{CBM-H}{rvon} {rvof}/ /{CBM-G}{rvon} {rvof}/ /{CBM-G}{rvon} {rvof}/{rvon} {rvof}/ "
+20013 gosub20050
+20014 printspc(x)"{rvon} {rvof} {rvon} {rvof} {CBM-G}{rvon} {rvof} {rvon} {rvof} {CBM-G}{CBM-*}{rvon} {rvof}{SHIFT-POUND}{CBM-G} {rvon}   {rvof} {CBM-H}{rvon}   {rvof} {CBM-H}{rvon}   {rvof}/ {CBM-*}{rvon} {rvof}{SHIFT-POUND}{CBM-G} "
+20015 gosub20050
+20016 printspc(4-x)"{rvon} {rvof}/{rvon} {grn}{rvof} {yel}{CBM-G}{rvon} {rvof}/{rvon} {rvof} {CBM-G} {rvon} {rvof} {CBM-H} /{grn} {yel}{rvon} {grn}{rvof} {yel}{CBM-H}/{grn} {yel}{rvon} {grn}{rvof} {yel}{CBM-G}{rvon} {rvof}/ /{CBM-G}{grn} {yel}{rvon} {rvof} {CBM-G}
+20017 gosub20050
+20018 printspc(x)"{rvon}   {rvof}/ {rvon}   {rvof}/  {rvon} {rvof} {CBM-G} {rvon}   {rvof}/ {rvon}   {rvof}/ {rvon}   {rvof}/  {rvon} {rvof} {CBM-G} "
+20019 gosub20050
+20020 printspc(4-x)"{CBM-*}{rvon} {rvof}{SHIFT-POUND}  {rvon}  {rvof}{SHIFT-POUND}   {rvon} {rvof}/  {rvon}  {rvof}{SHIFT-POUND}  {rvon}  {rvof}{SHIFT-POUND}  {rvon}  {rvof}{SHIFT-POUND}   {rvon} {rvof}/  "
+20021 gosub20050
+20030 gosub20060:print"{down}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}"
+20035 gosub20060:print"{down}{left}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}  {down}{left}{left}{left}  {down}{left}{left}  {down}{left}{left}  "
+20040 next
+20049 goto20065
+20050 fori=0to400:next:return
+20060 print"{home}{down}{down}{down}{down}{down}{down}{down}":return
+20065 ifdd=1thengoto17430
+20070 printspc(10)"{blu}{down}{down}ein":gosub20050
+20075 printspc(14)"{up}abenteuerspiel":gosub20050
+20080 printspc(18)"{down}von":gosub20050
+20090 printspc(9)"{lblu}{down}hans":gosub20050
+20091 printspc(13)"{up}-guenther":gosub20050
+20092 printspc(23)"{up}schreck":gosub20050
+20100 data33,24,35,20,37,3,39,45,41,19,43,15,45,6,47,20,49,23,51,1,53,18
+20101 data55,5,-1,-1,118,16,119,18,120,1,121,5,122,19,123,5,124,14,125,20
+20102 data126,9,127,5,128,18,129,20,-1,-1
+20103 return
+25000 print"{wht}Sie erinnern sich:
+25001 print"{down}Sie waren Passagier an Bord des Luxus-
+25002 print"liners 'Queen Mary' gewesen.Der Taifun
+25003 print"hatte die Besatzung vollkommen ueber-   rascht.
+25004 print"Das einzige brauchbare Rettungsboot war
+25005 print"kurz nach dem Aussetzen gekentert.
+25006 print"Was dann geschah, wissen Sie nicht mehr.
+25007 print"Jetzt erwachen Sie langsam wieder aus
+25008 print"Ihrer Bewusstlosigkeit.....
+25009 :gosub750:print"{clr}"chr$(142):return
+30000 print"{clr}"spc(17)"{wht} {rvon} {rvof}"
+30002 printspc(17)"{rvon}   {rvof}"
+30003 printspc(17)" {rvon} {rvof}"
+30004 printspc(17)" {rvon} {rvof}{down}"
+30005 return
+30100 print"{down}noch ein versuch? (j/n)"
+30110 getb$:ifb$=chr$(74)thenclr:goto10
+30120 ifb$=chr$(78)thenend
+30130 goto30110
+

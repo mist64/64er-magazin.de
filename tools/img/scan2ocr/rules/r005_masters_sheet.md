@@ -70,6 +70,36 @@ with the means to answer it rather than as a bare demand:
   printed against the low profile's `W`. On SH8601 the eight non-interior pages
   read 240–250 across the board; the interior reads 217 192 179.
 
+**THE EDGE-FINDER PRE-FILL IS ONE WITNESS AND THE WEAKEST OF THREE.** It is
+one-sided, and it produces both misses and false positives:
+
+- SH8603: it offered `[1]` where the answer was eight pages.
+- SH8604: it offered `[1, 60]`, and p060 is an INTERIOR page printed under a
+  full-page salmon tint — its own white is 200 169 154, the interior's.
+
+Two stronger witnesses, both free:
+
+1. **The own-white gap.** Pool each page's own white and sort. The wrapper and
+   any bound-in card sit far from the interior with a clear gap: SH8604 reads
+   163 (136), 002 (125), 164-166 (91), 168 (90), 167 (85), then NOTHING until
+   p016 at 20.
+2. **The scan resolution.** MEASURED on SH8602, SH8603 and SH8604: the pages
+   scanned at 2400 dpi are EXACTLY the wrapper and the card, the interior at
+   600. Print the per-page dpi beside each candidate.
+
+**THE CODE DOES NOT DO THIS YET.** `r005_masters_sheet.py` pre-fills from the
+edge finder alone (`from_ink = paper_frac < FULLBLEED_PAPER_FRAC`), which is
+the one-sided witness described above. Until that changes, compute the
+own-white gap and the per-page dpi BY HAND before accepting a pre-fill, and
+treat what the program offers as one of three witnesses rather than as the
+answer. Flagged rather than silently prescribed, because a rule that describes
+behaviour the code does not have reads as a missing step rather than an error.
+
+Pre-fill from the UNION of the own-white gap and the edge-finder set, print
+the dpi beside each, and say which witness produced each page. A page named by
+only the edge finder is a candidate to check, not an answer. The owner confirms
+it against the physical copy at PAUSE 1 regardless.
+
 The step pre-fills `high_pages` with what the edge-finder evidence points at and
 says, in the output, that it is a guess to be checked against the copy.
 
@@ -145,7 +175,8 @@ nothing to fill, which is why the two variants exist at all.
   (`cargo build --release` in `tools/img/cmyk_reconstruction`)
 - the ICC pair in `tools/img/`: `USWebCoatedSWOP.icc`, `AdobeRGB1998.icc`
 - `magick` (ImageMagick 7)
-- Python 3.11+ with `numpy`, `scipy`, `pillow` — on this box `/usr/bin/python3`
+- Python 3.11+ with `numpy`, `scipy`, `pillow` — use the repo venv
+  (`.venv/bin/python`, CLAUDE.md). On this box `/usr/bin/python3`
   has all three
 
 ### Not every scan is 2400 dpi
@@ -165,12 +196,20 @@ trace to 209.2 × 296.9 mm (p050). Derive that issue's thumbs at
 
 ```bash
 cd tools/img/scan2ocr/rules
-python3 r005_masters_sheet.py            # every page in the descriptor
-python3 r005_masters_sheet.py 6 41 56 92 # named pages
+../../../../.venv/bin/python r005_masters_sheet.py            # every page
+../../../../.venv/bin/python r005_masters_sheet.py 6 41 56 92 # named pages
 ```
 
-The only per-issue knob is `ISSUE = "SH8601"` at the top of the program. No CLI
-flags, no environment knobs — every path is derived from the descriptor. Page
+**The repo venv, not `python3`** — CLAUDE.md requires it, and *Inputs* above
+used to say "`/usr/bin/python3` has all three", which is a claim about one box.
+
+**There is no per-issue knob in the program.** This said "the only per-issue
+knob is `ISSUE = "SH8601"` at the top of the program"; the issue comes from
+`ISSUE.txt` or `$ISSUE` through `r000_issue.py` (r000, *BEFORE ANYTHING
+ELSE*), and the program reads it from there. A reader of r005 alone would
+have edited the source to build their issue. No CLI
+flags, no environment knobs beyond `$ISSUE` — every path is derived from the
+descriptor. Page
 numbers are positional purely so the work can be split across processes, exactly
 as in `r010`.
 
@@ -186,11 +225,63 @@ directory mixing two runs is not something any downstream check can see.
 ```
 <tmp>/masters600/NNN.png         the OCR master — r010 reads this   (the contract)
 <tmp>/masters600/NNN.stamp.txt   which profile and which curve made that master
-<tmp>/figures600/NNN.png         the figure master — r145 reads this
+<tmp>/sheets600/NNN.png          the uncropped graded sheet
+(NO figures600/ — see below)
 <tmp>/cmyk2400/NNN.tif            the CMYK archival form, deflate-compressed
 <tmp>/cmyk2400/NNN.colors.txt     the profile the separator was actually run with
 <tmp>/debug600/NNN.png           the overlay: the four traced lines, in green
+<tmp>/title_source_150.png       the cover crop for the owner  (see below)
 ```
+
+## HAND THE OWNER THEIR TWO FILES NOW — and do not stop
+
+Two of PAUSE 2's deliverables are finished the moment this step is, and both
+are work the owner does **by hand**. Owner, 2026-10-05: **as soon as either is
+available, tell me and `open` it — and do not stop.** See r000, *An OWNER
+DELIVERABLE is handed over the MOMENT it exists*.
+
+```bash
+# 1. the uncut, deskewed, colour-corrected 600 dpi pages -- for review
+open "$TMPDIR_ISSUE/sheets600"
+
+# 2. the 150 dpi cover crop, from which the owner makes issues/<ID>/title.png.
+#    sheets600 is the graded sheet BEFORE the cut, so the crop comes off the
+#    MASTER, which is the page: a plain /4 reduction of masters600/001.png.
+"$PY" - <<'PYEOF'
+import os
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
+t = os.environ['TMPDIR_ISSUE']
+src = f'{t}/a4600/001.png'          # binding=sheet; spread -> masters600/001.png
+im = Image.open(src).convert('RGB')
+w, h = im.size
+W, H = round(w * .25), round(h * .25)
+im.resize((W, H), Image.LANCZOS).save(f'{t}/title_source_150.png')
+print(f'title_source_150.png  {W}x{H}  (25% of {src}, {w}x{h})')
+PYEOF
+open "$TMPDIR_ISSUE/title_source_150.png"
+```
+
+**Make the FILE, not a recipe.** SH8602 wrote the source master, the traced
+page box, the target size and an export warning into its crop worklist and
+produced no file, so the owner had to ask where it was. SH8603 produced
+`title_source_150.png`, and that is the name.
+
+**The cover comes from the SAME directory the PDF reads, reduced 25 %.** On a
+`sheet` binding that is `a4600` (the A4 cut 005b makes), not `masters600` (the
+traced-trim canvas, 5457×7181 on SH8604). `make_issue_pdf.sh` computes the
+size it will accept as 25 % of `<A4>/001.png` and exits 1 on anything else.
+Both `a4600` and a spread issue's `masters600` are 4961×7016, so the answer
+is 1240×1754 today — as a consequence, not a constant. Compute it, and see
+r006, *PIXEL SIZE DOES NOT PROVE A COVER WAS RETOUCHED*.
+
+**On a sheet issue this means 005b must have run first**, since `a4600` is its
+output. If you reach this hand-over before 005b, hand over `sheets600` now and
+the cover crop when 005b finishes.
+
+Then say, in one message: which directory holds the pages and how many, where
+the title crop is, and that **nothing is blocked** — the chain is already on
+the next step.
 
 `<tmp>/masters600` is derived by `r000_issue.py`, because it is the contract the
 rest of the chain depends on. The other three directories are this step's own
@@ -236,8 +327,8 @@ scan_dir/NNN.png
   -> the traced page must match one of PAGE_CLASSES          [the size gate]
   -> separate to CMYK with tools/img/cmyk_reconstruction     [not reimplemented]
   -> two renders off that ONE separation: masters600 carries the black-point
-     curve, figures600 does not
-  -> masters600/NNN.png + NNN.stamp.txt, figures600/NNN.png,
+     curve (there is no separate uncurved render -- see below)
+  -> masters600/NNN.png + NNN.stamp.txt, sheets600/NNN.png,
      cmyk2400/NNN.tif + NNN.colors.txt, debug600/NNN.png
 ```
 
@@ -533,7 +624,17 @@ The two consumers want different images, so both come off **one** separation:
 | render | for | wants |
 |---|---|---|
 | `masters600/NNN.png` | `r010` OCR | contrast: type to solid black. The ICC render **with the black-point curve on it**. Clipping is a feature |
-| `figures600/NNN.png` | `r145` figure cuts | fidelity: the straight ICC render. No clipped highlight, no crushed shadow, **no curve** |
+| ~~`figures600/NNN.png`~~ | — | **DOES NOT EXIST.** The code writes no `figures600` and has no `OUT_FIGURE`; this row described a second, UNCURVED render that was to feed the figure cuts. **It is void because THE CURVE ITSELF WAS REMOVED** (`r005_masters_sheet.py`: "there is no OCR contrast curve, and that is deliberate"; every stamp reads "ONE master, uncurved"). So there is one render and nothing to compare it against. MEASURED on SH8603: `sheets600` and `masters600` give the same glyph p50 (21/24/19/20 on 050/100/120/150) — because NEITHER is curved, not because both are. Reported on SH8602, reported again on SH8603, harvested 2026-10-05, corrected 2026-10-05 after SH8604 caught the inverted reading. |
+
+**Verification 6 therefore measures nothing and should be read as retired**, not
+as a passing check: it compared the curved master against the uncurved figure
+render, and neither term exists.
+
+**And checks 4 and 6 read `masters600`, not `sheets600`.** `sheets600` is the
+UNCROPPED sheet and is offset from the master by the stamp's `sheet-box`
+(SH8604 p041: offset `40 5`, 5071x7188 against the master's 5457x7181), so
+slicing `[:ph, :pw]` off it reads the wrong region. The master is the canvas
+every band in these checks is expressed in.
 
 Ink at ~66 is not a bug, it is honesty: 100% SWOP black is not RGB 0. The OCR
 master boosts it anyway — tesseract binarises, so the boost costs nothing there
@@ -571,7 +672,7 @@ eating paper, which is the one thing a black-point curve must never do.
 **And the figure render must not have it.** A black-point curve crushes a
 photograph: measured on p006's cover photo, this level drives the pure-black
 area of the picture from **25 % to 42 %**. Type wants the crush; pictures do
-not. `r145` cuts its pictures from `figures600`, which is why that render stays
+not. (`r145` was to cut its pictures from `figures600`, which is why that render stays
 straight.
 
 (The implementation is four lines of numpy rather than a `magick` call, so the
@@ -650,7 +751,7 @@ profile      (none -- the built-in anchors, identity levels)
 |---|---|
 | `masters600/NNN.png` | a PNG `tEXt` chunk keyed `r005` |
 | `masters600/NNN.stamp.txt` | the same text, readable without opening a 110 megapixel PNG |
-| `figures600/NNN.png` | PNG `Comment` |
+| `sheets600/NNN.png` | PNG `Comment` |
 | `cmyk2400/NNN.tif` | TIFF `ImageDescription` |
 | `cmyk2400/NNN.colors.txt` | the profile file the separator was **actually run with**, kept rather than deleted with the scratch directory |
 | the run's log | the whole block once at the top, and `grade <sha> level 30%` on every page line |
@@ -683,8 +784,18 @@ misfiled or mis-rotated, and finding that after a full-resolution sweep is
 expensive, so it is checked on the **thumb**, before the 800 MB scan is opened.
 
 A guillotined edge is straight to within a pixel row; a torn edge jitters from
-row to row. So parity decides, and only a **confident** disagreement
-(`ratio >= TORN_CONFIDENT_RATIO`) fails the page. Ambiguity passes.
+row to row. So parity decides, and a **confident** disagreement
+(`ratio >= TORN_CONFIDENT_RATIO`) is **NOTED on the page, not failed**.
+Ambiguity passes silently.
+
+**This rule used to say it "fails the page". The code has never done that** —
+`r005_masters_sheet.py:1082` appends to `notes` and publishes — and the code is
+right. Making it fail would have stopped SH8604 on **93 of its 160 interior
+pages**, none of them misfiled: see *THESE NUMBERS ARE FROM 2400 dpi FRAMES*
+below. The overlay and the size gate are the checks that can say what is
+actually wrong with a page; this one can only say that something is worth a
+look. Where a rule and its code tell two stories the build follows the code,
+so the story that costs a reader time is the rule's.
 
 **Re-measured over all 152 thumbs after `colors.txt` was re-measured**, because
 this gate reads the paper mask and a new paper white is a new mask. Of the 144
@@ -704,6 +815,22 @@ p117's paper mask sees only the cream panel inside a full-bleed dark ground, so
 its jitter measurement means nothing. It fails the **size** gate two steps
 later, which is the check that can say what is actually wrong with it.
 
+**THESE NUMBERS ARE FROM 2400 dpi FRAMES AND DO NOT TRANSFER TO 600 dpi ONES.**
+The whole measurement rests on a torn edge jittering from row to row — and at
+600 dpi the frame can cut THROUGH the torn fringe at x = 0, so the torn side
+shows no jitter at all and the clean guillotined edge against the bed wins the
+comparison. MEASURED on SH8604 (160 of 168 pages at 600 dpi): the gate fired on
+**93 pages** — 75 odd pages reading "right", 18 even reading "left", ratios
+2.6-8.5 — and not one was misfiled. Sizes and overlays were normal throughout;
+p041 shows the frame cutting the fringe.
+
+So on a 600 dpi issue the gate is not evidence. Re-measure the floor against
+this issue's own thumbs before trusting it, or treat a parity disagreement as a
+LOOK AT rather than a failure and let the size gate two steps later decide. A
+gate that fires on 55% of an issue has stopped being read (r000).
+
+The SH8601 numbers above remain correct for a 2400 dpi issue.
+
 ## The debug overlay
 
 One per page, always: the four traced lines drawn in green on the **levelled,
@@ -721,7 +848,7 @@ python3 - <<'PY'
 import os, r000_issue, r005_masters_sheet as R
 iss = r000_issue.load(R.ISSUE)
 for d, ext in ((R.OUT_MASTER, ".png"), (R.OUT_MASTER, ".stamp.txt"),
-               (R.OUT_FIGURE, ".png"), (R.OUT_CMYK, ".tif"),
+               (R.OUT_SHEET600, ".png"), (R.OUT_CMYK, ".tif"),
                (R.OUT_CMYK, ".colors.txt"), (R.OUT_DEBUG, ".png")):
     have = sorted(f[:3] for f in os.listdir(d) if f.endswith(ext))
     want = ["%03d" % p for p in iss.page_range]
@@ -764,9 +891,15 @@ PY
 #        from the pixels.  The fabricated margin and the page's own paper are
 #        both white, and a bbox of "not quite white" guesses wrong on a master
 #        whose paper the curve has pushed to 255.
-#      - it reads figures600, the UNCURVED render.  BED_LUM was measured on
-#        unclipped pixels; on the curved master a printed RED banner (lum 101)
-#        lands at 35 and reads as bed.
+#      - it reads MASTERS600.  This said "it reads sheets600 (there is no
+#        uncurved render)" and gave the reason as the curve: BED_LUM was
+#        measured on unclipped pixels, and on a curved master a printed RED
+#        banner (lum 101) would land at 35 and read as bed.  THERE IS NO CURVE
+#        ANY MORE -- the code removed it and every stamp reads "ONE master,
+#        uncurved" -- so the reason is void, and sheets600 is the wrong file
+#        for a different reason: it is the UNCUT sheet, offset from the page by
+#        the sheet box, so a band measured inside the traced page lands
+#        somewhere else.  See "checks 4 and 6 read masters600, not sheets600".
 python3 - <<'PY'
 import numpy as np, os, re
 from PIL import Image
@@ -778,7 +911,7 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
         continue
     s = (R.OUT_MASTER / f.replace(".png", ".stamp.txt")).read_text()
     pw, ph = (int(v) for v in re.search(r"^page-px\s+(\d+) (\d+)$", s, re.M).groups())
-    rgb = np.array(Image.open(R.OUT_FIGURE / f).convert("RGB"))[:ph, :pw]
+    rgb = np.array(Image.open(R.OUT_MASTER / f).convert("RGB"))[:ph, :pw]
     lum, prop = rgb.mean(2), R.prop_mask(rgb)
     cells = []
     for k, sl in (("top", (slice(None, b), slice(None))),
@@ -829,7 +962,7 @@ WINDOWS = {"006": (14, 100, 58, 180), "041": (16, 60, 60, 140),
            "056": (20, 60, 90, 140), "092": (12, 150, 45, 260)}
 for stem, mm in sorted(WINDOWS.items()):
     box = tuple(int(v * R.MM) for v in mm)
-    fig = np.array(Image.open(R.OUT_FIGURE / f"{stem}.png").crop(box).convert("L"), float)
+    fig = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").crop(box).convert("L"), float)
     ocr = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").crop(box).convert("L"), float)
     glyph = ND.binary_erosion(fig < 128, np.ones((3, 3)))
     paper = fig > 200

@@ -1,0 +1,708 @@
+
+
+;der kl. hobbit.prg ==0801==
+;Zeile 115 neu entspr. Fehlerteufelchen 7/1986
+    0 rem *********************************
+    1 rem *t h e  h o b b i t  mbm 19.8.84*
+    2 rem *********************************
+    5 gosub62500
+   11 i1=40960:i2=49151:restore
+   12 fori=i1toi2:pokei,peek(i):next:a=10*4096+8*256+10*16:fori=atoa+2
+   13 readx:pokei,x:next:a=704:fori=atoa+5:readx:pokei,x:next
+   14 data 32,192,2
+   15 data 32,138,173,76,247,183
+   16 a=2*256+12*16+6:fori=atoa+20:readx:pokei,x:next
+   17 data 208,3,76,29,168,32,192,2,32,19,166
+   18 data 56,165,95,233,1,164,96,76,36,168
+   19 poke40996,197:poke40997,2:poke1,54
+   23 print"{clr}{wht}";:poke53280,0:poke53281,0
+   24 data4900,5000,5100,5300,5400,5700,5900,5800,5500,5600,5300
+   25 restore 24:dimok(11):fori=1to11:readii:ok(i)=ii:nexti:ok=1
+   26 data7300,7400,7200,7100
+   27 restore26:fori=1to4:readii:bu(i)=ii:next:bu=1
+   28 sm(1)=8600:sm(2)=8400:sm(3)=8200:sm(4)=8500:ms=0:sm=1:diml$(38)
+   29 datadie karte,2,den schluessel,10,das schwert,3400,das seil,3400
+   30 dataden ring,5900,den goldschluessel,4700,das essen,0,den bogen,6
+   31 datadas fass,7300,den goldschatz,8600
+   32 datader warg,6100,thorin,3000,gandalf,3000,elrond,3600,eine waldelbe,7000
+   33 databard,7700,gollum,6000,der butler,7300,der ork,0,der troll,3200
+   39 restore29:fori=1to10:readi$:readii:ge$(i)=i$:ge(i)=ii:next
+   40 fori=1to10:readi$:readii:pe$(i)=i$:pe(i)=ii:next
+   80 rem   ge(1)=1:ge(2)=1:ge(3)=1:ge(4)=1:ge(5)=1:ge(6)=1:gl=3
+   90 fa(0)=1:gl=0:bt=1:sa=1:zm=3000:pe(2)=1:goto2105
+  100 ti$="000000":l$="":poke198,0:print"{down}{wht}> {CBM-@}";
+  115 rem
+  120 getx$:ifpeek(203)=1then160
+  121 ifti$>"000030"then160
+  128 ifx$=""then120
+  129 ifl$=""andasc(x$)=20then120
+  130 i=asc(x$):ifi<65ori>90thenifi<>20andi<>32andi<>34then120
+  135 printchr$(20);x$;"{CBM-@}";
+  137 ifasc(x$)=20thenl$=left$(l$,len(l$)-1):goto120
+  140 l$=l$+x$:ti$="000000":iflen(l$)>76thenfori=1to80:printchr$(20);:next:goto115
+  150 goto120
+  160 print".";:fori=1tolen(l$)+4:printchr$(20);:next
+  170 rem satz in l$(0)-l$(10) gliedern
+  175 fori=0to10:l$(i)="":next
+  180 lc=0:fori=1tolen(l$)
+  185 ifmid$(l$,i,1)=" "thenlc=lc+1:goto190
+  188 l$(lc)=l$(lc)+mid$(l$,i,1)
+  190 nexti
+  200 goto1000
+  500 print"{lred}";a$:poke198,0:wait198,1:fori=1to40:printchr$(20);:next:r$=""
+  510 print"{wht}{up}";:return
+ 1000 rem a u s w e r t u n g
+ 1005 r$="":ca=-1:ob=0:ac=0:ve=0
+ 1010 ca=ca+1:e$=l$(ca)
+ 1030 ife$="n"thenr$="norden":zm=n
+ 1040 ife$="s"thenr$="sueden":zm=s
+ 1050 ife$="w"thenr$="westen":zm=w
+ 1060 ife$="o"thenr$="osten":zm=o
+ 1065 ife$="runter"thenr$="{left}{left}{left}{left}{left}runter":zm=r
+ 1070 ife$="rauf"thenr$="{left}{left}{left}{left}{left}rauf":zm=h
+ 1075 ife$="nw"thenr$="nordwesten":zm=nw
+ 1080 ife$="no"thenr$="nordosten":zm=ne
+ 1085 ife$="sw"thenr$="suedwesten":zm=sw
+ 1090 ife$="so"thenr$="suedosten":zm=so
+ 1100 ife$<>"warte"ande$<>"wa"then1105
+ 1101 ifzn=3300andtu(1)<>1thenprint"ein neuer tag bricht an.":tu(1)=1:goto1600
+ 1102 print"sie warten.":goto1600
+ 1105 ife$="schau"thenzm=zn:goto2105
+ 1110 ife$="oeffne"thengosub11100
+ 1115 ife$="schliesse"thengosub11200
+ 1116 ife$="toete"thengosub11500
+ 1120 ife$="nimm"thenve=1:gosub11300
+ 1122 ife$="verlier"thenve=2:gosub11300
+ 1124 ife$="i"ore$="inventur"thengosub11400
+ 1125 ife$="iss"thenifge(7)=1orge(7)=znthenprint"sie essen.":ge(7)=0:goto1600
+ 1130 ife$="sag"ore$="sage"thengosub20000:goto1600
+ 1131 ifvl=2ande$="zeit"thenvl=0:gl=2:goto1600
+ 1132 ife$<>"grabe"orzn<>5200then1135
+ 1133 print"{down}sie graben im sand und entdecken eine   falltuer.":tu(7)=1:goto1600
+ 1135 ifleft$(e$,5)="zerst"ore$="vernichte"orleft$(e$,5)="zersc"thenac=ac+1
+ 1140 ife$="spinnennetz"ore$="netz"thenac=ac+1
+ 1142 ife$="wirf"thenve=17
+ 1143 ife$="seil"andge(4)=1thenob=4
+ 1144 ifleft$(e$,4)="zieh"thenve=2
+ 1146 ifleft$(e$,9)="ueberquer"orleft$(e$,3)="geh"thenve=3
+ 1148 ifleft$(e$,7)="schwimm"andzn=6900thenvl=5
+ 1150 ife$="fass"thenifge(9)=1orge(9)=znthenob=5
+ 1152 ifleft$(e$,6)="spring"thenve=4
+ 1500 ifca=lcthen1600
+ 1510 goto1010
+ 1600 :
+ 2000 rem a c t i o n
+ 2005 ifge(10)=1then62000
+ 2010 ifzm=0andr$<>""thena$="kein weg in diese richtung !":gosub500:goto2200
+ 2020 ifzm=0then2200
+ 2100 rem neues zn
+ 2103 print"sie gehen nach ";r$;"."
+ 2105 zn=zm:zm=0:restore zn:print
+ 2110 readdl
+ 2111 fori=1todl:readd$:print"{yel}";d$;:next:print"{wht}":print
+ 2115 n=0:s=0:w=0:o=0:h=0:r=0:nw=0:ne=0:sw=0:so=0:gosubzn:gosub10000:goto2400
+ 2200 rem
+ 2204 ifvl>0then39000
+ 2400 rem die monster bewegen sich
+ 2401 ifint(10*rnd(1))>5then2403
+ 2402 ifzn=7000thenprint"{down}die waldelbe nimmt sie gefangen.":zm=7100:goto2105
+ 2403 :
+ 2410 ifpe(9)=znthen2455
+ 2411 ok=ok+1:ifok=12thenok=1
+ 2415 pe(9)=ok(ok)
+ 2420 ifpe(9)<>4900then2450
+ 2422 iftu(5)<>0then2430
+ 2424 tu(5)=1:ifzn=4100thenprint"{down}in der hoehle oeffnet sich ein spalt !":n=4900
+ 2425 goto2450
+ 2430 tu(5)=0:ifzn=4100thenprint"{down}der spalt schliesst sich.":n=0
+ 2450 ifpe(9)<>znthen2480
+ 2455 print"{down}ein ork betritt den raum !"
+ 2460 i=int(12*rnd(1))+1
+ 2462 ifi<=2orge(5)=1thenprint"{down}der ork geht weiter.":goto2411
+ 2463 ifi>9then2480
+ 2464 ifi>2thenprint"{down}der ork nimmt sie gefangen.":zm=5200:goto2105
+ 2480 ifbt=0then2495: rem butler
+ 2481 ifzn<>pe(8)thenbu=bu+1:ifbu=5thenbu=1
+ 2482 pe(8)=bu(bu)
+ 2483 ifpe(8)<>7100then2490
+ 2484 iftu(10)=1then2487
+ 2485 tu(10)=1:ifpe(8)=znthenprint"{down}jemand oeffnet die kerkertuer.":o=7200:bu=1
+ 2486 goto2490
+ 2487 tu(10)=0:ifpe(8)=znthenprint"{down}jemand schliesst die kerkertuer.":o=0
+ 2490 ifpe(8)<>znorzn=7100then2495
+ 2491 print"{down}der butler des elbenkoenigs erscheint   ploetzlich !"
+ 2492 ifint(10*rnd(1))>4then2494
+ 2493 print"{down}der butler nimmt sie gefangen.":zm=7100:goto2105
+ 2494 pe(8)=bu(bu)
+ 2495 ifsa=0then2500
+ 2496 ms=ms+1:ifms=5thenms=1
+ 2497 ifsm=znthengosub34000:vl=6:dr=1:goto2500
+ 2498 sm=sm(ms):ifsm=znthendr=1
+ 2500 gosub9000:rem t h o r i n
+ 2501 ifpe(3)=znthengosub9500:remgandalf
+ 2502 ifpe(4)=znthengosub30000:rem elrond
+ 2503 ifpe(7)=znthengosub31000:rem gollum
+ 2504 ifpe(1)=znthengoto32000:rem warg
+ 2505 ifba=1thengosub33000:rem bard
+ 2506 ifdr=1andsa=1thengosub34000:rem smaug
+ 2509 it=0:ifac=2andzn=6800thenit=1:ifge(3)=1thentu(8)=1:o=6900:it=2
+ 2510 ifit=1andge(3)<>1thena$="sie haben kein schwert !":gosub500:return
+ 2511 ifit=2thenprint"{down}sie zerschlagen das spinnennetz mit dem schwert."
+ 2520 ifve<>17orob<>4orzn<>6900then2550
+ 2521 iftu(9)=1thena$="das haben sie bereits.":gosub500:return
+ 2530 print"{down}sie werfen das seil ueber den fluss.":fori=1to2000:next:ge(4)=6900
+ 2540 print"{down}das seil verfaengt sich im boot.":tu(9)=1
+ 2550 ifve<>2orob<>4andge(4)<>6900ortu(9)<>1then2570
+ 2555 print"{down}sie ziehen das boot zu sich herueber.":tu(9)=2:ge(4)=1
+ 2570 ifve<>3ortu(9)<>2then2580
+ 2575 print"{down}sie ueberqueren den fluss mit dem boot.":pe(2)=7600:zm=7000
+ 2576 tu(9)=3:goto2105
+ 2580 ifzn<>7300then2600
+ 2582 ifve<>17orob<>5orfa(0)<>1then2585
+ 2583 print"{down}sie werfen das fass durch die falltuer.":ge(9)=7500
+ 2585 ifve<>4orfa(0)<>1then2600
+ 2587 print"{down}sie springen durch die falltuer in das  fass,das im fluss schwimmt."
+ 2590 fori=1to3000:next
+ 2591 print"{down}sie treiben auf dem fluss in oestliche  richtung.":pe(2)=7600
+ 2592 fori=1to3000:next
+ 2594 print"{down}in einer starken kurve werden sie aus   dem fass heraus ans ufer";
+ 2595 print" geschleudert."
+ 2597 zm=7600:goto2105
+ 2600 :
+ 2899 goto100
+ 2910 rem     s p i e l k a r t e
+ 3000 data 3,sie befinden sich in einer kompfortabel eingerichteten hoehle ,
+ 3010 data die einer langen  halle aehnelt.
+ 3015 data 0
+ 3016 iftu(0)=1theno=3100
+ 3030 gosub60000:return
+ 3100 data 1,das einsame tal:n=3200:vl=0:gosub60050:return
+ 3200 data 1,lagerplatz der trolle
+ 3202 iftu(1)=-1thenvl=1:goto39000
+ 3203 iftu(1)=0thentu(1)=-1:gosub60090
+ 3205 iftu(1)=1thenpe$(10)="die versteinerten trolle"
+ 3206 iftu(1)=1andge(2)=10thenge(2)=3200
+ 3207 iftu(1)=1then3230
+ 3210 print"der boese troll sagt 'kann man den wohl kochen ?'"
+ 3220 print"der fette troll meint 'er wird kaum ei- nen mundvoll geben.'{down}
+ 3230 s=3100:n=3300:so=3500
+ 3231 iftu(1)=-1thenvl=1
+ 3240 return
+ 3300 data 3,dunkler pfad mit fussspuren der trolle. ,
+ 3302 data noerdlich liegt die tuer zur hoehle der trolle.:gosub60310
+ 3303 iftu(3)=1thenn=3400
+ 3305 s=3200:vl=0:return
+ 3400 data 1,in der hoehle der trolle:s=3300:return
+ 3500 data 1,am kleinen fluss:vl=0:nw=3200:so=3600:tu(4)=0:return
+ 3600 data 1,rivendell:nw=3500:o=3700:return
+ 3700 data1,im nebelgebirge:w=3600:n=3800:o=4300:return
+ 3800 data1,im nebelgebirge:s=3700:n=3900:return
+ 3900 data1,im nebelgebirge:s=3800:ne=4000:return
+ 4000 data1,im nebelgebirge:sw=3900:so=4400:return
+ 4100 data1,trockene hoehle im nebelgebirge:iftu(5)=1thenn=4900
+ 4110 s=4200:return
+ 4200 data1,im nebelgebirge:nw=3900:n=4100:s=4300:return
+ 4300 data1,im nebelgebirge:w=3700:n=4200:o=4800:nw=3800:return
+ 4400 data1,im nebelgebirge:nw=4000:r=4500:return
+ 4500 data1,im nebelgebirge:r=4600:return
+ 4600 data1,im nebelgebirge:w=4700:return
+ 4700 data1,im nebelgebirge:sw=4300:o=4600:return
+ 4800 data1,ein schwerer und gefaehrlicher gebirgs- pfad im nebelgebirge
+ 4810 w=4300:o=6100:gosub60175:return
+ 4900 data 1,hoehlensystem der orks:s=4100:o=5000:ne=5300:return
+ 5000 data 1,hoehlensystem der orks:w=4900:n=5300:o=5100:return
+ 5100 data 1,hoehlensystem der orks:w=5000:nw=5300:n=5400:return
+ 5200 data 1,gefaengnis der orks:return
+ 5300 data 1,hoehlensystem der orks
+ 5310 w=5200:sw=4900:s=5000:so=5100:o=5400:h=5600:return
+ 5400 data 1,hoehlensystem der orks:w=5300:s=5100:h=5700:return
+ 5500 data 1,hoehlensystem der orks:n=5800:o=5600:return
+ 5600 data 1,hoehlensystem der orks:w=5500:r=5300:return
+ 5700 data 1,hoehlensystem der orks:nw=5900:n=6000:return
+ 5800 data 1,hoehlensystem der orks:s=5500:o=5900:return
+ 5900 data 1,hoehlensystem der orks:w=5800:so=5700:return
+ 6000 data 1,feuchte grotte:s=5700:return
+ 6100 data 1,eine waldlichtung:w=4800:return
+ 6300 data 1,weites grasland am fuss des gebirges:n=6400:return
+ 6400 data1,beorns haus:ge(7)=6400:s=6300:o=6600:ne=6500:gosub60345:return
+ 6500 data1,das tor zu mirkwald:sw=6400:s=6600:o=6700:gosub60140:return
+ 6600 data1,auf dem nachtwaldweg
+ 6610 w=6400:o=6800:s=6700:return
+ 6700 data1,auf dem nachtwaldweg
+ 6710 print"{down}sie sehen riesiege augen auf sie herun- terstarren.":vl=4:return
+ 6800 data1,auf dem nachtwaldweg
+ 6810 w=6600:s=6700
+ 6820 iftu(8)=1theno=6900:return
+ 6830 print"{down}ein riesiges spinnennetz versperrt den  weg nach osten.{down}":return
+ 6900 data1,der schwarze schnelle fluss
+ 6910 w=6800
+ 6920 iftu(9)<2thenprint"{down}auf der anderen seite des flusses liegt ein boot.{down}"
+ 6930 return
+ 7000 data1,auf dem nachtwaldweg
+ 7010 return
+ 7100 data1,im kerker der waldelben
+ 7110 return
+ 7200 data 1,in einem gang
+ 7210 w=7100:s=7400:return
+ 7300 data1,im weinkeller des elbenkoenigs
+ 7310 o=7400:gosub60270:return
+ 7400 data 1,an der magischen tuer
+ 7410 n=7200:w=7300:return
+ 7600 data1,am grossen see
+ 7610 o=7700:return
+ 7700 data 1,die stadt esgaroth
+ 7710 w=7600:n=7800:gosub60220:return
+ 7800 data 1,am schnellen fluss
+ 7810 n=8000:s=7700:o=7900:return
+ 7900 data 1,am wasserfall:gosub60405
+ 7910 w=7800:return
+ 8000 data 1,wuestenland
+ 8010 s=7800:h=8100:return
+ 8100 data 1,die ruinen von dal:gosub60470
+ 8110 r=8000:h=8200:return
+ 8200 data 1,der einsame berg:gosub63100
+ 8210 n=8400:r=8100:nw=8300:ne=8500:return
+ 8300 data 1,der rabenhuegel
+ 8310 so=8200:return
+ 8400 data 1,eingang zur drachenhoehle
+ 8410 s=8200:return
+ 8500 data1,trockene hoehle
+ 8505 iffa(1)=1thenr=8600
+ 8510 sw=8200:return
+ 8600 data1,die schlafkammer des drachen
+ 8610 sw=8400:return
+ 9000 ifpe(2)=5200andzn<>5200andzn<6100then9050
+ 9001 rem  t h o r i n
+ 9002 ifzn>4900andzn<6300then9050
+ 9003 ic=0:ifpe(2)<>znthenr$="{down}thorin kommt herbei.":pe(2)=zn:ic=1
+ 9004 ific=1andpe(3)<>znandpe(3)<>0thenpe(3)=zn:pe(2)=zn:r$="beide"
+ 9005 ifr$=""then9009
+ 9006 ifr$="beide"thenr$="{down}thorin und gandalf kommen herbei."
+ 9007 printr$
+ 9009 ifge(1)=2andzn=3000thenprint"{down}thorin gibt ihnen die karte.":ge(1)=1
+ 9010 ifint(10*rnd(1))>4thenreturn
+ 9011 ifpe(3)=3100andzn=3000thenprint"{down}thorin sagt 'beeil dich !'":goto9016
+ 9015 ifint(10*rnd(1))=5thenprint"{down}thorin sagt 'beeil dich !'":goto9020
+ 9016 ifint(20*rnd(1))=5thenprint"{down}thorin beginnt von gold zu singen.":goto9020
+ 9017 ifint(20*rnd(1))=5thenprint"{down}thorin setzt sich und wartet."
+ 9018 ifint(20*rnd(1))<>5orpe(3)<>0then9020
+ 9019 print"{down}thorin sagt'waere gandalf nur bei uns.'.
+ 9020 ifzn>=4900andzn<6000andint(20*rnd(1))+1>3andpe(2)<>5200thenpe(2)=4800
+ 9050 ifpe(3)<3700then9055
+ 9051 print"{down}gandalf sagt 'wichtige aufgaben warten  auf mich{$a0}!' und geht fort."
+ 9052 pe(3)=0
+ 9055 ifzn=5200andpe(2)<>5200thenprint"{down}thorin kommt herein.":pe(2)=5200
+ 9060 ifge(6)=1thenprint"{down}thorin nimmt den goldschluessel.":ge(6)=2
+ 9070 ifsa<>0orzn<>8500orfa(1)<>0then9499
+ 9075 print"{down}ein roter sonnenstrahl trifft auf die   glatte felswand in der";
+ 9076 print" hoehle !":fori=1to2000:next
+ 9080 print"{down}ein flaches stueck gestein splittert vomfels und faellt herunter."
+ 9090 print"{down}ein kleines loch erscheint etwa drei    fuss ueber der erde !"
+ 9095 print"{down}thorin steckt den goldschluessel in das loch."
+ 9097 print"{down}eine tuer tut sich auf - ein steiler wegfuehrt von ihr hinab in ";
+ 9098 print"die dunkelheit.":fa(1)=1:r=8600
+ 9499 return
+ 9500 rem  g a n d a l f
+ 9503 ifun(0)=3thenun(0)=0:print"{down}gandalf sagt 'was soll der quatsch ?'"
+ 9504 ifint(10*rnd(1))>4thenreturn
+ 9505 ifzn=3000andtu(0)=1thenprint"{down}gandalf geht nach osten.":pe(3)=3100
+ 9510 ifzn=3000andtu(0)=0thenprint"{down}gandalf oeffnet die tuer.":tu(0)=1:o=3100
+ 9512 ifzn<>3100orga(0)=1then9514
+ 9513 print"{down}gandalf sagt 'ein grosses abenteuer ste-ht dir bevor !'":ga(0)=1
+ 9514 :
+ 9517 ifint(20*rnd(1))=1andge(1)=1thenge(1)=3:print"{down}gandalf nimmt die karte."
+ 9519 ifint(20*rnd(1))=1andge(1)=3thenge(1)=1:print"{down}gandalf gibt dir die karte.
+ 9520 ifint(30*rnd(1))=1thenprint"{down}gandalf sagt 'was nun ?'."
+ 9999 return
+10000 rem moegliche richtungen                                         
+10010 r$="":ifnthenr$=r$+"n,"
+10011 ifsthenr$=r$+"s,"
+10012 ifothenr$=r$+"o,"
+10013 ifwthenr$=r$+"w,"
+10014 ifnwthenr$=r$+"nw,"
+10015 ifnethenr$=r$+"no,"
+10016 ifswthenr$=r$+"sw,"
+10017 ifsothenr$=r$+"so,"
+10018 ifhthenr$=r$+"rauf,"
+10019 ifrthenr$=r$+"runter,"
+10020 ifr$=""then10100
+10030 print"moegliche richtungen: ";left$(r$,len(r$)-1):print:r$=""
+10100 rem sie sehen ...
+10105 ic=0:s$="{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"
+10110 print"sie sehen : {up}"
+10120 fori=1to10:ifpe(i)<>znthen10125
+10121 ic=1:i$=pe$(i):ifleft$(i$,3)="der"theni$=mid$(i$,4,len(i$)):i$="einen"+i$
+10123 prints$;i$
+10125 ifge(i)=znthenprints$;ge$(i):ic=1
+10130 next
+10190 ifzn=3000thenic=1:prints$"die truhe
+10200 ifzn=3000thenic=1:prints$"die tuer
+10201 ifzn=6300thenic=1:prints$"den carrock
+10202 ifzn=3300thenic=1:prints$"die tuer zur trollhoehle
+10210 ifzn=4100andtu(5)=1thenic=1:prints$"einen spalt in der nordwand."
+10220 ifzn=5200thenic=1:prints$"ein fenster im westen.
+10222 ifzn=5200thenic=1:prints$"die gefaengnistuer.
+10223 ifzn=5200thenic=1:prints$"den sandboden
+10224 iftu(7)=1andzn=5200thenprints$"die falltuer"
+10225 ifzn=7300thenprints$"die falltuer"
+10226 ifsa=0andzn=msthenprints$"den toten smaug."
+10227 ifzn=7300thenprint"{down}unter der falltuer rauscht ein starker  fluss."
+10228 ifzn=8500andfa(1)=1thenprints$"eine oeffene tuer"
+10229 iftu(9)=2andzn=6900thenprints$"ein boot"
+10230 ifzn=7100thenprints$"tuer nach osten"
+10290 ific=0thenprint"           {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{up}";
+10300 fori=1to10
+10310 ifge(i)=0orge(i)>=3000then10350
+10320 :forii=2to10
+10325 ::ifge(i)=iiandpe(ii)=znthenprint"{down}";pe$(ii);" hat ";ge$(i);"."
+10330 :nextii
+10350 nexti
+10500 rem ific=1thenprint
+10600 return
+11000 rem routinen fuer verben
+11010 ob=0:fori1=0tolc:e$=l$(i1)
+11020 ife$="tuer"thenob=1
+11030 ife$="truhe"thenob=2
+11031 ife$="fenster"thenob=3
+11032 ife$="falltuer"thenob=4
+11040 nexti1:return
+11100 rem oeffne ********
+11110 gosub11000
+11114 ifob<>2then11125
+11115 ifob=2andzn<>3000thena$="hier ist keine truhe.":gosub500:return
+11117 iftu(2)=0thenprint"sie oeffnen die truhe.{down}":tu(2)=1:return
+11118 iftu(2)=1thena$="die truhe ist bereits offen.":gosub500:return
+11125 ifob<>1orzn<>3000then11128
+11126 iftu(0)=1thena$="die tuer ist bereits offen.":gosub500:return
+11127 iftu(0)=0thenprint"sie oeffnen die tuer.":tu(0)=1:o=3100:return
+11128 ifzn<>3300then11140
+11130 iftu(3)=0andge(2)=1thenprint"sie oeffnen die tuer.":tu(3)=1:n=3400:return
+11131 iftu(3)=0andge(2)<>1thena$="sie haben keinen schluessel.":gosub500:return
+11132 iftu(3)=1thena$="die tuer ist bereits offen.":gosub500:return
+11140 ifob=3andzn=5200thena$="sie sind zu klein dazu.":gosub500:return
+11145 ifzn<>7300orob<>4then11160
+11147 iffa(0)=0thenfa(0)=1:print"sie oeffnen die falltuer.":return
+11148 iffa(0)=1thena$="die falltuer ist bereits offen.":gosub500:return
+11160 a$="sie koennen das nicht oeffnen.":gosub500:return
+11200 rem schliesse  *********
+11210 gosub11000
+11214 ifob<>2then11225
+11215 ifob=2andzn<>3000thena$="hier ist keine truhe.":gosub500:return
+11217 iftu(2)=1thenprint"sie schliessen die truhe.":tu(2)=0:return
+11218 iftu(2)=0thena$="die truhe ist bereits zu.":gosub500:return
+11225 ifob<>1orzn<>3000then11230
+11226 iftu(0)=0thena$="die tuer ist bereits zu.":gosub500:return
+11227 iftu(0)=1thenprint"sie schliessen die tuer.":tu(0)=0:un(0)=un(0)+1:o=0:return
+11230 ifzn=3300andtu(3)=1thenprint"sie schliessen die tuer.":tu(3)=0:n=0:return
+11231 ifzn=3300andtu(3)=0thena$="die tuer ist bereits zu.":gosub500:return
+11232 ifzn<>7300thenreturn
+11233 ifob=4andfa(0)=1thenfa(0)=0:print"sie schliessen die falltuer.":return
+11235 ifob=4andfa(0)=0thena$="die falltuer ist bereits zu.":gosub500:return
+11260 a$="das geht nicht.":gosub500:return
+11300 rem nimm / verliere **********
+11310 im=0:s$="":g1=0:fori=0tolc:e$=l$(lc)
+11320 fori1=1to10
+11330 ife$=mid$(ge$(i1),5,len(ge$(i1))-4)thenim=i1:i1=11:i=lc+1
+11340 nexti1:nexti
+11350 s$=ge$(im):g1=ge(im)
+11360 ifve=1andg1=1thena$="sie haben das bereits.":gosub500:return
+11365 ifve=1andg1=znthenprint"sie nehmen ";s$;".":ge(im)=1:return
+11366 ifve=1thena$="sie koennen das nicht nehmen.":gosub500:return
+11370 ifve=2andg1=1thenge(im)=zn:print"sie verlieren ";s$;".":return
+11375 a$="sie haben das nicht.":gosub500:return
+11400 rem inventur ************
+11410 print"sie haben :{up}"
+11420 ic=0:fori=1to10:ifge(i)=1thenprint,"{rght}{rght}"ge$(i):ic=1
+11430 nexti
+11440 ific=0thenprint,"{rght}{rght}nichts"
+11450 return
+11500 rem toete *********
+11505 p$="":p=0:fori=1tolc:e$=l$(lc)
+11506 ife$="thorin"andpe(2)=znthenp$="thorin"
+11507 ife$="gandalf"andpe(3)=znthenp$="gandalf"
+11508 ife$="elrond"andpe(4)=znthenp$="elrond"
+11509 ife$="waldelbe"andpe(5)=znthenp$="die waldelbe"
+11510 ife$="gollum"andpe(7)=znthenp$="gollum"
+11511 ife$="ork"andpe(9)=znthenp$="ork"
+11512 ife$="troll"andpe(10)=znthenp$="troll"
+11513 ife$="butler"andpe(8)=znthenp$="der butler"
+11519 nexti
+11520 ifp$=""thena$="ich seh das hier nicht":gosub500:return
+11540 print"{down}sie greifen "p$" an !"
+11550 ifp$="der butler"then11570
+11552 print:printp$" verteidigt sich zu sehr !"
+11554 fori=1to2000:next
+11556 print:printp$" hat sie getoetet.":vl=1.4:return
+11570 ifge(3)<>1thenprint"{down}der butler hat sie getoetet.":vl=1.4:return
+11572 print"{down}sie haben den butler mit einem schlag   enthauptet.":bt=0
+11574 pe$(8)="den toten butler":return
+20000 rem    s p r e c h e n
+20005 ic=0:fori=2to7
+20010 ifpe$(i)=l$(1)thenic=1
+20011 ifpe(i)=znandic=1thenp$=pe$(i):p=i:ic=2
+20015 nexti
+20020 ific=1thena$=""+l$(1)+" ist nicht anwesend.":gosub500:return
+20022 ific=0thena$="das geht nicht.":gosub500:return
+20030 print"sie sagen etwas zu ";p$;"."
+20040 i1=0:i2=0:fori=1tolen(l$)
+20042 ifmid$(l$,i,1)<>chr$(34)then20045
+20043 ifi1=0theni1=i+1:goto20045
+20044 ifi2=0theni2=i
+20045 nexti
+20050 l$=mid$(l$,i1,i2-i1)
+20060 rem satz in l$(0)-l$(10) gliedern
+20062 fori=0to10:l$(i)="":next
+20064 lc=0:fori=1tolen(l$)
+20066 ifmid$(l$,i,1)=" "thenlc=lc+1:goto20070
+20068 l$(lc)=l$(lc)+mid$(l$,i,1)
+20070 nexti
+20100 rem analysieren
+20105 eg=0:ve=0:gg=0:fori=0tolc:e$=l$(i)
+20110 ife$="lies"ore$="untersuche"thenve=1
+20120 ife$="gib"thenve=2
+20121 ife$="smaug"theneg=3
+20130 ifleft$(e$,4)="trag"thenve=3
+20140 ifleft$(e$,3)="geh"thenve=4
+20145 ife$="nimm"thenve=5
+20150 ife$="verlier"thenve=6
+20160 ife$="hilf"thenve=7
+20170 ife$="mir"ore$="mich"theneg=1
+20171 ife$="oeffne"thenve=8
+20172 ife$="fenster"theneg=2
+20173 ife$="toete"thenve=8
+20174 ifvl=2ande$="zeit"thenvl=0:gl=2
+20175 fori1=1to10
+20176 ife$=mid$(ge$(i1),5,len(ge$(i1))-4)thengg=1
+20180 nexti1
+20190 nexti
+20200 rem
+20210 ifve<>1orp<>4orgg<>1then20280
+20212 ifge(1)<>1then20500
+20215 print"{down}elrond betrachtet die karte.":print"{down}elrond sagt ";
+20220 ifik=0thenik=(int(5*rnd(1))+1)*10+20220
+20221 gotoik
+20230 print"'nordoestlich von beorns    haus liegt das tor zu mirkwald.'."
+20231 return
+20240 print"'noerdlich vom carrock liegtdas haus von beorn.'.":return
+20250 print"'oestlich vom grossen see   liegt die stadt esgaroth.'.":return
+20260 print"'oestlich vom schnellen     fluss ist ein wasserfall.'.":return
+20270 print"auf der nordwestseite des einsamen berges ist der rabenhuegel.'."
+20271 return
+20280 ifve=2andp=3andge(gg)=3thenprint:printpe$(3)" gibt ihnen ";ge$(gg)
+20281 ifve=2andp=3andge(gg)=3thenge(gg)=1
+20290 ifve=3andeg=1andp=2andzn=5200thenprint"{down}thorin traegt sie.":tr=1:return
+20292 ifve<>8orp<>2oreg<>2ortu(6)<>0then20295
+20293 print"{down}thorin oeffnet das fenster.":tu(6)=1:return
+20295 ifp=2andve=4andtr=1thentr=0:zm=5300:print:r$="{left}{left}{left}{left}{left}{left} durch das fenster":return
+20300 ifp=6andve=7thenprint"{down}bard sagt 'ich werde smaug toeten !'.":ba=1:return
+20310 ifeg<>3orp<>6orve<>8orsm<>znthen20320
+20311 print"{down}bard nimmt seinen schwarzen pfeil.":print"{down}eine alte drossel ";
+20312 print"kommt angeflogen und  setzt sich auf bards schulter.
+20313 print"{down}bard sagt 'schwarzer pfeil,du hast nie  gefehlt,glueck sei mit dir.
+20314 fori=1to2000:next:print"{down}bard schiesst auf smaug."
+20315 fori=1to3000:next:ifint(100*rnd(1))<95then20317
+20316 print"{down}der schwarze pfeil verfehlt smaug !":vl=6:return
+20317 print"{down}der schwarze pfeil bohrt sich tief in   smaugs brust !"
+20318 print"{down}smaug stuerzt und stirbt.":sa=0:ms=zn:vl=0
+20320 return
+20499 ifp=7then20600
+20500 print"{down}"p$" sagt 'nein.'.
+20600 return
+30000 rem  e l r o n d
+30005 tu(4)=tu(4)+1
+30010 iftu(4)=1thenprint"{down}elrond sagt 'hallo !'.
+30015 iftu(4)=2thenprint"{down}elrond bietet ihnen etwas zu essen an.":ge(7)=3600
+30020 return
+31000 rem g o l l u m
+31005 ifgl>1then31100
+31010 print"{down}gollum fragt 'etwas,das alles und jeden verschlingt:baum der rau";
+31012 print"scht,vogel der  singt,frisst eisen,zermalmt den haertes-ten stein,";
+31014 print"zerbeisst jedes schwert,zerb- richt jeden schrein,schlaegt ";
+31015 print"koenige    nieder,schleift ihren palast,traegt     maechtigen fels";
+31017 print" fort als leichte last?'.":vl=2:gl=2:return
+31100 ifgl=2thenprint"{down}gollum sagt'er weiss es mein schatzzz.'.":gl=3:return
+31110 gl=gl+1:ifgl>5andge(5)=1thenge(5)=7:print"{down}gollum nimmt den ring.":return
+31120 ifge(5)=1thenprint"{down}gollum sagt ' was hat er in der tasche  mein schatz?'.
+31130 ifge(5)=7thenvl=2
+31140 return
+32000 rem w a r g
+32010 print"{down}der fuerchterliche warg greift sie an !"
+32020 ifge(3)+ge(4)+ge(5)<>3orgl=0then32100
+32030 print"{down}sie verteidigen sich mit ganzer kraft...
+32032 fori=1to3000:next
+32034 print"ein riesiger adler stuerzt aus der luft auf sie herunter,packt sie ";
+32036 print"mit seinen   klauen und fliegt davon !
+32038 fori=1to2000:next:pe(2)=6300
+32040 print"{down}nach einem langen flug landet der adler in der naehe eines ";
+32042 print"felsplateaus,laesst  sie frei und fliegt davon...":zm=6300:goto2105
+32100 vl=3:goto39000
+33000 rem  b a r d
+33010 ifpe(6)<>znthenpe(6)=zn:print"{down}bard folgt ihnen."
+33050 return
+34000 rem  s m a u g
+34010 ifsm=znthenprint"{down}smaug erscheint !"
+34040 ifint(20*rnd(1))<5thenprint"{down}smaug sagt 'ich krieg dich,dieb !'."
+34100 return
+39000 rem v e r l o r e n
+39010 print
+39015 ifvl=1thenprint"der troll hat sie gefressen."
+39017 ifvl=2thenprint"jemand hat sie von hinten erwuergt.
+39019 ifvl=3thenprint"der warg hat sie getoetet.
+39020 ifvl=4thenprint"etwas schweres faellt herunter und er-  schlaegt sie."
+39021 ifvl=5thenprint"als sie das wasser beruhren fallen sie  in schlaf....."
+39023 ifvl=6thenprint"smaug hat sie gefressen.
+39500 end
+60000 rem g r a f i k                                        
+60005 rem hobbit-hoehle
+60015 print,"{brn}       {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}",,,"    {CBM-P}{CBM-P}{SHIFT-@}{rvon}{orng}M  B  N{rvof}{brn}L{CBM-P}",,," {CBM-P}{CBM-P}{SHIFT-@}{orng}{rvon}M  MM B NN N{rvof}{brn}L{CBM-P}
+60020 print,"{CBM-M}{orng}{CBM-*}{rvon}  MM  M{brn}{CBM-R}{CBM-E}{CBM-R}{orng}N NN {rvof}{SHIFT-POUND}{brn}{CBM-G}",,,"{CBM-N} {orng}{CBM-*}{rvon}  M{brn}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{orng}N {rvof}{SHIFT-POUND} {brn}{CBM-H}
+60025 print,"{CBM-M}  {rvon}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{rvof}  {CBM-G}",,,"{CBM-M}  {rvon}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{rvof}  {CBM-G}
+60030 print,"{CBM-M}  {rvon}{CBM-R}{CBM-E}{blu}OP{brn}{CBM-R}{CBM-E}{rvof}{orng}{CBM-*}{rvon}{CBM-@}{CBM-@}{CBM-@}{rvof}{SHIFT-POUND}{brn}{rvon}{CBM-E}{CBM-R}{rvof}  {CBM-G}",,,"{CBM-M}  {rvon}{CBM-E}{CBM-R}{blu}{CBM-H}{CBM-N}{brn}{CBM-E}{CBM-R}{rght}{orng}{CBM-G}{left}GBB{rght}{brn}{CBM-R}{CBM-E}{rvof}  {CBM-G}
+60035 print,"{CBM-M}  {rvon}{CBM-R}{CBM-E}{grn}L{SHIFT-@}{brn}{CBM-R}{CBM-E}{rght}{gry1}{CBM-D}{orng}HH{rght}{brn}{CBM-E}{CBM-R}{rvof}  {CBM-G}",,,"{CBM-N}  {rvon}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{rght}{orng}GBB{rght}{brn}{CBM-R}{CBM-E}{rvof}  {CBM-G}
+60040 print,"{CBM-M}  {rvon}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{orng}{SHIFT-POUND}{CBM-T}{CBM-T}{CBM-T}{CBM-*}{brn}{CBM-E}{CBM-R}{rvof}  {CBM-G}",,,"{CBM-N} {orng}{rvon}{SHIFT-POUND}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}     {CBM-T}{CBM-T}{CBM-*}{rvof}{brn} {CBM-G}
+60045 print,"{CBM-M}{orng}{rvon}{SHIFT-POUND}               {CBM-*}{rvof}{brn}{CBM-G}":goto63000
+60050 rem wuestenland
+60055 print"{brn}","{CBM-N}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-H}
+60060 fori=1to13:print,"{CBM-N}",," {CBM-H}":next
+60065 print"{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}","{down}{rght}{rght}{down}{wht}.{up}{rght}{rght}.{rght}{rght}{down}{down}.{up}{up}{rght}.{rght}{rght}.{down}.{rght}{rght}.{up}{rght}.
+60070 print,"{rght}{down}{down}{down}{down}{down}{gry1}N{up}N{up}N{up}NM{down}MNMN{up}NM{down}MNMNM  NM",,"{rght}{rght}{rght}{rght}{rght}{rght}N N   N N  MN
+60075 print,"{rght}{rght}{rght}{rght}{rght}N N   N N   N",,,,"  {brn}MN",,,"{rght}{rght}{rght}{rght}{CBM-N}N  MN  {CBM-N}N",,,"{rght}{rght}{rght}{rght}M{CBM-H}  {CBM-N}N  {CBM-N}
+60080 print,"{rght}{rght}{rght}{rght}{CBM-N}   {CBM-N}  {CBM-N}{orng}{CBM-*}{rvon}        {rvof}":fori=1to2:print,"{rght}{rvon}                    {rvof}"
+60085 next:goto63000
+60090 remork-grillplatz
+60095 print,"{brn} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}":fori=1to14:print,"{CBM-N}",,"{CBM-G}":next
+60100 print," {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+60105 print"{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}","{down}{rght}{rght}{wht}.   {down}.{up}{rght}{rght}.{rght}{rght}{down}{down}.{up}{up}.{down}{rght}{rght}.{down}{down}.
+60110 print,,"{up}{up}{left}{left}{left}{left}{brn}MN MN{down}{left}{left}{left}{left}{left}{CBM-N}NM{CBM-N}NMNMN",,,"{rght}{rght}{rght}{rght}MNM{CBM-H} M{CBM-H}N{CBM-H}{CBM-N}NMN
+60115 print,"{CBM-M}MN MN{CBM-N}NN{CBM-N}N{CBM-N}NM{CBM-H}M{CBM-H}MNN{CBM-G}",,"{CBM-N}M{CBM-H}M{CBM-N}M{CBM-N}NMM{CBM-H}M{CBM-H}{CBM-N}N{CBM-N}N M{CBM-H}{CBM-H}
+60120 print,"{CBM-M}{CBM-N}NNM{CBM-H}M{CBM-H} M{CBM-H}{CBM-N} M{CBM-H}{CBM-N}N {CBM-N}N{CBM-G}",,"{rght}{CBM-N}N {CBM-N}N{CBM-N}  {CBM-N}{gry1}{CBM-F}{CBM-F}{CBM-D}{brn}{CBM-N} M{CBM-H}NM{CBM-H}{CBM-H}
+60125 print,"{CBM-M}M{CBM-G}MM{CBM-H}N{CBM-H} {gry1}{CBM-V}{brn}N{yel}X{brn}M{gry1}{CBM-F}{brn} {CBM-N}N {CBM-N}N{CBM-G}",,"{CBM-N}{CBM-N}N {CBM-N}N   {gry1}{CBM-C} {CBM-V}{CBM-V}{brn}  M{CBM-H} M{CBM-H}{CBM-H}
+60130 print,"{CBM-M}{CBM-N}  {CBM-N}           {CBM-H}  {CBM-H}{CBM-G}",,"{CBM-N}      {orng}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-K}{brn}   {CBM-H}
+60135 print,"{CBM-M}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-G}":goto63000
+60140 rem das waldtor
+60145 print,"{lblu}{rvon}                {rvof}",,,"{rvon}      NMNM      {rvof}
+60150 print,"{rvon}M  NMN N  MNMNM {rvof}",,,"{rvon} MN N N{rvof}{yel}NM{rvon}{lblu} N N  M{rvof}
+60155 print,"{rvon} N N N{rvof}{yel}NNMM{rvon}{lblu} N    {rvof}",,,"{rvon}N    {rvof}{yel}NN  MM{rvon}{lblu}     {rvof}
+60160 print,"{yel}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}",,,"{brn}{rvon}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{yel}{rvof}OO{CBM-Y}{CBM-Y}PP{brn}{rvon}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}
+60165 print,"{rvon}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{yel}{rvof}{CBM-H}{CBM-H}{rvon}  {rvof}{CBM-N}{CBM-N}{brn}{rvon}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}",,,"{rvon}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{yel}{rvof}{CBM-H}{CBM-H}{rvon}  {rvof}{CBM-N}{CBM-N}{brn}{rvon}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}
+60170 print,"{rvon}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{yel}{rvof}{CBM-H}{CBM-H}{rvon}  {rvof}{CBM-N}{CBM-N}{brn}{rvon}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}",,,"{rvon}{orng}                {rvof}":goto63000
+60175 rem gebirgspfad
+60180 print,"{brn} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}",,"{CBM-N}    {wht}.{orng}{rvon}{CBM-H}{CBM-H}{CBM-H} {CBM-H} {CBM-H}  {CBM-H}  B {rvof}{brn}{CBM-G}
+60185 print,"{CBM-M} {wht}.{orng}   {rvon}{CBM-H}{CBM-H}{CBM-H} {CBM-H} {CBM-H}  {CBM-H}  B {rvof}{brn}{CBM-G}",,"{CBM-N}  {wht}.{orng}  {rvon}{CBM-J}{CBM-H}{CBM-H} {CBM-H} {CBM-H}  {CBM-H}  B {rvof}{brn}{CBM-G}
+60190 print,"{CBM-M}{wht}.   .{orng}{rvon}{CBM-K}{CBM-H}{CBM-H} {CBM-H} {CBM-H}  {CBM-H}  B {rvof}{brn}{CBM-G}",,"{CBM-N} {orng}{rvon}{SHIFT-POUND}{CBM-*}{rvof}  {rvon}{CBM-K}{CBM-H}{CBM-H} {CBM-H} {CBM-H}  {CBM-H}  B {rvof}{brn}{CBM-G}
+60195 print,"{CBM-M}{orng}{rvon}{SHIFT-POUND}NM{CBM-*}{SHIFT-POUND}{brn}{CBM-Y}{CBM-Y}P{orng}{rvof}{CBM-*}{rvon}{CBM-H} {CBM-H}  {CBM-H}  B {rvof}{brn}{CBM-G}",,"{CBM-N}{orng}{rvon}N  MM{brn}  {CBM-N}{CBM-*}{orng}{rvof} {CBM-*}{rvon}{CBM-H}  {CBM-H}  B {rvof}{brn}{CBM-H}
+60200 print,"{CBM-M}{orng}{rvon} NM M{brn}  {CBM-N}{CBM-N} {rvon}{CBM-*}{rvof} {orng}{CBM-*}{rvon} {CBM-H}  B {rvof}{brn}{CBM-G}",,"{CBM-N}{orng}{rvon}N  MN{brn}  {CBM-N}{CBM-N} {CBM-N}{CBM-N}{rvon}{cyn}{rvof} {orng} {CBM-*}{rvon}  B {rvof}{brn}{CBM-G}
+60205 print,"{CBM-M}{orng}{rvon}   N {brn}  {CBM-N}{CBM-N} {CBM-N}{CBM-N} {rvof}  {orng}{CBM-*}{rvon} B {rvof}{brn}{CBM-G}",,"{CBM-N}{gry1}{rvon}     {brn}  {CBM-N}{CBM-N} {CBM-N}{CBM-N} {rvof}   {orng}{CBM-*}{rvon}B {rvof}{brn}{CBM-G}
+60210 print,"{CBM-M}{gry1}{rvon}         {brn} {CBM-N}{CBM-N} {rvof}    {orng}{CBM-*}{rvon} {rvof}{brn}{CBM-G}",,"{CBM-M}{gry1}{rvon}             {rvof}     {orng}{CBM-*}{brn}{CBM-G}
+60215 print," {brn}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":goto63000
+60220 rem forrestriver
+60225 fori=1to6:print,"{rvon}{lblu}                   {rvof}":next
+60230 print,"{rvon}{lblu}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}":fori=1to7:print,"{rvon}{lgrn}                   ":next
+60235 print,"{up}{up}{up}{up}{up}{up}{up}{up}{up}{rvon}{lblu}N{up}N{up}NM{down}M{left}{up}{up}{up}UI{down}{down}{down}{down}{left}{left}N{up}N{up}N{up}{up}{up}UI{down}UI{down}{down}{down}{left}{left}N{up}NM{down}{left}N{up}N{up}NM{down}MNMN
+60240 print,,"{left}{left}{left}{up}{up}{lblu}{SHIFT-POUND}{CBM-*}{down}{left}{left}{rvon}{gry1}UI{down}{left}{left}JK{down}{left}{left}  {rvof}   {lblu}{CBM-*}{down}{left}{left}{left}{left}{left}{left}{rvon}{gry1}  {gry2}{CBM-H}{CBM-F}{CBM-F}{CBM-F}{down}{left}{left}{left}{left}{left}{left}{gry1}  {gry2}{CBM-H}{CBM-V}{CBM-V}{CBM-V}
+60245 print,,"{up}{left}{left}{left}{left}{left}{left}{lgrn}{SHIFT-POUND}{CBM-*}{rvon}{gry1}{down}{left}{left}{gry1}{CBM-D} {rght}{gry1}{rvof}{CBM-K}{rvon}{CBM-K}{gry2}{CBM-H}   {rght}{rght}{up}{lgrn}{rvof}{SHIFT-POUND}{CBM-*}{rvon}{down}{left}{left}{gry1}{CBM-D} ",,,"{rght}{rvof}{lgrn}{SHIFT-POUND}{CBM-*}","{rght}{SHIFT-POUND}{CBM-*}"
+60250 print,"{rght}{gry2}{rvon}{CBM-D} {rvof}{lgrn}{SHIFT-POUND} {CBM-*}{rght}{SHIFT-POUND} {CBM-*}{rght}{rvon}{gry1} {CBM-F}{rvof}{rght}{lgrn}{SHIFT-POUND} {CBM-*}",,,"{rght}{rght}{rght}{gry1}{rvon}{CBM-C}{CBM-D} {rght}{gry2} {CBM-D} {rght}{rght}{rght}{rght} {CBM-F} "
+60255 print,"{lgrn}{rvon} {CBM-@}{CBM-P}{CBM-O}{CBM-I}{rvof}{CBM-U}{CBM-Y}{CBM-T}{CBM-Y}{rvon}{CBM-I}{CBM-O}{CBM-@}       {rvof}
+60260 print," {CBM-@}{CBM-P}{CBM-O}{CBM-I}{rvon}{CBM-U}{CBM-Y}{CBM-T}{CBM-U}{rvof}{CBM-I}{CBM-P}{orng}{rvon}{SHIFT-POUND}{rvof}{SHIFT-POUND}{lgrn}{CBM-Y}{CBM-U}{rvon}{CBM-I}{CBM-O}{CBM-P} {rvof}
+60265 print,"{rvon}            {CBM-T}{CBM-U}{rvof}{CBM-I}{CBM-O}{CBM-P}{CBM-@}"
+60266 print,,"{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{rght}{rght}{rght}{rght}{rght}{lblu}{rvon}N{rght}N{down}{left}{left}{left}{left}N{up}{up}{up}{rght}{rght}{rght}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":goto63000
+60270 rem weinkeller
+60275 print," {gry2}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}
+60280 fori=1to2:print,"{CBM-M}    {rvon}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{rvof}{CBM-G}":print,"{CBM-N}    {rvon}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{rvof}{CBM-G}":next
+60285 print,"{CBM-M}   {brn}{rvon}{SHIFT-POUND}{gry2}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{orng}HBG{gry2}{CBM-E}{orng}HBG{gry2}{CBM-E}{rvof}{CBM-G}":print,"{CBM-N}  {brn}{rvon}{SHIFT-POUND}N{gry2}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{orng}BBB{gry2}{CBM-E}{orng}BBB{gry2}{CBM-R}{rvof}{CBM-G}"
+60290 print,"{CBM-M} {brn}{rvon}{SHIFT-POUND}NN{rvof}{CBM-@}{CBM-@}{CBM-@}{CBM-@} {orng}{rvon}HBG{rght}HBG{rvof}{gry2} {CBM-G}":print,"{CBM-M} {brn}{rvon}NN{rvof}{brn}{SHIFT-POUND}L{CBM-P}{CBM-P}N         {gry2}{CBM-G}
+60295 print,"{CBM-M} {brn}{rvon}N{rvof}{brn}{SHIFT-POUND}{lblu}{rvon}{SHIFT-POUND}  {rvof}{SHIFT-POUND}         {gry2} {CBM-G}
+60300 print,"{CBM-M}N{brn}{SHIFT-POUND}{lblu}{rvon}{SHIFT-POUND}  {rvof}{SHIFT-POUND}          {gry2} {CBM-G}":print,"{CBM-M} {brn}{CBM-T}{CBM-T}{CBM-T}{CBM-T}     {orng}{rvon}HBG{rvof}    {gry2}{CBM-G}
+60305 print,"{CBM-M}      {orng}{rvon}HBG{rght}BBB{rvof}{gry2}    {CBM-G}":print," {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":goto63000
+60310 rem dunkler pfad
+60315 print:fori=1to3:print,"{grn}{rvon}              ":next
+60320 print,"{CBM-C}{brn}{CBM-K}{grn}{CBM-U}{CBM-C}{brn}{CBM-K} {grn}{CBM-U}{brn}{CBM-K}{grn}{CBM-C}{rvon}  {CBM-D}{CBM-F} "
+60325 fori=1to3:print,"{brn} {CBM-K}  {CBM-K}  {CBM-K}  {CBM-K}  {CBM-K}":next
+60330 print,"{orng}{rvon} {CBM-@}{CBM-P}{CBM-O}{CBM-I}{CBM-P} {CBM-P}{CBM-O}{CBM-P}{CBM-@} {CBM-@}{CBM-P}"
+60335 print,"{CBM-@}{CBM-@}{CBM-P}{CBM-O}{CBM-I}{CBM-P}{CBM-@}{CBM-P}{CBM-O}{CBM-P}{CBM-@}{CBM-@}{CBM-@}{CBM-P}
+60340 print,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}":goto63000
+60345 rem beorns haus
+60350 print,"{lblu}{rvon}                {rvof}
+60355 print,"{rvon}   {$a0}      NM    {rvof}
+60360 print,"{rvon} NM  NM{rvof}{SHIFT-POUND}{CBM-*}{rvon}N  M  N{rvof}
+60365 print,"{rvon}N  MN {rvof}{SHIFT-POUND}  {rvon}{orng} {lblu}   MN {rvof}
+60370 print,"{rvon}   N {rvof}{SHIFT-POUND}   {rvon}{orng} {lblu}{rvof}{CBM-*}{rvon}  N  {rvof}
+60375 print,"{rvon}  N {rvof}{SHIFT-POUND}      {CBM-*}{rvon}    {rvof}
+60380 print,"{rvon}     {brn}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{CBM-E}{CBM-R}{lblu}     {rvof}
+60385 print,"{rvon}     {brn}{CBM-R}{CBM-E}{rght}{CBM-E}{wht} {brn}{CBM-E}{lblu}     {rvof}
+60390 print,"{rvon}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{brn}{CBM-E}{CBM-R}{rvof}{orng}{CBM-V}{rvon}{brn}{CBM-R}{CBM-E}{CBM-R}{lblu}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{rvof}
+60395 print,"{rvon}{grn}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{rvof}
+60400 print,"{rvon}                {rvof}":goto63000
+60405 rem wasserfall
+60410 print," {brn}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}
+60415 print,"{CBM-M} H H Y{CBM-M}{CBM-M}{lblu}{CBM-O}{brn}{CBM-G}GB B {CBM-H}
+60420 print,"{CBM-M} Y B B {CBM-H}{lblu}{rvon} {rvof}{brn} {CBM-H}H B {CBM-H}
+60425 print,"{CBM-M} H B {CBM-G}{CBM-N}{lblu}{CBM-M}{rvon} {rvof}{brn}{CBM-G}T{CBM-N} H {CBM-H}
+60430 print,"{CBM-M} H G {CBM-G}H{lblu}{CBM-N}{rvon} {rvof}{CBM-H}{brn}G{CBM-N} {CBM-N} {CBM-H}
+60435 print,"{CBM-M} B G {CBM-G}B{lblu}{CBM-L}{rvon} {rvof}{CBM-J}{brn}B {CBM-H} {CBM-H}{CBM-H}
+60440 print,"{CBM-M}{grn}{CBM-N}{brn}B{grn}{CBM-N}{brn}{CBM-H}{CBM-N} H{lblu}{rvon}{CBM-K} {rvof}{CBM-K}{brn}Y G {CBM-G}{CBM-H}
+60445 print,"{CBM-M}{grn}{rvon}{CBM-J}{rvof}{CBM-K}{rvon}{CBM-K}{CBM-L}{rvof}{brn}Y {CBM-N}{lblu}{rvon}{CBM-J} {CBM-L}{rvof}{brn}H G {CBM-H}{CBM-H}
+60450 print,"{CBM-M}{grn}{rvon}{CBM-H}{CBM-L}{CBM-H}{CBM-N}{rvof}{brn}H H{lblu}{rvon}   {rvof}{brn}{CBM-N} B{CBM-N} {CBM-H}
+60455 print,"{CBM-M}{grn}{rvon} {CBM-M}  {rvof}{brn}B{blu}{CBM-O}{rvon}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{rvof}{CBM-O}{brn}B{CBM-N} {CBM-H}
+60460 print,"{CBM-M}{CBM-L} {CBM-L}{blu}{CBM-O}{rvon}         {rvof}{CBM-O}{brn}{CBM-H}{CBM-H}
+60465 print," {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":goto63000
+60470 rem dal
+60475 print,"{brn} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}
+60480 print,"{CBM-M} {wht}.      .    {brn}   {CBM-G}
+60485 print,"{CBM-M} {wht}    .     . .{brn}  {CBM-G}
+60490 print,"{CBM-M} {gry1}      NM{brn}       {CBM-G}
+60495 print,"{CBM-M}{gry1}  NM  N  MNM{brn}  {$a0} {CBM-G}
+60500 print,"{CBM-M}{gry1} N  MN   N  M  N{brn}{CBM-G}
+60505 print,"{CBM-M}{gry1}N   N{yel} {CBM-D}{gry1} N    MN{brn} {CBM-G}
+60510 print,"{CBM-M}{yel}   {CBM-D} {rvon}{CBM-U} {rvof} {CBM-K}{CBM-K}{CBM-D} {gry1} N{brn}  {CBM-G}
+60515 print,"{CBM-M}{yel}   {rvon} {rvof}{CBM-K}{CBM-K}{CBM-K} {rvon} {rvof}{CBM-K}{CBM-K}{CBM-K} {brn}   {CBM-G}
+60520 print,"{CBM-M}{yel}  {rvon}{CBM-V}    {rvof}{CBM-O}{rvon}    {rvof}{CBM-I}{$a0}{brn}  {CBM-G}
+60525 print,"{CBM-M}{orng}{rvon}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{rvof}{brn}{CBM-G}
+60530 print,"{CBM-M}{orng}{rvon}                {rvof}{brn}{CBM-G}":goto63000
+62000 print"{clr}":print,"{yel}     M MN N
+62001 print,"  M M  MN  N N
+62002 print," M  M M  N N  N
+62003 print," M MM M{CBM-N} N NN N
+62004 print,"MMMM MMUINN NNNN
+62005 print,"MMMM{CBM-*}{rvon}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{rvof}{SHIFT-POUND}NNNN
+62006 print," MMM{red}{rvon}{SHIFT-POUND}      {CBM-*}{rvof}{yel}NNN
+62007 print," MM{red}{rvon}{SHIFT-POUND}        {CBM-*}{rvof}{yel}NN
+62008 print,"  M{rvon}{CBM-M}{CBM-N} M  N {CBM-H}{CBM-H}{rvof}N
+62009 print,"  M{rvon}{CBM-M}{CBM-N}  OP  {CBM-H}{CBM-H}{rvof}N
+62010 print,"   {rvon}{CBM-M}{CBM-N}  {CBM-H}{CBM-N}  {CBM-H}{CBM-H}{rvof}
+62011 print,"{orng}{rvon}   {yel}{CBM-M}{CBM-N}  L{SHIFT-@}  {CBM-H}{CBM-H}{orng}   {rvof}
+62012 print,"{rvon}   {yel}{CBM-M}{CBM-N} N  M {CBM-H}{CBM-H}{orng}   {rvof}
+62013 print,"{rvon}   ekim-repus   {rvof}
+62020 print,"{left}{left}{left}{left}{down}{wht}herzlichen glueckwunsch ,",,"{left}{left}{left}{left}sie haben es geschafft !
+62025 x$="                                        *** j.r.r tolkien"
+62030 x$=x$+" *** der kleine hobbit *** ein abenteuerspiel von "
+62040 x$=x$+"michael nickles - bergstr.3 - 8763 klingenberg 2 ***"
+62070 x$=x$+"                                         "
+62100 fori=1tolen(x$)-39
+62110 poke211,1:poke214,20:sys58732
+62120 printmid$(x$,i,39)
+62130 forii=1to150:nextii
+62140 nexti:end
+62500 poke53280,0:poke53281,0:print"{clr}{red}{down}{down}{down}{down}","  j.r.r. tolkien"
+62501 print"{down}{down}{down}":print,"{yel}  der kleine
+62502 print
+62503 print,"  {CBM-H}{CBM-N} NM OP OP {CBM-H}P{CBM-Y}
+62504 print,"  L{SHIFT-@} {CBM-H}{CBM-N} L{SHIFT-@} L{SHIFT-@} {CBM-H}{CBM-N}
+62505 print,"  {CBM-H}{CBM-N} {CBM-H}{CBM-N} {CBM-H}{CBM-N} {CBM-H}{CBM-N} {CBM-H}{CBM-N}
+62506 print,"  {CBM-H}{CBM-N} MN L{SHIFT-@} L{SHIFT-@} {CBM-H}{CBM-N}
+62510 print"{down}{down}{down}{down} ein abenteuerspiel von michael nickles
+62520 print,"{down}{down}{red}  bitte warten !"
+62600 return
+63000 poke198,0:wait198,1:print"{wht}":return
+63100 print," {orng}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}
+63102 print,"{CBM-M}{wht}.     .    . {orng} {CBM-G}
+63103 print,"{CBM-M}{wht}   .     .   .{orng}{CBM-G}
+63104 print,"{CBM-M}              {CBM-G}
+63105 print,"{CBM-M}      {wht}{rvon}{SHIFT-POUND}{CBM-*}{rvof}{orng}      {CBM-G}
+63106 print,"{CBM-M}     {wht}{rvon}{SHIFT-POUND}  {CBM-*}{rvof}{orng}     {CBM-G}
+63107 print,"{CBM-M}    {gry1}{rvon}{SHIFT-POUND}    {CBM-*}{rvof}{orng}    {CBM-G}
+63108 print,"{CBM-M}   {gry1}{rvon}{SHIFT-POUND}      {CBM-*}{rvof}{orng}   {CBM-G}
+63109 print,"{CBM-M}  {gry1}{rvon}{SHIFT-POUND}        {CBM-*}{rvof}{orng}  {CBM-G}
+63110 print,"{CBM-M}{rvon}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{rvof}{CBM-G}
+63111 print,"{CBM-M}{rvon}              {rvof}{CBM-G}":goto63000
+

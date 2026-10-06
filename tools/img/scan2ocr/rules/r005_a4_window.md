@@ -128,6 +128,15 @@ re-derived.
 
 ## A PAGE WHOSE TRACE FAILS IS STILL CUT AUTOMATICALLY — NEVER BY HAND
 
+**NAMING, because the numbers collide.** The three above — logo, paper-edge,
+traced-edge — are the ANCHOR fallbacks, and they are implemented in
+`r005_a4_window.py`. The three below are RECOVERIES for a page whose trace
+failed outright, they are a different thing, and **they are not in the code**:
+every build so far has re-derived them in a hand-written script (SH8603's
+155/163/168, SH8604's 163). Call them recovery A, B and C, not fallback 1, 2
+and 3. Implementing them in `r005_a4_window.py` is the open task; until then,
+the builder writes the script and records which recovery it used in the stamp.
+
 **Owner, 2026-10-04: "manual cropping is not an option for the PDF."** A hand
 crop does not reproduce, is not recorded anywhere a later build can read, and
 turns one person into the step. A page whose trace fails gets a BEST-EFFORT
@@ -145,15 +154,28 @@ no card at all and the page was published as an uncropped sheet. MEASURED:
 
 So, in order:
 
-1. **A failed page of an INSERT takes its run's unified size**, anchored on its
-   own traced top-left corner where there is one, else on the run's offset. The
-   Zahlkarte measures **~144 x 208 mm** across every Sonderheft that has one
-   (four good traces over SH8602 and SH8603; SH8601's reads ~144 x 205). A
-   member that disagrees with that by more than a few mm has failed, whatever
-   its trace says — 216 x 304 mm is the SHEET, not the card.
-2. **A failed page with surplus paper** (a wrapper back cover, 217 mm of paper
+**Recovery A.** **A failed page of an INSERT takes its run's unified size.** The authority is
+   **the run's own agreeing traces**, never a corpus constant: a bound-in card
+   is whatever that issue bound in. MEASURED: SH8602 and SH8603's Zahlkarte read
+   ~144 x 208 mm, SH8601's ~144 x 205 — but **SH8604's reads 149.9 x 206.9**,
+   6 mm wider, because its card carries a printed "Wußten Sie schon …" flap.
+   All four of its traces agree and its edges are clean, so the card is simply a
+   different object. Read as a constant, the rule would have called all four
+   failed.
+
+   So the test is **agreement within the run**, not a match against ~144 x 208.
+   A member has failed when it disagrees with its agreeing siblings, or when it
+   reads at sheet size (216 x 304 mm) — that is the frame, not the card.
+
+   **Anchoring:** on the page's own traced top-left corner where there is one;
+   where there is not, on whichever edges ARE measurable (right or bottom
+   against the bed), and NOT on the run's offset. MEASURED on SH8603: the run's
+   offset put the window's right edge at 3438, past 183's card edge at 3431, so
+   28% of 183's right 24 px band was bed. Check the window's edge bands for bed
+   before accepting it.
+**Recovery B.** **A failed page with surplus paper** (a wrapper back cover, 217 mm of paper
    in an A4 frame) is windowed on its **ink bounding box**, not the paper's.
-3. **A failed page whose ground is full-bleed dark**, where a colour test for
+**Recovery C.** **A failed page whose ground is full-bleed dark**, where a colour test for
    the prop cannot work because the sheet is already graded and separated, is
    cut from **row and column luminance profiles**: the prop shows as a step at
    the foot, the bed as a plateau darker than the page. MEASURED on SH8602/155:

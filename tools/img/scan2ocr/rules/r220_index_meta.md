@@ -57,7 +57,11 @@ An earlier note here had it backwards and told the builder to write nothing.
 its 29 articles because this rule was skipped as `not applicable — kind`.
 Published; not fixed retroactively (owner, 2026-10-03). Do not repeat it.
 
-**The apply script reads only the monthly layout** (`line.startswith(f"{code},")`
+**The apply script HAS a Sonderheft reader** — `parse_sonderheft_csv` in
+`r220_index_meta_apply.py`, which keys on column 4. This paragraph used to say
+it "reads only the monthly layout … write one as part of this step", so
+SH8603 set out to write a parser that already existed. What remains true is
+below; the monthly path is `line.startswith(f"{code},")`
 and `parts[1]` pages / `parts[2]` category / `parts[4]` title). A Sonderheft
 needs its own reader for the columns above; write one as part of this step.
 
@@ -76,7 +80,15 @@ Each row: `YYMM,pages,category,subcategory,title`. Pages use em-dash
 
 - `index_category` — drives the article's place on the site's
   generated "Artikel by topic" page. Format: `Category|Subcategory`.
-  Category values must match a `TOPICS` list inside `generate.py`.
+  Category values are **not** constrained by the `TOPICS` list inside
+  `generate.py`. This line used to say they "must match" it; `TOPICS` is a
+  GROUPING list for the topic index pages, mapping a label to a set of
+  `Category|Subcategory|` prefixes, and a value outside every prefix is
+  applied normally and simply does not appear under a labelled topic.
+  MEASURED, distinct values matching no prefix: **SH8603 19 of 42 metas,
+  SH8602 15 of 35, 8612 30 of 55, 8611 32 of 49.** So this was false for the
+  monthlies too, not only for the Sonderhefte — a build that believed it
+  would have "corrected" two thirds of a correct CSV.
 - `index_title` — title as it appears in the annual index, often
   with parenthetical clarifications like `(Teil 1)` or
   `(Farbdruckerübersicht)` not in the headline.
@@ -187,7 +199,11 @@ which put four of 8611's 49 rows in the wrong article. It now takes the
 **nearest preceding start page**, and that same rule is the check:
 
 ```bash
-$PY - issues/<YYMM> "Jahresinhaltsverzeichnis <YYYY>.csv" <YYMM> <<'PYEOF'
+# For a Sonderheft, pass the Sonderheft CSV; the script picks the columns from
+# the id it is given.  An empty row set is now reported, not passed.
+$PY - issues/<ID> "Jahresinhaltsverzeichnis <YYYY>.csv" <ID> <<'PYEOF'
+#   ... or, for a Sonderheft:
+# $PY - issues/SH8603 "Gesamtinhaltsverzeichnis Sonderhefte.csv" SH8603 <<'PYEOF'
 import csv, glob, io, os, re, sys
 # THE ROUTING RULE IS THE CHECK. A row (page, title) belongs to the article
 # whose start page is the NEAREST PRECEDING one. So for every applied row,
@@ -196,26 +212,52 @@ import csv, glob, io, os, re, sys
 # article's -- an article's mere overlap with another is normal (interleaved
 # listing runs) and says nothing.
 d, csv_path, code = sys.argv[1], sys.argv[2], sys.argv[3]
+# A SONDERHEFT KEYS ITS ROWS IN A DIFFERENT COLUMN OF A DIFFERENT FILE, so this
+# filter found 0 rows for one and reported "0 of 0 ... past a nearer article"
+# as a pass -- vacuous on SH8601, SH8602 and SH8603 alike.
+#   monthly    col 0 = "8612", col 1 = page, col 4 = title
+#   Sonderheft col 3 = "3/86", col 4 = page, col 2 = title
+SH = code.startswith('SH')
+if SH:
+    key = '%d/%s' % (int(code[4:6]), code[2:4])      # SH8603 -> 3/86, UNPADDED
+    PAGE, TITLE, KEYCOL = 4, 2, 3
+else:
+    key, PAGE, TITLE, KEYCOL = code, 1, 4, 0
 rows = []
 for line in io.open(csv_path, encoding='utf-8'):
     p = next(csv.reader([line]))
     # PARSE THE FIRST INTEGER BEFORE THE DASH. `p[1].isdigit()` is False for
     # every range row ("172—173"), so this check silently examined 26 of
     # 8612's 55 rows and a planted range-row misroute passed.
-    if len(p) > 4 and p[0] == code:
-        mm = re.match(r'\s*(\d+)', p[1])
+    if len(p) > max(PAGE, TITLE, KEYCOL) and p[KEYCOL].strip() == key:
+        mm = re.match(r'\s*(\d+)', p[PAGE])
         if mm:
-            rows.append((int(mm.group(1)), p[4]))
-starts, spans, titles = {}, {}, {}
+            rows.append((int(mm.group(1)), p[TITLE]))
+if not rows:
+    print('  NO ROWS for %s in %s -- wrong CSV or wrong key, not a pass'
+          % (key, os.path.basename(csv_path)))
+starts, spans, titles, LETTERED = {}, {}, {}, {}
 for f in sorted(glob.glob(os.path.join(d, '*.html'))):
     s = io.open(f, encoding='utf-8').read()
     m = re.search(r'64er\.pages" content="([^"]+)"', s)
     if not m: continue
     segs = []
+    # PARSE THE LEADING INTEGER, here too.  `lo.isdigit()` is False for a
+    # LETTERED page ('21a', '77b'), which r080 requires when two articles start
+    # on one page -- so such an article produced no segs, fell out through the
+    # `continue` below, and was INVISIBLE to this check: a row on p21 could
+    # neither be routed to it nor see it as a nearer article.
+    lettered = set()
     for seg in m.group(1).split(','):
         lo, _, hi = seg.strip().partition('-')
-        if lo.isdigit(): segs.append((int(lo), int(hi or lo)))
+        ml = re.match(r'\s*(\d+)([a-z]?)', lo)
+        mh = re.match(r'\s*(\d+)', hi) if hi else None
+        if ml:
+            segs.append((int(ml.group(1)),
+                         int(mh.group(1)) if mh else int(ml.group(1))))
+            if ml.group(2): lettered.add(int(ml.group(1)))
     if not segs: continue
+    if lettered: LETTERED.setdefault(min(lettered), []).append(f)
     starts[f] = segs[0][0]
     spans[f] = segs
     for t in re.findall(r'64er\.index_title" content="([^"]*)"', s):
@@ -246,6 +288,15 @@ for page, title in rows:
               f"  (p{starts[best]} {os.path.basename(best)[:26]} starts closer)")
         bad += 1
 print(f"{bad} of {len(rows)} rows routed past a nearer article")
+# LETTERED SIBLINGS CANNOT BE SEPARATED BY PAGE, because they share one.  The
+# nearest-preceding-start rule is silent between 21a and 21b, so say so and
+# name them: those rows are routed by TITLE and have to be read.
+for pg, fs in sorted(LETTERED.items()):
+    if len(fs) > 1:
+        print(f"  BY TITLE  p{pg} has {len(fs)} lettered articles; page routing "
+              f"cannot choose between them -- check each row's title:")
+        for f in sorted(fs):
+            print(f"              {os.path.basename(f)}")
 PYEOF
 ```
 
@@ -262,10 +313,31 @@ Druckermarkt*, because "drucker" matches "Druckermarkt".
 
 ```bash
 dir=issues/<YYMM>
-csv="Jahresinhaltsverzeichnis <YYYY>.csv"
+csv="Jahresinhaltsverzeichnis <YYYY>.csv"    # replaced below for a Sonderheft
 
-# 1. CSV row count vs applied index_category count
-csv_rows=$(grep -c "^<YYMM>," "$csv" | tr -d ' ')
+# 1. CSV row count vs applied index_category count.
+#
+# THE SONDERHEFT CSV IS A DIFFERENT SHAPE AND A DIFFERENT FILE.  The monthly
+# Jahresinhaltsverzeichnis keys the issue in COLUMN 1 ("8612,..."); the
+# Gesamtinhaltsverzeichnis Sonderhefte keys it in COLUMN 4, unpadded and with
+# a slash ("Buchbesprechungen,C16/VC20,Bücher zum C16 und VC20,3/86,52").  So
+# `grep -c "^SH8603,"` finds 0 rows, 0 == 0 is reported as a PASS, and the
+# routing check below filters on the monthly columns and passes too.  Both
+# were vacuous on SH8601, SH8602 and SH8603.
+if [ "${ISSUE#SH}" != "$ISSUE" ]; then
+  csv="Gesamtinhaltsverzeichnis Sonderhefte.csv"
+  YY=${ISSUE:2:2}; MM=${ISSUE:4:2}
+  key="$((10#$MM))/$YY"                  # SH8603 -> 3/86, UNPADDED
+  csv_rows=$($PY - "$csv" "$key" <<'PYEOF'
+import csv, io, sys
+rows = [r for r in csv.reader(io.open(sys.argv[1], encoding='utf-8'))
+         if len(r) > 3 and r[3].strip() == sys.argv[2]]
+print(len(rows))
+PYEOF
+)
+else
+  csv_rows=$(grep -c "^$ISSUE," "$csv" | tr -d ' ')
+fi
 applied=$(grep -c '64er.index_category' "$dir"/*.html | \
           awk -F: '{s+=$2} END {print s}')
 echo "  csv rows: $csv_rows  applied: $applied"

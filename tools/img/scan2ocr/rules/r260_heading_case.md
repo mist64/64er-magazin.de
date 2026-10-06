@@ -38,9 +38,30 @@ A heading qualifies for re-casing iff **all** of the following hold:
 A heading that IS code stays in caps. The exemption below lists ROM keywords,
 but a **program NAME** is code too and is not in any keyword list — SH8602's
 `UNNEW` is one, and the check reported FAIL on a correct tree with no way to be
-told otherwise. So: **r260 reads `adjudicated.txt` the way r310 does**, under
-the key `heading-all-caps`, and a program name is adjudicated there once rather
-than added to a keyword list that can never be complete.
+told otherwise. So: **r260's own Verification check 1 reads
+`issues/<ID>/adjudicated.txt`**, in r310's format and with r310's loader,
+under the key `heading-all-caps` — and a program name is adjudicated there
+once rather than added to a keyword list that can never be complete.
+
+This paragraph used to say "r260 reads `adjudicated.txt` **the way r310
+does**", which SH8603 read as meaning r310 performs the check. It does not:
+r310 has no `heading-all-caps` check, and r260's Verification read no
+adjudication file at all. An entry in `adjudicated.txt` therefore satisfied
+neither — r260 went on failing and r310 reported `declared N, found 0` — so
+a heading kept in caps on purpose could not be cleared from either end.
+SH8602's `UNNEW` is the standing example. The hook is wired now, and r260
+owns it. The reason text should NAME the heading, because what is blessed is
+one specific program name:
+
+```
+# finding-key        n   reason
+heading-all-caps     1   UNNEW ist der Programmname, so gedruckt
+```
+
+The check clears a heading whose text appears in the reason, and otherwise
+clears up to `n` of them, reporting an over-count as r310 does. The copy of
+this scan in *Briefing for the sub-agent* deliberately does **not** clear
+anything: there it is a candidate list to walk, not a gate.
 
 8609's `POKE 1,0 ???` is one hit and is correct. So is `14mal schneller laden`, which check 2
 flags and published precedent shares (`30mal schneller mit SpeedDos`).
@@ -198,6 +219,19 @@ import glob, io, os, re, sys
 # else. Do not re-express it as a character class: any punctuation left out of
 # the class (: — » « ?) or a leading digit makes the heading pass while it is
 # still in caps.
+# THE ADJUDICATION HOOK THIS RULE PROMISES, which was never wired: the prose
+# above said r260 reads adjudicated.txt while the code read nothing, so
+# SH8602's UNNEW could not be cleared from either end.  Same file and the same
+# loader as r310, key `heading-all-caps`.
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+try:
+    from r310_issue_invariants import adjudications
+    ADJ = adjudications(sys.argv[1])
+except Exception:
+    ADJ = {}
+_n, _why = ADJ.get('heading-all-caps', (0, ''))
+_cleared = 0
+
 for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
     for m in re.finditer(r'<h([12])>(.*?)</h\1>', io.open(f, encoding='utf-8').read(), re.S):
         t = re.sub(r'<[^>]+>', '', m.group(2))
@@ -221,7 +255,16 @@ for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
         if runs and all(r in BASIC for r in runs):
             continue
         if len(upper) / len(letters) >= 0.8 and re.search(r'[A-ZÄÖÜẞ]{3,}', t):
+            if t.strip() and t.strip() in _why:
+                _cleared += 1
+                continue
+            if _cleared < _n:
+                _cleared += 1
+                continue
             print(f"  ALL CAPS heading: {os.path.basename(f)}: {t.strip()[:60]}")
+if _n and _cleared != _n:
+    print(f"  ADJ heading-all-caps: declared {_n}, cleared {_cleared}"
+          f"{' -- MORE than adjudicated' if _cleared > _n else ''}")
 PYEOF
 )
 [ -n "$caps" ] && { printf '%s\n' "$caps"; echo "  FAIL: ALL CAPS heading survived"; }

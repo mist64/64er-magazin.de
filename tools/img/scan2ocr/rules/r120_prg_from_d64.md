@@ -45,6 +45,171 @@ For Sonderhefte the file lives under the same root with the SH naming. An
 issue published as two disks is `<YYMM>A.D64` / `<YYMM>B.D64` -- 8611 is two,
 8612 is one; look, do not assume. Each `.D64` has a `.TXT` beside it.
 
+**The Sonderheft names are NOT `<YYMM>A.D64`.** They drop the year and pad the
+issue number to two digits, in a directory of the same shape: SH 3/86 is
+`SH0X/SH03A.D64` and `SH0X/SH03B.D64`, SH 4/86 is `SH04A` through **`SH04D`**
+— four disks, so "two" is not the ceiling either. `ls` the directory.
+
+## Bare `petcat` is BASIC 7.0, and this rule used to say V2
+
+petcat's own help is explicit: `-<version>` means *"use keywords for
+`<version>` instead of **the v7.0 ones**"*. So the default is 7.0, and there
+is no V2 unless `-2` is passed.
+
+Confirmed empirically on VICE 3.9 with a one-line program whose only token is
+`$E3`: bare `petcat` prints `10 gshape` (BASIC 7.0), `petcat -2` prints `10`
+and drops it.
+
+What that costs in practice, both seen on SH8603: C16 files came out readable
+but **untagged** (`key5,"dsave"…dec(`), and a VC 20 file showed **C16
+keywords**. Neither looks like a decode failure — the text is plausible — so
+only check 4 exposed it. Pass the dialect explicitly for anything that is not
+a C64 BASIC 7.0 program.
+
+## A `.txt` IS BYTES, AND $A0 AFTER `REM` IS NOT `CLOSE`
+
+A PETSCII listing is one byte per character, and a byte ≥ `$80` is a real
+character. **`$A0` is the shifted space**, which the magazines use to pad a REM
+banner to width.
+
+**petcat emits it as the keyword `CLOSE`.** `$A0` is also the token for CLOSE,
+and after `REM` petcat detokenises rather than passing the byte through:
+
+| | |
+|---|---|
+| disk, SH8604 `der kl. hobbit` line 10000 | `8F 20 4D 4F … 20 20 A0` = `REM MOEGLICHE RICHTUNGEN` + padding + shifted space |
+| petcat's `.txt` | `10000 rem moegliche richtungen    close` |
+
+That is a **transcription error in a file we publish**, not a display quirk:
+`generate.py` runs `petcat -w` over the `.txt` to build the downloadable
+`.prg`, so the reader's download had `CLOSE` — five literal bytes — where the
+program has one.
+
+### OUTSIDE A QUOTED STRING, petcat INTERPRETS NO BRACE ESCAPE AT ALL
+
+This is the one fact behind every round-trip surprise in this file, so it is
+worth having on its own. MEASURED, tokenising with `-w2`:
+
+| input | inside a string | outside one (bare body, or after `REM`) |
+|---|---|---|
+| `{$20}` | `20` | `5B 24 32 30 5D` — the literal text `[$20]` |
+| `{$a0}` | `A0` | `5B 24 41 30 5D` — the literal text `[$A0]` |
+| `{space}` | `20` | — |
+| a raw `$20` as the whole body | — | **the line is dropped** |
+
+petcat is not skipping a particular escape; once it is outside quotes it does
+no escape processing whatever. Both defects below follow from that:
+
+- **`$A0` after `REM`** is outside a string, so no escape reaches it and **the
+  raw byte is the only way to express it** — which is why `generate.py` reads
+  the listing and pipes it to petcat as **latin-1** rather than UTF-8 (both
+  sites commented there);
+- **a space-only line** is outside a string too, so no escape reaches it
+  either, and the one byte that would work is the one petcat strips as
+  trailing whitespace. It cannot be expressed at all. See *petcat's round trip
+  is NOT loss-free*, below.
+
+Measured for the encoding:
+
+```
+read utf-8   -> encode utf-8     UnicodeDecodeError: invalid start byte
+read latin-1 -> encode utf-8     8F 20 41 42 C2 A0      <- two bytes, wrong
+read latin-1 -> encode latin-1   8F 20 41 42 A0         <- correct
+```
+
+**Verify by regenerating, not by reading.** Tokenise the `.txt` and compare it
+line by line with the file extracted from the D64 — that is the only check
+that sees this. SH8604's Hobbit now matches the disk on all 702 lines, the one
+difference being the `115 rem` the owner authorised from the 7/86
+Fehlerteufelchen.
+
+**Swept the corpus 2026-10-06** for a REM line ending in any BASIC keyword
+after padding, which is the general shape: **two damaged lines, both in
+`der kl. hobbit`**. SH8504's `etiketten.txt` line 3180 `rem      return` looks
+identical and is **genuine** — the disk has `52 45 54 55 52 4E`, the six
+letters, not a token. Check the disk before fixing one.
+
+## petcat's round trip is NOT loss-free: a SPACE-ONLY line is dropped
+
+**The known case, measured — and it is not what it first looks like.** A
+`.prg → .txt → .prg` round trip through petcat can come back shorter, with a
+cascade of differing bytes from the first divergence onward. On SH8604's
+`1985/1986` that read as **5,932 differing bytes**; the real difference is
+**two lines**.
+
+The cause is a line whose body is a **single space** (`$20`):
+
+```
+ 2260 print"wollen sie wirklich aufh$ren";:gosub3720
+ 2270                     <- body is one byte, $20
+ 2280 ifr$="n"thenprint:print"ich wu&te es.":goto2330
+```
+
+petcat's **detokeniser** writes the space out faithfully. petcat's
+**tokeniser** strips trailing whitespace, sees an empty body, and **discards
+the line**. Verified directly: feeding `10 print"a"` / `20 ` / `30 print"b"`
+to `petcat -w2` produces lines 10 and 30 only.
+
+**This is NOT an "empty line", and the distinction matters** because an empty
+line is not enterable on a C64 — a bare line number DELETES the line. A line
+number followed by a SPACE is a different thing and stores a one-byte body,
+which is how these got onto the disk. Reading petcat's output as "nothing
+there" instead of dumping the bytes is what made the first diagnosis of this
+wrong; **go to the bytes.**
+
+Measured on SH8604: `1985/1986` has 2 such lines, `lader` 1. Nothing `GOTO`s
+or `GOSUB`s any of them, so the programs behave identically, and **our shipped
+`.txt` keeps them**, so the archive is faithful to the disk. The loss happens
+only if someone re-tokenises our `.txt` back into a `.prg`.
+
+Owner, 2026-10-05: *"tiny difference and tiny bugs in print in the context of
+MSE are just ok."* So a round-trip difference of this shape is recorded and
+left; it is not a transcription error and not a print/disk divergence.
+
+**What this means for check 4's round-trip test:** a length difference plus a
+cascade is the SIGNATURE of a dropped line, not of a bad transcription.
+Detokenise BOTH files and diff the text — the difference will be a handful of
+lines, and if they are space-only lines you are done.
+
+## Three shapes check 4's three cases do not cover
+
+All three found on SH8603, with its own evidence:
+
+1. **petcat's round-trip is not symmetric.** `$9A` detokenises to `{blu}` and
+   re-tokenises under `-w3` to `$1F`. SH8604 met the same class three times
+   (`1985_1986`, `lader`, `der kl. hobbit`). A re-tokenise that differs is not
+   automatically a transcription error.
+2. **A BASIC extension petcat has no dialect for at all** — SH8603's *19
+   Grafik-Befehle* for the VC 20. There is no flag to pass; the tokens have to
+   be decoded from the article's own table.
+3. **Real BASIC with machine code APPENDED** — `fast hardcopy`. This looks
+   like case 3's "trailing bytes" and is not harmless: the appended block is
+   part of the program and a reader needs it.
+
+And check 4's stub test would wrongly flag `turbo-racer`, a 73-byte loader
+with a bare `SYS` and no code appended, which is complete as printed.
+
+## Read errors: see `r120_d64_errors.py`
+
+`c1541 -extract` reports read errors **not at all** — on SH8604's SH04C, a
+disk with two bad sectors, it printed four informational lines, exited 0 and
+extracted the files; and `tools/prg_links.sh` sent even those to `/dev/null`.
+The extracted file COUNT cannot stand in either: `c1541 -list | grep -c '"'`
+reads 48 on the healthy SH03A against 27 files extracted, so a count
+comparison flags a good disk.
+
+The signal is in the image. A 35-track D64 is 683 × 256 = **174,848 bytes**;
+one written by a tool that recorded read errors carries one status byte per
+sector appended, so **175,531**. `r120_d64_errors.py` decodes that block, and
+reads the BAM to say whether each bad sector holds anything. `prg_links.sh`
+now runs it before extracting.
+
+MEASURED over the Sonderheft disks on hand: six are 174,848 with no error info,
+and SH04C is 175,531 with exactly 2 sectors at code 5 (*23 checksum error in
+data block*), **both in free blocks** — so nothing extracted is affected, which
+is a conclusion to record in LOG.md rather than one to assume from a silent
+extract.
+
 **Check the canonical path first and use it if it is there** -- VERIFIED
 2026-10-01, the archive is mounted and holds `84XX` through `91XX`. Only when
 it is absent is the source a question for the operator, because copies of the
@@ -287,7 +452,8 @@ the omission class that reads as correct.
   command line every time; do not copy the disk image into the issue
   directory.
 - **Non-V2 BASIC dialects need a re-decode.** `tools/prg_links.sh`
-  petcat-detokenises every `.prg` with default V2 mode. If the
+  petcat-detokenises every `.prg` with **bare `petcat`, which is BASIC 7.0,
+  NOT V2** — see *bare petcat is 7.0* below. If the
   source program uses Simons' BASIC, Final Cartridge BASIC, Speech
   BASIC, Mighty BASIC, etc. (any of the `petcat -<dialect>` flags),
   the extension tokens come out as garbled bytes
@@ -404,7 +570,7 @@ the download.
 ### Signals of the misclassification
 
 `tools/prg_links.sh` runs every `.prg` that starts at `$0801` through
-petcat in default V2 mode. When the source is actually a Hypra-Ass
+bare petcat, which is **BASIC 7.0 mode** (below). When the source is actually a Hypra-Ass
 or Top-Ass listing, the extractor wrongly stashes the raw `.prg`
 in `issues/<YYMM>/prg/del/<name>.prg` and emits a bogus
 `issues/<YYMM>/prg/<name>.txt` companion. Tells:

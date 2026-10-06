@@ -1,0 +1,160 @@
+
+
+;ram-editor.prg ==0801==
+   10 rem *****************************
+   20 rem *       ram-editor          *
+   30 rem *     <c> 1985 bei          *
+   40 rem *    michael nickles        *
+   50 rem *****************************
+   60 dimm$(255),wz(26)
+   70 goto51000
+ 8000 rem ordnungsfile index-seq ------------------------------------------------
+ 8005 print"moechten sie einen index-file erstellen?";
+ 8006 geti$:ifi$<>"j"andi$<>"n"then8006
+ 8008 ifi$="n"thenreturn
+ 8019 input"ab speicherstelle ";e1
+ 8020 input"bis               ";e2:ife1>e2thenprint"unsinn!:goto8005
+ 8030 input"schrittweite-step ";sw
+ 8100 print"{down}bitte warten!"
+ 8105 fori1=e1toe2stepsw
+ 8110 :fori2=1to26
+ 8112 : ifusr(i1)=64+i2andwz(i2)=0thenwz(i2)=i1
+ 8114 :nexti2
+ 8120 nexti1
+ 8400 rem wz(n) als seq-file speichern ------------------------------------------
+ 8410 poke198,0:input"filename ";i$:i$=i$+",s,w"
+ 8420 open2,8,2,i$
+ 8430 fori=1to26
+ 8440 :print#2,wz(i)
+ 8450 nexti:close2
+ 8500 return
+ 9000 rem up-positionieren ------------------------------------------------------
+ 9010 hb%=sa/256:lb%=sa-hb%*256
+ 9020 print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+ 9030 input#15,a:ifa=50thenprint"satznummer zu hoch!":end
+ 9040 return
+ 9100 rem up-satz lesen ---------------------------------------------------------
+ 9110 ifa=50thenreturn
+ 9120 input#1,a$
+ 9130 return
+51000 rem ram-editor -----------------------------------------------------------
+51029 poke53280,0:poke53281,0:print"{wht}"
+51030 print"{clr}{rvon}ram-editor v. 1.5    von michael nickles{rvof}";
+51040 rem modifizierte peek-funktion -------------------------------------------
+51045 data32,247,183,120,169,52,133,1
+51048 data160,0,177,20,168,169,55,133
+51050 data1,88,76,162,179
+51060 fori=704to724:readx:pokei,x:s=s+x:nexti
+51070 poke785,192:poke786,2:rem usr-zeiger
+51080 ifs<>2325thenprint"fehler in datas{$a0}!":end
+51130 rem anfang ---------------------------------------------------------------
+51131 rem goto8000
+51132 print"{down}ram editor  kann in freien ram-bereichen";
+51134 print"relative dateien verwalten."
+51135 print"bitte name der relativen datei angeben,
+51136 print"von der daten ins ram geschrieben werden";
+51137 print"sollen (disk einlegen)!"
+51138 input"{down}filenname ";f$
+51139 open15,8,15  :rem floppykanal an
+51140 print#15,"i0":rem initializieren
+51141 open1,8,3,f$ :rem datei oeffnen
+51143 print"bitte geben sie anfang und ende des     bereiches an, der ins ram";
+51144 print" geschrieben   werden soll!"
+51146 poke198,0:input"{down}anfang";an
+51147 input"ende  ";en:ifen<=anthenprint"unsinn !":goto51146
+51148 sa=an:gosub9000:gosub9100
+51149 print"{down}bitte geben sie anfang und ende des     ram-bereiches an, in dem";
+51150 print" die daten      abgelegt werden sollen! achtung - diese angaben ";
+51151 print"werden nicht ueberprueft !
+51152 poke198,0:input"{down}anfang";e1
+51153 input"ende";e2
+51154 ife2<e1thenprint"unsinn !":goto51152run
+51159 gosub60000
+51200 rem ins ram schreiben ----------
+51205 print"{down}bitte warten!"
+51210 iz=e1
+51215 forsa=antoen:gosub9000:gosub9100:                    rem lese a$
+51220 forii=1to3
+51225 :ifma(ii)=0then51250
+51230 :ifty%(ii)=2thengosub51500:rem $
+51240 :ifty%(ii)=1thengosub51600:rem val
+51250 nextii
+51255 nextsa
+51270 rem speichern auf disk ---------
+51280 print"{down}bitte diskette einlegen auf der ram-
+51281 print"bereich gespeichert wird! [return]":poke198,0:wait198,1
+51290 poke198,0:input"filename";i$:ifi$=""then51290
+51300 print"{down}bitte warten!"
+51315 fori=1to15:closei:next
+51320 open1,8,1,i$
+51330 hb%=int(e1/256):lb%=e1-hb%*256
+51340 print#1,chr$(lb%);chr$(hb%);
+51350 fori=e1toe2
+51360 :print#1,chr$(usr(i));
+51370 nexti:close1
+51375 gosub8000 :rem index-seq-file
+51380 print"*** fertig ***":end
+51500 rem als string speichern   ------
+51501 iflen(a$)<mb(ii)-ma(ii)+1thena$=a$+" ":goto51501
+51510 fori=ma(ii)tomb(ii)
+51515 :ifasc(mid$(a$,i,1))=29thenpokeiz,32:iz=iz+1:goto51520
+51516 :pokeiz,asc(mid$(a$,i,1)):iz=iz+1
+51520 nexti
+51550 return
+51600 rem als val-wert speichern ------
+51610 poke iz,val(mid$(a$,ma(ii),mb(ii)))
+51620 iz=iz+1
+51630 return
+60000 rem markieren wie datiert wird
+60010 i$="":fori=1tolen(a$)
+60012 : ifasc(mid$(a$,i,1))=29theni$=i$+" ":goto60015
+60014 : i$=i$+mid$(a$,i,1)
+60015 nexti
+60019 fori=1tolen(i$):m$(i)="0":next
+60020 im=1:print
+60025 printi$:fori=1tolen(i$):printm$(i);:next:print
+60030 print"{down}edit   >";mid$(i$,im,1);"<    {rvon}"im"{rvof}"
+60035 i=peek(203):ifi=64then60035
+60040 ifi=2andpeek(653)=0andim<>len(i$)thenim=im+1:goto60070
+60042 ifi=2andpeek(653)=1andim<>1thenim=im-1:goto60070
+60045 ifi=56thenm$(im)="1":goto60070
+60047 ifi=59andig=0thenm$(im)="2":goto60070
+60050 ifi=8andig=0thenm$(im)="3":goto60070
+60055 ifi=35thenm$(im)="0":goto60070
+60056 ifi=1then60100
+60060 goto60035
+60070 print"{up}                         {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{up}{up}{up}";:goto60025
+60100 rem umrechnen
+60102 fori=1to3:ma(i)=0:mb(i)=0:nexti
+60105 forii=1to3:rem  print"{rvon}ii={rvof}";ii
+60110 :fori=1tolen(i$):ifma(ii)=0andm$(i)=right$(str$(ii),1)thenma(ii)=i
+60112 :remprint"m$(i)=";m$(i);"  right$"right$(sth$(ii),1)
+60113 nexti
+60115 :ifma(ii)=0then60150
+60120 :   mb(ii)=ma(ii)
+60125 :   mb(ii)=mb(ii)+1:remprint,mb(ii)
+60130 :   ifm$(mb(ii))<>right$(str$(ii),1)thenmb(ii)=mb(ii)-1:goto60150
+60135 :   ifmb(ii)=len(i$)then60150
+60140 :   goto60125
+60150 nextii
+60200 print"{clr}{rvon}";i$:print"{rvof}wurde in folgende bereiche zerlegt:{down}"
+60210 fori=1to3
+60215 ifma(i)=0then60230
+60220 print"bereich";i;": {rvon}"mid$(i$,ma(i),mb(i)-ma(i)+1)"{rvof}"
+60230 nexti:print
+60240 print"bitte geben sie nun an, ob die bereiche
+60245 print"als {rvon}v{rvof}al-wert oder als {rvon}s{rvof}tring
+60250 print"gespeichert werden sollen!{down}"
+60260 fori=1to3
+60262 ifma(i)=0then60290
+60265 print"{rvon}"mid$(i$,ma(i),mb(i)-ma(i)+1)"{rvof}"
+60270 poke198,0:input"{rvon}v{rvof} oder {rvon}s{rvof}";ii$
+60275 ifii$<>"v"andii$<>"s"then60270
+60280 ty%(i)=1:ifii$="s"thenty%(i)=2
+60290 nexti
+60300 return
+61000 close1:open1,8,15
+61010 input#1,a,b$,c,d
+61020 printa,b$,c,d
+61030 close1
+

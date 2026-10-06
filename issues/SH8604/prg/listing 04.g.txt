@@ -1,0 +1,33 @@
+
+
+;listing 04.g.prg ==0801==
+    5 print"{clr}{rvon}bildumschreiberoutine{rvof}"
+   10 rem bildumschreiber paint magic
+   20 rem
+   30 rem von wolfgang borgsmueller
+   40 rem
+   45 ifa=1then500
+   50 poke55,144:poke56,48
+   60 clr:a=1
+   65 print"bitte quelldisk einlegen und name des   paint-magic bildes eingeben!"
+   66 input"name ";f$
+   70 loadf$,8,1
+   80 end
+  500 print"zieldisk einlegen!":poke198,0
+  510 geta$:ifa$=""goto510
+  511 print"bitte geben sie den kennbuchstaben des  fensterbildes ein!
+  512 inputc$
+  520 open1,8,1,left$(c$,1)+" b,p,w"
+  525 print#1,chr$(0);chr$(128);
+  530 fori=16384to21184
+  540 print#1,chr$(peek(i));:next
+  550 close1
+  555 input"hg-farbe des bildes";hg
+  556 input"farbe 4 des bildes";f4
+  560 open1,8,1,left$(c$,1)+" v,p,w"
+  565 print"bildname: ";c$
+  570 print#1,chr$(254);chr$(159);chr$(f4);chr$(hg);
+  580 fori=24576to25176
+  590 print#1,chr$(peek(i));:next
+  600 close1
+

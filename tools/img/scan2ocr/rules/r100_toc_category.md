@@ -155,6 +155,76 @@ For an alternative invocation pattern, write the mapping to
 tools/img/scan2ocr/rules/r100_toc_category.sh issues/<ID> < issues/<ID>/toc_category_mapping.tsv
 ```
 
+## `r100_toc_title_apply.py` IS NOT PART OF THIS STEP — do not run it
+
+The file sits in `rules/` beside this one, is named as if it belonged to 100,
+and is mentioned by no rule. It also contradicts this one in three ways,
+confirmed by reading it:
+
+- it writes `toc_title` equal to `<title>`, where this rule says to write a
+  `toc_title` **only when the printed TOC wording differs** from the headline;
+- it does not escape `&`, so a title like *Tips & Tricks* goes in raw;
+- it cannot parse lettered pages — run against SH8603 it gave p21's entry to
+  *14 Maschinensprache* and left `77a`/`77b` unmatched.
+
+Neither SH8603 nor SH8604 used it; both found it and had to work out that it
+was a trap. Until it is removed or rewritten, treat it as absent.
+
+## Running it: bash 3.2, and why the body is a file
+
+**`#!/bin/bash` on macOS is bash 3.2.57**, and 3.2 scans inside `$( ... )`
+even when the heredoc there is quoted. The script used to run its Python as
+`python3 -c "$(cat <<'PY' … PY)"`, chosen so the inline source would not
+consume the stdin that carries the mapping TSV — and a **backtick or an
+apostrophe in a Python comment** then broke the whole file:
+
+```
+r100_toc_category.sh: line 87: unexpected EOF while looking for matching quote
+```
+
+`bash -n` failed too, and it ran only under Homebrew bash 5. Both SH8603 and
+SH8604 hit it. Removing the offending characters one at a time only leaves the
+next comment to re-break it, so the body now goes to a `mktemp` file — which
+is not scanned, keeps stdin free, and ends the class. **Verified parsing and
+running under both `/bin/bash` 3.2.57 and Homebrew bash 5.**
+
+Any script in this directory that embeds a `$( ... )` heredoc should be
+checked with `/bin/bash -n`, not just with whatever `bash` is on PATH.
+
+## ONLY THE FIRST `toc_title` IS EVER READ
+
+`generate.py`'s `find_meta` is `soup.find('meta', {'name': …})` — **first
+match, singular**. `toc_title` is read through it exactly once (`generate.py`
+:663), and only `author` anywhere in the generator uses `find_all`. So a
+second `<meta name="64er.toc_title">` in a file is **silently ignored**.
+
+MEASURED: **21 files in the corpus carry more than one**, and every value
+after the first has never been read by anything. Some are clearly deliberate
+attempts at one Inhalt line per item — 8512's *Tips & Tricks* carries 15,
+8601's 16, 8511's 7 — and that whole intent is unrealised. SH8604 found it by
+being told to add a second one.
+
+**Do not add a second.** There is also no need to synthesise a combined one.
+
+**WHEN TWO PRINTED INHALT ENTRIES BECOME ONE ARTICLE, THE TOC KEEPS THE
+SURVIVING ARTICLE'S OWN ENTRY.** Owner, 2026-10-06, on the merged
+Künstliche Intelligenz / Eliza: *"toc mentions eliza, but lets just drop
+that. it's messy. toc should only say kuenstliche."*
+
+So `toc_title` is the printed Inhalt wording for the article's OWN start page
+— `Kurs: Künstliche Intelligenz`, which is what p40's line says — and the
+absorbed entry simply does not appear in the table of contents. The merged
+article still covers the pages, so a reader following the printed Inhalt to
+p49 lands in the right place; the site's own contents list just does not
+duplicate a heading for a section of an article.
+
+I first proposed the corpus's `<br>` join here (**120 `toc_title` values
+contain one**, 8408's Comal among them, rendering as a single line carrying
+both headings). It works, and the owner rejected it on sight as messy. The
+`<br>` join remains right for an article the PRINT itself gives two headings
+on one line; it is wrong for stitching two separate Inhalt entries back
+together.
+
 ## Verification
 
 After running, every article should have exactly one `64er.toc_category`
@@ -165,9 +235,14 @@ line and no remaining placeholder comment:
 grep -lE '<!-- <meta name="64er\.toc_category" content="XXX"> -->' issues/<ID>/*.html
 # expect: no output
 
-# every file has exactly one toc_category line
+# every file has exactly one toc_category line.
+# ANCHORED, so the commented placeholder does not count as the real thing.
+# The placeholder line CONTAINS this string:
+#     <!-- <meta name="64er.toc_category" content="XXX"> -->
+# so unanchored, a file carrying ONLY the placeholder reported n=1 and PASSED
+# -- confirmed on a planted copy.  A real line starts the element.
 for f in issues/<ID>/*.html; do
-  n=$(grep -c '<meta name="64er\.toc_category"' "$f")
+  n=$(grep -cE '^[[:space:]]*<meta name="64er\.toc_category"' "$f")
   [ "$n" -eq 1 ] || echo "$f: $n"
 done
 

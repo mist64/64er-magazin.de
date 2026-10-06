@@ -1,0 +1,27 @@
+
+
+;listing 25.d.prg ==0801==
+   10 rem ********************************
+   15 rem * programm zum aendern von     *
+   20 rem * diskname und id              *
+   25 rem ********************************
+   30 print"{clr}{rvon}disk-utility 1                          {rvof}";
+   35 print"{down}{down}     disk-name aendern   -  '1'
+   40 print"     disk-id   aendern   -  '2'
+   42 print"     ende                -  '3'
+   45 getx$:ifx$<>"1"andx$<>"2"andx$<>"3"then45
+   46 ifx$="3"thenprint"{down}{down}*** fertig ***":end
+   50 open15,8,15:rem floppykanal oeffnen
+   55 print#15,"i0":open1,8,3,"#":print#15,"u1:3"0",18,0":ifx$="1"then90
+   60 print#15,"b-p:3,162":get#1,a$,b$,c$,d$,e$:print"{down}alter disk-id ist {rvon} ";a$;
+   65 printb$;c$;d$;e$:input"{down}neuer disk-id ";f$
+   70 iflen(f$)<>4thenf$=left$(f$+"      ",5)
+   75 print#15,"b-p:3,162":print#1,f$;:print#15,"u2:3"dv",18,0
+   80 i$="i"+mid$(str$(dv),2):print#15,i$
+   85 run
+   90 print#15,"b-p:3,144":r$="":forl=1to16:get#1,a$:r$=r$+a$:nextl
+   95 print"{down}alter disk-name ist ";"{rvon}"r$"{rvof}"
+  100 input"{down}neuer disk-name ";ne$
+  105 ne$=left$(ne$+"              ",16)
+  110 print#15,"b-p:3,144":print#1,ne$;:print#15,"u2:3"dv",18,0":goto80
+

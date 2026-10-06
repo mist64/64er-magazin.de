@@ -1,0 +1,111 @@
+
+
+;listing 07.ki.prg ==0801==
+    0 rem ********************************
+    1 rem *     pac-man ki-programm      *
+    2 rem * <c> 1985 bei michael nickles *
+    3 rem ********************************
+    4 poke53280,0:poke53281,0:print"{clr}";
+   10 print"{clr}{yel}{rvon}taktik / zufall experiment{rvof}"
+   20 print"{down}wie gross soll der zufallsanteil sein
+   30 inputzu
+   40 ifzu<0orzu>100then10
+   50 print"{down}{down}zufall:"zu"%"
+   60 print"{down}{down}taktik:"100-zu"%"
+   70 print"{down}{down}{down}bitte eine taste druecken!"
+   80 poke198,0:wait198,1
+   99 gosub10000
+  100 x=17:y=16:xx=1024+x+y*40:xp=peek(xx):pokexx,42
+  110 gg=1361:gp=peek(gg):pokegg,160:gw=-1
+ 1000 rem steuerung spielfigur --------------------------------------------------
+ 1001 :
+ 1010 jo=56320
+ 1020 ifpeek(jo)=126thenwy=-1:wx=0
+ 1030 ifpeek(jo)=125thenwy=1 :wx=0
+ 1040 ifpeek(jo)=123thenwy=0 :wx=-1
+ 1050 ifpeek(jo)=119thenwy=0 :wx=1
+ 1100 pokexx,xp
+ 1110 x=x+wx:y=y+wy
+ 1120 xx=1024+x+40*y
+ 1130 xp=peek(xx)
+ 1140 ifxp=102thenx=x-wx:y=y-wy:goto1120
+ 1150 ifx=-1andy=10thenx=33:y=10:goto1120
+ 1160 ifx=34andy=10thenx=0:y=10:goto1120
+ 1200 xp=peek(xx)
+ 1210 pokexx,42
+ 2000 rem steuerung gespenster --------------------------------------------------
+ 2001 :
+ 2032 ifgw<>40thenifpeek(gg-40)=32orpeek(gg-40)=96then2100
+ 2034 ifgw<>-40thenifpeek(gg+40)=32orpeek(gg+40)=96then2100
+ 2035 ifgw<>1thenifpeek(gg-1)=32orpeek(gg-1)=96then2100
+ 2037 ifgw<>-1thenifpeek(gg+1)=32orpeek(gg+1)=96then2100
+ 2040 pokegg,gp:gg=gg+gw
+ 2042 ifgg=1459thengg=1424:gw=1 :rem tunnel
+ 2043 ifgg=1423thengg=1458:gw=-1:rem tunnel
+ 2045 ifgg=xxthenpoke53280,1:end
+ 2050 ifpeek(gg)<>32thengg=gg-gw:goto2100
+ 2070 gp=peek(gg):pokegg,160
+ 2080 goto1000
+ 2100 rem neue richtung waehlen -------------------------------------------------
+ 2101 :pokegg,gp
+ 2110 rem welche richtungen sind moeglich
+ 2120 rz=0:fori=0to3:ri(i)=0:nexti
+ 2130 ifgw<>40thenifpeek(gg-40)=96orpeek(gg-40)=32thenri(rz)=-40:rz=rz+1
+ 2140 ifgw<>-40thenifpeek(gg+40)=96orpeek(gg+40)=32thenri(rz)=+40:rz=rz+1
+ 2150 ifgw<>1thenifpeek(gg-1)=96 orpeek(gg-1)=32 thenri(rz)=-1 :rz=rz+1
+ 2160 ifgw<>-1thenifpeek(gg+1)=96 orpeek(gg+1)=32 thenri(rz)=+1 :rz=rz+1
+ 2200 rem wahl des besten zuges -------------------------------------------------
+ 2201 :
+ 2205 rem  fori=1to4:print" ";ri(i);:next:pokegg,87:printpeek(gg+40):wait198,1
+ 2210 gy=int((gg-1024)/40)
+ 2220 gx=gg-1024-gy*40
+ 2230 fori=0torz
+ 2235 : ifgx=xthen2255
+ 2240 : ifri(i)=1andgx<x    thengw=1
+ 2250 : ifri(i)=-1andgx>x   thengw=-1
+ 2255 : ifgy=ythen2280
+ 2260 : ifri(i)=40andgy<y   thengw=40
+ 2270 : ifri(i)=-40andgy>y  thengw=-40
+ 2280 nexti
+ 2300 rem zufalls-element -------------------------------------------------------
+ 2301 :
+ 2310 if int(100*rnd(1))+1>zuthen2400
+ 2320 rem zufallszug
+ 2330 gw=ri(int(rz)*rnd(1))
+ 2400 rem ausfuehren des zuges --------------------------------------------------
+ 2401 :
+ 2404 gg=gg+gw
+ 2405 ifgg=1459thengg=1424:gw=1 :rem tunnel
+ 2406 ifgg=1423thengg=1458:gw=-1:rem tunnel
+ 2410 ifgg=xxthenpoke53280,1:end
+ 2420 gp=peek(gg):pokegg,160
+ 2430 goto1000
+10000 rem up-spielfeld zeichnen ------------------------------------------------
+10001 :
+10010 print"{clr}{lblu}";
+10020 data"{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+10025 data"{CBM-+}                {CBM-+}                {CBM-+}"
+10030 data"{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}"
+10035 data"{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}"
+10040 data"{CBM-+}                                 {CBM-+}"
+10045 data"{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}"
+10050 data"{CBM-+}       {CBM-+} {CBM-+}      {CBM-+}      {CBM-+} {CBM-+}       {CBM-+}"
+10055 data"{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+10060 data"      {CBM-+} {CBM-+} {CBM-+}             {CBM-+} {CBM-+} {CBM-+}      "
+10065 data"{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{$a0}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{$a0}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+10070 data"            {CBM-+}{yel}supermike{lblu}{CBM-+}            "
+10075 data"{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{$a0}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{$a0}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+10080 data"      {CBM-+} {CBM-+} {CBM-+}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{CBM-+} {CBM-+} {CBM-+}      "
+10085 data"{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{$a0}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{$a0}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+10090 data"{CBM-+}                {CBM-+}                {CBM-+}"
+10095 data"{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}"
+10100 data"{CBM-+}     {CBM-+}                     {CBM-+}     {CBM-+}"
+10105 data"{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+10110 data"{CBM-+}       {CBM-+} {CBM-+}      {CBM-+}      {CBM-+} {CBM-+}       {CBM-+}"
+10115 data"{CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+} {CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+} {CBM-+}"
+10120 data"{CBM-+}                                 {CBM-+}"
+10125 data"{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}"
+10130 restore
+10140 fori=1to22:readi$:printi$:next
+10150 return
+

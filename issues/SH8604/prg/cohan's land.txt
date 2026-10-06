@@ -1,0 +1,716 @@
+
+
+;cohan's land.prg ==0801==
+    0 rem *********************************
+    2 rem *    c o h a n ' s   l a n d    *
+    4 rem *      copyright 1984 by        *
+    5 rem * supermike's fantasy products  *
+    7 rem *********************************
+    8 poke53280,0:poke53281,0:printchr$(14):sys65499:print"{clr}{yel}
+    9 zn=1:ro=10000+zn*100
+   11 data76,24,1,177,251,145,251,200,208,249,230,252,202,208,244,96,120,160
+   12 data0,169,160,132,251,133,252,162,32,32,11,1,169,224,132,251,133,252
+   13 data162,32,32,11,1,169,53,133,1,88,96:fori=264to310:reada:pokei,a:next
+   15 sys264:a=710:fori=atoa+20:readx:pokei,x:next
+   16 data208,3,76,29,168,32,192,2,32,19,166,56,165,95,233,1,164,96,76,36,168
+   18 poke40996,197:poke40997,2:poke1,54:a=43168:fori=atoa+2:readx:pokei,x:next
+   20 a=704:fori=atoa+5:readx:pokei,x:next:data32,192,2,32,138,173,76,247,183
+   25 gosub51000
+   30 print"{clr}{down}{down}{down}{down}{down}{down}";chr$(142)
+   36 print,"{yel}N{CBM-T} NP{CBM-N}{CBM-P}{SHIFT-@} NP{CBM-N}M {CBM-G}N N{CBM-T}
+   37 print,"L{CBM-P}{CBM-M}{CBM-P}{SHIFT-@}{CBM-N} {CBM-N} OP{CBM-N} M{CBM-G}  {CBM-Y}P
+   38 print,"                 {CBM-T}{CBM-T}
+   39 print,"    {CBM-H}  NP{CBM-N}M {CBM-H}OM
+   40 print,"    L{CBM-P} OP{CBM-N} M{CBM-H}LN
+   42 print,"{down}{down}{down}{lred}{left}ein abenteuerspiel von
+   43 print,"{down}{lred}  michael nickles":poke198,0:wait198,1
+   50 print"{clr}";chr$(14)
+   55 remge$(14)="Drahtgitter":ge(15)=-1:ma=0:ge(10)=-1:ge(16)=-1:ge(6)=-1
+   56 rem   ge(1)=-1:zb=10
+   57 remfori=1togz:ge(i)=-1:next
+   60 goto1040
+ 1000 rem actionmodul -------------------
+ 1001 ifrithen1015
+ 1002 gosub50000
+ 1010 ifri=0then2000
+ 1015 ifri(ri)=0thenprint"Kein Weg in diese Richtung !":ri=0:goto2000
+ 1016 ve=0:om=0:ob=0:pe=0:pm=0:rem ge=0
+ 1020 ro=10000+100*ri(ri):zn=ri(ri):ri=0
+ 1040 restorero:fori=1to10:readri(i):next
+ 1041 ifpa(7)andzn=37thenri(2)=38
+ 1050 print"{clr}{yel}";:gosub room
+ 1100 rem ***** sie sehen
+ 1700 se$="":ic=0:fori=1topz:ifpe(i)=znthenprintpe$(i)". ";:ic=1
+ 1710 next:ificthenprint
+ 1820 fori=1tooz:ifoo(i)=znthense$=se$+o$(i)+". ":ic=1
+ 1822 next
+ 1830 fori=1togz:ifge(i)=znthense$=se$+ge$(i)+". ":ic=1
+ 1831 ifge(i)=-2andzn=1andtu(1)=0thense$=se$+ge$(i)+". ":ic=1
+ 1832 ifge(i)=-3andzn=5andtu(3)=0thense$=se$+ge$(i)+". ":ic=1
+ 1833 ifge(i)=-4andzn=43andtu(4)=0thense$=se$+ge$(i)+". ":ic=1
+ 1834 nexti
+ 1835 ifse$=""then1900
+ 1840 iflen(se$)<41thenprintse$:goto1900
+ 1850 i$=left$(se$,39)
+ 1860 im=0:fori=1tolen(i$)
+ 1865 :ifmid$(i$,i,1)=" "thenim=i
+ 1868 nexti
+ 1870 i$=left$(i$,im):printi$
+ 1880 se$=right$(se$,len(se$)-im)
+ 1890 goto1840
+ 1900 print"Moegliche Richtungen : ";
+ 1910 ic=0:fori=1to10:ifri(i)thenprintri$(i)",";:ic=1
+ 1920 next:ific=0thenprint"keine ";
+ 1930 print"{left} {down}"
+ 2000 rem reagieren auf befehle ---------
+ 2005 rem fehlermeldungen **************
+ 2010 ifobandom=0thenprint"Das geht hier nicht .... noch nicht !"
+ 2015 ifpeandpm=0thenprint"Ich sehe diese Person hier nicht !"
+ 2019 ifve=16then2100
+ 2020 ifve<>5andve<>8andg1andgm=0andg1<>12thenprint"Ich habe das nicht !"
+ 2100 rem einwort-befehle **************
+ 2105 ifve=3andob=0andgm=0thenve=0:goto1050:rem look
+ 2110 ifve<>12then2130:rem inventur
+ 2111 se$="Ich habe: ":ic=0:fori=1togz:ifge(i)=-1thense$=se$+ge$(i)+", ":ic=1
+ 2112 nexti:ific=0thense$=se$+" nichts. "
+ 2113 se$=left$(se$,len(se$)-1)
+ 2116 iflen(se$)<41thenprintse$:goto2130
+ 2117 i$=left$(se$,39)
+ 2118 im=0:fori=1tolen(i$)
+ 2119 :ifmid$(i$,i,1)=" "thenim=i
+ 2120 nexti
+ 2121 i$=left$(i$,im):printi$
+ 2122 se$=right$(se$,len(se$)-im)
+ 2123 goto2116
+ 2130 ifve=19thenprint"Zeit vergeht......."
+ 2200 rem nimm/verlier rout. ***********
+ 2205 ifve<>5andve<>8org1=0orobthen2237
+ 2220 ifve=5andge(g1)=-1thenprint"Ich habe das bereits !":goto2300
+ 2222 ifve=8andge(g1)<>-1thenprint"Ich habe das nicht !"
+ 2229 ifzn=27andve=5andge(5)=-4thenge(5)=-1:print"Ok.":goto2300
+ 2230 ifve=5andge(g1)=znthenprint"Ok.":ge(g1)=-1:goto2250
+ 2231 ifve=8andge(g1)=-1thenprint"Ok.":ge(g1)=zn
+ 2232 ifve=5andge(g1)=-2andtu(1)=0thenprint"Ok.":ge(g1)=-1:goto2250
+ 2233 ifve=5andge(g1)=-3andtu(3)=0thenprint"Ok.":ge(g1)=-1:goto2250
+ 2234 ifve=5andge(g1)=-4andtu(4)=0thenprint"Ok.":ge(g1)=-1:goto2250
+ 2237 ifg1andve=5andge(g1)<>znthenprint"Ich sehe das hier nicht !"
+ 2238 ifve=5andg1=0andob<>0thenprint"Dazu bin ich nicht stark genug !"
+ 2250 ifg1=15andfs=1thenfs=0
+ 2252 ifg1=14andfa+fs=2then2625
+ 2254 ifve=5andg1=16thenprint"Ich ziehe den Schutzanzug am besten so- fort an !"
+ 2300 rem toete ************************
+ 2310 ifve<>20then2400
+ 2315 ifg1=0thenprint"Wie ? Doch nicht mit meinen blossen     Haenden !":goto2400
+ 2320 ifgm=3thenprint"Ich greife mit dem Saebel an !"
+ 2322 ifgm=10thenprint"Ich greife mit der Axt an !"
+ 2324 ifgm=6andmu=0thenprint"Ich habe keine Munition mehr !":ge(7)=0:goto2400
+ 2326 ifgm=6andmuthenprint"Ich schiesse mit der Pistole !":mu=mu-1
+ 2330 ifpa(3)<6then2340
+ 2332 ifzn<>71orgm<>6then2340
+ 2334 print"Der Loewe bricht tot zusammen.":pe$(3)="Toter Loewe":pa(3)=-1
+ 2335 pe(3)=10:sc=sc+7.5
+ 2340 ifgm<>6andgm<>3andgm<>10orpa(4)<1then2350
+ 2342 print"Das Krokodil stuerzt blutend ins Wasser.":pa(4)=-1:sc=sc+3.5
+ 2350 ifzn<>61orom<>39orgm<>6then2360
+ 2352 i=int(100*rnd(1))+1
+ 2354 ifi>50orbr=2thenprint"Die Kugel verfehlt den Druckknopf knapp.":br=-1
+ 2356 ifi<=50andbr<>2thenprint"Die Kugel trifft den Druckknopf exakt !":br=1
+ 2360 :
+ 2400 rem baue floss ******************
+ 2410 ifve<>25org1<>12then2500
+ 2420 ifge(11)<>-1thenprint"Ich habe kein Holz !":goto2500
+ 2430 print"Ok.":ge(11)=0:ge(12)=-1
+ 2500 ifve<>31andve<>42then2600: rem verbinde ******************
+ 2505 ifg1+g2<>29then2600
+ 2510 ifge(14)<>-1thenprint"Ich habe das Drahtgitter nicht !":goto2600
+ 2520 ifge(15)<>-1then2600
+ 2530 iffa=1thenprint"Das habe ich bereits.":goto2600
+ 2535 print"Ok.":fa=1:rem iffs=1then2625
+ 2600 ifve<>44andve<>42then2700:rem stecke **************
+ 2610 ifom<>26then2700
+ 2620 iffs=0thenprint"Ok.":ge(15)=zn:fs=1
+ 2622 iffa<>1orge(14)<>-1then2630
+ 2625 print"Das Drahtgitter glueht auf und verabrei-cht mir einen Elektroschock";
+ 2626 print" von mehrerentausend Volt.":goto8000
+ 2630 iffs=0andge(15)=-1thenprint"Ok.":ge(15)=zn:fs=1
+ 2700 rem spezial action scenario
+ 2710 ifzn=43orzn=51thenifma<>0then6145
+ 2715 ifge(18)=-1andzb=11thenprint"Die Zeitbombe beginnt ploetzlich zu     ticken !"
+ 2716 ifzb<11andge(18)=-1thenprint"Die Zeitbombe tickt immer schneller !"
+ 2720 ifzbthenzb=zb-1:ifzb=0thenprint"Die Zeitbombe explodiert.":goto8000
+ 2730 i=pa(9): rem strahlenverseuchung
+ 2735 ifi=1thenprint"Mir wird ganz komisch von dem violetten Licht !"
+ 2740 ifithenpa(9)=pa(9)+1:i=pa(9)
+ 2745 ifi=5thenprint"Ich werde ploetzlich ganz schwach !"
+ 2746 ifi=8thenprint"Ich werde immer schwaecher !"
+ 2747 ifi=10thenprint"Meine Kraefte verlassen mich .....":goto8000
+ 2800 ifve=28andgm=1thenprint"Ich bin kein Schiffsnavigator !"
+ 2810 ifve<>37orgm<>8orge$(8)="Glasscherben"then2820
+ 2815 print"Die Flasche zerspringt in Glasscherben. Eine Seekarte faellt auf ";
+ 2816 print"den Boden.":ge$(8)="Glasscherben":ge(8)=zn:ge(1)=zn:sc=sc+2.5
+ 2820 ifve<>49then2830
+ 2822 ifge(2)<>-1andge(4)<>-1thenprint"Ich habe keinen Hunger.":goto2830
+ 2824 print"Ok.":ge(2)=0:ge(4)=0:sc=sc+2.5
+ 2830 :
+ 4000 rem hilfe ***********************
+ 4010 ifve<>30then5000
+ 4999 rem  gosub61020
+ 5000 rem u n t e r s u c h e -----------
+ 5001 ifve<>3orom=0andgm=0then5999
+ 5010 ic=0:ifom=7thenprint"Die Mauer ist unueberwindbar hoch.":ic=1
+ 5015 ifom=14andoo(16)<>22thensc=sc+6.5
+ 5020 ifom=14thenprint"Eine Schrift ist in die Wand geritzt.":oo(16)=22:ic=1
+ 5030 ifom<>17then5035
+ 5031 print"Die rechte Hand des Skeletts umklammert einen spitzen Kreidestein."
+ 5032 ic=1:oo(15)=22
+ 5035 ifom<>20then5037
+ 5036 print"In einem Tropfstein ist eingeritzt :    POWERPETER{$a0}war hier !":ic=1
+ 5037 ifom=24orom=1thenve=0:goto1050
+ 5040 ifgm=7thenprint"Ich habe noch";mu;"Schuss !":ic=1
+ 5050 ifgm<>15then5055
+ 5051 print"Das Kabel ist ca 50m lang. Am einen Endehat es einen Stecker, am ";
+ 5052 print"anderen Ende   ist es blank."
+ 5053 ic=1
+ 5055 ifom<>37orge(17)<>0then5060
+ 5056 print"Der Tote hat einen Schluessel und eine  aktivierte ZEITBOMBE ";
+ 5057 print"bei sich !":ge(17)=zn:ge(18)=zn:ic=1:zb=50
+ 5060 ifgm<>18then5065
+ 5062 print"Auf der Zeitbombe ist ein Zaehler ange- bracht der momentan den ";
+ 5063 print"Wert";zb;"hat !":ic=1
+ 5065 ifom<>43then5070
+ 5066 print"Am Boden des Brunnens strahlt ein hellesLicht-Die QUELLE{$a0}DER{$a0}MACHT !"
+ 5067 ic=1
+ 5070 ifgm=8thenprint"In der Flasche ist eine Schriftrolle.":ic=1
+ 5075 ifgm=16thenprint"Der Anzug schuezt vor radioaktiver      Strahlung.":ic=1
+ 5500 ific=0thenprint"Ich entdecke nichts besonderes."
+ 5999 :
+ 6000 rem nichtspielerpersonen ----------
+ 6010 rem ********** loewe
+ 6015 ifzn=71andpa(3)<>-1then6035
+ 6020 ifzn<6orzn>13orpa(3)=-1orint(10*rnd(1))+1<6orpa(4)then6100
+ 6035 pa(3)=pa(3)+1:ifpa(3)<6thenprint"Im Gebuesch raschelt etwas !":rem  61010
+ 6050 ifpa(3)=6thenprint"Ein riessiger Loewe springt aus dem Ge- buesch hervor !"
+ 6051 ifpa(3)=6thenpe(3)=zn
+ 6055 ifpa(3)=7andzn=71thenprint"Der Loewe springt am Baumstamm hoch !"
+ 6060 ifpa(3)=8thenprint"Der Loewe faellt mich an !":goto8000
+ 6100 rem ********** roboter
+ 6105 ifzn<38orma=0then6200
+ 6110 mw=mw+1:ma=ma(mw):ifma=-1thenmw=0:goto6110
+ 6130 ic=0:fori=1to10:ifri(i)=mathenic=1
+ 6135 next:ificthenprint"Ich hoere Schritte in der Naehe !"
+ 6136 ifma<>ge(14)orfa+fs<>2then6140
+ 6137 ma=0:pe(4)=ge(14):sc=sc+7
+ 6138 ifpe(4)<>znthenprint"Ich hoere ein lautes Krachen !":goto6140
+ 6139 print"Der Roboter laueft ueber das Drahtgitterund verschmort !"
+ 6140 ifma<>znthen6150
+ 6145 print"Ein riessiger Roboter erscheint !"
+ 6146 print"Aus den Augen des Roboters schiesst ein Lichtstrahl auf mich ....."
+ 6147 print"Ich werde muede ..... sehr muede ....."
+ 6148 ri(1)=39:ri=1:pa(8)=1:poke198,0:wait198,1
+ 6150 :
+ 6200 gosub room+20:goto1000
+ 7000 rem verloren
+ 8000 print"Ich bin tot."
+ 8010 print"{wht}Sie haben";sc;"% dieses Adventures geloest."
+ 8020 fori=1to3000:next:poke198,0:wait198,1:run
+10000 rem die landkarte ----------------
+10100 data,,,,,,,,,,,:print"Gemuetlich eingerichtete Wohnstube."
+10102 print"In einem offenen Kamin knistert ein be- hagliches Feuer."
+10109 iftu(2)=0thenri(1)=2
+10120 ifve=1andom=1thenprint"Ok.":tu(1)=0
+10125 ifve=2andom=1thenprint"Ok.":tu(1)=1
+10127 ifve=1andom=2orom=5thenprint"Ok.":tu(2)=0:ri(1)=2
+10128 ifve=2andom=2orom=5thenprint"Ok.":tu(2)=1:ri(1)=0
+10129 ifve<>8orom<>1then10140
+10130 iftu(1)thenprint"Der Schrank ist geschlossen !":goto10140
+10131 ifge(g1)=-1thenprint"Ok.":ge(g1)=-2:rem goto
+10140 ifve=8andom=10andgm=1thenprint"Die Seekarte verbrennt.":ge(1)=0
+10150 return
+10200 data3,,,,,,,,,,,:print"Breite Strasse die zum Hafen fuehrt."
+10203 print"Mr Bolings Haus.
+10205 iftu(2)=0thenri(2)=1
+10220 ifve=1andom=5thenprint"Ok.":tu(2)=0:ri(2)=1
+10221 ifve=2andom=5thenprint"Ok.":tu(2)=1:ri(2)=0
+10230 return
+10300 data,2,,,,,,,,:print"Am grossen Hafen. Ein grosses Handels-  schiff, ";
+10305 print"die 'Queen Mary' wird gerade    beladen."
+10320 ifve=13andob=3thenri(1)=4:ri=1:ti$="000000"
+10330 return
+10400 data,,,,,,,,,,:print"Auf der Queen Mary."
+10410 ifpa(0)then10419
+10411 print"Kaeptan Graubart sagt : 'Hallo, willkom-men an Bord Mr Bolings ! ";
+10412 print"Navigator an   Deck, hievt die Segel, holt den Anker   ein!'{down}"
+10413 pa(0)=1
+10419 return
+10420 ifve=13andob=3thenri(1)=3:ri=1
+10424 pa(0)=pa(0)+1:ifpa(0)>3thenpa(0)=3
+10425 ifpa(0)=3thenprint"{yel}Das Schiff befindet sich auf hoher See."
+10426 ifti$>"000300"then10440
+10427 ifge(1)<>-1then10430
+10428 ifve+pe+g1=18thenprint"{down}Der Navigator nimmt die Karte.":pa(1)=1:ge(1)=0
+10429 ifve+pe+g1=18thensc=sc+2.5
+10430 ifpa(1)thenpa(1)=pa(1)+1
+10431 ifpa(1)=4thenprint"Ein Schiffsjunge ruft 'Land in Sicht !'.":ti$="000300"
+10432 ifti$>"000030"andpa(2)=0thenprint"Ein schwerer Sturm bricht aus !":pa(2)=1
+10433 return
+10440 print"Ein starker Ruck zuckt ploetzlich durch das Schiff !"
+10441 fori=1to4000:next
+10445 print"Ein Matrose ruft 'Wir sind auf ein Riff aufgefahren und haben ein ";
+10446 print"Leck......wir sinken....."
+10450 poke198,0:wait198,1
+10460 ifpa(1)=0thenprint"Ich ertrinke....":goto8000
+10470 ri(1)=5:ri=1:return
+10500 data,,,,,,6,,,:print"Am Inselstrand."
+10502 print"Im Wasser in Strandnaehe treiben einige Schiffswrackteile.":return
+10510 return
+10520 ifve<>19oroo(4)thenifpa(3)<>5then10523
+10521 print"Eine riessige Holztruhe wird ploetzlich an den Strand getrieben.
+10522 oo(4)=5:pa(3)=6
+10523 pa(3)=pa(3)+1
+10530 ifve=1andom=4thenprint"Ok.":tu(3)=0:o$(4)="Offene Truhe"
+10531 ifve=2andom=4thenprint"Ok.":tu(3)=1:o$(4)="Grosse Seemannstruhe"
+10535 ifve=8andom=4andtu(3)=0andge(g1)=-1thenprint"Ok.":ge(g1)=-3
+10540 return
+10600 data,13,,,,5,12,,,:print"In dichtem Dschungel."
+10620 return
+10700 data,10,,,8,,9,,,:print"In dichtem Dschungel."
+10720 return
+10800 data,9,,,,,,7,,:print"In dichtem Dschungel."
+10820 ifve=23andom=7thenprint"Die Mauer ist viel zu hoch dazu !"
+10825 ifve=8andgm=5andom=7thenprint"Das Seil ist leider zu kurz !"
+10830 return
+10900 data8,8,,10,,7,,,,:print"In dichtem Dschungel."
+10920 return
+11000 data,11,9,,,,,11,,:print"Offene Lichtung im Dschungel.":return
+11020 ifve=23andom=6thenri(1)=71:ri=1
+11030 return
+11100 data10,,,,,12,,,,:print"In dichtem Dschungel."
+11120 ifve=26thenprint"Die Krokodile lassen das nicht zu !"
+11122 ifve<>27then11134
+11124 ifge(12)<>-1thenprint"Wie denn ?":goto11150
+11130 ifpa(4)=0andge(12)=-1thenpa(4)=1:print"Ok.Ich befinde mich auf dem Fluss."
+11132 return
+11134 ifpa(4)<>1then11138
+11135 print"Zahlreiche Krokodile kommen herbeige-   schwommen !"
+11136 print"Ein besonders wildes Krokodil klettert  auf das kleine Floss !"
+11137 pa(4)=2:return
+11138 ifpa(4)=2thenprint"Das Krokodil kommt bedrohlich naeher !":pa(4)=3:return
+11140 ifpa(4)=3thenprint"Das Krokodil hat mich gefressen.":goto8000
+11150 ifpa(4)=-1thenprint"Die uebrigen Krokodile fressen es."
+11152 ifpa(4)=-1thenri(1)=14:ri=1:print"Ich habe das andere Ufer erreicht."
+11154 ifpa(4)=-1thenprint"Das Floss treibt auf{$a0}dem Fluss davon.":ge(12)=0
+11155 ifpa(4)=-1thenpoke198,0:wait198,1
+11160 return
+11200 data,,,13,10,6,11,,,:print"In dichtem Dschungel."
+11205 print"In der Naehe rauscht Wasser."
+11220 ifve<>24orom<>11orge(10)<>-1orge(11)<>0then11230
+11225 print"Ok.":o$(11)="Gefaellter Baum":ge(11)=zn
+11230 return
+11300 data6,,12,,,,,,,:print"In dichtem Dschungel."
+11320 return
+11400 data,16,,17,,,,,,:print"In dichtem Dschungel."
+11420 return
+11600 data14,,,17,,,,,,:print"In dichtem Dschungel"
+11620 return
+11700 data14,,16,,,,,18,,:print"In dichtem Dschungel am Gebirgsrand."
+11720 return
+11800 data,19,,,17,,,,,:print"Sehr steiler Gebirgspfad."
+11820 return
+11900 data18,20,,,,,,,,:print"Sehr steiler Gebirgspfad."
+11920 return
+12000 data19,23,,21,,,,,,:print"Im hohen Gebirge."
+12020 return
+12100 data0,24,20,,,,23,,,:print"Im hohen Gebirge."
+12120 return
+12200 data,25,,,,,,,,:print"In einer trockenen Hoehle."
+12220 ifve<>28orom<>16then12250
+12224 print"Die Schrift lautet :"
+12225 print"Ich bin dem Geheimnis der Macht auf der Spur......."
+12226 print".. Codewort ....{$a0}NAHOC....
+12230 print"Achtung vor den Robo.....
+12235 print"....Dr. GORDON....
+12240 print"Mehr kann man leider nicht entziffern !"
+12250 return
+12300 data20,26,,,,21,25,,,:print"Im hohen Gebirge."
+12320 return
+12400 data21,,,,,,26,,,:print"Im hohen Gebirge."
+12420 return
+12500 data,,,26,,23,27,,,:print"Im hohen Gebirge."
+12520 ifve=13andob=13thenri(1)=22:ri=1
+12530 return
+12600 data23,28,25,,,24,28,30,,:print"Im hohen Gebirge."
+12620 return
+12700 data,,,,,25,,,,:print"Im hohen Gebirge auf einem Felsplateau."
+12710 print"Ca 10 Meter unter mir ist ein Spalt in  der Gebirgswand."
+12715 ifge(5)=-4thenprint"Ein am Ring befestigtes Seil haengt hin-ab."
+12720 ifom=18andgm=5andve=31thenge(5)=-4:print"Ok."
+12725 ifve=23andge(5)<>-4thenprint"Die Wand ist zu steil !"
+12730 ifve=23andge(5)=-4thenprint"Ok.":ri(1)=31:ri=1:ge(5)=31:sc=sc+8
+12740 return
+12800 data,,,26,,26,,29,,:print"Im hohen Gebirge."
+12820 return
+12900 data,,,,29,30,,,,:print"Im hohen Gebirge."
+12920 return
+13000 data,,,,26,,29,,,:print"Im hohen Gebirge."
+13020 return
+13100 data,,,,,,,,,:print"Auf einem Felsvorsprung an einer steilen";
+13110 print"Gebirgswand."
+13120 ifve=13andom=19thenri(1)=32:ri=1
+13130 return
+13200 data33,,31,,,,,,,:print"In einer Grotte."
+13220 return
+13300 data,33,,34,,,,,,:print"Schmaler Gang in der Grotte."
+13320 return
+13400 data36,,,35,,,,,,:print"Enger Durchgang."
+13401 ifpa(5)thenprint"Durch Steine verschuetteter Ausgang."
+13405 ifpa(5)<>0then13420
+13406 print"Hinter mir bricht eine Steinlawine aus  und verschuettet den Aus";
+13407 print"gang zum Spalt  gaenzlich !":pa(5)=1
+13420 return
+13500 data,,34,,,,,,,:print"Feuchte Grotte."
+13520 return
+13600 data,34,,,,,,,,:print"In einer Grotte."
+13601 print"In der Wand ist eine Stahltuer eingelas-sen.":ifpa(6)<>0then13620
+13602 print"Hinter den Felsen schnellen Stahlgreif- arme hervor und halten mi";
+13603 print"ch fest."
+13604 print"Ein kleiner Apparat schwebt direkt vor  mein Gesicht.":pa(6)=1
+13605 return
+13620 ifpa(6)<>1then13640
+13621 print"Eine synthetische Stimme aus dem Apparatfragt :";
+13622 print"'Wie lautet das Codewort ?'.":gosub50000
+13625 ifve=34thenpa(6)=-1
+13630 ifpa(6)=1thenprint"Ein Laserstrahl schiesst aus dem Apparat.":goto8000
+13632 pa(6)=-1:print"Die synthetische Stimme sagt : 'CodewortAkzeptiert !'."
+13633 print"Die Greifarme lassen mich wieder frei,  der Apparat schwebt davon."
+13634 print"Die Stahltuer oeffnet sich mit einem    leisen Surren.":oo(22)=36
+13635 o$(21)="Offene Stahltuer"
+13640 ifve=13andom=22thenri(1)=37:ri=1
+13650 return
+13700 data,36,,,,,,,,:print"In einem Aufzug.":return
+13720 ifve<>35orom<>23orpa(7)=3then13730
+13721 print"Die Stahltuer schliesst sich mit einem  leisen Surren.
+13722 ifpa(7)=0thenprint"Die rote Taste blinkt kurz hell auf."
+13723 ifpa(7)=0thenprint"Seltsam - Die Stahltuer oeffnet sich    wieder !"
+13724 ifpa(7)=0orpa(7)=3then13730
+13725 print"Der Aufzug bewegt sich leise nach unten.";:sc=sc+9.5
+13726 print"Nach ca 2 Minuten bleibt er stehen !"
+13727 print"Die Stahltuer oeffnet sich.":pa(7)=3:ri(2)=38
+13730 ifve=1andom=24thenprint"Der Schaltkasten ist verriegelt !"
+13735 ifve<>37orom<>24then13750
+13737 ifgm=0thenprint"Doch nicht etwa mit meinen blossen Haen-den !"
+13739 ifgm=3thenprint"Mit dem Saebel schaffe ich das nicht !"
+13740 ifgm<>10then13750
+13741 print"Mit lautem Krachen faellt die Blechab-  deckung des Schaltkastens";
+13742 print" auf den Boden.":ge(13)=37
+13743 oo(25)=37:o$(24)="Aufgebrochener Schaltkasten"
+13750 ifve=31orve=42thenifom=25thenprint"Ok.":pa(7)=1
+13751 ifpa(7)<>1then13760
+13752 print"Die rote Taste leuchtet hell auf."
+13753 o$(23)="Hell leuchtende rote Taste":pa(7)=2
+13754 o$(25)="Im Schaltkasten sind zwei miteinander kurzgeschlossene rote Kabel"
+13760 return
+13800 data,,42,,,,,,,:print"Schwach beleuchteter Raum."
+13820 ifve=1andom=33thenprint"Ich kann die Stahltuer nicht oeffnen."
+13825 return
+13900 data,,,,,,,,,:print"Raum mit verriegelter Stahltuer.":return
+13920 ifpa(8)thenprint"Langsam verschwindet meine Muedigkeit   wieder."
+13921 ifpa(8)thenprint"Ich bin gefangen !":pa(8)=0
+13925 ifve<>13orom<>27then13940
+13930 ifge(14)=0thenprint"Ein Drahtgitter verschliesst den Zugang zum Schacht."
+13932 ifge(14)<>0thenri(1)=72:ri=1
+13940 ifve<>37orom<>35then13950
+13942 ifgm=0thenprint"Womit denn ?":goto13950
+13943 ifgm<>10then13950
+13944 print"Ok. Das Drahtgitter faellt herrunter undgibt den Ein";:sc=sc+5
+13945 print"gang zum Schacht frei."
+13946 oo(35)=0:ge(14)=39:ge$(14)="Drahtgitter"
+13950 return
+14000 data,41,51,,,,,,,:print"Nordende eines Korridors."
+14020 return
+14100 data40,42,43,39,,,,,,:print"Langer Korridor."
+14120 return
+14200 data41,,44,38,,,,,,:print"Suedende eines Korridors."
+14220 return
+14243 print"Ok.":ge(gm)=-4
+14250 next
+14300 data,,,41,,,,,,:print"Aussruestungsraum."
+14320 ifve=13andom=29thenprint"Dazu bin ich zu gross."
+14322 ifve>2orom<>29then14340
+14325 iftu(4)<>2then14330
+14326 ifge(17)<>-1thenprint"Der Schrank ist verriegelt !"
+14327 ifge(17)<>-1thenprint"Ich habe auch keinen Schluessel !"
+14330 ifve=1andge(17)=-1thenprint"Ok.":tu(4)=0
+14335 ifve=2andtu(4)=0thenprint"Ok.":tu(4)=2
+14340 ifve<>8orom<>29orgm=0then14350
+14341 iftu(5)=0thenprint"Der Schrank ist nicht offen.":goto14350
+14343 print"Ok.":ge(gm)=-4
+14350 return
+14400 data,45,49,42,,,,,,:print"Raum."
+14420 return
+14500 data44,46,48,,,,,,,:print"Korridor."
+14520 return
+14600 data45,,,,,,,,,:print"Elektrizitaets-Labor."
+14620 return
+14700 data,,,,,,,,48,:print"Grosse Halle."
+14710 ifytthenyt=1:sc=sc+5
+14720 return
+14800 data,,,45,,,,,,47:print"Gekachelter Raum."
+14820 return
+14900 data50,,,44,,,,,,:print"Kleiner Korridor."
+14920 return
+15000 data,49,,,,,,,,:print"Grosses antik eingerichtetes Wohnzimmer.";
+15020 ifve<>47orom<>38thenreturn
+15021 ifyathenya=1:sc=sc+5
+15022 print"Ok.":print"Das Licht im Raum geht ploetzlich aus   und ein ";
+15023 print"heller rechteckiger Fleck er-   scheint an der Zimmerwand."
+15024 print"Ein versteckter Projektor beginnt zu    laufen !"
+15025 print"An der Wand erscheint das Bild eines    Wesens das halb Mensch ";
+15026 print"und halb Roboter ist und ein Tonband beginnt zu laufen........"
+15027 poke198,0:wait198,1
+15030 print"Hier spricht Professor Cohan !          Mein Experiment, eine bes";
+15031 print"sere kuenstli- che Menschheit zu schafen ist fehlge-   schlagen."
+15032 print"Meine Roboter haben sich gegen mich ge- wendet."
+15033 print"Bei einem Kampf wurde meine mechanische Koerperhaelfte zerstoert !"
+15035 print"Ich habe nur noch kurze Zeit zu leben."
+15036 print"Ich versuche nun die Verbotene Zone zu  erreichen und die Quelle ";
+15037 print"der Macht mit  einer Zeitbombe zu zerstoeren um die be-vorstehende";
+15038 print" Roboterinvasion auf die Men-schheit zu verhindern."
+15040 print"Moege Gott mir mein Verbrechen vergeben......."
+15045 poke198,0:wait198,1
+15050 print"Das Bild an der Wand verschwindet und   das Licht geht wieder an."
+15099 return
+15100 data,,,40,,,,,,:print"Kleiner weiss gekachelter Raum."
+15120 ifve<>45andve<>35orom<>36then15130
+15122 print"Die Schleusse oeffnet sich.":o$(28)="Offene Schleusse":tu(5)=0
+15123 ifybthenyb=1:sc=sc+2.5
+15124 print"Eine synthetische Stimme ruft 'ALARM !  Schleusse zur verbotenen";
+15126 print"{$a0}Zone ist akti- viert worden !'."
+15130 ifve=13andom=28andtu(5)=0thenri(1)=52:ri=1
+15140 return
+15200 data,51,,,53,,,,,:print"Enger Gang im Inneren des Gebirges."
+15205 print"Der Boden strahlt in einem seltsamen    violetten Licht."
+15220 ifge(16)<>-1thenpa(9)=1
+15230 return
+15300 data54,,,,,,56,52,,:print"Hoehlensystem."
+15320 return
+15400 data,53,,,,,55,,,:print"Hoehlensystem."
+15420 return
+15500 data59,56,57,,,54,57,,,:print"Hoehlensystem."
+15520 return
+15600 data55,58,57,,59,53,,,,:print"Hoehlensystem."
+15620 return
+15700 data55,,,56,,55,,,,:print"Hoehlensystem."
+15720 return
+15800 data56,,,,57,,,,,:print"Hoehlensystem."
+15820 return
+15900 data,,,55,,,,56,60,0:print"Hoehlensystem."
+15920 return
+16000 data,,,,,,,,61,59:print"Hoehlensystem."
+16020 return
+16100 data,,,,,,,,,60:print"Am Ende des Weges.
+16101 print"Vor mir liegt ein tiefer, ca 10 Meter   breiter Abgrund der in ";
+16102 print"Dunkelheit ge-   huellt ist."
+16103 print"Auf der anderen Seite des Abgrunds setztsich der Weg fort."
+16104 print"An der Felswand auf der anderen Seite   ist ein rot leuchtender";
+16105 print" Druckknopf ange-bracht."
+16120 ifve=35andom=39thenprint"Meine Arme sind nicht 10 Meter lang !"
+16130 ifbr<>1then16135
+16131 print"Ein lautes Rattern ertoent !":sc=sc+10
+16132 print"Eine Bruecke aus Stahl wird ueber den   Abgrund hinweg herrueber";
+16133 print" geschoben.":br=2:oo(40)=61:oo(41)=63
+16135 ifve=13andom=40thenri(1)=62:ri=1
+16140 ifve<>8orgm<>6orom<>39then16150
+16141 ifbr<>-1thenprint"Die Pistole faellt hinab.":ge(6)=0:goto16150
+16142 print"Ok.":print"Die Pistole trifft den Druckknopf mit   voler Wucht !"
+16143 ge(6)=63:br=1:goto16130
+16150 return
+16200 data63,61,,,,,,,,:print"Auf einer Stahlbruecke die ueber einen ";
+16210 print" tiefen, dunklen Abgrund fuehrt."
+16220 return
+16300 data,,,64,0,0,0,0,0,0:print"Hoehlenweg am Rande eines Abgrunds."
+16320 ifve=13andom=41thenri(1)=62:ri=1
+16325 ifve=35andom=42thenprint"Ok.":print"Es passiert nichts."
+16330 return
+16400 data,,63,,,,,65,,:print"Hoehlensystem."
+16420 return
+16500 data,,,,64,,,,66,:print"Feuchte Grotte."
+16501 print"Eine breite unregelmaessige Steintreppe fuehrt nach oben."
+16520 return
+16600 data,,,67,,,,,,65:print"Riessiger prunkvoller Tempelraum."
+16620 return
+16700 data,69,66,68,,,,,,:print"Grosser runder Raum."
+16720 ifve<>8orom<>43then16740
+16725 ifg1<>18andge(g1)=-1thenprint"Ok.":ge(g1)=0
+16727 ifg1<>18then16740
+16730 print"Eine synthetische Stimme aus der Zeit-  bombe spricht :":ge(18)=-9
+16732 print"'Mission beendet. Detonation erfolgt in ";zb;"Zeiteinheiten !'"
+16733 sc=sc+10
+16740 return
+16800 data,,67,,,,,,,:print"Altarraum."
+16820 return
+16900 data67,,,,,,,,,:print"Ausserhalb des Tempels."
+16920 ifve=23andom=44thenprint"Die Mauer ist viel zu hoch und zu steil."
+16925 ifve=13orve=26orve=48thenri(1)=75:ri=1:sc=sc+5
+16930 return
+17100 data,,,,,,,,,10:print"Hoch oben auf einem Affenbrotbaum."
+17110 ifpa(3)<>-1thenpa(3)=5
+17120 return
+17200 data39,45,,,,,,,,:print"In einem Belueftungsschacht."
+17220 return
+17500 data,,,,,,,,,:print"Ich schwimme unter der Mauer durch und  treibe nun";
+17501 print" auf dem Fluss......"
+17520 poke198,0:wait198,1
+17525 :print"{clr}Und so endete das Abenteuer des         Mr Bolings :"
+17530 print"Mit letzter Kraft erreichte er den      Inselstrand, wo er ";
+17532 print"von einem vorbeifah- renden Handelsschiff entdeckt und in ";
+17533 print"   seine Heimat zurueckgebracht wurde."
+17540 ifge(18)<>-9then17550
+17545 print"Als die Zeitbombe explodierte versank   die gesamte Insel spurlos";
+17546 print" im Meer......"
+17550 ifge(18)=-9then17560
+17552 print"Was mit den Robotern geschah blieb      BISHER unbekannt......
+17560 print"{wht}Sie haben";sc;"% dieses Adventures geloest."
+17564 print"{down}{down}{lred}Mit freundlichen Gruessen,
+17565 print"{down}{down}              Michael Nickles
+17566 poke198,0:wait198,1:run
+50000 rem ****************************
+50050 ifud=1then50220
+50055 tt=0
+50060 fori=1to10:be$(i)="":next:poke198,0:be$=""
+50061 print"{grn}Was soll ich nun machen ?":print"{gry2}{down}{CBM-@}";
+50080 getx$:tt=tt+1:iftt>1500thenprint"{up}{grn}":goto50140
+50085 ifx$=""then50080
+50086 tt=0
+50090 ifpeek(203)=1orlen(be$)>75thenifbe$<>""thenprint"{left}.{grn}":goto50140
+50100 i=asc(x$):ifi<65ori>90thenifi<>32andi<>20andi<>34then50080
+50110 ifi=20andlen(be$)=0then50080
+50120 ifi=20thenprint"{left}{left}  {left}{left}{CBM-@}";:be$=left$(be$,len(be$)-1):goto50080
+50130 be$=be$+chr$(i):i=i+128:print"{left}";chr$(i);"{CBM-@}";:goto50080
+50140 be$=be$+" ":fori=1to10:be$(i)="":next:wz=1:fori=1tolen(be$)
+50150 :ifmid$(be$,i,1)=" "thengosub50190:goto50180
+50160 :ifwz>19thenprint"Eingabe ist zu lang !":i=len(be$)+1:goto50180
+50170 :be$(wz)=be$(wz)+mid$(be$,i,1)
+50180 nexti:goto50220
+50190 ic=0:fori1=1toaz:ifbe$(wz)=au$(i1)thenic=1
+50200 nexti1:ific=0thenwz=wz+1:return
+50210 be$(wz)="":return
+50220 ifud=1thenud=0:goto50240
+50230 wz=1:ve=0:ob=0:om=0:pe=0
+50240 ic=0:g1=0:g2=0:gm=0
+50241 b$=be$(wz):ifb$=""thenreturn
+50242 ifb$="supermike"thenprint"0937210682":ic=1:goto50370
+50245 fori=1to10:ifb$=ri$(i)thenri=i
+50246 nexti:ifri<>0thenreturn
+50260 fori=1tovz:ifb$=left$(ve$(i),len(b$))thenve=i-val(right$(ve$(i),1)):ic=1
+50261 nexti:ificthen50370
+50270 fori=1togz
+50275 ifmid$(b$,2,len(b$)-1)<>mid$(ge$(i),2,len(ge$(i))-1)then50300
+50280 ic=1:ifg1=0theng1=i:ifge(g1)=-1thengm=i
+50290 g2=i:ifg2=g1theng2=0
+50300 nexti:ificthen50370
+50310 fori=1tooz:ifb$=ob$(i)thenob=i:ic=1:ifoo(i)=znthenom=i
+50320 nexti:ificthen50370
+50329 rem     iflen(b$)<3then50350
+50330 fori=1topz
+50331 ifmid$(b$,2,len(b$)-1)=mid$(pe$(i),2,len(pe$(i))-1)thenpe=i:ic=1
+50332 ifpe=iandpe(i)=znthenpm=pe:ic=2
+50340 nexti:ificthen50370
+50350 ifb$="und"thenud=1:ic=1
+50360 ific=0andri=0thenprint"Ich kenne ";b$;" nicht !":goto50000
+50370 wz=wz+1:ifwz>10orbe$(wz)=""orud=1thenreturn
+50380 ic=0:goto50241
+51000 rem allgemeine tabellen ----------
+51005 restore51000
+51010 datan,s,w,o,nw,no,sw,so,rauf,runter:fori=1to10:readri$(i):next
+51100 tu(1)=1:rem schrank
+51105 tu(2)=1:rem haustuer
+51110 tu(3)=1:rem truhe
+51115 tu(4)=2:rem schrank
+51116 tu(5)=1:rem schleusse
+51120 mu=4
+51130 dim be$(20)
+51200 :
+51210 data51,51,51,40,41,42,44,45,48,48,48,45,44,42,41,40,-1
+51220 dimma(17):fori=1to17:readma(i):next:ma=1:rem robot aktiv
+52000 rem w o r t s c h a t z ----------
+52005 restore52000
+52010 dataoeffne,schliesse,schaue,untersuche1,nimm,nehme1,hole2,verliere,lege1
+52011 datawirf2,werfe3,inventur,gehe
+52012 databetrete1,verlasse,gib,gebe1,zeige2,warte,toete,erlege1,schiesse2
+52013 dataklettere,faelle,baue,schwimme,ueberquere,lies,lese1,hilfe
+52014 databefestige,binde1,verknote2,nahoc,druecke,betaetige1
+52015 databreche,brich1,zerschlage2,zerstoere3,vernichte4
+52016 dataverbinde,kurz1,stecke,ziehe,schiebe1,setze,springe,esse
+52040 vz=49:dimve$(vz):fori=1tovz:readve$(i):next
+52100 datader,die,das,den,in,auf,nach,vom,zum,dem,aufs,sie,mit,ueber,hoch,weg
+52105 dataein,am,an,dich
+52120 az=20:dimau$(az):fori=1toaz:readau$(i):next
+52200 rem die objekte --------------
+52210 data schrank,"Alter Schrank aus Eichenholz",1
+52212 data haustuer,"Haustuer",1
+52214 data schiff,"Schiff",3
+52216 data truhe,"Grosse Seemannstruhe",0
+52217 data tuer,"Haustuer",2
+52218 databaum,"Hoher Affenbrotbaum",10
+52219 datamauer,"Sehr hohe, breite Mauer aus Felsbrocken",8
+52220 datafluss,"Breiter reissender Fluss",11
+52221 datakrokodil,"Viele Krokodile lauern im Fluss",11
+52222 datakamin,"Kamin",1
+52223 databaum,"Duenne Holzbaume",12
+52224 datafluss,"Breiter reissender Fluss",14
+52225 datahoehle,"Eingang zu einer Hoehle",25
+52226 datahoehlenwand,"Hoehlenwand",22
+52227 datastein,"Spitzer Kreidestein",0
+52228 dataschrift,"Schwer lesbare Schrift",0
+52229 dataskelett,"In einer Ecke liegt ein menschliches Skelett",22
+52230 dataeisenring,"Am Boden ist ein Eisenring befestigt",27
+52231 dataspalt,"Ca 1 Meter breiter Spalt in der Gebirgswand",31
+52232 datatropfsteine,"Von der Decke haengen Gebilde aus Tropfsteinen",35
+52233 datastahltuer,"Stahltuer",36
+52234 dataaufzug,"Die Stahltuer gibt den Zugang zu einem Aufzug frei",0
+52235 datataste,"Rote Taste",37
+52236 dataschaltkasten,"An der Wand haengt ein Schaltkasten",37
+52237 datakabel,"Im Schaltkasten sind zwei rote Kabel mit blanken Enden",0
+52238 datasteckdose,"In der Wand ist eine Steckdose",41
+52239 dataschacht,"In der Wand ist ein Belueftungsschacht",39
+52240 dataschleusse,"Schleusse aus Stahl",51
+52241 dataschrank,"Schrank aus Stahl",43
+52242 dataschacht,"In der Wand ist ein Belueftungschacht",45
+52244 datatreppe,"Wendeltreppe die nach unten fuehrt",48
+52245 datatreppe,"Wendeltreppe die nach oben fuehrt",47
+52246 datastahltuer,"Verschlossene Stahltuer",38
+52247 datakampfroboter,"Riessiges regungsloses Kampfroboterheer",47
+52248 datadrahtgitter,"Vor dem Schacht ist ein Drahtgitter",39
+52249 dataschalthebel,"Neben der Schleusse ist ein roter Schalthebel",51
+52250 datatoten,"Am Boden liegt ein Toter - halb Mensch halb Roboter",51
+52252 datasessel,"In der Mitte des Raums steht ein antiker Sessel",50
+52253 datadruckknopf,"Leuchtender Druckknopf",61
+52254 databruecke,"Bruecke aus Stahl",0
+52255 databruecke,"Bruecke aus Stahl",0
+52256 datadruckknopf,"Leuchtender Druckknopf in der Felswand",63
+52257 databrunnen,"In der Mitte des Raums ist eine Art von Brunnen",67
+52258 datamauer,"Sehr hohe, breite Mauer aus Felsbrocken",69
+52259 datafluss,"Breiter Fluss, der unter der Mauer durchfliesst",69
+52260 oz=45:dimob$(oz):dimo$(oz):dimoo(oz)
+52262 fori=1tooz:readob$(i):reado$(i):readoo(i):next
+52300 data "Seekarte",0,"Muscheln",5
+52302 data"Saebel",-3,"Schiffszwieback",-3,"Seil",-3,"Pistole",-3
+52303 data"Munition",-3,"Flasche",-2,"Buch",0,"Axt",-3,"Holz",0
+52305 data"Floss",0,"Blechdeckel",0,"Draht",0,"Stromkabel",46
+52306 data"Schutzanzug",-4,"Schluessel",0,"Zeitbombe",0
+52330 gz=18:dimge$(gz):dimge(gz):fori=1togz:readge$(i):readge(i):next
+52400 data"Navigator",4,"Kaepten Graubard",4,"Loewe",0,"Verbrannter Roboter",0
+52410 pz=4:dimpe$(pz):dimpe(pz):fori=1topz:readpe$(i):readpe(i):next
+53000 return
+60000 rem mp
+60004 fori=49152to49206:reada:pokei,a:next:sys49152:sys49191:sp=49152
+60010 data160,0,177,122,201,44,240,1,96,32,115,0,32,49,192,165,20,32,23,192
+60020 data76,0,192,41,63,141,1,221,9,64,141,1,221,173,1,221,48,251,96,169,127
+60025 data141,3,221,169,0,76,23,192,32,138,173,76,247,183
+60045 return:remsys49152,6,3,26,0,16,4,4,39,7,21,2,19,4
+61000 rem speakeasy-saetze
+61010 remsyssp,19,37,4,57,23,3,63,7,4,23,44,41,55,13:return
+61020 remsyssp,33,7,44,41,4,33,30,8,4,16,26,62,4,11,59,8,3,3,4:return
+61030 remsyssp,27,26,62,45,53,4,4,4,19,37,4,27,6,55,55,7,4,4,16,19,55,17,52,4
+61031 remsyssp,63,31,45,19,11,4:return
+

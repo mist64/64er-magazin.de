@@ -20,7 +20,16 @@ usage: r150_figure_captions.py <issue-dir> [ocr-dir] [--write]
 """
 import glob, html, json, os, re, sys
 
-CAPTION = re.compile(r'^(Bild|Tabelle|Listing)\s*\d', re.I)
+# THE NUMBER IS OPTIONAL.  `\s*\d` required a digit, so an UNNUMBERED caption
+# never matched: SH8603 prints a bare "Tabelle." whose prose calls it "Tabelle
+# 1", and "Bild. 1." puts the period before the number.  Both are captions, and
+# both were invisible -- which matters most because an unnumbered one is exactly
+# the caption r150's naming scheme has no slot for either.
+# (?![a-zäöüß]) because the number is now optional: without it, "Bild" matches
+# as a PREFIX and "Bildschirm Grafik Basic-Erweiterung" is read as a caption.
+# The old `\s*\d` was safe from that only by accident -- 's' is not a digit.
+CAPTION = re.compile(r'^(Bild|Tabelle|Listing)(?![a-zäöüß])'
+                     r'\s*\.?\s*\d*[a-z]?\s*[.:»]?', re.I)
 # JOIN THE LINE-BREAK HYPHEN FIRST (r280 Pass 1's defect, seen from here).
 # The OCR keeps the print's hyphenation as '¬' or '-', so "Buch¬stabens"
 # normalises to two words where the HTML has one, and the caption reads as
@@ -35,13 +44,28 @@ def main(issue_dir, ocr_dir, write):
         for i in range(len(w)):
             hay.add(' '.join(w[i:i+4]))          # 4-word shingles, as r320 uses
     def seen(words):
-        if len(words) < 4: return True
+        # A SHORT CAPTION IS NOT AUTOMATICALLY PRESENT.  `return True` for
+        # anything under four words reported SH8603's p146 and p148 tables as
+        # IN_HTML while they were absent -- the shortcut exists because the
+        # haystack is 4-word shingles, so it was answering "I cannot tell" with
+        # "yes".  Fall back to the longest shingle the caption can form.
+        if not words:
+            return True
+        if len(words) < 4:
+            return ' '.join(words) in ' '.join(sorted(hay)) or any(
+                ' '.join(words) in h for h in hay)
         return ' '.join(words[:4]) in hay
     rows = []
     for jf in sorted(glob.glob(os.path.join(ocr_dir, '[0-9][0-9][0-9].json'))):
         page = int(os.path.basename(jf)[:3])
         for b in json.load(open(jf)).get('blocks', []):
-            if b.get('label') != 'caption': continue
+            # NOT ONLY label == 'caption'.  020 labels a caption that sits
+            # inside a listing block `listing-inline`, and SH8603's p23 Bild 2
+            # was labelled exactly that and so never examined.  Take any block
+            # whose TEXT opens like a caption; the CAPTION match below is the
+            # real filter, and a false one costs a line in the report.
+            if b.get('label') not in ('caption', 'listing-inline', 'body', None):
+                continue
             t = ' '.join((b.get('text') or '').split())
             if not CAPTION.match(t): continue
             w = norm(t)

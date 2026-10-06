@@ -198,8 +198,10 @@ with **no cut figures**, then stops and hands over. What it delivers:
 2. the **crop worklist**: every figure the pages call for, with page and caption,
    so the owner can cut them;
 3. the **cover source** for `title.png` -- step 006 blocks on a hand-made 150 dpi
-   `title.png` and the owner makes it from the scan, so put the crop in front of
-   them in the same sitting rather than a week later;
+   `title.png` and the owner makes it from the scan. **This is handed over at
+   005, not here** -- see *An OWNER DELIVERABLE is handed over the MOMENT it
+   exists*, below. By PAUSE 2 it should already be in the owner's hands;
+   re-state it here only as a reminder of what is outstanding;
 4. **every owner decision accumulated since pause 1** (below).
 
 Then the owner cuts the figures and makes `title.png`. Then the chain resumes:
@@ -208,6 +210,43 @@ place the images (150), build the PDF (006), re-run the end-of-issue gates.
 **Step 006 is numbered early and RUNS LATE.** It is the issue PDF, it blocks on a
 hand-made input, and the PDF comes last anyway (*THE PAGE IMAGE IS `masters600`*).
 Numbering is not a schedule.
+
+### An OWNER DELIVERABLE is handed over the MOMENT it exists — and the chain does not stop
+
+PAUSE 2 is the point at which the chain **cannot make progress without the
+owner**. It is not the point at which the owner first hears from it.
+
+Two of the things PAUSE 2 hands over are **ready long before PAUSE 2**, and
+both are work the owner does by hand, so every hour they sit unmentioned is an
+hour of the owner's time the build is holding:
+
+| deliverable | ready after | hand over |
+|---|---|---|
+| the **uncut, deskewed, colour-corrected 600 dpi pages** — `<tmp>/sheets600/` | **005** | `open <tmp>/sheets600` |
+| the **150 dpi cover crop** for `title.png` | **005**, and on a `sheet` binding **005b** (it is a 25 % reduction of `<A4>/001.png` — `a4600` for `sheet`, `masters600` for `spread`; see r006) | `open <tmp>/title_source_150.png` |
+
+**Owner, 2026-10-05:** as soon as either is available, **tell the owner and
+`open` it — and do NOT stop.** Carry on with the next step in the same breath.
+This is a notification, not a pause: the owner works on the title and reviews
+the pages while the chain runs on, and the two only have to meet at PAUSE 2.
+
+So, at the end of 005:
+
+```bash
+# the pages: all of them, uncut, deskewed, graded
+open "$TMPDIR_ISSUE/sheets600"
+
+# the cover crop, which is a FILE and not a recipe -- see below
+open "$TMPDIR_ISSUE/title_source_150.png"
+```
+
+and say in the same message which is which, how many pages, and that nothing
+is blocked.
+
+**The cover crop is a FILE, not a recipe.** SH8602 documented the source
+master, the traced page box, the target size and an export warning in its crop
+worklist, and **made no file**, so the owner had to ask where it was. SH8603
+produced `title_source_150.png` and that is the precedent. Make the file.
 
 ### Owner decisions ACCUMULATE; they are not raised when found
 
@@ -1145,6 +1184,22 @@ disposable:
   8610 stays at `/private/tmp/64er_8610` by the user's decision, knowing the
   cleaner: that is a choice to re-run, not a default to copy.
 
+**`$TMPDIR_ISSUE` is the shell spelling of `<tmp>`. Export it once, at the top
+of the run, and every `<tmp>` in these files is that variable:**
+
+```bash
+export TMPDIR_ISSUE=$(.venv/bin/python -c \
+  'import json,sys; print(json.load(open("issues/'"$ISSUE"'/issue.json"))["tmp"])')
+[ -d "$TMPDIR_ISSUE" ] || { echo "no <tmp> for $ISSUE"; exit 1; }
+```
+
+r190's Verification and r060's keep-a-copy both referred to `$TMPDIR_ISSUE`
+with **nothing anywhere defining it** (SH8603: both 190 sub-agents substituted
+their own scratch dirs, and two parallel parts would have collided on one
+path had they not). A variable two rules read and no rule writes is a path
+that silently resolves to the filesystem root. Export it, or run the steps
+that use it from an environment that has.
+
 ## Cross-cutting rule: PARALLELISE TO HALF THE FREE RAM
 
 Every step that fans out over pages locally — 005 masters, 010 OCR, 145 figure
@@ -1411,6 +1466,34 @@ magick "$SRC/145.png" -crop 2136x574+390+3736 +repage <scratch>/crop.png
 - The bboxes in `<OUT_DIR>/blocks/pNNN.txt` are **in this file's pixels**
   (600 dpi), so a crop is the bbox verbatim -- no scaling, no offset. `frac=`
   is the same box for a render at any other resolution.
+- **`NNN.labels.json` IS NOT IN MASTER PIXELS, and it says so itself.** The
+  sentence above is true of `blocks/pNNN.txt` only. This recipe then sends you
+  to the JSON for full text (see *the block index is a PREVIEW*, below), and
+  that file's `bbox` is at **300 dpi** -- it carries `"ocr_dpi": 300` and
+  `"ocr_size": [2728, 3594]` at the top, against a 600 dpi master of
+  5457x7181. Cropping a `labels.json` bbox verbatim from `masters600` lands on
+  the wrong region; SH8603 got p164's intro instead of the line it wanted, and
+  x2 gave the line.
+  MEASURED on SH8603 p001, block 2051, which appears in both files: the JSON
+  has `bbox [1089, 920, 1643, 1323]`, and `blocks/p001.txt` has
+  `bbox=1108x806+2178+1840` — the same box at exactly twice the coordinates
+  (3286−2178 = 1108, 2646−1840 = 806). The factor is 2 for a 600 dpi master
+  and **4 for a 2400 dpi one**, which is the reason not to hardcode it.
+  So: **read `ocr_dpi` from the file rather than assuming either number**, or
+  better, use the `bbox_frac` each block already carries, which is
+  resolution-independent and needs no factor at all:
+
+  ```bash
+  magick <tmp>/masters600/164.png -crop "$($PY - <<'PYEOF'
+  import json
+  d = json.load(open('<OUT_DIR>/164.labels.json', encoding='utf-8'))
+  W, H = 5457, 7181                      # the master, from `magick identify`
+  b = next(b for b in d['blocks'] if b['id'] == 2051)
+  x0, y0, x1, y1 = b['bbox_frac']        # not b['bbox']
+  print('%dx%d+%d+%d' % ((x1-x0)*W, (y1-y0)*H, x0*W, y0*H))
+  PYEOF
+  )" +repage /tmp/block.png
+  ```
 - A lower-resolution look is `-resize 12%` of the same file, never a second
   render of something else.
 - **No rule says `pdftoppm` any more.** This paragraph used to end "where a
@@ -1460,12 +1543,39 @@ each citing rule 280 as the authority.
 Where the magazine is inconsistent, **the transcription is inconsistent in the
 same places.** Match the page, site by site; do not normalise.
 
-The standing example is the machine names. The magazine sets `C 64` and `C64`,
-`C 128` and `C128`, and switches between them within one issue and sometimes
-within one article — SH8601 has 344 sites of the closed-up form. Normalising
-them all to the spaced form would make the archive tidier than the paper, which
-is the one thing it must not be. **DECIDED 2026-08 by the issue owner:
-consistency with the page.**
+**THE MACHINE NAMES ARE NO LONGER THIS RULE'S EXAMPLE — they are its one
+standing exception.** Owner, 2026-10-04: **"space. C 64, C 128, C 16, C 116,
+VC 20."** This supersedes the 2026-08 decision for these names only; the rule
+itself is unchanged for everything else.
+
+Why the earlier decision did not survive contact with the page: on SH8603 the
+body type sets a thin gap that measures neither a closed pair nor a word
+space, so "match the page site by site" has no answer to give. r325 part A
+alone read the same issue 165 spaced against 99 closed, and 210 had set the
+bands closed. An instruction that cannot be carried out consistently produces
+inconsistency of our own, which is worse than a house style, because it
+masquerades as the paper's.
+
+MEASURED over the published corpus, prose only (`<pre>` and `<code>`
+excluded): **spaced 10,312 against closed 393** — `C 64` 5,762/232, `VC 20`
+1,897/94, `C 128` 1,739/46, `C 16` 802/16, `C 116` 112/5. The spaced form was
+already the archive's overwhelming practice, so this ruling tidies a 4 %
+residue rather than overturning anything.
+
+**What it does NOT touch:**
+
+- program text — anything inside `<pre>` or `<code>`, where the string is
+  typed in by a reader;
+- the index CSVs' titles, which are quoted verbatim and carry `C16/VC20`;
+- a filename or an `id`, which are already settled;
+- any other `C`-plus-number that is not a machine (`C 64` the note, a column
+  label, a formula).
+
+(For the record: this paragraph used to say SH8601 has 344 sites of the
+closed-up form. Measured now it has **5**, and the old figure does not
+reproduce by any counting I can construct. Do not carry a number forward
+without re-measuring it — r000 asks that of timing figures and it holds here
+too.)
 
 It follows from the rule this chain already lives by — *typos in print remain
 typos in the HTML* — and it costs something real: the published text stays
@@ -1480,6 +1590,37 @@ pair the paper does not settle: read the page, set what it sets.
 **This is not a licence to preserve OUR errors.** A glyph we mis-read is ours
 and gets fixed; a form the magazine chose is the magazine's and stays. The test
 is always the crop, never the corpus frequency.
+
+## Cross-cutting rule: NO PROCESS NOTES IN ANYTHING THAT SHIPS
+
+Owner, 2026-10-06: **"do not add log messages to shipping code/data."**
+
+Everything under `issues/` is published — the articles, `style.css`, the `prg/`
+listings, the PDFs. A comment in any of them is read by a visitor, not by us.
+So a shipping file never carries **why we did something, which issue revealed
+it, what a check found, or whose decision it was.** That belongs in `LOG.md`,
+in the commit message, and in these rule files, none of which ship.
+
+What a shipping comment MAY say is what the thing IS. Compare, in
+`issues/style.css`:
+
+```css
+--table-shaded: #D6D2B0;   /* a printed grey ground inside a table */   /* fine */
+```
+
+against the five-line block I first wrote above the same rule, explaining
+SH8604 p46's backtracking table and what typesetting it away would cost a
+reader. That is a commit message in a stylesheet. Removed.
+
+**The house style is already there to copy** and it is terse: `/* Colors */`,
+`/* light cyan */`, `/* Link Styling */` — 52 comments in `style.css`, none of
+them longer than a line, none about history.
+
+This generalises the rule r290 states for HTML comments inside articles
+(*the marker is German because the comment is* — say it to the reader, not to
+the checker). Same principle, every shipping artefact: a `.txt` listing's `;`
+header records the program's errata state, not our reasoning; a PDF's metadata
+is the house standard, not a build note.
 
 ## Cross-cutting rule: THE ISSUE YOU ARE WORKING ON IS THE SCOPE
 
@@ -1576,8 +1717,31 @@ data to look like. The data is a 40-year-old magazine.
 
 **Corollary — a gate that always reports the same number stops being read.**
 Where a finding is adjudicated and correct as printed, record the adjudication
-where the CHECK can see it (r290's `PRINTED` comment beside the heading), not
-only in LOG.md. Otherwise the count never reaches zero and nobody looks again.
+where the CHECK can see it, not only in LOG.md. Otherwise the count never
+reaches zero and nobody looks again.
+
+**Three mechanisms, and this line used to name only the one that was
+withdrawn.** It pointed at r290's `PRINTED` comment beside the heading — which
+r290 itself retired, because a rule saying "put this English token in a
+comment" is a rule saying "write the comment in English", and 8611 duly
+commented 22 of 22 in English. Use:
+
+| what is blessed | where | shape |
+|---|---|---|
+| a whole finding CLASS, with a count | `issues/<ID>/adjudicated.txt` | `key  n  reason`, read by r310's `adjudications()`; r260 reads the same file |
+| ONE instance, where the page is the evidence | an HTML comment, **in German**, within 400 characters before it | states what the printed page has or lacks — to the reader, not to the checker |
+| an open LIST a gate hands you to walk | `issues/<ID>/reviewed/<key>.txt` | one item per line, via `r000_reviewed.py`; later runs report only the delta. **Commit it** — `.gitignore` whitelists `!issues/*/reviewed/` for exactly this, and without the record the next build has no baseline and the gate reports everything again |
+
+The third is new with the SH8603 harvest and exists for the checks that are
+not pass/fail at all: a correct issue produces a non-empty list from them every
+run. SH8603 shipped 14 such lines from two r160 checks alone, **all 14
+correct.** A list that cannot be emptied gets skimmed, and the one new line in
+it gets skimmed with it.
+
+An adjudication clears exactly its count. If the pages now hold more of the
+class than the file declares, the extra ones were never looked at, and that is
+a HARD failure — not a note. r310 printed `MORE than adjudicated` and exited 0
+until the same harvest.
 
 ## Cross-cutting rule: SAY WHAT TO READ SEPARATELY FROM WHAT TO EDIT
 
@@ -1755,9 +1919,18 @@ Exit 0 and no traceback. This is the only check that sees the issue the way
 the site does, and it catches what no per-rule verification can:
 
 - a missing `issues/<ID>/title.png` -- the generator stops dead on it. Make it
-  from the cover master, as SH8601 did: crop `masters600/001.png` to the traced
-  page box in its stamp, resize to **1240 x 1754** (A4 at 150 dpi, what every
-  other issue uses).
+  by reducing `<A4>/001.png` by **25 %**, where `<A4>` is the directory the PDF
+  reads: **`a4600` on a `sheet` binding, `masters600` on a `spread` one** (r006
+  tables this). Both are 4961 x 7016, so the result is 1240 x 1754 -- **as a
+  consequence, not a constant**: `make_issue_pdf.sh` COMPUTES the size it will
+  accept and exits 1 on a mismatch.
+  This line used to say "crop `masters600/001.png` to the traced page box in
+  its stamp, resize to 1240 x 1754 (what every other issue uses)". On a sheet
+  binding `masters600` is the traced-trim canvas and NOT the A4 cut -- SH8604's
+  is 5457 x 7181 -- so that recipe squeezes the page 0.8 % horizontally to
+  reach the number, and the "what every other issue uses" reads as a constant
+  to copy. Reduce the A4 page instead: no crop, no resample decision, and it is
+  the same file every other page of the PDF comes from.
 - a `toc_category` outside the issue's own `toc.txt`, a duplicate `64er.id`, a
   malformed `64er.pages`.
 - An issue with no PDF yet builds (8610 fixed the two sites that assumed one);

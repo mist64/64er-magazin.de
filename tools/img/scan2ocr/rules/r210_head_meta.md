@@ -20,9 +20,42 @@ Two short lines at the very top of a typical 64'er interior page:
 - right side: `C 64` / `C 128` / `C 64/C 128` / `C 64/VC 20` /
   `C 16/C 116/Plus 4`. Sometimes absent.
 
+  **The machine names are SPACED, whatever the band sets.** Owner,
+  2026-10-04: *"space. C 64, C 128, C 16, C 116, VC 20."* — see r000's
+  CONSISTENCY WITH THE PAGE, where these names are now the one standing
+  exception. The examples here were already all spaced; what was missing was
+  the statement, so SH8603 set its bands CLOSED to match a body type whose
+  thin gap measures neither way, and the issue ended with both forms in it.
+  Read the band for the WORDS and the slashes; set the spacing from this rule.
+
 Both come from the OCR / vision read of the top ~250 px of the
 rendered page. Anti-memory: never compose either value from the
 article's category — the print is the source.
+
+## A LETTERED `b` START PAGE SHARES THE `a` ARTICLE'S BAND
+
+Where r080 has given two articles the same start page as `NNNa` and `NNNb`,
+there is **one** printed band on that page, and it sits above the `a` article.
+It is still the band for both: the page's running head describes the page.
+
+So read it once and write it to both, unless the `b` article continues onto a
+page of its own whose band differs — then the `b` article takes ITS page's
+band, because that is the band above its own text. SH8603's `77b` had no
+guidance either way and had to be decided by hand.
+
+Record in LOG.md which page each value was read from; with a shared start page
+the per-page evidence requirement cannot be satisfied by the page number
+alone.
+
+## `&` IN A head1 VALUE: BOTH FORMS ARE IN THE CORPUS
+
+`r210_head_meta_apply.py` writes through `html.escape`, so it emits
+`Tips &amp; Tricks`. MEASURED over the published corpus: **159 files carry the
+literal `Tips & Tricks` and 52 carry `Tips &amp; Tricks`** (plus one
+`Tips&Tricks`). Both parse to the same string, so nothing is broken and
+neither is being changed retroactively — but **any grep over `head1` must
+accept both forms**, or it silently misses a quarter of the corpus. The
+checks below do.
 
 ## Briefing for the sub-agent
 
@@ -86,19 +119,31 @@ dir=issues/<YYMM>
 n=$(grep -lE '64er\.head1' "$dir"/*.html | wc -l | tr -d ' ')
 total=$(ls "$dir"/*.html | wc -l | tr -d ' ')
 echo "  head1 in $n of $total article(s)"
-echo "  excluded (should NOT have head1):"
-# NOTE the reason below is SH8601-ONLY. SH8602's p3 prints EINLEITUNG in the
-# band, and so do SH8503-07 -- a Sonderheft Vorwort usually DOES carry a
-# section word. Exclude it because it is the opening piece, not because the
-# band is empty, and do not skip it at step 3.
-# `vorwort` belongs here too: a Sonderheft's opening piece is a Vorwort, not
-# an editorial, and its page carries the band WITHOUT a section word -- so it
-# is a real exclusion, not a missed article.  Without it the count was off by
-# one on SH8601 and the check reported a failure that did not exist.
-grep -lE '64er\.id" content="(editorial|vorwort|impressum|inhalt|vorschau)"' "$dir"/*.html
-# Leserforum is excluded too (rule 200 already set its head1 by hand);
-# it may still show a head1, so don't count it as a rule 210 target.
-echo "  → expect n ≈ total − (count of the excluded files above, plus Leserforum)"
+# FRONT MATTER MAY OR MAY NOT CARRY A BAND, AND THIS IS NOT A GATE.
+#
+# The two comments that used to sit here contradicted each other: one said a
+# Sonderheft Vorwort "usually DOES carry a section word" (SH8602's p3 prints
+# EINLEITUNG), the other that "its page carries the band WITHOUT a section
+# word -- so it is a real exclusion".  MEASURED: SH8601's vorwort has no
+# head1, SH8602's and SH8603's each have one.  It is a per-page fact, exactly
+# as this rule's own per-page evidence requirement says, so the check REPORTS
+# the front matter rather than asserting about it.
+echo "  front matter (band present or not is a per-page fact, read the crop):"
+for f in "$dir"/*.html; do
+  id=$(grep -oE '64er\.id" content="[^"]*"' "$f" | sed 's/.*content="//;s/"//')
+  case "$id" in
+    editorial|vorwort|impressum|inhalt|vorschau)
+      h=$(grep -c '64er\.head1' "$f")
+      printf '    %-10s head1=%s  %s\n' "$id" "$h" "$(basename "$f")" ;;
+  esac
+done
+# Leserforum, where rule 200 already set head1 by hand -- and NOT every issue
+# has one: no Sonderheft does, so a formula that always subtracts it is off by
+# one on every Sonderheft.  Count it instead of assuming it.
+lf=$(ls "$dir" | grep -ci leserforum || true)
+echo "  Leserforum articles: $lf  (0 on every Sonderheft)"
+echo "  → n plus the front-matter files WITHOUT a band plus $lf should be $total;"
+echo "    any other gap is a missed article, and the crop decides which."
 
 # 2. head1 / head2 placement is immediately before toc_category
 python3 -c "$(cat <<'PY'

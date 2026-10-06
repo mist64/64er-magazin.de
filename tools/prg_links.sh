@@ -41,6 +41,19 @@ for D64_FILE in "${D64_FILES[@]}"; do
     TMP_DIR="$OUTPUT_DIR/tmp"
     mkdir -p "$TMP_DIR"
 
+    # READ ERRORS ARE REPORTED BEFORE ANYTHING IS EXTRACTED.
+    #
+    # c1541 -extract says nothing about them: on SH8604's SH04C, a disk with
+    # two bad sectors, it printed four informational lines, exited 0 and
+    # extracted the files.  This line additionally sent all of that to
+    # /dev/null.  Nor can the file COUNT stand in -- `c1541 -list | grep -c
+    # '"'` reads 48 on the healthy SH03A against 27 files extracted, because
+    # the listing counts the disk-name line and types -extract does not write,
+    # so a count comparison flags a good disk.  The signal is the image's own
+    # appended error-info block; see r120_d64_errors.py, which also reads the
+    # BAM and says whether each bad sector holds anything.
+    "$SCRIPT_DIR/img/scan2ocr/rules/r120_d64_errors.py" "$D64_FILE" >&2 || true
+
     # Extract all files from D64 into tmp
     echo "  Extracting files..." >&2
     cd "$TMP_DIR"

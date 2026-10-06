@@ -1,0 +1,1 @@
+˜                        Ÿ    m        ˜       Ÿ     m  m  m ˜       Ÿ  m m    m   ˜       Ÿ   m m    m  ˜       Ÿ             ˜                                                               ™¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦_15SIE STEHEN IM VORGARTEN DES HAUSES,DER MAKELLOSE ENGLISCHE RASEN ST$HNTUNTER IHREN F%&EN.

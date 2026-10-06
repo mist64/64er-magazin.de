@@ -1,0 +1,64 @@
+
+
+;listing 04.a.prg ==0801==
+    0 rem *******************************
+    1 rem *                             *
+    2 rem *    adventure-cracker        *
+    3 rem *      version 1.0            *
+    4 rem *   von mright$chael nickles  *
+    5 rem *                             *
+    6 rem *******************************
+   10 print"{clr}{rvon}adventure-cracker version 1.0           {rvof}";
+   20 print"{down}bitte disk mit spiel einlegen {rvon}return{rvof}"
+   25 poke198,0:wait198,1
+   30 open1,8,15:open2,8,2,"#"
+   50 rem hauptmenue
+   51 print"{rvon}einzel / alles"
+   52 getx$:ifx$=""then52
+   55 ifx$="e"then200
+   57 ifx$="a"then100
+   58 goto52
+  100 rem alle daten von disk lesen
+  105 input"ab welchem track ";an
+  110 for t=an to 35: rem tracks
+  112 rem as=anzahl der sektoren
+  113 if t<18        then as=21
+  114 if t>17andt<25 then as=19
+  115 if t>24andt<31 then as=18
+  116 if t>30        then as=17
+  118 for s=1 to as: rem sectors
+  120 gosub1000:rem daten in buffer lesen
+  130 gosub2000:rem daten ausdrucken
+  140 next s
+  150 next t
+  200 rem einzelne daten lesen
+  201 print
+  205 input"track ";t
+  206 input"sektor ";s
+  210 ift<1ort>35then200
+  211 ifs<1then200
+  212 ift<18ands>21then200
+  213 ift>17andt<25ands>19then200
+  214 ift>24andt<31ands>18then200
+  215 ift>30ands>17then200
+  220 gosub1000
+  230 gosub2000
+  250 goto200
+ 1000 :
+ 1001 rem daten in buffer lesen
+ 1002 :
+ 1005 print#1,"u1 2 0 ";t;s
+ 1010 return
+ 2000 :
+ 2001 rem buffer auslesen
+ 2002 :m$=""
+ 2010 fori=0to255
+ 2020 : get#2,a$
+ 2021 ifa$=""then2030
+ 2022 m=asc(a$) : rem checken
+ 2023 ifm>64andm<91thenprinta$;
+ 2024 ifm>96andm<123thenprinta$;
+ 2030 ifm=46orm=58orm=59orm=63orm=32orm=160orval(a$)>0thenprinta$;
+ 2040 nexti
+ 2050 return
+

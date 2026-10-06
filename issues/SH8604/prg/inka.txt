@@ -1,0 +1,664 @@
+
+
+;inka.prg ==0801==
+   10 rem"       ***INKA***
+   20 rem"      (c) by BCSPC
+   30 rem"          1985
+   31 rem"Designed by Pile & Zombie
+   32 rem"  Programmed  by Zombie
+   33 rem"
+   34 rem"      Thilo Mahnig
+   35 rem"  a.d. Stephansberg 56
+   36 rem"    5309 Meckenheim
+   37 rem"   Tel.:  02225/4721
+   38 rem"-------------------------
+   45 :
+   46 :
+   47 :
+   48 :
+   49 restore:r=rnd(-ti)
+   50 data 76,24,1,177,251,145,251,200,208,249,230,252,202,208,244,96,120,160,0,169
+   52 data 160,132,251,133,252,162,32,32,11,1,169,224,132,251,133,252,162,32,32,11
+   54 data 1,169,53,133,1,88,96:fori=264to310:readx:pokei,x:next:sys264
+   56 fori=710to730:readx:pokei,x:next
+   58 data 208,3,76,29,168,32,192,2,32,19,166,56,165,95,233,1,164,96,76,36,168
+   60 poke40996,197:poke40997,2:poke1,54
+   62 fori=43168to43170:readx:pokei,x:next
+   64 fori=704to709:readx:pokei,x:next
+   66 data 32,192,2,32,138,173,76,247,183
+   70 :
+   71 :
+   72 :
+  100 poke53280,7:poke53281,7
+  110 print"{clr}{blk}{dish}"chr$(142):rem h:ctrl+h
+  120 print
+  130 goto 2000
+  499 rem input
+  500 print:gosub 700
+  510 q=0:fori=1tolen(ii$):ifmid$(ii$,i,1)=" "thenq=i:i=len(ii$)
+  520 next:ifq=0thenv$=ii$:n$="":goto540
+  530 v$=left$(ii$,q-1):n$=mid$(ii$,q+1)
+  532 q1=0:fori=1tolen(n$):ifmid$(n$,i,1)=" "thenq1=i
+  534 next:ifq1=0theno$="":o=0:goto540
+  536 o$=mid$(n$,q1+1):n$=left$(n$,q1-1)
+  540 l=len(v$):v=0:fori=1to54:ifv$=left$(v$(i),l)thenv=i:i=54
+  550 next:ifv=0thenprint"Ich verstehe dein verb nicht!":goto500
+  560 ifright$(v$(v),1)="*"thenv=v-1:goto560
+  570 ifq=0thenn=0:return
+  580 l=len(n$):n=0:fori=1tomx:ifn$=left$(n$(i),l)thenn=i:i=mx
+  590 next:ifn=0thenprint"Ich verstehe dein Nomen nicht!":goto500
+  600 ifo$=""thenreturn
+  610 l=len(o$):o=0:fori=1tomx:ifo$=left$(n$(i),l)theno=i:i=mx
+  620 next:ifo=0thenprint"Ich verstehe dein Objekt nicht!":goto500
+  630 return
+  700 print:print"Was nun ? ";:i1$=ii$:ii$=""
+  710 print"<{left}";
+  720 getin$:ifin$=""then710
+  730 ifin$=chr$(20)andii$>""then770
+  740 ifin$=chr$(13)then780
+  750 if(in$<"@"orin$>"z")andin$<>" "orlen(ii$)>27then720
+  755 ifin$="@"then795
+  760 ii$=ii$+in$:printin$;:goto710
+  770 ii$=left$(ii$,len(ii$)-1):printin$;:goto710
+  780 :
+  785 ifii$=""then720
+  790 print:return
+  795 ii$=i1$:printchr$(141)"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"ii$;:goto710
+  999 rem sieh
+ 1000 print"Herumliegende Gegenstaende:":f=0
+ 1010 fori=1to23:ifn(i)=pandnf(i)<>pthenf=1:print"-";n$(i)
+ 1020 next:iff=0thenprint"keine"
+ 1030 ifn(46)=pandp<>14thenprint"Der Affe ist hier."
+ 1050 print:print"Ausgaenge:";:restore 4900+p*100:x=.
+ 1060 readx,e:printv$(abs(x))" ";:e(abs(x))=e:ifx>0then1060
+ 1065 ifx=.thenprint"keine";
+ 1070 print:return
+ 1500 print"{down}{down}{down}"
+ 1510 printtab(17)"{rvon}{rght}+"
+ 1520 printtab(17)"{rvon}RIP"
+ 1530 printtab(17)"{rvon}{rght} "
+ 1540 printtab(17)"{rvon}{rght} "
+ 1550 print"{down}{down}{down}Willst du nochmal spielen ?"
+ 1560 getin$:ifin$=""then1560
+ 1570 ifin$="j"thenprint"{clr}":run3000
+ 1580 ifin$<>"n"then1560
+ 1590 print"{clr}":end
+ 1999 end
+ 2000 print"{clr}";:poke53265,peek(53265)and239
+ 2002 print"black croco software programming crew     presents: {down}    inka"
+ 2003 fori=54272to54296:pokei,0:next
+ 2005 print"   {CBM-P}{CBM-P}{CBM-P}{CBM-P} OL {CBM-P} {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}
+ 2010 print"   L {CBM-P} M{CBM-G}{CBM-N}NNN{CBM-P} {CBM-P}{CBM-P}N
+ 2020 print"   {CBM-N}{CBM-N}{CBM-N}{CBM-N}M   {CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}
+ 2030 print"   {CBM-N}{CBM-N}{SHIFT-@}{CBM-N} {CBM-G}{CBM-N}MM{CBM-G}{CBM-Y} {CBM-G}
+ 2040 print"N{CBM-Y}{CBM-Y}{CBM-Y}  {CBM-N} {CBM-G}{CBM-N} M O{CBM-G}{CBM-G}
+ 2050 print"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{SHIFT-@} {CBM-Y}{CBM-Y}  {CBM-Y} {CBM-Y}
+ 2055 rem +++++++++-+++++++++-+++++++++-
+ 2060 print"{down}{down}{down}    UI":print"    JK"
+ 2065 restore30000:fori=0to62:readx:poke832+i,x:next:v=53248:pokev+39,0
+ 2066 pokev+40,0:pokev+41,0:pokev+2,100:pokev+3,80:poke2041,15:poke2042,14
+ 2067 pokev+16,2
+ 2068 fori=0to62:readx:poke896+i,x:next:fori=0to62:readx:poke960+i,x:next
+ 2070 poke2040,13:pokev,200:pokev+1,65:pokev+29,3:pokev+21,3:pokev+23,2
+ 2080 si=54272:pokesi+24,15:pokesi+5,0:pokesi+6,240:pokesi+1,10
+ 2100 printtab(10)"       {CBM-P}NM{CBM-P}
+ 2110 printtab(10)"      NN NN{CBM-G}
+ 2120 printtab(10)"     NN NNNM{CBM-P}
+ 2130 print"{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}NNMNNN NNL{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}"
+ 2140 printtab(10)"   NOZZPN NNNM
+ 2150 printtab(10)"  NN    MNNN N
+ 2160 printtab(10)"  O  OP  PN N
+ 2170 printtab(10)" N  O{CBM-D}{CBM-F}P  MN
+ 2180 printtab(10)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}
+ 2190 poke53265,peek(53265)or16
+ 2200 z=0:fori=90to0step-1:pokev+2,i:poke975+z,255:poke976-z,0:z=1-z
+ 2210 pokesi+4,128+z:forn=1to20:nextn,i
+ 2220 pokev+4,255:pokev+5,100:pokev+21,7
+ 2230 fori=100to200:poke975+z,255:poke976-z,0:z=1-z:pokev+5,i:pokesi+4,128+z
+ 2240 forn=1to20:nextn,i
+ 2250 fori=80to0step-1:poke975+z,255:poke976-z,0:pokesi+4,128+z:z=1-z
+ 2260 pokev+3,i:ifi<32thenpokesi+24,i/2
+ 2265 forn=1to20:nextn,i
+ 2270 pokesi+4,0:pokev+21,0
+ 2280 print"{clr}{swlc}{down}{down}{down}{down}{down}{down}{down}{down}{down}Von Wenzel Borucki & Thilo Mahnig"
+ 2290 poke198,0:wait198,1
+ 2300 print"{clr}{swlc}{down}Das Spiel:":rem n:ctrl+n
+ 2310 print"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 2320 print"{down}Du bist Anthony Wolf.
+ 2330 print"{down}Du wurdest mit dem Fallschirm ueber dem"
+ 2340 print"Regenwald des Amazonas abgeworfen."
+ 2350 print"{down}FINDE{$a0}DEN{$a0}SCHATZ{$a0}DER{$a0}INKA{$a0}!"
+ 2360 print"{down}Bringe ein Zeichen des Forschers, der"
+ 2370 print"seine Station irgendwo dort unten hat!"
+ 2380 print"{down}Hast du beide Aufgaben erfuellt, so"
+ 2390 print"mache ein weithin sichtbares Signal, und";
+ 2400 print"der Hubschrauber wird dich wieder abho- len!"
+ 2410 print"{down}Druecke eine Taste."
+ 2420 poke198,0:wait198,1:geta$
+ 3000 fl=22:dimfl%(fl):restore 3020
+ 3005 print"{clr}{swlc}"
+ 3010 dimv$(54):fori=1to54:readv$(i):next
+ 3020 data n,s,o,w,no,nw,so,sw,nimm,gib,lege,schwimme,stuelpe,wirf,springe
+ 3030 data schlage,toete*,schau,sieh*,betrachte*,gucke*,halte,inventur,liste*
+ 3040 data ziehe,druecke*,gehe,stelle,krieche,krabble*,grabe,buddle*,schliesse
+ 3050 data oeffne,binde,befestige*,klettere,hangle,wasche,schmiere,klebe*
+ 3060 data bestreiche*,beschmiere*,save,load,quit,ende*,stop*,mache,entzuende*
+ 3070 data warte,trage,*anziehe,ja
+ 3100 mx=51:dimn$(mx),n(mx),nf(mx):fori=1tomx:readn$(i),n(i):nf(i)=n(i):next
+ 3110 data machete,0,uhr,43,stein,-1,eimer,5,bananen,46,brille,38,topf,8
+ 3120 data liane,-1,taschentuch,38,eier,42,gold,-1,schluessel,39,alles,-1
+ 3130 data deckel,-1,tierkadaver,39,figur,50,schatz,-1,schaufel,26
+ 3140 data fallschirm,0,stange,41,truhe,-1,geld,0,teller,30
+ 3200 data baum,,bienen,11,inka,,toter,,hebel,,mestize,,wasserfall,
+ 3210 data fluss,,steine,,indianer,,feuer,
+ 3220 data skorpion,,honig,,einsiedler,,nest,,ast,,tempelportal,,spalt,
+ 3230 data brunnen,,hoehle,,fels,,gebuesch,,affe,14,nische,,bruecke,
+ 3240 data zelt,,staude,,seil,
+ 3300 restore 3310:fori=1toint(rnd(1)*8)+1:readp:next:n(19)=p
+ 3310 data 26,29,7,3,12,24,17,40
+ 3320 kn$="Kann ich nicht.":wd$="Was denn ?":hn$="Hab ich nicht."
+ 3330 sn$="Seh ich nicht.":ok$="Ok."
+ 4000 iffl%(18)=.orp=p1then4050
+ 4010 print"Der Affe kommt dir nach.":p1=p:n(46)=p:fl%(18)=.
+ 4050 fori=1to8:e(i)=.:next:print:goto4900+p*100:print
+ 4100 gosub1000
+ 4110 gosub4300:ifdthen1500
+ 4120 gosub500:goto19900+100*v
+ 4300 d=0
+ 4310 ifnot(p>9andp<23andp<>18andn(12)=0andfl%(3)=0)then4322
+ 4320 print:print"Eine diebische Elster stiehlt dir deinenSchluessel.":n(12)=43
+ 4322 ifnot(p>9andp<23andp<>18andn(2)=0andfl%(3)=0)then4330
+ 4325 print:print"Die Elster stiehlt dir die Uhr.":n(2)=43
+ 4330 iffl%(2)=.then4340
+ 4332 fl%(2)=fl%(2)-1
+ 4335 iffl%(2)=.andp=9andn(3)thenprint"Er setzt sich wieder hin.":n(3)=-1
+ 4340 iffl%(4)=.then4350
+ 4342 fl%(4)=fl%(4)-1:iffl%(4)>1thenprint"Dir bleibt nicht viel Zeit...":goto4350
+ 4343 ifn(19)>-1then4348
+ 4344 print"Du wirst hinuntergeworfen.Durch den"
+ 4345 print"Fallschirm wirst du gerettet:die India-"
+ 4346 print"ner koennen nur fassungslos starren...":p=41:fl%(4)=0:fl%(22)=1:return
+ 4348 print"Die Indianer werfen dich in den Abgrund.":d=1
+ 4350 if(p<10orp>23)andp<>43thenfl%(15)=0:goto4380
+ 4355 iffl%(15)=-1then4380
+ 4360 fl%(15)=fl%(15)-1:iffl%(15)=1thenprint"Du hoerst ein Geraeusch..."
+ 4370 iffl%(15)then4380
+ 4375 print"Ein Indianer stuerzt herbei und ueber-  waeltigt dich!":d=1
+ 4380 iffl%(18)=.orfl%(19)=.then4400
+ 4385 fl%(18)=fl%(18)-1
+ 4400 ifp<>42then4420
+ 4405 ifn(46)<>pandn(46)<>-1thenprint"Der Adler toetet dich.":d=1:return
+ 4408 iffl%(20)then4420
+ 4410 print"Der Adler toetet den Affen.":fl%(20)=1:n(46)=-1
+ 4420 iffl%(19)=.thenn(5)=46
+ 4430 iffl%(21)thenfl%(21)=fl%(21)-1
+ 4435 return
+ 5000 data -1,3
+ 5010 print"Du stehst am Flussufer, nahe bei einem  tosenden Wasserfall."
+ 5020 print"Ein schmaler Uferpfad fuehrt nordwaerts.";:goto4100
+ 5100 data -4,1
+ 5110 print"Du bist in einer Hoehle hinter dem Was- serfall."
+ 5120 iffl%(0)=0thenprint"Ein Indianer starrt dich boesartig an!"
+ 5130 iffl%(0)thenprint"Zwischen den Felsen ist ein Hebel."
+ 5140 goto4100
+ 5200 data 2,1,-5,4
+ 5210 print"Du stehst am Flussufer. Der Uferpfad"
+ 5220 print"weist den Weg nach Nordosten und Sueden.";:goto4100
+ 5300 data 8,3,-6,5
+ 5310 print"Du bist am Flussufer. Der Fluss hat"
+ 5320 print"einige Steine herangespuelt.":goto4100
+ 5400 data 7,4,-1,6
+ 5410 print"Vor dir steht ein Brunnen. Ein breit"
+ 5420 print"grinsender Mestize haelt dir ein Schild vor die Nase:"
+ 5430 print">Fuer Abenteurer $10.-<":goto4100
+ 5500 data 2,5,-1,7
+ 5510 print"Du bist im trockenen Unterholz.":goto4100
+ 5600 data 4,8,1,9,-2,6
+ 5610 print"Dein Weg hat dich in die Berge gefuehrt.";
+ 5620 print"Westlich ist ein Hoehleneingang.":goto4100
+ 5700 data -3,7
+ 5710 print"Du hast eine enge Hoehle betreten."
+ 5720 iffl%(1)thenprint"Der Eimer ist ueber dem Skorpion.":goto5750
+ 5730 print"Vor deinen Fuessen hockt ein etwa faust-";
+ 5740 print"grosser Skorpion,der im Halbdunkel der  Hoehle blaeulich schimmert."
+ 5750 print"In einer Nische entdeckst du einen Topf Honig."
+ 5760 goto4100
+ 5800 data 2,7,-1,12
+ 5810 print"Hier ist ein Einsiedler."
+ 5820 ifn(3)=-1thenprint"Er sitzt auf einem Stein."
+ 5830 goto4100
+ 5900 data -3,11
+ 5910 print"Du stehst im undurchsichtigen Gestruepp"
+ 5920 print"des lianenbewachsenen Dschungels.":goto4100
+ 6000 data 4,10,3,12,-1,15
+ 6010 ifn(25)<>11then5910
+ 6020 print"Ein surrender Bienenschwarm umschwaermt dich."
+ 6030 ifn(36)=.thenprint"Die Bienen stuerzen sich auf den Honig."
+ 6040 goto4100
+ 6100 data 2,9,4,11,-3,13
+ 6110 goto5910
+ 6200 data 1,17,5,18,6,16,-4,12
+ 6210 goto5910
+ 6300 data 2,10,-5,20
+ 6310 ifn(46)<>14then5910
+ 6320 print"Ein Affe gafft dich hungrig an...":goto4100
+ 6400 data 2,11,-5,21
+ 6410 goto5910
+ 6500 data 1,21,-7,13
+ 6503 iffl%(3)then6520
+ 6505 print"Eine Elster sitzt auf einem Ast eines"
+ 6508 print"Baumes.Als sie dich sieht, fliegt sie   davon."
+ 6510 goto5910
+ 6520 print"Die Elster klebt mit ihren Krallen am   Ast fest.":goto5910
+ 6600 data 2,13,6,21,-5,23
+ 6610 goto5910
+ 6700 data 8,13,1,23,-5,24
+ 6710 print"Du hast ein kleines Dorf mit Inkahuettenbetreten.":goto4100
+ 6800 data 2,14,-3,20
+ 6810 goto5910
+ 6900 data 4,19,8,14,-3,21
+ 6910 goto5910
+ 7000 data 4,20,3,22,8,15,-7,17
+ 7010 goto5910
+ 7100 data 4,21,-3,23
+ 7110 goto5910
+ 7200 data 2,18,8,17,-3,24
+ 7210 goto5910
+ 7300 data 8,18,4,23,-7,25
+ 7310 print"Du stehst auf einem seicht bewaldeten"
+ 7320 print"Huegel.Westlich ist Dschungel,suedwest-"
+ 7330 print"lich erblickst du ein Inkadorf,suedoest-";
+ 7340 print"lich ist eine wackelige Haengebruecke.":goto4100
+ 7400 data 6,24,-7,26
+ 7410 print"Du stehst auf einer schwankenden Haenge-";
+ 7415 print"bruecke. Unter dir zuengeln die zischen-";
+ 7420 print"den Fluten des Flusses dahin, der fuer"
+ 7430 print"seinen Goldgehalt beruehmt ist.":goto4100
+ 7500 data 6,25,1,27,-2,29
+ 7510 print"Du bist am Ufer des Flusses.Nordwestlich";
+ 7520 print"ist eine Bruecke.";:ifn(18)<>26thenprint:goto4100
+ 7530 print"In den Sand ist nach-","laessig eine Schaufel gesteckt.":goto4100
+ 7600 data -2,26
+ 7610 print"Hier, oberhalb der Bruecke ist das Was- ser seicht und klar.":goto4100
+ 7700 data 0,0
+ 7710 print"Du stehst bis zur Huefte im Wasser.":goto4100
+ 7800 data 1,26,8,31,-4,30
+ 7810 print"Du bist auf einem Pfad vor einem Zelt."
+ 7820 print"Das muss die Behausung des Forschers    sein!":goto4100
+ 7900 data -3,29
+ 7910 print"Du bist in dem Zelt des Forschers.Es ist";
+ 7920 print"niemand hier.";:ifn(23)<>30thenprint:goto4100
+ 7930 print"Ein Teller mit Essen steht auf dem Boden.":goto4100
+ 8000 data -5,29
+ 8010 print"Du stehst auf einer felsigen Hoehe vor"
+ 8020 print"einem Abgrund.Tief unten siehst du den"
+ 8030 print"Tempel.In der Felswand ist ein Adler-   nest.":goto4100
+ 8100 data -7,34
+ 8110 print"Du stehst an einer tiefen Schlucht,an"
+ 8120 print"deren Boden du den Inkatempel zu erken-"
+ 8130 print"nen glaubst.":goto4100
+ 8200 data 6,29,-2,34
+ 8210 print"Ein fast unsichtbarer Pfad windet sich"
+ 8220 print"durch das Gestruepp.Ich glaube nicht,"
+ 8230 print"dass ich ihn wiederfinden wuerde.Er "
+ 8240 print"setzt sich nach Norden und Sueden fort.":goto4100
+ 8300 data 1,33,-6,32
+ 8310 print"Du stehst vor einem tiefen Abgrund."
+ 8320 print"Unten liegen Skelette von Opfern."
+ 8325 iffl%(4)=.thenprint"Bewaffnete Inkas stehen um dich herum."
+ 8340 goto4100
+ 8400 data -4,36
+ 8410 print"Du bist am Fuss des Abgrunds.Westlich   ist der Tempel.":goto4100
+ 8500 data -3,35
+ 8510 print"Vor dir ist das Portal das Tempels."
+ 8520 print"Davor liegt der tote Forscher,auf seinem";
+ 8530 print"Gesicht ein schmerzverzerrter Ausdruck.":iffl%(14)=.then4110
+ 8540 print"Der Tempelportal ist offen.":goto4110
+ 8600 data -6,4
+ 8610 print"Du stehst auf einem Stein im Fluss."
+ 8620 iffl%(5)=.thenprint"Der naechste Stein ist ein gutes Stueck entfernt."
+ 8630 goto4100
+ 8700 data 5,40,-3,39
+ 8710 print"Du bist am oestlichen Flussufer."
+ 8720 ifn(6)<>38andn(9)<>38then4100
+ 8730 ifn(6)=38thenprint"Eine zerschlagene Brille ":ifn(9)=38thenprint"und ein"
+ 8740 ifn(6)<>38thenprint"Ein ";
+ 8750 ifn(9)=38thenprint"blutiges Taschentuch mit Initialen"
+ 8760 print"liegt auf dem Boden.":
+ 8770 goto4100
+ 8800 data 0,0
+ 8810 print"Du bist in eine Fallgrube geraten!"
+ 8820 print"Mit dir hier ist ein Tierkadaver.";
+ 8825 ifn(12)=39thenprint"{left} und","ein Schluessel."
+ 8827 ifn(12)<>39thenprint
+ 8830 print"Vom oberen Rand starren dich einige Hy- aenen an.":goto4100
+ 8900 data -8,38
+ 8910 iffl%(6)=.thenprint"Du bist in voellig undurchdringlichem   Gebuesch."
+ 8920 iffl%(6)thenprint"Du stehst im Gestraeuch."
+ 8930 goto4100
+ 9000 data -8,40
+ 9010 print"Du bist unter einem Abgrund.Gerippe"
+ 9020 print"liegen herum.":ifn(20)<>41then4100
+ 9030 print"Eine Holzstange liegt zwischen den Kno- chen.":goto4100
+ 9100 data 0,0
+ 9110 print"Du haengst am Seil an der Felswand.":ifn(10)<>42then4100
+ 9120 print"Im Horst sitzt ein Adler, einige Eier   ausbruetend.":goto4100
+ 9200 data ,
+ 9210 print"Du sitzt auf dem Baum.Neben dir ist das"
+ 9220 print"Nest der Elster.":ifn(2)=43thenprint"Darin liegt eine Uhr."
+ 9230 iffl%(15)=-1thengoto4100
+ 9240 print"Ein Indianer taucht unter dir auf, sieht";
+ 9250 print"um sich und verschwindet wieder.":fl%(15)=-1:goto4100
+ 9300 data ,
+ 9310 print"Du stehst in dem dreckigen Wasser des   Brunnens.":goto4100
+ 9400 data ,
+ 9410 print"Du bist auf einer kleinen Insel."
+ 9420 print"Die Blaetter einer Staude spenden dir   angenehmen Schatten."
+ 9425 ifn(5)=.thenfl%(19)=9
+ 9430 ifn(21)<>45then4100
+ 9440 print"Die Truhe steckt halb im Sand.":goto4100
+ 9500 data 0,0
+ 9510 print"Du sitzt in der Spitze der Staude."
+ 9520 ifn(5)=46thenprint"Ein Busch Bananen haengt zum Greifen    nahe."
+ 9530 goto4100
+ 9600 data -2,48
+ 9610 print"Du bist im Schatzraum des Tempels!!!"
+ 9620 iffl%(13)thenprint"Durch einen Spalt scheint Licht herein."
+ 9625 iffl%(13)thenprint"Vor dem Spalt ist eine Nische."
+ 9630 ifn(16)>-1then4100
+ 9640 print"Das Licht wird durch die Figur gebrochen";
+ 9650 print"und strahlt auf eine bestimmte Stelle.":goto4100
+ 9700 data 1,54,-2,52
+ 9710 iffl%(11)thenprint"Die Schlangen essen noch.":goto4100
+ 9720 print"Zwei Koenigskobras verwehren dir den    Weg.":goto4100
+ 9800 data 1,52,-3,53
+ 9810 iffl%(12)then9820
+ 9815 print"Die Tuer schliesst sich hinter dir":fl%(12)=1
+ 9820 print"Du hast einen finsteren Tempelraum be-"
+ 9830 print"treten.Der Boden des nach Norden fuehr-"
+ 9835 print"enden Ganges ist halb eingestuerzt und"
+ 9837 print"wird nur noch durch ein paar lose Plan- ken gehalten."
+ 9840 print"Oestlich ist eine feines Seil gespannt.":goto4100
+ 9900 data -4,53
+ 9910 print"Du bist in einem dunklen Raum.":ifn(16)<>50then4100
+ 9920 print"Eine glaeserne Figur schimmert geheim-  nisvoll.":goto4100
+10000 data -7,38
+10010 goto8610
+10100 print"Der Gang stuerzt unter dir zusammen.":goto1500
+10200 print"Das Seil zerreisst, ein Stein loest sich";
+10210 print"aus dem Gewoelbe und begraebt dich untersich.":goto1500
+10300 ifn(10)=48thenp=47:goto4000
+10310 print"Das haettest du nicht du nicht sollen!"
+10320 print"Blitzschnell stoesst eine der Schlangen"
+10330 print"vor und schlaegt ihre Giftzaehne in deinFleisch.":goto1500
+20000 :
+20100 :
+20200 :
+20300 :
+20400 :
+20500 :
+20600 :
+20700 ife(v)=0thenprint"Du kannst nicht in diese Richtung!":goto4110
+20701 ifnthenprintkn$:goto4110
+20702 ifn(19)=-1andfl%(22)=.thenprintkn$:goto4110
+20703 ifn(19)=-1andfl%(21)>-1thenprint"Mit Fallschirm ?":e=e(v):fl%(21)=2:goto4110
+20705 ifp<10orp>23orfl%(16)<>e(v)orfl%(15)=-1orp=18then20710
+20707 print"Mit einem mal steht dir ein Indianer ge-";
+20708 print"genueber. Er greift dich an und ueber-  waeltigt dich.":goto1500
+20710 iffl%(15)<>-1thenfl%(15)=3
+20715 fl%(16)=p:ifp<>18thenp=e(v):goto4000
+20720 print"Von allen Seiten kommen Indianer herbei.";
+20725 print"Sie schleppen dich weg..."
+20730 fori=1to2000:next:fl%(4)=5:p=34:goto4000
+20800 ifn=0thenprintwd$:goto4110
+20802 ifn(n)<>pthenprintsn$:goto4110
+20805 ifothen20850
+20810 gosub20860:ifdthen1500
+20815 goto4110
+20850 print"   "n$(n)" oder "n$(o)" ?":goto4110
+20860 d=0:ifn>23thenprintkn$:return
+20861 ifn=7andp=8andfl%(1)=.thenprint"Der Skorpion sticht dich!":d=1:return
+20862 ifn=4andfl%(1)=1thenfl%(1)=.
+20863 ifn=3andp=9thenprint"Unter dem Stein lag ein Deckel.":n(14)=9
+20864 ifn=7andp=8thenn(36)=.
+20866 ifn=3andp=37thenfl%(5)=.
+20870 z=.:fori=1to23:ifn(i)=.thenz=z+1
+20875 next:ifz>5thenprint"Du traegst zuviel!!":return
+20880 n(n)=.:printok$:return
+20900 ifn=.thenprintwd$:goto4110
+20905 ifo<>.thengoto20920
+20907 ifn>23thenprintkn$:goto4110
+20910 goto21000
+20915 ifn=22andp=5ando=29then21012
+20920 ifnot(n=11andp=34ando=33andn(11)=.andfl%(4)<>.)then20930
+20925 print"Sie lassen dich in Frieden und gehen.":n(11)=-1:fl%(4)=0:goto4110
+20930 ifnot(n=46ando=5andn(46)=p)then20950
+20935 ifn(5)thenprinthn$:goto4110
+20937 print"Der Affe stuerzt sich auf die Banane.":fl%(18)=4:fl%(19)=fl%(19)-1
+20940 goto4110
+20950 ifnot((n=33orn=46orn=37)ando<24)thenprintkn$:goto4110
+20960 print"Der ";n$(n);" schaut darauf,":print"und wirft es hin.":n(o)=p:goto4110
+21000 ifn=13then21050
+21007 ifn=19andn(n)<.thenn(n)=.
+21010 ifn(n)<>.thenprinthn$:goto4110
+21011 ifnot(n=22andp=5andn(4)=5)then21013
+21012 print"Er sagt:<Halt dich am Eimer fest!>":fl%(7)=1:n(22)=-1:goto4100
+21013 ifnot(n=2andp=9)then21015
+21014 print"Der Einsiedler stuerzt sich auf die Uhr.":fl%(2)=3:n(2)=-1:n(3)=9:goto4110
+21015 ifnot(n=3and(p=37orp=51))then21017
+21016 print"Du kannst jetzt ueber den Fluss.":fl%(5)=1:n(3)=37:goto4110
+21017 ifp=34andn=11theno=33:goto20920
+21018 ifp=n(46)andn=5then20935
+21020 ifnot(n=16ando=47andp=47andfl%(13)=1)then21029
+21022 print"Die Figur passt sich in die Nische ein.":n(16)=-1
+21023 print"Ein Lichtstrahl weist auf eine Stelle   des Bodens.":goto4110
+21029 ifothen20850
+21030 n(n)=p:printok$:goto4110
+21050 fori=1to23:ifn(i)=.thenn(i)=p:printok$
+21060 next:goto4110
+21100 ifnthenprintkn$:goto4110
+21105 ifp=28thenp=45:goto4000
+21106 ifp<>38then21110
+21107 fori=1to23:ifn(i)=.thenn(i)=-2
+21108 next:p=3:goto4000
+21110 ifp<>45then21120
+21115 iffl%(5)thenprint"Du zerschellst an einem Stein im Fluss.":goto1500
+21118 p=3:goto4000
+21120 ifp<>3thenprintkn$:goto4110
+21125 print"Du wirst den Wasserfall hinunter ge-    schwemmt.":goto1500
+21200 ifn=4and(o=.oro=35)then21220
+21210 printkn$:goto4110
+21220 ifn(4)thenprinthn$:goto4110
+21225 print"Der Skorpion ist gefangen."
+21230 n(4)=8:fl%(1)=1:goto4110
+21300 ifothen20850
+21305 ifn=.thenprintwd$:goto4110
+21310 ifn<>15orp<>39orn(15)<>pthenprintkn$:goto4110
+21315 n(15)=-1
+21316 iffl%(8)+fl%(9)=2then21320
+21317 print"Der Kadaver wird von den Hyaenen sofort"
+21318 print"weggeschleppt und gefressen.":goto4110
+21320 print"Die Hyaenen stuerzen sich gierig auf den";
+21330 print"Kadaver und zerren dich daran aus der   Grube.":p=38:goto4000
+21400 if(n=.orn=31ando=.)andp=25thenp=28:goto4000
+21410 ifnthenprintkn$:goto4110
+21412 ifp=43thenp=16:goto4000
+21415 ifp=46thenp=45:goto4000
+21417 ifnot(p=5orp=34orp=31orp=32)thenprintkn$:goto4110
+21418 ifn(19)>-1thenprint"Du zerschellst...":goto1500
+21419 ifp=31thenprint"Dein Fallschirm bleibt haengen und zer- reisst...":goto1500
+21420 ifp=34thenprint"Es geht abwaerts...":p=41:fl%(22)=1:goto4000
+21421 ifp=32thenprint"Du schwebst sanft herab!":p=35:fl%(22)=1:goto4000
+21425 print"Du faellst in den Brunnen...":goto1500
+21500 ifn<>8orp<10orp>23orp=18then21530
+21510 ifn(1)thenprintkn$:goto4110
+21520 n(8)=p:n=8:goto20810
+21530 ifn<>45orp<>40thenprintkn$:goto4110
+21540 ifn(1)thenprintkn$:goto4110
+21550 print"Du hast das Gebuesch wegbar gemacht.":fl%(6)=1:goto4110
+21700 goto 4000
+22100 ifothen20850
+22105 ifn=.thenprintwd$:goto4110
+22110 if(n=4and(p=44orp=5)andn(4)=5)or(n=8andp=39andn(15)>.)then22130
+22120 printkn$:goto4110
+22130 ifn=8thenfl%(8)=1:printok$:goto4110
+22140 iffl%(7)=.thenprint"Du musst ihn bezahlen!":goto4110
+22150 print"Er kurbelt kraeftig an der Winde.":p=49-p:goto4000
+22200 z=.:print"Du hast:":fori=1to23:ifn(i)=.thenprint"-"n$(i):z=1
+22210 next:ifz=.thenprint"nichts"
+22220 goto4110
+22400 ifn=.thenprintwd$:goto4110
+22410 ifnot(n=28andp=2andfl%(.)=1)thenprintkn$:goto4110
+22420 print"Du hoerst ein seltsames,schnarrendes Ge-raeusch.":fl%(13)=1
+22430 goto4110
+22600 ifothen20850
+22610 ifn=43andp=7thenp=8:goto4000
+22615 ifn=30andp=1thenp=2:goto4000
+22620 ifn=31andp=3thenprint"Du wirst den Wasserfall hinabgespuelt...":goto1500
+22625 ifnot(n=32and(p=4orp=38orp=37orp=51))then22630
+22626 ifp=4orp=38thenp=-37*(p=4)-51*(p=38):goto4000
+22627 iffl%(5)=.thenprint"Du wirst weggespuelt...":goto1500
+22628 p=88-p:goto4000
+22630 ifn=40andp=36andfl%(14)=1thenp=49:goto4000
+22635 ifn=41andp=47andfl%(13)=1thenp=2:goto4000
+22640 ifn=48and(p=26orp=24)thenp=25:goto4000
+22645 ifn=49andp=29thenp=30:goto4000
+22650 ifn=45andp=40andfl%(6)=1thenp=41:goto4000
+22660 printkn$:goto4110
+22700 ifn=16ando=47andp=47andfl%(13)=1then21022
+22710 printkn$:goto4110
+22800 ifothen20850
+22820 if(p<>49andp<>50)orn<>51thenprintkn$:goto4110
+22830 p=99-p:goto4000
+23000 ifnthenprintkn$:goto4110
+23010 ifn(18)thenprint"Ich habe keine Schaufel...":goto4110
+23015 ifp<>45then23030
+23020 print"Du siehst eine Truhe, noch halb im Sand.";:n(21)=45:goto4110
+23030 ifp<>47thenprintkn$:goto4110
+23040 ifn(16)<>-1thenprint"Wo soll ich denn graben ???":goto4110
+23050 print"Du graebst den Inkaschatz aus!":n(16)=-2:n(17)=47:goto4110
+23200 ifn=.thenprintwd$:goto4110
+23202 ifothen20850
+23204 ifnot(p=11andn=7andfl%(10)=.andn(36)=.)then23210
+23205 ifn(14)thenprint"Ohne Deckel ?":goto4110
+23206 ifn(7)thenprinthn$:goto4110
+23207 fl%(10)=1:n(14)=-1:n(36)=-1:print"Die Bienen sind gefangen.":goto4110
+23210 ifn=7thenprint"Das kann ich jetzt nicht.":goto4110
+23215 ifn=40andp=36thenprintok$:fl%(14)=.:goto4110
+23220 printkn$:goto4110
+23300 ifn=.thenprintwd$:goto4110
+23310 ifnot(n=7andfl%(10)=1)orothen23330
+23312 ifn(7)thenprinthn$:goto4110
+23315 n(14)=.:ifp<>2thenprint"Die Bienen fliegen davon.":fl%(10)=.:goto4110
+23320 print"Die Bienen verjagen den Indianer.":fl%(.)=1:goto4110
+23330 ifnot(n=40andp=36)then23340
+23331 ifn(20)thenprinthn$:goto4110
+23332 ifo=20then23336
+23333 print"Als du das Portal aufdrueckst, sticht"
+23334 print"dich etwas in die Hand.Dir wird schwin-"
+23335 print"delig und Augenblicke spaeter kippst du tot um.":goto1500
+23336 ifn(12)thenprint"Dir fehlt der passende Schluessel.":goto4110
+23337 print"Das grosse Portal schwingt sanft auf...":fl%(14)=1:goto4110
+23340 ifn<>21thenprintkn$:goto4110
+23350 ifn(12)thenprint"Ich habe keinen Schluessel...":goto4110
+23360 print"Die Truhe ist leer.":goto4110
+23400 ifo=.thenprintwd$:goto4110
+23410 ifnot(n=8andp=39ando=15andn(15)>.)then23450
+23430 ifn(8)thenprinthn$:goto4110
+23440 printok$:fl%(9)=1:n(8)=-1:goto4110
+23450 ifnot(n=8ando=44andp=31)then23470
+23455 ifn(8)thenprinthn$:goto4110
+23460 printok$:fl%(17)=1:n(8)=31:goto4110
+23470 printkn$:goto4110
+23600 ifothen20850
+23605 ifn=.and(p=49orp=48)thenp=97-p:goto4000
+23608 ifn=.thenprintwd$:goto4110
+23610 ifn=24andp=16thenp=43:goto4000
+23615 ifn=50andp=45thenp=46:goto4000
+23618 ifn=8and(p=31orp=42)andfl%(17)=1thenp=73-p:goto4000
+23620 printkn$:goto4110
+23700 ifnthenprintkn$:goto4110
+23710 ifp=49orp=48then23605
+23720 printkn$:goto4110
+23800 ifn<>11orp<>27thenprintkn$:goto4110
+23802 ifothen20850
+23805 ifn(23)thenprint"Mir fehlt die Ausruestung.":goto4110
+23810 print"Du kannst tatsaechlich Gold waschen!":n(11)=27:goto4110
+23900 if(n=39and(o=.oro=36))or(n=36and(o=.oro=39))then23930
+23920 printkn$:goto4110
+23930 ifn(36)thenprinthn$:goto4110
+23935 print"Der Ast wird klebrig.Neugierig setzt si-";
+23940 print"ch die Elster auf ihn und klebt fest!":fl%(3)=1:goto4110
+24300 input "{down}Filename ";fi$
+24310 print"{rvon}D{rvof}isk oder {rvon}T{rvof}ape ?"
+24315 getin$:ifin$=""then24315
+24320 ifin$="d"thenopen1,8,2,fi$+",s,w":goto24330
+24325 ifin$="t"thenopen1,1,1,fi$:goto24330
+24328 goto24315
+24330 print#1,p:fori=1tomx:print#1,n(i):next
+24340 fori=0tofl:print#1,fl%(i):next
+24350 close1:printok$:goto4110
+24400 input "{down}Filename ";fi$
+24410 print"{rvon}D{rvof}isk oder {rvon}T{rvof}ape ?"
+24415 getin$:ifin$=""then24415
+24420 ifin$="d"thenopen1,8,2,fi$+",s,r":goto24430
+24425 ifin$="t"thenopen1,1,0,fi$:goto24430
+24428 goto24415
+24430 input#1,p:fori=1tomx:input#1,n(i):next
+24440 fori=0tofl:input#1,fl%(i):next
+24450 close1:printok$:goto4000
+24500 print"{down}{down}Wirklich ?"
+24510 getin$:ifin$=""then24510
+24520 ifin$="j"thenprint"{clr}goto4000:[zum weitermachen]":poke631,141:end
+24530 ifin$="n"thenpoke198,0:goto4110
+24540 goto24510
+24800 ifp<>6orn<>34thenprintkn$:goto4110
+24810 ifo=.thenprint"Womit denn ?":goto4110
+24820 ifo<>6thenprintkn$:goto4110
+24825 ifn(6)thenprinthn$:goto4110
+24830 print"Ein Feuer kommt auf.Jetzt heisst es war-";
+24840 print"ten.":fori=1to2000:next
+24850 print"Ein Hubschrauber kommt und laesst eine"
+24855 print"Strickleiter herunter, an der du hochkl-";
+24860 print"etterst."
+24870 fori=1to2000:next:goto40000
+25000 ifnthenprintkn$:goto4110
+25010 printok$:goto4110
+25100 ifn<>19orn(19)thenprintkn$:goto4110
+25110 n(19)=-1:printok$:goto4110
+25300 ifnthenprintkn$:goto4110
+25310 iffl%(21)thenprint"Okay, war nur 'ne Frage...":p=e:fl%(21)=-1:goto4000
+25320 print"Was soll das denn ?":goto4110
+30000 data0,0,0,0,0,0,0,0,2,0,0,15
+30010 data2,217,255,15,255,190,31,255
+30020 data252,63,255,248,127,255,252
+30030 data127,255,254,125,255,255,63
+30040 data127,199,15,188,224,3,206
+30050 data112,0,0,0,0,0,0,0,0,0,0,0
+30060 data0,0,0,0,0,0,0,0,0,0
+30100 data0,255,0,7,255,224,31,255
+30101 data248,127,255,254,127,255,254
+30102 data255,255,255,255,255,255,255
+30103 data129,255,240,129,15,200,66
+30104 data19,132,36,33,194,0,67,49
+30105 data60,140,12,60,48,3,24,192
+30106 data0,126,0,0,189,0,0,60,0,0
+30107 data60,0,0,36,0,0,102,0
+30110 data0,0,0,0,0,0,0,0,0,0,0,0,0
+30111 data0,0,255,255,0,1,128,0,15
+30112 data240,0,51,248,0,71,248,3,143
+30113 data252,7,255,255,255,255,255
+30114 data255,127,248,0,16,32,0,127
+30115 data248,0,0,0,0,0,0,0,0,0,0,0
+30116 data0,0,0,0,0
+40000 fori=1to1000:next
+40010 print"{clr}":print"Du bist wieder im sicheren Hubschrauber!";
+40020 ifn(17)=.thenprint"{down}Du hast den Schatz gefunden !"
+40030 ifn(9)=.thenprint"{down}Du hast ein Zeichen des Forschers ge-   bracht !"
+40035 ifn(17)thenprint"{down}Aber wo ist der Schatz ?"
+40038 ifn(9)thenprint"{down}Und wo ist ein Zeichen des Forschers ?"
+40040 ifn(17)orn(9)thenprint"{down}{down}{down}{rvon}Mission nicht erfuellt !!!":goto40100
+40050 print"{down}{down}Mission erfuellt !!!{down}"
+40060 r=18:fori=1to500:printchr$(r)"WIR{$a0}GRATULIEREN!!{up}":r=164-r:next
+40100 print"{down}{down}Aufhoeren ?":goto24510
+

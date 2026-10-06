@@ -1,0 +1,827 @@
+
+
+;asterix & obelix.prg ==0801==
+    1 rem**********************************
+    2 rem*------asterix und obelix--------*
+    3 rem*----------die odyssee-----------*
+    4 rem*              by                *
+    5 rem*         norbert klein          *
+    6 rem*  maarweg 6  : 5204 lohmar 21   *
+    7 rem*(befehlsauswertung aus 64'er sh)*
+    8 rem**********************************
+    9 rem zeilen weglassen
+   10 poke53280,7:poke53281,0
+   11 data76,24,1,177,251,145,251,200,208,249,230,252,202,208,244,96,120,160,0,169
+   12 data160,132,251,133,252,162,32,32,11,1,169,224,132,251,133,252,162,32,32,11
+   14 data1,169,53,133,1,88,96:fori=264to310:readx:pokei,x:next:sys264
+   16 fori=710to730:readx:pokei,x:next
+   18 data208,3,76,29,168,32,192,2,32,19,166,56,165,95,233,1,164,96,76,36,168
+   20 poke40996,197:poke40997,2:poke1,54
+   22 fori=43168to43170:readx:pokei,x:next
+   24 fori=704to709:readx:pokei,x:next
+   26 data32,192,2,32,138,173,76,247,183
+   27 poke95,0:poke96,224:poke90,255:poke91,255:poke88,255:poke89,255:sys41919
+   28 poke59639,16:poke1,53
+   29 gosub52000:rem init.
+   30 poke56578,peek(56578)or3:poke56576,(peek(56576)and252)or1
+   31 poke53272,(peek(53272)and15)or0:poke648,128
+   32 print"{clr}":print"wollen sie ein {rvon}a{rvof}ltes spiel weiterspielen"
+   33 print"oder ein {rvon}n{rvof}eues beginnen?"
+   34 geta$:ifa$=""then34
+   35 ifa$="a"thengosub25000
+   37 poke53280,11:pokev+28,255:goto1130
+   38 pokev+28,255:pokev,100:pokev+1,87:pokev+2,150:pokev+3,87:pokev+4,150
+   39 pokev+5,50:pokev+6,250:pokev+7,87:pokev+8,60:pokev+9,87:pokev+10,120
+   40 pokev+11,50:pokev+12,60:pokev+13,100:pokev+14,150:pokev+15,150:return
+  199 rem textfensterloeschen und home
+  200 fori=1to10:print:next
+  201 poke214,17:poke211,0:sys58732:return
+  299 rem textfensterloeschen ,warten und home
+  300 fori=1to850:next:fori=1to10:print:next
+  301 poke214,17:poke211,0:sys58732:return
+  499 rem restart
+  500 print"ich bin tot !"
+  502 print"soll ich es nocheinmal probieren ?"
+  503 getg$:ifg$="n"thensys64738
+  504 ifg$<>"j"then503
+  505 clr:gosub52000:goto32
+  999 rem**** actionmodul ****
+ 1000 gosub50000:rem befehlseingabe
+ 1099 rem befehl n,s,o,w,no,..
+ 1100 ifve<1orve>8then2100
+ 1110 ifri%(ve)=0thenprint"in diese richtung fuehrt kein weg":goto2100
+ 1111 ifp=23andge%(10)<>-2andve<>2thenprint"die wachen erlauben das nicht!":goto1000
+ 1120 print"obelix folgt mir!":p=ri%(ve):fori=1to1000:next:pr%(1)=p
+ 1125 pokev+21,0:pokev+23,0:pokev+27,0:pokev+29,0
+ 1130 gosub10002+p*100
+ 1140 restore10001+p*100
+ 1150 fori=1to8:readri%(i):next
+ 1160 print"{down}{gry3}richtungen: ";
+ 1165 ic=0:fori=1to8:ifri%(i)<>0thenprintve$(i);",";:ic=1
+ 1170 nexti
+ 1175 ific=0thenprint"keine."
+ 1180 ific=1thenprintchr$(20)
+ 1181 print"ich sehe: ";
+ 1182 ic=0:fori=1tooz:ifoo%(i)=pthenprintob$(i);",";:ic=1
+ 1183 next
+ 1184 bi=1:fori=1togz:ifge%(i)=porge%(i)=-pandp>12thenprintge$(i);",";:ic=1
+ 1190 next
+ 1191 fori=1topz:ifpr%(i)=pthenprintpe$(i);",";:ic=1
+ 1192 next
+ 1193 ific=0thenprint"nichts besonderes."
+ 1194 ific=1thenprintchr$(20)
+ 1195 ifa>0thena=a-1:goto2100
+ 1197 ift=1thenprint"der zaubertrank hat keine wirkung mehr":t=0
+ 2099 rem nimm routine
+ 2100 ifve<>9then2200
+ 2120 ifge%(g1)=-1thenprint"habe ich schon":goto2200
+ 2123 ifge%(g1)<>pandob=0andpe=0thenprint"ich sehe "ge$(g1)" nicht"
+ 2125 ifpe<>0thenprint"das geht nicht"
+ 2126 ifpr%(10)=pthenprint"das krokodil laesst mich nicht!":goto2200
+ 2127 ifob<>0thenprint"das ist zu schwer fuer mich"
+ 2128 ifag>5thenprint"ich trage schon 5 gegenstaende!":goto2200
+ 2130 ifge%(g1)=pthenge%(g1)=-1:print"ich nehme "ge$(g1):ag=ag+1
+ 2140 ifud=0andic=1thenic=0:ve=0:gosub300:goto1140
+ 2199 rem inventur routine
+ 2200 ifve<>37then2300
+ 2210 print"ich habe: "
+ 2220 ic=0:fori=1togz:ifge%(i)=-1thenprinttab(5)ge$(i):poke198,0:wait198,1:ic=1
+ 2225 next
+ 2230 ific=0thenprint"nichts."
+ 2235 poke198,0:wait198,1:ifud<>1thenve=0:goto1130
+ 2299 rem verlier routine
+ 2300 ifve<>11then2400
+ 2310 ifge%(g1)<>-1thenprint"ich habe das nicht.":goto2400
+ 2320 ge%(g1)=p:print"ich lege "ge$(g1)" hin."
+ 2325 ifpr%(10)=pandg1=4thenprint"das seil wickelt sich um das maul"
+ 2326 ifpr%(10)=pandg1=4thenprint"des krokodils!das krokodil ist davon"
+ 2327 ifpr%(10)=pandg1=4thenprint"so erschreckt,dass es davonlaeuft!":pr%(10)=0:ic=1
+ 2334 ific=1thenic=0:fori=1to2000:next
+ 2335 ifud=0thenve=0:goto1140
+ 2399 rem schau routine
+ 2400 ifve<>36then2500
+ 2410 ifob=0andg1=0andpe=0thengosub200:ve=0:goto1140
+ 2415 ifob=1andoo%(1)=pthenprint"das schiff ist sehr gross"
+ 2417 ifpe=2andpr%(2)=pthenprint"die schlange ist riesig"
+ 2418 ifob=3andoo%(2)=pthenprint"es ist dein haus"
+ 2419 ifob=3andoo%(3)=pthenprint"es ist das haus von mirakulix"
+ 2420 ifpe=3andpr%(3)=pthenprint"sie bedrohen den kaufmann"
+ 2421 ifpe=5andpr%(5)=pthenprint"er hat angst um sein leben"
+ 2422 ifg1=3andge%(3)=-1thenprint"vieleicht lese ich ihn besser!"
+ 2423 ifpe=4andpr%(4)=pthenprint"er sagt,dass ich sicher ein"
+ 2424 ifpe=4andpr%(4)=pthenprint"gallier bin.er hat das an"
+ 2425 ifpe=4andpr%(4)=pthenprint"meiner kleidung erkannt!"
+ 2426 ifpe=9andpr%(9)=pthenprint"er will seinen hund verkaufen!"
+ 2427 ifpe=9andp=19thenprint"er will hebraeische kleider verkaufen!"
+ 2428 ifg1=9andge%(9)=pthenprint"es ist ein kleiner,weisser hund!"
+ 2429 ifg1=10andge%(10)=pthenprint"es sind hebraeische kleider!"
+ 2430 ifpe=10andpr%(10)=pthenprint"es sieht sehr grimmig aus!"
+ 2499 rem lies routine
+ 2500 ifve<>41then2600
+ 2506 ifge%(3)<>-1then2514
+ 2507 ifg1=3thenprint"{clr} U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+ 2508 ifg1=3thenprint" {SHIFT--}  auch  grosse  {SHIFT--}"
+ 2509 ifg1=3thenprint" {SHIFT--}    schlangen   {SHIFT--}"
+ 2510 ifg1=3thenprint" {SHIFT--}      sind      {SHIFT--}"
+ 2511 ifg1=3thenprint" {SHIFT--}                {SHIFT--}"
+ 2512 ifg1=3thenprint" {SHIFT--}  k i t z l i g {SHIFT--}"
+ 2513 ifg1=3thenprint" J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K":poke198,0:wait198,1:print"{clr}"
+ 2514 ifg1=3thenifud=0thenve=0:goto1130
+ 2515 print"was soll ich bitteschoen haben , das"
+ 2516 print"ich es lesen koennte?"
+ 2599 rem trink routine
+ 2600 ifve<>32then2700
+ 2602 iff=1thenprint"die flasche ist leer!":goto2700
+ 2603 ifg1<>13thenprint"das kann ich nicht trinken!":goto2700
+ 2604 ifge%(6)<>-1thenprint"ich habe den zaubertrank nicht!":goto2700
+ 2605 print"ich trinke den zaubertrank":t=1:a=3:f=1:print"aaahh !! ist das gut!"
+ 2699 rem warte routine
+ 2700 ifve<>23then2800
+ 2702 ifge%(10)<>-2orpr%(7)<>pthen2710
+ 2703 print"jetzt entdeckt auch obelix die"
+ 2704 print"patroullie und schlaegt alle roemer"
+ 2705 print"ko. er kommt zurueck und gibt dir"
+ 2706 print"einen schluessel den er bei den"
+ 2707 print"roemern gefunden hat."
+ 2708 ge%(14)=-1:pokev+21,0:goto2800
+ 2710 print"die zeit verinnt!"
+ 2799 rem such routine
+ 2800 ifve<>39then2900
+ 2802 print"ich habe nichts gefunden."
+ 2899 rem sage routine
+ 2900 ifve<>35then3000
+ 2902 print"ok.":ud=0
+ 2999 rem trage routine
+ 3000 ifve<>30then3100
+ 3002 ifg1<>10thenprint"das kann ich nicht anziehen!":goto3100
+ 3003 ifge%(10)=-2thenprint"ich habe die kleider schon an!":goto3100
+ 3004 ifge%(10)<>-1thenprint"ich habe keine kleider!":goto3100
+ 3005 print"ok. ich habe die kleider angezogen!":ge%(10)=-2
+ 3099 rem befestige routine
+ 3100 ifve<>15then3200
+ 3102 ifg1<>4thenprint"ich kann das nicht festmachen!":goto3200
+ 3103 ifge%(4)<>-1thenprint"ich habe das seil nicht!":goto3200
+ 3104 ifge%(4)=-pthenprint"das seil ist schon fest!":goto3200
+ 3105 print"ok.das seil ist fest!":ge%(4)=-p:ge%(15)=-(p-1)
+ 3199 rem loese routine
+ 3200 ifve<>45then3300
+ 3202 ifg1<>4thenprint"ich kann das nicht loesen!":goto3300
+ 3203 ifge%(4)<>-pandge%(15)<>-pthenprint"das seil ist hier nicht angebunden!":goto3300
+ 3204 print"ich habe das seil losgemacht!":ge%(4)=p:ge%(15)=0
+ 3220 goto1000
+ 3299 rem springe routine
+ 3300 ifve<>34then3400
+ 3302 print"ok."
+ 3399 rem oeffne routine
+ 3400 ifve<>42then3500
+ 3402 ifob<>7thenprint"das geht nicht!":goto3500
+ 3403 ifge%(14)<>-1thenprint"ich habe keinen schluessel!":goto3500
+ 3404 print"ok. ich oeffne die kiste!":print"in der kiste liegt ein beutel":ge%(8)=p
+ 3499 rem fuelle routine
+ 3500 ifve<>47then3600
+ 3502 ifg1<>8orge%(8)<>-1then3600
+ 3503 goto30000
+ 3599 rem sprung zur save routine
+ 3600 ifve<>48then3700
+ 3602 gosub20000
+ 3699 rem sprung zur load routine
+ 3700 ifve<>50then3800
+ 3702 gosub25000
+ 3799 rem toete routine
+ 3800 ifve<>20then3900
+ 3802 ifpe<>3orp<>6then3808
+ 3803 ift<>1thenprint"die roemer waren staerker als ich !":goto500
+ 3804 print"die roemer laufen davon.":pr%(3)=0:pokev+21,12
+ 3805 print"der kaufmann bedankt sich und"
+ 3806 print"bringt mich und obelix zu seinem schiff":p=12:fori=1to4500:next
+ 3807 ve=0:goto1130
+ 3808 ifpe<>2orp<>5then3810
+ 3809 print"die schlange hat mich gebissen !":goto500
+ 3810 ifpe<>10orp<>36then3900
+ 3811 print"das krokodil hat mich gefressen !":goto500
+ 3900 gosub10021+p*100
+ 3920 goto1000
+10000 rem**** spielkarte ****
+10100 rem platz1-------
+10101 data4,0,2,0,0,0,0,0
+10102 gosub62020:gosub62104:print"{gry3}ich bin vor einem haus"
+10103 pokev+21,1:poke33784,21:pokev,192:pokev+1,117:pokev+39,0:pokev+37,10
+10104 pokev+38,6
+10120 return
+10121 return
+10200 rem platz2-------
+10201 data0,0,3,1,0,0,0,0
+10202 gosub62020:gosub62112:print"{gry3}ich bin vor einem haus"
+10220 return
+10221 ifve<>18then10229
+10222 gosub200:gosub62143:print"{gry3}ich bin vor einem haus{down}":tu=1
+10223 print"die tuer geht auf"
+10224 print"und mirakulix kommt heraus"
+10225 pokev+21,3:poke33784,17:poke33785,18:pokev,156:pokev+1,110:pokev+2,156
+10226 pokev+3,130:pokev+39,10:pokev+40,9:pokev+37,9:pokev+38,1:pokev+23,2
+10227 goto10299
+10229 ifve<>24andpeek(v+21)=0andtu=0then10299
+10230 ifve<>24then10236
+10231 ic=0:gosub200:gosub62112:print"{gry3}ich bin vor einem haus{down}"
+10232 ifg1=1andge%(1)=-1andtu=1thenprint"er gibt mir eine flasche zaubertrank.":ic=1
+10233 ifg1=1andge%(1)<>-1thenprint"ich habe keine sichel"
+10234 ific=1thenic=0:ge%(1)=0:ge%(6)=-1:tu=0
+10236 print"er geht wieder zurueck und schliesst"
+10237 print"die tuer."
+10238 pokev+21,0
+10299 return
+10300 rem platz3-------
+10301 data6,0,8,2,7,5,0,0
+10302 gosub62036:print"{gry3}ich bin am ausgang des dorfes"
+10320 return
+10321 return
+10400 rem platz4-------
+10401 data0,1,5,0,0,0,0,0
+10402 gosub62036:print"{gry3}ich bin am ausgang des dorfes"
+10420 return
+10421 return
+10500 rem platz5-------
+10501 data0,0,6,4,0,0,3,0
+10502 gosub62052:print"{gry3}ich bin auf einer wiese"
+10503 ifpr%(2)<>pthen10520
+10504 pokev+21,3:poke33784,22:poke33785,23:pokev+23,1:pokev,150:pokev+1,100
+10505 pokev+2,150:pokev+3,130:pokev+39,1:pokev+40,1:pokev+37,0:pokev+38,0
+10520 return
+10521 ifpe<>2orpr%(2)<>pthen10599
+10522 ifve=43thenprint"die schlange zicht laut und kriecht weg":pr%(2)=0
+10523 ifve=43then:ge%(12)=5:print"sie laesst einen haufen gold liegen":pokev+21,0
+10525 ifve<>43thenprint"die schlange zicht boesartig"
+10599 return
+10600 rem platz6-------
+10601 data0,3,7,5,0,0,8,0
+10602 gosub62052:print"{gry3}ich bin auf einer wiese"
+10603 ifpr%(3)<>pthen10620
+10604 pokev+21,63:poke33784,19:poke33785,20:poke33786,16:poke33787,18:poke33788,19
+10605 poke33789,20:pokev,100:pokev+1,100:pokev+2,100:pokev+3,120:pokev+4,120
+10606 pokev+5,100:pokev+6,120:pokev+7,120:pokev+8,140:pokev+9,100:pokev+10,140
+10607 pokev+11,120:pokev+39,11:pokev+40,11:pokev+41,10:pokev+42,0:pokev+43,11
+10608 pokev+44,11:pokev+37,0:pokev+38,1:pokev+23,42
+10620 return
+10621 return
+10700 rem platz7-------
+10701 data0,8,9,6,0,0,10,3
+10702 gosub62052:print"{gry3}ich bin auf einer wiese"
+10720 return
+10721 return
+10800 rem platz8-------
+10801 data7,0,10,3,9,6,0,0
+10802 gosub62052:print"{gry3}ich bin auf einer wiese"
+10820 return
+10821 return
+10900 rem platz9-------
+10901 data0,10,0,7,0,0,11,8
+10902 gosub62052:print"{gry3}ich bin auf einer wiese"
+10920 return
+10921 return
+11000 rem platz10------
+11001 data9,0,11,8,0,7,0,0
+11002 gosub62052:print"{gry3}ich bin auf einer wiese"
+11020 return
+11021 return
+11024 pokev+29,1
+11100 rem platz11------
+11101 data12,0,0,10,0,9,0,0
+11102 gosub62052:print"{gry3}ich bin am strand"
+11120 return
+11121 return
+11200 rem platz12------
+11201 data0,11,0,0,0,0,0,0
+11202 gosub62052:gosub62120:print"{gry3}ich bin am strand"
+11203 pokev+21,1:poke33784,24:pokev,155:pokev+1,80:pokev+38,7:pokev+39,6:pokev+37,7
+11204 pokev+23,1:pokev+29,1
+11220 return
+11221 ifve<>28orob<>1orpr%(3)<>0then11299
+11222 print"obelix folgt mir!":fori=1to500:next:goto62010
+11299 return
+11300 rem platz 13------
+11301 data14,0,0,16,0,0,0,0
+11302 gosub62052:gosub62120:print"{gry3}ich bin am strand"
+11303 pokev+21,1:poke33784,24:pokev,155:pokev+1,80:pokev+38,7:pokev+39,6:pokev+37,7
+11304 pokev+23,1:pokev+29,1
+11320 return
+11321 ifve=28andob=1thenprint"das geht nicht mehr!"
+11399 return
+11400 rem platz 14------
+11401 data0,13,0,15,0,0,0,0
+11402 gosub62052:print"{gry3}ich bin in der wueste"
+11420 return
+11421 return
+11500 rem platz 15------
+11501 data0,0,0,0,0,0,0,0
+11502 gosub62052:print"{gry3}ich bin im treibsand"
+11520 return
+11521 ifge%(4)<>-1thenprint"ich versinke im treibsand":goto500
+11522 ifve<>28org1<>4orge%(4)<>-pthen11599
+11523 p=14:print"obelix folgt mir!":pr%(1)=p:fori=1to500:next:goto1130
+11599 return
+11600 rem platz 16------
+11601 data0,0,13,17,0,0,0,0
+11602 gosub62052:gosub62155:print"{gry3}ich bin an einer oase"
+11604 pokev+21,3:poke33784,16:poke33785,18:pokev,120:pokev+1,100:pokev+2,120
+11605 pokev+3,120:pokev+39,10:poke40,0:pokev+37,0:pokev+38,1:pokev+23,2
+11620 return
+11621 return
+11700 rem platz 17------
+11701 data0,0,16,0,0,0,0,0
+11702 gosub62070:print"{gry3}ich bin an einer stadtmauer"
+11720 return
+11721 ifve<>28orob<>5then11799
+11722 print"obelix folgt mir!":fori=1to500:next
+11723 print"die leiter bricht hinter uns , wir"
+11724 print"koennen nicht mehr zurueck!"
+11725 fori=1to2500:next:p=18:ve=0:pr%(1)=p:goto1130
+11799 return
+11800 rem platz 18------
+11801 data21,0,0,19,22,20,0,0
+11802 gosub62087:print"{gry3}ich bin in einer strasse"
+11820 return
+11821 return
+11900 rem platz 19------
+11901 data20,0,18,0,21,0,0,0
+11902 gosub62087:gosub62130:print"{gry3}ich bin vor einem geschaeft"
+11904 pokev+21,3:poke33784,16:poke33785,18:pokev,170:pokev+1,130:pokev+2,170
+11905 pokev+3,150:pokev+39,10:poke40,9:pokev+37,9:pokev+38,6:pokev+23,2:pokev+27,3
+11920 return
+11921 ifve<>27then11999
+11922 ifg1<>10thenprint"das kann man hier nicht kaufen!":goto11999
+11923 print"der haendler will dafuer gold haben"
+11924 print"willst du es geben ":inputa$:ifa$="nein"thena$=""goto11999
+11925 ifge%(12)<>-1thenprint"du hast es nicht":a$="":goto11999
+11926 print"ok. habe die kleider!":ge%(12)=0:ge%(10)=-1:a$=""
+11999 return
+12000 rem platz 20------
+12001 data23,19,21,0,0,0,18,0
+12002 gosub62087:print"{gry3}ich bin in einer strasse"
+12020 return
+12021 return
+12100 rem platz 21------
+12101 data0,18,22,0,0,0,0,19
+12102 gosub62087:print"{gry3}ich bin in einer strasse"
+12104 pokev+21,3:poke33784,19:poke33785,20:pokev,170:pokev+1,120:pokev+2,170
+12105 pokev+3,140:pokev+37,12:pokev+38,1:pokev+39,11:pokev+40,11:pokev+23,2
+12120 return
+12121 ifge%(10)<>-2thenprint"die patroullie hat uns an den"
+12122 ifge%(10)<>-2thenprint"kleidern erkannt und schlaegt alarm!":goto500
+12199 return
+12200 rem platz 22------
+12201 data0,0,0,21,0,0,0,18
+12202 gosub62087:print"{gry3}ich bin in einer strasse"
+12220 return
+12221 return
+12300 rem platz 23------
+12301 data32,20,24,0,31,0,0,0
+12302 gosub62070:gosub62138:print"{gry3}ich bin am stadttor"
+12304 pokev+21,15:poke33784,19:poke33785,20:poke33786,19:poke33787,20
+12305 pokev,95:pokev+1,120:pokev+2,95:pokev+3,140:pokev+4,212
+12306 pokev+5,120:pokev+6,212:pokev+7,140:pokev+37,0:pokev+38,1:pokev+39,11
+12307 pokev+40,11:pokev+41,11:pokev+42,11:pokev+23,10
+12320 return
+12321 return
+12400 rem platz 24------
+12401 data31,0,25,23,30,32,0,0
+12402 gosub62052:print"{gry3}ich bin in der wueste"
+12420 return
+12421 return
+12500 rem platz 25------
+12501 data30,0,26,24,29,31,0,0
+12502 gosub62052:print"{gry3}ich bin in der wueste"
+12520 return
+12521 return
+12600 rem platz 26------
+12601 data29,0,27,25,28,30,0,0
+12602 gosub62052:print"{gry3}ich bin in der wueste"
+12620 return
+12621 return
+12700 rem platz 27------
+12701 data28,0,0,26,0,29,0,0
+12702 gosub62052:gosub62155:print"{gry3}ich bin an einer oase"
+12720 return
+12721 return
+12800 rem platz 28------
+12801 data37,27,0,29,0,36,0,26
+12802 gosub62052:print"{gry3}ich bin in der wueste"
+12820 return
+12821 return
+12900 rem platz 29------
+12901 data36,26,28,30,37,35,27,25
+12902 gosub62052:print"{gry3}ich bin in der wueste"
+12920 return
+12921 return
+13000 rem platz 30------
+13001 data35,25,29,31,36,34,26,24
+13002 gosub62052:print"{gry3}ich bin in der wueste"
+13020 return
+13021 return
+13100 rem platz 31------
+13101 data34,24,30,32,35,33,25,23
+13102 gosub62052:gosub62155:print"{gry3}ich bin an einer oase"
+13120 return
+13121 return
+13200 rem platz 32------
+13201 data33,23,31,0,0,0,24,0
+13202 gosub62052:print"{gry3}ich bin in der wueste"
+13220 return
+13221 return
+13300 rem platz 33------
+13301 data42,0,34,0,0,0,31,0
+13302 gosub62052:gosub62151:print"{gry3}ich bin vor einem stand"
+13304 pokev+21,3:poke33784,16:poke33785,18:pokev,170:pokev+1,110:pokev+2,170
+13305 pokev+3,130:pokev+39,10:poke40,0:pokev+37,0:pokev+38,1:pokev+23,2
+13320 return
+13321 ifve<>27then13399
+13322 ifg1<>9thenprint"das gibt es hier nicht":goto13399
+13323 print"der haendler will das schwert!"
+13324 print"willst du es geben ":inputa$:ifa$="nein"thena$="":goto13399
+13325 ifge%(2)<>-1thenprint"du hast es nicht":a$="":goto13399
+13326 print"ok. ich habe den hund bekommen!":ge%(2)=0:ge%(9)=-1:a$=""
+13399 return
+13400 rem platz 34------
+13401 data41,31,35,33,40,42,30,0
+13402 gosub62052:print"{gry3}ich bin in der wueste"
+13420 return
+13421 return
+13500 rem platz 35------
+13501 data40,30,36,34,39,41,29,31
+13502 gosub62052:print"{gry3}ich bin in der wueste"
+13520 return
+13521 return
+13600 rem platz 36------
+13601 data39,29,37,35,38,40,28,30
+13602 gosub62052:gosub62155:print"{gry3}ich bin an einer oase"
+13620 return
+13621 return
+13700 rem platz 37------
+13701 data38,28,0,36,0,39,0,29
+13702 gosub62052:print"{gry3}ich bin in der wueste"
+13720 return
+13721 return
+13800 rem platz 38------
+13801 data47,37,0,39,0,46,0,36
+13802 gosub62052:print"{gry3}ich bin in der wueste"
+13820 return
+13821 return
+13900 rem platz 39------
+13901 data46,36,38,40,47,0,37,35
+13902 gosub62052:print"{gry3}ich bin in der wueste"
+13920 return
+13921 return
+14000 rem platz 40------
+14001 data45,35,39,41,46,0,36,34
+14002 gosub62052:print"{gry3}ich bin in einer steppe"
+14020 return
+14021 ifge%(9)<>-1orge%(11)=pthen14099
+14022 print"der hund buddelt in der erde!"
+14023 fori=1to2000:next:print"ploetzlich faengt der boden"
+14024 fori=1to2000:next:print"an zu wackeln,"
+14025 fori=1to4000:next:print"und jetzt kommt steinoel aus dem boden"
+14026 print"geschossen!":ge%(11)=p
+14099 return
+14100 rem platz 41------
+14101 data44,34,40,42,0,43,35,0
+14102 gosub62052:print"{gry3}ich bin in der wueste"
+14120 return
+14121 return
+14200 rem platz 42------
+14201 data43,33,41,0,0,0,34,0
+14202 gosub62052:print"{gry3}ich bin in der wueste"
+14220 return
+14221 return
+14300 rem platz 43------
+14301 data0,42,44,0,0,0,41,0
+14302 gosub62052:print"{gry3}ich bin in der wueste"
+14320 return
+14321 return
+14400 rem platz 44------
+14401 data0,0,0,0,0,0,0,0
+14402 gosub62052:print"{gry3}ich bin im treibsand"
+14420 return
+14421 ifge%(4)<>-1thenprint"ich versinke im treibsand":goto500
+14422 ifve=28andg1=4andge%(4)=-pthenp=43:goto1130
+14499 return
+14500 rem platz 45------
+14501 data0,0,0,44,0,0,0,0
+14502 gosub62052:print"{gry3}ich bin im treibsand"
+14520 return
+14521 ifge%(4)<>-1thenprint"ich versinke im treibsand":goto500
+14522 return
+14600 rem platz 46------
+14601 data0,39,47,45,0,0,38,40
+14602 gosub62052:print"{gry3}ich bin in der wueste"
+14620 return
+14621 return
+14700 rem platz 47------
+14701 data0,38,0,46,0,0,0,39
+14702 gosub62052:gosub62155:print"{gry3}ich bin an einer oase"
+14720 return
+14721 return
+19999 rem**** save-routine ****
+20000 gosub200:printtab(7);
+20010 input"name des files:";n$
+20020 open1,8,2,n$+"&,s,w"
+20040 fori=1togz
+20041 : print#1,ge%(i)
+20042 next
+20050 fori=1tooz
+20051 : print#1,oo%(i)
+20052 next
+20060 fori=1topz
+20061 : print#1,pr%(i)
+20062 next
+20065 print#1,p:close1
+20070 print"taste":poke198,0:wait198,1:return
+24999 rem**** load-routine ****
+25000 gosub200:printtab(7);
+25010 input"name des files:";n$
+25030 open1,8,2,n$+"&,s,r"
+25032 fori=0to15:n$=n$+chr$(peek(833+i)):next
+25040 fori=1togz
+25041 : input#1,ge%(i)
+25043 next
+25050 fori=1tooz
+25051 : input#1,oo%(i)
+25053 next
+25060 fori=1topz
+25061 : input#1,pr%(i)
+25063 next
+25065 input#1,p:close1
+25070 print"taste":poke198,0:wait198,1:return
+29999 rem**** gewonnen ****
+30000 fori=1to32:fori1=1to16:poke53280,i1:next:poke53281,i:next
+30010 print"{clr}":a$="herzlichen glueckwunsch !!":gosub35000
+30020 a$="sie haben das adventure geloest":gosub35000
+30030 a$="ich hoffe sie haben nicht zu oft":gosub35000
+30040 a$="im listing nach loesungshinweisen":gosub35000
+30050 a$="gesucht! das gilt natuerlich nicht!":gosub35000
+30060 a$="ich wuensche ihnen noch ebensoviel":gosub35000
+30070 a$="glueck bei anderen adventures!":gosub35000
+30080 print:print:a$=" ende ":gosub35000:end
+35000 fori=1tolen(a$):printmid$(a$,i,1);"{rvon} {rvof}{left}";:fori1=1to100:next:next
+35010 print" ":return
+49998 rem **** befehlseingabe ****
+49999 rem *zerlegung u. codierung*
+50000 ifud=1then50220
+50060 poke198,0:be$="":print"{gry3}> {CBM-@}{left}";
+50080 getx$:ifx$=""then50080
+50090 ifpeek(203)=1orlen(be$)>68thenprint" ":goto50140
+50100 i=asc(x$):ifi<65ori>90thenifi<>32andi<>20andi<>44andi<>39then50080
+50110 ifi=20andbe$=""then50080
+50120 ifi=20thenprint"{left}  {left}{left}{CBM-@}{left}";:be$=left$(be$,len(be$)-1):goto50080
+50130 printx$"{CBM-@}{left}";:be$=be$+x$:goto50080
+50140 fori=1to10:be$(i)="":next:wz=1:fori=1tolen(be$)
+50150 ifmid$(be$,i,1)=" "thengosub50190:goto50180
+50160 ifwz>10thenprint"eingabe zu lang !!!":i=len(be$)+1:goto50180
+50170 be$(wz)=be$(wz)+mid$(be$,i,1)
+50180 nexti:goto50220
+50190 ic=0:fori1=1toaz:ifbe$(wz)=au$(i1)thenic=1
+50200 nexti1:ific=0thenwz=wz+1:return
+50210 be$(wz)="":return
+50220 ifud=1thenud=0:goto50240
+50230 wz=1:ve=0:ob=0:pe=0
+50240 ic=0:g1=0:g2=0
+50250 fori=1tovz:ifbe$(wz)=ve$(i)thenve=i:ic=1
+50251 iflen(be$(wz))<3then50260
+50255 ifbe$(wz)=left$(ve$(i),len(be$(wz)))thenve=i-val(right$(ve$(i),1)):ic=1
+50260 nexti:ific=1then50350
+50270 fori=1togz:ifbe$(wz)<>ge$(i)then50300
+50280 ic=1:ifg1=0theng1=i
+50290 g2=i:ifg2=g1theng2=0
+50300 nexti:ific=1then50350
+50310 fori=1tooz:ifbe$(wz)=ob$(i)thenob=i:ic=1
+50320 nexti:ific=1then50350
+50330 fori=1topz:ifbe$(wz)=pe$(i)thenpe=i:ic=1
+50340 nexti
+50350 ifbe$(wz)="und"orbe$(wz)="dann"orbe$(wz)=","orbe$(wz)="'"thenud=1:ic=1
+50360 ific=0thenprint"ich kenne '"be$(wz)"' nicht !":return
+50370 wz=wz+1:ifwz>10orbe$(wz)=""orud=1thenreturn
+50380 ic=0:goto50250
+51999 rem**** tabellen ****
+52000 restore52000
+52051 rem variabeln
+52052 v=53248:p=1
+52060 rem verbtabelle---------
+52070 vz=52:dimve$(vz):fori=1tovz:readve$(i):next
+52072 datan,s,o,w,no,nw,so,sw
+52074 datanimm,nehme1,verliere,wirf1,werfe2,lege3,binde,befestige1,verknote2
+52075 dataklopfe,beruehre1,schlage,verpruegele1,toete2,warte,gib,gebe1
+52078 datareiche2,kaufe,klettere,gehe1,trage,benutze1,trinke,schluerfe1,springe
+52080 datasage,schau,inventur,list1,suche,erkunde1,lies,oeffne,kitzel,kitzle1
+52082 dataloese,entferne1,fuelle,speichere,save1,lade,load1,restart2
+52100 rem gegenstandtabelle------
+52102 gz=15:dimge$(gz),ge%(gz):fori=1togz:readge$(i):readge%(i):next
+52104 datasichel,1,schwert,1,zettel,5,seil,14,keule,18,flasche,0,kessel,22
+52106 databeutel,0,hund,0,kleider,0,steinoel,0,gold,0,zaubertrank,0
+52107 dataschluessel,0,seil,0
+52110 rem objekttabelle--------
+52112 oz=7:dimob$(oz),oo%(oz):fori=1tooz:readob$(i):readoo%(i):next
+52114 dataschiff,12,haus,1,haus,2,geschaeft,19,leiter,17,tuer,2,kiste,36
+52120 rem personentabelle-------
+52122 pz=10:dimpe$(pz),pr%(pz):fori=1topz:readpe$(i):readpr%(i):next
+52124 dataobelix,1,schlange,5,roemer,6,josua,16,kaufmann,6
+52126 datahaendler,19,patroullie,21,wachen,23
+52128 datahaendler,33,krokodil,36
+52129 az=17:dimau$(az):fori=1toaz:readau$(i):next
+52130 datader,die,das,den,dem, ,ueber,unter,in,hinein,durch,auf,von,vom
+52131 datamit,am,im
+52150 rem ****sprites****
+52192 rem kaufmannkopf---
+52193 fori=0to62:readq:poke33792+i,q:next
+52194 data,,,,,,,,,,,,,,,,,,,,,,,,,20,,,85,,1,85,64,6,170,144,6,162,144,40,138
+52195 data40,40,42,40,42,42,168,10,42,160,10,130,160,2,170,128,,170,,,170,
+52196 rem mirakulixkopf---
+52197 fori=0to62:readq:poke33856+i,q:next
+52198 data,,,,,,,,,,,,15,170,240,62,170,188,58,170,172,168,170,42,168,170,42
+52199 data170,170,170,42,170,168,62,170,188,62,170,188,63,170,252,63,235,252
+52200 data15,255,240,15,255,240,15,255,240,3,255,192,3,255,192,,255,
+52201 rem mirakulixkoerper---
+52202 fori=0to62:readq:poke33920+i,q:next
+52203 data,255,,3,255,192,14,255,176,15,255,176,15,255,176,15,190,240,15,190
+52204 data240,15,190,240,15,190,240,15,190,240,15,190,240,15,170,240,15,255
+52205 data240,15,255,240,15,255,240,5,65,80,21,,84,84,,21,,,,,,,,,
+52206 rem roemerkopf---
+52207 fori=0to62:readq:poke33984+i,q:next
+52208 data,,,,,,,,,,,,,8,,,42,,,170,128,2,170,160,2,170,160,10,191,168,10,255
+52209 data232,11,127,120,11,119,120,11,247,248,3,223,240,3,221,240,3,247,240
+52210 data,255,192,,63,,,63,,,63,
+52211 rem roemerkoerper---
+52212 fori=0to62:readq:poke34048+i,q:next
+52213 data64,255,192,83,255,240,79,255,240,79,255,240,79,255,240,127,255,240
+52214 data127,255,240,243,255,240,243,255,240,67,255,240,67,255,240,67,243,240
+52215 data67,243,240,67,243,240,67,243,240,67,243,240,74,128,168,74,128,168,106
+52216 data,42,,,,,,
+52217 rem obelix---
+52218 fori=0to62:readq:poke34112+i,q:next
+52219 data48,60,12,12,255,48,15,255,240,3,255,192,3,255,192,3,255,192,1,85,64
+52220 data1,85,64,2,89,80,41,85,80,150,85,80,149,149,83,149,85,64,149,85,64,37
+52221 data102,64,9,150,104,10,89,86,37,165,85,149,85,85,149,85,85,85,85,85
+52222 rem schlange1---
+52223 fori=0to62:readq:poke34176+i,q:next
+52224 data,,,12,12,,51,51,,51,51,,12,12,,,192,,63,63,,200,8,192,200,8,208,192,
+52225 data192,63,255,,3,252,,3,252,,,255,,,255,,,255,,,255,,3,252,,3,252,,3,252
+52226 data,,255,192
+52227 rem schlange2---
+52228 fori=0to62:readq:poke34240+i,q:next
+52229 data,255,192,,63,240,,63,240,,63,240,,255,192,3,255,,15,252,,63,240,,255
+52230 data192,,63,240,,255,255,240,255,255,240,255,255,252,255,255,252,255,255
+52231 data252,,,,,,,,,,,,,,,,,,
+52237 rem segel---
+52238 fori=0to62:readq:poke34304+i,q:next
+52239 data,,192,,3,64,,14,64,,58,64,,218,64,3,90,64,14,90,64,58,90,64,218,90,64
+52240 data90,90,64,90,90,64,90,90,64,90,90,64,90,90,,90,88,,90,80,,90,64,,90,,
+52241 data88,,,80,,,64,,
+59999 return
+62000 rem **** grafik ****
+62009 rem uebersetzen nach mesopot.
+62010 print"{clr}":pokev+21,0
+62012 print"nach ein paar wochen kommt ihr in"
+62013 print"mesopotamien an. die reise verlief"
+62014 print"ruhig und ihr habt kein schiff gesehen"
+62015 print"ausser einem piratenschiff,das die"
+62016 print"piraten aber komischerweise selbst"
+62017 print"versenkt haben.          {wht}[taste]{gry3}"
+62018 poke198,0:wait198,1:oo%(1)=13:p=13:ve=0:pr%(1)=p:goto1130
+62020 print"{clr}{rvon}{lblu}            {rvof}{SHIFT-POUND}{rvon}{gry1}OP{gry3}OPOPOP{rvof}{lblu}{CBM-*}{rvon}                  ";
+62021 print"{rvon}         {gry1}O{gry2}O{rvof}{lblu}{SHIFT-POUND}{rvon}{gry1}OP{gry3}OPOPO{gry2}OPO{rvof}{lblu}{CBM-*}{rvon}                 ";
+62022 print"{rvon}         {gry3}O{gry1}{rvof}{SHIFT-POUND}{rvon}{gry1}P{gry3}OPOPOOPOP{gry2}OP{rvof}{lblu}{CBM-*}{rvon}                ";
+62023 print"{rvon}         {gry2}{rvof}{SHIFT-POUND}{rvon}OP{gry3}OPOPOP{gry1}OP{gry3}OOPO{rvof}{lblu}{CBM-*}{rvon}               ";
+62024 print"{rvon}        {rvof}{SHIFT-POUND}{rvon}{gry2}OP{gry3}OPOP{gry2}OP{gry3}OPOOPOOP{rvof}{lblu}{CBM-*}{rvon}              ";
+62025 print"{rvon}       {rvof}{SHIFT-POUND}{rvon}{gry3}OPOPOOOPOPO{CBM-Y}POPOOP{rvof}{lblu}{CBM-*}{rvon}             ";
+62026 print"{rvon}      {rvof}{SHIFT-POUND}{rvon}{gry3}OPOPOOP{gry2}O{CBM-Y}{CBM-Y}POP{gry1}OP{gry3}OPOOP{rvof}{lblu}{CBM-*}{rvon}            ";
+62027 print"{rvon}     {rvof}{SHIFT-POUND}{rvon}{brn}                      {rvof}{lblu}{CBM-*}{rvon}           ";
+62028 print"{rvon}    {rvof}{SHIFT-POUND}{rvon}{gry1}POP{gry3}OPOOPOPOPOOPOOPOPOPOP{rvof}{lblu}{CBM-*}{rvon}          ";
+62029 print"{rvon}   {rvof}{SHIFT-POUND}{rvon}{gry1}OP{gry3}OPOP{gry2}O{CBM-Y}O{gry3}OOPO{CBM-Y}POOPOOPOPO{gry2}OP{rvof}{lblu}{CBM-*}{rvon}         ";
+62030 print"{rvon}  {rvof}{SHIFT-POUND}{rvon}{gry3}OPOPOPOPOPOPOOPOOPOPOOPOPOPO{rvof}{lblu}{CBM-*}{rvon}        ";
+62031 print"{rvon} {rvof}{SHIFT-POUND}{rvon}{gry2}POPOPOP{gry1}O{CBM-Y}P{gry3}POOPOP{gry2}O{gry3}OPOPOPOOPOPOP{rvof}{lblu}{CBM-*}{rvon}       ";
+62032 print"{rvof}{SHIFT-POUND}{rvon}{gry1}O{CBM-Y}PO{CBM-Y}P{gry3}POPOP{gry1}OP{gry3}OPOOPOP{gry2}OP{gry3}OOOOPOOPOP{rvof}{lblu}{CBM-*}{rvon}      ";
+62033 print"{rvon}{gry3}POPOP{gry1}OPOP{gry3}OPOPOPOP{gry2}OP{gry3}OPOPOPOPOPOPOPO{rvof}{lblu}{CBM-*}{rvon}     ";
+62034 print"{rvon}{grn}                                        ";
+62035 print"{rvon}{grn}                                        {rvof}";:return
+62036 print"{clr}"
+62037 print"{rvon}{brn}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{rvof}              {rvon}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}{SHIFT-POUND}{CBM-*}";
+62038 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62039 print"{rvon}{brn}                {rvof}              {rvon}          ";
+62040 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62041 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62042 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62043 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62044 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62045 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62046 print"{rvon}{brn}                {rvof}              {rvon}          ";
+62047 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62048 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62049 print"{rvon}{brn}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{rvof}              {rvon}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}{CBM-G}{CBM-M}";
+62050 print"{rvon}{grn}                                        ";
+62051 print"{rvon}{grn}                                        {rvof}";:return
+62052 print"{clr}{rvon}{lblu}                                        ";
+62053 print"{rvon}                                        ";
+62054 print"{rvon}                                        ";
+62055 print"{rvon}                                        ";
+62056 print"{rvon}                                        ";
+62057 print"{rvon}                                        ";
+62058 print"{rvon}                                        ";
+62059 ifp>10thenprint"{yel}";:goto62061
+62060 print"{grn}";
+62061 print"{rvon}                                        ";
+62062 print"{rvon}                                        ";
+62063 print"{rvon}                                        ";
+62064 print"{rvon}                                        ";
+62065 print"{rvon}                                        ";
+62066 print"{rvon}                                        ";
+62067 print"{rvon}                                        ";
+62068 print"{rvon}                                        ";
+62069 print"{rvon}                                        {rvof}";:return
+62070 print"{clr}{lblu}{rvon}                                        ";
+62071 print"{rvon}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel} {lblu}";
+62072 print"{rvon}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel}   {lblu}   {yel} {lblu}";
+62073 print"{rvon}{yel}                                        ";
+62074 print"{rvon}{yel}                                        ";
+62075 print"{rvon}{yel}                                        ";
+62076 print"{rvon}{yel}                                        ";
+62077 print"{rvon}{yel}                                        ";
+62078 print"{rvon}{yel}                                        ";
+62079 print"{rvon}{yel}                                        ";
+62080 print"{rvon}{yel}                                        ";
+62081 print"{rvon}{yel}                                        ";
+62082 print"{rvon}{yel}                                        ";
+62083 print"{rvon}{yel}                                        ";
+62084 print"{rvon}{yel}                                        ";
+62085 print"{rvon}{yel}                                        {rvof}";
+62086 return
+62087 print"{clr}{rvon}{yel}             {rvof}                {rvon}           ";
+62088 print"{rvon}{yel}             {rvof}                {rvon}           ";
+62089 print"{rvon}{yel}             {rvof}                {rvon}           ";
+62090 print"{rvon}{yel}             {rvof}                {rvon}  {rvof}{SHIFT-POUND}{brn}{SHIFT-+}{SHIFT-+}{yel}{CBM-*}{rvon}     ";
+62091 print"{rvon}{yel}             {rvof}                {rvon}  {rvof}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{rvon}     ";
+62092 print"{rvon}{yel}             {rvof}                {rvon}  {rvof}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{rvon}     ";
+62093 print"{rvon}{yel}             {rvof}                {rvon}  {rvof}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{rvon}     ";
+62094 print"{rvon}{yel}             {rvof}                {rvon}  {rvof}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{rvon}     ";
+62095 print"{rvon}{yel}   {rvof}{SHIFT-POUND}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{CBM-*}{rvon}     {rvof}                {rvon}           ";
+62096 print"{rvon}{yel}  {rvof}{SHIFT-POUND}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{CBM-*}{rvon}    {rvof}                {rvon}           ";
+62097 print"{rvon}{yel} {rvof}{SHIFT-POUND}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{CBM-*}{rvon}   {rvof}                {rvon}       {rvof}    ";
+62098 print"{rvon}{yel} {rvof}{brn}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{yel}{rvon}   {rvof}                {rvon}       {rvof}    ";
+62099 print"{rvon}{yel} {rvof}{brn}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{yel}{rvon}   {rvof}                {rvon}       {rvof}    ";
+62100 print"{rvon}{yel} {rvof}         {rvon}   {rvof}                {rvon}       {rvof}    ";
+62101 print"{rvon}{yel} {rvof}         {rvon}   {rvof}                {rvon}       {rvof}    ";
+62102 print"{rvon}{yel} {rvof}         {rvon}   {rvof}                {rvon}       {rvof}    ";
+62103 return
+62104 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}";
+62105 printtab(7)"{rvon}{brn} {rvof}     {rvon} {rvof}"spc(5)"{CBM-L}    {CBM-J}";
+62106 printtab(47)"{rvon}{brn} {rvof}     {rvon} {rvof}"spc(5)"{CBM-L}    {CBM-J}"
+62107 printtab(7)"{rvon}{brn} {rvof}     {rvon} {rvof}"spc(5)"{CBM-L}    {CBM-J}";
+62108 printtab(47)"{rvon}{brn} {rvof}     {rvon} {rvof}"spc(5)"{rvon}      {rvof}"
+62109 printtab(7)"{rvon}{brn} {rvof}     {rvon} {rvof}";
+62110 printtab(47)"{rvon}{brn} {rvof}     {rvon} {rvof}"
+62111 printtab(7)"{grn}{SHIFT-POUND}     {CBM-*}";:printtab(46)"{SHIFT-POUND}       {CBM-*}":return
+62112 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}";
+62113 printtab(14)"{brn}{rvon} {rvof}    {rvon} {rvof}";
+62114 printtab(54)"{rvon} {SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-L}{rvon} {rvof}"
+62115 printtab(14)"{rvon} {SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-L}{rvon} {rvof}";
+62116 printtab(54)"{rvon} {SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-L}{rvon} {rvof}"
+62117 printtab(14)"{rvon} {SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-L}{rvon} {rvof}";
+62118 printtab(54)"{rvon} {rvof}    {rvon} {rvof}"
+62119 printtab(14)"{grn}{SHIFT-POUND}    {CBM-*}";:printtab(53)"{SHIFT-POUND}      {CBM-*}":return
+62120 print"{home}{down}{down}{down}{down}{down}{down}{down}";
+62121 print"{rvon}{lblu}                                        ";
+62122 print"{rvon}{lblu}                                        ";
+62123 print"{rvon}{lblu}                                        ";
+62124 print"{rvon}{lblu}                                        ";
+62125 print"{home}{down}{down}{down}"
+62126 printtab(18)"{rvon}{SHIFT--}";:printtab(58)"{rvon}{SHIFT--}"
+62127 printtab(18)"{rvon}{SHIFT--}";:printtab(58)"{rvon}{SHIFT--}    M"
+62128 printtab(14)"{rvon}{CBM-K}   {SHIFT--}   {rvof}  {rvon}M";:printtab(54)"{rvon}{CBM-*}{rvof}        {rvon}{SHIFT-POUND} {CBM-B}"
+62129 printtab(14)"{rvon}  MMMMMMM{down}{down}{down}{down}{down}":return
+62130 print"{home}{down}{down}"
+62131 printtab(13)"{rvon}{yel}                ";
+62132 printtab(53)"{rvon}{yel}     kleider    "
+62133 printtab(13)"{rvon}{yel}                "
+62134 print:print:print
+62135 printtab(16)"{brn}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}";
+62136 printtab(56)"{brn} {CBM-J}      {CBM-L} "
+62137 printtab(16)"{brn} {CBM-J}      {CBM-L} ":return
+62138 print"{home}{down}{down}{down}{down}{down}{down}"
+62139 printtab(15)"      ";:printtab(54)"        "
+62140 printtab(13)"          ";:printtab(53)"          "
+62141 printtab(13)"          ";:printtab(53)"          "
+62142 printtab(13)"          ";:printtab(53)"          ":return
+62143 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}";
+62144 printtab(14)"{brn}{rvon} {rvof}    {rvon} {rvof}";
+62145 printtab(54)"{rvon} {rvof}    {rvon} {rvof}"
+62146 printtab(14)"{rvon} {rvof}    {rvon} {rvof}";
+62147 printtab(54)"{rvon} {rvof}    {rvon} {rvof}"
+62148 printtab(14)"{rvon} {rvof}    {rvon} {rvof}";
+62149 printtab(54)"{rvon} {rvof}    {rvon} {rvof}"
+62150 printtab(14)"{grn}{SHIFT-POUND}    {CBM-*}";:printtab(53)"{SHIFT-POUND}      {CBM-*}":return
+62151 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+62152 printtab(16)"{yel}{rvon}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}";
+62153 printtab(56)"{yel}{rvon} {CBM-J}      {CBM-L} "
+62154 printtab(16)"{yel}{rvon} {CBM-J}      {CBM-L} ":return
+62155 print"{home}{down}{down}{down}{down}{down}{down}{down}"
+62156 printtab(18)"{blu}{rvon}          ";
+62157 printtab(57)"{blu}{rvon}             "
+62158 printtab(20)"{blu}{rvon}       ";
+62159 printtab(62)"{blu}{rvon}     {rvof}{down}{down}{down}{down}":return
+

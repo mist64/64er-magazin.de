@@ -270,6 +270,51 @@ Critical preservation rules:
   **never** add or drop characters.
 - `TODO LISTING` is NOT a table — leave those to the listings rule.
 
+## A GREY GROUND IN A PRINTED TABLE IS MEANING — keep it
+
+Owner, 2026-10-06, on SH8604 p46: *"tabelle 6 has some field with gray bg,
+they seem to have a meaning, but we lost the styling."*
+
+A tinted cell, row or block inside a table is not decoration. SH8604's
+Tabelle 6 shades **six rows** — the ones the backtracking search discards —
+against circled numbers ①②③④⑤ marking the chosen step at each stage. The
+shading is the distinction the table exists to draw; typeset away, the reader
+is left with two blocks of numbers and nothing to separate them.
+
+**Mark it `class="shaded"`** on each `<td>`/`<th>` that carries the ground, or
+on the `<tr>`'s cells where a whole row is shaded. `issues/style.css` defines
+`--table-shaded` and the `.shaded` rule.
+
+```html
+<tr>
+    <td>5</td>
+    <td class="shaded">2</td>
+    <td class="shaded">2</td>
+    <td class="shaded">4</td>
+    <td class="shaded">-2</td>
+</tr>
+```
+
+Put it on the CELLS and not on the `<tr>`: the row's leading label column is
+usually NOT shaded in the print (Tabelle 6's RAUM column stays white), and a
+`tr` rule would shade it too.
+
+**Nothing in the chain detects this.** The OCR returns characters, not tints,
+so a shaded block is invisible to every check here — it is found by looking at
+the crop, which is the same reading that r160's Pass 3 already asks for.
+Whether other issues have lost table shading is unmeasured; it is not
+retroactively corrected, and r000's *THE ISSUE YOU ARE WORKING ON IS THE
+SCOPE* applies.
+
+## An element you cannot place does NOT go at the end
+
+Owner, 2026-10-06. A table, figure or listing whose print position cannot be
+determined is placed **where it fits best** — for a numbered series, between
+its neighbours — never appended to the bottom of the article, which reads as
+the conclusion and lands after the byline's closing run. The rule, the
+reasoning and the check are in **r150, *NEVER LEAVE AN ORPHAN AT THE END***,
+and they cover all three kinds.
+
 ## Verification
 
 ```bash
@@ -324,20 +369,29 @@ PY
 #    Soft check — flag for human review:
 python3 -c "$(cat <<'PY'
 import os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
 d = sys.argv[1]
+items = []
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
-    refs = set()
-    # OCR damage puts ']', 'l' or 'I' where the digit was ("Tabelle ]"),
-    # and a table may be captioned "Bild N" -- both were missed on 8612.
-    for m in re.finditer(r'\b(?:Tabelle|Bild) ([\d\]lI]+)\b', s):
-        refs.add(m.group(1))
+    # TABELLE ONLY.  This matched "Tabelle|Bild" on both sides, so every Bild
+    # PHOTO reference had to be satisfied by a placed TABLE -- 8 permanent lines
+    # on SH8603, which is a gate that can never reach zero.  A Bild is r150's,
+    # and r150's own mapping check is what covers it.  OCR damage still puts
+    # ']', 'l' or 'I' where the digit was ("Tabelle ]"), found on 8612.
+    refs = {m.group(1) for m in re.finditer(r'\bTabelle ([\d\]lI]+)\b', s)}
     placed = set(re.findall(r'<figcaption>(?:Tabelle|Bild) ([\d\]lI]+)', s)) | \
              set(re.findall(r'-t(\d+)\.png', s))
-    miss = refs - placed
-    if miss:
-        print(f"  {f}: Tabelle {sorted(miss)} referenced but not placed")
+    for n in sorted(refs - placed):
+        items.append('%s: Tabelle %s referenced but not placed' % (f, n))
+# Reported as a DELTA: an unnumbered printed "Tabelle." that the prose calls
+# "Tabelle 1" is a legitimate permanent entry, and so is a reference to a table
+# in another issue.  Walk them once, record them, see only what is new after.
+new = R.delta(d, 'r160-table-refs', items)
+R.report('check 5 (Tabelle N referenced, not placed)', new, len(items),
+         d, 'r160-table-refs')
 PY
 )" "$dir"
 
@@ -368,7 +422,10 @@ PY
 #    is for operator-eyeballing — confirm each one is intentional.
 python3 -c "$(cat <<'PY'
 import os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
 d = sys.argv[1]
+nocap, odd = [], []
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
@@ -378,21 +435,48 @@ for f in sorted(os.listdir(d)):
         cap = re.search(r'<figcaption[^>]*>(.*?)</figcaption>',
                         body, re.DOTALL)
         if not cap:
-            print(f"  {f}: <figure><table> with no <figcaption>")
+            nocap.append('%s: <figure><table> with no <figcaption>' % f)
             continue
         # A Bild-captioned <figure><table> is the shape this rule REQUIRES
         # for a numbered figure-table, so it is not a finding.
         if 'Tabelle' not in cap.group(1) and 'Bild' not in cap.group(1):
             txt = re.sub(r'<[^>]+>', '', cap.group(1)).strip()[:60]
-            print(f"  {f}: <figure><table> caption not 'Tabelle …': {txt!r}")
+            odd.append('%s: %s' % (f, txt))
+for x in nocap: print('  %s' % x)
+# THE NAMED-BOX LIST IS A DELTA.  r160's own "NAMED BOX whose title belongs to
+# the box" clause REQUIRES these captions, so this printed 6 permanent lines on
+# SH8603 -- "Variablenliste", "Programmaufbau", "Programmablaufplan:",
+# "Variable", "Zusammenfassung der Bedienung des Programms:", "Tabellarische
+# Uebersicht", all correct.  The vocabulary is open by design, so it cannot be
+# listed; what can be recorded is which ones were walked.
+new = R.delta(d, 'r160-box-captions', odd)
+R.report("check 7 (<figure><table> caption not 'Tabelle …')", new, len(odd),
+         d, 'r160-box-captions')
 PY
 )" "$dir"
 ```
 
-All seven checks should pass. Soft check (#5) may flag false positives
-(prose mentioning "Tabelle N" of a previous issue, or a "Tabelle"
-that turns out to be a bullet list); the orchestrator should walk
-the flagged ones and decide.
+All seven checks should pass, and **checks 5 and 7 can now reach zero.**
+
+Both are list-gates, not pass/fail checks: a correct issue produces a
+non-empty list from each every run, which r000 forbids — *a gate that always
+reports stops being read.* On SH8603 check 5 printed 8 lines and check 7
+printed 6, and **every one of the 14 was correct.** Check 5's were Bild photo
+references and an unnumbered printed "Tabelle." that the prose calls "Tabelle
+1"; check 7's were the named-box captions this rule itself requires.
+
+Two changes:
+
+- **Check 5 is about `Tabelle` only.** It matched `Tabelle|Bild` on both sides,
+  so every Bild reference had to be satisfied by a placed TABLE. A Bild is
+  r150's business and r150's mapping check covers it.
+- **Both report a DELTA** against `issues/<ID>/reviewed/<key>.txt`, via
+  `r000_reviewed.py`. Walk the list once, record it with the reason, and later
+  runs show only what is new. The remaining legitimate entries — an unnumbered
+  printed "Tabelle.", a reference to a table in another issue, a named box
+  whose vocabulary is open by design — stay visible as a count rather than as
+  noise. This is the per-INSTANCE companion to r310's per-CLASS
+  `adjudicated.txt`.
 
 ## Evidence-in-report requirement
 

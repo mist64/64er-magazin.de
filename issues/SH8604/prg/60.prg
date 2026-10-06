@@ -1,0 +1,1 @@
+Ю    е                 Р Ю еЯ               Ю Р  Ю еЯ m      m    m Ю Р  Ю еЯ  mm  m  m    mЮ Р  Ю еЯ    m  m   m   Ю Р  Ю еЯ            m  Ю Р  Ю lЯпппппппппппппппЮ Р  Ю_Тжжжжжжжжжжжжжжжж Р Ю_Тжжжжжжжжжжжжжжжжж _Тжжжжжжжжжжжжжжжжжж_Тжжжжжжжжжжжжжжжжжжж_5NEBEN IHNEN BEGINNT DER FLUR DESHAUSES.DIE T%R ZUM BALKONVOR IHNEN IST VERSCHLOSSEN.

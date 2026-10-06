@@ -1,0 +1,346 @@
+
+
+;rel.dat.editor.prg ==0801==
+    0 rem *********************************
+    1 rem *     texteditor v.iii.4        *
+    2 rem *         <c> 1985              *
+    3 rem *     von michael nickles       *
+    4 rem *********************************
+    8 ifim=1thenpoke648,204:poke53272,56:poke56576,0:print"{clr}":goto20
+    9 poke53280,0:poke53281,0:print"{clr}{wht}";
+   10 m%=300:dim m$(m%),m(m%):rem puffer
+   15 dimlg(100),rg(100)     :rem q.sort
+   19 rem anfangsmenue ------------------------------------------------------------
+   20 print"{clr}{rvon}        texteditor - version 3          {rvof}";
+   21 print"{rvon}    <c> 1985 von michael nickles        {rvof}";
+   22 print"{down}{down}     alte datei editieren  -  'a'
+   23 print"     neue datei eroeffnen  -  'n'
+   24 print"{down}     d.z.satz laden        -  'd'
+   25 geti$:ifpeek(203)=1theni$="a"
+   26 ifi$<>"a"andi$<>"n"andi$<>"d"then25
+   27 ifi$="d"thenim=1:load"d.z.satz",8,1
+   28 poke198,0:input"{down}{down}dateiname  *{left}{left}{left}";d$:poke198,0
+   29 input"satzlaenge  40{left}{left}{left}{left}";sl:ifsl<1orsl>254thenprint"geht nicht !":goto30
+   30 ifi$="a"then40
+   31 input"satzanzahl ";sn:hb=int(sn/255):lb=sn-hb*255
+   32 print"bitte leere disk einlegen <return>":poke198,0:wait198,1
+   33 open15,8,15
+   35 print#15,"i0":open1,8,3,d$+",l,"+chr$(sl)
+   36 print#15,"p";chr$(3);chr$(lb);chr$(hb);chr$(1)
+   37 print#1,chr$(255)
+   38 close1:close15
+   40 open 15,8,15
+   41 print#15,"i0":open 1,8,3,d$:print
+   50 rem zwischenmenue -----------------------------------------------------------
+   51 print"{rvon}s / l / v / o / d / i / z / f / ende    {rvof}";
+   52 geti$:ifi$=""then52
+   53 ifi$="e"thenprint"{clr}";:goto9900
+   54 ifi$="v"thenprint"{clr}";:goto6000
+   55 ifi$="o"thenprint"{clr}";:goto10000
+   56 ifi$="d"thenprint"{clr}";:goto7000
+   57 ifi$="i"thenprint"{clr}";:goto30000
+   58 ifi$="z"thenprint"{clr}";:goto8000
+   59 ifi$="f"thenprint"{clr}";:goto61000
+   60 ifi$<>"s"andi$<>"l"then52
+   61 input"satznr";sa:if sa<0 or sa>63000 then60
+   64 ifi$="l"thenprint"{clr}";:goto2000
+   66 ifi$="s"thenprint"{clr}";:mo=1:goto3000
+   70 goto 50
+ 2000 rem lesen -----------------------------------------------------------------
+ 2001 :print"{clr}{rvon}";sa;"{left}-";str$(sa+20);" {rvof}"
+ 2005 ia=sa
+ 2007 for sa=ia to ia+20
+ 2010 : gosub9000:gosub9100
+ 2025 : ifa=50thensa=ia+21:goto2045
+ 2030 : iflen(a$)<40thenprinta$
+ 2035 : iflen(a$)>=40thenprinta$;
+ 2045 next:print
+ 2046 ifa=50thenprint"satznummer zu hoch!"
+ 2050 goto 50
+ 3000 rem schreiben -------------------------------------------------------------
+ 3005 print"eingabesatz  //=keine eingabe"
+ 3010 gosub9000   :rem positionieren
+ 3020 ifa=50thenprint"satznummer zu hoch!":goto50             :rem fehlerkanalabfr.
+ 3030 gosub50000:a$=be$                                   :rem input-rout.
+ 3040 ifa$="//"thenmo=0:goto50:rem ende
+ 3050 gosub9200   :rem a$ schreiben
+ 3060 sa=sa+1     :rem naechster satz
+ 3070 goto3010    :rem next (loop)
+ 6000 rem versetzen -------------------------------------------------------------
+ 6002 print"{clr}{rvon}versetzen{rvof}"
+ 6010 print"{down}bitte geben sie anfang und ende des be- reiches an, den sie ";
+ 6015 print"versetzen wollen !"
+ 6020 poke198,0:input"{down}anfang";an
+ 6021 poke198,0:input"ende";en:ifan>enthenprint"das ist unsinn !":goto6020
+ 6023 sa=an:gosub9000:ifa=50thenprint"anfangssatz existiert nicht!":goto50
+ 6024 sa=en:gosub9000:ifa=50thenprint"endsatz zu hoch!":goto50
+ 6026 print"{down}quelldatei = ";d$
+ 6028 poke198,0:input"zieldatei ";z$:if z$=""then z$=d$:print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";d$
+ 6029 print"{down}bitte anfang des neuen bereichs angeben!";:poke198,0:inputnb:print
+ 6030 sa=nb:gosub9000:ifa=50thenprint"neuer anfangssatz zu hoch!":goto50
+ 6031 sa=nb+en-an:gosub9000:ifa=50thenprint"bereich zu gross!":goto50
+ 6032 print"bitte warten!"
+ 6036 sa=an:im=0:ifan=enthenprint"*** fertig ***":poke198,0:wait198,1:goto50
+ 6038 gosub9000:gosub9100:ifa=50then6100
+ 6040 m$(sa-an)=a$
+ 6045 ifsa=enthen6100
+ 6050 ifsa-an=m%thenim=1:goto6100:rem *
+ 6060 sa=sa+1:goto6038
+ 6100 rem transport
+ 6110 print"bitte disk mit zieldatei einlegen !":poke198,0:wait198,1
+ 6120 close1:print#15,"i0":open1,8,3,z$
+ 6200 sa=nb:gosub9000:ifa=50then50
+ 6205 ii=en-an:ifim=1thenii=m%:rem *
+ 6215 fori=0toii
+ 6220 a$=m$(i):ifa$=""thena$=":"
+ 6225 gosub9200:rem schreiben
+ 6240 sa=sa+1:nexti:ifim<>0then6260
+ 6250 print"bitte disk mit quelldatei einlegen !":poke198,0:wait198,1:goto50
+ 6260 an=an+m%:nb=nb+m%:print"bitte disk mit quelldatei einlegen !"
+ 6270 poke198,0:wait198,1:close1:print#15,"i0":open1,8,3,d$:goto6036:rem *
+ 7000 rem printer-routine -------------------------------------------------------
+ 7001 print"{clr}{rvon}printer-routine mps 801{rvof}
+ 7002 input"{down}anfang";an:input"ende";en:ifan>enthen7000
+ 7005 sa=an:gosub9000:ifa=50thenprint"anfangssatz existiert nicht!":goto50
+ 7006 sa=en:gosub9000:ifa=50thenprint"endsatz zu hoch!":goto50
+ 7009 an=an-1:print"{down}bitte waehlen sie:{down}
+ 7010 print,"normale ausgabe ..1
+ 7011 print,"d.z.s. ausgabe ...2
+ 7012 print,"eigene routine ...3
+ 7013 geti$:ifval(i$)<1orval(i$)>3then7013
+ 7014 ifi$="2"then7100
+ 7015 ifi$="3"then7500
+ 7020 rem normale ausgabe --------------
+ 7021 open3,4,7:forsa=antoen:gosub9000:gosub9100
+ 7025 ifa=50thenprint"satznummer zu hoch!":sa=en+1:goto7045
+ 7035 print#3,right$("   "+str$(sa),3);"    ";
+ 7036 fori=1tolen(a$)
+ 7037 :ifmid$(a$,i,1)="{rght}"thenprint#3," ";:goto7040
+ 7038 :print#3,mid$(a$,i,1);
+ 7040 nexti:print#3
+ 7045 nextsa:close3:print:goto50
+ 7100 rem d.z.satz ausgabe -------------
+ 7101 open3,4,7:forsa=antoen:gosub9000:gosub9100
+ 7102 ifa=50thensa=en+1:print"satznummer zu hoch!":goto7170
+ 7110 print#3,right$("    "+str$(sa),4);"    ";
+ 7120 fori=1tolen(a$):ifa$=""then7160
+ 7125 im=asc(mid$(a$,i,1))
+ 7126 ifim>64andim<91orim>96andim<123then7160
+ 7130 ifim=64thenprint#3,chr$(34);:goto7170
+ 7135 ifim=173thenprint#3,"Ae";:goto7170
+ 7140 ifim=174thenprint#3,"ss";:goto7170
+ 7145 ifim=176thenprint#3,"ae";:goto7170
+ 7150 ifim=181thenprint#3,"Ue";:goto7170
+ 7152 ifim=182thenprint#3,"Oe";:goto7170
+ 7154 ifim=184thenprint#3,"ue";:goto7170
+ 7156 ifim=185thenprint#3,"oe";:goto7170
+ 7158 ifim=94thenprint#3,":";  :goto7170
+ 7159 ifim=95thenprint#3,",";  :goto7170
+ 7160 print#3,chr$(im);
+ 7170 nexti:print#3,chr$(13);
+ 7175 nextsa:close3:print:goto50
+ 7500 rem eigene routine ---------------
+ 7510 print"{down}sie haben noch keine eigene printer-    routine deffiniert!":goto50
+ 8000 rem text zentrieren -------------------------------------------------------
+ 8001 i$="":fori=1to10:i$=i$+"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}":nexti
+ 8002 remsl=27
+ 8005 remdimm$(300):goto8100
+ 8010 print"{rvon}zentrieren{rvof}{down}"
+ 8015 print"bitte geben sie anfang und ende des     bereiches an, der zentriert";
+ 8017 print" werden soll!"
+ 8020 input"anfang";an:input"ende";en:ifan>enthen50
+ 8025 sa=an:gosub9000:ifa=50thenprint"anfangssatz existiert nicht!":goto50
+ 8030 sa=en:gosub9000:ifa=50thenprint"endsatz zu hoch!":goto50
+ 8040 print"{down}links-rechts buendig zentrieren  - '1'
+ 8045 print"{down}in die mitte zentrieren          - '2'
+ 8050 getii$:ifii$<>"1"andii$<>"2"then8050
+ 8060 ifii$="2"then8600
+ 8099 rem links-rechts buendig ---------
+ 8100 print"{down}bitte warten!"
+ 8105 forsa=antoen
+ 8110 : gosub9000:gosub9100:printa$:printlen(a$)
+ 8120 : ifright$(a$,1)=chr$(29)thena$=left$(a$,len(a$)-1):goto8120
+ 8122 : ifright$(a$,1)=chr$(32)thena$=left$(a$,len(a$)-1):goto8122
+ 8123 : ifright$(a$,1)=chr$(160)thena$=left$(a$,len(a$)-1):goto8123
+ 8130 : iflen(a$)=slthen8520
+ 8200 :  lu=sl-len(a$):print"lu=";lu
+ 8220 :  i=1:ic=0:rem begin loop -------
+ 8222 :
+ 8230 :   ifmid$(a$,i,1)=""ormid$(a$,i+1,1)=""then8530
+ 8231 :   im=asc(mid$(a$,i,1))
+ 8232 :   in=asc(mid$(a$,i+1,1))
+ 8240 :   ifim<>29andim<>32andim<>160then8500
+ 8250 :   ifin=29orin=32orin=160then8500
+ 8260 :    a$=left$(a$,i)+" "+right$(a$,len(a$)-i)
+ 8261 :   ifmid$(a$,i,1)=" "ormid$(a$,i,1)="{rght}"theni=i+1:goto8261
+ 8265 :   lu=lu-1:iflu=0then8510
+ 8266 :   ic=ic+1
+ 8270 :   i=i+1
+ 8400 :
+ 8500 i=i+1
+ 8505 ifi<len(a$)then8230
+ 8510 ifi=len(a$)andlu>0andic<>0then8220
+ 8520 gosub9000:gosub9200
+ 8530 nextsa
+ 8540 goto50
+ 8600 rem in die mitte -----------------
+ 8610 print"{down}bitte warten!"
+ 8620 forsa=antoen
+ 8630 :gosub9000:gosub9100
+ 8635 ifright$(a$,1)=chr$(29)thena$=left$(a$,len(a$)-1):goto8635
+ 8636 ifright$(a$,1)=chr$(32)thena$=left$(a$,len(a$)-1):goto8636
+ 8637 ifright$(a$,1)=chr$(160)thena$=left$(a$,len(a$)-1):goto8637
+ 8640 :iflen(a$)=slthen8680
+ 8650 :as=sl-len(a$): rem anzahl spaces
+ 8660 :a$=left$(i$,as/2)+a$
+ 8670 :gosub9000:gosub9200
+ 8680 nextsa
+ 8690 goto50
+ 9000 rem positionieren ****************
+ 9010 hb%=sa/256:lb%=sa-hb%*256
+ 9020 print#15,"p";chr$(3);chr$(lb%);chr$(hb%);chr$(1)
+ 9030 input#15,a
+ 9040 return
+ 9100 rem satz einlesen ****************
+ 9110 ifa=50thenreturn
+ 9120 input#1,a$
+ 9140 return
+ 9200 rem satz schreiben ***************
+ 9210 ifa=50thenreturn
+ 9211 ifa$=""thena$=":":rem zur sicherheit !!!
+ 9220 print#1,a$
+ 9240 return
+ 9900 rem beenden **********************
+ 9910 close 1
+ 9920 close 15
+ 9930 print "++ ende ++"
+ 9940 end
+10000 rem sort-alogarithmus ----------------------------------------------------
+10010 print"{clr}{rvon}datei sortieren{rvof}"
+10100 print"bitte geben sie anfang und ende des zu  sortierenden bereichs an !
+10110 input"anfang";an
+10120 input"ende";  en
+10122 sa=an:gosub9000:ifa=50thenprint"anfangssatz existiert nicht!":goto50
+10124 sa=en:gosub9000:ifa=50thenprint"endsatz zu hoch!":goto50
+10130 ifen-an>m%thenprint"bereich zu gross!":goto50
+10135 print"{down}bitte markieren sie den bereich inner-
+10136 print"halb der strings nach dem die sortierung";
+10137 print"erfolgen soll!"
+10138 sa=an:gosub9000:gosub9100:ifa=50thenprint"satz existiert nicht!":goto50
+10139 ig=-1:gosub60000:ig=0
+10140 ic=0:forsa=antoen:ic=ic+1
+10145 :gosub9000:gosub9100:ifa=50thenprint"satznummer zu hoch!":sa=en+1:goto1015
+10146 :m$(ic)=a$
+10150 nextsa
+10180 z=0:lg(1)=1:rg(1)=en-an+1
+10190 gosub10200:goto10400
+10200 rem  quicksort -----------------
+10210 z=z+1:iflg(z)>=rg(z)then10350
+10220 x=lg(z):y=rg(z)
+10230 vg$=mid$(m$(int((x+y)/2)),ma(1),mb(1)-ma(1)+1)
+10240 if x>y then10330
+10250 if mid$(m$(x),ma(1),mb(1)-ma(1)+1)<vg$thenx=x+1:goto10250
+10260 if mid$(m$(y),ma(1),mb(1)-ma(1)+1)>vg$theny=y-1:goto10260
+10270 if x>ythen10330
+10280 s$=m$(x):m$(x)=m$(y):m$(y)=s$
+10290 x=x+1:y=y-1:goto10240
+10330 rg(z+1)=y:lg(z+1)=lg(z):gosub10210
+10340 lg(z+1)=x:rg(z+1)=rg(z):gosub10210
+10350 z=z-1:return
+10400 rem abspeichern
+10410 ic=0:forsa=antoen:ic=ic+1
+10420 :gosub9000:a$=m$(ic):gosub9200
+10430 nextsa
+10500 goto50
+20000 rem korrektur-routine ----------------------------------------------------
+20001 fori=0tolen(be$):printchr$(20);:nexti:be$=""
+20010 sa=sa+sc       : rem textzeiger
+20015 ifsa<0thensa=0 : rem sperre
+20020 gosub 9000     : rem positionieren
+20025 ifa=50thensa=sa-sc:goto20020
+20040 input#1,a$
+20060 return
+30000 rem directory einlesen ---------------------------------------------------
+30010 print"{clr}{rvon}inhaltsverzeichnis:{down}{rvof}"
+30110 print#15,"io":open2,8,2,"#"
+30120 t=18:s=1
+30130 print#15,"u1";2;0;t;s
+30140 print#15,"b-p";2;0
+30150 get#2,x$:ifx$=""thenx$=chr$(0)
+30160 t=asc(x$)
+30170 get#2,x$:ifx$=""thenx$=chr$(0)
+30180 s=asc(x$)
+30190 forx=0to7
+30192 print#15,"b-p";2;x*32+2
+30194 get#2,x$:ifx$=""thenx$=chr$(0)
+30196 ifasc(x$)=0then30290
+30200 print#15,"b-p";2;x*32+5
+30210 ff$=""
+30220 fory=0to15
+30230 get#2,x$:ifx$=""thenx$=chr$(0)
+30240 ifasc(x$)=160then30270
+30250 ff$=ff$+x$
+30260 nexty
+30270 ifa=0thena=1:printff$;:goto30290
+30280 a=0:printtab(19);"{CBM-M} ";ff$
+30290 nextx
+30300 ift<>0then30130
+30310 close2:print
+30330 goto50
+50000 rem texteingabe ----------------------------------------------------------
+50002 ifar=1thenar=0:a$="{rvon}satznummer zu hoch!{rvof}":goto50007
+50006 gosub9000:gosub9100
+50007 print"{home}                                        ";:print"{home}{rvon}satz";sa;"{rvof}"
+50008 print"                                        {up}";a$
+50009 print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}";
+50010 print"{down}"
+50020 be$="":poke198,0:poke211,0:poke214,22:sys58732:print"{yel}{CBM-@}";
+50030 getx$:ifpeek(203)=1then50120
+50035 if peek(203)=7andpeek(653)=0 then sc=1 : gosub 20000 : goto 50000
+50037 if peek(203)=7andpeek(653)=1 then sc=-1 : gosub 20000 : goto 50000
+50040 ifx$=""then50030
+50050 iflen(be$)=0andasc(x$)=20then50030
+50060 i=asc(x$):ifi<32ori>133andi<159thenifi<>20then50030
+50070 iflen(be$)=slandi<>20then50030
+50075 ifx$=" "thenx$="{rght}"
+50080 be$=be$+x$
+50090 printchr$(20);x$;"{CBM-@}";
+50100 ifi=20thenbe$=left$(be$,len(be$)-2):goto50030
+50110 goto50030
+50120 print"{left} ":gosub9000
+50130 ifbe$=""thenbe$=":"
+50140 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":return
+60000 rem markieren wie datiert wird -------------------------------------------
+60010 i$=a$:fori=1tolen(i$):m$(i)="0":next
+60020 im=1:print
+60025 printi$:fori=1tolen(i$):printm$(i);:next:print
+60030 print"{down}edit   >";mid$(i$,im,1);"<    {rvon}"im"{rvof}"
+60035 i=peek(203):ifi=64then60035
+60040 ifi=2andpeek(653)=0andim<>len(i$)thenim=im+1:goto60070
+60042 ifi=2andpeek(653)=1andim<>1thenim=im-1:goto60070
+60045 ifi=56thenm$(im)="1":goto60070
+60055 ifi=35thenm$(im)="0":goto60070
+60056 ifi=1then60100
+60060 goto60035
+60070 print"{up}                         {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{up}{up}{up}";:goto60025
+60100 rem umrechnen
+60102 fori=1to3:ma(i)=0:mb(i)=0:nexti
+60105 forii=1to3
+60110 :fori=1tolen(i$):ifma(ii)=0andm$(i)=right$(str$(ii),1)thenma(ii)=i
+60113 nexti
+60115 :ifma(ii)=0then60150
+60120 :   mb(ii)=ma(ii)
+60125 :   mb(ii)=mb(ii)+1:remprint,mb(ii)
+60130 :   ifm$(mb(ii))<>right$(str$(ii),1)thenmb(ii)=mb(ii)-1:goto60150
+60135 :   ifmb(ii)=len(i$)then60150
+60140 :   goto60125
+60150 nextii
+60170 print"die sortierung erfolgt nach folgendem   stringbereich:"
+60180 print"{rvon}"mid$(i$,ma(1),mb(1)-ma(1)+1)"{rvof}"
+60190 return
+61000 rem floppy-fehlerkanal lesen ---------------------------------------------
+61005 print"{clr}{rvon}floppy-fehlerkanalabfrage{rvof}"
+61010 input#15,a,b$,c,d
+61020 printa,b$,c,d
+61040 goto50
+

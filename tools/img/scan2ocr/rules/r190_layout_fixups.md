@@ -221,7 +221,8 @@ issue. Two limits to know before spending time on them:
 The print bolds things the monthlies have never marked: Impressum field labels
 (`<strong>` in **0 of 32**) and Leserforum question lead-ins (**0 of 31**) are
 bold on the page and unmarked in every monthly issue. Follow precedent and
-leave them unmarked. Draw precedent from the monthlies only — the Sonderhefte
+leave them unmarked — **but read the next paragraph before you do, because it
+is the half that was missed twice.** Draw precedent from the monthlies only — the Sonderhefte
 are a separate series and eight of them do bold the Impressum labels. Fidelity to the artefact is
 the job of the page image and the PDF, which keep every one of those bolds; the
 HTML owes the reader that two issues of the same magazine look alike.
@@ -230,6 +231,78 @@ This does **not** license dropping emphasis that carries meaning. A bold
 lead-in that separates one Q&A item from the next is structure, and structure
 is content. The test is whether the emphasis distinguishes *this* text from the
 text beside it, or merely decorates a field name the layout already sets apart.
+
+**The precedent applies only where the structure survives WITHOUT the bold.**
+SH8603's `11 Fragen und Antworten zum C 16 und VC 20` prints three levels —
+centred bold headings with a rule, **bold flush-left questions**, roman
+indented answers — and shipped through every step with the questions as plain
+`<p>`: **0 `<strong>` in the whole file**, question and answer
+indistinguishable to a reader. The owner found it by reading. No gate looked,
+because the paragraph above reads like permission and this one like a caveat.
+
+So, as a procedure rather than a principle: where the bold is the ONLY thing
+separating one item from the next, mark it as printed. Where other markup
+already carries the structure — a heading, a `<dl>`, a table cell, an
+`<aside>` — leave it unmarked and follow the monthlies.
+
+**And check it.** An article whose print bolds paragraph starts and whose HTML
+has no `<strong>` and no headings between those paragraphs is the shape:
+
+```bash
+# Q&A-shaped articles whose questions are UNMARKED.  A hit is a LOOK, not a
+# failure: read the crop and decide.  r190's find_bold is the locator (see the
+# ink-fraction section) and the 600 dpi crop settles it.
+#
+# THE SHAPE IS THE ALTERNATION, not the question mark.  Three narrower
+# versions of this check all failed, and each failure named an exclusion:
+#   * "0 <strong> and 0 headings in the file" -- SH8603's article 11 had 16
+#     headings from its first commit.  The three printed levels were centred
+#     headings, bold questions, roman answers; only the QUESTIONS were
+#     unmarked, so a file-level test could never see it.
+#   * no attribution test -- the monthlies separate question from answer with a
+#     short "(Reader Name)" line (8611/29 and 8612/26, Profis helfen
+#     Einsteigern).  That line IS the structure, so those are correct.
+#   * no length test -- a rhetorical question ending an ordinary paragraph
+#     matched (SH8602/20 "Wo sind die Computer-Detektive? Haben Sie's
+#     gemerkt?").  A real Q&A question is SHORT and its answer is LONG.
+#
+# Two exclusions stay by rule rather than by shape: LESERFORUM, which is this
+# section's own precedent (0 of 31 marked), and an INTERVIEW, whose questions
+# the print sets roman -- see "Three conflicts settled on 8612".  MEASURED
+# over the whole archive with those in place: 3 articles, of which 8604/8 is
+# the interview.  SH8603's article 11 as first committed scores 10.
+$PY - issues/<ID> <<'PYEOF'
+import glob, io, os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
+TXT = lambda t: re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', t)).strip()
+items = []
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    if 'Leserforum' in f:
+        continue
+    s = io.open(f, encoding='utf-8').read()
+    i = s.find('<article'); b = s[i:s.rfind('</article>')] if i >= 0 else s
+    raw = re.findall(r'<p(?: class="[^"]*")?>(.*?)</p>', b, re.S)
+    txt = [TXT(r) for r in raw]
+    bare = 0
+    for n, (r, t) in enumerate(zip(raw, txt)):
+        if not t.endswith('?') or not (20 <= len(t) <= 250):
+            continue
+        if '<strong>' in r or '<em>' in r:
+            continue
+        nxt = txt[n + 1] if n + 1 < len(txt) else ''
+        if re.fullmatch(r'\(.{2,40}\)', nxt):   # attribution separates them
+            continue
+        if len(nxt) < 400:                       # a question, then a long answer
+            continue
+        bare += 1
+    if bare >= 3:
+        items.append('%s: %d unmarked question paragraph(s)'
+                     % (os.path.basename(f), bare))
+new = R.delta(sys.argv[1], 'r190-qa-unmarked', items)
+R.report('unmarked Q&A questions', new, len(items), sys.argv[1], 'r190-qa-unmarked')
+PYEOF
+```
 
 ## Three conflicts settled on 8612
 
@@ -411,6 +484,90 @@ between the final paragraph and the byline.
 
 Check: walking the article in document order, no `<figure>`/`<table>` may sit
 between the last body `<p>` and the trailing `<address>`/`<p class="source">`.
+
+**And the move is a DEPARTURE FROM PRINT POSITION, so record it.** On SH8603
+this moved tables and figures that the page floats MID-article to after the
+byline in **9 files** — the rule is right that a byline must not be split, but
+the result is an element no longer where the reader saw it, and nothing marked
+that. It is also in tension with *restore in print position* for boxes, and
+with the 8612 ruling two sections up that the printed order decides where a
+box goes when it is unambiguous.
+
+So: the closing run wins, because a split byline misattributes text, which is
+worse than a moved float. But **list every element this rule moves in LOG.md
+with its printed position**, and where the element is a numbered Bild or
+Tabelle, its caption already tells the reader which one it is. Where the float
+is mid-article in print and its caption does NOT number it, prefer moving it
+to just BEFORE the closing run rather than after the byline, so it stays
+inside the article's body.
+
+## BEFORE RESTORING A "MISSING" PASSAGE, CHECK IT IS NOT ALREADY THERE
+
+SH8603's 190A reported *Missing section "Kleiner Epson ganz groß" restored*
+in article 43 and restored it under its `<h2>`. **The text was not missing.**
+030 had glued it onto the end of the article's opening paragraph in raw OCR
+form, so the issue shipped the section TWICE — and 280A noticed only because
+a stray `©` survived in the raw copy. The same pass left two paragraphs in
+article 6 ending with a copy of the heading it had split out.
+
+The check that was run compared the restored words against the OCR, which can
+only confirm the text EXISTS — that is the opposite of the question being
+asked. **The question is whether it is already in the FILE.**
+
+So, two steps, both mandatory:
+
+1. **Before restoring anything**, grep the article for the passage's first
+   eight words and its last eight words. A hit means it is already there,
+   possibly glued into a neighbouring paragraph by 030, and the job is to
+   SPLIT it out rather than to add it.
+2. **After any restoration or heading split**, run the repeated-window sweep
+   below. It found exactly these two cases.
+
+```bash
+# A DUPLICATED PASSAGE, which is what a wrong "restoration" leaves behind.
+# PROSE ONLY: a <table> repeats cell patterns by nature ("a) 1, 2, 3 b) 1, 2
+# min. 10; max. 25,4" across printer columns), a <pre> repeats listing lines,
+# and a pin-name legend repeats its own vocabulary -- swept with those in, all
+# four of SH8603's first hits and all of 8612's were tables, i.e. correct
+# output reported as a defect.  MEASURED with them out: 1 to 4 hits per issue.
+# A hit is a LOOK: read both occurrences and decide which (if either) belongs.
+$PY - issues/<ID> <<'PYEOF'
+import glob, io, os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
+W = 12
+STRIP = re.compile(r'<(pre|code|table)\b.*?</\1>', re.S)
+items = []
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    s = io.open(f, encoding='utf-8').read()
+    i = s.find('<article'); b = s[i:s.rfind('</article>')] if i >= 0 else s
+    b = STRIP.sub(' ', b)
+    words = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', b)).split()
+    seen, last = {}, -99
+    for n in range(len(words) - W + 1):
+        k = ' '.join(words[n:n + W]).lower()
+        if k in seen and n - seen[k] >= W:
+            if n - last > W:
+                items.append('%s: w%d and w%d  "%s"'
+                             % (os.path.basename(f), seen[k], n, k[:62]))
+            last = n
+        seen.setdefault(k, n)
+new = R.delta(sys.argv[1], 'dup-passages', items)
+R.report('duplicated prose passages', new, len(items), sys.argv[1], 'dup-passages')
+PYEOF
+```
+
+## Nobody owns a lost drop cap before 190
+
+030 and 080 leave them; r310 gates them only at the very end, by which time
+the fix is a re-read of every affected crop. SH8603's 190 read **~38** of them
+off the crops as part of its own pass, which is the right place but was never
+anybody's instruction.
+
+So it is 190's: as part of the bold/italic pass, scan for a paragraph whose
+first word is not a word (`er Computer`, `as Programm`, `enn Sie`) and read
+the dropped letter off the 600 dpi crop. 8612 had 31+, SH8603 ~38 — this is
+not a rare defect, it is one per two or three articles.
 
 ## Interview speaker labels are bold
 

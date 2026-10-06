@@ -1,0 +1,24 @@
+
+
+;listing 03.p.prg ==0801==
+   10 dim m%(26)
+51000 rem befehlszerlegung-codierung -------------------------------------------
+51001 :
+51010 vg$="nimm":vg=1012
+51020 rem m$-tabelle anlegen ---------
+51040 fori=1to26:m%(i)=len(vg$):nexti
+51050 fori=1tolen(vg$):m%(asc(mid$(vg$,i,1))-64)=len(vg$)-i:nexti
+51052 fori=1tolen(vg$):printmid$(vg$,i,1),m%(asc(mid$(vg$,i,1))-64):nexti
+51060 rem vg$ in be$ suchen ----------
+51065 print"{clr} ";be$
+51070 po=1
+51080 fori=1topo:print" ";:nexti:printvg$
+51085 ifvg$=mid$(be$,po,len(vg$))thenprint"gefunden !":end
+51090 fori=len(vg$)to1step-1
+51095 :ifmid$(be$,po+i,1)=""thenprint"nicht gefunden!":end
+51105 :ifmid$(vg$,i,1)=mid$(be$,po+i-1,1)then51120
+51109 :ifasc(mid$(be$,po+i-1,1))=32thenpo=po+len(vg$):i=0:goto51120
+51110 :po=po+m%(asc(mid$(be$,po+i-1,1))-64)+len(vg$)-i:i=0
+51120 nexti
+51130 goto51080
+

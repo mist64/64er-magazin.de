@@ -137,6 +137,51 @@ summary printed `kept prose blocks 0   UNACCOUNTED 0   (0.0%)` — a pass, from 
 check that had not looked at anything. It now prints `CANNOT RUN` and says
 what is missing. The unclaimed-pages half needs no OCR and still runs.
 
+## A PASSAGE PRESENT TWICE IS AN OMISSION DEFECT TOO
+
+This gate looks for text that went missing. The mirror defect is text added
+back that was never gone: SH8603's 190A "restored" a section that 030 had
+glued onto the end of a neighbouring paragraph, and the issue shipped it
+twice — noticed only because a stray `©` survived in the raw copy. r190 now
+pre-checks before restoring anything; this gate is the backstop, because by
+here every restoration and every heading split has happened.
+
+Same sweep r190 runs, over the finished issue:
+
+```bash
+# A DUPLICATED PASSAGE, which is what a wrong "restoration" leaves behind.
+# PROSE ONLY: a <table> repeats cell patterns by nature ("a) 1, 2, 3 b) 1, 2
+# min. 10; max. 25,4" across printer columns), a <pre> repeats listing lines,
+# and a pin-name legend repeats its own vocabulary -- swept with those in, all
+# four of SH8603's first hits and all of 8612's were tables, i.e. correct
+# output reported as a defect.  MEASURED with them out: 1 to 4 hits per issue.
+# A hit is a LOOK: read both occurrences and decide which (if either) belongs.
+$PY - issues/<ID> <<'PYEOF'
+import glob, io, os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
+W = 12
+STRIP = re.compile(r'<(pre|code|table)\b.*?</\1>', re.S)
+items = []
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    s = io.open(f, encoding='utf-8').read()
+    i = s.find('<article'); b = s[i:s.rfind('</article>')] if i >= 0 else s
+    b = STRIP.sub(' ', b)
+    words = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', b)).split()
+    seen, last = {}, -99
+    for n in range(len(words) - W + 1):
+        k = ' '.join(words[n:n + W]).lower()
+        if k in seen and n - seen[k] >= W:
+            if n - last > W:
+                items.append('%s: w%d and w%d  "%s"'
+                             % (os.path.basename(f), seen[k], n, k[:62]))
+            last = n
+        seen.setdefault(k, n)
+new = R.delta(sys.argv[1], 'dup-passages', items)
+R.report('duplicated prose passages', new, len(items), sys.argv[1], 'dup-passages')
+PYEOF
+```
+
 ## The loss this gate CANNOT see: a line or two dropped inside a claimed page
 
 Every check here asks whether a page, an article or a file is accounted for.

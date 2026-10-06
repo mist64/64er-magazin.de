@@ -37,10 +37,74 @@ numbers IS the program. So it does not stay as page text — it goes into
 |---|---|---|
 | Checksummer BASIC | `petcat -w<ver> -l <addr>` the transcription, keep the petcat text as `prg/<name>.txt` (house opener `;<name>.prg ==0801==`, plus `;version=` where the dialect is not V2) | `<pre data-filename="<name>" data-name="<Name>" data-checksummer="<1\|2\|3>"></pre>` — EMPTY; the generator tokenises the file and recomputes the sums for display |
 | MSE hex | decode the hex to the binary with `tools/mse.py`, write `prg/<name>.prg` | `<pre data-filename="<name>.prg" data-name="<Name>" data-mse=mse1></pre>` |
+| A **monitor dump** (TEDMON, VC-20 monitor, C64 monitor) | assemble the bytes at their printed addresses, write `prg/<name>.prg` | `<pre>` carrying the dump **as printed** — not `data-mse`, which would render MSE's row format and addresses the magazine never set |
+| A dump in the **program's own format with a row sum** | same, and verify every row sum | as printed |
+
+**Two more things prove a transcription, and the table used to list only MSE
+and Checksummer.** The rule's *prove it* assumes a printed checksum, so a
+format without one looked unprovable:
+
+- **A monitor listing proves itself.** The hex bytes, the disassembly beside
+  them and the contiguous address column are three readings of the same data,
+  and a misread byte breaks at least one of them. It found nothing wrong on
+  SH8603, which is the point — it is a proof you can state, not a hope.
+- **A program's own format can carry a sum.** SH8603's `tacco` dumps at
+  file−$200 with a **16-bit row sum**, which proves a transcription exactly as
+  MSE's per-line checksum does. `penco` uses 25-byte rows. Read the printed
+  format before assuming it has no check.
 
 `data-checksummer` is the Checksummer VERSION the article printed — 1, 2 or 3;
 the corpus carries 81, 114 and 32 of each, so all three are live. Getting it
 wrong changes every displayed sum.
+
+### THE PRINTED LAST ROW MAY BE PADDED, AND WE DO NOT REPRODUCE IT
+
+**Owner, 2026-10-05: "print sometimes has a few more hex values and will have a
+different checksum. we don't reproduce this."**
+
+An MSE1 row is eight bytes. A program whose length is not a multiple of eight
+therefore ends in a SHORT row — and the printed dump sometimes pads that last
+row out to full width with whatever happened to follow the program in memory.
+Because the row checksum covers the bytes in the row, **a padded row carries a
+different checksum than the real one**, and both the extra bytes and the sum
+are artefacts of the printing, not of the program.
+
+The page renders from the `.prg`, which ends at the program's real last byte,
+so it emits the short row and the real checksum. That is correct and it stays.
+MEASURED on SH8604:
+
+| | the file | printed |
+|---|---|---|
+| `freiheit.prg` | 28,678 bytes, last `$7806`, final row **6 bytes** `D3 23 EA EA EA 60`, sum `0C` | `D3 23 EA EA EA 60 3D 22` sum `69` — two bytes of padding |
+| `fenster.prg` | 331 bytes, last `$9D4A`, final row **3 bytes** `4C D5 FF` | padded likewise |
+
+This is **not** a print/disk divergence and does not go to the owner under
+r300's standing ruling, because nothing about the program differs — only the
+printing of its tail. **No aside, no `data-range`, no note on the page.** Log
+it and move on.
+
+It is common: **90 of SH8604's 110 `.prg` files have a short final row**, so
+any issue with MSE listings will meet it.
+
+**Consequence for the proof below, and it is not optional.** "The recomputed
+sums equal every printed one" is false by construction wherever the print
+padded the tail. So: verify every row but the last against the print, and
+verify the last row against the FILE — its bytes must be the program's real
+final bytes and its sum must be the sum of those. A last-row mismatch of
+exactly this shape is the expected result, and a build that "fixes" it by
+transcribing the padding has put bytes into the archive that the program does
+not contain.
+
+**Two shapes that look like this and are NOT it** — both still owner
+decisions, both seen on SH8604:
+
+- the printed row and the file row are the **same length but different
+  bytes** (`b.prg`: print `… 20 10 12 0f`, file `… 20 31 FF FF`);
+- the **file** is longer than the printed span rather than shorter
+  (`rueckwaerts.prg` runs 2 bytes past it, ending `4C 31 EA 01 08`).
+
+Padding adds bytes to the PRINT. Anything else is a real divergence and goes
+to the owner.
 
 **Prove it before you write it**, and say so in the report: the recomputed sums
 equal every printed one, and where the listing's DATA is a known binary, the
@@ -90,7 +154,7 @@ the delivered PDF page is neither, so the two spaces differ by a rotation and an
 offset — cropping these coordinates out of a `pdftoppm` render lands in the
 wrong place. See r000, "page block index".
 
-## A LOCAL OCR MODEL READS HEX DUMPS BYTE-PERFECTLY — measured
+## A LOCAL OCR MODEL READS CLEAN MSE PRINT BYTE-PERFECTLY — measured
 
 MEASURED 2026-10-01 on 8611 p59, a page of MSE hex (45 lines of
 `addr : b0..b7 cs`, the last 360 bytes of `3D-CODE`). The truth is not a
@@ -113,6 +177,27 @@ token loop (a run of `20 20 20…`) and it reads *across* a three-column dump,
 emitting one output line per printed row rather than per listing line. Both go
 away on a **single-column crop with a modest `max_tokens`**, which is what the
 0.00% was measured on — and cropping the region is what this rule already does.
+
+**AND A THIRD CONDITION: the print has to be clean MSE.** The 0.00 % above is
+one page of sharp, regularly spaced MSE hex. It is not a property of the model.
+MEASURED on SH8603:
+
+| print | reading |
+|---|---|
+| clean MSE hex, column crop (8611 p59) | **360/360 bytes**, 0.00 % wrong |
+| Penco's faint dot-matrix dump | **~86 %** of bytes right — and still ~86 % on half-row crops, so cropping harder does not rescue it |
+| a two-column TEDMON dump | sometimes emits the ADDRESS column and the DATA column as two separate lists, which silently drops the pairing |
+
+So "byte-perfect" is a claim about one kind of page. On a faint dot-matrix
+dump, **one byte in seven is wrong** and the output looks entirely plausible,
+which is worse than an obvious failure. Read the model's output against a
+printed check — a per-line checksum, a row sum, a contiguous address column,
+or the disassembly beside the hex — and where the print carries none, the
+transcription is a human's.
+
+A two-column dump that comes back as two lists is detectable: the address
+column is monotonic and the data column is not, and the line counts differ
+from the printed rows. Check for that shape before trusting the output.
 
 **What this does and does not say.** It is a comparison against *tesseract*, the
 chain's general OCR. It is **not** a comparison against the vision sub-agent this
@@ -149,6 +234,14 @@ The sub-agent must:
 2. For every `<pre>TODO</pre>` placeholder in `issues/<YYMM>/*.html`:
    - Read the adjacent `<figcaption>` to identify which listing + page.
    - tesseract-locate the caption's bbox in the rendered page.
+     **WHERE THERE IS NO CAPTION BLOCK, locate the listing itself.** This
+     step assumed every boxed listing has a caption to anchor on; SH8603's
+     L1, L14 and L16–L18 have none at all, and the locator returned nothing
+     for five of its boxes. Fall back to a **page overview** — a
+     `-resize 25%` render of `masters600/NNN.png`, read for the box's
+     position — and crop from that, which is how those five were found.
+     A monospace block is also findable without any OCR: it is the region
+     whose rows have near-constant ink width and no ragged right edge.
    - `magick` crop the listing region above (or beside) the caption
      with ~50px padding.
    - Dispatch a **sub-sub-agent** to OCR the crop and return the text.
@@ -335,7 +428,21 @@ for f in sorted(os.listdir(d)):
         frac = digit_starts / len(lines)
         # 0% → not BASIC (asm/Pascal), fine. >=60% → healthy BASIC.
         # Between: looks like BASIC with some numbers eaten by OCR.
-        if 0 < frac < 0.6:
+        # ONE LANGUAGE PER <pre> IS AN ASSUMPTION, AND THE PRINT BREAKS IT.
+        # SH8603's C16 course prints "Basic:" and a TEDMON monitor listing in
+        # ONE box: L9 has 9 digit-led lines of 30 and L11 1 of 10, so this
+        # fires by construction on a box that is correct.  Where the <pre>
+        # carries two languages, the mixed fraction is the expected reading.
+        # A box like that is split by a blank line and a label in the print --
+        # look for a line matching ^(Basic|Assembler|Monitor|Maschinen\w*):
+        # and, if there is one, say so rather than flagging the fraction.
+        mixed = re.search(r'(?mi)^\s*(basic|assembler|monitor|maschinen\w*)\s*:',
+                          re.sub(r'<[^>]+>', '', body))
+        if 0 < frac < 0.6 and mixed:
+            print(f"  look {f}: <pre> mixes languages "
+                  f"({mixed.group(1)}: label present), "
+                  f"{digit_starts}/{len(lines)} digit-led -- expected")
+        elif 0 < frac < 0.6:
             print(f"  {f}: <pre> looks like BASIC but only "
                   f"{digit_starts}/{len(lines)} lines start with a digit "
                   f"— OCR may have eaten line numbers")

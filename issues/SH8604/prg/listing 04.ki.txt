@@ -1,0 +1,91 @@
+
+
+;listing 04.ki.prg ==0801==
+    1 rem ********************************
+    2 rem *   irrgaerten und maeuse iii  *
+    3 rem * <c> 1985 bei michael nickles *
+    4 rem ********************************
+    5 poke53280,0:poke53281,0:print"{clr}{rvon}{wht}maus iii{rvof}{down}"
+   10 m%=1000:dimm(m%,3):rem gedaechtnis
+   20 ri$(0)="norden"
+   22 ri$(1)="osten"
+   24 ri$(2)="sueden"
+   26 ri$(3)="westen"
+   30 mz=1           :rem ged. zeiger
+   40 fori1=0tom%    :rem gedaechtnis
+   42 : fori2=0to3   :rem loeschen
+   44 :   m(i1,i2)=-1
+   46 : nexti2
+   48 nexti1
+  100 print"biite geben sie die anfangsrichtung ein:
+  110 print"norden=1
+  120 print"osten =2
+  130 print"sueden=3
+  140 print"westen=4
+  150 geti$:ifval(i$)=0orval(i$)>3then150
+  160 x=val(i$)-1:goto1141
+ 1000 rem hauptprogramm ---------------------------------------------------------
+ 1001 :
+ 1100 rem richtung ausprobieren
+ 1101 :
+ 1110 x=0            :rem 1. versuch = n
+ 1115 :  gosub5000   :rem sackgasse ?
+ 1120 :  ifm(mz,x)<>-1then1200
+ 1125 :  print"kann ich nach ";ri$(x);" gehen ?";            :rem x probieren
+ 1130 :  geti$:ifi$<>"j"andi$<>"n"andi$<>" "then1130
+ 1131 :  ifi$=" "then10000
+ 1135 :  ifi$="n"thenprint" nein.":m(mz,x)=-2:x=x+1:goto1115 :rem x geht nicht
+ 1140 print" ja."    :rem x geht
+ 1141 :  m(mz,x)=mz+1:rem richt. merken
+ 1142 :  mz=mz+1     :rem bewegen
+ 1144 :  ifmz>m%thenprint"habe mich verirrt - gebe auf !":end:rem memory full
+ 1146 :    g=x:gosub6000:x=g                                 :rem gegenbefehl
+ 1148 :    m(mz,x)=mz-1
+ 1150 :              :rem merken
+ 1152 :    g=x:gosub6000:x=g                                 :rem gegenbefehl
+ 1160 :  goto1000
+ 1200 :  ifm(mz,x)=-2thenx=x+1:goto1115                      :rem x geht nicht
+ 1210 :  ifm(mz,x)>-1thenx=x+1:goto1115                      :rem prioritaet !!!
+ 5000 rem feststellen ob maus in sackgasse ist (3 * -2) -------------------------
+ 5001 :
+ 5010 ic=0
+ 5015 forn=0to3
+ 5020 : ifm(mz,n)=-2thenic=ic+1
+ 5030 nextn
+ 5040 ific<3thenreturn
+ 5050 ific=4thenprint"ich lasse mich nicht reinlegen !":end
+ 5100 rem backtracking - schritt zurueck ----------------------------------------
+ 5101 :
+ 5110 mz=mz-1   :rem zeiger um 1 zurueck
+ 5120 forn=0to3
+ 5125 : m(mz+1,n)=-1                                    :rem irrweg loeschen
+ 5130 : ifm(mz,n)<>mz+1then5140
+ 5134 : m(mz,n)=-2                                      :rem irrweg loeschen
+ 5136 : g=n:gosub6000
+ 5137 : print"ich gehe nach "ri$(g)"."
+ 5140 nextn
+ 5145 x=0       :rem reset auf n
+ 5147 ifmz=1thenprint"bin wieder am eingang!":poke109,0:wait198,1:run
+ 5150 goto5000  :rem pruefen
+ 6000 rem gegenbefehl bilden ----------------------------------------------------
+ 6001 :
+ 6010 : ifg=0theng=2:goto6080
+ 6020 : ifg=1theng=3:goto6080
+ 6030 : ifg=2theng=0:goto6080
+ 6040 : ifg=3theng=1:goto6080
+ 6080 return
+10000 rem loesung ausgeben -----------------------------------------------------
+10001 :
+10010 print"{clr}durch folgende befehlsfolge gelangt man vom eingang zu meinem ";
+10020 print"jetzigen standort:"
+10030 fori1=0tomz-1
+10040 : fori2=0to3
+10045 :   ifm(i1,i2)>0andm(i1,i2)<>i1-1thenprintri$(i2)",";:i2=4
+10050 : nexti2
+10060 nexti1
+10070 print
+10080 print"soll ich weitermachen ?"
+10090 geti$:ifi$<>"j"andi$<>"n"then10090
+10095 ifi$="j"then1125:rem weitermachen
+10099 end
+

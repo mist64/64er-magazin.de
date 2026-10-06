@@ -226,6 +226,46 @@ Skip tokens whose right half starts uppercase or is digit-only — those
 are genuine compounds (`Sub-D-Stecker`, `RS232/V.24-Kabel`,
 `MPS-801`).
 
+### A `¬` WITH A SPACE BEFORE IT IS A DASH, NOT A HYPHENATION
+
+**The test is the space** — the same discriminator as r040's `#` and `>`
+escapes, and for the same reason: a line-break hyphen is **word-final**, with
+no space before it. `wort¬` at a line end is hyphenation. `wort ¬ wort` is a
+spaced **dash** that 010 read as `¬`, and Pass 1's rejoin would silently glue
+the two words together and swallow the dash.
+
+MEASURED on SH8604, over `labels.json`: **37 sites** match `\w+ ¬\s*\w+`, of
+which 13 are prose and were restored by hand — *"für jedes Spielkommando
+intelligent reagiert ¬ also nie einfach nur stupide…"* is an em dash in the
+print and ships as `reagiert – also`. The rest are noise blocks and listings.
+
+Nothing downstream can find these afterwards: **no `¬` survives into any
+issue's HTML**, corpus-wide, so once Pass 1 has joined the words the loss is
+invisible.
+
+**It is a risk, not a standing wound.** Checked on SH8603, which shipped
+without this rule: of its 24 prose sites, **0 were joined** in the published
+HTML and 7 carry a dash — so the hazard is real and did not materialise there.
+Do not go back over published issues for it; find them before Pass 1 runs:
+
+```bash
+# every spaced ¬ in the OCR -- a DASH the engine misread, not a hyphenation
+$PY - "$TMPDIR_ISSUE/ocr/out" <<'PYEOF'
+import glob, json, os, re, sys
+n = 0
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.labels.json'))):
+    for b in json.load(open(f, encoding='utf-8')).get('blocks', []):
+        for m in re.finditer(r'\S+\s¬\s*\S+', b.get('text') or ''):
+            n += 1
+            print('  p%s  %s' % (os.path.basename(f)[:3], m.group(0)[:60]))
+print(f'{n} spaced-¬ site(s) -- each is a dash, not a hyphenation')
+PYEOF
+```
+
+Each one becomes a dash, and **which dash follows r070's ruling**: a spaced
+dash in body text is an en dash. Set it before Pass 1, so the rejoin never
+sees it.
+
 ## Pass 2 — character-level confusions
 
 Walk the article text and apply these only-when-context-confirms
@@ -285,15 +325,18 @@ character class when a scan shows a different confusion; the shape of the
 check -- *a token whose only content is the ambiguous glyph* -- is the part
 that transfers. The district-code case has its own gated check in r310.
 
-### THE BRIEFING BELOW IS STALE WHERE IT CONTRADICTS THIS SECTION
+### The Briefing has been rewritten from this section
 
-The Briefing still tells a sub-agent to skip a candidate whose letter count
-differs ("do not even open the block index"), to leave `<pre>` alone, and to
-run a "two-engine cross-check" whose evidence it then asks for — all three
-reversed above, and the evidence it asks for cannot exist. **Where the Briefing
-and the body disagree, the body wins**, and the Briefing is to be rewritten
-from it before the next build. (SH8602: `spezieles` is OCR damage — the print
-has `spe-zielles` — and the letter-count rule would have kept it.)
+It used to tell a sub-agent to skip a candidate whose letter count differs
+("do not even open the block index"), to leave `<pre>` alone, and to run a
+"two-engine cross-check" whose evidence it then asked for — all three reversed
+in this section, and the evidence unobtainable. This file said "where the
+Briefing and the body disagree, the body wins, and the Briefing is to be
+rewritten before the next build"; **two builds then resolved the contradiction
+by hand instead.** An annotation that survives two builds is not a fix, so the
+Briefing now carries the body's instructions directly. (SH8602: `spezieles` is
+OCR damage — the print has `spe-zielles` — and the letter-count rule would
+have kept it.)
 
 ## A token that is not valid hex is OCR damage
 
@@ -604,16 +647,25 @@ The sub-agent must:
 For **every** candidate in Pass 1 / Pass 2 / Pass 3 the decision
 procedure is:
 
-1. **Character-count heuristic** (see section above). If the
-   candidate would add or drop letters vs the German-correct form,
-   it's a print typo. Skip — do not even open the block index.
-2. **Two-engine cross-check** (see mandatory pre-fix check). Only
-   if step 1 says "looks like OCR" does the agent grep the block
-   index and decide fix vs skip from what it returns.
+1. **Read the glyph on the crop.** The character-count heuristic is NOT a
+   reason to skip: SH8602's `spezieles` is OCR damage — the print has
+   `spe-zielles` — and a letter count would have kept it. Use the count as
+   one piece of evidence, never as a gate, and always open the page.
+2. **Locate it, then decide.** The block index is a PREVIEW (r000): it is
+   truncated at ~200 characters, so most mid-paragraph words and whole boxes
+   are simply not in it — SH8603 could not find the p148 box there and ran
+   its own tesseract word-box pass as a locator, which is the right move.
+   Use `NNN.labels.json` for full text and the word-box pass for position.
 
-The sub-agent should explicitly NOT touch `<address class="author">`,
-`<pre>`, `<code>`, or `<meta>` content. Body `<p>`, `<h1>`/`<h2>`,
-`<li>`, `<td>`, `<figcaption>` are in scope.
+**`<pre>` IS in scope**, together with body `<p>`, `<h1>`/`<h2>`, `<li>`,
+`<td>` and `<figcaption>`: word-level OCR damage inside a listing is damage
+like any other, and SH8603 fixed `JMP $DE60` on p164 accordingly. Line
+STRUCTURE inside a hand-typed listing belongs to r325. Do NOT touch
+`<address class="author">`, `<code>` or `<meta>` content.
+
+(This replaces three instructions the body had already reversed. Two builds
+read "where the Briefing and the body disagree, the body wins" and resolved
+it by hand; an annotation that survives two builds is not a fix.)
 
 ## Evidence-in-report requirement
 
@@ -649,12 +701,22 @@ a candidate is acceptable; claiming an unverified fix is not.
 ```bash
 dir=issues/<YYMM>
 
+# NO `| head` HERE.  r000: A CHECK SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL --
+# and a check truncated to ten lines cannot be seen to fail, because the
+# eleventh finding is indistinguishable from none.  Both of these were piped
+# into `head`.  Print the COUNT, then a sample: the count is the signal and the
+# sample is the lead.
+
 # 1. obvious hyphen-rejoin candidates remaining
-grep -hoE '[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+' "$dir"/*.html | sort -u | head
+n=$(grep -hoE '[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+' "$dir"/*.html | sort -u | wc -l | tr -d ' ')
+echo "  hyphen-rejoin candidates: $n"
+grep -hoE '[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+' "$dir"/*.html | sort -u | sed -n '1,12p;$p'
 # review by hand — most remaining should be genuine compounds.
 
 # 2. obvious lost-space candidates remaining
-grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' "$dir"/*.html | sort -u | head
+n=$(grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' "$dir"/*.html | sort -u | wc -l | tr -d ' ')
+echo "  lost-space candidates: $n"
+grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' "$dir"/*.html | sort -u | sed -n '1,12p;$p'
 # legitimate CamelCase only.
 
 # 3. spot a known fix landed.

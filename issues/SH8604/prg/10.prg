@@ -1,0 +1,1 @@
+                                                                                      šo······p           šo········p         šo··········p       šo············p     šo··············p   šo················p šo··················p_11SIE STEHEN IM TREPPENHAUS,DIE STUFENF%HREN HINAUF ZUM 2.GESCHO&,ZUMDACHBODEN UND ZUM TURM.

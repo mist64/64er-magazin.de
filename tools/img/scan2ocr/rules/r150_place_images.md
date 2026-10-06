@@ -46,6 +46,157 @@ So do not renumber a figure into the neighbouring article's sequence, and do
 not read a `9-0.png` as belonging to a page-9 article when no article starts on
 page 9 — it is the second page-8 article's lead image and belongs at `8-00`.
 
+### `-00` covers the LEAD IMAGE only; four shapes have no name
+
+Each of these came up on SH8603 and had to be settled by hand:
+
+| shape | name | why |
+|---|---|---|
+| a second article's **table** | `<page>-00t<n>` | `-t<n>` is the table series, and `-00` marks the second article; compose them in that order |
+| an **unnumbered** printed "Tabelle." | `<page>-t0` | `t0` for the table the print does not number, so a later numbered one still starts at `t1`. r160's prose may call it "Tabelle 1"; the FILE follows the print |
+| a whole **screen-output** crop | `<page>-s<n>` | not a Bild, not a Tabelle, not a listing — a photograph of the screen standing in for text nobody can set |
+| a figure printed on the page **BEFORE** its article starts | `<its own article's start page>-<n>` | SH8603's p76 carries Bild 1 and Bild 2 for the article that starts on 77a. The figure belongs to the ARTICLE, so the prefix is the article's start page, not the page the ink is on |
+
+That last one is the only one that changes an existing convention, and it has
+to: a figure named for the page it was printed on would land in the
+Checksummer's sequence and be placed in the wrong article.
+
+## NEVER LEAVE AN ORPHAN AT THE END — place it where it fits best
+
+**Owner, 2026-10-06:** *"could not be placed so it's at the end. it's clearly
+part of a series … place it somewhere between 2 and 4. same rule should apply
+to images. dont have orphans at the very end, place them where they fit
+best."*
+
+An element whose print position cannot be determined — a table the OCR never
+anchored, a figure whose callout is missing, a listing the text never names —
+does **not** go to the bottom of the article. The bottom is not a neutral
+place to put something: it reads as the article's conclusion, it lands after
+the byline's closing run, and a reader meets it with no context at all.
+
+**Place it where it fits best, and a numbered series tells you exactly where.**
+SH8604's *Künstliche Intelligenz* shipped its tables as **1, 2, 4, 5, 6 … 3**,
+with Tabelle 3 stranded after Listing 4 at the very end. It belongs between
+Tabelle 2 and Tabelle 4. Where there is no series, use the first text that
+mentions it; where nothing mentions it, use the printed page's own order.
+
+This applies to **images, tables and listings alike** — r130 and r160 place
+the other two and the rule is the same.
+
+### The check: a series whose LAST member is not its highest
+
+Plain ascending order is NOT the test and must not be made one. Magazine
+layout floats figures out of numeric sequence as a matter of course:
+MEASURED over the corpus, **34 articles** carry an out-of-order series, nearly
+all of them correct — 8404's *Commodore Drucker* runs 1-5, 11-14, 6-10
+because that is how the pages fall.
+
+The orphan signature is narrower: **the last member of the series in document
+order is not the highest-numbered, and nothing but markup follows it.** That
+finds 10 articles corpus-wide.
+
+```bash
+$PY - issues/<ID> <<'PYEOF'
+import glob, io, os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
+items = []
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
+    s = io.open(f, encoding='utf-8').read()
+    i = s.find('<article')
+    b = s[i:s.rfind('</article>')] if i >= 0 else s
+    for kind in ('Bild', 'Tabelle', 'Listing'):
+        ms = [(m.start(), int(m.group(1))) for m in
+              re.finditer(r'<figcaption[^>]*>(?:<[^>]+>)*\s*%s\s*(\d+)' % kind, b)]
+        if len(ms) < 3:
+            continue
+        nums = [n for _, n in ms]
+        pos, last = ms[-1]
+        tail = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', b[pos:])).strip()
+        if last == max(nums) or len(tail) >= 400:
+            continue
+        # THE WHOLE TRAILING RUN, not just the last member.  Reporting only the
+        # last one made this a THREE-ROUND check on SH8604's article 10, whose
+        # listings ran 1-15, 17-22, 25, 26, 16, 23, 24: it named 24, and 23 and
+        # 16 only became "last" after each fix.  The run is the maximal suffix
+        # every member of which is below the highest number seen before it.
+        k = len(nums)
+        while k > 1 and nums[k - 1] < max(nums[:k - 1]):
+            k -= 1
+        run = nums[k:]
+        items.append('%s: %s %s at the end; the series reaches %d before them'
+                     % (os.path.basename(f), kind,
+                        ', '.join(str(n) for n in run), max(nums[:k])))
+new = R.delta(sys.argv[1], 'orphan-at-end', items)
+R.report('series ending on a non-highest member', new, len(items),
+         sys.argv[1], 'orphan-at-end')
+PYEOF
+```
+
+A hit is a LOOK: the print may genuinely end on a lower-numbered figure. Read
+the page, place it, and record the ones that are right.
+
+## A 1-BIT CROP THAT IS MOSTLY BLACK IS A THRESHOLDING FAILURE
+
+SH8604 shipped 29 figures whose printed halftone screen had been thresholded
+into near-solid noise — *58-4* was **89.8 % black**, three legible boxes on a
+black field where the page has a full diagram with `VG$=`, `BE$=`, a NIMM
+cascade and `GEFUNDEN!→`. The owner re-cut all 29; the new set's maximum is
+12.0 %.
+
+**Nothing in the chain noticed.** r150's set check counts files against
+references, r310 checks markup, and no gate asks whether a figure is legible
+— so 9 crops above 50 % black and 11 above 40 % passed everything.
+
+```bash
+# black fraction of every placed 1-bit crop.  Photos are exempt: a dark lead
+# photo is legitimately dark.  MEASURED on SH8604 after the re-cut: the only
+# crops above 15 % are the lead photos and 10-5 (21.6 %, CHR$ grids, genuine).
+$PY - issues/<ID> <<'PYEOF'
+import glob, os, sys
+import numpy as np
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
+for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.png'))):
+    im = Image.open(f)
+    # MODE 1 AND P ONLY.  A greyscale (L) crop is a PHOTO and was never
+    # thresholded, so it is legitimately dark: including L flagged exactly
+    # SH8604's six lead photos at 71.6-96.5 % and not one line figure, which
+    # is the check inverted.  "Photos are exempt" has to be in the code, not
+    # only in the prose.
+    if im.mode not in ('1', 'P'):
+        continue
+    a = np.asarray(im.convert('L')) < 128
+    frac = 100.0 * a.mean()
+    if frac > 40:
+        print('  %-16s %5.1f%% black -- look at it at display size' %
+              (os.path.basename(f), frac))
+PYEOF
+```
+
+**It can only flag, never reject** — a solid-black design element and a
+crushed halftone measure the same. State the threshold whenever you quote a
+figure: grey converted, cut at 128.
+
+**Bilevel and palette crops only.** A greyscale crop is a photograph and was
+never thresholded, so darkness there means nothing: with mode `L` included the
+check flagged SH8604's six lead photos at **71.6–96.5 %** and not a single
+line figure — precisely inverted. MEASURED after that fix: 40 bilevel/palette
+crops, **none above 40 %**, the highest being `10-5` at 21.6 % (the CHR$
+grids).
+
+### A figure's page must be inside its article's `64er.pages`, and at 150 it often is not
+
+r150's mapping assumes it is. On SH8603, 080 had left the ranges short for
+article 31 (p38), 47 (p48), 58 (p59) and most of the game-listing pages,
+because a listing-only page carries no headline for 080 to see.
+
+**r320's page-coverage half is the check that catches this, and it runs at the
+END — after 130, 150 and 160 have all depended on the ranges.** Run that half
+immediately after 080 instead. It needs nothing but the HTML and the page
+count, so there is no reason it has to wait, and fixing a range at 080 costs a
+meta edit where fixing it at 320 costs re-placing figures.
+
 **And when you add an article on a page another article already claims, do NOT
 reduce that article's `64er.pages`.** Sharing a page is normal; the other
 article probably prints there too. Look at the page first. 8611 gained a new
