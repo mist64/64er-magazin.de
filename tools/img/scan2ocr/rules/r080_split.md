@@ -108,6 +108,28 @@ so 8612 repeated the defect twice: 169 (Preiswerter Schnellader above, 1000 Mark
 zu gewinnen! below) and 193 (Wir suchen die Anwendung above, Einmal im Monat
 below).
 
+## WHICH PAGES BELONG IN `64er.pages` — and how it is written
+
+030 omits a page carrying only an article's listing by design, so the page is
+not in the consolidated `.md` and the splitter never learns about it. **A page
+that carries only an article's listing still belongs in that article's
+`64er.pages`.** An **ad spread inside the run does not** (SH8604's Odyssey
+98-99). The SH8603 precedent for both lived only in a brief, so SH8604 had to
+rediscover it; it is a rule now.
+
+**A page holding one article's tail and the next one's start is NOT the lettered
+case.** Lettering is for two articles *starting* on the same page (above).
+SH8604's 49, 126, 133 and 161 are tail-plus-start: the page number simply
+appears in both articles' specs, undecorated.
+
+**The separator is a bare comma, no space:** `a-b,c`. MEASURED over the
+published corpus: 240 specs comma-without-space against 58 with. The spaced
+form is concentrated in the recent issues (8609-8612, SH8601, SH8602) and
+SH8604 wrote both forms in one issue, so "look at the latest" misleads here —
+and Verification 4's character class accepts a space, so nothing catches the
+drift. Existing spaced specs stay as they are; the issue you are working on is
+the scope.
+
 The splitter is adapted from `tools/split.py` and **embedded inline in
 `r080_split.sh`** -- there is no `split.py` in this directory. The original
 still works standalone; the embedded copy is canonical for this chain.

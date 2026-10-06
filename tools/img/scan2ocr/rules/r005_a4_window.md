@@ -143,6 +143,17 @@ turns one person into the step. A page whose trace fails gets a BEST-EFFORT
 window from the evidence that is there, and the result is published with a note
 saying which fallback produced it.
 
+**THE SUMMARY CANNOT SEE THIS FAILURE, SO DO NOT WAIT FOR IT TO SAY SO.** The
+program runs the anchor fallbacks only for pages step 005 TRACED. For an
+uncropped page it still produces a window — `traced-edge` off the whole frame
+— and the two numbers that would normally condemn one both look healthy:
+MEASURED on SH8604's p163, **alpha 4.02 %, fabricated 0.00 %**, with ~4 mm of
+scanner bed left along the foot. Fabricated is 0 precisely BECAUSE the window
+sits inside the frame; alpha is small because the frame is bigger than A4.
+Neither can rise for the one defect that is actually present. Check the foot of
+every page the 005 stamp calls `uncropped` by eye, and expect to run a
+recovery.
+
 The rule above assumes every page of an insert traced, so the run can take the
 max per axis. It does not cover a page that failed OUTRIGHT — the trace found
 no card at all and the page was published as an uncropped sheet. MEASURED:

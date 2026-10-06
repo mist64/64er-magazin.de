@@ -204,7 +204,13 @@ echo "Generating HTML..." >&2
 
                 # Check for .txt file (BASIC listing)
                 if [ -f "${OUTPUT_DIR}/${filename_alt}.txt" ]; then
-                    echo "<figure><pre data-filename=\"${filename}\" data-name=\"XXXXXXXXXXXX\"></pre><figcaption>YYYYYYYYYYYYY</figcaption></figure>"
+                    # $filename_alt, NOT $filename: the file on disk is
+                    # ${filename_alt}.txt, and a <pre>'s data-filename is the
+                    # KEY a later .prg download is paired against.  A disk name
+                    # with a slash broke both -- SH8604's "1985/1986" emitted
+                    # data-filename="1985/1986" for prg/1985_1986.txt.  Every
+                    # other branch below already uses $filename_alt.
+                    echo "<figure><pre data-filename=\"${filename_alt}\" data-name=\"XXXXXXXXXXXX\"></pre><figcaption>YYYYYYYYYYYYY</figcaption></figure>"
                     echo ""
                     found=true
                 fi

@@ -105,7 +105,27 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
    ```
 
    `section` is the `toc.txt` line the entry sits under, verbatim. `page` is
-   the printed page number. `entry` is the printed entry text.
+   the printed page number. `entry` is the printed entry text — and "the
+   printed entry text" was too loose to act on, so, MEASURED on SH8604:
+
+   * `entry` is **the bold title as printed, and only that**: not the blurb
+     under it, and not a qualifier the TOC adds such as *(nur auf Diskette)*
+     or a `Kurs:` prefix.
+   * **Normalise the glyphs the way the article FILENAMES do** — `–` for the
+     dash, `'` for the apostrophe, `...` for the ellipsis. The two are compared
+     downstream, and 100 cannot match an entry whose dash is the other one.
+   * **A printed page number that is wrong goes in as printed**, and the
+     misprint is named in `LOG.md`. SH8604's TOC puts MSE on 95; the article
+     starts on 94. Correcting it silently loses the only record that the page
+     and the TOC disagree.
+   * The **disk icon** beside an entry (the Programm-Service marker) OCRs as
+     `EI`, `Ei`, `BE` or `Bi`. It is not part of the entry text.
+   * **A Sonderheft may have NO Rubriken box at all** and still have an
+     Impressum — and, in SH8604, an Einleitung the TOC does not list.
+     Neither this step nor 100 covers that; record both, and do not go
+     looking for a box that is not printed.
+   * Step 1's page loop assumes the TOC is on 6-7 or 4-5. SH8604's is **p5
+     alone**. Find it, do not count on it.
 
    **Why this file exists.** Step 100 needs exactly this and used to
    re-read p6/p7 in full to get it — MEASURED on 8611, where three separate

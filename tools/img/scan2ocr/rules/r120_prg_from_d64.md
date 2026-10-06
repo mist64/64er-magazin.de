@@ -275,8 +275,20 @@ test -s issues/8607/prg.txt && echo "prg.txt OK"
 
 # 2. Every section-separator comment matches the start page of some
 #    article in the issue (otherwise listings will end up orphaned).
-grep -oE '"--+[^"]*"' issues/8607/prg.txt | sort -u
+#    `--+` MISSES A SINGLE-DASH SEPARATOR: SH8604's disks carry
+#    "-dateiverwaltung", which is a text separator and not a program, so
+#    one dash has to match too.  Match the whole class, then eyeball.
+grep -oE '"-+[^"]*"' issues/8607/prg.txt | sort -u
 # Eyeball: each "----------NN" should map to a `NN ….html` in the issue.
+# TWO SHAPES THIS CANNOT DECIDE FOR YOU, both measured on SH8604:
+#   * a separator that is ALL dashes and no page number -- every SH04 disk
+#     opens with a bare "----------------".  It is a section to check 3
+#     below, so an unnumbered intro file under it passes as "placed" while
+#     nothing has said where it goes.  Check 3 is vacuous on these disks;
+#     do not read a clean orphan count as an answer.
+#   * ONE section spanning TWO articles -- disk 40's section feeds both
+#     Kuenstliche Intelligenz and Eliza.  The separator names one start
+#     page; the files divide between two articles at step 130.
 
 # 3. Cross-check: no <figure> block in prg.txt was emitted without a
 #    section separator above it (orphan listing — would have no
@@ -346,6 +358,15 @@ If you see orphans, the very first listings on the disk preceded any
 section separator — they're typically the boot screen / disk
 intro. Treat them per the placement rule (next step): if they don't
 match an article, they get reported, not placed.
+
+## A DATA FILE TYPED `prg` ON THE DISK STILL GETS AN MSE PROPOSAL
+
+The SEQ guard in `prg_links.sh` catches data files the directory marks `seq`.
+It cannot catch a data file the directory marks `prg` — the disk is the only
+thing that knows, and it says the wrong thing. MEASURED on SH8604: disk C holds
+101 PRG-typed DATA files and every one came out of the extractor as a
+`data-mse=mse1` figure proposal. Expect the pile, un-propose it at step 130,
+and do not read 101 proposals as 101 listings.
 
 ## Check 4: every mismatch is one of three things
 
